@@ -618,6 +618,9 @@ export class Scatter {
     // *under* the wall face, is what actually eats the join.
     const clump = (px, pz, { n = 4, spread = 0.55, size = 1, pri = true, litter = 0 }) => {
       if (heightAt(px, pz) < waterY(px) + 0.02) return;
+      // Not `blocked`: the wall-footing pass below aims at exactly that ring. `paved` is the one
+      // ground a priority tuft must not grow through, and priority is what the cap cannot strip.
+      if (T.paved(px, pz)) return;
       const zi = zoneAt(px, pz);
       const zz = kinds[zi].z, f = kinds[zi].f;
       const gid = ++GID;

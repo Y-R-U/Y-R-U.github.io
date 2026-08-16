@@ -10,7 +10,7 @@ import { ZONE_IDS } from '../world/zones.js';
 import { TOWNS, creekZ, nearCamera, CROSSINGS } from '../world/terrain.js';
 import { SCENE_VERSION, district, footprint } from './scene.js';
 import { seedDocument } from './build.js';
-import { whitewall, ROAD, ROAD_WIDTH, SWEPT } from './whitewall.js';
+import { whitewall, ROAD, ROAD_WIDTH, PAVED } from './whitewall.js';
 
 export function demoScene(terrain) {
   const doc = { version: SCENE_VERSION, name: 'Demo', districts: [], objects: [] };
@@ -21,16 +21,21 @@ export function demoScene(terrain) {
   return seedDocument(doc, skips);
 }
 
+// Whitewall's paved ground belongs to the town rather than to the scene document, so a saved
+// scene gets it too — the generator is skipped on that path and the Yard would come back a lawn.
+// A surface, not a footprint: paving has no building on it to shade the ground, and the scatter
+// mask on its own cannot change the colour of the ground it is masking.
+export function paveLight(terrain) {
+  for (const r of PAVED) terrain.addPatch(r, 'light');
+}
+
 // An authored town draws nothing from the district's RNG stream, so seedDocument starts it at
 // zero — which is what the 0 returned here says.
 function authored(doc, terrain, zone, di) {
   for (const o of whitewall()) {
     if (!nearCamera(o.x, o.z)) doc.objects.push({ id: 0, dist: di, zone, seed: 0, ...o });
   }
-  // The scatter mask, not a footprint: a swept yard has no building on it to shade the ground.
-  for (const r of SWEPT) {
-    for (let z = r.z0; z <= r.z1; z += 3) for (let x = r.x0; x <= r.x1; x += 3) terrain.mark(x, z, 2.2);
-  }
+  paveLight(terrain);
   doc.districts.push(district(zone, TOWNS[di].cx, {
     seed: 0x2f1a71 + di * 977, road: ROAD, roadWidth: ROAD_WIDTH, kerbs: [], bridge: bridgeFor(di),
   }));

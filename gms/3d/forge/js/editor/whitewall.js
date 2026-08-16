@@ -49,8 +49,9 @@ export const SPOTS = {
 };
 
 // A gate leaves GAP metres of wall out either side of its centre line and stands a tower TOW out
-// on each side, so the clear opening between the two towers is 18.8 m — the 18 m principal street
-// of WORLD.md §3.
+// on each side. What is left is 2 · (TOW − 1.3 · r) = 16.6 m, and that is now both the opening
+// you can see and the one you can walk through: the 1.3 is the tower's battered foot, drawn and
+// collided at the same radius (scene.js `TOWER_FOOT`). WORLD.md §3 wanted 18.
 const GAP = 18.5, TOW = 14, CORNER_R = 5;
 
 // A curtain run over 24 m grows its own gatehouse (buildings.js `gate = length > 24`), and every
@@ -59,9 +60,8 @@ const GAP = 18.5, TOW = 14, CORNER_R = 5;
 // modules, and the ruined stretch and the hoarding, which need six and seven.
 const RUN_MAX = 24;
 
-// `retaining` is the enclosure wall: a battered face, a coping course and buttresses every 8 m.
-// Measured at 57 triangles a run against a curtain wall's 62 a metre, and none of the
-// crenellation a granary has no business having.
+// The shortest stretch worth emitting: `retaining`'s own schema minimum in scene.js, under which
+// the object does not normalise.
 const WALL_MIN = 6;
 
 const P2 = Math.PI / 2;
@@ -105,7 +105,9 @@ function wallLine(out, { axis, fixed, from, to, gaps = [], max, min, make }) {
 }
 
 // A room at ground level: four `retaining` runs round the plot with a gap where each door goes.
-// `doors` are keyed by side and given in world coordinates along that side.
+// `retaining`, not `wallRun`, because a granary has no business with a crenellated parapet — and
+// because a run of it is two orders of magnitude cheaper. `doors` are keyed by side and given in
+// world coordinates along that side.
 function room(out, r, { h, batter = 0.05, max = 20, doors = {} }) {
   const g = side => (doors[side] || []).map(([at, w]) => [at - w / 2, at + w / 2]);
   const make = (o, x, z, ry, length) => put(o, 'retaining', x, z, ry, { length, height: h, batter });
@@ -275,10 +277,11 @@ export const ROAD = [
 // Matches the King's Road's own half-width so the two read as one road through the gate.
 export const ROAD_WIDTH = 9;
 
-// Ground the town keeps swept: the square and the floor of every walled room. These go into the
-// terrain's scatter mask, which is the only thing that decides where grass grows — a 60 × 50 m
-// lawn in the middle of a limestone town was the single loudest wrong note in the first render.
-export const SWEPT = [
+// Sanctum Yard and the floor of every walled room. `terrain.addPatch` surfaces these in the
+// zone's own road stone — `marbleCobble` for Whitewall — and masks scatter off them. The mask
+// alone is not enough and never was: groundColour() does not read the mask, so without a surface
+// over it the Yard is a 60 × 50 m lawn and the Sanctum is a paddock with a font on it.
+export const PAVED = [
   PLOTS['wwa.market'], PLOTS['wwa.temple'], PLOTS['wwa.kitchen'], PLOTS['wwa.granary'],
   PLOTS['wwa.almonry'], PLOTS['wwa.cloister'], PLOTS['wwa.cells'], PLOTS['wwa.works'],
 ];

@@ -392,3 +392,344 @@ This is the point of building one first, so: concretely.
 9. **`wwa_steps` is the weakest framing in the set.** The place is built and Rell and the fishing
    spot are on it, but the Vail reads as a pale band in the fog at that distance and I did not find
    a camera that fixes it inside my remaining budget.
+
+---
+
+# A8-fix — answering `docs/REVIEW_A8_WHITEWALL.md`
+
+Same profile as §3 throughout: `--preset=medium --dpr=1 --w=844 --h=390`, `shadowRate` forced to
+every frame, `node tools/budget.mjs --traverse --step=25` (348 samples). New traverse in
+`docs/TRAVERSE_A8_FIX.json`; `docs/TRAVERSE_A8.json` is kept as the before.
+
+| | before | after | gate |
+|---|---|---|---|
+| worst calls | **189** (122 main + 67 shadow) | **149** (122 main + 27 shadow) | 150 |
+| samples over 150 calls | 19 of 348 | **0 of 348** | |
+| worst total tris | 320.0k | **331.1k** (186.1k main + 145.0k shadow) | 350k |
+| samples over 350k | 0 of 348 | **0 of 348** | |
+| p50 / p95 | 74.1k / 254.2k · 74 / 154 | **76.6k / 263.0k · 72 / 124** | |
+
+508 → **511 tests, 0 failing**. `lintQuests` 0 errors and the same one `light.06` warning.
+`lintText` clean.
+
+---
+
+## 1. The draw-call gate — 189 → 149
+
+Two changes, measured one at a time.
+
+### One depth-only mesh per LOD set — 189 → 164
+
+`build.js` `mergeShadow()`. Every block's `detail` and `proxy` holder now carries a single
+position-only mesh merged from every surface that was casting on its own, and those surfaces get
+`castShadow = false`. A shadow pass has no material distinctions to keep, so this is the same
+shadow at one call a block instead of ~2.9.
+
+The mechanism is the only one three allows. `material.visible` is read in **both** passes, but
+`projectObject` builds the main render list *before* `shadowMap.render` runs, and `app.js` already
+wrapped `shadowMap.render` for the stats mark. `App.shadowOnly` is a list of materials that
+wrapper flips on for the shadow pass and off again; `demo.js` registers `build.js`'s one shared
+`shadowOnly` material into it. Layers do not work for this — `WebGLShadowMap.renderObject` tests
+`object.layers` against the **view** camera, so a layer excludes from both passes or neither.
+
+Measured on its own: worst calls **189 → 164**, worst shadow calls 67 → 27, `wall_day` total
+184 → 154. Triangles moved by +0.3 % (the merged mesh has one bounding sphere where three or four
+used to be frustum-culled separately). Nothing else moved.
+
+That left the overage in the **main** pass, which the review's arithmetic had attributed to blocks:
+at the worst frame 20 drawn blocks are ~72 of 138 main calls, not all of them. The other ~66 are
+9 contact-AO chunks, 8 water, 6 ground chunks, 6 road ribbons, 3 bank, ~12 foliage kinds and ~20
+people / props / nodes / doors.
+
+### `trim` folds into `wall` for proxy sets only — 164 → 148
+
+`endBatch(root, fold)` renames surfaces on the way into the merge buckets, and `block()` passes
+`PROXY_FOLD` for the proxy set. A proxy set is never seen closer than `lodDetail`'s 70 m, where the
+ridge cap is 0.27 m and a window surround is 1.53 m — one to two pixels at 844 × 390. Four merged
+meshes a block become three.
+
+`glass` deliberately stays its own surface. I measured folding it too: another **12 calls** at the
+worst frame (149 → 137) and no visible difference at all in `town_night` or from outside the north
+gate at night, because Whitewall's wall hides its houses — **but** a night view of Longacre from
+120 m loses its three or four lit windows entirely, and the whole window-lighting system exists for
+that. Not taken. It is the next lever if Blackstone needs it, and it is worth 12.
+
+### What this did *not* fix
+
+The worst frame is **(−518, −216) yaw 120**, on the Drove road 74 m outside the north gate, where
+19 of Whitewall's 20 blocks are drawn as proxies at once. 149 against 150 is **one call of
+margin**, and two more walled towns of this footprint will not fit under it. Ranked, measured
+where I could:
+
+1. **`glass` into `wall` for proxies** — −12, costs distant lit windows. Measured.
+2. **A coarser second-level block past `lodDetail`** — the 19 proxy blocks are ~54 of the 122 main
+   calls; grouping them 3 × 3 would be ~12. Not attempted; it needs stream.js to fall back to
+   per-block sets wherever one sub-block is inside the detail radius.
+3. **`AOC` 120 → 240** in terrain.js — worth ~4–5 calls and costs decal triangles, which is the
+   wrong way round: the comment on `AOC` already says so.
+
+`BLK` is dead, as the review established. Do not measure it again.
+
+## 2. Sanctum Yard was grass, and the mask could not have fixed it
+
+The review is right on all three counts and the comment at `whitewall.js:278` was false. Replaced,
+and the mechanism replaced with one that works.
+
+**`terrain.addPatch(rect, zoneId)`** surfaces a rectangle in the zone's own `road` material —
+`marbleCobble` for Whitewall — as one merged mesh per zone, built in `buildPatches()` and pushed
+into `roadSegs` so it culls on the same distance rule the ribbons do. It sits at `surfaceY + 0.05`,
+0.01 m under the road ribbon and at `renderOrder` 0, so the street crossing the square is the
+street rather than a seam. The edge fades over 2.4 m with the same fbm the ribbons wear, and the
+rect is grown by that fade so a room's paving runs under its wall rather than stopping at it.
+**One draw call for the whole town.**
+
+`whitewall.js` `SWEPT` is now `PAVED` and is the eight plots: the square and the seven walled rooms.
+`demoScene.paveLight()` applies it, and `demo.js` calls it on the **saved-scene path too** — §8.6's
+"a saved scene loses the swept ground" is closed.
+
+The scatter leak is closed at its source. The occupancy grid's second bit now means *surfaced*
+(`terrain.paved()`), and `scatter.js`'s `clump()` returns early on it. It cannot use `blocked()`:
+that ring is exactly where the anti-sticker tufts belong, and testing it would strip the wall-footing
+grass off every building in the valley.
+
+**Proof.** Counting instanced scatter transforms inside the eight rects on a cleared-storage first
+run: the review counted 1,089 source items; the tree now draws **0 of 2,960 instances inside the
+paved rects**, against 2,641 inside the precinct wall. By eye: `shots/wwa_yard.png`,
+`wwa_sanctum.png`, `wwa_almonry.png`, `wwa_cloister.png`, `wwa_works.png` and `wall_day.png` are
+paved wall to wall. This is a first run with `localStorage` cleared, same as the review's.
+
+## 3. The room floors, not the roofs
+
+Done as the review recommended, by the same mechanism as finding 2 — the seven walled rooms are in
+`PAVED`. `wwa_sanctum.png` is a courtyard with the font standing on cobble; `wwa_almonry.png` is
+the Store's yard with the shelf and the tally on it; `wwa_granary.png` is the game's opening frame.
+**No room was roofed and no `house` was substituted**: the four reasons in §2 stand, the review
+verified them, and nothing in `interior.js`, `doors.js`, `props.js` or `people.js` was touched. All
+11 Whitewall houses still enter (`doors.jump()` → `state: 'in'` on every one).
+
+## 4. The Lantern Spire
+
+The cause is that every dressing in `tower()` is a *fraction of the shaft*, which is right for the
+two- and three-storey turrets it was tuned on and wrong at 58 m. Fixed generally, above a
+threshold, so no existing tower in the world changes:
+
+```js
+const LOFTY = 30, STOREY = 8.4;   // shaft metres; floor-to-floor at K = 1.5
+```
+
+A shaft over 30 m gets its opening bands and its string courses on the absolute storey rhythm
+instead of at 0.34 / 0.66 / 0.88, plus a ground-level doorway on one face standing on the plinth the
+batter already climbs to, plus a **lantern**: a glazed stage on half the shaft's faces, standing
+inside the parapet and carrying the roof. The lantern's panes are ordinary `glass`, so
+`materials.js` `windows.discover()` finds them and the Spire lights from the inside after dark
+without a line of code about it.
+
+Lowest opening **21.4 m → 8.1 m**; first string course 22.5 m → 5.4 m; the doorway at 2.9 m. Only
+two towers in the world are over `LOFTY` — the Spire and the Blackstone keep in `budget.mjs`'s spec
+table — and every other tower is byte-identical, including its RNG draws.
+
+**Cost, and what I traded back.** The Spire is the one object pinned `lod: 'full'`, so its
+triangles are resident everywhere. First cut was 4.7k → 13.7k and took the worst traverse frame to
+337.7k, a 3.5 % margin. Halving the lantern's faces (`n >> 1`) and dropping the lofty opening
+probability from 0.62 to 0.44 brought it to **9.9k** and the worst frame to **331.1k**. The
+Blackstone keep goes 3.1k → 7.1k on the same rule, which is a bill A9 now owes.
+
+Judged by eye at player height: `wwa_yard.png`, `wwa_gate.png`, and framings from the south gate
+and from the Yard's south edge. It is no longer a blank drum for its visible height and it has the
+thing it is named for.
+
+## 5. The Spire's collider
+
+Fixed generally, and both halves moved so nothing invisible is left behind.
+
+- `scene.js` exports `TOWER_FOOT = 1.3` and `TYPES.tower.plan` is `radius × TOWER_FOOT`.
+- `buildings.js` imports the same constant and the drawn foot's widest ring is now
+  `radius × TOWER_FOOT` instead of `× 1.5`.
+
+So the drawn stone and the collider are the same number, from one place. The skirt loses 0.2 ×
+radius of a 0.6 m-tall ring; nothing else about a tower changes. The alternative — collider at 1.5
+× radius, geometry untouched — costs 4.5 m of Sanctum Yard and stops the player 4.5 m short of
+anything they can see.
+
+Measured live with the real `walkStep` at the Spire, stepping inward one metre at a time:
+
+| distance from centre | before | after |
+|---|---|---|
+| 9.5 m | blocked | blocked |
+| **10.5 m** | **free** | blocked |
+| 11.9 m | free | blocked |
+| **12.5 m** | free | **free** |
+
+Drawn stone now reaches 11.7 m and the player stops at 12.22 m (11.7 + 0.18 collider pad + 0.34
+body). `wwa.market.stall` at 14.0 m clears it by 2.3 m instead of 0.5 m.
+
+**The gate opening changed and the comment with it.** `whitewall.js:53` claimed 18.8 m; the review
+pointed out the *visual* opening was 14.8 m. Both numbers are now one number: 2 · (14 − 1.3 · 4.4)
+= **16.6 m** drawn, 16.2 m walkable, measured at ±7 m either side of the centre line. That is 1.4 m
+under WORLD.md §3's 18 m principal street. I did not widen `TOW` to buy it back: at `TOW` 15 the
+north gate's west tower comes within 0.3 m of the gate cells' east wall, and the layout is tuned
+tighter than that number is worth.
+
+## 6. The coverage test
+
+`whitewall.test.js` is 14 → 17 tests. The 34 m radius is gone.
+
+**Coverage now reads the area table, not the quest graph.** `referenced()` is deleted: walking
+`area` / `in` / `at` keys out of the packs only ever found 15 of the 19 light-side areas, which is
+why nothing asserted the Spire, the board, the Cloister or three of the four gates existed. The
+test iterates every light-side area in `areas.json` — **18 plots**, up from 12 — minus an explicit
+three-entry `REGIONS` list.
+
+**"Near" is replaced by "on".** `overlaps(area, object)` is separating-axis between the object's
+collider plan and the area's shape. In a town of 20 m plots a 34 m radius asked "is there a
+building somewhere near here", which is always true.
+
+**The exemption list is guarded.** `REGIONS` is the hole a future town could hide in, so a test
+asserts each entry is a rect at least 100 m across that fully contains at least one light area that
+is *not* exempt.
+
+Revert checks, each run and each reddened:
+
+| # | mutation | old test 2 | new tests |
+|---|---|---|---|
+| 1 | delete `yard()` — Spire, Yard post, market arcades | **green** | coverage **red** (market, spire, board) |
+| 2 | delete `almonry()` | **green** | coverage **red**, room-sides **red** |
+| 3 | delete `works()` | **green** | coverage **red**, room-sides **red** |
+| 4 | delete `cloister()` | **green** (unchecked) | coverage **red**, room-sides **red** |
+| 5 | delete `sanctumRange()` | red | coverage **red**, room-sides **red** |
+| 6 | delete `cells()` | green | room-sides **red**, coverage green — see below |
+| 7 | delete `reach()` | red | coverage **red** ×4 |
+| 8 | `room()` stops emitting its east side | green | room-sides **red** |
+| 9 | the works yard loses its north wall | green | room-sides **red** |
+| 10 | the granary left off `PAVED` | — | paving **red** |
+| 11 | `plan: p => [p.radius, p.radius]` back in scene.js | green | tower-foot **red** |
+| 12 | `'wwa.spire'` added to `REGIONS` | — | regions **red** |
+| 13 | `'wwa.market'` added to `REGIONS` | — | regions **red** |
+
+**Test 3 is now per side.** "Three or more `retaining` runs within 4 m of the plot" became "every
+one of the four sides has wall on it", with a two-entry table naming the sides that are open by
+design — `wwa.cells` north (the precinct wall is it) and `wwa.works` east (open to the street).
+That table is now an assertion rather than a paragraph in this file.
+
+**Row 6 is the one residual hole and it is honest.** `wwa.cells` is a 18 × 18 rect immediately
+inside the north gate, and the west gate tower's collider stands inside it. So the *coverage* test
+still passes with the cells deleted; the *room-sides* test does not. Every other plot is covered by
+its own geometry alone.
+
+Two more tests were added for the fixes above so they cannot silently revert: `PAVED` must be
+exactly the plot table, and every tower's collider plan must equal `radius × TOWER_FOOT`.
+
+## 7. Checked live, in the browser
+
+- **`light.01` completes end to end on this tree.** Cleared `localStorage` → slate → Whitewall →
+  player at (−547.0, −24.0), `here: ['wwa','wwa.granary']` → `spawner.tick()` places **8 rats, all
+  `area: wwa.granary`** → **15 real `session.cast()` bolts** kill all eight (the review's number to
+  the bolt) → step 2 → lamp lit through the real context button, which resolved to
+  `interact` / `wwa.granary.lamp` → step 3 → Bel's context resolved to `talk` / `bel` and
+  `light.01.out` played to its last line → **`light.01: done`**, flags `wwa.granary.clear`,
+  `unlocked.light.02`, `unlocked.light.05`.
+- All **11** Whitewall houses entered via `doors.jump()`; `state: 'in'` on every one. 25 doors in
+  the world, unchanged — the proxy fold does not duplicate them.
+- `?editor=1` boots: 189 objects, 35 blocks, no exceptions.
+- Zero console warnings or exceptions through boot and play.
+
+## 8. What this cost, stated plainly
+
+1. **Geometry memory is up 10.7 MB.** The depth meshes are 934,692 vertices of positions against
+   1,097,417 vertices of everything else in the scene — a 31 % increase in mesh memory for the
+   whole world. Nothing gates this and nothing tracks it (`budget.js` `track()` is textures), but it
+   is real and it is on a phone. Quantising those positions to `Int16` inside each block's box would
+   halve it and is not done.
+2. **One call of margin.** 149 against 150 at the worst frame. Two more towns will break it; §1
+   ranks the levers with the two I measured.
+3. **The triangle margin is thinner: 8.6 % → 5.4 %.** 11.1k of that is the Spire (+5.2k main,
+   +5.0k in the shadow pass because the depth mesh carries it too) and the paving (~2.4k, always
+   resident inside the town).
+4. **Every foliage clump in the valley re-rolled.** `clump()`'s new early return and the tower
+   footprint change both shift the scatter RNG stream, which §3 already documents as re-rolling the
+   whole world. `creek_day` moved 98,294 → 98,769 tris (+0.5 %) and its trees moved; the other four
+   scored plates are within noise. This is visible in `shots/creek_day.png` and it is not a defect.
+5. **Still no phone.** Every number here is headless and software-rendered. `docs/PHONE_TEST.md` is
+   still owed, and 150 is still an unmeasured budget.
+6. **The five plates were still not blind-compared.** `tools/compare.mjs` cannot run here —
+   `gms/3d/aaa_refs/refs/clean/` does not exist on this machine, exactly as the review found. I
+   judged every render by eye at player height.
+7. **`wall_day` is unresolved.** The review recommends promoting a north-gate framing into `SHOTS`
+   and re-aiming or retiring `wall_day`, and gives a second reason: its 13 m keep-out is a permanent
+   hole through the Cloister. I did not touch `SHOTS` — it is the critic's contract and moving a
+   camera re-scores a plate and moves the layout. It is a decision for Aaron, not a fix. §4's
+   account and D6's label complaint both still stand.
+8. **The `retaining` triangle claims are still unverified**, as the review said. So is the masonry
+   reading as brick rather than ashlar — that is `zones.js`, which is frozen.
+9. **`row()`'s `real` is a count, not a ratio.** The review is right; §6 below says so now.
+
+## 9. What a second town reuses, and what it needs fresh — rewritten
+
+This replaces §6. §6 was written before the review; three of its claims were wrong or too generous
+and the fixes above changed two more.
+
+### Free, and now genuinely free
+
+- **`wallLine()` + `segments()`, `room()`, `circuit()`** — unchanged, zone-agnostic, and
+  `js/world/zones.js` is still byte-for-byte untouched. That property survived this pass and it is
+  what makes the next two towns a plot table rather than a wave of engine work. Keep it.
+- **The test harness.** `blockedBy`, `walkable`, `placements()`, `overlaps()`, `REGIONS`. Point
+  them at `lac.*` / `bst.*` and every assertion holds verbatim — but read the corrections below
+  before believing §6's "the same 14 guarantees for the cost of a plot table". It is now 17
+  guarantees and the two that mattered were hollow until this pass.
+- **Paved ground.** `terrain.addPatch(rect, zoneId)` costs one draw call for a whole town's squares
+  and room floors, surfaces them in that zone's own `road` material with no new art, and masks
+  scatter off them properly. A town's `PAVED` list is its plot table; one test asserts the two
+  agree. **Longacre's Tithe Barn precinct and Blackstone's forge, cistern, barracks, shift kitchen
+  and chantry are all `room()` shapes and will all be lawns unless they are in that list.** This is
+  the single highest-value thing this pass added.
+- **Tall towers.** `tower()` dresses anything over a 30 m shaft on a storey rhythm with a door and
+  a lantern stage, and the lantern lights itself at night through the existing window system.
+  Blackstone's keep (r 11, h 52) is over the threshold and gets it for nothing — but see the bill
+  below.
+- **The draw-call machinery.** The merged shadow pass and the proxy surface fold are per-block, so
+  they scale with the towns rather than being spent on Whitewall. A second town's blocks arrive
+  already paying the reduced rate.
+
+### Corrections to §6
+
+- **`row()`'s `real` is a count, not a ratio.** §6 said "a second town starts at 1-in-3". Writing
+  `real: 3` gives you three full houses in that row, not one in three. The knob is still the whole
+  perf story; the sentence was wrong.
+- **The reuse claim was 13 guarantees, not 14.** Coverage was hollow for 11 of the 12 areas it
+  checked and did not check four of them at all. It is fixed here — but the lesson generalises: a
+  guarantee expressed as a radius around a point is not a guarantee in a dense town.
+- **A saved scene used to lose the paving.** It does not now (`demo.js` calls `paveLight` on the
+  load path), but the pattern is worth copying: anything the *generator* does to the terrain has to
+  be redone on the saved-scene path, because `startScene()` returns the document and skips the
+  generator entirely. There is exactly one such thing today. Do not add a second without wiring it
+  the same way.
+
+### Needs writing fresh, per town — unchanged
+
+The plot table (~10 rects and ~6 circles out of `areas.json`), the `PAVED` list (the same table),
+the road polyline, and the composition. Longacre must still keep `roadWidth: 0`.
+
+### The bills the next two towns arrive owing
+
+1. **Draw calls, 1 of margin.** Whitewall alone is 149 of 150 at the worst frame, and the worst
+   frame is *outside* the town looking at 19 proxy blocks. Longacre and Blackstone each add another
+   ~20 blocks and the King's Road runs between all three. **Measure the traverse before authoring
+   the second town's composition, not after.** The two levers are §1's list; the first is measured
+   at −12 and the second at roughly −40 but needs stream.js work.
+2. **Triangles, 5.4 % of margin.** Blackstone's keep costs 7.1k instead of 3.1k under the new tall
+   tower rule, and if it is pinned `lod: 'full'` the way the Spire is, that is resident everywhere
+   in the town. Decide that deliberately.
+3. **Blackstone's terraces.** Unchanged from §6: `field.js` gives `dark` a real 26 m riser, so
+   `kerb()` finally fires and `retaining` becomes structural. Whitewall exercised none of it.
+4. **`bst.levels`.** Still no subterranean support anywhere in the engine.
+5. **`wall_day`.** Settle it before Longacre, not after — each town gets a scenario keep-out and
+   the question is otherwise answered three times.
+6. **`stand.east` is still in the West March**, still marked `town: "light"`, and may belong to
+   Longacre's wave.
+
+### The one-line version
+
+A second town is a plot table, a `PAVED` list, a road polyline and a composition — about a day —
+plus a traverse run *before* the composition is fixed, because the draw-call budget is now the
+binding constraint and Whitewall spent all but one call of it.

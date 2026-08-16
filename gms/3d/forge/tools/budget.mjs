@@ -79,7 +79,8 @@ const WALK = `(() => {
       const per = (g.index ? g.index.count : g.attributes.position ? g.attributes.position.count : 0) / 3;
       const tris = per * (o.isInstancedMesh ? o.count : 1);
       if (tris > 0) {
-        let drawn = vis;
+        // material.visible is how a depth-only mesh stays out of the main render list
+        let drawn = vis && [].concat(o.material).some(m => m.visible);
         if (drawn && o.frustumCulled) {
           // An InstancedMesh's own bounding sphere spans its instances; its geometry's spans one
           // blade of grass at the origin. Using the wrong one culls the entire foliage system.

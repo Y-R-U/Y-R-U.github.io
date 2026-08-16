@@ -19,6 +19,10 @@ const num = (v, def) => (Number.isFinite(+v) ? +v : def);
 // comfortably and should be a mass.
 export const HOUSE_MIN_W = 10;
 
+// How far past the shaft radius a tower's foot spreads at ground level. Shared with buildings.js
+// so the drawn stone and the collider cannot drift apart again.
+export const TOWER_FOOT = 1.3;
+
 const HOUSE_SIZE = [
   { key: 'w', label: 'Width', min: HOUSE_MIN_W, max: 36, step: 0.5, def: 12 },
   { key: 'd', label: 'Depth', min: 9, max: 30, step: 0.5, def: 10.5 },
@@ -46,7 +50,10 @@ export const TYPES = {
       { key: 'height', label: 'Height', min: 8, max: 60, step: 0.5, def: 27 },
       { key: 'sides', label: 'Sides', min: 8, max: 16, step: 1, def: 12 },
     ],
-    plan: p => [p.radius, p.radius], margin: [2.4, 2.4],
+    // `radius` is the shaft; the battered foot buildings.js draws under it reaches 1.3 × that at
+    // the ground, and a collider on the shaft alone let the player walk 4 m into the stone of a
+    // radius-9 landmark. The foot's widest ring and this figure are the same number on purpose.
+    plan: p => [p.radius * TOWER_FOOT, p.radius * TOWER_FOOT], margin: [2.4, 2.4],
     tall: p => p.height + p.radius * 3.2,
   },
   wallRun: {

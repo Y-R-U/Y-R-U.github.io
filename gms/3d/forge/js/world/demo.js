@@ -6,8 +6,8 @@ import { Terrain, CAMERAS, setCameras, heightAt, TOWNS } from './terrain.js';
 import { Scatter } from './scatter.js';
 import { Stream } from './stream.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
-import { SceneBuilder } from '../editor/build.js';
-import { demoScene } from '../editor/demoScene.js';
+import { SceneBuilder, shadowOnly } from '../editor/build.js';
+import { demoScene, paveLight } from '../editor/demoScene.js';
 import { loadScene } from '../editor/store.js';
 
 // x and z are offsets from the town the shot belongs to and **y is height above the ground at
@@ -59,7 +59,10 @@ export class Demo {
     this.terrain.registerKnobs(q);
     this.scatter.registerKnobs(q);
     this.stream.registerKnobs(q);
-    if (app) app.stats.blocks = () => this.stream.counts;
+    if (app) {
+      app.stats.blocks = () => this.stream.counts;
+      app.shadowOnly.push(shadowOnly);
+    }
   }
 
   // For quality.onRebuild. Only the terrain's own meshes are rebuilt: the occupancy grid, the
@@ -141,7 +144,7 @@ function startScene(terrain, report) {
     const saved = loadScene();
     if (saved) {
       report(saved);
-      if (saved.doc) return saved.doc;
+      if (saved.doc) { paveLight(terrain); return saved.doc; }
     }
   }
   return demoScene(terrain);

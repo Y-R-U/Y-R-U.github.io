@@ -4,11 +4,11 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { TYPES, HOUSE_MIN_W } from './scene.js';
-import { whitewall, PLOTS, SPOTS, GATES, CIRCUIT, segments } from './whitewall.js';
+import { TYPES, HOUSE_MIN_W, TOWER_FOOT } from './scene.js';
+import { whitewall, PLOTS, PAVED, SPOTS, GATES, CIRCUIT, segments } from './whitewall.js';
 import { anchor } from '../game/placement.js';
 import { contains, centreOf } from '../game/areas.js';
 
@@ -53,19 +53,34 @@ function walkable(from, to, pad = BODY) {
 // Anything with a shape near enough to Whitewall to be this town's job.
 const lightAreas = () => Object.values(AREAS).filter(a => a.town === 'light');
 
-function referenced() {
-  const ids = new Set();
-  const walk = o => {
-    if (Array.isArray(o)) return o.forEach(walk);
-    if (!o || typeof o !== 'object') return;
-    for (const [k, v] of Object.entries(o)) {
-      if (typeof v === 'string' && ['area', 'in', 'at', 'to', 'from'].includes(k) && AREAS[v]) ids.add(v);
-      else walk(v);
-    }
-  };
-  for (const f of readdirSync(`${DATA}/quests`)) walk(load(`quests/${f}`));
-  for (const f of ['props.json', 'cast_at.json', 'gather.json', 'escorts.json']) walk(load(f));
-  return [...ids].filter(id => AREAS[id].town === 'light');
+// The coverage test below reads the area table rather than the quest graph. Walking `area` / `in`
+// / `at` keys out of the packs only ever found 15 of the 19 light-side areas, so the Spire, the
+// board, the Cloister and three of the four gates had nothing asserting they were built at all.
+// These three are the only exemptions: a reach and a town are regions, covered through the
+// children standing inside them. Adding to this list is how the coverage would go hollow again,
+// which is what the test under it is for.
+const REGIONS = ['wwa', 'reach.light', 'reach.east'];
+const plotAreas = () => lightAreas().filter(a => !REGIONS.includes(a.id));
+
+// Does an object's collider plan overlap the area's shape at all? Separating-axis on the four
+// candidate axes for a rect, closest-point for a circle. This replaces a 34 m radius around the
+// area centre, which in a town of 20 m plots asked "is there a building somewhere near here" —
+// true of eleven of the twelve areas it checked even with their own geometry deleted.
+function overlaps(area, o) {
+  const s = area.shape;
+  const [hw, hd] = TYPES[o.type].plan(o.p);
+  const c = Math.cos(o.ry), sn = Math.sin(o.ry);
+  if (s.k === 'circle') {
+    const px = s.x - o.x, pz = s.z - o.z;
+    const lx = px * c - pz * sn, lz = px * sn + pz * c;
+    return Math.hypot(Math.max(0, Math.abs(lx) - hw), Math.max(0, Math.abs(lz) - hd)) <= s.r;
+  }
+  const rhw = Math.abs(s.x1 - s.x0) / 2, rhd = Math.abs(s.z1 - s.z0) / 2;
+  const dx = o.x - (s.x0 + s.x1) / 2, dz = o.z - (s.z0 + s.z1) / 2;
+  const ac = Math.abs(c), as = Math.abs(sn);
+  if (Math.abs(dx) > rhw + hw * ac + hd * as || Math.abs(dz) > rhd + hw * as + hd * ac) return false;
+  const lx = dx * c + dz * sn, lz = dz * c - dx * sn;
+  return Math.abs(lx) <= hw + rhw * ac + rhd * as && Math.abs(lz) <= hd + rhw * as + rhd * ac;
 }
 
 // Every prop, body and node the placement layer puts inside a light-side area, at the same world
@@ -101,25 +116,59 @@ test('the plots are the rects data/areas.json declares, to the metre', () => {
   }
 });
 
-test('every light-side area a quest, prop, body or node names has geometry standing on it', () => {
+test('every light-side plot has geometry standing inside its own shape', () => {
   const missing = [];
-  for (const id of referenced()) {
-    const a = AREAS[id];
-    // A reach or a town is a region rather than a plot; it is covered through its children.
-    if (a.shape.k === 'rect' && Math.abs(a.shape.x1 - a.shape.x0) > 100) continue;
-    const c = centreOf(a);
-    const near = OBJECTS.filter(o => Math.hypot(o.x - c.x, o.z - c.z) < 34);
-    if (!near.length) missing.push(id);
-  }
-  assert.deepEqual(missing, [], 'named place with nothing built at it');
+  for (const a of plotAreas()) if (!OBJECTS.some(o => overlaps(a, o))) missing.push(a.id);
+  assert.deepEqual(missing, [], 'named place with nothing built on it');
 });
 
-test('the walled rooms enclose their own plot and nothing else', () => {
+const extremes = a => (a.shape.k === 'circle'
+  ? [[a.shape.x - a.shape.r, a.shape.z], [a.shape.x + a.shape.r, a.shape.z],
+    [a.shape.x, a.shape.z - a.shape.r], [a.shape.x, a.shape.z + a.shape.r]]
+  : [[a.shape.x0, a.shape.z0], [a.shape.x1, a.shape.z1]]);
+
+test('the only areas exempt from that are regions holding a place that is not', () => {
+  for (const id of REGIONS) {
+    const a = AREAS[id];
+    assert.ok(a?.shape.k === 'rect' && Math.abs(a.shape.x1 - a.shape.x0) >= 100,
+      `${id} is exempt from the coverage test and is not big enough to be a region`);
+    const held = lightAreas().filter(k => k !== a && extremes(k).every(([x, z]) => contains(a, x, z)));
+    assert.ok(held.length, `${id} is exempt from the coverage test and holds nothing that is not`);
+  }
+});
+
+// Which side of which room is deliberately open. `wwa.cells` has no north wall because the
+// precinct wall is it; the works yard is open to the street on the east.
+const OPEN_SIDE = { 'wwa.cells': ['n'], 'wwa.works': ['e'] };
+
+test('every side of a walled room has wall on it, except the sides that are meant to be open', () => {
+  const bare = [];
   for (const [id, r] of Object.entries(PLOTS)) {
     if (id === 'wwa.market') continue;           // the square is open by definition
-    const walls = OBJECTS.filter(o => o.type === 'retaining'
-      && o.x > r.x0 - 4 && o.x < r.x1 + 4 && o.z > r.z0 - 4 && o.z < r.z1 + 4);
-    assert.ok(walls.length >= 3, `${id} has ${walls.length} wall runs — it is not a room`);
+    const on = (axis, at) => OBJECTS.some(o => o.type === 'retaining'
+      && Math.abs((axis === 'x' ? o.z : o.x) - at) < 2
+      && (axis === 'x' ? o.x > r.x0 - 2 && o.x < r.x1 + 2 : o.z > r.z0 - 2 && o.z < r.z1 + 2));
+    for (const [side, axis, at] of [['n', 'x', r.z0], ['s', 'x', r.z1], ['w', 'z', r.x0], ['e', 'z', r.x1]]) {
+      if (OPEN_SIDE[id]?.includes(side)) continue;
+      if (!on(axis, at)) bare.push(`${id} ${side}`);
+    }
+  }
+  assert.deepEqual(bare, [], 'a room with a side missing is a courtyard, not a room');
+});
+
+test('the square and every walled room stands on paved ground, not on lawn', () => {
+  // terrain.groundColour() never reads the scatter mask, so masking scatter off a rect cannot
+  // stop the rect being green. Only a surface can — see terrain.addPatch, demoScene.paveLight.
+  assert.deepEqual(new Set(PAVED), new Set(Object.values(PLOTS)));
+});
+
+test('a tower is collided at the foot it is drawn with, not at its shaft', () => {
+  // buildings.js flares the battered foot out to TOWER_FOOT × radius at ground level. While the
+  // collider was the bare shaft, the player walked 4 m into the Lantern Spire's plinth.
+  assert.ok(TOWER_FOOT > 1, 'the drawn foot is wider than the shaft');
+  for (const o of OBJECTS) {
+    if (o.type !== 'tower') continue;
+    assert.equal(TYPES.tower.plan(o.p)[0], o.p.radius * TOWER_FOOT, `tower(${o.x}, ${o.z})`);
   }
 });
 

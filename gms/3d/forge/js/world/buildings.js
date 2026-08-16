@@ -3,6 +3,7 @@
 
 import * as THREE from 'three';
 import { zone } from './zones.js';
+import { TOWER_FOOT } from '../editor/scene.js';
 import {
   Batch, T, rng, span, openingPts, extrude, rectShape, taperBox, mergedMesh,
   addOpening, addMerlons, addCorbels, addCrest, roofSlab, roofY, gableShape,
@@ -32,7 +33,9 @@ let pending = null;
 
 export function beginBatch() { pending = []; seq = 0; }
 
-export function endBatch(root) {
+// `fold` renames surfaces on the way into the buckets, so a set that is only ever seen from far
+// away can be merged into fewer meshes than the one seen from close up.
+export function endBatch(root, fold) {
   const list = pending;
   pending = null;
   if (!list || !list.length) return null;
@@ -40,7 +43,8 @@ export function endBatch(root) {
   const out = new THREE.Group();
   const buckets = new Map();
   for (const { group, zoneId, parts } of list) {
-    for (const [surface, arr] of parts) {
+    for (const [name, arr] of parts) {
+      const surface = fold?.[name] || name;
       const key = `${zoneId}|${surface}`;
       let bucket = buckets.get(key);
       if (!bucket) buckets.set(key, bucket = { zoneId, surface, geos: [] });
@@ -267,6 +271,10 @@ export function wallRun(zoneId, { length = 40, height = 8, thickness = 2.4, seed
   return finish(b, g, zoneId);
 }
 
+// Above this shaft height a tower is a landmark rather than a turret and is dressed on an
+// absolute storey rhythm instead of in thirds. STOREY is floor-to-floor at K = 1.5.
+const LOFTY = 30, STOREY = 8.4;
+
 export function tower(zoneId, { radius = 4, height = 18, sides = 16, seed: sv = 0 } = {}) {
   const z = zone(zoneId);
   const R = seed(sv, radius, height, sides);
@@ -284,30 +292,44 @@ export function tower(zoneId, { radius = 4, height = 18, sides = 16, seed: sv = 
   // breaks the extrusion. At K the top level sits at 0.88·shaftH and a 2.85 m light no longer fits.
   const headroom = y => Math.max(0.7, shaftH - y - 0.6);
 
-  b.add(S.wall, new THREE.CylinderGeometry(radius * 1.02, radius * 1.3, foot, n), T(0, foot / 2, 0));
-  b.add(S.wall, new THREE.CylinderGeometry(radius * 1.34, radius * 1.5, 0.6, n), T(0, 0.3, 0));
+  b.add(S.wall, new THREE.CylinderGeometry(radius * 1.02, radius * TOWER_FOOT, foot, n), T(0, foot / 2, 0));
+  b.add(S.wall, new THREE.CylinderGeometry(radius * (TOWER_FOOT - 0.08), radius * TOWER_FOOT, 0.6, n), T(0, 0.3, 0));
 
   const core = Math.max(0.9, apo - t - 0.09);
   b.add(S.wall, new THREE.CylinderGeometry(core, core, height, n), T(0, height / 2, 0));
 
+  // Every band below is a fraction of the shaft, which is right for the two- and three-storey
+  // turrets this was tuned on and wrong for a landmark: at 58 m the lowest opening lands 21 m up
+  // and the whole height anyone stands next to is blank. A tall shaft gets a storey rhythm, a
+  // door, and the lantern stage a lantern tower is named for.
+  const lofty = shaftH > LOFTY;
   const lit = 2 + Math.floor(R() * 2);
   const levels = [shaftH * 0.34, shaftH * 0.66, shaftH * 0.88];
+  if (lofty) {
+    levels.length = 0;
+    for (let y = STOREY * 0.66; y < shaftH - 5; y += STOREY) levels.push(y);
+  }
   for (let i = 0; i < n; i++) {
     const a = ((i + 0.5) / n) * Math.PI * 2;
     const m = T(Math.sin(a) * (apo - t), foot, Math.cos(a) * (apo - t), a);
     const openings = [];
     for (let L = 0; L < levels.length; L++) {
-      if (R() > (L === levels.length - 1 ? 0.55 : 0.34)) continue;
+      if (R() > (L === levels.length - 1 ? 0.55 : lofty ? 0.44 : 0.34)) continue;
       const big = L > 0 && lit > 0;
       openings.push(big
         ? { kind: z.window.shape, w: Math.min(pw * 0.5, 1.5), h: Math.min(2.85, headroom(levels[L])), x: 0, y: levels[L], reveal: t * 0.8 }
         : { kind: 'square', w: 0.42, h: Math.min(2.1, headroom(levels[L])), x: 0, y: levels[L], glass: false, bars: false, sill: false, head: false, reveal: t * 0.72 });
     }
+    // one face gets the way in, standing on the plinth the batter already climbs to
+    if (lofty && i === 0) {
+      openings.push({ kind: z.window.shape, w: Math.min(pw * 0.62, 2.4), h: 3.6, x: 0, y: 0.3, reveal: t * 0.9, glass: false, bars: false, sill: false });
+    }
     panel(b, S, { m, w: pw + 0.03, h: shaftH, t, openings });
   }
 
-  for (const f of [0.36, 0.7]) {
-    b.add(S.trim, new THREE.CylinderGeometry(radius + 0.21, radius + 0.21, 0.36, n), T(0, foot + shaftH * f, 0));
+  const courses = lofty ? levels.map(y => y - STOREY * 0.36) : [shaftH * 0.36, shaftH * 0.7];
+  for (const f of courses) {
+    b.add(S.trim, new THREE.CylinderGeometry(radius + 0.21, radius + 0.21, 0.36, n), T(0, foot + f, 0));
   }
 
   // machicolated head: corbels, an overhanging ring, then the parapet
@@ -335,16 +357,39 @@ export function tower(zoneId, { radius = 4, height = 18, sides = 16, seed: sv = 
     }
   }
 
+  // The lantern: a glazed stage standing inside the parapet, carrying the roof. It is what the
+  // tower is named for and the only part of it lit from the inside after dark.
+  let crown = radius, roofY0 = topY + 2.4;
+  if (lofty) {
+    // Half the shaft's faces: a light every 60° reads as a lantern from the ground and costs half
+    // the openings, and this object is pinned to full detail everywhere in the world.
+    const ln = Math.max(6, n >> 1);
+    const lr = radius * 0.58, lt = 0.42, lh = 7.5;
+    const lapo = lr * Math.cos(Math.PI / ln), lpw = 2 * lr * Math.sin(Math.PI / ln);
+    const ly = topY + 1.05;
+    b.add(S.wall, new THREE.CylinderGeometry(lr * 1.12, lr * 1.24, 0.7, ln), T(0, ly + 0.35, 0));
+    for (let i = 0; i < ln; i++) {
+      const a = ((i + 0.5) / ln) * Math.PI * 2;
+      panel(b, S, {
+        m: T(Math.sin(a) * (lapo - lt), ly + 0.7, Math.cos(a) * (lapo - lt), a),
+        w: lpw + 0.03, h: lh, t: lt,
+        openings: [{ kind: z.window.shape, w: Math.min(lpw * 0.5, 2.1), h: lh - 2.4, x: 0, y: 0.9, reveal: lt * 0.8, bars: false }],
+      });
+    }
+    b.add(S.trim, new THREE.CylinderGeometry(lr * 1.3, lr * 1.06, 0.6, ln), T(0, ly + lh + 1.0, 0));
+    crown = lr;
+    roofY0 = ly + lh + 1.3;
+  }
+
   // roof: bell for curved edges, spire for sharp, plain cone for flat
   const pitch = z.edges === 'sharp' ? 2.6 : z.edges === 'curved' ? 1.2 : 0.9;
-  const rr = radius * 1.18, rh = radius * pitch * span(R, 0.94, 1.08);
+  const rr = crown * 1.18, rh = crown * pitch * span(R, 0.94, 1.08);
   const curve = z.edges === 'curved' ? 1.6 : 1.0;
   const prof = [V2(rr * 1.12, -0.15), V2(rr * 1.14, 0.24)];
   for (let i = 1; i <= 5; i++) {
     const u = i / 5;
     prof.push(V2(rr * (1 - u), 0.45 + rh * Math.pow(u, curve)));
   }
-  const roofY0 = topY + 2.4;
   b.add(S.roof, new THREE.LatheGeometry(prof, n), T(0, roofY0, 0));
   b.add(S.crest, new THREE.SphereGeometry(0.36, 7, 5), T(0, roofY0 + 0.45 + rh + 0.15, 0));
 

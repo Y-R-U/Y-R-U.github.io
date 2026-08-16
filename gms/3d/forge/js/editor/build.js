@@ -34,6 +34,45 @@ export const BRIDGE = {
 
 export const KERB = { minDrop: 0.6, sink: 0.45 };
 
+// Stays out of the main render list because three skips a material with `visible` false — and
+// stays *in* the shadow pass because App flips it back on for the duration. That is the only gap
+// there is: three reads material.visible in both passes, but projectObject has already run by the
+// time shadowMap.render does. Layers cannot do it — the shadow pass tests them against the view
+// camera, so a layer excludes from both passes or from neither.
+export const shadowOnly = new THREE.MeshBasicMaterial({ visible: false });
+
+// One depth-only mesh for a whole LOD set: positions only, in `holder` space, from every mesh
+// under it that was casting on its own. wall, trim, roof and wood all write the same depth.
+function mergeShadow(holder) {
+  const parts = [];
+  holder.traverse(o => { if (o.isMesh && o.castShadow) parts.push(o); });
+  if (!parts.length) return;
+  holder.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(holder.matrixWorld).invert();
+
+  let n = 0;
+  for (const m of parts) n += m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count;
+  const out = new Float32Array(n * 3);
+  const v = new THREE.Vector3();
+  let at = 0;
+  for (const m of parts) {
+    m.castShadow = false;
+    const g = m.geometry, p = g.attributes.position, idx = g.index;
+    const local = inv.clone().multiply(m.matrixWorld);
+    const count = idx ? idx.count : p.count;
+    for (let i = 0; i < count; i++) {
+      v.fromBufferAttribute(p, idx ? idx.getX(i) : i).applyMatrix4(local);
+      out[at++] = v.x; out[at++] = v.y; out[at++] = v.z;
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(out, 3));
+  const mesh = new THREE.Mesh(geo, shadowOnly);
+  mesh.name = 'shadowDepth';
+  mesh.castShadow = true;
+  holder.add(mesh);
+}
+
 export class SceneBuilder {
   constructor(terrain) {
     this.terrain = terrain;
@@ -128,8 +167,9 @@ export class SceneBuilder {
       holder.name = `blk${c.key}:${name}`;
       g.add(holder);
       fill(holder);
-      const merged = endBatch(this.object3D);
+      const merged = endBatch(this.object3D, name === 'proxy' ? PROXY_FOLD : null);
       if (merged) holder.add(merged);
+      mergeShadow(holder);
       rec[name] = holder;
     };
 
@@ -218,6 +258,12 @@ export class SceneBuilder {
     return this.terrain.range(o.x, o.z, hw, hd, o.ry);
   }
 }
+
+// A proxy set is never seen closer than stream.js's 70 m detail radius, where a 0.27 m ridge cap
+// and a 1.53 m window surround are a pixel or two of slightly different stone. Folding the
+// dressing back into the wall there takes a distant block from four merged meshes to three.
+// `glass` stays its own surface: it is what lights a distant town up after dark.
+const PROXY_FOLD = { trim: 'wall', crest: 'wall' };
 
 const massRec = (o, r) => ({ zone: o.zone, seed: o.seed, x: o.x, z: o.z, rot: o.ry, ...o.p, top: r.hi, bot: r.lo });
 

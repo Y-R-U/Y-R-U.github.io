@@ -52,6 +52,9 @@ const GS = 2;
 const GW = Math.round((X1 - X0) / GS) + 1;
 const GH = Math.round((Z1 - Z0) / GS) + 1;
 
+// Second bit of the occupancy grid: this cell is not merely blocked, it is a hard surface.
+const PAVED = 2;
+
 
 // Scenario cameras: position, keep-out radius, and the view direction. The scenarios are the
 // critic's contract, so this is a hard constraint on the layout, not a hint. demo.js fills it
@@ -102,6 +105,7 @@ export class Terrain {
     this.aoSrc = new Float32Array(GW * GH);
     this.footprints = [];
     this.paths = [];
+    this.patches = [];
     this.decalRings = [];
     this.propDecals = [];
     this.reflects = [];
@@ -110,7 +114,7 @@ export class Terrain {
   mark(x, z, r) {
     for (let dz = -r; dz <= r; dz += GS) {
       for (let dx = -r; dx <= r; dx += GS) {
-        if (dx * dx + dz * dz <= r * r) this.occ[this.gi(x + dx, z + dz)] = 1;
+        if (dx * dx + dz * dz <= r * r) this.occ[this.gi(x + dx, z + dz)] |= 1;
       }
     }
   }
@@ -135,7 +139,7 @@ export class Terrain {
         const ox = Math.abs(lx) - hw, oz = Math.abs(lz) - hd;
         const d = Math.hypot(Math.max(ox, 0), Math.max(oz, 0)) + Math.min(Math.max(ox, oz), 0);
         const k = this.gi(x + dx, z + dz);
-        if (d < fp.grow) this.occ[k] = 1;
+        if (d < fp.grow) this.occ[k] |= 1;
         if (fp.ao) this.aoSrc[k] = Math.max(this.aoSrc[k], fp.ao * smoothstep(4.8, -0.3, d));
       }
     }
@@ -154,14 +158,28 @@ export class Terrain {
         for (let dz = -halfWidth; dz <= halfWidth; dz += GS) {
           for (let dx = -halfWidth; dx <= halfWidth; dx += GS) {
             if (dx * dx + dz * dz > halfWidth * halfWidth) continue;
-            this.occ[this.gi(x + dx, z + dz)] = 1;
+            this.occ[this.gi(x + dx, z + dz)] |= 1;
           }
         }
       }
     }
   }
 
-  blocked(x, z) { return this.occ[this.gi(x, z)] === 1; }
+  // A town square or the floor of a walled room, surfaced in the zone's own road stone and kept
+  // clear of scatter. It takes a surface, not a mask: groundColour() never reads `occ`, so masking
+  // a rect can stop things growing on it but can never stop it being green.
+  addPatch(r, zoneId, fade = 2.4) {
+    this.patches.push({ ...r, zoneId, fade });
+    for (let z = r.z0 - fade; z <= r.z1 + fade; z += GS) {
+      for (let x = r.x0 - fade; x <= r.x1 + fade; x += GS) this.occ[this.gi(x, z)] |= 1 | PAVED;
+    }
+  }
+
+  blocked(x, z) { return (this.occ[this.gi(x, z)] & 1) === 1; }
+
+  // Blocked *and* surfaced. The wall-footing scatter grows through `blocked` on purpose — that
+  // ring is exactly where the anti-sticker tufts belong — but not through a paved floor.
+  paved(x, z) { return (this.occ[this.gi(x, z)] & PAVED) !== 0; }
 
   // min / max ground under a rotated footprint — what a foundation has to span. Reads the built
   // grid once it exists, so a building is seated on what is drawn rather than on the field the
@@ -189,6 +207,7 @@ export class Terrain {
     this.buildWater();
     this.buildReflections();
     this.buildRoads();
+    this.buildPatches();
   }
 
   blurAO() {
@@ -768,6 +787,67 @@ export class Terrain {
     mesh.receiveShadow = true;
     this.object3D.add(mesh);
     this.roadSegs.push(mesh);
+  }
+
+  // Every patch of a zone in one mesh: a paved square is one draw call for the whole town, and it
+  // rides in roadSegs so it culls on the same distance rule the ribbons do.
+  buildPatches() {
+    const byZone = new Map();
+    for (const p of this.patches) {
+      if (!byZone.has(p.zoneId)) byZone.set(p.zoneId, []);
+      byZone.get(p.zoneId).push(p);
+    }
+    for (const [zoneId, list] of byZone) {
+      const pos = [], col = [], nrm = [], idx = [];
+      for (const p of list) this.patch(p, pos, col, nrm, idx);
+      if (!idx.length) continue;
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
+      geo.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
+      geo.setIndex(idx);
+      geo.computeBoundingSphere();
+
+      const mat = getMaterial(zoneId, 'road');
+      mat.vertexColors = true;
+      mat.transparent = true;
+      mat.depthWrite = false;
+      mat.needsUpdate = true;
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.name = 'road';
+      mesh.receiveShadow = true;
+      this.object3D.add(mesh);
+      this.roadSegs.push(mesh);
+    }
+  }
+
+  // Sits 0.01 m under the road ribbon so a street crossing a square is the street, not a seam.
+  patch(p, pos, col, nrm, idx) {
+    const STEP = 3;
+    const x0 = p.x0 - p.fade, x1 = p.x1 + p.fade, z0 = p.z0 - p.fade, z1 = p.z1 + p.fade;
+    const nx = Math.max(2, Math.round((x1 - x0) / STEP)), nz = Math.max(2, Math.round((z1 - z0) / STEP));
+    const base = pos.length / 3;
+    for (let j = 0; j <= nz; j++) {
+      for (let i = 0; i <= nx; i++) {
+        const x = lerp(x0, x1, i / nx), z = lerp(z0, z1, j / nz);
+        pos.push(x, this.surfaceY(x, z) + 0.05, z);
+        const gx = (this.surfaceY(x - 1, z) - this.surfaceY(x + 1, z)) / 2;
+        const gz = (this.surfaceY(x, z - 1) - this.surfaceY(x, z + 1)) / 2;
+        const l = Math.hypot(gx, 1, gz);
+        nrm.push(gx / l, 1 / l, gz / l);
+        // the same noisy margin the ribbons wear, so a square stops in worn stone rather than on
+        // the straight edge of the rect it came from
+        const f = p.fade * (0.7 + 0.5 * fbm(x * 0.18 + 5.196, z * 0.18 + 2.449, 2, 23));
+        const in0 = Math.min(x - x0, x1 - x, z - z0, z1 - z);
+        col.push(1, 1, 1, smoothstep(0, f, in0));
+      }
+    }
+    for (let j = 0; j < nz; j++) {
+      for (let i = 0; i < nx; i++) {
+        const a = base + j * (nx + 1) + i;
+        idx.push(a, a + nx + 1, a + 1, a + 1, a + nx + 1, a + nx + 2);
+      }
+    }
   }
 
   // A soft dark collar on the ground at every base. This is the single thing that stops a

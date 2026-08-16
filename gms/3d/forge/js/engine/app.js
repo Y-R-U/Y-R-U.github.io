@@ -40,11 +40,20 @@ export class App {
     this.camera.lookAt(0, 3, 0);
 
     this.stats = new Stats(this.renderer, document.getElementById('perf'));
+    // Materials a system wants drawn into the shadow map and nowhere else. three reads
+    // material.visible in both passes but builds the main render list before the shadow pass runs,
+    // so this wrapper is the only place the two can be told apart. See build.js `shadowOnly`.
+    this.shadowOnly = [];
     // three offers no hook between the shadow pass and the main one, and info.render sums both.
     // First call only: a fullscreen AA/post quad is its own renderer.render() and runs the shadow
     // pass again, which would push the mark past the whole main pass.
     const sm = this.renderer.shadowMap, smRender = sm.render.bind(sm);
-    sm.render = (...a) => { smRender(...a); if (!this.marked) { this.marked = true; this.stats.markShadow(); } };
+    sm.render = (...a) => {
+      for (const m of this.shadowOnly) m.visible = true;
+      smRender(...a);
+      for (const m of this.shadowOnly) m.visible = false;
+      if (!this.marked) { this.marked = true; this.stats.markShadow(); }
+    };
 
     this.aa = new AA(this);
 
