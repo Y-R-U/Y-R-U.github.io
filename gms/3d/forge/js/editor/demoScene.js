@@ -1,6 +1,7 @@
-// The demo scene, as a document. A generator rather than a literal because the layout is 24
-// buildings a district of seeded jitter — but its output is ordinary data, and once it has run
-// the editor treats it like any other scene.
+// The scene, as a document. Whitewall is authored — see whitewall.js — and Longacre and
+// Blackstone are still a district of seeded jitter each, which A8 replaces one town at a time.
+// The output is ordinary data either way, and once it has run the editor treats it like any
+// other scene.
 //
 // Call it after `setCameras()`: the layout skips anything standing inside a scenario keep-out.
 
@@ -9,16 +10,44 @@ import { ZONE_IDS } from '../world/zones.js';
 import { TOWNS, creekZ, nearCamera, CROSSINGS } from '../world/terrain.js';
 import { SCENE_VERSION, district, footprint } from './scene.js';
 import { seedDocument } from './build.js';
+import { whitewall, ROAD, ROAD_WIDTH, SWEPT } from './whitewall.js';
 
 export function demoScene(terrain) {
   const doc = { version: SCENE_VERSION, name: 'Demo', districts: [], objects: [] };
-  const skips = ZONE_IDS.map((zone, di) => layout(doc, terrain, zone, di, TOWNS[di]));
+  const skips = ZONE_IDS.map((zone, di) => (
+    zone === 'light' ? authored(doc, terrain, zone, di) : layout(doc, terrain, zone, di, TOWNS[di])
+  ));
   doc.objects.forEach((o, i) => { o.id = i + 1; });
   return seedDocument(doc, skips);
 }
 
-// The demo town is a placeholder A8 replaces, but it has to sit on its town's pad or every
-// scenario camera looks at empty countryside. Everything here is (cx, tz)-relative.
+// An authored town draws nothing from the district's RNG stream, so seedDocument starts it at
+// zero — which is what the 0 returned here says.
+function authored(doc, terrain, zone, di) {
+  for (const o of whitewall()) {
+    if (!nearCamera(o.x, o.z)) doc.objects.push({ id: 0, dist: di, zone, seed: 0, ...o });
+  }
+  // The scatter mask, not a footprint: a swept yard has no building on it to shade the ground.
+  for (const r of SWEPT) {
+    for (let z = r.z0; z <= r.z1; z += 3) for (let x = r.x0; x <= r.x1; x += 3) terrain.mark(x, z, 2.2);
+  }
+  doc.districts.push(district(zone, TOWNS[di].cx, {
+    seed: 0x2f1a71 + di * 977, road: ROAD, roadWidth: ROAD_WIDTH, kerbs: [], bridge: bridgeFor(di),
+  }));
+  return 0;
+}
+
+// One stone crossing per district, at its real x — the Vail does not pass through the middle of
+// every town, so a bridge at `cx` was a bridge over dry land the moment the towns moved.
+function bridgeFor(di) {
+  const cross = CROSSINGS.filter(c => c.kind === 'bridge')[di];
+  return {
+    x: cross.x, z: creekZ(cross.x), halfSpan: cross.halfSpan, deck: cross.deck ?? 0,
+    ry: -Math.atan2(creekZ(cross.x + 4) - creekZ(cross.x - 4), 8),
+  };
+}
+
+// Longacre and Blackstone, still seeded. Everything here is (cx, tz)-relative.
 function layout(doc, terrain, zone, di, town) {
   const cx = town.cx, tz = town.cz;
   let draws = 0;
@@ -124,19 +153,12 @@ function layout(doc, terrain, zone, di, town) {
   put('house', hallX, hallZ, span(R, -0.2, 0.2) + (di === 1 ? 0.35 : -0.35),
     { w: 14.5, d: 10.5, h: 10.5 }, { fp: [8, 6] });
 
-  // One stone crossing per district, at its real x — the Vail does not pass through the middle
-  // of every town, so a bridge at `cx` was a bridge over dry land the moment the towns moved.
-  const cross = CROSSINGS.filter(c => c.kind === 'bridge')[di];
   // Longacre's High Street *is* the King's Road, and two overlapping transparent ribbons put a
   // 7 % luminance edge down the middle of street_dusk where their noisy widths disagreed. The
   // polyline stays — the kerbs and the frontages are laid out against it — but only the towns the
   // King's Road terminates outside of surface their own street.
   doc.districts.push(district(zone, cx, {
-    seed: 0x2f1a71 + di * 977, road, kerbs, roadWidth: di === 1 ? 0 : 3.6,
-    bridge: {
-      x: cross.x, z: creekZ(cross.x), halfSpan: cross.halfSpan, deck: cross.deck ?? 0,
-      ry: -Math.atan2(creekZ(cross.x + 4) - creekZ(cross.x - 4), 8),
-    },
+    seed: 0x2f1a71 + di * 977, road, kerbs, roadWidth: di === 1 ? 0 : 3.6, bridge: bridgeFor(di),
   }));
   return draws;
 }

@@ -69,11 +69,13 @@ assert on it, so deleting a single `in` field turns 11 tests red.
 
 ### The towns
 
-6. **A8.** The three towns are still procedurally generated anonymous massing —
-   `js/editor/demoScene.js` emits `put('mass', …)` and `put('house', …)` with seeded jitter. The
-   90 named areas have correct coordinates and generic buildings standing on them. A8 is replacing
-   that massing with authored buildings that match the named areas. Well-specified, because the
-   coordinates are already settled; still the largest single piece of work here.
+6. **A8.** ~~The three towns are still procedurally generated anonymous massing.~~ **Whitewall is
+   done** — `js/editor/whitewall.js`, see `docs/NOTES_A8_WHITEWALL.md`. Every `wwa.*` area a quest,
+   prop, NPC or gather node reaches is an authored place at its `areas.json` coordinates, asserted
+   by `js/editor/whitewall.test.js` against the real data files. **Longacre and Blackstone are
+   still seeded jitter** and are the rest of A8; §6 of the notes says what they reuse. Two things
+   Whitewall left open: the draw-call gate (189 against 150 — the triangle gate passes with 8 % to
+   spare), and whether the named rooms staying open to the sky is the right call.
 
 ### Known rough edges
 

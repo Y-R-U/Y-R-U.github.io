@@ -89,12 +89,37 @@ export class Demo {
   }
 }
 
+// A8's framings, one per named place in Whitewall. Absolute world coordinates, because these are
+// aimed at areas data/areas.json fixes rather than at a town centre; `y` is still height above the
+// ground. Off unless ?dev=1, so they cannot become scenario keep-outs and cannot move the five
+// framings the critic scores.
+const WHITEWALL_SHOTS = [
+  { id: 'wwa_air', label: 'Whitewall from the north-west', time: 10, fov: 60,
+    pos: [-660, 74, -216], look: [-508, -8, -58] },
+  { id: 'wwa_yard', label: 'Sanctum Yard and the Lantern Spire', time: 11,
+    pos: [-556, 9, -92], look: [-518, 14, -58] },
+  { id: 'wwa_gate', label: 'The north gate and the cells', time: 9,
+    pos: [-520, 5, -178], look: [-524, 6, -128] },
+  { id: 'wwa_sanctum', label: 'The Sanctum from the Yard', time: 12,
+    pos: [-520, 5, -45], look: [-520, 5, -18] },
+  { id: 'wwa_granary', label: 'The granary door, where the game opens', time: 4.2,
+    pos: [-547, 3.4, -6], look: [-548, 1.6, -25] },
+  { id: 'wwa_cloister', label: 'The Cloister garth', time: 10,
+    pos: [-556, 9, -111], look: [-590, 4, -111] },
+  { id: 'wwa_almonry', label: 'The Almonry and Ivo\'s room', time: 15,
+    pos: [-457, 5, -101], look: [-459, 3, -120] },
+  { id: 'wwa_works', label: 'Pell\'s works yard', time: 15,
+    pos: [-556, 7, -44], look: [-592, 3, -44] },
+  { id: 'wwa_steps', label: 'The fish steps on the Vail', time: 8,
+    pos: [-566, 20, 66], look: [-512, -2, 124] },
+];
+
 // Working framings for the door kit, off unless ?dev=1 — --all lists whatever is registered,
 // and the critic scores exactly the five above. Derived from the scene rather than hardcoded so
 // they follow the layout.
 function devShots(doc) {
   if (!new URLSearchParams(location.search).has('dev')) return [];
-  const out = [];
+  const out = WHITEWALL_SHOTS.map(s => ({ zone: 'light', ...s }));
   for (const [di, d] of doc.districts.entries()) {
     const h = doc.objects.find(o => o.dist === di && o.type === 'house');
     if (!h) continue;
