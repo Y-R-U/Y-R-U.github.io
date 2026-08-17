@@ -1,0 +1,340 @@
+{
+  "_": "§3.1.1 — the authored core. DECISIONS decision 3. Eight landmarks across three named districts, authored as DATA: every part is an existing §3.3 prototype at a larger scale. No bespoke meshes, no new materials, no new draw calls. `rect` is [cx0,cz0,cx1,cz1] in CHUNK coordinates, inclusive, and wins over districts.js' noise field. A landmark's `off` is metres inside its chunk; a part's `off` is metres from the landmark anchor. `scale` is [W,H,D] in metres. `radius` is the hard keep-out circle: no seeded footprint may intersect it.",
+  "spawn": {
+    "pos": [
+      40,
+      92,
+      30
+    ],
+    "bearing": 118,
+    "landmark": "spindle",
+    "deck": 92
+  },
+  "districts": [
+    {
+      "id": "spine",
+      "name": "The Spine",
+      "rect": [
+        -3,
+        -3,
+        3,
+        3
+      ]
+    },
+    {
+      "id": "ribs",
+      "name": "The Ribs",
+      "rect": [
+        -8,
+        -3,
+        -4,
+        4
+      ]
+    },
+    {
+      "id": "lantern",
+      "name": "Lantern Quarter",
+      "rect": [
+        4,
+        -4,
+        9,
+        3
+      ]
+    }
+  ],
+  "landmarks": [
+    {
+      "id": "spindle",
+      "name": "The Spindle",
+      "district": "spine",
+      "chunk": [
+        0,
+        0
+      ],
+      "off": [
+        40,
+        30
+      ],
+      "radius": 190,
+      "cell": 15,
+      "tint": "0xdbe8ff",
+      "signage": [
+        "hero_00",
+        "board_en:HAUL CONTROL"
+      ],
+      "note": "640 m. The one silhouette you can see from anywhere. The HUB pad sits on the 92 m podium deck; the shaft is set 70 m north of the pad anchor so the spawn point is on open deck.",
+      "parts": [
+        {
+          "proto": "slab",
+          "off": [
+            0,
+            34
+          ],
+          "scale": [
+            186,
+            92,
+            210
+          ],
+          "cell": 12
+        },
+        {
+          "proto": "spire",
+          "off": [
+            0,
+            70
+          ],
+          "scale": [
+            74,
+            640,
+            74
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hollow",
+      "name": "The Hollow",
+      "district": "spine",
+      "chunk": [
+        1,
+        0
+      ],
+      "off": [
+        170,
+        84
+      ],
+      "radius": 155,
+      "cell": 0,
+      "tint": "0xdbe8ff",
+      "signage": [
+        "hero_01",
+        "board_en:UNDERSTACK"
+      ],
+      "note": "430 m. Two 58 m slabs and a sky bridge at 240 m (55 %). You fly through it. Placed at bearing 98 deg and 390 m from the spawn so it lands in the LEFT THIRD of the opening frame, which is what §3.1.1 asks the spawn framing to deliver — and inside the 512 m LOD0 radius, so the bridge is real geometry from the first frame and not a box.",
+      "parts": [
+        {
+          "proto": "bridged",
+          "off": [
+            0,
+            0
+          ],
+          "scale": [
+            190,
+            430,
+            58
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kiln",
+      "name": "The Kiln",
+      "district": "spine",
+      "chunk": [
+        1,
+        -1
+      ],
+      "off": [
+        120,
+        180
+      ],
+      "radius": 125,
+      "cell": 5,
+      "tint": "0xffb070",
+      "signage": [
+        "board_en:KILN"
+      ],
+      "note": "300 m drum, sodium-lit — the only warm mass in a cold district, and it breaks the box rhythm next to the start.",
+      "parts": [
+        {
+          "proto": "drum",
+          "off": [
+            0,
+            0
+          ],
+          "scale": [
+            96,
+            300,
+            96
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sever",
+      "name": "Sever Wall",
+      "district": "ribs",
+      "chunk": [
+        -5,
+        0
+      ],
+      "off": [
+        128,
+        120
+      ],
+      "radius": 150,
+      "cell": 2,
+      "tint": "0xffc07a",
+      "signage": [
+        "hero_02",
+        "board_en:SEVER"
+      ],
+      "note": "310 m. Sheer on the west face, stepped east. The canyon south of it is the canyon_dive shot.",
+      "parts": [
+        {
+          "proto": "terrace",
+          "off": [
+            0,
+            0
+          ],
+          "scale": [
+            120,
+            310,
+            80
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ladder",
+      "name": "The Ladder",
+      "district": "ribs",
+      "chunk": [
+        -6,
+        2
+      ],
+      "off": [
+        100,
+        90
+      ],
+      "radius": 120,
+      "cell": 9,
+      "tint": "0xffc07a",
+      "signage": [
+        "board_en:LADDER"
+      ],
+      "note": "380 m of stack with ledges every 48 m — §3.10 #7, the scale ruler made literal.",
+      "parts": [
+        {
+          "proto": "stack",
+          "off": [
+            0,
+            0
+          ],
+          "scale": [
+            62,
+            380,
+            62
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pennant",
+      "name": "The Pennant",
+      "district": "lantern",
+      "chunk": [
+        6,
+        -1
+      ],
+      "off": [
+        60,
+        150
+      ],
+      "radius": 150,
+      "cell": 4,
+      "tint": "0xff8ad8",
+      "signage": [
+        "hero_01",
+        "hero_02",
+        "hero_03"
+      ],
+      "note": "520 m. Carries three of the twelve L5 hero billboards (§3.5.5). Magenta.",
+      "parts": [
+        {
+          "proto": "spire",
+          "off": [
+            0,
+            0
+          ],
+          "scale": [
+            48,
+            520,
+            48
+          ]
+        }
+      ]
+    },
+    {
+      "id": "market",
+      "name": "The Market",
+      "district": "lantern",
+      "chunk": [
+        5,
+        0
+      ],
+      "off": [
+        128,
+        128
+      ],
+      "radius": 165,
+      "cell": 7,
+      "tint": "0xff8ad8",
+      "signage": [
+        "hero_00",
+        "board_en:NIGHT MARKET",
+        "board_ja",
+        "board_en:OPEN"
+      ],
+      "note": "160 m. Three-storey base with every podium face flagged commercial — the signage showcase.",
+      "parts": [
+        {
+          "proto": "podium",
+          "off": [
+            0,
+            0
+          ],
+          "scale": [
+            180,
+            160,
+            140
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ninefold",
+      "name": "Ninefold",
+      "district": "lantern",
+      "chunk": [
+        8,
+        1
+      ],
+      "off": [
+        140,
+        110
+      ],
+      "radius": 150,
+      "cell": 1,
+      "tint": "0xff8ad8",
+      "signage": [
+        "board_en:NINEFOLD"
+      ],
+      "note": "470 m taper. Closes the eastern skyline so the Quarter reads as a district and not a patch.",
+      "parts": [
+        {
+          "proto": "taper",
+          "off": [
+            0,
+            0
+          ],
+          "scale": [
+            90,
+            470,
+            90
+          ]
+        }
+      ]
+    }
+  ]
+}

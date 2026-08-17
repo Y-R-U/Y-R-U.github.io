@@ -1,0 +1,39 @@
+{
+  "_": "§3.1.2. Three lists, no code. Districts are §3.1's eight plus the three core names (which are the same three ids, so the list is eight). Pads are assigned by hash2i(cx, cz, PAD_SALT) % 40, so a pad's name is stable across reloads without storing anything. `pinned` overrides three pads inside the core so the radio chatter and the world agree — Kell's Rest is a Ribs pad and is the destination in §7.3's panel mock, which is what makes that mock a legal tier-1 job.",
+
+  "districts": {
+    "spine": "The Spine",
+    "ribs": "The Ribs",
+    "vault": "Vault Row",
+    "soot": "Sootfields",
+    "lantern": "Lantern Quarter",
+    "cradle": "The Cradle",
+    "pale": "Pale Terrace",
+    "drown": "The Drownings"
+  },
+
+  "pads": [
+    "Kell's Rest", "Ardent Deck", "Vane Street Upper", "Tallow Yard", "Sixteen Low",
+    "The Gantry", "Ninefold Approach", "Cinder Step", "Marrow Landing", "Low Ferrand",
+    "Pike Deck", "The Chandlery", "Halyard Nine", "Sunder Rest", "Grist Landing",
+    "Ashlock Upper", "Verge Deck", "The Bell Yard", "Quill Step", "Redoubt Two",
+    "Salt Gantry", "Fathom Deck", "Ninth Bight", "Coppice Rest", "The Lamplands",
+    "Hollow Approach", "Brine Step", "Tanner's Low", "Kestrel Deck", "Vault Nine",
+    "The Long Ledge", "Sallow Yard", "Ember Landing", "Thrift Deck", "Undercroft Six",
+    "Palegate", "Skeel Rest", "The Drop", "Winnow Step", "Cordage Upper"
+  ],
+
+  "pinnedPads": {
+    "-5,1": "Kell's Rest",
+    "0,1": "Ardent Deck",
+    "1,0": "Vane Street Upper"
+  },
+
+  "streets": [
+    "Vane Street", "the Understack", "Ardent Corridor", "Lanes Four Through Nine",
+    "Kell Cut", "the Spine Run", "Tallow Reach", "Sixteen Deep", "Gantry Row",
+    "the Ninefold Approach", "Cinder Mile", "Marrow Cut", "Low Ferrand", "Pike Reach",
+    "the Chandlery Lanes", "Halyard Run", "Sunder Row", "Grist Cut", "Ashlock Deep",
+    "Verge Mile", "the Bell Yard Lanes", "Quill Run", "Redoubt Reach", "Salt Corridor"
+  ]
+}

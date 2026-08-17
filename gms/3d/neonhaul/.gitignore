@@ -1,0 +1,18 @@
+# shots/*.json are the COMMITTED scenario definitions (§2.1); renders and stats are not.
+shots/*.png
+shots/*.jpg
+shots/*.stats.json
+shots/_*.json
+# Every per-phase evidence directory (p1a … p11, wire, …). This was a list of four subdirs
+# until P10, by which point p4/p5/p6/p7a/p7b/p8/p11/wire had appeared under it — 25 MB of
+# renders that the line above says are not committed. A glob cannot fall behind that way.
+shots/*/
+critique/
+tools/__pycache__/
+*.log
+.DS_Store
+
+# SUNO source takes — the full multi-line generations. Kept locally so a group can be
+# re-split without regenerating; never shipped (~40 MB and redundant with the cut clips).
+tools/vo/raw/
+tools/vo/vw/

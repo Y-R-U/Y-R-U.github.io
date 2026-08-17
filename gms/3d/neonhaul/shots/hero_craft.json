@@ -1,0 +1,19 @@
+{
+  "id": "hero_craft",
+  "ref": "1939970_00",
+  "seed": 1313165134,
+  "variant": "duskburn",
+  "clock": 19.6,
+  "pos": [
+    1380,
+    210,
+    420
+  ],
+  "yaw": 3.0,
+  "pitch": -18,
+  "fov": 55,
+  "craft": true,
+  "hud": false,
+  "aspect": null,
+  "note": "FROZEN at P3b, scored at P5. The canyon falls away to the right and the left third is deliberately open \u2014 that is where P5's craft goes. Do not re-frame it when the craft exists; the empty third is the composition."
+}

@@ -1,0 +1,19 @@
+{
+  "id": "day_smog",
+  "ref": "1091500_08",
+  "seed": 1313165134,
+  "variant": "daysmog",
+  "clock": 12.4,
+  "pos": [
+    1280,
+    26,
+    140
+  ],
+  "yaw": 2.6,
+  "pitch": 30,
+  "fov": 62,
+  "craft": false,
+  "hud": false,
+  "aspect": 0.844106463878327,
+  "note": "FROZEN at P3b, scored at P10. Authored at the PLATE CROP'S ASPECT (obligation T4): \u00a712.1's crop of 1091500_08 is 444x526 = 0.844, portrait. Render 760x900. Looking UP a tower into the drained sky, which is what the plate is. NOTE for P10: compare.mjs pre-scales our half to 444x526 before the shared upscale, because the plate crop is 0.37 of source and resolution would otherwise be the tell (DECISIONS T1's known gap)."
+}

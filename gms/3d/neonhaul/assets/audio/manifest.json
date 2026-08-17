@@ -1,0 +1,1002 @@
+{
+ "version": 1,
+ "music": [
+  {
+   "slot": "menu",
+   "file": "music/menu.mp3",
+   "gain": 0.55,
+   "fade": 2,
+   "pool": "menu"
+  },
+  {
+   "slot": "cruise_a",
+   "file": "music/cruise_a.mp3",
+   "gain": 0.4,
+   "fade": 3,
+   "pool": "cruise"
+  },
+  {
+   "slot": "cruise_b",
+   "file": "music/cruise_b.mp3",
+   "gain": 0.4,
+   "fade": 3,
+   "pool": "cruise"
+  },
+  {
+   "slot": "cruise_day",
+   "file": "music/cruise_day.mp3",
+   "gain": 0.36,
+   "fade": 3,
+   "pool": "cruise_day"
+  },
+  {
+   "slot": "docked",
+   "file": "music/docked.mp3",
+   "gain": 0.32,
+   "fade": 1.2,
+   "pool": "docked"
+  },
+  {
+   "slot": "chase",
+   "file": "music/chase.mp3",
+   "gain": 0.5,
+   "fade": 0.8,
+   "pool": "rush"
+  },
+  {
+   "slot": "storm",
+   "file": "music/storm.mp3",
+   "gain": 0.42,
+   "fade": 3,
+   "pool": "storm"
+  },
+  {
+   "slot": "first_flight",
+   "file": "music/first_flight.mp3",
+   "gain": 0.55,
+   "fade": 2,
+   "pool": "intro"
+  },
+  {
+   "slot": "pirate",
+   "file": "music/pirate.mp3",
+   "gain": 0.3,
+   "fade": 1.5,
+   "pool": "diegetic"
+  }
+ ],
+ "chatter": [
+  {
+   "slot": "bg_net_01",
+   "file": "chatter/bg_net_01.mp3",
+   "group": "bg_net",
+   "layer": "back",
+   "tags": [
+    "bg_net"
+   ],
+   "gain": 0.22,
+   "cooldown": 0
+  },
+  {
+   "slot": "bg_net_02",
+   "file": "chatter/bg_net_02.mp3",
+   "group": "bg_net",
+   "layer": "back",
+   "tags": [
+    "bg_net"
+   ],
+   "gain": 0.22,
+   "cooldown": 0
+  },
+  {
+   "slot": "bg_net_03",
+   "file": "chatter/bg_net_03.mp3",
+   "group": "bg_net",
+   "layer": "back",
+   "tags": [
+    "bg_net"
+   ],
+   "gain": 0.22,
+   "cooldown": 0
+  },
+  {
+   "slot": "bg_net_04",
+   "file": "chatter/bg_net_04.mp3",
+   "group": "bg_net",
+   "layer": "back",
+   "tags": [
+    "bg_net"
+   ],
+   "gain": 0.22,
+   "cooldown": 0
+  },
+  {
+   "slot": "bg_dock_01",
+   "file": "chatter/bg_dock_01.mp3",
+   "group": "bg_dock",
+   "layer": "back",
+   "tags": [
+    "bg_dock"
+   ],
+   "gain": 0.22,
+   "cooldown": 0
+  },
+  {
+   "slot": "bg_dock_02",
+   "file": "chatter/bg_dock_02.mp3",
+   "group": "bg_dock",
+   "layer": "back",
+   "tags": [
+    "bg_dock"
+   ],
+   "gain": 0.22,
+   "cooldown": 0
+  },
+  {
+   "slot": "bg_dock_03",
+   "file": "chatter/bg_dock_03.mp3",
+   "group": "bg_dock",
+   "layer": "back",
+   "tags": [
+    "bg_dock"
+   ],
+   "gain": 0.22,
+   "cooldown": 0
+  },
+  {
+   "slot": "dispatch_01",
+   "file": "chatter/dispatch_01.mp3",
+   "group": "dispatch",
+   "layer": "fore",
+   "tags": [
+    "dispatch"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Haul Control to all couriers — the Vane Street corridor is open again. Lanes four through nine, keep it under two hundred."
+  },
+  {
+   "slot": "dispatch_02",
+   "file": "chatter/dispatch_02.mp3",
+   "group": "dispatch",
+   "layer": "fore",
+   "tags": [
+    "dispatch"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "We have a manifest mismatch on the Kessel drop. If that box is warm, it is not my problem."
+  },
+  {
+   "slot": "dispatch_03",
+   "file": "chatter/dispatch_03.mp3",
+   "group": "dispatch",
+   "layer": "fore",
+   "tags": [
+    "dispatch"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": true,
+   "text": "PULL UP, COURIER. PULL UP. YOU ARE INSIDE THE STACK."
+  },
+  {
+   "slot": "dispatch_04",
+   "file": "chatter/dispatch_04.mp3",
+   "group": "dispatch",
+   "layer": "fore",
+   "tags": [
+    "dispatch"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Shift change in ten. Whoever is on the roof at Ardent, the beacon is out again. Still."
+  },
+  {
+   "slot": "dispatch_05",
+   "file": "chatter/dispatch_05.mp3",
+   "group": "dispatch",
+   "layer": "fore",
+   "tags": [
+    "dispatch"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Somebody has parked a freighter across two of my lanes. I am told this is temporary. I am told a lot of things."
+  },
+  {
+   "slot": "dispatch_06",
+   "file": "chatter/dispatch_06.mp3",
+   "group": "dispatch",
+   "layer": "fore",
+   "tags": [
+    "dispatch"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Weather is closing the upper approach at Pale Terrace. If you are booked up there, you are now booked somewhere else."
+  },
+  {
+   "slot": "dispatch_confirm_01",
+   "file": "chatter/dispatch_confirm_01.mp3",
+   "group": "dispatch_confirm",
+   "layer": "fore",
+   "tags": [
+    "dispatch_confirm"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Courier, your parcel is logged and the pad is holding for you. Try not to make them wait."
+  },
+  {
+   "slot": "dispatch_confirm_02",
+   "file": "chatter/dispatch_confirm_02.mp3",
+   "group": "dispatch_confirm",
+   "layer": "fore",
+   "tags": [
+    "dispatch_confirm"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Logged. Clock's running. Try to look like you've done this before."
+  },
+  {
+   "slot": "dispatch_confirm_03",
+   "file": "chatter/dispatch_confirm_03.mp3",
+   "group": "dispatch_confirm",
+   "layer": "fore",
+   "tags": [
+    "dispatch_confirm"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "That's on your manifest now. Whatever it is."
+  },
+  {
+   "slot": "dispatch_confirm_04",
+   "file": "chatter/dispatch_confirm_04.mp3",
+   "group": "dispatch_confirm",
+   "layer": "fore",
+   "tags": [
+    "dispatch_confirm"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Confirmed. Lane's clear as far as I can see, which is not far."
+  },
+  {
+   "slot": "dispatch_confirm_05",
+   "file": "chatter/dispatch_confirm_05.mp3",
+   "group": "dispatch_confirm",
+   "layer": "fore",
+   "tags": [
+    "dispatch_confirm"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "You've got it. Sealed, weighed, and none of my business."
+  },
+  {
+   "slot": "dispatch_confirm_06",
+   "file": "chatter/dispatch_confirm_06.mp3",
+   "group": "dispatch_confirm",
+   "layer": "fore",
+   "tags": [
+    "dispatch_confirm"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Accepted. They asked for someone reliable. I sent you anyway."
+  },
+  {
+   "slot": "dispatch_confirm_07",
+   "file": "chatter/dispatch_confirm_07.mp3",
+   "group": "dispatch_confirm",
+   "layer": "fore",
+   "tags": [
+    "dispatch_confirm"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Booked. Take the high lane, the low one's a car park."
+  },
+  {
+   "slot": "dispatch_confirm_08",
+   "file": "chatter/dispatch_confirm_08.mp3",
+   "group": "dispatch_confirm",
+   "layer": "fore",
+   "tags": [
+    "dispatch_confirm"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "On the board and off my desk. Go."
+  },
+  {
+   "slot": "dispatch_pay_01",
+   "file": "chatter/dispatch_pay_01.mp3",
+   "group": "dispatch_pay",
+   "layer": "fore",
+   "tags": [
+    "dispatch_pay"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "pay",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Nice run. Credits are clearing now. Don't spend it all in the Ribs."
+  },
+  {
+   "slot": "dispatch_pay_02",
+   "file": "chatter/dispatch_pay_02.mp3",
+   "group": "dispatch_pay",
+   "layer": "fore",
+   "tags": [
+    "dispatch_pay"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "pay",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Signed for. Money's moving. Slowly, but it's moving."
+  },
+  {
+   "slot": "dispatch_pay_03",
+   "file": "chatter/dispatch_pay_03.mp3",
+   "group": "dispatch_pay",
+   "layer": "fore",
+   "tags": [
+    "dispatch_pay"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "pay",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Delivered and closed. That's one thing today that went where it was supposed to."
+  },
+  {
+   "slot": "dispatch_pay_04",
+   "file": "chatter/dispatch_pay_04.mp3",
+   "group": "dispatch_pay",
+   "layer": "fore",
+   "tags": [
+    "dispatch_pay"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "pay",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Paid. They didn't complain, which from them is a compliment."
+  },
+  {
+   "slot": "dispatch_pay_05",
+   "file": "chatter/dispatch_pay_05.mp3",
+   "group": "dispatch_pay",
+   "layer": "fore",
+   "tags": [
+    "dispatch_pay"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "pay",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Clean drop. I'm marking you as competent. Don't make me change it."
+  },
+  {
+   "slot": "dispatch_pay_06",
+   "file": "chatter/dispatch_pay_06.mp3",
+   "group": "dispatch_pay",
+   "layer": "fore",
+   "tags": [
+    "dispatch_pay"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "pay",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Received in one piece. Credits inbound. Enjoy the four minutes before you need them."
+  },
+  {
+   "slot": "dispatch_pay_07",
+   "file": "chatter/dispatch_pay_07.mp3",
+   "group": "dispatch_pay",
+   "layer": "fore",
+   "tags": [
+    "dispatch_pay"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "pay",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Logged, paid, forgotten. That's the job."
+  },
+  {
+   "slot": "dispatch_pay_08",
+   "file": "chatter/dispatch_pay_08.mp3",
+   "group": "dispatch_pay",
+   "layer": "fore",
+   "tags": [
+    "dispatch_pay"
+   ],
+   "speaker": "HAUL CONTROL",
+   "tag": "pay",
+   "gain": 0.9,
+   "cooldown": 660,
+   "shout": false,
+   "text": "Done. There's more where that came from, unfortunately."
+  },
+  {
+   "slot": "police_01",
+   "file": "chatter/police_01.mp3",
+   "group": "police",
+   "layer": "fore",
+   "tags": [
+    "police"
+   ],
+   "speaker": "CITY PATROL",
+   "tag": "warn",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Air Division, routine sweep, lanes one through six. Nothing to see. As usual."
+  },
+  {
+   "slot": "police_02",
+   "file": "chatter/police_02.mp3",
+   "group": "police",
+   "layer": "fore",
+   "tags": [
+    "police"
+   ],
+   "speaker": "CITY PATROL",
+   "tag": "warn",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Unregistered hauler in the Lantern Quarter, descending. We are aware. We are not interested."
+  },
+  {
+   "slot": "police_03",
+   "file": "chatter/police_03.mp3",
+   "group": "police",
+   "layer": "fore",
+   "tags": [
+    "police"
+   ],
+   "speaker": "CITY PATROL",
+   "tag": "warn",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Courier craft, you are flying a lane you are not licensed for. Consider this the friendly version."
+  },
+  {
+   "slot": "police_04",
+   "file": "chatter/police_04.mp3",
+   "group": "police",
+   "layer": "fore",
+   "tags": [
+    "police"
+   ],
+   "speaker": "CITY PATROL",
+   "tag": "warn",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": true,
+   "text": "HOLD YOUR ALTITUDE. HOLD IT. DO NOT DESCEND."
+  },
+  {
+   "slot": "police_05",
+   "file": "chatter/police_05.mp3",
+   "group": "police",
+   "layer": "fore",
+   "tags": [
+    "police"
+   ],
+   "speaker": "CITY PATROL",
+   "tag": "warn",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Cargo seizure at pad nine. Owner declined to attend. Owner never does."
+  },
+  {
+   "slot": "police_06",
+   "file": "chatter/police_06.mp3",
+   "group": "police",
+   "layer": "fore",
+   "tags": [
+    "police"
+   ],
+   "speaker": "CITY PATROL",
+   "tag": "warn",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Break off pursuit, we lost him in the smog band. Log it as weather."
+  },
+  {
+   "slot": "pirate_01",
+   "file": "chatter/pirate_01.mp3",
+   "group": "pirate",
+   "layer": "fore",
+   "tags": [
+    "pirate"
+   ],
+   "speaker": "THE UNDERSTACK",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "You're on the understack. If you can hear me, you're too low, and that's exactly where I want you."
+  },
+  {
+   "slot": "pirate_02",
+   "file": "chatter/pirate_02.mp3",
+   "group": "pirate",
+   "layer": "fore",
+   "tags": [
+    "pirate"
+   ],
+   "speaker": "THE UNDERSTACK",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "They say the Pale Terrace towers are empty. Forty floors, every light on, nobody home. Ask yourself who's paying that bill."
+  },
+  {
+   "slot": "pirate_03",
+   "file": "chatter/pirate_03.mp3",
+   "group": "pirate",
+   "layer": "fore",
+   "tags": [
+    "pirate"
+   ],
+   "speaker": "THE UNDERSTACK",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Couriers — if a client won't tell you what's in the box, that's not a red flag. That's a pay rise. Charge accordingly."
+  },
+  {
+   "slot": "pirate_04",
+   "file": "chatter/pirate_04.mp3",
+   "group": "pirate",
+   "layer": "fore",
+   "tags": [
+    "pirate"
+   ],
+   "speaker": "THE UNDERSTACK",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": true,
+   "text": "THEY ARE NOT CLOUDS. THEY HAVE NEVER BEEN CLOUDS. LOOK UP."
+  },
+  {
+   "slot": "pirate_05",
+   "file": "chatter/pirate_05.mp3",
+   "group": "pirate",
+   "layer": "fore",
+   "tags": [
+    "pirate"
+   ],
+   "speaker": "THE UNDERSTACK",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Anyway. Rain until Thursday. Fly low, fly rude."
+  },
+  {
+   "slot": "ad_01",
+   "file": "chatter/ad_01.mp3",
+   "group": "ad",
+   "layer": "fore",
+   "tags": [
+    "ad"
+   ],
+   "speaker": "COMMERCIAL BAND",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Tallow Nutrient Paste. Nine flavours. All of them are paste."
+  },
+  {
+   "slot": "ad_02",
+   "file": "chatter/ad_02.mp3",
+   "group": "ad",
+   "layer": "fore",
+   "tags": [
+    "ad"
+   ],
+   "speaker": "COMMERCIAL BAND",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Breathing shouldn't be a luxury. At Ardent Air, breathing is a subscription. That's better."
+  },
+  {
+   "slot": "ad_03",
+   "file": "chatter/ad_03.mp3",
+   "group": "ad",
+   "layer": "fore",
+   "tags": [
+    "ad"
+   ],
+   "speaker": "COMMERCIAL BAND",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Kell's Rest. Sleep four hours, wake up owing nothing. Terms apply. Many terms apply."
+  },
+  {
+   "slot": "ad_04",
+   "file": "chatter/ad_04.mp3",
+   "group": "ad",
+   "layer": "fore",
+   "tags": [
+    "ad"
+   ],
+   "speaker": "COMMERCIAL BAND",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "New from Vantage Optics — see the sky the way it used to be, for eleven credits a month, forever."
+  },
+  {
+   "slot": "ad_05",
+   "file": "chatter/ad_05.mp3",
+   "group": "ad",
+   "layer": "fore",
+   "tags": [
+    "ad"
+   ],
+   "speaker": "COMMERCIAL BAND",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": true,
+   "text": "EVERY UNIT MUST GO. EVERY UNIT. WE ARE NOT COMING BACK."
+  },
+  {
+   "slot": "ad_06",
+   "file": "chatter/ad_06.mp3",
+   "group": "ad",
+   "layer": "fore",
+   "tags": [
+    "ad"
+   ],
+   "speaker": "COMMERCIAL BAND",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Drownings Reclamation. We buy anything. We do not ask."
+  },
+  {
+   "slot": "distress_01",
+   "file": "chatter/distress_01.mp3",
+   "group": "distress",
+   "layer": "fore",
+   "tags": [
+    "distress"
+   ],
+   "speaker": "EMERGENCY BAND",
+   "tag": "bad",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Mayday, mayday — cell's gone, I'm at ninety metres and dropping, anyone on this band —"
+  },
+  {
+   "slot": "distress_02",
+   "file": "chatter/distress_02.mp3",
+   "group": "distress",
+   "layer": "fore",
+   "tags": [
+    "distress"
+   ],
+   "speaker": "EMERGENCY BAND",
+   "tag": "bad",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": true,
+   "text": "I AM IN THE SMOG BAND. I CANNOT SEE THE LANE. I CANNOT SEE THE LANE."
+  },
+  {
+   "slot": "distress_03",
+   "file": "chatter/distress_03.mp3",
+   "group": "distress",
+   "layer": "fore",
+   "tags": [
+    "distress"
+   ],
+   "speaker": "EMERGENCY BAND",
+   "tag": "bad",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "It's not an emergency yet. I'm just saying it might be. In about a minute."
+  },
+  {
+   "slot": "distress_04",
+   "file": "chatter/distress_04.mp3",
+   "group": "distress",
+   "layer": "fore",
+   "tags": [
+    "distress"
+   ],
+   "speaker": "EMERGENCY BAND",
+   "tag": "bad",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": true,
+   "text": "GET OFF THE PAD. GET OFF THE PAD NOW."
+  },
+  {
+   "slot": "distress_05",
+   "file": "chatter/distress_05.mp3",
+   "group": "distress",
+   "layer": "fore",
+   "tags": [
+    "distress"
+   ],
+   "speaker": "EMERGENCY BAND",
+   "tag": "bad",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Cancel the mayday. I found a ledge. It'll do."
+  },
+  {
+   "slot": "weather_01",
+   "file": "chatter/weather_01.mp3",
+   "group": "weather",
+   "layer": "fore",
+   "tags": [
+    "weather"
+   ],
+   "speaker": "ATMOSPHERIC",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Atmospheric bulletin. Particulate density high below one hundred metres. Visibility, four hundred. Conditions are within normal."
+  },
+  {
+   "slot": "weather_02",
+   "file": "chatter/weather_02.mp3",
+   "group": "weather",
+   "layer": "fore",
+   "tags": [
+    "weather"
+   ],
+   "speaker": "ATMOSPHERIC",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Precipitation across all districts for the next nine hours. Surface reflectivity elevated. Reduce approach speed."
+  },
+  {
+   "slot": "weather_03",
+   "file": "chatter/weather_03.mp3",
+   "group": "weather",
+   "layer": "fore",
+   "tags": [
+    "weather"
+   ],
+   "speaker": "ATMOSPHERIC",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Daylight index, zero point two. This is the maximum for today."
+  },
+  {
+   "slot": "weather_04",
+   "file": "chatter/weather_04.mp3",
+   "group": "weather",
+   "layer": "fore",
+   "tags": [
+    "weather"
+   ],
+   "speaker": "ATMOSPHERIC",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Electrical activity above three hundred metres. Craft in the upper lanes should descend. Craft that cannot descend should continue."
+  },
+  {
+   "slot": "weather_05",
+   "file": "chatter/weather_05.mp3",
+   "group": "weather",
+   "layer": "fore",
+   "tags": [
+    "weather"
+   ],
+   "speaker": "ATMOSPHERIC",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "The smog band has lifted to one hundred and forty metres. Enjoy the view."
+  },
+  {
+   "slot": "life_01",
+   "file": "chatter/life_01.mp3",
+   "group": "life",
+   "layer": "fore",
+   "tags": [
+    "life"
+   ],
+   "speaker": "OPEN CHANNEL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Third time at this pad and the lift's still out. I'm carrying it up. Forty floors. Somebody owes me a drink."
+  },
+  {
+   "slot": "life_02",
+   "file": "chatter/life_02.mp3",
+   "group": "life",
+   "layer": "fore",
+   "tags": [
+    "life"
+   ],
+   "speaker": "OPEN CHANNEL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Market's open on the Gantry until two. Bring your own light, the strip's been dead since spring."
+  },
+  {
+   "slot": "life_03",
+   "file": "chatter/life_03.mp3",
+   "group": "life",
+   "layer": "fore",
+   "tags": [
+    "life"
+   ],
+   "speaker": "OPEN CHANNEL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Anyone flying past Sixteen Low — is that a fire or is that just Tuesday?"
+  },
+  {
+   "slot": "life_04",
+   "file": "chatter/life_04.mp3",
+   "group": "life",
+   "layer": "fore",
+   "tags": [
+    "life"
+   ],
+   "speaker": "OPEN CHANNEL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Tower maintenance, block nine. We are aware the beacon is out. We have been aware for some time."
+  },
+  {
+   "slot": "life_05",
+   "file": "chatter/life_05.mp3",
+   "group": "life",
+   "layer": "fore",
+   "tags": [
+    "life"
+   ],
+   "speaker": "OPEN CHANNEL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Taxi four-one-one, off shift, going home. Whoever's got the Lantern run tonight — good luck, and I mean that."
+  },
+  {
+   "slot": "life_06",
+   "file": "chatter/life_06.mp3",
+   "group": "life",
+   "layer": "fore",
+   "tags": [
+    "life"
+   ],
+   "speaker": "OPEN CHANNEL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "My kid asked what the sky looks like. I said grey. She said what's grey. Fair question."
+  },
+  {
+   "slot": "life_07",
+   "file": "chatter/life_07.mp3",
+   "group": "life",
+   "layer": "fore",
+   "tags": [
+    "life"
+   ],
+   "speaker": "OPEN CHANNEL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": true,
+   "text": "GET IT OFF THE EDGE. OFF THE EDGE. IT IS NOT SECURED."
+  },
+  {
+   "slot": "life_08",
+   "file": "chatter/life_08.mp3",
+   "group": "life",
+   "layer": "fore",
+   "tags": [
+    "life"
+   ],
+   "speaker": "OPEN CHANNEL",
+   "tag": "info",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Understack, if you're listening — play the one about the windows again. It's been a week."
+  }
+ ]
+}

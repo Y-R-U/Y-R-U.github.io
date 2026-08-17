@@ -1,0 +1,627 @@
+/* NEONHAUL — one file, mobile-first, safe-area aware. */
+
+:root {
+  --ink: #05070c;
+  --panel: #0b0d12;
+  --line: #1b2230;
+  --text: #cfe2f5;
+  --dim: #7d8ea3;
+  --cyan: #35e6ff;
+  --mag: #ff3ea5;
+  --amber: #ffb238;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  background: #000; color: var(--text);
+  font: 400 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  overflow: hidden;
+  /* §2.8: double-tap zoom, rubber-band scroll and drag-select all break the control scheme */
+  touch-action: none;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#stage, #stage canvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  touch-action: none;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.hidden { display: none !important; }
+
+/* ── boot ─────────────────────────────────────────────────────────────── */
+
+#boot {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; background: var(--ink); z-index: 60;
+  transition: opacity .5s ease;
+}
+#boot.fade { opacity: 0; pointer-events: none; }
+#boot-title {
+  font-size: 30px; letter-spacing: .42em; font-weight: 300;
+  color: var(--cyan); text-shadow: 0 0 18px rgba(53, 230, 255, .55);
+  padding-left: .42em;
+}
+#boot-bar { width: min(52vw, 260px); height: 2px; background: #131a26; overflow: hidden; }
+#boot-fill { width: 0; height: 100%; background: var(--cyan); transition: width .3s ease; }
+#boot-status { color: var(--dim); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+
+/* ── layers ───────────────────────────────────────────────────────────── */
+
+#hud, #dock, #ui {
+  position: fixed; inset: 0; z-index: 20;
+  pointer-events: none;
+  padding: var(--safe-t) var(--safe-r) var(--safe-b) var(--safe-l);
+}
+#dock, #ui { z-index: 30; pointer-events: auto; }
+
+/* ── toasts ───────────────────────────────────────────────────────────── */
+
+#toasts {
+  position: fixed; z-index: 45; pointer-events: none;
+  top: calc(var(--safe-t) + 10px); left: 0; right: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.toast {
+  background: rgba(11, 13, 18, .86);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--cyan);
+  padding: 7px 14px; border-radius: 3px;
+  font-size: 12px; letter-spacing: .04em;
+  animation: toast-in .22s ease;
+  max-width: min(78vw, 420px);
+}
+.toast.out { opacity: 0; transition: opacity .35s ease; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(-6px); } }
+
+/* §8.4's four kinds. Colour on the left rule only — a full-colour toast over a mostly-black
+   frame is a light source, and every saturated colour in frame is supposed to be one. */
+.toast.t-pay  { border-left-color: #6cff9c; color: #d8ffe6; }
+.toast.t-info { border-left-color: var(--cyan); }
+.toast.t-warn { border-left-color: var(--amber); color: #ffe8c2; }
+.toast.t-bad  { border-left-color: #ff2b3a; color: #ffd8da; }
+
+/* ── §8.6 minimap ─────────────────────────────────────────────────────────
+   Top-right in portrait, right-of-centre in landscape. `pointer-events: none` is load-bearing,
+   not cosmetic: this sits inside the look thumb's half of the screen. */
+
+#minimap {
+  position: absolute;
+  width: 128px; height: 128px;
+  top: calc(var(--safe-t) + 56px);
+  right: calc(var(--safe-r) + 10px);
+  pointer-events: none;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, .7));
+}
+
+/* ── §8.5 chatter popup ───────────────────────────────────────────────── */
+
+#chatter {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(var(--safe-b) + 96px);
+  /* raised in portrait — see the orientation query below */
+  display: flex; justify-content: center;
+  pointer-events: none;
+}
+.chat-line {
+  width: min(76vw, 460px);
+  background: rgba(6, 9, 14, .82);
+  border-left: 2px solid var(--cyan);
+  padding: 7px 12px 8px;
+  border-radius: 0 3px 3px 0;
+  animation: toast-in .2s ease;
+}
+.chat-line.k-pay { border-left-color: #6cff9c; }
+.chat-line.k-warn { border-left-color: var(--amber); }
+.chat-line.k-bad { border-left-color: #ff2b3a; }
+.chat-speaker {
+  font: 600 9px/1 ui-monospace, Menlo, monospace;
+  letter-spacing: .22em; color: var(--cyan); text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.chat-line.k-warn .chat-speaker { color: var(--amber); }
+.chat-line.k-bad .chat-speaker { color: #ff5a52; }
+.chat-text { font-size: 13px; line-height: 1.35; color: var(--text); }
+.chat-bar { margin-top: 6px; height: 1px; background: rgba(53, 230, 255, .14); }
+.chat-bar i { display: block; height: 100%; background: rgba(53, 230, 255, .55); width: 100%; }
+
+/* ── the chase-view instrument strip (see hud.js — not in §8) ──────────── */
+
+#hud-strip {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(var(--safe-b) + 16px);
+  display: flex; justify-content: center; align-items: center; gap: 8px;
+  pointer-events: none; flex-wrap: wrap;
+  padding: 0 calc(var(--safe-l) + 78px) 0 calc(var(--safe-r) + 78px);
+}
+#hud-strip .chip {
+  background: rgba(6, 9, 14, .72);
+  border: 1px solid rgba(53, 230, 255, .18);
+  border-radius: 3px; padding: 4px 9px;
+  display: flex; align-items: baseline; gap: 4px;
+}
+#hud-strip .chip b { font: 300 17px/1 ui-monospace, Menlo, monospace; color: #eaf6ff; }
+#hud-strip .chip i {
+  font: 600 8px/1 ui-monospace, Menlo, monospace; font-style: normal;
+  letter-spacing: .12em; color: var(--dim); text-transform: uppercase;
+}
+#hud-strip .chip.bad { border-color: rgba(255, 43, 58, .5); }
+#hud-strip .chip.bad b { color: #ff5a52; }
+#hud-strip .chip.task {
+  font: 500 11px/1 ui-monospace, Menlo, monospace; color: #6cff9c; letter-spacing: .04em;
+}
+#hud-strip .chip.task.dim { color: var(--dim); }
+
+/* ── perf overlay (?perf) ─────────────────────────────────────────────── */
+
+#perf {
+  position: fixed; z-index: 50; pointer-events: none;
+  top: calc(var(--safe-t) + 6px); left: calc(var(--safe-l) + 6px);
+  background: rgba(0, 0, 0, .62);
+  border: 1px solid #1b2230;
+  padding: 6px 8px; border-radius: 3px;
+  font: 400 10px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #9fe8ff; white-space: pre;
+}
+
+/* ── context loss ─────────────────────────────────────────────────────── */
+
+#ctxlost {
+  position: fixed; inset: 0; z-index: 70;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5, 7, 12, .92);
+}
+#ctxlost .panel {
+  border: 1px solid var(--line); background: var(--panel);
+  padding: 20px 26px; border-radius: 4px; text-align: center;
+}
+#ctxlost h2 { margin: 0 0 6px; font-size: 15px; font-weight: 500; letter-spacing: .1em; color: var(--amber); }
+#ctxlost p { margin: 0; color: var(--dim); font-size: 12px; }
+
+/* ── §6.1 controls ────────────────────────────────────────────────────────
+   The capture surface is the whole viewport and carries no visible split: the halves are a
+   function of `innerWidth / 2` in controls.js, so they follow a rotation with nothing to
+   re-lay-out, and the same code serves portrait and landscape. */
+
+#controls {
+  position: fixed; inset: 0; z-index: 18;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+#stick {
+  position: fixed; width: 0; height: 0; pointer-events: none;
+  opacity: 0; transition: opacity .12s ease;
+}
+#stick.on { opacity: 1; }
+#stick .ring, #stick .nub {
+  position: absolute; border-radius: 50%; transform: translate(-50%, -50%);
+  left: 0; top: 0;
+}
+#stick .ring {
+  width: 128px; height: 128px;
+  border: 1px solid rgba(53, 230, 255, .34);
+  background: radial-gradient(circle, rgba(53, 230, 255, .07), transparent 68%);
+}
+#stick .nub {
+  width: 46px; height: 46px;
+  border: 1px solid rgba(53, 230, 255, .75);
+  background: rgba(53, 230, 255, .16);
+  box-shadow: 0 0 14px rgba(53, 230, 255, .32);
+}
+
+/* The pad sits in the LOOK half's bottom outer corner (§6.1) and mirrors with the flip. */
+#altpad {
+  position: fixed; right: calc(var(--safe-r) + 14px); bottom: calc(var(--safe-b) + 16px);
+  display: flex; flex-direction: column; gap: 10px; align-items: center;
+}
+#controls.flipped #altpad { right: auto; left: calc(var(--safe-l) + 14px); }
+
+.ctl-btn {
+  -webkit-appearance: none; appearance: none;
+  width: var(--btn, 56px); height: var(--btn, 56px);
+  border-radius: 50%;
+  border: 1px solid rgba(53, 230, 255, .38);
+  background: rgba(8, 12, 18, .5);
+  color: var(--cyan);
+  font: 400 17px/1 system-ui, sans-serif;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: auto; touch-action: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.ctl-btn:active { background: rgba(53, 230, 255, .2); border-color: rgba(53, 230, 255, .85); }
+.ctl-btn.boost { color: var(--amber); border-color: rgba(255, 178, 56, .42); font-size: 13px; letter-spacing: -1px; }
+.ctl-btn.boost:active { background: rgba(255, 178, 56, .22); border-color: rgba(255, 178, 56, .9); }
+.ctl-btn.gear {
+  position: fixed; top: calc(var(--safe-t) + 10px); right: calc(var(--safe-r) + 10px);
+  width: 38px; height: 38px; font-size: 15px; color: var(--dim);
+  border-color: rgba(125, 142, 163, .3);
+}
+#controls.flipped .ctl-btn.gear { right: auto; left: calc(var(--safe-l) + 10px); }
+
+/* ── §6.5 settings ────────────────────────────────────────────────────── */
+
+#settings {
+  position: fixed; inset: 0; z-index: 40;
+  background: rgba(3, 5, 9, .74);
+  display: flex; align-items: center; justify-content: center;
+  padding: calc(var(--safe-t) + 12px) calc(var(--safe-r) + 12px) calc(var(--safe-b) + 12px) calc(var(--safe-l) + 12px);
+  overflow: auto;
+}
+.set-panel {
+  width: min(420px, 100%); max-height: 100%; overflow: auto;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 5px;
+  padding: 16px 16px 12px;
+}
+.set-title {
+  font-size: 11px; letter-spacing: .3em; color: var(--cyan);
+  margin-bottom: 12px; text-transform: uppercase;
+}
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 0; }
+.set-label { font-size: 12px; color: var(--text); white-space: nowrap; }
+.set-seg { display: flex; align-items: center; gap: 6px; }
+.set-opt {
+  -webkit-appearance: none; appearance: none;
+  border: 1px solid var(--line); background: transparent; color: var(--dim);
+  font: 400 11px/1 system-ui, sans-serif; padding: 7px 10px; border-radius: 3px; cursor: pointer;
+}
+.set-opt.on { color: var(--ink); background: var(--cyan); border-color: var(--cyan); }
+.set-note { font-size: 10px; color: var(--dim); margin: -4px 0 4px; letter-spacing: .02em; }
+.set-val { font: 400 11px/1 ui-monospace, Menlo, monospace; color: var(--cyan); width: 34px; text-align: right; }
+.set-panel input[type=range] { width: 128px; accent-color: var(--cyan); }
+.set-close {
+  -webkit-appearance: none; appearance: none; width: 100%; margin-top: 12px;
+  border: 1px solid var(--line); background: transparent; color: var(--dim);
+  font: 400 11px/1 system-ui, sans-serif; letter-spacing: .2em; padding: 10px; border-radius: 3px; cursor: pointer;
+}
+
+/* In portrait the §8.2 dash occupies the bottom ~28 % of the frame, so a chatter line at 96 px
+   sits on top of the speed readout. Measured on a 390x844 capture: the line covered the arc. */
+@media (orientation: portrait) {
+  #chatter { bottom: calc(var(--safe-b) + 30vh); }
+  #hud-strip { bottom: calc(var(--safe-b) + 22vh); }
+}
+
+@media (orientation: landscape) and (max-height: 480px) {
+  #boot-title { font-size: 22px; }
+  #altpad { gap: 7px; bottom: calc(var(--safe-b) + 8px); }
+  .set-row { padding: 4px 0; }
+  .set-panel { width: min(520px, 100%); padding: 12px 14px 10px; }
+  /* §8.6 puts the map "right-of-centre in landscape" — a short viewport has no room under the
+     gear, and the far corner is where the look thumb lives. */
+  #minimap { width: 104px; height: 104px; top: calc(var(--safe-t) + 8px); right: calc(var(--safe-r) + 54px); }
+  #chatter { bottom: calc(var(--safe-b) + 62px); }
+  #hud-strip { bottom: calc(var(--safe-b) + 10px); }
+}
+
+/* ── P7a — the job board and the shop (js/ui.js DockUI) ──────────────────
+   NOT §7.3's docking panel: that is P7b's `dock.js` and it renders into #dock. This is the plain
+   functional board §13 puts in ui.js, styled to the same discipline as everything else — one
+   saturated colour per panel (the zone tint, injected as --tint), greys for the rest, tabular
+   numerals, nothing round, nothing that bounces. Portrait first; landscape widens the sheet.
+   No `backdrop-filter` anywhere — §7.3 explains why (a full-res readback per composited frame on
+   mobile Safari, over a live WebGL canvas). */
+
+#ui {
+  position: fixed; inset: 0; z-index: 35;
+  background: rgba(3, 5, 9, .82);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: max(calc(var(--safe-t) + 8px), calc(var(--toast-h, 0px) + 8px)) calc(var(--safe-r) + 8px) calc(var(--safe-b) + 8px) calc(var(--safe-l) + 8px);
+}
+.dk-sheet {
+  --tint: var(--cyan);
+  width: min(460px, 100%); max-height: 100%; overflow: auto;
+  /* §7.3: "#080a0f at 0.96 over a static blurred still of the city". The still is a 96 px
+     data-URL captured in the rAF callback after composer.render() and upscaled by
+     background-size: cover — the upscale IS the blur. No backdrop-filter; see the note above. */
+  background-color: rgba(8, 10, 15, .96);
+  background-position: center; background-size: cover; background-repeat: no-repeat;
+  background-blend-mode: multiply;
+  border: 1px solid var(--tint); border-radius: 4px;
+  box-shadow: 0 0 22px -6px var(--tint);
+  padding: 12px 12px 10px;
+  font-variant-numeric: tabular-nums;
+  animation: dk-in .18s ease-out;
+}
+@keyframes dk-in { from { transform: scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* The sheet scrolls, and the first browser run found UNDOCK sitting below the fold on a 390x844
+   portrait with three jobs on the board — a modal panel with no reachable way out. Header and tabs
+   stick to the top of the scroll box, UNDOCK to the bottom, so both are always under a thumb. */
+.dk-head {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+  position: sticky; top: -12px; z-index: 2;
+  background: rgba(8, 10, 15, .98); padding: 12px 0 6px; margin: -12px 0 0;
+}
+.dk-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.dk-kicker { font-size: 10px; letter-spacing: .28em; color: var(--tint); text-transform: uppercase; }
+.dk-pad { font-size: 17px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dk-dist { font-size: 11px; color: var(--dim); }
+.dk-purse { text-align: right; display: flex; flex-direction: column; gap: 2px; }
+.dk-purse b { font-size: 17px; color: #6cff9c; font-weight: 500; }
+.dk-purse span { font-size: 10px; color: var(--dim); letter-spacing: .04em; }
+
+.dk-tabs {
+  display: flex; gap: 6px; margin: 0 0 8px; padding-bottom: 8px;
+  position: sticky; top: 52px; z-index: 2; background: rgba(8, 10, 15, .98);
+}
+.dk-tab {
+  -webkit-appearance: none; appearance: none; flex: 1;
+  border: 1px solid var(--line); background: transparent; color: var(--dim);
+  font: 400 10px/1 system-ui, sans-serif; letter-spacing: .18em; padding: 8px 4px; border-radius: 3px; cursor: pointer;
+}
+.dk-tab.on { color: var(--ink); background: var(--tint); border-color: var(--tint); }
+
+.dk-body { display: flex; flex-direction: column; gap: 10px; }
+.dk-empty { font-size: 12px; color: var(--dim); padding: 18px 2px; text-align: center; }
+
+.dk-job, .dk-held, .dk-sect {
+  border: 1px solid var(--line); border-radius: 3px; padding: 10px;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.dk-job.rush { border-color: #ff2b3a; }
+.dk-sect h4 { margin: 0 0 2px; font: 500 10px/1 system-ui, sans-serif; letter-spacing: .24em; color: var(--tint); }
+/* The client block is a button: it opens §7.3's panel for that job. It has to LOOK pressable
+   without becoming a second ACCEPT, so it is a flat row with a chevron and no fill. */
+.dk-who {
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 0 0 2px; margin: 0; text-align: left;
+  background: none; border: 0; border-bottom: 1px solid var(--line);
+  color: inherit; font: inherit;
+}
+.dk-whotx { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.dk-more { color: var(--tint); font-size: 13px; opacity: .8; }
+.dk-thumb {
+  width: 48px; height: 48px; flex: 0 0 48px;
+  border: 1px solid var(--line); background: #0a0d13;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.dk-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dk-ph { font-size: 15px; letter-spacing: .06em; color: var(--tint); opacity: .85; }
+.dk-client { font-size: 14px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dk-fac { font-size: 10px; color: var(--dim); letter-spacing: .1em; text-transform: uppercase;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dk-line { font-size: 11px; color: var(--dim); font-style: italic;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dk-parcel { font-size: 13px; color: var(--text); }
+.dk-dest { font-size: 12px; color: var(--dim); }
+.dk-chips { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; color: var(--dim); }
+.dk-chip { border: 1px solid var(--line); border-radius: 2px; padding: 2px 6px; }
+.dk-chip.risk.r1 { color: var(--amber); }
+.dk-chip.risk.r2, .dk-chip.risk.r3 { color: #ff6a4a; }
+.dk-chip.hot { color: #ff2b3a; border-color: #ff2b3a; }
+.dk-pay { display: flex; justify-content: space-between; align-items: baseline; margin-top: 3px; }
+.dk-payl { font-size: 10px; letter-spacing: .24em; color: var(--dim); }
+.dk-pay b { font-size: 22px; font-weight: 500; color: var(--text); }
+.dk-bonus { display: flex; justify-content: space-between; font-size: 11px; color: var(--dim); }
+
+.dk-acts { display: flex; gap: 6px; margin-top: 6px; }
+.dk-accept, .dk-fill, .dk-ghost, .dk-shop, .dk-undock {
+  -webkit-appearance: none; appearance: none;
+  font: 400 12px/1 system-ui, sans-serif; letter-spacing: .16em;
+  padding: 12px 10px; border-radius: 3px; cursor: pointer; min-height: 42px;
+}
+.dk-accept, .dk-fill { flex: 2; border: 1px solid var(--tint); background: var(--tint); color: var(--ink); }
+.dk-fill { width: 100%; }
+.dk-ghost { flex: 1; border: 1px solid var(--line); background: transparent; color: var(--dim); }
+.dk-shop { width: 100%; border: 1px solid var(--line); background: transparent; color: var(--text); text-align: left; letter-spacing: .06em; }
+.dk-accept:disabled, .dk-fill:disabled, .dk-shop:disabled { opacity: .38; cursor: default; }
+.dk-note { font-size: 11px; color: var(--amber); margin-top: 8px; }
+.dk-undock {
+  width: 100%; margin-top: 10px;
+  position: sticky; bottom: -10px; z-index: 2;
+  border: 1px solid var(--line); background: rgba(8, 10, 15, .98); color: var(--text);
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  #ui { align-items: center; }
+  .dk-sheet { width: min(640px, 100%); }
+  .dk-body { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+}
+
+/* §7.2's DOCK button. `#ui` keeps its z-index but gives every pixel back to the control layer
+   underneath — only the button itself is live. Top-centre, clear of the minimap (top-right), the
+   gear (top-right corner), the stick and the ▲/▼ pad. */
+#ui.chip {
+  background: none;
+  pointer-events: none;
+  align-items: flex-start;
+}
+.dk-prompt {
+  -webkit-appearance: none; appearance: none; pointer-events: auto;
+  margin-top: 6px;
+  border: 1px solid var(--cyan); border-radius: 3px;
+  background: rgba(8, 10, 15, .88); color: var(--cyan);
+  font: 400 11px/1 system-ui, sans-serif; letter-spacing: .18em;
+  padding: 11px 18px; min-height: 40px; cursor: pointer;
+  box-shadow: 0 0 16px -6px var(--cyan);
+}
+
+/* ── P7b — §7.3's DOCKING PANEL (js/dock.js, renders into #dock) ───────────
+   The main UI of the game. The board (#ui) is the list you scan; this is the deal you read: one
+   client, one job, three blocks in the order a player asks the questions — who is this, what do
+   they want, do I take it.
+
+   The rules §7.3 calls "what makes it outstanding", and all of them are cheap:
+     · exactly ONE saturated colour per panel — the client's own tint_hex, which is the neon the
+       portrait was actually lit with, so the UI and the image agree. Everything else is greys.
+     · one family, THREE SIZES ONLY — 10 (kickers, labels, chips, bonus rows), 14 (body: the
+       quote, the parcel, the destination, the buttons) and 28 (the two things the panel is
+       about: WHO, and HOW MUCH) — one weight change, tabular numerals everywhere. Gate P7
+       counts the distinct computed sizes in the live panel, because a type scale nobody
+       measures grows a fourth size the first time something looks slightly wrong.
+     · 180 ms scale + blur + fade in; rows stagger 40 ms. CSS keyframes, no JS animation loop.
+     · the media frame gets a 1 px inner neon edge, a 3 px outer glow at 20 %, and a scanline
+       gradient at 4 % over mix-blend-mode: screen.
+     · nothing bounces; nothing is round except the reliability chips.
+   NO `backdrop-filter` — see the note on #ui above; it is a per-frame full-res readback on mobile
+   Safari over a live WebGL canvas, for an effect that is not even moving. */
+
+#dock {
+  position: fixed; inset: 0; z-index: 36;
+  background: rgba(2, 3, 6, .86);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: max(calc(var(--safe-t) + 8px), calc(var(--toast-h, 0px) + 8px)) calc(var(--safe-r) + 8px) calc(var(--safe-b) + 8px) calc(var(--safe-l) + 8px);
+  pointer-events: auto;
+}
+#dock.hidden { display: none; }
+
+.cp-sheet {
+  --tint: var(--cyan);
+  width: min(460px, 100%); max-height: 100%; overflow: auto;
+  background-color: rgba(8, 10, 15, .96);
+  background-position: center; background-size: cover; background-repeat: no-repeat;
+  background-blend-mode: multiply;
+  border: 1px solid var(--tint); border-radius: 4px;
+  box-shadow: 0 0 26px -8px var(--tint);
+  padding: 14px 14px 12px;
+  font-variant-numeric: tabular-nums;
+  animation: cp-in .18s ease-out;
+}
+@keyframes cp-in {
+  from { transform: scale(.96); opacity: 0; filter: blur(6px); }
+  to   { transform: none; opacity: 1; filter: none; }
+}
+/* §7.3's 40 ms row stagger. Five children, five delays — no JS. */
+.cp-sheet > * { animation: cp-row .22s both; }
+.cp-sheet > :nth-child(1) { animation-delay: .00s; }
+.cp-sheet > :nth-child(2) { animation-delay: .04s; }
+.cp-sheet > :nth-child(3) { animation-delay: .08s; }
+.cp-sheet > :nth-child(4) { animation-delay: .12s; }
+.cp-sheet > :nth-child(5) { animation-delay: .16s; }
+@keyframes cp-row { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.cp-kicker {
+  font-size: 10px; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--tint); margin-bottom: 10px;
+}
+
+/* ── block 1 — who is this ─────────────────────────────────────────────── */
+.cp-who { display: flex; gap: 12px; align-items: flex-start; }
+.cp-id { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.cp-name { font-size: 28px; font-weight: 500; color: var(--text); letter-spacing: -.01em; line-height: 1.05; }
+.cp-fac { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.cp-line { font-size: 14px; color: #9fb0c6; font-style: italic; margin-top: 6px; }
+
+/* The only round things in the panel, per §7.3. */
+.cp-rel { display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+.cp-rel i { width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--tint); opacity: .45; }
+.cp-rel i.on { background: var(--tint); opacity: 1; }
+.cp-rel span { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); margin-left: 4px; }
+
+/* The hex-clipped media frame. The clip is on the frame; the 1 px neon edge and the 3 px glow are
+   a second, slightly larger hex behind it, because a clip-path cuts a border off. */
+.cp-media {
+  position: relative; width: 132px; height: 132px; flex: 0 0 132px;
+  background: #05070b;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  overflow: hidden;
+}
+.cp-media::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  box-shadow: inset 0 0 0 1px var(--tint), inset 0 0 12px -2px var(--tint);
+}
+.cp-still, .cp-video {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; display: block; background: #05070b;
+}
+.cp-video { z-index: 1; }
+.cp-ph {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 28px; letter-spacing: .06em; color: var(--tint); opacity: .55;
+  background: linear-gradient(160deg, #0b0f16, #05070b);
+}
+.cp-scan {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  mix-blend-mode: screen; opacity: .04;
+  background: repeating-linear-gradient(to bottom, #fff 0 1px, transparent 1px 3px);
+}
+/* §7.3's 2 s "signal acquired" wipe, once, on open. */
+.cp-wipe {
+  position: absolute; left: 0; right: 0; height: 34%; z-index: 3; pointer-events: none;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--tint) 55%, transparent), transparent);
+  animation: cp-wipe 2s ease-out 1 both;
+}
+@keyframes cp-wipe { from { top: -34%; opacity: .9; } to { top: 100%; opacity: 0; } }
+/* §9.6's absence path: the still, with a subtle scanline shimmer and no <video> at all. */
+.cp-media.shimmer .cp-scan { animation: cp-shim 3.4s ease-in-out infinite; opacity: .07; }
+@keyframes cp-shim { 0%, 100% { opacity: .04; } 50% { opacity: .11; } }
+
+/* ── block 2 — what do they want ───────────────────────────────────────── */
+.cp-deal {
+  margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.cp-parcel { font-size: 14px; color: var(--text); }
+.cp-dest { font-size: 14px; color: var(--dim); }
+.cp-chips { display: flex; flex-wrap: wrap; gap: 6px; font-size: 10px; color: var(--dim); }
+.cp-chip { border: 1px solid var(--line); border-radius: 2px; padding: 3px 7px; }
+.cp-chip.risk.r1 { color: var(--amber); }
+.cp-chip.risk.r2, .cp-chip.risk.r3 { color: #ff6a4a; }
+.cp-chip.hot { color: #ff2b3a; border-color: #ff2b3a; }
+.cp-pay {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--line);
+}
+.cp-payl { font-size: 10px; letter-spacing: .24em; color: var(--dim); }
+.cp-pay b { font-size: 28px; font-weight: 500; color: var(--text); }
+.cp-bonus { display: flex; justify-content: space-between; font-size: 10px; color: var(--dim); }
+.cp-bonus b { font-weight: 400; color: #9fb0c6; }
+.cp-bonus.dim { opacity: .42; }        /* §7.3: "dimmed until earned" */
+.cp-note { font-size: 10px; color: var(--amber); margin-top: 10px; }
+
+/* ── block 3 — do I take it ────────────────────────────────────────────── */
+.cp-accept, .cp-ghost {
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  font-family: inherit; font-weight: 400; font-size: 14px; line-height: 1;
+  letter-spacing: .16em;
+  padding: 13px 10px; min-height: 44px; border-radius: 3px;
+}
+.cp-accept {
+  width: 100%; margin-top: 14px;
+  border: 1px solid var(--tint); background: var(--tint); color: #05070b;
+}
+.cp-accept:disabled { opacity: .38; cursor: default; }
+.cp-acts { display: flex; gap: 8px; margin-top: 8px; }
+.cp-ghost { flex: 1; border: 1px solid var(--line); background: transparent; color: var(--dim); }
+
+/* §7.3: "identical DOM, a CSS grid switch puts the media block in the left column and the deal
+   plus actions in the right. No JS branch." */
+@media (orientation: landscape) and (max-height: 520px) {
+  #dock { align-items: center; }
+  .cp-sheet {
+    width: min(720px, 100%); padding: 10px 12px 10px;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: 'kick deal' 'who deal' 'note acc' 'note acts';
+    column-gap: 18px; align-content: start;
+  }
+  .cp-kicker { grid-area: kick; margin-bottom: 6px; }
+  /* The media block stays a ROW here. Stacking it made the left column ~410 px tall on a 390 px
+     viewport, which put HAGGLE and DECLINE below the fold — the same "modal with no reachable way
+     out" the board's UNDOCK button hit on its first browser run. */
+  .cp-who { grid-area: who; }
+  .cp-media { width: 96px; height: 96px; flex: 0 0 96px; }
+  .cp-name { font-size: 28px; }
+  .cp-deal { grid-area: deal; margin-top: 0; border-top: 0; padding-top: 0; }
+  .cp-note { grid-area: note; }
+  .cp-accept { grid-area: acc; margin-top: 8px; }
+  .cp-acts { grid-area: acts; margin-top: 8px; }
+  .cp-accept, .cp-ghost { min-height: 40px; padding: 10px; }
+  .cp-pay b { font-size: 24px; }
+}

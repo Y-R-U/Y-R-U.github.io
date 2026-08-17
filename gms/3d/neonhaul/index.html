@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#05070c">
+<title>NEONHAUL</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+
+<div id="stage"></div>
+
+<!-- every screen is static markup hidden by .hidden; phases fill them in -->
+
+<div id="boot">
+  <div id="boot-title">NEONHAUL</div>
+  <div id="boot-bar"><div id="boot-fill"></div></div>
+  <div id="boot-status">warming the grid…</div>
+</div>
+
+<!-- §6.1 — the two-thumb control layer. One full-screen capture surface (both halves are live at
+     once and neither owns a fixed widget), the floating stick, and the button pad that §6.1 puts
+     in the LOOK half's outer corner so the look thumb reaches ▲/▼ without lifting. `.flipped`
+     mirrors the pad when the movement side is swapped in settings. -->
+<div id="controls" class="hidden">
+  <div id="stick"><div class="ring"></div><div class="nub"></div></div>
+  <div id="altpad">
+    <button id="btn-boost" class="ctl-btn boost" aria-label="boost">&#9656;&#9656;</button>
+    <button id="btn-up" class="ctl-btn" aria-label="climb">&#9650;</button>
+    <button id="btn-down" class="ctl-btn" aria-label="descend">&#9660;</button>
+  </div>
+  <button id="btn-settings" class="ctl-btn gear" aria-label="settings">&#9881;</button>
+</div>
+
+<!-- §8's DOM half. It is `pointer-events: none` all the way down and it must stay that way: the
+     right half of the screen is the look thumb and the minimap sits in it. gates_p6 asserts
+     elementFromPoint over the map returns #controls, and falsifies that by turning the map's
+     pointer-events on. §8.4's toast rail is the separate #toasts layer above.
+     NOT `hidden` by default — main.js hides this layer for ?nohud and for any shot whose
+     scenario says hud:false, which is the only thing that should ever hide it. -->
+<div id="hud">
+  <canvas id="minimap" width="256" height="256"></canvas>
+  <div id="chatter" class="hidden"></div>
+  <div id="hud-strip" class="hidden"></div>
+</div>
+<div id="settings" class="hidden"></div>
+<div id="dock" class="hidden"></div>
+<div id="ui" class="hidden"></div>
+
+<div id="toasts"></div>
+
+<div id="perf" class="hidden"></div>
+
+<div id="ctxlost" class="hidden">
+  <div class="panel">
+    <h2>Graphics context lost</h2>
+    <p>Restoring…</p>
+  </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

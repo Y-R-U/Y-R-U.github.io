@@ -1,0 +1,19 @@
+{
+  "id": "canyon_dive",
+  "ref": "746850_03",
+  "seed": 1313165134,
+  "variant": "stormnight",
+  "clock": 1.4,
+  "pos": [
+    1305.6,
+    150,
+    260
+  ],
+  "yaw": 3.1416,
+  "pitch": -32,
+  "fov": 64,
+  "craft": true,
+  "hud": false,
+  "aspect": null,
+  "note": "FROZEN at P3b. Centred on a 51.2 m lot boundary so the camera looks straight DOWN a street rather than at a wall \u2014 the plate's whole subject is the canyon, and an off-axis camera has buildings where the canyon should be. 150 m and -32 rather than \u00a712.1's 180/-38: at 180 m the canyon floor is past stormnight's V(2.2) = 279 m and renders as flat fog, which is the one thing this shot is not allowed to be. | P5: `craft` flipped to true per DECISIONS decision 14 (a hero subject in frame). The CAMERA is unchanged from the P3b freeze \u2014 pos, yaw, pitch, fov, variant and clock are identical."
+}

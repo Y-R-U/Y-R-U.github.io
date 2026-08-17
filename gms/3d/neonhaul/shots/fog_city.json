@@ -1,0 +1,19 @@
+{
+  "id": "fog_city",
+  "ref": "746850_01",
+  "seed": 1313165134,
+  "variant": "stormnight",
+  "clock": 23.2,
+  "pos": [
+    1350,
+    320,
+    180
+  ],
+  "yaw": 1.9,
+  "pitch": -14,
+  "fov": 68,
+  "craft": true,
+  "hud": false,
+  "aspect": null,
+  "note": "FROZEN at P3b (BUILD_PLAN \u00a712.1). 320 m over the Lantern Quarter's north edge, wide (fov 68) and near-level, looking back into The Ribs so the frame is amber low-rise in front of pink towers with three fog bands between them. \u00a712.1 says 'level'; -14 deg is the smallest pitch that puts a foreground roofline in the bottom third \u2014 a truly level 320 m camera in a city whose median height is 180 m frames half a screen of empty sky, which scores as an empty frame and not as a dark one. Plate 746850_01 is pitched about -25. | P5: `craft` flipped to true per DECISIONS decision 14 (a hero subject in frame). The CAMERA is unchanged from the P3b freeze \u2014 pos, yaw, pitch, fov, variant and clock are identical."
+}

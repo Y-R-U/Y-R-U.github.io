@@ -1,0 +1,52 @@
+{
+  "_readme": [
+    "Word lists for tools/bake_signs.mjs (BUILD_PLAN §3.5.2). Editing this file and re-running",
+    "`node tools/bake_signs.mjs` is the supported way to extend the signage atlas — no code change.",
+    "Counts: the baker takes the FIRST n entries of each list, where n is the region count for that",
+    "kind. Add words at the END so an extension does not reshuffle every existing region index.",
+    "Real-script entries are checked for glyph coverage at bake time; a word whose glyphs render as",
+    "tofu is skipped, logged, and its slot refilled with an abstract tile (§3.5.2 fallback)."
+  ],
+
+  "board_en": [
+    "NOODLES", "RAMEN BAR", "OPEN 24H", "PHARMACY", "HOT FOOD", "COLD STORE",
+    "LOADING BAY", "TRANSIT", "SPARE PARTS", "SALVAGE", "IMPORTS", "DATA BANK",
+    "ARCADE", "TEA HOUSE", "LAUNDRY", "RENTALS", "DRINKS", "SUSHI",
+    "EAST WARD", "SKYLINE", "HAULAGE", "DELIVERY", "FUEL DEPOT", "DOCK 4",
+    "LEVEL 12", "SECTOR 7", "NO ENTRY", "HIGH VOLTAGE", "SERVICE LIFT", "TOWER 9",
+    "GRAND HOTEL", "NIGHT MARKET", "CLINIC", "TOOLS", "WIRE", "SYNTH",
+    "ROOFTOP", "PAY HERE", "CARGO ONLY", "LOW CLEARANCE"
+  ],
+
+  "blade_en": [
+    "BAR", "HOTEL", "EAT", "OPEN", "SAKE", "CAFE", "ROOMS", "LOAN",
+    "GEAR", "CLUB", "PAWN", "DOJO", "TAXI", "SOUP", "ICE", "LAB",
+    "GYM", "MEDS", "KEYS", "DECK", "FUEL", "PODS"
+  ],
+
+  "board_ja": [
+    { "text": "営業中", "reading": "eigyochu", "meaning": "open (for business)" },
+    { "text": "駐車場", "reading": "chushajo", "meaning": "car park" },
+    { "text": "24時間", "reading": "nijuyo-jikan", "meaning": "24 hours" },
+    { "text": "出口", "reading": "deguchi", "meaning": "exit" },
+    { "text": "入口", "reading": "iriguchi", "meaning": "entrance" },
+    { "text": "東区", "reading": "higashi-ku", "meaning": "East Ward" }
+  ],
+
+  "blade_ja": [
+    { "text": "ラーメン", "reading": "ramen", "meaning": "ramen" },
+    { "text": "食堂", "reading": "shokudo", "meaning": "canteen / eatery" },
+    { "text": "薬", "reading": "kusuri", "meaning": "medicine (pharmacy)" },
+    { "text": "酒", "reading": "sake", "meaning": "liquor" },
+    { "text": "ホテル", "reading": "hoteru", "meaning": "hotel" },
+    { "text": "電気", "reading": "denki", "meaning": "electric" }
+  ],
+
+  "board_ko": [
+    { "text": "편의점", "reading": "pyeonuijeom", "meaning": "convenience store" }
+  ],
+
+  "blade_ko": [
+    { "text": "노래방", "reading": "noraebang", "meaning": "karaoke room" }
+  ]
+}

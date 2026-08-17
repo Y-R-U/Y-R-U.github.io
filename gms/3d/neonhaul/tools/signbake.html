@@ -1,0 +1,1088 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>NEONHAUL — signage atlas bake</title>
+<!--
+  BUILD_PLAN §3.5.1 / §3.5.2 / §3.5.3 / §3.5.6 — the offline signage bake page.
+
+  Draws every region into one 2048² canvas, WHITE MARKS ON PURE BLACK, no colour anywhere.
+  `tools/bake_signs.mjs` drives this over CDP, reads the canvas back, and runs oxipng to reduce
+  the RGBA canvas output to the 8-bit greyscale PNG §3.5.1 mandates.
+
+  It is also openable in a browser to eyeball the sheet before baking, which is how the abstract
+  generator gets checked. It fetches data/signwords.json, so it needs an http origin:
+
+      node tools/bake_signs.mjs --serve      # serves and prints the URL
+
+  No imports, no modules, no dependencies — this file is self-contained on purpose so the bake
+  never breaks because a game module moved.
+-->
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #14161a; color: #c8ccd4;
+         font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  header { padding: 10px 14px; border-bottom: 1px solid #262a31; display: flex;
+           gap: 16px; align-items: center; flex-wrap: wrap; }
+  h1 { font-size: 13px; margin: 0; font-weight: 600; letter-spacing: .04em; color: #eef1f6; }
+  label { display: flex; gap: 5px; align-items: center; cursor: pointer; user-select: none; }
+  #stage { position: relative; width: min(100%, 1024px); margin: 14px auto; }
+  #stage canvas { position: absolute; inset: 0; width: 100%; height: auto; display: block; }
+  #sheet { position: relative; }
+  #ovl { pointer-events: none; }
+  #log { max-width: 1024px; margin: 14px auto 40px; white-space: pre-wrap; color: #98a0ad; }
+  .err { color: #ff8f6b; }
+  .ok { color: #7fd39b; }
+</style>
+
+<header>
+  <h1>NEONHAUL signage atlas</h1>
+  <span id="hud">baking…</span>
+  <label><input type="checkbox" id="grid"> region overlay</label>
+  <label><input type="checkbox" id="labels"> labels</label>
+</header>
+<div id="stage">
+  <canvas id="sheet" width="2048" height="2048"></canvas>
+  <canvas id="ovl" width="2048" height="2048"></canvas>
+</div>
+<pre id="log"></pre>
+
+<script>
+(() => {
+'use strict';
+
+const Q = new URLSearchParams(location.search);
+const SIZE   = +(Q.get('size') || 2048);
+const SEED   = +(Q.get('seed') || 0x5164);
+const KOREAN = Q.get('korean') === '1';
+
+// 8 px between every pair of regions (§3.5.1), implemented as a 4 px ring on each rect so the
+// gap between two neighbouring content rects is exactly PAD. Same convention as js/atlas.js:
+// the gutter is taken OUT of the cell and holds that cell's own correct continuation — which for
+// a sign on a black sheet is black, and for a `ticker` (which scrolls its U) is the wrapped
+// pattern. Never the neighbour.
+const PAD = 8;
+
+// ── the region table ───────────────────────────────────────────────────────────────────────
+//
+// PLAN DEFECT, and the one deviation in this file. §3.5.2's pixel sizes sum to 13.25 Mpx of
+// content — 3.2x the 4.19 Mpx a 2048² sheet has, before any padding. Even halving every
+// dimension lands at 98 % occupancy, which no packer places. The counts are what §3.5.2 and the
+// manager brief actually care about (110 abstract, 12 real-script, the kind mix), so the counts
+// are kept exactly and the per-tile RESOLUTION is scaled down, preserving every aspect ratio
+// because §3.5.1 sizes the world quad from `region.aspect`. Result: 82.9 % occupancy, packs with
+// ~140 px of sheet height spare for later extension.
+//
+//   kind          §3.5.2 px    baked px    aspect
+//   board_*        512×128      224×56       4.0
+//   blade_*         96×384       48×192      0.25
+//   panel_abs      256×256      112×112      1.0
+//   mark           128×128       64×64       1.0
+//   rule           256×32       192×24       8.0
+//   ticker         512×64       256×32       8.0
+//   hero           512×512      192×192      1.0
+//   board_ja       512×128      256×64       4.0   ← kept larger: CJK needs the texels
+//   blade_ja        96×384       56×224      0.25  ← ditto
+//   poster           (new)      128×256      0.5   ← DECISIONS decision 9
+//
+// `tubeShare` is the fraction of that kind's regions that get mode "tube" (additive neon) as
+// opposed to "box" (lit lightbox panel, dark artwork). §3.5.4 wants roughly 70/30.
+const KINDS = [
+  { kind: 'board_en',  cls: 'english',  script: 'en',  n: 40, w: 224, h:  56, tubeShare: 0.75 },
+  { kind: 'board_abs', cls: 'abstract', script: 'abs', n: 46, w: 224, h:  56, tubeShare: 0.75 },
+  { kind: 'blade_en',  cls: 'english',  script: 'en',  n: 22, w:  48, h: 192, tubeShare: 0.80 },
+  { kind: 'blade_abs', cls: 'abstract', script: 'abs', n: 34, w:  48, h: 192, tubeShare: 0.80 },
+  { kind: 'panel_abs', cls: 'abstract', script: 'abs', n: 30, w: 112, h: 112, tubeShare: 0.00 },
+  { kind: 'mark',      cls: 'graphic',  script: 'abs', n: 26, w:  64, h:  64, tubeShare: 1.00 },
+  { kind: 'rule',      cls: 'graphic',  script: 'abs', n: 14, w: 192, h:  24, tubeShare: 1.00 },
+  { kind: 'ticker',    cls: 'graphic',  script: 'abs', n: 10, w: 256, h:  32, tubeShare: 1.00, wrapU: true },
+  { kind: 'hero',      cls: 'graphic',  script: 'abs', n:  8, w: 192, h: 192, tubeShare: 0.00 },
+  { kind: 'board_ja',  cls: 'japanese', script: 'ja',  n:  6, w: 256, h:  64, tubeShare: 0.50 },
+  { kind: 'blade_ja',  cls: 'japanese', script: 'ja',  n:  6, w:  56, h: 224, tubeShare: 0.50 },
+  { kind: 'poster',    cls: 'poster',   script: 'gfx', n:  8, w: 128, h: 256, tubeShare: 0.00 },
+];
+
+const SANS = '"Avenir Next Condensed","Helvetica Neue",Helvetica,Arial,sans-serif';
+const CJK  = '"Hiragino Sans","Hiragino Kaku Gothic ProN","Apple SD Gothic Neo","Helvetica Neue",sans-serif';
+const KO   = '"Apple SD Gothic Neo","AppleGothic","Hiragino Sans","Helvetica Neue",sans-serif';
+
+// ── rng ────────────────────────────────────────────────────────────────────────────────────
+// xorshift32, same generator js/utils.js uses. Every region draws from its OWN stream keyed on
+// its index, so adding a region never reshuffles the ones before it.
+function xorshift32(seed) {
+  let s = (seed | 0) || 0x9e3779b9;
+  return () => { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; return ((s >>> 0) / 4294967296); };
+}
+const pick = (rng, arr) => arr[Math.min(arr.length - 1, (rng() * arr.length) | 0)];
+const irnd = (rng, a, b) => a + ((rng() * (b - a + 1)) | 0);
+
+const log = [];
+const say = (s, cls) => { log.push(cls ? { s, cls } : { s }); };
+
+// ── the abstract glyph generator (§3.5.3) ──────────────────────────────────────────────────
+//
+// Random marks read as noise. Random marks that share a 4x5 lattice, one stroke width and a
+// baseline read as writing. That is the entire idea, and the four rules below are the whole
+// implementation.
+//
+// A glyph is emitted in NORMALISED coordinates: x in [0, adv], y in [0, 1] with y=0 the top of
+// the em box and y=1 the baseline. The drawing pass multiplies by `em`.
+
+const ADVANCES = [0.5, 0.7, 1.0, 1.0, 1.3];   // rule 3 — rhythm, not a picket fence
+const STROKE   = 0.14;                        // rule 2 — one pen across the whole tile
+
+function makeGlyph(rng, family) {
+  const adv = pick(rng, ADVANCES);
+  const S = [];
+  const X = c => (c / 3) * adv;               // rule 1 — the 4x5 lattice
+  const Y = r => r / 4;
+  const line = (c0, r0, c1, r1) => S.push({ t: 'l', x1: X(c0), y1: Y(r0), x2: X(c1), y2: Y(r1) });
+  const rect = (c0, r0, c1, r1) => S.push({ t: 'r', x: X(c0), y: Y(r0), w: X(c1) - X(c0), h: Y(r1) - Y(r0) });
+  const dot  = (c, r) => S.push({ t: 'd', x: X(c), y: Y(r) });
+  const arc  = (c, r, rad, a0, a1) => S.push({ t: 'a', x: X(c), y: Y(r), r: rad, a0, a1 });
+
+  if (family === 'bars') {
+    // verticals + short horizontals, few enclosures — kana-ish
+    const cols = [0, 1, 2, 3].filter(() => true);
+    const nv = irnd(rng, 2, 3);
+    const used = [];
+    for (let i = 0; i < nv; i++) {
+      let c = pick(rng, cols);
+      for (let g = 0; g < 4 && used.includes(c); g++) c = pick(rng, cols);
+      used.push(c);
+      line(c, irnd(rng, 0, 1), c, irnd(rng, 3, 4));
+    }
+    const nh = rng() < 0.85 ? irnd(rng, 1, 2) : 0;
+    for (let i = 0; i < nh; i++) {
+      const r = irnd(rng, 0, 4), c0 = irnd(rng, 0, 1);
+      line(c0, r, Math.min(3, c0 + irnd(rng, 1, 2)), r);
+    }
+    if (rng() < 0.28) dot(irnd(rng, 0, 3), irnd(rng, 0, 4));
+    if (rng() < 0.16) rect(0, 0, 1, 1);
+    if (rng() < 0.20) line(0, 4, 3, 4);
+
+  } else if (family === 'boxes') {
+    // closed boxes, crossbars, dense enclosures — kanji-ish
+    const r0 = rng() < 0.6 ? 0 : 1, r1 = rng() < 0.6 ? 4 : 3;
+    rect(0, r0, 3, r1);
+    const bars = irnd(rng, 1, 3);
+    for (let i = 0; i < bars; i++) {
+      if (rng() < 0.6) { const r = irnd(rng, r0 + 1, r1 - 1); line(0, r, 3, r); }
+      else             { const c = irnd(rng, 1, 2);           line(c, r0, c, r1); }
+    }
+    if (r0 === 1 && rng() < 0.7) line(1, 0, 2, 0);            // the "roof"
+    if (r1 === 3 && rng() < 0.6) { line(1, 4, 1, 3); line(2, 4, 2, 3); }   // the "legs"
+    if (rng() < 0.25) rect(1, r0 + 1, 2, r1 - 1);
+
+  } else {
+    // cursive — arcs and diagonals on a connected baseline
+    if (rng() < 0.75) line(0, 4, 3, 4);
+    const na = irnd(rng, 2, 3);
+    for (let i = 0; i < na; i++) {
+      const q = (rng() * 4) | 0;
+      arc(irnd(rng, 1, 2), irnd(rng, 1, 3), 0.26 + rng() * 0.22, (q * Math.PI) / 2, (q * Math.PI) / 2 + Math.PI / 2);
+    }
+    const nd = irnd(rng, 1, 2);
+    for (let i = 0; i < nd; i++) {
+      const c = irnd(rng, 0, 2), r = irnd(rng, 0, 2);
+      line(c, r, Math.min(3, c + 1), Math.min(4, r + 2));
+    }
+    if (rng() < 0.35) dot(irnd(rng, 0, 3), 0);
+  }
+  return { adv, strokes: S };
+}
+
+// 2–4 words of 3–7 glyphs, one space of 0.5 em between them (rule 4).
+function makeString(rng, family, opts = {}) {
+  const nw = irnd(rng, opts.minWords || 2, opts.maxWords || 4);
+  const words = [];
+  let total = 0;
+  for (let w = 0; w < nw; w++) {
+    const ng = irnd(rng, opts.minGlyphs || 3, opts.maxGlyphs || 7);
+    const gs = [];
+    for (let g = 0; g < ng; g++) { const gl = makeGlyph(rng, family); gs.push(gl); total += gl.adv; }
+    words.push(gs);
+    if (w < nw - 1) total += 0.5;
+  }
+  return { words, total, family };
+}
+
+function drawGlyph(ctx, gl, x, y, em, family) {
+  ctx.lineWidth = STROKE * em;
+  ctx.lineCap = family === 'cursive' ? 'round' : 'butt';
+  ctx.lineJoin = family === 'cursive' ? 'round' : 'miter';
+  for (const s of gl.strokes) {
+    if (s.t === 'l') {
+      ctx.beginPath(); ctx.moveTo(x + s.x1 * em, y + s.y1 * em); ctx.lineTo(x + s.x2 * em, y + s.y2 * em); ctx.stroke();
+    } else if (s.t === 'r') {
+      ctx.strokeRect(x + s.x * em, y + s.y * em, Math.max(em * 0.1, s.w * em), Math.max(em * 0.1, s.h * em));
+    } else if (s.t === 'd') {
+      const d = STROKE * em * 1.15;
+      ctx.fillRect(x + s.x * em - d / 2, y + s.y * em - d / 2, d, d);
+    } else {
+      ctx.beginPath(); ctx.arc(x + s.x * em, y + s.y * em, s.r * em, s.a0, s.a1); ctx.stroke();
+    }
+  }
+}
+
+// Lay a string into a box, scaled so it always fits. `em` falls out of the box, never the other
+// way round, so no tile can ever overflow its region and bleed into a neighbour.
+function drawString(ctx, str, bx, by, bw, bh) {
+  const em = Math.min(bh, bw / Math.max(0.001, str.total));
+  const w = str.total * em;
+  let x = bx + (bw - w) / 2;
+  const y = by + (bh - em) / 2;
+  for (let i = 0; i < str.words.length; i++) {
+    for (const gl of str.words[i]) { drawGlyph(ctx, gl, x, y, em, str.family); x += gl.adv * em; }
+    if (i < str.words.length - 1) x += 0.5 * em;
+  }
+  return em;
+}
+
+// ── text helpers ───────────────────────────────────────────────────────────────────────────
+
+// Size a font so the string fits `maxW × maxH`, optionally condensed on X.
+function fitFont(ctx, text, stack, weight, maxW, maxH, condense) {
+  let size = Math.max(6, Math.floor(maxH));
+  ctx.font = `${weight} ${size}px ${stack}`;
+  const w = ctx.measureText(text).width * condense;
+  if (w > maxW) size = Math.max(5, Math.floor(size * (maxW / w)));
+  return size;
+}
+
+function drawText(ctx, text, stack, weight, cx, cy, size, condense, mode, lw) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(condense, 1);
+  ctx.font = `${weight} ${size}px ${stack}`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  if (mode === 'outline') { ctx.lineWidth = lw / condense; ctx.strokeText(text, 0, 0); }
+  else ctx.fillText(text, 0, 0);
+  ctx.restore();
+}
+
+// ── glyph coverage / tofu detection (§3.5.2) ───────────────────────────────────────────────
+//
+// Mechanical, not a judgement call. Three independent tests, any one of which condemns a word:
+//   1. zero advance from measureText
+//   2. the rendered bitmap is blank
+//   3. the rendered bitmap matches a reference .notdef box, rendered from the same font stack
+//      with codepoints that are unassigned in Unicode and therefore CANNOT have a real glyph.
+// A word is only kept if every one of its characters passes.
+
+const TOFU_REFS = ['\u0378', '\u{2FFFF}', '\u{E0001}'];
+const tc = document.createElement('canvas'); tc.width = tc.height = 96;
+const tctx = tc.getContext('2d', { willReadFrequently: true });
+
+function sig(ch, stack) {
+  tctx.fillStyle = '#000'; tctx.fillRect(0, 0, 96, 96);
+  tctx.fillStyle = '#fff';
+  tctx.font = `64px ${stack}`;
+  tctx.textAlign = 'center'; tctx.textBaseline = 'middle';
+  tctx.fillText(ch, 48, 48);
+  const d = tctx.getImageData(0, 0, 96, 96).data;
+  const bits = new Uint8Array(576);           // 24x24 binary
+  let ink = 0;
+  for (let y = 0; y < 24; y++) for (let x = 0; x < 24; x++) {
+    let sum = 0;
+    for (let j = 0; j < 4; j++) for (let i = 0; i < 4; i++) sum += d[((y * 4 + j) * 96 + (x * 4 + i)) * 4];
+    const b = sum > 4 * 4 * 96 ? 1 : 0;
+    bits[y * 24 + x] = b; ink += b;
+  }
+  return { bits, ink };
+}
+
+let TOFU = null;
+function tofuSigs(stack) {
+  if (!TOFU) TOFU = TOFU_REFS.map(c => sig(c, stack));
+  return TOFU;
+}
+
+function charOk(ch, stack, why) {
+  tctx.font = `64px ${stack}`;
+  if (!(tctx.measureText(ch).width > 0)) { why.push(`U+${ch.codePointAt(0).toString(16).toUpperCase()} zero advance`); return false; }
+  const s = sig(ch, stack);
+  if (s.ink < 6) { why.push(`U+${ch.codePointAt(0).toString(16).toUpperCase()} renders blank`); return false; }
+  for (const t of tofuSigs(stack)) {
+    let diff = 0;
+    for (let i = 0; i < 576; i++) if (s.bits[i] !== t.bits[i]) diff++;
+    if (diff / 576 < 0.03) { why.push(`U+${ch.codePointAt(0).toString(16).toUpperCase()} matches .notdef box`); return false; }
+  }
+  return true;
+}
+
+function wordOk(text, stack) {
+  const why = [];
+  const ok = [...text].every(ch => charOk(ch, stack, why));
+  return { ok, why };
+}
+
+// ── shelf packer (§3.5.1) ──────────────────────────────────────────────────────────────────
+// Sort by padded height descending, best-fit into an existing shelf (smallest leftover width),
+// otherwise open a new one. Fully deterministic: ties break on region index.
+
+function pack(items, size) {
+  const ord = items.slice().sort((a, b) => (b.h + PAD) - (a.h + PAD) || (b.w - a.w) || (a.i - b.i));
+  const shelves = [];
+  let y = 0;
+  for (const it of ord) {
+    const pw = it.w + PAD, ph = it.h + PAD;
+    let best = null, bestLeft = Infinity;
+    for (const s of shelves) {
+      if (ph > s.h) continue;
+      const left = size - s.x - pw;
+      if (left >= 0 && left < bestLeft) { best = s; bestLeft = left; }
+    }
+    if (!best) {
+      if (y + ph > size) throw new Error(`shelf packer overflowed at region ${it.i} (${it.kind}) — `
+        + `sheet is ${size}px, needed ${y + ph}px. Shrink a kind's px in KINDS or drop a count.`);
+      best = { y, x: 0, h: ph }; shelves.push(best); y += ph;
+    }
+    it.x = best.x + PAD / 2; it.y = best.y + PAD / 2;
+    best.x += pw;
+  }
+  return { shelves: shelves.length, usedH: y };
+}
+
+// ── region painters ────────────────────────────────────────────────────────────────────────
+
+const FAMILIES = ['bars', 'boxes', 'cursive'];
+
+function frame(ctx, x, y, w, h, inset, lw, grey) {
+  ctx.save();
+  ctx.strokeStyle = grey; ctx.lineWidth = lw;
+  ctx.strokeRect(x + inset + lw / 2, y + inset + lw / 2, w - 2 * inset - lw, h - 2 * inset - lw);
+  ctx.restore();
+}
+
+// board — a horizontal word board. Solid / outlined / underruled, per §3.5.2.
+function paintBoard(ctx, r, rng) {
+  const { x, y, w, h } = r;
+  const cjkText = r.script === 'ja' || r.script === 'ko';
+  // solid | outline | underrule — but never outline on CJK: a 3.5 px stroke closes up dense
+  // kanji (駐車場 was an unreadable smear) and the whole point of the set is that it is real.
+  const treat = cjkText ? (r.n % 2) * 2 : r.n % 3;
+  const boxed = rng() < 0.30;
+  const pad = Math.round(h * 0.14);
+  let cy = y + h / 2, th = h - pad * 2;
+  if (treat === 2) { th = h * 0.60; cy = y + h * 0.42; }
+  if (boxed) frame(ctx, x, y, w, h, 1, Math.max(1, h * 0.045), '#fff');
+
+  const cjk = cjkText;
+  const stack = r.script === 'ko' ? KO : cjk ? CJK : SANS;
+  const condense = cjk ? 1 : 0.86;
+  const weight = cjk ? '600' : '700';
+  const avail = w - pad * 2 - (boxed ? h * 0.16 : 0);
+
+  const two = !cjk && r.text.includes(' ') && (r.i % 5 === 0);
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#fff';
+  if (two) {
+    const parts = r.text.split(' ');
+    const a = parts[0], b = parts.slice(1).join(' ');
+    const s = Math.min(fitFont(ctx, a, stack, weight, avail, th * 0.5, condense),
+                       fitFont(ctx, b, stack, weight, avail, th * 0.5, condense));
+    drawText(ctx, a, stack, weight, x + w / 2, cy - th * 0.24, s, condense, 'fill');
+    drawText(ctx, b, stack, weight, x + w / 2, cy + th * 0.24, s, condense, 'fill');
+  } else {
+    const s = fitFont(ctx, r.text, stack, weight, avail, th * (cjk ? 0.92 : 1.0), condense);
+    drawText(ctx, r.text, stack, weight, x + w / 2, cy, s, condense,
+             treat === 1 ? 'outline' : 'fill', Math.max(1.2, h * 0.055));
+  }
+  if (treat === 2) {
+    const bh = Math.max(2, h * 0.10);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x + pad, y + h - pad - bh, w - pad * 2, bh);
+    ctx.fillStyle = '#8c8c8c';
+    ctx.fillRect(x + pad, y + h - pad - bh - Math.max(1, h * 0.05), w - pad * 2, Math.max(1, h * 0.03));
+  }
+}
+
+// blade — letters or characters stacked vertically. The classic shop blade.
+function paintBlade(ctx, r, rng) {
+  const { x, y, w, h } = r;
+  const chars = [...r.text];
+  const cjk = r.script === 'ja' || r.script === 'ko';
+  const stack = r.script === 'ko' ? KO : cjk ? CJK : SANS;
+  const boxed = rng() < 0.45;
+  if (boxed) frame(ctx, x, y, w, h, 1, Math.max(1, w * 0.10), '#fff');
+  const padx = w * (boxed ? 0.22 : 0.12), pady = h * 0.05;
+  const cellH = (h - pady * 2) / chars.length;
+  const size = Math.floor(Math.min((w - padx * 2) / (cjk ? 1 : 0.72), cellH * 0.82));
+  ctx.fillStyle = '#fff';
+  for (let i = 0; i < chars.length; i++) {
+    drawText(ctx, chars[i], stack, cjk ? '600' : '700',
+             x + w / 2, y + pady + cellH * (i + 0.5), size, cjk ? 1 : 0.9, 'fill');
+  }
+  if (!boxed && rng() < 0.5) {
+    ctx.fillStyle = '#a0a0a0';
+    ctx.fillRect(x + w * 0.30, y + h * 0.015, w * 0.40, Math.max(1, h * 0.012));
+    ctx.fillRect(x + w * 0.30, y + h * 0.973, w * 0.40, Math.max(1, h * 0.012));
+  }
+}
+
+function paintBoardAbs(ctx, r, rng) {
+  const { x, y, w, h } = r;
+  const fam = FAMILIES[r.n % 3];
+  const boxed = rng() < 0.30;
+  if (boxed) frame(ctx, x, y, w, h, 1, Math.max(1, h * 0.045), '#fff');
+  const pad = h * (boxed ? 0.22 : 0.15);
+  const rule = rng() < 0.35;
+  ctx.strokeStyle = '#fff'; ctx.fillStyle = '#fff';
+  const bh = (h - pad * 2) * (rule ? 0.76 : 1);
+  drawString(ctx, makeString(rng, fam, { minWords: 1, maxWords: 3, minGlyphs: 3, maxGlyphs: 6 }),
+             x + pad, y + pad, w - pad * 2, bh);
+  if (rule) { ctx.fillStyle = '#fff'; ctx.fillRect(x + pad, y + h - pad - Math.max(2, h * 0.09), w - pad * 2, Math.max(2, h * 0.09)); }
+}
+
+function paintBladeAbs(ctx, r, rng) {
+  const { x, y, w, h } = r;
+  const fam = FAMILIES[r.n % 3];
+  const boxed = rng() < 0.45;
+  if (boxed) frame(ctx, x, y, w, h, 1, Math.max(1, w * 0.10), '#fff');
+  const padx = w * (boxed ? 0.24 : 0.13), pady = h * 0.05;
+  const n = irnd(rng, 4, 6);
+  const em = Math.min((w - padx * 2) / 1.3, (h - pady * 2) / n * 0.84);
+  ctx.strokeStyle = '#fff'; ctx.fillStyle = '#fff';
+  const cellH = (h - pady * 2) / n;
+  for (let i = 0; i < n; i++) {
+    const gl = makeGlyph(rng, fam);
+    drawGlyph(ctx, gl, x + w / 2 - (gl.adv * em) / 2, y + pady + cellH * (i + 0.5) - em / 2, em, fam);
+  }
+}
+
+// panel_abs — poster fields. Graphic, not textual: one oversized glyph, a dot matrix, two rules
+// and a border (§3.5.3). These are `box` mode, so white here reads as dark artwork on a lit panel.
+function paintPanel(ctx, r, rng) {
+  const { x, y, w, h } = r;
+  const fam = FAMILIES[r.n % 3];
+  ctx.strokeStyle = '#fff'; ctx.fillStyle = '#fff';
+  frame(ctx, x, y, w, h, Math.round(w * 0.04), Math.max(1.5, w * 0.028), '#fff');
+  const inner = w * 0.12;
+  const variant = r.n % 4;
+
+  // the big glyph, 60 % of the tile
+  const em = h * 0.58;
+  const gl = makeGlyph(rng, fam);
+  const gy = variant === 3 ? y + h * 0.10 : y + h * 0.14;
+  drawGlyph(ctx, gl, x + w / 2 - (gl.adv * em) / 2, gy, em, fam);
+
+  // dot matrix field
+  const dr = irnd(rng, 3, 5), dc = irnd(rng, 6, 9);
+  const fy = y + h * 0.74, fh = h * 0.14, fx = x + inner, fw = w - inner * 2;
+  const dw = Math.max(1, (fw / dc) * 0.55), dh = Math.max(1, (fh / dr) * 0.55);
+  for (let i = 0; i < dr; i++) for (let j = 0; j < dc; j++) {
+    if (rng() < 0.42) continue;
+    ctx.fillStyle = rng() < 0.25 ? '#9a9a9a' : '#fff';
+    ctx.fillRect(fx + (j + 0.22) * (fw / dc), fy + (i + 0.22) * (fh / dr), dw, dh);
+  }
+  // two rules
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(fx, y + h * 0.695, fw, Math.max(1.5, h * 0.022));
+  ctx.fillRect(fx, y + h * 0.905, fw * (0.45 + rng() * 0.5), Math.max(1.5, h * 0.022));
+}
+
+// mark — logos, roundels, chevrons, arrows, hazard marks.
+function paintMark(ctx, r, rng) {
+  const { x, y, w, h } = r;
+  const cx = x + w / 2, cy = y + h / 2, R = Math.min(w, h) * 0.42;
+  const lw = Math.max(1.6, w * 0.075);
+  ctx.strokeStyle = '#fff'; ctx.fillStyle = '#fff';
+  ctx.lineWidth = lw; ctx.lineCap = 'butt'; ctx.lineJoin = 'miter';
+  const v = r.n % 13;
+  const ring = (rad, wid) => { ctx.lineWidth = wid; ctx.beginPath(); ctx.arc(cx, cy, rad, 0, 6.2832); ctx.stroke(); ctx.lineWidth = lw; };
+  const poly = (n, rad, rot, fill) => {
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) { const a = rot + (i / n) * 6.2832; const px = cx + Math.cos(a) * rad, py = cy + Math.sin(a) * rad; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+    ctx.closePath(); fill ? ctx.fill() : ctx.stroke();
+  };
+  const chev = (dx, scale) => {
+    ctx.beginPath();
+    ctx.moveTo(cx - R * 0.45 * scale + dx, cy - R * 0.7 * scale);
+    ctx.lineTo(cx + R * 0.35 * scale + dx, cy);
+    ctx.lineTo(cx - R * 0.45 * scale + dx, cy + R * 0.7 * scale);
+    ctx.stroke();
+  };
+  switch (v) {
+    case 0: ring(R, lw); ring(R * 0.5, lw * 0.7); ctx.beginPath(); ctx.arc(cx, cy, R * 0.16, 0, 6.2832); ctx.fill(); break;
+    case 1: ring(R, lw); { const gl = makeGlyph(rng, 'boxes'); const em = R * 1.05; drawGlyph(ctx, gl, cx - gl.adv * em / 2, cy - em / 2, em, 'boxes'); } break;
+    case 2: chev(-R * 0.42, 1); chev(R * 0.12, 1); break;
+    case 3: // arrow
+      ctx.beginPath(); ctx.moveTo(cx - R * 0.8, cy); ctx.lineTo(cx + R * 0.25, cy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx + R * 0.85, cy); ctx.lineTo(cx + R * 0.1, cy - R * 0.55); ctx.lineTo(cx + R * 0.1, cy + R * 0.55); ctx.closePath(); ctx.fill(); break;
+    case 4: // hazard triangle
+      ctx.beginPath(); ctx.moveTo(cx, cy - R); ctx.lineTo(cx + R * 0.92, cy + R * 0.72); ctx.lineTo(cx - R * 0.92, cy + R * 0.72); ctx.closePath(); ctx.stroke();
+      ctx.fillRect(cx - lw * 0.55, cy - R * 0.30, lw * 1.1, R * 0.72);
+      ctx.fillRect(cx - lw * 0.55, cy + R * 0.50, lw * 1.1, lw * 1.1); break;
+    case 5: poly(6, R, Math.PI / 6, false); poly(6, R * 0.46, Math.PI / 6, true); break;
+    case 6: // cross / clinic
+      ctx.fillRect(cx - R * 0.24, cy - R * 0.86, R * 0.48, R * 1.72);
+      ctx.fillRect(cx - R * 0.86, cy - R * 0.24, R * 1.72, R * 0.48); break;
+    case 7: // target
+      ring(R, lw * 0.8); ring(R * 0.62, lw * 0.8); ring(R * 0.26, lw * 0.8);
+      ctx.beginPath(); ctx.moveTo(cx - R * 1.05, cy); ctx.lineTo(cx - R * 0.75, cy); ctx.moveTo(cx + R * 0.75, cy); ctx.lineTo(cx + R * 1.05, cy); ctx.stroke(); break;
+    case 8: // diagonal hazard stripes in a box
+      ctx.strokeRect(x + w * 0.10, y + h * 0.24, w * 0.80, h * 0.52);
+      ctx.save(); ctx.beginPath(); ctx.rect(x + w * 0.10, y + h * 0.24, w * 0.80, h * 0.52); ctx.clip();
+      ctx.lineWidth = lw * 0.9;
+      for (let i = -6; i < 12; i++) { ctx.beginPath(); ctx.moveTo(x + i * w * 0.13, y + h * 0.80); ctx.lineTo(x + i * w * 0.13 + w * 0.35, y + h * 0.20); ctx.stroke(); }
+      ctx.restore(); break;
+    case 9: poly(4, R, Math.PI / 4, false); poly(4, R * 0.42, Math.PI / 4, true); break;
+    case 10: // burst
+      for (let i = 0; i < 8; i++) { const a = (i / 8) * 6.2832; ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * R * 0.34, cy + Math.sin(a) * R * 0.34); ctx.lineTo(cx + Math.cos(a) * R, cy + Math.sin(a) * R); ctx.stroke(); }
+      ctx.beginPath(); ctx.arc(cx, cy, R * 0.2, 0, 6.2832); ctx.fill(); break;
+    case 11: // bracketed corners
+      { const s = R * 0.95, t = R * 0.42;
+        for (const [sx, sy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+          ctx.beginPath();
+          ctx.moveTo(cx + sx * s, cy + sy * (s - t)); ctx.lineTo(cx + sx * s, cy + sy * s); ctx.lineTo(cx + sx * (s - t), cy + sy * s);
+          ctx.stroke();
+        }
+        const gl = makeGlyph(rng, 'bars'); const em = R * 0.95;
+        drawGlyph(ctx, gl, cx - gl.adv * em / 2, cy - em / 2, em, 'bars'); } break;
+    default: // stacked bars roundel
+      ring(R, lw * 0.8);
+      for (let i = 0; i < 3; i++) ctx.fillRect(cx - R * 0.5, cy - R * 0.5 + i * R * 0.42, R * (1.0 - i * 0.22), R * 0.2);
+      break;
+  }
+}
+
+// rule — plain / double / dotted / zigzag neon tubes and edges.
+function paintRule(ctx, r) {
+  const { x, y, w, h } = r;
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#fff';
+  const t = Math.max(2, h * 0.22);
+  const my = y + h / 2;
+  switch (r.n % 14) {
+    case 0: ctx.fillRect(x, my - t / 2, w, t); break;
+    case 1: ctx.fillRect(x, my - h * 0.30, w, t * 0.7); ctx.fillRect(x, my + h * 0.30 - t * 0.7, w, t * 0.7); break;
+    case 2: for (let i = 0; i < 24; i++) ctx.fillRect(x + (i + 0.25) * (w / 24), my - t / 2, (w / 24) * 0.5, t); break;
+    case 3: for (let i = 0; i < 10; i++) ctx.fillRect(x + i * (w / 10), my - t / 2, (w / 10) * 0.62, t); break;
+    case 4: {
+      ctx.lineWidth = t; ctx.lineJoin = 'miter'; ctx.beginPath();
+      for (let i = 0; i <= 16; i++) ctx.lineTo(x + i * (w / 16), my + (i % 2 ? h * 0.26 : -h * 0.26));
+      ctx.stroke(); break;
+    }
+    case 5: ctx.fillRect(x, my - t / 2, w, t); ctx.fillStyle = '#8a8a8a'; ctx.fillRect(x, my + t / 2, w, t * 0.5); break;
+    case 6: ctx.fillRect(x, my - t * 0.8, w, t * 1.6); ctx.fillRect(x, my - h * 0.42, t * 1.6, h * 0.84); ctx.fillRect(x + w - t * 1.6, my - h * 0.42, t * 1.6, h * 0.84); break;
+    case 7: for (let i = 0; i < 40; i++) { const f = i / 39; ctx.fillStyle = `rgb(${(255 * (1 - f * 0.85)) | 0},${(255 * (1 - f * 0.85)) | 0},${(255 * (1 - f * 0.85)) | 0})`; ctx.fillRect(x + f * w, my - t / 2, w / 40 + 1, t); } break;
+    case 8: ctx.fillRect(x, my - h * 0.34, w, t * 0.55); ctx.fillRect(x, my - t * 0.3, w, t * 0.6); ctx.fillRect(x, my + h * 0.34 - t * 0.55, w, t * 0.55); break;
+    case 9: for (let i = 0; i < 12; i++) { ctx.fillRect(x + i * (w / 12), my - t / 2, (w / 12) * 0.45, t); ctx.fillRect(x + (i + 0.62) * (w / 12), my - t * 0.35, (w / 12) * 0.16, t * 0.7); } break;
+    case 10: for (let i = 0; i < 16; i++) { ctx.beginPath(); ctx.arc(x + (i + 0.5) * (w / 16), my, t * 0.62, 0, 6.2832); ctx.fill(); } break;
+    case 11: ctx.fillRect(x, my - t / 2, w, t); for (let i = 0; i < 9; i++) ctx.fillRect(x + (i + 0.5) * (w / 9), y + h * 0.06, Math.max(1, t * 0.35), h * 0.88); break;
+    case 12: {
+      ctx.lineWidth = t * 0.9; ctx.beginPath();
+      for (let i = 0; i <= 12; i++) { const px = x + i * (w / 12); ctx.moveTo(px, my + h * 0.30); ctx.lineTo(px + w / 24, my - h * 0.30); ctx.lineTo(px + w / 12, my + h * 0.30); }
+      ctx.stroke(); break;
+    }
+    default: ctx.fillRect(x, my - t * 0.9, w, t * 0.5); ctx.fillRect(x, my + t * 0.2, w, t * 1.1); break;
+  }
+}
+
+// ticker — horizontally PERIODIC so P3a can scroll U and have it wrap seamlessly. The 4 px side
+// padding is filled with the wrapped continuation rather than black, exactly the js/atlas.js
+// gutter trick; top and bottom stay black.
+function paintTicker(ctx, r, rng) {
+  const { x, y, w, h } = r;
+  const P = w / 8;                                   // period, divides w exactly
+  // Every case below must be a pure function of the position WITHIN one period. A case that
+  // varies with `k` is not periodic, and a non-periodic ticker seams the moment P3a scrolls it.
+  const tickGlyph = makeGlyph(rng, 'bars');
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x - PAD / 2, y, w + PAD, h); ctx.clip();
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#fff';
+  const v = r.n % 10;
+  for (let k = -1; k <= 8; k++) {
+    const ox = x + k * P;
+    switch (v) {
+      case 0: ctx.fillRect(ox + P * 0.10, y + h * 0.26, P * 0.55, h * 0.48); break;
+      case 1: for (let i = 0; i < 3; i++) ctx.fillRect(ox + P * (0.08 + i * 0.30), y + h * 0.20, P * 0.18, h * 0.60); break;
+      case 2: for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) if ((i * 3 + j) % 4) ctx.fillRect(ox + P * (0.08 + i * 0.22), y + h * (0.22 + j * 0.22), P * 0.13, h * 0.13); break;
+      case 3: ctx.beginPath(); ctx.moveTo(ox + P * 0.10, y + h * 0.18); ctx.lineTo(ox + P * 0.62, y + h * 0.5); ctx.lineTo(ox + P * 0.10, y + h * 0.82); ctx.closePath(); ctx.fill(); break;
+      case 4: ctx.fillRect(ox, y + h * 0.42, P * 0.72, h * 0.16); ctx.fillRect(ox + P * 0.12, y + h * 0.16, P * 0.30, h * 0.14); break;
+      case 5: // seven-segment cell — all four rails, or it reads as the letter E
+        ctx.fillRect(ox + P * 0.10, y + h * 0.16, P * 0.52, h * 0.10);
+        ctx.fillRect(ox + P * 0.10, y + h * 0.45, P * 0.52, h * 0.10);
+        ctx.fillRect(ox + P * 0.10, y + h * 0.74, P * 0.52, h * 0.10);
+        ctx.fillRect(ox + P * 0.10, y + h * 0.16, P * 0.10, h * 0.68);
+        ctx.fillRect(ox + P * 0.52, y + h * 0.45, P * 0.10, h * 0.39); break;
+      case 6: for (let i = 0; i < 5; i++) ctx.fillRect(ox + P * (0.06 + i * 0.18), y + h * (0.5 - 0.06 - i * 0.055), P * 0.11, h * (0.12 + i * 0.11)); break;
+      case 7: ctx.fillRect(ox + P * 0.06, y + h * 0.30, P * 0.30, h * 0.40); ctx.fillRect(ox + P * 0.46, y + h * 0.14, P * 0.14, h * 0.72); break;
+      case 8: { const em = h * 0.72; drawGlyph(ctx, tickGlyph, ox + P * 0.12, y + h * 0.14, em, 'bars'); ctx.fillStyle = '#fff'; break; }
+      default: ctx.fillRect(ox + P * 0.05, y + h * 0.38, P * 0.90, h * 0.24); ctx.fillStyle = '#000'; ctx.fillRect(ox + P * 0.42, y + h * 0.30, P * 0.12, h * 0.40); ctx.fillStyle = '#fff'; break;
+    }
+  }
+  ctx.restore();
+}
+
+// hero — big abstract poster art for the L5 billboards (the `box` fallback when holoFps === 0).
+function paintHero(ctx, r, rng) {
+  const { x, y, w, h } = r;
+  const fam = FAMILIES[r.n % 3];
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#fff';
+  frame(ctx, x, y, w, h, Math.round(w * 0.035), Math.max(2, w * 0.02), '#fff');
+  const v = r.n % 8;
+  const pad = w * 0.12;
+  if (v === 0 || v === 4) {                                    // stacked glyph banner
+    const rows = v === 0 ? 3 : 4;
+    for (let i = 0; i < rows; i++) {
+      drawString(ctx, makeString(rng, fam, { minWords: 1, maxWords: 2, minGlyphs: 2, maxGlyphs: 4 }),
+                 x + pad, y + pad + (h - pad * 2) * (i / rows), w - pad * 2, (h - pad * 2) / rows * 0.82);
+    }
+  } else if (v === 1 || v === 5) {                             // one huge glyph on a bar field
+    const em = h * 0.52;
+    const gl = makeGlyph(rng, fam);
+    drawGlyph(ctx, gl, x + w / 2 - gl.adv * em / 2, y + h * 0.16, em, fam);
+    ctx.fillStyle = '#fff';
+    for (let i = 0; i < 5; i++) ctx.fillRect(x + pad, y + h * (0.74 + i * 0.045), (w - pad * 2) * (1 - i * 0.16), Math.max(1.5, h * 0.022));
+  } else if (v === 2 || v === 6) {                             // concentric field + glyph strip
+    ctx.lineWidth = Math.max(2, w * 0.018);
+    for (let i = 1; i <= 5; i++) { ctx.beginPath(); ctx.arc(x + w / 2, y + h * 0.42, (w * 0.44) * (i / 5), 0, 6.2832); ctx.stroke(); }
+    drawString(ctx, makeString(rng, fam, { minWords: 1, maxWords: 2, minGlyphs: 3, maxGlyphs: 5 }),
+               x + pad, y + h * 0.78, w - pad * 2, h * 0.16);
+  } else {                                                      // diagonal wipe + block glyphs
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x + pad * 0.5, y + pad * 0.5, w - pad, h - pad); ctx.clip();
+    ctx.fillStyle = '#5e5e5e';
+    for (let i = -4; i < 10; i++) { ctx.beginPath(); ctx.moveTo(x + i * w * 0.16, y + h); ctx.lineTo(x + i * w * 0.16 + w * 0.42, y); ctx.lineTo(x + i * w * 0.16 + w * 0.50, y); ctx.lineTo(x + i * w * 0.16 + w * 0.08, y + h); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#fff';
+    drawString(ctx, makeString(rng, fam, { minWords: 1, maxWords: 2, minGlyphs: 3, maxGlyphs: 5 }),
+               x + pad, y + h * 0.34, w - pad * 2, h * 0.30);
+  }
+}
+
+// ── poster (DECISIONS decision 9) ──────────────────────────────────────────────────────────
+//
+// Figurative, but STYLISED AND GRAPHIC ONLY: silhouette and flat shape, high contrast, poster
+// language. No photoreal faces, no anatomy, nothing that could be mistaken for a portrait. These
+// are all `box` mode, so white in the atlas is DARK ARTWORK on a glowing panel — which is exactly
+// the reference's blue "EXOTIC" board. Eight tiles; they are punctuation, not wallpaper.
+
+const POSTERS = ['figure', 'hand', 'eye', 'bowl', 'cat', 'craft', 'bottle', 'capsule'];
+
+function paintPoster(ctx, r, rng) {
+  const { x, y, w, h } = r;
+  const cx = x + w / 2;
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = '#fff';
+  frame(ctx, x, y, w, h, Math.round(w * 0.045), Math.max(2, w * 0.028), '#fff');
+  const pad = w * 0.14;
+  // every poster carries a typographic band, which is most of what sells "advert"
+  const band = () => {
+    drawString(ctx, makeString(rng, FAMILIES[r.n % 3], { minWords: 1, maxWords: 2, minGlyphs: 3, maxGlyphs: 5 }),
+               x + pad, y + h * 0.80, w - pad * 2, h * 0.10);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(x + pad, y + h * 0.925, w - pad * 2, Math.max(2, h * 0.012));
+  };
+  const rays = (ox, oy, R0, R1, n) => {
+    ctx.save(); ctx.fillStyle = '#5a5a5a';
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * 6.2832 + 0.15, s = 6.2832 / n * 0.42;
+      ctx.beginPath(); ctx.moveTo(ox + Math.cos(a) * R0, oy + Math.sin(a) * R0);
+      ctx.lineTo(ox + Math.cos(a - s) * R1, oy + Math.sin(a - s) * R1);
+      ctx.lineTo(ox + Math.cos(a + s) * R1, oy + Math.sin(a + s) * R1);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.restore(); ctx.fillStyle = '#fff';
+  };
+
+  switch (POSTERS[r.n % POSTERS.length]) {
+    case 'figure': {
+      // a long-coat standing silhouette, small in a big frame. Shape only — no features.
+      const fy = y + h * 0.66, fh = h * 0.42;
+      rays(cx, y + h * 0.44, w * 0.10, w * 0.52, 12);
+      ctx.beginPath();
+      ctx.moveTo(cx, fy - fh * 0.98);
+      ctx.bezierCurveTo(cx + fh * 0.13, fy - fh * 0.98, cx + fh * 0.14, fy - fh * 0.80, cx + fh * 0.10, fy - fh * 0.74);
+      ctx.lineTo(cx + fh * 0.30, fy - fh * 0.58);            // shoulder
+      ctx.lineTo(cx + fh * 0.34, fy + fh * 0.02);            // coat
+      ctx.lineTo(cx + fh * 0.20, fy + fh * 0.02);
+      ctx.lineTo(cx + fh * 0.16, fy + fh * 0.30);
+      ctx.lineTo(cx - fh * 0.16, fy + fh * 0.30);
+      ctx.lineTo(cx - fh * 0.20, fy + fh * 0.02);
+      ctx.lineTo(cx - fh * 0.34, fy + fh * 0.02);
+      ctx.lineTo(cx - fh * 0.30, fy - fh * 0.58);
+      ctx.lineTo(cx - fh * 0.10, fy - fh * 0.74);
+      ctx.bezierCurveTo(cx - fh * 0.14, fy - fh * 0.80, cx - fh * 0.13, fy - fh * 0.98, cx, fy - fh * 0.98);
+      ctx.fill();
+      band(); break;
+    }
+    case 'hand': {
+      const by = y + h * 0.60, s = w * 0.34;
+      rays(cx, y + h * 0.40, w * 0.14, w * 0.55, 14);
+      // blocky raised hand, four fingers + thumb — geometry, not anatomy
+      for (let i = 0; i < 4; i++) ctx.fillRect(cx - s * 0.75 + i * s * 0.40, by - s * 1.55 + (i === 0 || i === 3 ? s * 0.22 : 0), s * 0.28, s * 1.10);
+      ctx.fillRect(cx - s * 0.80, by - s * 0.55, s * 1.60, s * 0.72);
+      ctx.fillRect(cx + s * 0.62, by - s * 0.95, s * 0.26, s * 0.55);
+      ctx.fillRect(cx - s * 0.26, by + s * 0.34, s * 0.52, s * 0.40);       // cup, clear of the palm
+      band(); break;
+    }
+    case 'eye': {
+      const ey = y + h * 0.42, R = w * 0.36;
+      ctx.lineWidth = Math.max(2.5, w * 0.035);
+      ctx.beginPath();                                          // almond
+      ctx.moveTo(cx - R, ey);
+      ctx.quadraticCurveTo(cx, ey - R * 0.78, cx + R, ey);
+      ctx.quadraticCurveTo(cx, ey + R * 0.78, cx - R, ey);
+      ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, ey, R * 0.34, 0, 6.2832); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx, ey, R * 0.55, 0, 6.2832); ctx.stroke();
+      for (let i = 0; i < 7; i++) {                              // lash bars
+        const a = -Math.PI * (0.20 + i * 0.10);
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(a) * R * 0.86, ey + Math.sin(a) * R * 0.52);
+        ctx.lineTo(cx + Math.cos(a) * R * 1.20, ey + Math.sin(a) * R * 0.90);
+        ctx.stroke();
+      }
+      band(); break;
+    }
+    case 'bowl': {
+      const by = y + h * 0.60, R = w * 0.36;
+      ctx.beginPath();                                           // bowl
+      ctx.moveTo(cx - R, by - R * 0.20);
+      ctx.lineTo(cx + R, by - R * 0.20);
+      ctx.quadraticCurveTo(cx + R * 0.72, by + R * 0.86, cx, by + R * 0.86);
+      ctx.quadraticCurveTo(cx - R * 0.72, by + R * 0.86, cx - R, by - R * 0.20);
+      ctx.fill();
+      ctx.fillRect(cx - R * 1.12, by - R * 0.34, R * 2.24, R * 0.16);
+      ctx.save(); ctx.translate(cx + R * 0.5, by - R * 0.7); ctx.rotate(-0.5);
+      ctx.fillRect(-R * 0.05, -R * 0.9, R * 0.09, R * 1.7); ctx.fillRect(R * 0.14, -R * 0.9, R * 0.09, R * 1.7);
+      ctx.restore();
+      ctx.lineWidth = Math.max(2, w * 0.030);                    // steam
+      for (let i = -1; i <= 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(cx + i * R * 0.42, by - R * 0.52);
+        ctx.bezierCurveTo(cx + i * R * 0.42 + R * 0.26, by - R * 0.92, cx + i * R * 0.42 - R * 0.26, by - R * 1.16, cx + i * R * 0.42 + R * 0.10, by - R * 1.55);
+        ctx.stroke();
+      }
+      band(); break;
+    }
+    case 'cat': {
+      // sitting cat: head disc + two ear triangles + a trapezoid body + a swept tail. The ears
+      // are what make it read; the first version merged them into the body and looked like a vase.
+      const cy2 = y + h * 0.40, S = w * 0.30;
+      ctx.lineWidth = Math.max(2.5, w * 0.030);
+      ctx.beginPath(); ctx.arc(cx, cy2, S * 1.34, 0, 6.2832); ctx.stroke();
+      ctx.beginPath();                                                  // body
+      ctx.moveTo(cx - S * 0.28, cy2 - S * 0.32);
+      ctx.bezierCurveTo(cx - S * 0.52, cy2 + S * 0.10, cx - S * 0.60, cy2 + S * 0.50, cx - S * 0.62, cy2 + S * 0.86);
+      ctx.lineTo(cx + S * 0.62, cy2 + S * 0.86);
+      ctx.bezierCurveTo(cx + S * 0.60, cy2 + S * 0.50, cx + S * 0.52, cy2 + S * 0.10, cx + S * 0.28, cy2 - S * 0.32);
+      ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx, cy2 - S * 0.58, S * 0.42, 0, 6.2832); ctx.fill();   // head
+      for (const sx of [-1, 1]) {                                       // ears
+        ctx.beginPath();
+        ctx.moveTo(cx + sx * S * 0.42, cy2 - S * 0.74);
+        ctx.lineTo(cx + sx * S * 0.24, cy2 - S * 1.32);
+        ctx.lineTo(cx + sx * S * 0.06, cy2 - S * 0.86);
+        ctx.closePath(); ctx.fill();
+      }
+      ctx.beginPath();                                                  // tail
+      ctx.lineWidth = S * 0.20; ctx.lineCap = 'round';
+      ctx.moveTo(cx + S * 0.56, cy2 + S * 0.80);
+      ctx.bezierCurveTo(cx + S * 1.10, cy2 + S * 0.86, cx + S * 1.16, cy2 + S * 0.30, cx + S * 0.84, cy2 + S * 0.06);
+      ctx.stroke(); ctx.lineCap = 'butt';
+      band(); break;
+    }
+    case 'craft': {
+      // sleek craft, on the diagonal so it can use the tall format, with a cut-out canopy. The
+      // first version was a flat lozenge and read as a blimp; the canopy is what says "vehicle".
+      const vy = y + h * 0.40;
+      rays(cx, vy, w * 0.12, w * 0.54, 16);
+      ctx.save(); ctx.translate(cx, vy); ctx.rotate(-0.28);
+      const L = w * 0.42, H = w * 0.13;
+      ctx.beginPath();
+      ctx.moveTo(-L, H * 0.15);
+      ctx.quadraticCurveTo(-L * 0.55, -H * 0.58, -L * 0.05, -H * 0.88);
+      ctx.lineTo(L * 0.30, -H * 0.92);
+      ctx.lineTo(L * 0.60, -H * 1.90);
+      ctx.lineTo(L * 0.84, -H * 1.84);
+      ctx.lineTo(L * 1.00, -H * 0.28);
+      ctx.quadraticCurveTo(L * 0.60, H * 0.98, -L * 0.20, H * 0.88);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.moveTo(-L * 0.44, -H * 0.18); ctx.lineTo(-L * 0.04, -H * 0.62);
+      ctx.lineTo(L * 0.22, -H * 0.58); ctx.lineTo(L * 0.20, -H * 0.08);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(-L * 0.55, H * 1.05, L * 1.15, H * 0.18);
+      ctx.restore();
+      band(); break;
+    }
+    case 'bottle': {
+      const by = y + h * 0.62, R = w * 0.30;
+      ctx.lineWidth = Math.max(2, w * 0.030);
+      ctx.beginPath(); ctx.arc(cx, y + h * 0.40, R * 1.28, 0, 6.2832); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx - R * 0.20, by - R * 1.60);
+      ctx.lineTo(cx + R * 0.20, by - R * 1.60);
+      ctx.lineTo(cx + R * 0.20, by - R * 1.05);
+      ctx.quadraticCurveTo(cx + R * 0.62, by - R * 0.80, cx + R * 0.62, by - R * 0.30);
+      ctx.lineTo(cx + R * 0.62, by + R * 0.72);
+      ctx.lineTo(cx - R * 0.62, by + R * 0.72);
+      ctx.lineTo(cx - R * 0.62, by - R * 0.30);
+      ctx.quadraticCurveTo(cx - R * 0.62, by - R * 0.80, cx - R * 0.20, by - R * 1.05);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#000'; ctx.fillRect(cx - R * 0.44, by - R * 0.18, R * 0.88, R * 0.44); ctx.fillStyle = '#fff';
+      band(); break;
+    }
+    default: {  // capsule — pharmacy
+      const py = y + h * 0.42, R = w * 0.34;
+      ctx.save(); ctx.translate(cx - R * 0.18, py); ctx.rotate(-0.62);
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(-R * 0.34, -R * 1.05, R * 0.68, R * 2.10, R * 0.34);
+      else ctx.rect(-R * 0.34, -R * 1.05, R * 0.68, R * 2.10);
+      ctx.fill();
+      ctx.fillStyle = '#000'; ctx.fillRect(-R * 0.34, -R * 0.06, R * 0.68, R * 0.12); ctx.fillStyle = '#fff';
+      ctx.restore();
+      // the cross sat outside the frame and was clipped away; it now lives inside it
+      const kx = cx + R * 0.62, ky = py - R * 0.92, ka = R * 0.44, kt = R * 0.16;
+      ctx.fillRect(kx - ka, ky - kt, ka * 2, kt * 2);
+      ctx.fillRect(kx - kt, ky - ka, kt * 2, ka * 2);
+      band(); break;
+    }
+  }
+}
+
+// ── build ──────────────────────────────────────────────────────────────────────────────────
+
+function build() {
+  return fetch('../data/signwords.json', { cache: 'no-store' })
+    .then(r => { if (!r.ok) throw new Error(`data/signwords.json → HTTP ${r.status}`); return r.json(); })
+    .then(words => run(words))
+    .catch(e => {
+      window.__signError = String(e.message || e);
+      document.getElementById('hud').innerHTML = `<span class="err">${window.__signError}</span>`;
+      document.getElementById('log').innerHTML =
+        `<span class="err">This page needs an http origin to read data/signwords.json.\n`
+        + `Run:  node tools/bake_signs.mjs --serve</span>`;
+      window.__signReady = true;
+    });
+}
+
+function run(words) {
+  const cv = document.getElementById('sheet');
+  cv.width = cv.height = SIZE;
+  const ctx = cv.getContext('2d', { willReadFrequently: true, alpha: false });
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, SIZE, SIZE);
+
+  // 1 — coverage check on the real-script words, before anything is drawn.
+  const survived = { ja: [], ko: [] }, cut = [];
+  for (const [lang, stack] of [['ja', CJK], ['ko', KO]]) {
+    if (lang === 'ko' && !KOREAN) continue;
+    TOFU = null;                                    // reference tofu is per font stack
+    for (const kind of [`board_${lang}`, `blade_${lang}`]) {
+      for (const e of (words[kind] || [])) {
+        const v = wordOk(e.text, stack);
+        if (v.ok) survived[lang].push({ kind, ...e });
+        else { cut.push({ kind, text: e.text, why: v.why.join('; ') }); }
+      }
+    }
+  }
+  TOFU = null;
+  const jaOk = survived.ja.length;
+  say(`glyph coverage: ${jaOk}/12 Japanese tiles survived`
+    + (KOREAN ? `, ${survived.ko.length}/2 Korean` : '') , jaOk === 12 ? 'ok' : 'err');
+  for (const c of cut) say(`  CUT ${c.kind} "${c.text}" — ${c.why}`, 'err');
+  // §3.5.2: under four survivors, drop the whole set and ship English + abstract.
+  const shipJa = jaOk >= 4;
+  if (!shipJa && jaOk > 0) say(`only ${jaOk} real-script tiles survived (<4) — dropping the ja set entirely`, 'err');
+
+  // 2 — the region list. Real-script slots that did not survive are refilled with abstract, so
+  //     the region COUNT never changes and neither does the pack.
+  const regions = [];
+  let i = 0;
+  const enPool = { board_en: (words.board_en || []).slice(), blade_en: (words.blade_en || []).slice() };
+  const jaPool = { board_ja: [], blade_ja: [] };
+  if (shipJa) for (const e of survived.ja) jaPool[e.kind].push(e);
+  if (KOREAN && survived.ko.length) {
+    // Korean rides in the ja slots when --korean is on and there is room, per §3.5.2's "optional
+    // extra set". It never displaces a surviving Japanese word.
+    for (const e of survived.ko) {
+      const dst = e.kind.replace('_ko', '_ja');
+      if (jaPool[dst].length < 6) jaPool[dst].push({ ...e, script: 'ko' });
+    }
+  }
+
+  for (const K of KINDS) {
+    for (let n = 0; n < K.n; n++) {
+      const r = {
+        i: i++, n, kind: K.kind, cls: K.cls, script: K.script,
+        w: K.w, h: K.h, mode: null, text: null,
+        tube: n < Math.round(K.n * K.tubeShare),
+      };
+      if (K.wrapU) r.wrapU = true;
+      if (K.script === 'en') {
+        const p = enPool[K.kind];
+        r.text = p.length ? p[n % p.length] : null;
+        if (r.text == null) { r.cls = 'abstract'; r.script = 'abs'; }
+      } else if (K.script === 'ja') {
+        const p = jaPool[K.kind];
+        if (n < p.length) { r.text = p[n].text; r.script = p[n].script || 'ja'; r.reading = p[n].reading; r.meaning = p[n].meaning; }
+        else { r.cls = 'abstract'; r.script = 'abs'; r.kindDrawnAs = K.kind.replace('_ja', '_abs'); }
+      } else if (K.kind === 'poster') {
+        r.text = POSTERS[r.n % POSTERS.length];
+      }
+      r.mode = r.tube ? 'tube' : 'box';
+      delete r.tube;
+      regions.push(r);
+    }
+  }
+
+  // 3 — pack, then paint.
+  const packInfo = pack(regions, SIZE);
+
+  for (const r of regions) {
+    const rng = xorshift32(SEED ^ (r.i * 0x9e3779b1));
+    ctx.save();
+    ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();   // nothing can ever leave its rect
+    const drawKind = r.kindDrawnAs || r.kind;
+    if (drawKind === 'board_en' || drawKind === 'board_ja') (r.text ? paintBoard : paintBoardAbs)(ctx, r, rng);
+    else if (drawKind === 'blade_en' || drawKind === 'blade_ja') (r.text ? paintBlade : paintBladeAbs)(ctx, r, rng);
+    else if (drawKind === 'board_abs') paintBoardAbs(ctx, r, rng);
+    else if (drawKind === 'blade_abs') paintBladeAbs(ctx, r, rng);
+    else if (drawKind === 'panel_abs') paintPanel(ctx, r, rng);
+    else if (drawKind === 'mark') paintMark(ctx, r, rng);
+    else if (drawKind === 'rule') paintRule(ctx, r, rng);
+    else if (drawKind === 'ticker') { ctx.restore(); ctx.save(); paintTicker(ctx, r, rng); }   // ticker owns its own clip
+    else if (drawKind === 'hero') paintHero(ctx, r, rng);
+    else if (drawKind === 'poster') paintPoster(ctx, r, rng);
+    ctx.restore();
+  }
+
+  // 4 — verify the sheet really is greyscale and fully opaque, before oxipng is asked to reduce
+  //     the colour type. A single coloured or translucent pixel would silently keep it RGBA.
+  let bad = 0, alphaBad = 0, ink = 0;
+  const px = ctx.getImageData(0, 0, SIZE, SIZE).data;
+  for (let p = 0; p < px.length; p += 4) {
+    if (px[p] !== px[p + 1] || px[p + 1] !== px[p + 2]) bad++;
+    if (px[p + 3] !== 255) alphaBad++;
+    if (px[p] > 8) ink++;
+  }
+
+  // 4b — per-region proof, measured off the finished sheet rather than asserted from the packer.
+  //      For every region: how much ink is inside the rect the table will claim, and what the
+  //      brightest texel in its 4 px ring is. A ring that is not black means a neighbour bled in,
+  //      or the table is off by a few pixels — the classic failure, invisible until P3a.
+  const at = (X, Y) => px[(Y * SIZE + X) * 4];
+  for (const r of regions) {
+    let rink = 0;
+    for (let Y = r.y; Y < r.y + r.h; Y++) for (let X = r.x; X < r.x + r.w; X++) if (at(X, Y) > 8) rink++;
+    r.inkPct = +(rink / (r.w * r.h) * 100).toFixed(2);
+    let ring = 0, ringSide = 0;
+    const g = PAD / 2;
+    for (let Y = r.y - g; Y < r.y + r.h + g; Y++) {
+      for (let X = r.x - g; X < r.x + r.w + g; X++) {
+        if (X >= r.x && X < r.x + r.w && Y >= r.y && Y < r.y + r.h) continue;
+        if (X < 0 || Y < 0 || X >= SIZE || Y >= SIZE) continue;
+        const v = at(X, Y);
+        const side = Y >= r.y && Y < r.y + r.h;      // left/right ring, where a ticker wraps
+        if (side) ringSide = Math.max(ringSide, v); else ring = Math.max(ring, v);
+      }
+    }
+    r.ringMax = ring;                 // must be 0 for every region, wrapU or not
+    r.ringSideMax = ringSide;         // must be 0 unless wrapU
+  }
+  const ringBad = regions.filter(r => r.ringMax > 0 || (!r.wrapU && r.ringSideMax > 0));
+  const inkBad = regions.filter(r => r.inkPct < 0.5);
+  say(`region proof: ${ringBad.length} regions with ink in their padding ring, ${inkBad.length} near-empty`,
+      ringBad.length || inkBad.length ? 'err' : 'ok');
+  for (const r of ringBad.slice(0, 8)) say(`  BLEED ${r.i} ${r.kind} ring=${r.ringMax}/${r.ringSideMax}`, 'err');
+  for (const r of inkBad.slice(0, 8)) say(`  EMPTY ${r.i} ${r.kind} ink=${r.inkPct}%`, 'err');
+
+  // 5 — the region table. u/v are TOP-LEFT-origin fractions, matching js/atlas.js's flipY=false.
+  const minDim = Math.min(...regions.map(r => Math.min(r.w, r.h)));
+  let mipLevels = 1;
+  while ((minDim >> mipLevels) >= 4 && ((PAD / 2) >> mipLevels) >= 1) mipLevels++;
+
+  const byClass = {};
+  const byMode = { tube: 0, box: 0 };
+  for (const r of regions) { byClass[r.cls] = (byClass[r.cls] || 0) + 1; byMode[r.mode]++; }
+
+  const table = {
+    atlas: 'assets/signs.png',
+    size: SIZE,
+    seed: SEED,
+    padPx: PAD,
+    minRegionPx: minDim,
+    mipLevels,
+    uvOrigin: 'top-left',
+    counts: { total: regions.length, byClass, byKind: Object.fromEntries(KINDS.map(k => [k.kind, k.n])), byMode },
+    notes: {
+      uv: 'u,v,w,h are fractions of the sheet with (0,0) at the TOP-LEFT texel. Load signs.png with tex.flipY=false, exactly as js/atlas.js does, or every region is upside down.',
+      greyscale: 'One channel. Multiply by a per-instance emissive tint; never bake colour.',
+      mip: 'Build texture.mipmaps by hand and stop at mipLevels. Beyond that the 4px padding ring is under one texel and regions bleed into each other.',
+      mode: '"tube" = AdditiveBlending, sample.r IS the glow. "box" = lit lightbox panel: the region background (black here) glows and the white marks are the dark artwork cut out of it.',
+      wrapU: 'ticker regions are horizontally periodic and their side padding holds the wrapped continuation, so U may be scrolled and wrapped inside the region seamlessly.',
+      aspect: 'World quad size is bandHeight * aspect (§3.5.1).',
+    },
+    regions: regions.map(r => ({
+      i: r.i, kind: r.kind, cls: r.cls, script: r.script,
+      text: r.text, ...(r.reading ? { reading: r.reading, meaning: r.meaning } : {}),
+      u: +(r.x / SIZE).toFixed(7), v: +(r.y / SIZE).toFixed(7),
+      w: +(r.w / SIZE).toFixed(7), h: +(r.h / SIZE).toFixed(7),
+      px: [r.x, r.y, r.w, r.h],
+      aspect: +(r.w / r.h).toFixed(6),
+      mode: r.mode, ...(r.wrapU ? { wrapU: true } : {}),
+    })),
+  };
+
+  say(`packed ${regions.length} regions into ${packInfo.shelves} shelves, ${packInfo.usedH}/${SIZE} px used`, 'ok');
+  say(`classes: ${Object.entries(byClass).map(([k, v]) => `${k} ${v}`).join(', ')}`);
+  say(`modes: tube ${byMode.tube} (${(byMode.tube / regions.length * 100).toFixed(0)}%), box ${byMode.box}`);
+  say(`greyscale check: ${bad} non-grey px, ${alphaBad} non-opaque px, ink ${(ink / (SIZE * SIZE) * 100).toFixed(2)}%`,
+      bad || alphaBad ? 'err' : 'ok');
+  say(`mip clamp: smallest region ${minDim}px → ${mipLevels} levels`);
+
+  window.__signbake = {
+    table,
+    verify: {
+      nonGrey: bad, nonOpaque: alphaBad, inkPct: +(ink / (SIZE * SIZE) * 100).toFixed(3),
+      ringBad: ringBad.map(r => ({ i: r.i, kind: r.kind, ringMax: r.ringMax, ringSideMax: r.ringSideMax })),
+      inkBad: inkBad.map(r => ({ i: r.i, kind: r.kind, inkPct: r.inkPct })),
+      inkByKind: Object.fromEntries(KINDS.map(K => {
+        const rs = regions.filter(r => r.kind === K.kind);
+        return [K.kind, +(rs.reduce((a, r) => a + r.inkPct, 0) / rs.length).toFixed(2)];
+      })),
+    },
+    coverage: { jaSurvived: jaOk, koSurvived: survived.ko.length, shipJa, cut },
+    pack: packInfo,
+    log: log.map(l => l.s),
+    fonts: {
+      hiraginoSans: document.fonts.check('64px "Hiragino Sans"'),
+      appleSDGothic: document.fonts.check('64px "Apple SD Gothic Neo"'),
+      avenirCondensed: document.fonts.check('64px "Avenir Next Condensed"'),
+    },
+  };
+  window.__png = cv.toDataURL('image/png');
+  window.__signReady = true;
+
+  // ── the eyeball view ────────────────────────────────────────────────────────────────────
+  document.getElementById('stage').style.aspectRatio = '1 / 1';
+  document.getElementById('hud').textContent =
+    `${regions.length} regions · ${packInfo.shelves} shelves · ja ${shipJa ? jaOk : 0}/12 · ${bad} non-grey`;
+  document.getElementById('log').innerHTML = log
+    .map(l => l.cls ? `<span class="${l.cls}">${l.s}</span>` : l.s).join('\n');
+
+  const ov = document.getElementById('ovl');
+  ov.width = ov.height = SIZE;
+  const octx = ov.getContext('2d');
+  const redraw = () => {
+    octx.clearRect(0, 0, SIZE, SIZE);
+    if (!document.getElementById('grid').checked) return;
+    const lab = document.getElementById('labels').checked;
+    octx.lineWidth = 2;
+    for (const r of regions) {
+      octx.strokeStyle = { abstract: '#41c7ff', english: '#8bff6b', japanese: '#ff9f4a', poster: '#ff5fd0', graphic: '#a08bff' }[r.cls];
+      octx.strokeRect(r.x - 0.5, r.y - 0.5, r.w + 1, r.h + 1);
+      if (lab) { octx.fillStyle = octx.strokeStyle; octx.font = '11px monospace'; octx.fillText(`${r.i} ${r.kind}`, r.x, r.y - 3); }
+    }
+  };
+  document.getElementById('grid').onchange = redraw;
+  document.getElementById('labels').onchange = redraw;
+}
+
+// Fonts must be loaded before the first measureText or the coverage check tests the fallback.
+(document.fonts?.ready || Promise.resolve()).then(build);
+})();
+</script>

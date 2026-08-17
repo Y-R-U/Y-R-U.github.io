@@ -1,0 +1,19 @@
+{
+  "id": "cockpit",
+  "ref": "746850_02",
+  "seed": 1313165134,
+  "variant": "stormnight",
+  "clock": 22.0,
+  "pos": [
+    1305.6,
+    60,
+    340
+  ],
+  "yaw": 3.1416,
+  "pitch": -4,
+  "fov": 60,
+  "craft": true,
+  "hud": true,
+  "aspect": null,
+  "note": "FROZEN at P3b, scored at P6. 60 m down the same canyon: low enough that the city fills the glass and high enough that the dash has a horizon to sit against."
+}

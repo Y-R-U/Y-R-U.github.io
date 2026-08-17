@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NEONHAUL — audio harness</title>
+<style>
+  html,body{margin:0;background:#05070c;color:#9fe8ff;font:13px/1.5 ui-monospace,Menlo,monospace}
+  #pad{position:fixed;inset:0;display:grid;place-items:center;touch-action:none}
+  #gesture{width:70vw;height:40vh;border:1px solid #1c6f8c;background:#081420;color:#9fe8ff;
+    font:inherit;border-radius:12px}
+  pre{position:fixed;left:8px;bottom:8px;right:8px;max-height:44vh;overflow:auto;margin:0;
+    color:#6fd; font-size:11px}
+</style>
+</head>
+<body>
+<!-- P8 owns no part of the game's own page (index.html is another agent's file), so this is where
+     js/audio.js and js/radio.js are exercised in a real browser with a real user gesture. It loads
+     NEITHER main.js NOR three.js: everything here is the audio layer against stubs, which is the
+     point — a failure in this page is a failure in the audio layer and nothing else. -->
+<div id="pad"><button id="gesture">tap / click to unlock the AudioContext</button></div>
+<pre id="log"></pre>
+<script type="module">
+import { GameAudio, buildRadioBus, rms, dbfs, MIN_RMS, MIX, BUS } from '../js/audio.js';
+import { Radio, ChatterDirector, ShuffleBag, mulberry32, DIR } from '../js/radio.js';
+
+const logEl = document.getElementById('log');
+const errors = [];
+const chatterLines = [];
+const say = m => { logEl.textContent = (m + '\n' + logEl.textContent).slice(0, 6000); };
+
+// the settings stub — the real one is save.js's S().settings
+const settings = { music: true, sfx: true, radio: true, chatterHold: 'normal', station: 'none' };
+
+const audio = new GameAudio({
+  settings: () => settings,
+  onError: (k, m) => { errors.push(k + ': ' + m); say('ERR ' + k + ' ' + m); },
+});
+
+const radio = new Radio({
+  audio,
+  base: '../',                                  // this page lives in tools/
+  chatter: o => { chatterLines.push(o); say('CHAT [' + o.speaker + '] audio=' + (o.audio || 0).toFixed(2) + ' ' + o.text.slice(0, 60)); },
+  settings: () => settings,
+  onError: (k, m) => { errors.push(k + ': ' + m); say('ERR ' + k + ' ' + m); },
+  rng: mulberry32(12345),
+});
+
+// The harness does NOT auto-unlock. Nothing may create or resume a context except a gesture.
+audio.installGestureHooks(window);
+
+const ready = radio.load().then(m => { say('manifest ' + (m ? (m.music.length + ' music / ' + m.chatter.length + ' chatter') : 'MISSING')); return !!m; });
+
+// ── the offline radio-bus measurement (§10.2) ──────────────────────────────
+// A single sine at f through the bus, rendered offline, and the output/input RMS ratio is one point
+// of the transfer function. Level is deliberately low (0.05) so the waveshaper and compressor stay
+// close to linear and the number that comes back is the FILTER's, not the dynamics'.
+async function busPoint(f, { hp = BUS.HP, lp = BUS.LP, level = 0.05, sr = 48000, secs = 0.5 } = {}) {
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const ctx = new OAC(1, Math.floor(sr * secs), sr);
+  const bus = buildRadioBus(ctx, { gain: 1 });
+  bus.nodes.hp.frequency.value = hp;
+  bus.nodes.lp.frequency.value = lp;
+  bus.output.connect(ctx.destination);
+  const o = ctx.createOscillator();
+  o.type = 'sine'; o.frequency.value = f;
+  const g = ctx.createGain(); g.gain.value = level;
+  o.connect(g); g.connect(bus.input);
+  o.start(0); o.stop(secs);
+  const rendered = await ctx.startRendering();
+  // skip the first 100 ms: filter transients and the compressor attack are not the steady state
+  const skip = Math.floor(sr * 0.1);
+  const d = rendered.getChannelData(0);
+  let s = 0;
+  for (let i = skip; i < d.length; i++) s += d[i] * d[i];
+  const out = Math.sqrt(s / (d.length - skip));
+  const inRms = level / Math.SQRT2;
+  return { f, out, ratio: out / inRms, db: 20 * Math.log10(Math.max(1e-12, out / inRms)) };
+}
+
+async function busCurve(opts) {
+  const fs = [40, 60, 120, 250, 500, 1000, 2000, 3400, 6000, 9000, 14000];
+  const out = [];
+  for (const f of fs) out.push(await busPoint(f, opts));
+  return out;
+}
+
+// ── the decoded-energy check, in the browser that will actually decode it ──
+async function rmsOf(path) {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  const ctx = audio.ctx || new AC();
+  const r = await fetch('../' + path, { cache: 'no-store' });
+  if (!r.ok) return { path, ok: false, status: r.status };
+  const bytes = await r.arrayBuffer();
+  let buf;
+  try { buf = await ctx.decodeAudioData(bytes.slice(0)); }
+  catch (e) { return { path, ok: false, decode: String(e && e.message) }; }
+  const r1 = rms(buf, 30);
+  return { path, ok: true, bytes: bytes.byteLength, duration: +buf.duration.toFixed(3),
+    channels: buf.numberOfChannels, sampleRate: buf.sampleRate,
+    rms: +r1.toFixed(6), db: +dbfs(r1).toFixed(2), silent: r1 < MIN_RMS };
+}
+
+document.getElementById('gesture').addEventListener('click', () => {
+  audio.unlock();
+  say('gesture → ctx ' + (audio.ctx ? audio.ctx.state : 'none'));
+});
+
+// ── everything the gate driver calls ───────────────────────────────────────
+window.__audio = {
+  ready,
+  audio, radio, settings, errors, chatterLines,
+  MIN_RMS, MIX, DIR,
+  gaState: () => audio.state(),
+  radioState: () => radio.state(),
+  ctxState: () => (audio.ctx ? audio.ctx.state : null),
+  unlock: () => audio.unlock(),
+  probe: () => radio.probeAll(),
+  absence: () => radio.absenceReport(),
+  rmsOf,
+  busPoint, busCurve,
+  // Drive `n` frames of dt seconds. Real time is not advanced, which is fine: everything the
+  // director does is a function of the accumulated `t` it is handed.
+  tick(n = 1, dt = 1 / 60, ctx = {}) {
+    let fired = [];
+    for (let i = 0; i < n; i++) { const r = radio.update(dt, ctx); if (r) fired = fired.concat(r); audio.update(dt, ctx.audio || {}); }
+    return fired;
+  },
+  // audio.js ONLY — no radio.update, therefore no music state machine and no chance a streamed
+  // track creeps into a measurement of the synthesised bed. `radio.update({})` legitimately resolves
+  // to the "cruise" state and starts a track, which silently contaminated the bed gate until it was
+  // isolated. Isolate the variable you are measuring (obligation T7).
+  tickAudio(n = 1, dt = 1 / 60, s = {}) { for (let i = 0; i < n; i++) audio.update(dt, s); return audio.state(); },
+  event: k => radio.event(k),
+  setState: s => radio.setState(s),
+  // Real evidence that sound EXISTS, not just that the context says "running". An analyser tapped
+  // off the master bus, sampled over `ms`, peak RMS returned. Chrome is launched with --mute-audio,
+  // which silences the output DEVICE and not the graph, so this still reads the real signal.
+  async masterRms(ms = 400) {
+    if (!audio.master) return { ok: false, why: 'no graph' };
+    if (!this._an) {
+      this._an = audio.ctx.createAnalyser();
+      this._an.fftSize = 2048;
+      audio.master.connect(this._an);
+      this._buf = new Float32Array(this._an.fftSize);
+    }
+    let peak = 0, n = 0;
+    const t0 = performance.now();
+    while (performance.now() - t0 < ms) {
+      this._an.getFloatTimeDomainData(this._buf);
+      let s = 0;
+      for (let i = 0; i < this._buf.length; i++) s += this._buf[i] * this._buf[i];
+      const r = Math.sqrt(s / this._buf.length);
+      if (r > peak) peak = r;
+      n++;
+      await new Promise(res => setTimeout(res, 16));
+    }
+    return { ok: true, peak: +peak.toFixed(6), db: +(20 * Math.log10(Math.max(1e-12, peak))).toFixed(2), samples: n };
+  },
+  // Feed a buffer straight into the graph, so the silence refusal in playClip can be exercised
+  // against a known-silent buffer and against a known-good one.
+  playRaw(buf, gain = 0.9) { const r = audio.playClip(buf, { gain }); return r ? { duration: r.duration, rms: r.rms } : null; },
+  // Sample a gain node's value over a window, to see a crossfade actually crossfade.
+  async sampleMusicGain(ms = 2000, every = 60) {
+    const out = [];
+    const t0 = performance.now();
+    while (performance.now() - t0 < ms) {
+      const c = radio.current;
+      out.push({ t: +((performance.now() - t0) / 1000).toFixed(3), slot: c ? c.slot : null,
+        g: c && c.gain ? +c.gain.gain.value.toFixed(5) : null });
+      await new Promise(res => setTimeout(res, every));
+    }
+    return out;
+  },
+  prefetch: () => radio.scheduleChatterPrefetch(0),
+  clip: s => radio.clip(s).then(b => (b ? { slot: s, duration: b.duration, rms: b._rms } : null)),
+  // a deliberately-silent AudioBuffer, for falsifying the silence check
+  silentBuffer(seconds = 3) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const ctx = audio.ctx || new AC();
+    return ctx.createBuffer(1, Math.floor(ctx.sampleRate * seconds), ctx.sampleRate);
+  },
+  ShuffleBag, ChatterDirector, mulberry32,
+};
+window.__harnessReady = true;
+say('harness up — no context, no nodes, no bytes');
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{
+ "group": "dispatch",
+ "lines": [
+  {
+   "file": "dispatch_01.mp3",
+   "text": "Haul Control to all couriers \u2014 the Vane Street corridor is open again. Lanes four through nine, keep it under two hundred."
+  },
+  {
+   "file": "dispatch_02.mp3",
+   "text": "We have a manifest mismatch on the Kessel drop. If that box is warm, it is not my problem."
+  },
+  {
+   "file": "dispatch_03.mp3",
+   "text": "PULL UP, COURIER. PULL UP. YOU ARE INSIDE THE STACK."
+  },
+  {
+   "file": "dispatch_04.mp3",
+   "text": "Shift change in ten. Whoever is on the roof at Ardent, the beacon is out again. Still."
+  },
+  {
+   "file": "dispatch_05.mp3",
+   "text": "Somebody has parked a freighter across two of my lanes. I am told this is temporary. I am told a lot of things."
+  },
+  {
+   "file": "dispatch_06.mp3",
+   "text": "Weather is closing the upper approach at Pale Terrace. If you are booked up there, you are now booked somewhere else."
+  },
+  {
+   "file": "dispatch_confirm_01.mp3",
+   "text": "Courier, your parcel is logged and the pad is holding for you. Try not to make them wait."
+  },
+  {
+   "file": "dispatch_confirm_02.mp3",
+   "text": "Logged. Clock's running. Try to look like you've done this before."
+  },
+  {
+   "file": "dispatch_confirm_03.mp3",
+   "text": "That's on your manifest now. Whatever it is."
+  },
+  {
+   "file": "dispatch_confirm_04.mp3",
+   "text": "Confirmed. Lane's clear as far as I can see, which is not far."
+  },
+  {
+   "file": "dispatch_confirm_05.mp3",
+   "text": "You've got it. Sealed, weighed, and none of my business."
+  },
+  {
+   "file": "dispatch_confirm_06.mp3",
+   "text": "Accepted. They asked for someone reliable. I sent you anyway."
+  },
+  {
+   "file": "dispatch_confirm_07.mp3",
+   "text": "Booked. Take the high lane, the low one's a car park."
+  },
+  {
+   "file": "dispatch_confirm_08.mp3",
+   "text": "On the board and off my desk. Go."
+  },
+  {
+   "file": "dispatch_pay_01.mp3",
+   "text": "Nice run. Credits are clearing now. Don't spend it all in the Ribs."
+  },
+  {
+   "file": "dispatch_pay_02.mp3",
+   "text": "Signed for. Money's moving. Slowly, but it's moving."
+  },
+  {
+   "file": "dispatch_pay_03.mp3",
+   "text": "Delivered and closed. That's one thing today that went where it was supposed to."
+  },
+  {
+   "file": "dispatch_pay_04.mp3",
+   "text": "Paid. They didn't complain, which from them is a compliment."
+  },
+  {
+   "file": "dispatch_pay_05.mp3",
+   "text": "Clean drop. I'm marking you as competent. Don't make me change it."
+  },
+  {
+   "file": "dispatch_pay_06.mp3",
+   "text": "Received in one piece. Credits inbound. Enjoy the four minutes before you need them."
+  },
+  {
+   "file": "dispatch_pay_07.mp3",
+   "text": "Logged, paid, forgotten. That's the job."
+  },
+  {
+   "file": "dispatch_pay_08.mp3",
+   "text": "Done. There's more where that came from, unfortunately."
+  }
+ ]
+}

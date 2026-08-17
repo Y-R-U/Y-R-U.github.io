@@ -1,0 +1,19 @@
+{
+  "id": "wet_street",
+  "ref": "1475810_04",
+  "seed": 1313165134,
+  "variant": "stormnight",
+  "clock": 0.8,
+  "pos": [
+    1305.6,
+    5,
+    300
+  ],
+  "yaw": 3.1416,
+  "pitch": -3,
+  "fov": 64,
+  "craft": false,
+  "hud": false,
+  "aspect": 1.11864406779661,
+  "note": "FROZEN at P3b, authored at the PLATE CROP'S ASPECT (obligation T4): \u00a712.1's crop of 1475810_04 is 528x472 of a 1200x675 plate = 1.119, not 16:9. Render 900x804. 5 m above the same street canyon_dive looks down, so the two shots share a sign wall and the reflection under it."
+}
