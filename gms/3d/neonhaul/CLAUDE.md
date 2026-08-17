@@ -1,7 +1,12 @@
 # NEONHAUL — project guide
 
 A mobile-first cyberpunk courier game. Three.js from a CDN importmap, ES modules, **no build step**.
-Open `index.html` over a static server and it runs. Live at `/gms/3d/neonhaul/`.
+Open `index.html` over a static server and it runs.
+
+**Live at https://yru.br8t.com/gms/3d/neonhaul/** — the repo has a `CNAME`, so the `y-r-u.github.io`
+host answers **301** and redirects. Curl it without `-L` and you will poll `301` forever and
+conclude the deploy never happened. A status code from a URL you did not follow is not a
+measurement of the resource.
 
 **Read `docs/MANAGER_STATE.md` first.** It is the running record of what was built, what was
 measured, what was deliberately not done, and every trap this project has already paid for.

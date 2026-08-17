@@ -46,9 +46,10 @@ lands `main.js`.** Both were told to flag the pending wiring in their reports. *
 - Manager spawns a phase agent, waits, **verifies its claims**, then spawns the next.
 - A 30-minute cron check-in fires at :13 and :43 (job `c6f226ad`, session-only, dies with the
   session — **recreate it after any restart**).
-- **Nothing is committed yet.** Builders are told not to commit and not to run git. Other Claude
-  sessions have uncommitted work in this repo — when shipping, stage only paths under
-  `gms/3d/neonhaul/`, plus your own hunk of `projects.js` and `assets/screenshots/neonhaul.jpg`.
+- ~~**Nothing is committed yet.**~~ **SHIPPED 2026-08-18 as `a0627f0` on `main`.** Builders were
+  told not to commit and not to run git; other Claude sessions have uncommitted work in this repo,
+  so P10 staged only paths under `gms/3d/neonhaul/`, plus one hunk of `projects.js` and
+  `assets/screenshots/neonhaul.jpg`. That discipline still applies to every later commit.
 
 ## Phase status
 
@@ -68,7 +69,7 @@ lands `main.js`.** Both were told to flag the pending wiring in their reports. *
 | P7b | the docking panel + the ledge fix + T8 | ✅ 20/20 incl. 6/6 falsification · `docs/P7B_NOTES.md` |
 | P8 | audio + SUNO manifest loader | ✅ 30/30 · **wiring APPLIED** |
 | P11 | **Aaron's art pass** — see `ART_PASS.md` | ✅ 8/8 both presets · round 7 scored · `docs/SUBLEVELS.md` written |
-| P10 | polish, perf, ship (commit + push) | last |
+| P10 | polish, perf, ship (commit + push) | ✅ **SHIPPED 2026-08-18** — see the P10 SHIP section |
 
 Budget before vehicles: HIGH **37–42 draws / 118–144k tris** against gates of 65 / 260k.
 
@@ -804,7 +805,95 @@ CSS grid switch with **1,440 characters of identical HTML** across the flip.
 
 ---
 
-## P10 SHIP — Aaron's explicit instruction, 2026-08-18
+## P10 SHIP — DONE. `a0627f0`, live and flown on the live URL.
+
+### ⚠ THE LIVE URL IS NOT `y-r-u.github.io` — it is **https://yru.br8t.com/**
+
+The repo has a `CNAME` of `yru.br8t.com`, so `y-r-u.github.io/gms/3d/neonhaul/` answers **301** and
+redirects. A verification loop polling the `github.io` host without `curl -L` reads `301` forever
+and never sees the deploy — which is exactly what P10's first check did for ten minutes. **A status
+code from a URL you did not follow is not a measurement of the resource.** Instance eighteen, and
+the first one committed against the *live site* rather than a gate.
+
+Game: **https://yru.br8t.com/gms/3d/neonhaul/**
+
+### What shipped
+
+`a0627f0` on `main`, **178 files / 14.25 MB**: the whole of `gms/3d/neonhaul/` minus the ignores,
+one hunk of `projects.js`, and `assets/screenshots/neonhaul.jpg` (the frozen `hero_craft` render at
+1600×900, q88 JPEG, 285 KB — in line with the other 99 screenshots). Committed with `commit-tree`
+against `main` from a **temporary index**, because the checkout was on another session's
+`claude/forge-game-checkpoint` branch (3 ahead / 17 behind `main`, full of FORGE work). The working
+tree was never switched and nothing of anyone else's was staged; `git diff --cached main` was read
+in full first.
+
+`.gitignore` gained `shots/*/` in place of a hand-list of four phase dirs — `p4 p5 p6 p7a p7b p8
+p11 wire` had appeared under it since, and **25 MB of evidence renders were about to be committed
+by a rule whose own comment says renders are not.** A glob cannot fall behind that way.
+`CLAUDE.md` written (§2.1 assigns it to P10).
+
+### Verified ON THE LIVE URL, not locally
+
+| | desktop 1280×800 | mobile 390×844 dpr 2, touch |
+|---|---|---|
+| document | **200** | **200** |
+| `__ready` | **true**, 2 s | **true**, 1 s |
+| `__state.errors` / console errors / thrown | **0 / 0 / 0** | **0 / 0 / 0** |
+| draws / tris / chunks | **49 / 160,944 / 169** | **49 / 160,944** |
+| non-audio 4xx/5xx | **0** | **0** |
+
+Byte sizes on the wire match disk (`main.js` 113,658, `style.css` 30,558, screenshot 285,020).
+The **42** 4xx are all `assets/audio/` — the optional SUNO slots (police, pirate, ad, distress,
+weather, life, `bg_dock`, `music/chase`, `music/first_flight`) that Aaron has not generated. They
+land in `__state.audioIssues`, not `__state.errors`, which is P8's design working.
+
+**And it PLAYS live, which "it booted" does not prove.** `?courier=1` on the live URL in mobile
+portrait for 180 s: **4 jobs taken, 3 delivered, 0 failed, 0 tows, 250 → 1,735 CRD** (lifetime
+1,485), **60 fps**, 0 errors, 0 thrown exceptions.
+
+Projects page: the card is on `https://yru.br8t.com/`, badge `Game`, link `/gms/3d/neonhaul/`,
+and its `<img>` reports **naturalWidth 1600 × 900** — the JPEG decoded, not merely 200'd.
+
+**Both verification scripts were falsified before their green was believed.** The boot checker was
+run with `js/main.js` renamed away: it returned `docStatus 200, ready false, 404 Script` — the
+precise "200 on the HTML, 404 on the JS" case, caught. `main.js` was restored and the re-run
+reproduced 49 draws / 160,944 tris exactly. The card checker was run for `NEONHAULX` and returned
+`found: false` on the same 12-card page.
+
+### What P10 did NOT do
+
+- **§13's real-device measurement (§3.11.2) — Aaron's phone, cannot be done from here.** The four
+  `?perf` numbers in portrait and landscape at default and `?lite=1` are still owed.
+- **No critic round, and `day_smog` is unscored.** P10 ran as a single agent under Aaron's usage
+  limit; a critic round is three `fp-critic` subagents per shot and was not authorised. Round 7
+  stands as the last scored round.
+- **T6.2 (the six landmark sign words) — NOT done, and its recipe does not work.** See below.
+
+### ⚠ PLAN DEFECT — T6.2's prescription is impossible as written
+
+DECISIONS T6.2 says: at P10, "add the six words to `data/signwords.json`, re-run
+`tools/bake_signs.mjs`, drop the alias table in `signage.js`". **The baker takes the FIRST n
+entries of each list** (`signwords.json`'s own `_readme` says so) and **`board_en` is already
+exactly n = 40** — so words appended at the end are never read, and the file's advice to "add words
+at the END" guarantees they are ignored. Including them means editing the `KINDS` table in
+`tools/signbake.html` (40 → 46), which takes the sheet from 250 regions to 256, **repacks the atlas
+and moves every UV in it**, invalidating `assets/signs.png`, `data/signs.json`, `gates_p3a`,
+`gates_p3b` and possibly the golden hash — on ship day, for six words that are already aliased to
+plausible substitutes. That is precisely what T6.2's own "**do not re-bake `assets/signs.png`
+mid-run**" warning exists to prevent. **Left aliased. Reopen it only with a phase budget.**
+
+### Two dead counters, reported not fixed
+
+`stats.distance` and `stats.playtime` are declared in `js/save.js` and `js/economy.js` and are
+**never incremented anywhere** — they read 0 after a 180 s flight with three deliveries. Neither is
+displayed to the player or read by progression (tier comes from `lifetime`), so they are dormant
+save fields rather than a visible bug. Noted because a stored number that can only ever be zero is
+this project's signature failure mode in miniature. `stats.spentFuel` **is** wired
+(`economy.js:310`); it read 0 only because the pilot never needed a recharge inside three minutes.
+
+---
+
+## P10 SHIP — the original instruction, 2026-08-18
 
 > "as part of commit, add to projects so it can be tested externally."
 
