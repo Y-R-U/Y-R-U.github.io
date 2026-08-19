@@ -66,7 +66,14 @@ export const PREFETCH = {
   PROBE_DELAY: 1.0,    // seconds after the game is ready before the first HEAD probe goes out
   DELAY: 1.5,          // seconds after the game is ready before a single chatter byte is requested
   CONCURRENCY: 2,
-  MAX_BYTES: 1.5e6,    // the whole chatter set is ~900 KB; this is a ceiling, not a target
+  // S2-B took the pool from 26 clips (896 KB) to 203 (2.29 MB measured, 11.3 KB mean) by encoding
+  // at 16 kbps mono 16 kHz behind a 300–3400 Hz band-limit. The ceiling is set above the whole set
+  // on purpose: a foreground line whose clip has not arrived still SPEAKS, but it speaks as text
+  // only, and a pool this size would leave most lines silent on their first play if the cap cut the
+  // queue off. It is a ceiling on a trickle, not a burst — CONCURRENCY is 2 and nothing starts
+  // until DELAY seconds after the game is playable. `navigator.connection.saveData` still skips it
+  // entirely.
+  MAX_BYTES: 2.6e6,
 };
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);

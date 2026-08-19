@@ -37,7 +37,8 @@ import { Field } from './render_city.js';
 import { protoBoxes, PROTO_TRAITS } from './blocks.js';
 import { signMaterial, stripMaterial, strobeMaterial, structureMaterial } from './materials.js';
 import { heroCanvases } from './signs.js';
-import { xorshift32, hash2i, clamp } from './utils.js';
+import { PosterBoard } from './posters.js';
+import { xorshift32, hash2i, hashf, clamp } from './utils.js';
 import { byId } from './districts.js';
 
 const AXIS_Y = new THREE.Vector3(0, 1, 0);
@@ -111,10 +112,21 @@ const TEXT_ALIAS = {
   SEVER: 'NO ENTRY', LADDER: 'LEVEL 12', NINEFOLD: 'TOWER 9', OPEN: 'OPEN 24H',
 };
 
+// S2-G. What fraction of decision 9's poster sites become LIVING — a screen that cycles stills and
+// short clips instead of one baked tile. Deliberately not all of them: a facade where every poster
+// moves is the wallpaper decision 9 exists to prevent, and a still baked tile beside a live one is
+// what makes the live one read as alive.
+//
+// The roll is a HASH of the building, not a draw from `rng`. Taking it from the placement stream
+// would shift every sign after it and silently re-cut the whole city's signage — gates_p3a's size
+// bands, counts and facade audit all measure that stream.
+const LIVING_FRACTION = 0.6;
+const livingRoll = b => hashf(Math.round(b.x * 4), Math.round(b.z * 4), 0x70a5) < LIVING_FRACTION;
+
 const lin = (hex, out) => out.setHex(hex).convertSRGBToLinear();
 
 export class Signage {
-  constructor(scene, Q, sa, city, sky, noiseTex, keepMeta = false) {
+  constructor(scene, Q, sa, city, sky, noiseTex, keepMeta = false, base = './') {
     this.Q = Q; this.sa = sa; this.city = city;
     this.density = Q.signDensity;
     // Per-sign placement metadata for tools/gates_p3a.mjs. OFF unless ?debug: it is one object
@@ -133,6 +145,13 @@ export class Signage {
     this.matBox = signMaterial(sa.tex, 'box');
     // §3.5.4's fallback: with holo off the hero quads take the eight static `hero` sheet tiles.
     this.matHero = this.heroFps > 0 ? signMaterial(this.hero.tex, 'hero') : signMaterial(sa.tex, 'box');
+    // S2-G. One shared 2x2 atlas of 192x384 cells behind one material, so however many living
+    // poster quads the city places they are one extra draw and one extra texture.
+    this.posters = new PosterBoard(base, { channels: Q.posterChannels ?? 0, maxVideo: Q.posterVideo ?? 0 });
+    this.pvOn = this.posters.enabled;
+    this.pvSites = [];
+    this.posters.load();
+    this.matPost = signMaterial(this.posters.tex, 'hero');
     this.matStrip = stripMaterial();
     this.matStrobe = strobeMaterial();
     this.matStruct = structureMaterial(sky?.env, noiseTex);
@@ -152,8 +171,11 @@ export class Signage {
     this.strip = this.add(new Field('strips', boxg(), this.matStrip, 2900, EMIS_ATTRS), 4);
     this.strobe = this.add(new Field('strobes', quad(), this.matStrobe, 4200, EMIS_ATTRS), 5);
     this.struct = this.add(new Field('structures', boxg(), this.matStruct, 2200, STRUCT_ATTRS), 0);
+    // Living posters are a strict subset of the ~0.5 % of signs that are posters at all; a 5x5 HIGH
+    // ring measures 30-60. 240 is ~4x the worst measured ring, and the field reports overflow.
+    this.postF = this.add(new Field('posters', quad(), this.matPost, 240, SIGN_ATTRS), 3);
 
-    this.fields = [this.neon, this.box, this.heroF, this.strip, this.strobe, this.struct];
+    this.fields = [this.neon, this.box, this.heroF, this.postF, this.strip, this.strobe, this.struct];
 
     this._m4 = new THREE.Matrix4();
     this._q = new THREE.Quaternion();
@@ -164,8 +186,8 @@ export class Signage {
     this._hit = { x: 0, y: 0, z: 0, yaw: 0, nx: 0, nz: 0, face: 0, box: null };
     this._q2 = { x: 0, y: 0, z: 0, yaw: 0, w: 0, h: 0, reg: null, anim: 0, off: 0, tint: 0,
       inten: 0, seed: 0, ccx: 0, ccz: 0, layer: 0, cls: '', kind: '', mode: '', b: null,
-      face: 0, nx: 0, nz: 0, perp: false };
-    this.stats = { blade: 0, board: 0, panel: 0, rule: 0, hero: 0, poster: 0, rejected: 0 };
+      face: 0, nx: 0, nz: 0, perp: false, live: false };
+    this.stats = { blade: 0, board: 0, panel: 0, rule: 0, hero: 0, poster: 0, living: 0, rejected: 0 };
   }
 
   add(f, order) {
@@ -178,14 +200,28 @@ export class Signage {
     this.Q = Q;
     this.density = Q.signDensity;
     this.heroFps = Q.holoFps > 0 ? 8 : 0;
+    // The channel count is baked into placement, so a quality change moves only the decode cap.
+    this.posters.maxVideo = Q.posterVideo ?? this.posters.maxVideo;
   }
 
-  update(dt, t) {
+  update(dt, t, camera) {
     if (this.heroFps > 0 && this.heroF.n > 0) {
       this.heroAcc += dt;
       if (this.heroAcc >= 1 / this.heroFps) { this.heroAcc = 0; this.hero.draw(t); }
     }
+    // S2-G. Cheap when nothing is in front of you and that is the whole point: with no site inside
+    // the range/view gate this is one sweep of a few dozen positions and no draw, no upload and no
+    // decode. `camera` is the only thing this file needs from main.js.
+    if (this.pvOn && this.postF.n > 0) this.posters.update(dt, this.pvSites, camera || this._camOverride);
   }
+
+  // The isolation hook, and it is an OVERRIDE rather than a set: CLAUDE.md's rule is that the game
+  // loop overwrites test fixtures, and `update` is called every frame with the live camera.
+  setPosterCamera(cam) { this._camOverride = cam || null; return !!cam; }
+
+  // The live site list, so a gate can fly to one rather than hunt for it. Copies: the real array
+  // is compacted in place on every chunk demotion.
+  posterSites() { return this.pvSites.map(s => ({ ch: s.ch, x: s.x, y: s.y, z: s.z, nx: s.nx, nz: s.nz })); }
 
   flush() { for (const f of this.fields) f.flush(); }
 
@@ -193,7 +229,7 @@ export class Signage {
 
   prepare(rec) {
     if (!rec.sgN) {
-      rec.sgN = []; rec.sgB = []; rec.sgH = [];
+      rec.sgN = []; rec.sgB = []; rec.sgH = []; rec.sgP = [];
       rec.stS = []; rec.stO = []; rec.stR = [];
       rec.sgMeta = []; rec.stMeta = []; rec.sgAt = 0;
     }
@@ -203,7 +239,18 @@ export class Signage {
     if (!rec.sgN) return;
     const free = (f, arr) => { for (let i = arr.length - 1; i >= 0; i--) f.free(arr[i]); arr.length = 0; };
     free(this.neon, rec.sgN); free(this.box, rec.sgB); free(this.heroF, rec.sgH);
+    free(this.postF, rec.sgP);
     free(this.strip, rec.stS); free(this.strobe, rec.stO); free(this.struct, rec.stR);
+    // The flat site list is what posters.js sweeps; a chunk that has gone must not keep a channel
+    // live from behind you. Compacted in place — this runs on every demotion.
+    if (rec.pvN) {
+      let w = 0;
+      for (let i = 0; i < this.pvSites.length; i++) {
+        if (this.pvSites[i].rec !== rec) this.pvSites[w++] = this.pvSites[i];
+      }
+      this.pvSites.length = w;
+      rec.pvN = 0;
+    }
     rec.sgMeta.length = 0; rec.stMeta.length = 0;
     rec.sgAt = 0; rec.signed = false; rec.extra = false;
   }
@@ -337,8 +384,12 @@ export class Signage {
     x += hit.nx * off; z += hit.nz * off;
     if (L.perp) yaw += Math.PI / 2;
 
-    const field = reg.mode === 'box' ? this.box : this.neon;
-    const arr = reg.mode === 'box' ? rec.sgB : rec.sgN;
+    // S2-G. A living poster is the same placement, the same 12-20 m band and the same
+    // decision-9 height rule; only the tile it points at changes — from one baked cell of
+    // assets/signs.png to one cycling cell of the poster atlas.
+    const living = poster && !forced && this.pvOn && livingRoll(b);
+    const field = living ? this.postF : reg.mode === 'box' ? this.box : this.neon;
+    const arr = living ? rec.sgP : reg.mode === 'box' ? rec.sgB : rec.sgN;
     const q = this._q2;
     q.x = x; q.y = hit.y; q.z = z; q.yaw = yaw; q.w = W; q.h = H; q.reg = reg; q.off = off;
     q.anim = reg.wrapU ? 0.08 + rng() * 0.12 : 0;
@@ -347,6 +398,24 @@ export class Signage {
     q.seed = rng() * 100; q.ccx = ccx; q.ccz = ccz;
     q.layer = layer; q.cls = reg.cls; q.kind = reg.kind; q.mode = reg.mode;
     q.b = b; q.face = hit.face; q.nx = hit.nx; q.nz = hit.nz; q.perp = !!L.perp;
+    q.live = false;
+    if (living) {
+      // The channel is a hash of the building, so neighbours differ and the assignment survives a
+      // chunk being demoted and re-streamed. iRegion becomes the atlas cell; the tint goes white
+      // and the intensity to 1 because `hero` mode multiplies the texel by both, and a poster is
+      // colour, not a mask to be tinted.
+      const chn = hash2i(Math.round(b.x * 4), Math.round(b.z * 4), 0x31c7) % this.posters.nCh;
+      q.reg = Object.assign(this.posters.region(chn), { cls: 'poster', kind: 'poster' });
+      q.tint = 0xffffff;
+      q.inten = 1.0;
+      q.mode = 'hero';
+      q.live = true;
+      if (!this.writeQuad(rec, field, arr, q)) return false;
+      this.pvSites.push({ ch: chn, x: q.x, y: q.y, z: q.z, nx: hit.nx, nz: hit.nz, rec });
+      rec.pvN = (rec.pvN || 0) + 1;
+      this.stats.living++;
+      return true;
+    }
     return this.writeQuad(rec, field, arr, q);
   }
 
@@ -585,7 +654,7 @@ export class Signage {
     rec.sgMeta.push({
       layer: m.layer, cls: m.cls, kind: m.kind, mode: m.mode,
       x: m.x, y: m.y, z: m.z, yaw: m.yaw, w: m.w, h: m.h, perp: m.perp, off: m.off,
-      nx: m.nx, nz: m.nz, proto: m.b.proto, bx: m.b.x, bz: m.b.z,
+      nx: m.nx, nz: m.nz, live: !!m.live, proto: m.b.proto, bx: m.b.x, bz: m.b.z,
       bw: m.b.w, bh: m.b.h, bd: m.b.d, face: m.face, lm: m.b.landmark || null,
     });
     return true;
@@ -856,7 +925,7 @@ export class Signage {
   // measurement sweeps R0, and R0 drives P3a's intensity ramp as well, so leaving the emissive
   // layers on makes part 2 show up as part 3's residue.
   setVisible(on, all) {
-    const set = all ? this.fields : [this.neon, this.box, this.heroF];
+    const set = all ? this.fields : [this.neon, this.box, this.heroF, this.postF];
     for (const f of set) f.mesh.visible = !!on;
     const d = this.derived && (all ? this.derived.all : this.derived.signs);
     if (d) for (const m of d) m.visible = !!on;
@@ -865,18 +934,24 @@ export class Signage {
 
   state() {
     return {
-      neon: this.neon.n, box: this.box.n, hero: this.heroF.n,
+      neon: this.neon.n, box: this.box.n, hero: this.heroF.n, posters: this.postF.n,
       strips: this.strip.n, strobes: this.strobe.n, structures: this.struct.n,
-      signs: this.neon.n + this.box.n + this.heroF.n,
+      signs: this.neon.n + this.box.n + this.heroF.n + this.postF.n,
       density: this.density, heroFps: this.heroFps,
+      // NOT `poster` — main.js's signStats() merges stats and state into one object, and
+      // `stats.poster` is decision 9's tile COUNT. A key collision there would have replaced a
+      // number with an object and read as a working gate.
+      posterBoard: Object.assign({ sites: this.pvSites.length }, this.posters.state()),
       overflow: this.breakdown().overflow,
     };
   }
 
   dispose() {
     for (const f of this.fields) f.dispose();
-    for (const m of [this.matNeon, this.matBox, this.matHero, this.matStrip, this.matStrobe, this.matStruct]) m.dispose();
+    for (const m of [this.matNeon, this.matBox, this.matHero, this.matPost, this.matStrip, this.matStrobe, this.matStruct]) m.dispose();
     this.hero.tex.dispose();
+    this.posters.dispose();
+    this.pvSites.length = 0;
     this.group.parent?.remove(this.group);
   }
 }

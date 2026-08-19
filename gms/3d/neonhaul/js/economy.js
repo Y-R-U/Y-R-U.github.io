@@ -107,6 +107,11 @@ export const UPGRADES = {
   cargo:  { steps: [1, 2, 3],          label: 'CARGO' },
   cell:   { steps: [0.15, 0.30, 0.50], label: 'CELL' },
   eff:    { steps: [0.12, 0.22, 0.30], label: 'SILENT RUNNING' },
+  // S2-F. The one line whose LEVEL 0 already does something: every craft ships with the DRONE
+  // autopilot, which flies the lanes at a third of the hull's speed. The steps are the ladder's
+  // rungs 1-3 and are read through `lanes.js` AUTO_LEVELS — the numbers here would be a second
+  // copy of that table, so this carries only the label and the level count the shop draws.
+  auto:   { steps: [1, 2, 3],          label: 'AUTOPILOT' },
 };
 export const UPGRADE_FRAC = [0.15, 0.35, 0.70];   // of the CURRENT craft's list price
 export const REPAIR_PRICE = 40;
@@ -155,6 +160,12 @@ export function effMul(state) {
   const lv = (state.upgrades && state.upgrades.eff) || 0;
   const up = lv ? 1 - UPGRADES.eff.steps[lv - 1] : 1;
   return up * (CRAFT[state.craft] || CRAFT.wisp).effMul;
+}
+
+// S2-F. The autopilot rung the player is on. There is no `if (bought)` anywhere in the game: the
+// free rung is a rung, so the only question is ever WHICH pilot, never WHETHER.
+export function autoLevel(state) {
+  return clamp(((state.upgrades && state.upgrades.auto) || 0) | 0, 0, 3);
 }
 
 export function occupiedSlots(state) {
@@ -262,7 +273,7 @@ export function newState(over = {}) {
     lifetime: 0,
     tier: 1,
     craft: 'wisp',
-    upgrades: { thrust: 0, cargo: 0, cell: 0, eff: 0 },
+    upgrades: { thrust: 0, cargo: 0, cell: 0, eff: 0, auto: 0 },
     cellUnits: 0,
     cargo: [],
     stats: { jobs: 0, delivered: 0, failed: 0, distance: 0, spentFuel: 0, tows: 0, haggles: 0 },
@@ -389,7 +400,7 @@ export function fromSave(profile) {
   const s = newState({
     credits: profile.credits, lifetime: profile.lifetime,
     craft: profile.craft || 'wisp',
-    upgrades: { thrust: 0, cargo: 0, cell: 0, eff: 0, ...(profile.upgrades || {}) },
+    upgrades: { thrust: 0, cargo: 0, cell: 0, eff: 0, auto: 0, ...(profile.upgrades || {}) },
     stats: { jobs: 0, delivered: 0, failed: 0, distance: 0, spentFuel: 0, tows: 0, haggles: 0, ...(profile.stats || {}) },
   });
   // The tier is DERIVED from lifetime, never trusted from disk — a hand-edited profile cannot

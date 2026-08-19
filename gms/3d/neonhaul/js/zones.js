@@ -704,6 +704,22 @@ export function createZoneVisuals(THREE, { Q, scene }) {
     // T7's rule: every layer that can contaminate a gate's isolation must be hideable.
     setVisible(v) { group.visible = !!v; },
 
+    // §S2-E — Aaron asked for this by name: *"Make the white/coloured transparent docking cylinder
+    // almost invisible for the cutscene."* ALMOST, not off: the craft is parked ON a pad and a pad
+    // with no volume at all reads as a mistake rather than as a mood. `k` scales the three
+    // additive materials' opacity off their shipped values, so restoring is `setDim(1)` and there
+    // is no second copy of the numbers to drift.
+    setDim(k) {
+      const v = k === null || k === undefined ? 1 : Math.max(0, Math.min(1, +k));
+      cylMat.opacity = 0.55 * v;
+      ringMat.opacity = 0.9 * v;
+      for (const m of glyphs) m.material.opacity = 0.85 * v;
+      // NOT the ledge deck. That is a physical slab with a lit rim, not a glow, and it is opaque
+      // (`MeshBasicMaterial` with no `transparent`) — writing `opacity` on it would have changed
+      // nothing at all and read in the diff as if it had. Aaron asked for the *cylinder* to go.
+      return v;
+    },
+
     dispose() {
       cylGeo.dispose(); ringGeo.dispose(); glyphGeo.dispose(); markGeo.dispose();
       cylMat.dispose(); ringMat.dispose(); tex.dispose();

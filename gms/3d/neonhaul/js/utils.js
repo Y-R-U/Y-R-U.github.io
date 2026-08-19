@@ -88,3 +88,27 @@ export class Roll {
   get worst() { return this.a.length ? Math.max(...this.a) : 0; }
   clear() { this.a.length = 0; this.i = 0; }
 }
+
+// The zone tint, made usable as a UI accent.
+//
+// This exists because of something the first S2-D capture showed rather than something anybody
+// predicted: HUB's zone colour is `0xdfeaff` (js/config.js ZONE_TYPES) — near white. Every accent
+// on the FIRST board of the game therefore came out white, the filled primary button rendered as a
+// large pale slab, and the screen looked exactly like the web form this phase exists to delete. A
+// desaturated tint is not an accent; it is the absence of one. So a tint that is too pale or too
+// washed out falls back to the HUD cyan, and every saturated zone colour is used as it is.
+export function accentOf(hex) {
+  // Takes either a number (config.js's ZONE_TYPES) or a '#rrggbb' string (clients.json's
+  // `tint_hex`). Both reach here, and the first version only handled the number — which is how the
+  // client panel kept painting itself white after the board had been fixed.
+  const n = typeof hex === 'number' ? hex
+    : parseInt(String(hex).replace('#', '').slice(0, 6), 16);
+  if (!Number.isFinite(n)) return '#35e6ff';
+  const r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+  const l = (mx + mn) / 2;
+  const sat = mx === mn ? 0 : (mx - mn) / (l > 0.5 ? 2 - mx - mn : mx + mn);
+  if (sat < 0.45 || l > 0.82) return '#35e6ff';
+  return '#' + n.toString(16).padStart(6, '0');
+}
+

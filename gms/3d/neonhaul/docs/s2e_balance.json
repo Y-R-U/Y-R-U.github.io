@@ -1,0 +1,2972 @@
+{
+ "at": "2026-08-19T18:25:02.141Z",
+ "seeds": 12,
+ "debt": 50000,
+ "debt_kestrel": {
+  "payAt": {
+   "focused": {
+    "n": 12,
+    "reached": 12,
+    "p10": 61.4,
+    "p50": 69.4,
+    "p90": 73.7,
+    "crdPerMin": 737.9
+   },
+   "normal": {
+    "n": 12,
+    "reached": 12,
+    "p10": 67.3,
+    "p50": 69.9,
+    "p90": 72.1,
+    "crdPerMin": 733.3
+   },
+   "casual": {
+    "n": 12,
+    "reached": 12,
+    "p10": 81.9,
+    "p50": 85,
+    "p90": 90.4,
+    "crdPerMin": 595.3
+   },
+   "invest": {
+    "n": 12,
+    "reached": 12,
+    "p10": 62.6,
+    "p50": 64.6,
+    "p90": 65.8,
+    "crdPerMin": 952
+   },
+   "dawdle": {
+    "n": 12,
+    "reached": 12,
+    "p10": 106.1,
+    "p50": 109.6,
+    "p90": 112.8,
+    "crdPerMin": 490
+   }
+  },
+  "windows": [
+   {
+    "minutes": 40,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 42,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 44,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 46,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 48,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 50,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 52,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 54,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 56,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 58,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 8.3,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 60,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 8.3,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 62,
+    "by": {
+     "focused": 16.7,
+     "normal": 0,
+     "casual": 0,
+     "invest": 8.3,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 64,
+    "by": {
+     "focused": 33.3,
+     "normal": 0,
+     "casual": 0,
+     "invest": 33.3,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 66,
+    "by": {
+     "focused": 41.7,
+     "normal": 8.3,
+     "casual": 0,
+     "invest": 91.7,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 68,
+    "by": {
+     "focused": 41.7,
+     "normal": 16.7,
+     "casual": 0,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 70,
+    "by": {
+     "focused": 50,
+     "normal": 58.3,
+     "casual": 0,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 72,
+    "by": {
+     "focused": 75,
+     "normal": 83.3,
+     "casual": 0,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 74,
+    "by": {
+     "focused": 91.7,
+     "normal": 100,
+     "casual": 0,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 76,
+    "by": {
+     "focused": 91.7,
+     "normal": 100,
+     "casual": 0,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 78,
+    "by": {
+     "focused": 91.7,
+     "normal": 100,
+     "casual": 0,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 80,
+    "by": {
+     "focused": 91.7,
+     "normal": 100,
+     "casual": 0,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 82,
+    "by": {
+     "focused": 91.7,
+     "normal": 100,
+     "casual": 16.7,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 84,
+    "by": {
+     "focused": 91.7,
+     "normal": 100,
+     "casual": 33.3,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 86,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 58.3,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 88,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 66.7,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 90,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 83.3,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 92,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 94,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 96,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 98,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 100,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 102,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 104,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 106,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 8.3
+    }
+   },
+   {
+    "minutes": 108,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 41.7
+    }
+   },
+   {
+    "minutes": 110,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 50
+    }
+   },
+   {
+    "minutes": 112,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 83.3
+    }
+   },
+   {
+    "minutes": 114,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 91.7
+    }
+   },
+   {
+    "minutes": 116,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 118,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 120,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 122,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 124,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 126,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 128,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 130,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 100,
+     "dawdle": 100
+    }
+   }
+  ],
+  "pick": {
+   "minutes": 84,
+   "score": 0.776,
+   "inBand": false,
+   "by": {
+    "focused": 91.7,
+    "normal": 100,
+    "casual": 33.3,
+    "invest": 100,
+    "dawdle": 0
+   }
+  }
+ },
+ "debt_nocturne": {
+  "payAt": {
+   "focused": {
+    "n": 12,
+    "reached": 12,
+    "p10": 56,
+    "p50": 59.8,
+    "p90": 63.6,
+    "crdPerMin": 834
+   },
+   "normal": {
+    "n": 12,
+    "reached": 12,
+    "p10": 59.8,
+    "p50": 61.8,
+    "p90": 64.3,
+    "crdPerMin": 830.4
+   },
+   "casual": {
+    "n": 12,
+    "reached": 12,
+    "p10": 71.1,
+    "p50": 73.8,
+    "p90": 77.1,
+    "crdPerMin": 706.3
+   },
+   "invest": {
+    "n": 12,
+    "reached": 6,
+    "p10": 146,
+    "p50": 147.6,
+    "p90": 150,
+    "crdPerMin": 995
+   },
+   "dawdle": {
+    "n": 12,
+    "reached": 12,
+    "p10": 90.9,
+    "p50": 92.9,
+    "p90": 94.8,
+    "crdPerMin": 566.5
+   }
+  },
+  "windows": [
+   {
+    "minutes": 40,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 42,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 44,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 46,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 48,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 50,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 52,
+    "by": {
+     "focused": 0,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 54,
+    "by": {
+     "focused": 8.3,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 56,
+    "by": {
+     "focused": 16.7,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 58,
+    "by": {
+     "focused": 25,
+     "normal": 0,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 60,
+    "by": {
+     "focused": 50,
+     "normal": 16.7,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 62,
+    "by": {
+     "focused": 66.7,
+     "normal": 50,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 64,
+    "by": {
+     "focused": 91.7,
+     "normal": 83.3,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 66,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 68,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 0,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 70,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 8.3,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 72,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 25,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 74,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 50,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 76,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 66.7,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 78,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 91.7,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 80,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 82,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 84,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 86,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 88,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 0
+    }
+   },
+   {
+    "minutes": 90,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 8.3
+    }
+   },
+   {
+    "minutes": 92,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 25
+    }
+   },
+   {
+    "minutes": 94,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 83.3
+    }
+   },
+   {
+    "minutes": 96,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 91.7
+    }
+   },
+   {
+    "minutes": 98,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 100,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 102,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 104,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 106,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 108,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 110,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 112,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 114,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 116,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 118,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 120,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 122,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 124,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 126,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 128,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   },
+   {
+    "minutes": 130,
+    "by": {
+     "focused": 100,
+     "normal": 100,
+     "casual": 100,
+     "invest": 0,
+     "dawdle": 100
+    }
+   }
+  ],
+  "pick": {
+   "minutes": 74,
+   "score": 0.906,
+   "inBand": false,
+   "by": {
+    "focused": 100,
+    "normal": 100,
+    "casual": 50,
+    "invest": 0,
+    "dawdle": 0
+   }
+  }
+ },
+ "hire": {
+  "block": 5,
+  "craft": "wisp",
+  "byPilot": {
+   "focused": {
+    "n": 72,
+    "grossP10": 3359,
+    "grossP50": 4112.5,
+    "grossP90": 4925,
+    "firstP10": 3983,
+    "firstP50": 4212.5
+   },
+   "normal": {
+    "n": 72,
+    "grossP10": 2923.5,
+    "grossP50": 3532.5,
+    "grossP90": 4124.5,
+    "firstP10": 3691.5,
+    "firstP50": 3825
+   },
+   "casual": {
+    "n": 72,
+    "grossP10": 2442,
+    "grossP50": 2950,
+    "grossP90": 3474,
+    "firstP10": 2839,
+    "firstP50": 3110
+   },
+   "dawdle": {
+    "n": 72,
+    "grossP10": 1886,
+    "grossP50": 2282.5,
+    "grossP90": 2643,
+    "firstP10": 2302,
+    "firstP50": 2530
+   }
+  },
+  "rows": [
+   {
+    "price": 200,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.049,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.057,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.068,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.088,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 225,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.055,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.064,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.076,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.099,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 250,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.061,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.071,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.085,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.11,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 275,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.067,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.078,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.093,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.12,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 300,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.073,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.085,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.102,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.131,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 325,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.079,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.092,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.11,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.142,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 350,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.085,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.099,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.119,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.153,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 375,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.091,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.106,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.127,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.164,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 400,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.097,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.113,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.136,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.175,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 425,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.103,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.12,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.144,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.186,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 450,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.109,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.127,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.153,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.197,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 475,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.116,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.134,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.161,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.208,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 500,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.122,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.142,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.169,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.219,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 525,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.128,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.149,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.178,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.23,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 550,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.134,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.156,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.186,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.241,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 575,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.14,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.163,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.195,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.252,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 600,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.146,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.17,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.203,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.263,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 625,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.152,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.177,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.212,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.274,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 650,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.158,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.184,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.22,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.285,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 675,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.164,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.191,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.229,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.296,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 700,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.17,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.198,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.237,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.307,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 725,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.176,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.205,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.246,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.318,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 750,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.182,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.212,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.254,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.329,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 775,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.188,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.219,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.263,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.34,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 800,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.195,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.226,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.271,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.35,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 825,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.201,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.234,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.28,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.361,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 850,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.207,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.241,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.288,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.372,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 875,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.213,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.248,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.297,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.383,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 900,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.219,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.255,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.305,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.394,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 925,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.225,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.262,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.314,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.405,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 950,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.231,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.269,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.322,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.416,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 975,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.237,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.276,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.331,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.427,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1000,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.243,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.283,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.339,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.438,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1025,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.249,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.29,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.347,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.449,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1050,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.255,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.297,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.356,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.46,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1075,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.261,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.304,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.364,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.471,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1100,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.267,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.311,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.373,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.482,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1125,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.274,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.318,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.381,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.493,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1150,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.28,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.326,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.39,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.504,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1175,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.286,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.333,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.398,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.515,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1200,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.292,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.34,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.407,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.526,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1225,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.298,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.347,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.415,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.537,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1250,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.304,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.354,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.424,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.548,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1275,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.31,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.361,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.432,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.559,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1300,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.316,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.368,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.441,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.57,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1325,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.322,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.375,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.449,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.581,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1350,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.328,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.382,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.458,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.591,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1375,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.334,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.389,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.466,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.602,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1400,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.34,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.396,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.475,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.613,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1425,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.347,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.403,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.483,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.624,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1450,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.353,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.41,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.492,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.635,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1475,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.359,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.418,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.5,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.646,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1500,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.365,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.425,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.508,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.657,
+      "uncovered": 0
+     }
+    }
+   },
+   {
+    "price": 1525,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.371,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.432,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.517,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.668,
+      "uncovered": 1.4
+     }
+    }
+   },
+   {
+    "price": 1550,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.377,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.439,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.525,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.679,
+      "uncovered": 1.4
+     }
+    }
+   },
+   {
+    "price": 1575,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.383,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.446,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.534,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.69,
+      "uncovered": 1.4
+     }
+    }
+   },
+   {
+    "price": 1600,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.389,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.453,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.542,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.701,
+      "uncovered": 1.4
+     }
+    }
+   },
+   {
+    "price": 1625,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.395,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.46,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.551,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.712,
+      "uncovered": 2.8
+     }
+    }
+   },
+   {
+    "price": 1650,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.401,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.467,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.559,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.723,
+      "uncovered": 2.8
+     }
+    }
+   },
+   {
+    "price": 1675,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.407,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.474,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.568,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.734,
+      "uncovered": 4.2
+     }
+    }
+   },
+   {
+    "price": 1700,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.413,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.481,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.576,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.745,
+      "uncovered": 5.6
+     }
+    }
+   },
+   {
+    "price": 1725,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.419,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.488,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.585,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.756,
+      "uncovered": 5.6
+     }
+    }
+   },
+   {
+    "price": 1750,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.426,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.495,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.593,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.767,
+      "uncovered": 6.9
+     }
+    }
+   },
+   {
+    "price": 1775,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.432,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.502,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.602,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.778,
+      "uncovered": 8.3
+     }
+    }
+   },
+   {
+    "price": 1800,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.438,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.51,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.61,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.789,
+      "uncovered": 8.3
+     }
+    }
+   },
+   {
+    "price": 1825,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.444,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.517,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.619,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.8,
+      "uncovered": 8.3
+     }
+    }
+   },
+   {
+    "price": 1850,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.45,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.524,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.627,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.811,
+      "uncovered": 8.3
+     }
+    }
+   },
+   {
+    "price": 1875,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.456,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.531,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.636,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.821,
+      "uncovered": 9.7
+     }
+    }
+   },
+   {
+    "price": 1900,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.462,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.538,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.644,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.832,
+      "uncovered": 12.5
+     }
+    }
+   },
+   {
+    "price": 1925,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.468,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.545,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.653,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.843,
+      "uncovered": 12.5
+     }
+    }
+   },
+   {
+    "price": 1950,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.474,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.552,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.661,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.854,
+      "uncovered": 15.3
+     }
+    }
+   },
+   {
+    "price": 1975,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.48,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.559,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.669,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.865,
+      "uncovered": 16.7
+     }
+    }
+   },
+   {
+    "price": 2000,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.486,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.566,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.678,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.876,
+      "uncovered": 20.8
+     }
+    }
+   },
+   {
+    "price": 2025,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.492,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.573,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.686,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.887,
+      "uncovered": 20.8
+     }
+    }
+   },
+   {
+    "price": 2050,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.498,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.58,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.695,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.898,
+      "uncovered": 23.6
+     }
+    }
+   },
+   {
+    "price": 2075,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.505,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.587,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.703,
+      "uncovered": 0
+     },
+     "dawdle": {
+      "burnAtP50": 0.909,
+      "uncovered": 26.4
+     }
+    }
+   },
+   {
+    "price": 2100,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.511,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.594,
+      "uncovered": 0
+     },
+     "casual": {
+      "burnAtP50": 0.712,
+      "uncovered": 1.4
+     },
+     "dawdle": {
+      "burnAtP50": 0.92,
+      "uncovered": 30.6
+     }
+    }
+   },
+   {
+    "price": 2125,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.517,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.602,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.72,
+      "uncovered": 2.8
+     },
+     "dawdle": {
+      "burnAtP50": 0.931,
+      "uncovered": 37.5
+     }
+    }
+   },
+   {
+    "price": 2150,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.523,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.609,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.729,
+      "uncovered": 2.8
+     },
+     "dawdle": {
+      "burnAtP50": 0.942,
+      "uncovered": 38.9
+     }
+    }
+   },
+   {
+    "price": 2175,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.529,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.616,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.737,
+      "uncovered": 4.2
+     },
+     "dawdle": {
+      "burnAtP50": 0.953,
+      "uncovered": 38.9
+     }
+    }
+   },
+   {
+    "price": 2200,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.535,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.623,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.746,
+      "uncovered": 4.2
+     },
+     "dawdle": {
+      "burnAtP50": 0.964,
+      "uncovered": 40.3
+     }
+    }
+   },
+   {
+    "price": 2225,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.541,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.63,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.754,
+      "uncovered": 4.2
+     },
+     "dawdle": {
+      "burnAtP50": 0.975,
+      "uncovered": 43.1
+     }
+    }
+   },
+   {
+    "price": 2250,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.547,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.637,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.763,
+      "uncovered": 4.2
+     },
+     "dawdle": {
+      "burnAtP50": 0.986,
+      "uncovered": 44.4
+     }
+    }
+   },
+   {
+    "price": 2275,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.553,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.644,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.771,
+      "uncovered": 6.9
+     },
+     "dawdle": {
+      "burnAtP50": 0.997,
+      "uncovered": 45.8
+     }
+    }
+   },
+   {
+    "price": 2300,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.559,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.651,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.78,
+      "uncovered": 6.9
+     },
+     "dawdle": {
+      "burnAtP50": 1.008,
+      "uncovered": 51.4
+     }
+    }
+   },
+   {
+    "price": 2325,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.565,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.658,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.788,
+      "uncovered": 6.9
+     },
+     "dawdle": {
+      "burnAtP50": 1.019,
+      "uncovered": 55.6
+     }
+    }
+   },
+   {
+    "price": 2350,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.571,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.665,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.797,
+      "uncovered": 8.3
+     },
+     "dawdle": {
+      "burnAtP50": 1.03,
+      "uncovered": 55.6
+     }
+    }
+   },
+   {
+    "price": 2375,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.578,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.672,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.805,
+      "uncovered": 8.3
+     },
+     "dawdle": {
+      "burnAtP50": 1.041,
+      "uncovered": 55.6
+     }
+    }
+   },
+   {
+    "price": 2400,
+    "by": {
+     "focused": {
+      "burnAtP50": 0.584,
+      "uncovered": 0
+     },
+     "normal": {
+      "burnAtP50": 0.679,
+      "uncovered": 1.4
+     },
+     "casual": {
+      "burnAtP50": 0.814,
+      "uncovered": 8.3
+     },
+     "dawdle": {
+      "burnAtP50": 1.051,
+      "uncovered": 62.5
+     }
+    }
+   }
+  ],
+  "pick": {
+   "price": 1425,
+   "by": {
+    "focused": {
+     "burnAtP50": 0.347,
+     "uncovered": 0
+    },
+    "normal": {
+     "burnAtP50": 0.403,
+     "uncovered": 0
+    },
+    "casual": {
+     "burnAtP50": 0.483,
+     "uncovered": 0
+    },
+    "dawdle": {
+     "burnAtP50": 0.624,
+     "uncovered": 0
+    }
+   }
+  }
+ },
+ "ms": 8418
+}

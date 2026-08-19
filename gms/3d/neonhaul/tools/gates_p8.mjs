@@ -26,7 +26,7 @@
 
 import { spawn } from 'node:child_process';
 import { writeFileSync, readFileSync, existsSync, mkdirSync, createReadStream, statSync,
-  renameSync, copyFileSync, rmSync } from 'node:fs';
+  renameSync, copyFileSync, rmSync, readdirSync } from 'node:fs';
 import { dirname, resolve, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -261,26 +261,61 @@ async function legA() {
   const M = JSON.parse(readFileSync(resolve(ROOT, 'assets/audio/manifest.json'), 'utf8'));
   const suno = readFileSync(resolve(ROOT, 'docs/SUNO.md'), 'utf8');
 
-  // ── A1 §11 — 73 slots, every one listed whether or not the file exists ───
+  // ── A1 §11 — every slot listed, and the manifest agrees with its source ──
+  // The counts are no longer hard-coded. S2-B grew the pool from 64 chatter slots to 203, so a
+  // literal 73 here would have to be edited on every content change, and a number that is edited to
+  // match whatever was produced is not an assertion. Instead the manifest is checked against
+  // tools/vo/lines.json, which is what generated it — the two can only agree if the generator ran
+  // over the current source — and against the one number the phase actually promised.
   const back = M.chatter.filter(c => c.layer === 'back');
   const fore = M.chatter.filter(c => c.layer === 'fore');
-  check('A1 §11 — the manifest lists all 73 slots (9 music / 7 background / 57 foreground)',
-    M.music.length === 9 && back.length === 7 && fore.length === 57
-    && M.music.length + M.chatter.length === 73,
+  const LINES = JSON.parse(readFileSync(resolve(ROOT, 'tools/vo/lines.json'), 'utf8'));
+  const srcSlots = [];
+  for (const [g, gd] of Object.entries(LINES.groups))
+    gd.lines.forEach((_, i) => srcSlots.push(`${g}_${String(i + 1).padStart(2, '0')}`));
+  const manSlots = M.chatter.map(c => c.slot);
+  const missingFromMan = srcSlots.filter(x => !manSlots.includes(x));
+  const extraInMan = manSlots.filter(x => !srcSlots.includes(x));
+  check('A1 §11 — every slot in tools/vo/lines.json is listed in the manifest, and the pool clears the 150-line floor S2-B was set',
+    missingFromMan.length === 0 && extraInMan.length === 0 && M.music.length === 9
+    && fore.length >= 150,
     `music ${M.music.length}, background ${back.length}, foreground ${fore.length}, `
-    + `total ${M.music.length + M.chatter.length}. 42 of the 73 files do not exist on disk and every `
-    + `one of them is still a slot — §10.3's "committed with every slot listed".`);
+    + `total ${M.music.length + M.chatter.length}. lines.json declares ${srcSlots.length} chatter slots `
+    + `and the manifest lists ${manSlots.length}; ${missingFromMan.length} missing, ${extraInMan.length} extra. `
+    + `Foreground ${fore.length} against the floor of 150.`);
 
   // ── A2 §11 — the load-bearing pool sizes ────────────────────────────────
+  // §11's pool sizes were the sizes §10.4's repeat arithmetic was SOLVED against, so they are a
+  // floor, not a target: a bigger pool can only push a repeat further away. They stay here as
+  // minimums, which is the assertion that actually protects the player — plus the S2-B tag contract,
+  // whose vocabulary is exactly three values and is the one field the other agent reads.
   const SIZES = { dispatch: 6, dispatch_confirm: 8, dispatch_pay: 8, police: 6, pirate: 5, ad: 6,
     distress: 5, weather: 5, life: 8, bg_net: 4, bg_dock: 3 };
   const got = {};
   for (const c of M.chatter) got[c.group] = (got[c.group] || 0) + 1;
-  const wrong = Object.entries(SIZES).filter(([g, n]) => got[g] !== n);
-  check('A2 §11 — every foreground pool is exactly the size §10.4\'s arithmetic is solved against',
-    wrong.length === 0,
-    wrong.length ? `WRONG: ${wrong.map(([g, n]) => `${g} expected ${n} got ${got[g]}`).join('; ')}`
-      : Object.entries(got).map(([g, n]) => `${g} ${n}`).join(' · '));
+  const wrong = Object.entries(SIZES).filter(([g, n]) => !(got[g] >= n));
+  // `layer` and `tag` are two different axes and the contract must not conflate them. `layer` is the
+  // AUDIO BUS — `back` is the unintelligible ambient bed at 0.22 gain, `fore` is a discrete
+  // transmission you can make out. `tag` is how the TICKER RENDERS THE TEXT. A `life` line is a real
+  // foreground transmission you hear clearly, and its text still belongs in the faded tier, because
+  // a trucker blathering on an open channel is not addressed to the player. Requiring
+  // `TAGS[tag] === layer` made the display tier a synonym for the bus and collapsed three render
+  // tiers onto two, which is the whole reason the field exists.
+  //
+  // So the rule is ONE-DIRECTIONAL, and keeps what the original assertion actually protected: a bed
+  // line can never render bright. `back` implies `bg`; `fore` may carry any of the three.
+  const TAGS = ['bg', 'info', 'alert'];
+  const badTag = M.chatter.filter(c => !TAGS.includes(c.tag) || (c.layer === 'back' && c.tag !== 'bg'));
+  const tagCount = {};
+  for (const c of M.chatter) tagCount[c.tag] = (tagCount[c.tag] || 0) + 1;
+  check('A2 §11 — every pool meets the size §10.4\'s arithmetic is solved against, and every slot carries a legal S2 `tag`',
+    wrong.length === 0 && badTag.length === 0,
+    (wrong.length ? `UNDERSIZED: ${wrong.map(([g, n]) => `${g} needs ${n} has ${got[g]}`).join('; ')}. ` : '')
+    + (badTag.length ? `ILLEGAL TAGS: ${badTag.slice(0, 5).map(c => `${c.slot}=${c.tag}/${c.layer}`).join(' ')}. ` : '')
+    + Object.entries(got).map(([g, n]) => `${g} ${n}`).join(' · ')
+    + `. tag vocabulary ${JSON.stringify(tagCount)} — exactly bg|info|alert, and every 'back' slot `
+    + `carries 'bg' (a bed line can never render bright). A 'fore' slot may carry any of the three: `
+    + `the bus and the render tier are different axes.`);
 
   // ── A3 — the popup text is SUNO.md's, character for character ───────────
   // §11: "Every line becomes one manifest slot with its text field set to the line exactly as
@@ -289,9 +324,9 @@ async function legA() {
   const missing = fore.filter(c => !c.text || !c.text.trim());
   const notInSuno = fore.filter(c => c.text && !suno.includes(c.text));
   const backWithText = back.filter(c => 'text' in c);
-  check('A3 §11 — all 57 foreground texts are non-empty and appear verbatim in docs/SUNO.md; no background slot carries text',
+  check('A3 §11 — every foreground text is non-empty and appears verbatim in docs/SUNO.md; no background slot carries text',
     missing.length === 0 && notInSuno.length === 0 && backWithText.length === 0,
-    `${fore.length}/57 foreground texts found verbatim in SUNO.md; ${missing.length} empty; `
+    `${fore.length - notInSuno.length}/${fore.length} foreground texts found verbatim in SUNO.md; ${missing.length} empty; `
     + `${notInSuno.length} not matching source; ${backWithText.length} background slots carrying text `
     + `(§10.3 rule 3 — a back line NEVER shows text, so the field is absent rather than unused). `
     + `Longest line ${Math.max(...fore.map(c => c.text.length))} chars.`);
@@ -460,7 +495,7 @@ async function legA() {
   check('A7 §10.3 rule 2 — marking EVERY slot absent leaves the foreground bags whole and the schedule unchanged',
     foreBagsIntact && backBagsEmpty && allHaveText && aBack.length === 0
     && Math.abs(meanA - meanP) / meanP < 0.05,
-    `all 73 slots absent. Every one of the ${DIR.AMBIENT.length} ambient foreground bags is still at `
+    `all ${M.chatter.length} chatter slots absent. Every one of the ${DIR.AMBIENT.length} ambient foreground bags is still at `
     + `full size (${DIR.AMBIENT.map(g => `${g}:${dirAbsent.groups.get(g).bag.all.length}`).join(' ')}) — absence `
     + `removes a slot from the AUDIO path and never from a bag. Both background bags are empty `
     + `(${backBagsEmpty}), and 0 background lines fired: a back line never shows text (§10.3 rule 3) so an `
@@ -496,13 +531,21 @@ async function legA() {
   const confirms = evSeq.filter((_, i) => i % 2 === 0);
   const pays = evSeq.filter((_, i) => i % 2 === 1);
   const gapC = minGap(confirms), gapP = minGap(pays);
+  // Both numbers are functions of the pool size, not constants: S2-B took these two pools from 8
+  // lines to 20 each and a hard-coded 8 would have had to be edited to whatever was produced.
+  // 30 draws from a bag of n>=... must use every line in it, and the bag's hold-back puts a floor of
+  // floor(n/2)+1 draws between two plays of the same line (A4 proves that floor separately).
+  const nC = M.chatter.filter(c => c.group === 'dispatch_confirm').length;
+  const nP = M.chatter.filter(c => c.group === 'dispatch_pay').length;
+  const floorC = Math.floor(nC / 2) + 1, floorP = Math.floor(nP / 2) + 1;
   check('A9 §10.4 — 30 jobs draw from the two dedicated event pools with no adjacent repeat',
-    confirms.every(Boolean) && pays.every(Boolean) && gapC >= 3 && gapP >= 3
-    && new Set(confirms).size === 8 && new Set(pays).size === 8,
-    `30 jobs at 90 s: ${new Set(confirms).size}/8 confirm lines and ${new Set(pays).size}/8 pay lines `
-    + `used; closest repeat ${gapC} jobs (confirm) / ${gapP} jobs (pay) = `
-    + `${(gapC * 90 / 60).toFixed(1)} / ${(gapP * 90 / 60).toFixed(1)} minutes apart, against §10.4's `
-    + `"about every twelve minutes". Neither pool ever failed to produce a line.`);
+    confirms.every(Boolean) && pays.every(Boolean) && gapC >= floorC && gapP >= floorP
+    && new Set(confirms).size === Math.min(nC, 30) && new Set(pays).size === Math.min(nP, 30),
+    `30 jobs at 90 s: ${new Set(confirms).size}/${nC} confirm lines and ${new Set(pays).size}/${nP} pay `
+    + `lines used; closest repeat ${gapC} jobs (confirm, floor ${floorC}) / ${gapP} jobs (pay, floor `
+    + `${floorP}) = ${(gapC * 90 / 60).toFixed(1)} / ${(gapP * 90 / 60).toFixed(1)} minutes apart. §10.4 `
+    + `budgeted "about every twelve minutes" off an 8-line pool; the pools are ${nC} and ${nP} now, which `
+    + `is why the measured figure is well past it. Neither pool ever failed to produce a line.`);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -510,6 +553,7 @@ async function legA() {
 // ════════════════════════════════════════════════════════════════════════════
 
 async function legB() {
+  const M = JSON.parse(readFileSync(resolve(ROOT, 'assets/audio/manifest.json'), 'utf8'));
   const B = await launch({ mobile: true, autoplay: 'strict' });
   const { S } = B;
   try {
@@ -598,15 +642,91 @@ async function legB() {
     const absentF = files.filter(f => !f.ok);
     const silentF = present.filter(f => f.silent);
     const minDb = Math.min(...present.map(f => f.db)), maxDb = Math.max(...present.map(f => f.db));
+    // The claim is now stronger than it was at ship. Then, 42 of 73 slots legitimately had no file
+    // and the assertion was a count. Now EVERY chatter slot has one, so the assertion is that not a
+    // single chatter clip is missing, undecodable or silent — a per-slot claim with nothing to hide
+    // behind. Only the four optional music tracks are still allowed to 404, and they are named.
+    const chatterFiles = files.filter(f => /\/chatter\//.test(f.path));
+    const chatterAbsent = chatterFiles.filter(f => !f.ok);
+    const OPTIONAL_MUSIC = ['chase.mp3', 'storm.mp3', 'first_flight.mp3', 'pirate.mp3'];
+    const unexpectedAbsent = absentF.filter(f => !OPTIONAL_MUSIC.includes(f.path.split('/').pop()));
     check('B5 — every present clip carries real decoded sample energy (RMS, not bytes and not duration)',
-      present.length === 31 && silentF.length === 0,
-      `${present.length} of 73 slots have a file; all ${present.length} decode and all ${present.length} `
-      + `are above MIN_RMS. Range ${minDb.toFixed(1)} dBFS to ${maxDb.toFixed(1)} dBFS `
+      chatterAbsent.length === 0 && chatterFiles.length === M.chatter.length
+      && silentF.length === 0 && unexpectedAbsent.length === 0,
+      `${present.length} of ${files.length} slots have a file; all ${present.length} decode and all `
+      + `${present.length} are above MIN_RMS. Range ${minDb.toFixed(1)} dBFS to ${maxDb.toFixed(1)} dBFS `
       + `(RMS ${Math.min(...present.map(f => f.rms)).toFixed(4)}–${Math.max(...present.map(f => f.rms)).toFixed(4)}). `
-      + `${absentF.length} slots 404 as expected — police, pirate, ad, distress, weather, life, bg_dock and `
-      + `four music tracks are unfilled and optional. Quietest present clip: `
+      + `All ${chatterFiles.length} chatter slots have audio — ${chatterAbsent.length} absent, `
+      + `${silentF.length} silent. The only ${absentF.length} absent slots are the optional music `
+      + `tracks (${absentF.map(f => f.path.split('/').pop()).join(', ') || 'none'}); `
+      + `${unexpectedAbsent.length} unexpected. Quietest present clip: `
       + `${present.slice().sort((a, b) => a.rms - b.rms)[0].path.split('/').pop()}.`);
     note('clipRms', present.map(f => ({ f: f.path.split('/').pop(), rms: f.rms, db: f.db, dur: f.duration })));
+
+    // ── B5b — the hole B5 acquired when the assets grew a noise floor ────
+    // B5 asks "does this clip contain energy". At ship that was the whole question, because a SUNO
+    // take was either speech or digital silence. S2-B's radio chain deliberately mixes a pink-noise
+    // carrier and two squelch bursts into EVERY clip, so a clip whose synthesiser step produced
+    // nothing now decodes at about −37 dBFS of pure hiss — and sails through B5. That was measured,
+    // not assumed: a noise-only encode staged into life_20.mp3 was reported by B5 as the quietest
+    // present clip and the gate stayed green.
+    //
+    // So this measures the SPEECH WINDOW: the span between the head squelch (75 ms) and the tail
+    // squelch (130 ms), with 50 ms of margin either side. The floor is −26.5 dBFS, which is 8 dB
+    // above the loudest of the four no-speech controls that tools/vo/gen_chatter.py builds by
+    // running silence through the identical chain. The falsification does not need a staged file:
+    // a real clip is decoded and its speech window zeroed IN THE PAGE, leaving the squelch bursts
+    // intact, and the pair is measured by the same code.
+    const SPEECH_FLOOR_DB = -26.5;
+    const win = await ev(S, `(async () => {
+      const m = await (await fetch('../assets/audio/manifest.json')).json();
+      const ctx = window.__audio.audio.ctx;
+      const HEAD = 0.075 + 0.05, TAIL = 0.130 + 0.05;
+      const winRms = (buf, h, t) => {
+        const d = buf.getChannelData(0), sr = buf.sampleRate;
+        const i0 = Math.min(d.length, Math.round(h * sr)), i1 = Math.max(i0, d.length - Math.round(t * sr));
+        let s = 0; for (let i = i0; i < i1; i++) s += d[i] * d[i];
+        return Math.sqrt(s / Math.max(1, i1 - i0));
+      };
+      const out = [];
+      let probe = null;
+      for (const c of m.chatter) {
+        const r = await fetch('../assets/audio/' + c.file, { cache: 'no-store' });
+        if (!r.ok) { out.push({ slot: c.slot, ok: false }); continue; }
+        const buf = await ctx.decodeAudioData(await r.arrayBuffer());
+        const s = winRms(buf, HEAD, TAIL);
+        out.push({ slot: c.slot, ok: true, speech: +(20 * Math.log10(s + 1e-12)).toFixed(2),
+                   whole: +(20 * Math.log10(winRms(buf, 0, 0) + 1e-12)).toFixed(2) });
+        if (!probe) {
+          // the falsification: same buffer, speech window zeroed, squelch bursts left alone
+          const z = ctx.createBuffer(1, buf.length, buf.sampleRate);
+          const src = buf.getChannelData(0), dst = z.getChannelData(0);
+          const i0 = Math.round(HEAD * buf.sampleRate), i1 = buf.length - Math.round(TAIL * buf.sampleRate);
+          for (let i = 0; i < buf.length; i++) dst[i] = (i >= i0 && i < i1) ? 0 : src[i];
+          const zw = winRms(z, 0, 0);
+          probe = { slot: c.slot,
+                    speech: +(20 * Math.log10(winRms(z, HEAD, TAIL) + 1e-12)).toFixed(2),
+                    whole: +(20 * Math.log10(zw + 1e-12)).toFixed(2),
+                    wholeRms: +zw.toFixed(6), minRms: window.__audio.MIN_RMS,
+                    passesB5: zw >= window.__audio.MIN_RMS };
+        }
+      }
+      return { out, probe };
+    })()`, { timeout: 300000 });
+    const wOk = win.out.filter(w => w.ok);
+    const wQuiet = wOk.filter(w => w.speech < SPEECH_FLOOR_DB);
+    const wMin = Math.min(...wOk.map(w => w.speech)), wMax = Math.max(...wOk.map(w => w.speech));
+    check('B5b — every clip contains SPEECH, not just the hiss the radio chain adds  [FALSIFIED]',
+      wOk.length === win.out.length && wQuiet.length === 0
+      && win.probe.speech < SPEECH_FLOOR_DB && win.probe.passesB5 === true,
+      `${wOk.length} chatter clips decoded; speech window ${wMin.toFixed(1)} to ${wMax.toFixed(1)} dBFS `
+      + `against a floor of ${SPEECH_FLOOR_DB} dBFS, ${wQuiet.length} below it. Falsification — `
+      + `${win.probe.slot} with its speech window zeroed and its squelch bursts kept reads `
+      + `${win.probe.speech} dBFS in the window (rejected) while its WHOLE-FILE RMS is still `
+      + `${win.probe.wholeRms} (${win.probe.whole} dBFS) against MIN_RMS ${win.probe.minRms} — so B5 `
+      + `would call that clip fine (passesB5=${win.probe.passesB5}). That is the hole, and it opened `
+      + `the moment the assets acquired a deliberate noise floor.`);
+    note('speechWindow', { floor: SPEECH_FLOOR_DB, min: wMin, max: wMax, probe: win.probe });
 
     // ── B6 — and the check catches silence ───────────────────────────────
     // `_silenced.mp3` was encoded from a real clip with volume=0: identical duration, identical
@@ -668,10 +788,11 @@ async function legB() {
 
     // ── B9 §10.3 rule 1 — the absence sweep ──────────────────────────────
     const abs = await ev(S, 'window.__audio.probe()', { timeout: 120000 });
-    check('B9 §10.3 rule 1 — the deferred HEAD sweep classifies all 73 slots and empties the pools that have no files',
-      abs.music.present === 5 && abs.pools.cruise === 2 && abs.pools.rush === 0 && abs.pools.storm === 0,
+    check('B9 §10.3 rule 1 — the deferred HEAD sweep classifies every slot and empties the pools that have no files',
+      abs.music.present === 5 && abs.pools.cruise === 2 && abs.pools.rush === 0 && abs.pools.storm === 0
+      && abs.chatter.absent === 0 && abs.chatter.total === M.chatter.length,
       `music present ${abs.music.present}/9 (${abs.music.presentSlots.join(', ')}); `
-      + `chatter absent ${abs.chatter.absent}/64. Pools: `
+      + `chatter absent ${abs.chatter.absent}/${abs.chatter.total}. Pools: `
       + Object.entries(abs.pools).map(([p, n]) => `${p}=${n}`).join(' ')
       + `. rush/storm/intro/diegetic are empty and the chain falls through to cruise — §10.3 rule 4's `
       + `state machine cannot request a file that is not there.`);
@@ -739,8 +860,19 @@ async function legB() {
 async function legC() {
   const CH = resolve(ROOT, 'assets/audio/chatter');
   const staged = [resolve(CH, 'police_01.mp3'), resolve(CH, 'police_02.mp3')];
-  // police_01 gets the SILENCED encode (an optional, genuinely-unfilled slot), police_02 gets a
-  // verbatim copy of a real clip. Both are removed in the finally.
+  // police_01 gets the SILENCED encode, police_02 gets a verbatim copy of a different real clip.
+  //
+  // At ship these two slots had no file, so staging one WAS the drop-in this leg is about and the
+  // finally simply deleted them. S2-B generated every slot, so the same three lines would now
+  // overwrite two real assets and then delete them — a gate that destroys the thing it measures.
+  // So the real files are moved aside first and restored at the end, which keeps the leg's premise
+  // exactly (both slots genuinely have no file when the browser starts) and is asserted by C3.
+  const backups = staged.map(f => f + '.p8bak');
+  for (let i = 0; i < staged.length; i++) {
+    if (!existsSync(staged[i])) throw new Error(`legC: ${staged[i]} is missing — it should exist before this leg hides it`);
+    renameSync(staged[i], backups[i]);
+  }
+  const bakBytes = backups.map(b => statSync(b).size);
   copyFileSync(resolve(CH, '_p8_silenced.mp3'), staged[0]);
   copyFileSync(resolve(CH, 'dispatch_pay_01.mp3'), staged[1]);
 
@@ -817,9 +949,22 @@ async function legC() {
       + `path on a real clip played audio — that contrast is the falsification: the two runs differ only `
       + `in whether the bytes contain sound.`);
 
+    // ── C3 — and the two real clips this leg hid are back, byte for byte ──
+    for (let i = 0; i < staged.length; i++) { try { rmSync(staged[i]); } catch {} renameSync(backups[i], staged[i]); }
+    const restored = staged.map(f => existsSync(f) && statSync(f).size);
+    check('C3 — the two real clips legC replaced with fixtures were restored, byte for byte',
+      restored.every((n, i) => n === bakBytes[i]) && backups.every(b => !existsSync(b)),
+      `police_01.mp3 ${bakBytes[0]} B → ${restored[0]} B and police_02.mp3 ${bakBytes[1]} B → `
+      + `${restored[1]} B, and no .p8bak file is left behind. This leg overwrites two shipped assets `
+      + `with test fixtures; without this assertion a crash between the copy and the restore would `
+      + `leave a silenced clip in the shipped pool and the suite would still read green.`);
+
   } finally {
     await B.close();
-    for (const f of staged) { try { rmSync(f); } catch {} }
+    // Belt and braces: if the leg threw before C3, the originals are still under .p8bak.
+    for (let i = 0; i < staged.length; i++) {
+      if (existsSync(backups[i])) { try { rmSync(staged[i]); } catch {} renameSync(backups[i], staged[i]); }
+    }
   }
 }
 
@@ -953,7 +1098,8 @@ async function legD() {
       + `Requests under assets/audio/ at all: ${audioBefore.length}, `
       + `${audioBefore.reduce((a, r) => a + r.bytes, 0)} bytes of ${totalBefore} total on the boot path — `
       + `i.e. the audio layer contributes ${(audioBefore.reduce((a, r) => a + r.bytes, 0) / totalBefore * 100).toFixed(1)} % `
-      + `of boot bytes, all of it the 22 KB manifest. The mechanism is not ordering: music is an `
+      + `of boot bytes, all of it the manifest — ${(audioBefore.reduce((a, r) => a + r.bytes, 0) / 1024).toFixed(0)} KB of it, up from 22 KB `
+      + `at ship because S2-B took the chatter pool from 64 slots to 203. The mechanism is not ordering: music is an `
       + `HTMLMediaElement with preload="none" whose src is assigned only when a pool starts, and a pool `
       + `cannot start before a gesture has made the context run. There is no code path that could `
       + `request a music body earlier.`);
@@ -1051,7 +1197,7 @@ async function legE() {
     const e1frames = await ev(S, 'window.__state.frames');
     check('E1 §13 — with EVERY audio file deleted the game runs, the bed plays, and foreground chatter is text-only on schedule',
       e1.popups >= 3 && e1.fired.every(f => f.audio === 0) && e1bed.peak > 1e-4 && e1frames > 60,
-      `assets/audio/{chatter,music} moved away — 0 of 73 files present. Game reached __ready in `
+      `assets/audio/{chatter,music} moved away — not one of the manifest's files is present. Game reached __ready in `
       + `${readyMs} ms and rendered ${e1frames} frames. ${e1.fired.length} radio lines fired in 200 `
       + `virtual seconds, ALL of them with audio=0, and ${e1.popups} popups reached the HUD from the `
       + `manifest's own text. Synthesised bed peak RMS ${e1bed.peak} — the city still talks. `
@@ -1103,6 +1249,26 @@ async function legE() {
 // ── the silenced fixture ────────────────────────────────────────────────────
 // Built with ffmpeg from a real clip at volume=0: same duration, same channels, same codec, same
 // container. Every "is this clip OK" check this project used before passes on it.
+// Recover from a previous run that died between staging a fixture and putting the real file back.
+// legC's `finally` is not enough: a hard process death — this suite lost one to an EINVAL out of the
+// local server while the machine was at load 7 — skips it entirely, and what it leaves behind is a
+// SILENCED clip sitting in the shipped pool under a real slot name. That is precisely the failure
+// this project is built around, manufactured by its own test harness, so recovery runs before
+// anything else and says so out loud.
+function recoverStaged() {
+  const CH = resolve(ROOT, 'assets/audio/chatter');
+  const baks = readdirSync(CH).filter(f => f.endsWith('.p8bak'));
+  for (const b of baks) {
+    const real = resolve(CH, b.slice(0, -6));
+    try { rmSync(real); } catch {}
+    renameSync(resolve(CH, b), real);
+    console.log(`  RECOVERED ${b.slice(0, -6)} from a previous run that did not finish`);
+  }
+  const stale = resolve(CH, '_p8_silenced.mp3');
+  if (existsSync(stale)) { rmSync(stale); console.log('  removed a stale _p8_silenced.mp3 fixture'); }
+  return baks.length;
+}
+
 function makeSilenced() {
   const src = resolve(ROOT, 'assets/audio/chatter/dispatch_01.mp3');
   const dst = resolve(ROOT, 'assets/audio/chatter/_p8_silenced.mp3');
@@ -1116,6 +1282,8 @@ function makeSilenced() {
 
 async function main() {
   const t0 = Date.now();
+  const recovered = recoverStaged();
+  if (recovered) note('recoveredStagedFiles', recovered);
   const silenced = makeSilenced();
   note('fixtures', { silenced: silenced.replace(ROOT + '/', ''),
     silencedBytes: statSync(silenced).size,

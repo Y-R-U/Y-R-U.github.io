@@ -1,0 +1,1344 @@
+{
+  "_readme": [
+    "The whole radio line pool, and the single source of truth for tools/vo/gen_chatter.py.",
+    "Editing this file and re-running `python3 tools/vo/gen_chatter.py` regenerates the audio, the",
+    "manifest and the docs/SUNO.md line tables. Nothing else needs touching.",
+    "",
+    "  src:'suno'  the audio is an existing SUNO take in tools/vo/raw_suno/ — do NOT re-synthesise it,",
+    "              only pass it through tools/radio_fx.sh so the whole pool has one texture.",
+    "  v           a key in `voices`. For a back-layer line it is a LIST, and the texts are rendered",
+    "              separately and overlapped, because the background is meant to be several people",
+    "              talking over each other rather than one person being unintelligible.",
+    "  t           the line. For a FOREGROUND slot this becomes the manifest `text` and the on-screen",
+    "              popup, so it must match the audio word for word. A BACK slot never shows text, so",
+    "              its `t` is generator input only and is deliberately not copied to the manifest.",
+    "  shout       drives the `loud` radio profile AND is recorded in the manifest.",
+    "",
+    "tag is the S2 A-B contract field: exactly bg | info | alert, set per GROUP here."
+  ],
+  "voices": {
+    "ctrl_a": {
+      "say": "Samantha",
+      "pitch": 1.0,
+      "profile": "close",
+      "who": "Haul Control, day operator — US female, calm and clipped",
+      "rate": 208
+    },
+    "ctrl_b": {
+      "say": "Karen",
+      "pitch": 0.97,
+      "profile": "close",
+      "who": "Haul Control, night operator — AU female, dry",
+      "rate": 199
+    },
+    "ctrl_c": {
+      "say": "Tessa",
+      "pitch": 1.03,
+      "profile": "close",
+      "who": "Haul Control, relief operator — ZA female, brisk",
+      "rate": 220
+    },
+    "patrol_a": {
+      "say": "Daniel",
+      "pitch": 0.93,
+      "profile": "loud",
+      "who": "City Patrol officer — GB male, bored authority",
+      "rate": 188
+    },
+    "patrol_b": {
+      "say": "Rocko (English (US))",
+      "pitch": 1.0,
+      "profile": "loud",
+      "who": "City Patrol second unit — deep US male",
+      "rate": 179
+    },
+    "patrol_c": {
+      "say": "Tara",
+      "pitch": 1.0,
+      "profile": "close",
+      "who": "City Patrol dispatcher — IN female, procedural",
+      "rate": 182
+    },
+    "dj": {
+      "say": "Aman",
+      "pitch": 1.07,
+      "profile": "thin",
+      "who": "The Understack pirate DJ — over-modulated, cheap gear",
+      "rate": 235
+    },
+    "ad_f": {
+      "say": "Moira",
+      "pitch": 1.09,
+      "profile": "close",
+      "who": "commercial announcer - bright female, too close to the microphone",
+      "rate": 208
+    },
+    "ad_m": {
+      "say": "Daniel",
+      "pitch": 1.09,
+      "profile": "close",
+      "who": "commercial announcer - bright male, pitched up and pushed",
+      "rate": 205
+    },
+    "bulletin": {
+      "say": "Karen",
+      "pitch": 0.99,
+      "profile": "close",
+      "who": "Atmospheric Bulletin - flat, evenly paced, no emotion whatsoever",
+      "rate": 162
+    },
+    "hauler": {
+      "say": "Ralph",
+      "pitch": 0.98,
+      "profile": "distant",
+      "who": "long-haul freight driver — deep, weary, talks to fill the hours",
+      "rate": 170
+    },
+    "life_a": {
+      "say": "Moira",
+      "pitch": 1.0,
+      "profile": "close",
+      "who": "IE female",
+      "rate": 197
+    },
+    "life_b": {
+      "say": "Rishi",
+      "pitch": 1.0,
+      "profile": "close",
+      "who": "IN male",
+      "rate": 188
+    },
+    "life_c": {
+      "say": "Fred",
+      "pitch": 1.0,
+      "profile": "close",
+      "who": "US male, gruff",
+      "rate": 168
+    },
+    "life_d": {
+      "say": "Grandpa (English (US))",
+      "pitch": 1.0,
+      "profile": "distant",
+      "who": "old US male",
+      "rate": 168
+    },
+    "life_e": {
+      "say": "Grandma (English (UK))",
+      "pitch": 1.02,
+      "profile": "close",
+      "who": "old GB female",
+      "rate": 168
+    },
+    "life_f": {
+      "say": "Samantha",
+      "pitch": 1.06,
+      "profile": "close",
+      "who": "GB female -> US female, brisk",
+      "rate": 186
+    },
+    "life_g": {
+      "say": "Sandy (English (US))",
+      "pitch": 0.96,
+      "profile": "close",
+      "who": "US female, high",
+      "rate": 200
+    },
+    "life_h": {
+      "say": "Reed (English (UK))",
+      "pitch": 1.02,
+      "profile": "close",
+      "who": "GB male",
+      "rate": 193
+    },
+    "life_i": {
+      "say": "Eddy (English (UK))",
+      "pitch": 0.96,
+      "profile": "close",
+      "who": "GB male, distant",
+      "rate": 184
+    },
+    "life_j": {
+      "say": "Daniel",
+      "pitch": 1.06,
+      "profile": "close",
+      "who": "GB male, younger",
+      "rate": 228
+    },
+    "life_k": {
+      "say": "Karen",
+      "pitch": 1.07,
+      "profile": "distant",
+      "who": "AU female, younger",
+      "rate": 215
+    },
+    "life_l": {
+      "say": "Tessa",
+      "pitch": 0.94,
+      "profile": "close",
+      "who": "ZA female, lower",
+      "rate": 195
+    },
+    "life_m": {
+      "say": "Aman",
+      "pitch": 0.93,
+      "profile": "close",
+      "who": "IN male, lower",
+      "rate": 186
+    },
+    "life_n": {
+      "say": "Samantha",
+      "pitch": 0.92,
+      "profile": "distant",
+      "who": "US female, lower",
+      "rate": 175
+    },
+    "dis_a": {
+      "say": "Moira",
+      "pitch": 1.04,
+      "profile": "thin",
+      "who": "emergency band — IE female",
+      "rate": 240
+    },
+    "dis_b": {
+      "say": "Rishi",
+      "pitch": 1.05,
+      "profile": "thin",
+      "who": "emergency band — IN male",
+      "rate": 246
+    },
+    "dis_c": {
+      "say": "Sandy (English (US))",
+      "pitch": 1.0,
+      "profile": "loud",
+      "who": "emergency band — US female",
+      "rate": 210
+    },
+    "dis_d": {
+      "say": "Rocko (English (US))",
+      "pitch": 1.03,
+      "profile": "thin",
+      "who": "emergency band — deep US male",
+      "rate": 195
+    },
+    "dis_e": {
+      "say": "Tara",
+      "pitch": 1.06,
+      "profile": "loud",
+      "who": "emergency band — IN female",
+      "rate": 253
+    },
+    "dis_f": {
+      "say": "Daniel",
+      "pitch": 1.0,
+      "profile": "thin",
+      "who": "emergency band — GB male",
+      "rate": 233
+    }
+  },
+  "groups": {
+    "dispatch": {
+      "speaker": "HAUL CONTROL",
+      "tag": "info",
+      "layer": "fore",
+      "gain": 0.9,
+      "cooldown": 1500,
+      "lines": [
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Haul Control to all couriers — the Vane Street corridor is open again. Lanes four through nine, keep it under two hundred."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "We have a manifest mismatch on the Kessel drop. If that box is warm, it is not my problem."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "PULL UP, COURIER. PULL UP. YOU ARE INSIDE THE STACK."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Shift change in ten. Whoever is on the roof at Ardent, the beacon is out again. Still."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Somebody has parked a freighter across two of my lanes. I am told this is temporary. I am told a lot of things."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Weather is closing the upper approach at Pale Terrace. If you are booked up there, you are now booked somewhere else."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "Haul Control, all couriers. Vault Row has closed its low approach for the night. Come in high or come in tomorrow."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "Advisory for the Ninefold Approach. The beacon is reading. The beacon is lying. Fly it by eye."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "Anyone still holding for Sixteen Low, the pad has been reassigned. I would tell you to whom, but nobody told me."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "Reminder to the lane. Sootfields is a corridor, not a shortcut. I can see all of you."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "We have a stalled hauler across Gantry Row. Go around it, go under it, go home. Do not go through it."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "Cinder Step is stacking six deep. If your parcel is not warm, take the long way and enjoy the quiet."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "That is the third transponder failure over The Drownings this shift. If you go dark down there, nobody is coming."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "Haul Control. Marrow Landing has power again. Everything standing on it does not."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "Lanes four through nine are yours until the weather turns. The weather always turns."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "Somebody on this band is broadcasting music. It is not good music. Please stop."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "The Spindle deck is closed to unlicensed traffic. Yes, that means you. It has always meant you."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "Courier traffic, stay off Pale Terrace for the next hour. There is a thing happening and I am not being told what."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "SEPARATE. SEPARATE. TWO OF YOU ARE IN THE SAME LANE AT THE SAME HEIGHT.",
+          "shout": true
+        }
+      ]
+    },
+    "dispatch_confirm": {
+      "speaker": "HAUL CONTROL",
+      "tag": "alert",
+      "layer": "fore",
+      "gain": 0.9,
+      "cooldown": 660,
+      "lines": [
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Courier, your parcel is logged and the pad is holding for you. Try not to make them wait."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Logged. Clock's running. Try to look like you've done this before."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "That's on your manifest now. Whatever it is."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Confirmed. Lane's clear as far as I can see, which is not far."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "You've got it. Sealed, weighed, and none of my business."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Accepted. They asked for someone reliable. I sent you anyway."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Booked. Take the high lane, the low one's a car park."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "On the board and off my desk. Go."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "Logged. The pad knows you are coming. It is not excited about it."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "You have it. The weight is declared, which is not the same as true."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "Confirmed. Straight there, and I do mean straight."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "On your manifest. Try to arrive with the same number of pieces."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "Booked. If it rattles, that is normal. If it stops rattling, hurry."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "Accepted. The client is already asking where you are. They asked before you took it."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "That is yours. I have put you down as reliable, which was a decision."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "Sealed and signed. Do not open it, do not shake it, do not ask."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "Logged at this end. The clock started before I finished saying that."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "Got it. Lane is busy, weather is turning, and you said yes anyway."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "Confirmed. Somebody wanted this yesterday, so today is already late."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "You are on it. Nice and boring, please. Boring is the good one."
+        }
+      ]
+    },
+    "dispatch_pay": {
+      "speaker": "HAUL CONTROL",
+      "tag": "alert",
+      "layer": "fore",
+      "gain": 0.9,
+      "cooldown": 660,
+      "lines": [
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Nice run. Credits are clearing now. Don't spend it all in the Ribs."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Signed for. Money's moving. Slowly, but it's moving."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Delivered and closed. That's one thing today that went where it was supposed to."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Paid. They didn't complain, which from them is a compliment."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Clean drop. I'm marking you as competent. Don't make me change it."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Received in one piece. Credits inbound. Enjoy the four minutes before you need them."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Logged, paid, forgotten. That's the job."
+        },
+        {
+          "src": "suno",
+          "v": "suno",
+          "t": "Done. There's more where that came from, unfortunately."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "Delivered. The credits are moving through four systems that all take a cut. What is left is yours."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "Signed for. They counted it twice in front of you, which is their way of being friendly."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "Paid. Nothing broken, nothing missing, nobody shouting. Rare."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "Closed. That parcel is somebody else's problem now, and honestly it always was."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "Clean drop. I have had worse days, and most of them were this one."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "Received. Money is in. Spend it on the cell before you spend it on anything fun."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "Logged. They have asked for you specifically next time, which is either a compliment or a warning."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "Done and paid. Go and sit somewhere with a roof over it for ten minutes."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "That has cleared. Small job, small money, still money."
+        },
+        {
+          "v": "ctrl_b",
+          "t": "Delivered on time, which I have noted, because nobody else will."
+        },
+        {
+          "v": "ctrl_c",
+          "t": "Paid out. There is a queue of work behind it. There always is."
+        },
+        {
+          "v": "ctrl_a",
+          "t": "Settled. And before you ask, yes, there is more."
+        }
+      ]
+    },
+    "police": {
+      "speaker": "CITY PATROL",
+      "tag": "info",
+      "layer": "fore",
+      "gain": 0.9,
+      "cooldown": 1500,
+      "lines": [
+        {
+          "v": "patrol_a",
+          "t": "Air Division, routine sweep, lanes one through six. Nothing to see. As usual."
+        },
+        {
+          "v": "patrol_c",
+          "t": "Unregistered hauler in the Lantern Quarter, descending. We are aware. We are not interested."
+        },
+        {
+          "v": "patrol_b",
+          "t": "Courier craft, you are flying a lane you are not licensed for. Consider this the friendly version."
+        },
+        {
+          "v": "patrol_a",
+          "t": "HOLD YOUR ALTITUDE. HOLD IT. DO NOT DESCEND.",
+          "shout": true
+        },
+        {
+          "v": "patrol_c",
+          "t": "Cargo seizure at pad nine. Owner declined to attend. Owner never does."
+        },
+        {
+          "v": "patrol_b",
+          "t": "Break off pursuit, we lost him in the smog band. Log it as weather."
+        },
+        {
+          "v": "patrol_a",
+          "t": "Air Division to all units. Be advised, grey hauler, no transponder, last seen crossing Tallow Yard low and fast. Do not approach it. Just tell us where it went."
+        },
+        {
+          "v": "patrol_c",
+          "t": "All craft in the Lantern Quarter, this is City Patrol. A vehicle on your band is running a false registry. If it hails you, do not answer it."
+        },
+        {
+          "v": "patrol_b",
+          "t": "Notice to lane traffic. Pike Deck is a controlled approach from tonight. Fly it without clearance and we will find you. Eventually. Probably."
+        },
+        {
+          "v": "patrol_a",
+          "t": "Air Division, routine sweep, Vault Row. Nothing. Same as last night. Same as the night before that."
+        },
+        {
+          "v": "patrol_c",
+          "t": "Security advisory. Two craft are working the Gantry as a pair. One stops you, the other takes the cargo. If you get flagged down over the Gantry, keep flying."
+        },
+        {
+          "v": "patrol_b",
+          "t": "HOLD YOUR LINE. HOLD IT. YOU ARE CROSSING A CONTROLLED APPROACH.",
+          "shout": true
+        },
+        {
+          "v": "patrol_a",
+          "t": "We have a craft parked mid lane over Ninefold with its lights off. It has been there two hours. Somebody go and look at it. Not me."
+        },
+        {
+          "v": "patrol_c",
+          "t": "All units, cargo theft reported at Quill Step. Description of the vehicle, a courier craft. That is the entire description we were given."
+        },
+        {
+          "v": "patrol_b",
+          "t": "Air Division. If you are the one flying under the Sever Wall, we can see you, we have always been able to see you, and it is not clever."
+        },
+        {
+          "v": "patrol_a",
+          "t": "Be advised, the smog band is down to sixty metres over Sootfields. If you lose somebody in there, log it as weather and go home."
+        },
+        {
+          "v": "patrol_c",
+          "t": "Notice. An unlicensed pad is operating somewhere off Low Ferrand. We are told that it moves. Pads do not move. We are looking into it."
+        },
+        {
+          "v": "patrol_b",
+          "t": "Patrol to control. That hauler we flagged over Marrow Landing has put itself in the water. Recovery is your problem now."
+        },
+        {
+          "v": "patrol_a",
+          "t": "This is City Patrol, Air Division. The Drownings is not closed. The Drownings is simply not recommended. There is a difference and it is yours."
+        },
+        {
+          "v": "patrol_c",
+          "t": "Alert to all lanes. A craft matching the theft report was seen at Redoubt Two. It has since been seen at four other places at the same time, which tells you how good the report is."
+        },
+        {
+          "v": "patrol_b",
+          "t": "CLEAR THE PAD. CLEAR THE PAD. WE HAVE A CRAFT COMING IN WITHOUT POWER.",
+          "shout": true
+        },
+        {
+          "v": "patrol_a",
+          "t": "Air Division. Somebody has taken the beacon off the Kiln. Not broken it. Taken it. It weighs four hundred kilos."
+        },
+        {
+          "v": "patrol_c",
+          "t": "Advisory for couriers. If a client meets you out on the pad instead of inside, that is not a client. Log it and fly."
+        },
+        {
+          "v": "patrol_b",
+          "t": "Routine notice. Speed enforcement is active on the Spine Run tonight. Enforcement means we write it down."
+        },
+        {
+          "v": "patrol_a",
+          "t": "We have found the craft from the Quill Step report. It was never stolen. Its owner forgot where he parked it. Three days."
+        },
+        {
+          "v": "patrol_c",
+          "t": "City Patrol to all air traffic. Stand by for a controlled descent over Ashlock Upper. Anyone below three hundred metres, be somewhere else."
+        }
+      ]
+    },
+    "pirate": {
+      "speaker": "THE UNDERSTACK",
+      "tag": "bg",
+      "layer": "fore",
+      "gain": 0.9,
+      "cooldown": 1500,
+      "lines": [
+        {
+          "v": "dj",
+          "t": "You're on the understack. If you can hear me, you're too low, and that's exactly where I want you."
+        },
+        {
+          "v": "dj",
+          "t": "They say the Pale Terrace towers are empty. Forty floors, every light on, nobody home. Ask yourself who's paying that bill."
+        },
+        {
+          "v": "dj",
+          "t": "Couriers — if a client won't tell you what's in the box, that's not a red flag. That's a pay rise. Charge accordingly."
+        },
+        {
+          "v": "dj",
+          "t": "THEY ARE NOT CLOUDS. THEY HAVE NEVER BEEN CLOUDS. LOOK UP.",
+          "shout": true
+        },
+        {
+          "v": "dj",
+          "t": "Anyway. Rain until Thursday. Fly low, fly rude."
+        },
+        {
+          "v": "dj",
+          "t": "You are down in the understack. Nobody licensed this, nobody is paying for this, and nobody can find the transmitter. Yet."
+        },
+        {
+          "v": "dj",
+          "t": "Forty floors at Pale Terrace, every light burning, nobody home. That is not a building. That is a receipt."
+        },
+        {
+          "v": "dj",
+          "t": "Somebody asked me why the sky is grey. Wrong question. Ask who it is grey for."
+        },
+        {
+          "v": "dj",
+          "t": "They put a new sign on the Kiln this week. Same building, same everything, new sign. That is the whole economy, right there."
+        },
+        {
+          "v": "dj",
+          "t": "Message for the patrol craft that has been circling the Ribs for an hour. I can hear your engine through the microphone. Come in and have a cup of something."
+        },
+        {
+          "v": "dj",
+          "t": "If you are flying low enough to hear this clearly, congratulations, you are breaking about four rules. Keep going."
+        },
+        {
+          "v": "dj",
+          "t": "The Market is still open. They will tell you it is not. It is. Go round the back of the Gantry and follow the noise."
+        },
+        {
+          "v": "dj",
+          "t": "Here is a fact they do not put on the boards. Nobody in this city was born in this city. Nobody. Think about who that is convenient for."
+        },
+        {
+          "v": "dj",
+          "t": "TURN IT UP. IF YOUR NEIGHBOUR COMPLAINS, TURN IT UP AGAIN.",
+          "shout": true
+        },
+        {
+          "v": "dj",
+          "t": "Somebody has left a parcel outside the studio. I am not opening it, I am not moving it, and I am broadcasting next to it, which is a decision I am reviewing."
+        }
+      ]
+    },
+    "ad": {
+      "speaker": "COMMERCIAL BAND",
+      "tag": "bg",
+      "layer": "fore",
+      "gain": 0.9,
+      "cooldown": 1500,
+      "lines": [
+        {
+          "v": "ad_f",
+          "t": "Tallow Nutrient Paste. Nine flavours. All of them are paste."
+        },
+        {
+          "v": "ad_m",
+          "t": "Breathing shouldn't be a luxury. At Ardent Air, breathing is a subscription. That's better."
+        },
+        {
+          "v": "ad_f",
+          "t": "Kell's Rest. Sleep four hours, wake up owing nothing. Terms apply. Many terms apply."
+        },
+        {
+          "v": "ad_m",
+          "t": "New from Vantage Optics — see the sky the way it used to be, for eleven credits a month, forever."
+        },
+        {
+          "v": "ad_f",
+          "t": "EVERY UNIT MUST GO. EVERY UNIT. WE ARE NOT COMING BACK.",
+          "shout": true
+        },
+        {
+          "v": "ad_m",
+          "t": "Drownings Reclamation. We buy anything. We do not ask."
+        },
+        {
+          "v": "ad_f",
+          "t": "Cinder Step Storage. Your things, somewhere else, forever, for less."
+        },
+        {
+          "v": "ad_m",
+          "t": "Feeling slow? Feeling grey? That is your body asking for Bright. Bright is a drink. Bright is a choice. Bright is nine credits."
+        },
+        {
+          "v": "ad_f",
+          "t": "The Gantry Market. Everything you need and eleven things you do not. Bring a light."
+        },
+        {
+          "v": "ad_m",
+          "t": "Halyard Nine Clinic. Walk in with a problem. Walk out with a payment plan."
+        },
+        {
+          "v": "ad_f",
+          "t": "CLOSING DOWN. CLOSING DOWN. AGAIN.",
+          "shout": true
+        },
+        {
+          "v": "ad_m",
+          "t": "Pike Deck Fuel. The cheapest on the approach, because we are the furthest from anywhere."
+        },
+        {
+          "v": "ad_f",
+          "t": "New from Vantage Optics. The Clear filter. See the city the way the architects intended it, with none of the people in it."
+        },
+        {
+          "v": "ad_m",
+          "t": "Sunder Rest Insurance. We cover everything except what happens."
+        },
+        {
+          "v": "ad_f",
+          "t": "Kell's Rest Noodles. Open all night, because the night is also open."
+        },
+        {
+          "v": "ad_m",
+          "t": "Own a piece of Pale Terrace. Forty floors, one owner, and it could be you. It will not be you."
+        }
+      ]
+    },
+    "distress": {
+      "speaker": "EMERGENCY BAND",
+      "tag": "info",
+      "layer": "fore",
+      "gain": 0.9,
+      "cooldown": 1500,
+      "lines": [
+        {
+          "v": "dis_b",
+          "t": "Mayday, mayday — cell's gone, I'm at ninety metres and dropping, anyone on this band —"
+        },
+        {
+          "v": "dis_c",
+          "t": "I AM IN THE SMOG BAND. I CANNOT SEE THE LANE. I CANNOT SEE THE LANE.",
+          "shout": true
+        },
+        {
+          "v": "dis_a",
+          "t": "It's not an emergency yet. I'm just saying it might be. In about a minute."
+        },
+        {
+          "v": "dis_d",
+          "t": "GET OFF THE PAD. GET OFF THE PAD NOW.",
+          "shout": true
+        },
+        {
+          "v": "dis_f",
+          "t": "Cancel the mayday. I found a ledge. It'll do."
+        },
+        {
+          "v": "dis_b",
+          "t": "Anyone on this band, I have a cargo fire, repeat, cargo fire, I am putting it down on the first flat thing I can see."
+        },
+        {
+          "v": "dis_c",
+          "t": "IT IS COMING OFF. THE WHOLE PANEL IS COMING OFF. GET CLEAR OF ME.",
+          "shout": true
+        },
+        {
+          "v": "dis_a",
+          "t": "This is not an emergency. I am formally declaring that it is not an emergency. Please stay on this channel anyway."
+        },
+        {
+          "v": "dis_f",
+          "t": "I have lost the lane markers over Sootfields. I am flying on the instruments and the instruments have opinions."
+        },
+        {
+          "v": "dis_e",
+          "t": "SOMEBODY IS IN THE WATER. SOMEBODY IS IN THE WATER OFF THE DROWNINGS.",
+          "shout": true
+        },
+        {
+          "v": "dis_d",
+          "t": "Cell at eight per cent. Eight. I am nine minutes from anywhere. Please tell me somebody is nearer than that."
+        },
+        {
+          "v": "dis_b",
+          "t": "My passenger has stopped answering me. I do not know what to do about that at four hundred metres."
+        },
+        {
+          "v": "dis_a",
+          "t": "Correction to my last. Correction. I have it back. I have it back. Stand down. Thank you. Thank you."
+        },
+        {
+          "v": "dis_f",
+          "t": "Mayday relay, mayday relay. I am not the one in trouble. I am just the one who can still transmit."
+        }
+      ]
+    },
+    "weather": {
+      "speaker": "ATMOSPHERIC",
+      "tag": "bg",
+      "layer": "fore",
+      "gain": 0.9,
+      "cooldown": 1500,
+      "lines": [
+        {
+          "v": "bulletin",
+          "t": "Atmospheric bulletin. Particulate density high below one hundred metres. Visibility, four hundred. Conditions are within normal."
+        },
+        {
+          "v": "bulletin",
+          "t": "Precipitation across all districts for the next nine hours. Surface reflectivity elevated. Reduce approach speed."
+        },
+        {
+          "v": "bulletin",
+          "t": "Daylight index, zero point two. This is the maximum for today."
+        },
+        {
+          "v": "bulletin",
+          "t": "Electrical activity above three hundred metres. Craft in the upper lanes should descend. Craft that cannot descend should continue."
+        },
+        {
+          "v": "bulletin",
+          "t": "The smog band has lifted to one hundred and forty metres. Enjoy the view."
+        },
+        {
+          "v": "bulletin",
+          "t": "Atmospheric bulletin. Wind shear across the upper lanes above two hundred metres. Craft under six tonnes should not be up there. Craft over six tonnes are not our concern."
+        },
+        {
+          "v": "bulletin",
+          "t": "Rainfall total for the period, forty one millimetres. Rainfall total for the year, unavailable. The instrument is under water."
+        },
+        {
+          "v": "bulletin",
+          "t": "Bulletin. Temperature, eleven degrees. Temperature at street level, unknown. Nobody is measuring street level."
+        },
+        {
+          "v": "bulletin",
+          "t": "Visibility at the Spine, two hundred metres. Visibility at Sootfields, one hundred. Visibility at the Drownings, not applicable."
+        },
+        {
+          "v": "bulletin",
+          "t": "Advisory. Ice is forming on approach surfaces above three hundred and twenty metres. Descend, or accept the ice."
+        },
+        {
+          "v": "bulletin",
+          "t": "Atmospheric bulletin. The particulate index has been revised. It has not improved. The index has been revised."
+        },
+        {
+          "v": "bulletin",
+          "t": "Daylight index, zero point one. Sunrise occurred. Sunset will occur. Neither will be visible."
+        },
+        {
+          "v": "bulletin",
+          "t": "Bulletin. A pressure front is crossing Vault Row. Expect turbulence, expect delay, expect the usual."
+        },
+        {
+          "v": "bulletin",
+          "t": "Conditions are within normal. Normal has been revised twice this year."
+        }
+      ]
+    },
+    "life": {
+      "speaker": "OPEN CHANNEL",
+      "tag": "bg",
+      "layer": "fore",
+      "gain": 0.9,
+      "cooldown": 1500,
+      "lines": [
+        {
+          "v": "hauler",
+          "t": "Third time at this pad and the lift's still out. I'm carrying it up. Forty floors. Somebody owes me a drink."
+        },
+        {
+          "v": "life_f",
+          "t": "Market's open on the Gantry until two. Bring your own light, the strip's been dead since spring."
+        },
+        {
+          "v": "life_c",
+          "t": "Anyone flying past Sixteen Low — is that a fire or is that just Tuesday?"
+        },
+        {
+          "v": "life_l",
+          "t": "Tower maintenance, block nine. We are aware the beacon is out. We have been aware for some time."
+        },
+        {
+          "v": "life_k",
+          "t": "Taxi four-one-one, off shift, going home. Whoever's got the Lantern run tonight — good luck, and I mean that."
+        },
+        {
+          "v": "life_n",
+          "t": "My kid asked what the sky looks like. I said grey. She said what's grey. Fair question."
+        },
+        {
+          "v": "life_c",
+          "t": "GET IT OFF THE EDGE. OFF THE EDGE. IT IS NOT SECURED.",
+          "shout": true
+        },
+        {
+          "v": "life_g",
+          "t": "Understack, if you're listening — play the one about the windows again. It's been a week."
+        },
+        {
+          "v": "hauler",
+          "t": "Twenty two hours on this run and I have seen the same advert for paste eleven times. Eleven. I could recite it. I will not, but I could."
+        },
+        {
+          "v": "hauler",
+          "t": "They have resurfaced the Spine Run and it is worse. I do not know how you make a lane worse, but they have found a way and they should be proud of themselves."
+        },
+        {
+          "v": "hauler",
+          "t": "Does anybody know a pad that will take a nine tonner after midnight? And before you say Tallow Yard, Tallow Yard says no. Tallow Yard always says no."
+        },
+        {
+          "v": "hauler",
+          "t": "Cargo is fine, I am fine, and the craft is making a noise it was not making yesterday. That is the whole report."
+        },
+        {
+          "v": "hauler",
+          "t": "Four hours left, a flask of something brown, and a lane full of couriers who all think they are the only one in it."
+        },
+        {
+          "v": "hauler",
+          "t": "It says here I am carrying agricultural equipment. There is no agriculture. I have never seen a field. I am carrying something, I will give them that."
+        },
+        {
+          "v": "life_a",
+          "t": "Anyone at the Bell Yard, the lift is out again. And before you ask, yes, I have told them, and yes, they have noted it."
+        },
+        {
+          "v": "life_b",
+          "t": "The tea place on Quill Run has closed. Just so everyone knows. I am still processing it."
+        },
+        {
+          "v": "life_c",
+          "t": "Whoever keeps parking across the Ninefold Approach, I have your registry and I have nothing else to do."
+        },
+        {
+          "v": "life_d",
+          "t": "I have been flying this city forty years and it has never once been finished. Not once. Always scaffolding."
+        },
+        {
+          "v": "life_e",
+          "t": "My grandson says he is going to work up on the Spine. I said, lovely. I said, and where will you sleep. He has not answered."
+        },
+        {
+          "v": "life_f",
+          "t": "Market is on the Gantry until two. Bring your own light. And your own bag. And, honestly, your own opinion about the fish."
+        },
+        {
+          "v": "life_g",
+          "t": "Is anyone else's beacon showing Cinder Step twice? Mine is showing it twice. There is one Cinder Step."
+        },
+        {
+          "v": "life_h",
+          "t": "Fourteen years on this band and I still do not know who runs it. I just know it is always on."
+        },
+        {
+          "v": "life_i",
+          "t": "Somebody's dog is on the Gantry roof again. It is fine. It lives up there now, apparently."
+        },
+        {
+          "v": "life_j",
+          "t": "First shift tonight. If I sound nervous it is because I am nervous. Be nice to me, lane."
+        },
+        {
+          "v": "life_k",
+          "t": "Off shift, going down, going home, going to sleep for a very long time. Good luck to whoever has the Lantern run."
+        },
+        {
+          "v": "life_l",
+          "t": "Tower maintenance, block four. We know about the lights. We have known about the lights since spring."
+        },
+        {
+          "v": "life_m",
+          "t": "Does anybody actually live in Pale Terrace? I have flown past it every night this month and I have never seen a curtain move."
+        },
+        {
+          "v": "life_n",
+          "t": "A kid asked me today why the rain is warm. I did not have an answer. I still do not."
+        },
+        {
+          "v": "life_a",
+          "t": "If the person who found a courier bag at Marrow Landing is listening, there is a photograph in it that matters to somebody. Please."
+        },
+        {
+          "v": "life_h",
+          "t": "Reminder to whoever is flying the Ribs at fifty metres. There are people under you. You cannot see them. They can definitely hear you."
+        },
+        {
+          "v": "life_f",
+          "t": "Somebody is playing the understack out loud on Pike Deck and honestly, good."
+        },
+        {
+          "v": "life_b",
+          "t": "I have worked out that if I take Cinder Mile instead of the Spine Run I save four minutes and lose my mind. It is a trade."
+        },
+        {
+          "v": "life_g",
+          "t": "The lamps in the Lantern Quarter are on the wrong colour again. Everyone looks ill. Everyone looks like that anyway, but more so."
+        },
+        {
+          "v": "life_d",
+          "t": "Old Ferrand has gone. Just so you all know. He had that pad thirty years. Somebody put a light on for him."
+        },
+        {
+          "v": "life_j",
+          "t": "That is me done. First run, delivered, nothing broken. I am going to talk about this for a week."
+        }
+      ]
+    },
+    "bg_net": {
+      "tag": "bg",
+      "layer": "back",
+      "gain": 0.22,
+      "cooldown": 0,
+      "lines": [
+        {
+          "src": "suno",
+          "v": "suno"
+        },
+        {
+          "src": "suno",
+          "v": "suno"
+        },
+        {
+          "src": "suno",
+          "v": "suno"
+        },
+        {
+          "src": "suno",
+          "v": "suno"
+        },
+        {
+          "v": [
+            "life_c",
+            "life_k"
+          ],
+          "t": [
+            "Seven four two is clear of the stack, going down to lane four.",
+            "Say again your last, you are breaking up."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_h",
+            "life_d"
+          ],
+          "t": [
+            "Negative on the Ardent beacon, it is still out.",
+            "It has been out three weeks."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_l",
+            "life_b"
+          ],
+          "t": [
+            "Holding at one forty until you clear me.",
+            "Nothing moving on pad nine, tell them to circle."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_g",
+            "life_i"
+          ],
+          "t": [
+            "Ninefold approach, one inbound, nine tonnes, wet.",
+            "Copy, put him on the outer."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_n",
+            "life_j"
+          ],
+          "t": [
+            "End of shift. Somebody else can have it.",
+            "Roger that, and good luck to them."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_a",
+            "life_c"
+          ],
+          "t": [
+            "Anyone got eyes on the lane markers over Sootfields?",
+            "Nobody has eyes on anything over Sootfields."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_m",
+            "life_f"
+          ],
+          "t": [
+            "Confirm you are two hundred and descending.",
+            "Confirmed, two hundred, descending, all quiet."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_e",
+            "life_h"
+          ],
+          "t": [
+            "Vault Row is closed to the low approach until the morning.",
+            "Understood, we will take the high side."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_k",
+            "life_d"
+          ],
+          "t": [
+            "That freighter is still across my lanes.",
+            "It is temporary. They told me it is temporary."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_b",
+            "life_g"
+          ],
+          "t": [
+            "Pike Deck, one in, one out, no delay.",
+            "Copy Pike Deck, nothing behind him."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        }
+      ]
+    },
+    "bg_dock": {
+      "tag": "bg",
+      "layer": "back",
+      "gain": 0.22,
+      "cooldown": 0,
+      "lines": [
+        {
+          "v": [
+            "life_c",
+            "life_f"
+          ],
+          "t": [
+            "Left side. Left side. No, the other left.",
+            "It is sealed, do not shake it."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_g",
+            "life_d"
+          ],
+          "t": [
+            "Whose is the black one on pad two? It has been there since Tuesday.",
+            "Nobody's. That is the whole problem."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_c",
+            "life_a"
+          ],
+          "t": [
+            "MIND THE EDGE. MIND THE EDGE.",
+            "He does that every single time."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_i",
+            "life_l"
+          ],
+          "t": [
+            "Sign for it and it is yours, I am not carrying it back.",
+            "I am not signing for something I cannot see inside."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_h",
+            "life_k"
+          ],
+          "t": [
+            "Straps on, straps on, we are not doing this twice.",
+            "It moved last time. I saw it move."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_m",
+            "life_n"
+          ],
+          "t": [
+            "Pad three has no power again, run it off the cart.",
+            "The cart has no power either. Nothing has power."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_e",
+            "life_j"
+          ],
+          "t": [
+            "Tea is going, last call, I am not asking twice.",
+            "Two minutes, I am nearly done here."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_b",
+            "life_f"
+          ],
+          "t": [
+            "That one goes up the Spine, do not put it with the Ribs run.",
+            "It is already with the Ribs run."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_d",
+            "life_c"
+          ],
+          "t": [
+            "Rain is coming in sideways again, get the covers on.",
+            "The covers are wetter than the cargo."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        },
+        {
+          "v": [
+            "life_a",
+            "life_i"
+          ],
+          "t": [
+            "Whoever is on the roof, we can hear you, and you are very loud.",
+            "Then stop listening."
+          ],
+          "gap": 0.9,
+          "profile": "distant"
+        }
+      ]
+    }
+  }
+}

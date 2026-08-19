@@ -44,13 +44,12 @@ import { hash2i, clamp, smoothstep } from './utils.js';
 // §3.10 #2's altitudes, and the geometry of the road grid they hang off. `CORR` is four §3.1 lots
 // — the road canyons are on a 51.2 m lattice, so a lane centred on a multiple of 51.2 is centred
 // on a road and not on a building.
-const ALT = [30, 55, 85, 120, 160, 210, 270];
-const LOT = 51.2;
-const CORR = LOT * 4;            // 204.8 m between corridors of one lane family
-const NC = 8;                    // corridors per cross tile
-const CT = NC * CORR;            // 1638.4 m — the cross period, +/- 819 m of the camera
-const W_TILE = 2048;             // the along period, +/- 1024 m of the camera
-const LANE_SEP = 3.4;            // the two directions of one altitude, side by side in one canyon
+//
+// S2-F MOVED THESE TO `js/lanes.js` and changed none of them. The autopilot routes along the same
+// lattice this file fills with traffic, and two copies of a lattice is exactly the sort of pair
+// that agrees for four phases and then does not. They are re-exported at the bottom of this file,
+// so every existing `import { ALT } from './traffic.js'` still resolves.
+import { ALT, LOT, CORR, NC, CT, W_TILE, LANE_SEP, lanePhase } from './lanes.js';
 
 // Lower lanes carry more traffic: the canyon shots are the ones the plates are made of, and a
 // 270 m lane is three pixels of glow. Normalised at build time, so the totals still add to
@@ -64,13 +63,42 @@ const STREAK_IN = 190, STREAK_OUT = 250;   // the crossfade band for a PROMOTED 
 // §5.5's yield. "up to 12 m/s² of lateral acceleration away from the player inside 25 m."
 const YIELD_R = 25, YIELD_ACC = 12, YIELD_SPRING = 2.2, YIELD_DAMP = 2.6, YIELD_MAX = 9;
 
+// S2-C. Aaron, having flown it: "The cars/vehicles have little variation from what I can see …
+// some different height/length vehicles? Maybe 2 or 3 other shapes as well". This table WAS two
+// civilian silhouettes for the whole city — the seeded colour variety at `_derive` below landed
+// last pass and was painting two shapes. Five now, spread deliberately across proportion rather
+// than across size: 2.2 m of length per metre of width on the van, 5.6 on the limo.
 const TYPES = [
-  { id: 'taxi_ai', w: 0.60 },
-  { id: 'hauler_ai', w: 0.32 },
+  { id: 'taxi_ai', w: 0.32 },
+  { id: 'hauler_ai', w: 0.18 },
+  { id: 'pod_ai', w: 0.17 },
+  { id: 'limo_ai', w: 0.11 },
+  { id: 'van_ai', w: 0.14 },
   { id: 'patrol', w: 0.08 },     // §5.2's "lower spawn weight", and nothing else differs
 ];
 
+// The road transports, which travel the STREETS and not the lanes. Aaron: "for now I just want a
+// few longer vehicles that could represent buses/trams/long transports - but traveling on the
+// roads". They are a second analytic population in this file rather than a module of their own,
+// because they share the streak field, the craft fields and the tiling arithmetic — which is what
+// keeps §3.8's five-draw vehicle layer at five draws.
+const ROAD_TYPES = [
+  { id: 'bus_road', w: 0.52 },
+  { id: 'tram_road', w: 0.30 },
+  { id: 'haul_road', w: 0.18 },
+];
+
+// The six edge-light modes of craft.js's `iVar.z`, and how much of the fleet carries each. Aaron:
+// "i mention possible lights highlighting some edges that could be varied per vehicle". Mode 0 is
+// the shipped shoulder run, so the fleet still contains what it contained; the rest are new.
+//   0 shoulder · 1 shoulder + spine · 2 keel (underglow) · 3 spine · 4 shoulder + keel · 5 keel + spine
+const EDGE_W = [0.30, 0.16, 0.18, 0.12, 0.16, 0.08];
+const PULSE_FRAC = 0.22;         // how much of the fleet carries a travelling bead on its trim
+
 const WARM = 0xffb45a, COOL = 0x9fd8ff;
+// Street level reads differently from the lanes on purpose: headlights one way, tail lamps the
+// other, so a canyon shot has two colours of street traffic under seven altitudes of lane traffic.
+const R_HEAD = 0xfff0d0, R_TAIL = 0xff5a3a;
 
 // ── the streak field's material (§5.5) ─────────────────────────────────────
 //
@@ -150,7 +178,7 @@ function buildLanes(seed) {
       alt: ALT[a],
       dir: (i & 1) ? 1 : -1,
       axis: a & 1,                                  // 0 — runs along X · 1 — runs along Z
-      phase: (hash2i(a, 7, seed ^ 0x2f11) % 4) * LOT,
+      phase: lanePhase(a, seed),
       weight: ALT_WEIGHT[a],
       n: 0, first: 0, nAlong: 1,
     });
@@ -158,7 +186,41 @@ function buildLanes(seed) {
   return lanes;
 }
 
+// ── the road population's own geometry ─────────────────────────────────────
+//
+// The streets are the gaps city.js leaves between its lots: `LOT` 51.2 m pitch, a 13.2 m
+// carriageway, and materials.js's ROAD_BODY paints the dashed centreline at exactly a multiple of
+// 51.2 (uRoad.x). A road corridor is therefore `CORR` — four lots, the same pitch the flying
+// lanes use, chosen there for the same reason — and R_LANE puts a vehicle on the correct side of
+// the centreline it is driving beside. Get R_LANE wrong and the buses drive down the paint.
+const R_LANE = 3.3;              // half the 13.2 m carriageway, minus a kerb margin
+const R_NL = 8;                  // road lanes: four corridor families x two directions
+// Two corridors per cross tile rather than the flying field's eight. The road population is a
+// tenth the size of the flying one, and spreading it over eight corridors would put a bus every
+// kilometre — visible from nowhere. Two corridors x four families is a street with traffic on it
+// roughly every 100 m across, and a vehicle every ~340 m along it.
+const R_NC = 2;
+const R_CT = R_NC * CORR;        // 409.6 m — the cross period, +/- 204.8 m of the camera
+const R_NEAR = 200;              // road vehicles promote later than the flying 220 m line
+const R_NEAR_MAX = 240;
+
+function buildRoadLanes(seed) {
+  const lanes = [];
+  for (let i = 0; i < R_NL; i++) {
+    const a = i >> 1;
+    lanes.push({
+      i, dir: (i & 1) ? 1 : -1, axis: a & 1,
+      phase: (hash2i(a, 23, seed ^ 0x5b21) % 4) * LOT,
+      n: 0, first: 0, nAlong: 1,
+    });
+  }
+  return lanes;
+}
+
 const CAP_STREAK = 1024;
+// The road population's ceiling. It shares CAP_STREAK with the flying one, so the live count is
+// whichever of this and the remaining streak slots is smaller — see applyQuality.
+const CAP_ROAD = 96;
 
 export class Traffic {
   constructor(scene, Q, seed, cityR = null) {
@@ -204,6 +266,9 @@ export class Traffic {
     this.tBody = new Uint8Array(CAP_STREAK);
     this.tTrim = new Uint8Array(CAP_STREAK);
     this.tRun = new Uint8Array(CAP_STREAK);
+    // S2-C's fourth and fifth bytes: WHICH edge this craft lights, and whether the light travels.
+    this.tEdge = new Uint8Array(CAP_STREAK);
+    this.tPulse = new Float32Array(CAP_STREAK);
     // Live state — and the ONLY state in this file. Two offsets per craft, both springs to zero.
     this.offC = new Float32Array(CAP_STREAK);
     this.offV = new Float32Array(CAP_STREAK);
@@ -221,9 +286,31 @@ export class Traffic {
     this._col = new THREE.Color();
     this._pose = { def: null, x: 0, y: 0, z: 0, yaw: 0, pitch: 0, roll: 0,
       throttle: 0.55, brake: false, boost: false, t: 0,
-      tint: undefined, trim: undefined, run: undefined };
+      tint: undefined, trim: undefined, run: undefined, edge: 0, pulse: 0 };
 
-    this.stats = { streaks: 0, meshes: 0, patrol: 0, patrolNear: Infinity, yields: 0, avoided: 0 };
+    // ── the road population ────────────────────────────────────────────────
+    // Its own arrays, its own lanes, its own near set. It shares the streak InstancedMesh (its
+    // instances sit at [N, N + rN)), the craft fields, and nothing else — so every existing gate
+    // that walks the flying population keeps measuring exactly what it measured before.
+    this.rLanes = buildRoadLanes(this.seed ^ 0x2ab7);
+    this.rN = 0;
+    this.rType = new Uint8Array(CAP_ROAD);
+    this.rLane = new Uint8Array(CAP_ROAD);
+    this.rU = new Float32Array(CAP_ROAD);
+    this.rSpeed = new Float32Array(CAP_ROAD);
+    this.rBody = new Uint8Array(CAP_ROAD);
+    this.rTrim = new Uint8Array(CAP_ROAD);
+    this.rEdge = new Uint8Array(CAP_ROAD);
+    this.rx = new Float32Array(CAP_ROAD);
+    this.ry = new Float32Array(CAP_ROAD);
+    this.rz = new Float32Array(CAP_ROAD);
+    this.rd = new Float32Array(CAP_ROAD);
+    this.rCand = new Int32Array(CAP_ROAD);
+    this.rNearIdx = new Int32Array(16);
+    this.rNearN = 0;
+
+    this.stats = { streaks: 0, meshes: 0, patrol: 0, patrolNear: Infinity, yields: 0, avoided: 0,
+      road: 0, roadMeshes: 0 };
     this.msSim = 0;
     this.applyQuality(Q);
   }
@@ -242,7 +329,25 @@ export class Traffic {
       at += l.n;
     }
     this.N = Math.min(CAP_STREAK, at);
+    // Road transports are a few LONG vehicles, not a second fleet: they scale off the same preset
+    // number so LOW gets proportionally fewer, and they never take a streak slot the flying
+    // population wanted. A shipped preset lands at 89 (HIGH) and 32 (LOW).
+    const wantRoad = Math.max(8, Math.round(Q.trafficFar * 0.10));
+    const budget = Math.max(0, Math.min(CAP_ROAD, wantRoad, CAP_STREAK - this.N));
+    let ra = 0;
+    for (const l of this.rLanes) {
+      l.n = Math.max(2, Math.floor(budget / R_NL));
+      l.first = ra;
+      l.nAlong = Math.max(1, Math.ceil(l.n / R_NC));
+      ra += l.n;
+    }
+    this.rN = Math.min(CAP_ROAD, CAP_STREAK - this.N, ra);
+    // Six near road meshes at HIGH, three at LOW. They are big — a 32 m transport is three times
+    // the length of anything in the flying set — so a handful is what "a few longer vehicles"
+    // asked for, and they compete with the 26 flying meshes for the 56 body slots.
+    this.roadNear = Math.max(2, Math.round(Q.trafficNear * 0.24));
     this._derive();
+    this._deriveRoad();
     return this.N;
   }
 
@@ -274,6 +379,23 @@ export class Traffic {
           for (let ri = 0; ri < TRIM_RUNS.length; ri++) { acc2 += TRIM_RUNS[ri].w; if (u2 < acc2) { r = ri; break; } }
           this.tRun[gi] = r;
         }
+        // S2-C — which EDGE carries the light, and whether it travels. A fourth seeded byte from
+        // its own hash, so adding it does not shift the colours the last pass already produced
+        // for a given (lane, slot): a rehash of h3 would have repainted the whole fleet.
+        {
+          const h4 = hash2i(j * 17 + l.i, this.seed ^ 0x6d4f, 0x51ab);
+          const h5 = hash2i(l.i * 7 + j, this.seed ^ 0x0b3d, 0x27e5);
+          let u3 = (h4 & 0xffff) / 65536, acc3 = 0, e = 0;
+          for (let ei = 0; ei < EDGE_W.length; ei++) { acc3 += EDGE_W[ei]; if (u3 < acc3) { e = ei; break; } e = ei; }
+          this.tEdge[gi] = e;
+          // `h5 >>> 16` is SIXTEEN bits, so u is uniform over [0, 1). The first cut wrote
+          // `(h4 >>> 17) & 0xffff` — fifteen bits over a 65536 divisor, i.e. uniform over [0, 0.5)
+          // — which doubled every threshold taken against it and put a pulse on 43 % of the fleet
+          // instead of 22 %. gates_s2c B1 caught it, which is the only reason it is a comment and
+          // not a shipped defect: a wrong-range hash produces a perfectly plausible-looking fleet.
+          const up = (h5 >>> 16) / 65536;
+          this.tPulse[gi] = up < PULSE_FRAC ? 0.35 + (h5 & 0xff) / 255 * 0.55 : 0;
+        }
         // `k` is the corridor slot; kept out of a second array because it is j % NC everywhere.
         void k; pick++;
       }
@@ -282,6 +404,37 @@ export class Traffic {
     for (let i = 0; i < this.N; i++) if (TYPES[this.tType[i]].id === 'patrol') this.stats.patrol++;
     this._writeStatic();
     return pick;
+  }
+
+  // The road population's constants, same shape and same discipline: a pure function of
+  // (seed, lane, slot), written once, never touched in the frame.
+  _deriveRoad() {
+    for (const l of this.rLanes) {
+      for (let j = 0; j < l.n; j++) {
+        const gi = l.first + j;
+        if (gi >= this.rN) break;
+        const h = hash2i(l.i, j, this.seed ^ 0x1e77);
+        const h2 = hash2i(j, l.i, this.seed ^ 0x40c9);
+        const m = (j / R_NC) | 0;
+        const jitter = ((h & 0xffff) / 65535 - 0.5) * 0.7;
+        this.rU[gi] = (m + 0.5 + jitter) / l.nAlong;
+        this.rLane[gi] = l.i;
+        // 8-17 m/s: 30-60 km/h, which is a city bus, and slow enough that the streak reads as a
+        // vehicle on a street rather than as another lane of the flying traffic.
+        this.rSpeed[gi] = 8 + ((h >>> 16) / 65536) * 9;
+        let u = (h2 & 0xffff) / 65536, acc = 0, ty = 0;
+        for (let ti = 0; ti < ROAD_TYPES.length; ti++) { acc += ROAD_TYPES[ti].w; if (u < acc) { ty = ti; break; } ty = ti; }
+        this.rType[gi] = ty;
+        this.rBody[gi] = (h2 >>> 7) % BODY_TINTS.length;
+        this.rTrim[gi] = (h2 >>> 13) % TRIM_TINTS.length;
+        // Road forms have no spine channel — it carries the window band — so their edge modes are
+        // limited to the ones that use the shoulder and keel: 0, 2 and 4.
+        this.rEdge[gi] = [0, 2, 4][(h >>> 8) % 3];
+      }
+    }
+    this.stats.road = this.rN;
+    this._writeStaticRoad();
+    return this.rN;
   }
 
   // Everything about a streak that does not change: its colour (warm one way, cool the other — the
@@ -303,8 +456,58 @@ export class Traffic {
     A.iCol.needsUpdate = true; A.iDir.needsUpdate = true; A.iSize.needsUpdate = true;
   }
 
+  // The road population's streaks live at [N, N + rN) of the SAME instanced mesh, which is what
+  // keeps the whole vehicle layer at five draws. Shorter than a flying streak because they are
+  // slower, and a different pair of colours because a street is not a lane.
+  _writeStaticRoad() {
+    const A = this.geo.attributes;
+    const col = A.iCol.array, dir = A.iDir.array, size = A.iSize.array;
+    for (let i = 0; i < this.rN; i++) {
+      const s = this.N + i;
+      const l = this.rLaneOf(i);
+      dir[s * 3] = l.axis === 0 ? l.dir : 0;
+      dir[s * 3 + 1] = 0;
+      dir[s * 3 + 2] = l.axis === 0 ? 0 : l.dir;
+      size[s * 2] = 3.5 + this.rSpeed[i] * 0.30;
+      size[s * 2 + 1] = 0.95;
+      const c = this._col.setHex(l.dir > 0 ? R_HEAD : R_TAIL).convertSRGBToLinear();
+      col[s * 3] = c.r; col[s * 3 + 1] = c.g; col[s * 3 + 2] = c.b;
+    }
+    A.iCol.needsUpdate = true; A.iDir.needsUpdate = true; A.iSize.needsUpdate = true;
+  }
+
   laneOf(i) { return this.lanes[this.tLane[i]]; }
   corridorOf(i) { return (i - this.lanes[this.tLane[i]].first) % NC; }
+  rLaneOf(i) { return this.rLanes[this.rLane[i]]; }
+  rCorridorOf(i) { return (i - this.rLanes[this.rLane[i]].first) % R_NC; }
+
+  // The road position, on exactly the same tiling arithmetic as posOf and for the same reason:
+  // it is a pure function of (seed, index, time, camera), so street traffic is as deterministic
+  // as lane traffic and `hash()` covers both.
+  //
+  // `y` is the vehicle's own half-height above a flat deck — the ground plane in this game is
+  // y = 0 everywhere (render_city.js's `ground`), so a road vehicle needs no terrain query.
+  roadPosOf(i, t, camX, camZ, out) {
+    const l = this.rLaneOf(i);
+    const along0 = l.axis === 0 ? camX : camZ;
+    const cross0 = l.axis === 0 ? camZ : camX;
+    const s = (((this.rU[i] * W_TILE + l.dir * this.rSpeed[i] * t) % W_TILE) + W_TILE) % W_TILE;
+    const tileA = Math.round(along0 / W_TILE) * W_TILE - W_TILE / 2;
+    const tileC = Math.round((cross0 - l.phase) / R_CT) * R_CT - R_CT / 2;
+    const along = tileA + s;
+    const cross = tileC + l.phase + this.rCorridorOf(i) * CORR + l.dir * R_LANE;
+    if (l.axis === 0) { out[0] = along; out[2] = cross; out[3] = l.dir; out[5] = 0; }
+    else { out[2] = along; out[0] = cross; out[3] = 0; out[5] = l.dir; }
+    out[1] = CRAFT_DEFS[ROAD_TYPES[this.rType[i]].id].H * 0.5;
+    out[4] = 0;
+    return out;
+  }
+
+  roadYawOf(i) {
+    const l = this.rLaneOf(i);
+    if (l.axis === 0) return l.dir > 0 ? -Math.PI / 2 : Math.PI / 2;
+    return l.dir > 0 ? Math.PI : 0;
+  }
 
   // ── the analytic position (§5.5) ─────────────────────────────────────────
   // Pure. No frame state is read and none is written. `out` gets [x, y, z, dx, dy, dz].
@@ -403,16 +606,25 @@ export class Traffic {
       pose.t = t;
       // `patrol` keeps its own def colours (§5.3: the police hull stays black, and its trim has to
       // be recognisable); every civilian craft takes its own from the seeded palettes.
-      if (def.police) { pose.tint = undefined; pose.trim = undefined; pose.run = undefined; }
-      else {
+      if (def.police) {
+        pose.tint = undefined; pose.trim = undefined; pose.run = undefined;
+        pose.edge = 0; pose.pulse = 0;
+      } else {
         pose.tint = BODY_TINTS[this.tBody[i]];
         pose.trim = TRIM_TINTS[this.tTrim[i]];
         pose.run = this.tRun[i];
+        pose.edge = this.tEdge[i];
+        pose.pulse = this.tPulse[i];
       }
       if (fields) fields.write(pose);
       this.stats.meshes++;
       if (def.police) this.stats.patrolNear = Math.min(this.stats.patrolNear, pd[i]);
     }
+
+    // 3b. the road population. Positions, a near set, and a mesh for the closest handful. No
+    //     yield and no facade avoidance: a bus on a street is not going to dodge the player, and
+    //     the streets are the gaps city.js left between its lots, so there is nothing to hit.
+    this._updateRoad(t, cx, cy, cz, fields);
 
     // 4. every craft as a streak. Colour, direction and length are CONSTANTS of the craft and were
     //    written once by `_writeStatic`; the frame path touches three floats of translation and
@@ -431,11 +643,75 @@ export class Traffic {
       const i = this.nearIdx[a];
       inten[i] = 1.35 * smoothstep((pd[i] - STREAK_IN) / (STREAK_OUT - STREAK_IN));
     }
-    this.mesh.count = N;
+    // 5. the road streaks, in the same buffer at [N, N + rN). Dimmer than a lane streak: a
+    //    headlight at street level is under the whole city and should not out-shine a lane.
+    for (let i = 0; i < this.rN; i++) {
+      const o = (N + i) * 16;
+      im[o + 12] = this.rx[i]; im[o + 13] = this.ry[i]; im[o + 14] = this.rz[i];
+      inten[N + i] = 0.95;
+    }
+    for (let a = 0; a < this.rNearN; a++) {
+      const i = this.rNearIdx[a];
+      inten[N + i] = 0.95 * smoothstep((this.rd[i] - (R_NEAR - 30)) / 30);
+    }
+    this.mesh.count = N + this.rN;
     this.mesh.instanceMatrix.needsUpdate = true;
     A.iInt.needsUpdate = true;
     this.stats.streaks = N;
     this.msSim = performance.now() - t0;
+  }
+
+  // The road population's frame. Same three steps as the flying one minus the two forces: the
+  // positions, the closest few, a mesh each.
+  _updateRoad(t, cx, cy, cz, fields) {
+    this.stats.roadMeshes = 0;
+    this.rNearN = 0;
+    if (!this.rN) return;
+    const p = [0, 0, 0, 0, 0, 0];
+    for (let i = 0; i < this.rN; i++) {
+      this.roadPosOf(i, t, cx, cz, p);
+      this.rx[i] = p[0]; this.ry[i] = p[1]; this.rz[i] = p[2];
+      const dx = p[0] - cx, dy = p[1] - cy, dz = p[2] - cz;
+      this.rd[i] = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+    let nc = 0;
+    for (let i = 0; i < this.rN && nc < this.rCand.length; i++) if (this.rd[i] < R_NEAR_MAX) this.rCand[nc++] = i;
+    const want = Math.min(this.roadNear, this.rNearIdx.length, nc);
+    for (let a = 0; a < want; a++) {
+      let best = a;
+      for (let b = a + 1; b < nc; b++) if (this.rd[this.rCand[b]] < this.rd[this.rCand[best]]) best = b;
+      const sw = this.rCand[a]; this.rCand[a] = this.rCand[best]; this.rCand[best] = sw;
+      this.rNearIdx[a] = this.rCand[a];
+    }
+    this.rNearN = want;
+    if (!fields) return;
+    const pose = this._pose;
+    for (let a = 0; a < want; a++) {
+      const i = this.rNearIdx[a];
+      const def = CRAFT_DEFS[ROAD_TYPES[this.rType[i]].id];
+      // A landmark podium or a dock skirt can sit over a street the generator thought was clear.
+      // A 32 m transport half-buried in a plinth is the one road defect that reads instantly, so
+      // it simply does not get a mesh — its streak stays, and it is underneath a building anyway.
+      //
+      // `solidAt` returns null for an UNGENERATED chunk, which is indistinguishable from open air
+      // — the gotcha that once concluded a defect did not exist across 242 pads. Here that null
+      // means "draw the transport", which is the safe direction, and it cannot bite: R_NEAR_MAX is
+      // 240 m and the near ring streams to 512 m, so every road vehicle that reaches this line is
+      // standing on a live chunk.
+      if (this.avoid && this.cityR && this.cityR.solidAt(this.rx[i], this.ry[i], this.rz[i], 1.5)) continue;
+      pose.def = def;
+      pose.x = this.rx[i]; pose.y = this.ry[i]; pose.z = this.rz[i];
+      pose.yaw = this.roadYawOf(i);
+      pose.pitch = 0; pose.roll = 0;
+      pose.throttle = 0;              // no plume: `nac` is 0 on a road def, so there is nothing to light
+      pose.t = t;
+      pose.tint = BODY_TINTS[this.rBody[i]];
+      pose.trim = TRIM_TINTS[this.rTrim[i]];
+      pose.run = 0;
+      pose.edge = this.rEdge[i];
+      pose.pulse = 0;
+      if (fields.write(pose)) this.stats.roadMeshes++;
+    }
   }
 
   // §5.5's yield, and the ONLY line in this file that reads the player's position.
@@ -478,12 +754,48 @@ export class Traffic {
     for (let i = 0; i < this.N; i++) {
       this.posOf(i, t, camX, camZ, p);
       keys.push(`${TYPES[this.tType[i]].id}|${Math.round(p[0] * 64)},${Math.round(p[1] * 64)},${Math.round(p[2] * 64)}`
-        + `|${p[3]},${p[5]}|${Math.round(this.tSpeed[i] * 256)}|${this.tBody[i]},${this.tTrim[i]},${this.tRun[i]}`);
+        + `|${p[3]},${p[5]}|${Math.round(this.tSpeed[i] * 256)}|${this.tBody[i]},${this.tTrim[i]},${this.tRun[i]}`
+        + `|${this.tEdge[i]},${Math.round(this.tPulse[i] * 256)}`);
+    }
+    // The road population is inside the hash, not beside it: street traffic is derived from the
+    // same seed by the same arithmetic, so a change that makes it non-deterministic has to be
+    // visible to the determinism gate rather than to a second gate somebody might not run.
+    for (let i = 0; i < this.rN; i++) {
+      this.roadPosOf(i, t, camX, camZ, p);
+      keys.push(`R:${ROAD_TYPES[this.rType[i]].id}|${Math.round(p[0] * 64)},${Math.round(p[1] * 64)},${Math.round(p[2] * 64)}`
+        + `|${p[3]},${p[5]}|${Math.round(this.rSpeed[i] * 256)}|${this.rBody[i]},${this.rTrim[i]},${this.rEdge[i]}`);
     }
     keys.sort();
     let h = 0x811c9dc5 >>> 0;
     for (const s of keys) for (let k = 0; k < s.length; k++) { h ^= s.charCodeAt(k); h = Math.imul(h, 0x01000193) >>> 0; }
-    return { n: this.N, hash: ('00000000' + h.toString(16)).slice(-8) };
+    return { n: this.N, road: this.rN, hash: ('00000000' + h.toString(16)).slice(-8) };
+  }
+
+  // Every live ROAD vehicle, for the gates. Same shape as list().
+  roadList(t, cam, limit = 0) {
+    const p = [0, 0, 0, 0, 0, 0];
+    const out = [];
+    for (let i = 0; i < this.rN; i++) {
+      this.roadPosOf(i, t, cam.x, cam.z, p);
+      const l = this.rLaneOf(i);
+      const id = ROAD_TYPES[this.rType[i]].id;
+      const dx = p[0] - cam.x, dy = p[1] - cam.y, dz = p[2] - cam.z;
+      // How far the vehicle is from the nearest road CENTRELINE, which is the one thing that
+      // proves it is on a street rather than on a plausible-looking arbitrary line.
+      const cross = l.axis === 0 ? p[2] : p[0];
+      const offRoad = Math.abs(((cross / LOT) - Math.round(cross / LOT)) * LOT);
+      out.push({
+        i, type: id, lane: l.i, dir: l.dir, axis: l.axis, L: CRAFT_DEFS[id].L,
+        x: +p[0].toFixed(2), y: +p[1].toFixed(2), z: +p[2].toFixed(2),
+        speed: +this.rSpeed[i].toFixed(2), edge: this.rEdge[i],
+        body: BODY_TINTS[this.rBody[i]], trim: TRIM_TINTS[this.rTrim[i]],
+        offRoad: +offRoad.toFixed(3),
+        d: +Math.sqrt(dx * dx + dy * dy + dz * dz).toFixed(2),
+        near: this.rNearIdx.slice(0, this.rNearN).includes(i),
+      });
+      if (limit && out.length >= limit) break;
+    }
+    return out;
   }
 
   // The NEAR set only, written into caller-owned scratch — no allocation, no strings, no toFixed.
@@ -516,6 +828,7 @@ export class Traffic {
       out.push({
         i, type: TYPES[this.tType[i]].id, lane: l.i, alt: l.alt, dir: l.dir, axis: l.axis,
         body: BODY_TINTS[this.tBody[i]], trim: TRIM_TINTS[this.tTrim[i]], run: this.tRun[i],
+        edge: this.tEdge[i], pulse: +this.tPulse[i].toFixed(3),
       x: +p[0].toFixed(2), y: +p[1].toFixed(2), z: +p[2].toFixed(2),
         dx: p[3], dz: p[5], speed: +this.tSpeed[i].toFixed(2),
         d: +Math.sqrt(dx * dx + dy * dy + dz * dz).toFixed(2),
@@ -533,17 +846,34 @@ export class Traffic {
     const body = new Array(BODY_TINTS.length).fill(0);
     const trim = new Array(TRIM_TINTS.length).fill(0);
     const run = new Array(TRIM_RUNS.length).fill(0);
-    let police = 0;
+    const edge = new Array(EDGE_W.length).fill(0);
+    const shape = {};
+    let police = 0, pulsed = 0;
     for (let i = 0; i < this.N; i++) {
-      if (TYPES[this.tType[i]].id === 'patrol') { police++; continue; }
+      const id = TYPES[this.tType[i]].id;
+      shape[id] = (shape[id] || 0) + 1;
+      if (id === 'patrol') { police++; continue; }
       body[this.tBody[i]]++; trim[this.tTrim[i]]++; run[this.tRun[i]]++;
+      edge[this.tEdge[i]]++;
+      if (this.tPulse[i] > 0) pulsed++;
+    }
+    const roadShape = {};
+    for (let i = 0; i < this.rN; i++) {
+      const id = ROAD_TYPES[this.rType[i]].id;
+      roadShape[id] = (roadShape[id] || 0) + 1;
     }
     const civil = this.N - police;
     return {
-      n: this.N, civil, police, body, trim, run,
+      n: this.N, civil, police, body, trim, run, edge, shape, roadShape, road: this.rN, pulsed,
       bodyDistinct: body.filter(v => v > 0).length,
       trimDistinct: trim.filter(v => v > 0).length,
       runDistinct: run.filter(v => v > 0).length,
+      // S2-C's two new axes, counted rather than asserted by eye: how many distinct SILHOUETTES
+      // are live (the complaint was that there were two), and how many distinct lit edges.
+      shapeDistinct: Object.keys(shape).length,
+      roadShapeDistinct: Object.keys(roadShape).length,
+      edgeDistinct: edge.filter(v => v > 0).length,
+      pulsedFrac: civil ? +(pulsed / civil).toFixed(3) : 0,
       noTrim: run[TRIM_RUNS.findIndex(r => r.amt === 0)] || 0,
       noTrimFrac: civil ? +((run[TRIM_RUNS.findIndex(r => r.amt === 0)] || 0) / civil).toFixed(3) : 0,
     };
@@ -560,8 +890,13 @@ export class Traffic {
 
   state() {
     return {
-      on: this.on, n: this.N, near: this.nearN, streaks: this.mesh.count,
+      on: this.on, n: this.N, near: this.nearN, streaks: this.stats.streaks,
       lanes: this.lanes.length, alts: ALT, nearLine: NEAR_LINE,
+      // The road population, reported separately from `n` on purpose: every gate that asserts
+      // "all N craft are also in the streak field" is about the FLYING population and must keep
+      // measuring exactly that. `streakTotal` is what the InstancedMesh actually draws.
+      road: this.rN, roadNear: this.rNearN, roadMeshes: this.stats.roadMeshes,
+      roadLanes: this.rLanes.length, streakTotal: this.mesh.count,
       meshes: this.stats.meshes, patrol: this.stats.patrol,
       patrolNear: Number.isFinite(this.stats.patrolNear) ? +this.stats.patrolNear.toFixed(2) : null,
       yields: this.stats.yields, avoided: this.stats.avoided,
@@ -575,4 +910,4 @@ export class Traffic {
   }
 }
 
-export { ALT, CORR, NC, CT, W_TILE, NEAR_LINE, TYPES };
+export { ALT, CORR, NC, CT, W_TILE, LANE_SEP, NEAR_LINE, TYPES, ROAD_TYPES, EDGE_W, R_LANE, R_NEAR };

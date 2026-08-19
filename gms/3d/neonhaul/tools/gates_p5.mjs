@@ -82,25 +82,43 @@ async function main() {
       bodyN: f.body.n, glassN: f.glass.n, lightN: f.light.n, coneN: f.cone.n,
       geoIds: [f.body.geo.uuid, f.glass.geo.uuid], attrs: Object.keys(f.body.geo.attributes) }; })()`);
 
-  check('§5.1 all nine craft are ONE geometry under a non-uniform scale',
-    ids.length === 9 && sheet.craft.length === 9 && geo.bodyN === 9 && geo.glassN === 9,
+  // S2-C: nine craft became fifteen and three of them are ROAD forms, which have no canopy — their
+  // glazing is a lit window band in the body geometry. So the canopy count is asserted as
+  // "everything that is not a road form", not as a second copy of the craft count: writing
+  // `glassN === ids.length` would have gone red for the right reason and `glassN === 12` would go
+  // green for the wrong one the moment a road def is added.
+  const roadIds = ids.filter(i => defs[i].road);
+  check(`§5.1 all ${ids.length} craft are ONE geometry under a non-uniform scale`,
+    ids.length === 15 && sheet.craft.length === ids.length && geo.bodyN === ids.length
+    && geo.glassN === ids.length - roadIds.length && roadIds.length === 3,
     `${sheet.craft.length} craft drawn from a single ${geo.body}-tri body geometry and a single `
-    + `${geo.glass}-tri canopy; instance attributes ${geo.attrs.filter(a => a[0] === 'i').join(', ')}`);
+    + `${geo.glass}-tri canopy; ${roadIds.length} of them are road forms (${roadIds.join(', ')}) and `
+    + `take no canopy instance, so ${geo.glassN} canopies for ${geo.bodyN} bodies. Instance `
+    + `attributes ${geo.attrs.filter(a => a[0] === 'i').join(', ')}`);
 
-  // §5.1's "variation is L / W / H plus three integer options only". Proven from the DEFS: no def
-  // may carry any other geometric field, or the family has quietly acquired a bespoke silhouette.
-  const GEOM_KEYS = ['L', 'W', 'H', 'nac', 'fin'];
+  // §5.1's "variation is L / W / H plus three integer options only", now five. Proven from the
+  // DEFS: no def may carry any other geometric field, or the family has quietly acquired a bespoke
+  // silhouette — which is the failure this check exists to catch and which S2-C did NOT commit:
+  // `kit` and `road` select between parts baked into the same geometry and collapsed in the vertex
+  // shader, exactly as `nac` and `fin` already do. gates_s2c A3 and D4 falsify both on pixels.
+  const GEOM_KEYS = ['L', 'W', 'H', 'nac', 'fin', 'kit', 'road'];
   const extra = [];
   for (const [id, d] of Object.entries(defs)) {
     for (const k of Object.keys(d)) {
-      if (!GEOM_KEYS.includes(k) && !['slots', 'top', 'role', 'hull', 'trim', 'run', 'police'].includes(k)) extra.push(`${id}.${k}`);
+      if (!GEOM_KEYS.includes(k) && !['slots', 'top', 'role', 'hull', 'trim', 'run', 'police', 'edge', 'pulse'].includes(k)) extra.push(`${id}.${k}`);
     }
   }
   const opts = new Set(ids.map(i => `${defs[i].nac}/${defs[i].fin}`));
-  check('§5.1 variation is L/W/H plus the three integer options and NOTHING else',
-    extra.length === 0 && [...opts].every(o => ['2', '4'].includes(o.split('/')[0]) && ['0', '1', '2'].includes(o.split('/')[1])),
-    `no def carries a geometric field beyond L/W/H/nac/fin (extras: ${extra.length ? extra.join(',') : 'none'}); `
-    + `nacelle/fin combinations in use: ${[...opts].sort().join(' ')}`);
+  const kits = new Set(ids.map(i => defs[i].kit || 0));
+  const roads = new Set(ids.map(i => defs[i].road || 0));
+  const intOk = v => Number.isInteger(v) && v >= 0 && v <= 3;
+  check('§5.1 variation is L/W/H plus the five integer options and NOTHING else',
+    extra.length === 0
+    && [...opts].every(o => ['0', '2', '4'].includes(o.split('/')[0]) && ['0', '1', '2'].includes(o.split('/')[1]))
+    && [...kits].every(intOk) && [...roads].every(intOk),
+    `no def carries a geometric field beyond L/W/H/nac/fin/kit/road (extras: ${extra.length ? extra.join(',') : 'none'}); `
+    + `nacelle/fin combinations in use: ${[...opts].sort().join(' ')}; `
+    + `module kits ${[...kits].sort().join(',')}; road forms ${[...roads].sort().join(',')}`);
 
   // FALSIFIED: the part-collapse is what makes one geometry serve 2 and 4 nacelles. Force every
   // craft to nac=4 and the drawn triangle count must not move (the tris are always there) while
@@ -186,7 +204,7 @@ async function main() {
   check('§5.4 the light RIG is shared across civilian types; `patrol` is the only exception',
     rigs.civil.length > 0 && rigs.police.join('|') !== rigs.civil.join('|')
     && rigs.police.filter(r => rigs.civil.includes(r)).length === 2,
-    `one civilian rig for all six player craft and both civilian traffic types (${rigs.civil.join(' ')}); `
+    `one civilian rig for all six player craft and all five civilian traffic types (${rigs.civil.join(' ')}); `
     + `patrol keeps the two forward lamps and replaces the tail strips and belly strobe with a roof bar `
     + `(${rigs.police.join(' ')})`);
 

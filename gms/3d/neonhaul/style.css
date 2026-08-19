@@ -96,76 +96,241 @@ html, body {
 .toast.t-warn { border-left-color: var(--amber); color: #ffe8c2; }
 .toast.t-bad  { border-left-color: #ff2b3a; color: #ffd8da; }
 
-/* ── §8.6 minimap ─────────────────────────────────────────────────────────
-   Top-right in portrait, right-of-centre in landscape. `pointer-events: none` is load-bearing,
-   not cosmetic: this sits inside the look thumb's half of the screen. */
+/* `--toast-h` is a LAYOUT cost, not a decoration: #ui and #dock pad their top by it so the rail
+   cannot cover a panel header (gates_p7b B2). Stacked downward, four toasts reserve ~160 px — of a
+   390 px landscape frame that is 41 % of the screen, and it is what pushed the first job's ACCEPT
+   under the UNDOCK bar on the dock board. Across the top instead of down the side of the screen,
+   the reservation is one row whatever the count, and landscape has the width to spare. The
+   ellipsis is load-bearing: a wrapped toast would put the second row back. */
+@media (orientation: landscape) and (max-height: 560px) {
+  #toasts { flex-direction: row; flex-wrap: nowrap; justify-content: center; gap: 8px; padding: 0 10px; }
+  .toast { max-width: 30vw; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
 
-#minimap {
+/* ── §8.6 minimap, as an instrument POD ───────────────────────────────────
+   S2: "minimap moves to the top-right corner, and the cog sits under it and slightly overlapping,
+   so it reads as part of the minimap housing."
+
+   The overlap works because of the LAYER ORDER, not because of a z-index on either element: #hud
+   is z 20 and #controls is z 18, so the map disc paints over the cog and the cog genuinely tucks
+   BEHIND it. Nothing here may take pointer-events — this sits in the look thumb's half of the
+   screen, and gates_p6 asserts a hit test at the map's own centre returns the control layer. */
+
+#mapcase {
   position: absolute;
-  width: 128px; height: 128px;
-  top: calc(var(--safe-t) + 56px);
-  right: calc(var(--safe-r) + 10px);
+  top: calc(var(--safe-t) + 8px);
+  right: calc(var(--safe-r) + 8px);
+  width: 122px; height: 122px;
+  pointer-events: none;
+}
+#minimap {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
   pointer-events: none;
   filter: drop-shadow(0 0 10px rgba(0, 0, 0, .7));
 }
+/* the housing: a ring just outside the map's own rim, and a shallow shadow under it */
+#mapcase::before {
+  content: ''; position: absolute; inset: -3px;
+  border-radius: 50%;
+  border: 1px solid rgba(53, 230, 255, .22);
+  box-shadow: 0 0 0 4px rgba(6, 9, 14, .55), 0 6px 18px -6px #000;
+}
 
-/* ── §8.5 chatter popup ───────────────────────────────────────────────── */
+/* ── §8.5 chatter — the TICKER ────────────────────────────────────────────
+   The floating rectangle that showed one line and vanished is gone. This is a scrolling box:
+   history stays, faded, and the live line is the bright one at the bottom.
+
+   In CHASE view it is a HUD in Aaron's sense — a semi-transparent neon frame over a transparent
+   background of the same colour, a floating futuristic window. In COCKPIT view it is hidden here
+   entirely, because the dash canvas draws the same log inside the dashboard housing (`#hud.incab`
+   below). One model, two presentations, and never both at once. */
 
 #chatter {
-  position: absolute; left: 0; right: 0;
-  bottom: calc(var(--safe-b) + 96px);
-  /* raised in portrait — see the orientation query below */
-  display: flex; justify-content: center;
+  position: absolute;
+  right: calc(var(--safe-r) + 10px);
+  bottom: calc(var(--safe-b) + 156px);
+  width: min(70vw, 360px);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  gap: 3px;
   pointer-events: none;
 }
-.chat-line {
-  width: min(76vw, 460px);
-  background: rgba(6, 9, 14, .82);
-  border-left: 2px solid var(--cyan);
-  padding: 7px 12px 8px;
-  border-radius: 0 3px 3px 0;
-  animation: toast-in .2s ease;
+#hud.incab #chatter { display: none; }
+
+.chat-line, .chat-past {
+  border: 1px solid rgba(53, 230, 255, .32);
+  border-left-width: 2px;
+  border-radius: 3px 7px 7px 3px;
+  background: rgba(53, 230, 255, .055);
+  padding: 4px 9px 5px;
+  animation: chat-in .18s ease-out;
 }
-.chat-line.k-pay { border-left-color: #6cff9c; }
-.chat-line.k-warn { border-left-color: var(--amber); }
-.chat-line.k-bad { border-left-color: #ff2b3a; }
+@keyframes chat-in { from { opacity: 0; transform: translateY(4px); } }
+/* History is a WASH, not a second conversation. Opacity is set ONLY in combined selectors: a bare
+   `.chat-past { opacity }` followed by a bare `.k-bg { opacity }` loses to the later rule at equal
+   specificity, which made a retired background line LESS faded than a retired ordinary one — the
+   exact inversion of what the tag means. gates_s2a compares the two and would catch it again. */
+.chat-line { opacity: 1; }
+.chat-line.k-bg { opacity: .62; }
+.chat-past { opacity: .40; }
+.chat-past.k-bg { opacity: .24; }
+.chat-past.k-alert { opacity: .58; }
+.chat-past .chat-bar { display: none; }
+
 .chat-speaker {
-  font: 600 9px/1 ui-monospace, Menlo, monospace;
+  font: 600 8px/1 ui-monospace, Menlo, monospace;
   letter-spacing: .22em; color: var(--cyan); text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
-.chat-line.k-warn .chat-speaker { color: var(--amber); }
-.chat-line.k-bad .chat-speaker { color: #ff5a52; }
-.chat-text { font-size: 13px; line-height: 1.35; color: var(--text); }
-.chat-bar { margin-top: 6px; height: 1px; background: rgba(53, 230, 255, .14); }
+.chat-text { font-size: 12px; line-height: 1.3; color: var(--text); }
+.chat-bar { margin-top: 5px; height: 1px; background: rgba(53, 230, 255, .14); }
 .chat-bar i { display: block; height: 100%; background: rgba(53, 230, 255, .55); width: 100%; }
 
-/* ── the chase-view instrument strip (see hud.js — not in §8) ──────────── */
+/* The three-value tag vocabulary of the S2 A↔B contract, and nothing else. `bg` is a background
+   wash the player is not being spoken to by; `alert` is the traffic that matters. Unknown tags are
+   normalised to `info` in js/ui.js, so there is no fourth rule here to fall out of step. */
+.k-bg { border-color: rgba(125, 142, 163, .22); background: rgba(125, 142, 163, .05); }
+.k-bg .chat-speaker { color: rgba(125, 142, 163, .8); }
+.k-bg .chat-text { color: rgba(160, 180, 200, .72); font-size: 11px; }
+.k-alert { border-color: rgba(255, 178, 56, .75); background: rgba(255, 178, 56, .10); }
+.k-alert .chat-speaker { color: var(--amber); }
+.k-alert .chat-text { color: #fff1d6; }
+.k-alert .chat-bar i { background: rgba(255, 178, 56, .7); }
+
+/* ── the CHASE-VIEW HUD (js/hud.js ChaseHud) ──────────────────────────────
+   Aaron's two words, and this is the first of them:
+
+     HUD       a semi-transparent neon FRAME, transparent background of the same colour, like
+               something reflected onto a windscreen — a futuristic floating window.
+     DASHBOARD physically part of the vehicle, high-tech and expensive. That one is the canvas in
+               js/hud.js, and it is a different presentation, not this one restyled.
+
+   So: no solid panels, no filled boxes. A hairline frame, corner brackets, and the city visible
+   straight through the middle of every element. `pointer-events: none` throughout — this sits over
+   both thumbs and gates_p6 hit-tests it. */
 
 #hud-strip {
-  position: absolute; left: 0; right: 0;
-  bottom: calc(var(--safe-b) + 16px);
-  display: flex; justify-content: center; align-items: center; gap: 8px;
-  pointer-events: none; flex-wrap: wrap;
-  padding: 0 calc(var(--safe-l) + 78px) 0 calc(var(--safe-r) + 78px);
+  position: absolute; inset: 0;
+  pointer-events: none;
 }
-#hud-strip .chip {
-  background: rgba(6, 9, 14, .72);
-  border: 1px solid rgba(53, 230, 255, .18);
-  border-radius: 3px; padding: 4px 9px;
-  display: flex; align-items: baseline; gap: 4px;
+.ch-frame {
+  position: relative;
+  border: 1px solid rgba(53, 230, 255, .38);
+  border-radius: 10px;
+  background: linear-gradient(rgba(53, 230, 255, .10), rgba(53, 230, 255, .02));
+  box-shadow: 0 0 14px -6px rgba(53, 230, 255, .8), inset 0 0 18px -12px var(--cyan);
 }
-#hud-strip .chip b { font: 300 17px/1 ui-monospace, Menlo, monospace; color: #eaf6ff; }
-#hud-strip .chip i {
+/* the corner brackets, drawn as two gradient strips so four corners cost no extra elements */
+.ch-frame::before, .ch-frame::after {
+  content: ''; position: absolute; left: 5px; right: 5px; height: 2px;
+  background:
+    linear-gradient(90deg, var(--cyan) 0 16px, transparent 16px) left / 100% 100% no-repeat,
+    linear-gradient(270deg, var(--cyan) 0 16px, transparent 16px) right / 100% 100% no-repeat;
+  opacity: .9; border-radius: 2px;
+}
+.ch-frame::before { top: -1px; }
+.ch-frame::after { bottom: -1px; }
+
+#hud-strip .ch-top {
+  position: absolute;
+  /* below the VIEW switch, which owns the top-left corner in both views */
+  top: calc(var(--safe-t) + 42px);
+  left: calc(var(--safe-l) + 10px);
+  right: calc(var(--safe-r) + 142px);        /* clear of the minimap pod */
+  display: flex; gap: 8px; align-items: stretch;
+}
+.ch-cash { padding: 5px 10px 6px; display: flex; flex-direction: column; justify-content: center; }
+.ch-cash i {
+  font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .22em;
+  color: rgba(120, 150, 175, .95); font-style: normal;
+}
+.ch-cash b { font: 400 16px/1.1 ui-monospace, Menlo, monospace; color: #6cff9c; }
+.ch-job {
+  flex: 1; min-width: 0; padding: 5px 10px 6px;
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px;
+}
+.ch-job i {
+  flex: 0 0 100%; font: 700 8px/1.3 ui-monospace, Menlo, monospace; letter-spacing: .16em;
+  color: rgba(120, 150, 175, .95); font-style: normal;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ch-job b { font: 400 14px/1 ui-monospace, Menlo, monospace; color: #eaf6ff; }
+.ch-job u {
+  text-decoration: none; font: 400 12px/1 ui-monospace, Menlo, monospace;
+  color: rgba(207, 226, 245, .9);
+}
+.ch-job u.soon { color: var(--amber); }
+.ch-job u.late { color: #ff5a52; }
+.ch-bonus {
+  display: flex; align-items: baseline; gap: 6px;
+  padding-left: 8px; border-left: 1px solid rgba(255, 178, 56, .3);
+}
+/* S2, explicit: the bonus and its countdown go TOGETHER when the window is missed. Not greyed —
+   gone. A reward that can no longer be collected must not keep a slot implying that it can. */
+.ch-bonus.off { display: none; }
+.ch-bonus b { color: var(--amber) !important; }
+.ch-bonus u { color: rgba(255, 178, 56, .75); }
+.ch-bonus.fading u { color: #ff5a52; }
+
+#hud-strip .ch-bot {
+  position: absolute;
+  left: calc(var(--safe-l) + 10px);
+  bottom: calc(var(--safe-b) + 14px);
+  display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap;
+  /* Clear of the control cluster on the right. S2-E added a fourth frame to this row and the first
+     portrait capture had the warmth bar sitting UNDER the collective lever — a gauge you cannot
+     read is a gauge that is not there. */
+  max-width: calc(100vw - var(--safe-l) - var(--safe-r) - 116px);
+}
+/* Portrait has no width to spare, so the warmth bar takes its own line ABOVE the dial and the
+   bars rather than a fourth column beside them. `order` and not DOM order: the chase HUD's
+   skeleton is written once and only its values are patched after that (js/hud.js). */
+@media (orientation: portrait) {
+  #hud-strip .ch-warm { order: -1; flex: 0 0 auto; min-width: 168px; }
+}
+/* the one CIRCULAR readout — variety of form is the point (S2), and a row of identical bars is
+   the thing that was asked against */
+.ch-dial {
+  width: 82px; height: 82px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.ch-dial::before, .ch-dial::after { display: none; }
+.ch-dial svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ch-dial path { fill: none; stroke-width: 7; stroke-linecap: butt; }
+.ch-dial .ch-track { stroke: rgba(53, 230, 255, .16); }
+.ch-dial .ch-red { stroke: rgba(255, 43, 58, .5); }
+.ch-dial .ch-arc { stroke: var(--cyan); transition: stroke-dashoffset .12s linear; }
+.ch-dial .ch-arc.hot { stroke: #ff5a52; }
+.ch-dial b { font: 300 24px/1 ui-monospace, Menlo, monospace; color: #eaf6ff; }
+.ch-dial i {
   font: 600 8px/1 ui-monospace, Menlo, monospace; font-style: normal;
-  letter-spacing: .12em; color: var(--dim); text-transform: uppercase;
+  letter-spacing: .18em; color: rgba(150, 170, 192, .95);
 }
-#hud-strip .chip.bad { border-color: rgba(255, 43, 58, .5); }
-#hud-strip .chip.bad b { color: #ff5a52; }
-#hud-strip .chip.task {
-  font: 500 11px/1 ui-monospace, Menlo, monospace; color: #6cff9c; letter-spacing: .04em;
+/* …and the RECTANGULAR ones beside it */
+.ch-bars { padding: 7px 10px 8px; display: flex; flex-direction: column; gap: 6px; min-width: 148px; }
+.ch-bar { display: flex; align-items: center; gap: 7px; }
+.ch-bar i {
+  font: 700 8px/1 ui-monospace, Menlo, monospace; font-style: normal;
+  letter-spacing: .16em; color: rgba(120, 150, 175, .95); width: 26px;
 }
-#hud-strip .chip.task.dim { color: var(--dim); }
+.ch-bar span {
+  flex: 1; height: 6px; border-radius: 3px;
+  background: rgba(2, 5, 9, .6); box-shadow: inset 0 0 0 1px rgba(150, 200, 230, .16);
+  overflow: hidden;
+}
+.ch-bar u { display: block; height: 100%; background: var(--cyan); }
+.ch-bar u.warn { background: var(--amber); }
+.ch-bar u.bad { background: #ff2b3a; }
+.ch-bar b {
+  font: 400 12px/1 ui-monospace, Menlo, monospace; color: #eaf6ff;
+  width: 46px; text-align: right; font-variant-numeric: tabular-nums;
+}
+.ch-pips { display: flex; gap: 4px; padding-left: 33px; }
+.ch-pips em {
+  width: 11px; height: 11px; border-radius: 3px;
+  border: 1px solid rgba(108, 255, 156, .5);
+}
+.ch-pips em.on { background: rgba(108, 255, 156, .85); }
 
 /* ── perf overlay (?perf) ─────────────────────────────────────────────── */
 
@@ -225,12 +390,51 @@ html, body {
   box-shadow: 0 0 14px rgba(53, 230, 255, .32);
 }
 
-/* The pad sits in the LOOK half's bottom outer corner (§6.1) and mirrors with the flip. */
+/* ── the control cluster ─────────────────────────────────────────────────
+   §6.1 puts it in the LOOK half's bottom outer corner so the look thumb reaches it without
+   lifting, and it mirrors with §6.5's move-side setting. S2 rebuilt what is IN it.
+
+   THE COLLECTIVE. Aaron's note on the ▲/▼ chevrons is the whole design here: he had been aiming
+   the nose to gain height and only worked out afterwards that "going up/down without forward/back
+   motion does make sense". The control was never redundant — its LABEL was wrong. A button marked
+   "climb" beside a nose that already climbs is a button a player is right to ignore. So it is no
+   longer two round buttons: it is one lever in one slot, RISE at the top, SINK at the bottom, and
+   HOVER printed on the rail between them, which is the thing it does that the nose cannot.
+
+   The dash canvas draws a blank moulded BAY under this cluster in portrait (js/hud.js `_bay`), on
+   whichever side the flip has put it, so it never covers an instrument. */
+
 #altpad {
-  position: fixed; right: calc(var(--safe-r) + 14px); bottom: calc(var(--safe-b) + 16px);
+  position: fixed; right: calc(var(--safe-r) + 12px); bottom: calc(var(--safe-b) + 14px);
   display: flex; flex-direction: column; gap: 10px; align-items: center;
 }
-#controls.flipped #altpad { right: auto; left: calc(var(--safe-l) + 14px); }
+#controls.flipped #altpad { right: auto; left: calc(var(--safe-l) + 12px); }
+
+#collective {
+  display: flex; flex-direction: column; align-items: stretch; gap: 0;
+  padding: 5px; border-radius: 16px;
+  /* the housing: a moulded block with a lit top lip, so the lever reads as hardware bolted to the
+     console rather than as two floating circles */
+  background: linear-gradient(rgba(26, 34, 46, .78), rgba(8, 11, 16, .82));
+  border: 1px solid rgba(150, 200, 230, .22);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .5), 0 8px 20px -8px #000,
+              inset 0 1px 0 rgba(190, 225, 245, .18);
+}
+.lv-slot {
+  position: relative; height: 26px; margin: 2px 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.lv-rail {
+  position: absolute; top: 0; bottom: 0; left: 50%; width: 5px; transform: translateX(-50%);
+  border-radius: 3px;
+  background: #04070b; box-shadow: inset 0 0 0 1px rgba(53, 230, 255, .22);
+}
+.lv-tag {
+  position: relative;
+  font: 700 7px/1 ui-monospace, Menlo, monospace; letter-spacing: .18em;
+  color: rgba(53, 230, 255, .75);
+  background: rgba(8, 11, 16, .95); padding: 2px 4px; border-radius: 2px;
+}
 
 .ctl-btn {
   -webkit-appearance: none; appearance: none;
@@ -240,199 +444,724 @@ html, body {
   background: rgba(8, 12, 18, .5);
   color: var(--cyan);
   font: 400 17px/1 system-ui, sans-serif;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
   pointer-events: auto; touch-action: none; cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 .ctl-btn:active { background: rgba(53, 230, 255, .2); border-color: rgba(53, 230, 255, .85); }
-.ctl-btn.boost { color: var(--amber); border-color: rgba(255, 178, 56, .42); font-size: 13px; letter-spacing: -1px; }
-.ctl-btn.boost:active { background: rgba(255, 178, 56, .22); border-color: rgba(255, 178, 56, .9); }
-.ctl-btn.gear {
-  position: fixed; top: calc(var(--safe-t) + 10px); right: calc(var(--safe-r) + 10px);
-  width: 38px; height: 38px; font-size: 15px; color: var(--dim);
-  border-color: rgba(125, 142, 163, .3);
+.cb-glyph { font-size: 15px; line-height: 1; }
+/* Every button says what it DOES. `>>` shipped unlabelled and Aaron did not know what it was. */
+.cb-label {
+  font: 700 7px/1 ui-monospace, Menlo, monospace; letter-spacing: .1em;
+  opacity: .85;
 }
-#controls.flipped .ctl-btn.gear { right: auto; left: calc(var(--safe-l) + 10px); }
 
-/* ── §6.5 settings ────────────────────────────────────────────────────── */
+/* the two ends of the lever: squared off against the slot, rounded on the outside, so the pair
+   plus the rail read as ONE object rather than as two buttons with a gap */
+.ctl-btn.lever {
+  width: calc(var(--btn, 56px) - 2px); height: calc(var(--btn, 56px) * .82);
+  border-color: rgba(53, 230, 255, .5);
+  background: linear-gradient(rgba(20, 30, 42, .9), rgba(8, 12, 18, .92));
+  box-shadow: inset 0 1px 0 rgba(190, 225, 245, .16);
+}
+.ctl-btn.lever.up { border-radius: 12px 12px 4px 4px; }
+.ctl-btn.lever.down { border-radius: 4px 4px 12px 12px; }
+.ctl-btn.lever:active { background: rgba(53, 230, 255, .22); border-color: rgba(53, 230, 255, .95); }
 
-#settings {
+.ctl-btn.boost {
+  width: calc(var(--btn, 56px) - 2px); height: calc(var(--btn, 56px) * .78);
+  border-radius: 14px;
+  color: var(--amber); border-color: rgba(255, 178, 56, .48);
+  background: linear-gradient(rgba(40, 28, 10, .7), rgba(14, 10, 6, .82));
+  box-shadow: inset 0 1px 0 rgba(255, 210, 140, .18);
+}
+.ctl-btn.boost .cb-glyph { letter-spacing: -1px; font-size: 13px; }
+.ctl-btn.boost:active { background: rgba(255, 178, 56, .26); border-color: rgba(255, 178, 56, .95); }
+
+/* The cog, tucked UNDER the minimap and overlapping it. #hud (z 20) paints over #controls (z 18),
+   so the disc genuinely covers the top of this and the two read as one pod. It no longer mirrors
+   with the flip: it belongs to the map housing now, and the map does not move. */
+.ctl-btn.gear {
+  position: fixed;
+  top: calc(var(--safe-t) + 8px + 122px - 15px);
+  right: calc(var(--safe-r) + 8px + 43px);
+  width: 36px; height: 36px; font-size: 15px; color: var(--dim);
+  border-radius: 0 0 12px 12px;
+  border-color: rgba(53, 230, 255, .22);
+  background: linear-gradient(rgba(14, 20, 28, .92), rgba(6, 9, 14, .92));
+  padding-top: 12px;
+  box-shadow: 0 6px 14px -8px #000;
+}
+
+/* The left console's squelch switch (S2). Mirrors #altpad's side so the two clusters are always
+   on opposite consoles, and sits 150 px up from the floor of the frame — above where a resting
+   thumb puts the flight stick, below the chase HUD's instrument frame. */
+#leftpad {
+  position: fixed;
+  left: calc(var(--safe-l) + 12px); bottom: calc(var(--safe-b) + 222px);
+  display: flex; flex-direction: column-reverse; gap: 8px; align-items: flex-start;
+}
+#controls.flipped #leftpad { left: auto; right: calc(var(--safe-r) + 12px); align-items: flex-end; }
+.ctl-btn.squelch, .ctl-btn.hire, .ctl-btn.auto, .ctl-btn.home {
+  position: static;
+  width: 46px; height: 36px; border-radius: 10px;
+  color: rgba(53, 230, 255, .85);
+  border-color: rgba(53, 230, 255, .3);
+  background: linear-gradient(rgba(22, 30, 41, .8), rgba(8, 11, 16, .84));
+  box-shadow: inset 0 1px 0 rgba(190, 225, 245, .14), 0 6px 16px -8px #000;
+}
+.ctl-btn.squelch .cb-glyph, .ctl-btn.hire .cb-glyph,
+.ctl-btn.auto .cb-glyph, .ctl-btn.home .cb-glyph { font-size: 12px; }
+
+/* S2-F's two autopilot keys. `.on` is the ENGAGED state and it has to be unmistakable, because the
+   thing that makes this design good is that the player can override it without being told how: a
+   key that is lit is a craft flying itself, and the moment a thumb touches the stick the light
+   goes out. If the lit state were subtle, the override would read as a bug. */
+.ctl-btn.auto, .ctl-btn.home {
+  color: rgba(159, 216, 255, .85);
+  border-color: rgba(159, 216, 255, .28);
+}
+.ctl-btn.auto[disabled], .ctl-btn.home[disabled] { opacity: .38; }
+.ctl-btn.auto.on, .ctl-btn.home.on {
+  color: #061019;
+  border-color: rgba(53, 230, 255, .95);
+  background: linear-gradient(rgba(53, 230, 255, .95), rgba(31, 178, 220, .92));
+  box-shadow: 0 0 16px -2px rgba(53, 230, 255, .7), inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+.ctl-btn.auto.on .cb-glyph { display: inline-block; animation: ap-spin 2.4s linear infinite; }
+@keyframes ap-spin { to { transform: rotate(360deg); } }
+/* the reserved slot's own look, for whoever un-hides it */
+.ctl-btn.hire { color: rgba(108, 255, 156, .85); border-color: rgba(108, 255, 156, .3); }
+.ctl-btn.hire[disabled] { opacity: .45; }
+/* muted is a STATE, and it has to be visible at a glance or the button is a trap */
+.ctl-btn.squelch.off { color: rgba(125, 142, 163, .55); border-color: rgba(125, 142, 163, .22); }
+.ctl-btn.squelch.off .cb-glyph { text-decoration: line-through; }
+
+/* The on-screen VIEW switch (S2). Top-LEFT corner: out of both thumbs' corners (the stick
+   materialises bottom-left, the lever is bottom-right), out of the top-right pod, and — the reason
+   it is not under the map with the cog — clear of the right holo panel, which in portrait sits
+   exactly where a third pod element would land. The chase HUD's own top frame starts below it. */
+.ctl-btn.view {
+  position: fixed;
+  top: calc(var(--safe-t) + 8px); left: calc(var(--safe-l) + 10px);
+  width: auto; height: 26px; border-radius: 7px;
+  flex-direction: row; gap: 0;
+  padding: 0 10px;
+  font: 700 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .18em;
+  color: rgba(53, 230, 255, .9);
+  background: linear-gradient(rgba(53, 230, 255, .14), rgba(53, 230, 255, .03));
+  border-color: rgba(53, 230, 255, .4);
+  box-shadow: 0 4px 12px -6px #000;
+}
+.ctl-btn.view::before {
+  content: '⟳'; margin-right: 6px; font-size: 12px; opacity: .8;
+}
+.ctl-btn.view > span { display: block; }
+
+/* ── the in-cabin PANEL shell (js/ui.js CabinPanel) ───────────────────────
+   One shell, reused: §6.5's settings today, and S2-D/E's hire panel plus the company layer's
+   earnings and roster screens later. Aaron on the surface those replace — "it looks fine if it
+   was a web form" — so this is deliberately not a card: it is the HUD idiom at panel scale, a
+   semi-transparent neon frame with corner brackets over a transparent tint of the same colour.
+   No `backdrop-filter` anywhere; §7.3 explains why (a full-res readback per composited frame on
+   mobile Safari, over a live WebGL canvas). */
+
+#settings, .cabin-layer {
   position: fixed; inset: 0; z-index: 40;
-  background: rgba(3, 5, 9, .74);
+  background: radial-gradient(120% 90% at 50% 40%, rgba(4, 8, 14, .62), rgba(2, 4, 8, .86));
   display: flex; align-items: center; justify-content: center;
   padding: calc(var(--safe-t) + 12px) calc(var(--safe-r) + 12px) calc(var(--safe-b) + 12px) calc(var(--safe-l) + 12px);
   overflow: auto;
 }
-.set-panel {
+.hud-panel {
+  position: relative;
   width: min(420px, 100%); max-height: 100%; overflow: auto;
-  background: var(--panel); border: 1px solid var(--line); border-radius: 5px;
+  background: linear-gradient(rgba(53, 230, 255, .085), rgba(53, 230, 255, .02)), rgba(6, 10, 16, .80);
+  border: 1px solid rgba(53, 230, 255, .42);
+  border-radius: 14px;
+  box-shadow: 0 0 34px -12px var(--cyan), inset 0 0 40px -26px var(--cyan);
   padding: 16px 16px 12px;
+  animation: hp-in .18s ease-out;
 }
-.set-title {
-  font-size: 11px; letter-spacing: .3em; color: var(--cyan);
-  margin-bottom: 12px; text-transform: uppercase;
+.hud-panel.wide { width: min(640px, 100%); }
+@keyframes hp-in { from { opacity: 0; transform: translateY(6px); } }
+/* the corner brackets — the thing that says "projected", not "printed" */
+.hud-panel::before, .hud-panel::after {
+  content: ''; position: absolute; left: 7px; right: 7px; height: 2px; border-radius: 2px;
+  background:
+    linear-gradient(90deg, var(--cyan) 0 26px, transparent 26px) left / 100% 100% no-repeat,
+    linear-gradient(270deg, var(--cyan) 0 26px, transparent 26px) right / 100% 100% no-repeat;
 }
+.hud-panel::before { top: -1px; }
+.hud-panel::after { bottom: -1px; }
+
+.hp-head { display: flex; flex-direction: column; gap: 3px; margin-bottom: 12px; }
+.hp-kicker { font: 700 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .3em; color: rgba(53, 230, 255, .7); }
+.hp-title {
+  margin: 0; font: 300 19px/1 system-ui, sans-serif; letter-spacing: .26em;
+  color: #eaf6ff; text-transform: uppercase;
+}
+.hp-body { display: block; }
+.hp-foot { margin-top: 12px; }
+.hp-close {
+  -webkit-appearance: none; appearance: none; width: 100%;
+  border: 1px solid rgba(53, 230, 255, .34); border-radius: 8px;
+  background: rgba(53, 230, 255, .07); color: rgba(53, 230, 255, .9);
+  font: 400 11px/1 system-ui, sans-serif; letter-spacing: .22em; padding: 11px; cursor: pointer;
+}
+.hp-close:active { background: rgba(53, 230, 255, .2); }
+
+/* ── §6.5's rows, inside that shell ───────────────────────────────────── */
+
 .set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 7px 0; }
 .set-label { font-size: 12px; color: var(--text); white-space: nowrap; }
 .set-seg { display: flex; align-items: center; gap: 6px; }
 .set-opt {
   -webkit-appearance: none; appearance: none;
-  border: 1px solid var(--line); background: transparent; color: var(--dim);
-  font: 400 11px/1 system-ui, sans-serif; padding: 7px 10px; border-radius: 3px; cursor: pointer;
+  border: 1px solid rgba(150, 200, 230, .2); background: rgba(4, 8, 14, .5); color: var(--dim);
+  font: 400 11px/1 system-ui, sans-serif; padding: 7px 10px; border-radius: 6px; cursor: pointer;
 }
 .set-opt.on { color: var(--ink); background: var(--cyan); border-color: var(--cyan); }
 .set-note { font-size: 10px; color: var(--dim); margin: -4px 0 4px; letter-spacing: .02em; }
 .set-val { font: 400 11px/1 ui-monospace, Menlo, monospace; color: var(--cyan); width: 34px; text-align: right; }
-.set-panel input[type=range] { width: 128px; accent-color: var(--cyan); }
-.set-close {
-  -webkit-appearance: none; appearance: none; width: 100%; margin-top: 12px;
-  border: 1px solid var(--line); background: transparent; color: var(--dim);
-  font: 400 11px/1 system-ui, sans-serif; letter-spacing: .2em; padding: 10px; border-radius: 3px; cursor: pointer;
-}
+.hud-panel input[type=range] { width: 128px; accent-color: var(--cyan); }
 
-/* In portrait the §8.2 dash occupies the bottom ~28 % of the frame, so a chatter line at 96 px
-   sits on top of the speed readout. Measured on a 390x844 capture: the line covered the arc. */
+/* In portrait the control cluster stands in front of the dash's console bay, so the chat window —
+   which only exists in CHASE view, where there is no dash — clears it on the same side. */
 @media (orientation: portrait) {
-  #chatter { bottom: calc(var(--safe-b) + 30vh); }
-  #hud-strip { bottom: calc(var(--safe-b) + 22vh); }
+  #chatter { bottom: calc(var(--safe-b) + 214px); width: min(78vw, 340px); }
+  #controls.flipped ~ #hud #chatter { right: auto; left: calc(var(--safe-l) + 10px); }
 }
 
-@media (orientation: landscape) and (max-height: 480px) {
+@media (orientation: landscape) and (max-height: 520px) {
   #boot-title { font-size: 22px; }
   #altpad { gap: 7px; bottom: calc(var(--safe-b) + 8px); }
   .set-row { padding: 4px 0; }
-  .set-panel { width: min(520px, 100%); padding: 12px 14px 10px; }
-  /* §8.6 puts the map "right-of-centre in landscape" — a short viewport has no room under the
-     gear, and the far corner is where the look thumb lives. */
-  #minimap { width: 104px; height: 104px; top: calc(var(--safe-t) + 8px); right: calc(var(--safe-r) + 54px); }
-  #chatter { bottom: calc(var(--safe-b) + 62px); }
-  #hud-strip { bottom: calc(var(--safe-b) + 10px); }
+  .hud-panel { width: min(560px, 100%); padding: 12px 14px 10px; }
+  /* A short viewport has no room for a 122 px pod plus the cog under it. */
+  #mapcase { width: 96px; height: 96px; top: calc(var(--safe-t) + 6px); right: calc(var(--safe-r) + 6px); }
+  .ctl-btn.gear {
+    top: calc(var(--safe-t) + 6px + 96px - 14px);
+    right: calc(var(--safe-r) + 6px + 30px);
+    width: 32px; height: 32px; font-size: 13px; padding-top: 10px;
+  }
+  .ctl-btn.view { height: 22px; padding: 0 8px; font-size: 8px; }
+  #chatter { bottom: calc(var(--safe-b) + 118px); width: min(46vw, 320px); }
+  #leftpad { bottom: calc(var(--safe-b) + 116px); }
+  .ctl-btn.squelch, .ctl-btn.hire, .ctl-btn.auto, .ctl-btn.home { width: 42px; height: 32px; }
+  #hud-strip .ch-top { right: calc(var(--safe-r) + 118px); }
 }
 
-/* ── P7a — the job board and the shop (js/ui.js DockUI) ──────────────────
-   NOT §7.3's docking panel: that is P7b's `dock.js` and it renders into #dock. This is the plain
-   functional board §13 puts in ui.js, styled to the same discipline as everything else — one
-   saturated colour per panel (the zone tint, injected as --tint), greys for the rest, tabular
-   numerals, nothing round, nothing that bounces. Portrait first; landscape widens the sheet.
+/* ── S2-D — THE SCREEN IDIOM (js/ui.js DockUI, renders into #ui) ──────────
+   Aaron on the surface this replaces: ***"I mean it looks fine if it was a web form."*** The
+   before-shot is shots/s2d/before_board_jobs.png — a LOCAL artefact, since the shots subdirectories
+   are gitignored; `node tools/cap_s2d.mjs --tag=before` regenerates it. He is right: an opaque grey
+   sheet, rounded cards, two pale rectangles under each one.
+
+   The company layer in pass 2-B is nothing but screens, so the idiom is settled here once. It is
+   Aaron's word HUD, used as he defines it: a semi-transparent neon FRAME with a transparent
+   background of the same colour, like something reflected onto a windscreen.
+
+   Five rules, and gates_s2d measures every one of them on the live DOM:
+
+     1. GLASS, NOT PAPER.   The sheet is see-through. The city and the §7.3 static blur are both
+                            still there behind it.
+     2. NOTHING ROUNDED.    Every surface is CHAMFERED with clip-path. `border-radius` appears
+                            nowhere below this line. A machined corner is the single strongest
+                            signal that a panel is a device and not a document.
+     3. BRACKETED.          Corner ticks in the zone tint, brighter than the frame — the same move
+                            hudFrame() makes on the in-cabin holo panels, so the DOM screens and
+                            the WebGL ones speak one language.
+     4. INSTRUMENTS, NOT FIELDS.  A letterspaced kicker ABOVE a monospace value. Never "Label:".
+     5. RAILS, NOT BOXES.   A row has a lit left spine and a slot ordinal, not a border on four
+                            sides.
+
+   THE CHAMFER RECIPE, written once and reused, because it is the one thing here that is not
+   obvious. `clip-path` cuts the border off with the corner, so a chamfered OUTLINE cannot be a
+   `border`. Instead: the element is `isolation: isolate`, `::before` at z-index -2 is the frame
+   colour clipped to the shape, and `::after` at z-index -1 is the fill clipped to the same shape
+   inset by the line width. The isolation is what stops the negative z-indices escaping into the
+   layer behind. Painting order puts both pseudo-elements ABOVE the element's own background —
+   which is why the static blur is set on the element and the glass tint on `::after`, so the
+   blur reads through it.
+
    No `backdrop-filter` anywhere — §7.3 explains why (a full-res readback per composited frame on
    mobile Safari, over a live WebGL canvas). */
 
 #ui {
   position: fixed; inset: 0; z-index: 35;
-  background: rgba(3, 5, 9, .82);
+  /* Was a flat rgba(3,5,9,.82) blackout. A vignette instead: the city stays legible at the edges,
+     which is what makes the board read as a window opened in the world rather than a page. */
+  background:
+    radial-gradient(120% 80% at 50% 42%, rgba(3, 6, 11, .58) 0%, rgba(2, 4, 8, .88) 78%);
   display: flex; align-items: flex-end; justify-content: center;
   padding: max(calc(var(--safe-t) + 8px), calc(var(--toast-h, 0px) + 8px)) calc(var(--safe-r) + 8px) calc(var(--safe-b) + 8px) calc(var(--safe-l) + 8px);
 }
+
 .dk-sheet {
   --tint: var(--cyan);
-  width: min(460px, 100%); max-height: 100%; overflow: auto;
-  /* §7.3: "#080a0f at 0.96 over a static blurred still of the city". The still is a 96 px
-     data-URL captured in the rAF callback after composer.render() and upscaled by
-     background-size: cover — the upscale IS the blur. No backdrop-filter; see the note above. */
-  background-color: rgba(8, 10, 15, .96);
+  --cut: 20px;
+  --shape: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+  position: relative; isolation: isolate;
+  display: flex; flex-direction: column;
+  width: min(460px, 100%); max-height: 100%;
+  overflow: hidden;
+  clip-path: var(--shape);
+  /* §7.3's static blurred still, upscaled — the upscale IS the blur. The tint over it lives on
+     ::after so the city reads through instead of being painted out. */
+  background-color: rgba(6, 10, 17, .40);
   background-position: center; background-size: cover; background-repeat: no-repeat;
-  background-blend-mode: multiply;
-  border: 1px solid var(--tint); border-radius: 4px;
-  box-shadow: 0 0 22px -6px var(--tint);
-  padding: 12px 12px 10px;
+  padding: 0;
+  color: var(--text);
   font-variant-numeric: tabular-nums;
-  animation: dk-in .18s ease-out;
+  animation: dk-in .2s ease-out;
+  filter: drop-shadow(0 0 26px rgba(53, 230, 255, .16));
 }
-@keyframes dk-in { from { transform: scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+.dk-sheet::before {
+  content: ''; position: absolute; inset: 0; z-index: -2;
+  clip-path: var(--shape);
+  background: linear-gradient(150deg, var(--tint) 0%, rgba(120, 160, 200, .45) 38%, var(--tint) 100%);
+}
+.dk-sheet::after {
+  content: ''; position: absolute; inset: 1.5px; z-index: -1;
+  clip-path: var(--shape);
+  background:
+    linear-gradient(180deg, rgba(9, 17, 28, .90) 0%, rgba(4, 8, 13, .74) 30%, rgba(4, 8, 13, .80) 100%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, .028) 0 1px, transparent 1px 3px);
+}
+@keyframes dk-in { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
 
-/* The sheet scrolls, and the first browser run found UNDOCK sitting below the fold on a 390x844
-   portrait with three jobs on the board — a modal panel with no reachable way out. Header and tabs
-   stick to the top of the scroll box, UNDOCK to the bottom, so both are always under a thumb. */
+/* The corner brackets. Two elements, four corners: each draws an L on two opposite corners. */
+.dk-brk { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+.dk-brk::before, .dk-brk::after {
+  content: ''; position: absolute; width: 26px; height: 26px;
+  border: 0 solid var(--tint); opacity: .95;
+}
+.dk-brk::before { top: 0; right: 0; border-top-width: 2px; border-right-width: 2px; }
+.dk-brk::after { bottom: 0; left: 0; border-bottom-width: 2px; border-left-width: 2px; }
+
+/* ── header ─────────────────────────────────────────────────────────────
+   No longer sticky: the sheet is a flex column with a scrolling BODY, so the header, the rank
+   rail, the tabs and UNDOCK are structurally always on screen. The first browser run of P7a found
+   UNDOCK below the fold on a 390x844 portrait — a modal with no reachable way out. A flex column
+   cannot reproduce that; a sticky offset can, and did. */
 .dk-head {
   display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
-  position: sticky; top: -12px; z-index: 2;
-  background: rgba(8, 10, 15, .98); padding: 12px 0 6px; margin: -12px 0 0;
+  padding: 12px 14px 9px; flex: 0 0 auto;
+  border-bottom: 1px solid rgba(125, 142, 163, .16);
+  background: linear-gradient(180deg, rgba(0, 0, 0, .34), transparent);
 }
-.dk-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.dk-kicker { font-size: 10px; letter-spacing: .28em; color: var(--tint); text-transform: uppercase; }
-.dk-pad { font-size: 17px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dk-dist { font-size: 11px; color: var(--dim); }
-.dk-purse { text-align: right; display: flex; flex-direction: column; gap: 2px; }
-.dk-purse b { font-size: 17px; color: #6cff9c; font-weight: 500; }
-.dk-purse span { font-size: 10px; color: var(--dim); letter-spacing: .04em; }
+.dk-title { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.dk-kicker {
+  font: 500 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .34em;
+  color: var(--tint); text-transform: uppercase; text-shadow: 0 0 10px currentColor;
+}
+.dk-pad {
+  font: 300 20px/1.05 system-ui, sans-serif; letter-spacing: .01em; color: #eaf6ff;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dk-dist { font: 400 10px/1 ui-monospace, Menlo, monospace; letter-spacing: .16em; color: var(--dim); text-transform: uppercase; }
+.dk-purse { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.dk-purse b { font: 400 18px/1 ui-monospace, Menlo, monospace; color: #6cff9c; text-shadow: 0 0 12px rgba(108, 255, 156, .45); }
+.dk-gauges { display: flex; flex-direction: column; gap: 3px; }
+.dk-gauge { display: flex; align-items: center; gap: 5px; }
+.dk-gauge i { font: 400 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .18em; color: var(--dim); font-style: normal; width: 26px; }
+.dk-gauge b { font: 400 9px/1 ui-monospace, Menlo, monospace; color: #9fb8cf; width: 30px; text-align: right; }
 
-.dk-tabs {
-  display: flex; gap: 6px; margin: 0 0 8px; padding-bottom: 8px;
-  position: sticky; top: 52px; z-index: 2; background: rgba(8, 10, 15, .98);
-}
-.dk-tab {
-  -webkit-appearance: none; appearance: none; flex: 1;
-  border: 1px solid var(--line); background: transparent; color: var(--dim);
-  font: 400 10px/1 system-ui, sans-serif; letter-spacing: .18em; padding: 8px 4px; border-radius: 3px; cursor: pointer;
-}
-.dk-tab.on { color: var(--ink); background: var(--tint); border-color: var(--tint); }
+/* The segmented meter — the workhorse. Segments, never a smooth fill: a continuous bar is the
+   most web-like element a UI owns and a segmented one the most instrument-like. */
+.dk-meter { display: flex; gap: 2px; align-items: center; }
+.dk-meter i { display: block; width: 4px; height: 8px; background: rgba(125, 142, 163, .18); }
+.dk-meter i.on { background: var(--tint); box-shadow: 0 0 5px -1px var(--tint); }
+.dk-meter.thin i { width: 3px; height: 4px; }
+.dk-meter.tall i { width: 7px; height: 22px; }
+.dk-meter.warn i.on { background: var(--amber); box-shadow: 0 0 5px -1px var(--amber); }
+.dk-meter.bad i.on { background: #ff5a52; box-shadow: 0 0 5px -1px #ff5a52; }
 
-.dk-body { display: flex; flex-direction: column; gap: 10px; }
-.dk-empty { font-size: 12px; color: var(--dim); padding: 18px 2px; text-align: center; }
-
-.dk-job, .dk-held, .dk-sect {
-  border: 1px solid var(--line); border-radius: 3px; padding: 10px;
-  display: flex; flex-direction: column; gap: 5px;
+/* ── the rank rail — both ladders, on every screen ────────────────────── */
+.dk-rail { display: flex; gap: 1px; flex: 0 0 auto; background: rgba(125, 142, 163, .14); }
+.dk-rank {
+  flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 3px;
+  padding: 7px 12px 8px; background: rgba(6, 11, 18, .55);
 }
-.dk-job.rush { border-color: #ff2b3a; }
-.dk-sect h4 { margin: 0 0 2px; font: 500 10px/1 system-ui, sans-serif; letter-spacing: .24em; color: var(--tint); }
-/* The client block is a button: it opens §7.3's panel for that job. It has to LOOK pressable
-   without becoming a second ACCEPT, so it is a flat row with a chevron and no fill. */
+.dk-rank.std { background: rgba(10, 8, 18, .55); }
+.dkr-kick { font: 500 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .26em; color: var(--dim); }
+.dkr-name {
+  font: 400 13px/1 ui-monospace, Menlo, monospace; letter-spacing: .06em; color: var(--tint);
+  text-shadow: 0 0 12px currentColor; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dk-rank.std .dkr-name { color: #c98bff; }
+.dk-rank.std .dk-meter i.on { background: #c98bff; box-shadow: 0 0 5px -1px #c98bff; }
+.dkr-sub { font: 400 9px/1.2 ui-monospace, Menlo, monospace; color: rgba(125, 142, 163, .85);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── tabs — a bezel strip, not pills ─────────────────────────────────── */
+.dk-tabs { display: flex; flex: 0 0 auto; border-bottom: 1px solid rgba(125, 142, 163, .18); }
+/* `.dk-key` shares this block rather than copying it. S2-E's HIRE key sits in the tab strip and is
+   deliberately NOT a `.dk-tab` (gates_wire presses `.dk-tab` index 2 for the SHOP and gates_s2d
+   asserts RECORD is the last one), but a copied block meant the landscape override below hit only
+   half of it: the key stayed 40 px, `.dk-tabs` stretches every child to the tallest, and the whole
+   strip came out 4 px over — which pushed the first ACCEPT past the bottom of a 390 px frame. */
+.dk-tab, .dk-key {
+  -webkit-appearance: none; appearance: none; flex: 1 1 0; cursor: pointer;
+  position: relative; border: 0; background: transparent; color: var(--dim);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 11px 2px 10px; min-height: 40px;
+  font: 500 10px/1 ui-monospace, Menlo, monospace; letter-spacing: .2em;
+}
+.dk-tab + .dk-tab::before {
+  content: ''; position: absolute; left: 0; top: 22%; bottom: 22%; width: 1px;
+  background: rgba(125, 142, 163, .2);
+}
+.dkt-n { font-size: 9px; color: rgba(125, 142, 163, .7); letter-spacing: 0; }
+.dk-tab.on { color: #eaf6ff; background: linear-gradient(180deg, transparent, rgba(53, 230, 255, .10)); }
+.dk-tab.on .dkt-n { color: var(--tint); }
+.dk-tab.on::after {
+  content: ''; position: absolute; left: 12%; right: 12%; bottom: 0; height: 2px;
+  background: var(--tint); box-shadow: 0 0 10px -1px var(--tint);
+}
+
+/* ── the scrolling body ─────────────────────────────────────────────── */
+.dk-body {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+  display: flex; flex-direction: column; gap: 8px; padding: 10px 12px 4px;
+}
+.dk-empty { display: flex; flex-direction: column; gap: 6px; padding: 34px 6px; text-align: center; }
+.dke-t { font: 500 11px/1 ui-monospace, Menlo, monospace; letter-spacing: .28em; color: var(--tint); opacity: .8; }
+.dke-s { font: 400 11px/1.5 system-ui, sans-serif; color: var(--dim); }
+
+/* ── a row is a RAIL ─────────────────────────────────────────────────── */
+.dk-job, .dk-held {
+  --rcut: 12px;
+  position: relative; isolation: isolate;
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 10px 12px 11px 14px;
+  clip-path: polygon(var(--rcut) 0, 100% 0, 100% 100%, 0 100%, 0 var(--rcut));
+}
+.dk-job::before, .dk-held::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(53, 230, 255, .10) 0, rgba(53, 230, 255, 0) 55%),
+    rgba(3, 7, 12, .46);
+  clip-path: polygon(var(--rcut) 0, 100% 0, 100% 100%, 0 100%, 0 var(--rcut));
+  box-shadow: inset 0 0 0 1px rgba(125, 142, 163, .13);
+}
+/* the lit spine */
+.dk-job::after, .dk-held::after {
+  content: ''; position: absolute; left: 0; top: var(--rcut); bottom: 0; width: 2px; z-index: 0;
+  background: linear-gradient(180deg, var(--tint), rgba(53, 230, 255, .12));
+  box-shadow: 0 0 8px -2px var(--tint);
+}
+.dk-job.rush::after { background: linear-gradient(180deg, #ff2b3a, rgba(255, 43, 58, .15)); box-shadow: 0 0 8px -2px #ff2b3a; }
+.dk-slot {
+  position: absolute; top: 6px; right: 10px;
+  font: 400 22px/1 ui-monospace, Menlo, monospace; letter-spacing: .04em;
+  color: rgba(207, 226, 245, .13);
+}
+
 .dk-who {
   -webkit-appearance: none; appearance: none; cursor: pointer;
   display: flex; align-items: center; gap: 10px; width: 100%;
-  padding: 0 0 2px; margin: 0; text-align: left;
-  background: none; border: 0; border-bottom: 1px solid var(--line);
+  padding: 0 0 8px; margin: 0; text-align: left;
+  background: none; border: 0; border-bottom: 1px solid rgba(125, 142, 163, .16);
   color: inherit; font: inherit;
 }
-.dk-whotx { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
-.dk-more { color: var(--tint); font-size: 13px; opacity: .8; }
+.dk-whotx { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.dk-more { color: var(--tint); font-size: 13px; opacity: .85; }
 .dk-thumb {
-  width: 48px; height: 48px; flex: 0 0 48px;
-  border: 1px solid var(--line); background: #0a0d13;
-  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  width: 44px; height: 44px; flex: 0 0 44px; overflow: hidden;
+  background: #0a0d13; position: relative;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: inset 0 0 0 1px rgba(53, 230, 255, .35);
 }
 .dk-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.dk-ph { font-size: 15px; letter-spacing: .06em; color: var(--tint); opacity: .85; }
-.dk-client { font-size: 14px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dk-fac { font-size: 10px; color: var(--dim); letter-spacing: .1em; text-transform: uppercase;
+.dk-ph { font: 400 15px/1 ui-monospace, Menlo, monospace; letter-spacing: .06em; color: var(--tint); opacity: .85; }
+.dk-client { font: 400 14px/1.1 system-ui, sans-serif; color: #eaf6ff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dk-fac { font: 400 9px/1 ui-monospace, Menlo, monospace; color: var(--dim); letter-spacing: .16em; text-transform: uppercase;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dk-line { font-size: 11px; color: var(--dim); font-style: italic;
+.dk-line { font: 400 11px/1.3 system-ui, sans-serif; color: rgba(159, 176, 198, .8); font-style: italic;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dk-parcel { font-size: 13px; color: var(--text); }
-.dk-dest { font-size: 12px; color: var(--dim); }
-.dk-chips { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; color: var(--dim); }
-.dk-chip { border: 1px solid var(--line); border-radius: 2px; padding: 2px 6px; }
-.dk-chip.risk.r1 { color: var(--amber); }
-.dk-chip.risk.r2, .dk-chip.risk.r3 { color: #ff6a4a; }
-.dk-chip.hot { color: #ff2b3a; border-color: #ff2b3a; }
-.dk-pay { display: flex; justify-content: space-between; align-items: baseline; margin-top: 3px; }
-.dk-payl { font-size: 10px; letter-spacing: .24em; color: var(--dim); }
-.dk-pay b { font-size: 22px; font-weight: 500; color: var(--text); }
-.dk-bonus { display: flex; justify-content: space-between; font-size: 11px; color: var(--dim); }
 
-.dk-acts { display: flex; gap: 6px; margin-top: 6px; }
+/* ── the manifest, drawn as a route ──────────────────────────────────── */
+.dk-route { display: flex; align-items: center; gap: 8px; }
+.dk-parcel { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 42%; }
+.dkp-icon { font-size: 13px; color: var(--tint); line-height: 1; }
+.dkp-name { font: 400 12px/1.1 system-ui, sans-serif; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dkp-slots { font: 400 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .16em; color: var(--dim); }
+.dk-lane { flex: 0 0 auto; position: relative; height: 20px; min-width: 62px; display: flex; align-items: center; justify-content: center; }
+.dk-lane::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px;
+  background: repeating-linear-gradient(90deg, var(--tint) 0 4px, transparent 4px 8px);
+  opacity: .5;
+}
+.dk-lane::after {
+  content: ''; position: absolute; right: 0; top: 50%; margin-top: -3px;
+  border-left: 5px solid var(--tint); border-top: 3px solid transparent; border-bottom: 3px solid transparent;
+}
+.dkl-km { position: relative; font: 400 9px/1 ui-monospace, Menlo, monospace; color: #9fb8cf;
+  background: rgba(5, 9, 15, .92); padding: 0 4px; }
+.dk-dest { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 42%; text-align: right; }
+.dkd-name { font: 400 12px/1.1 system-ui, sans-serif; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dkd-dist { font: 400 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .16em; color: var(--dim); text-transform: uppercase; }
+
+.dk-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.dk-chip {
+  font: 400 10px/1 ui-monospace, Menlo, monospace; color: var(--dim); padding: 4px 7px;
+  background: rgba(125, 142, 163, .08); box-shadow: inset 0 0 0 1px rgba(125, 142, 163, .22);
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+.dk-chip.risk.r1 { color: var(--amber); box-shadow: inset 0 0 0 1px rgba(255, 178, 56, .4); }
+.dk-chip.risk.r2, .dk-chip.risk.r3 { color: #ff6a4a; box-shadow: inset 0 0 0 1px rgba(255, 106, 74, .45); }
+.dk-chip.hot { color: #ff2b3a; box-shadow: inset 0 0 0 1px rgba(255, 43, 58, .6); background: rgba(255, 43, 58, .09); }
+
+.dk-pay { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 2px; }
+.dk-payl { font: 500 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .3em; color: var(--dim); padding-bottom: 3px; }
+.dk-pay b { display: flex; align-items: baseline; gap: 5px; }
+.dkv-n { font: 300 26px/1 ui-monospace, Menlo, monospace; color: #eaf6ff; letter-spacing: -.01em; }
+.dkv-u { font: 500 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .22em; color: var(--dim); }
+.dk-bonuses { display: flex; flex-direction: column; gap: 2px; }
+.dk-bonus { display: flex; justify-content: space-between; font: 400 10px/1.3 ui-monospace, Menlo, monospace; color: var(--dim); }
+.dk-bonus b { font-weight: 400; color: rgba(108, 255, 156, .8); }
+
+/* ── buttons — chamfered, never a rounded rectangle ──────────────────── */
+.dk-acts { display: flex; gap: 6px; margin-top: 7px; }
 .dk-accept, .dk-fill, .dk-ghost, .dk-shop, .dk-undock {
-  -webkit-appearance: none; appearance: none;
-  font: 400 12px/1 system-ui, sans-serif; letter-spacing: .16em;
-  padding: 12px 10px; border-radius: 3px; cursor: pointer; min-height: 42px;
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  position: relative; isolation: isolate; border: 0; background: transparent;
+  --bcut: 10px;
+  --bshape: polygon(var(--bcut) 0, 100% 0, 100% calc(100% - var(--bcut)), calc(100% - var(--bcut)) 100%, 0 100%, 0 var(--bcut));
+  font: 500 11px/1 ui-monospace, Menlo, monospace; letter-spacing: .2em;
+  padding: 13px 12px; min-height: 44px; color: var(--text);
 }
-.dk-accept, .dk-fill { flex: 2; border: 1px solid var(--tint); background: var(--tint); color: var(--ink); }
-.dk-fill { width: 100%; }
-.dk-ghost { flex: 1; border: 1px solid var(--line); background: transparent; color: var(--dim); }
-.dk-shop { width: 100%; border: 1px solid var(--line); background: transparent; color: var(--text); text-align: left; letter-spacing: .06em; }
-.dk-accept:disabled, .dk-fill:disabled, .dk-shop:disabled { opacity: .38; cursor: default; }
-.dk-note { font-size: 11px; color: var(--amber); margin-top: 8px; }
-.dk-undock {
-  width: 100%; margin-top: 10px;
-  position: sticky; bottom: -10px; z-index: 2;
-  border: 1px solid var(--line); background: rgba(8, 10, 15, .98); color: var(--text);
+.dk-accept::before, .dk-fill::before, .dk-ghost::before, .dk-shop::before, .dk-undock::before {
+  content: ''; position: absolute; inset: 0; z-index: -2; clip-path: var(--bshape);
+  background: var(--tint);
 }
+.dk-accept::after, .dk-fill::after, .dk-ghost::after, .dk-shop::after, .dk-undock::after {
+  content: ''; position: absolute; inset: 1px; z-index: -1; clip-path: var(--bshape);
+  background: rgba(6, 11, 18, .86);
+}
+/* THE PRIMARY ACTION IS NOT A FILLED PILL, and that is a decision rather than a preference.
+   `--tint` is the ZONE's colour and HUB's is #dfeaff — near white (js/config.js ZONE_TYPES). A
+   filled primary therefore renders as a large WHITE slab on the first board of the game, which is
+   precisely the "web form" read this phase exists to remove. It is a lit console key instead: dark
+   glass, a bright tint frame, a solid tint wedge down its leading edge and the label glowing in the
+   tint. The hierarchy against HAGGLE survives at every zone colour, which a fill does not. */
+.dk-accept, .dk-fill {
+  flex: 2; color: var(--tint); text-shadow: 0 0 14px currentColor;
+  padding-left: 20px;
+}
+.dk-accept::after, .dk-fill::after {
+  background:
+    linear-gradient(90deg, var(--tint) 0 5px, rgba(53, 230, 255, .16) 5px 6px, transparent 6px),
+    linear-gradient(180deg, rgba(53, 230, 255, .16), rgba(6, 11, 18, .9) 70%);
+}
+.dk-accept:active::after, .dk-fill:active::after {
+  background:
+    linear-gradient(90deg, var(--tint) 0 5px, transparent 5px),
+    linear-gradient(180deg, rgba(53, 230, 255, .34), rgba(6, 11, 18, .9) 80%);
+}
+.dk-fill { width: 100%; margin-top: 9px; }
+.dk-ghost { flex: 1; color: var(--dim); }
+.dk-ghost::before { background: rgba(125, 142, 163, .38); }
+.dk-accept:disabled, .dk-fill:disabled, .dk-shop:disabled { cursor: default; color: rgba(125, 142, 163, .8); text-shadow: none; }
+.dk-accept:disabled::before, .dk-fill:disabled::before { background: rgba(125, 142, 163, .3); }
+.dk-accept:disabled::after, .dk-fill:disabled::after {
+  background: linear-gradient(90deg, rgba(125, 142, 163, .45) 0 5px, transparent 5px), rgba(10, 14, 20, .82);
+}
+.dk-shop:disabled { opacity: .5; }
 
-@media (orientation: landscape) and (max-height: 520px) {
+/* ── the shop's three modules ───────────────────────────────────────── */
+.dk-screen {
+  --scut: 12px;
+  position: relative; isolation: isolate; display: flex; flex-direction: column;
+  clip-path: polygon(var(--scut) 0, 100% 0, 100% 100%, 0 100%, 0 var(--scut));
+}
+.dk-screen::before {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background: rgba(255, 255, 255, .035);
+  clip-path: polygon(var(--scut) 0, 100% 0, 100% 100%, 0 100%, 0 var(--scut));
+  box-shadow: inset 0 0 0 1px rgba(125, 142, 163, .16);
+}
+.dk-shead {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  padding: 9px 12px 8px 13px; border-bottom: 1px solid rgba(125, 142, 163, .16);
+}
+.dk-skick { font: 500 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .3em; color: var(--tint); }
+.dk-stitle { font: 400 13px/1 ui-monospace, Menlo, monospace; letter-spacing: .12em; color: #eaf6ff; }
+.dk-ssub { margin-left: auto; font: 400 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .14em; color: var(--dim); }
+.dk-sbody { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px 12px 13px; }
+
+.dk-cellbank { display: flex; flex-direction: column; gap: 10px; }
+.dk-cellbank .dk-meter { justify-content: space-between; }
+.dk-cellbank .dk-meter i { flex: 1 1 0; }
+.dk-cellnums { display: flex; gap: 22px; }
+.dk-ro { display: flex; flex-direction: column; gap: 2px; }
+.dk-ro i { font: 500 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .26em; color: var(--dim); font-style: normal; }
+.dk-ro b { font: 400 14px/1 ui-monospace, Menlo, monospace; color: #eaf6ff; }
+.dk-ro.big b { font-size: 20px; color: #6cff9c; }
+.dk-ro.sub b { color: #9fb8cf; }
+
+/* A shop line is a MODULE BAY: a dim bezel, and a lit tint wedge on its leading edge only while
+   the line can actually be bought. A tint outline on every row made the shop read as fifteen
+   equally urgent things — which is the same failure as tagging half the radio chatter `alert`. */
+.dk-shop { width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; padding: 11px 12px 11px 18px; letter-spacing: .1em; }
+.dk-shop::before { background: rgba(125, 142, 163, .28); }
+.dk-shop::after { background: linear-gradient(90deg, rgba(53, 230, 255, .55) 0 4px, transparent 4px), rgba(6, 11, 18, .72); }
+.dk-shop:disabled::after { background: linear-gradient(90deg, rgba(125, 142, 163, .3) 0 4px, transparent 4px), rgba(8, 12, 18, .7); }
+.dkm-name, .dkh-name { flex: 1; font: 400 11px/1 ui-monospace, Menlo, monospace; letter-spacing: .16em; color: var(--text); }
+.dkm-pips { display: flex; gap: 3px; }
+.dkm-pips i { width: 12px; height: 4px; background: rgba(125, 142, 163, .22); }
+.dkm-pips i.on { background: var(--tint); box-shadow: 0 0 6px -1px var(--tint); }
+.dkm-price, .dkh-state { font: 400 10px/1 ui-monospace, Menlo, monospace; letter-spacing: .06em; color: #6cff9c; min-width: 76px; text-align: right; }
+.dk-shop:disabled .dkm-price, .dk-shop:disabled .dkh-state { color: var(--dim); }
+.dkh-slots { display: flex; gap: 3px; }
+.dkh-slots i { width: 5px; height: 5px; background: rgba(53, 230, 255, .55); }
+.dk-shop.own .dkh-name { color: var(--tint); }
+.dk-shop.own::after { background: linear-gradient(90deg, var(--tint) 0 4px, transparent 4px), rgba(6, 11, 18, .72); }
+
+/* ── the RECORD tab — the two ladders ────────────────────────────────── */
+.dk-sect.lad .dk-sbody { gap: 0; padding-bottom: 8px; }
+.dk-worth { display: flex; gap: 16px; align-items: flex-end; padding-bottom: 10px; }
+.dk-ladder { display: flex; flex-direction: column; }
+.dk-rung {
+  position: relative; display: flex; align-items: center; gap: 9px;
+  padding: 6px 2px 6px 8px; border-left: 2px solid rgba(125, 142, 163, .18);
+  opacity: .5;
+}
+.dk-rung.done { opacity: .74; border-left-color: rgba(53, 230, 255, .45); }
+.dk-rung.here {
+  opacity: 1; border-left-color: var(--tint);
+  background: linear-gradient(90deg, rgba(53, 230, 255, .13), transparent 72%);
+  flex-wrap: wrap;
+}
+.dk-rung.locked { opacity: .3; }
+.dkg-i { font: 400 9px/1 ui-monospace, Menlo, monospace; color: var(--dim); width: 16px; }
+.dkg-tx { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.dkg-name { font: 400 11px/1 ui-monospace, Menlo, monospace; letter-spacing: .16em; color: #eaf6ff; }
+.dk-rung.here .dkg-name { color: var(--tint); text-shadow: 0 0 12px currentColor; }
+.dkg-blurb { font: 400 9px/1.3 system-ui, sans-serif; color: var(--dim);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dkg-at { font: 400 9px/1 ui-monospace, Menlo, monospace; color: rgba(159, 184, 207, .8); }
+.dk-rung.here .dk-meter { flex: 1 0 100%; margin-top: 4px; }
+.dk-ladnote { font: 400 9px/1.4 system-ui, sans-serif; color: rgba(125, 142, 163, .8); padding: 8px 2px 0; font-style: italic; }
+.dk-sect.lad .dkr-name { color: var(--tint); }
+.dk-sealed { display: flex; flex-wrap: wrap; gap: 5px; }
+.dks-rung {
+  font: 400 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .16em; color: rgba(201, 139, 255, .5);
+  padding: 5px 7px; background: rgba(201, 139, 255, .06);
+  box-shadow: inset 0 0 0 1px rgba(201, 139, 255, .22);
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+.dk-sect.sealed .dk-skick, .dk-sect.sealed .dk-stitle { color: rgba(201, 139, 255, .8); }
+
+/* ── the note, and the way out ──────────────────────────────────────── */
+.dk-note {
+  display: flex; align-items: center; gap: 8px; flex: 0 0 auto;
+  padding: 9px 14px; margin: 0;
+  font: 400 11px/1.35 system-ui, sans-serif; color: #ffe8c2;
+  background: rgba(255, 178, 56, .10); border-top: 1px solid rgba(255, 178, 56, .4);
+}
+.dkn-mark {
+  flex: 0 0 auto; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;
+  font: 700 10px/1 ui-monospace, Menlo, monospace; color: #04121a; background: var(--amber);
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+.dk-undock {
+  flex: 0 0 auto; width: 100%; margin: 0; --bcut: 0px;
+  color: var(--dim); letter-spacing: .34em; min-height: 46px;
+}
+.dk-undock::before { background: transparent; }
+.dk-undock::after { background: rgba(0, 0, 0, .34); }
+.dk-undock { border-top: 1px solid rgba(125, 142, 163, .22); }
+
+/* LANDSCAPE IS SHORT, NOT NARROW, and it is a different arrangement rather than the same one
+   scaled — the lesson S2-A paid for when a portrait-only check let the dash run through the floor.
+   Here the cost is vertical: header, rank rail, tabs and UNDOCK are all fixed height, so a stacked
+   portrait layout leaves the scrolling body about 190 px on a 390-tall screen and ACCEPT lands
+   below the fold. The sheet becomes a grid and the rank rail moves UP BESIDE the header. */
+@media (orientation: landscape) and (max-height: 560px) {
   #ui { align-items: center; }
-  .dk-sheet { width: min(640px, 100%); }
-  .dk-body { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dk-sheet {
+    width: min(780px, 100%);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+  }
+  .dk-head { grid-area: 1 / 1; border-right: 1px solid rgba(125, 142, 163, .16); padding: 7px 14px 6px; }
+  .dk-rail { grid-area: 1 / 2; border-bottom: 1px solid rgba(125, 142, 163, .16); }
+  .dk-tabs { grid-area: 2 / 1 / 3 / -1; }
+  .dk-body {
+    grid-area: 3 / 1 / 4 / -1;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start;
+    padding: 8px 10px 4px;
+  }
+  /* The note and UNDOCK SHARE the last row. `.dk-note` is transient — it is what a refused ACCEPT
+     says back — so it appears exactly when the player is about to press ACCEPT again, and a row of
+     its own took 33 px off the body at that moment. Beside UNDOCK it costs nothing: the row is
+     already 38 px for the button. The adjacent-sibling selector does the presence test, because
+     `.dk-note` is inserted immediately before UNDOCK or not at all (js/ui.js `_paint`) — no
+     `:has()`, and no rule that misfires when the note is absent. */
+  .dk-note { grid-area: 4 / 1 / 5 / 2; padding: 6px 12px; font-size: 10px; align-self: stretch;
+    border-top-color: rgba(125, 142, 163, .22); }
+  .dk-undock { grid-area: 4 / 1 / 5 / -1; }
+  .dk-note + .dk-undock { grid-area: 4 / 2 / 5 / -1; }
+  .dk-body > .dk-empty, .dk-body > .dk-sect.lad { grid-column: 1 / -1; }
+  .dk-rank { padding: 4px 12px 5px; }
+  .dk-pad { font-size: 16px; }
+  .dk-purse b { font-size: 15px; }
+  /* 36, not 32. A 390 px-tall frame makes every row want to be smaller and the tab strip is the
+     first thing that gives — but a 32 px target is below anything defensible for a thumb, so the
+     height is taken out of the CARD instead. gates_s2d B7 asserts the floor rather than trusting it. */
+  /* `.dk-key` too. S2-E's HIRE key sits in this strip but is deliberately not a `.dk-tab` (see the
+     note beside its rule), and the first landscape run after it landed put the strip 4 px taller
+     than this grid expects — which pushed the first ACCEPT 17 px past the bottom of a 390 px frame
+     and B7 caught it. A shared look needs a shared override. */
+  /* 37, not 36, and the extra pixel is the whole point. gates_s2d B7 asserts
+     `getBoundingClientRect().height >= 36` on a target whose CSS floor was exactly 36 — a
+     threshold with zero slack against a fractional used height. It failed about one run in
+     twenty while its detail line printed `Math.round(r.height)`, i.e. "36 px tall", so the term
+     that flipped was invisible. B7 now prints the raw height; this gives it a pixel to be wrong
+     by, and a bigger thumb target is never the wrong answer on a 390 px frame. */
+  .dk-tab, .dk-key { min-height: 37px; padding: 8px 2px; }
+  .dk-undock { min-height: 38px; }
+  .dk-job, .dk-held { padding: 8px 10px 9px 12px; gap: 5px; }
+  .dk-who { padding-bottom: 6px; }
+  .dk-line { display: none; }              /* the client's quip is the panel's job, not the board's */
+  .dkv-n { font-size: 22px; }
+  .dk-acts { margin-top: 5px; }
+  .dk-accept, .dk-fill, .dk-ghost { min-height: 38px; padding-top: 11px; padding-bottom: 11px; }
+  /* the last 20 px, so the primary action clears the fold on a 390-tall screen rather than sitting
+     one scroll below it — measured with gates_s2d's D3, not eyeballed */
+  .dk-thumb { width: 32px; height: 32px; flex-basis: 32px; }
+  .dkv-n { font-size: 20px; }
+  .dk-bonus { font-size: 9px; line-height: 1.15; }
+  .dk-bonuses { gap: 1px; }
+  .dk-job, .dk-held { gap: 4px; padding: 6px 10px 6px 12px; }
+  .dk-who { gap: 8px; padding-bottom: 5px; }
+  /* THE CARD IS A GRID HERE, NOT A COLUMN. Stacked, the card came out 211 px against a body that
+     gets 199-242 depending on what else is on screen, so ACCEPT sat within ~30 px of the fold and
+     anything that moved — a toast reservation, a `.dk-note` — put it under the UNDOCK bar, where a
+     tap on the game's primary action ejected the player from the board instead. Chips beside the
+     payment and the two bonus lines side by side take ~45 px out of the card, which is the
+     difference between "just fits" and "fits with the rail full". gates_s2f B1 holds the margin. */
+  .dk-job {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 10px; row-gap: 4px;
+  }
+  .dk-job > .dk-who, .dk-job > .dk-route,
+  .dk-job > .dk-bonuses, .dk-job > .dk-acts { grid-column: 1 / -1; }
+  .dk-job > .dk-chips { grid-column: 1; align-self: center; }
+  .dk-job > .dk-pay { grid-column: 2; margin-top: 0; gap: 8px; }
+  .dk-job > .dk-bonuses { flex-direction: row; gap: 14px; }
+  .dk-job > .dk-bonuses .dk-bonus { gap: 6px; }
+  .dk-chip { padding: 3px 6px; }
+  .dk-pay { margin-top: 0; }
+  .dk-head { padding: 6px 12px 5px; }
+  .dk-dist { display: none; }              /* the district is on the pad name's own line in the world */
+  .dk-slot { font-size: 18px; top: 4px; }
+  #ui { padding-top: max(calc(var(--safe-t) + 4px), calc(var(--toast-h, 0px) + 4px)); padding-bottom: calc(var(--safe-b) + 4px); }
 }
 
 /* §7.2's DOCK button. `#ui` keeps its z-index but gives every pixel back to the control layer
@@ -445,13 +1174,26 @@ html, body {
 }
 .dk-prompt {
   -webkit-appearance: none; appearance: none; pointer-events: auto;
-  margin-top: 6px;
-  border: 1px solid var(--cyan); border-radius: 3px;
-  background: rgba(8, 10, 15, .88); color: var(--cyan);
-  font: 400 11px/1 system-ui, sans-serif; letter-spacing: .18em;
-  padding: 11px 18px; min-height: 40px; cursor: pointer;
-  box-shadow: 0 0 16px -6px var(--cyan);
+  position: relative; isolation: isolate; border: 0; background: transparent;
+  margin-top: 6px; display: flex; align-items: center; gap: 8px;
+  padding: 11px 18px; min-height: 42px; cursor: pointer;
+  --pcut: 11px;
+  color: var(--cyan);
 }
+.dk-prompt::before {
+  content: ''; position: absolute; inset: 0; z-index: -2;
+  background: var(--cyan);
+  clip-path: polygon(var(--pcut) 0, 100% 0, 100% calc(100% - var(--pcut)), calc(100% - var(--pcut)) 100%, 0 100%, 0 var(--pcut));
+}
+.dk-prompt::after {
+  content: ''; position: absolute; inset: 1px; z-index: -1;
+  background: rgba(5, 9, 15, .9);
+  clip-path: polygon(var(--pcut) 0, 100% 0, 100% calc(100% - var(--pcut)), calc(100% - var(--pcut)) 100%, 0 100%, 0 var(--pcut));
+}
+.dkp-glyph { font-size: 13px; }
+.dkp-label { font: 500 11px/1 ui-monospace, Menlo, monospace; letter-spacing: .3em; }
+.dkp-name { font: 400 11px/1 ui-monospace, Menlo, monospace; letter-spacing: .08em; color: #eaf6ff; }
+
 
 /* ── P7b — §7.3's DOCKING PANEL (js/dock.js, renders into #dock) ───────────
    The main UI of the game. The board (#ui) is the list you scan; this is the deal you read: one
@@ -482,14 +1224,23 @@ html, body {
 }
 #dock.hidden { display: none; }
 
+/* S2-D reskinned this in the same idiom as the board, within one hard limit that is worth stating
+   because it shapes what could and could not change: gate P7 in gates_p7b measures the LIVE panel
+   for exactly three type sizes, one family, at most two weights and nothing round but `.cp-rel`.
+   So this is a skin, not a rebuild — glass instead of a near-opaque card, a square frame instead of
+   a 4 px radius, chamfered chips, and console keys instead of a filled white slab. The sheet itself
+   keeps a plain 1 px frame rather than the board's chamfer-plus-brackets: `.cp-sheet` is the
+   SCROLLER, and the pseudo-element recipe that draws a chamfered outline scrolls away with the
+   content. Restructuring it into a fixed frame around an inner scroller would move the direct
+   children the §7.3 row stagger and the landscape grid areas both address by position. */
 .cp-sheet {
   --tint: var(--cyan);
   width: min(460px, 100%); max-height: 100%; overflow: auto;
-  background-color: rgba(8, 10, 15, .96);
+  background-color: rgba(6, 10, 16, .82);
   background-position: center; background-size: cover; background-repeat: no-repeat;
   background-blend-mode: multiply;
-  border: 1px solid var(--tint); border-radius: 4px;
-  box-shadow: 0 0 26px -8px var(--tint);
+  border: 1px solid var(--tint); border-radius: 0;
+  box-shadow: 0 0 30px -8px var(--tint), inset 0 0 60px -30px var(--tint);
   padding: 14px 14px 12px;
   font-variant-numeric: tabular-nums;
   animation: cp-in .18s ease-out;
@@ -571,10 +1322,13 @@ html, body {
 .cp-parcel { font-size: 14px; color: var(--text); }
 .cp-dest { font-size: 14px; color: var(--dim); }
 .cp-chips { display: flex; flex-wrap: wrap; gap: 6px; font-size: 10px; color: var(--dim); }
-.cp-chip { border: 1px solid var(--line); border-radius: 2px; padding: 3px 7px; }
+.cp-chip {
+  padding: 4px 8px; box-shadow: inset 0 0 0 1px var(--line);
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
 .cp-chip.risk.r1 { color: var(--amber); }
 .cp-chip.risk.r2, .cp-chip.risk.r3 { color: #ff6a4a; }
-.cp-chip.hot { color: #ff2b3a; border-color: #ff2b3a; }
+.cp-chip.hot { color: #ff2b3a; box-shadow: inset 0 0 0 1px #ff2b3a; }
 .cp-pay {
   display: flex; justify-content: space-between; align-items: baseline;
   margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--line);
@@ -587,19 +1341,49 @@ html, body {
 .cp-note { font-size: 10px; color: var(--amber); margin-top: 10px; }
 
 /* ── block 3 — do I take it ────────────────────────────────────────────── */
+/* Console keys, in the board's idiom: dark glass, a bright frame, a solid tint wedge on the
+   leading edge and the label lit in the tint. Buttons do not scroll, so they can use the chamfer
+   recipe the sheet cannot — `::before` is the frame, `::after` the fill, both clipped to the same
+   cut shape and held inside the button by `isolation: isolate`. */
 .cp-accept, .cp-ghost {
   -webkit-appearance: none; appearance: none; cursor: pointer;
+  position: relative; isolation: isolate; border: 0; background: transparent;
   font-family: inherit; font-weight: 400; font-size: 14px; line-height: 1;
   letter-spacing: .16em;
-  padding: 13px 10px; min-height: 44px; border-radius: 3px;
+  padding: 13px 10px; min-height: 44px; border-radius: 0;
+  --bcut: 11px;
+  --bshape: polygon(var(--bcut) 0, 100% 0, 100% calc(100% - var(--bcut)), calc(100% - var(--bcut)) 100%, 0 100%, 0 var(--bcut));
+}
+.cp-accept::before, .cp-ghost::before {
+  content: ''; position: absolute; inset: 0; z-index: -2; clip-path: var(--bshape);
+  background: var(--tint);
+}
+.cp-accept::after, .cp-ghost::after {
+  content: ''; position: absolute; inset: 1px; z-index: -1; clip-path: var(--bshape);
+  background: rgba(6, 11, 18, .88);
 }
 .cp-accept {
-  width: 100%; margin-top: 14px;
-  border: 1px solid var(--tint); background: var(--tint); color: #05070b;
+  width: 100%; margin-top: 14px; padding-left: 22px;
+  color: var(--tint); text-shadow: 0 0 14px currentColor;
 }
-.cp-accept:disabled { opacity: .38; cursor: default; }
+.cp-accept::after {
+  background:
+    linear-gradient(90deg, var(--tint) 0 6px, transparent 6px),
+    linear-gradient(180deg, rgba(53, 230, 255, .18), rgba(6, 11, 18, .9) 70%);
+}
+.cp-accept:active::after {
+  background:
+    linear-gradient(90deg, var(--tint) 0 6px, transparent 6px),
+    linear-gradient(180deg, rgba(53, 230, 255, .36), rgba(6, 11, 18, .9) 80%);
+}
+.cp-accept:disabled { cursor: default; color: rgba(125, 142, 163, .8); text-shadow: none; }
+.cp-accept:disabled::before { background: rgba(125, 142, 163, .32); }
+.cp-accept:disabled::after {
+  background: linear-gradient(90deg, rgba(125, 142, 163, .45) 0 6px, transparent 6px), rgba(10, 14, 20, .85);
+}
 .cp-acts { display: flex; gap: 8px; margin-top: 8px; }
-.cp-ghost { flex: 1; border: 1px solid var(--line); background: transparent; color: var(--dim); }
+.cp-ghost { flex: 1; color: var(--dim); }
+.cp-ghost::before { background: rgba(125, 142, 163, .34); }
 
 /* §7.3: "identical DOM, a CSS grid switch puts the media block in the left column and the deal
    plus actions in the right. No JS branch." */
@@ -624,4 +1408,297 @@ html, body {
   .cp-acts { grid-area: acts; margin-top: 8px; }
   .cp-accept, .cp-ghost { min-height: 40px; padding: 10px; }
   .cp-pay b { font-size: 24px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   S2-E — THE STORY SURFACES
+   the intro cutscene · the warmth gauge's chase-view half · the hire panel ·
+   the act-one ending
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── the chase view's warmth bar ────────────────────────────────────────────
+   The dash draws a temperature gauge; chase view gets the same signal as a
+   horizontal bar with the break-even mark printed ON it, because the actionable
+   fact is not "how full" but "which side of the pace am I". It vanishes outright
+   once there is no debt — a gauge that reads zero forever teaches the player to
+   stop looking at the panel it is on. */
+.ch-warm {
+  padding: 7px 10px 8px; min-width: 128px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.ch-warm.off { display: none; }
+.ch-warm i {
+  font: 700 8px/1 ui-monospace, Menlo, monospace; font-style: normal;
+  letter-spacing: .2em; color: rgba(120, 150, 175, .95);
+}
+.ch-warm span {
+  position: relative; display: block; height: 7px; border-radius: 3px;
+  background: rgba(2, 5, 9, .6); box-shadow: inset 0 0 0 1px rgba(150, 200, 230, .16);
+  overflow: hidden;
+}
+.ch-warm u { display: block; height: 100%; background: var(--cyan); transition: width .35s linear; }
+.ch-warm u.cool { background: var(--cyan); }
+.ch-warm u.ok { background: #8ee6b0; }
+.ch-warm u.warn { background: var(--amber); }
+.ch-warm u.bad { background: #ff5a52; }
+.ch-warm u.clear { background: #6cff9c; }
+/* the break-even mark: exactly half, which is where a player earning the rate the debt
+   requires sits by construction (js/story.js) */
+.ch-warm em {
+  position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px;
+  background: rgba(234, 246, 255, .75);
+}
+.ch-warm b {
+  font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .2em;
+  color: rgba(120, 150, 175, .8);
+}
+.ch-warm.due { border-color: rgba(255, 90, 82, .7); }
+.ch-warm.due i { color: #ff5a52; }
+
+/* ── the cabin HIRE key ───────────────────────────────────────────────────── */
+.ctl-btn.hire.warn { color: var(--amber); border-color: rgba(255, 178, 56, .55); }
+.ctl-btn.hire.bad {
+  color: #ff5a52; border-color: rgba(255, 90, 82, .7);
+  animation: hire-pulse 1.1s ease-in-out infinite;
+}
+@keyframes hire-pulse { 50% { background: rgba(255, 90, 82, .18); } }
+
+/* the dock's HIRE key. It is a tab in the strip and a hand-off out of it — it opens the
+   same panel the cabin key does, so there is one hire screen in the game. */
+/* The HIRE key's own two differences from a tab: its colour, and the divider it needs because the
+   `.dk-tab + .dk-tab` sibling rule cannot see it. Everything else comes from the shared block above. */
+.dk-key { color: rgba(108, 255, 156, .9); }
+.dk-key::before {
+  content: ''; position: absolute; left: 0; top: 22%; bottom: 22%; width: 1px;
+  background: rgba(125, 142, 163, .2);
+}
+.dk-key .dkt-n { color: var(--amber); }
+
+/* ── the intro cutscene ────────────────────────────────────────────────────
+   Not a CabinPanel. The speech is anchored to WORLD points and re-projected
+   every frame (Aaron: "a line extends from one of them into a speech
+   rectangle"), so the layer carries an SVG for the leaders and the boxes are
+   positioned by script. It is pointer-events:none except on the things you can
+   actually press, so a stray tap does not eat the scene. */
+#intro {
+  position: fixed; inset: 0; z-index: 44;
+  pointer-events: none;
+  padding: calc(var(--safe-t) + 10px) calc(var(--safe-r) + 10px)
+           calc(var(--safe-b) + 10px) calc(var(--safe-l) + 10px);
+}
+#intro.hidden { display: none; }
+/* a very slight vignette so the type has a floor over a bright pad, and nothing more:
+   the whole point of the scene is that you are looking at the city */
+#intro::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(130% 100% at 50% 45%, rgba(2, 4, 8, 0) 42%, rgba(2, 4, 8, .58));
+}
+.iv-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.iv-lead {
+  fill: none; stroke: var(--cyan); stroke-width: 1.4;
+  filter: drop-shadow(0 0 4px rgba(53, 230, 255, .8));
+  opacity: .9;
+}
+.iv-stage { position: absolute; inset: 0; }
+.iv-bubble {
+  position: absolute; z-index: 2;
+  max-width: min(78vw, 420px);
+  border: 1px solid rgba(53, 230, 255, .45);
+  background: linear-gradient(rgba(53, 230, 255, .10), rgba(53, 230, 255, .02)), rgba(6, 10, 16, .78);
+  box-shadow: 0 0 22px -8px var(--cyan), inset 0 0 26px -18px var(--cyan);
+  /* chamfered, not rounded — the S2-D idiom, so the cutscene and the screens speak one language */
+  clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+  padding: 9px 12px 10px;
+  animation: iv-in .22s ease-out;
+}
+@keyframes iv-in { from { opacity: 0; transform: translateY(5px); } }
+.iv-bubble.offscreen { opacity: .25; }
+.iv-bubble.boss { top: calc(var(--safe-t) + 46px); border-color: rgba(255, 90, 82, .55); }
+.iv-bubble.boss { box-shadow: 0 0 24px -8px #ff5a52, inset 0 0 26px -18px #ff5a52; }
+.iv-bubble.pc { bottom: calc(var(--safe-b) + 96px); max-width: min(70vw, 360px); }
+.ivb-who {
+  display: block; font: 700 8px/1 ui-monospace, Menlo, monospace;
+  letter-spacing: .28em; color: rgba(53, 230, 255, .8); margin-bottom: 5px;
+}
+.iv-bubble.boss .ivb-who { color: #ff5a52; }
+.ivb-body { font: 400 13px/1.42 system-ui, sans-serif; color: #eaf6ff; }
+.iv-bubble.boss .ivb-body { font-size: 14px; }
+
+/* the name / gender panel. It grows out of the parked hull on the same leader line the
+   speech does, which is why it is a bubble and not a modal. */
+.iv-form {
+  pointer-events: auto;
+  top: auto; bottom: calc(var(--safe-b) + 84px);
+  width: min(84vw, 340px); max-width: min(84vw, 340px);
+  padding: 12px 14px 13px;
+}
+.ivf-kick {
+  font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .26em;
+  color: rgba(53, 230, 255, .75); margin: 2px 0 6px;
+}
+.ivf-row { margin-bottom: 10px; }
+.ivf-name {
+  -webkit-appearance: none; appearance: none; width: 100%;
+  background: rgba(2, 5, 9, .66); border: 1px solid rgba(53, 230, 255, .3);
+  border-radius: 0; clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+  color: #eaf6ff; font: 400 16px/1 ui-monospace, Menlo, monospace;
+  letter-spacing: .18em; padding: 10px 11px; text-transform: uppercase;
+}
+.ivf-name::placeholder { color: rgba(125, 142, 163, .7); }
+.ivf-gender { display: flex; gap: 6px; margin-bottom: 12px; }
+.ivf-g {
+  -webkit-appearance: none; appearance: none; flex: 1;
+  border: 1px solid rgba(150, 200, 230, .22); background: rgba(4, 8, 14, .5); color: var(--dim);
+  font: 400 10px/1 system-ui, sans-serif; letter-spacing: .14em; padding: 9px 4px; cursor: pointer;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+.ivf-g.on { color: var(--ink); background: var(--cyan); border-color: var(--cyan); }
+.ivf-foot { display: flex; gap: 7px; }
+.ivf-auto, .ivf-go {
+  -webkit-appearance: none; appearance: none; flex: 1;
+  border: 1px solid rgba(53, 230, 255, .34); background: rgba(53, 230, 255, .07);
+  color: rgba(53, 230, 255, .92);
+  font: 400 10px/1 system-ui, sans-serif; letter-spacing: .18em; padding: 11px 6px; cursor: pointer;
+  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+}
+.ivf-go { background: rgba(53, 230, 255, .2); color: #eaf6ff; }
+.ivf-auto:active, .ivf-go:active { background: rgba(53, 230, 255, .32); }
+
+.iv-skip {
+  position: absolute; z-index: 3; pointer-events: auto;
+  top: calc(var(--safe-t) + 10px); right: calc(var(--safe-r) + 10px);
+  -webkit-appearance: none; appearance: none;
+  border: 1px solid rgba(150, 200, 230, .28); background: rgba(4, 8, 14, .6);
+  color: rgba(207, 226, 245, .8);
+  font: 400 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .24em;
+  padding: 9px 13px; cursor: pointer;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+.iv-title {
+  position: absolute; z-index: 2;
+  top: calc(var(--safe-t) + 10px); left: calc(var(--safe-l) + 12px);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.ivt-k {
+  font: 300 15px/1 system-ui, sans-serif; letter-spacing: .42em; color: var(--cyan);
+  text-shadow: 0 0 16px rgba(53, 230, 255, .6);
+}
+.ivt-s {
+  font: 400 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .24em;
+  color: rgba(125, 142, 163, .85); text-transform: uppercase;
+}
+
+/* ── the hire panel ───────────────────────────────────────────────────────
+   A CabinPanel, so the frame, the brackets and the no-modal guarantee are
+   inherited. Everything below is the instrument idiom S2-D settled: kickers in
+   letterspaced small caps, values monospaced, rows as rails rather than boxes,
+   segmented meters rather than smooth fills. */
+.hr-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.hr-meter { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.hrm-k { font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .26em; color: rgba(53, 230, 255, .75); }
+.hrm-v { font: 300 22px/1 ui-monospace, Menlo, monospace; color: #eaf6ff; font-variant-numeric: tabular-nums; }
+.hrm-v.warn { color: var(--amber); }
+.hrm-v.bad { color: #ff5a52; font-size: 13px; letter-spacing: .1em; }
+.hr-bar { display: flex; gap: 2px; margin-top: 3px; }
+.hr-bar i { flex: 1; height: 5px; background: rgba(150, 200, 230, .13); }
+.hr-bar i.on { background: var(--cyan); }
+.hr-purse { text-align: right; }
+.hrp-k { display: block; font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .26em; color: rgba(120, 150, 175, .95); }
+.hrp-v { display: block; font: 400 15px/1 ui-monospace, Menlo, monospace; color: #6cff9c; margin-top: 4px; }
+
+.hr-blocks { display: flex; align-items: center; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+.hrb-k { font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .24em; color: rgba(120, 150, 175, .95); }
+.hrb {
+  -webkit-appearance: none; appearance: none; flex: 1; min-width: 52px;
+  border: 1px solid rgba(150, 200, 230, .22); background: rgba(4, 8, 14, .5);
+  color: var(--text); padding: 7px 3px 6px; cursor: pointer; text-align: center;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+.hrb b { display: block; font: 400 13px/1 ui-monospace, Menlo, monospace; }
+.hrb i { display: block; font: 400 9px/1 ui-monospace, Menlo, monospace; font-style: normal; color: var(--dim); margin-top: 3px; }
+.hrb u { display: block; font: 700 8px/1 ui-monospace, Menlo, monospace; text-decoration: none; color: #6cff9c; margin-top: 2px; }
+.hrb.on { border-color: var(--cyan); background: rgba(53, 230, 255, .16); color: #eaf6ff; }
+.hrb.no, .hrb[disabled] { opacity: .38; cursor: default; }
+.hr-wreck {
+  font: 400 10px/1.4 system-ui, sans-serif; color: rgba(255, 178, 56, .9);
+  border-left: 2px solid var(--amber); padding: 5px 0 5px 8px; margin-bottom: 10px;
+}
+
+.hr-fleet { display: flex; flex-direction: column; gap: 3px; margin-bottom: 12px; }
+.hr-row {
+  -webkit-appearance: none; appearance: none; width: 100%; text-align: left;
+  display: grid; grid-template-columns: 1fr auto; gap: 1px 10px; align-items: baseline;
+  border: 0; border-left: 2px solid rgba(53, 230, 255, .3);
+  background: rgba(53, 230, 255, .035); color: var(--text);
+  padding: 7px 10px 8px; cursor: pointer;
+}
+.hr-row.on { border-left-color: var(--cyan); background: rgba(53, 230, 255, .14); }
+.hr-row.no, .hr-row[disabled] { opacity: .42; cursor: default; }
+.hrr-id { font: 400 12px/1 ui-monospace, Menlo, monospace; letter-spacing: .2em; color: #eaf6ff; }
+.hrr-price { font: 400 12px/1 ui-monospace, Menlo, monospace; color: var(--amber); text-align: right; }
+.hrr-spec { font: 400 9px/1 ui-monospace, Menlo, monospace; color: var(--dim); }
+.hrr-why { font: 400 9px/1 ui-monospace, Menlo, monospace; color: var(--dim); text-align: right; }
+
+.hr-foot { margin-top: 4px; }
+.hr-take {
+  -webkit-appearance: none; appearance: none; width: 100%;
+  border: 1px solid rgba(108, 255, 156, .45); background: rgba(108, 255, 156, .12);
+  color: #cfffdf; font: 400 11px/1 system-ui, sans-serif; letter-spacing: .2em;
+  padding: 12px; cursor: pointer;
+  clip-path: polygon(9px 0, 100% 0, 100% calc(100% - 9px), calc(100% - 9px) 100%, 0 100%, 0 9px);
+}
+.hr-take[disabled] { opacity: .4; cursor: default; }
+.hr-take:active { background: rgba(108, 255, 156, .26); }
+.hr-note {
+  display: flex; gap: 7px; align-items: baseline; margin-top: 9px;
+  font: 400 11px/1.35 system-ui, sans-serif; color: rgba(255, 178, 56, .95);
+}
+.hrn-mark { color: var(--amber); font-weight: 700; }
+
+/* ── the act-one ending ──────────────────────────────────────────────────── */
+.en-kick {
+  font: 700 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .34em;
+  margin-bottom: 12px; color: #6cff9c;
+}
+.en-kick.seized { color: #ff5a52; }
+.en-p { margin: 0 0 9px; font: 400 12px/1.5 system-ui, sans-serif; color: var(--text); }
+.en-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin: 13px 0 11px; }
+.en-cell {
+  border-left: 2px solid rgba(53, 230, 255, .3); background: rgba(53, 230, 255, .035);
+  padding: 6px 10px 8px;
+}
+.en-cell i { display: block; font: 700 8px/1 ui-monospace, Menlo, monospace; font-style: normal; letter-spacing: .22em; color: rgba(120, 150, 175, .95); }
+.en-cell b { display: block; font: 400 13px/1.2 ui-monospace, Menlo, monospace; color: #eaf6ff; margin-top: 5px; }
+.en-cell.good { border-left-color: #6cff9c; }
+.en-cell.good b { color: #6cff9c; }
+.en-cell.bad { border-left-color: #ff5a52; }
+.en-cell.bad b { color: #ff8a84; }
+.en-next {
+  font: 400 11px/1.45 system-ui, sans-serif; color: rgba(53, 230, 255, .9);
+  border-left: 2px solid var(--cyan); padding: 6px 0 6px 9px;
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  /* A short viewport is not tall enough for a story panel plus its way out, and the first landscape
+     capture had GO ON below the fold on the ending and CLOSE half off on the hire panel — the
+     PRIMARY ACTION off screen, which is the defect gates_s2d B7 exists to catch on the dock sheet.
+     Scoped to these two hosts on purpose: #settings is a list of rows and scrolls happily, and
+     turning the shared CabinPanel into a flex column would change it too. */
+  #ending .hud-panel, #hire .hud-panel {
+    display: flex; flex-direction: column; max-height: 100%; overflow: hidden;
+  }
+  #ending .hp-body, #hire .hp-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  #ending .hp-head, #hire .hp-head, #ending .hp-foot, #hire .hp-foot { flex: 0 0 auto; }
+  #ending .hp-foot, #hire .hp-foot { margin-top: 8px; }
+  #ending .hp-close, #hire .hp-close { padding: 9px; }
+  .hr-fleet .hr-row { padding: 5px 9px 6px; }
+  .hrb { padding: 5px 3px 4px; }
+  .hrm-v { font-size: 18px; }
+  .iv-bubble.boss { top: calc(var(--safe-t) + 38px); max-width: min(56vw, 420px); }
+  .iv-bubble.pc { bottom: calc(var(--safe-b) + 62px); }
+  .iv-form { bottom: calc(var(--safe-b) + 46px); width: min(56vw, 340px); max-width: min(56vw, 340px); }
+  .ivt-k { font-size: 13px; }
+  .hr-fleet { display: grid; grid-template-columns: 1fr 1fr; }
+  .en-p { font-size: 11px; margin-bottom: 6px; }
+  #hud-strip .ch-warm { min-width: 110px; }
 }

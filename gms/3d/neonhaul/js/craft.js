@@ -76,18 +76,45 @@ import { clamp } from './utils.js';
 // L/W/H are FULL dimensions in metres. `nac` and `fin` are the two integer options; `hull` is the
 // §5.3 tint (black unless the table says otherwise) and `police` selects §5.4's light override.
 
+// S2-C adds two more integer options to §5.1's three, for the same reason and by the same
+// mechanism. Aaron, having flown the shipped build: "The cars/vehicles have little variation …
+// no variation … some different height/length vehicles? Maybe 2 or 3 other shapes as well".
+// L/W/H alone could not answer that — nine craft under one loft read as nine lozenges, which is
+// exactly what shots/s2c/before_family.png shows. So:
+//
+//   `kit`  0-3  a bolt-on module group on a FLYING hull — spine rail, flank sponsons, cargo stack
+//   `road` 0-3  a ROAD form: 0 is the flying hull, 1-3 are bus / articulated / tram-transport
+//
+// Both are per-instance integers selecting between parts that are baked into the SAME geometry
+// and collapsed to zero in the vertex shader, exactly as `nac` and `fin` already are. Still one
+// body geometry, still one draw call. §5.1's rule was never "two options"; it was "no craft gets
+// a bespoke mesh", and that survives intact.
 export const CRAFT_DEFS = {
   wisp:      { L: 5.4,  W: 2.0, H: 1.15, nac: 2, fin: 1, slots: 2, top: 62, role: 'starter courier', hull: 0x0a0b0e, trim: 0x35e6ff, run: 0 },
   kestrel:   { L: 6.2,  W: 2.4, H: 1.50, nac: 2, fin: 1, slots: 3, top: 66, role: 'all-rounder', hull: 0x090e18, trim: 0x2bd0ff, run: 0 },
-  lance:     { L: 6.6,  W: 1.8, H: 1.00, nac: 2, fin: 2, slots: 2, top: 84, role: 'racer', hull: 0x15090c, trim: 0xff3a2b, run: 4 },
-  drayman:   { L: 7.8,  W: 2.6, H: 1.90, nac: 4, fin: 1, slots: 4, top: 54, role: 'hauler', hull: 0x1a1005, trim: 0xffb04a, run: 1 },
-  nocturne:  { L: 6.8,  W: 2.2, H: 1.35, nac: 4, fin: 0, slots: 3, top: 72, role: 'premium', hull: 0x120b18, trim: 0x9a6bff, run: 0 },
-  mammoth:   { L: 10.5, W: 3.4, H: 2.40, nac: 4, fin: 2, slots: 6, top: 46, role: 'freighter', hull: 0x14161a, trim: 0x6bff8a, run: 3 },
+  lance:     { L: 6.6,  W: 1.8, H: 1.00, nac: 2, fin: 2, slots: 2, top: 84, role: 'racer', hull: 0x15090c, trim: 0xff3a2b, run: 4, edge: 4 },
+  drayman:   { L: 7.8,  W: 2.6, H: 1.90, nac: 4, fin: 1, kit: 2, slots: 4, top: 54, role: 'hauler', hull: 0x1a1005, trim: 0xffb04a, run: 1, edge: 2 },
+  nocturne:  { L: 6.8,  W: 2.2, H: 1.35, nac: 4, fin: 0, kit: 1, slots: 3, top: 72, role: 'premium', hull: 0x120b18, trim: 0x9a6bff, run: 0, edge: 3, pulse: 0.55 },
+  mammoth:   { L: 10.5, W: 3.4, H: 2.40, nac: 4, fin: 2, kit: 3, slots: 6, top: 46, role: 'freighter', hull: 0x14161a, trim: 0x6bff8a, run: 3, edge: 1 },
+  // ── civilian traffic. Five silhouettes, not two. The proportions are deliberately spread:
+  // 2.5:1 (van) to 5.4:1 (limo) in length-to-width, and 1.10 m to 2.55 m tall, so a lane reads as
+  // mixed traffic rather than as one model at three scales.
   taxi_ai:   { L: 6.0,  W: 2.2, H: 1.40, nac: 2, fin: 1, top: 58, role: 'traffic' },
-  hauler_ai: { L: 9.0,  W: 3.0, H: 2.10, nac: 4, fin: 1, top: 46, role: 'traffic' },
+  hauler_ai: { L: 9.0,  W: 3.0, H: 2.10, nac: 4, fin: 1, kit: 3, top: 46, role: 'traffic' },
+  pod_ai:    { L: 4.8,  W: 2.2, H: 1.90, nac: 2, fin: 0, top: 44, role: 'traffic' },      // stubby, tall
+  limo_ai:   { L: 11.2, W: 2.0, H: 1.10, nac: 2, fin: 1, top: 70, role: 'traffic' },      // long, low
+  van_ai:    { L: 7.6,  W: 3.0, H: 2.55, nac: 4, fin: 0, kit: 1, top: 40, role: 'traffic' },
   // §5.3: "the police hull stays black". Its trim is the one that does NOT vary — a patrol craft
   // has to be identifiable at a glance or the light rig exception means nothing.
   patrol:    { L: 7.0,  W: 2.5, H: 1.50, nac: 4, fin: 2, top: 78, role: 'traffic', police: true, hull: 0x0a0b0e, trim: 0xdfeaff, run: 4 },
+  // ── §S2-C's road transports. Aaron: "for now I just want a few longer vehicles that could
+  // represent buses/trams/long transports - but traveling on the roads". `road` collapses the
+  // flying hull, its nacelles and its fins, and raises a box form instead; `nac`/`fin` are still
+  // declared so nothing downstream has to special-case a missing field, and both are ignored.
+  // L is the whole vehicle: a 34 m three-car transport is 34 m, not 3 x 34.
+  bus_road:  { L: 12.0, W: 2.60, H: 3.00, nac: 0, fin: 0, road: 1, top: 16, role: 'road', trim: 0xffb04a, run: 0 },
+  tram_road: { L: 22.0, W: 2.60, H: 3.20, nac: 0, fin: 0, road: 2, top: 14, role: 'road', trim: 0x35e6ff, run: 0 },
+  haul_road: { L: 32.0, W: 3.00, H: 3.40, nac: 0, fin: 0, road: 3, top: 12, role: 'road', trim: 0x6bff8a, run: 0 },
 };
 
 export const CRAFT_IDS = Object.keys(CRAFT_DEFS);
@@ -185,9 +212,17 @@ function station(t, k, out) {
 // gymnastics layer. Positions and normals are pushed flat; `part` and `chine` ride along.
 
 class Mesh {
-  constructor() { this.p = []; this.n = []; this.part = []; this.chine = []; this.t = []; this.tMark = 0.5; }
-  vert(x, y, z, nx, ny, nz, part, chine, t = this.tMark) {
-    this.p.push(x, y, z); this.n.push(nx, ny, nz); this.part.push(part); this.chine.push(chine);
+  constructor() {
+    this.p = []; this.n = []; this.part = []; this.t = [];
+    // Three EDGE channels rather than one chine. `eMark` is the value tri()/quad() stamp on every
+    // vertex they emit, so a strip authored as a quad becomes a lit band without a per-vertex
+    // argument threaded through six call sites.
+    this.eA = []; this.eB = []; this.eC = [];
+    this.tMark = 0.5; this.eMark = [0, 0, 0];
+  }
+  vert(x, y, z, nx, ny, nz, part, e = this.eMark, t = this.tMark) {
+    this.p.push(x, y, z); this.n.push(nx, ny, nz); this.part.push(part);
+    this.eA.push(e[0]); this.eB.push(e[1]); this.eC.push(e[2]);
     this.t.push(t);
   }
   // Flat-shaded triangle: the normal is the face normal, which is what a hard-edged nacelle wants.
@@ -197,7 +232,7 @@ class Mesh {
     let nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
     const l = Math.hypot(nx, ny, nz) || 1;
     nx /= l; ny /= l; nz /= l;
-    for (const v of [a, b, c]) this.vert(v[0], v[1], v[2], nx, ny, nz, part, 0);
+    for (const v of [a, b, c]) this.vert(v[0], v[1], v[2], nx, ny, nz, part);
   }
   quad(a, b, c, d, part) { this.tri(a, b, c, part); this.tri(a, c, d, part); }
   get tris() { return this.p.length / 9; }
@@ -206,20 +241,35 @@ class Mesh {
     g.setAttribute('position', new THREE.Float32BufferAttribute(this.p, 3));
     g.setAttribute('normal', new THREE.Float32BufferAttribute(this.n, 3));
     g.setAttribute('aPart', new THREE.Float32BufferAttribute(this.part, 1));
-    // `aCT` is (chine, station t) in ONE vec2 rather than two floats. Attribute and varying slots
-    // are the scarcest thing in this shader — see the header note on the blank-frame bug — and the
-    // pair are always read together anyway. `t` is what lets a trim run be a PER-INSTANCE span, so
-    // "some craft have only partial trim" is attribute data and not a second mesh.
-    const ct = new Float32Array(this.chine.length * 2);
-    for (let i = 0; i < this.chine.length; i++) { ct[i * 2] = this.chine[i]; ct[i * 2 + 1] = this.t[i]; }
-    g.setAttribute('aCT', new THREE.Float32BufferAttribute(ct, 2));
+    // `aCT` is (shoulder, station t, keel, spine) in ONE vec4. It began as a vec2 of (chine, t)
+    // because attribute and varying slots are the scarcest thing in this shader — see the header
+    // note on the blank-frame bug — and widening a vec2 to a vec4 costs no additional slot, which
+    // is why S2-C's two extra edge channels went here rather than into a second attribute.
+    // `t` is what lets a trim run be a PER-INSTANCE span, so "some craft have only partial trim"
+    // is attribute data and not a second mesh; on a ROAD form the spine channel is reused as the
+    // lit-window-band mask, because a bus has no dorsal spine and does have windows.
+    const n = this.eA.length;
+    const ct = new Float32Array(n * 4);
+    for (let i = 0; i < n; i++) {
+      ct[i * 4] = this.eA[i]; ct[i * 4 + 1] = this.t[i];
+      ct[i * 4 + 2] = this.eB[i]; ct[i * 4 + 3] = this.eC[i];
+    }
+    g.setAttribute('aCT', new THREE.Float32BufferAttribute(ct, 4));
     return g;
   }
 }
 
-// aPart codes. 0 is always drawn; 1-4 are nacelle slots (kept while `slot <= iOpt.x`); 11-12 are
-// fin slots (kept while `slot - 10 <= iOpt.y`).
-const P_ALWAYS = 0, P_NAC = 1, P_FIN = 11;
+// aPart codes.
+//   0      the flying hull core — drawn unless the instance is a ROAD form
+//   1-4    nacelle slots, kept while `slot <= iOpt.x`            (COUNT, nested)
+//   11-12  fin slots, kept while `slot - 10 <= iOpt.y`           (COUNT, nested)
+//   21-23  flying module kits, kept when `slot - 20 == iVar.x`   (EXACT, exclusive)
+//   31-33  road forms, kept when `slot - 30 == iVar.y`           (EXACT, exclusive)
+//
+// Nacelles and fins are counts because two nacelles are a subset of four. Kits and road forms are
+// exact matches because a cargo stack is not a superset of a spine rail and a tram is not a bus
+// with an extra box on it — nesting them would force an ordering that does not exist.
+const P_ALWAYS = 0, P_NAC = 1, P_FIN = 11, P_KIT = 21, P_ROAD = 31;
 
 // Numeric surface normal for the loft. An analytic one exists but the superellipse exponent is
 // itself a function of t, so the derivative is three terms of chain rule for a shape that is
@@ -247,13 +297,21 @@ function hullNormal(t, k, out) {
 // power to tighten the interpolated band into a hairline. The 0.25→0.85 SPAN is deliberately NOT
 // baked here: it is per-instance (`iTrimK`), which is what makes "some vehicles have only partial
 // trim, some none at all" a colour attribute rather than a second geometry.
-function chineAt(t, k) {
-  // k = 1 and k = 5 are theta 30 and 150 degrees — the UPPER SHOULDER line, not the widest line.
-  // The widest line is the true chine and is where §5.4 puts the edge rule, but from the chase
-  // camera and from every angle the player actually sees a craft from, the widest line is exactly
-  // the silhouette edge and the trim disappears into it. The shoulder reads from above, from the
-  // side, and in the `1939970_00` framing.
-  return (k === 1 || k === 5) ? 1 : 0;
+// RING = 12, so k is theta in 30-degree steps: 0 = +x (widest), 3 = top, 6 = -x, 9 = bottom.
+//   A  k 1, 5    the UPPER SHOULDER line
+//   B  k 7, 11   the LOWER SHOULDER — the keel line, which is what an underglow runs along
+//   C  k 3       the SPINE, the top centreline
+//
+// k = 1 and 5 rather than k = 0 and 6: the widest line is the true chine and is where §5.4 puts
+// the edge rule, but from the chase camera and from every angle the player actually sees a craft
+// from, the widest line is exactly the silhouette edge and the trim disappears into it. The
+// shoulder reads from above, from the side, and in the `1939970_00` framing.
+//
+// Three channels rather than one because Aaron asked for "lights highlighting some edges that
+// could be varied per vehicle" — the variation has to be in WHICH edge, not only in its colour,
+// and a per-instance mode picking among three baked channels costs no geometry at all.
+function edgeAt(k) {
+  return [(k === 1 || k === 5) ? 1 : 0, (k === 7 || k === 11) ? 1 : 0, (k === 3) ? 1 : 0];
 }
 
 function buildBody() {
@@ -266,7 +324,7 @@ function buildBody() {
     for (let k = 0; k < RING; k++) {
       P[i].push(station(t, k, [0, 0, 0]).slice());
       N[i].push(hullNormal(t, k, [0, 0, 0]).slice());
-      C[i].push(chineAt(t, k));
+      C[i].push(edgeAt(k));
     }
   }
   // The lofted skin, smooth-shaded from the analytic normals.
@@ -309,7 +367,181 @@ function buildBody() {
 
   for (let s = 0; s < 4; s++) { m.tMark = NACELLE[s].t; pod(m, NACELLE[s], P_NAC + s); }
   for (let s = 0; s < 2; s++) { m.tMark = FIN[s].t; fin(m, FIN[s], P_FIN + s); }
+  buildKits(m);
+  buildRoadForms(m);
+  m.tMark = 0.5; m.eMark = [0, 0, 0];
   return m.geometry();
+}
+
+// An axis-aligned box in unit-hull space, 12 tris, with `t` written per face from the face's own
+// z so a trim run and the window band both track length rather than the whole box taking one t.
+function box(m, x0, y0, z0, x1, y1, z1, part) {
+  const A = [x0, y0, z0], B = [x1, y0, z0], C = [x1, y1, z0], D = [x0, y1, z0];
+  const E = [x0, y0, z1], F = [x1, y0, z1], G = [x1, y1, z1], H = [x0, y1, z1];
+  const tz = z => z + 0.5;
+  const mid = (tz(z0) + tz(z1)) * 0.5;
+  m.tMark = tz(z0); m.quad(B, A, D, C, part);          // -z end (nose)
+  m.tMark = tz(z1); m.quad(E, F, G, H, part);          // +z end (tail)
+  m.tMark = mid;
+  m.quad(A, E, H, D, part);                            // -x flank
+  m.quad(F, B, C, G, part);                            // +x flank
+  m.quad(D, H, G, C, part);                            // roof
+  m.quad(A, B, F, E, part);                            // floor
+}
+
+// A thin lit STRIP: one marked quad, running along z, carrying an edge channel.
+//
+// TWO renders forced this into existence and both are worth keeping.
+//
+// 1. The first cut marked whole box FACES with an edge channel and came back with a bus whose
+//    entire roof was a slab of solid orange and a sponson that was a bar of neon. The chine term
+//    is `pow(edge, 2.2) * 4.2 * RIM_DIM` — on the loft that is a hairline, because the value
+//    interpolates from 1 at two vertices to 0 at their neighbours, but on a marked face every
+//    fragment reads 1 and the "edge light" becomes a coat of paint. An edge light on a FLAT form
+//    has to be an actual thin piece of geometry.
+// 2. The second cut emitted each strip twice with opposite winding so it would be visible from
+//    either side, and shots/s2c/bus_close.png came back with the roofline as a dotted line of red
+//    specks — two coincident planes z-fighting, which at a glance reads as aliasing and is not.
+//    So a strip faces ONE way and the caller says which.
+function stripUp(m, x0, x1, y, z0, z1, e, part) {      // a rail on a roofline, facing +y
+  m.eMark = e;
+  m.quad([x0, y, z0], [x0, y, z1], [x1, y, z1], [x1, y, z0], part);
+  m.eMark = [0, 0, 0];
+}
+
+function stripSide(m, x, sgn, y0, y1, z0, z1, e, part) {   // a band on a flank, facing sgn * x
+  m.eMark = e;
+  const A = [x, y0, z0], B = [x, y0, z1], C = [x, y1, z1], D = [x, y1, z0];
+  if (sgn > 0) m.quad(D, C, B, A, part); else m.quad(A, B, C, D, part);
+  m.eMark = [0, 0, 0];
+}
+
+// ── the flying module kits (§S2-C) ─────────────────────────────────────────
+//
+// Three bolt-on groups, each authored in the same normalised hull coordinates the light rig uses,
+// so a kit sits on the skin of a 4.8 m pod and a 10.5 m freighter without a per-craft number. The
+// point of them is SILHOUETTE: `hauler_ai` with a cargo stack and `taxi_ai` without are two
+// different shapes in the same lane, which is what "no variation" was asking for.
+function buildKits(m) {
+  // kit 1 — a dorsal spine rail. A long low ridge along the crown, marked on the spine channel so
+  // a craft whose edge mode is `spine` lights the rail rather than the hull under it.
+  {
+    const t0 = 0.30, t1 = 0.92;
+    const y0 = HULL.up(0.55) * 0.96, y1 = y0 + 0.055;
+    box(m, -0.055, y0, t0 - 0.5, 0.055, y1, t1 - 0.5, P_KIT + 0);
+    // two ribs, so the rail is a fitting and not an extrusion
+    for (const t of [0.44, 0.72]) box(m, -0.10, y0 - 0.01, t - 0.5 - 0.012, 0.10, y0 + 0.03, t - 0.5 + 0.012, P_KIT + 0);
+    // the rail's own light line, on the spine channel
+    m.tMark = 0.6;
+    stripUp(m, -0.048, 0.048, y1 + 0.004, t0 - 0.48, t1 - 0.52, [0, 0, 1], P_KIT + 0);
+  }
+  // kit 2 — flank sponsons. Two tapered outriggers low on the sides: the mid-body gets wider than
+  // the loft ever goes, which is the one thing a non-uniform scale cannot produce.
+  {
+    const t0 = 0.34, t1 = 0.86;
+    for (const s of [-1, 1]) {
+      const xa = s * HULL.halfW(0.6) * 1.00, xb = s * HULL.halfW(0.6) * 1.42;
+      const lo = Math.min(xa, xb), hi = Math.max(xa, xb);
+      box(m, lo, -0.055, t0 - 0.5, hi, 0.055, t1 - 0.5, P_KIT + 1);
+      // a nose fairing on each, so the pod does not end in a flat wall
+      box(m, lo + 0.01, -0.030, t0 - 0.5 - 0.055, hi - 0.01, 0.030, t0 - 0.5, P_KIT + 1);
+      // a light line along the sponson's outer shoulder
+      m.tMark = 0.6;
+      const xe = s > 0 ? hi : lo;
+      stripUp(m, xe - 0.012, xe + 0.012, 0.058, t0 - 0.48, t1 - 0.52, [1, 0, 0], P_KIT + 1);
+    }
+  }
+  // kit 3 — the cargo stack. A boxy container sitting proud of the spine: this is the freighter
+  // read, and it is the strongest silhouette change in the set.
+  {
+    const y0 = HULL.up(0.62) * 0.92, y1 = y0 + 0.30;
+    box(m, -0.20, y0, -0.10, 0.20, y1, 0.34, P_KIT + 2);
+    // banding straps, and a smaller second container forward — an uneven stack reads as cargo
+    for (const t of [0.02, 0.22]) box(m, -0.215, y0 + 0.04, t - 0.014, 0.215, y0 + 0.09, t + 0.014, P_KIT + 2);
+    box(m, -0.13, y0, -0.30, 0.13, y0 + 0.17, -0.12, P_KIT + 2);
+    // a marker line along the container's top edge
+    m.tMark = 0.75;
+    stripUp(m, -0.19, 0.19, y1 + 0.004, -0.08, 0.32, [0, 0, 1], P_KIT + 2);
+  }
+}
+
+// ── the road transports (§S2-C) ────────────────────────────────────────────
+//
+// Authored in a UNIT BOX — x, y, z all in [-0.5, 0.5] — and scaled by the def's (W, H, L), so
+// y = -0.5 is the road surface and the pose only has to place the vehicle at y = H/2. Nothing
+// about the loft is involved: `road > 0` collapses the hull, its nacelles and its fins, and one
+// of these three is raised instead.
+//
+// Each form is a complete vehicle over the whole unit length, not a segment, because the three
+// are EXCLUSIVE rather than nested — see the aPart note above. The cost of that choice is the two
+// unused forms riding along as degenerate triangles on every instance, which is the same bargain
+// the four nacelles have always taken.
+function buildRoadForms(m) {
+  const WIN = [0, 0, 1];               // the spine channel, reused as the lit-window mask
+
+  // One carriage: a body, a chamfered roof cap, a lit window band down each flank, a skirt, and
+  // a light line where the roof cap meets the body — the shoulder of a bus.
+  const carriage = (z0, z1, part, cab) => {
+    const hw = 0.5, hy0 = -0.34, hy1 = 0.40;
+    m.eMark = [0, 0, 0];
+    box(m, -hw, hy0, z0, hw, hy1, z1, part);
+    // the skirt: inset and darker-reading because it is a separate face at a different angle
+    box(m, -hw * 0.90, -0.50, z0 + 0.004, hw * 0.90, hy0, z1 - 0.004, part);
+    // roof cap, narrower — the chamfer that stops the box being a box
+    box(m, -hw * 0.86, hy1, z0 + 0.006, hw * 0.86, 0.50, z1 - 0.006, part);
+    m.tMark = 0.5;
+    for (const sg of [-1, 1]) {
+      // the ledge where the roof cap steps in from the body — a real 18 cm shoulder rail, seen
+      // from above, which is the angle the player looks at a street from
+      const xe = sg * hw * 0.93;
+      stripUp(m, xe - 0.035, xe + 0.035, hy1 + 0.006, z0 + 0.02, z1 - 0.02, [1, 0, 0], part);
+      // and a keel band on the flank above the skirt, seen from the side
+      stripSide(m, sg * (hw + 0.006), sg, hy0 - 0.012, hy0 + 0.028, z0 + 0.02, z1 - 0.02,
+        [0, 1, 0], part);
+    }
+    // the window band: two thin quads proud of each flank, marked on the window channel
+    m.eMark = WIN;
+    const wy0 = 0.02, wy1 = 0.34, xo = hw + 0.004;
+    const za = z0 + (cab ? 0.055 : 0.012), zb = z1 - 0.012;
+    for (const s of [-1, 1]) {
+      const x = s * xo;
+      const A = [x, wy0, za], B = [x, wy0, zb], C = [x, wy1, zb], D = [x, wy1, za];
+      // Wound so the outward normal is the flank's own: A,B,C,D faces -x, the reverse faces +x.
+      if (s > 0) m.quad(D, C, B, A, part); else m.quad(A, B, C, D, part);
+      // The band has to carry the LENGTH coordinate per vertex or every pane shares one `t` and
+      // the per-window hash in the shader lights the whole strip identically. quad() emits
+      // A,B,C then A,C,D, and both windings above put za/zb in the same six slots.
+      const n = m.t.length;
+      const order = [za, zb, zb, za, zb, za];
+      for (let i = 0; i < 6; i++) m.t[n - 6 + i] = order[i] + 0.5;
+    }
+    m.eMark = [0, 0, 0];
+  };
+
+  // A concertina joint: narrower and shorter than the carriages either side, so an articulated
+  // vehicle visibly bends there. One box — three ribs were 36 tris of detail invisible at 60 m.
+  const joint = (zc, part) => {
+    m.eMark = [0, 0, 0];
+    box(m, -0.42, -0.28, zc - 0.030, 0.42, 0.34, zc + 0.030, part);
+  };
+
+  // form 1 — a bus. One carriage over the whole length, a cab front.
+  carriage(-0.5, 0.5, P_ROAD + 0, true);
+
+  // form 2 — an articulated bus: two carriages and a joint at the middle.
+  carriage(-0.5, -0.03, P_ROAD + 1, true);
+  joint(0.0, P_ROAD + 1);
+  carriage(0.03, 0.5, P_ROAD + 1, false);
+
+  // form 3 — a tram / long transport: three carriages, two joints and a full-length roof rail,
+  // which is the pantograph read even though nothing is drawn above it.
+  carriage(-0.5, -0.19, P_ROAD + 2, true);
+  joint(-0.17, P_ROAD + 2);
+  carriage(-0.15, 0.15, P_ROAD + 2, false);
+  joint(0.17, P_ROAD + 2);
+  carriage(0.19, 0.5, P_ROAD + 2, false);
+  box(m, -0.05, 0.50, -0.44, 0.05, 0.54, 0.44, P_ROAD + 2);
+  m.eMark = [0, 0, 0];
 }
 
 // §5.4's rig and the nacelle placements share one convention: positions are given as a station `t`
@@ -332,6 +564,10 @@ export function localAt(t, fx, fy) {
   const y = fy >= 0 ? HULL.up(t) * fy : HULL.dn(t) * fy;
   return [HULL.halfW(t) * fx, y, t - 0.5];
 }
+
+// The road forms' equivalent: a unit BOX, so nothing tapers and a headlamp at fx = -0.74 sits at
+// 0.74 of the half-width whatever the vehicle's length.
+export function boxAt(t, fx, fy) { return [0.5 * fx, 0.5 * fy, t - 0.5]; }
 
 // A nacelle pod: a 6-sided tube with both ends capped. 6*2*2 + 2*6 = 36 tris.
 function pod(m, d, part) {
@@ -435,48 +671,113 @@ function buildCone() {
 
 const BODY_VERT_DECL = /* glsl */`
 attribute float aPart;
-attribute vec2 aCT;          // x chine, y station t
+attribute vec4 aCT;          // x shoulder, y station t, z keel, w spine (road: lit window band)
 attribute vec4 iTint;         // rgb body colour, w throttle
 attribute vec4 iRim;         // rgb trim colour, w trim amount
 attribute vec4 iOpt;         // x nacelles, y fins, z trim t0, w trim t1
+attribute vec4 iVar;         // x kit, y road form, z edge mode, w edge pulse rate
 varying vec3 vTint;
 varying vec3 vRim;
-varying vec3 vMix;           // x chine, y station t, z trim strength
-varying float vThr;
+varying vec4 vMix;           // x edge mask, y station t, z trim strength, w lit-window mask
+varying vec3 vThr;           // x throttle, y road flag, z pulse rate
 `;
 
-// The part collapse and §5.1's three integer options. `step(a,b)` is 1 when b >= a, so nacelle
-// slot 3 survives only on a craft whose iOpt.x is 4.
+// The part collapse and §5.1's integer options — three when this shipped, five now. `step(a,b)`
+// is 1 when b >= a, so nacelle slot 3 survives only on a craft whose iOpt.x is 4; the kit and
+// road slots use `step(abs(diff), 0.5)` instead, which is an EQUALITY and not a threshold.
 const BODY_VERT_BODY = /* glsl */`
 #include <begin_vertex>
   vTint = iTint.rgb;
-  vThr = iTint.w;
   vRim = iRim.rgb;
+  float road = step( 0.5, iVar.y );
+  vThr = vec3( iTint.w, road, iVar.w );
+  // Which EDGE this vehicle lights, per instance. Six modes over three baked channels; the weights
+  // are equality tests rather than a branch so every craft compiles to the same instruction path.
+  float em = iVar.z;
+  float wS = step( abs( em ), 0.5 ) + step( abs( em - 1.0 ), 0.5 ) + step( abs( em - 4.0 ), 0.5 );
+  float wK = step( abs( em - 2.0 ), 0.5 ) + step( abs( em - 4.0 ), 0.5 ) + step( abs( em - 5.0 ), 0.5 );
+  float wP = step( abs( em - 1.0 ), 0.5 ) + step( abs( em - 3.0 ), 0.5 ) + step( abs( em - 5.0 ), 0.5 );
   // vMix.z is the trim RUN, per instance: its amount and the station span it covers. An amount of
   // 0 is a craft with no trim at all, which is as much a part of the variety as any colour.
-  vMix = vec3( aCT.x, aCT.y, iRim.w
-    * smoothstep( iOpt.z, iOpt.z + 0.07, aCT.y )
-    * ( 1.0 - smoothstep( iOpt.w - 0.07, iOpt.w, aCT.y ) ) );
+  vMix = vec4(
+    wS * aCT.x + wK * aCT.z + ( 1.0 - road ) * wP * aCT.w,
+    aCT.y,
+    iRim.w * smoothstep( iOpt.z, iOpt.z + 0.07, aCT.y )
+      * ( 1.0 - smoothstep( iOpt.w - 0.07, iOpt.w, aCT.y ) ),
+    road * aCT.w );
   {
-    float keep = 1.0;
-    if ( aPart > 10.5 ) keep = step( aPart - 10.0, iOpt.y );
-    else if ( aPart > 0.5 ) keep = step( aPart, iOpt.x );
+    float keep;
+    if ( aPart > 30.5 ) keep = step( abs( aPart - 30.0 - iVar.y ), 0.5 );
+    else if ( aPart > 20.5 ) keep = ( 1.0 - road ) * step( abs( aPart - 20.0 - iVar.x ), 0.5 );
+    else if ( aPart > 10.5 ) keep = ( 1.0 - road ) * step( aPart - 10.0, iOpt.y );
+    else if ( aPart > 0.5 ) keep = ( 1.0 - road ) * step( aPart, iOpt.x );
+    else keep = 1.0 - road;
     transformed *= keep;
   }
 `;
 
 
+// ── the reflection, which is the whole point of S2-C ───────────────────────
+//
+// Aaron, on the shipped build: "I am not seeing one of the main goals of making them look
+// reflective/glassy/futuristic atm." He is right, and the reason is written in this file's own
+// comment three screens down: "our env is a smooth sky bake, so any roughness gives a smooth
+// WASH". A wash is not a reflection. What makes a black lacquered surface read as lacquer is
+// STRUCTURE in what it reflects — a hard bright edge that slides across the panel as the object
+// turns — and a PMREM of a four-stop sky gradient contains no edges at all.
+//
+// A real probe is a second scene render and is not happening on a phone. So the city is
+// RECONSTRUCTED from the reflection direction: vertical slabs of window light around the horizon,
+// a rarer saturated sign among them, warm sodium below. Cost is about thirty ALU on the few
+// hundred pixels a craft covers — no texture fetch, no render target, no draw call, and it is a
+// uniform away from zero on a weak phone.
+//
+// The world-position term is the load-bearing half. Without it the slabs are a fixed pattern in
+// world direction and the reflection only moves when the craft turns; with it, flying two blocks
+// north changes which slab a given direction picks up, which is what "a sign going past" is.
+const CITY_REFL = /* glsl */`
+uniform vec4 uCity;          // x intensity, y reflection floor at normal incidence, z sign gain, w scale
+
+vec3 cityRefl( vec3 d, vec2 wp ) {
+  float el = d.y;
+  float u = atan( d.z, d.x ) * 2.5464 + dot( wp, vec2( 0.0090 ) );   // 8/PI -> 16 slabs a turn
+  float i = floor( u ), f = fract( u );
+  float h = fract( sin( i * 127.1 + 11.7 ) * 43758.5453 );
+  float h2 = fract( h * 197.3 );
+  float wd = 0.09 + 0.22 * h2;
+  // The gaps matter more than the slabs. A first cut fired a slab 66 % of the time over a broad
+  // elevation band, and the render came back with nine chrome craft: fill the reflection and it
+  // is a wash again, just an expensive one. Half the directions must return nothing.
+  float slab = smoothstep( wd + 0.07, wd, abs( f - 0.5 ) ) * step( 0.52, h );
+  // The towers occupy a wedge of elevation and the sky above them is the real envMap's job.
+  float band = exp( -el * el * 44.0 ) * step( -0.30, el );
+  // Window rows inside the slab. Deliberately low contrast: the reflection direction sweeps fast
+  // across a curved hull, and a high-contrast row pattern turns into a moire the moment it does.
+  float rows = 0.72 + 0.28 * sin( el * 46.0 + h * 30.0 );
+  vec3 col = mix( vec3( 1.00, 0.62, 0.26 ), vec3( 0.36, 0.72, 1.00 ), h2 );
+  // The rarer, brighter, saturated one — a sign rather than a window grid. This is the term that
+  // actually reads as a reflection when it slides across the crown.
+  float sgn = step( 0.86, h ) * smoothstep( 0.30, 0.10, abs( f - 0.5 ) ) * exp( -el * el * 90.0 );
+  vec3 sgnCol = mix( vec3( 1.0, 0.14, 0.52 ), vec3( 0.20, 0.95, 1.0 ), fract( h * 53.7 ) );
+  float street = smoothstep( -0.10, -0.55, el );
+  return col * ( slab * band * rows ) + sgnCol * ( sgn * uCity.z )
+    + vec3( 1.0, 0.55, 0.22 ) * ( street * 0.09 );
+}
+`;
+
 const BODY_FRAG_DECL = /* glsl */`
 varying vec3 vTint;
 varying vec3 vRim;
-varying vec3 vMix;
-varying float vThr;
+varying vec4 vMix;
+varying vec3 vThr;
 uniform float uRimAmt;
 uniform vec3 uEngine;
 uniform float uChineAmt;
 uniform float uPanels;
 uniform float uKey;
-`;
+uniform float uTime;
+uniform vec3 uWindow;
+` + CITY_REFL;
 
 // Panel lines, per pixel and not per polygon. A single smooth reflective lozenge reads as a bar of
 // soap however good the material is; seven bands of slightly different roughness break the
@@ -509,16 +810,40 @@ const BODY_FRAG_BODY = /* glsl */`
   // hull the colour of the sky (which is how the first three passes ended up with red craft). So the
   // break comes from a fixed virtual key at a high exponent: bright, narrow, and — because it is
   // additive on top of a near-black albedo — it lights the crown and nothing else.
+  vec3 vRefl = reflect( -geometryViewDir, geometryNormal );
   vec3 kL = normalize( vec3( -0.35, 0.86, 0.37 ) );
-  float kSpec = pow( saturate( dot( reflect( -geometryViewDir, geometryNormal ), kL ) ), 420.0 );
+  float kSpec = pow( saturate( dot( vRefl, kL ) ), 420.0 );
   outgoingLight += vec3( 0.72, 0.78, 0.92 ) * kSpec * uKey;
-  float cRim = pow( 1.0 - saturate( dot( geometryNormal, geometryViewDir ) ), 3.4 );
+  float nv = saturate( dot( geometryNormal, geometryViewDir ) );
+  // The city, in the paint. Fresnel-weighted, because a dielectric clear coat over a black base
+  // reflects a few per cent head-on and nearly everything at a grazing angle — which is exactly
+  // why the reflection lands as a bright rim around the silhouette and a slide across the crown
+  // rather than as a uniform coat, and why it does not turn a near-black hull into a grey one.
+  {
+    vec3 wR = inverseTransformDirection( vRefl, viewMatrix );
+    float fr = mix( uCity.y, 1.0, pow( 1.0 - nv, 3.6 ) );
+    outgoingLight += cityRefl( wR, vWorldPosition.xz * uCity.w ) * ( uCity.x * fr );
+  }
+  float cRim = pow( 1.0 - nv, 3.4 );
   outgoingLight += vRim * cRim * uRimAmt * saturate( vMix.z );
-  outgoingLight += vRim * pow( saturate( vMix.x ), 2.2 ) * uChineAmt * saturate( vMix.z );
+  // §5.4's edge rule, now on WHICH edge and with an optional travelling bead. A craft with
+  // vThr.z = 0 is the steady run this shipped with; the rest carry a chaser, which is the
+  // cheapest thing in the file that reads as "powered" rather than "painted".
+  float pulse = mix( 1.0,
+    0.30 + 0.95 * ( 0.5 + 0.5 * sin( ( vMix.y * 3.0 - uTime * vThr.z ) * 6.2832 ) ),
+    step( 0.01, vThr.z ) );
+  outgoingLight += vRim * pow( saturate( vMix.x ), 2.2 ) * uChineAmt * saturate( vMix.z ) * pulse;
+  // A road transport's lit window band. Per-pane, hashed off the length coordinate, so some panes
+  // are dark and the strip reads as a vehicle with people in it rather than as a light bar.
+  {
+    float pane = floor( vMix.y * 22.0 );
+    float lit = 0.30 + 0.70 * step( 0.34, fract( sin( pane * 91.7 + 3.1 ) * 4375.85 ) );
+    outgoingLight += uWindow * ( saturate( vMix.w ) * lit );
+  }
   // The plume's own light on the hull it is bolted to. Not a real light — a station-space wash over
   // the aft third, scaled by throttle — but it is the difference between "three plasma torches under
   // a black shell" and a craft whose engines are attached to it.
-  outgoingLight += uEngine * smoothstep( 0.52, 0.98, vMix.y ) * vThr * 0.5;
+  outgoingLight += uEngine * smoothstep( 0.52, 0.98, vMix.y ) * vThr.x * 0.5 * ( 1.0 - vThr.y );
   {
     float e = abs( fract( vMix.y * 7.0 ) - 0.5 ) * 2.0;
     outgoingLight *= mix( 1.0, mix( 1.0, 0.45, smoothstep( 0.88, 1.0, e ) ), uPanels );
@@ -546,7 +871,29 @@ export const CRAFT_U = {
   uKey: { value: 0.60 },
   // §5.4's thruster cyan, in linear. One colour for the whole fleet, because §5.4's rig is shared.
   uEngine: { value: new THREE.Color(0x35d6e8).convertSRGBToLinear().multiplyScalar(0.16) },
+  // S2-C's procedural city reflection. `x` is the master amplitude and is what a gate drives to
+  // zero to prove the term is doing the work; `y` is the reflection surviving at normal incidence
+  // (a clear coat is ~4 % head-on, and 0.14 here is that plus a little licence because the hull
+  // has to read at all from directly behind); `z` is the sign gain; `w` scales the world-position
+  // term — 1.0 means the reflection changes over roughly a 110 m block, which is the pitch that
+  // makes a craft crossing a junction pick up a different sign.
+  uCity: { value: new THREE.Vector4(0.46, 0.07, 2.2, 1.0) },
+  // A road transport's interior, warm and dim: it is seen through glass from 60 m up.
+  uWindow: { value: new THREE.Color(0xffd7a0).convertSRGBToLinear().multiplyScalar(0.42) },
+  // The canopy takes the same city at 3.4x the hull's gain — it is glass over a cabin, not clear
+  // coat over black paint — and its alpha runs from nearly clear head-on to nearly opaque at the
+  // grazing angle where a real windscreen becomes a mirror.
+  uGlassRefl: { value: 3.4 },
+  uGlassA: { value: new THREE.Vector2(0.24, 0.92) },
 };
+
+// The one lever the quality preset would want if the measurement said the reflection is too
+// expensive on a weak phone. It is a uniform, so it is also how a gate falsifies the term.
+export function setCityRefl(amount) {
+  const p = CRAFT_U.uCity.value.x;
+  CRAFT_U.uCity.value.x = +amount;
+  return p;
+}
 
 function addPatch(mat, tag, fn) {
   const prev = mat.onBeforeCompile;
@@ -587,6 +934,9 @@ export function bodyMaterial(env) {
     sh.uniforms.uPanels = CRAFT_U.uPanels;
     sh.uniforms.uKey = CRAFT_U.uKey;
     sh.uniforms.uEngine = CRAFT_U.uEngine;
+    sh.uniforms.uCity = CRAFT_U.uCity;
+    sh.uniforms.uWindow = CRAFT_U.uWindow;
+    sh.uniforms.uTime = U.uTime;
     sh.vertexShader = patch(sh.vertexShader, '#include <common>',
       '#include <common>' + BODY_VERT_DECL, 'craft/body-vert-decl');
     sh.vertexShader = patch(sh.vertexShader, '#include <begin_vertex>',
@@ -607,11 +957,39 @@ export function bodyMaterial(env) {
 // §5.3's canopy. MeshStandardMaterial, NOT MeshPhysicalMaterial — transmission is a second render
 // target and is not happening on a phone. FrontSide: transparent + DoubleSide renders twice in
 // r160 and a canopy is a closed cap seen from outside.
+// The canopy read nothing at all in shots/s2c/before_family.png — nine craft and not one visible
+// windscreen — because a constant 0.55 alpha over a near-black metal is a slightly grey patch on
+// a black hull whichever way you look at it. Real glass is the opposite: nearly transparent
+// head-on and nearly a mirror at a grazing angle. So the alpha now RIDES the fresnel, and the
+// same procedural city the hull reflects lands on it at a much higher gain, which is what puts a
+// hard bright sweep across the screen as the craft banks.
+const GLASS_FRAG = /* glsl */`
+  float gnv = saturate( dot( geometryNormal, geometryViewDir ) );
+  float gf = pow( 1.0 - gnv, 3.0 );
+  vec3 gR = inverseTransformDirection( reflect( -geometryViewDir, geometryNormal ), viewMatrix );
+  outgoingLight += cityRefl( gR, vWorldPosition.xz * uCity.w ) * ( uCity.x * uGlassRefl * ( 0.30 + 0.90 * gf ) );
+  // A tint of the frame's own colour at the very edge, so the canopy has a rim and not just a
+  // gradient — the thing that says "there is a pane fitted here" rather than "the paint changed".
+  outgoingLight += vec3( 0.42, 0.62, 0.86 ) * pow( 1.0 - gnv, 7.0 ) * 0.55;
+  diffuseColor.a = mix( uGlassA.x, uGlassA.y, gf );
+#include <opaque_fragment>
+`;
+
 export function glassMaterial(env) {
   const m = new THREE.MeshStandardMaterial({
     color: 0x05070a, metalness: 1.0, roughness: 0.05,
     envMap: env || null, envMapIntensity: 1.35,
-    transparent: true, opacity: 0.55, depthWrite: false, fog: true,
+    transparent: true, opacity: 1.0, depthWrite: false, fog: true,
+  });
+  addPatch(m, 'craft:glass', sh => {
+    sh.uniforms.uCity = CRAFT_U.uCity;
+    sh.uniforms.uGlassRefl = CRAFT_U.uGlassRefl;
+    sh.uniforms.uGlassA = CRAFT_U.uGlassA;
+    sh.fragmentShader = patch(sh.fragmentShader, '#include <common>',
+      '#include <common>\nuniform float uGlassRefl;\nuniform vec2 uGlassA;\n' + CITY_REFL,
+      'craft/glass-decl');
+    sh.fragmentShader = patch(sh.fragmentShader, '#include <opaque_fragment>',
+      GLASS_FRAG, 'craft/glass-body');
   });
   patchFog(m, 'alpha');
   return m;
@@ -759,6 +1137,18 @@ export const LIGHT_RIG = [
 
 // §5.4's ONE piece of per-type light data in the whole game. `patrol` drops the tail strips and
 // the belly strobe and takes a roof bar instead; everything else on it is the civilian rig.
+// S2-C's road transports. Coordinates are in the UNIT BOX the road forms are authored in, not on
+// the loft, so `boxAt` and not `localAt` places them: fx and fy are fractions of the half-width
+// and half-height of the box itself.
+export const ROAD_RIG = [
+  { id: 'lamp', t: 0.005, fx: -0.74, fy: -0.34, col: 0xfff0d0, size: 0.11, i: 0.80, anim: 0 },
+  { id: 'lamp', t: 0.005, fx: 0.74, fy: -0.34, col: 0xfff0d0, size: 0.11, i: 0.80, anim: 0 },
+  { id: 'dest', t: 0.010, fx: 0.00, fy: 0.62, col: 0xffb04a, size: 0.10, i: 0.55, anim: 0 },
+  { id: 'tail', t: 0.995, fx: -0.74, fy: -0.20, col: 0xff2b3a, size: 0.09, i: 0.45, anim: 0, brake: true },
+  { id: 'tail', t: 0.995, fx: 0.74, fy: -0.20, col: 0xff2b3a, size: 0.09, i: 0.45, anim: 0, brake: true },
+  { id: 'roof', t: 0.500, fx: 0.00, fy: 1.04, col: 0x9fd8ff, size: 0.07, i: 0.30, anim: 0 },
+];
+
 export const POLICE_RIG = [
   { id: 'lamp', t: 0.06, fx: -0.55, fy: 0.00, col: 0xdfeaff, size: 0.135, i: 0.85, anim: 0 },
   { id: 'lamp', t: 0.06, fx: 0.55, fy: 0.00, col: 0xdfeaff, size: 0.135, i: 0.85, anim: 0 },
@@ -776,7 +1166,11 @@ const lin = hex => _col.setHex(hex).convertSRGBToLinear();
 // vehicle in the game moves every frame, so there is no static allocation to preserve; what the
 // architecture rule protects (one mesh, packed [0, n), frustumCulled off) is preserved exactly.
 
-const CAP = { body: 40, glass: 40, light: 40 * 6, cone: 40 * 6 };
+// 56, not 40: S2-C's road transports share these fields with the flying population (that is what
+// keeps the whole vehicle layer at §3.8's five draws), so the near set is now 26 flying + up to 8
+// road + the player. The buffers are 56 x 16 floats — 3.5 KB — so the headroom is free and an
+// overflow is a craft that silently does not draw.
+const CAP = { body: 56, glass: 56, light: 56 * 7, cone: 56 * 6 };
 
 export class CraftFields {
   constructor(scene, sky) {
@@ -795,7 +1189,7 @@ export class CraftFields {
     this.geoCone = buildCone();
 
     this.body = this._field('craftBody', this.geoBody, this.matBody, CAP.body,
-      [['iTint', 4], ['iRim', 4], ['iOpt', 4]], 2);
+      [['iTint', 4], ['iRim', 4], ['iOpt', 4], ['iVar', 4]], 2);
     this.glass = this._field('craftGlass', this.geoGlass, this.matGlass, CAP.glass, [], 3);
     this.light = this._field('craftLight', this.geoLight, this.matLight, CAP.light,
       [['iCol', 3], ['iInt', 1]], 4);
@@ -850,6 +1244,12 @@ export class CraftFields {
 
   setVisible(on) { for (const f of this.fields) f.mesh.visible = !!on; return !!on; }
 
+  // The gate's handles on S2-C's material work. They live here rather than in main.js because
+  // main.js is another phase's file and `__game.craftFields` is already exposed — a gate reaching
+  // `craftFields.setCityRefl(0)` is reaching the same object the renderer uses, which is the point.
+  get u() { return CRAFT_U; }
+  setCityRefl(amount) { return setCityRefl(amount); }
+
   setRim(hex) { this.rim.setHex(hex).convertSRGBToLinear(); return this.rim; }
 
   // ── write one craft ──────────────────────────────────────────────────────
@@ -885,8 +1285,18 @@ export class CraftFields {
     A.iRim[bi * 4 + 2] = tr.b * RIM_DIM; A.iRim[bi * 4 + 3] = run.amt;
     A.iOpt[bi * 4] = d.nac; A.iOpt[bi * 4 + 1] = d.fin;
     A.iOpt[bi * 4 + 2] = run.t0; A.iOpt[bi * 4 + 3] = run.t1;
+    // S2-C's two extra options plus the edge rig. `kit` and `road` come off the DEF (a def is a
+    // vehicle type and its shape is not per-instance); `edge` and `pulse` come off the POSE,
+    // because "lights highlighting some edges … varied per vehicle" is exactly a per-instance
+    // property and traffic.js seeds it from the same bytes the colours come from.
+    const road = d.road || 0;
+    A.iVar[bi * 4] = road ? 0 : (d.kit || 0);
+    A.iVar[bi * 4 + 1] = road;
+    A.iVar[bi * 4 + 2] = c.edge !== undefined ? c.edge : (d.edge !== undefined ? d.edge : 0);
+    A.iVar[bi * 4 + 3] = c.pulse !== undefined ? c.pulse : (d.pulse !== undefined ? d.pulse : 0);
 
-    if (c.glass !== false && this.glass.n < this.glass.cap) {
+    // A road transport has no canopy: its glazing is the lit window band in the body geometry.
+    if (c.glass !== false && !road && this.glass.n < this.glass.cap) {
       const gi = this.glass.n++;
       this._m.toArray(this.glass.mesh.instanceMatrix.array, gi * 16);
     }
@@ -907,12 +1317,14 @@ export class CraftFields {
 
     const t = c.t || 0;
     const police = !!d.police;
-    const rig = police ? POLICE_RIG : LIGHT_RIG;
+    const road = !!d.road;
+    const rig = road ? ROAD_RIG : (police ? POLICE_RIG : LIGHT_RIG);
+    const at = road ? boxAt : localAt;
     const thr = clamp(c.throttle === undefined ? 0.35 : c.throttle, 0, 1);
     const brake = c.brake ? 2 : 1;
 
     for (const L of rig) {
-      const lp = localAt(L.t, L.fx, L.fy);
+      const lp = at(L.t, L.fx, L.fy);
       let inten = L.i;
       if (L.anim === 1) inten *= (t * 1.4) % 1 < 0.084 ? 1 : 0.06;
       else if (L.anim === 2) inten *= (t * 2.2) % 1 < 0.42 ? 1 : 0.04;
@@ -939,8 +1351,10 @@ export class CraftFields {
 
     // §5.4's forward lamp cones — 14 m, apex AT the lamp and widening forward, which is the whole
     // reason `iGrad` exists. Placed by translating the instance to the far end and giving it a
-    // negative length, so the apex lands back on the lamp.
-    this._lampCone(d, rx, ry, rz, ux, uy, uz, fx, fy, fz, c, 0xbfd6ff, 14, 2.6, 0.085);
+    // negative length, so the apex lands back on the lamp. A road transport gets a shorter, wider
+    // one: it is 3 m off the deck and its beam ends on tarmac, not in open air.
+    if (road) this._lampCone(d, rx, ry, rz, ux, uy, uz, fx, fy, fz, c, 0xffe6bf, 9, 2.2, 0.075, 0.0, boxAt);
+    else this._lampCone(d, rx, ry, rz, ux, uy, uz, fx, fy, fz, c, 0xbfd6ff, 14, 2.6, 0.085);
     if (police) {
       // decision 6: a sweep light, because a police craft in this genre has one. It illuminates
       // nothing, follows nothing, and is 12 triangles.
@@ -951,10 +1365,24 @@ export class CraftFields {
 
   // A cone whose APEX is on the hull and whose mouth is `len` metres forward. `fwdT` is where the
   // apex sits along the hull (0.06 = the lamps, 0.30 = the police sweep).
-  _lampCone(d, rx, ry, rz, ux, uy, uz, fx, fy, fz, c, col, len, radius, inten, fwdT = 0.06) {
-    const lp = localAt(fwdT, 0, 0);
+  //
+  // ── a P5 bug, found by S2-C and fixed here ─────────────────────────────
+  //
+  // The length was passed NEGATIVE, and the comment on it ("so the apex lands back on the lamp")
+  // described what the author intended rather than what the arithmetic did. Measured on the live
+  // instance matrix at yaw 0, a `kestrel` whose nose is at z = -3.1 had its lamp cone spanning
+  // z -16.73 to -30.73 — a beam floating between 13.6 m and 27.6 m IN FRONT of the craft, never
+  // touching it. It survived since P5 because a faint additive cone in fog reads as haze; S2-C
+  // found it only because a road transport is a slab and the detached wedge beside it was obvious.
+  //
+  // The origin was already right. `_cone` places the ring (local z = 0) at the origin and the apex
+  // (local z = 1) at origin + zAxis, so with the origin at `lamp - len` the axis must be `+len`
+  // for the apex to land on the lamp. gates_s2c B3 asserts exactly that, and can fail: it
+  // measures the apex against the lamp station, not against a tolerance around zero.
+  _lampCone(d, rx, ry, rz, ux, uy, uz, fx, fy, fz, c, col, len, radius, inten, fwdT = 0.06, at = localAt) {
+    const lp = at(fwdT, 0, 0);
     lp[2] -= len / d.L;          // localAt is in unit-hull space; _cone scales z by d.L
-    this._cone(lp, d, rx, ry, rz, ux, uy, uz, fx, fy, fz, c, col, radius, -len, inten, 1);
+    this._cone(lp, d, rx, ry, rz, ux, uy, uz, fx, fy, fz, c, col, radius, len, inten, 1);
   }
 
   _light(lp, d, rx, ry, rz, ux, uy, uz, fx, fy, fz, c, col, size, inten) {

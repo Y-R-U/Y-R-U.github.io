@@ -29,14 +29,19 @@ import { Silhouettes } from './silhouettes.js';
 import { Flight, emptyInput } from './flight.js';
 import { Controls } from './controls.js';
 import { CameraRig } from './camera.js';
-import { Autopilot, Courier } from './autopilot.js';
+import { Autopilot, Courier, LanePilot } from './autopilot.js';
+import * as LanesModule from './lanes.js';
+import { planLaneRoute } from './lanes.js';
 import { SettingsPanel } from './settings.js';
 import { CraftFields, PlayerCraft, CRAFT_DEFS, CRAFT_U, SHOT_CRAFT,
   BODY_TINTS, TRIM_TINTS, TRIM_RUNS, RIM_DIM, LIGHT_RIG, POLICE_RIG } from './craft.js';
 import { Traffic } from './traffic.js';
-import { Cockpit, ChaseStrip } from './hud.js';
+import { Cockpit, ChaseHud } from './hud.js';
 import { Minimap } from './minimap.js';
-import { UI, DockUI, holdFor, CHATTER_MULT } from './ui.js';
+import { UI, DockUI, CabinPanel, holdFor, CHATTER_MULT } from './ui.js';
+import * as Ranks from './ranks.js';
+import * as Story from './story.js';
+import { IntroScene, HirePanel, EndingPanel, StoryVoice, SCRIPT as STORY_SCRIPT } from './storyui.js';
 import { ClientPanel, captureBlur } from './dock.js';
 // P7a (§7). zones.js's analytic half is node-clean; createZoneVisuals takes THREE as an argument.
 import { ZoneField, createZoneVisuals, KIND, VOLUME } from './zones.js';
@@ -319,7 +324,7 @@ function onResize() {
   // dash plane are laid out one way for a landscape frame and another for a portrait one, because a
   // panel that fits a 1.6:1 laptop is off screen at 0.46:1 on a phone. Only a change of
   // arrangement rebuilds anything (hud.js applyLayout).
-  cockpit?.applyLayout(w / h);
+  cockpit?.applyLayout(w / h, rig ? rig.fov : (+S().settings.fov || CAMERA.fov));
 }
 addEventListener('resize', onResize);
 // iOS reports the old size synchronously on orientationchange.
@@ -367,6 +372,14 @@ if (cityR) {
     }
   }
   // ?crd= is already in the profile; fromSave copied it. Nothing else to do.
+
+  // §S2-E. `borrowed` and `flags` are NOT economy — economy.js's toSave/fromSave deliberately
+  // carry six keys and none of them is a story — so they are copied off the profile onto the live
+  // state here and written back by persist(). `borrowed` is the one field S2-D asked S2-E to set:
+  // without it a borrowed hull hands a brand-new player its recovery value as net worth and boots
+  // them several standing rungs up the ladder before the story has started.
+  Game.economy.borrowed = S().borrowed !== false;
+  Game.economy.flags = Array.isArray(S().flags) ? S().flags.slice() : [];
 }
 
 // 'cx,cz' -> the pad object. zonesNear() hands out a display record, not the pad, and canDock /
@@ -412,6 +425,15 @@ function resumeAudio() {
     // Adopting main.js's context beats letting audio.js build a second one: iOS counts contexts
     // against a small per-page budget. Idempotent, so calling it on every gesture is free.
     if (audio) audio.attach(actx);
+    // §S2-E — the story pool is built before the audio bus exists (the panels are constructed at
+    // boot and the bus waits on a gesture), so the handle is attached here rather than passed in.
+    // Without this the Boss decodes into a StoryVoice with no context and every line goes out
+    // silent while the bubbles play perfectly — which is precisely this project's dominant failure
+    // mode wearing a cutscene, so gates_s2e V1 asserts the handle rather than the bubbles.
+    if (storyVoice && audio) {
+      storyVoice.audio = audio;
+      if (story) storyVoice.preload(story.gender);
+    }
   } catch (e) { reportError('audio', e.message); }
 }
 for (const ev of ['pointerdown', 'keydown', 'touchstart']) {
@@ -571,12 +593,34 @@ if (scenario) applyScenario(scenario);
 
 let flight = null, controls = null, rig = null, autopilot = null, settingsUI = null, courier = null;
 let ferry = null;                          // __game.flyTo() — see update()
+// §S2-F — the PLAYER's lane-following autopilot. A THIRD pilot and the only one a player meets:
+// `autopilot` is `?auto=1`'s fixed route (four suites measure against it), `ferry` is a gate's
+// remote control, and this one is the AUTO / HOME keys on the left console. Declared here with the
+// other forward `let`s for the reason the comment below gives — `main.js` has died on a `let` in
+// temporal dead zone three times, and `autoOff()` is called from `update()` well above this file's
+// build block.
+let pilot = null;
 // P6 (§8). Declared up here rather than beside its own build block below, because
 // `applyFlightSettings()` and `registerDerived()` both run before that block and a `let` in
 // temporal dead zone THROWS — it does not read as undefined. Boot died on exactly this once.
-let cockpit = null, minimap = null, chaseStrip = null, hudT = 0, cockpitForced = null;
+let cockpit = null, minimap = null, chaseHud = null, hudT = 0, cockpitForced = null;
+// §S2-E's two-thumb hint, deferred past the cutscene (endIntro fires it). Declared HERE, beside the
+// other forward `let`s, and not beside startIntro() where it is used: the assignment is ~250 lines
+// above that block, and a `let` read before its declaration is executed THROWS rather than reading
+// undefined. Boot died on exactly this while it was declared down there — which is the third time
+// this file has paid for the same mistake, and the reason the comment two lines up exists.
+let controlHint = null;
 const msHud = new Roll(90);
 const ctlEl = document.getElementById('controls');
+const hudRoot = document.getElementById('hud');
+const viewBtn = document.getElementById('btn-view');
+const squelchBtn = document.getElementById('btn-squelch');
+// §S2-E fills S2-A's reserved slot. It ships `hidden` and `disabled` and tickStory() un-hides it
+// the moment there is a hire to extend or a pad to hire from — see index.html's own note.
+const hireBtn = document.getElementById('btn-hire');
+// §S2-F's two autopilot keys, in the switchgear bank S2-A left room for.
+const autoBtn = document.getElementById('btn-auto');
+const homeBtn = document.getElementById('btn-home');
 
 if (cityR && !scenario) {
   const st = S().settings;
@@ -599,15 +643,49 @@ if (cityR && !scenario) {
     controls = new Controls(ctlEl, {
       flip: st.flipSides, btnSize: st.altBtn,
       onSettings: () => settingsUI.toggle(),
-      onKey: k => { if (k === 'escape') settingsUI.toggle(); },
+      // `f` is controls.js' existing key list (f / tab / m / escape) — the desktop shortcut for the
+      // view switch, so the same action exists on both input paths.
+      onKey: k => { if (k === 'escape') settingsUI.toggle(); else if (k === 'f') toggleView(); },
     });
+    // §S2 — the view switch is an ON-SCREEN control, not a cog row. Cockpit is the default view
+    // now (save.js), and the reason this button exists at all is that the cabin shipped behind a
+    // settings row nobody opened: Aaron played the whole build without ever seeing the dashboard.
+    tapBtn(viewBtn, toggleView);
+    // The left console's squelch. It drives §6.5's own `radio` setting through applySettings, so
+    // the cog row and this switch are one setting with two switches rather than two settings.
+    tapBtn(squelchBtn, () => {
+      S().settings.radio = !S().settings.radio;
+      save();
+      applyFlightSettings(S().settings);
+      settingsUI?.refresh();
+      toast(S().settings.radio ? 'Radio on' : 'Radio squelched', 'info', 1400);
+    });
+    // §S2-E — the cabin's HIRE key. Aaron: *"Extending a hire happens from inside the cabin ...
+    // The player must never have to fly somewhere to keep the meter running."* So this opens the
+    // panel wherever the craft is, in the air or on a pad, and it is the same panel the dock uses.
+    tapBtn(hireBtn, () => { if (!hireBtn.disabled) hirePanel?.toggle(story && story.hire ? 'extend' : 'ground'); });
+    // §S2-F. Pressing a LIT key stops the pilot; pressing the other one re-routes without a stop
+    // in between, because "cancel then engage" is two presses for one intention.
+    // The SAME seed traffic.js is built with, not WORLD_SEED: the corridor phases are a function
+    // of it, and a pilot seeded differently would fly a lattice offset from the one the traffic is
+    // on — legal-looking lanes with the wrong cars in them.
+    pilot = new LanePilot({ seed: (city ? city.seed : WORLD_SEED) ^ 0x7a11, level: 0 });
+    tapBtn(autoBtn, () => (pilot.active && autoKey === 'auto' ? autoOff('off') : autoTo(autoTargets, 'auto')));
+    tapBtn(homeBtn, () => (pilot.active && autoKey === 'home' ? autoOff('off') : autoTo(homeTarget, 'home')));
+    paintViewBtn();
     if (!FLAG.nohud) {
       ctlEl.classList.remove('hidden');
       // The one thing a player cannot discover by looking: there is no visible split and no
       // on-screen stick until a thumb lands. One line, five seconds, through the toast system
       // that already exists. Suppressed under ?nohud and ?auto so no shot or gate ever sees it.
-      setTimeout(() => toast(`${st.flipSides ? 'Right' : 'Left'} thumb flies · `
-        + `${st.flipSides ? 'left' : 'right'} thumb looks · ⚙ to swap`, 5200), 900);
+      //
+      // §S2-E — and held back while the cutscene is on screen. This block runs BEFORE startIntro()
+      // and its 900 ms timer would otherwise fire a control hint over the name panel, on the one
+      // screen in the game where there are no thumb controls to hint about. `controlHint` is
+      // called by endIntro() instead when the scene is the one that ran.
+      controlHint = () => toast(`${st.flipSides ? 'Right' : 'Left'} thumb flies · `
+        + `${st.flipSides ? 'left' : 'right'} thumb looks · ⚙ to swap`, 5200);
+      setTimeout(() => { if (!introScene) { controlHint(); controlHint = null; } }, 900);
     }
   }
 }
@@ -678,7 +756,7 @@ if (cityR) {
   minimap = new Minimap(document.getElementById('minimap'),
     { hz: Q.name === 'low' ? HUD.MAP_HZ_LOW : HUD.MAP_HZ, low: Q.name === 'low',
       rotate: S().settings.mapRotate !== false });
-  chaseStrip = new ChaseStrip(document.getElementById('hud-strip'));
+  chaseHud = new ChaseHud(document.getElementById('hud-strip'));
   registerDerived();
 }
 
@@ -747,11 +825,15 @@ if (cityR && Game.zones) {
     charge: units => doCharge(units),
     buyUpgrade: line => doBuy(() => Econ.buyUpgrade(Game.economy, line),
       r => `${Econ.UPGRADES[line].label} L${r.level} fitted — ${r.price} CRD`),
-    buyCraft: id => doBuy(() => Econ.buyCraft(Game.economy, id),
+    buyCraft: id => doBuy(() => buyOwnCraft(id),
       r => `${id.toUpperCase()} in service — ${r.price} CRD. Upgrades were fitted to the old hull.`),
     buyRepair: () => doBuy(() => Econ.buyRepair(Game.economy), r => `Hull cleaned up — ${r.price} CRD`),
     dock: key => { const pad = padOf(key); if (pad) { dockGrace = 0; doDock(pad); } return null; },
     undock: () => { doUndock(); return null; },
+    // §S2-E. The dock's HIRE key opens the SAME panel the cabin key does — hiring from a pad and
+    // extending from the cabin are one transaction with two doors, and two screens for it would
+    // be two screens to keep in step.
+    hire: () => { hirePanel?.show(Story.grounded(story) ? 'ground' : 'extend'); return null; },
   }, { paths: clientPaths });
   // `?courier=1` is a soak, not a gate: it WANTS the boot dock, because §7.4.9's scripted opener
   // only exists on the HUB board and the run starts on the HUB deck.
@@ -760,10 +842,220 @@ if (cityR && Game.zones) {
 
 // The profile is the MIRROR of the economy object, never the other way round: `Game.economy` is
 // the source of truth from construction onward (P7A_WIRING §2).
+// S2-D — STANDING is the second ladder and it is the one that can go DOWN, so it cannot ride on
+// `earn()` the way the licence tier does. It is watched here instead: `persist()` is called after
+// every event that moves money in either direction (a delivery, a charge, a purchase), which is
+// exactly the set of events that can move net worth.
+let standingRung = null;
+function checkStanding(quiet) {
+  if (!Game.economy) return null;
+  const r = Ranks.standingRank(Ranks.netWorth(Game.economy), Game.economy.flags);
+  const was = standingRung;
+  standingRung = r.rung;
+  // The first call after boot only ARMS the watcher. Without this the game would announce the
+  // player's existing standing at every reload, which is a notification about nothing.
+  if (was === null || quiet || r.rung === was) return r;
+  toast(r.rung > was ? `STANDING · ${r.name}` : `STANDING DOWN · ${r.name}`,
+    r.rung > was ? 'pay' : 'warn', 5200);
+  return r;
+}
+
 function persist() {
   if (!Game.economy) return;
   Object.assign(S(), Econ.toSave(Game.economy));
+  // §S2-E's three keys. They are written on the same beat as the economy because every event that
+  // moves money is also an event that can move the arc — a delivery credits the pace EWMA, a
+  // hire spends and changes the hull, and the settlement does both.
+  S().borrowed = !!Game.economy.borrowed;
+  S().flags = (Game.economy.flags || []).slice();
+  if (story) S().story = Story.toSave(story, simTime);
+  checkStanding();
   save();
+}
+// Arm the watcher at boot rather than on the first money event: without this, a player who loads a
+// save and immediately banks a big delivery gets the standing they ALREADY HAD announced as a
+// promotion. `quiet` is what makes that impossible rather than unlikely.
+checkStanding(true);
+
+// ── §S2-E — the story arc ─────────────────────────────────────────────────
+//
+// Four surfaces and one pure module. `js/story.js` decides everything (the pace, the escalation,
+// the endings, what a hire costs); this is the wiring, and it deliberately makes no decisions of
+// its own beyond WHEN to ask.
+//
+// The one ordering rule that matters: **the seizure fires at a DOCK and nowhere else.** Aaron's
+// note is that the player must be standing somewhere they can immediately hire, and §7.4.1's cell
+// is what makes that airtight without a single line of enforcement — charge runs down, so nobody
+// can stay airborne to dodge it.
+
+let story = null;
+let introScene = null, hirePanel = null, endingPanel = null, storyVoice = null;
+// The needle the dash draws, which is NOT the raw pace signal. See hudData().
+let warmthShown = null;
+// A lapsed hire limps at §7.4.3's tow speed. Tracked here rather than read per frame so syncCraft()
+// is the single place that decides what the flight model's maxFwd is.
+let hireLimp = false;
+let hireWarned = false;
+
+if (Game.economy) {
+  story = Story.fromSave(S().story, simTime);
+  // ?story=paid | seized | due | act2 — jump the arc, for testing what act two looks like without
+  // playing 84 minutes to reach it. ?debt=<minutes> winds the meter on instead, which is the one
+  // that exercises the real escalation ladder.
+  if (FLAG.debt !== null) story.t = Math.max(0, FLAG.debt) * 60;
+  if (FLAG.story === 'due') { story.stage = Story.STAGE.DEBT; story.t = Story.WINDOW_S; story.due = true; }
+  else if (FLAG.story === 'paid' || FLAG.story === 'seized') {
+    story.stage = Story.STAGE.DEBT;
+    if (FLAG.story === 'paid') Game.economy.credits = Math.max(Game.economy.credits, Story.DEBT);
+    else Game.economy.credits = Math.min(Game.economy.credits, Story.DEBT - 1);
+    story.t = Story.WINDOW_S; story.due = true;
+  } else if (FLAG.story === 'act2') {
+    story.stage = Story.STAGE.ACT2; story.branch = 'seized'; story.grounded = true;
+    story.wreckLeft = 1; Game.economy.credits = Story.HIRE.SEIZED_CREDITS;
+  }
+}
+
+// Should the cutscene actually play? Explicit both ways — see FLAG.intro in config.js. The default
+// is "a real first-time player yes, a harness no", because a cutscene that blocked the first frame
+// would take eleven gate suites down with it and one that only ran behind a flag would never be
+// measured by any of them.
+function introWanted() {
+  if (!story || story.stage !== Story.STAGE.INTRO) return false;
+  if (FLAG.intro === true) return true;
+  if (FLAG.intro === false) return false;
+  return !(FLAG.nosave || FLAG.auto || FLAG.courier || FLAG.shot || FLAG.nohud);
+}
+
+// Leaving the intro, by any route: confirmed, skipped, or never played at all. ONE function, so
+// the state the game starts in cannot depend on which door was used.
+function beginDebt(pick) {
+  if (!story || story.stage !== Story.STAGE.INTRO) return false;
+  story.stage = Story.STAGE.DEBT;
+  story.name = (pick && pick.name) || story.name || 'COURIER';
+  story.gender = (pick && pick.gender) || story.gender || 'n';
+  story.t = 0;
+  story.rate = Story.BREAK_EVEN;
+  if (Game.economy) Game.economy.borrowed = true;
+  persist();
+  return true;
+}
+
+// The Boss, over the radio-that-is-not-a-radio: his pressure messages arrive as chatter lines
+// tagged `alert`, which is the one tag the S2 A-B contract reserves for "addressed to the player
+// and actionable". Nothing else in the game is allowed to use it for atmosphere, which is exactly
+// why it still means something when he uses it.
+function bossSays(line) {
+  if (!line) return;
+  ui.chatter({ speaker: 'THE BOSS', text: line.text, tag: 'alert' });
+  toast(line.text, line.id === 'clear' ? 'pay' : 'warn', 5600);
+}
+
+function hireState() {
+  return { econ: Game.economy, story, now: simTime };
+}
+
+// Take or extend a hire. The ONE place a hire is bought, so the flight model, the profile and the
+// panel cannot end up describing three different vehicles.
+function doHire(craftId, blocks) {
+  if (!Game.economy || !story) return null;
+  const r = Story.takeHire(story, Game.economy, craftId, blocks, simTime);
+  if (r.ok) {
+    story.grounded = false;
+    hireLimp = false; hireWarned = false;
+    syncCraft();
+    audio?.payment();
+    toast(`${craftId.toUpperCase()} ON HIRE · ${Math.round(r.blocks * Story.HIRE.BLOCK_S / 60)} min · ${r.price} CRD`,
+      'pay', 4200);
+    persist();
+    boardJobs = boardNow();
+    dockUI?.refresh(boardJobs, Game.economy, '');
+    return { ok: true, note: r.wreck ? 'It smells of somebody else and the trim is missing.' : '' };
+  }
+  return { ok: false,
+    note: r.why === 'credits' ? `Short by ${r.short} CRD.`
+      : r.why === 'unknown' ? 'No such hull on the lot.' : 'Not available.' };
+}
+
+// The crew arrive. Called from doDock and NOWHERE else.
+function settleDebt() {
+  if (!story || !Game.economy || story.stage !== Story.STAGE.DEBT || !story.due) return null;
+  const res = Story.settle(story, Game.economy);
+  hireLimp = false; hireWarned = false;
+  // The hull stays visible and flyable-looking until the panel is dismissed; `grounded` is what
+  // actually stops them leaving, and the dock screen is already open over the top of it.
+  syncCraft();
+  persist();
+  // The board behind the panel is still painted from the balance the crew just emptied. It is the
+  // first thing the player sees when the ending closes, and a header reading 4,000 CRD over a
+  // panel that says they were left 90 is the kind of contradiction that reads as a bug in the
+  // ending rather than as a stale repaint.
+  boardJobs = boardNow();
+  dockUI?.refresh(boardJobs, Game.economy, '');
+  radio?.event(res.paid ? 'dispatch_pay' : 'dispatch');
+  endingPanel?.show(res, Game.economy);
+  return res;
+}
+
+if (Game.economy && !FLAG.shot) {
+  hirePanel = new HirePanel(document.getElementById('hire'), {
+    state: hireState,
+    hire: (craft, blocks) => doHire(craft, blocks),
+  });
+  endingPanel = new EndingPanel(document.getElementById('ending'), {
+    close: () => {
+      // Straight from the ending into the thing that replaces the car. `ground` mode is the hire
+      // panel with no hull of its own to extend, which is exactly the situation.
+      if (Story.grounded(story)) hirePanel?.show('ground');
+    },
+  });
+  storyVoice = new StoryVoice({ audio: null, base: './', onError: (k, m) => reportAudio(k, m) });
+}
+
+// ── the intro cutscene ────────────────────────────────────────────────────
+//
+// It runs in `free` mode, which is the mode every fixed-camera gate already uses: the flight model
+// and the rig are both skipped, so the scene owns `camera.position` outright and there is no
+// second writer to fight. The cabin and the chase HUD are off for the same reason — `cockpitShown`
+// and `craftShown` are both false in `free` — so the intro draws its own craft poses instead.
+let introPrevMode = null;
+function startIntro() {
+  if (!cityR || !flight || !city) return false;
+  introScene = new IntroScene(document.getElementById('intro'), THREE, camera, {
+    setZoneDim: k => zoneVis?.setDim(k),
+    gender: g => { if (storyVoice) storyVoice.preload(g); },
+    picked: pick => { if (storyVoice) storyVoice.preload(pick.gender); },
+    voice: (row, gender) => storyVoice?.play(storyVoice.slotFor(row, gender)),
+    done: pick => endIntro(pick),
+  });
+  introPrevMode = mode;
+  mode = 'free';
+  ctlEl.classList.add('hidden');
+  hudRoot.classList.add('hidden');
+  // The crew's hulls. Six of the game's own defs rather than a new asset: they are the SAME
+  // instanced fields every other craft in the world writes into, so the whole cutscene costs zero
+  // extra draw calls (gates_s2e asserts that, because "it looked cheap" is not a measurement).
+  const mobDefs = ['nocturne', 'lance', 'nocturne', 'drayman', 'lance', 'mammoth']
+    .map(id => CRAFT_DEFS[id]).filter(Boolean);
+  introScene.start({ x: flight.px, y: flight.py, z: flight.pz, yaw: flight.heading,
+    def: CRAFT_DEFS[Game.economy.craft] || CRAFT_DEFS.kestrel, mobDefs });
+  storyVoice?.preload(introScene.pick.gender);
+  return true;
+}
+
+function endIntro(pick) {
+  beginDebt(pick);
+  introScene = null;
+  zoneVis?.setDim(1);
+  mode = introPrevMode || 'fly';
+  if (!FLAG.nohud) ctlEl.classList.remove('hidden');
+  hudRoot.classList.remove('hidden');
+  // The camera is wherever the pull-out left it. Snapping the rig back to the craft on the same
+  // frame reads as a cut; `rig.update` eases it because the rig is a spring, and the one thing it
+  // needs is to be told the mode again.
+  rig?.setMode(S().settings.camera);
+  toast(`${story.name} — fifty thousand credits. Take a job.`, 'warn', 6400);
+  if (controlHint) { const h = controlHint; controlHint = null; setTimeout(h, 2600); }
+  return pick;
 }
 
 // Every derived flight number the shop can move, in one place. Buying a hull or a thrust level
@@ -773,6 +1065,11 @@ function syncCraft() {
   if (flight) {
     flight.setCraft(Game.economy.craft);
     flight.maxFwd = Econ.maxFwd(Game.economy);
+    // §S2-E — a LAPSED hire limps. It is §7.4.3's tow speed and not a new mechanic on purpose: the
+    // player has already met a craft that crawls to the nearest pad, so the feeling is recognised
+    // rather than explained. It is also not a fail state — the cabin HIRE key extends from where
+    // you are, and if the account is empty the free tow still finishes the leg.
+    if (hireLimp) flight.maxFwd = Econ.CELL.TOW_SPEED;
     flight.accFwd = 0.74 * flight.maxFwd;
     flight.maxBoost = FLIGHT.MAX_BOOST * (flight.maxFwd / FLIGHT.MAX_FWD);
   }
@@ -814,6 +1111,24 @@ function doCharge(units) {
   if (r.units > 0) { audio?.click(0.8); persist(); }
   return { jobs: boardJobs, state: Game.economy,
     note: r.units > 0 ? `+${Math.round(r.units)} units · ${r.cost} CRD` : 'Nothing to buy.' };
+}
+
+// Buying a hull OUTRIGHT. This is the arc's destination — Aaron's *"eventually you buy your own
+// craft, debt-free, and the burn disappears"* — and it is the one purchase that has to reach into
+// the story rather than only into the economy: it ends the hire, clears `borrowed` so the hull
+// finally counts on the standing ladder, and un-grounds a player who bought their way out of act
+// two's opening rather than hiring their way through it. `Econ.buyCraft` is pure and knows nothing
+// about any of that, which is why this wrapper exists rather than a story import in economy.js.
+function buyOwnCraft(id) {
+  const r = Econ.buyCraft(Game.economy, id);
+  if (!r.ok) return r;
+  Game.economy.borrowed = false;
+  if (story) {
+    story.hire = null;
+    story.grounded = false;
+    hireLimp = false; hireWarned = false;
+  }
+  return r;
 }
 
 function doBuy(fn, ok) {
@@ -863,8 +1178,15 @@ function doDock(pad) {
   // on the same trip each earn a chain step.
   const res = Game.missions.deliver(pad, Game.economy, simTime);
   if (res.ok) {
+    // §S2-E — every credit the player earns is announced to the pace EWMA, exactly as every credit
+    // goes through `economy.earn()`. If a future payment path forgets this call the gauge reads
+    // low and the Boss escalates on a player who is actually fine, so gates_s2e E4 asserts the two
+    // totals against each other rather than trusting the wiring.
+    if (story) for (const r of res.receipts) Story.credit(story, r.credits);
     for (const r of res.receipts) toast(`+${r.credits} CRD · ${r.client ? r.client.name : 'CLIENT'}`, 'pay', 4200);
-    if (res.promoted) toast(`LICENCE TIER ${res.tier}`, 'pay', 5200);
+    // S2-D: a promotion says WHAT you were promoted to. "LICENCE TIER 4" is a number the player
+    // has no way to value; "LANEWRIGHT" is the thing the ladder screen shows them.
+    if (res.promoted) toast(`LICENCE · ${Ranks.courierRank(res.tier).name}`, 'pay', 5200);
     audio?.payment();
     radio?.event('dispatch_pay');
     persist();
@@ -872,11 +1194,21 @@ function doDock(pad) {
   boardJobs = boardNow();
   dockUI?.show(padForPanel(pad), boardJobs, Game.economy);
   wantBlur = true;                        // §7.3's static blur, captured on the next rendered frame
+  // §S2-E — the crew. This is the ONLY call site of settleDebt(), and it is here because the
+  // brief is explicit that the seizure happens at a dock: the player has to be standing somewhere
+  // they can immediately hire. It runs AFTER the board is shown so the ending panel lands on top
+  // of the screen they will be using thirty seconds later rather than over a black frame.
+  if (story && story.due) settleDebt();
+  else if (Story.grounded(story)) hirePanel?.show('ground');
   return res;
 }
 
 function doUndock() {
   if (!dockPad) return false;
+  // §S2-E — act two with no hire on the meter. There is nothing on the pad that is yours, so
+  // UNDOCK opens the hire panel instead of refusing: a button that does nothing is a bug report,
+  // and a button that opens the one screen that can fix the situation is an affordance.
+  if (Story.grounded(story)) { hirePanel?.show('ground'); return false; }
   Game.missions.lock(null);
   dockPad = null;
   Game.dock = null;
@@ -975,6 +1307,56 @@ function updateEconomy(dt, wdt) {
 
   if (mode === 'fly' || mode === 'auto') tickDock(dt);
   if (courier) tickCourier(dt);
+  tickStory(dt);
+}
+
+// §S2-E's per-frame half. Two clocks and neither of them is visible: the debt window, and the hire
+// meter. Both advance on SIM time, so a backgrounded tab (which main.js parks) does not burn either
+// one, and `?time=`/`freezeTime` stop them exactly as they stop everything else.
+function tickStory(dt) {
+  if (!story || !Game.economy || dt <= 0) return;
+
+  const ev = Story.tick(story, Game.economy, dt, simTime);
+  if (ev.boss) bossSays(ev.boss);
+  if (ev.due) {
+    // He does not arrive here — he arrives at the next dock. What arrives here is the last warning,
+    // which is the whole of what the player is owed while they are still in the air.
+    toast('THEY ARE COMING. Be somewhere you can pay.', 'warn', 6800);
+    ui.chatter({ speaker: 'THE BOSS', text: 'We are on our way. Put down somewhere.', tag: 'alert' });
+    persist();
+  }
+
+  // The hire meter. `hireLapsed` is story.js's; everything here is what the CABIN does about it.
+  if (story.hire) {
+    const left = Story.hireLeft(story, simTime);
+    if (left > 0 && left <= Story.HIRE.WARN_S && !hireWarned) {
+      hireWarned = true;
+      toast(`HIRE ENDS IN ${Math.ceil(left)} s — press HIRE to extend`, 'warn', 5200);
+    }
+    if (left <= 0 && !hireLimp) {
+      hireLimp = true;
+      syncCraft();
+      toast('HIRE LAPSED — the hull is recalled and limping. Press HIRE to extend.', 'warn', 7000);
+      ui.chatter({ speaker: 'HIRE DESK', text: 'Meter is out. Bring it back or put money on it.', tag: 'alert' });
+      persist();
+    }
+  }
+  // The cabin key is live exactly when there is something for it to do: on a hire, or grounded.
+  // It is `disabled` rather than removed, because a control that appears and disappears is a
+  // control the player never learns the position of.
+  if (dockUI && dockUI.open) {
+    const left = Story.hireLeft(story, simTime);
+    dockUI.hireLabel = Story.grounded(story) ? 'GROUNDED'
+      : left === null ? '' : left <= 0 ? 'LAPSED' : `${Math.ceil(left / 60)}m`;
+  }
+  if (hireBtn) {
+    const want = !!story.hire || Story.grounded(story);
+    if (hireBtn.classList.contains('hidden') === want) hireBtn.classList.toggle('hidden', !want);
+    hireBtn.disabled = !want;
+    const left = Story.hireLeft(story, simTime);
+    hireBtn.classList.toggle('warn', left !== null && left > 0 && left <= Story.HIRE.WARN_S);
+    hireBtn.classList.toggle('bad', left !== null && left <= 0);
+  }
 }
 
 // ── the `?courier=1` decision layer ───────────────────────────────────────
@@ -1027,6 +1409,74 @@ function tickCourier(dt) {
   if (next) courier.setTarget({ x: next.x, y: next.y, z: next.z });
 }
 
+// ── §S2-F — AUTO and HOME ─────────────────────────────────────────────────
+//
+// Two keys on the left console, one pilot. `autoTo()` engages it, `autoOff()` stops it, and
+// `update()` calls `autoOff('manual')` the instant a thumb touches the stick. The whole of the
+// state is `pilot.active` plus a class on a button, because there is no mode to leave: a stopped
+// pilot is a craft with nobody flying it, which is what a craft always is here.
+//
+// The ladder lives in `js/lanes.js` and the rung is `economy.upgrades.auto`. Level 0 ships with
+// every hull, so this never asks "does the player own an autopilot" — only which one.
+
+function autoTargets() {
+  // What AUTO means, in the order a courier would want it:
+  //   1. the parcel I am carrying, because that is the job
+  //   2. otherwise the nearest board, because that is where the next job is
+  const t = Game.economy && Game.missions ? Game.missions.task(Game.economy, simTime) : null;
+  if (t) return { to: { x: t.x, y: t.y, z: t.z }, label: t.name || 'DROP' };
+  const next = zoneList.find(z => (z.kind === KIND.PAD || z.kind === KIND.HUB) && z.dist > 60);
+  return next ? { to: { x: next.x, y: next.y, z: next.z }, label: next.name || 'PAD' } : null;
+}
+
+function homeTarget() {
+  if (!Game.zones) return null;
+  const h = Game.zones.hubPos;
+  return h ? { to: { x: h[0], y: h[1], z: h[2] }, label: 'HUB' } : null;
+}
+
+function autoTo(pick, key) {
+  if (!flight || !pilot || mode !== 'fly') return null;
+  if (dockPad) { toast('Undock first — the autopilot flies, it does not taxi.', 'warn', 2200); return null; }
+  const t = pick();
+  if (!t) { toast('Nowhere to fly — no job aboard and no pad in range.', 'warn', 2200); return null; }
+  const st = pilot.engage(t.to, {
+    label: t.label,
+    level: Game.economy ? Econ.autoLevel(Game.economy) : 0,
+    from: { x: flight.px, y: flight.py, z: flight.pz },
+  });
+  autoKey = key;
+  paintAutoBtns();
+  const km = (st.plan.total / 1000).toFixed(1);
+  toast(`${st.tier} autopilot · ${t.label} · ${km} km on the lanes`, 'info', 2600);
+  return st;
+}
+
+// `why` is carried into the toast because the three reasons a pilot stops are three different
+// events and collapsing them would hide the interesting one: `manual` is the player taking over,
+// `arrived` is a success, and anything else is the pilot giving up.
+function autoOff(why = 'off') {
+  // `arrived` leaves the pilot INACTIVE with the key still lit — that is the one stop the pilot
+  // makes on its own, and guarding on `active` alone would leave the key glowing over a craft
+  // nobody is flying.
+  if (!pilot || (!pilot.active && !autoKey)) return null;
+  const st = pilot.state();
+  pilot.disengage(why);
+  autoKey = null;
+  paintAutoBtns();
+  if (why === 'manual') toast('Autopilot released — you have the stick.', 'info', 1600);
+  else if (why === 'arrived') toast(`Autopilot: ${st.label} reached.`, 'pay', 2000);
+  return st;
+}
+
+let autoKey = null;                        // 'auto' | 'home' | null — which key is lit
+
+function paintAutoBtns() {
+  const on = !!(pilot && pilot.active);
+  autoBtn?.classList.toggle('on', on && autoKey === 'auto');
+  homeBtn?.classList.toggle('on', on && autoKey === 'home');
+}
+
 // The one data model both §8.2's dash and the chase strip read, so they can never disagree. P7a
 // fills `job`, `nearest` and the real cell curve; every field degrades to a drawn placeholder
 // rather than to a blank panel, which is what keeps those code paths exercised before P7a lands.
@@ -1051,6 +1501,15 @@ function hudData() {
     job: Game.job || null,
     task: Game.job ? { name: Game.job.dest, km: Game.job.km, eta: Game.job.timeLeft } : null,
     nearest,
+    // §S2's top bar. The economy is the source of truth from construction onward; S() is its
+    // mirror and would report the last FLUSHED save, which lags the purse by up to two seconds.
+    credits: Game.economy ? Game.economy.credits : S().credits,
+    bonus: timeBonusFor(Game.job),
+    // The chatter scrollback, drawn by whichever of the two surfaces is live.
+    chat: ui.chatLog(),
+    // Which side §6.5 has put the control cluster on, so the dash's console bay is under it and
+    // not on the far side of the panel from it.
+    flip: !!S().settings.flipSides,
     // §7.4.1's readout, from economy.js's real drain curve. `HUD.CELL_PER_MIN` — the placeholder
     // that stood here — is DELETED, not left beside its replacement (obligation T3's lesson): it
     // modelled 28 minutes from full where the cruise curve gives 5.2, so the dash and the holo
@@ -1063,6 +1522,66 @@ function hudData() {
           * (f ? f.maxFwd : FLIGHT.MAX_FWD)
         : false,
     comms: chat ? { speaker: chat.speaker, level: clamp(chat.left / Math.max(0.001, chat.hold), 0, 1) } : null,
+    // §S2-E's warmth. `null` in act two and during the intro, which is what makes the dash bay go
+    // back to being a blanking plate rather than a gauge reading zero — there is no debt to be
+    // behind on, and a needle parked at cold would be a claim about something that no longer
+    // exists. `warmthShown` is the SMOOTHED value; see below.
+    warmth: warmthShown,
+    warmthState: warmthStateNow(),
+    hire: story && story.hire
+      ? { craft: story.hire.craft, left: Math.max(0, Story.hireLeft(story, simTime)),
+        block: Story.HIRE.BLOCK_S }
+      : null,
+  };
+}
+
+// The needle the panel draws is NOT the raw pace signal, and the reason is a real property of the
+// estimator rather than a cosmetic preference. Earnings arrive as ~800 CRD lumps every 60-90 s, so
+// story.js's EWMA sawtooths by roughly a tenth of full scale between deliveries: it jumps on each
+// payment and decays until the next. That is correct — the mean is the true rate — but a needle
+// that steps once a minute is not a gauge, it is a notification.
+//
+// So the display is low-passed with an 8 s time constant. A temperature gauge having thermal mass
+// is the one kind of smoothing that is diegetically honest, and it is DISPLAY only: `__state.story`
+// reports the raw signal, and every gate reads that rather than the needle.
+const WARMTH_TAU = 8;
+function tickWarmth(dt) {
+  if (!story || !Game.economy || story.stage !== Story.STAGE.DEBT) { warmthShown = null; return; }
+  const p = Story.pace(story, Game.economy);
+  if (warmthShown === null) { warmthShown = p.warmth; return; }
+  warmthShown += (p.warmth - warmthShown) * (1 - Math.exp(-Math.max(0, dt) / WARMTH_TAU));
+}
+
+function warmthStateNow() {
+  if (!story || !Game.economy || story.stage !== Story.STAGE.DEBT) return null;
+  if (story.due) return 'due';
+  return Story.pace(story, Game.economy).clear ? 'clear' : 'pace';
+}
+
+// §S2 — the time bonus as the dash and the chase HUD show it: a figure and a clock of its own,
+// and BOTH DISAPPEAR once the window is missed.
+//
+// `economy.timeBonus()` holds the full +45 % until 65 % of the limit is spent and then decays it
+// linearly to zero at the limit, so there are two honest deadlines and the panel shows the one
+// that is still in front of the player:
+//
+//   while saturated  → the full figure, and the seconds left before it starts eroding
+//   once eroding     → the LIVE figure as it falls, and the seconds left before it reaches zero
+//   at zero          → nothing at all, because there is nothing left to collect
+//
+// Returning the live figure rather than the headline one is deliberate: a panel that kept showing
+// +$385 while the payout had already fallen to +$150 would be lying about money.
+function timeBonusFor(job) {
+  if (!job || !job.timeTotal) return null;
+  const elapsed = job.timeTotal - job.timeLeft;
+  const frac = Econ.timeBonus(job.timeTotal, elapsed);
+  if (frac <= 0) return null;
+  const saturateLeft = job.timeLeft - job.timeTotal * Econ.PAY.TIME_SPAN;
+  const fading = saturateLeft <= 0;
+  return {
+    pay: Math.round(job.pay * frac),
+    left: Math.max(0, fading ? job.timeLeft : saturateLeft),
+    fading,
   };
 }
 
@@ -1071,12 +1590,17 @@ function updateHud(dt) {
   if (!cockpit) return;
   const t0 = performance.now();
   hudT += dt;
+  tickWarmth(dt);
   ui.update();
 
   const show = cockpitShown();
   cockpit.setVisible(show);
   const inFlight = mode === 'fly' || mode === 'auto';
-  chaseStrip.setVisible(inFlight && !show && !FLAG.nohud);
+  chaseHud.setVisible(inFlight && !show && !FLAG.nohud);
+  // Which chat surface is live is a property of the VIEW, and there is only ever one: in the
+  // cabin the dash canvas draws the ticker inside its own housing, so the DOM copy of the same
+  // log stands down. One renderer (ui.js), two presentations — they cannot disagree.
+  hudRoot.classList.toggle('incab', show);
 
   const data = hudData();
   if (show) {
@@ -1100,7 +1624,7 @@ function updateHud(dt) {
       eye: camera.position, data,
     });
   }
-  chaseStrip.draw(data);
+  chaseHud.draw(data);
 
   if (inFlight || mode === 'shot') {
     minimap.update(dt, {
@@ -1135,6 +1659,10 @@ function updateVehicles(dt, t) {
   if (!craftFields || sheetHold) return;
   vehT += dt;
   craftFields.begin();
+  // §S2-E's cutscene writes its own poses — the parked hull and the crew — into the SAME four
+  // instanced fields everything else uses. That is why the scene adds no draw calls: seven craft
+  // in shot are seven more instances of meshes that are already being drawn.
+  if (introScene && introScene.active) for (const p of introScene.poses(vehT)) craftFields.write(p);
   if (craftShown()) {
     const p = flight && (mode === 'fly' || mode === 'auto')
       ? playerCraft.fromFlight(flight, vehT)
@@ -1145,6 +1673,41 @@ function updateVehicles(dt, t) {
     flight && (mode === 'fly' || mode === 'auto') ? Game.player : null);
   craftFields.flush();
   void t;
+}
+
+// A tap handler that works on a phone. `click` alone does NOT: #controls' own touchstart handler
+// calls preventDefault() on every touch it sees — it has to, or the page scrolls under the flight
+// stick — and a prevented touchstart suppresses the compatibility click the browser would
+// otherwise synthesise. controls.js already binds the ▲/▼/boost pad on raw touch events for the
+// same reason. gates_s2a caught this: the button was 73x26 px, uncovered, and did nothing.
+// The `guard` window swallows the trailing click on platforms that still send one.
+function tapBtn(el, fn) {
+  if (!el) return null;
+  let last = 0;
+  const fire = e => { last = performance.now(); e.preventDefault(); fn(); };
+  el.addEventListener('touchend', fire, { passive: false });
+  el.addEventListener('click', () => { if (performance.now() - last > 600) fn(); });
+  return el;
+}
+
+function toggleView() {
+  if (!rig) return null;
+  const next = rig.mode === 'cockpit' ? 'chase' : 'cockpit';
+  S().settings.camera = next;
+  save();
+  applyFlightSettings(S().settings);
+  settingsUI?.refresh();
+  return next;
+}
+
+// The button names the view it will TAKE YOU TO, not the one you are in. Both readings are
+// defensible and they are opposites, so the label carries a verb — "→ CHASE" cannot be read as
+// a status line the way a bare "CHASE" can.
+function paintViewBtn() {
+  if (!viewBtn) return;
+  const chase = rig && rig.mode === 'chase';
+  viewBtn.firstElementChild.textContent = chase ? 'COCKPIT' : 'CHASE';
+  viewBtn.classList.toggle('on', !!chase);
 }
 
 // The ONE place a settings change takes effect, so "which object owns look sensitivity?" cannot
@@ -1159,9 +1722,19 @@ function applyFlightSettings(st) {
   flight.assists = st.assists === 'reduced' ? 'reduced' : 'on';
   rig?.setMode(st.camera);
   rig?.setFov(+st.fov || CAMERA.fov);
+  paintViewBtn();
+  squelchBtn?.classList.toggle('off', st.radio === false);
   controls?.setFlip(st.flipSides);
   controls?.setButtonSize(+st.altBtn || 56);
   minimap?.setRotate(st.mapRotate !== false);       // §8.6's one setting
+  // The cabin layout is a function of the FOV as well as the aspect — every panel and the dash
+  // are sized as fractions of the visible frame, and the FOV is what sets how wide that is. Before
+  // this call the FOV row moved the camera and left the dash at whatever width 62 deg had implied,
+  // which at 58 deg put both holo panels off the sides of a portrait phone.
+  cockpit?.applyLayout(undefined, +st.fov || CAMERA.fov);
+  // §S2 — the FPS / simple-stats row. It drives the EXISTING ?perf overlay rather than a second
+  // one: two overlays answering the same question is how they start disagreeing.
+  perfEl.classList.toggle('hidden', !(FLAG.perf || st.stats));
   if (st.quality && st.quality !== 'auto' && (st.quality === 'low') !== (Q.name === 'low')) {
     window.__game?.setQuality(st.quality);
   }
@@ -1202,6 +1775,18 @@ if (cityR) {
   const p = camera.position;
   Game.player.x = p.x; Game.player.y = p.y; Game.player.z = p.z; Game.player.alt = p.y;
   Game.city = { model: city, render: cityR };
+}
+
+// §S2-E — the opening. It goes here, after the near ring has been generated behind the loading bar
+// and the spawn has placed the craft, because the scene is framed on wherever that left it: a
+// cutscene started before the prewarm would open on an empty grid and fill in around the Boss.
+//
+// Both doors are explicit. `introWanted()` is false for every harness, and the game still has to
+// arrive in the same state either way, so the skip path calls the SAME `beginDebt()` the confirm
+// button does rather than leaving the arc in its `intro` stage where nothing would ever tick it.
+if (story) {
+  if (introWanted()) startIntro();
+  else beginDebt({ name: story.name || 'COURIER', gender: story.gender || 'n' });
 }
 
 // Move the debug camera to whichever gate is being run: ?debug=1&view=tiling|depth|band|boxes.
@@ -1301,7 +1886,7 @@ function frame(now) {
     guardQuality();
   }
 
-  if (FLAG.perf) {
+  if (FLAG.perf || S().settings.stats) {
     perfAcc += dt;
     if (perfAcc > 0.25) { perfAcc = 0; drawPerf(); }
   }
@@ -1313,12 +1898,25 @@ function update(dt) {
   // pass is 20x its size.
   if (flight && (mode === 'fly' || mode === 'auto')) {
     const tf = performance.now();
+    // ── S2-F: the PLAYER's autopilot, and the one rule that makes it worth having ──────────
+    //
+    // The stick is read FIRST and every frame, whether the pilot is flying or not, for two
+    // reasons. `controls.read()` consumes and zeroes the pending look deltas, so skipping it while
+    // the pilot flies would hand the player a lurch made of every pixel they dragged since they
+    // engaged it. And it is what the override tests: if a thumb is on anything, the pilot is off
+    // on that frame — no mode transition, no confirmation, nothing to cancel.
+    const stick = controls ? controls.read() : null;
+    if (pilot && pilot.active) {
+      if (stick && (stick.moveActive || stick.climb !== 0 || stick.boost)) autoOff('manual');
+      else if (dockPad) autoOff('docked');
+    }
     let inp = autopilot ? autopilot.read(simTime, flight, dt)
+      : pilot && pilot.active ? pilot.read(simTime, flight, dt)
       // `__game.flyTo()` — a test-only ferry for the CDP delivery script. It is the SAME Courier
       // `?courier=1` uses, emitting the same `emptyInput()` struct a thumb emits, so what it
       // exercises is the real flight model, the real collision and the real assists. It is not a
       // teleport, and the gate asserts the distance actually flown.
-      : ferry ? ferry.read(simTime, flight, dt) : controls.read();
+      : ferry ? ferry.read(simTime, flight, dt) : stick;
     // §7.2 step 2: "controls lock". A docked craft reads a zeroed stick rather than being skipped,
     // so the model still damps and the alt-hold assist still unwinds — then easeToPad() writes the
     // pose. Skipping flight.update entirely leaves whatever the last frame's velocity was in the
@@ -1332,15 +1930,35 @@ function update(dt) {
     // …and the dock lock outranks both, on a frozen struct nothing can write through.
     if (dockPad) inp = DOCK_INPUT;
     flight.update(dt, inp, cityR);
+    // The pilot's own stop. It sets `arrived` inside read() and hands back a released stick, so by
+    // here the craft is already coasting to a halt under §6.2's damping — exactly what happens
+    // when a player lets go, which is the point.
+    if (pilot && pilot.arrived && autoKey) autoOff('arrived');
     rig.update(dt, cityR);
     const p = Game.player;
     p.x = flight.px; p.y = flight.py; p.z = flight.pz; p.alt = flight.py;
     p.speed = +flight.speed.toFixed(3); p.heading = flight.heading;
     msFly.push(performance.now() - tf);
   }
+  // §S2-E's cutscene. It runs in `free` mode so nothing else is writing the camera, and it returns
+  // where the camera should be rather than moving it — one writer, here, for the same reason
+  // `setCamera` parks the rig.
+  if (introScene && introScene.active) {
+    introScene.update(dt);
+    if (introScene.active) {
+      const c = introScene.cameraFor();
+      camera.position.set(c.x, c.y, c.z);
+      camera.up.set(0, 1, 0);
+      camera.lookAt(c.look.x, c.look.y, c.look.z);
+      camera.updateMatrixWorld(true);
+      const p = Game.player;
+      p.x = flight ? flight.px : c.x; p.z = flight ? flight.pz : c.z;
+      p.y = p.alt = flight ? flight.py : c.y;
+    }
+  }
   // Frozen only by the gate: signage flicker, pulse and the ticker scroll all move on uTime, and
   // a measurement of the LOD ramp taken while they move measures the flicker (`freezeTime`).
-  if (!timeFrozen) { U.uTime.value = simTime; signage?.update(dt, simTime); }
+  if (!timeFrozen) { U.uTime.value = simTime; signage?.update(dt, simTime, camera); }
   sky.setVariant(forcedVariant);
   sky.update(dt, clock);
   variant = forcedVariant || sky.p.name;
@@ -1553,6 +2171,32 @@ Object.defineProperty(window, '__state', {
       credits: Game.economy ? Game.economy.credits : S().credits,
       tier: Game.economy ? Game.economy.tier : S().tier,
       lifetime: Game.economy ? Game.economy.lifetime : S().lifetime,
+      // S2-D's two ladders, so a gate reads what the game believes rather than OCRing a panel.
+      ranks: Game.economy ? Ranks.rankState(Game.economy) : null,
+      // S2-E's arc, RAW. `warmth` here is story.js's signal, not the smoothed needle the dash
+      // draws — a gate that read the needle would be measuring an 8 s low-pass filter and would
+      // pass or fail on how long it had been sitting there.
+      story: story && Game.economy ? {
+        stage: story.stage, name: story.name, gender: story.gender,
+        t: +story.t.toFixed(2), due: !!story.due, branch: story.branch,
+        sent: story.sent.slice(), earned: Math.round(story.earned),
+        grounded: Story.grounded(story),
+        wreckLeft: story.wreckLeft | 0, hireSpend: story.hireSpend | 0, hireBlocks: story.hireBlocks | 0,
+        hire: story.hire ? { craft: story.hire.craft, blocks: story.hire.blocks,
+          spent: story.hire.spent, left: +Story.hireLeft(story, simTime).toFixed(2) } : null,
+        limp: hireLimp,
+        ...Story.pace(story, Game.economy),
+        // The needle, separately, so a gate can assert the two are the same signal without
+        // conflating them.
+        shown: warmthShown === null ? null : +warmthShown.toFixed(4),
+        window: Story.WINDOW_S, debt: Story.DEBT,
+      } : null,
+      intro: introScene ? introScene.stateOf() : null,
+      hirePanel: hirePanel ? hirePanel.stateOf() : null,
+      ending: endingPanel ? endingPanel.stateOf() : null,
+      storyVoice: storyVoice ? storyVoice.state() : null,
+      borrowed: Game.economy ? !!Game.economy.borrowed : null,
+      flags: Game.economy ? (Game.economy.flags || []).slice() : null,
       cargo: Game.economy ? Game.economy.cargo.length : 0,
       cell: Game.economy ? +Econ.cellFrac(Game.economy).toFixed(4) : null,
       cellUnits: Game.economy ? +Game.economy.cellUnits.toFixed(2) : null,
@@ -1582,11 +2226,14 @@ Object.defineProperty(window, '__state', {
       traffic: traffic ? traffic.state() : null,
       // P6 (§8). `hud` is the cabin, `map` the minimap, `ui` the two DOM surfaces.
       hud: cockpit ? { ...cockpit.state(), shown: cockpitShown(),
-        strip: chaseStrip ? chaseStrip.shown : null, ...cockpit.breakdown() } : null,
+        strip: chaseHud ? chaseHud.shown : null, ...cockpit.breakdown() } : null,
       map: minimap ? minimap.state() : null,
       ui: ui.state(),
       input: flight ? { ...(autopilot ? autopilot.inp : controls.inp) } : null,
       auto: autopilot ? autopilot.state() : null,
+      // §S2-F. Separate key from `auto` on purpose: `auto` is the ?auto=1 programme and this is
+      // the player's pilot, and a gate that read one for the other would measure a soak.
+      pilot: pilot ? pilot.state() : null,
       aces: acesOn,
       atlas: { ms: atlas.msBuild, size: atlas.windows.image.width, cell: atlas.windows.userData.cell,
         gutter: atlas.windows.userData.gutter, mips: atlas.windows.userData.levels,
@@ -1680,6 +2327,10 @@ window.__game = {
   get zones() { return Game.zones; },
   get missions() { return Game.missions; },
   get economy() { return Game.economy; },
+  // The economy MODULE, not the state. gates_s2d reads LADDER and CRAFT off it to prove the rank
+  // tables are derived from them rather than a second copy — a check that read a copy of LADDER
+  // would be comparing the copy to itself.
+  economyModule: Econ,
   econ: Econ,
   // T7's isolation. NOT optional and NOT `&&`-guarded at the call site: additive DoubleSide
   // cylinders ride the same frame §3.2.2's dither gate measures. Returns null when there is no
@@ -1718,7 +2369,7 @@ window.__game = {
   haggle: i => (boardJobs[i] ? doHaggle(boardJobs[i]) : null),
   charge: (u = Infinity) => (Game.economy ? doCharge(u) : null),
   buyUpgrade: line => (Game.economy ? doBuy(() => Econ.buyUpgrade(Game.economy, line), r => `L${r.level}`) : null),
-  buyCraft: id => (Game.economy ? doBuy(() => Econ.buyCraft(Game.economy, id), r => `${r.price}`) : null),
+  buyCraft: id => (Game.economy ? doBuy(() => buyOwnCraft(id), r => `${r.price}`) : null),
   grantCredits(n) {
     if (!Game.economy) { S().credits += n | 0; S().lifetime += Math.max(0, n | 0); save(); return null; }
     const r = Econ.earn(Game.economy, n | 0);
@@ -1737,6 +2388,95 @@ window.__game = {
   setCell: u => (Game.economy
     ? (Game.economy.cellUnits = clamp(+u, 0, Econ.cellMax(Game.economy)), Game.economy.cellUnits) : null),
   dockUI: () => (dockUI ? dockUI.stateOf() : null),
+  // S2-D. `ranks()` reads; `setFlags()` is the isolation hook for the story-flag axis S2-E owns —
+  // it returns the resulting rank so "there was nothing to set" is distinguishable from "it was
+  // set and changed nothing" (T10).
+  ranks: () => (Game.economy ? Ranks.rankState(Game.economy) : null),
+
+  // ── §S2-E hooks ─────────────────────────────────────────────────────────
+  // Every one of these is an OVERRIDE, not a suggestion, for the reason `setZones` is: the game
+  // loop owns these fields and a fixture the loop can undo is a fixture that measures nothing.
+  storyModule: Story,
+  story: () => story,
+  storyState: () => (story && Game.economy ? { ...Story.pace(story, Game.economy),
+    stage: story.stage, due: !!story.due, sent: story.sent.slice() } : null),
+  // Wind the debt clock. Takes SECONDS of play, returns the pace signal it produced, so a gate can
+  // walk the escalation ladder without playing 84 minutes.
+  setStoryTime(sec) {
+    if (!story) return null;
+    story.t = Math.max(0, +sec || 0);
+    return Story.pace(story, Game.economy);
+  },
+  // Set the trailing earning rate directly, in CRD/s. This is the axis the gauge reads and the one
+  // a gate has to be able to move without simulating an hour of deliveries.
+  setStoryRate(rate) {
+    if (!story) return null;
+    story.rate = Math.max(0, +rate || 0);
+    warmthShown = null;                 // re-seed the display filter, or the needle lags the fixture
+    return Story.pace(story, Game.economy);
+  },
+  storyTick: (dt = 1) => (story ? Story.tick(story, Game.economy, +dt, simTime) : null),
+  // Force the crew to be due at the next dock.
+  setDue(on = true) { if (!story) return null; story.due = !!on; return story.due; },
+  settle: () => settleDebt(),
+  intro: () => (introScene ? introScene.stateOf() : null),
+  introSkip: () => (introScene ? introScene.skip() : null),
+  introName: (name, gender) => {
+    if (!introScene) return null;
+    if (gender) introScene.pick.gender = gender;
+    if (introScene.nameInput && name !== undefined) introScene.nameInput.value = name;
+    return introScene.confirmName();
+  },
+  // Step the cutscene by sim seconds without waiting for them. `paint()` still runs, so the
+  // bubbles and the leader lines are in their real positions at the frame it lands on.
+  introStep(sec = 1) {
+    if (!introScene || !introScene.active) return null;
+    let left = +sec;
+    // `introScene` is nulled by endIntro() the moment the scene finishes, and endIntro() is called
+    // from inside update() via the `done` hook — so the loop condition cannot read `introScene`
+    // directly or it throws on the step that completes the cutscene. Held locally instead.
+    const sc = introScene;
+    while (left > 0 && sc.active) { sc.update(Math.min(0.5, left)); left -= 0.5; }
+    // Move the camera to where the stepped scene says it should be and repaint. WITHOUT this the
+    // bubbles are projected through the camera the last RENDERED frame left behind, several
+    // seconds of orbit ago — every anchor came back `offscreen` and the leader lines were drawn
+    // to the wrong place. It self-corrected on the next real frame, so a screenshot taken after a
+    // settle looked perfect while anything reading the DOM straight after the hook read a lie.
+    if (introScene && introScene.active) {
+      const c = introScene.cameraFor();
+      camera.position.set(c.x, c.y, c.z);
+      camera.up.set(0, 1, 0);
+      camera.lookAt(c.look.x, c.look.y, c.look.z);
+      camera.updateMatrixWorld(true);
+      introScene.paint();
+    }
+    return introScene ? introScene.stateOf() : null;
+  },
+  openHire: (mode = 'extend') => (hirePanel ? (hirePanel.show(mode), hirePanel.stateOf()) : null),
+  closeHire: () => (hirePanel ? hirePanel.hide() : null),
+  hireState: () => (hirePanel ? hirePanel.stateOf() : null),
+  hire: (craft, blocks = 1) => doHire(craft, blocks),
+  hireCost: (craft, blocks = 1) => (story ? Story.hireCost(story, craft, blocks) : null),
+  // Expire the meter now, so the limp path is testable without waiting five minutes.
+  expireHire() {
+    if (!story || !story.hire) return null;
+    story.hire.until = simTime;
+    return Story.hireLeft(story, simTime);
+  },
+  endingState: () => (endingPanel ? endingPanel.stateOf() : null),
+  closeEnding: () => (endingPanel ? endingPanel.hide() : null),
+  setBorrowed(on) {
+    if (!Game.economy) return null;
+    Game.economy.borrowed = !!on;
+    return Game.economy.borrowed;
+  },
+  zoneDim: k => (zoneVis ? zoneVis.setDim(k) : null),
+  storyVoiceState: () => (storyVoice ? storyVoice.state() : null),
+  setFlags(list) {
+    if (!Game.economy) return null;
+    Game.economy.flags = Array.isArray(list) ? list.slice() : [];
+    return Ranks.rankState(Game.economy);
+  },
   // ── P7b (§7.3, §9.6) ─────────────────────────────────────────────────────
   get clientPanel() { return clientPanel; },
   // Open §7.3's panel for a board slot. Returns null when there is no panel at all, which is
@@ -1769,6 +2509,37 @@ window.__game = {
     return ferry.state();
   },
   flyState: () => (ferry ? ferry.state() : null),
+
+  // ── §S2-F hooks ──────────────────────────────────────────────────────────
+  // Every one returns null rather than false when the thing it drives does not exist, so "there is
+  // no pilot" can never be read as "the pilot did nothing" (T10).
+  pilot: () => (pilot ? pilot.state() : null),
+  // Engage exactly what the console keys engage — the same two functions, so a gate cannot pass
+  // against a code path the buttons do not take.
+  autoEngage: (kind = 'auto') => (kind === 'home' ? autoTo(homeTarget, 'home') : autoTo(autoTargets, 'auto')),
+  autoStop: (why = 'off') => autoOff(why),
+  autoKey: () => autoKey,
+  // §7.2's docking cylinder, so a gate can measure an arrival against the number the game docks
+  // on rather than against a number that looked about right.
+  dockVolume: () => ({ ...VOLUME }),
+  // The rung, as an OVERRIDE: the game loop does not write `upgrades.auto`, but the shop does, and
+  // a fixture the next purchase silently reverts is a fixture that measures nothing.
+  setAutoLevel(n) {
+    if (!Game.economy) return null;
+    Game.economy.upgrades.auto = clamp(n | 0, 0, 3);
+    persist();
+    if (pilot && pilot.active && pilot.target) {
+      pilot.engage(pilot.target, { label: pilot.label, level: Econ.autoLevel(Game.economy),
+        from: { x: flight.px, y: flight.py, z: flight.pz } });
+    }
+    return Econ.autoLevel(Game.economy);
+  },
+  // The planner itself, so a gate can compare the route the pilot FLEW against the route it was
+  // handed without re-deriving the lattice in the gate — which is how a check ends up asserting
+  // its own arithmetic.
+  lanes: () => LanesModule,
+  planRoute: (from, to, level = 0) => planLaneRoute(from, to,
+    { seed: (city ? city.seed : WORLD_SEED) ^ 0x7a11, level }),
 
   // ── P8 hooks (§10) ───────────────────────────────────────────────────────
   get audio() { return audio; },
@@ -1873,7 +2644,7 @@ window.__game = {
   signHash() {
     if (!signage) return null;
     const parts = [];
-    for (const f of [signage.neon, signage.box, signage.heroF, signage.strip, signage.strobe, signage.struct]) {
+    for (const f of [signage.neon, signage.box, signage.heroF, signage.postF, signage.strip, signage.strobe, signage.struct]) {
       const m = f.mesh.instanceMatrix.array;
       const keys = [];
       for (let i = 0; i < f.n; i++) {
@@ -2041,6 +2812,11 @@ window.__game = {
   // The live cabin arrangement, so a gate can derive its own test angles from the geometry it is
   // testing rather than hard-coding numbers that are only true in landscape.
   hudLayout: () => (cockpit ? cockpit.lay : null),
+  // How much of the frame the dash ASSEMBLY covers — lip, consoles and instrument plane, not just
+  // the quad. See hud.js cabinExtent().
+  cabinExtent: fov => (cockpit ? cockpit.cabinExtent(fov === undefined ? undefined : +fov) : null),
+  // The dash's named rectangles, including the two RESERVED bays. See hud.js dashSlots().
+  dashSlots: () => (cockpit ? cockpit.dashSlots(hudData()) : null),
   cockpitParts: () => (cockpit ? cockpit.parts() : null),
   // The falsification hook for "no occupant, no hands, no seat". Nothing in the game calls it.
   testOccupant: on => (cockpit ? cockpit.testOccupant(!!on) : null),
@@ -2080,6 +2856,21 @@ window.__game = {
     for (let i = 0; i < d.length; i += 4 * step) out.push(d[i], d[i + 1], d[i + 2], d[i + 3]);
     return out;
   },
+  // The MEAN colour of one rectangle of the dash canvas. `dashPixels` is a whole-canvas sample and
+  // cannot answer "did the warmth bay change while the cell ring did not", which is the only form
+  // of that question worth asking: a whole-canvas difference moves when the clock in the top bar
+  // ticks over, so it proves nothing about the instrument under test.
+  dashRegion(x, y, w, h) {
+    if (!cockpit) return null;
+    const c = cockpit.dashCanvas;
+    const X = Math.max(0, Math.round(x)), Y = Math.max(0, Math.round(y));
+    const W2 = Math.max(1, Math.min(c.width - X, Math.round(w)));
+    const H2 = Math.max(1, Math.min(c.height - Y, Math.round(h)));
+    const d = c.getContext('2d').getImageData(X, Y, W2, H2).data;
+    let r = 0, g2 = 0, b = 0, n = 0;
+    for (let i = 0; i < d.length; i += 4) { r += d[i]; g2 += d[i + 1]; b += d[i + 2]; n++; }
+    return { x: X, y: Y, w: W2, h: H2, n, r: +(r / n).toFixed(3), g: +(g2 / n).toFixed(3), b: +(b / n).toFixed(3) };
+  },
   dashPixels(step = 8) {
     if (!cockpit) return null;
     const g = cockpit.dashCanvas.getContext('2d');
@@ -2116,6 +2907,21 @@ window.__game = {
   holdFor,                                   // the §8.5 arithmetic, as a pure function
   chatterMult: () => CHATTER_MULT,
   uiState: () => ui.state(),
+  // ── S2-A hooks ───────────────────────────────────────────────────────────
+  // The time bonus as the panels show it, as a PURE function of a job record, so "the bonus and
+  // its clock disappear when the window is missed" is one call instead of a four-minute flight.
+  // Returns null when there is no bonus left, which is exactly what makes the pair vanish.
+  bonusFor: job => timeBonusFor(job),
+  chatLog: () => ui.chatLog(),
+  // The in-cabin panel shell, exposed so a gate can build a SECOND one and show the pattern is
+  // reusable — and so S2-D/E's hire panel and the company layer's screens have an obvious door in.
+  CabinPanel,
+  // S2-D's rank tables, exposed so a gate can install a story-flag FIXTURE in the live registry
+  // rather than testing a copy of the mechanism. S2-E owns the real entries.
+  Ranks,
+  // The view switch, driven the way the button drives it. Returns null when there is no rig at
+  // all, so "there was nothing to switch" cannot be read as "it switched" (T10).
+  toggleView: () => toggleView(),
   get ui() { return ui; },
   zoneTypes: () => ZONE_TYPES,
   hudCost: () => ({ mean: +msHud.mean.toFixed(4), worst: +msHud.worst.toFixed(4) }),

@@ -70,12 +70,17 @@ const PARTS = [
   // The lip is deliberately SHALLOW and pushed back. Its first version was 0.72 m deep centred at
   // 0.66 m, so its near edge came within 0.30 m of the eye — and a horizontal surface that close
   // projects to the bottom 40 % of the frame as featureless black, which on a phone is most of the
-  // screen spent on nothing. Pushed back and thinned, the visible wedge is the bottom ~18 %, and
-  // §8.2's instrument plane now covers most of what is left.
-  ['dash_lip',          'dash',    [0, -0.475, -Z * 0.80],   [1.50, 0.14, 0.52],  [-9, 0, 0]],
-  ['dash_face',         'dash',    [0, -0.368, -Z * 0.64],   [1.24, 0.09, 0.06],  [-30, 0, 0]],
-  ['console_l',         'console', [-0.60, -0.315, -Z * 0.50], [0.20, 0.13, 0.44], [-6, 0, 12]],
-  ['console_r',         'console', [0.60, -0.315, -Z * 0.50],  [0.20, 0.13, 0.44], [-6, 0, -12]],
+  // screen spent on nothing. S2 cut it again: the instrument plane is now roughly half the height
+  // it was, so the lip behind it was re-cut to match rather than being left to fill the gap with
+  // the same featureless black the plane had just stopped covering.
+  ['dash_lip',          'dash',    [0, -0.545, -Z * 0.84],   [1.74, 0.10, 0.40],  [-9, 0, 0]],
+  ['dash_face',         'dash',    [0, -0.455, -Z * 0.67],   [1.42, 0.06, 0.05],  [-30, 0, 0]],
+  // The two side consoles carry S2's "additional buttons around the sides": they are the physical
+  // housings the DOM control cluster sits over, so a lever or a boost key reads as MOUNTED on the
+  // cabin rather than floating in front of it. Raised and brought inboard from P6's pair, which
+  // sat below the instrument plane where nothing ever overlapped them.
+  ['console_l',         'console', [-0.60, -0.415, -Z * 0.53], [0.26, 0.14, 0.38], [-8, 0, 14]],
+  ['console_r',         'console', [0.60, -0.415, -Z * 0.53],  [0.26, 0.14, 0.38], [-8, 0, -14]],
 ];
 
 // The emissive edge rules — §8.1's "4 mm emissive edge rule in the district tint at 0.2".
@@ -83,9 +88,13 @@ const RULES = [
   [[-0.572, 0.16, -Z * 0.955], [0.006, 1.02, 0.004], [0, 0, 10]],
   [[0.572, 0.16, -Z * 0.955], [0.006, 1.02, 0.004], [0, 0, -10]],
   [[0, 0.508, -Z * 0.905], [1.34, 0.006, 0.004], [16, 0, 0]],
-  [[0, -0.326, -Z * 0.645], [1.22, 0.006, 0.004], [-30, 0, 0]],
-  [[-0.60, -0.243, -Z * 0.50], [0.19, 0.005, 0.004], [-6, 0, 12]],
-  [[0.60, -0.243, -Z * 0.50], [0.19, 0.005, 0.004], [-6, 0, -12]],
+  [[0, -0.417, -Z * 0.675], [1.40, 0.006, 0.004], [-30, 0, 0]],
+  [[-0.60, -0.338, -Z * 0.53], [0.25, 0.005, 0.004], [-8, 0, 14]],
+  [[0.60, -0.338, -Z * 0.53], [0.25, 0.005, 0.004], [-8, 0, -14]],
+  // Two short verticals down the inboard face of each console. Small, cheap, and the thing that
+  // reads as "expensive" at a glance: an unbroken run of edge light around a moulded corner.
+  [[-0.485, -0.415, -Z * 0.53], [0.004, 0.12, 0.004], [-8, 0, 14]],
+  [[0.485, -0.415, -Z * 0.53], [0.004, 0.12, 0.004], [-8, 0, -14]],
 ];
 
 // ── §8.3's three panels, and §8.2's dash plane, as an ASPECT-DEPENDENT layout ───────────────
@@ -101,31 +110,81 @@ const RULES = [
 // `wide` is §8.3's left/right/centre-low; `tall` pulls the pair in, narrows them and lifts them
 // above the dash so they frame the view instead of covering it.
 
-export function layoutFor(aspect) {
+export function layoutFor(aspect, fov = CAMERA.fov) {
   const wide = aspect >= 1.15;
-  const lat = wide ? 0.44 : 0.145;
-  const pw = wide ? 0.42 : 0.235;
-  const py = wide ? 0.05 : 0.22;
+  const tan = Math.tan(fov * 0.5 * D2R);
+  // Half-extents of the visible frame AT a given cabin depth. Everything below is expressed as a
+  // fraction of these rather than in metres, because a metre that fits at 62 deg is off screen at
+  // 58 and marooned in the middle at 78 — and the FOV is a settings row the player can drag. The
+  // shipped build had exactly that defect: at the default 62 the left holo panel's outer edge
+  // landed on x = -0.2625 against a visible -0.2626, so it was clipped on every portrait phone.
+  const hw = z => tan * z * aspect;
+  const hh = z => tan * z;
+
+  const zPanel = Z * 0.86, zDash = Z * 0.62;
+  const pHW = hw(zPanel);
+  // Panel width and offset as fractions of the visible half-width, so the pair always frames the
+  // view with a real margin instead of sitting on the edge of it.
+  // S2-D widened the portrait pair from 0.72. At 0.72 a band landed in ~140 CSS px on a 390-wide
+  // phone and no type size survived the mapping; 0.80 buys 16 px each and still leaves a real gap
+  // down the middle of the frame (the two panels together span 1.60 of the 2.0 half-widths).
+  const pw = pHW * (wide ? 0.46 : 0.80);
+  // 0.13, not 0.05. The panels are yawed toward the pilot, so their INBOARD edge is nearer the
+  // camera than their centre and projects wider than the flat half-width predicts — a margin
+  // computed from pw/2 alone still clipped the left panel's first character on a 390 px frame.
+  // The CAP is HUD.HOLO_LAT_DEG and it is not cosmetic: §8.3's look-away fade completes at
+  // HOLO_FADE_DOT (45 deg), and a panel parked further off the axis than ~25 deg is already
+  // part-faded when the pilot is looking straight at the city. gates_p6 measures exactly that.
+  const lat = Math.min(pHW - pw / 2 - pHW * (wide ? 0.13 : 0.09), zPanel * Math.tan(HUD.HOLO_LAT_DEG * D2R));
   const yaw = wide ? 22 : 8;
-  const cw = wide ? 0.50 : 0.22;
-  // The dash canvas has TWO shapes, not one scaled down. In portrait the plane is only ~0.35 m
-  // across at the cabin plane, so the 512x160 landscape sheet renders into roughly 180 device
-  // pixels and its 8 px labels land at three — measured on the first pass and unreadable, which is
-  // the whole reason this branch exists. The portrait sheet is squarer, carries a third of the
-  // information and sets it four times larger. `ar` is height/width and MUST match the quad, or
-  // the type stretches.
-  const dash = wide
-    ? { w: 0.86, ar: HUD.DASH_H / HUD.DASH_W, cw: HUD.DASH_W, ch: HUD.DASH_H }
-    : { w: 0.345, ar: HUD.DASH_TH / HUD.DASH_TW, cw: HUD.DASH_TW, ch: HUD.DASH_TH };
+  // The comms band is §8.3's "centre-low, ONLY when relevant" and it is deliberately the SMALLEST
+  // of the three: with the chatter ticker now living in the dash housing this is a transmission
+  // indicator, not a second place to read the same line. Its first S2 size put a pink slab across
+  // the middle of a portrait frame.
+  const cw = pHW * (wide ? 0.40 : 0.52);
+  const py = hh(zPanel) * (wide ? 0.12 : 0.50);
+
+  // ── the dash plane ────────────────────────────────────────────────────────
+  // S2's "reduce the dash height by almost half". The height is not a free number: the canvas
+  // aspect IS the quad aspect (a mismatch stretches every glyph on it), so the height comes from
+  // config's DASH_H/DASH_W pair and the only lever here is the WIDTH. It is bottom-anchored — the
+  // dash grows up from the floor of the frame rather than being centred on a guess — and capped so
+  // a very wide desktop frame does not hand it the whole viewport.
+  const dsh = wide
+    ? { cw: HUD.DASH_W, ch: HUD.DASH_H, frac: 0.73, cap: 1.42 }
+    : { cw: HUD.DASH_TW, ch: HUD.DASH_TH, frac: 0.96, cap: 0.52 };
+  const ar = dsh.ch / dsh.cw;
+  const dw = Math.min(2 * hw(zDash) * dsh.frac, dsh.cap);
+  const pitch = -34;
+  // Seating the plane on the floor of the frame is a PERSPECTIVE problem, not a flat one. Tilting
+  // it about its own centre swings the near edge toward the eye — and a nearer edge projects
+  // further down — so anchoring on `y - h·cos/2` against a flat half-height put the whole bottom
+  // third of the dashboard, rounded corners and chat box included, below the bottom of the screen
+  // on a landscape phone. It looked plausible in a portrait screenshot, which is exactly why it
+  // survived a pass. Both edges are projected properly here and the BOTTOM one is placed.
+  const dh = dw * ar;
+  const yc = Math.cos(pitch * D2R) * dh * 0.5, zc = Math.abs(Math.sin(pitch * D2R)) * dh * 0.5;
+  const MARGIN = 0.02;                                // fraction of the half-frame left under it
+  const dashY = yc - (1 - MARGIN) * tan * (zDash - zc);
+  const topN = (dashY + yc) / (tan * (zDash + zc));   // normalised screen y of the plane's top edge
+  const projH = dw * ar * Math.cos(pitch * D2R);
+
   return {
-    wide, aspect: +aspect.toFixed(4),
-    dash: { ...dash, y: -0.26, z: -Z * 0.62, pitch: -34 },
+    wide, aspect: +aspect.toFixed(4), fov: +fov.toFixed(2),
+    // What fraction of the frame's WIDTH one holo panel covers. drawHolo picks its dense or its
+    // sparse variant from this rather than from `wide`, because the thing that decides whether
+    // 13 px type survives is how many device pixels the panel gets — and a landscape PHONE gives
+    // it about as few as a portrait one does.
+    panelFrac: +(pw / (2 * pHW)).toFixed(4),
+    dash: { w: dw, ar, cw: dsh.cw, ch: dsh.ch, y: +dashY.toFixed(4), z: -zDash, pitch,
+      // what the QUAD costs the frame, top edge to the floor, after the perspective divide
+      screenFrac: +((topN + 1) / 2).toFixed(4), projH: +projH.toFixed(4) },
     // Every panel is h = w/3 because all three share one 384-wide, 128-tall band of the same
     // CanvasTexture. A panel quad at a different aspect from its band is stretched text.
     panels: [
-      { id: 'job',   pos: [-lat, py, -Z * 0.86], rot: [-4, yaw, 0], w: pw, h: pw / 3, band: 0 },
-      { id: 'zone',  pos: [lat, py, -Z * 0.86], rot: [-4, -yaw, 0], w: pw, h: pw / 3, band: 1 },
-      { id: 'comms', pos: [0, wide ? -0.10 : 0.06, -Z * 0.74], rot: [-11, 0, 0],
+      { id: 'job',   pos: [-lat, py, -zPanel], rot: [-4, yaw, 0], w: pw, h: pw / 3, band: 0 },
+      { id: 'zone',  pos: [lat, py, -zPanel], rot: [-4, -yaw, 0], w: pw, h: pw / 3, band: 1 },
+      { id: 'comms', pos: [0, -hh(Z * 0.74) * (wide ? 0.34 : 0.54), -Z * 0.74], rot: [-11, 0, 0],
         w: cw, h: cw / 3, band: 2 },
     ],
   };
@@ -148,6 +207,13 @@ export class Cockpit {
     const w = window.innerWidth || 1280, h = window.innerHeight || 720;
     return h > 0 ? w / h : 16 / 9;
   }
+
+  // §8.3's two drawings. The dense one is the full four-line panel; the sparse one carries the
+  // same facts in a third of the lines at twice the size, and it is the right one whenever the
+  // panel lands in fewer than ~260 CSS pixels — which a landscape phone does just as surely as a
+  // portrait one. Choosing on orientation instead put 13 px type onto five device pixels on
+  // every 844x390 handset, which is the defect §8.2's two dash sheets exist to avoid.
+  holoDense() { return this.lay.panelFrac * (window.innerWidth || 1280) >= 260; }
 
   constructor(scene, Q, sky, atlas) {
     this.scene = scene;
@@ -221,12 +287,17 @@ export class Cockpit {
     // ── §8.2 dash ────────────────────────────────────────────────────────
     // The canvas is SIZED by the layout, not by a constant: portrait gets a squarer sheet with
     // larger type (see layoutFor). LOW halves whichever sheet the layout picked.
-    this.lay = layoutFor(this.aspectNow());
+    this.fov = CAMERA.fov;
+    this.lay = layoutFor(this.aspectNow(), this.fov);
     this.dashCanvas = document.createElement('canvas');
     this.sizeDash();
     this.dashTex = new THREE.CanvasTexture(this.dashCanvas);
     this.dashTex.colorSpace = THREE.SRGBColorSpace;
-    this.dashMat = new THREE.MeshBasicMaterial({ map: this.dashTex, fog: false, transparent: false });
+    // TRANSPARENT, which is what buys S2's "rounded corners, no hard rectangles": the housing is
+    // painted inside a rounded path and everything outside it is left as cleared alpha, so the
+    // corner is a real corner against the lip behind it rather than a black square with a curve
+    // drawn on it. `depthWrite` stays on — the plane is opaque where it is painted at all.
+    this.dashMat = new THREE.MeshBasicMaterial({ map: this.dashTex, fog: false, transparent: true });
     this.dash = new THREE.Mesh(dashGeo(this.lay), this.dashMat);
     this.dash.name = 'cockpit.dash';
     this.dash.frustumCulled = false;
@@ -241,9 +312,26 @@ export class Cockpit {
     this.holoCanvas.width = this.holoW; this.holoCanvas.height = this.holoH * 3;
     this.holoTex = new THREE.CanvasTexture(this.holoCanvas);
     this.holoTex.colorSpace = THREE.SRGBColorSpace;
+    // ── S2-D: the panels are NORMAL-blended, and that is the fix, not a preference ─────────
+    //
+    // The S2-A handover called these "the least legible thing in the cabin and the two largest UI
+    // objects in the view". The cause was structural rather than cosmetic. ADDITIVE blending can
+    // only ever ADD to what is behind it, so a panel over a bright tower can never be darker than
+    // the tower — the text had no floor to sit on and washed out exactly where the city is
+    // brightest. On top of that `drawHolo` painted 30 %-black scanlines over every second pair of
+    // rows, which under additive blending does not darken the CITY at all; it only subtracts from
+    // the panel's own glyphs. Two mechanisms, both removing contrast, neither adding any.
+    //
+    // Normal blending gives the symbology a combiner to sit on: the canvas now carries a dark
+    // tinted glass plate and the neon is drawn opaque over it. That is also the truer reading of
+    // Aaron's own definition — a HUD reflected onto a windscreen is a semi-transparent frame with a
+    // transparent background of the same colour, which is an alpha statement, not an additive one.
+    //
+    // Cost: nothing. Same mesh, same draw call, same texture. gates_p6 asserts the cabin is exactly
+    // 5 draws and it still is.
     this.holo = new THREE.Mesh(buildPanels(this.lay.panels), new THREE.MeshBasicMaterial({
       map: this.holoTex, vertexColors: true, transparent: true, fog: false,
-      blending: THREE.AdditiveBlending, depthWrite: false,
+      blending: THREE.NormalBlending, depthWrite: false,
     }));
     this.holo.name = 'cockpit.holo';
     this.holo.frustumCulled = false;
@@ -263,21 +351,29 @@ export class Cockpit {
     return [this.dashCanvas.width, this.dashCanvas.height];
   }
 
-  // Called from main.js' onResize. Only a change of ARRANGEMENT rebuilds anything — a window drag
-  // that stays landscape costs a layout object and nothing else.
-  applyLayout(aspect = this.aspectNow()) {
-    const lay = layoutFor(aspect);
-    const same = this.lay && lay.wide === this.lay.wide;
+  // Called from main.js' onResize AND from the FOV settings row, because the layout is a function
+  // of both: everything in `layoutFor` is a fraction of the visible frame, and the FOV is what sets
+  // how wide that frame is. Two levels of rebuild, because they cost different things —
+  // ARRANGEMENT (portrait ↔ landscape) swaps the canvas and its texture, while a FOV nudge only
+  // re-cuts two small geometries. A drag that changes neither costs a layout object and nothing.
+  applyLayout(aspect = this.aspectNow(), fov = this.fov) {
+    this.fov = fov;
+    const lay = layoutFor(aspect, fov);
+    const arrangement = !this.lay || lay.wide !== this.lay.wide;
+    const moved = arrangement || Math.abs(lay.fov - this.lay.fov) > 0.4
+      || Math.abs(lay.dash.w - this.lay.dash.w) > 1e-4;
     this.lay = lay;
-    if (same) return false;
-    this.sizeDash();
-    // A CanvasTexture whose canvas changed SIZE has to be replaced, not flagged: three uploads the
-    // new dimensions only on a fresh texture and otherwise samples a stale allocation.
-    this.dashTex.dispose();
-    this.dashTex = new THREE.CanvasTexture(this.dashCanvas);
-    this.dashTex.colorSpace = THREE.SRGBColorSpace;
-    this.dashMat.map = this.dashTex;
-    this.dashMat.needsUpdate = true;
+    if (!moved) return false;
+    if (arrangement) {
+      this.sizeDash();
+      // A CanvasTexture whose canvas changed SIZE has to be replaced, not flagged: three uploads
+      // the new dimensions only on a fresh texture and otherwise samples a stale allocation.
+      this.dashTex.dispose();
+      this.dashTex = new THREE.CanvasTexture(this.dashCanvas);
+      this.dashTex.colorSpace = THREE.SRGBColorSpace;
+      this.dashMat.map = this.dashTex;
+      this.dashMat.needsUpdate = true;
+    }
     this.dash.geometry.dispose();
     this.dash.geometry = dashGeo(lay);
     this.holo.geometry.dispose();
@@ -323,6 +419,45 @@ export class Cockpit {
       this._occupant = null;
     }
     return !!this._occupant;
+  }
+
+  // How much of the FRAME the dash assembly eats, top edge down, as a fraction of frame height.
+  //
+  // This is the number S2's "reduce the dash height by almost half — it currently eats the bottom
+  // third" is actually about, and it is not `lay.dash.screenFrac`: the player sees the instrument
+  // PLANE plus the lip behind it plus the two side consoles, and in portrait the lip was the
+  // larger half of that. Every box corner is projected to a normalised screen y (−1 at the bottom
+  // of the frame, +1 at the top) through the same perspective the camera uses, and the answer is
+  // the highest one any dash or console part reaches. A gate that measured only the quad would
+  // have reported a cut the player could not see.
+  cabinExtent(fov = this.fov) {
+    const t = Math.tan(fov * 0.5 * D2R);
+    let top = -1;
+    const consider = (y, z) => {
+      if (z >= -1e-3) return;                       // behind or at the eye: not on screen
+      top = Math.max(top, y / (t * -z));
+    };
+    for (const p of PARTS) {
+      if (p[1] !== 'dash' && p[1] !== 'console') continue;
+      const [, py, pz] = p[2], [, sy, sz] = p[3];
+      for (const dy of [-0.5, 0.5]) for (const dz of [-0.5, 0.5]) {
+        // the rotations here are at most 30 deg about X, which moves a corner by less than the
+        // corner spacing itself — the AABB of the untransformed box is the conservative envelope
+        consider(py + sy * dy + Math.abs(sz * dz * Math.sin(p[4][0] * D2R)), pz + sz * dz);
+      }
+    }
+    // …and the instrument plane, whose top edge is a function of the live layout
+    const L = this.lay.dash;
+    const h = L.w * L.ar;
+    const yc = h * 0.5 * Math.cos(L.pitch * D2R), zc = h * 0.5 * Math.abs(Math.sin(L.pitch * D2R));
+    consider(L.y + yc, L.z - zc);
+    // The plane's BOTTOM edge, reported because it is where a real defect hid: the near edge is
+    // closer to the eye than the centre and projects further down, and the first S2 layout put it
+    // at -1.03 — the bottom third of the dashboard, rounded corners and chat box included, was
+    // below the floor of the screen on a landscape phone and looked fine in a portrait capture.
+    const planeBottom = (L.y - yc) / (t * (Math.abs(L.z) - zc));
+    return { top: +top.toFixed(4), frac: +((top + 1) / 2).toFixed(4), fov: +fov.toFixed(1),
+      plane: L.screenFrac, planeBottom: +planeBottom.toFixed(4) };
   }
 
   // Every mesh in the cabin, with what it is and how big. §13's "no occupant, no hands, no seat
@@ -460,19 +595,35 @@ export class Cockpit {
       this.fade[p] = +k.toFixed(4);
       for (let v = 0; v < 4; v++) {
         const i = p * 4 + v;
-        col.setXYZ(i, k, k, k);
+        // RGB *and* alpha. See the note on the material: with normal blending, brightness alone
+        // fades a panel to a dark rectangle rather than out of the way.
+        col.setXYZW(i, k, k, k, k);
       }
     }
     col.needsUpdate = true;
     return this.fade.slice();
   }
 
-  // ── §8.2's canvas ───────────────────────────────────────────────────────
-  // Two layouts, dispatched on the arrangement the aspect chose. They are not the same drawing at
-  // two scales: the portrait sheet drops the heading tape, the lane ticks and the cargo row, and
-  // spends the space it wins on three numbers a player can read at arm's length. Judged on a
-  // phone in portrait, which is the platform the brief names first — the landscape sheet scaled
-  // into a 0.35 m plane put 8 px labels onto three device pixels.
+  // ── §8.2's canvas — S2's dashboard ──────────────────────────────────────
+  //
+  // Aaron's two words for two different things, and this file now holds both of them:
+  //
+  //   DASHBOARD — physically part of the vehicle. Opaque, moulded, lit from its own bezel, with
+  //               screw bosses, a brushed sheen and rounded corners. That is THIS canvas.
+  //   HUD       — a semi-transparent neon frame reflected onto the windscreen. That is the holo
+  //               panels below, and the chase-view surface at the bottom of this file.
+  //
+  // Three rules the drawing obeys:
+  //
+  //  1. **It is a pure function of `d`.** Nothing here reads a clock, a random or `this.t`. The
+  //     same data twice must produce byte-identical pixels or gates_p6's §8.2 falsification —
+  //     which asserts exactly that, and then that changing speed/alt/cell DOES move it — cannot
+  //     tell an instrument from noise.
+  //  2. **Rounded, never rectangular.** The housing is a rounded path and everything outside it is
+  //     cleared alpha (the material is transparent), so the corners are corners.
+  //  3. **Variety of form.** A circular dial for speed, a segmented ring for the cell, a
+  //     rectangular tape for altitude, pips for the hold. Aaron asked for it in those words and a
+  //     panel of five identical bars is the thing he was asking not to get.
   drawDash(d) {
     this.dashDraws++;
     const c = this.dashCanvas, g = c.getContext('2d');
@@ -481,30 +632,203 @@ export class Cockpit {
     g.clearRect(0, 0, c.width, c.height);
     g.save();
     g.scale(c.width / W, c.height / H);                 // LOW draws the same layout at half scale
-    g.fillStyle = '#070a10';
-    g.fillRect(0, 0, W, H);
-    g.strokeStyle = 'rgba(53,230,255,0.14)';
-    g.lineWidth = 1.5; g.strokeRect(0.75, 0.75, W - 1.5, H - 1.5);
-    if (this.lay.wide) this._dashWide(g, d, W, H);
-    else this._dashTall(g, d, W, H);
+    const R = HUD.DASH_R;
+    const S = this.dashSlots(d);
+    this._housing(g, W, H, R);
+    if (S.bay) this._bay(g, ...S.bay, R);
+    this._topBar(g, d, S.x0, S.iw, S.bar, R);
+    g.save();
+    rrect(g, 0, 0, W, H, R); g.clip();
+    if (this.lay.wide) this._dashWide(g, d, S);
+    else this._dashTall(g, d, S);
+    g.restore();
+    this._greeble(g, W, H, R);
     g.restore();
     this.dashTex.needsUpdate = true;
     return this.dashDraws;
   }
 
-  // The shared pieces, so the two layouts cannot disagree about what a redline or a lane tick is.
+  // The moulding. A vertical gradient from a lit top lip to a shadowed belly is what separates
+  // "expensive" from "a black rectangle with numbers on it" — a flat fill has no surface, and a
+  // surface is the whole claim the word dashboard makes.
+  _housing(g, W, H, R) {
+    const grad = g.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#1e2733');
+    grad.addColorStop(0.10, '#131b26');
+    grad.addColorStop(0.58, '#0c121a');
+    grad.addColorStop(1, '#101822');
+    g.save();
+    rrect(g, 0, 0, W, H, R); g.clip();
+    g.fillStyle = grad; g.fillRect(0, 0, W, H);
+    // a soft glow behind the instrument cluster, so the panel looks lit from within
+    const spot = g.createRadialGradient(W * 0.5, H * 1.05, 0, W * 0.5, H * 1.05, W * 0.5);
+    spot.addColorStop(0, 'rgba(53,230,255,0.055)');
+    spot.addColorStop(1, 'rgba(53,230,255,0)');
+    g.fillStyle = spot; g.fillRect(0, 0, W, H);
+    // the lit top edge of the moulding. One 2 px sweep is most of what says "this is a surface
+    // with a light on it" rather than "this is a dark rectangle".
+    const lip = g.createLinearGradient(0, 0, W, 0);
+    lip.addColorStop(0, 'rgba(190,225,245,0.04)');
+    lip.addColorStop(0.5, 'rgba(190,225,245,0.22)');
+    lip.addColorStop(1, 'rgba(190,225,245,0.04)');
+    g.fillStyle = lip; g.fillRect(0, 0, W, 1.6);
+    g.restore();
+    // outer bezel: one bright hairline on the top lip, one dark one under it
+    g.lineWidth = 2;
+    g.strokeStyle = 'rgba(150,205,235,0.30)';
+    rrect(g, 1, 1, W - 2, H - 2, R - 1); g.stroke();
+    g.lineWidth = 1;
+    g.strokeStyle = 'rgba(0,0,0,0.55)';
+    rrect(g, 3, 3, W - 6, H - 6, R - 3); g.stroke();
+  }
 
-  // §8.2's 200 deg speed arc with a thin needle, redline past 85 % of max.
+  // The blank moulded column the DOM control cluster sits over. It carries a rail and a couple of
+  // fixings and NOTHING a player has to read, which is the point of it.
+  _bay(g, x, y, w, h, R) {
+    g.save();
+    rrect(g, 0, 0, this.lay.dash.cw, this.lay.dash.ch, R); g.clip();
+    const grad = g.createLinearGradient(x, 0, x + w, 0);
+    grad.addColorStop(0, 'rgba(20,27,37,0.0)');
+    grad.addColorStop(0.35, 'rgba(20,27,37,0.85)');
+    grad.addColorStop(1, 'rgba(11,15,21,0.95)');
+    g.fillStyle = grad; g.fillRect(x, y, w, h);
+    g.strokeStyle = 'rgba(150,200,230,0.16)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(x + 0.5, y + 4); g.lineTo(x + 0.5, y + h - 4); g.stroke();
+    g.restore();
+  }
+
+  // §8.2's thin top bar: money, the live job with its clock, and the time bonus with its own.
+  // The bonus PAIR disappears the moment the bonus window is gone (S2, explicit) — a reward that
+  // is no longer collectable must not keep a slot on the panel implying that it is.
+  _topBar(g, d, x0, W, h, R) {
+    g.save();
+    // clipped to the HOUSING path, not to its own box, so the bar inherits the two rounded top
+    // corners instead of squaring them off again
+    rrect(g, 0, 0, this.lay.dash.cw, h * 4, R); g.clip();
+    const grad = g.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, 'rgba(24,34,46,0.95)');
+    grad.addColorStop(1, 'rgba(9,13,19,0.95)');
+    g.fillStyle = grad; g.fillRect(x0, 0, W, h);
+    g.restore();
+    g.strokeStyle = 'rgba(53,230,255,0.28)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(x0 + 6, h + 0.5); g.lineTo(x0 + W - 6, h + 0.5); g.stroke();
+    g.save();
+    g.translate(x0, 0);
+
+    const wide = this.lay.wide;
+    const fs = wide ? 1 : 1.18;                       // portrait sets everything larger
+    const cy = h / 2;
+    const tape = wide ? 168 : 0;                      // landscape keeps §8.2's heading tape
+    let x = 12;
+
+    // money
+    g.textBaseline = 'middle'; g.textAlign = 'left';
+    g.fillStyle = 'rgba(120,150,175,0.95)';
+    g.font = `700 ${Math.round(8 * fs)}px ui-monospace, Menlo, monospace`;
+    g.fillText('CRD', x, cy - 6 * fs);
+    g.fillStyle = '#6cff9c';
+    g.font = `400 ${Math.round(16 * fs)}px ui-monospace, Menlo, monospace`;
+    g.fillText(commas(Math.round(d.credits || 0)), x, cy + 5 * fs);
+    x += Math.max(72, g.measureText(commas(Math.round(d.credits || 0))).width + 26);
+    divider(g, x - 12, h);
+
+    // the job: name, fee, clock
+    const jobW = W - tape - x - 12 - (d.bonus ? (wide ? 132 : 120) : 0);
+    if (d.job) {
+      g.fillStyle = 'rgba(120,150,175,0.95)';
+      g.font = `700 ${Math.round(8 * fs)}px ui-monospace, Menlo, monospace`;
+      g.fillText(fit(g, `→ ${String(d.job.dest || '').toUpperCase()}`, jobW), x, cy - 6 * fs);
+      g.fillStyle = '#eaf6ff';
+      g.font = `400 ${Math.round(14 * fs)}px ui-monospace, Menlo, monospace`;
+      const fee = `$${commas(d.job.pay || 0)}`;
+      g.fillText(fee, x, cy + 5 * fs);
+      const late = (d.job.timeLeft || 0) <= 0;
+      g.fillStyle = late ? '#ff5a52' : (d.job.timeLeft < 45 ? '#ffb238' : 'rgba(207,226,245,0.9)');
+      g.font = `400 ${Math.round(12 * fs)}px ui-monospace, Menlo, monospace`;
+      g.fillText(`⏱ ${mmss(d.job.timeLeft)}`, x + g.measureText(fee).width + 14, cy + 4 * fs);
+    } else {
+      g.fillStyle = 'rgba(125,142,163,0.8)';
+      g.font = `500 ${Math.round(11 * fs)}px ui-monospace, Menlo, monospace`;
+      g.fillText(fit(g, 'NO JOB — dock at a HUB pad', jobW), x, cy);
+    }
+
+    // the bonus, and its own countdown. Both go together or neither is drawn.
+    if (d.bonus) {
+      const bx = W - tape - (wide ? 128 : 116);
+      divider(g, bx - 12, h);
+      g.fillStyle = 'rgba(255,178,56,0.85)';
+      g.font = `700 ${Math.round(8 * fs)}px ui-monospace, Menlo, monospace`;
+      g.fillText('BONUS', bx, cy - 6 * fs);
+      g.fillStyle = '#ffb238';
+      g.font = `400 ${Math.round(14 * fs)}px ui-monospace, Menlo, monospace`;
+      const bp = `+$${commas(d.bonus.pay)}`;
+      g.fillText(bp, bx, cy + 5 * fs);
+      g.fillStyle = d.bonus.fading ? '#ff5a52' : 'rgba(255,178,56,0.75)';
+      g.font = `400 ${Math.round(12 * fs)}px ui-monospace, Menlo, monospace`;
+      g.fillText(`⏱ ${mmss(d.bonus.left)}`, bx + g.measureText(bp).width + 12, cy + 4 * fs);
+    }
+
+    if (tape) {
+      divider(g, W - tape - 4, h);
+      this._headingTape(g, d, W - tape + 6, 3, tape - 16, h - 6);
+    }
+    g.restore();
+  }
+
+  // Screw bosses in the four corners and a vent grille on the belly. Pure surface detail, drawn
+  // last so it sits over everything, and the cheapest half of the gap between "good for basic"
+  // and "expensive" — a moulded panel has fixings and it has air.
+  _greeble(g, W, H, R) {
+    const k = R * 0.62;
+    for (const [x, y] of [[k, H - k * 0.85], [W - k, H - k * 0.85]]) {
+      g.beginPath(); g.arc(x, y, 3.4, 0, 6.2832);
+      g.fillStyle = 'rgba(0,0,0,0.5)'; g.fill();
+      g.lineWidth = 1; g.strokeStyle = 'rgba(160,190,215,0.28)'; g.stroke();
+      g.beginPath(); g.moveTo(x - 2, y); g.lineTo(x + 2, y);
+      g.strokeStyle = 'rgba(160,190,215,0.22)'; g.stroke();
+    }
+    // vent slots, bottom centre
+    const vw = Math.min(96, W * 0.16), vx = W / 2 - vw / 2, vy = H - 9;
+    g.fillStyle = 'rgba(0,0,0,0.42)';
+    for (let i = 0; i < 5; i++) g.fillRect(vx + i * (vw / 5), vy, vw / 5 - 3, 3.2);
+  }
+
+  // ── the shared instrument vocabulary ────────────────────────────────────
+  // Written once so the two arrangements cannot disagree about what a redline, a lane tick or a
+  // faded chatter line is.
+
+  // §8.2's 200 deg speed arc with a thin needle, redline past 85 % of max. The one CIRCULAR
+  // instrument with a moving pointer.
   _speedArc(g, d, cx, cy, R, numSize) {
     const speed = d.speed || 0, maxSpeed = d.maxSpeed || F.MAX_FWD;
     const A0 = 170 * D2R, A1 = A0 + 200 * D2R;
+    // a recessed well behind the dial, so it reads as sunk into the moulding
+    const well = g.createRadialGradient(cx, cy - R * 0.2, R * 0.2, cx, cy, R * 1.34);
+    well.addColorStop(0, 'rgba(4,9,15,0.85)');
+    well.addColorStop(0.75, 'rgba(10,17,26,0.55)');
+    well.addColorStop(1, 'rgba(14,22,32,0.0)');
+    g.fillStyle = well;
+    g.beginPath(); g.arc(cx, cy, R * 1.34, 0, 6.2832); g.fill();
+    g.lineWidth = 1; g.strokeStyle = 'rgba(150,200,230,0.16)';
+    g.beginPath(); g.arc(cx, cy, R * 1.30, 0, 6.2832); g.stroke();
+
     g.lineCap = 'butt';
     g.lineWidth = R * 0.13;
-    g.strokeStyle = 'rgba(53,230,255,0.16)';
+    g.strokeStyle = 'rgba(53,230,255,0.24)';
     g.beginPath(); g.arc(cx, cy, R, A0, A1); g.stroke();
     g.strokeStyle = 'rgba(255,43,58,0.45)';
     g.beginPath(); g.arc(cx, cy, R, A0 + (A1 - A0) * 0.85, A1); g.stroke();
+    // minor graduations, which is what makes an arc read as an instrument rather than a progress bar
+    g.lineWidth = 1.2; g.strokeStyle = 'rgba(150,190,215,0.34)';
+    for (let i = 0; i <= 10; i++) {
+      const a = A0 + (A1 - A0) * (i / 10), o = i % 5 === 0 ? R * 0.20 : R * 0.11;
+      g.beginPath();
+      g.moveTo(cx + Math.cos(a) * (R + R * 0.09), cy + Math.sin(a) * (R + R * 0.09));
+      g.lineTo(cx + Math.cos(a) * (R + R * 0.09 + o), cy + Math.sin(a) * (R + R * 0.09 + o));
+      g.stroke();
+    }
     const k = clamp(speed / maxSpeed, 0, 1);
+    g.lineWidth = R * 0.13;
     g.strokeStyle = k > 0.85 ? '#ff5a52' : '#35e6ff';
     g.beginPath(); g.arc(cx, cy, R, A0, A0 + (A1 - A0) * k); g.stroke();
     const na = A0 + (A1 - A0) * k;
@@ -513,6 +837,8 @@ export class Cockpit {
     g.moveTo(cx + Math.cos(na) * R * 0.28, cy + Math.sin(na) * R * 0.28);
     g.lineTo(cx + Math.cos(na) * (R + R * 0.09), cy + Math.sin(na) * (R + R * 0.09));
     g.stroke();
+    g.beginPath(); g.arc(cx, cy, R * 0.10, 0, 6.2832);
+    g.fillStyle = 'rgba(234,246,255,0.85)'; g.fill();
     g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillStyle = d.boost ? '#ffb238' : '#eaf6ff';
     g.font = `300 ${numSize}px ui-monospace, Menlo, monospace`;
@@ -520,154 +846,341 @@ export class Cockpit {
     g.fillStyle = 'rgba(150,170,192,0.95)';
     g.font = `600 ${Math.round(numSize * 0.34)}px ui-monospace, Menlo, monospace`;
     g.fillText('M/S', cx, cy + numSize * 0.62);
-    const mode = d.boost ? 'BOOST' : d.altHold ? 'ALT HOLD' : null;
-    if (mode) {
-      g.fillStyle = d.boost ? '#ffb238' : 'rgba(53,230,255,0.9)';
-      g.font = `700 ${Math.round(numSize * 0.32)}px ui-monospace, Menlo, monospace`;
-      g.fillText(mode, cx, cy - R * 0.62);
+  }
+
+  // The cell, as a SEGMENTED RING — deliberately a different circular form from the speed dial's
+  // swept arc and needle, so two round instruments side by side do not read as a pair of clones.
+  _cellRing(g, d, cx, cy, R, numSize) {
+    const cell = d.cell === undefined ? 1 : d.cell;
+    const A0 = 130 * D2R, A1 = A0 + 280 * D2R;
+    const N = 18, gap = (A1 - A0) / N * 0.30, seg = (A1 - A0) / N - gap;
+    const col = cell < 0.15 ? '#ff2b3a' : '#ffb04a';
+    g.lineCap = 'butt';
+    g.lineWidth = R * 0.22;
+    for (let i = 0; i < N; i++) {
+      const a = A0 + i * (seg + gap);
+      g.strokeStyle = (i + 0.5) / N < cell ? col : 'rgba(255,178,56,0.13)';
+      g.beginPath(); g.arc(cx, cy, R, a, a + seg); g.stroke();
+    }
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = col;
+    g.font = `300 ${numSize}px ui-monospace, Menlo, monospace`;
+    g.fillText(`${Math.round(cell * 100)}`, cx, cy - numSize * 0.02);
+    g.fillStyle = 'rgba(150,170,192,0.95)';
+    g.font = `600 ${Math.round(numSize * 0.40)}px ui-monospace, Menlo, monospace`;
+    g.fillText('% CELL', cx, cy + numSize * 0.58);
+    // §7.4.1's minutes-of-cruise, which is the number that actually decides whether to divert
+    if (d.cellMinutes !== undefined && d.cellMinutes !== null) {
+      g.fillStyle = d.cellMinutes < 3 ? '#ff5a52' : 'rgba(255,178,56,0.7)';
+      g.font = `400 ${Math.round(numSize * 0.36)}px ui-monospace, Menlo, monospace`;
+      g.fillText(`${Math.round(d.cellMinutes)} MIN`, cx, cy + R + numSize * 0.42);
     }
   }
 
-  // A labelled vertical gauge with a big number beside it. `ticks` draws §8.2's lane-altitude set.
-  _gauge(g, { x, y, w, h, k, label, value, color, dim, ticks, numSize, labelSize }) {
-    g.fillStyle = dim; g.fillRect(x, y, w, h);
-    g.fillStyle = color;
-    g.fillRect(x, y + h * (1 - k), w, h * k);
-    if (ticks) {
-      g.strokeStyle = 'rgba(207,226,245,0.5)'; g.lineWidth = 1;
-      for (const la of LANE_ALT) {
-        const kk = clamp((la - F.ALT_MIN) / (F.ALT_MAX - F.ALT_MIN), 0, 1);
-        const ty = y + h * (1 - kk);
-        g.beginPath(); g.moveTo(x - 3, ty); g.lineTo(x + w + 3, ty); g.stroke();
+  // Altitude as a horizontal RECTANGULAR tape with the seven traffic-lane ticks on it. The third
+  // form, and the right one for altitude: a lane is a place on a scale, not a fraction of a whole.
+  _altTape(g, d, x, y, w, h, fs) {
+    const alt = d.alt || 0;
+    const k = clamp((alt - F.ALT_MIN) / (F.ALT_MAX - F.ALT_MIN), 0, 1);
+    const col = alt > F.ALT_WARN ? '#ffb238' : '#35e6ff';
+    g.fillStyle = 'rgba(2,5,9,0.75)';
+    rrect(g, x, y, w, h, h / 2); g.fill();
+    g.fillStyle = col;
+    g.save(); rrect(g, x, y, w, h, h / 2); g.clip();
+    g.fillRect(x, y, w * k, h);
+    g.restore();
+    g.strokeStyle = 'rgba(207,226,245,0.45)'; g.lineWidth = 1;
+    for (const la of LANE_ALT) {
+      const kk = clamp((la - F.ALT_MIN) / (F.ALT_MAX - F.ALT_MIN), 0, 1);
+      g.beginPath(); g.moveTo(x + w * kk, y - 2); g.lineTo(x + w * kk, y + h + 2); g.stroke();
+    }
+    g.lineWidth = 1; g.strokeStyle = 'rgba(150,200,230,0.22)';
+    rrect(g, x, y, w, h, h / 2); g.stroke();
+    g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.fillStyle = 'rgba(120,150,175,0.95)';
+    g.font = `700 ${Math.round(9 * fs)}px ui-monospace, Menlo, monospace`;
+    g.fillText('ALT', x, y - 7);
+    g.textAlign = 'right';
+    g.fillStyle = col;
+    g.font = `300 ${Math.round(17 * fs)}px ui-monospace, Menlo, monospace`;
+    g.fillText(`${Math.round(alt)} m`, x + w, y - 6);
+    g.textAlign = 'left';
+  }
+
+  // The hold, as outlined pips. The fourth form and the smallest — how many slots, how many full.
+  _cargoPips(g, d, x, y, s, fs) {
+    const slots = d.cargoMax || 3, cargo = d.cargo || 0;
+    g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.fillStyle = 'rgba(120,150,175,0.95)';
+    g.font = `700 ${Math.round(9 * fs)}px ui-monospace, Menlo, monospace`;
+    g.fillText('HOLD', x, y - 5);
+    for (let i = 0; i < slots; i++) {
+      const px = x + i * (s + 5);
+      g.strokeStyle = 'rgba(108,255,156,0.55)'; g.lineWidth = 1.2;
+      rrect(g, px + 0.6, y + 0.6, s - 1.2, s - 1.2, 2.5); g.stroke();
+      if (i < cargo) {
+        g.fillStyle = 'rgba(108,255,156,0.85)';
+        rrect(g, px + 3, y + 3, s - 6, s - 6, 1.6); g.fill();
       }
     }
-    g.textAlign = 'left'; g.textBaseline = 'alphabetic';
-    g.fillStyle = 'rgba(150,170,192,0.95)';
-    g.font = `600 ${labelSize}px ui-monospace, Menlo, monospace`;
-    g.fillText(label, x, y - labelSize * 0.5);
-    g.fillStyle = color;
-    g.font = `300 ${numSize}px ui-monospace, Menlo, monospace`;
-    g.fillText(value, x + w + 8, y + numSize * 0.9);
+  }
+
+  // Annunciator lamps. Every one is a real state the flight model or the economy owns; there are
+  // no dummies on this panel, because a lamp that never lights is a lie about the vehicle.
+  _lamps(g, d, x, y, fs) {
+    const set = [
+      ['BOOST', !!d.boost, '#ffb238'],
+      ['HOLD', !!d.altHold, '#35e6ff'],
+      ['PAD', d.chargeInRange === true, '#6cff9c'],
+      ['LINK', !!d.comms, '#ff3ea5'],
+    ];
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `700 ${Math.round(8 * fs)}px ui-monospace, Menlo, monospace`;
+    const w = Math.round(38 * fs);
+    set.forEach(([label, on, col], i) => {
+      const lx = x + i * (w + 4);
+      g.fillStyle = on ? hexa(col, 0.16) : 'rgba(255,255,255,0.03)';
+      rrect(g, lx, y, w, Math.round(14 * fs), 3); g.fill();
+      g.strokeStyle = on ? hexa(col, 0.75) : 'rgba(150,180,205,0.14)';
+      g.lineWidth = 1; rrect(g, lx, y, w, Math.round(14 * fs), 3); g.stroke();
+      g.fillStyle = on ? col : 'rgba(125,142,163,0.42)';
+      g.fillText(label, lx + w / 2, y + Math.round(7.5 * fs));
+    });
+    g.textAlign = 'left';
+  }
+
+  // §8.5's chatter, as a scrolling box INSIDE the dashboard rather than a rectangle floating over
+  // the city. A recessed screen with a bezel; background lines faded, `alert` lines bright with a
+  // coloured rule. The tag vocabulary is fixed at bg / info / alert (the S2 A↔B contract) and an
+  // unknown or absent tag is treated as `info`.
+  _chatBox(g, d, x, y, w, h, fs) {
+    g.save();
+    rrect(g, x, y, w, h, 6); g.clip();
+    g.fillStyle = 'rgba(2,5,9,0.80)'; g.fillRect(x, y, w, h);
+    // a couple of scan bands, static (this canvas must be a pure function of `d`)
+    g.fillStyle = 'rgba(53,230,255,0.022)';
+    for (let yy = y; yy < y + h; yy += 4) g.fillRect(x, yy, w, 2);
+    const lh = Math.round(13 * fs);
+    const rows = Math.max(1, Math.floor((h - 6) / lh));
+    const log = Array.isArray(d.chat) ? d.chat.slice(-rows) : [];
+    if (!log.length) {
+      g.textAlign = 'left'; g.textBaseline = 'middle';
+      g.fillStyle = 'rgba(90,110,130,0.55)';
+      g.font = `400 ${Math.round(10 * fs)}px ui-monospace, Menlo, monospace`;
+      g.fillText('· net quiet ·', x + 8, y + h / 2);
+    }
+    // oldest at the top, newest at the bottom — the direction a ticker scrolls
+    log.forEach((line, i) => {
+      const ly = y + 4 + i * lh + lh * 0.5;
+      const tag = TAGS[line.tag] ? line.tag : 'info';
+      const T = TAGS[tag];
+      g.fillStyle = T.rule;
+      g.fillRect(x + 4, ly - lh * 0.36, 2, lh * 0.72);
+      g.textAlign = 'left'; g.textBaseline = 'middle';
+      g.font = `700 ${Math.round(8 * fs)}px ui-monospace, Menlo, monospace`;
+      g.fillStyle = T.speaker;
+      const sp = String(line.speaker || '').toUpperCase().slice(0, 9);
+      g.fillText(sp, x + 10, ly);
+      const tx = x + 10 + Math.round(52 * fs);
+      g.font = `400 ${Math.round(10.5 * fs)}px ui-monospace, Menlo, monospace`;
+      g.fillStyle = T.text;
+      g.fillText(fit(g, String(line.text || ''), x + w - tx - 6), tx, ly);
+    });
+    g.restore();
+    g.lineWidth = 1; g.strokeStyle = 'rgba(150,200,230,0.18)';
+    rrect(g, x, y, w, h, 6); g.stroke();
   }
 
   _headingTape(g, d, x, y, w, h) {
     const bearing = ((-(d.heading || 0) * 180 / Math.PI) % 360 + 360) % 360;
     g.save();
-    g.beginPath(); g.rect(x, y, w, h); g.clip();
-    g.fillStyle = 'rgba(53,230,255,0.06)'; g.fillRect(x, y, w, h);
-    g.font = '700 11px ui-monospace, Menlo, monospace';
+    rrect(g, x, y, w, h, 4); g.clip();
+    g.fillStyle = 'rgba(53,230,255,0.05)'; g.fillRect(x, y, w, h);
+    g.font = '700 12px ui-monospace, Menlo, monospace';
     g.textAlign = 'center'; g.textBaseline = 'middle';
-    const cx = x + w / 2, px = w / 190;
-    for (let b = -95; b <= 95; b += 15) {
+    const cx = x + w / 2, px = w / 150;               // +/-75 deg across the tape, not +/-95
+    for (let b = -75; b <= 75; b += 15) {
       const deg = bearing + b;
       const tx = cx + b * px;
       const major = ((Math.round(deg) % 45) + 45) % 45 < 8;
-      g.strokeStyle = major ? 'rgba(53,230,255,0.6)' : 'rgba(53,230,255,0.24)';
-      g.beginPath(); g.moveTo(tx, y + 1); g.lineTo(tx, y + (major ? h * 0.45 : h * 0.3)); g.stroke();
-      if (major) { g.fillStyle = 'rgba(215,232,248,0.9)'; g.fillText(COMPASS(deg), tx, y + h * 0.72); }
+      g.strokeStyle = major ? 'rgba(53,230,255,0.75)' : 'rgba(53,230,255,0.3)';
+      g.beginPath(); g.moveTo(tx, y + 1); g.lineTo(tx, y + (major ? h * 0.34 : h * 0.22)); g.stroke();
+      if (major) { g.fillStyle = 'rgba(225,240,252,0.95)'; g.fillText(COMPASS(deg), tx, y + h * 0.66); }
     }
     g.restore();
     g.strokeStyle = 'rgba(255,178,56,0.95)'; g.lineWidth = 1.6;
     g.beginPath(); g.moveTo(x + w / 2, y - 1); g.lineTo(x + w / 2, y + h + 1); g.stroke();
   }
 
-  // ── landscape: the full §8.2 instrument set ─────────────────────────────
-  _dashWide(g, d, W, H) {
-    const alt = d.alt || 0, cell = d.cell === undefined ? 1 : d.cell;
-    this._headingTape(g, d, 96, 5, 320, 21);
-    this._speedArc(g, d, 62, 96, 50, 40);
-
-    this._gauge(g, {
-      x: 138, y: 42, w: 13, h: 100,
-      k: clamp((alt - F.ALT_MIN) / (F.ALT_MAX - F.ALT_MIN), 0, 1),
-      label: 'ALT', value: `${Math.round(alt)} m`,
-      color: alt > F.ALT_WARN ? '#ffb238' : '#35e6ff',
-      dim: 'rgba(53,230,255,0.09)', ticks: true, numSize: 21, labelSize: 12,
-    });
-    this._gauge(g, {
-      x: 246, y: 42, w: 13, h: 100, k: clamp(cell, 0, 1),
-      label: 'CELL', value: `${Math.round(cell * 100)}%`,
-      color: cell < 0.15 ? '#ff2b3a' : '#ffb04a',
-      dim: 'rgba(255,178,56,0.10)', ticks: false, numSize: 21, labelSize: 12,
-    });
-
-    // cargo slots — N outlined squares, filled when occupied (§8.2)
-    const slots = d.cargoMax || 3, cargo = d.cargo || 0;
-    g.textAlign = 'left'; g.textBaseline = 'alphabetic';
-    g.font = '600 12px ui-monospace, Menlo, monospace';
-    g.fillStyle = 'rgba(150,170,192,0.95)';
-    g.fillText('CARGO', 350, 36);
-    for (let i = 0; i < slots; i++) {
-      const x = 350 + i * 26, y = 44;
-      g.strokeStyle = 'rgba(108,255,156,0.6)'; g.lineWidth = 1.4;
-      g.strokeRect(x + 0.7, y + 0.7, 19, 19);
-      if (i < cargo) { g.fillStyle = 'rgba(108,255,156,0.85)'; g.fillRect(x + 4, y + 4, 13, 13); }
+  // ── the dash layout, as DATA ────────────────────────────────────────────
+  //
+  // Both arrangements return the same table of named rectangles and the drawing reads it, so
+  // "where is the cell ring" has one answer and a reserved bay cannot silently be drawn over.
+  // That matters because two of these are RESERVED and empty on purpose:
+  //
+  //   `warmth`  the debt-pressure gauge S2-E will fit — a temperature that climbs when the player
+  //             is behind the pace, not a countdown. It sits beside the cell ring because both
+  //             answer the same question: how much runway is left.
+  //   `bay`     the blank moulded column the DOM control cluster stands over in portrait, so the
+  //             collective and the boost key never cover an instrument.
+  //
+  // Both are drawn as empty recessed wells rather than left as bare panel: a blanking plate is
+  // what a real instrument panel does with an unfitted bay, and it reads as deliberate.
+  dashSlots(d = {}) {
+    const W = this.lay.dash.cw, H = this.lay.dash.ch;
+    if (this.lay.wide) {
+      const bar = 22;
+      return { W, H, bar, bay: null, x0: 0, iw: W,
+        speed: [16, 24, 50, 50], cell: [78, 26, 38, 38], warmth: [124, 26, 38, 38],
+        alt: [174, 34, 140, 8], hold: [174, 54, 55, 11],
+        lamps: [330, 54, 144, 12], chat: [500, 26, W - 514, H - 36],
+        place: [16, H - 5] };
     }
-
-    // the one task line (§8.2)
-    g.textBaseline = 'middle';
-    if (d.task) {
-      g.fillStyle = '#6cff9c';
-      g.font = '500 19px ui-monospace, Menlo, monospace';
-      g.fillText(fit(g, `→ ${d.task.name}`, W - 366), 350, 96);
-      g.fillStyle = 'rgba(215,232,248,0.9)';
-      g.font = '400 16px ui-monospace, Menlo, monospace';
-      g.fillText(`${d.task.km.toFixed(1)} km   ⏱ ${mmss(d.task.eta)}`, 350, 121);
-    } else {
-      g.fillStyle = 'rgba(150,170,192,0.85)';
-      g.font = '500 17px ui-monospace, Menlo, monospace';
-      g.fillText('NO ACTIVE JOB', 350, 96);
-      g.font = '400 13px ui-monospace, Menlo, monospace';
-      // measured, not guessed — the literal "dock at a HUB pad for work" ran off the sheet
-      g.fillText(fit(g, 'dock at a HUB pad', W - 358), 350, 120);
-    }
-
-    g.font = '700 12px ui-monospace, Menlo, monospace';
-    g.fillStyle = 'rgba(53,230,255,0.62)';
-    g.textAlign = 'center';
-    g.fillText((d.place || '').toUpperCase(), 62, 150);
+    const bar = 30, bay = 120;
+    const flip = !!d.flip, x0 = flip ? bay : 0, iw = W - bay, o = x0;
+    return { W, H, bar, bay: [flip ? 0 : W - bay, bar, bay, H - bar], x0, iw,
+      speed: [o + 14, 34, 62, 62], cell: [o + 88, 36, 42, 42], warmth: [o + 138, 36, 42, 42],
+      alt: [o + 190, 46, iw - 204, 9], hold: [o + 190, 68, 60, 12],
+      lamps: [o + 88, 88, 152, 12], chat: [o + 12, 110, iw - 24, 48],
+      place: [o + 16, H - 4] };
   }
 
-  // ── portrait: three numbers, four times the size ────────────────────────
-  _dashTall(g, d, W, H) {
-    const alt = d.alt || 0, cell = d.cell === undefined ? 1 : d.cell;
-    this._speedArc(g, d, W / 2, 74, 58, 54);
+  // ── §S2-E's WARMTH gauge ────────────────────────────────────────────────
+  //
+  // The bay `dashSlots` reserved is now fitted. It reads PACE, not time, and the difference is the
+  // whole design (js/story.js has the derivation):
+  //
+  //   projection = credits + recent earning rate x time remaining
+  //   ratio      = projection / DEBT
+  //   warmth     = 1 at ratio 0.75 · 0.5 at ratio 1.00 · 0 at ratio 1.25
+  //
+  // So the needle opens at HALF SCALE on a fresh profile and stays there while the player earns
+  // exactly the rate the debt needs. A countdown could not do that: it would read identically for
+  // a player who is going to make it and one who is not, and Aaron's whole requirement is that
+  // losing the car must be visible *in time to change behaviour*.
+  //
+  // It is drawn as a TEMPERATURE gauge and not as a fifth ring: a bulb, a bent capillary, a rising
+  // column and graduations, with a needle riding the column. The dash already carries a swept arc,
+  // a segmented ring, a linear tape and outlined pips (four different forms, deliberately), and a
+  // fifth circular fill would have collapsed into the cell ring beside it.
+  //
+  // `d.warmth` is SMOOTHED by hudData before it arrives here. Earnings land in ~800 CRD lumps
+  // every 60-90 s, so the raw pace signal sawtooths by about a tenth of full scale between
+  // deliveries — a real property of the estimator, not noise to be hidden, but a needle that
+  // twitches once a minute is unreadable. A temperature gauge having thermal lag is also the one
+  // kind of smoothing that is diegetically honest.
+  _warmthGauge(g, d, x, y, w, h) {
+    const on = d.warmth !== undefined && d.warmth !== null;
+    if (!on) { this._slot(g, x, y, w, h); return; }
+    const k = clamp(d.warmth, 0, 1);
+    const clear = d.warmthState === 'clear';
+    const due = d.warmthState === 'due';
+    const cx = x + w / 2, cy = y + h / 2, R = Math.min(w, h) / 2;
 
-    // ALT and CELL as big paired readouts under the arc, bars as thin underlines rather than
-    // columns — a 13 px column is invisible at this scale and the number is what gets read.
-    const row = (x, label, value, k, color, dim) => {
-      g.textAlign = 'left'; g.textBaseline = 'alphabetic';
-      g.fillStyle = 'rgba(150,170,192,0.95)';
-      g.font = '700 12px ui-monospace, Menlo, monospace';
-      g.fillText(label, x, 150);
-      g.fillStyle = color;
-      g.font = '300 30px ui-monospace, Menlo, monospace';
-      g.fillText(value, x, 180);
-      g.fillStyle = dim; g.fillRect(x, 188, 140, 4);
-      g.fillStyle = color; g.fillRect(x, 188, 140 * clamp(k, 0, 1), 4);
-    };
-    row(16, 'ALT', `${Math.round(alt)}m`,
-      clamp((alt - F.ALT_MIN) / (F.ALT_MAX - F.ALT_MIN), 0, 1),
-      alt > F.ALT_WARN ? '#ffb238' : '#35e6ff', 'rgba(53,230,255,0.14)');
-    row(184, 'CELL', `${Math.round(cell * 100)}%`, cell,
-      cell < 0.15 ? '#ff2b3a' : '#ffb04a', 'rgba(255,178,56,0.14)');
+    // the recess the bay always had, so a fitted gauge sits IN the panel rather than on it
+    const well = g.createRadialGradient(cx, cy - R * 0.2, R * 0.2, cx, cy, R);
+    well.addColorStop(0, 'rgba(4,8,13,0.62)');
+    well.addColorStop(1, 'rgba(14,21,30,0.0)');
+    g.fillStyle = well;
+    g.beginPath(); g.arc(cx, cy, R, 0, 6.2832); g.fill();
 
-    // one task line, and cargo as pips beside it — no room for outlined squares at this width
-    g.textAlign = 'left'; g.textBaseline = 'middle';
-    const slots = d.cargoMax || 3, cargo = d.cargo || 0;
-    for (let i = 0; i < slots; i++) {
-      g.fillStyle = i < cargo ? 'rgba(108,255,156,0.9)' : 'rgba(108,255,156,0.22)';
-      g.fillRect(16 + i * 12, 122, 8, 8);
+    const col = clear ? '#6cff9c' : k < 0.34 ? '#35e6ff' : k < 0.62 ? '#8ee6b0'
+      : k < 0.82 ? '#ffb238' : '#ff5a52';
+    // The capillary: a 250 deg arc that fills from the cold end. Cold is at the LEFT, which is
+    // where every gauge in every vehicle puts it.
+    const A0 = 150 * D2R, A1 = A0 + 250 * D2R;
+    g.lineCap = 'round';
+    g.lineWidth = Math.max(2.2, R * 0.19);
+    g.strokeStyle = 'rgba(150,190,215,0.13)';
+    g.beginPath(); g.arc(cx, cy, R * 0.72, A0, A1); g.stroke();
+    if (k > 0.005 || clear) {
+      g.strokeStyle = col;
+      g.beginPath(); g.arc(cx, cy, R * 0.72, A0, A0 + (A1 - A0) * (clear ? 1 : k)); g.stroke();
     }
-    if (d.task) {
-      g.fillStyle = '#6cff9c';
-      g.font = '500 15px ui-monospace, Menlo, monospace';
-      g.fillText(fit(g, `→ ${d.task.name}  ${d.task.km.toFixed(1)}km`, W - 76), 60, 126);
-    } else {
-      g.fillStyle = 'rgba(150,170,192,0.8)';
-      g.font = '500 14px ui-monospace, Menlo, monospace';
-      g.fillText('NO ACTIVE JOB', 60, 126);
+    // graduations — cold, the break-even mid, and the redline
+    g.lineWidth = 1;
+    for (const t of [0, 0.5, 0.85, 1]) {
+      const a = A0 + (A1 - A0) * t;
+      g.strokeStyle = t >= 0.85 ? 'rgba(255,90,82,0.75)' : 'rgba(207,226,245,0.4)';
+      g.beginPath();
+      g.moveTo(cx + Math.cos(a) * R * 0.86, cy + Math.sin(a) * R * 0.86);
+      g.lineTo(cx + Math.cos(a) * R * 0.99, cy + Math.sin(a) * R * 0.99);
+      g.stroke();
     }
+    // the needle, and the bulb it hangs off
+    const na = A0 + (A1 - A0) * (clear ? 1 : k);
+    g.strokeStyle = '#eaf6ff'; g.lineWidth = Math.max(1.3, R * 0.075); g.lineCap = 'butt';
+    g.beginPath();
+    g.moveTo(cx, cy);
+    g.lineTo(cx + Math.cos(na) * R * 0.86, cy + Math.sin(na) * R * 0.86);
+    g.stroke();
+    g.beginPath(); g.arc(cx, cy, R * 0.16, 0, 6.2832);
+    g.fillStyle = col; g.fill();
+
+    // The legend. NEVER a time and never a number of days — the Boss has not named one and neither
+    // does the panel. Four words, which is the whole vocabulary a pace gauge needs.
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = due ? '#ff5a52' : 'rgba(150,170,192,0.95)';
+    g.font = `700 ${Math.max(6, Math.round(R * 0.30))}px ui-monospace, Menlo, monospace`;
+    g.fillText(due ? 'DUE' : clear ? 'CLEAR' : k < 0.34 ? 'AHEAD' : k < 0.62 ? 'PACE'
+      : k < 0.82 ? 'BEHIND' : 'HOT', cx, cy + R * 0.52);
+    // The kicker sits INSIDE the arc's ring, so it has to be brighter than a normal label to read
+    // at all against the capillary behind it — measured on a 4x crop of the real dash, where the
+    // first pass at 0.24 R and 85 % alpha was invisible.
+    g.fillStyle = due ? 'rgba(255,140,130,0.95)' : 'rgba(150,190,215,0.95)';
+    g.font = `700 ${Math.max(6, Math.round(R * 0.30))}px ui-monospace, Menlo, monospace`;
+    g.fillText('DEBT', cx, cy - R * 0.54);
+    g.lineCap = 'butt';
+  }
+
+  // An empty instrument well. A hairline ring, a shallow recess, no legend and no needle — the
+  // shape of a bay that has been left for a gauge that is not fitted yet. Still reached: the bay is
+  // empty in act two, when there is no debt left to be behind on.
+  _slot(g, x, y, w, h) {
+    const cx = x + w / 2, cy = y + h / 2, r = Math.min(w, h) / 2;
+    const well = g.createRadialGradient(cx, cy - r * 0.2, r * 0.2, cx, cy, r);
+    well.addColorStop(0, 'rgba(4,8,13,0.55)');
+    well.addColorStop(1, 'rgba(14,21,30,0.0)');
+    g.fillStyle = well;
+    g.beginPath(); g.arc(cx, cy, r, 0, 6.2832); g.fill();
+    g.lineWidth = 1; g.strokeStyle = 'rgba(150,190,215,0.14)';
+    g.beginPath(); g.arc(cx, cy, r * 0.92, 0, 6.2832); g.stroke();
+  }
+
+  // ── landscape: the wide cluster ─────────────────────────────────────────
+  // 896 x 90. Instruments left, chat right — a landscape frame has width and no height, so the
+  // chatter goes beside the cluster rather than under it.
+  _dashWide(g, d, S) {
+    this._speedArc(g, d, S.speed[0] + S.speed[2] / 2, S.speed[1] + S.speed[3] / 2, S.speed[2] / 2 - 5, 17);
+    this._cellRing(g, d, S.cell[0] + S.cell[2] / 2, S.cell[1] + S.cell[3] / 2, S.cell[2] / 2 - 4, 12);
+    this._warmthGauge(g, d, ...S.warmth);
+    this._altTape(g, d, ...S.alt, 1);
+    this._cargoPips(g, d, S.hold[0], S.hold[1], S.hold[3], 1);
+    this._lamps(g, d, S.lamps[0], S.lamps[1], 0.85);
+    this._chatBox(g, d, ...S.chat, 0.95);
+
+    g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.font = '700 9px ui-monospace, Menlo, monospace';
+    g.fillStyle = 'rgba(53,230,255,0.55)';
+    g.fillText(fit(g, (d.place || '').toUpperCase(), 130), S.place[0], S.place[1]);
+  }
+
+  // ── portrait: the tall cluster ──────────────────────────────────────────
+  // 512 x 190 minus the console bay: three round wells and the altitude tape on one row, the
+  // lamps under them, and the chat box across the bottom of what is left.
+  _dashTall(g, d, S) {
+    this._speedArc(g, d, S.speed[0] + S.speed[2] / 2, S.speed[1] + S.speed[3] / 2, S.speed[2] / 2 - 6, 24);
+    this._cellRing(g, d, S.cell[0] + S.cell[2] / 2, S.cell[1] + S.cell[3] / 2, S.cell[2] / 2 - 5, 15);
+    this._warmthGauge(g, d, ...S.warmth);
+    this._altTape(g, d, ...S.alt, 1.1);
+    this._cargoPips(g, d, S.hold[0], S.hold[1], S.hold[3], 1.1);
+    this._lamps(g, d, S.lamps[0], S.lamps[1], 0.9);
+    this._chatBox(g, d, ...S.chat, 1.1);
+
+    g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.font = '700 10px ui-monospace, Menlo, monospace';
+    g.fillStyle = 'rgba(53,230,255,0.55)';
+    g.fillText(fit(g, (d.place || '').toUpperCase(), 150), S.place[0], S.place[1]);
   }
 
   // ── §8.3's canvas — three bands in one sheet ────────────────────────────
@@ -687,19 +1200,49 @@ export class Cockpit {
       fn(g, HUD.HOLO_W, HUD.HOLO_H);
       g.restore();
     };
+    // §8.3's scanline, inverted. It used to be a 30 %-black bar over every second pair of rows,
+    // which under the old additive blend removed 30 % of the GLYPH and none of the city — the
+    // single biggest contributor to "heavy scanlines over small text". A CRT's scanlines are the
+    // lit lines, not the gaps, so this brightens instead, at a twelfth of the amplitude.
     const scan = (g2, w, h) => {
-      g2.fillStyle = 'rgba(0,0,0,0.30)';
-      for (let y = 0; y < h; y += 4) g2.fillRect(0, y, w, 2);     // §8.3's 2 px scanline
+      g2.fillStyle = 'rgba(150,225,255,0.05)';
+      for (let y = 0; y < h; y += 3) g2.fillRect(0, y, w, 1);
     };
 
     // left — the active job (§8.3)
     band(0, (g2, w, h) => {
-      g2.fillStyle = 'rgba(10,26,34,0.55)'; g2.fillRect(0, 0, w, h);
-      g2.strokeStyle = 'rgba(53,230,255,0.75)'; g2.lineWidth = 2;
-      g2.strokeRect(1, 1, w - 2, h - 2);
+      hudFrame(g2, w, h, '53,230,255');
       g2.textAlign = 'left'; g2.textBaseline = 'top';
+      // PORTRAIT is a different drawing, not the same one scaled down. A 384 px band rendered into
+      // a 140 px-wide panel on a phone puts 13 px type onto five device pixels — the same defect
+      // §8.2's two dash sheets exist to avoid. Fewer lines, twice the size, same facts.
+      // PORTRAIT — and S2-D cut it again. This band lands in about 150 CSS px on a 390-wide
+      // phone, so a 384-unit canvas maps 384 units onto ~150 px: the old 26 px type arrived as
+      // NINE and the 22 px kicker as eight. Three facts at nine pixels is worse than two at
+      // thirteen, so the sparse drawing now carries the destination and the fee and nothing else.
+      if (!this.holoDense()) {
+        g2.font = '700 26px ui-monospace, Menlo, monospace';
+        g2.fillStyle = '#35e6ff'; g2.fillText('JOB', 16, 6);
+        if (d.job) {
+          g2.font = '400 34px ui-monospace, Menlo, monospace';
+          g2.fillStyle = '#ffffff'; g2.fillText(fit(g2, String(d.job.dest), w - 32), 16, 38);
+          g2.font = '400 32px ui-monospace, Menlo, monospace';
+          g2.fillStyle = '#7dffab'; g2.fillText(`${d.job.pay} CRD`, 16, 74);
+          const k = clamp(d.job.timeLeft / Math.max(1, d.job.timeTotal), 0, 1);
+          g2.fillStyle = 'rgba(53,230,255,0.18)'; g2.fillRect(16, 112, w - 32, 10);
+          g2.fillStyle = k < 0.25 ? '#ff5a52' : '#35e6ff'; g2.fillRect(16, 112, (w - 32) * k, 10);
+        } else {
+          g2.font = '400 34px ui-monospace, Menlo, monospace';
+          g2.fillStyle = 'rgba(190,208,226,0.95)'; g2.fillText('NO JOB', 16, 40);
+          g2.font = '400 24px ui-monospace, Menlo, monospace';
+          g2.fillStyle = 'rgba(140,158,180,0.9)';
+          g2.fillText(fit(g2, 'dock at a HUB', w - 32), 16, 84);
+        }
+        scan(g2, w, h);
+        return;
+      }
       g2.font = '700 13px ui-monospace, Menlo, monospace';
-      g2.fillStyle = '#35e6ff'; g2.fillText('ACTIVE JOB', 12, 10);
+      g2.fillStyle = '#35e6ff'; g2.fillText('ACTIVE JOB', 14, 11);
       g2.font = '400 15px ui-monospace, Menlo, monospace';
       if (d.job) {
         g2.fillStyle = '#eaf6ff'; g2.fillText(d.job.client, 12, 34);
@@ -721,12 +1264,37 @@ export class Cockpit {
     // right — nearest zone + the cell-range readout (§8.3; this REPLACES the heat pip row,
     // DECISIONS decision 6 — there is no heat in this game and nothing here may imply one)
     band(1, (g2, w, h) => {
-      g2.fillStyle = 'rgba(10,26,34,0.55)'; g2.fillRect(0, 0, w, h);
-      g2.strokeStyle = 'rgba(53,230,255,0.75)'; g2.lineWidth = 2;
-      g2.strokeRect(1, 1, w - 2, h - 2);
+      hudFrame(g2, w, h, '53,230,255');
       g2.textAlign = 'left'; g2.textBaseline = 'top';
+      const mins0 = d.cellMinutes === undefined ? null : d.cellMinutes;
+      if (!this.holoDense()) {
+        g2.font = '700 26px ui-monospace, Menlo, monospace';
+        g2.fillStyle = '#35e6ff'; g2.fillText('PAD', 16, 6);
+        if (d.nearest) {
+          const ty0 = ZONE_TYPES[d.nearest.type] || ZONE_TYPES.PICKUP;
+          g2.font = '700 30px system-ui, sans-serif';
+          g2.fillStyle = hexs(ty0.color); g2.fillText(ty0.glyph, 16, 36);
+          g2.font = '400 34px ui-monospace, Menlo, monospace';
+          g2.fillStyle = '#ffffff'; g2.fillText(fit(g2, String(d.nearest.name), w - 70), 52, 38);
+          g2.font = '400 26px ui-monospace, Menlo, monospace';
+          g2.fillStyle = 'rgba(200,220,240,0.92)';
+          g2.fillText(`${d.nearest.km.toFixed(2)} km`, 16, 76);
+        } else {
+          g2.font = '400 32px ui-monospace, Menlo, monospace';
+          g2.fillStyle = 'rgba(190,208,226,0.9)'; g2.fillText('NO PAD', 16, 38);
+        }
+        // §7.4.1's number is the one that decides whether to divert, so it survives the cut.
+        // Right-aligned against the km on the same baseline: two numbers, one line, both big.
+        g2.textAlign = 'right';
+        g2.font = '400 26px ui-monospace, Menlo, monospace';
+        g2.fillStyle = mins0 !== null && mins0 < 3 ? '#ff5a52' : '#ffc26a';
+        g2.fillText(mins0 === null ? 'CELL —' : `${mins0.toFixed(0)} MIN`, w - 22, 76);
+        g2.textAlign = 'left';
+        scan(g2, w, h);
+        return;
+      }
       g2.font = '700 13px ui-monospace, Menlo, monospace';
-      g2.fillStyle = '#35e6ff'; g2.fillText('NEAREST PAD', 12, 10);
+      g2.fillStyle = '#35e6ff'; g2.fillText('NEAREST PAD', 14, 11);
       if (d.nearest) {
         const ty = ZONE_TYPES[d.nearest.type] || ZONE_TYPES.PICKUP;
         g2.font = '700 22px system-ui, sans-serif';
@@ -756,9 +1324,7 @@ export class Cockpit {
     // centre-low — comms, only when relevant (§8.3)
     band(2, (g2, w, h) => {
       if (!d.comms) return;
-      g2.fillStyle = 'rgba(26,14,30,0.5)'; g2.fillRect(0, 0, w, h);
-      g2.strokeStyle = 'rgba(255,62,165,0.7)'; g2.lineWidth = 2;
-      g2.strokeRect(1, 1, w - 2, h - 2);
+      hudFrame(g2, w, h, '255,62,165');
       g2.textAlign = 'left'; g2.textBaseline = 'middle';
       g2.font = '700 13px ui-monospace, Menlo, monospace';
       g2.fillStyle = '#ff3ea5'; g2.fillText(d.comms.speaker, 12, 26);
@@ -799,31 +1365,150 @@ export class Cockpit {
   }
 }
 
-// ── the chase-view instrument strip ────────────────────────────────────────
-// NOT in §8. §8 assumes the player is in the cabin, but save.js ships `camera: 'chase'` (P5 set
-// it so the hull is in frame and acts as one of §3.10's scale cues) — so in the DEFAULT view the
-// dash is behind the camera and the player has no speed, no altitude and no cell reading at all,
-// which is exactly the gap this phase exists to close. This is DOM, it is three chips and a task
-// line, it costs zero draw calls, and it reads the same data model the dash does so the two can
-// never disagree. It hides itself the moment the player is in the cabin.
+// ── the chase-view HUD ─────────────────────────────────────────────────────
+//
+// `ChaseStrip` — P6's row of three DOM chips — is GONE, not restyled. It was three numbers in
+// three boxes with no frame, no hierarchy and nothing that read as a vehicle, and Aaron's verdict
+// on it was "pretty crappy". This is its replacement, and it is a different KIND of thing.
+//
+// Cockpit view gets a DASHBOARD: opaque, moulded, part of the craft. Chase view gets a HUD in
+// Aaron's sense of the word — **a semi-transparent neon frame with a transparent background of
+// the same colour, like something reflected onto a windscreen. A futuristic floating window.**
+// So: no fills that read as panels, corner brackets rather than closed boxes, one hairline of
+// neon, and the city visible straight through all of it.
+//
+// It is DOM, so it costs zero draw calls and its type is crisp at any device pixel ratio, and it
+// reads the SAME data model the dash does — the two can never disagree about the speed.
+//
+// It renders into `#hud-strip`, which is `pointer-events: none` all the way down: the right half
+// of the screen is the look thumb and this sits in it. gates_p6 asserts that with a hit test.
 
-export class ChaseStrip {
-  constructor(el) { this.el = el; this.n = 0; this.shown = false; this._last = ''; }
+export class ChaseHud {
+  constructor(el) {
+    this.el = el;
+    this.n = 0;
+    this.shown = false;
+    this._last = '';
+    this._built = false;
+  }
+
   setVisible(on) {
     this.shown = !!on;
     this.el.classList.toggle('hidden', !on);
     return this.shown;
   }
+
+  // The static skeleton is written once and only the VALUES are patched after that. A HUD that
+  // rebuilds its own innerHTML at 60 fps re-parses an SVG arc every frame for no reason, and the
+  // chatter rows lose their scroll position every time it happens.
+  _build() {
+    this.el.innerHTML = `
+<div class="ch-top">
+  <div class="ch-frame ch-cash"><i>CRD</i><b data-f="cash">0</b></div>
+  <div class="ch-frame ch-job" data-f="jobwrap">
+    <i data-f="jobdest">NO JOB</i>
+    <b data-f="jobpay"></b><u data-f="jobclock"></u>
+    <span class="ch-bonus" data-f="bonuswrap"><b data-f="bonuspay"></b><u data-f="bonusclock"></u></span>
+  </div>
+</div>
+<div class="ch-bot">
+  <div class="ch-frame ch-dial">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <path class="ch-track" d="M 15.2 78.8 A 45 45 0 1 1 84.8 78.8" />
+      <path class="ch-red" d="M 84.8 78.8 A 45 45 0 0 0 94.6 61.2" />
+      <path class="ch-arc" data-f="arc" d="M 15.2 78.8 A 45 45 0 1 1 84.8 78.8" />
+    </svg>
+    <b data-f="speed">0</b><i>M/S</i>
+  </div>
+  <div class="ch-frame ch-bars">
+    <div class="ch-bar"><i>ALT</i><span><u data-f="altfill"></u></span><b data-f="alt">0 m</b></div>
+    <div class="ch-bar c"><i>CELL</i><span><u data-f="cellfill"></u></span><b data-f="cell">100%</b></div>
+    <div class="ch-pips" data-f="pips"></div>
+  </div>
+  <div class="ch-frame ch-warm" data-f="warmwrap">
+    <i data-f="warmlabel">PACE</i>
+    <span><u data-f="warmfill"></u><em data-f="warmmid"></em></span>
+    <b data-f="warmsub">DEBT</b>
+  </div>
+</div>`;
+    this.f = {};
+    for (const n of this.el.querySelectorAll('[data-f]')) this.f[n.dataset.f] = n;
+    // The dash length of the 200 deg speed arc, measured off the live path rather than derived
+    // from the `d` attribute by hand — a hand-computed length is wrong the first time somebody
+    // nudges the radius and nothing about the HUD looks broken enough to notice.
+    this.arcLen = this.f.arc.getTotalLength();
+    this.f.arc.style.strokeDasharray = `${this.arcLen}`;
+    this._built = true;
+  }
+
   draw(d) {
     if (!this.shown) return false;
+    if (!this._built) this._build();
+    const f = this.f;
     const cell = d.cell === undefined ? 1 : d.cell;
-    const html =
-      `<div class="chip"><b>${Math.round(d.speed || 0)}</b><i>m/s</i></div>` +
-      `<div class="chip"><b>${Math.round(d.alt || 0)}</b><i>m</i></div>` +
-      `<div class="chip${cell < 0.15 ? ' bad' : ''}"><b>${Math.round(cell * 100)}</b><i>% cell</i></div>` +
-      (d.task ? `<div class="chip task">→ ${esc(d.task.name)} · ${d.task.km.toFixed(1)} km</div>`
-        : `<div class="chip task dim">no active job</div>`);
-    if (html !== this._last) { this.el.innerHTML = html; this._last = html; }
+    const maxSpeed = d.maxSpeed || F.MAX_FWD;
+    const k = clamp((d.speed || 0) / maxSpeed, 0, 1);
+
+    set(f.cash, commas(Math.round(d.credits || 0)));
+    set(f.speed, String(Math.round(d.speed || 0)));
+    f.arc.style.strokeDashoffset = `${this.arcLen * (1 - k)}`;
+    f.arc.classList.toggle('hot', k > 0.85);
+    set(f.alt, `${Math.round(d.alt || 0)} m`);
+    f.altfill.style.width = `${clamp((d.alt - F.ALT_MIN) / (F.ALT_MAX - F.ALT_MIN), 0, 1) * 100}%`;
+    f.altfill.classList.toggle('warn', (d.alt || 0) > F.ALT_WARN);
+    set(f.cell, `${Math.round(cell * 100)}%`);
+    f.cellfill.style.width = `${clamp(cell, 0, 1) * 100}%`;
+    f.cellfill.classList.toggle('bad', cell < 0.15);
+
+    const slots = d.cargoMax || 3, held = d.cargo || 0;
+    const pipKey = `${held}/${slots}`;
+    if (f.pips.dataset.k !== pipKey) {
+      f.pips.dataset.k = pipKey;
+      f.pips.innerHTML = Array.from({ length: slots },
+        (_, i) => `<em class="${i < held ? 'on' : ''}"></em>`).join('');
+    }
+
+    if (d.job) {
+      set(f.jobdest, `→ ${String(d.job.dest || '').toUpperCase()}`);
+      set(f.jobpay, `$${commas(d.job.pay || 0)}`);
+      set(f.jobclock, mmss(d.job.timeLeft));
+      f.jobclock.className = d.job.timeLeft <= 0 ? 'late' : d.job.timeLeft < 45 ? 'soon' : '';
+    } else {
+      set(f.jobdest, 'NO JOB — dock at a HUB pad');
+      set(f.jobpay, ''); set(f.jobclock, '');
+    }
+    // The bonus and its clock go together, and they GO — §S2: once the window is missed the pair
+    // disappears rather than sitting there advertising money that is no longer on the table.
+    f.bonuswrap.classList.toggle('off', !d.bonus);
+    if (d.bonus) {
+      set(f.bonuspay, `+$${commas(d.bonus.pay)}`);
+      set(f.bonusclock, mmss(d.bonus.left));
+      f.bonuswrap.classList.toggle('fading', !!d.bonus.fading);
+    }
+
+    // §S2-E's warmth, in the chase view's own idiom: a horizontal neon bar with the break-even
+    // mark printed ON it, so the player can see which side of the pace they are on rather than
+    // only how full a bar is. It is the SAME number the dash needle rides — one signal, two
+    // presentations, exactly as the chatter is. It disappears entirely once the debt is behind
+    // them, because a gauge with nothing to measure is a gauge that teaches the player to ignore
+    // the panel it is on.
+    const hasWarm = d.warmth !== undefined && d.warmth !== null;
+    f.warmwrap.classList.toggle('off', !hasWarm);
+    if (hasWarm) {
+      const wk = clamp(d.warmth, 0, 1);
+      const ws = d.warmthState || 'pace';
+      set(f.warmlabel, ws === 'due' ? 'DUE' : ws === 'clear' ? 'CLEAR'
+        : wk < 0.34 ? 'AHEAD' : wk < 0.62 ? 'PACE' : wk < 0.82 ? 'BEHIND' : 'HOT');
+      f.warmfill.style.width = `${(ws === 'clear' ? 1 : wk) * 100}%`;
+      f.warmfill.className = ws === 'clear' ? 'clear' : wk < 0.34 ? 'cool'
+        : wk < 0.62 ? 'ok' : wk < 0.82 ? 'warn' : 'bad';
+      set(f.warmsub, ws === 'clear' ? 'PAID' : 'DEBT');
+      f.warmwrap.classList.toggle('due', ws === 'due');
+    }
+
+    // The chatter ticker is NOT rebuilt here. It is `#chatter`, owned by ui.js, and in chase view
+    // it is styled as one more floating neon window in this same language — one renderer, two
+    // presentations, so the chase HUD and the dashboard can never show a different conversation.
     this.n++;
     return true;
   }
@@ -882,7 +1567,7 @@ function buildPanels(panels) {
       v.set(corners[i][0], corners[i][1], 0).applyMatrix4(m);
       pos.push(v.x, v.y, v.z);
       uv.push(uvs[i][0], uvs[i][1]);
-      col.push(1, 1, 1);
+      col.push(1, 1, 1, 1);
     }
     const b = p * 4;
     idx.push(b, b + 2, b + 1, b + 1, b + 2, b + 3);
@@ -890,7 +1575,12 @@ function buildPanels(panels) {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  // itemSize 4, not 3. §8.3's fade used to ride RGB alone, which was correct while the panels
+  // were ADDITIVE (darker = more transparent, for free). They are normal-blended now — see the
+  // material — so a fade that only darkens turns a looked-away panel into a dark slab instead of a
+  // ghost. three.js reads a 4-component `color` attribute as vColor with alpha (USE_COLOR_ALPHA),
+  // so this is the whole of the change on the shader side.
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
   g.setIndex(idx);
   g.computeBoundingSphere();
   return g;
@@ -907,7 +1597,84 @@ function fit(g, s, w) {
 
 const triCount = m => (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3;
 const hexs = h => `#${('000000' + h.toString(16)).slice(-6)}`;
-const esc = s => String(s).replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+const set = (n, v) => { if (n.textContent !== v) n.textContent = v; };
+const commas = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const hexa = (hex, a) => {
+  const v = parseInt(hex.slice(1), 16);
+  return `rgba(${(v >> 16) & 255},${(v >> 8) & 255},${v & 255},${a})`;
+};
+
+// One rounded path, used everywhere. S2 calls out "rounded corners, no hard rectangles" as an
+// explicit requirement, so it is a primitive here rather than a flourish applied in three places
+// and forgotten in the fourth.
+function rrect(g, x, y, w, h, r) {
+  const k = Math.max(0, Math.min(r, Math.min(w, h) / 2));
+  g.beginPath();
+  g.moveTo(x + k, y);
+  g.arcTo(x + w, y, x + w, y + h, k);
+  g.arcTo(x + w, y + h, x, y + h, k);
+  g.arcTo(x, y + h, x, y, k);
+  g.arcTo(x, y, x + w, y, k);
+  g.closePath();
+}
+
+// A vertical hairline between two cells of the dash's top bar.
+function divider(g, x, h) {
+  g.strokeStyle = 'rgba(150,200,230,0.16)'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(x + 0.5, 7); g.lineTo(x + 0.5, h - 7); g.stroke();
+}
+
+// **Aaron's HUD**, as a drawing primitive: a semi-transparent neon FRAME with a transparent
+// background of the same colour, plus corner brackets — a floating futuristic window, not a
+// panel. The fill is deliberately weak (0.10) so the city reads straight through it; the frame
+// carries the whole shape.
+// The combiner plate every holo band is drawn on. S2-D rewrote it: with the panels normal-blended
+// (see the material) this has to supply a DARK GROUND for the symbology, which the old
+// 10 %-tint-over-nothing version never did. It is still glass — 0.62 alpha at the top falling to
+// 0.50 at the bottom, so the city reads through it and Aaron's "transparent background of the same
+// colour" survives — but the text now has something to be legible against.
+function hudFrame(g, w, h, tint, r = 9) {
+  g.save();
+  rrect(g, 1.5, 1.5, w - 3, h - 3, r); g.clip();
+  const gr = g.createLinearGradient(0, 0, 0, h);
+  gr.addColorStop(0, 'rgba(4,10,17,0.72)');
+  gr.addColorStop(0.55, 'rgba(3,7,12,0.60)');
+  gr.addColorStop(1, 'rgba(3,7,12,0.52)');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  // the tint wash that makes it the colour of its own frame
+  const tg = g.createLinearGradient(0, 0, 0, h);
+  tg.addColorStop(0, `rgba(${tint},0.16)`);
+  tg.addColorStop(1, `rgba(${tint},0.03)`);
+  g.fillStyle = tg; g.fillRect(0, 0, w, h);
+  // a lit leading edge, so the plate reads as projected onto glass rather than printed on it
+  g.fillStyle = `rgba(${tint},0.55)`; g.fillRect(0, 0, w, 2);
+  g.restore();
+  g.lineWidth = 1.6; g.strokeStyle = `rgba(${tint},0.75)`;
+  rrect(g, 1.5, 1.5, w - 3, h - 3, r); g.stroke();
+  // corner brackets — brighter than the frame, which is what makes it read as projected rather
+  // than printed
+  g.lineWidth = 2.6; g.strokeStyle = `rgba(${tint},1)`; g.lineCap = 'round';
+  const L = Math.min(22, w * 0.14);
+  for (const [cx, sx] of [[6, 1], [w - 6, -1]]) {
+    for (const [cy, sy] of [[6, 1], [h - 6, -1]]) {
+      g.beginPath();
+      g.moveTo(cx + sx * L, cy); g.lineTo(cx + sx * 5, cy);
+      g.moveTo(cx, cy + sy * L); g.lineTo(cx, cy + sy * 5);
+      g.stroke();
+    }
+  }
+  g.lineCap = 'butt';
+}
+
+// The S2 A↔B contract, and the only place the three tag values are given a look. `bg` is a
+// background wash the player is not being addressed by, `info` is ordinary traffic, `alert`
+// matters. An unknown or missing tag is `info` — S2-B owns the manifest, this owns the rendering,
+// and neither may assume the other shipped first.
+const TAGS = {
+  bg:    { rule: 'rgba(125,142,163,0.30)', speaker: 'rgba(125,142,163,0.45)', text: 'rgba(160,180,200,0.42)' },
+  info:  { rule: 'rgba(53,230,255,0.55)',  speaker: 'rgba(53,230,255,0.75)',  text: 'rgba(212,231,247,0.88)' },
+  alert: { rule: 'rgba(255,178,56,0.95)',  speaker: '#ffb238',                text: '#fff1d6' },
+};
 
 function mmss(sec) {
   const s = Math.max(0, Math.round(sec || 0));

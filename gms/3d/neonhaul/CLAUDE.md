@@ -59,6 +59,10 @@ every tool in `tools/`. `window.__ready` goes true when the game is playable.
 | `?nosave=1` `?seed=` `?time=` `?var=` `?tier=` `?crd=` `?dock=` `?dpr=` `?probes=1` `?debug` | test hooks |
 
 `?auto=1` and `?courier=1` are **not** the same flag and never should be. See `js/autopilot.js`.
+Neither of those is the **player's** autopilot. That is `js/autopilot.js`'s `LanePilot`, on the AUTO
+and HOME keys of the left console — it follows the traffic lanes (`js/lanes.js`), it is always
+slower than hand-flying, and touching the stick takes the craft back on that frame with no mode to
+cancel.
 
 ## Running it
 
@@ -79,14 +83,21 @@ node tools/budget.mjs --headed       # the frame budget, on a real GPU
 node tools/shot.mjs --shot=fog_city  # a render + its perf snapshot
 ```
 
-Suites: `p1a p2 p3a p3b p4 p5 p6 p7a p7b p8 p11 wire`, plus `determinism`, `t10_falsify`,
-`budget`, `soak`. **`gates_p5` and `gates_p7a`/`p8` write a different JSON schema from `p1a`–`p4`
+Suites: `p1a p2 p3a p3b p4 p5 p6 p7a p7b p8 p11 wire`, plus the season-2 suites
+`s2a s2c s2d s2e s2f`, and `determinism`, `t10_falsify`, `budget`, `soak`, `sim_s2f`.
+**`gates_p5` and `gates_p7a`/`p8` write a different JSON schema from `p1a`–`p4`
 (`ok`/`fail` rather than `results`)** — a parser that reads only `results` reports 0/0 on a suite
 that fully passed. That mistake has been made three times here.
 
-Green at ship: `p1a` 10/10 · `p2` 8/8 · `p3a` 13/13 · `p3b` 12/12 · `p4` 19/19×2 · `p5` 16/16×2 ·
-`p6` 19/19×4 · `p7a` 30/30 · `p7b` 20/20 · `p8` 30/30 · `p11` 8/8×2 · `wire` 11/11 ·
-`determinism` 9/9 (**golden hash `f29beaf9`, 25,039 buildings**) · `t10` 4/4.
+Green at end of **pass 2-A** (2026-08-20): `p1a` 10/10 · `p2` 8/8 · `p3a` 13/13×2 · `p3b` 12/12 ·
+`p4` 19/19×2 · `p5` 16/16×2 · `p6` 19/19×5 · `p7a` 30/30 · `p7b` 20/20 · `p8` **32/32** ·
+`p11` 8/8×2 · `wire` 11/11 · `s2a` 13/13×2 · `s2c` 17/17×2 · `s2d` 14/14×2 · `s2e` 30/30×2 ·
+`s2f` 11/11×2 · `s2g` 9/9×2 · `determinism` 9/9 (**golden hash `f29beaf9`, 25,039 buildings**) ·
+`t10` 4/4 · `budget --headed` green on both presets.
+
+**`p7a` and `p7b`'s numbers are the `--falsify` totals** — that flag ADDS six checks to each suite
+(24+6=30, 14+6=20). Running them without it and "correcting" these figures downward would quietly
+retire twelve falsification controls. One agent proposed exactly that.
 
 ## Gotchas that have cost real time
 

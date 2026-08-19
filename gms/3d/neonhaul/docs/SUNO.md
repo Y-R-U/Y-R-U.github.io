@@ -19,91 +19,96 @@ rebuild. **The game is fully playable and correct with this entire folder empty*
 line still appears as a text popup, and the synthesised radio bed still runs. So generate in any
 order, stop whenever, and come back later.
 
-**One track can be several slots.** Every chatter prompt contains several lines separated by
-`[pause]`, so one generation gives you a whole group. `tools/split_chatter.py` silence-splits the
-returned file and writes the numbered slots **in the order they are written here** — so don't
-reorder the lines. If the split comes out wrong the tool tells you and leaves the whole file as
-`_unsplit_<group>.mp3` for you to cut by hand; it never writes wrong files silently. If you'd rather
-generate one line at a time, that works too — the manifest lists every line individually.
+**One track can be several slots.** Every chatter prompt in §2–§3 contains several lines separated
+by `[pause]`, so one SUNO generation gives you a whole group. Cut it with **`tools/vo/split_take.py`**,
+which aligns the known script against whisper's word stream. There is no `tools/split_chatter.py` —
+BUILD_PLAN §11 specified one, and then explained why silence-splitting fails on SUNO output (it puts
+a musical bed under spoken word, so `silencedetect` finds ~7 gaps where a 22-line take needs 21).
+`split_take.py` is the tool that was built instead and it is the one that produced the 22 dispatch
+lines on disk.
+
+**Since S2-B you almost certainly do not want SUNO for chatter at all.** The whole pool is generated
+locally — see the STATUS block below — and a SUNO take now has to be *worse* on purpose to match the
+rest. The prompts in §2 and §3 are kept because they are still the best description of what each
+group is FOR, and because the music prompts in §1 are unchanged and still live.
 
 ---
 
-## STATUS — updated by P8 (the audio code), 2026-08-18
+## STATUS — rewritten by S2-B (radio voices), 2026-08-20
 
-**The player-facing half of this file is done.** Every *required* slot is generated and every one of
-them has been verified to contain real sound — not "the file exists", but decoded sample energy,
-measured in the browser that will actually decode it. All 31 present clips read between **−18.5 and
-−6.9 dBFS RMS**; the check that produced those numbers was proved able to fail by running it against
-a deliberately silenced encode of `dispatch_01.mp3` (same duration, same codec, same byte size,
-flagged silent). `tools/gates_p8.mjs` B5 and B6.
+**Every chatter slot now has audio.** The pool went from 64 declared slots with 26 files on disk to
+**203 slots with 203 files** — 179 foreground, 24 background — spoken by **31 voice
+identities over 16 installed macOS voices**. Aaron's complaint was *"there is only a couple of
+random chatter that loop frequently"*, and the cause was that 38 of the 64 declared slots had never
+been generated: the player was hearing four dispatch groups on rotation and nothing else existed.
 
-| | group | slots | on disk | note |
-|---|---|---|---|---|
-| M1 | `menu` | 1 | ✅ | see the caveat below — nothing plays it yet |
-| M2 | `cruise_a` | 1 | ✅ | |
-| M3 | `cruise_b` | 1 | ✅ | |
-| M4 | `cruise_day` | 1 | ✅ | |
-| M5 | `docked` | 1 | ✅ | |
-| M6 | `chase` | 1 | — | optional; the `rush` pool is empty and falls through to cruise |
-| M7 | `storm` | 1 | — | optional; `storm` falls through to cruise |
-| M8 | `first_flight` | 1 | — | optional; `intro` falls through to cruise |
-| M9 | `pirate` | 1 | — | optional; the diegetic station has nothing to play |
-| B1 | `bg_net` | 4 | ✅ | |
-| B2 | `bg_dock` | 3 | — | optional |
-| C1 | `dispatch` | 6 | ✅ | |
-| C2 | `dispatch_confirm` | 8 | ✅ | |
-| C3 | `dispatch_pay` | 8 | ✅ | |
-| C4–C9 | `police` `pirate` `ad` `distress` `weather` `life` | 35 | — | all optional |
+| | now | was |
+|---|---|---|
+| chatter slots | 203 | 64 declared, 26 on disk |
+| foreground lines | 179 | 22 on disk |
+| distinct voices | 31 identities / 16 base voices | 1 (a single SUNO operator) |
+| total bytes | **2283 KB** | 841 KB across the 26 — 7.8x the clips for 2.71x the bytes |
+| mean clip | 11.2 KB | 32.4 KB |
+| the same 26 slots | 291 KB re-encoded | 841 KB |
+| encode | mono, 16 kHz, 16 kbps mp3 | mono, 32 kHz, ~51 kbps |
 
-**31 of 73 slots have a file. The other 42 are wired, listed, and behave correctly.** Every one of
-them still speaks: an absent foreground line fires as a text-only popup on exactly the same schedule,
-using the `text` in the manifest, which is this file's line copied character for character (asserted
-against this document by gate A3). Deleting `assets/audio/` in its entirety was run as a test — the
-game boots, renders, and the synthesised radio bed still plays (gates E1, E2).
+**How it is built.** `tools/vo/lines.json` holds every line, its voice and its group. `python3
+tools/vo/gen_chatter.py` synthesises the ones that need synthesising with macOS `say`, passes every
+clip — the SUNO takes included — through `tools/radio_fx.sh`, rewrites `assets/audio/manifest.json`,
+and verifies the result. **The SUNO originals are the only input that cannot be rebuilt**; they are
+kept in `tools/vo/raw/suno/` (gitignored) and the generator refuses to overwrite them. This file's
+generated halves come from `tools/vo/write_suno_md.py`.
 
-**`assets/audio/manifest.json` now exists** with all 73 slots, generated from *this file* so the
-popup text and the audio can never drift apart. You still do not need to touch it: drop an mp3 in
-with the filename below and it plays. That was tested by staging one file into a slot that had none
-(gate C1) — it decoded, played, ducked the music to 0.37×, and showed its popup for the computed
-9.6 s hold, with no code change and no rebuild.
+**The radio character is in ffmpeg, not in a prompt.** `tools/radio_fx.sh` is a filter chain:
+300–3400 Hz band-limit at 36 dB/oct, a 1.8 kHz intelligibility lift, two stages of hard compression,
+a pink-noise carrier floor, and a squelch burst keying on at the head and decaying at the tail.
+Measured with white noise in (flat to 0.1 dB), the chain reads **−30.8 dB at 50–150 Hz, −17.0 dB at
+150–300 Hz, flat across 600–3400 Hz, −14.1 dB at 3400–4500 Hz and −31.5 dB at 4500–7000 Hz**,
+relative to the passband. Four profiles — `close`, `distant`, `loud`, `thin` — are the four physical
+situations the lines are written for, not four EQ presets.
 
-### Corrections to the arithmetic further down this file
+**Verification.** Because the chain deliberately mixes hiss into every clip, *whole-file* RMS would
+pass a clip in which nobody spoke. So `gen_chatter.py --verify` measures the **speech window**
+between the two squelch bursts against a floor derived by running a no-speech control through the
+identical chain, and checks each clip's duration against what its script and its voice's own
+words-per-minute predict. `--falsify` proves both go red. Over all 203 clips: speech window
+**-20.2 to -13.6 dBFS** against a floor of **-26.5 dBFS**, 0 rejected.
 
-- **"5 × 7 × 36 s ≈ 21 minutes before any foreground line repeats" is not right.** 21 minutes is the
-  length of one shuffle-bag *cycle* — the mean interval — not a floor. A bag guarantees each line is
-  heard once per cycle, which still allows the last line of one bag to come back near the front of
-  the next. Measured over 200 seeded 25-minute runs with the bags alone: **0 of 200 were repeat-free,
-  and the earliest repeat landed at 280 s.** The code therefore adds a per-slot **cooldown** (1500 s
-  on ambient lines, 660 s on the two job pools) as a hard time floor on top of the bag. Measured over
-  60 seeded *hour-long* runs, the shortest gap between two plays of any line is **1500.0 s exactly**
-  — the floor, doing its job. Gates A4, A5 and A6.
-- **The pool sizes in the table below are still exactly right** and are asserted by gate A2. The
-  reason to generate the full eight lines of `life` rather than four is unchanged.
+`tools/gates_p8.mjs` B5 checks decoded energy again in the browser that will actually decode it, B6
+proves that check can fail, and **B5b** measures the same speech window in the browser — B5 alone
+stopped being sufficient the moment the assets acquired a deliberate noise floor, and B5b's
+falsification demonstrates exactly that: a clip with its speech zeroed and its squelch kept still
+reads −33 dBFS whole-file, well above MIN_RMS.
 
-### Two things worth knowing before you generate more
+**And the words actually arrive.** `tools/vo/intelligibility.py` transcribes every foreground clip with whisper and scores it against the line it is supposed to say. Mean word-sequence match **90.7%** over 179 clips; the weakest group is `ad` at 82% and the strongest is `dispatch_confirm` at 96%. Read that number
+as a RANKING, not as a percentage a human would score — whisper is degraded by the same band-limit and has
+never heard of the Ninefold Approach. What it is good for is finding the mush, and it found it: three of the
+MacinTalk-era voices were losing their consonants under the band-limit and were replaced off a controlled
+A/B (the same four lines through every candidate), which moved the pool from 86.4% to 90.7%.
 
-1. **`menu.mp3` currently has nothing to play it.** The game has no menu screen — `main.js` runs
-   `free | shot | auto | fly` and shows a boot overlay — so the music state machine resolves straight
-   to `cruise`. The track is generated and correct; it needs a menu, or it stays unused. Flagged in
-   `docs/P8_WIRING.md`, not silently wired to something else.
-2. **Use `tools/vo/split_take.py`, not the `tools/split_chatter.py` §11 describes.** §11 specifies a
-   silence-splitter and then explains why silence-splitting fails — SUNO puts a musical bed under
-   spoken word, so `silencedetect` finds ~7 gaps where a 22-line take needs 21. `split_take.py`
-   already exists, already solved this by aligning the known script against whisper's word stream,
-   and already produced the 22 dispatch lines on disk. Writing the tool §11 asks for would be
-   replacing a working tool with the algorithm it was built to escape. Its input is one small JSON
-   per group, and those can be generated straight out of the manifest — the text is already there,
-   in order:
+### The `tag` field
 
-   ```bash
-   node -e '
-   const m=require("./assets/audio/manifest.json"), g=process.argv[1];
-   const lines=m.chatter.filter(c=>c.group===g).map(c=>({file:c.slot+".mp3",text:c.text}));
-   require("fs").writeFileSync(`tools/vo/script_${g}.json`,JSON.stringify({group:g,lines},null,1));
-   console.log(g,lines.length,"lines");' police
-   ```
+Every slot carries `tag`, and the vocabulary is exactly three values — this is the contract with the
+dashboard work (S2-A), which styles the chatter ticker off it and never touches this file:
 
----
+| `tag` | groups | rendered |
+|---|---|---|
+| `bg` | `bg_net` `bg_dock` | faded — background wash, not addressed to the player |
+| `info` | `ad` `pirate` `weather` `life` | normal — ordinary traffic |
+| `alert` | `dispatch` `dispatch_confirm` `dispatch_pay` `police` `distress` | bright / highlighted |
+
+### Music is unchanged
+
+Five of nine music slots have a file. `chase`, `storm`, `first_flight` and `pirate` are still
+unfilled and still optional; their pools fall through to `cruise`. `menu.mp3` still has nothing to
+play it — the game has no menu screen. Both are unchanged from P8.
+
+### The correction P8 made to the repeat arithmetic still stands
+
+"5 × 7 × 36 s ≈ 21 minutes before any foreground line repeats" is one shuffle-bag *cycle*, i.e. the
+mean interval, not a floor. The code adds a per-slot **cooldown** (1500 s ambient, 660 s on the two
+job pools) as the hard time floor. Gates A4, A5, A6. With the pool at 179 foreground lines those
+bags are 2–4x longer, so the cycle length rises with them; the cooldown floor is unchanged.
 
 ## The three rules every chatter prompt here follows
 
@@ -274,10 +279,13 @@ under the radio bus's bandpass, and being lyrical is the point.
 ---
 ---
 
-# 2. BACKGROUND CHATTER — 7 slots
+# 2. BACKGROUND CHATTER — the original SUNO prompts
 
 Ambient, low in the mix, **never shown on screen**. Half-intelligible on purpose — these sit under
 the synthesised traffic-net bed and make the city sound busy.
+
+*These two prompts describe the original 7 slots. The pool is 24 background slots now and all of
+them are generated locally — §4 is the current list. Keep this section for what each group is FOR.*
 
 ---
 
@@ -339,9 +347,13 @@ Plays only while docked.
 ---
 ---
 
-# 3. FOREGROUND CHATTER — 57 slots
+# 3. FOREGROUND CHATTER — the original SUNO prompts
 
 These play at full radio gain **and** pop up on the HUD. Nine groups.
+
+*These prompts describe the original 57 foreground slots and the voice specced for each group. The
+pool is 179 foreground slots now, generated locally — §4 is the current list, §5 the current cast.
+Kept because the register each group is written in has not changed and this is where it is set out.*
 
 Every line becomes one manifest slot with its text field set to the line exactly as written here, so
 the popup and the audio match word for word. **That matters** — a mismatch reads as a bug. If you
@@ -681,31 +693,527 @@ and it is one generation.
 ---
 ---
 
-# 4. Slot summary
+# 4. THE FULL LINE POOL — every slot, verbatim
 
-| group | slots | on screen | generations | required |
+Generated from `tools/vo/lines.json`; this is what `assets/audio/manifest.json` says, line for
+line. `gates_p8` A3 asserts that every foreground slot's popup text appears in THIS FILE verbatim,
+so the two cannot drift. **Do not hand-edit the tables** — edit `lines.json`, re-run
+`python3 tools/vo/gen_chatter.py`, then `python3 tools/vo/write_suno_md.py`.
+
+`voice` is a key in §5's cast table. A `SUNO` row is one of the 26 original SUNO takes, kept and
+only re-processed through the radio chain.
+
+---
+
+## `dispatch` — general Haul Control traffic
+
+**19 slots** · `fore` · `tag: alert` · gain 0.9 · cooldown 1500 s
+
+Speaker label on screen: **HAUL CONTROL**
+
+| slot | voice | line |
+|---|---|---|
+| `dispatch_01` | *SUNO* | Haul Control to all couriers — the Vane Street corridor is open again. Lanes four through nine, keep it under two hundred. |
+| `dispatch_02` | *SUNO* | We have a manifest mismatch on the Kessel drop. If that box is warm, it is not my problem. |
+| `dispatch_03` | *SUNO* | PULL UP, COURIER. PULL UP. YOU ARE INSIDE THE STACK. |
+| `dispatch_04` | *SUNO* | Shift change in ten. Whoever is on the roof at Ardent, the beacon is out again. Still. |
+| `dispatch_05` | *SUNO* | Somebody has parked a freighter across two of my lanes. I am told this is temporary. I am told a lot of things. |
+| `dispatch_06` | *SUNO* | Weather is closing the upper approach at Pale Terrace. If you are booked up there, you are now booked somewhere else. |
+| `dispatch_07` | `ctrl_b` | Haul Control, all couriers. Vault Row has closed its low approach for the night. Come in high or come in tomorrow. |
+| `dispatch_08` | `ctrl_c` | Advisory for the Ninefold Approach. The beacon is reading. The beacon is lying. Fly it by eye. |
+| `dispatch_09` | `ctrl_a` | Anyone still holding for Sixteen Low, the pad has been reassigned. I would tell you to whom, but nobody told me. |
+| `dispatch_10` | `ctrl_b` | Reminder to the lane. Sootfields is a corridor, not a shortcut. I can see all of you. |
+| `dispatch_11` | `ctrl_c` | We have a stalled hauler across Gantry Row. Go around it, go under it, go home. Do not go through it. |
+| `dispatch_12` | `ctrl_a` | Cinder Step is stacking six deep. If your parcel is not warm, take the long way and enjoy the quiet. |
+| `dispatch_13` | `ctrl_b` | That is the third transponder failure over The Drownings this shift. If you go dark down there, nobody is coming. |
+| `dispatch_14` | `ctrl_c` | Haul Control. Marrow Landing has power again. Everything standing on it does not. |
+| `dispatch_15` | `ctrl_a` | Lanes four through nine are yours until the weather turns. The weather always turns. |
+| `dispatch_16` | `ctrl_b` | Somebody on this band is broadcasting music. It is not good music. Please stop. |
+| `dispatch_17` | `ctrl_c` | The Spindle deck is closed to unlicensed traffic. Yes, that means you. It has always meant you. |
+| `dispatch_18` | `ctrl_a` | Courier traffic, stay off Pale Terrace for the next hour. There is a thing happening and I am not being told what. |
+| `dispatch_19` | `ctrl_b` | SEPARATE. SEPARATE. TWO OF YOU ARE IN THE SAME LANE AT THE SAME HEIGHT. |
+
+---
+
+## `dispatch_confirm` — fires every time the player accepts a job
+
+**20 slots** · `fore` · `tag: alert` · gain 0.9 · cooldown 660 s
+
+Speaker label on screen: **HAUL CONTROL**
+
+| slot | voice | line |
+|---|---|---|
+| `dispatch_confirm_01` | *SUNO* | Courier, your parcel is logged and the pad is holding for you. Try not to make them wait. |
+| `dispatch_confirm_02` | *SUNO* | Logged. Clock's running. Try to look like you've done this before. |
+| `dispatch_confirm_03` | *SUNO* | That's on your manifest now. Whatever it is. |
+| `dispatch_confirm_04` | *SUNO* | Confirmed. Lane's clear as far as I can see, which is not far. |
+| `dispatch_confirm_05` | *SUNO* | You've got it. Sealed, weighed, and none of my business. |
+| `dispatch_confirm_06` | *SUNO* | Accepted. They asked for someone reliable. I sent you anyway. |
+| `dispatch_confirm_07` | *SUNO* | Booked. Take the high lane, the low one's a car park. |
+| `dispatch_confirm_08` | *SUNO* | On the board and off my desk. Go. |
+| `dispatch_confirm_09` | `ctrl_b` | Logged. The pad knows you are coming. It is not excited about it. |
+| `dispatch_confirm_10` | `ctrl_c` | You have it. The weight is declared, which is not the same as true. |
+| `dispatch_confirm_11` | `ctrl_a` | Confirmed. Straight there, and I do mean straight. |
+| `dispatch_confirm_12` | `ctrl_b` | On your manifest. Try to arrive with the same number of pieces. |
+| `dispatch_confirm_13` | `ctrl_c` | Booked. If it rattles, that is normal. If it stops rattling, hurry. |
+| `dispatch_confirm_14` | `ctrl_a` | Accepted. The client is already asking where you are. They asked before you took it. |
+| `dispatch_confirm_15` | `ctrl_b` | That is yours. I have put you down as reliable, which was a decision. |
+| `dispatch_confirm_16` | `ctrl_c` | Sealed and signed. Do not open it, do not shake it, do not ask. |
+| `dispatch_confirm_17` | `ctrl_a` | Logged at this end. The clock started before I finished saying that. |
+| `dispatch_confirm_18` | `ctrl_b` | Got it. Lane is busy, weather is turning, and you said yes anyway. |
+| `dispatch_confirm_19` | `ctrl_c` | Confirmed. Somebody wanted this yesterday, so today is already late. |
+| `dispatch_confirm_20` | `ctrl_a` | You are on it. Nice and boring, please. Boring is the good one. |
+
+---
+
+## `dispatch_pay` — fires every time the player completes a delivery
+
+**20 slots** · `fore` · `tag: alert` · gain 0.9 · cooldown 660 s
+
+Speaker label on screen: **HAUL CONTROL**
+
+| slot | voice | line |
+|---|---|---|
+| `dispatch_pay_01` | *SUNO* | Nice run. Credits are clearing now. Don't spend it all in the Ribs. |
+| `dispatch_pay_02` | *SUNO* | Signed for. Money's moving. Slowly, but it's moving. |
+| `dispatch_pay_03` | *SUNO* | Delivered and closed. That's one thing today that went where it was supposed to. |
+| `dispatch_pay_04` | *SUNO* | Paid. They didn't complain, which from them is a compliment. |
+| `dispatch_pay_05` | *SUNO* | Clean drop. I'm marking you as competent. Don't make me change it. |
+| `dispatch_pay_06` | *SUNO* | Received in one piece. Credits inbound. Enjoy the four minutes before you need them. |
+| `dispatch_pay_07` | *SUNO* | Logged, paid, forgotten. That's the job. |
+| `dispatch_pay_08` | *SUNO* | Done. There's more where that came from, unfortunately. |
+| `dispatch_pay_09` | `ctrl_b` | Delivered. The credits are moving through four systems that all take a cut. What is left is yours. |
+| `dispatch_pay_10` | `ctrl_c` | Signed for. They counted it twice in front of you, which is their way of being friendly. |
+| `dispatch_pay_11` | `ctrl_a` | Paid. Nothing broken, nothing missing, nobody shouting. Rare. |
+| `dispatch_pay_12` | `ctrl_b` | Closed. That parcel is somebody else's problem now, and honestly it always was. |
+| `dispatch_pay_13` | `ctrl_c` | Clean drop. I have had worse days, and most of them were this one. |
+| `dispatch_pay_14` | `ctrl_a` | Received. Money is in. Spend it on the cell before you spend it on anything fun. |
+| `dispatch_pay_15` | `ctrl_b` | Logged. They have asked for you specifically next time, which is either a compliment or a warning. |
+| `dispatch_pay_16` | `ctrl_c` | Done and paid. Go and sit somewhere with a roof over it for ten minutes. |
+| `dispatch_pay_17` | `ctrl_a` | That has cleared. Small job, small money, still money. |
+| `dispatch_pay_18` | `ctrl_b` | Delivered on time, which I have noted, because nobody else will. |
+| `dispatch_pay_19` | `ctrl_c` | Paid out. There is a queue of work behind it. There always is. |
+| `dispatch_pay_20` | `ctrl_a` | Settled. And before you ask, yes, there is more. |
+
+---
+
+## `police` — City Patrol, Air Division — other people’s problems on an open band
+
+**26 slots** · `fore` · `tag: alert` · gain 0.9 · cooldown 1500 s
+
+Speaker label on screen: **CITY PATROL**
+
+| slot | voice | line |
+|---|---|---|
+| `police_01` | `patrol_a` | Air Division, routine sweep, lanes one through six. Nothing to see. As usual. |
+| `police_02` | `patrol_c` | Unregistered hauler in the Lantern Quarter, descending. We are aware. We are not interested. |
+| `police_03` | `patrol_b` | Courier craft, you are flying a lane you are not licensed for. Consider this the friendly version. |
+| `police_04` | `patrol_a` | HOLD YOUR ALTITUDE. HOLD IT. DO NOT DESCEND. |
+| `police_05` | `patrol_c` | Cargo seizure at pad nine. Owner declined to attend. Owner never does. |
+| `police_06` | `patrol_b` | Break off pursuit, we lost him in the smog band. Log it as weather. |
+| `police_07` | `patrol_a` | Air Division to all units. Be advised, grey hauler, no transponder, last seen crossing Tallow Yard low and fast. Do not approach it. Just tell us where it went. |
+| `police_08` | `patrol_c` | All craft in the Lantern Quarter, this is City Patrol. A vehicle on your band is running a false registry. If it hails you, do not answer it. |
+| `police_09` | `patrol_b` | Notice to lane traffic. Pike Deck is a controlled approach from tonight. Fly it without clearance and we will find you. Eventually. Probably. |
+| `police_10` | `patrol_a` | Air Division, routine sweep, Vault Row. Nothing. Same as last night. Same as the night before that. |
+| `police_11` | `patrol_c` | Security advisory. Two craft are working the Gantry as a pair. One stops you, the other takes the cargo. If you get flagged down over the Gantry, keep flying. |
+| `police_12` | `patrol_b` | HOLD YOUR LINE. HOLD IT. YOU ARE CROSSING A CONTROLLED APPROACH. |
+| `police_13` | `patrol_a` | We have a craft parked mid lane over Ninefold with its lights off. It has been there two hours. Somebody go and look at it. Not me. |
+| `police_14` | `patrol_c` | All units, cargo theft reported at Quill Step. Description of the vehicle, a courier craft. That is the entire description we were given. |
+| `police_15` | `patrol_b` | Air Division. If you are the one flying under the Sever Wall, we can see you, we have always been able to see you, and it is not clever. |
+| `police_16` | `patrol_a` | Be advised, the smog band is down to sixty metres over Sootfields. If you lose somebody in there, log it as weather and go home. |
+| `police_17` | `patrol_c` | Notice. An unlicensed pad is operating somewhere off Low Ferrand. We are told that it moves. Pads do not move. We are looking into it. |
+| `police_18` | `patrol_b` | Patrol to control. That hauler we flagged over Marrow Landing has put itself in the water. Recovery is your problem now. |
+| `police_19` | `patrol_a` | This is City Patrol, Air Division. The Drownings is not closed. The Drownings is simply not recommended. There is a difference and it is yours. |
+| `police_20` | `patrol_c` | Alert to all lanes. A craft matching the theft report was seen at Redoubt Two. It has since been seen at four other places at the same time, which tells you how good the report is. |
+| `police_21` | `patrol_b` | CLEAR THE PAD. CLEAR THE PAD. WE HAVE A CRAFT COMING IN WITHOUT POWER. |
+| `police_22` | `patrol_a` | Air Division. Somebody has taken the beacon off the Kiln. Not broken it. Taken it. It weighs four hundred kilos. |
+| `police_23` | `patrol_c` | Advisory for couriers. If a client meets you out on the pad instead of inside, that is not a client. Log it and fly. |
+| `police_24` | `patrol_b` | Routine notice. Speed enforcement is active on the Spine Run tonight. Enforcement means we write it down. |
+| `police_25` | `patrol_a` | We have found the craft from the Quill Step report. It was never stolen. Its owner forgot where he parked it. Three days. |
+| `police_26` | `patrol_c` | City Patrol to all air traffic. Stand by for a controlled descent over Ashlock Upper. Anyone below three hundred metres, be somewhere else. |
+
+---
+
+## `pirate` — The Understack, the unlicensed station
+
+**15 slots** · `fore` · `tag: info` · gain 0.9 · cooldown 1500 s
+
+Speaker label on screen: **THE UNDERSTACK**
+
+| slot | voice | line |
+|---|---|---|
+| `pirate_01` | `dj` | You're on the understack. If you can hear me, you're too low, and that's exactly where I want you. |
+| `pirate_02` | `dj` | They say the Pale Terrace towers are empty. Forty floors, every light on, nobody home. Ask yourself who's paying that bill. |
+| `pirate_03` | `dj` | Couriers — if a client won't tell you what's in the box, that's not a red flag. That's a pay rise. Charge accordingly. |
+| `pirate_04` | `dj` | THEY ARE NOT CLOUDS. THEY HAVE NEVER BEEN CLOUDS. LOOK UP. |
+| `pirate_05` | `dj` | Anyway. Rain until Thursday. Fly low, fly rude. |
+| `pirate_06` | `dj` | You are down in the understack. Nobody licensed this, nobody is paying for this, and nobody can find the transmitter. Yet. |
+| `pirate_07` | `dj` | Forty floors at Pale Terrace, every light burning, nobody home. That is not a building. That is a receipt. |
+| `pirate_08` | `dj` | Somebody asked me why the sky is grey. Wrong question. Ask who it is grey for. |
+| `pirate_09` | `dj` | They put a new sign on the Kiln this week. Same building, same everything, new sign. That is the whole economy, right there. |
+| `pirate_10` | `dj` | Message for the patrol craft that has been circling the Ribs for an hour. I can hear your engine through the microphone. Come in and have a cup of something. |
+| `pirate_11` | `dj` | If you are flying low enough to hear this clearly, congratulations, you are breaking about four rules. Keep going. |
+| `pirate_12` | `dj` | The Market is still open. They will tell you it is not. It is. Go round the back of the Gantry and follow the noise. |
+| `pirate_13` | `dj` | Here is a fact they do not put on the boards. Nobody in this city was born in this city. Nobody. Think about who that is convenient for. |
+| `pirate_14` | `dj` | TURN IT UP. IF YOUR NEIGHBOUR COMPLAINS, TURN IT UP AGAIN. |
+| `pirate_15` | `dj` | Somebody has left a parcel outside the studio. I am not opening it, I am not moving it, and I am broadcasting next to it, which is a decision I am reviewing. |
+
+---
+
+## `ad` — the commercial band
+
+**16 slots** · `fore` · `tag: info` · gain 0.9 · cooldown 1500 s
+
+Speaker label on screen: **COMMERCIAL BAND**
+
+| slot | voice | line |
+|---|---|---|
+| `ad_01` | `ad_f` | Tallow Nutrient Paste. Nine flavours. All of them are paste. |
+| `ad_02` | `ad_m` | Breathing shouldn't be a luxury. At Ardent Air, breathing is a subscription. That's better. |
+| `ad_03` | `ad_f` | Kell's Rest. Sleep four hours, wake up owing nothing. Terms apply. Many terms apply. |
+| `ad_04` | `ad_m` | New from Vantage Optics — see the sky the way it used to be, for eleven credits a month, forever. |
+| `ad_05` | `ad_f` | EVERY UNIT MUST GO. EVERY UNIT. WE ARE NOT COMING BACK. |
+| `ad_06` | `ad_m` | Drownings Reclamation. We buy anything. We do not ask. |
+| `ad_07` | `ad_f` | Cinder Step Storage. Your things, somewhere else, forever, for less. |
+| `ad_08` | `ad_m` | Feeling slow? Feeling grey? That is your body asking for Bright. Bright is a drink. Bright is a choice. Bright is nine credits. |
+| `ad_09` | `ad_f` | The Gantry Market. Everything you need and eleven things you do not. Bring a light. |
+| `ad_10` | `ad_m` | Halyard Nine Clinic. Walk in with a problem. Walk out with a payment plan. |
+| `ad_11` | `ad_f` | CLOSING DOWN. CLOSING DOWN. AGAIN. |
+| `ad_12` | `ad_m` | Pike Deck Fuel. The cheapest on the approach, because we are the furthest from anywhere. |
+| `ad_13` | `ad_f` | New from Vantage Optics. The Clear filter. See the city the way the architects intended it, with none of the people in it. |
+| `ad_14` | `ad_m` | Sunder Rest Insurance. We cover everything except what happens. |
+| `ad_15` | `ad_f` | Kell's Rest Noodles. Open all night, because the night is also open. |
+| `ad_16` | `ad_m` | Own a piece of Pale Terrace. Forty floors, one owner, and it could be you. It will not be you. |
+
+---
+
+## `distress` — the open emergency band
+
+**14 slots** · `fore` · `tag: alert` · gain 0.9 · cooldown 1500 s
+
+Speaker label on screen: **EMERGENCY BAND**
+
+| slot | voice | line |
+|---|---|---|
+| `distress_01` | `dis_b` | Mayday, mayday — cell's gone, I'm at ninety metres and dropping, anyone on this band — |
+| `distress_02` | `dis_c` | I AM IN THE SMOG BAND. I CANNOT SEE THE LANE. I CANNOT SEE THE LANE. |
+| `distress_03` | `dis_a` | It's not an emergency yet. I'm just saying it might be. In about a minute. |
+| `distress_04` | `dis_d` | GET OFF THE PAD. GET OFF THE PAD NOW. |
+| `distress_05` | `dis_f` | Cancel the mayday. I found a ledge. It'll do. |
+| `distress_06` | `dis_b` | Anyone on this band, I have a cargo fire, repeat, cargo fire, I am putting it down on the first flat thing I can see. |
+| `distress_07` | `dis_c` | IT IS COMING OFF. THE WHOLE PANEL IS COMING OFF. GET CLEAR OF ME. |
+| `distress_08` | `dis_a` | This is not an emergency. I am formally declaring that it is not an emergency. Please stay on this channel anyway. |
+| `distress_09` | `dis_f` | I have lost the lane markers over Sootfields. I am flying on the instruments and the instruments have opinions. |
+| `distress_10` | `dis_e` | SOMEBODY IS IN THE WATER. SOMEBODY IS IN THE WATER OFF THE DROWNINGS. |
+| `distress_11` | `dis_d` | Cell at eight per cent. Eight. I am nine minutes from anywhere. Please tell me somebody is nearer than that. |
+| `distress_12` | `dis_b` | My passenger has stopped answering me. I do not know what to do about that at four hundred metres. |
+| `distress_13` | `dis_a` | Correction to my last. Correction. I have it back. I have it back. Stand down. Thank you. Thank you. |
+| `distress_14` | `dis_f` | Mayday relay, mayday relay. I am not the one in trouble. I am just the one who can still transmit. |
+
+---
+
+## `weather` — the Atmospheric Bulletin
+
+**14 slots** · `fore` · `tag: info` · gain 0.9 · cooldown 1500 s
+
+Speaker label on screen: **ATMOSPHERIC**
+
+| slot | voice | line |
+|---|---|---|
+| `weather_01` | `bulletin` | Atmospheric bulletin. Particulate density high below one hundred metres. Visibility, four hundred. Conditions are within normal. |
+| `weather_02` | `bulletin` | Precipitation across all districts for the next nine hours. Surface reflectivity elevated. Reduce approach speed. |
+| `weather_03` | `bulletin` | Daylight index, zero point two. This is the maximum for today. |
+| `weather_04` | `bulletin` | Electrical activity above three hundred metres. Craft in the upper lanes should descend. Craft that cannot descend should continue. |
+| `weather_05` | `bulletin` | The smog band has lifted to one hundred and forty metres. Enjoy the view. |
+| `weather_06` | `bulletin` | Atmospheric bulletin. Wind shear across the upper lanes above two hundred metres. Craft under six tonnes should not be up there. Craft over six tonnes are not our concern. |
+| `weather_07` | `bulletin` | Rainfall total for the period, forty one millimetres. Rainfall total for the year, unavailable. The instrument is under water. |
+| `weather_08` | `bulletin` | Bulletin. Temperature, eleven degrees. Temperature at street level, unknown. Nobody is measuring street level. |
+| `weather_09` | `bulletin` | Visibility at the Spine, two hundred metres. Visibility at Sootfields, one hundred. Visibility at the Drownings, not applicable. |
+| `weather_10` | `bulletin` | Advisory. Ice is forming on approach surfaces above three hundred and twenty metres. Descend, or accept the ice. |
+| `weather_11` | `bulletin` | Atmospheric bulletin. The particulate index has been revised. It has not improved. The index has been revised. |
+| `weather_12` | `bulletin` | Daylight index, zero point one. Sunrise occurred. Sunset will occur. Neither will be visible. |
+| `weather_13` | `bulletin` | Bulletin. A pressure front is crossing Vault Row. Expect turbulence, expect delay, expect the usual. |
+| `weather_14` | `bulletin` | Conditions are within normal. Normal has been revised twice this year. |
+
+---
+
+## `life` — the city talking to itself
+
+**35 slots** · `fore` · `tag: info` · gain 0.9 · cooldown 1500 s
+
+Speaker label on screen: **OPEN CHANNEL**
+
+| slot | voice | line |
+|---|---|---|
+| `life_01` | `hauler` | Third time at this pad and the lift's still out. I'm carrying it up. Forty floors. Somebody owes me a drink. |
+| `life_02` | `life_f` | Market's open on the Gantry until two. Bring your own light, the strip's been dead since spring. |
+| `life_03` | `life_c` | Anyone flying past Sixteen Low — is that a fire or is that just Tuesday? |
+| `life_04` | `life_l` | Tower maintenance, block nine. We are aware the beacon is out. We have been aware for some time. |
+| `life_05` | `life_k` | Taxi four-one-one, off shift, going home. Whoever's got the Lantern run tonight — good luck, and I mean that. |
+| `life_06` | `life_n` | My kid asked what the sky looks like. I said grey. She said what's grey. Fair question. |
+| `life_07` | `life_c` | GET IT OFF THE EDGE. OFF THE EDGE. IT IS NOT SECURED. |
+| `life_08` | `life_g` | Understack, if you're listening — play the one about the windows again. It's been a week. |
+| `life_09` | `hauler` | Twenty two hours on this run and I have seen the same advert for paste eleven times. Eleven. I could recite it. I will not, but I could. |
+| `life_10` | `hauler` | They have resurfaced the Spine Run and it is worse. I do not know how you make a lane worse, but they have found a way and they should be proud of themselves. |
+| `life_11` | `hauler` | Does anybody know a pad that will take a nine tonner after midnight? And before you say Tallow Yard, Tallow Yard says no. Tallow Yard always says no. |
+| `life_12` | `hauler` | Cargo is fine, I am fine, and the craft is making a noise it was not making yesterday. That is the whole report. |
+| `life_13` | `hauler` | Four hours left, a flask of something brown, and a lane full of couriers who all think they are the only one in it. |
+| `life_14` | `hauler` | It says here I am carrying agricultural equipment. There is no agriculture. I have never seen a field. I am carrying something, I will give them that. |
+| `life_15` | `life_a` | Anyone at the Bell Yard, the lift is out again. And before you ask, yes, I have told them, and yes, they have noted it. |
+| `life_16` | `life_b` | The tea place on Quill Run has closed. Just so everyone knows. I am still processing it. |
+| `life_17` | `life_c` | Whoever keeps parking across the Ninefold Approach, I have your registry and I have nothing else to do. |
+| `life_18` | `life_d` | I have been flying this city forty years and it has never once been finished. Not once. Always scaffolding. |
+| `life_19` | `life_e` | My grandson says he is going to work up on the Spine. I said, lovely. I said, and where will you sleep. He has not answered. |
+| `life_20` | `life_f` | Market is on the Gantry until two. Bring your own light. And your own bag. And, honestly, your own opinion about the fish. |
+| `life_21` | `life_g` | Is anyone else's beacon showing Cinder Step twice? Mine is showing it twice. There is one Cinder Step. |
+| `life_22` | `life_h` | Fourteen years on this band and I still do not know who runs it. I just know it is always on. |
+| `life_23` | `life_i` | Somebody's dog is on the Gantry roof again. It is fine. It lives up there now, apparently. |
+| `life_24` | `life_j` | First shift tonight. If I sound nervous it is because I am nervous. Be nice to me, lane. |
+| `life_25` | `life_k` | Off shift, going down, going home, going to sleep for a very long time. Good luck to whoever has the Lantern run. |
+| `life_26` | `life_l` | Tower maintenance, block four. We know about the lights. We have known about the lights since spring. |
+| `life_27` | `life_m` | Does anybody actually live in Pale Terrace? I have flown past it every night this month and I have never seen a curtain move. |
+| `life_28` | `life_n` | A kid asked me today why the rain is warm. I did not have an answer. I still do not. |
+| `life_29` | `life_a` | If the person who found a courier bag at Marrow Landing is listening, there is a photograph in it that matters to somebody. Please. |
+| `life_30` | `life_h` | Reminder to whoever is flying the Ribs at fifty metres. There are people under you. You cannot see them. They can definitely hear you. |
+| `life_31` | `life_f` | Somebody is playing the understack out loud on Pike Deck and honestly, good. |
+| `life_32` | `life_b` | I have worked out that if I take Cinder Mile instead of the Spine Run I save four minutes and lose my mind. It is a trade. |
+| `life_33` | `life_g` | The lamps in the Lantern Quarter are on the wrong colour again. Everyone looks ill. Everyone looks like that anyway, but more so. |
+| `life_34` | `life_d` | Old Ferrand has gone. Just so you all know. He had that pad thirty years. Somebody put a light on for him. |
+| `life_35` | `life_j` | That is me done. First run, delivered, nothing broken. I am going to talk about this for a week. |
+
+---
+
+## `bg_net` — the traffic-net murmur (background — never shown on screen)
+
+**14 slots** · `back` · `tag: bg` · gain 0.22 · cooldown 0 s
+
+Background lines are **never shown on screen**, so they carry no `text` in the manifest and
+nothing here has to match a popup. Each synthesised one is two people talking over each other,
+rendered separately and stacked with a 0.9 s offset.
+
+| slot | voices | said |
+|---|---|---|
+| `bg_net_01` | *SUNO* | *(overlapping traffic-net murmur — see §2's B1 prompt)* |
+| `bg_net_02` | *SUNO* | *(overlapping traffic-net murmur — see §2's B1 prompt)* |
+| `bg_net_03` | *SUNO* | *(overlapping traffic-net murmur — see §2's B1 prompt)* |
+| `bg_net_04` | *SUNO* | *(overlapping traffic-net murmur — see §2's B1 prompt)* |
+| `bg_net_05` | `life_c + life_k` | Seven four two is clear of the stack, going down to lane four. // Say again your last, you are breaking up. |
+| `bg_net_06` | `life_h + life_d` | Negative on the Ardent beacon, it is still out. // It has been out three weeks. |
+| `bg_net_07` | `life_l + life_b` | Holding at one forty until you clear me. // Nothing moving on pad nine, tell them to circle. |
+| `bg_net_08` | `life_g + life_i` | Ninefold approach, one inbound, nine tonnes, wet. // Copy, put him on the outer. |
+| `bg_net_09` | `life_n + life_j` | End of shift. Somebody else can have it. // Roger that, and good luck to them. |
+| `bg_net_10` | `life_a + life_c` | Anyone got eyes on the lane markers over Sootfields? // Nobody has eyes on anything over Sootfields. |
+| `bg_net_11` | `life_m + life_f` | Confirm you are two hundred and descending. // Confirmed, two hundred, descending, all quiet. |
+| `bg_net_12` | `life_e + life_h` | Vault Row is closed to the low approach until the morning. // Understood, we will take the high side. |
+| `bg_net_13` | `life_k + life_d` | That freighter is still across my lanes. // It is temporary. They told me it is temporary. |
+| `bg_net_14` | `life_b + life_g` | Pike Deck, one in, one out, no delay. // Copy Pike Deck, nothing behind him. |
+
+---
+
+## `bg_dock` — dock-hand chatter, only while docked (background — never shown on screen)
+
+**10 slots** · `back` · `tag: bg` · gain 0.22 · cooldown 0 s
+
+Background lines are **never shown on screen**, so they carry no `text` in the manifest and
+nothing here has to match a popup. Each synthesised one is two people talking over each other,
+rendered separately and stacked with a 0.9 s offset.
+
+| slot | voices | said |
+|---|---|---|
+| `bg_dock_01` | `life_c + life_f` | Left side. Left side. No, the other left. // It is sealed, do not shake it. |
+| `bg_dock_02` | `life_g + life_d` | Whose is the black one on pad two? It has been there since Tuesday. // Nobody's. That is the whole problem. |
+| `bg_dock_03` | `life_c + life_a` | MIND THE EDGE. MIND THE EDGE. // He does that every single time. |
+| `bg_dock_04` | `life_i + life_l` | Sign for it and it is yours, I am not carrying it back. // I am not signing for something I cannot see inside. |
+| `bg_dock_05` | `life_h + life_k` | Straps on, straps on, we are not doing this twice. // It moved last time. I saw it move. |
+| `bg_dock_06` | `life_m + life_n` | Pad three has no power again, run it off the cart. // The cart has no power either. Nothing has power. |
+| `bg_dock_07` | `life_e + life_j` | Tea is going, last call, I am not asking twice. // Two minutes, I am nearly done here. |
+| `bg_dock_08` | `life_b + life_f` | That one goes up the Spine, do not put it with the Ribs run. // It is already with the Ribs run. |
+| `bg_dock_09` | `life_d + life_c` | Rain is coming in sideways again, get the covers on. // The covers are wetter than the cargo. |
+| `bg_dock_10` | `life_a + life_i` | Whoever is on the roof, we can hear you, and you are very loud. // Then stop listening. |
+
+---
+---
+
+# 5. THE CAST
+
+31 voice identities over 16 installed macOS voices. Where two identities share a base
+voice they differ in pitch, in words-per-minute and usually in radio profile — a ±7 % pitch shift
+moves the formants as well as the pitch, so behind a 3.4 kHz band-limit it reads as a different
+person rather than the same person sped up. Listen to the whole cast in one file:
+`python3 tools/vo/gen_chatter.py --demo` → `tools/vo/raw/voice_demo.mp3`.
+
+| id | macOS voice | pitch | wpm | profile | who |
+|---|---|---|---|---|---|
+| `ctrl_a` | Samantha | 1.00 | 208 | `close` | Haul Control, day operator — US female, calm and clipped |
+| `ctrl_b` | Karen | 0.97 | 199 | `close` | Haul Control, night operator — AU female, dry |
+| `ctrl_c` | Tessa | 1.03 | 220 | `close` | Haul Control, relief operator — ZA female, brisk |
+| `patrol_a` | Daniel | 0.93 | 188 | `loud` | City Patrol officer — GB male, bored authority |
+| `patrol_b` | Rocko (English (US)) | 1.00 | 179 | `loud` | City Patrol second unit — deep US male |
+| `patrol_c` | Tara | 1.00 | 182 | `close` | City Patrol dispatcher — IN female, procedural |
+| `dj` | Aman | 1.07 | 235 | `thin` | The Understack pirate DJ — over-modulated, cheap gear |
+| `ad_f` | Moira | 1.09 | 208 | `close` | commercial announcer - bright female, too close to the microphone |
+| `ad_m` | Daniel | 1.09 | 205 | `close` | commercial announcer - bright male, pitched up and pushed |
+| `bulletin` | Karen | 0.99 | 162 | `close` | Atmospheric Bulletin - flat, evenly paced, no emotion whatsoever |
+| `hauler` | Ralph | 0.98 | 170 | `distant` | long-haul freight driver — deep, weary, talks to fill the hours |
+| `life_a` | Moira | 1.00 | 197 | `close` | IE female |
+| `life_b` | Rishi | 1.00 | 188 | `close` | IN male |
+| `life_c` | Fred | 1.00 | 168 | `close` | US male, gruff |
+| `life_d` | Grandpa (English (US)) | 1.00 | 168 | `distant` | old US male |
+| `life_e` | Grandma (English (UK)) | 1.02 | 168 | `close` | old GB female |
+| `life_f` | Samantha | 1.06 | 186 | `close` | GB female -> US female, brisk |
+| `life_g` | Sandy (English (US)) | 0.96 | 200 | `close` | US female, high |
+| `life_h` | Reed (English (UK)) | 1.02 | 193 | `close` | GB male |
+| `life_i` | Eddy (English (UK)) | 0.96 | 184 | `close` | GB male, distant |
+| `life_j` | Daniel | 1.06 | 228 | `close` | GB male, younger |
+| `life_k` | Karen | 1.07 | 215 | `distant` | AU female, younger |
+| `life_l` | Tessa | 0.94 | 195 | `close` | ZA female, lower |
+| `life_m` | Aman | 0.93 | 186 | `close` | IN male, lower |
+| `life_n` | Samantha | 0.92 | 175 | `distant` | US female, lower |
+| `dis_a` | Moira | 1.04 | 240 | `thin` | emergency band — IE female |
+| `dis_b` | Rishi | 1.05 | 246 | `thin` | emergency band — IN male |
+| `dis_c` | Sandy (English (US)) | 1.00 | 210 | `loud` | emergency band — US female |
+| `dis_d` | Rocko (English (US)) | 1.03 | 195 | `thin` | emergency band — deep US male |
+| `dis_e` | Tara | 1.06 | 253 | `loud` | emergency band — IN female |
+| `dis_f` | Daniel | 1.00 | 233 | `thin` | emergency band — GB male |
+
+---
+
+## Slot summary
+
+| group | slots | on screen | tag |
+|---|---|---|---|
+| music | 9 | — | — |
+| `dispatch` | 19 | yes | `alert` |
+| `dispatch_confirm` | 20 | yes | `alert` |
+| `dispatch_pay` | 20 | yes | `alert` |
+| `police` | 26 | yes | `alert` |
+| `pirate` | 15 | yes | `info` |
+| `ad` | 16 | yes | `info` |
+| `distress` | 14 | yes | `alert` |
+| `weather` | 14 | yes | `info` |
+| `life` | 35 | yes | `info` |
+| `bg_net` | 14 | no | `bg` |
+| `bg_dock` | 10 | no | `bg` |
+| **total** | **212** | **179 foreground** | |
+
+---
+---
+
+# 6. THE STORY VO — S2-E's intro cutscene
+
+**This is the one place in NEONHAUL where SUNO is the better tool, and S2-B's verdict is why.**
+Whisper transcription scored the local `say` pipeline **90.7 %** against SUNO's **88.1 %** on radio
+chatter — but that comparison was made through a 3.4 kHz band-limit, where flatness reads as cheap
+gear. The Boss is **not on a radio**. He is sitting in a craft eight metres away with his canopy
+open, talking over a twenty-year-old who has just realised what their father has done. There is no
+band-limit to hide behind and the whole scene is a performance.
+
+So: **the local takes ship now** (`tools/vo/gen_story.py`, 19 clips, 497 KB, in
+`assets/audio/story/`) and the scene is complete and testable today. These prompts exist so Aaron
+can upgrade the Boss in one session without anyone having to re-derive the script.
+
+## What to replace, and what not to
+
+| | replace with SUNO? | why |
+|---|---|---|
+| `boss_01` … `boss_07` | **yes — this is the whole point** | seven lines, gender-invariant, one voice, one session |
+| `pc_*_int1/2/3` | no | three words each; there is nothing to perform |
+| `pc_*_close` | optional, and it is 3 takes | the monologue is the only player line worth a real read |
+
+**Drop-in rule.** Save the take as `assets/audio/story/boss_0N.mp3` and nothing else changes —
+`js/storyui.js`'s `StoryVoice` fetches by slot name and `SCRIPT[n].hold` is the on-screen time. If a
+SUNO take is longer than its `hold`, raise the `hold` in `js/storyui.js` to match; the bubble timing
+is written in that one table and nowhere else.
+
+**Do NOT run these through `tools/radio_fx.sh`.** That is the radio chain. Run them through
+`gen_story.py`'s `room()` treatment instead, or nothing at all — a band-limited Boss sounds like
+dispatch, and dispatch is the one thing this scene must not sound like.
+
+## The voice
+
+> **Style:** `spoken word only, no music, no melody, no beat, no background bed. A single male
+> voice, mid-fifties, deep and unhurried. Close-mic'd, dry, small room. Completely calm — this is a
+> conversation he has had many times and the outcome does not concern him. Never shouts. Slight
+> smile in the delivery on the threats.`
+
+The one direction that matters: **he is not angry.** Every draft that plays him angry makes him
+smaller. He is bored, and being bored while describing breaking somebody's arm is the character.
+
+## S1 — `boss_01`
+
+> **Lyrics:** `[Man, calm, quiet, unhurried] Don't get out. Don't touch the stick. Just listen.`
+
+## S2 — `boss_02`
+
+> **Lyrics:** `[Man, calm, conversational, faintly amused] That is a very nice craft you are
+> flying. [slight pause] Insured to somebody else, I notice.`
+
+## S3 — `boss_03`
+
+> **Lyrics:** `[Man, calm, flat, matter of fact] Your father owes us fifty thousand. [pause] He has
+> owed us fifty thousand for a while now.`
+
+## S4 — `boss_04` — spoken OVER the player's "But—"
+
+> **Lyrics:** `[Man, calm, cutting in, not raising his voice] He is away. You are here. That makes
+> it yours.`
+
+Direction: come in early and flat. He is not interrupting because he is annoyed, he is interrupting
+because he was never going to stop.
+
+## S5 — `boss_05` — spoken OVER the player's "Wait—"
+
+> **Lyrics:** `[Man, calm, patient] Fifty thousand credits. We will come for it, [pause] and I
+> would not make us look for you.`
+
+## S6 — `boss_06` — the threat, spoken OVER the player's "Just wait—"
+
+> **Lyrics:** `[Man, calm, almost pleasant, listing things] If it is not ready we take the craft
+> and sell it. [pause] Then we break an arm. [pause] Then, [slight pause] if I am in a mood, we
+> sell whoever was driving to whoever is buying.`
+
+Direction: the list is the joke and the pauses are the performance. Nothing in it is emphasised.
+This is the longest line in the game at 10.9 s locally, and the one worth the most from a real read.
+
+## S7 — `boss_07`
+
+> **Lyrics:** `[Man, calm, finishing a conversation] Make the money. Soon.`
+
+## S8 — the escalation lines (**not** in the cutscene)
+
+The four pressure messages arrive as text in the chatter ticker while the player is flying, keyed
+off the warmth gauge's pace signal (`js/story.js` `BOSS_LINES`). **They currently have no audio at
+all** and the game is complete without it. If Aaron wants them spoken, they are four more takes in
+the same voice, and they would want the RADIO treatment rather than the room one — he is calling in,
+not standing there. Slots would be `assets/audio/story/boss_msg1..4.mp3` and the wiring is one line
+in `bossSays()`.
+
+> **Lyrics 1:** `[Man, calm, flat] Better make money fast.`
+> **Lyrics 2:** `[Man, calm, flat] Will be needing the money soon.`
+> **Lyrics 3:** `[Man, calm, harder] Ensure you have the money ready.`
+> **Lyrics 4:** `[Man, calm, final] We are on our way. Better have the money ready.`
+
+## S9 — the player's closing monologue, `pc_{m,f,n}_close`
+
+Three takes, ~20 years old, and the only player line long enough to be worth a real performance.
+
+> **Style:** `spoken word only, no music. A twenty-year-old talking to themself in an empty cabin.
+> Shaken, then angry, then decided — in that order, inside twelve seconds. Close-mic'd, dry.`
+>
+> **Lyrics:** `[Young {man/woman/person}, shaken] Shit. [pause] They wouldn't let me get a word in.
+> [angrier] What sort of shit has my Dad got himself into? [quieter, looking around the cabin] I
+> shouldn't even be flying this. [decided] But now I'm going to have to. I need to make that money
+> fast.`
+
+The neutral take is Aaron's own direction: **a high male or low female read**, not a processed one.
+
+## Slot summary — story
+
+| slot | who | takes | local sec | local bytes |
 |---|---|---|---|---|
-| music | 9 | — | 9 | M1, M2, M5 |
-| `bg_net` | 4 | no | 1 | ✓ |
-| `bg_dock` | 3 | no | 1 | |
-| `dispatch` | 6 | yes | 1 | ✓ |
-| **`dispatch_confirm`** | **8** | yes | 1 | **✓** |
-| **`dispatch_pay`** | **8** | yes | 1 | **✓** |
-| `police` | 6 | yes | 1 | |
-| `pirate` | 5 | yes | 1 | |
-| `ad` | 6 | yes | 1 | |
-| `distress` | 5 | yes | 1 | |
-| `weather` | 5 | yes | 1 | |
-| `life` | 8 | yes | 1 | |
-| **total** | **73** | 57 foreground | **21 generations** | 7 of them |
+| `boss_01`–`boss_07` | the Boss | 1 each | 2.2–10.9 | 240 KB total |
+| `pc_{m,f,n}_int1/2/3` | the player | 3 each | 0.5–0.9 | 44 KB total |
+| `pc_{m,f,n}_close` | the player | 3 | 11.9 | 216 KB total |
 
-**How often you'll hear a repeat.** An ambient foreground line fires every 22–50 seconds (mean 36).
-Lines are drawn from a **shuffle bag** per group — without replacement, reshuffled only when the bag
-is empty — so no line can come back until its whole group has been heard. The binding case is a
-five-line group, drawn roughly every seventh line: `5 × 7 × 36 s` ≈ **21 minutes** before any
-foreground line repeats. The two job-event pools are separate: eight lines each, one per job at
-~90 s, so a confirm or pay line repeats no sooner than **12 minutes**.
-
-That is the arithmetic the pool sizes above were chosen against. **If you generate fewer lines in a
-group than are listed here, tell the manager** — the numbers shrink proportionally and the game
-starts sounding like a loop.
+19 clips · 497 KB · mean 26 KB. Only 11 of them are ever fetched in one session, because
+`StoryVoice.preload(gender)` asks for the Boss plus one gender's takes.

@@ -30,6 +30,11 @@ const HIGH = {
   atlasSize: 1024,
   dashFps: 12,
   holoFps: 4,
+  // S2-G living posters: how many poster CHANNELS (one shared-atlas cell each, so this is not a
+  // draw-call count) and how many may hold a decoding <video> at once. `posterVideo` is the one
+  // number the frame budget actually moves on — see js/posters.js.
+  posterChannels: 4,
+  posterVideo: 2,
   minimapFps: 15,
   shafts: 4,
   zonesDrawn: 3,
@@ -59,6 +64,10 @@ const LOW = {
   atlasSize: 512,
   dashFps: 6,
   holoFps: 2,
+  // LOW keeps the cycling stills — they are a texture upload every few seconds — and drops video
+  // decode entirely. A weak phone is exactly where a stalled decode is felt.
+  posterChannels: 2,
+  posterVideo: 0,
   minimapFps: 8,
   shafts: 1,
   zonesDrawn: 2,
@@ -282,14 +291,29 @@ export const HUD = {
   // player can never see is a fade that does not exist, however well it measures under a forced
   // look direction.
   HOLO_FADE_DOT: 0.707,
+  // …and the other half of that sentence, made explicit. The 45 deg above is only reachable if the
+  // panels sit at most ~25 deg off the axis, and S2 made the layout derive their offset from the
+  // visible frame instead of hard-coding 0.44 m — which on a wide frame pushed them to 32 deg and
+  // dropped the looking-straight-ahead fade from 0.79 to 0.66. The frame rule still applies; this
+  // is the ceiling on it, so the geometry can never contradict HOLO_FADE_DOT's own premise.
+  HOLO_LAT_DEG: 25,
   // How far the cabin may lag the view, in radians. §6.1 has the craft heading chasing the camera
   // yaw at 2.6 rad/s, and the cabin is anchored to the CRAFT — so a sustained turn holds a steady
   // heading error, and with nothing bounding it the dash slides bodily off the screen. Seen in the
   // first portrait capture: the instrument panel was clipped by the left edge mid-turn. 20 deg is
   // enough to read as the frame leaning into the turn and small enough that the dash never leaves.
   CABIN_YAW_LAG: 20 * Math.PI / 180,
-  DASH_W: 512, DASH_H: 160,             // dash canvas backing, landscape. LOW halves it
-  DASH_TW: 340, DASH_TH: 212,           // …and portrait: squarer, less on it, much larger type
+  // Dash canvas backing. The ASPECT of each pair is the aspect of the quad it is drawn on
+  // (hud.js dashGeo), so these are the numbers that set how tall the dashboard is on screen —
+  // S2's "reduce the dash height by almost half" is this ratio, not a scale factor somewhere else.
+  // Landscape went 512x160 (0.313) → 896x85 (0.095) and portrait 340x212 (0.624) → 512x174
+  // (0.340); both got WIDER at the same time, so the instruments gained room while the slab lost
+  // the bottom third of the frame. Measured with __game.cabinExtent(), which projects the lip and
+  // the consoles as well as the quad rather than just the quad — in portrait the lip was the
+  // larger half of what the player actually saw.
+  DASH_W: 896, DASH_H: 85,              // dash canvas backing, landscape. LOW halves it
+  DASH_TW: 512, DASH_TH: 174,           // …and portrait: taller, less on it, much larger type
+  DASH_R: 22,                           // corner radius of the dash housing, in canvas px
   HOLO_W: 384, HOLO_H: 128,             // one holo panel's cell in the shared sheet
   CABIN_Z: 1.10,                        // metres in front of the camera — see hud.js, NOT §8.1's
   // `CELL_PER_MIN` was here and is DELETED, not disabled. It was a stated placeholder for the
@@ -348,6 +372,21 @@ function parseFlags(search) {
     probes: has('probes'),
     dpr: q.has('dpr') ? num('dpr', null) : null,
     debug: has('debug'),
+    // §S2-E. `intro` is TRI-STATE and the default is the interesting one.
+    //
+    //   absent   → main.js decides: the cutscene plays for a real first-time player and is
+    //              silently completed for anything that smells like a harness (?nosave, ?auto,
+    //              ?courier, ?shot, ?nohud). A cutscene that blocked the first frame of every gate
+    //              would take eleven suites down with it, and a cutscene that only ever ran under
+    //              a flag would never be measured — so both halves are explicit.
+    //   ?intro=1 → force it, which is how gates_s2e opens it on a throwaway profile.
+    //   ?intro=0 → skip it, which is how a human re-tests the game without watching it again.
+    intro: q.has('intro') ? (q.get('intro') !== '0' && q.get('intro') !== 'false') : null,
+    // Jump the arc straight to a state, for testing what act two looks like without playing 84
+    // minutes to get there: ?story=due (the crew are at the next dock), ?story=paid, ?story=seized.
+    story: q.has('story') ? q.get('story') : null,
+    // Wind the debt clock on. ?debt=80 puts 80 minutes of play on the meter.
+    debt: q.has('debt') ? num('debt', null) : null,
   };
 }
 

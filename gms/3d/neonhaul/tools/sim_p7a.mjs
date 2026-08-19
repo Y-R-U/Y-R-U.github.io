@@ -78,11 +78,20 @@ const POLICIES = ['hop', 'chain', 'greedy', 'hubcamp', 'repeat', 'dawdle', 'reck
 export function runCareer({
   seed = 0x4e454f4e, policy = 'hop', minutes = 20, skill = 1.0, dwell = 1.0,
   world = null, trace = false, buy = false, rng = Math.random,
+  // S2-D added these two. Both default to the pre-S2-D behaviour, so every P7a number this file
+  // has ever reported is reproduced unchanged when they are omitted.
+  //   craft    the hull the career STARTS in. The addendum puts the player in a borrowed hull
+  //            above their licence tier, and says S2-D must measure that rather than assume it.
+  //   buyHull  also buy the best unlocked hull the moment it is affordable, not just upgrades —
+  //            which is what makes NET WORTH diverge from lifetime gross, and therefore what the
+  //            standing ladder is solved against.
+  craft = 'wisp', buyHull = false,
 } = {}) {
   const W = world || loadWorld(seed);
   const { zones, city, clients } = W;
   const missions = new Missions({ zones, city, clients, seed: city.seed });
   const state = E.newState();
+  if (craft !== 'wisp' && E.CRAFT[craft]) { state.craft = craft; state.cellUnits = E.cellMax(state); }
 
   const hub = zones.padAt(...zones.hubChunk);
   let pad = hub;
@@ -269,6 +278,10 @@ export function runCareer({
             t: t / 60, credits: r.credits, base: r.base, km: r.km, risk: r.risk,
             elapsed: r.elapsed, limit: r.limit, timeBonus: r.timeBonus, chainBonus: r.chainBonus,
             rushMul: r.rushMul, othersHeld: r.othersHeld, overdue: r.overdue,
+            // S2-D: the balance-sheet snapshot at the moment of payment. `bank` is liquid, `hull`
+            // is what it is parked in — the standing ladder reads both and the licence ladder
+            // reads neither.
+            bank: state.credits, lifetime: state.lifetime, tier: state.tier, hull: state.craft,
           });
         }
         note('deliver', { credits: res.credits, lifetime: state.lifetime, tier: state.tier });
@@ -284,6 +297,18 @@ export function runCareer({
           if (opts.length) {
             const r = E.buyUpgrade(state, opts[0].l);
             if (r.ok) purchases.push({ t: t / 60, line: opts[0].l, level: r.level, price: r.price });
+          }
+          if (buyHull) {
+            // The most expensive hull the licence allows and the balance covers. A hull is the
+            // single biggest capital event in the game and it is what a standing threshold has to
+            // survive, so a harness that only ever buys upgrades cannot solve one.
+            const best = E.unlockedCraft(state.tier)
+              .filter(id => E.canBuyCraft(state, id).ok)
+              .sort((a, b) => E.CRAFT[b].price - E.CRAFT[a].price)[0];
+            if (best) {
+              const rr = E.buyCraft(state, best);
+              if (rr.ok) purchases.push({ t: t / 60, line: 'hull:' + best, level: 0, price: rr.price });
+            }
           }
         }
       } else break;

@@ -30,10 +30,28 @@
 import { FLIGHT as F } from './config.js';
 import { clamp, wrapAngle } from './utils.js';
 import { emptyInput } from './flight.js';
+import { planLaneRoute, autoSpec, ALT } from './lanes.js';
 
 const DEG = Math.PI / 180;
 const PERIOD = 120;
 const ARC_PX = 2.86;              // px/s of look drag → 0.0120 rad/s → a 5.2 km arc at 62 m/s
+
+// ── the two sign-critical formulas, written ONCE ───────────────────────────
+//
+// `flight`'s forward under its own convention is (-sin h, ., -cos h), so the yaw that points at a
+// target is `atan2(-dx, -dz)` and nothing else. Negating it flies the craft away from every pad in
+// the city and still looks like a working controller — the Courier's own comment says so, and S2-F
+// added a second pilot that would otherwise have carried a second copy of it.
+function steerYaw(i, flight, dx, dz, dt) {
+  const yawErr = wrapAngle(Math.atan2(-dx, -dz) - flight.yawT);
+  i.lookDX = clamp(-yawErr / (F.YAW_SENS * flight.sens), -900, 900) * dt;
+  return yawErr;
+}
+
+// Level the nose. The thrust vector follows the camera pitch, so a nose-down cruise dives.
+function levelPitch(i, flight, dt, gain = 0.8, cap = 500) {
+  i.lookDY += clamp(-(0 - flight.pitchT) / (F.PITCH_SENS * flight.sens) * gain, -cap, cap) * dt;
+}
 
 export class Autopilot {
   constructor() {
@@ -153,9 +171,7 @@ export class Courier {
     // Heading. flight's forward under its own convention is (-sin h, ., -cos h), so the yaw that
     // points at the target is atan2(-dx, -dz) and nothing else. Negating it here would fly the
     // craft away from every pad in the city and still look like a working controller.
-    const wantYaw = Math.atan2(-dx, -dz);
-    const yawErr = wrapAngle(wantYaw - flight.yawT);
-    i.lookDX = clamp(-yawErr / (F.YAW_SENS * flight.sens), -900, 900) * dt;
+    steerYaw(i, flight, dx, dz, dt);
 
     // Altitude: high while crossing the city, THEN DOWN ONTO THE PAD FROM ABOVE — the descent is
     // held back to the last 60 m on purpose.
@@ -189,8 +205,8 @@ export class Courier {
     i.climb = ae > 4 ? 1 : ae < -4 ? -1 : 0;
 
     // Level pitch. A P controller on the LOOK channel, in pixels, exactly as the fixed programme
-    // does it — the thrust vector follows the camera pitch, so a nose-down cruise dives.
-    i.lookDY += clamp(-(0 - flight.pitchT) / (F.PITCH_SENS * flight.sens) * 0.8, -500, 500) * dt;
+    // does it — see `levelPitch` at the top of this file.
+    levelPitch(i, flight, dt, 0.8, 500);
 
     // Throttle is BANG-BANG against a distance-proportional speed target, because §6.2's model
     // does not damp a held stick: `vf` is clamped to MAX_FWD while the stick is down and only
@@ -235,5 +251,208 @@ export class Courier {
       escaping: this._esc > 0, clearance: this.clearance,
       noProgress: +this._noProg.toFixed(1), best: this._best === Infinity ? null : +this._best.toFixed(1),
       target: this.target };
+  }
+}
+
+// ───────────────────────────────────────────────────────────────────────────
+// S2-F — the PLAYER's autopilot.
+//
+// A third pilot, and the only one a player ever meets. `Autopilot` is the fixed `?auto=1` route
+// four gate suites measure against; `Courier` is the `?courier=1` soak. Neither is reachable from
+// the cabin and neither changes here.
+//
+// **What makes this one different is that it flies the LANES.** `Courier` points itself at the
+// target and goes, which is the fast line and the one a player flies by hand. This one climbs to a
+// lane altitude, runs a corridor along X, turns, runs a corridor along Z, and drops onto the pad —
+// so it is always further, and at every rung of the ladder it is also slower per metre. That is
+// the design: the autopilot is the safe lazy option and your thumbs are the quick one. A ladder
+// that ended by making the autopilot fastest would delete the reason to fly.
+//
+// **The stick is never taken away.** This class has no authority over `main.js`'s input path: it
+// hands back an `emptyInput()` struct exactly as `controls.js` does, and main.js prefers the
+// player's the instant a thumb touches anything. There is no mode to cancel and no transition to
+// animate — the property is free, and it is the best thing about building the autopilot out of
+// synthetic fingers instead of a state machine.
+export class LanePilot {
+  constructor({ seed = 0, level = 0 } = {}) {
+    this.inp = emptyInput();
+    this.seed = seed | 0;
+    this.level = level | 0;
+    this.route = null;              // { legs, order, total, lane, off, vert }
+    this.wp = 0;                    // index of the waypoint being flown to
+    this.target = null;             // the final destination, kept for the HUD and for re-planning
+    this.label = '';                // what the player asked for: 'HOME' or a job name
+    this.leg = 'idle';
+    this.active = false;
+    this.arrived = false;
+    this.escapes = 0;
+    this.flown = 0;                 // metres actually covered since engage — gates measure this
+    this.offLane = 0;               // …of which, metres NOT on a lane leg
+    this._prev = null;
+    this._esc = 0;
+    this._noProg = 0;
+    this._best = Infinity;
+  }
+
+  spec() { return autoSpec(this.level); }
+
+  // `to` is a world point. Planning happens ONCE per engage: a route re-planned every frame from a
+  // moving start point walks its own corridor sideways, which reads as drift and is impossible to
+  // assert against.
+  engage(to, { label = '', level = this.level, from = null } = {}) {
+    if (!to) return this.disengage();
+    this.level = level | 0;
+    this.target = { x: to.x, y: to.y, z: to.z };
+    this.label = label;
+    this.route = planLaneRoute(from || this._prev || { x: to.x, y: to.y, z: to.z }, this.target,
+      { seed: this.seed, level: this.level });
+    this.wp = 0;
+    this.active = true;
+    this.arrived = false;
+    this.flown = 0; this.offLane = 0;
+    this._esc = 0; this._noProg = 0; this._best = Infinity;
+    this.leg = this.route.legs[0].kind;
+    return this.state();
+  }
+
+  disengage(why = 'off') {
+    this.active = false;
+    this.route = null;
+    this.wp = 0;
+    this.leg = why;
+    const i = this.inp;
+    i.moveX = 0; i.moveY = 0; i.moveActive = false;
+    i.lookDX = 0; i.lookDY = 0; i.climb = 0; i.boost = false;
+    return this.state();
+  }
+
+  // Distance still to fly along the PLANNED route, not the straight line to the pad. A player
+  // watching an ETA count down against a straight line while the pilot flies a dog-leg would
+  // reasonably conclude the ETA is lying, and it would be.
+  remaining(flight) {
+    if (!this.route) return 0;
+    const legs = this.route.legs;
+    let p = { x: flight.px, y: flight.py, z: flight.pz }, d = 0;
+    for (let k = this.wp; k < legs.length; k++) {
+      const q = legs[k];
+      d += Math.hypot(q.x - p.x, q.z - p.z) + Math.abs(q.y - p.y);
+      p = q;
+    }
+    return d;
+  }
+
+  read(t, flight, dt) {
+    const i = this.inp;
+    i.moveX = 0; i.moveY = 0; i.moveActive = false;
+    i.lookDX = 0; i.lookDY = 0; i.climb = 0; i.boost = false;
+    if (!this.active || !this.route) { this.leg = 'idle'; return i; }
+
+    // Odometer first, and it is measured on the CRAFT, not on the plan — the plan is what was
+    // intended and the flown path is what happened. gates_s2f compares the two.
+    if (this._prev) {
+      const step = Math.hypot(flight.px - this._prev.x, flight.pz - this._prev.z);
+      this.flown += step;
+      if (this.leg !== 'lane') this.offLane += step;
+    }
+    this._prev = { x: flight.px, y: flight.py, z: flight.pz };
+
+    const legs = this.route.legs;
+    let wp = legs[this.wp];
+    const spec = this.spec();
+
+    // Waypoint advance. A vertical waypoint is reached on ALTITUDE and a horizontal one on
+    // HORIZONTAL distance — testing both on every leg leaves the pilot circling a climb waypoint
+    // it is already directly under, because the horizontal error is already zero and the altitude
+    // error is what it is there to close.
+    const vertical = wp.kind === 'climb' || wp.kind === 'turn' || wp.kind === 'drop';
+    const last = this.wp >= legs.length - 1;
+    const dh = Math.hypot(wp.x - flight.px, wp.z - flight.pz);
+    const dv = wp.y - flight.py;
+    // The last waypoint is the PAD, and `zones.js` VOLUME is a 14 m cylinder — so "arrived" here
+    // means inside the docking volume with the craft slowing, not on the deck. The autopilot
+    // delivers the player to the prompt; pressing DOCK stays the player's.
+    const near = last ? (dh < 14 && Math.abs(dv) < 16)
+      : vertical ? (dh < 26 && Math.abs(dv) < 12)
+        : dh < 22;
+    if (near) {
+      if (this.wp >= legs.length - 1) {
+        this.arrived = true;
+        this.leg = 'arrived';
+        this.active = false;
+        return i;
+      }
+      this.wp++;
+      wp = legs[this.wp];
+      this._noProg = 0; this._best = Infinity;
+    }
+    this.leg = this._esc > 0 ? wp.kind + '+escape' : wp.kind;
+
+    const dx = wp.x - flight.px, dz = wp.z - flight.pz;
+    const d = Math.hypot(dx, dz);
+    steerYaw(i, flight, dx, dz, dt);
+    levelPitch(i, flight, dt, 0.8, 500);
+
+    // Altitude on the ▲/▼ buttons, the same channel the collective lever drives. 4 m deadband so
+    // the hold assist gets to do its job rather than being overridden every frame.
+    const ae = wp.y - flight.py;
+    i.climb = ae > 4 ? 1 : ae < -4 ? -1 : 0;
+
+    // Throttle. Bang-bang against a distance-proportional target, capped by the LADDER — this cap
+    // is the whole of "the upgrade buys speed", and it is a fraction of the hull's own MAX_FWD so
+    // a better hull moves every rung without reordering them.
+    const cap = spec.speed * flight.maxFwd;
+    const wantSpeed = Math.min(cap, d * 0.35);
+    // On a vertical leg the craft is meant to stop and go up. Commanding forward there is how the
+    // first version drifted off its own corridor while climbing.
+    //
+    // The hold radius is TIGHTER on the last waypoint than on the others, and that difference is
+    // not cosmetic: with one radius of 26 m the pilot arrived over the pad at the right altitude,
+    // at 0.0 m/s, 20 m sideways of it — inside its own no-thrust bubble but outside the 14 m
+    // docking volume, hovering forever one thumb-flick from a dock it would not make itself.
+    const holdR = last ? 9 : 26;
+    if (!(vertical && dh < holdR) && flight.speed < wantSpeed) { i.moveY = -1; i.moveActive = true; }
+
+    // The escape manoeuvre, carried over from Courier in intent and in the reason for it: what it
+    // stops is the pilot spending its whole flight grinding along one facade. Lanes are over the
+    // roads and are meant to be clear, so an escape here is EVIDENCE — `escapes > 0` on a lane leg
+    // means something is standing in a corridor, and gates_s2f reports the count rather than
+    // absorbing it.
+    if (this._esc > 0) {
+      this._esc -= dt;
+      i.moveY = 0; i.moveX = 0; i.moveActive = false; i.climb = 1; i.boost = false;
+      i.lookDX = 90 * dt;
+    } else if (!vertical) {
+      // PROGRESS in three dimensions, and NOT on a vertical leg. The first version measured the
+      // horizontal distance only and ran the watchdog on every leg — so on the final drop onto a
+      // ledge pad, where the craft is already directly over the target and 120 m below it, the
+      // horizontal distance was correctly not improving and the watchdog called it a wall. It
+      // fired an escape, whose whole action is `climb = 1`, and drove the craft 21 m PAST the pad
+      // it was arriving at. A watchdog that cannot see the axis the craft is making progress on
+      // will always eventually fight it.
+      const d3 = Math.hypot(d, dv);
+      if (d3 < this._best - 3) { this._best = d3; this._noProg = 0; }
+      else this._noProg += dt;
+      if (this._noProg > 3.5 && d > 14) {
+        this._esc = 3; this._noProg = 0; this._best = Infinity; this.escapes++;
+      }
+    } else {
+      this._noProg = 0; this._best = Infinity;
+    }
+    return i;
+  }
+
+  state() {
+    const s = this.spec();
+    return {
+      active: this.active, arrived: this.arrived, leg: this.leg, label: this.label,
+      level: this.level, tier: s.name, speedCap: s.speed, smart: s.smart,
+      wp: this.wp, legs: this.route ? this.route.legs.length : 0,
+      order: this.route ? this.route.order : null,
+      plan: this.route ? { total: Math.round(this.route.total), lane: Math.round(this.route.lane),
+        off: Math.round(this.route.off), vert: Math.round(this.route.vert) } : null,
+      flown: Math.round(this.flown), offLane: Math.round(this.offLane),
+      escapes: this.escapes, target: this.target,
+      alts: [ALT[s.famX], ALT[s.famZ]],
+    };
   }
 }

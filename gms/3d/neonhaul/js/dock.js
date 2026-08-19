@@ -30,6 +30,7 @@
 // `__state.errors` — a portrait Aaron has not generated yet is not a §2.8 error.
 
 import { ZONE_TYPES } from './config.js';
+import { accentOf } from './utils.js';
 
 const el = (tag, cls, text) => {
   const d = document.createElement(tag);
@@ -158,8 +159,12 @@ export class ClientPanel {
     // §7.3: "exactly one saturated colour per panel — the zone's tint". The client's own
     // `tint_hex` is the neon the portrait was LIT with, so when we have it the UI and the image
     // agree; otherwise the zone colour.
-    const zoneHex = '#' + ((ZONE_TYPES[type] || ZONE_TYPES.PICKUP).color).toString(16).padStart(6, '0');
-    const tint = (job.client && job.client.tint) || zoneHex;
+    // S2-D: through `accentOf`. §7.3 asks for "exactly one saturated colour per panel", and HUB's
+    // zone colour is 0xdfeaff — which is not saturated at all. Taken literally it painted the frame,
+    // the kicker and the whole ACCEPT key white on the first board of the game. `accentOf` keeps
+    // every genuinely saturated tint and substitutes the HUD cyan for the ones that are not.
+    const zoneHex = accentOf((ZONE_TYPES[type] || ZONE_TYPES.PICKUP).color);
+    const tint = job.client && job.client.tint ? accentOf(job.client.tint) : zoneHex;
 
     r.innerHTML = '';
     const sheet = el('div', 'cp-sheet');

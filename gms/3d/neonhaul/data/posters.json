@@ -1,0 +1,83 @@
+{
+  "_": "S2-G living posters. Four CHANNELS; a channel is one 192x384 slot in one shared atlas texture, so the whole layer is one draw call and one upload. Each channel cycles its items. `kind` video items are ~5.3 s seamless ping-pong loops (tools/gen_posters.py), stills are hard-compressed jpgs. `word` is drawn by the compositor at runtime, not baked — Flux cannot spell and a strapline is what makes a picture read as an advert. `hold` is seconds on screen. Aspect is 0.5, the same band data/signs.json bakes its eight poster tiles at, so DECISIONS decision 9's size ruler is unchanged.",
+  "slot": [192, 384],
+  "grid": [2, 2],
+  "channels": [
+    {
+      "id": "chow",
+      "accent": "#ffb04a",
+      "items": [
+        { "id": "noodle", "kind": "still", "hold": 7.5, "word": "HOT NOODLE",
+          "subject": "a steaming bowl of noodles lifted on chopsticks, thick broth, one boiled egg half",
+          "palette": "burnt orange and deep red on near-black" },
+        { "id": "ramen", "kind": "video", "hold": 10.7, "word": "RAMEN 24H",
+          "subject": "a single wide ramen bowl seen from above the rim, curling steam, one egg half",
+          "palette": "hot amber and crimson on near-black",
+          "motion": "the steam curls and drifts slowly upward, the broth surface ripples very slightly" },
+        { "id": "skewer", "kind": "still", "hold": 6.5, "word": "SKEWER BAR",
+          "subject": "three grilled skewers over an open flame grill",
+          "palette": "ember orange and charcoal, thin cyan rim" },
+        { "id": "candrink", "kind": "still", "hold": 8.0, "word": "KIRIN DRY",
+          "subject": "a tall drink can standing alone, condensation beads, hard studio rim light",
+          "palette": "pale cyan and white on deep blue-black" }
+      ]
+    },
+    {
+      "id": "clinic",
+      "accent": "#35e6ff",
+      "items": [
+        { "id": "limb", "kind": "still", "hold": 8.0, "word": "LIMB-TECH",
+          "subject": "a chrome prosthetic forearm and open hand, segmented plating, clean product shot",
+          "palette": "cold steel and cyan on near-black" },
+        { "id": "optic", "kind": "video", "hold": 10.7, "word": "OPTIC NINE",
+          "subject": "one huge stylised mechanical iris, concentric shutter blades, glowing ring",
+          "palette": "electric cyan and white on near-black",
+          "motion": "the iris shutter blades open and close slowly, the ring pulses, nothing else moves" },
+        { "id": "profile", "kind": "still", "hold": 7.0, "word": "NEURAL FIT",
+          "subject": "a flat side-profile head silhouette with thin circuit tracing across the skull, no face detail",
+          "palette": "teal and violet on black, flat two-tone" },
+        { "id": "capsule", "kind": "still", "hold": 6.0, "word": "CAPSULE 12",
+          "subject": "two glossy medical capsules crossed on a plain field",
+          "palette": "mint green and white on deep teal" }
+      ]
+    },
+    {
+      "id": "corp",
+      "accent": "#9a6bff",
+      "items": [
+        { "id": "spire", "kind": "still", "hold": 8.5, "word": "VAULT CORP",
+          "subject": "one monolithic tower seen from below against a flat field, brutal geometric mass",
+          "palette": "violet and indigo on black, flat poster tones" },
+        { "id": "hauler", "kind": "still", "hold": 7.0, "word": "HAULAGE", "seed": 8814,
+          "subject": "a blunt-nosed cargo aircraft in hard side profile filling the frame, container slung underneath",
+          "palette": "safety orange and white on deep black, two flat colours only" },
+        { "id": "glyph", "kind": "video", "hold": 10.7, "word": "SPIRE LINE",
+          "subject": "a single hard-edged geometric emblem, concentric rings and a bar, centred on a flat field",
+          "palette": "violet and pale lilac on near-black",
+          "motion": "the emblem rotates slowly on the spot and the rings pulse outward, static background" },
+        { "id": "scan", "kind": "still", "hold": 6.5, "word": "NO ENTRY",
+          "subject": "an open palm pressed flat to a glowing scanner plate",
+          "palette": "hard red and white on black, warning-sign contrast" }
+      ]
+    },
+    {
+      "id": "night",
+      "accent": "#ff2a9d",
+      "items": [
+        { "id": "dancer", "kind": "still", "hold": 7.5, "word": "NIGHT CELL",
+          "subject": "a single flat dancing figure silhouette, arms raised, no face, no detail inside the shape",
+          "palette": "hot magenta and black, one flat colour inside the silhouette" },
+        { "id": "smoke", "kind": "video", "hold": 10.7, "word": "SMOKE BAR",
+          "subject": "a stylised pair of lips exhaling a thick ribbon of smoke, graphic flat treatment",
+          "palette": "magenta and pale pink on black",
+          "motion": "the smoke ribbon drifts and curls slowly upward, the lips do not move" },
+        { "id": "cat", "kind": "still", "hold": 6.5, "word": "LUCKY CAT",
+          "subject": "a beckoning lucky cat figurine, one paw raised, front on",
+          "palette": "gold and red on deep purple-black" },
+        { "id": "bottle", "kind": "still", "hold": 8.0, "word": "DRY GIN",
+          "subject": "a tall spirit bottle standing alone, hard rim light down one edge",
+          "palette": "emerald green and gold on black" }
+      ]
+    }
+  ]
+}

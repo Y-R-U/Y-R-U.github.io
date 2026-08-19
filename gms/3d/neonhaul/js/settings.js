@@ -10,29 +10,36 @@
 
 import { S, save } from './save.js';
 import { FLIGHT as F } from './config.js';
+import { CabinPanel } from './ui.js';
 
 export class SettingsPanel {
   constructor(el, apply) {
     this.el = el;
     this.apply = apply;          // (settings) => void — the single place changes take effect
     this.open = false;
+    // §S2 — the shell is ui.js' CabinPanel, not markup owned here. A hire panel, an earnings
+    // screen and a company screen all have to look like this one, and the way to make that true
+    // is for them to BE this one with a different body rather than three files each doing their
+    // own idea of a neon frame.
+    this.shell = new CabinPanel(el, { kicker: 'CABIN', title: 'SETTINGS' });
     this._build();
   }
 
   s() { return S().settings; }
 
   _build() {
-    const el = this.el;
-    el.innerHTML = '';
-    const panel = div('set-panel');
-    panel.appendChild(h('SETTINGS'));
+    const panel = this.shell.body;
+    panel.innerHTML = '';
 
     this.seg(panel, 'Move side', 'flipSides',
       [['Left', false], ['Right', true]], v => `fly with the ${v ? 'right' : 'left'} thumb, look with the other`);
     this.slider(panel, 'Look speed', 'lookSens', F.SENS[0], F.SENS[1], 0.1, v => v.toFixed(1) + '×');
     this.seg(panel, 'Invert look', 'invertLook', [['Off', false], ['On', true]]);
     this.seg(panel, 'Alt buttons', 'altBtn', [['S', 48], ['M', 56], ['L', 68]]);
-    this.seg(panel, 'View', 'camera', [['Cockpit', 'cockpit'], ['Chase', 'chase']]);
+    // §S2 — the View row is GONE, not disabled. The switch is an on-screen button now
+    // (`#btn-view`), which is the whole point: the cabin shipped behind this row and the player it
+    // was built for never found it. Two ways to change one setting is also two places for it to
+    // get out of step, and the settings panel is the one a player has to go looking for.
     this.slider(panel, 'Field of view', 'fov', F.FOV[0], F.FOV[1], 1, v => v.toFixed(0) + '°');
     this.seg(panel, 'Assists', 'assists', [['Full', 'on'], ['Reduced', 'reduced']],
       v => v === 'on' ? 'the craft slides off buildings for you' : 'half the nudge — for pilots who want the room');
@@ -49,15 +56,11 @@ export class SettingsPanel {
     this.seg(panel, 'Radio hold', 'chatterHold',
       [['Normal', 'normal'], ['Long', 'long'], ['Longest', 'very long']],
       v => `a 60-character line holds for ${(6.9 * ({ normal: 1, long: 1.35, 'very long': 1.75 }[v] || 1)).toFixed(1)} s`);
+    // §S2 — the stats row. It turns the ?perf overlay on, which already existed; nothing here
+    // builds a second one.
+    this.seg(panel, 'Stats', 'stats', [['Off', false], ['On', true]],
+      v => v ? 'fps, draw calls, triangles and frame time, top-left' : 'no overlay');
 
-    const close = document.createElement('button');
-    close.className = 'set-close';
-    close.textContent = 'CLOSE';
-    close.addEventListener('click', () => this.hide());
-    panel.appendChild(close);
-
-    el.appendChild(panel);
-    el.addEventListener('click', e => { if (e.target === el) this.hide(); });
   }
 
   row(parent, label) {
@@ -113,10 +116,11 @@ export class SettingsPanel {
 
   refresh() { for (const p of this._paints || []) p(); }
 
-  show() { this.open = true; this.refresh(); this.el.classList.remove('hidden'); }
-  hide() { this.open = false; this.el.classList.add('hidden'); }
+  // The panel's own `open` mirrors the shell's, because gates and main.js both read it and a
+  // second source of truth for "is the panel up" is a bug waiting to happen.
+  show() { this.refresh(); this.shell.show(); this.open = true; }
+  hide() { this.shell.hide(); this.open = false; }
   toggle() { this.open ? this.hide() : this.show(); return this.open; }
 }
 
 const div = c => { const d = document.createElement('div'); d.className = c; return d; };
-const h = t => { const d = document.createElement('div'); d.className = 'set-title'; d.textContent = t; return d; };
