@@ -11,6 +11,13 @@ import { ORDNANCE } from '../config.js';
 import { register } from './flow.js';
 
 const KIND_LABEL = { shell: 'Shell', heavy: 'Heavy', salvo: 'Salvo' };
+
+// The eye is always drawn; hiding adds the bar through it. Two different glyphs at 17 px read as
+// two different controls rather than as one control in two states.
+const EYE = '<svg viewBox="0 0 24 24" aria-hidden="true">'
+  + '<path d="M1.6 12S5.5 5.5 12 5.5 22.4 12 22.4 12 18.5 18.5 12 18.5 1.6 12 1.6 12Z"/>'
+  + '<circle cx="12" cy="12" r="3.1"/>'
+  + '<path class="eye-bar" d="M3.4 20.6 20.6 3.4"/></svg>';
 const STATE = ['', 'miss', 'hit', 'sunk'];
 
 export function buildHUD(mount, opts = {}) {
@@ -18,6 +25,14 @@ export function buildHUD(mount, opts = {}) {
   root.className = 'hud';
   root.hidden = true;
   root.innerHTML = `
+    <div class="hud-note" data-note>
+      <button data-note-open aria-label="What the sea view shows">
+        <i>?</i><span>Sea view is a mock-up. The chart is the real board.</span>
+      </button>
+      <p data-note-long hidden>Where the ships sit on the sea, and where the shells land on it, are
+      drawn for effect and are not the real positions. Everything true about this battle is on the
+      chart: your fleet in the box below, the enemy's on the plotting table.</p>
+    </div>
     <div class="hud-top">
       <button class="hud-pause" data-pause aria-label="Pause">❚❚</button>
       <div class="hud-who">
@@ -25,13 +40,23 @@ export function buildHUD(mount, opts = {}) {
         <s data-opponent></s>
       </div>
       <div class="hud-own-slot">
-        <button class="hud-own" data-fleet aria-label="Your fleet — open the layout">
-          <div class="hud-own-grid" data-own></div>
-          <div class="hud-roster" data-roster></div>
-        </button>
+        <div class="hud-own">
+          <div class="hud-own-head">
+            <span>Your fleet</span>
+            <button class="hud-own-eye" data-private aria-pressed="false" aria-label="Hide your fleet">${EYE}</button>
+          </div>
+          <button class="hud-own-open" data-fleet aria-label="Your fleet — open the layout">
+            <div class="hud-own-plot">
+              <div class="hud-own-grid" data-own></div>
+              <div class="hud-own-blank"><b>Hidden</b></div>
+            </div>
+            <div class="hud-roster" data-roster></div>
+          </button>
+        </div>
         <div class="hud-cue" data-cue hidden aria-hidden="true"><i></i><span>Your fleet — tap to change it</span></div>
       </div>
     </div>
+
     <div class="hud-bar">
       <div class="hud-read"><b data-target>—</b><s data-hint>Tap the chart to aim</s></div>
       <div class="hud-ord">
@@ -47,7 +72,11 @@ export function buildHUD(mount, opts = {}) {
   const rosterEl = q('[data-roster]');
   const fireEl = q('[data-fire]');
 
-  let handlers = { onArm: opts.onArm, onConfirm: opts.onConfirm, onPause: opts.onPause, onFleet: opts.onFleet };
+  let handlers = {
+    onArm: opts.onArm, onConfirm: opts.onConfirm, onPause: opts.onPause,
+    onFleet: opts.onFleet, onPrivate: opts.onPrivate,
+  };
+  let hidden = false;
   let kind = 'shell';
   let armed = null;
   let yours = false;
@@ -66,6 +95,14 @@ export function buildHUD(mount, opts = {}) {
   fireEl.onclick = () => handlers.onConfirm?.(armed, kind);
   q('[data-pause]').onclick = () => handlers.onPause?.();
   q('[data-fleet]').onclick = () => handlers.onFleet?.();
+  // A sibling of the box's own button, never nested inside it: a button in a button is invalid and
+  // the inner one's tap would still have run the outer handler.
+  q('[data-private]').onclick = () => { api.setPrivate(!hidden); handlers.onPrivate?.(hidden); };
+  q('[data-note-open]').onclick = () => {
+    const long = q('[data-note-long]');
+    long.hidden = !long.hidden;
+    root.querySelector('[data-note]').classList.toggle('open', !long.hidden);
+  };
 
   function sync() {
     root.querySelectorAll('[data-kind]').forEach(b => b.classList.toggle('on', b.dataset.kind === kind));
@@ -96,10 +133,13 @@ export function buildHUD(mount, opts = {}) {
     const mine = v.ships.filter(s => !s.sunk).length;
     const theirs = v.enemyShips.length ? v.enemyShips.filter(s => !s.sunk).length : v.fleet.length;
     const chips = list => (list.length ? list.map(l => `<u>${l}</u>`).join('') : '<u class="none">—</u>');
+    // `mine` is blanked with the grid: a count of your surviving ships and the lengths you have
+    // already lost is a readout of your own fleet, and hiding the grid beside it would hide nothing.
+    // The enemy's two figures are about the enemy and stay.
     rosterEl.innerHTML =
-      `<span>You <b>${mine}</b>/${v.fleet.length}</span>`
+      `<span class="mine">You <b>${mine}</b>/${v.fleet.length}</span>`
       + `<span>Enemy <b>${theirs}</b>/${v.fleet.length}</span>`
-      + `<i>lost ${chips(lens(v.ships))}</i>`
+      + `<i class="mine">lost ${chips(lens(v.ships))}</i>`
       + `<i>sunk ${chips(lens(v.enemyShips))}</i>`;
   }
 
@@ -129,6 +169,19 @@ export function buildHUD(mount, opts = {}) {
       el.hidden = !on;
       el.classList.toggle('on', !!on);
     },
+
+    // The privacy blank. Two people on one phone: the box shows YOUR board, which is the one thing
+    // the other player must not read over your shoulder. A class on the box, so it survives every
+    // repaint — drawOwn() only ever rewrites the cells inside it — and flow.js stores it so it
+    // survives a resume as well. It is a comfort control, not a lock.
+    setPrivate(on) {
+      hidden = !!on;
+      root.querySelector('.hud-own').classList.toggle('private', hidden);
+      const btn = q('[data-private]');
+      btn.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+      btn.setAttribute('aria-label', hidden ? 'Show your fleet' : 'Hide your fleet');
+    },
+    get private() { return hidden; },
 
     setTurn(text) { q('[data-turn]').textContent = text; },
     setOpponent(name) { q('[data-opponent]').textContent = name || ''; },

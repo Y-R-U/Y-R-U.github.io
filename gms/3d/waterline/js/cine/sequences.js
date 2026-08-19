@@ -26,6 +26,16 @@ const W = () => window.__waterline;
 export const vfxOf = () => W().vfx.emit ?? W().vfx;
 export const tableOf = () => W().world.table;
 
+// How far a beat has to stand off to hold a subject `halfW` metres wide, at `fov`, in the live
+// viewport. Half a frame subtends d·tan(fov/2) vertically and that × aspect horizontally, so the
+// NARROW axis binds — in portrait that is the horizontal, by a factor of nearly four (D38, D45).
+// `floor` is the station the beat already had: landscape solves under it and keeps its pose, and
+// only a frame too narrow to hold the subject pulls back.
+const standoff = (halfW, fov, aspect, floor) => Math.max(
+  floor,
+  Math.min(floor * 6, halfW / (Math.tan((fov * Math.PI) / 360) * Math.min(1, aspect || 1.78))),
+);
+
 export function registerSequences(director, world) {
   const bridge = world.bridge;
   const fleet = world.fleet;
@@ -175,50 +185,106 @@ export function registerSequences(director, world) {
     const arc = round ? round.round.arc : ballistic(from, to);
     const at = (u, out) => arc.at(u, out);
 
-    // Trail the round from behind, outboard and above, easing outboard as it falls so the impact
-    // is already in frame when it lands. Distances are in shell calibres, so a size-9 round gets a
-    // proportionally wider berth and does not fill the lens.
     const R = (VFX[ctx.size] || VFX[1]).scale;
-    const head = new THREE.Vector3(), tail = new THREE.Vector3(), aim = new THREE.Vector3();
-    const start = ctx.u0 ?? 0.06, end = ctx.u1 ?? 0.97;
+    const head = new THREE.Vector3(), aim = new THREE.Vector3();
+    const start = ctx.u0 ?? 0, end = ctx.u1 ?? 1;
+    // The round keeps its OWN clock (Round.update: elapsed / ms) and starts at u = 0. A beat that
+    // remaps its time onto a different stretch of the arc therefore frames a point the shell has
+    // not reached — at u0 = 0.06 that is 54 m of a 900 m flight, and the shell spends the first
+    // half of the beat behind the lens. Read the round's phase; only a still with no live round
+    // falls back to the ramp.
+    const phase = u => (round ? round.round.u : start + (end - start) * u);
 
+    // Trail the round down its COURSE rather than down its tangent. The tangent at launch points
+    // 33° up, so a camera set back along it sits UNDER the shell looking at the zenith — that is
+    // where the grey sky came from. Every distance is in shell calibres, the trail included: leave
+    // that one in metres and a size-9 round's offset tips over toward overhead, because only the
+    // other two terms grow with it, and the horizon leaves the frame.
+    const course = to.clone().sub(from).setY(0);
+    const trail = R * Math.max(20, course.length() * 0.055);
+    course.normalize();
+    const beam = v(course.z, 0, -course.x);
+    const off = (u, out) => out.copy(course).multiplyScalar(-trail * (0.62 + u * 0.5))
+      .addScaledVector(beam, R * (6.5 + u * 9))
+      .add(v(0, R * 4.2 * (1 + u * 1.7), 0));
+
+    // The subject is not the 1.35 m shell: its glow streak alone runs ~13 R behind the head and the
+    // smoke trail further still, and a frame cut to the body reads as a grey field with a dot in
+    // it. The camera stands off the round itself, so the range is exactly zoom · |off(u)| and one
+    // scalar solves the narrow axis over the whole beat (D38/D45).
+    const FOV = 42;
+    const aspect = ctx.aspect || 1.78;
+    const halfW = R * 13;
+    const LEAD = 0.45;
+    const narrow = fov => Math.tan((fov * Math.PI) / 360) * Math.min(1, aspect);
+    let zoom = 1;
+    const o = new THREE.Vector3();
+    for (let i = 0; i <= 24; i++) {
+      const u = i / 24;
+      zoom = Math.max(zoom, halfW / narrow(FOV - u * 6) / off(u, o).length());
+    }
+
+    const qa = new THREE.Quaternion(), qb = new THREE.Quaternion();
+    const dr = new THREE.Vector3(), dl = new THREE.Vector3();
     rig.drift(0.16 * R, 0.5 * R, 0.28);
-    rig.fov(42);
+    rig.fov(FOV);
     rig.pose(ms, u => {
-      const f = start + (end - start) * u;
+      const f = phase(u);
+      const fov = FOV - u * 6;
       at(f, head);
-      at(Math.max(0, f - 0.055), tail);
-      // camera sits behind the round on its own path, offset outboard and up
-      const back = tail.clone().sub(head);
-      const side = new THREE.Vector3(-back.z, 0, back.x).normalize();
-      const lift = 1 + u * 1.7;
-      const pos = head.clone()
-        .add(back.multiplyScalar(0.62 + u * 0.5))
-        .addScaledVector(side, R * (6.5 + u * 9))
-        .add(v(0, R * (4.2 * lift), 0));
-      // look slightly ahead of the round, at where it is going, not at where it is
+      const pos = head.clone().addScaledVector(off(u, o), zoom);
+      // look ahead of the round, at where it is going — the impact has to be in frame before it
+      // happens — but the lead is tens of metres of arc at launch, and taken raw it walks the
+      // shell straight off the edge. dr is held inside LEAD of the narrow half-frame, where
+      // NDC = tan(offset) / tan(halfAngle), by slerping the look back toward the round.
       at(Math.min(1, f + 0.09 + u * 0.16), aim);
-      return { pos, look: head.clone().lerp(aim, 0.42 + u * 0.3), fov: 42 - u * 6 };
+      const look = head.clone().lerp(aim, 0.42 + u * 0.3);
+      dr.copy(head).sub(pos);
+      dl.copy(look).sub(pos);
+      const reach = dl.length();
+      dr.normalize(); dl.normalize();
+      const ang = Math.acos(Math.min(1, Math.max(-1, dr.dot(dl))));
+      const cap = Math.atan(LEAD * narrow(fov));
+      if (ang > cap) {
+        qa.setFromUnitVectors(dr, dl);
+        qb.identity().slerp(qa, cap / ang);
+        return { pos, look: pos.clone().addScaledVector(dr.applyQuaternion(qb), reach), fov };
+      }
+      return { pos, look, fov };
     });
-    // the round poses itself from the same u, so still and motion agree by construction
     if (round) rig.on(() => setShellPhase(null));
     yield { until: ms };
   });
 
+  // The subject is the column, which stands COLUMN_M × the calibre's scale out of the water; the
+  // frame has to hold its height as well as the ring of spray at its foot.
   director.registerSequence('impact_miss', function* (rig, ctx) {
+    const FOV = 40;
     const at = ctx.at || v(0, 0, 900);
-    const eye = ctx.eye || at.clone().add(v(-46, 34, -78));
+    const dir = v(-46, 34, -78);
+    const halfW = 15 * (VFX[ctx.size] || VFX[1]).scale * 1.15;
+    const eye = ctx.eye || at.clone().addScaledVector(dir, standoff(halfW, FOV, ctx.aspect, dir.length()) / dir.length());
+    rig.fov(FOV);
     rig.drift(0.22, 0.7, 0.2);
     rig.move(eye, eye.clone().add(v(6, -4, 14)), at.clone().add(v(0, 14, 0)), at.clone().add(v(0, 20, 0)), 1100, EASE.out);
     yield { until: 1100 };
   });
 
+  // The subject is the STRUCK HULL, not the grid cell it stands for (D43/D44/D45). `len` is the
+  // ship's length; the floor is a destroyer, whose fireball is the same size as a battleship's.
   director.registerSequence('impact_hit', function* (rig, ctx) {
+    const FOV = 44;
     const at = ctx.at || v(0, 8, 900);
-    const eye = ctx.eye || at.clone().add(v(-40, 26, -66));
+    const dir = ctx.eyeDir ? ctx.eyeDir.clone() : v(-40, 26, -66);
+    const halfW = Math.max(18, (ctx.len || 90) * 0.22);
+    const eye = ctx.eye || at.clone().addScaledVector(dir, standoff(halfW, FOV, ctx.aspect, dir.length()) / dir.length());
+    // Framed between the hit and the middle of the ship, not on the hit: aimed at the impact alone
+    // the hull runs out of one corner and the shot reads as a fireball with grey behind it.
+    const look = ctx.hub ? at.clone().lerp(ctx.hub, 0.35) : at;
+    rig.fov(FOV);
     rig.drift(0.26, 0.8, 0.22);
     rig.kick(1.5, 620, 15);
-    rig.move(eye, eye.clone().add(v(4, 3, 16)), at, at.clone().add(v(0, 8, 0)), 1250, EASE.out);
+    rig.move(eye, eye.clone().add(v(4, 3, 16)), look, look.clone().add(v(0, 8, 0)), 1250, EASE.out);
     yield { until: 1250 };
   });
 
@@ -229,15 +295,23 @@ export function registerSequences(director, world) {
     const mark = ctx.at || own.clone().add(v(14, 2, 20));   // where it lands on you
     const short = ctx.pace !== 'full';
 
+    // both stations are solved against your own hull, which is what they have to contain: the
+    // first beat looks past it at the enemy line, the second closes on the plating that was hit
+    const FOV = 44;
+    const halfW = Math.max(18, (ctx.len || 90) * 0.22);
+    const dirA = v(-34, 20, -30), dirB = v(-30, 15, -26);
+    const kA = standoff(halfW, FOV, ctx.aspect, dirA.length()) / dirA.length();
+    const kB = standoff(halfW, FOV, ctx.aspect, dirB.length()) / dirB.length();
+
     // over your own rail, looking out at the enemy line
-    const eyeA = own.clone().add(v(-34, 20, -30));
-    rig.fov(44);
+    const eyeA = own.clone().addScaledVector(dirA, kA);
+    rig.fov(FOV);
     rig.drift(0.3, 0.9, 0.19);
     rig.move(eyeA, eyeA.clone().add(v(7, -2, 4)), foe, foe, short ? 520 : 1000, EASE.out);
     yield { until: short ? 520 : 1000 };
 
     // swing to the struck plating — the red indicator is the point of the whole beat
-    const eyeB = mark.clone().add(v(-30, 15, -26));
+    const eyeB = mark.clone().addScaledVector(dirB, kB);
     rig.kick(1.4, 560, 16);
     rig.move(eyeA.clone().add(v(7, -2, 4)), eyeB, foe, mark, short ? 420 : 820, EASE.inOut);
     yield { until: short ? 420 : 820 };
@@ -402,39 +476,58 @@ function buildPresenter(director, world) {
       const results = events.filter(e => e.t === 'result');
       const sunkIds = events.filter(e => e.t === 'sunk');
       const first = results[0] || { r: shot.anchor.r, c: shot.anchor.c, hit: false };
-      const target = cellPos(shot.at, first.r, first.c);
-      const { ship: firer, anchor, pos: gun } = gunner(shot.side, target);
+      // A shot that hits is aimed at the cell it HITS, not at the first cell of the pattern: a
+      // salvo's anchor is usually open water and the round has to end up on the hull.
+      const land = results.find(e => e.hit && !e.repeat) || first;
+      const aspect = W().app.camera.aspect || 1.78;
+      const { ship: firer, anchor, pos: gun } = gunner(shot.side, cellPos(shot.at, land.r, land.c));
       const size = ORD_SIZE[shot.kind] ?? 1;
+      // The dramatised fleet is under way toward the arrangement this shot's result demands (D43).
+      // The aim is taken against where the hull ARRIVES; `settle` below is what makes sure it has.
+      const mark = fleet.impactPoint?.(shot.at, land.r, land.c, gun) ?? null;
+      const target = mark ? mark.point.clone() : cellPos(shot.at, land.r, land.c);
 
       if (mode === 'instant') {
-        api.resolve(events, { mySide, size });
+        fleet.settle?.(shot.at);
+        api.resolve(events, { mySide, size, from: gun });
         await wait(PACE.instant.ms);
         return;
       }
 
       if (mine) {
         await director.play('fire_out', {
-          gun, aim: target, size,
+          gun, aim: target, size, aspect,
           len: firer?.handle.length ?? 90,
-          aspect: W().app.camera.aspect || 1.78,
           flash: anchor ? () => { firer?.handle.fireGun(0); vfx.muzzle(anchor, size); } : null,
         });
       } else {
         await director.play('enemy_volley', {
-          own: cellPos(mySide, first.r, first.c).setY(14), foe: gun, at: target, size,
+          own: cellPos(mySide, first.r, first.c).setY(14), foe: gun, at: target, size, aspect,
+          len: fleet.shipAt?.(mySide, first.r, first.c)?.ship?.length ?? 90,
         });
       }
+
+      // Whatever the pace, whatever the fast-forward, the hull is on its station before the round
+      // is in the air — the aim above was taken against that station.
+      fleet.settle?.(shot.at);
 
       const ms = CINE.shellMs[mode] ?? CINE.shellMs.full;
       const round = vfx.tracer(gun.clone(), target.clone(), ms, { size, seed: (turn * 7919) & 0xffff, sea: true });
       caption?.forShot(turn, shot.kind);
       caption?.follow(() => round.head());
-      await director.play('shell_chase', { round, size, from: gun, to: target });
+      await director.play('shell_chase', { round, size, from: gun, to: target, aspect });
       caption?.unfollow();
 
-      api.resolve(events, { mySide, size });
+      api.resolve(events, { mySide, size, from: gun });
       const hit = results.some(r => r.hit);
-      await director.play(hit ? 'impact_hit' : 'impact_miss', { at: target, size });
+      // The impact frames the struck hull. `eyeDir` stands off the flank the shell went into, so
+      // the fireball is between the camera and the ship rather than behind her.
+      await director.play(hit ? 'impact_hit' : 'impact_miss', {
+        at: target, size, aspect,
+        len: hit ? (mark?.len || 90) : 0,
+        eyeDir: hit && mark?.out ? impactEye(mark.out) : null,
+        hub: hit && mark?.ship ? mark.ship.hullPoint(0.5) : null,
+      });
 
       if (sunkIds.length) await wait(500);
       if (mine) await director.play('bridge_return', {});
@@ -442,29 +535,36 @@ function buildPresenter(director, world) {
 
     // The world-side consequences of a shot: splashes, hits, fires, the red indicator on your own
     // hull. Split out so `instant` pace and a replay can reuse it without any camera work.
-    resolve(events, { mySide = 0, size = 1 } = {}) {
+    resolve(events, { mySide = 0, size = 1, from = null } = {}) {
       const vfx = vfxOf();
       const table = tableOf();
+      fleet.settle?.(0); fleet.settle?.(1);
       for (const e of events) {
         if (e.t === 'result') {
           if (e.repeat) continue;                     // no new column on an already-resolved cell
-          const p = cellPos(e.at, e.r, e.c);
           if (e.hit) {
-            const s = fleet.shipAt?.(e.at, e.r, e.c);
-            const at = s?.ship?.hullSide ? s.ship.hullSide(s.t, 1) : p;
-            vfx.hit(at, { size, seconds: 6 });
+            // D44: a ship taking a shell is not the sea taking one. Struck at the waterline of a
+            // real hull, with the fireball breaking OUT of the plating rather than sitting on it.
+            const m = fleet.impactPoint?.(e.at, e.r, e.c, from);
+            vfx.hit(m?.point || cellPos(e.at, e.r, e.c), {
+              size, seconds: 6, sea: !m?.ship,
+              out: m?.out || undefined,
+              seed: (e.r * 977 + e.c * 131 + 17) & 0xffff,
+            });
             if (e.at === mySide) fleet.mark?.(e.at, e.r, e.c, 'hit');   // the red indicator
           } else {
-            vfx.splash(p, { size, seed: (e.r * 131 + e.c * 17) & 0xffff });
+            vfx.splash(fleet.missPoint?.(e.at, e.r, e.c) ?? cellPos(e.at, e.r, e.c),
+              { size, seed: (e.r * 131 + e.c * 17) & 0xffff });
           }
           table?.pulse?.(e.r, e.c, e.hit ? 'hit' : 'miss');
         }
         if (e.t === 'sunk') {
-          const s = fleet.shipAt?.(e.at, e.cells[0].r, e.cells[0].c);
-          if (s?.ship) vfx.fire(s.ship.object3D, s.ship.object3D.worldToLocal(s.ship.hullPoint(s.t)), { seconds: 0, size: 9 });
           for (const c of e.cells) table?.pulse?.(c.r, c.c, 'sunk');
         }
       }
+      // The burning and the list stay on the model afterwards, and they are derived from the board
+      // rather than accumulated here — a re-pack can move a struck cell onto a different hull.
+      fleet.commitDamage?.();
     },
 
     // Hold-anywhere fast-forward, and the settle the loop returns to.
@@ -475,6 +575,14 @@ function buildPresenter(director, world) {
   };
 
   return api;
+}
+
+// Stand off the struck flank, forward of it and up. The authored 40/26/66 is kept as a shape and
+// swung onto whichever side the shell went in.
+function impactEye(out) {
+  const n = out.clone().setY(0).normalize();
+  const beam = new THREE.Vector3(-n.z, 0, n.x);
+  return n.multiplyScalar(66).addScaledVector(beam, 40).setY(26);
 }
 
 const ORD_SIZE = { shell: 1, heavy: 4, salvo: 9 };

@@ -16,6 +16,7 @@ import { MODES, UI } from '../config.js';
 import { createAim } from './aim.js';
 import { createPresenter } from './present.js';
 import { buildLayoutPanel } from './layout.js';
+import { dramatise } from './drama.js';
 
 const TIERS = sim.TIER_NAMES;
 
@@ -52,6 +53,7 @@ export const flow = {
 let hook, app, save, hud, setup, ladderUI, overlay, aim, present, layout;
 let table = null;                 // the table sized to THIS match
 let dramaSeed = 0;                // the seed the DISPLAYED enemy fleet is drawn from (§7)
+let dramaList = null;             // where it says the enemy's ships are — see enemyLayout()
 const tables = new Map();         // one per grid size; main.js builds the 10x10 one
 
 function boot() {
@@ -89,7 +91,9 @@ function boot() {
     onConfirm: () => aim.commit(),
     onPause: () => pause(),
     onFleet: () => openLayout(),
+    onPrivate: on => save.patch('settings', { hideFleet: !!on }),
   });
+  hud.setPrivate(settings().hideFleet);
   setup.bind({
     onResume: () => resumeMatch(),
     onDiscard: () => { clearMatch(); showTitle(); },
@@ -162,7 +166,7 @@ function session(key, value) {
   return null;
 }
 
-const settings = () => save.get('settings', { cine: 'auto', place: 'auto', sound: true, flyout: 'on' });
+const settings = () => save.get('settings', { cine: 'auto', place: 'auto', sound: true, flyout: 'on', hideFleet: false });
 // A save written before P3 has no `flyout` key, so anything that is not an explicit 'off' is on.
 const flyoutOn = () => settings().flyout !== 'off';
 
@@ -316,6 +320,7 @@ function startMatch(cfg, placements) {
   catch (e) { overlay.toast(e.reason || e.message); return; }
   clearMatch();
   dramaSeed = entropy();
+  dramaList = null;
   enterMatch(game, cfg, true);
 }
 
@@ -337,6 +342,7 @@ function enterMatch(game, cfg, flyover) {
   aim.setActive(true);
   aim.frame();
   hud.setOpponent(name);
+  hud.setPrivate(settings().hideFleet);
   overlay.toast(`${cfg.w}×${cfg.h} · ${cfg.fleet.length} ships · ${name}`);
   opening(flyover);
 }
@@ -367,11 +373,71 @@ function layoutFleets(v) {
   const f = hook.world.fleet;
   try {
     const mine = v.ships.map(s => ({ id: s.id, len: s.len, ...corner(s.cells) }));
-    const theirs = sim.packedPlacement(sim.makeRng(dramaSeed || entropy()), v.w, v.h, v.fleet)
-      .map((p, i) => ({ id: i, len: p.len, r: p.r, c: p.c, dir: p.dir }));
     f.layout(0, { fleet: mine });
-    f.layout(1, { fleet: theirs });
+    f.layout(1, { fleet: enemyLayout(v) || [] });
+    syncDamage(v, true);
   } catch (e) { console.warn('[waterline] fleet layout', e); }
+}
+
+// D43 — the enemy arrangement you can see has to agree with the chart. `drama.js` is handed two
+// masks over the board and the cells of the ships that have already gone down, all of which the
+// player is looking at; it is never handed the game, the View or an owner map, so there is no
+// channel for the hidden board to reach it. The seed is the private one drawn at match start.
+function enemyLayout(v) {
+  const blocked = new Uint8Array(v.w * v.h);
+  const struck = new Uint8Array(v.w * v.h);
+  for (let i = 0; i < v.grid.length; i++) {
+    if (v.grid[i] === sim.MISS) blocked[i] = 1;
+    else if (v.grid[i] === sim.HIT) struck[i] = 1;
+  }
+  const list = dramatise({
+    w: v.w, h: v.h, fleet: v.fleet, blocked, struck,
+    sunk: v.enemyShips.filter(s => s.sunk).map(s => ({ id: s.id, cells: s.cells })),
+    seed: dramaSeed || 1,
+    current: dramaList,
+  });
+  // Only reachable from a bug: the true layout is itself an arrangement that satisfies every one
+  // of those constraints, so one always exists. Keeping the old one is the safe failure.
+  if (!list) { console.warn('[waterline] no arrangement fits the chart; the enemy fleet stays put'); return dramaList; }
+  dramaList = list;
+  return list;
+}
+
+// Which hull is burning and how hard, for both fleets, read off the board rather than counted from
+// events — the enemy's damage belongs to whichever dramatised hull is standing over the hits now.
+function syncDamage(v, commit) {
+  const f = hook.world.fleet;
+  const cell = (s, k) => (s.dir === 'h' ? s.r * v.w + s.c + k : (s.r + k) * v.w + s.c);
+  f.setDamageState?.(0, v.ships.map(s => ({ hits: s.sunk ? s.len : s.hits, sunk: s.sunk })));
+  f.setDamageState?.(1, (dramaList || []).map(s => {
+    let hits = 0, gone = 0;
+    for (let k = 0; k < s.len; k++) {
+      const g = v.grid[cell(s, k)];
+      if (g === sim.HIT || g === sim.SUNK) hits++;
+      if (g === sim.SUNK) gone++;
+    }
+    return { hits, sunk: gone === s.len };
+  }));
+  if (commit) f.commitDamage?.();
+}
+
+// The escorts steam to the arrangement this shot's result demands while the round is still in the
+// air and the camera is on our own guns (D43). `settle` in the presenter is what guarantees they
+// have arrived before it lands, whatever the pace or the fast-forward.
+function restageEnemy(v, pace) {
+  const f = hook.world.fleet;
+  const list = enemyLayout(v);
+  if (!list) return null;
+  const ms = UI.drama.steamMs[pace] ?? 0;
+  try {
+    const move = f.reform(1, { fleet: list }, { ms });
+    if (ms) move.start(); else move.finish();
+    return move;
+  } catch (e) {
+    console.warn('[waterline] enemy reform', e);
+    f.layout(1, { fleet: list });
+    return null;
+  }
 }
 
 const corner = cells => ({
@@ -538,7 +604,10 @@ function saveMatch() {
   const g = flow.game;
   if (!g || !flow.cfg || g.phase === 'OVER' || flow.screen !== 'play') return;
   try {
-    save.set('match', { v: RESUME_V, game: sim.serialize(g), cfg: flow.cfg, drama: dramaSeed, at: Date.now() });
+    save.set('match', {
+      v: RESUME_V, game: sim.serialize(g), cfg: flow.cfg,
+      drama: dramaSeed, dramaShips: dramaList, at: Date.now(),
+    });
   } catch (e) {
     console.warn('[waterline] could not store the match', e);
   }
@@ -580,6 +649,9 @@ function resumeMatch() {
     return;
   }
   dramaSeed = rec.drama || entropy();
+  // Restored as the arrangement to prefer, not as the arrangement: it is re-solved against the
+  // chart, so a save written by an older build still comes back consistent.
+  dramaList = Array.isArray(rec.dramaShips) ? rec.dramaShips : null;
   enterMatch(g, rec.cfg, false);
 }
 
@@ -738,9 +810,13 @@ async function beat(events, by) {
   aim.setActive(false);
   aim.release();
   hud.setBusy(true);
-  refresh();
+  const v0 = refresh();
+  const move = by === 0 ? restageEnemy(v0, present.pace(flow.game.turns)) : null;
+  syncDamage(v0, false);
   try { await present.play(events, by, flow.game); }
   catch (e) { console.warn('[waterline] presenter', e); }
+  move?.finish();
+  hook.world.fleet.commitDamage?.();
   present.rate(1);
   flow.busy = false;
   hud.setBusy(false);

@@ -139,6 +139,14 @@ class Plumes {
 // to `ROOM.deck − drop` and stops there — the room's own house (bridge.js) continues it. `drop` is
 // slack, not a gap: the house reaches down past it, so the joint is a lap and never a seam.
 
+const TMP = new THREE.Vector3();
+
+// Persistent battle damage on a hull, derived from the revealed board rather than accumulated from
+// events: a re-pack under D43 can move a struck cell onto a different hull, and the fire has to
+// move with it. `BURN_CAP` is a card budget, not a look decision — the fields are shared and a
+// hit's own fireball has to be able to take from them (VFX cap is 220).
+const BURN_CAP = 4;
+
 const flagshipIndex = list => {
   let best = -1, len = 0;
   for (let i = 0; i < list.length; i++) if (list[i].len > len) { len = list[i].len; best = i; }
@@ -200,6 +208,8 @@ export function buildFleet(quality) {
   const markers = [];
   const live = [];
   const firing = [0, 0];         // index into ships[side] of the ship whose guns we cut to
+  const fires = [[], []];        // per ship: the persistent burn, and the state it was raised for
+  const pending = [null, null];
 
   // The same point cellToWorld returns, before the side frame is applied.
   const cellLocal = (r, c) => new THREE.Vector3(
@@ -216,7 +226,10 @@ export function buildFleet(quality) {
     const flag = side === 0 ? flagshipIndex(list) : -1;
     const mid = cellLocal((FLEET.grid.h - 1) / 2, (FLEET.grid.w - 1) / 2);
     const slots = list.map((def, i) => {
-      const r = rng(1 + def.r * 131 + def.c * 17 + def.len * 7 + side * 977);
+      // Hashed on the ship, not on its cell. A station that re-rolls its jitter whenever the board
+      // moves teleports a hull that only stepped one cell; hashed on the hull, a one-cell change is
+      // a one-cell move and the ship keeps its own bearing and its own place in the formation.
+      const r = rng(1 + (def.id ?? (def.r * 131 + def.c * 17)) * 313 + def.len * 7 + side * 977);
       const seed = (r() * 1e6) | 0;      // drawn first: the rng stream order is the layout
       // pull the fleet in toward its own centre so ships read as a formation rather than as a
       // grid, then jitter what is left. Your own side is pulled in less: you are standing in the
@@ -282,6 +295,8 @@ export function buildFleet(quality) {
     // it to; assigning its result as a local position double-counted the standoff (D30).
     layout(side, view) {
       voyage = null;                     // its legs hold handles this is about to dispose
+      for (const f of fires[side]) for (const h of f?.handles || []) h.kill?.();
+      fires[side] = [];
       for (const s of ships[side]) { sides[side].remove(s.handle.object3D); s.handle.dispose?.(); }
       ships[side].length = 0;
       const list = view?.fleet ?? [];
@@ -343,7 +358,7 @@ export function buildFleet(quality) {
         });
       }
 
-      voyage = { legs, el: 0, on: false, ms: legs.some(l => l.a.distanceTo(l.b) > 1) ? ms : 0 };
+      voyage = { side, legs, el: 0, on: false, ms: legs.some(l => l.a.distanceTo(l.b) > 1) ? ms : 0 };
       const mine = voyage;
       const handle = {
         ms: voyage.ms,
@@ -356,6 +371,112 @@ export function buildFleet(quality) {
       };
       if (!voyage.ms) handle.finish();
       return handle;
+    },
+
+    // What the revealed board says has happened to each hull. Stored, not applied: on a live shot
+    // the arrangement is settled while the round is still in the air, and the ship must not start
+    // burning before it lands. commitDamage() is the frame the shell arrives on.
+    setDamageState(side, states) {
+      pending[side] = states || [];
+    },
+
+    commitDamage() {
+      const vfx = window.__waterline?.vfx?.emit;
+      for (let side = 0; side < 2; side++) {
+        const states = pending[side];
+        if (!states) continue;
+        const list = ships[side];
+        const rank = states
+          .map((st, i) => ({ i, hits: st?.hits || 0, sunk: !!st?.sunk }))
+          .filter(x => x.hits > 0 && list[x.i])
+          .sort((a, b) => (b.sunk - a.sunk) || (b.hits - a.hits));
+        const burning = new Set(rank.slice(0, BURN_CAP).map(x => x.i));
+        for (let i = 0; i < list.length; i++) {
+          const st = states[i] || { hits: 0, sunk: false };
+          const key = `${st.hits}/${st.sunk ? 1 : 0}/${burning.has(i) ? 1 : 0}`;
+          const ship = list[i].handle;
+          if (fires[side][i]?.key === key) continue;
+          for (const f of fires[side][i]?.handles || []) f.kill?.();
+          fires[side][i] = { key, handles: [] };
+          const frac = list[i].len ? Math.min(1, st.hits / list[i].len) : 0;
+          ship.setDamage?.(st.sunk ? 1 : frac * 0.85);
+          if (!st.hits || !burning.has(i) || !vfx) continue;
+          // `size` is a CARD budget and `scale` is the height: a fire that has to read on a 115 m
+          // hull from 130 m out needs ten metres of flame, and buying that through `size` would
+          // spend four times the cards for it. On the centreline, not the flank — a fire on the
+          // far side of the plating is a fire nobody watching the impact can see.
+          const size = st.sunk ? 4 : 1;
+          const t = st.sunk ? 0.42 : 0.34 + (i % 3) * 0.13;
+          const seed = 3301 + side * 97 + i * 613;
+          const near = rank.findIndex(x => x.i === i) < 2;
+          try {
+            fires[side][i].handles.push(vfx.fire(
+              ship.object3D, ship.object3D.worldToLocal(ship.hullPoint(t)),
+              { seconds: 0, size, scale: st.sunk ? 1.7 : Math.min(2.6, 1.6 + st.hits * 0.3),
+                seed, smoke: 0.55, candela: near ? 150 : 0,
+                light: near, sea: false }));
+            if (st.sunk) {
+              fires[side][i].handles.push(vfx.fire(
+                ship.object3D, ship.object3D.worldToLocal(ship.hullPoint(0.68)),
+                { seconds: 0, size: 1, scale: 1.9, seed: seed + 71, smoke: 0.7, light: false, sea: false }));
+            }
+          } catch (e) { console.warn('[waterline] fire', e); }
+        }
+      }
+    },
+
+    // Put a side's ships on their new stations NOW. The round is only in the air for so long, and
+    // the impact has to land on a hull that has arrived rather than on one still crossing the water.
+    settle(side) {
+      if (voyage && voyage.side === side) { voyage.on = true; voyage.el = voyage.ms; tickVoyage(0); }
+    },
+
+    // Where a MISS goes. The grid's own space is not the space the fleet stands in — a station is
+    // pulled toward its formation's centre — so a column raised at the bare cell can come up
+    // through a hull standing somewhere else entirely, and D43 wants a revealed miss to be open
+    // water on the sea as well as on the chart. Same pull, then pushed clear of every hull.
+    missPoint(side, r, c) {
+      const mid = cellLocal((FLEET.grid.h - 1) / 2, (FLEET.grid.w - 1) / 2);
+      const w = sides[side].localToWorld(
+        cellLocal(r, c).lerp(mid, side === 0 ? FLEET.ownPull : FLEET.pull));
+      for (let pass = 0; pass < 3; pass++) {
+        for (const list of ships) {
+          for (const sh of list) {
+            const q = sh.handle.object3D.getWorldPosition(TMP);
+            const need = sh.handle.length * 0.5 + FLEET.missClear;
+            const dx = w.x - q.x, dz = w.z - q.z;
+            const d = Math.hypot(dx, dz) || 1e-3;
+            if (d >= need) continue;
+            w.x = q.x + (dx / d) * need;
+            w.z = q.z + (dz / d) * need;
+          }
+        }
+      }
+      return w;
+    },
+
+    // Where a shell aimed at this cell breaks the skin, and which way is out of the plating. A ship
+    // under way is asked for its ARRIVAL pose: the aim is taken before the move ends, and a round
+    // that led the target would otherwise land where the ship used to be.
+    // `from` is where the round comes from and picks the struck flank; without it, starboard.
+    impactPoint(side, r, c, from = null) {
+      const s = api.shipAt(side, r, c);
+      if (!s) return { point: api.missPoint(side, r, c), ship: null, t: 0, out: null, len: 0 };
+      const o = s.ship.object3D;
+      const leg = voyage && voyage.side === side ? voyage.legs.find(l => l.o === o) : null;
+      const keep = leg && { x: o.position.x, z: o.position.z, ry: o.rotation.y };
+      if (leg) { o.position.x = leg.b.x; o.position.z = leg.b.z; o.rotation.y = leg.h2; }
+      o.updateWorldMatrix(true, false);
+      const mid = s.ship.hullPoint(s.t);
+      const nrm = new THREE.Vector3(0, 0, 1).transformDirection(o.matrixWorld).normalize();
+      const flank = from && nrm.dot(TMP.subVectors(from, mid)) < 0 ? -1 : 1;
+      const point = s.ship.hullSide(s.t, flank);
+      const out = nrm.multiplyScalar(flank);
+      if (leg) {
+        o.position.x = keep.x; o.position.z = keep.z; o.rotation.y = keep.ry;
+        o.updateWorldMatrix(true, false);
+      }
+      return { point, ship: s.ship, t: s.t, out, len: s.ship.length };
     },
 
     // The ship whose guns a `fire_out` cuts to, and the anchor the muzzle flash is emitted from.

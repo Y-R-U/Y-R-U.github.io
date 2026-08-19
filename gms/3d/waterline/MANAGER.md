@@ -113,6 +113,57 @@ auto-resume is correctly scoped.
 loss has been synthesised in headless Chrome. iOS Safari is a different code path for all three of
 P4's fixes.
 
+## Phase 1.7 — Aaron's third phone round
+
+Four items, filed 2026-08-19 after playing the phase-1.6 build. Rulings **D43–D47**. Items 2 and 3
+reproduced by me before briefing. **P5 landed all four on pass 1; item 2 took a second pass.**
+
+| | what | cause |
+|---|---|---|
+| 1 | a privacy blank on the own-fleet box, for two people on one phone | new feature, not a defect |
+| 2 | the chase camera is too close while the round travels | no aspect term, and then **the beat and the round were on two different clocks** (D45, D47) |
+| 3 | a hit explodes on water, not on a ship | the enemy fleet you see is drawn from a private seed and **has no ship on the cell you hit** (D43, D44) |
+| 4 | the "positions dramatised" notice is never read | 1.4 s, small, tracking a moving shell, first turn only (D46) |
+
+**Item 3 was the real work.** `js/ui/drama.js` re-solves the enemy arrangement under the full
+constraint set after every shot — a revealed hit carries a hull, a revealed miss is open water, a
+sunk ship's cells carry a hull of exactly that length — and `fleet.reform(1, …)` steams the escorts
+into place while the round is in the air. Explosion-to-hull distance **46.3 m → max 4.5 m**. The
+leak argument that matters is structural, not statistical: the file imports nothing from `js/sim`
+and its whole input is two public masks plus the cells of ships already sunk.
+
+**Item 2 needed a second pass and the reason is worth keeping.** Pass 1 widened the frame — I
+measured it doubling — but the round was still outside the viewport for **80 of 156 frames**, up to
+4.5× beyond the edge. Pass 1 had solved the camera's *distance* and not its *direction*. Pass 2
+found three faults under it, the first of which is D47: **`Round.update()` counts `u` from 0 while
+the beat mapped its own time onto `start + (end − start)·u` with `start = 0.06`** — 54 m of arc at
+launch against a 30 m standoff, so the round was behind the lens rather than off the edge. Also: the
+offset was built on the ballistic tangent, which points 33° up at launch and put the horizon off the
+bottom of the frame (the "grey sky" I photographed); and the look-ahead was unbounded.
+
+Verified independently on the **played** beat, portrait 390×844, projecting `round.head()` every
+frame: **80/156 frames off screen → 0/156**, worst excursion 4.54 → 0.45 NDC, narrow frame at the
+round 7.6 → 26.1 m minimum. Reproduced their table to the decimal. Landscape the same.
+
+Also verified by me: the hit lands on a hull, in a picture, against my own pre-fix reproduction; the
+privacy eye sets state without opening the editor, the box still opens it, and the blank survives a
+genuine reload and resume; the notice reads from the first frame. 88–93 draw calls against a 120
+ceiling, 60 fps, zero console errors, measured against a same-code control.
+
+**My own instrument lied to me once this round**, which is the eighth instance of that class on this
+project and the first where the fault was mine: an A/B said the new build hung at startup. It was a
+leaked headless Chrome from an earlier probe. Interleave A and B, and `pkill -f wl-probe` between
+runs — headless frame rate on this machine varies by 5× between runs and a wall-clock timeout is
+not a result.
+
+Left standing, deliberately, rather than spending a third pass: the sky above the horizon is flat
+grey through the first half of the chase, where the same sky is a sunset in the impact beat. That is
+D37 working as ruled — the chase looks away from the sun — not a defect, and it is a look note for
+Wave C.
+
+**Still true after five passes: no finger has touched any of this.** Every tap, drag and context
+loss has been synthesised in headless Chrome.
+
 ## Where the queue stands
 
 | Component | Passes | Status |

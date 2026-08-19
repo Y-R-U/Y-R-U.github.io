@@ -116,6 +116,7 @@ export const FLEET = {
   cellMetres: 55,          // one grid cell of OCEAN, not of ship. Ships are much shorter than this
   standoff: 900,           // metres from your own frame (the bridge, at z 0) to the enemy's
   markerScale: 2.4,        // radius of the red hit indicator on your own hull
+  missClear: 22,           // metres a miss column is pushed off the nearest hull's own half-length
   markerFade: 6,           // seconds before it fades
   pull: 0.42,              // how far each ship is drawn toward its own formation's centre
   ownPull: 0.04,           // your own side, which you are standing in the middle of
@@ -193,6 +194,11 @@ export const UI = {
 
   // A stored match older than this is dropped rather than offered — nobody remembers the position.
   resumeMaxDays: 30,
+
+  // D43 — how long the enemy escorts take to steam to the arrangement a shot's result demands.
+  // Both are shorter than `fire_out` at that pace (1280 / 2180 ms), because the move has to be
+  // over before the round is in the air. `instant` has no fire_out, so it has no cover and snaps.
+  drama: { steamMs: { full: 1900, short: 1100, instant: 0 } },
 
   // D33 — the own-grid box opens the fleet editor, and saving flies the camera out to watch the
   // escorts re-form. `reformMs` is both how long the ships take and how long the bird's-eye beat
