@@ -914,6 +914,114 @@ back-fitted to `fire_out`, which was written first.
 made, the existing code it applies to is part of the ruling — check what else it lands on before
 closing the pass.
 
+## D43 — a hit has to land on a hull, and it is the dramatised fleet that must move
+
+Aaron: *"when you hit someone there is no visible ship being hit. we should see a ship being hit —
+atm it looks like the water being hit instead."*
+
+He is describing the code exactly. Side 1's fleet is drawn from `dramaSeed` in `flow.js`
+`layoutFleets()` and has **no relationship to the true enemy layout** — it cannot have one, because
+the sim will not tell the renderer where the enemy's ships are. So `resolve()`'s
+`fleet.shipAt(1, r, c)` returns null for almost every hit, `at` falls back to the bare cell, and
+`vfx.hit` goes off on open water.
+
+Measured, portrait 390×844, first hit of a real match: nearest dramatised enemy hull to the
+explosion **46.3 m**, and the ship in question is a 3-cell destroyer steaming away from a fireball
+that has nothing under it. The screenshot is unambiguous — a fire on the sea, beside an untouched
+ship.
+
+**Ruling: the dramatised enemy fleet is not a fixed fiction. It is a fiction that must stay
+consistent with everything the player has already been shown.** A revealed hit cell has a hull on
+it; a revealed miss cell has open water; a sunk ship's revealed cells are covered by a hull of
+exactly that length. Nothing else about the arrangement is constrained, and nothing about the
+*unrevealed* board may leak into it.
+
+The mechanism is already built: these ships are steaming, and `fleet.reform()` tweens them along
+Bézier courses. A ship moving to be where the shell is about to land is legal in this fiction and is
+covered by the shell's own flight time, during which the camera is chasing the round and not looking
+at the target.
+
+**Not acceptable:** moving the camera so that a nearby hull happens to sit behind the fireball. The
+explosion would still be on the water and Aaron would still be right.
+
+## D44 — a ship taking a shell is a different effect from the sea taking one
+
+The vocabulary for this already exists and has been blind-scored: the `hit_explode` scenario in
+`js/world/vfx/impact.js` calls `emit.hit(target.hullSide(...))` plus two **hull-attached**
+`emit.fire()` and `target.setDamage(0.55)`. Live play calls `vfx.hit(point)` and nothing else, and
+only reaches for `vfx.fire` when a ship sinks.
+
+**Ruling: a resolved hit uses the scored vocabulary — struck at the waterline of a real hull, fire
+that rides the ship, and damage on the model that persists.** A point explosion with no hull under
+it is the miss effect, and using it for a hit is why the two read the same.
+
+## D45 — every beat with a subject, for the third time
+
+D38 ruled it. D42 recorded that it had been ruled and not applied to `fire_out`. It is *still* not
+applied to `shell_chase`, `impact_hit`, `impact_miss` or `enemy_volley`, every one of which is a
+hard-coded eye offset with no aspect term:
+
+```
+shell_chase   fov 42, camera ~15 m off the round        portrait  ~5.3 m of frame   landscape ~20.5 m
+impact_hit    eye = at + (-40, 26, -66), ~83 m out      portrait  ~29 m of frame    landscape ~113 m
+```
+
+Aaron, on the chase: *"zoom out a little more when it travels."* He is reading the 5.3 m.
+
+**Ruling: no beat in `sequences.js` ships with a hard-coded eye offset. Every one solves its station
+from its subject's extent and `ctx.aspect`, and the file gets no fourth chance at this.** When a
+ruling is made, the code it already lands on is part of the ruling — grep for the pattern before
+closing the pass, not after the next report.
+
+## D46 — the dramatisation notice has to be seen to be a notice
+
+Aaron: *"we also need the message to be clear (at top of screen?) that tells you ship/ship location
+and hit location is not being shown reflected. i.e. mock view only being shown."*
+
+The notice exists. D2 fixed its wording at "Positions dramatised", put the long form on once per
+match, and set it to follow the shell for 1.4 s. Aaron has played whole matches and is asking for it
+as though it were not there, which is the only evidence that matters: **a notice that is shown for
+1.4 s, in a small font, tracking a moving object, while a shell is in the air, has not been read.**
+
+**Ruling: D2's brevity stands for the in-flight caption. It is not the whole notice.** The player
+must be able to learn — early, in a fixed place, without a shell competing for the same eye — that
+both the ship positions and the impact positions on the sea are illustration, and that the chart is
+the truth. D2's ban on legal-sounding padding stands: say the true thing plainly and once, don't
+write a disclaimer.
+
+## D47 — a beat and the thing it follows must share a clock
+
+`shell_chase` follows a round. `Round.update()` runs its own `u` from 0 across the flight; the beat
+mapped its pose time onto `start + (end − start) · u` with `start = 0.06`. The two clocks agree at
+exactly one point, `u = 0.67`, and disagree everywhere else — by **54 m of arc at launch**, against a
+camera standing about 30 m off. So the camera was not framing the round late or wide. It was framing
+a point the round had not reached, with the round **behind the lens**.
+
+Two passes were spent on the symptom. Pass 1 read it as a framing width problem, applied D38's
+aspect solve, doubled the frame — and measured 80 of 156 frames with the round still outside the
+viewport. The distance was right and the direction was never in question, because nobody had asked
+whether the two `u`s were the same `u`.
+
+**Ruling: when a beat follows a live object, it takes its parameter from that object — `round.u` —
+and never re-derives one that ought to match.** Two expressions that are supposed to produce the
+same number are a bug waiting for someone to change one of them.
+
+The general form, which has now cost this project three separate faults: **a measurement can confirm
+the fix you made and still be measuring the wrong quantity.** Pass 1's standoff search was searching
+the gap between two clocks. It converged. It reported a real number. The picture was unchanged, and
+only a screenshot of the played beat showed it.
+
+## D48 — a look-ahead needs a leash
+
+The same beat aimed at a point up to `0.09 + 0.16u` of arc ahead of the round, unbounded — tens of
+metres at the start of a 900 m flight, which throws the subject outside a 42° cone at any standoff.
+The look-ahead exists for a good reason and it earns its keep at the end of the beat, where the
+impact should already be in frame when the round lands.
+
+**Ruling: an aim offset from a subject is clamped by what the frame can hold, not by taste.** Slerp
+it back toward the subject until the subject sits inside a fixed fraction of the *narrow* half-frame,
+and let it release as the two converge.
+
 ---
 
 ## Standing rules for every agent on this project
