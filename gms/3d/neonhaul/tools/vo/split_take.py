@@ -13,7 +13,7 @@ the timings off the matched words. Alignment is immune to the drift that makes r
 whisper timestamps unusable, because a word only supplies a time once the aligner has
 already agreed which word it is.
 
-    python3 split_take.py <take.mp3> <script.json> <outdir> [--dry]
+    python3 split_take.py <take.mp3> <script.json> <outdir> [--dry] [--no-verify]
 
 script.json: {"group": "dispatch", "lines": [{"file": "dispatch_01.mp3",
              "text": "Haul Control to all couriers ..."}, ...]}  in spoken order.
@@ -27,8 +27,42 @@ GAP_REAL = 2.2               # a gap longer than this is real silence, not a mis
 MODEL = 'mlx-community/whisper-small.en-mlx'
 
 
+_ONES = ('zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen '
+         'fifteen sixteen seventeen eighteen nineteen').split()
+_TENS = ('', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety')
+
+
+def _num_words(n):
+    if n < 20:
+        return [_ONES[n]]
+    if n < 100:
+        return [_TENS[n // 10]] + ([_ONES[n % 10]] if n % 10 else [])
+    if n < 1000:
+        return [_ONES[n // 100], 'hundred'] + (_num_words(n % 100) if n % 100 else [])
+    for div, name in ((10 ** 9, 'billion'), (10 ** 6, 'million'), (1000, 'thousand')):
+        if n >= div:
+            return _num_words(n // div) + [name] + (_num_words(n % div) if n % div else [])
+    return [str(n)]
+
+
 def norm(t):
-    return re.sub(r"[^a-z0-9' ]", ' ', t.lower()).split()
+    """Tokens, with numbers canonicalised to WORDS on both sides of the alignment.
+
+    Whisper writes a spoken "fifty thousand" as **50,000**, which used to tokenise to `50` / `000`
+    and could never match the script's `fifty` / `thousand`. Those two tokens then went unmatched,
+    which pushed the measured gap to the previous line out to 2.21 s against `GAP_REAL = 2.2` —
+    so the aligner took the real-silence branch and cut at a word edge in the middle of the number.
+    `boss_05` shipped starting on the word "credits".
+
+    Every automatic check passed it. Coverage read 0.882 against a 0.6 threshold and the byte count
+    was unremarkable, which is the whole reason `verify_cuts()` below exists: the only check that
+    could have caught it is one that listens to what was actually written.
+    """
+    t = re.sub(r'(?<=\d),(?=\d)', '', t.lower())          # 50,000 -> 50000, before punctuation goes
+    out = []
+    for tok in re.sub(r"[^a-z0-9' ]", ' ', t).split():
+        out.extend(_num_words(int(tok)) if tok.isdigit() and len(tok) <= 12 else [tok])
+    return out
 
 
 def transcribe(path):
@@ -66,6 +100,36 @@ def align(script_lines, words):
             spans.append(None); misses.append(i); continue
         spans.append((words[min(idx)][1], words[max(idx)][2], len(idx), n_tok))
     return spans, misses
+
+
+def verify_cuts(lines, outdir):
+    """Transcribe every clip that was just written and check it says its own line.
+
+    This is the check that was missing. `cps` and `coverage` are computed from the ALIGNMENT — they
+    describe the tool's own opinion of where the words were, so a boundary placed in the wrong place
+    is scored by the same numbers that put it there. Reading the finished file back is the only
+    measurement in this pipeline that is independent of the decision it is auditing.
+
+    The claim is deliberately weak and therefore trustworthy: the clip's opening tokens must be the
+    line's opening tokens. That is exactly the failure a mis-cut produces and it needs no threshold
+    tuned against a corpus.
+    """
+    bad = []
+    for ln in lines:
+        f = outdir / ln['file']
+        if not f.exists():
+            bad.append((ln['file'], 'missing', '')); continue
+        heard = norm(' '.join(w[0] for w in transcribe(f)))
+        want = norm(ln['text'])
+        head_w, head_h = want[:3], heard[:3]
+        ratio = difflib.SequenceMatcher(None, want, heard, autojunk=False).ratio()
+        # A clipped head is the defect; a ragged tail is normal (the fade takes the last phoneme).
+        head_ok = bool(head_h) and difflib.SequenceMatcher(None, head_w, head_h).ratio() >= 0.6
+        print(f"  {ln['file']:28s} heard {ratio:4.0%}  head {'ok  ' if head_ok else 'CUT '}"
+              f"{' '.join(head_h) or '(silence)'}")
+        if not head_ok or ratio < 0.55:
+            bad.append((ln['file'], f'{ratio:.0%}', ' '.join(head_h)))
+    return bad
 
 
 def main():
@@ -129,6 +193,15 @@ def main():
                             str(outdir / ln['file'])], check=True)
 
     (outdir / f"_report_{spec['group']}.json").write_text(json.dumps(report, indent=1))
+
+    if not dry and '--no-verify' not in sys.argv:
+        print('verify — transcribing the cut clips back:')
+        bad = verify_cuts(lines, outdir)
+        if bad:
+            ok = False
+            for f, r, h in bad:
+                print(f"  !! {f}: starts \"{h}\" ({r} of the line) — re-cut this one by hand")
+
     print(('OK' if ok else 'REVIEW NEEDED') + f" — {len(lines)} lines -> {outdir}")
     return 0 if ok else 1
 
