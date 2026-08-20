@@ -38,7 +38,7 @@ GROUP_NOTE = {
 def status_block(L, M, ver, intel):
     fore = sum(1 for c in M['chatter'] if c['layer'] == 'fore')
     back = len(M['chatter']) - fore
-    bases = len({v['say'] for v in L['voices'].values()})
+    bases = len({v['voice'] for v in L['voices'].values()})
     kb = ver['totalBytes'] / 1024
     sp = [c['speech'] for c in ver['clips'].values()]
     intel_line = ''
@@ -161,14 +161,14 @@ def pool_block(L, M):
                 p.append(f"| `{slot}` | {v} | {esc(by[slot]['text'])} |\n")
 
     p.append("\n---\n---\n\n# 5. THE CAST\n\n")
-    p.append(f"{len(L['voices'])} voice identities over {len({v['say'] for v in L['voices'].values()})} installed macOS voices. Where two identities share a base\n"
+    p.append(f"{len(L['voices'])} voice identities over {len({v['voice'] for v in L['voices'].values()})} Kokoro voices. Where two identities share a base\n"
              "voice they differ in pitch, in words-per-minute and usually in radio profile — a ±7 % pitch shift\n"
              "moves the formants as well as the pitch, so behind a 3.4 kHz band-limit it reads as a different\n"
              "person rather than the same person sped up. Listen to the whole cast in one file:\n"
              "`python3 tools/vo/gen_chatter.py --demo` → `tools/vo/raw/voice_demo.mp3`.\n\n")
-    p.append("| id | macOS voice | pitch | wpm | profile | who |\n|---|---|---|---|---|---|\n")
+    p.append("| id | Kokoro voice | pitch | wpm | profile | who |\n|---|---|---|---|---|---|\n")
     for k, v in L['voices'].items():
-        p.append(f"| `{k}` | {v['say']} | {v['pitch']:.2f} | {v['rate']} | `{v['profile']}` | {v['who']} |\n")
+        p.append(f"| `{k}` | {v['voice']} | {v['pitch']:.2f} | {v['rate']} | `{v['profile']}` | {v['who']} |\n")
     p.append("\n---\n\n## Slot summary\n\n| group | slots | on screen | tag |\n|---|---|---|---|\n")
     p.append(f"| music | {len(M['music'])} | — | — |\n")
     for g, gd in L['groups'].items():

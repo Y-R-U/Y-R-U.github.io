@@ -952,3 +952,51 @@ FAIL  §3.2.3 — chunk generation fits its budget over a 20s ?auto=1 flight
 **There is no runtime lever for `shopDensity`** (`js/config.js:41`, read once in `js/shops.js:134`/`:170`), so the A/B needs a config edit or a new hook — `setShopVisible`/`setShopForce`/`setShopRange` are all *render* levers and will not move `ms.gen`. **Bisect it; do not assume the shopfronts.**
 
 Recorded rather than fixed at ship time, per Aaron's *"better to get things working and tweak after."* **Assigned to the defect-fix agent as item four.**
+
+---
+
+## S2-K — the four defects, verified by the manager 2026-08-20
+
+**All 47 suites green, none failing.** `p2` **8/8** · new `s2k` 20/20 ×2 · `determinism` 9/9 golden `f29beaf9` / 25,039.
+
+### D1 — voices: DONE, but **Aaron is the gate and has not heard them**
+macOS `say` replaced with **Kokoro-82M** through a batched worker (`tools/vo/kokoro_say.py`) — one process for the whole run, because `KPipeline` costs ~6 s to build and per-clip processes would have spent 20 of 25 minutes loading weights. **31 identities over 27 distinct Kokoro voices**, `bm_george` held out of the pool and reserved for the Boss. `tools/radio_fx.sh` untouched; the Boss still skips it.
+
+**222 clips regenerated. Bytes went DOWN: chatter 2,333 → 2,174 KB, story 497 → 429 KB, −227 KB total.** Encoder deliberately held at 16 kbps — changing voice and encoder in one rebuild would leave nobody able to say which they were hearing.
+
+Manager-measured: sampled clips read **−15.6 to −17.3 dBFS mean, peaks −1.6 to −2.8** — real audio with headroom. **That is all I can verify. I cannot listen.** Two tapes for Aaron under gitignored `tools/vo/raw/`: `voice_demo.mp3` (3 m 28 s, all 31 voices) and **`ab_say_vs_kokoro.mp3`** (six lines, old take then new, identical radio chain, so only the voice differs).
+
+Its `--calibrate` first measured **raw Kokoro duration while `radio_fx.sh` trims dead air**, so every clip came out 25 % shorter than its own calibration predicted. Refitted on characters rather than words.
+
+### D2 — controls: DONE, verified visually in both flip states
+The original bug was worse than reported: `#leftpad` **mirrored the wrong way**, so RADIO/HOME/AUTO sat in the flying half in **both** `flipSides` states. Now one console stack (`#conspad`) on the look thumb's side.
+
+**The gate derives its exemption instead of listing one:** a control belongs to a thumb **iff its box moves when `flipSides` flips**. `#btn-view` and the cog don't move, so they're exempt by measurement rather than by allowlist. Falsified by forcing HOME back to the left edge — 0 offenders → 1 → 0.
+
+It also caught a second defect the half-check could not see: **in landscape the cog sat on top of AUTO**. Every visible control now hit-tests to itself in both orientations and both flips. I looked at all four captures.
+
+### D3 — cutscene mix: DONE, and **the first fix shipped broken with its own gate passing**
+`radio.setScene(on)` now stops the director drawing lines (fore, back **and** event) and takes `SCENE_NET 0` / `SCENE_MUSIC 0.16`, restored over `DUCK_FADE`. `startIntro()` latches, `endIntro()` releases — one exit for confirm, skip and auto-name alike.
+
+**The first version was `this.dir && this.dir.setScene(v)`** — and the director does not exist until the 22 KB manifest lands, which is *after* the cutscene starts. **The call did nothing, the manifest arrived mid-scene, and the chatter came up under the Boss exactly as before.** The mechanism gate passed because it drove `setScene()` on a page where the director already existed.
+
+**That is `CLAUDE.md`'s `&&`-guarded no-op rule — which the project wrote for its TESTS — appearing in production code and defeating a test that obeyed the rule.** The new `D3 LIVE` check plays the real cutscene and winds 120 s of director clock inside it: with the fix 0 lines, with the one line reverted **3 foreground + 9 background**.
+
+### D4 — **it was not the shopfronts, and not a per-chunk cost at all**
+Timed on real chunk records at the dense camera: signage **0.104 ms**, extras **0.187–0.21 ms**, deferred release **0.026 ms** — against a **1.2 ms per-unit cap**, so between a sixth and a forty-sixth of budget. Shopfronts are 0.111 ms of that, the largest component of the largest unit, and **removing all 2,290 live shopfronts leaves `ms.gen` unchanged.**
+
+The same units measure **1.0–2.1 ms in flight**. A **50× gap between the work and the wall time around it is allocation/GC/scheduling, not cost** — `CLAUDE.md`'s `budget.mjs` lesson verbatim. `p2` is 8/8 in 10/10 runs, including under eight busy CPU threads.
+
+**The agent built a slice optimisation on the shopfront hypothesis and reverted it when the timing came back.** Machinery justified by noise is what this project keeps a list of.
+
+**Manager check on the gate itself:** `gates_p2.mjs` was edited, so I diffed it — the pass condition is byte-identical and the addition is explicitly *"Printed, not gated"*. `GATES.msGen` is still **1.4** in `config.js`, unchanged. **The bar was not moved; the code got faster.**
+
+### STILL OPEN after S2-K
+
+- **`ms.gen` exceeds 1.4 in LANDSCAPE and `gates_p2` has no landscape arm.** Three paired 20 s flights: **1.0/1.1/1.3 portrait against 1.4/1.5/2.1 landscape.** Worst *frame* is 7.6–10.2 ms against a gate of 12 in both, so 60 fps holds — but **D4 is fixed in the arm that runs, not in the arm that doesn't.** The agent disclosed this rather than letting the green stand.
+- `gates_s2f` C1's touch floor is **≥30 px and the landscape keys were 28** after the first pass — caught only by re-running. Now 34, but that floor has zero headroom for anything else on the console.
+- **The 26 SUNO dispatch slots are still SUNO** — the most-heard lines in the game. `--resynth-suno` switches them; Aaron's call.
+
+### Manager fixes applied on top
+
+`tools/vo/write_suno_md.py` still read `v['say']` — a key `lines.json` no longer has, so **the doc generator would `KeyError`** — and `docs/SUNO.md`, the file Aaron reads to regenerate audio, still claimed *"31 voice identities over 16 installed macOS voices"* with a "macOS voice" column. Both corrected to 27 Kokoro voices. **A document describing the engine we had just removed, an hour after a peer session and I agreed that a comment is not a measurement and outlives the code it describes.**

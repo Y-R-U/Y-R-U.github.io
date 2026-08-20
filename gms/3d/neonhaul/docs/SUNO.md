@@ -38,7 +38,7 @@ group is FOR, and because the music prompts in §1 are unchanged and still live.
 
 **Every chatter slot now has audio.** The pool went from 64 declared slots with 26 files on disk to
 **203 slots with 203 files** — 179 foreground, 24 background — spoken by **31 voice
-identities over 16 installed macOS voices**. Aaron's complaint was *"there is only a couple of
+identities over 27 Kokoro voices**. Aaron's complaint was *"there is only a couple of
 random chatter that loop frequently"*, and the cause was that 38 of the 64 declared slots had never
 been generated: the player was hearing four dispatch groups on rotation and nothing else existed.
 
@@ -1040,13 +1040,13 @@ rendered separately and stacked with a 0.9 s offset.
 
 # 5. THE CAST
 
-31 voice identities over 16 installed macOS voices. Where two identities share a base
+31 voice identities over 27 Kokoro voices. Where two identities share a base
 voice they differ in pitch, in words-per-minute and usually in radio profile — a ±7 % pitch shift
 moves the formants as well as the pitch, so behind a 3.4 kHz band-limit it reads as a different
 person rather than the same person sped up. Listen to the whole cast in one file:
 `python3 tools/vo/gen_chatter.py --demo` → `tools/vo/raw/voice_demo.mp3`.
 
-| id | macOS voice | pitch | wpm | profile | who |
+| id | Kokoro voice | pitch | wpm | profile | who |
 |---|---|---|---|---|---|
 | `ctrl_a` | Samantha | 1.00 | 208 | `close` | Haul Control, day operator — US female, calm and clipped |
 | `ctrl_b` | Karen | 0.97 | 199 | `close` | Haul Control, night operator — AU female, dry |

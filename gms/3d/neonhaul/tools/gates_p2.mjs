@@ -352,10 +352,19 @@ async function main() {
   }
   const flight = await evalJSON(S, 'window.__state');
   meanFrame /= Math.max(1, n);
+  // §S2-K D4. `ms.gen` alone cannot say whether a red reading is one expensive work unit or an
+  // accumulation, and the 1.900 ms failure this suite found at ship time cost a phase to answer.
+  // `city.stagePeak` is the worst any single §3.2.3 unit cost DURING THIS FLIGHT — the sibling
+  // `stageMs` also carries the boot pre-warm, where units run back to back with no cap at all.
+  // Printed, not gated: gates_s2k D4 owns the assertion and the per-component timing behind it.
+  const peak = flight.city.stagePeak || [];
   check(`§3.2.3 — chunk generation fits its budget over a ${SECS}s ?auto=1 flight`,
     worstGen <= GATES.msGen && worstFrame <= GATES.worstFrame && flight.errors.length === 0,
     `worst ms.gen ${worstGen.toFixed(3)} ms over any single frame (gate ${GATES.msGen}); worst frame ${worstFrame.toFixed(2)} ms `
     + `(gate ${GATES.worstFrame}, §13 quotes 22 — see the report); mean frame ${meanFrame.toFixed(2)} ms\n      `
+    + `worst SINGLE work unit this flight [${peak.join(', ')}] ms against §3.2.3's 1.2 per-unit cap `
+    + `(units 1-4 plus the deferred release) — a red ms.gen with every one of these low is a stall, `
+    + `not a cost; see the header of tools/gates_s2k.mjs\n      `
     + `${chunkSet.size} distinct chunks flown through; deepest stream queue ${maxQueued} chunks; `
     + `${flight.city.chunks} live, ${flight.city.lod0}/${flight.city.lod1}/${flight.city.lod2} instances; `
     + `${flight.errors.length} errors`);

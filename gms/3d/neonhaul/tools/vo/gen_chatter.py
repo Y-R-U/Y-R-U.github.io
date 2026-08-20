@@ -5,14 +5,21 @@
     python3 tools/vo/gen_chatter.py --only life  # one group
     python3 tools/vo/gen_chatter.py --verify     # measure what is on disk, generate nothing
     python3 tools/vo/gen_chatter.py --demo       # one mp3 per voice, for listening to
+    python3 tools/vo/gen_chatter.py --calibrate  # re-measure each voice's words-per-minute
 
 Three stages, and the third is the one that matters.
 
-1. VOICE — macOS `say`, which ships ~20 usable English voices with real accent and pitch spread
-   (F0 78–306 Hz measured). It is not a good audiobook narrator. It does not need to be: every line
-   here goes through a 300–3400 Hz band-limit, and behind that the slight flatness reads as cheap
-   radio gear rather than as bad acting. Lines whose audio already exists as a SUNO take are NOT
-   re-synthesised — they come out of tools/vo/raw/suno/ and only get stage 2.
+1. VOICE — **Kokoro-82M**, via tools/vo/kokoro_say.py. Was macOS `say` until 2026-08-20, when Aaron
+   played the shipped build and said *"it sounds like a computer voice from the 90s."* He is right,
+   and the number that hid it is instructive: S2-B measured the `say` pool with whisper at 90.7 %
+   intelligibility and shipped on that. Intelligibility measures whether a word is RECOGNISABLE. It
+   cannot see prosody, and prosody is the whole difference. **The acceptance test for the voice is
+   a person listening to `--demo`; everything measured in this file is a build check.**
+
+   Lines whose audio already exists as a SUNO take are NOT re-synthesised — they come out of
+   tools/vo/raw/suno/ and only get stage 2 — unless `--resynth-suno` is passed, which is how the
+   Kokoro pass took the pool over to one consistent cast. The SUNO originals are never overwritten
+   (see cmd_build), so that decision is one flag away from being reversed.
 
 2. RADIO — tools/radio_fx.sh. Deterministic ffmpeg, not a prompt. See that file for why.
 
@@ -86,9 +93,10 @@ def rms_db(a):
 def for_say(text):
     """The manifest text is what the player READS; this is what the synthesiser is given.
 
-    Shouted lines are stored upper-case (SUNO.md rule 3) but `say` pronounces short upper-case words
-    letter by letter — "IT IS" becomes "eye tee eye ess" — so the shout is carried by the `loud`
-    radio profile instead and the synthesiser gets ordinary case."""
+    Shouted lines are stored upper-case (SUNO.md rule 3) but a grapheme-to-phoneme front end reads a
+    short upper-case word as an initialism — "IT IS" becomes "eye tee eye ess" — so the shout is
+    carried by the `loud` radio profile instead and the synthesiser gets ordinary case. Kokoro's
+    misaki front end does this as readily as `say` did."""
     t = text.replace('—', ',').replace('–', ',').replace('…', '.')
     t = t.replace('’', "'").replace('“', '').replace('”', '')
     if t == t.upper():
@@ -96,17 +104,46 @@ def for_say(text):
     return re.sub(r'\s+', ' ', t).strip()
 
 
-def say(voice, rate, text, out):
-    cmd = ['say', '-v', voice]
-    if rate:
-        cmd += ['-r', str(rate)]
-    cmd += ['-o', out, text]
-    run(cmd)
-    # `say -o x.aiff` exits 0 after writing a ZERO-BYTE file when it dislikes the output format.
-    # That is this project's house bug in its purest form, so it is caught here rather than becoming
-    # a clip that "exists".
-    if not os.path.exists(out) or os.path.getsize(out) < 2000:
-        raise RuntimeError(f"say('{voice}') wrote {os.path.getsize(out) if os.path.exists(out) else 0} bytes for {out}")
+# ── Kokoro, batched ────────────────────────────────────────────────────────
+#
+# Abogen's uv tool install is the interpreter that has kokoro 0.9.4 and the cached Kokoro-82M
+# weights. It is not this project's python and there is no HTTP endpoint to POST to — Abogen's own
+# :8808 is htmx against /wizard/upload and has no one-shot TTS route — so the library is driven
+# directly, in ONE subprocess for the whole run: KPipeline costs ~6 s to construct and ~1 s per
+# line, so a process per clip would spend 20 of 25 minutes loading the same weights.
+KOKORO_PY = os.environ.get('KOKORO_PY',
+                           '/Users/aaronair/.local/share/uv/tools/abogen/bin/python')
+
+
+def kokoro_batch(jobs, label='tts', specdir=None):
+    """jobs: [{voice, text, speed, out}]. Returns {out: measurement}. Raises on any refusal.
+
+    Every take is written as 24 kHz wav — Kokoro's native rate — and the ffmpeg stages resample
+    from there. A `say`-era .aiff and this are equally readable to stage 2, so nothing downstream
+    had to change."""
+    if not jobs:
+        return {}
+    if not os.path.exists(KOKORO_PY):
+        raise RuntimeError(f"KOKORO_PY does not exist: {KOKORO_PY}. This is Abogen's uv tool "
+                           f"interpreter — the one with kokoro and the cached weights in it.")
+    specdir = specdir or RAW_TTS
+    os.makedirs(specdir, exist_ok=True)
+    spec = os.path.join(specdir, f'_jobs_{label}.json')
+    json.dump(jobs, open(spec, 'w'))
+    env = dict(os.environ, HF_HUB_DISABLE_PROGRESS_BARS='1')
+    print(f"  kokoro: {len(jobs)} takes in one process …", flush=True)
+    r = subprocess.run([KOKORO_PY, os.path.join(VO, 'kokoro_say.py'), spec],
+                       capture_output=True, text=True, env=env)
+    # The worker prints its JSON after an ASCII record separator, because kokoro's own imports write
+    # warnings to stdout and a bare json.loads of the whole stream fails on them.
+    if '\x1e' not in r.stdout:
+        raise RuntimeError(f"kokoro_say produced no result record (rc {r.returncode}):\n"
+                           f"{(r.stderr or r.stdout)[-1200:]}")
+    res = json.loads(r.stdout.rsplit('\x1e', 1)[1])
+    errs = [x['error'] for x in res if 'error' in x]
+    if errs:
+        raise RuntimeError('kokoro refused ' + str(len(errs)) + ' take(s): ' + '; '.join(errs[:6]))
+    return {x['out']: x for x in res}
 
 
 def overlap(parts, gap, out):
@@ -178,31 +215,48 @@ def slots(spec):
             yield f'{g}_{i:02d}', g, gd, ln
 
 
-def build_one(spec, slot, g, gd, ln, idx, bitrate, force):
+# A `src='suno'` dispatch line still has its text, so it CAN be re-cast onto the Kokoro operators —
+# the three Haul Control voices, rotated by position so one group is not one speaker. The four
+# `bg_net` SUNO takes have no `t` at all (a back slot never shows text, §10.3 rule 3) and so cannot
+# be re-synthesised from anything; they stay SUNO whatever the flag says.
+def resynth_voice(slot, g, i):
+    return ['ctrl_a', 'ctrl_b', 'ctrl_c'][i % 3]
+
+
+def parts_of(spec, slot, ln, g, idx, resynth_suno):
+    """(voice_key, text, wav_path) for every take this slot needs, or None if it comes from SUNO."""
+    if ln.get('src') == 'suno':
+        if not resynth_suno or not ln.get('t'):
+            return None
+        vkeys, texts = [resynth_voice(slot, g, idx)], [ln['t']]
+    else:
+        vkeys = ln['v'] if isinstance(ln['v'], list) else [ln['v']]
+        texts = ln['t'] if isinstance(ln['t'], list) else [ln['t']]
+    return [(vk, tx, os.path.join(RAW_TTS, f'{slot}_{k}.wav'))
+            for k, (vk, tx) in enumerate(zip(vkeys, texts))]
+
+
+def build_one(spec, slot, g, gd, ln, idx, bitrate, resynth_suno):
     voices = spec['voices']
     dst = os.path.join(CH, slot + '.mp3')
-    if ln.get('src') == 'suno':
+    ps = parts_of(spec, slot, ln, g, idx, resynth_suno)
+    if ps is None:
         src = os.path.join(RAW_SUNO, slot + '.mp3')
         if not os.path.exists(src):
             raise RuntimeError(f"{slot}: src='suno' but {src} is missing — the original take is the "
                                f"only input that is not derived, so it cannot be rebuilt")
         prof, pitch = 'close', 1.0
     else:
-        vkeys = ln['v'] if isinstance(ln['v'], list) else [ln['v']]
-        texts = ln['t'] if isinstance(ln['t'], list) else [ln['t']]
-        parts = []
-        for k, (vk, tx) in enumerate(zip(vkeys, texts)):
-            v = voices[vk]
-            p = os.path.join(RAW_TTS, f'{slot}_{k}.aiff')
-            if force or not os.path.exists(p) or os.path.getsize(p) < 2000:
-                say(v['say'], v.get('rate'), for_say(tx), p)
-            parts.append(p)
+        parts = [p for _, _, p in ps]
+        for p in parts:
+            if not os.path.exists(p) or os.path.getsize(p) < 2000:
+                raise RuntimeError(f"{slot}: stage 1 left nothing at {p}")
         if len(parts) == 1:
             src = parts[0]
         else:
             src = os.path.join(RAW_TTS, f'{slot}_mix.wav')
             overlap(parts, ln.get('gap', 0.9), src)
-        v0 = voices[vkeys[0]]
+        v0 = voices[ps[0][0]]
         prof = ln.get('profile') or ('loud' if ln.get('shout') else v0['profile'])
         pitch = v0.get('pitch', 1.0)
     radio(src, dst, prof, pitch, idx, bitrate)
@@ -224,10 +278,25 @@ def cmd_build(a):
     work = [(s, g, gd, ln, i) for i, (s, g, gd, ln) in enumerate(slots(spec))
             if not a.only or g in a.only]
     print(f"building {len(work)} slots at {a.bitrate} …")
+
+    # STAGE 1, for the whole run, in one process. Splitting it out of build_one is not a tidy-up:
+    # the radio stage below is six ffmpeg processes wide and the Kokoro stage must not be, because
+    # one model in one process is the entire reason this takes four minutes instead of forty.
+    jobs = []
+    for (s, g, gd, ln, i) in work:
+        ps = parts_of(spec, s, ln, g, i, a.resynth_suno)
+        for vk, tx, path in (ps or []):
+            if not a.force and os.path.exists(path) and os.path.getsize(path) >= 2000:
+                continue
+            v = spec['voices'][vk]
+            jobs.append({'voice': v['voice'], 'speed': v.get('speed', 1.0),
+                         'text': for_say(tx), 'out': path})
+    kokoro_batch(jobs, 'chatter')
+
     out = {}
     errs = []
     with ThreadPoolExecutor(max_workers=6) as ex:
-        futs = {ex.submit(build_one, spec, s, g, gd, ln, i, a.bitrate, a.force): s
+        futs = {ex.submit(build_one, spec, s, g, gd, ln, i, a.bitrate, a.resynth_suno): s
                 for (s, g, gd, ln, i) in work}
         for f in futs:
             try:
@@ -275,40 +344,43 @@ def cmd_manifest(a):
 
 # ── verification ───────────────────────────────────────────────────────────
 
+# Characters per "word" at the calibrated rate. Fitted, and worth one line on why it is characters
+# and not words: over the 203-clip pool, predicting from CHARACTER count is measurably tighter than
+# from word count — a 2.56x total spread against 2.99x — because Kokoro's pace tracks syllables far
+# better than it tracks how many spaces are in the sentence. The constant absorbs the chars-per-word
+# of the calibration sentence as well as the true ratio, so it is not 5.2 and is not supposed to be.
+CPW = 6.35
+
+
 def expected_dur(spec, ln):
-    """How long this line SHOULD take: word count over the words-per-minute the voice was actually
-    driven at, plus the offset of each overlapping part.
+    """How long this line SHOULD take, and the band its measured/predicted ratio must fall in.
 
-    A fixed words-per-second band was tried first and was wrong twice over. It failed the fast
-    voices — the pirate DJ is driven at 235 wpm on purpose — and it failed every overlapped
-    background line, where two people's words fit inside one person's duration. Twenty-nine of
-    203 clips were rejected by a check that was measuring the script rather than the clip.
+    ── WHAT THIS CHECK IS AND IS NOT ──────────────────────────────────────────
+    It catches GROSS failures: a truncated take, an empty one, the wrong take in the slot. It is
+    NOT sensitive enough to catch a subtly wrong one, and the bands are wide because the residual
+    spread is real rather than sloppy. Kokoro reads a short imperative far faster than a long
+    formal one — `distress_04` ("GET OFF THE PAD. GET OFF THE PAD NOW.") comes out at 312 wpm and
+    `weather_02` at 124 wpm, from voices calibrated at 214 and 195 — and no per-voice constant can
+    model that. The observed distribution is printed on every run so drift shows.
 
-    A src='suno' line has no synthesiser rate, so it is measured against a nominal 165 wpm and a
+    The `say` era's predictor modelled words plus a pause per full stop and comma. Both parts were
+    re-fitted for Kokoro rather than inherited: the pause constants are less than half what `say`
+    needed, because a neural front end's stop is shorter, and the base term is characters.
+
+    A src='suno' line has no calibrated rate, so it is measured against a nominal 185 wpm and a
     correspondingly wider band. It is NOT skipped: a check with a hole in it is how this project
-    shipped a silent clip. Returns (seconds, lo, hi) bounding the acceptable measured/predicted
-    ratio. The bands are wide on purpose. A grid search over the pause constants and a global rate
-    scale across all 203 clips could not get the measured/predicted spread below 1.56x around its
-    own median, because `say` does not honour `-r` linearly and pause length depends on the sentence
-    either side of the stop. So this catches gross failures — a truncated clip, an empty one, the
-    wrong take in the slot — and it is not sensitive enough to catch a subtly wrong one. Saying
-    which is which is the point; the observed distribution is printed on every run so drift shows."""
+    shipped a silent clip. Returns (seconds, lo, hi)."""
     vkeys = ln['v'] if isinstance(ln.get('v'), list) else [ln.get('v')]
     texts = ln['t'] if isinstance(ln.get('t'), list) else [ln.get('t', '')]
     gap = ln.get('gap', 0.9)
     ends = []
     for i, (vk, tx) in enumerate(zip(vkeys, texts)):
-        wpm = (spec['voices'].get(vk) or {}).get('rate') or 165
-        # Word rate alone under-predicts a line built out of short sentences by up to 2x: the
-        # synthesiser inserts a real pause at every full stop and a shorter one at every comma, and
-        # the Atmospheric Bulletin lines are almost entirely full stops. Nine of 203 clips were
-        # flagged by a predictor that modelled only the words, and every one of them was correct
-        # audio. These two constants are measured against that set, not chosen to make it green.
-        pause = 0.35 * sum(tx.count(c) for c in '.!?') + 0.15 * tx.count(',')
-        ends.append(i * gap + len(tx.split()) / (wpm / 60.0) + pause)
+        wpm = (spec['voices'].get(vk) or {}).get('rate') or 185
+        pause = 0.15 * sum(tx.count(c) for c in '.!?') + 0.06 * tx.count(',')
+        ends.append(i * gap + len(tx) / (wpm / 60.0 * CPW) + pause)
     if ln.get('src') == 'suno':
-        return (max(ends) if ends else 0), 0.40, 2.10
-    return (max(ends) if ends else 0), 0.45, 1.75
+        return (max(ends) if ends else 0), 0.70, 2.40
+    return (max(ends) if ends else 0), 0.55, 1.70
 
 
 def cmd_verify(a):
@@ -397,11 +469,16 @@ def cmd_demo(a):
     spec = load()
     os.makedirs(RAW_TTS, exist_ok=True)
     parts = []
+    jobs, plan = [], []
     for i, (vk, v) in enumerate(spec['voices'].items()):
-        raw = os.path.join(RAW_TTS, f'_demo_{vk}.aiff')
+        raw = os.path.join(RAW_TTS, f'_demo_{vk}.wav')
         out = os.path.join(RAW_TTS, f'_demo_{vk}.mp3')
-        say(v['say'], v.get('rate'), for_say(
-            f"This is {vk.replace('_',' ')}. {v['who']}. Haul Control, this is a courier on lanes four through nine."), raw)
+        jobs.append({'voice': v['voice'], 'speed': v.get('speed', 1.0), 'out': raw,
+                     'text': for_say(f"This is {vk.replace('_',' ')}. {v['who']}. "
+                                     f"Haul Control, this is a courier on lanes four through nine.")})
+        plan.append((raw, out, v, i))
+    kokoro_batch(jobs, 'demo')
+    for raw, out, v, i in plan:
         radio(raw, out, v['profile'], v.get('pitch', 1.0), i, a.bitrate)
         parts.append(out)
     lst = os.path.join(RAW_TTS, '_demo.txt')
@@ -413,18 +490,64 @@ def cmd_demo(a):
     return 0
 
 
+def cmd_calibrate(a):
+    """Measure the words-per-minute each cast voice ACTUALLY produces at the speed it is cast at,
+    and write it into lines.json's `rate` — the only thing `rate` is used for is expected_dur().
+
+    This is a calibration, not a self-fulfilling check. It measures ONE fixed sentence per voice and
+    the duration check then runs against ~200 different sentences of different lengths and
+    punctuation, so what it catches — a truncated take, an empty one, the wrong voice in the slot —
+    is untouched by it. Calibrating the per-line predictor against the per-line output would be
+    circular; calibrating a per-VOICE constant against one held-out sentence is what `say -r` was
+    handing us for free and Kokoro does not."""
+    spec = load()
+    line = ("Haul Control to all couriers, the Vane Street corridor is open again. "
+            "Lanes four through nine, keep it under two hundred.")
+    os.makedirs(RAW_TTS, exist_ok=True)
+    jobs = [{'voice': v['voice'], 'speed': v.get('speed', 1.0), 'text': line,
+             'out': os.path.join(RAW_TTS, f'_cal_{vk}.wav')} for vk, v in spec['voices'].items()]
+    kokoro_batch(jobs, 'cal')
+    words = len(line.split())
+    for i, (vk, v) in enumerate(spec['voices'].items()):
+        # Measured on the take AFTER stage 2, minus the two squelch bursts — i.e. exactly the
+        # quantity cmd_verify measures. The first version of this read the raw Kokoro duration and
+        # every clip in the pool then came out 25 % SHORTER than its own calibration predicted,
+        # because radio_fx.sh trims the dead air Kokoro leaves at both ends and the calibration had
+        # counted it as speech. A predictor and its measurement have to be the same quantity.
+        raw = os.path.join(RAW_TTS, f'_cal_{vk}.wav')
+        out = os.path.join(RAW_TTS, f'_cal_{vk}.mp3')
+        radio(raw, out, v['profile'], v.get('pitch', 1.0), i, '16k')
+        sec = dur(out) - HEAD - TAIL
+        was = v.get('rate')
+        v['rate'] = int(round(words / sec * 60))
+        print(f"  {vk:9s} {v['voice']:12s} speed {v.get('speed',1.0):.2f}  "
+              f"{sec:5.2f} s spoken  {v['rate']:4d} wpm (was {was})")
+    json.dump(spec, open(os.path.join(VO, 'lines.json'), 'w'), indent=1, ensure_ascii=False)
+    print(f"lines.json: {len(spec['voices'])} rates re-measured")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--only', action='append', help='limit to these groups')
-    ap.add_argument('--bitrate', default='24k')
+    # 16 kbps mono at 16 kHz behind a 300-3400 Hz band-limit. This is what the shipped pool was
+    # encoded at (2.29 MB over 203 clips, 11.3 KB mean) and the Kokoro pass deliberately did not
+    # move it: changing the voice and the encoder in the same rebuild would leave nobody able to
+    # say which one they were hearing.
+    ap.add_argument('--bitrate', default='16k')
     ap.add_argument('--force', action='store_true', help='re-synthesise even if the raw take exists')
+    ap.add_argument('--resynth-suno', action='store_true',
+                    help='re-cast the SUNO dispatch lines onto the Kokoro operators too')
     ap.add_argument('--verify', action='store_true')
     ap.add_argument('--falsify', action='store_true')
     ap.add_argument('--demo', action='store_true')
+    ap.add_argument('--calibrate', action='store_true')
     ap.add_argument('--manifest-only', action='store_true')
     ap.add_argument('--json', help='write the verification report here')
     ap.add_argument('--out')
     a = ap.parse_args()
+    if a.calibrate:
+        return cmd_calibrate(a)
     if a.demo:
         return cmd_demo(a)
     if a.falsify:

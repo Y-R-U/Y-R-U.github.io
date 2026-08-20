@@ -47,6 +47,14 @@ export const MIX = {
   MUSIC_DUCK: 0.35,      // §10.2 ducking
   NET_DUCK_MUL: 0.4,     // §10.2 states the net duck as a multiplier too; NET_DUCK is the absolute
   DUCK_FADE: 0.6,        // §10.2 restored over 0.6 s
+  // §10.2's duck is tuned for a DISPATCH LINE — a 4-second interruption the bed should sit under
+  // and then come back from. A cutscene is not that. Aaron, on the shipped intro: *"you can hear
+  // what should be background chatter, and it is heaps louder than the actual speech you are
+  // trying to listen to."* So a story beat gets its own, deeper pair, and the chatter DIRECTOR is
+  // held off entirely on top of them (radio.js `setScene`) — attenuating a line that should never
+  // have fired is the wrong repair.
+  SCENE_NET: 0.0,        // the traffic bed is silence while somebody is in the room
+  SCENE_MUSIC: 0.16,     // music stays, well under the voice — this scene has a score
 };
 
 // Any clip whose decoded RMS is below this is treated as ABSENT, not as quiet. Measured against the
@@ -181,6 +189,7 @@ export class GameAudio {
     this.gestureBound = false;
     this._duck = 0;
     this._duckUntil = 0;
+    this._scene = false;          // §S2-K D3 — a story beat is on screen
     this._netNext = 0;
     this._sirenNext = 0;
     this._t = 0;
@@ -454,8 +463,11 @@ export class GameAudio {
 
     // §10.1 the net bed: a slow random envelope per voice, plus squelch clicks at 4–14 s
     const ducked = this._t < this._duckUntil;
-    const target = (this.settings().radio === false) ? 0 : (ducked ? MIX.NET_DUCK : MIX.NET);
-    this.net.gain.setTargetAtTime(target, now, 0.5);
+    const target = (this.settings().radio === false || this._scene) ? 0
+      : (ducked ? MIX.NET_DUCK : MIX.NET);
+    // DUCK_FADE on the way back, as §10.2 asks; the scene's own drop is faster than that, because a
+    // bed that takes 0.6 s to leave is audible under the Boss's first three words.
+    this.net.gain.setTargetAtTime(target, now, this._scene ? 0.12 : 0.5);
     for (const v of this.netVoices) {
       if (this._t >= v.next) {
         v.next = this._t + 0.9 + Math.random() * 2.6;
@@ -476,7 +488,9 @@ export class GameAudio {
     }
 
     // §10.2 ducking, restored over DUCK_FADE
-    const mTarget = (this.settings().music === false) ? 0 : (ducked ? MIX.MUSIC * MIX.MUSIC_DUCK : MIX.MUSIC);
+    const mTarget = (this.settings().music === false) ? 0
+      : this._scene ? MIX.MUSIC * MIX.SCENE_MUSIC
+        : (ducked ? MIX.MUSIC * MIX.MUSIC_DUCK : MIX.MUSIC);
     this.music.gain.setTargetAtTime(mTarget, now, MIX.DUCK_FADE / 3);
     return true;
   }
@@ -488,6 +502,16 @@ export class GameAudio {
     return this._duckUntil - this._t;
   }
   get ducked() { return this._t < this._duckUntil; }
+
+  // §S2-K D3. A LATCH, not a timer, because a cutscene's length is not known when it starts and
+  // `duckFor(seconds)` would have to be re-armed every beat — which is exactly the seam the defect
+  // fell into. The scene turns it on once and `finish()` turns it off on every exit route, skip
+  // included. Everything it changes is read in update(), so there is one writer of every gain.
+  setScene(on) {
+    this._scene = !!on;
+    return this._scene;
+  }
+  get sceneDucked() { return !!this._scene; }
 
   // ── §10.1 one-shots ─────────────────────────────────────────────────────
 
@@ -646,6 +670,7 @@ export class GameAudio {
       gestureBound: this.gestureBound,
       nodes: this.master ? true : false,
       ducked: this.ducked,
+      sceneDucked: this.sceneDucked,
       net: this.net ? +this.net.gain.value.toFixed(4) : 0,
       musicGain: this.music ? +this.music.gain.value.toFixed(4) : 0,
       radioGain: this.bus ? +this.bus.output.gain.value.toFixed(4) : 0,

@@ -189,6 +189,13 @@ export class CityRenderer {
     // The worst each §3.2.3 work unit has actually cost, so `pump` can refuse to start one that
     // will not fit in what is left of the frame's 1.2 ms.
     this.stageMs = [0, 0, 0, 0, 0];
+    // The same worsts, but FLIGHT-SCOPED and diagnostic-only. `stageMs` is the predictive cap's
+    // memory and must never be cleared — seeded at zero it would let the first signage unit of a
+    // flight run unbounded — but it also carries the BOOT PRE-WARM, where units run back to back
+    // with no cap at all and stage 0 measures 1.6 ms. A gate reading it was therefore reading the
+    // loading bar and calling it a flight. This one is cleared by resetPerf() and written only by
+    // pump(), so what it holds is the worst work unit of the run under test.
+    this.stagePeak = [0, 0, 0, 0, 0];
     this.farMs = 0;
     this.relMs = 0;
     this.retargetMs = 0;
@@ -407,10 +414,17 @@ export class CityRenderer {
       const ms = performance.now() - s0;
       if (stage === -2) this.relMs = Math.max(this.relMs, ms);
       else if (stage < 0) this.farMs = Math.max(this.farMs, ms);
-      else if (ms > this.stageMs[stage]) this.stageMs[stage] = ms;
+      else {
+        if (ms > this.stageMs[stage]) this.stageMs[stage] = ms;
+        if (ms > this.stagePeak[stage]) this.stagePeak[stage] = ms;
+      }
       ran++;
     }
   }
+
+  // Cleared by main.js's resetPerf(). Only the flight-scoped copy — the predictive cap keeps its
+  // memory, which is the whole reason there are two arrays.
+  resetStagePeak() { this.stagePeak = [0, 0, 0, 0, 0]; return this.stagePeak; }
 
   step(rec) {
     switch (rec.stage) {
@@ -689,7 +703,8 @@ export class CityRenderer {
       aabbs, gen: +this.msGen.toFixed(3),
       ring: [this.ringNear, this.ringMid, this.ringFar], r0: this.R0,
       overflow, fadeHard: this.fadeHard,
-      stageMs: this.stageMs.map(v => +v.toFixed(3)), farMs: +this.farMs.toFixed(3),
+      stageMs: this.stageMs.map(v => +v.toFixed(3)),
+      stagePeak: this.stagePeak.map(v => +v.toFixed(3)), farMs: +this.farMs.toFixed(3),
       relMs: +this.relMs.toFixed(3), retargetMs: +this.retargetMs.toFixed(3), dying: this.sgDying.length,
       signage: this.signage ? this.signage.state() : null,
     };

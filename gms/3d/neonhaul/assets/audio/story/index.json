@@ -2,148 +2,153 @@
  "version": 1,
  "voices": {
   "boss": {
-   "say": "Ralph",
-   "rate": 142,
-   "pitch": 0.94,
+   "voice": "bm_george",
+   "speed": 0.88,
+   "pitch": 0.97,
    "gain": 1.0,
    "who": "the Criminal Leader \u2014 low, unhurried, bored of this conversation"
   },
   "pc_m": {
-   "say": "Junior",
-   "rate": 188,
+   "voice": "am_liam",
+   "speed": 1.04,
    "pitch": 1.02,
    "gain": 1.0,
    "who": "the player, young male ~20"
   },
   "pc_f": {
-   "say": "Shelley (English (UK))",
-   "rate": 190,
-   "pitch": 1.06,
+   "voice": "af_sky",
+   "speed": 1.04,
+   "pitch": 1.04,
    "gain": 1.0,
    "who": "the player, young female ~20"
   },
   "pc_n": {
-   "say": "Reed (English (UK))",
-   "rate": 188,
-   "pitch": 1.0,
+   "voice": "af_sky",
+   "speed": 1.02,
+   "pitch": 0.9,
    "gain": 1.0,
-   "who": "the player, gender-neutral \u2014 a high male / low female read"
+   "who": "the player, gender-neutral \u2014 pc_f's own voice resampled down 10 %"
   }
+ },
+ "takeSec": {
+  "m": 8.72,
+  "f": 9.63,
+  "n": 9.69
  },
  "clips": [
   {
    "slot": "boss_01",
-   "sec": 4.26,
-   "rms": -17.5,
-   "bytes": 26245
+   "sec": 3.4,
+   "rms": -15.6,
+   "bytes": 21072
   },
   {
    "slot": "boss_02",
-   "sec": 6.16,
-   "rms": -16.7,
-   "bytes": 37530
+   "sec": 5.76,
+   "rms": -15.3,
+   "bytes": 35179
   },
   {
    "slot": "boss_03",
-   "sec": 5.8,
-   "rms": -17.1,
-   "bytes": 35492
+   "sec": 5.96,
+   "rms": -15.0,
+   "bytes": 36432
   },
   {
    "slot": "boss_04",
-   "sec": 4.12,
-   "rms": -16.1,
-   "bytes": 25304
+   "sec": 3.52,
+   "rms": -15.6,
+   "bytes": 21699
   },
   {
    "slot": "boss_05",
-   "sec": 6.03,
-   "rms": -16.1,
-   "bytes": 36746
+   "sec": 5.37,
+   "rms": -15.5,
+   "bytes": 32828
   },
   {
    "slot": "boss_06",
-   "sec": 10.86,
-   "rms": -16.4,
-   "bytes": 65742
+   "sec": 10.28,
+   "rms": -15.3,
+   "bytes": 62294
   },
   {
    "slot": "boss_07",
-   "sec": 2.18,
-   "rms": -17.4,
-   "bytes": 13706
+   "sec": 1.98,
+   "rms": -15.7,
+   "bytes": 12452
   },
   {
    "slot": "pc_m_int1",
-   "sec": 0.52,
-   "rms": -16.6,
-   "bytes": 3832
-  },
-  {
-   "slot": "pc_m_int2",
-   "sec": 0.62,
-   "rms": -16.3,
+   "sec": 0.63,
+   "rms": -17.6,
    "bytes": 4302
   },
   {
+   "slot": "pc_m_int2",
+   "sec": 0.7,
+   "rms": -17.0,
+   "bytes": 4772
+  },
+  {
    "slot": "pc_m_int3",
-   "sec": 0.86,
-   "rms": -17.1,
-   "bytes": 5712
+   "sec": 0.91,
+   "rms": -16.9,
+   "bytes": 6026
   },
   {
    "slot": "pc_m_close",
-   "sec": 11.97,
-   "rms": -15.6,
-   "bytes": 72481
+   "sec": 8.72,
+   "rms": -16.3,
+   "bytes": 52890
   },
   {
    "slot": "pc_f_int1",
-   "sec": 0.52,
-   "rms": -16.3,
-   "bytes": 3675
+   "sec": 0.67,
+   "rms": -19.1,
+   "bytes": 4615
   },
   {
    "slot": "pc_f_int2",
-   "sec": 0.52,
-   "rms": -16.1,
-   "bytes": 3675
+   "sec": 0.74,
+   "rms": -18.4,
+   "bytes": 5086
   },
   {
    "slot": "pc_f_int3",
-   "sec": 0.86,
-   "rms": -16.8,
-   "bytes": 5869
+   "sec": 0.95,
+   "rms": -17.4,
+   "bytes": 6339
   },
   {
    "slot": "pc_f_close",
-   "sec": 11.88,
-   "rms": -15.4,
-   "bytes": 71855
+   "sec": 9.63,
+   "rms": -15.9,
+   "bytes": 58375
   },
   {
    "slot": "pc_n_int1",
-   "sec": 0.51,
-   "rms": -18.4,
-   "bytes": 3675
+   "sec": 0.68,
+   "rms": -19.0,
+   "bytes": 4615
   },
   {
    "slot": "pc_n_int2",
-   "sec": 0.54,
-   "rms": -16.5,
-   "bytes": 3832
+   "sec": 0.74,
+   "rms": -18.0,
+   "bytes": 5086
   },
   {
    "slot": "pc_n_int3",
-   "sec": 0.85,
-   "rms": -16.9,
-   "bytes": 5712
+   "sec": 0.95,
+   "rms": -17.4,
+   "bytes": 6339
   },
   {
    "slot": "pc_n_close",
-   "sec": 11.89,
-   "rms": -15.9,
-   "bytes": 71855
+   "sec": 9.69,
+   "rms": -15.6,
+   "bytes": 58689
   }
  ]
 }

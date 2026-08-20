@@ -64,7 +64,16 @@ const EMIS_ATTRS = [
 const STRUCT_ATTRS = [{ name: 'iChunk', size: 2 }];
 
 // Buildings per signage work unit. 9 keeps the worst unit near 0.5 ms (§3.2.3's cap is 1.2).
-const SIGN_SLICE = 9;
+let SIGN_SLICE = 9;
+
+// Gate-only. §S2-K D4 collapses unit (3) back to a whole chunk to measure what the slice is
+// actually worth: 0.104 ms a chunk unsliced, over 100 chunk-samples in the densest district,
+// against §3.2.3's 1.2 ms cap. That is where the answer "the signage slice is not the binding
+// cost either" came from, and it is the reason nothing here was re-sliced.
+export function setGenSlice(sign) {
+  if (sign > 0) SIGN_SLICE = sign;
+  return SIGN_SLICE;
+}
 
 // §3.5.5 rule 2. The plan pins ribs and lantern at 45 % and pale at 12 %; the rest are interpolated
 // by what the district IS — Vault Row and Pale Terrace are corporate towers, the Drownings and
@@ -287,6 +296,14 @@ export class Signage {
 
   // ── §3.2.3 work unit (4) — strips, strobes, antennae, bridges ────────────
 
+  // NOT yieldable, and §S2-K D4 measured why it does not need to be. It was sliced on the
+  // hypothesis that S2-H's shopfront packing had made it the unit behind gates_p2's 1.900 ms
+  // `ms.gen`; timed directly over 100 chunk-samples in the densest district it comes to
+  // **0.187 ms a chunk** (strips 0.043 · strobes 0.004 · structures 0.021 · shopfronts 0.111 ·
+  // bridges 0.009), worst single chunk 0.6 ms, against §3.2.3's 1.2 ms cap. The shopfronts are
+  // indeed the largest component of the unit and the unit is a sixth of its budget. The slice was
+  // reverted rather than kept "for safety": machinery justified by noise is the thing this project
+  // keeps a list of. gates_s2k D4 re-runs that timing so the number stays honest.
   writeExtras(rec) {
     if (rec.extra) return;
     this.prepare(rec);

@@ -196,6 +196,7 @@ export class ChatterDirector {
     this.nextBack = 0;
     this.fired = { fore: 0, back: 0, event: 0 };
     this.suppressedUntil = 0;
+    this.scene = false;               // §S2-K D3 — a story beat owns the channel
     this.started = false;
 
     for (const s of slots || []) {
@@ -239,6 +240,12 @@ export class ChatterDirector {
 
   suppress(t, seconds) { this.suppressedUntil = Math.max(this.suppressedUntil, t + seconds); }
 
+  // §S2-K D3. `suppress()` is a TIMER and every caller of it knows how long it wants. A cutscene
+  // does not: it ends when the player skips it or when the last beat plays out. So this is a latch,
+  // and it gates the whole of tick() rather than only the foreground leg — the background `bg_net`
+  // murmur is the layer Aaron could actually hear under the Boss.
+  setScene(on) { this.scene = !!on; return this.scene; }
+
   // §10.4's context weights. `ctx` carries whatever the caller knows; every unknown field is simply
   // ×1, so a caller that knows nothing still gets a correctly-shaped ambient mix.
   weightFor(group, ctx = {}) {
@@ -279,6 +286,14 @@ export class ChatterDirector {
     if (!this.started) this.start(t);
     const out = [];
 
+    // §S2-K D3. A story beat takes the channel outright. The next-fire clocks are still pushed
+    // forward below, so the scene does not end with a queue of lines all due at once.
+    if (this.scene) {
+      if (t >= this.nextFore) this.nextFore = t + this.jitter(DIR.FORE_MIN, DIR.FORE_MAX);
+      if (t >= this.nextBack) this.nextBack = t + this.jitter(DIR.BACK_MIN, DIR.BACK_MAX);
+      return out;
+    }
+
     // §10.4: suppressed while the docking panel is open and for 4 s after any toast.
     const blocked = !!ctx.docked || t < this.suppressedUntil;
 
@@ -312,6 +327,7 @@ export class ChatterDirector {
 
   // §10.4's dedicated event pools. `kind` is a group id: 'dispatch_confirm' | 'dispatch_pay'.
   event(kind, t) {
+    if (this.scene) return null;
     const g = this.groups.get(kind);
     if (!g || !g.ids.length) return null;
     const id = g.bag.draw(this._eligible(t));
@@ -329,7 +345,7 @@ export class ChatterDirector {
   state() {
     const bags = {};
     for (const [gid, g] of this.groups) bags[gid] = g.bag ? g.bag.state() : null;
-    return { fired: { ...this.fired }, bags, lines: this.history.length,
+    return { fired: { ...this.fired }, bags, lines: this.history.length, scene: !!this.scene,
       nextFore: +this.nextFore.toFixed(2), nextBack: +this.nextBack.toFixed(2) };
   }
 }
@@ -364,6 +380,8 @@ export class Radio {
     this.buffers = new Map();                // slot -> AudioBuffer | 'absent' | 'pending'
     this.absent = new Set();
     this.silent = new Set();                 // decoded, and measured to contain no audio
+    this.playing = new Set();                // §S2-K D3 — live one-shots, so a scene can stop them
+    this.scene = false;
     this.probed = false;
     this.t = 0;
     this.ready = false;
@@ -406,6 +424,13 @@ export class Radio {
       this.pools.get(rec.pool).push(rec.slot);
     }
     this.dir = new ChatterDirector({ slots: (m.chatter || []).map(c => ({ ...c })), rng: this.rng });
+    // The scene latch is set on `this`, not on the director, because the director does not exist
+    // until the 22 KB manifest lands — and the intro cutscene starts before that. `setScene(true)`
+    // arriving while `this.dir` was null did nothing at all (the guard is `this.dir && …`), the
+    // manifest then arrived MID-CUTSCENE, and the chatter came up under the Boss exactly as
+    // before. Found by reading the state during a forced intro rather than by trusting the gate,
+    // which drove setScene() on a page where the director already existed.
+    this.dir.setScene(this.scene);
     this.ready = true;
     return this;
   }
@@ -561,6 +586,12 @@ export class Radio {
 
     if (playable && this.audio && this.audio.ready && this.settings().radio !== false) {
       played = this.audio.playClip(buf, { gain: rec.gain || (fore ? 0.9 : 0.22), squelch: true, bus: 'radio' });
+      // Held only so `setScene(true)` can cut a line that is already in flight. `onended` fires for
+      // a stopped source too, so the set drains either way and cannot grow without bound.
+      if (played && played.src) {
+        this.playing.add(played);
+        played.src.addEventListener('ended', () => this.playing.delete(played), { once: true });
+      }
     } else if (!this.buffers.has(rec.slot)) {
       this.clip(rec.slot);                     // fire-and-forget; no await, no rejection escapes
     }
@@ -605,6 +636,33 @@ export class Radio {
   }
 
   onToast() { this.dir && this.dir.suppress(this.t, DIR.TOAST_SUPPRESS); }
+
+  // §S2-K D3 — the fix for "in the cut scene you can hear what should be background chatter, and it
+  // is heaps louder than the actual speech you are trying to listen to."
+  //
+  // The cause was a seam, not a bug in either half. `fire()` calls `audio.duckFor()` on every
+  // foreground line, which is what pulls the bed down under speech — and js/storyui.js's StoryVoice
+  // deliberately does NOT go through this file, because the Boss is in the room and must not be
+  // band-limited. That reasoning is right; it also stepped off the ducking the radio bus performs,
+  // so the director kept firing at full level under him.
+  //
+  // ONE call moves both halves, because two calls is how they drifted apart in the first place:
+  // the director stops drawing lines AND the mix takes the deeper scene duck (MIX.SCENE_NET /
+  // MIX.SCENE_MUSIC). Any clip already in flight is stopped — a line that started 200 ms before
+  // the Boss did would otherwise talk over his first sentence with nothing able to stop it.
+  setScene(on) {
+    const v = !!on;
+    this.scene = v;
+    this.dir && this.dir.setScene(v);
+    this.audio && this.audio.setScene && this.audio.setScene(v);
+    if (v) this._stopChatter();
+    return v;
+  }
+
+  _stopChatter() {
+    for (const p of this.playing) { try { p.src.stop(); } catch {} }
+    this.playing.clear();
+  }
 
   // ── music: streamed, lazy, and never on the critical path ────────────────
 
@@ -848,6 +906,8 @@ export class Radio {
       state: this.state_,
       absent: this.absent.size,
       silent: [...this.silent],
+      scene: !!this.scene,
+      playing: this.playing.size,
       buffers: [...this.buffers.keys()].filter(k => { const v = this.buffers.get(k); return v && v.duration !== undefined; }).length,
       stats: { ...this.stats },
       // `this.dir` is null whenever the manifest did not load — which is the entire point of leg E,

@@ -47,23 +47,25 @@
      router skips any finger that lands on a `.ctl-btn` so the lever never drives the stick. -->
 <div id="controls" class="hidden">
   <div id="stick"><div class="ring"></div><div class="nub"></div></div>
-  <div id="altpad">
-    <button id="btn-boost" class="ctl-btn boost" aria-label="boost">
-      <span class="cb-glyph">&#9656;&#9656;</span><span class="cb-label">BOOST</span>
-    </button>
-    <div id="collective" aria-label="collective">
-      <button id="btn-up" class="ctl-btn lever up" aria-label="rise on the spot">
-        <span class="cb-glyph">&#9650;</span><span class="cb-label">RISE</span>
-      </button>
-      <div class="lv-slot"><span class="lv-rail"></span><span class="lv-tag">HOVER</span></div>
-      <button id="btn-down" class="ctl-btn lever down" aria-label="sink on the spot">
-        <span class="cb-glyph">&#9660;</span><span class="cb-label">SINK</span>
-      </button>
-    </div>
-  </div>
-  <!-- The LEFT console's cluster, so the cabin has hardware on both sides rather than a switchgear
-       stack on one and nothing on the other. It is raised well clear of where the flight stick
-       materialises under a resting thumb, and it mirrors with the flip like #altpad does.
+  <!-- §S2-K D2. ONE console stack, on the LOOK thumb's side, and everything with a `.ctl-btn` on it
+       lives inside it. Aaron, on the shipped build: *"The buttons on the left are not part of the
+       dash and are exactly where you want to put your finger on mobile to fly the plane."* He is
+       describing #leftpad, which sat on the left edge at mid-height and mirrored WITH the flip —
+       so it was in the FLYING half in both states, while #altpad mirrored the other way and was
+       always in the looking half.
+
+       The stick is FLOATING (js/controls.js: its origin is wherever the finger lands), so there is
+       no safe corner of the flying half to put furniture in. The whole half has to be empty. That
+       is why this is a stack and not a second cluster: one container, one side, one mirror rule,
+       and a new control cannot be added anywhere else without failing gates_s2k D2.
+
+       #leftpad and #altpad keep their ids — every gate and every querySelector in js/ binds by them
+       — and both are now laid out by the stack rather than positioned themselves. They stay
+       separate elements because gates_s2a asserts the reserved #btn-hire slot clears #altpad's box,
+       and nesting them would make that overlap trivially true and the check meaningless. -->
+  <div id="conspad">
+  <!-- The switchgear bank. Named #leftpad for the console it used to be; it is now the TOP of the
+       one console stack, above the boost key and the collective, on whichever side is not flying.
 
        SQUELCH is the control a courier actually reaches for, and it is the same `radio` setting
        the cog holds — both go through applySettings, so the two switches cannot drift apart.
@@ -72,7 +74,8 @@
        puts them on 5-minute vehicle hires that have to be extendable from inside the cabin, so the
        button that opens that panel needs a home on the console now rather than being wedged in
        later. Removing `hidden` and pointing its click at a CabinPanel is the whole of the work;
-       gates_s2a un-hides it and asserts the slot is clear of every other control. -->
+       gates_s2a un-hides it and asserts the slot is clear of every other control. Un-hiding it
+       turns the bank from three keys into a full 2x2 — the fourth cell is empty, not absent. -->
   <div id="leftpad">
     <!-- S2-F fills out the switchgear bank S2-A left room for. Two keys, because they answer two
          different questions and folding them into one would make the answer a guess:
@@ -97,6 +100,21 @@
     <button id="btn-squelch" class="ctl-btn squelch" aria-label="radio squelch">
       <span class="cb-glyph">&#9673;</span><span class="cb-label">RADIO</span>
     </button>
+  </div>
+  <div id="altpad">
+    <button id="btn-boost" class="ctl-btn boost" aria-label="boost">
+      <span class="cb-glyph">&#9656;&#9656;</span><span class="cb-label">BOOST</span>
+    </button>
+    <div id="collective" aria-label="collective">
+      <button id="btn-up" class="ctl-btn lever up" aria-label="rise on the spot">
+        <span class="cb-glyph">&#9650;</span><span class="cb-label">RISE</span>
+      </button>
+      <div class="lv-slot"><span class="lv-rail"></span><span class="lv-tag">HOVER</span></div>
+      <button id="btn-down" class="ctl-btn lever down" aria-label="sink on the spot">
+        <span class="cb-glyph">&#9660;</span><span class="cb-label">SINK</span>
+      </button>
+    </div>
+  </div>
   </div>
   <!-- S2: the view switch is an on-screen control, not a settings row. Cockpit is the default view
        now and a player who never opens the cog would otherwise never learn the other one exists. -->

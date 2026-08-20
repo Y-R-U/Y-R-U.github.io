@@ -20,7 +20,7 @@ import { CityModel, loadCityData, CHUNK } from './city.js';
 import { districtAt } from './districts.js';
 import { CityRenderer } from './render_city.js';
 import { loadSignAtlas } from './signs.js';
-import { Signage } from './signage.js';
+import { Signage, setGenSlice } from './signage.js';
 import { protoBoxes } from './blocks.js';
 import { makeProbe } from './probe.js';
 import { Weather } from './weather.js';
@@ -1425,6 +1425,10 @@ function startIntro() {
   mode = 'free';
   ctlEl.classList.add('hidden');
   hudRoot.classList.add('hidden');
+  // §S2-K D3. The Boss owns the channel for the whole scene: the chatter director stops drawing
+  // lines and the bed takes the deeper scene duck. It is set HERE and cleared in endIntro(), which
+  // every exit route goes through — confirm, skip, and the auto-name path all end in finish().
+  radio?.setScene(true);
   // The crew's hulls. Six of the game's own defs rather than a new asset: they are the SAME
   // instanced fields every other craft in the world writes into, so the whole cutscene costs zero
   // extra draw calls (gates_s2e asserts that, because "it looked cheap" is not a measurement).
@@ -1440,6 +1444,7 @@ function endIntro(pick) {
   beginDebt(pick);
   introScene = null;
   zoneVis?.setDim(1);
+  radio?.setScene(false);              // §S2-K D3 — the bed comes back over MIX.DUCK_FADE
   mode = introPrevMode || 'fly';
   if (!FLAG.nohud) ctlEl.classList.remove('hidden');
   hudRoot.classList.remove('hidden');
@@ -3127,7 +3132,7 @@ window.__game = {
   throwTestError(msg = 'neonhaul test error') { setTimeout(() => { throw new Error(msg); }, 0); return true; },
   // Boot and navigation hitches sit in the rolling window for 90 frames and would be reported as
   // the worst frame of a run that had settled long before.
-  resetPerf() { msSim.clear(); msRender.clear(); msFrame.clear(); msGen.clear(); msFly.clear(); msHud.clear(); cockpit?.resetPerf(); minimap?.resetPerf(); return true; },
+  resetPerf() { msSim.clear(); msRender.clear(); msFrame.clear(); msGen.clear(); msFly.clear(); msHud.clear(); cityR?.resetStagePeak(); cockpit?.resetPerf(); minimap?.resetPerf(); return true; },
   testGuard() { fpsAvg = 10; guardQuality(); return { downgraded, dpr: renderer.getPixelRatio(), bloom: Q.bloom }; },
   loseContext: loseContextForTest,
   resize: onResize,
@@ -3180,6 +3185,20 @@ window.__game = {
     flipY: signAtlas.tex.flipY, mips: signAtlas.tex.mipmaps.length,
     anisotropy: signAtlas.tex.anisotropy, colorSpace: signAtlas.tex.colorSpace } : null),
   signStats: () => (signage ? Object.assign({}, signage.stats, signage.state()) : null),
+  // §S2-K D4. Unit (3)'s slice size, so a gate can collapse it back to a whole chunk and measure
+  // what the slicing is worth. Re-staging every live chunk is part of the hook, not the caller's
+  // job: without it the new slice would only apply to chunks that had not streamed in yet, and the
+  // arm would be half the old build.
+  // The live chunk records, so a gate can re-run one §3.2.3 work unit over real data and time the
+  // worst SINGLE call. Flying a 20 s route and taking the tail was tried first and the arms
+  // overlapped between runs; a threshold check needs a sharper instrument than a tail statistic.
+  cityRecs: () => (cityR ? [...cityR.live.values()] : []),
+  setGenSlice: sign => {
+    if (!signage || !cityR) return null;
+    const v = setGenSlice(sign);
+    for (const rec of cityR.live.values()) { signage.release(rec); rec.stage = Math.min(rec.stage, 2); }
+    return v;
+  },
   signBreakdown: () => (signage ? signage.breakdown() : null),
 
   // ── S2-H gates (street level) ────────────────────────────────────────────
@@ -3191,6 +3210,23 @@ window.__game = {
   setShopVisible: on => (signage ? signage.shops.setVisible(on) : false),
   setShopForce: v => { U.uShopForce.value = v === null || v === undefined ? -1 : v; return U.uShopForce.value; },
   setShopRange: (near, far) => { U.uShop.value.y = near; U.uShop.value.z = far; return [U.uShop.value.y, U.uShop.value.z]; },
+  // §S2-K D4. The three hooks above are RENDER levers and none of them can move `ms.gen`: the
+  // shopfronts are packed inside §3.2.3's work unit (4) whether or not the shader ever draws them.
+  // So bisecting a generation-budget question needed a GENERATION lever, and there was none —
+  // `Q.shopDensity` (js/config.js) is read once in js/shops.js and never again.
+  //
+  // This one re-rolls the layer for real: it moves the quality number, pushes it through
+  // applyQuality, and then RELEASES every live chunk's signage and winds its stage back so the
+  // extras unit runs again with the new density. Without that last part the call would return a
+  // number, change nothing on screen, and the A/B would compare a build against itself — which is
+  // the shape of half the failures in docs/MANAGER_STATE.md.
+  setShopDensity: v => {
+    if (!signage || !cityR) return null;
+    Q.shopDensity = +v;
+    signage.applyQuality(Q);
+    for (const rec of cityR.live.values()) { signage.release(rec); rec.stage = Math.min(rec.stage, 2); }
+    return Q.shopDensity;
+  },
   // Every live shopfront's PLACEMENT record — the host prototype, its unit-space ground box, the
   // wall normal. Only under ?debug. gates_s2h re-derives the wall from blocks.js' own box list and
   // proves the frontage is ON it; a screenshot cannot tell you whether a shopfront is 0.12 m off a

@@ -35,7 +35,7 @@ js/                 34 ES modules, no bundler — main.js wires everything
 data/               districts, landmarks, names, clients, the baked sign atlas region table
 assets/signs.png    baked greyscale signage atlas, 2048², ≤ 400 KB
 assets/clients/     16 client portraits: jpg + 96px thumb + looping mp4
-assets/audio/       manifest.json + chatter/ + music/ (SUNO takes)
+assets/audio/       manifest.json + chatter/ (207 Kokoro clips) + story/ (19) + music/ (SUNO)
 shots/*.json        COMMITTED shot scenario definitions; renders alongside them are gitignored
 tools/              headless-CDP renderer, gate suites, sims, the sign baker
 docs/               the plan, the decisions, the manager state, the phase notes
@@ -85,8 +85,8 @@ node tools/shot.mjs --shot=fog_city  # a render + its perf snapshot
 ```
 
 Suites: `p1a p2 p3a p3b p4 p5 p6 p7a p7b p8 p11 wire`, plus the season-2 suites
-`s2a s2c s2d s2e s2f s2g s2h s2i`, and `determinism`, `t10_falsify`, `budget`, `soak`, `sim_s2f`,
-`sim_s2i`, `fleet_rate`.
+`s2a s2c s2d s2e s2f s2g s2h s2i s2j s2k`, and `determinism`, `t10_falsify`, `budget`, `soak`,
+`sim_s2f`, `sim_s2i`, `fleet_rate`.
 **`gates_p5` and `gates_p7a`/`p8` write a different JSON schema from `p1a`–`p4`
 (`ok`/`fail` rather than `results`)** — a parser that reads only `results` reports 0/0 on a suite
 that fully passed. That mistake has been made three times here.
@@ -96,6 +96,10 @@ Green at end of **pass 2-A** (2026-08-20): `p1a` 10/10 · `p2` 8/8 · `p3a` 13/1
 `p11` 8/8×2 · `wire` 11/11 · `s2a` 13/13×2 · `s2c` 17/17×2 · `s2d` 14/14×2 · `s2e` 30/30×2 ·
 `s2f` 11/11×2 · `s2g` 9/9×2 · `determinism` 9/9 (**golden hash `f29beaf9`, 25,039 buildings**) ·
 `t10` 4/4 · `budget --headed` green on both presets.
+
+**`gates_s2k`** (2026-08-20) covers the four play-test defects: the Kokoro voice pool, the console
+that has to stay out of the flying thumb's half in BOTH `flipSides` states, the chatter suppression
+over a story beat, and §3.2.3's per-work-unit cost cap.
 
 **`p7a` and `p7b`'s numbers are the `--falsify` totals** — that flag ADDS six checks to each suite
 (24+6=30, 14+6=20). Running them without it and "correcting" these figures downward would quietly
@@ -148,6 +152,18 @@ back short (`gates_s2i.mjs`'s `advance()`).
   data-only edit `DECISIONS.md` T6.2 describes. Six landmark words are aliased in `js/signage.js`
   instead.
 - **No `alert()` / `confirm()` / `prompt()`, ever.** Styled in-game panels only.
+- **`X && X.method()` is how a fix ships broken.** §S2-K's chatter suppression called
+  `this.dir && this.dir.setScene(v)` from `startIntro()` — and the director does not exist until
+  the 22 KB manifest lands, which is after the cutscene starts. The call did nothing, the manifest
+  arrived mid-scene, and the defect was still there. Its own gate passed, because the gate drove
+  the method on a page where the director already existed. **A latch set before its object exists
+  has to be re-applied when the object is built**, and the gate for it has to play the real scene.
+- **The voice pool is Kokoro-82M**, driven from Abogen's uv-tool interpreter
+  (`/Users/aaronair/.local/share/uv/tools/abogen/bin/python`) by `tools/vo/kokoro_say.py`, batched
+  once per run. There is no HTTP TTS endpoint on `:8808` — it is htmx against `/wizard/upload`.
+  **Whisper intelligibility is not an acceptance test for a voice**: it scored the macOS `say` pool
+  at 90.7 % and that pool is what Aaron called *"a computer voice from the 90s"*. Build
+  `tools/vo/gen_chatter.py --demo` and listen to it.
 
 ## Where the art stands
 

@@ -8,15 +8,15 @@
 
 ── WHY THIS IS NOT gen_chatter.py ─────────────────────────────────────────────
 
-S2-B's pipeline is `say` → tools/radio_fx.sh, and every clip it makes is band-limited to
+The chatter pipeline is Kokoro → tools/radio_fx.sh, and every clip it makes is band-limited to
 300-3400 Hz with squelch bursts keyed on either end, because every line it makes comes out of a
 radio.
 
 **The Boss is in the room.** He is sitting in the cabin of a craft eight metres away with his own
 canopy open, and Aaron's beat sheet has him talking over the player rather than transmitting at
 them. A band-limited Boss sounds like dispatch, and dispatch is the one thing that scene must not
-sound like. So this file shares stage 1 (`say`) and stage 3 (verification) with gen_chatter.py and
-replaces stage 2 entirely:
+sound like. So this file shares stage 1 (Kokoro, imported from gen_chatter) and stage 3 (verification) with
+gen_chatter.py and replaces stage 2 entirely:
 
     gen_chatter.py   highpass 300 · lowpass 3400 · hiss bed · squelch head/tail · 16 kHz 16 kbps
     gen_story.py     full band · a short room reflection · gentle compression · 22 kHz 48 kbps
@@ -51,29 +51,34 @@ SR = 22050
 
 # ── the cast ───────────────────────────────────────────────────────────────
 #
-# `say`'s voices are what they are; the casting below is the only lever, and it was chosen by
-# listening rather than by reading the names. Every one of these is already in the game's 31-voice
-# chatter pool except the Boss, who deliberately is not — he must not sound like anybody on the
-# radio, because the player will have heard the radio for two minutes before he arrives.
+# Kokoro-82M, the same engine and the same casting rules as the chatter pool (tools/vo/lines.json).
+# Every one of these is a voice the chatter pool ALSO uses, except the Boss, who deliberately is
+# not: `bm_george` is held out of lines.json entirely, because the player will have had two minutes
+# of radio before he arrives and he must not sound like anybody they have already heard.
 #
-#   boss   Ralph is the lowest-F0 US male `say` ships and it has a dry, unhurried delivery that
-#          reads as somebody who is not worried about the outcome of the conversation. Slowed to
-#          142 wpm (the pool's range is 199-220) so he takes his time, and pitched down 6 %.
-#   pc_m   Junior — the youngest-sounding male voice available, which is what "young male ~20" asks
-#          for. Pitched up very slightly.
-#   pc_f   Shelley (UK) at a raised pitch. Samantha and Karen are both Haul Control operators in
-#          the chatter pool and would have made the player sound like dispatch.
-#   pc_n   Aaron's spec is "a high male or low female read". This is Reed (UK) UNPITCHED, which
-#          measures between the other two takes rather than being asserted to.
+#   boss   bm_george — GB male, and the slowest-reading voice in the English set (148 wpm at
+#          speed 1.0 against a 144-198 cast range). Unhurried is the character: he is not worried
+#          about how this conversation ends. Slowed further and pitched down 3 %.
+#   pc_m   am_liam, the youngest-sounding male, which is what "young male ~20" asks for.
+#   pc_f   af_sky, light and young. The Haul Control operators are af_sarah/bf_emma/af_alloy, so
+#          the player does not end up sounding like dispatch.
+#   pc_n   Aaron's spec is "a high male or low female read". This is af_sky — pc_f's OWN voice —
+#          resampled down 10 %, which moves the formants with it. Casting it as the same voice
+#          rather than a third one is deliberate: "lower than the female take" is then arithmetic
+#          on a resample ratio instead of a claim about a neural voice that would need an F0
+#          estimator to settle. See cast_check() for what happened when one was tried.
+#
+# `speed` is Kokoro's; `pitch` is the resample-and-retempo shift in room(), which moves formants
+# too and is therefore what makes a re-used voice read as a different person.
 VOICES = {
-    'boss': {'say': 'Ralph', 'rate': 142, 'pitch': 0.94, 'gain': 1.0,
+    'boss': {'voice': 'bm_george', 'speed': 0.88, 'pitch': 0.97, 'gain': 1.0,
              'who': 'the Criminal Leader — low, unhurried, bored of this conversation'},
-    'pc_m': {'say': 'Junior', 'rate': 188, 'pitch': 1.02, 'gain': 1.0,
+    'pc_m': {'voice': 'am_liam', 'speed': 1.04, 'pitch': 1.02, 'gain': 1.0,
              'who': 'the player, young male ~20'},
-    'pc_f': {'say': 'Shelley (English (UK))', 'rate': 190, 'pitch': 1.06, 'gain': 1.0,
+    'pc_f': {'voice': 'af_sky', 'speed': 1.04, 'pitch': 1.04, 'gain': 1.0,
              'who': 'the player, young female ~20'},
-    'pc_n': {'say': 'Reed (English (UK))', 'rate': 188, 'pitch': 1.00, 'gain': 1.0,
-             'who': 'the player, gender-neutral — a high male / low female read'},
+    'pc_n': {'voice': 'af_sky', 'speed': 1.02, 'pitch': 0.90, 'gain': 1.0,
+             'who': 'the player, gender-neutral — pc_f\'s own voice resampled down 10 %'},
 }
 
 # The script. It MUST match js/storyui.js's SCRIPT word for word: the bubble shows the text and the
@@ -97,8 +102,8 @@ PC = [
               'I need to make that money fast.'),
 ]
 
-# Words per second the `say` rates above actually produce, measured rather than assumed — used only
-# by the duration sanity check, which exists to catch a clip that decoded but said one word.
+# Seconds per word the cast above actually produces, measured rather than assumed — used only by
+# the duration sanity check, which exists to catch a clip that decoded but said one word.
 MIN_SEC_PER_WORD = 0.16
 
 
@@ -139,24 +144,25 @@ def peak_db(a):
 
 
 def for_say(text):
-    """What the synthesiser is given, as opposed to what the bubble shows. An em dash makes `say`
-    pause; a right single quote is spoken as a quote by some voices."""
+    """What the synthesiser is given, as opposed to what the bubble shows. An em dash is rendered as
+    a comma so the pause is a real one, and a right single quote is spoken aloud by some front
+    ends."""
     t = text.replace('—', ',').replace('–', ',').replace('…', '.')
     t = t.replace('’', "'").replace('“', '').replace('”', '')
     return re.sub(r'\s+', ' ', t).strip()
 
 
-def say(voice, rate, text, out):
-    cmd = ['say', '-v', voice]
-    if rate:
-        cmd += ['-r', str(rate)]
-    cmd += ['-o', out, text]
-    run(cmd)
-    # `say -o x.aiff` exits 0 after writing a ZERO-BYTE file when it dislikes the output format.
-    # gen_chatter.py's own note: this is the house bug in its purest form.
-    if not os.path.exists(out) or os.path.getsize(out) < 2000:
-        got = os.path.getsize(out) if os.path.exists(out) else 0
-        raise RuntimeError(f"say('{voice}') wrote {got} bytes for {out}")
+# Stage 1 is gen_chatter.py's, imported rather than copied: one Kokoro process for the whole run,
+# and one place where the interpreter path and the refusal rules live.
+sys.path.insert(0, VO)
+from gen_chatter import kokoro_batch                                   # noqa: E402
+
+
+def synth(plan):
+    """plan: [(wav_path, voice_key, text)]. Renders every take in one Kokoro process."""
+    jobs = [{'voice': VOICES[vk]['voice'], 'speed': VOICES[vk].get('speed', 1.0),
+             'text': for_say(tx), 'out': path} for path, vk, tx in plan]
+    return kokoro_batch(jobs, 'story', specdir=RAW)
 
 
 def room(src, dst, pitch, gain, bitrate='48k'):
@@ -193,9 +199,9 @@ def room(src, dst, pitch, gain, bitrate='48k'):
          '-ac', '1', '-ar', str(SR), '-c:a', 'libmp3lame', '-b:a', bitrate, dst])
 
 
-# The floor a REAL `say` take sits at before any treatment. Measured across the 19 takes: the
-# quietest is -35.1 dBFS raw. -55 leaves 20 dB of headroom under that and is still 35 dB above the
-# float floor a silent render produces.
+# The floor a REAL take sits at before any treatment. Kokoro renders the 19 story takes at -21 to
+# -28 dBFS raw (`say` managed -35.1 at its quietest). -55 leaves 27 dB of headroom under the
+# quietest of them and is still 35 dB above the float floor a silent render produces.
 RAW_FLOOR_DB = -55.0
 
 
@@ -218,12 +224,20 @@ def check_raw(path):
 
 
 def build(slot, voice_key, text, bitrate='48k'):
+    """One clip, synthesised and treated. Used by --falsify and by anything wanting a single take;
+    the main path batches stage 1 across the whole script first (see main)."""
+    wav = os.path.join(RAW, f'{slot}.wav')
+    synth([(wav, voice_key, text)])
+    return treat(slot, voice_key, bitrate)
+
+
+def treat(slot, voice_key, bitrate='48k'):
+    """Stages 2 and 3 for a take stage 1 has already written."""
     v = VOICES[voice_key]
-    aiff = os.path.join(RAW, f'{slot}.aiff')
+    wav = os.path.join(RAW, f'{slot}.wav')
     mp3 = os.path.join(OUT, f'{slot}.mp3')
-    say(v['say'], v['rate'], for_say(text), aiff)
-    check_raw(aiff)
-    room(aiff, mp3, v['pitch'], v['gain'], bitrate)
+    check_raw(wav)
+    room(wav, mp3, v['pitch'], v['gain'], bitrate)
     return mp3
 
 
@@ -257,6 +271,34 @@ def verify(slot, text, quiet=False):
         print(f"  {'ok ' if out['ok'] else 'FAIL'} {slot:14s} {out['sec']:5.2f}s  "
               f"{out['rms']:6.1f} dBFS  peak {out['peak']:5.1f}  {out['bytes']:6d} B  {out['why']}")
     return out
+
+
+def cast_check():
+    """The gender pick must actually change what the player hears. Three takes of the SAME line
+    exist only for that, and `slotFor()` returning the wrong stem — or three takes accidentally cast
+    on one voice — would be inaudible in every gate that only asks "did a clip play".
+
+    ── WHY THIS IS NOT AN F0 CHECK ────────────────────────────────────────────
+    The first version asserted Aaron's spec for the neutral take, *"a high male or low female
+    read"*, as an ORDERING: median F0 of pc_n between pc_m and pc_f. Two reasonable autocorrelation
+    estimators — one plain, one low-passed to 500 Hz — disagreed about that ordering on the same
+    three files, and put the Boss at 86 Hz and 130 Hz respectively. Octave errors are what
+    autocorrelation does, and neither number was trustworthy enough to fail a build on. So the
+    claim was removed from the measurement and moved into the CASTING instead: pc_n is af_sky, the
+    female take's own voice, resampled DOWN 10 % — literally a low female read, true by
+    construction, with nothing left to assert. What is asserted here is only what can be measured
+    without an estimator: three distinct files, of three distinct lengths."""
+    import hashlib
+    rows = {}
+    for g in ('m', 'f', 'n'):
+        b = open(os.path.join(OUT, f'pc_{g}_close.mp3'), 'rb').read()
+        rows[g] = (hashlib.sha1(b).hexdigest()[:8], round(dur(os.path.join(OUT, f'pc_{g}_close.mp3')), 2))
+    hashes = {h for h, _ in rows.values()}
+    lens = {d for _, d in rows.values()}
+    ok = len(hashes) == 3 and len(lens) == 3
+    print("  cast     " + "  ".join(f"pc_{g} {h} {d:.2f}s" for g, (h, d) in rows.items())
+          + f"   -> {'ok' if ok else 'FAIL — the three player takes are not three different clips'}")
+    return ok, {g: d for g, (_, d) in rows.items()}
 
 
 def falsify():
@@ -306,12 +348,33 @@ def falsify():
     #    everything, which is a different way of measuring nothing.
     build('_ctrl_real', 'boss', BOSS[2][1])          # build() calls check_raw; a raise fails here
     g = verify('_ctrl_real', BOSS[2][1], quiet=True)
-    print(f"  control REAL     raw {rms_db(samples(os.path.join(RAW, '_ctrl_real.aiff'))):.1f} dBFS "
+    print(f"  control REAL     raw {rms_db(samples(os.path.join(RAW, '_ctrl_real.wav'))):.1f} dBFS "
           f"passed check_raw")
     print(f"  control REAL     {g['sec']}s  rms {g['rms']} -> "
           f"{'ACCEPTED (good)' if g['ok'] else 'REJECTED — the checks reject everything'}")
     if not g['ok']:
         fails.append('a real clip was rejected')
+
+    # 4. The CAST check. Three takes of one line exist only so the gender pick changes something;
+    #    the failure it guards against is all three resolving to one clip, so that is the fixture.
+    keep = os.path.join(RAW, '_ctrl_pc_n_close.mp3')
+    live = os.path.join(OUT, 'pc_n_close.mp3')
+    shutil.copyfile(live, keep)
+    try:
+        shutil.copyfile(os.path.join(OUT, 'pc_m_close.mp3'), live)
+        dup_ok, _ = cast_check()
+        print(f"  control CAST     pc_n replaced by pc_m's take -> "
+              f"{'REJECTED (good)' if not dup_ok else 'ACCEPTED — THE CHECK IS BROKEN'}")
+        if dup_ok:
+            fails.append('three identical takes passed cast_check')
+    finally:
+        shutil.copyfile(keep, live)
+        os.remove(keep)
+    real_ok, _ = cast_check()
+    print(f"  control CAST     the real three -> "
+          f"{'ACCEPTED (good)' if real_ok else 'REJECTED — the check rejects everything'}")
+    if not real_ok:
+        fails.append('the real three takes were rejected by cast_check')
 
     for n in ['_ctrl_silence', '_ctrl_short', '_ctrl_real']:
         p = os.path.join(OUT, f'{n}.mp3')
@@ -347,17 +410,19 @@ def main():
                 plan.append((f'pc_{g}_{stem}', f'pc_{g}', text))
 
     if not args.verify:
+        synth([(os.path.join(RAW, f'{slot}.wav'), vk, text) for slot, vk, text in plan])
         for slot, vk, text in plan:
-            build(slot, vk, text)
+            treat(slot, vk)
         print(f'built {len(plan)} clips')
 
     print('verify:')
     results = [verify(slot, text) for slot, _, text in plan]
     bad = [r for r in results if not r['ok']]
+    cast_ok, f0s = cast_check()
     total = sum(r.get('bytes', 0) for r in results)
     print(f"{len(results) - len(bad)}/{len(results)} ok · {total} B total · "
           f"mean {total // max(1, len(results))} B")
-    manifest = {'version': 1, 'voices': VOICES,
+    manifest = {'version': 1, 'voices': VOICES, 'takeSec': f0s,
                 'clips': [{'slot': r['slot'], 'sec': r['sec'], 'rms': r['rms'],
                            'bytes': r['bytes']} for r in results]}
     with open(os.path.join(OUT, 'index.json'), 'w') as f:
@@ -365,7 +430,7 @@ def main():
     if bad:
         print('FAILED: ' + ', '.join(f"{r['slot']}({r['why']})" for r in bad))
         return 1
-    return 0
+    return 0 if cast_ok else 1
 
 
 if __name__ == '__main__':

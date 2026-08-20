@@ -404,21 +404,46 @@ html, body {
    The dash canvas draws a blank moulded BAY under this cluster in portrait (js/hud.js `_bay`), on
    whichever side the flip has put it, so it never covers an instrument. */
 
-#altpad {
-  position: fixed; right: calc(var(--safe-r) + 12px); bottom: calc(var(--safe-b) + 14px);
-  display: flex; flex-direction: column; gap: 10px; align-items: center;
+/* §S2-K D2 — THE CONSOLE STACK. One fixed container on the LOOK thumb's side; the switchgear bank
+   and the boost/collective pad are both laid out BY it rather than positioning themselves.
+
+   The rule this enforces, and it is js/controls.js's own: the stick is FLOATING — `half(x)` routes
+   any finger in the movement half to it and the origin is wherever that finger landed — so there
+   is no safe corner of the flying half, and every `.ctl-btn` below the top band has to be on the
+   other side. #leftpad shipped mirroring the WRONG WAY (left when #altpad was right) and was in
+   the flying half in both flip states. gates_s2k D2 measures every visible control against the
+   router's own `half()` in both states and falsifies itself by moving a key back. */
+#conspad {
+  position: fixed; right: calc(var(--safe-r) + 10px); bottom: calc(var(--safe-b) + 10px);
+  display: flex; flex-direction: column; align-items: stretch; gap: 8px;
+  padding: 7px;
+  /* ONE moulded block, not three floating pods. Aaron's other half of the same complaint was
+     *"the buttons on the left are not part of the dash"* — and *"Dashboard is like a car
+     dashboard, physically a part of the car."* The switchgear, the boost key and the collective
+     now share a housing with a lit top lip and a rolled bottom edge, so the column reads as a
+     centre console rising off the dash rather than as chrome floating over the sky. */
+  border-radius: 18px 18px 14px 14px;
+  background: linear-gradient(rgba(30, 39, 52, .80), rgba(10, 14, 20, .88));
+  border: 1px solid rgba(150, 200, 230, .20);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .55), 0 14px 30px -12px #000,
+              inset 0 1px 0 rgba(190, 225, 245, .22),
+              inset 0 -14px 22px -18px rgba(53, 230, 255, .5);
 }
-#controls.flipped #altpad { right: auto; left: calc(var(--safe-l) + 12px); }
+#controls.flipped #conspad { right: auto; left: calc(var(--safe-l) + 10px); }
+
+#altpad {
+  position: static;
+  display: flex; flex-direction: column; gap: 10px; align-items: center;
+  width: 100%;
+}
 
 #collective {
   display: flex; flex-direction: column; align-items: stretch; gap: 0;
-  padding: 5px; border-radius: 16px;
-  /* the housing: a moulded block with a lit top lip, so the lever reads as hardware bolted to the
-     console rather than as two floating circles */
-  background: linear-gradient(rgba(26, 34, 46, .78), rgba(8, 11, 16, .82));
-  border: 1px solid rgba(150, 200, 230, .22);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .5), 0 8px 20px -8px #000,
-              inset 0 1px 0 rgba(190, 225, 245, .18);
+  padding: 5px; border-radius: 12px;
+  /* the lever's own slot, let INTO the console face (#conspad) rather than bolted on top of it —
+     the outer shell now supplies the moulding and the lit lip, so this is a recess */
+  background: linear-gradient(rgba(6, 9, 14, .55), rgba(6, 9, 14, .18));
+  box-shadow: inset 0 2px 5px -2px #000, 0 1px 0 rgba(190, 225, 245, .10);
 }
 .lv-slot {
   position: relative; height: 26px; margin: 2px 0;
@@ -493,15 +518,28 @@ html, body {
   box-shadow: 0 6px 14px -8px #000;
 }
 
-/* The left console's squelch switch (S2). Mirrors #altpad's side so the two clusters are always
-   on opposite consoles, and sits 150 px up from the floor of the frame — above where a resting
-   thumb puts the flight stick, below the chase HUD's instrument frame. */
+/* The switchgear bank, at the top of the console stack. ONE COLUMN of short keys, not a 2x2 grid:
+   the grid was tried first and it was 118 px wide against the old cluster's 66, which put the
+   console over the dash's own altitude readout. The console has to be narrow enough that the dash
+   it sits on is still readable — the whole point of moving these keys was to make them part of
+   the instrument panel, not to cover it.
+
+   DOM order is the stacking order, so RADIO — the one a courier actually reaches for — ends up
+   nearest the thumb, and #btn-hire un-hides into a real slot above it rather than a gap. */
 #leftpad {
-  position: fixed;
-  left: calc(var(--safe-l) + 12px); bottom: calc(var(--safe-b) + 222px);
-  display: flex; flex-direction: column-reverse; gap: 8px; align-items: flex-start;
+  display: flex; flex-direction: column; gap: 5px;
+  padding: 5px 4px 7px;
+  /* a RECESSED bay in the console face, not a second box on top of it: an inset shadow and a hair
+     line under it, the way a switch panel is let into a moulding */
+  border-radius: 11px;
+  background: linear-gradient(rgba(6, 9, 14, .55), rgba(6, 9, 14, .18));
+  box-shadow: inset 0 2px 5px -2px #000, 0 1px 0 rgba(190, 225, 245, .10);
 }
-#controls.flipped #leftpad { left: auto; right: calc(var(--safe-r) + 12px); align-items: flex-end; }
+/* 34, not 30. gates_s2f C1 wants >= 30 px and S2-G's recorded lesson is that a threshold with zero
+   slack fails on a sub-pixel layout — a tab with `min-height: 36px` measured 35.99 and failed a
+   `>= 36` check while the check's own output printed "36 px tall". These are flight controls on a
+   phone; they get headroom. */
+.ctl-btn.squelch, .ctl-btn.hire, .ctl-btn.auto, .ctl-btn.home { height: 34px; }
 .ctl-btn.squelch, .ctl-btn.hire, .ctl-btn.auto, .ctl-btn.home {
   position: static;
   width: 46px; height: 36px; border-radius: 10px;
@@ -635,7 +673,7 @@ html, body {
 
 @media (orientation: landscape) and (max-height: 520px) {
   #boot-title { font-size: 22px; }
-  #altpad { gap: 7px; bottom: calc(var(--safe-b) + 8px); }
+  #altpad { gap: 7px; }
   .set-row { padding: 4px 0; }
   .hud-panel { width: min(560px, 100%); padding: 12px 14px 10px; }
   /* A short viewport has no room for a 122 px pod plus the cog under it. */
@@ -647,8 +685,21 @@ html, body {
   }
   .ctl-btn.view { height: 22px; padding: 0 8px; font-size: 8px; }
   #chatter { bottom: calc(var(--safe-b) + 118px); width: min(46vw, 320px); }
-  #leftpad { bottom: calc(var(--safe-b) + 116px); }
-  .ctl-btn.squelch, .ctl-btn.hire, .ctl-btn.auto, .ctl-btn.home { width: 42px; height: 32px; }
+  /* 390 px of height has to carry the whole stack: 2x32 of switchgear, boost, and the collective.
+     The grid keeps it to four rows instead of six. */
+  #conspad { bottom: calc(var(--safe-b) + 8px); gap: 7px; }
+  /* 390 px of height, and the top ~120 of it belongs to the map pod and the cog tucked under it.
+     Measured, not guessed: at the portrait proportions the console came out 306 px tall with its
+     top at y 76, and #btn-auto's own centre hit-tested to #btn-settings — the cog was sitting on
+     it. So in landscape the switchgear goes two-wide (there is horizontal room here and no
+     vertical) and the collective's lever and slot lose the height the taller viewport was paying
+     for. gates_s2k D2 asserts every visible control hit-tests to ITSELF, which is what caught it. */
+  #leftpad { display: grid; grid-template-columns: repeat(2, 44px); gap: 4px; padding: 4px 3px 5px; }
+  #conspad { padding: 6px; gap: 6px; }
+  .ctl-btn.squelch, .ctl-btn.hire, .ctl-btn.auto, .ctl-btn.home { width: 44px; }
+  .ctl-btn.lever { height: calc(var(--btn, 56px) * .60); }
+  .ctl-btn.boost { height: calc(var(--btn, 56px) * .66); }
+  .lv-slot { height: 13px; margin: 1px 0; }
   #hud-strip .ch-top { right: calc(var(--safe-r) + 118px); }
 }
 
@@ -1982,6 +2033,7 @@ html, body {
    craft, which is parked on a pad somewhere behind the camera. #btn-view and the cog stay: moving
    between the driver's cockpit and their chase boom is the one control the feed actually wants. */
 #controls.feeding #stick,
+#controls.feeding #conspad,
 #controls.feeding #altpad,
 #controls.feeding #leftpad { display: none; }
 
