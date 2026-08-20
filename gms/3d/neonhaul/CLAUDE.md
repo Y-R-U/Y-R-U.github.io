@@ -56,7 +56,8 @@ every tool in `tools/`. `window.__ready` goes true when the game is playable.
 | `?auto=1` | the **fixed 120 s** autopilot route. Four gate suites measure against it — do not change it |
 | `?courier=1` | the **navigating** soak pilot: takes jobs off real boards and flies them. Implies `auto` |
 | `?noaudio=1` | build no audio layer at all (the control arm for "what does audio cost") |
-| `?nosave=1` `?seed=` `?time=` `?var=` `?tier=` `?crd=` `?dock=` `?dpr=` `?probes=1` `?debug` | test hooks |
+| `?fleet=n` | §S2-I — open the company layer and put **n hired drivers** on the books. It winds `company.gross` on far enough to allow the cap (the cap is a company tier) and hires through the **shipped** transaction, signing fees and all. A measurement that reads absolute `gross` rather than a delta is reading the fixture |
+| `?nosave=1` `?seed=` `?time=` `?var=` `?tier=` `?crd=` `?cogross=` `?dock=` `?dpr=` `?probes=1` `?debug` | test hooks |
 
 `?auto=1` and `?courier=1` are **not** the same flag and never should be. See `js/autopilot.js`.
 Neither of those is the **player's** autopilot. That is `js/autopilot.js`'s `LanePilot`, on the AUTO
@@ -84,7 +85,8 @@ node tools/shot.mjs --shot=fog_city  # a render + its perf snapshot
 ```
 
 Suites: `p1a p2 p3a p3b p4 p5 p6 p7a p7b p8 p11 wire`, plus the season-2 suites
-`s2a s2c s2d s2e s2f`, and `determinism`, `t10_falsify`, `budget`, `soak`, `sim_s2f`.
+`s2a s2c s2d s2e s2f s2g s2h s2i`, and `determinism`, `t10_falsify`, `budget`, `soak`, `sim_s2f`,
+`sim_s2i`, `fleet_rate`.
 **`gates_p5` and `gates_p7a`/`p8` write a different JSON schema from `p1a`–`p4`
 (`ok`/`fail` rather than `results`)** — a parser that reads only `results` reports 0/0 on a suite
 that fully passed. That mistake has been made three times here.
@@ -98,6 +100,33 @@ Green at end of **pass 2-A** (2026-08-20): `p1a` 10/10 · `p2` 8/8 · `p3a` 13/1
 **`p7a` and `p7b`'s numbers are the `--falsify` totals** — that flag ADDS six checks to each suite
 (24+6=30, 14+6=20). Running them without it and "correcting" these figures downward would quietly
 retire twelve falsification controls. One agent proposed exactly that.
+
+## `budget.mjs`'s millisecond gate is a CPU gate
+
+**`__state.ms.frame` is CPU wall time around the loop body — it measures draw-call submission, not
+GPU execution.** While the GPU finishes inside vsync it cannot see fragment cost at all. S2-H proved
+this: forcing every shopfront blind OPEN vs SHUT moved the mean by −0.003 ms at 1.3 Mpx and −0.14 ms
+at 5.8 Mpx, both inside a 0.4–0.8 ms within-arm spread, and at **13 Mpx all three arms sat on 60.0
+fps with a spread of 0.01**.
+
+So **a fill-rate-heavy feature can pass `budget.mjs` cleanly and still stutter on a phone.** Draw
+calls and triangle counts from that tool are real; its millisecond figures are evidence about the
+CPU and nothing else. Several phases have reported "the cost is inside the noise" — every one of
+those is a CPU statement. Do not repeat them as if they were GPU measurements.
+
+## Two Chrome sessions in one node script kill each other
+
+`shot.mjs`'s `cleanup()` pkills on `/tmp/neonhaul-cdp-<NODE PID>` — the profile dir is keyed on the
+**node** process, not on the Chrome instance, and **every session a script opens shares it**. So
+closing a second browser kills the first one's Chrome too, and the next `evalJSON` on the first
+session **hangs forever**: there is no timeout on a CDP send. S2-I lost 25 minutes to this and it
+reads exactly like a slow gate, not like a crash. If a suite needs a second page (a control arm on a
+different URL), open it **after** the main session's `close()`.
+
+Related: **`settle()` counts FRAMES and gives up after 25 s of wall time.** `settle(S, 3600)` returns
+`-1` having advanced whatever it managed — 26 sim seconds against the 60 that were asked for, on
+S2-I's first run. Anything that needs minutes of sim must wait on `__state.t` and say so if it comes
+back short (`gates_s2i.mjs`'s `advance()`).
 
 ## Gotchas that have cost real time
 

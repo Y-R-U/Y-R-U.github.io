@@ -857,6 +857,7 @@ Speaker label on screen: **THE UNDERSTACK**
 | `pirate_13` | `dj` | Here is a fact they do not put on the boards. Nobody in this city was born in this city. Nobody. Think about who that is convenient for. |
 | `pirate_14` | `dj` | TURN IT UP. IF YOUR NEIGHBOUR COMPLAINS, TURN IT UP AGAIN. |
 | `pirate_15` | `dj` | Somebody has left a parcel outside the studio. I am not opening it, I am not moving it, and I am broadcasting next to it, which is a decision I am reviewing. |
+| `pirate_16` | `dj` | And a quiet one out to the man who borrowed off the wrong room and walked away. Rare. Play him something warm. |
 
 ---
 
@@ -980,6 +981,9 @@ Speaker label on screen: **OPEN CHANNEL**
 | `life_33` | `life_g` | The lamps in the Lantern Quarter are on the wrong colour again. Everyone looks ill. Everyone looks like that anyway, but more so. |
 | `life_34` | `life_d` | Old Ferrand has gone. Just so you all know. He had that pad thirty years. Somebody put a light on for him. |
 | `life_35` | `life_j` | That is me done. First run, delivered, nothing broken. I am going to talk about this for a week. |
+| `life_36` | `life_d` | Whoever settled the Vane account — the old boy, not the kid — tell him the desk still has his paper. |
+| `life_37` | `hauler` | Somebody was asking after a hauler by that surname at the Tallow desk. Not a friendly ask, if you follow. |
+| `life_38` | `life_h` | Second time this month a courier has come in with a name on a docket that should not be on a docket. |
 
 ---
 
@@ -1217,3 +1221,11 @@ The neutral take is Aaron's own direction: **a high male or low female read**, n
 
 19 clips · 497 KB · mean 26 KB. Only 11 of them are ever fetched in one session, because
 `StoryVoice.preload(gender)` asks for the Boss plus one gender's takes.
+
+### §S2-J — four seeded lines (2026-08-20)
+
+`life_36`, `life_37`, `life_38` and `pirate_16` are the story's remarks about the player's father.
+They are ordinary pool entries in every respect — same voices, same `bg` tag, same chain, same
+16 kbps mono — because that is the whole point: **a player who is not listening never notices them.**
+The director never draws them on its own; `js/story.js` asks for them by name through
+`radio.speak()`. Pool 203 → 207 slots, 2 283 → 2 333 KB.

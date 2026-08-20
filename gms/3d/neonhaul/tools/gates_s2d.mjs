@@ -133,19 +133,21 @@ async function main() {
   })()`);
   check('S2-D/A3 FALSIFIED — standing has a second, story-driven axis, and it moves in both directions',
     // `registryEmpty === 0` was S2-D's assertion that the registry SHIPPED empty. S2-E owns the
-    // story and has filled it, so the assertion is now the opposite one: the four story flags are
-    // present, and an unknown flag still moves nothing — which is the property the empty check was
-    // really protecting.
+    // story and filled it with four; **§S2-J added a fifth, `marked`**, which is the standing cost
+    // of having a charter read by the patrol. The assertion is a COUNT on purpose — it is what
+    // makes a flag added without anybody deciding to add it show up here — so it moves when the
+    // registry legitimately does, and the names are printed below so the next reader can see which.
     flags.before === flags.back && flags.after === flags.before + 2 && flags.down === flags.before - 1
-      && flags.registryEmpty === 4,
+      && flags.registryEmpty === 5,
     `an unknown flag moves nothing: rung ${flags.before} (${flags.names[0]})\n`
     + `a fixture worth +2 rungs installed in the LIVE registry: rung ${flags.after} (${flags.names[1]})\n`
     + `the same fixture at -1: rung ${flags.down} (${flags.names[2]}) — it goes DOWN as well as up, which a `
     + `check that only asserted "it changed" would not have caught\n`
     + `removed again: rung ${flags.back} (${flags.names[3]})\n`
     + `STANDING_FLAGS carries ${flags.registryEmpty} entries — S2-E's four story flags `
-    + `(debt_cleared +1, dad_favour +1, car_seized -1, crew_hook 0). They landed on the path this `
-    + `gate had already run with a fixture, which is what the empty registry was for`);
+    + `(debt_cleared +1, dad_favour +1, car_seized -1, crew_hook 0) and S2-J's marked (-1), which `
+    + `is set the first time a charter's heat crosses HEAT.FLAG and never clears. They landed on `
+    + `the path this gate had already run with a fixture, which is what the empty registry was for`);
 
   // A4. A BORROWED hull is not an asset. S2-E opens the game in a hull that belongs to the
   // player's parents; at recovery value a nocturne would boot a brand-new player in at NAMEHOLDER.

@@ -31,6 +31,12 @@ export class CameraRig {
   }
 
   setMode(m) { this.mode = m === 'chase' ? 'chase' : 'cockpit'; return this.mode; }
+
+  // §S2-I. Point the SAME two rigs at a different flight model — a hired driver's craft. There is
+  // no third rig and no bespoke spectator camera: a driver is a craft with a `Courier` at the
+  // stick, so cockpit and chase already describe every viewpoint the feed needs, including the
+  // boom's collision shortening. `main.js` passes the player's model back to leave the feed.
+  setFlight(f) { this.flight = f || this.flight; return this.flight; }
   setFov(v) {
     this.fov = clamp(v, F.FOV[0], F.FOV[1]);
     this.camera.fov = this.fov;

@@ -1702,3 +1702,471 @@ html, body {
   .en-p { font-size: 11px; margin-bottom: 6px; }
   #hud-strip .ch-warm { min-width: 110px; }
 }
+
+/* ══ §S2-I — the company layer ═════════════════════════════════════════════
+   Two surfaces. #fleet is a CabinPanel (the roster, the agency list and the
+   books); #feed is the HUD strip that replaces the dashboard while the player
+   is watching a driver's craft.
+
+   Nothing below invents a look. Every element is S2-D's instrument idiom —
+   kickers in letterspaced small caps, values monospaced, rows as lit rails
+   rather than boxes, chamfered keys, segmented meters — because the complaint
+   that produced that idiom ("it looks fine if it was a web form") is answered
+   by there being ONE of it, not by there being a second one that agrees. */
+
+#fleet .hud-panel { --tint: var(--cyan); }
+
+/* the company rail — the two numbers that say what you may do, above the tabs */
+.fl-rail {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+  margin-bottom: 11px; flex-wrap: wrap;
+}
+.fl-tier { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1 1 190px; }
+.flt-k { font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .26em; color: rgba(53, 230, 255, .75); }
+.flt-n { font: 300 19px/1 ui-monospace, Menlo, monospace; letter-spacing: .1em; color: #eaf6ff; }
+.flt-s { font: 400 9px/1.3 ui-monospace, Menlo, monospace; color: var(--dim); }
+.fl-nums { display: flex; gap: 16px; align-items: flex-end; }
+.fl-nums .dk-ro b { font-size: 13px; }
+.fl-nums .dk-ro.good b { color: #6cff9c; }
+.fl-nums .dk-ro.bad b { color: #ff5a52; }
+
+/* the tab strip. `.fl-tab`, never `.dk-tab` — two suites hold contracts about
+   that collection and this panel is not a member of it. */
+.fl-tabs { display: flex; gap: 1px; margin-bottom: 10px; }
+.fl-tab {
+  -webkit-appearance: none; appearance: none; flex: 1; min-height: 38px;
+  border: 0; border-bottom: 2px solid rgba(125, 142, 163, .22);
+  background: rgba(255, 255, 255, .028); color: var(--dim);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  cursor: pointer; padding: 6px 4px;
+}
+.fl-tab.on { color: #eaf6ff; border-bottom-color: var(--cyan); background: rgba(53, 230, 255, .1); }
+.flt-l { font: 400 10px/1 ui-monospace, Menlo, monospace; letter-spacing: .2em; }
+.flt-c { font: 400 8px/1 ui-monospace, Menlo, monospace; color: var(--amber); }
+
+.fl-sect { margin-bottom: 9px; }
+.fl-empty, .fl-hint {
+  font: 400 10px/1.5 system-ui, sans-serif; color: var(--dim);
+  border-left: 2px solid rgba(53, 230, 255, .3); padding: 5px 0 5px 9px;
+}
+.fl-note {
+  display: flex; gap: 7px; align-items: baseline; margin-top: 9px;
+  font: 400 11px/1.35 system-ui, sans-serif; color: rgba(255, 178, 56, .95);
+}
+.fln-mark { color: var(--amber); font-weight: 700; }
+
+/* ── ROSTER ───────────────────────────────────────────────────────────── */
+.fl-drv {
+  border-left: 2px solid rgba(53, 230, 255, .3); background: rgba(53, 230, 255, .035);
+  padding: 8px 10px 9px 11px; display: flex; flex-direction: column; gap: 6px;
+}
+.fl-drv.watching { border-left-color: #6cff9c; background: rgba(108, 255, 156, .08); }
+.fld-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.fld-name { font: 400 13px/1 ui-monospace, Menlo, monospace; letter-spacing: .1em; color: #eaf6ff; }
+.fld-hull { margin-left: auto; font: 400 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .12em; color: var(--dim); }
+/* the grade chip — four steps of one hue rather than four different colours,
+   because the grades are a LADDER and four hues would read as four categories */
+.fld-grade, .flc-grade, .df-grade {
+  font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .22em;
+  padding: 3px 6px; color: var(--ink); background: rgba(53, 230, 255, .45);
+  clip-path: polygon(3px 0, 100% 0, 100% calc(100% - 3px), calc(100% - 3px) 100%, 0 100%, 0 3px);
+}
+.fld-grade.g0, .flc-grade.g0, .df-grade.g0 { background: rgba(125, 142, 163, .55); color: #dfeaf5; }
+.fld-grade.g1, .flc-grade.g1, .df-grade.g1 { background: rgba(53, 230, 255, .35); color: #eaf6ff; }
+.fld-grade.g2, .flc-grade.g2, .df-grade.g2 { background: rgba(53, 230, 255, .72); color: var(--ink); }
+.fld-grade.g3, .flc-grade.g3, .df-grade.g3 { background: #6cff9c; color: var(--ink); }
+.fld-status { font: 400 10px/1.3 ui-monospace, Menlo, monospace; color: rgba(159, 184, 207, .92); }
+.fld-gauges { display: flex; gap: 14px; flex-wrap: wrap; }
+.fl-gauge { display: flex; align-items: center; gap: 5px; }
+.fl-gauge i { font: 400 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .18em; color: var(--dim); font-style: normal; }
+.fl-gauge b { font: 400 9px/1 ui-monospace, Menlo, monospace; color: #9fb8cf; }
+.fl-gauge.warn .dk-meter i.on { background: var(--amber); box-shadow: 0 0 5px -1px var(--amber); }
+.fl-gauge.bad .dk-meter i.on { background: #ff5a52; box-shadow: 0 0 5px -1px #ff5a52; }
+.fld-sum { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px 8px; }
+.fld-sum .dk-ro b { font-size: 12px; }
+.fld-sum .dk-ro.big b { font-size: 17px; color: #eaf6ff; }
+.fld-sum .dk-ro.big.good b { color: #6cff9c; }
+.fld-sum .dk-ro.big.bad b { color: #ff5a52; }
+.fld-tot { display: flex; gap: 12px; flex-wrap: wrap; font: 400 9px/1 ui-monospace, Menlo, monospace; color: var(--dim); }
+.fld-tot .bad { color: #ff5a52; }
+.fld-warn {
+  font: 400 10px/1.4 system-ui, sans-serif; color: #ff8a84;
+  border-left: 2px solid #ff5a52; padding: 4px 0 4px 8px;
+}
+.fld-why { font: 400 9px/1 ui-monospace, Menlo, monospace; color: var(--dim); }
+.fld-keys { display: flex; gap: 5px; }
+.fld-key {
+  -webkit-appearance: none; appearance: none; flex: 1; min-height: 38px;
+  border: 1px solid rgba(53, 230, 255, .38); background: rgba(53, 230, 255, .1);
+  color: #cfe9ff; font: 400 10px/1 system-ui, sans-serif; letter-spacing: .18em;
+  padding: 11px 8px; cursor: pointer;
+  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+}
+.fld-key.on { border-color: #6cff9c; background: rgba(108, 255, 156, .2); color: #cfffdf; }
+.fld-key.drop { border-color: rgba(255, 90, 82, .45); background: rgba(255, 90, 82, .08); color: #ffb8b4; flex: 0 0 108px; }
+.fld-key[disabled] { opacity: .38; cursor: default; }
+.fld-key:active { background: rgba(53, 230, 255, .24); }
+
+/* ── RECRUIT ──────────────────────────────────────────────────────────── */
+.fl-hulls { display: flex; align-items: stretch; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+.flh-k { flex: 1 0 100%; font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .24em; color: rgba(120, 150, 175, .95); }
+.flh {
+  -webkit-appearance: none; appearance: none; flex: 1 1 88px; min-height: 44px;
+  border: 1px solid rgba(150, 200, 230, .22); background: rgba(4, 8, 14, .5);
+  color: var(--text); padding: 7px 4px 6px; cursor: pointer; text-align: center;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+.flh b { display: block; font: 400 11px/1 ui-monospace, Menlo, monospace; letter-spacing: .12em; }
+.flh i { display: block; font: 400 8px/1 ui-monospace, Menlo, monospace; font-style: normal; color: var(--dim); margin-top: 4px; }
+.flh u { display: block; font: 700 8px/1 ui-monospace, Menlo, monospace; text-decoration: none; color: var(--amber); margin-top: 3px; }
+.flh.on { border-color: var(--cyan); background: rgba(53, 230, 255, .16); color: #eaf6ff; }
+.flh.no, .flh[disabled] { opacity: .34; cursor: default; }
+
+.fl-cand {
+  border-left: 2px solid rgba(53, 230, 255, .3); background: rgba(53, 230, 255, .035);
+  padding: 8px 10px 9px 11px; display: flex; flex-direction: column; gap: 6px;
+}
+.flc-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.flc-name { font: 400 13px/1 ui-monospace, Menlo, monospace; letter-spacing: .1em; color: #eaf6ff; }
+.flc-blurb { flex: 1 0 100%; font: 400 10px/1.35 system-ui, sans-serif; color: var(--dim); font-style: italic; }
+.flc-sum { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px 8px; }
+.flc-sum .dk-ro b { font-size: 12px; }
+.flc-sum .dk-ro.big b { font-size: 16px; color: var(--amber); }
+.flc-fine { font: 400 9px/1.4 system-ui, sans-serif; color: rgba(125, 142, 163, .9); }
+.flc-keys { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.flc-key {
+  -webkit-appearance: none; appearance: none; flex: 1 1 190px; min-height: 40px;
+  border: 1px solid rgba(108, 255, 156, .45); background: rgba(108, 255, 156, .12);
+  color: #cfffdf; font: 400 10px/1 system-ui, sans-serif; letter-spacing: .18em;
+  padding: 12px 8px; cursor: pointer;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+.flc-key[disabled] { opacity: .38; cursor: default; }
+.flc-key:active { background: rgba(108, 255, 156, .26); }
+.flc-why { font: 400 9px/1.3 ui-monospace, Menlo, monospace; color: var(--dim); flex: 1 1 120px; }
+.fl-foot { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-top: 4px; }
+.fl-refresh {
+  -webkit-appearance: none; appearance: none; min-height: 38px;
+  border: 1px solid rgba(53, 230, 255, .34); background: rgba(53, 230, 255, .07);
+  color: rgba(53, 230, 255, .9); font: 400 10px/1 system-ui, sans-serif; letter-spacing: .18em;
+  padding: 11px 14px; cursor: pointer;
+  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+}
+.fl-refresh[disabled] { opacity: .4; cursor: default; }
+.fl-footnote { flex: 1 1 150px; font: 400 9px/1.35 system-ui, sans-serif; color: var(--dim); }
+
+/* ── EARNINGS — the arithmetic, not a total ───────────────────────────── */
+.fl-books { display: flex; flex-direction: column; }
+.flb-row {
+  display: grid; grid-template-columns: 1fr auto; grid-template-areas: "k v" "why min";
+  gap: 1px 10px; align-items: baseline;
+  padding: 7px 2px; border-bottom: 1px solid rgba(125, 142, 163, .12);
+}
+.flb-k { grid-area: k; font: 400 10px/1 ui-monospace, Menlo, monospace; letter-spacing: .2em; color: #cfe2f5; }
+.flb-why { grid-area: why; font: 400 9px/1.3 system-ui, sans-serif; color: var(--dim); }
+.flb-v { grid-area: v; font: 400 15px/1 ui-monospace, Menlo, monospace; color: #eaf6ff; text-align: right; font-variant-numeric: tabular-nums; }
+.flb-min { grid-area: min; font: 400 9px/1 ui-monospace, Menlo, monospace; color: var(--dim); text-align: right; }
+.flb-v.good { color: #6cff9c; }
+.flb-v.bad { color: #ff5a52; }
+.flb-row.out .flb-k { color: rgba(159, 184, 207, .85); }
+.flb-row.net { border-bottom: 0; border-top: 1px solid rgba(53, 230, 255, .4); margin-top: 3px; padding-top: 10px; }
+.flb-row.net .flb-k { color: var(--cyan); letter-spacing: .3em; }
+.flb-row.net .flb-v { font-size: 22px; }
+
+.fl-arrears {
+  font: 400 10px/1.45 system-ui, sans-serif; color: #ff8a84;
+  border-left: 2px solid #ff5a52; padding: 5px 0 5px 9px; margin-top: 8px;
+}
+.fl-table { display: flex; flex-direction: column; margin-top: 10px; }
+.flt-row {
+  display: grid; grid-template-columns: 1.5fr 1fr .6fr 1fr 1fr 1fr; gap: 6px;
+  font: 400 10px/1 ui-monospace, Menlo, monospace; color: #cfe2f5;
+  padding: 6px 2px; border-bottom: 1px solid rgba(125, 142, 163, .1);
+}
+.flt-row span:not(.flt-nm) { text-align: right; font-variant-numeric: tabular-nums; }
+.flt-row.head span { font-size: 8px; letter-spacing: .18em; color: var(--dim); }
+.flt-nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.flt-row .good { color: #6cff9c; }
+.flt-row .bad { color: #ff5a52; }
+
+.fl-ladder { display: flex; flex-direction: column; }
+.fl-rung {
+  display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap;
+  padding: 7px 2px 7px 9px; border-left: 2px solid rgba(125, 142, 163, .22);
+}
+.fl-rung.done { opacity: .74; border-left-color: rgba(53, 230, 255, .45); }
+.fl-rung.here { border-left-color: var(--cyan); background: rgba(53, 230, 255, .07); }
+.flr-i { font: 400 9px/1 ui-monospace, Menlo, monospace; color: var(--dim); width: 16px; }
+.flr-tx { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.flr-name { font: 400 11px/1 ui-monospace, Menlo, monospace; letter-spacing: .16em; color: #eaf6ff; }
+.fl-rung.here .flr-name { color: var(--cyan); text-shadow: 0 0 12px currentColor; }
+.flr-blurb { font: 400 9px/1.3 system-ui, sans-serif; color: var(--dim); }
+.flr-at { font: 400 9px/1 ui-monospace, Menlo, monospace; color: rgba(159, 184, 207, .8); }
+.fl-rung.here .dk-meter { flex: 1 0 100%; margin-top: 4px; }
+.fl-ladnote { font: 400 9px/1.4 system-ui, sans-serif; color: rgba(125, 142, 163, .8); padding: 8px 2px 0; font-style: italic; }
+
+/* ── #feed — the DRIVER FEED strip ────────────────────────────────────────
+   Aaron's HUD, in his own words: a semi-transparent neon FRAME over a
+   transparent ground of the same colour, like something reflected onto a
+   windscreen. It stands where the dashboard would be, because the dashboard is
+   off — every instrument on it reads the player's own craft and none of them
+   describe what is on screen while a driver is being watched. */
+#feed {
+  position: fixed; z-index: 22; pointer-events: none;
+  left: calc(var(--safe-l) + 10px); right: calc(var(--safe-r) + 10px);
+  bottom: calc(var(--safe-b) + 12px);
+  display: flex; justify-content: center;
+}
+#feed.hidden { display: none; }
+.df-frame {
+  --tint: var(--cyan);
+  pointer-events: auto; width: min(430px, 100%);
+  display: flex; flex-direction: column; gap: 7px;
+  padding: 10px 12px 11px;
+  background: linear-gradient(rgba(53, 230, 255, .1), rgba(53, 230, 255, .028)), rgba(4, 8, 14, .5);
+  box-shadow: inset 0 0 0 1px rgba(53, 230, 255, .45), 0 0 26px -14px var(--cyan);
+  clip-path: polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px);
+}
+.df-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.df-kick { font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .3em; color: rgba(53, 230, 255, .8); }
+.df-name { font: 400 13px/1 ui-monospace, Menlo, monospace; letter-spacing: .1em; color: #eaf6ff; }
+.df-head .df-grade { margin-left: auto; }
+.df-inst { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px 8px; }
+.df-inst .dk-ro b { font-size: 14px; }
+.df-inst .dk-ro.good b { color: #6cff9c; }
+.df-inst .dk-ro.bad b { color: #ff5a52; }
+.df-task { font: 400 10px/1.3 ui-monospace, Menlo, monospace; color: rgba(159, 184, 207, .92); }
+.df-cell { display: flex; align-items: center; gap: 7px; }
+.df-cell i { font: 400 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .2em; color: var(--dim); font-style: normal; }
+.df-cell .dk-meter { flex: 1; }
+.df-cell .dk-meter i { flex: 1 1 0; }
+.df-keys { display: flex; gap: 5px; }
+.df-key {
+  -webkit-appearance: none; appearance: none; flex: 1; min-height: 40px;
+  border: 1px solid rgba(53, 230, 255, .4); background: rgba(53, 230, 255, .1);
+  color: #cfe9ff; font: 400 10px/1 system-ui, sans-serif; letter-spacing: .2em;
+  padding: 12px 8px; cursor: pointer;
+  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+}
+.df-key.leave { border-color: rgba(255, 178, 56, .5); background: rgba(255, 178, 56, .1); color: #ffdca6; }
+.df-key:active { background: rgba(53, 230, 255, .26); }
+
+/* Landscape is the scarce-VERTICAL case, exactly as it is for the dash and the
+   toast rail. The books collapse to one line per row and the driver rows drop
+   their gauges to a single line so four drivers still fit above the fold. */
+@media (orientation: landscape) and (max-height: 520px) {
+  .fl-rail { margin-bottom: 7px; }
+  .flt-n { font-size: 15px; }
+  /* 40, not 36. S2-G's find: a tab with `min-height: 36px` — a threshold with ZERO slack —
+     measured 35.99 px and failed a `>= 36` gate while the gate's own detail line printed "36 px
+     tall". A touch floor wants headroom, and vertical space in landscape is not that scarce. */
+  .fl-tab { min-height: 40px; }
+  .fld-sum, .flc-sum { grid-template-columns: repeat(4, 1fr); gap: 3px 8px; }
+  .fld-sum .dk-ro.big b { font-size: 14px; }
+  .flb-row { grid-template-columns: 1fr 1.4fr auto auto; grid-template-areas: "k why v min"; padding: 5px 2px; }
+  .flb-row.net .flb-v { font-size: 17px; }
+  .fl-drv, .fl-cand { padding: 6px 9px 7px 10px; gap: 4px; }
+  .df-frame { width: min(520px, 100%); padding: 7px 11px 8px; gap: 5px; }
+  .df-inst .dk-ro b { font-size: 12px; }
+  .df-key { min-height: 36px; padding: 9px 8px; }
+}
+
+/* While a driver feed is up, the dock board and the HUD layer are STOWED rather than closed. The
+   board covers the whole screen and the feed is reached from inside it, so watching a driver from
+   behind it would be watching a job list; and the HUD's minimap and chatter both describe the
+   player's own craft, which is not what is on screen. Closing the board instead would throw away
+   the pad, the job list and the scroll position and drop the player into the air on undock. */
+#ui.stowed, #hud.stowed { display: none; }
+
+/* While a driver feed is up the flight consoles are hidden. Every key on them acts on the PLAYER's
+   craft, which is parked on a pad somewhere behind the camera. #btn-view and the cog stay: moving
+   between the driver's cockpit and their chase boom is the one control the feed actually wants. */
+#controls.feeding #stick,
+#controls.feeding #altpad,
+#controls.feeding #leftpad { display: none; }
+
+/* ══ §S2-J — companies, and the shady branch ═══════════════════════════════
+   Aaron: *"at some point you would need to start a company for your employees to work under ... a
+   shady business option may open up performing dodgy trades - it may be a tab to switch between
+   them ... you may own multiple, so the layout for all these things will have to look good, it
+   should all look futuristic."*
+
+   Everything below is the S2-D idiom and nothing else: chamfered plates, corner brackets,
+   letterspaced monospace kickers, segmented meters. The one NEW visual idea is that the off-book
+   branch is DARKER and warmer than the haulage side — the same instruments, under a different
+   light — so a screenshot of one is never mistaken for the other. There is no second design
+   language, because there is only one dashboard. */
+
+/* ── the group rail: one layout that lists n charters ───────────────────── */
+.fl-group { margin-bottom: 9px; }
+.flg-list { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 3px; -webkit-overflow-scrolling: touch; }
+.flg-chip {
+  flex: 0 0 auto; min-width: 116px; text-align: left; padding: 6px 9px 5px;
+  background: rgba(12, 18, 27, .55); border: 1px solid rgba(94, 122, 148, .3);
+  clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 7px, 100% 100%, 7px 100%, 0 calc(100% - 7px));
+  color: #9fb8cf; cursor: pointer; display: block;
+}
+.flg-chip.on { border-color: var(--cyan); background: rgba(53, 230, 255, .13); color: #eaf6ff; }
+.flg-chip.susp { border-color: rgba(255, 90, 82, .6); background: rgba(255, 90, 82, .12); }
+.flg-chip.add { border-style: dashed; }
+.flgc-n { display: block; font: 400 11px/1.1 ui-monospace, Menlo, monospace; letter-spacing: .1em; color: inherit; }
+.flgc-s { display: flex; gap: 7px; margin-top: 3px; }
+.flgc-s i { font: 400 8px/1 ui-monospace, Menlo, monospace; font-style: normal; letter-spacing: .1em; color: var(--dim); }
+.flgc-s i.good { color: #6cff9c; }
+.flgc-s i.bad { color: #ff5a52; }
+.flgc-file { display: flex; align-items: center; gap: 5px; margin-top: 4px; }
+.flgc-file i { font: 400 7px/1 ui-monospace, Menlo, monospace; font-style: normal; letter-spacing: .16em; color: var(--dim); }
+.dk-meter.pip { gap: 1px; }
+.dk-meter.pip i { width: 3px; height: 5px; }
+.flg-tot { margin-top: 5px; font: 400 9px/1 ui-monospace, Menlo, monospace; color: var(--dim); }
+
+/* the FILE, as a colour. One scale, used on chips, rails, tabs and tables alike. */
+.hclean  { color: rgba(159, 184, 207, .9) !important; }
+.hwatched { color: var(--amber) !important; }
+.hflagged { color: #ff9a3c !important; }
+.hburning { color: #ff5a52 !important; }
+.dk-ro.hclean b { color: rgba(159, 184, 207, .9); }
+.dk-ro.hwatched b { color: var(--amber); }
+.dk-ro.hflagged b { color: #ff9a3c; }
+.dk-ro.hburning b { color: #ff5a52; }
+.flgc-file.hwatched .dk-meter i.on { background: var(--amber); box-shadow: 0 0 4px -1px var(--amber); }
+.flgc-file.hflagged .dk-meter i.on { background: #ff9a3c; box-shadow: 0 0 4px -1px #ff9a3c; }
+.flgc-file.hburning .dk-meter i.on { background: #ff5a52; box-shadow: 0 0 4px -1px #ff5a52; }
+
+/* ── Aaron's branch tabs ────────────────────────────────────────────────── */
+.fl-branch { display: flex; gap: 3px; margin-bottom: 8px; }
+.fl-br {
+  flex: 1 1 0; text-align: left; padding: 7px 10px 6px; cursor: pointer;
+  background: rgba(12, 18, 27, .5); border: 1px solid rgba(94, 122, 148, .28);
+  border-bottom: 2px solid transparent; color: rgba(159, 184, 207, .8);
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 0 100%);
+}
+.fl-br.on { color: #eaf6ff; border-bottom-color: var(--cyan); background: rgba(53, 230, 255, .12); }
+.fl-br.dark { background: rgba(24, 12, 10, .55); border-color: rgba(255, 154, 60, .26); }
+.fl-br.dark.on { border-bottom-color: #ff9a3c; background: rgba(255, 154, 60, .14); color: #ffe0c2; }
+.fbr-l { display: block; font: 400 12px/1 ui-monospace, Menlo, monospace; letter-spacing: .2em; }
+.fbr-s { display: block; margin-top: 4px; font: 400 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .12em; color: var(--dim); }
+
+/* the off-book screens are the same instruments under a warmer, darker light */
+.fl-sect.dark .dk-shead { border-left-color: #ff9a3c; }
+.fl-sect.dark .dk-skick { color: rgba(255, 154, 60, .85); }
+.fl-sect.dark .dk-sbody { background: rgba(20, 11, 9, .34); }
+
+/* ── the suspension banner ──────────────────────────────────────────────── */
+.fl-susp {
+  display: flex; flex-direction: column; gap: 3px; margin-bottom: 9px; padding: 8px 10px;
+  background: rgba(255, 90, 82, .12); border-left: 2px solid #ff5a52;
+}
+.fls-k { font: 700 10px/1 ui-monospace, Menlo, monospace; letter-spacing: .24em; color: #ffb8b4; }
+.fls-t { font: 400 9px/1.35 ui-monospace, Menlo, monospace; color: rgba(255, 200, 196, .9); }
+
+/* ── FOUND ──────────────────────────────────────────────────────────────── */
+.fl-namerow { display: flex; gap: 5px; margin: 8px 0; }
+.fl-name {
+  flex: 1 1 auto; min-width: 0; padding: 8px 10px; background: rgba(6, 10, 16, .72);
+  border: 1px solid rgba(53, 230, 255, .38); border-radius: 0; color: #eaf6ff;
+  font: 400 14px/1 ui-monospace, Menlo, monospace; letter-spacing: .14em; text-transform: uppercase;
+}
+.fl-name::placeholder { color: rgba(120, 150, 175, .7); }
+.fl-name:focus { outline: none; border-color: var(--cyan); background: rgba(53, 230, 255, .1); }
+.fl-suggest {
+  flex: 0 0 auto; padding: 0 12px; cursor: pointer; color: #cfe9ff;
+  background: rgba(53, 230, 255, .12); border: 1px solid rgba(53, 230, 255, .4);
+  font: 400 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .18em;
+}
+.flc-key.back { border-color: rgba(94, 122, 148, .4); background: rgba(12, 18, 27, .6); color: #9fb8cf; flex: 0 0 96px; }
+.fl-ladder.small .fl-rung { padding: 4px 0; }
+
+/* ── the file gauge and what it costs ───────────────────────────────────── */
+.fl-file {
+  margin-bottom: 9px; padding: 9px 10px 8px;
+  background: rgba(10, 14, 21, .5); border-left: 2px solid rgba(159, 184, 207, .5);
+}
+.fl-file.hwatched { border-left-color: var(--amber); }
+.fl-file.hflagged { border-left-color: #ff9a3c; }
+.fl-file.hburning { border-left-color: #ff5a52; }
+.fh-head { display: flex; align-items: baseline; gap: 9px; }
+.fh-k { font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .26em; color: rgba(120, 150, 175, .95); }
+.fh-b { font: 400 12px/1 ui-monospace, Menlo, monospace; letter-spacing: .18em; color: #eaf6ff; }
+.fh-n { margin-left: auto; font: 300 20px/1 ui-monospace, Menlo, monospace; color: #eaf6ff; }
+.fl-file .dk-meter { margin: 6px 0 5px; }
+.fl-file.hwatched .dk-meter i.on { background: var(--amber); box-shadow: 0 0 5px -1px var(--amber); }
+.fl-file.hflagged .dk-meter i.on { background: #ff9a3c; box-shadow: 0 0 5px -1px #ff9a3c; }
+.fl-file.hburning .dk-meter i.on { background: #ff5a52; box-shadow: 0 0 6px -1px #ff5a52; }
+.fh-note { font: 400 9px/1.3 ui-monospace, Menlo, monospace; color: var(--dim); }
+.fh-costs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px 8px; margin-top: 8px; }
+.fh-costs .dk-ro b { font-size: 14px; }
+.fh-costs .dk-ro.good b { color: #6cff9c; }
+.fh-costs .dk-ro.bad b { color: #ff5a52; }
+.fh-edge {
+  margin-top: 8px; padding: 6px 8px; font: 400 10px/1.35 ui-monospace, Menlo, monospace;
+  color: #cfe9ff; background: rgba(53, 230, 255, .08); border-left: 2px solid rgba(53, 230, 255, .5);
+}
+.fh-edge.good { color: #cfffdf; background: rgba(108, 255, 156, .1); border-left-color: #6cff9c; }
+.fh-edge.bad { color: #ffd8da; background: rgba(255, 90, 82, .1); border-left-color: #ff5a52; }
+.fh-fine { margin-top: 6px; font: 400 9px/1.4 ui-monospace, Menlo, monospace; color: var(--dim); }
+
+/* ── a run row ──────────────────────────────────────────────────────────── */
+.fl-run {
+  display: flex; flex-direction: column; gap: 6px; padding: 8px 0 9px;
+  border-bottom: 1px solid rgba(94, 122, 148, .16);
+  border-left: 2px solid rgba(94, 122, 148, .3); padding-left: 9px; margin-bottom: 6px;
+}
+.fl-run.on { border-left-color: #ff9a3c; background: rgba(255, 154, 60, .07); }
+.fl-run.me { border-left-color: rgba(53, 230, 255, .5); }
+.fl-run.me.on { border-left-color: #ff9a3c; }
+.fr-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.fr-nm { font: 400 12px/1 ui-monospace, Menlo, monospace; letter-spacing: .12em; color: #eaf6ff; }
+.fr-gr { margin-left: auto; font: 700 8px/1 ui-monospace, Menlo, monospace; letter-spacing: .2em; color: var(--dim); }
+.fl-run.on .fr-gr { color: #ff9a3c; }
+.fr-blurb { font: 400 9px/1.4 ui-monospace, Menlo, monospace; color: rgba(159, 184, 207, .88); }
+.fl-run .fld-key { align-self: flex-start; flex: 0 0 auto; padding: 0 14px; }
+.fld-off, .df-off {
+  font: 700 7px/1 ui-monospace, Menlo, monospace; letter-spacing: .2em; padding: 3px 5px;
+  background: rgba(255, 154, 60, .22); color: #ffc98a; border: 1px solid rgba(255, 154, 60, .5);
+}
+.flb-row.note .flb-v { color: var(--dim); }
+.flb-row.note .flb-k { color: rgba(120, 150, 175, .8); }
+
+/* ── the RECORD tab's other side, once it is not sealed ─────────────────── */
+.dk-sect.other .dk-shead { border-left-color: #ff9a3c; }
+.dk-sect.other .dk-skick { color: rgba(255, 154, 60, .85); }
+.dk-sect.sealed.cue .dk-stitle { color: var(--amber); }
+.dk-key.ask {
+  display: block; width: 100%; margin-top: 8px; text-align: left; padding: 9px 11px; cursor: pointer;
+  background: rgba(255, 154, 60, .12); border: 1px solid rgba(255, 154, 60, .45); color: #ffe0c2;
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+}
+.dk-key.ask .dkt-l { display: block; font: 400 12px/1 ui-monospace, Menlo, monospace; letter-spacing: .22em; }
+.dk-key.ask .dkt-n { display: block; margin-top: 4px; font: 400 9px/1 ui-monospace, Menlo, monospace; color: rgba(255, 200, 150, .75); }
+
+/* ── the thread panel ───────────────────────────────────────────────────── */
+.th-kick { font: 700 9px/1 ui-monospace, Menlo, monospace; letter-spacing: .3em; color: var(--amber); margin-bottom: 8px; }
+.th-line { display: flex; gap: 9px; padding: 7px 0; border-bottom: 1px solid rgba(94, 122, 148, .14); }
+.th-who { flex: 0 0 40px; font: 700 8px/1.5 ui-monospace, Menlo, monospace; letter-spacing: .18em; color: var(--dim); }
+.th-line.pc .th-who { color: var(--cyan); }
+.th-tx { font: 400 12px/1.5 ui-monospace, Menlo, monospace; color: #dceaf7; }
+.th-line.pc .th-tx { color: #eaf6ff; }
+.th-keys { display: flex; flex-direction: column; gap: 5px; margin-top: 12px; }
+.th-key {
+  padding: 11px 14px; cursor: pointer; text-align: left; color: #ffe0c2;
+  background: rgba(255, 154, 60, .14); border: 1px solid rgba(255, 154, 60, .5);
+  font: 400 12px/1 ui-monospace, Menlo, monospace; letter-spacing: .22em;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+.th-why { font: 400 9px/1.3 ui-monospace, Menlo, monospace; color: var(--dim); }
+.th-open {
+  margin-top: 12px; padding: 8px 10px; font: 400 10px/1.45 ui-monospace, Menlo, monospace;
+  color: #ffe0c2; background: rgba(255, 154, 60, .1); border-left: 2px solid #ff9a3c;
+}
+
+/* Landscape: the panel is 390 px tall, so the group chips and the cost grid both have to fold. */
+@media (orientation: landscape) and (max-height: 460px) {
+  .flg-chip { min-width: 100px; padding: 5px 7px 4px; }
+  .flgc-n { font-size: 10px; }
+  .fh-costs { grid-template-columns: repeat(2, 1fr); }
+  .fh-n { font-size: 16px; }
+  .fl-br { padding: 5px 8px 4px; }
+  .fbr-l { font-size: 11px; }
+  .th-tx { font-size: 11px; }
+}

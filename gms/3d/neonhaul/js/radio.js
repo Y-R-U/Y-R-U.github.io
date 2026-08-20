@@ -579,6 +579,24 @@ export class Radio {
     return { slot: rec.slot, audio: played ? +played.duration.toFixed(3) : 0, rms: played ? played.rms : 0 };
   }
 
+  // §S2-J. Fire ONE NAMED SLOT with text the caller supplies. The story's remarks about the
+  // player's father are seeded into the ordinary `life` and `pirate` pools precisely so they arrive
+  // looking like every other line on the channel, and this is how the story asks for a specific one
+  // instead of waiting for the director to happen to draw it.
+  //
+  // It goes through `fire()` and nothing else, so it inherits the property that matters: **the
+  // popup never waits on the network.** If the 11 KB clip is not decoded yet the line goes out as
+  // text immediately and the fetch starts for next time — which is what every line in this game
+  // already does on its first play.
+  speak(slot, { speaker = null, text = null, tag = null } = {}) {
+    const rec = (this.manifest && this.manifest.chatter || []).find(c => c.slot === slot) || null;
+    const out = rec
+      ? { ...rec, speaker: speaker || rec.speaker, text: text || rec.text, tag: tag || rec.tag }
+      : { slot, speaker: speaker || 'OPEN CHANNEL', text: text || '', tag: tag || 'bg',
+        layer: 'fore', gain: 0.9 };
+    return this.fire(out);
+  }
+
   // §10.4's job-event pools. Called by the mission loop (see docs/P8_WIRING.md).
   event(kind) {
     if (!this.dir) return null;

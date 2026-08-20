@@ -580,3 +580,375 @@ The fix itself is real and is not what flakes — ACCEPT sits at `[54,289,227,38
 - Adding a fifth `UPGRADES` line shifts `sim_p7a`'s spending model slightly; **the S2-E debt sweep was not re-run against it.**
 - `CLAUDE.md`'s "Green at ship" line still records `p8` 30/30; it is **32/32**. Fix at commit.
 - **Nobody has flown any of this by hand or on a phone.**
+
+---
+
+## S2-G — DONE, verified by the manager 2026-08-20. **PASS 2-A SHIPPED.**
+
+**Accepted.** 9 of 16 figurative poster sites are now screens cycling hard-compressed stills (6–9 s) and ~5.3 s looping clips with crossfades; the other 7 keep their baked tile, and that contrast is what makes the live ones read as alive. **The whole layer costs exactly one draw call** — 4 channels into a 2×2 `CanvasTexture` atlas, the same trick `signs.js` uses for hero panels. Gated two ways: stills cycle to 380 m, clips only inside 220 m (a 30 m tile at 240 m is ~25 px — measured, not guessed). LOW gets 2 channels and **zero** video.
+
+**348 KB added**, 284 KB of it assets — 12 stills averaging 9.0 KB, 4 clips averaging 41.6 KB. For scale the 16 client portraits are 1.3 MB.
+
+**Verified:** all 38 suites green, none failing. `determinism` 9/9 golden unchanged, `git diff` clean on `city_golden.json`. Looked at `live_3_ramen.png` myself — the RAMEN 24H board glows on a tower face with a legible strapline, sitting naturally among the towers.
+
+**Its A/B was honest about its own control.** The morning budget baseline predates eight hours of GPU generation, so the agent used the feature switched **off now** as the control instead. Result: **exactly +1 draw, frame time inside the noise — ON is faster than OFF on two of seven shots.**
+
+### It corrected the manager's diagnosis of the flake
+
+I said a toast was transiently covering the first tab. **It never was** — the agent made B7 print every term, ran it 20×, caught the failure once, and measured the rail at `[0,10,844,33]` against a tab at y 113–149: **70 px clear.** They have never overlapped.
+
+The real failing term was **`reach.tab.tall`** — and the reason it took two sessions is pure signature-bug: `tall` tests `r.height >= 36` on a **float**, while the detail line printed `Math.round(r.height)`. So a **35.99 px tab failed while printing "36 px tall."** Its CSS floor was exactly `min-height: 36px` — a threshold with zero slack. B7 now prints every term of its own condition plus raw heights to 2 dp, the covering element and `--toast-h`; the landscape floor went to 37 px. **8 consecutive `--land` runs since, 14/14, height 37.00 each time.** Against a ~1-in-20 rate that is suggestive, not proof, but the gate will now name its own failing term.
+
+**That is the twenty-first instance**, and the most instructive yet: *the passing detail line hid the failing term.* Every gate that prints a rounded value while testing the raw one has this bug latent.
+
+### Pass 2-A shipped
+
+Commit **`68d6983`** on `main`, pushed to `origin/main`. 297 files, 22,623 insertions, **0 files outside `gms/3d/neonhaul/`**, nothing over 200 KB. Committed via `git commit-tree` against a temporary index seeded from `main`, so the working tree — on another session's `claude/forge-game-checkpoint` at `266aaa2` with 31 dirty paths — was never touched. Confirmed intact afterwards.
+
+**A trap for next time:** running `git status` in the same shell after `rm`-ing the temp index while `GIT_INDEX_FILE` is still exported reports **5,537 dirty paths** — git rebuilds an empty index and calls the whole repo untracked. It reads exactly like catastrophic damage. `unset GIT_INDEX_FILE` before any verification, and re-check in a clean shell before believing a number like that.
+
+### Left undone across pass 2-A
+
+- **Nobody has flown any of it by hand or on a phone.** Every band, cap and threshold is Mac-measured.
+- `gates_s2g` needs `?debug` — A1 audits per-sign metadata that only exists under it. Load-bearing.
+- Nine living posters in a near ring is punctuation by design; a player can fly a while without passing one. `LIVING_FRACTION` (0.6) is the dial.
+- **`budget --headed` failed `auto` at 67.9 ms worst frame this morning, before a line of S2-G existed**, and has not recurred in any run since. Pre-existing, unexplained, **worth watching**.
+- S2-F's `C4` logged 5 escapes and 2,340 m off-lane of 4,162 m flown — lanes run over roads, so an escape on a lane leg means something is standing in a corridor.
+- The S2-E debt sweep was not re-run after S2-F added a fifth `UPGRADES` line.
+- The client deal panel got a skin, not a rebuild.
+
+---
+
+## S2-H — DONE, verified by the manager 2026-08-20. Pass 2-B opens.
+
+**Accepted.** New `js/shops.js` + `materials.js` §11 (`patchShop`/`shopMaterial`). **One quad is one shop; the entire street layer is one draw call and two triangles per instance** — 3,852 shopfronts in the worst district against a 5,600 cap, 68.8 % peak use, zero overflow across six districts.
+
+Aaron's venetian blind is the product of **three** gates — ray elevation against a per-shop slat tilt, distance band, and facing — and only when it opens does the shader intersect three parallax planes to draw the room: cove light, counter, people with heads, hanging lamps, shelving, chiller. 17 % of units are shuttered for the night. Shops differ by district: Sootfields 25 % spare-parts, the Ribs 30 % ramen, the Lantern Quarter 24 % bars and 17 % arcades.
+
+**80,299 bytes of source and ZERO asset bytes** — fascia signs come out of the already-resident frozen `assets/signs.png`, using 25 words the bake already produced (NOODLES, RAMEN BAR, COLD STORE, 営業中, 24時間 …).
+
+**Verified:** all 40 suites green, none failing. `s2h` 14/14 HIGH and LOW **both with `--falsify`** · `determinism` 9/9 golden `f29beaf9` / 25,039 unchanged, `git diff` clean. **Exactly +1 draw everywhere**, +4.6 k tris HIGH / +1.0 k LOW.
+
+**Looked at with my own eyes:** `ribs_open_port.png` is a ramen bar with a red neon fascia, warm interior, three hanging lamps and two people at the counter. `lantern_canyon_land.png` is a street that had no frontage at all now receding into lit shopfronts, with the near shop open and the far ones correctly showing as lit faces with no room behind them — the blind working, visible in one frame.
+
+**A manager flag that resolved cleanly:** I noticed two captures with identical byte counts mid-run — the classic measured-nothing signature. They are the *same* capture reused for two purposes (identical md5), and the meaningful A/B pair differs in both size and hash. Checked, not assumed.
+
+### THE FINDING OF THE RUN — `budget.mjs`'s ms gate is a CPU gate
+
+**`__state.ms.frame` is CPU wall time around the loop body. It measures draw-call submission, not GPU execution.** While the GPU finishes inside vsync it cannot see fragment cost *at all*.
+
+The agent tried to measure what the venetian blind saves and could not. Forcing every blind in a street-level frame OPEN vs SHUT moved the mean by **−0.003 ms at 1.3 Mpx and −0.14 ms at 5.8 Mpx**, both far inside a 0.4–0.8 ms within-arm spread. Pushed to **13 Mpx (4800×2700), all three arms sat on 60.0 fps with a spread of 0.01.**
+
+**So a fill-rate-heavy feature can pass `budget.mjs` cleanly and still stutter on a phone.** This invalidates a class of claim made across this whole project — including S2-C's "the reflection's cost is below the noise floor" and S2-G's "+1 draw, frame time inside the noise". Those numbers are *true* and they are *CPU* numbers; neither is evidence about a phone's fragment throughput.
+
+The blind ships **because it is what Aaron asked for and is right for a phone, not on a measurement**, and the comments in `shops.js` and the gate's own detail line now say exactly that rather than claiming a saving. `__game.setShopRange(near, far)` is the live lever. **This is the twenty-second instance and the widest-reaching: the instrument could not see the thing it was pointed at.**
+
+### Three defects its own checks caught
+
+1. **The capture tool aimed every camera 180° away from its subject** — `atan2(-nx,-nz)` where three's YXZ Euler wants `atan2(dx,dz)` negated. Four districts of frames with no shopfront in them, **which reads exactly like a dead feature.** Caught by the A/B coming back byte-identical, not by looking.
+2. **The district-mix check was reading a cumulative session counter**, so by the third district every "district mix" was the running total of the first three and all six rows agreed to within 0.6 %. Counted off the live field now; total-variation distance went 0.006 → 0.110.
+3. **The atlas-region check compared float32 buffer values against JSON doubles as strings** and reported all 3,701 regions as absent from the sheet every one of them came out of.
+
+Also: F2's falsifier nudged shops along `x`, which for a ±Z wall is a slide *along* the wall — it caught 22 of 39 and read as a half-working audit while actually falsifying two different things. Now 39/39.
+
+### Left undone
+
+- **Nobody has flown this on a phone.** Both range bands and the density are Mac-measured, and per the finding above **the blind's entire performance rationale is untested on the hardware it was designed for.**
+- **No wet-road reflection of the shopfronts** — the biggest remaining visual win at this altitude. `reflect.js`'s buckets are transparent non-depth-writing and `shopMaterial` is opaque and depth-writing, so it needs a separate variant and +1 draw. Deliberately not half-built.
+- The shopfronts do not light the road in front of them; the road shader would need a per-lot term.
+- Sootfields food share is 0.54 against the agent's own >0.50 assertion — an industrial district legitimately near the floor. That check will fire first if the mix is retuned.
+
+---
+
+## S2-I — DONE, pending the manager's verification. Read `docs/S2I_NOTES.md`.
+
+**Built.** Hired drivers, automatic wages, the driver vehicle-view feed, and three earnings screens.
+Founding a company with legit/shady tabs stays S2-J and is untouched.
+
+| | |
+|---|---|
+| `js/company.js` | PURE — grades, wages, the lease, arrears, the company ladder, the ledger, the save. Node-runnable, so the wage table is swept. |
+| `js/fleet.js` | A driver is a `Courier` at the stick of a real `Flight`, with its own `Missions`. |
+| `js/companyui.js` | `FleetPanel` (ROSTER / RECRUIT / EARNINGS) and `DriverFeed`. Renders only. |
+| `tools/sim_s2i.mjs` | The wage sweep, and a `--solve=1` that re-derives it. |
+| `tools/fleet_rate.mjs` | The in-game measurement — this phase's `courier_rate.mjs`. |
+| `tools/gates_s2i.mjs` · `tools/cap_s2i.mjs` | 18 checks ×2 orientations, and the capture pass. |
+
+**Earnings are deliveries, not a formula.** The same class `?courier=1` drives, which S2-E measured
+against the analytic economy at 0.995. Competence is `lanes.js` `AUTO_LEVELS[n].speed` read through
+a new `Courier.speedCap` that **defaults to 1**, so `?auto=1` and `?courier=1` are unchanged.
+
+**Zero extra draw calls** — driver craft go into the four instanced fields the player, the traffic
+and S2-E's cutscene already write into. Measured **4 draws with a hired driver and 4 without**
+(traffic on, which is what keeps the baseline non-empty), and **1 → 0 craftBody instances** with the
+traffic off, plus a +4,000 m arm proving the cull is what takes the instance off.
+
+**CPU: four drivers cost +0.025 ms of frame time against a worst within-arm spread of 1.304 ms** at
+844×390, three alternating arms — *below a ±1.3 ms noise floor on this machine*, not "free".
+`CLAUDE.md`'s warning that `budget.mjs`'s milliseconds are a CPU statement does not weaken this
+number; it is what makes it the right one. A fleet is four `Flight.update`s, four `Courier.read`s
+and four `aabbsNear` queries, and **no fill at all**.
+
+### The balance, and the number it nearly was
+
+`tools/fleet_rate.mjs` flew one driver of each grade in parallel for 9 sim minutes, **in two
+different worlds**:
+
+| world | measured | modelled | ratio |
+|---|---|---|---|
+| `0x4e454f4e` | 1,457.7 CRD/min | 1,848 | 1.27× optimistic |
+| `987654321` | 2,175.7 CRD/min | 1,848 | 0.85× optimistic |
+| **pooled, 77 deliveries** | **1,816.7** | 1,848 | **1.017×** |
+
+**The first world was run alone first and `CALIBRATION` was set to 1/1.268 on it.** The second world
+caught that: the between-world spread is 1.5×, larger than the correction it was justifying. Pooled,
+the model is within 2 % of the game — the same place S2-E left the player's own courier. So the
+constant ships at **1.0 because it was measured**.
+
+The wage table is then **solved, not picked** (`--solve=1` targets a rising margin per grade), and
+the sweep asserts its own design properties and exits non-zero if they stop holding:
+
+- **14 of 24 (grade × hull) pairings lose money** at the median seed.
+- Best pairing ACE/`lance` +299.8 CRD/min, **30 % margin, signing fee back in 11 minutes**.
+- **GREEN's best pairing has a p10 of −0.9 against a p50 of +33.6** — a bad world wipes the margin
+  off the hull a player would actually pick.
+- The lever is the **hull**: the lease is a fraction of `story.js`'s already-swept block price, and
+  the same ACE nets +299.8 in a `lance` and −908 in a `mammoth`.
+
+### The two reserved licence rungs are open
+
+`LANE MARSHAL` and `SPIRE HAULIER` now have thresholds on **fleet lifetime gross**, found by name off
+`COMPANY_TIERS`. `courierRank(tier)` with **one argument is byte-for-byte the pre-S2-I function**, so
+`gates_s2d` A1's `courierRank(99) === 'HAULMASTER'` still holds and is still worth having. A fleet
+cannot buy the sixth rung, only the seventh and eighth. `rankState` gained an `axis` field so a
+surface never has to guess which quantity the number under it is.
+
+### Findings worth keeping
+
+1. **`shot.mjs`'s `cleanup()` kills every Chrome a node process opened** — it pkills on
+   `/tmp/neonhaul-cdp-<NODE PID>`, shared by every session in one script, so closing a second
+   browser kills the first and the next `evalJSON` **hangs forever** with no timeout. A 25-minute
+   stall that read exactly like a slow gate. Any suite that wants two pages has this trap.
+2. **A derived quantity taken from the uncorrected source**: the calibrated sweep printed a
+   calibrated `gross` and computed `net` from the raw one beside it, so the same pairing read 30 %
+   in the solver and 57 % in the table.
+3. **A geometry check over an empty screen** — E3 reported "3 pressable keys" because the previous
+   check had released the whole roster to measure draw calls.
+4. **A short window over-states a fleet badly**: 2.88 minutes gave 1,015 CRD/min for two drivers;
+   the same pair over 9 minutes gave 548, and the rate was still falling at 9.
+5. **The draw-call check measured nothing in landscape** — its only driver had flown 1.7 km away and
+   was correctly culled, which is indistinguishable from "no pose was written". It now hires a fresh
+   driver, prints the distance, and uses the cull itself as the falsification.
+6. `settle()` counts FRAMES and gives up after 25 s: asking for 3,600 returned −1 having advanced 26
+   sim seconds against the 60 asked for. `advance()` waits on `__state.t` and reports if it is short.
+7. **The draw-call check was differencing a number with a noisy term in it — and the fix for that
+   broke the other half.** `craftBody` counts the traffic too and its churn is about the size of the
+   +1 being measured: one landscape run read 31/30/30 and passed, the next 31/31/31 and failed.
+   Turning the traffic off fixed the instance count and made the DRAWS read `4 → 0`, because a field
+   draws once if it holds any instance and not at all if it is empty. C2 now has **two arms** —
+   draws with traffic ON, instances with traffic OFF. **A check whose effect is the size of its
+   noise is a coin toss with a name on it, and the isolation that removes the noise can remove the
+   baseline with it.**
+8. **`gates_s2e --land` died mid-suite** with `timed out waiting for window.__ready` at check 25 of
+   30, writing a file that reads **`25/25`**. It re-ran clean at 30/30 with nothing changed (that
+   suite opens a session per group — see finding 1). `25/25` is the shape of a partial run, not of a
+   pass: read `total` against what the suite declares.
+
+### Verified
+
+`s2i` **18/18 portrait and 18/18 landscape** (landscape run twice after its last change). Every
+suite green on disk, none failing: `determinism` **9/9, golden `f29beaf9` / 25,039 unchanged** ·
+`wire` 11/11 (full W1–W11) · `s2a` 13/13 ×2 · `s2c` 17/17 · `s2d` 14/14 ×2 · `s2e` 30/30 ×2 ·
+`s2f` 11/11 ×2 · `s2g` 9/9 · `s2h` 14/14 HIGH **and** LOW, both `--falsify` · `p5` 16/16 ·
+`p6` 19/19 · `p7a` **30/30** and `p7b` **20/20** (falsify totals) · `p8` 32/32 ·
+`budget --headed` green on both presets. **Every suite that renders the dock was re-run after the
+last `js/ui.js` change**, so none of it is claimed on a mixed tree.
+
+**Looked at, portrait and landscape.** Four defects came out of the pictures and out of nothing
+else: the FLEET and HIRE panels stacking; the feed opening behind the hire panel; the flight
+consoles staying live over the feed (AUTO, HOME and HIRE all act on a craft three kilometres behind
+the camera); and **the rank rail reading HAULMASTER while the ladder below it read SPIRE HAULIER** —
+one screen disagreeing with itself about the player's rank.
+
+### Flagged, not tuned
+
+**The ACE under-earned the SEASONED in both measurement worlds.** Two of two is not evidence at 5–15
+deliveries per driver, but the speed cap makes it hard to explain as a steady state. The plausible
+mechanism is the cell — an ACE at 0.88 burns 2.1× what a GREEN at 0.32 does. **Worth a longer run
+before anyone tunes the grade ladder on it.**
+
+### Left undone
+
+- **Nobody has flown this on a phone**, and nobody has hired a driver by hand.
+- A driver that finds no pad within 3 km goes `idle` and sits there still drawing wages. Visible on
+  the roster; nothing recovers from it.
+- Drivers are not on the minimap. `fleet.live[].flight` has the positions.
+- The driver feed is offered **from a pad only** — watching one moves the camera, and the city
+  streamer, kilometres from the player's own hull. Deliberate, and the obvious next request.
+- `company.gross` never falls, so an unprofitable fleet still climbs the charter ladder to the top
+  two licence rungs. Deliberate (a ladder that walks back down is a ladder nobody trusts).
+
+---
+
+## S2-I — VERIFIED AND ACCEPTED by the manager 2026-08-20
+
+The agent's own section above is accurate. Independently confirmed: **all 42 suites green, none failing** · `s2i` 18/18 portrait and landscape · `determinism` 9/9 golden `f29beaf9` / 25,039 unchanged, `git diff` clean · `s2e --land` re-runs at **30/30**, so the `25/25` partial it wrote earlier is gone.
+
+**Looked at `earnings_port.png` with my own eyes.** It shows the arithmetic rather than a total — fleet gross **+77,905**, driver wages **−61,435**, hull leases **−26,496**, charge −420, signing fees −4,425, net **−14,871**, captioned *"the payroll is bigger than the work"*, with a per-driver table beneath. **The screenshot is of a losing fleet**, which demonstrates the phase's hardest requirement instead of asserting it.
+
+### The calibration, which is the best piece of measurement discipline in the run
+
+`fleet_rate.mjs` flew one driver per grade in world `0x4e454f4e`: **1,457.7 CRD/min against 1,848 modelled**, and the agent set `CALIBRATION = 1/1.268`. Then **a second world returned 2,175.7 against the same 1,848** — the opposite direction. The agent recognised that **the between-world spread (1.5×) was larger than the correction it had just justified**, pooled 77 deliveries instead (1,816.7 vs 1,848, **ratio 1.017**), and **shipped at 1.0 because that is what the pooled measurement says.**
+
+A single-world calibration would have baked a 27 % error into the wage economy and looked rigorous doing it. This is the discipline the project has been trying to teach itself all run, applied unprompted.
+
+**Flagged rather than tuned:** the ACE grade under-earned the SEASONED in *both* worlds. Two of two at n=5–15 is not evidence, and the agent said so and left it alone. Probably the cell — an ACE burns 2.1× a GREEN. **Worth a longer run before anyone tunes the ladder on it.**
+
+### Hiring can lose money — measured
+
+**14 of 24 (grade × hull) pairings lose money at the median seed.** The hull is the lever: the same ACE nets **+299.8 CRD/min in a `lance` and −908 in a `mammoth`**. GREEN's *best* pairing has a **p10 of −0.9 against a p50 of +33.6** — a bad world wipes the margin off the hull a player would actually pick. STEADY is profitable in 1 of 6 hulls. The sweep asserts these four properties itself and exits non-zero if they stop holding.
+
+**Cost:** zero extra draws. CPU +0.025 ms for four drivers against a 1.304 ms within-arm spread. And unlike S2-H's blind, **CPU is the right instrument here — a fleet adds no fill**, so this number means what it says.
+
+### Four defects found only by looking at pictures
+
+The FLEET and HIRE panels stacking; the feed opening **behind** the hire panel; the flight consoles staying live over the feed, so AUTO/HOME/HIRE acted on a craft 3 km behind the camera; and **the rank rail reading HAULMASTER while the ladder directly below it read SPIRE HAULIER**.
+
+### New traps, now in CLAUDE.md (verified present)
+
+1. **`shot.mjs`'s `cleanup()` kills every Chrome that one node process opened** — it pkills on `/tmp/neonhaul-cdp-<NODE PID>`, which is shared by every browser in a script. Closing a second browser kills the first, and the next `evalJSON` **hangs forever**, because there is no timeout on a CDP send. Cost 25 minutes and read exactly like a slow gate.
+2. **`settle()` counts FRAMES and gives up after 25 s of wall time** — `settle(S, 3600)` advanced 26 sim seconds against 3,600 asked for, so a "roster with real numbers" came back with four zeros.
+3. **`gates_s2e --land` died mid-suite and wrote a file reading `25/25`.** That is the **fourth** instance this run of a partial gate run being written as a complete one. `25/25` is the shape of a partial.
+
+### Unfinished
+
+- **Nobody has flown it on a phone or hired a driver by hand.**
+- **An idle driver (no pad within 3 km) still draws wages with nothing to recover it.**
+- **`company.gross` never falls, so an unprofitable fleet still climbs to the top two licence rungs.** That is a real progression hole and the obvious first thing to fix if Aaron dislikes it.
+- Drivers are not on the minimap; the feed is pad-only by design.
+
+---
+
+## AARON'S PLAY-TEST DEFECTS, 2026-08-20 — both are the MANAGER'S fault
+
+Two defects reported after a one-minute look at the shipped pass 2-A. Both trace to manager decisions, not agent error. **These outrank remaining polish.**
+
+### D1 — the voices are macOS `say`, and they sound like 1990s speech synthesis
+
+Aaron: *"the voice that was used was terrible... why is it computer voice? it sounds like a computer voice from the 90s. i thought you were going to use the abogen reader? the one I use to create audiobooks?"*
+
+**He is right and he told us which engine he meant.** His actual words when choosing were *"lets try our local generator... if it is the audiobook one, it is a very small model so is probably ok?"* — **"the audiobook one" is Abogen/Kokoro.** The manager's S2-B brief then listed **macOS `say` first** and said *"Try this first; it may simply be the answer."* The agent did as briefed. The misread is the manager's.
+
+**And a metric hid it.** S2-B measured "intelligibility" by transcribing each clip with whisper and scoring against the manifest text — 90.7 %. That measures whether words are *recognisable*, not whether they sound *human*. **A synthetic voice can score highly and still be unlistenable.** This is the project's signature failure applied to a manager decision: the number could not see the thing that mattered. Twenty-third instance.
+
+**The fix:** regenerate with **Kokoro** via Abogen at `http://192.168.0.236:8808`. Confirmed present: `af_heart af_bella af_nicole af_sarah af_sky af_alloy af_aoede af_jessica af_kore af_nova af_river bf_alice bf_emma bf_isabella bf_lily ff_siwis` plus the male set, and a `supertonic` engine alongside `kokoro`. Abogen is long-form and has no obvious one-shot TTS endpoint (`/docs`, `/openapi.json`, `/api/*` all 404; the UI is htmx against `/wizard/upload` and `/voices/`), so **installing `kokoro` into a venv and generating directly is likely cleaner than driving the web UI.** Scope: **203 chatter clips + 19 story clips**. The ffmpeg radio chain (`tools/radio_fx.sh`) is good and stays — only the voice source changes. The Boss must NOT get the radio band-limit; he is in the room.
+
+**Do not re-use whisper intelligibility as the acceptance test.** It already passed on the bad output. Aaron listening is the gate.
+
+### D2 — the left-hand keys sit exactly where the flying thumb goes
+
+Aaron: *"The buttons on the left are not part of the dash and are exactly where you want to put your finger on mobile to fly the plane, so that is no good either."*
+
+`#leftpad`'s RADIO / HOME / AUTO render as **floating DOM buttons on the left edge at mid-height**. `save.js` ships `flipSides: false`, which is *"fly with the left thumb"* — so **the controls sit on top of the flight stick's own thumb zone.**
+
+**The manager looked straight at this and missed it**, describing them in `shots/s2i` and `shots/s2g` review as *"HOME and AUTO keys on the left console"* — they are not on a console, they are floating over the flight area. Having the picture is not the same as reading it.
+
+**The fix:** they belong **in the dashboard**, which is what Aaron asked for in the first place for the altitude controls — *"Dashboard is like a car dashboard - physically a part of the car."* S2-A already put the collective lever there successfully. Whatever occupies the flight-stick thumb zone must be nothing at all. **Check this against `flipSides` in both states** — the buttons must never land under whichever thumb is flying.
+
+### D3 — background chatter drowns the cutscene speech
+
+Aaron: *"in the cut scene you can hear what should be background chatter - and it is heaps louder than the actual speech you are trying to listen to."*
+
+**Diagnosed, not guessed.** `js/radio.js:577` calls `this.audio.duckFor(holdish)` on every radio line, which is what pulls the mix down under speech. But `js/storyui.js:85` says in its own comment: *"Deliberately NOT js/radio.js. Every clip radio.js plays goes out through the radio bus, which band-limits to 300–3400 Hz and adds squelch — and **the Boss is in the room**, not on a radio."*
+
+That reasoning is **right**, and the Boss should keep his full bandwidth. But `StoryVoice` stepping off the radio bus also stepped off the **ducking that bus performs** — it never calls `duckFor()`. So the chatter director keeps firing lines at full level while the Boss talks over them. A correct decision with an unowned consequence, falling in the seam between S2-B (built the bus and its ducking) and S2-E (built the story voice that avoids the bus).
+
+**The fix, and go further than ducking:** during a story beat the radio should be **suppressed, not merely attenuated** — the player is being talked at by a mob boss, and `NET_DUCK 0.04` / `MUSIC_DUCK 0.35` are tuned for a dispatch line, not a cutscene. Hold the chatter director off entirely for the duration of the scene and restore it after, using the existing `DUCK_FADE 0.6` for the return.
+
+**Check the whole cutscene, not one line** — the intro has the Boss, the player's interjections and a closing monologue, and the bug will be audible under all three.
+
+#### D1 — the manager has already proven the Kokoro path. Start here, do not rediscover it.
+
+Abogen runs on **this machine** from a `uv` tool install, and its interpreter has Kokoro in it:
+
+```
+PY=/Users/aaronair/.local/share/uv/tools/abogen/bin/python     # kokoro 0.9.4, python 3.13.13
+```
+
+`/docs`, `/openapi.json` and `/api/*` on :8808 all 404 — the web UI is htmx, there is **no one-shot HTTP TTS endpoint**. Drive the library directly. This script is **tested and working**:
+
+```python
+import sys, numpy as np, soundfile as sf
+from kokoro import KPipeline
+voice, text, out = sys.argv[1], sys.argv[2], sys.argv[3]
+pipe = KPipeline(lang_code=voice[0])          # 'a' = US, 'b' = GB
+chunks = [a for _, _, a in pipe(text, voice=voice, speed=1.0)]
+audio = np.concatenate(chunks) if len(chunks) > 1 else chunks[0]
+sf.write(out, audio, 24000)                    # Kokoro is 24 kHz
+```
+
+**Measured by the manager**, four voices on one sentence: `bm_george` 5.33 s, `af_heart` 4.75 s, `am_onyx` 4.90 s, `bf_emma` 4.92 s — all distinct hashes, mean **−24 to −26 dBFS**, peaks **−5 to −10 dBFS** (headroom, no clipping, unlike the SUNO takes). The duration spread on identical text is natural prosody variation between speakers, which is precisely what `say` could not do.
+
+**Voices cached and available** (from `~/cc/airon/abogen-web.log`): `af_heart af_bella af_nicole af_sarah af_sky af_jessica af_kore af_nova af_river af_alloy af_aoede · bf_emma bf_alice bf_lily bf_isabella · am_michael am_adam am_onyx am_echo am_puck am_liam am_santa · bm_george bm_daniel bm_fable bm_lewis` plus French, Japanese, Chinese, Hindi, Italian, Spanish sets. **More than enough for 31 distinct radio identities plus a cast.**
+
+Casting notes: **`bm_george` reads well for the Boss** (British male, unhurried) — that is what the manager's test line was generated with. Keep the Boss OFF `tools/radio_fx.sh`; he is in the room. Everything else keeps the ffmpeg radio chain, which is good and stays.
+
+**Set `HF_TOKEN` or expect a rate-limit warning**; `HF_HUB_DISABLE_PROGRESS_BARS=1` keeps logs clean. First call downloads `hexgrad/Kokoro-82M` — already cached on this machine.
+
+---
+
+## S2-J — VERIFIED AND ACCEPTED by the manager 2026-08-20. **PASS 2 COMPLETE.**
+
+**Accepted.** The company registry (`GROUP_MAX 3`, charter fee 3,000 ×2.4), the off-book branch on **HAULAGE | OFF BOOK** tabs, `SHADY_TIERS` on Aaron's six names verbatim, and **the two doors** — `shadyDoor` is `null` | `cue` | `asked` | `seized`, with remarks seeded into four real chatter clips (pool 203 → 207).
+
+**Verified:** `s2j` 17/17 ×2 · `determinism` 9/9 golden `f29beaf9` / 25,039 · every other suite green on disk. The agent declared honestly that it had **not** re-run `p1a p2 p3a p3b p4 p11` or the `_low` variants; **the manager ran them before shipping.**
+
+**Looked at with my own eyes.** `found_port.png` — a proper in-game name field with SUGGEST (no `prompt()`), the fee marked *"sunk; the name is not changeable afterwards"*, and the charter ladder with its thresholds. `exposure_port.png` is the phase's whole argument in one screen.
+
+### The shady side is a genuine trade-off — and the screen says so out loud
+
+> *"None of 18,564 CRD of run money counts on the charter. FLEET GROSS is 74,000 and that is the only number the SPIRE CONTRACT tier reads — so every run is a hull you are not buying yet, and the two reserved licence rungs sit on the same ledger."*
+
+Off-book pays **1.70×** but **contributes nothing to charter gross**, which gates driver capacity *and* the two top licence rungs. The screen showed **EDGE 1.04×** against **SEIZURE RISK 23 %**. Barely ahead, and it costs you the company.
+
+**Swept, twelve worlds × 90 min, seven policies, through the shipped `company.js` on a one-second clock with real delivery logs.** An inverted U: `clean` 264 · **`one_off` 472** · `two_off` 47 · **`all_off` −636** CRD/min (2 suspensions, 92 k of fines, **charter gross zero**). `PAY` was picked *against* that curve — 1.9 made `one_off` 2.5× clean and stopped being a decision; 1.5 wasn't worth the risk.
+
+**One number it refused to bank:** the shell's operating net came out 121 CRD/min below `one_off` against a **375 p10–p90 spread on the same arm** — smaller than its own noise. Check 6 asserts the noise-free mechanism instead and **prints the net as unbanked.** That is the S2-I calibration lesson applied by a different agent, unprompted.
+
+### `heat` was the wrong word — and it did not weaken the gate to keep it
+
+`gates_p7a` T14 failed on 47 `heat` references, because **DECISIONS §6 forbids a heat/pursuit mechanic.** The agent renamed the whole system to **`exposure` / "THE FILE"** rather than relax the assertion. **It also flagged that §6 is still *qualified*** — the consequence is an economy multiplier, nothing chases or spawns or ends a session — and wrote that up **for Aaron to judge rather than quietly reinterpreting a design decision.** Correct on both counts.
+
+### Three defects found only in pictures
+
+The ending panel covering the RECORD tab while the precondition passed on a DOM query (now a hit-test); toasts stacking over the company rail; and **the file gauge rendering cyan instead of amber** — the JS built a class `fl-exposure` and the stylesheet spelled it `fl-file`. **Nothing errored.** A CSS class name is a string contract with no compiler behind it.
+
+### Unfinished
+
+- **Nobody has founded a company or run a delivery off the books by hand, or on a phone.**
+- **Six drivers were never measured in isolation** — `GROUP_LIVE 6` is reasoned from S2-I's four-driver figure plus margin, not measured.
+- **`one_off` is strong** (1.8× clean at 90 min). The counterweight is the charter ladder rather than credits; `EXPOSURE.PAY` is the one constant to move and the sweep re-runs in 3 s.
+- A suspended charter's drivers keep flying and earning nothing, with no stand-down.
+- **The remarks fire only on the paid branch**, so 3 of 4 seeded clips are unreachable in a seized playthrough.
+- `docs/S2J_NOTES.md` holds eleven findings, including backticks inside template literals (**third time this run**), `&&`-chained shells hiding a stale log, `find -newermt` failing silently, and `write_suno_md.py` destroying the music section.
+
+### REGRESSION found by the manager at ship time: `gates_p2` is 7/8
+
+**No pass-2 phase ran `gates_p2`.** S2-J declared it had not re-run `p1a p2 p3a p3b p4 p11`; the manager ran them before shipping and found this.
+
+```
+FAIL  §3.2.3 — chunk generation fits its budget over a 20s ?auto=1 flight
+      worst ms.gen 1.900 ms over any single frame (gate 1.4)
+      worst frame 5.50 ms (gate 12); mean frame 1.91 ms
+      6 distinct chunks flown; deepest stream queue 46 chunks; 169 live; 0 errors
+```
+
+**Severity: a streaming-hitch risk, not a break.** The worst *frame* is 5.50 ms against a gate of 12, so the game holds 60 fps; it is the per-frame chunk-*generation* sub-budget that is over, by 0.5 ms.
+
+**Cause not yet isolated — do not guess it.** Three pass-2 phases added per-chunk or per-frame work, and any of them could be it:
+- **S2-H shopfronts** are the prime suspect: `js/signage.js:182` says a shopfront *"is allocated and freed on the SAME chunk lifetime as everything else here"*, so shop packing runs inside chunk generation.
+- S2-G posters and S2-C traffic also grew that path.
+
+**There is no runtime lever for `shopDensity`** (`js/config.js:41`, read once in `js/shops.js:134`/`:170`), so the A/B needs a config edit or a new hook — `setShopVisible`/`setShopForce`/`setShopRange` are all *render* levers and will not move `ms.gen`. **Bisect it; do not assume the shopfronts.**
+
+Recorded rather than fixed at ship time, per Aaron's *"better to get things working and tweak after."* **Assigned to the defect-fix agent as item four.**

@@ -40,6 +40,11 @@ function defaults() {
     // `null` means "a profile written before the story existed", which fromSave() treats as a
     // brand-new arc rather than as a corrupt one.
     story: null,
+    // §S2-I's company layer, same contract as `story`: shape and defaults live in
+    // `js/company.js`, `null` means "a profile written before the company existed" and is treated
+    // as no company at all rather than as a corrupt one. It is in REPLACE below for the same
+    // reason `story` is — a null base makes merge() walk a null.
+    company: null,
     // §7.4.9's four lines. `{}` merged against a stored `{thrust:1}` produced a profile whose
     // upgrade keys existed on disk and not in the defaults, and merge() skips keys it has no base
     // for — so a bought upgrade silently vanished on reload.
@@ -100,12 +105,12 @@ function load() {
   return merge(d, parsed);
 }
 
-// §S2-E — two keys do not merge, they REPLACE: `story` has a `null` base (so `typeof b === typeof o`
+// §S2-E/S2-I — three keys do not merge, they REPLACE: `story` and `company` have a `null` base (so `typeof b === typeof o`
 // is true for any object and merge would then walk a null) and `flags` is an array, which the
 // object branch would recurse into by index. Both are owned end-to-end by one module that already
 // validates what it reads back, so a whole-value copy is both correct and the honest description
 // of what is happening.
-const REPLACE = new Set(['story', 'flags']);
+const REPLACE = new Set(['story', 'flags', 'company']);
 
 function merge(base, over) {
   for (const k of Object.keys(over)) {

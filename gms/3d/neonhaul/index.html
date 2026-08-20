@@ -136,6 +136,16 @@
 <div id="intro" class="hidden"></div>
 <div id="hire" class="hidden"></div>
 <div id="ending" class="hidden"></div>
+<!-- §S2-I. The company layer. Two layers and not one, for the same reason S2-E gave: #fleet is a
+     CabinPanel (roster / recruit / the books) and #feed is a HUD strip that is up while the panel
+     is CLOSED — the player is watching a driver's craft fly, and a panel over the feed would be
+     covering the thing they opened it to see. -->
+<div id="fleet" class="hidden"></div>
+<div id="feed" class="hidden"></div>
+<!-- §S2-J. The paid-off branch's door. It is its own layer and not #ending's, because the ending
+     panel is act one's and this is reached from the RECORD tab an hour later — sharing a host
+     would make "both are up" a sequencing bug instead of a layout. js/storyui.js owns it. -->
+<div id="thread" class="hidden"></div>
 
 <div id="toasts"></div>
 

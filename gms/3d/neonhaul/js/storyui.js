@@ -676,6 +676,74 @@ export class HirePanel {
 // **Both branches lose the car**, which is Aaron's call and is structural rather than flavour: the
 // hire loop is the spine of the game, so it gets built once and properly and every player arrives
 // in it. What differs is the capital you arrive with and what is on your record.
+// ── §S2-J — the thread ────────────────────────────────────────────────────
+//
+// The paid-off branch's door, and the player is the one who opens it. `js/story.js` decides when
+// the row that leads here appears; this renders the scene behind it and nothing else.
+//
+// It is deliberately SHORT. The scene is the player deciding to pull the thread, not a second
+// cutscene — Aaron's note is *"you go to him and demand to know who he borrowed from"*, which is
+// four lines and a name, and the game the player is already playing is what happens next.
+export class ThreadPanel {
+  constructor(host, hooks = {}) {
+    this.hooks = hooks;                        // { ask, close }
+    this.panel = new CabinPanel(host, { kicker: 'ACT TWO', title: 'THE CALL', closeLabel: 'LEAVE IT' });
+    this.opens = 0;
+    this.asked = false;
+  }
+
+  get open() { return this.panel.open; }
+  hide() { return this.panel.hide(); }
+
+  // `scene` is `Story.THREAD_SCENE`; `state` is the thread state. The panel opens on the DEMAND and
+  // only shows the answer once the player has pressed it, because a screen that shows the answer
+  // and a button underneath it has already answered.
+  show(scene, state) {
+    this.opens++;
+    this.asked = !!(state && state.asked);
+    this.scene = scene;
+    this._paint();
+    this.panel.show();
+    return true;
+  }
+
+  _paint() {
+    const body = this.panel.body;
+    body.innerHTML = '';
+    body.appendChild(el('div', 'th-kick', this.asked ? 'HE TOLD YOU' : 'HE IS NOT GOING TO OFFER'));
+    body.appendChild(el('p', 'en-p', this.asked
+      ? 'He gave you a place and a name and then he asked you not to use either of them.'
+      : 'He has been home a while now. He has not mentioned it once, and you have heard his name '
+        + 'twice on an open channel from people who do not sound like friends.'));
+
+    // Up to the demand while it is unasked; the whole exchange once it is.
+    const upto = this.asked ? this.scene.length : 2;
+    for (let i = 0; i < Math.min(upto, this.scene.length); i++) {
+      const row = this.scene[i];
+      const b = el('div', `th-line ${row.who}`);
+      b.appendChild(el('span', 'th-who', row.who === 'pc' ? 'YOU' : 'DAD'));
+      b.appendChild(el('span', 'th-tx', row.text));
+      body.appendChild(b);
+    }
+
+    if (!this.asked) {
+      const keys = el('div', 'th-keys');
+      const go = el('button', 'th-key demand', 'DEMAND A NAME');
+      go.addEventListener('click', () => {
+        const r = this.hooks.ask ? this.hooks.ask() : null;
+        if (r && r.ok) { this.asked = true; this._paint(); }
+      });
+      keys.appendChild(go);
+      keys.appendChild(el('span', 'th-why', 'He will not raise it himself, and it does not come up twice.'));
+      body.appendChild(keys);
+    } else {
+      body.appendChild(el('div', 'th-open',
+        'The desk under the Tallow Yard is open to you. It is a tab on your company screen now, '
+        + 'and it will be there whether or not you ever use it.'));
+    }
+  }
+}
+
 export class EndingPanel {
   constructor(host, hooks = {}) {
     this.hooks = hooks;                        // { close }

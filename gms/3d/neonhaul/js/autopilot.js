@@ -148,6 +148,12 @@ export class Courier {
     this._noProg = 0;
     this.clearance = 0;           // extra approach altitude bought by each escape
     this.dist = 0;
+    // §S2-I. A fraction of the hull's MAX_FWD, and it defaults to 1 so `?courier=1` and
+    // `__game.flyTo()` fly EXACTLY as they did before this field existed — four gate suites and
+    // `tools/courier_rate.mjs`'s 737.3 CRD/min measure against that behaviour. `js/fleet.js` sets
+    // it to `lanes.AUTO_LEVELS[n].speed`, which is the ladder S2-F measured over 4,000 trips, so a
+    // hired driver's competence is not a new number invented for the company layer.
+    this.speedCap = 1;
   }
 
   setTarget(t) {
@@ -212,7 +218,7 @@ export class Courier {
     // does not damp a held stick: `vf` is clamped to MAX_FWD while the stick is down and only
     // bleeds at DAMP_RELEASE when it is released. A proportional stick would cruise at MAX_FWD all
     // the way onto the pad. Release distance is v / DAMP_RELEASE ≈ v / 4.5, hence the 0.35 slope.
-    const wantSpeed = clamp(d * 0.35, 0, flight.maxFwd);
+    const wantSpeed = clamp(d * 0.35, 0, flight.maxFwd * this.speedCap);
     const arrived = d < 7;
     this.leg = arrived ? 'settle' : d > 220 ? 'cruise' : 'approach';
     if (!arrived && flight.speed < wantSpeed) { i.moveY = -1; i.moveActive = true; }
@@ -248,7 +254,7 @@ export class Courier {
 
   state() {
     return { leg: this.leg, dist: +this.dist.toFixed(1), escapes: this.escapes,
-      escaping: this._esc > 0, clearance: this.clearance,
+      escaping: this._esc > 0, clearance: this.clearance, speedCap: this.speedCap,
       noProgress: +this._noProg.toFixed(1), best: this._best === Infinity ? null : +this._best.toFixed(1),
       target: this.target };
   }

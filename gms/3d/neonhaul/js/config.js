@@ -35,6 +35,11 @@ const HIGH = {
   // number the frame budget actually moves on — see js/posters.js.
   posterChannels: 4,
   posterVideo: 2,
+  // S2-H street level: what fraction of the per-district street-trade roll survives. This is the
+  // INSTANCE count, and the instances are almost free; what the frame budget actually moves on is
+  // `shopRange`, the distance inside which a blind may open and the room behind it be evaluated.
+  shopDensity: 1.0,
+  shopRange: [58, 100],
   minimapFps: 15,
   shafts: 4,
   zonesDrawn: 3,
@@ -68,6 +73,10 @@ const LOW = {
   // decode entirely. A weak phone is exactly where a stalled decode is felt.
   posterChannels: 2,
   posterVideo: 0,
+  // A weak phone keeps the lit frontage — it is the cheap half — and gets the interiors only when
+  // it is close enough that they are most of the screen anyway.
+  shopDensity: 0.62,
+  shopRange: [34, 58],
   minimapFps: 8,
   shafts: 1,
   zonesDrawn: 2,
@@ -269,7 +278,7 @@ export const CRAFT_DEFAULT = 'wisp';
 // and §7.1's rule is that **colour is never the only identifier** — six types including green, red
 // and amber is unusable for ~8 % of male players, and the glyph closes that at zero cost. One
 // table, so a zone dot, a HUD marker and a panel can never disagree about what a DROP looks like.
-// `RUSH`, not `HOT`: there is no heat system (DECISIONS decision 6).
+// `RUSH`, not `HOT`: there is no exposure system (DECISIONS decision 6).
 export const ZONE_TYPES = {
   PICKUP:   { color: 0x35d6e8, glyph: '▽', label: 'PICKUP' },
   DROP:     { color: 0x6cff9c, glyph: '△', label: 'DROP' },
@@ -387,6 +396,26 @@ function parseFlags(search) {
     story: q.has('story') ? q.get('story') : null,
     // Wind the debt clock on. ?debt=80 puts 80 minutes of play on the meter.
     debt: q.has('debt') ? num('debt', null) : null,
+    // §S2-I. `?fleet=2` opens the company layer and puts two drivers on the books immediately, so
+    // a gate does not have to play act one to reach it. It does NOT grant money, and it does not
+    // skip the signing fees — main.js hires through `company.hire()` exactly as the panel does, so
+    // what a gate measures is the shipped transaction and not a fixture.
+    fleet: q.has('fleet') ? num('fleet', 0) : null,
+    // The fleet's lifetime gross, for reaching a company tier without earning it. Same reason
+    // ?crd= exists.
+    cogross: q.has('cogross') ? num('cogross', 0) : null,
+    // §S2-J. `?shady=1` opens the off-book branch the way the story opens it — through
+    // `Story.askDad` and `Company.openBranch` — rather than by setting a flag on one charter, so a
+    // gate meets the state a player would reach and not a shortcut past the door.
+    shady: q.has('shady') ? (q.get('shady') !== '0' && q.get('shady') !== 'false') : false,
+    // The charter's exposure, 0..1, for reaching a band without running twenty deliveries off the books.
+    // It moves the same field a run moves and nothing else — the costs, the bust chance and the
+    // suspension threshold are all read off it by the shipped functions.
+    exposure: q.has('exposure') ? num('exposure', 0) : null,
+    // How many EXTRA charters to register at boot, for the multi-company layout. They are founded
+    // through `Company.foundCompany`, fee and all; the flag tops the account up first, exactly as
+    // ?fleet= does for signing fees, and says so.
+    cos: q.has('cos') ? num('cos', 1) : null,
   };
 }
 

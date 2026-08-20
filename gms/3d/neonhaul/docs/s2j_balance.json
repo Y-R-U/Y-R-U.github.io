@@ -1,0 +1,407 @@
+{
+ "seeds": 12,
+ "minutes": 90,
+ "roster": [
+  {
+   "grade": 2,
+   "craft": "lance"
+  },
+  {
+   "grade": 1,
+   "craft": "lance"
+  },
+  {
+   "grade": 1,
+   "craft": "lance"
+  },
+  {
+   "grade": 0,
+   "craft": "lance"
+  }
+ ],
+ "burstCeil": 0.2,
+ "exposure": {
+  "PER_RUN": 0.014,
+  "DECAY_S": 900,
+  "WATCH": 0.2,
+  "FLAG": 0.55,
+  "PAY": 1.7,
+  "BUST_BASE": 0.04,
+  "BUST_SLOPE": 0.26,
+  "BUST_ADD": 0.05,
+  "FINE_MULT": 2.5,
+  "SUSPEND_S": 240,
+  "SUSPEND_RESET": 0.55,
+  "LEGIT_FLOOR": 0.55,
+  "WAGE_TOP": 1.3
+ },
+ "shadyTiers": [
+  {
+   "rung": 1,
+   "name": "SMOKE",
+   "at": 0,
+   "blurb": "a face at a pad, no name on anything"
+  },
+  {
+   "rung": 2,
+   "name": "EARNER",
+   "at": 12000,
+   "blurb": "they call you when something has to move quietly"
+  },
+  {
+   "rung": 3,
+   "name": "FIXER",
+   "at": 45000,
+   "blurb": "you are the one who knows who to ask"
+  },
+  {
+   "rung": 4,
+   "name": "BROKER",
+   "at": 120000,
+   "blurb": "other people’s runs go through your desk"
+  },
+  {
+   "rung": 5,
+   "name": "QUIET PARTNER",
+   "at": 280000,
+   "blurb": "a share of something you are never seen at"
+  },
+  {
+   "rung": 6,
+   "name": "THE HOUSE",
+   "at": 600000,
+   "blurb": "the room takes its cut before anyone is paid"
+  }
+ ],
+ "foundFee": {
+  "BASE": 3000,
+  "STEP": 2.4
+ },
+ "table": [
+  {
+   "policy": "clean",
+   "n": 12,
+   "netP10": 215.7,
+   "netP50": 264.3,
+   "netP90": 339.7,
+   "netMean": 278.7,
+   "fullP50": 177.1,
+   "signing": 7850,
+   "charterP50": 168087.5,
+   "shadyP50": 0,
+   "runs": 0,
+   "bustRate": 0,
+   "fines": 0,
+   "lostLegit": 0,
+   "wages": 141300,
+   "founding": 3000,
+   "hired": 4,
+   "tierA": 3.8,
+   "suspensions": 0,
+   "suspendedFrac": 0,
+   "exposureMean": 0,
+   "exposurePeak": 0,
+   "exposureAPeak": 0,
+   "markedShare": 0
+  },
+  {
+   "policy": "one_off",
+   "n": 12,
+   "netP10": 432.4,
+   "netP50": 472.5,
+   "netP90": 650.7,
+   "netMean": 496.7,
+   "fullP50": 385.3,
+   "signing": 7850,
+   "charterP50": 100273.5,
+   "shadyP50": 103189.5,
+   "runs": 79,
+   "bustRate": 0.1,
+   "fines": 14966,
+   "lostLegit": 1242,
+   "wages": 142362,
+   "founding": 3000,
+   "hired": 4,
+   "tierA": 3,
+   "suspensions": 0,
+   "suspendedFrac": 0,
+   "exposureMean": 0.2,
+   "exposurePeak": 0.3,
+   "exposureAPeak": 0.3,
+   "markedShare": 0
+  },
+  {
+   "policy": "two_off",
+   "n": 12,
+   "netP10": -184.9,
+   "netP50": 47,
+   "netP90": 372.1,
+   "netMean": 44.1,
+   "fullP50": -40.2,
+   "signing": 7850,
+   "charterP50": 52945,
+   "shadyP50": 153057,
+   "runs": 140,
+   "bustRate": 0.2,
+   "fines": 45187,
+   "lostLegit": 8085,
+   "wages": 154196,
+   "founding": 3000,
+   "hired": 4,
+   "tierA": 2,
+   "suspensions": 0,
+   "suspendedFrac": 0,
+   "exposureMean": 0.4,
+   "exposurePeak": 0.6,
+   "exposureAPeak": 0.6,
+   "markedShare": 0.75
+  },
+  {
+   "policy": "all_off",
+   "n": 12,
+   "netP10": -1078,
+   "netP50": -635.8,
+   "netP90": -350.4,
+   "netMean": -695.7,
+   "fullP50": -723,
+   "signing": 7850,
+   "charterP50": 0,
+   "shadyP50": 206472,
+   "runs": 222,
+   "bustRate": 0.2,
+   "fines": 92063,
+   "lostLegit": 13571,
+   "wages": 169878,
+   "founding": 3000,
+   "hired": 4,
+   "tierA": 1,
+   "suspensions": 2,
+   "suspendedFrac": 0.1,
+   "exposureMean": 0.7,
+   "exposurePeak": 1,
+   "exposureAPeak": 1,
+   "markedShare": 1
+  },
+  {
+   "policy": "burst",
+   "n": 12,
+   "netP10": 319.8,
+   "netP50": 420.9,
+   "netP90": 601.9,
+   "netMean": 441.5,
+   "fullP50": 333.6,
+   "signing": 7850,
+   "charterP50": 113064.5,
+   "shadyP50": 83287,
+   "runs": 79,
+   "bustRate": 0.1,
+   "fines": 13627,
+   "lostLegit": 918,
+   "wages": 141635,
+   "founding": 3000,
+   "hired": 4,
+   "tierA": 3,
+   "suspensions": 0,
+   "suspendedFrac": 0,
+   "exposureMean": 0.2,
+   "exposurePeak": 0.3,
+   "exposureAPeak": 0.3,
+   "markedShare": 0
+  },
+  {
+   "policy": "shell",
+   "n": 12,
+   "netP10": 146.3,
+   "netP50": 346.7,
+   "netP90": 512.3,
+   "netMean": 327.1,
+   "fullP50": 259.5,
+   "signing": 7850,
+   "charterP50": 101262.5,
+   "shadyP50": 97570.5,
+   "runs": 79,
+   "bustRate": 0.1,
+   "fines": 20737,
+   "lostLegit": 0,
+   "wages": 141967,
+   "founding": 10200,
+   "hired": 4,
+   "tierA": 3,
+   "suspensions": 0,
+   "suspendedFrac": 0,
+   "exposureMean": 0.1,
+   "exposurePeak": 0.4,
+   "exposureAPeak": 0,
+   "markedShare": 0.08
+  },
+  {
+   "policy": "shell2",
+   "n": 12,
+   "netP10": 118.3,
+   "netP50": 278.6,
+   "netP90": 481.4,
+   "netMean": 284,
+   "fullP50": 191.4,
+   "signing": 7850,
+   "charterP50": 60877.5,
+   "shadyP50": 163704.5,
+   "runs": 140,
+   "bustRate": 0.1,
+   "fines": 29816,
+   "lostLegit": 0,
+   "wages": 142035,
+   "founding": 27480,
+   "hired": 4,
+   "tierA": 2.6,
+   "suspensions": 0,
+   "suspendedFrac": 0,
+   "exposureMean": 0.1,
+   "exposurePeak": 0.4,
+   "exposureAPeak": 0,
+   "markedShare": 0.08
+  }
+ ],
+ "ladder": [
+  {
+   "arm": "clean",
+   "n": 12,
+   "netP50": 143.1,
+   "hired": 3,
+   "onCharter": 3,
+   "tier": 3,
+   "charterP50": 112075,
+   "shadyP50": 0,
+   "exposureA": 0,
+   "companies": 1
+  },
+  {
+   "arm": "last_off",
+   "n": 12,
+   "netP50": 300.5,
+   "hired": 3,
+   "onCharter": 3,
+   "tier": 3,
+   "charterP50": 72564,
+   "shadyP50": 49169.5,
+   "exposureA": 0.3,
+   "companies": 1
+  },
+  {
+   "arm": "first_off",
+   "n": 12,
+   "netP50": 359.4,
+   "hired": 1,
+   "onCharter": 1,
+   "tier": 1,
+   "charterP50": 0,
+   "shadyP50": 103189.5,
+   "exposureA": 0.3,
+   "companies": 1
+  },
+  {
+   "arm": "shell",
+   "n": 12,
+   "netP50": 252.6,
+   "hired": 4,
+   "onCharter": 3,
+   "tier": 3,
+   "charterP50": 112075,
+   "shadyP50": 62322.5,
+   "exposureA": 0,
+   "companies": 2
+  }
+ ],
+ "ladderStart": 20000,
+ "checks": [
+  {
+   "name": "a pure off-book policy is NOT the best policy",
+   "pass": true,
+   "detail": "best net/min p50 is one_off at 472.5; all_off is -635.8"
+  },
+  {
+   "name": "the branch is worth having — some off-book policy beats clean",
+   "pass": true,
+   "detail": "clean 264.3; beaten by one_off 472.5, burst 420.9, shell 346.7, shell2 278.6"
+  },
+  {
+   "name": "off-book gross does not climb the CHARTER ladder",
+   "pass": true,
+   "detail": "charter gross p50 — clean 168087.5, all_off 0 (0 % of it)"
+  },
+  {
+   "name": "running everything off the books gets the charter suspended",
+   "pass": true,
+   "detail": "suspensions per 90 min — all_off 2, burst 0, clean 0"
+  },
+  {
+   "name": "a shell charter keeps the legit charter cool, and that is what a second company buys",
+   "pass": true,
+   "detail": "legit charter's PEAK exposure — shell 0 (WATCH is 0.2), one_off 0.3. The SAME driver (roster slot 0) is running in both arms; the only difference is which charter they are registered to."
+  },
+  {
+   "name": "the shell is priced, and what it buys is a legit charter with NOTHING on its file",
+   "pass": true,
+   "detail": "legit pay lost to exposure — shell 0, one_off 1242\n      legit charter's peak file — shell 0, one_off 0.3\n      founding fees paid — shell 10200, one_off 3000\n      NET is deliberately NOT asserted here: shell 346.7 vs one_off 472.5 against a p10-p90 spread of 366 on the shell arm alone — the difference is smaller than its own noise and is reported, not banked"
+  },
+  {
+   "name": "a shell can never hold more than one driver, and that is a consequence not a rule",
+   "pass": true,
+   "detail": "a charter with 5,000,000 CRD of OFF-BOOK gross and 900 deliveries on it has driverCap 1 — still SOLE TRADER, because TWO-HANDED needs 18000 of CHARTER gross and a run does not produce any"
+  },
+  {
+   "name": "running the branch on your ONLY charter costs you the driver cap, and that compounds",
+   "pass": true,
+   "detail": "after 90 min from SOLE TRADER — clean reached charter tier 3 with 3 drivers hired; first_off reached tier 1 with 1. The cap is a company tier, company tiers are reached on CHARTER gross, and a run produces none — so the naive policy freezes its own fleet."
+  },
+  {
+   "name": "a shell buys a hull the charter’s own cap could not have carried",
+   "pass": true,
+   "detail": "shell ends with 4 drivers across 2 charters against clean's 3 across 1; its legit charter still reached tier 3 (clean 3) with a file reading 0. last_off, which runs the same one driver on the ONE charter, ends at tier 3 with a file of 0.3."
+  }
+ ],
+ "pacing": [
+  {
+   "rung": 1,
+   "name": "SMOKE",
+   "at": 0,
+   "minsTotal": 0,
+   "minsFromPrev": 0
+  },
+  {
+   "rung": 2,
+   "name": "EARNER",
+   "at": 12000,
+   "minsTotal": 7,
+   "minsFromPrev": 7
+  },
+  {
+   "rung": 3,
+   "name": "FIXER",
+   "at": 45000,
+   "minsTotal": 26,
+   "minsFromPrev": 19
+  },
+  {
+   "rung": 4,
+   "name": "BROKER",
+   "at": 120000,
+   "minsTotal": 71,
+   "minsFromPrev": 44
+  },
+  {
+   "rung": 5,
+   "name": "QUIET PARTNER",
+   "at": 280000,
+   "minsTotal": 165,
+   "minsFromPrev": 94
+  },
+  {
+   "rung": 6,
+   "name": "THE HOUSE",
+   "at": 600000,
+   "minsTotal": 353,
+   "minsFromPrev": 188
+  }
+ ],
+ "at": "2026-08-20T06:01:29.776Z"
+}

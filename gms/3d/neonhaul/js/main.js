@@ -41,7 +41,10 @@ import { Minimap } from './minimap.js';
 import { UI, DockUI, CabinPanel, holdFor, CHATTER_MULT } from './ui.js';
 import * as Ranks from './ranks.js';
 import * as Story from './story.js';
-import { IntroScene, HirePanel, EndingPanel, StoryVoice, SCRIPT as STORY_SCRIPT } from './storyui.js';
+import { IntroScene, HirePanel, EndingPanel, StoryVoice, SCRIPT as STORY_SCRIPT, ThreadPanel } from './storyui.js';
+import * as Company from './company.js';
+import { Fleet } from './fleet.js';
+import { FleetPanel, DriverFeed } from './companyui.js';
 import { ClientPanel, captureBlur } from './dock.js';
 // P7a (§7). zones.js's analytic half is node-clean; createZoneVisuals takes THREE as an argument.
 import { ZoneField, createZoneVisuals, KIND, VOLUME } from './zones.js';
@@ -663,7 +666,11 @@ if (cityR && !scenario) {
     // §S2-E — the cabin's HIRE key. Aaron: *"Extending a hire happens from inside the cabin ...
     // The player must never have to fly somewhere to keep the meter running."* So this opens the
     // panel wherever the craft is, in the air or on a pad, and it is the same panel the dock uses.
-    tapBtn(hireBtn, () => { if (!hireBtn.disabled) hirePanel?.toggle(story && story.hire ? 'extend' : 'ground'); });
+    tapBtn(hireBtn, () => {
+      if (hireBtn.disabled) return;
+      fleetPanel?.hide();
+      hirePanel?.toggle(story && story.hire ? 'extend' : 'ground');
+    });
     // §S2-F. Pressing a LIT key stops the pilot; pressing the other one re-routes without a stop
     // in between, because "cancel then engage" is two presses for one intention.
     // The SAME seed traffic.js is built with, not WORLD_SEED: the corridor phases are a function
@@ -766,6 +773,10 @@ if (cityR) {
 function cockpitShown() {
   if (!cockpit) return false;
   if (cockpitForced !== null) return cockpitForced;
+  // §S2-I. While the player is watching a driver, the dash is OFF. Every instrument on it reads
+  // the player's own craft — speed, altitude, cell, job, the warmth gauge — and none of them
+  // describe what is on screen. `#feed` carries that driver's telemetry instead.
+  if (viewing) return false;
   if (mode === 'shot') return !!(scenario && scenario.hud && rigModeForShot() === 'cockpit');
   if (mode === 'fly' || mode === 'auto') return rig ? rig.mode === 'cockpit' : false;
   return false;
@@ -833,7 +844,17 @@ if (cityR && Game.zones) {
     // §S2-E. The dock's HIRE key opens the SAME panel the cabin key does — hiring from a pad and
     // extending from the cabin are one transaction with two doors, and two screens for it would
     // be two screens to keep in step.
-    hire: () => { hirePanel?.show(Story.grounded(story) ? 'ground' : 'extend'); return null; },
+    hire: () => { fleetPanel?.hide(); hirePanel?.show(Story.grounded(story) ? 'ground' : 'extend'); return null; },
+    // §S2-I. The FLEET key hands off to the SAME panel the roster, the agency list and the books
+    // live on, so there is one company screen in the game and not three that drift.
+    // The hire panel goes down first. Both are `.cabin-layer`s at z 40 and a GROUNDED player is
+    // exactly the player who has both to open — S2-E's own note says two of its layers can
+    // legitimately be up at once — but two centred panels over two stacked backdrops reads as a
+    // rendering fault rather than as two screens.
+    fleet: () => { hirePanel?.hide(); threadPanel?.hide(); fleetPanel?.show(); return null; },
+    // §S2-J. The one row that leads into the thread, on the screen the player already reads. It is
+    // there only because two remarks landed on the chatter channel and they noticed.
+    askDad: () => { fleetPanel?.hide(); hirePanel?.hide(); openThread(); return null; },
   }, { paths: clientPaths });
   // `?courier=1` is a soak, not a gate: it WANTS the boot dock, because §7.4.9's scripted opener
   // only exists on the HUB board and the run starts on the HUB deck.
@@ -869,6 +890,7 @@ function persist() {
   S().borrowed = !!Game.economy.borrowed;
   S().flags = (Game.economy.flags || []).slice();
   if (story) S().story = Story.toSave(story, simTime);
+  if (group) S().company = Company.groupToSave(group, simTime);
   checkStanding();
   save();
 }
@@ -890,6 +912,19 @@ checkStanding(true);
 
 let story = null;
 let introScene = null, hirePanel = null, endingPanel = null, storyVoice = null;
+// §S2-I — the company layer. Declared HERE with the other forward `let`s and not beside its own
+// build block, for the reason this file has now paid for four times: `updateVehicles()` and
+// `craftShown()` both read `viewing` and they run well above where the company is built, and a
+// `let` read before its declaration THROWS rather than reading undefined.
+let company = null, fleet = null, fleetPanel = null, driverFeed = null;
+// §S2-J. `group` is the registry — every charter the player holds — and `company` is whichever one
+// the screens are showing. `company` stays the name every S2-I call site already uses, so the only
+// thing that changed for them is that it can now be null (before the first charter is founded) and
+// can be swapped by the chip strip.
+let group = null, threadPanel = null;
+let remarkAcc = 0;
+let viewing = null;                  // the driver whose craft the camera is on, or null
+let fleetPaintAcc = 0, companyPersistAcc = 0, fleetLabelAcc = 0;
 // The needle the dash draws, which is NOT the raw pace signal. See hudData().
 let warmthShown = null;
 // A lapsed hire limps at §7.4.3's tow speed. Tracked here rather than read per frame so syncCraft()
@@ -1009,6 +1044,365 @@ if (Game.economy && !FLAG.shot) {
     },
   });
   storyVoice = new StoryVoice({ audio: null, base: './', onError: (k, m) => reportAudio(k, m) });
+}
+
+// ── §S2-I — the company layer ─────────────────────────────────────────────
+//
+// Aaron: *"a later enhancement ... will open up the ability to hire more drivers - and you will be
+// able to switch to their vehicle views, you will be paying wages (automatically) and there would
+// be earnings screens etc."*
+//
+// Four things and one module each. `js/company.js` is the money (pure, node-runnable, swept by
+// `tools/sim_s2i.mjs`); `js/fleet.js` is the flying (a `Courier` at the stick of a real `Flight`);
+// `js/companyui.js` is the screens; this block is the wiring, and it decides nothing.
+//
+// **It opens after act one**, because that is where the brief puts it: the player has lost the car
+// either way and is on hires, and a business is what act two is about. `?fleet=n` opens it for a
+// gate without playing 84 minutes to get there.
+function companyOpen() {
+  if (FLAG.fleet !== null) return true;
+  return !!story && story.stage === Story.STAGE.ACT2;
+}
+
+function buildCompany() {
+  // §S2-J. The save is a GROUP now. `groupFromSave` recognises a v1 profile — one company written
+  // flat, which is every build before this phase — by the absence of its version field and wraps it
+  // as an unnamed founding charter, so an S2-I save keeps its fleet and its money.
+  group = Company.groupFromSave(S().company, simTime);
+  // A gate or a flag that wants a company without playing act two gets one, founded through the
+  // shipped transaction. `?fleet=n` implies it, because there is nowhere to put a driver otherwise.
+  if ((FLAG.fleet !== null || FLAG.cogross !== null || FLAG.shady) && !group.companies.length) {
+    Game.economy.credits += Company.foundFee(group);
+    Company.foundCompany(group, Game.economy, Company.suggestName(group), simTime);
+  }
+  company = Company.activeCompany(group);
+  if (FLAG.cogross !== null && company) company.gross = Math.max(0, FLAG.cogross | 0);
+  // `?shady=1` opens the door the way the story opens it — through `Company.openBranch` — rather
+  // than by setting the flag on one charter, so a gate meets the same state a player would.
+  if (FLAG.shady && story) {
+    story.thread.cue = true;
+    Story.askDad(story, simTime);
+    Company.openBranch(group, simTime);
+  }
+  if (FLAG.exposure !== null && company) {
+    company.exposure = Math.max(0, Math.min(1, +FLAG.exposure));
+    company.exposurePeak = Math.max(company.exposurePeak, company.exposure);
+  }
+  if (city && Game.zones) {
+    fleet = new Fleet({ zones: Game.zones, city, clients: clientData, seed: city.seed });
+    fleet.spawn = spawnPadFor();
+    fleet.sync(group);
+  }
+  // `?fleet=n` hires n drivers through the SHIPPED transaction — signing fees, cap check and all —
+  // rather than pushing records onto the roster. A fixture that skips `company.hire()` would let a
+  // gate pass while the only path a player has is broken.
+  if (FLAG.fleet && company) {
+    const want = Math.max(1, Math.min(FLAG.fleet | 0, Company.CANDIDATES));
+    // The CAP is a company tier, and hiring four drivers on a SOLE TRADER charter is refused by
+    // `company.hire()` exactly as it would be for a player. So the flag winds the ladder on far
+    // enough to allow what it asked for — and it says so by moving the same field the game moves,
+    // rather than by bypassing the check that would otherwise catch a real bug.
+    const need = Company.COMPANY_TIERS.filter(t => t.cap >= want).map(t => t.gross).sort((a, b) => a - b)[0];
+    if (need !== undefined && company.gross < need) company.gross = need;
+    const list = Company.candidates(company);
+    for (let i = 0; i < Math.min(want, list.length); i++) {
+      const fee = Company.signingFee(list[i].grade, 'wisp');
+      if (Game.economy.credits < fee) Game.economy.credits += fee;
+      Company.hire(company, Game.economy, list[i], 'wisp', simTime, group);
+    }
+    fleet?.sync(group);
+  }
+  // §S2-J. `?cos=2` registers that many EXTRA charters, through the shipped transaction. The fee
+  // rises 2.4x per charter, so the flag tops the account up first — exactly as ?fleet= does for
+  // signing fees — and any measurement that reads an absolute balance rather than a delta is
+  // reading the fixture.
+  if (FLAG.cos) {
+    for (let i = 0; i < Math.max(0, FLAG.cos | 0) && group.companies.length < Company.GROUP_MAX; i++) {
+      const fee = Company.foundFee(group);
+      if (Game.economy.credits < fee) Game.economy.credits += fee;
+      Company.foundCompany(group, Game.economy, Company.suggestName(group), simTime);
+    }
+    group.active = 0;
+    company = Company.activeCompany(group);
+  }
+  return company;
+}
+
+// Where a new hire's craft appears: the pad the player is standing on, or the hub. A driver that
+// spawned at the world origin would be flying in from three kilometres away on their first wage.
+function spawnPadFor() {
+  if (dockPad) return { x: dockPad.x, y: dockPad.y, z: dockPad.z };
+  if (Game.zones) {
+    const hub = Game.zones.padAt(...Game.zones.hubChunk);
+    if (hub) return { x: hub.x, y: hub.y, z: hub.z };
+  }
+  return { x: Game.player.x, y: Game.player.y, z: Game.player.z };
+}
+
+function fleetState() {
+  return {
+    econ: Game.economy, company, group, now: simTime,
+    ledger: company ? Company.ledger(company, simTime) : null,
+    groupLedger: group ? Company.groupLedger(group, simTime) : null,
+    statuses: fleet ? fleet.statuses() : {},
+    viewing,
+    // The feed is offered only from a pad. Watching a driver moves the camera — and with it the
+    // city streamer — kilometres from the player's own hull, which is free while they are parked
+    // and is flying blind while they are not.
+    docked: !!dockPad,
+  };
+}
+
+function doFleetHire(cand, craftId) {
+  if (!company || !Game.economy) return null;
+  const r = Company.hire(company, Game.economy, cand, craftId, simTime, group);
+  if (r.ok) {
+    fleet.spawn = spawnPadFor();
+    fleet.sync(group);
+    audio?.payment();
+    toast(`${cand.name.toUpperCase()} SIGNED · ${r.fee} CRD · ${r.wage.total} CRD/min`, 'pay', 4600);
+    persist();
+    return { ok: true, note: `${cand.name} is on the payroll from now, not from their first delivery.` };
+  }
+  return { ok: false,
+    note: r.why === 'credits' ? `Short by ${r.short} CRD on the signing fee.`
+      : r.why === 'cap' ? `A ${Company.companyTier(company.gross).name} may run ${r.cap}.`
+        : r.why === 'fleetcap' ? `${r.cap} hulls in the air is all the registry allows across every charter.`
+          : r.why === 'unknown' ? 'No such hull on the lot.' : 'Not available.' };
+}
+
+function doFleetRelease(id) {
+  if (!company) return null;
+  const d = Company.findDriver(company, id);
+  const r = Company.release(company, id, 'released');
+  if (!r.ok) return { ok: false, note: 'Nobody by that name.' };
+  if (viewing === id) viewDriver(null);
+  fleet.sync(group);
+  toast(`${(d ? d.name : 'DRIVER').toUpperCase()} RELEASED`, 'warn', 3800);
+  persist();
+  return { ok: true, note: 'The signing fee does not come back.' };
+}
+
+function doFleetRefresh() {
+  if (!company || !Game.economy) return null;
+  const r = Company.refreshCandidates(company, Game.economy);
+  if (!r.ok) return { ok: false, note: `Short by ${r.short} CRD.` };
+  persist();
+  return { ok: true, note: '' };
+}
+
+// ── §S2-J — founding, switching, and the off-book switch ──────────────────
+//
+// Aaron: *"at some point you would need to start a company for your employees to work under ... at
+// some point it won't be just a single company - you may own multiple."*
+//
+// All four of these are wiring: `js/company.js` decides, `js/companyui.js` renders, and the only
+// thing here is which one to call and what to say afterwards.
+function doFound(name) {
+  if (!group || !Game.economy) return null;
+  const r = Company.foundCompany(group, Game.economy, name, simTime);
+  if (!r.ok) {
+    return { ok: false,
+      note: r.why === 'credits' ? `Short by ${r.short} CRD on the registration.`
+        : r.why === 'max' ? `${r.max} charters is all the registry will carry.`
+          : r.why === 'name' ? 'You already hold a charter by that name.' : 'Refused.' };
+  }
+  company = Company.activeCompany(group);
+  fleet?.sync(group);
+  audio?.payment();
+  toast(`${r.name} REGISTERED · ${r.fee} CRD`, 'pay', 5200);
+  persist();
+  return { ok: true, note: `${r.name} is on the registry. It opens at `
+    + `${Company.COMPANY_TIERS[0].name}, which is one driver.` };
+}
+
+function doPickCompany(i) {
+  if (!group) return null;
+  const n = Math.max(0, Math.min(group.companies.length - 1, i | 0));
+  group.active = n;
+  company = Company.activeCompany(group);
+  persist();
+  return { ok: true, note: '' };
+}
+
+// Which side of the books a driver's next delivery goes on. It is a per-driver switch and not a
+// company mode on purpose: "one of the four is running for them" is the interesting shape, because
+// the exposure lands on the CHARTER and therefore on the other three.
+function doOffBook(id, on) {
+  if (!company) return null;
+  const d = Company.findDriver(company, id);
+  if (!d) return { ok: false, note: 'Nobody by that name.' };
+  if (Company.suspended(company, simTime)) {
+    return { ok: false, note: 'The charter is suspended. Nothing is moving through this desk.' };
+  }
+  d.offBook = !!on;
+  persist();
+  return { ok: true, note: on
+    ? `${d.name} takes their next load off the manifest. It pays `
+      + `${Company.EXPOSURE.PAY.toFixed(2)}× and it goes on the charter's file.`
+    : `${d.name} is back on the books.` };
+}
+
+function doPlayerOffBook(on) {
+  if (!company) return null;
+  if (Company.suspended(company, simTime)) {
+    return { ok: false, note: 'The charter is suspended. Nothing is moving through this desk.' };
+  }
+  company.playerOffBook = !!on;
+  persist();
+  return { ok: true, note: on
+    ? 'What you deliver is settled at the desk now. If it is seized you pay for it yourself.'
+    : 'Back on the manifest.' };
+}
+
+// ── the thread, and the door it opens ────────────────────────────────────
+//
+// The remarks are seeded in ORDINARY CONTENT — they go out on the same chatter ticker as the two
+// hundred radio lines, from speakers the player has been hearing for an hour, in the quiet `bg`
+// and `info` tiers. Nothing marks them. A player who is not listening never notices, and the row
+// that leads to this panel only appears because two of them landed.
+// What the RECORD tab needs to know about the other side, in one object so the surface never has to
+// reach into the story. `door` is `null` | 'cue' | 'asked' | 'seized' — see `Story.shadyDoor`.
+function threadInfo() {
+  if (!story) return null;
+  const th = story.thread || {};
+  return { door: Story.shadyDoor(story), remarks: th.remarks | 0, asked: !!th.asked,
+    shadyGross: group ? Company.groupShady(group) : 0 };
+}
+
+// The STANDING cost of running dirty. `marked` is set the first time any charter's file crosses
+// EXPOSURE.FLAG and it never clears — `js/ranks.js` says why: standing is what the city thinks of you,
+// and a charter that has once been read stays on the record whatever the gauge says afterwards.
+function markIfFlagged() {
+  if (!group || !Game.economy) return false;
+  if ((Game.economy.flags || []).includes('marked')) return false;
+  if (!group.companies.some(c => (c.exposure || 0) >= Company.EXPOSURE.FLAG)) return false;
+  Game.economy.flags = Array.from(new Set([...(Game.economy.flags || []), 'marked']));
+  toast('THE PATROL HAS A FILE ON YOU', 'bad', 6000);
+  persist();
+  return true;
+}
+
+function openThread() {
+  if (!story || !threadPanel) return null;
+  // Every centred panel is a `.cabin-layer` at the same z, so two open at once STACK — S2-I found
+  // that with the fleet and hire panels and it is the same shape here. Each puts the others down.
+  fleetPanel?.hide();
+  hirePanel?.hide();
+  threadPanel.show(Story.THREAD_SCENE, story.thread);
+  return true;
+}
+
+function doAskDad() {
+  if (!story || !group) return null;
+  const r = Story.askDad(story, simTime);
+  if (!r.ok) return r;
+  // The door, and the standing that comes with knowing. `crew_hook` is the same flag the seized
+  // branch sets — two routes into one room, which is the whole design — and it is worth 0 rungs
+  // there and here, because a contact is not a reputation.
+  Company.openBranch(group, simTime);
+  Game.economy.flags = Array.from(new Set([...(Game.economy.flags || []), 'crew_hook']));
+  toast('THE TALLOW YARD DESK', 'pay', 5600);
+  persist();
+  return r;
+}
+
+// One remark, if the story says one is due. Driven off DELIVERIES rather than a timer, so it lands
+// in the gap after a job where the player is reading the board — which is where they are actually
+// listening — and never in the middle of a manoeuvre.
+function maybeRemark(roll = Math.random()) {
+  if (!story || !ui) return null;
+  const r = Story.nextRemark(story, simTime, roll);
+  if (!r) return null;
+  const got = Story.hearRemark(story, r, simTime);
+  if (!got.remark) return null;
+  // Through the RADIO, so it is a spoken line with a squelch on it like everything else on that
+  // channel. `speak` falls back to text when the clip has not been fetched, which is what the whole
+  // ticker already does for every line whose 11 KB has not arrived yet.
+  if (radio && radio.speak) radio.speak(r.slot, { speaker: r.who, text: r.text, tag: r.tag });
+  else ui.chatter({ speaker: r.who, text: r.text, tag: r.tag });
+  if (got.cue) {
+    // The player's own voice, once, and then one row on a screen they already read. No panel opens
+    // by itself: they have to go and pull it.
+    setTimeout(() => {
+      ui.chatter({ speaker: (story.name || 'YOU'), text: Story.THREAD_CUE, tag: 'info' });
+    }, 9000);
+  }
+  persist();
+  return got;
+}
+
+// ── switching to a driver's vehicle view ──────────────────────────────────
+//
+// It reuses `js/camera.js`'s TWO rigs and adds no third one — a driver is a craft with a `Courier`
+// at the stick, so cockpit and chase already describe every viewpoint the feed needs, boom
+// collision included. `rig.setFlight()` is the whole mechanism.
+//
+// The cabin goes off while the feed is up. The dash reads the PLAYER's speed, altitude, job and
+// cell, and none of those describe what is on screen — a dashboard showing the wrong craft's
+// numbers is worse than no dashboard. `#feed` carries the driver's telemetry instead.
+function viewDriver(id) {
+  if (!rig || !flight) return null;
+  const d = id ? (fleet && fleet.find(id)) : null;
+  if (id && !d) return null;
+  viewing = d ? id : null;
+  rig.setFlight(d ? d.flight : flight);
+  if (d) driverFeed?.show(id); else driverFeed?.hide();
+  // Every centred panel goes down for the feed, for the same reason the dock board is stowed
+  // below: the player asked to watch a craft fly and a panel over it is a panel over the thing
+  // they opened. `grounded` keeps the hire panel open across a dock, so without this the first
+  // frame of act two's feed is a picture of the hire screen.
+  if (d) { hirePanel?.hide(); fleetPanel?.hide(); threadPanel?.hide(); }
+  // The feed is reached from the dock board, and the board covers the whole screen — so watching a
+  // driver from behind it would be watching a job list. `stowed` HIDES the board without closing
+  // it: `dockUI.open` stays true, the pad, the jobs and the scroll position all survive, and
+  // leaving the feed puts the player back on the screen they left. `hide()` would have thrown all
+  // of that away and dropped them into the air on undock.
+  document.getElementById('ui').classList.toggle('stowed', !!viewing);
+  document.getElementById('hud').classList.toggle('stowed', !!viewing);
+  // The flight consoles go with them. Every key on them acts on the PLAYER's craft — AUTO and HOME
+  // engage their autopilot, HIRE opens their hire panel, the collective and BOOST drive a hull that
+  // is parked on a pad three kilometres away — so over a driver feed they are at best inert and at
+  // worst a button that does something invisible. `#btn-view` and the cog stay: switching between
+  // the driver's cockpit and their chase boom is the one control the feed genuinely wants.
+  ctlEl.classList.toggle('feeding', !!viewing);
+  // The city streams around the camera (`cityR.update(camera.position, …)`), so leaving the feed
+  // has to put the camera back before the next frame or one frame renders the driver's sky over
+  // the player's pad.
+  rig.update(0, cityR);
+  return viewing;
+}
+
+// The next driver on the roster, wrapping. One key, because a fleet is at most four.
+function viewNextDriver() {
+  if (!company || !company.drivers.length) return null;
+  const ids = company.drivers.map(d => d.id);
+  const i = viewing ? ids.indexOf(viewing) : -1;
+  return viewDriver(ids[(i + 1) % ids.length]);
+}
+
+if (Game.economy && !FLAG.shot) {
+  buildCompany();
+  fleetPanel = new FleetPanel(document.getElementById('fleet'), {
+    state: fleetState,
+    hire: (cand, craftId) => doFleetHire(cand, craftId),
+    release: id => doFleetRelease(id),
+    refresh: () => doFleetRefresh(),
+    view: id => viewDriver(id),
+    // §S2-J
+    found: name => doFound(name),
+    pick: i => doPickCompany(i),
+    offBook: (id, on) => doOffBook(id, on),
+    playerOffBook: on => doPlayerOffBook(on),
+    suggest: () => Company.suggestName(group),
+  });
+  threadPanel = new ThreadPanel(document.getElementById('thread'), {
+    ask: () => doAskDad(),
+  });
+  driverFeed = new DriverFeed(document.getElementById('feed'), {
+    leave: () => viewDriver(null),
+    next: () => viewNextDriver(),
+  });
 }
 
 // ── the intro cutscene ────────────────────────────────────────────────────
@@ -1184,12 +1578,33 @@ function doDock(pad) {
     // totals against each other rather than trusting the wiring.
     if (story) for (const r of res.receipts) Story.credit(story, r.credits);
     for (const r of res.receipts) toast(`+${r.credits} CRD · ${r.client ? r.client.name : 'CLIENT'}`, 'pay', 4200);
+    // §S2-J. The PLAYER's own off-book work. The parcel has already been paid at the on-book rate
+    // by `economy.earn` — which is the licence ladder's axis and must stay exactly what it was,
+    // because running off the books does not make you a better courier — so this settles only the
+    // DIFFERENCE: the bonus on a clean run, the claw-back and the fine on a seized one.
+    if (company && Company.branchOpen(company) && company.playerOffBook) {
+      for (const r of res.receipts) {
+        const run = Company.playerRun(company, Game.economy, r.credits, simTime);
+        if (!run) continue;
+        if (run.busted) {
+          toast(`SEIZED AT THE PAD · −${run.fine} CRD`, 'bad', 6000);
+          radio?.event('police');
+        } else {
+          toast(`OFF BOOK · +${run.bonus} CRD`, 'pay', 4200);
+        }
+        if (run.suspended) toast(`${(company.name || 'CHARTER')} SUSPENDED · ${Math.round(run.suspended / 60)} MIN`, 'bad', 6400);
+      }
+      markIfFlagged();
+    }
     // S2-D: a promotion says WHAT you were promoted to. "LICENCE TIER 4" is a number the player
     // has no way to value; "LANEWRIGHT" is the thing the ladder screen shows them.
     if (res.promoted) toast(`LICENCE · ${Ranks.courierRank(res.tier).name}`, 'pay', 5200);
     audio?.payment();
     radio?.event('dispatch_pay');
     persist();
+    // A remark about the player's father, if the story says one is due. It goes out on the ordinary
+    // chatter channel among two hundred other lines and nothing marks it — see `maybeRemark`.
+    maybeRemark();
   }
   boardJobs = boardNow();
   dockUI?.show(padForPanel(pad), boardJobs, Game.economy);
@@ -1308,7 +1723,89 @@ function updateEconomy(dt, wdt) {
   if (mode === 'fly' || mode === 'auto') tickDock(dt);
   if (courier) tickCourier(dt);
   tickStory(dt);
+  tickCompany(dt);
 }
+
+// ── §S2-I's per-frame half ────────────────────────────────────────────────
+//
+// Wages are paid EVERY FRAME, not on a timer. A payroll that fires once a minute can be dodged by
+// spending in the gap, and "paid automatically" has to mean it cannot be. `fleet.tick` pays first
+// and flies second, so a driver who cannot be paid walks before they cover another metre and the
+// roster and the account agree on the same frame.
+function tickCompany(dt) {
+  if (!Game.economy || dt <= 0) return;
+  if (!companyOpen()) return;
+  // §S2-J. A registry with no charter in it is a legitimate state — it is where act two starts —
+  // and it is not the same thing as "the layer is closed". The fleet still ticks (there is nothing
+  // in it), the dock still shows the FOUND key, and nothing below reads `company`.
+  if (!group) return;
+  if (!company && group.companies.length) company = Company.activeCompany(group);
+  // The SEIZED branch's door needs nothing pulled: the crew already have a hook in you, and act two
+  // opens with the desk there. The paid-off branch reaches the same state through `doAskDad`. One
+  // predicate for both, so there is no route into the branch that bypasses `Story.shadyDoor`.
+  if (!group.shady && Story.shadyOpen(story)) Company.openBranch(group, simTime);
+  const pay = fleet ? fleet.tick(dt, simTime, cityR, group, Game.economy) : null;
+  // §S2-J. A run resolves inside `creditDelivery`, which is pure and says nothing — so the surface
+  // for it is here, and it is a toast because it is an event and not a state. A seizure is the one
+  // thing in this layer a player must not be able to miss.
+  if (fleet) {
+    for (const d of fleet.live) {
+      const r = d.lastRun;
+      if (!r) continue;
+      d.lastRun = null;
+      if (r.busted) {
+        toast(`${d.rec.name.toUpperCase()} SEIZED AT THE PAD · −${r.fine} CRD`, 'bad', 5200);
+        audio?.deny && audio.deny();
+      } else {
+        toast(`OFF BOOK · +${r.credits} CRD · ${d.rec.name.toUpperCase()}`, 'pay', 3800);
+      }
+      if (r.suspended) toast(`${(company && company.name) || 'CHARTER'} SUSPENDED · ${Math.round(r.suspended / 60)} MIN`, 'bad', 6400);
+    }
+    markIfFlagged();
+  }
+  if (pay && pay.quit.length) {
+    for (const d of pay.quit) {
+      toast(`${d.name.toUpperCase()} WALKED OUT — ${Math.round(d.arrears)} CRD of wages unpaid`, 'warn', 6000);
+      ui.chatter({ speaker: d.name.toUpperCase(), text: 'Find someone else. I do not fly for free.', tag: 'alert' });
+    }
+    if (viewing && !group.companies.some(c => Company.findDriver(c, viewing))) viewDriver(null);
+    persist();
+  }
+  // The FLEET key's caption: the payroll, or the arrears if there are any, because the second is
+  // the thing the player has to act on and the first is only news.
+  //
+  // At 2 Hz, not every frame. `setFleet` repaints the whole dock sheet when the board is open, and
+  // a caption that rebuilds the job list sixty times a second would make the board unscrollable —
+  // which is the same reason the fleet panel's own repaint is throttled.
+  fleetLabelAcc += dt;
+  if (dockUI && fleetLabelAcc > 0.5) {
+    fleetLabelAcc = 0;
+    // The key's caption is the charter's own state, and 'FOUND ONE' is a real caption and not an
+    // absence: `null` HIDES the key, and there being no company yet is exactly when the player most
+    // needs the door.
+    const L = company ? Company.ledger(company, simTime) : null;
+    const want = !L ? 'FOUND ONE'
+      : L.shady.suspended ? 'SUSPENDED'
+        : L.arrears > 0 ? `${Math.round(L.arrears)} OWED`
+          : L.count ? `${L.count}/${L.cap} · ${L.wagePerMin}/min` : 'HIRE';
+    // §S2-J. The thread's state has to be part of the change test. Without it the RECORD tab keeps
+    // whatever `thread` it was handed on the first tick — and since the FLEET key's caption does
+    // not move when a remark lands, the row that leads into the thread would never appear on a
+    // board that was already open. A stale surface that renders perfectly is the hardest kind to
+    // notice, which is why this is a signature and not a truthiness test.
+    const ti = threadInfo();
+    const sig = ti ? `${ti.door}:${ti.remarks}:${ti.shadyGross}` : '-';
+    if (want !== dockUI.fleetLabel || dockUI.company !== company || sig !== dockUI._threadSig) {
+      dockUI._threadSig = sig;
+      dockUI.setFleet(want, company, { group, thread: ti });
+    }
+  }
+  // The company banks money on its own; the profile has to follow it or a reload loses an hour of
+  // fleet earnings. Debounced by save() itself, so this is one assignment per second, not a write.
+  companyPersistAcc += dt;
+  if (companyPersistAcc > 5) { companyPersistAcc = 0; persist(); }
+}
+
 
 // §S2-E's per-frame half. Two clocks and neither of them is visible: the debt window, and the hire
 // meter. Both advance on SIM time, so a backgrounded tab (which main.js parks) does not burn either
@@ -1407,6 +1904,38 @@ function tickCourier(dt) {
   const next = zoneList.find(z => (z.kind === KIND.PAD || z.kind === KIND.HUB)
     && z.dist > 40 && z.key !== courierAvoid);
   if (next) courier.setTarget({ x: next.x, y: next.y, z: next.z });
+}
+
+// §S2-I. The two live company surfaces, repainted here rather than on their own timers — one
+// clock in the frame, frozen by `freezeTime` exactly as everything else is, so a differencing gate
+// never sees a counter tick between two captures.
+//
+// The roster's numbers move every second; a repaint every frame would be a DOM rebuild at 60 Hz
+// for a panel nobody is reading that fast. 2 Hz is fast enough that a driver's NET/MIN visibly
+// responds to a delivery and slow enough to cost nothing.
+const FLEET_HZ = 2;
+function paintFleet(dt) {
+  if (!group || dt <= 0) return;
+  // Leaving the pad leaves the feed. The view is only offered from a dock (see `fleetState`), so
+  // an undock while watching would put the player in the air with the camera three kilometres away
+  // and no dash — which is the one state this design must not be able to reach.
+  if (viewing && !dockPad) viewDriver(null);
+  if (viewing && driverFeed && fleet) {
+    const d = fleet.find(viewing);
+    // §S2-J. The driver's OWN charter, not the selected one — with three registrations the panel
+    // can be showing a different company from the one the craft on screen is on the books of, and
+    // a feed printing the wrong charter's wage premium would be a dashboard showing the wrong
+    // craft's numbers, which is the exact thing S2-I built the feed to avoid.
+    const co = d ? d.co : null;
+    const rec = co ? Company.findDriver(co, viewing) : null;
+    if (d && rec) driverFeed.update(d.status(), Company.driverLedger(rec, co));
+    else viewDriver(null);
+  }
+  if (!fleetPanel || !fleetPanel.open) return;
+  fleetPaintAcc += dt;
+  if (fleetPaintAcc < 1 / FLEET_HZ) return;
+  fleetPaintAcc = 0;
+  fleetPanel.refreshLive();
 }
 
 // ── §S2-F — AUTO and HOME ─────────────────────────────────────────────────
@@ -1596,7 +2125,10 @@ function updateHud(dt) {
   const show = cockpitShown();
   cockpit.setVisible(show);
   const inFlight = mode === 'fly' || mode === 'auto';
-  chaseHud.setVisible(inFlight && !show && !FLAG.nohud);
+  // §S2-I. The chase HUD reads the player's craft too, so it stands down for the feed for the same
+  // reason the dash does. `#feed` is the only instrument surface up while a driver is being watched.
+  chaseHud.setVisible(inFlight && !show && !FLAG.nohud && !viewing);
+  paintFleet(dt);
   // Which chat surface is live is a property of the VIEW, and there is only ever one: in the
   // cabin the dash canvas draws the ticker inside its own housing, so the DOM copy of the same
   // log stands down. One renderer (ui.js), two presentations — they cannot disagree.
@@ -1663,6 +2195,20 @@ function updateVehicles(dt, t) {
   // instanced fields everything else uses. That is why the scene adds no draw calls: seven craft
   // in shot are seven more instances of meshes that are already being drawn.
   if (introScene && introScene.active) for (const p of introScene.poses(vehT)) craftFields.write(p);
+  // §S2-I's fleet. Same four instanced fields, so four hired craft in the sky are four more
+  // INSTANCES of meshes that are already being drawn and cost zero extra draw calls — the trick
+  // §5.5 established and the intro scene above already uses. Culled by distance from the camera,
+  // which is what makes a fleet working the far side of the city free.
+  //
+  // The craft being WATCHED is skipped in cockpit view: the camera is at its origin, so drawing it
+  // would fill the frame with the inside of its own hull.
+  if (fleet && !FLAG.shot) {
+    for (const d of fleet.live) {
+      if (viewing === d.id && rig && rig.mode === 'cockpit') continue;
+      const p = d.pose(vehT, camera.position);
+      if (p) craftFields.write(p);
+    }
+  }
   if (craftShown()) {
     const p = flight && (mode === 'fly' || mode === 'auto')
       ? playerCraft.fromFlight(flight, vehT)
@@ -2172,7 +2718,7 @@ Object.defineProperty(window, '__state', {
       tier: Game.economy ? Game.economy.tier : S().tier,
       lifetime: Game.economy ? Game.economy.lifetime : S().lifetime,
       // S2-D's two ladders, so a gate reads what the game believes rather than OCRing a panel.
-      ranks: Game.economy ? Ranks.rankState(Game.economy) : null,
+      ranks: Game.economy ? Ranks.rankState(Game.economy, companyOpen() ? company : null) : null,
       // S2-E's arc, RAW. `warmth` here is story.js's signal, not the smoothed needle the dash
       // draws — a gate that read the needle would be measuring an 8 s low-pass filter and would
       // pass or fail on how long it had been sitting there.
@@ -2195,6 +2741,29 @@ Object.defineProperty(window, '__state', {
       hirePanel: hirePanel ? hirePanel.stateOf() : null,
       ending: endingPanel ? endingPanel.stateOf() : null,
       storyVoice: storyVoice ? storyVoice.state() : null,
+      // §S2-I. The company's OWN ledger, from the pure module, plus the live flight state of every
+      // driver. A gate reads the same object the panel paints from rather than OCR-ing the screen,
+      // and `statuses` comes off the flight models so "FLYING" can never be a stale mirrored field.
+      // §S2-J. The GROUP, so a gate reads the registry rather than inferring it from the one
+      // charter that happens to be selected. `null` when the layer is shut, which is a different
+      // thing from an empty registry and must stay distinguishable (T10).
+      group: group && companyOpen() ? {
+        ...Company.groupLedger(group, simTime),
+        active: group.active, shady: !!group.shady,
+        names: group.companies.map(c => c.name),
+      } : null,
+      thread: threadInfo(),
+      company: company && companyOpen() ? {
+        ...Company.ledger(company, simTime),
+        open: true, seed: company.seed, gen: company.gen,
+        candidates: Company.candidates(company),
+        statuses: fleet ? fleet.statuses() : {},
+        live: fleet ? fleet.live.length : 0,
+        viewing,
+        rigFlight: rig ? (viewing ? 'driver' : 'player') : null,
+      } : (company ? { open: false, count: company.drivers.length } : null),
+      fleetPanel: fleetPanel ? fleetPanel.stateOf() : null,
+      feed: driverFeed ? { id: driverFeed.id, shown: !document.getElementById('feed').classList.contains('hidden') } : null,
       borrowed: Game.economy ? !!Game.economy.borrowed : null,
       flags: Game.economy ? (Game.economy.flags || []).slice() : null,
       cargo: Game.economy ? Game.economy.cargo.length : 0,
@@ -2391,7 +2960,7 @@ window.__game = {
   // S2-D. `ranks()` reads; `setFlags()` is the isolation hook for the story-flag axis S2-E owns —
   // it returns the resulting rank so "there was nothing to set" is distinguishable from "it was
   // set and changed nothing" (T10).
-  ranks: () => (Game.economy ? Ranks.rankState(Game.economy) : null),
+  ranks: () => (Game.economy ? Ranks.rankState(Game.economy, companyOpen() ? company : null) : null),
 
   // ── §S2-E hooks ─────────────────────────────────────────────────────────
   // Every one of these is an OVERRIDE, not a suggestion, for the reason `setZones` is: the game
@@ -2475,7 +3044,7 @@ window.__game = {
   setFlags(list) {
     if (!Game.economy) return null;
     Game.economy.flags = Array.isArray(list) ? list.slice() : [];
-    return Ranks.rankState(Game.economy);
+    return Ranks.rankState(Game.economy, companyOpen() ? company : null);
   },
   // ── P7b (§7.3, §9.6) ─────────────────────────────────────────────────────
   get clientPanel() { return clientPanel; },
@@ -2612,6 +3181,73 @@ window.__game = {
     anisotropy: signAtlas.tex.anisotropy, colorSpace: signAtlas.tex.colorSpace } : null),
   signStats: () => (signage ? Object.assign({}, signage.stats, signage.state()) : null),
   signBreakdown: () => (signage ? signage.breakdown() : null),
+
+  // ── S2-H gates (street level) ────────────────────────────────────────────
+  // The A/B control for the whole layer, and the two overrides that make Aaron's venetian blind
+  // measurable. `setShopForce` outranks the angle/distance answer entirely — CLAUDE.md's rule is
+  // that the game loop overwrites test fixtures, so this is a uniform the shader reads every frame
+  // rather than a state a later frame could undo.
+  shopState: () => (signage ? signage.shops.state() : null),
+  setShopVisible: on => (signage ? signage.shops.setVisible(on) : false),
+  setShopForce: v => { U.uShopForce.value = v === null || v === undefined ? -1 : v; return U.uShopForce.value; },
+  setShopRange: (near, far) => { U.uShop.value.y = near; U.uShop.value.z = far; return [U.uShop.value.y, U.uShop.value.z]; },
+  // Every live shopfront's PLACEMENT record — the host prototype, its unit-space ground box, the
+  // wall normal. Only under ?debug. gates_s2h re-derives the wall from blocks.js' own box list and
+  // proves the frontage is ON it; a screenshot cannot tell you whether a shopfront is 0.12 m off a
+  // facade or 8 m off the front of a `taper` setback.
+  shopPlacements(limit = 0) {
+    if (!cityR) return [];
+    const out = [];
+    for (const rec of cityR.live.values()) {
+      if (!rec.shMeta) continue;
+      for (const m of rec.shMeta) { out.push(m); if (limit && out.length >= limit) return out; }
+    }
+    return out;
+  },
+
+  // An order-independent hash of every live shopfront, straight out of the GPU buffers. Order
+  // independent because slot indices depend on the order chunks happened to stream in, and "same
+  // seed, same shops" is a claim about the SHOPS, not about the streaming.
+  shopHash() {
+    if (!signage) return null;
+    const f = signage.shops.field, m = f.mesh.instanceMatrix.array;
+    const keys = [];
+    for (let i = 0; i < f.n; i++) {
+      let s = '';
+      for (let k = 0; k < 16; k++) s += Math.round(m[i * 16 + k] * 64) + ',';
+      for (const a of f.attrSpec) {
+        const b = f.attr[a.name].array;
+        for (let k = 0; k < a.size; k++) s += Math.round(b[i * a.size + k] * 4096) + ',';
+      }
+      keys.push(s);
+    }
+    keys.sort();
+    let h = 0x811c9dc5 >>> 0;
+    for (const s of keys) for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+    return { n: f.n, hash: ('00000000' + h.toString(16)).slice(-8) };
+  },
+
+  // Every live shopfront, with the wall it stands on, so a gate can fly to one instead of hunting.
+  shopMeta(limit = 0) {
+    if (!cityR || !signage) return [];
+    const f = signage.shops.field, m = f.mesh.instanceMatrix.array;
+    const S = f.attr.iShop.array, G = f.attr.iGlow.array, R = f.attr.iRegion.array;
+    const out = [];
+    for (let i = 0; i < f.n; i++) {
+      const o = i * 16;
+      out.push({
+        x: m[o + 12], y: m[o + 13], z: m[o + 14],
+        // the quad's local +Z after the yaw, i.e. the outward wall normal, straight off the matrix
+        nx: m[o + 8], nz: m[o + 10],
+        w: Math.hypot(m[o], m[o + 1], m[o + 2]), h: Math.hypot(m[o + 4], m[o + 5], m[o + 6]),
+        kind: S[i * 4 + 3] % 8, tube: S[i * 4 + 3] >= 8, seed: S[i * 4 + 2],
+        glow: [G[i * 3], G[i * 3 + 1], G[i * 3 + 2]],
+        reg: [R[i * 4], R[i * 4 + 1], R[i * 4 + 2], R[i * 4 + 3]],
+      });
+      if (limit && out.length >= limit) break;
+    }
+    return out;
+  },
 
   // Every live sign, with the wall it was placed against. gates_p3a re-derives the wall from
   // blocks.js' own box list and proves the sign is ON it — a screenshot cannot tell you whether a
@@ -2919,6 +3555,152 @@ window.__game = {
   // S2-D's rank tables, exposed so a gate can install a story-flag FIXTURE in the live registry
   // rather than testing a copy of the mechanism. S2-E owns the real entries.
   Ranks,
+
+  // ── §S2-I hooks ──────────────────────────────────────────────────────────
+  // The pure module and the live fleet, so a gate asserts against the same tables the panel reads
+  // rather than against a copy of them. Everything below returns `null` when the thing it drives
+  // does not exist, so "there is no company" can never be read as "the company did nothing" (T10).
+  Company,
+  get company() { return company; },
+  get fleet() { return fleet; },
+  companyOpen: () => companyOpen(),
+  ledger: () => (company ? Company.ledger(company) : null),
+  // Hire through the SHIPPED transaction — signing fee, cap check, refusal reasons and all. A hook
+  // that pushed a record onto the roster would let a gate pass while the only path a player has is
+  // broken, which is this project's whole failure mode wearing a different hat.
+  hireDriver(slot = 0, craftId = 'wisp') {
+    if (!company || !Game.economy) return null;
+    const list = Company.candidates(company);
+    const cand = list[Math.max(0, Math.min(list.length - 1, slot | 0))];
+    return doFleetHire(cand, craftId);
+  },
+  releaseDriver: id => (company ? doFleetRelease(id) : null),
+  // Hire a driver of a CHOSEN grade. The agency list is weighted (an all-ACE pool would be a shop,
+  // not a labour market), so a measurement that wants one of each grade cannot get there by
+  // re-rolling. The candidate is synthesised; the TRANSACTION is the shipped one — signing fee,
+  // cap check, refusal reasons — so what is measured is still the driver a player would have.
+  hireGrade(grade = 0, craftId = 'wisp', tag = '') {
+    if (!company || !Game.economy) return null;
+    const cand = { id: `g${grade}_${tag || company.drivers.length}`,
+      name: `${['GREEN', 'STEADY', 'SEASONED', 'ACE'][Math.max(0, Math.min(3, grade | 0))]} ${(company.drivers.length + 1)}`,
+      grade: grade | 0 };
+    return doFleetHire(cand, craftId);
+  },
+  refreshCandidates: () => (company ? doFleetRefresh() : null),
+  // The view switch, driven exactly as the roster's VIEW key drives it.
+  viewDriver: id => (fleet ? viewDriver(id) : null),
+  viewNextDriver: () => (fleet ? viewNextDriver() : null),
+  // Which flight model the camera rig is actually reading. This is the assertion that "switch to
+  // their vehicle view" is a real camera change rather than a label: `rig.flight === driver.flight`
+  // is the whole mechanism and there is nothing else to check.
+  rigTarget() {
+    if (!rig) return null;
+    const d = viewing && fleet ? fleet.find(viewing) : null;
+    return { viewing, onDriver: !!d && rig.flight === d.flight, onPlayer: rig.flight === flight,
+      mode: rig.mode, cabin: cockpitShown() };
+  },
+  // Open the panel the way the dock key opens it, and read what it is showing.
+  fleetPanel: (tab = null) => { if (!fleetPanel) return null; fleetPanel.show(tab); return fleetPanel.stateOf(); },
+
+  // ── §S2-J hooks ──────────────────────────────────────────────────────────
+  // Same rule as S2-I's: every one of these drives the SHIPPED transaction — fee, refusal reason
+  // and all — because a hook that mutated state directly would let a gate pass while the only path
+  // a player has is broken.
+  get group() { return group; },
+  groupLedger: () => (group ? Company.groupLedger(group, simTime) : null),
+  found: (name = null) => doFound(name === null ? Company.suggestName(group) : name),
+  // Register a charter the player could not afford, by topping the account up first and SAYING SO.
+  // A measurement that reads an absolute balance after this is reading the fixture.
+  foundFunded(name = null) {
+    if (!group || !Game.economy) return null;
+    const fee = Company.foundFee(group);
+    if (Game.economy.credits < fee) Game.economy.credits += fee;
+    return doFound(name === null ? Company.suggestName(group) : name);
+  },
+  pickCompany: i => doPickCompany(i),
+  setOffBook: (id, on = true) => doOffBook(id, on),
+  setPlayerOffBook: (on = true) => doPlayerOffBook(on),
+  // The FILE, straight onto the field a run moves. Everything downstream — the cost curves, the
+  // bust chance, the suspension threshold — is read off it by the shipped functions, so this is a
+  // fixture for the CAUSE and never for an effect.
+  setExposure(v, which = null) {
+    const co = which === null ? company : (group && group.companies[which | 0]);
+    if (!co) return null;
+    co.exposure = Math.max(0, Math.min(1, +v));
+    co.exposurePeak = Math.max(co.exposurePeak || 0, co.exposure);
+    markIfFlagged();
+    return Company.ledger(co, simTime).shady;
+  },
+  // Resolve ONE off-book delivery through the shipped path, at a payout the caller names. This is
+  // how a gate reaches a bust without flying twenty jobs and waiting for the dice.
+  runOnce(credits = 800, driverId = null) {
+    if (!company || !Game.economy) return null;
+    if (driverId) {
+      const d = Company.findDriver(company, driverId);
+      if (!d) return null;
+      return Company.creditDelivery(company, Game.economy, d, credits, 1, simTime);
+    }
+    return Company.playerRun(company, Game.economy, credits, simTime);
+  },
+  // The thread, driven the way the ticker drives it: `remark()` delivers the NEXT unheard remark
+  // (bypassing only the dice and the spacing, never the ordering or the count), and `askDad()` is
+  // the key the player presses.
+  remark() {
+    if (!story) return null;
+    const th = story.thread || {};
+    th.last = -1e9;                       // the spacing
+    const got = maybeRemark(0);           // and the dice — NEITHER the ordering nor the count
+    return got ? { id: got.remark.id, cue: got.cue, ...threadInfo() } : threadInfo();
+  },
+  thread: () => threadInfo(),
+  openThread: () => (threadPanel ? (openThread(), { open: threadPanel.open, opens: threadPanel.opens }) : null),
+  askDad: () => doAskDad(),
+  threadPanel: () => (threadPanel ? { open: threadPanel.open, opens: threadPanel.opens, asked: threadPanel.asked } : null),
+  Story,
+  closeFleetPanel: () => (fleetPanel ? fleetPanel.hide() : null),
+  // S2-E's hire panel opens itself on every dock while the player is GROUNDED, which is the whole
+  // of act two until they hire something. A capture or a gate that wants to see anything else on
+  // the dock has to be able to put it down.
+  closeHirePanel: () => (hirePanel ? hirePanel.hide() : null),
+  // Wind the fleet's lifetime gross on, for reaching a company tier without an hour of trading.
+  // It moves the LADDER's axis and nothing else — it does not credit the account, because the two
+  // are different quantities and a hook that moved both could not tell them apart.
+  // `minutes` is how long that gross is meant to have taken. It is not decoration: every readout
+  // on the earnings screen is a PER-MINUTE figure derived from `company.t`, so winding the gross on
+  // without winding the clock prints a fleet earning twenty thousand credits a minute. A capture of
+  // that is a capture of the fixture, not of the screen.
+  setFleetGross(n, minutes = null) {
+    if (!company) return null;
+    const add = Math.max(0, (n | 0) - company.gross);
+    company.gross = Math.max(0, n | 0);
+    if (minutes !== null) {
+      // Grant the WHOLE history, not just the income half. Every readout on the earnings screen is
+      // a per-minute figure over `company.t`, so winding the gross and the clock on while leaving
+      // the payroll where it was prints a company that grossed 784 CRD/min against a 20 CRD/min
+      // wage bill — beside a roster that says the payroll is 885. A fixture that is internally
+      // inconsistent is a fixture that makes the screen look broken when it is not.
+      const want = Math.max(0, minutes) * 60;
+      const extra = Math.max(0, want - company.t);
+      const L = Company.ledger(company, simTime);
+      const rate = L.wagePerMin / 60;
+      const paid = rate * extra;
+      company.t = Math.max(company.t, want);
+      company.wages += paid;
+      company.wagesBase += paid * 0.7;      // the split is indicative; the LIVE payroll accrues exactly
+      company.wagesLease += paid * 0.3;
+      company.fuel += (add * 0.03);         // ~3 % of gross, which is what the sweep measures
+    }
+    persist();
+    return Company.ledger(company);
+  },
+  // Drain the account to a chosen balance, so the arrears path can be reached deliberately. Not
+  // `grantCredits(-n)`: that would go through `earn()` and move lifetime.
+  setCredits(n) {
+    if (!Game.economy) return null;
+    Game.economy.credits = Math.max(0, n | 0);
+    persist();
+    return Game.economy.credits;
+  },
   // The view switch, driven the way the button drives it. Returns null when there is no rig at
   // all, so "there was nothing to switch" cannot be read as "it switched" (T10).
   toggleView: () => toggleView(),

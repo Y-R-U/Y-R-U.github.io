@@ -62,6 +62,15 @@ export const U = {
   uRoadCol: { value: new THREE.Color(0xffb066).convertSRGBToLinear() },
   // §4 again — the water film's missing view-angle term. See patchFilmFresnel.
   uFilmFres: { value: new THREE.Vector2(2.4, 0.12) },     // (exponent, floor at normal incidence)
+  // ── S2-H — street-level shopfronts (js/shops.js) ─────────────────────────
+  // (master, interior range near m, interior range far m, venetian half-band in sin(elevation)).
+  // The two ranges and the half-band ARE the venetian blind: outside either, the glass is a flat
+  // lit face and the interior is never evaluated.
+  uShop: { value: new THREE.Vector4(1, 58, 100, 0.20) },
+  // The gate's override, and like uFadeHard/uSignHard it is never a runtime option: -1 is the
+  // real angle/distance answer, 0 forces every blind SHUT and 1 forces every blind OPEN, so a
+  // gate can measure what the gate is actually buying instead of hunting for a lucky camera.
+  uShopForce: { value: -1 },
 };
 
 // onBeforeCompile is a single slot. Chaining lets a material take two patches without either
@@ -1016,6 +1025,288 @@ export function structureMaterial(env, noiseTex) {
     color: 0x0b0d12, metalness: 0.9, roughness: 0.72,
     envMap: env || null, envMapIntensity: 0.08, fog: true,
   });
+  patchFog(m, 'opaque');
+  if (noiseTex) patchFade(m, true, noiseTex);
+  return m;
+}
+
+// ── 11. S2-H — the shopfront, and Aaron's venetian blind ───────────────────
+//
+// Aaron's brief, verbatim: *"windows are just light faces except at certain angles — e.g. like a
+// venetian blind where at some angles you only see blind, other angles you can see through … this
+// would allow us not to render much other than nice lighting except when at the right distance
+// and angle"*. That is the design and this is where it lives.
+//
+// ONE QUAD IS A WHOLE SHOP. A shopfront instance is a plane W x H metres standing 0.12 m off the
+// building's ground-floor face, and everything on it — the fascia, its sign, the mullions, the
+// stall riser, the blind and the room behind the blind — is drawn per pixel inside that one quad.
+// No geometry, no second draw, no texture but the signage sheet the city already has loaded.
+//
+// THE BLIND IS THE BUDGET. `open` is the product of three gates and every one of them is zero for
+// most of the game:
+//
+//   angle     the slats are horizontal and tilted per shop; you see between them only when the
+//             ray's elevation is inside a narrow band around that tilt. Flying at 60 m over a
+//             street looks DOWN at every shopfront, so from the air every blind is shut.
+//   distance  the room fades out between uShop.y and uShop.z. A 6 m shopfront at 100 m is ~20 px.
+//   facing    a wall seen at a grazing angle is slats, exactly as a real blind behaves.
+//
+// The interior is inside `if ( open > 0.004 )`, and that branch is COHERENT — openness varies
+// smoothly across a quad and identically across every pixel of a shop you are not looking at — so
+// the closed case costs a handful of ALU and never touches the room at all. What that is WORTH is
+// unmeasured: see the note in js/shops.js. On this Mac it is worth nothing that any instrument here
+// can see, and it is shipped for the phone and for the look, not on a measurement.
+//
+// THE ROOM IS THREE PARALLAX PLANES, not box-mapped and not marched. The view ray is re-expressed
+// in the shop's own tangent frame and intersected with planes at 5.2 m, 3.0 m and 1.1 m behind the
+// glass; each plane paints its own content and the nearer ones over-paint the further. Three plane
+// intersections is nine multiply-adds, and because the three slide against each other at different
+// rates as you move it reads as depth rather than as a picture of depth.
+//
+// THE SLATS FADE BEFORE THEY ALIAS. The slat pitch is 0.11 m; at 40 m on a 390 px phone that is
+// well under a pixel, and a sub-pixel stripe pattern with no mip chain crawls. `fwidth` measures
+// the pitch in pixels and dissolves the pattern into its own mean before it can — the same
+// discipline §3.10 #1 applies to the window grid, applied to a procedural one.
+
+const SHOP_VERT_DECL = /* glsl */`
+attribute vec4 iRegion;      // the fascia sign's region in the signage sheet (top-left fractions)
+attribute vec3 iEmissive;    // fascia sign tint, linear
+attribute vec3 iGlow;        // the light INSIDE this shop, linear — one colour lights the whole room
+attribute vec4 iShop;        // (width m, height m, seed, kind)
+varying vec4 vRegion;
+varying vec3 vEmissive;
+varying vec3 vGlow;
+varying vec4 vShop;
+varying vec2 vLocal;
+varying vec3 vTanW;
+varying vec3 vNorW;
+`;
+
+// The tangent frame comes straight off the instance matrix: the quad is only ever yawed about Y,
+// so its local +X is the along-wall axis and its local +Z is the outward wall normal. Taking them
+// from the matrix rather than from a per-instance attribute is two normalises and no upload, and
+// it cannot disagree with where the quad actually is.
+const SHOP_VERT_BODY = /* glsl */`
+#include <begin_vertex>
+  vRegion = iRegion; vEmissive = iEmissive; vGlow = iGlow; vShop = iShop; vLocal = uv;
+  vTanW = normalize( instanceMatrix[0].xyz );
+  vNorW = normalize( instanceMatrix[2].xyz );
+`;
+
+const SHOP_FRAG_DECL = /* glsl */`
+varying vec4 vRegion;
+varying vec3 vEmissive;
+varying vec3 vGlow;
+varying vec4 vShop;
+varying vec2 vLocal;
+varying vec3 vTanW;
+varying vec3 vNorW;
+uniform vec4 uShop;
+uniform float uShopForce;
+uniform float uTime;
+uniform float uNeon;
+
+float shopHash( float a, float b ) { return fract( sin( a * 12.9898 + b * 78.233 ) * 43758.5453 ); }
+
+// A soft-edged box in room coordinates. Everything in the room is one of these.
+float shopBox( vec2 p, vec2 lo, vec2 hi, float soft ) {
+  vec2 a = smoothstep( lo - soft, lo + soft, p );
+  vec2 b = smoothstep( hi + soft, hi - soft, p );
+  return a.x * a.y * b.x * b.y;
+}
+`;
+
+// `gx, gy` are metres across and up the GLAZING; `d` is the view ray in the shop's tangent frame,
+// already divided by its own depth component, so travelling `t` metres into the room is a plain
+// multiply-add. `W, H` are the room's interior width and height.
+const SHOP_ROOM = /* glsl */`
+vec3 shopRoom( vec2 g, vec2 d, float W, float H, float seed, float kind, vec3 lamp ) {
+  float eatery = 1.0 - step( 2.5, kind );
+
+  // Surfaces are NEUTRAL and the LIGHT is coloured. Painting the walls with the lamp colour makes
+  // a room that reads as a coloured filter over a stripe pattern rather than as a room — the first
+  // pass did exactly that and every shop in the city was one flat hue from floor to ceiling.
+  const vec3 WALL  = vec3( 0.44, 0.42, 0.40 );
+  const vec3 FLOOR = vec3( 0.26, 0.25, 0.25 );
+  const vec3 DARK  = vec3( 0.05, 0.05, 0.055 );
+
+  // ── plane 3: the back wall, 5.2 m in ───────────────────────────────────
+  vec2 p = g + d * 5.2;
+  // Outside the room's width is a side wall; below zero is the floor. Both are much darker than
+  // the lit back wall, and that difference is what gives the opening its depth.
+  float side = smoothstep( -0.9, 0.15, p.x ) * smoothstep( W + 0.9, W - 0.15, p.x );
+  vec3 alb = mix( FLOOR, WALL, smoothstep( -0.04, 0.12, p.y ) ) * mix( 0.34, 1.0, side );
+  // one cove light along the top of the back wall, and its wash down the wall
+  float cove = smoothstep( H * 0.74, H * 0.93, p.y ) * side;
+  float wash = ( 1.0 - smoothstep( 0.0, H * 1.15, p.y ) ) * side;
+  vec3 c = alb * lamp * ( 0.42 + 0.72 * wash ) + lamp * 0.70 * cove;
+  // an eatery hangs a menu board; a store racks shelves. Same two lines, different pitch.
+  float rowPitch = mix( 0.58, 1.02, eatery );
+  c *= 1.0 - 0.18 * side * smoothstep( 0.74, 0.88, fract( p.y / rowPitch + seed ) );
+  c += lamp * side * eatery * 0.30 * shopBox( p, vec2( W * 0.20, H * 0.55 ), vec2( W * 0.80, H * 0.73 ), 0.05 );
+  // the chiller cabinet a food store always has against one wall — colder than the room light
+  c += mix( lamp, vec3( 0.45, 0.70, 0.85 ), 0.6 ) * side * ( 1.0 - eatery ) * 0.42
+     * shopBox( p, vec2( W * 0.50, 0.18 ), vec2( W * 0.94, H * 0.60 ), 0.06 );
+
+  // ── plane 2: the counter line and the people at it, 3.0 m in ───────────
+  p = g + d * 3.0;
+  float counter = shopBox( p, vec2( -0.7, -0.5 ), vec2( W + 0.7, 1.00 ), 0.04 );
+  c = mix( c, alb * lamp * 0.16, counter );
+  // the counter top catches the light above it — the line that says "this is furniture"
+  c += lamp * 0.34 * shopBox( p, vec2( -0.7, 0.92 ), vec2( W + 0.7, 1.00 ), 0.02 );
+  // Three seeded stations. A lit room with nobody in it is a diorama, and these are the single
+  // strongest read in the feature — so they are body-width, head-height, and they have a head.
+  for ( int i = 0; i < 3; i++ ) {
+    float fi = float( i );
+    float there = step( 0.36, shopHash( seed + fi * 1.9, 5.0 ) );
+    float px = ( 0.14 + 0.72 * shopHash( seed + fi * 3.7, 11.0 ) ) * W;
+    float ph = 1.46 + 0.30 * shopHash( seed + fi, 21.0 );
+    float body = shopBox( p, vec2( px - 0.30, 0.0 ), vec2( px + 0.30, ph - 0.30 ), 0.05 );
+    float head = smoothstep( 0.20, 0.13, length( vec2( p.x - px, ( p.y - ph + 0.14 ) * 1.15 ) ) );
+    c = mix( c, DARK * lamp, max( body, head ) * there );
+  }
+
+  // ── plane 1: what hangs near the glass, 1.1 m in ───────────────────────
+  p = g + d * 1.1;
+  // hanging lamps over an eatery counter; a lit display case in a store
+  float lampX = fract( p.x / 1.55 + seed * 0.7 ) - 0.5;
+  float hang = eatery * smoothstep( 0.19, 0.02, length( vec2( lampX * 1.55, p.y - ( H - 0.62 ) ) ) );
+  c += lamp * 1.60 * hang;
+  c += lamp * 0.46 * ( 1.0 - eatery ) * shopBox( p, vec2( 0.18, 0.12 ), vec2( W - 0.18, 0.82 ), 0.05 );
+  return c;
+}
+`;
+
+const SHOP_FRAG_BODY = /* glsl */`
+  float shopW = vShop.x, shopH = vShop.y, sSeed = vShop.z;
+  float tube  = step( 7.5, vShop.w );          // the tile's bake mode rides in the kind's high bit
+  float sKind = vShop.w - 8.0 * tube;
+  // A sixth of the units are shut for the night: shutter down, sign on a trickle. A street where
+  // every single unit is trading is the wallpaper this layer exists to avoid, and a dark shutter
+  // beside a lit window is what makes the lit one read as open.
+  float shut  = step( shopHash( sSeed, 13.0 ), 0.17 );
+
+  float mx = vLocal.x * shopW;
+  float my = vLocal.y * shopH;
+
+  const float FASCIA = 1.60;      // the sign band above the glass — a fixed physical size (§3.10 #4)
+  const float PLINTH = 0.52;      // the stall riser under it
+  float winTop = shopH - FASCIA;
+
+  vec3 col;
+  if ( my >= winTop ) {
+    float fy = ( my - winTop ) / FASCIA;
+    // The sign keeps the sheet's baked 4:1 aspect whatever the shop is wide, because §3.10 #4's
+    // ruler is the reason a distance read works at all. A wide shop gets a wider fascia BOARD and
+    // the same size sign, exactly as a real one does.
+    float sw = min( 6.4, shopW - 0.5 );
+    float sh = sw * 0.25;
+    float sx = ( mx - ( shopW - sw ) * 0.5 ) / sw;
+    float sy = ( ( my - winTop ) - ( FASCIA - sh ) * 0.5 ) / sh;
+    col = vGlow * 0.04 + vec3( 0.011, 0.012, 0.017 );
+    if ( sx > 0.0 && sx < 1.0 && sy > 0.0 && sy < 1.0 ) {
+      // §3.5.4's two idioms and the same v flip: the sheet is top-left-origin and uv.y runs up.
+      vec2 auv = vec2( vRegion.x + vRegion.z * sx, vRegion.y + vRegion.w * ( 1.0 - sy ) );
+      float t = texture2D( map, auv ).r;
+      col = mix( mix( vEmissive * 0.70, vEmissive * 0.07, t ),   // box: a lit panel, dark artwork
+                 vEmissive * ( 0.05 + 1.10 * t ),                // tube: the marks ARE the light
+                 tube );
+      col *= mix( 1.0, 0.16, shut );
+    }
+    // the downlight lip under the fascia — the thing that says a shopfront is lit from above
+    col += vGlow * 0.34 * ( 1.0 - shut ) * smoothstep( 0.14, 0.0, fy );
+  } else {
+    float gy = my - PLINTH;
+    float gh = winTop - PLINTH - 0.14;
+    if ( gy < 0.0 || gy > gh ) {
+      col = vGlow * 0.06 + vec3( 0.009, 0.010, 0.013 );
+    } else if ( shut > 0.5 ) {
+      // A roller shutter: horizontal corrugation, no light behind it, and the fascia's trickle
+      // catching the top few slats.
+      float corr = 0.5 + 0.5 * cos( gy * 41.9 );
+      float visC = 1.0 - smoothstep( 0.22, 0.55, fwidth( gy ) * 6.67 );
+      col = vec3( 0.030, 0.030, 0.034 ) * mix( 1.0, 0.55 + 0.9 * corr, visC )
+          + vGlow * 0.045 * smoothstep( gh * 0.55, gh, gy );
+    } else {
+      vec3 V = normalize( vWorldPosition - cameraPosition );
+      float dz = -dot( V, vNorW );
+      float dxv = dot( V, vTanW );
+
+      // ── the venetian blind ─────────────────────────────────────────────
+      float tilt = -0.30 + 0.34 * shopHash( sSeed, 3.0 );
+      float openA = 1.0 - smoothstep( uShop.w, uShop.w + 0.14, abs( V.y - tilt ) );
+      float openB = 1.0 - smoothstep( uShop.y, uShop.z, distance( vWorldPosition, cameraPosition ) );
+      float openC = smoothstep( 0.16, 0.52, dz );
+      float open = openA * openB * openC * uShop.x;
+      open = mix( open, uShopForce, step( 0.0, uShopForce ) );
+
+      // The lit face. Slats ramp across their own pitch, and fwidth() dissolves the ramp into its
+      // own mean the moment the pitch drops below about two pixels.
+      float pitch = 0.11;
+      float sl = fract( gy / pitch );
+      float vis = 1.0 - smoothstep( 0.22, 0.55, fwidth( gy ) / pitch );
+      vec3 blind = vGlow * ( 0.52 + 0.30 * ( gy / gh ) ) * mix( 1.0, 0.72 + 0.34 * sl, vis );
+
+      vec3 glass = blind;
+      if ( open > 0.004 ) {
+        float k = 1.0 / max( dz, 0.10 );
+        glass = mix( blind, shopRoom( vec2( mx, gy ), vec2( dxv * k, V.y * k ),
+                                      shopW, gh, sSeed, sKind, vGlow ), open );
+      }
+      // A grazing sheen so the glazing reads as glass rather than as an opening. Neutral, because
+      // what a shop window picks up at a grazing angle is the street, not its own lamps.
+      glass += vec3( 0.055, 0.060, 0.075 ) * pow( 1.0 - clamp( dz, 0.0, 1.0 ), 4.0 );
+
+      // The posts are widened by one pixel of fwidth() for the same reason the slats dissolve: a
+      // 60 mm mullion at 200 m is a stairstep otherwise, and a stairstep is what a critic reads as
+      // an untrimmed primitive.
+      float pw = fwidth( mx );
+      float bays = max( 1.0, floor( shopW / 1.65 + 0.5 ) );
+      float bay = shopW / bays;
+      float post = 1.0 - smoothstep( 0.030, 0.075 + pw, abs( fract( mx / bay + 0.5 ) - 0.5 ) * bay );
+      float doorBay = floor( shopHash( sSeed, 7.0 ) * bays );
+      float onDoor = 1.0 - abs( sign( floor( mx / bay ) - doorBay ) );
+      float frame = max( post, 1.0 - smoothstep( 0.05, 0.12 + pw, min( gy, gh - gy ) ) );
+      // one bay is the door, marked by its head rail. Without it a shop row is one continuous
+      // window; with it the row reads as a row of separate shops you could walk into.
+      frame = max( frame, onDoor * ( 1.0 - smoothstep( 0.05, 0.11, abs( gy - gh * 0.86 ) ) ) );
+      col = mix( glass, vGlow * 0.035 + vec3( 0.010, 0.011, 0.015 ), frame * 0.90 );
+    }
+  }
+  diffuseColor.rgb = col * uNeon;
+`;
+
+export function patchShop(mat) {
+  mat.extensions = Object.assign({ derivatives: true }, mat.extensions);
+  return addPatch(mat, 'shop', shader => {
+    shader.uniforms.uShop = U.uShop;
+    shader.uniforms.uShopForce = U.uShopForce;
+    shader.uniforms.uTime = U.uTime;
+    shader.uniforms.uNeon = U.uNeon;
+    shader.vertexShader = patch(shader.vertexShader, '#include <common>',
+      '#include <common>' + SHOP_VERT_DECL, 'shop/vert-decl');
+    shader.vertexShader = patch(shader.vertexShader, '#include <begin_vertex>',
+      SHOP_VERT_BODY, 'shop/vert-body');
+    shader.fragmentShader = patch(shader.fragmentShader, '#include <common>',
+      '#include <common>' + SHOP_FRAG_DECL + SHOP_ROOM, 'shop/frag-decl');
+    shader.fragmentShader = patch(shader.fragmentShader, '#include <map_fragment>',
+      SHOP_FRAG_BODY, 'shop/frag-body');
+  });
+}
+
+// Opaque, unlit, front faces only, and it WRITES DEPTH: a shopfront is a physical panel 0.12 m off
+// the wall, not a decal, so it belongs in the opaque pass where it costs no sort and back-facing
+// shops across the street are culled for free.
+//
+// The distance treatment is the LOD0 dither, not signage's intensity ramp. A shopfront has no LOD1
+// counterpart to ramp INTO, and fading a lit panel by colour alone leaves a dark rectangle glued
+// to the facade — the failure §3.5.4 already documents for box signs. `structureMaterial` reached
+// the same conclusion for masts for the same reason.
+export function shopMaterial(tex, noiseTex) {
+  const m = new THREE.MeshBasicMaterial({
+    map: tex, color: 0xffffff, side: THREE.FrontSide, fog: true, toneMapped: false,
+  });
+  patchShop(m);
   patchFog(m, 'opaque');
   if (noiseTex) patchFade(m, true, noiseTex);
   return m;

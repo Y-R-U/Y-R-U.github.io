@@ -1,0 +1,733 @@
+{
+ "at": "2026-08-20T01:01:02.717Z",
+ "wallMins": 9,
+ "simMins": 9,
+ "hull": "wisp",
+ "drivers": 4,
+ "fleetGross": 19590,
+ "fleetWages": 13191,
+ "fleetFuel": 590,
+ "jobs": 46,
+ "grossPerMin": 2175.7,
+ "wagePerMin": 1465,
+ "netPerMin": 645.2,
+ "ratedGrossPerMin": 1848,
+ "optimismRatio": 0.849,
+ "perDriver": [
+  {
+   "id": "g0_m0",
+   "name": "GREEN 1",
+   "grade": 0,
+   "gradeName": "GREEN",
+   "craft": "wisp",
+   "wage": 170,
+   "base": 70,
+   "lease": 100,
+   "jobs": 5,
+   "measuredGrossPerMin": 229.3,
+   "ratedGrossPerMin": 218,
+   "optimism": 0.951,
+   "measuredNetPerMin": 59.3,
+   "fuelPerMin": 0
+  },
+  {
+   "id": "g1_m1",
+   "name": "STEADY 2",
+   "grade": 1,
+   "gradeName": "STEADY",
+   "craft": "wisp",
+   "wage": 275,
+   "base": 175,
+   "lease": 100,
+   "jobs": 13,
+   "measuredGrossPerMin": 599.2,
+   "ratedGrossPerMin": 338,
+   "optimism": 0.564,
+   "measuredNetPerMin": 302.5,
+   "fuelPerMin": 21.7
+  },
+  {
+   "id": "g2_m2",
+   "name": "SEASONED 3",
+   "grade": 2,
+   "gradeName": "SEASONED",
+   "craft": "wisp",
+   "wage": 440,
+   "base": 340,
+   "lease": 100,
+   "jobs": 15,
+   "measuredGrossPerMin": 720.8,
+   "ratedGrossPerMin": 563,
+   "optimism": 0.781,
+   "measuredNetPerMin": 259.7,
+   "fuelPerMin": 21.1
+  },
+  {
+   "id": "g3_m3",
+   "name": "ACE 4",
+   "grade": 3,
+   "gradeName": "ACE",
+   "craft": "wisp",
+   "wage": 580,
+   "base": 480,
+   "lease": 100,
+   "jobs": 13,
+   "measuredGrossPerMin": 626.4,
+   "ratedGrossPerMin": 729,
+   "optimism": 1.164,
+   "measuredNetPerMin": 23.6,
+   "fuelPerMin": 22.8
+  }
+ ],
+ "samples": [
+  {
+   "t": 11.533,
+   "gross": 200000,
+   "jobs": 0,
+   "wages": 262,
+   "fuel": 0,
+   "fps": 60.1,
+   "per": [
+    {
+     "id": "g0_m0",
+     "gross": 0,
+     "jobs": 0,
+     "fuel": 0
+    },
+    {
+     "id": "g1_m1",
+     "gross": 0,
+     "jobs": 0,
+     "fuel": 0
+    },
+    {
+     "id": "g2_m2",
+     "gross": 0,
+     "jobs": 0,
+     "fuel": 0
+    },
+    {
+     "id": "g3_m3",
+     "gross": 0,
+     "jobs": 0,
+     "fuel": 0
+    }
+   ],
+   "st": [
+    {
+     "state": "fly",
+     "leg": "cruise+escape",
+     "deliveries": 0,
+     "escapes": 1,
+     "stucks": 0,
+     "cell": 0.987,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 0,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.983,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 0,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.978,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 0,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.977,
+     "towing": false
+    }
+   ]
+  },
+  {
+   "t": 71.567,
+   "gross": 202565,
+   "jobs": 6,
+   "wages": 1727,
+   "fuel": 0,
+   "fps": 60,
+   "per": [
+    {
+     "id": "g0_m0",
+     "gross": 360,
+     "jobs": 1,
+     "fuel": 0
+    },
+    {
+     "id": "g1_m1",
+     "gross": 760,
+     "jobs": 2,
+     "fuel": 0
+    },
+    {
+     "id": "g2_m2",
+     "gross": 970,
+     "jobs": 2,
+     "fuel": 0
+    },
+    {
+     "id": "g3_m3",
+     "gross": 475,
+     "jobs": 1,
+     "fuel": 0
+    }
+   ],
+   "st": [
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 1,
+     "escapes": 3,
+     "stucks": 0,
+     "cell": 0.896,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 2,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.878,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 2,
+     "escapes": 1,
+     "stucks": 0,
+     "cell": 0.862,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 1,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.84,
+     "towing": false
+    }
+   ]
+  },
+  {
+   "t": 131.581,
+   "gross": 204185,
+   "jobs": 10,
+   "wages": 3193,
+   "fuel": 0,
+   "fps": 60.1,
+   "per": [
+    {
+     "id": "g0_m0",
+     "gross": 360,
+     "jobs": 1,
+     "fuel": 0
+    },
+    {
+     "id": "g1_m1",
+     "gross": 1180,
+     "jobs": 3,
+     "fuel": 0
+    },
+    {
+     "id": "g2_m2",
+     "gross": 1750,
+     "jobs": 4,
+     "fuel": 0
+    },
+    {
+     "id": "g3_m3",
+     "gross": 895,
+     "jobs": 2,
+     "fuel": 0
+    }
+   ],
+   "st": [
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 1,
+     "escapes": 4,
+     "stucks": 0,
+     "cell": 0.802,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 3,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.764,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 4,
+     "escapes": 2,
+     "stucks": 0,
+     "cell": 0.748,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "approach",
+     "deliveries": 2,
+     "escapes": 1,
+     "stucks": 0,
+     "cell": 0.7,
+     "towing": false
+    }
+   ]
+  },
+  {
+   "t": 191.616,
+   "gross": 206590,
+   "jobs": 16,
+   "wages": 4659,
+   "fuel": 0,
+   "fps": 60,
+   "per": [
+    {
+     "id": "g0_m0",
+     "gross": 770,
+     "jobs": 2,
+     "fuel": 0
+    },
+    {
+     "id": "g1_m1",
+     "gross": 1630,
+     "jobs": 4,
+     "fuel": 0
+    },
+    {
+     "id": "g2_m2",
+     "gross": 2540,
+     "jobs": 6,
+     "fuel": 0
+    },
+    {
+     "id": "g3_m3",
+     "gross": 1650,
+     "jobs": 4,
+     "fuel": 0
+    }
+   ],
+   "st": [
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 2,
+     "escapes": 4,
+     "stucks": 0,
+     "cell": 0.712,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "approach",
+     "deliveries": 4,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.652,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 6,
+     "escapes": 2,
+     "stucks": 0,
+     "cell": 0.621,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 4,
+     "escapes": 2,
+     "stucks": 0,
+     "cell": 0.582,
+     "towing": false
+    }
+   ]
+  },
+  {
+   "t": 251.633,
+   "gross": 208400,
+   "jobs": 20,
+   "wages": 6124,
+   "fuel": 0,
+   "fps": 60,
+   "per": [
+    {
+     "id": "g0_m0",
+     "gross": 770,
+     "jobs": 2,
+     "fuel": 0
+    },
+    {
+     "id": "g1_m1",
+     "gross": 2035,
+     "jobs": 5,
+     "fuel": 0
+    },
+    {
+     "id": "g2_m2",
+     "gross": 3055,
+     "jobs": 7,
+     "fuel": 0
+    },
+    {
+     "id": "g3_m3",
+     "gross": 2540,
+     "jobs": 6,
+     "fuel": 0
+    }
+   ],
+   "st": [
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 2,
+     "escapes": 9,
+     "stucks": 0,
+     "cell": 0.614,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "approach",
+     "deliveries": 5,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.542,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 7,
+     "escapes": 2,
+     "stucks": 0,
+     "cell": 0.485,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 6,
+     "escapes": 2,
+     "stucks": 0,
+     "cell": 0.429,
+     "towing": false
+    }
+   ]
+  },
+  {
+   "t": 311.666,
+   "gross": 212360,
+   "jobs": 29,
+   "wages": 7590,
+   "fuel": 0,
+   "fps": 60,
+   "per": [
+    {
+     "id": "g0_m0",
+     "gross": 1660,
+     "jobs": 4,
+     "fuel": 0
+    },
+    {
+     "id": "g1_m1",
+     "gross": 3200,
+     "jobs": 8,
+     "fuel": 0
+    },
+    {
+     "id": "g2_m2",
+     "gross": 3935,
+     "jobs": 9,
+     "fuel": 0
+    },
+    {
+     "id": "g3_m3",
+     "gross": 3565,
+     "jobs": 8,
+     "fuel": 0
+    }
+   ],
+   "st": [
+    {
+     "state": "fly",
+     "leg": "cruise+escape",
+     "deliveries": 4,
+     "escapes": 10,
+     "stucks": 0,
+     "cell": 0.523,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 8,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.436,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 9,
+     "escapes": 2,
+     "stucks": 0,
+     "cell": 0.36,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 8,
+     "escapes": 2,
+     "stucks": 0,
+     "cell": 0.287,
+     "towing": false
+    }
+   ]
+  },
+  {
+   "t": 371.697,
+   "gross": 214025,
+   "jobs": 32,
+   "wages": 9056,
+   "fuel": 0,
+   "fps": 60.1,
+   "per": [
+    {
+     "id": "g0_m0",
+     "gross": 1660,
+     "jobs": 4,
+     "fuel": 0
+    },
+    {
+     "id": "g1_m1",
+     "gross": 3790,
+     "jobs": 9,
+     "fuel": 0
+    },
+    {
+     "id": "g2_m2",
+     "gross": 4395,
+     "jobs": 10,
+     "fuel": 0
+    },
+    {
+     "id": "g3_m3",
+     "gross": 4180,
+     "jobs": 9,
+     "fuel": 0
+    }
+   ],
+   "st": [
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 4,
+     "escapes": 12,
+     "stucks": 0,
+     "cell": 0.428,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 9,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.322,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 10,
+     "escapes": 2,
+     "stucks": 0,
+     "cell": 0.226,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 9,
+     "escapes": 2,
+     "stucks": 0,
+     "cell": 0.14,
+     "towing": false
+    }
+   ]
+  },
+  {
+   "t": 431.715,
+   "gross": 216535,
+   "jobs": 38,
+   "wages": 10521,
+   "fuel": 395,
+   "fps": 60.1,
+   "per": [
+    {
+     "id": "g0_m0",
+     "gross": 2065,
+     "jobs": 5,
+     "fuel": 0
+    },
+    {
+     "id": "g1_m1",
+     "gross": 4955,
+     "jobs": 12,
+     "fuel": 0
+    },
+    {
+     "id": "g2_m2",
+     "gross": 4955,
+     "jobs": 11,
+     "fuel": 190
+    },
+    {
+     "id": "g3_m3",
+     "gross": 4560,
+     "jobs": 10,
+     "fuel": 205
+    }
+   ],
+   "st": [
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 5,
+     "escapes": 13,
+     "stucks": 0,
+     "cell": 0.337,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 12,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.217,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 11,
+     "escapes": 2,
+     "stucks": 0,
+     "cell": 0.969,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "approach",
+     "deliveries": 10,
+     "escapes": 3,
+     "stucks": 0,
+     "cell": 0.953,
+     "towing": false
+    }
+   ]
+  },
+  {
+   "t": 491.747,
+   "gross": 218430,
+   "jobs": 43,
+   "wages": 11987,
+   "fuel": 395,
+   "fps": 60.1,
+   "per": [
+    {
+     "id": "g0_m0",
+     "gross": 2065,
+     "jobs": 5,
+     "fuel": 0
+    },
+    {
+     "id": "g1_m1",
+     "gross": 5395,
+     "jobs": 13,
+     "fuel": 0
+    },
+    {
+     "id": "g2_m2",
+     "gross": 5765,
+     "jobs": 13,
+     "fuel": 190
+    },
+    {
+     "id": "g3_m3",
+     "gross": 5205,
+     "jobs": 12,
+     "fuel": 205
+    }
+   ],
+   "st": [
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 5,
+     "escapes": 14,
+     "stucks": 0,
+     "cell": 0.242,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "approach",
+     "deliveries": 13,
+     "escapes": 0,
+     "stucks": 0,
+     "cell": 0.11,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 13,
+     "escapes": 2,
+     "stucks": 0,
+     "cell": 0.842,
+     "towing": false
+    },
+    {
+     "state": "fly",
+     "leg": "cruise",
+     "deliveries": 12,
+     "escapes": 3,
+     "stucks": 0,
+     "cell": 0.824,
+     "towing": false
+    }
+   ]
+  }
+ ],
+ "samplesNote": "thinned to every 6th of 54 \u2014 the trajectory is what matters, not the raw poll rate"
+}

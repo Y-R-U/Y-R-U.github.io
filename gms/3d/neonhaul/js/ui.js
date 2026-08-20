@@ -23,7 +23,8 @@ import { clamp, accentOf } from './utils.js';
 import * as E from './economy.js';
 import { ZONE_TYPES } from './config.js';
 import { mediaFor, initialsOf } from './dock.js';
-import { rankState, COURIER_RANKS, STANDING_RANKS, SHADY_RANKS, ASSET_RECOVERY } from './ranks.js';
+import { rankState, COURIER_RANKS, STANDING_RANKS, SHADY_RANKS, SHADY_TIERS, shadyState,
+  ASSET_RECOVERY } from './ranks.js';
 
 export const TOAST_MS = 2600;          // §8.4 hold
 export const TOAST_FADE = 350;         // §8.4 in/out
@@ -345,11 +346,11 @@ export class CabinPanel {
 // why `canBuyCraft` returns `{ok:false, why, short}` instead of just failing.
 // ───────────────────────────────────────────────────────────────────────────
 
-const mmss = s => {
+export const mmss = s => {
   const t = Math.max(0, Math.round(s));
   return `${(t / 60) | 0}:${String(t % 60).padStart(2, '0')}`;
 };
-const el = (tag, cls, text) => {
+export const el = (tag, cls, text) => {
   const d = document.createElement(tag);
   if (cls) d.className = cls;
   if (text !== undefined) d.textContent = text;
@@ -357,12 +358,17 @@ const el = (tag, cls, text) => {
 };
 // Thin-space groups, so 44000 reads as 44 000 on an instrument rather than as a phone number.
 // ` ` and not a comma: a comma in a monospace column looks like punctuation in a sentence.
-const crd = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+export const crd = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
 // The one screen-chrome builder. Every surface in this file is assembled through it, which is what
 // makes "settle the idiom once" true in code rather than in a comment: a company earnings screen in
 // pass 2-B calls `screen('EARNINGS', '…')` and inherits the frame, the brackets and the ident.
-function screen(cls, kicker, title, sub) {
+//
+// §S2-I took that promise up: `screen`, `readout`, `meter`, `el`, `crd` and `mmss` are EXPORTED and
+// `js/companyui.js` assembles the whole company layer out of them. They were `const`s in this file
+// only because nothing outside it existed yet — exporting them is the difference between one idiom
+// and two that drift, which is the complaint S2-D was created by.
+export function screen(cls, kicker, title, sub) {
   const s = el('div', `dk-screen ${cls}`);
   const h = el('div', 'dk-shead');
   h.appendChild(el('span', 'dk-skick', kicker));
@@ -377,7 +383,7 @@ function screen(cls, kicker, title, sub) {
 
 // A labelled instrument readout: kicker above, value below. The board's numbers used to be
 // sentences ("100 / 100 units · full costs 0 CRD"); this is what makes them read as gauges.
-function readout(label, value, cls) {
+export function readout(label, value, cls) {
   const r = el('div', `dk-ro${cls ? ' ' + cls : ''}`);
   r.appendChild(el('i', null, label));
   r.appendChild(el('b', null, value));
@@ -387,7 +393,7 @@ function readout(label, value, cls) {
 // A segmented bar. `n` of `of` segments lit — deliberately SEGMENTED and not a smooth fill,
 // because a continuous bar is the single most web-like element a UI can carry and a segmented one
 // is the most instrument-like.
-function meter(frac, segs = 16, cls) {
+export function meter(frac, segs = 16, cls) {
   const m = el('div', `dk-meter${cls ? ' ' + cls : ''}`);
   const lit = Math.round(clamp(frac, 0, 1) * segs);
   for (let i = 0; i < segs; i++) m.appendChild(el('i', i < lit ? 'on' : null));
@@ -414,6 +420,13 @@ export class DockUI {
     this.actions = 0;
     this._prompt = null;             // §7.2's DOCK button, shown while inside a zone
     this._promptKey = null;
+    this.fleetLabel = null;          // §S2-I — null until the company layer opens
+    this.company = null;
+    // §S2-J. The whole group, and the state of the shady thread. Both are read ONLY by the RECORD
+    // tab, and both default to null so a dock that nobody has told about a company behaves exactly
+    // as it did before this phase.
+    this.group = null;
+    this.thread = null;
     this._blur = '';
   }
 
@@ -429,6 +442,17 @@ export class DockUI {
   // §S2-E — what the HIRE key says under its label: the time on the meter, or GROUNDED. Set by
   // main.js before every paint so the key is never showing a stale clock.
   setHire(label) { this.hireLabel = label || ''; if (this.open) this.paint(); return this.hireLabel; }
+
+  // §S2-I — `null` HIDES the FLEET key (there is no company yet); a string shows it with that
+  // string under the label. `''` is a live key with no caption, which is a different thing from
+  // no key at all, so the two states cannot collapse into one falsy test.
+  setFleet(label, company = null, extra = null) {
+    this.fleetLabel = label;
+    this.company = company;
+    if (extra) { this.group = extra.group || null; this.thread = extra.thread || null; }
+    if (this.open) this.paint();
+    return this.fleetLabel;
+  }
 
   show(pad, jobs, state) {
     this.pad = pad; this.jobs = jobs || []; this.state = state;
@@ -565,6 +589,17 @@ export class DockUI {
       b.addEventListener('click', () => this.hooks.hire());
       tabs.appendChild(b);
     }
+    // §S2-I's FLEET key. A `.dk-key` for the same reason HIRE is one — `.dk-tab` is a collection
+    // two suites hold contracts about — and it is only present once the company layer is open,
+    // which is after act one. It hands off to `companyui.js`'s FleetPanel: the roster, the agency
+    // list and the books are one screen, not three doors.
+    if (this.hooks.fleet && this.fleetLabel !== null) {
+      const b = el('button', 'dk-key fleet');
+      b.appendChild(el('span', 'dkt-l', 'FLEET'));
+      b.appendChild(el('span', 'dkt-n', this.fleetLabel || ''));
+      b.addEventListener('click', () => this.hooks.fleet());
+      tabs.appendChild(b);
+    }
     sheet.appendChild(tabs);
 
     const body = el('div', 'dk-body');
@@ -603,8 +638,12 @@ export class DockUI {
   }
 
   // Both ladders as one strip: name, rung, and how far through the current rung you are.
+  //
+  // §S2-I — it reads the COMPANY too, for the same reason `_record` does. Without it the rail said
+  // HAULMASTER while the ladder six centimetres below it said SPIRE HAULIER, which is one screen
+  // disagreeing with itself about the player's own rank. Caught by looking at the capture.
   _rankRail(st) {
-    const R = rankState(st);
+    const R = rankState(st, this.company);
     const rail = el('div', 'dk-rail');
     const one = (cls, kick, name, sub, frac) => {
       const c = el('div', `dk-rank ${cls}`);
@@ -843,13 +882,37 @@ export class DockUI {
   // by side and never as one score. The shady ladder is shown as a sealed strip: it exists, it is
   // not yours, and pass 2-B is where a door into it opens.
   _record(body, st) {
-    const R = rankState(st);
-
-    const lic = screen('dk-sect lad', 'LICENCE', R.licence.name, `TIER ${R.licence.tier} · ${crd(R.licence.at)} CRD HAULED`);
+    const co = this.company;
+    const R = rankState(st, co);
+    // §S2-I. The top two rungs are on a DIFFERENT AXIS — fleet gross, not lifetime — so the
+    // subtitle, the thresholds and the "done" test all have to change with it. Printing a fleet
+    // threshold in a column headed "CRD HAULED" would be the surface lying about which number the
+    // promotion is waiting on, which is the failure S2-D's blurbFor() exists to prevent.
+    const fleetGross = co ? Math.round(co.gross || 0) : 0;
+    const lic = screen('dk-sect lad', 'LICENCE', R.licence.name,
+      R.licence.axis === 'fleet'
+        ? `TIER ${R.licence.tier} · ${crd(fleetGross)} CRD FLEET GROSS`
+        : `TIER ${R.licence.tier} · ${crd(R.licence.at)} CRD HAULED`);
     lic.body.appendChild(this._ladder(COURIER_RANKS.map(r => ({
-      key: r.tier, name: r.name, at: r.lifetime, blurb: r.blurb, locked: !!r.opens,
-      here: r.tier === R.licence.tier, done: r.lifetime !== null && r.lifetime <= R.licence.at,
-    })), R.licence.frac, 'lifetime gross — it counts what you have hauled and it can never fall'));
+      key: r.tier, name: r.name,
+      at: r.opens ? r.fleet : r.lifetime,
+      blurb: r.blurb,
+      // A company rung is LOCKED until there is a company at all. Once there is one it is a real
+      // rung with a real threshold and it stops reading SEALED.
+      locked: !!r.opens && !co,
+      here: r.tier === R.licence.tier,
+      // A company rung is DONE only when BOTH conditions hold: the fleet has hauled the gross AND
+      // the player is already at the top of the lifetime ladder. `courierRank` refuses to hand out
+      // rung 7 to anybody below HAULMASTER — a fleet cannot buy you the sixth rung, only the
+      // seventh and eighth — so a fleet-gross-only test drew a LANEWRIGHT a ladder with two rungs
+      // ABOVE their own position ticked off. Which is the surface disagreeing with the function
+      // that decides the rank, and is exactly what blurbFor() exists to stop happening to blurbs.
+      done: r.opens
+        ? (!!co && r.fleet !== null && fleetGross >= r.fleet && st.tier >= E.LADDER.length)
+        : (r.lifetime !== null && r.lifetime <= st.lifetime),
+    })), R.licence.frac, co
+      ? 'the first six rungs count what YOU hauled; the last two count what your FLEET hauled'
+      : 'lifetime gross — it counts what you have hauled and it can never fall'));
     body.appendChild(lic);
 
     const std = screen('dk-sect lad', 'STANDING', R.standing.name, `RUNG ${R.standing.rung} · ${crd(R.worth)} CRD NET`);
@@ -864,12 +927,64 @@ export class DockUI {
     })), R.standing.frac, 'net worth — what you keep, at ' + Math.round(ASSET_RECOVERY * 100) + '% on the hull'));
     body.appendChild(std);
 
-    const sh = screen('dk-sect lad sealed', 'THE OTHER SIDE', 'SEALED', 'NO RECORD');
-    const strip = el('div', 'dk-sealed');
-    for (const n of SHADY_RANKS) strip.appendChild(el('span', 'dks-rung', n));
-    sh.body.appendChild(strip);
-    sh.body.appendChild(el('div', 'dk-ladnote', 'There is a second ledger. You are not on it.'));
-    body.appendChild(sh);
+    // ── §S2-J — the other side ──────────────────────────────────────────
+    //
+    // Three states, and the middle one is the point of the whole design. SEALED is what S2-D
+    // shipped: the ladder exists, it is not yours. OPEN is the real ladder with a rung on it. And
+    // between them is CUE — the thread is live because the player NOTICED something, and the only
+    // thing on the screen is one row they can pull.
+    //
+    // The brief is explicit that the remarks themselves must not be gated behind a menu, and they
+    // are not: they arrive on the chatter ticker among two hundred ordinary lines. This row exists
+    // only because two of them landed and the player was listening. Aaron: *"a player who is not
+    // paying attention simply never notices, and one who is feels clever."*
+    const th = this.thread || null;
+    const door = th ? th.door : null;
+    // WHERE it goes matters as much as what it says, and it depends on the state — which is why
+    // this is a function and not a position.
+    //
+    //   sealed   last, where S2-D put it: a rumour at the bottom of your own record
+    //   CUE      FIRST. This is the one state with something to DO in it, it is easy to miss by
+    //            design, and a key the player has to scroll past two full ladders to reach is a key
+    //            most players never reach.
+    //   open     last again. Once the door is open it is simply a third ladder, and LICENCE is
+    //            still the ladder this screen is primarily about — `gates_s2i` F1 reads the FIRST
+    //            `.dk-sect.lad` on this tab and asserts it is the licence one, which is a contract
+    //            worth keeping and which caught this being got wrong.
+    const lead = el => (door === 'cue' ? body.insertBefore(el, body.firstChild) : body.appendChild(el));
+    if (door === 'asked' || door === 'seized') {
+      const total = th && th.shadyGross !== undefined ? th.shadyGross : 0;
+      const R = shadyState(total, true);
+      const sh = screen('dk-sect lad other', 'THE OTHER SIDE', R.name,
+        `RUNG ${R.rung} · ${crd(R.at)} CRD OFF THE BOOKS`);
+      sh.body.appendChild(this._ladder(SHADY_TIERS.map(t => ({
+        key: t.rung, name: t.name, at: t.at, blurb: t.blurb, locked: false,
+        here: t.rung === R.rung, done: R.at >= t.at,
+      })), R.frac, 'off-book gross, across every charter you hold — the desk knows who you are'));
+      lead(sh);
+    } else if (door === 'cue') {
+      const sh = screen('dk-sect lad sealed cue', 'THE OTHER SIDE', 'A NAME KEEPS COMING UP',
+        `${th.remarks} TIMES NOW`);
+      const strip = el('div', 'dk-sealed');
+      for (const n of SHADY_RANKS) strip.appendChild(el('span', 'dks-rung', n));
+      sh.body.appendChild(strip);
+      sh.body.appendChild(el('div', 'dk-ladnote',
+        'Somebody said your father’s name on the open channel. Twice. He is home, he is fine, and '
+        + 'he still has not told you who he borrowed from.'));
+      const k = el('button', 'dk-key ask');
+      k.appendChild(el('span', 'dkt-l', 'ASK HIM'));
+      k.appendChild(el('span', 'dkt-n', 'and do not take the first answer'));
+      k.addEventListener('click', () => this._act(this.hooks.askDad));
+      sh.body.appendChild(k);
+      lead(sh);
+    } else {
+      const sh = screen('dk-sect lad sealed', 'THE OTHER SIDE', 'SEALED', 'NO RECORD');
+      const strip = el('div', 'dk-sealed');
+      for (const n of SHADY_RANKS) strip.appendChild(el('span', 'dks-rung', n));
+      sh.body.appendChild(strip);
+      sh.body.appendChild(el('div', 'dk-ladnote', 'There is a second ledger. You are not on it.'));
+      body.appendChild(sh);
+    }
   }
 
   _ladder(rows, frac, note) {
@@ -881,7 +996,7 @@ export class DockUI {
       tx.appendChild(el('span', 'dkg-name', r.name));
       tx.appendChild(el('span', 'dkg-blurb', r.blurb));
       d.appendChild(tx);
-      d.appendChild(el('span', 'dkg-at', r.locked || r.at === null ? 'SEALED' : crd(r.at)));
+      d.appendChild(el('span', 'dkg-at', r.locked || r.at === null || r.at === undefined ? 'SEALED' : crd(r.at)));
       if (r.here) d.appendChild(meter(frac, 20, 'thin here'));
       l.appendChild(d);
     }
@@ -894,6 +1009,10 @@ export class DockUI {
       pad: this.pad ? this.pad.key : null, opens: this.opens, actions: this.actions,
       prompt: this._promptKey,
       // S2-D: the two ladders, so a gate can read what the surface is claiming rather than OCR it.
-      ranks: this.state ? rankState(this.state) : null };
+      fleet: this.fleetLabel,
+      // §S2-J. What the RECORD tab is claiming about the other side, so a gate reads the surface's
+      // own answer instead of inferring it from the story state it is supposed to be rendering.
+      thread: this.thread ? { door: this.thread.door, remarks: this.thread.remarks } : null,
+      ranks: this.state ? rankState(this.state, this.company) : null };
   }
 }

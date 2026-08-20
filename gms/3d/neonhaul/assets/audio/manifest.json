@@ -79,7 +79,7 @@
    "gain": 0.9,
    "cooldown": 1500,
    "shout": false,
-   "text": "Haul Control to all couriers — the Vane Street corridor is open again. Lanes four through nine, keep it under two hundred."
+   "text": "Haul Control to all couriers \u2014 the Vane Street corridor is open again. Lanes four through nine, keep it under two hundred."
   },
   {
    "slot": "dispatch_02",
@@ -1384,7 +1384,7 @@
    "gain": 0.9,
    "cooldown": 1500,
    "shout": false,
-   "text": "Couriers — if a client won't tell you what's in the box, that's not a red flag. That's a pay rise. Charge accordingly."
+   "text": "Couriers \u2014 if a client won't tell you what's in the box, that's not a red flag. That's a pay rise. Charge accordingly."
   },
   {
    "slot": "pirate_04",
@@ -1567,6 +1567,21 @@
    "text": "Somebody has left a parcel outside the studio. I am not opening it, I am not moving it, and I am broadcasting next to it, which is a decision I am reviewing."
   },
   {
+   "slot": "pirate_16",
+   "file": "chatter/pirate_16.mp3",
+   "group": "pirate",
+   "layer": "fore",
+   "tags": [
+    "pirate"
+   ],
+   "speaker": "THE UNDERSTACK",
+   "tag": "bg",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "And a quiet one out to the man who borrowed off the wrong room and walked away. Rare. Play him something warm."
+  },
+  {
    "slot": "ad_01",
    "file": "chatter/ad_01.mp3",
    "group": "ad",
@@ -1624,7 +1639,7 @@
    "gain": 0.9,
    "cooldown": 1500,
    "shout": false,
-   "text": "New from Vantage Optics — see the sky the way it used to be, for eleven credits a month, forever."
+   "text": "New from Vantage Optics \u2014 see the sky the way it used to be, for eleven credits a month, forever."
   },
   {
    "slot": "ad_05",
@@ -1819,7 +1834,7 @@
    "gain": 0.9,
    "cooldown": 1500,
    "shout": false,
-   "text": "Mayday, mayday — cell's gone, I'm at ninety metres and dropping, anyone on this band —"
+   "text": "Mayday, mayday \u2014 cell's gone, I'm at ninety metres and dropping, anyone on this band \u2014"
   },
   {
    "slot": "distress_02",
@@ -2269,7 +2284,7 @@
    "gain": 0.9,
    "cooldown": 1500,
    "shout": false,
-   "text": "Anyone flying past Sixteen Low — is that a fire or is that just Tuesday?"
+   "text": "Anyone flying past Sixteen Low \u2014 is that a fire or is that just Tuesday?"
   },
   {
    "slot": "life_04",
@@ -2299,7 +2314,7 @@
    "gain": 0.9,
    "cooldown": 1500,
    "shout": false,
-   "text": "Taxi four-one-one, off shift, going home. Whoever's got the Lantern run tonight — good luck, and I mean that."
+   "text": "Taxi four-one-one, off shift, going home. Whoever's got the Lantern run tonight \u2014 good luck, and I mean that."
   },
   {
    "slot": "life_06",
@@ -2344,7 +2359,7 @@
    "gain": 0.9,
    "cooldown": 1500,
    "shout": false,
-   "text": "Understack, if you're listening — play the one about the windows again. It's been a week."
+   "text": "Understack, if you're listening \u2014 play the one about the windows again. It's been a week."
   },
   {
    "slot": "life_09",
@@ -2750,6 +2765,51 @@
    "cooldown": 1500,
    "shout": false,
    "text": "That is me done. First run, delivered, nothing broken. I am going to talk about this for a week."
+  },
+  {
+   "slot": "life_36",
+   "file": "chatter/life_36.mp3",
+   "group": "life",
+   "layer": "fore",
+   "tags": [
+    "life"
+   ],
+   "speaker": "OPEN CHANNEL",
+   "tag": "bg",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Whoever settled the Vane account \u2014 the old boy, not the kid \u2014 tell him the desk still has his paper."
+  },
+  {
+   "slot": "life_37",
+   "file": "chatter/life_37.mp3",
+   "group": "life",
+   "layer": "fore",
+   "tags": [
+    "life"
+   ],
+   "speaker": "OPEN CHANNEL",
+   "tag": "bg",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Somebody was asking after a hauler by that surname at the Tallow desk. Not a friendly ask, if you follow."
+  },
+  {
+   "slot": "life_38",
+   "file": "chatter/life_38.mp3",
+   "group": "life",
+   "layer": "fore",
+   "tags": [
+    "life"
+   ],
+   "speaker": "OPEN CHANNEL",
+   "tag": "bg",
+   "gain": 0.9,
+   "cooldown": 1500,
+   "shout": false,
+   "text": "Second time this month a courier has come in with a name on a docket that should not be on a docket."
   },
   {
    "slot": "bg_net_01",
