@@ -40,115 +40,134 @@
    "slot": "boss_01",
    "sec": 3.4,
    "rms": -15.6,
-   "bytes": 21072
+   "bytes": 21072,
+   "src": "kokoro"
   },
   {
    "slot": "boss_02",
    "sec": 5.76,
    "rms": -15.3,
-   "bytes": 35179
+   "bytes": 35179,
+   "src": "kokoro"
   },
   {
    "slot": "boss_03",
    "sec": 5.96,
    "rms": -15.0,
-   "bytes": 36432
+   "bytes": 36432,
+   "src": "kokoro"
   },
   {
    "slot": "boss_04",
    "sec": 3.52,
    "rms": -15.6,
-   "bytes": 21699
+   "bytes": 21699,
+   "src": "kokoro"
   },
   {
    "slot": "boss_05",
    "sec": 5.37,
    "rms": -15.5,
-   "bytes": 32828
+   "bytes": 32828,
+   "src": "kokoro"
   },
   {
    "slot": "boss_06",
    "sec": 10.28,
    "rms": -15.3,
-   "bytes": 62294
+   "bytes": 62294,
+   "src": "kokoro"
   },
   {
    "slot": "boss_07",
    "sec": 1.98,
    "rms": -15.7,
-   "bytes": 12452
+   "bytes": 12452,
+   "src": "kokoro"
   },
   {
    "slot": "pc_m_int1",
    "sec": 0.63,
    "rms": -17.6,
-   "bytes": 4302
+   "bytes": 4302,
+   "src": "kokoro"
   },
   {
    "slot": "pc_m_int2",
    "sec": 0.7,
    "rms": -17.0,
-   "bytes": 4772
+   "bytes": 4772,
+   "src": "kokoro"
   },
   {
    "slot": "pc_m_int3",
    "sec": 0.91,
    "rms": -16.9,
-   "bytes": 6026
+   "bytes": 6026,
+   "src": "kokoro"
   },
   {
    "slot": "pc_m_close",
    "sec": 8.72,
    "rms": -16.3,
-   "bytes": 52890
+   "bytes": 52890,
+   "src": "kokoro"
   },
   {
    "slot": "pc_f_int1",
    "sec": 0.67,
    "rms": -19.1,
-   "bytes": 4615
+   "bytes": 4615,
+   "src": "kokoro"
   },
   {
    "slot": "pc_f_int2",
    "sec": 0.74,
    "rms": -18.4,
-   "bytes": 5086
+   "bytes": 5086,
+   "src": "kokoro"
   },
   {
    "slot": "pc_f_int3",
    "sec": 0.95,
    "rms": -17.4,
-   "bytes": 6339
+   "bytes": 6339,
+   "src": "kokoro"
   },
   {
    "slot": "pc_f_close",
    "sec": 9.63,
    "rms": -15.9,
-   "bytes": 58375
+   "bytes": 58375,
+   "src": "kokoro"
   },
   {
    "slot": "pc_n_int1",
    "sec": 0.68,
    "rms": -19.0,
-   "bytes": 4615
+   "bytes": 4615,
+   "src": "kokoro"
   },
   {
    "slot": "pc_n_int2",
    "sec": 0.74,
    "rms": -18.0,
-   "bytes": 5086
+   "bytes": 5086,
+   "src": "kokoro"
   },
   {
    "slot": "pc_n_int3",
    "sec": 0.95,
    "rms": -17.4,
-   "bytes": 6339
+   "bytes": 6339,
+   "src": "kokoro"
   },
   {
    "slot": "pc_n_close",
    "sec": 9.69,
    "rms": -15.6,
-   "bytes": 58689
+   "bytes": 58689,
+   "src": "kokoro"
   }
  ]
 }

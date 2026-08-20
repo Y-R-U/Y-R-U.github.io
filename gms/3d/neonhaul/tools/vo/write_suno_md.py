@@ -58,7 +58,7 @@ def status_block(L, M, ver, intel):
 
 **Every chatter slot now has audio.** The pool went from 64 declared slots with 26 files on disk to
 **{len(M['chatter'])} slots with {len(M['chatter'])} files** — {fore} foreground, {back} background — spoken by **{len(L['voices'])} voice
-identities over {bases} installed macOS voices**. Aaron's complaint was *"there is only a couple of
+identities over {bases} Kokoro voices**. Aaron's complaint was *"there is only a couple of
 random chatter that loop frequently"*, and the cause was that 38 of the 64 declared slots had never
 been generated: the player was hearing four dispatch groups on rotation and nothing else existed.
 
@@ -73,7 +73,7 @@ been generated: the player was hearing four dispatch groups on rotation and noth
 | encode | mono, 16 kHz, 16 kbps mp3 | mono, 32 kHz, ~51 kbps |
 
 **How it is built.** `tools/vo/lines.json` holds every line, its voice and its group. `python3
-tools/vo/gen_chatter.py` synthesises the ones that need synthesising with macOS `say`, passes every
+tools/vo/gen_chatter.py` synthesises the ones that need synthesising with Kokoro-82M, passes every
 clip — the SUNO takes included — through `tools/radio_fx.sh`, rewrites `assets/audio/manifest.json`,
 and verifies the result. **The SUNO originals are the only input that cannot be rebuilt**; they are
 kept in `tools/vo/raw/suno/` (gitignored) and the generator refuses to overwrite them. This file's

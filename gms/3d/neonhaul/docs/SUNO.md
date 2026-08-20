@@ -34,26 +34,117 @@ group is FOR, and because the music prompts in §1 are unchanged and still live.
 
 ---
 
+---
+
+## §0 — THE CRIMINAL LEADER  ← the one SUNO take that matters
+
+**Aaron, this is the only thing in this file that is actually waiting on you.** Everything else in
+the game has audio. This one voice does not work and you were right about why:
+
+> the lead criminal voice doesn't work, i don't think abogen will give us the answer or fierceness
+> sounding voice we need... i think we need suno for that voice.
+
+Kokoro is an audiobook reader. It reads *at* you pleasantly and there is no dial on it marked
+menace. `bm_george` at 0.88 speed is the closest the whole 27-voice set gets, and the closest it
+gets is a polite man reading a threat.
+
+**The game is correct and playable right now without this.** The Kokoro takes are on disk and wired
+up. If you never generate this, nothing breaks — you just keep the polite villain.
+
+### One take, seven lines
+
+Paste the Style block into SUNO's Style/Description box and the Lyrics block into its Lyrics box.
+One generation gives you the whole scene; `split_take.py` cuts it.
+
+**Style**
+
+```
+spoken word monologue, no music, no melody, no beat, no instruments at all.
+one male voice only. deep gravelly baritone, heavy smoker, late fifties.
+slow, quiet, completely unhurried — he is bored of this conversation and he
+has had it before. threat delivered flat, never shouted, never theatrical.
+close mic, dry, small hard-surfaced room, slight tape hiss. film noir.
+```
+
+**Lyrics**
+
+```
+[spoken, quiet, unhurried]
+Don't get out. Don't touch the stick. Just listen.
+[pause]
+That is a very nice craft you are flying. Insured to somebody else, I notice.
+[pause]
+Your father owes us fifty thousand. He has owed us fifty thousand for a while now.
+[pause]
+He is away. You are here. That makes it yours.
+[pause]
+Fifty thousand credits. We will come for it, and I would not make us look for you.
+[pause]
+If it is not ready we take the craft and sell it. Then we break an arm. Then, if I am in a mood, we sell whoever was driving to whoever is buying.
+[pause]
+Make the money. Soon.
+```
+
+### Where it goes
+
+```
+tools/vo/raw/suno/boss_take.mp3        ← save the download here, any name is fine
+```
+
+Then, from `gms/3d/neonhaul/`:
+
+```sh
+python3 tools/vo/gen_story.py --suno-script                              # writes script_boss.json
+python3 tools/vo/split_take.py tools/vo/raw/suno/boss_take.mp3 \
+        tools/vo/script_boss.json tools/vo/raw/suno/                     # → boss_01..07.mp3
+python3 tools/vo/gen_story.py --only boss                                # treat, verify, manifest
+```
+
+The last command prints `suno: 7 slot(s) performed, not synthesised` and then verifies all seven.
+A slot with a file in `tools/vo/raw/suno/` is **never synthesised and never overwritten** — the
+performance is the only input in this pipeline that cannot be rebuilt.
+
+### What the treatment does to it, and does not
+
+A SUNO take arrives with its own space on it, so it does **not** go through `room()` — that chain
+exists to put a synthesiser's dry, placeless output in a cabin, and running it over a performance
+would stack a second reflection on the first and pitch-shift a delivery that was cast rather than
+tuned. What it does get is trim, the same **-16 LUFS** shelf every other clip in the build sits on,
+and a **-1.5 dBTP** ceiling. S2-B shipped SUNO takes clipping to **+2.7 dBTP**; that is the mistake
+this ceiling exists to not repeat.
+
+### If a take is nearly right
+
+Regenerate rather than tune. There is no post-processing that adds menace to a read that does not
+have it, and the one thing that IS worth re-rolling for is the last line — *"Make the money.
+Soon."* — which is the beat the whole cutscene lands on.
+
+### Not this voice
+
+The rest of the cast stays Kokoro, on your verdict: *"boys voice is ok... i think several female
+voices work well in abogen that could be used for radio chatter and docking voices etc. and the
+boys voice was fine."* So `pc_m`/`pc_f`/`pc_n` and all 181 chatter lines are unchanged.
+
 ## STATUS — rewritten by S2-B (radio voices), 2026-08-20
 
 **Every chatter slot now has audio.** The pool went from 64 declared slots with 26 files on disk to
-**203 slots with 203 files** — 179 foreground, 24 background — spoken by **31 voice
+**207 slots with 207 files** — 183 foreground, 24 background — spoken by **31 voice
 identities over 27 Kokoro voices**. Aaron's complaint was *"there is only a couple of
 random chatter that loop frequently"*, and the cause was that 38 of the 64 declared slots had never
 been generated: the player was hearing four dispatch groups on rotation and nothing else existed.
 
 | | now | was |
 |---|---|---|
-| chatter slots | 203 | 64 declared, 26 on disk |
-| foreground lines | 179 | 22 on disk |
-| distinct voices | 31 identities / 16 base voices | 1 (a single SUNO operator) |
-| total bytes | **2283 KB** | 841 KB across the 26 — 7.8x the clips for 2.71x the bytes |
-| mean clip | 11.2 KB | 32.4 KB |
+| chatter slots | 207 | 64 declared, 26 on disk |
+| foreground lines | 183 | 22 on disk |
+| distinct voices | 31 identities / 27 base voices | 1 (a single SUNO operator) |
+| total bytes | **2174 KB** | 841 KB across the 26 — 7.8x the clips for 2.58x the bytes |
+| mean clip | 10.5 KB | 32.4 KB |
 | the same 26 slots | 291 KB re-encoded | 841 KB |
 | encode | mono, 16 kHz, 16 kbps mp3 | mono, 32 kHz, ~51 kbps |
 
 **How it is built.** `tools/vo/lines.json` holds every line, its voice and its group. `python3
-tools/vo/gen_chatter.py` synthesises the ones that need synthesising with macOS `say`, passes every
+tools/vo/gen_chatter.py` synthesises the ones that need synthesising with Kokoro-82M, passes every
 clip — the SUNO takes included — through `tools/radio_fx.sh`, rewrites `assets/audio/manifest.json`,
 and verifies the result. **The SUNO originals are the only input that cannot be rebuilt**; they are
 kept in `tools/vo/raw/suno/` (gitignored) and the generator refuses to overwrite them. This file's
@@ -71,20 +162,14 @@ situations the lines are written for, not four EQ presets.
 pass a clip in which nobody spoke. So `gen_chatter.py --verify` measures the **speech window**
 between the two squelch bursts against a floor derived by running a no-speech control through the
 identical chain, and checks each clip's duration against what its script and its voice's own
-words-per-minute predict. `--falsify` proves both go red. Over all 203 clips: speech window
-**-20.2 to -13.6 dBFS** against a floor of **-26.5 dBFS**, 0 rejected.
+words-per-minute predict. `--falsify` proves both go red. Over all 207 clips: speech window
+**-20.1 to -13.8 dBFS** against a floor of **-26.5 dBFS**, 0 rejected.
 
 `tools/gates_p8.mjs` B5 checks decoded energy again in the browser that will actually decode it, B6
 proves that check can fail, and **B5b** measures the same speech window in the browser — B5 alone
 stopped being sufficient the moment the assets acquired a deliberate noise floor, and B5b's
 falsification demonstrates exactly that: a clip with its speech zeroed and its squelch kept still
 reads −33 dBFS whole-file, well above MIN_RMS.
-
-**And the words actually arrive.** `tools/vo/intelligibility.py` transcribes every foreground clip with whisper and scores it against the line it is supposed to say. Mean word-sequence match **90.7%** over 179 clips; the weakest group is `ad` at 82% and the strongest is `dispatch_confirm` at 96%. Read that number
-as a RANKING, not as a percentage a human would score — whisper is degraded by the same band-limit and has
-never heard of the Ninefold Approach. What it is good for is finding the mush, and it found it: three of the
-MacinTalk-era voices were losing their consonants under the band-limit and were replaced off a controlled
-A/B (the same four lines through every candidate), which moved the pool from 86.4% to 90.7%.
 
 ### The `tag` field
 
@@ -107,7 +192,7 @@ play it — the game has no menu screen. Both are unchanged from P8.
 
 "5 × 7 × 36 s ≈ 21 minutes before any foreground line repeats" is one shuffle-bag *cycle*, i.e. the
 mean interval, not a floor. The code adds a per-slot **cooldown** (1500 s ambient, 660 s on the two
-job pools) as the hard time floor. Gates A4, A5, A6. With the pool at 179 foreground lines those
+job pools) as the hard time floor. Gates A4, A5, A6. With the pool at 183 foreground lines those
 bags are 2–4x longer, so the cycle length rises with them; the cooldown floor is unchanged.
 
 ## The three rules every chatter prompt here follows
@@ -707,7 +792,7 @@ only re-processed through the radio chain.
 
 ## `dispatch` — general Haul Control traffic
 
-**19 slots** · `fore` · `tag: alert` · gain 0.9 · cooldown 1500 s
+**19 slots** · `fore` · `tag: info` · gain 0.9 · cooldown 1500 s
 
 Speaker label on screen: **HAUL CONTROL**
 
@@ -799,7 +884,7 @@ Speaker label on screen: **HAUL CONTROL**
 
 ## `police` — City Patrol, Air Division — other people’s problems on an open band
 
-**26 slots** · `fore` · `tag: alert` · gain 0.9 · cooldown 1500 s
+**26 slots** · `fore` · `tag: info` · gain 0.9 · cooldown 1500 s
 
 Speaker label on screen: **CITY PATROL**
 
@@ -836,7 +921,7 @@ Speaker label on screen: **CITY PATROL**
 
 ## `pirate` — The Understack, the unlicensed station
 
-**15 slots** · `fore` · `tag: info` · gain 0.9 · cooldown 1500 s
+**16 slots** · `fore` · `tag: bg` · gain 0.9 · cooldown 1500 s
 
 Speaker label on screen: **THE UNDERSTACK**
 
@@ -863,7 +948,7 @@ Speaker label on screen: **THE UNDERSTACK**
 
 ## `ad` — the commercial band
 
-**16 slots** · `fore` · `tag: info` · gain 0.9 · cooldown 1500 s
+**16 slots** · `fore` · `tag: bg` · gain 0.9 · cooldown 1500 s
 
 Speaker label on screen: **COMMERCIAL BAND**
 
@@ -890,7 +975,7 @@ Speaker label on screen: **COMMERCIAL BAND**
 
 ## `distress` — the open emergency band
 
-**14 slots** · `fore` · `tag: alert` · gain 0.9 · cooldown 1500 s
+**14 slots** · `fore` · `tag: info` · gain 0.9 · cooldown 1500 s
 
 Speaker label on screen: **EMERGENCY BAND**
 
@@ -915,7 +1000,7 @@ Speaker label on screen: **EMERGENCY BAND**
 
 ## `weather` — the Atmospheric Bulletin
 
-**14 slots** · `fore` · `tag: info` · gain 0.9 · cooldown 1500 s
+**14 slots** · `fore` · `tag: bg` · gain 0.9 · cooldown 1500 s
 
 Speaker label on screen: **ATMOSPHERIC**
 
@@ -940,7 +1025,7 @@ Speaker label on screen: **ATMOSPHERIC**
 
 ## `life` — the city talking to itself
 
-**35 slots** · `fore` · `tag: info` · gain 0.9 · cooldown 1500 s
+**38 slots** · `fore` · `tag: bg` · gain 0.9 · cooldown 1500 s
 
 Speaker label on screen: **OPEN CHANNEL**
 
@@ -1048,37 +1133,37 @@ person rather than the same person sped up. Listen to the whole cast in one file
 
 | id | Kokoro voice | pitch | wpm | profile | who |
 |---|---|---|---|---|---|
-| `ctrl_a` | Samantha | 1.00 | 208 | `close` | Haul Control, day operator — US female, calm and clipped |
-| `ctrl_b` | Karen | 0.97 | 199 | `close` | Haul Control, night operator — AU female, dry |
-| `ctrl_c` | Tessa | 1.03 | 220 | `close` | Haul Control, relief operator — ZA female, brisk |
-| `patrol_a` | Daniel | 0.93 | 188 | `loud` | City Patrol officer — GB male, bored authority |
-| `patrol_b` | Rocko (English (US)) | 1.00 | 179 | `loud` | City Patrol second unit — deep US male |
-| `patrol_c` | Tara | 1.00 | 182 | `close` | City Patrol dispatcher — IN female, procedural |
-| `dj` | Aman | 1.07 | 235 | `thin` | The Understack pirate DJ — over-modulated, cheap gear |
-| `ad_f` | Moira | 1.09 | 208 | `close` | commercial announcer - bright female, too close to the microphone |
-| `ad_m` | Daniel | 1.09 | 205 | `close` | commercial announcer - bright male, pitched up and pushed |
-| `bulletin` | Karen | 0.99 | 162 | `close` | Atmospheric Bulletin - flat, evenly paced, no emotion whatsoever |
-| `hauler` | Ralph | 0.98 | 170 | `distant` | long-haul freight driver — deep, weary, talks to fill the hours |
-| `life_a` | Moira | 1.00 | 197 | `close` | IE female |
-| `life_b` | Rishi | 1.00 | 188 | `close` | IN male |
-| `life_c` | Fred | 1.00 | 168 | `close` | US male, gruff |
-| `life_d` | Grandpa (English (US)) | 1.00 | 168 | `distant` | old US male |
-| `life_e` | Grandma (English (UK)) | 1.02 | 168 | `close` | old GB female |
-| `life_f` | Samantha | 1.06 | 186 | `close` | GB female -> US female, brisk |
-| `life_g` | Sandy (English (US)) | 0.96 | 200 | `close` | US female, high |
-| `life_h` | Reed (English (UK)) | 1.02 | 193 | `close` | GB male |
-| `life_i` | Eddy (English (UK)) | 0.96 | 184 | `close` | GB male, distant |
-| `life_j` | Daniel | 1.06 | 228 | `close` | GB male, younger |
-| `life_k` | Karen | 1.07 | 215 | `distant` | AU female, younger |
-| `life_l` | Tessa | 0.94 | 195 | `close` | ZA female, lower |
-| `life_m` | Aman | 0.93 | 186 | `close` | IN male, lower |
-| `life_n` | Samantha | 0.92 | 175 | `distant` | US female, lower |
-| `dis_a` | Moira | 1.04 | 240 | `thin` | emergency band — IE female |
-| `dis_b` | Rishi | 1.05 | 246 | `thin` | emergency band — IN male |
-| `dis_c` | Sandy (English (US)) | 1.00 | 210 | `loud` | emergency band — US female |
-| `dis_d` | Rocko (English (US)) | 1.03 | 195 | `thin` | emergency band — deep US male |
-| `dis_e` | Tara | 1.06 | 253 | `loud` | emergency band — IN female |
-| `dis_f` | Daniel | 1.00 | 233 | `thin` | emergency band — GB male |
+| `ctrl_a` | af_sarah | 1.00 | 204 | `close` | Haul Control, day operator — US female, clipped and procedural |
+| `ctrl_b` | bf_emma | 0.98 | 194 | `close` | Haul Control, night operator — GB female, dry |
+| `ctrl_c` | af_alloy | 1.03 | 204 | `close` | Haul Control, relief operator — brisk, half bored |
+| `patrol_a` | bm_lewis | 0.96 | 168 | `loud` | City Patrol officer — GB male, bored authority |
+| `patrol_b` | am_onyx | 0.94 | 194 | `loud` | City Patrol second unit — deep US male |
+| `patrol_c` | af_kore | 1.00 | 184 | `close` | City Patrol dispatcher — procedural female |
+| `dj` | am_puck | 1.06 | 221 | `thin` | The Understack pirate DJ — fast, over-modulated, cheap gear |
+| `ad_f` | af_bella | 1.06 | 195 | `close` | commercial announcer — bright female, too close to the microphone |
+| `ad_m` | am_eric | 1.05 | 222 | `close` | commercial announcer — bright male, pitched up and pushed |
+| `bulletin` | af_river | 1.00 | 195 | `close` | Atmospheric Bulletin — flat, evenly paced, no emotion whatsoever |
+| `hauler` | am_fenrir | 0.97 | 171 | `distant` | long-haul freight driver — deep, weary, talks to fill the hours |
+| `life_a` | bf_alice | 1.00 | 190 | `close` | open channel — GB female |
+| `life_b` | am_adam | 1.00 | 196 | `close` | open channel — US male, even |
+| `life_c` | am_michael | 0.95 | 163 | `close` | open channel — US male, gruff and low |
+| `life_d` | am_santa | 0.97 | 159 | `distant` | open channel — old US male, unhurried |
+| `life_e` | bf_isabella | 1.02 | 189 | `close` | open channel — older GB female |
+| `life_f` | af_aoede | 1.04 | 193 | `close` | open channel — US female, warm |
+| `life_g` | af_nova | 1.05 | 204 | `close` | open channel — US female, high and light |
+| `life_h` | bm_daniel | 1.00 | 197 | `close` | open channel — GB male |
+| `life_i` | bm_fable | 0.97 | 177 | `close` | open channel — GB male, low |
+| `life_j` | am_liam | 1.04 | 216 | `close` | open channel — US male, younger |
+| `life_k` | bf_lily | 1.03 | 195 | `distant` | open channel — GB female, younger |
+| `life_l` | af_jessica | 0.96 | 211 | `close` | open channel — US female, lower |
+| `life_m` | am_echo | 0.95 | 189 | `close` | open channel — US male, lower |
+| `life_n` | af_nicole | 0.98 | 138 | `distant` | open channel — US female, quiet and close-miked |
+| `dis_a` | af_heart | 1.03 | 203 | `thin` | emergency band — US female, urgent |
+| `dis_b` | am_adam | 1.05 | 228 | `thin` | emergency band — US male, urgent |
+| `dis_c` | af_sky | 1.00 | 212 | `loud` | emergency band — US female, shouting into the mic |
+| `dis_d` | am_onyx | 1.04 | 214 | `thin` | emergency band — deep US male |
+| `dis_e` | af_alloy | 1.07 | 222 | `loud` | emergency band — brisk female |
+| `dis_f` | bm_daniel | 1.00 | 213 | `thin` | emergency band — GB male |
 
 ---
 
@@ -1087,145 +1172,15 @@ person rather than the same person sped up. Listen to the whole cast in one file
 | group | slots | on screen | tag |
 |---|---|---|---|
 | music | 9 | — | — |
-| `dispatch` | 19 | yes | `alert` |
+| `dispatch` | 19 | yes | `info` |
 | `dispatch_confirm` | 20 | yes | `alert` |
 | `dispatch_pay` | 20 | yes | `alert` |
-| `police` | 26 | yes | `alert` |
-| `pirate` | 15 | yes | `info` |
-| `ad` | 16 | yes | `info` |
-| `distress` | 14 | yes | `alert` |
-| `weather` | 14 | yes | `info` |
-| `life` | 35 | yes | `info` |
+| `police` | 26 | yes | `info` |
+| `pirate` | 16 | yes | `bg` |
+| `ad` | 16 | yes | `bg` |
+| `distress` | 14 | yes | `info` |
+| `weather` | 14 | yes | `bg` |
+| `life` | 38 | yes | `bg` |
 | `bg_net` | 14 | no | `bg` |
 | `bg_dock` | 10 | no | `bg` |
-| **total** | **212** | **179 foreground** | |
-
----
----
-
-# 6. THE STORY VO — S2-E's intro cutscene
-
-**This is the one place in NEONHAUL where SUNO is the better tool, and S2-B's verdict is why.**
-Whisper transcription scored the local `say` pipeline **90.7 %** against SUNO's **88.1 %** on radio
-chatter — but that comparison was made through a 3.4 kHz band-limit, where flatness reads as cheap
-gear. The Boss is **not on a radio**. He is sitting in a craft eight metres away with his canopy
-open, talking over a twenty-year-old who has just realised what their father has done. There is no
-band-limit to hide behind and the whole scene is a performance.
-
-So: **the local takes ship now** (`tools/vo/gen_story.py`, 19 clips, 497 KB, in
-`assets/audio/story/`) and the scene is complete and testable today. These prompts exist so Aaron
-can upgrade the Boss in one session without anyone having to re-derive the script.
-
-## What to replace, and what not to
-
-| | replace with SUNO? | why |
-|---|---|---|
-| `boss_01` … `boss_07` | **yes — this is the whole point** | seven lines, gender-invariant, one voice, one session |
-| `pc_*_int1/2/3` | no | three words each; there is nothing to perform |
-| `pc_*_close` | optional, and it is 3 takes | the monologue is the only player line worth a real read |
-
-**Drop-in rule.** Save the take as `assets/audio/story/boss_0N.mp3` and nothing else changes —
-`js/storyui.js`'s `StoryVoice` fetches by slot name and `SCRIPT[n].hold` is the on-screen time. If a
-SUNO take is longer than its `hold`, raise the `hold` in `js/storyui.js` to match; the bubble timing
-is written in that one table and nowhere else.
-
-**Do NOT run these through `tools/radio_fx.sh`.** That is the radio chain. Run them through
-`gen_story.py`'s `room()` treatment instead, or nothing at all — a band-limited Boss sounds like
-dispatch, and dispatch is the one thing this scene must not sound like.
-
-## The voice
-
-> **Style:** `spoken word only, no music, no melody, no beat, no background bed. A single male
-> voice, mid-fifties, deep and unhurried. Close-mic'd, dry, small room. Completely calm — this is a
-> conversation he has had many times and the outcome does not concern him. Never shouts. Slight
-> smile in the delivery on the threats.`
-
-The one direction that matters: **he is not angry.** Every draft that plays him angry makes him
-smaller. He is bored, and being bored while describing breaking somebody's arm is the character.
-
-## S1 — `boss_01`
-
-> **Lyrics:** `[Man, calm, quiet, unhurried] Don't get out. Don't touch the stick. Just listen.`
-
-## S2 — `boss_02`
-
-> **Lyrics:** `[Man, calm, conversational, faintly amused] That is a very nice craft you are
-> flying. [slight pause] Insured to somebody else, I notice.`
-
-## S3 — `boss_03`
-
-> **Lyrics:** `[Man, calm, flat, matter of fact] Your father owes us fifty thousand. [pause] He has
-> owed us fifty thousand for a while now.`
-
-## S4 — `boss_04` — spoken OVER the player's "But—"
-
-> **Lyrics:** `[Man, calm, cutting in, not raising his voice] He is away. You are here. That makes
-> it yours.`
-
-Direction: come in early and flat. He is not interrupting because he is annoyed, he is interrupting
-because he was never going to stop.
-
-## S5 — `boss_05` — spoken OVER the player's "Wait—"
-
-> **Lyrics:** `[Man, calm, patient] Fifty thousand credits. We will come for it, [pause] and I
-> would not make us look for you.`
-
-## S6 — `boss_06` — the threat, spoken OVER the player's "Just wait—"
-
-> **Lyrics:** `[Man, calm, almost pleasant, listing things] If it is not ready we take the craft
-> and sell it. [pause] Then we break an arm. [pause] Then, [slight pause] if I am in a mood, we
-> sell whoever was driving to whoever is buying.`
-
-Direction: the list is the joke and the pauses are the performance. Nothing in it is emphasised.
-This is the longest line in the game at 10.9 s locally, and the one worth the most from a real read.
-
-## S7 — `boss_07`
-
-> **Lyrics:** `[Man, calm, finishing a conversation] Make the money. Soon.`
-
-## S8 — the escalation lines (**not** in the cutscene)
-
-The four pressure messages arrive as text in the chatter ticker while the player is flying, keyed
-off the warmth gauge's pace signal (`js/story.js` `BOSS_LINES`). **They currently have no audio at
-all** and the game is complete without it. If Aaron wants them spoken, they are four more takes in
-the same voice, and they would want the RADIO treatment rather than the room one — he is calling in,
-not standing there. Slots would be `assets/audio/story/boss_msg1..4.mp3` and the wiring is one line
-in `bossSays()`.
-
-> **Lyrics 1:** `[Man, calm, flat] Better make money fast.`
-> **Lyrics 2:** `[Man, calm, flat] Will be needing the money soon.`
-> **Lyrics 3:** `[Man, calm, harder] Ensure you have the money ready.`
-> **Lyrics 4:** `[Man, calm, final] We are on our way. Better have the money ready.`
-
-## S9 — the player's closing monologue, `pc_{m,f,n}_close`
-
-Three takes, ~20 years old, and the only player line long enough to be worth a real performance.
-
-> **Style:** `spoken word only, no music. A twenty-year-old talking to themself in an empty cabin.
-> Shaken, then angry, then decided — in that order, inside twelve seconds. Close-mic'd, dry.`
->
-> **Lyrics:** `[Young {man/woman/person}, shaken] Shit. [pause] They wouldn't let me get a word in.
-> [angrier] What sort of shit has my Dad got himself into? [quieter, looking around the cabin] I
-> shouldn't even be flying this. [decided] But now I'm going to have to. I need to make that money
-> fast.`
-
-The neutral take is Aaron's own direction: **a high male or low female read**, not a processed one.
-
-## Slot summary — story
-
-| slot | who | takes | local sec | local bytes |
-|---|---|---|---|---|
-| `boss_01`–`boss_07` | the Boss | 1 each | 2.2–10.9 | 240 KB total |
-| `pc_{m,f,n}_int1/2/3` | the player | 3 each | 0.5–0.9 | 44 KB total |
-| `pc_{m,f,n}_close` | the player | 3 | 11.9 | 216 KB total |
-
-19 clips · 497 KB · mean 26 KB. Only 11 of them are ever fetched in one session, because
-`StoryVoice.preload(gender)` asks for the Boss plus one gender's takes.
-
-### §S2-J — four seeded lines (2026-08-20)
-
-`life_36`, `life_37`, `life_38` and `pirate_16` are the story's remarks about the player's father.
-They are ordinary pool entries in every respect — same voices, same `bg` tag, same chain, same
-16 kbps mono — because that is the whole point: **a player who is not listening never notices them.**
-The director never draws them on its own; `js/story.js` asks for them by name through
-`radio.speak()`. Pool 203 → 207 slots, 2 283 → 2 333 KB.
+| **total** | **216** | **183 foreground** | |

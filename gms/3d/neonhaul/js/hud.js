@@ -7,9 +7,11 @@
 // craft plus every traffic craft in the world — into five, and it did that by refusing to let
 // "one object" mean "one mesh". The same rule applies here:
 //
-//   shell   every near-black metal part of the cabin — both A-pillars, the roof lip, the dash
-//           lip, the two side consoles — merged into ONE BufferGeometry at build time. They never
-//           move relative to each other, so there is nothing an object split would buy.
+//   shell   every solid part of the cabin — both A-pillars, the dash lip, the two side consoles —
+//           merged into ONE BufferGeometry at build time. They never move relative to each other,
+//           so there is nothing an object split would buy. §S2-L made the pillars GLASS without
+//           splitting the mesh: the material is white with RGBA vertex colours, so "which parts are
+//           see-through" is a per-vertex attribute rather than a second material.
 //   rules   every 4 mm emissive edge rule, merged the same way. One material, one district tint,
 //           one red flash on contact.
 //   glass   the canopy. A 4x4 grid whose VERTEX COLOURS carry the fresnel falloff, so the sheen
@@ -54,40 +56,56 @@ const _eyeOf = (group, out) => out.setFromMatrixPosition(group.matrix);
 
 // ── the cabin, as data ─────────────────────────────────────────────────────
 // Every part is a box with a transform, so "no occupant, no hands, no seat" (§13) is a property a
-// gate can read off this table rather than a claim in a handoff. `role` is what the part IS;
-// gates_p6 asserts the set of roles present is exactly ROLES_ALLOWED.
+// gate can read off this table rather than a claim in a handoff. `role` is what the part IS.
+//
+// This comment used to say "gates_p6 asserts the set of roles present is exactly ROLES_ALLOWED".
+// **It never did.** gates_p6 asserts the MESH roles — frame / rule / glass / dash / holo — which is
+// a different list on a different object, and §S2-L found that nothing in js/ or tools/ read
+// ROLES_ALLOWED at all. An exported constant, a comment claiming a gate enforced it, and no gate:
+// the twenty-second instance of this project's one failure mode. `Cockpit.roles()` exists now and
+// gates_s2l D4 reads it.
 
-export const ROLES_ALLOWED = ['pillar', 'roof', 'dash', 'console'];
+// §S2-L. `roof` is GONE from this list, and that is the point of the phase. Aaron, on the shipped
+// build: *"there is a big black bar if i look up, it doesn't look good, have it all glass, I almost
+// want the exact same view as chase but dashboard instead of chasing car."* The bar was `roof_lip`
+// and `roof_spar` in near-black metal, and there was nothing in them worth saving.
+export const ROLES_ALLOWED = ['pillar', 'dash', 'console'];
 
 const Z = HUD.CABIN_Z;
 
+// Two surfaces, one merged geometry. `col` is an RGBA vertex colour and it is what lets the
+// A-pillars be GLASS while the dash mouldings stay near-black metal without a second draw call:
+// the shell material is white with `vertexColors`, so each part carries its own colour and its own
+// alpha. SOLID reproduces the old 0x0c0e12 shell exactly (three converts a hex through sRGB, so the
+// literal has to come from THREE.Color rather than from 12/255).
+const SOLID = new THREE.Color(0x0c0e12);
+const GLASSY = new THREE.Color(0x63879f);
+
 const PARTS = [
-  // id                 role       pos                       size                 rot (deg)
-  ['pillar_l',          'pillar',  [-0.62, 0.16, -Z * 0.98], [0.075, 1.05, 0.10], [0, 0, 10]],
-  ['pillar_r',          'pillar',  [0.62, 0.16, -Z * 0.98],  [0.075, 1.05, 0.10], [0, 0, -10]],
-  ['roof_lip',          'roof',    [0, 0.58, -Z * 0.92],     [1.38, 0.13, 0.16],  [16, 0, 0]],
-  ['roof_spar',         'roof',    [0, 0.66, -Z * 0.60],     [1.10, 0.07, 0.55],  [0, 0, 0]],
+  // id                 role       pos                       size                 rot (deg)   colour
+  ['pillar_l',          'pillar',  [-0.62, 0.16, -Z * 0.98], [0.075, 1.05, 0.10], [0, 0, 10],  [GLASSY, 0.26]],
+  ['pillar_r',          'pillar',  [0.62, 0.16, -Z * 0.98],  [0.075, 1.05, 0.10], [0, 0, -10], [GLASSY, 0.26]],
   // The lip is deliberately SHALLOW and pushed back. Its first version was 0.72 m deep centred at
   // 0.66 m, so its near edge came within 0.30 m of the eye — and a horizontal surface that close
   // projects to the bottom 40 % of the frame as featureless black, which on a phone is most of the
-  // screen spent on nothing. S2 cut it again: the instrument plane is now roughly half the height
-  // it was, so the lip behind it was re-cut to match rather than being left to fill the gap with
-  // the same featureless black the plane had just stopped covering.
-  ['dash_lip',          'dash',    [0, -0.545, -Z * 0.84],   [1.74, 0.10, 0.40],  [-9, 0, 0]],
-  ['dash_face',         'dash',    [0, -0.455, -Z * 0.67],   [1.42, 0.06, 0.05],  [-30, 0, 0]],
-  // The two side consoles carry S2's "additional buttons around the sides": they are the physical
-  // housings the DOM control cluster sits over, so a lever or a boost key reads as MOUNTED on the
-  // cabin rather than floating in front of it. Raised and brought inboard from P6's pair, which
-  // sat below the instrument plane where nothing ever overlapped them.
-  ['console_l',         'console', [-0.60, -0.415, -Z * 0.53], [0.26, 0.14, 0.38], [-8, 0, 14]],
-  ['console_r',         'console', [0.60, -0.415, -Z * 0.53],  [0.26, 0.14, 0.38], [-8, 0, -14]],
+  // screen spent on nothing. S2 cut it again to match a halved instrument plane. As of §S2-L the
+  // DOM control lip covers the band where this sits, so what it does now is give the pilot a floor
+  // to see when the view is pitched down past the instrument top.
+  ['dash_lip',          'dash',    [0, -0.545, -Z * 0.84],   [1.74, 0.10, 0.40],  [-9, 0, 0],  [SOLID, 1]],
+  ['dash_face',         'dash',    [0, -0.455, -Z * 0.67],   [1.42, 0.06, 0.05],  [-30, 0, 0], [SOLID, 1]],
+  // The two side consoles. They were the housings the floating control cluster stood over; §S2-L
+  // moved the controls into a DOM lip along the bottom, so what these are now is the moulded ENDS
+  // of that lip in 3D — off screen in portrait at +/-0.60 m, and the shoulders the keys sit on in
+  // landscape. Kept rather than deleted: they are what stops the lip's two ends reading as painted
+  // onto the glass when the pilot looks down.
+  ['console_l',         'console', [-0.60, -0.415, -Z * 0.53], [0.26, 0.14, 0.38], [-8, 0, 14],  [SOLID, 1]],
+  ['console_r',         'console', [0.60, -0.415, -Z * 0.53],  [0.26, 0.14, 0.38], [-8, 0, -14], [SOLID, 1]],
 ];
 
 // The emissive edge rules — §8.1's "4 mm emissive edge rule in the district tint at 0.2".
 const RULES = [
   [[-0.572, 0.16, -Z * 0.955], [0.006, 1.02, 0.004], [0, 0, 10]],
   [[0.572, 0.16, -Z * 0.955], [0.006, 1.02, 0.004], [0, 0, -10]],
-  [[0, 0.508, -Z * 0.905], [1.34, 0.006, 0.004], [16, 0, 0]],
   [[0, -0.417, -Z * 0.675], [1.40, 0.006, 0.004], [-30, 0, 0]],
   [[-0.60, -0.338, -Z * 0.53], [0.25, 0.005, 0.004], [-8, 0, 14]],
   [[0.60, -0.338, -Z * 0.53], [0.25, 0.005, 0.004], [-8, 0, -14]],
@@ -110,7 +128,7 @@ const RULES = [
 // `wide` is §8.3's left/right/centre-low; `tall` pulls the pair in, narrows them and lifts them
 // above the dash so they frame the view instead of covering it.
 
-export function layoutFor(aspect, fov = CAMERA.fov) {
+export function layoutFor(aspect, fov = CAMERA.fov, lipFrac = 0) {
   const wide = aspect >= 1.15;
   const tan = Math.tan(fov * 0.5 * D2R);
   // Half-extents of the visible frame AT a given cabin depth. Everything below is expressed as a
@@ -150,9 +168,12 @@ export function layoutFor(aspect, fov = CAMERA.fov) {
   // config's DASH_H/DASH_W pair and the only lever here is the WIDTH. It is bottom-anchored — the
   // dash grows up from the floor of the frame rather than being centred on a guess — and capped so
   // a very wide desktop frame does not hand it the whole viewport.
+  // Full-bleed in both arrangements now. The quad and the DOM lip under it have to read as one
+  // moulding, and a quad inset from the frame edge above a lip that runs edge to edge reads as two
+  // objects however well the gradients match.
   const dsh = wide
-    ? { cw: HUD.DASH_W, ch: HUD.DASH_H, frac: 0.73, cap: 1.42 }
-    : { cw: HUD.DASH_TW, ch: HUD.DASH_TH, frac: 0.96, cap: 0.52 };
+    ? { cw: HUD.DASH_W, ch: HUD.DASH_H, frac: 1.0, cap: 1.9 }
+    : { cw: HUD.DASH_TW, ch: HUD.DASH_TH, frac: 0.98, cap: 0.52 };
   const ar = dsh.ch / dsh.cw;
   const dw = Math.min(2 * hw(zDash) * dsh.frac, dsh.cap);
   const pitch = -34;
@@ -164,8 +185,12 @@ export function layoutFor(aspect, fov = CAMERA.fov) {
   // survived a pass. Both edges are projected properly here and the BOTTOM one is placed.
   const dh = dw * ar;
   const yc = Math.cos(pitch * D2R) * dh * 0.5, zc = Math.abs(Math.sin(pitch * D2R)) * dh * 0.5;
-  const MARGIN = 0.02;                                // fraction of the half-frame left under it
-  const dashY = yc - (1 - MARGIN) * tan * (zDash - zc);
+  // §S2-L: the plane's bottom edge lands on the TOP OF THE LIP, not on the floor of the frame.
+  // `lipFrac` is the lip's share of the viewport height, measured off the DOM (see `lipFrac()`),
+  // so the seam between the laid-back instrument top and the face-on control lip is a real edge
+  // between two touching surfaces rather than a gap the eye has to forgive.
+  const bottomN = -1 + 2 * clamp(lipFrac, 0, 0.45);
+  const dashY = yc + bottomN * tan * (zDash - zc);
   const topN = (dashY + yc) / (tan * (zDash + zc));   // normalised screen y of the plane's top edge
   const projH = dw * ar * Math.cos(pitch * D2R);
 
@@ -177,8 +202,10 @@ export function layoutFor(aspect, fov = CAMERA.fov) {
     // it about as few as a portrait one does.
     panelFrac: +(pw / (2 * pHW)).toFixed(4),
     dash: { w: dw, ar, cw: dsh.cw, ch: dsh.ch, y: +dashY.toFixed(4), z: -zDash, pitch,
-      // what the QUAD costs the frame, top edge to the floor, after the perspective divide
-      screenFrac: +((topN + 1) / 2).toFixed(4), projH: +projH.toFixed(4) },
+      // what the QUAD costs the frame, top edge to the floor, after the perspective divide —
+      // which now INCLUDES the lip, because the quad is seated on top of it
+      screenFrac: +((topN + 1) / 2).toFixed(4), projH: +projH.toFixed(4),
+      lipFrac: +lipFrac.toFixed(4) },
     // Every panel is h = w/3 because all three share one 384-wide, 128-tall band of the same
     // CanvasTexture. A panel quad at a different aspect from its band is stretched text.
     panels: [
@@ -215,6 +242,19 @@ export class Cockpit {
   // every 844x390 handset, which is the defect §8.2's two dash sheets exist to avoid.
   holoDense() { return this.lay.panelFrac * (window.innerWidth || 1280) >= 260; }
 
+  // §S2-L. The control lip's share of the viewport height, MEASURED rather than assumed, because
+  // the number has to include whatever safe-area inset the device adds under it. `#lipsize` is a
+  // zero-width probe carrying exactly the lip's own height expression, and it lives outside
+  // #controls so it is still laid out while the control layer is hidden — which it is for the
+  // whole of boot and for every ?nohud shot. No probe (a bare test page) falls back to the config
+  // pair, which is the same number the stylesheet uses.
+  lipFrac() {
+    const h = window.innerHeight || 1;
+    const el = typeof document === 'undefined' ? null : document.getElementById('lipsize');
+    const px = el ? el.getBoundingClientRect().height : 0;
+    return clamp((px || (this.aspectNow() >= 1.15 ? HUD.LIP_H_LAND : HUD.LIP_H)) / h, 0, 0.45);
+  }
+
   constructor(scene, Q, sky, atlas) {
     this.scene = scene;
     this.low = Q.name === 'low';
@@ -234,9 +274,14 @@ export class Cockpit {
     this.fade = [1, 1, 0];
     this._occupant = null;
 
-    const geo = buildBoxes(PARTS.map(p => ({ pos: p[2], size: p[3], rot: p[4] })));
+    const geo = buildBoxes(PARTS.map(p => ({ pos: p[2], size: p[3], rot: p[4], col: p[5] })));
+    // White base, colour in the attribute. `transparent` is what the glass pillars need and it
+    // costs the dash mouldings nothing: at alpha 1 the blend is the same pixel the opaque pass
+    // produced. The cabin keeps renderOrder 0, so it still draws before the dash quad (3), the
+    // canopy (4) and the holo panels (5), which is the near-to-far order they sit in.
     this.shellMat = new THREE.MeshStandardMaterial({
-      color: 0x0c0e12, metalness: 0.85, roughness: 0.35, fog: false,
+      color: 0xffffff, vertexColors: true, transparent: true,
+      metalness: 0.85, roughness: 0.35, fog: false,
       envMap: sky ? sky.env : null, envMapIntensity: 0.9,
     });
     this.shell = new THREE.Mesh(geo, this.shellMat);
@@ -288,7 +333,7 @@ export class Cockpit {
     // The canvas is SIZED by the layout, not by a constant: portrait gets a squarer sheet with
     // larger type (see layoutFor). LOW halves whichever sheet the layout picked.
     this.fov = CAMERA.fov;
-    this.lay = layoutFor(this.aspectNow(), this.fov);
+    this.lay = layoutFor(this.aspectNow(), this.fov, this.lipFrac());
     this.dashCanvas = document.createElement('canvas');
     this.sizeDash();
     this.dashTex = new THREE.CanvasTexture(this.dashCanvas);
@@ -358,10 +403,11 @@ export class Cockpit {
   // re-cuts two small geometries. A drag that changes neither costs a layout object and nothing.
   applyLayout(aspect = this.aspectNow(), fov = this.fov) {
     this.fov = fov;
-    const lay = layoutFor(aspect, fov);
+    const lay = layoutFor(aspect, fov, this.lipFrac());
     const arrangement = !this.lay || lay.wide !== this.lay.wide;
     const moved = arrangement || Math.abs(lay.fov - this.lay.fov) > 0.4
-      || Math.abs(lay.dash.w - this.lay.dash.w) > 1e-4;
+      || Math.abs(lay.dash.w - this.lay.dash.w) > 1e-4
+      || Math.abs(lay.dash.lipFrac - this.lay.dash.lipFrac) > 1e-4;
     this.lay = lay;
     if (!moved) return false;
     if (arrangement) {
@@ -421,6 +467,36 @@ export class Cockpit {
     return !!this._occupant;
   }
 
+  // §S2-L's falsification hook, and the twin of testOccupant above: put the roof back. Nothing in
+  // the game calls it. It re-uses the shell material, so a gate that forgets to take it down again
+  // is visible in the draw count rather than silently absorbed.
+  testRoof(on) {
+    if (on && !this._roof) {
+      const g = buildBoxes([
+        { pos: [0, 0.58, -Z * 0.92], size: [1.38, 0.13, 0.16], rot: [16, 0, 0], col: [SOLID, 1] },
+        { pos: [0, 0.66, -Z * 0.60], size: [1.10, 0.07, 0.55], rot: [0, 0, 0], col: [SOLID, 1] },
+      ]);
+      this._roof = new THREE.Mesh(g, this.shellMat);
+      this._roof.name = 'cockpit.roof';
+      this._roof.frustumCulled = false;
+      this._roof.userData.role = 'roof';
+      this.group.add(this._roof);
+    } else if (!on && this._roof) {
+      this.group.remove(this._roof);
+      this._roof.geometry.dispose();
+      this._roof = null;
+    }
+    return !!this._roof;
+  }
+
+  // The cabin's PART roles, against the list this file declares. `ROLES_ALLOWED` was exported for
+  // exactly this and — found in §S2-L — nothing had ever read it, so the "roles are exactly this
+  // list" claim in the header comment was a comment and not a check. gates_s2l D4 reads this.
+  roles() {
+    return { allowed: ROLES_ALLOWED.slice(), present: [...new Set(PARTS.map(p => p[1]))].sort(),
+      parts: PARTS.map(p => ({ id: p[0], role: p[1], alpha: p[5] ? p[5][1] : 1 })) };
+  }
+
   // How much of the FRAME the dash assembly eats, top edge down, as a fraction of frame height.
   //
   // This is the number S2's "reduce the dash height by almost half — it currently eats the bottom
@@ -456,8 +532,15 @@ export class Cockpit {
     // at -1.03 — the bottom third of the dashboard, rounded corners and chat box included, was
     // below the floor of the screen on a landscape phone and looked fine in a portrait capture.
     const planeBottom = (L.y - yc) / (t * (Math.abs(L.z) - zc));
+    // §S2-L: the assembly is now the quad PLUS the DOM control lip it is seated on, and `frac`
+    // covers both — the quad's bottom edge is the lip's top edge, so the plane's top is still the
+    // top of everything the player reads as dashboard. `lipPx` is broken out so a gate can say
+    // which half is which instead of quoting one number for two surfaces.
+    const H = window.innerHeight || 1;
     return { top: +top.toFixed(4), frac: +((top + 1) / 2).toFixed(4), fov: +fov.toFixed(1),
-      plane: L.screenFrac, planeBottom: +planeBottom.toFixed(4) };
+      plane: L.screenFrac, planeBottom: +planeBottom.toFixed(4),
+      lipFrac: L.lipFrac, lipPx: +(L.lipFrac * H).toFixed(2),
+      totalPx: +(((top + 1) / 2) * H).toFixed(2) };
   }
 
   // Every mesh in the cabin, with what it is and how big. §13's "no occupant, no hands, no seat
@@ -514,7 +597,18 @@ export class Cockpit {
     // fixed camera and NO flight model — and a cabin that silently defaulted to heading 0 there
     // would render its own back wall into the one frame this phase is scored on.
     const m = new THREE.Matrix4();
-    const e = new THREE.Euler(ctx.vpitch || 0, ctx.heading || 0, (ctx.bank || 0) * F.COCKPIT.rollMul, 'YXZ');
+    // PITCH is the camera's, not the craft's, and that is §S2-L's doing. The yaw already worked
+    // this way — main.js clamps the cabin's heading to the camera's ± CABIN_YAW_LAG because an
+    // unbounded lag slid the dash bodily off the left edge mid-turn. The vertical axis had exactly
+    // the same defect and nothing bounded it: the cabin pitches with the craft while the camera
+    // pitches with the LOOK, so at a 3.4 deg resting pitch the dashboard sat 57 CSS px up the
+    // frame, and looking down walked it further. That was survivable while the dash floated; it is
+    // not now, because the control lip is a screen-space surface and the instrument top has to
+    // stay seated on it at every look angle or "one moulding" is true at exactly one of them.
+    // The craft's nose attitude is not lost — camera.js already carries it as `vpitch * pitchMul`,
+    // so the whole head tips with the craft and the cabin comes with it.
+    const e = new THREE.Euler(ctx.pitch !== undefined ? ctx.pitch : (ctx.vpitch || 0),
+      ctx.heading || 0, (ctx.bank || 0) * F.COCKPIT.rollMul, 'YXZ');
     this.bob = Math.sin(this.t * 1.7) * 0.006;                 // §8.3's +/-6 mm
     m.compose(
       new THREE.Vector3(ctx.x, ctx.y + F.COCKPIT.height + this.bob, ctx.z),
@@ -633,16 +727,15 @@ export class Cockpit {
     g.save();
     g.scale(c.width / W, c.height / H);                 // LOW draws the same layout at half scale
     const R = HUD.DASH_R;
-    const S = this.dashSlots(d);
+    const S = this.dashSlots();
     this._housing(g, W, H, R);
-    if (S.bay) this._bay(g, ...S.bay, R);
     this._topBar(g, d, S.x0, S.iw, S.bar, R);
     g.save();
     rrect(g, 0, 0, W, H, R); g.clip();
     if (this.lay.wide) this._dashWide(g, d, S);
     else this._dashTall(g, d, S);
     g.restore();
-    this._greeble(g, W, H, R);
+    this._greeble(g, W, H, S.pad);
     g.restore();
     this.dashTex.needsUpdate = true;
     return this.dashDraws;
@@ -682,21 +775,6 @@ export class Cockpit {
     rrect(g, 3, 3, W - 6, H - 6, R - 3); g.stroke();
   }
 
-  // The blank moulded column the DOM control cluster sits over. It carries a rail and a couple of
-  // fixings and NOTHING a player has to read, which is the point of it.
-  _bay(g, x, y, w, h, R) {
-    g.save();
-    rrect(g, 0, 0, this.lay.dash.cw, this.lay.dash.ch, R); g.clip();
-    const grad = g.createLinearGradient(x, 0, x + w, 0);
-    grad.addColorStop(0, 'rgba(20,27,37,0.0)');
-    grad.addColorStop(0.35, 'rgba(20,27,37,0.85)');
-    grad.addColorStop(1, 'rgba(11,15,21,0.95)');
-    g.fillStyle = grad; g.fillRect(x, y, w, h);
-    g.strokeStyle = 'rgba(150,200,230,0.16)'; g.lineWidth = 1;
-    g.beginPath(); g.moveTo(x + 0.5, y + 4); g.lineTo(x + 0.5, y + h - 4); g.stroke();
-    g.restore();
-  }
-
   // §8.2's thin top bar: money, the live job with its clock, and the time bonus with its own.
   // The bonus PAIR disappears the moment the bonus window is gone (S2, explicit) — a reward that
   // is no longer collectable must not keep a slot on the panel implying that it is.
@@ -716,10 +794,14 @@ export class Cockpit {
     g.translate(x0, 0);
 
     const wide = this.lay.wide;
-    const fs = wide ? 1 : 1.18;                       // portrait sets everything larger
+    // The bar's height comes from the layout now rather than from a constant, so everything drawn
+    // on it scales off `h`. Without this §S2-L's shorter bar drew a 16 px credit figure into a
+    // 15 px band and the housing clip ate half of it.
+    const fs = (wide ? 1 : 1.18) * (h / (wide ? 22 : 30));
     const cy = h / 2;
-    const tape = wide ? 168 : 0;                      // landscape keeps §8.2's heading tape
-    let x = 12;
+    const tape = wide ? 200 : 0;                      // landscape keeps §8.2's heading tape
+    const pad = Math.round(12 * fs);
+    let x = pad;
 
     // money
     g.textBaseline = 'middle'; g.textAlign = 'left';
@@ -729,11 +811,11 @@ export class Cockpit {
     g.fillStyle = '#6cff9c';
     g.font = `400 ${Math.round(16 * fs)}px ui-monospace, Menlo, monospace`;
     g.fillText(commas(Math.round(d.credits || 0)), x, cy + 5 * fs);
-    x += Math.max(72, g.measureText(commas(Math.round(d.credits || 0))).width + 26);
-    divider(g, x - 12, h);
+    x += Math.max(72 * fs, g.measureText(commas(Math.round(d.credits || 0))).width + 26 * fs);
+    divider(g, x - pad, h);
 
     // the job: name, fee, clock
-    const jobW = W - tape - x - 12 - (d.bonus ? (wide ? 132 : 120) : 0);
+    const jobW = W - tape - x - pad - (d.bonus ? Math.round((wide ? 132 : 120) * fs) : 0);
     if (d.job) {
       g.fillStyle = 'rgba(120,150,175,0.95)';
       g.font = `700 ${Math.round(8 * fs)}px ui-monospace, Menlo, monospace`;
@@ -754,8 +836,8 @@ export class Cockpit {
 
     // the bonus, and its own countdown. Both go together or neither is drawn.
     if (d.bonus) {
-      const bx = W - tape - (wide ? 128 : 116);
-      divider(g, bx - 12, h);
+      const bx = W - tape - Math.round((wide ? 128 : 116) * fs);
+      divider(g, bx - pad, h);
       g.fillStyle = 'rgba(255,178,56,0.85)';
       g.font = `700 ${Math.round(8 * fs)}px ui-monospace, Menlo, monospace`;
       g.fillText('BONUS', bx, cy - 6 * fs);
@@ -778,9 +860,8 @@ export class Cockpit {
   // Screw bosses in the four corners and a vent grille on the belly. Pure surface detail, drawn
   // last so it sits over everything, and the cheapest half of the gap between "good for basic"
   // and "expensive" — a moulded panel has fixings and it has air.
-  _greeble(g, W, H, R) {
-    const k = R * 0.62;
-    for (const [x, y] of [[k, H - k * 0.85], [W - k, H - k * 0.85]]) {
+  _greeble(g, W, H, pad) {
+    for (const [x, y] of [[pad - 2, H - 8], [W - pad + 2, H - 8]]) {
       g.beginPath(); g.arc(x, y, 3.4, 0, 6.2832);
       g.fillStyle = 'rgba(0,0,0,0.5)'; g.fill();
       g.lineWidth = 1; g.strokeStyle = 'rgba(160,190,215,0.28)'; g.stroke();
@@ -996,7 +1077,7 @@ export class Cockpit {
     g.save();
     rrect(g, x, y, w, h, 4); g.clip();
     g.fillStyle = 'rgba(53,230,255,0.05)'; g.fillRect(x, y, w, h);
-    g.font = '700 12px ui-monospace, Menlo, monospace';
+    g.font = `700 ${Math.max(6, Math.round(h * 0.75))}px ui-monospace, Menlo, monospace`;
     g.textAlign = 'center'; g.textBaseline = 'middle';
     const cx = x + w / 2, px = w / 150;               // +/-75 deg across the tape, not +/-95
     for (let b = -75; b <= 75; b += 15) {
@@ -1021,28 +1102,33 @@ export class Cockpit {
   //   `warmth`  the debt-pressure gauge S2-E will fit — a temperature that climbs when the player
   //             is behind the pace, not a countdown. It sits beside the cell ring because both
   //             answer the same question: how much runway is left.
-  //   `bay`     the blank moulded column the DOM control cluster stands over in portrait, so the
-  //             collective and the boost key never cover an instrument.
+  //   `bay`     GONE as of §S2-L, and `null` in both arrangements. It was the blank moulded column
+  //             the floating control cluster stood over; the controls are now a DOM lip under the
+  //             quad, so the whole canvas is instruments and nothing has to be kept clear.
   //
   // Both are drawn as empty recessed wells rather than left as bare panel: a blanking plate is
   // what a real instrument panel does with an unfitted bay, and it reads as deliberate.
-  dashSlots(d = {}) {
+  dashSlots() {
     const W = this.lay.dash.cw, H = this.lay.dash.ch;
+    // `pad` is not decoration. The quad is FULL-BLEED and it is TILTED, so its near (bottom) edge
+    // projects ~3 % wider than the frame while its far edge is inset by the same — measured, not
+    // guessed: at 844x390 the first full-bleed layout put the speed dial's left third off the side
+    // of the screen. Everything drawable lives inside `pad`, and the housing is what runs out past
+    // the edge, which is exactly the right way round.
     if (this.lay.wide) {
-      const bar = 22;
-      return { W, H, bar, bay: null, x0: 0, iw: W,
-        speed: [16, 24, 50, 50], cell: [78, 26, 38, 38], warmth: [124, 26, 38, 38],
-        alt: [174, 34, 140, 8], hold: [174, 54, 55, 11],
-        lamps: [330, 54, 144, 12], chat: [500, 26, W - 514, H - 36],
-        place: [16, H - 5] };
+      const bar = 17, pad = 50;
+      return { W, H, bar, pad, bay: null, x0: pad - 6, iw: W - 2 * (pad - 6),
+        speed: [pad, 18, 30, 30], cell: [84, 19, 26, 26], warmth: [114, 19, 26, 26],
+        alt: [152, 30, 150, 7], hold: [322, 30, 46, 8],
+        lamps: [388, 34, 124, 10], chat: [700, 18, W - 764, 30],
+        place: [524, H - 4] };
     }
-    const bar = 30, bay = 120;
-    const flip = !!d.flip, x0 = flip ? bay : 0, iw = W - bay, o = x0;
-    return { W, H, bar, bay: [flip ? 0 : W - bay, bar, bay, H - bar], x0, iw,
-      speed: [o + 14, 34, 62, 62], cell: [o + 88, 36, 42, 42], warmth: [o + 138, 36, 42, 42],
-      alt: [o + 190, 46, iw - 204, 9], hold: [o + 190, 68, 60, 12],
-      lamps: [o + 88, 88, 152, 12], chat: [o + 12, 110, iw - 24, 48],
-      place: [o + 16, H - 4] };
+    const bar = 28, pad = 18;
+    return { W, H, bar, pad, bay: null, x0: pad - 8, iw: W - 2 * (pad - 8),
+      speed: [pad, 30, 58, 58], cell: [84, 32, 42, 42], warmth: [132, 32, 42, 42],
+      alt: [182, 46, 140, 9], hold: [182, 74, 56, 11],
+      lamps: [182, 94, 144, 12], chat: [336, 30, W - 360, 92],
+      place: [pad, H - 4] };
   }
 
   // ── §S2-E's WARMTH gauge ────────────────────────────────────────────────
@@ -1148,34 +1234,37 @@ export class Cockpit {
   }
 
   // ── landscape: the wide cluster ─────────────────────────────────────────
-  // 896 x 90. Instruments left, chat right — a landscape frame has width and no height, so the
-  // chatter goes beside the cluster rather than under it.
+  // 1280 x 49, full-bleed across the frame. Instruments left, chat right — a landscape frame has
+  // width and no height, so the chatter goes beside the cluster rather than under it.
   _dashWide(g, d, S) {
-    this._speedArc(g, d, S.speed[0] + S.speed[2] / 2, S.speed[1] + S.speed[3] / 2, S.speed[2] / 2 - 5, 17);
-    this._cellRing(g, d, S.cell[0] + S.cell[2] / 2, S.cell[1] + S.cell[3] / 2, S.cell[2] / 2 - 4, 12);
+    this._speedArc(g, d, S.speed[0] + S.speed[2] / 2, S.speed[1] + S.speed[3] / 2, S.speed[2] * 0.40, 11);
+    this._cellRing(g, d, S.cell[0] + S.cell[2] / 2, S.cell[1] + S.cell[3] / 2, S.cell[2] * 0.37, 9);
     this._warmthGauge(g, d, ...S.warmth);
-    this._altTape(g, d, ...S.alt, 1);
-    this._cargoPips(g, d, S.hold[0], S.hold[1], S.hold[3], 1);
-    this._lamps(g, d, S.lamps[0], S.lamps[1], 0.85);
-    this._chatBox(g, d, ...S.chat, 0.95);
+    this._altTape(g, d, ...S.alt, 0.8);
+    this._cargoPips(g, d, S.hold[0], S.hold[1], S.hold[3], 0.8);
+    this._lamps(g, d, S.lamps[0], S.lamps[1], 0.71);
+    this._chatBox(g, d, ...S.chat, 0.9);
 
     g.textAlign = 'left'; g.textBaseline = 'alphabetic';
     g.font = '700 9px ui-monospace, Menlo, monospace';
     g.fillStyle = 'rgba(53,230,255,0.55)';
-    g.fillText(fit(g, (d.place || '').toUpperCase(), 130), S.place[0], S.place[1]);
+    // 66 canvas px, not 130: the district name lives in the blank moulding between the lamps and
+    // the vent grille, and a long name overrunning it would land on the chat box.
+    g.fillText(fit(g, (d.place || '').toUpperCase(), 66), S.place[0], S.place[1]);
   }
 
   // ── portrait: the tall cluster ──────────────────────────────────────────
-  // 512 x 190 minus the console bay: three round wells and the altitude tape on one row, the
-  // lamps under them, and the chat box across the bottom of what is left.
+  // 640 x 135, the whole width of it: three round wells with the altitude tape, the hold and the
+  // lamps stacked beside them, and the chat box down the right — a landscape arrangement, because
+  // losing the console bay made the portrait sheet wide enough to take one.
   _dashTall(g, d, S) {
-    this._speedArc(g, d, S.speed[0] + S.speed[2] / 2, S.speed[1] + S.speed[3] / 2, S.speed[2] / 2 - 6, 24);
-    this._cellRing(g, d, S.cell[0] + S.cell[2] / 2, S.cell[1] + S.cell[3] / 2, S.cell[2] / 2 - 5, 15);
+    this._speedArc(g, d, S.speed[0] + S.speed[2] / 2, S.speed[1] + S.speed[3] / 2, S.speed[2] * 0.40, 22);
+    this._cellRing(g, d, S.cell[0] + S.cell[2] / 2, S.cell[1] + S.cell[3] / 2, S.cell[2] * 0.37, 14);
     this._warmthGauge(g, d, ...S.warmth);
     this._altTape(g, d, ...S.alt, 1.1);
     this._cargoPips(g, d, S.hold[0], S.hold[1], S.hold[3], 1.1);
-    this._lamps(g, d, S.lamps[0], S.lamps[1], 0.9);
-    this._chatBox(g, d, ...S.chat, 1.1);
+    this._lamps(g, d, S.lamps[0], S.lamps[1], 0.85);
+    this._chatBox(g, d, ...S.chat, 1.05);
 
     g.textAlign = 'left'; g.textBaseline = 'alphabetic';
     g.font = '700 10px ui-monospace, Menlo, monospace';
@@ -1517,7 +1606,7 @@ export class ChaseHud {
 // ── geometry helpers ───────────────────────────────────────────────────────
 
 function buildBoxes(list) {
-  const pos = [], nor = [], uv = [], idx = [];
+  const pos = [], nor = [], uv = [], col = [], idx = [];
   const m = new THREE.Matrix4(), nm = new THREE.Matrix3();
   const v = new THREE.Vector3(), n = new THREE.Vector3();
   for (const part of list) {
@@ -1534,6 +1623,7 @@ function buildBoxes(list) {
       v.fromBufferAttribute(gp, i).applyMatrix4(m);
       n.fromBufferAttribute(gn, i).applyMatrix3(nm).normalize();
       pos.push(v.x, v.y, v.z); nor.push(n.x, n.y, n.z); uv.push(gu.getX(i), gu.getY(i));
+      if (part.col) col.push(part.col[0].r, part.col[0].g, part.col[0].b, part.col[1]);
     }
     const gi = g.index;
     for (let i = 0; i < gi.count; i++) idx.push(base + gi.getX(i));
@@ -1543,6 +1633,7 @@ function buildBoxes(list) {
   out.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   out.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
   out.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  if (col.length) out.setAttribute('color', new THREE.Float32BufferAttribute(col, 4));
   out.setIndex(idx);
   out.computeBoundingSphere();
   return out;

@@ -3,7 +3,8 @@
 //
 //   node tools/gates_s2k.mjs [--headed] [--land] [--w= --h=]
 //
-// D2  no control button may sit in the FLYING half, in EITHER flipSides state
+// D2  no control button may sit in the flying thumb's way, in EITHER flipSides state — see the
+//     note over `offenders()`: §S2-L changed that from a horizontal rule to a vertical one
 // D3  the chatter director is silent for the whole of a story beat, and comes back after it
 // D1  the shipped chatter and story pools decode, speak, and are the pool the manifest describes
 //
@@ -61,11 +62,6 @@ async function shot(S, name) {
 // corner of it. #leftpad shipped on the left at mid-height and mirrored WITH the flip, which put
 // RADIO / HOME / AUTO in the flying thumb's half in both states.
 //
-// So the assertion is every visible `.ctl-btn` centre, against the half the router would give it.
-// `.ctl-btn.gear` and `.ctl-btn.view` are exempt BY POSITION rather than by name: both sit in the
-// top band, above `TOP_BAND` px, where a flight thumb never goes and where the map pod and the view
-// switch have always lived. Naming exemptions would let the next control be exempted by adding it
-// to a list.
 // A control belongs to a THUMB if it mirrors when the movement side is flipped. That is not a
 // stylistic observation, it is the layout's own contract: #altpad and #leftpad both mirror because
 // they are meant to be reachable by one particular thumb, and #btn-view and the cog do NOT mirror
@@ -73,9 +69,9 @@ async function shot(S, name) {
 // now, and the map does not move"*).
 //
 // So the exemption is derived rather than listed: a control is exempt iff its box is IDENTICAL in
-// both flipSides states AND sits entirely in the top half of the viewport. Nothing can be exempted
-// by being added to a name list, and the falsification below still fires, because a mirrored key
-// moved into the stick zone is still mirrored.
+// both flipSides states. Nothing can be exempted by being added to a name list, and the
+// falsification below still fires, because a mirrored key moved into the stick zone is still
+// mirrored.
 const buttonBoxes = S => evalJSON(S, `(() => {
   // The ROUTER's own truth. js/controls.js applyFlip() writes the flipped class and sets this.flip
   // in the same call, and half() reads this.flip — so this is the value the touch router will
@@ -84,6 +80,7 @@ const buttonBoxes = S => evalJSON(S, `(() => {
   // (No backticks below this line: it is inside a template literal. Fourth time on this project.)
   const flip = document.getElementById('controls').classList.contains('flipped');
   const w = innerWidth, h = innerHeight;
+  const lip = document.getElementById('conspad').getBoundingClientRect();
   const out = [];
   for (const el of document.querySelectorAll('#controls .ctl-btn')) {
     const r = el.getBoundingClientRect();
@@ -101,19 +98,26 @@ const buttonBoxes = S => evalJSON(S, `(() => {
       self: !!(hit && (hit === el || el.contains(hit))),
       over: hit ? (hit.id || hit.className) : null });
   }
-  return { flip, w, h, btns: out };
+  return { flip, w, h, lipTop: +lip.y.toFixed(2), lipH: +lip.height.toFixed(2), btns: out };
 })()`);
 
-// A button is only clear if its whole BOX is out of the flying half, not just its centre — half a
-// key under the thumb is still under the thumb.
+// ── UPDATED BY §S2-L, and it is the ASSERTION that changed, not the build being made to fit it ──
+//
+// D2 shipped asking "is this key out of the flying HALF". That was the right question for a console
+// standing on one edge of the screen, and it is the wrong one now: Aaron's answer to S2-K was
+// *"moving the buttons the to right creates the exact same problem on the right side of screen. I
+// wanted the buttons built into the dashboard!"*, so the controls are a lip that runs EDGE TO EDGE
+// along the bottom. Half of that lip is in the flying half by construction, in either flip state,
+// and that is correct — the floating stick only ever needs the frame ABOVE it.
+//
+// So the rule is now vertical rather than horizontal: a control that belongs to a thumb must lie
+// entirely at or below the top of the lip. Everything the old rule protected is still protected —
+// the falsification below moves a key back to the left edge at mid-height and is still caught —
+// and the property Aaron reported twice is now the thing being measured. gates_s2l D1 is the same
+// assertion, run in both orientations, and the two suites deliberately derive `mirrors` the same
+// way so they cannot disagree about which controls belong to a thumb.
 function offenders(st, mirrors) {
-  const mid = st.w / 2;
-  return st.btns.filter(b => {
-    const corner = !mirrors.has(b.id) && b.y1 <= st.h / 2;
-    if (corner) return false;
-    // the move half is the left when flip is false, the right when it is true
-    return st.flip ? b.x1 > mid : b.x0 < mid;
-  });
+  return st.btns.filter(b => mirrors.has(b.id) && b.y0 < st.lipTop - 0.5);
 }
 
 const setFlip = async (S, v) => {
@@ -147,11 +151,14 @@ async function d2(S) {
     const bad = offenders(st, mirrors);
     await setFlip(S, flip);
     const png = await shot(S, `controls_flip${flip ? 1 : 0}${LAND ? '_land' : ''}`);
-    check(`D2 no control button is in the flying half — flipSides=${flip}${LAND ? ' landscape' : ''}`,
-      bad.length === 0 && st.btns.length >= 6 && st.flip === flip,
-      `${st.btns.length} visible controls at ${st.w}x${st.h}; flying half is the `
-      + `${flip ? 'RIGHT' : 'LEFT'}; offenders ${bad.length ? bad.map(b => `${b.id}@${b.x0}-${b.x1}`).join(', ') : 'none'}`
-      + `\n      ${st.btns.map(b => `${b.id}:${b.x0}-${b.x1}`).join('  ')}`
+    check(`D2 no control button is in the flying thumb's way — flipSides=${flip}${LAND ? ' landscape' : ''}`,
+      bad.length === 0 && st.btns.length >= 6 && st.flip === flip && st.lipH > 0,
+      `${st.btns.length} visible controls at ${st.w}x${st.h}; the control lip's top edge is `
+      + `y ${st.lipTop} and everything that flies the craft has to be at or below it — the flying `
+      + `half is the ${flip ? 'RIGHT' : 'LEFT'}, but the lip spans both halves by design and only `
+      + `the frame ABOVE it has to be empty; offenders `
+      + `${bad.length ? bad.map(b => `${b.id}@y${b.y0}`).join(', ') : 'none'}`
+      + `\n      ${st.btns.map(b => `${b.id}:y${b.y0}`).join('  ')}`
       + `\n      ${png}`);
   }
 
@@ -179,7 +186,8 @@ async function d2(S) {
   const restored = offenders(await buttonBoxes(S), mirrors).length;
   check(`D2 FALSIFY — the check catches a key moved back into the stick zone${LAND ? ' landscape' : ''}`,
     before === 0 && after.length === 1 && after[0].id === 'btn-home' && restored === 0,
-    `clean ${before} offenders → HOME forced to the left edge at mid-height → ${after.length} `
+    `clean ${before} offenders → HOME forced to the left edge at mid-height, which is exactly `
+    + `where the shipped build had it → ${after.length} `
     + `(${after.map(b => b.id).join(',') || 'none'}) → restored ${restored}\n      ${png}`);
 }
 

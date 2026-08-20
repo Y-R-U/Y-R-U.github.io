@@ -73,15 +73,26 @@ export class Controls {
   }
 
   setFlip(v) { this.flip = !!v; this.release(); return this.applyFlip(); }
-  setButtonSize(px) { this.btnPx = px; this.root.style.setProperty('--btn', px + 'px'); return px; }
+  // On the ROOT element, not on #controls: §S2-L's #lipsize probe lives outside the control layer
+  // (it has to be laid out while #controls is display:none) and its height is derived from --btn.
+  // Custom properties inherit, so everything inside #controls still resolves the same value.
+  setButtonSize(px) {
+    this.btnPx = px;
+    document.documentElement.style.setProperty('--btn', px + 'px');
+    return px;
+  }
 
   _bind() {
     const el = this.root;
 
     // ── touch ────────────────────────────────────────────────────────────
+    // §S2-L: the whole CONTROL LIP is furniture, not glass. A finger that lands on the moulding
+    // between two keys must do nothing — it is the front face of the dashboard — rather than start
+    // a stick at the very bottom of the screen, which is what a router that only knew about
+    // `.ctl-btn` would do.
     const isBtn = t => {
       const e = (t.target && t.target.closest) ? t.target : document.elementFromPoint(t.clientX, t.clientY);
-      return !!(e && e.closest && e.closest('.ctl-btn'));
+      return !!(e && e.closest && e.closest('.ctl-btn, #conspad'));
     };
 
     el.addEventListener('touchstart', e => {
@@ -133,7 +144,7 @@ export class Controls {
     // mousemove looks. Esc leaves the lock (browser default) and that is the only exit.
     el.addEventListener('mousedown', e => {
       if (!this.enabled || e.button !== 0) return;
-      if (e.target.closest && e.target.closest('.ctl-btn')) return;
+      if (e.target.closest && e.target.closest('.ctl-btn, #conspad')) return;
       this.mouse = { x: e.clientX, y: e.clientY, moved: 0 };
     });
     addEventListener('mousemove', e => {
@@ -172,8 +183,27 @@ export class Controls {
     this._btn('#btn-up', 'up');
     this._btn('#btn-down', 'down');
     this._btn('#btn-boost', 'boost');
+    // §S2-L. The cog was bound to `click` ALONE, and on a phone that means it was bound to
+    // nothing. Aaron: *"settings is unclickable. (in testing on mobile)"* — and it worked
+    // perfectly under a mouse, which is why it shipped.
+    //
+    // The cause is four lines up in this same file: the `touchstart` handler on #controls ends
+    // with an unconditional `e.preventDefault()`, including on the path where `isBtn(t)` matched
+    // and the finger was handed to the pad. preventDefault on touchstart is what suppresses the
+    // browser's SYNTHESISED mouse events, and a `click` on a touch device is one of those. So the
+    // cog's only listener could never fire. Every other .ctl-btn survived by accident: `_btn()`
+    // binds touchstart/touchend directly and `tapBtn()` binds touchend, so neither of them was
+    // ever relying on the synthesised event that the router had already cancelled.
+    //
+    // Bound the same way `tapBtn` binds the rest, and for the same reason: touchend is the real
+    // event, click is the desktop path, and the 600 ms guard stops a device that DOES deliver both
+    // from opening and immediately closing the panel.
     const gear = this.root.querySelector('#btn-settings');
-    if (gear) gear.addEventListener('click', () => this.onSettings?.());
+    if (gear) {
+      let last = 0;
+      gear.addEventListener('touchend', e => { last = performance.now(); e.preventDefault(); this.onSettings?.(); }, { passive: false });
+      gear.addEventListener('click', () => { if (performance.now() - last > 600) this.onSettings?.(); });
+    }
   }
 
   // Hold-to-act, on touch and mouse alike, with a pointerleave/cancel release so a finger that

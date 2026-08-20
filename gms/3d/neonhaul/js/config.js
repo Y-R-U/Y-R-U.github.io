@@ -313,16 +313,23 @@ export const HUD = {
   // enough to read as the frame leaning into the turn and small enough that the dash never leaves.
   CABIN_YAW_LAG: 20 * Math.PI / 180,
   // Dash canvas backing. The ASPECT of each pair is the aspect of the quad it is drawn on
-  // (hud.js dashGeo), so these are the numbers that set how tall the dashboard is on screen —
-  // S2's "reduce the dash height by almost half" is this ratio, not a scale factor somewhere else.
-  // Landscape went 512x160 (0.313) → 896x85 (0.095) and portrait 340x212 (0.624) → 512x174
-  // (0.340); both got WIDER at the same time, so the instruments gained room while the slab lost
-  // the bottom third of the frame. Measured with __game.cabinExtent(), which projects the lip and
-  // the consoles as well as the quad rather than just the quad — in portrait the lip was the
-  // larger half of what the player actually saw.
-  DASH_W: 896, DASH_H: 85,              // dash canvas backing, landscape. LOW halves it
-  DASH_TW: 512, DASH_TH: 174,           // …and portrait: taller, less on it, much larger type
+  // (hud.js dashGeo), so these are the numbers that set how tall the dashboard is on screen.
+  // Landscape has gone 512x160 → 896x85 → 1280x49 and portrait 340x212 → 512x174 → 640x135, and
+  // each step got WIDER as well as shorter, so the instruments kept their area.
+  //
+  // §S2-L: these are DERIVED, not chosen. The quad's bottom edge is pinned to the top of the DOM
+  // control lip, so the aspect is what decides where its TOP edge lands — solve layoutFor's
+  // `topN` for the height that puts it at the target share of the frame. Measured with
+  // __game.cabinExtent(), which projects the 3D lip and the consoles as well as the quad.
+  DASH_W: 1280, DASH_H: 49,             // dash canvas backing, landscape. LOW halves it
+  DASH_TW: 640, DASH_TH: 135,           // …and portrait: squarer, less on it, much larger type
   DASH_R: 22,                           // corner radius of the dash housing, in canvas px
+  // §S2-L's control lip, in CSS pixels, and the CSS `--lip-h` is the same number. The LIP is what
+  // drives the layout and not the other way round: 44 CSS px is a touch-target floor and a quad
+  // fitted first would hand the lip whatever height was left over. hud.js measures #lipsize rather
+  // than trusting these, so a safe-area inset is included; they are the fallback for a page with
+  // no control layer at all (a shot scenario, ?nohud).
+  LIP_H: 60, LIP_H_LAND: 46,
   HOLO_W: 384, HOLO_H: 128,             // one holo panel's cell in the shared sheet
   CABIN_Z: 1.10,                        // metres in front of the camera — see hud.js, NOT §8.1's
   // `CELL_PER_MIN` was here and is DELETED, not disabled. It was a stated placeholder for the

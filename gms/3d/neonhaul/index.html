@@ -8,10 +8,25 @@
 <meta name="theme-color" content="#05070c">
 <title>NEONHAUL</title>
 <link rel="stylesheet" href="style.css">
+<!-- three is VENDORED, not fetched from a CDN, and that is a bug fix rather than a preference.
+     Aaron: *"sometimes the game doesn't load if i reload the page… happens on local as well. i
+     think game freezes first on restore of browser? then refresh of game doesn't work."* A bare
+     `import 'three'` pointed at cdn.jsdelivr.net makes the ENTIRE module graph — and therefore the
+     whole game — hostage to one network fetch, and the moment it fails there is no error, no
+     retry and no fallback: `js/main.js` simply never evaluates and #boot sits on its bar forever.
+     That is exactly what a machine coming back from sleep produces, because the network stack is
+     still down for the first second or two after a wake and a reload issued in that window resolves
+     nothing. It reproduced on a local server for the same reason: the SERVER was local, the CDN
+     was not.
+
+     vendor/three/0.160.0/ is byte-identical to what the importmap used to fetch (three@0.160.0 plus
+     the four postprocessing addons and their four transitive deps, resolved recursively). The game
+     now has no third-party network dependency at all, so a reload can only fail for a reason we
+     own. Every other game in this repo still has the CDN form and therefore still has this bug. -->
 <script type="importmap">
 { "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  "three": "./vendor/three/0.160.0/three.module.js",
+  "three/addons/": "./vendor/three/0.160.0/addons/"
 } }
 </script>
 </head>
@@ -19,12 +34,20 @@
 
 <div id="stage"></div>
 
+<!-- §S2-L. A zero-width probe carrying the control lip's own height expression. js/hud.js reads it
+     to seat the instrument quad's bottom edge exactly on the lip's top edge. It lives HERE and not
+     inside #controls because #controls is `.hidden` (display:none) for the whole of boot and for
+     every ?nohud shot, and a probe inside a display:none subtree measures 0 — which reads exactly
+     like "there is no lip" and would drop the dashboard back onto the floor of the frame. -->
+<div id="lipsize" aria-hidden="true"></div>
+
 <!-- every screen is static markup hidden by .hidden; phases fill them in -->
 
 <div id="boot">
   <div id="boot-title">NEONHAUL</div>
   <div id="boot-bar"><div id="boot-fill"></div></div>
   <div id="boot-status">warming the grid…</div>
+  <button id="boot-retry" type="button" hidden>Reload</button>
 </div>
 
 <!-- §6.1 — the two-thumb control layer. One full-screen capture surface (both halves are live at
@@ -47,47 +70,69 @@
      router skips any finger that lands on a `.ctl-btn` so the lever never drives the stick. -->
 <div id="controls" class="hidden">
   <div id="stick"><div class="ring"></div><div class="nub"></div></div>
-  <!-- §S2-K D2. ONE console stack, on the LOOK thumb's side, and everything with a `.ctl-btn` on it
-       lives inside it. Aaron, on the shipped build: *"The buttons on the left are not part of the
-       dash and are exactly where you want to put your finger on mobile to fly the plane."* He is
-       describing #leftpad, which sat on the left edge at mid-height and mirrored WITH the flip —
-       so it was in the FLYING half in both states, while #altpad mirrored the other way and was
-       always in the looking half.
+  <!-- §S2-L. THE CONTROL LIP. Aaron, after the second play-test: *"moving the buttons the to right
+       creates the exact same problem on the right side of screen. I wanted the buttons built into
+       the dashboard!"* — and, a sentence later, *"I almost want the exact same view as chase but
+       dashboard instead of chasing car."* That is one screen: an open view of the city, a dashboard
+       along the bottom, and the controls as keys ON it.
 
-       The stick is FLOATING (js/controls.js: its origin is wherever the finger lands), so there is
-       no safe corner of the flying half to put furniture in. The whole half has to be empty. That
-       is why this is a stack and not a second cluster: one container, one side, one mirror rule,
-       and a new control cannot be added anywhere else without failing gates_s2k D2.
+       So the dashboard is two physical surfaces, which is what a car actually has. The INSTRUMENT
+       TOP is the laid-back 3D quad above (js/hud.js), and this is the CONTROL LIP: the vertical
+       front face, which is the one part of a real dash that faces the driver square on. A flat DOM
+       rect is physically correct here, and the seam between the two is a real edge rather than a
+       mismatch to hide — hud.js seats the quad's bottom edge exactly on this strip's top edge, and
+       measures #lipsize to find out where that is.
 
-       #leftpad and #altpad keep their ids — every gate and every querySelector in js/ binds by them
-       — and both are now laid out by the stack rather than positioned themselves. They stay
-       separate elements because gates_s2a asserts the reserved #btn-hire slot clears #altpad's box,
-       and nesting them would make that overlap trivially true and the check meaningless. -->
+       Every `.ctl-btn` that flies the craft is in here and nothing is above it: the stick is
+       FLOATING (js/controls.js — its origin is wherever the finger lands), so there is no safe
+       corner of the flying half and the whole of the frame above this strip has to be empty. That
+       is what gates_s2l D1 asserts, in both flip states and both orientations.
+
+       The two ends swap with §6.5's move-side setting, so the collective is always under the thumb
+       that is not flying. #leftpad and #altpad keep their ids — every gate and every querySelector
+       in js/ binds by them — and gates_s2a asserts the reserved #btn-hire slot clears #altpad's
+       box, which is why they are still two elements and not one. -->
   <div id="conspad">
-  <!-- The switchgear bank. Named #leftpad for the console it used to be; it is now the TOP of the
-       one console stack, above the boost key and the collective, on whichever side is not flying.
+  <div id="altpad">
+    <!-- THE COLLECTIVE, laid out along the lip as a throttle quadrant rather than up the side of
+         the screen. Aaron's note on the ▲/▼ chevrons is unchanged and is the whole design: he had
+         been aiming the nose to gain height and only worked out afterwards that "going up/down
+         without forward/back motion does make sense". The control was never redundant — its LABEL
+         was. RISE at one end, SINK at the other, HOVER printed on the detent between them. -->
+    <div id="collective" aria-label="collective">
+      <button id="btn-up" class="ctl-btn lever up" aria-label="rise on the spot">
+        <span class="cb-glyph">&#9650;</span><span class="cb-label">RISE</span>
+      </button>
+      <div class="lv-slot"><span class="lv-rail"></span><span class="lv-tag">HOVER</span></div>
+      <button id="btn-down" class="ctl-btn lever down" aria-label="sink on the spot">
+        <span class="cb-glyph">&#9660;</span><span class="cb-label">SINK</span>
+      </button>
+    </div>
+    <button id="btn-boost" class="ctl-btn boost" aria-label="boost">
+      <span class="cb-glyph">&#9656;&#9656;</span><span class="cb-label">BOOST</span>
+    </button>
+  </div>
+  <!-- The middle of the lip is blank moulding with a vent grille on it, because the instruments
+       are on the surface ABOVE it and a key in the centre would sit under the reading eye. -->
+  <div class="lip-mid" aria-hidden="true"></div>
+  <!-- The switchgear bank, at the other end. Named #leftpad for the console it used to be.
 
-       SQUELCH is the control a courier actually reaches for, and it is the same `radio` setting
-       the cog holds — both go through applySettings, so the two switches cannot drift apart.
+       AUTO  fly the job I am carrying, or the nearest board if I am empty
+       HOME  fly to the hub, whatever I am carrying
 
-       #btn-hire is a RESERVED SLOT, present and hidden. S2-D/E takes the player's craft away and
-       puts them on 5-minute vehicle hires that have to be extendable from inside the cabin, so the
-       button that opens that panel needs a home on the console now rather than being wedged in
-       later. Removing `hidden` and pointing its click at a CabinPanel is the whole of the work;
-       gates_s2a un-hides it and asserts the slot is clear of every other control. Un-hiding it
-       turns the bank from three keys into a full 2x2 — the fourth cell is empty, not absent. -->
+       Both engage the LANE pilot — the slow, safe, road-following one — and neither is a mode.
+       Touching the stick, the collective or boost takes the craft back on that frame with no
+       transition to sit through; the key just stops being lit. That property is free because the
+       pilot emits the same synthetic input struct controls.js does (js/autopilot.js).
+
+       SQUELCH is the same `radio` setting the cog holds — both go through applySettings, so the
+       two switches cannot drift apart.
+
+       #btn-hire is a RESERVED SLOT, present and hidden: S2-E puts the player on 5-minute vehicle
+       hires that have to be extendable from inside the cabin. Removing `hidden` and pointing its
+       click at a CabinPanel is the whole of the work; gates_s2a un-hides it and asserts the slot is
+       clear of every other control. -->
   <div id="leftpad">
-    <!-- S2-F fills out the switchgear bank S2-A left room for. Two keys, because they answer two
-         different questions and folding them into one would make the answer a guess:
-
-         AUTO  fly the job I am carrying, or the nearest board if I am empty
-         HOME  fly to the hub, whatever I am carrying
-
-         Both engage the LANE pilot — the slow, safe, road-following one — and neither is a mode.
-         Touching the stick, the collective or boost takes the craft back on that frame with no
-         transition to sit through; the key just stops being lit. That property is free because
-         the pilot emits the same synthetic input struct controls.js does (js/autopilot.js), and
-         it is the reason this is not built as a state machine. -->
     <button id="btn-auto" class="ctl-btn auto" aria-label="autopilot to the current job">
       <span class="cb-glyph">&#9678;</span><span class="cb-label">AUTO</span>
     </button>
@@ -100,20 +145,6 @@
     <button id="btn-squelch" class="ctl-btn squelch" aria-label="radio squelch">
       <span class="cb-glyph">&#9673;</span><span class="cb-label">RADIO</span>
     </button>
-  </div>
-  <div id="altpad">
-    <button id="btn-boost" class="ctl-btn boost" aria-label="boost">
-      <span class="cb-glyph">&#9656;&#9656;</span><span class="cb-label">BOOST</span>
-    </button>
-    <div id="collective" aria-label="collective">
-      <button id="btn-up" class="ctl-btn lever up" aria-label="rise on the spot">
-        <span class="cb-glyph">&#9650;</span><span class="cb-label">RISE</span>
-      </button>
-      <div class="lv-slot"><span class="lv-rail"></span><span class="lv-tag">HOVER</span></div>
-      <button id="btn-down" class="ctl-btn lever down" aria-label="sink on the spot">
-        <span class="cb-glyph">&#9660;</span><span class="cb-label">SINK</span>
-      </button>
-    </div>
   </div>
   </div>
   <!-- S2: the view switch is an on-screen control, not a settings row. Cockpit is the default view
@@ -172,9 +203,47 @@
 <div id="ctxlost" class="hidden">
   <div class="panel">
     <h2>Graphics context lost</h2>
-    <p>Restoring…</p>
+    <p id="ctxlost-msg">Restoring…</p>
+    <button id="ctxlost-reload" type="button">Reload</button>
   </div>
 </div>
+
+<!-- §S2-L. The BOOT WATCHDOG, and it is deliberately a CLASSIC inline script rather than anything
+     in js/. The failure it exists to catch is `js/main.js` never evaluating at all — a module
+     graph that fails to resolve throws nothing a page can see, reports no error, and leaves #boot
+     sitting on "warming the grid…" forever. Measured, not assumed: with DNS blocked and the old
+     CDN importmap in place, two of two loads hung exactly like that with `__state.errors` EMPTY.
+     Any watchdog living inside the module it is watching would have hung with it.
+
+     So this runs first, owns the deadline, and cannot be taken down by anything downstream. It
+     does not diagnose — it converts a silent permanent hang into a visible one with a way out,
+     which is the whole ask. -->
+<script>
+(function () {
+  var BOOT_MS = 20000;                 // a cold cache on a slow phone is ~6 s; 20 is not tight
+  var seen = [];
+  addEventListener('error', function (e) {
+    // A failed <script type="module"> or a failed import fires a NON-Error event on window with
+    // no message. That is the case worth naming, because it is the one with no other tell.
+    var t = e.target;
+    if (t && (t.tagName === 'SCRIPT' || t.tagName === 'LINK')) seen.push('could not load ' + (t.src || t.href));
+    else if (e.message) seen.push(e.message);
+  }, true);
+  setTimeout(function () {
+    if (window.__ready) return;
+    var boot = document.getElementById('boot');
+    if (!boot || boot.classList.contains('hidden')) return;
+    boot.classList.add('stalled');
+    var st = document.getElementById('boot-status');
+    if (st) st.textContent = seen.length ? seen[seen.length - 1].slice(0, 90) : 'the game did not finish loading';
+    var b = document.getElementById('boot-retry');
+    if (b) b.hidden = false;
+  }, BOOT_MS);
+  document.addEventListener('click', function (e) {
+    if (e.target && (e.target.id === 'boot-retry' || e.target.id === 'ctxlost-reload')) location.reload();
+  });
+})();
+</script>
 
 <script type="module" src="js/main.js"></script>
 </body>

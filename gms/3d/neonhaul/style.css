@@ -275,12 +275,13 @@ html, body {
 #hud-strip .ch-bot {
   position: absolute;
   left: calc(var(--safe-l) + 10px);
-  bottom: calc(var(--safe-b) + 14px);
+  /* ABOVE the control lip, which is there in chase view too. S2-E added a fourth frame to this row
+     and the first portrait capture had the warmth bar sitting UNDER the collective lever — a gauge
+     you cannot read is a gauge that is not there; §S2-L's lip put the whole row back under the
+     keys until this went from a 116 px side allowance to a lip-height bottom one. */
+  bottom: calc(var(--safe-b) + var(--lip-h) + 10px);
   display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap;
-  /* Clear of the control cluster on the right. S2-E added a fourth frame to this row and the first
-     portrait capture had the warmth bar sitting UNDER the collective lever — a gauge you cannot
-     read is a gauge that is not there. */
-  max-width: calc(100vw - var(--safe-l) - var(--safe-r) - 116px);
+  max-width: calc(100vw - var(--safe-l) - var(--safe-r) - 20px);
 }
 /* Portrait has no width to spare, so the warmth bar takes its own line ABOVE the dial and the
    bars rather than a fourth column beside them. `order` and not DOM order: the chase HUD's
@@ -358,6 +359,23 @@ html, body {
 #ctxlost h2 { margin: 0 0 6px; font-size: 15px; font-weight: 500; letter-spacing: .1em; color: var(--amber); }
 #ctxlost p { margin: 0; color: var(--dim); font-size: 12px; }
 
+/* §S2-L. The two ways out of a dead frame. Both were unreachable before: a lost context showed
+   "Restoring…" forever whether or not a restore was ever coming, and a boot that never finished
+   showed a bar at 100 % with no text that admitted anything was wrong. A 44 px target, because
+   the one place a player meets these is a phone. */
+#boot-retry, #ctxlost-reload {
+  min-height: 44px; min-width: 132px; margin-top: 14px;
+  border: 1px solid var(--cyan); border-radius: 3px;
+  background: rgba(0, 229, 255, .07); color: var(--cyan);
+  font: inherit; font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+#boot-retry:active, #ctxlost-reload:active { background: rgba(0, 229, 255, .18); }
+/* A stalled boot stops pretending. The bar goes amber and stops moving; the status line carries
+   whatever the watchdog managed to catch. */
+#boot.stalled #boot-fill { background: var(--amber); transition: none; }
+#boot.stalled #boot-status { color: var(--amber); text-transform: none; letter-spacing: .04em; }
+
 /* ── §6.1 controls ────────────────────────────────────────────────────────
    The capture surface is the whole viewport and carries no visible split: the halves are a
    function of `innerWidth / 2` in controls.js, so they follow a rotation with nothing to
@@ -390,81 +408,111 @@ html, body {
   box-shadow: 0 0 14px rgba(53, 230, 255, .32);
 }
 
-/* ── the control cluster ─────────────────────────────────────────────────
-   §6.1 puts it in the LOOK half's bottom outer corner so the look thumb reaches it without
-   lifting, and it mirrors with §6.5's move-side setting. S2 rebuilt what is IN it.
+/* ── §S2-L — THE CONTROL LIP ─────────────────────────────────────────────
+   Aaron, after the second play-test: ***"moving the buttons the to right creates the exact same
+   problem on the right side of screen. I wanted the buttons built into the dashboard!"*** and
+   ***"I almost want the exact same view as chase but dashboard instead of chasing car."***
 
-   THE COLLECTIVE. Aaron's note on the ▲/▼ chevrons is the whole design here: he had been aiming
-   the nose to gain height and only worked out afterwards that "going up/down without forward/back
-   motion does make sense". The control was never redundant — its LABEL was wrong. A button marked
-   "climb" beside a nose that already climbs is a button a player is right to ignore. So it is no
-   longer two round buttons: it is one lever in one slot, RISE at the top, SINK at the bottom, and
-   HOVER printed on the rail between them, which is the thing it does that the nose cannot.
+   Those are one screen, not two notes. The dashboard is now two physical surfaces: the laid-back
+   INSTRUMENT TOP (the 3D quad and its CanvasTexture, js/hud.js) and this, the CONTROL LIP — the
+   vertical front face, which on a real dash is the one part that faces the driver square on. So a
+   flat DOM rect is physically correct here, and the seam between the two is an edge rather than a
+   mismatch to hide. hud.js seats the quad's bottom edge on this strip's top edge by measuring
+   #lipsize, so the height below is the only place the number lives.
 
-   The dash canvas draws a blank moulded BAY under this cluster in portrait (js/hud.js `_bay`), on
-   whichever side the flip has put it, so it never covers an instrument. */
+   Every flight control is in the strip and the whole frame above it is empty. That is not a
+   preference: js/controls.js's stick is FLOATING — `half(x)` routes any finger in the movement half
+   to it and the origin is wherever that finger landed — so there is no safe corner to put furniture
+   in. Two previous layouts (left edge, then right edge) both put keys under a flying thumb, which
+   is what Aaron reported twice. gates_s2l D1 asserts the emptiness in both flip states and both
+   orientations.
 
-/* §S2-K D2 — THE CONSOLE STACK. One fixed container on the LOOK thumb's side; the switchgear bank
-   and the boost/collective pad are both laid out BY it rather than positioning themselves.
+   THE COLLECTIVE keeps its meaning and loses its column. Aaron had been aiming the nose to gain
+   height and only worked out afterwards that "going up/down without forward/back motion does make
+   sense" — the control was never redundant, its LABEL was. Along the lip it reads as a throttle
+   quadrant: RISE at one end, SINK at the other, HOVER on the detent between them. */
 
-   The rule this enforces, and it is js/controls.js's own: the stick is FLOATING — `half(x)` routes
-   any finger in the movement half to it and the origin is wherever that finger landed — so there
-   is no safe corner of the flying half, and every `.ctl-btn` below the top band has to be on the
-   other side. #leftpad shipped mirroring the WRONG WAY (left when #altpad was right) and was in
-   the flying half in both flip states. gates_s2k D2 measures every visible control against the
-   router's own `half()` in both states and falsifies itself by moving a key back. */
-#conspad {
-  position: fixed; right: calc(var(--safe-r) + 10px); bottom: calc(var(--safe-b) + 10px);
-  display: flex; flex-direction: column; align-items: stretch; gap: 8px;
-  padding: 7px;
-  /* ONE moulded block, not three floating pods. Aaron's other half of the same complaint was
-     *"the buttons on the left are not part of the dash"* — and *"Dashboard is like a car
-     dashboard, physically a part of the car."* The switchgear, the boost key and the collective
-     now share a housing with a lit top lip and a rolled bottom edge, so the column reads as a
-     centre console rising off the dash rather than as chrome floating over the sky. */
-  border-radius: 18px 18px 14px 14px;
-  background: linear-gradient(rgba(30, 39, 52, .80), rgba(10, 14, 20, .88));
-  border: 1px solid rgba(150, 200, 230, .20);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .55), 0 14px 30px -12px #000,
-              inset 0 1px 0 rgba(190, 225, 245, .22),
-              inset 0 -14px 22px -18px rgba(53, 230, 255, .5);
+/* The lip's own height, in one place, mirrored by config.js HUD.LIP_H / LIP_H_LAND for a page with
+   no control layer. 44 px is the touch-target floor and it is a FLOOR, not a target: §6.5's "Alt
+   buttons" setting can make the keys bigger and the strip grows with them, up to a cap that keeps
+   the whole dashboard inside its share of the frame. */
+:root {
+  --lip-key: clamp(44px, calc(var(--btn, 56px) * .80), 54px);
+  --lip-h: calc(var(--lip-key) + 16px);
 }
-#controls.flipped #conspad { right: auto; left: calc(var(--safe-l) + 10px); }
 
-#altpad {
+/* The probe hud.js measures. Zero width, laid out, invisible — and outside #controls, because that
+   layer is display:none for the whole of boot and a probe inside a display:none subtree measures 0,
+   which reads exactly like "there is no lip". */
+#lipsize {
+  position: fixed; left: 0; bottom: 0; width: 0;
+  height: calc(var(--lip-h) + var(--safe-b));
+  visibility: hidden; pointer-events: none;
+}
+
+#conspad {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  height: calc(var(--lip-h) + var(--safe-b));
+  padding: 0 calc(var(--safe-r) + 6px) var(--safe-b) calc(var(--safe-l) + 6px);
+  display: flex; align-items: center; gap: 0;
+  /* Same moulding as the canvas above it: the housing gradient carries on where `_housing`'s ends,
+     and the 1 px light on the top edge is the same rgba the canvas paints its lit lip with. Rounded
+     only at the top, because the bottom of this is the bottom of the screen. */
+  border-radius: 14px 14px 0 0;
+  background:
+    linear-gradient(rgba(190, 225, 245, .26), rgba(190, 225, 245, 0)) 0 0 / 100% 1.5px no-repeat,
+    linear-gradient(180deg, #1a2331 0%, #131b26 22%, #0c121a 62%, #101822 100%);
+  box-shadow: inset 0 1px 0 rgba(190, 225, 245, .14), 0 -10px 26px -18px #000;
+}
+/* The two ends swap with §6.5's move-side setting, so the collective is always under the thumb that
+   is not flying. gates_s2k D2 derives which controls belong to a thumb from exactly this: a control
+   is a thumb control iff its box moves when the flip does. */
+#controls.flipped #conspad { flex-direction: row-reverse; }
+
+#altpad, #leftpad {
   position: static;
-  display: flex; flex-direction: column; gap: 10px; align-items: center;
-  width: 100%;
+  display: flex; flex-direction: row; align-items: center;
+}
+#altpad { gap: 6px; }
+#leftpad { gap: 4px; }
+
+/* blank moulding between the two banks, with the vent grille on it. The instruments are on the
+   surface above, so nothing that has to be read or pressed goes in the middle of the lip. */
+.lip-mid {
+  flex: 1 1 0; min-width: 0; align-self: stretch;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(0, 0, 0, .40) 0 4px, transparent 4px 9px) center / 74px 6px no-repeat;
 }
 
 #collective {
-  display: flex; flex-direction: column; align-items: stretch; gap: 0;
-  padding: 5px; border-radius: 12px;
-  /* the lever's own slot, let INTO the console face (#conspad) rather than bolted on top of it —
-     the outer shell now supplies the moulding and the lit lip, so this is a recess */
+  display: flex; flex-direction: row; align-items: center; gap: 0;
+  padding: 0 3px; border-radius: 11px;
+  /* the lever's slot, let INTO the lip face rather than bolted on top of it */
   background: linear-gradient(rgba(6, 9, 14, .55), rgba(6, 9, 14, .18));
   box-shadow: inset 0 2px 5px -2px #000, 0 1px 0 rgba(190, 225, 245, .10);
 }
 .lv-slot {
-  position: relative; height: 26px; margin: 2px 0;
+  position: relative; width: 26px; height: var(--lip-key);
   display: flex; align-items: center; justify-content: center;
 }
 .lv-rail {
-  position: absolute; top: 0; bottom: 0; left: 50%; width: 5px; transform: translateX(-50%);
+  position: absolute; left: 1px; right: 1px; top: 50%; height: 5px; transform: translateY(-50%);
   border-radius: 3px;
   background: #04070b; box-shadow: inset 0 0 0 1px rgba(53, 230, 255, .22);
 }
 .lv-tag {
   position: relative;
-  font: 700 7px/1 ui-monospace, Menlo, monospace; letter-spacing: .18em;
+  font: 700 6px/1 ui-monospace, Menlo, monospace; letter-spacing: .04em;
   color: rgba(53, 230, 255, .75);
-  background: rgba(8, 11, 16, .95); padding: 2px 4px; border-radius: 2px;
+  background: rgba(8, 11, 16, .95); padding: 2px 1px; border-radius: 2px;
 }
 
 .ctl-btn {
   -webkit-appearance: none; appearance: none;
-  width: var(--btn, 56px); height: var(--btn, 56px);
-  border-radius: 50%;
+  width: 44px; height: var(--lip-key);
+  border-radius: 10px;
   border: 1px solid rgba(53, 230, 255, .38);
   background: rgba(8, 12, 18, .5);
   color: var(--cyan);
@@ -474,28 +522,28 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 .ctl-btn:active { background: rgba(53, 230, 255, .2); border-color: rgba(53, 230, 255, .85); }
-.cb-glyph { font-size: 15px; line-height: 1; }
+.cb-glyph { font-size: 14px; line-height: 1; }
 /* Every button says what it DOES. `>>` shipped unlabelled and Aaron did not know what it was. */
 .cb-label {
   font: 700 7px/1 ui-monospace, Menlo, monospace; letter-spacing: .1em;
   opacity: .85;
 }
 
-/* the two ends of the lever: squared off against the slot, rounded on the outside, so the pair
-   plus the rail read as ONE object rather than as two buttons with a gap */
+/* the two ends of the lever: squared off against the slot, rounded on the outside, so the pair plus
+   the rail read as ONE object rather than as two buttons with a gap */
 .ctl-btn.lever {
-  width: calc(var(--btn, 56px) - 2px); height: calc(var(--btn, 56px) * .82);
+  width: 46px;
   border-color: rgba(53, 230, 255, .5);
   background: linear-gradient(rgba(20, 30, 42, .9), rgba(8, 12, 18, .92));
   box-shadow: inset 0 1px 0 rgba(190, 225, 245, .16);
 }
-.ctl-btn.lever.up { border-radius: 12px 12px 4px 4px; }
-.ctl-btn.lever.down { border-radius: 4px 4px 12px 12px; }
+.ctl-btn.lever.up { border-radius: 12px 4px 4px 12px; }
+.ctl-btn.lever.down { border-radius: 4px 12px 12px 4px; }
 .ctl-btn.lever:active { background: rgba(53, 230, 255, .22); border-color: rgba(53, 230, 255, .95); }
 
 .ctl-btn.boost {
-  width: calc(var(--btn, 56px) - 2px); height: calc(var(--btn, 56px) * .78);
-  border-radius: 14px;
+  width: 48px;
+  border-radius: 12px;
   color: var(--amber); border-color: rgba(255, 178, 56, .48);
   background: linear-gradient(rgba(40, 28, 10, .7), rgba(14, 10, 6, .82));
   box-shadow: inset 0 1px 0 rgba(255, 210, 140, .18);
@@ -508,41 +556,26 @@ html, body {
    with the flip: it belongs to the map housing now, and the map does not move. */
 .ctl-btn.gear {
   position: fixed;
-  top: calc(var(--safe-t) + 8px + 122px - 15px);
-  right: calc(var(--safe-r) + 8px + 43px);
-  width: 36px; height: 36px; font-size: 15px; color: var(--dim);
-  border-radius: 0 0 12px 12px;
+  top: calc(var(--safe-t) + 8px + 122px - 10px);
+  right: calc(var(--safe-r) + 8px + 39px);
+  width: 44px; height: 44px; font-size: 16px; color: var(--dim);
+  border-radius: 0 0 14px 14px;
   border-color: rgba(53, 230, 255, .22);
   background: linear-gradient(rgba(14, 20, 28, .92), rgba(6, 9, 14, .92));
-  padding-top: 12px;
+  padding-top: 14px;
   box-shadow: 0 6px 14px -8px #000;
 }
 
-/* The switchgear bank, at the top of the console stack. ONE COLUMN of short keys, not a 2x2 grid:
-   the grid was tried first and it was 118 px wide against the old cluster's 66, which put the
-   console over the dash's own altitude readout. The console has to be narrow enough that the dash
-   it sits on is still readable — the whole point of moving these keys was to make them part of
-   the instrument panel, not to cover it.
+/* The switchgear bank, at the far end of the lip. One ROW of keys, each a full touch target: these
+   are flight controls on a phone and the S2-G lesson is that a threshold with zero slack fails on a
+   sub-pixel layout — a tab with `min-height: 36px` measured 35.99 and failed a `>= 36` check while
+   the check's own output printed "36 px tall". 44 is the floor and `--lip-key` never goes under it.
 
-   DOM order is the stacking order, so RADIO — the one a courier actually reaches for — ends up
-   nearest the thumb, and #btn-hire un-hides into a real slot above it rather than a gap. */
-#leftpad {
-  display: flex; flex-direction: column; gap: 5px;
-  padding: 5px 4px 7px;
-  /* a RECESSED bay in the console face, not a second box on top of it: an inset shadow and a hair
-     line under it, the way a switch panel is let into a moulding */
-  border-radius: 11px;
-  background: linear-gradient(rgba(6, 9, 14, .55), rgba(6, 9, 14, .18));
-  box-shadow: inset 0 2px 5px -2px #000, 0 1px 0 rgba(190, 225, 245, .10);
-}
-/* 34, not 30. gates_s2f C1 wants >= 30 px and S2-G's recorded lesson is that a threshold with zero
-   slack fails on a sub-pixel layout — a tab with `min-height: 36px` measured 35.99 and failed a
-   `>= 36` check while the check's own output printed "36 px tall". These are flight controls on a
-   phone; they get headroom. */
-.ctl-btn.squelch, .ctl-btn.hire, .ctl-btn.auto, .ctl-btn.home { height: 34px; }
+   DOM order is reading order along the lip, so RADIO — the one a courier actually reaches for —
+   ends up at the outboard end, and #btn-hire un-hides into a real slot rather than a gap. */
 .ctl-btn.squelch, .ctl-btn.hire, .ctl-btn.auto, .ctl-btn.home {
   position: static;
-  width: 46px; height: 36px; border-radius: 10px;
+  width: 44px; border-radius: 10px;
   color: rgba(53, 230, 255, .85);
   border-color: rgba(53, 230, 255, .3);
   background: linear-gradient(rgba(22, 30, 41, .8), rgba(8, 11, 16, .84));
@@ -575,10 +608,8 @@ html, body {
 .ctl-btn.squelch.off { color: rgba(125, 142, 163, .55); border-color: rgba(125, 142, 163, .22); }
 .ctl-btn.squelch.off .cb-glyph { text-decoration: line-through; }
 
-/* The on-screen VIEW switch (S2). Top-LEFT corner: out of both thumbs' corners (the stick
-   materialises bottom-left, the lever is bottom-right), out of the top-right pod, and — the reason
-   it is not under the map with the cog — clear of the right holo panel, which in portrait sits
-   exactly where a third pod element would land. The chase HUD's own top frame starts below it. */
+/* The on-screen VIEW switch (S2). Top-LEFT corner: it is not a flight control, so it stays out of
+   the lip, and the top band is where a flying thumb never goes. */
 .ctl-btn.view {
   position: fixed;
   top: calc(var(--safe-t) + 8px); left: calc(var(--safe-l) + 10px);
@@ -664,42 +695,38 @@ html, body {
 .set-val { font: 400 11px/1 ui-monospace, Menlo, monospace; color: var(--cyan); width: 34px; text-align: right; }
 .hud-panel input[type=range] { width: 128px; accent-color: var(--cyan); }
 
-/* In portrait the control cluster stands in front of the dash's console bay, so the chat window —
-   which only exists in CHASE view, where there is no dash — clears it on the same side. */
+/* The chat window only exists in CHASE view, where there is no dash — but the control lip is there
+   in both views, so it clears the lip rather than a console on one side. The flip no longer moves
+   it: §S2-L's lip runs edge to edge, so there is no side to dodge. */
 @media (orientation: portrait) {
-  #chatter { bottom: calc(var(--safe-b) + 214px); width: min(78vw, 340px); }
-  #controls.flipped ~ #hud #chatter { right: auto; left: calc(var(--safe-l) + 10px); }
+  #chatter { bottom: calc(var(--safe-b) + var(--lip-h) + 12px); width: min(78vw, 340px); }
 }
 
 @media (orientation: landscape) and (max-height: 520px) {
+  /* 390 px of height is the scarce axis here, so the lip is the touch-target floor and nothing
+     more: 44 px of key with a hairline over and under it. The instrument quad above it is fitted to
+     what is left (js/hud.js layoutFor), and §6.5's button-size setting moves the key WIDTH here
+     rather than its height — a 54 px key would take the whole dashboard past its share of a 390 px
+     frame, which gates_s2a measures. */
+  :root { --lip-key: 44px; --lip-h: 46px; }
   #boot-title { font-size: 22px; }
   #altpad { gap: 7px; }
+  #leftpad { gap: 6px; }
+  .ctl-btn.squelch, .ctl-btn.hire, .ctl-btn.auto, .ctl-btn.home {
+    width: clamp(44px, calc(var(--btn, 56px) * .86), 62px);
+  }
+  .lip-mid { background-size: 120px 6px; }
   .set-row { padding: 4px 0; }
   .hud-panel { width: min(560px, 100%); padding: 12px 14px 10px; }
   /* A short viewport has no room for a 122 px pod plus the cog under it. */
   #mapcase { width: 96px; height: 96px; top: calc(var(--safe-t) + 6px); right: calc(var(--safe-r) + 6px); }
   .ctl-btn.gear {
-    top: calc(var(--safe-t) + 6px + 96px - 14px);
-    right: calc(var(--safe-r) + 6px + 30px);
-    width: 32px; height: 32px; font-size: 13px; padding-top: 10px;
+    top: calc(var(--safe-t) + 6px + 96px - 8px);
+    right: calc(var(--safe-r) + 6px + 26px);
+    width: 44px; height: 44px; font-size: 14px; padding-top: 14px;
   }
   .ctl-btn.view { height: 22px; padding: 0 8px; font-size: 8px; }
-  #chatter { bottom: calc(var(--safe-b) + 118px); width: min(46vw, 320px); }
-  /* 390 px of height has to carry the whole stack: 2x32 of switchgear, boost, and the collective.
-     The grid keeps it to four rows instead of six. */
-  #conspad { bottom: calc(var(--safe-b) + 8px); gap: 7px; }
-  /* 390 px of height, and the top ~120 of it belongs to the map pod and the cog tucked under it.
-     Measured, not guessed: at the portrait proportions the console came out 306 px tall with its
-     top at y 76, and #btn-auto's own centre hit-tested to #btn-settings — the cog was sitting on
-     it. So in landscape the switchgear goes two-wide (there is horizontal room here and no
-     vertical) and the collective's lever and slot lose the height the taller viewport was paying
-     for. gates_s2k D2 asserts every visible control hit-tests to ITSELF, which is what caught it. */
-  #leftpad { display: grid; grid-template-columns: repeat(2, 44px); gap: 4px; padding: 4px 3px 5px; }
-  #conspad { padding: 6px; gap: 6px; }
-  .ctl-btn.squelch, .ctl-btn.hire, .ctl-btn.auto, .ctl-btn.home { width: 44px; }
-  .ctl-btn.lever { height: calc(var(--btn, 56px) * .60); }
-  .ctl-btn.boost { height: calc(var(--btn, 56px) * .66); }
-  .lv-slot { height: 13px; margin: 1px 0; }
+  #chatter { bottom: calc(var(--safe-b) + var(--lip-h) + 10px); width: min(46vw, 320px); }
   #hud-strip .ch-top { right: calc(var(--safe-r) + 118px); }
 }
 

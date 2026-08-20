@@ -1,0 +1,33 @@
+{
+ "group": "boss",
+ "lines": [
+  {
+   "file": "boss_01.mp3",
+   "text": "Don't get out. Don't touch the stick. Just listen."
+  },
+  {
+   "file": "boss_02.mp3",
+   "text": "That is a very nice craft you are flying. Insured to somebody else, I notice."
+  },
+  {
+   "file": "boss_03.mp3",
+   "text": "Your father owes us fifty thousand. He has owed us fifty thousand for a while now."
+  },
+  {
+   "file": "boss_04.mp3",
+   "text": "He is away. You are here. That makes it yours."
+  },
+  {
+   "file": "boss_05.mp3",
+   "text": "Fifty thousand credits. We will come for it, and I would not make us look for you."
+  },
+  {
+   "file": "boss_06.mp3",
+   "text": "If it is not ready we take the craft and sell it. Then we break an arm. Then, if I am in a mood, we sell whoever was driving to whoever is buying."
+  },
+  {
+   "file": "boss_07.mp3",
+   "text": "Make the money. Soon."
+  }
+ ]
+}

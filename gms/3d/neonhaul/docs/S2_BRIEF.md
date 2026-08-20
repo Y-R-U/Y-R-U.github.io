@@ -1000,3 +1000,130 @@ The same units measure **1.0–2.1 ms in flight**. A **50× gap between the work
 ### Manager fixes applied on top
 
 `tools/vo/write_suno_md.py` still read `v['say']` — a key `lines.json` no longer has, so **the doc generator would `KeyError`** — and `docs/SUNO.md`, the file Aaron reads to regenerate audio, still claimed *"31 voice identities over 16 installed macOS voices"* with a "macOS voice" column. Both corrected to 27 Kokoro voices. **A document describing the engine we had just removed, an hour after a peer session and I agreed that a comment is not a measurement and outlives the code it describes.**
+
+---
+
+## PASS 2-C — Aaron's second play-test, 2026-08-20 evening
+
+Verbatim, in the order he wrote it:
+
+> boys voice is ok, but the lead criminal voice doesn't work, i don't think abogen will give us the
+> answer or fierceness sounding voice we need... i think we need suno for that voice. but i think
+> several female voices work well in abogen that could be used for radio chatter and docking voices
+> etc. and the boys voice was fine. ui: moving the buttons the to right creates the exact same
+> problem on the right side of screen. I wanted the buttons built into the dashboard! settings is
+> unclickable. (in testing on mobile) cog was meant to only a little overlap/under but i can't click
+> on it at all? there is a big black bar if i look up, it doesn't look good, have it all glass, I
+> almost want the exact same view as chase but dashboard instead of chasing car... sometimes the
+> game doesn't load if i reload the page (at least on pages?
+
+and, a minute later:
+
+> happens on local as well. i think game freezes first on restore of browser? then refresh of game
+> doesn't work
+
+### The manager's read
+
+Six defects. **L1, L4 and L5 the manager has already fixed and verified** — they are recorded here
+because the causes are worth keeping, not because there is work left in them.
+
+| | defect | cause | state |
+|---|---|---|---|
+| **L1** | the game sometimes never loads | `three` was imported from **cdn.jsdelivr.net** | FIXED — vendored |
+| **L2** | the console is in the flying thumb's way, on whichever side it is on | S2-K moved it; Aaron never asked for it moved, he asked for it **in the dash** | the build |
+| **L3** | a big black bar overhead; wants the chase framing with a dash | the cabin's roof is opaque near-black metal | the build |
+| **L4** | the cog does nothing on a phone | bound to `click` only, which `preventDefault()` had already cancelled | FIXED |
+| **L5** | a lost context freezes the game forever | `preventDefault()` and hope; nothing ever asked for a restore | FIXED |
+| **L6** | the Criminal Leader's voice has no menace | Kokoro `bm_george`; Kokoro cannot do fierce | the voice pass |
+
+### L1 — the load bug, and why nothing caught it
+
+`index.html` resolved the bare specifier `three` to `https://cdn.jsdelivr.net/npm/three@0.160.0/…`.
+That makes the **entire module graph**, and therefore the whole game, hostage to one third-party
+fetch — and when that fetch fails there is no error, no retry and no fallback. `js/main.js` simply
+never evaluates. `#boot` sits on its bar. `__state.errors` is **empty**, because the module that
+owns `reportError` is the module that did not load.
+
+A machine coming back from sleep produces exactly this: the network stack is still down for the
+first second or two after a wake, and a reload issued in that window resolves nothing. It reproduced
+on a local server for the reason Aaron would not have guessed — the SERVER was local, the CDN was
+not.
+
+Measured, with a null control, because "it loads now" is not evidence of anything:
+
+```
+CDN importmap,      DNS blocked, fresh profile → 0/2 loads   stuck on "warming the grid…", 0 errors
+vendored importmap, DNS blocked, fresh profile → 3/3 loads   clean
+```
+
+The first run of that control **passed**, which was wrong: the Chrome profile was being reused and
+was serving three from its HTTP cache. It only became a real control once the profile was destroyed
+between arms. Same family as [[believable-wrong-metric]] — a check that cannot see the thing it is
+trusted to see.
+
+`vendor/three/0.160.0/` is byte-identical to what the importmap used to fetch: three@0.160.0 plus
+the four postprocessing addons and their four transitive deps, resolved recursively. **The game now
+has no third-party network dependency at all.** Every other game in this repo still has the CDN form
+and therefore still has this bug — worth telling Aaron, out of scope to fix here.
+
+Two defences went in alongside it, because a silent permanent hang must never again be a thing this
+game can do:
+
+* **a boot watchdog** — a CLASSIC inline script in `index.html`, deliberately not a module, because
+  the failure it catches is the module never running. At 20 s with `__ready` still false it turns
+  #boot amber, prints whatever it caught, and shows a **Reload** button.
+* **`#ctxlost` grew a Reload button** and `main.js` now *asks* for a restore on a backoff
+  (0.9 s, then 1.4 / 2.8 / 5.6 / 11.2), only while the tab is visible, and after four tries says so
+  instead of claiming "Restoring…" forever.
+
+### L5 — what a restored context actually needs
+
+Audited, because the obvious version of this comment would have been a guess: a render target that
+is drawn into **once** does not survive a restore — three re-creates the framebuffer and has no idea
+anything was ever rendered into it. There are exactly **two** targets in the game: the composer's,
+which is re-rendered every frame, and sky's PMREM, which `bakeEnv()` already covers. Every other
+"bake" in `js/` is a CanvasTexture or an image atlas, and those re-upload from their CPU-side copy.
+So `sky.bakeEnv()` **is** the complete restore path. A `Game.rebake` hook was written, found to have
+nothing to do, and deleted rather than left in looking like coverage.
+
+### L2 + L3 — one job, not two
+
+These are the same sentence read twice. *"I wanted the buttons built into the dashboard"* and
+*"I almost want the exact same view as chase but dashboard instead of chasing car"* describe one
+screen: **an open view of the city, with a dashboard along the bottom, and the controls as keys on
+that dashboard.** Nothing floating, nothing at mid-height on either edge, no roof.
+
+The manager's design, which the build agent implements rather than re-decides:
+
+1. **The roof goes.** `roof_lip` and `roof_spar` are deleted from `PARTS` and their rules from
+   `RULES`. They are the black bar and there is nothing to save in them.
+2. **The A-pillars become glass.** They keep their edge rule so the frame still reads at the corner
+   of the eye, but the near-black shell material is not what they are made of any more. In portrait
+   they are off screen at ±0.62 m regardless; this is for landscape.
+3. **The dash splits into two physical surfaces**, which is what a car actually has and is what makes
+   a DOM strip and a 3D quad able to look like one object:
+   * the **instrument top**, laid back — the existing tilted quad and its CanvasTexture, instruments
+     only, shortened so its bottom edge lands at the top of (4);
+   * the **control lip**, vertical and face-on — a full-width DOM strip at the very bottom of the
+     screen carrying every key. A flat DOM rect is *physically correct* here, because the front lip
+     of a dashboard is the one part of it that faces the driver square on. The seam between the two
+     is a real edge, not a mismatch to hide.
+4. **Every `.ctl-btn` moves into the lip.** `#conspad`, `#leftpad` and `#altpad` stop being a
+   floating stack on an edge. The collective and BOOST go in one end, the switchgear in the other,
+   the instruments between them. The ids do not change — too much binds by them.
+5. **The flying half is then empty from the lip upward**, which is the property Aaron has now
+   reported twice and which no gate has ever asserted.
+
+### L6 — the voices
+
+Aaron's verdict, which is the gate and not the metric: **the boy is fine, several of the female
+voices are fine, the Criminal Leader is not.** Kokoro is an audiobook reader; it does not do menace,
+and no amount of speed/pitch trim on `bm_george` will make it. He named the fix himself: **SUNO for
+that voice.**
+
+SUNO has no API here — it is Aaron pasting a prompt into a browser. So the deliverable is the seven
+Boss lines written as SUNO prompts in `docs/SUNO.md`, the drop-in path documented, and the game
+**correct with the files absent**: the Kokoro takes stay on disk and stay wired, and a Boss mp3 that
+appears in `tools/vo/raw/suno/` replaces one when `gen_story.py` next runs. Never a build that
+requires an asset Aaron has not made yet.
+

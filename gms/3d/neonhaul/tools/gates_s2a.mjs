@@ -359,8 +359,18 @@ async function main() {
     __game.drawHud(__game.hudData());
     return { forced: v, restored: g.getImageData(1, 1, 1, 1).data[3] };
   })()`);
+  // §S2-L moved this bound, and it is the ASSERTION that changed rather than the build being made
+  // to fit it. It read `planeBottom < -0.9` — the plane's near edge within a hair of the FLOOR of
+  // the frame — which was true because the quad used to be bottom-anchored to the frame. It is now
+  // bottom-anchored to the top of the DOM control lip, so -0.86 portrait / -0.76 landscape is the
+  // design rather than a drift. What the bound protected is intact and is now stated exactly: the
+  // near edge must be ON SCREEN (> -1, which is the S2-A defect where the bottom third of the
+  // dashboard was below the floor and a portrait capture showed nothing wrong) and it must land ON
+  // the lip line rather than anywhere near it — a seam, not a gap.
+  const lipN = -1 + 2 * (ext.lipFrac || 0);
+  const seatedOnLip = ext.planeBottom > -1 && Math.abs(ext.planeBottom - lipN) < 0.01;
   check('S2-A/dash FALSIFIED — the assembly is about half the height it shipped at, sits fully on screen, and its corners are round',
-    ratio < 0.65 && ratio > 0.35 && ext.planeBottom > -1 && ext.planeBottom < -0.9
+    ratio < 0.65 && ratio > 0.35 && seatedOnLip
       && corners.tl === 0 && corners.tr === 0 && corners.bl === 0 && corners.br === 0
       && corners.insideTL === 255 && corners.centre === 255
       && forced.forced === 255 && forced.restored === 0,
@@ -369,9 +379,10 @@ async function main() {
     + `${(oldFrac * 100).toFixed(1)} %. A ratio of ${ratio.toFixed(2)}; S2 asked for "almost half"\n`
     + `measuring the QUAD alone would have reported ${(ext.plane * 100).toFixed(1)} % and missed the lip, which in `
     + `portrait was the larger half of what the player actually saw\n`
-    + `the plane's near edge projects to ${ext.planeBottom} — inside the frame, with a margin. The first S2 `
-    + `layout put it at −1.03, i.e. the bottom third of the dashboard was below the floor of the screen on a `
-    + `landscape phone, and a portrait screenshot showed nothing wrong\n`
+    + `the plane's near edge projects to ${ext.planeBottom} against the control lip's top edge at `
+    + `${lipN.toFixed(4)} — SEATED ON IT (${seatedOnLip}), and inside the frame. The first S2 layout put it `
+    + `at −1.03, i.e. the bottom third of the dashboard was below the floor of the screen on a landscape `
+    + `phone, and a portrait screenshot showed nothing wrong\n`
     + `canvas ${corners.w}x${corners.h}: alpha at the four extreme corners ${[corners.tl, corners.tr, corners.bl, corners.br].join('/')}, `
     + `at (22,22) just inside the radius ${corners.insideTL}, at the centre ${corners.centre} — the corner is CLEARED, `
     + `not painted black over a curve, which is what a transparent material buys\n`

@@ -447,20 +447,62 @@ for (const ev of ['pointerdown', 'keydown', 'touchstart']) {
 
 let contextLost = false;
 const ctxlostEl = document.getElementById('ctxlost');
+const ctxlostMsg = document.getElementById('ctxlost-msg');
+
+// §S2-L. `preventDefault()` makes a restore POSSIBLE; it does not make one happen. Chrome restores
+// a lost context when its compositor gets round to it, and a tab that lost the context while
+// backgrounded — a machine waking from sleep, a window un-minimised — can sit there indefinitely
+// with no restore ever arriving. The shipped build's whole recovery story was to preventDefault
+// and hope, so that case read to Aaron as *"game freezes first on restore of browser"*: parked
+// loop, "Restoring…" on screen, and nothing on either side actually trying.
+//
+// So we ask, on a backoff, and only while the tab is on screen (restoreContext() from a hidden tab
+// is spent for nothing). After RESTORE_TRIES the panel stops claiming a restore is coming and says
+// so — the Reload button next to it has been the way out since the message changed.
+const RESTORE_TRIES = 4;
+let restoreTry = 0, restoreTimer = 0;
+
+function askRestore() {
+  clearTimeout(restoreTimer);
+  restoreTimer = 0;
+  if (!contextLost) return;
+  if (document.hidden) { restoreTimer = setTimeout(askRestore, 1000); return; }
+  if (restoreTry >= RESTORE_TRIES) {
+    if (ctxlostMsg) ctxlostMsg.textContent = 'The graphics context did not come back.';
+    return;
+  }
+  restoreTry++;
+  try { loseExt?.restoreContext(); } catch (e) { reportError('gl', 'restoreContext: ' + e.message); }
+  restoreTimer = setTimeout(askRestore, 700 * Math.pow(2, restoreTry));   // 1.4s 2.8s 5.6s 11.2s
+}
 
 renderer.domElement.addEventListener('webglcontextlost', e => {
   e.preventDefault();               // without this the browser never restores
   contextLost = true;
   ctxlostEl.classList.remove('hidden');
+  if (ctxlostMsg) ctxlostMsg.textContent = 'Restoring…';
   park('contextlost');
   reportError('gl', 'context lost');
+  restoreTry = 0;
+  // Give the browser its own free shot before spending a try on it.
+  restoreTimer = setTimeout(askRestore, 900);
 }, false);
 
 renderer.domElement.addEventListener('webglcontextrestored', () => {
   contextLost = false;
+  clearTimeout(restoreTimer);
+  restoreTimer = 0;
+  restoreTry = 0;
   ctxlostEl.classList.add('hidden');
   renderer.info.autoReset = false;
   onResize();
+  // A render target that is drawn into ONCE does not survive a restore: three re-creates the
+  // framebuffer on demand and has no idea anything was ever rendered into it. Audited the whole
+  // tree for that shape and there are exactly two targets in the game — the composer's, which is
+  // re-rendered every frame, and sky's PMREM, which is this call. Every other "bake" in js/ is a
+  // CanvasTexture or an image atlas, and those re-upload from their CPU-side copy on next use.
+  // So this one line IS the complete restore path, which is worth stating because it does not
+  // look like it should be.
   Game.sky?.bakeEnv?.();
   unpark('contextrestored');
 }, false);
@@ -2041,9 +2083,6 @@ function hudData() {
     bonus: timeBonusFor(Game.job),
     // The chatter scrollback, drawn by whichever of the two surfaces is live.
     chat: ui.chatLog(),
-    // Which side §6.5 has put the control cluster on, so the dash's console bay is under it and
-    // not on the far side of the panel from it.
-    flip: !!S().settings.flipSides,
     // §7.4.1's readout, from economy.js's real drain curve. `HUD.CELL_PER_MIN` — the placeholder
     // that stood here — is DELETED, not left beside its replacement (obligation T3's lesson): it
     // modelled 28 minutes from full where the cruise curve gives 5.2, so the dash and the holo
@@ -2156,6 +2195,10 @@ function updateHud(dt) {
           -HUD.CABIN_YAW_LAG, HUD.CABIN_YAW_LAG)
         : camera.rotation.y,
       bank: flight ? flight.bank : 0,
+      // §S2-L. The cabin's PITCH is the camera's, for the same reason the heading above is clamped
+      // to it: the dashboard must not walk up and down the frame. camera.js already folds the
+      // craft's nose attitude into this as `flight.pitch + vpitch * pitchMul`, so nothing is lost.
+      pitch: camera.rotation.x,
       vpitch: flight ? flight.vpitch * FLIGHT.COCKPIT.pitchMul : 0, fwd: _hudFwd,
       speed: data.speed, rain: sky.p.rain, contact: !!(flight && flight.contact > 0),
       eye: camera.position, data,
@@ -3488,7 +3531,7 @@ window.__game = {
   // the quad. See hud.js cabinExtent().
   cabinExtent: fov => (cockpit ? cockpit.cabinExtent(fov === undefined ? undefined : +fov) : null),
   // The dash's named rectangles, including the two RESERVED bays. See hud.js dashSlots().
-  dashSlots: () => (cockpit ? cockpit.dashSlots(hudData()) : null),
+  dashSlots: () => (cockpit ? cockpit.dashSlots() : null),
   cockpitParts: () => (cockpit ? cockpit.parts() : null),
   // The falsification hook for "no occupant, no hands, no seat". Nothing in the game calls it.
   testOccupant: on => (cockpit ? cockpit.testOccupant(!!on) : null),

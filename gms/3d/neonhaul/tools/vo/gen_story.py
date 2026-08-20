@@ -45,6 +45,13 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 VO = os.path.join(ROOT, 'tools/vo')
 OUT = os.path.join(ROOT, 'assets/audio/story')
 RAW = os.path.join(VO, 'raw/story')
+# Aaron's SUNO takes, dropped in by hand. The one voice Kokoro cannot do is the one this scene is
+# built around: *"the lead criminal voice doesn't work, i don't think abogen will give us the
+# answer or fierceness sounding voice we need... i think we need suno for that voice."* A file here
+# named for a slot REPLACES that slot's synthesis. Nothing here is generated and nothing here is
+# ever overwritten — see suno_src().
+RAW_SUNO = os.path.join(VO, 'raw/suno')
+SUNO_EXT = ('.mp3', '.wav', '.m4a', '.flac')
 FFMPEG = os.environ.get('FFMPEG', '/opt/homebrew/bin/ffmpeg')
 FFPROBE = os.environ.get('FFPROBE', '/opt/homebrew/bin/ffprobe')
 SR = 22050
@@ -223,6 +230,38 @@ def check_raw(path):
     return r
 
 
+def suno_src(slot):
+    """The SUNO take for a slot, or None. Absent is the normal case and must stay playable."""
+    for ext in SUNO_EXT:
+        p = os.path.join(RAW_SUNO, slot + ext)
+        if os.path.exists(p):
+            return p
+    return None
+
+
+def produced(src, dst, gain, bitrate='48k'):
+    """Stage 2 for a take that was PERFORMED rather than synthesised.
+
+    room() exists to put a synthesiser's dry, placeless output in a cabin. A SUNO take arrives with
+    its own space already on it, so running room() over one would stack a second reflection on the
+    first and pitch-shift a performance that was cast, not tuned. What is left is the part that is
+    about the GAME rather than about the voice: trim, the same -16 LUFS shelf every other clip in
+    the build sits on, and the same limiter — S2-B shipped SUNO takes clipping to +2.7 dBTP and
+    that is the mistake this ceiling exists to not repeat."""
+    chain = (
+        f'aresample={SR},'
+        'silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.04,'
+        'areverse,silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.06,areverse,'
+        'highpass=f=70,'
+        f'volume={gain:g},'
+        'loudnorm=I=-16:TP=-1.5:LRA=11,'
+        'alimiter=limit=0.94,'
+        'apad=pad_dur=0.08'
+    )
+    run([FFMPEG, '-y', '-v', 'error', '-i', src, '-af', chain,
+         '-ac', '1', '-ar', str(SR), '-c:a', 'libmp3lame', '-b:a', bitrate, dst])
+
+
 def build(slot, voice_key, text, bitrate='48k'):
     """One clip, synthesised and treated. Used by --falsify and by anything wanting a single take;
     the main path batches stage 1 across the whole script first (see main)."""
@@ -232,10 +271,15 @@ def build(slot, voice_key, text, bitrate='48k'):
 
 
 def treat(slot, voice_key, bitrate='48k'):
-    """Stages 2 and 3 for a take stage 1 has already written."""
+    """Stages 2 and 3 for a take stage 1 has already written — or for one Aaron performed."""
     v = VOICES[voice_key]
-    wav = os.path.join(RAW, f'{slot}.wav')
     mp3 = os.path.join(OUT, f'{slot}.mp3')
+    src = suno_src(slot)
+    if src:
+        check_raw(src)
+        produced(src, mp3, v['gain'], bitrate)
+        return mp3
+    wav = os.path.join(RAW, f'{slot}.wav')
     check_raw(wav)
     room(wav, mp3, v['pitch'], v['gain'], bitrate)
     return mp3
@@ -392,10 +436,23 @@ def main():
     ap.add_argument('--verify', action='store_true')
     ap.add_argument('--falsify', action='store_true')
     ap.add_argument('--only', default=None, choices=['boss', 'pc'])
+    ap.add_argument('--suno-script', action='store_true',
+                    help='write tools/vo/script_boss.json for split_take.py and exit')
     args = ap.parse_args()
 
     os.makedirs(OUT, exist_ok=True)
     os.makedirs(RAW, exist_ok=True)
+
+    if args.suno_script:
+        # Generated, never hand-written: split_take.py aligns against this text, and a copy that
+        # drifted from BOSS would cut the take at the wrong words and report success.
+        path = os.path.join(VO, 'script_boss.json')
+        with open(path, 'w') as f:
+            json.dump({'group': 'boss',
+                       'lines': [{'file': f'{slot}.mp3', 'text': for_say(t)} for slot, t in BOSS]},
+                      f, indent=1, ensure_ascii=False)
+        print(path)
+        return 0
 
     if args.falsify:
         return falsify()
@@ -409,8 +466,15 @@ def main():
             for stem, text in PC:
                 plan.append((f'pc_{g}_{stem}', f'pc_{g}', text))
 
+    covered = {slot for slot, _, _ in plan if suno_src(slot)}
+    if covered:
+        print(f"suno: {len(covered)} slot(s) performed, not synthesised — {', '.join(sorted(covered))}")
+
     if not args.verify:
-        synth([(os.path.join(RAW, f'{slot}.wav'), vk, text) for slot, vk, text in plan])
+        need = [(os.path.join(RAW, f'{slot}.wav'), vk, text)
+                for slot, vk, text in plan if slot not in covered]
+        if need:
+            synth(need)
         for slot, vk, text in plan:
             treat(slot, vk)
         print(f'built {len(plan)} clips')
@@ -422,10 +486,21 @@ def main():
     total = sum(r.get('bytes', 0) for r in results)
     print(f"{len(results) - len(bad)}/{len(results)} ok · {total} B total · "
           f"mean {total // max(1, len(results))} B")
-    manifest = {'version': 1, 'voices': VOICES, 'takeSec': f0s,
-                'clips': [{'slot': r['slot'], 'sec': r['sec'], 'rms': r['rms'],
-                           'bytes': r['bytes']} for r in results]}
-    with open(os.path.join(OUT, 'index.json'), 'w') as f:
+    clips = [{'slot': r['slot'], 'sec': r['sec'], 'rms': r['rms'], 'bytes': r['bytes'],
+              'src': 'suno' if r['slot'] in covered else 'kokoro'} for r in results]
+    # `--only` builds a SUBSET, and writing the manifest from that subset deletes the other twelve
+    # clips from it — the files stay on disk and the game stops being told they exist. Found by
+    # running `--only boss` while wiring the SUNO path in; it had been true since S2-E.
+    path = os.path.join(OUT, 'index.json')
+    if args.only and os.path.exists(path):
+        with open(path) as f:
+            prev = json.load(f)
+        keep = {c['slot']: c for c in prev.get('clips', [])}
+        keep.update({c['slot']: c for c in clips})
+        order = [s for s, _ in BOSS] + [f'pc_{g}_{stem}' for g in ('m', 'f', 'n') for stem, _ in PC]
+        clips = [keep[s] for s in order if s in keep]
+    manifest = {'version': 1, 'voices': VOICES, 'takeSec': f0s, 'clips': clips}
+    with open(path, 'w') as f:
         json.dump(manifest, f, indent=1)
     if bad:
         print('FAILED: ' + ', '.join(f"{r['slot']}({r['why']})" for r in bad))
