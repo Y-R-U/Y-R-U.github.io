@@ -38,52 +38,52 @@
  "clips": [
   {
    "slot": "boss_01",
-   "sec": 3.4,
-   "rms": -15.6,
-   "bytes": 21072,
-   "src": "kokoro"
+   "sec": 3.55,
+   "rms": -17.2,
+   "bytes": 22633,
+   "src": "suno"
   },
   {
    "slot": "boss_02",
-   "sec": 5.76,
-   "rms": -15.3,
-   "bytes": 35179,
-   "src": "kokoro"
+   "sec": 5.25,
+   "rms": -16.8,
+   "bytes": 32978,
+   "src": "suno"
   },
   {
    "slot": "boss_03",
-   "sec": 5.96,
-   "rms": -15.0,
-   "bytes": 36432,
-   "src": "kokoro"
+   "sec": 6.69,
+   "rms": -17.6,
+   "bytes": 41598,
+   "src": "suno"
   },
   {
    "slot": "boss_04",
-   "sec": 3.52,
-   "rms": -15.6,
-   "bytes": 21699,
-   "src": "kokoro"
+   "sec": 4.04,
+   "rms": -17.0,
+   "bytes": 25611,
+   "src": "suno"
   },
   {
    "slot": "boss_05",
-   "sec": 5.37,
-   "rms": -15.5,
-   "bytes": 32828,
-   "src": "kokoro"
+   "sec": 5.66,
+   "rms": -17.2,
+   "bytes": 35329,
+   "src": "suno"
   },
   {
    "slot": "boss_06",
-   "sec": 10.28,
-   "rms": -15.3,
-   "bytes": 62294,
-   "src": "kokoro"
+   "sec": 11.5,
+   "rms": -16.5,
+   "bytes": 70437,
+   "src": "suno"
   },
   {
    "slot": "boss_07",
-   "sec": 1.98,
+   "sec": 3.7,
    "rms": -15.7,
-   "bytes": 12452,
-   "src": "kokoro"
+   "bytes": 23574,
+   "src": "suno"
   },
   {
    "slot": "pc_m_int1",
