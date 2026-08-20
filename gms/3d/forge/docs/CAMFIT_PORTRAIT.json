@@ -1,0 +1,2549 @@
+{
+  "rooms": [
+    {
+      "door": 0,
+      "zone": "light",
+      "level": "ground",
+      "loft": true,
+      "w": 10.5,
+      "d": 11,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.308,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.244,
+            0
+          ],
+          [
+            0.463,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 4.65,
+      "rz": 4.9,
+      "samples": 7344,
+      "fullFrac": 0.772,
+      "coreX": 0.794,
+      "coreZ": 0.806,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 0,
+      "zone": "light",
+      "level": "loft",
+      "loft": true,
+      "w": 10.5,
+      "d": 11,
+      "ceil": {
+        "L": [
+          [
+            0.21,
+            0
+          ],
+          [
+            0.57,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.368,
+            0
+          ],
+          [
+            0.561,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 4.65,
+      "rz": 4.9,
+      "samples": 7344,
+      "fullFrac": 0.772,
+      "coreX": 0.794,
+      "coreZ": 0.806,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 1,
+      "zone": "light",
+      "level": "ground",
+      "loft": true,
+      "w": 18,
+      "d": 12,
+      "ceil": {
+        "L": [
+          [
+            0.026,
+            0
+          ],
+          [
+            0.432,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.293,
+            0
+          ],
+          [
+            0.512,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 8.4,
+      "rz": 5.4,
+      "samples": 15360,
+      "fullFrac": 0.835,
+      "coreX": 0.891,
+      "coreZ": 0.825,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 1,
+      "zone": "light",
+      "level": "loft",
+      "loft": true,
+      "w": 18,
+      "d": 12,
+      "ceil": {
+        "L": [
+          [
+            0.244,
+            0
+          ],
+          [
+            0.659,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.39,
+            0
+          ],
+          [
+            0.58,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 8.4,
+      "rz": 5.4,
+      "samples": 15360,
+      "fullFrac": 0.835,
+      "coreX": 0.891,
+      "coreZ": 0.825,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 2,
+      "zone": "light",
+      "level": "ground",
+      "loft": true,
+      "w": 10.5,
+      "d": 11,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.308,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.244,
+            0
+          ],
+          [
+            0.463,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 4.65,
+      "rz": 4.9,
+      "samples": 7344,
+      "fullFrac": 0.772,
+      "coreX": 0.794,
+      "coreZ": 0.806,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 2,
+      "zone": "light",
+      "level": "loft",
+      "loft": true,
+      "w": 10.5,
+      "d": 11,
+      "ceil": {
+        "L": [
+          [
+            0.21,
+            0
+          ],
+          [
+            0.57,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.368,
+            0
+          ],
+          [
+            0.561,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 4.65,
+      "rz": 4.9,
+      "samples": 7344,
+      "fullFrac": 0.772,
+      "coreX": 0.794,
+      "coreZ": 0.806,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 3,
+      "zone": "light",
+      "level": "ground",
+      "loft": true,
+      "w": 22,
+      "d": 14,
+      "ceil": {
+        "L": [
+          [
+            0.043,
+            0
+          ],
+          [
+            0.48,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.295,
+            0
+          ],
+          [
+            0.537,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 10.4,
+      "rz": 6.4,
+      "samples": 23040,
+      "fullFrac": 0.864,
+      "coreX": 0.912,
+      "coreZ": 0.854,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 3,
+      "zone": "light",
+      "level": "loft",
+      "loft": true,
+      "w": 22,
+      "d": 14,
+      "ceil": {
+        "L": [
+          [
+            0.244,
+            0
+          ],
+          [
+            0.683,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.39,
+            0
+          ],
+          [
+            0.591,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 10.4,
+      "rz": 6.4,
+      "samples": 23040,
+      "fullFrac": 0.864,
+      "coreX": 0.912,
+      "coreZ": 0.854,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 4,
+      "zone": "light",
+      "level": "ground",
+      "loft": true,
+      "w": 14,
+      "d": 12,
+      "ceil": {
+        "L": [
+          [
+            0.004,
+            0
+          ],
+          [
+            0.402,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.268,
+            0
+          ],
+          [
+            0.488,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 6.4,
+      "rz": 5.4,
+      "samples": 11520,
+      "fullFrac": 0.815,
+      "coreX": 0.854,
+      "coreZ": 0.825,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 4,
+      "zone": "light",
+      "level": "loft",
+      "loft": true,
+      "w": 14,
+      "d": 12,
+      "ceil": {
+        "L": [
+          [
+            0.229,
+            0
+          ],
+          [
+            0.629,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.39,
+            0
+          ],
+          [
+            0.572,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 6.4,
+      "rz": 5.4,
+      "samples": 11520,
+      "fullFrac": 0.815,
+      "coreX": 0.854,
+      "coreZ": 0.825,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 5,
+      "zone": "light",
+      "level": "ground",
+      "loft": true,
+      "w": 11,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.295,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.244,
+            0
+          ],
+          [
+            0.463,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 4.9,
+      "rz": 4.4,
+      "samples": 6912,
+      "fullFrac": 0.764,
+      "coreX": 0.806,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 5,
+      "zone": "light",
+      "level": "loft",
+      "loft": true,
+      "w": 11,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.214,
+            0
+          ],
+          [
+            0.574,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.37,
+            0
+          ],
+          [
+            0.561,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 4.9,
+      "rz": 4.4,
+      "samples": 6912,
+      "fullFrac": 0.764,
+      "coreX": 0.806,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 6,
+      "zone": "light",
+      "level": "ground",
+      "loft": true,
+      "w": 12.5,
+      "d": 12,
+      "ceil": {
+        "L": [
+          [
+            0.002,
+            0
+          ],
+          [
+            0.368,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.253,
+            0
+          ],
+          [
+            0.471,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 5.65,
+      "rz": 5.4,
+      "samples": 10080,
+      "fullFrac": 0.804,
+      "coreX": 0.833,
+      "coreZ": 0.825,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 6,
+      "zone": "light",
+      "level": "loft",
+      "loft": true,
+      "w": 12.5,
+      "d": 12,
+      "ceil": {
+        "L": [
+          [
+            0.221,
+            0
+          ],
+          [
+            0.61,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.39,
+            0
+          ],
+          [
+            0.567,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 5.65,
+      "rz": 5.4,
+      "samples": 10080,
+      "fullFrac": 0.804,
+      "coreX": 0.833,
+      "coreZ": 0.825,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 7,
+      "zone": "light",
+      "level": "ground",
+      "loft": true,
+      "w": 18,
+      "d": 14,
+      "ceil": {
+        "L": [
+          [
+            0.03,
+            0
+          ],
+          [
+            0.458,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.293,
+            0
+          ],
+          [
+            0.512,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 8.4,
+      "rz": 6.4,
+      "samples": 18432,
+      "fullFrac": 0.852,
+      "coreX": 0.891,
+      "coreZ": 0.854,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 7,
+      "zone": "light",
+      "level": "loft",
+      "loft": true,
+      "w": 18,
+      "d": 14,
+      "ceil": {
+        "L": [
+          [
+            0.24,
+            0
+          ],
+          [
+            0.675,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.39,
+            0
+          ],
+          [
+            0.587,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 8.4,
+      "rz": 6.4,
+      "samples": 18432,
+      "fullFrac": 0.852,
+      "coreX": 0.891,
+      "coreZ": 0.854,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 8,
+      "zone": "light",
+      "level": "ground",
+      "loft": true,
+      "w": 12,
+      "d": 12,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.36,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.25,
+            0
+          ],
+          [
+            0.471,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 5.4,
+      "rz": 5.4,
+      "samples": 9600,
+      "fullFrac": 0.799,
+      "coreX": 0.825,
+      "coreZ": 0.825,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 8,
+      "zone": "light",
+      "level": "loft",
+      "loft": true,
+      "w": 12,
+      "d": 12,
+      "ceil": {
+        "L": [
+          [
+            0.214,
+            0
+          ],
+          [
+            0.598,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.39,
+            0
+          ],
+          [
+            0.567,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 5.4,
+      "rz": 5.4,
+      "samples": 9600,
+      "fullFrac": 0.799,
+      "coreX": 0.825,
+      "coreZ": 0.825,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 9,
+      "zone": "light",
+      "level": "ground",
+      "loft": true,
+      "w": 12,
+      "d": 12,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.36,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.25,
+            0
+          ],
+          [
+            0.471,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 5.4,
+      "rz": 5.4,
+      "samples": 9600,
+      "fullFrac": 0.799,
+      "coreX": 0.825,
+      "coreZ": 0.825,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 9,
+      "zone": "light",
+      "level": "loft",
+      "loft": true,
+      "w": 12,
+      "d": 12,
+      "ceil": {
+        "L": [
+          [
+            0.214,
+            0
+          ],
+          [
+            0.598,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.39,
+            0
+          ],
+          [
+            0.567,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 5.4,
+      "rz": 5.4,
+      "samples": 9600,
+      "fullFrac": 0.799,
+      "coreX": 0.825,
+      "coreZ": 0.825,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 10,
+      "zone": "light",
+      "level": "ground",
+      "loft": true,
+      "w": 12,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.013,
+            0
+          ],
+          [
+            0.402,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.293,
+            0
+          ],
+          [
+            0.488,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.12,
+      "eaves": 4.12,
+      "roomH": 4.3,
+      "rx": 5.4,
+      "rz": 4.4,
+      "samples": 7680,
+      "fullFrac": 0.775,
+      "coreX": 0.825,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 0.981,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 10,
+      "zone": "light",
+      "level": "loft",
+      "loft": true,
+      "w": 12,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.345,
+            6
+          ],
+          [
+            0.754,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.403,
+            6
+          ],
+          [
+            0.634,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.05,
+      "eaves": 1.9,
+      "roomH": 3.13,
+      "rx": 5.4,
+      "rz": 4.4,
+      "samples": 7680,
+      "fullFrac": 0.379,
+      "coreX": 0.825,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 8.324,
+      "wallT": 0.51,
+      "headroom": -0.19,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 11,
+      "zone": "neutral",
+      "level": "ground",
+      "loft": true,
+      "w": 10,
+      "d": 9,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.248,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.221,
+            0
+          ],
+          [
+            0.439,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 4.4,
+      "rz": 3.9,
+      "samples": 5376,
+      "fullFrac": 0.734,
+      "coreX": 0.781,
+      "coreZ": 0.75,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 11,
+      "zone": "neutral",
+      "level": "loft",
+      "loft": true,
+      "w": 10,
+      "d": 9,
+      "ceil": {
+        "L": [
+          [
+            0.21,
+            0
+          ],
+          [
+            0.535,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.366,
+            0
+          ],
+          [
+            0.561,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 4.4,
+      "rz": 3.9,
+      "samples": 5376,
+      "fullFrac": 0.734,
+      "coreX": 0.781,
+      "coreZ": 0.75,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 12,
+      "zone": "neutral",
+      "level": "ground",
+      "loft": true,
+      "w": 10,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.261,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.227,
+            0
+          ],
+          [
+            0.441,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 4.4,
+      "rz": 4.4,
+      "samples": 6144,
+      "fullFrac": 0.751,
+      "coreX": 0.781,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 12,
+      "zone": "neutral",
+      "level": "loft",
+      "loft": true,
+      "w": 10,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.199,
+            0
+          ],
+          [
+            0.55,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.366,
+            0
+          ],
+          [
+            0.561,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 4.4,
+      "rz": 4.4,
+      "samples": 6144,
+      "fullFrac": 0.751,
+      "coreX": 0.781,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 13,
+      "zone": "neutral",
+      "level": "ground",
+      "loft": true,
+      "w": 10.5,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.047,
+            0
+          ],
+          [
+            0.428,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.302,
+            0
+          ],
+          [
+            0.495,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.76,
+      "eaves": 3.76,
+      "roomH": 3.94,
+      "rx": 4.65,
+      "rz": 4.4,
+      "samples": 6528,
+      "fullFrac": 0.758,
+      "coreX": 0.794,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 0.62,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 13,
+      "zone": "neutral",
+      "level": "loft",
+      "loft": true,
+      "w": 10.5,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.328,
+            2
+          ],
+          [
+            0.707,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.428,
+            2
+          ],
+          [
+            0.61,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.13,
+      "eaves": 1.97,
+      "roomH": 3.2,
+      "rx": 4.65,
+      "rz": 4.4,
+      "samples": 6528,
+      "fullFrac": 0.37,
+      "coreX": 0.794,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 7.964,
+      "wallT": 0.51,
+      "headroom": -0.114,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 14,
+      "zone": "neutral",
+      "level": "ground",
+      "loft": true,
+      "w": 10,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.002,
+            0
+          ],
+          [
+            0.325,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.257,
+            0
+          ],
+          [
+            0.463,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.28,
+      "eaves": 4.28,
+      "roomH": 4.46,
+      "rx": 4.4,
+      "rz": 4.4,
+      "samples": 6144,
+      "fullFrac": 0.751,
+      "coreX": 0.781,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.14,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 14,
+      "zone": "neutral",
+      "level": "loft",
+      "loft": true,
+      "w": 10,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.255,
+            0
+          ],
+          [
+            0.614,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.415,
+            0
+          ],
+          [
+            0.585,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.61,
+      "eaves": 2.45,
+      "roomH": 3.68,
+      "rx": 4.4,
+      "rz": 4.4,
+      "samples": 6144,
+      "fullFrac": 0.751,
+      "coreX": 0.781,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 8.484,
+      "wallT": 0.51,
+      "headroom": 0.366,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 15,
+      "zone": "neutral",
+      "level": "ground",
+      "loft": true,
+      "w": 10,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.261,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.227,
+            0
+          ],
+          [
+            0.441,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 4.4,
+      "rz": 4.4,
+      "samples": 6144,
+      "fullFrac": 0.751,
+      "coreX": 0.781,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 15,
+      "zone": "neutral",
+      "level": "loft",
+      "loft": true,
+      "w": 10,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.199,
+            0
+          ],
+          [
+            0.55,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.366,
+            0
+          ],
+          [
+            0.561,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 4.4,
+      "rz": 4.4,
+      "samples": 6144,
+      "fullFrac": 0.751,
+      "coreX": 0.781,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 16,
+      "zone": "neutral",
+      "level": "ground",
+      "loft": true,
+      "w": 18,
+      "d": 13,
+      "ceil": {
+        "L": [
+          [
+            0.026,
+            0
+          ],
+          [
+            0.452,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.293,
+            0
+          ],
+          [
+            0.512,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 8.4,
+      "rz": 5.9,
+      "samples": 16896,
+      "fullFrac": 0.844,
+      "coreX": 0.891,
+      "coreZ": 0.841,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 16,
+      "zone": "neutral",
+      "level": "loft",
+      "loft": true,
+      "w": 18,
+      "d": 13,
+      "ceil": {
+        "L": [
+          [
+            0.244,
+            0
+          ],
+          [
+            0.655,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.39,
+            0
+          ],
+          [
+            0.585,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 8.4,
+      "rz": 5.9,
+      "samples": 16896,
+      "fullFrac": 0.844,
+      "coreX": 0.891,
+      "coreZ": 0.841,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 17,
+      "zone": "neutral",
+      "level": "ground",
+      "loft": true,
+      "w": 14,
+      "d": 11,
+      "ceil": {
+        "L": [
+          [
+            0.026,
+            0
+          ],
+          [
+            0.417,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.293,
+            0
+          ],
+          [
+            0.512,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.28,
+      "eaves": 4.28,
+      "roomH": 4.46,
+      "rx": 6.4,
+      "rz": 4.9,
+      "samples": 10368,
+      "fullFrac": 0.804,
+      "coreX": 0.854,
+      "coreZ": 0.806,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.14,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 17,
+      "zone": "neutral",
+      "level": "loft",
+      "loft": true,
+      "w": 14,
+      "d": 11,
+      "ceil": {
+        "L": [
+          [
+            0.285,
+            0
+          ],
+          [
+            0.692,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.415,
+            0
+          ],
+          [
+            0.591,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.61,
+      "eaves": 2.45,
+      "roomH": 3.68,
+      "rx": 6.4,
+      "rz": 4.9,
+      "samples": 10368,
+      "fullFrac": 0.804,
+      "coreX": 0.854,
+      "coreZ": 0.806,
+      "minArm": 0.4,
+      "maxEye": 8.484,
+      "wallT": 0.51,
+      "headroom": 0.366,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 18,
+      "zone": "neutral",
+      "level": "ground",
+      "loft": true,
+      "w": 10,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.261,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.227,
+            0
+          ],
+          [
+            0.441,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 4.4,
+      "rz": 4.4,
+      "samples": 6144,
+      "fullFrac": 0.751,
+      "coreX": 0.781,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 18,
+      "zone": "neutral",
+      "level": "loft",
+      "loft": true,
+      "w": 10,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.199,
+            0
+          ],
+          [
+            0.55,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.366,
+            0
+          ],
+          [
+            0.561,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 4.4,
+      "rz": 4.4,
+      "samples": 6144,
+      "fullFrac": 0.751,
+      "coreX": 0.781,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 19,
+      "zone": "neutral",
+      "level": "ground",
+      "loft": true,
+      "w": 11.3,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.047,
+            0
+          ],
+          [
+            0.443,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.317,
+            0
+          ],
+          [
+            0.512,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.76,
+      "eaves": 3.76,
+      "roomH": 3.94,
+      "rx": 5.05,
+      "rz": 4.4,
+      "samples": 7296,
+      "fullFrac": 0.757,
+      "coreX": 0.789,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 0.62,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 19,
+      "zone": "neutral",
+      "level": "loft",
+      "loft": true,
+      "w": 11.3,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.332,
+            2
+          ],
+          [
+            0.726,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.43,
+            2
+          ],
+          [
+            0.612,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.13,
+      "eaves": 1.97,
+      "roomH": 3.2,
+      "rx": 5.05,
+      "rz": 4.4,
+      "samples": 7296,
+      "fullFrac": 0.371,
+      "coreX": 0.789,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 7.964,
+      "wallT": 0.51,
+      "headroom": -0.114,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 20,
+      "zone": "neutral",
+      "level": "ground",
+      "loft": true,
+      "w": 12,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.006,
+            0
+          ],
+          [
+            0.373,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.268,
+            0
+          ],
+          [
+            0.488,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.28,
+      "eaves": 4.28,
+      "roomH": 4.46,
+      "rx": 5.4,
+      "rz": 4.4,
+      "samples": 7680,
+      "fullFrac": 0.775,
+      "coreX": 0.825,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.14,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 20,
+      "zone": "neutral",
+      "level": "loft",
+      "loft": true,
+      "w": 12,
+      "d": 10,
+      "ceil": {
+        "L": [
+          [
+            0.278,
+            0
+          ],
+          [
+            0.653,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.415,
+            0
+          ],
+          [
+            0.585,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.61,
+      "eaves": 2.45,
+      "roomH": 3.68,
+      "rx": 5.4,
+      "rz": 4.4,
+      "samples": 7680,
+      "fullFrac": 0.775,
+      "coreX": 0.825,
+      "coreZ": 0.781,
+      "minArm": 0.4,
+      "maxEye": 8.484,
+      "wallT": 0.51,
+      "headroom": 0.366,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 21,
+      "zone": "neutral",
+      "level": "ground",
+      "loft": true,
+      "w": 12,
+      "d": 9,
+      "ceil": {
+        "L": [
+          [
+            0.056,
+            0
+          ],
+          [
+            0.437,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.317,
+            0
+          ],
+          [
+            0.512,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.76,
+      "eaves": 3.76,
+      "roomH": 3.94,
+      "rx": 5.4,
+      "rz": 3.9,
+      "samples": 6720,
+      "fullFrac": 0.758,
+      "coreX": 0.825,
+      "coreZ": 0.75,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 0.62,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 21,
+      "zone": "neutral",
+      "level": "loft",
+      "loft": true,
+      "w": 12,
+      "d": 9,
+      "ceil": {
+        "L": [
+          [
+            0.347,
+            6
+          ],
+          [
+            0.741,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.403,
+            6
+          ],
+          [
+            0.615,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.12,
+      "eaves": 1.97,
+      "roomH": 3.2,
+      "rx": 5.4,
+      "rz": 3.9,
+      "samples": 6720,
+      "fullFrac": 0.37,
+      "coreX": 0.825,
+      "coreZ": 0.75,
+      "minArm": 0.4,
+      "maxEye": 7.964,
+      "wallT": 0.51,
+      "headroom": -0.114,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 22,
+      "zone": "dark",
+      "level": "ground",
+      "loft": false,
+      "w": 10.39,
+      "d": 6.59,
+      "ceil": {
+        "L": [
+          [
+            0.019,
+            0
+          ],
+          [
+            0.336,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.289,
+            0
+          ],
+          [
+            0.477,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.91,
+      "eaves": 3.91,
+      "roomH": 3.91,
+      "rx": 4.59,
+      "rz": 2.69,
+      "samples": 4080,
+      "fullFrac": 0.64,
+      "coreX": 0.765,
+      "coreZ": 0.6,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 0.589,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 23,
+      "zone": "dark",
+      "level": "ground",
+      "loft": false,
+      "w": 8.42,
+      "d": 6.34,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.255,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.268,
+            0
+          ],
+          [
+            0.452,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.99,
+      "eaves": 3.99,
+      "roomH": 3.99,
+      "rx": 3.61,
+      "rz": 2.57,
+      "samples": 2808,
+      "fullFrac": 0.609,
+      "coreX": 0.731,
+      "coreZ": 0.556,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 0.675,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 24,
+      "zone": "dark",
+      "level": "ground",
+      "loft": false,
+      "w": 8.08,
+      "d": 6.85,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.236,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.244,
+            0
+          ],
+          [
+            0.435,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.08,
+      "eaves": 4.08,
+      "roomH": 4.08,
+      "rx": 3.44,
+      "rz": 2.82,
+      "samples": 3120,
+      "fullFrac": 0.611,
+      "coreX": 0.692,
+      "coreZ": 0.6,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 0.764,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 25,
+      "zone": "dark",
+      "level": "ground",
+      "loft": false,
+      "w": 7.44,
+      "d": 6.75,
+      "ceil": {
+        "L": [
+          [
+            0.008,
+            0
+          ],
+          [
+            0.274,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.27,
+            0
+          ],
+          [
+            0.46,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.75,
+      "eaves": 3.75,
+      "roomH": 3.75,
+      "rx": 3.12,
+      "rz": 2.78,
+      "samples": 2640,
+      "fullFrac": 0.6,
+      "coreX": 0.682,
+      "coreZ": 0.6,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 0.435,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 26,
+      "zone": "dark",
+      "level": "ground",
+      "loft": true,
+      "w": 14.5,
+      "d": 10.5,
+      "ceil": {
+        "L": [
+          [
+            0.002,
+            0
+          ],
+          [
+            0.371,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.268,
+            0
+          ],
+          [
+            0.488,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.65,
+      "eaves": 4.65,
+      "roomH": 4.83,
+      "rx": 6.65,
+      "rz": 4.65,
+      "samples": 10200,
+      "fullFrac": 0.801,
+      "coreX": 0.86,
+      "coreZ": 0.794,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.513,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 26,
+      "zone": "dark",
+      "level": "loft",
+      "loft": true,
+      "w": 14.5,
+      "d": 10.5,
+      "ceil": {
+        "L": [
+          [
+            0.24,
+            0
+          ],
+          [
+            0.623,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.377,
+            0
+          ],
+          [
+            0.568,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.97,
+      "eaves": 2.82,
+      "roomH": 4.05,
+      "rx": 6.65,
+      "rz": 4.65,
+      "samples": 10200,
+      "fullFrac": 0.801,
+      "coreX": 0.86,
+      "coreZ": 0.794,
+      "minArm": 0.4,
+      "maxEye": 8.857,
+      "wallT": 0.51,
+      "headroom": 0.733,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 27,
+      "zone": "dark",
+      "level": "ground",
+      "loft": false,
+      "w": 10.12,
+      "d": 6.78,
+      "ceil": {
+        "L": [
+          [
+            0.045,
+            0
+          ],
+          [
+            0.385,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.313,
+            0
+          ],
+          [
+            0.501,
+            0
+          ]
+        ]
+      },
+      "ridge": 3.57,
+      "eaves": 3.57,
+      "roomH": 3.57,
+      "rx": 4.46,
+      "rz": 2.79,
+      "samples": 4080,
+      "fullFrac": 0.642,
+      "coreX": 0.765,
+      "coreZ": 0.6,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 0.253,
+      "poke": 0,
+      "escaped": 0
+    },
+    {
+      "door": 28,
+      "zone": "dark",
+      "level": "ground",
+      "loft": false,
+      "w": 8.67,
+      "d": 8.22,
+      "ceil": {
+        "L": [
+          [
+            0,
+            0
+          ],
+          [
+            0.197,
+            0
+          ]
+        ],
+        "P": [
+          [
+            0.197,
+            0
+          ],
+          [
+            0.415,
+            0
+          ]
+        ]
+      },
+      "ridge": 4.7,
+      "eaves": 4.7,
+      "roomH": 4.7,
+      "rx": 3.73,
+      "rz": 3.51,
+      "samples": 4368,
+      "fullFrac": 0.665,
+      "coreX": 0.714,
+      "coreZ": 0.692,
+      "minArm": 0.4,
+      "maxEye": 4.027,
+      "wallT": 0.51,
+      "headroom": 1.383,
+      "poke": 0,
+      "escaped": 0
+    }
+  ],
+  "outdoor": [
+    {
+      "door": 0,
+      "zone": "light",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 1,
+      "zone": "light",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 2,
+      "zone": "light",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 3,
+      "zone": "light",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 4,
+      "zone": "light",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 5,
+      "zone": "light",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 6,
+      "zone": "light",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 7,
+      "zone": "light",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 8,
+      "zone": "light",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 9,
+      "zone": "light",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 10,
+      "zone": "light",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 11,
+      "zone": "neutral",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 12,
+      "zone": "neutral",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 13,
+      "zone": "neutral",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 14,
+      "zone": "neutral",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 15,
+      "zone": "neutral",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 16,
+      "zone": "neutral",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 17,
+      "zone": "neutral",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 18,
+      "zone": "neutral",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 19,
+      "zone": "neutral",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 20,
+      "zone": "neutral",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 21,
+      "zone": "neutral",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 22,
+      "zone": "dark",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 23,
+      "zone": "dark",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 24,
+      "zone": "dark",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 25,
+      "zone": "dark",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 26,
+      "zone": "dark",
+      "bad": 36,
+      "worst": 240,
+      "aimInside": 240
+    },
+    {
+      "door": 27,
+      "zone": "dark",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    },
+    {
+      "door": 28,
+      "zone": "dark",
+      "bad": 0,
+      "worst": 0,
+      "aimInside": 0
+    }
+  ]
+}

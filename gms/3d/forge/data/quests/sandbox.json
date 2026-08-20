@@ -1,0 +1,384 @@
+[
+  {
+    "id": "sandbox.01",
+    "story": "S01",
+    "campaign": "sandbox", "town": "light",
+    "title": "Vermin Contract",
+    "summary": "The granary posts a standing bounty.",
+    "giver": "wwa.board",
+    "prereq": ["quest", "light.01", "done"],
+    "board": { "school": "cull", "weight": 3 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "cull", "do": ["kill", "grain_rat", 6], "in": "wwa",
+        "text": "Clear six grain rats" },
+      { "id": "claim", "do": ["deliver", "rat_tail", 6, "wwa.board"],
+        "text": "Claim at the post",
+        "recover": [["grant", "rat_tail", 6]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.02",
+    "story": "S02",
+    "campaign": "sandbox",
+    "title": "Fish Order",
+    "summary": "A standing order. Every board carries it.",
+    "giver": "marrin",
+    "prereq": ["quest", "light.01", "done"],
+    "board": { "school": "line", "weight": 1 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "catch", "do": ["gather", "silverling", 6],
+        "text": "Take six silverling off any reach" },
+      { "id": "carry", "do": ["deliver", "silverling", 6, "marrin"],
+        "text": "Carry them to the cook who ordered them",
+        "recover": [["grant", "silverling", 6], ["moveTo", "wwa.kitchen"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.03",
+    "story": "S03",
+    "campaign": "sandbox", "town": "neutral",
+    "title": "Long Line",
+    "summary": "One fish, off the deepest stand there is.",
+    "giver": "fen",
+    "prereq": ["quest", "light.13", "done"],
+    "board": { "school": "line", "weight": 1 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "deep", "do": ["gather", "goldenscale", 1], "in": "stand.quiet",
+        "text": "Land one off the deep water",
+        "hint": "It takes as long as it takes.",
+        "recover": [["moveTo", "stand.quiet"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.04",
+    "story": "S04",
+    "campaign": "sandbox",
+    "title": "Kitchen Order",
+    "summary": "Three hot meals. Every board, every day.",
+    "giver": "marrin",
+    "prereq": ["quest", "light.01", "done"],
+    "board": { "school": "hearth", "weight": 1 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "cook", "do": ["gather", "cooked_mudbream", 3], "via": "craft",
+        "verb": "hearth",
+        "text": "Cook three meals",
+        "recover": [["grant", "mudbream", 3]] },
+      { "id": "serve", "do": ["deliver", "cooked_mudbream", 3, "wwa.kitchen"], "in": "wwa.kitchen",
+        "text": "Take them up to the kitchen that ordered them",
+        "recover": [["grant", "cooked_mudbream", 3], ["moveTo", "wwa.kitchen"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.05",
+    "story": "S05",
+    "campaign": "sandbox", "town": "light",
+    "title": "Panel Repair",
+    "summary": "Two panels down on the yard fence.",
+    "giver": "wwa.board",
+    "prereq": ["quest", "light.01", "done"],
+    "board": { "school": "mend", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "mend", "do": ["interact", "wwa.fence.panel", 2], "verb": "mend",
+        "text": "Mend the fence panels" }
+    ]
+  },
+
+  {
+    "id": "sandbox.06",
+    "story": "S06",
+    "campaign": "sandbox", "town": "dark",
+    "title": "After the Storm",
+    "summary": "Slates off the chantry roof again.",
+    "giver": "ossa",
+    "prereq": ["quest", "dark.01", "done"],
+    "board": { "school": "mend", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "slate", "do": ["interact", "bst.chantry.slate", 5], "in": "bst.chantry",
+        "verb": "mend",
+        "text": "Re-slate the roof",
+        "recover": [["arm", "bst.chantry.slate"], ["moveTo", "bst.chantry"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.07",
+    "story": "S07",
+    "campaign": "sandbox", "town": "light",
+    "title": "Kerb and Course",
+    "summary": "Six stones, set true along the yard.",
+    "giver": "wwa.board",
+    "prereq": ["quest", "light.01", "done"],
+    "board": { "school": "setting", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "set", "do": ["interact", "wwa.market.kerb", 6], "in": "wwa.market",
+        "verb": "setting",
+        "text": "Set six kerb stones",
+        "recover": [["arm", "wwa.market.kerb"], ["moveTo", "wwa.market"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.08",
+    "story": "S08",
+    "campaign": "sandbox", "town": "neutral",
+    "title": "Raise a Shed",
+    "summary": "A marked plot behind the stables.",
+    "giver": "hana",
+    "prereq": ["quest", "light.13", "done"],
+    "board": { "school": "setting", "weight": 1 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "quarry", "do": ["gather", "stone_chip", 4],
+        "text": "Cut four chips of chalk" },
+      { "id": "raise", "do": ["interact", "lac.stables.plot", 4], "in": "lac.stables",
+        "verb": "setting",
+        "text": "Raise it on the marked plot",
+        "recover": [["arm", "lac.stables.plot"], ["moveTo", "lac.stables"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.09",
+    "story": "S09",
+    "campaign": "sandbox", "town": "dark",
+    "title": "Forage Run",
+    "summary": "Twelve bitterroot off the heath.",
+    "giver": "ossa",
+    "prereq": ["quest", "dark.01", "done"],
+    "board": { "school": "forage", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "run", "do": ["gather", "bitterroot", 12], "in": "heath",
+        "text": "Bring in twelve bitterroot",
+        "recover": [["moveTo", "heath.crag"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.10",
+    "story": "S10",
+    "campaign": "sandbox", "town": "neutral",
+    "title": "Leat Clearing",
+    "summary": "The leat is up again above the mill.",
+    "giver": "hana",
+    "prereq": ["quest", "light.13", "done"],
+    "board": { "school": "forage", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "clear", "do": ["interact", "lac.leat", 6], "in": "lac.leat",
+        "verb": "forage",
+        "text": "Clear the stretch above the wheel",
+        "recover": [["arm", "lac.leat"], ["moveTo", "lac.leat"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.11",
+    "story": "S11",
+    "campaign": "sandbox", "town": "neutral",
+    "title": "Firewood",
+    "summary": "Straw and kindling for the barn hearth.",
+    "giver": "hana",
+    "prereq": ["quest", "light.13", "done"],
+    "board": { "school": "forage", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "cut", "do": ["gather", "wheatglass", 8], "in": "fields",
+        "verb": "forage",
+        "text": "Cut eight bundles off the strips",
+        "recover": [["moveTo", "fields"]] },
+      { "id": "stack", "do": ["deliver", "wheatglass", 8, "lac.barn"], "in": "lac.barn",
+        "text": "Stack them by the barn hearth",
+        "recover": [["grant", "wheatglass", 8], ["moveTo", "lac.barn"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.12",
+    "story": "S12",
+    "campaign": "sandbox", "town": "neutral",
+    "title": "Lost Hen",
+    "summary": "Under the cotts. It is always the cotts.",
+    "giver": "hana",
+    "prereq": ["quest", "light.13", "done"],
+    "board": { "school": "ward", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "drive", "do": ["escort", "hen", "lac.henhouse"],
+        "text": "Drive the hen home",
+        "recover": [["arm", "lac.henhouse.hen"], ["moveTo", "lac.henhouse"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.13",
+    "story": "S13",
+    "campaign": "sandbox", "town": "dark",
+    "title": "Escort the Cart",
+    "summary": "A grain cart over the ford, crates intact.",
+    "giver": "ossa",
+    "prereq": ["quest", "dark.01", "done"],
+    "board": { "school": "ward", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "walk",
+        "all": [["escort", "cart", "heath.ford"], ["kill", "rat_knot", 3]],
+        "in": "heath",
+        "text": "Walk the cart and keep the knots off it",
+        "recover": [["moveTo", "heath.ford"], ["respawn", "rat_knot", 3]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.14",
+    "story": "S14",
+    "campaign": "sandbox", "town": "light",
+    "title": "Night Watch",
+    "summary": "One night on the gate. Turn back strays.",
+    "giver": "kesta",
+    "prereq": ["quest", "light.01", "done"],
+    "board": { "school": "ward", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "hold",
+        "all": [["survive", "wwa.northgate", 90], ["kill", "mire_rat", 4]],
+        "in": "wwa.northgate",
+        "after": 21, "before": 5,
+        "text": "Hold the north gate",
+        "recover": [["moveTo", "wwa.northgate"], ["respawn", "mire_rat", 4]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.15",
+    "story": "S15",
+    "campaign": "sandbox", "town": "light",
+    "title": "Strays on the Road",
+    "summary": "Casters on the march road again.",
+    "giver": "wwa.board",
+    "prereq": ["quest", "light.18", "done"],
+    "board": { "school": "kindle", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "clear", "do": ["kill", "hollow", 5], "in": "march.west",
+        "text": "Clear the road stretch",
+        "hint": "They keep to the hedges between the bothies.",
+        "recover": [["moveTo", "march.west"], ["respawn", "hollow", 5]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.16",
+    "story": "S16",
+    "campaign": "sandbox",
+    "title": "Price Round",
+    "summary": "All three markets, one day, one slate.",
+    "giver": "wick_ww",
+    "prereq": ["quest", "dark.01", "done"],
+    "board": { "school": "barter", "weight": 1 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "west", "do": ["interact", "wwa.market.stall", 1], "in": "wwa.market",
+        "verb": "barter",
+        "text": "Copy Whitewall's prices",
+        "recover": [["arm", "wwa.market.stall"], ["moveTo", "wwa.market"]] },
+      { "id": "middle", "do": ["interact", "lac.cross.post", 1], "in": "lac.square",
+        "verb": "barter",
+        "text": "Copy Longacre's prices",
+        "recover": [["arm", "lac.cross.post"], ["moveTo", "lac.square"]] },
+      { "id": "east", "do": ["interact", "bst.board.rate", 1], "in": "bst.board",
+        "verb": "barter",
+        "text": "Copy the Board's rate",
+        "recover": [["arm", "bst.board.rate"], ["moveTo", "bst.board"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.17",
+    "story": "S17",
+    "campaign": "sandbox", "town": "dark",
+    "title": "Appraise the Chest",
+    "summary": "Something came up out of the workings.",
+    "giver": "ossa",
+    "prereq": ["quest", "dark.01", "done"],
+    "board": { "school": "barter", "weight": 1 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "value", "do": ["interact", "bst.levels.chest", 4], "in": "bst.levels",
+        "verb": "barter",
+        "text": "Put a number on what is in it",
+        "recover": [["arm", "bst.levels.chest"], ["moveTo", "bst.levels"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.18",
+    "story": "S18",
+    "campaign": "sandbox", "town": "neutral",
+    "title": "Ferry Shift",
+    "summary": "Four crossings on Fen's ferry.",
+    "giver": "fen",
+    "prereq": ["quest", "light.13", "done"],
+    "board": { "school": "barter", "weight": 2 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "load", "do": ["interact", "lac.millbridge.crate", 4], "in": "lac.millbridge",
+        "verb": "barter",
+        "text": "Load the crossings",
+        "recover": [["arm", "lac.millbridge.crate"], ["moveTo", "lac.millbridge"]] },
+      { "id": "cross", "do": ["escort", "fen", "lac.mill"],
+        "text": "Run the shift",
+        "recover": [["moveTo", "lac.millbridge"]] }
+    ]
+  },
+
+  {
+    "id": "sandbox.19",
+    "story": "S19",
+    "campaign": "sandbox", "town": "light",
+    "title": "Lamp Round",
+    "summary": "Nine lamps, lit before the Low bell.",
+    "giver": "wwa.board",
+    "prereq": ["quest", "light.01", "done"],
+    "board": { "school": "kindle", "weight": 1 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "round", "do": ["interact", "wwa.lamp", 9], "verb": "kindle",
+        "after": 18, "before": 21, "within": 180,
+        "text": "Light the round before Low" }
+    ]
+  },
+
+  {
+    "id": "sandbox.20",
+    "story": "S20",
+    "campaign": "sandbox", "town": "neutral",
+    "title": "A Meal for the Bridge",
+    "summary": "Hot, at the bridge, before it cools.",
+    "giver": "fen",
+    "prereq": ["quest", "light.13", "done"],
+    "board": { "school": "hearth", "weight": 1 },
+    "repeat": { "every": 1 },
+    "steps": [
+      { "id": "cook", "do": ["gather", "cooked_mudbream", 2], "via": "craft", "in": "lac.barn",
+        "verb": "hearth",
+        "text": "Cook two, and do not dawdle",
+        "recover": [["grant", "mudbream", 2]] },
+      { "id": "carry", "do": ["deliver", "cooked_mudbream", 2, "lac.millbridge"], "in": "lac.millbridge",
+        "within": 90,
+        "text": "Get them to the bridge hot",
+        "recover": [["grant", "cooked_mudbream", 2], ["moveTo", "lac.mill"]] }
+    ]
+  }
+]

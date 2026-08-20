@@ -1,0 +1,22 @@
+[
+  { "id": "bel", "area": "wwa.granary", "at": [0, 0.92], "ry": 3.14 },
+  { "id": "rell", "area": "wwa.fishsteps", "at": [0, -0.5], "ry": 0.4 },
+  { "id": "marrin", "area": "wwa.kitchen", "at": [0, 0], "ry": 2.2 },
+  { "id": "kesta", "area": "wwa.northgate", "at": [0.3, 0.3], "ry": 3.14 },
+  { "id": "alder", "area": "wwa.temple", "at": [0.3, -0.3], "ry": 1.57 },
+  { "id": "ivo", "area": "wwa.almonry", "at": [0, -0.2], "ry": 0 },
+  { "id": "pell", "area": "wwa.works", "at": [-0.3, 0], "ry": 1.0 },
+  { "id": "wick_ww", "area": "wwa.market", "at": [0.15, 0.75], "ry": 4.0 },
+
+  { "id": "sedge", "area": "lac.granary", "at": [0, -0.6], "ry": 3.14 },
+  { "id": "hana", "area": "lac.mill", "at": [0.4, 0], "ry": 4.7 },
+  { "id": "fen", "area": "lac.millbridge", "at": [0.45, -0.75], "ry": 1.57 },
+  { "id": "ansel", "area": "lac.cross", "at": [-0.5, -0.3], "ry": 0.8 },
+  { "id": "dob", "area": "lac.barn", "at": [0.4, 0.2], "ry": 3.14 },
+
+  { "id": "sela", "area": "bst.cistern", "at": [0, 0], "ry": 0 },
+  { "id": "corve", "area": "bst.keep", "at": [0.72, 0.18], "ry": 2.6 },
+  { "id": "ossa", "area": "bst.reeve", "at": [0, 0], "ry": 3.14 },
+  { "id": "nim", "area": "bst.upper", "at": [-0.5, -0.5], "ry": 1.57 },
+  { "id": "torr", "area": "bst.forge", "at": [0, 0], "ry": 0 }
+]

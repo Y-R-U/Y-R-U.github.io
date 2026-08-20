@@ -1,0 +1,778 @@
+[
+  {
+    "id": "dark.01",
+    "story": "D01",
+    "campaign": "dark", "act": 1, "town": "dark",
+    "title": "The Posting",
+    "summary": "Garrison duty. The store under the keep.",
+    "giver": "kesta",
+    "prereq": ["quest", "light.24", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "kesta", "dark.01.in"],
+        "text": "Take the posting from Kesta" },
+
+      { "id": "down", "do": ["goto", "bst.levels"],
+        "text": "Go down to the flooded store",
+        "recover": [["moveTo", "bst.bailey"]] },
+
+      { "id": "clear",
+        "all": [["kill", "mire_rat", 6], ["kill", "creek_crab", 4]],
+        "in": "bst.levels",
+        "text": "Clear the store",
+        "hint": "The crabs are in the standing water. Break the shell first.",
+        "recover": [["moveTo", "bst.levels"], ["respawn", "mire_rat", 6], ["respawn", "creek_crab", 4]] },
+
+      { "id": "out", "do": ["talk", "kesta", "dark.01.out"],
+        "text": "Report the store clear" }
+    ],
+    "reward": { "items": [["rat_tail", 10]] },
+    "onDone": [["flag", "dark.posted", true], ["unlock", "dark.02"]]
+  },
+
+  {
+    "id": "dark.02",
+    "story": "D02",
+    "campaign": "dark", "act": 1, "town": "dark",
+    "title": "Sela's Question",
+    "summary": "She knows where you were born.",
+    "giver": "sela",
+    "prereq": ["quest", "dark.01", "done"],
+    "steps": [
+      { "id": "find", "do": ["goto", "bst.alleys"],
+        "text": "Find the Delver in the alleys",
+        "recover": [["moveTo", "bst.middle"]] },
+
+      { "id": "ask", "do": ["talk", "sela", "dark.02.ask"],
+        "text": "Answer her question" },
+
+      { "id": "hear", "do": ["talk", "sela", "dark.02.robe"],
+        "text": "Hear the rest of it" },
+
+      { "id": "robe", "do": ["interact", "self", 1],
+        "text": "Take the white robe off",
+        "hint": "You are not garrison any more. Nobody will stop you." }
+    ],
+    "onDone": [["flag", "dark.robe.off", true], ["unlock", "dark.03"]]
+  },
+
+  {
+    "id": "dark.03",
+    "story": "D03",
+    "campaign": "dark", "act": 1, "town": "dark",
+    "title": "Night Line",
+    "summary": "The Blackstone reach, after the horn.",
+    "giver": "sela",
+    "prereq": ["quest", "dark.02", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sela", "dark.03.in"],
+        "text": "Take the line off Sela" },
+
+      { "id": "fish", "do": ["gather", "blackeel", 11], "in": "reach.dark",
+        "after": 21, "before": 5,
+        "text": "Take eleven eels off the reach",
+        "hint": "Eight for the Reeve. Three are ours.",
+        "recover": [["moveTo", "stand.dry"]] },
+
+      { "id": "out", "do": ["talk", "sela", "dark.03.out"],
+        "text": "Bring the eels up" }
+    ],
+    "onDone": [["unlock", "dark.04"], ["unlock", "dark.05"]]
+  },
+
+  {
+    "id": "dark.04",
+    "story": "D04",
+    "campaign": "dark", "act": 1, "town": "dark",
+    "title": "What It's Worth",
+    "summary": "The rate is posted, not asked.",
+    "giver": "ossa",
+    "prereq": ["quest", "dark.03", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "ossa", "dark.04.in"],
+        "text": "Take the eels to the Reeve" },
+
+      { "id": "read", "do": ["interact", "bst.board.rate", 1], "in": "bst.board",
+        "verb": "barter",
+        "text": "Read the posted rate",
+        "recover": [["arm", "bst.board.rate"], ["moveTo", "bst.board"]] },
+
+      { "id": "sell", "do": ["deliver", "blackeel", 8, "ossa"], "via": "sell", "in": "bst.board",
+        "text": "Sell at the rate",
+        "recover": [["grant", "blackeel", 8], ["moveTo", "bst.board"]] },
+
+      { "id": "out", "do": ["talk", "ossa", "dark.04.out"],
+        "text": "Try to argue the price" }
+    ],
+    "onDone": [["flag", "dark.board.sold", true], ["unlock", "dark.06"]]
+  },
+
+  {
+    "id": "dark.05",
+    "story": "D05",
+    "campaign": "dark", "act": 1, "town": "dark",
+    "title": "Two Pots",
+    "summary": "Three fish into eight bowls.",
+    "giver": "sela",
+    "prereq": ["quest", "dark.03", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sela", "dark.05.in"],
+        "text": "Hear Sela out in the shift kitchen" },
+
+      { "id": "cook", "do": ["gather", "cooked_blackeel", 3], "via": "craft", "in": "bst.kitchen",
+        "verb": "hearth",
+        "text": "Cook three eels",
+        "recover": [["grant", "blackeel", 3]] },
+
+      { "id": "split", "do": ["interact", "bst.kitchen.bowl", 8], "in": "bst.kitchen",
+        "verb": "hearth",
+        "text": "Fill eight bowls off three fish",
+        "hint": "Cut them small and let the pot sit.",
+        "recover": [["arm", "bst.kitchen.bowl"]] },
+
+      { "id": "serve", "do": ["deliver", "cooked_blackeel", 3, "bst.barracks"], "in": "bst.barracks",
+        "text": "Carry the pots to the shift",
+        "recover": [["grant", "cooked_blackeel", 3], ["moveTo", "bst.barracks"]] },
+
+      { "id": "out", "do": ["talk", "sela", "dark.05.out"],
+        "text": "Sit down when they are fed" }
+    ],
+    "onDone": [["unlock", "dark.06"], ["unlock", "dark.10"]]
+  },
+
+  {
+    "id": "dark.06",
+    "story": "D06",
+    "campaign": "dark", "act": 1, "town": "dark",
+    "title": "The Tally",
+    "summary": "The yield is read at the shift change.",
+    "giver": "corve",
+    "prereq": ["all",
+      ["quest", "dark.04", "done"],
+      ["quest", "dark.05", "done"]],
+    "steps": [
+      { "id": "brief", "do": ["talk", "corve", "dark.06.in"],
+        "text": "Take the morning from Corve" },
+
+      { "id": "curtain", "do": ["goto", "bst.northgate"],
+        "text": "Walk the north curtain with Nim",
+        "recover": [["moveTo", "bst.upper"]] },
+
+      { "id": "wall", "do": ["talk", "nim", "dark.06.wall"],
+        "text": "Let Nim talk" },
+
+      { "id": "come", "do": ["goto", "bst.board"],
+        "after": 13, "before": 14,
+        "text": "Be at the Board for the shift change",
+        "recover": [["moveTo", "bst.upper"]] },
+
+      { "id": "tally", "do": ["talk", "corve", "dark.06.tally"],
+        "text": "Hear the yield read" }
+    ],
+    "onDone": [["flag", "dark.act1.done", true], ["act", 2],
+      ["unlock", "dark.07"], ["unlock", "dark.08"]]
+  },
+
+  {
+    "id": "dark.07",
+    "story": "D07",
+    "campaign": "dark", "act": 2, "town": "dark",
+    "title": "Chasing the Seam",
+    "summary": "Follow the fourth level west.",
+    "giver": "corve",
+    "prereq": ["quest", "dark.06", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "corve", "dark.07.in"],
+        "text": "Take a lamp off Corve" },
+
+      { "id": "down", "do": ["goto", "bst.levels"],
+        "text": "Go down to the fourth level",
+        "recover": [["moveTo", "bst.keep"]] },
+
+      { "id": "seam", "do": ["interact", "bst.levels.mark", 3], "in": "bst.levels",
+        "verb": "setting",
+        "text": "Mark the seam as it runs west",
+        "hint": "Three marks. Corve wants to know where it thins.",
+        "recover": [["arm", "bst.levels.mark"], ["moveTo", "bst.levels"]] },
+
+      { "id": "cut", "do": ["gather", "iron_shard", 5], "in": "bst.levels",
+        "text": "Cut what the seam still gives" },
+
+      { "id": "wheels", "do": ["talk", "corve", "dark.07.wheels"],
+        "text": "Stop when Corve stops" }
+    ],
+    "onDone": [["flag", "dark.seam.followed", true], ["unlock", "dark.23"], ["unlock", "dark.19"]]
+  },
+
+  {
+    "id": "dark.08",
+    "story": "D08",
+    "campaign": "dark", "act": 2, "town": "dark",
+    "title": "Dead Water",
+    "summary": "Draw at the intake. Nothing lives in it.",
+    "giver": "sela",
+    "prereq": ["quest", "dark.06", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sela", "dark.08.in"],
+        "text": "Walk down to the cistern with Sela" },
+
+      { "id": "intake", "do": ["goto", "bst.intake"],
+        "text": "Get down to the intake",
+        "recover": [["moveTo", "bst.gorgewalk"]] },
+
+      { "id": "draw", "do": ["interact", "bst.intake.draw", 3], "in": "bst.intake",
+        "verb": "line",
+        "text": "Draw three times at the intake",
+        "recover": [["arm", "bst.intake.draw"], ["moveTo", "bst.intake"]] },
+
+      { "id": "line", "do": ["gather", "foul_water", 3], "in": "reach.dark",
+        "text": "Work the line until something takes",
+        "hint": "Nothing will. That is the reading.",
+        "recover": [["moveTo", "stand.dry"]] },
+
+      { "id": "out", "do": ["talk", "sela", "dark.08.out"],
+        "text": "Say what the town is drinking" }
+    ],
+    "onDone": [["unlock", "dark.09"]]
+  },
+
+  {
+    "id": "dark.09",
+    "story": "D09",
+    "campaign": "dark", "act": 2, "town": "dark",
+    "title": "Upstream",
+    "summary": "West to the ford. Taste it, then fish it.",
+    "giver": "sela",
+    "prereq": ["quest", "dark.08", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sela", "dark.09.in"],
+        "text": "Take a cup and go west" },
+
+      { "id": "walk", "do": ["goto", "heath.ford"],
+        "text": "Walk the Vail up to the Hollow Ford",
+        "recover": [["moveTo", "bst.westgate"]] },
+
+      { "id": "taste", "do": ["interact", "heath.ford.reading", 3], "in": "heath.ford",
+        "verb": "forage",
+        "text": "Take three readings at the ford",
+        "recover": [["arm", "heath.ford.reading"], ["moveTo", "heath.ford"]] },
+
+      { "id": "fish", "do": ["gather", "mudbream", 4], "in": "reach.neutral",
+        "text": "Catch something out of live water",
+        "recover": [["moveTo", "lac.millbridge"]] },
+
+      { "id": "out", "do": ["talk", "sela", "dark.09.out"],
+        "text": "Hold the fish up and say it" }
+    ],
+    "onDone": [["flag", "dark.upstream", true], ["unlock", "dark.11"]]
+  },
+
+  {
+    "id": "dark.23",
+    "story": "D23",
+    "campaign": "dark", "act": 2, "town": "dark",
+    "title": "The Old Workings",
+    "summary": "A gallery nobody has propped in forty years.",
+    "giver": "corve",
+    "prereq": ["quest", "dark.07", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "corve", "dark.23.in"],
+        "text": "Take the shoring timber down" },
+
+      { "id": "through", "do": ["interact", "bst.levels.fall", 2], "in": "bst.levels",
+        "verb": "setting",
+        "text": "Break through the old fall",
+        "recover": [["arm", "bst.levels.fall"], ["moveTo", "bst.levels"]] },
+
+      { "id": "clear",
+        "all": [["kill", "mire_rat", 5], ["kill", "rat_knot", 5]],
+        "in": "bst.levels",
+        "text": "Clear the gallery",
+        "hint": "Knots come out of the sumps. Do not let them ring you.",
+        "recover": [["moveTo", "bst.levels"], ["respawn", "mire_rat", 5], ["respawn", "rat_knot", 5]] },
+
+      { "id": "shore", "do": ["interact", "bst.levels.prop", 5], "in": "bst.levels",
+        "verb": "mend",
+        "text": "Shore what will hold",
+        "recover": [["arm", "bst.levels.prop"], ["moveTo", "bst.levels"]] },
+
+      { "id": "out", "do": ["talk", "corve", "dark.23.out"],
+        "text": "Come up and say it is standing" }
+    ],
+    "onDone": [["flag", "dark.workings.open", true], ["unlock", "dark.10"]]
+  },
+
+  {
+    "id": "dark.10",
+    "story": "D10",
+    "campaign": "dark", "act": 2, "town": "dark",
+    "title": "A Bowl for the Shift",
+    "summary": "Feed them with nothing to feed them with.",
+    "giver": "sela",
+    "prereq": ["quest", "dark.05", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sela", "dark.10.in"],
+        "text": "Take the pot off Sela" },
+
+      { "id": "scrape",
+        "all": [["gather", "silt_carp", 4], ["gather", "gravecap", 4]],
+        "text": "Find anything at all",
+        "hint": "Carp out of the reach, cap off the gallery walls.",
+        "recover": [["moveTo", "stand.dry"]] },
+
+      { "id": "cook", "do": ["gather", "cooked_silt_carp", 4], "via": "craft", "in": "bst.kitchen",
+        "verb": "hearth",
+        "text": "Cook whatever it turns into",
+        "recover": [["grant", "silt_carp", 4]] },
+
+      { "id": "serve", "do": ["deliver", "cooked_silt_carp", 4, "bst.barracks"], "in": "bst.barracks",
+        "text": "Feed the shift coming up",
+        "recover": [["grant", "cooked_silt_carp", 4], ["moveTo", "bst.barracks"]] },
+
+      { "id": "out", "do": ["talk", "sela", "dark.10.out"],
+        "text": "Wait to see if anybody complains" }
+    ],
+    "onDone": [["flag", "dark.act2.done", true], ["act", 3], ["unlock", "dark.11"]]
+  },
+
+  {
+    "id": "dark.11",
+    "story": "D11",
+    "campaign": "dark", "act": 3, "town": "dark",
+    "title": "The Miller's Terms",
+    "summary": "Take the month down the valley. Buy grain.",
+    "giver": "ossa",
+    "prereq": ["quest", "dark.09", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "ossa", "dark.11.in"],
+        "text": "Take the month's yield off the Reeve" },
+
+      { "id": "load", "do": ["interact", "bst.board.yield", 3], "in": "bst.board",
+        "verb": "barter",
+        "text": "Weigh and load the yield",
+        "onDone": [["item", "iron_shard", 5]],
+        "recover": [["arm", "bst.board.yield"], ["moveTo", "bst.board"]] },
+
+      { "id": "road", "do": ["goto", "lac.square"],
+        "text": "Take King's Road west to Longacre",
+        "hint": "Over Blackspan, past the ford, into the square.",
+        "recover": [["moveTo", "heath.ford"]] },
+
+      { "id": "sell", "do": ["deliver", "iron_shard", 5, "wick_ww"], "via": "sell", "in": "lac.square",
+        "text": "Sell the month at the cross",
+        "recover": [["grant", "iron_shard", 5], ["moveTo", "lac.square"]] },
+
+      { "id": "out", "do": ["talk", "hana", "dark.11.out"],
+        "text": "Ask the miller for grain" }
+    ],
+    "onDone": [["unlock", "dark.12"], ["unlock", "dark.24"]]
+  },
+
+  {
+    "id": "dark.12",
+    "story": "D12",
+    "campaign": "dark", "act": 3, "town": "neutral",
+    "title": "Weighing Hana",
+    "summary": "She has your numbers before you speak.",
+    "giver": "hana",
+    "prereq": ["quest", "dark.11", "done"],
+    "steps": [
+      { "id": "price", "do": ["talk", "hana", "dark.12.price"],
+        "text": "Put a price to Hana" },
+
+      { "id": "terms", "do": ["talk", "hana", "dark.12.terms"],
+        "text": "Hear what she wants instead" },
+
+      { "id": "follow", "do": ["goto", "lac.mill"],
+        "text": "Follow her into the mill",
+        "recover": [["moveTo", "lac.square"]] }
+    ],
+    "onDone": [["unlock", "dark.13"]]
+  },
+
+  {
+    "id": "dark.13",
+    "story": "D13",
+    "campaign": "dark", "act": 3, "town": "neutral",
+    "title": "Three Chores for Hana",
+    "summary": "The leat, a crate, the hen. Again.",
+    "giver": "hana",
+    "prereq": ["quest", "dark.12", "done"],
+    "steps": [
+      { "id": "leat", "do": ["interact", "lac.leat", 4], "in": "lac.leat",
+        "verb": "forage",
+        "text": "Clear the leat",
+        "recover": [["arm", "lac.leat"], ["moveTo", "lac.leat"]] },
+
+      { "id": "crate", "do": ["interact", "lac.mill.crate", 3], "in": "lac.mill",
+        "verb": "setting",
+        "text": "Stack the crate off the mill floor",
+        "recover": [["arm", "lac.mill.crate"], ["moveTo", "lac.mill"]] },
+
+      { "id": "hen", "do": ["escort", "hen", "lac.henhouse"],
+        "text": "Drive the hen home",
+        "hint": "Under the cotts. It is always under the cotts.",
+        "recover": [["arm", "lac.henhouse.hen"], ["moveTo", "lac.henhouse"]] },
+
+      { "id": "hurdle", "do": ["interact", "lac.mill.hurdle", 3], "in": "lac.mill",
+        "verb": "mend",
+        "text": "Mend the mill hurdle she added",
+        "recover": [["arm", "lac.mill.hurdle"], ["moveTo", "lac.mill"]] },
+
+      { "id": "out", "do": ["talk", "hana", "dark.13.out"],
+        "text": "Take the grain off Hana" }
+    ],
+    "reward": { "items": [["wheatglass", 14]] },
+    "onDone": [["flag", "dark.grain", true], ["unlock", "dark.14"], ["unlock", "dark.15"]]
+  },
+
+  {
+    "id": "dark.14",
+    "story": "D14",
+    "campaign": "dark", "act": 3, "town": "neutral",
+    "title": "The Face at the Cross",
+    "summary": "A Whitewall cousin, trading as one of yours.",
+    "giver": "ansel",
+    "prereq": ["quest", "dark.13", "done"],
+    "steps": [
+      { "id": "spot", "do": ["goto", "lac.cross"],
+        "text": "Get to the cross before he moves on",
+        "recover": [["moveTo", "lac.square"]] },
+
+      { "id": "watch", "do": ["interact", "lac.cross.post", 3], "in": "lac.square",
+        "verb": "glamour", "unseen": true,
+        "text": "Read the post over his shoulder",
+        "hint": "Dim first. He reads a room better than you do.",
+        "recover": [["arm", "lac.cross.post"], ["moveTo", "lac.square"]] },
+
+      { "id": "meet", "do": ["talk", "ansel", "dark.14.in"],
+        "text": "Let him introduce himself again" },
+
+      { "id": "out", "do": ["talk", "ansel", "dark.14.out"],
+        "text": "Ask him whose house he buys for" }
+    ],
+    "onDone": [["unlock", "dark.15"]]
+  },
+
+  {
+    "id": "dark.24",
+    "story": "D24",
+    "campaign": "dark", "act": 3, "town": "dark",
+    "title": "The Quota",
+    "summary": "Twenty tails by the horn. Then the rate drops.",
+    "giver": "ossa",
+    "prereq": ["quest", "dark.11", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "ossa", "dark.24.in"],
+        "text": "Take the contract off the Board" },
+
+      { "id": "cull",
+        "all": [["kill", "mire_rat", 8], ["kill", "rat_knot", 12]],
+        "in": "bst.levels",
+        "text": "Cull in the workings until you have twenty tails",
+        "hint": "The sumps on the third level. Knots come up with them.",
+        "recover": [["moveTo", "bst.levels"], ["respawn", "mire_rat", 8], ["respawn", "rat_knot", 12]] },
+
+      { "id": "claim", "do": ["deliver", "rat_tail", 20, "ossa"], "via": "sell", "in": "bst.board",
+        "text": "Claim before the horn",
+        "recover": [["grant", "rat_tail", 20], ["moveTo", "bst.board"]] },
+
+      { "id": "out", "do": ["talk", "ossa", "dark.24.out"],
+        "text": "Ask what it pays tomorrow" }
+    ],
+    "onDone": [["unlock", "dark.15"]]
+  },
+
+  {
+    "id": "dark.15",
+    "story": "D15",
+    "campaign": "dark", "act": 3, "town": "neutral",
+    "title": "What Fen Won't Say",
+    "summary": "Run a ferry shift. Count them yourself.",
+    "giver": "fen",
+    "prereq": ["quest", "dark.13", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "fen", "dark.15.in"],
+        "text": "Take a turn on the ferry" },
+
+      { "id": "load", "do": ["interact", "lac.millbridge.crate", 4], "in": "lac.millbridge",
+        "verb": "barter",
+        "text": "Count four crates aboard",
+        "recover": [["arm", "lac.millbridge.crate"], ["moveTo", "lac.millbridge"]] },
+
+      { "id": "cross", "do": ["escort", "fen", "lac.mill"],
+        "text": "Cross with the load",
+        "recover": [["moveTo", "lac.millbridge"]] },
+
+      { "id": "count", "do": ["interact", "lac.mill.crate", 4], "in": "lac.mill",
+        "verb": "barter",
+        "text": "Count them off at the far end",
+        "recover": [["arm", "lac.mill.crate"], ["moveTo", "lac.mill"]] },
+
+      { "id": "out", "do": ["talk", "fen", "dark.15.out"],
+        "text": "Tell Fen your number" }
+    ],
+    "onDone": [["flag", "dark.act3.done", true], ["act", 4], ["unlock", "dark.16"]]
+  },
+
+  {
+    "id": "dark.16",
+    "story": "D16",
+    "campaign": "dark", "act": 4, "town": "light",
+    "title": "What We Came For",
+    "summary": "The east stands, at night. Nobody fights.",
+    "giver": "sela",
+    "prereq": ["quest", "dark.15", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sela", "dark.16.in"],
+        "text": "Take a barrel yoke off Sela" },
+
+      { "id": "night", "do": ["goto", "reach.east"],
+        "after": 21, "before": 5, "unseen": true,
+        "text": "Get onto the east stands unseen",
+        "hint": "Hush, then move. The picket is fed and bored.",
+        "recover": [["moveTo", "march.west"]] },
+
+      { "id": "fill", "do": ["interact", "reach.east.barrel", 6], "in": "reach.east",
+        "verb": "ward", "unseen": true,
+        "text": "Fill six barrels",
+        "recover": [["arm", "reach.east.barrel"], ["moveTo", "stand.east"]] },
+
+      { "id": "hold", "all": [["survive", "reach.east", 90], ["kill", "creek_crab", 4]],
+        "in": "reach.east", "unseen": true,
+        "text": "Wait out the picket's round",
+        "hint": "Nothing on two legs comes. Nobody has worked these stands since the raid.",
+        "recover": [["moveTo", "stand.east"], ["respawn", "creek_crab", 4]] },
+
+      { "id": "out", "do": ["talk", "sela", "dark.16.out"],
+        "text": "Walk the water home" }
+    ],
+    "onDone": [["flag", "dark.water.taken", true], ["unlock", "dark.17"], ["unlock", "dark.18"]]
+  },
+
+  {
+    "id": "dark.17",
+    "story": "D17",
+    "campaign": "dark", "act": 4, "town": "dark",
+    "title": "Sela Is Home",
+    "summary": "Work out who Whitewall actually took.",
+    "giver": "sela",
+    "prereq": ["quest", "dark.16", "done"],
+    "steps": [
+      { "id": "find", "do": ["goto", "bst.kitchen"],
+        "text": "She is in the shift kitchen",
+        "recover": [["moveTo", "bst.lower"]] },
+
+      { "id": "ask", "do": ["talk", "sela", "dark.17.ask"],
+        "text": "Ask her where she was that week" },
+
+      { "id": "out", "do": ["talk", "sela", "dark.17.out"],
+        "text": "Say the part neither of you likes" }
+    ],
+    "onDone": [["flag", "dark.sela.home", true], ["unlock", "dark.19"]]
+  },
+
+  {
+    "id": "dark.18",
+    "story": "D18",
+    "campaign": "dark", "act": 4, "town": "dark",
+    "title": "The Watcher on the Ridge",
+    "summary": "Nim kept a mark on the ridge. Read it.",
+    "giver": "nim",
+    "prereq": ["quest", "dark.16", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "nim", "dark.18.in"],
+        "text": "Let Nim take you up" },
+
+      { "id": "climb", "do": ["goto", "ridge.dark"],
+        "text": "Get onto the ridge above the keep",
+        "recover": [["moveTo", "bst.northgate"]] },
+
+      { "id": "sign", "do": ["interact", "ridge.dark.mark", 3], "in": "ridge.dark",
+        "verb": "ward",
+        "text": "Read the three marks",
+        "recover": [["arm", "ridge.dark.mark"], ["moveTo", "ridge.dark"]] },
+
+      { "id": "clear", "do": ["kill", "hollow", 4], "in": "ridge.dark",
+        "text": "Clear what is living up there now",
+        "hint": "They keep to the scree. Ward first, then cast.",
+        "recover": [["moveTo", "ridge.dark"], ["respawn", "hollow", 4]] },
+
+      { "id": "out", "do": ["talk", "nim", "dark.18.out"],
+        "text": "Tell Nim whose hand it is" }
+    ],
+    "onDone": [["unlock", "dark.19"]]
+  },
+
+  {
+    "id": "dark.19",
+    "story": "D19",
+    "campaign": "dark", "act": 4, "town": "dark",
+    "title": "Below the Bottom",
+    "summary": "Break the shaft floor. Follow what is under.",
+    "giver": "corve",
+    "prereq": ["all",
+      ["quest", "dark.07", "done"],
+      ["quest", "dark.17", "done"],
+      ["quest", "dark.18", "done"]],
+    "steps": [
+      { "id": "brief", "do": ["talk", "corve", "dark.19.in"],
+        "text": "Take the order to break the floor" },
+
+      { "id": "break", "do": ["interact", "bst.levels.floor", 6], "in": "bst.levels",
+        "verb": "setting",
+        "text": "Break the floor of the bottom level",
+        "recover": [["arm", "bst.levels.floor"], ["moveTo", "bst.levels"]] },
+
+      { "id": "clear",
+        "all": [["kill", "blight_boar", 4], ["kill", "mire_rat", 8]],
+        "in": "bst.levels",
+        "text": "Clear what was living under it",
+        "hint": "Boar in a gallery cannot turn. Keep behind it.",
+        "recover": [["moveTo", "bst.levels"], ["respawn", "blight_boar", 4], ["respawn", "mire_rat", 8]] },
+
+      { "id": "follow", "do": ["gather", "obsidian_core", 4], "in": "bst.levels",
+        "text": "Cut along the new seam",
+        "recover": [["moveTo", "bst.levels"]] },
+
+      { "id": "out", "do": ["talk", "corve", "dark.19.out"],
+        "text": "Tell Corve which way it goes" }
+    ],
+    "onDone": [["flag", "dark.act4.done", true], ["act", 5], ["unlock", "dark.20"]]
+  },
+
+  {
+    "id": "dark.20",
+    "story": "D20",
+    "campaign": "dark", "act": 5, "town": "dark",
+    "title": "Everything Down",
+    "summary": "Move the stores below before they come back.",
+    "giver": "corve",
+    "prereq": ["quest", "dark.19", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "corve", "dark.20.in"],
+        "text": "Take the store list off Corve" },
+
+      { "id": "count", "do": ["interact", "bst.board.crate", 10], "in": "bst.board",
+        "verb": "barter",
+        "text": "Weigh out what goes down",
+        "recover": [["arm", "bst.board.crate"], ["moveTo", "bst.board"]] },
+
+      { "id": "carry", "do": ["deliver", "wheatglass", 8, "bst.levels"], "in": "bst.levels",
+        "text": "Carry the grain below",
+        "recover": [["grant", "wheatglass", 8], ["moveTo", "bst.levels"]] },
+
+      { "id": "set", "do": ["interact", "bst.levels.prop", 6], "in": "bst.levels",
+        "verb": "setting",
+        "text": "Set the store gallery up properly",
+        "recover": [["arm", "bst.levels.prop"], ["moveTo", "bst.levels"]] },
+
+      { "id": "out", "do": ["talk", "corve", "dark.20.out"],
+        "text": "Watch Torr take his forge apart" }
+    ],
+    "onDone": [["flag", "dark.stores.below", true], ["unlock", "dark.21"], ["unlock", "dark.25"]]
+  },
+
+  {
+    "id": "dark.25",
+    "story": "D25",
+    "campaign": "dark", "act": 5, "town": "dark",
+    "title": "Feeding the Retake",
+    "summary": "Feed everyone below before you go up.",
+    "giver": "sela",
+    "prereq": ["quest", "dark.20", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sela", "dark.25.in"],
+        "text": "Hear what there is to cook with" },
+
+      { "id": "bake", "do": ["gather", "cooked_wheatglass", 6], "via": "craft", "in": "bst.kitchen",
+        "verb": "hearth",
+        "text": "Bake six off the Longacre grain",
+        "recover": [["grant", "wheatglass", 6]] },
+
+      { "id": "serve", "do": ["deliver", "cooked_wheatglass", 6, "bst.levels"], "in": "bst.levels",
+        "text": "Feed everyone below",
+        "recover": [["grant", "cooked_wheatglass", 6], ["moveTo", "bst.levels"]] },
+
+      { "id": "out", "do": ["talk", "sela", "dark.25.out"],
+        "text": "Say where the flour came from" }
+    ],
+    "onDone": [["unlock", "dark.21"]]
+  },
+
+  {
+    "id": "dark.21",
+    "story": "D21",
+    "campaign": "dark", "act": 5, "town": "dark",
+    "title": "The Night We Came Back Up",
+    "summary": "Retake the keep. Uphill, in the dark.",
+    "giver": "corve",
+    "prereq": ["quest", "dark.20", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "corve", "dark.21.in"],
+        "text": "Muster below with Corve" },
+
+      { "id": "up", "do": ["goto", "bst.alleys"],
+        "after": 21, "before": 5,
+        "text": "Come up through the undercroft",
+        "hint": "They held the roof. They never mapped what is under it.",
+        "recover": [["moveTo", "bst.levels"]] },
+
+      { "id": "climb",
+        "all": [["kill", "watchman", 6], ["kill", "raider", 4]],
+        "in": "bst.switchback",
+        "text": "Fight up the switchback",
+        "hint": "Your own switchback. You know where the wall is.",
+        "recover": [["moveTo", "bst.middle"], ["respawn", "watchman", 6], ["respawn", "raider", 4]] },
+
+      { "id": "take", "do": ["goto", "bst.keep"],
+        "text": "Take the keep back",
+        "recover": [["moveTo", "bst.bailey"]] },
+
+      { "id": "hold", "all": [["survive", "bst.bailey", 120], ["kill", "watchman", 4]],
+        "in": "bst.bailey",
+        "text": "Hold the bailey until the horn",
+        "hint": "Kesta's people rally at the gatehouse and come back.",
+        "recover": [["moveTo", "bst.bailey"], ["respawn", "watchman", 4]] },
+
+      { "id": "out", "do": ["talk", "sela", "dark.21.out"],
+        "text": "Stand in front of Kesta" }
+    ],
+    "onDone": [["flag", "dark.keep.retaken", true], ["unlock", "dark.22"]]
+  },
+
+  {
+    "id": "dark.22",
+    "story": "D22",
+    "campaign": "dark", "act": 5, "town": "dark",
+    "title": "What the Root Is",
+    "summary": "Follow the western seam until it stops.",
+    "giver": "sela",
+    "prereq": ["quest", "dark.21", "done"],
+    "steps": [
+      { "id": "brief", "do": ["talk", "sela", "dark.22.in"],
+        "text": "Take a lamp off Sela" },
+
+      { "id": "lamp", "do": ["interact", "bst.levels.lamp", 1], "in": "bst.levels",
+        "verb": "kindle",
+        "text": "Light the deep lamp",
+        "recover": [["arm", "bst.levels.lamp"]] },
+
+      { "id": "west", "do": ["goto", "heath.ford"],
+        "text": "Follow it west under the heath",
+        "hint": "It crosses under the Vail. You will hear the water.",
+        "recover": [["moveTo", "bst.levels"]] },
+
+      { "id": "cut", "do": ["gather", "obsidian_core", 4],
+        "text": "Cut a core every hundred paces" },
+
+      { "id": "stop", "do": ["goto", "lac.westfield"],
+        "text": "Follow it until it stops",
+        "recover": [["moveTo", "heath.ford"]] },
+
+      { "id": "out", "do": ["talk", "sela", "dark.22.out"],
+        "text": "Ask what is above you" }
+    ],
+    "onDone": [["flag", "dark.done", true], ["flag", "echo.short_rope", true],
+      ["unlock", "neutral"]]
+  }
+]

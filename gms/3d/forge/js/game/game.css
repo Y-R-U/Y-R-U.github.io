@@ -1,0 +1,870 @@
+#game {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  font: 15px/1.45 system-ui, -apple-system, sans-serif;
+  color: #e8e3d8;
+  /* iOS ignores user-scalable=no, so double-tap zoom and pinch are only off if the UI says so.
+     The two range inputs and the two round buttons override this with `none`. */
+  touch-action: manipulation;
+  /* Two deliberate long-presses live over text (the dial at 400 ms, the tracker at 500 ms), and
+     without these iOS raises the selection magnifier and the copy callout on both. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#game .g-track {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 52px * var(--ui));
+  left: calc(env(safe-area-inset-left, 0px) + 14px);
+  max-width: 46%;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+  transition: opacity .25s;
+}
+#game .g-track.gone { opacity: 0; }
+#game .g-track b {
+  display: block;
+  font: 600 calc(11px * var(--ui))/1.3 system-ui, sans-serif;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  opacity: .55;
+}
+#game .g-track span {
+  display: flex;
+  gap: 10px;
+  min-width: calc(190px * var(--ui));
+  font-size: calc(13px * var(--ui));
+}
+#game .g-track span i { margin-left: auto; font-style: normal; color: #b9721f; }
+/* inline-block or the rotation is silently dropped: transform does not apply to inline boxes */
+#game .g-track .g-chev {
+  display: inline-block;
+  text-decoration: none;
+  color: #b9721f;
+  line-height: 1;
+}
+
+#game .g-scene {
+  position: absolute;
+  z-index: 1;
+  left: calc(env(safe-area-inset-left, 0px) + 16px);
+  right: calc(env(safe-area-inset-right, 0px) + var(--thumb) + 12px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  max-height: calc(100% - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 60px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+body.flip #game .g-scene {
+  left: calc(env(safe-area-inset-left, 0px) + var(--thumb) + 12px);
+  right: calc(env(safe-area-inset-right, 0px) + 16px);
+}
+
+#game .g-bubble {
+  flex: 0 0 auto;
+  background: rgba(16, 18, 21, .92);
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 10px;
+  padding: 9px 14px 11px;
+  pointer-events: auto;
+  cursor: pointer;
+}
+#game .g-bubble header {
+  display: flex;
+  font: 600 calc(11px * var(--ui))/1.6 system-ui, sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  opacity: .62;
+}
+#game .g-bubble header i { margin-left: auto; font-style: normal; }
+#game .g-bubble p { margin: 0; min-height: 1.45em; }
+#game .g-bubble .g-next { float: right; color: #b9721f; }
+
+/* Four 44px choices plus the bubble overflow 390px of landscape, so the list is what gives. */
+#game .g-choices {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+}
+#game .g-choices button {
+  flex: 0 0 auto;
+  min-height: var(--tap);
+  pointer-events: auto;
+  text-align: left;
+  padding: 0 14px;
+  font: inherit;
+  color: inherit;
+  background: rgba(16, 18, 21, .92);
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-bottom: 0;
+}
+#game .g-choices button:first-child { border-radius: 10px 10px 0 0; }
+#game .g-choices button:last-child { border-radius: 0 0 10px 10px; border-bottom: 1px solid rgba(255, 255, 255, .09); }
+#game .g-choices button:active { background: #b9721f; color: #14161a; }
+
+#game .g-card {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 18px;
+  justify-items: center;
+  background: rgba(10, 11, 13, .72);
+  pointer-events: auto;
+}
+#game .g-card p { margin: 0; font-size: calc(19px * var(--ui)); }
+#game .g-card button {
+  min-height: var(--tap);
+  min-width: 160px;
+  font: inherit;
+  color: #14161a;
+  background: #b9721f;
+  border: 0;
+  border-radius: 8px;
+}
+
+#game .g-journal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #14161a;
+  pointer-events: auto;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+
+#game .g-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, .09);
+  flex: 0 0 auto;
+}
+#game .g-tabs button {
+  min-height: var(--tap);
+  padding: 0 16px;
+  font: 600 11px/1 system-ui, sans-serif;
+  letter-spacing: .1em;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  opacity: .5;
+}
+#game .g-tabs button.on { opacity: 1; border-bottom-color: #b9721f; }
+#game .g-tabs .g-x { font-size: 15px; letter-spacing: 0; opacity: .6; }
+#game .g-tabs i { margin-left: auto; font-style: normal; font-size: 11px; opacity: .45; }
+
+#game .g-jbody { display: flex; flex: 1 1 auto; min-height: 0; }
+#game .g-empty { opacity: .45; padding: 18px 4px; }
+
+#game .g-jlist {
+  flex: 0 0 38%;
+  overflow-y: auto;
+  border-right: 1px solid rgba(255, 255, 255, .09);
+  padding: 8px;
+}
+#game .g-jrow {
+  display: block;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 6px 10px;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 7px;
+}
+#game .g-jrow.on { background: rgba(185, 114, 31, .16); }
+#game .g-jrow.done { opacity: .45; }
+#game .g-jrow span { display: flex; gap: 8px; align-items: baseline; }
+#game .g-jrow i { font-style: normal; color: #b9721f; width: 12px; }
+#game .g-jrow em {
+  margin-left: auto;
+  font: 600 9px/1 system-ui, sans-serif;
+  letter-spacing: .1em;
+  font-style: normal;
+  opacity: .4;
+}
+#game .g-jsub { font-size: calc(13px * var(--ui)); opacity: .7; padding-left: 20px; }
+#game .g-jsub i { margin-left: auto; width: auto; }
+
+#game .g-jpane { flex: 1 1 auto; overflow-y: auto; padding: 14px 18px; }
+#game .g-jpane h3 { margin: 0; font-size: calc(17px * var(--ui)); }
+#game .g-jby {
+  margin: 3px 0 12px;
+  font: 600 10px/1.5 system-ui, sans-serif;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  opacity: .45;
+}
+#game .g-jsteps { margin: 12px 0; padding: 0; list-style: none; }
+#game .g-jsteps li { display: flex; gap: 10px; padding: 3px 0 3px 16px; opacity: .4; }
+#game .g-jsteps li.now { opacity: 1; }
+#game .g-jsteps li.now::before { content: '▸'; margin-left: -16px; color: #b9721f; }
+#game .g-jsteps li.was { text-decoration: line-through; }
+#game .g-jsteps i { margin-left: auto; font-style: normal; color: #b9721f; }
+#game .g-jacts { display: flex; gap: 8px; margin-top: 16px; }
+#game .g-jacts button {
+  min-height: var(--tap);
+  flex: 1 1 0;
+  font: inherit;
+  color: inherit;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+}
+#game .g-jacts button:disabled { opacity: .3; }
+
+#game .g-jtruths, #game .g-jlog { flex: 1 1 auto; overflow-y: auto; padding: 14px 18px; }
+#game .g-chain { margin-bottom: 14px; }
+#game .g-truth { display: flex; gap: 12px; align-items: baseline; padding: 3px 0; }
+#game .g-truth i { font-style: normal; opacity: .55; width: 12px; }
+#game .g-truth em { margin-left: auto; font-style: normal; font-size: 11px; opacity: .4; }
+/* The overturned line is kept and struck through — deleting it would erase the mechanic. */
+#game .g-truth.struck span { text-decoration: line-through; opacity: .45; }
+#game .g-jfoot {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, .09);
+  font-size: 11px;
+  opacity: .5;
+}
+#game .g-jfoot i { margin-left: auto; font-style: normal; }
+
+#game .g-scene-log { margin-bottom: 14px; }
+#game .g-scene-log.hit { box-shadow: -12px 0 0 -10px #b9721f; padding-left: 8px; }
+#game .g-scene-log b {
+  display: block;
+  font: 600 10px/1.8 system-ui, sans-serif;
+  letter-spacing: .1em;
+  opacity: .4;
+}
+#game .g-scene-log p { margin: 0; font-size: calc(13px * var(--ui)); opacity: .82; }
+
+/* ── HUD ─────────────────────────────────────────────────────────────────── */
+/* Every dimension is scaled by --ui, which Settings' text-size slider writes (§9.1). */
+
+#game {
+  --ui: 1;
+  --gold: #b9721f;
+  font-size: calc(15px * var(--ui));
+  /* 44px is a floor, not a scalable: uiScale goes down to 0.85 and 44 × 0.85 = 37.4. */
+  --tap: max(44px, calc(44px * var(--ui)));
+  /* Width the bottom thumb cluster owns: 26px offset + dial 60 + gap 30 + act 76. Anything
+     bottom-anchored and full-width has to stop short of this or it lands on both buttons. */
+  --thumb: calc(26px + 166px * var(--ui));
+}
+
+/* Explicit paint order. The bubble is appended to the host after the HUD, so at z-index auto it
+   won over both primary buttons and swallowed their taps. */
+#game .g-hud { position: absolute; inset: 0; z-index: 2; }
+
+#game .g-vitals {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  left: calc(env(safe-area-inset-left, 0px) + 14px);
+  display: flex;
+  flex-direction: column;
+  gap: calc(5px * var(--ui));
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+}
+#game .g-vital { display: flex; align-items: center; gap: calc(6px * var(--ui)); }
+#game .g-vital > u {
+  text-decoration: none;
+  width: calc(11px * var(--ui));
+  font-size: calc(11px * var(--ui));
+  opacity: .7;
+}
+#game .g-bar {
+  width: calc(132px * var(--ui));
+  height: calc(6px * var(--ui));
+  border-radius: 3px;
+  background: rgba(0, 0, 0, .45);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
+  overflow: hidden;
+}
+#game .g-bar i { display: block; height: 100%; background: #d8d2c4; transition: width .18s linear; }
+#game .g-vital em {
+  font-style: normal;
+  font-size: calc(11px * var(--ui));
+  opacity: .82;
+  font-variant-numeric: tabular-nums;
+}
+#game .g-hp i { background: #c05a4a; }
+#game .g-fp i { background: #6f93a8; }
+/* Second channel for both danger states, so neither is a colour on its own (§9.2). */
+#game .g-hp.lowhp i { animation: g-pulse 1.1s ease-in-out infinite; }
+#game .g-fp.gut i { background: #c05a4a; }
+@keyframes g-pulse { 50% { opacity: .35; } }
+#game .g-buffs { display: flex; gap: calc(4px * var(--ui)); margin-left: calc(6px * var(--ui)); }
+#game .g-buffs b { width: calc(12px * var(--ui)); height: calc(12px * var(--ui)); border-radius: 50%; background: var(--gold); font-size: 0; }
+
+#game .g-chip {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  right: calc(env(safe-area-inset-right, 0px) + 56px);
+  min-width: calc(104px * var(--ui));
+  height: calc(22px * var(--ui));
+  padding: 0 calc(9px * var(--ui));
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: calc(6px * var(--ui));
+  font-size: calc(11px * var(--ui));
+  letter-spacing: .06em;
+  border-radius: calc(11px * var(--ui));
+  background: rgba(10, 11, 13, .5);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+}
+/* The chip pulsing IS the deaf player's bell (§9.3), so it is not behind a setting. */
+#game .g-chip.rang { animation: g-ring 3s ease-out 1; }
+@keyframes g-ring { 0% { background: var(--gold); color: #14161a; } 100% { background: rgba(10, 11, 13, .5); } }
+
+/* The only way into pause, journal and settings on touch, so it gets the floor even though the
+   glyph inside it stays 17px. */
+#game .g-cog {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 4px);
+  right: calc(env(safe-area-inset-right, 0px) + 6px);
+  width: max(44px, calc(38px * var(--ui)));
+  height: max(44px, calc(38px * var(--ui)));
+  font-size: calc(17px * var(--ui));
+  color: inherit;
+  background: none;
+  border: 0;
+  pointer-events: auto;
+  opacity: .65;
+}
+
+#game .g-right {
+  position: absolute;
+  right: calc(env(safe-area-inset-right, 0px) + 26px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 26px);
+  display: flex;
+  align-items: flex-end;
+  gap: calc(30px * var(--ui));
+}
+body.flip #game .g-right { right: auto; left: calc(env(safe-area-inset-left, 0px) + 26px); flex-direction: row-reverse; }
+
+#game .g-dial, #game .g-act {
+  position: relative;
+  display: grid;
+  place-content: center;
+  gap: 1px;
+  pointer-events: auto;
+  color: inherit;
+  background: rgba(10, 11, 13, .34);
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 50%;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+  touch-action: none;
+  transition: transform .12s, opacity .12s;
+}
+#game .g-dial { width: calc(60px * var(--ui)); height: calc(60px * var(--ui)); margin-bottom: calc(8px * var(--ui)); }
+#game .g-act { width: calc(76px * var(--ui)); height: calc(76px * var(--ui)); }
+#game .g-dial b, #game .g-act b { font: 600 calc(13px * var(--ui))/1 system-ui, sans-serif; }
+#game .g-act b { font-size: calc(24px * var(--ui)); font-weight: 400; }
+#game .g-dial em, #game .g-act em {
+  font: 600 calc(10px * var(--ui))/1 system-ui, sans-serif;
+  font-style: normal;
+  letter-spacing: .1em;
+  opacity: .85;
+}
+#game .g-act.off { opacity: .3; }
+#game .g-act.big { transform: scale(1.12); }
+#game .g-dial:active, #game .g-act:active { background: rgba(185, 114, 31, .5); }
+#game .g-ring { position: absolute; inset: -3px; pointer-events: none; }
+#game .g-ring circle { fill: none; stroke: var(--gold); stroke-width: 3; transform: rotate(-90deg); transform-origin: 50% 50%; }
+/* Suspicion is thickness as well as colour, and only above 10 (§7.3). */
+#game .g-susp circle { stroke: #d8a13a; }
+
+#game .g-radial { position: absolute; inset: 0; pointer-events: auto; background: rgba(10, 11, 13, .55); }
+#game .g-radial button {
+  position: absolute;
+  width: max(78px, calc(78px * var(--ui)));
+  height: max(44px, calc(48px * var(--ui)));
+  margin: calc(-24px * var(--ui)) 0 0 calc(-39px * var(--ui));
+  font: 600 calc(11px * var(--ui))/1 system-ui, sans-serif;
+  letter-spacing: .06em;
+  color: inherit;
+  background: rgba(16, 18, 21, .92);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: calc(24px * var(--ui));
+  pointer-events: none;
+}
+#game .g-radial button.on { background: var(--gold); color: #14161a; border-color: var(--gold); }
+
+/* The whole tutorial reads through this. It was 12px at 55% over a moving sky, which against a
+   pale dusk is about 1.5:1 — a text-shadow only helps on a dark background, so the line carries
+   its own plate instead. Inset by the thumb width on both sides so neither layout can put it
+   under the two round buttons. */
+#game .g-prompt {
+  position: absolute;
+  z-index: 3;
+  left: calc(env(safe-area-inset-left, 0px) + var(--thumb));
+  right: calc(env(safe-area-inset-right, 0px) + var(--thumb));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(6px * var(--ui));
+  font-size: calc(14px * var(--ui));
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+  transition: opacity .4s;
+}
+#game .g-prompt > span {
+  padding: calc(5px * var(--ui)) calc(13px * var(--ui));
+  border-radius: calc(15px * var(--ui));
+  background: rgba(10, 11, 13, .78);
+  border: 1px solid rgba(255, 255, 255, .1);
+  text-align: center;
+}
+#game .g-prompt.gone { opacity: 0; }
+#game .g-prompt button {
+  min-height: var(--tap);
+  padding: 0 calc(16px * var(--ui));
+  font: inherit;
+  color: inherit;
+  background: rgba(16, 18, 21, .9);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: calc(22px * var(--ui));
+  pointer-events: auto;
+}
+
+/* One line, once per session, when a road is far above the player (§9.4). No skulls. */
+#game .g-telegraph {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 38%;
+  text-align: center;
+  font-size: calc(15px * var(--ui));
+  opacity: 0;
+  text-shadow: 0 1px 4px #000;
+  animation: g-say 6s ease-in-out 1;
+}
+@keyframes g-say { 12%, 70% { opacity: .8; } 100% { opacity: 0; } }
+
+/* The only screen-edge indicator in the game (§9.3). */
+#game .g-notch {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s;
+  background: radial-gradient(closest-side at var(--nx, 50%) var(--ny, 50%), rgba(216, 161, 58, .5), transparent 70%);
+}
+#game .g-notch.on { opacity: 1; }
+
+/* ── sheets: pause, settings, character, market, slate ───────────────────── */
+
+/* Everything full-screen sits above the HUD and the dialogue bubble regardless of append order. */
+#game .g-dim, #game .g-pause, #game .g-journal, #game .g-sheet, #game .g-card, #game .g-slate { z-index: 4; }
+
+#game .g-dim { position: absolute; inset: 0; background: rgba(6, 7, 9, .6); pointer-events: auto; }
+
+#game .g-pause {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(10px * var(--ui));
+  pointer-events: auto;
+}
+#game .g-pause menu {
+  display: flex;
+  flex-direction: column;
+  width: calc(228px * var(--ui));
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(16, 18, 21, .94);
+}
+#game .g-pause button {
+  min-height: var(--tap);
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, .07);
+}
+#game .g-pause button:first-child { border-top: 0; font-weight: 600; letter-spacing: .12em; }
+#game .g-pause button:active { background: var(--gold); color: #14161a; }
+#game .g-pause button.gap { border-top: 1px solid rgba(255, 255, 255, .18); }
+#game .g-pause button:disabled { opacity: .3; }
+#game .g-pause p { margin: 0; font-size: calc(11px * var(--ui)); opacity: .45; }
+#game .g-pause p.warn { opacity: 1; color: #e0a99e; max-width: calc(300px * var(--ui)); text-align: center; }
+
+#game .g-sheet {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #14161a;
+  pointer-events: auto;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+#game .g-head {
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--ui));
+  flex: 0 0 auto;
+  padding-right: calc(16px * var(--ui));
+  border-bottom: 1px solid rgba(255, 255, 255, .09);
+}
+#game .g-head button {
+  min-width: calc(48px * var(--ui));
+  min-height: var(--tap);
+  font-size: calc(15px * var(--ui));
+  color: inherit;
+  background: none;
+  border: 0;
+  opacity: .6;
+}
+#game .g-head h2 {
+  margin: 0;
+  font: 600 calc(11px * var(--ui))/1 system-ui, sans-serif;
+  letter-spacing: .16em;
+}
+#game .g-head i { margin-left: auto; font-style: normal; font-size: calc(12px * var(--ui)); opacity: .6; }
+#game .g-head i + i { margin-left: calc(16px * var(--ui)); }
+#game .g-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: calc(12px * var(--ui)) calc(18px * var(--ui)); }
+
+#game .g-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px calc(22px * var(--ui)); }
+#game .g-skill { display: flex; align-items: center; gap: calc(8px * var(--ui)); font-size: calc(13px * var(--ui)); min-height: calc(22px * var(--ui)); }
+#game .g-skill span { flex: 0 0 calc(56px * var(--ui)); }
+#game .g-skill b { flex: 0 0 calc(14px * var(--ui)); font-variant-numeric: tabular-nums; font-weight: 400; }
+#game .g-skill.locked { opacity: .35; }
+#game .g-skill.g-kit { gap: calc(10px * var(--ui)); }
+#game .g-skill.g-kit span { flex: 1 1 auto; }
+#game .g-skill.g-kit u { text-decoration: none; flex: 0 0 auto; }
+#game .g-skill.g-kit i { font-style: normal; opacity: .6; }
+#game .g-skill .g-bar { width: calc(72px * var(--ui)); height: calc(5px * var(--ui)); background: rgba(255, 255, 255, .1); box-shadow: none; }
+#game .g-skill .g-bar i { background: var(--gold); }
+#game .g-stat { display: flex; gap: calc(24px * var(--ui)); font-size: calc(13px * var(--ui)); margin-bottom: calc(12px * var(--ui)); }
+#game .g-stat b { font-weight: 600; font-variant-numeric: tabular-nums; }
+#game .g-stat s { text-decoration: none; opacity: .5; }
+#game .g-rule { height: 1px; background: rgba(255, 255, 255, .09); margin: calc(12px * var(--ui)) 0; }
+#game .g-foot { display: flex; gap: calc(20px * var(--ui)); font-size: calc(12px * var(--ui)); opacity: .6; flex-wrap: wrap; }
+#game .g-foot i { margin-left: auto; font-style: normal; }
+
+#game .g-wares { display: flex; flex-direction: column; }
+#game .g-ware {
+  display: flex;
+  align-items: center;
+  gap: calc(10px * var(--ui));
+  min-height: max(44px, calc(34px * var(--ui)));
+  padding: 0 calc(4px * var(--ui));
+  font: inherit;
+  font-size: calc(13px * var(--ui));
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+#game .g-ware > span { flex: 1 1 auto; }
+#game .g-ware .g-n { flex: 0 0 calc(34px * var(--ui)); opacity: .65; font-variant-numeric: tabular-nums; }
+#game .g-ware .g-pips { flex: 0 0 calc(46px * var(--ui)); letter-spacing: .08em; font-size: calc(10px * var(--ui)); opacity: .75; }
+#game .g-ware .g-spark { flex: 0 0 calc(40px * var(--ui)); display: flex; align-items: flex-end; gap: 2px; height: calc(11px * var(--ui)); }
+#game .g-ware .g-spark u { width: calc(5px * var(--ui)); background: rgba(255, 255, 255, .55); }
+#game .g-ware .g-unit { flex: 0 0 calc(66px * var(--ui)); text-align: right; opacity: .7; font-variant-numeric: tabular-nums; }
+#game .g-ware .g-tot { flex: 0 0 calc(58px * var(--ui)); text-align: right; font-variant-numeric: tabular-nums; }
+#game .g-ware .g-tick { flex: 0 0 calc(24px * var(--ui)); text-align: right; color: var(--gold); }
+#game .g-ware.on { background: rgba(185, 114, 31, .12); }
+
+#game .g-till {
+  display: flex;
+  align-items: center;
+  gap: calc(16px * var(--ui));
+  flex: 0 0 auto;
+  padding: calc(8px * var(--ui)) calc(18px * var(--ui)) calc(10px * var(--ui));
+  border-top: 1px solid rgba(255, 255, 255, .09);
+  font-size: calc(12px * var(--ui));
+}
+#game .g-till s { text-decoration: none; opacity: .5; }
+#game .g-till b { margin-left: auto; font-size: calc(15px * var(--ui)); font-variant-numeric: tabular-nums; }
+#game .g-till button {
+  min-width: calc(104px * var(--ui));
+  min-height: var(--tap);
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: .1em;
+  color: #14161a;
+  background: var(--gold);
+  border: 0;
+  border-radius: 8px;
+}
+#game .g-till button:disabled { opacity: .3; }
+
+#game .g-set { display: flex; flex-direction: column; }
+#game .g-set label {
+  display: flex;
+  align-items: center;
+  gap: calc(14px * var(--ui));
+  min-height: var(--tap);
+  font-size: calc(13px * var(--ui));
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+#game .g-set label > span { flex: 0 0 40%; }
+#game .g-set input[type=range] { flex: 1 1 auto; accent-color: var(--gold); touch-action: none; }
+#game .g-set input[type=checkbox] { flex: 0 0 auto; width: calc(22px * var(--ui)); height: calc(22px * var(--ui)); accent-color: var(--gold); }
+#game .g-set label > em:last-child { margin-left: auto; }
+#game .g-set em { font-style: normal; opacity: .5; font-variant-numeric: tabular-nums; min-width: calc(38px * var(--ui)); text-align: right; }
+#game .g-set p { margin: calc(10px * var(--ui)) 0 0; font-size: calc(12px * var(--ui)); opacity: .45; }
+
+/* ── the faction slate ───────────────────────────────────────────────────── */
+
+#game .g-slate {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(14px * var(--ui));
+  background: #0d1013;
+  pointer-events: auto;
+}
+#game .g-slate h1 {
+  margin: 0;
+  font: 300 calc(30px * var(--ui))/1 Optima, Palatino, Georgia, serif;
+  letter-spacing: .24em;
+}
+/* Three 200px panels at uiScale 1.4 want 907px against 726px of safe landscape width, so they
+   shrink rather than clip. */
+#game .g-panels {
+  display: flex;
+  gap: calc(24px * var(--ui));
+  width: 100%;
+  padding: 0 calc(env(safe-area-inset-left, 0px) + 12px) 0 calc(env(safe-area-inset-right, 0px) + 12px);
+  justify-content: center;
+}
+#game .g-panel {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: calc(200px * var(--ui));
+  height: min(calc(178px * var(--ui)), 48vh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(6px * var(--ui));
+  padding: calc(16px * var(--ui)) calc(12px * var(--ui));
+  font: inherit;
+  color: inherit;
+  text-align: center;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+}
+#game .g-panel u { text-decoration: none; font-size: calc(26px * var(--ui)); opacity: .8; letter-spacing: .06em; }
+#game .g-panel b { font: 600 calc(12px * var(--ui))/1.6 system-ui, sans-serif; letter-spacing: .18em; }
+#game .g-panel span { font-size: calc(12px * var(--ui)); opacity: .6; }
+#game .g-panel em { margin-top: auto; font-style: normal; font-size: calc(10px * var(--ui)); letter-spacing: .1em; opacity: .35; }
+#game .g-panel.dim { opacity: .55; }
+#game .g-panel.shadow { opacity: .3; }
+#game .g-panel.lit { background: rgba(185, 114, 31, .1); border-color: rgba(185, 114, 31, .5); }
+#game .g-panel:active { background: rgba(185, 114, 31, .3); }
+#game .g-reply { min-height: calc(20px * var(--ui)); font-size: calc(13px * var(--ui)); opacity: .7; }
+
+/* ── portrait ────────────────────────────────────────────────────────────── */
+
+/* Portrait is a first-class orientation (docs/NOTES_PORTRAIT.md). It buys height and loses width,
+   which inverts every landscape assumption in this file: anything that sat *beside* the thumb
+   cluster has to sit *above* it, and anything in three columns has to be in fewer.
+
+   Gated on width too: `orientation: portrait` alone is true of any window taller than it is wide,
+   and an 890 × 900 desktop took the phone layout. 560px clears the widest phone in portrait (430)
+   and stops short of the narrowest tablet (744). Deliberately not the aspect the camera keys off —
+   that is about the frustum, this is about whether it is a phone in a hand. */
+@media (orientation: portrait) and (max-width: 560px) {
+  /* Landscape reserves the cluster's width; portrait reserves its height instead, so --thumb
+     stops being a horizontal inset and --stack takes over. */
+  #game {
+    --thumb: 0px;
+    --cog: max(44px, calc(38px * var(--ui)));
+    /* 26px offset + dial 60 + its 8px margin + the 10px gap + act 76, then the cog's own 16px gap
+       and height above them, then 14px of air. */
+    --stack: calc(40px + 170px * var(--ui) + var(--cog));
+  }
+
+  /* Side by side the cluster is 26 + 60·ui + 30·ui + 76·ui wide, which at uiScale 1.4 is 258px of
+     a 390px screen and crosses the midline the move stick owns. Stacked it never can. */
+  #game .g-right, body.flip #game .g-right {
+    flex-direction: column;
+    gap: calc(10px * var(--ui));
+  }
+  #game .g-right { align-items: flex-end; }
+  body.flip #game .g-right { align-items: flex-start; }
+
+  /* Still the only touch route to pause, and in the top corner it is 818px from where a portrait
+     grip pivots the thumb. It joins the top of the button column instead — 220px, and top rather
+     than bottom because the act button has to keep the rest position. */
+  #game .g-cog {
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 26px + 170px * var(--ui));
+    right: calc(env(safe-area-inset-right, 0px) + 26px);
+    /* At the top of the frame it sat against sky; down here it sits against sunlit pavement. */
+    opacity: .85;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .9);
+  }
+  body.flip #game .g-cog {
+    right: auto;
+    left: calc(env(safe-area-inset-left, 0px) + 26px);
+  }
+
+  /* Landscape fits the vitals and the day chip on one row; 390px does not, and at uiScale 1.4
+     they overlap. The chip drops under the vitals and the tracker under the chip, cleared by a
+     scaled height — a fixed one left 3px at uiScale 1.4, which is a Chrome font metric. */
+  #game .g-chip {
+    top: calc(env(safe-area-inset-top, 0px) + 14px + 44px * var(--ui));
+    right: calc(env(safe-area-inset-right, 0px) + 6px);
+  }
+  /* 46% of 390px is narrower than the 190px the objective line asks for, so the block overflowed
+     itself rather than wrapping. */
+  #game .g-track {
+    top: calc(env(safe-area-inset-top, 0px) + 26px + 66px * var(--ui));
+    max-width: 78%;
+  }
+
+  #game .g-scene,
+  #game .g-open,
+  body.flip #game .g-scene,
+  body.flip #game .g-open {
+    left: calc(env(safe-area-inset-left, 0px) + 12px);
+    right: calc(env(safe-area-inset-right, 0px) + 12px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--stack));
+  }
+  #game .g-scene { max-height: calc(100% - env(safe-area-inset-top, 0px) - var(--stack) - 90px); }
+  #game .g-prompt { bottom: calc(env(safe-area-inset-bottom, 0px) + var(--stack) + 6px); }
+
+  #game .g-toast { max-width: 78%; }
+
+  /* Three panels across 390px is 114px each. There is height to spend instead. */
+  #game .g-panels { flex-direction: column; align-items: center; gap: calc(12px * var(--ui)); }
+  #game .g-panel {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: calc(300px * var(--ui));
+    height: auto;
+    padding: calc(11px * var(--ui)) calc(14px * var(--ui));
+  }
+
+  /* A 38% master list is 148px. Stack the two panes instead of splitting the width. */
+  #game .g-jbody { flex-direction: column; }
+  #game .g-jlist {
+    flex: 0 0 auto;
+    max-height: 34%;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .09);
+  }
+
+  /* A skill row is 158px × --ui wide, so three columns never fit 390px, two fit at uiScale 1 and
+     only one fits at 1.4. Let the track count fall out of the row width rather than pick it. */
+  #game .g-cols { grid-template-columns: repeat(auto-fit, minmax(calc(158px * var(--ui)), 1fr)); }
+
+  /* The sparkline is the one column in a ware row that carries no number, and the rest are sized
+     to leave the name a line of its own once --ui pushes them past the width. */
+  #game .g-ware { flex-wrap: wrap; gap: calc(6px * var(--ui)); }
+  #game .g-ware > span { min-width: calc(70px * var(--ui)); }
+  #game .g-ware .g-spark { display: none; }
+  #game .g-ware .g-pips { flex-basis: calc(38px * var(--ui)); }
+  #game .g-ware .g-n { flex-basis: calc(30px * var(--ui)); }
+  #game .g-ware .g-unit { flex-basis: calc(46px * var(--ui)); }
+  #game .g-ware .g-tot { flex-basis: calc(44px * var(--ui)); }
+  #game .g-ware .g-tick { flex-basis: calc(20px * var(--ui)); }
+
+  #game .g-till { flex-wrap: wrap; gap: calc(10px * var(--ui)); padding-left: calc(12px * var(--ui)); padding-right: calc(12px * var(--ui)); }
+  #game .g-till button { flex: 0 0 auto; }
+
+  /* Chrome gives a range input an intrinsic 129px, which with a 40% label and the value cell is
+     357px of a 340px row. */
+  #game .g-set label > span { flex: 0 0 34%; }
+  #game .g-set input[type=range] { min-width: 0; }
+}
+
+#game .g-dial.g-nudge { animation: g-nudge .5s ease-out 1; }
+@keyframes g-nudge { 40% { transform: scale(1.14); border-color: var(--gold); } }
+
+/* ── the opening beat ────────────────────────────────────────────────────── */
+
+/* Deliberately not a card: the world stays visible and running behind it, it takes the same
+   bottom band and the same thumb clearance as the dialogue bubble, and it is dismissed by a tap
+   anywhere on it or by waiting. */
+#game .g-open {
+  position: absolute;
+  z-index: 3;
+  left: calc(env(safe-area-inset-left, 0px) + 16px);
+  right: calc(env(safe-area-inset-right, 0px) + var(--thumb) + 12px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  padding: calc(11px * var(--ui)) calc(16px * var(--ui)) calc(13px * var(--ui));
+  border-radius: 10px;
+  background: rgba(16, 18, 21, .92);
+  border: 1px solid rgba(255, 255, 255, .09);
+  pointer-events: auto;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .5s;
+}
+body.flip #game .g-open {
+  left: calc(env(safe-area-inset-left, 0px) + var(--thumb) + 12px);
+  right: calc(env(safe-area-inset-right, 0px) + 16px);
+}
+#game .g-open.in { opacity: 1; }
+#game .g-open b {
+  display: block;
+  font: 600 calc(10px * var(--ui))/1.7 system-ui, sans-serif;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  opacity: .5;
+}
+#game .g-open p { margin: 0; font-size: calc(16px * var(--ui)); }
+#game .g-open i {
+  float: right;
+  font-style: normal;
+  color: var(--gold);
+  font-size: calc(15px * var(--ui));
+}
+
+/* ── the running status line ─────────────────────────────────────────────── */
+
+/* Non-modal by construction: no dim, no button, no pointer-events. Top centre is the only band
+   with nothing in it — vitals own the left, the day chip and the cog own the right. */
+#game .g-toast {
+  position: absolute;
+  z-index: 3;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 56%;
+  padding: calc(6px * var(--ui)) calc(13px * var(--ui));
+  border-radius: calc(15px * var(--ui));
+  font-size: calc(12px * var(--ui));
+  text-align: center;
+  background: rgba(10, 11, 13, .82);
+  border: 1px solid rgba(255, 255, 255, .12);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s;
+}
+#game .g-toast.in { opacity: 1; }
+/* A save that is not happening is the one status worth colouring. */
+#game .g-toast.warn { border-color: rgba(192, 90, 74, .7); color: #f0cdc6; }

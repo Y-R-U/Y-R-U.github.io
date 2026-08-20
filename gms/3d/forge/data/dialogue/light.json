@@ -1,0 +1,481 @@
+{
+  "light.01.first": {
+    "cam": "close",
+    "lines": [
+      ["bel", "That is one.", "There will be seven more in there."]
+    ]
+  },
+
+  "light.01.out": {
+    "cam": "two",
+    "once": true,
+    "lines": [
+      ["bel", "You have been getting away with talent.", "That stops being enough this year."],
+      ["bel", "Learn the craft. Earn your own keep.", "Do that and the rest follows."],
+      ["player", "It was only rats."],
+      ["bel", "It was dark and you did it anyway.", "That is the part I am talking about."]
+    ]
+  },
+
+  "light.02.in": {
+    "lines": [
+      ["rell", "Five silverling, off the steps below.", "Nothing clever. Just five."],
+      ["rell", "The line is magic. So is the patience."]
+    ]
+  },
+
+  "light.02.out": {
+    "lines": [
+      ["rell", "Five, and not a weed among them.", "Take them up to the yard."]
+    ]
+  },
+
+  "light.03.price": {
+    "cam": "two",
+    "lines": [
+      ["wick_ww", "Five marks the lot.", "That is what the post says."],
+      ["player", "The post is three days old."],
+      ["wick_ww", "So it is.", "Six, and you carry your own crate."]
+    ],
+    "choices": [
+      { "say": "Five is fine.", "goto": null, "sets": [["flag", "light.03.haggled", false]] },
+      { "say": "Six, then.", "goto": null, "sets": [["flag", "light.03.haggled", true]] },
+      { "say": "I will come back.", "goto": null }
+    ]
+  },
+
+  "light.04.in": {
+    "lines": [
+      ["marrin", "Three off the slab. Take them."],
+      ["marrin", "Three fish, three hands, one hearth.", "Do not let it catch."],
+      ["marrin", "Cold heart, low flame. That is all it is."]
+    ]
+  },
+
+  "light.04.out": {
+    "lines": [
+      ["marrin", "They ate. That is the whole of it.", "Come back when you can do six."]
+    ]
+  },
+
+  "light.05.in": {
+    "lines": [
+      ["kesta", "The gate is yours until the bell.", "Two strays usually come up the road."],
+      ["kesta", "Turn them back. Do not chase them."]
+    ]
+  },
+
+  "light.05.out": {
+    "lines": [
+      ["kesta", "Quiet night, then.", "You did not sit down once. Good."]
+    ]
+  },
+
+  "light.06.reading": {
+    "cam": "wide",
+    "once": true,
+    "lines": [
+      ["alder", "The draw is measured and the draw is even.", "So it was written, so it is read."],
+      ["alder", "Whitewall takes what Whitewall is owed.", "No more, and never in the dark."],
+      ["alder", "Come up. The font is uncovered."]
+    ]
+  },
+
+  "light.07.in": {
+    "lines": [
+      ["rell", "Four stands dry between here and the bend.", "I have never known three."],
+      ["rell", "Walk it down and count for me.", "I would rather be wrong."]
+    ]
+  },
+
+  "light.07.out": {
+    "lines": [
+      ["player", "Six."],
+      ["rell", "Say it again and make it five."],
+      ["rell", "Then it is not the weather."]
+    ]
+  },
+
+  "light.08.in": {
+    "lines": [
+      ["sedge", "Three jars. Shallow, middle, deep.", "Do not mix them up."],
+      ["sedge", "Weed tells you what the water has had.", "Fish only tell you they are hungry."]
+    ]
+  },
+
+  "light.08.out": {
+    "lines": [
+      ["sedge", "The deep jar is the interesting one.", "Someone upstream is taking too much."],
+      ["player", "Whitewall is upstream."],
+      ["sedge", "So it is. Thank you for the jars."]
+    ]
+  },
+
+  "light.09.in": {
+    "lines": [
+      ["ivo", "The week's draw goes up to the Store.", "Ward it, carry it, set it down."],
+      ["ivo", "Nine measures. It is always nine."]
+    ]
+  },
+
+  "light.09.pell": {
+    "cam": "two",
+    "once": true,
+    "lines": [
+      ["pell", "Mind that course, it is green yet.", "Feet on the old stone."],
+      ["pell", "There was one hall once.", "One hall, one seam, one argument."],
+      ["player", "What happened to it?"],
+      ["pell", "A gallery came down. Eleven dead.", "Then there were two towns."]
+    ]
+  },
+
+  "light.09.out": {
+    "lines": [
+      ["ivo", "Nine on the shelf. Good.", "You may go."]
+    ]
+  },
+
+  "light.10.in": {
+    "lines": [
+      ["kesta", "You set nine jars on that shelf.", "Ivo's board says seven."],
+      ["kesta", "Count it yourself. I want to be wrong."]
+    ]
+  },
+
+  "light.10.out": {
+    "cam": "two",
+    "mark": "overdraw",
+    "lines": [
+      ["player", "Nine on the shelf. Seven on the board."],
+      ["kesta", "Two measures a week, then.", "For how long, do you think?"],
+      ["kesta", "Do not say that in the Yard."]
+    ]
+  },
+
+  "light.11.in": {
+    "lines": [
+      ["alder", "A wagon goes out on the eighth day.", "Walk it to the moor and come home."],
+      ["player", "Carrying what?"],
+      ["alder", "You will not need to ask about it."]
+    ]
+  },
+
+  "light.11.out": {
+    "mark": "wagon.eighth",
+    "lines": [
+      ["alder", "Thank you. It is a long road for a cart."],
+      ["player", "Where does it go?"],
+      ["alder", "We do not discuss the wagon."]
+    ]
+  },
+
+  "light.12.in": {
+    "lines": [
+      ["marrin", "Rell sent up a fish from the low stand.", "It would not cook."],
+      ["marrin", "Bring me another and we will see."]
+    ]
+  },
+
+  "light.12.out": {
+    "cam": "close",
+    "lines": [
+      ["marrin", "Hot pan. Cold fish.", "That is not a cooking fault."],
+      ["player", "What is it, then?"],
+      ["marrin", "It is the water.", "Tell Rell I said so, not you."]
+    ]
+  },
+
+  "light.13.in": {
+    "lines": [
+      ["alder", "Our flour comes from Longacre this year.", "Take the coin and buy the winter."],
+      ["alder", "Be courteous. They are farmers."]
+    ]
+  },
+
+  "light.13.out": {
+    "lines": [
+      ["hana", "You will be Whitewall's, then.", "Sit down. You look walked."],
+      ["hana", "The flour is not going anywhere.", "How is the water up your end?"]
+    ]
+  },
+
+  "light.14.price": {
+    "cam": "two",
+    "lines": [
+      ["player", "Nine marks a sack. The temple's price."],
+      ["hana", "It is a fair price and I do not want it."],
+      ["hana", "I want the leat cleared before the eighth."]
+    ],
+    "choices": [
+      { "say": "Take the coin.", "goto": null, "sets": [["flag", "light.14.offered.coin", true]] },
+      { "say": "What needs doing?", "goto": null },
+      { "say": "That is our whole purse.", "goto": null }
+    ]
+  },
+
+  "light.14.terms": {
+    "lines": [
+      ["hana", "Coin sits in a box and does nothing.", "Work I can see from the window."],
+      ["hana", "Three things, and none of them hard.", "The leat, a crate, and the hen."],
+      ["hana", "Then we will talk about flour."]
+    ]
+  },
+
+  "light.15.out": {
+    "cam": "close",
+    "once": true,
+    "lines": [
+      ["hana", "Six sacks, and one for the walk home."],
+      ["hana", "You have good hands. Whose are they?"],
+      ["player", "Mine."],
+      ["hana", "When were you born?"],
+      ["player", "Why?"],
+      ["hana", "No reason. Mind the ford going up."]
+    ]
+  },
+
+  "light.16.in": {
+    "lines": [
+      ["ansel", "You are Whitewall. I can hear it.", "Do not look so relieved."],
+      ["ansel", "Ansel. I buy for a house up your end."],
+      ["player", "Which house?"],
+      ["ansel", "Read the post with me first."]
+    ]
+  },
+
+  "light.16.out": {
+    "mark": "cousin",
+    "lines": [
+      ["player", "Which hall did you train in?"],
+      ["ansel", "The one with the bells.", "Same as you."],
+      ["ansel", "Bring eels next time. They pay better."]
+    ]
+  },
+
+  "light.25.in": {
+    "lines": [
+      ["marrin", "So this is Longacre wheat.", "It smells like the field it came off."],
+      ["marrin", "Bake three. One goes back down."]
+    ]
+  },
+
+  "light.25.out": {
+    "lines": [
+      ["hana", "You brought my own flour back as bread."],
+      ["player", "Marrin's compliments."],
+      ["hana", "Tell her the west field did that.", "No. Do not tell her that."]
+    ]
+  },
+
+  "light.17.in": {
+    "lines": [
+      ["fen", "Three crates over, three crates back.", "Count them on and count them off."],
+      ["fen", "It is not a hard job. It is just a job."]
+    ]
+  },
+
+  "light.17.out": {
+    "mark": "count.never.holds",
+    "lines": [
+      ["player", "Four came off. Three went on."],
+      ["fen", "Then you counted wrong at one end."],
+      ["player", "Which end?"],
+      ["fen", "The count never holds. Ask the river."]
+    ]
+  },
+
+  "light.18.in": {
+    "lines": [
+      ["kesta", "Smoke on the east stands. Black staffs."],
+      ["kesta", "Six of us, and we go now.", "Not at the bell. Now."]
+    ]
+  },
+
+  "light.18.out": {
+    "mark": "raiders.east",
+    "lines": [
+      ["kesta", "They went east and they went fast."],
+      ["player", "They were carrying something."],
+      ["kesta", "They were taking our water stands.", "Write it down that way."]
+    ]
+  },
+
+  "light.19.in": {
+    "lines": [
+      ["alder", "We took one of them alive.", "She has given a name and nothing else."],
+      ["alder", "You fought her. She may speak to you."]
+    ]
+  },
+
+  "light.19.ask": {
+    "cam": "two",
+    "mark": "shaft.dry",
+    "lines": [
+      ["sela", "You are the one with the bright core."],
+      ["player", "What did you come for?"],
+      ["sela", "Water. Our shaft is dry.", "It has been dry longer than you are old."]
+    ],
+    "choices": [
+      { "say": "You are lying.", "goto": null, "sets": [["flag", "light.19.pressed", true]] },
+      { "say": "Then why bring staffs?", "goto": null },
+      { "say": "That is enough.", "goto": null }
+    ]
+  },
+
+  "light.19.more": {
+    "lines": [
+      ["sela", "I have no reason to lie to a white robe."],
+      ["sela", "We came for water.", "Nobody here believes that either."],
+      ["sela", "Go and look at it.", "That is my whole answer."]
+    ]
+  },
+
+  "light.19.out": {
+    "lines": [
+      ["player", "She says their shaft is dry."],
+      ["alder", "Then they are finished and they know it."],
+      ["alder", "That is a dangerous thing to stand near."]
+    ]
+  },
+
+  "light.20.in": {
+    "lines": [
+      ["kesta", "Get up the ridge and count the shaft.", "Do not be seen doing it."],
+      ["kesta", "If they see you, they move it all.", "Then we have nothing."]
+    ]
+  },
+
+  "light.20.out": {
+    "mark": "unseen",
+    "lines": [
+      ["kesta", "Nobody called out. Nobody followed."],
+      ["player", "Nobody was watching."],
+      ["kesta", "Good. That is worth more than the count."]
+    ]
+  },
+
+  "light.26.in": {
+    "lines": [
+      ["kesta", "The stands are held day and night now."],
+      ["kesta", "Nobody has eaten hot since the raid.", "Fix that first."]
+    ]
+  },
+
+  "light.26.out": {
+    "lines": [
+      ["kesta", "They stood up for the bowls.", "They did not stand up for me."],
+      ["kesta", "A siege is mostly dinner.", "Nobody puts that in the reading."]
+    ]
+  },
+
+  "light.27.in": {
+    "lines": [
+      ["rell", "Nobody has worked the east water in days."],
+      ["rell", "Crabs have the stands. Big ones.", "Clear three and I will go back down."]
+    ]
+  },
+
+  "light.27.out": {
+    "lines": [
+      ["rell", "Silverling off the east stands again."],
+      ["rell", "First good hour I have had this month."]
+    ]
+  },
+
+  "light.21.in": {
+    "lines": [
+      ["fen", "I will row you down past the gorge.", "You want to see this yourself."],
+      ["fen", "Take a jar. Nobody believes a story."]
+    ]
+  },
+
+  "light.21.out": {
+    "cam": "wide",
+    "mark": "vail.dead",
+    "lines": [
+      ["player", "There is nothing living in it."],
+      ["fen", "Not for the last mile, no."],
+      ["fen", "It goes in bright at your end.", "It comes out like that at theirs."]
+    ]
+  },
+
+  "light.22.out": {
+    "cam": "close",
+    "mark": "thirty.years",
+    "lines": [
+      ["player", "Thirty years. Signed every year."],
+      ["kesta", "By Alder?"],
+      ["player", "By everyone. Alder last."],
+      ["kesta", "Then there is nobody to take it to."]
+    ]
+  },
+
+  "light.28.in": {
+    "lines": [
+      ["marrin", "Two hundred bowls before the bell."],
+      ["marrin", "They march in the morning.", "I am not asking where."]
+    ]
+  },
+
+  "light.28.out": {
+    "lines": [
+      ["marrin", "Sit. You have been up since four."],
+      ["marrin", "They ate well.", "That is my whole part in it."]
+    ]
+  },
+
+  "light.23.in": {
+    "lines": [
+      ["alder", "We march at Setting and cross in the dark."],
+      ["alder", "Take the keep. Hold it until morning."],
+      ["bel", "Come back with your hands still yours."]
+    ]
+  },
+
+  "light.23.out": {
+    "cam": "wide",
+    "mark": "strike.won",
+    "lines": [
+      ["kesta", "We hold it. The whole thing is ours."],
+      ["player", "The shaft is empty."],
+      ["kesta", "Then she was telling the truth."],
+      ["kesta", "Do not say that where Alder can hear."]
+    ]
+  },
+
+  "light.24.reading": {
+    "cam": "wide",
+    "once": true,
+    "lines": [
+      ["alder", "Nine measures drawn. Nine returned."],
+      ["alder", "So it was written, so it is read."],
+      ["bel", "You did that well. Both times."]
+    ]
+  },
+
+  "light.24.choice": {
+    "cam": "two",
+    "lines": [
+      ["alder", "You have read the Store's ledger."],
+      ["player", "Yes."],
+      ["alder", "Then it is your hand on it now."]
+    ],
+    "choices": [
+      { "say": "Publish it.", "goto": null, "sets": [["flag", "light.ledger.published", true]] },
+      { "say": "Hold it.", "goto": null, "sets": [["flag", "light.ledger.published", false]] }
+    ]
+  },
+
+  "light.24.answer": {
+    "cam": "close",
+    "once": true,
+    "lines": [
+      ["alder", "Then that is what we will do."],
+      ["alder", "I have read it too.", "Every year, and I signed it every year."],
+      ["player", "Why?"],
+      ["alder", "The town needed the water.", "That is the whole of my defence."],
+      ["alder", "Say the words with me."],
+      ["player", "As it is given, so it is given back."]
+    ]
+  }
+}
