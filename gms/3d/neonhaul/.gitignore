@@ -8,7 +8,7 @@ shots/_*.json
 # renders that the line above says are not committed. A glob cannot fall behind that way.
 shots/*/
 critique/
-tools/__pycache__/
+__pycache__/
 *.log
 .DS_Store
 
