@@ -34,7 +34,7 @@ import * as LanesModule from './lanes.js';
 import { planLaneRoute, trafficSeed } from './lanes.js';
 import { SettingsPanel } from './settings.js';
 import { CraftFields, PlayerCraft, CRAFT_DEFS, CRAFT_U, SHOT_CRAFT,
-  BODY_TINTS, TRIM_TINTS, TRIM_RUNS, RIM_DIM, LIGHT_RIG, POLICE_RIG } from './craft.js';
+  BODY_TINTS, TRIM_TINTS, TRIM_RUNS, RIM_DIM, LIGHT_RIG, POLICE_RIG, setCityRefl } from './craft.js';
 import { Traffic } from './traffic.js';
 import { Cockpit, ChaseHud } from './hud.js';
 import { Minimap } from './minimap.js';
@@ -3548,12 +3548,23 @@ window.__game = {
   // an S⁻² double-correction on top of the S⁻¹ three already applies; if the frame does not change,
   // nothing in it is reading these normals and every claim about the hull's shading is empty.
   craftNormalBreak(on) { CRAFT_U.uNormBreak.value = on ? 1 : 0; return CRAFT_U.uNormBreak.value; },
-  craftRim(a, c, p) {
+  // `w` is S2-M's rim WIDTH in pixels. A gate that drives it to a huge number turns the silhouette
+  // stroke back into the area flood it used to be, which is the only way to show the width term is
+  // the thing doing the work.
+  craftRim(a, c, p, w, cw) {
     if (a !== null && a !== undefined) CRAFT_U.uRimAmt.value = +a;
     if (c !== null && c !== undefined) CRAFT_U.uChineAmt.value = +c;
     if (p !== null && p !== undefined) CRAFT_U.uPanels.value = +p;
-    return { rim: CRAFT_U.uRimAmt.value, chine: CRAFT_U.uChineAmt.value, panels: CRAFT_U.uPanels.value };
+    if (w !== null && w !== undefined) CRAFT_U.uRimW.value = +w;
+    if (cw !== null && cw !== undefined) CRAFT_U.uChineW.value = +cw;
+    return { rim: CRAFT_U.uRimAmt.value, chine: CRAFT_U.uChineAmt.value,
+      panels: CRAFT_U.uPanels.value, width: CRAFT_U.uRimW.value, chineWidth: CRAFT_U.uChineW.value };
   },
+  // The city-in-the-paint term. craft.js has exported `setCityRefl` since P5 with a comment saying
+  // it "is also how a gate falsifies the term" — and until S2-M nothing imported it, so no gate
+  // ever had. An isolation lever nobody can reach is not a lever; the claim it supports was
+  // unmeasured for eleven phases. Returns the previous amount so an arm can put it back.
+  craftCityRefl(a) { return { was: setCityRefl(a), now: CRAFT_U.uCity.value.x }; },
   setCraft(id) { const r = playerCraft ? playerCraft.setCraft(id) : null; if (r) { S().craft = r; save(); } return r; },
   setCraftVisible(on) { if (playerCraft) playerCraft.visible = on !== false; return craftShown(); },
   setTraffic(on) { return traffic ? traffic.setEnabled(on !== false) : false; },

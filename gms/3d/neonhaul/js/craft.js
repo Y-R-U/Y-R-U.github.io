@@ -45,6 +45,11 @@
 //    So there is no correction here, and the attribute that carried it is gone. The proof that the
 //    hull's shading is real is `__game.craftEnv(false)` instead: detach the envMap and the hull
 //    goes flat black, which is a check that can fail and did.
+//    S2-M POSTSCRIPT: "mirroring the sky like white chrome" was never this. The lofted skin was
+//    wound inside out (see `buildBody`), so the reflection vector was built from a normal pointing
+//    away from the camera and sampled the bright upper sky over the whole body. Removing the
+//    double correction was still right; the symptom it was credited with outlived it by nine
+//    phases. A defect that persists after its explanation is removed did not have that explanation.
 //
 // 3. `pow()` ON AN INTERPOLATED VARYING BLANKED EVERY SHOT. This one is worth reading twice. With five patches on the hull
 //    (normals, part collapse, panels, tint, rim) AND the streak field drawing in the same frame,
@@ -330,11 +335,18 @@ function buildBody() {
   // The lofted skin, smooth-shaded from the analytic normals.
   const push = (i, k) => m.vert(P[i][k][0], P[i][k][1], P[i][k][2],
     N[i][k][0], N[i][k][1], N[i][k][2], P_ALWAYS, C[i][k], i / (STATIONS - 1));
+  // The winding runs the other way round the ring from the obvious one, and P5 to S2-L shipped the
+  // obvious one. Authored as (i,k)(i+1,k)(i+1,k2) the skin's front faces are its INSIDE: three
+  // culls the near half and draws the far half's interior, so every shading term on the hull ran on
+  // a normal pointing away from the camera — `dot(N, V)` negative over the whole visible body,
+  // `saturate` pinning it to 0, and §3.7(c)'s `1 - nv` fresnel therefore stuck at full strength.
+  // That is the trim-colour flood in shots/s2m/rim_before.png, and it is why no exponent could
+  // tighten it into a rim. `gates_p5` now checks face normal against vertex normal, per triangle.
   for (let i = 0; i < STATIONS - 1; i++) {
     for (let k = 0; k < RING; k++) {
       const k2 = (k + 1) % RING;
-      push(i, k); push(i + 1, k); push(i + 1, k2);
-      push(i, k); push(i + 1, k2); push(i, k2);
+      push(i, k); push(i + 1, k2); push(i + 1, k);
+      push(i, k); push(i, k2); push(i + 1, k2);
     }
   }
   // Flat caps. Their own copies of the ring, so the cap's -Z/+Z normal never bleeds into the skin.
@@ -771,6 +783,8 @@ varying vec3 vRim;
 varying vec4 vMix;
 varying vec3 vThr;
 uniform float uRimAmt;
+uniform float uRimW;
+uniform float uChineW;
 uniform vec3 uEngine;
 uniform float uChineAmt;
 uniform float uPanels;
@@ -824,7 +838,19 @@ const BODY_FRAG_BODY = /* glsl */`
     float fr = mix( uCity.y, 1.0, pow( 1.0 - nv, 3.6 ) );
     outgoingLight += cityRefl( wR, vWorldPosition.xz * uCity.w ) * ( uCity.x * fr );
   }
-  float cRim = pow( 1.0 - nv, 3.4 );
+  // The trim rim, in SCREEN SPACE. §3.7(c)'s fresnel power cannot draw an edge on this hull and no
+  // exponent fixes it: a fresnel band's WIDTH is set by how fast the shading normal turns per
+  // pixel, which is curvature over distance, and a 2.6 m lozenge at 30 m turns slowly enough that
+  // the band swallows the whole grazing half of the body. It shipped as a flood of the craft's
+  // trim colour with the hull's own facet edges cutting through it; shots/s2m/rim_before.png.
+  //
+  // Dividing by that turn rate removes the term the geometry controls: fwidth(nv) is d(nv) per
+  // pixel, so the band is uRimW PIXELS wide on any craft, at any distance, over any curvature.
+  // Fifty metres away it is still the same stroke rather than a coat of paint. The max() is the
+  // flat-facet guard — a box face has a constant nv and a zero gradient, and without it a bus
+  // flank that happens to sit near edge-on divides by zero and lights up entire.
+  float gRim = fwidth( nv );
+  float cRim = 1.0 - smoothstep( 0.0, max( gRim, 1e-4 ) * uRimW, nv );
   outgoingLight += vRim * cRim * uRimAmt * saturate( vMix.z );
   // §5.4's edge rule, now on WHICH edge and with an optional travelling bead. A craft with
   // vThr.z = 0 is the steady run this shipped with; the rest carry a chaser, which is the
@@ -832,7 +858,16 @@ const BODY_FRAG_BODY = /* glsl */`
   float pulse = mix( 1.0,
     0.30 + 0.95 * ( 0.5 + 0.5 * sin( ( vMix.y * 3.0 - uTime * vThr.z ) * 6.2832 ) ),
     step( 0.01, vThr.z ) );
-  outgoingLight += vRim * pow( saturate( vMix.x ), 2.2 ) * uChineAmt * saturate( vMix.z ) * pulse;
+  // The same screen-space narrowing as the rim, for the same reason. vMix.x is 1 on the marked ring
+  // vertices and 0 on their neighbours, so a fixed power draws a band 30 degrees of hull arc wide —
+  // a stroke when the shoulder is edge-on to the camera and a soft green wash when it is not, which
+  // is what the flank of shots/s2m/rim_before.png actually is. Widening by fwidth makes it uChineW
+  // pixels whichever way the craft is turned. On a bolt-on STRIP the whole quad is marked, so the
+  // gradient is zero and the guard lights the strip entire — which is right: there the geometry IS
+  // the light fitting.
+  float gEdge = fwidth( vMix.x );
+  float cEdge = 1.0 - smoothstep( 0.0, max( gEdge, 1e-4 ) * uChineW, 1.0 - saturate( vMix.x ) );
+  outgoingLight += vRim * cEdge * uChineAmt * saturate( vMix.z ) * pulse;
   // A road transport's lit window band. Per-pane, hashed off the length coordinate, so some panes
   // are dark and the strip reads as a vehicle with people in it rather than as a light bar.
   {
@@ -860,12 +895,17 @@ const BODY_FRAG_BODY = /* glsl */`
 export const RIM_DIM = 0.13;
 
 export const CRAFT_U = {
-  // §3.7(c)'s own number, kept — it is the COLOUR that had to be dimmed (RIM_DIM above), not the
-  // amplitude. Peak contribution is 0.55 x 0.13 = 0.07 of a neon at full grazing, which is an edge
-  // and not a coat of paint.
-  uRimAmt: { value: 0.55 },
-  // The shoulder line. A hairline at 4.2 x 0.13 = 0.55 peak, tightened by pow(x, 2.2) so it stays a
-  // stroke rather than a band.
+  // §3.7(c)'s 0.55 was chosen for a term that covered half the hull. S2-M's rim covers a three-pixel
+  // stroke, so the same amplitude is invisible; 4.0 x 0.13 = 0.52 peak is a neon edge on a hull whose
+  // albedo is 0.005, and it is confined to the silhouette rather than spread over the bodywork.
+  uRimAmt: { value: 4.0 },
+  // The rim's and the edge stroke's width, in PIXELS rather than as exponents. See BODY_FRAG_BODY.
+  // These are DEVICE pixels — at dpr 2 the stroke is half as wide in CSS pixels, which is a
+  // sharper line and not a different design.
+  uRimW: { value: 3.0 },
+  uChineW: { value: 2.2 },
+  // The shoulder line. A hairline at 4.2 x 0.13 = 0.55 peak, held to uChineW pixels by the same
+  // derivative the rim uses so it stays a stroke rather than a band.
   uChineAmt: { value: 4.2 },
   uPanels: { value: 1 },
   uKey: { value: 0.60 },
@@ -925,12 +965,24 @@ export function bodyMaterial(env) {
     // `tools/gates_p5.mjs` proves the reflection is real by detaching the envMap and measuring the
     // hull go dark — P3b's `groundMaterial` shipped a roughness map that was really an albedo
     // channel, and "it has an envMap assigned" is not evidence that anything is reflecting.
+    // envMapIntensity was 0.62 against the inside-out hull, where the reflection vector was built
+    // from a normal pointing away from the camera and sampled the bright upper sky over the whole
+    // body — the "mirroring the sky like white chrome" this file's header note blames on the
+    // instance-scale normals. That was never the normals; it was the winding. With the skin the
+    // right way out the same 0.62 reflects the dark city instead and the dusk sky stopped sliding
+    // down the flank at all, so the number goes up to put a real reflection back. Chosen on
+    // shots/hero_craft.png, not on a gate bound.
     color: 0xffffff, metalness: 0.30, roughness: 0.11,
-    envMap: env || null, envMapIntensity: 0.62, fog: true,
+    envMap: env || null, envMapIntensity: 1.10, fog: true,
   });
+  // fwidth() in the rim. Core in GLSL ES 3.00, but this flag is what keeps the shader compiling if
+  // the context ever falls back to WebGL1 — signs.js and atlas.js both handle that case already.
+  m.extensions = Object.assign({ derivatives: true }, m.extensions);
   addPatch(m, 'craft:body', sh => {
     sh.uniforms.uRimAmt = CRAFT_U.uRimAmt;
+    sh.uniforms.uRimW = CRAFT_U.uRimW;
     sh.uniforms.uChineAmt = CRAFT_U.uChineAmt;
+    sh.uniforms.uChineW = CRAFT_U.uChineW;
     sh.uniforms.uPanels = CRAFT_U.uPanels;
     sh.uniforms.uKey = CRAFT_U.uKey;
     sh.uniforms.uEngine = CRAFT_U.uEngine;

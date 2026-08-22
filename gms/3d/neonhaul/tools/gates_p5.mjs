@@ -175,6 +175,92 @@ async function main() {
     + `reflection, measured. A material whose envMap does nothing reads identically both ways, which is `
     + `what P3b's groundMaterial did for two phases while "having a roughness map".`);
 
+  // ── 2b. S2-M: the hull is not inside out, and the trim rim is an EDGE ─────
+  //
+  // The lofted skin shipped from P5 to S2-L wound the wrong way round the ring. Its front faces
+  // were its INSIDE, so three culled the near half and drew the far half's interior, and every
+  // shading term on the hull ran on a normal pointing away from the camera. `dot(N, V)` was
+  // negative over the whole visible body, `saturate()` pinned it to 0, and §3.7(c)'s `1 - nv`
+  // fresnel sat at full strength across the bodywork — a flood of the craft's trim colour that
+  // every existing gate here was blind to, because it is a picture defect that costs no draw call,
+  // no triangle and no millisecond. Both checks below are on things a screenshot comparison would
+  // not name either: one is the geometry, one is the AREA the trim term covers.
+
+  const wind = await evalJSON(S, `(() => {
+    // The counter, run twice: once on the shipped arrays and once on a copy with every triangle's
+    // winding reversed. Same code, opposite verdict — which is what makes the zero below a result.
+    const g = window.__game.craftFields.geoBody;
+    const P = g.attributes.position.array, N = g.attributes.normal.array;
+    const count = (flip) => {
+      let agree = 0, disagree = 0;
+      for (let i = 0; i < P.length; i += 9) {
+        const o = flip ? [6, 3] : [3, 6];
+        const ux = P[i + o[0]] - P[i], uy = P[i + o[0] + 1] - P[i + 1], uz = P[i + o[0] + 2] - P[i + 2];
+        const vx = P[i + o[1]] - P[i], vy = P[i + o[1] + 1] - P[i + 1], vz = P[i + o[1] + 2] - P[i + 2];
+        const fx = uy * vz - uz * vy, fy = uz * vx - ux * vz, fz = ux * vy - uy * vx;
+        if (Math.hypot(fx, fy, fz) < 1e-9) { agree++; continue; }
+        const nx = N[i] + N[i + 3] + N[i + 6], ny = N[i + 1] + N[i + 4] + N[i + 7],
+          nz = N[i + 2] + N[i + 5] + N[i + 8];
+        (fx * nx + fy * ny + fz * nz > 0 ? agree++ : disagree++);
+      }
+      return { agree, disagree };
+    };
+    return { tris: P.length / 9, shipped: count(false), reversed: count(true) };
+  })()`);
+
+  check('S2-M the hull is not INSIDE OUT — every face winds the way its own normals point',
+    wind.shipped.disagree === 0 && wind.reversed.disagree === wind.tris && wind.tris > 800,
+    `${wind.tris} triangles in the body geometry, ${wind.shipped.disagree} of them wound against `
+    + `their own vertex normals. FALSIFIED: the same counter run over a copy with every winding `
+    + `reversed reports ${wind.reversed.disagree}/${wind.tris} — so the zero is a measurement and `
+    + `not a counter that cannot count. The shipped build had 240 (the whole lofted skin: 10 `
+    + `stations x 12 ring x 2), which put dot(N,V) below zero over the entire visible hull and left `
+    + `the fresnel rim pinned at full strength.`);
+
+  // The trim rim must be an EDGE. Measured as AREA, because that is the property that was wrong:
+  // the term was drawn, it was the right colour, it was driven by the right per-instance data, and
+  // it covered half the body. Total added light over a fine grid separates a stroke from a coat;
+  // the flood arm is the same measurement with uRimW turned up, and it is what stops "the rim adds
+  // almost nothing" from passing as "the rim is nicely tight".
+  const cityWas = await evalJSON(S, `(() => { const g = window.__game;
+    g.craftSheetRelease(); g.setTraffic(false); g.craftSheet(['mammoth'], 16, 1400, 1);
+    g.setCamera({ pos: [0, 1400.4, 11], yaw: 0, pitch: -1.2, fov: 40 });
+    return g.craftCityRefl(0).was; })()`);
+  // Read the shipped values BEFORE zeroing anything: capturing them afterwards would make the
+  // restore below put the zeros back and leave the edge stroke and the panel lines off for every
+  // later gate in this suite — a fixture leak, which is the house speciality.
+  const rimU = await evalJSON(S, 'window.__game.craftRim(null, null, null, null, null)');
+  await evalJSON(S, 'window.__game.craftRim(null, 0, 0, null, null)');
+  const rimCells = S2 => evalAsync(S2, `window.__game.probe({ grid: [24, 16] })
+    .then(r => (r && r.grid ? r.grid.cells.map(c => c.lum) : null))`);
+  const sumDelta = (a, b) => (!a || !b ? 0 : a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0));
+
+  await evalJSON(S, 'window.__game.craftRim(0, null, null, null, null)');
+  await settle(S, 14);
+  const rimOff = await rimCells(S);
+  await evalJSON(S, `window.__game.craftRim(${rimU.rim}, null, null, ${rimU.width}, null)`);
+  await settle(S, 14);
+  const rimOn = await rimCells(S);
+  await shot(S, 'gate_rim_edge');
+  await evalJSON(S, 'window.__game.craftRim(null, null, null, 1e9, null)');
+  await settle(S, 14);
+  const rimFlood = await rimCells(S);
+  await shot(S, 'gate_rim_flood');
+  await evalJSON(S, `(() => { const g = window.__game;
+    g.craftRim(${rimU.rim}, ${rimU.chine}, ${rimU.panels}, ${rimU.width}, ${rimU.chineWidth});
+    g.craftCityRefl(${cityWas}); return 1; })()`);
+
+  const edgeSum = sumDelta(rimOff, rimOn), floodSum = sumDelta(rimOff, rimFlood);
+  check('S2-M FALSIFIED — the trim rim is an EDGE and not a coat of paint',
+    floodSum > 0.05 && edgeSum > 0.004 && edgeSum < 0.25 * floodSum,
+    `one mammoth filling the frame, reflection and edge stroke off so only the rim moves: turning `
+    + `the rim on adds ${edgeSum.toFixed(4)} of summed luminance over a 24x16 grid, against `
+    + `${floodSum.toFixed(4)} for the same rim with its width driven to 1e9 — `
+    + `${(100 * edgeSum / Math.max(1e-9, floodSum)).toFixed(1)} % of the flood, bound 25 %. The flood `
+    + `arm is what the shipped fresnel looked like, and it is also the proof this instrument can `
+    + `see area at all; the 0.004 floor under the edge figure is what stops a rim that draws nothing `
+    + `at all from passing this as "tight".`);
+
   // ── 3. §5.3 / Aaron's note: dark bodies, varied trim, some with none ─────
 
   const pal = await evalJSON(S, `(() => { const g = window.__game;

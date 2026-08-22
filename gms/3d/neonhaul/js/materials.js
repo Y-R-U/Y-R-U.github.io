@@ -1209,7 +1209,7 @@ vec3 shopRoom( vec2 g, vec2 d, float W, float H, float seed, float kind, vec3 la
     // the cloth comes out the lamp's own hue and disappears into the wall behind it.
     vec3 fig = cloth * mix( lamp, vec3( 0.40, 0.45, 0.58 ), 0.20 )
              * ( 0.30 + 0.46 * smoothstep( 0.02, 0.86, u ) ) * ( 0.80 + 0.26 * sw )
-             + lamp * ( 0.22 * smoothstep( w * 0.45, w * 0.99, ax ) * smoothstep( 0.30, 0.95, u )
+             + lamp * ( 0.16 * smoothstep( w * 0.82, w * 0.99, ax ) * smoothstep( 0.30, 0.95, u )
                         + 0.13 * smoothstep( 0.86, 1.00, u ) );
 
     // One in three raises a cup to the hood and lowers it again, arcing inward as it goes up. It
