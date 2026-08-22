@@ -925,6 +925,161 @@ have uncommitted work in this repo — never `git add -A`, never `git commit -a`
 Note the home Projects grid groups by month and defaults to the current month (see the user's
 `projects-page-month-reveal` memory), so an entry dated `2026-08-18` shows immediately.
 
+## S2-N — road tunnels. Aaron's play-test note, answered.
+
+> *"Trains going through buildings, that is fine as long as an auto door slides open and train goes
+> into a dark tunnel?"*
+
+**What it was.** `traffic.js`'s road transports drive dead straight down a fixed corridor for ever
+— `roadPosOf` is a pure function of (seed, index, time, camera) with no steering and no knowledge
+of the city — so where a corridor crosses a footprint the vehicle drives through the building. The
+only mitigation was a **centre-point** `solidAt` suppression, and that is the defect he was looking
+at: it drops the mesh the moment the vehicle's MIDDLE crosses the wall, so a 32 m haulier stands
+half out of a blank facade and then pops. Measured over 120 sim moments at one site, 24 of 38
+straddle observations were suppressed that way.
+
+**What landed.** `js/tunnels.js` — one `Field`, one instanced quad per portal, **one draw call** —
+puts a tunnel mouth on each face a corridor pierces, with two leaves that slide on the approach and
+shut behind, and a dark bore behind them (`materials.js` `patchTunnel`: the view ray is intersected
+with the four walls of the bore analytically, so the depth is real and nothing is marched).
+`traffic.js` now hides a transport only when it is **entirely between the two portal planes**, and
+zeroes its streak with it.
+
+**The fact the whole thing rests on.** A road corridor's cross coordinate is FIXED IN WORLD SPACE.
+`roadPosOf` snaps its cross tile to the camera, but the snap moves in whole `R_CT = R_NC * CORR`
+steps, so the set of cross coordinates it can produce is `roadPhase(a) + n*CORR` whatever the camera
+does. That is what makes a portal a static property of a building. `R_LANE`, `R_NC`, `R_CT` and the
+family phase moved to `js/lanes.js` (unchanged) so the tunnel layer and the population read one
+lattice — S2-F's argument, applied to the streets.
+
+**The invariant that matters: hide ⇔ portal.** Where a crossing is not dressed — a corner clip, a
+mass too short, a mouth that would run off the face — `traffic.js` keeps the shipped centre-point
+rule. Nothing may be hidden in open air, and `gates_tunnel` T7 audits that over 7,920 observations
+with `cityChunkLive` asserted first.
+
+**`js/main.js`'s three `^ 0x7a11` literals are now `trafficSeed()`** (js/lanes.js). Handing the
+tunnel layer the WORLD seed instead produces a perfectly plausible lattice ~50 m from every street;
+`gates_tunnel` T1 falsifies against exactly that.
+
+**`tools/gates_tunnel.mjs` — 17/17 on HIGH and on LOW.** Every check falsified in-suite. The
+vacuity guards (and only those) are scaled by the near ring, 9/25 on LOW; every substantive
+assertion is identical on both presets.
+
+**Cost.** +1 draw call and +2 triangles per portal (10–12 portals in a HIGH ring → +20–24 tris),
+measured by differencing in every shot scenario. Placement is 0.007–0.013 ms a chunk against
+§3.2.3's 1.2 ms unit cap. Determinism untouched: golden `f29beaf9`, 25,039 buildings. The traffic
+hash is byte-identical with the layer hooked and unhooked — visibility is not one of `hash()`'s
+inputs.
+
+**Residue, honestly.** Roughly half of the corridor/building intersections are a GRAZE — the
+vehicle band only partly overlaps the mass — and those are left undressed and keep the old rule
+(`tunnelState().stats.partial`). Round masses past 0.30 of their radius, mouths that would run off
+a narrow face, and bores under 5 m are dropped and counted (`skipRound`, `skipNarrow`, `skipStub`).
+
+### ⚠ S2-N found a differencing gate that had never been isolated — `gates_p6`
+
+`gates_p6`'s cabin-cost check differences two `__state` samples 12 frames apart **with 892 craft
+moving through them**. Every craft that crosses §5.5's 220 m line between the samples adds its whole
+868-triangle body to the "cabin". The cabin is **196** triangles; the gate read 196 + traffic and
+passed for eleven phases only because the contamination usually landed under its 1000-triangle
+bound. S2-N's per-frame door update shifted the frame phase by a hair, one more craft promoted, and
+the same gate read **1088**. Measured three ways at that camera: live 1088 and 206 on consecutive
+runs, frozen **196 twice with `craft.tris` identical across both samples**.
+
+The gate now calls `freezeTime` across the differencing and asserts `craft.tris` did not move. **The
+1000-triangle bound was not touched.** This is the same shape as P11's §3.7(b) instance: a number
+that was never measuring what it named.
+
+## S2-N pass 2 — one real defect in the layer, and six fixtures that were measuring nothing
+
+Picked up after the road lattice was restored (`roadPhase`'s stray `^ 0x2ab7` removed, `gates_tunnel`
+T1b added to pin the four phases to literals). `gates_tunnel` was at 15/19; it is now **20/20 on HIGH
+and on LOW**, and `determinism` still reads golden `f29beaf9` / 25,039 buildings.
+
+### The defect: a cached instance slot that goes stale on streaming churn
+
+`Field.free` is a **swap-remove**. It moves the last live instance into the freed slot and repairs
+exactly one thing — the owner array the instance was allocated with, `rec.tnQ`. `js/tunnels.js` kept
+a second copy of the slot on its own portal record (`p.slot`) and wrote `iDoor` to it every frame.
+The first time a neighbouring chunk was released, that copy went stale: the door in front of you
+stopped moving and a door across the street opened for nothing.
+
+**Every JS-side number agreed with the model.** `tunnelList()` said the leaf was fully open,
+`want` was 1, the ramp was correct — and the pixels were of a shut door. `gates_tunnel` T8b is the
+only check that could see it, and it reads as a shader bug: `live → shut 0.00000` with forced-open
+and forced-shut differing normally.
+
+Checked for the same pattern in the other three `Field` users: `js/shops.js` and `js/signage.js`
+both use their slot only at allocation and never touch the instance again, so a swap-remove is
+harmless there. The tunnel layer is the only one that writes to an instance EVERY FRAME, and so the
+only one that ever needed a durable reference to it.
+
+Fixed by holding the INDEX into `rec.tnQ` (`p.qi`) instead of the slot, so the field's own repair is
+the single source of truth. `tunnelState().slotsBad` now reports how many mouths the field disagrees
+with, and T8b asserts it — reinstating the old code turns that into **6 of 22** while the pixel half
+of the same check happens to pass, because whether the pixels catch it depends on which mouth the
+camera is pointed at.
+
+### T2 was real too: the fit test was a clamp
+
+`bore()` clamped the mouth centre to `c0 + QUAD_W/2` and asked only whether it was inside the face.
+So whenever a corridor ran closer to a corner than half a panel, the panel came out **exactly flush
+with the building's corner** — measured over 4,896 buildings from eight rings, **20 of 114 placed
+mouths (17.5 %)**, with zero wall beside the frame. And it made the check unmeasurable: `list()`
+reports to the centimetre, so "flush" and "5 mm over the corner" were the same number, and T2 flagged
+one of the two flush mouths in its ring and passed the other purely on which way `toFixed` rounded.
+
+The mouth now needs `JAMB` (0.35 m) of undressed wall beyond each edge of the panel or the crossing
+is **dropped** and counted in `skipNarrow` — which is this file's rule everywhere else. Cost: **13 of
+114 crossings (11.4 %)** dropped; the rest keep a real reveal. T2 does its containment on a new
+full-precision `cross` field rather than the rounded pair, and the panel geometry (`quadW`, `edge`,
+`nudge`) is **pinned to literals in the gate** — reading it off `tunnelState()` meant the assertion
+moved with the constant it was checking, which is the shape T1b exists for.
+
+### Six fixtures that could not have failed
+
+None of these were defects in the layer. All six are the house failure mode.
+
+1. **T4 aimed at a place its vehicle cannot reach.** `roadPosOf` wraps every road vehicle inside a
+   2048 m along tile snapped to the CAMERA. The scan for "the moment this bus is at z" returns its
+   closest approach whether or not it ever gets there — it came back 80 m short, all three samples
+   read `iInt 0.95`, and the check was asserting about a hull outside the building. Every aimed
+   instant now carries `hit`; every enclosure instant is **found by its predicate** rather than aimed
+   at; and a bore is only a candidate once a wholly-inside moment has been found for it.
+2. **T5's "vehicle 240 m away" was 129 m away** on the LOW ring, for the same reason. It is now a
+   search for a moment when nothing on that corridor is within `LEAD + TRAIL + 40` m of the bore.
+3. **T7 and T7b sampled slower than the event.** 1.7 s and 0.9 s steps against a 0.6 s enclosure and
+   a 0.8 s straddle: most transits fell between two samples. T7 was reporting 2 bore-enclosed
+   observations against a guard of 1 and T7b 4 straddles against a guard of 30 — which reads exactly
+   like the layer having stopped working. The step is 0.2 s now. **No threshold was moved**: instead
+   the guards count EPISODES — a (vehicle, bore) pair absent from the previous sample — so a finer
+   step cannot buy its way past a vacuity guard with more reads of the same bus.
+4. **T7's falsification arm probed only the non-bore residue.** At a camera where every hidden
+   transport happened to be inside a dressed bore it ran on nothing and returned zero open air — the
+   same zero T7 wants. The mass probe now runs for every hidden transport.
+5. **T2's falsification counted building width as instrument failure.** A 25.6 m shift across a 100 m
+   downtown slab lands on the same ground box and a correct derivation *must* still agree. The arm
+   now separates the bores where the shift left the mass, asserts it bit at all, and requires it to
+   bite every time it could — a rubber-stamp derivation scores 11 of 14.
+6. **The camera was a literal.** `SITE = [-1400, -1400]`, chosen once because it had a crossing on
+   it. On the restored lattice that block holds five bores of which two carry traffic; neighbouring
+   blocks hold 13 to 24. The suite now measures ten candidate cameras against the behaviour gates'
+   own predicates and asserts the winner clears the bar (**T0**) — and it picks different cameras on
+   HIGH and LOW, which is the point.
+
+### Every one of these was broken on purpose to prove it catches
+
+| break | what went red |
+|---|---|
+| restore the cached `p.slot` | T8b — `6 of 22 mouths disagree with the field's ownership map` |
+| `EDGE = 0` | T2 — 4 mismatches, two of them at 0.000 / 0.001 m of wall, plus the pinned-spec row |
+| `groundRun` ignores the line | T2-falsify — 11 of 14 still match from the same mass |
+| stop zeroing a hidden transport's streak | T4 — `wholly inside 0.95` |
+
+`gates_p5` 16/16, `gates_p6` 19/19, `gates_boot` 12/12, `budget --headed` green on both presets,
+determinism 9/9. Screenshots of a bus approaching, entering, vanishing inside and emerging from a
+real doorway on the restored lattice: `shots/tunnel/tram_1..4*.png`.
+
 ## Carry-forward
 
 - **T10 — the helper and the fix are DONE by the manager; verification is BLOCKED on P6's boot.**
@@ -949,13 +1104,23 @@ Note the home Projects grid groups by month and defaults to the current month (s
   instruction. **Aaron flies it next and has the final say** (ART_PASS). The one thing P11 did NOT
   close is the complaint every critic still leads with — *"every light source in this image is a
   sticker"* — and `SCORES.md` round 7 lists what six critics say would close it.
+- **S2-N left the GRAZE class undressed.** About half the corridor/building intersections overlap
+  the vehicle band only partly; those keep the shipped centre-point suppression, which still pops.
+  If Aaron reports it again, the fix is not a wider mouth — it is a small lateral nudge in
+  `roadPosOf`, and that is inside `hash()`, so it needs its own determinism argument first.
 - **Decision 14:** the low critic scores are a *composition* problem — every reference plate has a
   hero craft, ours were city-only. P5's re-score of `fog_city`/`canyon_dive` with a craft in frame
   is the experiment that tests it.
 
 ## The dominant failure mode on this project
 
-**Measurements that silently measure nothing.** **The count is now SEVENTEEN.** P11 added one and
+**Measurements that silently measure nothing.** **The count is now TWENTY-FOUR.** S2-N's second
+pass added six at once, every one of them inside `gates_tunnel` itself and every one of them looking
+like a regression in the layer rather than a fixture that had stopped pointing at anything — see the
+S2-N pass 2 section. S2-N added one:
+`gates_p6`'s cabin-cost differencing had never frozen the clock, so for eleven phases it was
+reporting the cabin PLUS whatever the traffic did in 24 frames. See the S2-N section.
+ P11 added one and
 it is the oldest yet: `gates_p3b`'s §3.7(b) occlusion gate asserted that the mirror moves none of
 the cells a near tower covers — at a camera where the mirror group (`y < 0`) is only ever visible on
 the non-depth-writing road, so nothing could have moved those cells under any circumstances. It had

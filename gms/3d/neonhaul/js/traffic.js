@@ -49,7 +49,8 @@ import { hash2i, clamp, smoothstep } from './utils.js';
 // lattice this file fills with traffic, and two copies of a lattice is exactly the sort of pair
 // that agrees for four phases and then does not. They are re-exported at the bottom of this file,
 // so every existing `import { ALT } from './traffic.js'` still resolves.
-import { ALT, LOT, CORR, NC, CT, W_TILE, LANE_SEP, lanePhase } from './lanes.js';
+import { ALT, LOT, CORR, NC, CT, W_TILE, LANE_SEP, lanePhase,
+  R_LANE, R_NC, R_CT, roadPhase } from './lanes.js';
 
 // Lower lanes carry more traffic: the canyon shots are the ones the plates are made of, and a
 // 270 m lane is three pixels of glow. Normalised at build time, so the totals still add to
@@ -193,14 +194,12 @@ function buildLanes(seed) {
 // 51.2 (uRoad.x). A road corridor is therefore `CORR` — four lots, the same pitch the flying
 // lanes use, chosen there for the same reason — and R_LANE puts a vehicle on the correct side of
 // the centreline it is driving beside. Get R_LANE wrong and the buses drive down the paint.
-const R_LANE = 3.3;              // half the 13.2 m carriageway, minus a kerb margin
+// S2-N MOVED `R_LANE`, `R_NC`, `R_CT` and the family phase to `js/lanes.js`, unchanged, for the
+// same reason S2-F moved the flying lattice: `js/tunnels.js` has to put a tunnel mouth on exactly
+// the line a bus drives down, and a second copy of that arithmetic is a pair that agrees until it
+// does not. Two corridors per cross tile rather than the flying field's eight — the road
+// population is a tenth the size, and spreading it over eight would put a bus every kilometre.
 const R_NL = 8;                  // road lanes: four corridor families x two directions
-// Two corridors per cross tile rather than the flying field's eight. The road population is a
-// tenth the size of the flying one, and spreading it over eight corridors would put a bus every
-// kilometre — visible from nowhere. Two corridors x four families is a street with traffic on it
-// roughly every 100 m across, and a vehicle every ~340 m along it.
-const R_NC = 2;
-const R_CT = R_NC * CORR;        // 409.6 m — the cross period, +/- 204.8 m of the camera
 const R_NEAR = 200;              // road vehicles promote later than the flying 220 m line
 const R_NEAR_MAX = 240;
 
@@ -210,7 +209,7 @@ function buildRoadLanes(seed) {
     const a = i >> 1;
     lanes.push({
       i, dir: (i & 1) ? 1 : -1, axis: a & 1,
-      phase: (hash2i(a, 23, seed ^ 0x5b21) % 4) * LOT,
+      phase: roadPhase(a, seed),
       n: 0, first: 0, nAlong: 1,
     });
   }
@@ -292,7 +291,7 @@ export class Traffic {
     // Its own arrays, its own lanes, its own near set. It shares the streak InstancedMesh (its
     // instances sit at [N, N + rN)), the craft fields, and nothing else — so every existing gate
     // that walks the flying population keeps measuring exactly what it measured before.
-    this.rLanes = buildRoadLanes(this.seed ^ 0x2ab7);
+    this.rLanes = buildRoadLanes(this.seed);
     this.rN = 0;
     this.rType = new Uint8Array(CAP_ROAD);
     this.rLane = new Uint8Array(CAP_ROAD);
@@ -306,11 +305,23 @@ export class Traffic {
     this.rz = new Float32Array(CAP_ROAD);
     this.rd = new Float32Array(CAP_ROAD);
     this.rCand = new Int32Array(CAP_ROAD);
+    // S2-N. Set by main.js once js/tunnels.js exists. Null is the SHIPPED-BEFORE behaviour and
+    // not a degraded one: with no tunnel layer every road vehicle falls back to the centre-point
+    // `solidAt` suppression this file has always used.
+    this.tunnels = null;
+    // Per-vehicle, rewritten every frame by `_updateRoad`: 1 while the transport is entirely
+    // between a bore's two portals. The STREAK loop reads it too — a bus inside a tunnel must not
+    // leave a headlight smear on the outside of the wall.
+    this.rHid = new Uint8Array(CAP_ROAD);
+    // Which road vehicles actually got a mesh written THIS frame. `near` is "in the promotion
+    // set"; this is "geometry was submitted", and the difference between the two is exactly what
+    // a gate asserting "you cannot see it inside the building" has to read.
+    this.rDrawn = new Uint8Array(CAP_ROAD);
     this.rNearIdx = new Int32Array(16);
     this.rNearN = 0;
 
     this.stats = { streaks: 0, meshes: 0, patrol: 0, patrolNear: Infinity, yields: 0, avoided: 0,
-      road: 0, roadMeshes: 0 };
+      road: 0, roadMeshes: 0, roadHidden: 0 };
     this.msSim = 0;
     this.applyQuality(Q);
   }
@@ -480,6 +491,10 @@ export class Traffic {
   corridorOf(i) { return (i - this.lanes[this.tLane[i]].first) % NC; }
   rLaneOf(i) { return this.rLanes[this.rLane[i]]; }
   rCorridorOf(i) { return (i - this.rLanes[this.rLane[i]].first) % R_NC; }
+  // The physical length of road vehicle `i`. js/tunnels.js drives its doors off it — a 32 m
+  // haulier has to hold a doorway open more than twice as long as a 12 m bus, and that difference
+  // is the whole reason the door is not on a timer.
+  roadLength(i) { return CRAFT_DEFS[ROAD_TYPES[this.rType[i]].id].L; }
 
   // The road position, on exactly the same tiling arithmetic as posOf and for the same reason:
   // it is a pure function of (seed, index, time, camera), so street traffic is as deterministic
@@ -648,10 +663,15 @@ export class Traffic {
     for (let i = 0; i < this.rN; i++) {
       const o = (N + i) * 16;
       im[o + 12] = this.rx[i]; im[o + 13] = this.ry[i]; im[o + 14] = this.rz[i];
-      inten[N + i] = 0.95;
+      // S2-N. A streak is additive and depth-TESTED, so a wall already hides one — but a bore's
+      // own portal panel is only 5.5 m wide and the streak is up to 9 m long, so a transport a
+      // metre inside a short tunnel could still smear past the jamb. Zero, not dimmed: it is in a
+      // tunnel, and the instance stays in the buffer so `mesh.count` and the hash do not move.
+      inten[N + i] = this.rHid[i] ? 0 : 0.95;
     }
     for (let a = 0; a < this.rNearN; a++) {
       const i = this.rNearIdx[a];
+      if (this.rHid[i]) continue;
       inten[N + i] = 0.95 * smoothstep((this.rd[i] - (R_NEAR - 30)) / 30);
     }
     this.mesh.count = N + this.rN;
@@ -666,6 +686,7 @@ export class Traffic {
   _updateRoad(t, cx, cy, cz, fields) {
     this.stats.roadMeshes = 0;
     this.rNearN = 0;
+    this.rDrawn.fill(0);
     if (!this.rN) return;
     const p = [0, 0, 0, 0, 0, 0];
     for (let i = 0; i < this.rN; i++) {
@@ -673,6 +694,13 @@ export class Traffic {
       this.rx[i] = p[0]; this.ry[i] = p[1]; this.rz[i] = p[2];
       const dx = p[0] - cx, dy = p[1] - cy, dz = p[2] - cz;
       this.rd[i] = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+    // S2-N. Whether each transport is INSIDE a tunnel, decided once here and read by both the
+    // mesh loop below and the streak loop in `update`. See `_roadHidden`.
+    this.stats.roadHidden = 0;
+    for (let i = 0; i < this.rN; i++) {
+      this.rHid[i] = this._roadHidden(i) ? 1 : 0;
+      this.stats.roadHidden += this.rHid[i];
     }
     let nc = 0;
     for (let i = 0; i < this.rN && nc < this.rCand.length; i++) if (this.rd[i] < R_NEAR_MAX) this.rCand[nc++] = i;
@@ -698,7 +726,12 @@ export class Traffic {
       // means "draw the transport", which is the safe direction, and it cannot bite: R_NEAR_MAX is
       // 240 m and the near ring streams to 512 m, so every road vehicle that reaches this line is
       // standing on a live chunk.
-      if (this.avoid && this.cityR && this.cityR.solidAt(this.rx[i], this.ry[i], this.rz[i], 1.5)) continue;
+      //
+      // S2-N moved the decision itself into `_roadHidden`, because at a DRESSED crossing this
+      // centre-point test is exactly the defect: it cut a 32 m haulier in half at the wall and
+      // popped the remaining half out of existence. Where there is a bore, the mouth and the wall
+      // do the cutting and the mesh survives until the whole vehicle is inside.
+      if (this.rHid[i]) continue;
       pose.def = def;
       pose.x = this.rx[i]; pose.y = this.ry[i]; pose.z = this.rz[i];
       pose.yaw = this.roadYawOf(i);
@@ -710,8 +743,35 @@ export class Traffic {
       pose.run = 0;
       pose.edge = this.rEdge[i];
       pose.pulse = 0;
-      if (fields.write(pose)) this.stats.roadMeshes++;
+      if (fields.write(pose)) { this.stats.roadMeshes++; this.rDrawn[i] = 1; }
     }
+  }
+
+  // ── S2-N — is this transport inside a building, and does that building have a bore? ──────
+  //
+  // Two rules, and which one applies is decided by whether `js/tunnels.js` actually dressed this
+  // crossing. That is the invariant the whole feature rests on: **hide only where a portal
+  // exists**, or a bus disappears in open air, which is a worse defect than the one being fixed.
+  //
+  //   a bore   hidden only when the vehicle is ENTIRELY between the two portal planes. It is
+  //            already invisible by then — the far wall and the near portal panel are opaque and
+  //            write depth, so at the instant this flips the vehicle is behind both of them. That
+  //            is what makes it a fade-free swap rather than a pop, and it is why the test is on
+  //            the ENDS of the hull (`along -/+ L/2`) and not on its centre.
+  //   no bore  the shipped centre-point `solidAt` suppression, unchanged, so a corridor that
+  //            clips a corner or runs under a landmark plinth behaves exactly as it always has.
+  _roadHidden(i) {
+    const t = this.tunnels;
+    if (t) {
+      const l = this.rLaneOf(i);
+      const cross = l.axis === 0 ? this.rz[i] : this.rx[i];
+      const along = l.axis === 0 ? this.rx[i] : this.rz[i];
+      // `spanAt` answers "is this crossing DRESSED"; `enclosed` answers "am I inside one of the
+      // bores on this line". Two questions, because the second one has to consider every bore and
+      // the first only has to find one.
+      if (t.spanAt(l.axis, cross, along)) return t.enclosed(l.axis, cross, along, this.roadLength(i) * 0.5);
+    }
+    return !!(this.avoid && this.cityR && this.cityR.solidAt(this.rx[i], this.ry[i], this.rz[i], 1.5));
   }
 
   // §5.5's yield, and the ONLY line in this file that reads the player's position.
@@ -792,6 +852,10 @@ export class Traffic {
         offRoad: +offRoad.toFixed(3),
         d: +Math.sqrt(dx * dx + dy * dy + dz * dz).toFixed(2),
         near: this.rNearIdx.slice(0, this.rNearN).includes(i),
+        hidden: !!this.rHid[i], drawn: !!this.rDrawn[i],
+        // The streak's own intensity, straight off the GPU buffer at its instance slot. A gate
+        // asserting "and its streak is gone too" must read the buffer, not this file's intent.
+        streak: +this.geo.attributes.iInt.array[this.N + i].toFixed(4),
       });
       if (limit && out.length >= limit) break;
     }
@@ -896,6 +960,7 @@ export class Traffic {
       // "all N craft are also in the streak field" is about the FLYING population and must keep
       // measuring exactly that. `streakTotal` is what the InstancedMesh actually draws.
       road: this.rN, roadNear: this.rNearN, roadMeshes: this.stats.roadMeshes,
+      roadHidden: this.stats.roadHidden, tunnels: !!this.tunnels,
       roadLanes: this.rLanes.length, streakTotal: this.mesh.count,
       meshes: this.stats.meshes, patrol: this.stats.patrol,
       patrolNear: Number.isFinite(this.stats.patrolNear) ? +this.stats.patrolNear.toFixed(2) : null,
@@ -910,4 +975,5 @@ export class Traffic {
   }
 }
 
-export { ALT, CORR, NC, CT, W_TILE, LANE_SEP, NEAR_LINE, TYPES, ROAD_TYPES, EDGE_W, R_LANE, R_NEAR };
+export { ALT, CORR, NC, CT, W_TILE, LANE_SEP, NEAR_LINE, TYPES, ROAD_TYPES, EDGE_W,
+  R_LANE, R_NC, R_CT, R_NEAR };

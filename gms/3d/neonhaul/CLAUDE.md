@@ -16,7 +16,7 @@ which sections a piece of work needs.
 
 ## The one lesson this project is built around
 
-**Measurements that silently measure nothing.** Seventeen instances so far: silent audio clips
+**Measurements that silently measure nothing.** Eighteen instances so far: silent audio clips
 reported OK; a layer compared against itself returning exactly 0.0; `&&`-guarded isolation that
 no-ops; a gate parser reading a key that did not exist; `solidAt()` returning `null` for an
 ungenerated chunk and being banked as "clear"; an occlusion gate that sampled a region the tower
@@ -85,8 +85,8 @@ node tools/shot.mjs --shot=fog_city  # a render + its perf snapshot
 ```
 
 Suites: `p1a p2 p3a p3b p4 p5 p6 p7a p7b p8 p11 wire`, plus the season-2 suites
-`s2a s2c s2d s2e s2f s2g s2h s2i s2j s2k`, and `determinism`, `t10_falsify`, `budget`, `soak`,
-`sim_s2f`, `sim_s2i`, `fleet_rate`.
+`s2a s2c s2d s2e s2f s2g s2h s2i s2j s2k`, `boot`, `tunnel`, and `determinism`, `t10_falsify`,
+`budget`, `soak`, `sim_s2f`, `sim_s2i`, `fleet_rate`.
 **`gates_p5` and `gates_p7a`/`p8` write a different JSON schema from `p1a`–`p4`
 (`ok`/`fail` rather than `results`)** — a parser that reads only `results` reports 0/0 on a suite
 that fully passed. That mistake has been made three times here.
@@ -137,6 +137,14 @@ back short (`gates_s2i.mjs`'s `advance()`).
 - **Headless ANGLE stalls above ~5 Mpx on this machine.** `1600×900 @ dpr 2` never returns a
   screenshot; `--headed` does. `shot.mjs` defaults to `--dpr=1` and warns. Do not debug a "hang"
   that is this — and note the threshold is soft: `1280×800 @ dpr 2` (4.1 Mpx) stalled too, at P10.
+- **A differencing gate must FREEZE THE CLOCK, and `gates_p6` did not for eleven phases.** Its
+  cabin cost check took two `__state` samples 12 frames apart with 892 craft moving through them,
+  so every craft that crossed §5.5's 220 m line between the samples added its whole 868-triangle
+  body to the "cabin". The cabin is 5 draws and **196** triangles; the gate read 196 + traffic and
+  passed only because the contamination usually landed under its 1000-triangle bound. S2-N's
+  per-frame door update shifted the frame phase, one more craft promoted, and the same gate read
+  **1088** — an 82 % "regression" in a number with nothing to do with the cabin. It now freezes,
+  and asserts `craft.tris` did not move across the two samples. The bound was NOT touched.
 - **`solidAt()` returns `null` for an ungenerated chunk**, which is indistinguishable from open air.
   Any remote probe must assert `__game.cityChunkLive(x, z)` first, or it will conclude a defect does
   not exist. It once did exactly that across 242 pads.

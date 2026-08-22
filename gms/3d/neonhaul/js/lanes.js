@@ -50,6 +50,74 @@ export function laneCross(family, seed, v) {
 // Which side of the corridor a craft travelling in `dir` (+1 / -1) along the axis belongs on.
 export const laneSide = (cross, dir) => cross + (dir >= 0 ? 1 : -1) * LANE_SEP;
 
+// ── the ROAD corridor lattice ─────────────────────────────────────────────
+//
+// The street population in `traffic.js` is tiled the same way the flying one is, and the same
+// argument applies: `js/tunnels.js` has to place a tunnel mouth on exactly the line a bus drives
+// down, so the two must not each own a copy of the arithmetic.
+//
+// The non-obvious fact, and the one the tunnel placement rests on: a road corridor's cross
+// coordinate is FIXED IN WORLD SPACE even though `roadPosOf` snaps its tile to the camera. The
+// snap moves in whole `R_CT` steps and `R_CT` is exactly `R_NC * CORR`, so the set of cross
+// coordinates the snap can produce is `roadPhase(a) + n * CORR` for integer n, whatever the camera
+// does. Camera motion changes WHICH two corridors of a family are populated, never where they are.
+//
+// A vehicle then sits `R_LANE` to its own side of that centre, so the line it actually drives —
+// `roadLine` — is what a portal has to be centred on. `roadPhase` IS what `buildRoadLanes` calls,
+// so there is one derivation rather than two that agree until they do not; gates_tunnel T1 still
+// asserts the portal lattice against the population's own lanes, because one function being used
+// twice is a reason to expect agreement and not evidence of it.
+export const R_LANE = 3.3;        // half the 13.2 m carriageway, minus a kerb margin
+export const R_NC = 2;            // corridors per cross tile — a tenth the flying field's traffic
+export const R_CT = R_NC * CORR;  // 409.6 m
+export const R_FAM = 4;           // four families x two directions = traffic.js's R_NL
+
+// `js/traffic.js` is NOT built with the world seed — main.js salts it, and the salt lives here
+// now rather than as a literal at three call sites. `roadPhase`'s `seed` is therefore the TRAFFIC
+// seed, i.e. `trafficSeed(city.seed)`, and passing the world seed instead silently produces a
+// plausible lattice that is nowhere near the streets the buses actually drive.
+export const TRAFFIC_SALT = 0x7a11;
+export const trafficSeed = citySeed => (citySeed ^ TRAFFIC_SALT) | 0;
+
+// The `^ 0x5b21` is `buildRoadLanes`'s own, carried over unchanged. S2-N briefly had a second
+// `^ 0x2ab7` in here as well, from a mistaken belief that this would be called with the WORLD seed
+// and had to compensate; it is called with the traffic seed at both sites. The extra salt was
+// harmless to the FEATURE — both consumers read the same function, so the portals sat on the lanes
+// either way — and that is exactly why nothing caught it: every gate compares the build against
+// itself. What it actually did was move all four road families off the streets the shipped build
+// drove, silently. gates_tunnel T1b now pins the phases to the shipped values.
+export function roadPhase(family, seed) {
+  return (hash2i(family, 23, seed ^ 0x5b21) % 4) * LOT;
+}
+
+// The distinct road TRAVEL lines — deduplicated, because two families can roll the same phase on
+// the same axis and then drive down the same street. On the shipped seed families 1 and 3 do
+// exactly that, and a portal placed once per family would be two coplanar quads z-fighting.
+export function roadLines(seed) {
+  const out = [], seen = new Set();
+  for (let a = 0; a < R_FAM; a++) {
+    const axis = a & 1, phase = roadPhase(a, seed);
+    for (const dir of [-1, 1]) {
+      const key = axis + ':' + Math.round((phase + dir * R_LANE) * 16);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ axis, phase, dir, off: phase + dir * R_LANE });
+    }
+  }
+  return out;
+}
+
+// Every travel line of `lines` whose band [line - half, line + half] touches [c0, c1].
+export function roadLinesIn(lines, axis, c0, c1, half, out = []) {
+  out.length = 0;
+  for (const L of lines) {
+    if (L.axis !== axis) continue;
+    const k0 = Math.ceil((c0 - half - L.off) / CORR), k1 = Math.floor((c1 + half - L.off) / CORR);
+    for (let k = k0; k <= k1; k++) out.push({ axis, dir: L.dir, line: L.off + k * CORR });
+  }
+  return out;
+}
+
 // ── the autopilot ladder ──────────────────────────────────────────────────
 //
 // Four rungs, L0 free. The brief: *"a very slow version is enabled from the start"*, and the

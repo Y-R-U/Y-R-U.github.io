@@ -114,19 +114,41 @@ async function main() {
     + parts.map(p => `  ${p.name.padEnd(15)} ${String(p.tris).padStart(4)} tris  role=${p.role}`).join('\n'));
 
   // ── 3. the cabin's cost, by isolation ────────────────────────────────────
+  //
+  // FROZEN, and S2-N is why. This differencing ran against a LIVE scene for eleven phases: two
+  // 12-frame settles with 892 craft moving through them, and every craft that crosses §5.5's
+  // 220 m line between the samples adds its whole 868-triangle body to the "cabin". The cabin's
+  // real cost is 5 draws and 196 triangles; the reading was 196 + whatever the traffic did, and
+  // it passed only because the contamination usually landed under the 1000-triangle bound.
+  //
+  // S2-N's per-frame door update shifted the frame phase by a hair, one more craft promoted
+  // between the two samples, and the same gate read 1088 — an 82 % "regression" in a number that
+  // has nothing to do with the cabin. Measured three ways at this camera: live 1088 and 206 on
+  // consecutive runs, frozen 196 twice with `craft.tris` identical across both samples.
+  //
+  // So: freeze the clock, which is what CLAUDE.md's own rule says a differencing gate needs, and
+  // ASSERT that the craft fields did not move — a contamination that can come back silently is
+  // the thing this project keeps a list of. The 1000-triangle bound is untouched.
+  await hook(S, 'freezeTime', true);
+  await settle(S, 6);
   await evalJSON(S, 'window.__game.setCockpit(false)');
   await settle(S, 12);
   const offSt = await evalJSON(S, 'window.__state');
   await evalJSON(S, 'window.__game.setCockpit(true)');
   await settle(S, 12);
   const onSt = await evalJSON(S, 'window.__state');
+  await hook(S, 'freezeTime', false);
   const dDraw = onSt.draws - offSt.draws, dTri = onSt.tris - offSt.tris;
+  const dCraft = (onSt.craft ? onSt.craft.tris : 0) - (offSt.craft ? offSt.craft.tris : 0);
   check('§8.1-§8.3 — the entire diegetic HUD is 5 draw calls, measured by differencing',
-    dDraw === 5 && dTri > 0 && dTri < 1000 && onSt.draws <= 65,
+    dDraw === 5 && dTri > 0 && dTri < 1000 && onSt.draws <= 65 && dCraft === 0,
     `cabin OFF ${offSt.draws} draws / ${offSt.tris} tris → ON ${onSt.draws} / ${onSt.tris}\n`
     + `delta ${dDraw} draws, ${dTri} triangles. §8 prices this at 6 + 1 + 3 = 10 draws and ~4.4k `
     + `tris; merging the metal, the edge rules and the three holo panels each into one geometry `
-    + `gets it to 5 / ${dTri}. Scene total with the cabin up: ${onSt.draws} draws against the 65 gate`);
+    + `gets it to 5 / ${dTri}. Scene total with the cabin up: ${onSt.draws} draws against the 65 gate\n`
+    + `the clock is FROZEN across both samples and the craft fields moved ${dCraft} triangles `
+    + `between them — unfrozen, a single craft crossing the 220 m line adds 868 of its own to this `
+    + `number, and it did`);
 
   // ── 4. §8.2 — the dash redraws at 12 fps (6 on LOW), not per frame ───────
   await evalJSON(S, 'window.__game.resetPerf()');

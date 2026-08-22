@@ -31,7 +31,7 @@ import { Controls } from './controls.js';
 import { CameraRig } from './camera.js';
 import { Autopilot, Courier, LanePilot } from './autopilot.js';
 import * as LanesModule from './lanes.js';
-import { planLaneRoute } from './lanes.js';
+import { planLaneRoute, trafficSeed } from './lanes.js';
 import { SettingsPanel } from './settings.js';
 import { CraftFields, PlayerCraft, CRAFT_DEFS, CRAFT_U, SHOT_CRAFT,
   BODY_TINTS, TRIM_TINTS, TRIM_RUNS, RIM_DIM, LIGHT_RIG, POLICE_RIG } from './craft.js';
@@ -718,7 +718,7 @@ if (cityR && !scenario) {
     // The SAME seed traffic.js is built with, not WORLD_SEED: the corridor phases are a function
     // of it, and a pilot seeded differently would fly a lattice offset from the one the traffic is
     // on — legal-looking lanes with the wrong cars in them.
-    pilot = new LanePilot({ seed: (city ? city.seed : WORLD_SEED) ^ 0x7a11, level: 0 });
+    pilot = new LanePilot({ seed: trafficSeed(city ? city.seed : WORLD_SEED), level: 0 });
     tapBtn(autoBtn, () => (pilot.active && autoKey === 'auto' ? autoOff('off') : autoTo(autoTargets, 'auto')));
     tapBtn(homeBtn, () => (pilot.active && autoKey === 'home' ? autoOff('off') : autoTo(homeTarget, 'home')));
     paintViewBtn();
@@ -753,7 +753,11 @@ let craftFields = null, traffic = null, playerCraft = null, vehT = 0;
 
 if (cityR) {
   craftFields = new CraftFields(scene, sky);
-  traffic = new Traffic(scene, Q, (city ? city.seed : WORLD_SEED) ^ 0x7a11, cityR);
+  traffic = new Traffic(scene, Q, trafficSeed(city ? city.seed : WORLD_SEED), cityR);
+  // S2-N. The tunnel layer is placed by js/signage.js on the chunk lifetime, but it is TRAFFIC
+  // that has to know about it: a transport may only be hidden inside a footprint that actually
+  // has a mouth on both faces. Null here is the shipped-before behaviour, not a broken one.
+  if (signage) traffic.tunnels = signage.tunnels;
   playerCraft = new PlayerCraft(S().craft);
   if (scenario && SHOT_CRAFT[scenario.id]) {
     playerCraft.setCraft(SHOT_CRAFT[scenario.id].craft);
@@ -2273,6 +2277,9 @@ function updateVehicles(dt, t) {
   }
   traffic.update(dt, vehT, camera.position, craftFields,
     flight && (mode === 'fly' || mode === 'auto') ? Game.player : null);
+  // AFTER traffic, never before: the doors are driven off the positions this frame's road update
+  // just wrote, and a door reading last frame's positions is a door on a one-frame timer.
+  if (signage) signage.tunnels.update(dt, traffic);
   craftFields.flush();
   void t;
 }
@@ -3164,7 +3171,7 @@ window.__game = {
   // its own arithmetic.
   lanes: () => LanesModule,
   planRoute: (from, to, level = 0) => planLaneRoute(from, to,
-    { seed: (city ? city.seed : WORLD_SEED) ^ 0x7a11, level }),
+    { seed: trafficSeed(city ? city.seed : WORLD_SEED), level }),
 
   // ── P8 hooks (§10) ───────────────────────────────────────────────────────
   get audio() { return audio; },
@@ -3261,6 +3268,51 @@ window.__game = {
   setShopVisible: on => (signage ? signage.shops.setVisible(on) : false),
   setShopForce: v => { U.uShopForce.value = v === null || v === undefined ? -1 : v; return U.uShopForce.value; },
   setShopRange: (near, far) => { U.uShop.value.y = near; U.uShop.value.z = far; return [U.uShop.value.y, U.uShop.value.z]; },
+
+  // ── S2-N hooks (road tunnels) ────────────────────────────────────────────
+  tunnelState: () => (signage ? signage.tunnels.state() : null),
+  // Every live bore: both mouths, their world positions, and each leaf's live openness. A gate
+  // reads this instead of hunting for a doorway in a screenshot.
+  tunnelList: () => (signage ? signage.tunnels.list() : null),
+  setTunnelVisible: on => (signage ? signage.tunnels.setVisible(on) : null),
+  // The door override, and like uShopForce it is the GATE's and never a runtime option: -1 is the
+  // answer the vehicles drive, 0 forces every leaf SHUT, 1 forces every leaf OPEN.
+  setDoorForce: v => { U.uDoorForce.value = v === null || v === undefined ? -1 : v; return U.uDoorForce.value; },
+  // The falsification switch for the WHOLE feature: with the layer unhooked, traffic.js falls
+  // back to the centre-point `solidAt` suppression it shipped with, and every "the transport is
+  // not visible inside the building" assertion must go the other way. An override, not a set —
+  // the game loop never writes `traffic.tunnels`, so nothing can undo it mid-gate.
+  setTunnels(on) {
+    if (!traffic || !signage) return null;
+    traffic.tunnels = on === false ? null : signage.tunnels;
+    return !!traffic.tunnels;
+  },
+  // The road population, at the LIVE vehicle clock. `trafficList` is the flying half; this is the
+  // half that drives the streets, and `hidden` on each row is the flag both the mesh and the
+  // streak are suppressed by.
+  roadList: (limit = 0, t) => (traffic ? traffic.roadList(t === undefined ? vehT : +t, camera.position, limit) : []),
+  // Gate-only, and an OVERRIDE rather than a set: it pins the road population to an exact moment
+  // and optionally advances the DOORS by `dt` without unfreezing the world, so "drive a 32 m
+  // haulier into a doorway and photograph it" is arithmetic instead of a wait for luck. Use it
+  // with freezeTime(true) or the next frame's `vehT += dt` walks straight off it.
+  //
+  // `traffic.update` is called with dt 0 — the only thing that reads it is §5.5's yield spring,
+  // and a gate that wants a still population must not integrate one.
+  stepVehicles(t, dt = 0) {
+    if (!craftFields || !traffic) return null;
+    vehT = +t;
+    craftFields.begin();
+    traffic.update(0, vehT, camera.position, craftFields,
+      flight && (mode === 'fly' || mode === 'auto') ? Game.player : null);
+    if (signage) signage.tunnels.update(+dt, traffic);
+    craftFields.flush();
+    return { t: vehT, roadMeshes: traffic.stats.roadMeshes, hidden: traffic.stats.roadHidden };
+  },
+  // The road corridor lattice as traffic.js itself built it, so a gate can assert the tunnel
+  // layer's copy against the population's rather than against its own re-derivation.
+  roadLanes: () => (traffic ? traffic.rLanes.map(l => ({ i: l.i, axis: l.axis, dir: l.dir,
+    phase: l.phase, n: l.n })) : null),
+  trafficSeed: () => (traffic ? traffic.seed : null),
   // §S2-K D4. The three hooks above are RENDER levers and none of them can move `ms.gen`: the
   // shopfronts are packed inside §3.2.3's work unit (4) whether or not the shader ever draws them.
   // So bisecting a generation-budget question needed a GENERATION lever, and there was none —

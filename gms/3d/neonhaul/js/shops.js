@@ -132,6 +132,7 @@ export class Shops {
     // 1.2 ms, and nothing in the game reads it.
     this.keepMeta = !!keepMeta;
     this.density = Q.shopDensity ?? 1;
+    this.blockers = null;
     this.mat = shopMaterial(sa.tex, noiseTex);
     this.applyRange(Q);
 
@@ -163,7 +164,7 @@ export class Shops {
     this._p = new THREE.Vector3();
     this._s = new THREE.Vector3();
     this._c = new THREE.Color();
-    this.stats = { shops: 0, buildings: 0, skippedShort: 0, rounds: 0, peak: 0 };
+    this.stats = { shops: 0, buildings: 0, skippedShort: 0, rounds: 0, peak: 0, blockedByPortal: 0 };
     for (const k of SHOP_KINDS) this.stats[k.id] = 0;
   }
 
@@ -192,7 +193,12 @@ export class Shops {
 
   // ── one building's street frontage ───────────────────────────────────────
 
-  writeBuilding(rec, b, ccx, ccz) {
+  // `blockers` is S2-N's tunnel-portal list for THIS building (js/tunnels.js). A portal and a
+  // shopfront are both opaque panels standing off the same wall, so a shop that lands on one is
+  // dropped rather than z-fought — the row simply steps over the doorway, which is what a real
+  // street does. Absent or empty is the shipped behaviour.
+  writeBuilding(rec, b, ccx, ccz, blockers = null) {
+    this.blockers = blockers && blockers.length ? blockers : null;
     if (this.density <= 0) return;
     const d = byId[b.district];
     if (!d) return;
@@ -272,7 +278,21 @@ export class Shops {
     return n;
   }
 
+  // A shop centre that lands on a tunnel mouth. The test is anisotropic on the PORTAL's own axes
+  // — wide across its face, tight along its normal — because an isotropic radius large enough to
+  // cover a 5.5 m doorway also deletes shops round the corner that were never in the way.
+  onPortal(x, z, w) {
+    if (!this.blockers) return false;
+    for (const p of this.blockers) {
+      const dAcross = p.axis === 0 ? z - p.z : x - p.x;      // across the portal's face
+      const dAlong = p.axis === 0 ? x - p.x : z - p.z;       // out along its normal
+      if (Math.abs(dAlong) < 2.2 && Math.abs(dAcross) < p.hw + w * 0.5 + 0.5) return true;
+    }
+    return false;
+  }
+
   write(rec, b, d, rng, x, z, yaw, w, ccx, ccz, host) {
+    if (this.onPortal(x, z, w)) { this.stats.blockedByPortal++; return true; }
     this.prepare(rec);
     const idx = rec.shQ.length;
     const slot = this.field.alloc(rec.shQ, idx);

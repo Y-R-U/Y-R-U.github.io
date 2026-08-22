@@ -39,6 +39,8 @@ import { signMaterial, stripMaterial, strobeMaterial, structureMaterial } from '
 import { heroCanvases } from './signs.js';
 import { PosterBoard } from './posters.js';
 import { Shops } from './shops.js';
+import { Tunnels } from './tunnels.js';
+import { trafficSeed } from './lanes.js';
 import { xorshift32, hash2i, hashf, clamp } from './utils.js';
 import { byId } from './districts.js';
 
@@ -194,6 +196,13 @@ export class Signage {
     this.shops = new Shops(Q, sa, noiseTex, this.keepMeta);
     this.group.add(this.shops.mesh);
 
+    // S2-N. Same chunk lifetime, same one-draw discipline, and it is owned here rather than by
+    // main.js for one reason: a tunnel mouth and a shopfront are both opaque panels standing off
+    // the SAME ground-floor wall, so the portals have to be placed first and handed to the
+    // shopfronts as keep-outs. Two files could not agree on that ordering; one can.
+    this.tunnels = new Tunnels(Q, trafficSeed(city.seed), noiseTex, this.keepMeta);
+    this.group.add(this.tunnels.mesh);
+
     this._m4 = new THREE.Matrix4();
     this._q = new THREE.Quaternion();
     this._p = new THREE.Vector3();
@@ -220,6 +229,7 @@ export class Signage {
     // The channel count is baked into placement, so a quality change moves only the decode cap.
     this.posters.maxVideo = Q.posterVideo ?? this.posters.maxVideo;
     this.shops.applyQuality(Q);
+    this.tunnels.applyQuality(Q);
   }
 
   update(dt, t, camera) {
@@ -241,7 +251,7 @@ export class Signage {
   // is compacted in place on every chunk demotion.
   posterSites() { return this.pvSites.map(s => ({ ch: s.ch, x: s.x, y: s.y, z: s.z, nx: s.nx, nz: s.nz })); }
 
-  flush() { for (const f of this.fields) f.flush(); this.shops.flush(); }
+  flush() { for (const f of this.fields) f.flush(); this.shops.flush(); this.tunnels.flush(); }
 
   // ── slot ownership ───────────────────────────────────────────────────────
 
@@ -260,6 +270,7 @@ export class Signage {
     free(this.postF, rec.sgP);
     free(this.strip, rec.stS); free(this.strobe, rec.stO); free(this.struct, rec.stR);
     this.shops.release(rec);
+    this.tunnels.release(rec);
     // The flat site list is what posters.js sweeps; a chunk that has gone must not keep a channel
     // live from behind you. Compacted in place — this runs on every demotion.
     if (rec.pvN) {
@@ -313,7 +324,10 @@ export class Signage {
       this.buildingStrips(rec, b, ccx, ccz);
       this.buildingStrobes(rec, b, ccx, ccz);
       this.buildingStructures(rec, b, ccx, ccz);
-      this.shops.writeBuilding(rec, b, ccx, ccz);
+      // The portals go down FIRST and the list they return is a keep-out for the shopfronts on
+      // the same wall. The array is the tunnel layer's own scratch and is valid only until the
+      // next writeBuilding call, which is exactly this line.
+      this.shops.writeBuilding(rec, b, ccx, ccz, this.tunnels.writeBuilding(rec, b, ccx, ccz));
     }
     this.bridges(rec, ccx, ccz);
   }
@@ -916,7 +930,7 @@ export class Signage {
   // ── reporting ────────────────────────────────────────────────────────────
 
   breakdown() {
-    const rows = this.fields.concat([this.shops.field]).map(f => ({
+    const rows = this.fields.concat([this.shops.field, this.tunnels.field]).map(f => ({
       field: f.name, draws: f.n ? 1 : 0, instances: f.n, geoTris: f.tris,
       tris: f.n * f.tris, cap: f.cap, overflow: f.overflow,
     }));
@@ -958,7 +972,7 @@ export class Signage {
     // Obligation T7. Shopfronts carry the LOD0 dither itself, which is the very thing gates_p2's
     // R0 sweep measures, so the "hide everything this file added" arm has to take them with it or
     // part 2's measurement quietly acquires a second population.
-    if (all) this.shops.setVisible(on);
+    if (all) { this.shops.setVisible(on); this.tunnels.setVisible(on); }
     const d = this.derived && (all ? this.derived.all : this.derived.signs);
     if (d) for (const m of d) m.visible = !!on;
     return !!on;
@@ -975,12 +989,14 @@ export class Signage {
       // number with an object and read as a working gate.
       posterBoard: Object.assign({ sites: this.pvSites.length }, this.posters.state()),
       shopfronts: this.shops.field.n,
+      portals: this.tunnels.field.n,
       overflow: this.breakdown().overflow,
     };
   }
 
   dispose() {
     this.shops.dispose();
+    this.tunnels.dispose();
     for (const f of this.fields) f.dispose();
     for (const m of [this.matNeon, this.matBox, this.matHero, this.matPost, this.matStrip, this.matStrobe, this.matStruct]) m.dispose();
     this.hero.tex.dispose();

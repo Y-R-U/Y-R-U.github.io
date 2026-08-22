@@ -71,6 +71,13 @@ export const U = {
   // real angle/distance answer, 0 forces every blind SHUT and 1 forces every blind OPEN, so a
   // gate can measure what the gate is actually buying instead of hunting for a lucky camera.
   uShopForce: { value: -1 },
+  // ── S2-N — road tunnel portals (js/tunnels.js) ───────────────────────────
+  // (master, unused, unused, unused). The gate's override for the doors is uDoorForce: -1 is the
+  // live answer the vehicles drive, 0 forces every leaf SHUT and 1 forces every leaf OPEN. Same
+  // discipline as uShopForce, and for the same reason — a gate must not have to hunt for a lucky
+  // moment to photograph a state.
+  uTunnel: { value: new THREE.Vector4(1, 0, 0, 0) },
+  uDoorForce: { value: -1 },
 };
 
 // onBeforeCompile is a single slot. Chaining lets a material take two patches without either
@@ -1372,6 +1379,180 @@ export function shopMaterial(tex, noiseTex) {
     map: tex, color: 0xffffff, side: THREE.FrontSide, fog: true, toneMapped: false,
   });
   patchShop(m);
+  patchFog(m, 'opaque');
+  if (noiseTex) patchFade(m, true, noiseTex);
+  return m;
+}
+
+// ── S2-N. the road tunnel portal ───────────────────────────────────────────
+//
+// ONE QUAD IS A WHOLE PORTAL, on exactly the terms js/shops.js sets: an opaque panel standing a
+// little off the building's ground-floor face, with the frame, the two sliding leaves and the
+// dark shaft behind them all drawn per pixel inside it. One `Field`, one draw, no new texture.
+//
+// THE SHAFT IS A TUBE INTERSECTION, NOT A PARALLAX STACK. A shopfront's room is three planes
+// because a room is a box you look INTO from outside; a tunnel is a box you look ALONG, and the
+// thing that sells it is how far the eye gets before it hits a wall. So the view ray is
+// re-expressed in the opening's own frame and intersected with the four walls of the bore
+// analytically — one divide per axis — and the hit distance drives both the falloff and the lamp
+// rings. Nothing is marched and nothing is sampled.
+//
+// IT IS DELIBERATELY VERY DARK. Aaron asked for "a dark tunnel", and a bore that is merely dim
+// reads as a painted rectangle. The brightest thing in the opening is the lamp ring nearest the
+// mouth and the two guide lines on the deck; everything else is under 0.05.
+//
+// THE DOOR IS THE INSTANCE'S OWN NUMBER, not a function of time. `iDoor` is written every frame
+// by js/tunnels.js from the distance and direction of the vehicles on that line, so a 32 m
+// transport takes as long to clear a doorway as it physically takes. A shader clock could only
+// produce a door that opens on a schedule, which is what the brief rules out.
+
+const TUNNEL_VERT_DECL = /* glsl */`
+attribute vec4 iTun;         // (quad width m, quad height m, opening width m, opening height m)
+attribute vec2 iDoor;        // (openness 0..1, seed)
+attribute vec3 iGlow;        // the rim / lamp tint, linear
+varying vec4 vTun;
+varying vec2 vDoor;
+varying vec3 vGlow;
+varying vec2 vLocal;
+varying vec3 vTanW;
+varying vec3 vNorW;
+`;
+
+// The tangent frame comes off the instance matrix exactly as the shopfront's does: the quad is
+// only ever yawed about Y, so local +X is the across-the-face axis and local +Z is the outward
+// normal — which for a portal is the axis the vehicle drives down.
+const TUNNEL_VERT_BODY = /* glsl */`
+#include <begin_vertex>
+  vTun = iTun; vDoor = iDoor; vGlow = iGlow; vLocal = uv;
+  vTanW = normalize( instanceMatrix[0].xyz );
+  vNorW = normalize( instanceMatrix[2].xyz );
+`;
+
+const TUNNEL_FRAG_DECL = /* glsl */`
+varying vec4 vTun;
+varying vec2 vDoor;
+varying vec3 vGlow;
+varying vec2 vLocal;
+varying vec3 vTanW;
+varying vec3 vNorW;
+uniform vec4 uTunnel;
+uniform float uDoorForce;
+uniform float uNeon;
+
+float tunHash( float a, float b ) { return fract( sin( a * 12.9898 + b * 78.233 ) * 43758.5453 ); }
+`;
+
+const TUNNEL_FRAG_BODY = /* glsl */`
+  float qw = vTun.x, qh = vTun.y, ow = vTun.z, oh = vTun.w;
+  float mx = ( vLocal.x - 0.5 ) * qw;     // metres across the face, 0 on the vehicle's own line
+  float gy = vLocal.y * qh;               // metres up from the deck
+  float sSeed = vDoor.y;
+  float open = mix( vDoor.x, uDoorForce, step( 0.0, uDoorForce ) );
+
+  float px = fwidth( mx );
+  vec3 col;
+
+  // ── the surround ────────────────────────────────────────────────────────
+  // Poured concrete, a lit reveal hugging the bore, and a hazard band on the lintel. The reveal
+  // is what stops the opening reading as a black decal glued to a wall: an edge that is LIT is an
+  // edge with a thickness.
+  float dIn = max( max( abs( mx ) - ow * 0.5, gy - oh ), -1.0 );   // >0 outside the bore
+  {
+    float grime = 0.5 + 0.5 * sin( gy * 2.1 + sSeed );
+    // Cast concrete, a shade under the facade it is set into. It must not out-read the building:
+    // the only NEW thing on this wall is meant to be the hole.
+    vec3 conc = vec3( 0.062, 0.056, 0.054 ) * ( 0.78 + 0.26 * grime );
+    // The reveal is a LINE, not the whole jamb. Lighting the full 0.35 m returns a fluorescent
+    // rectangle sitting on the wall, which is precisely the "every light source is a sticker"
+    // note six critics keep giving this project.
+    float rim = 1.0 - smoothstep( 0.0, 0.09 + px, dIn );
+    float band = 1.0 - smoothstep( 0.07, 0.19, abs( gy - ( oh + 0.42 ) ) );
+    float chev = step( 0.5, fract( ( mx * 1.6 + gy * 1.1 ) / 0.9 ) );
+    col = conc + vGlow * ( rim * 0.20 + band * ( 0.030 + 0.075 * chev ) );
+  }
+
+  if ( dIn <= 0.0 ) {
+    // ── the bore ─────────────────────────────────────────────────────────
+    vec3 V = normalize( vWorldPosition - cameraPosition );
+    float dz = -dot( V, vNorW );
+    float k = 1.0 / max( dz, 0.08 );
+    float rx = dot( V, vTanW ) * k;        // metres across per metre of depth
+    float ry = V.y * k;
+
+    float bx = rx > 0.0 ? ( ow * 0.5 - mx ) / rx : ( rx < 0.0 ? ( -ow * 0.5 - mx ) / rx : 1e4 );
+    float by = ry > 0.0 ? ( oh - gy ) / ry : ( ry < 0.0 ? -gy / ry : 1e4 );
+    float tHit = clamp( min( bx, by ), 0.0, 46.0 );
+    float onDeck = step( by, bx ) * step( ry, 0.0 );      // the ray went down and hit the road
+
+    // Depth. Everything in the bore is under 0.06 and falls off hard — the tunnel must read as a
+    // hole in a lit wall, not as a grey panel.
+    float fall = exp( -tHit * 0.175 );
+    vec3 bore = vec3( 0.0075, 0.0075, 0.0095 ) * fall;
+    // The deck keeps a trace of the street's own sodium, which is what makes the floor legible.
+    bore += vec3( 0.017, 0.012, 0.008 ) * onDeck * fall;
+    // Lamp rings every 7 m. fwidth(tHit) dissolves them into their mean once they are closer
+    // together than a pixel, the same discipline the window grid and the shop slats keep.
+    float ring = 1.0 - smoothstep( 0.10, 0.34 + fwidth( tHit ) * 0.5, abs( fract( tHit / 7.0 + 0.5 ) - 0.5 ) * 7.0 );
+    bore += vGlow * ring * fall * 0.105 * ( 1.0 - onDeck );
+    // Two guide lines down the deck, at the kerbs of the bore.
+    float guide = ( 1.0 - smoothstep( 0.05, 0.16, abs( abs( mx + rx * tHit ) - ow * 0.42 ) ) ) * onDeck;
+    bore += vGlow * guide * fall * 0.055;
+
+    // ── the leaves ───────────────────────────────────────────────────────
+    // Two panels meeting on the vehicle's line, retracting into the jamb. open is metres of
+    // travel expressed as a fraction of the half-opening, so the leading edge IS the animation.
+    float lead = open * ow * 0.5;
+    float onDoor = step( lead, abs( mx ) );
+    if ( onDoor > 0.5 ) {
+      float rib = 0.5 + 0.5 * cos( mx * 6.28318 / 0.42 );
+      float ribV = 1.0 - smoothstep( 0.22, 0.55, px / 0.42 );
+      // Darker at the head than at the sill: a shutter is lit by the street it faces, and a slab
+      // of one value is the flat-panel read a critic calls a decal.
+      vec3 leaf = vec3( 0.040, 0.042, 0.049 ) * mix( 1.0, 0.70 + 0.55 * rib, ribV )
+                * ( 1.20 - 0.55 * clamp( gy / oh, 0.0, 1.0 ) );
+      // a lit rail across the leaf, and the hazard flash on the leading edge
+      leaf += vGlow * 0.11 * ( 1.0 - smoothstep( 0.05, 0.13, abs( gy - oh * 0.62 ) ) );
+      float edge = 1.0 - smoothstep( 0.03, 0.10 + px, abs( abs( mx ) - lead ) );
+      leaf += vGlow * edge * ( 0.20 + 0.22 * step( 0.02, open ) );
+      // the gap the two leaves leave when shut, so a closed door still has a seam
+      leaf *= mix( 1.0, 0.45, 1.0 - smoothstep( 0.0, 0.05 + px, abs( mx ) - lead ) );
+      col = leaf;
+    } else {
+      col = bore;
+    }
+    // The threshold: a lit sill across the whole opening, in front of both leaves.
+    col += vGlow * 0.085 * ( 1.0 - smoothstep( 0.04, 0.14, gy ) );
+  }
+
+  diffuseColor.rgb = col * uNeon * uTunnel.x;
+`;
+
+export function patchTunnel(mat) {
+  mat.extensions = Object.assign({ derivatives: true }, mat.extensions);
+  return addPatch(mat, 'tunnel', shader => {
+    shader.uniforms.uTunnel = U.uTunnel;
+    shader.uniforms.uDoorForce = U.uDoorForce;
+    shader.uniforms.uNeon = U.uNeon;
+    shader.vertexShader = patch(shader.vertexShader, '#include <common>',
+      '#include <common>' + TUNNEL_VERT_DECL, 'tunnel/vert-decl');
+    shader.vertexShader = patch(shader.vertexShader, '#include <begin_vertex>',
+      TUNNEL_VERT_BODY, 'tunnel/vert-body');
+    shader.fragmentShader = patch(shader.fragmentShader, '#include <common>',
+      '#include <common>' + TUNNEL_FRAG_DECL, 'tunnel/frag-decl');
+    shader.fragmentShader = patch(shader.fragmentShader, '#include <map_fragment>',
+      TUNNEL_FRAG_BODY, 'tunnel/frag-body');
+  });
+}
+
+// Opaque, unlit, front faces only, DEPTH-WRITING — and the depth write is the point, not an
+// incidental. The portal panel is what OCCLUDES a transport that has driven past it: the bore is
+// painted, not modelled, so without a depth write you would see a bus through the back of the
+// tunnel it just entered.
+export function tunnelMaterial(noiseTex) {
+  const m = new THREE.MeshBasicMaterial({
+    color: 0xffffff, side: THREE.FrontSide, fog: true, toneMapped: false,
+  });
+  patchTunnel(m);
   patchFog(m, 'opaque');
   if (noiseTex) patchFade(m, true, noiseTex);
   return m;
