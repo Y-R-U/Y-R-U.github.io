@@ -1169,6 +1169,19 @@ vec3 shopRoom( vec2 g, vec2 d, float W, float H, float seed, float kind, vec3 la
     float hB = shopHash( seed + fi * 3.7, 11.0 );
     float hC = shopHash( seed + fi, 21.0 );
     float there = step( 0.36, hA );
+    // WHICH WAY THEY ARE STANDING. Every figure used to face the glass, because the cloak is
+    // symmetric and the band was always centred — so a room full of people all stared out at the
+    // street. Aaron: *"every single person is facing outward in a store. even people who would be
+    // facing the other way."* Most of a shop's occupants are turned to the counter or to each
+    // other, so FRONT is now the minority: ~32 % away, ~38 % in profile, ~30 % facing out.
+    //
+    // The visor is what carries it. A cloak from behind and a cloak from the front are the same
+    // garment; it is the band that says which way the head is pointed, so the facing is expressed
+    // almost entirely in where that band is and whether it is visible at all.
+    float fc = fract( hB * 7.3 );
+    float away = 1.0 - step( 0.32, fc );                  // turned to the counter — no band
+    float prof = step( 0.32, fc ) * ( 1.0 - step( 0.70, fc ) );
+    float side = sign( fract( hC * 5.1 ) - 0.5 );         // which shoulder the profile turns over
     vec2 pf = g + d * ( 3.0 - fi * 0.42 );
     float px = ( 0.14 + 0.72 * hB ) * W;
     float ph = 1.52 + 0.26 * hC;
@@ -1197,6 +1210,9 @@ vec3 shopRoom( vec2 g, vec2 d, float W, float H, float seed, float kind, vec3 la
             * ( 1.0 - 0.44 * smoothstep( 0.74, 0.845, u ) )
             * sqrt( clamp( 1.0 - dt * dt, 0.0, 1.0 ) )
             + 0.015 * sw * ( 1.0 - smoothstep( 0.60, 0.80, u ) );
+    // Shoulders read narrower turned side-on. Only the profile narrows: a cloak seen from behind
+    // is as wide as one seen from the front.
+    w *= mix( 1.0, 0.80, prof );
     float ax = abs( q.x );
     float cover = smoothstep( w + 0.026, w - 0.026, ax ) * step( u, 1.0 )
                 * smoothstep( 0.030 * sw - 0.028, 0.030 * sw + 0.024, q.y );
@@ -1216,7 +1232,10 @@ vec3 shopRoom( vec2 g, vec2 d, float W, float H, float seed, float kind, vec3 la
     // is one lozenge, not a cup and an arm: a disc on its own reads as a dot beside the cloak.
     float ct = smoothstep( 0.2, 0.8, 0.5 - 0.5 * osc.z );
     vec2 cq = q - vec2( mix( 0.265, 0.185, ct ), ph * mix( 0.50, 0.855, ct ) );
-    float cup = smoothstep( 0.062, 0.028, length( cq * vec2( 0.80, 1.0 ) ) ) * step( 0.70, act );
+    // Turned away the arm is on the far side of the body, so there is nothing to see; in profile it
+    // comes up on the shoulder they are turned over.
+    float cup = smoothstep( 0.062, 0.028, length( cq * vec2( 0.80, 1.0 ) ) ) * step( 0.70, act )
+              * ( 1.0 - away );
     cover = max( cover, cup );
     // It has to break the OUTLINE to read at all — sleeve-toned and half outside the cloak, with
     // the cup end lit. Tucked inside and bright it is a patch on the garment, not an arm.
@@ -1230,8 +1249,22 @@ vec3 shopRoom( vec2 g, vec2 d, float W, float H, float seed, float kind, vec3 la
     vec3 eyeC = mix( vec3( 0.05, 0.79, 1.00 ), vec3( 1.00, 0.06, 0.36 ), step( 0.42, eh ) );
     eyeC = mix( eyeC, vec3( 1.00, 0.44, 0.07 ), step( 0.80, eh ) );
     float ey = abs( q.y - ph * 0.885 );
-    float band = smoothstep( 0.078, 0.056, ax ) * smoothstep( 0.021, 0.013, ey );
-    fig += eyeC * ( 1.5 * band + 0.30 * smoothstep( 0.130, 0.060, ax ) * smoothstep( 0.055, 0.016, ey ) )
+    // Centred and full width facing out; a short stub carried over one shoulder in profile; gone
+    // entirely turned away. bx is signed off the band's own centre rather than off the figure's,
+    // which is the whole of the profile shift.
+    float bOff = prof * side * 0.052;
+    float bHalf = mix( 0.078, 0.030, prof );
+    float bx = abs( q.x - bOff );
+    float band = smoothstep( bHalf, bHalf - 0.022, bx ) * smoothstep( 0.021, 0.013, ey ) * ( 1.0 - away );
+    // Turned away there is no visor to see, and the first attempt at implying one was worse than
+    // nothing: a term symmetric in abs(x) draws TWO lobes, which read as a pair of eyes staring
+    // straight out — the exact opposite of the facing it was meant to express. So what is left is
+    // a single soft spill over the crown, no structure and no lobes: enough that something is lit
+    // inside the hood, not enough to be a face.
+    float rim = away * smoothstep( 0.855, 1.0, u ) * smoothstep( w + 0.01, w * 0.55, ax );
+    fig += eyeC * ( 1.5 * band
+                  + 0.30 * smoothstep( bHalf + 0.052, bHalf - 0.018, bx ) * smoothstep( 0.055, 0.016, ey ) * ( 1.0 - away )
+                  + 0.13 * rim )
          + vec3( 0.06 ) * band;
 
     // Only the first figure is behind the counter, so only it is cut off by the counter top.
