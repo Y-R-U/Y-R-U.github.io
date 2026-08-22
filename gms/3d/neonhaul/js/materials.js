@@ -1128,7 +1128,6 @@ vec3 shopRoom( vec2 g, vec2 d, float W, float H, float seed, float kind, vec3 la
   // pass did exactly that and every shop in the city was one flat hue from floor to ceiling.
   const vec3 WALL  = vec3( 0.44, 0.42, 0.40 );
   const vec3 FLOOR = vec3( 0.26, 0.25, 0.25 );
-  const vec3 DARK  = vec3( 0.05, 0.05, 0.055 );
 
   // ── plane 3: the back wall, 5.2 m in ───────────────────────────────────
   vec2 p = g + d * 5.2;
@@ -1154,16 +1153,82 @@ vec3 shopRoom( vec2 g, vec2 d, float W, float H, float seed, float kind, vec3 la
   c = mix( c, alb * lamp * 0.16, counter );
   // the counter top catches the light above it — the line that says "this is furniture"
   c += lamp * 0.34 * shopBox( p, vec2( -0.7, 0.92 ), vec2( W + 0.7, 1.00 ), 0.02 );
-  // Three seeded stations. A lit room with nobody in it is a diorama, and these are the single
-  // strongest read in the feature — so they are body-width, head-height, and they have a head.
+  // Three seeded stations, drawn far to near so painter's order IS depth order. The first stands
+  // behind the counter and only its hood clears the top; the other two are on the customer side,
+  // which is the only way a whole cloak reads.
   for ( int i = 0; i < 3; i++ ) {
     float fi = float( i );
-    float there = step( 0.36, shopHash( seed + fi * 1.9, 5.0 ) );
-    float px = ( 0.14 + 0.72 * shopHash( seed + fi * 3.7, 11.0 ) ) * W;
-    float ph = 1.46 + 0.30 * shopHash( seed + fi, 21.0 );
-    float body = shopBox( p, vec2( px - 0.30, 0.0 ), vec2( px + 0.30, ph - 0.30 ), 0.05 );
-    float head = smoothstep( 0.20, 0.13, length( vec2( p.x - px, ( p.y - ph + 0.14 ) * 1.15 ) ) );
-    c = mix( c, DARK * lamp, max( body, head ) * there );
+    float hA = shopHash( seed + fi * 1.9, 5.0 );
+    float hB = shopHash( seed + fi * 3.7, 11.0 );
+    float hC = shopHash( seed + fi, 21.0 );
+    float there = step( 0.36, hA );
+    vec2 pf = g + d * ( 3.0 - fi * 0.42 );
+    float px = ( 0.14 + 0.72 * hB ) * W;
+    float ph = 1.52 + 0.26 * hC;
+
+    // Idle, not activity: a shopfront is glimpsed at flying speed, so the whole of the motion is a
+    // 7 cm lean, a 2.6 cm bob and a cup. One vec3 sin because the per-figure transcendental is the
+    // expensive part here; the third term is a quarter turn out, so it is the cup's cosine.
+    float t = uTime * 0.6 + hA * 24.0 + fi * 2.1;
+    float act = fract( hA * 6.19 );
+    vec3 osc = sin( vec3( t * 0.31, t * 1.15, t * 0.24 + 1.5708 ) );
+    float upper = smoothstep( 0.10, 0.92, pf.y / ph );
+    vec2 q = pf - vec2( px + 0.070 * osc.x * step( act, 0.62 ) * upper,
+                              0.026 * osc.y * step( 0.30, act ) * upper );
+    float u = q.y / ph;
+
+    // One garment, hem to hood: a flare that tapers past the shoulders and closes over the head,
+    // so there is no neck to give the join away. sw shades the folds AND waves the hem, which is
+    // what stops the hem reading as the bottom of a cone.
+    float sw = sin( q.x * ( 11.0 + 15.0 * ( 1.0 - u ) ) + hC * 6.0 );
+    float flare = 1.0 - smoothstep( 0.0, 0.60, u );
+    // the shoulder bump is what stops the taper reading as a traffic cone, and the dome is what
+    // stops the hood reading as a point
+    float shoulder = smoothstep( 0.52, 0.71, u ) * ( 1.0 - smoothstep( 0.71, 0.81, u ) );
+    float dt = max( u - 0.885, 0.0 ) / 0.115;
+    float w = ( 0.242 + 0.120 * flare * flare + 0.046 * shoulder )
+            * ( 1.0 - 0.44 * smoothstep( 0.74, 0.845, u ) )
+            * sqrt( clamp( 1.0 - dt * dt, 0.0, 1.0 ) )
+            + 0.015 * sw * ( 1.0 - smoothstep( 0.60, 0.80, u ) );
+    float ax = abs( q.x );
+    float cover = smoothstep( w + 0.026, w - 0.026, ax ) * step( u, 1.0 )
+                * smoothstep( 0.030 * sw - 0.028, 0.030 * sw + 0.024, q.y );
+
+    // Cloth, not a hole punched in the room. The near-black fill this replaced is exactly why the
+    // figures read as 2D cut-outs: a real albedo under the room's own lamp, hem darker than the
+    // shoulders, and a lit outline where the cove light above catches the edge of the drape.
+    vec3 cloth = mix( vec3( 0.34, 0.34, 0.38 ), vec3( 0.40, 0.32, 0.26 ), fract( hC * 3.3 ) );
+    // Standing at the window, a figure catches the cold street as well as the room. Without that
+    // the cloth comes out the lamp's own hue and disappears into the wall behind it.
+    vec3 fig = cloth * mix( lamp, vec3( 0.40, 0.45, 0.58 ), 0.20 )
+             * ( 0.30 + 0.46 * smoothstep( 0.02, 0.86, u ) ) * ( 0.80 + 0.26 * sw )
+             + lamp * ( 0.22 * smoothstep( w * 0.45, w * 0.99, ax ) * smoothstep( 0.30, 0.95, u )
+                        + 0.13 * smoothstep( 0.86, 1.00, u ) );
+
+    // One in three raises a cup to the hood and lowers it again, arcing inward as it goes up. It
+    // is one lozenge, not a cup and an arm: a disc on its own reads as a dot beside the cloak.
+    float ct = smoothstep( 0.2, 0.8, 0.5 - 0.5 * osc.z );
+    vec2 cq = q - vec2( mix( 0.265, 0.185, ct ), ph * mix( 0.50, 0.855, ct ) );
+    float cup = smoothstep( 0.062, 0.028, length( cq * vec2( 0.80, 1.0 ) ) ) * step( 0.70, act );
+    cover = max( cover, cup );
+    // It has to break the OUTLINE to read at all — sleeve-toned and half outside the cloak, with
+    // the cup end lit. Tucked inside and bright it is a patch on the garment, not an arm.
+    fig = mix( fig, cloth * lamp * 0.95
+                  + lamp * 0.30 * smoothstep( 0.01, 0.07, cq.x * mix( 1.0, -1.0, ct ) ), cup );
+
+    // The eye band. Emissive, so it does not take the room's colour, and it is THE read at
+    // distance — everything above is what the band is worn by. Colours are the shop signage
+    // palette (js/shops.js), not a fourth one nobody else in the city uses.
+    float eh = fract( hB * 4.7 );
+    vec3 eyeC = mix( vec3( 0.05, 0.79, 1.00 ), vec3( 1.00, 0.06, 0.36 ), step( 0.42, eh ) );
+    eyeC = mix( eyeC, vec3( 1.00, 0.44, 0.07 ), step( 0.80, eh ) );
+    float ey = abs( q.y - ph * 0.885 );
+    float band = smoothstep( 0.078, 0.056, ax ) * smoothstep( 0.021, 0.013, ey );
+    fig += eyeC * ( 1.5 * band + 0.30 * smoothstep( 0.130, 0.060, ax ) * smoothstep( 0.055, 0.016, ey ) )
+         + vec3( 0.06 ) * band;
+
+    // Only the first figure is behind the counter, so only it is cut off by the counter top.
+    c = mix( c, fig, cover * there * mix( smoothstep( 0.96, 1.06, pf.y ), 1.0, step( 0.5, fi ) ) );
   }
 
   // ── plane 1: what hangs near the glass, 1.1 m in ───────────────────────

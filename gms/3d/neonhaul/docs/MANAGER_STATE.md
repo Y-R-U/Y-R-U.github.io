@@ -1022,8 +1022,20 @@ cd ~/cc/yru/gms/3d/aaa_refs/cyber      && python3 -m http.server 8231 --bind 127
 
 ## Aaron's preferences established this run
 
-- **No people in the 3D world.** Docking-panel client portraits only; distant cloth silhouettes the
-  one optional exception. Audio carries the populated feel.
+- **People in the 3D world: SUPERSEDED as of pass 2-M (2026-08-23).** The old rule was "none at
+  all — docking-panel portraits only, distant cloth silhouettes the one optional exception, audio
+  carries the populated feel". Aaron then played the shipped build and asked for the opposite
+  inside the shopfronts: *"People in the shops are too clearly 2d black silhouettes. Maybe make
+  cute simple cloth people (people wearing from top to bottom a cloak). Eyes have a colour band,
+  futuristic look. Have simple movements for the people. E.g taking a drink/ talking etc."*
+  So: **figures ARE wanted where the player is close enough to read them**, as cloaked shapes with
+  a lit eye band, and the "no people" rule now means no walking crowds on the street and no rigs —
+  not no depiction. Do not "correct" the shop figures back to silhouettes.
+  Note also that `js/silhouettes.js` carries an explicit kill criterion in its own header ("if a
+  critic round calls them flat, cardboard or sprites, DELETE THIS FILE"). Aaron's wording is that
+  criterion firing — but it fired at the SHOPFRONT figures in `materials.js`'s `SHOP_ROOM`, which
+  are a different feature that happened to have the same defect. The rooftop silhouettes were not
+  what he was looking at.
 - **Signage:** mostly English + abstract; a small set of real Japanese only because it is cheap.
 - **Flying high must be possible, but most play is low** — gate the aerial treatment on altitude so
   the common path costs nothing. Done in P3b's fog shader, verified at exactly 0.0 cost below 340 m.

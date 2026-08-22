@@ -12,6 +12,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { open, parseArgs, waitFor, settle, evalJSON, hook, quiesce } from './shot.mjs';
+import { SCRIPT, beatHold } from '../js/storyui.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = parseArgs();
@@ -20,6 +21,22 @@ const W = +(args.w || (LAND ? 844 : 390)), H = +(args.h || (LAND ? 390 : 844));
 const TAG = LAND ? 'land' : 'port';
 const ONLY = args.only || null;
 const OUT = resolve(ROOT, 'shots/s2e');
+
+// The beat clock, DERIVED rather than eyeballed — and derived from storyui.js itself rather than
+// copied out of it. These offsets were hand-written numbers until S2-M, when the Boss's audio was
+// replaced with a slower take and every beat in the scene moved: `intro_cut` had been aimed at the
+// interjection and was landing 5 s past it, so the capture pass was quietly photographing the
+// wrong moments and reporting success. Nothing that reads the table can drift from it.
+//
+// `beatHold(row, null)` is the WRITTEN fallback, which is what a capture run gets — `introStep`
+// drives the scene without waiting for audio to decode. It is the same number the game uses when
+// a clip has not arrived yet.
+const PULLOUT = 3.4;                                   // the camera move before he speaks
+const holds = SCRIPT.map(r => beatHold(r, null));
+const cum = holds.reduce((a, h) => (a.push((a[a.length - 1] || 0) + h), a), []);
+const iCut = SCRIPT.findIndex(r => r.cut);
+const CUT = PULLOUT + cum[iCut - 1] + 1.4;             // 1.4 s into the first interjection
+const BOSS_END = PULLOUT + cum[cum.length - 1];
 
 async function shot(S, name) {
   const { data } = await S('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
@@ -57,18 +74,18 @@ if (!ONLY || ONLY === 'intro') {
   await hook(S, 'introStep', 1.7);          // mid pull-out
   await settle(S, 4);
   await shot(S, 'intro_pullout');
-  await hook(S, 'introStep', 2.2);          // 3.9 — the Boss's first line
+  await hook(S, 'introStep', PULLOUT - 1.7 + 0.5);
   await settle(S, 4);
   await shot(S, 'intro_boss');
-  // 17.0 total = 13.6 into the Boss = 1.4 s after "But—" started and 0.4 s after he cut it off.
-  // Both boxes are up; his is the one still going.
-  await hook(S, 'introStep', 13.1);
+  // 1.4 s after "But—" goes up, which is while the Boss is talking over it. Both boxes are up and
+  // his is the one still going — that overlap IS the scene, and a capture that misses it is a
+  // screenshot of the thing this cutscene exists to show, taken just after it stopped.
+  await hook(S, 'introStep', CUT - (PULLOUT + 0.5));
   await settle(S, 4);
   await shot(S, 'intro_cut');
-  // The script's holds sum to 33.4 s, but `introStep` advances in 0.5 s chunks and DISCARDS the
-  // overshoot at every beat boundary, so ten beats can cost up to 5 s more than the sum. 37.5 landed
-  // on the Boss's last line rather than on the crew leaving; 27 more gets clear of the worst case.
-  await hook(S, 'introStep', 27.0);         // the crew breaking formation
+  // `introStep` advances in 0.5 s chunks and DISCARDS the overshoot at every beat boundary, so ten
+  // beats can cost up to 5 s more than the sum — hence the margin rather than the exact figure.
+  await hook(S, 'introStep', (BOSS_END + 2.6) - CUT + 6);
   await settle(S, 4);
   await shot(S, 'intro_leave');
   await hook(S, 'introStep', 6.0);          // the closing monologue
