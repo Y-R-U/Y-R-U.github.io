@@ -1186,15 +1186,32 @@ vec3 shopRoom( vec2 g, vec2 d, float W, float H, float seed, float kind, vec3 la
     float px = ( 0.14 + 0.72 * hB ) * W;
     float ph = 1.52 + 0.26 * hC;
 
-    // Idle, not activity: a shopfront is glimpsed at flying speed, so the whole of the motion is a
-    // 7 cm lean, a 2.6 cm bob and a cup. One vec3 sin because the per-figure transcendental is the
-    // expensive part here; the third term is a quarter turn out, so it is the cup's cosine.
+    // STILL MOST OF THE TIME, then a few seconds of something. The first version ran every figure
+    // as a permanent sinusoid — a 33.8 s lean, a 9.1 s bob and a 43.6 s cup, all continuous — so
+    // nobody in the city was ever motionless. Aaron: *"small movements occasionally, it shouldn't
+    // be too frequent."* The envelope is ~5 s of activity in every 30, phase-staggered per figure
+    // off its own hash, so across the shops in frame two or three people are doing something and
+    // the rest are standing there.
+    //
+    // idle is the floor and it is not zero on purpose: a figure pinned to exactly one position
+    // reads as a prop rather than as a person holding still. 16 % of 7 cm is about a centimetre.
     float t = uTime * 0.6 + hA * 24.0 + fi * 2.1;
     float act = fract( hA * 6.19 );
     vec3 osc = sin( vec3( t * 0.31, t * 1.15, t * 0.24 + 1.5708 ) );
+    float cyc = fract( t * 0.0556 + hC );
+    float env = smoothstep( 0.0, 0.03, cyc ) * ( 1.0 - smoothstep( 0.14, 0.17, cyc ) );
+    float m = 0.16 + 0.84 * env;
+    // Three things a person in a shop does: shift their weight, talk, or drink. Talking is the new
+    // one and it is the commonest, which is what a bar looks like.
+    float talk = step( 0.30, act ) * ( 1.0 - step( 0.70, act ) );
+    float drink = step( 0.70, act );
+    // Speech cadence, and it only exists while they are actually talking — a nod at 0.7 Hz on a
+    // silent figure is a twitch.
+    float tk = 0.5 + 0.5 * sin( t * 4.4 );
     float upper = smoothstep( 0.10, 0.92, pf.y / ph );
-    vec2 q = pf - vec2( px + 0.070 * osc.x * step( act, 0.62 ) * upper,
-                              0.026 * osc.y * step( 0.30, act ) * upper );
+    vec2 q = pf - vec2( px + 0.070 * osc.x * step( act, 0.62 ) * upper * m,
+                              ( 0.026 * osc.y * step( 0.30, act )
+                              + 0.019 * ( tk - 0.5 ) * talk * env ) * upper * m );
     float u = q.y / ph;
 
     // One garment, hem to hood: a flare that tapers past the shoulders and closes over the head,
@@ -1231,11 +1248,14 @@ vec3 shopRoom( vec2 g, vec2 d, float W, float H, float seed, float kind, vec3 la
     // One in three raises a cup to the hood and lowers it again, arcing inward as it goes up. It
     // is one lozenge, not a cup and an arm: a disc on its own reads as a dot beside the cloak.
     float ct = smoothstep( 0.2, 0.8, 0.5 - 0.5 * osc.z );
-    vec2 cq = q - vec2( mix( 0.265, 0.185, ct ), ph * mix( 0.50, 0.855, ct ) );
-    // Turned away the arm is on the far side of the body, so there is nothing to see; in profile it
-    // comes up on the shoulder they are turned over.
-    float cup = smoothstep( 0.062, 0.028, length( cq * vec2( 0.80, 1.0 ) ) ) * step( 0.70, act )
-              * ( 1.0 - away );
+    // ONE lozenge, two jobs, because the arm is the same arm: a drinker's arcs slowly up to the
+    // hood and back, a talker's makes small quick moves at chest height. Selecting the PATH rather
+    // than adding a second shape keeps this at one length() per figure.
+    vec2 cq = q - mix( vec2( 0.232 + 0.048 * tk, ph * ( 0.44 + 0.09 * tk ) ),
+                       vec2( mix( 0.265, 0.185, ct ), ph * mix( 0.50, 0.855, ct ) ), drink );
+    // Turned away the arm is on the far side of the body, so there is nothing to see.
+    float cup = smoothstep( 0.062, 0.028, length( cq * vec2( 0.80, 1.0 ) ) )
+              * max( drink, talk ) * env * ( 1.0 - away );
     cover = max( cover, cup );
     // It has to break the OUTLINE to read at all — sleeve-toned and half outside the cloak, with
     // the cup end lit. Tucked inside and bright it is a patch on the garment, not an arm.
