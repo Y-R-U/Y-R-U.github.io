@@ -586,6 +586,86 @@ async function main() {
     await settle(S, 10);
     await shoot(S, LOW ? 'board_closeup_low' : 'board_closeup');
   }
+  // ── no geometry in the scene is INSIDE OUT ────────────────────────────────
+  // S2-M found `Mesher.prism()` emitting its side quads clockwise-from-outside while writing an
+  // outward radial normal, so every one of a drum's thirty wall quads had a face normal that was
+  // the exact negative of the normal it carried — three culled the near wall and lit the far
+  // wall's interior. It shipped that way from P2. The caps were right, so a drum still looked like
+  // a drum, and no pixel gate on this project has a reference to compare against; the same defect
+  // in the CRAFT hull is what made anyone look.
+  //
+  // This costs no render: it is arithmetic over the buffers the scene already holds. That is the
+  // point — a check this cheap should have existed from the first mesher.
+  {
+    const PROBE = `(() => {
+      const seen = new Set(), out = [];
+      const scan = (g, name, o) => {
+        if (!g || seen.has(g.uuid)) return; seen.add(g.uuid);
+        const pa = g.attributes && g.attributes.position, na = g.attributes && g.attributes.normal;
+        if (!pa || !na) return;
+        const idx = g.index ? g.index.array : null, P = pa.array, N = na.array;
+        const tris = idx ? idx.length / 3 : P.length / 9;
+        if (tris > 60000) return;
+        let agree = 0, disagree = 0, degen = 0;
+        for (let t = 0; t < tris; t++) {
+          const a = idx ? idx[t*3] : t*3, b = idx ? idx[t*3+1] : t*3+1, c = idx ? idx[t*3+2] : t*3+2;
+          const ux=P[b*3]-P[a*3], uy=P[b*3+1]-P[a*3+1], uz=P[b*3+2]-P[a*3+2];
+          const vx=P[c*3]-P[a*3], vy=P[c*3+1]-P[a*3+1], vz=P[c*3+2]-P[a*3+2];
+          const fx=uy*vz-uz*vy, fy=uz*vx-ux*vz, fz=ux*vy-uy*vx;
+          if (Math.hypot(fx,fy,fz) < 1e-12) { degen++; continue; }
+          const nx=N[a*3]+N[b*3]+N[c*3], ny=N[a*3+1]+N[b*3+1]+N[c*3+1], nz=N[a*3+2]+N[b*3+2]+N[c*3+2];
+          if (Math.hypot(nx,ny,nz) < 1e-6) { degen++; continue; }
+          (fx*nx+fy*ny+fz*nz > 0 ? agree++ : disagree++);
+        }
+        // An UNLIT material never reads a normal, so a disagreement there is not a defect. Every
+        // lit surface in this scene is Standard; Basic is the signage/streak/cone family.
+        const lit = !!(o.material && /Standard|Physical|Lambert|Phong/.test(o.material.type));
+        out.push({ name, tris, agree, disagree, degen, lit, vis: !!o.visible });
+      };
+      const walk = o => { if (o.geometry) scan(o.geometry, o.name || o.type, o); (o.children||[]).forEach(walk); };
+      walk(window.__game.scene || {});
+      return out;
+    })()`;
+    const rows = await evalJSON(S, PROBE);
+    const bad = (rows || []).filter(r => r.disagree > 0 && r.lit && r.vis);
+    const inert = (rows || []).filter(r => r.disagree > 0 && !(r.lit && r.vis));
+    check('no lit geometry is wound against its own normals', (rows || []).length > 0 && bad.length === 0,
+      `${(rows || []).length} geometries swept, ${(rows || []).reduce((a, r) => a + r.tris, 0)} triangles\n`
+      + `      ${bad.length} LIT AND VISIBLE with a disagreement`
+      + (bad.length ? ': ' + bad.map(r => `${r.name} ${r.disagree}/${r.tris}`).join(' · ') : '')
+      + `\n      ${inert.length} disagreeing but unlit or hidden, which reads no normal and is not a defect`
+      + (inert.length ? ': ' + inert.map(r => `${r.name} ${r.disagree}/${r.tris}`).join(' · ') : ''));
+
+    // FALSIFY: reverse the winding of one real geometry in place and confirm the sweep sees it.
+    // Not a synthetic buffer — the arithmetic has to bite on the scene as it actually is.
+    const flip = await evalJSON(S, `(() => {
+      const seen = new Set();
+      let hit = null;
+      const walk = o => {
+        if (hit) return;
+        const g = o.geometry;
+        if (g && !seen.has(g.uuid) && g.index && o.visible
+            && o.material && /Standard|Physical/.test(o.material.type) && g.index.count >= 300) {
+          seen.add(g.uuid);
+          const a = g.index.array;
+          for (let t = 0; t < a.length; t += 3) { const q = a[t + 1]; a[t + 1] = a[t + 2]; a[t + 2] = q; }
+          g.index.needsUpdate = true;
+          hit = { name: o.name || o.type, tris: a.length / 3 };
+        }
+        (o.children || []).forEach(walk);
+      };
+      walk(window.__game.scene || {});
+      return hit;
+    })()`);
+    const after = await evalJSON(S, PROBE);
+    const caught = (after || []).filter(r => r.disagree > 0 && r.lit && r.vis);
+    check('FALSIFY — one real geometry reversed in place is caught', !!flip && caught.length > 0,
+      flip ? `reversed all ${flip.tris} triangles of "${flip.name}" in the live scene: `
+        + `${caught.length} geometry now reports a disagreement `
+        + `(${caught.map(r => `${r.disagree}/${r.tris}`).join(' ')}) — so the zero above is a result`
+      : 'found no indexed lit geometry to reverse, so this control did NOT run and the check above is unproven');
+  }
+
   check('visual record captured', true,
     `shots/p3a/: street, midrise, above, canyon, dense, board_closeup, canyon_mips|nomips`
     + (board ? `\n      close-up is a ${board.kind} at ${board.w.toFixed(1)} x ${board.h.toFixed(1)} m, `

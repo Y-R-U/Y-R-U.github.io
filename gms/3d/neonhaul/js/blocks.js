@@ -75,7 +75,13 @@ class Mesher {
       const u0 = (i / sides) * Math.PI, u1 = ((i + 1) / sides) * Math.PI;
       const put = (x, y, z, u) => { this.p.push(x, y, z); this.n.push(mx / L, 0, mz / L); this.uv.push(u, y); this.f.push(0); };
       put(x0, y0, z0, u0); put(x1, y0, z1, u1); put(x1, y1, z1, u1); put(x0, y1, z0, u0);
-      this.i.push(base, base + 1, base + 2, base, base + 2, base + 3);
+      // WOUND THE OTHER WAY, and it shipped inverted from P2 until S2-M. `put` writes an outward
+      // radial normal, but this order emits the corners clockwise seen from outside, so every side
+      // quad's face normal was the exact negative of the normal it carried: three culled the near
+      // wall and drew the far wall's interior. The caps were always right — their winding and their
+      // +y normal agree — which is why a drum looked like a drum and nobody looked twice.
+      // gates_p5's inside-out check is what found it, in the craft hull, in the same shape.
+      this.i.push(base, base + 2, base + 1, base, base + 3, base + 2);
     }
     if (cap) {
       const c = this.p.length / 3;
