@@ -1460,7 +1460,15 @@ function startIntro() {
     setZoneDim: k => zoneVis?.setDim(k),
     gender: g => { if (storyVoice) storyVoice.preload(g); },
     picked: pick => { if (storyVoice) storyVoice.preload(pick.gender); },
-    voice: (row, gender) => storyVoice?.play(storyVoice.slotFor(row, gender)),
+    // Returns the DECODED LENGTH of the clip it started, which storyui's beat machine times the
+    // beat off. Before S2-M this returned the playback handle and the beat ran on a hand-written
+    // number instead — see the SCRIPT table's header for what that cost.
+    voice: (row, gender) => {
+      if (!storyVoice) return null;
+      const slot = storyVoice.slotFor(row, gender);
+      storyVoice.play(slot);
+      return storyVoice.duration(slot);
+    },
     done: pick => endIntro(pick),
   });
   introPrevMode = mode;

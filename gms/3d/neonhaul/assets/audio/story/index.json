@@ -31,9 +31,9 @@
   }
  },
  "takeSec": {
-  "m": 8.72,
-  "f": 9.63,
-  "n": 9.69
+  "m": 7.44,
+  "f": 8.0,
+  "n": 8.08
  },
  "clips": [
   {
@@ -88,13 +88,13 @@
   {
    "slot": "pc_m_int1",
    "sec": 0.63,
-   "rms": -17.6,
-   "bytes": 4302,
+   "rms": -18.0,
+   "bytes": 4459,
    "src": "kokoro"
   },
   {
    "slot": "pc_m_int2",
-   "sec": 0.7,
+   "sec": 0.69,
    "rms": -17.0,
    "bytes": 4772,
    "src": "kokoro"
@@ -108,15 +108,15 @@
   },
   {
    "slot": "pc_m_close",
-   "sec": 8.72,
+   "sec": 7.44,
    "rms": -16.3,
-   "bytes": 52890,
+   "bytes": 45210,
    "src": "kokoro"
   },
   {
    "slot": "pc_f_int1",
-   "sec": 0.67,
-   "rms": -19.1,
+   "sec": 0.66,
+   "rms": -19.6,
    "bytes": 4615,
    "src": "kokoro"
   },
@@ -129,29 +129,29 @@
   },
   {
    "slot": "pc_f_int3",
-   "sec": 0.95,
-   "rms": -17.4,
+   "sec": 0.96,
+   "rms": -17.2,
    "bytes": 6339,
    "src": "kokoro"
   },
   {
    "slot": "pc_f_close",
-   "sec": 9.63,
-   "rms": -15.9,
-   "bytes": 58375,
+   "sec": 8.0,
+   "rms": -15.6,
+   "bytes": 48658,
    "src": "kokoro"
   },
   {
    "slot": "pc_n_int1",
    "sec": 0.68,
-   "rms": -19.0,
+   "rms": -19.1,
    "bytes": 4615,
    "src": "kokoro"
   },
   {
    "slot": "pc_n_int2",
    "sec": 0.74,
-   "rms": -18.0,
+   "rms": -17.9,
    "bytes": 5086,
    "src": "kokoro"
   },
@@ -164,9 +164,9 @@
   },
   {
    "slot": "pc_n_close",
-   "sec": 9.69,
+   "sec": 8.08,
    "rms": -15.6,
-   "bytes": 58689,
+   "bytes": 49128,
    "src": "kokoro"
   }
  ]

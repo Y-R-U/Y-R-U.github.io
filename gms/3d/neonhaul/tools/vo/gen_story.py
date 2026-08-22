@@ -104,9 +104,11 @@ PC = [
     ('int1', 'But—'),
     ('int2', 'Wait—'),
     ('int3', 'Just wait—'),
+    # "but now I’m going to have to" was cut in S2-M. Aaron: *"It doesn’t sound good and is
+    # implied anyway."* He is right on both counts — the clause is the line explaining itself, and
+    # "I need to make that money fast" two sentences later already says it.
     ('close', 'Shit — they wouldn’t let me get a word in. What sort of shit has my Dad got '
-              'himself into? I shouldn’t even be flying this, but now I’m going to have to. '
-              'I need to make that money fast.'),
+              'himself into? I shouldn’t even be flying this. I need to make that money fast.'),
 ]
 
 # Seconds per word the cast above actually produces, measured rather than assumed — used only by

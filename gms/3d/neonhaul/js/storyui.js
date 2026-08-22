@@ -41,32 +41,75 @@ const mmss = s => {
 // `voice` is the clip slot in assets/audio/story/. The Boss's lines are GENDER-INVARIANT and
 // generated once; the player's take is chosen at play time from the gender pick, which is why the
 // player rows carry a slot STEM and the Boss's carry a whole slot.
+// ── how long a beat lasts, and why it is no longer a written number ────────
+//
+// It WAS a written number. Every row carried a hand-tuned `hold`, and the numbers were tuned
+// against the Abogen takes the scene shipped with. S2-L then replaced the Boss with the SUNO
+// performance, which is a slower read of the same words — and nothing recomputed the holds. Every
+// single Boss line has been cut off since:
+//
+//     boss_01  3.55 s of audio, held 3.2      boss_05  5.66, held 4.8
+//     boss_02  5.25, held 4.4                 boss_06 11.50, held 7.2   <-- 4.3 s short
+//     boss_03  6.69, held 4.6                 boss_07  3.70, held 2.6
+//     boss_04  4.04, held 3.4
+//
+// Aaron, playing it: *"The break an arm sentence doesn't wait for the sentence to finish, it gets
+// to just after the word 'then' in the middle then moves on even though he is still talking… and
+// the last sentence starts playing over the top."* 7.2 s into an 11.5 s line is the second
+// "Then". He heard the exact frame.
+//
+// So a beat is now MEASURED, not written: `sec` is only the fallback for a clip that has not
+// decoded yet (or a player with audio off), and it now holds the real duration rather than a
+// guess. `pad` is the silence AFTER the line — the thing a written hold could never express,
+// because it was one number doing two jobs.
+//
+// The interjections are the deliberate exception. `cut` rows are MEANT to be talked over, so they
+// keep a written hold that is shorter than the line would need; that gap IS the scene.
+const PAD = 0.5;              // a breath between the Boss's sentences
+
 export const SCRIPT = [
-  { who: 'boss', voice: 'boss_01', hold: 3.2,
+  // Aaron: *"0.5s to 1s more pause after first boss sentence after 'just listen'."* It is the beat
+  // where he has told you to shut up and you find out whether he means it, so it is the one pause
+  // in the scene that is doing dramatic work rather than punctuation.
+  { who: 'boss', voice: 'boss_01', sec: 3.55, pad: 1.1,
     text: 'Don’t get out. Don’t touch the stick. Just listen.' },
-  { who: 'boss', voice: 'boss_02', hold: 4.4,
+  { who: 'boss', voice: 'boss_02', sec: 5.25,
     text: 'That is a very nice craft you are flying. Insured to somebody else, I notice.' },
-  { who: 'boss', voice: 'boss_03', hold: 4.6,
+  { who: 'boss', voice: 'boss_03', sec: 6.69,
     text: 'Your father owes us fifty thousand. He has owed us fifty thousand for a while now.' },
-  { who: 'pc', voice: 'int1', hold: 1.0, cut: true, text: 'But—' },
-  { who: 'boss', voice: 'boss_04', hold: 3.4,
+  { who: 'pc', voice: 'int1', sec: 1.0, cut: true, text: 'But—' },
+  { who: 'boss', voice: 'boss_04', sec: 4.04,
     text: 'He is away. You are here. That makes it yours.' },
-  { who: 'pc', voice: 'int2', hold: 1.0, cut: true, text: 'Wait—' },
-  { who: 'boss', voice: 'boss_05', hold: 4.8,
+  { who: 'pc', voice: 'int2', sec: 1.0, cut: true, text: 'Wait—' },
+  { who: 'boss', voice: 'boss_05', sec: 5.66,
     text: 'Fifty thousand credits. We will come for it, and I would not make us look for you.' },
-  { who: 'pc', voice: 'int3', hold: 1.2, cut: true, text: 'Just wait—' },
-  { who: 'boss', voice: 'boss_06', hold: 7.2,
+  { who: 'pc', voice: 'int3', sec: 1.2, cut: true, text: 'Just wait—' },
+  { who: 'boss', voice: 'boss_06', sec: 11.50,
     text: 'If it is not ready we take the craft and sell it. Then we break an arm. Then, if I am in a mood, we sell whoever was driving to whoever is buying.' },
-  { who: 'boss', voice: 'boss_07', hold: 2.6, text: 'Make the money. Soon.' },
+  // The last thing he says before they leave, so the pad here is the silence you sit in.
+  { who: 'boss', voice: 'boss_07', sec: 3.70, pad: 1.0, text: 'Make the money. Soon.' },
 ];
+
+// Measured + pad, with the written `sec` standing in only when the clip is not decoded. A `cut`
+// row is exempt by design (see above). `Math.max` against `sec` is deliberate belt-and-braces: a
+// decode that reports short must never make a line shorter than the table already promised.
+export function beatHold(row, measured) {
+  if (row.cut) return row.sec;
+  const d = measured && measured > 0 ? Math.max(measured, row.sec) : row.sec;
+  return d + (row.pad === undefined ? PAD : row.pad);
+}
 
 // Aaron's line, verbatim. It is the whole point of the scene's last beat: the player has to know
 // where they stand, and the reason the borrowed hull is above their licence is so that
 // *"I shouldn't even be flying this"* is literally true when they look at the dash.
+// `sec` is pc_n's take, the longest of the three; the other two are 7.44 (m) and 8.00 (f), and the
+// derived hold picks the right one per gender at play time. One written number could not — it was
+// 11.0, which over-held the male take by 2.3 s and under-held nothing, so the defect here read as
+// a dead pause rather than as a truncation and nobody caught it.
 export const MONOLOGUE = {
-  who: 'pc', voice: 'close', hold: 11.0,
+  who: 'pc', voice: 'close', sec: 8.08, pad: 1.4,
   text: 'Shit — they wouldn’t let me get a word in. What sort of shit has my Dad got himself into? '
-    + 'I shouldn’t even be flying this, but now I’m going to have to. I need to make that money fast.',
+    + 'I shouldn’t even be flying this. I need to make that money fast.',
 };
 
 // Auto-names, offered rather than imposed. A player who wants to be called something else types it;
@@ -124,6 +167,13 @@ export class StoryVoice {
     }
   }
 
+  // What the beat machine times itself off. `null` means "not decoded", which storyui's beatHold()
+  // reads as "use the written fallback" — the same graceful path a player with audio off takes.
+  duration(slot) {
+    const buf = this.buffers.get(slot);
+    return buf ? buf.duration : null;
+  }
+
   // Fire and forget. A line NEVER waits on the network: if the clip is not decoded yet the bubble
   // goes up on its written hold and the fetch is started for next time — the same rule radio.js
   // follows, and for the same reason.
@@ -177,6 +227,10 @@ export class IntroScene {
     this.t = 0;
     this.beat = 0;
     this.beatT = 0;
+    // Set by say() from the clip it just started. Seeded to a real number rather than left
+    // undefined: `beatT >= undefined` is false forever, so a beat that somehow never said anything
+    // would park the cutscene rather than advance through it.
+    this.beatHold = 0;
     this.pick = { name: '', gender: 'n' };
     this.autoName = AUTO_NAMES[(Math.random() * AUTO_NAMES.length) | 0];
     this.anchor = { x: 0, y: 0, z: 0 };     // the parked craft, world space
@@ -214,7 +268,7 @@ export class IntroScene {
   start({ x, y, z, yaw, def, mobDefs = [] }) {
     this.active = true;
     this.phase = 'park';
-    this.t = 0; this.beat = 0; this.beatT = 0;
+    this.t = 0; this.beat = 0; this.beatT = 0; this.beatHold = 0;
     this.anchor = { x, y, z };
     this.playerPose = { def, x, y, z, yaw, pitch: 0, roll: 0, throttle: 0, t: 0 };
     // Six craft in a ring, at mixed radii and heights so it reads as a crew arriving rather than
@@ -343,7 +397,7 @@ export class IntroScene {
       if (this.beatT >= 3.4) { this.phase = 'boss'; this.beat = 0; this.beatT = 0; this.sayBeat(); }
     } else if (this.phase === 'boss') {
       const row = SCRIPT[this.beat];
-      if (row && this.beatT >= row.hold) {
+      if (row && this.beatT >= this.beatHold) {
         this.beat++;
         this.beatT = 0;
         if (this.beat >= SCRIPT.length) { this.phase = 'leave'; this.clearBubbles(); }
@@ -355,7 +409,7 @@ export class IntroScene {
         this.say(MONOLOGUE, 'player');
       }
     } else if (this.phase === 'close') {
-      if (this.beatT >= MONOLOGUE.hold) return this.finish();
+      if (this.beatT >= this.beatHold) return this.finish();
     }
     // Retire an interjection on its own clock rather than on the Boss's.
     for (const b of this.bubbles.slice()) {
@@ -391,7 +445,10 @@ export class IntroScene {
     const rec = this.bubble(`b${this.beat}`, { at, text: row.text, who,
       cls: row.who === 'boss' ? 'boss' : 'pc' });
     rec.cut = !!row.cut;
-    this.hooks.voice && this.hooks.voice(row, this.pick.gender);
+    // The hook returns the decoded length of the clip it just started, or null. That return value
+    // is the whole timing fix: the beat is as long as the audio actually is.
+    const measured = this.hooks.voice ? this.hooks.voice(row, this.pick.gender) : null;
+    this.beatHold = beatHold(row, typeof measured === 'number' ? measured : null);
     return rec;
   }
 

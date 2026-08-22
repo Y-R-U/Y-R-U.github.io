@@ -8,6 +8,7 @@
 // B3  a boot that never finishes surfaces itself instead of hanging on the bar forever
 // B4  a lost context that the browser does not restore is restored by the game
 // B5  the cog opens settings under a real TOUCH, not just under a mouse
+// B6  a SECOND boot, against a save the first one wrote, still boots
 //
 // Why this suite exists. Aaron: *"sometimes the game doesn't load if i reload the page… happens on
 // local as well. i think game freezes first on restore of browser? then refresh of game doesn't
@@ -21,7 +22,7 @@
 // version of this experiment PASSED its null control, because the Chrome profile was being reused
 // and was serving three from its HTTP cache. A control that cannot fail is not a control.
 
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { open, parseArgs, waitFor, evalJSON } from './shot.mjs';
@@ -59,18 +60,37 @@ ctx.cdp.ws.addEventListener('message', e => {
   if (m.method === 'Network.requestWillBeSent') seen.push(m.params.request.url);
 });
 
-async function boot({ block = [], cache = true, extraScript = null, wait = 30000 } = {}) {
+// `save` seeds localStorage BEFORE any module evaluates, which is the only way to reach the
+// stored-profile path on a first navigation. `nosave` defaults on because B1-B5 are about the
+// module graph and not about the profile — B6 is the arm that turns it off.
+async function boot({ block = [], cache = true, extraScript = null, wait = 30000,
+                      nosave = true, save = null } = {}) {
   seen.length = 0;
   await S('Network.setCacheDisabled', { cacheDisabled: !cache });
   await S('Network.setBlockedURLs', { urls: block });
-  if (extraScript) await S('Page.addScriptToEvaluateOnNewDocument', { source: extraScript });
-  await S('Page.navigate', { url: `${base}/index.html?nosave` });
+  if (save) {
+    await addScript(`try { localStorage.setItem('neonhaul.save.v1', ${JSON.stringify(JSON.stringify(save))}); } catch (e) {}`);
+  }
+  if (extraScript) await addScript(extraScript);
+  await S('Page.navigate', { url: `${base}/index.html${nosave ? '?nosave' : ''}` });
   try { await waitFor(S, 'window.__ready', wait); return true; } catch { return false; }
 }
 
-// A fresh page for every arm, and every arm re-registers its own script-on-new-document, so the
-// helper above cannot leak an injection into the next check.
+// Scripts-on-new-document are registered against the TARGET, not the document, so navigating away
+// does not drop them. Nothing removed them until S2-M, which meant B1-falsify's injected external
+// fetch was still firing inside B2 and B3. It was harmless there — B2 blocks the host it reaches
+// for — but a control that survives into the next arm is how a suite starts measuring the wrong
+// page, so the ids are tracked and dropped rather than left to luck.
+const injected = [];
+async function addScript(source) {
+  const r = await S('Page.addScriptToEvaluateOnNewDocument', { source });
+  injected.push(r.identifier);
+}
+
 async function reset() {
+  while (injected.length) {
+    await S('Page.removeScriptToEvaluateOnNewDocument', { identifier: injected.pop() });
+  }
   await S('Page.navigate', { url: 'about:blank' });
   await sleep(150);
 }
@@ -209,6 +229,74 @@ await reset();
   check('B5-falsify a cog with no listeners does not open it', dead.open === false,
     `#settings open=${dead.open} (want false) with the cog's listeners stripped`);
 }
+
+// ── B6 ─────────────────────────────────────────────────────────────────────
+// The reload bug, and the reason it survived 24 green suites and a live deploy.
+//
+// `js/save.js` ran its module init — `let data = load()` — ABOVE the `const REPLACE` that
+// `load() -> merge()` reads. Reaching merge() therefore threw in the temporal dead zone, killing
+// the module graph at evaluation with the same silence as the CDN hang in B1: no error handler had
+// been installed yet, so `__state` did not exist to record it.
+//
+// What made it invisible is the shape of `load()`. It returns EARLY — before merge() — in exactly
+// the two situations every automated check is in: `?nosave` set (B1-B5 above, and every other
+// gate in tools/), or no stored profile at all (a fresh Chrome profile, which is every gate again).
+// The only way to reach the throw is to boot a SECOND time against a save a first boot wrote.
+// Aaron found it in four seconds by pressing reload.
+//
+// So B6 is not "the game boots" — B1 already says that. B6 is "the game boots WITH A PROFILE ON
+// DISK, and the profile is really read", and the second half is load-bearing: without it the gate
+// would pass on a build where save.js never ran at all.
+await reset();
+{
+  // `credits` and `lifetime` are read back off `__state`, which sources them from the ECONOMY —
+  // and economy.fromSave() is downstream of merge(). 4,242 is not the 250 a fresh profile starts
+  // on and 96,000 is not 0, so two independent numbers say the stored profile was really merged.
+  // `flags` is in the REPLACE set that the dead const declared, so seeding it exercises the exact
+  // line that threw.
+  const SEEDED = { v: 1, credits: 4242, lifetime: 96000, flags: ['b6'], craft: 'kestrel' };
+
+  const booted = await boot({ cache: false, nosave: false, save: SEEDED });
+  const read = booted
+    ? await evalJSON(S, `(() => { const s = window.__state; return s ? { credits: s.credits, lifetime: s.lifetime } : null; })()`)
+    : null;
+  check('B6 a second boot against a written save loads it',
+    booted && read && read.credits === 4242 && read.lifetime === 96000,
+    `booted=${booted} read=${JSON.stringify(read)} (want credits 4242 not 250, lifetime 96000 not 0 — both prove merge() ran)`);
+
+  // The falsification serves the PRE-FIX save.js: the same file with its init block moved back
+  // above the const it depends on. Not "block save.js" — that would only prove a missing module
+  // kills the boot, which B2 already proves. This reconstructs the actual defect and shows B6 red.
+  const live = readFileSync(resolve(ROOT, 'js/save.js'), 'utf8');
+  const INIT = /\n\/\/ MODULE INIT GOES LAST[\s\S]*?\nlet data = load\(\);\nlet timer = 0;\nlet dirty = false;\n/;
+  const m = live.match(INIT);
+  if (!m) {
+    check('B6-falsify the pre-fix save.js does kill the boot', false,
+      'could not reconstruct the buggy ordering from js/save.js — the init block moved, so this control is BLIND');
+  } else {
+    const buggy = live.replace(INIT, '\n')
+      .replace('\nfunction load() {', '\nlet data = load();\nlet timer = 0;\nlet dirty = false;\n\nfunction load() {');
+    await reset();
+    await S('Fetch.enable', { patterns: [{ urlPattern: '*/js/save.js*', requestStage: 'Request' }] });
+    const serve = e => {
+      const msg = JSON.parse(e.data);
+      if (msg.method !== 'Fetch.requestPaused') return;
+      S('Fetch.fulfillRequest', {
+        requestId: msg.params.requestId,
+        responseCode: 200,
+        responseHeaders: [{ name: 'Content-Type', value: 'text/javascript' }],
+        body: Buffer.from(buggy, 'utf8').toString('base64'),
+      }).catch(() => {});
+    };
+    ctx.cdp.ws.addEventListener('message', serve);
+    const dead = await boot({ cache: false, nosave: false, save: SEEDED, wait: 12000 });
+    ctx.cdp.ws.removeEventListener('message', serve);
+    await S('Fetch.disable');
+    check('B6-falsify the pre-fix save.js does kill the boot', dead === false,
+      `booted=${dead} (want false) with save.js's init block served back above its const`);
+  }
+}
+
 
 await close();
 console.log(`\n${ok.length}/${ok.length + fail.length} gates green${fail.length ? '  FAILED: ' + fail.join(', ') : ''}`);

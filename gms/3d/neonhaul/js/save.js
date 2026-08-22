@@ -88,10 +88,6 @@ function defaults() {
   };
 }
 
-let data = load();
-let timer = 0;
-let dirty = false;
-
 function load() {
   const d = defaults();
   if (FLAG.nosave) return d;
@@ -122,6 +118,20 @@ function merge(base, over) {
   }
   return base;
 }
+
+// MODULE INIT GOES LAST, and this is not tidiness. `load()` calls `merge()`, which reads the
+// `const REPLACE` above — so running it any earlier in the file is a temporal-dead-zone throw:
+// *Cannot access 'REPLACE' before initialization*. It shipped that way and the failure was
+// invisible for the worst possible reason: a brand-new player has no stored profile, `load()`
+// returns at `if (!raw)` and never reaches `merge()`. The game booted perfectly ONCE, wrote a
+// save, and was bricked on every reload after — with no error on screen, because the module that
+// throws during evaluation is imported by the module that would have reported it.
+//
+// Every gate missed it for the same reason: they boot fresh profiles. gates_boot B6 now boots a
+// SECOND time against a written save, which is the only arrangement that can see this.
+let data = load();
+let timer = 0;
+let dirty = false;
 
 export function S() { return data; }
 
