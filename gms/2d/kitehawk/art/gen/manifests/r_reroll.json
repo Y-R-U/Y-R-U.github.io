@@ -1,0 +1,20 @@
+[
+ {
+  "out": "x47b_shred",
+  "w": 768,
+  "h": 512,
+  "seed": 147,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of nine separate torn slivers and splinters of near-black charcoal paint, each a long thin shard with sharp jagged points at both ends, all different lengths and widths and angles, none of them square, none of them rectangular, none of them round, irregular scattered layout, no two alike, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "cL02",
+  "w": 768,
+  "h": 768,
+  "seed": 102,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated anvil-topped cumulonimbus cloud, a broad flat top spreading sideways over a heavy body, the whole cloud comfortably inside the frame with clear grey space on every side, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ }
+]

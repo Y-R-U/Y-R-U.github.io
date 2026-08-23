@@ -1,0 +1,7 @@
+[1/6] skip x42_puff_b.png
+[2/6] x44_streak_b.png  232s  768x512 flux2-klein-4b
+[3/6] x45_spark.png  265s  768x512 flux2-klein-4b
+[4/6] x46_wisp.png  244s  768x512 flux2-klein-4b
+[5/6] x47_shred.png  244s  768x512 flux2-klein-4b
+[6/6] x48_blob.png  235s  768x512 flux2-klein-4b
+batch x_fxbrush.json queue time 20.3 min

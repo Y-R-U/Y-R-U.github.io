@@ -1,0 +1,74 @@
+[
+ {
+  "out": "d39_gun_L0neutral",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 13,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI anti-aircraft field gun on a wheeled cruciform mount with the barrel raised steeply, a stack of shell cases beside it, flat straight-on side elevation, even overcast light, low saturation, neutral grey-blue, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "d39_gun_L1warmcool",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 13,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI anti-aircraft field gun on a wheeled cruciform mount with the barrel raised steeply, a stack of shell cases beside it, flat straight-on side elevation, warm cream sunlight on the upper surfaces and cool violet shadow below, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "d39_gun_L2actii",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 13,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI anti-aircraft field gun on a wheeled cruciform mount with the barrel raised steeply, a stack of shell cases beside it, flat straight-on side elevation, low warm gold sunlight raking from the left, deep violet-blue shadow on the undersides, dusty ochre and cream and violet, high summer, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "d39_gun_L3hybrid",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 13,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI anti-aircraft field gun on a wheeled cruciform mount with the barrel raised steeply, a stack of shell cases beside it, flat straight-on side elevation, even flat light with a warm cream key on the upper surfaces and a cool blue-grey shadow below, low saturation, restrained colour, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "d39_hangar_L0neutral",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 12,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI wooden aerodrome hangar with corrugated iron doors and a canvas Bessonneau tent beside it, flat straight-on side elevation, even overcast light, low saturation, neutral grey-blue, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "d39_hangar_L1warmcool",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 12,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI wooden aerodrome hangar with corrugated iron doors and a canvas Bessonneau tent beside it, flat straight-on side elevation, warm cream sunlight on the upper surfaces and cool violet shadow below, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "d39_hangar_L2actii",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 12,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI wooden aerodrome hangar with corrugated iron doors and a canvas Bessonneau tent beside it, flat straight-on side elevation, low warm gold sunlight raking from the left, deep violet-blue shadow on the undersides, dusty ochre and cream and violet, high summer, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "d39_hangar_L3hybrid",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 12,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI wooden aerodrome hangar with corrugated iron doors and a canvas Bessonneau tent beside it, flat straight-on side elevation, even flat light with a warm cream key on the upper surfaces and a cool blue-grey shadow below, low saturation, restrained colour, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ }
+]

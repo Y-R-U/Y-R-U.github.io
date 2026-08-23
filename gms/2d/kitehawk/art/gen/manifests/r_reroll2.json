@@ -1,0 +1,20 @@
+[
+ {
+  "out": "h65b_balloon_sphere",
+  "w": 768,
+  "h": 768,
+  "seed": 165,
+  "steps": 16,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI spherical observation balloon gasbag alone, just the fat round doped fabric envelope and nothing else, a net of rigging cord pressed into its surface, the bottom of the sphere simply ends, warm cream sunlight on the upper curve and cool violet shadow below, crisp readable silhouette, no basket, no gondola, no wicker, no burner, no cables, no ropes, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no grass, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "h68b_factory",
+  "w": 1024,
+  "h": 768,
+  "seed": 168,
+  "steps": 16,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one long brick industrial factory building seen from the side, a sawtooth glass roof, two tall round chimneys, one end of the roof collapsed, the whole building including the full height of both chimneys comfortably inside the frame with clear grey space above and on every side, low warm sunlight raking from the left and cool violet shadow on the right faces, crisp readable silhouette, flat straight-on side elevation, no smoke, no fire, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no grass, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail, no sun, no sunburst, no glow, no white border, no paper mount, nothing else in the frame"
+ }
+]

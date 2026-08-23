@@ -1,0 +1,56 @@
+[
+ {
+  "out": "p1_watertower",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 1,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one wooden water tower on a tall lattice timber trestle with a ladder up one leg, flat straight-on side elevation, even overcast light, low saturation, neutral grey-blue, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "p2_fueldump",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 2,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a dump of stacked steel fuel drums with a hand pump and two wooden crates beside them, flat straight-on side elevation, even overcast light, low saturation, neutral grey-blue, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "p3_wagon",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 3,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one horse-drawn army supply wagon with a canvas tilt over hoops and tall spoked wheels, no horse, flat straight-on side elevation, even overcast light, low saturation, neutral grey-blue, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "p4_searchlight",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 4,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI searchlight with a large parabolic mirror on a two-wheeled trailer with a generator box, flat straight-on side elevation, even overcast light, low saturation, neutral grey-blue, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "p5_mgpost",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 5,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one sandbagged machine gun post with a corrugated iron roof and a timber firing step, flat straight-on side elevation, even overcast light, low saturation, neutral grey-blue, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "p6_signalmast",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 6,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one wooden signal mast with a windsock and guy wires and a small plank hut at its foot, flat straight-on side elevation, even overcast light, low saturation, neutral grey-blue, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ }
+]

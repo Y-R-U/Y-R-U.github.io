@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0d14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>KITEHAWK</title>
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <div id="ui"></div>
+  <!-- read by core/viewport.js: the only reliable way to get safe-area insets -->
+  <div id="safe-probe" aria-hidden="true"></div>
+</div>
+<div id="callout" hidden></div>
+<script type="module">
+  // No CDN, ever. A CDN import has silently hung every other 3D game in this
+  // repo with zero console errors — the page just never boots.
+  const say = (msg) => {
+    const el = document.getElementById('callout');
+    el.textContent = msg;
+    el.hidden = false;
+  };
+  window.addEventListener('error', (e) => say('error: ' + (e.message || e)));
+  window.addEventListener('unhandledrejection', (e) => say('error: ' + (e.reason && e.reason.message || e.reason)));
+  try {
+    const m = await import('./js/main.js');
+    if (m.boot) await m.boot();
+  } catch (err) {
+    say('js/main.js is not built yet — the engine is. Debug pages: tools/pages/boot.html, parallax.html, parts.html');
+    console.warn('[boot]', err);
+  }
+</script>
+</body>
+</html>

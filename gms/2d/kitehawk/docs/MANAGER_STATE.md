@@ -30,6 +30,25 @@ story across 5 acts, hangar upgrades. Lives at `gms/2d/kitehawk/`, will be serve
 - **Aaron's standing instruction: at every playable milestone, commit + push and make sure the
   `projects.js` entry exists.** `wip: true` until the game is finished.
 
+## Usage budgeting — run this before deciding concurrency
+
+`node ~/cc/usage/usage.mjs` reports percent used, burn rate %/h and time left in the 5-hour block.
+There is no local usage API, so it reads the per-message `usage` records in every session
+transcript, weights them by rough relative cost, and works out the block from a calibrated phase
+anchor in `~/cc/usage/calibration.json`.
+
+**Calibrated 2026-08-24 02:12 from a real `/usage` reading Aaron gave (15% used, 3h left).** The
+gap-inference fallback got the block boundary badly wrong before that — it guessed a start 2h50m
+too early — so *do not trust an uncalibrated reading*; ask Aaron for one `/usage` number instead.
+Blocks run on a fixed 5-hour cadence from the anchor, so the calibration keeps working across
+blocks. Re-calibrate with `node ~/cc/usage/usage.mjs --calibrate <pctUsed> <hoursLeft>`.
+
+**2026-08-24 (D42): report-only. It must NOT justify concurrency until verified.** Budget: average under 19–20%/h. Measured 2026-08-24 with four agents running: **7.5%/h**,
+projecting 37% at block end. **Agent count is not burn rate** — an agent waiting on the Flux queue
+or Kokoro costs almost nothing, so judge on the measured rate. There is no way to pause a running
+agent; the levers are stopping one (loses its work — reserve for genuinely stuck agents) and not
+starting the next phase.
+
 ## The check-in cron
 
 A 30-minute health check fires at **:13 and :43** — job **`154dea7d`**, created 2026-08-23. It is
@@ -46,29 +65,29 @@ is explicitly told not to restart agents or spawn new ones without asking. Aaron
 | 2026-08-23 | up to 4, all starting within 15 min | the four planning agents A–D |
 | 2026-08-23 | 2 *additional* agents, 15 min only, "smallish tasks" | E (gouache-drift A/B) and F (Kokoro voice audition) |
 
-**Both windows are spent and specific to those batches. Revert to one agent at a time.** The reason
-is Aaron's usage limits, not speed.
+| 2026-08-24 | 3 concurrent, "back to single once they all complete" | BUILD_PLAN, G (poster.js + D39), H (audio engine + sustain) |
+
+**Every window is spent and specific to its batch. Revert to one agent at a time.** The reason is
+Aaron's usage limits, not speed. He granted the third window because the session had sat idle for
+its first two hours — that was the manager wrongly waiting for permission, now fixed by D40.
 
 ## Phase status
 
+**The provisional P0–P11 table is superseded by `BUILD_PLAN.md`'s P1–P17.** Read the phase brief
+there, not a table here. Planning (the four docs, the two spikes, the build plan) is complete and
+committed as `f2d77c9` on `main`.
+
 | | phase | state |
 |---|---|---|
-| P0a | shared manager brief | ✅ `MANAGER_BRIEF.md` |
-| P0b | **4 planning docs in parallel** — architecture / design / art / story+audio | 🔄 running |
-| P0c | manager reconciles the four docs, resolves REQUESTs, writes `BUILD_PLAN.md` | 🔄 A/B still editing |
-| P0d | E — gouache drift A/B on hard-surface/FX subjects (`ART_AB_FINDINGS.md`) | 🔄 blocks the terrain atlas |
-| P0e | F — local Kokoro pipeline proof + one-line-per-character audition (`VO_AUDITION.md`) | 🔄 |
-| P1 | scaffold + renderer port + **sustained-audio layer** + test harness | ⬜ |
-| P2 | sky, parallax, art pipeline first plates | ⬜ |
-| P3 | **flight model → PORTRAIT GATE** (keep portrait or pivot to landscape) | ⬜ |
-| P4 | combat + parachute crates | ⬜ |
-| P5 | level format + generator → **FIRST PLAYABLE, first commit + projects.js entry** | ⬜ |
-| P6 | story delivery + the 100 levels | ⬜ |
-| P7 | the other five modes | ⬜ |
-| P8 | hangar, upgrades, economy, save | ⬜ |
-| P9 | audio: aviation SFX set (`SFX.md`) + SUNO/Kokoro assets | ⬜ |
-| P10 | art pass + blind critic rounds | ⬜ |
-| P11 | polish, perf, ship | ⬜ |
+| P0 | planning: 4 docs, 2 spikes, BUILD_PLAN | ✅ committed `f2d77c9` |
+| P1 | engine port A — `gfx/`, `parts.js`, parallaxY, ramp sampler, painterly geometry | 🔄 |
+| P2 | engine port B — `core/`, camera/zoom, input, **sustained audio**, CDP harness | 🔄 audio layer in flight |
+| P3 | sky, ramps, art pipeline — `poster.js`, LUTs, cloud/FX/hero atlases | 🔄 both halves in flight |
+| P4–P17 | see `BUILD_PLAN.md` | ⬜ |
+
+**P8 is the PORTRAIT GATE** and is manager-run. A FAIL goes to Aaron — it is the one decision D40
+does not delegate. **P10 is FIRST PLAYABLE**: commit, push, `projects.js` with `wip: true`.
+
 
 Phase numbering after P0c is provisional — `BUILD_PLAN.md` supersedes it.
 
@@ -88,6 +107,11 @@ Disjoint file ownership, deliberately, so four concurrent agents cannot corrupt 
 levels) to be the main seam: B, C and D all independently design against it.
 
 ## Decision authority — READ THIS BEFORE ASKING AARON ANYTHING
+
+**2026-08-24, D40: build the complete game without checking in.** When a phase reports and verifies,
+spawn the next one immediately. **Playtest is the only checkpoint** — do not ask for design, art or
+tuning opinions before there is something to play. Report non-obvious calls as you go; a report is
+not a question. One build agent at a time still stands (usage limits).
 
 Both former open decisions are **closed**: the name is **KITEHAWK** (D13) and the renderer is a
 **port of Sunderfall's batcher** (D14), both ratified by Aaron on 2026-08-23.

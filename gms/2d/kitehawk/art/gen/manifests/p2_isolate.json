@@ -1,0 +1,16 @@
+[
+{"out":"iso_ce_1024x768","w":1024,"h":768,"seed":3303,"steps":16,"model":"flux2-klein-4b",
+ "prompt":"Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated towering cumulus cloud, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"},
+
+{"out":"iso_cf_896","w":896,"h":896,"seed":3303,"steps":16,"model":"flux2-klein-4b",
+ "prompt":"Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated towering cumulus cloud, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"},
+
+{"out":"iso_xb_single512","w":512,"h":512,"seed":45,"steps":14,"model":"flux2-klein-4b",
+ "prompt":"Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single ragged torn-edged blot of thick opaque charcoal grey paint pressed onto the paper, dense and solid in the middle and frayed into torn lobes and broken bristle marks at the rim, one mark only, completely isolated in the centre of a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no aircraft, no ground, no cast shadow, no outline, no ink line"},
+
+{"out":"iso_xc_single768","w":768,"h":768,"seed":45,"steps":14,"model":"flux2-klein-4b",
+ "prompt":"Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single ragged torn-edged blot of thick opaque charcoal grey paint pressed onto the paper, dense and solid in the middle and frayed into torn lobes and broken bristle marks at the rim, one mark only, completely isolated in the centre of a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no aircraft, no ground, no cast shadow, no outline, no ink line"},
+
+{"out":"iso_xd_sheet12","w":1024,"h":768,"seed":47,"steps":14,"model":"flux2-klein-4b",
+ "prompt":"Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of twelve separate marks of thick opaque charcoal grey paint, all different shapes and sizes, some tiny dense specks, some huge ragged torn-edged blots, some long smeared drags, some frayed and half dissolved into broken bristle marks, irregular scattered layout, no two alike, wide clear space between every mark, limited palette, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow, no outline, no ink line"}
+]

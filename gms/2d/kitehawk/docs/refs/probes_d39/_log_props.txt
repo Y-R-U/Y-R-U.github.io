@@ -1,0 +1,6 @@
+[1/6] p1_watertower.png  123s  768x512 flux2-klein-4b
+[2/6] p2_fueldump.png  180s  768x512 flux2-klein-4b
+[3/6] p3_wagon.png  132s  768x512 flux2-klein-4b
+[4/6] p4_searchlight.png  168s  768x512 flux2-klein-4b
+[5/6] p5_mgpost.png  241s  768x512 flux2-klein-4b
+[6/6] p6_signalmast.png  286s  768x512 flux2-klein-4b

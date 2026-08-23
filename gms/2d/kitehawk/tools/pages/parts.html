@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>kitehawk gfx — parts</title>
+<style>
+  html,body{margin:0;background:#111;color:#cfc;font:12px ui-monospace,monospace}
+  #wrap{position:relative;width:max-content;margin:0 auto}
+  #gl{display:block}
+  #labels{position:absolute;inset:0;pointer-events:none}
+  #labels span{position:absolute;transform:translateX(-50%);color:#e8e2d4;
+    text-shadow:0 1px 2px #000;font:11px ui-monospace,monospace}
+  #hud{position:fixed;top:0;left:0;padding:6px 8px;background:rgba(0,0,0,.6);white-space:pre}
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="gl"></canvas><div id="labels"></div></div>
+<script type="module">
+import { mount, qp, flatGrade, readback, crop, meanAbsDiff, bestShift, overlay } from './harness.js';
+import { LAYER } from '../../js/gfx/renderer.js';
+import { createRig } from '../../js/gfx/parts.js';
+import { makePaper } from '../../js/gfx/texture.js';
+
+const GRID = qp('grid', 1);
+const W = GRID ? 1500 : 420;
+const { R } = await mount({ w: W, h: 460, dpr: 1, worldH: 460 });
+flatGrade(R);
+R.setAmbient(0.62, 0.64, 0.70);
+R.setClearColor(0.50, 0.56, 0.62);
+R.setLayer(LAYER.ACTORS, { shade: 0.25, response: 0.5, grainAmt: 1.0 });
+
+const paper = makePaper(R.gl, 256, 3);
+let grainOn = true;
+const applyGrain = () => R.setGrain(paper, 1 / 128, grainOn ? 0.30 : 0);
+applyGrain();
+
+/* ---- a throwaway 14-part scout, purely to exercise the module ---------- */
+
+const fab = [0.74, 0.68, 0.55];     // doped linen
+const metal = [0.46, 0.49, 0.53];
+const wood = [0.52, 0.38, 0.23];
+const skin = [0.78, 0.58, 0.44];
+
+const rigDef = {
+  jitterRel: 0.05,
+  edge: 1.15,
+  edgeDark: 0.44,
+  maxEdges: 2,
+  tones: { lit: 1.24, mid: 0.94, shadow: 0.46 },
+  terminator: { hi: 0.26, lo: -0.16 },
+  parts: [
+    { id: 'wing_lower_far', side: 'far', z: 1, x: -1, y: 10, color: fab, normal: [0.08, 0.99],
+      poly: [-24, -3.4, 24, -4.4, 25, 2.4, -25, 3.4] },
+    { id: 'wing_upper_far', side: 'far', z: 2, x: 2, y: -15, color: fab, normal: [0.05, 0.99],
+      poly: [-27, -3.6, 26, -4.6, 27, 2.2, -28, 3.2] },
+    { id: 'strut_far', side: 'far', z: 4, x: 10, y: -3, color: wood, normal: [0.30, -0.95],
+      poly: [-1.4, -12, 1.6, -12, 2.2, 12, -0.9, 12] },
+    { id: 'fin', z: 5, x: -29, y: -2, color: fab, normal: [-0.86, -0.51],
+      poly: [-3.0, -12, 4.5, -7.0, 6.0, 1.0, -3.4, 1.6] },
+    { id: 'fuselage', z: 6, x: 0, y: 0, color: fab, normal: [0.06, -1],
+      poly: [26, -7.2, 33, -1.4, 31, 4.0, 2, 7.4, -22, 5.4, -33, 2.0, -30, -2.4, 5, -7.8] },
+    { id: 'engine_cowl', parent: 'fuselage', z: 7, x: 29, y: -1.6, color: metal, normal: [0.80, -0.60],
+      poly: [-5, -6.0, 5, -4.6, 5.5, 4.0, -5, 5.2] },
+    { id: 'prop_disc', parent: 'engine_cowl', z: 8, x: 6.0, y: 0, color: [0.36, 0.34, 0.31],
+      normal: [0.94, -0.34], alpha: 0.22, edge: 0, jitterRel: 0.01,
+      poly: [-1.2, -21, 1.4, -19, 2.0, 0, 1.4, 19, -1.2, 21, -1.8, 0] },
+    { id: 'coaming', parent: 'fuselage', z: 9, x: -4, y: -6.4, color: wood, normal: [-0.08, -1],
+      poly: [-7, -2.6, 8, -1.8, 8, 1.8, -7, 2.2] },
+    { id: 'pilot_head', parent: 'coaming', z: 10, x: -1.5, y: -5.0, color: skin, normal: [-0.36, -0.93],
+      poly: [-3.2, -4.0, 3.4, -3.4, 3.2, 2.6, -3.4, 2.4] },
+    { id: 'tail_near', z: 11, x: -26, y: 1.0, color: fab, normal: [-0.10, -0.99],
+      poly: [-7, -2.8, 11, -3.8, 11, 1.4, -7, 2.4] },
+    { id: 'rudder', parent: 'fin', z: 12, x: -2.5, y: -6, color: fab, normal: [-0.90, -0.44],
+      poly: [-4.2, -6.0, 1.4, -5.0, 1.6, 6.5, -4.6, 5.0] },
+    { id: 'strut_near', z: 13, x: 10, y: -4, color: wood, normal: [0.26, -0.97],
+      poly: [-1.6, -12.5, 1.8, -12.5, 2.4, 12.5, -1.1, 12.5] },
+    { id: 'wing_lower_near', z: 14, x: -1, y: 11, color: fab, normal: [0.08, -0.99],
+      poly: [-24, -3.6, 24, -4.6, 25, 2.2, -25, 3.2] },
+    { id: 'wing_upper_near', z: 15, x: 2, y: -17, color: fab, normal: [0.04, -1],
+      poly: [-27, -3.8, 26, -4.8, 27, 2.0, -28, 3.0] },
+  ],
+  poses: { bank: { wing_upper_near: 0.10, wing_lower_near: -0.10, rudder: 0.25 } },
+};
+
+const rig = createRig(rigDef);
+
+// key from over the left shoulder, plus one warm local source at the cowl —
+// the local light is what a painted sprite could never do
+const LIGHTS = [
+  { dx: -0.55, dy: -0.84, intensity: 1.0, r: 1.00, g: 0.93, b: 0.78 },
+  { x: 46, y: -6, radius: 55, intensity: 0.85, r: 1.00, g: 0.55, b: 0.22 },
+];
+
+const SCALE = 3.6;
+const VARIANTS = [
+  { name: 'all on', f: {}, grain: true },
+  { name: 'no 3-tone', f: { tones: false }, grain: true },
+  { name: 'no jitter', f: { jitter: false }, grain: true },
+  { name: 'no loaded edge', f: { edge: false }, grain: true },
+  { name: 'no paper grain', f: {}, grain: false },
+];
+
+const cam = { x: 0, y: 0, zoom: 1 };
+// the rig is ~70 wu long at scale 2.6 -> ~182 wu, comfortably inside a cell
+const CELL = 300;
+
+/** Tight bbox of the rig as actually transformed, in device px, plus 3 px. */
+function rigBBox(dx = 0) {
+  const m = rig.m;
+  const h = { x: R.pixelW * 0.5, y: R.pixelH * 0.5 };
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (let i = 0; i < rig.parts.length; i++) {
+    const p = rig.parts[i], o = i * 6;
+    for (let v = 0; v < p.nv; v++) {
+      const wx = m[o] * p.jx[v] + m[o + 2] * p.jy[v] + m[o + 4];
+      const wy = m[o + 1] * p.jx[v] + m[o + 3] * p.jy[v] + m[o + 5];
+      const sx = (wx - cam.x) * R.scale + h.x, sy = (wy - cam.y) * R.scale + h.y;
+      if (sx < x0) x0 = sx; if (sx > x1) x1 = sx;
+      if (sy < y0) y0 = sy; if (sy > y1) y1 = sy;
+    }
+  }
+  return { x0: x0 - 3, y0: y0 - 3, x1: x1 + 4, y1: y1 + 4 };
+}
+
+function drawOne(cx, feat) {
+  R.drawRig(rig, cx, 0, rot, SCALE, LIGHTS, LAYER.ACTORS, { features: feat, keyDir: [-0.55, -0.84] });
+}
+
+let rot = 0;
+
+function frame(dt) {
+  R.tick(dt);
+  R.begin(cam);
+  if (GRID) {
+    for (let i = 0; i < VARIANTS.length; i++) {
+      const v = VARIANTS[i];
+      grainOn = v.grain;
+      applyGrain();
+      // grain is a per-layer uniform, so a variant that changes it needs its
+      // own layer slot; ACTORS_BACK is configured identically for this page
+      const layer = v.grain ? LAYER.ACTORS : LAYER.ACTORS_BACK;
+      R.drawRig(rig, (i - 2) * CELL, 0, rot, SCALE, LIGHTS, layer,
+        { features: v.f, keyDir: [-0.55, -0.84] });
+    }
+    grainOn = true; applyGrain();
+  } else {
+    drawOne(0, window.__feat || {});
+  }
+  R.end();
+}
+
+R.setLayer(LAYER.ACTORS_BACK, { shade: 0.25, response: 0.5, grainAmt: 0, haze: 0, parallax: 1, parallaxY: 1 });
+
+if (GRID) {
+  const lab = document.getElementById('labels');
+  for (let i = 0; i < VARIANTS.length; i++) {
+    const s = document.createElement('span');
+    s.textContent = VARIANTS[i].name;
+    s.style.left = (W * 0.5 + (i - 2) * CELL * R.scale) + 'px';
+    s.style.top = '8px';
+    lab.appendChild(s);
+  }
+}
+
+let frames = 0, last = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (qp('anim', 0)) rot = Math.sin(now / 1400) * 0.30;
+  frame(dt);
+  frames++;
+  if ((frames & 15) === 0) {
+    overlay([
+      `${R.pixelW}x${R.pixelH}  parts ${rig.parts.length}  triBudget ${rig.triBudget()}`,
+      `tris drawn ${R.stats.tris}  draws ${R.stats.drawCalls}  sprites ${R.stats.sprites}`,
+      `grain ${grainOn ? 'on' : 'off'}  frame ${frames}`,
+    ]);
+  }
+  requestAnimationFrame(loop);
+}
+
+window.__parts = {
+  R, rig, LIGHTS, LAYER, SCALE,
+  get stats() { return { ...R.stats }; },
+  triBudget: () => rig.triBudget(),
+  setCam(x, y, zoom) { cam.x = x; cam.y = y; if (zoom !== undefined) cam.zoom = zoom; },
+
+  /**
+   * R6 complement: the rig moves ON SCREEN while the camera stands still. A
+   * screen-locked tooth must NOT travel with the object — if the grain crop is
+   * identical after the move, the grain is stuck to the object, not the screen.
+   */
+  grainScreenLock(dxPx) {
+    const a = this.shot({}, true).crop;
+    const b = this.shot({}, true, dxPx / R.scale).crop;
+    const c = this.shot({}, false).crop;
+    const d = this.shot({}, false, dxPx / R.scale).crop;
+    const md = (p, q) => +(meanAbsDiff({px:p.px,w:p.w,h:p.h}, {px:q.px,w:q.w,h:q.h}, {x0:0,y0:0,x1:p.w,y1:p.h}) * 100).toFixed(4);
+    return { withGrain: md(a, b), withoutGrain: md(c, d) };
+  },
+
+  /** One solo frame with the named feature set; returns the rig-bbox crop. */
+  shot(features, grain = true, dx = 0) {
+    grainOn = grain;
+    applyGrain();
+    R.tick(1 / 60);
+    R.begin(cam);
+    R.drawRig(rig, cam.x + dx, 0, rot, SCALE, LIGHTS, LAYER.ACTORS,
+      { features, keyDir: [-0.55, -0.84] });
+    R.end();
+    const img = readback(R);
+    const box = rigBBox(dx);
+    grainOn = true; applyGrain();
+    return { crop: crop(img, box), box, tris: R.stats.tris };
+  },
+
+  diff(a, b) { return meanAbsDiff({ px: a.px, w: a.w, h: a.h }, { px: b.px, w: b.w, h: b.h }, { x0: 0, y0: 0, x1: a.w, y1: a.h }); },
+
+  /**
+   * Fraction of the bbox the rig actually paints. A bounding RECTANGLE around a
+   * biplane is mostly sky — the gaps between the wings and around the tail —
+   * so a per-bbox difference understates every feature by 1/coverage.
+   */
+  coverage() {
+    const on = this.shot({}, true).crop;
+    for (const p of rig.parts) p.hidden = true;
+    const off = this.shot({}, true).crop;
+    for (const p of rig.parts) p.hidden = false;
+    let n = 0;
+    for (let i = 0; i < on.px.length; i += 4) {
+      if (Math.abs(on.px[i] - off.px[i]) + Math.abs(on.px[i+1] - off.px[i+1]) + Math.abs(on.px[i+2] - off.px[i+2]) > 6) n++;
+    }
+    return n / (on.w * on.h);
+  },
+
+  /**
+   * R6: pan the camera and keep the rig pinned to the same screen position. A
+   * SCREEN-space grain leaves the pattern over the rig untouched; a world-space
+   * one drags it sideways by camPan * scale.
+   */
+  grainShift(pan) {
+    const c0 = this.shot({}, true).crop;
+    const x0 = cam.x;
+    cam.x = x0 + pan;
+    const c1 = this.shot({}, true).crop;
+    cam.x = x0;
+    const row = (c, y) => { const a = new Float32Array(c.w); let m = 0;
+      for (let x = 0; x < c.w; x++) { a[x] = c.px[(y * c.w + x) * 4]; m += a[x]; }
+      m /= c.w; for (let x = 0; x < c.w; x++) a[x] -= m; return a; };
+    const y = Math.floor(c0.h * 0.5);
+    return { shift: bestShift(row(c0, y), row(c1, y), Math.min(60, c0.w >> 2)),
+             mad: +(meanAbsDiff({px:c0.px,w:c0.w,h:c0.h}, {px:c1.px,w:c1.w,h:c1.h}, {x0:0,y0:0,x1:c0.w,y1:c0.h}) * 100).toFixed(4),
+             expectedWorldShift: +(pan * R.scale).toFixed(1) };
+  },
+
+  /** Every rig vertex in device px — the jitter-stability probe. */
+  vertexScreen() {
+    const out = [];
+    const m = rig.m;
+    const h = { x: R.pixelW * 0.5, y: R.pixelH * 0.5 };
+    for (const p of rig.parts) {
+      const i = rig.parts.indexOf(p) * 6;
+      for (let v = 0; v < p.nv; v++) {
+        const wx = m[i] * p.jx[v] + m[i + 2] * p.jy[v] + m[i + 4];
+        const wy = m[i + 1] * p.jx[v] + m[i + 3] * p.jy[v] + m[i + 5];
+        out.push([(wx - cam.x) * R.scale + h.x, (wy - cam.y) * R.scale + h.y]);
+      }
+    }
+    return out;
+  },
+
+  hashCrop(c) {
+    let h = 2166136261;
+    for (let i = 0; i < c.px.length; i++) { h ^= c.px[i]; h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(16);
+  },
+};
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

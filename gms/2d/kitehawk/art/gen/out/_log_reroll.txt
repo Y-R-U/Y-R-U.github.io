@@ -1,0 +1,3 @@
+[1/2] x47b_shred.png  205s  768x512 flux2-klein-4b
+[2/2] cL02.png  205s  768x768 flux2-klein-4b
+batch r_reroll.json queue time 6.8 min

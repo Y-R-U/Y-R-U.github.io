@@ -1,0 +1,10 @@
+[1/9] h60_zeppelin_whole.png  322s  1024x384 flux2-klein-9b-mlx-4bit
+[2/9] h60b_zeppelin_envelope.png  274s  1024x384 flux2-klein-9b-mlx-4bit
+[3/9] h60c_zeppelin_envelope_s2.png  220s  1024x384 flux2-klein-9b-mlx-4bit
+[4/9] h65_balloon_sphere.png  265s  768x768 flux2-klein-9b-mlx-4bit
+[5/9] h66_chateau.png  241s  1024x576 flux2-klein-9b-mlx-4bit
+[6/9] h67_bridge_wrecked.png  247s  1024x576 flux2-klein-9b-mlx-4bit
+[7/9] h68_factory_burning.png  238s  1024x576 flux2-klein-9b-mlx-4bit
+[8/9] h69_cathedral.png  268s  768x1024 flux2-klein-9b-mlx-4bit
+[9/9] h71_sun_bloom.png  163s  512x512 flux2-klein-4b
+batch h_hero.json queue time 37.3 min

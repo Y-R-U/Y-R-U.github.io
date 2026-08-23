@@ -1,0 +1,112 @@
+{
+  "gate": "audio",
+  "at": "2026-08-23T16:43:00.843Z",
+  "low": false,
+  "headed": false,
+  "viewport": null,
+  "counts": {
+    "oneShots": 65,
+    "sustained": 6,
+    "sweeps": 15,
+    "rows": 89
+  },
+  "thresholds": {
+    "rms": 0.0008,
+    "peak": 1,
+    "dc": 0.005,
+    "head": 0.02,
+    "tailRms": 0.004,
+    "resp": 0.3,
+    "release": 0.0008,
+    "dropRatio": 0.02,
+    "pitch": 1.03,
+    "distRatio": 1.5
+  },
+  "results": [
+    {
+      "name": "A1 — every one-shot makes sound and is clean",
+      "pass": true,
+      "value": 65,
+      "threshold": 65,
+      "op": ">=",
+      "unit": "effects",
+      "detail": "65/65 clean; quietest 0.00160 rms (leaves); loudest peak 0.795"
+    },
+    {
+      "name": "A2 — every swept parameter changes the output",
+      "pass": true,
+      "value": 0.4994,
+      "threshold": 0.3,
+      "op": ">=",
+      "unit": "fraction",
+      "detail": "weakest response is stallBuffet.speed at 0.4994 (rms 0.368, brightness 0.4994, modulation 0.1134); 15/15 sweeps clean; stallBuffet.speed rms sequence [0.0445,0.0524,0.0493,0.0575,0.0587,0.0661,0.0656,0.0704]"
+    },
+    {
+      "name": "A3 — a released source goes silent",
+      "pass": true,
+      "value": 0,
+      "threshold": 0.0008,
+      "op": "<=",
+      "unit": "rms",
+      "detail": "loudest 400 ms tail after release is groundRoll.surface at 0 rms; every sweep ended with zero live handles"
+    },
+    {
+      "name": "A4 — doppler shifts pitch up on approach",
+      "pass": true,
+      "value": 1.073,
+      "threshold": 1.03,
+      "op": ">=",
+      "unit": "ratio",
+      "detail": "weakest is slipstream.flyby at 1.073× approach/recede spectral centroid over mirrored 2.5 s windows, divided by the same seeded flyby rendered with doppler clamped off (210-2100 wu each side, 700 wu/s); ratios rotary.flyby=1.292 (raw 1.297 / ref 1.004, centroid 1103 Hz in vs 850 Hz out), slipstream.flyby=1.073 (raw 1.079 / ref 1.006, centroid 3593 Hz in vs 3328 Hz out), wireHum.flyby=1.315 (raw 1.328 / ref 1.01, centroid 2117 Hz in vs 1594 Hz out), zeppelinDrone.flyby=1.145 (raw 1.33 / ref 1.161, centroid 275 Hz in vs 207 Hz out); stallBuffet and groundRoll are self-noise and are excluded by design"
+    },
+    {
+      "name": "A5 — distance attenuates",
+      "pass": true,
+      "value": 5.94,
+      "threshold": 1.5,
+      "op": ">=",
+      "unit": "ratio",
+      "detail": "weakest is rotary.flyby at 5.94× (near 0.31274 rms at the pass vs 0.05265 rms at 2400 wu); ratios rotary.flyby=5.94, slipstream.flyby=7.354, wireHum.flyby=7.806, stallBuffet.flyby=7.675, zeppelinDrone.flyby=10.723, groundRoll.flyby=6.673"
+    },
+    {
+      "name": "A6 — the pool caps concurrent sources",
+      "pass": true,
+      "value": 12,
+      "threshold": 12,
+      "op": "<=",
+      "unit": "sources",
+      "detail": "asked for 22 rotaries at cap 12: 15 real handles, 12 live, 7 refused, 3 stolen; render rms 0.15018, nan 0"
+    },
+    {
+      "name": "A7 — release frees the slot",
+      "pass": true,
+      "value": 0.00017,
+      "threshold": 0.02,
+      "op": "<=",
+      "unit": "ratio",
+      "detail": "rotary+slipstream ran at 0.37393 rms and measured 0.000064 rms 2.2 s after release (0.00017×); live 0, dying 0, idle 2"
+    },
+    {
+      "name": "A9 — the facade is total with audio disabled",
+      "pass": true,
+      "value": 0,
+      "threshold": 0,
+      "op": "<=",
+      "unit": "exceptions",
+      "detail": "22 facade methods called with the context disabled and 22 with it enabled: 0 exceptions; available=false ready=false, sfx()=false, loop()=false, voice()={\"playing\":false,\"len\":0}; 45 game keys mapped, 0 resolving to nothing"
+    },
+    {
+      "name": "A8 — the lab page boots and every card plays",
+      "pass": true,
+      "value": 65,
+      "threshold": 65,
+      "op": ">=",
+      "unit": "cards",
+      "detail": "page ready true; 71 cards rendered; 65 play buttons clicked; 328 sliders; 6 sustained holds; ctx running; voices after firing everything 65"
+    }
+  ],
+  "pass": 9,
+  "fail": 0,
+  "skipped": 0,
+  "artifacts": []
+}

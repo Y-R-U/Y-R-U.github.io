@@ -1,0 +1,25 @@
+[1/24] cL01.png  328s  768x768 flux2-klein-4b
+[2/24] cL02.png  244s  768x768 flux2-klein-4b
+[3/24] cL03.png  244s  768x768 flux2-klein-4b
+[4/24] cL04.png  241s  768x768 flux2-klein-4b
+[5/24] cL05.png  235s  768x768 flux2-klein-4b
+[6/24] cL06.png  268s  768x768 flux2-klein-4b
+[7/24] cL07.png  217s  768x768 flux2-klein-4b
+[8/24] cL08.png  84s  768x768 flux2-klein-4b
+[9/24] cS09.png  87s  768x768 flux2-klein-4b
+[10/24] cS10.png  186s  768x768 flux2-klein-4b
+[11/24] cS11.png  220s  768x768 flux2-klein-4b
+[12/24] cS12.png  72s  768x768 flux2-klein-4b
+[13/24] cS13.png  75s  768x768 flux2-klein-4b
+[14/24] cS14.png  81s  768x768 flux2-klein-4b
+[15/24] cS15.png  84s  768x768 flux2-klein-4b
+[16/24] cS16.png  84s  768x768 flux2-klein-4b
+[17/24] cS17.png  84s  768x768 flux2-klein-4b
+[18/24] cS18.png  87s  768x768 flux2-klein-4b
+[19/24] cS19.png  90s  768x768 flux2-klein-4b
+[20/24] cS20.png  84s  768x768 flux2-klein-4b
+[21/24] cS21.png  90s  768x768 flux2-klein-4b
+[22/24] cS22.png  84s  768x768 flux2-klein-4b
+[23/24] cS23.png  81s  768x768 flux2-klein-4b
+[24/24] cS24.png  87s  768x768 flux2-klein-4b
+batch c_cloudmid.json queue time 57.3 min

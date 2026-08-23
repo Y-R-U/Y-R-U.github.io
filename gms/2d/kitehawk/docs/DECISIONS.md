@@ -252,3 +252,189 @@ saturation, neutral grey-blue` strips the warm-key/cool-shadow contrast that mak
 plates read as painted, yet it is what allows one asset to serve five acts through the LUT. Resolve
 with a small follow-up A/B: either accept props as the hard case and lean on `poster.js`, or make
 `TERRAIN` props act-exclusive and prompt them in palette.
+
+**D40** — **Build the complete game without checking in.** Aaron, 2026-08-24: *"you don't need my go
+ahead, I want you to do the complete game, only once we can play test will we consider tweaks and
+improvements."* This supersedes any habit of pausing between phases:
+
+- **The manager does not wait for permission to start the next phase.** When a phase agent reports
+  and its claims are verified, the next one is spawned immediately. Idling to ask is now the wrong
+  behaviour, not the safe one.
+- **Playtest is the only checkpoint.** Do not solicit design opinions, art opinions or tuning
+  preferences before there is something to play. Aaron will form them by playing.
+- **Still surface, without stopping:** non-obvious calls (D15), and anything that contradicts the
+  brief. Report and keep building — a report is not a question.
+- **Still goes to Aaron regardless:** the portrait→landscape pivot if the gate fails, and anything
+  irreversible or outward-facing beyond the routine commit/push he has already authorised.
+- Concurrency is unchanged: **one build agent at a time** by default (usage limits), plus the blind-
+  critic exception. That rule was never lifted, only the asking.
+- Commit and push freely at every milestone (D9), and register in `projects.js` once something is
+  playable.
+
+**D41** — **BUILD_PLAN.md supersedes the provisional phase table**: 17 phases, each brief
+self-contained, no brief over ~10 KB. Its §6 carries 15 rulings on contradictions DECISIONS had not
+settled; those rulings are accepted. Three matter:
+- **R-01: DESIGN and ARCHITECTURE describe two different aeroplanes.** At 45 m/s, ARCHITECTURE's
+  126 °/s is a 10.1 g turn while DESIGN's wing cannot exceed ~6.4 g there. **DESIGN wins on model
+  form, ARCHITECTURE on envelope targets**; P4 re-derives mass/area/CLmax/CD0/thrust to fit both.
+  The turn diameter and dive-recovery extent may not move — the portrait gate rests on them.
+- **R-08, a real bug behind D33:** ARCHITECTURE §3.4 puts terminal velocity (84 m/s) *below* Vne
+  (93), so **a dive could never overspeed the airframe** and DESIGN's whole "over the red" regime
+  was unreachable. D33 read this as a 7% coefficient error; it is worse than that. Fix: terminal =
+  Vne × 1.02–1.05.
+- **R-02:** ARCHITECTURE's provisional band table violates its own minimum-band constraint (Mud at
+  333 wu against a 700 wu floor). BUILD_PLAN's canonical six-band set replaces it.
+
+**R-15 amends ARCHITECTURE §5.1's audio-facade ownership** — the only override of the frozen
+contract, and it is accepted because the audio module is being built now.
+
+**D42** — **Back to ONE build agent at a time, and the usage tracker is report-only.** Aaron,
+2026-08-24: *"best to be safe than have all agents stop because we run out of usage."* The four
+agents in flight finish; nothing replaces them as they complete.
+
+**The tracker is unverified and must not drive concurrency.** Two things in it are guesses: the cost
+weights (only ratios matter, but they are approximations, not measurements) and the block phase,
+anchored on a *single* real `/usage` reading — one data point fixes both the limit and the phase, so
+a systematic error in either is invisible. Its gap-inference fallback was wrong by nearly three
+hours on its one test, which is why the scepticism is well founded.
+
+Verification is **pre-registered** so it cannot be fudged after the fact: predictions are written to
+`~/cc/usage/prediction_HHMM.json` *before* any comparison, and `~/cc/usage/VERIFY.md` says how to
+check them. Two or three readings across different burn rates will show whether the error is a
+constant scale factor (recalibrate) or drifts with load (the weights are wrong). Until then it is a
+report, not a control input.
+
+**D43** — **The audio engine landed with the sustained layer, 89/89 harness rows clean and 9/9 gates
+passing — and every gate was proven to go red when its feature was reverted.** That last part is the
+only reason to believe the first part: silence a one-shot and A1 goes red; disconnect the `rough`
+parameter and A2 falls to 0.218; neuter `stop()` and A3/A7 go 0/15; force doppler to 1 and all four
+sources read exactly 1.000; remove the cap and A6 reads 22/12. A test that still passes after you
+revert the fix was never testing it, and this repo has been bitten by that twice.
+
+Four bugs the harness caught that source review did not:
+- Misfire only dipped the firing tone; a dead cylinder takes the exhaust with it.
+- **Mean RMS is the wrong instrument for an intermittent parameter** — an 80% dip 20% of the time
+  barely moves the average, so a knob wired to a dramatic effect measured the same as one wired to
+  nothing. Fixed with envelope-modulation depth.
+- The rotary's filters did not doppler-shift, only its oscillators, so passes sounded thin.
+- **Two pitch proxies were believable and wrong on the zeppelin** — its engine beat swings the metric
+  more than pitch does, and a Goertzel bank 0.4 Hz wide samples arbitrary slivers. Replaced with an
+  averaged FFT centroid plus a doppler-clamped control render. A plausible-looking wrong metric is
+  more dangerous than an obviously broken one.
+
+**D44** — **Nobody has heard a single sound yet, and that is the honest state.** The harness proves
+each effect responds; it cannot prove any of it is *good*. Least confident, in order:
+`zeppelinDrone` (the beat may wallow), `stallBuffet` (an LFO can read as tremolo, not buffet),
+`wireHum` (risks theremin rather than structure), `ricochet` (cartoon-zing risk). **These need
+Aaron's ears or a blind critic before P15 content lands.** All defaults are agent guesses; per
+`SFX.md` the values Aaron lands on in the bench are what ship, and the bench emits a
+machine-applicable `DEFAULTS` block for exactly that.
+
+**D45** — **Layout call: the audio engine lives at `js/audio/` with the bench at `tools/sfxlab/`.**
+ARCHITECTURE §5's tree has no slot for either — §6.8 names only `core/audio.js` and §2.6 said not to
+port the DSP bank, which D16 later reversed. Accepted. Two consequent amendments to the frozen
+contract, both additive: §6.8 gains `param()`, `place()`, `handle()` and `update()` to drive a
+running source (it had no way to), and **§6.8's file-first SFX resolution order is superseded by D16**
+— the procedural bank is primary for SFX, while music, ambience and VO keep the file-first path.
+P2 owns the one-line re-export in `js/core/audio.js`.
+
+**D46** — **P1 landed: the renderer port, 2,494 lines, measured on a real GPU** (ANGLE Metal, not
+SwiftShader — worth stating, because software rendering would have made the draw-call numbers
+meaningless). 5,000 sprites across 8 layers = **9 draw calls at 60.0 fps at 390×844**; 8 without the
+additive stream, i.e. exactly one draw per layer, so Sunderfall's chunking claim survives the port.
+9,000 sprites still 9 draws at 60 fps.
+
+**D47** — **The falsification technique P1 used should be the house standard.** It did not merely
+assert `parallaxY` was implemented correctly — **it shipped the forbidden screen-space shortcut
+alongside it as `?impl=screen` and ran both through the gate.** The result is the point: the
+shortcut passes the axis-decoupling check *identically* (802.20 wu, same to two decimals) and only
+fails the zoom-invariance check, by 53.6/164.3 wu. **One of the two criteria could not have caught
+the bug it was written to catch.** Measurement was done by reading the marker back out of the
+framebuffer and inverting the shader, not by re-running the same arithmetic in JS — which is the
+difference between testing the renderer and testing your own formula.
+
+**D48** — **P1 refused to move a threshold to make a gate pass, and was right.** Two criteria are
+worded against the wrong quantity: R5 asks for "light contribution unchanged within 3/255", but
+under a correct ramp the *ratio* is invariant while absolute contribution must scale with the ramped
+albedo; R7 measures feature strength over the rig's bounding box, which divides footprint-local
+effects by the rig's 57.8% coverage of that rectangle. The shipped defaults are the ones that look
+right in `shots/p1/parts_five_way.png`, not the ones that clear a mis-specified number. **Fix the
+criteria at P16, not the constants.**
+
+**D49** — Accepted from P1: `R.mesh` stays deferred (the 6-segment canopy works); the **world-space
+brushwork term is drawn as a per-part overlay sprite**, not a third sampler in a frozen shader —
+flagged now so P16 does not discover it as a renderer change; and **ramp LUTs are authored as
+ordinary sRGB 256×1 strips** (the renderer squares them into linear, because every other texture
+here is display-space and without it a ramped layer sits visibly brighter).
+
+**D50** — **Vertex jitter is a close-up feature only, and this bounds what the art pass can rely on.**
+At combat framing the hull is ~54 px, so jitter big enough to see would be half a wing chord. It is
+now sized relative to each part's geometric mean extent. **The features carrying the painted read
+during a fight are the three tones, the loaded edge and the grain** — jitter earns its place only
+when the camera pushes in.
+
+**D51** — **`poster.js` works and props are still blocked. Both are true.** The bake lifts
+warm-key/cool-shadow contrast from 13–38 into the **37–84 band where the references sit**, and it
+kills the cast shadow deterministically. But three blind critics over two rounds picked the
+reference instantly and scored our sheet **3.33 against 7.67–8.00 — a gap of −4.5 against a −2.0
+gate**, calling it "flat", "posterise", "filter", "wallpaper". **The manager looked at
+`docs/refs/poster/in_situ.png` and agrees with the critics**: the painted ground is excellent and
+the props are pasted onto it.
+
+**The diagnostic that matters: tuning moved the score 3.33 → 3.33 while the critics' differences
+lists changed completely.** That is the NEONHAUL shape, and it means the remaining gap is **not in
+this step**. Six critic-named defects were genuinely `poster.js`'s and are fixed; what still fails
+is generation.
+
+**D52** — **The remaining prop failures are generation-side, and one is a carve-out to D36.**
+1. Ground gets painted in despite `no ground` — D22 again, negatives are inert; crop or compose.
+2. **Amputated structure** — watchtower legs, no gun trail, no MG support. **D36's "4B for props"
+   needs a carve-out: props with a load-bearing part tree need 9B**, which is what D36 already says
+   about structured subjects. 4B stays for FX and atmospherics.
+3. **D35's "all different, no two alike" was missing from the prop prompts** — the agent's own
+   omission, self-reported. Instanced drums and crates came out as clones.
+4. Period drift — three of eight assets are post-1930.
+5. **Contact shadows must be code-drawn** (D5), not baked. Props float exactly as the critics
+   describe, and no bake step can fix a shadow that has to respond to ground and light. **This is a
+   renderer requirement, not an art one** — it belongs with the actor draw path.
+
+**D53** — **D39 resolved: keep the neutral-light rule and lean on `poster.js`.** Controlled A/B, 8
+plates, seed and subject held, only the light clause varied. Neutral raw scores 12.7/23.3 against
+references at 45.5/81.9 — agent E's diagnosis was right — but neutral **+ bake** lands at 34.8/71.1,
+inside the band with no act colour baked in, while in-palette variants overshoot to 82–146. Cost:
+props now depend on the ramp-map actually shipping. Worth knowing: **`p04_cloud_cutout`, the plate
+`ART.md` §8 calls "the pipeline result", was never prompted neutral-lit** — the best shared asset in
+the project already breaks §7's rule, and what it has is neutral *saturation* with directional
+*temperature*, which is exactly what neutral + bake produces.
+
+**D54** — **Sky atlases delivered: 40 accepted plates, 18.5 MB, 121 minutes of queue across 75 jobs.**
+All 24 `CLOUD_MID` cutouts at bar, four FX marks at bar, the zeppelin reproducing `z10` bit-for-bit,
+plus château/bridge/cathedral. Real throughput was **75–90 s per plate against `ART.md`'s "~1
+minute"** — right for an idle queue, ~50% optimistic when shared. The 26 rejected plates are
+gitignored: they are exactly regenerable from `art/gen/manifests/`, and 17.1 MB of dead ends is not
+worth carrying forever.
+
+**D55** — **768×768 is the ceiling for an isolated cutout on this model, and this contradicts
+"generate large and downscale".** Same prompt, same seed, only the canvas changed: 896 gives a paper
+mount, 1024×768 gives scene furniture, 1024×1024 gives a die-cut sticker with a white border. So
+**pack large at 768 and downscale small to 512 — never upscale to 1024.** The layer lands under its
+2.2 MB budget rather than over it.
+
+**D56** — **Two refinements to my own earlier decisions, both from measurement:**
+- **D22 was too broad.** The `negative_prompt` *field* is inert, but a `no X` clause *inside the
+  prompt* is not — it removed a sun. It still cannot remove the 1024² sticker, which stays banned.
+- **D35 read literally is wrong.** Dropping the phenomenon noun for pure abstract marks produced
+  clone sheets twice, and a single mark generated alone becomes a photoreal wax seal. `f08`, the
+  proof plate, **kept the noun**. The paint-mark language replaces the *rendering adjectives*, not
+  the subject, and variation comes from naming contrasting states ("some fresh, some old and torn"),
+  not from "no two alike".
+
+**D57** — **Two bake bugs found by measurement rather than by eye.** `f08_varied` has marks inside
+the 4% crop zone, so **D22's mandatory crop would slice the reference plate's own outer marks off —
+crop the cutouts, key the sheets.** And key tolerance must be **≥12 per channel with per-plate
+backdrop sampling**, because `paper grain` in D34's stem puts real texture in the backdrop and an
+exact-match key removes nothing. General fix for stray suns, grass strips and shadows: after keying,
+keep only the largest connected component.
+
+**D58** — Independent confirmation from outside the prop set: `h68b_factory` kept a cast shadow
+despite being told not to. `poster.js`'s shadow pass is needed for hero objects too, not just props.

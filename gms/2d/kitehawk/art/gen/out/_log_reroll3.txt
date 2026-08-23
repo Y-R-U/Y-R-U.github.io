@@ -1,0 +1,7 @@
+[1/6] cL03.png  60s  768x768 flux2-klein-4b
+[2/6] cL05.png  69s  768x768 flux2-klein-4b
+[3/6] cL06.png  84s  768x768 flux2-klein-4b
+[4/6] cL07.png  90s  768x768 flux2-klein-4b
+[5/6] cL08.png  87s  768x768 flux2-klein-4b
+[6/6] cS12.png  84s  768x768 flux2-klein-4b
+batch r_reroll3.json queue time 7.9 min

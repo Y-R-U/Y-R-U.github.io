@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>kitehawk gfx — parallax</title>
+<style>
+  html,body{margin:0;background:#111;color:#cfc;font:12px ui-monospace,monospace}
+  #gl{display:block;margin:0 auto}
+  #hud{position:fixed;top:0;left:0;padding:6px 8px;background:rgba(0,0,0,.6);white-space:pre}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<script type="module">
+import { mount, qp, flatGrade, readback, pixelAt, centroid, overlay } from './harness.js';
+import { LAYER } from '../../js/gfx/renderer.js';
+import { makeRamp } from '../../js/gfx/texture.js';
+
+// Big enough that a 4,000 wu camera pan keeps the marker on screen on BOTH
+// axes: X moves the band 800 wu, Y moves it 3,600 wu.
+const { R } = await mount({ w: 1200, h: 1000, dpr: 1, worldH: 4200 });
+flatGrade(R);
+
+const MODE = qp('mode', 'band');
+const PX = qp('px', 0.20);
+const PY = qp('py', 0.90);
+const TEST = LAYER.CLOUD_MID;
+const IMPL = qp('impl', 'world');   // 'screen' = the forbidden shortcut, for falsification
+
+R.setLayerParallax(TEST, PX, PY);
+R.setLayer(TEST, { shade: 0, haze: 0, grainAmt: 0, rampAmt: 0 });
+R.setLayer(LAYER.SKY, { shade: 0, haze: 0, grainAmt: 0 });
+
+// A band with a real vertical extent, plus one small saturated marker drawn on
+// the same layer with the same parallax pair. The marker's position is measured
+// by reading the framebuffer back, so the test runs through the actual shader
+// rather than re-deriving the same arithmetic in JS.
+const BAND = { layer: TEST, tex: R.white, y0: -900, y1: -2100, worldW: 1400, tile: true };
+const MARK = { x: qp('mx', 0), y: qp('my', -1500), w: 90, h: 90 };
+
+// full-column sky ramp: y0 is the low end (+Y is down), y1 the top of the climb
+const SKY_Y0 = 200, SKY_Y1 = -10000;
+const skyLut = makeRamp(R.gl, [
+  [0.00, 0.66, 0.58, 0.44],
+  [0.28, 0.55, 0.60, 0.62],
+  [0.62, 0.28, 0.44, 0.72],
+  [1.00, 0.06, 0.13, 0.42],
+]);
+
+const cam = { x: 0, y: 0, zoom: 1 };
+
+function draw() {
+  R.tick(1 / 60);
+  R.begin(cam);
+  if (MODE === 'sky') {
+    R.skyRamp(SKY_Y0, SKY_Y1, skyLut, LAYER.SKY);
+  } else {
+    R.skyBand(BAND, { r: 0.16, g: 0.22, b: 0.30, a: 1 });
+    if (IMPL === 'screen') {
+      // The shortcut this whole change exists to forbid: parallax as a
+      // SCREEN-space scroll multiplier, i.e. cam * p * scaleAtZoom1 subtracted
+      // after the projection instead of from the camera before it. Emulated by
+      // drawing at parallax 0 and pre-compensating the world position, so it
+      // exercises the same shader. It is identical at zoom 1 and wrong
+      // everywhere else, which is exactly why it survives a code review.
+      const base = R.pixelH / R.worldHBase;
+      R.quad({ x: MARK.x - cam.x * PX * base / R.scale,
+               y: MARK.y - cam.y * PY * base / R.scale,
+               w: MARK.w, h: MARK.h, r: 1, g: 0.06, b: 0.06, a: 1,
+               layer: TEST, parallax: 0, parallaxY: 0 });
+    } else {
+      R.quad({ x: MARK.x, y: MARK.y, w: MARK.w, h: MARK.h, r: 1, g: 0.06, b: 0.06, a: 1,
+               layer: TEST, parallax: PX, parallaxY: PY });
+    }
+  }
+  R.end();
+}
+
+/** Marker centroid, in top-down device px, straight out of the framebuffer. */
+function findMarker() {
+  const img = readback(R);
+  return centroid(img, (r, g, b) => Math.max(0, r - Math.max(g, b) - 40));
+}
+
+const half = () => ({ x: R.pixelW * 0.5, y: R.pixelH * 0.5 });
+
+window.__px = {
+  R, LAYER, TEST, MARK, PX, PY, SKY_Y0, SKY_Y1,
+  setCam(x, y, zoom) { cam.x = x; cam.y = y; cam.zoom = zoom === undefined ? cam.zoom : zoom; },
+  setMark(x, y) { MARK.x = x; MARK.y = y; },
+  getCam() { return { ...cam }; },
+  draw,
+
+  /** Marker position in device px, and the world position that implies. */
+  measure() {
+    draw();
+    const c = findMarker();
+    if (!c) return null;
+    const h = half();
+    return {
+      screenX: c.x, screenY: c.y, px: c.n,
+      scale: R.scale,
+      // invert the shader: px = (world - cam * p) * scale
+      worldX: (c.x - h.x) / R.scale + cam.x * PX,
+      worldY: (c.y - h.y) / R.scale + cam.y * PY,
+    };
+  },
+
+  /** Colour at a given WORLD y, on the sky ramp's own column. */
+  sampleWorldY(worldY, layer = LAYER.SKY) {
+    // draw FIRST: R.scale only updates inside R.begin(), so computing the
+    // screen row before the frame samples the previous zoom's mapping
+    draw();
+    const cfg = R.getLayer(layer);
+    const h = half();
+    const sy = (worldY - cam.y * cfg.parallaxY) * R.scale + h.y;
+    if (sy < 1 || sy > R.pixelH - 2) return null;
+    const img = readback(R);
+    return { y: sy, rgb: pixelAt(img, Math.round(h.x), Math.round(sy)) };
+  },
+};
+
+function loop() {
+  draw();
+  overlay([
+    `mode ${MODE}  ${R.pixelW}x${R.pixelH}  worldH ${R.worldHBase}`,
+    `cam ${cam.x.toFixed(0)}, ${cam.y.toFixed(0)}  zoom ${cam.zoom.toFixed(2)}  scale ${R.scale.toFixed(4)}`,
+    `layer parallax ${PX} / parallaxY ${PY}`,
+    `sprites ${R.stats.sprites}  draws ${R.stats.drawCalls}`,
+  ]);
+  requestAnimationFrame(loop);
+}
+if (!qp('still', 0)) requestAnimationFrame(loop);
+else draw();
+</script>
+</body>
+</html>

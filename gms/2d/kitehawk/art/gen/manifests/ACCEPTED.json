@@ -1,0 +1,362 @@
+[
+ {
+  "out": "cL01",
+  "w": 768,
+  "h": 768,
+  "seed": 1,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated towering cumulus cloud with a tall stacked cauliflower head, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cL02",
+  "w": 768,
+  "h": 768,
+  "seed": 102,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated anvil-topped cumulonimbus cloud, a broad flat top spreading sideways over a heavy body, the whole cloud comfortably inside the frame with clear grey space on every side, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cL03",
+  "w": 768,
+  "h": 768,
+  "seed": 103,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated tall narrow cumulus tower, far taller than it is wide, a slim column of round cloud lobes stacked one above another, leaning slightly, the whole cloud comfortably inside the frame with clear grey space on every side, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow, no sun, no moon, no stars, no rocks, no cliffs, no buildings, no towers, no scaffolding, no metal, nothing but cloud"
+ },
+ {
+  "out": "cL04",
+  "w": 768,
+  "h": 768,
+  "seed": 4,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated broad mountainous cloud bank with two separate rounded peaks, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cL05",
+  "w": 768,
+  "h": 768,
+  "seed": 105,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated towering cumulus cloud with two tall separate heads and a deep shaded cleft of open air between them, the whole cloud comfortably inside the frame with clear grey space on every side, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow, no sun, no moon, no stars, no rocks, no cliffs, no buildings, no towers, no scaffolding, no metal, nothing but cloud"
+ },
+ {
+  "out": "cL06",
+  "w": 768,
+  "h": 768,
+  "seed": 206,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated cumulus congestus cloud with broad rounded tiers of cloud lobes rising one above another, the whole cloud small and comfortably inside the frame with a wide band of clear grey space on every side, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no sun, no moon, no rocks, no buildings, nothing but cloud, no cast shadow, no shadow on the ground beneath it, no white outline, no white border, no sticker, no die cut"
+ },
+ {
+  "out": "cL07",
+  "w": 768,
+  "h": 768,
+  "seed": 107,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated huge cumulus cloud with a smooth rounded crown above and a soft frayed wispy base of thin cloud below, the whole cloud comfortably inside the frame with clear grey space on every side, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow, no sun, no moon, no stars, no rocks, no cliffs, no buildings, no towers, no scaffolding, no metal, nothing but cloud"
+ },
+ {
+  "out": "cL08",
+  "w": 768,
+  "h": 768,
+  "seed": 208,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated cumulus tower leaning steeply to the right, its top blown sideways into a long trailing plume of thin cloud, the whole cloud small and comfortably inside the frame with a wide band of clear grey space on every side, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no sun, no moon, no rocks, no buildings, nothing but cloud, no cast shadow, no shadow on the ground beneath it, no white outline, no white border, no sticker, no die cut"
+ },
+ {
+  "out": "cS09",
+  "w": 768,
+  "h": 768,
+  "seed": 9,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated small fair-weather cumulus puff, a wide low mound of four soft lobes, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS10",
+  "w": 768,
+  "h": 768,
+  "seed": 10,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated round compact little cloud puff, almost a ball, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS11",
+  "w": 768,
+  "h": 768,
+  "seed": 11,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated long flat raft of cloud, four times wider than it is tall, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS12",
+  "w": 768,
+  "h": 768,
+  "seed": 212,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated long curved bank of cumulus cloud bowed into a gentle arc, soft rounded lobes along its whole length, the whole cloud small and comfortably inside the frame with a wide band of clear grey space on every side, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no sun, no moon, no rocks, no buildings, nothing but cloud, no cast shadow, no shadow on the ground beneath it, no white outline, no white border, no sticker, no die cut"
+ },
+ {
+  "out": "cS13",
+  "w": 768,
+  "h": 768,
+  "seed": 13,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated small cloud with a flat level base and one rounded head above it, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS14",
+  "w": 768,
+  "h": 768,
+  "seed": 14,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated pair of small cloud puffs joined by a thin bridge of vapour, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS15",
+  "w": 768,
+  "h": 768,
+  "seed": 15,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated thin horizontal streak of stratus cloud, soft and flat, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS16",
+  "w": 768,
+  "h": 768,
+  "seed": 16,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated small ragged scrap of fractus cloud with no clear shape, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS17",
+  "w": 768,
+  "h": 768,
+  "seed": 17,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated small cauliflower cloud puff with a bumpy knobbly top, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS18",
+  "w": 768,
+  "h": 768,
+  "seed": 18,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated smooth lens-shaped lenticular cloud, sleek and almond-like, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS19",
+  "w": 768,
+  "h": 768,
+  "seed": 19,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated small tufted cloud puff trailing one thin wisp to the right, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS20",
+  "w": 768,
+  "h": 768,
+  "seed": 20,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated crescent-shaped curved bank of cloud, bowed like a bracket, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS21",
+  "w": 768,
+  "h": 768,
+  "seed": 21,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated small dense cloud with a dark flat underside and a bright rounded crown, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS22",
+  "w": 768,
+  "h": 768,
+  "seed": 22,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated clump of three small cloud puffs of different sizes crowded together, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS23",
+  "w": 768,
+  "h": 768,
+  "seed": 23,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated thin translucent veil patch of cloud, soft and dissolving at the edges, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "cS24",
+  "w": 768,
+  "h": 768,
+  "seed": 24,
+  "steps": 16,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated small cloud taller than it is wide with a narrow pinched waist, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"
+ },
+ {
+  "out": "x40_puff_a",
+  "w": 768,
+  "h": 512,
+  "seed": 8808,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of eight anti-aircraft shell burst smoke puffs, all different shapes and sizes and ages, some fresh and compact with a flat hot orange core, some old and torn and drifting into wispy ragged tails, each one a ragged torn-edged blot of thick opaque paint, dirty charcoal and warm brown, limited palette, irregular scattered layout, no two alike, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "x42_puff_b",
+  "w": 768,
+  "h": 512,
+  "seed": 8908,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of eight anti-aircraft shell burst smoke puffs, all different shapes and sizes and ages, some fresh and compact with a flat hot orange core, some old and torn and drifting into wispy ragged tails, each one a ragged torn-edged blot of thick opaque paint, dirty charcoal and warm brown, limited palette, irregular scattered layout, no two alike, every mark small and well inside the sheet with a wide empty grey margin all around it, nothing touching or near the edge of the frame, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "x43_streak",
+  "w": 768,
+  "h": 512,
+  "seed": 43,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of nine separate long tapered drag strokes of near-black charcoal paint made by a loaded flat brush pulled fast across the paper, thick and solid at one end and dry-broken into bristle streaks at the other, all different lengths and thicknesses and angles, irregular scattered layout, no two alike, wide clear space between every stroke, limited palette, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "x45_spark",
+  "w": 768,
+  "h": 512,
+  "seed": 45,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of sixteen separate tiny flicked specks and comma-shaped dashes of near-black charcoal paint thrown from the tip of a loaded brush, all different sizes and angles, some barely a dot and some a short curved tick, irregular scattered layout, no two alike, wide clear space between every mark, limited palette, every mark placed well inside the frame with clear grey space around it, no mark near the edge, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "x46_wisp",
+  "w": 768,
+  "h": 512,
+  "seed": 46,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of nine separate long wispy dry-brush smears of near-black charcoal paint dragged across the paper with an almost empty brush, the separate bristle streaks showing through, each fading from solid at one end to nothing at the other, all different lengths and curves and angles, irregular scattered layout, no two alike, wide clear space between every smear, limited palette, every mark placed well inside the frame with clear grey space around it, no mark near the edge, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "x47b_shred",
+  "w": 768,
+  "h": 512,
+  "seed": 147,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of nine separate torn slivers and splinters of near-black charcoal paint, each a long thin shard with sharp jagged points at both ends, all different lengths and widths and angles, none of them square, none of them rectangular, none of them round, irregular scattered layout, no two alike, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "x48_blob",
+  "w": 768,
+  "h": 512,
+  "seed": 48,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of nine separate soft round dabs of near-black charcoal paint pressed with a soft loaded brush, dense and solid in the middle and scumbled softly out to nothing at the rim with no hard edge anywhere, all different sizes and roundnesses, irregular scattered layout, no two alike, wide clear space between every dab, limited palette, every mark placed well inside the frame with clear grey space around it, no mark near the edge, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "h60_zeppelin_whole",
+  "w": 1024,
+  "h": 384,
+  "seed": 7707,
+  "steps": 16,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one enormous WWI zeppelin airship seen from the side, doped fabric envelope with longitudinal frame seams, tail fins, a control gondola and two engine nacelles slung beneath on short struts, warm cream sunlight on the upper curve and cool violet shadow below, crisp readable silhouette, no cables, no ropes, no mooring lines, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "h60b_zeppelin_envelope",
+  "w": 1024,
+  "h": 384,
+  "seed": 7707,
+  "steps": 16,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one enormous WWI zeppelin airship envelope alone seen from the side, a long doped fabric hull with longitudinal frame seams and cruciform tail fins, nothing slung beneath it, warm cream sunlight on the upper curve and cool violet shadow below, crisp readable silhouette, no gondola, no nacelles, no engines, no cables, no ropes, no mooring lines, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "h60c_zeppelin_envelope_s2",
+  "w": 1024,
+  "h": 384,
+  "seed": 7807,
+  "steps": 16,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one enormous WWI zeppelin airship envelope alone seen from the side, a long doped fabric hull with longitudinal frame seams and cruciform tail fins, nothing slung beneath it, warm cream sunlight on the upper curve and cool violet shadow below, crisp readable silhouette, no gondola, no nacelles, no engines, no cables, no ropes, no mooring lines, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "h61_balloon",
+  "w": 768,
+  "h": 768,
+  "seed": 61,
+  "steps": 16,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI Drachen observation balloon envelope seen from the side, a fat sausage-shaped doped fabric gasbag with three bulbous stabiliser lobes at the tail, warm cream sunlight on the upper curve and cool violet shadow below, crisp readable silhouette, no cables, no ropes, no mooring lines, no basket, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "h65b_balloon_sphere",
+  "w": 768,
+  "h": 768,
+  "seed": 165,
+  "steps": 16,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one WWI spherical observation balloon gasbag alone, just the fat round doped fabric envelope and nothing else, a net of rigging cord pressed into its surface, the bottom of the sphere simply ends, warm cream sunlight on the upper curve and cool violet shadow below, crisp readable silhouette, no basket, no gondola, no wicker, no burner, no cables, no ropes, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no grass, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "h66_chateau",
+  "w": 1024,
+  "h": 576,
+  "seed": 66,
+  "steps": 16,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one large French country chateau seen from the side, a long pale stone facade with steep blue-grey slate roofs, two round corner towers with conical caps, tall shuttered windows, low warm sunlight raking from the left and cool violet shadow on the right faces, crisp readable silhouette, flat straight-on side elevation, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no trees, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "h67_bridge_wrecked",
+  "w": 1024,
+  "h": 576,
+  "seed": 67,
+  "steps": 16,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one wrecked stone arch bridge seen from the side, three tall masonry arches with the middle span blown away and the broken stonework hanging, low warm sunlight raking from the left and cool violet shadow inside the arches, crisp readable silhouette, flat straight-on side elevation, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no water, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ },
+ {
+  "out": "h68b_factory",
+  "w": 1024,
+  "h": 768,
+  "seed": 168,
+  "steps": 16,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one long brick industrial factory building seen from the side, a sawtooth glass roof, two tall round chimneys, one end of the roof collapsed, the whole building including the full height of both chimneys comfortably inside the frame with clear grey space above and on every side, low warm sunlight raking from the left and cool violet shadow on the right faces, crisp readable silhouette, flat straight-on side elevation, no smoke, no fire, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no grass, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail, no sun, no sunburst, no glow, no white border, no paper mount, nothing else in the frame"
+ },
+ {
+  "out": "h69_cathedral",
+  "w": 768,
+  "h": 1024,
+  "seed": 69,
+  "steps": 16,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one tall gothic cathedral seen from the side, a long nave with flying buttresses and one very tall stone spire, a shell-torn hole in the roof, low warm sunlight raking from the left and cool violet shadow on the right faces, crisp readable silhouette, flat straight-on side elevation, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no trees, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail"
+ }
+]

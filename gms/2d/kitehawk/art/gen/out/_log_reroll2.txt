@@ -1,0 +1,3 @@
+[1/2] h65b_balloon_sphere.png  129s  768x768 flux2-klein-9b-mlx-4bit
+[2/2] h68b_factory.png  220s  1024x768 flux2-klein-9b-mlx-4bit
+batch r_reroll2.json queue time 5.8 min

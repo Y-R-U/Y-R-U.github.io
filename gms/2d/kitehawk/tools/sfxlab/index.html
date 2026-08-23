@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d1013">
+<meta name="description" content="KITEHAWK SFX bench — every sound effect synthesized live with the Web Audio API. No audio files.">
+<title>KITEHAWK · SFX Bench</title>
+<link rel="stylesheet" href="css/lab.css">
+</head>
+<body>
+
+<header id="top">
+  <a id="back" href="../../index.html" aria-label="Back to KITEHAWK">‹</a>
+  <div id="title"><b>SFX BENCH</b><s>synthesized · hold, tune, triage</s></div>
+  <div id="meter">
+    <canvas id="scope" width="180" height="34"></canvas>
+    <div id="meterbars"><i id="rms"></i><u id="pk"></u></div>
+    <div id="voices">0 voices</div>
+  </div>
+</header>
+
+<nav id="tabs">
+  <div id="tally"></div>
+  <div id="acts">
+    <button id="copykeep" class="prim">Copy keepers</button>
+    <button id="copyall">Copy all</button>
+    <button id="stopall">Release all</button>
+    <button id="resetall" class="warn">Reset</button>
+  </div>
+</nav>
+
+<main>
+  <div id="bench"></div>
+</main>
+
+<div id="gate">
+  <div class="gcard">
+    <div class="glogo">SFX BENCH</div>
+    <p>Everything you hear is synthesized in the browser — there are no audio files.</p>
+    <button id="gbtn">Enable audio</button>
+    <small>Browsers only start audio from a real tap.</small>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module" src="js/bench.js"></script>
+</body>
+</html>

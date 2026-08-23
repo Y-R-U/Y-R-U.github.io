@@ -1,0 +1,56 @@
+[
+ {
+  "out": "x42_puff_b",
+  "w": 768,
+  "h": 512,
+  "seed": 8908,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of eight anti-aircraft shell burst smoke puffs, all different shapes and sizes and ages, some fresh and compact with a flat hot orange core, some old and torn and drifting into wispy ragged tails, each one a ragged torn-edged blot of thick opaque paint, dirty charcoal and warm brown, limited palette, irregular scattered layout, no two alike, every mark placed well inside the frame with clear grey space around it, no mark near the edge, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "x44_streak_b",
+  "w": 768,
+  "h": 512,
+  "seed": 44,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of nine separate long tapered drag strokes of near-black charcoal paint made by a loaded flat brush pulled fast across the paper, thick and solid at one end and dry-broken into bristle streaks at the other, all different lengths and thicknesses and angles, irregular scattered layout, no two alike, wide clear space between every stroke, limited palette, every mark placed well inside the frame with clear grey space around it, no mark near the edge, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "x45_spark",
+  "w": 768,
+  "h": 512,
+  "seed": 45,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of sixteen separate tiny flicked specks and comma-shaped dashes of near-black charcoal paint thrown from the tip of a loaded brush, all different sizes and angles, some barely a dot and some a short curved tick, irregular scattered layout, no two alike, wide clear space between every mark, limited palette, every mark placed well inside the frame with clear grey space around it, no mark near the edge, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "x46_wisp",
+  "w": 768,
+  "h": 512,
+  "seed": 46,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of nine separate long wispy dry-brush smears of near-black charcoal paint dragged across the paper with an almost empty brush, the separate bristle streaks showing through, each fading from solid at one end to nothing at the other, all different lengths and curves and angles, irregular scattered layout, no two alike, wide clear space between every smear, limited palette, every mark placed well inside the frame with clear grey space around it, no mark near the edge, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "x47_shred",
+  "w": 768,
+  "h": 512,
+  "seed": 47,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of nine separate flat solid patches of near-black charcoal paint each with a jagged broken splintered outline, like fragments snapped off something, all different shapes and sizes, some long and splintery, some blocky, irregular scattered layout, no two alike, wide clear space between every patch, limited palette, every mark placed well inside the frame with clear grey space around it, no mark near the edge, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ },
+ {
+  "out": "x48_blob",
+  "w": 768,
+  "h": 512,
+  "seed": 48,
+  "steps": 14,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of nine separate soft round dabs of near-black charcoal paint pressed with a soft loaded brush, dense and solid in the middle and scumbled softly out to nothing at the rim with no hard edge anywhere, all different sizes and roundnesses, irregular scattered layout, no two alike, wide clear space between every dab, limited palette, every mark placed well inside the frame with clear grey space around it, no mark near the edge, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"
+ }
+]
