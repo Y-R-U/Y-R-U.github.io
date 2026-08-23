@@ -41,7 +41,8 @@ import { Minimap } from './minimap.js';
 import { UI, DockUI, CabinPanel, holdFor, CHATTER_MULT } from './ui.js';
 import * as Ranks from './ranks.js';
 import * as Story from './story.js';
-import { IntroScene, HirePanel, EndingPanel, StoryVoice, SCRIPT as STORY_SCRIPT, ThreadPanel, OwnPanel } from './storyui.js';
+import { IntroScene, HirePanel, EndingPanel, StoryVoice, SCRIPT as STORY_SCRIPT, ThreadPanel, OwnPanel,
+  BossPanel } from './storyui.js';
 import * as Company from './company.js';
 import { Fleet } from './fleet.js';
 import { FleetPanel, DriverFeed } from './companyui.js';
@@ -958,7 +959,7 @@ checkStanding(true);
 
 let story = null;
 let introScene = null, hirePanel = null, endingPanel = null, storyVoice = null;
-let ownPanel = null;
+let ownPanel = null, bossPanel = null;
 // §S2-I — the company layer. Declared HERE with the other forward `let`s and not beside its own
 // build block, for the reason this file has now paid for four times: `updateVehicles()` and
 // `craftShown()` both read `viewing` and they run well above where the company is built, and a
@@ -985,15 +986,29 @@ if (Game.economy) {
   // playing 84 minutes to reach it. ?debt=<minutes> winds the meter on instead, which is the one
   // that exercises the real escalation ladder.
   if (FLAG.debt !== null) story.t = Math.max(0, FLAG.debt) * 60;
-  if (FLAG.story === 'due') { story.stage = Story.STAGE.DEBT; story.t = Story.WINDOW_S; story.due = true; }
-  else if (FLAG.story === 'paid' || FLAG.story === 'seized') {
-    story.stage = Story.STAGE.DEBT;
-    if (FLAG.story === 'paid') Game.economy.credits = Math.max(Game.economy.credits, Story.DEBT);
-    else Game.economy.credits = Math.min(Game.economy.credits, Story.DEBT - 1);
-    story.t = Story.WINDOW_S; story.due = true;
-  } else if (FLAG.story === 'act2') {
-    story.stage = Story.STAGE.ACT2; story.branch = 'seized'; story.grounded = true;
-    story.wreckLeft = 1; Game.economy.credits = Story.HIRE.SEIZED_CREDITS;
+  // §S2-P. There is ONE road, so the flags name POSITIONS ON IT rather than branches:
+  //
+  //   ?story=taken     act one with the seizure armed — the crew are at the next dock
+  //   ?story=summons   after the seizure, before the Boss meeting (act two's objective is live)
+  //   ?story=act2      after the meeting: company layer open, the thread's remarks un-gated
+  //
+  // `due` and the old `paid`/`seized` are kept as ALIASES of `taken`. They named the two branches
+  // and both now reach the same scene, so a stale command line lands on the beat it meant rather
+  // than silently doing nothing — and the credits are left exactly as `?crd=` set them, because
+  // the balance no longer decides anything.
+  const pos = FLAG.story === 'due' || FLAG.story === 'paid' || FLAG.story === 'seized'
+    ? 'taken' : FLAG.story;
+  if (pos === 'taken') { story.stage = Story.STAGE.DEBT; story.due = true; }
+  else if (pos === 'summons' || pos === 'act2') {
+    story.stage = Story.STAGE.ACT2;
+    story.branch = Story.OUTCOME.branch;
+    story.grounded = true;
+    story.wreckLeft = 1;
+    Game.economy.flags = Array.from(new Set([...(Game.economy.flags || []), ...Story.OUTCOME.flags]));
+    if (pos === 'act2') {
+      story.met = true;
+      Game.economy.flags = Array.from(new Set([...Game.economy.flags, 'crew_hook', 'paid_up']));
+    }
   }
 }
 
@@ -1016,7 +1031,7 @@ function beginDebt(pick) {
   story.name = (pick && pick.name) || story.name || 'COURIER';
   story.gender = (pick && pick.gender) || story.gender || 'n';
   story.t = 0;
-  story.rate = Story.BREAK_EVEN;
+  story.rate = 0;
   if (Game.economy) Game.economy.borrowed = true;
   persist();
   return true;
@@ -1029,7 +1044,10 @@ function beginDebt(pick) {
 function bossSays(line) {
   if (!line) return;
   ui.chatter({ speaker: 'THE BOSS', text: line.text, tag: 'alert' });
-  toast(line.text, line.id === 'clear' ? 'pay' : 'warn', 5600);
+  // `ready` is act two's line — he is expecting you, which is progress rather than a threat. It
+  // was keyed on `clear`, the id BOSS_CLEAR carried before §S2-Q, and a stale id here would have
+  // painted the one encouraging thing the Boss ever says in the warning colour.
+  toast(line.text, line.id === 'ready' ? 'pay' : 'warn', 5600);
 }
 
 function hireState() {
@@ -1101,9 +1119,19 @@ function maybeCloseArc() {
   return res;
 }
 
-// The crew arrive. Called from doDock and NOWHERE else.
+// The crew arrive. **Called from tickStory while the player is on a pad, and nowhere else.**
+//
+// It used to be called from `doDock` only, and that is one of the three defects this restructure
+// exists to fix: a player who armed the trigger and then kept flying — or who was already standing
+// on a pad when it armed — never saw the crew at all. Docked-and-checked-every-frame is the same
+// rule (*"the seizure happens at a dock, never mid-air"*) with the hole taken out of it.
 function settleDebt() {
   if (!story || !Game.economy || story.stage !== Story.STAGE.DEBT || !story.due) return null;
+  // **The dock rule lives HERE, not at the call site.** The first cut of this restructure guarded
+  // it in `tickStory` and left this function open, and the very first browser run settled act one
+  // in mid-air the frame the balance crossed 2 500. `gates_s2e` C1 is the check that exists for
+  // exactly this, and one function owning the rule is why it cannot come back through a new caller.
+  if (!dockPad) return null;
   const res = Story.settle(story, Game.economy);
   hireLimp = false; hireWarned = false;
   // The hull stays visible and flyable-looking until the panel is dismissed; `grounded` is what
@@ -1116,8 +1144,39 @@ function settleDebt() {
   // ending rather than as a stale repaint.
   boardJobs = boardNow();
   dockUI?.refresh(boardJobs, Game.economy, '');
-  radio?.event(res.paid ? 'dispatch_pay' : 'dispatch');
+  radio?.event('dispatch');
+  // Both are `.cabin-layer`s at one z. The dock's hire panel opens itself for a grounded player and
+  // would stack behind this — S2-I's lesson, and it reads as a rendering fault rather than as two
+  // screens. The ending's own `close` hook re-opens it a moment later, which is the right order.
+  hirePanel?.hide();
   endingPanel?.show(res, Game.economy);
+  return res;
+}
+
+// ── the Boss meeting ──────────────────────────────────────────────────────
+//
+// Act two's opening objective, and the beat Aaron asked for by name: *"earn $10k and bring it to
+// 'the boss' as he wants to talk to you."* Same rule as the seizure and for the same reason — it
+// lands at a dock, checked on the frame, so it cannot be outrun and cannot be missed by arriving
+// at the money while already parked.
+//
+// It is what opens act two proper: `story.met` un-gates the company layer (`companyOpen`), the
+// remarks about the player's father (`Story.nextRemark`) and, through them, the desk under the
+// Tallow Yard.
+function maybeMeetBoss() {
+  if (!story || !Game.economy || !dockPad || !bossPanel) return null;
+  const res = Story.meetBoss(story, Game.economy);
+  if (!res) return null;
+  persist();
+  audio?.payment();
+  radio?.event('dispatch_pay');
+  hirePanel?.hide();
+  fleetPanel?.hide();
+  threadPanel?.hide();
+  // The board behind the panel is painted from the balance he just took ten thousand out of.
+  boardJobs = boardNow();
+  dockUI?.refresh(boardJobs, Game.economy, '');
+  bossPanel.show(res);
   return res;
 }
 
@@ -1136,6 +1195,11 @@ if (Game.economy && !FLAG.shot) {
   // The arc's curtain. It has no `close` work to do — that is the point of it: pressing FLY puts
   // the player back on the board they were already standing on and nothing anywhere is different.
   ownPanel = new OwnPanel(document.getElementById('own'), {});
+  // The meeting. Its `close` does the same job the ending's does: a player who is grounded when
+  // they walk out of that room needs the one screen that fixes it, not an empty pad.
+  bossPanel = new BossPanel(document.getElementById('boss'), {
+    close: () => { if (Story.grounded(story, Game.economy)) hirePanel?.show('ground'); },
+  });
   storyVoice = new StoryVoice({ audio: null, base: './', onError: (k, m) => reportAudio(k, m) });
 }
 
@@ -1152,9 +1216,13 @@ if (Game.economy && !FLAG.shot) {
 // **It opens after act one**, because that is where the brief puts it: the player has lost the car
 // either way and is on hires, and a business is what act two is about. `?fleet=n` opens it for a
 // gate without playing 84 minutes to get there.
+// §S2-P — it opens at the BOSS MEETING, not at the seizure. The seizure now lands three to eight
+// minutes into a first run; handing the player a company layer there would put a founding fee and
+// a payroll in front of somebody who has just been grounded and has one objective. Aaron's line is
+// that the meeting *"opens act two"*, and this is the surface that makes that true.
 function companyOpen() {
   if (FLAG.fleet !== null) return true;
-  return !!story && story.stage === Story.STAGE.ACT2;
+  return !!story && story.stage === Story.STAGE.ACT2 && !!story.met;
 }
 
 function buildCompany() {
@@ -1355,7 +1423,9 @@ function doPlayerOffBook(on) {
 // and `info` tiers. Nothing marks them. A player who is not listening never notices, and the row
 // that leads to this panel only appears because two of them landed.
 // What the RECORD tab needs to know about the other side, in one object so the surface never has to
-// reach into the story. `door` is `null` | 'cue' | 'asked' | 'seized' — see `Story.shadyDoor`.
+// reach into the story. `door` is `null` | 'cue' | 'asked' — see `Story.shadyDoor`. §S2-P removed
+// the fourth state, `'seized'`: it was the other branch's immediate door and there is no other
+// branch, so the thread is the only way in and the player is always the one who opens it.
 function threadInfo() {
   if (!story) return null;
   const th = story.thread || {};
@@ -1390,9 +1460,9 @@ function doAskDad() {
   if (!story || !group) return null;
   const r = Story.askDad(story, simTime);
   if (!r.ok) return r;
-  // The door, and the standing that comes with knowing. `crew_hook` is the same flag the seized
-  // branch sets — two routes into one room, which is the whole design — and it is worth 0 rungs
-  // there and here, because a contact is not a reputation.
+  // The door. `crew_hook` is the same flag the Boss meeting sets and is worth 0 rungs in both
+  // places, because a contact is not a reputation — the meeting tells you they exist and this tells
+  // you how to walk in as a worker rather than as somebody's son.
   Company.openBranch(group, simTime);
   Game.economy.flags = Array.from(new Set([...(Game.economy.flags || []), 'crew_hook']));
   toast('THE TALLOW YARD DESK', 'pay', 5600);
@@ -1715,12 +1785,14 @@ function doDock(pad) {
   boardJobs = boardNow();
   dockUI?.show(padForPanel(pad), boardJobs, Game.economy);
   wantBlur = true;                        // §7.3's static blur, captured on the next rendered frame
-  // §S2-E — the crew. This is the ONLY call site of settleDebt(), and it is here because the
-  // brief is explicit that the seizure happens at a dock: the player has to be standing somewhere
-  // they can immediately hire. It runs AFTER the board is shown so the ending panel lands on top
-  // of the screen they will be using thirty seconds later rather than over a black frame.
-  if (story && story.due) settleDebt();
-  else if (Story.grounded(story, Game.economy)) hirePanel?.show('ground');
+  // §S2-P — the crew and the meeting are NOT called from here any more. They are checked in
+  // `tickStory` behind `dockPad`, which is the same "only at a dock" rule with the hole taken out:
+  // the shipped build called `settleDebt()` from this function alone, so a player who armed the
+  // trigger and kept flying, or who was already parked when it armed, never saw it. They land on
+  // the next frame, which is still after the board below has been shown.
+  if (!story || (!story.due && !Story.summonsReady(story, Game.economy))) {
+    if (Story.grounded(story, Game.economy)) hirePanel?.show('ground');
+  }
   return res;
 }
 
@@ -1922,10 +1994,15 @@ function tickStory(dt) {
   const ev = Story.tick(story, Game.economy, dt, simTime);
   if (ev.boss) bossSays(ev.boss);
   if (ev.due) {
-    // He does not arrive here — he arrives at the next dock. What arrives here is the last warning,
-    // which is the whole of what the player is owed while they are still in the air.
-    toast('THEY ARE COMING. Be somewhere you can pay.', 'warn', 6800);
+    // They do not arrive here — they arrive at the pad. What arrives here is the last warning, and
+    // it names the number, because the whole point of the restructure is that the player can see
+    // what armed it.
+    toast(`THEY ARE COMING — ${Story.SEIZE_AT} CRD IN THE ACCOUNT. The next pad is the one.`, 'warn', 7200);
     ui.chatter({ speaker: 'THE BOSS', text: 'We are on our way. Put down somewhere.', tag: 'alert' });
+    persist();
+  }
+  if (ev.ready) {
+    toast(`${Story.SUMMONS} CRD — TAKE IT TO HIM. Any pad.`, 'pay', 7200);
     persist();
   }
 
@@ -1944,8 +2021,14 @@ function tickStory(dt) {
       persist();
     }
   }
-  // The arc's curtain, checked on the same beat as the meter it ends. `Story.ownArc` early-outs on
-  // the latch, so this is a handful of field reads once the beat has fired.
+  // The three beats that land on a pad, in the order the player meets them. Each early-outs on its
+  // own latch, so once they have fired this is a handful of field reads per frame.
+  //
+  // Order is load-bearing: the seizure has to precede the meeting (the meeting only exists in act
+  // two) and the meeting has to precede the curtain (`ownArc` lists `summons` as a condition), so
+  // three beats can never land on the same frame in the wrong sequence.
+  settleDebt();
+  maybeMeetBoss();
   maybeCloseArc();
 
   // The cabin key is live exactly when there is something for it to do: on a hire, or grounded.
@@ -2158,12 +2241,15 @@ function hudData() {
           * (f ? f.maxFwd : FLIGHT.MAX_FWD)
         : false,
     comms: chat ? { speaker: chat.speaker, level: clamp(chat.left / Math.max(0.001, chat.hold), 0, 1) } : null,
-    // §S2-E's warmth. `null` in act two and during the intro, which is what makes the dash bay go
-    // back to being a blanking plate rather than a gauge reading zero — there is no debt to be
-    // behind on, and a needle parked at cold would be a claim about something that no longer
-    // exists. `warmthShown` is the SMOOTHED value; see below.
+    // §S2-P's demand gauge. `null` during the intro and once the Boss has been paid, which is what
+    // makes the dash bay go back to being a blanking plate rather than a gauge reading zero —
+    // there is nothing left to be short of, and a needle parked at cold would be a claim about
+    // something that no longer exists. `warmthShown` is the SMOOTHED value; see below.
     warmth: warmthShown,
     warmthState: warmthStateNow(),
+    // The credits still needed, RAW. It is the actionable half of the signal and the dash bay is
+    // too small to print it, so the chase HUD's bar carries it.
+    warmthNeed: warmthNeedNow(),
     hire: story && story.hire
       ? { craft: story.hire.craft, left: Math.max(0, Story.hireLeft(story, simTime)),
         block: Story.HIRE.BLOCK_S }
@@ -2182,16 +2268,23 @@ function hudData() {
 // reports the raw signal, and every gate reads that rather than the needle.
 const WARMTH_TAU = 8;
 function tickWarmth(dt) {
-  if (!story || !Game.economy || story.stage !== Story.STAGE.DEBT) { warmthShown = null; return; }
+  const d = Story.demand(story, Game.economy);
+  if (!d) { warmthShown = null; return; }
   const p = Story.pace(story, Game.economy);
   if (warmthShown === null) { warmthShown = p.warmth; return; }
   warmthShown += (p.warmth - warmthShown) * (1 - Math.exp(-Math.max(0, dt) / WARMTH_TAU));
 }
 
+// 'call' | 'due' | 'summons' | 'ready' | null — `Story.demand` decides, and this is the only place
+// the surfaces read it from, so the gauge, the chase bar and `__state` cannot drift.
 function warmthStateNow() {
-  if (!story || !Game.economy || story.stage !== Story.STAGE.DEBT) return null;
-  if (story.due) return 'due';
-  return Story.pace(story, Game.economy).clear ? 'clear' : 'pace';
+  const d = Story.demand(story, Game.economy);
+  return d ? d.state : null;
+}
+
+function warmthNeedNow() {
+  const d = Story.demand(story, Game.economy);
+  return d ? Math.max(0, d.target - d.have) : null;
 }
 
 // §S2 — the time bonus as the dash and the chase HUD show it: a figure and a clock of its own,
@@ -2841,6 +2934,10 @@ Object.defineProperty(window, '__state', {
         t: +story.t.toFixed(2), due: !!story.due, branch: story.branch,
         sent: story.sent.slice(), earned: Math.round(story.earned),
         grounded: Story.grounded(story, Game.economy),
+        // §S2-P — the Boss meeting's latch and the shadow it moves. `met` is what un-gates the
+        // company layer and the thread, so a gate that could not see it could not tell "act two"
+        // from "act two, and he has looked at you".
+        met: !!story.met, ...Story.settled(story),
         wreckLeft: story.wreckLeft | 0, hireSpend: story.hireSpend | 0, hireBlocks: story.hireBlocks | 0,
         hire: story.hire ? { craft: story.hire.craft, blocks: story.hire.blocks,
           spent: story.hire.spent, left: +Story.hireLeft(story, simTime).toFixed(2) } : null,
@@ -2849,11 +2946,16 @@ Object.defineProperty(window, '__state', {
         // The needle, separately, so a gate can assert the two are the same signal without
         // conflating them.
         shown: warmthShown === null ? null : +warmthShown.toFixed(4),
-        window: Story.WINDOW_S, debt: Story.DEBT,
+        // The three numbers, so a gate reads the contract rather than a copy of it. `window` is
+        // GONE rather than left at 0 — obligation T3's rule: a field describing the 84-minute clock
+        // would be describing a rule that no longer exists.
+        seizeAt: Story.SEIZE_AT, summons: Story.SUMMONS, debt: Story.DEBT,
       } : null,
       intro: introScene ? introScene.stateOf() : null,
       hirePanel: hirePanel ? hirePanel.stateOf() : null,
       ending: endingPanel ? endingPanel.stateOf() : null,
+      boss: bossPanel ? { ...bossPanel.stateOf(), met: !!(story && story.met),
+        ready: Story.summonsReady(story, Game.economy) } : null,
       // The curtain, and the RAW predicate beside it. A gate that could only see the panel could
       // not tell "the arc is not complete" from "the arc completed and nothing fired".
       // `arc` is NESTED and not spread: both objects carry `craft` and `branch`, and a spread would
@@ -3090,25 +3192,38 @@ window.__game = {
   story: () => story,
   storyState: () => (story && Game.economy ? { ...Story.pace(story, Game.economy),
     stage: story.stage, due: !!story.due, sent: story.sent.slice() } : null),
-  // Wind the debt clock. Takes SECONDS of play, returns the pace signal it produced, so a gate can
-  // walk the escalation ladder without playing 84 minutes.
+  // Wind the PLAYTIME on. §S2-P: `story.t` gates nothing any more — the 84-minute window is gone —
+  // so this moves the record screen's clock and the escalation's MSG_FLOOR and nothing else. It is
+  // kept precisely because a gate has to be able to prove that: the demand signal must read
+  // IDENTICALLY at t=0 and t=80 minutes for the same balance, which is the exact property the old
+  // gauge did not have.
   setStoryTime(sec) {
     if (!story) return null;
     story.t = Math.max(0, +sec || 0);
     return Story.pace(story, Game.economy);
   },
-  // Set the trailing earning rate directly, in CRD/s. This is the axis the gauge reads and the one
-  // a gate has to be able to move without simulating an hour of deliveries.
+  // Set the trailing earning rate directly, in CRD/s. A READOUT axis now, not the gauge's — the
+  // gauge is a balance. Kept because `perMin` is on the record screen and F1 asserts the payment
+  // path feeds it.
   setStoryRate(rate) {
     if (!story) return null;
     story.rate = Math.max(0, +rate || 0);
-    warmthShown = null;                 // re-seed the display filter, or the needle lags the fixture
     return Story.pace(story, Game.economy);
   },
+  // The gauge's axis, which is the BALANCE. `setCredits` moves it through the economy; this exists
+  // so a gate can re-seed the 8 s display filter after doing so and photograph the needle where the
+  // fixture put it rather than 8 s behind it.
+  seedWarmth() { warmthShown = null; tickWarmth(0); return warmthShown; },
   storyTick: (dt = 1) => (story ? Story.tick(story, Game.economy, +dt, simTime) : null),
+  demand: () => Story.demand(story, Game.economy),
   // Force the crew to be due at the next dock.
   setDue(on = true) { if (!story) return null; story.due = !!on; return story.due; },
   settle: () => settleDebt(),
+  // The Boss meeting, driven through the SHIPPED transaction — it refuses exactly as it would for
+  // a player who is short, or who has already been.
+  meetBoss: () => maybeMeetBoss(),
+  closeBoss: () => (bossPanel ? bossPanel.hide() : null),
+  bossPanel: () => (bossPanel ? bossPanel.stateOf() : null),
   intro: () => (introScene ? introScene.stateOf() : null),
   introSkip: () => (introScene ? introScene.skip() : null),
   introName: (name, gender) => {

@@ -95,22 +95,50 @@ if (!ONLY || ONLY === 'intro') {
   await close();
 }
 
-// ── the warmth gauge, at three pace settings, in both views ────────────────
+// ── the demand gauge, along the climb, in both views ───────────────────────
+//
+// §S2-P — the fixture is MONEY now, not a pace rate, because the gauge is a balance against the
+// demand. `seedWarmth` re-seeds the 8 s display filter so the needle is photographed where the
+// fixture put it rather than eight seconds behind it.
 if (!ONLY || ONLY === 'warmth') {
   console.log(`warmth ${W}x${H}`);
-  const { S, close } = await session('/index.html?nosave=1&intro=0&crd=8000');
+  const { S, close } = await session('/index.html?nosave=1&intro=0&crd=300');
   await evalJSON(S, '(window.__game.clearToasts(), 1)');
-  for (const [name, t, rate] of [['cool', 600, 26], ['pace', 1800, 9.9], ['hot', 3600, 3.0]]) {
-    await hook(S, 'setStoryTime', t);
-    await hook(S, 'setStoryRate', rate);
-    await settle(S, 30);            // the display filter has an 8 s constant; let it arrive
+  for (const [name, crd] of [['quiet', 300], ['noted', 1300], ['close', 2100]]) {
+    await hook(S, 'setCredits', crd);
+    await hook(S, 'setDue', false);
+    await hook(S, 'seedWarmth');
+    await settle(S, 12);
+    await evalJSON(S, '(window.__game.clearToasts(), 1)');
+    await settle(S, 4);
     await shot(S, `warm_cockpit_${name}`);
     console.log(`  ${name}:`, JSON.stringify(await evalJSON(S,
-      '({w:__state.story.warmth, shown:__state.story.shown, ratio:__state.story.ratio})')));
+      '({w:__state.story.warmth, shown:__state.story.shown, need:__state.story.need, state:__state.story.state})')));
   }
+  // …and the act-two half of the same bay: the SUMMONS, which is the thing it re-targets on.
+  await hook(S, 'setCredits', 2600);
+  await hook(S, 'forceDock', 0);
+  await settle(S, 16);
+  await hook(S, 'closeEnding');
+  await hook(S, 'closeHirePanel');
+  // Back in the air, or the "cockpit" shot is a photograph of the dock board with a stale header
+  // on it — which is what the first pass captured. A grounded player has to hire before they can
+  // leave, so this plays the loop rather than teleporting past it.
+  await hook(S, 'hire', 'wisp', 1);
+  await settle(S, 8);
+  await evalJSON(S, '(window.__game.undock(), 1)');
+  await settle(S, 20);
+  await hook(S, 'setCredits', 4200);
+  await hook(S, 'seedWarmth');
+  await settle(S, 12);
+  await evalJSON(S, '(window.__game.clearToasts(), 1)');
+  await settle(S, 4);
+  await shot(S, 'warm_cockpit_summons');
+  console.log('  summons:', JSON.stringify(await evalJSON(S,
+    '({w:__state.story.warmth, need:__state.story.need, state:__state.story.state})')));
   await hook(S, 'toggleView');
   await settle(S, 20);
-  await shot(S, 'warm_chase_hot');
+  await shot(S, 'warm_chase_summons');
   await close();
 }
 
@@ -133,22 +161,45 @@ if (!ONLY || ONLY === 'hire') {
   await close();
 }
 
-// ── both endings, and the grounded hire that follows ───────────────────────
+// ── the seizure, the hire that follows, and the Boss meeting ───────────────
+//
+// ONE road, so this is a sequence rather than a pair of branches. Every shot is reached by EARNING
+// past the trigger — `setCredits` then a dock — not by a `?story=` fixture, because the whole point
+// of the restructure is that the number the player can see is the number that fires the beat.
 if (!ONLY || ONLY === 'ending') {
-  for (const branch of ['paid', 'seized']) {
-    console.log(`ending ${branch} ${W}x${H}`);
-    const { S, close } = await session(`/index.html?nosave=1&intro=0&story=${branch}&crd=${branch === 'paid' ? 62000 : 4000}`);
-    await evalJSON(S, '(window.__game.clearToasts(), 1)');
-    await hook(S, 'forceDock', 0);
-    await settle(S, 10);
-    await shot(S, `ending_${branch}`);
-    console.log(`  ${branch}:`, JSON.stringify(await evalJSON(S,
-      '({branch:__state.story.branch, credits:__state.credits, flags:__state.flags, grounded:__state.story.grounded})')));
-    await hook(S, 'closeEnding');
-    await settle(S, 8);
-    await shot(S, `ending_${branch}_hire`);
-    await close();
-  }
+  console.log(`ending ${W}x${H}`);
+  const { S, close } = await session('/index.html?nosave=1&intro=0&crd=2100');
+  await evalJSON(S, '(window.__game.clearToasts(), 1)');
+  // One delivery's worth over the line, so the balance on the panel is a balance a player could
+  // plausibly be holding rather than a round fixture number.
+  await hook(S, 'grantCredits', 640);
+  await settle(S, 20);
+  console.log('  armed:', JSON.stringify(await evalJSON(S,
+    '({due:__state.story.due, credits:__state.credits, warmth:__state.story.warmth})')));
+  await hook(S, 'forceDock', 0);
+  await settle(S, 16);
+  await evalJSON(S, '(window.__game.clearToasts(), 1)');
+  await settle(S, 4);
+  await shot(S, 'ending_seized');
+  console.log('  seizure:', JSON.stringify(await evalJSON(S,
+    '({branch:__state.story.branch, credits:__state.credits, flags:__state.flags, grounded:__state.story.grounded})')));
+  await hook(S, 'closeEnding');
+  await settle(S, 8);
+  await shot(S, 'ending_seized_hire');
+  // …and act two's beat, reached the same way: earn the ten thousand, put down anywhere.
+  await hook(S, 'closeHirePanel');
+  await hook(S, 'hire', 'wisp', 1);
+  await settle(S, 8);
+  await hook(S, 'grantCredits', 8200);
+  await settle(S, 20);
+  await hook(S, 'forceDock', 0);
+  await settle(S, 20);
+  await evalJSON(S, '(window.__game.clearToasts(), 1)');
+  await settle(S, 4);
+  await shot(S, 'boss_meeting');
+  console.log('  meeting:', JSON.stringify(await evalJSON(S,
+    '({met:__state.story.met, credits:__state.credits, left:__state.story.left, flags:__state.flags})')));
+  await close();
 }
 
 // ── the arc's curtain, on both roads and with the shady door climbed ───────
@@ -160,9 +211,8 @@ if (!ONLY || ONLY === 'ending') {
 // rather than of the screen. So each arm plays the hire loop first.
 if (!ONLY || ONLY === 'own') {
   const arms = [
-    ['own_paid', '/index.html?nosave=1&intro=0&story=paid&crd=62000&tier=2', 0],
-    ['own_seized', '/index.html?nosave=1&intro=0&story=seized&crd=4000&tier=2', 0],
-    ['own_broker', '/index.html?nosave=1&intro=0&story=seized&crd=4000&tier=2&fleet=1&shady=1', 130000],
+    ['own_taken', '/index.html?nosave=1&intro=0&story=taken&crd=4000&tier=2', 0],
+    ['own_broker', '/index.html?nosave=1&intro=0&story=taken&crd=4000&tier=2&fleet=1&shady=1', 130000],
   ];
   for (const [name, url, shady] of arms) {
     console.log(`${name} ${W}x${H}`);
@@ -171,6 +221,13 @@ if (!ONLY || ONLY === 'own') {
     await hook(S, 'forceDock', 0);
     await settle(S, 12);
     await hook(S, 'closeEnding');
+    await hook(S, 'closeHirePanel');
+    // §S2-P — the curtain lists the Boss meeting as a condition, so the arm has to keep the
+    // appointment before it can photograph anything. Through the shipped transaction.
+    await hook(S, 'grantCredits', 10000);
+    await hook(S, 'forceDock', 0);
+    await settle(S, 16);
+    await hook(S, 'closeBoss');
     await hook(S, 'closeHirePanel');
     // The hire loop, so the burn on the panel is a burn the run actually paid.
     await hook(S, 'grantCredits', 20000);

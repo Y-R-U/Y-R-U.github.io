@@ -1131,19 +1131,30 @@ export class Cockpit {
       place: [pad, H - 4] };
   }
 
-  // ── §S2-E's WARMTH gauge ────────────────────────────────────────────────
+  // ── §S2-P's DEMAND gauge (the bay S2-E called `warmth`) ─────────────────
   //
-  // The bay `dashSlots` reserved is now fitted. It reads PACE, not time, and the difference is the
-  // whole design (js/story.js has the derivation):
+  // **This instrument was replaced, and what it replaced is the reason it exists.** S2-E fitted a
+  // PACE gauge here: a projection of the final balance against a 50,000 debt and an 84-minute
+  // window, mapped 1 at ratio <= 0.75 and 0 at >= 1.25. That saturated. A player earning 70 % of
+  // the required rate pinned the needle to MAX **on the first frame** and it never moved again for
+  // the whole 84 minutes — and the thing it was pinned against was not even what fired the event,
+  // which was an invisible clock. Aaron played it, watched a maxed gauge say they were coming, and
+  // nothing happened for another two thousand credits.
   //
-  //   projection = credits + recent earning rate x time remaining
-  //   ratio      = projection / DEBT
-  //   warmth     = 1 at ratio 0.75 · 0.5 at ratio 1.00 · 0 at ratio 1.25
+  // So the bay now draws the DEMAND, which is the same comparison the event itself makes:
   //
-  // So the needle opens at HALF SCALE on a fresh profile and stays there while the player earns
-  // exactly the rate the debt needs. A countdown could not do that: it would read identically for
-  // a player who is going to make it and one who is not, and Aaron's whole requirement is that
-  // losing the car must be visible *in time to change behaviour*.
+  //   act one     warmth = credits / SEIZE_AT  (2 500)   full = they take the craft at this pad
+  //   act two     warmth = credits / SUMMONS   (10 000)  full = go and see him
+  //   after that  null — a blanking plate, because there is nothing left to be short of
+  //
+  // It opens at 250/2500 = 0.10 on a fresh profile, it moves on every delivery, and full scale
+  // means the event, so a full needle is a statement and not a saturation. The slot key stays
+  // `warmth` because it is a LAYOUT name and `gates_s2a` asserts the bay's geometry by it; what
+  // changed is the signal riding it.
+  //
+  // The two demands read in opposite directions and are coloured accordingly: climbing toward the
+  // seizure is bad news and runs cold-blue to red, climbing toward the summons is progress and
+  // runs blue to green. Same form, same bay, and the kicker word says which.
   //
   // It is drawn as a TEMPERATURE gauge and not as a fifth ring: a bulb, a bent capillary, a rising
   // column and graduations, with a needle riding the column. The dash already carries a swept arc,
@@ -1151,16 +1162,17 @@ export class Cockpit {
   // fifth circular fill would have collapsed into the cell ring beside it.
   //
   // `d.warmth` is SMOOTHED by hudData before it arrives here. Earnings land in ~800 CRD lumps
-  // every 60-90 s, so the raw pace signal sawtooths by about a tenth of full scale between
-  // deliveries — a real property of the estimator, not noise to be hidden, but a needle that
-  // twitches once a minute is unreadable. A temperature gauge having thermal lag is also the one
-  // kind of smoothing that is diegetically honest.
+  // every 60-90 s, so the raw signal steps rather than sweeps — real, not noise, but a needle that
+  // jumps once a minute is unreadable. A temperature gauge having thermal lag is also the one kind
+  // of smoothing that is diegetically honest.
   _warmthGauge(g, d, x, y, w, h) {
     const on = d.warmth !== undefined && d.warmth !== null;
     if (!on) { this._slot(g, x, y, w, h); return; }
     const k = clamp(d.warmth, 0, 1);
-    const clear = d.warmthState === 'clear';
-    const due = d.warmthState === 'due';
+    const st = d.warmthState || 'call';
+    const boss = st === 'summons' || st === 'ready';     // act two's demand, which is progress
+    const clear = st === 'ready';
+    const due = st === 'due';
     const cx = x + w / 2, cy = y + h / 2, R = Math.min(w, h) / 2;
 
     // the recess the bay always had, so a fitted gauge sits IN the panel rather than on it
@@ -1170,8 +1182,9 @@ export class Cockpit {
     g.fillStyle = well;
     g.beginPath(); g.arc(cx, cy, R, 0, 6.2832); g.fill();
 
-    const col = clear ? '#6cff9c' : k < 0.34 ? '#35e6ff' : k < 0.62 ? '#8ee6b0'
-      : k < 0.82 ? '#ffb238' : '#ff5a52';
+    const col = clear ? '#6cff9c'
+      : boss ? (k < 0.5 ? '#35e6ff' : k < 0.85 ? '#8ee6b0' : '#6cff9c')
+        : k < 0.34 ? '#35e6ff' : k < 0.62 ? '#8ee6b0' : k < 0.82 ? '#ffb238' : '#ff5a52';
     // The capillary: a 250 deg arc that fills from the cold end. Cold is at the LEFT, which is
     // where every gauge in every vehicle puts it.
     const A0 = 150 * D2R, A1 = A0 + 250 * D2R;
@@ -1204,18 +1217,21 @@ export class Cockpit {
     g.fillStyle = col; g.fill();
 
     // The legend. NEVER a time and never a number of days — the Boss has not named one and neither
-    // does the panel. Four words, which is the whole vocabulary a pace gauge needs.
+    // does this. It is four words per demand, which is the whole vocabulary a bay this size can
+    // carry; the ACTUAL credits still needed are printed on the chase HUD's bar, which has room.
     g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillStyle = due ? '#ff5a52' : 'rgba(150,170,192,0.95)';
     g.font = `700 ${Math.max(6, Math.round(R * 0.30))}px ui-monospace, Menlo, monospace`;
-    g.fillText(due ? 'DUE' : clear ? 'CLEAR' : k < 0.34 ? 'AHEAD' : k < 0.62 ? 'PACE'
-      : k < 0.82 ? 'BEHIND' : 'HOT', cx, cy + R * 0.52);
+    g.fillText(due ? 'DUE' : clear ? 'READY'
+      : boss ? (k < 0.5 ? 'OWED' : k < 0.85 ? 'CLOSE' : 'NEARLY')
+        : k < 0.34 ? 'QUIET' : k < 0.62 ? 'NOTED' : k < 0.82 ? 'CLOSE' : 'SOON',
+    cx, cy + R * 0.52);
     // The kicker sits INSIDE the arc's ring, so it has to be brighter than a normal label to read
     // at all against the capillary behind it — measured on a 4x crop of the real dash, where the
     // first pass at 0.24 R and 85 % alpha was invisible.
     g.fillStyle = due ? 'rgba(255,140,130,0.95)' : 'rgba(150,190,215,0.95)';
     g.font = `700 ${Math.max(6, Math.round(R * 0.30))}px ui-monospace, Menlo, monospace`;
-    g.fillText('DEBT', cx, cy - R * 0.54);
+    g.fillText(boss ? 'BOSS' : 'DEBT', cx, cy - R * 0.54);
     g.lineCap = 'butt';
   }
 
@@ -1585,13 +1601,21 @@ export class ChaseHud {
     f.warmwrap.classList.toggle('off', !hasWarm);
     if (hasWarm) {
       const wk = clamp(d.warmth, 0, 1);
-      const ws = d.warmthState || 'pace';
-      set(f.warmlabel, ws === 'due' ? 'DUE' : ws === 'clear' ? 'CLEAR'
-        : wk < 0.34 ? 'AHEAD' : wk < 0.62 ? 'PACE' : wk < 0.82 ? 'BEHIND' : 'HOT');
-      f.warmfill.style.width = `${(ws === 'clear' ? 1 : wk) * 100}%`;
-      f.warmfill.className = ws === 'clear' ? 'clear' : wk < 0.34 ? 'cool'
-        : wk < 0.62 ? 'ok' : wk < 0.82 ? 'warn' : 'bad';
-      set(f.warmsub, ws === 'clear' ? 'PAID' : 'DEBT');
+      const ws = d.warmthState || 'call';
+      const boss = ws === 'summons' || ws === 'ready';
+      set(f.warmlabel, ws === 'due' ? 'DUE' : ws === 'ready' ? 'READY'
+        : boss ? (wk < 0.5 ? 'OWED' : wk < 0.85 ? 'CLOSE' : 'NEARLY')
+          : wk < 0.34 ? 'QUIET' : wk < 0.62 ? 'NOTED' : wk < 0.82 ? 'CLOSE' : 'SOON');
+      f.warmfill.style.width = `${wk * 100}%`;
+      f.warmfill.className = ws === 'ready' ? 'clear'
+        : boss ? (wk < 0.5 ? 'cool' : 'ok')
+          : wk < 0.34 ? 'cool' : wk < 0.62 ? 'ok' : wk < 0.82 ? 'warn' : 'bad';
+      // The bar has the width the dash bay does not, so it carries the ACTUAL number. "BEHIND"
+      // without "by how much" is a mood; `2 250 TO GO` is something the player can act on, and it
+      // is the figure the whole restructure exists to make visible.
+      set(f.warmsub, d.warmthNeed === null || d.warmthNeed === undefined ? (boss ? 'BOSS' : 'DEBT')
+        : d.warmthNeed <= 0 ? (boss ? 'BRING IT' : 'AT THE NEXT PAD')
+          : `${commas(Math.ceil(d.warmthNeed))} TO GO`);
       f.warmwrap.classList.toggle('due', ws === 'due');
     }
 

@@ -57,6 +57,7 @@ every tool in `tools/`. `window.__ready` goes true when the game is playable.
 | `?courier=1` | the **navigating** soak pilot: takes jobs off real boards and flies them. Implies `auto` |
 | `?noaudio=1` | build no audio layer at all (the control arm for "what does audio cost") |
 | `?fleet=n` | §S2-I — open the company layer and put **n hired drivers** on the books. It winds `company.gross` on far enough to allow the cap (the cap is a company tier) and hires through the **shipped** transaction, signing fees and all. A measurement that reads absolute `gross` rather than a delta is reading the fixture |
+| `?story=` | §S2-Q — a position on the one storyline: `taken` (the crew are at the next dock), `summons` (act two, the Boss unpaid), `act2` (after the meeting). `due`/`paid`/`seized` alias `taken` |
 | `?nosave=1` `?seed=` `?time=` `?var=` `?tier=` `?crd=` `?cogross=` `?dock=` `?dpr=` `?probes=1` `?debug` | test hooks |
 
 `?auto=1` and `?courier=1` are **not** the same flag and never should be. See `js/autopilot.js`.
@@ -92,6 +93,15 @@ Suites: `p1a p2 p3a p3b p4 p5 p6 p7a p7b p8 p11 wire`, plus the season-2 suites
 outright, debt-free, in act two. 19/19 portrait and landscape. It also carries the two controls for
 the defects that phase found: a player who owns a hull must not read as GROUNDED, and the free
 `wisp` must not close the arc.
+
+**§S2-Q rewrote act one and there is now ONE storyline.** The 84-minute window (`WINDOW_S`) and the
+saturating pace gauge are DELETED. The crew take the craft — and not the money — at the **first dock
+at or above 2 500 CRD**; act two's objective is to earn **10 000** and hand it to the Boss in person,
+and that meeting (`Story.meetBoss`, `#boss`) opens the company layer and the Dad thread. The 50 000
+survives as the shadow. `?story=taken | summons | act2` name positions on that road (`due`, `paid`
+and `seized` are aliases of `taken`). The dash's `warmth` bay is now `credits / target` — it cannot
+saturate, and it is the same comparison that fires the event. **Read `docs/MANAGER_STATE.md`'s S2-Q
+section before touching `js/story.js`.** `gates_s2e` is 33/33, `gates_end` 19/19, both orientations.
 **`gates_p5` and `gates_p7a`/`p8` write a different JSON schema from `p1a`–`p4`
 (`ok`/`fail` rather than `results`)** — a parser that reads only `results` reports 0/0 on a suite
 that fully passed. That mistake has been made three times here.

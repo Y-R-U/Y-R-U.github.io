@@ -1116,6 +1116,90 @@ skipped for 0 CRD at the first dock of act two.** `gates_end` A3/B1 assert the h
 that the curtain refuses to celebrate it, but the hole itself needs an economy decision: either the
 starter hull is not on the act-two lot, or it costs something once it has been taken off you.
 
+## S2-Q — ONE STORYLINE. The 84-minute window is deleted; the seizure is a number the player can see
+
+**Why.** Aaron played the shipped build: he reached ~3 000 CRD, the Boss chatter said they were
+coming, the warmth gauge was at maximum — and nothing happened. He kept going to 5 000. Still
+nothing. Three compounding defects, all measured:
+
+1. **The gauge saturated.** `warmth` was 1 at pace ratio <= 0.75. At 70 % of the required pace it
+   pinned to MAX **at minute zero** and never moved again for 84 minutes.
+2. **The gauge was not the trigger.** The crew arrived on `t >= WINDOW_S`, an invisible clock,
+   while the one visible instrument read pace.
+3. **They only arrived at a dock, from `doDock` alone.** A player who passed the window and kept
+   flying never saw them at all.
+
+And the scale was wrong anyway: the measured courier rate is 737 CRD/min, so 50 000 took 67 minutes
+against an 84-minute window. Aaron: *"I felt it was going to be way too punishing to get to 50k or
+even 20k and lose everything."*
+
+**What replaced it — Aaron's second option, verbatim:** *"a single starting storyline where you are
+100% going to lose the car next stop after 2k or 2.5k cash… they take the car and say they won't
+break your arm, earn $10k and bring it to 'the boss' as he wants to talk to you… it could even
+allow to let the player keep his cash."*
+
+| | |
+|---|---|
+| `SEIZE_AT` **2 500** | the first DOCK at or above this. Everyone. `WINDOW_S`, `BREAK_EVEN`, `COLD`, `HOT` deleted |
+| `SUMMONS` **10 000** | bring it to him in person. `Story.meetBoss` at a dock. That meeting opens act two |
+| `DEBT` **50 000** | your father's. The SHADOW — never an act-one target. The meeting pays a fifth of it |
+
+**No intro VO was re-recorded, and that is a check on the design rather than a convenience.**
+`boss_06` is *"If it is not ready we take the craft and sell it. Then we break an arm."* One road is
+that threat carried out to the first clause and **commuted** at the second — you are worth more to
+them working. `boss_03`/`04`/`05` stay literally true. `gates_vo` 5/5 unchanged.
+
+**The gauge is now the trigger.** `warmth = credits / target`, target being whichever demand is
+live. It opens at 250/2500 = 0.10, moves on every delivery, and hits full scale on exactly the frame
+the event arms. The bay keeps the layout key `warmth` (that is a LAYOUT name and `gates_s2a`
+asserts its geometry by it); the signal riding it changed. The chase HUD's bar carries the
+actionable number — `1,500 TO GO` — because the 42 px dash bay cannot.
+
+**The seizure and the meeting are both checked per frame behind `dockPad`**, not from `doDock`.
+Same "only at a dock" rule with defect 3's hole taken out. The dock guard lives INSIDE
+`settleDebt()`: the first cut of this work guarded it at the call site and the very first browser
+run settled act one in mid-air.
+
+**One door into the shady side, not two.** `shadyDoor`'s `'seized'` state is gone; the Dad thread —
+`THREAD_NEED`, `REMARK_GAP_S`, the seeded remarks, `ThreadPanel` — is the only way in, un-gated by
+`story.met`. This was gating REMOVED, not new code, exactly as the brief predicted.
+
+**Standing.** `debt_cleared` DELETED (nothing on one road can set it); `paid_up` +1 ADDED, granted
+by the meeting. Registry still 5 entries, so `gates_s2d` A3's count is unchanged. The seizure grants
+`car_seized` −1 + `dad_favour` +1 = **net zero**, deliberately: every player loses the car, so a
+permanent penalty for it would be an offset applied to the whole game rather than an axis.
+
+**Old saves.** `Story.fromSave` migrates explicitly and `gates_s2e` A8 asserts it: act one is left
+alone (it meets the new rule at its next dock); any act-two profile gets `met = true` on both old
+branches, because charging somebody ten thousand credits for an appointment that did not exist when
+they played act one is the retroactive charge this work exists to remove; an old SEIZED profile
+additionally keeps its shady desk (`thread.cue`/`asked` set), or the migration would shut a door it
+already had. `branch: 'paid'|'seized'` → `'taken'`.
+
+**The escalation was retuned by MEASUREMENT, and the first retune was wrong.** A `?courier=1` run
+earned to the seizure in 221 sim seconds over six deliveries and heard **two of the four Boss
+lines**; the gates were all green. The observed climb is in `js/story.js`'s BOSS_LINES header and
+the spacing is solved against it (30 / 40 s, thresholds .35 .55 .72 .90). The same run now delivers
+b1 at t≈91, b2 ≈131, b3 ≈171, b4 ≈211, seizure at 221. `b4` is ALSO force-fired the instant `due`
+arms, spacing ignored, so a fast run cannot lose the one line that says the next pad is the one.
+
+**A gate that could not fail, found by breaking the thing it guards.** `gates_end` A7's first
+rewrite read `settle().branch` — and `settle` builds its result by spreading `OUTCOME`, so the field
+it compared was the constant, not what the function had written. Patching `settle` to fork on the
+balance again left A7 GREEN while the browser leg threw. It now reads the mutated story. That is
+the twenty-fourth silent measurement on this project.
+
+**Gates.** `s2e` 30 → **33/33** portrait and landscape (A1/A2/A3/A4/A6 rewritten to the new
+behaviour, A3b and A8 and B1b and C1–C6 new); `end` **19/19** both (A2 grew a `summons` arm, A7 and
+B2 rewritten, the branch loop became two BALANCES on one road); `s2j` **17/17** both (A7 "two doors"
+→ "one door", B1 and B6 reach it through the meeting); `s2d` **14/14** both — it boots on 9 000 CRD
+and now meets the seizure, so it dismisses the story panels the way it already dismissed the boot
+toast. `vo` 5/5, `boot` 12/12, `determinism` 9/9 golden `f29beaf9` / 25 039 unchanged.
+
+**Still open.** The free `wisp` hole from S2-P is unchanged. `tools/sim_s2e.mjs` still sweeps the
+deleted window and has not been re-pointed at the new targets — it is not in any gate's path, but
+it will mislead whoever reads it next. Nobody has flown this on a phone.
+
 ## Carry-forward
 
 - **T10 — the helper and the fix are DONE by the manager; verification is BLOCKED on P6's boot.**

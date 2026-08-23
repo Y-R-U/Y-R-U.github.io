@@ -1,4 +1,12 @@
 #!/usr/bin/env node
+// ⚠ **STALE AS OF §S2-Q, AND KEPT ONLY AS THE RECORD OF HOW THE OLD ARC WAS TUNED.**
+//
+// This tool swept the 84-MINUTE WINDOW: how long a player should get to bank 50,000 credits before
+// the crew arrive. That window is deleted. Act one now ends at the first DOCK at or above
+// `Story.SEIZE_AT` (2,500) and act two asks for `Story.SUMMONS` (10,000) — see js/story.js. Nothing
+// in any gate's path reads this file and its `docs/s2e_balance.json` describes a rule the game no
+// longer has, so do not quote either number at anybody. `tools/courier_rate.mjs` reports the two
+// live targets against the measured courier rate; that is the tool this one was replaced by.
 // tools/sim_s2e.mjs — S2-E's two balance questions, both swept rather than picked.
 //
 //   node tools/sim_s2e.mjs                        # both sweeps

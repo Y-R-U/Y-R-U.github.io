@@ -265,15 +265,27 @@ async function nodeChecks() {
       + `${v1.companies[0].gross} CRD rather than being dropped`);
   }
 
-  // ── A7. THE TWO DOORS ─────────────────────────────────────────────────
-  // The settled design, asserted: seized is immediate, paid is delayed and the player opens it.
+  // ── A7. THE ONE DOOR ──────────────────────────────────────────────────
+  //
+  // **This check asserted TWO doors and there is one.** §S2-P collapsed the paid/seized fork into a
+  // single storyline, so `shadyDoor`'s immediate `'seized'` state is gone and the delayed, earned-by-
+  // curiosity thread is the only way in — opened after the Boss meeting rather than after the
+  // seizure. The assertion is rewritten to the new behaviour rather than deleted: what it still
+  // guards, and what it always guarded, is that **listening is not enough — the player opens it.**
   {
-    const seized = Story.newStory({ stage: Story.STAGE.ACT2, branch: 'seized' });
-    const paid = Story.newStory({ stage: Story.STAGE.ACT2, branch: 'paid' });
-    const doors = { seizedAt0: Story.shadyDoor(seized), paidAt0: Story.shadyDoor(paid) };
+    const beforeMeeting = Story.newStory({ stage: Story.STAGE.ACT2, branch: 'taken', met: false });
+    const afterMeeting = Story.newStory({ stage: Story.STAGE.ACT2, branch: 'taken', met: true });
+    const doors = { unmet: Story.shadyDoor(beforeMeeting), met: Story.shadyDoor(afterMeeting) };
+    // The meeting is the gate on the REMARKS as well as on the door: a player who has not sat
+    // opposite him hears nothing, however long they fly.
+    let unmetHeard = 0, ut = 0;
+    for (let i = 0; i < Story.REMARKS.length; i++) {
+      ut += Story.REMARK_GAP_S + 1;
+      if (Story.nextRemark(beforeMeeting, ut, 0)) unmetHeard++;
+    }
     // The CONTROL: a player who hears every remark and never presses the key. This is the arm that
     // makes "the player opens it themselves" a measurement rather than a sentence.
-    const listener = Story.newStory({ stage: Story.STAGE.ACT2, branch: 'paid' });
+    const listener = Story.newStory({ stage: Story.STAGE.ACT2, branch: 'taken', met: true });
     let t = 0;
     for (let i = 0; i < Story.REMARKS.length; i++) {
       t += Story.REMARK_GAP_S + 1;
@@ -284,24 +296,26 @@ async function nodeChecks() {
       open: Story.shadyOpen(listener) };
     // …and the same story with the key pressed.
     const asker = Story.fromSave(Story.toSave(listener, t), 0);
-    const early = Story.newStory({ stage: Story.STAGE.ACT2, branch: 'paid' });
+    const early = Story.newStory({ stage: Story.STAGE.ACT2, branch: 'taken', met: true });
     const earlyAsk = Story.askDad(early, 0);
     const ask = Story.askDad(asker, t);
     // Spacing: two remarks cannot land inside REMARK_GAP_S of each other.
-    const spaced = Story.newStory({ stage: Story.STAGE.ACT2, branch: 'paid' });
+    const spaced = Story.newStory({ stage: Story.STAGE.ACT2, branch: 'taken', met: true });
     const s1 = Story.nextRemark(spaced, 100, 0);
     Story.hearRemark(spaced, s1, 100);
     const s2 = Story.nextRemark(spaced, 100 + Story.REMARK_GAP_S - 1, 0);
-    check('S2-J/A7 FALSIFIED — two doors into one room: seized is immediate, paid is earned and the PLAYER opens it',
-      doors.seizedAt0 === 'seized' && Story.shadyOpen(seized)
-        && doors.paidAt0 === null
+    check('S2-J/A7 FALSIFIED — one door into one room: it opens after the Boss meeting and the PLAYER opens it',
+      doors.unmet === null && doors.met === null && unmetHeard === 0
+        && !Story.shadyOpen(beforeMeeting) && !Story.shadyOpen(afterMeeting)
         && heardAll.remarks === Story.REMARKS.length && heardAll.door === 'cue' && !heardAll.open
         && !earlyAsk.ok && earlyAsk.why === 'early'
         && ask.ok && Story.shadyDoor(asker) === 'asked' && Story.shadyOpen(asker)
         && s2 === null,
-      `SEIZED branch at t=0: door "${doors.seizedAt0}", open ${Story.shadyOpen(seized)} — the crew `
-      + `already have the hook\n`
-      + `PAID branch at t=0: door ${JSON.stringify(doors.paidAt0)} — sealed\n`
+      `ACT TWO before the Boss meeting: door ${JSON.stringify(doors.unmet)}, and ${unmetHeard} of `
+      + `${Story.REMARKS.length} remarks reachable — the sub-story does not exist until you have sat `
+      + `opposite the man who took the car\n`
+      + `ACT TWO after it, nothing heard yet: door ${JSON.stringify(doors.met)} — still sealed. The `
+      + `meeting un-gates the remarks; it does not open the desk\n`
       + `CONTROL — a player who hears all ${heardAll.remarks} remarks and never asks: door `
       + `"${heardAll.door}", shadyOpen ${heardAll.open}. **Listening is not enough**\n`
       + `askDad() before the cue: refused, why "${earlyAsk.why}" (needs ${Story.THREAD_NEED})\n`
@@ -343,7 +357,11 @@ async function browserChecks() {
 
   try {
     // ── B1. the branch tabs exist ONLY once the door is open ───────────
-    await go('story=act2&fleet=2&cogross=74000');
+    // §S2-P — the door is the THREAD's now and the player pulls it, so the open arm reaches it the
+    // way a player does: `?shady=1` runs `Story.askDad` and `Company.openBranch`, and `?story=act2`
+    // is what puts the arc past the Boss meeting that un-gates them. It used to read `story=act2`
+    // alone, because the seized branch handed the desk over on arrival.
+    await go('story=act2&shady=1&fleet=2&cogross=74000');
     await hook(S, 'closeHirePanel');
     await hook(S, 'fleetPanel', 'roster');
     await settle(S, 12);
@@ -358,9 +376,9 @@ async function browserChecks() {
       door: __state.thread && __state.thread.door, tabs: [...document.querySelectorAll('.fl-tab')].map(b => b.textContent.replace(/\\s+/g,' ').trim()) })`);
     check('S2-J/B1 FALSIFIED — the OFF BOOK tab exists only once a door is open, and is not merely greyed before',
       openArm.br.length === 2 && /HAULAGE/.test(openArm.br[0]) && /OFF BOOK/.test(openArm.br[1])
-        && openArm.door === 'seized' && shutArm.br === 0 && shutArm.door === null
+        && openArm.door === 'asked' && shutArm.br === 0 && shutArm.door === null
         && shutArm.tabs.length === 3,
-      `ACT TWO, seized branch — branch tabs: ${JSON.stringify(openArm.br)}, door "${openArm.door}"\n`
+      `ACT TWO, the thread pulled — branch tabs: ${JSON.stringify(openArm.br)}, door "${openArm.door}"\n`
       + `CONTROL, mid-debt (the door has opened by neither route) — ${shutArm.br} branch tabs, `
       + `door ${JSON.stringify(shutArm.door)}, and the panel still shows its three legit sections `
       + `${JSON.stringify(shutArm.tabs)}\n`
@@ -492,16 +510,27 @@ async function browserChecks() {
       + `\nFALSIFIED: the terms are parsed OUT OF THE DOM, not read from the model, so a screen that `
       + `printed a total its own rows do not add up to fails here while the model stays correct`);
 
-    // ── B6. the ASK HIM row — the paid branch's door, on screen ────────
-    await go('story=paid&crd=60000');
-    await hook(S, 'settle');
+    // ── B6. the ASK HIM row — the ONE door, on screen ──────────────────
+    //
+    // §S2-P — it was the paid branch's door and it is the only one now, opened after the Boss
+    // meeting. So this arm reaches it the way a player does: the seizure at a dock, then the
+    // meeting at a dock with the ten thousand, then the remarks. The row itself, the hit test and
+    // "the player's own press is what opens it" are unchanged, because none of that was branch
+    // logic — it was always the delayed door, and the delay is now the meeting rather than luck.
+    await go('story=taken&crd=60000');
+    await hook(S, 'forceDock');
     await settle(S, 20);
     const sealed = await evalJSON(S, `({ stage: __state.story.stage, branch: __state.story.branch,
       door: __state.thread.door })`);
-    await hook(S, 'forceDock');
     await evalJSON(S, `(() => { const b = document.querySelector('#ending .hp-close'); b && b.click(); return !!b; })()`);
     await settle(S, 8);
     await hook(S, 'closeHirePanel');
+    // The meeting, through the shipped transaction. The remarks do not exist before it.
+    await hook(S, 'meetBoss');
+    await settle(S, 12);
+    await hook(S, 'closeBoss');
+    await hook(S, 'closeHirePanel');
+    await settle(S, 8);
     await evalJSON(S, `(() => { const t = [...document.querySelectorAll('.dk-tab')]; t[t.length-1].click(); return 1; })()`);
     await settle(S, 10);
     const noRow = await evalJSON(S, 'document.querySelectorAll(".dk-key.ask").length');
@@ -526,12 +555,12 @@ async function browserChecks() {
     await settle(S, 12);
     const opened = await evalJSON(S, `({ door: __state.thread.door, groupOpen: __state.group.open,
       flags: __state.flags || [] })`);
-    check('S2-J/B6 FALSIFIED — on the PAID branch the row appears only after two remarks, hit-tests to itself, and the player’s own press is what opens the branch',
-      sealed.stage === 'act2' && sealed.branch === 'paid' && sealed.door === null
+    check('S2-J/B6 FALSIFIED — the row appears only after two remarks, hit-tests to itself, and the player’s own press is what opens the branch',
+      sealed.stage === 'act2' && sealed.branch === 'taken' && sealed.door === null
         && noRow === 0 && row.key && row.self && row.h >= 36
         && /A NAME KEEPS COMING UP/.test(row.title || '')
         && panel.open && !panel.asked && opened.door === 'asked' && opened.groupOpen,
-      `act two on the PAID branch, before any remark: ${noRow} ASK HIM rows on the RECORD tab, `
+      `act two, the Boss paid, before any remark: ${noRow} ASK HIM rows on the RECORD tab, `
       + `door ${JSON.stringify(sealed.door)}\n`
       + `after two remarks on the ordinary chatter channel: "${row.title}", key `
       + `${row.w.toFixed(2)} x ${row.h.toFixed(2)} px, hit-tests to itself: ${row.self} `

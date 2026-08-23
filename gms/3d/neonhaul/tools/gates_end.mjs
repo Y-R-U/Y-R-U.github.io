@@ -97,10 +97,11 @@ const E = await import(resolve(ROOT, 'js/economy.js'));
 // A complete act-two state whose arc HAS closed. Every A-check below starts here and takes one
 // thing away, so the thing taken away is the only variable.
 const done = (over = {}) => ({
-  story: Story.newStory({ stage: Story.STAGE.ACT2, branch: 'paid', hireSpend: 8550, hireBlocks: 6,
-    ...(over.story || {}) }),
+  story: Story.newStory({ stage: Story.STAGE.ACT2, branch: Story.OUTCOME.branch, met: true,
+    hireSpend: 8550, hireBlocks: 6, ...(over.story || {}) }),
   econ: { credits: 4000, craft: Story.STARTER_HULL, borrowed: false, tier: 2, lifetime: 30000,
-    flags: ['debt_cleared', 'dad_favour'], upgrades: { thrust: 0, cargo: 0, cell: 0, eff: 0 },
+    flags: [...Story.OUTCOME.flags, 'crew_hook', 'paid_up'],
+    upgrades: { thrust: 0, cargo: 0, cell: 0, eff: 0 },
     ...(over.econ || {}) },
   arrears: over.arrears === undefined ? 0 : over.arrears,
 });
@@ -132,6 +133,10 @@ const done = (over = {}) => ({
   const pos = Story.ownArc(base.story, base.econ, base.arrears);
   const arms = [
     ['act2', done({ story: { stage: Story.STAGE.DEBT } })],
+    // §S2-P's condition. The arc is not over while the crew are still waiting for the ten thousand,
+    // and a curtain reading NOTHING OWED over an unkept appointment is the one incoherent state the
+    // restructure could leave behind.
+    ['summons', done({ story: { met: false } })],
     ['hire', done({ story: { hire: { craft: 'wisp', until: 999, blocks: 1, spent: 1425, took: 0 } } })],
     ['borrowed', done({ econ: { borrowed: true } })],
     ['hull', done({ econ: { craft: 'wisp' } })],
@@ -146,8 +151,8 @@ const done = (over = {}) => ({
     pos.done === true && pos.need.length === 0 && rows.every(r => r.hit),
     `positive control: done=${pos.done} need=[] · `
     + rows.map(r => `${r.want} removed -> done=${r.done} need=[${r.need}] ${r.hit ? 'ok' : 'MISS'}`).join(' · ')
-    + ` · falsified six ways: each arm is the SAME state with one field changed, and each names only `
-    + `its own condition`);
+    + ` · falsified ${rows.length} ways: each arm is the SAME state with one field changed, and each `
+    + `names only its own condition`);
 }
 
 {
@@ -226,40 +231,91 @@ const done = (over = {}) => ({
 }
 
 {
-  // A7 — the two roads arrive at the same fact and say different things about it.
-  const p = Story.closeArc(done({ story: { branch: 'paid' } }).story, done().econ, 0);
-  const s = Story.closeArc(done({ story: { branch: 'seized' } }).story,
-    done({ econ: { flags: ['car_seized', 'crew_hook'] } }).econ, 0);
-  check('A7 both branches close the arc, and they do not read the same',
-    p.branch === 'paid' && s.branch === 'seized' && p.title !== s.title && p.kicker === s.kicker
-    && p.flags.join() !== s.flags.join(),
-    `paid   "${p.kicker}" / "${p.title}" / record ${JSON.stringify(p.flags)}\n`
-    + `seized "${s.kicker}" / "${s.title}" / record ${JSON.stringify(s.flags)} · the kicker is `
-    + `shared on purpose (it is the one fact both roads reach) and everything else differs · `
-    + `falsified by the titles and the records, which are compared for INEQUALITY`);
+  // A7 — **ONE ROAD, ASSERTED AS ONE.** This check used to compare the paid and seized branches and
+  // require them to read differently. There are no branches, so it is rewritten to assert the thing
+  // that replaced them rather than deleted to go green: `settle()` produces the SAME outcome from
+  // opposite starting balances, and the only thing that differs between the two is the money the
+  // player walks away with — which is the design change itself, because the shipped build took all
+  // of it on one road and fifty thousand of it on the other.
+  const rich = { credits: 62000, craft: 'kestrel', flags: [], upgrades: {}, borrowed: true };
+  const poor = { credits: 2500, craft: 'kestrel', flags: [], upgrades: {}, borrowed: true };
+  const stR = Story.newStory({ stage: Story.STAGE.DEBT, due: true });
+  const stP = Story.newStory({ stage: Story.STAGE.DEBT, due: true });
+  const sr = Story.settle(stR, rich);
+  const sp = Story.settle(stP, poor);
+  const single = typeof Story.OUTCOME.branch === 'string' && typeof Story.OWN.branch === 'string';
+  // **Read the branch off the STORY, not off the return value.** The first cut of this check read
+  // `sr.branch`, and `settle` builds its result by spreading OUTCOME — so the field it compared was
+  // the constant, not what the function had written. Patching `settle` to fork on the balance again
+  // left this check GREEN while the browser leg two hundred lines down threw on the fork. It is the
+  // twenty-fourth measurement on this project that measured nothing, found by breaking the thing it
+  // guards, and the fix is to assert against the mutated state.
+  const branches = [stR.branch, stP.branch];
+  // FALSIFY: the two arms must differ SOMEWHERE, or "the same outcome" is being read off two
+  // identical fixtures rather than off a settlement that ignores the balance.
+  const differ = sr.kept !== sp.kept && rich.credits !== poor.credits;
+  check('A7 one road: the same settlement from opposite balances, and neither loses a credit',
+    stR.branch === stP.branch && stR.branch === Story.OUTCOME.branch
+    && stR.stage === Story.STAGE.ACT2 && stP.stage === Story.STAGE.ACT2
+    && sr.title === sp.title && sr.kicker === sp.kicker
+    && sr.flags.join() === sp.flags.join() && sr.took === 0 && sp.took === 0
+    && rich.credits === 62000 && poor.credits === 2500 && single && differ,
+    `62 000 CRD -> "${sr.kicker}" / "${sr.title}", story.branch ${stR.branch}, took ${sr.took}, kept ${sr.kept}\n`
+    + ` 2 500 CRD -> "${sp.kicker}" / "${sp.title}", story.branch ${stP.branch}, took ${sp.took}, kept ${sp.kept}\n`
+    + `read off the MUTATED STORY (${JSON.stringify(branches)}) and not off the return value, which `
+    + `spreads OUTCOME and would report the constant whatever settle() did · record `
+    + `${JSON.stringify(sr.flags)} on both · OUTCOME and OWN are single objects rather than tables `
+    + `keyed by branch (${single}), so there is nowhere for a second road to grow back\n`
+    + `falsified: the two arms are genuinely different states — they keep ${sr.kept} and ${sp.kept} `
+    + `CRD — so "identical outcome" is a property of \`settle\` and not of the fixture`);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // LEG B — the browser: reaching it for real, on both branches
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Act one, settled at a dock, exactly as a player reaches it. Returns the state after the ending
-// panel is dismissed.
-async function throughActOne(S, branch) {
+// Act one, settled at a dock, exactly as a player reaches it. There is one road, so this no longer
+// takes a branch — what it asserts instead is that the road it landed on is the only one there is.
+// Returns the state after the ending panel is dismissed.
+async function throughActOne(S) {
   await hook(S, 'forceDock', 0);
-  await settle(S, 12);
-  const end = await evalJSON(S, '({branch:__state.story.branch, stage:__state.story.stage, ending:__state.ending.open})');
-  if (end.branch !== branch) throw new Error(`act one settled as ${end.branch}, wanted ${branch}`);
+  await settle(S, 14);
+  const end = await evalJSON(S, '({branch:__state.story.branch, stage:__state.story.stage, ending:__state.ending.open, credits:__state.credits})');
+  if (end.stage !== 'act2' || end.branch !== Story.OUTCOME.branch) {
+    throw new Error(`act one settled as ${end.stage}/${end.branch}, wanted act2/${Story.OUTCOME.branch}`);
+  }
   await hook(S, 'closeHirePanel');
   await hook(S, 'closeEnding');
   await settle(S, 8);
   return end;
 }
 
-for (const [branch, crd] of [['paid', 62000], ['seized', 4000]]) {
-  const s = await session(`/index.html?nosave=1&intro=0&story=${branch}&crd=${crd}&tier=2`);
+// §S2-P — act two opens with a meeting, and `ownArc` lists it as a condition, so every arm below
+// that expects a curtain has to keep the appointment first. Driven through the SHIPPED transaction
+// (`__game.meetBoss`), not by setting `met`, so a broken meeting shows up here rather than being
+// stepped over.
+async function throughSummons(S) {
+  await hook(S, 'grantCredits', Story.SUMMONS);
+  await hook(S, 'forceDock', 0);
+  await settle(S, 16);
+  const met = await evalJSON(S, '({met:__state.story.met, boss:__state.boss.opens, credits:__state.credits})');
+  if (!met.met) throw new Error(`the Boss meeting did not fire: ${JSON.stringify(met)}`);
+  await hook(S, 'closeBoss');
+  await hook(S, 'closeHirePanel');
+  await settle(S, 8);
+  return met;
+}
+
+// TWO ARMS ON ONE ROAD. They used to be the two branches; they are now the two ends of the balance
+// the seizure leaves alone — a player who arrives rich and one who arrives with barely a hire in
+// hand. Everything asserted below must be identical across them, which is exactly what "one road"
+// means, and the money is what proves the arms are not the same fixture twice.
+for (const [arm, crd] of [['rich', 62000], ['thin', 2600]]) {
+  const s = await session(`/index.html?nosave=1&intro=0&story=taken&crd=${crd}&tier=2`);
   const { S, close } = s;
-  await throughActOne(S, branch);
+  const one = await throughActOne(S);
+  await throughSummons(S);
+  void one;
 
   // Grounded, on hires, nothing owned — the state every player is in for the whole of act two.
   const before = await evalJSON(S, '({arc:window.__game.arcCheck(), panel:window.__game.ownState()})');
@@ -287,7 +343,7 @@ for (const [branch, crd] of [['paid', 62000], ['seized', 4000]]) {
     borrowed:__state.borrowed, credits:__state.credits})`);
   const panel = await evalJSON(S, PANEL);
 
-  check(`B1 ${branch}: the free hull is not for sale, and the bought hull closes the arc`,
+  check(`B1 ${arm}: the free hull is not for sale, and the bought hull closes the arc`,
     onWisp.borrowed === true && onWisp.craft !== E.STARTER_HULL
     && onWisp.arc.done === false && onWisp.panel.open === false && onWisp.hidden === true
     && after.arc.done === false && after.arc.need.join() === 'done'
@@ -301,23 +357,35 @@ for (const [branch, crd] of [['paid', 62000], ['seized', 4000]]) {
     + `the two locks are independent: this arm is the SHOP refusing, A3 is the arc PREDICATE `
     + `refusing the same state built directly, so neither is the other's control`);
 
-  // B2 — what the panel actually SAYS, per branch. Read off the DOM, because leg A already read
-  // the module and a panel that rendered nothing at all would pass that.
+  // B2 — what the panel actually SAYS. Read off the DOM, because leg A already read the module and
+  // a panel that rendered nothing at all would pass that.
+  //
+  // Its falsification USED to be the other branch — the same panel class asserted against different
+  // text in the same run. There is no other branch, so it is replaced by a control that is stronger
+  // rather than weaker: the ACT-ONE ending panel is asserted to be a genuinely different screen.
+  // Both are `.en-p` paragraph stacks with `.en-cell` grids in `.cabin-layer` hosts, so "the right
+  // panel rendered" is a real question and a host mix-up would read as a pass without it.
   const shady = await evalJSON(S, 'window.__game.thread()');
-  check(`B2 ${branch}: the panel reads for this branch, and names the shady side`,
-    panel.kicker === 'ACT TWO' && panel.title === Story.OWN[branch].title
+  const endingText = await evalJSON(S, `[...document.querySelectorAll('#ending .en-p')].map(e => e.textContent).join(' ')`);
+  const text = panel.paras.join(' ');
+  const all = `${text} ${panel.next}`;
+  check(`B2 ${arm}: the panel reads for the one road, and names the shady side`,
+    panel.kicker === 'ACT TWO' && panel.title === Story.OWN.title
     && panel.paras.length >= 5 && panel.close === 'FLY'
     && panel.cells.some(c => c[0] === 'THE METER' && c[1] === 'off')
     && panel.cells.some(c => c[0] === 'SPENT ON HIRE')
+    && panel.cells.some(c => c[0] === 'YOUR FATHER OWES' && /40 000/.test(c[1]))
     && /Nothing closes here/.test(panel.next)
-    && (branch === 'paid'
-      ? /manifest/.test(panel.paras.join(' ')) && /warranty/.test(panel.paras.join(' '))
-      : /Tallow Yard/.test(panel.paras.join(' ')) && /crew/.test(panel.paras.join(' '))),
+    && /Tallow Yard/.test(all) && /crew/.test(text) && /40 000 credits/.test(text)
+    && !/worth more to him flying/.test(text) && /worth more to him flying/.test(endingText),
     `kicker "${panel.kicker}" title "${panel.title}" close "${panel.close}"\n`
     + panel.paras.map((t, i) => `  p${i + 1} ${t}`).join('\n') + '\n'
     + `  cells ${JSON.stringify(panel.cells)}\n  next ${panel.next}\n`
-    + `  shady door ${shady.door} gross ${shady.shadyGross} · falsified by the other branch, which `
-    + `is the same panel class asserted against different text in the same run`);
+    + `  shady door ${shady.door} gross ${shady.shadyGross}\n`
+    + `  falsified against the ACT-ONE panel, which is still in the DOM one host over and is the `
+    + `same shape: its arm line is present there (${/worth more to him flying/.test(endingText)}) and `
+    + `absent here (${!/worth more to him flying/.test(text)}), so #own cannot be passing on #ending's `
+    + `text · the shadow is on the grid: the curtain says the hull is clear and the family is not`);
 
   // B3 — IT IS NOT AN ENDING. Close it and play: undock, take a job, fly it, get paid. Everything
   // the game had before the curtain it still has after it.
@@ -344,7 +412,7 @@ for (const [branch, crd] of [['paid', 62000], ['seized', 4000]]) {
     stage:__state.story.stage, own:__state.own.latch, ready:window.__ready,
     hirePanel:!!window.__game.openHire('extend'), thread:!!window.__game.thread()})`);
   await hook(S, 'closeHire');
-  check(`B3 ${branch}: the curtain is not a stop — the game plays on afterwards`,
+  check(`B3 ${arm}: the curtain is not a stop — the game plays on afterwards`,
     shut.panel.open === false && shut.hidden === true && undocked.dock === null
     && took.cargo > 0 && played.credits > paidBefore && played.delivered > 0 && played.thread === true
     && played.stage === 'act2' && played.own === true && played.ready === true
@@ -361,7 +429,7 @@ for (const [branch, crd] of [['paid', 62000], ['seized', 4000]]) {
 
   const modals = await evalJSON(S, 'window.__modals');
   const spyWorks = await evalJSON(S, '(window.alert("probe"), window.__modals.length)');
-  check(`B3b ${branch}: no modal anywhere on the curtain path, and the spy can see one`,
+  check(`B3b ${arm}: no modal anywhere on the curtain path, and the spy can see one`,
     Array.isArray(modals) && modals.length === 0 && spyWorks === 1,
     `alert/confirm/prompt spied from before the first story frame; through act one's settlement, `
     + `the free hull, the purchase, the panel and a delivery afterwards they recorded `
@@ -375,9 +443,10 @@ for (const [branch, crd] of [['paid', 62000], ['seized', 4000]]) {
   // The one condition leg A can prove and a normal play-through cannot reach: a fleet the player
   // cannot make payroll on. Both halves are asserted on ONE page — the curtain held shut with the
   // hull already bought, and the same curtain falling the moment the drivers are square.
-  const s = await session(`/index.html?nosave=1&intro=0&story=seized&crd=4000&tier=2&fleet=1`);
+  const s = await session(`/index.html?nosave=1&intro=0&story=taken&crd=4000&tier=2&fleet=1`);
   const { S, close } = s;
-  await throughActOne(S, 'seized');
+  await throughActOne(S);
+  await throughSummons(S);
 
   // Out of the dock on a hire, so the purchase below happens in the AIR and the curtain's own
   // dock rule is not what is holding it. Then buy the hull, then empty the account.
@@ -427,9 +496,14 @@ for (const [branch, crd] of [['paid', 62000], ['seized', 4000]]) {
   // A player who is a BROKER when they buy their hull has had a different game from one who never
   // opened the door. Three states, not two — never opened / opened and never used / climbed — and
   // this arm is the third, against the second which the seized run above already photographed.
-  const s = await session(`/index.html?nosave=1&intro=0&story=seized&crd=4000&tier=2&fleet=1&shady=1`);
+  // `?shady=1` opens the desk through the shipped path — `Story.askDad` then `Company.openBranch` —
+  // and §S2-P made that path require the Boss meeting, so the summons is kept before anything here
+  // can read a door at all. That ordering IS the restructure: one storyline, one door, and it is
+  // behind the man who took the car.
+  const s = await session(`/index.html?nosave=1&intro=0&story=taken&crd=4000&tier=2&fleet=1&shady=1`);
   const { S, close } = s;
-  await throughActOne(S, 'seized');
+  await throughActOne(S);
+  await throughSummons(S);
   // Off-book gross, set on the live ledger. It is the shady ladder's own axis (`groupShady`) and
   // nothing else reads it, so this moves one quantity — the rung — and not the player's money.
   const BROKER = 130000;
@@ -449,8 +523,8 @@ for (const [branch, crd] of [['paid', 62000], ['seized', 4000]]) {
     `door ${set.door}, off-book gross ${set.gross} CRD (SHADY_TIERS puts BROKER at 120 000)\n`
     + `  the line: ${panel.paras[panel.paras.length - 1]}\n`
     + `  the cell: ${JSON.stringify(cell)}\n`
-    + `falsified by the seized run above, which is the SAME panel with the same door open at 0 CRD `
-    + `off the books and prints "…has been open to you the whole time and you have never used it" `
+    + `falsified by the two arms above, which are the SAME panel with the same door open at 0 CRD `
+    + `off the books and print "…has been open to you the whole time and you have never used it" `
     + `instead — asserted here as an ABSENCE (${!/never used it/.test(text)}) so the two arms `
     + `cannot both be passing on the same string`);
   await close();
@@ -464,9 +538,12 @@ for (const [branch, crd] of [['paid', 62000], ['seized', 4000]]) {
   const URL = '/index.html?intro=0&crd=62000&tier=2';
   const s = await session(URL);
   const { S, close } = s;
-  await hook(S, 'setStoryTime', 84 * 60);
-  await hook(S, 'setDue', true);
-  await throughActOne(S, 'paid');
+  // No fixture is needed to arm the seizure any more — 62 000 CRD is over SEIZE_AT, so the balance
+  // arms it on the first tick exactly as a player's would. `setStoryTime`/`setDue` used to be the
+  // only way to reach this beat, which is itself the point: the trigger is now something the player
+  // can produce by playing.
+  await throughActOne(S);
+  await throughSummons(S);
   await hook(S, 'buyCraft', Story.STARTER_HULL);
   await settle(S, 20);
   const first = await evalJSON(S, `({panel:window.__game.ownState(), arc:window.__game.arcCheck(),
@@ -508,9 +585,10 @@ for (const [branch, crd] of [['paid', 62000], ['seized', 4000]]) {
   // The lesson style.css already paid for: on a short landscape viewport the act-one ending had
   // GO ON below the fold — the PRIMARY ACTION off screen. #own is a fourth host under that rule
   // and it is the one nobody would think to re-check.
-  const s = await session(`/index.html?nosave=1&intro=0&story=seized&crd=4000&tier=2`);
+  const s = await session(`/index.html?nosave=1&intro=0&story=taken&crd=4000&tier=2`);
   const { S, close } = s;
-  await throughActOne(S, 'seized');
+  await throughActOne(S);
+  await throughSummons(S);
   await hook(S, 'grantCredits', 40000);
   await hook(S, 'buyCraft', Story.STARTER_HULL);
   await settle(S, 20);

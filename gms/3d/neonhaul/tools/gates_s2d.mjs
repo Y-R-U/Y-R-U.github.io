@@ -144,10 +144,14 @@ async function main() {
     + `the same fixture at -1: rung ${flags.down} (${flags.names[2]}) — it goes DOWN as well as up, which a `
     + `check that only asserted "it changed" would not have caught\n`
     + `removed again: rung ${flags.back} (${flags.names[3]})\n`
-    + `STANDING_FLAGS carries ${flags.registryEmpty} entries — S2-E's four story flags `
-    + `(debt_cleared +1, dad_favour +1, car_seized -1, crew_hook 0) and S2-J's marked (-1), which `
-    + `is set the first time a charter's heat crosses HEAT.FLAG and never clears. They landed on `
-    + `the path this gate had already run with a fixture, which is what the empty registry was for`);
+    + `STANDING_FLAGS carries ${flags.registryEmpty} entries — S2-E's story flags and S2-J's `
+    + `marked (-1), which is set the first time a charter's heat crosses HEAT.FLAG and never `
+    + `clears. **The count is unchanged at 5 but the contents are not:** §S2-P collapsed the story `
+    + `to one road, so \`debt_cleared\` (the paid branch's, which nothing can now set) came OUT and `
+    + `\`paid_up\` (+1, granted by the Boss meeting) went IN. The live list is `
+    + `dad_favour +1, car_seized -1, crew_hook 0, paid_up +1, marked -1. `
+    + `They landed on the path this gate had already run with a `
+    + `fixture, which is what the empty registry was for`);
 
   // A4. A BORROWED hull is not an asset. S2-E opens the game in a hull that belongs to the
   // player's parents; at recovery value a nocturne would boot a brand-new player in at NAMEHOLDER.
@@ -182,6 +186,14 @@ async function main() {
   await evalJSON(S, '(__game.grantCredits(0), 1)');
   const docked = await hook(S, 'forceDock');
   await settle(S, 20);
+  // §S2-P — this suite boots on 9 000 CRD, and act one's seizure now fires on the first dock at or
+  // above 2 500. So the ending panel and the grounded hire panel land over the board, and every
+  // geometric check below would be measuring THEM: B3's corner hit test read "cabin-layer" and
+  // B7's UNDOCK read "covered by p.en-p" on the first run after the restructure. Same class as the
+  // boot-hint toast cleared above — a story surface over the screen under test — and the same fix.
+  await hook(S, 'closeEnding');
+  await hook(S, 'closeBoss');
+  await hook(S, 'closeHirePanel');
   await evalJSON(S, '(window.__game.clearToasts(), 1)');
   await settle(S, 6);
 
@@ -521,6 +533,9 @@ async function main() {
   await shot(S, `cockpit_${W}x${H}`);
   await hook(S, 'forceDock');
   await settle(S, 16);
+  await hook(S, 'closeEnding');
+  await hook(S, 'closeBoss');
+  await hook(S, 'closeHirePanel');
   await evalJSON(S, '(window.__game.clearToasts(), 1)');
   await settle(S, 6);
   await shot(S, `board_${W}x${H}`);

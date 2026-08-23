@@ -61,7 +61,11 @@ const perMin = last.lifetime / Math.max(0.01, mins);
 // The two numbers that decide whether the window is fair. A courier who must HOLD 50,000 pays for
 // fuel out of the same purse, so the bankable rate is the one the debt is actually paid from.
 const bankPerMin = last.credits / Math.max(0.01, mins);
+// §S2-P — the arc's targets are the SEIZURE and the SUMMONS, not the 50 000, which is the shadow.
+// Both are reported, because they are the two numbers a first-time player is actually asked for.
 const projected = Story.DEBT / Math.max(1e-6, bankPerMin);
+const toSeize = Math.max(0, Story.SEIZE_AT - 250) / Math.max(1e-6, bankPerMin);
+const toSummons = Story.SUMMONS / Math.max(1e-6, bankPerMin);
 
 const report = {
   at: new Date().toISOString(), wallMins: MINS, simMins: +mins.toFixed(2),
@@ -69,7 +73,9 @@ const report = {
   lifetime: last.lifetime, credits: last.credits,
   grossPerMin: +perMin.toFixed(1), bankPerMin: +bankPerMin.toFixed(1),
   minutesToDebt: +projected.toFixed(1),
-  window: Story.WINDOW_S / 60,
+  minutesToSeizure: +toSeize.toFixed(1),
+  minutesToSummons: +toSummons.toFixed(1),
+  seizeAt: Story.SEIZE_AT, summons: Story.SUMMONS,
   simSweptGrossPerMin: 733.3,          // sim_s2e's `normal` pilot, docs/s2e_balance.json
   optimismRatio: +(733.3 / Math.max(1e-6, perMin)).toFixed(3),
   samples,
@@ -80,7 +86,8 @@ writeFileSync(OUT, JSON.stringify(report, null, 1));
 console.log(`\n  ${mins.toFixed(1)} sim min · ${last.jobs} jobs · tier ${last.tier} · ${last.tows} tows`);
 console.log(`  gross ${report.grossPerMin} CRD/min   (sim_s2e's normal pilot: 733.3 — the analytic`);
 console.log(`                                          model is ${report.optimismRatio}x optimistic)`);
-console.log(`  bankable ${report.bankPerMin} CRD/min -> ${report.minutesToDebt} min to hold ${Story.DEBT}`);
+console.log(`  bankable ${report.bankPerMin} CRD/min -> ${report.minutesToSeizure} min from a 250 CRD start to the ${Story.SEIZE_AT} seizure`);
+console.log(`  ${report.minutesToSummons} min more for the ${Story.SUMMONS} summons · ${report.minutesToDebt} min for the ${Story.DEBT} shadow`);
 console.log(`  the shipped window is ${report.window} min`);
 console.log(`\nwrote ${OUT.replace(ROOT + '/', '')}`);
 await close();

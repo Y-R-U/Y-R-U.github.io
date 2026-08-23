@@ -126,31 +126,47 @@ export function netWorth(state) {
 }
 
 // Story flags that move standing, as { flag: rungs }. S2-D shipped this EMPTY and proved the
-// mechanism with a fixture; S2-E owns the story and these are its four flags. Only flags that
+// mechanism with a fixture; S2-E owns the story and these are its flags. Only flags that
 // change what the CITY thinks of you belong here — a flag that is a plot bookmark and nothing else
 // (`intro_seen`) is deliberately absent, because a registry that carries both stops meaning
 // anything and every rung it hands out is then a rung somebody has to argue about.
 //
-//   debt_cleared  you settled a 50,000 debt with a crew nobody settles with. That is a reference.
-//   dad_favour    the paid branch's concrete asset. Aaron's note: the good ending must be paid in
-//                 something, not in gratitude — *"Dad owes you"*, and a name that owes you is
+//   dad_favour    granted BY THE SEIZURE. Aaron's note is that the debt has to be paid in something
+//                 rather than in gratitude — *"Dad owes you"* — and under one road it is paid in a
+//                 vehicle, which is more true than the money version was. A name that owes you is
 //                 exactly what the STANDING axis measures.
-//   car_seized    a repossession on the record. It is the ONLY negative here, and it is what makes
-//                 the seized branch's climb back real rather than cosmetic: you start act two a
-//                 rung below where the same net worth would otherwise put you.
-//   crew_hook     they have a hook in you. It is worth nothing to the legitimate city — 0 rungs —
-//                 and it is present so `flagSteps` sees it and the shady ladder in pass 2-B has a
-//                 flag to open on. A zero is a real answer here, not a placeholder.
+//   car_seized    a repossession on the record, and public. Paired with `dad_favour` above so the
+//                 seizure nets to zero: every player loses the car, so a standing penalty nobody
+//                 can avoid is an offset applied to the whole game rather than an axis.
+//   crew_hook     they have a hook in you, granted by the Boss meeting. Worth nothing to the
+//                 legitimate city — 0 rungs — and present so `flagSteps` sees it and the shady
+//                 ladder has a flag to open on. A zero is a real answer here, not a placeholder.
+//   paid_up       §S2-Q. You walked into a room under a freight ramp with ten thousand credits when
+//                 running was an option. This city can tell, and it is the rung the meeting buys.
 //   marked        §S2-J. The patrol has opened a file on a charter you hold — `company.exposure` crossed
 //                 EXPOSURE.FLAG at least once. It is the only STANDING cost of running off the books,
 //                 and it is here rather than in company.js because standing is what the CITY thinks
 //                 of you and a charter under inspection is exactly that. It does not clear when the
 //                 exposure does: the file is the record, not the temperature.
+// §S2-Q — the restructure. `debt_cleared` is DELETED rather than left beside its replacement
+// (obligation T3's rule): it was the paid branch's flag, there is no paid branch, and nothing on
+// the single road can set it. `paid_up` takes its slot and IS reachable — it is what the Boss
+// meeting grants.
+//
+// The single road's arithmetic, which is the thing worth checking rather than the list:
+//
+//   the seizure   car_seized −1 + dad_favour +1  =  0
+//   the meeting   crew_hook   0 + paid_up    +1  = +1
+//
+// It nets to zero at the seizure on purpose. Every player loses the car, so a permanent −1 with no
+// decision attached to it would not be an axis, it would be an offset applied to the whole game —
+// and the reason the +1 is `dad_favour` rather than a consolation is that under one road it is
+// MORE true than it was: you settled his debt with a vehicle instead of with money.
 export const STANDING_FLAGS = {
-  debt_cleared: 1,
   dad_favour: 1,
   car_seized: -1,
   crew_hook: 0,
+  paid_up: 1,
   marked: -1,
 };
 

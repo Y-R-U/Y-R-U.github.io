@@ -737,8 +737,10 @@ export class HirePanel {
 // in it. What differs is the capital you arrive with and what is on your record.
 // ── §S2-J — the thread ────────────────────────────────────────────────────
 //
-// The paid-off branch's door, and the player is the one who opens it. `js/story.js` decides when
-// the row that leads here appears; this renders the scene behind it and nothing else.
+// The ONE door into the shady side, and the player is the one who opens it. It was built as the
+// paid branch's delayed door; with one storyline it is the only one, and it opens after the Boss
+// meeting. `js/story.js` decides when the row that leads here appears; this renders the scene
+// behind it and nothing else.
 //
 // It is deliberately SHORT. The scene is the player deciding to pull the thread, not a second
 // cutscene — Aaron's note is *"you go to him and demand to know who he borrowed from"*, which is
@@ -772,8 +774,8 @@ export class ThreadPanel {
     body.appendChild(el('div', 'th-kick', this.asked ? 'HE TOLD YOU' : 'HE IS NOT GOING TO OFFER'));
     body.appendChild(el('p', 'en-p', this.asked
       ? 'He gave you a place and a name and then he asked you not to use either of them.'
-      : 'He has been home a while now. He has not mentioned it once, and you have heard his name '
-        + 'twice on an open channel from people who do not sound like friends.'));
+      : 'He is back. He has not asked once where the car went, and you have heard his name twice '
+        + 'on an open channel from people who do not sound like friends.'));
 
     // Up to the demand while it is unasked; the whole exchange once it is.
     const upto = this.asked ? this.scene.length : 2;
@@ -803,11 +805,22 @@ export class ThreadPanel {
   }
 }
 
+// ── the seizure ────────────────────────────────────────────────────────────
+//
+// There is one of these now. It used to fork on paid/seized; there is no fork, so the prose is a
+// single scene and it can be written for the moment rather than for a table.
+//
+// **The arm is the scene.** Aaron: *"they either need to do so and it costs you $10k or $20k debt
+// to have it fixed up? or stick with the bad guys demanding money, they take the car and say they
+// won't break your arm."* The second, and the reason is checkable rather than aesthetic: the
+// shipped intro VO already sets it up. `boss_06` is *"If it is not ready we take the craft and
+// sell it. Then we break an arm."* This is that threat carried out to the first clause and
+// commuted at the second — and a threat withheld because you are useful is worse than one carried
+// out, because it prices you. Not one line of intro audio needed re-recording.
 export class EndingPanel {
   constructor(host, hooks = {}) {
     this.hooks = hooks;                        // { close }
-    this.panel = new CabinPanel(host, { kicker: 'ACT ONE', title: '', closeLabel: 'GO ON' },
-      );
+    this.panel = new CabinPanel(host, { kicker: 'ACT ONE', title: '', closeLabel: 'GO ON' });
     this.result = null;
     this.opens = 0;
   }
@@ -821,26 +834,28 @@ export class EndingPanel {
     const body = this.panel.body;
     body.innerHTML = '';
     body.appendChild(el('div', `en-kick ${result.branch}`, result.kicker));
+    // **The objective, above the prose.** In landscape the panel body scrolls, and the first
+    // capture had the whole instrument grid — including the ten thousand the player is now being
+    // asked for — below the fold: five paragraphs of scene and no visible objective. The prose can
+    // be scrolled to; what the player has to do next cannot be.
+    const goal = el('div', 'en-goal');
+    goal.appendChild(el('i', null, 'WHAT HE WANTS NOW'));
+    goal.appendChild(el('b', null, `${crd(result.summons)} CRD, BROUGHT TO HIM`));
+    body.appendChild(goal);
 
-    const lines = result.paid ? [
-      'They land on the pad while you are still shutting down. Nobody says anything for a while.',
-      `You transfer fifty thousand credits. He counts it in front of you, which is the point of `
-      + `counting it in front of you.`,
-      // NO DAYS. Aaron: *"i actually like the idea of no days in the game."* The first draft of this
-      // paragraph opened "Two days later" and the seized one said "a decision he made today", which
-      // would have been the only place in the entire game that counted one.
-      'Your parents come home sooner than they said they would. Your father does not look at the '
-      + 'craft when he takes the keys back, and he does not look at you either. Your mother thanks '
-      + 'you about six times.',
-      'You are standing on a pad with no vehicle and whatever is left in your account. '
-      + 'Your father owes you, and he knows it.',
-    ] : [
+    const lines = [
       'They are waiting on the pad. They were always going to be waiting on the pad.',
       'He does not raise his voice. Somebody else flies the craft away while he is still talking, '
-      + 'and the account goes to ninety credits in front of you.',
-      'Nobody breaks an arm. He wants you to understand that this was a decision, that he made it, '
-      + 'and that he could have made a different one.',
-      'You are standing on a pad with ninety credits and a crew who now know your name.',
+      + 'and your father’s insurance papers go into a coat pocket like a receipt.',
+      // The line the whole scene exists for. It has to be the coldest thing anybody says.
+      'He told you he would break an arm. He looks at your hands for a while, the way you would '
+      + 'look at a tool you were deciding whether to keep. Then he says an arm takes six weeks and '
+      + 'you are worth more to him flying, and that is the end of it — not mercy. Arithmetic.',
+      'He does not touch the account, and he wants you to notice that he did not. A courier with '
+      + 'nothing in the bank cannot hire a craft. A courier who cannot hire a craft cannot earn.',
+      `Ten thousand credits, and you bring it to him yourself, because he wants to be looking at `
+      + `you while you hand it over. It is a fifth of what your father owes and he says it like he `
+      + `is doing you a kindness.`,
     ];
     for (const t of lines) body.appendChild(el('p', 'en-p', t));
 
@@ -851,17 +866,19 @@ export class EndingPanel {
       c.appendChild(el('b', null, v));
       return c;
     };
-    grid.appendChild(cell('THEY TOOK', `${crd(result.took)} CRD`, 'bad'));
-    grid.appendChild(cell('YOU KEEP', `${crd(result.kept)} CRD`, result.paid ? 'good' : 'bad'));
     grid.appendChild(cell('THE CRAFT', 'gone', 'bad'));
-    grid.appendChild(cell('ON YOUR RECORD', result.flags.map(f => f.replace(/_/g, ' ')).join(' · '),
-      result.paid ? 'good' : ''));
+    // The cell that carries the whole design change: they did not take the money. It is `good` and
+    // it prints the real balance, because a player who has just been robbed of a vehicle needs to
+    // see, on the same screen, that they can still afford to work.
+    grid.appendChild(cell('YOU KEEP', `${crd(result.kept)} CRD`, 'good'));
+    grid.appendChild(cell('HE WANTS', `${crd(result.summons)} CRD`, 'bad'));
+    grid.appendChild(cell('YOUR FATHER OWES', `${crd(result.debt)} CRD`, 'bad'));
+    grid.appendChild(cell('ON YOUR RECORD', result.flags.map(f => f.replace(/_/g, ' ')).join(' · ')));
     body.appendChild(grid);
 
-    body.appendChild(el('div', 'en-next', result.paid
-      ? 'Act two: you hire what you fly, by the block, until you can buy a hull that is yours.'
-      : 'Act two: you hire what you fly, by the block. There is one wreck on the lot at ninety '
-        + 'credits and it is exactly as good as it sounds.'));
+    body.appendChild(el('div', 'en-next',
+      `Act two: you hire what you fly, by the block, and you earn his ten thousand. There is one `
+      + `wreck on the lot at ${result.wreck} credits and it is exactly as good as it sounds.`));
     this.panel.onHide = () => { this.hooks.close && this.hooks.close(result); };
     this.panel.show();
     void econ;
@@ -871,6 +888,89 @@ export class EndingPanel {
   hide() { return this.panel.hide(); }
   stateOf() { return { open: this.panel.open, opens: this.opens,
     branch: this.result ? this.result.branch : null }; }
+}
+
+// ── the Boss meeting ───────────────────────────────────────────────────────
+//
+// Aaron: *"earn $10k and bring it to 'the boss' as he wants to talk to you."* So act two's opening
+// objective ends with a PERSON rather than with a balance, and this is the room.
+//
+// Deliberately the same shape as EndingPanel — kicker, five paragraphs, an instrument grid, one
+// forward-looking line — because it is the other half of the same conversation and the player
+// should recognise the surface. What it is NOT is a reward screen: he takes the money, the number
+// on the debt goes down by a fifth, and nothing about the situation has improved except that he
+// now knows your face on purpose.
+//
+// It is also the door. Nothing here says so — `js/story.js`'s `met` is what un-gates the remarks
+// about your father, and the player finds those the way they find every other line on the ticker.
+export class BossPanel {
+  constructor(host, hooks = {}) {
+    this.hooks = hooks;                        // { close }
+    this.panel = new CabinPanel(host, { kicker: 'ACT TWO', title: '', closeLabel: 'GO ON' });
+    this.result = null;
+    this.opens = 0;
+  }
+
+  get open() { return this.panel.open; }
+
+  show(result, extra = {}) {
+    this.result = result;
+    this.opens++;
+    this.panel.setTitle('HE WANTED TO LOOK AT YOU');
+    const body = this.panel.body;
+    body.innerHTML = '';
+    body.appendChild(el('div', 'en-kick taken', 'TEN THOUSAND, IN PERSON'));
+    const goal = el('div', 'en-goal owed');
+    goal.appendChild(el('i', null, 'STILL AGAINST YOUR FATHER’S NAME'));
+    goal.appendChild(el('b', null, `${crd(result.left)} CRD`));
+    body.appendChild(goal);
+
+    const lines = [
+      'The address is a service level under a freight ramp with nothing on the door. He is sitting '
+      + 'where he can see both ends of the corridor, which is the first thing about him you have '
+      + 'properly understood.',
+      `You put ${crd(result.paid)} credits on the table. He does not count it. He counts you `
+      + `instead — the hire paperwork, the hours on it, the fact that you came.`,
+      `“Forty thousand,” he says, as if you had asked. “Your father’s. Not yours. But you are the `
+      + `one who keeps turning up.”`,
+      '“You could have run. People do.” He says it the way dispatch reads out a delivery window. '
+      + '“They are not hard to find and they are not worth finding.”',
+      'On the way out he asks after your father, by his first name, in the tone of a man asking '
+      + 'after a colleague. You are still working out what that means when he tells you to go and '
+      + 'earn.',
+    ];
+    for (const t of lines) body.appendChild(el('p', 'en-p', t));
+
+    const grid = el('div', 'en-grid');
+    const cell = (k, v, cls) => {
+      const c = el('div', `en-cell${cls ? ' ' + cls : ''}`);
+      c.appendChild(el('i', null, k));
+      c.appendChild(el('b', null, v));
+      return c;
+    };
+    grid.appendChild(cell('YOU HANDED OVER', `${crd(result.paid)} CRD`, 'bad'));
+    grid.appendChild(cell('YOU KEEP', `${crd(result.kept)} CRD`, 'good'));
+    grid.appendChild(cell('STILL OWED', `${crd(result.left)} CRD`, 'bad'));
+    grid.appendChild(cell('YOUR ARM', 'where you left it', 'good'));
+    grid.appendChild(cell('ON YOUR RECORD', result.flags.map(f => f.replace(/_/g, ' ')).join(' · ')));
+    body.appendChild(grid);
+
+    body.appendChild(el('div', 'en-next',
+      'Nothing is settled. You fly what you can afford to hire, you buy a hull of your own when '
+      + 'you can afford that, and behind all of it there are forty thousand credits with your '
+      + 'family’s name on them.'));
+    this.panel.onHide = () => { this.hooks.close && this.hooks.close(result); };
+    this.panel.show();
+    void extra;
+    return true;
+  }
+
+  hide() { return this.panel.hide(); }
+  stateOf() {
+    return { open: this.panel.open, opens: this.opens,
+      paid: this.result ? this.result.paid : null,
+      left: this.result ? this.result.left : null };
+  }
 }
 
 // ── the arc's curtain ──────────────────────────────────────────────────────
@@ -899,7 +999,6 @@ export class OwnPanel {
   show(result, extra = {}) {
     this.result = result;
     this.opens++;
-    const paid = result.branch === 'paid';
     const shady = extra.shady || null;
     const open = !!(shady && shady.open);
     this.panel.setTitle(result.title);
@@ -907,26 +1006,23 @@ export class OwnPanel {
     body.innerHTML = '';
     body.appendChild(el('div', `en-kick ${result.branch}`, result.kicker));
 
+    // ONE road, so one set of paragraphs. The branch fork that used to be here was the paid
+    // ending's other end and there is no paid ending. What replaced it is the shadow: this beat is
+    // the player climbing back to a hull of their own, and the forty thousand is still out there.
     const lines = [
-      paid
-        ? 'The transfer takes about a minute. Nobody counts anything in front of you.'
-        : 'The transfer takes about a minute. Nobody watches you do it, which is new.',
+      'The transfer takes about a minute. Nobody watches you do it, which is new.',
       'The meter is off. Nothing on this pad belongs to a hire desk, a crew or your parents, and '
       + 'the only thing this hull costs to keep is charge.',
+      'Somebody from the crew is at the desk on your way out. He looks at the paperwork and not at '
+      + 'you, and he says the number back to you before you have said it.',
+      `They are not going to take this one. Nobody promised that. It is only that there is nothing `
+      + `here of theirs — and ${crd(result.left)} credits somewhere else that still is.`,
+      extra.asked
+        ? 'Your father gave you a name once and asked you not to use it. Neither of you has '
+          + 'mentioned it since.'
+        : 'Your father still has not told you who he borrowed from. You have stopped asking, which '
+          + 'is not the same as not wanting to know.',
     ];
-    if (paid) {
-      lines.push('You call home. Your father asks what you paid, and whether it came with a '
-        + 'warranty, and then there is a gap where he could say the other thing.');
-      lines.push(extra.asked
-        ? 'He gave you a name once and asked you not to use it. Neither of you mentions that either.'
-        : 'He still has not told you who he borrowed from. You have stopped asking, which is not '
-          + 'the same as not wanting to know.');
-    } else {
-      lines.push('Somebody from the crew is at the desk on your way out. He looks at the paperwork '
-        + 'and not at you, and he says the number back to you before you have said it.');
-      lines.push('They are not going to take this one. Nobody promised that. It is only that there '
-        + 'is nothing here of theirs.');
-    }
     // The shady ladder, if they climbed it. Three states and not two: a door that was never opened
     // and a door that was opened and never used are different games, and a player who is a BROKER
     // has had a third one.
@@ -954,17 +1050,17 @@ export class OwnPanel {
     grid.appendChild(cell('SPENT ON HIRE', `${crd(result.hireSpend)} CRD`, 'bad'));
     grid.appendChild(cell('BLOCKS RENTED', `${result.hireBlocks}`));
     grid.appendChild(cell('THE METER', 'off', 'good'));
+    // The shadow, on the same grid as the hull. It is the one cell on this panel that is not good
+    // news and it is the reason the kicker says NOTHING OWED ON IT rather than NOTHING OWED.
+    grid.appendChild(cell('YOUR FATHER OWES', `${crd(result.left)} CRD`, 'bad'));
     grid.appendChild(cell('ON YOUR RECORD',
-      result.flags.length ? result.flags.map(f => f.replace(/_/g, ' ')).join(' · ') : 'clean',
-      paid ? 'good' : ''));
+      result.flags.length ? result.flags.map(f => f.replace(/_/g, ' ')).join(' · ') : 'clean'));
     if (open) grid.appendChild(cell('OFF THE BOOKS', `${shady.name} · ${crd(shady.at)} CRD`));
     body.appendChild(grid);
 
-    body.appendChild(el('div', 'en-next', paid
-      ? 'Nothing closes here. The board is still out there and the hire desk is still on it — you '
-        + 'have simply stopped needing it.'
-      : 'Nothing closes here. The board is still out there, the hire desk is still on it, and so is '
-        + 'the desk under the Tallow Yard. You have stopped needing one of the three.'));
+    body.appendChild(el('div', 'en-next',
+      'Nothing closes here. The board is still out there, the hire desk is still on it, and so is '
+      + 'the desk under the Tallow Yard. You have stopped needing one of the three.'));
     this.panel.onHide = () => { this.hooks.close && this.hooks.close(result); };
     this.panel.show();
     return true;

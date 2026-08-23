@@ -5,105 +5,142 @@
 // `tools/sim_s2e.mjs` can run the whole arc in node and the two constants that decide whether the
 // game is fair are MEASURED. The clock is always a sim time in SECONDS passed as an argument.
 //
-// ── THERE ARE NO DAYS ──────────────────────────────────────────────────────
+// ── ONE ROAD, AND IT IS PAVED WITH MONEY YOU CAN SEE ───────────────────────
 //
-// Aaron: *"i actually like the idea of no days in the game."* The player never sleeps, there is no
-// day counter, and — the part that matters here — **there is no visible clock on the debt**. The
-// Boss never names a number. He says the money will be called in *soon*.
+// **This is a restructure, and the thing it replaced is worth stating so nobody rebuilds it.**
 //
-// That is only fair if the player can still see they are falling behind, which is what the warmth
-// gauge is for and why it reads PACE rather than TIME:
+// The shipped arc gave the player 84 minutes of play (`WINDOW_S`) to bank 50,000 credits. It had
+// three defects and they compounded:
 //
-//     projection = credits + (recent earning rate x time remaining)
-//     ratio      = projection / DEBT
-//     warmth     = 1 when ratio <= 0.75,  0.5 at ratio 1.00,  0 at ratio >= 1.25
+//   1. The gauge saturated. `warmth` was 1 at pace ratio <= 0.75 and 0 at >= 1.25, so a player
+//      earning 70 % of the required rate pinned the needle to MAX **at minute zero** and it never
+//      moved again for the whole 84 minutes. The one instrument that existed to tell you how you
+//      were doing was dead for exactly the player who most needed it.
+//   2. The gauge was not the trigger. The crew arrived on `t >= WINDOW_S` — an invisible clock —
+//      while the visible instrument read pace. Aaron reached max warmth, was told they were
+//      coming, and nothing happened, twice, five thousand credits apart.
+//   3. Measured against the real courier rate (737 CRD/min, `shots/_courier_rate.json`) the
+//      50,000 took 67 minutes against an 84-minute window, so the whole game up to that point was
+//      a grind whose reward was losing everything.
 //
-// At t = 0 the rate is seeded at exactly break-even (`DEBT / WINDOW`), so the gauge opens at
-// **half scale and stays there while the player earns exactly the rate the debt requires**. It
-// moves the moment they earn faster or slower than that. A countdown could not do this: it would
-// read the same for a player who is going to make it and one who is not.
+// Aaron's call, verbatim: *"a single starting storyline where you are 100% going to lose the car
+// next stop after 2k or 2.5k cash… stick with the bad guys demanding money, they take the car and
+// say they won't break your arm, earn $10k and bring it to 'the boss' as he wants to talk to
+// you."*
 //
-// The Boss reads the same signal. *"Better make money fast"* arrives because you are behind, not
-// because a week went by — he is reading your balance, not the calendar.
+// So the arc is now three numbers and no clock at all:
+//
+//     SEIZE_AT   2 500   the first DOCK at or above this and they take the craft. Everyone.
+//     SUMMONS   10 000   bring it to the Boss in person. That meeting opens act two.
+//     DEBT      50 000   what your father owes. The SHADOW — never an act-one target.
+//
+// The intro VO did not have to be re-recorded for any of this, and that is a check on the design
+// rather than a convenience: `boss_06` is *"If it is not ready we take the craft and sell it. Then
+// we break an arm."* One road is that threat paid off and then **commuted** — they take the craft,
+// they do not break the arm, because you are worth more to them working. `boss_03`/`04`/`05` stay
+// literally true.
+//
+// ── THE GAUGE IS THE TRIGGER ───────────────────────────────────────────────
+//
+// `warmth` is now `credits / target`, and the target is whichever of the two demands is live. It
+// opens at 250/2500 = 0.10 on a fresh profile, it moves on every single delivery, and it reaches
+// full scale on **exactly the frame the event arms**. It cannot saturate early because there is
+// nothing for it to saturate against, and it cannot disagree with the trigger because it is the
+// same comparison. The Boss's escalation reads the same number for the same reason.
+//
+// ── THERE ARE STILL NO DAYS ────────────────────────────────────────────────
+//
+// Aaron: *"i actually like the idea of no days in the game."* There is no day counter and no clock
+// on the debt — and now there is no hidden one either. `story.t` survives as playtime for the
+// record screen and gates nothing.
 //
 // ── THE MONEY MUST BE IN THE ACCOUNT ───────────────────────────────────────
 //
-// Progress is `credits`, never `lifetime`. The crew takes what is in the account, so a player who
-// ploughs their earnings into a hull is genuinely behind — and the borrowed hull makes that a real
-// decision, because every upgrade fitted to it is fitted to a car that is leaving either way. The
-// sweep measured that: `tools/sim_s2e.mjs`'s `invest` pilot, which is the `normal` pilot with
-// upgrade buying turned on, holds the debt at 84 minutes on a `kestrel` and **never** on a
-// `nocturne`, where upgrades are priced off a 20,000 list.
+// Progress is `credits`, never `lifetime`, for both demands. A player who ploughs earnings into
+// upgrades on the borrowed hull genuinely delays the seizure — and every one of those upgrades is
+// fitted to a car that is leaving anyway, which is the joke the borrowed hull exists to tell.
 //
 // ── NO FAIL STATE (DECISIONS 6) ────────────────────────────────────────────
 //
-// Both endings lose the car. Neither ends the game. See `settle()`.
+// The seizure takes the craft and NOT the money (Aaron: *"it could even allow to let the player
+// keep his cash"*), so nobody is ever left unable to hire. See `settle()`.
 
 import * as E from './economy.js';
 
-// ── the debt ───────────────────────────────────────────────────────────────
+// ── the three numbers ──────────────────────────────────────────────────────
 
+// What your father owes. It is never an act-one target and the player is never asked to earn it;
+// it is the reason any of this is happening, it is what the Boss says out loud in the intro, and
+// `meetBoss()` pays SUMMONS off it so the shadow has a figure that moves.
 export const DEBT = 50000;
 
-// The window, in SECONDS OF PLAY. `simTime`, so it does not advance while the tab is backgrounded
-// (main.js parks the loop) and it does not advance during the intro.
+// The seizure. The first dock at or above this balance and the craft is gone.
 //
-// **SWEPT, NOT PICKED** — `node tools/sim_s2e.mjs --seeds=12`, output committed at
-// `docs/s2e_balance.json`. 12 world seeds x 5 pilot classes were run through the real economy and
-// the real mission generator in a borrowed `kestrel`, and the first moment each career's LIQUID
-// balance reached 50,000 was recorded. Median minutes to the debt, and the share of each class
-// still holding the car at the candidate window:
-//
-//     pilot     CRD/min   payAt p10/p50/p90      | window   focused normal casual invest dawdle
-//     focused     737.9    61.4  69.4  73.7      |    72 m     75.0  83.3    0.0  100.0    0.0
-//     normal      733.3    67.3  69.9  72.1      |    76 m     91.7 100.0    0.0  100.0    0.0
-//     casual      595.3    81.9  85.0  90.4      |  * 84 m     91.7 100.0   33.3  100.0    0.0
-//     invest      952.0    62.6  64.6  65.8      |    88 m    100.0 100.0   66.7  100.0    0.0
-//     dawdle      490.0   106.1 109.6 112.8      |   108 m    100.0 100.0  100.0  100.0   41.7
-//
-// 84 minutes is the row where the target distribution in the brief holds: a focused player who
-// routes well keeps the car on most runs (91.7 %), a dawdling player loses it on all of them, and
-// the swing class — `casual`, which is `hop` at 0.78 skill and 1.6x dwell — is a one-in-three
-// coin flip. That is the *"real risk of running out of time"*, and it is a risk the gauge warns
-// about from the first minute rather than at the end.
-//
-// **The limitation, stated rather than buried:** sim_p7a's flight model prices a leg as distance
-// over cruise speed and cannot see a wall, so it is optimistic about a real pilot. Every class
-// above is therefore an UPPER bound on how often the car is kept, and real play moves the whole
-// table down. That is the direction the design wants (tight), but it is one constant to change if
-// Aaron reports it as unwinnable rather than tense.
-export const WINDOW_S = 84 * 60;
+// **Why 2 500 rather than 2 000.** Aaron named both. The measured courier rate is 737 CRD/min
+// (`shots/_courier_rate.json`, an autopilot at tier 2 that routes better than a person), and a
+// fresh profile boots on 250 CRD — so 2 500 is 2 250 CRD of earning, which is **3.1 minutes at
+// the measured rate and realistically 6-8 for somebody meeting the controls for the first time**.
+// 2 000 would be 2.4 minutes and would land before the Boss's escalation could finish. This is the
+// number that leaves room for all four of his lines and still fires inside the first ten minutes,
+// which is what *"the hire loop is the spine of the game"* requires.
+export const SEIZE_AT = 2500;
 
-// The rate the debt requires if you start from nothing: 9.92 CRD/s, 595 CRD/min. Also the seed for
-// the pace EWMA, which is what puts the needle at exactly half scale on the first frame.
-export const BREAK_EVEN = DEBT / WINDOW_S;
+// The summons. Earn it, dock, and hand it to him yourself — that meeting opens act two.
+//
+// 10 000 is Aaron's number. At the measured rate it is ~13 minutes of earning on top of the hire
+// burn (a `wisp` block is 1 425 CRD per 5 minutes, so roughly 3 800 CRD of hire across it), i.e.
+// somewhere around 20 minutes of real play. It is a fifth of the debt, which is the line the
+// meeting itself makes.
+export const SUMMONS = 10000;
 
-// The pace EWMA's time constant. Earnings arrive as lumps roughly every 60-90 s, so a short window
-// would make the gauge flick between "miles ahead" and "hopeless" once per delivery. Five minutes
-// is long enough to be a pace and short enough that two slow jobs in a row are visible.
+// The trailing earning rate's EWMA constant. It no longer feeds the gauge — the gauge is a
+// balance, not a rate — but `perMin` is a genuinely useful readout and the record screen shows it.
+// Earnings arrive as lumps roughly every 60-90 s, so five minutes is long enough to be a pace.
 export const RATE_TAU = 300;
-
-// Where the needle sits. `ratio` is projected-final-balance over the debt.
-export const COLD = 1.25;      // comfortably ahead — the gauge is cool
-export const HOT = 0.75;       // will not make it at this rate — the gauge is pegged
 
 // ── the Boss's escalation ──────────────────────────────────────────────────
 //
-// Keyed on WARMTH, which is pace. Ratcheting: each line fires once, in order, and the ladder never
-// walks back down — a threat that is withdrawn is not a threat. `hold` keeps two lines from
-// arriving inside the same minute when a big delivery swings the projection.
-export const MSG_HOLD = 105;         // s between messages
-export const MSG_FLOOR = 150;        // s of play before the first one can arrive
+// Keyed on WARMTH, which is now `credits / SEIZE_AT` — **the same comparison that fires the
+// seizure**. That is the whole repair. Under the window the ladder read pace while the event read
+// a hidden clock, so "we are on our way" could be true of the gauge and false of the game.
+//
+// Ratcheting: each line fires once, in order, and the ladder never walks back down — a threat that
+// is withdrawn is not a threat. `hold` keeps two lines arriving inside the same breath when a big
+// delivery swings the balance.
+//
+// **The spacing and the thresholds are MEASURED against a real climb, not picked.** They were
+// 150 s before the first line and 105 s between, which needed 465 s — 7.75 minutes — to deliver
+// four lines into an act one that now ends in three to eight.
+//
+// The first retune (40 / 55 s, thresholds .42 .62 .80 .94) was still wrong, and the thing that
+// caught it was a `?courier=1` run rather than a gate: the navigating pilot earned to the seizure
+// in 221 sim seconds over six deliveries and heard **two of the four lines**. The observed climb,
+// which is what these numbers are now solved against:
+//
+//     t (s)     71    91   121   161   191   221
+//     warmth  0.21  0.38  0.57  0.73  0.96  seizure
+//
+// At 30 / 40 s with the thresholds below, that same run delivers b1 at t≈91, b2 at ≈131, b3 at
+// ≈171 and b4 at ≈211 — the whole ladder, ten seconds clear of the pad. And `?courier=1` is the
+// FAST arm: it routes better than a person and never loses a second to a wall, so a human's climb
+// is longer and has more room, not less.
+export const MSG_HOLD = 40;          // s between messages
+export const MSG_FLOOR = 30;         // s of play before the first one can arrive
 
 export const BOSS_LINES = [
-  { id: 'b1', at: 0.55, text: 'Better make money fast.' },
-  { id: 'b2', at: 0.70, text: 'Will be needing the money soon.' },
-  { id: 'b3', at: 0.84, text: 'Ensure you have the money ready.' },
-  { id: 'b4', at: 0.94, text: 'We are on our way, better have the money ready!' },
+  { id: 'b1', at: 0.35, text: 'Better make money fast.' },
+  { id: 'b2', at: 0.55, text: 'Will be needing the money soon.' },
+  { id: 'b3', at: 0.72, text: 'Ensure you have the money ready.' },
+  // The last rung is ALSO force-fired the instant `due` arms, spacing ignored — see `tick`. A
+  // player who blitzes to 2 500 must not have the payoff line eaten by MSG_HOLD, because it is the
+  // only warning that the next pad is the one.
+  { id: 'b4', at: 0.90, text: 'We are on our way, better have the money ready!' },
 ];
-// Fired once, the first time the account actually covers the debt. It is not an escalation — it is
-// the crew noticing, and it is the line that tells the player to stop spending.
-export const BOSS_CLEAR = { id: 'clear', text: 'Good. It stays in the account until we come for it.' };
+
+// Act two's line, fired once, the first time the account covers the SUMMONS. It is not an
+// escalation — it is the crew noticing, and it is the line that tells the player to stop spending
+// and go and see him.
+export const BOSS_READY = { id: 'ready', text: 'He is expecting you. Bring it yourself.' };
 
 // ── the hire loop ──────────────────────────────────────────────────────────
 //
@@ -145,8 +182,11 @@ export const HIRE = {
   // job you cannot otherwise carry is a decision the player can win, and holding it all session is
   // one they cannot afford.
   SCALE: 0.35,
-  WRECK_PRICE: 90,             // the story price. Granted once, at the seizure. See above.
-  SEIZED_CREDITS: 90,          // what the crew leaves in the account
+  // The story price. Granted once, at the seizure — the crew leave you something to work in,
+  // because a courier who cannot fly cannot pay. `SEIZED_CREDITS` used to sit beside this and is
+  // DELETED rather than left there: the seizure no longer touches the account at all, and a
+  // constant describing what the crew leave in it would be describing a rule that is gone.
+  WRECK_PRICE: 90,
   // Discount for committing to several blocks at once, by block count. Index 0 is unused.
   DISCOUNT: [1, 1.00, 0.96, 0.93, 0.90, 0.88, 0.86, 0.845, 0.83, 0.82, 0.81, 0.80, 0.79],
   MAX_BLOCKS: 12,
@@ -239,21 +279,27 @@ export function hireLapsed(story, now) {
   return left !== null && left <= 0;
 }
 
-// ── §S2-J — THE TWO DOORS INTO THE SHADY SIDE ──────────────────────────────
+// ── §S2-J — THE DOOR INTO THE SHADY SIDE ───────────────────────────────────
 //
-// This is settled design and is not re-derived here. Aaron: *"the success branch may mean access to
-// the 'shady' side of the story may trigger later - via an interaction with Dad, where you may even
-// demand to know a contact. perhaps triggers off a certain job? perhaps a comment someone makes
-// about your Dad or etc?"*
+// Aaron: *"the success branch may mean access to the 'shady' side of the story may trigger later -
+// via an interaction with Dad, where you may even demand to know a contact… perhaps a comment
+// someone makes about your Dad or etc?"* and, on the restructure, *"we may need to combine the
+// latter Dad story into a sub story now that there is only a single storyline."*
 //
-//   SEIZED   immediate. The crew already has a hook in you; the relationship IS the debt you could
-//            not pay. `settle()` sets `crew_hook`, and act two opens with the desk already there.
+// So there was a SEIZED door (immediate, because the crew had a hook in you) and a PAID door
+// (delayed, earned by curiosity). One road means **one door, and it is the good one**: the thread
+// about your father, opened after the Boss meeting. That is mostly gating REMOVED — the remarks,
+// the spacing, the cue and `ThreadPanel` were all built for the delayed door and none of them
+// change. What went is `branch !== 'paid'` here and the `'seized'` state in `shadyDoor`.
 //
-//   PAID     delayed, and EARNED BY CURIOSITY. Remarks about your father surface in ordinary
-//            content — an open-channel line, a client's aside — and a player who is not paying
-//            attention simply never notices them. Once two have landed the player's own voice says
-//            something, one row appears on a screen they already read, and pulling it is what opens
-//            the door. **They open it themselves.**
+// Why after the meeting rather than after the seizure: the remarks are people talking about a man
+// who borrowed off the wrong room, and they only mean anything once you have sat opposite that
+// room and been asked after your father by his first name. `meetBoss()` is what sets `met`.
+//
+// It stays EARNED BY CURIOSITY. Remarks surface in ordinary content — an open-channel line, a
+// client's aside — and a player who is not paying attention simply never notices them. Once two
+// have landed the player's own voice says something, one row appears on a screen they already
+// read, and pulling it is what opens the door. **They open it themselves.**
 //
 // The remarks are the load-bearing part and they are deliberately NOT a menu. They go out through
 // `ui.chatter` on the same ticker every radio line uses, in the same `bg`/`info` tiers, from
@@ -294,13 +340,13 @@ export const REMARKS = [
 // The player's own line when the second remark lands. Their voice, not a prompt — `storyui.js`
 // renders it in the same bubble the closing monologue uses.
 export const THREAD_CUE = 'That is twice tonight somebody has said my father’s name like they '
-  + 'know it. He is home, he is fine, and he still has not told me who he borrowed from.';
+  + 'know it. He is back, he is fine, and he has not once asked me where the car went.';
 
 // What the player demands, and what they are given. Short, because the scene is the player deciding
 // to pull the thread and not a second cutscene.
 export const THREAD_SCENE = [
   { who: 'pc', text: 'Who was it. Not what it was for, not how much. Who.' },
-  { who: 'dad', text: 'You settled it. It is done. Leave it done.' },
+  { who: 'dad', text: 'They took the car and they have not been back. That is as done as it gets.' },
   { who: 'pc', text: 'They came for your car with me in it. I am not asking twice.' },
   { who: 'dad', text: '…There is a desk under the Tallow Yard. Ask for the Quartermaster. '
     + 'And do not tell them whose kid you are, because they already know.' },
@@ -314,7 +360,7 @@ export function newThread(over = {}) {
 // lets `tools/gates_s2j.mjs` walk the whole thread deterministically without waiting for a chance.
 export function nextRemark(story, now, roll = 0) {
   if (!story || story.stage !== STAGE.ACT2) return null;
-  if (story.branch !== 'paid') return null;          // the seized branch has its own door
+  if (!story.met) return null;                       // not until you have sat opposite him
   const th = story.thread || (story.thread = newThread());
   if (th.asked) return null;
   if (now - th.last < REMARK_GAP_S) return null;
@@ -345,25 +391,22 @@ export function askDad(story, now = 0) {
   return { ok: true, scene: THREAD_SCENE };
 }
 
-// Which door is open, and `null` when neither is — the whole shady branch reads this one function.
+// Which door is open, and `null` when it is not — the whole shady branch reads this one function.
 //
-// The seized branch is immediate because the crew already has the hook; the paid branch is open
-// only once the player has asked. A THIRD state matters and is why this returns a string and not a
-// boolean: `'cue'` is "the thread is live and the player has not pulled it", which is the state the
-// one row on the RECORD tab exists for.
+// THREE states, which is why this returns a string and not a boolean: `'cue'` is "the thread is
+// live and the player has not pulled it", and that is a different game from never having heard the
+// remarks at all. It is the state the one row on the RECORD tab exists for.
+//
+// `'seized'` is GONE. It was the other branch's immediate door and there is no other branch.
 export function shadyDoor(story) {
-  if (!story || story.stage !== STAGE.ACT2) return null;
-  if (story.branch === 'seized') return 'seized';
+  if (!story || story.stage !== STAGE.ACT2 || !story.met) return null;
   const th = story.thread || newThread();
   if (th.asked) return 'asked';
   if (th.cue) return 'cue';
   return null;
 }
 
-export const shadyOpen = story => {
-  const d = shadyDoor(story);
-  return d === 'seized' || d === 'asked';
-};
+export const shadyOpen = story => shadyDoor(story) === 'asked';
 
 // ── the story state ────────────────────────────────────────────────────────
 
@@ -374,11 +417,16 @@ export function newStory(over = {}) {
     stage: STAGE.INTRO,
     name: '',
     gender: 'n',                 // 'm' | 'f' | 'n' — picks which of the three player VO takes plays
-    t: 0,                        // seconds of play since the mob flew off
-    rate: BREAK_EVEN,            // the pace EWMA, seeded at break-even (see the header)
+    t: 0,                        // seconds of play since the mob flew off — playtime, gates nothing
+    rate: 0,                     // the trailing earning EWMA, in CRD/s. A readout, not the gauge.
     earned: 0,                   // gross since the debt started, for the record screen
-    due: false,                  // the window has closed; the crew arrive at the next dock
-    branch: null,                // 'paid' | 'seized', set by settle()
+    // The seizure is armed. A LATCH: once the balance has been seen at or above SEIZE_AT the crew
+    // are coming, and spending back down below it at the shop does not call them off.
+    due: false,
+    branch: null,                // 'taken', set by settle(). One road — see OUTCOME.
+    // The Boss meeting. It is the beat that opens act two proper: the company layer, the remarks
+    // about your father, and through them the desk under the Tallow Yard.
+    met: false,
     sent: [],                    // Boss line ids already delivered
     lastMsg: -1e9,
     hire: null,                  // { craft, until, blocks, spent, took }
@@ -403,33 +451,65 @@ export function credit(story, amount) {
   return story.rate;
 }
 
-// The whole pace signal, from a story and an economy. Nothing here reads a clock.
-export function pace(story, econ) {
-  const remain = Math.max(0, WINDOW_S - story.t);
+// ── the demand, and the one gauge that shows it ────────────────────────────
+//
+// Which of the two demands is live, and how close the account is to it. This is the ONLY thing the
+// warmth bay draws and the ONLY thing the seizure and the summons compare against, and that
+// identity is the repair: the instrument and the trigger cannot disagree because they are one
+// expression.
+//
+//     stage DEBT              target SEIZE_AT   state 'call'    · 'due' once armed
+//     stage ACT2, not met     target SUMMONS    state 'summons' · 'ready' once covered
+//     stage ACT2, met         null — the bay goes back to a blanking plate
+//
+// `null` and not "a gauge reading zero": there is nothing left to be short of, and a needle parked
+// at cold would be a claim about something that no longer exists.
+export function demand(story, econ) {
+  if (!story) return null;
   const credits = econ ? econ.credits : 0;
-  const clear = credits >= DEBT;
-  const proj = credits + story.rate * remain;
-  const ratio = proj / DEBT;
-  // CLEAR is not "very cool", it is a different state: the money is in the account and the only
-  // way to leave this state is to spend it. Collapsing it into the ratio would show a player who
-  // has just made it a needle at half scale, which reads as "you are behind".
-  const warmth = clear ? 0 : clamp01((COLD - ratio) / (COLD - HOT));
+  if (story.stage === STAGE.DEBT) {
+    const clear = credits >= SEIZE_AT || !!story.due;
+    return { target: SEIZE_AT, have: credits, clear, state: story.due ? 'due' : 'call' };
+  }
+  if (story.stage === STAGE.ACT2 && !story.met) {
+    const clear = credits >= SUMMONS;
+    return { target: SUMMONS, have: credits, clear, state: clear ? 'ready' : 'summons' };
+  }
+  return null;
+}
+
+// The whole signal, from a story and an economy. Nothing here reads a clock — that is the point.
+//
+// `warmth` is a BALANCE against a target, so it is 0.10 on a fresh profile, it moves on every
+// delivery, and it hits 1.0 on the frame the event arms. The old signal was a projection against a
+// window and pinned to 1.0 at minute zero for any player under 75 % of pace; that could not be
+// falsified by anything the player did, which is what made it useless.
+export function pace(story, econ) {
+  const d = demand(story, econ);
+  const credits = econ ? econ.credits : 0;
+  const rate = { rate: +(story ? story.rate : 0).toFixed(3),
+    perMin: Math.round((story ? story.rate : 0) * 60) };
+  if (!d) {
+    return { target: null, warmth: null, ratio: null, clear: false, need: 0, state: null, ...rate };
+  }
+  const ratio = d.have / d.target;
   return {
-    remain, ratio: +ratio.toFixed(4), warmth: +warmth.toFixed(4), clear,
-    need: Math.max(0, DEBT - credits),
-    rate: +story.rate.toFixed(3),
-    perMin: Math.round(story.rate * 60),
-    // The rate the player would have to hold from here. This is the actionable number and it is
-    // what the gauge's legend shows, because "you are behind" without "by how much" is a mood.
-    required: remain > 0 ? +(Math.max(0, DEBT - credits) / remain).toFixed(3) : Infinity,
+    target: d.target, state: d.state, clear: d.clear,
+    ratio: +ratio.toFixed(4),
+    warmth: +clamp01(ratio).toFixed(4),
+    need: Math.max(0, d.target - credits),
+    ...rate,
   };
 }
 
 // Advance the arc. `dt` and `now` are SIM seconds. Returns the events this tick produced; it never
 // speaks, toasts or plays anything itself — main.js owns every surface.
+//
+// It runs in BOTH story stages now. Act two has a demand of its own and the same crew watching the
+// same account, so the line that says "he is expecting you" has to come from the same place.
 export function tick(story, econ, dt, now) {
-  const out = { boss: null, due: false, lapsed: false };
-  if (!story || story.stage !== STAGE.DEBT) return out;
+  const out = { boss: null, due: false, ready: false };
+  if (!story || story.stage === STAGE.INTRO) return out;
   story.t += dt;
   // Continuous decay of the trailing rate. Paired with `credit()`'s impulse, this is an EWMA over
   // RATE_TAU seconds expressed as a rate, so it is correct at any frame rate.
@@ -437,20 +517,41 @@ export function tick(story, econ, dt, now) {
 
   const p = pace(story, econ);
 
-  if (!story.due && story.t >= WINDOW_S) { story.due = true; out.due = true; }
-
-  // The clear line, once, the first time the account covers it.
-  if (p.clear && !story.sent.includes(BOSS_CLEAR.id)) {
-    story.sent.push(BOSS_CLEAR.id);
-    story.lastMsg = now;
-    out.boss = BOSS_CLEAR;
+  // ── act two: the summons ────────────────────────────────────────────
+  if (story.stage === STAGE.ACT2) {
+    if (p.clear && !story.met && !story.sent.includes(BOSS_READY.id)) {
+      story.sent.push(BOSS_READY.id);
+      story.lastMsg = now;
+      out.boss = BOSS_READY;
+      out.ready = true;
+    }
     return out;
   }
-  if (p.clear) return out;
+
+  // ── act one: the seizure arms, and the last rung goes with it ───────
+  //
+  // A LATCH. Once the balance has been seen at or above SEIZE_AT the crew are coming, and paying
+  // for an upgrade on the way to the pad does not call them off.
+  if (!story.due && econ && econ.credits >= SEIZE_AT) {
+    story.due = true;
+    out.due = true;
+    // The payoff line, spacing IGNORED. A player who reaches 2 500 in three minutes would
+    // otherwise have it eaten by MSG_HOLD, and it is the only warning that the next pad is the
+    // one. Everything below it is marked sent, because a ladder that walks backwards after its own
+    // top rung is not a ladder.
+    const last = BOSS_LINES[BOSS_LINES.length - 1];
+    if (!story.sent.includes(last.id)) {
+      for (const l of BOSS_LINES) if (!story.sent.includes(l.id)) story.sent.push(l.id);
+      story.lastMsg = now;
+      out.boss = last;
+    }
+    return out;
+  }
+  if (story.due) return out;
   if (story.t < MSG_FLOOR || now - story.lastMsg < MSG_HOLD) return out;
   // Ratcheting: the NEXT unsent line, and only if warmth has reached its threshold. Walking the
-  // list in order means a sudden collapse in pace delivers the ladder one rung at a time rather
-  // than jumping to the last line, which is what makes the escalation read as escalation.
+  // list in order means a big delivery delivers the ladder one rung at a time rather than jumping
+  // to the last line, which is what makes the escalation read as escalation.
   const next = BOSS_LINES.find(l => !story.sent.includes(l.id));
   if (next && p.warmth >= next.at) {
     story.sent.push(next.id);
@@ -460,56 +561,94 @@ export function tick(story, econ, dt, now) {
   return out;
 }
 
-// ── the two endings ────────────────────────────────────────────────────────
+// ── the end of act one ─────────────────────────────────────────────────────
 //
-// **Both lose the car.** Aaron: *"either way we lose the car"*. That is structural: every player
-// ends act one carless and hiring, so the hire loop is the spine of the game rather than a
-// consolation prize, and "buy your own craft, debt-free" is the real arc.
+// **ONE road, and it loses the car.** Aaron: *"a single starting storyline where you are 100% going
+// to lose the car."* That is structural: every player ends act one carless and hiring, so the hire
+// loop is the spine of the game rather than a consolation prize, and "buy your own craft,
+// debt-free" is the real arc.
 //
-// The branches differ in STARTING CAPITAL, not in whether you continue. There is no game over.
+// There is no paid branch, no fork and no dice. `OUTCOME` is a single object rather than a table
+// keyed by branch, so there is nowhere for a second road to grow back.
+//
+// **They do not take the money.** Aaron: *"it could even allow to let the player keep his cash,
+// since we established renting a car should be expensive."* It is also what makes the arm line
+// true rather than a bluff — a courier with nothing in the bank cannot hire, and a courier who
+// cannot hire cannot earn, and he says as much.
+//
+// The two flags cancel on the standing ladder ON PURPOSE. `car_seized` is −1 because the city saw
+// your craft repossessed and that is public; `dad_favour` is +1 because you settled his debt with
+// a vehicle rather than with money, and *"your father owes you, and he knows it"* was already the
+// line. Under two branches only one player carried a penalty; under one road a permanent −1 with
+// no choice attached to it would not be an axis at all, it would be an offset.
 export const OUTCOME = {
-  paid: {
-    branch: 'paid',
-    flags: ['debt_cleared', 'dad_favour'],
-    title: 'THEY CAME FOR THE MONEY',
-    // Dad's gratitude is a concrete asset, not a thank-you: it is a standing rung, and it is the
-    // door to the shady ladder later, when a remark about him makes you go and ask who he borrowed
-    // from. See the brief — the paid branch reaches the same room through curiosity.
-    kicker: 'PAID IN FULL',
-  },
-  seized: {
-    branch: 'seized',
-    flags: ['car_seized', 'crew_hook'],
-    title: 'THEY CAME FOR THE CAR',
-    kicker: 'REPOSSESSED',
-  },
+  branch: 'taken',
+  flags: ['car_seized', 'dad_favour'],
+  title: 'THEY CAME FOR THE CAR',
+  kicker: 'REPOSSESSED',
 };
 
 // Close act one. Mutates both states. Called by main.js at a DOCK and nowhere else — the seizure
 // must never happen mid-air, because the player has to be standing somewhere they can hire.
 export function settle(story, econ) {
-  const paid = econ.credits >= DEBT;
-  const O = paid ? OUTCOME.paid : OUTCOME.seized;
   const before = econ.credits;
-  if (paid) {
-    E.spend(econ, DEBT);
-  } else {
-    // Cleaned out. `credits` is set rather than spent: `spend()` refuses to overdraw and the point
-    // is that they take everything and leave a float.
-    econ.credits = HIRE.SEIZED_CREDITS;
-    story.wreckLeft = 1;           // the one vehicle $90 buys — see the HIRE header
-  }
-  // The car goes either way. `hire` is null, `craft` is left as it was so nothing downstream reads
-  // an undefined hull, and `grounded` is what the dock screen and main.js test: the player owns
-  // nothing and cannot undock until they have hired something.
+  // The one vehicle 90 credits buys. Not a mercy any more — the account is untouched — but the
+  // crew's own arithmetic: they want you flying, so they point you at the thing nobody wants.
+  story.wreckLeft = 1;
+  // `hire` is null, `craft` is left as it was so nothing downstream reads an undefined hull, and
+  // `grounded` is what the dock screen and main.js test: the player owns nothing and cannot undock
+  // until they have hired something.
   story.stage = STAGE.ACT2;
-  story.branch = O.branch;
+  story.branch = OUTCOME.branch;
   story.due = false;
   story.hire = null;
   story.grounded = true;
+  // Act two has its own demand and its own escalation line, and `sent` is what stops a line
+  // repeating. Cleared so BOSS_READY can fire on a list that act one filled.
+  story.sent = [];
+  story.lastMsg = -1e9;
   econ.borrowed = true;            // whatever they are sitting in, it is not theirs
-  econ.flags = Array.from(new Set([...(econ.flags || []), ...O.flags]));
-  return { ...O, paid, before, kept: econ.credits, took: paid ? DEBT : before - econ.credits };
+  econ.flags = Array.from(new Set([...(econ.flags || []), ...OUTCOME.flags]));
+  return { ...OUTCOME, before, kept: econ.credits, took: 0, summons: SUMMONS, debt: DEBT,
+    wreck: HIRE.WRECK_PRICE };
+}
+
+// ── the summons ────────────────────────────────────────────────────────────
+//
+// Act one's threat was *"we take the craft and sell it. Then we break an arm."* One road is that
+// threat carried out to the first clause and commuted at the second, and the commutation is the
+// most menacing thing in the scene because it is arithmetic: you are worth more working. This is
+// the appointment that comes with it.
+//
+// Aaron: *"earn $10k and bring it to 'the boss' as he wants to talk to you."* So it is not an
+// open-ended debt with a person at the far end of it, it is a person with a number in front of
+// them — and the money is genuinely paid, against the fifty thousand, which is what stops the
+// shadow being scenery. `settled()` reports how much of DEBT has been cleared.
+export function summonsReady(story, econ) {
+  return !!story && story.stage === STAGE.ACT2 && !story.met
+    && !!econ && econ.credits >= SUMMONS;
+}
+
+// What has been paid off the father's debt, and what is left. The meeting is the only thing that
+// moves it.
+export function settled(story) {
+  const paid = story && story.met ? SUMMONS : 0;
+  return { paid, left: DEBT - paid, debt: DEBT };
+}
+
+// The meeting. Mutates both states, once. Called by main.js at a DOCK and nowhere else, for the
+// same reason `settle()` is: a full-screen scene over a moving craft is a scene the player cannot
+// put down.
+export function meetBoss(story, econ) {
+  if (!summonsReady(story, econ)) return null;
+  const before = econ.credits;
+  E.spend(econ, SUMMONS);
+  story.met = true;
+  // `crew_hook` is worth 0 rungs — a contact is not a reputation. `paid_up` is worth 1: you turned
+  // up with ten thousand credits when running was an option, and this city can tell.
+  econ.flags = Array.from(new Set([...(econ.flags || []), 'crew_hook', 'paid_up']));
+  return { paid: SUMMONS, before, kept: econ.credits, ...settled(story),
+    flags: (econ.flags || []).slice() };
 }
 
 // The player is grounded when act two has begun and there is NOTHING ON THE PAD THAT IS THEIRS. It
@@ -580,6 +719,12 @@ export function ownArc(story, econ, arrears = 0) {
   const need = [];
   if (!story || story.stage !== STAGE.ACT2) need.push('act2');
   else if (story.own) need.push('done');
+  // The restructure's condition. The arc is not over while the crew are still waiting for you to
+  // walk in with their ten thousand: a player who bought a hull with the summons unpaid would get
+  // a curtain reading NOTHING OWED over an appointment they have not kept. In play the meeting
+  // always comes first — both beats fire at a dock and the meeting is the cheaper one — so this is
+  // a guard on a state the game makes hard to reach rather than a new gate on the player.
+  if (story && story.stage === STAGE.ACT2 && !story.met) need.push('summons');
   if (story && story.hire) need.push('hire');
   if (!econ || econ.borrowed !== false) need.push('borrowed');
   const price = econ && E.CRAFT[econ.craft] ? E.CRAFT[econ.craft].price : 0;
@@ -590,25 +735,22 @@ export function ownArc(story, econ, arrears = 0) {
     branch: story ? story.branch : null };
 }
 
-// The two branches' headline. The prose is `js/storyui.js`'s, exactly as OUTCOME's is: this holds
-// what the arc DECIDES and not what it says.
+// The headline. The prose is `js/storyui.js`'s, exactly as OUTCOME's is: this holds what the arc
+// DECIDES and not what it says.
 //
-// The kicker is the same on both roads on purpose. It is the one fact the two branches genuinely
-// share — the brief makes them different situations rather than a good and a bad ending, and they
-// arrive at the same place from opposite sides of it. Everything under the kicker differs.
-export const OWN = {
-  paid: { branch: 'paid', kicker: 'NOTHING OWED', title: 'YOU BOUGHT IT YOURSELF' },
-  seized: { branch: 'seized', kicker: 'NOTHING OWED', title: 'YOU BOUGHT IT BACK' },
-};
+// It was a table keyed by branch — YOU BOUGHT IT YOURSELF / YOU BOUGHT IT BACK — and it is a
+// single object now for the same reason OUTCOME is. `NOTHING OWED` is a claim about the HULL and
+// stays exactly true: the meter is off and the hull is yours. What is emphatically still owed is
+// the forty thousand, and the panel says so.
+export const OWN = { branch: 'taken', kicker: 'NOTHING OWED ON IT', title: 'YOU BOUGHT IT BACK' };
 
 // Fire it, once. Mutates `story` and nothing else, and the one field it writes is the latch.
 export function closeArc(story, econ, arrears = 0) {
   const a = ownArc(story, econ, arrears);
   if (!a.done) return null;
   story.own = true;
-  const O = OWN[story.branch] || OWN.paid;
-  return { ...O, branch: story.branch, craft: a.craft, price: a.price,
-    flags: (econ.flags || []).slice(),
+  return { ...OWN, branch: story.branch, craft: a.craft, price: a.price,
+    flags: (econ.flags || []).slice(), ...settled(story),
     hireSpend: story.hireSpend | 0, hireBlocks: story.hireBlocks | 0 };
 }
 
@@ -622,7 +764,8 @@ export function toSave(story, now = 0) {
   return {
     stage: story.stage, name: story.name, gender: story.gender,
     t: +story.t.toFixed(2), rate: +story.rate.toFixed(4), earned: Math.round(story.earned),
-    due: !!story.due, branch: story.branch, sent: story.sent.slice(), lastMsg: -1e9,
+    due: !!story.due, branch: story.branch, met: !!story.met,
+    sent: story.sent.slice(), lastMsg: -1e9,
     // A hire's `until` is an absolute SIM time and sim time restarts at zero on the next load, so
     // persisting it would hand the player either an expired hire or an eternal one. What survives
     // is how much was LEFT; main.js re-bases it against the new clock. Getting this wrong is the
@@ -641,15 +784,46 @@ export function toSave(story, now = 0) {
   };
 }
 
+// ── what a profile from the SHIPPED build becomes ──────────────────────────
+//
+// Every save on disk carries `branch: 'paid' | 'seized' | null` and the flags that went with it.
+// There is one road now, and the migration is explicit rather than emergent because the failure
+// mode of getting it wrong is a player parked in a state the game can no longer leave.
+//
+//   stage 'intro'   untouched. They never started.
+//
+//   stage 'debt'    untouched, and it does the right thing on its own: `t` and the old 84-minute
+//                   window gate nothing any more, and the seizure re-arms off the BALANCE on the
+//                   next tick. A mid-arc save almost certainly holds more than 2 500, so the crew
+//                   arrive at their next dock — which is exactly what the new rule says and is a
+//                   thing the player can see coming on the gauge.
+//
+//   stage 'act2'    **`met` is forced true, on BOTH old branches.** They finished act one under
+//                   the old rules; billing them ten thousand credits now for an appointment that
+//                   did not exist when they played it is the retroactive charge this restructure
+//                   exists to remove. It also keeps the company layer and the arc's curtain open
+//                   for them, both of which read `met`.
+//
+//                   An old SEIZED save additionally had the shady desk open from the moment act
+//                   two began. Under one road the desk is the thread's, so a straight migration
+//                   would CLOSE a door that player already had. `thread.cue`/`asked` are set for
+//                   them — the hook they were given stays given.
+//
+//   `branch`        both old values become 'taken'. Nothing reads it as a fork any more; it is
+//                   kept because it is what act two's surfaces print on the record.
 export function fromSave(profile, now = 0) {
   const s = newStory();
   const p = profile || {};
-  for (const k of ['stage', 'name', 'gender', 'branch']) if (p[k] !== undefined) s[k] = p[k];
+  for (const k of ['stage', 'name', 'gender']) if (p[k] !== undefined) s[k] = p[k];
   for (const k of ['t', 'rate', 'earned', 'wreckLeft', 'hireSpend', 'hireBlocks']) {
     if (typeof p[k] === 'number' && Number.isFinite(p[k])) s[k] = p[k];
   }
+  const legacy = p.branch === 'paid' || p.branch === 'seized';
+  s.branch = p.branch === undefined || p.branch === null ? null
+    : legacy ? OUTCOME.branch : p.branch;
   s.due = !!p.due;
   s.grounded = !!p.grounded;
+  s.met = p.met === undefined ? (legacy && p.stage === STAGE.ACT2) : !!p.met;
   // The latch. A profile written before this beat existed has no key at all, which reads as `false`
   // — i.e. a player who already owns a hull outright gets the beat on their next dock rather than
   // never. That is the right way round: the alternative silently retires it for everyone who was
@@ -664,6 +838,9 @@ export function fromSave(profile, now = 0) {
     });
     s.thread.remarks = s.thread.heard.length;
   }
+  // The old SEIZED branch's door, carried over. It was `shadyDoor`'s immediate `'seized'` state and
+  // that state is gone, so without this the desk they already had would shut on the next load.
+  if (p.branch === 'seized' && p.stage === STAGE.ACT2) { s.thread.cue = true; s.thread.asked = true; }
   if (p.hire && E.CRAFT[p.hire.craft]) {
     s.hire = { craft: p.hire.craft, until: now + Math.max(0, p.hire.left || 0),
       blocks: p.hire.blocks | 0, spent: p.hire.spent | 0, took: now };

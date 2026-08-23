@@ -969,8 +969,8 @@ export class DockUI {
       for (const n of SHADY_RANKS) strip.appendChild(el('span', 'dks-rung', n));
       sh.body.appendChild(strip);
       sh.body.appendChild(el('div', 'dk-ladnote',
-        'Somebody said your father’s name on the open channel. Twice. He is home, he is fine, and '
-        + 'he still has not told you who he borrowed from.'));
+        'Somebody said your father’s name on the open channel. Twice. He is back, he is fine, and '
+        + 'he has not once asked where the car went.'));
       const k = el('button', 'dk-key ask');
       k.appendChild(el('span', 'dkt-l', 'ASK HIM'));
       k.appendChild(el('span', 'dkt-n', 'and do not take the first answer'));
