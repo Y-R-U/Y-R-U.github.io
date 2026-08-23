@@ -1,0 +1,136 @@
+[cam] framing "reveal" asked for allowOutsideClamp while the player has combat control — refused, clamping to [0.78, 1.22] (ARCHITECTURE §4.3.4)
+[cam] framing "beat" asked for allowOutsideClamp while the player has combat control — refused, clamping to [0.78, 1.22] (ARCHITECTURE §4.3.4)
+
+KITEHAWK — zoom controller trace   120 s @ 60 Hz, seed "kitehawk-p2"
+portrait 390x844: worldW 462.09 wu, worldH 1000 wu, zoomFill 0.85
+
+§4.3.1 solve, width-bound (the numbers §4.4.1 is built on):
+  boxW  200 wu -> need   235.3 -> zoom  1.9639  clamped    1.22
+  boxW  273 wu -> need   321.2 -> zoom  1.4387  clamped    1.22
+  boxW  320 wu -> need   376.5 -> zoom  1.2274  clamped    1.22
+  boxW  460 wu -> need   541.2 -> zoom  0.8539  clamped  0.8539
+  boxW  503 wu -> need   591.8 -> zoom  0.7809  clamped  0.7809
+  boxW  585 wu -> need   688.2 -> zoom  0.6714  clamped    0.78
+  boxW  700 wu -> need   823.5 -> zoom  0.5611  clamped    0.78
+§4.3.1 solve, height-bound:
+  boxH  500 wu -> need   588.2 -> zoom     1.7
+  boxH 1000 wu -> need  1176.5 -> zoom    0.85
+  boxH 1053 wu -> need  1238.8 -> zoom  0.8072
+  boxH 1176 wu -> need  1383.5 -> zoom  0.7228
+  boxH 1282 wu -> need  1508.2 -> zoom   0.663
+zoom bias — settled zoom, ~378 wu box (mid-range) and alone (saturated):
+  tight:latch            offset    0.1  target  1.1402  settles  1.1206
+  tight:strict           offset    0.1  target  1.1402  settles   0.967
+  alone:tight:latch      offset    0.1  target    1.22  settles  1.2005
+  alone:tight:strict     offset    0.1  target    1.22  settles  1.0367
+  normal:latch           offset      0  target  1.0402  settles  1.0207
+  normal:strict          offset      0  target  1.0402  settles  0.8827
+  alone:normal:latch     offset      0  target    1.22  settles  1.2005
+  alone:normal:strict    offset      0  target    1.22  settles  1.0367
+  wide:latch             offset  -0.08  target  0.9602  settles  0.9406
+  wide:strict            offset  -0.08  target  0.9602  settles  0.8167
+  alone:wide:latch       offset  -0.08  target    1.22  settles  1.2005
+  alone:wide:strict      offset  -0.08  target    1.22  settles  1.0367
+
+Z1-Z3 stability (PASS: <= 6 reversals/min, no pair inside 1.2 s, no osc > 0.05 for > 3 s)
+  run                             rev/min   minGap  gapViol  oscWin  oscAmp   zoom range
+                                    (raw sign changes; the >=0.02-amplitude count is below)
+  shipped/static                        0     null        0       0       0   1-1
+  shipped/jitter                        0     null        0       0       0   0.9716-1
+  shipped/scripted                   10.5     0.95        6       0       0   0.7973-1.0306
+  shipped/duel                         21    0.333        7       0       0   0.7976-1.2005
+  shipped/patrol                        8      0.5        3       0       0   0.798-1.2005
+  shipped/furball                      10    0.383        4       0       0   0.7976-1.2001
+  control:symmetric-slew/furball     16.5    0.133       11      55    0.44   0.78-1.22
+  control:strict-margin/furball        10    0.433        4       0       0   0.7975-1.0368
+  control:sticky-members/furball      0.5     null        0       0       0   0.8-1.1562
+  control:no-enforcement/furball       10    0.383        4       0       0   0.7976-1.2001
+  control:symmetric-slew/jitter        52    0.567      103     680  0.2559   0.9557-1.2116
+  control:symmetric-slew/scripted      11      1.6        0       0       0   0.78-1.2199
+  control:strict-margin/scripted     10.5    1.117        6       0       0   0.7984-1
+  control:sticky-members/scripted    10.5     0.95        6       0       0   0.7973-1.0306
+  control:no-enforcement/scripted    10.5     0.95        6       0       0   0.7973-1.0306
+  control:track-everything/furball      0     null        0       0       0   0.7984-0.9817
+  shipped/static                   p90 box    367.6 x    262.6 wu, max members 1, box-membership changes 0
+  shipped/jitter                   p90 box    410.4 x    279.7 wu, max members 1, box-membership changes 0
+  shipped/scripted                 p90 box    967.6 x    243.2 wu, max members 1, box-membership changes 0
+  shipped/duel                     p90 box    940.3 x    854.2 wu, max members 1, box-membership changes 30
+  shipped/patrol                   p90 box     1262 x   1089.6 wu, max members 3, box-membership changes 46
+  shipped/furball                  p90 box   1623.5 x     1196 wu, max members 6, box-membership changes 70
+  control:symmetric-slew/furball   p90 box   1623.5 x     1196 wu, max members 6, box-membership changes 70
+  control:strict-margin/furball    p90 box   1623.5 x     1196 wu, max members 6, box-membership changes 70
+  control:sticky-members/furball   p90 box   6827.1 x   3128.4 wu, max members 6, box-membership changes 5
+  control:no-enforcement/furball   p90 box   1623.5 x     1196 wu, max members 6, box-membership changes 70
+  control:symmetric-slew/jitter    p90 box    410.4 x    279.7 wu, max members 1, box-membership changes 0
+  control:symmetric-slew/scripted  p90 box    967.6 x    243.2 wu, max members 1, box-membership changes 0
+  control:strict-margin/scripted   p90 box    967.6 x    243.2 wu, max members 1, box-membership changes 0
+  control:sticky-members/scripted  p90 box    967.6 x    243.2 wu, max members 1, box-membership changes 0
+  control:no-enforcement/scripted  p90 box    967.6 x    243.2 wu, max members 1, box-membership changes 0
+  control:track-everything/furball p90 box   1862.7 x   1395.8 wu, max members 6, box-membership changes 4
+
+  same traces, counting only reversals a player could SEE (both runs >= 0.02 zoom):
+  run                             rev/min   minGap  gapViol   smallest raw reversal
+  shipped/static                        0     null        0                Infinity
+  shipped/jitter                        0     null        0                 0.02844
+  shipped/scripted                   10.5     0.95        6                 0.17347
+  shipped/duel                         21    0.333        7                 0.03985
+  shipped/patrol                        8      0.5        3                  0.0775
+  shipped/furball                      10    0.383        4                 0.05311
+  control:symmetric-slew/furball       14    0.133        6                 0.00397
+  control:strict-margin/furball        10    0.433        4                 0.02933
+  control:sticky-members/furball      0.5     null        0                 0.15617
+  control:no-enforcement/furball       10    0.383        4                 0.05311
+  control:symmetric-slew/jitter        52    0.567      103                 0.02219
+  control:symmetric-slew/scripted      11      1.6        0                 0.05821
+  control:strict-margin/scripted     10.5    1.117        6                 0.09034
+  control:sticky-members/scripted    10.5     0.95        6                 0.17347
+  control:no-enforcement/scripted    10.5     0.95        6                 0.17347
+  control:track-everything/furball      0     null        0                 0.18326
+
+  which direction pair breaks the 1.2 s rule, and reversals per box-membership change:
+  shipped/static                   in->out   0   out->in   0   rev/churn   null
+  shipped/jitter                   in->out   0   out->in   0   rev/churn   null
+  shipped/scripted                 in->out   6   out->in   0   rev/churn   null
+  shipped/duel                     in->out   7   out->in   0   rev/churn    1.4
+  shipped/patrol                   in->out   3   out->in   0   rev/churn   0.35
+  shipped/furball                  in->out   4   out->in   0   rev/churn   0.29
+  control:symmetric-slew/furball   in->out   8   out->in   3   rev/churn   0.47
+  control:strict-margin/furball    in->out   4   out->in   0   rev/churn   0.29
+  control:sticky-members/furball   in->out   0   out->in   0   rev/churn    0.2
+  control:no-enforcement/furball   in->out   4   out->in   0   rev/churn   0.29
+  control:symmetric-slew/jitter    in->out  51   out->in  52   rev/churn   null
+  control:symmetric-slew/scripted  in->out   0   out->in   0   rev/churn   null
+  control:strict-margin/scripted   in->out   6   out->in   0   rev/churn   null
+  control:sticky-members/scripted  in->out   6   out->in   0   rev/churn   null
+  control:no-enforcement/scripted  in->out   6   out->in   0   rev/churn   null
+  control:track-everything/furball in->out   0   out->in   0   rev/churn      0
+
+  shipped/scripted reversals (t, direction, gap):
+    12.87s in  |  13.98s out +1.11  |  16.87s in +2.89  |  21.98s out +5.11  |  28.87s in +6.89  |  29.98s out +1.11  |  40.87s in +10.89  |  48.23s out +7.36  |  68.3s in +20.07  |  73.98s out +5.68  |  79.18s in +5.2  |  80.13s out +0.95  |  86.17s in +6.04  |  87.12s out +0.95  |  93.13s in +6.01  |  94.1s out +0.97  |  100.12s in +6.02  |  101.08s out +0.96  |  104.87s in +3.79  |  109.98s out +5.11  |  116.87s in +6.89
+  shipped/duel reversals (t, direction, gap):
+    1.67s out  |  4.08s in +2.41  |  8.62s out +4.54  |  10.52s in +1.9  |  14.2s out +3.68  |  16.8s in +2.6  |  19.2s out +2.4  |  22.62s in +3.42  |  23.03s out +0.41  |  28.58s in +5.55  |  29.28s out +0.7  |  36.27s in +6.99  |  38.78s out +2.51  |  41.3s in +2.52  |  45.8s out +4.5  |  47.72s in +1.92  |  51.23s out +3.51  |  53.98s in +2.75  |  56.42s out +2.44  |  59.77s in +3.35  |  60.15s out +0.38  |  66.03s in +5.88  |  66.53s out +0.5  |  69.45s in +2.92  |  70.43s out +0.98  |  73.27s in +2.84  |  75.9s out +2.63  |  78.53s in +2.63  |  82.98s out +4.45  |  84.93s in +1.95  |  88.25s out +3.32  |  91.18s in +2.93  |  93.63s out +2.45  |  96.92s in +3.29  |  97.25s out +0.33  |  103.18s in +5.93  |  103.67s out +0.49  |  106.23s in +2.56  |  108.1s out +1.87  |  109.55s in +1.45
+  shipped/patrol reversals (t, direction, gap):
+    1.67s out  |  4.08s in +2.41  |  8.62s out +4.54  |  10.52s in +1.9  |  14.2s out +3.68  |  16.8s in +2.6  |  19.2s out +2.4  |  66.03s in +46.83  |  66.53s out +0.5  |  69.45s in +2.92  |  70.43s out +0.98  |  80.87s in +10.44  |  81.45s out +0.58  |  84.93s in +3.48  |  88.25s out +3.32  |  119.27s in +31.02
+  shipped/furball reversals (t, direction, gap):
+    1.67s out  |  4.08s in +2.41  |  8.62s out +4.54  |  10.52s in +1.9  |  14.2s out +3.68  |  22.62s in +8.42  |  23.03s out +0.41  |  49.02s in +25.99  |  50.27s out +1.25  |  53.98s in +3.71  |  56.42s out +2.44  |  59.77s in +3.35  |  60.15s out +0.38  |  66.03s in +5.88  |  66.53s out +0.5  |  69.45s in +2.92  |  69.98s out +0.53  |  109.62s in +39.64  |  110.98s out +1.36  |  119.43s in +8.45
+
+Z4 zoom-out is never blocked (400 randomised trials)
+  shipped                    400 trials, 0 blocked, 0 inside the deadband (not counted), max first-tick step 0.01833
+  control:symmetric-slew     400 trials, 0 blocked, 0 inside the deadband (not counted), max first-tick step 0.01833
+
+Z5 allowOutsideClamp under player control
+  shipped
+    refused flag true; with control zoom 0.78 (floor 0.78) escaped=false
+    without control zoom 0.62 (establish 0.62) reached=true; 'beat' zoom 0.78 escaped=false
+  control:no-enforcement
+    refused flag false; with control zoom 0.62 (floor 0.78) escaped=true
+    without control zoom 0.62 (establish 0.62) reached=true; 'beat' zoom 0.78 escaped=false
+
+Z6 a stale framing member cannot pin the floor
+  shipped                    dropped at tick 2; zoom after 6 s 1.2017
+    t1:1m/4200wu t2:0m/243.2wu t3:0m/243.2wu t4:0m/243.2wu t5:0m/243.2wu t6:0m/243.2wu t7:0m/243.2wu t8:0m/243.2wu
+  control:sticky-members     dropped at tick NEVER; zoom after 6 s 0.7984
+    t1:1m/4200wu t2:1m/4200wu t3:1m/4200wu t4:1m/4200wu t5:1m/4200wu t6:1m/4200wu t7:1m/4200wu t8:1m/4200wu
+
+wrote shots/p2/camtrace.json
+

@@ -1,0 +1,64 @@
+{
+ "tick": 117,
+ "fps": 59.99999999999995,
+ "frameMs": 16.666666666666682,
+ "drawCalls": 0,
+ "sprites": 0,
+ "tris": 0,
+ "particles": 0,
+ "lights": 0,
+ "scene": "boot",
+ "view": {
+  "mode": "portrait",
+  "w": 390,
+  "h": 844,
+  "dpr": 1,
+  "worldW": 462.08530805687207,
+  "worldH": 1000,
+  "scale": 0.844
+ },
+ "cam": {
+  "x": 1366.8978868788208,
+  "y": -2278.580416395622,
+  "zoom": 1.1807951733257198,
+  "zoomTarget": 1.22,
+  "reason": "in",
+  "boxW": 243.2,
+  "boxH": 243.2,
+  "members": 0
+ },
+ "input": {
+  "axisX": 0,
+  "axisY": 0,
+  "stickActive": false,
+  "stickR": 81.11999999999999,
+  "source": "keyboard"
+ },
+ "entities": {
+  "total": 0,
+  "hostile": 0,
+  "crates": 0
+ },
+ "player": {
+  "alive": false,
+  "x": 0,
+  "y": 0,
+  "vx": 0,
+  "vy": 0,
+  "speed": 0,
+  "angle": 0,
+  "band": "mud",
+  "altFt": 0
+ },
+ "bands": {},
+ "audio": {
+  "ready": true,
+  "available": true,
+  "voices": 0,
+  "oneShots": 0
+ },
+ "quality": {
+  "low": false
+ },
+ "errors": []
+}

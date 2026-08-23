@@ -1,0 +1,90 @@
+[
+ {
+  "out": "a_cirrus_a1",
+  "w": 1024,
+  "h": 256,
+  "steps": 16,
+  "seed": 80,
+  "model": "flux2-klein-4b",
+  "class": "strip",
+  "layer": "cirrus",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a long wide band of very high thin cirrus, drawn-out fibrous mare's-tail streaks and torn feathered sheets far above everything, some streaks long and combed straight and some short and curled, painted as dry-brush drags of thin pale paint, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, a long wide horizontal panoramic band running unbroken from the left edge to the right edge of the frame, the rest of the frame a flat uniform neutral mid grey field, no sky gradient, no ground, no horizon, no sun, no aircraft, no lettering, no cast shadow, no paper mount, no border"
+ },
+ {
+  "out": "a_cirrus_a2",
+  "w": 1024,
+  "h": 256,
+  "steps": 16,
+  "seed": 81,
+  "model": "flux2-klein-4b",
+  "class": "strip",
+  "layer": "cirrus",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a long wide band of very high thin cirrus, drawn-out fibrous mare's-tail streaks and torn feathered sheets far above everything, some streaks long and combed straight and some short and curled, painted as dry-brush drags of thin pale paint, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, a long wide horizontal panoramic band running unbroken from the left edge to the right edge of the frame, the rest of the frame a flat uniform neutral mid grey field, no sky gradient, no ground, no horizon, no sun, no aircraft, no lettering, no cast shadow, no paper mount, no border"
+ },
+ {
+  "out": "a_cirrus_b1",
+  "w": 1024,
+  "h": 256,
+  "steps": 16,
+  "seed": 82,
+  "model": "flux2-klein-4b",
+  "class": "strip",
+  "layer": "cirrus",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a long wide band of very high thin cirrus, drawn-out fibrous mare's-tail streaks and torn feathered sheets far above everything, some streaks long and combed straight and some short and curled, painted as dry-brush drags of thin pale paint, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, a long wide horizontal panoramic band running unbroken from the left edge to the right edge of the frame, the rest of the frame a flat uniform neutral mid grey field, no sky gradient, no ground, no horizon, no sun, no aircraft, no lettering, no cast shadow, no paper mount, no border"
+ },
+ {
+  "out": "a_cirrus_b2",
+  "w": 1024,
+  "h": 256,
+  "steps": 16,
+  "seed": 83,
+  "model": "flux2-klein-4b",
+  "class": "strip",
+  "layer": "cirrus",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a long wide band of very high thin cirrus, drawn-out fibrous mare's-tail streaks and torn feathered sheets far above everything, some streaks long and combed straight and some short and curled, painted as dry-brush drags of thin pale paint, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, a long wide horizontal panoramic band running unbroken from the left edge to the right edge of the frame, the rest of the frame a flat uniform neutral mid grey field, no sky gradient, no ground, no horizon, no sun, no aircraft, no lettering, no cast shadow, no paper mount, no border"
+ },
+ {
+  "out": "a_wisp_1",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 90,
+  "model": "flux2-klein-4b",
+  "class": "sheet",
+  "layer": "cloudnear",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of seven torn scraps and wisps of thin pale cloud passing close by, all different shapes and sizes, some long and combed into thin streaming tails and some short and curled and lumpy, each one painted as a soft dry-brush drag of thin pale paint, irregular scattered layout, no two alike, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky gradient, no ground, no aircraft, no sun, no moon, no cast shadow, no lettering, every mark well inside the sheet with a wide empty grey margin all around it, nothing touching or near the edge of the frame"
+ },
+ {
+  "out": "a_wisp_2",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 91,
+  "model": "flux2-klein-4b",
+  "class": "sheet",
+  "layer": "cloudnear",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of seven torn scraps and wisps of thin pale cloud passing close by, all different shapes and sizes, some long and combed into thin streaming tails and some short and curled and lumpy, each one painted as a soft dry-brush drag of thin pale paint, irregular scattered layout, no two alike, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky gradient, no ground, no aircraft, no sun, no moon, no cast shadow, no lettering, every mark well inside the sheet with a wide empty grey margin all around it, nothing touching or near the edge of the frame"
+ },
+ {
+  "out": "a_shred_1",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 95,
+  "model": "flux2-klein-4b",
+  "class": "sheet",
+  "layer": "fgocclude",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of six ragged shreds of very dark smoke and torn storm cloud, all different shapes and sizes, some broad and heavy and some thin and drawn out into tatters, each one painted as a single flat torn-edged mark of thick opaque near-black paint with no interior detail, irregular scattered layout, no two alike, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky gradient, no ground, no aircraft, no sun, no moon, no cast shadow, no lettering, every mark well inside the sheet with a wide empty grey margin all around it, nothing touching or near the edge of the frame"
+ },
+ {
+  "out": "a_shred_2",
+  "w": 768,
+  "h": 512,
+  "steps": 16,
+  "seed": 96,
+  "model": "flux2-klein-4b",
+  "class": "sheet",
+  "layer": "fgocclude",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a study sheet of six ragged shreds of very dark smoke and torn storm cloud, all different shapes and sizes, some broad and heavy and some thin and drawn out into tatters, each one painted as a single flat torn-edged mark of thick opaque near-black paint with no interior detail, irregular scattered layout, no two alike, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky gradient, no ground, no aircraft, no sun, no moon, no cast shadow, no lettering, every mark well inside the sheet with a wide empty grey margin all around it, nothing touching or near the edge of the frame"
+ }
+]

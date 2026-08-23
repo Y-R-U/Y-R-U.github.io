@@ -1,0 +1,171 @@
+{
+ "round": "before",
+ "rows": [
+  {
+   "frame": "act2_day_deck",
+   "pickedReference": true,
+   "ours": [
+    2,
+    1,
+    3,
+    1,
+    3,
+    2
+   ],
+   "reference": [
+    7,
+    7,
+    7,
+    8,
+    6,
+    7
+   ],
+   "differences": "flat grey-beige backdrop, no real gradient, dead air. sickly olive-green cloud lobes wrapped in thick black cartoon outlines. shadows crush to flat black inside the outline strokes, no bounce light, no core-shadow gradation. satellite puffs pasted at random scale with zero atmospheric perspective, read as cutouts floating on top of the sky. hard-edged flat sun disc with a generic radial glow. texture-free flat fill.",
+   "oursMean": 2,
+   "refMean": 7,
+   "gap": -5
+  },
+  {
+   "frame": "act2_overcast",
+   "pickedReference": true,
+   "ours": [
+    2,
+    1,
+    3,
+    2,
+    2,
+    4
+   ],
+   "reference": [
+    8,
+    8,
+    6,
+    7,
+    6,
+    7
+   ],
+   "differences": "essentially flat, one grey-beige value fills the lower two thirds with no perceptible vertical shift - the single biggest gap of the whole set. clouds stuck to the top edge, no deck, no floor. shadows do not hold volume, flat airbrushed grey. no grain, reads like a gaussian-blur placeholder. unmotivated hard white glare behind the right-hand cloud mass. huge dead textureless void in the lower left.",
+   "oursMean": 2.3333333333333335,
+   "refMean": 7,
+   "gap": -4.666666666666666
+  },
+  {
+   "frame": "act3_massif",
+   "pickedReference": true,
+   "ours": [
+    2,
+    1,
+    3,
+    1,
+    3,
+    2
+   ],
+   "reference": [
+    7,
+    7,
+    7,
+    8,
+    7,
+    7
+   ],
+   "differences": "flat tan sky, dead air. ochre gold-brown cloud colour with no basis in daylight cloud lighting, closer to smoke or dust. thick black outline round every lobe, sticker look. shadows are solid black cavities inside the outlines. small satellite puffs carry the same saturation and outline weight as the big near cloud, no near/far logic at all. flat vector fill, no grain.",
+   "oursMean": 2,
+   "refMean": 7.166666666666667,
+   "gap": -5.166666666666667
+  },
+  {
+   "frame": "act5_dusk",
+   "pickedReference": true,
+   "ours": [
+    2,
+    2,
+    4,
+    1,
+    3,
+    1
+   ],
+   "reference": [
+    8,
+    8,
+    7,
+    8,
+    7,
+    8
+   ],
+   "differences": "a single flat orange fill, zero vertical gradient from top of frame to bottom. cloud shadows hard-edged cel black crushed to a flat silhouette value with no internal modulation. the same two or three cloud stamps reused at different sizes, near-identical cluster shape. no canvas texture, flat vector-style fill. the sun is a soft gaussian blob that sits on top of the sky rather than in it.",
+   "oursMean": 2.1666666666666665,
+   "refMean": 7.666666666666667,
+   "gap": -5.5
+  },
+  {
+   "frame": "act4_night",
+   "pickedReference": true,
+   "ours": [
+    2,
+    1,
+    3,
+    1,
+    2,
+    2
+   ],
+   "reference": [
+    8,
+    8,
+    7,
+    8,
+    7,
+    8
+   ],
+   "differences": "completely flat navy fill, no vertical gradient, no deepening toward the horizon. shadow value on the cloud crushes to near-black with no gradation. the moon has only a weak gaussian falloff, no halo rings or colour-temperature falloff. the identical pasted-cutout cloud stamp reused from the other frame. composition is mostly dead space.",
+   "oursMean": 1.8333333333333333,
+   "refMean": 7.666666666666667,
+   "gap": -5.833333333333334
+  },
+  {
+   "frame": "act1_mud",
+   "pickedReference": true,
+   "ours": [
+    4,
+    2,
+    5,
+    2,
+    4,
+    3
+   ],
+   "reference": [
+    7,
+    7,
+    6,
+    8,
+    7,
+    7
+   ],
+   "differences": "the one frame whose sky carries a soft vertical gradient. large foreground silhouette crushes to a near-flat dark mass with a shallow procedural-looking mottled overlay, does not hold internal volume. dead trees and distant ruins are flat pasted silhouette cutouts at uniform contrast, they do not recede or lose edge sharpness with distance, they read as decals on top of the fog. debris dots look like a repeated procedural scatter-noise texture. almost no material differentiation, mud fog ruins and wire all at nearly the same low-chroma value.",
+   "oursMean": 3.3333333333333335,
+   "refMean": 7,
+   "gap": -3.6666666666666665
+  }
+ ],
+ "gap": -4.972222222222222,
+ "oursMean": 2.277777777777778,
+ "refMean": 7.25,
+ "banned": {
+  "flat": [
+   "act2_day_deck",
+   "act2_overcast",
+   "act3_massif",
+   "act5_dusk",
+   "act4_night",
+   "act1_mud"
+  ],
+  "sticker": [
+   "act3_massif"
+  ],
+  "uniform": [
+   "act1_mud"
+  ],
+  "repeated": [
+   "act1_mud"
+  ]
+ }
+}

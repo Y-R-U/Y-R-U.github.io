@@ -1,0 +1,163 @@
+{
+ "round": "after3",
+ "rows": [
+  {
+   "frame": "act2_day_deck",
+   "pickedReference": true,
+   "ours": [
+    3,
+    2,
+    5,
+    3,
+    5,
+    4
+   ],
+   "reference": [
+    8,
+    8,
+    8,
+    8,
+    7,
+    6
+   ],
+   "differences": "sky is a single khaki-tan-to-grey wash, no blue anywhere, reads like fog not altitude. cloud shadows are a slightly darker tan with no hue shift, no cool/warm turn - murky flat, the form never turns. sun is a flat pale-grey disc with a faint halo, a sticker. clouds repeat one lumpy cauliflower silhouette at every scale, visibly stamped. airbrush-smooth throughout.",
+   "oursMean": 3.6666666666666665,
+   "refMean": 7.5,
+   "gap": -3.8333333333333335
+  },
+  {
+   "frame": "act2_overcast",
+   "pickedReference": true,
+   "ours": [
+    2,
+    2,
+    5,
+    2,
+    4,
+    3
+   ],
+   "reference": [
+    5,
+    6,
+    5,
+    5,
+    6,
+    5
+   ],
+   "differences": "background is a single sage/khaki tone edge to edge, no gradient at all, no sun position, no atmosphere. clouds are simple two-lobe puffs, flat light-grey fill plus a thin darker outline for shadow, no core shadow, no rim light, no temperature shift, closer to clip-art than paint. clouds do not sit in a deck with depth, they are isolated identical-silhouette copies scattered at random positions and scales. NOTE the reference itself scored only 5.33 here and was marked defective for visible banding.",
+   "oursMean": 3,
+   "refMean": 5.333333333333333,
+   "gap": -2.333333333333333
+  },
+  {
+   "frame": "act3_massif",
+   "pickedReference": true,
+   "ours": [
+    5,
+    5,
+    6,
+    4,
+    5,
+    4
+   ],
+   "reference": [
+    8,
+    8,
+    8,
+    8,
+    7,
+    6
+   ],
+   "differences": "gradient blue-grey top to warm amber base is a reasonable golden-hour idea but smoothed to the point of looking airbrushed, no grain, no drag. cloud shadow is a single warm-brown wash, no hue turn, shading rather than light modelling. repeats the same lobed-blob cloud template at nearly every scale, very low shape variety. two-value fill+wash against the reference's three-value lit crown / mid / violet core.",
+   "oursMean": 4.833333333333333,
+   "refMean": 7.5,
+   "gap": -2.666666666666667
+  },
+  {
+   "frame": "act5_dusk",
+   "pickedReference": true,
+   "ours": [
+    2,
+    2,
+    3,
+    3,
+    3,
+    3
+   ],
+   "reference": [
+    8,
+    8,
+    7,
+    8,
+    7,
+    8
+   ],
+   "differences": "top-left and bottom-left corners are the same dusty rose-tan, essentially no vertical gradient. cloud undershadows are flat opaque contact-shadow rings drawn around each puff with zero gradation inside the shadow. clouds are individually silhouetted, evenly spaced, consistent scale regardless of position, no aerial perspective, they read as pasted cutouts on a backdrop. nothing to stand on, no horizon, does not resolve into a place. the sun disc is barely brighter than the clouds around it and rim-lights nothing. the same cloud silhouette and internal shadow pattern relocated.",
+   "oursMean": 2.6666666666666665,
+   "refMean": 7.666666666666667,
+   "gap": -5
+  },
+  {
+   "frame": "act4_night",
+   "pickedReference": true,
+   "ours": [
+    4,
+    3,
+    4,
+    3,
+    4,
+    4
+   ],
+   "reference": [
+    8,
+    8,
+    7,
+    8,
+    7,
+    8
+   ],
+   "differences": "nearly flat navy fill top to bottom, no sense of atmosphere thinning toward a horizon because there is no horizon. the moonlit cloud cluster holds real modelling and is the one competent passage; the small puffs elsewhere are flat and underworked, so rendering attention is inconsistent. grain reads as a synthetic overlay at one frequency everywhere rather than paint texture following stroke direction. large stretches of unmodulated navy doing no work. zero terrain or horizon to anchor scale.",
+   "oursMean": 3.6666666666666665,
+   "refMean": 7.666666666666667,
+   "gap": -4
+  },
+  {
+   "frame": "act1_mud",
+   "pickedReference": true,
+   "ours": [
+    2,
+    1,
+    1,
+    2,
+    2,
+    3
+   ],
+   "reference": [
+    8,
+    8,
+    9,
+    9,
+    8,
+    8
+   ],
+   "differences": "the failure is not shadows crushing to black, it is the opposite - everything crushes UPWARD into a narrow pale grey-beige midtone band, sky, treeline and foreground all within a few value steps, so nothing reads as in front of or behind anything. the sun glow is a spot glow, not a vertical atmospheric gradient. the treeline is a smear almost dissolved into the fog. the foreground vehicle mass barely separates in value from the ground and has no clean edge. two planes only, no material distinction between mud, water and vegetation. no visible brushwork, soft-focus blur with grain on top.",
+   "oursMean": 1.8333333333333333,
+   "refMean": 8.333333333333334,
+   "gap": -6.500000000000001
+  }
+ ],
+ "gap": -4.055555555555555,
+ "oursMean": 3.2777777777777772,
+ "refMean": 7.333333333333333,
+ "banned": {
+  "flat": [
+   "act2_day_deck",
+   "act2_overcast",
+   "act5_dusk",
+   "act4_night"
+  ],
+  "sticker": [
+   "act2_day_deck"
+  ]
+ }
+}

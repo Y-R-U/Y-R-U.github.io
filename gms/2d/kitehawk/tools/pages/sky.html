@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>kitehawk — sky, clouds, strips</title>
+<style>
+  html,body{margin:0;background:#111;color:#cfc;font:12px ui-monospace,monospace}
+  #gl{display:block;margin:0 auto}
+  #hud{position:fixed;top:0;left:0;padding:6px 8px;background:rgba(0,0,0,.6);white-space:pre;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="hud"></div>
+<script type="module">
+// The P3 harness. Draws the whole painted stack and exposes __sky so the gate script can
+// drive it over CDP. Every gate number P3 reports comes out of this page or out of the
+// node-side tools; nothing is eyeballed and then written down.
+import { mount, qp, flatGrade, readback } from './harness.js';
+import { LAYER } from '../../js/gfx/renderer.js';
+import { createSky, loadRamps, bandBlend, BAND_FEATHER_WU, BEST_CLIMB_WU_S, setBandFeather, getBandFeather } from '../../js/gfx/sky.js';
+import { createClouds } from '../../js/gfx/clouds.js';
+import { BANDS } from '../../js/core/bands.js';
+
+const W = qp('w', 390), H = qp('h', 844);
+const { R } = await mount({ w: W, h: H, dpr: qp('dpr', 1), worldH: 1000 });
+if (qp('flat', 0)) flatGrade(R);
+
+const BASE = '../../assets/';
+const man = await fetch(BASE + 'atlas.json').then(r => r.json());
+const ramps = await loadRamps(R, BASE);
+
+const loadImg = src => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error(src)); i.src = src; });
+async function tex(src, o) { return R.createTexture(await loadImg(BASE + src), o || {}); }
+
+// atlases
+const assets = { luts: ramps.luts, strips: {} };
+for (const [k, a] of Object.entries(man.atlases)) {
+  try { assets[k] = { ...a, tex: await tex(a.image) }; } catch (e) { console.warn('missing atlas', k); }
+}
+for (const [k, s] of Object.entries(man.strips)) {
+  try { assets.strips[k] = { ...s, tex: await tex(s.image, { repeat: false }) }; } catch (e) { console.warn('missing strip', k); }
+}
+// paper tooth over everything, painted and procedural alike (ART.md §11 defence 1)
+try { R.setGrain(await tex('paper.png', { repeat: true }), qp('grainScale', 2.1), qp('grain', 0.30)); } catch (e) {}
+
+const sky = createSky(R, assets);
+// Deliberate-bug switches, the same pattern P1 used for ?impl=screen and P2 for
+// ?slew=symmetric. No shipped build ever sets one.
+const BUG = String(qp('bug', ''));
+if (BUG === 'hardBands') setBandFeather(1);
+if (BUG === 'rampFg') R.setLayer(LAYER.FG_OCCLUDE, { rampAmt: 1.0 });
+const clouds = createClouds(R, assets, { seed: qp('seed', 7), bug: BUG });
+if (BUG === 'noCrush') console.log('control: FG_OCCLUDE crush undone');
+
+let act = qp('act', 2), state = String(qp('sky', 'd'));
+sky.setAct(act, state);
+
+const cam = { x: qp('x', 0), y: qp('y', -3600), zoom: qp('zoom', 1) };
+let climb = qp('climb', 0);      // wu/s, positive = climbing
+let t0 = performance.now(), last = t0;
+const hud = document.getElementById('hud');
+
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (climb) cam.y -= climb * dt;
+  const b = sky.update(cam.x, cam.y, cam.zoom, dt);
+  R.tick(dt);
+  R.begin(cam);
+  sky.drawSky();
+  const hz = sky.hazeRGB();
+  const nc = clouds.drawMid(cam.x, cam.y, b.cloudMid, hz, Math.min(0.85, b.haze * 0.9));
+  const ng = sky.drawGround(cam.x, cam.y, act);
+  const nn = clouds.drawNear(cam.x, cam.y, b.cloudNear, b.fg);
+  R.end();
+  if (!qp('nohud', 0)) hud.textContent =
+    `act ${act}${state}  lut ${sky.lutKey}  y ${cam.y.toFixed(0)}  zoom ${cam.zoom.toFixed(2)}\n` +
+    `band ${b.band}${b.mix ? '->' + b.mix + ' t=' + b.t.toFixed(2) : ''}  haze ${b.haze.toFixed(2)}\n` +
+    `sprites ${R.stats.sprites}  draws ${R.stats.drawCalls}  cloudMid ${nc}  strips ${ng}  near ${nn}`;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ---- the gate surface -------------------------------------------------------- */
+let __lastFg = 0;
+window.__sky = {
+  R, sky, clouds, cam, man, BANDS, BAND_FEATHER_WU, BEST_CLIMB_WU_S, bug: BUG,
+  feather: () => getBandFeather(),
+  setAct(a, s) { act = a; state = s || 'd'; const k = sky.setAct(act, state); if (BUG === 'rampFg') R.setLayer(LAYER.FG_OCCLUDE, { rampAmt: 1.0 }); return k; },
+  set(o) { Object.assign(cam, o); },
+  setClimb(v) { climb = v; },
+  band: (y) => bandBlend(y),
+
+  /** Gate A4: repeats visible in the current frame. */
+  repeats() { return clouds.repeatsOnScreen(cam.x, cam.y); },
+
+  /**
+   * Gate A7. Walk the column at best climb rate and time how long the band term takes to
+   * go from 5% to 95% through each boundary. Sampled in wu and converted, so it does not
+   * depend on the frame rate of the machine running it.
+   */
+  crossfades() {
+    const out = [];
+    for (let i = 0; i < BANDS.length - 1; i++) {
+      const edge = BANDS[i].y1;
+      // The blend fraction from band i toward band i+1, read off the SAME function the
+      // drawing uses. The first version of this scaled b.t by 0.5 and reported 0.00 s on
+      // every edge -- a metric returning a confident zero while the feature worked fine.
+      let lo = null, hi = null;
+      const frac = (y) => {
+        const b = bandBlend(y);
+        if (b.band === BANDS[i].id) return b.mix === BANDS[i + 1].id ? b.t : 0;
+        if (b.band === BANDS[i + 1].id) return b.mix === BANDS[i].id ? 1 - b.t : 1;
+        return b.band === BANDS[i].id ? 0 : 1;
+      };
+      // walk downward through the boundary: d starts BELOW the edge (lower altitude) and
+      // ends above it. "Completes" is the full 2%-98% extent, not a 5-95% core.
+      for (let d = BAND_FEATHER_WU * 2; d >= -BAND_FEATHER_WU * 2; d -= 0.25) {
+        const f = frac(edge + d);
+        if (lo === null && f >= 0.02) lo = edge + d;
+        if (f >= 0.98) { hi = edge + d; break; }
+      }
+      const wu = lo !== null && hi !== null ? Math.abs(lo - hi) : 0;
+      out.push({ edge: `${BANDS[i].id}->${BANDS[i + 1].id}`, wu, secs: wu / BEST_CLIMB_WU_S });
+    }
+    return out;
+  },
+
+  /** Gate A6: the 90th-percentile luminance of everything actually drawn on FG_OCCLUDE. */
+  fgHistogram() {
+    // Refuse to answer if there is nothing on the layer. The first run of this reported a
+    // confident PASS at p90 0.0588 over 22,887 pixels while the FG_OCCLUDE atlas had not
+    // been built at all -- it was measuring the post-process grain over an empty frame.
+    // A gate that passes when the feature is ABSENT is worse than one that fails.
+    if (!assets.fg || !assets.fg.tex || !Object.keys(assets.fg.frames || {}).length)
+      return { absent: true, n: 0, p90: null };
+    // draw FG_OCCLUDE alone on black so the measurement is of that layer and nothing else
+    R.begin(cam);
+    const drawn = clouds.drawNear(cam.x, cam.y, 0, 1);
+    R.end();
+    if (!drawn) return { absent: false, none: true, n: 0, p90: null };
+    const { px } = readback(R);
+    const v = [];
+    for (let i = 0; i < px.length; i += 4) {
+      if (px[i + 3] < 8) continue;
+      const L = (px[i] * 0.2126 + px[i + 1] * 0.7152 + px[i + 2] * 0.0722) / 255;
+      if (L > 0.002) v.push(L);
+    }
+    v.sort((a, b) => a - b);
+    __lastFg = 1;
+    return { n: v.length, drawn, p50: v[v.length >> 1] || 0, p90: v[Math.round(0.9 * (v.length - 1))] || 0, max: v[v.length - 1] || 0 };
+  },
+
+  /** Read the rendered sky at a screen row and compare it with the LUT texel it should be. */
+  probeSky(rows = [120, 420, 720]) {
+    R.begin(cam); sky.drawSky(); R.end();
+    const { px, w, h } = readback(R);
+    return rows.map(y => {
+      const gy = h - 1 - y, i = (gy * w + (w >> 1)) * 4;
+      const worldY = cam.y + (y - h / 2) / (h / R.worldH);
+      return { row: y, worldY: Math.round(worldY), alt: +(-worldY / 10000).toFixed(3),
+        rgb: [px[i], px[i + 1], px[i + 2]] };
+    });
+  },
+
+  /** Draw ONLY FG_OCCLUDE and leave it on screen, so the histogram can be eyeballed. */
+  fgOnly() { R.begin(cam); const n = clouds.drawNear(cam.x, cam.y, 0, 1); R.end(); return n; },
+
+  /** Draw ONE layer group alone, for measurement. 'mid' | 'sky' | 'all'. */
+  only(what) {
+    R.begin(cam);
+    const b = sky.update(cam.x, cam.y, cam.zoom, 0.016);
+    if (what !== 'mid') sky.drawSky();
+    let n = 0;
+    if (what !== 'sky') n = clouds.drawMid(cam.x, cam.y, b.cloudMid, sky.hazeRGB(), Math.min(0.85, b.haze * 0.9));
+    R.end();
+    const { px } = readback(R);
+    const v = [], ch = [];
+    for (let i = 0; i < px.length; i += 4) {
+      const r = px[i], g = px[i + 1], bl = px[i + 2];
+      const L = (r * 0.2126 + g * 0.7152 + bl * 0.0722) / 255;
+      if (what === 'mid' && L < 0.02) continue;      // only the drawn cutouts
+      v.push(L);
+      ch.push((Math.max(r, g, bl) - Math.min(r, g, bl)) / 255);
+    }
+    v.sort((a, b2) => a - b2); ch.sort((a, b2) => a - b2);
+    const q = t => v.length ? +v[Math.round(t * (v.length - 1))].toFixed(3) : 0;
+    return { n, px: v.length, coverage: +(v.length / (px.length / 4)).toFixed(3),
+      p2: q(0.02), p10: q(0.10), p50: q(0.50), p90: q(0.90), p98: q(0.98),
+      chroma: ch.length ? +ch[ch.length >> 1].toFixed(3) : 0 };
+  },
+
+  shot() { return readback(R); },
+};
+console.log('__sky ready');
+</script>
+</body>
+</html>

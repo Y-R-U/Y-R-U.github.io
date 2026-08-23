@@ -1,0 +1,60 @@
+[
+ {
+  "id": "A7",
+  "pass": true,
+  "line": "crossfades mud->belt 1.66s  belt->floor 1.66s  floor->deck 1.66s  deck->lane 1.66s  lane->blue 1.66s",
+  "xf": [
+   {
+    "edge": "mud->belt",
+    "wu": 149.75,
+    "secs": 1.663888888888889
+   },
+   {
+    "edge": "belt->floor",
+    "wu": 149.75,
+    "secs": 1.663888888888889
+   },
+   {
+    "edge": "floor->deck",
+    "wu": 149.75,
+    "secs": 1.663888888888889
+   },
+   {
+    "edge": "deck->lane",
+    "wu": 149.75,
+    "secs": 1.663888888888889
+   },
+   {
+    "edge": "lane->blue",
+    "wu": 149.75,
+    "secs": 1.663888888888889
+   }
+  ]
+ },
+ {
+  "id": "A4",
+  "pass": true,
+  "line": "worst cutout multiplicity on one screen 2 (FAIL at 3+), 19/180 frames contain any repeat at all, on the worst frame 8 cutouts drawn from 7 distinct ids",
+  "worst": {
+   "total": 8,
+   "distinct": 7,
+   "worst": 2,
+   "rawWorst": 2,
+   "repeats": [
+    [
+     "cS17",
+     2
+    ]
+   ],
+   "speed": 400,
+   "i": 5
+  },
+  "frames": 180,
+  "withRepeat": 19
+ },
+ {
+  "id": "A5",
+  "pass": true,
+  "line": "A5 worst pair 1/2 = 0.26  PASS  (line 0.25)"
+ }
+]

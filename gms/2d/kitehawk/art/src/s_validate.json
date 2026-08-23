@@ -1,0 +1,74 @@
+[
+ {
+  "out": "s2_hor_a1",
+  "w": 1024,
+  "h": 192,
+  "steps": 16,
+  "seed": 2010,
+  "model": "flux2-klein-4b",
+  "class": "strip",
+  "act": 2,
+  "layer": "hor",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a low band of distant rolling chalk downland and a hazy treeline seen from the air, soft layered ridges, some ridges near and firm and some far and dissolved into haze, warm cream summer morning sunlight raking from the left, long cool violet shadows, dusty gold, warm ochre, cream and violet, high summer, the land forming a band along the bottom of the frame with its skyline running straight and level all the way across, the entire upper half of the frame a completely flat uniform featureless neutral mid grey field with absolutely nothing painted in it, no sky, no sky wash, no sky gradient, no clouds, no sun, no moon, no aircraft, no birds, no lettering, no cast shadow, no paper mount, no border, nothing else in the frame"
+ },
+ {
+  "out": "s2_hor_a2",
+  "w": 1024,
+  "h": 192,
+  "steps": 16,
+  "seed": 2011,
+  "model": "flux2-klein-4b",
+  "class": "strip",
+  "act": 2,
+  "layer": "hor",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a low band of distant rolling chalk downland and a hazy treeline seen from the air, soft layered ridges, some ridges near and firm and some far and dissolved into haze, warm cream summer morning sunlight raking from the left, long cool violet shadows, dusty gold, warm ochre, cream and violet, high summer, the land forming a band along the bottom of the frame with its skyline running straight and level all the way across, the entire upper half of the frame a completely flat uniform featureless neutral mid grey field with absolutely nothing painted in it, no sky, no sky wash, no sky gradient, no clouds, no sun, no moon, no aircraft, no birds, no lettering, no cast shadow, no paper mount, no border, nothing else in the frame"
+ },
+ {
+  "out": "s2_gf_a1",
+  "w": 1024,
+  "h": 256,
+  "steps": 16,
+  "seed": 2030,
+  "model": "flux2-klein-4b",
+  "class": "strip",
+  "act": 2,
+  "layer": "gf",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, summer farmland seen from the air, small irregular fields in wheat gold and green, hedgerows, a winding river, a chalk road, small copses, some fields cut to stubble and some still standing in crop, warm cream summer morning sunlight raking from the left, long cool violet shadows, dusty gold, warm ochre, cream and violet, high summer, the land forming a band along the bottom of the frame with its skyline running straight and level all the way across, the entire upper third of the frame a completely flat uniform featureless neutral mid grey field with absolutely nothing painted in it, no sky, no sky wash, no sky gradient, no clouds, no sun, no moon, no aircraft, no birds, no lettering, no cast shadow, no paper mount, no border, nothing else in the frame"
+ },
+ {
+  "out": "s2_gf_a2",
+  "w": 1024,
+  "h": 256,
+  "steps": 16,
+  "seed": 2031,
+  "model": "flux2-klein-4b",
+  "class": "strip",
+  "act": 2,
+  "layer": "gf",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, summer farmland seen from the air, small irregular fields in wheat gold and green, hedgerows, a winding river, a chalk road, small copses, some fields cut to stubble and some still standing in crop, warm cream summer morning sunlight raking from the left, long cool violet shadows, dusty gold, warm ochre, cream and violet, high summer, the land forming a band along the bottom of the frame with its skyline running straight and level all the way across, the entire upper third of the frame a completely flat uniform featureless neutral mid grey field with absolutely nothing painted in it, no sky, no sky wash, no sky gradient, no clouds, no sun, no moon, no aircraft, no birds, no lettering, no cast shadow, no paper mount, no border, nothing else in the frame"
+ },
+ {
+  "out": "s2_gm_a1",
+  "w": 1024,
+  "h": 384,
+  "steps": 16,
+  "seed": 2050,
+  "model": "flux2-klein-4b",
+  "class": "strip",
+  "act": 2,
+  "layer": "gm",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a Somme valley floor seen from a shallow oblique aerial view, a ruined village with a church tower, poplar rows along a road, an orchard, a stone bridge, shell holes, some buildings intact and some roofless and burnt, warm cream summer morning sunlight raking from the left, long cool violet shadows, dusty gold, warm ochre, cream and violet, high summer, the land forming a band along the bottom of the frame with its skyline running straight and level all the way across, the entire upper third of the frame a completely flat uniform featureless neutral mid grey field with absolutely nothing painted in it, no sky, no sky wash, no sky gradient, no clouds, no sun, no moon, no aircraft, no birds, no lettering, no cast shadow, no paper mount, no border, nothing else in the frame"
+ },
+ {
+  "out": "s2_gm_a2",
+  "w": 1024,
+  "h": 384,
+  "steps": 16,
+  "seed": 2051,
+  "model": "flux2-klein-4b",
+  "class": "strip",
+  "act": 2,
+  "layer": "gm",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, a Somme valley floor seen from a shallow oblique aerial view, a ruined village with a church tower, poplar rows along a road, an orchard, a stone bridge, shell holes, some buildings intact and some roofless and burnt, warm cream summer morning sunlight raking from the left, long cool violet shadows, dusty gold, warm ochre, cream and violet, high summer, the land forming a band along the bottom of the frame with its skyline running straight and level all the way across, the entire upper third of the frame a completely flat uniform featureless neutral mid grey field with absolutely nothing painted in it, no sky, no sky wash, no sky gradient, no clouds, no sun, no moon, no aircraft, no birds, no lettering, no cast shadow, no paper mount, no border, nothing else in the frame"
+ }
+]

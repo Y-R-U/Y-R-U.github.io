@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>kitehawk core — input</title>
+<style>
+  html,body{margin:0;height:100%;background:#0b0d12;color:#cfc;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;
+    touch-action:none;-webkit-user-select:none;user-select:none;overflow:hidden}
+  #stage{position:fixed;inset:0}
+  #gl{display:block;width:100%;height:100%}
+  #hud{position:fixed;left:8px;top:8px;white-space:pre;line-height:1.5;pointer-events:none;text-shadow:0 1px 2px #000}
+  #safe-probe{position:absolute;top:0;left:0;width:0;height:0;visibility:hidden;
+    padding-top:env(safe-area-inset-top);padding-right:env(safe-area-inset-right);
+    padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left)}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="gl"></canvas><div id="safe-probe"></div></div>
+<div id="hud"></div>
+<script type="module">
+/* The one-thumb layer, drawn. Put a thumb anywhere in the lower 55% and slide.
+   The page draws the stick origin, the current deflection, the stick radius and
+   the shaped axis values, plus the last tap / double-tap / flick, so a gesture
+   that "did not register" can be told apart from one that registered as
+   something else. Screenshots alone miss this. */
+
+import { createRenderer, LAYER } from '../../js/gfx/renderer.js';
+import { createBus } from '../../js/core/events.js';
+import { createViewport } from '../../js/core/viewport.js';
+import { createInput } from '../../js/core/input.js';
+import { slotRect, stickRadius } from '../../js/core/viewprofile.js';
+import { DT } from '../../js/core/loop.js';
+
+const q = new URLSearchParams(location.search);
+const bus = createBus();
+const canvas = document.getElementById('gl');
+const R = await createRenderer(canvas, { preserveDrawingBuffer: true });
+const view = createViewport(canvas, bus);
+const cam = { x: 0, y: 0, zoom: 1 };
+view.setCamera(cam);
+R.resize(view.w, view.h, view.dpr, view.worldH);
+// flat and unlit: this page is about where the thumb is, not what the sky looks like
+R.fx.bloom = 0; R.fx.vignetteAmt = 0; R.fx.grain = 0;
+R.fx.exposure = 1; R.fx.saturation = 1; R.fx.contrast = 1;
+R.setAmbient(1, 1, 1);
+for (let l = 0; l < 14; l++) R.setLayer(l, { shade: 1, response: 0, haze: 0, grainAmt: 0 });
+
+const input = createInput(canvas, view, bus, {
+  invertPitch: q.has('invert'), holdToFly: q.has('hold'),
+});
+input.installDefaultZones();
+
+const log = { tap: '-', dtap: '-', flick: '-', special: 0 };
+input.onTap((e) => { log.tap = `${e.x.toFixed(0)},${e.y.toFixed(0)} ${e.inStick ? 'in stick' : 'outside'}`; });
+input.onDoubleTap((e) => { log.dtap = `${e.x.toFixed(0)},${e.y.toFixed(0)} ${e.inStick ? 'in stick' : 'outside'}`; });
+input.onFlick((e) => { log.flick = `d ${e.dx.toFixed(0)},${e.dy.toFixed(0)} @ ${e.speed.toFixed(0)} px/s ${e.inStick ? 'in stick' : 'outside'}`; });
+
+const rect = {};
+const w2 = (px) => px / view.scale;   // css px -> wu at zoom 1
+
+function ring(cx, cy, r, col, seg = 40) {
+  const th = 2 / view.scale;
+  for (let i = 0; i < seg; i++) {
+    const a0 = i / seg * 6.28318, a1 = (i + 1) / seg * 6.28318;
+    R.line(cx + Math.cos(a0) * r, cy + Math.sin(a0) * r, cx + Math.cos(a1) * r, cy + Math.sin(a1) * r, th, col, LAYER.UI_WORLD);
+  }
+}
+
+function draw() {
+  R.begin(cam);
+  const z = slotRect(view.profile.stickZone, view, rect);
+  // the stick zone, in world space via the identity camera
+  const zx0 = w2(z.x - view.w / 2), zx1 = w2(z.x + z.w - view.w / 2);
+  const zy0 = w2(z.y - view.h / 2), zy1 = w2(z.y + z.h - view.h / 2);
+  R.gradient(zy0, zy1, [0.10, 0.13, 0.19, 1], [0.07, 0.09, 0.13, 1], LAYER.SKY, { x0: zx0, x1: zx1 });
+  const th = 2 / view.scale;
+  R.line(zx0, zy0, zx1, zy0, th, [0.35, 0.42, 0.6, 1], LAYER.GROUND);
+
+  if (input.stick.active || input.axisX || input.axisY) {
+    const ox = w2(input.stick.ox - view.w / 2), oy = w2(input.stick.oy - view.h / 2);
+    const px = w2(input.stick.x - view.w / 2), py = w2(input.stick.y - view.h / 2);
+    ring(ox, oy, w2(input.stick.r), [0.4, 0.5, 0.75, 0.9]);
+    ring(ox, oy, w2(input.stick.r * 0.067), [0.6, 0.4, 0.3, 0.9], 16);   // the deadzone
+    R.line(ox, oy, px, py, 3 / view.scale, [0.95, 0.8, 0.35, 1], LAYER.UI_WORLD);
+    R.sprite({ tex: R.disc, x: px, y: py, w: w2(26), h: w2(26), r: 0.95, g: 0.85, b: 0.5, layer: LAYER.ACTORS });
+  }
+
+  // the shaped output, as a bar pair at the top — this is what the sim sees
+  const bx = w2(-view.w * 0.5 + 20), by = w2(-view.h * 0.5 + 60);
+  R.line(bx, by, bx + w2(input.axisX * 120), by, 8 / view.scale, [0.4, 0.8, 0.9, 1], LAYER.UI_WORLD);
+  R.line(bx, by + w2(24), bx + w2(input.axisY * 120), by + w2(24), 8 / view.scale, [0.9, 0.5, 0.4, 1], LAYER.UI_WORLD);
+  R.end();
+}
+
+function hud() {
+  const z = slotRect(view.profile.stickZone, view, rect);
+  document.getElementById('hud').textContent =
+    `view       ${view.mode} ${view.w}x${view.h} dpr ${view.dpr}  safe ${JSON.stringify(view.safe)}\n` +
+    `stickR     ${input.stickRadius().toFixed(2)} css px   (max(36, w * 0.208), R-12)\n` +
+    `stick zone ${z.x.toFixed(0)},${z.y.toFixed(0)} ${z.w.toFixed(0)}x${z.h.toFixed(0)}\n` +
+    `axis       X ${input.axisX.toFixed(3)}  Y ${input.axisY.toFixed(3)}   (Y<0 = nose UP)\n` +
+    `raw        X ${input.axisRaw.x.toFixed(3)}  Y ${input.axisRaw.y.toFixed(3)}\n` +
+    `held       ${['pitchUp','pitchDown','slipLeft','slipRight','special','brake','pause'].filter(a => input.held(a)).join(' ') || '-'}\n` +
+    `source     ${input.lastSource}   stick ${input.stick.active ? 'DOWN' : 'up'}\n` +
+    `tap        ${log.tap}\n` +
+    `doubleTap  ${log.dtap}\n` +
+    `flick      ${log.flick}\n` +
+    `special    fired ${log.special}x  (tap OUTSIDE the stick zone)\n` +
+    `invert     ${input.invertPitch}   holdToFly ${input.holdToFly}`;
+}
+
+function frame(now) {
+  requestAnimationFrame(frame);
+  input.update();
+  if (input.pressed('special')) log.special++;
+  R.tick(1 / 60);
+  draw();
+  hud();
+}
+requestAnimationFrame(frame);
+
+bus.on('view:change', () => R.resize(view.w, view.h, view.dpr, view.worldH));
+window.__in = { input, view, log, stickRadius };
+</script>
+</body>
+</html>

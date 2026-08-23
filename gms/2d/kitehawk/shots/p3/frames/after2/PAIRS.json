@@ -1,0 +1,32 @@
+[
+ {
+  "name": "act2_day_deck",
+  "a": "shots/p3/frames/after2/act2_day_deck_A.png",
+  "b": "shots/p3/frames/after2/act2_day_deck_B.png"
+ },
+ {
+  "name": "act2_overcast",
+  "a": "shots/p3/frames/after2/act2_overcast_A.png",
+  "b": "shots/p3/frames/after2/act2_overcast_B.png"
+ },
+ {
+  "name": "act3_massif",
+  "a": "shots/p3/frames/after2/act3_massif_A.png",
+  "b": "shots/p3/frames/after2/act3_massif_B.png"
+ },
+ {
+  "name": "act5_dusk",
+  "a": "shots/p3/frames/after2/act5_dusk_A.png",
+  "b": "shots/p3/frames/after2/act5_dusk_B.png"
+ },
+ {
+  "name": "act4_night",
+  "a": "shots/p3/frames/after2/act4_night_A.png",
+  "b": "shots/p3/frames/after2/act4_night_B.png"
+ },
+ {
+  "name": "act1_mud",
+  "a": "shots/p3/frames/after2/act1_mud_A.png",
+  "b": "shots/p3/frames/after2/act1_mud_B.png"
+ }
+]

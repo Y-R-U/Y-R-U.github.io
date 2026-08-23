@@ -1,0 +1,11 @@
+[
+ {
+  "out": "cS18",
+  "w": 768,
+  "h": 768,
+  "steps": 16,
+  "seed": 218,
+  "model": "flux2-klein-4b",
+  "prompt": "Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, visible brush strokes and paper grain, romantic and beautiful, one single isolated low wide bank of small cumulus lobes, five or six rounded cloud mounds of different sizes sitting side by side in a long low row, much wider than it is tall, the row broken and uneven along its top, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow, no sun, no moon, no egg, no oval, no smooth unbroken outline, nothing else in the frame"
+ }
+]

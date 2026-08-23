@@ -438,3 +438,115 @@ keep only the largest connected component.
 
 **D58** — Independent confirmation from outside the prop set: `h68b_factory` kept a cast shadow
 despite being told not to. `poster.js`'s shadow pass is needed for hero objects too, not just props.
+
+**D59** — **P2 landed the rest of the engine** — `js/core/` (14 files), `main.js`, 7 harness tools.
+The solver reproduces ARCHITECTURE §4.4.1's table to 4 decimal places. `camera.js` is deliberately
+DOM-free so the harness drives **the real module** in node rather than a re-implementation of it,
+which is the difference between testing the camera and testing a copy of your own arithmetic.
+
+**D60** — **Two real bugs found, one of which also exists in a shipped game.**
+- **`viewport.js` measured the canvas — its own output.** `view:change` never fired on rotation and
+  the layout stayed portrait forever. **Screenshots at either orientation look correct**; only
+  counting events caught it. **The same bug is in Sunderfall's copy** — worth telling Aaron, it
+  affects a game already on the site.
+- `save.load()` reported a reset it had not performed: invisible at boot, stale data on any later load.
+
+**D61** — **Several P8 gate criteria reward broken behaviour and must be rewritten before P8 runs.**
+This is the most important thing P2 reported, and it was only visible because it shipped deliberately
+broken controllers alongside the correct one:
+- **`?track=sticky`, which is completely broken, scores the BEST Z1–Z3 numbers in the table.** Only
+  Z6 catches it. A gate suite where the broken implementation wins on three of six criteria is not
+  measuring what it thinks.
+- On a step trace the **broken symmetric controller scores 0 gap violations against the shipped
+  controller's 6.** Pumping must be measured against a *continuously moving* target, not a step.
+- **Z1 is unpassable as written and measures the wrong thing** — it budgets how often the *AI* may
+  change the framing box, not how the controller responds. Isolation runs score 0.
+- **Z2 and Z4 are mutually exclusive**, and `zoomInDwell = 0.90 s` is below Z2's 1.2 s threshold —
+  §4.1's constant and §4.4's criterion are numerically incompatible.
+**Fix the criteria, not the constants.** P2 refused to tune anything to clear them, which is correct.
+
+**D62** — Accepted from P2: `cam.setPlayerControl()` and `cam.setBias()` are additions to §6.6
+(§4.3.3/§4.3.4 cannot be implemented without them); §4.3.2's zoom-in margin **read literally caps
+zoom at 1.034**, making `zoomIntimate` unreachable and distorting the user bias, so a latch ships
+with `?margin=strict` preserving the literal reading for comparison; **P8 must state whether P1b is
+derived at 90% fill or at `zoomFill 0.85`** — §4.4.1 and the solver currently disagree.
+
+**D63** — **Routed to P15: the audio facade swallows a missing manifest.** `facade.js` uses
+`.then(r => r.ok ? r.json() : null)`, so an absent `assets/audio/` resolves instead of rejecting and
+the `warnOnce` never fires — zero console warnings where the contract requires exactly one. **The
+game is correct; the contract is not.** Fix it when the audio content lands.
+
+**D64** — **P3's ten gates all pass and the rendered sky is not good. The manager looked.**
+`shots/p3/act2_day_deck.png` and `act5_dusk.png` share the same defects across different acts, so
+this is systemic, not one act's palette:
+- **Clouds are crushed to hard black cores.** The shadow end of the ramp LUT is too dark and too
+  abrupt; the reference plates (`p03_cloud_deck`, `p08_hero_9b`) have soft violet-to-gold shadows
+  with volume and gentle value transitions.
+- **The sky is a flat single-hue wash** with almost no vertical gradient, where the references carry
+  a rich one. Act 5 is a wall of orange; act 2 is olive.
+- Clouds read as **stamped cutouts on a backdrop**, not as a deck with depth.
+
+**The gate suite measures seams, frame multiplicity, hue separation and haze — and nothing measures
+whether the composed frame looks like the target.** That is the fourth time on this project that a
+passing gate has failed to catch the thing it existed to protect. **The missing gate is a blind
+critic on the RENDERED FRAME**, not on assets, scored against the reference plates. P3 said as much
+itself: three of the art pillars are not reachable by this pipeline alone.
+
+**D65** — **Act 2 takes the cream, not the green.** P3 reported that clearing criterion A5 (hue
+separation between acts) forced a green cast it did not believe in, and that the cream alternative
+is one line and misses A5 by 4.8°. Having looked: **the green is wrong and A5 is mis-specified.**
+A criterion that forces a colour nobody thinks is right is a broken criterion — the same finding as
+A3 and A6 in this phase, and the same rule as D48 and D61: **fix the criterion, not the artwork.**
+
+**D66** — **A6's unnamed 0.12–0.18 band is closed at 0.12.** Pass below 0.12, fail at or above. The
+deliberately broken control lands at 0.146, so any threshold above that would let the broken
+implementation through — which is exactly what D61 caught in the camera gates.
+
+**D67** — **Props will be drawn in code, not generated.** Third clean negative in a row: all four
+generation-side causes from D52 were visibly fixed — 9B gave the watchtower complete legs and the
+gun its trail, the contrasting-states clause killed the clones, in-prompt negation removed the
+painted ground, no anachronisms — and two fresh blind critics still scored **3.83 and 3.33 against
+the reference's 8.33**, unmoved from D51, while the complaints changed completely. **The remaining
+gap is the medium: this model renders a mechanical subject and will not paint one.** The critics'
+worst finding — "the same spoked wheel under seven unrelated objects" — is a cross-asset repeat only
+a part tree can fix, and `gfx/parts.js` already exists for the aircraft. This also settles the
+outstanding contact-shadow requirement: code-drawn props get code-drawn contact shadows for free.
+
+**D68** — **P3's corrective pass found four real pipeline bugs, none of them the palette.** Clouds
+drawn alone had a median luminance of **0.113 against the reference's 0.637** — an error, not a
+taste question:
+1. **The ramp applied an effective gamma of 1.88 (3.90 at night)** — `sprite.js` indexes the LUT by
+   *linear* luminance and squares the texel back, so an authored `L^gamma` became `d^(2·gamma)`.
+2. **The LUT bottomed on black rather than the act's shadow colour** — `pow(L, g/2)` is 0 at L=0, so
+   every ramp's darkest entry was pure black whatever the shadow hex said.
+3. **The grade clamped everything under 10% luminance to black** — probed on act 4: LUT `[24,33,51]`
+   → framebuffer `[0,0,35]`, a per-channel clamp rather than a darkening.
+4. **Painted layers were being shaded by a scene with no lights in it.** Painted layers are now
+   self-lit and ambient is per-act — which also stops P4's aeroplane rendering black in daylight.
+
+**D69** — **The sky is much better and still does not clear the gate: −4.06 against a −2.0 line, and
+the +0.91 improvement is inside the ±1.5 noise floor.** The manager looked: the crushing is gone and
+the clouds hold volume, the wash behind them is still muddy. **What moved is the differences list,
+not the number** — every before-critic said the shadows crushed to black and two named "black
+cartoon outlines"; no after-critic says either, and two say explicitly that it does not crush. That
+is the NEONHAUL shape and it is the fourth time it has appeared here.
+
+**Moving on to P4 rather than pushing further, because the comparison is currently unfair.** Three
+of the five remaining complaints need things that do not exist yet — the ground plane is P9's, and
+actors and the removal test are P4/P5's. We are scoring an empty sky against composed paintings that
+contain a subject. **Re-run `tools/framegate.mjs` at P16 with actors and ground in frame**; that is
+the first honest reading.
+
+**D70** — **Two in-scope defects are deferred to P16 and must not be forgotten:**
+- **Shadows do not turn hue.** A 1D LUT indexed by luminance gives one colour per luminance, so
+  there is no mechanism for a shadow to differ in hue from a midtone at the same value. This is an
+  architectural limit of the ramp-map idea, it is the most-named remaining defect, and fixing it
+  means a shadow-tint term or a second LUT — not more tuning.
+- **Grain does not vary with the wash**; uniformity is the tell. This is P1's unbuilt REQUEST-2, the
+  world-space brushwork term.
+
+**D71** — Criteria re-specified this pass: **A5** now measures the key/shadow *relationship* (key
+hue, shadow hue, key chroma, value spread, largest axis) rather than a single mean hue, which
+collapsed the whole ramp to one number; **A4** counts confusable repeats — same id *and* similar
+scale *and* same flip — because the id-only proxy broke once the deck got denser. Act 1's −6.50 is
+**stale**: it was repaired after scoring and not re-run.

@@ -1,0 +1,17 @@
+[
+ {
+  "id": "A4",
+  "red": true,
+  "line": "one-cutout atlas: worst multiplicity 3 against the shipped 2 (red needs >= 3)"
+ },
+ {
+  "id": "A7",
+  "red": true,
+  "line": "hard bands: crossfades 0.019, 0.019, 0.019, 0.019, 0.019 s against the shipped 1.66, 1.66, 1.66, 1.66, 1.66 (red needs < 0.4)"
+ },
+ {
+  "id": "A5",
+  "red": true,
+  "line": "one LUT shared by all five acts: worst pair 0.00 against the shipped 0.26 (red needs < 0.25)"
+ }
+]
