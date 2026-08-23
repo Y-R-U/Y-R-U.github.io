@@ -1,0 +1,17 @@
+[
+ {"who":"hurdy",    "char":"Marla Hurdle",     "voice":"bf_alice",    "speed":1.02, "id":"a1_l20_hurdy_01", "text":"Lamps are lit. I lit them myself. Twice."},
+ {"who":"nell",     "char":"Nell Corrigan",    "voice":"bf_emma",     "speed":0.98, "id":"a1_l20_nell_01",  "text":"I used to bring the post in over this hedge."},
+ {"who":"nell_m",   "char":"Nils Corrigan",    "voice":"bm_daniel",   "speed":0.98, "id":"a1_l20_nell_01",  "text":"I used to bring the post in over this hedge."},
+ {"who":"roo",      "char":"Ruthven Halke",    "voice":"bm_lewis",    "speed":0.92, "id":"a1_l09_roo_03",   "text":"Good. Now do that when it is not a nice day."},
+ {"who":"ferry",    "char":"Tobin Ferris",     "voice":"bm_fable",    "speed":0.88, "id":"a1_l06_ferry_03", "text":"Anything you catch, I can bolt to it. That's the arrangement."},
+ {"who":"aurie",    "char":"Aurie Petch",      "voice":"bf_lily",     "speed":1.06, "id":"a1_l09_aurie_01", "text":"There's sun up here. Nell. There's sun."},
+ {"who":"odile",    "char":"Odile Sarn",       "voice":"bf_isabella", "speed":0.96, "id":"a5_l90_odile_01", "text":"Twelve crates. Quarter end. After this the Line stops and everyone goes home hungry."},
+ {"who":"baumgart", "char":"Wilhelm Baumgart", "voice":"am_onyx",     "speed":0.86, "id":"a1_l18_baum_07",  "text":"Well flown. I'll take the low road home."},
+ {"who":"grelle",   "char":"Sabin Grelle",     "voice":"am_eric",     "speed":0.92, "id":"a4_l70_grelle_04","text":"I am paid whether you live or not."},
+ {"who":"ferber_y", "char":"Yannik Ferber",    "voice":"am_liam",     "speed":1.02, "id":"a4_l67_ferb_y_02","text":"Take the low one. Take the low one now."},
+ {"who":"ferber_o", "char":"Ott Ferber",       "voice":"am_fenrir",   "speed":0.98, "id":"a4_l67_ferb_o_01","text":"I am high. I'm always high."},
+ {"who":"board",    "char":"Verrine Air Board","voice":"am_echo",     "speed":0.92, "id":"a4_l79_board_01", "text":"The Patience is a legitimate object. This determination has been made."},
+ {"who":"bulletin", "char":"Concord Bulletin", "voice":"af_alloy",    "speed":1.00, "id":"a4_l79_bull_01",  "text":"Concord Line, Patience. We carry no arms."},
+ {"who":"countess", "char":"Ilsabet Kohl-Marren","voice":"af_nova",   "speed":1.06, "id":"cnts_03",        "text":"That was a pretty turn. It cost you nine hundred feet, but it was pretty."},
+ {"who":"drach",    "char":"Anselm Drach",     "voice":"am_adam",     "speed":0.90, "id":"drach_06",       "text":"I have cut four hundred canopies. I have never once opened one."}
+]

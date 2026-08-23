@@ -1,0 +1,92 @@
+[
+ {
+  "voice": "bf_alice",
+  "speed": 1.02,
+  "text": "Lamps are lit. I lit them myself. Twice.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/hurdy.wav"
+ },
+ {
+  "voice": "bf_emma",
+  "speed": 0.98,
+  "text": "I used to bring the post in over this hedge.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/nell.wav"
+ },
+ {
+  "voice": "bm_daniel",
+  "speed": 0.98,
+  "text": "I used to bring the post in over this hedge.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/nell_m.wav"
+ },
+ {
+  "voice": "bm_lewis",
+  "speed": 0.92,
+  "text": "Good. Now do that when it is not a nice day.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/roo.wav"
+ },
+ {
+  "voice": "bm_fable",
+  "speed": 0.88,
+  "text": "Anything you catch, I can bolt to it. That's the arrangement.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/ferry.wav"
+ },
+ {
+  "voice": "bf_lily",
+  "speed": 1.06,
+  "text": "There's sun up here. Nell. There's sun.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/aurie.wav"
+ },
+ {
+  "voice": "bf_isabella",
+  "speed": 0.96,
+  "text": "Twelve crates. Quarter end. After this the Line stops and everyone goes home hungry.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/odile.wav"
+ },
+ {
+  "voice": "am_onyx",
+  "speed": 0.86,
+  "text": "Well flown. I'll take the low road home.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/baumgart.wav"
+ },
+ {
+  "voice": "am_eric",
+  "speed": 0.92,
+  "text": "I am paid whether you live or not.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/grelle.wav"
+ },
+ {
+  "voice": "am_liam",
+  "speed": 1.02,
+  "text": "Take the low one. Take the low one now.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/ferber_y.wav"
+ },
+ {
+  "voice": "am_fenrir",
+  "speed": 0.98,
+  "text": "I am high. I'm always high.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/ferber_o.wav"
+ },
+ {
+  "voice": "am_echo",
+  "speed": 0.92,
+  "text": "The Patience is a legitimate object. This determination has been made.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/board.wav"
+ },
+ {
+  "voice": "af_alloy",
+  "speed": 1.0,
+  "text": "Concord Line, Patience. We carry no arms.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/bulletin.wav"
+ },
+ {
+  "voice": "af_nova",
+  "speed": 1.06,
+  "text": "That was a pretty turn. It cost you nine hundred feet, but it was pretty.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/countess.wav"
+ },
+ {
+  "voice": "am_adam",
+  "speed": 0.9,
+  "text": "I have cut four hundred canopies. I have never once opened one.",
+  "out": "/Users/aaronair/cc/yru/site/gms/2d/kitehawk/docs/vo_audition/wav/drach.wav"
+ }
+]

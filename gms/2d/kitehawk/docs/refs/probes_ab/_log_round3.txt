@@ -1,0 +1,6 @@
+[1/6] z10_winner_9b.png  57s  1024x384 flux2-klein-9b-mlx-4bit
+[2/6] z11_winner_9b_seed2.png  78s  1024x384 flux2-klein-9b-mlx-4bit
+[3/6] t01_hangar_oldgrammar.png  105s  768x512 flux2-klein-9b-mlx-4bit
+[4/6] t02_hangar_newgrammar.png  105s  768x512 flux2-klein-9b-mlx-4bit
+[5/6] t03_aagun_newgrammar.png  114s  768x512 flux2-klein-9b-mlx-4bit
+[6/6] f08_varied.png  39s  768x512 flux2-klein-4b

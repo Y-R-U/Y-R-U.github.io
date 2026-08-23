@@ -1,0 +1,25 @@
+[
+{"out":"z01_9b","w":1024,"h":384,"seed":7707,"steps":16,"model":"flux2-klein-9b-mlx-4bit",
+ "prompt":"Hand-painted gouache painting, one enormous WWI zeppelin airship seen from the side, riveted grey-olive doped fabric envelope, small gondolas and engine nacelles slung beneath, warm sunlight on the upper curve and deep cool shadow below, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no cast shadow"},
+
+{"out":"z02_tail_4b","w":1024,"h":384,"seed":7707,"steps":16,
+ "prompt":"Hand-painted gouache painting, one enormous WWI zeppelin airship seen from the side, riveted grey-olive doped fabric envelope, small gondolas and engine nacelles slung beneath, warm sunlight on the upper curve and deep cool shadow below, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail, hand-painted gouache on textured paper, visible brush strokes and paper grain throughout"},
+
+{"out":"z03_steps10_4b","w":1024,"h":384,"seed":7707,"steps":10,
+ "prompt":"Hand-painted gouache painting, one enormous WWI zeppelin airship seen from the side, riveted grey-olive doped fabric envelope, small gondolas and engine nacelles slung beneath, warm sunlight on the upper curve and deep cool shadow below, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no cast shadow"},
+
+{"out":"z04_tail_9b","w":1024,"h":384,"seed":7707,"steps":16,"model":"flux2-klein-9b-mlx-4bit",
+ "prompt":"Hand-painted gouache painting, one enormous WWI zeppelin airship seen from the side, riveted grey-olive doped fabric envelope, small gondolas and engine nacelles slung beneath, warm sunlight on the upper curve and deep cool shadow below, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail, hand-painted gouache on textured paper, visible brush strokes and paper grain throughout"},
+
+{"out":"z05_edit_p04ref","w":1024,"h":384,"seed":7707,"steps":16,"refs":["../probes/p04_cloud_cutout.png"],
+ "prompt":"Paint one enormous WWI zeppelin airship seen from the side in the exact painting style, brush handling and paper texture of the reference image: thick opaque gouache, flat poster shapes, visible brush strokes, riveted doped fabric envelope, small gondolas and engine nacelles slung beneath, warm sunlight on the upper curve and cool violet shadow below, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no cast shadow"},
+
+{"out":"f01_tail_4b","w":768,"h":512,"seed":8808,"steps":14,
+ "prompt":"Hand-painted gouache painting, a scatter of six WWI anti-aircraft flak burst smoke puffs of different sizes, dirty charcoal black and brown smoke with a brief hot orange core in the newest one, ragged painterly edges, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow, thick opaque gouache, matte, no gloss, no specular highlights, no photographic detail, hand-painted gouache on textured paper, visible brush strokes and paper grain throughout"},
+
+{"out":"f02_steps10_4b","w":768,"h":512,"seed":8808,"steps":10,
+ "prompt":"Hand-painted gouache painting, a scatter of six WWI anti-aircraft flak burst smoke puffs of different sizes, dirty charcoal black and brown smoke with a brief hot orange core in the newest one, ragged painterly edges, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"},
+
+{"out":"f03_edit_p04ref","w":768,"h":512,"seed":8808,"steps":14,"refs":["../probes/p04_cloud_cutout.png"],
+ "prompt":"Paint a scatter of six anti-aircraft flak burst smoke puffs of different sizes in the exact painting style, brush handling and paper texture of the reference image: thick opaque gouache, visible brush strokes, ragged torn edges, dirty charcoal black and brown smoke with a hot orange core in the newest one, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"}
+]

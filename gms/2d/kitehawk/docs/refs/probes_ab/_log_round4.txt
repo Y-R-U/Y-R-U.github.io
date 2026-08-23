@@ -1,0 +1,5 @@
+[1/5] t04_aagun_edit_p04ref.png  48s  768x512 flux2-klein-4b
+[2/5] t05_aagun_brushlang.png  72s  768x512 flux2-klein-9b-mlx-4bit
+[3/5] t06_aagun_small.png  45s  320x256 flux2-klein-9b-mlx-4bit
+[4/5] t07_hangar_small.png  42s  384x256 flux2-klein-9b-mlx-4bit
+[5/5] t08_aagun_brushlang_4b.png  48s  768x512 flux2-klein-4b

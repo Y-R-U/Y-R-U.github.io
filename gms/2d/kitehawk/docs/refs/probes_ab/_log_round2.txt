@@ -1,0 +1,8 @@
+[1/8] z06_p08stem_9b.png  57s  1024x384 flux2-klein-9b-mlx-4bit
+[2/8] z07_p08stem_paintlang_9b.png  78s  1024x384 flux2-klein-9b-mlx-4bit
+[3/8] z08_p08stem_paintlang_4b.png  36s  1024x384 flux2-klein-4b
+[4/8] z09_edit_p08ref.png  67s  1024x384 flux2-klein-4b
+[5/8] f04_p08stem_paintlang_tail.png  39s  768x512 flux2-klein-4b
+[6/8] f05_p08stem_paintlang.png  54s  768x512 flux2-klein-4b
+[7/8] f06_edit_p08ref.png  60s  768x512 flux2-klein-4b
+[8/8] f07_edit_p04ref_tail.png  78s  768x512 flux2-klein-4b

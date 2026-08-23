@@ -1,0 +1,8 @@
+[1/8] z01_9b.png  57s  1024x384 flux2-klein-9b-mlx-4bit
+[2/8] z02_tail_4b.png  30s  1024x384 flux2-klein-4b
+[3/8] z03_steps10_4b.png  39s  1024x384 flux2-klein-4b
+[4/8] z04_tail_9b.png  60s  1024x384 flux2-klein-9b-mlx-4bit
+[5/8] z05_edit_p04ref.png  54s  1024x384 flux2-klein-4b
+[6/8] f01_tail_4b.png  30s  768x512 flux2-klein-4b
+[7/8] f02_steps10_4b.png  42s  768x512 flux2-klein-4b
+[8/8] f03_edit_p04ref.png  57s  768x512 flux2-klein-4b

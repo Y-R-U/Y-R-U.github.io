@@ -1,0 +1,10 @@
+[1/10] p01_sky_dawn.png  33s  512x1024 flux2-klein-4b
+[2/10] p02_sky_dusk.png  60s  512x1024 flux2-klein-4b
+[3/10] p03_cloud_deck.png  60s  1024x384 flux2-klein-4b
+[4/10] p04_cloud_cutout.png  51s  768x768 flux2-klein-4b
+[5/10] p05_ground_trench.png  54s  1024x256 flux2-klein-4b
+[6/10] p06_ground_fields.png  45s  1024x256 flux2-klein-4b
+[7/10] p07_hero_4b.png  69s  1024x576 flux2-klein-4b
+[8/10] p08_hero_9b.png  96s  1024x576 flux2-klein-9b-mlx-4bit
+[9/10] p09_zeppelin.png  30s  1024x384 flux2-klein-4b
+[10/10] p10_flak.png  42s  768x512 flux2-klein-4b

@@ -1,0 +1,31 @@
+[
+{"out":"p01_sky_dawn","w":512,"h":1024,"seed":1701,"steps":14,
+ "prompt":"Hand-painted gouache painting, WWI recruitment poster art, visible brush texture and paper grain, a tall vertical column of empty sky at dawn seen from high altitude, cold violet-blue thin air at the very top, warm rose and pale gold band across the middle, thick pale haze and mist near the bottom, smooth airbrushed vertical gradient, atmospheric perspective, no aircraft, no ground, no clouds, empty sky only"},
+
+{"out":"p02_sky_dusk","w":512,"h":1024,"seed":1701,"steps":14,
+ "prompt":"Hand-painted gouache painting, WWI recruitment poster art, visible brush texture and paper grain, a tall vertical column of empty sky at stormy dusk seen from high altitude, deep indigo and slate above, a bruised band of burnt orange and crimson across the middle, heavy grey-green murk near the bottom, smooth airbrushed vertical gradient, atmospheric perspective, no aircraft, no ground, no clouds, empty sky only"},
+
+{"out":"p03_cloud_deck","w":1024,"h":384,"seed":2202,"steps":16,
+ "prompt":"Hand-painted gouache painting, WWI aviation poster art, visible brush texture, a horizontal deck of towering white cumulus cloud tops seen edge-on from the same altitude, sunlit warm cream and pale gold on the upper left faces, cool lavender and blue-grey shadow on the underside, soft sculpted painterly forms, one warm low sun off frame left, empty blue sky above and below, no aircraft, no ground, no horizon line"},
+
+{"out":"p04_cloud_cutout","w":768,"h":768,"seed":3303,"steps":16,
+ "prompt":"Hand-painted gouache painting, one single isolated towering cumulus cloud, sculpted painterly volume, warm cream sunlit top-left face and cool violet-grey shadowed underside, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky gradient, no ground, no aircraft, no cast shadow"},
+
+{"out":"p05_ground_trench","w":1024,"h":256,"seed":4404,"steps":16,
+ "prompt":"Hand-painted gouache painting, WWI poster art, a horizontal strip of shattered battlefield mud seen far below from an aircraft, zigzag trench lines and shell craters and flooded pools, splintered black tree stumps, drifting smoke, near-monochrome umber and cold grey-green, very low contrast, muted and hazy with distance, top-down oblique aerial view, no aircraft, no sky, no horizon"},
+
+{"out":"p06_ground_fields","w":1024,"h":256,"seed":5505,"steps":16,
+ "prompt":"Hand-painted gouache painting, WWI poster art, a horizontal strip of patchwork French farmland seen far below from an aircraft, irregular fields of ochre wheat and olive green and dark plough, a pale road and a river thread, tiny slate rooftops, seen through pale blue atmospheric haze, very low contrast, soft flat poster shapes, top-down oblique aerial view, no aircraft, no sky, no horizon"},
+
+{"out":"p07_hero_4b","w":1024,"h":576,"seed":6606,"steps":18,
+ "prompt":"Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, a single red biplane fighter banking above a vast sunlit deck of cumulus cloud, low warm golden sun raking from the left, cool lavender shadow on the cloud undersides, thin cold blue sky above, a small supply crate descending under a white parachute canopy in the middle distance, visible brush strokes and paper grain, romantic and beautiful, no text"},
+
+{"out":"p08_hero_9b","w":1024,"h":576,"seed":6606,"steps":18,"model":"flux2-klein-9b-mlx-4bit",
+ "prompt":"Hand-painted gouache painting in the style of a WWI aviation poster and a Studio Ghibli aviation film, a single red biplane fighter banking above a vast sunlit deck of cumulus cloud, low warm golden sun raking from the left, cool lavender shadow on the cloud undersides, thin cold blue sky above, a small supply crate descending under a white parachute canopy in the middle distance, visible brush strokes and paper grain, romantic and beautiful, no text"},
+
+{"out":"p09_zeppelin","w":1024,"h":384,"seed":7707,"steps":16,
+ "prompt":"Hand-painted gouache painting, one enormous WWI zeppelin airship seen from the side, riveted grey-olive doped fabric envelope, small gondolas and engine nacelles slung beneath, warm sunlight on the upper curve and deep cool shadow below, crisp readable silhouette, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no clouds, no ground, no cast shadow"},
+
+{"out":"p10_flak","w":768,"h":512,"seed":8808,"steps":14,
+ "prompt":"Hand-painted gouache painting, a scatter of six WWI anti-aircraft flak burst smoke puffs of different sizes, dirty charcoal black and brown smoke with a brief hot orange core in the newest one, ragged painterly edges, completely isolated on a flat uniform neutral mid grey background, 2D game asset sheet, no sky, no aircraft, no ground, no cast shadow"}
+]

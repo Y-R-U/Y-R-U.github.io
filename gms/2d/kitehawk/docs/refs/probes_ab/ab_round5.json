@@ -1,0 +1,10 @@
+[
+{"out":"t09_aagun_twotone_4b","w":768,"h":512,"seed":13,"steps":16,
+ "prompt":"Hand-painted gouache painting in the style of a WWI aviation poster, one WWI anti-aircraft field gun on a wheeled cruciform mount with the barrel raised steeply, a stack of shell cases beside it, every surface painted as two flat tones with a hard edge between them, one lit tone and one shadow tone, no gradients, no rendered metal, no reflections, chalky opaque body colour on textured paper, visible brush strokes, flat straight-on side elevation, even overcast light, low saturation, neutral grey-blue, cut out on a flat uniform neutral mid grey field, no sky, no ground, no cast shadow"},
+
+{"out":"t10_aagun_twotone_noassetphrase_4b","w":768,"h":512,"seed":13,"steps":16,
+ "prompt":"Hand-painted gouache painting in the style of a WWI aviation poster, one WWI anti-aircraft field gun on a wheeled cruciform mount with the barrel raised steeply, a stack of shell cases beside it, every surface painted as two flat tones with a hard edge between them, one lit tone and one shadow tone, no gradients, no rendered metal, no reflections, chalky opaque body colour on textured paper, visible brush strokes, flat straight-on side elevation, even overcast light, low saturation, neutral grey-blue, completely isolated on a flat uniform neutral mid grey background, 2D game asset cutout, no sky, no ground, no cast shadow"},
+
+{"out":"t11_hangar_twotone_4b","w":768,"h":512,"seed":12,"steps":16,
+ "prompt":"Hand-painted gouache painting in the style of a WWI aviation poster, one WWI wooden aerodrome hangar with corrugated iron doors and a canvas Bessonneau tent beside it, every surface painted as two flat tones with a hard edge between them, one lit tone and one shadow tone, no gradients, no rendered metal, no reflections, chalky opaque body colour on textured paper, visible brush strokes, flat straight-on side elevation, even overcast light, low saturation, neutral grey-blue, cut out on a flat uniform neutral mid grey field, no sky, no ground, no cast shadow"}
+]
