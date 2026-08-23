@@ -387,6 +387,8 @@ export function newStory(over = {}) {
     hireBlocks: 0,
     // §S2-J — the paid branch's door. See THE TWO DOORS above.
     thread: newThread(),
+    // The arc's curtain, latched. See `ownArc`.
+    own: false,
     ...over,
   };
 }
@@ -510,10 +512,104 @@ export function settle(story, econ) {
   return { ...O, paid, before, kept: econ.credits, took: paid ? DEBT : before - econ.credits };
 }
 
-// The player is grounded when act two has begun and they are not currently on a hire. It is the
-// one condition that blocks UNDOCK, and it is a state the hire panel can always leave.
-export function grounded(story) {
-  return !!story && story.stage === STAGE.ACT2 && !story.hire;
+// The player is grounded when act two has begun and there is NOTHING ON THE PAD THAT IS THEIRS. It
+// is the one condition that blocks UNDOCK, and it is a state the hire panel can always leave.
+//
+// It shipped reading only `stage` and `hire`, and that made the arc's own destination a trap: a
+// player who bought a hull outright in act two has no hire, so this returned true, so `doUndock`
+// refused and re-opened the hire panel — on a craft they owned. **They could not take off.** The
+// field `story.grounded` that `settle()` and `takeHire()` maintain was never read by this function
+// at all, so nothing anywhere contradicted it.
+//
+// `borrowed` is the flag that separates the two cases and it is `js/economy.js`'s, so this takes
+// the economy. It is not optional: `story` is only ever non-null when `Game.economy` is (main.js
+// creates them together), and the `!!story` test short-circuits ahead of the dereference.
+export function grounded(story, econ) {
+  return !!story && story.stage === STAGE.ACT2 && !story.hire && econ.borrowed !== false;
+}
+
+// ── the arc closes ─────────────────────────────────────────────────────────
+//
+// The brief, verbatim: *"'buy your own craft, debt-free' is the real arc rather than a consolation
+// prize."* Act one takes the car from every player and act two is the hire loop; this is the
+// moment the loop stops being the game.
+//
+// **It is a curtain, not a stop.** Nothing here moves `stage`, sets a flag, spends a credit or
+// locks a surface. There is no fail state and there is no win state either — DECISIONS 6 — and the
+// player is on the board again the second they press FLY.
+//
+// ── what "debt-free" is allowed to mean ────────────────────────────────────
+//
+// `borrowed === false` with no hire on the meter is the obvious reading, and on its own it is
+// wrong twice:
+//
+//   1. **`wisp` costs nothing.** `economy.buyCraft` will hand a grounded act-two player the free
+//      starter hull for 0 CRD, which clears `borrowed`, ends the grounding and would fire the
+//      game's climax about ten seconds into act two having bought nothing. So the hull has to be
+//      at least the one that was taken — the brief's own *"climbing back to what you started with
+//      and past it"*, which is a sentence about the `kestrel` the player opens the game in and not
+//      a threshold invented here. (The free hull ALSO walks straight past the hire loop, which is
+//      a bigger hole than this beat and is not this function's to fix. It is recorded in
+//      docs/MANAGER_STATE.md.)
+//
+//   2. **Wages.** §S2-I's payroll is the only other money in this game that is owed to a person,
+//      and a fleet in arrears is a fleet whose drivers are about to walk over it. A screen reading
+//      NOTHING OWED over three unpaid drivers is the game congratulating you on somebody else's
+//      loss. Arrears clear themselves the moment the account can cover them (`company.payWages`
+//      pays back pay before it pays anyone new), so this delays the beat and can never withhold it.
+//
+// What is deliberately NOT in here: a balance, a licence tier, a standing rung, a lifetime figure.
+// Those are numbers, and the requirement is that this fires when the ARC completes.
+
+// The hull the player opens the game in — their parents'. `js/save.js`'s defaults are the source of
+// truth for that; this is the copy a pure module is allowed to hold, and `tools/gates_end.mjs` A1
+// asserts the two strings are the same so they cannot drift apart in silence.
+export const STARTER_HULL = 'kestrel';
+
+// A sub-credit residue of arrears must not hold the curtain shut forever. `payWages` lands on exact
+// zero when the account covers the payment, so this is slack and not a threshold.
+const ARREARS_EPS = 0.5;
+
+// Is the arc complete? PURE. It returns the UNMET conditions rather than a boolean, because a gate
+// that can only see `true` can only prove that a true is true — with this it can knock out one
+// condition at a time and watch the answer change.
+//
+// `arrears` is the caller's: story.js does not import company.js, and main.js sums it across every
+// charter the player holds, because a debt parked on a shell is still a debt.
+export function ownArc(story, econ, arrears = 0) {
+  const need = [];
+  if (!story || story.stage !== STAGE.ACT2) need.push('act2');
+  else if (story.own) need.push('done');
+  if (story && story.hire) need.push('hire');
+  if (!econ || econ.borrowed !== false) need.push('borrowed');
+  const price = econ && E.CRAFT[econ.craft] ? E.CRAFT[econ.craft].price : 0;
+  if (price < E.CRAFT[STARTER_HULL].price) need.push('hull');
+  if (arrears > ARREARS_EPS) need.push('arrears');
+  return { done: need.length === 0, need, craft: econ ? econ.craft : null, price,
+    floor: E.CRAFT[STARTER_HULL].price, arrears: +(+arrears || 0).toFixed(2),
+    branch: story ? story.branch : null };
+}
+
+// The two branches' headline. The prose is `js/storyui.js`'s, exactly as OUTCOME's is: this holds
+// what the arc DECIDES and not what it says.
+//
+// The kicker is the same on both roads on purpose. It is the one fact the two branches genuinely
+// share — the brief makes them different situations rather than a good and a bad ending, and they
+// arrive at the same place from opposite sides of it. Everything under the kicker differs.
+export const OWN = {
+  paid: { branch: 'paid', kicker: 'NOTHING OWED', title: 'YOU BOUGHT IT YOURSELF' },
+  seized: { branch: 'seized', kicker: 'NOTHING OWED', title: 'YOU BOUGHT IT BACK' },
+};
+
+// Fire it, once. Mutates `story` and nothing else, and the one field it writes is the latch.
+export function closeArc(story, econ, arrears = 0) {
+  const a = ownArc(story, econ, arrears);
+  if (!a.done) return null;
+  story.own = true;
+  const O = OWN[story.branch] || OWN.paid;
+  return { ...O, branch: story.branch, craft: a.craft, price: a.price,
+    flags: (econ.flags || []).slice(),
+    hireSpend: story.hireSpend | 0, hireBlocks: story.hireBlocks | 0 };
 }
 
 const clamp01 = v => (v < 0 ? 0 : v > 1 ? 1 : v);
@@ -534,7 +630,7 @@ export function toSave(story, now = 0) {
     hire: story.hire ? { craft: story.hire.craft, left: Math.max(0, story.hire.until - now),
       blocks: story.hire.blocks, spent: story.hire.spent } : null,
     wreckLeft: story.wreckLeft | 0, hireSpend: story.hireSpend | 0, hireBlocks: story.hireBlocks | 0,
-    grounded: !!story.grounded,
+    grounded: !!story.grounded, own: !!story.own,
     // `last` is an absolute sim time and sim time restarts at zero on the next load — persisting it
     // would silence the thread for the rest of the session. It is deliberately reset, which costs
     // at most one remark's spacing and cannot strand the player mid-thread.
@@ -554,6 +650,11 @@ export function fromSave(profile, now = 0) {
   }
   s.due = !!p.due;
   s.grounded = !!p.grounded;
+  // The latch. A profile written before this beat existed has no key at all, which reads as `false`
+  // — i.e. a player who already owns a hull outright gets the beat on their next dock rather than
+  // never. That is the right way round: the alternative silently retires it for everyone who was
+  // already there.
+  s.own = !!p.own;
   s.sent = Array.isArray(p.sent) ? p.sent.slice() : [];
   if (p.thread) {
     s.thread = newThread({

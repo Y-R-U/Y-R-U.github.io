@@ -626,7 +626,9 @@ export class HirePanel {
     const meterWrap = el('div', 'hr-meter');
     if (left === null) {
       meterWrap.appendChild(el('span', 'hrm-k', 'NO HIRE'));
-      meterWrap.appendChild(el('span', 'hrm-v', story && story.stage === Story.STAGE.ACT2
+      // `Story.grounded` and not `stage === ACT2`: a player who has bought a hull outright is in
+      // act two with no hire and is NOT grounded, and this line was the surface that said so wrongly.
+      meterWrap.appendChild(el('span', 'hrm-v', Story.grounded(story, econ)
         ? 'grounded — nothing on the pad is yours' : 'you are flying your own hull'));
     } else {
       const frac = clamp(left / Story.HIRE.BLOCK_S, 0, 1);
@@ -869,6 +871,112 @@ export class EndingPanel {
   hide() { return this.panel.hide(); }
   stateOf() { return { open: this.panel.open, opens: this.opens,
     branch: this.result ? this.result.branch : null }; }
+}
+
+// ── the arc's curtain ──────────────────────────────────────────────────────
+//
+// `js/story.js`'s `closeArc` decides when; this only says it. It is deliberately the SAME shape as
+// EndingPanel — kicker, four or five paragraphs, an instrument grid, one forward-looking line —
+// because it is the other end of the same arc and the player should recognise the surface.
+//
+// Two things it is not. It is not a win screen: nothing here congratulates anybody, the close key
+// says FLY, and the last line's whole job is to say that nothing has closed. And it is not a
+// second ending: `ACT TWO` stays in the kicker, the stage never moves, and the hire desk is still
+// on the board behind it.
+export class OwnPanel {
+  constructor(host, hooks = {}) {
+    this.hooks = hooks;                        // { close }
+    this.panel = new CabinPanel(host, { kicker: 'ACT TWO', title: '', closeLabel: 'FLY' });
+    this.result = null;
+    this.opens = 0;
+  }
+
+  get open() { return this.panel.open; }
+
+  // `result` is `Story.closeArc`'s. `extra` is what the shady side and the thread look like right
+  // now — read from main.js rather than stored on the story, because both are live state that this
+  // panel reports and does not own.
+  show(result, extra = {}) {
+    this.result = result;
+    this.opens++;
+    const paid = result.branch === 'paid';
+    const shady = extra.shady || null;
+    const open = !!(shady && shady.open);
+    this.panel.setTitle(result.title);
+    const body = this.panel.body;
+    body.innerHTML = '';
+    body.appendChild(el('div', `en-kick ${result.branch}`, result.kicker));
+
+    const lines = [
+      paid
+        ? 'The transfer takes about a minute. Nobody counts anything in front of you.'
+        : 'The transfer takes about a minute. Nobody watches you do it, which is new.',
+      'The meter is off. Nothing on this pad belongs to a hire desk, a crew or your parents, and '
+      + 'the only thing this hull costs to keep is charge.',
+    ];
+    if (paid) {
+      lines.push('You call home. Your father asks what you paid, and whether it came with a '
+        + 'warranty, and then there is a gap where he could say the other thing.');
+      lines.push(extra.asked
+        ? 'He gave you a name once and asked you not to use it. Neither of you mentions that either.'
+        : 'He still has not told you who he borrowed from. You have stopped asking, which is not '
+          + 'the same as not wanting to know.');
+    } else {
+      lines.push('Somebody from the crew is at the desk on your way out. He looks at the paperwork '
+        + 'and not at you, and he says the number back to you before you have said it.');
+      lines.push('They are not going to take this one. Nobody promised that. It is only that there '
+        + 'is nothing here of theirs.');
+    }
+    // The shady ladder, if they climbed it. Three states and not two: a door that was never opened
+    // and a door that was opened and never used are different games, and a player who is a BROKER
+    // has had a third one.
+    lines.push(!open
+      ? 'Nobody in this city has ever asked you to carry anything that was not on a manifest. That '
+        + 'is rarer than it sounds and it is worth exactly nothing to anyone but you.'
+      : shady.rung <= 1
+        ? 'The desk under the Tallow Yard has been open to you the whole time and you have never '
+          + 'used it. That was also a decision.'
+        : `At the desk under the Tallow Yard you are a ${shady.name} — ${shady.blurb}. None of that `
+          + 'is on the paperwork you just signed, and none of it goes away because you own a hull.');
+    for (const t of lines) body.appendChild(el('p', 'en-p', t));
+
+    const grid = el('div', 'en-grid');
+    const cell = (k, v, cls) => {
+      const c = el('div', `en-cell${cls ? ' ' + cls : ''}`);
+      c.appendChild(el('i', null, k));
+      c.appendChild(el('b', null, v));
+      return c;
+    };
+    grid.appendChild(cell('THE HULL', result.craft.toUpperCase(), 'good'));
+    grid.appendChild(cell('YOU PAID', `${crd(result.price)} CRD`));
+    // The burn, totalled. It is the number the beat exists to end, and it is the one figure here
+    // the player cannot work out for themselves.
+    grid.appendChild(cell('SPENT ON HIRE', `${crd(result.hireSpend)} CRD`, 'bad'));
+    grid.appendChild(cell('BLOCKS RENTED', `${result.hireBlocks}`));
+    grid.appendChild(cell('THE METER', 'off', 'good'));
+    grid.appendChild(cell('ON YOUR RECORD',
+      result.flags.length ? result.flags.map(f => f.replace(/_/g, ' ')).join(' · ') : 'clean',
+      paid ? 'good' : ''));
+    if (open) grid.appendChild(cell('OFF THE BOOKS', `${shady.name} · ${crd(shady.at)} CRD`));
+    body.appendChild(grid);
+
+    body.appendChild(el('div', 'en-next', paid
+      ? 'Nothing closes here. The board is still out there and the hire desk is still on it — you '
+        + 'have simply stopped needing it.'
+      : 'Nothing closes here. The board is still out there, the hire desk is still on it, and so is '
+        + 'the desk under the Tallow Yard. You have stopped needing one of the three.'));
+    this.panel.onHide = () => { this.hooks.close && this.hooks.close(result); };
+    this.panel.show();
+    return true;
+  }
+
+  hide() { return this.panel.hide(); }
+  stateOf() {
+    return { open: this.panel.open, opens: this.opens,
+      branch: this.result ? this.result.branch : null,
+      craft: this.result ? this.result.craft : null,
+      title: this.result ? this.result.title : null };
+  }
 }
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);

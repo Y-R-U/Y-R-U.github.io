@@ -41,7 +41,7 @@ import { Minimap } from './minimap.js';
 import { UI, DockUI, CabinPanel, holdFor, CHATTER_MULT } from './ui.js';
 import * as Ranks from './ranks.js';
 import * as Story from './story.js';
-import { IntroScene, HirePanel, EndingPanel, StoryVoice, SCRIPT as STORY_SCRIPT, ThreadPanel } from './storyui.js';
+import { IntroScene, HirePanel, EndingPanel, StoryVoice, SCRIPT as STORY_SCRIPT, ThreadPanel, OwnPanel } from './storyui.js';
 import * as Company from './company.js';
 import { Fleet } from './fleet.js';
 import { FleetPanel, DriverFeed } from './companyui.js';
@@ -890,7 +890,7 @@ if (cityR && Game.zones) {
     // §S2-E. The dock's HIRE key opens the SAME panel the cabin key does — hiring from a pad and
     // extending from the cabin are one transaction with two doors, and two screens for it would
     // be two screens to keep in step.
-    hire: () => { fleetPanel?.hide(); hirePanel?.show(Story.grounded(story) ? 'ground' : 'extend'); return null; },
+    hire: () => { fleetPanel?.hide(); hirePanel?.show(Story.grounded(story, Game.economy) ? 'ground' : 'extend'); return null; },
     // §S2-I. The FLEET key hands off to the SAME panel the roster, the agency list and the books
     // live on, so there is one company screen in the game and not three that drift.
     // The hire panel goes down first. Both are `.cabin-layer`s at z 40 and a GROUNDED player is
@@ -958,6 +958,7 @@ checkStanding(true);
 
 let story = null;
 let introScene = null, hirePanel = null, endingPanel = null, storyVoice = null;
+let ownPanel = null;
 // §S2-I — the company layer. Declared HERE with the other forward `let`s and not beside its own
 // build block, for the reason this file has now paid for four times: `updateVehicles()` and
 // `craftShown()` both read `viewing` and they run well above where the company is built, and a
@@ -1057,6 +1058,49 @@ function doHire(craftId, blocks) {
       : r.why === 'unknown' ? 'No such hull on the lot.' : 'Not available.' };
 }
 
+// ── the arc's curtain ─────────────────────────────────────────────────────
+//
+// `Story.ownArc` owns the condition and is pure; this is the wiring, and it adds exactly one rule
+// of its own — **the same rule the seizure follows.** The crew arrive at a dock because the player
+// has to be standing somewhere they can act; this lands at a dock because a full-screen panel over
+// a moving craft is the surface arriving somewhere the player cannot put it down. In practice the
+// two are the same frame: the hull is bought from the dock board.
+//
+// It cannot end anything. There is no stage change and no lock, and the only field written is the
+// latch that stops it happening twice.
+
+// Every credit owed to a person, across every charter — a debt parked on a shell is still a debt,
+// which is why this walks the GROUP and not the selected company.
+function arcArrears() {
+  if (!group) return 0;
+  return group.companies.reduce((n, c) => n + (c.arrears || 0), 0);
+}
+
+// What the beat needs that the story does not hold: the shady rung right now, and whether the
+// thread was ever pulled. Both are live state this panel REPORTS and does not own.
+function arcExtra() {
+  const gross = group ? Company.groupShady(group) : 0;
+  return { shady: Ranks.shadyState(gross, Story.shadyOpen(story)),
+    asked: !!(story && story.thread && story.thread.asked) };
+}
+
+function maybeCloseArc() {
+  if (!story || !Game.economy || story.own || !ownPanel || !dockPad) return null;
+  const res = Story.closeArc(story, Game.economy, arcArrears());
+  if (!res) return null;
+  persist();
+  audio?.payment();
+  radio?.event('dispatch_pay');
+  // Both are `.cabin-layer`s at one z and a player who has just bought a hull may well have the
+  // hire panel open behind them — S2-I's lesson, and it reads as a rendering fault rather than as
+  // two screens.
+  hirePanel?.hide();
+  fleetPanel?.hide();
+  threadPanel?.hide();
+  ownPanel.show(res, arcExtra());
+  return res;
+}
+
 // The crew arrive. Called from doDock and NOWHERE else.
 function settleDebt() {
   if (!story || !Game.economy || story.stage !== Story.STAGE.DEBT || !story.due) return null;
@@ -1086,9 +1130,12 @@ if (Game.economy && !FLAG.shot) {
     close: () => {
       // Straight from the ending into the thing that replaces the car. `ground` mode is the hire
       // panel with no hull of its own to extend, which is exactly the situation.
-      if (Story.grounded(story)) hirePanel?.show('ground');
+      if (Story.grounded(story, Game.economy)) hirePanel?.show('ground');
     },
   });
+  // The arc's curtain. It has no `close` work to do — that is the point of it: pressing FLY puts
+  // the player back on the board they were already standing on and nothing anywhere is different.
+  ownPanel = new OwnPanel(document.getElementById('own'), {});
   storyVoice = new StoryVoice({ audio: null, base: './', onError: (k, m) => reportAudio(k, m) });
 }
 
@@ -1673,7 +1720,7 @@ function doDock(pad) {
   // they can immediately hire. It runs AFTER the board is shown so the ending panel lands on top
   // of the screen they will be using thirty seconds later rather than over a black frame.
   if (story && story.due) settleDebt();
-  else if (Story.grounded(story)) hirePanel?.show('ground');
+  else if (Story.grounded(story, Game.economy)) hirePanel?.show('ground');
   return res;
 }
 
@@ -1682,7 +1729,7 @@ function doUndock() {
   // §S2-E — act two with no hire on the meter. There is nothing on the pad that is yours, so
   // UNDOCK opens the hire panel instead of refusing: a button that does nothing is a bug report,
   // and a button that opens the one screen that can fix the situation is an affordance.
-  if (Story.grounded(story)) { hirePanel?.show('ground'); return false; }
+  if (Story.grounded(story, Game.economy)) { hirePanel?.show('ground'); return false; }
   Game.missions.lock(null);
   dockPad = null;
   Game.dock = null;
@@ -1897,16 +1944,20 @@ function tickStory(dt) {
       persist();
     }
   }
+  // The arc's curtain, checked on the same beat as the meter it ends. `Story.ownArc` early-outs on
+  // the latch, so this is a handful of field reads once the beat has fired.
+  maybeCloseArc();
+
   // The cabin key is live exactly when there is something for it to do: on a hire, or grounded.
   // It is `disabled` rather than removed, because a control that appears and disappears is a
   // control the player never learns the position of.
   if (dockUI && dockUI.open) {
     const left = Story.hireLeft(story, simTime);
-    dockUI.hireLabel = Story.grounded(story) ? 'GROUNDED'
+    dockUI.hireLabel = Story.grounded(story, Game.economy) ? 'GROUNDED'
       : left === null ? '' : left <= 0 ? 'LAPSED' : `${Math.ceil(left / 60)}m`;
   }
   if (hireBtn) {
-    const want = !!story.hire || Story.grounded(story);
+    const want = !!story.hire || Story.grounded(story, Game.economy);
     if (hireBtn.classList.contains('hidden') === want) hireBtn.classList.toggle('hidden', !want);
     hireBtn.disabled = !want;
     const left = Story.hireLeft(story, simTime);
@@ -2789,7 +2840,7 @@ Object.defineProperty(window, '__state', {
         stage: story.stage, name: story.name, gender: story.gender,
         t: +story.t.toFixed(2), due: !!story.due, branch: story.branch,
         sent: story.sent.slice(), earned: Math.round(story.earned),
-        grounded: Story.grounded(story),
+        grounded: Story.grounded(story, Game.economy),
         wreckLeft: story.wreckLeft | 0, hireSpend: story.hireSpend | 0, hireBlocks: story.hireBlocks | 0,
         hire: story.hire ? { craft: story.hire.craft, blocks: story.hire.blocks,
           spent: story.hire.spent, left: +Story.hireLeft(story, simTime).toFixed(2) } : null,
@@ -2803,6 +2854,13 @@ Object.defineProperty(window, '__state', {
       intro: introScene ? introScene.stateOf() : null,
       hirePanel: hirePanel ? hirePanel.stateOf() : null,
       ending: endingPanel ? endingPanel.stateOf() : null,
+      // The curtain, and the RAW predicate beside it. A gate that could only see the panel could
+      // not tell "the arc is not complete" from "the arc completed and nothing fired".
+      // `arc` is NESTED and not spread: both objects carry `craft` and `branch`, and a spread would
+      // silently hand the surface's fields to the predicate's — which is exactly the defect
+      // `gates_s2j` A5 caught in `ranks.shadyState`, one file over.
+      own: ownPanel ? { ...ownPanel.stateOf(), latch: !!(story && story.own),
+        arc: Story.ownArc(story, Game.economy, arcArrears()) } : null,
       storyVoice: storyVoice ? storyVoice.state() : null,
       // §S2-I. The company's OWN ledger, from the pure module, plus the live flight state of every
       // driver. A gate reads the same object the panel paints from rather than OCR-ing the screen,
@@ -3097,6 +3155,12 @@ window.__game = {
   },
   endingState: () => (endingPanel ? endingPanel.stateOf() : null),
   closeEnding: () => (endingPanel ? endingPanel.hide() : null),
+  ownState: () => (ownPanel ? { ...ownPanel.stateOf(), latch: !!(story && story.own) } : null),
+  closeOwn: () => (ownPanel ? ownPanel.hide() : null),
+  // The predicate, unlatched, so a gate can knock out one condition at a time and read the answer
+  // rather than reading a boolean that is true for six reasons at once.
+  arcCheck: () => (story && Game.economy ? { ...Story.ownArc(story, Game.economy, arcArrears()),
+    arrearsSum: +arcArrears().toFixed(2) } : null),
   setBorrowed(on) {
     if (!Game.economy) return null;
     Game.economy.borrowed = !!on;

@@ -1080,6 +1080,42 @@ None of these were defects in the layer. All six are the house failure mode.
 determinism 9/9. Screenshots of a bus approaching, entering, vanishing inside and emerging from a
 real doorway on the restored lattice: `shots/tunnel/tram_1..4*.png`.
 
+## S2-P — the arc's curtain, and two shipped defects that made its destination unreachable
+
+**The gap.** Act one closed with `EndingPanel` (kicker "ACT ONE") and `STAGE.ACT2` was terminal.
+The brief's *"'buy your own craft, debt-free' is the real arc rather than a consolation prize"* was
+implemented as **one toast line** in `buyOwnCraft()`. Built: `Story.ownArc` / `Story.closeArc`
+(pure), `storyui.OwnPanel` (a `CabinPanel`, no modal, closes on FLY), `#own`, and
+`tools/gates_end.mjs` (19/19 portrait and landscape, falsified twice by deliberate breakage).
+
+**The trigger is not "you bought a hull".** It is act two + no hire + `borrowed === false` + a hull
+at least as good as the one that was taken + **nothing owed to a person anywhere** (§S2-I payroll
+arrears across the whole group). It is checked every tick and delivered AT A DOCK, the same rule
+the seizure follows. It fires once, latched on `story.own`, which rides in the save on the `story`
+key (already in `REPLACE`, so no `defaults()` entry). It does not move `stage` and locks nothing.
+
+**Two defects found by driving it, both shipped, both on the arc's own path:**
+
+1. **`Story.grounded()` never read ownership.** It was `stage === ACT2 && !story.hire`, so a player
+   who bought a hull outright in act two was still "grounded" — `doUndock` refused and re-opened the
+   hire panel on a craft they owned. **They could not take off.** The `story.grounded` field that
+   `settle()` and `takeHire()` maintain was never read by the function at all. `gates_s2e` D5 missed
+   it because its session never reaches act two (stage is `debt`, so the first term was false).
+   Fixed: `grounded(story, econ)` also requires `econ.borrowed !== false`; all seven call sites
+   updated, plus the hire panel's own "grounded / flying your own hull" line.
+
+2. **`economy.canBuyCraft` treated a BORROWED hull as owned.** `state.craft === id` → `'owned'`,
+   and `settle()` leaves `craft` where it was — so the shop refused to sell a `kestrel` to a player
+   who had just had their parents' `kestrel` taken, and refused to sell anyone the hull they were
+   currently HIRING, which is the most natural purchase in act two. Fixed with `&& !state.borrowed`.
+
+**Still open — not fixed here, and bigger than this beat.** `CRAFT.wisp.price` is **0** and `wisp`
+is unlocked at tier 1, so `buyCraft('wisp')` hands a grounded act-two player a hull for nothing:
+`borrowed` clears, the grounding ends, and **the entire hire loop — the spine of the game — can be
+skipped for 0 CRD at the first dock of act two.** `gates_end` A3/B1 assert the hole is real and
+that the curtain refuses to celebrate it, but the hole itself needs an economy decision: either the
+starter hull is not on the act-two lot, or it costs something once it has been taken off you.
+
 ## Carry-forward
 
 - **T10 — the helper and the fix are DONE by the manager; verification is BLOCKED on P6's boot.**

@@ -91,6 +91,10 @@ export const LADDER = [
 ];
 
 // ── §5.2's slots + §7.4.9's prices ────────────────────────────────────────
+// The free tier-1 courier. Named rather than spelled 'wisp' at each site, because two places
+// deciding what the starter hull is would agree until they did not.
+export const STARTER_HULL = 'wisp';
+
 export const CRAFT = {
   wisp:     { slots: 2, price: 0,     effMul: 1.00 },
   kestrel:  { slots: 3, price: 1800,  effMul: 1.00 },
@@ -344,7 +348,21 @@ export function tickCell(state, dt, opts) {
 export function canBuyCraft(state, id) {
   const c = CRAFT[id];
   if (!c) return { ok: false, why: 'unknown' };
-  if (state.craft === id) return { ok: false, why: 'owned' };
+  // `borrowed` is load-bearing here and was added after this line was written. Without it the shop
+  // refuses to sell you the hull you are HIRING — which is the single most natural purchase in act
+  // two — and refuses to sell a `kestrel` to a player who ended act one nominally sitting in their
+  // parents' one, because `settle()` leaves `craft` where it was. Owning is what 'owned' means.
+  if (state.craft === id && !state.borrowed) return { ok: false, why: 'owned' };
+  // THE STARTER HULL IS NOT SOLD, and this is a rule about the shape of the game rather than about
+  // pricing. `wisp` lists at 0 and unlocks at tier 1, so the shop would hand a grounded act-two
+  // player a hull for nothing — which clears `borrowed`, ends the grounding, and deletes the hire
+  // loop that S2_BRIEF calls the spine of the game, about ten seconds into act two. Nobody has a
+  // legitimate claim on it either: since S2-E the player starts in a BORROWED `kestrel`, so no
+  // career ever passes through a wisp and the free hull has no buyer it was meant for.
+  //
+  // It stays in CRAFT — it is a valid save value, it has a flight model and a hull, and
+  // WISP_NOTIONAL exists downstream precisely because its list price is 0. It is simply off the lot.
+  if (id === STARTER_HULL) return { ok: false, why: 'starter' };
   if (!unlockedCraft(state.tier).includes(id)) return { ok: false, why: 'licence' };
   if (state.credits < c.price) return { ok: false, why: 'credits', short: c.price - state.credits };
   return { ok: true, price: c.price };

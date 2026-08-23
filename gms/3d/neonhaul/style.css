@@ -1739,6 +1739,9 @@ html, body {
   margin-bottom: 12px; color: #6cff9c;
 }
 .en-kick.seized { color: #ff5a52; }
+/* The curtain is the other end of the arc: the seized road gets there too, so its kicker must not
+   go on reading like a repossession. Scoped to #own so the act-one panel is untouched. */
+#own .en-kick, #own .en-kick.seized { color: #6cff9c; }
 .en-p { margin: 0 0 9px; font: 400 12px/1.5 system-ui, sans-serif; color: var(--text); }
 .en-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin: 13px 0 11px; }
 .en-cell {
@@ -1762,13 +1765,14 @@ html, body {
      PRIMARY ACTION off screen, which is the defect gates_s2d B7 exists to catch on the dock sheet.
      Scoped to these two hosts on purpose: #settings is a list of rows and scrolls happily, and
      turning the shared CabinPanel into a flex column would change it too. */
-  #ending .hud-panel, #hire .hud-panel {
+  #ending .hud-panel, #hire .hud-panel, #own .hud-panel {
     display: flex; flex-direction: column; max-height: 100%; overflow: hidden;
   }
-  #ending .hp-body, #hire .hp-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
-  #ending .hp-head, #hire .hp-head, #ending .hp-foot, #hire .hp-foot { flex: 0 0 auto; }
-  #ending .hp-foot, #hire .hp-foot { margin-top: 8px; }
-  #ending .hp-close, #hire .hp-close { padding: 9px; }
+  #ending .hp-body, #hire .hp-body, #own .hp-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  #ending .hp-head, #hire .hp-head, #own .hp-head,
+  #ending .hp-foot, #hire .hp-foot, #own .hp-foot { flex: 0 0 auto; }
+  #ending .hp-foot, #hire .hp-foot, #own .hp-foot { margin-top: 8px; }
+  #ending .hp-close, #hire .hp-close, #own .hp-close { padding: 9px; }
   .hr-fleet .hr-row { padding: 5px 9px 6px; }
   .hrb { padding: 5px 3px 4px; }
   .hrm-v { font-size: 18px; }

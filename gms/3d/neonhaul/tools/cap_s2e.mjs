@@ -151,4 +151,44 @@ if (!ONLY || ONLY === 'ending') {
   }
 }
 
+// ── the arc's curtain, on both roads and with the shady door climbed ───────
+//
+// It has no beat clock of its own — it is a panel, not a scene — so there is nothing here to
+// derive from storyui.js the way the cutscene captures above are. What there IS to get right is
+// the FIXTURE: every cell on this panel is a real number, and a capture that bought the hull
+// without ever hiring one photographs "SPENT ON HIRE 0 CRD", which is a picture of the harness
+// rather than of the screen. So each arm plays the hire loop first.
+if (!ONLY || ONLY === 'own') {
+  const arms = [
+    ['own_paid', '/index.html?nosave=1&intro=0&story=paid&crd=62000&tier=2', 0],
+    ['own_seized', '/index.html?nosave=1&intro=0&story=seized&crd=4000&tier=2', 0],
+    ['own_broker', '/index.html?nosave=1&intro=0&story=seized&crd=4000&tier=2&fleet=1&shady=1', 130000],
+  ];
+  for (const [name, url, shady] of arms) {
+    console.log(`${name} ${W}x${H}`);
+    const { S, close } = await session(url);
+    await evalJSON(S, '(window.__game.clearToasts(), 1)');
+    await hook(S, 'forceDock', 0);
+    await settle(S, 12);
+    await hook(S, 'closeEnding');
+    await hook(S, 'closeHirePanel');
+    // The hire loop, so the burn on the panel is a burn the run actually paid.
+    await hook(S, 'grantCredits', 20000);
+    await hook(S, 'hire', 'wisp', 4);
+    await settle(S, 8);
+    await hook(S, 'hire', 'wisp', 2);
+    await settle(S, 8);
+    if (shady) await evalJSON(S, `(window.__game.company.shadyGross = ${shady}, 1)`);
+    await hook(S, 'grantCredits', 20000);
+    await hook(S, 'buyCraft', 'kestrel');
+    await settle(S, 20);
+    await evalJSON(S, '(window.__game.clearToasts(), 1)');
+    await settle(S, 6);
+    await shot(S, name);
+    console.log(`  ${name}:`, JSON.stringify(await evalJSON(S,
+      '({open:__state.own.open, title:__state.own.title, need:__state.own.arc.need, latch:__state.own.latch})')));
+    await close();
+  }
+}
+
 console.log('done');
