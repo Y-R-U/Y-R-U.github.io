@@ -90,9 +90,13 @@ export function roadPhase(family, seed) {
   return (hash2i(family, 23, seed ^ 0x5b21) % 4) * LOT;
 }
 
-// The distinct road TRAVEL lines — deduplicated, because two families can roll the same phase on
-// the same axis and then drive down the same street. On the shipped seed families 1 and 3 do
-// exactly that, and a portal placed once per family would be two coplanar quads z-fighting.
+// The distinct road TRAVEL lines — deduplicated, because two families CAN roll the same phase on
+// the same axis and then drive down the same street, and a portal placed once per family would be
+// two coplanar quads z-fighting. This comment used to say families 1 and 3 do exactly that on the
+// shipped seed; they do not — the phases are 102.4, 0, 0, 153.6, so the collision is between 1 and
+// 2, which are different axes and never shared a line. The dedup is still right, and gates_road R7
+// asserts the case it guards against does not arise on this seed rather than leaving it to a
+// comment: two families on ONE axis sharing a phase would put twelve vehicles into ten slots.
 export function roadLines(seed) {
   const out = [], seen = new Set();
   for (let a = 0; a < R_FAM; a++) {
@@ -105,6 +109,68 @@ export function roadLines(seed) {
     }
   }
   return out;
+}
+
+// ── why the street population moves on a lattice, at one speed ────────────
+//
+// Aaron, on the shipped build: *"trains go through each other, one needs to wait for the other."*
+// Measured off the real `roadList` over 100 s: 1,570 overlapping pairs SAME LANE SAME DIRECTION
+// (a 16.5 m/s tram driving through a 10.6 m/s bus from behind — there is no following behaviour
+// and there cannot be one, because `roadPosOf` is a pure function of time) and 77 at a crossing.
+//
+// Both fall out of one arithmetic fact. Write an axis-0 vehicle's offset from a junction as
+// `F` and an axis-1 vehicle's offset from the same junction as `G`. If the two share a speed then
+// `F - G` (same direction sign) or `F + G` (opposite) is CONSTANT for all time — the `vt` terms
+// cancel. An overlap needs `|F| < h1` and `|G| < h0` at the same instant, so it needs
+// `|F ∓ G| < h0 + h1`; keep that constant away from zero and the pair can never touch, forever,
+// with no state and no integration. `h0 + h1` is at worst `(32 + 3)/2 * 2 = 35 m`, two hauliers.
+//
+// What the constant is: the tile snaps are whole multiples of `CORR` and the ±`R_LANE` terms
+// cancel with the direction, so it reduces to `(phase_p ∓ phase_q) + (A_p ∓ A_q)` mod `CORR`,
+// where `A` is a vehicle's along offset. Give every vehicle an `A` on the `CORR` lattice with the
+// per-lane offset below — its axis's base MINUS its own family phase, which is what absorbs the
+// phase term — and the constant is ±`LOT` for every crossing pair on every seed.
+//
+// `LOT` (51.2 m) is the ceiling, not a choice. The four road phases are multiples of `LOT`, and
+// the opposite-direction case picks up `2*(phase_p + phase_q)`, which is `0` or `2*LOT` mod
+// `CORR`; a margin that has to clear both is at most `LOT/2` away from each, i.e. `LOT`. So the
+// budget for the give-way hold below is `LOT - 35 = 16.2 m`, and R_HOLD spends 12 of it.
+//
+// Same lane, same direction falls out for free: one speed means constant spacing, and the lattice
+// puts the closest two vehicles a whole `CORR` = 204.8 m apart — six times the longest hull.
+export const R_SPEED = 12;             // m/s — 43 km/h, the mean of the 8–17 m/s spread it replaces
+export const R_SLOTS = W_TILE / CORR;  // 10 along slots per tile
+
+// Which axis yields. Aaron: *"perhaps have one direction always give way to another to keep it
+// simple?"* — so it is a fixed rule and not a negotiation. Axis 1 is the one that can carry it:
+// the junctions on a Z street are the X families' phases, and on the shipped seed those are
+// evenly spaced at 102.4 m, where the X street's junctions are not.
+export const R_YIELD_AXIS = 1;
+export const R_HOLD = 12;              // metres of lag at a full yield — see the budget above
+// The width of the deceleration ramp. A smoothstep's peak slope is 1.5, so `dλ/du` peaks at
+// `1.5 * R_HOLD / R_HOLD_W`; at 0.97 the vehicle is down to 3 % of R_SPEED at the stop line and
+// AT 1.0 IT WOULD RUN BACKWARDS. That is the only hard constraint on this number.
+export const R_HOLD_W = 1.5 * R_HOLD / 0.97;
+export const R_HOLD_BASE = 0.4;        // amplitude at a junction with nothing crossing it
+
+// A road lane's along-lattice offset: the axis base, minus the family phase that would otherwise
+// land in the crossing constant.
+export function roadSlotBase(axis, phase) {
+  return ((((axis === R_YIELD_AXIS ? LOT : 0) - phase) % CORR) + CORR) % CORR;
+}
+
+// Where a yielding vehicle travelling in `dir` meets cross traffic, as offsets in its own
+// increasing-progress coordinate, sorted. One entry per distinct family phase on the other axis:
+// a family's two directions sit ±R_LANE either side of its phase, which is one junction and not
+// two.
+export function roadXings(seed, dir) {
+  const out = [];
+  for (let a = 0; a < R_FAM; a++) {
+    if ((a & 1) === R_YIELD_AXIS) continue;
+    const q = (((dir * roadPhase(a, seed)) % CORR) + CORR) % CORR;
+    if (!out.some(v => Math.abs(v - q) < 1e-6)) out.push(q);
+  }
+  return out.sort((p, q) => p - q);
 }
 
 // Every travel line of `lines` whose band [line - half, line + half] touches [c0, c1].

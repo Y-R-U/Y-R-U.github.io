@@ -50,7 +50,8 @@ import { hash2i, clamp, smoothstep } from './utils.js';
 // that agrees for four phases and then does not. They are re-exported at the bottom of this file,
 // so every existing `import { ALT } from './traffic.js'` still resolves.
 import { ALT, LOT, CORR, NC, CT, W_TILE, LANE_SEP, lanePhase,
-  R_LANE, R_NC, R_CT, roadPhase } from './lanes.js';
+  R_LANE, R_NC, R_CT, roadPhase, R_SPEED, R_SLOTS, R_YIELD_AXIS, R_HOLD, R_HOLD_W,
+  R_HOLD_BASE, roadSlotBase, roadXings } from './lanes.js';
 
 // Lower lanes carry more traffic: the canyon shots are the ones the plates are made of, and a
 // 270 m lane is three pixels of glow. Normalised at build time, so the totals still add to
@@ -202,14 +203,20 @@ function buildLanes(seed) {
 const R_NL = 8;                  // road lanes: four corridor families x two directions
 const R_NEAR = 200;              // road vehicles promote later than the flying 220 m line
 const R_NEAR_MAX = 240;
+// How far up the priority street a crosser still counts as "coming". Under about 40 m nothing ever
+// qualifies: the crossing constant in lanes.js keeps the pair LOT metres apart in F ∓ G, so a
+// priority vehicle sitting on the junction at the moment this one arrives is arithmetically
+// impossible. 80 m catches the ones that are a couple of seconds out.
+const R_YIELD_R = 80;
 
 function buildRoadLanes(seed) {
   const lanes = [];
   for (let i = 0; i < R_NL; i++) {
     const a = i >> 1;
+    const axis = a & 1, phase = roadPhase(a, seed);
     lanes.push({
-      i, dir: (i & 1) ? 1 : -1, axis: a & 1,
-      phase: roadPhase(a, seed),
+      i, dir: (i & 1) ? 1 : -1, axis, phase,
+      slotBase: roadSlotBase(axis, phase),
       n: 0, first: 0, nAlong: 1,
     });
   }
@@ -292,6 +299,15 @@ export class Traffic {
     // instances sit at [N, N + rN)), the craft fields, and nothing else — so every existing gate
     // that walks the flying population keeps measuring exactly what it measured before.
     this.rLanes = buildRoadLanes(this.seed);
+    // Where a yielding vehicle meets cross traffic, per direction. Derived once: it is a property
+    // of the seed's four road phases and nothing else.
+    this.rXing = { '-1': roadXings(this.seed, -1), 1: roadXings(this.seed, 1) };
+    // gates_road's two falsification switches. `roadVariety` puts the per-vehicle speed spread
+    // back (see `_deriveRoad`); `holdScale` multiplies the give-way, and past 1 it spends more
+    // than the LOT-metre crossing margin lanes.js proves — which is how the sweep is shown able to
+    // find the CROSSING case Aaron described and not only the rear-end one.
+    this.roadVariety = false;
+    this.holdScale = 1;
     this.rN = 0;
     this.rType = new Uint8Array(CAP_ROAD);
     this.rLane = new Uint8Array(CAP_ROAD);
@@ -427,12 +443,19 @@ export class Traffic {
         const h = hash2i(l.i, j, this.seed ^ 0x1e77);
         const h2 = hash2i(j, l.i, this.seed ^ 0x40c9);
         const m = (j / R_NC) | 0;
-        const jitter = ((h & 0xffff) / 65535 - 0.5) * 0.7;
-        this.rU[gi] = (m + 0.5 + jitter) / l.nAlong;
+        // The along lattice. `m` is the slot index within this vehicle's own travel line, and the
+        // seeded `step` (coprime with R_SLOTS, so the map is injective while nAlong <= R_SLOTS,
+        // which CAP_ROAD/R_NL/R_NC = 6 guarantees) is what stops the line reading as a conveyor of
+        // evenly spaced vehicles. lanes.js's header has why the offset is `slotBase`.
+        const hs = hash2i(l.i * 5 + ((gi - l.first) % R_NC), 91, this.seed ^ 0x63b1);
+        const slot = (m * [1, 3, 7, 9][hs % 4] + ((hs >>> 8) % R_SLOTS)) % R_SLOTS;
+        this.rU[gi] = (l.slotBase + slot * CORR) / W_TILE;
         this.rLane[gi] = l.i;
-        // 8-17 m/s: 30-60 km/h, which is a city bus, and slow enough that the streak reads as a
-        // vehicle on a street rather than as another lane of the flying traffic.
-        this.rSpeed[gi] = 8 + ((h >>> 16) / 65536) * 9;
+        // ONE speed for the whole street population — see the block in lanes.js. This WAS
+        // `8 + u * 9`, and that 2x spread is the whole of Aaron's rear-end defect: two vehicles on
+        // one line at different speeds close on each other and there is no following behaviour to
+        // stop them. The variety it carried has moved to the yield, which is per-junction.
+        this.rSpeed[gi] = this.roadVariety ? 8 + ((h >>> 16) / 65536) * 9 : R_SPEED;
         let u = (h2 & 0xffff) / 65536, acc = 0, ty = 0;
         for (let ti = 0; ti < ROAD_TYPES.length; ti++) { acc += ROAD_TYPES[ti].w; if (u < acc) { ty = ti; break; } ty = ti; }
         this.rType[gi] = ty;
@@ -479,7 +502,11 @@ export class Traffic {
       dir[s * 3] = l.axis === 0 ? l.dir : 0;
       dir[s * 3 + 1] = 0;
       dir[s * 3 + 2] = l.axis === 0 ? 0 : l.dir;
-      size[s * 2] = 3.5 + this.rSpeed[i] * 0.30;
+      // Length, not speed. A flying streak is "length proportional to speed" (§5.5) because the
+      // flying fleet still HAS a speed spread; the street population no longer does, and a fleet
+      // of identical 7.1 m smears throws away the one silhouette cue the road types carry. A
+      // 32 m haulier now smears further than a 12 m bus, which is what it looked like before.
+      size[s * 2] = 3.2 + CRAFT_DEFS[ROAD_TYPES[this.rType[i]].id].L * 0.16;
       size[s * 2 + 1] = 0.95;
       const c = this._col.setHex(l.dir > 0 ? R_HEAD : R_TAIL).convertSRGBToLinear();
       col[s * 3] = c.r; col[s * 3 + 1] = c.g; col[s * 3 + 2] = c.b;
@@ -506,7 +533,9 @@ export class Traffic {
     const l = this.rLaneOf(i);
     const along0 = l.axis === 0 ? camX : camZ;
     const cross0 = l.axis === 0 ? camZ : camX;
-    const s = (((this.rU[i] * W_TILE + l.dir * this.rSpeed[i] * t) % W_TILE) + W_TILE) % W_TILE;
+    const a = this.rU[i] * W_TILE + l.dir * this.rSpeed[i] * t;
+    const lag = this.roadLag(i, l.dir * a, camX, camZ);
+    const s = (((a - l.dir * lag) % W_TILE) + W_TILE) % W_TILE;
     const tileA = Math.round(along0 / W_TILE) * W_TILE - W_TILE / 2;
     const tileC = Math.round((cross0 - l.phase) / R_CT) * R_CT - R_CT / 2;
     const along = tileA + s;
@@ -516,6 +545,74 @@ export class Traffic {
     out[1] = CRAFT_DEFS[ROAD_TYPES[this.rType[i]].id].H * 0.5;
     out[4] = 0;
     return out;
+  }
+
+  // ── the give-way ─────────────────────────────────────────────────────────
+  //
+  // How far behind its free-running position vehicle `i` is, in metres, given its progress `q`
+  // (= dir * along, so it always increases). Zero on the priority axis.
+  //
+  // This is a HOLD, not a decision: it is a pure function of the vehicle's own progress, so it
+  // costs no state, cannot depend on how long the page has been open, and is bit-identical across
+  // page loads — which is the property `trafficHash` and gates_p5 exist to protect. It is bounded
+  // by R_HOLD because the crossing proof in lanes.js is only worth `LOT` metres of margin and a
+  // pair of hauliers already eats 35 of it.
+  //
+  // The profile is a smoothstep down into the stop line and a longer smoothstep back out, and the
+  // two meet at exactly `gap` so consecutive junctions are contiguous with no seam. Both ends have
+  // zero slope, so the amplitude may change from one junction to the next without the vehicle
+  // jumping — which is what lets `roadYield` answer differently at each one.
+  roadLag(i, q, camX, camZ) {
+    const l = this.rLaneOf(i);
+    if (l.axis !== R_YIELD_AXIS) return 0;
+    const cs = this.rXing[l.dir];
+    // Half a hull, half a carriageway, and a nose-to-kerb margin: where the vehicle stops.
+    const clear = CRAFT_DEFS[ROAD_TYPES[this.rType[i]].id].L * 0.5 + R_LANE + 4.1;
+    for (let k = 0; k < cs.length; k++) {
+      const gap = k + 1 < cs.length ? cs[k + 1] - cs[k] : CORR - cs[k] + cs[0];
+      const base = (((cs[k] - clear + R_HOLD * 0.5) % CORR) + CORR) % CORR;
+      const x = ((((q - base + CORR * 0.5) % CORR) + CORR) % CORR) - CORR * 0.5;
+      if (x < -R_HOLD_W * 0.5 || x > gap - R_HOLD_W * 0.5) continue;
+      const amp = this.roadYield(i, q - x + clear - R_HOLD * 0.5, camX, camZ) * this.holdScale;
+      return x <= R_HOLD_W * 0.5
+        ? amp * R_HOLD * smoothstep((x + R_HOLD_W * 0.5) / R_HOLD_W)
+        : amp * R_HOLD * (1 - smoothstep((x - R_HOLD_W * 0.5) / (gap - R_HOLD_W)));
+    }
+    return 0;
+  }
+
+  // How hard vehicle `i` yields at the junction whose progress coordinate is `qc`: a full stop if
+  // a priority vehicle is genuinely closing on that junction when this one would reach it, and
+  // R_HOLD_BASE otherwise. Constant across the whole hold, because `qc` is.
+  //
+  // Be clear about what this is worth: the lattice has ALREADY made the collision impossible, so
+  // a real closing crosser turns up at about 1.4 % of junction passes and the base ease is what
+  // is on screen almost all the time. The test is here so that when a bus does stop dead there is
+  // something crossing in front of it.
+  roadYield(i, qc, camX, camZ) {
+    const l = this.rLaneOf(i);
+    const tArr = (qc - l.dir * this.rU[i] * W_TILE) / this.rSpeed[i];
+    const tileAx = Math.round(camX / W_TILE) * W_TILE - W_TILE / 2;
+    const tileAz = Math.round(camZ / W_TILE) * W_TILE - W_TILE / 2;
+    const cross0 = l.axis === 0 ? camZ : camX;
+    // Where this vehicle will be across the priority axis, and which junction line it is at.
+    const mine = (Math.round((cross0 - l.phase) / R_CT) * R_CT - R_CT / 2)
+      + l.phase + this.rCorridorOf(i) * CORR + l.dir * R_LANE;
+    const jn = (l.axis === 0 ? tileAx : tileAz)
+      + (((((l.dir * qc) % W_TILE) + W_TILE) % W_TILE));
+    for (let p = 0; p < this.rN; p++) {
+      const pl = this.rLaneOf(p);
+      if (pl.axis === l.axis) continue;
+      const line = (Math.round(((pl.axis === 0 ? camZ : camX) - pl.phase) / R_CT) * R_CT - R_CT / 2)
+        + pl.phase + this.rCorridorOf(p) * CORR + pl.dir * R_LANE;
+      if (Math.abs(line - jn) > R_LANE * 1.5) continue;
+      const half = CRAFT_DEFS[ROAD_TYPES[this.rType[p]].id].L * 0.5;
+      const at = (pl.axis === 0 ? tileAx : tileAz)
+        + ((((this.rU[p] * W_TILE + pl.dir * this.rSpeed[p] * tArr) % W_TILE) + W_TILE) % W_TILE);
+      const closing = (mine - at) * pl.dir;          // + = still short of the junction
+      if (closing > -half && closing < R_YIELD_R + half) return 1;
+    }
+    return R_HOLD_BASE;
   }
 
   roadYawOf(i) {
@@ -848,6 +945,10 @@ export class Traffic {
         i, type: id, lane: l.i, dir: l.dir, axis: l.axis, L: CRAFT_DEFS[id].L,
         x: +p[0].toFixed(2), y: +p[1].toFixed(2), z: +p[2].toFixed(2),
         speed: +this.rSpeed[i].toFixed(2), edge: this.rEdge[i],
+        // The give-way hold, in metres behind the free-running position. A gate that wants to
+        // prove the hold is doing anything has to read this, not infer it from a position.
+        lag: +this.roadLag(i, l.dir * (this.rU[i] * W_TILE + l.dir * this.rSpeed[i] * t),
+          cam.x, cam.z).toFixed(3),
         body: BODY_TINTS[this.rBody[i]], trim: TRIM_TINTS[this.rTrim[i]],
         offRoad: +offRoad.toFixed(3),
         d: +Math.sqrt(dx * dx + dy * dy + dz * dz).toFixed(2),
@@ -976,4 +1077,4 @@ export class Traffic {
 }
 
 export { ALT, CORR, NC, CT, W_TILE, LANE_SEP, NEAR_LINE, TYPES, ROAD_TYPES, EDGE_W,
-  R_LANE, R_NC, R_CT, R_NEAR };
+  R_LANE, R_NC, R_CT, R_NEAR, R_SPEED, R_SLOTS, R_YIELD_AXIS, R_HOLD, R_YIELD_R };

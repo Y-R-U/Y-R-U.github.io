@@ -670,7 +670,11 @@ if (!pickBore) {
       `walking the approach at 1/30 s: the entry leaf first reads 1.0 with the nose still `
       + `${gap.toFixed(2)} m short of the mouth (${opened ? opened.nose.toFixed(1) : 'never'} vs ${entry.toFixed(1)})\n`
       + `the door model is LEAD ${tstate.lead} m ahead / TRAIL ${tstate.trail} m behind over ${tstate.doorT} s of travel, `
-      + `and this transport does ${V.speed} m/s — the slowest in the fleet still clears it`);
+      + `and this transport does ${V.speed} m/s. That used to read "the slowest in the fleet still
+`
+      + `clears it", which is now vacuous: S2-O gave the whole street population ONE speed, so there
+`
+      + `is no slowest. The check is unaffected — the door model is DISTANCE-driven, not timed.`);
 
     // FALSIFY (a): with the population switched off every leaf must close. A door stuck open
     // satisfies T5's first half for free.

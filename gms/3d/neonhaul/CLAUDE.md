@@ -85,7 +85,7 @@ node tools/shot.mjs --shot=fog_city  # a render + its perf snapshot
 ```
 
 Suites: `p1a p2 p3a p3b p4 p5 p6 p7a p7b p8 p11 wire`, plus the season-2 suites
-`s2a s2c s2d s2e s2f s2g s2h s2i s2j s2k`, `boot`, `tunnel`, and `determinism`, `t10_falsify`,
+`s2a s2c s2d s2e s2f s2g s2h s2i s2j s2k`, `boot`, `tunnel`, `road`, `vo`, and `determinism`, `t10_falsify`,
 `budget`, `soak`, `sim_s2f`, `sim_s2i`, `fleet_rate`.
 **`gates_p5` and `gates_p7a`/`p8` write a different JSON schema from `p1a`–`p4`
 (`ok`/`fail` rather than `results`)** — a parser that reads only `results` reports 0/0 on a suite

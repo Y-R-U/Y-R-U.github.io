@@ -3311,7 +3311,21 @@ window.__game = {
   // The road corridor lattice as traffic.js itself built it, so a gate can assert the tunnel
   // layer's copy against the population's rather than against its own re-derivation.
   roadLanes: () => (traffic ? traffic.rLanes.map(l => ({ i: l.i, axis: l.axis, dir: l.dir,
-    phase: l.phase, n: l.n })) : null),
+    phase: l.phase, slotBase: l.slotBase, n: l.n, nAlong: l.nAlong, first: l.first })) : null),
+  // gates_road's falsification switch. It puts the 8-17 m/s per-vehicle speed spread back — the
+  // exact thing that made a tram drive through a bus from behind — and re-derives, so a sweep that
+  // reports zero overlaps has to show itself finding them again with this on. An override: nothing
+  // in the frame writes `roadVariety`, so the game loop cannot undo it.
+  setRoadVariety(on) {
+    if (!traffic) return null;
+    traffic.roadVariety = !!on;
+    traffic._deriveRoad();
+    return traffic.roadVariety;
+  },
+  // The other half of gates_road's falsification: scale the give-way hold. 1 is shipped; above
+  // about 1.35 the hold outgrows the crossing margin, and above 1.03 it outgrows the slope that
+  // keeps a vehicle moving forwards.
+  setRoadHold(k) { return traffic ? (traffic.holdScale = +k) : null; },
   trafficSeed: () => (traffic ? traffic.seed : null),
   // §S2-K D4. The three hooks above are RENDER levers and none of them can move `ms.gen`: the
   // shopfronts are packed inside §3.2.3's work unit (4) whether or not the shader ever draws them.
