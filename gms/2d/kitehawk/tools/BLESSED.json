@@ -1,0 +1,58 @@
+{
+  "loop": {
+    "hash": "9b3c54d0",
+    "secs": 5.383,
+    "alphaMaxDeg": 14.32,
+    "assert": true
+  },
+  "stallTurn": {
+    "hash": "f19f0696",
+    "secs": 2.583,
+    "minV": 22.8,
+    "released": true,
+    "assert": true
+  },
+  "immelmann": {
+    "hash": "c88983bb",
+    "gainM": 65.2,
+    "secs": 2.08,
+    "roll": -1,
+    "assert": true
+  },
+  "splitS": {
+    "hash": "8210e415",
+    "lossM": 48.2,
+    "assert": true
+  },
+  "glide": {
+    "hash": "12c1300a",
+    "rangeM": 3970,
+    "ld": 7.94,
+    "assert": true
+  },
+  "diveRecover": {
+    "hash": "bc87023e",
+    "extentWu": 585,
+    "peakStress": 1.059,
+    "hullHP": 14.7,
+    "assert": true
+  },
+  "stallRecover": {
+    "hash": "0662cd27",
+    "brokeAt": 0.45,
+    "recoveredIn": 1.38,
+    "alphaMaxDeg": 41.8,
+    "assert": true
+  },
+  "stallSides": {
+    "hash": "4L/8R",
+    "left": 4,
+    "right": 8,
+    "assert": true
+  },
+  "landing": {
+    "hash": "773bf819",
+    "touchdown": 19.3,
+    "assert": true
+  }
+}

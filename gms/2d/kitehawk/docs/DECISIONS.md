@@ -550,3 +550,68 @@ hue, shadow hue, key chroma, value spread, largest axis) rather than a single me
 collapsed the whole ramp to one number; **A4** counts confusable repeats — same id *and* similar
 scale *and* same flip — because the id-only proxy broke once the deck got denser. Act 1's −6.50 is
 **stale**: it was repaired after scoring and not re-run.
+
+**D72** — **P3's closeout: six instrument defects, and not one was found by reading code.** Each
+came from running a check against something that should fail it. Worth listing because the failure
+modes recur: A3's control scored *better* than the real strip; A6 measured the post-process noise
+floor; the crossfade metric reported 0.00 s; the A5 control parsed a superseded format; **`verify.js`
+kept a duplicate of a renderer constant which then drifted**; and fixing that drift revealed A6 had
+quietly become a test of the layer config rather than of the art.
+
+The duplicated-constant one is the most transferable: **a harness that re-declares a value the code
+under test also declares is testing itself.** P2 avoided this by keeping `camera.js` DOM-free so the
+harness drives the real module; P1 avoided it by reading the marker back out of the framebuffer and
+inverting the shader rather than re-running its own arithmetic in JS. Make the harness consume the
+real value or measure the real output — never keep a second copy.
+
+A6 now reports art p90 **0.0902** and drawn p90 **0.0199** against a 0.12 ceiling, control **0.2517**
+red. All asset gates pass with every control red.
+
+**D73** — **P4 landed the airframe: 14/14 gates, 9/9 fixtures, both immovable numbers held.**
+`m 520 kg · S 23.5 m² · CLmax 1.459 · CD0 0.05896 · T0 3207 N · Vne 93`. Turn diameter **263 wu**
+(≤286) and stall **16.08** (16.5±1). The structural insight that made an over-determined system
+solvable: **an airframe has four observable numbers, not six** — `Vs`, `T/W`, `CD0/CLmax`,
+`kInd·CLmax`; everything else is redundant parameterisation. DESIGN §1.4's original guesses survived
+well (CD0 0.060 → 0.05896, AR 5.5 → 5.82).
+
+**D74** — **THE DIVE RECOVERY IS 585 wu, NOT 1,053 — and this changes the portrait case in both
+directions.** ARCHITECTURE computed it as a constant-speed half-loop; a real pull-out sheds 30 m/s
+while it happens. Consequences, manager-verified:
+- **Portrait contains a full-speed dive recovery with no zoom-out at all** (58% of frame; required
+  zoom rises from 0.855 to ~1.10). The binding constraint on the zoom window is gone and the window
+  widens substantially. This is the biggest thing P4 hands P8.
+- **But the argument against landscape is now much thinner.** At 1,053 wu landscape was 88% over its
+  frame; at 585 wu it is **4% over** (585 vs 560). Portrait still wins on this criterion and the
+  earlier conclusion survives, **but it no longer survives comfortably** and must not be quoted as
+  though it does. P8 decides on the full suite, not on this one number.
+
+**D75** — **Two spec numbers had to move, and P4 was right to move them rather than fudge:**
+- **ARCHITECTURE's 126 °/s pitch rate → 95 °/s.** R-01 freed six coefficients to fix the 10.1 g
+  problem, but no combination of them can: `n = √(1+(ωv/g)²)` depends on ω and v alone. The pitch
+  envelope itself had to give. Corner load is now 5.6 g and the turn circle got *smaller* (263 vs
+  273) because corner speed fell with the rate.
+- **R-01's `A = 2.8` as literally worded deletes the stall from the game** — multiplying all lift by
+  2.8 puts minimum flying speed at 9.9 m/s, so the 16.5 m/s stall criterion would measure something
+  that does not exist. Implemented as a multiplier on the *manoeuvring margin*, exactly 1 g at the
+  stall. **Shipped agility is 2.11×, not 2.8×, and the notes say so plainly rather than dressing it up.**
+
+**D76** — **Three real defects, one severe.** DESIGN §1.3 resolves lift on the **body normal**, which
+double-counts induced drag: at a 14° corner-turn alpha the aircraft bled **−45 m/s instead of −7.2**
+and glided at L/D 2.44 instead of 7.89. Fixed to wind axes and shipped alongside as
+`--break lift-body-axis`. Also: §1.8's auto-upright condition could never fire after an Immelmann
+(level flight leftward is γ=π), and §8.1's `speed ≤ Vne × 1.05` invariant is **violated by legal
+flight** — terminal rises with altitude, so a dive from the ceiling reaches ~104 m/s. Implemented as
+`terminal(altitude) × 1.05` rather than hard-capping the dive.
+
+**D77** — **D32 closed: "4.5 g" is deleted.** `STRESS = |n| / 11.13`, anchored on a full pull-out at
+Vne rather than the corner turn — that anchor would make the ordinary *sustained* combat turn read
+0.91 stress and black the pilot out. Enforcement is real: over-stress costs 200 HP/s of excess.
+**D33/R-08 closed**: both terminals are tabulated with their conditions — unpowered 77.32, powered
+95.79 = Vne × 1.030 — so over-the-red is reachable. The flutter coefficient fell 1.8 → 0.161 and
+that is *forced*, not chosen: with terminal pinned to Vne×1.02–1.05 only 3% of drag is left for it.
+
+**D78** — **Falsification again earned its place: two of the seven break-switches originally passed
+the entire suite.** `no-stall-bias` (the wing drop alone reverses the aircraft, so one of the three
+stall components was unprotected) and `fixed-drop` (every fixture ran one seed, which happened to
+draw the hardcoded side). Both now have dedicated fixtures. Third phase running, third time this
+technique found a hole in the tests themselves.

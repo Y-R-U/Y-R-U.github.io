@@ -1,0 +1,217 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KITEHAWK — flight envelope</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #14171c; color: #d8dde4; font: 13px/1.45 ui-monospace, Menlo, monospace; }
+  header { padding: 10px 14px; border-bottom: 1px solid #2a2f38; display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
+  h1 { font: 600 15px/1 ui-monospace, monospace; margin: 0; letter-spacing: .06em; }
+  select, button { background: #202631; color: inherit; border: 1px solid #39414e; border-radius: 4px; padding: 4px 8px; font: inherit; }
+  main { display: grid; grid-template-columns: minmax(340px, 1fr) minmax(300px, 460px); gap: 14px; padding: 14px; align-items: start; }
+  @media (max-width: 760px) { main { grid-template-columns: 1fr; } }
+  canvas { width: 100%; height: auto; background: #191d24; border: 1px solid #2a2f38; border-radius: 6px; display: block; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: right; padding: 3px 7px; border-bottom: 1px solid #242a33; }
+  th:first-child, td:first-child { text-align: left; color: #97a1b0; }
+  .k { color: #7fb2ff; } .w { color: #ffcc66; } .bad { color: #ff7b72; }
+  p.note { grid-column: 1 / -1; color: #8b95a4; margin: 0; max-width: 78ch; }
+</style>
+
+<header>
+  <h1>KITEHAWK · ENVELOPE</h1>
+  <select id="frame"></select>
+  <select id="alt">
+    <option value="120">sea level (rig 120 m)</option>
+    <option value="500">500 m</option>
+    <option value="1350">1350 m — the Blue</option>
+  </select>
+  <span id="status">…</span>
+</header>
+
+<main>
+  <canvas id="turn" width="900" height="560"></canvas>
+  <div>
+    <table id="tbl"></table>
+    <p class="note" style="margin-top:10px">
+      Instantaneous is the peak flight-path rate from a full-deflection pull entered
+      vertically (gravity cancels there), attributed to the speed the aircraft was
+      actually flying when it got there. Sustained is the largest steady stick whose
+      specific energy is unchanged over a whole 360°. Corner is where the wing first
+      supplies everything the stick may command — the derived turn diameter is
+      <span class="k">2v/ω</span> there.
+    </p>
+  </div>
+  <p class="note">
+    Everything on this page is computed by importing <code>js/sim/</code> and
+    <code>js/data/</code> directly. If a number here disagrees with
+    <code>node tools/sim.mjs --envelope</code>, the page is wrong, not the sim.
+  </p>
+</main>
+
+<script type="module">
+import { AIRFRAMES, AIRFRAME_BY_ID, PITCH, pitchCeiling, G_SI, N_REF } from '../../js/data/tables.js';
+import { nAvailable, stallSpeed } from '../../js/sim/aero.js';
+import { createFlight } from '../../js/sim/flight.js';
+import { createRNG } from '../../js/core/rng.js';
+import { M_PER_WU } from '../../js/core/math.js';
+
+const DT = 1 / 60, DEG = 180 / Math.PI;
+const wrapPi = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+
+const sel = document.getElementById('frame');
+for (const a of AIRFRAMES) sel.add(new Option(a.name, a.id));
+const altSel = document.getElementById('alt');
+const cv = document.getElementById('turn'), cx = cv.getContext('2d');
+
+function fly(a, opts, secs, stick, onTick) {
+  const ac = createFlight({ rng: createRNG(opts.seed || 1) }, { airframe: a, ...opts });
+  const n = Math.round(secs / DT);
+  for (let i = 0; i < n; i++) {
+    ac.setInput(-stick(ac, i * DT), 0);
+    ac.update(DT);
+    if (onTick && onTick(ac, i * DT) === false) break;
+  }
+  return ac;
+}
+
+function instPoint(a, v, altM) {
+  const one = (sign) => {
+    const st = { speed: v, yM: -altM, theta: sign * Math.PI / 2 };
+    let prev = null, om = 0, at = v;
+    const ac = createFlight({ rng: createRNG(1) }, { airframe: a, ...st });
+    ac.svx = 0; ac.svy = sign * v;
+    for (let i = 0; i < 72; i++) {
+      ac.setInput(-1, 0); ac.update(DT);
+      if (prev !== null) { const w = Math.abs(wrapPi(ac.gamma - prev)) / DT; if (w > om) { om = w; at = ac.speedSI; } }
+      prev = ac.gamma;
+    }
+    return { om, at };
+  };
+  const p = one(1), q = one(-1);
+  return { om: (p.om + q.om) / 2, v: (p.at + q.at) / 2 };
+}
+
+function susOmega(a, v, altM) {
+  const run = (stick) => {
+    const ac = createFlight({ rng: createRNG(1) }, { airframe: a, speed: v, yM: -altM });
+    for (let i = 0; i < 18; i++) { ac.setInput(-stick, 0); ac.update(DT); }
+    const e0 = 0.5 * ac.speedSI ** 2 + G_SI * ac.altM;
+    let turned = 0, prev = ac.gamma, t = 0;
+    for (let i = 0; i < 1500 && turned < Math.PI * 2; i++) {
+      ac.setInput(-stick, 0); ac.update(DT);
+      turned += Math.abs(wrapPi(ac.gamma - prev)); prev = ac.gamma; t += DT;
+    }
+    const e1 = 0.5 * ac.speedSI ** 2 + G_SI * ac.altM;
+    return { ok: turned >= Math.PI * 2 && e1 >= e0, om: turned / Math.max(1e-6, t) };
+  };
+  let lo = 0, hi = 1;
+  for (let i = 0; i < 16; i++) { const m = (lo + hi) / 2; run(m).ok ? lo = m : hi = m; }
+  const r = run(lo);
+  return r.ok ? r.om : 0;
+}
+
+function cornerOf(a, altM) {
+  const om = (v) => {
+    const n = nAvailable(a, v, altM, PITCH.alphaMargin);
+    const aero = n > 1 ? G_SI * Math.sqrt(n * n - 1) / v : 0;
+    return Math.min(aero, pitchCeiling(v, a));
+  };
+  let best = 0, bv = 0;
+  for (let v = 8; v < 110; v += 0.1) { const o = om(v); if (o > best) { best = o; bv = v; } }
+  return { v: bv, om: best, diaWu: 2 * bv / best / M_PER_WU };
+}
+
+function draw(a, altM) {
+  const W = cv.width, H = cv.height, L = 56, R = 16, T = 18, B = 34;
+  const vMax = Math.ceil(a.vne / 10) * 10, omMax = 130;
+  const X = (v) => L + (v / vMax) * (W - L - R);
+  const Y = (o) => H - B - (o / omMax) * (H - T - B);
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = '#191d24'; cx.fillRect(0, 0, W, H);
+
+  cx.strokeStyle = '#252b34'; cx.fillStyle = '#7c8695'; cx.font = '12px ui-monospace, monospace';
+  for (let v = 0; v <= vMax; v += 10) {
+    cx.beginPath(); cx.moveTo(X(v), T); cx.lineTo(X(v), H - B); cx.stroke();
+    cx.fillText(String(v), X(v) - 7, H - 14);
+  }
+  for (let o = 0; o <= omMax; o += 20) {
+    cx.beginPath(); cx.moveTo(L, Y(o)); cx.lineTo(W - R, Y(o)); cx.stroke();
+    cx.fillText(String(o), 20, Y(o) + 4);
+  }
+  cx.fillText('m/s', W - R - 26, H - 14);
+  cx.save(); cx.translate(14, T + 60); cx.rotate(-Math.PI / 2); cx.fillText('deg/s', 0, 0); cx.restore();
+
+  const line = (pts, col, w = 2, dash = []) => {
+    cx.strokeStyle = col; cx.lineWidth = w; cx.setLineDash(dash); cx.beginPath();
+    pts.forEach(([x, y], i) => i ? cx.lineTo(X(x), Y(y)) : cx.moveTo(X(x), Y(y)));
+    cx.stroke(); cx.setLineDash([]);
+  };
+
+  const ceil = [], aero = [];
+  for (let v = 10; v <= vMax; v += 1) {
+    ceil.push([v, pitchCeiling(v, a) * DEG]);
+    const n = nAvailable(a, v, altM, PITCH.alphaMargin);
+    aero.push([v, n > 1 ? G_SI * Math.sqrt(n * n - 1) / v * DEG : 0]);
+  }
+  line(ceil, '#4d5a6d', 1.5, [5, 4]);
+  line(aero, '#5c6f52', 1.5, [5, 4]);
+
+  const inst = [], sus = [];
+  for (let v = 20; v <= Math.min(70, a.vne); v += 2) {
+    const p = instPoint(a, v, altM); if (p.om > 0) inst.push([p.v, p.om * DEG]);
+    const s = susOmega(a, v, altM); if (s > 0) sus.push([v, s * DEG]);
+  }
+  inst.sort((p, q) => p[0] - q[0]);
+  line(inst, '#ffcc66', 2.5);
+  line(sus, '#7fb2ff', 2.5);
+
+  const c = cornerOf(a, altM);
+  cx.strokeStyle = '#ff7b72'; cx.lineWidth = 1;
+  cx.beginPath(); cx.moveTo(X(c.v), T); cx.lineTo(X(c.v), H - B); cx.stroke();
+  cx.fillStyle = '#ff7b72';
+  cx.fillText(`corner ${c.v.toFixed(1)} m/s · ${c.diaWu.toFixed(0)} wu`, X(c.v) + 6, T + 14);
+
+  const vs = stallSpeed(a, altM);
+  cx.strokeStyle = '#8a6d3b';
+  cx.beginPath(); cx.moveTo(X(vs), T); cx.lineTo(X(vs), H - B); cx.stroke();
+  cx.fillStyle = '#c99a49'; cx.fillText(`Vs ${vs.toFixed(1)}`, X(vs) + 4, H - B - 6);
+
+  cx.fillStyle = '#ffcc66'; cx.fillText('instantaneous', W - R - 200, T + 16);
+  cx.fillStyle = '#7fb2ff'; cx.fillText('sustained', W - R - 200, T + 32);
+  cx.fillStyle = '#4d5a6d'; cx.fillText('pitch ceiling', W - R - 200, T + 48);
+  cx.fillStyle = '#5c6f52'; cx.fillText('wing limit', W - R - 200, T + 64);
+  return c;
+}
+
+function table(a, altM, c) {
+  const rows = [
+    ['airframe', a.name],
+    ['m · S · CLmax', `${a.m} kg · ${a.S} m² · ${a.CLmax}`],
+    ['CD0 · kInd · T0', `${a.CD0} · ${a.kInd} · ${a.T0} N`],
+    ['observables', `T/W ${a.t.toFixed(4)} · CD0/CLmax ${a.p0.toFixed(5)} · kInd·CLmax ${a.kappa.toFixed(5)}`],
+    ['Vs (wing, 1 g)', `${stallSpeed(a, altM).toFixed(2)} m/s = ${(stallSpeed(a, altM) / M_PER_WU).toFixed(0)} wu/s`],
+    ['Vne', `${a.vne} m/s = ${(a.vne / M_PER_WU).toFixed(0)} wu/s`],
+    ['corner', `${c.v.toFixed(1)} m/s · ${(c.om * DEG).toFixed(1)} deg/s · ${c.n === undefined ? '' : ''}`],
+    ['turn diameter', `<span class="k">${c.diaWu.toFixed(0)} wu</span> = ${(c.diaWu * M_PER_WU).toFixed(1)} m`],
+    ['stress limit', `${a.stressLimit.toFixed(2)} (1.00 = ${N_REF} g, a full pull-out at Vne)`],
+    ['agility margin', a.am.toFixed(4)],
+    ['pitch envelope', `${(a.omLo * DEG).toFixed(1)} → ${(a.omHi * DEG).toFixed(0)} deg/s at Vne`],
+  ];
+  document.getElementById('tbl').innerHTML =
+    rows.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('');
+}
+
+function refresh() {
+  const a = AIRFRAME_BY_ID[sel.value] || AIRFRAMES[0];
+  const altM = Number(altSel.value);
+  document.getElementById('status').textContent = 'computing…';
+  setTimeout(() => {
+    const c = draw(a, altM);
+    table(a, altM, c);
+    document.getElementById('status').textContent = `${a.id} @ ${altM} m`;
+  }, 10);
+}
+sel.onchange = altSel.onchange = refresh;
+refresh();
+</script>

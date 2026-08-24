@@ -52,6 +52,15 @@ export const getBandFeather = () => FEATHER;
 
 const SUN_PX = 0.02, SUN_PY = 0.04;
 
+/**
+ * FG_OCCLUDE's layer multiply. Exported because gate A6 measures the shipped atlas THROUGH
+ * it, and a second copy of this number in verify.js silently drifted once already: sky.js
+ * moved to 0.20 while the gate went on measuring 0.55, so A6 was reporting a frame that is
+ * not the one the game draws. It happened to be conservative, which is exactly why nothing
+ * caught it. verify.js now reads this line out of this file and fails loudly if it cannot.
+ */
+export const FG_OCCLUDE_MUL = [0.20, 0.22, 0.28];
+
 const clamp01 = v => (v < 0 ? 0 : v > 1 ? 1 : v);
 const smooth = t => t * t * (3 - 2 * t);
 const srgb = h => [parseInt(h.slice(1, 3), 16) / 255, parseInt(h.slice(3, 5), 16) / 255, parseInt(h.slice(5, 7), 16) / 255];
@@ -229,7 +238,7 @@ export function createSky(R, assets) {
     // the exact inverse of the defect this pass set out to fix, and worth stating as such
     // rather than quietly rebalancing. P3's near layer is the frame's darkest note and has
     // to be dark enough to be one.
-    R.setLayer(LAYER.FG_OCCLUDE, { shade: 0.10, grainAmt: 0.30, mul: [0.20, 0.22, 0.28] });
+    R.setLayer(LAYER.FG_OCCLUDE, { shade: 0.10, grainAmt: 0.30, mul: FG_OCCLUDE_MUL });
     R.setLayerParallax(LAYER.CLOUD_FAR, 0.06, 0.55);
     R.setLayerParallax(LAYER.CLOUD_MID, 0.55, 1.00);
     R.setLayerParallax(LAYER.HORIZON, 0.10, 0.85);

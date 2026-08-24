@@ -83,11 +83,23 @@ for (const b of bases)
 // Here the population is exactly the opaque pixels of the FG_OCCLUDE frames, times the
 // layer's own multiply, which is all the renderer does to them (FG_OCCLUDE is deliberately
 // left at rampAmt 0 -- see sky.js).
-const FG_MUL = [0.55, 0.58, 0.68];
+// Read from js/gfx/sky.js rather than duplicated here. The duplicate drifted once -- the
+// renderer moved to 0.20 and this gate went on measuring 0.55, so A6 was scoring a frame the
+// game does not draw. It was conservative, so nothing failed and nothing noticed. A gate that
+// keeps its own copy of a renderer constant is measuring its own copy.
+const FG_MUL = (() => {
+  const src = fs.readFileSync(path.join(ROOT, 'js', 'gfx', 'sky.js'), 'utf8');
+  const m = /FG_OCCLUDE_MUL\s*=\s*\[([^\]]+)\]/.exec(src);
+  if (!m) {
+    console.log('ERROR: cannot find FG_OCCLUDE_MUL in js/gfx/sky.js -- A6 cannot be measured');
+    process.exit(1);
+  }
+  return m[1].split(',').map(Number);
+})();
 let a6 = null;
 if (man.atlases && man.atlases.fg) {
   const im = readPNG(path.join(ASSETS, man.atlases.fg.image));
-  const v = [];
+  const v = [], vArt = [];
   for (const f of Object.values(man.atlases.fg.frames))
     for (let y = f.y; y < f.y + f.h; y++)
       for (let x = f.x; x < f.x + f.w; x++) {
@@ -95,13 +107,20 @@ if (man.atlases && man.atlases.fg) {
         if (im.data[i + 3] < 200) continue;
         v.push((im.data[i] * FG_MUL[0] * 0.2126 + im.data[i + 1] * FG_MUL[1] * 0.7152
           + im.data[i + 2] * FG_MUL[2] * 0.0722) / 255);
+        // the ART's own luminance, before the layer multiply. Both are required below 0.12:
+        // with the multiply alone at 0.20-0.28 the drawn figure passes whatever the atlas
+        // contains, so measuring only that turns A6 into a test of the layer config.
+        vArt.push((im.data[i] * 0.2126 + im.data[i + 1] * 0.7152 + im.data[i + 2] * 0.0722) / 255);
       }
   v.sort((p, q) => p - q);
+  vArt.sort((p, q) => p - q);
   a6 = { n: v.length, p50: v[v.length >> 1], p90: v[Math.round(0.9 * (v.length - 1))], max: v[v.length - 1],
+    artP90: vArt[Math.round(0.9 * (vArt.length - 1))],
     gain: man.atlases.fg.crushGain };
   // D66: the unnamed 0.12-0.18 band is closed at 0.12. Pass below, fail at or above. The
   // broken control lands at 0.146, so any threshold above that would let it through.
-  if (a6.p90 >= 0.12) errors.push(`A6: FG_OCCLUDE p90 luminance ${a6.p90.toFixed(4)} is at or above the 0.12 line`);
+  if (a6.p90 >= 0.12) errors.push(`A6: FG_OCCLUDE drawn p90 ${a6.p90.toFixed(4)} is at or above the 0.12 line`);
+  if (a6.artP90 >= 0.12) errors.push(`A6: FG_OCCLUDE art p90 ${a6.artP90.toFixed(4)} is at or above the 0.12 line`);
 } else warn.push('A6: no FG_OCCLUDE atlas to measure');
 
 /* ---- A1: payload ------------------------------------------------------------- */
@@ -159,8 +178,8 @@ for (const [d, n] of Object.entries(byDir).sort((a, b) => b[1] - a[1]))
 console.log(`A1 payload   ${mb.toFixed(2)} MB   target ${TARGET}, ceiling ${CEILING}   ${mb <= CEILING ? 'PASS' : 'FAIL'}`);
 console.log(`A2 hygiene   ${errors.filter(e => e.includes('atlas') || e.includes('frame')).length} problems`);
 if (a6) {
-  console.log(`A6 near-black FG_OCCLUDE p90 luminance ${a6.p90.toFixed(4)} (p50 ${a6.p50.toFixed(4)}, max ${a6.max.toFixed(4)}) over ${a6.n} opaque px   ` +
-    `${a6.p90 < 0.12 ? 'PASS' : 'FAIL'} (D66: fail at or above 0.12)`);
+  console.log(`A6 near-black FG_OCCLUDE  art p90 ${a6.artP90.toFixed(4)}   drawn p90 ${a6.p90.toFixed(4)} (mul ${FG_MUL.join('/')})   over ${a6.n} opaque px   ` +
+    `${a6.p90 < 0.12 && a6.artP90 < 0.12 ? 'PASS' : 'FAIL'} (D66: both fail at or above 0.12)`);
   if (process.argv.includes('--falsify') && a6.gain) {
     // undo the crush and require the number to go red. Without this the criterion is a
     // claim, not a measurement.
@@ -169,9 +188,14 @@ if (a6) {
     // un-crushed plates land at 0.146, squarely in that gap -- so the criterion does respond
     // to the pass it exists to test, and it also cannot be made to say FAIL by removing that
     // pass. Reported rather than adjusted; the gap is the manager's to close.
+    // The control is applied to the ART figure. Applied to the drawn figure it stopped
+    // biting the moment the layer multiply was darkened to 0.20-0.28 for the act-1 repair:
+    // un-crushed art still came out at 0.0554, so A6 would have passed with the pass it
+    // exists to test switched off. The multiply is a rendering choice; the art is what A6
+    // is about.
     const k = 1 / a6.gain;
-    const c = a6.p90 * k;
-    console.log(`   control: crush pass undone (x${k.toFixed(2)}) -> p90 ${c.toFixed(4)}   ` +
+    const c = a6.artP90 * k;
+    console.log(`   control: crush pass undone (x${k.toFixed(2)}) -> art p90 ${c.toFixed(4)}   ` +
       `${c >= 0.12 ? 'went RED, as required' : 'STAYED GREEN -- the criterion does not catch its own bug'}`);
   }
 }

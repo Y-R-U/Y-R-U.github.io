@@ -812,6 +812,40 @@ The asset gates all still pass with every control red: A1 7.55 MB, A2 clean, A3 
 −0.59/255, A4 2 (control 3), A5 0.26 (control 0.00), A6 0.0524 (control 0.146), A7 1.66 s
 (control 0.019 s).
 
+## 18. One more gate defect, found while closing out
+
+`verify.js` kept its own copy of `FG_OCCLUDE`'s layer multiply. `sky.js` moved from
+`[0.55,0.58,0.68]` to `[0.20,0.22,0.28]` in §16's act-1 repair and the gate went on measuring the
+old value, so **A6 was scoring a frame the game does not draw**. It happened to be conservative —
+the shipped multiply is darker, so the real p90 is lower than the reported one and no pass was
+false — and that is precisely why nothing caught it. A gate that keeps its own copy of a renderer
+constant is measuring its own copy.
+
+The constant is now named once, in `sky.js`, as the exported `FG_OCCLUDE_MUL`, and `verify.js`
+reads it out of that file and **exits with an error if it cannot find it**. Re-syncing the number
+would have fixed today's drift and left the mechanism in place for the next one.
+
+Fixing that immediately exposed a second one underneath it. With the correct multiply in place,
+A6 read 0.0199 and **its control went green at 0.0554** — the multiply had been darkened to
+0.20-0.28 in §16's act-1 repair and now dominates, so the drawn figure passes whatever the atlas
+contains and A6 had quietly become a test of the layer config rather than of the art.
+
+A6 now reports two numbers and requires both below 0.12: the **art** p90 (the atlas's own
+luminance) and the **drawn** p90 (through the multiply). The control is applied to the art figure,
+where it bites properly.
+
+```
+A6  art p90 0.0902   drawn p90 0.0199 (mul 0.2/0.22/0.28)   PASS
+    control: crush undone (x2.79) -> art p90 0.2517         went RED
+```
+
+These are the fifth and sixth instrument defects of the phase, after A3's control scoring better
+than the real strip, A6 measuring the post-process noise floor, the A5 control parsing a superseded
+output format, and the crossfade metric reporting 0.00 s. **Every one was found by running the
+check against something that should fail it. Not one was found by reading the code.** The lesson is
+not that these particular gates were badly written — it is that a gate's own correctness has to be
+tested the same way the feature's is, and the only test that works is a deliberate break.
+
 **Known artefact, unchased:** the Act 1 frame has a hard-edged rectangular tonal seam at mid-left
 where a ground strip's copy boundary shows. It is visible in `shots/p3/act1_mud.png` and it is not
 a tiling seam in the A3 sense — A3 measures the wrap join, and this is a layer edge.
