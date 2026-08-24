@@ -51,6 +51,7 @@ export async function boot(opts = {}) {
     slew: q.get('slew') || undefined,
     margin: q.get('margin') || undefined,
     track: q.get('track') || undefined,
+    frame: q.get('frame') || undefined,
     enforce: q.get('enforce') !== '0',
   });
   view.setCamera(cam);

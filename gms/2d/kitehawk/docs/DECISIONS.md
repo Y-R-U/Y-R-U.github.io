@@ -833,3 +833,81 @@ nothing, replacing the predictor produced *bit-identical* output, and adding hys
 **D103** — **REQUEST-1 settled: the altitude tape goes on the RIGHT.** The view profile says left,
 ART §10 and DESIGN §2.7 both say right, and P7 measured both — **it makes no measurable difference**,
 so it is a taste call and the two specs that agree win. `resolveLayout` already takes an override.
+
+**D104** — **The camera fix works: H5 passes with 0 occluded frames across three runs, bit-repeatable.**
+`playfield` is now a per-mode field (the fraction of the frame the HUD owns nothing permanent in) and
+the anchors are fractions of *that*, with the aeroplane's own box clamped inside it. D100's ≈0.845
+ceiling **falls out of the arithmetic rather than being typed in** — `0.86 − hull*0.25/visH` = 0.844
+— and it stays correct at `zoomIntimate`, where a hardcoded 0.845 would not. `right` is assigned
+from `specialSlot.x` rather than copied, so moving the special moves the camera's bound with it.
+Screen x p50 went **438 → 217**; `occlBy` went `{tape, coaming, belt, special, banner}` → `{}`.
+
+**D105** — **The pre-fix framing was not merely bad, it was a coin toss — and P8 would have measured
+that variance as if it were the orientation's fault.** The same seed produced 13.96%, 70.45% and
+29.96% occlusion on different runs, because which edge the aeroplane fell off depended on how the
+sortie went: sometimes x p50 438 (off the right), sometimes −3 (off the left). **The portrait gate
+runs next and measures framing.** Post-fix runs are bit-repeatable. This is the second time a gate
+was about to be run against an instrument that could not have given a stable answer.
+
+**D106** — **`leadMax 240` is sized for landscape and must be fixed properly, not merely bounded.**
+It is **52% of the portrait frame's width** where landscape's 420 is 35% of its. The new clamp bounds
+the symptom and the frame now spends real time pinned against the bound, which is a worse camera than
+one whose lead fits its frame. ARCHITECTURE §4.1 is verbatim, so this needs the explicit entry it is
+getting: **portrait `leadMax` scales to the same 35% fraction its own frame gives** (≈162 wu at
+worldW 462). Landscape unchanged.
+
+**D107** — Accepted: `js/main.js` should forward `frame` from the URL alongside `slew`/`margin`/
+`track`/`enforce`, so `?frame=full` reaches the real game. One line. Also noted honestly rather than
+hidden: the world-bounds clamp runs last and wins below ground level — it only binds ~40 m
+underground, so it costs nothing in play.
+
+**H11 remains failing at 2.23–8.18% against a 2% cap and that is accepted**, per D101: thumb overlap
+has no single value, what is left is the thumb disc rather than the coaming, and clearing it would
+surrender 11% of the portrait column to a criterion.
+
+**D108** — **D106 was the wrong constant, and the agent proved it rather than declaring victory.**
+Portrait `leadMax` 240 → 162 shipped and is **measurably inert**: screen-position distributions are
+unchanged to the pixel, and the clip counts are bit-identical. All that changed is `leadMax` biting
+on 47.6% of ticks instead of 2.7% — and every tick it bites is one the playfield clamp was already
+discarding *more* lead on.
+
+**The term actually sized for the other orientation is `leadSeconds`, not `leadMax`.** Portrait
+0.55 s × 280 wu/s cruise = 154 wu = **33% of a 462 wu frame**, against landscape's 0.70 s = 196 wu =
+**16% of 1212**. `leadMax 240` required 436 wu/s to bind at all — above the aeroplane's top speed.
+**Authorised: portrait `leadSeconds` 0.55 → 0.27**, matching landscape's fraction. Landscape
+untouched. This is the change that takes the clamp out of the loop; the playfield bound currently
+discards lead on **67.9% of ticks**, so the honest answer to "does the lead fit the frame" is still no.
+
+**D109** — **A third believable-wrong metric, found because a positive control moved the world and
+the number did not move.** The obvious instrument — "is the aeroplane touching the bound" — reads
+**0.0% on every run**, including a control with the bound dragged in to 0.45 that pulled x p95 from
+237 to 140 *while still reading 0.0%*. The camera's damping lags its target by ≈34 px at cruise, so
+it approaches the bound and never arrives. **Only the camera can report whether lead was
+discarded**, which is what the replacement counter measures. A metric reading 0.0% while the clamp
+does two-thirds of the work is exactly D99's pattern: the failure makes the instrument look clean.
+
+**D110** — **D108 landed and the fix was finally at the right level.** Portrait `leadSeconds`
+0.55 → 0.27; `leadMax` stays 162 and is now coherent rather than symptomatic (at 0.27 s it needs a
+Vne dive to bind, which is what a cap is for). Lead discarded per tick fell **55%** (52.6 → 23.4 px),
+`leadMax` bound 47.8% → **0.0%**, and the screen-position distribution contracted on all four tails.
+**Feel, for P8: tighter and more centred, and it does not lag** — what 0.55 s was adding was
+overshoot, and a dive that used to put the aeroplane at y≈90 under the objective banner now sits at
+y≈180 with the ground it is diving at visible below.
+
+The agent added `clipSumX/Y` **before answering the question**, because a clip count cannot tell a
+10 px clip from a 150 px one — which is the same instrument discipline as D109 and is why the answer
+is trustworthy.
+
+**D111** — **The residual clipping is the HUD, not the camera, and it is a real open item for P16 or
+P13.** `playfield.right = specialSlot.x = 0.72` leaves the playfield only 0.61 of the frame wide, so
+the westbound anchor has **54 px of headroom before any lead at all** — used up above ~35 m/s, and
+combat cruise is ~42. **The special ring occupies the right 28% of the column.** Removing that
+clipping means moving the special to an edge: a HUD/ergonomics call, not a camera one.
+
+**D112** — **H11 went green without being touched — 0.00% across three runs, from 2.23–8.18%.** The
+mechanism was measured rather than assumed: the shorter lead pulled y p95 from 670 to 615, and the
+thumb disc's top edge is at 645, so the aeroplane no longer descends into the thumb's reach.
+**It is not called solved** — D101's caveat stands, this is the shipped rest position only and no
+rest-position sweep has been run at the new lead. Also: the break-switch is still red but weaker
+(0.00% vs 4.92%, down from 24.28%), which is the expected direction — **the camera no longer depends
+on the clamp to be playable.**

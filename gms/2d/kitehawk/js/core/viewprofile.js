@@ -6,6 +6,12 @@
  * A system or HUD widget that reads `view.mode` directly is a bug. If something
  * needs a mode branch it needs a new field in this table, and a line in
  * docs/P2_NOTES.md saying why.
+ *
+ * `playfield` is the ONE field that is not ARCHITECTURE §4.1 verbatim. It was
+ * added under D100 because §4.1's anchors are fractions of the frame while the
+ * coaming owns the bottom 14% of the same frame, and the two are incompatible:
+ * over a 94 s mission the aeroplane sat inside the coaming and off the right
+ * edge. See docs/CAMFIX_NOTES.md.
  */
 
 export const VIEW_PROFILE = {
@@ -16,7 +22,25 @@ export const VIEW_PROFILE = {
     anchorYClimb: 0.78,         // eased to when climbing faster than 30 wu/s
     anchorYDive: 0.30,
     anchorYThreatAbove: 0.75,   // a committed diving attacker forces this (§4.4 P2)
-    leadSeconds: 0.55, leadMax: 240,
+    // Both terms were sized for the other orientation and BOTH are now the same
+    // fraction of their own frame as landscape's are of theirs.
+    //   leadSeconds 0.55 -> 0.27 (D108). 0.55 s at 280 wu/s cruise led the frame
+    //     154 wu = 33% of this 462 wu frame; landscape's 0.70 s leads 196 wu =
+    //     16% of its 1212. 0.27 s is that same 16%. THIS is the term that was
+    //     making the playfield clamp discard lead on 67.9% of ticks.
+    //   leadMax 240 -> 162 (D106) = 35% of 462, as landscape's 420 is of 1212.
+    //     At 0.27 s it no longer binds in level flight at all — only in a dive
+    //     past ~600 wu/s, which is the case a cap is for.
+    leadSeconds: 0.27, leadMax: 162,
+
+    // --- the PLAYFIELD (D100). The fraction of the frame the HUD owns nothing
+    // permanent in. Every anchor above is a fraction of THIS, not of the frame,
+    // and camera.js keeps the aeroplane's own box inside it.
+    //   bottom 0.86 = 1 - ART §10's COAM_FRAC 0.14, exactly
+    //   left   0.11 = the altitude tape's gutter, (6 + 34) / 390 = 0.103
+    //   top    0.05 = under the objective / wind row, 40.6 / 844 = 0.048
+    //   right       = `specialSlot.x`, assigned below rather than copied
+    playfield: { top: 0.05, right: 0, bottom: 0.86, left: 0.11 },
 
     // --- zoom anchors. 1.00 = combat framing. Below 1.00 shows MORE world.
     zoomCombat:    1.00,        // the reference. visible 1000 x 462 wu = 150 x 69 m
@@ -49,6 +73,12 @@ export const VIEW_PROFILE = {
     anchorYThreatAbove: 0.66,
     leadSeconds: 0.70, leadMax: 420,
 
+    // bottom 0.86 = the same COAM_FRAC 0.14; the coaming is split into two
+    // corners here but the band it occupies is the same one. left / top clear
+    // the radio card's corner; right is `specialSlot.x` (which is inboard of
+    // the tape at 808 / 844 = 0.957), assigned below.
+    playfield: { top: 0.06, right: 0, bottom: 0.86, left: 0.03 },
+
     zoomCombat: 1.00, zoomIntimate: 1.22, zoomWide: 0.78, zoomEstablish: 0.42,
     zoomFill: 0.85,
     zoomOutRate: 1.10, zoomInRate: 0.22, zoomOutK: 9.0, zoomInK: 1.8,
@@ -65,7 +95,19 @@ export const VIEW_PROFILE = {
 // Persistent user preference (save.settings.zoomBias). NOT a per-moment control.
 export const ZOOM_BIAS = { tight: +0.10, normal: 0.00, wide: -0.08 };
 
-/* --- P2 additions. Everything above this line is §4.1 verbatim. -------- */
+/* --- P2 additions, and D100's `playfield`. Everything above this line is
+       §4.1 verbatim except that one field. -------------------------------- */
+
+/**
+ * The playfield's right edge IS the special's left edge, DERIVED rather than
+ * copied. The special is the one permanent widget that sits inside the column
+ * instead of in a band at an edge, so it is the one the camera cannot dodge by
+ * clamping a rectangle unless the rectangle stops there — it was the last 49
+ * frames of H5 once the coaming and the tape were clear. Written this way so
+ * that moving the special moves the camera's bound with it: a copied 0.72 would
+ * go stale silently and H5 would fail for a reason nobody would connect to it.
+ */
+for (const P of Object.values(VIEW_PROFILE)) P.playfield.right = P.specialSlot.x;
 
 /** Stick radius, css px. R-12: DESIGN §2.2's 0.208-of-width, keeping the ported floor. */
 export const STICK_R_FRAC = 0.208;

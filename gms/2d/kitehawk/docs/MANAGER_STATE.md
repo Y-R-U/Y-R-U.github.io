@@ -1,5 +1,64 @@
 # Manager state — KITEHAWK
 
+## ⏸ PAUSED 2026-08-24 ~18:40. START HERE.
+
+**Read order for a fresh or compacted manager: this section → `DECISIONS.md` (all of it, D1–D109;
+it is the authority and it overrides every other document) → `MANAGER_BRIEF.md` → the phase brief you
+need from `BUILD_PLAN.md`. Never read `BUILD_PLAN.md` whole — it is 128 KB and each brief is
+self-contained.**
+
+### Where the build actually is
+
+Everything through **P7 is done, verified and pushed**. `main` is current; nothing uncommitted
+matters. The game is **not playable yet** — first playable is **P10**, three phases out.
+
+| done | P0 planning · P1 renderer · P2 core/camera/input · audio engine · P3 sky+atlases · P4 flight · P5 combat/AI/duel · P6 crates · P7 HUD · camera-anchor fix |
+|---|---|
+| **next** | **P8 — the PORTRAIT GATE.** Manager-run, deliberately: the agents that built the camera must not judge whether portrait passes. |
+| then | P9 world/level format → **P10 FIRST PLAYABLE** (commit, push, `projects.js` with `wip: true`) → P11 the 100 levels → P12 story → P13 hangar → P14 modes → P15 audio content → P16 art pass → P17 ship |
+
+### The first thing to do on resume
+
+**Run P8, but read D61, D105 and D109 before you trust any of its numbers.** Several of its criteria
+are known to be mis-specified: a *completely broken* camera scored best on three of six of them, two
+are mutually exclusive, and one is numerically incompatible with the engine constant it tests. **Fix
+the criteria first, then run the gate.** A FAIL sends the portrait-versus-landscape decision to
+Aaron — it is the one call D40 does not delegate.
+
+Also outstanding, small: check whether the last camera pass landed portrait `leadSeconds` 0.55 → 0.27
+(D108) and whether the playfield bound still discards lead on ~68% of ticks. If that number did not
+move, the fix is still not at the right level — do not ship a third constant without saying so.
+
+### Rules that are easy to lose in a compaction
+
+- **D40**: build the complete game without checking in. Playtest is the only checkpoint. Report
+  non-obvious calls; a report is not a question.
+- **D84**: **playable beats pretty, and playable beats exhaustive.** No art bar blocks a phase. The
+  sky is at −4.06 against a −2.0 line and that is fine; it improves alongside playtesting.
+- **D42**: **ONE build agent at a time** (Aaron's usage limits), plus the blind-critic exception.
+- **Verify claims, never accept reports.** Every phase has found a real defect this way, and three
+  separate metrics have read *clean* while the thing they measured was broken (D99, D105, D109).
+- Agents never run git; the manager stages selectively (paths under `gms/2d/kitehawk/`, plus one
+  `projects.js` hunk, plus the screenshot) because other sessions have uncommitted work in this repo.
+
+### The check-in cron is DELETED, on purpose
+
+It fired every 30 minutes and would spawn the next phase whenever nothing was running — which during
+a pause means building unattended while Aaron uses the machine for other work. **Recreate it on
+resume**, not before. The prompt is in the run log; it leads with `node ~/cc/usage/usage.mjs`,
+reports usage as information only, and enforces one agent at a time.
+
+### Two things waiting on Aaron, neither blocking
+
+1. **The voice audition** — 15 clips in `docs/vo_audition/`. Mainly: is Drach menacing enough, or is
+   the one SUNO take worth generating?
+2. **One `/usage` reading** to recalibrate `~/cc/usage/usage.mjs`. It was found to be undercounting
+   badly (subagent transcripts live outside `~/.claude/projects/`), the calibration was voided, and
+   it now prints raw counts with no percentage. See `~/cc/usage/VERIFY.md`.
+
+---
+
+
 **If you are a fresh or compacted manager: read this file, then `DECISIONS.md`, then
 `MANAGER_BRIEF.md`. Then whichever phase docs exist.**
 

@@ -24,6 +24,14 @@ const MEMBER_PAD = 1.0;       // 1.0 hull / canopy span / engaged section — on
 const BOX_CAP = 8;            // §4.3.1: one messy furball may not drag the zoom to the floor
 const TRACK_GRACE = 1;        // ticks a member survives without being re-asserted
 const PUNCH_HALFLIFE = 0.35;  // s
+const FULL_FRAME = { top: 0, right: 1, bottom: 1, left: 0 };   // the pre-D100 playfield
+
+/** clamp(), but a band narrower than the thing it bounds collapses to its centre
+ *  instead of inverting. Reachable at zoomIntimate on a very small viewport. */
+function between(v, lo, hi) {
+  if (hi <= lo) return (lo + hi) * 0.5;
+  return v < lo ? lo : v > hi ? hi : v;
+}
 
 export function createCamera(view, opts = {}) {
   const q = opts;
@@ -36,6 +44,9 @@ export function createCamera(view, opts = {}) {
     margin: q.margin || 'latch',    // 'strict'     — §4.3.2 read literally, margin re-tested every tick
     track: q.track || 'reassert',   // 'sticky'     — members never expire
     enforce: q.enforce !== false,   // false        — allowOutsideClamp honoured under player control
+    frame: q.frame || 'playfield',  // 'full'       — D100 reverted: anchors against the whole
+                                    //                frame, no playfield clamp. Read every tick,
+                                    //                so `cam.mode.frame = 'full'` flips it live.
   };
 
   let bias = ZOOM_BIAS[q.bias] !== undefined ? ZOOM_BIAS[q.bias] : ZOOM_BIAS.normal;
@@ -58,6 +69,7 @@ export function createCamera(view, opts = {}) {
   let granted = false;
   let lastStep = 0;
   let nearestHostile = Infinity;
+  let clipTicks = 0, capTicks = 0, clipSumX = 0, clipSumY = 0;
   const warned = new Set();
 
   const box = { x: 0, y: 0, w: 0, h: 0 };
@@ -79,6 +91,26 @@ export function createCamera(view, opts = {}) {
     get dwell() { return dwell; },
     get granted() { return granted; },
     get nearestHostile() { return nearestHostile; },
+    /**
+     * Ticks on which the playfield clamp discarded some of the lead — i.e. the
+     * frame WANTED to put the aeroplane outside the playfield and was refused.
+     *
+     * Not the same question as "is the aeroplane touching the bound", which is
+     * what a harness reaches for first and which reads 0.0% even while the clamp
+     * is doing all the work: the position damping lags its target by v/k, about
+     * 34 px at cruise, so the camera approaches the bound and never arrives.
+     * Sample it against `cam.tick` over a window. D106.
+     */
+    get clipTicks() { return clipTicks; },
+    /** Ticks on which `leadMax` itself bound — i.e. `leadSeconds * v` was over
+     *  the cap. Separate from clipTicks on purpose: they answer different
+     *  questions and D106 turns on which of them is doing the work. */
+    get capTicks() { return capTicks; },
+    /** Total lead discarded, in FRAME FRACTIONS, x and y. A count on its own
+     *  cannot tell a 10 px clip from a 150 px one, and the two mean opposite
+     *  things about whether the lead fits the frame. */
+    get clipSumX() { return clipSumX; },
+    get clipSumY() { return clipSumY; },
     mode: MODE,
   };
 
@@ -359,11 +391,50 @@ export function createCamera(view, opts = {}) {
     const dirTarget = vx === 0 ? dirNow : sign(vx);
     dirNow = approachK(dirNow, dirTarget, 1.2, dt);
 
-    const leadX = clamp(vx * P.leadSeconds, -P.leadMax, P.leadMax);
-    const leadY = clamp(vy * P.leadSeconds, -P.leadMax, P.leadMax);
+    const rawLeadX = vx * P.leadSeconds, rawLeadY = vy * P.leadSeconds;
+    const leadX = clamp(rawLeadX, -P.leadMax, P.leadMax);
+    const leadY = clamp(rawLeadY, -P.leadMax, P.leadMax);
+    if (leadX !== rawLeadX || leadY !== rawLeadY) capTicks++;
 
-    let tx = px + (0.5 - P.anchorX) * visW * dirNow + leadX;
-    let ty = py - (anchorYNow - 0.5) * visH + leadY;
+    /**
+     * D100 — THE ANCHORS ARE FRACTIONS OF THE PLAYFIELD, NOT OF THE FRAME.
+     *
+     * §4.1 places the aeroplane at a fraction of the frame and the HUD's
+     * coaming owns the bottom 14% of that same frame, so nothing stopped the
+     * two from being the same pixels — and they were: P7 measured screen
+     * y p95 707..745 against a coaming top of 725.8 and screen x p50 448 on a
+     * 390 px screen, i.e. the aeroplane entirely off the right edge for half a
+     * mission. Neither the anchors nor the lead are wrong on their own; what
+     * was missing is that they are *unbounded*. Climbing, `anchorYClimb 0.78`
+     * and a -240 wu lead (0.24 of a 1000 wu column) add rather than oppose, and
+     * flying west the mirrored `anchorX` and the lead do the same thing sideways.
+     *
+     * So: place inside the playfield, then clamp the aeroplane's own box inside
+     * it. Both terms keep their authored values and their intent — the frame
+     * still leads the aeroplane and still opens sky above a climb — they simply
+     * cannot push it under the chrome or off the screen any more.
+     *
+     * `frame: 'full'` is the forbidden control: the pre-D100 lines exactly.
+     */
+    const bounded = MODE.frame !== 'full';
+    const pf = bounded ? (P.playfield || FULL_FRAME) : FULL_FRAME;
+    // the aeroplane's own half-extents as a fraction of the frame — the same
+    // box gate H5 measures: one hull wide, half a hull tall, centred on it.
+    const mx = bounded ? hull * 0.5 / visW : 0;
+    const my = bounded ? hull * 0.25 / visH : 0;
+    const fxLo = pf.left + mx, fxHi = pf.right - mx;
+    const fyLo = pf.top + my, fyHi = pf.bottom - my;
+
+    let fx = pf.left + (0.5 - (0.5 - P.anchorX) * dirNow) * (pf.right - pf.left) - leadX / visW;
+    let fy = pf.top + anchorYNow * (pf.bottom - pf.top) - leadY / visH;
+    if (bounded) {
+      const cx = between(fx, fxLo, fxHi), cy = between(fy, fyLo, fyHi);
+      if (cx !== fx || cy !== fy) { clipTicks++; clipSumX += Math.abs(cx - fx); clipSumY += Math.abs(cy - fy); }
+      fx = cx; fy = cy;
+    }
+
+    let tx = px + (0.5 - fx) * visW;
+    let ty = py + (0.5 - fy) * visH;
 
     if (framingBlend > 0.0005 && activeTag) {
       const f = framings.get(activeTag);
@@ -375,6 +446,17 @@ export function createCamera(view, opts = {}) {
 
     cam.x = approachK(cam.x, tx, 10, dt);
     cam.y = approachK(cam.y, ty, 10, dt);
+
+    // The clamp is applied to the SETTLED camera as well as to its target. The
+    // 0.1 s ease is a lag against an aeroplane that is still moving, so a target
+    // inside the playfield still leaves the aeroplane outside it for a few frames
+    // after a reversal — and H5 is a per-frame criterion, not a p95 one.
+    // A blended framing override is exempt: §4.3.4 lets a cinematic put the
+    // aeroplane where it likes, and it only runs with the player out of control.
+    if (bounded && framingBlend <= 0.0005) {
+      cam.x = px + (0.5 - between(0.5 + (px - cam.x) / visW, fxLo, fxHi)) * visW;
+      cam.y = py + (0.5 - between(0.5 + (py - cam.y) / visH, fyLo, fyHi)) * visH;
+    }
 
     // never leave the world column
     const half = visH * 0.5;
