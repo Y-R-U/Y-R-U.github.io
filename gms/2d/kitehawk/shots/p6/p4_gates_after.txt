@@ -1,0 +1,30 @@
+  PASS  F13  band edges, §3.3 constraints       all four hold
+  PASS  F2   stall, sea level                   16.08 m/s
+  PASS  F3   best climb rate                    14.46 m/s at 34 m/s (flat 28-38)
+  PASS  F4   level top speed                    61.52 m/s
+  PASS  F5   terminal > Vne                     95.79 m/s = Vne x 1.030 (Vne 93)
+  PASS  F6   combat turn diameter at corner     263 wu at corner 32.7 m/s, 95.0 deg/s, 5.61 g
+            (flown: peak 94.3 deg/s from 36.9 m/s, and the 360 it draws boxes 357 wu)
+  PASS  F7   dive recovery from Vne             585 wu
+  PASS  F8   instantaneous vs sustained         95.0 / 74.0 deg/s at 38 m/s = 1.284
+  PASS  F9   energy bleed, max-rate turn        -7.22 m/s at corner 32.7; -15.60 m/s at 41.5
+            (speed-dependent — see P4_NOTES §5)
+  PASS  F10  thin air, sustained turn 1350 m / SL 47.5 / 74.0 = 0.641
+  PASS  F11  zoom climb from Vne                435 m in 9.1 s
+            (ideal drag-free is 428 m — see P4_NOTES §6)
+  PASS  F12  determinism, 200 runs              all 53cda0f1
+  PASS  F14  zoom neutrality                    byte-identical
+  PASS  F15  anti-mock record                   tools/BLESSED.md present
+
+  14/14 pass
+  PASS  loop           9b3c54d0  {"secs":5.383,"alphaMaxDeg":14.32}
+  PASS  stallTurn      f19f0696  {"secs":2.583,"minV":22.8,"released":true}
+  PASS  immelmann      c88983bb  {"gainM":65.2,"secs":2.08,"roll":-1}
+  PASS  splitS         8210e415  {"lossM":48.2}
+  PASS  glide          074f43c0  {"rangeM":3948,"ld":7.9}
+  PASS  diveRecover    bc87023e  {"extentWu":585,"peakStress":1.059,"hullHP":14.7}
+  PASS  stallRecover   0662cd27  {"brokeAt":0.45,"recoveredIn":1.38,"alphaMaxDeg":41.8}
+  PASS  stallSides     4L/8R  {"left":4,"right":8}
+  PASS  landing        f44526dc  {"touchdown":19.4}
+
+  9/9 pass

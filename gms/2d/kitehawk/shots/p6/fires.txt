@@ -1,0 +1,68 @@
+{
+  "rows": [
+    {
+      "altM": 60,
+      "survived": 0,
+      "n": 12,
+      "rate": 0,
+      "meanBlowS": 0
+    },
+    {
+      "altM": 100,
+      "survived": 0,
+      "n": 12,
+      "rate": 0,
+      "meanBlowS": 0
+    },
+    {
+      "altM": 150,
+      "survived": 0,
+      "n": 12,
+      "rate": 0,
+      "meanBlowS": 0
+    },
+    {
+      "altM": 200,
+      "survived": 0,
+      "n": 12,
+      "rate": 0,
+      "meanBlowS": 0
+    },
+    {
+      "altM": 300,
+      "survived": 0,
+      "n": 12,
+      "rate": 0,
+      "meanBlowS": 0
+    },
+    {
+      "altM": 450,
+      "survived": 0,
+      "n": 12,
+      "rate": 0,
+      "meanBlowS": 83.75
+    },
+    {
+      "altM": 700,
+      "survived": 12,
+      "n": 12,
+      "rate": 1,
+      "meanBlowS": 7.02
+    },
+    {
+      "altM": 1000,
+      "survived": 12,
+      "n": 12,
+      "rate": 1,
+      "meanBlowS": 7.12
+    },
+    {
+      "altM": 1400,
+      "survived": 12,
+      "n": 12,
+      "rate": 1,
+      "meanBlowS": 7.23
+    }
+  ],
+  "overall": 0.333
+}

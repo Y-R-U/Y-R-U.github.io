@@ -1,0 +1,7 @@
+  kite_b1       player  75  ace  86  draw  39  -> 46.6% of decisive  +-3.9
+  kite_b2       player  75  ace  78  draw  47  -> 49.0% of decisive  +-4.0
+  harrier_tri   player  78  ace  62  draw  60  -> 55.7% of decisive  +-4.2
+  lance_mk1     player  67  ace  71  draw  62  -> 48.6% of decisive  +-4.3
+  kitehawk      player  73  ace  60  draw  67  -> 54.9% of decisive  +-4.3
+  ALL           player 368  ace 357  draw 275  -> 50.8%  +-1.9
+DONE

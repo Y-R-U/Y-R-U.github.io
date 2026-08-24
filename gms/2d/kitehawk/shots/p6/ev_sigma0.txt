@@ -1,0 +1,20 @@
+  the decision model — 400 drop points x 2 levels, player wind-judgement sigma 0 m/s
+  a hit point is worth 0.4444 Scrip (§4.4's Parts crate: 20 / 45); a crate is worth 15.57
+
+  policy       taken  declined  enemy%  burst%  commit s   expHP*  net*   x fly*   |  policy net  x fly
+  flyThrough    800         0    0.0     0.0      30.3     0.00  1.000   1.000   |     1.000  1.000
+  cutLow        366       434    0.0     6.0      79.7     1.72  1.485   1.485   |     1.222  1.222
+  cutHigh       325       475    0.0    56.9      60.5     0.00  0.974   0.974   |     0.989  0.989
+  ignore          0         0   47.8     0.0       0.0     0.00  0.000   0.000   |     0.522  0.522
+  * = conditional on the take being made, which is what K3/K4 ask about.
+
+  T19 = 1.485x (policy-level 1.222x)    T20 = 0.974x (policy-level 0.989x)
+  {
+    "lowCutValueOnly": 1.545,
+    "highCutValueOnly": 0.94,
+    "M_min_for_K3": 1.395,
+    "M_max_for_K4": 1.75,
+    "jointlySatisfiableOnBurstAlone": true,
+    "burstNeededForK4AtM": 0.545,
+    "note": "At DESIGN §4.3's AUTHORED T20 of 0.35 these two criteria are jointly unsatisfiable: K3 needs the multiplier >= 1.395 and K4 needs it < 1.269, and no value of T19 is both. T20 is the register entry whose named test is exactly this, and it is refined to 0.60 — the smallest round number above the 0.545 the arithmetic forces. `burstNeededForK4AtM` is that solve. Alternative the manager may prefer: keep 0.35 and make a burst crate worth 0 instead of 0.5, which needs only 0.375."
+  }

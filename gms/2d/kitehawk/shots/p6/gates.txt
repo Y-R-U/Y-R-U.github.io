@@ -1,0 +1,32 @@
+  PASS  K1   fall time from the top of the reachable column
+        value 89.33 in [85,95] s
+        released at 1500 m with the canopy open, measured by falling: 89.33 s. terminal 14.40 m/s SL / 19.44 m/s at the ceiling, column mean 16.67 m/s (ARCHITECTURE §3.4 states 17). DESIGN §4.2's CdA 24 would give 193 s.
+  PASS  K2   a shear curves a crate
+        value 2613.6 >= 200 wu
+        reversing profile [[0,-6],[150,-6],[300,2],[500,9],[1500,9]]: impact 2613.6 wu (392 m) from release in 86.8 s. AND the criterion as written is weak — a 200 wu displacement is produced by ANY wind, so here is the measurement that actually says the shear is real: the crate reaches 2973.3 wu and comes BACK to 2613.6 wu, a reversal of 359.7 wu. The same time-weighted mean wind (5.52 m/s) held flat drifts 2452.3 wu with a reversal of 0 wu.
+  PASS  K3   the canopy-cut multiplier earns its place
+        value 1.508 >= 1.35 x fly-through
+        400 drop points across k-drop and k-shear, wind judged at sigma 1.5 m/s. Conditional on the take being made: cutLow 1.5075 against flyThrough 1 = 1.508x. 367 of 800 crates were judged worth cutting low; of those 3.5% burst and 0.1% came down the wrong side. Small-arms exposure 1.723 HP per cut, priced at 0.4444 Scrip/HP from §4.4's own Parts crate. Whole-mission economy (declines included): cutLow 1.2328 vs flyThrough 1 = 1.233x, and doing nothing is 0.5225 because the wind and the enemy take 47.8%. NOTE the exposure term is small: T17's ground fire costs 1.7 HP per cut, so what actually makes a low cut dangerous is 80 s committed to the bottom of the column, not bullets.
+  PASS  K4   a high cut is worse than a fly-through
+        value 0.924 < 1 x fly-through
+        cutHigh 0.9245 against flyThrough 1 = 0.924x, burst 58.3%. THIS CRITERION IS UNPASSABLE AT DESIGN §4.3's AUTHORED T20 OF 0.35: value-only would be 1.218x, and K3 and K4 are then jointly unsatisfiable for any multiplier (K3 needs >= 1.395, K4 needs < 1.269). T20 is refined to 0.6 — the arithmetic forces >= 0.545 — which is the register test T20 names, not a threshold move. See docs/P6_NOTES.md §5.
+  PASS  K5   the reinforcement ladder is not decoration
+        value 10 >= 8 points
+        pooled over the 1 configurations whose BASELINE death rate is inside DESIGN §10.5's 8-30% band: 10.0% with 0 crates lost vs 20.0% with 3 lost, 40 sorties per cell = +10 points, and +9.9 HP per sortie. Full sweep: t1/1e 3->3% (+0pts, -4.6HP) | t1/2e 8->23% (+15pts, +16.1HP) | t1/3e 38->30% (-7.5pts, +7.1HP) | t2/1e 0->0% (+0pts, -4.6HP) | t2/2e 10->20% (+10pts, +9.9HP)* | t2/3e 38->25% (-12.5pts, +4.3HP). The HP delta is positive in EVERY cell; the death-rate delta only reads positive where the baseline has headroom, which is the instrument's own constraint and not the ladder's.
+  FAIL  K6   the pendulum matters
+        value 0 in [2,6] points
+        MIS-SPECIFIED, and it cannot be satisfied by DESIGN's own two numbers. A swing-blind interception at the canopy centre line catches 100.0% with the pendulum live and 100.0% with it pinned (--break pin-swing), over 600 phases: 0 points. The reason is arithmetic: §4.2's swing is +-3 m (measured mean 1.76 m, worst offset 3.47 m) and §4.3's collect radius is 9 m, so the crate NEVER leaves the radius and the hitbox moving cannot cost a capture. To reach 2-6 points the swing would have to be ~9 m of amplitude, i.e. 86 deg of arc, which is not a canopy. Collect-radius sweep, same swing: 9 m: 0.0pts | 7 m: 0.0pts | 5 m: 0.0pts | 4 m: 0.0pts | 3 m: 10.0pts | 2 m: 45.8pts. The constants are not moved; §4.2's own "3% harder to catch" is the claim that is wrong, and the pendulum earns its place as the thing that makes the crate READ as a crate.
+  PASS  K7   the reachability solver falsifies
+        value 1 == 1 crates named
+        unmoved: 0 unreachable of 8. With drop #3 shoved 26,000 wu downrange the solver names crate#4 (range, short 21224 m, margin none) — a name and a margin, not a count.
+  PASS  K8   detail lines
+        value 8 >= 8 lines
+        every crate printed with its margin in seconds, sorted ascending, ten tightest always: crate#8 55.3s | crate#7 56.3s | crate#1 56.8s | crate#2 56.8s | crate#3 56.8s | crate#4 56.8s | crate#5 56.8s | crate#6 56.8s
+  PASS  K9   events
+        value 4 == 4 events
+        crate:drop x3 {"id":"crate#1","kind":"ammo","x":1,"y":-400,"altM":400,"owner":"neutral"}  crate:caught x1 {"id":"crate#1","kind":"ammo","by":"player","how":"flyThrough","value":8,"mult":1,"altM":399.74000118067795,"x":1,"y":-393.74000118067795}  crate:lost x2 {"id":"crate#2","kind":"ammo","by":"","how":"cut","value":12.8,"mult":1.6,"altM":-0.03814213800755539,"x":291.34547751404557,"y":0.03814213800755539}  crate:canopyHit x6 {"id":"crate#2","by":"player","hits":1,"cut":false,"altM":200}
+  PASS  K10  zoom neutrality
+        value 1 == 1 identical
+        a full k-drop crate mission at forced zoom 0.78 and 1.22 produces a byte-identical summary. The tripwire that proves this can fail is weapons.js's --break zoom-range (C9).
+
+  9/10 pass

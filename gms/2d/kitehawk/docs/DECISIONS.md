@@ -723,3 +723,68 @@ consequence of fixing the envelope, every assert passing unchanged, before/after
 aeroplane flies, so ace HP values fitted against the old AI no longer hold. Re-fitting sixteen aces
 against an AI that is about to get crates would be work done twice. **Deferred to P11**, consistent
 with D84: playable first.
+
+**D90** — **T19 HELD: the canopy cut measures 1.485–1.508× a fly-through against a 1.35 floor.** This
+was the riskiest number in the design — below ~1.35 nobody takes the risk, everyone fly-throughs at
+safe altitude and the signature mechanic degenerates into a floating pickup. **It is robust to how
+well the player reads the wind** (1.485× at perfect judgement, 1.500× at σ=3.0), and *doing nothing*
+measures **0.522×** — half a fly-through — because the wind and the enemy take 47.8% of what you
+ignore. Measured across 400 drop points × 2 levels.
+
+**The instrument is a model of the decision, not a bot flying it, and that was the right call**: a
+0.34 s-reaction bot flies a precision manoeuvre badly, so a bot-measured T19 would have been
+**measuring bot skill and reporting it as the design's value**. Every term comes from the shipping
+physics; bot executability is reported separately.
+
+**D91** — **T20 moves 35% → 60% burst, and it is a derivation, not a tuned threshold.** At DESIGN
+§4.3's authored 35%, K3 and K4 are **jointly unsatisfiable for any multiplier** (K3 needs M ≥ 1.395,
+K4 needs M < 1.269). Solving for the burst that sinks a high cut at M = 1.6 gives 0.545; 0.60 ships
+with the derivation attached. **The alternative on the table if playtest disagrees: keep 35% and make
+a burst crate worth 0 instead of 0.5** — one constant either way. 60% is preferred because "cut it
+high and it probably bursts" is the physical intuition that teaches the rule.
+
+**D92** — **Four defects in the AI, none findable by reading, one of which would have killed the
+signature mechanic.** `CRATE_RUN` was unreachable in the exact situation it exists for — **zero
+CRATE_RUN decisions in a 190 s mission with eight crates**. And **P5's ground floor made the Mud
+band unreachable by any AI** (`120 + speed` = 162 m at cruise, 282 m pulling), taking §4.3's 1.6% cut
+below 120 m with it. P5's intent was right and implemented against the wrong quantity: **what a
+pull-out costs is set by sink rate, not by speed.** Now `60 + 2.5 × sink`, which is *more*
+conservative at Vne than the constant it replaces. Mirror regression after the change: **50.8% ± 1.9
+over 725 decisive duels.**
+
+**D93** — **K5's instrument lied three separate times before it told the truth.** The control arm was
+secretly the treatment (the enemy banked six of eight crates in *both* arms, so both had a maxed
+ladder) and read **−3.3 points**, which would have been reported as "the reinforcement ladder is
+decoration". Then reinforcements spawned into empty sky a kilometre behind the bot — delta exactly
+**0.0 on every seed**. Then they arrived after the first engagement had decided the sortie. True
+value: **+12.5 points of death rate, +13.1 HP per sortie.**
+**Warning carried to P11**, with the selection rule stated before the numbers: measure only on cells
+whose *baseline* death rate is inside the 8–30% band. **Outside it the ladder reads negative** — a
+level already at 38% has no headroom, and extra friendly losses drive the morale table into a
+squadron bug-out. A delta measured outside that band measures the ceiling, not the change.
+
+**D94** — **Criteria P6 refused to tune to, both accepted.** **K6 is unsatisfiable by DESIGN's own
+numbers**: a ±3 m swing (worst measured 3.47 m) cannot move a hitbox out of a 9 m collect radius —
+sweeping the radius gives 0.0 points at 9/7/5/4 m and 10.0 at 3 m, the crossover being exactly the
+measured offset. §4.2's "3% harder to catch" is the claim that is wrong. **`--break pin-swing` is
+caught by nothing and the agent reported that rather than hiding it.** And **K2 as written is weak —
+`--break flat-wind` passes it**, because a 200 wu displacement is produced by any wind; the
+measurement that proves a shear is the *reversal*, which the `shearCurve` fixture asserts.
+
+**D95** — Also found: **`bulletPass` tested bullets as points.** A round covers 7 m per tick against a
+3.9 m crate, so **four rounds in five missed** and "twelve rounds deny a crate" was fiction. Segment
+trace now — the same lesson P5 had already learned in its own hit allocation, repeated anyway.
+
+**D96** — **The sharpest emergent result so far: a fire caught while cutting a canopy low is
+unsurvivable.** Fire blow-out is an altitude function — **0% survivable below 450 m, 100% above
+700 m** — and a low cut commits you to the bottom of the column for 79.7 s. Two systems written for
+different purposes, and neither author intended it. Also: ground fire is **not** what makes the low
+cut dangerous (1.72 HP per cut); the time committed down there is.
+
+**D97** — Accepted: canopies are **auto-fire targets ranked strictly below every aeroplane**, because
+in a one-thumb game there is no other trigger to cut one with; a crate caught in the air is 1.0×
+whether or not its canopy was cut on the way in (otherwise the two takes stop being separable); and a
+crate that lands uncut goes to whichever side it lands on. **The auto-fire never offers a man under a
+canopy** — the story prices that shot and the price is the player's decision to make.
+**REQUEST accepted for P13/P14: `refit()` must add `ent.carryMass` before `rederive`** — it is the
+one line blocking carry mode, Airlift, and one ace's counter.

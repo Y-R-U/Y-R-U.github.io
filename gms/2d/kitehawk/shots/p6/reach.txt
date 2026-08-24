@@ -1,0 +1,42 @@
+  reach — level k-drop, kite_b1: RoC 13.24 m/s at 35 m/s, Vmax 62.6, dive 100.4
+  every crate, margin ascending — the ten tightest are printed even when everything passes
+
+    crate     dropX  alt   fall   catch@  margin    cut@  margin  cutAlt  lands   side
+    crate#8      880  1450   87.3    32.0     55.3    79.0      8.3    119    440  theirs
+    crate#7      790  1445   87.3    31.0     56.3    79.0      8.3    116    350  theirs
+    crate#1      250  1450   87.3    30.5     56.8    79.0      8.3    119   -190  ours
+    crate#2      340  1455   87.3    30.5     56.8    79.5      7.8    116   -103  ours
+    crate#3      430  1445   87.3    30.5     56.8    79.0      8.3    116    -10  ours
+    crate#4      520  1450   87.3    30.5     56.8    79.0      8.3    119     80  theirs
+    crate#5      610  1450   87.3    30.5     56.8    79.0      8.3    119    170  theirs
+    crate#6      700  1455   87.3    30.5     56.8    79.5      7.8    116    257  theirs
+
+  PASS  8/8 reachable
+  reach — level k-shear, kite_b1: RoC 13.24 m/s at 35 m/s, Vmax 62.6, dive 100.4
+  every crate, margin ascending — the ten tightest are printed even when everything passes
+
+    crate     dropX  alt   fall   catch@  margin    cut@  margin  cutAlt  lands   side
+    crate#1     -900  1450   87.3    30.5     56.8    79.0      8.3    120   -338  ours
+    crate#2     -820  1450   87.3    30.0     57.3    79.0      8.3    120   -258  ours
+    crate#3     -740  1450   87.3    30.0     57.3    79.0      8.3    120   -178  ours
+    crate#4     -660  1450   87.3    30.0     57.3    79.0      8.3    120    -98  ours
+    crate#5     -580  1450   87.3    30.0     57.3    79.0      8.3    120    -18  ours
+    crate#6     -500  1450   87.3    30.0     57.3    79.0      8.3    120     62  theirs
+    crate#7     -420  1450   87.3    30.0     57.3    79.0      8.3    120    142  theirs
+    crate#8     -340  1450   87.3    30.0     57.3    79.0      8.3    120    222  theirs
+
+  PASS  8/8 reachable
+  reach — level k-drop, kite_b1: RoC 13.24 m/s at 35 m/s, Vmax 62.6, dive 100.4
+  every crate, margin ascending — the ten tightest are printed even when everything passes
+
+    crate     dropX  alt   fall   catch@  margin    cut@  margin  cutAlt  lands   side
+    crate#4    26520  1450   87.3       —   UNREACH       —   UNREACH      —      —  theirs   *** UNREACHABLE by any of the three takes: range short 21224 m
+    crate#8      880  1450   87.3    32.0     55.3    79.0      8.3    119    440  theirs
+    crate#7      790  1445   87.3    31.0     56.3    79.0      8.3    116    350  theirs
+    crate#1      250  1450   87.3    30.5     56.8    79.0      8.3    119   -190  ours
+    crate#2      340  1455   87.3    30.5     56.8    79.5      7.8    116   -103  ours
+    crate#3      430  1445   87.3    30.5     56.8    79.0      8.3    116    -10  ours
+    crate#5      610  1450   87.3    30.5     56.8    79.0      8.3    119    170  theirs
+    crate#6      700  1455   87.3    30.5     56.8    79.5      7.8    116    257  theirs
+
+  FAIL  7/8 reachable — crate#4 (range, short 21224 m)

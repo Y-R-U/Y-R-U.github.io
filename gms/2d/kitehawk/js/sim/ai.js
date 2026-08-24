@@ -33,6 +33,17 @@ export const STATES = Object.freeze(['PATROL', 'CLIMB', 'ENGAGE', 'ATTACK_RUN', 
 /** How close a hostile must be before a pilot is fighting rather than looking. */
 export const ENGAGE_RANGE = 500;      // m
 
+/**
+ * How far away a crate has to be before a pilot stops caring. §5.2 gives the
+ * energy condition but no range; without one, every aeroplane in the level
+ * breaks off for every crate the moment one is dropped and the fight stops.
+ */
+export const CRATE_INTEREST = 1600;   // m
+/** Station-keeping radius while waiting for a crate to fall into the cut band. */
+export const LOITER_R = 120;          // m, half the racetrack
+/** How many consecutive state decisions a pilot stays committed to a crate. */
+export const CRATE_COMMIT = 25;       // x 0.40 s = 10 s
+
 export const ENERGY = Object.freeze({
   attack: +80, engageLo: -40, defend: -60, crateFloor: -100, reclimb: +150,
 });
@@ -156,6 +167,11 @@ export function createAI(ent, opts = {}) {
     counter: opts.counter || null, counterT: 0, counterPhase: 0,
     baitRole: prof && prof.pair ? (opts.pairRole || 'bait') : null,
     seen: null, seenT: 99, seenX: 0, seenY: 0,
+    // P6. `windErr` is drawn ONCE per pilot, not per tick: §4.5 says a k 0.4
+    // pilot "misjudges drift by 2.4 m/s", which is a standing misjudgement. Per
+    // tick it would average to zero over a 90 s fall and `k` would measure
+    // nothing about crates at all — D43's believable-wrong-metric shape.
+    crate: null, crateLead: 4, crateX: 0, crateY: 0, crateMiss: 0, loiterDir: 1, windErr: 0,
     stats: { states: Object.create(null), decisions: 0 },
   };
   ent.k = ai.k;
@@ -172,6 +188,10 @@ export function createAI(ent, opts = {}) {
   const AIM = { x: 0, y: 0, range: 0 };
   const AIMSOFT = { x: 0, y: 0 };
   const AIMPT = { xM: 0, yM: 0 };      // reused: `point` intents must not allocate
+  const CRP = { x: 0, y: 0, t: 0, ok: false, dist: 0, tGround: 0 };   // rendezvous, pooled
+  /** §4.5: sigma_wind = (1-k) * 4 m/s. Held, not resampled — see `ai.windErr`. */
+  ai.windErr = rng ? rng.gauss(0, (1 - ai.k) * 4) : 0;
+  if (prof && prof.huntsSilk) ent.engageSilk = 'cut';
 
   /* ---------------------------------------------------------- perception -- */
 
@@ -203,6 +223,50 @@ export function createAI(ent, opts = {}) {
       if (d < bd) { bd = d; best = o; }
     }
     if (best) { ai.seen = best; ai.seenT = 0; ai.seenX = best.flight.sx; ai.seenY = best.flight.sy; }
+    return best;
+  }
+
+  /**
+   * Which crate, if any, this pilot breaks off for. §4.5: the enemy runs the
+   * same interception the player does. The utility is simple on purpose —
+   * time-to-reach against time-to-ground, with the pilot's OWN believed wind —
+   * because the interesting behaviour is the contest, not the scoring.
+   */
+  function chooseCrate(world, e) {
+    const fld = world.crates;
+    if (!fld) return null;
+    /**
+     * §4.3's three takes are three POLICIES, and this is where a pilot's is
+     * expressed: which crates it will break off for, and how late. The player
+     * bot and the enemy run the identical function — a policy is a window on the
+     * fall, never a private advantage.
+     */
+    const pol = e.cratePolicy;
+    if (pol && !pol.run) return null;
+    const f = e.flight;
+    /**
+     * Where you MEET it. A fly-through meets a crate as soon as it can reach it;
+     * a cut meets it at the altitude the cut is worth taking at, which for the
+     * 1.6x play is the bottom of the Mud band — so the pilot flies to a place
+     * and WAITS there, low, over the trenches, in the small-arms envelope. That
+     * waiting is the whole risk of §4.3's best decision, and it exists only
+     * because the rendezvous is chosen by ALTITUDE rather than by "as soon as
+     * possible".
+     */
+    const lo = pol && pol.cutAltM ? 0 : 0;
+    const altLo = pol && pol.altLo !== undefined ? pol.altLo : 0;
+    const altHi = pol && pol.altHi !== undefined ? pol.altHi : 1e9;
+    let best = null, bestT = 1e9;
+    for (let i = 0; i < fld.crates.length; i++) {
+      const c = fld.crates[i];
+      if (!c.alive || c.landed || c.carriedBy || c.pilot) continue;
+      if (pol && pol.skipCut && c.cut) continue;
+      fld.rendezvous(c, f.sx, f.sy, f.speedSI, ai.windErr, altLo, altHi, CRP);
+      if (!CRP.ok) continue;
+      if (CRP.dist > CRATE_INTEREST) continue;
+      if (CRP.t < bestT) { bestT = CRP.t; best = c; ai.crateLead = CRP.t; ai.crateX = CRP.x; ai.crateY = CRP.y; }
+    }
+    if (best) best.contestedBy = e.id;
     return best;
   }
 
@@ -257,14 +321,59 @@ export function createAI(ent, opts = {}) {
   function chooseState(world, e, tgt) {
     if (e.dead) return 'WRECK';
     if (ai.promoteT > 0) return ai.state === 'WRECK' ? 'WRECK' : 'PATROL';
-    const flee = MORALE.flee + (world.blooded ? MORALE.bloodedFlee : 0);
+    // §4.5 ladder step 4: "enemy morale floor rises by 0.15 (they stop fleeing)".
+    // A floor on nerve is a reduction in the threshold nerve must fall below.
+    const flee = MORALE.flee + (world.blooded ? MORALE.bloodedFlee : 0)
+               - (world.crateMoraleFloor || 0);
     const nerve = e.moraleEff ?? e.morale;
     // Running away is a decision, not a mood. Without hysteresis a bug-out
     // lasted a few seconds, the 0.05/s regen lifted him back over the line while
     // he was disengaged and running, and he turned round and came back — 591
     // bug-out decisions produced 7 aeroplanes that actually left.
-    if (ai.state === 'BUG_OUT' && nerve < flee + 0.30) return 'BUG_OUT';
-    if (nerve < flee) return 'BUG_OUT';
+    // A human player has no morale system, so a bot standing in for one must not
+    // either. Without this the player bot in a 190 s crate mission bugs out at
+    // ~50 s — the "alone" term alone is -0.15 every 10 s — and every policy in
+    // the EV comparison then measures the same aeroplane leaving the level.
+    if (!e.noFlee) {
+      if (ai.state === 'BUG_OUT' && nerve < flee + 0.30) return 'BUG_OUT';
+      if (nerve < flee) return 'BUG_OUT';
+    }
+
+    /**
+     * §5.2's crate condition, verbatim: "a crate under canopy is reachable and
+     * E_rel > -100". It sits ABOVE the target checks and not below them, because
+     * a crate is a WIN CONDITION and not a preference — the first version put it
+     * after `if (!tgt) return PATROL` and after the 500 m engagement range, and
+     * was therefore unreachable in exactly the situation it exists for: nobody
+     * near you and a crate in the sky. Measured: zero CRATE_RUN decisions in a
+     * 190 s mission with eight crates in it, on both sides.
+     */
+    if (world.crates && !PREF.denySilk) {
+      const eRelC = tgt ? specE(e.flight) - specE(tgt.flight) : 0;
+      if (eRelC > ENERGY.crateFloor) {
+        const c = chooseCrate(world, e);
+        if (c) { ai.crate = c; ai.crateMiss = 0; return 'CRATE_RUN'; }
+        /**
+         * Commitment, and it is the same lesson as §4.4's flee hysteresis. The
+         * interception solution is evaluated against where the aeroplane is
+         * RIGHT NOW, so a pilot holding station over a crate loses it for one
+         * decision, drops to PATROL, and PATROL flies east at cruise — 340 m in
+         * the eight seconds before he could have looked again. Measured: a
+         * pilot 30 m from his rendezvous at t-15 s was 310 m away and climbing
+         * when the crate reached the band, on every seed. Having broken off for
+         * a crate, you stay broken off.
+         */
+        const k = ai.crate;
+        const stale = !k || !k.alive || k.landed || k.carriedBy
+                   || (e.cratePolicy && e.cratePolicy.skipCut && k.cut);
+        if (!stale) {
+          ai.crateMiss = (ai.crateMiss || 0) + 1;
+          if (ai.crateMiss <= CRATE_COMMIT) return 'CRATE_RUN';
+        }
+      }
+    }
+    ai.crate = null; ai.crateMiss = 0;
+
     if (!tgt) return specE(e.flight) < 250 ? 'CLIMB' : 'PATROL';
     const dTgt = Math.hypot(tgt.flight.sx - e.flight.sx, tgt.flight.sy - e.flight.sy);
     // Nobody is "engaged" with something 1.4 km away. Without this a formation
@@ -486,6 +595,23 @@ export function createAI(ent, opts = {}) {
   function speedTo(e, v) { e.pilot.setIntent('speed', v); }
   /** The break: full deflection in the vertical, toward the canopy or away from it. */
   function hardTurn(e, up) { e.pilot.setIntent(up ? 'turnUp' : 'turnDown'); }
+  /**
+   * Hold station over a spot. An aeroplane cannot hover, so waiting is a
+   * RACETRACK and not a circle — chase a point four hundred metres away on the
+   * side you are heading for, and reverse when you have gone far enough past.
+   *
+   * The circle version is what a diagram suggests and it does not fly: a `point`
+   * intent aimed 55 m away swings its bearing faster than the aeroplane can
+   * turn, so the aircraft chases its own tail and porpoises. Measured, the
+   * orbiting pilot's altitude wandered between 59 m and 421 m while waiting and
+   * he was 265 m out of position when the crate reached the band. The racetrack
+   * holds +-LOITER_R of the spot and flies a straight, level leg.
+   */
+  function loiter(e, cx, cy) {
+    const d = e.flight.sx - cx;
+    if (Math.abs(d) > LOITER_R) ai.loiterDir = d > 0 ? -1 : 1;
+    goTo(e, cx + (ai.loiterDir || 1) * 400, cy);
+  }
 
   /**
    * The floor. A defensive spiral "toward the ground" (§5.2) and a bug-out "dive
@@ -495,14 +621,32 @@ export function createAI(ent, opts = {}) {
    * every cell. A pilot pulls out. P4 measured the dive recovery at 88 m from
    * Vne and it scales with speed, so the floor does too.
    */
-  const FLOOR_M = 120;
-  function floorOf(e) { return FLOOR_M + e.flight.speedSI; }
+  /**
+   * P6 CORRECTION, and it is a change to a P5 file made deliberately: the floor
+   * scaled with SPEED, so a level aeroplane at cruise refused to go below 162 m
+   * and pulled to 282 m if it did. That is P5's stated intent ("P4 measured the
+   * dive recovery at 88 m from Vne and it scales with speed") implemented
+   * against the wrong quantity — what a pull-out costs is set by how fast you
+   * are going DOWN, not by how fast you are going. The cost of the proxy is that
+   * **the Mud band is unreachable by any AI**, and with it §4.3's 1.6x canopy
+   * cut below 120 m, which is the signature mechanic. Measured before the fix:
+   * 4,700 ticks of CRATE_RUN and zero rounds through a canopy, in every seed.
+   *
+   * `svy * 3.0` is 3 s of the current sink rate. Level flight needs none; a
+   * vertical dive at Vne asks for 279 m against P4's measured 88 m of extent
+   * plus reaction, which is MORE conservative than the constant it replaces.
+   */
+  const FLOOR_M = 60;
+  function floorOf(e) { return FLOOR_M + Math.max(0, e.flight.svy) * 2.5; }
   function groundGuard(e, dt) {
     const f = e.flight;
     const alt = -f.sy, floor = floorOf(e);
     if (alt > floor) return false;
     if (alt > floor * 0.6 && f.svy <= 0) return false;      // already climbing away
-    holdAlt(e, floor + 120);
+    // Clear the floor, do not evacuate the band. Pulling to floor + 120 turned
+    // every brush with the deck into a 145 m zoom climb, which is why a pilot
+    // holding station over a crate at 80 m kept throwing himself 300 m away.
+    holdAlt(e, floor + 30);
     ai.floorT = (ai.floorT || 0) + dt;
     return true;
   }
@@ -649,9 +793,83 @@ export function createAI(ent, opts = {}) {
       }
 
       case 'CRATE_RUN': {
-        // P6 owns crates. The state, the transition and the utility hook exist;
-        // what they run against does not yet. Reported, not faked.
-        holdAlt(e, 300);
+        const c = ai.crate;
+        if (!c || !c.alive || c.landed || c.carriedBy) { ai.state = 'PATROL'; return; }
+        const fld = world.crates;
+        const pol = e.cratePolicy;
+        e.wantsFire = true;
+        /**
+         * A pilot who intends to CUT must not fly into the crate, or he catches
+         * it at 1.0x and the 1.6x never happens. `standoff` is what makes "cut
+         * and stay in the fight" a different act from "go and get it": hold
+         * short of the crate by less than gun range and more than the collect
+         * radius, and the auto-fire does the rest.
+         *
+         * And he has to WAIT. Steering at the interception point works for a
+         * fly-through and is useless for a cut, because the aeroplane arrives
+         * sixty seconds early, flies straight past at cruise and spends the rest
+         * of the fall turning round — measured: 4,700 ticks in CRATE_RUN, zero
+         * rounds through the silk. So: fly to the place, orbit it, and take the
+         * shot when the crate falls into the band you want it in.
+         */
+        if (pol && pol.standoff) {
+          const altM = -c.sy;
+          const lo = pol.altLo ?? 0, hi = pol.altHi ?? 1e9;
+          if (altM >= lo && altM <= hi) {
+            /**
+             * Nose ON the canopy, then BREAK. Aiming at a standoff point short
+             * of the crate does not work and it is worth saying why: the nose
+             * then points at the standoff point, and the canopy — 35 m beyond it
+             * and 40 m below — sits 30 deg off the boresight, outside the +-11
+             * deg cone, for the whole pass. Measured, the pilot closed to 52 m
+             * with the silk 118 deg off his nose and never fired a round.
+             *
+             * `standoff` is a BREAK-OFF range instead. Six rounds is 0.33 s of a
+             * two-gun volley and the canopy is inside 66 m for about 1.6 s, so
+             * the cut is made and the pilot pulls away with a whole second in
+             * hand — which is also why a cut is "you never left the fight" and a
+             * fly-through costs you 4-10 s of position.
+             */
+            const sx = fld.silkX(c), sy = fld.silkY(c);
+            if (Math.hypot(sx - f.sx, sy - f.sy) < pol.standoff) { climbAway(e); return; }
+            /**
+             * Level off FIRST, then run in. A pilot who dives at a canopy from
+             * 100 m above it loses it off the nose exactly as he enters gun
+             * range: the bearing rate of a pursuit goes as v_perp/d, so the
+             * angle GROWS as the range closes. Measured on a diving approach:
+             * 7 deg at 72 m, 14 deg at 66 m, 31 deg at 56 m — in the cone while
+             * out of range, in range while out of the cone, every single pass.
+             * A level run-in holds the canopy inside 5 deg all the way in.
+             */
+            const dAlt = sy - f.sy;
+            if (Math.abs(dAlt) > 30) {
+              const dir = Math.sign(sx - f.sx) || 1;
+              goTo(e, sx - dir * 220, sy);
+              return;
+            }
+            goTo(e, sx, sy);
+            return;
+          }
+          fld.rendezvous(c, f.sx, f.sy, f.speedSI, ai.windErr, lo, hi, CRP);
+          const px = CRP.ok ? CRP.x : ai.crateX;
+          // Wait ABOVE the band and ride it down. Sitting at 120 m for the fifty
+          // seconds it takes a crate to fall from the Deck is not the decision
+          // §4.3 describes — it is a man standing in a trench being shot at.
+          const wy = -Math.min(320, Math.max(hi + (pol.above ?? 15), altM * 0.42));
+          const d = Math.hypot(px - f.sx, wy - f.sy);
+          if (d > LOITER_R * 1.5) goTo(e, px, wy);
+          else loiter(e, px, wy);
+          return;
+        }
+        /**
+         * §4.5: "their wind maths uses the same solver with a skill-scaled
+         * error, sigma_wind = (1-k) * 4 m/s". The error goes into what the pilot
+         * BELIEVES the wind is — the crate is unaffected and the AI then flies
+         * accurately to its own wrong answer. D86's rule; here it is also the
+         * design's, and it is why a k 0.4 pilot misses and a k 0.9 ace does not.
+         */
+        fld.rendezvous(c, f.sx, f.sy, f.speedSI, ai.windErr, 0, 1e9, CRP);
+        goTo(e, CRP.ok ? CRP.x : ai.crateX, CRP.ok ? CRP.y : ai.crateY);
         return;
       }
     }
@@ -676,13 +894,15 @@ export function createAI(ent, opts = {}) {
    * the harness is measuring bot quality and every number here is worthless.
    */
   const PREF = { ceilM: 0, slow: 0, needERel: 0, holdAltM: 0, noMerge: false,
-                 hammer: false, ears: false, updraft: false, reach: false, placebo: 0 };
+                 hammer: false, ears: false, updraft: false, reach: false, placebo: 0,
+                 denySilk: false, carryNothing: false };
   ai.pref = PREF;
 
   function setCounter(c) {
     PREF.ceilM = 0; PREF.slow = 0; PREF.needERel = 0; PREF.holdAltM = 0;
     PREF.noMerge = false; PREF.hammer = false; PREF.ears = false;
     PREF.updraft = false; PREF.reach = false; PREF.placebo = 0;
+    PREF.denySilk = false; PREF.carryNothing = false;
     switch (c) {
       // A1 will not follow you under 45 m/s. Take the fight to the floor and
       // keep it slow: he can still make passes, but he cannot stay to turn, so
@@ -696,6 +916,11 @@ export function createAI(ent, opts = {}) {
       case 'campCloudTop':   PREF.holdAltM = -1; PREF.needERel = 20; break;
       // A5 only wants the head-on. Refuse it and take his six.
       case 'neverMerge':     PREF.noMerge = 150; break;
+      // S1 Drach hunts silk. Give him none: shoot the box, not the canopy, and
+      // take the 0 rather than let a cut crate drift to his side of the line.
+      case 'denySilk':       PREF.denySilk = true; ent.engageSilk = 'deny'; break;
+      // A9 only attacks crate-carriers. Bank as you go and carry nothing.
+      case 'carryNothing':   PREF.carryNothing = true; break;
       // A7 is invisible past 200 m. Fly the last known bearing.
       case 'ears':           PREF.ears = true; break;
       // A8's updrafts are authored, visible, and yours too.

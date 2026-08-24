@@ -1,0 +1,81 @@
+{
+  "v": 1,
+  "_": "DESIGN §4.8 — the one-tap slot. ONE special is loaded at a time and an Ordnance crate swaps it mid-mission (§4.4), which is the reason to take a crate you did not think you needed. `impl` says who owns the EFFECT: P6 owns the slot itself and the shotgun shell, because cutting a canopy in one shot is a crate rule; the other five are weapons and flares and belong to P13's hangar and P14's modes. A row with impl != 'p6' is live data with no effect wired, and it is declared here rather than stubbed silently.",
+  "slot": {
+    "capacity": 1,
+    "swappableBy": "ordnance",
+    "button": "bottom-right, 108 px radius, mirrored on left-handed (DESIGN §2.2)"
+  },
+  "specials": [
+    {
+      "id": "shotgun",
+      "name": "Shotgun shell",
+      "desc": "One wide blast. Cuts a canopy in a single shot.",
+      "ammo": 3,
+      "impl": "p6",
+      "pellets": 25,
+      "dmgPerPellet": 8,
+      "rangeM": 30,
+      "cutsCanopy": true,
+      "source": ["ordnance-crate"]
+    },
+    {
+      "id": "lePrieur",
+      "name": "Le Prieur rockets",
+      "desc": "Eight rockets, straight, and they eat balloons.",
+      "ammo": 1,
+      "impl": "p13",
+      "rockets": 8,
+      "dmg": 45,
+      "rangeM": 200,
+      "vsBalloon": 3.5,
+      "source": ["hangar", "ordnance-crate"]
+    },
+    {
+      "id": "cooper",
+      "name": "Cooper bombs",
+      "desc": "Four, released along the flight path with real gravity.",
+      "ammo": 4,
+      "impl": "p13",
+      "dmg": 90,
+      "groundOnly": true,
+      "source": ["hangar"],
+      "actFrom": 1
+    },
+    {
+      "id": "flare",
+      "name": "Flare",
+      "desc": "Lights a 180 m radius for 14 s, and drifts with the wind.",
+      "ammo": 4,
+      "impl": "p9",
+      "radiusM": 180,
+      "secs": 14,
+      "driftsWithWind": true,
+      "source": ["hangar"],
+      "actFrom": 4,
+      "_note": "§4.6.3 'Both Sides of the Line' is built on this: four flares cannot cover twelve crates, so information is the scarce resource. The drift uses the same wind profile a crate does — `windAt` in js/sim/crates.js — and must not grow a second copy."
+    },
+    {
+      "id": "boost",
+      "name": "Emergency boost",
+      "desc": "+55% thrust for 5 s. The engine takes 3 damage a second while it is lit.",
+      "ammo": 2,
+      "impl": "p13",
+      "thrustMult": 1.55,
+      "secs": 5,
+      "engineDPS": 3,
+      "source": ["engine-t4"]
+    },
+    {
+      "id": "smoke",
+      "name": "Smoke",
+      "desc": "A decoy trail. Breaks every enemy lock for 4 s.",
+      "ammo": 2,
+      "impl": "p13",
+      "secs": 4,
+      "breaksLock": true,
+      "source": ["trait-unlock"]
+    }
+  ],
+  "ordnancePool": ["shotgun", "lePrieur", "flare", "cooper", "boost", "smoke"]
+}

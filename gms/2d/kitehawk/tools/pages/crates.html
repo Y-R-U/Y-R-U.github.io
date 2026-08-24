@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>kitehawk — parachute crates</title>
+<style>
+  html,body{margin:0;background:#101014;color:#cfc;font:12px ui-monospace,monospace}
+  #wrap{position:relative;width:max-content;margin:8px auto}
+  #gl{display:block}
+  #hud{position:fixed;top:0;left:0;padding:6px 8px;background:rgba(0,0,0,.65);white-space:pre;
+       line-height:1.45;max-width:46ch}
+  #keys{position:fixed;bottom:0;left:0;padding:6px 8px;background:rgba(0,0,0,.65);white-space:pre}
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="gl"></canvas></div>
+<div id="hud"></div>
+<div id="keys"></div>
+<script type="module">
+/**
+ * The crates, drawn, driven by the SHIPPING `js/sim/crates.js`. Nothing on this
+ * page re-implements a fall, a wind, a pendulum or a cut — it imports the module
+ * `tools/sim.mjs` measures and puts a camera in front of it. That is the only
+ * arrangement in which what you are looking at is what the gates measured.
+ *
+ *   ?zoom=0.78 / 1.22   the D18 clamp ends, to eyeball the zoom-neutral claim
+ *   ?wind=shear         DESIGN §4.6.1's reversing profile instead of the steady one
+ *   ?scale=2            push in on one canopy, for the 2x seam question
+ *   ?pin=1              --break pin-swing: the pendulum stopped
+ */
+import { mount, qp, flatGrade } from './harness.js';
+import { LAYER } from '../../js/gfx/renderer.js';
+import { makePaper } from '../../js/gfx/texture.js';
+import { createRNG } from '../../js/core/rng.js';
+import { createWorld, playerType } from '../../js/sim/entities.js';
+import { createCrateField, CRATE, terminalAt, tau } from '../../js/sim/crates.js';
+import { makeCanopyRig, breathe, goreAt, CANOPY } from '../../js/gfx/rigs/canopy.js';
+import { makeCrateRig } from '../../js/gfx/rigs/crate.js';
+
+const ZOOM = qp('zoom', 1);
+const SCALE = qp('scale', 1);
+const PIN = qp('pin', 0);
+const WIND_ID = qp('wind', 'steady');
+
+const { R } = await mount({ w: 390, h: 844, dpr: 1, worldH: 1000 });
+flatGrade(R);
+R.setAmbient(0.60, 0.63, 0.72);
+R.setClearColor(0.42, 0.52, 0.64);
+R.setLayer(LAYER.ACTORS, { shade: 0.30, response: 0.55, grainAmt: 1.0 });
+const paper = makePaper(R.gl, 256, 3);
+R.setGrain(paper, 1 / 128, 0.28);
+
+/* ------------------------------------------------------------- the sim --- */
+
+const WINDS = {
+  steady: [[0, -4.5], [300, -5], [900, -5.5], [1500, -5.5]],
+  // DESIGN §4.6.1 "The Shear", verbatim
+  shear: [[0, -6], [150, -6], [300, 2], [500, 9], [1500, 9]],
+};
+
+const ctx = { rng: createRNG(7), bug: PIN ? 'pin-swing' : '' };
+const world = createWorld(ctx, {});
+const field = createCrateField(world, {
+  wind: WINDS[WIND_ID] || WINDS.steady, lineX: 0, groundFire: false, gustPhase: 0.7, gustSeed: 11,
+});
+
+const KINDS = ['supply', 'ammo', 'fuel', 'parts', 'ordnance', 'intel', 'contraband'];
+const rigs = new Map();               // one crate rig per kind, one canopy rig per crate slot
+const canopies = field.crates.map(() => makeCanopyRig());
+for (const k of KINDS) rigs.set(k, makeCrateRig(k));
+
+let t = 0, dropT = 0, dropN = 0;
+const DT = 1 / 60;
+
+/* -------------------------------------------------------------- lights --- */
+/**
+ * A key over the shoulder plus a warm bounce off the ground. The bounce is the
+ * point of drawing silk in code: it lights the SKIRT of every canopy from below
+ * and no painted sprite can do it.
+ */
+const LIGHTS = [
+  { dx: -0.42, dy: -0.91, intensity: 1.0, r: 1.00, g: 0.95, b: 0.84 },
+];
+
+/* -------------------------------------------------------------- camera --- */
+const cam = { x: 0, y: -600, zoom: ZOOM };
+
+function frame() {
+  world.update(DT);
+  t += DT;
+
+  dropT += DT;
+  if (dropT > 6 && dropN < 8) { dropT = 0; dropN++;
+    field.drop({ xM: -60 + dropN * 34, yM: -1450, kind: KINDS[dropN % KINDS.length] });
+  }
+
+  // follow the lowest live crate, so the interesting part of the fall is framed
+  let lowest = null;
+  for (const c of field.crates) if (c.alive && !c.landed && (!lowest || c.sy > lowest.sy)) lowest = c;
+  if (lowest) {
+    const ty = field.crateY(lowest) / 0.15;
+    cam.y += (Math.min(-180, ty - 120) - cam.y) * 0.04;
+    cam.x += (field.crateX(lowest) / 0.15 - cam.x) * 0.03;
+  }
+
+  R.begin(cam);
+  for (const L of LIGHTS) R.light(L);
+
+  // the ground, so an impact reads as an impact
+  R.poly([-20000, 0, 20000, 0, 20000, 4000, -20000, 4000], [0.30, 0.29, 0.24], LAYER.GROUND);
+
+  let live = 0, cut = 0;
+  for (let i = 0; i < field.crates.length; i++) {
+    const c = field.crates[i];
+    if (!c.alive || c.landed) continue;
+    live++; if (c.cut) cut++;
+    const cx = field.crateX(c) / 0.15, cy = field.crateY(c) / 0.15;
+    const rig = rigs.get(c.kind) || rigs.get('supply');
+    // a cut crate tumbles; an intact one hangs on the shroud angle
+    const rot = c.cut ? (c.t * 3.1) : c.ph * 0.6;
+    R.drawRig(rig, cx, cy, rot, SCALE, LIGHTS, LAYER.ACTORS);
+    if (!c.cut) {
+      const can = canopies[i];
+      breathe(can, c.t + i, 0.035);
+      if (c.silkHits > 0) {
+        const g = goreAt(0);
+        can.pose('hit' + g, Math.min(1, c.silkHits / CRATE.silkRounds) * 0.8);
+      }
+      R.drawRig(can, c.sx / 0.15, c.sy / 0.15, c.ph * 0.35, SCALE, LIGHTS, LAYER.ACTORS);
+    }
+  }
+  R.end();
+
+  const s = field.stats;
+  hud.textContent =
+    `t ${t.toFixed(1)} s   zoom ${ZOOM}   scale ${SCALE}   wind ${WIND_ID}${PIN ? '   PIN-SWING' : ''}\n` +
+    `terminal  ${terminalAt(0).toFixed(2)} m/s SL   ${terminalAt(1500).toFixed(2)} at the ceiling\n` +
+    `tau       ${tau(0).toFixed(2)} s  (DESIGN §4.2 asserts ~1.3, and does not author it)\n` +
+    `canopy    ${CANOPY.SEGMENTS} gores + ${CANOPY.LINES} shrouds, one draw call\n` +
+    `live ${live}   cut ${cut}   dropped ${s.dropped}   friendly ${s.landedFriendly}   theirs ${s.landedEnemy}`;
+
+  requestAnimationFrame(frame);
+}
+
+keys.textContent = '1..8 cut a canopy   0 deny the nearest   r reset';
+addEventListener('keydown', (e) => {
+  if (e.key === 'r') { field.reset(); dropN = 0; t = 0; return; }
+  const live = field.crates.filter(c => c.alive && !c.landed);
+  if (e.key === '0') { const c = live[0]; if (c) { c.boxHits = CRATE.boxRounds; c.alive = false; c.denied = true; } return; }
+  const n = Number(e.key);
+  if (n >= 1 && n <= 8 && live[n - 1]) { live[n - 1].silkHits = CRATE.silkRounds; field.cutCanopy(live[n - 1]); }
+});
+
+window.__crates = { field, world, CRATE };
+frame();
+</script>
+</body>
+</html>

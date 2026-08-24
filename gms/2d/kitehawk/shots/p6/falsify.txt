@@ -1,0 +1,25 @@
+=== --break pin-swing ===
+  13/13 pass
+  FAIL  K6   the pendulum matters
+=== --break flat-wind ===
+  FAIL  shearCurve     {"shearWu":5203.9,"flatWu":3192.1,"reversalWu":0,"flatReversalWu":0}
+  12/13 pass
+  FAIL  K6   the pendulum matters
+=== --break burst-free ===
+  13/13 pass
+  FAIL  K4   a high cut is worse than a fly-through
+  FAIL  K6   the pendulum matters
+=== --break no-ladder ===
+  FAIL  ladderSpawns   {"spawned":0,"dmgMult":1,"moraleFloor":0}
+  12/13 pass
+  FAIL  K5   the reinforcement ladder is not decoration
+  FAIL  K6   the pendulum matters
+=== --break point-bullets ===
+  FAIL  cutAndDeny     {"cut":true,"cutAlt":395,"denied":false,"deniedCount":0}
+  12/13 pass
+  FAIL  K6   the pendulum matters
+=== --break crate-zoom ===
+  FAIL  zoomNeutral    {"same":false,"marginal":"missed/caught"}
+  12/13 pass
+  FAIL  K6   the pendulum matters
+  FAIL  K10  zoom neutrality

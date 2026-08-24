@@ -144,6 +144,9 @@ function makeEntity(i) {
     shotsFired: 0, hits: 0, kills: 0,
     morale: 0.7, moraleBase: 0.7, k: 0.6, aggro: 1,
     leaderId: '', formSlot: 0, fled: false, grudge: 0,
+    // P6: §4.5's ladder multiplies enemy gun damage; §4.7's carry count is read
+    // by ace A9's target filter. Carry MASS is deferred to P14 — see P6_NOTES §9.
+    dmgMult: 1, carrying: 0, special: '', specialAmmo: 0,
     born: 0, lived: 0, wasDead: false,
   };
 }
@@ -181,6 +184,15 @@ export function createWorld(ctx = {}, opts = {}) {
     arena: { cloudLo: -560, cloudHi: -420, dark: false, updrafts: null, lineX: 1000, halfW: 1000 },
     stats: { fled: 0, killed: 0, bailed: 0, silkShot: 0 },
     blooded: false,
+    /**
+     * P6. `js/sim/crates.js` installs itself here (`createCrateField(world)`),
+     * and the four hook points below are the whole of its coupling to the world
+     * tick: the crate physics, the gun candidate list, the bullet pass and the
+     * framing box. `crateMoraleFloor` is §4.5's ladder step 4 — "enemy morale
+     * floor rises by 0.15" — read by `ai.js`'s flee decision.
+     */
+    crates: null,
+    crateMoraleFloor: 0,
   };
 
   world.byId = (id) => byIdMap.get(id) || null;
@@ -276,6 +288,8 @@ export function createWorld(ctx = {}, opts = {}) {
     e.pilot.setAxisX(0);
     e.leaderId = o.leaderId || ''; e.formSlot = o.formSlot || 0;
     e.fled = false; e.grudge = o.grudge || 0;
+    e.dmgMult = o.dmgMult ?? (world.crates && e.side !== 1 ? world.crates.dmgMult : 1);
+    e.carrying = 0; e.special = o.special || ''; e.specialAmmo = o.specialAmmo || 0;
     e.ai = null;
     e.born = world.t; e.lived = 0;
     e.alive = true;
@@ -316,6 +330,8 @@ export function createWorld(ctx = {}, opts = {}) {
     for (let i = 0; i < bullets.length; i++) bullets[i].alive = false;
     for (let i = 0; i < chutes.length; i++) chutes[i].alive = false;
     byIdMap.clear();
+    if (world.crates) world.crates.reset();
+    world.crateMoraleFloor = 0;
     world.t = 0; idSeq = 0;
     world.stats.fled = 0; world.stats.killed = 0; world.stats.bailed = 0; world.stats.silkShot = 0;
     world.blooded = false;
@@ -350,10 +366,15 @@ export function createWorld(ctx = {}, opts = {}) {
       if (world.arena.updrafts) applyUpdraft(e, world.arena, dt);
     }
 
+    if (world.crates) world.crates.update(dt);
+
     for (let i = 0; i < live.length; i++) {
       const e = live[i];
       if (e.dead || !e.gun) continue;
-      updateGun(world, e, live, dt);
+      // P6: silk is appended to the candidate list only for a side that is set
+      // to engage it, and weapons.js scores it strictly below any aeroplane, so
+      // the assist never shoots a canopy while somebody is shooting at you.
+      updateGun(world, e, world.crates ? world.crates.targetsFor(e) : live, dt);
     }
     for (let i = 0; i < live.length; i++) {
       const e = live[i];
@@ -362,6 +383,7 @@ export function createWorld(ctx = {}, opts = {}) {
     }
 
     updateBullets(world, dt);
+    if (world.crates) world.crates.bulletPass(dt);
 
     for (let i = 0; i < live.length; i++) updateDamage(live[i], dt, ctx);
     // Deaths are detected once, at the END of the tick, against a snapshot taken
@@ -506,7 +528,7 @@ function updateTurrets(world, e, live, dt) {
              + (e.rng ? e.rng.gauss(0, (1 - e.k) * 0.6 * (Math.PI / 180)) : 0);
     b.x = f.sx; b.y = f.sy;
     b.vx = Math.cos(th) * GUNS.vMuzzle; b.vy = Math.sin(th) * GUNS.vMuzzle;
-    b.t = 0; b.life = GUNS.rangeTracer / GUNS.vMuzzle; b.dmg = T.dmg; b.inc = 1;
+    b.t = 0; b.life = GUNS.rangeTracer / GUNS.vMuzzle; b.dmg = T.dmg * (e.dmgMult || 1); b.inc = 1;
     b.side = e.side; b.owner = e.id; b.alive = true;
   }
 }
@@ -549,5 +571,8 @@ export function framingContributions(world, player, out, lockRangeWu = 1400) {
     const size = big ? Math.min(FRAMING.bossSectionWu, e.type.section) : FRAMING.hullWu;
     out.push({ id: e.id, x: wuOf(f.sx), y: wuOf(f.sy), w: size, h: size, weight: 1 });
   }
+  // P6 / P5_NOTES §12.4: a contested crate is a framing subject at weight 0, so
+  // it widens the box without arming the zoom lock.
+  if (world.crates) world.crates.framing(player, out);
   return out;
 }

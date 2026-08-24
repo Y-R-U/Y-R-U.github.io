@@ -1,0 +1,16 @@
+  PASS  identity       {"balance":0,"columnSecs":89.99,"columnMean":16.67,"tauSL":1.468,"swing":4.914}
+  PASS  columnFall     {"secs":89.33}
+  PASS  shearCurve     {"shearWu":2613.6,"flatWu":2452.3,"reversalWu":359.7,"flatReversalWu":0}
+  PASS  cutAndDeny     {"cut":true,"cutAlt":395,"denied":true,"deniedCount":1}
+  PASS  cutDrift       {"landUncut":234.4,"landCutLow":226.5,"landCutHigh":169.6,"driftAfterLowCut":23.5,"driftAfterHighCut":53.1,"forfeitLow":7.9,"forfeitHigh":64.8,"ratio":8.18}
+  PASS  ladderSpawns   {"spawned":3,"dmgMult":1.12,"moraleFloor":0.15}
+  PASS  smallArms      {"at40":0.0942,"at150":0.0277,"at70slow":0.0978,"at300":0}
+  PASS  contents       {"mean":15.57,"kinds":7}
+  PASS  zoomNeutral    {"same":true,"marginal":"caught/caught"}
+  PASS  determinism    {"identical":true}
+  PASS  noAllocation   {"warm":48,"after":48}
+  PASS  bloodedChute   {"chuteExists":true,"offeredToAutoFire":false,"bloodedBefore":false,"bloodedAfter":true,"silkShot":1,"banked":0}
+  PASS  shotgun        {"fired":true,"wasCut":false,"isCut":true,"ammo":0}
+
+  13/13 pass
+  PASS  purity — 10 modules in the graph, 0 violations

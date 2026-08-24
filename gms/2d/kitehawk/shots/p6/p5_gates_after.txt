@@ -1,0 +1,27 @@
+  PASS  C1   purity across the sim graph                  10 files clean
+  FAIL  C2   time-to-kill, on target                      scout 0.87 s (13/14); player 9.78 s
+  PASS  C3   player lethality ratio                       11.3x
+  FAIL  C4   intended tier wins 55-70%                    A1:93% A3:75% A4:77% A6:20% A7:13% A9:54% A11:89% A12:31% S1:100% S2:98% S3:14%
+  FAIL  C5   sidegrades 45-65% on every act-appropriate ace A1(1) A3(2) A4(3) A5(2) A6(4) A7(4) A8(4) A9(3) A10(2) A11(5) S1(4) S2(4) S3(4)
+            (51 airframe x ace cells)
+  FAIL  C6   counter-play >= 18 points                    A1:1.6 A3:-55.9 A5:-25.6 A8:-3.1 A11:-2.6 S2:3.3
+            (2 need crates (P6); 3 exempt)
+  FAIL  C7   the mirror ace at k 0.90, all five airframes 46.7% of 471 decisive (+-2.3)
+            (kite_b1 44%  kite_b2 40%  harrier_tri 50%  lance_mk1 54%  kitehawk 45%)
+  PASS  C8   flee rate 12-22%                             16.7% (15/90)
+  PASS  C9   zoom neutrality of duel summaries            byte-identical
+  PASS  C10  no entity allocation after warm-up           warm 536, then +0 over 200 duels
+
+  5/10 pass
+  PASS  hitAspect      {"astern":{"structure":65.7,"engine":0,"wingU":0,"wingL":6,"tail":12.3,"fuel":10.9,"pilot":8.2},"asternLow":{"structure":62.7,"engine":0,"wingU":0,"wingL":19.1,"tail":12,"fuel":10.9,"pilot":0},"above":{"structure":65.6,"engine":0,"wingU":19.1,"wingL":0,"tail":0,"fuel":0,"pilot":0},"front":{"structure":61.4,"engine":16.4,"wingU":0,"wingL":0,"tail":0,"fuel":0,"pilot":0}}
+  FAIL  timeToKill     {"secs":0.867,"fired":14,"hits":13,"acc":0.929}
+  FAIL  straddle       {"farSecs":0.883,"nearSecs":0.667,"ratio":0.76}
+  PASS  fireOut        {"outAt":6.3,"peakV":90.4,"structLost":50.4,"levelFlightKills":true}
+  PASS  elementSplit   {"heldTicks":1075,"splitTicks":244,"promoteQuiet":2.5}
+  PASS  coneStrict     {"onNose":14,"off20deg":0}
+  PASS  kMonotone      {"winVsK025":0.714,"winVsK095":0.552,"gapPts":16.3}
+  PASS  lockStability  {"changesPer10s":18,"withoutHysteresis":18,"holdTicks":24,"holdTicksWithout":0,"note":"T13 target < 4; the 0.40 s hold suppresses 0.40 s of firing per 10 s, 0.00 s without it"}
+  PASS  recycle        {"identical":true}
+  PASS  noAllocation   {"warmUpObjects":536,"afterTwentyDuels":536,"growthOverRemaining":0}
+
+  8/10 pass

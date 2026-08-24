@@ -1,0 +1,82 @@
+{
+  "runs": 40,
+  "cells": [
+    {
+      "gun": "t1",
+      "enemies": 1,
+      "base": 0.025,
+      "with3": 0.025,
+      "deltaPts": 0,
+      "baseHP": 103.1,
+      "deltaHP": -4.6,
+      "inBand": false
+    },
+    {
+      "gun": "t1",
+      "enemies": 2,
+      "base": 0.1,
+      "with3": 0.25,
+      "deltaPts": 15,
+      "baseHP": 128.1,
+      "deltaHP": 16.2,
+      "inBand": true
+    },
+    {
+      "gun": "t1",
+      "enemies": 3,
+      "base": 0.4,
+      "with3": 0.325,
+      "deltaPts": -7.5,
+      "baseHP": 167.2,
+      "deltaHP": 5.8,
+      "inBand": false
+    },
+    {
+      "gun": "t2",
+      "enemies": 1,
+      "base": 0,
+      "with3": 0,
+      "deltaPts": 0,
+      "baseHP": 91.5,
+      "deltaHP": -4.6,
+      "inBand": false
+    },
+    {
+      "gun": "t2",
+      "enemies": 2,
+      "base": 0.1,
+      "with3": 0.2,
+      "deltaPts": 10,
+      "baseHP": 120.7,
+      "deltaHP": 10,
+      "inBand": true
+    },
+    {
+      "gun": "t2",
+      "enemies": 3,
+      "base": 0.375,
+      "with3": 0.25,
+      "deltaPts": -12.5,
+      "baseHP": 156.7,
+      "deltaHP": 4.3,
+      "inBand": false
+    }
+  ],
+  "inBandCells": 2,
+  "rows": [
+    {
+      "lost": 0,
+      "runs": 40,
+      "deathRate": 0.1,
+      "hpPerRun": 128.1
+    },
+    {
+      "lost": 3,
+      "runs": 40,
+      "deathRate": 0.225,
+      "hpPerRun": 144.3
+    }
+  ],
+  "deltaPts": 12.5,
+  "deltaHP": 13.1
+}

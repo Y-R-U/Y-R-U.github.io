@@ -70,6 +70,14 @@ export const PRIORITY = Object.freeze({
   align: 1.20, near: 1.00, threat: 0.90, wounded: 0.60, objective: 1.50,
   hysteresis: 0.40,        // s a lock survives outside the cone. Register T13.
   steal: 1.35,             // ...unless something else scores this much better
+  /**
+   * P6. A canopy (`c.silk`) is a target the assist may take, because in a
+   * one-thumb game there is no other trigger to cut one with — but it must never
+   * outrank an aeroplane, or the auto-fire shoots silk while somebody is shooting
+   * at you. The maximum score any aircraft can reach is 5.20, so this is a hard
+   * ordering rather than a weight that could ever be out-argued.
+   */
+  silk: 100,
 });
 
 /* ------------------------------------------------------------- the cone --- */
@@ -136,6 +144,7 @@ export function pickTarget(shooter, candidates, dt, ctx = null) {
           + (c.objective ? PRIORITY.objective : 0);
     // §2.5's tie-break: lowest absolute HP
     s -= c.hp.structure * 1e-6;
+    if (c.silk) s -= PRIORITY.silk;
     if (c.id === g.lockId) { lockStill = c; lockScore = s; }
     if (s > bestScore) { bestScore = s; best = c; }
   }
@@ -266,7 +275,7 @@ function spawnRound(world, shooter, portSide, bug = '') {
     const t = shooter.target;
     b.x = t.flight.sx; b.y = t.flight.sy - 0.2;
     b.vx = 1e-3; b.vy = 1e-3; b.t = 0; b.life = 0.02;
-    b.dmg = shooter.gun.tier.dmg; b.inc = shooter.gun.tier.incendiary || 1;
+    b.dmg = shooter.gun.tier.dmg * (shooter.dmgMult || 1); b.inc = shooter.gun.tier.incendiary || 1;
     b.side = shooter.side; b.owner = shooter.id; b.alive = true;
     return b;
   }
@@ -290,7 +299,10 @@ function spawnRound(world, shooter, portSide, bug = '') {
   b.vy = Math.sin(th) * vb;
   b.t = 0;
   b.life = g_life(shooter.gun);
-  b.dmg = shooter.gun.tier.dmg;
+  // P6 §4.5 ladder step 2: "every surviving enemy gains +12% damage". It is
+  // applied to the ROUND, not to the shared gun tier — mutating `gun.tier` would
+  // be D85's retained-shared-reference defect a third time.
+  b.dmg = shooter.gun.tier.dmg * (shooter.dmgMult || 1);
   b.inc = shooter.gun.tier.incendiary || 1;
   b.side = shooter.side;
   b.owner = shooter.id;

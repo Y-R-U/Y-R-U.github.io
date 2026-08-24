@@ -1,0 +1,19 @@
+{
+  "free": {
+    "runs": 600,
+    "caught": 600,
+    "radius": 9,
+    "rate": 1,
+    "meanSwingM": 1.76,
+    "maxOffsetM": 3.47
+  },
+  "pinned": {
+    "runs": 600,
+    "caught": 600,
+    "radius": 9,
+    "rate": 1,
+    "meanSwingM": 0,
+    "maxOffsetM": 0
+  },
+  "deltaPts": 0
+}

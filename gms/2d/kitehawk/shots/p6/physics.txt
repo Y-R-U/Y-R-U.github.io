@@ -1,0 +1,44 @@
+{
+  "identity": {
+    "vTermSL": 14.400549609445733,
+    "dragAtTerminal": 882.9000000000001,
+    "weight": 882.9000000000001,
+    "balance": 0,
+    "vTerm1500": 19.43870872424549,
+    "columnMean": 16.66847451312711,
+    "columnSecs": 89.99023868793083,
+    "tauSL": 1.4679459336845802,
+    "tauDesign": 1.3,
+    "swingPeriod": 4.913839757739828,
+    "swingDesign": 4.9,
+    "vTermCutSL": 34.99568352743432,
+    "crateEV": 15.57
+  },
+  "fallFromCeiling": 89.33,
+  "ceilingM": 1500,
+  "shear": {
+    "driftWu": 2613.6,
+    "driftM": 392,
+    "secs": 86.8,
+    "maxWu": 2973.3,
+    "minWu": 0,
+    "reversalWu": 359.7,
+    "meanWind": 5.52
+  },
+  "flat": {
+    "driftWu": 2452.3,
+    "driftM": 367.9,
+    "reversalWu": 0
+  },
+  "tauAt": {
+    "m0": 1.468,
+    "m500": 1.622,
+    "m1500": 1.982
+  },
+  "termAt": {
+    "m0": 14.4,
+    "m750": 16.73,
+    "m1500": 19.44
+  },
+  "cutTerminal": 35
+}

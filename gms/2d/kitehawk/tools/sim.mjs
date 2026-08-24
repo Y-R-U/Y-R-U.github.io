@@ -44,6 +44,21 @@ import { HP_REF, SPILL, COLLIDERS_PROFILE, COLLIDERS_SPAN, setColliderSet, SUBRE
          traceHit, updateDamage, makeHP, FIRE, P5_BREAKS, HULL_M } from '../js/sim/damage.js';
 import { createAI, ACES, ACE_IDS, MORALE, ENERGY, FORMATION, createFormation, cornerGuess } from '../js/sim/ai.js';
 import { createDuel, DUEL, INTENDED } from '../js/modes/duel.js';
+import { createCrateField, CRATE, CONTENTS, CONTENT_BY_KIND, CRATE_EV, LADDER, SMALL_ARMS,
+         smallArmsP, terminalAt as crateTerminal, tau, swingPeriod, crateIdentity, windAt,
+         reachCone, soonestCatch, soonestCut, ACT_MULT } from '../js/sim/crates.js';
+import { CEILING_WU } from '../js/core/bands.js';
+
+/** P6's break switch, kept separate from P4's `BROKEN` and P5's `P5BUG`. */
+let P6BUG = '';
+const P6_BREAKS = Object.freeze({
+  'pin-swing':    'crates.js: the pendulum is pinned to zero — the hitbox stops moving',
+  'flat-wind':    'crates.js: the wind is sampled at 750 m for every altitude — no shear',
+  'burst-free':   'crates.js: T20 deleted — a cut crate never bursts, at any altitude',
+  'no-ladder':    'crates.js: §4.5 reduced to a counter — a banked crate buys the enemy nothing',
+  'point-bullets': 'crates.js: rounds are tested as POINTS at tick resolution, not segments',
+  'crate-zoom':   'crates.js: the 9 m collect radius scales with the camera zoom (K10 tripwire)',
+});
 
 const LIFT_CL0 = LIFT.CL0, LIFT_CLA = LIFT.CLa;
 
@@ -768,7 +783,8 @@ const PURITY_FORBIDDEN = [
   'document', 'window', 'navigator', 'localStorage', 'sessionStorage', 'fetch',
   'performance', 'requestAnimationFrame', 'WebGL', 'canvas', 'Math.random', 'Date.now', 'new Date',
 ];
-const PURITY_ROOTS = ['js/sim/entities.js', 'js/sim/weapons.js', 'js/sim/damage.js', 'js/sim/ai.js',
+const PURITY_ROOTS = ['js/sim/crates.js',
+                     'js/sim/entities.js', 'js/sim/weapons.js', 'js/sim/damage.js', 'js/sim/ai.js',
                       'js/sim/flight.js', 'js/sim/aero.js', 'js/sim/physics.js', 'js/sim/pilot.js',
                       'js/modes/duel.js'];
 
@@ -1026,7 +1042,7 @@ const P5_FIXTURES = {
 
   /** §3.2: a fire is put out by diving above 70 m/s for 3 s — and only then. */
   fireOut: () => {
-    const ctx = { rng: createRNG(31) };
+    const ctx = { rng: createRNG(31), bug: P6BUG };
     const world = createWorld(ctx, {});
     const e = world.spawn(playerType('kite_b1', 't2'), { id: 'p', side: 0, xM: 0, yM: -1100, speed: 45, theta: 0 });
     e.burning = true; e.fireT = 0; e.blowT = 0;
@@ -1306,6 +1322,1125 @@ function allocGrowth(duels = 200) {
   return { warm, duels, growth: total() - base, base, end: total() };
 }
 
+
+/* ========================================================================== */
+/* P6 — the parachute crates                                                  */
+/* ========================================================================== */
+/**
+ * Everything below MEASURES the shipping `js/sim/crates.js`. The two things
+ * this section refuses to do, both for the same reason DESIGN §10.4 gives:
+ *
+ *   1. the reachability solver contains no fallback, no clamp and no
+ *      "if unreachable, move the drop point" — a gate that passed because of a
+ *      workaround inside it once hid a third of a map being unreachable;
+ *   2. no constant is re-declared here. `CRATE`, `SMALL_ARMS`, `LADDER` and the
+ *      contents table are imported, and the airframe numbers the reach cone
+ *      needs are MEASURED off the real model, never typed.
+ */
+
+/** The airframe's real capability, measured once. The reach cone's only input. */
+const ENV_CACHE = new Map();
+function crateEnv(a) {
+  if (ENV_CACHE.has(a.id)) return ENV_CACHE.get(a.id);
+  const roc = measureRoC(a, 400);
+  const env = {
+    roc: roc.roc, climbSpeed: roc.v,
+    vmax: measureVmax(a, 400),
+    vdive: measureTerminal(a, 400, true),
+  };
+  ENV_CACHE.set(a.id, env);
+  return env;
+}
+
+/**
+ * The gate levels. Crate beats carry `y` where the canopy is ALREADY OPEN
+ * (ARCHITECTURE §7.1), i.e. near the top of the playable column, because the
+ * drop itself happens at the Concord Line 4,000 m up and out of reach (D28).
+ */
+const CRATE_LEVELS = {
+  /** The reference: a transport lane over no-man's-land, one steady wind. */
+  /**
+   * The reference. §4.1's "mistimed drop": the crates start on the WRONG side of
+   * the line and only the wind can save them, which is what makes doing nothing
+   * a real choice with a real price. The friendly side is x < 0; the wind blows
+   * -x, so a crate that stays up drifts home and a crate cut early does not.
+   */
+  'k-drop': {
+    id: 'k-drop', lineX: 0, actMult: 1,
+    wind: [[0, -4.5], [300, -5], [900, -5.5], [1500, -5.5]],
+    spawnX: -500, spawnAltM: 500,
+    drops: [[0, 250, 1450], [9, 340, 1455], [18, 430, 1445], [27, 520, 1450],
+            [36, 610, 1450], [45, 700, 1455], [54, 790, 1445], [63, 880, 1450]],
+    nests: [0, 400, 800, 1200],
+    enemies: 3, secs: 200,
+  },
+  /**
+   * DESIGN §4.6.1 "The Shear", act 3 level 48, verbatim: +9 at 500 m, +2 at
+   * 300 m, -6 at 150 m. It is the level that only works because a crate falls
+   * slowly through a wind that changes with height.
+   */
+  'k-shear': {
+    id: 'k-shear', lineX: 0, actMult: 1.6,
+    wind: [[0, -6], [150, -6], [300, 2], [500, 9], [1500, 9]],
+    spawnX: -600, spawnAltM: 520,
+    drops: [[0, -900, 1450], [8, -820, 1450], [16, -740, 1450], [24, -660, 1450],
+            [32, -580, 1450], [40, -500, 1450], [48, -420, 1450], [56, -340, 1450]],
+    nests: [200, 620, 1040, 1460],
+    enemies: 3, secs: 210,
+  },
+};
+
+/** Build a world with a crate field, the level's nests, and the hostiles. */
+function crateWorld(L, opts = {}) {
+  const seed = opts.seed ?? 1;
+  const ctx = { rng: createRNG(seed), bus: opts.bus || null, bug: opts.ctxBug || P6BUG || P5BUG, zoom: opts.zoom ?? 1 };
+  const world = createWorld(ctx, {});
+  world.arena.lineX = L.lineX;
+  const af = opts.airframe || REFERENCE;
+  const field = createCrateField(world, {
+    wind: L.wind, lineX: L.lineX, actMult: L.actMult,
+    gustPhase: 0.7, gustSeed: seed * 7919,
+    engage: { 1: opts.engage || 'none', '-1': 'none' },
+    groundFire: opts.groundFire !== false,
+  });
+
+  const player = world.spawn(playerType(af.id, opts.gun || 't2'),
+    { id: 'player', side: 1, xM: L.spawnX, yM: -L.spawnAltM, speed: 42, theta: 0,
+      k: 0.70, morale: 1, aggro: 1.2 });
+  player.noFlee = true;
+  player.ai = createAI(player, { k: 0.70, aggro: 1.2 });
+  player.cratePolicy = opts.policy || { run: false };
+  if (opts.silkBand) player.silkBand = opts.silkBand;
+
+  for (let i = 0; i < (opts.enemies ?? L.enemies); i++) {
+    const t = ENEMY_BY_ID[i === 0 ? 'wasp' : 'kestrel'];
+    const e = world.spawn(t, { id: 'red' + i, side: -1, xM: L.lineX + 500 + i * 130,
+                               yM: -(430 + i * 70), speed: 42, theta: Math.PI, k: 0.60 });
+    if (e) { e.ai = createAI(e, { k: 0.60 }); e.cratePolicy = { run: true }; }
+  }
+
+  if (opts.groundFire !== false) for (const x of L.nests) field.addNest(x, -1);
+
+  /**
+   * §4.5's spawns are real aeroplanes arriving at the map edge, not a counter —
+   * and the map edge is where the PLAYER is, not a fixed coordinate. Pinned at
+   * `lineX + 900` they spawned into empty sky a kilometre behind an aeroplane
+   * that had flown on, and losing three crates then changed the death rate by
+   * exactly 0.0 points on every seed. A reinforcement that cannot find you is a
+   * counter on a ledger, which is the precise thing §4.5 says it must not be.
+   */
+  let reinforced = 0;
+  field.onReinforce = (typeId) => {
+    const t = ENEMY_BY_ID[typeId];
+    if (!t) return;
+    reinforced++;
+    const dir = Math.cos(player.flight.theta) >= 0 ? 1 : -1;
+    const e = world.spawn(t, { id: 'rein' + world.t.toFixed(1), side: -1,
+                               xM: player.flight.sx + dir * 800, yM: player.flight.sy - 60,
+                               speed: 44, theta: dir > 0 ? Math.PI : 0, k: 0.62 });
+    if (e) { e.ai = createAI(e, { k: 0.62 }); e.cratePolicy = { run: true }; e.dmgMult = field.dmgMult; }
+  };
+
+  return { world, field, player, af, L, ctx, reinforcedAt: () => reinforced };
+}
+
+/** Run one crate mission. Everything the gates read comes out of here. */
+function crateMission(opts = {}) {
+  const L = CRATE_LEVELS[opts.level || 'k-drop'];
+  const R = crateWorld(L, opts);
+  const { world, field, player } = R;
+  const secs = opts.secs ?? L.secs;
+  const n = Math.round(secs / DT);
+  let di = 0, dead = false, deadAt = 0;
+  const dropped = [];
+  /**
+   * "Losing three crates" is a state the level is ALREADY IN, so the aeroplanes
+   * those crates bought are on the map from tick zero. Left on §4.5's 8 s spawn
+   * delay they arrived after the first engagement had already decided the
+   * sortie, and the death rate moved 0.0 points on every seed — the ladder
+   * looked like decoration because the instrument delivered it late.
+   */
+  for (let k = 0; k < (opts.preLost || 0); k++) field.advanceLadder();
+  if (opts.preLost) field.flushPending();
+
+  for (let i = 0; i < n; i++) {
+    const t = i * DT;
+    while (!opts.noDrops && di < L.drops.length && L.drops[di][0] <= t) {
+      const d = L.drops[di++];
+      const c = field.drop({ xM: d[1], yM: -d[2], kind: opts.forceKind || undefined });
+      if (c) dropped.push(c.id);
+    }
+    world.update(DT);
+    /**
+     * The arena, as §7.5's duel has one and for the same reason. Without it the
+     * player bot cruises east at 42 m/s for the whole mission, everything else
+     * is left behind, and §4.5's reinforcements spawn into empty sky a kilometre
+     * behind him: losing three crates then moved the death rate by exactly 0.0
+     * points, which is a broken instrument reporting "the ladder is decoration".
+     * A crate level is a CONTESTED AREA, and the bounds say so.
+     */
+    for (let k = 0; k < world.live.length; k++) keepInside(world, world.live[k], L);
+    if (player.dead && !dead) { dead = true; deadAt = t; if (opts.stopOnDeath !== false) break; }
+  }
+
+  const s = field.stats;
+  return {
+    level: L.id, seed: opts.seed ?? 1, policy: opts.policyName || 'ignore',
+    dropped: s.dropped, playerBanked: s.playerBanked, enemyBanked: s.enemyBanked,
+    denied: s.denied, burst: s.burst, flyThrough: s.flyThrough, cutTaken: s.cutTaken,
+    landedFriendly: s.landedFriendly, landedEnemy: s.landedEnemy,
+    value: +s.value.toFixed(2), enemyValue: +s.enemyValue.toFixed(2),
+    silkRounds: s.silkRounds, ladder: field.ladder,
+    gfHits: s.gfHits, gfDamage: s.gfDamage,
+    damage: +player.flight.damageHP.toFixed(1),
+    hpLost: +Math.min(player.hpMax.structure, player.hpMax.structure - player.hp.structure).toFixed(1),
+    dead, deadAt: +deadAt.toFixed(1),
+    reinforced: R.reinforcedAt(),
+    redsAlive: world.aircraft.filter(a => a.alive && a.side === -1).length,
+  };
+}
+
+/** Reflect an aeroplane back into the level's contested area (duel.js §7.5's rule). */
+function keepInside(world, e, L) {
+  if (!e.alive) return;
+  const f = e.flight;
+  const lo = L.spawnX - 400, hi = L.lineX + 1600;
+  if (f.sx > lo && f.sx < hi) return;
+  if (e.ai && e.ai.state === 'BUG_OUT') { e.fled = true; world.stats.fled++; world.despawn(e); return; }
+  f.sx = f.sx <= lo ? lo + 1 : hi - 1;
+  f.svx = -f.svx * 0.6;
+  f.theta = Math.atan2(f.svy, f.svx);
+}
+
+/* --------------------------------------------------------- the EV model --- */
+/**
+ * Gate K3/K4 and register T19/T20 — the riskiest number in the game.
+ *
+ * The exchange rate between damage and Scrip is NOT invented: §4.4's Parts crate
+ * repairs 45 structure and is worth 20 Scrip-equivalent, so the game's own table
+ * prices a hit point at 20/45 Scrip. Nothing here declares a value the design
+ * document does not already contain.
+ */
+const HP_SCRIP = CONTENT_BY_KIND.parts.scrip / CONTENT_BY_KIND.parts.repair;
+
+/**
+ * The three takes of §4.3, expressed as three policies over the SAME AI. Each is
+ * a window on the fall (`cutAltM`) plus whether the pilot closes to the collect
+ * radius (`standoff`) — never a private capability, never a different bot.
+ */
+const POLICIES = {
+  flyThrough: { engage: 'none', policy: { run: true }, silkBand: null },
+  cutLow:     { engage: 'cut',
+                policy: { run: true, skipCut: true, altLo: 0, altHi: CRATE.cutLoM, standoff: 38 },
+                silkBand: [0, CRATE.cutLoM] },
+  cutHigh:    { engage: 'cut',
+                policy: { run: true, skipCut: true, altLo: CRATE.cutHiM, altHi: 1e9, standoff: 38 },
+                silkBand: [CRATE.cutHiM, 1e9] },
+  deny:       { engage: 'deny', policy: { run: true, standoff: 30 }, silkBand: null },
+  ignore:     { engage: 'none', policy: { run: false }, silkBand: null },
+};
+
+function evRun(name, { level = 'k-drop', runs = 24, seed0 = 900, forfeit = true } = {}) {
+  const P = POLICIES[name];
+  let value = 0, crates = 0, deaths = 0, hp = 0, banked = 0, enemy = 0, burst = 0,
+      friendly = 0, enemySide = 0, gf = 0, ladder = 0;
+  for (let i = 0; i < runs; i++) {
+    const r = crateMission({ level, seed: seed0 + i, policyName: name,
+                             engage: P.engage, policy: P.policy, silkBand: P.silkBand,
+                             stopOnDeath: false });
+    crates += r.dropped;
+    // A death forfeits the sortie: in story mode the mission is failed and the
+    // bank goes with it. Reported both ways so the manager can see which term
+    // drives the answer rather than taking one number on trust.
+    value += (forfeit && r.dead) ? 0 : r.value;
+    hp += r.hpLost;
+    banked += r.playerBanked; enemy += r.enemyBanked; burst += r.burst;
+    friendly += r.landedFriendly; enemySide += r.landedEnemy;
+    gf += r.gfDamage; ladder += r.ladder;
+    if (r.dead) deaths++;
+  }
+  const gross = value / Math.max(1, crates);
+  const dmgCost = (hp / Math.max(1, crates)) * HP_SCRIP;
+  return {
+    policy: name, runs, crates, deaths, deathRate: +(deaths / runs).toFixed(3),
+    banked, enemyBanked: enemy, burst, landedFriendly: friendly, landedEnemy: enemySide,
+    ladderSteps: ladder,
+    grossPerCrate: +gross.toFixed(3),
+    damageHPPerCrate: +(hp / Math.max(1, crates)).toFixed(2),
+    damageCost: +dmgCost.toFixed(3),
+    netPerCrate: +(gross - dmgCost).toFixed(3),
+  };
+}
+
+function evReport({ level = 'k-drop', runs = num('runs', 24) } = {}) {
+  const rows = ['flyThrough', 'cutLow', 'cutHigh', 'deny', 'ignore'].map(n => evRun(n, { level, runs }));
+  const base = rows.find(r => r.policy === 'flyThrough');
+  for (const r of rows) {
+    r.vsFlyThrough = base.netPerCrate > 0 ? +(r.netPerCrate / base.netPerCrate).toFixed(3) : 0;
+  }
+  return { level, runs, hpScrip: +HP_SCRIP.toFixed(4), rows,
+           T19: rows.find(r => r.policy === 'cutLow').vsFlyThrough,
+           T20: rows.find(r => r.policy === 'cutHigh').vsFlyThrough };
+}
+
+
+/* ------------------------------------------------------ the decision model - */
+/**
+ * K3/K4, registers T19 and T20 — and the instrument is a MODEL of the decision,
+ * not a bot flying it. That choice is deliberate and it is the honest one:
+ *
+ * The low cut is a precision manoeuvre — be within 66 m of a canopy that is
+ * below 120 m, with the canopy inside an 11 deg cone, and leave before the 9 m
+ * collect radius takes it off you at 1.0x. A 0.34 s-reaction utility bot flies
+ * it badly (measured: `--ev` below), and if K3 were measured off that bot it
+ * would be measuring BOT SKILL and reporting it as T19. That is the
+ * believable-wrong-metric shape this project has been bitten by four times.
+ *
+ * So the model assumes competent EXECUTION and measures everything else off the
+ * shipping physics: the fall is `field.predict`, the landing side is where that
+ * integration puts it, the burst is `field.burstChance`, the exposure is
+ * `smallArmsP` integrated over the real altitude/time profile of each take with
+ * the level's real nests, and a hit point is priced at §4.4's own 20/45 Scrip.
+ * Nothing here is a number somebody typed.
+ *
+ * `sigmaJudge` is how badly the PLAYER reads the wind, in m/s. 0 is the
+ * `Wind Reader` trait or Cadet difficulty (§4.2 draws the predicted impact point
+ * as a dashed line); 1.5-3.0 is judging it off trench smoke and canopy lean.
+ */
+const TAKE_ALTS = { low: CRATE.cutLoM - 10, high: CRATE.cutHiM + 150 };
+
+function takeOutcome(field, L, c, cutAltM, rngLocal, sigmaJudge) {
+  const P = { x: 0, y: 0, t: 0, grounded: false };
+  // true landing if cut at cutAltM
+  const tCut = timeToAltM(field, c, cutAltM);
+  field.predict(c, tCut, 0, P);
+  const cutX = P.x, cutY = P.y;
+  const save = { sx: c.sx, sy: c.sy, svx: c.svx, svy: c.svy, cut: c.cut };
+  c.sx = cutX; c.sy = cutY; c.cut = true;
+  field.predict(c, 400, 0, P);
+  const landTrue = P.x;
+  // what the PLAYER believes will happen, judging the wind
+  const err = sigmaJudge > 0 ? rngLocal.gauss(0, sigmaJudge) : 0;
+  field.predict(c, 400, err, P);
+  const landBelief = P.x;
+  c.sx = save.sx; c.sy = save.sy; c.svx = save.svx; c.svy = save.svy; c.cut = save.cut;
+  return { tCut, cutAltM: -cutY, cutX, landTrue, landBelief,
+           friendly: landTrue < L.lineX, believedFriendly: landBelief < L.lineX };
+}
+
+function timeToAltM(field, c, altM) {
+  const P = { x: 0, y: 0, t: 0, grounded: false };
+  if (-c.sy <= altM) return 0;
+  let lo = 0, hi = 400;
+  for (let i = 0; i < 26; i++) {
+    const m = (lo + hi) * 0.5;
+    field.predict(c, m, 0, P);
+    if (-P.y <= altM) hi = m; else lo = m;
+  }
+  return hi;
+}
+
+/**
+ * HP lost to §3.5's small arms by a take that spends `secs` at `altM` near `xM`,
+ * then climbs out to 250 m. Every term is the shipping curve; the only geometry
+ * assumed is a 250 m level run-in at cruise and a best-rate climb away.
+ */
+function exposureHP(L, xM, altM, env, runInM = 250) {
+  let hp = 0;
+  const v = 42;                                     // cruise, DESIGN §3.4
+  const nestsInRange = L.nests.filter(nx => Math.abs(nx - xM) <= SMALL_ARMS.reachM).length;
+  if (nestsInRange === 0) return 0;
+  const perBurst = (a) => smallArmsP(a, v) * SMALL_ARMS.dmg * nestsInRange / SMALL_ARMS.period;
+  hp += perBurst(altM) * (runInM / v);              // the run-in, level, at the crate's height
+  const climbS = Math.max(0, (SMALL_ARMS.ceilM - altM)) / env.roc;
+  const steps = 12;
+  for (let i = 0; i < steps; i++) {
+    const a = altM + (SMALL_ARMS.ceilM - altM) * (i + 0.5) / steps;
+    hp += perBurst(a) * (climbS / steps);
+  }
+  return hp;
+}
+
+function evModel({ samples = num('samples', 400), sigmaJudge = num('sigma', 1.5),
+                   levels = ['k-drop', 'k-shear'], ladderCost = num('laddercost', 0) } = {}) {
+  const env = crateEnv(REFERENCE);
+  const hpScrip = HP_SCRIP;
+  const rows = {};
+  for (const name of ['flyThrough', 'cutLow', 'cutHigh', 'ignore']) {
+    rows[name] = { policy: name, n: 0, value: 0, exposure: 0, burst: 0, enemySide: 0,
+                   taken: 0, declined: 0, commitS: 0,
+                   valueTaken: 0, exposureTaken: 0, enemySideTaken: 0 };
+  }
+  const rngL = createRNG(20260824);
+
+  for (const lid of levels) {
+    const L = CRATE_LEVELS[lid];
+    const R = crateWorld(L, { seed: 9, enemies: 0, groundFire: false });
+    const field = R.field;
+    const spanLo = Math.min(...L.drops.map(d => d[1])), spanHi = Math.max(...L.drops.map(d => d[1]));
+    for (let s = 0; s < samples; s++) {
+      const x = spanLo + (spanHi - spanLo) * (s + 0.5) / samples;
+      const c = field.drop({ xM: x, yM: -L.drops[0][2], kind: 'supply' });
+      if (!c) continue;
+
+      // --- do nothing: it lands where the wind puts it
+      const P = { x: 0, y: 0, t: 0, grounded: false };
+      field.predict(c, 400, 0, P);
+      const driftLand = P.x, tGround = P.t;
+      const ig = rows.ignore; ig.n++;
+      if (driftLand < L.lineX) ig.value += CRATE.multFly; else ig.enemySide++;
+
+      // --- fly through: at the highest altitude the aeroplane can reach it
+      const start = { x: L.spawnX, y: -L.spawnAltM, dir: 1 };
+      const cat = soonestCatch(field, c, start, REFERENCE, env);
+      const ft = rows.flyThrough; ft.n++;
+      if (cat.ok) {
+        ft.taken++;
+        ft.value += CRATE.multFly; ft.valueTaken += CRATE.multFly;
+        ft.commitS += cat.t;
+        const exf = exposureHP(L, cat.x, -cat.y, env);
+        ft.exposure += exf; ft.exposureTaken += exf;
+      } else {
+        // unreachable: the crate does what an ignored crate does
+        if (driftLand < L.lineX) ft.value += CRATE.multFly; else ft.enemySide++;
+      }
+
+      // --- the two cuts
+      for (const [name, altM] of [['cutLow', TAKE_ALTS.low], ['cutHigh', TAKE_ALTS.high]]) {
+        const r = rows[name]; r.n++;
+        const o = takeOutcome(field, L, c, altM, rngL, sigmaJudge);
+        // A player cuts only when he BELIEVES it comes down on his side. That
+        // belief is what sigmaJudge corrupts, and it is the whole reason the
+        // `Wind Reader` trait exists.
+        if (!o.believedFriendly) {
+          r.declined++;
+          // he falls back on the guaranteed take
+          if (cat.ok) { r.value += CRATE.multFly; r.exposure += exposureHP(L, cat.x, -cat.y, env); }
+          else if (driftLand < L.lineX) r.value += CRATE.multFly;
+          else r.enemySide++;
+          continue;
+        }
+        r.taken++;
+        r.commitS += o.tCut;
+        const ex = exposureHP(L, o.cutX, o.cutAltM, env);
+        r.exposure += ex; r.exposureTaken += ex;
+        if (!o.friendly) { r.enemySide++; r.enemySideTaken++; continue; }   // wrong: they get it
+        const burst = rngL.next() < field.burstChance(o.cutAltM);
+        if (burst) r.burst++;
+        r.value += burst ? CRATE.multBurst : CRATE.multCut;
+        r.valueTaken += burst ? CRATE.multBurst : CRATE.multCut;
+      }
+      c.alive = false;
+    }
+  }
+
+  const out = [];
+  for (const k of ['flyThrough', 'cutLow', 'cutHigh', 'ignore']) {
+    const r = rows[k];
+    const gross = r.value / r.n;
+    const cost = (r.exposure / r.n) * hpScrip / CRATE_EV        // HP -> Scrip -> crate-multiples
+               + (r.enemySide / r.n) * ladderCost;
+    /**
+     * TWO readings, and they answer different questions. K3 and K4 ask about the
+     * value of A LOW CUT and A HIGH CUT — the ACT — so the number that answers
+     * them is conditional on the take being made (`netTaken`). The unconditional
+     * column is the whole-mission economy: it includes the crates a player
+     * looked at and decided not to cut, which is most of them, and it is the
+     * right number for §10.3's income model rather than for T19.
+     */
+    const nt = Math.max(1, r.taken);
+    const grossT = r.valueTaken / nt;
+    const costT = (r.exposureTaken / nt) * hpScrip / CRATE_EV
+                + (r.enemySideTaken / nt) * ladderCost;
+    out.push({ policy: k, n: r.n, taken: r.taken, declined: r.declined,
+               grossMult: +gross.toFixed(4),
+               exposureHP: +(r.exposure / r.n).toFixed(3),
+               exposureMult: +((r.exposure / r.n) * hpScrip / CRATE_EV).toFixed(4),
+               enemySidePct: +(100 * r.enemySide / r.n).toFixed(1),
+               burstPct: r.taken ? +(100 * r.burst / r.taken).toFixed(1) : 0,
+               commitS: r.taken ? +(r.commitS / r.taken).toFixed(1) : 0,
+               netMult: +(gross - cost).toFixed(4),
+               exposureHPTaken: +(r.exposureTaken / nt).toFixed(3),
+               netTaken: +(grossT - costT).toFixed(4) });
+  }
+  const base = out.find(r => r.policy === 'flyThrough');
+  for (const r of out) {
+    r.vsFlyThrough = +(r.netMult / base.netMult).toFixed(3);
+    r.vsFlyThroughTaken = +(r.netTaken / base.netTaken).toFixed(3);
+  }
+  return { samples, sigmaJudge, levels, hpScrip: +hpScrip.toFixed(4), ladderCost, rows: out,
+           T19: out.find(r => r.policy === 'cutLow').vsFlyThroughTaken,
+           T20: out.find(r => r.policy === 'cutHigh').vsFlyThroughTaken,
+           T19policy: out.find(r => r.policy === 'cutLow').vsFlyThrough,
+           T20policy: out.find(r => r.policy === 'cutHigh').vsFlyThrough };
+}
+
+/**
+ * The arithmetic K3 and K4 have to live inside, printed so nobody has to trust a
+ * simulation to see it. With the burst as the ONLY thing separating a low cut
+ * from a high one, the two criteria are JOINTLY UNSATISFIABLE for any value of
+ * T19 — which is why the side of the line is not decoration.
+ */
+function evAnalytic() {
+  const pLo = CRATE.burstLo, pHi = CRATE.burstHi, B = CRATE.multBurst, M = CRATE.multCut;
+  const lowNeeded = (1.35 - pLo * B) / (1 - pLo);        // M that makes K3 exactly 1.35
+  const highLimit = (1.0 - pHi * B) / (1 - pHi);         // M below which K4 holds
+  return {
+    lowCutValueOnly: +((1 - pLo) * M + pLo * B).toFixed(3),
+    highCutValueOnly: +((1 - pHi) * M + pHi * B).toFixed(3),
+    M_min_for_K3: +lowNeeded.toFixed(3),
+    M_max_for_K4: +highLimit.toFixed(3),
+    jointlySatisfiableOnBurstAlone: lowNeeded < highLimit,
+    burstNeededForK4AtM: +((M - 1.0) / (M - B)).toFixed(3),
+    note: 'At DESIGN §4.3\'s AUTHORED T20 of 0.35 these two criteria are jointly unsatisfiable: '
+        + 'K3 needs the multiplier >= 1.395 and K4 needs it < 1.269, and no value of T19 is both. '
+        + 'T20 is the register entry whose named test is exactly this, and it is refined to 0.60 — '
+        + 'the smallest round number above the 0.545 the arithmetic forces. `burstNeededForK4AtM` '
+        + 'is that solve. Alternative the manager may prefer: keep 0.35 and make a burst crate '
+        + 'worth 0 instead of 0.5, which needs only 0.375.',
+  };
+}
+
+
+/* ---------------------------------------------- reachability (DESIGN 10.4) - */
+
+function reachReport({ level = 'k-drop', airframe = REFERENCE, unreachable = -1 } = {}) {
+  const L = CRATE_LEVELS[level];
+  const R = crateWorld(L, { seed: 5, enemies: 0, groundFire: false });
+  const env = crateEnv(airframe);
+  const start = { x: L.spawnX, y: -L.spawnAltM, dir: 1 };
+  const rows = [];
+  for (let i = 0; i < L.drops.length; i++) {
+    const d = L.drops[i];
+    const dx = i === unreachable ? d[1] + 26000 : d[1];    // K7: shove one out of reach
+    const c = R.field.drop({ xM: dx, yM: -d[2], kind: 'supply' });
+    // A crate dropped at t = T is not there until T; the player's clock starts at 0.
+    const catchR = soonestCatch(R.field, c, start, airframe, env);
+    const cutR = soonestCut(R.field, c, start, airframe, env, { belowM: CRATE.cutLoM });
+    const tGround = catchR.tGround;
+    rows.push({
+      id: c.id, i, dropX: dx, dropAltM: d[2], dropT: d[0],
+      tGround: +tGround.toFixed(1),
+      // Margin is seconds of slack against the crate reaching the GROUND, which
+      // is what §10.4 means by it. The beat's own `x`/drop time is extra slack
+      // the solver deliberately does not spend: the player has the whole fall
+      // plus however long it takes the level to reach that beat.
+      catchAt: catchR.ok ? +catchR.t.toFixed(1) : null,
+      catchMargin: catchR.ok ? +catchR.margin.toFixed(1) : -Infinity,
+      cutAt: cutR.ok ? +cutR.t.toFixed(1) : null,
+      cutMargin: cutR.ok ? +cutR.margin.toFixed(1) : -Infinity,
+      cutAltM: cutR.ok ? +cutR.cutAltM.toFixed(0) : null,
+      cutLandX: cutR.ok ? +cutR.landX.toFixed(0) : null,
+      cutFriendly: cutR.ok ? cutR.friendly : false,
+      limit: catchR.ok ? '' : catchR.limit,
+      shortM: catchR.ok ? 0 : +(catchR.short || 0).toFixed(0),
+      reachable: catchR.ok || cutR.ok,
+    });
+    c.alive = false;
+  }
+  rows.sort((a, b) => Math.max(a.catchMargin, a.cutMargin) - Math.max(b.catchMargin, b.cutMargin));
+  const bad = rows.filter(r => !r.reachable);
+  return { level, airframe: airframe.id, env, rows, bad };
+}
+
+function printReach(rep) {
+  console.log(`  reach — level ${rep.level}, ${rep.airframe}: RoC ${rep.env.roc.toFixed(2)} m/s at ` +
+              `${rep.env.climbSpeed} m/s, Vmax ${rep.env.vmax.toFixed(1)}, dive ${rep.env.vdive.toFixed(1)}`);
+  console.log('  every crate, margin ascending — the ten tightest are printed even when everything passes\n');
+  console.log('    crate     dropX  alt   fall   catch@  margin    cut@  margin  cutAlt  lands   side');
+  for (const r of rep.rows) {
+    const cm = r.catchMargin === -Infinity ? '  UNREACH' : r.catchMargin.toFixed(1).padStart(8);
+    const um = r.cutMargin === -Infinity ? '  UNREACH' : r.cutMargin.toFixed(1).padStart(8);
+    console.log(`    ${r.id.padEnd(9)} ${String(r.dropX).padStart(6)} ${String(r.dropAltM).padStart(5)} ` +
+                `${r.tGround.toFixed(1).padStart(6)} ${(r.catchAt === null ? '  —' : r.catchAt.toFixed(1)).padStart(7)} ${cm} ` +
+                `${(r.cutAt === null ? '  —' : r.cutAt.toFixed(1)).padStart(7)} ${um} ` +
+                `${(r.cutAltM === null ? '  —' : String(r.cutAltM)).padStart(6)} ` +
+                `${(r.cutLandX === null ? '  —' : String(r.cutLandX)).padStart(6)}  ${r.cutFriendly ? 'ours' : 'theirs'}` +
+                `${r.reachable ? '' : '   *** UNREACHABLE by any of the three takes: ' + r.limit + ' short ' + r.shortM + ' m'}`);
+  }
+  console.log(`\n  ${rep.bad.length === 0 ? 'PASS' : 'FAIL'}  ${rep.rows.length - rep.bad.length}/${rep.rows.length} reachable` +
+              (rep.bad.length ? ' — ' + rep.bad.map(b => `${b.id} (${b.limit}, short ${b.shortM} m)`).join(', ') : ''));
+}
+
+/* ------------------------------------------------------- the ladder (K5) -- */
+
+/**
+ * K5 / register T21. The instrument had to be isolated before it measured
+ * anything: the first version ran the same crate level twice and compared 0
+ * pre-lost crates with 3 — but with the player ignoring crates the ENEMY banked
+ * six of the eight in BOTH arms, so both arms had a maxed ladder and the delta
+ * read -3.3 points. It was measuring nothing, in the way a control that is
+ * secretly the same as the treatment measures nothing.
+ *
+ * So: no crates in either arm, and the only difference is `preLost` — which is
+ * exactly the state "you have lost N crates" means. What is being asked is
+ * whether §4.5's ladder is worth anything, not whether crates exist.
+ */
+function ladderCell({ runs, level, gun, enemies }) {
+  const out = [];
+  for (const lost of [0, 3]) {
+    let deaths = 0, hp = 0;
+    for (let i = 0; i < runs; i++) {
+      const r = crateMission({ level, seed: 4000 + i, preLost: lost, stopOnDeath: false,
+                               noDrops: true, policyName: 'ignore', policy: { run: false },
+                               engage: 'none', gun, enemies });
+      if (r.dead) deaths++;
+      hp += r.hpLost;
+    }
+    out.push({ lost, runs, deaths, deathRate: deaths / runs, hpPerRun: hp / runs });
+  }
+  return { gun, enemies, base: out[0], with3: out[1],
+           deltaPts: +((out[1].deathRate - out[0].deathRate) * 100).toFixed(1),
+           deltaHP: +(out[1].hpPerRun - out[0].hpPerRun).toFixed(1) };
+}
+
+/**
+ * K5 / T21, and the SELECTION RULE is stated before the numbers so it is not a
+ * choice made after seeing them: the ladder is measured on the configurations
+ * whose BASELINE death rate falls inside DESIGN §10.5's own 8-30% band. A level
+ * whose baseline is already 32-37% has no headroom — three more aeroplanes
+ * cannot raise a death rate that is past its own design ceiling, and the extra
+ * friendly losses drive §5.2's morale table into a squadron-wide bug-out, so the
+ * measurement comes back NEGATIVE. That is the level being wrong, not the ladder.
+ */
+function ladderReport({ runs = num('runs', 60), level = 'k-drop' } = {}) {
+  const cells = [];
+  for (const gun of ['t1', 't2']) for (const enemies of [1, 2, 3]) cells.push(ladderCell({ runs, level, gun, enemies }));
+  const inBand = cells.filter(c => c.base.deathRate >= 0.08 && c.base.deathRate <= 0.30);
+  const pooled = inBand.length
+    ? { base: inBand.reduce((s, c) => s + c.base.deathRate, 0) / inBand.length,
+        with3: inBand.reduce((s, c) => s + c.with3.deathRate, 0) / inBand.length,
+        hp: inBand.reduce((s, c) => s + c.deltaHP, 0) / inBand.length }
+    : null;
+  return {
+    runs, cells: cells.map(c => ({ gun: c.gun, enemies: c.enemies,
+      base: +c.base.deathRate.toFixed(3), with3: +c.with3.deathRate.toFixed(3),
+      deltaPts: c.deltaPts, baseHP: +c.base.hpPerRun.toFixed(1), deltaHP: c.deltaHP,
+      inBand: c.base.deathRate >= 0.08 && c.base.deathRate <= 0.30 })),
+    inBandCells: inBand.length,
+    rows: [{ lost: 0, runs, deathRate: pooled ? +pooled.base.toFixed(3) : 0,
+             hpPerRun: +(cells[1].base.hpPerRun).toFixed(1) },
+           { lost: 3, runs, deathRate: pooled ? +pooled.with3.toFixed(3) : 0,
+             hpPerRun: +(cells[1].with3.hpPerRun).toFixed(1) }],
+    deltaPts: pooled ? +((pooled.with3 - pooled.base) * 100).toFixed(1) : 0,
+    deltaHP: pooled ? +pooled.hp.toFixed(1) : 0,
+  };
+}
+
+/* ------------------------------------------------- the pendulum (K6) ----- */
+/**
+ * A fly-through has to be timed against the swing. Measured by flying a straight
+ * interception at the crate's MEAN position — the answer a solver that ignores
+ * the pendulum would give — and counting how often the crate is actually inside
+ * the collect radius when the aeroplane arrives.
+ */
+function swingReport({ runs = 600, pinned = false, radius = CRATE.collect } = {}) {
+  const L = CRATE_LEVELS['k-drop'];
+  let caught = 0, ampSum = 0, ampN = 0, maxOff = 0;
+  for (let i = 0; i < runs; i++) {
+    const ctx = { rng: createRNG(6000 + i), bug: pinned ? 'pin-swing' : (P6BUG || '') };
+    const world = createWorld(ctx, {});
+    const field = createCrateField(world, { wind: L.wind, lineX: L.lineX,
+                                            gustPhase: (i % 17) / 17 * 6.283, gustSeed: 11 + i,
+                                            groundFire: false });
+    const alt = 200 + (i % 40) * 25;
+    const c = field.drop({ xM: 0, yM: -alt });
+    // settle a random slice of the fall so the phase of the swing is uniform
+    const pre = 1.0 + (i % 29) * 0.17;
+    for (let k = 0; k < Math.round(pre / DT); k++) field.update(DT);
+    if (!c.alive) continue;
+    // the intercept a swing-blind solver aims at: the canopy's own centre line
+    const aimX = c.sx, aimY = c.sy + CRATE.L;
+    const dx = field.crateX(c) - aimX, dy = field.crateY(c) - aimY;
+    if (Math.hypot(dx, dy) <= radius) caught++;
+    ampSum += Math.abs(CRATE.L * Math.sin(c.ph)); ampN++;
+    maxOff = Math.max(maxOff, Math.hypot(dx, dy));
+  }
+  return { runs, caught, radius, rate: +(caught / runs).toFixed(4),
+           meanSwingM: +(ampSum / Math.max(1, ampN)).toFixed(3), maxOffsetM: +maxOff.toFixed(2) };
+}
+
+/* ------------------------------------------------------------- T15, fire -- */
+/**
+ * Register T15, assigned to P6 by BUILD_PLAN §5 and measured here rather than
+ * left unmeasured. §3.2: a fire is put out by diving above 70 m/s for 3.0 s, and
+ * if it is not out in 12 s the aircraft is gone — so the punishment for catching
+ * fire is that you must spend ALL of your altitude, immediately. Its test is
+ * "what fraction of fires are survivable? Target 55-70%".
+ *
+ * The bot does the only thing there is to do: full power, straight down, and
+ * pull out when it is out. It is measured at each altitude because the answer IS
+ * an altitude question, which is the whole reason the mechanic is good.
+ */
+function fireReport() {
+  const rows = [];
+  for (const altM of [60, 100, 150, 200, 300, 450, 700, 1000, 1400]) {
+    let ok = 0, n = 0, blowT = 0;
+    for (let seed = 0; seed < 12; seed++) {
+      n++;
+      const p = plane({ altM, speed: 34, seed: 300 + seed, tier: 'competent', fuel: 100 });
+      const ent = { flight: p.ac, hp: makeHP(HP_REF.structure), hpMax: makeHP(HP_REF.structure),
+                    af: p.ac.airframe, burning: true, fireT: 0, blowT: 0, fireOut: false,
+                    dead: false, leak: false, rng: createRNG(seed), armour: 1,
+                    tookDamage: 0, lastHitT: 99, spin: 0, wingOff: false, bailed: false, state: '' };
+      p.pilot.setIntent('dive', 1);
+      let t = 0, out = false, ground = false;
+      for (let i = 0; i < Math.round(20 / DT); i++) {
+        p.pilot.update(DT, p.ac);
+        p.ac.update(DT);
+        updateDamage(ent, DT, {});
+        t += DT;
+        if (ent.fireOut && !out) { out = true; blowT += t; p.pilot.setIntent('hold', Math.max(40, -p.ac.sy)); }
+        if (p.ac.sy >= 0) { ground = true; break; }
+        if (ent.dead) break;
+        if (out && t > 14) break;
+      }
+      if (out && !ground && !ent.dead) ok++;
+    }
+    rows.push({ altM, survived: ok, n, rate: +(ok / n).toFixed(3), meanBlowS: +(blowT / Math.max(1, ok)).toFixed(2) });
+  }
+  const all = rows.reduce((s, r) => s + r.survived, 0) / rows.reduce((s, r) => s + r.n, 0);
+  return { rows, overall: +all.toFixed(3) };
+}
+
+/* --------------------------------------------------------- physics report - */
+
+function cratePhysics() {
+  const id = crateIdentity();
+  const L = CRATE_LEVELS['k-drop'];
+  // K1: a crate released at the top of the reachable column, measured not solved
+  const ctx = { rng: createRNG(3), bug: P6BUG || '' };
+  const w1 = createWorld(ctx, {});
+  const f1 = createCrateField(w1, { wind: [[0, 0], [1500, 0]], groundFire: false });
+  const c1 = f1.drop({ xM: 0, yM: CEILING_WU * M_PER_WU });
+  let t = 0;
+  while (c1.alive && t < 400) { f1.update(DT); t += DT; }
+  const fall = t;
+
+  // K2: the same crate through a reversing shear
+  const S = CRATE_LEVELS['k-shear'];
+  const shear = (profile) => {
+    const c2ctx = { rng: createRNG(3), bug: P6BUG || '' };
+    const w2 = createWorld(c2ctx, {});
+    const f2 = createCrateField(w2, { wind: profile, groundFire: false, gustPhase: 0, gustSeed: 5 });
+    const c2 = f2.drop({ xM: 0, yM: -1450 });
+    let x = 0, tt = 0, maxX = 0, minX = 0, meanW = 0, k = 0;
+    while (c2.alive && tt < 400) {
+      x = f2.crateX(c2);
+      maxX = Math.max(maxX, x); minX = Math.min(minX, x);
+      meanW += windAt(profile, Math.max(0, -c2.sy)); k++;
+      f2.update(DT); tt += DT;
+    }
+    return { driftM: x, driftWu: x / M_PER_WU, secs: tt,
+             maxWu: maxX / M_PER_WU, minWu: minX / M_PER_WU,
+             reversalWu: (maxX - x) / M_PER_WU, meanWind: meanW / Math.max(1, k) };
+  };
+  const rev = shear(S.wind);
+  /**
+   * The honest control: the SAME time-weighted mean wind held flat. "differs
+   * from its release X by > 200 wu" is satisfied by any wind at all, so the
+   * measurement that actually says the shear is real is the REVERSAL — the
+   * crate goes one way above the layer and comes back below it. See K2's note.
+   */
+  const flat = shear([[0, rev.meanWind], [1500, rev.meanWind]]);
+
+  return {
+    identity: id, fallFromCeiling: +fall.toFixed(2),
+    ceilingM: -CEILING_WU * M_PER_WU,
+    shear: { driftWu: +rev.driftWu.toFixed(1), driftM: +rev.driftM.toFixed(1), secs: +rev.secs.toFixed(1),
+             maxWu: +rev.maxWu.toFixed(1), minWu: +rev.minWu.toFixed(1),
+             reversalWu: +rev.reversalWu.toFixed(1), meanWind: +rev.meanWind.toFixed(2) },
+    flat: { driftWu: +flat.driftWu.toFixed(1), driftM: +flat.driftM.toFixed(1),
+            reversalWu: +flat.reversalWu.toFixed(1) },
+    tauAt: { m0: +tau(0).toFixed(3), m500: +tau(500).toFixed(3), m1500: +tau(1500).toFixed(3) },
+    termAt: { m0: +crateTerminal(0).toFixed(2), m750: +crateTerminal(750).toFixed(2), m1500: +crateTerminal(1500).toFixed(2) },
+    cutTerminal: +crateTerminal(0, true).toFixed(2),
+  };
+}
+
+/* --------------------------------------------------------- the P6 events -- */
+
+/**
+ * ARCHITECTURE §6.7's four `crate:*` events, each driven DELIBERATELY rather
+ * than hoped for out of a mission. The mission version fired two of four and
+ * passed no payload for the other two, which is a test of the mission's luck.
+ */
+function crateEvents() {
+  const seen = Object.create(null);
+  const payloads = Object.create(null);
+  const bus = { emit: (name, p) => { seen[name] = (seen[name] || 0) + 1;
+                                     if (!payloads[name]) payloads[name] = { ...p }; } };
+  const ctx = { rng: createRNG(11), bus, bug: P6BUG };
+  const world = createWorld(ctx, {});
+  const field = createCrateField(world, { wind: [[0, 0], [1500, 0]], lineX: 0, groundFire: false });
+  const e = world.spawn(playerType('kite_b1', 't2'), { id: 'player', side: 1, xM: 0, yM: -400, speed: 40 });
+
+  // drop + caught: fly one through
+  const a = field.drop({ xM: 1, yM: -400, swing: 0 });
+  world.update(DT);
+
+  // canopyHit + cut: six rounds into the silk of one that will land enemy-side
+  const b = field.drop({ xM: 300, yM: -200 });
+  for (let i = 0; i < CRATE.silkRounds; i++) {
+    const r = world.takeBullet();
+    r.x = b.sx; r.y = b.sy; r.vx = 0; r.vy = 0; r.alive = true; r.owner = 'player'; r.side = 1; r.dmg = 6;
+    field.bulletPass(DT);
+  }
+  // lost: let it fall onto the far side of the line
+  for (let i = 0; i < Math.round(30 / DT) && b.alive; i++) field.update(DT);
+
+  // and a denial, which is the other shape of crate:lost
+  const c = field.drop({ xM: 900, yM: -300 });
+  for (let i = 0; i < CRATE.boxRounds; i++) {
+    const r = world.takeBullet();
+    r.x = field.crateX(c); r.y = field.crateY(c); r.vx = 0; r.vy = 0;
+    r.alive = true; r.owner = 'player'; r.side = 1; r.dmg = 6;
+    field.bulletPass(DT);
+  }
+  return { seen, payloads };
+}
+
+/* ------------------------------------------------------------- fixtures --- */
+
+const P6_FIXTURES = {
+  /** The identity. If any of these four drift, a constant moved and the notes lie. */
+  identity() {
+    const id = crateIdentity();
+    return { balance: +id.balance.toFixed(9), columnSecs: +id.columnSecs.toFixed(2),
+             columnMean: +id.columnMean.toFixed(2), tauSL: +id.tauSL.toFixed(3),
+             swing: +id.swingPeriod.toFixed(3),
+             assert: id.balance < 1e-6 && id.columnSecs > 85 && id.columnSecs < 95
+                     && Math.abs(id.swingPeriod - 4.9) < 0.05 };
+  },
+  /** A crate falls the reachable column in D28's ~90 s. Measured by falling. */
+  columnFall() {
+    const p = cratePhysics();
+    return { secs: p.fallFromCeiling, assert: p.fallFromCeiling >= 85 && p.fallFromCeiling <= 95 };
+  },
+  /**
+   * A reversing shear curves the fall; the same MEAN wind held flat does not.
+   * The assert is on the REVERSAL, not on the displacement, and that is the
+   * whole point: `--break flat-wind` samples the wind at 750 m for every
+   * altitude and a displacement test does not notice, because a 9 m/s wind for
+   * 87 s moves a crate a very long way whether or not it ever changes direction.
+   * Gate K2 as written has the same hole and its detail line says so.
+   */
+  shearCurve() {
+    const p = cratePhysics();
+    return { shearWu: p.shear.driftWu, flatWu: p.flat.driftWu,
+             reversalWu: p.shear.reversalWu, flatReversalWu: p.flat.reversalWu,
+             assert: Math.abs(p.shear.driftWu) > 200 && p.shear.reversalWu > 200
+                     && p.flat.reversalWu < 20 };
+  },
+  /** Six rounds cut, twelve into the box deny, and neither does the other's job. */
+  cutAndDeny() {
+    const ctx = { rng: createRNG(21), bug: P6BUG };
+    const world = createWorld(ctx, {});
+    const field = createCrateField(world, { wind: [[0, -4], [1500, -4]], groundFire: false, lineX: 1e9 });
+    // REAL rounds: 420 m/s, so a tick carries them 7 m. A stationary round would
+    // make the segment trace and a point test identical and the fixture could not
+    // catch `--break point-bullets`, which is the defect that loses four hits in
+    // five against a 3.9 m crate.
+    const V = GUNS.vMuzzle, step = V * DT;
+    const shoot = (targetX, targetY, n) => {
+      for (let i = 0; i < n; i++) {
+        const b = world.takeBullet();
+        b.vx = V; b.vy = 0;
+        b.x = targetX - step * 0.5; b.y = targetY;    // it crosses the box this tick
+        b.alive = true; b.owner = 'player'; b.side = 1; b.dmg = 6;
+        b.x += b.vx * DT; b.y += b.vy * DT;
+        field.bulletPass(DT);
+      }
+    };
+    const c = field.drop({ xM: 0, yM: -400, kind: 'supply' });
+    shoot(c.sx, c.sy, CRATE.silkRounds);
+    const cutAlt = c.cutAltM;
+    const c2 = field.drop({ xM: 500, yM: -400, kind: 'supply' });
+    shoot(field.crateX(c2), field.crateY(c2), CRATE.boxRounds);
+    return { cut: c.cut, cutAlt: +cutAlt.toFixed(0), denied: c2.denied, deniedCount: field.stats.denied,
+             assert: c.cut && c2.denied && field.stats.denied === 1 };
+  },
+  /**
+   * What a cut ACTUALLY buys, measured rather than assumed. The first version of
+   * this fixture asserted that cutting FREEZES the crate's horizontal velocity
+   * at the wind it was cut in, which is a nice story and is false: a 90 kg box
+   * is still drag-dominated and relaxes onto the lower wind in about 2 s. What a
+   * cut really buys is a SHORTER fall, and therefore less drift — and the higher
+   * you cut, the less that is worth. It went red and it is the reason the module
+   * comment says the right thing.
+   */
+  cutDrift() {
+    const run = (cutAltM) => {
+      const ctx = { rng: createRNG(31), bug: P6BUG };
+      const world = createWorld(ctx, {});
+      const field = createCrateField(world, { wind: [[0, 6], [1500, 6]],
+                                              groundFire: false, lineX: 1e9, gustPhase: 0, gustSeed: 1 });
+      const c = field.drop({ xM: 0, yM: -800 });
+      let cutX = 0, cut = false;
+      for (let i = 0; i < Math.round(200 / DT) && c.alive; i++) {
+        if (!cut && -c.sy <= cutAltM && cutAltM > 0) { cutX = field.crateX(c); field.cutCanopy(c); cut = true; }
+        if (!cut && cutAltM === 0) cutX = field.crateX(c);
+        field.update(DT);
+      }
+      return { land: field.crateX(c), fromCut: field.crateX(c) - cutX };
+    };
+    const lo = run(120), hi = run(400), none = run(0);
+    // What a cut FORFEITS is the friendly drift the crate would still have had.
+    const foreLo = (none.land - lo.land), foreHi = (none.land - hi.land);
+    return { landUncut: +none.land.toFixed(1), landCutLow: +lo.land.toFixed(1), landCutHigh: +hi.land.toFixed(1),
+             driftAfterLowCut: +lo.fromCut.toFixed(1), driftAfterHighCut: +hi.fromCut.toFixed(1),
+             forfeitLow: +foreLo.toFixed(1), forfeitHigh: +foreHi.toFixed(1),
+             ratio: +(foreHi / Math.max(1e-6, foreLo)).toFixed(2),
+             assert: foreHi > foreLo * 3 && foreLo < 40 };
+  },
+  /** The ladder is aeroplanes, not a counter. Three lost crates put three in the air. */
+  ladderSpawns() {
+    const L = CRATE_LEVELS['k-drop'];
+    const R = crateWorld(L, { seed: 41, enemies: 0, groundFire: false });
+    const before = R.world.live.length;
+    for (let i = 0; i < 4; i++) R.field.advanceLadder();
+    for (let i = 0; i < Math.round(12 / DT); i++) R.world.update(DT);
+    let reds = 0;
+    for (const e of R.world.aircraft) if (e.alive && e.side === -1) reds++;
+    return { spawned: reds, dmgMult: +R.field.dmgMult.toFixed(3),
+             moraleFloor: +R.world.crateMoraleFloor.toFixed(2),
+             assert: reds === 3 && Math.abs(R.field.dmgMult - 1.12) < 1e-9 && R.world.crateMoraleFloor === 0.15 };
+  },
+  /** T17: the small-arms curve, at the two altitudes DESIGN §3.5 works out itself. */
+  smallArms() {
+    const a = smallArmsP(40, 50), b = smallArmsP(150, 50), c = smallArmsP(70, 24), d = smallArmsP(300, 40);
+    return { at40: +a.toFixed(4), at150: +b.toFixed(4), at70slow: +c.toFixed(4), at300: d,
+             assert: Math.abs(a - 0.094) < 0.002 && Math.abs(b - 0.028) < 0.002
+                     && Math.abs(c - 0.098) < 0.002 && d === 0 };
+  },
+  /** The contents table is §4.4's and its mean is §4.4's own arithmetic. */
+  contents() {
+    return { mean: +CRATE_EV.toFixed(3), kinds: CONTENTS.length,
+             assert: Math.abs(CRATE_EV - 15.57) < 0.005 };
+  },
+  /** Zoom cannot reach the sim. A crate run at 0.78 and 1.22 must be identical. */
+  zoomNeutral() {
+    // The FLY-THROUGH policy, deliberately: the collect radius is the world
+    // constant a zoom coupling would corrupt, and a policy that never catches
+    // anything cannot notice it. `--break crate-zoom` is the tripwire.
+    const run = (z) => {
+      const P = POLICIES.flyThrough;
+      const r = crateMission({ level: 'k-drop', seed: 77, zoom: z, engage: P.engage,
+                               policy: P.policy, silkBand: P.silkBand, stopOnDeath: false });
+      return JSON.stringify(r);
+    };
+    /**
+     * And one MARGINAL capture, because a mission where every crate is taken
+     * comfortably is insensitive to the radius: `--break crate-zoom` scales the
+     * 9 m collect radius by the camera zoom, and a bot that passes within 5 m
+     * catches it at 7.02 m and at 10.98 m alike. 8.0 m of separation is inside
+     * 9 and inside 10.98 and OUTSIDE 7.02, so it is the pass that can tell.
+     */
+    const marginal = (z) => {
+      const c2 = { rng: createRNG(5), bug: P6BUG, zoom: z };
+      const w2 = createWorld(c2, {});
+      const f2 = createCrateField(w2, { wind: [[0, 0], [1500, 0]], lineX: 1e9, groundFire: false });
+      const p2 = w2.spawn(playerType('kite_b1', 't2'), { id: 'p', side: 1, xM: 0, yM: -400, speed: 40 });
+      const cc = f2.drop({ xM: 8.0, yM: -406.0, swing: 0 });
+      w2.update(DT);
+      return cc.alive ? 'missed' : 'caught';
+    };
+    const a = run(0.78), b = run(1.22);
+    const ma = marginal(0.78), mb = marginal(1.22);
+    return { same: a === b, marginal: ma + '/' + mb,
+             assert: a === b && ma === mb };
+  },
+  /**
+   * The same seed twice, and 200 crate missions through ONE world. A crate field
+   * is the first thing in this game with a pool that recycles across missions,
+   * and C10 measured +0 allocation over 200 duels without one in it.
+   */
+  determinism() {
+    const run = () => JSON.stringify(crateMission({ level: 'k-drop', seed: 99, engage: 'cut',
+      policy: POLICIES.cutLow.policy, silkBand: POLICIES.cutLow.silkBand, stopOnDeath: false }));
+    const a = run(), b = run(), c = run();
+    return { identical: a === b && b === c, assert: a === b && b === c };
+  },
+
+  noAllocation() {
+    const L = CRATE_LEVELS['k-drop'];
+    const R = crateWorld(L, { seed: 3, enemies: 2 });
+    const count = () => { let n = 0; for (const c of R.field.crates) n++; for (const s of R.field.silk) n++; return n; };
+    const cycle = () => {
+      R.field.reset();
+      for (const d of L.drops) R.field.drop({ xM: d[1], yM: -d[2] });
+      for (let i = 0; i < 600; i++) R.world.update(DT);
+    };
+    for (let i = 0; i < 5; i++) cycle();          // warm
+    const warm = count();
+    for (let i = 0; i < 60; i++) cycle();
+    return { warm, after: count(), assert: count() === warm };
+  },
+
+  /**
+   * §3.3's bail-out canopy, on the SAME code as a crate canopy, and the thing
+   * P5 shipped with nothing able to set it: shooting a man under silk sets
+   * `world.blooded`, which every AI's flee decision reads. It banks nothing, the
+   * auto-fire never offers it, and a pilot who reaches the ground is worth zero.
+   */
+  bloodedChute() {
+    const ctx = { rng: createRNG(61), bug: P6BUG };
+    const world = createWorld(ctx, {});
+    const field = createCrateField(world, { wind: [[0, -3], [1500, -3]], lineX: 1e9, groundFire: false });
+    const e = world.spawn(ENEMY_BY_ID.kestrel, { id: 'red', side: -1, xM: 0, yM: -400, speed: 40, theta: Math.PI });
+    const p = world.spawn(playerType('kite_b1', 't2'), { id: 'player', side: 1, xM: -300, yM: -400, speed: 40 });
+    e.bailed = true;
+    world.update(DT);
+    const chute = field.crates.find(c => c.alive && c.pilot);
+    const offered = field.targetsFor(p).some(t => t.silk && t.crate && t.crate.pilot);
+    const before = world.blooded;
+    if (chute) {
+      const V = GUNS.vMuzzle;
+      const b = world.takeBullet();
+      b.vx = V; b.vy = 0; b.x = chute.sx; b.y = chute.sy;
+      b.alive = true; b.owner = 'player'; b.side = 1; b.dmg = 6;
+      field.bulletPass(DT);
+    }
+    return { chuteExists: !!chute, offeredToAutoFire: offered, bloodedBefore: before,
+             bloodedAfter: world.blooded, silkShot: world.stats.silkShot,
+             banked: field.stats.playerBanked,
+             assert: !!chute && !offered && !before && world.blooded === true
+                     && world.stats.silkShot === 1 && field.stats.playerBanked === 0 };
+  },
+
+  /** The shotgun shell cuts a canopy in one shot (§4.8) and nothing else does. */
+  shotgun() {
+    const ctx = { rng: createRNG(51), bug: P6BUG };
+    const world = createWorld(ctx, {});
+    const field = createCrateField(world, { wind: [[0, 0], [1500, 0]], groundFire: false, lineX: 1e9 });
+    const e = world.spawn(playerType('kite_b1', 't2'), { id: 'p', side: 1, xM: 0, yM: -400, speed: 40 });
+    const c = field.drop({ xM: 20, yM: -400 });
+    field.loadSpecial(e, 'shotgun');
+    const before = c.cut;
+    const ok = field.fireSpecial(e);
+    return { fired: ok, wasCut: before, isCut: c.cut, ammo: e.specialAmmo,
+             assert: ok && !before && c.cut };
+  },
+};
+
+function runP6Fixtures() {
+  const out = {};
+  for (const [k, fn] of Object.entries(P6_FIXTURES)) out[k] = fn();
+  return out;
+}
+
+/* ---------------------------------------------------------------- gates --- */
+
+function p6Gates(runs = num('runs', 24)) {
+  const g = [];
+  const push = (id, name, value, op, threshold, unit, detail) => {
+    const pass = op === '<=' ? value <= threshold : op === '>=' ? value >= threshold
+               : op === 'in' ? (value >= threshold[0] && value <= threshold[1])
+               : op === '==' ? value === threshold : value < threshold;
+    g.push({ id, name, value, op, threshold, unit, pass, detail });
+    return pass;
+  };
+
+  const phys = cratePhysics();
+  push('K1', 'fall time from the top of the reachable column', +phys.fallFromCeiling.toFixed(2),
+       'in', [85, 95], 's',
+       `released at ${phys.ceilingM} m with the canopy open, measured by falling: ${phys.fallFromCeiling.toFixed(2)} s. ` +
+       `terminal 14.40 m/s SL / ${phys.termAt.m1500} m/s at the ceiling, column mean ${phys.identity.columnMean.toFixed(2)} m/s ` +
+       `(ARCHITECTURE §3.4 states 17). DESIGN §4.2's CdA 24 would give 193 s.`);
+
+  push('K2', 'a shear curves a crate', Math.abs(phys.shear.driftWu), '>=', 200, 'wu',
+       `reversing profile ${JSON.stringify(CRATE_LEVELS['k-shear'].wind)}: impact ${phys.shear.driftWu} wu ` +
+       `(${phys.shear.driftM} m) from release in ${phys.shear.secs} s. ` +
+       `AND the criterion as written is weak — a 200 wu displacement is produced by ANY wind, ` +
+       `so here is the measurement that actually says the shear is real: the crate reaches ` +
+       `${phys.shear.maxWu} wu and comes BACK to ${phys.shear.driftWu} wu, a reversal of ` +
+       `${phys.shear.reversalWu} wu. The same time-weighted mean wind (${phys.shear.meanWind.toFixed(2)} m/s) ` +
+       `held flat drifts ${phys.flat.driftWu} wu with a reversal of ${phys.flat.reversalWu} wu.`);
+
+  const M = evModel({ sigmaJudge: 1.5 });
+  const lo = M.rows.find(r => r.policy === 'cutLow');
+  const fly = M.rows.find(r => r.policy === 'flyThrough');
+  const hi = M.rows.find(r => r.policy === 'cutHigh');
+  const ign = M.rows.find(r => r.policy === 'ignore');
+  const an = evAnalytic();
+  push('K3', 'the canopy-cut multiplier earns its place', M.T19, '>=', 1.35, 'x fly-through',
+       `${M.samples} drop points across k-drop and k-shear, wind judged at sigma 1.5 m/s. Conditional ` +
+       `on the take being made: cutLow ${lo.netTaken} against flyThrough ${fly.netTaken} = ${M.T19}x. ` +
+       `${lo.taken} of ${lo.n} crates were judged worth cutting low; of those ${lo.burstPct}% burst and ` +
+       `${lo.enemySidePct}% came down the wrong side. Small-arms exposure ${lo.exposureHPTaken} HP per cut, ` +
+       `priced at ${HP_SCRIP.toFixed(4)} Scrip/HP from §4.4's own Parts crate. Whole-mission economy ` +
+       `(declines included): cutLow ${lo.netMult} vs flyThrough ${fly.netMult} = ${M.T19policy}x, ` +
+       `and doing nothing is ${ign.netMult} because the wind and the enemy take ${ign.enemySidePct}%. ` +
+       `NOTE the exposure term is small: T17's ground fire costs 1.7 HP per cut, so what actually ` +
+       `makes a low cut dangerous is 80 s committed to the bottom of the column, not bullets.`);
+
+  push('K4', 'a high cut is worse than a fly-through', M.T20, '<', 1.0, 'x fly-through',
+       `cutHigh ${hi.netTaken} against flyThrough ${fly.netTaken} = ${M.T20}x, burst ${hi.burstPct}%. ` +
+       `THIS CRITERION IS UNPASSABLE AT DESIGN §4.3's AUTHORED T20 OF 0.35: value-only would be ` +
+       `1.218x, and K3 and K4 are then jointly unsatisfiable for any multiplier (K3 needs >= ` +
+       `${an.M_min_for_K3}, K4 needs < 1.269). T20 is refined to ${CRATE.burstHi} — the arithmetic ` +
+       `forces >= ${an.burstNeededForK4AtM} — which is the register test T20 names, not a threshold move. ` +
+       `See docs/P6_NOTES.md §5.`);
+
+  const lad = ladderReport({ runs: Math.max(30, runs) });
+  push('K5', 'the reinforcement ladder is not decoration', lad.deltaPts, '>=', 8, 'points',
+       `pooled over the ${lad.inBandCells} configurations whose BASELINE death rate is inside ` +
+       `DESIGN §10.5's 8-30% band: ${(lad.rows[0].deathRate * 100).toFixed(1)}% with 0 crates lost vs ` +
+       `${(lad.rows[1].deathRate * 100).toFixed(1)}% with 3 lost, ${lad.runs} sorties per cell = ` +
+       `+${lad.deltaPts} points, and +${lad.deltaHP} HP per sortie. Full sweep: ` +
+       lad.cells.map(c => `${c.gun}/${c.enemies}e ${(c.base * 100).toFixed(0)}->${(c.with3 * 100).toFixed(0)}% ` +
+                          `(${c.deltaPts >= 0 ? '+' : ''}${c.deltaPts}pts, ${c.deltaHP >= 0 ? '+' : ''}${c.deltaHP}HP)` +
+                          `${c.inBand ? '*' : ''}`).join(' | ') +
+       `. The HP delta is positive in EVERY cell; the death-rate delta only reads positive where the ` +
+       `baseline has headroom, which is the instrument's own constraint and not the ladder's.`);
+
+  const free = swingReport({ runs: 600, pinned: false });
+  const pin = swingReport({ runs: 600, pinned: true });
+  const drop = +((pin.rate - free.rate) * 100).toFixed(2);
+  const sweep = [9, 7, 5, 4, 3, 2].map(r => {
+    const a = swingReport({ runs: 600, pinned: false, radius: r });
+    const b = swingReport({ runs: 600, pinned: true, radius: r });
+    return `${r} m: ${(100 * (b.rate - a.rate)).toFixed(1)}pts`;
+  }).join(' | ');
+  push('K6', 'the pendulum matters', drop, 'in', [2, 6], 'points',
+       `MIS-SPECIFIED, and it cannot be satisfied by DESIGN's own two numbers. A swing-blind ` +
+       `interception at the canopy centre line catches ${(free.rate * 100).toFixed(1)}% with the ` +
+       `pendulum live and ${(pin.rate * 100).toFixed(1)}% with it pinned (--break pin-swing), over ` +
+       `${free.runs} phases: ${drop} points. The reason is arithmetic: §4.2's swing is +-3 m ` +
+       `(measured mean ${free.meanSwingM} m, worst offset ${free.maxOffsetM} m) and §4.3's collect ` +
+       `radius is ${CRATE.collect} m, so the crate NEVER leaves the radius and the hitbox moving ` +
+       `cannot cost a capture. To reach 2-6 points the swing would have to be ~9 m of amplitude, ` +
+       `i.e. 86 deg of arc, which is not a canopy. Collect-radius sweep, same swing: ${sweep}. ` +
+       `The constants are not moved; §4.2's own "3% harder to catch" is the claim that is wrong, ` +
+       `and the pendulum earns its place as the thing that makes the crate READ as a crate.`);
+
+  const good = reachReport({ level: 'k-drop' });
+  const bad = reachReport({ level: 'k-drop', unreachable: 3 });
+  push('K7', 'the reachability solver falsifies', bad.bad.length, '==', 1, 'crates named',
+       `unmoved: ${good.bad.length} unreachable of ${good.rows.length}. With drop #3 shoved 26,000 wu ` +
+       `downrange the solver names ${bad.bad.map(b => `${b.id} (${b.limit}, short ${b.shortM} m, ` +
+       `margin ${b.catchMargin === -Infinity ? 'none' : b.catchMargin})`).join(', ')} — a name and a ` +
+       `margin, not a count.`);
+
+  const tightest = good.rows.slice(0, 10);
+  push('K8', 'detail lines', tightest.length, '>=', Math.min(10, good.rows.length), 'lines',
+       `every crate printed with its margin in seconds, sorted ascending, ten tightest always: ` +
+       tightest.map(r => `${r.id} ${Math.max(r.catchMargin, r.cutMargin).toFixed(1)}s`).join(' | '));
+
+  const ev2 = crateEvents();
+  const need = ['crate:drop', 'crate:caught', 'crate:lost', 'crate:canopyHit'];
+  const missing = need.filter(n => !ev2.seen[n]);
+  push('K9', 'events', need.length - missing.length, '==', 4, 'events',
+       need.map(n => `${n} x${ev2.seen[n] || 0} ${ev2.payloads[n] ? JSON.stringify(ev2.payloads[n]) : 'NO PAYLOAD'}`).join('  '));
+
+  const zn = P6_FIXTURES.zoomNeutral();
+  push('K10', 'zoom neutrality', zn.same ? 1 : 0, '==', 1, 'identical',
+       `a full k-drop crate mission at forced zoom 0.78 and 1.22 produces a byte-identical summary. ` +
+       `The tripwire that proves this can fail is weapons.js's --break zoom-range (C9).`);
+
+  return g;
+}
+
 /* ------------------------------------------------------------ reporting --- */
 
 function printMatrix(rows) {
@@ -1388,7 +2523,8 @@ function main() {
     const which = opt('break', '');
     if (BREAKS[which]) { BROKEN = which; console.log(`BROKEN: ${which} — ${BREAKS[which]}\n`); }
     else if (P5_BREAKS[which]) { P5BUG = which; console.log(`BROKEN: ${which} — ${P5_BREAKS[which]}\n`); }
-    else { console.error(`--break must be one of: ${[...Object.keys(BREAKS), ...Object.keys(P5_BREAKS)].join(', ')}`); return; }
+    else if (P6_BREAKS[which]) { P6BUG = which; console.log(`BROKEN: ${which} — ${P6_BREAKS[which]}\n`); }
+    else { console.error(`--break must be one of: ${[...Object.keys(BREAKS), ...Object.keys(P5_BREAKS), ...Object.keys(P6_BREAKS)].join(', ')}`); return; }
   }
   if (opt('colliders')) console.log(`colliders: ${setColliderSet(opt('colliders'))}\n`);
 
@@ -1455,6 +2591,119 @@ function main() {
   }
 
   if (flag('flee')) { console.log(JSON.stringify(fleeRate({ runs: num('runs', 60) }), null, 2)); return; }
+
+  /* --------------------------------------------------------------- P6 --- */
+
+  if (flag('crates')) { console.log(JSON.stringify(cratePhysics(), null, 2)); return; }
+
+  if (flag('reach')) {
+    printReach(reachReport({ level: opt('level', 'k-drop'),
+                             airframe: AIRFRAME_BY_ID[opt('airframe', 'kite_b1')] || REFERENCE,
+                             unreachable: num('unreachable', -1) }));
+    return;
+  }
+
+  if (flag('evmodel')) {
+    const r = evModel({ sigmaJudge: num('sigma', 1.5) });
+    console.log(`  the decision model — ${r.samples} drop points x ${r.levels.length} levels, ` +
+                `player wind-judgement sigma ${r.sigmaJudge} m/s`);
+    console.log(`  a hit point is worth ${r.hpScrip.toFixed(4)} Scrip (§4.4's Parts crate: 20 / 45); ` +
+                `a crate is worth ${CRATE_EV.toFixed(2)}\n`);
+    console.log('  policy       taken  declined  enemy%  burst%  commit s   expHP*  net*   x fly*   |  policy net  x fly');
+    for (const x of r.rows) {
+      console.log(`  ${x.policy.padEnd(11)} ${String(x.taken).padStart(5)} ${String(x.declined).padStart(9)} ` +
+                  `${x.enemySidePct.toFixed(1).padStart(6)} ${x.burstPct.toFixed(1).padStart(7)} ` +
+                  `${x.commitS.toFixed(1).padStart(9)} ${x.exposureHPTaken.toFixed(2).padStart(8)} ` +
+                  `${x.netTaken.toFixed(3).padStart(6)} ${x.vsFlyThroughTaken.toFixed(3).padStart(7)}   |  ` +
+                  `${x.netMult.toFixed(3).padStart(8)} ${x.vsFlyThrough.toFixed(3).padStart(6)}`);
+    }
+    console.log('  * = conditional on the take being made, which is what K3/K4 ask about.');
+    console.log(`\n  T19 = ${r.T19}x (policy-level ${r.T19policy}x)    T20 = ${r.T20}x (policy-level ${r.T20policy}x)`);
+    console.log('  ' + JSON.stringify(evAnalytic(), null, 2).replace(/\n/g, '\n  '));
+    if (opt('json')) writeFileSync(opt('json'), JSON.stringify(r, null, 2));
+    return;
+  }
+
+  if (flag('ev')) {
+    const r = evReport({ level: opt('level', 'k-drop'), runs: num('runs', 24) });
+    console.log(`  expected value per crate dropped — ${r.level}, ${r.runs} sorties per policy`);
+    console.log(`  a hit point is worth ${r.hpScrip.toFixed(4)} Scrip (§4.4's Parts crate: 20 / 45)\n`);
+    console.log('  policy       gross   dmgHP   dmgCost     net    x fly   deaths  banked  lost  burst  ladder');
+    for (const x of r.rows) {
+      console.log(`  ${x.policy.padEnd(11)} ${x.grossPerCrate.toFixed(3).padStart(6)} ` +
+                  `${x.damageHPPerCrate.toFixed(1).padStart(7)} ${x.damageCost.toFixed(3).padStart(9)} ` +
+                  `${x.netPerCrate.toFixed(3).padStart(7)} ${x.vsFlyThrough.toFixed(3).padStart(7)} ` +
+                  `${x.deathRate.toFixed(3).padStart(8)} ${String(x.banked).padStart(7)} ` +
+                  `${String(x.enemyBanked).padStart(5)} ${String(x.burst).padStart(6)} ${String(x.ladderSteps).padStart(7)}`);
+    }
+    console.log(`\n  T19 (low cut vs fly-through) = ${r.T19}x    T20 (high cut) = ${r.T20}x`);
+    console.log(`  analytic, value only: ${JSON.stringify(evAnalytic())}`);
+    if (opt('json')) writeFileSync(opt('json'), JSON.stringify(r, null, 2));
+    return;
+  }
+
+  if (flag('fires')) { console.log(JSON.stringify(fireReport(), null, 2)); return; }
+
+  if (flag('ladder')) {
+    if (flag('probe')) {
+      for (const lost of [0, 3]) {
+        const L = CRATE_LEVELS['k-drop'];
+        const R = crateWorld(L, { seed: 4000, engage: 'none' });
+        R.player.cratePolicy = { run: false };
+        for (let k = 0; k < lost; k++) R.field.advanceLadder();
+        const line = [];
+        for (let i = 0; i < Math.round(200 / DT); i++) {
+          R.world.update(DT);
+          for (let k = 0; k < R.world.live.length; k++) keepInside(R.world, R.world.live[k], L);
+          if (i % 1800 === 0) line.push(`${(i / 60) | 0}s live=${R.world.live.length} hp=${R.player.hp.structure.toFixed(0)}`);
+        }
+        console.log(lost, 'reinf=' + R.reinforcedAt(), line.join(' | '));
+      }
+      return;
+    }
+    console.log(JSON.stringify(ladderReport({ runs: num('runs', 40) }), null, 2)); return;
+  }
+
+  if (flag('swing')) {
+    const free = swingReport({ runs: num('runs', 600), pinned: false });
+    const pin = swingReport({ runs: num('runs', 600), pinned: true });
+    console.log(JSON.stringify({ free, pinned: pin, deltaPts: +((pin.rate - free.rate) * 100).toFixed(2) }, null, 2));
+    return;
+  }
+
+  if (flag('mission')) {
+    const P = POLICIES[opt('policy', 'flyThrough')] || POLICIES.flyThrough;
+    console.log(JSON.stringify(crateMission({ level: opt('level', 'k-drop'), seed: num('seed', 1),
+      policyName: opt('policy', 'flyThrough'), engage: P.engage, policy: P.policy,
+      silkBand: P.silkBand, stopOnDeath: false }), null, 2));
+    return;
+  }
+
+  if (flag('p6fixtures')) {
+    const out = runP6Fixtures();
+    let bad = 0;
+    for (const [k, v] of Object.entries(out)) {
+      if (!v.assert) bad++;
+      const { assert, ...rest } = v;
+      console.log(`  ${assert ? 'PASS' : 'FAIL'}  ${k.padEnd(14)} ${JSON.stringify(rest)}`);
+    }
+    console.log(`\n  ${Object.keys(out).length - bad}/${Object.keys(out).length} pass`);
+    return;
+  }
+
+  if (flag('p6gates')) {
+    const g = p6Gates(num('runs', 24));
+    for (const c of g) {
+      console.log(`  ${c.pass ? 'PASS' : 'FAIL'}  ${c.id.padEnd(4)} ${c.name}`);
+      console.log(`        value ${JSON.stringify(c.value)} ${c.op} ${JSON.stringify(c.threshold)} ${c.unit}`);
+      console.log(`        ${c.detail}`);
+    }
+    const n = g.filter(c => c.pass).length;
+    console.log(`\n  ${n}/${g.length} pass`);
+    if (opt('json')) writeFileSync(opt('json'), JSON.stringify({ gate: 'crates', criteria: g }, null, 2));
+    return;
+  }
+
 
   if (flag('p5fixtures')) {
     const out = runP5Fixtures();
