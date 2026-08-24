@@ -14,7 +14,8 @@
 import { clamp } from '../core/math.js';
 import { G_SI, PITCH, N_REF, STRESS, VNE_DAMAGE, FUEL, LIFT,
          REFERENCE, pitchCeiling } from '../data/tables.js';
-import { nAvailable, alphaForCL, wingLiftFor, stallAlpha, stallAlphaNeg, DEG, density } from './aero.js';
+import { nAvailable, alphaForCL, wingLiftFor, stallAlpha, stallAlphaNeg, DEG, density,
+         createForces } from './aero.js';
 import { integrate, syncWorld, wrapPi } from './physics.js';
 
 const UPRIGHT = { gamma: 25 * DEG, dwell: 0.6, rollTime: 0.4 };
@@ -36,8 +37,9 @@ export function createFlight(ctx = {}, opts = {}) {
     // --- world-unit mirror, DERIVED every tick by syncWorld (D26). Never authored.
     x: 0, y: 0, vx: 0, vy: 0, angle: 0, speed: 0, speedSI: 0, altM: 0,
     hull: 64,
-    // --- readouts
-    aero: null,
+    // --- readouts. `aero` is this aircraft's OWN force-resolve object, allocated
+    // once and written in place by physics.integrate. Never share it (P5).
+    aero: createForces(),
     alpha: 0, alphaW: 0, gamma: 0, n: 1, stress: 0, stressPeak: 0,
     throttle: 1, fuel: opts.fuel ?? FUEL.capacity, fuelOut: false,
     stalled: false, stallCount: 0, limiterOn: true, limiterReleased: false,
@@ -130,7 +132,7 @@ export function createFlight(ctx = {}, opts = {}) {
     if (e.tailGone) { qMax *= 0.5; Kq *= 0.6; }
 
     // gamma_dot fed forward so the aircraft TRACKS its turn instead of lagging it.
-    const f0 = e.aero;
+    const f0 = e.aero.resolved ? e.aero : null;
     const aNorm = f0 ? (f0.lift * Math.cos(alpha) + f0.thrust * Math.sin(alpha)) / a.m - G_SI * Math.cos(gamma) : 0;
     const gammaDot = v > 1e-3 ? -aNorm / v : 0;
 

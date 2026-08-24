@@ -25,9 +25,9 @@
     "assert": true
   },
   "glide": {
-    "hash": "12c1300a",
-    "rangeM": 3970,
-    "ld": 7.94,
+    "hash": "074f43c0",
+    "rangeM": 3948,
+    "ld": 7.9,
     "assert": true
   },
   "diveRecover": {
@@ -51,8 +51,8 @@
     "assert": true
   },
   "landing": {
-    "hash": "773bf819",
-    "touchdown": 19.3,
+    "hash": "f44526dc",
+    "touchdown": 19.4,
     "assert": true
   }
 }

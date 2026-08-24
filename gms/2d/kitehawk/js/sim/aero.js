@@ -8,7 +8,8 @@
  * Pure: no DOM, no clock, no Math.random.
  */
 
-import { RHO0, H_SCALE, THRUST_LAPSE, AGILITY_MARGIN, LIFT, FLUTTER, G_SI } from '../data/tables.js';
+import { RHO0, H_SCALE, THRUST_LAPSE, AGILITY_MARGIN, LIFT, FLUTTER, G_SI, PITCH,
+         pitchCeiling } from '../data/tables.js';
 
 export const DEG = Math.PI / 180;
 
@@ -95,12 +96,27 @@ export function cdOf(alpha, v, clEff, a) {
  * The force resolve. Returns SI accelerations plus the readouts the flight model
  * and the HUD need. `throttle` is 0..1; the auto-throttle owns it (DESIGN §1.10).
  *
- * out is reused — copy anything you keep (§10 rule 9).
+ * `out` IS REQUIRED AND IS OWNED BY THE CALLER. It used to default to one
+ * module-level object, which is correct and free for a single aeroplane and
+ * silently wrong for two: `flight.js` KEEPS the returned reference as `e.aero`
+ * and reads it back next tick as the gamma_dot feed-forward, so with two
+ * aircraft in the world every aeroplane fed forward the last one to update.
+ * Measured before it was found (P5_NOTES §1.1): a commanded 1.8 g pull produced
+ * 0.47 g and the AI could not hold a nose position at all. There is no default
+ * any more — a shared buffer is not a thing a caller should be able to get by
+ * accident, and every retained-reference caller now allocates its own with
+ * `createForces()` exactly once.
  */
-const OUT = {
-  ax: 0, ay: 0, v: 0, q: 0, rho: 0, alpha: 0, alphaW: 0, gamma: 0,
-  cl: 0, clEff: 0, cd: 0, lift: 0, drag: 0, thrust: 0, n: 0, stalled: false,
-};
+export function createForces() {
+  return {
+    ax: 0, ay: 0, v: 0, q: 0, rho: 0, alpha: 0, alphaW: 0, gamma: 0,
+    cl: 0, clEff: 0, cd: 0, lift: 0, drag: 0, thrust: 0, n: 0, stalled: false,
+    // false until the first resolve. `flight.js` treats an unresolved buffer as
+    // "no feed-forward yet", which is what the old `e.aero = null` meant — the
+    // ownership change must not quietly alter the first tick of every flight.
+    resolved: false,
+  };
+}
 
 /**
  * `roll` is -1..+1: which side of the aircraft the canopy is on, and how far
@@ -110,7 +126,7 @@ const OUT = {
  * is the auto-upright assist. At roll = 0 you are knife-edge and the wing makes
  * no lift, which is why a roll costs height.
  */
-export function forces(a, sx, sy, vx, vy, theta, throttle, altM, roll = 1, out = OUT) {
+export function forces(a, sx, sy, vx, vy, theta, throttle, altM, roll, out) {
   const v = Math.hypot(vx, vy);
   const gamma = Math.atan2(vy, vx);
   let alpha = gamma - theta;
@@ -129,7 +145,7 @@ export function forces(a, sx, sy, vx, vy, theta, throttle, altM, roll = 1, out =
   const cd = cdOf(alphaW, v, clEff, a);
 
   const L = Lmag * roll;                    // signed by which way up the wing is
-  if (v < 1e-6) { out.ax = 0; out.ay = G_SI; out.v = 0; out.n = 0; return out; }
+  if (v < 1e-6) { out.ax = 0; out.ay = G_SI; out.v = 0; out.n = 0; out.resolved = true; return out; }
   const D = qS * cd;
   const T = a.T0 * thrustFactor(altM, a) * throttle;
 
@@ -154,6 +170,7 @@ export function forces(a, sx, sy, vx, vy, theta, throttle, altM, roll = 1, out =
   out.lift = L; out.drag = D; out.thrust = T;
   out.n = L / a.W;
   out.stalled = alphaW > aStall || alphaW < aStallNeg;
+  out.resolved = true;
   return out;
 }
 
@@ -183,4 +200,54 @@ export function nAvailable(a, v, altM, margin = 1) {
 /** Level 1 g stall speed at altitude. */
 export function stallSpeed(a, altM = 0) {
   return Math.sqrt(2 * a.W / (density(altM, a) * a.S * a.CLmax));
+}
+
+/* ------------------------------------------------------------- corner ----- */
+/**
+ * Corner speed: where the stick ceiling and the wing ceiling cross, which is by
+ * definition the fastest turn the aeroplane has. Below it the wing runs out
+ * first, above it the pitch envelope does.
+ *
+ * It lives here, once, because both `pilot.js` (the energy governor) and
+ * `ai.js` (the tactical discipline) need it and a second copy of a derived
+ * constant is what D72 cost a whole gate to. It replaces the `2.1 * Vs`
+ * heuristic those two used to carry separately — that reproduced P4's measured
+ * corner for all five airframes to within 0.4 m/s, but it is a fit, and this is
+ * the identity.
+ *
+ * Memoised per airframe, with a signature so a battle-damaged refit (which
+ * mutates CLmax and the pitch ceiling) recomputes instead of returning a stale
+ * number for an aeroplane that has lost a wing.
+ */
+const CORNER = new WeakMap();
+/** Achievable turn rate at v: the lesser of what the stick allows and what the wing gives. */
+export function turnRate(a, v, altM = 0) {
+  const nWing = nAvailable(a, v, altM, PITCH.alphaMargin);
+  const omWing = nWing > 1 ? G_SI * Math.sqrt(nWing * nWing - 1) / Math.max(1e-6, v) : 0;
+  return Math.min(pitchCeiling(v, a), omWing);
+}
+
+export function cornerSpeed(a, altM = 0) {
+  const sig = a.CLmax * 1e6 + a.omLo * 1e3 + a.m + a.S + altM;
+  const hit = CORNER.get(a);
+  if (hit && hit.sig === sig) return hit.v;
+  // coarse scan for the peak, then refine around it. The peak is broad and flat
+  // by design (P4_NOTES §8: "does the corner speed feel like a place?"), so a
+  // scan is both cheaper and more robust here than a derivative.
+  let best = a.vs, bestOm = -1;
+  const lo0 = a.vs * 0.9, hi0 = a.vne;
+  for (let i = 0; i <= 64; i++) {
+    const v = lo0 + (hi0 - lo0) * (i / 64);
+    const om = turnRate(a, v, altM);
+    if (om > bestOm) { bestOm = om; best = v; }
+  }
+  const step = (hi0 - lo0) / 64;
+  for (let i = 0; i <= 32; i++) {
+    const v = best - step + (2 * step) * (i / 32);
+    if (v <= 0) continue;
+    const om = turnRate(a, v, altM);
+    if (om > bestOm) { bestOm = om; best = v; }
+  }
+  CORNER.set(a, { sig, v: best });
+  return best;
 }

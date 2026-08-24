@@ -208,7 +208,26 @@ export function updateGun(world, shooter, targets, dt) {
   if (!tgt || shooter.dead || shooter.wantsFire === false) { g.acquireT = 0; return 0; }
 
   leadPoint(shooter.flight, tgt, LEAD);
-  const err = Math.abs(offNose(shooter.flight, LEAD.x, LEAD.y));
+  /**
+   * §5.2's lead-solution error: what this pilot BELIEVES the solution is. It
+   * moves the moment he squeezes, never where the round goes — the round still
+   * leaves along the nose, with drop and dispersion, exactly as the player's
+   * does. `shooter.aimErrLead` is set by the AI; the player's is zero, because
+   * the player IS the lead solution.
+   */
+  let lx = LEAD.x, ly = LEAD.y;
+  const le = shooter.aimErrLead || 0, ae = shooter.aimErrAng || 0;
+  if (le || ae) {
+    const f = shooter.flight, tf = tgt.flight;
+    const tv = Math.max(1e-6, Math.hypot(tf.svx, tf.svy));
+    lx += (tf.svx / tv) * le; ly += (tf.svy / tv) * le;
+    if (ae) {
+      const dx = lx - f.sx, dy = ly - f.sy;
+      const c = Math.cos(ae), s = Math.sin(ae);
+      lx = f.sx + dx * c - dy * s; ly = f.sy + dx * s + dy * c;
+    }
+  }
+  const err = Math.abs(offNose(shooter.flight, lx, ly));
   const fc = bug === 'no-cone' ? 90 * Math.PI / 180 : g.fireCone;
   if (err > fc) { g.acquireT = 0; return 0; }
 

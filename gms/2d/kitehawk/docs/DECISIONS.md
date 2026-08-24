@@ -665,3 +665,61 @@ genuinely ours: **A3's counter is right and the bot cannot execute it** (a stall
 frame-accurate timing; a 0.34 s reaction bot arrives at zero airspeed with a live ace behind it), and
 **A5 is an ace that is wrong** — an armoured head-on merchant cannot be made scary against 220 HP
 without being unfair. **A5 goes back to the drawing board at P11's ace pass**, with R-11 and T23.
+
+**D84** — **Playable beats pretty. Getting to a playable state takes priority over hitting art
+bars.** Aaron, 2026-08-24: *"as long as it is playable we can continue working on hitting bars while
+also play-testing... Getting to a playable state is usually preferable to improving graphics — as
+continual improvement as you test can run in parallel."*
+
+Consequences, binding on every remaining phase:
+- **No art bar blocks a phase.** The sky's −4.06 against a −2.0 line does not gate P6, P7, P9 or
+  P10, and neither does the prop negative. Art quality is tracked, reported, and improved *alongside*
+  playtesting, never in front of it.
+- **P10 (first playable) is the schedule's centre of gravity.** Phases before it are scoped to *what
+  a playable mission needs*, not to what the phase could exhaustively cover. P9's level format ships
+  the minimum that lets a mission be flown; breadth comes after.
+- **Correctness still blocks.** This is a re-ordering of art versus play, not a licence to skip
+  verification — the flight-model defects P5 found were exactly the kind of thing that makes a build
+  unplayable, and the falsification discipline stays.
+- **P16's art pass keeps its scope but loses its veto.** It becomes the place improvements land, not
+  a gate the game must clear before Aaron can fly it.
+
+**D85** — **The three flight-model defects are fixed at root and the workarounds are deleted.**
+Manager-verified: P4 still 14/14 with its determinism digest unchanged.
+- **The shared force buffer** was *an output buffer whose lifetime outlived its scope*. Fixed by
+  ownership: each aeroplane allocates its own, and **`forces()` no longer has a default `out` at
+  all**, so no caller can acquire a shared buffer by accident. The old first-tick semantics are
+  preserved exactly, which is why the fix moved no P4 number.
+- **The pattern appeared twice — the second instance was the agent's own.** `createFormation` handed
+  every wingman one shared point object which `setIntent` retains, so every wingman flew to whichever
+  station was written last. The rest were audited: the two that were *retained* were the two that
+  were broken. **A shared buffer is only dangerous when someone keeps the reference.**
+- **The pilot** had two independent faults; climb 300 m now reaches **739 m east / 736 m west** (was
+  738/312). With the root fix in, the old mirrored-bearing workaround now *breaks* the same test —
+  which is what a dead workaround should do.
+- **`ace`'s 73% left-flying bias fell out of the pilot fix**: its finer stick quantum resolved the
+  roll-sign error more sharply, so the tier that flew best amplified the bias worst. `novice`'s
+  inversion was separate — `envelope` divided the limit *before* the stick was solved, so a smaller
+  envelope produced a **larger** stick.
+
+**D86** — **Two further defects surfaced by pinning one dial at a time rather than guessing.** A high
+envelope had become a *liability* because a max-rate turn costs 7.2 m/s per second — fixed with an
+energy governor so the envelope only differentiates where spending it is affordable. And **the aim
+error was perturbing the flight path**: a sloppy aim flies a wider pursuit curve, which in this model
+is free energy, so a *better* aim was a straight energy penalty. Both error terms now perturb what
+the pilot **believes** the solution to be; the AI always steers at the true solution. The skill
+ladder went from −11.4 to **+16.0 points** and `k` is monotone by construction.
+
+**D87** — **C7 pooled reads 48.9% ± 1.8 across five airframes, 49.6% over 1,200 duels.** The agent
+also **fixed C7's instrument**, which had been measuring a single airframe at n=120 — pooling all
+five is the faithful reading of "the player's loadout", and the band was left untouched.
+
+**D88** — **Two P4 trace digests drifted and were re-blessed, declared loudly rather than buried**:
+glide L/D 7.94 → 7.90 and landing touchdown 19.3 → 19.4 s. Both under 1%, both the correct
+consequence of fixing the envelope, every assert passing unchanged, before/after hashes recorded in
+`tools/BLESSED_P5.md`. **No P4 expectation was adjusted to make anything pass.**
+
+**D89** — **C4/C5/C6 are stale and deliberately not re-fitted.** The root fixes changed how every
+aeroplane flies, so ace HP values fitted against the old AI no longer hold. Re-fitting sixteen aces
+against an AI that is about to get crates would be work done twice. **Deferred to P11**, consistent
+with D84: playable first.

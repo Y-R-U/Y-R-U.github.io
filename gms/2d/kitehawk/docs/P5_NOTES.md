@@ -45,6 +45,13 @@ data/tables/enemies.json   GENERATED mirror
 tools/BLESSED_P5.md  the anti-mock record
 ```
 
+> **Corrective pass (D80).** All three P4 defects below are now **fixed at root**, not
+> worked around, and every workaround has been deleted rather than left alongside the
+> fix. `js/sim/aero.js`, `flight.js` and `pilot.js` were transferred to P5 for that pass.
+> `pilot.js`'s three tiers are un-quarantined and `k` is monotone across them. What each
+> root cause actually was is in §1.1–§1.3 and §4.2; the evidence that the family is
+> closed is C7 at **49.6% pooled over 1,200 mirror duels**.
+
 ### 1.1 `aero.js` resolves every aircraft's forces into one shared object
 
 `forces()` writes into a module-level `OUT` and `flight.js` keeps the reference as
@@ -53,9 +60,23 @@ that is correct and cheap. With two, **every aircraft's `aero` is whichever airc
 updated last**, so the feed-forward is somebody else's.
 
 Measured: a commanded 1.8 g pull produced 0.47 g, alpha sat at −0.5° against a
-commanded +1.4°, and the AI could not hold a nose position at all. Worked around in
-`entities.js` (`keepAero`) by copying the resolve into a per-entity object after every
-`flight.update`. **REQUEST-1** below asks P4 to give `integrate()` an `out`.
+commanded +1.4°, and the AI could not hold a nose position at all.
+
+**Root cause: an output buffer whose lifetime was longer than its scope.** `forces()`
+defaulted `out` to a module singleton, and `flight.js` *retained* the returned reference.
+Fixed by making the aircraft own it: `createForces()` allocates one per aeroplane at
+`createFlight`, `integrate()` writes into `e.aero` in place, and **`forces()` no longer
+has a default `out` at all** — a shared buffer is not something a caller should be able
+to get by accident. A `resolved` flag preserves the old `e.aero === null` first-tick
+semantics exactly, which is why every P4 gate and fixture hash is unchanged by this fix.
+The `keepAero` workaround is deleted.
+
+**The pattern appeared twice.** Going looking for it found the same defect in P5's own
+`ai.js`: `createFormation` handed every wingman one shared point object, and
+`pilot.setIntent('point', obj)` *retains* it — so every wingman in a formation flew to
+whichever station was written last. Now one point per wingman. The other module-level
+scratch objects in `js/sim/` (`SEG`, `HIT`, `LEAD`, `EV`) are consumed inside the call
+that fills them and are safe; the two that were not are the two that were retained.
 
 ### 1.2 `roll` is which side the canopy is on, and every hostile started inverted
 
@@ -79,9 +100,22 @@ Two separate faults in `pilot.js`, both invisible to P4 because every fixture fl
   roster**.
 
 Cost, measured before it was found: in a perfectly symmetric mirror fight the aircraft
-that started flying +x won **79 of 80**. P5 works around both — it uses `point` and
-nothing else, and mirrors the target bearing about the flight path when `roll < 0`,
-which is algebraically exact and restores the climb to 735 m. **REQUEST-2.**
+that started flying +x won **79 of 80**.
+
+**Both fixed at root.** The load-factor conversion is now `nWant = s·(cos γ − v·gd/g)`,
+with the `roll` on both terms where the algebra puts it. The flight-path intents are
+expressed as a **climb angle about the aircraft's own horizontal direction** and
+converted once (`headed()`): eastbound `γ = −χ`, westbound `γ = χ − π`. `dive` keeps its
+absolute angle, because straight down is straight down whichever way you were going.
+`turnUp`/`turnDown` are relative to the current flight path and signed by `roll`, so they
+saturate from any attitude instead of wrapping to a zero error.
+
+Verified by the isolation that found it: told to climb 300 m, eastbound reaches **739 m**
+and westbound **736 m** (was 312 m, having dived). `hold 600` now flies a mirrored path
+either way (606.1 m east, 607.4 m west). P5's mirrored-bearing workaround is deleted —
+and it is worth recording that with the root fix in, the old workaround *breaks* the
+same test (309 m), which is what a workaround should do once the thing it worked around
+is gone.
 
 ---
 
@@ -261,35 +295,51 @@ Everything goes through `point` and nothing through `level`, `hold`, `climb`, `s
   whole reason: 95 vs 74 °/s, at 7.2 m/s of energy every second. `DISCIPLINE = 0.55`,
   and it is deliberately **not** scaled by `k` — see §5.
 
-### 4.2 `k` had to be made monotone three times
+### 4.2 `k` had to be made monotone, and it took five attempts
 
 A skill dial that does not order pilots is worse than no dial. Measured on the exact
-mirror, player win rate against the same ace at `k` 0.25 and 0.95:
+mirror, player win rate against the same ace at `k` 0.25 and 0.95, two independent seed
+sets at the end:
 
 | build | k 0.25 | k 0.95 | gradient |
 |---|---|---|---|
 | as first written | 78.6% | 90.0% | **−11.4 pts (backwards)** |
 | discipline unscaled from `k` | 71.4% | 100% | **−28.6 (worse)** |
-| aim clock split from state clock | 90.9% | 80.0% | +10.9 |
-| **shipped** | **49.1%** | **34.0%** | **+15.2** |
+| aim clock split from the state clock | 90.9% | 80.0% | +10.9 |
+| tiers quarantined (P5's first answer) | 49.1% | 34.0% | +15.2 |
+| **tiers restored, both `k` errors on the trigger** | **62.6%** | **46.6%** | **+16.0** |
 
-Three separate causes, all of them mine or P4's and none of them visible in a morale or
-accuracy trace:
+Five causes, none of them visible in a morale or accuracy trace, and the last two only
+findable by pinning one dial at a time (`tools/lab/dials.mjs`, `setDialLock`):
 
-1. **P4's `ace` pilot tier flies worse than `competent`** in a sustained fight, and
-   carries a heading bias besides (§5).
-2. **P4's `novice` tier flies *better*.** Its `envelope` is 0.62, and a smaller envelope
-   makes the pilot command a **larger** stick for the same wanted turn rate — so the
-   worse pilot pulls harder and out-turns the better one.
-3. **The reaction period was driving state selection.** At `k` 0.95 that is 4.5
-   decisions a second, and the AI thrashed between ENGAGE, EXTEND and CLIMB. Aim and
-   state are now on separate clocks: `k` sets the aim clock, everybody re-chooses state
-   at 0.40 s.
+1. **P4's `envelope` divided `nMax` before the stick was solved**, so a *smaller*
+   envelope produced a *larger* stick — the novice out-pulled the ace. Fixed at root:
+   `envelope` now caps the commanded stick, which is what "the fraction of the envelope
+   it will use" says.
+2. **A high envelope is then a liability**, because P4's F8/F9 price a max-rate turn at
+   7.2 m/s of energy per second and the `ace` tier may command all of it. Fixed with an
+   **energy governor** in `pilot.js`: below corner speed every pilot is capped
+   identically, so nobody spirals into the deck, and the envelope only differentiates in
+   the fast regime where spending it is affordable.
+3. **The reaction period was driving state selection.** At `k` 0.95 that is 4.5 decisions
+   a second and the AI thrashed. Aim and state are now on separate clocks.
+4. **The lead-solution error was perturbing the flight path.** A sloppy aim flies a wider
+   pursuit curve, and in this model a wider curve is *free energy* — so a better aim was
+   a straight energy penalty. Moved to the trigger, where §5.2's wording puts it.
+5. **So was the angular aim error**, and it is worth 14 points on its own. Both now
+   perturb what the pilot *believes* the solution to be; the AI always steers at the
+   true solution, as well as its tier allows. `k` is then monotone by construction —
+   better judgement about when to fire cannot make a pilot worse.
 
-Consequently **every combat pilot flies the `competent` tier** and the whole skill
-gradient is P5's own: aim error, reaction, trigger discipline. `kMonotone` is the guard,
-and it is measured on the mirror cell because A10's cell reads 86% at every `k` and a
-ceiling cannot show a gradient.
+The dial isolation is the transferable part. The control row read −18.9 points; locking
+the aim error alone read **+2.3**, while locking the reaction period, the trigger cone or
+the check-six period left the inversion untouched. That is a one-line answer to "which of
+five things is it", and no amount of reading the code produced it.
+
+**The tiers are un-quarantined.** `k < 0.45` flies `novice`, `< 0.75` `competent`, above
+that `ace`, and the ladder contributes about 10 of the 16 points of gradient with the
+dials contributing the rest. `tools/lab/sym2.mjs` shows the `ace` tier's 73% heading bias
+is gone — it was the same root cause as §1.3, exactly as suspected.
 
 ### 4.3 The `k` error is held, not resampled
 
@@ -338,10 +388,10 @@ win rate, measured. `--break no-promotion` removes it.
 
 ---
 
-## 5. The `ace` pilot tier is quarantined, with the measurement
+## 5. The `ace` pilot tier — quarantined, diagnosed, and released
 
 `tools/lab/sym2.mjs` runs a perfectly symmetric fight — same type, same AI, same `k` —
-in both directions, and counts.
+in both directions, and counts. Before the root fix:
 
 | both sides on | A starts left | A starts right |
 |---|---|---|
@@ -349,11 +399,13 @@ in both directions, and counts.
 | `competent` | 33 / 24 | 26 / 34 |
 | **`ace`** | **16 / 44** | **44 / 14** |
 
-On `ace` the aeroplane that starts flying **left wins 73%** from heading alone. On
-`competent` the same fight is even. I could not localise it inside my own files — the
-mirroring in §1.3 is algebraically exact and the pilot's output is a frame-free
-magnitude — and the tier's only measured advantage over `competent` is a finer stick
-quantum. **REQUEST-3.**
+On `ace` the aeroplane that starts flying **left wins 73%** from heading alone; on
+`competent` the same fight is even. It was not localisable from inside P5's files,
+because the cause was in `pilot.js`: the finer stick quantum of the `ace` tier resolved
+the roll-sign error of §1.3 more sharply, so the tier that flew *best* amplified the bias
+worst. With the sign fixed the same table reads **30/27 and 25/26** at `k` 0.70 and
+**35/16, 28/19** at 0.90 — even, and the residual is the side-order variance that C7
+measures properly. The tier is back in service.
 
 ---
 
@@ -430,15 +482,29 @@ set is `hp`: one monotone lever, fitted per ace (`tools/lab/fit.mjs`).
 | C4 | intended tier wins 55–70% | 8 of 16 aces inside | ❌ |
 | C5 | sidegrades 45–65% | 14 aces have at least one cell outside, over 51 cells | ❌ |
 | C6 | counter-play ≥ 18 pts | 4 of 11 measurable counters clear it | ❌ |
-| C7 | the mirror ace at k 0.90 | **51.5%**, and 45.4–51.6% across all five airframes | ✅ 48–52 |
+| C7 | the mirror ace at k 0.90 | **48.9% ± 1.8** pooled over all five airframes | ✅ 48–52 |
 | C8 | flee rate | **20.0%** (18 of 90) | ✅ 12–22 |
 | C9 | zoom neutrality | byte-identical, and now able to fail | ✅ |
 | C10 | no allocation after warm-up | warm 536 objects, then **+0** over 200 duels | ✅ |
 
 **C7 is the one to read first.** An exact mirror — same airframe, same guns, same 220
-structure, same `k` — sits at a coin flip on every airframe. Every one of the six
-symmetry defects in §1 and §6 showed up here first, as a 79-to-1 or a 61-to-39, and this
-row is what says they are gone.
+structure, same `k` — sits at a coin flip. Every one of the symmetry defects in §1 and
+§6 showed up here first, as a 79-to-1 or a 61-to-39, and this row is what says they are
+gone: **49.6% over 1,200 duels** in the dedicated measurement, 48.9% ± 1.8 in the gate.
+
+It is measured across **all five airframes and pooled**, because a single airframe at
+n = 120 is an airframe lottery rather than a criterion — the same kitehawk cell reads
+39.3%, 48.1% and 52.4% on three seed sets, every one of them inside its own ±4.2. The
+gate used to measure one; that is fixed, and it is a mis-specified *instrument* rather
+than a mis-specified threshold, so the band is untouched.
+
+**C4, C5 and C6 must be re-fitted and that is P11's, not this pass's.** The root fixes
+changed how every aeroplane in the game flies — `k` now orders pilots, all three pilot
+tiers are live, and the AI flies the true lead solution — so the ace `hp` values fitted
+against the *old* AI are stale, and the counter deltas with them. The harness is
+unchanged and runs in about four minutes (`tools/lab/fit.mjs`, `--counterplay`); R-11 and
+T23 both place that pass at P11, and re-fitting sixteen aces against an AI that is about
+to get crates (P6) would be work done twice.
 
 **C2 is mis-specified and I did not tune to it.** Its 0.4–0.8 s band comes from
 DESIGN §3.1's own sanity check, `60 / 108 = 0.56 s`, which assumes **no component
@@ -517,9 +583,29 @@ New constants P5 introduces: `SPILL 0.35` (DESIGN's), `GUNS.portN 0.55`,
 `ENGAGE_RANGE 500 m`, `STATE_PERIOD 0.40 s`, `DISCIPLINE 0.55`, `FLOOR 120 + v` metres,
 `FRAMING.bossSectionWu 320`.
 
+One constant was **deleted**: the `2.1 × Vs` corner-speed heuristic that `ai.js` and
+`pilot.js` would otherwise both have carried. `aero.js` now derives corner speed from the
+envelope itself — the speed that maximises `min(pitchCeiling(v), g√(n_wing²−1)/v)` —
+memoised per airframe with a signature so a battle-damaged refit recomputes instead of
+returning a stale number for an aeroplane that has lost a wing. It reproduces P4's
+independently measured 32.7 m/s for the reference airframe at 33.8, and it is an identity
+rather than a fit, which is what D72 asks for.
+
 ---
 
-## 11. What P6 needs
+## 11. Requests, closed
+
+The three requests P5 raised against P4 are **resolved in the corrective pass**, at root:
+
+| # | was | now |
+|---|---|---|
+| REQUEST-1 | `aero.js`'s module-level `OUT`, worked around with `keepAero` | the aircraft owns its resolve; `forces()` has no default `out`; workaround deleted |
+| REQUEST-2 | `pilot.js`'s roll sign and absolute-angle intents, worked around by using only `point` with a mirrored bearing | sign corrected, intents made heading-relative, `turnUp`/`turnDown` made saturating from any attitude; workaround deleted |
+| REQUEST-3 | `ace` and `novice` tiers quarantined | both in service, ladder monotone, guarded by `kMonotone` and `sym2.mjs` |
+
+Nothing is left with two paths in it.
+
+## 12. What P6 needs
 
 1. **`CRATE_RUN` exists with its transition and its utility hook, and runs against
    nothing.** §5.2's condition is `a crate under canopy is reachable and E_rel > −100`;
@@ -543,7 +629,7 @@ New constants P5 introduces: `SPILL 0.35` (DESIGN's), `GUNS.portN 0.55`,
 
 ---
 
-## 12. What I would want Aaron to fly for ninety seconds
+## 13. What I would want Aaron to fly for ninety seconds
 
 Open `tools/pages/duel.html` and fight **A5** and then **A2**, in that order.
 

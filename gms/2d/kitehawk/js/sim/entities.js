@@ -135,18 +135,6 @@ function makeEntity(i) {
   return {
     slot: i, id: '', alive: false, side: 1, type: null,
     flight: null, pilot: null, pilots: null, ai: null, gun: null, turrets: null,
-    // P5 REQUEST-1. `js/sim/aero.js` resolves forces into ONE module-level object
-    // and `flight.js` keeps a reference to it as `e.aero`, which it reads back next
-    // tick as the gamma_dot feed-forward. With one aeroplane that is fine and P4
-    // measured it that way; with two, every aircraft's `aero` is the LAST aircraft
-    // to update, so the feed-forward is somebody else's. Measured cost: a commanded
-    // 1.8 g pull produced 0.47 g and the AI could not hold a nose position at all.
-    // Worked around here — a per-entity copy re-seated after every update — rather
-    // than by editing P4's file. See docs/P5_NOTES.md §1.
-    aeroOwn: { ax: 0, ay: 0, v: 0, q: 0, rho: 0, alpha: 0, alphaW: 0, gamma: 0,
-               cl: 0, clEff: 0, cd: 0, lift: 0, drag: 0, thrust: 0, n: 0, stalled: false },
-    control: null, forcedTarget: null, carrying: 0, lastFireT: 99,
-    af: null, rng: null, rngFlight: null, rngPilot: null, rngAI: null,
     hp: makeHP(220), hpMax: makeHP(220),
     armour: 1, gasbag: false, objective: false,
     dead: false, state: 'PATROL', spin: 0, wingOff: false, bailed: false,
@@ -250,7 +238,6 @@ export function createWorld(ctx = {}, opts = {}) {
     f.axisY = 0; f.axisX = 0;
     f.setInput(0, 0);
     f.update(1e-6);
-    keepAero(e);
 
     e.id = o.id || (type.id + '#' + (++idSeq));
     e.side = o.side ?? 1;
@@ -275,27 +262,16 @@ export function createWorld(ctx = {}, opts = {}) {
     // P4_NOTES §10.5: the three tiers are what make skill differ at the STICK.
     // `k` on top of that is what makes it differ at the GUN. Both, not one.
     /**
-     * P4's `ace` tier is QUARANTINED and no shipped pilot uses it. Measured
-     * (`tools/lab/sym2.mjs`): in a perfectly symmetric mirror fight with both
-     * sides on the `ace` tier, the aeroplane that starts flying LEFT wins 44-16
-     * and 44-14 — a 73% advantage from heading alone. On `competent` the same
-     * fight is 33-24 / 26-34, i.e. even. The tier's only measured advantage over
-     * `competent` is a finer stick quantum, and it costs a systematic bias in
-     * favour of half the roster. REQUEST-3: P4 or P7 should find it; until then
-     * skill above k 0.75 is expressed through P5's own dials, which are
-     * frame-free by construction.
-     *
-     * The `novice` tier is quarantined for a second, separate reason: its
-     * `envelope` is 0.62, and a smaller envelope makes the pilot command a
-     * LARGER stick for the same wanted turn rate, so the "worse" pilot pulls
-     * harder and out-turns the better one. Measured: an ace at k 0.25 (novice)
-     * beat the player 21.4% of duels where the same ace at k 0.95 (competent)
-     * managed 10.0% — `k` was anti-monotone, which is the one thing a skill
-     * dial may not be. Every combat pilot flies `competent` and the whole skill
-     * gradient is P5's: aim error, reaction period, trigger discipline and
-     * energy discipline. `--p5fixtures kMonotone` is the guard.
+     * P4's three tiers, restored. Both reasons they were quarantined were root
+     * causes in `pilot.js` and both are fixed: the roll sign in the load-factor
+     * conversion (which made `ace`'s finer stick amplify a heading bias) and
+     * `envelope` dividing `nMax` before the stick was solved (which made
+     * `novice`'s 0.62 produce a LARGER stick, so the worse pilot out-turned the
+     * better one). `--p5fixtures kMonotone` and `tools/lab/sym2.mjs` are the
+     * guards; `setTierForce` is the isolation switch that found it.
      */
-    e.pilot = TIER_FORCE ? e.pilots[TIER_FORCE] : e.pilots.competent;
+    e.pilot = TIER_FORCE ? e.pilots[TIER_FORCE]
+            : e.k < 0.45 ? e.pilots.novice : e.k < 0.75 ? e.pilots.competent : e.pilots.ace;
     e.pilot.setIntent('level');
     e.pilot.setAxisX(0);
     e.leaderId = o.leaderId || ''; e.formSlot = o.formSlot || 0;
@@ -323,7 +299,7 @@ export function createWorld(ctx = {}, opts = {}) {
     cloneAirframe(e.af.base || REFERENCE, e.af);
     f.setInput(0, 0);
     const n = Math.round(QUENCH_SECS / DT_FIXED);
-    for (let i = 0; i < n; i++) { f.setInput(0, 0); f.update(DT_FIXED); keepAero(e); }
+    for (let i = 0; i < n; i++) { f.setInput(0, 0); f.update(DT_FIXED); }
   }
 
   world.spawn = (type, o = {}) => {
@@ -371,7 +347,6 @@ export function createWorld(ctx = {}, opts = {}) {
       // shipped the hook with nothing to feed it. This is that feed.
       const t = nearestAhead(e, live, TGT);
       e.flight.update(dt, t);
-      keepAero(e);
       if (world.arena.updrafts) applyUpdraft(e, world.arena, dt);
     }
 
@@ -447,7 +422,6 @@ export function createWorld(ctx = {}, opts = {}) {
     f.theta += e.spin * dt * (e.wingOff ? WRECK.wingOffFall : 1);
     f.setInput(0, 0);
     f.update(dt);
-    keepAero(e);
     if (f.sy >= 0) { world.stats.killed++; world.despawn(e); }
   }
 
@@ -457,22 +431,6 @@ export function createWorld(ctx = {}, opts = {}) {
   }
 
   return world;
-}
-
-/**
- * Take the shared force-resolve object out of the aircraft and give it a private
- * copy. Must run after EVERY `flight.update`, before any other aircraft updates.
- */
-export function keepAero(e) {
-  const src = e.flight.aero;
-  if (!src) return;
-  const o = e.aeroOwn;
-  o.ax = src.ax; o.ay = src.ay; o.v = src.v; o.q = src.q; o.rho = src.rho;
-  o.alpha = src.alpha; o.alphaW = src.alphaW; o.gamma = src.gamma;
-  o.cl = src.cl; o.clEff = src.clEff; o.cd = src.cd;
-  o.lift = src.lift; o.drag = src.drag; o.thrust = src.thrust;
-  o.n = src.n; o.stalled = src.stalled;
-  e.flight.aero = o;
 }
 
 /** §5.3 A8's authored updraft bands. Visible as rain-streak direction, and yours too. */

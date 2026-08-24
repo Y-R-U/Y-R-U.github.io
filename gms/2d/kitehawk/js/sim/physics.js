@@ -29,12 +29,15 @@ export function integrate(a, e, qCmd, throttle, dt) {
   const h = dt / SUBSTEPS;
   for (let i = 0; i < SUBSTEPS; i++) {
     e.theta = wrapPi(e.theta + qCmd * h);
-    const f = forces(a, e.sx, e.sy, e.svx, e.svy, e.theta, throttle, -e.sy, e.roll);
+    // The aircraft owns its force-resolve object and this writes into it. The
+    // reference must NOT be reassigned here: `e.aero` is read at the top of the
+    // next `flight.update` as the gamma_dot feed-forward, and handing every
+    // aircraft a shared buffer is the defect P5 found (aero.js `createForces`).
+    const f = forces(a, e.sx, e.sy, e.svx, e.svy, e.theta, throttle, -e.sy, e.roll, e.aero);
     e.svx += f.ax * h;
     e.svy += f.ay * h;
     e.sx += e.svx * h;
     e.sy += e.svy * h;
-    e.aero = f;
   }
   e.q = qCmd;
   return e;

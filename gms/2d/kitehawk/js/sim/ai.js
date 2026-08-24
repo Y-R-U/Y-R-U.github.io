@@ -21,6 +21,7 @@ import { G_SI } from '../data/tables.js';
 import { clamp } from '../core/math.js';
 import { wrapPi } from './physics.js';
 import { offNose, leadPoint, GUNS } from './weapons.js';
+import { cornerSpeed } from './aero.js';
 import { HULL_M, bugOf } from './damage.js';
 
 const DEG = Math.PI / 180;
@@ -55,10 +56,10 @@ export const MORALE = Object.freeze({
   bloodedFlee: -0.25, bloodedAggro: 1.15,   // §3.3 "Blooded": they fight harder and run less
 });
 
-/** The corner speed the AI tries to fly. `2.1 x Vs` reproduces P4's measured corner
- *  for all five airframes to within 0.4 m/s; it is a heuristic the AI aims at, not
- *  a constant anything is measured against. */
-export const cornerGuess = (af) => af.vs * 2.1;
+/** The corner speed the AI flies to. Derived once, in aero.js, from the identity
+ *  rather than from a fit — see `cornerSpeed`. Re-exported so nothing downstream
+ *  grows a second copy. */
+export { cornerSpeed as cornerGuess } from './aero.js';
 
 /**
  * How hard a pilot eases off a max-rate turn he cannot pay for. It is NOT scaled
@@ -71,6 +72,15 @@ export const DISCIPLINE = 0.55;
 
 /** How often any pilot re-chooses a state. Fixed for everyone — see ai.update. */
 export const STATE_PERIOD = 0.40;
+
+/**
+ * Isolation switch for the harness, the same shape as `setTierForce`. Pins one
+ * of `k`'s dials to a fixed value so the others can be varied alone — the only
+ * way to find out which dial an anti-monotone `k` is coming from, rather than
+ * guessing and tuning. No shipped code sets it.
+ */
+export const DIAL_LOCK = { react: 0, aimLead: -1, aimAng: -1, fireCone: 0, six: 0 };
+export function setDialLock(o) { Object.assign(DIAL_LOCK, o); return DIAL_LOCK; }
 
 const specE = (f) => -f.sy + (f.svx * f.svx + f.svy * f.svy) / (2 * G_SI);
 
@@ -150,16 +160,17 @@ export function createAI(ent, opts = {}) {
   };
   ent.k = ai.k;
   ent.aggro = ai.aggro;
-  ai.react = 0.65 - 0.45 * ai.k;
-  ai.sixPeriod = 4.5 - 3.2 * ai.k;
+  ai.react = DIAL_LOCK.react || (0.65 - 0.45 * ai.k);
+  ai.sixPeriod = DIAL_LOCK.six || (4.5 - 3.2 * ai.k);
   // §2.6: stricter auto-fire is an AMMO and ACCURACY trade, not a DPS win, and a
   // steep k-scaling here made every good pilot fire so rarely that k measured
   // backwards in the mirror duel. Modest, and it is not where skill lives.
-  ai.fireCone = GUNS.coneHalf * (1 - 0.25 * ai.k);
+  ai.fireCone = DIAL_LOCK.fireCone || GUNS.coneHalf * (1 - 0.25 * ai.k);
   if (ent.gun) ent.gun.fireCone = ai.fireCone;
 
   const LEAD = { x: 0, y: 0, t: 0, range: 0 };
   const AIM = { x: 0, y: 0, range: 0 };
+  const AIMSOFT = { x: 0, y: 0 };
   const AIMPT = { xM: 0, yM: 0 };      // reused: `point` intents must not allocate
 
   /* ---------------------------------------------------------- perception -- */
@@ -360,17 +371,36 @@ export function createAI(ent, opts = {}) {
    */
   function disciplinedAim(e, aimX, aimY) {
     const f = e.flight;
-    const corner = cornerGuess(e.af);
+    const vc = cornerSpeed(e.af, f.altM);
     const v = f.speedSI;
-    if (v >= corner * 1.02) return null;                       // energy in hand: pull all you like
-    const shot = Math.hypot(aimX - f.sx, aimY - f.sy) < GUNS.rangeEff * 1.25;
-    if (shot) return null;                                     // a solution is worth the energy
-    const deficit = Math.min(1, (corner - v) / (corner * 0.40));
-    const ease = deficit * DISCIPLINE;
+    // A solution in reach is worth spending energy on — but only while there is
+    // energy to spend. Below the floor the aeroplane is mushing toward a stall
+    // and a shot it cannot hold is not a shot.
+    const d = Math.hypot(aimX - f.sx, aimY - f.sy);
+    if (d < GUNS.rangeEff * 1.25 && v > vc * 0.88) return null;
+    /**
+     * No shot: fly LAG pursuit, not lead. This is the single most important line
+     * in the AI and it was the last defect in the phase.
+     *
+     * Pointing continuously at the exact lead solution is the tightest turn the
+     * aeroplane can draw, and P4's F9 prices it at 7.2 m/s of energy per second
+     * at corner and 15.6 at the top of the band. A pilot who does it for a whole
+     * fight arrives at the bottom with nothing. The discipline used to apply
+     * only below corner speed, which meant a pilot with a SMALL aim error flew
+     * perfect lead pursuit above corner and exhausted itself — so `k` measured
+     * anti-monotone by 19 points, and locking the aim error was what proved it
+     * (tools/lab/dials.mjs: the inversion vanishes, -18.9 -> +2.3).
+     *
+     * Easing is heavier the deeper below corner the aeroplane already is.
+     */
+    const deficit = v < vc ? Math.min(1, (vc - v) / (vc * 0.40)) : 0;
+    const ease = DISCIPLINE * (0.60 + 0.40 * deficit);
     const bearing = Math.atan2(aimY - f.sy, aimX - f.sx);
-    const blended = f.gamma + wrapPi(bearing - f.gamma) * (1 - ease * 0.85);
-    const d = Math.max(60, Math.hypot(aimX - f.sx, aimY - f.sy));
-    return { x: f.sx + Math.cos(blended) * d, y: f.sy + Math.sin(blended) * d };
+    const blended = f.gamma + wrapPi(bearing - f.gamma) * (1 - ease);
+    const r = Math.max(60, d);
+    AIMSOFT.x = f.sx + Math.cos(blended) * r;
+    AIMSOFT.y = f.sy + Math.sin(blended) * r;
+    return AIMSOFT;
   }
 
   function closure(e, o) {
@@ -379,19 +409,32 @@ export function createAI(ent, opts = {}) {
     return ((e.flight.svx - o.flight.svx) * dx + (e.flight.svy - o.flight.svy) * dy) / d;
   }
 
-  /** The aim point: the true lead solution, plus this decision's held error. */
+  /**
+   * Where to point. §5.2 gives `k` two errors and they are NOT the same kind of
+   * thing, which is why they now go to two different places:
+   *
+   * Both of them describe what the pilot BELIEVES the solution to be, so both
+   * of them move the moment he squeezes and neither moves where he flies. The
+   * AI always steers at the true solution, as well as its pilot tier allows.
+   *
+   * That is not tidiness, it is the fix for a 19-point anti-monotone `k`, and it
+   * took two attempts to find. Applied to the FLIGHT PATH, an aim error makes a
+   * bad pilot fly a wider, sloppier pursuit curve — and in a model where P4's F9
+   * prices a max-rate turn at 7.2 m/s of energy per second, a wide sloppy curve
+   * is free energy. Perfect aim meant perfect lead pursuit meant exhaustion, so
+   * the best pilots lost. Moving the big (lead) error alone was not enough:
+   * three or four degrees of angular error is worth 14 points on its own.
+   * Locking each dial in turn is what proved it — tools/lab/dials.mjs, where
+   * the inversion vanishes the moment the aim error is held constant.
+   *
+   * With both on the trigger, `k` is monotone by construction: better judgement
+   * about when to fire cannot make a pilot worse.
+   */
   function aimAt(e, tgt) {
-    const f = e.flight;
-    leadPoint(f, tgt, LEAD);
-    // rotate the true solution about the shooter by the angular error, then slide
-    // it along the target's own velocity by the lead error
-    const dx = LEAD.x - f.sx, dy = LEAD.y - f.sy;
-    const c = Math.cos(ai.aimAng), sn = Math.sin(ai.aimAng);
-    const tf = tgt.flight;
-    const tv = Math.max(1e-6, Math.hypot(tf.svx, tf.svy));
-    AIM.x = f.sx + dx * c - dy * sn + (tf.svx / tv) * ai.aimLead;
-    AIM.y = f.sy + dx * sn + dy * c + (tf.svy / tv) * ai.aimLead;
-    AIM.range = LEAD.range;
+    leadPoint(e.flight, tgt, LEAD);
+    AIM.x = LEAD.x; AIM.y = LEAD.y; AIM.range = LEAD.range;
+    e.aimErrLead = ai.aimLead;          // read by the trigger, never by the flying
+    e.aimErrAng = ai.aimAng;
     return AIM;
   }
 
@@ -407,8 +450,10 @@ export function createAI(ent, opts = {}) {
    */
   function rollAimError() {
     if (!rng) { ai.aimLead = 0; ai.aimAng = 0; return; }
-    ai.aimLead = rng.gauss(0, (1 - ai.k) * 0.9) * HULL_M;
-    ai.aimAng = rng.gauss(0, (6 - 5 * ai.k) * DEG);
+    const sdLead = DIAL_LOCK.aimLead >= 0 ? DIAL_LOCK.aimLead : (1 - ai.k) * 0.9;
+    const sdAng = DIAL_LOCK.aimAng >= 0 ? DIAL_LOCK.aimAng : (6 - 5 * ai.k);
+    ai.aimLead = rng.gauss(0, sdLead) * HULL_M;
+    ai.aimAng = rng.gauss(0, sdAng * DEG);
   }
 
   /* --------------------------------------------------- the steering layer -- */
@@ -428,51 +473,19 @@ export function createAI(ent, opts = {}) {
   const dirX = (f) => (Math.cos(f.gamma) >= 0 ? 1 : -1);
 
   /**
-   * REQUEST-2, part two, and it is the larger half.
-   *
-   * P4's `pilot.js` converts a wanted turn rate into a load factor with
-   *   `nWant = cos(gamma) * roll - v * gd / g`
-   * where `nWant` is a magnitude measured toward the canopy. The correct
-   * relation is `roll * (cos(gamma) - v*gd/g)`, i.e. the `roll` belongs on BOTH
-   * terms. With `roll = +1` the two agree and every P4 fixture flies +x, so it
-   * was never visible. With `roll = -1` — an UPRIGHT aeroplane heading left,
-   * which is what the auto-upright assist produces after any Immelmann and what
-   * every hostile in the game starts as — the turn-rate term has the wrong sign
-   * and the pilot flies the exact opposite of what it is told.
-   *
-   * Measured in isolation (`tools/lab/roll.mjs`): told to climb 300 m, a +x
-   * aeroplane reaches 738 m and a -x one reaches 312 m, having dived instead.
-   *
-   * Since the error is exactly a sign flip on `gd`, feeding a target whose
-   * bearing is mirrored about the current flight path makes the wrong formula
-   * produce the right answer. That restores it to 735 m. It is a workaround in
-   * P5's file, not an edit to P4's, and it should be deleted the day `pilot.js`
-   * puts the `roll` on the other term.
+   * The steering layer. Every one of these is now a straight P4 intent: the two
+   * defects that forced P5 to route everything through `point` with a mirrored
+   * bearing — the roll sign in the load-factor conversion, and the intents that
+   * returned absolute flight-path angles — are fixed at root in `pilot.js`, and
+   * the workaround is gone rather than sitting alongside the fix.
    */
-  function goTo(e, xM, yM) {
-    const f = e.flight;
-    if (f.roll < 0) {
-      const d = Math.max(50, Math.hypot(xM - f.sx, yM - f.sy));
-      const mirrored = f.gamma - wrapPi(Math.atan2(yM - f.sy, xM - f.sx) - f.gamma);
-      AIMPT.xM = f.sx + Math.cos(mirrored) * d;
-      AIMPT.yM = f.sy + Math.sin(mirrored) * d;
-    } else { AIMPT.xM = xM; AIMPT.yM = yM; }
-    e.pilot.setIntent('point', AIMPT);
-  }
-  function holdAlt(e, altM) { const f = e.flight; goTo(e, f.sx + dirX(f) * 420, -altM); }
-  function climbAway(e) { const f = e.flight; goTo(e, f.sx + dirX(f) * 200, f.sy - 300); }
-  function diveAway(e) { const f = e.flight; goTo(e, f.sx + dirX(f) * 200, f.sy + 300); }
-  /** Trade angle for speed, or speed for angle, without ever commanding a reversal. */
-  function speedTo(e, v) {
-    const f = e.flight;
-    const err = clamp(v - f.speedSI, -14, 14);
-    goTo(e, f.sx + dirX(f) * 420, f.sy + err * 12);
-  }
-  /** The break: full deflection, in the vertical, relative to where the nose is. */
-  function hardTurn(e, up) {
-    const f = e.flight;
-    goTo(e, f.sx + Math.cos(f.gamma) * 55, f.sy + (up ? -340 : 340));
-  }
+  function goTo(e, xM, yM) { AIMPT.xM = xM; AIMPT.yM = yM; e.pilot.setIntent('point', AIMPT); }
+  function holdAlt(e, altM) { e.pilot.setIntent('hold', altM); }
+  function climbAway(e) { e.pilot.setIntent('climb'); }
+  function diveAway(e) { e.pilot.setIntent('dive', 0.4); }
+  function speedTo(e, v) { e.pilot.setIntent('speed', v); }
+  /** The break: full deflection in the vertical, toward the canopy or away from it. */
+  function hardTurn(e, up) { e.pilot.setIntent(up ? 'turnUp' : 'turnDown'); }
 
   /**
    * The floor. A defensive spiral "toward the ground" (§5.2) and a bug-out "dive
@@ -496,7 +509,7 @@ export function createAI(ent, opts = {}) {
 
   function drive(world, e, tgt, dt) {
     const p = e.pilot, f = e.flight, af = e.af;
-    const corner = cornerGuess(af);
+    const corner = cornerSpeed(af);
     e.wantsFire = true;
     if (groundGuard(e, dt)) return;
 
@@ -714,7 +727,7 @@ export function createAI(ent, opts = {}) {
     ai.stateT += dt; ai.reactT -= dt; ai.sixT += dt; ai.seenT += dt;
     e.lastFireT = (e.lastFireT || 99) + dt;
     if (e.shootingAt) e.lastFireT = 0;
-    if (ai.promoteT > 0) { ai.promoteT -= dt; e.wantsFire = false; e.pilot.setIntent('level'); e.pilot.update(0, e.flight); return; }
+    if (ai.promoteT > 0) { ai.promoteT -= dt; e.wantsFire = false; e.pilot.setIntent('level'); return; }
 
     if (ai.sixT >= ai.sixPeriod) { ai.sixT = 0; ai.sixAware = true; }
     // The trap this switch exists to prove: resampled every tick, the k-error is
@@ -776,10 +789,16 @@ export const FORMATION = Object.freeze({
   finger4: [[-40, -18], [+45, -10], [+80, +14]],
 });
 
-const FORMPT = { xM: 0, yM: 0 };
-
 export function createFormation(leader, wingmen, kind = 'finger4') {
   const stations = FORMATION[kind] || FORMATION.finger4;
+  /**
+   * One target point PER WINGMAN. `pilot.setIntent('point', obj)` RETAINS the
+   * object and reads it back every tick, so a single shared point object means
+   * every wingman in the formation flies to whichever station was written last.
+   * This is the same defect as aero.js's shared `OUT`, in P5's own code, found
+   * by going looking for the pattern after the first one turned up.
+   */
+  const pts = wingmen.map(() => ({ xM: 0, yM: 0 }));
   const form = { leader, wingmen, kind, stations, promoting: 0 };
   for (let i = 0; i < wingmen.length; i++) {
     wingmen[i].leaderId = leader.id;
@@ -808,8 +827,9 @@ export function createFormation(leader, wingmen, kind = 'finger4') {
       if (split) { w.ai.holding = false; continue; }
       w.ai.holding = true;
       const st = stations[i % stations.length];
-      FORMPT.xM = leader.flight.sx + st[0]; FORMPT.yM = leader.flight.sy + st[1];
-      w.pilot.setIntent('point', FORMPT);
+      const pt = pts[i];
+      pt.xM = leader.flight.sx + st[0]; pt.yM = leader.flight.sy + st[1];
+      w.pilot.setIntent('point', pt);
     }
   };
   return form;

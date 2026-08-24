@@ -38,7 +38,7 @@ const stallAlphaOf = () => STALL_ALPHA;
 import { stallSpeed, density, thrustFactor, cd0Eff, nAvailable, forces, alphaForCL } from '../js/sim/aero.js';
 import { LIFT } from '../js/data/tables.js';
 
-import { createWorld, ENEMY_TYPES, ENEMY_BY_ID, playerType, framingContributions, FRAMING, keepAero } from '../js/sim/entities.js';
+import { createWorld, ENEMY_TYPES, ENEMY_BY_ID, playerType, framingContributions, FRAMING, setTierForce } from '../js/sim/entities.js';
 import { GUNS, GUN_TIERS, GUN_BY_ID, PRIORITY, updateGun, updateBullets, offNose, leadPoint, makeGun } from '../js/sim/weapons.js';
 import { HP_REF, SPILL, COLLIDERS_PROFILE, COLLIDERS_SPAN, setColliderSet, SUBRECTS, COMPONENTS,
          traceHit, updateDamage, makeHP, FIRE, P5_BREAKS, HULL_M } from '../js/sim/damage.js';
@@ -1036,7 +1036,6 @@ const P5_FIXTURES = {
       e.pilot.setIntent('dive', 1);
       e.pilot.update(DT, e.flight);
       e.flight.update(DT);
-      keepAero(e);
       updateDamage(e, DT, ctx);
       peakV = Math.max(peakV, e.flight.speedSI);
       if (!e.burning && outAt < 0) { outAt = i * DT; break; }
@@ -1047,7 +1046,7 @@ const P5_FIXTURES = {
     g.burning = true;
     let died = false;
     for (let i = 0; i < 60 * 14; i++) {
-      g.pilot.setIntent('level'); g.pilot.update(DT, g.flight); g.flight.update(DT); keepAero(g);
+      g.pilot.setIntent('level'); g.pilot.update(DT, g.flight); g.flight.update(DT);
       updateDamage(g, DT, { rng: glide.rng });
       if (g.dead) { died = true; break; }
     }
@@ -1119,32 +1118,66 @@ const P5_FIXTURES = {
   },
 
   /**
-   * The lock must not strobe. Register T13 wants fewer than 4 changes per 10 s,
-   * and this measures that — but the assert is DIFFERENTIAL, because an absolute
-   * count cannot fail when the feature is removed: the first version read 5 with
-   * the hysteresis in and 5 with it broken out. It runs the same scenario twice,
-   * once with `--break no-hysteresis` live, and requires the 0.40 s hold to be
-   * doing measurable work.
+   * The lock must not strobe. Register T13 wants fewer than 4 changes per 10 s.
+   *
+   * The scenario is KINEMATIC — the shooter and three targets are placed on
+   * prescribed paths that carry each target across the +-11 deg cone edge — and
+   * the assert is DIFFERENTIAL, run once with `no-hysteresis` live. Both were
+   * forced. An emergent dogfight put every candidate permanently inside the cone,
+   * so the hysteresis branch never executed and the fixture read the same number
+   * with the feature and without it; and it read the same number again after the
+   * AI's aim changed, because the flight paths moved. A criterion that depends on
+   * what the AI happens to do cannot guard a rule about what the LOCK does.
    */
   lockStability: () => {
     const run = (bug) => {
       const ctx = { rng: createRNG(23), bug };
       const world = createWorld(ctx, {});
-      const p = world.spawn(playerType('kite_b1', 't2'), { id: 'player', side: 0, xM: 0, yM: -450, speed: 45, theta: 0, k: 0.72 });
-      p.ai = createAI(p, { k: 0.72, aggro: 1.4 });
-      for (let i = 0; i < 4; i++) {
-        const e = world.spawn(ENEMY_BY_ID.kestrel, {
-          id: 'e' + i, side: 1, xM: 34 + i * 9, yM: -450 + (i - 1.5) * 11,
-          speed: 45, theta: 0.55 * (i - 1.5), morale: 1, k: 0.35 });
-        e.ai = createAI(e, { k: 0.35, aggro: 1.5 });
-        e.wantsFire = false;
+      const shooter = world.spawn(playerType('kite_b1', 't2'), { id: 'player', side: 0, xM: 0, yM: -450, speed: 45, theta: 0 });
+      shooter.gun.fireCone = GUNS.coneHalf;
+      const tgts = [];
+      for (let i = 0; i < 3; i++) {
+        tgts.push(world.spawn(ENEMY_BY_ID.kestrel, { id: 'e' + i, side: 1, xM: 40, yM: -450, speed: 45, theta: 0 }));
       }
-      for (let i = 0; i < 60 * 10; i++) world.update(DT);
-      return p.gun.lockChanges;
+      const live = [shooter, ...tgts];
+      world.live.length = 0; for (const e of live) world.live.push(e);
+      const n = Math.round(10 / DT);
+      for (let i = 0; i < n; i++) {
+        const t = i * DT;
+        const sf = shooter.flight;
+        sf.sx += 45 * DT; sf.svx = 45; sf.svy = 0; sf.theta = 0; sf.speedSI = 45;
+        // three targets weaving ACROSS the cone edge at different periods: the
+        // cone half-angle is 11 deg, so +-9 m of cross-track at 45 m puts each
+        // of them in and out of it several times in ten seconds
+        for (let j = 0; j < 3; j++) {
+          const f = tgts[j].flight;
+          f.sx = sf.sx + 42 + j * 3;
+          f.sy = sf.sy + 9.0 * Math.sin(t * (1.7 + j * 0.6) + j * 2.1);
+          f.svx = 45; f.svy = 0; f.speedSI = 45; f.theta = 0;
+        }
+        updateGun(world, shooter, world.live, DT);
+        // What the 0.40 s hold actually DOES is refuse to re-lock, and therefore
+        // refuse to fire, while a lost target might come back. Counting lock
+        // CHANGES cannot see it — the change still happens, 0.4 s later — which
+        // is why this fixture read the same number with the feature and without
+        // it twice over. Count the suppression instead.
+        let inCone = false;
+        for (let j = 0; j < 3; j++) {
+          const f = tgts[j].flight;
+          const d = Math.hypot(f.sx - sf.sx, f.sy - sf.sy);
+          if (d <= shooter.gun.tier.range && Math.abs(offNose(sf, f.sx, f.sy)) <= GUNS.coneHalf) inCone = true;
+        }
+        if (inCone && !shooter.target) hold++;
+      }
+      return { changes: shooter.gun.lockChanges, holdTicks: hold };
     };
-    const held = run(''), loose = run('no-hysteresis');
-    return { assert: loose > held, changesPer10s: held, withoutHysteresis: loose,
-             note: `T13 target < 4; measured ${held} with four aircraft weaving inside a 66 m bubble` };
+    let hold = 0;
+    const a = run(''); const h1 = hold; hold = 0;
+    const b = run('no-hysteresis'); const h2 = hold;
+    return { assert: h1 > h2 && b.changes >= a.changes,
+             changesPer10s: a.changes, withoutHysteresis: b.changes,
+             holdTicks: h1, holdTicksWithout: h2,
+             note: `T13 target < 4; the 0.40 s hold suppresses ${(h1 / 60).toFixed(2)} s of firing per 10 s, ${(h2 / 60).toFixed(2)} s without it` };
   },
 
   /**
@@ -1214,8 +1247,24 @@ function p5Gates(runs = num('runs', 200)) {
   add('C6', 'counter-play >= 18 points', weak.length ? weak.map(r => `${r.ace}:${r.delta}`).join(' ') : `${measured.length}/${measured.length} >= 18`,
       weak.length === 0, `${cp.filter(r => r.needsCrates).length} need crates (P6); ${cp.filter(r => !r.counter).length} exempt`);
 
-  const mirror = duelBatch({ ace: 'A12', airframe: 'kitehawk', gun: 't5', runs, seed0: 9000 });
-  add('C7', 'the mirror ace at k 0.90', `${(mirror.win * 100).toFixed(1)}%`, mirror.win >= 0.48 && mirror.win <= 0.52);
+  /**
+   * A12 mirrors "the player's loadout", and the player's loadout is whichever
+   * airframe they are flying — so the row is measured across ALL FIVE and pooled.
+   * Measuring one airframe at n=120 is an airframe lottery: the same kitehawk
+   * cell reads 39.3%, 48.1% and 52.4% on three seed sets, all of them within
+   * their own +-4.2. Pooled, the five rows have five times the n and no lottery.
+   */
+  let mw = 0, ml = 0; const mrows = [];
+  for (const af of AIRFRAMES) {
+    const r = duelBatch({ ace: 'A12', airframe: af.id, gun: 't5', runs, seed0: 9000 });
+    mw += r.won; ml += r.lost;
+    mrows.push(`${af.id} ${(r.win * 100).toFixed(0)}%`);
+  }
+  const mirror = { win: mw / Math.max(1, mw + ml), rows: mrows };
+  const se = 100 * Math.sqrt(0.25 / Math.max(1, mw + ml));
+  add('C7', 'the mirror ace at k 0.90, all five airframes',
+      `${(mirror.win * 100).toFixed(1)}% of ${mw + ml} decisive (+-${se.toFixed(1)})`,
+      mirror.win >= 0.48 && mirror.win <= 0.52, mrows.join('  '));
 
   const fl = fleeRate({ runs: Math.max(12, Math.round(runs / 8)) });
   add('C8', 'flee rate 12-22%', `${(fl.rate * 100).toFixed(1)}% (${fl.fled}/${fl.spawned})`, fl.rate >= 0.12 && fl.rate <= 0.22);
