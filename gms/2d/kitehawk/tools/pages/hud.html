@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>kitehawk — HUD</title>
+<link rel="stylesheet" href="../../css/game.css">
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl"></canvas>
+  <div id="ui"></div>
+  <div id="safe-probe" aria-hidden="true"></div>
+</div>
+<div id="callout" hidden></div>
+<script type="module">
+/**
+ * The HUD, over a real fight, driven by the shipping modules.
+ *
+ * Nothing on this page re-implements a flight model, an AI, a crate, a camera
+ * or a HUD element. It imports `js/core/`, `js/sim/` and `js/ui/` and puts a
+ * renderer in front of them, which is the only arrangement in which what you
+ * are looking at is what the gates measured (D72, P6_NOTES §1).
+ *
+ * It is deliberately close to what P10's play scene will be. When that scene
+ * lands it should be able to lift `frame()` almost verbatim; the difference is
+ * that this page owns its own ctx instead of `main.js`'s.
+ *
+ *   ?w= ?h= ?dpr=        viewport, for the three gate sizes
+ *   ?mode=portrait|landscape   read by core/viewport.js, not by anything here
+ *   ?seed=               the run's root RNG stream
+ *   ?foes=3 ?crates=1    what is in the sky
+ *   ?sky=0 ?act= ?skystate=   the painted sky from P3, or a flat colour
+ *   ?respawn=0           let the fight end instead of keeping it topped up
+ *   ?auto=bot            the shipping AI + pilot fly the player directly
+ *   ?auto=thumb          ...and publish the axis they want, for a real touch to follow
+ *   ?zoom=0.78           pin the camera zoom (gate H4)
+ *   ?secs=60             stop the sim after this long, for a repeatable trace
+ *   ?tapeside=left|right the ART/ARCHITECTURE conflict, measured both ways
+ *   ?hudbug=zoom|notape|nochev|nobracket|framepip     the forbidden versions (D47)
+ */
+
+import { createRenderer, LAYER } from '../../js/gfx/renderer.js';
+import { createParticles } from '../../js/gfx/particles.js';
+import { makePaper } from '../../js/gfx/texture.js';
+import { createRig } from '../../js/gfx/parts.js';
+import { createSky, loadRamps } from '../../js/gfx/sky.js';
+import { createClouds } from '../../js/gfx/clouds.js';
+import { makeCrateRig } from '../../js/gfx/rigs/crate.js';
+import { makeCanopyRig, breathe } from '../../js/gfx/rigs/canopy.js';
+
+import { createBus } from '../../js/core/events.js';
+import { createViewport } from '../../js/core/viewport.js';
+import { createCamera } from '../../js/core/camera.js';
+import { createInput } from '../../js/core/input.js';
+import { createRNG } from '../../js/core/rng.js';
+import { DT } from '../../js/core/loop.js';
+import { M_PER_WU } from '../../js/core/math.js';
+
+import { createWorld, ENEMY_BY_ID, playerType, framingContributions } from '../../js/sim/entities.js';
+import { createCrateField } from '../../js/sim/crates.js';
+import { createAI } from '../../js/sim/ai.js';
+import { createPilot } from '../../js/sim/pilot.js';
+import { leadPoint, offNose, GUNS } from '../../js/sim/weapons.js';
+import { HULL_M } from '../../js/sim/damage.js';
+
+import { createHUD, hudState } from '../../js/ui/hud.js';
+
+const q = new URLSearchParams(location.search);
+const num = (k, d) => { const v = parseFloat(q.get(k)); return Number.isFinite(v) ? v : d; };
+const HULL_WU = HULL_M / M_PER_WU;
+const FOES = num('foes', 3);
+const SECS = num('secs', 0);
+const PINZOOM = num('zoom', 0);
+const AUTO = q.get('auto') || 'bot';
+
+/* ------------------------------------------------------------------ ctx --- */
+
+const canvas = document.getElementById('gl');
+const bus = createBus();
+const R = await createRenderer(canvas, { preserveDrawingBuffer: q.has('preserve') });
+const P = createParticles(R);
+const view = createViewport(canvas, bus);
+const cam = createCamera(view, { bias: 'normal' });
+view.setCamera(cam);
+const input = createInput(canvas, view, bus, {});
+input.installDefaultZones();
+const rng = createRNG(q.get('seed') || 'hud');
+
+/**
+ * The real painted sky, from P3's shipping modules. It is here because a HUD
+ * judged over a flat blue rectangle is a HUD nobody has looked at — every
+ * contrast decision in ART §10 is about sitting on top of a PAINTING — and
+ * because P8's portrait gate needs a fixture with a sky in it. `?sky=0` drops
+ * back to a flat clear colour for a cheap run.
+ */
+const BASE = '../../assets/';
+let sky = null, clouds = null;
+const ACT = num('act', 2), SKYSTATE = q.get('skystate') || 'd';
+if (q.get('sky') !== '0') {
+  try {
+    const man = await fetch(BASE + 'atlas.json').then((r) => r.json());
+    const ramps = await loadRamps(R, BASE);
+    const loadImg = (src) => new Promise((res, rej) => {
+      const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error(src)); i.src = src; });
+    const tex = async (src, o) => R.createTexture(await loadImg(BASE + src), o || {});
+    const assets = { luts: ramps.luts, strips: {} };
+    for (const [k, a] of Object.entries(man.atlases))
+      try { assets[k] = { ...a, tex: await tex(a.image) }; } catch (e) { console.warn('missing atlas', k); }
+    for (const [k, sp] of Object.entries(man.strips))
+      try { assets.strips[k] = { ...sp, tex: await tex(sp.image, { repeat: false }) }; } catch (e) { console.warn('missing strip', k); }
+    try { R.setGrain(await tex('paper.png', { repeat: true }), 2.1, 0.30); } catch (e) {}
+    sky = createSky(R, assets);
+    clouds = createClouds(R, assets, { seed: 7 });
+    sky.setAct(ACT, SKYSTATE);
+  } catch (e) { console.warn('[hud] sky unavailable, falling back to flat', e); sky = null; }
+}
+if (!sky) {
+  R.setGrain(makePaper(R.gl, 256, 3), 1 / 128, 0.22);
+  R.setAmbient(0.62, 0.65, 0.72);
+  R.setClearColor(0.44, 0.54, 0.64);
+}
+R.fx.bloom = 0;
+const LIGHTS = [{ dx: -0.55, dy: -0.84, intensity: 1.0, r: 1.00, g: 0.93, b: 0.78 }];
+
+const ctx = { R, P, view, cam, input, bus, rng, dom: { ui: document.getElementById('ui') }, DT };
+
+R.resize(view.w, view.h, view.dpr, view.worldH);
+bus.on('view:change', () => R.resize(view.w, view.h, view.dpr, view.worldH));
+
+/* ----------------------------------------------------------- the world --- */
+
+const world = createWorld({ rng, bus }, {});
+world.arena.halfW = 1400;
+world.arena.lineX = 0;
+const field = createCrateField(world, {
+  wind: [[0, -4.5], [300, -5], [900, -5.5], [1500, -5.5]], lineX: 0, groundFire: true,
+});
+world.crates = field;
+
+const player = world.spawn(playerType('kite_b1', 't2'), {
+  id: 'player', side: 1, xM: -120, yM: -520, speed: 42, theta: 0, k: 0.85,
+});
+player.special = 'shotgun'; player.specialAmmo = 3;
+
+/**
+ * The player's stick. `world.update` calls `e.pilot.update(dt, e.flight)` for
+ * every aircraft, so the human's aeroplane needs a pilot object that reads the
+ * INPUT LAYER instead of solving. In `auto=thumb` a real pilot still runs, but
+ * only to publish the axis it wants — a driver then puts a real thumb there and
+ * the aeroplane is flown through `core/input.js` exactly as a player flies it.
+ * That is the difference between measuring thumb travel and inventing it.
+ */
+const advisor = createPilot({ rng: { fork: () => rng.fork('advisor') } }, { tier: 'competent', id: 'player' });
+let wantAxis = 0;
+const humanPilot = {
+  tier: 'human', params: advisor.params,
+  get intent() { return advisor.intent; },
+  setIntent(n, v) { advisor.setIntent(n, v); return this; },
+  setAxisX(v) { advisor.setAxisX(v); },
+  update(dt, ac) {
+    const r = advisor.update(dt, ac);          // the AI's wanted stick, always computed
+    wantAxis = r.axisY;
+    if (AUTO === 'bot') return r;
+    ac.setInput(input.axisY, input.axisX);     // the thumb wins
+    return { axisY: input.axisY, axisX: input.axisX };
+  },
+};
+player.pilot = humanPilot;
+player.ai = createAI(player, { k: 0.85, aggro: 1 });
+
+const FOE_IDS = ['shrike', 'wasp', 'kestrel'];
+for (let i = 0; i < FOES; i++) {
+  const e = world.spawn(ENEMY_BY_ID[FOE_IDS[i % FOE_IDS.length]], {
+    side: -1, xM: 260 + i * 90, yM: -560 - i * 70, speed: 40, theta: Math.PI, k: 0.55 + i * 0.08,
+  });
+  if (e) e.ai = createAI(e, { k: 0.55 + i * 0.08 });
+}
+if (q.get('crates') !== '0') {
+  for (let i = 0; i < 2; i++) field.drop({ xM: -40 + i * 220, yM: -1450, kind: i ? 'ammo' : 'supply' });
+}
+
+/* -------------------------------------------------------------- the HUD --- */
+
+const hud = createHUD(ctx, {
+  tapeSide: q.get('tapeside') || '',
+  speakers: { lead: { name: 'Flight Lead', colour: '#d8c08a' } },
+  onSpecial: () => { if (player.specialAmmo > 0) player.specialAmmo--; },
+  onEngage: () => { field.engage[1] = field.engage[1] === 'cut' ? 'deny' : 'cut'; },
+});
+hud.cards.push({ id: 'a1-04.open', speaker: 'lead', kind: 'radio', text: "Belt's thick today. Climb through it." });
+
+/* -------------------------------------------------------------- render --- */
+
+const acRig = createRig(await (await fetch('./rigdef.json')).json());
+const crateRigs = new Map();
+const canopies = field.crates.map(() => makeCanopyRig());
+const ACS = HULL_WU / 66;                     // the rig def is ~66 units nose to tail
+
+const box = [];
+const LEAD = { x: 0, y: 0, t: 0, range: 0 };
+let t = 0, ticks = 0, stopped = false, lastSpawn = -99, spawnN = FOES;
+const RESPAWN = q.get('respawn') !== '0';
+
+function frame() {
+  if (!stopped) {
+    input.update();
+    world.update(DT);
+    t += DT; ticks++;
+    if (SECS && t >= SECS) stopped = true;
+
+    /**
+     * Keep the fight alive. Without this the three hostiles are down by about
+     * 25 s and the last 35 s of a 60 s run is a bot flying level with a still
+     * thumb — which does not fail any gate, it DILUTES them: H12 fell from
+     * 1017 to 193 css px/min and H5 from 35% to 7.7% purely because the tail
+     * was quiet. A per-minute number measured over a mission that stops being
+     * a mission is the wrong quantity measured well.
+     */
+    if (RESPAWN) {
+      let live = 0;
+      for (const e of world.live) if (e.side !== 1 && !e.dead) live++;
+      if (live < FOES && world.t - lastSpawn > 4) {
+        lastSpawn = world.t;
+        const i = spawnN++;
+        const e = world.spawn(ENEMY_BY_ID[FOE_IDS[i % FOE_IDS.length]], {
+          side: -1, xM: player.flight.sx + (i % 2 ? 320 : -320), yM: player.flight.sy - 90,
+          speed: 44, theta: i % 2 ? Math.PI : 0, k: 0.55 + (i % 3) * 0.08,
+        });
+        if (e) e.ai = createAI(e, { k: 0.55 + (i % 3) * 0.08 });
+      }
+    }
+
+    cam.clearTracked();
+    framingContributions(world, player, box, view.profile.zoomLockRange);
+    for (const m of box) cam.track(m.id, m.x, m.y, m.w, m.h, m.weight);
+    cam.setPlayerControl(input.stick.active);
+    cam.update({ x: player.flight.sx / M_PER_WU, y: player.flight.sy / M_PER_WU,
+                 vx: player.flight.svx / M_PER_WU, vy: player.flight.svy / M_PER_WU,
+                 angle: player.flight.theta, hull: HULL_WU }, DT);
+    if (PINZOOM) cam.zoom = PINZOOM;
+  }
+
+  R.begin(cam);
+  for (const L of LIGHTS) R.light(L);
+  if (sky) {
+    const b = sky.update(cam.x, cam.y, cam.zoom, DT);
+    sky.drawSky();
+    clouds.drawMid(cam.x, cam.y, b.cloudMid, sky.hazeRGB(), Math.min(0.85, b.haze * 0.9));
+    sky.drawGround(cam.x, cam.y, ACT);
+    clouds.drawNear(cam.x, cam.y, b.cloudNear, b.fg);
+  } else {
+    R.poly([-40000, 0, 40000, 0, 40000, 4000, -40000, 4000], [0.30, 0.29, 0.24], LAYER.GROUND);
+  }
+
+  for (const e of world.live) {
+    const f = e.flight;
+    R.drawRig(acRig, f.sx / M_PER_WU, f.sy / M_PER_WU, f.theta, ACS, LIGHTS, LAYER.ACTORS);
+  }
+  for (let i = 0; i < field.crates.length; i++) {
+    const c = field.crates[i];
+    if (!c.alive || c.landed) continue;
+    if (!crateRigs.has(c.kind)) crateRigs.set(c.kind, makeCrateRig(c.kind));
+    R.drawRig(crateRigs.get(c.kind), field.crateX(c) / M_PER_WU, field.crateY(c) / M_PER_WU,
+              c.cut ? c.t * 3.1 : c.ph * 0.6, ACS, LIGHTS, LAYER.ACTORS);
+    if (!c.cut) {
+      breathe(canopies[i], c.t + i, 0.035);
+      R.drawRig(canopies[i], c.sx / M_PER_WU, c.sy / M_PER_WU, c.ph * 0.35, ACS, LIGHTS, LAYER.ACTORS);
+    }
+  }
+  R.end();
+
+  /* --- the HUD's frame state, built by the shipping helper -------------- */
+  const s = hud.state;
+  hudState(s, world, player, cam, view, {
+    ramp: RAMP, objective: 'TAKE THE SILK', wind: -5, windShear: 0,
+    engage: field.engage[1], specialAmmoMax: 3, specialGlyph: 'S',
+    predictImpact: true,
+  });
+  const tgt = player.target;
+  if (tgt && !tgt.dead) {
+    leadPoint(player.flight, tgt, LEAD);
+    s.lead = LEAD;
+    s.leadInCone = Math.abs(offNose(player.flight, LEAD.x, LEAD.y)) <= (player.gun ? player.gun.fireCone : GUNS.coneHalf);
+  } else { s.lead = null; s.leadInCone = false; }
+
+  hud.update(DT);
+  hud.render(s);
+  if (trace.on) sample();
+  requestAnimationFrame(frame);
+}
+
+const RAMP = { key: '#C9CEC4', fill: '#7E8A8C', shadow: '#2E3639', accent: '#C2582A' };
+
+/* -------------------------------------------------------------- trace --- */
+/**
+ * H5, H11 and H12 are all "over a 60 s auto-flown mission, per frame" numbers,
+ * so they are accumulated HERE rather than polled over CDP. A 60 fps quantity
+ * sampled by round trip is a quantity you have measured your own latency on.
+ */
+const trace = { on: false, frames: 0, occl: 0, occlBy: {}, thumb: [], rects: [], px: [], py: [], travel: 0, last: null };
+
+function sample() {
+  trace.frames++;
+  const pr = window.__hud.playerRect();
+  trace.rects.push([pr.x, pr.y, pr.w, pr.h]);
+  // only elements that are actually DRAWN this frame. The radio card occupies a
+  // slot for two seconds a minute; counting its rect on every frame would report
+  // an occlusion that nobody can see.
+  let hit = false;
+  for (const e of hud.layout.elements) {
+    if (e.id === 'card' && !hud.cards.live) continue;
+    if (e.x < pr.x + pr.w && pr.x < e.x + e.w && e.y < pr.y + pr.h && pr.y < e.y + e.h) {
+      trace.occlBy[e.id] = (trace.occlBy[e.id] || 0) + 1; hit = true;
+    }
+  }
+  if (hit) trace.occl++;
+  trace.py.push(pr.y + pr.h * 0.5);
+  trace.px.push(pr.x + pr.w * 0.5);
+  const st = input.stick;
+  if (st.active) {
+    trace.thumb.push([st.x, st.y]);
+    if (trace.last) trace.travel += Math.hypot(st.x - trace.last[0], st.y - trace.last[1]);
+    trace.last = [st.x, st.y];
+  } else trace.last = null;
+}
+
+/* ------------------------------------------------- the harness surface --- */
+
+const pt = { x: 0, y: 0 };
+window.__hud = {
+  hud, world, field, player, cam, view, input, ctx,
+  get t() { return t; }, get ticks() { return ticks; },
+  get wantAxis() { return wantAxis; },
+  get stickR() { return input.stickRadius(); },
+  layout: () => JSON.parse(JSON.stringify(hud.layout.elements)),
+  /** The player's screen rect in css px — what gate H5 must never be covered by. */
+  playerRect() {
+    const f = player.flight;
+    view.toScreen(f.sx / M_PER_WU, f.sy / M_PER_WU, pt);
+    const w = HULL_WU * view.scale * cam.zoom;
+    return { x: pt.x - w * 0.5, y: pt.y - w * 0.25, w, h: w * 0.5 };
+  },
+  tape: () => ({
+    bands: hud.tape.bands.map((b) => ({ id: b.id, name: b.name, top: b.top, bot: b.bot })),
+    playerY: hud.tape.playerY, concordY: hud.tape.concordY, y: hud.tape.y, h: hud.tape.h,
+    pips: hud.tape.pips.map((p) => ({ id: p.id, y: p.y, kind: p.kind, above: p.above })),
+  }),
+  chevrons: () => hud.chevrons.map((c) => ({ id: c.id, edge: c.edge, y: c.y, n: c.n })),
+  threats: () => hud.threats.map((b) => ({ id: b.id, t: b.t, live: b.live })),
+  /** Inject N off-screen contacts, for the H8 merge check in a live frame. */
+  fakeContacts(n) {
+    const s = hud.state;
+    for (let i = 0; i < n; i++) {
+      s.contacts.push({ id: 'fake' + i, x: s.playerX + (i % 2 ? 1 : -1) * (900 + i * 130),
+                        y: s.playerY - 200 + i * 90, side: -1, kind: 'aircraft',
+                        dist: 900 + i * 130, closing: 40 });
+    }
+    hud.render(s);
+    return hud.chevrons.length;
+  },
+  /** #gl and #hud composited, because the HUD is not on the GL canvas. */
+  shot() {
+    const c = document.createElement('canvas');
+    c.width = canvas.width; c.height = canvas.height;
+    const g2 = c.getContext('2d');
+    g2.drawImage(canvas, 0, 0);
+    g2.drawImage(hud.canvas, 0, 0, c.width, c.height);
+    return c.toDataURL('image/png');
+  },
+  stop() { stopped = true; },
+  start() { stopped = false; },
+
+  trace,
+  traceStart() {
+    trace.on = true; trace.frames = 0; trace.occl = 0; trace.occlBy = {};
+    trace.thumb.length = 0; trace.rects.length = 0; trace.px.length = 0; trace.py.length = 0;
+    trace.travel = 0; trace.last = null;
+  },
+  /** H5, H11, H12, computed over the whole run rather than sampled. */
+  traceStats() {
+    trace.on = false;
+    const med = (a) => { if (!a.length) return NaN; const s2 = [...a].sort((x, y) => x - y);
+                         const m = s2.length >> 1; return s2.length % 2 ? s2[m] : (s2[m - 1] + s2[m]) / 2; };
+    const pctl = (a, p) => { if (!a.length) return NaN; const s2 = [...a].sort((x, y) => x - y);
+                             return s2[Math.min(s2.length - 1, Math.floor(s2.length * p / 100))]; };
+    const mx = med(trace.thumb.map((p) => p[0])), my = med(trace.thumb.map((p) => p[1]));
+    const R = 165 / 2;                                   // H11's 44 mm thumb contact
+    let discOverlap = 0;
+    for (const r of trace.rects) {
+      const cx = Math.max(r[0], Math.min(mx, r[0] + r[2]));
+      const cy = Math.max(r[1], Math.min(my, r[1] + r[3]));
+      if (Math.hypot(cx - mx, cy - my) <= R) discOverlap++;
+    }
+    // the swept union of the disc, on a 4 px grid, as a fraction of the screen
+    const G = 4, gw = Math.ceil(view.w / G), gh = Math.ceil(view.h / G);
+    const hit = new Uint8Array(gw * gh);
+    for (const p of trace.thumb) {
+      const x0 = Math.max(0, Math.floor((p[0] - R) / G)), x1 = Math.min(gw - 1, Math.ceil((p[0] + R) / G));
+      const y0 = Math.max(0, Math.floor((p[1] - R) / G)), y1 = Math.min(gh - 1, Math.ceil((p[1] + R) / G));
+      for (let gy = y0; gy <= y1; gy++) for (let gx = x0; gx <= x1; gx++) {
+        if (Math.hypot((gx + 0.5) * G - p[0], (gy + 0.5) * G - p[1]) <= R) hit[gy * gw + gx] = 1;
+      }
+    }
+    let cells = 0; for (let i = 0; i < hit.length; i++) cells += hit[i];
+    return {
+      frames: trace.frames, secs: trace.frames / 60,
+      occlFrames: trace.occl, occlPct: 100 * trace.occl / Math.max(1, trace.frames), occlBy: trace.occlBy,
+      thumbSamples: trace.thumb.length, medianX: mx, medianY: my,
+      discPct: 100 * Math.PI * R * R / (view.w * view.h),
+      sweptPct: 100 * cells * G * G / (view.w * view.h),
+      discOverlapFrames: discOverlap,
+      discOverlapPct: 100 * discOverlap / Math.max(1, trace.rects.length),
+      travel: trace.travel, travelPerMin: trace.travel / Math.max(1e-6, trace.frames / 3600),
+      stickR: input.stickRadius(),
+      // where the aeroplane actually SITS on screen, which is what both H5 and
+      // H11 turn on and which nothing in the profile states directly
+      playerY: [5, 25, 50, 75, 95].map((p) => pctl(trace.py, p)),
+      playerX: [5, 50, 95].map((p) => pctl(trace.px, p)),
+      screenW: view.w, screenH: view.h,
+    };
+  },
+  /**
+   * H4. Render the HUD at two zooms with the SIM FROZEN — only `cam.zoom`
+   * differs — and return each element's ink bounding box, measured out of the
+   * HUD canvas itself rather than recomputed from the layout table. Measuring
+   * the layout would only prove that the layout does not read zoom; measuring
+   * the pixels proves the drawn thing does not.
+   */
+  bboxes(z) {
+    stopped = true;
+    cam.zoom = z;
+    hud.render(hud.state, window.__hud.__pad === undefined ? 'chrome' : 'all');
+    const g2 = hud.canvas.getContext('2d');
+    const d = view.dpr, W = hud.canvas.width, H = hud.canvas.height;
+    const img = g2.getImageData(0, 0, W, H).data;
+    /**
+     * The tape is measured with NO pad, i.e. inside its own 34 px body column.
+     * Everything that legitimately moves with zoom lives OUTSIDE that column —
+     * the viewport bracket on one edge, the off-screen pips and the band labels
+     * on the other — and those are readouts of a world quantity, not HUD
+     * geometry. `bboxesWide()` measures them too, and the difference between the
+     * two numbers is the report: the chrome must not move, the readouts must.
+     */
+    const PADS = { tape: 0 };
+    const out = {};
+    for (const e of hud.layout.elements) {
+      const PAD = window.__hud.__pad !== undefined ? window.__hud.__pad
+                : PADS[e.id] === undefined ? 24 : PADS[e.id];
+      const x0 = Math.max(0, Math.floor((e.x - PAD) * d)), x1 = Math.min(W, Math.ceil((e.x + e.w + PAD) * d));
+      const y0 = Math.max(0, Math.floor((e.y - PAD) * d)), y1 = Math.min(H, Math.ceil((e.y + e.h + PAD) * d));
+      let ax0 = 1e9, ay0 = 1e9, ax1 = -1e9, ay1 = -1e9, n = 0;
+      for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+        if (img[(y * W + x) * 4 + 3] > 24) {
+          n++; if (x < ax0) ax0 = x; if (x > ax1) ax1 = x;
+          if (y < ay0) ay0 = y; if (y > ay1) ay1 = y;
+        }
+      }
+      out[e.id] = n ? { x: ax0 / d, y: ay0 / d, w: (ax1 - ax0) / d, h: (ay1 - ay0) / d, n } : null;
+    }
+    return out;
+  },
+  /** The same measurement with a pad on every element, tape readouts included. */
+  bboxesWide(z) {
+    const keep = window.__hud.__pad;
+    window.__hud.__pad = 24;
+    const r = window.__hud.bboxes(z);
+    window.__hud.__pad = keep;
+    return r;
+  },
+};
+
+frame();
+</script>
+</body>
+</html>

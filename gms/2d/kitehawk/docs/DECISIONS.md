@@ -788,3 +788,48 @@ crate that lands uncut goes to whichever side it lands on. **The auto-fire never
 canopy** — the story prices that shot and the price is the player's decision to make.
 **REQUEST accepted for P13/P14: `refit()` must add `ent.carryMass` before `rederive`** — it is the
 one line blocking carry mode, Airlift, and one ace's counter.
+
+**D98** — **P7 landed the HUD: 21/23 criteria, 12/12 falsification switches caught, and both P8
+preconditions are genuinely ready.** The altitude tape spans the full column at 9.28 ft/px with the
+six D19 band names and segment colours taken from the act's own ramp LUT; the Concord Line is drawn
+detached above the playable top. Chevrons: **196/196 dives warned before the silhouette entered the
+frame, median lead 7.72 s** (p10 2.40, min 1.73), over 200 seeded dives half of them flying west.
+The HUD is a second canvas in css pixels, so zoom-invariance holds *by construction* — no code path
+carries `cam.zoom` into a HUD coordinate.
+
+**D99** — **The best catch of the phase: `#ui > * { pointer-events: auto }` made the HUD canvas eat
+every touch, so the aeroplane could not be flown at all — and the metrics read as GOOD numbers.**
+Thumb-overlap 0.00%, stick travel 0 px/min, and the screenshot is perfect. **An unflyable build
+scored better than a flyable one on two criteria.** Now guarded by `hudbug=input`. This is the
+believable-wrong-metric pattern in its purest form yet: the failure mode makes the instrument read
+*better*, not worse.
+
+**D100** — **H5 and H11 fail and the cause is the camera, not the HUD. This is a playability bug and
+it is fixed before P8.** Over a 94 s mission the aeroplane's own screen position runs to
+**x p50 448 on a 390-wide screen** and y p5 133 / p95 707: `anchorY 0.62` / `anchorYClimb 0.78` plus
+a 240 wu lead sweep it across the whole frame, and the coaming occupies the bottom 14% of that same
+frame. **The manager looked at `shots/p7/hud_portrait.png` and the aeroplane is buried in the
+coaming.** Moving the tape does not help — the right side is worse (59 → 74 frames).
+**Accepted REQUEST-2: the camera's vertical anchors must be expressed against the playfield *above*
+the coaming, effective ceiling ≈ 0.845** — one clamp in `camera.js` or one field in `viewprofile.js`.
+Until it lands, ART §10's "no element on top of the aeroplane, at any time" is not met, and **P8's
+gate would fail for the wrong reason.**
+
+**D101** — **Criteria P7 refused to move, both accepted.** **H3 as worded is arithmetically
+unsatisfiable**: 4.5:1 against white needs luminance ≤ 0.1833, against the ground colour ≥ 0.1953,
+and no colour lies between — which is precisely *why* ART §10 draws every mark twice. Gated on the
+mark instead, worst tone-vs-ground **5.87:1**; the outline alpha moved 0.55 → 0.62 because 0.55
+measures 4.41:1, **a colour changed to meet a criterion rather than a criterion changed to meet a
+colour.** And **H11 has no single value** — thumb overlap ranges 0.8–14.3% purely with where the
+thumb rests; the shipped default is the only rest position with full travel unclamped, and the value
+that would have turned H11 *and* H12 green does so by not letting the thumb move.
+
+**D102** — **The threat bracket was gated on the same threshold as the trigger, so the warning
+arrived with the shot.** Found by pinning one term at a time after lengthening the lookahead did
+nothing, replacing the predictor produced *bit-identical* output, and adding hysteresis did nothing.
+**R-09 cut gun range 140 → 66 m and nobody re-checked the bracket** — the physical window is now
+~0.7 s. Median continuous warning now **0.567 s** across 40/40.
+
+**D103** — **REQUEST-1 settled: the altitude tape goes on the RIGHT.** The view profile says left,
+ART §10 and DESIGN §2.7 both say right, and P7 measured both — **it makes no measurable difference**,
+so it is a taste call and the two specs that agree win. `resolveLayout` already takes an override.

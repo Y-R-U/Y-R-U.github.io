@@ -1,0 +1,539 @@
+{
+ "results": [
+  {
+   "id": "H1",
+   "name": "no pixel literals outside layout.js",
+   "pass": true,
+   "detail": "0 numeric literals >= 3 across 6 widget files (exempt: layout.js, colour.js)"
+  },
+  {
+   "id": "H13",
+   "name": "no modals anywhere in the tree",
+   "pass": true,
+   "detail": "zero alert/confirm/prompt"
+  },
+  {
+   "id": "H3",
+   "name": "two-tone mark reads on both grounds",
+   "pass": true,
+   "detail": "worst tone-vs-ground 5.87:1 over 20 ink x ground pairs; outline vs white 5.87:1, outline vs night 1.02:1"
+  },
+  {
+   "id": "H3n",
+   "name": "H3 as worded is unsatisfiable",
+   "pass": true,
+   "info": true,
+   "detail": "10/20 single-colour readings below 4.5. No colour clears 4.5 against BOTH #FFFFFF (needs L<=0.1833) and #080B12 (needs L>=0.1953)"
+  },
+  {
+   "id": "H3s",
+   "name": "fill vs its own outline (not gated)",
+   "pass": true,
+   "info": true,
+   "detail": "worst 1.89:1 (hostileHot on snow) — saturated ink cannot clear 4.5 against near-black; the outline separates the mark from the ground instead"
+  },
+  {
+   "id": "H6",
+   "name": "tape shows the whole column",
+   "pass": true,
+   "detail": "0 -> -10000 wu in 530 px, 6 bands Mud/Belt/Floor/Deck/Lane/Blue, Concord (-26667 wu) drawn 12 px above the top"
+  },
+  {
+   "id": "H8",
+   "name": "chevron merge: 8 contacts -> 3",
+   "pass": true,
+   "detail": "3 drawn, kept the 3 nearest (c0,c1,c2)"
+  },
+  {
+   "id": "H8b",
+   "name": "two chevrons 4 px apart become one",
+   "pass": true,
+   "detail": "2 marks, counts 2+1"
+  },
+  {
+   "id": "H9",
+   "name": "radio > 44 chars fails the load",
+   "pass": true,
+   "detail": "1 error(s); the 79-char radio line refused, the same text as kind:\"card\" allowed"
+  },
+  {
+   "id": "H10",
+   "name": "card duration is text-derived",
+   "pass": true,
+   "detail": "no audio layer present; durations 1.60 3.84 3.62 4.36 s, 0 ms cards: 0"
+  },
+  {
+   "id": "H10b",
+   "name": "audio may only extend a card",
+   "pass": true,
+   "detail": "0.2 s take -> 1.60 s (text), 5.0 s take -> 5.00 s"
+  },
+  {
+   "id": "H9b",
+   "name": "an over-long radio line does not render",
+   "pass": true,
+   "detail": "push() refused it"
+  },
+  {
+   "id": "H7",
+   "name": "tape warns before the frame does",
+   "pass": true,
+   "detail": "far arm: 196/196 warned first (of 200 dives), median lead 7.72 s (p10 2.40, min 1.73, max 14.08); unusable: {\"timeout\":4}"
+  },
+  {
+   "id": "H7b",
+   "name": "...attackers starting inside the cylinder",
+   "pass": true,
+   "detail": "near arm: 156/156 warned first, median lead 11.46 s — a spawn-table artefact, reported not gated"
+  },
+  {
+   "id": "H14",
+   "name": "threat bracket precedes the first round",
+   "pass": true,
+   "detail": "13/13 engagements bracketed first, median lead 0.567 s (target 0.5 s, floor 0.4); bracket up on 2.6% of frames; unwarned 0"
+  },
+  {
+   "id": "H2",
+   "name": "every element inside its slot + safe area",
+   "pass": true,
+   "detail": "390x844 portrait/left 10 elements; 844x390 landscape/right 11 elements; 1440x810 landscape/right 11 elements"
+  },
+  {
+   "id": "H2b",
+   "name": "HUD elements do not overlap each other",
+   "pass": true,
+   "detail": "no element rect intersects another"
+  },
+  {
+   "id": "H4",
+   "name": "the HUD does not zoom",
+   "pass": true,
+   "detail": "worst chrome bbox delta between zoom 0.78 and 1.22 = 0.000 px over 10 elements"
+  },
+  {
+   "id": "H4r",
+   "name": "tape readouts DO move with zoom",
+   "pass": true,
+   "info": true,
+   "detail": "including the viewport bracket and the off-screen pips, the tape's ink box moves 0.0 px (worst element 2.0 px) — that is the bracket reporting a changed frame, not the HUD scaling"
+  },
+  {
+   "id": "H5",
+   "name": "nothing occludes the aeroplane",
+   "pass": false,
+   "detail": "977/4203 frames (23.25%) over 70 s — {\"tape\":284,\"coaming\":533,\"belt\":252,\"special\":33,\"banner\":90,\"wind\":78}"
+  },
+  {
+   "id": "H11",
+   "name": "thumb occlusion",
+   "pass": false,
+   "detail": "165 px disc = 6.50% of screen, swept union 12.51% (cap 18%); overlaps the player rect on 10.47% of frames (cap 2%)"
+  },
+  {
+   "id": "H12",
+   "name": "thumb travel per minute",
+   "pass": true,
+   "detail": "1091 css px/min over 70 s at stickR 81.1 px (cap 2200, fail 3000)"
+  },
+  {
+   "id": "Hcdn",
+   "name": "nothing loaded from a CDN",
+   "pass": true,
+   "detail": "all same-origin"
+  }
+ ],
+ "out": {
+  "H1": true,
+  "H13": true,
+  "H3": {
+   "pass": true,
+   "rows": [
+    {
+     "ink": "bright",
+     "bg": "#FFFFFF",
+     "outlineVsBg": 5.8694888350114685,
+     "fillVsOutline": 4.901344634960502,
+     "fillVsBg": 1.1975262447666606,
+     "best": 5.8694888350114685
+    },
+    {
+     "ink": "bright",
+     "bg": "#080B12",
+     "outlineVsBg": 1.0187849578090147,
+     "fillVsOutline": 16.744863455329593,
+     "fillVsBg": 16.436111788832132,
+     "best": 16.436111788832132
+    },
+    {
+     "ink": "ink",
+     "bg": "#FFFFFF",
+     "outlineVsBg": 5.8694888350114685,
+     "fillVsOutline": 4.146404039859096,
+     "fillVsBg": 1.4155612377830231,
+     "best": 5.8694888350114685
+    },
+    {
+     "ink": "ink",
+     "bg": "#080B12",
+     "outlineVsBg": 1.0187849578090147,
+     "fillVsOutline": 14.16569832344121,
+     "fillVsBg": 13.904502824527144,
+     "best": 13.904502824527144
+    },
+    {
+     "ink": "brass",
+     "bg": "#FFFFFF",
+     "outlineVsBg": 5.8694888350114685,
+     "fillVsOutline": 3.5239740820699477,
+     "fillVsBg": 1.665587969240622,
+     "best": 5.8694888350114685
+    },
+    {
+     "ink": "brass",
+     "bg": "#080B12",
+     "outlineVsBg": 1.0187849578090147,
+     "fillVsOutline": 12.039240090052806,
+     "fillVsBg": 11.817253481975467,
+     "best": 11.817253481975467
+    },
+    {
+     "ink": "hostile",
+     "bg": "#FFFFFF",
+     "outlineVsBg": 5.8694888350114685,
+     "fillVsOutline": 2.5272154432940526,
+     "fillVsBg": 2.322512253787509,
+     "best": 5.8694888350114685
+    },
+    {
+     "ink": "hostile",
+     "bg": "#080B12",
+     "outlineVsBg": 1.0187849578090147,
+     "fillVsOutline": 8.633932251634082,
+     "fillVsBg": 8.474734717522825,
+     "best": 8.474734717522825
+    },
+    {
+     "ink": "hostileHot",
+     "bg": "#FFFFFF",
+     "outlineVsBg": 5.8694888350114685,
+     "fillVsOutline": 1.8949266343238447,
+     "fillVsBg": 3.0974755057500385,
+     "best": 5.8694888350114685
+    },
+    {
+     "ink": "hostileHot",
+     "bg": "#080B12",
+     "outlineVsBg": 1.0187849578090147,
+     "fillVsOutline": 6.47379242081714,
+     "fillVsBg": 6.354424818697355,
+     "best": 6.354424818697355
+    },
+    {
+     "ink": "friendly",
+     "bg": "#FFFFFF",
+     "outlineVsBg": 5.8694888350114685,
+     "fillVsOutline": 4.481103617181893,
+     "fillVsBg": 1.309831089936437,
+     "best": 5.8694888350114685
+    },
+    {
+     "ink": "friendly",
+     "bg": "#080B12",
+     "outlineVsBg": 1.0187849578090147,
+     "fillVsOutline": 15.309159789270563,
+     "fillVsBg": 15.026880473573383,
+     "best": 15.026880473573383
+    },
+    {
+     "ink": "crate",
+     "bg": "#FFFFFF",
+     "outlineVsBg": 5.8694888350114685,
+     "fillVsOutline": 4.177256122229948,
+     "fillVsBg": 1.4051062858645484,
+     "best": 5.8694888350114685
+    },
+    {
+     "ink": "crate",
+     "bg": "#080B12",
+     "outlineVsBg": 1.0187849578090147,
+     "fillVsOutline": 14.271100808899503,
+     "fillVsBg": 14.007961836804837,
+     "best": 14.007961836804837
+    },
+    {
+     "ink": "objective",
+     "bg": "#FFFFFF",
+     "outlineVsBg": 5.8694888350114685,
+     "fillVsOutline": 5.8694888350114685,
+     "fillVsBg": 1,
+     "best": 5.8694888350114685
+    },
+    {
+     "ink": "objective",
+     "bg": "#080B12",
+     "outlineVsBg": 1.0187849578090147,
+     "fillVsOutline": 20.052413452791335,
+     "fillVsBg": 19.682675229045184,
+     "best": 19.682675229045184
+    },
+    {
+     "ink": "warn",
+     "bg": "#FFFFFF",
+     "outlineVsBg": 5.8694888350114685,
+     "fillVsOutline": 3.2777803419888056,
+     "fillVsBg": 1.7906901081266886,
+     "best": 5.8694888350114685
+    },
+    {
+     "ink": "warn",
+     "bg": "#080B12",
+     "outlineVsBg": 1.0187849578090147,
+     "fillVsOutline": 11.198148334984078,
+     "fillVsBg": 10.99167027266153,
+     "best": 10.99167027266153
+    },
+    {
+     "ink": "danger",
+     "bg": "#FFFFFF",
+     "outlineVsBg": 5.8694888350114685,
+     "fillVsOutline": 2.0741035167742674,
+     "fillVsBg": 2.8298919449015467,
+     "best": 5.8694888350114685
+    },
+    {
+     "ink": "danger",
+     "bg": "#080B12",
+     "outlineVsBg": 1.0187849578090147,
+     "fillVsOutline": 7.085929018921946,
+     "fillVsBg": 6.955274481241705,
+     "best": 6.955274481241705
+    }
+   ],
+   "worstBest": 5.8694888350114685,
+   "worstSep": 1.8949266343238447,
+   "naiveFails": 10,
+   "olW": 5.8694888350114685,
+   "olN": 1.0187849578090147
+  },
+  "H6": {
+   "pass": true,
+   "spans": true,
+   "six": true,
+   "named": true,
+   "concordAbove": true,
+   "px_per_wu": 0.053015999999999994
+  },
+  "H8": {
+   "pass": true,
+   "drawn": 3,
+   "merged": 2
+  },
+  "H9": {
+   "pass": true,
+   "durs": [
+    1.6,
+    3.840740740740741,
+    3.6185185185185187,
+    4.359259259259259
+   ]
+  },
+  "H7": {
+   "pass": true,
+   "arms": {
+    "far": {
+     "whys": {
+      "timeout": 4
+     },
+     "n": 200,
+     "usable": 196,
+     "warned": 196,
+     "median": 7.716666666666658,
+     "min": 1.7333333333333272,
+     "max": 14.083333333333618,
+     "p10": 2.3999999999999915
+    },
+    "near": {
+     "whys": {
+      "timeout": 44
+     },
+     "n": 200,
+     "usable": 156,
+     "warned": 156,
+     "median": 11.458333333333481,
+     "min": 1.100000000000001,
+     "max": 22.699999999999992,
+     "p10": 1.7499999999999987
+    }
+   }
+  },
+  "H14": {
+   "pass": true,
+   "engagements": 13,
+   "unwarned": 0,
+   "median": 0.5666666666666647,
+   "n": 13,
+   "duty": 2.5948941153849514
+  },
+  "H2": [
+   {
+    "name": "portrait phone",
+    "w": 390,
+    "h": 844,
+    "bad": [],
+    "over": [],
+    "n": 10,
+    "hud": "portrait",
+    "tapeSide": "left",
+    "mode": "portrait"
+   },
+   {
+    "name": "landscape phone",
+    "w": 844,
+    "h": 390,
+    "bad": [],
+    "over": [],
+    "n": 11,
+    "hud": "landscape",
+    "tapeSide": "right",
+    "mode": "landscape"
+   },
+   {
+    "name": "desktop",
+    "w": 1440,
+    "h": 810,
+    "bad": [],
+    "over": [],
+    "n": 11,
+    "hud": "landscape",
+    "tapeSide": "right",
+    "mode": "landscape"
+   }
+  ],
+  "H4": {
+   "worst": 0,
+   "wide": 2,
+   "rows": [
+    {
+     "id": "tape",
+     "dx": 0,
+     "dy": 0,
+     "dw": 0,
+     "dh": 0
+    },
+    {
+     "id": "coaming",
+     "dx": 0,
+     "dy": 0,
+     "dw": 0,
+     "dh": 0
+    },
+    {
+     "id": "arc",
+     "dx": 0,
+     "dy": 0,
+     "dw": 0,
+     "dh": 0
+    },
+    {
+     "id": "belt",
+     "dx": 0,
+     "dy": 0,
+     "dw": 0,
+     "dh": 0
+    },
+    {
+     "id": "engine",
+     "dx": 0,
+     "dy": 0,
+     "dw": 0,
+     "dh": 0
+    },
+    {
+     "id": "stress",
+     "dx": 0,
+     "dy": 0,
+     "dw": 0,
+     "dh": 0
+    },
+    {
+     "id": "card",
+     "dx": 0,
+     "dy": 0,
+     "dw": 0,
+     "dh": 0
+    },
+    {
+     "id": "special",
+     "dx": 0,
+     "dy": 0,
+     "dw": 0,
+     "dh": 0
+    },
+    {
+     "id": "banner",
+     "dx": 0,
+     "dy": 0,
+     "dw": 0,
+     "dh": 0
+    },
+    {
+     "id": "wind",
+     "dx": 0,
+     "dy": 0,
+     "dw": 0,
+     "dh": 0
+    }
+   ]
+  },
+  "trace": {
+   "frames": 4203,
+   "secs": 70.05,
+   "occlFrames": 977,
+   "occlPct": 23.245300975493695,
+   "occlBy": {
+    "tape": 284,
+    "coaming": 533,
+    "belt": 252,
+    "special": 33,
+    "banner": 90,
+    "wind": 78
+   },
+   "thumbSamples": 4203,
+   "medianX": 195,
+   "medianY": 777.3282470703125,
+   "discPct": 6.496070299700915,
+   "sweptPct": 12.511848341232227,
+   "discOverlapFrames": 440,
+   "discOverlapPct": 10.46871282417321,
+   "travel": 1273.291015625,
+   "travelPerMin": 1090.6132896145612,
+   "stickR": 81.11999999999999,
+   "playerY": [
+    74.87518073485796,
+    370.9382300331166,
+    404.83087643929895,
+    674.5493102397879,
+    749.8019702190202
+   ],
+   "playerX": [
+    49.49083342663263,
+    329.2375391703449,
+    426.55874611215756
+   ],
+   "screenW": 390,
+   "screenH": 844,
+   "replaced": 0
+  },
+  "H5": {
+   "occlPct": 23.245300975493695
+  },
+  "H11": {
+   "sweptPct": 12.511848341232227,
+   "discOverlapPct": 10.46871282417321
+  },
+  "H12": {
+   "travelPerMin": 1090.6132896145612,
+   "stickR": 81.11999999999999
+  }
+ }
+}

@@ -49,6 +49,21 @@ or Kokoro costs almost nothing, so judge on the measured rate. There is no way t
 agent; the levers are stopping one (loses its work — reserve for genuinely stuck agents) and not
 starting the next phase.
 
+## ⚠ P7 IS RESUMABLE — RESUME IT, DO NOT RESPAWN IT
+
+**2026-08-24 ~16:00: P7 (HUD) has been killed twice by server-side `529 Overloaded` errors**, not by
+any fault in its work. The second kill produced no new files, so the API is under sustained load —
+**do not retry in a tight loop.**
+
+Its partial work is intact on disk: `js/ui/{theme,alttape,overlay,stick,cards,layout,hud}.js`
+(~63 KB) plus `tools/pages/hud.html` and `rigdef.json`. **Resume the existing agent with
+SendMessage — a fresh spawn throws away both those files' context and everything it had worked out.**
+Its agent ref is in the run log; if it cannot be resumed, tell the new agent the files already exist
+and to continue rather than restart.
+
+The next check-in is the natural backoff (~30 min cadence). If 529s persist across several
+check-ins, say so plainly rather than burning attempts.
+
 ## The check-in cron
 
 A 30-minute health check fires at **:13 and :43** — job **`154dea7d`**, created 2026-08-23. It is
