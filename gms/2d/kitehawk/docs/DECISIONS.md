@@ -615,3 +615,53 @@ the entire suite.** `no-stall-bias` (the wing drop alone reverses the aircraft, 
 stall components was unprotected) and `fixed-drop` (every fixture ran one seed, which happened to
 draw the hardcoded side). Both now have dedicated fixtures. Third phase running, third time this
 technique found a hole in the tests themselves.
+
+**D79** — **P5 found nine real defects, three of them P4's, and none were findable by P4's tests.**
+The duel is the first time two aircraft existed at once and the first time anything flew *left* —
+which is exactly why they were invisible:
+1. **`aero.js` resolves every aircraft's forces into one module-level `OUT` buffer**, and `flight.js`
+   keeps that reference as `e.aero` to feed forward. With two aeroplanes, every aircraft's
+   feed-forward is somebody else's. Measured: **a commanded 1.8 g pull produced 0.47 g.**
+2. **`pilot.js` mis-signs `roll` in the load-factor conversion**, and several commands return
+   absolute flight-path angles that wrap to zero error at γ=π. Told to climb 300 m, a +x aeroplane
+   reaches 738 m and a −x one reaches 312 m **having dived**. Cost before it was found: **in a
+   perfectly symmetric mirror fight, the aeroplane that started flying +x won 79 of 80.**
+3. `roll` is which side the canopy is on, so every hostile — all of which fly −x — **spawned inverted**.
+Plus: gun convergence diverged on left-flying aircraft, aim lead became lag flying west, hit
+allocation gave **the tail zero damage in every test** while the bench looked reasonable, best-of-three
+was best-of-one, every mutual kill went to the player, and morale measured **exactly 0.0% flee** while
+a per-tick trace looked healthy.
+
+**The row that proves the fixes: C7 mirror is now 51.5%, and 45.4–51.6% across all five airframes.**
+Every symmetry defect surfaced there first as a 79-to-1 or a 61-to-39; a coin flip on every airframe
+is what says they are gone.
+
+**D80** — **The three P4 defects are WORKED AROUND, not fixed, and that is not acceptable to carry
+forward.** A module-level output buffer shared across entities is a correctness landmine that will
+bite again the moment a third aircraft exists, and **P4's `ace` and `novice` pilot tiers are
+currently quarantined** — on `ace` a symmetric fight is won 73% by whichever aeroplane flies left,
+and `novice` makes the *worse* pilot out-turn the better one. Those tiers are the difficulty lever
+for 100 levels, so they cannot stay quarantined. **Fix at root before P6.**
+
+**D81** — **Criteria P5 refused to tune to, all accepted:**
+- **C2's 0.4–0.8 s band is derived from DESIGN §3.1's own `60/108 = 0.56 s`, which assumes zero
+  component absorption — in the same section that specifies 35% spill.** The band is reachable only
+  by deleting components. Measured 0.75–0.98 s. **Restate the criterion.**
+- **C6's counter-play threshold fights C4**: a counter worth 18 points needs 18 points of headroom,
+  while C4 pins the baseline at 55–70%. Adopt P5's restatement — *a counter must close half the
+  remaining gap to 100%*.
+- **R-10's collider set is a plan view.** 11.0 m is a *wingspan*; in a side-view game those capsules
+  roof and floor the fuselage and the tank and pilot become unhittable from every aspect, making
+  "six o'clock low" identical to "six o'clock". **The side-view set is the default**; `--colliders
+  span` keeps the plan view for comparison.
+
+**D82** — **`placeboA` is not a valid control, and P5 said so rather than dropping it quietly.** The
+"meaningless" slow porpoise is worth **+35.1** against one ace — because a porpoise *is* a lag yo-yo,
+and a lag yo-yo is a real manoeuvre. **The believable-wrong control is the same failure mode as the
+believable-wrong metric**, and it is the first time this project has hit it on the control side.
+
+**D83** — Counter-play does **not** pass: 4 of 11 measurable counters clear the bar. Two failures are
+genuinely ours: **A3's counter is right and the bot cannot execute it** (a stall turn is
+frame-accurate timing; a 0.34 s reaction bot arrives at zero airspeed with a live ace behind it), and
+**A5 is an ace that is wrong** — an armoured head-on merchant cannot be made scary against 220 HP
+without being unfair. **A5 goes back to the drawing board at P11's ace pass**, with R-11 and T23.

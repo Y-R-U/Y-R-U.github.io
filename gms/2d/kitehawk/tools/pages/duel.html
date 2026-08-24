@@ -1,0 +1,172 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>KITEHAWK — duel bench</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body { margin:0; background:#12161c; color:#cfd6df; font:13px/1.45 ui-monospace,Menlo,monospace; }
+  header { padding:8px 12px; border-bottom:1px solid #2a323d; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  select,button,label { font:inherit; color:inherit; background:#1c222b; border:1px solid #333c48; border-radius:4px; padding:3px 7px; }
+  button { cursor:pointer; }
+  #wrap { display:flex; flex-wrap:wrap; }
+  canvas { background:#0d1116; display:block; }
+  #side { padding:10px 14px; min-width:330px; }
+  h3 { margin:14px 0 4px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#7f8b9a; font-weight:600; }
+  table { border-collapse:collapse; font-size:12px; }
+  td { padding:1px 10px 1px 0; }
+  .k { color:#7f8b9a; }
+  .warn { color:#e2a04a; }
+</style>
+<header>
+  <label>ace <select id="ace"></select></label>
+  <label>airframe <select id="af"></select></label>
+  <label>gun <select id="gun"></select></label>
+  <label>counter <select id="ctr"><option value="">none</option><option value="__ace">the ace's own</option></select></label>
+  <label><input type="checkbox" id="swap"> swap sides</label>
+  <button id="run">new duel</button>
+  <button id="pause">pause</button>
+  <button id="batch">200 headless</button>
+  <span id="tick" class="k"></span>
+</header>
+<div id="wrap">
+  <canvas id="c" width="760" height="620"></canvas>
+  <div id="side">
+    <h3>round</h3><div id="round"></div>
+    <h3>player</h3><table id="p"></table>
+    <h3>opponent</h3><table id="a"></table>
+    <h3>batch</h3><div id="batch-out" class="k">—</div>
+    <h3>notes</h3>
+    <div class="k">
+      This page draws the <b>shipping</b> sim modules, not a copy of them — the same
+      <code>js/modes/duel.js</code> <code>tools/sim.mjs</code> drives. Ranges are world
+      units and the camera is a fixed 1:1 scale, so nothing here can be a zoom effect.
+      The dashed ring is 66 m (440 wu) gun range; the wedge is the &plusmn;11&deg; cone.
+    </div>
+  </div>
+</div>
+<script type="module">
+import { createDuel, DUEL, INTENDED } from '../../js/modes/duel.js';
+import { ACES, ACE_IDS } from '../../js/sim/ai.js';
+import { AIRFRAMES } from '../../js/data/tables.js';
+import { GUN_TIERS, GUNS } from '../../js/sim/weapons.js';
+import { COLLIDERS, SUBRECTS, COMPONENTS } from '../../js/sim/damage.js';
+
+const cv = document.getElementById('c'), g = cv.getContext('2d');
+const $ = (id) => document.getElementById(id);
+for (const id of ACE_IDS) $('ace').add(new Option(`${id} — ${ACES[id].tag}`, id));
+for (const a of AIRFRAMES) $('af').add(new Option(a.name, a.id));
+for (const t of GUN_TIERS) $('gun').add(new Option(t.name, t.id));
+$('ace').value = 'A10'; $('gun').value = 't2';
+
+let live = null, world = null, paused = false, seed = 1;
+const PX = 0.55;                       // px per metre — fixed. Zoom is not a sim input.
+
+function drawPlane(e, colour) {
+  const f = e.flight, s = f.roll >= 0 ? 1 : -1;
+  g.save();
+  g.translate(f.sx * PX, f.sy * PX);
+  g.rotate(f.theta);
+  g.scale(1, s);
+  g.strokeStyle = colour; g.lineWidth = 1;
+  for (const key of ['fuselage', 'wingU', 'wingL']) {
+    const C = COLLIDERS[key];
+    g.globalAlpha = e.hp[key === 'fuselage' ? 'structure' : key] > 0 ? 1 : 0.25;
+    g.strokeRect((C.cx - C.len / 2) * PX, (C.cn - C.thick / 2) * PX, C.len * PX, C.thick * PX);
+  }
+  g.globalAlpha = 0.5;
+  for (const R of SUBRECTS) {
+    g.strokeStyle = e.hp[R.part] > 0 ? colour : '#e2554a';
+    g.strokeRect(R.x0 * PX, R.n0 * PX, (R.x1 - R.x0) * PX, (R.n1 - R.n0) * PX);
+  }
+  g.globalAlpha = 1;
+  g.restore();
+  // the cone and the range ring
+  g.save();
+  g.translate(f.sx * PX, f.sy * PX);
+  g.strokeStyle = colour; g.globalAlpha = 0.22;
+  g.beginPath(); g.arc(0, 0, GUNS.rangeEff * PX, 0, Math.PI * 2); g.setLineDash([3, 4]); g.stroke();
+  g.setLineDash([]);
+  g.beginPath(); g.moveTo(0, 0);
+  g.arc(0, 0, GUNS.rangeEff * PX, f.theta - GUNS.coneHalf, f.theta + GUNS.coneHalf);
+  g.closePath(); g.globalAlpha = 0.10; g.fillStyle = colour; g.fill();
+  g.restore();
+}
+
+function draw() {
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.fillStyle = '#0d1116'; g.fillRect(0, 0, cv.width, cv.height);
+  if (!world) return;
+  const p = world.byId('player');
+  const cx = cv.width / 2 - (p ? p.flight.sx * PX : 0);
+  const cy = cv.height * 0.62 - (p ? p.flight.sy * PX : 0);
+  g.setTransform(1, 0, 0, 1, cx, cy);
+
+  // ground and the cloud deck
+  g.fillStyle = '#1a2129'; g.fillRect(-4000, 0, 8000, 400);
+  g.fillStyle = 'rgba(120,140,170,0.10)';
+  g.fillRect(-4000, world.arena.cloudLo * PX, 8000, (world.arena.cloudHi - world.arena.cloudLo) * PX);
+  g.strokeStyle = '#222c36';
+  for (let a = 0; a <= 1500; a += 250) { g.beginPath(); g.moveTo(-4000, -a * PX); g.lineTo(4000, -a * PX); g.stroke(); }
+  g.strokeStyle = '#33404d';
+  for (const x of [-world.arena.halfW, world.arena.halfW]) { g.beginPath(); g.moveTo(x * PX, -1600 * PX); g.lineTo(x * PX, 0); g.stroke(); }
+  if (world.arena.objectiveX !== undefined) {
+    g.strokeStyle = '#d8b25a'; g.beginPath();
+    g.arc(world.arena.objectiveX * PX, world.arena.objectiveY * PX, DUEL.reachRadius * PX, 0, 7); g.stroke();
+  }
+
+  g.fillStyle = '#e8d9a0';
+  for (const b of world.bullets) if (b.alive) g.fillRect(b.x * PX - 1, b.y * PX - 1, 2, 2);
+  for (const e of world.live) drawPlane(e, e.side === 0 ? '#6fc3ff' : e.dead ? '#7a5a52' : '#e2554a');
+}
+
+function row(t, e) {
+  if (!e) { t.innerHTML = ''; return; }
+  const f = e.flight;
+  const comps = COMPONENTS.map(c => `${c} ${Math.max(0, e.hp[c]).toFixed(0)}`).join('  ');
+  t.innerHTML = `
+   <tr><td class="k">state</td><td>${e.state}${e.ai && e.ai.counter ? ' · ' + e.ai.counter : ''}</td></tr>
+   <tr><td class="k">alt / speed</td><td>${(-f.sy).toFixed(0)} m · ${f.speedSI.toFixed(1)} m/s</td></tr>
+   <tr><td class="k">stress</td><td>${f.stress.toFixed(2)}${f.greyout ? ' <span class="warn">GREY</span>' : ''}${f.blackout ? ' <span class="warn">BLACK</span>' : ''}</td></tr>
+   <tr><td class="k">structure</td><td>${Math.max(0, e.hp.structure).toFixed(0)} / ${e.hpMax.structure.toFixed(0)}${e.burning ? ' <span class="warn">FIRE</span>' : ''}</td></tr>
+   <tr><td class="k">components</td><td>${comps}</td></tr>
+   <tr><td class="k">morale</td><td>${e.morale.toFixed(2)} · k ${e.k.toFixed(2)} · aggro ${e.aggro.toFixed(1)}</td></tr>
+   <tr><td class="k">gun</td><td>${e.gun ? `${e.gun.ammo} rds · ${e.gun.fired} fired · ${e.gun.hits} hits` : '—'}</td></tr>`;
+}
+
+/* The page owns only the frame loop; every rule lives in js/modes/duel.js. */
+function start() {
+  const ace = $('ace').value;
+  const ctr = $('ctr').value === '__ace' ? ACES[ace].counter : ($('ctr').value || null);
+  live = createDuel({}, { ace, airframe: $('af').value, gun: $('gun').value,
+                          seed: seed++, counter: ctr, swap: $('swap').checked });
+  world = live.world;
+  live.begin();
+}
+function frame() {
+  if (!paused && live) {
+    for (let i = 0; i < 2; i++) live.step();
+    $('round').textContent = `round ${live.roundIndex + 1}/3 · ${live.roundTime.toFixed(1)} s · ` +
+      `${live.summary.won}-${live.summary.lost}${live.summary.drawn ? '-' + live.summary.drawn : ''}` +
+      (live.done ? ` · ${live.summary.winner.toUpperCase()}` : '');
+  }
+  draw();
+  row($('p'), world && world.byId('player'));
+  row($('a'), world && world.byId('ace'));
+  $('tick').textContent = world ? `t ${world.t.toFixed(1)} s · pool ${world.alloc.bullets} bullets` : '';
+  requestAnimationFrame(frame);
+}
+$('run').onclick = start;
+$('pause').onclick = () => { paused = !paused; };
+$('batch').onclick = () => {
+  const ace = $('ace').value;
+  const ctr = $('ctr').value === '__ace' ? ACES[ace].counter : ($('ctr').value || null);
+  let w = 0, l = 0, d = 0;
+  for (let i = 0; i < 200; i++) {
+    const r = createDuel({}, { ace, airframe: $('af').value, gun: $('gun').value,
+                               seed: 20000 + i, counter: ctr, swap: (i & 1) === 1 }).run();
+    if (r.winner === 'player') w++; else if (r.winner === 'ace') l++; else d++;
+  }
+  $('batch-out').textContent = `player ${w} · ace ${l} · draw ${d} → ${(100 * w / Math.max(1, w + l)).toFixed(1)}% of decisive`;
+};
+start();
+frame();
+</script>
