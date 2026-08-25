@@ -1,0 +1,43 @@
+{
+  "w": 844,
+  "h": 390,
+  "when": "2026-08-25T09:29:02.435Z",
+  "rows": [
+    {
+      "id": "M1",
+      "what": "a human plays a1-01 end to end on a phone-sized viewport",
+      "pass": true,
+      "detail": "mode follow: 1 touch(es), 682 real moves, mean |want| 0.145 — 41.1 s, completed true, won true, 2 down, 0 HP taken, stars 3; console errors 0, page errors 0"
+    },
+    {
+      "id": "M2",
+      "what": "crates are in it — one caught, one cut, one denied (D4)",
+      "pass": false,
+      "detail": "2 long press(es) on the special slot: engage none -> deny (game reports deny); at 83.8 s — dropped 6, CAUGHT 5, CUT 0, DENIED 0; cut-and-banked 0 (REQUEST-3), to the enemy 1"
+    },
+    {
+      "id": "M3",
+      "what": "assets/audio absent — it boots, plays and completes (D7)",
+      "pass": true,
+      "detail": "assets/audio present on disk: false; reached title: true; flew >1.5 s of sim; audio {\"ready\":true,\"available\":true,\"voices\":0,\"oneShots\":0}; text cards path live true"
+    },
+    {
+      "id": "M4",
+      "what": "rotate 20x mid-flight — gates_orientation green against the real sim",
+      "pass": true,
+      "detail": "tools/orient.mjs: 0 FAIL line(s)"
+    },
+    {
+      "id": "M5",
+      "what": "save round trip, migration, and a corrupt file",
+      "pass": true,
+      "detail": "round trip: wrote true, restored true, scrip 62, unlocked [a1-01,a1-04]; v3 MIGRATED: v4, airframe kite_b1, scrip 777 kept, best 61.2 kept, wiped false; corrupt JSON: fresh save v4 scrip 0, 1 console warning, callout \"Saved progress could not be read and has been reset.\", 0 alerts, 0 dialogs; ?nosave wrote to storage: false"
+    },
+    {
+      "id": "M6",
+      "what": "restart is a 1.2 s \"again\" card, not a modal, not a menu",
+      "pass": true,
+      "detail": "card opened at 1.183 s and ran 27 polls over 1.23 s wall; scene stayed play: true; tap targets while up: none; alerts 0, dialogs 0; sim advanced 0.000 s while held"
+    }
+  ]
+}

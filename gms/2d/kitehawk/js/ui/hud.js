@@ -20,7 +20,7 @@
  * engine gauge creeping into the red. Damage is read off the aeroplane.
  */
 
-import { resolveLayout, METRICS, TIMING, RANGES } from './layout.js';
+import { resolveLayout, METRICS, TIMING, rangesFor, framePipWindowPx } from './layout.js';
 import { INK, mark, label, font, rgba, NEUTRAL_RAMP } from './theme.js';
 import { tapeModel, drawTape } from './alttape.js';
 import { chevronModel, drawChevrons, threatModel, drawBrackets, drawGlyphs, drawLeadPip, drawCratePips } from './overlay.js';
@@ -275,13 +275,16 @@ export function createHUD(ctx, opts = {}) {
     // free (it is a function of world distance), which is what §2.9a requires.
     if (BUG !== 'nochev' && only !== 'chrome') {
       chevronModel(s.contacts, scr, toScreen, chevrons);
-      drawChevrons(g, chevrons, scr, RANGES.CHEV_RANGE_WU);
+      drawChevrons(g, chevrons, scr, L.ranges.CHEV_RANGE_WU);
     }
     if (BUG !== 'notape') {
       tapeModel(L.tape, s, tape);
       if (BUG === 'framepip') {
-        // the believable-wrong tape: pips only for what is nearly on screen
-        const keep = tape.pips.filter((p) => Math.abs(p.y - tape.playerY) < METRICS.CHEV_MERGE_PX);
+        // the believable-wrong tape: pips only for what is nearly on screen.
+        // The window is per-profile — a flat 26 px is 4x landscape's frame and
+        // the switch could not go red there (P8c).
+        const keep = tape.pips.filter((p) =>
+          Math.abs(p.y - tape.playerY) < framePipWindowPx(view, L.tape));
         tape.pips.length = 0; tape.pips.push(...keep);
       }
       avoid[0] = L.special;
@@ -324,6 +327,9 @@ export function hudState(out, world, player, cam, view, extra = {}) {
   const halfH = (view.worldH / ((cam && cam.zoom) || 1)) * 0.5;
   s.viewTopY = (cam ? cam.y : 0) - halfH;
   s.viewBotY = (cam ? cam.y : 0) + halfH;
+  // P8c: the pip radius is the CAMERA PROFILE's `zoomLockRange`, taken from the
+  // view rather than from a module constant that named one profile.
+  s.pipRangeWu = rangesFor(view.profile).PIP_RANGE_WU;
 
   // DESIGN §2.7's energy chevron: E = alt + v^2/2g, the height you could zoom to
   const v = pf ? Math.hypot(pf.svx, pf.svy) : 0;

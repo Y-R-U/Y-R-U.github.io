@@ -21,7 +21,18 @@ import { Touch } from './touch.mjs';
 
 const SIZES = [[390, 844, 'portrait phone'], [844, 390, 'landscape phone'], [1440, 810, 'desktop']];
 
-export async function runCdp({ row, note, secs = 60, gpu = false, bug = '', tapeSide = '', thumbRest = 0.75, thumbGain = 0.3, sweep = false, gainSweep = false } = {}) {
+/**
+ * P8b, additive: `mode` steers H4/H5/H11/H12 only. H2 already loops all three
+ * SIZES. The default is 'portrait' at 390x844, so every shipped number
+ * reproduces unchanged; 'landscape' runs the same driver at 844x390.
+ */
+export async function runCdp({ row, note, secs = 60, gpu = false, bug = '', tapeSide = '', thumbRest = 0.75, thumbGain = 0.3, sweep = false, gainSweep = false, mode = 'portrait' } = {}) {
+  const MW = mode === 'portrait' ? 390 : 844, MH = mode === 'portrait' ? 844 : 390;
+  // P8c: H4 swept a hardcoded 0.78..1.22 in BOTH modes. Landscape's clamp floor
+  // is 0.74 (D128), so the 0.74..0.78 band a landscape player actually reaches
+  // was never tested — the band, not the literal, is the criterion.
+  const { VIEW_PROFILE: VP } = await import('../js/core/viewprofile.js');
+  const FLOOR = VP[mode].zoomWide, CEIL = VP[mode].zoomIntimate;
   const out = {};
   const { cdp, base, close } = await harness({ gpu });
   const q = (extra) => `${base}/tools/pages/hud.html?preserve=1&dpr=1&nosave&seed=7` +
@@ -85,8 +96,8 @@ export async function runCdp({ row, note, secs = 60, gpu = false, bug = '', tape
     out.H2 = h2;
 
     /* ------------------------------------------------------------- H4 --- */
-    await cdp.viewport(390, 844, 1, true);
-    await cdp.goto(q('&secs=4'));
+    await cdp.viewport(MW, MH, 1, true);
+    await cdp.goto(q(`&secs=4&mode=${mode}`));
     await cdp.waitFor('window.__hud', 20000);
     await cdp.frames(40);
     const h4 = await cdp.eval(`(() => {
@@ -100,17 +111,17 @@ export async function runCdp({ row, note, secs = 60, gpu = false, bug = '', tape
         }
         return rows;
       };
-      const chrome = delta(window.__hud.bboxes(0.78), window.__hud.bboxes(1.22));
-      const wide = delta(window.__hud.bboxesWide(0.78), window.__hud.bboxesWide(1.22));
+      const chrome = delta(window.__hud.bboxes(FLOOR), window.__hud.bboxes(CEIL));
+      const wide = delta(window.__hud.bboxesWide(FLOOR), window.__hud.bboxesWide(CEIL));
       return { chrome, wide };
-    })()`);
+    })()`.replace(/FLOOR/g, String(FLOOR)).replace(/CEIL/g, String(CEIL)));
     const worstOf = (rows) => rows.reduce((m, r) => r.missing ? m : Math.max(m, r.dx, r.dy, r.dw, r.dh), 0);
     const worst4 = worstOf(h4.chrome);
     const wide4 = worstOf(h4.wide);
     const tapeWide = h4.wide.find((r) => r.id === 'tape') || {};
     const missing = h4.chrome.filter((r) => r.missing).map((r) => r.id);
     row('H4', 'the HUD does not zoom', worst4 <= 1 && missing.length === 0,
-        `worst chrome bbox delta between zoom 0.78 and 1.22 = ${worst4.toFixed(3)} px ` +
+        `worst chrome bbox delta between zoom ${FLOOR} and ${CEIL} = ${worst4.toFixed(3)} px ` +
         `over ${h4.chrome.length} elements` + (missing.length ? ` (no ink: ${missing.join(',')})` : ''));
     if (note) note('H4r', 'tape readouts DO move with zoom',
         `including the viewport bracket and the off-screen pips, the tape's ink box moves ` +
@@ -119,7 +130,7 @@ export async function runCdp({ row, note, secs = 60, gpu = false, bug = '', tape
     out.H4 = { worst: worst4, wide: wide4, rows: h4.chrome };
 
     /* -------------------------------------------------- H5, H11, H12 --- */
-    await cdp.viewport(390, 844, 1, true);
+    await cdp.viewport(MW, MH, 1, true);
 
     const zone = await cdp.eval(`JSON.stringify(window.__hud.hud.layout.stickZone)`).then(JSON.parse);
     const R = await cdp.eval('window.__hud.stickR');
@@ -145,7 +156,7 @@ export async function runCdp({ row, note, secs = 60, gpu = false, bug = '', tape
      * H11 as specified does not have a single value. The sweep is the result.
      */
     async function runThumb(rest, gain = thumbGain) {
-      await cdp.goto(q(`&auto=thumb&secs=${secs + 4}`));
+      await cdp.goto(q(`&auto=thumb&secs=${secs + 4}&mode=${mode}`));
       await cdp.waitFor('window.__hud', 20000);
       await cdp.frames(10);
       const t = new Touch(cdp);

@@ -15,7 +15,8 @@
  */
 
 import { createRNG } from '../core/rng.js';
-import { G_SI, RHO0, AGILITY_MARGIN, makeAirframe, AIRFRAME_BY_ID, REFERENCE } from '../data/tables.js';
+import { G_SI, RHO0, AGILITY_MARGIN, makeAirframe, AIRFRAME_BY_ID, REFERENCE,
+         MIN_ENEMY_HULL_WU } from '../data/tables.js';
 import { createFlight } from './flight.js';
 import { createPilot } from './pilot.js';
 import { makeHP, cloneAirframe, refit, updateDamage, aircraftCollision, groundContact,
@@ -95,7 +96,7 @@ function buildEnemyAirframe(row) {
   const vne = vmax * 1.51;
   const cFlutter = fitFlutter(m, S, T0, CD0, vne);
   const omLo = omLoDeg * DEG;
-  return makeAirframe({ id, name, m, S, CLmax, CD0, kInd, T0, vne, cFlutter,
+  return makeAirframe({ id, name, m, S, CLmax, CD0, kInd, T0, vne, cFlutter, hullWu: MIN_ENEMY_HULL_WU,
                         stressLimit: stress, am: AGILITY_MARGIN, omLo, omHi: omLo * 0.705 });
 }
 
@@ -546,10 +547,26 @@ function updateTurrets(world, e, live, dt) {
 export const FRAMING = Object.freeze({
   closingWu: 120,        // §4.3.1: a hostile closing faster than this enters the box
   bossSectionWu: 320,    // rule 18: a boss contributes its ENGAGED SECTION only, never the hull
-  hullWu: 64,
+  // IMPORTED, not copied: this is the enemy hull the box frames and the same
+  // number P3 measures for legibility. A second literal here is D72's drift.
+  hullWu: MIN_ENEMY_HULL_WU,
+
 });
 
-export function framingContributions(world, player, out, lockRangeWu = 1400) {
+/**
+ * `admitWu` is PER PROFILE (D129) and there is deliberately NO DEFAULT here.
+ *
+ * A default would have to name one profile's value, and this file cannot see
+ * the view — which is exactly the shape that made `zoomLockRange` serve two
+ * jobs in the first place, and that P8c found in three other files. An omitted
+ * radius would silently admit `undefined`, i.e. reject every hostile (`dWu >
+ * undefined` is false, so nothing is skipped — it would admit EVERYTHING), and
+ * a framing box containing the whole arena reads as a camera that frames the
+ * fight perfectly. Loud instead.
+ */
+export function framingContributions(world, player, out, lockRangeWu) {
+  if (!Number.isFinite(lockRangeWu))
+    throw new Error('framingContributions: lockRangeWu is required — pass view.profile.admitWu (D129)');
   out.length = 0;
   if (!player || !player.alive) return out;
   const pf = player.flight;

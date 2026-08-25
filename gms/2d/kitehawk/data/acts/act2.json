@@ -1,0 +1,45 @@
+{
+  "v": 1,
+  "id": "act2",
+  "act": 2,
+  "name": "The Deck",
+  "levels": [
+    "a2-01",
+    "a2-02",
+    "a2-03",
+    "a2-04",
+    "a2-05",
+    "a2-06",
+    "a2-07",
+    "a2-08",
+    "a2-09",
+    "a2-10",
+    "a2-11",
+    "a2-12",
+    "a2-13",
+    "a2-14",
+    "a2-15",
+    "a2-16",
+    "a2-17",
+    "a2-18",
+    "a2-19",
+    "a2-20"
+  ],
+  "unlocks": {
+    "airframes": [
+      "kite_b2"
+    ],
+    "upgrades": [
+      "engine.2",
+      "guns.2",
+      "armour.1"
+    ]
+  },
+  "gate": {
+    "starsRequired": 0
+  },
+  "intro": "story.act2.open",
+  "outro": "story.act2.close",
+  "palette": "dawn-ochre",
+  "ace": ""
+}

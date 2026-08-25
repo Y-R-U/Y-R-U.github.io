@@ -52,6 +52,10 @@ export function createInput(canvas, view, bus, opts = {}) {
    *              thumb on the stick carries the input into the next scene
    *   twitch     touchdown writes the axis immediately      -> putting a thumb
    *              down jerks the nose before you have moved
+   *   noreanchor view:change does NOT stale the stick anchor  -> rotating the
+   *              device leaves the anchor in the old coordinate frame, and the
+   *              first thumb movement afterwards slams the axis to full
+   *              deflection (D131)
    *
    * They exist for `node tools/touch.mjs --falsify`. Never ship a build that
    * sets one; the default path is untouched.
@@ -113,6 +117,7 @@ export function createInput(canvas, view, bus, opts = {}) {
     zones.length = 0;
     for (const a of ACTIONS) set(a, SRC.ZONE, false);
     stickPointer = -1;
+    stickStale = false;
     input.stick.active = false;
   };
   input.getZones = () => zones;
@@ -154,6 +159,7 @@ export function createInput(canvas, view, bus, opts = {}) {
   let stickPointer = -1;
   let stickOx = 0, stickOy = 0, stickR = 90;
   let releaseT = 0, releaseFromX = 0, releaseFromY = 0;
+  let stickStale = false;    // a rotation moved the frame under a held thumb
 
   function localXY(e, out) {
     const r = canvas.getBoundingClientRect();
@@ -163,8 +169,8 @@ export function createInput(canvas, view, bus, opts = {}) {
   }
   const _p = { x: 0, y: 0 };
 
-  /** R-12: DESIGN §2.2's 0.208-of-width, keeping the ported max(36, …) floor. */
-  function currentStickR() { return stickRadius(view.w); }
+  /** R-12 as amended by P8c: 0.208 of the stick ZONE's shorter side. */
+  function currentStickR() { return stickRadius(view); }
   input.stickRadius = currentStickR;
 
   function shape(v) {
@@ -175,6 +181,21 @@ export function createInput(canvas, view, bus, opts = {}) {
   }
 
   function driveStick(x, y) {
+    if (stickStale) {
+      /**
+       * A rotation moved the canvas coordinate frame out from under a held
+       * thumb, and the browser does not tell us where the thumb went — no
+       * pointermove fires for a finger that did not move. So the anchor is
+       * re-derived from the first position we DO get, placed so that the raw
+       * deflection the pilot was holding comes out unchanged under the NEW
+       * radius. Without this the first movement after a rotation is a
+       * several-hundred-pixel step from a stale anchor and the nose slams to
+       * full deflection (D131).
+       */
+      stickStale = false;
+      stickOx = x - input.axisRaw.x * stickR;
+      stickOy = y - input.axisRaw.y * stickR;
+    }
     // Anchor slide: a thumb can never run out of screen at the bottom bezel,
     // which is the commonest failure of a fixed virtual stick on a tall phone.
     let dx = x - stickOx, dy = y - stickOy;
@@ -214,6 +235,7 @@ export function createInput(canvas, view, bus, opts = {}) {
       stickPointer = e.pointerId;
       stickOx = p.x; stickOy = p.y;
       stickR = currentStickR();
+      stickStale = false;
       releaseT = 0;
       input.stick.active = true;
       // NO INPUT ON TOUCHDOWN (DESIGN §2.2). Putting a thumb down never twitches
@@ -269,6 +291,7 @@ export function createInput(canvas, view, bus, opts = {}) {
 
     if (e.pointerId === stickPointer) {
       stickPointer = -1;
+      stickStale = false;
       input.stick.active = false;
       if (input.holdToFly) {
         // latch: the stick stays where it was left (DESIGN §9.3)
@@ -354,6 +377,7 @@ export function createInput(canvas, view, bus, opts = {}) {
     input.pointerDown = false;
     input.stick.active = false;
     stickPointer = -1;
+    stickStale = false;
     releaseT = 0;
     pointers.clear();
   };
@@ -447,6 +471,7 @@ export function createInput(canvas, view, bus, opts = {}) {
     }
     pointers.clear();
     stickPointer = -1;
+    stickStale = false;
     releaseT = 0;
     input.axisX = input.axisY = 0;
     input.axisRaw.x = input.axisRaw.y = 0;
@@ -466,7 +491,13 @@ export function createInput(canvas, view, bus, opts = {}) {
   };
 
   // Zones are rect closures over `view`, so rotation re-derives them for free.
-  if (bus) bus.on('view:change', () => { stickR = currentStickR(); input.stick.r = stickR; });
+  // The ANCHOR is not free: it is a css-pixel position in a frame that has just
+  // been replaced. Mark it stale and let driveStick re-derive it (D131).
+  if (bus) bus.on('view:change', () => {
+    stickR = currentStickR();
+    input.stick.r = stickR;
+    if (stickPointer >= 0 && BUG !== 'noreanchor') stickStale = true;
+  });
 
   return input;
 }

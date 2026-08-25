@@ -27,6 +27,8 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2);
 const flag = (n) => argv.includes(n);
 const opt = (n, d) => { const i = argv.indexOf(n); return i >= 0 ? argv[i + 1] : d; };
+/** P8b, additive: H6 and H7 hardcoded portrait. Default unchanged. */
+const HMODE = opt('--mode', 'portrait');
 
 /* ------------------------------------------------------------- reporting -- */
 
@@ -199,12 +201,23 @@ async function h3() {
 
 /* ==================================================================== H6 === */
 
-async function h6() {
+async function h6(mode = 'portrait') {
   const { tapeModel } = await import('../js/ui/alttape.js');
   const { BANDS, CEILING_WU, CONCORD_LINE_WU } = await import('../js/core/bands.js');
-  const rect = { x: 6, y: 185.68, w: 34, h: 530.16 };
+  const { VIEW_PROFILE } = await import('../js/core/viewprofile.js');
+  // P8b, additive: the portrait literal is left exactly as shipped so the
+  // default reproduces byte-for-byte; any other mode resolves its own tape rect.
+  // (Verified: resolveLayout(portrait).tape IS {6, 185.68, 34, 530.16}.)
+  let rect = { x: 6, y: 185.68, w: 34, h: 530.16 };
+  if (mode !== 'portrait') {
+    const { resolveLayout } = await import('../js/ui/layout.js');
+    const { makeView } = await import('./p8engage.mjs');
+    const t = resolveLayout(makeView(mode)).tape;
+    rect = { x: t.x, y: t.y, w: t.w, h: t.h };
+  }
   const m = tapeModel(rect, {
     playerY: -3000, playerX: 0, viewTopY: -3500, viewBotY: -2500, contacts: [], energyWu: -3400,
+    pipRangeWu: VIEW_PROFILE[mode].zoomLockRange,
   });
   const names = m.bands.map((b) => b.name).join('/');
   const top = m.bands[m.bands.length - 1].top, bot = m.bands[0].bot;
@@ -310,7 +323,9 @@ async function h7(n = 200, opts = {}) {
   const { M_PER_WU } = await import('../js/core/math.js');
 
   const DT = 1 / 60;
-  const mode = 'portrait', W = 390, H = 844;
+  // P8b, additive: `opts.mode` defaults to the shipped portrait numbers.
+  const mode = opts.mode || 'portrait';
+  const W = mode === 'portrait' ? 390 : 844, H = mode === 'portrait' ? 844 : 390;
   const profile = VIEW_PROFILE[mode];
   const scale0 = H / profile.worldH;
   const view = {
@@ -321,9 +336,18 @@ async function h7(n = 200, opts = {}) {
   const L = resolveLayout(view);
   const HULL_WU = 64;
 
-  const st = { playerX: 0, playerY: 0, viewTopY: 0, viewBotY: 0, contacts: [] };
+  const st = { playerX: 0, playerY: 0, viewTopY: 0, viewBotY: 0, contacts: [], pipRangeWu: profile.zoomLockRange };
   const tape = { bands: [], pips: [] };
   const box = [];
+
+  /**
+   * `framepip`'s window comes from the SHIPPED `alttape.js` (P8c). It used to be
+   * computed here; the harness's copy was repaired and `js/ui/hud.js`'s was not,
+   * which is a break-switch that goes red in the test and stays green in the
+   * browser. One definition, imported — DESIGN §10.8's anti-mock rule.
+   */
+  const { framePipWindowPx } = await import('../js/ui/layout.js');
+  const FRAMEPIP_WIN_PX = framePipWindowPx(view, L.tape);
 
   /**
    * The attacker is flown by the SHIPPING pilot on a `point` intent at the
@@ -385,7 +409,7 @@ async function h7(n = 200, opts = {}) {
       if (!player.alive || !foe.alive || foe.dead) { why = foe.dead ? 'diver dead' : !player.alive ? 'player gone' : 'foe gone'; break; }
 
       cam.clearTracked();
-      framingContributions(world, player, box, profile.zoomLockRange);
+      framingContributions(world, player, box, profile.admitWu);
       for (const m of box) cam.track(m.id, m.x, m.y, m.w, m.h, m.weight);
       cam.update({ x: pf.sx / M_PER_WU, y: pf.sy / M_PER_WU, vx: pf.svx / M_PER_WU,
                    vy: pf.svy / M_PER_WU, angle: pf.theta, hull: HULL_WU }, DT);
@@ -398,7 +422,7 @@ async function h7(n = 200, opts = {}) {
       st.contacts.push({ id: foe.id, x: ff.sx / M_PER_WU, y: ff.sy / M_PER_WU, side: -1, kind: 'aircraft' });
       tapeModel(L.tape, st, tape);
       if (opts.framepip) {
-        const keep = tape.pips.filter((p) => Math.abs(p.y - tape.playerY) < 26);
+        const keep = tape.pips.filter((p) => Math.abs(p.y - tape.playerY) < FRAMEPIP_WIN_PX);
         tape.pips.length = 0; tape.pips.push(...keep);
       }
       if (opts.notape) tape.pips.length = 0;
@@ -524,10 +548,10 @@ export async function runNode(dives) {
   out.H1 = h1();
   out.H13 = h13();
   out.H3 = await h3();
-  out.H6 = await h6();
+  out.H6 = await h6(HMODE);
   out.H8 = await h8();
   out.H9 = await h9h10();
-  out.H7 = await h7(dives);
+  out.H7 = await h7(dives, { mode: HMODE });
   out.H14 = await h14(60);
   return out;
 }
@@ -540,11 +564,14 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   if (doNode) Object.assign(out, await runNode(dives));
   if (flag('--cdp') || (!flag('--node') && !flag('--falsify'))) {
     const { runCdp } = await import('./hudcdp.mjs');
-    Object.assign(out, await runCdp({ row, note, secs: parseFloat(opt('--secs', '60')) }));
+    // P8c, additive: D101 says H11 has no single value and must be read as a
+    // rest-position sweep; `runCdp` has always had the arm and no flag reached it.
+    Object.assign(out, await runCdp({ row, note, secs: parseFloat(opt('--secs', '60')),
+                                      mode: HMODE, sweep: flag('--thumbsweep') }));
   }
   if (flag('--falsify')) {
     const { falsify } = await import('./hudfalsify.mjs');
-    await falsify({ row, h7 });
+    await falsify({ row, h7, mode: HMODE });
   }
   const bad = results.filter((r) => !r.pass);
   console.log(`\n${results.length - bad.length}/${results.length} pass` +

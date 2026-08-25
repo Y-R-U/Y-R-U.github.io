@@ -1,0 +1,112 @@
+{
+  "id": "a1-04",
+  "index": 4,
+  "name": "Wire and Wind",
+  "length": 12600,
+  "column": {
+    "ground": 0,
+    "ceiling": -3000,
+    "concordLine": -26666.666666666668
+  },
+  "weather": {
+    "wind": [
+      [
+        0,
+        2
+      ],
+      [
+        1500,
+        2
+      ]
+    ]
+  },
+  "beats": [
+    {
+      "x": 1488,
+      "event": "gate",
+      "y": -1200
+    },
+    {
+      "x": 2886,
+      "event": "gate",
+      "y": -350
+    },
+    {
+      "x": 4283,
+      "event": "gate",
+      "y": -350
+    },
+    {
+      "x": 5681,
+      "event": "gate",
+      "y": -2350
+    },
+    {
+      "x": 7079,
+      "event": "gate",
+      "y": -2350
+    },
+    {
+      "x": 8477,
+      "event": "gate",
+      "y": -1200
+    },
+    {
+      "x": 9874,
+      "event": "gate",
+      "y": -1200
+    },
+    {
+      "x": 11272,
+      "event": "gate",
+      "y": -350
+    }
+  ],
+  "objectives": [
+    {
+      "type": "reach",
+      "x": 12600
+    },
+    {
+      "type": "gates",
+      "n": 8
+    },
+    {
+      "type": "survive",
+      "maxDeaths": 0
+    }
+  ],
+  "stars": [
+    {
+      "id": "clean",
+      "desc": "Not a scratch",
+      "stat": "damageTaken",
+      "op": "==",
+      "value": 0
+    },
+    {
+      "id": "steady",
+      "desc": "One stall, no more",
+      "stat": "stalls",
+      "op": "<=",
+      "value": 1
+    },
+    {
+      "id": "quick",
+      "desc": "Under 45 s",
+      "stat": "time",
+      "op": "<=",
+      "value": 45
+    }
+  ],
+  "landmarks": [
+    {
+      "x": 744,
+      "kind": "bridge"
+    }
+  ],
+  "reward": {
+    "crates": 0,
+    "scrip": 25
+  }
+}

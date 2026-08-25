@@ -232,7 +232,7 @@ function frame() {
     }
 
     cam.clearTracked();
-    framingContributions(world, player, box, view.profile.zoomLockRange);
+    framingContributions(world, player, box, view.profile.admitWu);   // D120/D129: NOT zoomLockRange
     for (const m of box) cam.track(m.id, m.x, m.y, m.w, m.h, m.weight);
     cam.setPlayerControl(input.stick.active);
     cam.update({ x: player.flight.sx / M_PER_WU, y: player.flight.sy / M_PER_WU,

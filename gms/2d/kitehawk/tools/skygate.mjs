@@ -21,11 +21,60 @@ const has = f => argv.includes(f);
 const OUT = 'shots/p3';
 mkdirSync(OUT, { recursive: true });
 
+/** P8b, additive: the viewport was hardcoded portrait. Defaults unchanged. */
+const argN = (f, d) => { const i = argv.indexOf(f); return i < 0 ? d : Number(argv[i + 1]); };
+const SW = argN('--w', 390), SH = argN('--h', 844);
+/**
+ * P9: `--worldh` exists so the pre-fix behaviour can still be run on purpose.
+ * sky.html used to pin `worldH: 1000` while taking `w`/`h` from the query, so
+ * every landscape run measured 1000 wu of sky in a 390 px frame — a picture the
+ * game never draws (D131). It now takes the profile's value; `--worldh 1000` is
+ * the break-switch that reproduces the old measurement.
+ */
+const WORLDH = argN('--worldh', 0);
+
 const { cdp, base, close } = await harness({ gpu: has('--gpu') });
-await cdp.viewport(390, 844, 1, false);
-await cdp.goto(`${base}/tools/pages/sky.html?w=390&h=844&nohud=1`);
-await cdp.waitFor('!!window.__sky', 20000);
-await cdp.frames(3);
+await cdp.viewport(SW, SH, 1, false);
+
+/**
+ * ONE url builder, and every goto in this file goes through `load`.
+ *
+ * The falsification arms used to carry their own `w=390&h=844` literals, so
+ * `--w 844 --h 390 --falsify` set an 844x390 BROWSER viewport and then loaded a
+ * 390x844 PAGE inside it: the controls ran portrait whatever the flags said, and
+ * printed their portrait numbers against the landscape run's shipped figures.
+ * Believable, and wrong. `load` also asserts the page came up in the frame it
+ * was asked for and refuses to continue otherwise, so a third goto cannot drift.
+ */
+const pageURL = (extra = '') =>
+  `${base}/tools/pages/sky.html?w=${SW}&h=${SH}&nohud=1${WORLDH ? `&worldH=${WORLDH}` : ''}${extra}`;
+
+/**
+ * `--framebug` restores the pre-fix defect on the CONTROL arms only: they load a
+ * literal 390x844 page whatever `--w`/`--h` say. It exists so the guard below can
+ * be shown to trip — a guard that has never been seen to fire is not a guard, and
+ * this one was written because the defect it catches shipped undetected.
+ */
+const FRAMEBUG = has('--framebug');
+
+async function load(extra = '', label = 'run') {
+  const bugged = FRAMEBUG && label !== 'shipped';
+  await cdp.goto(bugged
+    ? `${base}/tools/pages/sky.html?w=390&h=844&nohud=1${WORLDH ? `&worldH=${WORLDH}` : ''}${extra}`
+    : pageURL(extra));
+  if (!await cdp.waitFor('!!window.__sky', 20000)) { console.log(`FAIL  ${label}: sky.html did not boot`); close(); process.exit(1); }
+  await cdp.frames(3);
+  const fr = await cdp.eval('JSON.stringify(window.__sky.frame)').then(JSON.parse);
+  if (fr.w !== SW || fr.h !== SH) {
+    console.log(`FAIL  ${label}: page measured ${fr.w}x${fr.h} but was asked for ${SW}x${SH}. ` +
+      `Every goto must go through load(); a control that runs in the wrong frame tests nothing.`);
+    close(); process.exit(1);
+  }
+  return fr;
+}
+
+const FRAME = await load('', 'shipped');
+console.log(`frame ${FRAME.w}x${FRAME.h} ${FRAME.mode}, worldH ${FRAME.worldH} wu, scale ${(FRAME.h / FRAME.worldH).toFixed(4)} px/wu`);
 
 const results = [];
 const rec = (id, pass, line, extra) => { results.push({ id, pass, line, ...extra }); console.log(`${id} ${pass ? 'PASS' : 'FAIL'}  ${line}`); };
@@ -101,23 +150,24 @@ if (has('--falsify')) {
   const f = [];
 
   // A4 control: collapse the cloud atlas to one cutout.
-  await cdp.goto(`${base}/tools/pages/sky.html?w=390&h=844&nohud=1&bug=oneCutout`);
-  await cdp.waitFor('!!window.__sky', 20000);
-  await cdp.frames(2);
+  const f4 = await load('&bug=oneCutout', 'A4 control');
+  console.log(`  control frame ${f4.w}x${f4.h} ${f4.mode}, worldH ${f4.worldH} wu`);
   let w4 = 0;
   for (let i = 0; i < 40; i++) {
     await cdp.eval(`window.__sky.set({x:${i * 1400}, y:${-2600 - (i % 9) * 420}})`);
     const r = await cdp.eval('JSON.stringify(window.__sky.repeats())').then(JSON.parse);
     if (r.worst > w4) w4 = r.worst;
   }
-  f.push({ id: 'A4', red: w4 >= 3, line: `one-cutout atlas: worst multiplicity ${w4} against the shipped ${worst.worst} (red needs >= 3)` });
+  f.push({ id: 'A4', red: w4 >= 3, frame: `${f4.w}x${f4.h} ${f4.mode} worldH ${f4.worldH}`,
+    line: `one-cutout atlas: worst multiplicity ${w4} against the shipped ${worst.worst} in the SAME frame ${f4.w}x${f4.h} ${f4.mode} (red needs >= 3)` });
 
   // A7 control: make every band change at a line.
-  await cdp.goto(`${base}/tools/pages/sky.html?w=390&h=844&nohud=1&bug=hardBands`);
-  await cdp.waitFor('!!window.__sky', 20000);
+  const f7 = await load('&bug=hardBands', 'A7 control');
+  console.log(`  control frame ${f7.w}x${f7.h} ${f7.mode}, worldH ${f7.worldH} wu`);
   const bad7 = await cdp.eval('JSON.stringify(window.__sky.crossfades())').then(JSON.parse);
   const s7 = bad7.map(x => x.secs);
-  f.push({ id: 'A7', red: s7.some(v => v < 0.4), line: `hard bands: crossfades ${s7.map(v => v.toFixed(3)).join(', ')} s against the shipped ${secs.map(v => v.toFixed(2)).join(', ')} (red needs < 0.4)` });
+  f.push({ id: 'A7', red: s7.some(v => v < 0.4), frame: `${f7.w}x${f7.h} ${f7.mode} worldH ${f7.worldH}`,
+    line: `hard bands: crossfades ${s7.map(v => v.toFixed(3)).join(', ')} s against the shipped ${secs.map(v => v.toFixed(2)).join(', ')} in the SAME frame ${f7.w}x${f7.h} ${f7.mode} (red needs < 0.4)` });
 
   // A5 control: give every act the SAME tone LUT and require the separation to collapse.
   // `--measure --sameLut` does exactly that in ramp.js, against the same baked plate, so
@@ -128,12 +178,15 @@ if (has('--falsify')) {
   // matches the re-specified A5's output (§15), not the superseded degrees form
   const m = /A5 worst pair \S+ = ([\d.]+)\s+(PASS|FAIL)/.exec(a5c);
   const w5 = m ? Number(m[1]) : null;
-  f.push({ id: 'A5', red: w5 !== null && w5 < 0.25, line: `one LUT shared by all five acts: worst pair ${w5 === null ? '?' : w5.toFixed(2)} against the shipped 0.26 (red needs < 0.25)` });
+  // A5 is measured on disk against the baked plate, so it has no frame at all —
+  // said explicitly rather than left to look like an omission.
+  f.push({ id: 'A5', red: w5 !== null && w5 < 0.25, frame: 'on disk — art/work/clouds/cL01.png, no viewport',
+    line: `one LUT shared by all five acts: worst pair ${w5 === null ? '?' : w5.toFixed(2)} against the shipped 0.26 (red needs < 0.25)` });
 
   for (const x of f)
     console.log(`  control ${x.id}: ${x.red === null ? 'INCONCLUSIVE' : x.red ? 'went RED, as required' : 'STAYED GREEN -- the criterion does not catch its own bug'} -- ${x.line}`);
   writeFileSync(`${OUT}/falsify.json`, JSON.stringify(f, null, 1));
-  if (f.some(x => !x.red)) console.log('  ONE OR MORE CRITERIA DO NOT CATCH THEIR OWN BUG');
+  if (f.some(x => !x.red)) { console.log('  ONE OR MORE CRITERIA DO NOT CATCH THEIR OWN BUG'); close(); process.exit(1); }
 }
 
 writeFileSync(`${OUT}/gates.json`, JSON.stringify(results, null, 1));

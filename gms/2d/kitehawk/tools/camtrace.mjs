@@ -27,9 +27,88 @@ const argv = process.argv.slice(2);
 const arg = (k, d) => { const i = argv.indexOf(k); return i >= 0 ? argv[i + 1] : d; };
 const SECS = Number(arg('--secs', 120));
 const SEED = arg('--seed', 'kitehawk-p2');
+/**
+ * P8b, additive: every `makeView()` below took the default. Under D123 landscape
+ * is the tuning target and Z1-Z6 had never been run against its profile, so a
+ * criterion that has only ever seen one profile is not evidence about the other.
+ * The default is unchanged, so every prior number reproduces exactly.
+ */
+const MODE = arg('--mode', 'portrait');
+const VIEW_W = Number(arg('--w', MODE === 'portrait' ? 390 : 844));
+const VIEW_H = Number(arg('--h', MODE === 'portrait' ? 844 : 390));
+
+/**
+ * P8c — the ISOLATION FIXTURE, SIZED FROM THE CAMERA'S OWN SOLVE.
+ *
+ * `control:symmetric-slew / jitter` is camtrace's largest signal — 52 rev/min,
+ * 103 gap violations, 680 oscillation windows in portrait — and it read 0/0/0 in
+ * landscape, because a 150 wu member inside a 1212 wu frame saturates the solve
+ * at `zoomIntimate` and the wobble moves nothing. The fixture's own comment
+ * names that failure mode ("a wobble that never moves the clamped target proves
+ * nothing, which is how a test quietly becomes vacuous") — it was simply written
+ * in absolute wu against one profile.
+ *
+ * Scaling the offset by `worldW` does NOT fix it: the framing box is
+ * `offset + padding + hull` and the second two terms are ABSOLUTE, so equal
+ * fractions of the frame do not give equal demanded zooms. The offset is
+ * therefore MAPPED, per profile, to the zoom demand portrait's shipped 150 wu
+ * offset produces — across the wobble's whole range, not just its centre. The
+ * additive constant is measured off the shipped `cam.box` rather than typed.
+ *
+ * Same treatment for the bias probe's 160 wu box (P8b §6.2 / REQUEST-12).
+ */
+const HOLD_UP_FRAC = 60 / VIEW_PROFILE.portrait.worldH;      // 0.06 of the column
+
+/**
+ * Settle a static hold and report the framing box the shipped camera builds.
+ * The box is `|offset| + padding + hull`, and the last two terms are ABSOLUTE —
+ * which is why scaling the offset by `worldW` does not scale the demand.
+ */
+function boxConst(view, ahead, weight = 1) {
+  const cam = createCamera(view, { bias: 'normal' });
+  cam.reset(0, -3000, view.profile.zoomCombat);
+  const player = { x: 0, y: -3000, vx: 0, vy: 0, hull: 64 };
+  const up = view.worldH * HOLD_UP_FRAC;
+  for (let i = 0; i < 60 * 20; i++) {
+    cam.track('held', ahead, -3000 - up, 64, 34, weight);
+    cam.update(player, DT);
+  }
+  return cam.box.w - ahead;
+}
+
+/**
+ * The offset in THIS view that demands the same zoom portrait's `a` does.
+ *
+ *   demand(a) = worldW * zoomFill / (a + C)      (§4.3.1's width term)
+ *   a' = (worldW' * zoomFill') / (worldW * zoomFill) * (a + C') - C'
+ *
+ * Applied to the wobble's whole range, not just its centre: matching only the
+ * mean demand leaves landscape a 1.3x larger SWING, because C is a smaller
+ * fraction of a larger offset — and the first version of this repair did
+ * exactly that and made the SHIPPED arm score 51 rev/min against the broken
+ * arm's 52. A control that both arms fail is no better than one neither fails.
+ *
+ * In portrait the factor is 1 and this returns `a` unchanged, so every prior
+ * camtrace number reproduces byte-for-byte.
+ */
+function matchAhead(view, a, C) {
+  const k = (view.worldW * view.profile.zoomFill) / (REF_VIEW.worldW * REF_VIEW.profile.zoomFill);
+  return k * (a + C) - C;
+}
+
+/** PORTRAIT IS THE REFERENCE and its literals are untouched (`k` is 1 there). */
+const REF_VIEW = { profile: VIEW_PROFILE.portrait, worldH: VIEW_PROFILE.portrait.worldH,
+                   worldW: 390 / (844 / VIEW_PROFILE.portrait.worldH),
+                   mode: 'portrait', w: 390, h: 844, dpr: 2, scale: 844 / VIEW_PROFILE.portrait.worldH,
+                   safe: { top: 0, right: 0, bottom: 0, left: 0 } };
+const HOLD_C = boxConst(REF_VIEW, 150);
+const BIAS_C = boxConst(REF_VIEW, 160, 0);
+/** The wobbled hold offset, per tick. Portrait: exactly `150 * wob`, as shipped. */
+const holdAhead = (view, wob) => matchAhead(view, 150 * wob, HOLD_C);
+const BIAS_BOX_X = matchAhead(makeView(), 160, BIAS_C);
 
 /** A view exactly as core/viewport.js computes it at 390x844 portrait. */
-function makeView(mode = 'portrait', w = 390, h = 844) {
+function makeView(mode = MODE, w = VIEW_W, h = VIEW_H) {
   const profile = VIEW_PROFILE[mode];
   const scale = h / profile.worldH;
   return {
@@ -137,7 +216,8 @@ function runTrace(camOpts, secs, seedTag, policy = 'contract', scenario = 'furba
       // a wobble that never moves the clamped target proves nothing, which is
       // how a test quietly becomes vacuous.
       const wob = scenario === 'jitter' ? 1 + Math.sin(t * 2.7) * 0.30 : 1;
-      cam.track('held', player.x + 150 * wob, player.y - 60 * wob, 64, 34, 1);
+      cam.track('held', player.x + holdAhead(view, wob),
+                        player.y - view.worldH * HOLD_UP_FRAC * wob, 64, 34, 1);
       player.vx = 0; player.vy = 0;    // hold the lead point still too
       cam.update(player, DT);
       zoom[i] = cam.zoom; target_[i] = cam.zoomTarget;
@@ -167,7 +247,10 @@ function runTrace(camOpts, secs, seedTag, policy = 'contract', scenario = 'furba
       // §10 rule 18 is written about, and it is measured here rather than feared.
       const inBox = policy === 'all'
         ? true
-        : d <= P.zoomLockRange && (d < 700 || closing > 120);
+        // P8c: `d < 700` was portrait's admitWu as a literal, in a tool that has
+        // a --mode arm. Landscape admits at 1400 (D129), so every Z1-Z3 landscape
+        // number was taken on portrait's box population.
+        : d <= P.zoomLockRange && (d < P.admitWu || closing > 120);
       if (inBox) cam.track(f.id, fx, fy, f.hull, f.hull * 0.53, 1);
     }
 
@@ -410,7 +493,8 @@ function solveCheck() {
       const cam = createCamera(view, { bias: k, margin: mode });
       cam.reset(0, -3000, P.zoomWide);
       const player = { x: 0, y: -3000, vx: 0, vy: 0, hull: 64 };
-      for (let i = 0; i < 60 * 20; i++) { cam.track('box', 160, -3000, 64, 34, 0); cam.update(player, DT); }
+      const bx = BIAS_BOX_X;
+      for (let i = 0; i < 60 * 20; i++) { cam.track('box', bx, -3000, 64, 34, 0); cam.update(player, DT); }
       const key = k + ':' + mode;
       bias[key] = { offset: ZOOM_BIAS[k], settled: +cam.zoom.toFixed(4), target: +cam.zoomTarget.toFixed(4) };
     }

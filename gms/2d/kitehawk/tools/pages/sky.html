@@ -21,9 +21,20 @@ import { LAYER } from '../../js/gfx/renderer.js';
 import { createSky, loadRamps, bandBlend, BAND_FEATHER_WU, BEST_CLIMB_WU_S, setBandFeather, getBandFeather } from '../../js/gfx/sky.js';
 import { createClouds } from '../../js/gfx/clouds.js';
 import { BANDS } from '../../js/core/bands.js';
+import { VIEW_PROFILE } from '../../js/core/viewprofile.js';
+import { modeFor } from '../../js/core/viewport.js';
 
 const W = qp('w', 390), H = qp('h', 844);
-const { R } = await mount({ w: W, h: H, dpr: qp('dpr', 1), worldH: 1000 });
+/**
+ * This read `worldH: 1000` — portrait's constant — while `w`/`h` came from the
+ * query string, so every landscape run measured a frame the game never draws:
+ * 1000 wu of sky squeezed into a 390 px-tall viewport instead of landscape's
+ * 560 (D131). The profile is chosen by `modeFor`, viewport.js's own rule, so
+ * the page cannot drift from the game. `?worldH=` still overrides.
+ */
+const MODE = String(qp('mode', modeFor(W, H)));
+const WORLD_H = qp('worldH', VIEW_PROFILE[MODE].worldH);
+const { R } = await mount({ w: W, h: H, dpr: qp('dpr', 1), worldH: WORLD_H });
 if (qp('flat', 0)) flatGrade(R);
 
 const BASE = '../../assets/';
@@ -85,6 +96,9 @@ requestAnimationFrame(frame);
 let __lastFg = 0;
 window.__sky = {
   R, sky, clouds, cam, man, BANDS, BAND_FEATHER_WU, BEST_CLIMB_WU_S, bug: BUG,
+  // Reported so a gate can never again measure a frame the game does not draw
+  // without saying so in its own output (D131).
+  frame: { w: W, h: H, mode: MODE, worldH: WORLD_H },
   feather: () => getBandFeather(),
   setAct(a, s) { act = a; state = s || 'd'; const k = sky.setAct(act, state); if (BUG === 'rampFg') R.setLayer(LAYER.FG_OCCLUDE, { rampAmt: 1.0 }); return k; },
   set(o) { Object.assign(cam, o); },

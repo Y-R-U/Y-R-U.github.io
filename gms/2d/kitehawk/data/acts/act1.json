@@ -1,0 +1,45 @@
+{
+  "v": 1,
+  "id": "act1",
+  "act": 1,
+  "name": "The Mud",
+  "levels": [
+    "a1-01",
+    "a1-02",
+    "a1-03",
+    "a1-04",
+    "a1-05",
+    "a1-06",
+    "a1-07",
+    "a1-08",
+    "a1-09",
+    "a1-10",
+    "a1-11",
+    "a1-12",
+    "a1-13",
+    "a1-14",
+    "a1-15",
+    "a1-16",
+    "a1-17",
+    "a1-18",
+    "a1-19",
+    "a1-20"
+  ],
+  "unlocks": {
+    "airframes": [
+      "kite_b1"
+    ],
+    "upgrades": [
+      "engine.1",
+      "guns.1",
+      "fuel.1"
+    ]
+  },
+  "gate": {
+    "starsRequired": 0
+  },
+  "intro": "story.act1.open",
+  "outro": "story.act1.close",
+  "palette": "dawn-ochre",
+  "ace": ""
+}

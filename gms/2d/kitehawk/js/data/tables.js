@@ -149,12 +149,30 @@ function derive(row) {
 }
 
 /**
+ * Hull sizes, wu. D26's 0.15 m/wu makes 64 wu = 9.60 m, which is the Camel's
+ * 5.7 m under ART's K = 1.6 stylisation factor.
+ *
+ * The ENEMY minimum is NOT the same number and is not a taste call (D128). It is
+ * the smallest hull that clears §4.4.2 P3's 34 px silhouette line at landscape's
+ * clamp floor, which is the tightest the auto camera may legally go:
+ *
+ *     hull >= barPx * worldH / (refH * zoomWide)
+ *           = 34 * 560 / (390 * 0.74) = 65.97 wu  ->  66 wu (integer wu) = 9.90 m
+ *
+ * 64 wu gives 32.98 px and FAILS. There is 0.03 wu of slack in this, which is
+ * why `tools/p3guard.mjs` exists and why lowering it is a DECISIONS-level change.
+ */
+export const PLAYER_HULL_WU = 64;
+export const MIN_ENEMY_HULL_WU = 66;
+
+/**
  * Build an airframe from SI. Exported so tools can fit variants and so P13's
  * upgrades can refit one without a second copy of this arithmetic.
  */
 export function makeAirframe(spec) {
   const { id, act = 1, m, S, CLmax, CD0, kInd, T0, vne, cFlutter,
           stressLimit = 1, am = AGILITY_MARGIN, name = id,
+          hullWu = PLAYER_HULL_WU,
           omLo = PITCH.omegaLo, omHi = PITCH.omegaHi,
           // Falsification switch. No shipped airframe ever sets it; tools/sim.mjs
           // --break builds one that does, so every assert can be watched going red
@@ -168,7 +186,7 @@ export function makeAirframe(spec) {
     // the four observables, so a reader can check two airframes are not the same one
     t: T0 / W, p0: CD0 / CLmax, kappa: kInd * CLmax,
     // wu mirrors, DERIVED (D26). Never author these.
-    vsWu: wu(vs), vneWu: wu(vne), hullWu: 64,
+    vsWu: wu(vs), vneWu: wu(vne), hullWu,
   });
 }
 

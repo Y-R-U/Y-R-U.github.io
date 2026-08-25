@@ -10,8 +10,10 @@
  *
  * So this file splits js/core/ into two tiers and checks both:
  *
- *   PURE  — node imports it, and it contains no banned token. sim/ may import
- *           these: math, rng, events, bands, viewprofile, camera.
+ *   PURE  — node imports it, and it contains no banned token. sim/ and data/
+ *           may import these: math, rng, events, bands, viewprofile, camera,
+ *           content. A new pure core module MUST be added to this list, or it
+ *           is a core module nothing enforces.
  *   HOST  — browser-only by nature. sim/ must NEVER import these:
  *           viewport, input, loop, save, quality, debug, audio.
  *
@@ -28,7 +30,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
-const PURE = ['math.js', 'rng.js', 'events.js', 'bands.js', 'viewprofile.js', 'camera.js'];
+const PURE = ['math.js', 'rng.js', 'events.js', 'bands.js', 'viewprofile.js', 'camera.js', 'content.js'];
 const HOST = ['viewport.js', 'input.js', 'loop.js', 'save.js', 'quality.js', 'debug.js', 'audio.js'];
 
 const BANNED = [

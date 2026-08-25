@@ -19,7 +19,7 @@
  */
 
 import { BANDS, CEILING_WU, GROUND_WU, CONCORD_LINE_WU, bandAt, altitudeFeet } from '../core/bands.js';
-import { METRICS, RANGES } from './layout.js';
+import { METRICS } from './layout.js';
 import { INK, NEUTRAL_RAMP, mixHex, mark, label, rgba, font } from './theme.js';
 
 const SPAN = GROUND_WU - CEILING_WU;          // 10,000 wu, positive
@@ -29,6 +29,7 @@ const BANDS_MAX_CHARS = BANDS.reduce((n, b) => Math.max(n, b.name.length), 0);
 /** y (wu, negative up) -> fraction down the tape, 0 at the ceiling. */
 export const tapeFrac = (y) => (y - CEILING_WU) / SPAN;
 
+
 /* ---------------------------------------------------------------- model --- */
 
 /**
@@ -37,7 +38,9 @@ export const tapeFrac = (y) => (y - CEILING_WU) / SPAN;
  * `side` is the sim's: 1 is the player's side.
  *
  * A pip is drawn for a contact that is (a) off-screen VERTICALLY and (b) inside
- * `RANGES.PIP_RANGE_WU` horizontally. Both halves matter. Without (a) the tape
+ * `st.pipRangeWu` horizontally — the CALLER's, from `L.ranges`, because it is
+ * the camera profile's `zoomLockRange` and a module constant could only ever
+ * hold one profile's (P8c). Both halves matter. Without (a) the tape
  * duplicates the frame; without (b) every contact in a two-kilometre arena is a
  * pip and the tape stops meaning "something is above you" — which is also the
  * difference between H7 measuring a warning and H7 measuring the spawn table.
@@ -79,16 +82,22 @@ export function tapeModel(rect, st, out = null) {
 
   m.pips.length = 0;
   const cs = st.contacts;
+  // Loud rather than silent: an undefined range makes every comparison below
+  // false and turns every contact in the arena into a pip, which is the shape
+  // of failure H7 would read as a BETTER warning (P8b's fifth believable-wrong
+  // metric). A missing field is a caller bug, not a default.
+  if (cs && cs.length && !Number.isFinite(st.pipRangeWu))
+    throw new Error('tapeModel: st.pipRangeWu is required — pass L.ranges.PIP_RANGE_WU');
   if (cs) {
     for (let i = 0; i < cs.length; i++) {
       const c = cs[i];
       const offScreen = c.y < st.viewTopY || c.y > st.viewBotY;
       if (!offScreen) continue;
-      if (Math.abs(c.x - st.playerX) > RANGES.PIP_RANGE_WU) continue;
+      if (Math.abs(c.x - st.playerX) > st.pipRangeWu) continue;
       m.pips.push({
         id: c.id, y: at(c.y), kind: c.kind,
         side: c.side, above: c.y < st.viewTopY,
-        near: 1 - Math.min(1, Math.abs(c.x - st.playerX) / RANGES.PIP_RANGE_WU),
+        near: 1 - Math.min(1, Math.abs(c.x - st.playerX) / st.pipRangeWu),
       });
     }
   }

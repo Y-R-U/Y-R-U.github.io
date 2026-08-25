@@ -7,11 +7,15 @@
  * needs a mode branch it needs a new field in this table, and a line in
  * docs/P2_NOTES.md saying why.
  *
- * `playfield` is the ONE field that is not ARCHITECTURE §4.1 verbatim. It was
- * added under D100 because §4.1's anchors are fractions of the frame while the
- * coaming owns the bottom 14% of the same frame, and the two are incompatible:
- * over a 94 s mission the aeroplane sat inside the coaming and off the right
- * edge. See docs/CAMFIX_NOTES.md.
+ * TWO fields here are not ARCHITECTURE §4.1 verbatim, and each has a decision:
+ *
+ *   `playfield` (D100) — §4.1's anchors are fractions of the frame while the
+ *     coaming owns the bottom 14% of the same frame, and the two are
+ *     incompatible: over a 94 s mission the aeroplane sat inside the coaming and
+ *     off the right edge. See docs/CAMFIX_NOTES.md.
+ *   `admitWu` (D129) — the framing box's admission radius, split out of
+ *     `zoomLockRange` by D120 and made PER PROFILE here for the reason D104
+ *     made `playfield` per-mode: the right value genuinely differs. See below.
  */
 
 export const VIEW_PROFILE = {
@@ -59,7 +63,32 @@ export const VIEW_PROFILE = {
     zoomInDwell:  0.90,         // ...and has been for this long, continuously
     zoomDeadband: 0.02,         // ignore smaller corrections entirely
     zoomLockRange: 1400,        // 210 m. never tighten past zoomCombat*1.05 with a hostile this
-                                //   near, and a hostile inside it is trackable (§4.4 P2)
+                                //   near. NOT the framing box's admission radius — see admitWu.
+
+    /**
+     * THE FRAMING BOX'S ADMISSION RADIUS (D120, per-profile under D129).
+     *
+     * A hostile is a framing SUBJECT if the camera must already have him in
+     * frame by the time he can shoot. Whether he is merely TRACKABLE is the
+     * altitude tape's and the edge chevrons' job (§4.2) — conflating the two in
+     * one 1400 wu constant made `boxW` a restatement of the radius (p90 935.6 wu
+     * against a 585 wu pivot signal) and failed P0 in both orientations.
+     *
+     *     admit = gunRange + closing_p90 * t_widen
+     *           = 440 + 618 * 0.400 = 687.4 wu  ->  700 wu
+     *
+     *   gunRange    440 wu, §4.3.5
+     *   closing_p90 618 wu/s, p90 of the closing rate on the ticks where the
+     *               admission rule's own `closing > closingWu 120` holds —
+     *               13,969 of 52,016 engaged ticks over 16 duels (D115)
+     *   t_widen     0.400 s, measured off camera.js driving zoomIntimate to the
+     *               clamp floor; the zoomOutRate cap binds, (1.22-0.78)/1.10
+     *
+     * It is decisive HERE and only here: portrait P0 goes -0.3615 FAIL to
+     * +0.1583 PASS. Landscape's is a different number for a measured reason —
+     * see the assignment below the table.
+     */
+    admitWu: 700,
 
     hud: 'portrait',
     stickZone:   { x: 0.00, y: 0.45, w: 1.00, h: 0.55 },
@@ -71,18 +100,49 @@ export const VIEW_PROFILE = {
     worldH: 560,
     anchorX: 0.30, anchorY: 0.55, anchorYClimb: 0.70, anchorYDive: 0.34,
     anchorYThreatAbove: 0.66,
-    leadSeconds: 0.70, leadMax: 420,
+    // leadSeconds 0.70 -> 0.39 (P8c). D108 fitted this as a fraction of frame
+    // WIDTH and applied it to `leadY` as well; landscape's frame is 0.56x as
+    // tall as portrait's, so the vertical lead outran its own headroom on 28%
+    // of engaged ticks and the aeroplane sat pinned against the playfield edge
+    // in every dive — D106's "pinned against the bound" defect, on the other
+    // axis. Derived, not fitted: a lead above `headroom / |v|` is discarded by
+    // the clamp and buys nothing, so
+    //   leadSeconds <= min over axes of ( headroom_axis / v_axis,p90 )
+    //   x 255.22/404 = 0.631   climb 108.32/237 = 0.457   DIVE 124.90/317 = 0.394
+    // p90 over engaged ticks is the gate's own percentile (§4.4.2 P0). Rounded
+    // DOWN because it is an upper bound. tools/p8clead.mjs is the derivation.
+    // The x budget is 1.6x the dive budget and is left unspent — see P8C_NOTES
+    // REQUEST-3, which asks for the per-axis pair this scalar cannot express.
+    leadSeconds: 0.39, leadMax: 420,
 
     // bottom 0.86 = the same COAM_FRAC 0.14; the coaming is split into two
-    // corners here but the band it occupies is the same one. left / top clear
-    // the radio card's corner; right is `specialSlot.x` (which is inboard of
-    // the tape at 808 / 844 = 0.957), assigned below.
-    playfield: { top: 0.06, right: 0, bottom: 0.86, left: 0.03 },
+    // corners here but the band it occupies is the same one. left clears the
+    // radio card's corner; right is `specialSlot.x` (which is inboard of the
+    // tape at 808 / 844 = 0.957), assigned below.
+    //   top 0.06 -> 0.12 (P8c). 0.06 was NOT portrait's derivation carried: it
+    //     was a DIFFERENT rule — it cleared the radio card's TOP (it is exactly
+    //     `radioCard.y`), where portrait's clears the objective row's BOTTOM.
+    //     The card is non-blocking; the banner is not, and in landscape
+    //     `resolveLayout` puts the row BESIDE the card at the card's own y, so
+    //     the banner sat inside the playfield and the camera put the aeroplane
+    //     under it on 23.9% of frames. Portrait's rule, applied here:
+    //       top >= (banner row bottom) / H = radioCard.y + BANNER_H / H
+    //                                      = 0.06 + 22 / 390 = 0.1164 -> 0.12
+    //     which is the same rounding-up-to-2dp that turns portrait's 40.57/844
+    //     = 0.0481 into 0.05.
+    playfield: { top: 0.12, right: 0, bottom: 0.86, left: 0.03 },
 
-    zoomCombat: 1.00, zoomIntimate: 1.22, zoomWide: 0.78, zoomEstablish: 0.42,
+    // zoomWide 0.78 -> 0.74 (D128). P0's window is `containH - zoomWide` and
+    // landscape's ceiling is pinned at 0.8137 by the 585 wu dive recovery, so
+    // the floor is the ONLY term that widens it: 0.0337 -> 0.0737 against a
+    // 0.06 bar. The cost lands on P3, which the enemy hull buys back
+    // (MIN_ENEMY_HULL_WU, D128) — the two move in opposite directions and were
+    // solved together (D127). Guarded by tools/p3guard.mjs.
+    zoomCombat: 1.00, zoomIntimate: 1.22, zoomWide: 0.74, zoomEstablish: 0.42,
     zoomFill: 0.85,
     zoomOutRate: 1.10, zoomInRate: 0.22, zoomOutK: 9.0, zoomInK: 1.8,
     zoomInMargin: 1.18, zoomInDwell: 0.90, zoomDeadband: 0.02, zoomLockRange: 1400,
+    admitWu: 0,                 // = zoomLockRange (D129), assigned below rather than copied
 
     hud: 'landscape',
     stickZone:   { x: 0.00, y: 0.30, w: 0.46, h: 0.70 },   // handedness-mirrored
@@ -109,10 +169,53 @@ export const ZOOM_BIAS = { tight: +0.10, normal: 0.00, wide: -0.08 };
  */
 for (const P of Object.values(VIEW_PROFILE)) P.playfield.right = P.specialSlot.x;
 
-/** Stick radius, css px. R-12: DESIGN §2.2's 0.208-of-width, keeping the ported floor. */
+/**
+ * D129 — LANDSCAPE ADMITS EVERYTHING IT CAN TRACK, and that is a measurement.
+ *
+ * Portrait's 700 wu is derived above and it is worth what it costs there. In
+ * landscape the same radius buys NOTHING and costs the quantity the pivot was
+ * decided on:
+ *
+ *   landscape P0 in-clamp at admit 440 / 585 / 700 / 935 / 1400
+ *     = 0.0737 at EVERY ONE of them, to four decimals
+ *
+ * because landscape's containment is HEIGHT-bound — the ceiling is pinned at
+ * 0.8137 by the 585 wu dive recovery while the width term runs 1.10 to 2.46 and
+ * never binds (D124). Landscape's 0.0337 -> 0.0737 came entirely from D128's
+ * clamp floor, not from the admission radius. Meanwhile narrowing it to 700
+ * costs 0.53 s of in-frame warning (P2 median 1.23 -> 0.70 s), which is the
+ * number D121/D123 pivoted on.
+ *
+ * So landscape admits at its full lock range: DERIVED from `zoomLockRange`
+ * rather than copied, so that separating the two jobs further cannot silently
+ * re-merge them — the same reason `playfield.right` is assigned from
+ * `specialSlot.x` above.
+ */
+VIEW_PROFILE.landscape.admitWu = VIEW_PROFILE.landscape.zoomLockRange;
+
+/**
+ * Stick radius, css px. R-12: DESIGN §2.2's 0.208, keeping the ported floor.
+ *
+ * P8c — the fraction is now taken of the STICK ZONE's shorter side, not of
+ * `view.w`. `view.w` is the SHORT edge in portrait and the LONG edge in
+ * landscape, so landscape's radius came out 175.55 px inside a 273 px-tall
+ * zone: the thumb reached 39.7% of full nose-down deflection before running out
+ * of zone, and H12 read BETTER for it because a clamped thumb travels less
+ * (P8b §8.2, the fifth believable-wrong metric on this project).
+ *
+ * DESIGN's 0.208 was a fraction of a portrait canvas whose stick zone IS the
+ * full width and the short side, so `min(zone.w, zone.h)` reproduces portrait
+ * EXACTLY — 0.208 x 390 = 81.12 px, unchanged to the digit. That is the whole
+ * argument for this form: it is portrait-neutral by construction, and it is the
+ * fix `P2_NOTES` §R-12 wrote and P7's T8 did not make.
+ */
 export const STICK_R_FRAC = 0.208;
 export const STICK_R_MIN = 36;
-export const stickRadius = (viewW) => Math.max(STICK_R_MIN, viewW * STICK_R_FRAC);
+const _stickZone = { x: 0, y: 0, w: 0, h: 0 };
+export const stickRadius = (view) => {
+  const z = slotRect(view.profile.stickZone, view, _stickZone);
+  return Math.max(STICK_R_MIN, Math.min(z.w, z.h) * STICK_R_FRAC);
+};
 
 /** Resolve a normalised profile rect to css px, safe-area insets applied. */
 export function slotRect(rect, view, out) {

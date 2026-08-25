@@ -14,6 +14,13 @@ import { VIEW_PROFILE } from './viewprofile.js';
  * R.worldH are the extents at the CURRENT zoom (P1_NOTES §5.2) — different
  * quantities with the same names, and the camera solver needs the zoom-1 pair.
  */
+/**
+ * The one definition of "which way up is this". Exported because a harness page
+ * that picks its own worldH has to pick the same PROFILE the game would, and a
+ * second copy of `1.05` is exactly the shape D131 caught in `js/ui/hud.js`.
+ */
+export const modeFor = (w, h) => (h > w * 1.05 ? 'portrait' : 'landscape');
+
 export function createViewport(canvas, bus, opts = {}) {
   // ?dpr=1 exists so software-rendered headless captures stay tractable. Keep it.
   const q = typeof location !== 'undefined' ? new URLSearchParams(location.search) : new URLSearchParams();
@@ -83,7 +90,7 @@ export function createViewport(canvas, bus, opts = {}) {
     let w = Math.max(1, Math.round(rect.width || window.innerWidth));
     let h = Math.max(1, Math.round(rect.height || window.innerHeight));
     const dpr = clamp(window.devicePixelRatio || 1, 1, maxDpr);
-    const mode = lockMode || (h > w * 1.05 ? 'portrait' : 'landscape');
+    const mode = lockMode || modeFor(w, h);
 
     const changed = force || w !== view.w || h !== view.h || dpr !== view.dpr || mode !== view.mode;
     if (!changed) return false;

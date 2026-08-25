@@ -34,23 +34,23 @@
  {
   "id": "A4",
   "pass": true,
-  "line": "worst cutout multiplicity on one screen 2 (FAIL at 3+), 19/180 frames contain any repeat at all, on the worst frame 8 cutouts drawn from 7 distinct ids",
+  "line": "worst cutout multiplicity on one screen 2 (FAIL at 3+), 32/180 frames contain any repeat at all, on the worst frame 8 cutouts drawn from 5 distinct ids",
   "worst": {
    "total": 8,
-   "distinct": 7,
+   "distinct": 5,
    "worst": 2,
-   "rawWorst": 2,
+   "rawWorst": 4,
    "repeats": [
     [
-     "cS17",
+     "cL08",
      2
     ]
    ],
    "speed": 400,
-   "i": 5
+   "i": 1
   },
   "frames": 180,
-  "withRepeat": 19
+  "withRepeat": 32
  },
  {
   "id": "A5",

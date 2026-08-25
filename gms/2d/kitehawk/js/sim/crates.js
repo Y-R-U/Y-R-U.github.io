@@ -28,6 +28,7 @@ import { G_SI, RHO0, H_SCALE } from '../data/tables.js';
 import { density } from './aero.js';
 import { GUNS } from './weapons.js';
 import { applyDamage, bugOf } from './damage.js';
+import { windAt, windAtNearest } from './world.js';
 
 /* ---------------------------------------------------------- the constants -- */
 /**
@@ -207,24 +208,14 @@ export function crateIdentity() {
 
 /* ------------------------------------------------------------------- wind -- */
 /**
- * A per-level piecewise-linear altitude table, `[[altM, vxMS], ...]` low to
- * high. A crate under canopy relaxes onto the LOCAL wind, so two layers with
- * different winds make a falling crate curve — which is what turns §4.6.1's
- * "The Shear" into a decision instead of flavour.
+ * P9: `windAt` MOVED to `js/sim/world.js`, which is where the level's wind
+ * profile now lives, and is re-exported here so every existing caller keeps
+ * working. This is not tidying — W5 requires the crate solver and the AI's wind
+ * estimator to be the same evaluator, and `field.rendezvous` below IS the AI's
+ * estimator, so "the same" has to mean the same function object rather than the
+ * same arithmetic written twice. `tools/worldgate.mjs` asserts it by identity.
  */
-export function windAt(profile, altM) {
-  const p = profile;
-  if (!p || p.length === 0) return 0;
-  if (altM <= p[0][0]) return p[0][1];
-  for (let i = 1; i < p.length; i++) {
-    if (altM <= p[i][0]) {
-      const a = p[i - 1], b = p[i];
-      const t = (altM - a[0]) / Math.max(1e-6, b[0] - a[0]);
-      return a[1] + (b[1] - a[1]) * t;
-    }
-  }
-  return p[p.length - 1][1];
-}
+export { windAt } from './world.js';
 
 /* ------------------------------------------------------------- the field --- */
 
@@ -712,9 +703,19 @@ export function createCrateField(world, opts = {}) {
     const step = LADDER[idx];
     if (step.dmgMult) {
       field.dmgMult *= step.dmgMult;
-      for (let i = 0; i < world.live.length; i++) {
-        const e = world.live[i];
-        if (e.side !== 1) e.dmgMult = field.dmgMult;
+      /**
+       * `world.aircraft`, not `world.live`. `live` is rebuilt inside
+       * `world.update`, so it is EMPTY until the first tick — and a level that
+       * STARTS behind advances the ladder before tick zero. This rung then
+       * reached nobody, silently: the spawns still arrived, so anything
+       * watching reinforcements saw the treatment as delivered. Mid-tick the
+       * two lists agree (`live` is `aircraft` filtered by `alive`), which is
+       * why nothing shipped changes and the blessed hashes do not move.
+       */
+      const roll = bugOf(ctx) === 'preload-live' ? world.live : world.aircraft;
+      for (let i = 0; i < roll.length; i++) {
+        const e = roll[i];
+        if (e.alive && e.side !== 1) e.dmgMult = field.dmgMult;
       }
     }
     if (step.moraleFloor) {
@@ -795,6 +796,16 @@ export function createCrateField(world, opts = {}) {
    *
    * Writes into `out` so the AI can call it every decision without allocating.
    */
+  /**
+   * W5's break-switch. `?bug=second-wind` gives the SOLVER and the AI ESTIMATOR
+   * a second, subtly different interpolator while the crate's own fall keeps the
+   * shipped one — which is what a divergence between two hand-written wind
+   * models actually looks like: agreement at every knot, disagreement between
+   * them. No shipped build sets it; it exists so W5 can be shown to fail.
+   */
+  const solverWind = (profile, altM) =>
+    (bugOf(ctx) === 'second-wind' ? windAtNearest : windAt)(profile, altM);
+
   const PRED_STEP = 1 / 6;
   field.predict = (c, secs, windErr, out) => {
     let x = c.sx, y = c.sy, vx = c.svx, vy = c.svy;
@@ -804,7 +815,7 @@ export function createCrateField(world, opts = {}) {
       const h = Math.min(PRED_STEP, secs - t);
       const altM = Math.max(0, -y);
       const rho = density(altM);
-      const wx = windAt(field.wind, altM) + windErr;
+      const wx = solverWind(field.wind, altM) + windErr;
       const ux = vx - wx, uy = vy;
       const k = 0.5 * rho * CdA * Math.hypot(ux, uy) / CRATE.m;
       vx += -k * ux * h;
@@ -857,7 +868,7 @@ export function createCrateField(world, opts = {}) {
     for (let i = 0; i < 1600; i++) {
       const altM = Math.max(0, -y);
       const rho = density(altM);
-      const wx = windAt(field.wind, altM) + windErr;
+      const wx = solverWind(field.wind, altM) + windErr;
       const ux = vx - wx, uy = vy;
       const k = 0.5 * rho * CdA * Math.hypot(ux, uy) / CRATE.m;
       vx += -k * ux * h;

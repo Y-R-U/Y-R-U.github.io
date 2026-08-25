@@ -27,7 +27,7 @@ import { fileURLToPath } from 'node:url';
 
 import { M_PER_WU } from '../js/core/math.js';
 import { createRNG } from '../js/core/rng.js';
-import { bandIdAt } from '../js/core/bands.js';
+import { bandIdAt, BANDS as BAND_TABLE, BEST_CLIMB_WU_S, CRUISE_MS, CRUISE_WU_S } from '../js/core/bands.js';
 import { AIRFRAMES, AIRFRAME_BY_ID, REFERENCE, makeAirframe, N_REF, G_SI, PITCH, AGILITY,
          pitchCeiling, checkBands, unitIdentity, BANDS } from '../js/data/tables.js';
 import { createFlight } from '../js/sim/flight.js';
@@ -48,14 +48,37 @@ import { createCrateField, CRATE, CONTENTS, CONTENT_BY_KIND, CRATE_EV, LADDER, S
          smallArmsP, terminalAt as crateTerminal, tau, swingPeriod, crateIdentity, windAt,
          reachCone, soonestCatch, soonestCut, ACT_MULT } from '../js/sim/crates.js';
 import { CEILING_WU } from '../js/core/bands.js';
+import { createLevel } from '../js/data/level.js';
+import { validateLevel, formatErrors, evalCondition } from '../js/data/validate.js';
+import { containInLevel } from '../js/modes/story.js';
+import { createSpawner, SPAWN_LEAD_WU } from '../js/sim/spawner.js';
 
 /** P6's break switch, kept separate from P4's `BROKEN` and P5's `P5BUG`. */
 let P6BUG = '';
+let P9BUG = '';
+
+/**
+ * P9's break-switches, and they are REGISTERED rather than read straight off the
+ * command line. The first version read `--break` with `opt()` inside the level
+ * runner, so `--break no-beats` fell through `main()`'s dispatcher, printed
+ * "must be one of ..." and **exited before running anything** — and the three
+ * controls came back with byte-identical hashes, which reads exactly like three
+ * controls that do not bite. D136's `noreanchor` was the same defect: a
+ * break-switch that is not plumbed is indistinguishable from a fix that works.
+ */
+const P9_BREAKS = {
+  'no-corridor': 'the level stops being a corridor — the player may fly off either end',
+  'no-beats': 'the level\'s own beats are stripped; only the corridor remains',
+  'camera-current': 'the spawner is fed the camera\'s CURRENT x, not the furthest it has reached',
+  'no-lid': 'the corridor loses its LID — the act ceiling (D150) stops being enforced',
+};
 const P6_BREAKS = Object.freeze({
   'pin-swing':    'crates.js: the pendulum is pinned to zero — the hitbox stops moving',
   'flat-wind':    'crates.js: the wind is sampled at 750 m for every altitude — no shear',
   'burst-free':   'crates.js: T20 deleted — a cut crate never bursts, at any altitude',
   'no-ladder':    'crates.js: §4.5 reduced to a counter — a banked crate buys the enemy nothing',
+  'preload-live': 'crates.js: the ladder\'s damage rung is applied over world.live — empty before tick 0',
+  'rein-stacked': 'sim.mjs: every flushed reinforcement spawns on ONE point — they collide on arrival',
   'point-bullets': 'crates.js: rounds are tested as POINTS at tick resolution, not segments',
   'crate-zoom':   'crates.js: the 9 m collect radius scales with the camera zoom (K10 tripwire)',
 });
@@ -1429,14 +1452,31 @@ function crateWorld(L, opts = {}) {
    * exactly 0.0 points on every seed. A reinforcement that cannot find you is a
    * counter on a ledger, which is the precise thing §4.5 says it must not be.
    */
+  /**
+   * STAGGERED, and the id carries the ordinal. `flushPending` fires every
+   * pending reinforcement in ONE tick — which is what a level that starts
+   * behind must do — so `world.t` is the same for all of them and so was the
+   * spawn point. Two aeroplanes then materialised inside each other: the
+   * collision radius is 5.2 m and a contact costs 60 HP a tick, so a 60 HP
+   * kestrel was dead on the frame it arrived. The gate still read the treatment
+   * as DELIVERED, because the carcasses stay in `world.live` for ~20 s and the
+   * selector was counting enemy-seconds.
+   *
+   * The spacing is the level's own: `crateWorld` lines its opening enemies up
+   * at 130 m in x and 70 m in y and they have never collided. 130 m against a
+   * 5.2 m radius is 25x. The id was `'rein' + world.t.toFixed(1)`, which
+   * collided in `byIdMap` for the same reason.
+   */
   let reinforced = 0;
   field.onReinforce = (typeId) => {
     const t = ENEMY_BY_ID[typeId];
     if (!t) return;
+    const i = P6BUG === 'rein-stacked' ? 0 : reinforced;
     reinforced++;
     const dir = Math.cos(player.flight.theta) >= 0 ? 1 : -1;
-    const e = world.spawn(t, { id: 'rein' + world.t.toFixed(1), side: -1,
-                               xM: player.flight.sx + dir * 800, yM: player.flight.sy - 60,
+    const e = world.spawn(t, { id: 'rein' + i, side: -1,
+                               xM: player.flight.sx + dir * (800 + i * 130),
+                               yM: player.flight.sy - 60 - i * 70,
                                speed: 44, theta: dir > 0 ? Math.PI : 0, k: 0.62 });
     if (e) { e.ai = createAI(e, { k: 0.62 }); e.cratePolicy = { run: true }; e.dmgMult = field.dmgMult; }
   };
@@ -1451,7 +1491,7 @@ function crateMission(opts = {}) {
   const { world, field, player } = R;
   const secs = opts.secs ?? L.secs;
   const n = Math.round(secs / DT);
-  let di = 0, dead = false, deadAt = 0;
+  let di = 0, dead = false, deadAt = 0, redSeconds = 0;
   const dropped = [];
   /**
    * "Losing three crates" is a state the level is ALREADY IN, so the aeroplanes
@@ -1480,6 +1520,9 @@ function crateMission(opts = {}) {
      * A crate level is a CONTESTED AREA, and the bounds say so.
      */
     for (let k = 0; k < world.live.length; k++) keepInside(world, world.live[k], L);
+    // P9/D139: enemy-seconds, so K5 can select on whether the treatment was
+    // DELIVERED rather than on whether the outcome had headroom.
+    for (let k = 0; k < world.live.length; k++) if (world.live[k].side === -1) redSeconds += DT;
     if (player.dead && !dead) { dead = true; deadAt = t; if (opts.stopOnDeath !== false) break; }
   }
 
@@ -1497,6 +1540,7 @@ function crateMission(opts = {}) {
     dead, deadAt: +deadAt.toFixed(1),
     reinforced: R.reinforcedAt(),
     redsAlive: world.aircraft.filter(a => a.alive && a.side === -1).length,
+    redSeconds: +redSeconds.toFixed(1),
   };
 }
 
@@ -1862,6 +1906,238 @@ function printReach(rep) {
               (rep.bad.length ? ' — ' + rep.bad.map(b => `${b.id} (${b.limit}, short ${b.shortM} m)`).join(', ') : ''));
 }
 
+/* ------------------------------------------------------- the spawner (W8) - */
+/**
+ * W8's rig. It lives here rather than in `tools/worldgate.mjs` because THIS file
+ * owns world construction — a gate that builds its own world is measuring a
+ * second implementation of the game, which is the defect W5 exists to name.
+ * `worldgate` shells out to it, exactly as W1b already does for the run summary.
+ *
+ * The camera is driven by the PLAYER, not by a scripted ramp: `camWu` is the
+ * furthest world-x the player has reached, in world units. That is what the real
+ * camera does, and a ramp would test the ramp.
+ */
+function spawnerRun({ level, secs = 300, seed = 5, enemies = 0 } = {}) {
+  const L = CRATE_LEVELS['k-drop'];
+  const R = crateWorld(L, { seed, enemies, groundFire: false });
+  const { world, field, player } = R;
+  const lvl = createLevel(level);
+  const log = [];
+  const sp = createSpawner(world, lvl, {
+    onSpawn: (e, b) => log.push(`${world.t.toFixed(2)}|${b.x}|${e.type.id}|${e.flight.sx.toFixed(1)}|${e.flight.sy.toFixed(1)}`),
+    onBeat: (b) => log.push(`${world.t.toFixed(2)}|${b.x}|${b.event || b.boss || b.line || 'beat'}`),
+  });
+
+  const alloc0 = { ...world.alloc };
+  const n = Math.round(secs / DT);
+  let maxLive = 0, camWu = 0, retreats = 0, lastX = 0;
+  for (let i = 0; i < n; i++) {
+    world.update(DT);
+    for (let k = 0; k < world.live.length; k++) keepInside(world, world.live[k], L);
+    const xWu = player.flight.sx / M_PER_WU;
+    if (xWu < lastX) retreats++;
+    lastX = xWu;
+    camWu = Math.max(camWu, xWu);
+    sp.update(camWu);
+    let live = 0;
+    for (let k = 0; k < world.live.length; k++) if (world.live[k].side === -1) live++;
+    if (live > maxLive) maxLive = live;
+  }
+  const alloc1 = { ...world.alloc };
+  return {
+    level: lvl.id, secs, seed, beats: lvl.beats.length,
+    fired: sp.state.fired, remaining: sp.remaining, poolMisses: sp.state.poolMisses,
+    unknownTypes: sp.state.unknownTypes,
+    camWu: +camWu.toFixed(1), retreatTicks: retreats, maxLiveReds: maxLive,
+    allocBefore: alloc0, allocAfter: alloc1,
+    allocGrew: Object.keys(alloc0).some((k) => alloc1[k] !== alloc0[k]),
+    spawnLeadWu: SPAWN_LEAD_WU,
+    logHash: (() => { let h = 2166136261 >>> 0; const t = log.join('\n');
+      for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return (h >>> 0).toString(16).padStart(8, '0'); })(),
+    logLines: log.length,
+  };
+}
+
+/* ------------------------------------------- a WORKED LEVEL, flown (W3/W4) - */
+/**
+ * P9 item 7's instrument. `spawnerRun` above measures the SPAWNER, in the crate
+ * world, because W8 is a claim about the entity pool. This measures a LEVEL: the
+ * world is built from the level's own wind, terrain and player start, the beats
+ * are fired by the shipped spawner, and what comes out is ARCHITECTURE §8.1's
+ * run summary — the same field names the star conditions are written against, so
+ * `evalCondition` scores the level's own stars off it without a second path.
+ *
+ * It is NOT the story mode. There is no brief, no debrief, no objective
+ * evaluation and no save; those are P10's and building half of them here would
+ * put a second mode shell in the harness. What it is is the smallest thing that
+ * makes W3 (determinism) and W4 (the band slice) measurable on a real level
+ * rather than asserted about a JSON document.
+ */
+/**
+ * The level is a CORRIDOR, `0 .. length`, and this is the rule that says so.
+ *
+ * It is here because of what the first run measured: with the shipped AI and
+ * nothing else, the player engaged the level's two Kestrels at 2,100 wu, came
+ * out of the turn pointing WEST, and PATROLLED west for 240 s until the fuel ran
+ * out — 57,900 wu off the far end of a 14,000 wu level. PATROL holds the heading
+ * it inherits; it has no idea where the objective is, because **telling him is
+ * the mode shell's job and the mode shell is P10**. The level's own
+ * `{ type: 'reach', x: length }` is the whole statement of where he is going.
+ *
+ * So rather than write a second controller here — which is the defect W5 exists
+ * to name, one system over — the harness gives the level the bounds it already
+ * declares, exactly as `keepInside` gives the crate level its contested area
+ * (§7.5's duel rule). What that measures is a player who cannot leave the level,
+ * which is what a side-scroller level IS, and it is declared rather than
+ * implied: **`--break no-corridor` removes it, and W4 goes red when it does.**
+ */
+/**
+ * P10: the corridor moved into `js/modes/story.js`, which is the mode shell the
+ * comment above says owns it. There is exactly ONE implementation and both the
+ * headless level run and the browser's play scene call it — a second copy here
+ * is the defect W5 exists to name, one system over. The lid is D150's.
+ */
+const keepInsideLevel = (world, e, lengthWu, ceilingWu, o) =>
+  containInLevel(world, e, lengthWu, ceilingWu, o);
+
+function levelRun({ level, seed = 5, secs = 300, bug = P9BUG } = {}) {
+  const lvl = createLevel(level);
+  const res = validateLevel(lvl);
+  if (!res.ok) throw new Error(formatErrors(lvl.id, res.errors).join('\n'));
+
+  const ctx = { rng: createRNG(seed), bus: null, bug: '', zoom: 1 };
+  const world = createWorld(ctx, {});
+  world.arena.lineX = 0;
+  const field = createCrateField(world, {
+    wind: lvl.wind, lineX: 0, actMult: ACT_MULT[lvl.act] ?? 1,
+    gustPhase: 0.7, gustSeed: seed * 7919,
+    engage: { 1: 'none', '-1': 'take' }, groundFire: false,
+  });
+
+  const af = AIRFRAME_BY_ID[lvl.player.airframe] || REFERENCE;
+  const player = world.spawn(playerType(af.id, 't2'), {
+    id: 'player', side: 1, xM: lvl.player.start.x * M_PER_WU, yM: lvl.player.start.y * M_PER_WU,
+    speed: CRUISE_MS, theta: 0, k: 0.70, morale: 1, aggro: 1.2 });
+  player.noFlee = true;
+  player.ai = createAI(player, { k: 0.70, aggro: 1.2 });
+  player.cratePolicy = { run: false };
+
+  const log = [];
+  /**
+   * `--break no-beats` strips the level's content and leaves the corridor. It is
+   * W4's control: if the band slice does not move when the level's own beats are
+   * removed, W4 is measuring the harness rather than the level.
+   */
+  const spLevel = bug === 'no-beats' ? { ...lvl, beats: [] } : lvl;
+  const sp = createSpawner(world, spLevel, {
+    onSpawn: (e, b) => { e.ai = createAI(e, { k: b.k ?? 0.6 }); e.cratePolicy = { run: true };
+      log.push(`${world.t.toFixed(2)}|${b.x}|${e.type.id}|${e.flight.sx.toFixed(1)}|${e.flight.sy.toFixed(1)}`); },
+    onBeat: (b) => log.push(`${world.t.toFixed(2)}|${b.x}|${b.event || b.boss || b.line || 'beat'}`),
+  });
+
+  const timeInBand = Object.fromEntries(BAND_TABLE.map((b) => [b.id, 0]));
+  const alloc0 = { ...world.alloc };
+  const n = Math.round(secs / DT);
+  /**
+   * `--break camera-current` is the control for the monotone camera: it feeds
+   * the spawner the player's CURRENT x rather than the furthest he has reached.
+   */
+  const monotone = bug !== 'camera-current';
+  /**
+   * D150's lid, read off the level rather than typed. `--break no-lid` removes
+   * it and W4 must go red on a1-01 when it does; the arm reports the value it
+   * actually used, because a break-switch that only reports what it was ASKED
+   * to do is how three of P9's controls came back green (D148).
+   */
+  const lidWu = bug === 'no-lid' ? 0 : lvl.column.ceiling;
+  const CORRIDOR = { noLid: bug === 'no-lid' };
+  let camWu = lvl.player.start.x, kills = 0, stalls = 0, blackouts = 0, peakG = 0, lidHits = 0;
+  let wasStalled = false, blackPrev = false, reachedAt = 0, t = 0;
+  const seen = new Set();
+
+  for (let i = 0; i < n; i++) {
+    world.update(DT);
+    t = (i + 1) * DT;
+    const f = player.flight;
+    // The reach test comes BEFORE the corridor, because crossing the far end IS
+    // the objective and the corridor would otherwise reflect him one metre short.
+    if (!reachedAt && f.sx / M_PER_WU >= lvl.length) reachedAt = t;
+    if (bug !== 'no-corridor')
+      for (let k = 0; k < world.live.length; k++)
+        lidHits += (keepInsideLevel(world, world.live[k], lvl.length, lidWu, CORRIDOR) & 1) ? 1 : 0;
+    const xWu = f.sx / M_PER_WU;
+    camWu = monotone ? Math.max(camWu, xWu) : xWu;
+    sp.update(camWu);
+    timeInBand[bandIdAt(f.sy / M_PER_WU)] += DT;
+    peakG = Math.max(peakG, f.stress);
+    if (f.stalled && !wasStalled) stalls++;
+    wasStalled = f.stalled;
+    if (f.blackout && !blackPrev) blackouts++;
+    blackPrev = f.blackout;
+    for (let j = 0; j < world.aircraft.length; j++) {
+      const e = world.aircraft[j];
+      if (e.side === -1 && !e.alive && !seen.has(e.id)) { seen.add(e.id); kills++; }
+    }
+    if (player.dead || reachedAt) break;
+  }
+
+  const cs = field.stats;
+  const summary = {
+    level: lvl.id, seed, pilot: 'competent', completed: !!reachedAt && !player.dead,
+    time: +t.toFixed(1),
+    damageTaken: +player.flight.damageHP.toFixed(1),
+    deaths: player.dead ? 1 : 0,
+    kills,
+    cratesCaught: cs.playerBanked, cratesMissed: cs.dropped - cs.playerBanked,
+    shotsFired: player.gun.fired, hits: player.gun.hits,
+    accuracy: player.gun.fired ? +(player.gun.hits / player.gun.fired).toFixed(3) : 0,
+    ammoLeft: player.gun.ammo, fuelLeft: +(player.flight.fuel / 100).toFixed(3),
+    peakG: +peakG.toFixed(2), stalls, blackouts,
+    timeInBand: Object.fromEntries(Object.entries(timeInBand).map(([k, v]) => [k, +v.toFixed(1)])),
+    difficulty: 0, abort: null,
+  };
+
+  /**
+   * D31's 2-3 band slice, and "occupied" is DERIVED rather than a share picked
+   * to make the answer come out: a band is occupied if the player spent longer
+   * in it than crossing it costs at best climb — `thickness / BEST_CLIMB_WU_S`.
+   * Anything under that is a transit, which is what a band being a *place*
+   * rather than a *step* means (D27).
+   */
+  const occupancy = BAND_TABLE.map((b) => ({
+    id: b.id, s: summary.timeInBand[b.id],
+    transitS: +(Math.abs(b.y1 - b.y0) / BEST_CLIMB_WU_S).toFixed(2),
+  }));
+  const occupied = occupancy.filter((o) => o.s > o.transitS).map((o) => o.id);
+
+  return {
+    ...summary,
+    reachedAt: +reachedAt.toFixed(1), lengthWu: lvl.length,
+    beats: lvl.beats.length, fired: sp.state.fired, poolMisses: sp.state.poolMisses,
+    unknownTypes: sp.state.unknownTypes, camWu: +camWu.toFixed(1),
+    occupancy, occupied, touched: occupancy.filter((o) => o.s > 0).map((o) => o.id),
+    lidWu, lidHits,
+    stars: lvl.stars.map((c) => ({ id: c.id, got: evalCondition(c, summary) })),
+    allocBefore: alloc0, allocAfter: { ...world.alloc },
+    allocGrew: Object.keys(alloc0).some((k) => world.alloc[k] !== alloc0[k]),
+    logLines: log.length,
+    logHash: (() => { let h = 2166136261 >>> 0; const txt = log.join('\n');
+      for (let i = 0; i < txt.length; i++) { h ^= txt.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return (h >>> 0).toString(16).padStart(8, '0'); })(),
+    hash: null,
+  };
+}
+
+/** The state hash W3 compares. Every reported field except the seed itself. */
+function levelHash(r) {
+  const { seed, ...rest } = r;
+  const txt = JSON.stringify(rest);
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < txt.length; i++) { h ^= txt.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0).toString(16).padStart(8, '0');
+}
+
 /* ------------------------------------------------------- the ladder (K5) -- */
 
 /**
@@ -1876,54 +2152,165 @@ function printReach(rep) {
  * exactly the state "you have lost N crates" means. What is being asked is
  * whether §4.5's ladder is worth anything, not whether crates exist.
  */
-function ladderCell({ runs, level, gun, enemies }) {
+const meanVar = (a) => {
+  const n = a.length, m = a.reduce((x, y) => x + y, 0) / n;
+  const v = n > 1 ? a.reduce((x, y) => x + (y - m) * (y - m), 0) / (n - 1) : 0;
+  return { n, mean: m, var: v, se: Math.sqrt(v / n) };
+};
+
+function ladderCell({ runs, level, gun, enemies, seed0 = 4000 }) {
   const out = [];
   for (const lost of [0, 3]) {
-    let deaths = 0, hp = 0;
+    let deaths = 0, reinf = 0;
+    const hp = [], red = [];
     for (let i = 0; i < runs; i++) {
-      const r = crateMission({ level, seed: 4000 + i, preLost: lost, stopOnDeath: false,
+      const r = crateMission({ level, seed: seed0 + i, preLost: lost, stopOnDeath: false,
                                noDrops: true, policyName: 'ignore', policy: { run: false },
                                engage: 'none', gun, enemies });
       if (r.dead) deaths++;
-      hp += r.hpLost;
+      reinf += r.reinforced;
+      hp.push(r.hpLost);
+      red.push(r.redSeconds);
     }
-    out.push({ lost, runs, deaths, deathRate: deaths / runs, hpPerRun: hp / runs });
+    const h = meanVar(hp), rs = meanVar(red);
+    out.push({ lost, runs, deaths, deathRate: deaths / runs, hpPerRun: h.mean, hpSE: h.se,
+               redSeconds: rs.mean, reinf: reinf / runs });
   }
-  return { gun, enemies, base: out[0], with3: out[1],
+  const dHP = out[1].hpPerRun - out[0].hpPerRun;
+  const se = Math.sqrt(out[0].hpSE ** 2 + out[1].hpSE ** 2);
+  const dRed = out[1].redSeconds - out[0].redSeconds;
+  return { gun, enemies, base: out[0], with3: out[1], reinf: out[1].reinf,
            deltaPts: +((out[1].deathRate - out[0].deathRate) * 100).toFixed(1),
-           deltaHP: +(out[1].hpPerRun - out[0].hpPerRun).toFixed(1) };
+           deltaHP: +dHP.toFixed(1), seHP: +se.toFixed(2),
+           deltaRedSeconds: +dRed.toFixed(1),
+           /**
+            * DELIVERED, not "in band". The old selection rule kept the cells
+            * whose BASELINE DEATH RATE sat inside 8-30% — an OUTCOME-dependent
+            * filter, and therefore exactly the floor effect D139 names: a cell
+            * at 3% baseline has no room to improve, so the rule quietly kept
+            * only the cells where the answer was already possible. This selects
+            * on whether the INTERVENTION reached the map at all, which is a
+            * property of the treatment arm and cannot bias the outcome.
+            */
+           delivered: dRed > 0 };
+  /**
+   * ENEMY-SECONDS ALONE IS NOT PROOF OF DELIVERY, and that is how two defects
+   * hid. Before the fixes below this same selector read `delivered: yes` in all
+   * six cells for two reinforcements that were DEAD ON ARRIVAL — the carcasses
+   * stay in `world.live` for ~20 s, which is enough to make the delta positive.
+   * The two guards that make the claim real are structural rather than
+   * statistical, and both have been run red: the `ladderPreload` fixture
+   * (`--break preload-live`) and `--break rein-stacked`.
+   */
 }
 
 /**
- * K5 / T21, and the SELECTION RULE is stated before the numbers so it is not a
- * choice made after seeing them: the ladder is measured on the configurations
- * whose BASELINE death rate falls inside DESIGN §10.5's own 8-30% band. A level
- * whose baseline is already 32-37% has no headroom — three more aeroplanes
- * cannot raise a death rate that is past its own design ceiling, and the extra
- * friendly losses drive §5.2's morale table into a squadron-wide bug-out, so the
- * measurement comes back NEGATIVE. That is the level being wrong, not the ladder.
+ * K5 / T21 — RE-SPECIFIED (D139). The ladder was fine; the instrument was not.
+ *
+ * T21's own register test is *"if losing 3 crates does not **measurably** raise
+ * the death rate, the ladder is decoration"*. The operative word is MEASURABLY,
+ * and the death rate could not measure it for two reasons visible in the gate's
+ * own output:
+ *
+ *   FLOOR EFFECT.   The old rule pooled only cells whose BASELINE death rate sat
+ *                   inside DESIGN §10.5's 8-30% band. That is an OUTCOME-dependent
+ *                   filter: a cell at 3.3% baseline has no room to improve, so
+ *                   the rule kept only the cells where an answer was possible and
+ *                   the answer it kept was whatever those two cells happened to say.
+ *   QUANTISATION.   30 sorties per cell means the death rate can only move in
+ *                   steps of 3.33 points. Both surviving cells read 20.0% -> 20.0%
+ *                   — a dead heat that is an artefact of the step size, not a result.
+ *
+ * Meanwhile HP lost per sortie is CONTINUOUS, has no ceiling in the 8-30% sense,
+ * and was positive in every cell. So:
+ *
+ *   PRIMARY   pooled `deltaHP` per sortie, over the cells where the ladder was
+ *             DELIVERED (`deltaRedSeconds > 0` — a property of the treatment,
+ *             not of the outcome), must be >= 2 x its own standard error. That
+ *             is "measurably" said in the only way a continuous measure can say
+ *             it, and it is the register's word rather than a magnitude invented
+ *             here.
+ *   SECONDARY reported and NOT gated: the death-rate delta, its 100/runs quantum,
+ *             and deltaHP as a fraction of the HP cost of ONE MORE AEROPLANE —
+ *             which this same sweep measures, so the magnitude has a unit a
+ *             designer can act on without a threshold being made up for it.
  */
-function ladderReport({ runs = num('runs', 60), level = 'k-drop' } = {}) {
+/**
+ * Sorties per cell per arm. DERIVED from what the criterion must be able to
+ * RESOLVE, which is a property of LADDER, not of the effect that came out.
+ *
+ *   smallest rung of LADDER        step 2, dmgMult 1.12 — 12% more incoming fire.
+ *                                  It is the only rung that is not an aeroplane,
+ *                                  so it is the floor on "measurably".
+ *   pooled baseline HP per sortie  123.4 HP, measured in this same sweep
+ *                                  (`baseHPPooled` below, printed not typed)
+ *   the rung is therefore worth    0.12 x 123.4 = 14.8 HP per sortie
+ *   to see that at the bar t >= 2  pooled SE <= 14.8 / 2 = 7.4 HP
+ *   measured pooled SE at 30       4.69 HP — 1.6x inside
+ *
+ * 30 STAYS. The sample size was swept to 240 per cell, but to FALSIFY the +7.4
+ * that D139 was written on, not to buy significance: at 240 the pre-fix figure
+ * converges to -0.78 +- 1.80 and flips sign between seed blocks, so the +7.4 was
+ * a 30-sortie artefact of exactly the kind it was replacing. What moved K5 is
+ * the two delivery defects below, not the number of runs.
+ */
+const K5_RUNS = 30;
+
+function ladderReport({ runs = num('runs', 60), level = 'k-drop', seed0 = num('seed0', 4000) } = {}) {
   const cells = [];
-  for (const gun of ['t1', 't2']) for (const enemies of [1, 2, 3]) cells.push(ladderCell({ runs, level, gun, enemies }));
-  const inBand = cells.filter(c => c.base.deathRate >= 0.08 && c.base.deathRate <= 0.30);
-  const pooled = inBand.length
-    ? { base: inBand.reduce((s, c) => s + c.base.deathRate, 0) / inBand.length,
-        with3: inBand.reduce((s, c) => s + c.with3.deathRate, 0) / inBand.length,
-        hp: inBand.reduce((s, c) => s + c.deltaHP, 0) / inBand.length }
-    : null;
+  for (const gun of ['t1', 't2']) for (const enemies of [1, 2, 3]) cells.push(ladderCell({ runs, level, gun, enemies, seed0 }));
+  const live = cells.filter(c => c.delivered);
+  const k = live.length;
+  const deltaHP = k ? live.reduce((s, c) => s + c.deltaHP, 0) / k : 0;
+  // SE of a mean of k independent per-cell deltas.
+  const seHP = k ? Math.sqrt(live.reduce((s, c) => s + c.seHP * c.seHP, 0)) / k : 0;
+  /**
+   * The same pool over ALL cells, reported and not gated. It exists so the
+   * break-switch reads as a NUMBER GOING FLAT rather than as an empty
+   * selection: under `--break no-ladder` no cell is delivered, `k` is 0 and the
+   * gated figure is 0 by vacuity — which is a red for the wrong reason. Pooled
+   * over all six, the same switch reads exactly 0.00, because the two arms then
+   * receive bit-identical input.
+   */
+  const deltaHPAll = cells.reduce((s, c) => s + c.deltaHP, 0) / cells.length;
+  const seHPAll = Math.sqrt(cells.reduce((s, c) => s + c.seHP * c.seHP, 0)) / cells.length;
+  const deathBase = k ? live.reduce((s, c) => s + c.base.deathRate, 0) / k : 0;
+  const deathWith = k ? live.reduce((s, c) => s + c.with3.deathRate, 0) / k : 0;
+
+  /**
+   * The unit for the magnitude, measured in this same sweep rather than
+   * asserted: how much HP one MORE hostile aeroplane costs, from the baseline
+   * arm's own 1e -> 2e -> 3e ladder. Nothing here is a threshold; it is what
+   * turns "+7.4 HP" into a sentence.
+   */
+  const baseHPPooled = cells.reduce((s, c) => s + c.base.hpPerRun, 0) / cells.length;
+  const byCfg = Object.fromEntries(cells.map(c => [`${c.gun}${c.enemies}`, c.base.hpPerRun]));
+  const perEnemy = [];
+  for (const g of ['t1', 't2']) for (const [a, b] of [[1, 2], [2, 3]])
+    if (byCfg[`${g}${a}`] !== undefined && byCfg[`${g}${b}`] !== undefined)
+      perEnemy.push(byCfg[`${g}${b}`] - byCfg[`${g}${a}`]);
+  const hpPerEnemy = perEnemy.length ? perEnemy.reduce((s, v) => s + v, 0) / perEnemy.length : 0;
+
   return {
-    runs, cells: cells.map(c => ({ gun: c.gun, enemies: c.enemies,
+    runs, level, seed0,
+    cells: cells.map(c => ({ gun: c.gun, enemies: c.enemies,
       base: +c.base.deathRate.toFixed(3), with3: +c.with3.deathRate.toFixed(3),
       deltaPts: c.deltaPts, baseHP: +c.base.hpPerRun.toFixed(1), deltaHP: c.deltaHP,
-      inBand: c.base.deathRate >= 0.08 && c.base.deathRate <= 0.30 })),
-    inBandCells: inBand.length,
-    rows: [{ lost: 0, runs, deathRate: pooled ? +pooled.base.toFixed(3) : 0,
-             hpPerRun: +(cells[1].base.hpPerRun).toFixed(1) },
-           { lost: 3, runs, deathRate: pooled ? +pooled.with3.toFixed(3) : 0,
-             hpPerRun: +(cells[1].with3.hpPerRun).toFixed(1) }],
-    deltaPts: pooled ? +((pooled.with3 - pooled.base) * 100).toFixed(1) : 0,
-    deltaHP: pooled ? +pooled.hp.toFixed(1) : 0,
+      seHP: c.seHP, deltaRedSeconds: c.deltaRedSeconds, reinf: +c.reinf.toFixed(2),
+      baseRedSeconds: +c.base.redSeconds.toFixed(1), delivered: c.delivered })),
+    deliveredCells: k,
+    deltaHP: +deltaHP.toFixed(2), seHP: +seHP.toFixed(2),
+    tStat: seHP > 0 ? +(deltaHP / seHP).toFixed(2) : 0,
+    positiveCells: live.filter(c => c.deltaHP > 0).length,
+    deltaHPAll: +deltaHPAll.toFixed(2), seHPAll: +seHPAll.toFixed(2),
+    tStatAll: seHPAll > 0 ? +(deltaHPAll / seHPAll).toFixed(2) : 0,
+    // secondary, reported not gated
+    deathQuantumPts: +(100 / runs).toFixed(2),
+    deltaPts: +((deathWith - deathBase) * 100).toFixed(1),
+    hpPerEnemy: +hpPerEnemy.toFixed(1),
+    baseHPPooled: +baseHPPooled.toFixed(1),
+    smallestRungHP: +(0.12 * baseHPPooled).toFixed(1),
+    deltaAsEnemies: hpPerEnemy > 0 ? +(deltaHP / hpPerEnemy).toFixed(2) : 0,
   };
 }
 
@@ -2206,6 +2593,28 @@ const P6_FIXTURES = {
              moraleFloor: +R.world.crateMoraleFloor.toFixed(2),
              assert: reds === 3 && Math.abs(R.field.dmgMult - 1.12) < 1e-9 && R.world.crateMoraleFloor === 0.15 };
   },
+  /**
+   * The rung that is NOT an aeroplane. `ladderSpawns` runs at `enemies: 0`, so
+   * it could only ever check `field.dmgMult` — the ledger — and the ledger was
+   * always right. What was wrong is whether the multiplier reached the aeroplanes
+   * ALREADY FLYING when the ladder advances before the first tick, which is the
+   * state "the level starts three crates behind" and is exactly how K5 loads its
+   * treatment arm. `world.live` is rebuilt inside `world.update`, so it is empty
+   * there and the rung reached nobody — silently, because the spawns still
+   * arrived and anything counting reinforcements saw a delivered treatment.
+   */
+  ladderPreload() {
+    const L = CRATE_LEVELS['k-drop'];
+    const R = crateWorld(L, { seed: 41, enemies: 3, groundFire: false });
+    const liveAtLoad = R.world.live.length;          // 0 — this is the whole trap
+    for (let i = 0; i < 3; i++) R.field.advanceLadder();
+    R.world.update(DT);
+    const reds = R.world.live.filter((e) => e.side === -1);
+    const carrying = reds.filter((e) => Math.abs(e.dmgMult - 1.12) < 1e-9).length;
+    return { liveAtLoad, redsAfterTick: reds.length, carrying,
+             fieldDmgMult: +R.field.dmgMult.toFixed(3),
+             assert: liveAtLoad === 0 && reds.length >= 3 && carrying === reds.length };
+  },
   /** T17: the small-arms curve, at the two altitudes DESIGN §3.5 works out itself. */
   smallArms() {
     const a = smallArmsP(40, 50), b = smallArmsP(150, 50), c = smallArmsP(70, 24), d = smallArmsP(300, 40);
@@ -2382,17 +2791,43 @@ function p6Gates(runs = num('runs', 24)) {
        `forces >= ${an.burstNeededForK4AtM} — which is the register test T20 names, not a threshold move. ` +
        `See docs/P6_NOTES.md §5.`);
 
-  const lad = ladderReport({ runs: Math.max(30, runs) });
-  push('K5', 'the reinforcement ladder is not decoration', lad.deltaPts, '>=', 8, 'points',
-       `pooled over the ${lad.inBandCells} configurations whose BASELINE death rate is inside ` +
-       `DESIGN §10.5's 8-30% band: ${(lad.rows[0].deathRate * 100).toFixed(1)}% with 0 crates lost vs ` +
-       `${(lad.rows[1].deathRate * 100).toFixed(1)}% with 3 lost, ${lad.runs} sorties per cell = ` +
-       `+${lad.deltaPts} points, and +${lad.deltaHP} HP per sortie. Full sweep: ` +
+  const lad = ladderReport({ runs: Math.max(K5_RUNS, runs) });
+  push('K5', 'the reinforcement ladder is not decoration', lad.tStat, '>=', 2, 'x SE',
+       `RE-SPECIFIED per D139 onto HP per sortie — CONTINUOUS. T21's own test is "does losing 3 ` +
+       `crates MEASURABLY raise the cost", and the death rate could not measure it: it was pooled on ` +
+       `an OUTCOME-dependent filter (baseline inside 8-30%, so a 3.3% cell had no room to move) and ` +
+       `quantised at ${lad.deathQuantumPts} points by ${lad.runs} sorties per cell. ` +
+       `Now: +${lad.deltaHP} +-${lad.seHP} HP per sortie, t = ${lad.tStat} (PASS at >= 2), pooled over the ` +
+       `${lad.deliveredCells}/${lad.cells.length} cells where the ladder was DELIVERED — selected on ` +
+       `deltaRedSeconds > 0, a property of the TREATMENT, which cannot bias the outcome the way the old ` +
+       `rule did. Positive in ${lad.positiveCells}/${lad.deliveredCells} of them. ` +
+       `THE RE-SPECIFICATION ALONE DID NOT MOVE IT — D139's premise that "the ladder is fine" was ` +
+       `itself measured on 30 sorties, and at 240 it converges to -0.78 +-1.80 and flips sign between ` +
+       `seed blocks. What moved it is a DELIVERY defect: every flushed reinforcement spawned on ONE ` +
+       `point, inside a 5.2 m collision radius that costs 60 HP a tick, so both arrived dead and the ` +
+       `+45 enemy-seconds this gate read as DELIVERED were two carcasses lingering in world.live. ` +
+       `--break rein-stacked restores it and reproduces the inherited +7.85 +-5.80, t 1.35 exactly. ` +
+       `A SECOND delivery defect is fixed but is NOT visible here and the fixture owns it instead: ` +
+       `the damage rung was applied over world.live, empty before tick 0, so it reached nobody in the ` +
+       `pre-loaded arm. Isolated post-fix (--break preload-live) it is worth 0.05 HP per sortie — once ` +
+       `two more aeroplanes are in the air, 12% on the others' bullets is not the binding term. ` +
+       `Its guard is the ladderPreload fixture, which goes red at carrying 0/3 while the older ` +
+       `ladderSpawns stays green, because ladderSpawns runs at enemies: 0 and could only ever check ` +
+       `the ledger. ` +
+       `SAMPLE SIZE IS DERIVED, NOT TUNED: a priori LADDER's smallest rung is step 2's dmgMult 1.12, ` +
+       `worth ${lad.smallestRungHP} HP against a ${lad.baseHPPooled} HP pooled baseline, and seeing ` +
+       `that at t >= 2 needs SE <= ${(lad.smallestRungHP / 2).toFixed(1)} — met at ${lad.runs} runs, ` +
+       `SE ${lad.seHP}. That a-priori figure is CONSERVATIVE and the measurement says so: the rung ` +
+       `really delivers 0.05 HP, which no sample could resolve, and sizing to it would be sizing to an ` +
+       `effect the ladder does not depend on. ` +
+       `MAGNITUDE, in a unit this sweep measures rather than one invented here: one MORE hostile ` +
+       `aeroplane costs ${lad.hpPerEnemy} HP per sortie, so three lost crates are worth ` +
+       `${lad.deltaAsEnemies} of an extra aeroplane. SECONDARY, reported not gated: the death-rate ` +
+       `delta is ${lad.deltaPts >= 0 ? '+' : ''}${lad.deltaPts} points. Full sweep: ` +
        lad.cells.map(c => `${c.gun}/${c.enemies}e ${(c.base * 100).toFixed(0)}->${(c.with3 * 100).toFixed(0)}% ` +
-                          `(${c.deltaPts >= 0 ? '+' : ''}${c.deltaPts}pts, ${c.deltaHP >= 0 ? '+' : ''}${c.deltaHP}HP)` +
-                          `${c.inBand ? '*' : ''}`).join(' | ') +
-       `. The HP delta is positive in EVERY cell; the death-rate delta only reads positive where the ` +
-       `baseline has headroom, which is the instrument's own constraint and not the ladder's.`);
+                          `(${c.deltaHP >= 0 ? '+' : ''}${c.deltaHP}+-${c.seHP}HP, ` +
+                          `${c.deltaRedSeconds >= 0 ? '+' : ''}${c.deltaRedSeconds} enemy-s)` +
+                          `${c.delivered ? '*' : ' NOT DELIVERED'}`).join(' | ') + `.`);
 
   const free = swingReport({ runs: 600, pinned: false });
   const pin = swingReport({ runs: 600, pinned: true });
@@ -2524,7 +2959,8 @@ function main() {
     if (BREAKS[which]) { BROKEN = which; console.log(`BROKEN: ${which} — ${BREAKS[which]}\n`); }
     else if (P5_BREAKS[which]) { P5BUG = which; console.log(`BROKEN: ${which} — ${P5_BREAKS[which]}\n`); }
     else if (P6_BREAKS[which]) { P6BUG = which; console.log(`BROKEN: ${which} — ${P6_BREAKS[which]}\n`); }
-    else { console.error(`--break must be one of: ${[...Object.keys(BREAKS), ...Object.keys(P5_BREAKS), ...Object.keys(P6_BREAKS)].join(', ')}`); return; }
+    else if (P9_BREAKS[which]) { P9BUG = which; if (!flag('quiet')) console.error(`BROKEN: ${which} — ${P9_BREAKS[which]}`); }
+    else { console.error(`--break must be one of: ${[...Object.keys(BREAKS), ...Object.keys(P5_BREAKS), ...Object.keys(P6_BREAKS), ...Object.keys(P9_BREAKS)].join(', ')}`); return; }
   }
   if (opt('colliders')) console.log(`colliders: ${setColliderSet(opt('colliders'))}\n`);
 
@@ -2644,6 +3080,38 @@ function main() {
 
   if (flag('fires')) { console.log(JSON.stringify(fireReport(), null, 2)); return; }
 
+  if (flag('levelrun')) {
+    if (!opt('levelfile')) {
+      console.error('--levelrun needs --levelfile data/levels/<id>.json');
+      process.exitCode = 1; return;
+    }
+    const files = [opt('levelfile')];
+    const runs = num('runs', 1);
+    const out = [];
+    for (const f of files) {
+      const raw = JSON.parse(readFileSync(f, 'utf8'));
+      const hashes = new Set();
+      let first = null;
+      for (let i = 0; i < runs; i++) {
+        const r = levelRun({ level: raw, seed: num('seed', 5), secs: num('secs', 300) });
+        r.hash = levelHash(r);
+        hashes.add(r.hash);
+        if (!first) first = r;
+      }
+      out.push({ ...first, runs, distinctHashes: hashes.size });
+    }
+    console.log(JSON.stringify(out.length === 1 ? out[0] : out, null, 2));
+    return;
+  }
+
+  if (flag('spawner')) {
+    const raw = JSON.parse(readFileSync(opt('levelfile'), 'utf8'));
+    const out = spawnerRun({ level: raw, secs: num('secs', 300), seed: num('seed', 5),
+                             enemies: num('enemies', 0) });
+    console.log(JSON.stringify(out, null, 2));
+    return;
+  }
+
   if (flag('ladder')) {
     if (flag('probe')) {
       for (const lost of [0, 3]) {
@@ -2661,7 +3129,33 @@ function main() {
       }
       return;
     }
-    console.log(JSON.stringify(ladderReport({ runs: num('runs', 40) }), null, 2)); return;
+    const runs = num('runs', K5_RUNS);
+    const lad = ladderReport({ runs, level: opt('level', 'k-drop') });
+    if (opt('json')) writeFileSync(opt('json'), JSON.stringify(lad, null, 2));
+    console.log(`  K5 / T21 ladder — level ${lad.level}, ${lad.runs} sorties per cell per arm, ` +
+                `seeds ${lad.seed0}..${lad.seed0 + lad.runs - 1}, ${lad.cells.length} cells (2 guns x 3 enemy counts)` +
+                (P6BUG ? `, BROKEN: ${P6BUG}` : ''));
+    console.log('\n  cell    baseHP  deltaHP    +-SE      t   death% -> %   d-en-s/base  reinf  delivered');
+    for (const c of lad.cells) {
+      const t = c.seHP > 0 ? (c.deltaHP / c.seHP).toFixed(2) : '—';
+      console.log(`  ${c.gun}/${c.enemies}e ${c.baseHP.toFixed(1).padStart(8)} ` +
+                  `${(c.deltaHP >= 0 ? '+' : '') + c.deltaHP.toFixed(1)}`.padStart(10) +
+                  ` ${c.seHP.toFixed(2).padStart(6)} ${String(t).padStart(6)}   ` +
+                  `${(c.base * 100).toFixed(1).padStart(5)}->${(c.with3 * 100).toFixed(1).padStart(5)}  ` +
+                  `${((c.deltaRedSeconds >= 0 ? '+' : '') + c.deltaRedSeconds.toFixed(1)).padStart(9)}` +
+                  `${('/' + c.baseRedSeconds.toFixed(0)).padStart(7)} ${c.reinf.toFixed(2).padStart(6)}  ` +
+                  `${c.delivered ? 'yes' : 'NO'}`);
+    }
+    console.log(`\n  POOLED over the ${lad.deliveredCells}/${lad.cells.length} DELIVERED cells: ` +
+                `${lad.deltaHP >= 0 ? '+' : ''}${lad.deltaHP} +-${lad.seHP} HP per sortie, t = ${lad.tStat} ` +
+                `(bar >= 2), positive in ${lad.positiveCells}/${lad.deliveredCells}`);
+    console.log(`  ALL ${lad.cells.length} cells, ungated: ${lad.deltaHPAll >= 0 ? '+' : ''}${lad.deltaHPAll} ` +
+                `+-${lad.seHPAll} HP, t = ${lad.tStatAll}`);
+    console.log(`  SECONDARY, not gated: death-rate delta ${lad.deltaPts >= 0 ? '+' : ''}${lad.deltaPts} pts ` +
+                `at a quantum of ${lad.deathQuantumPts} pts; one more hostile aeroplane costs ` +
+                `${lad.hpPerEnemy} HP, so this is ${lad.deltaAsEnemies} of an extra aeroplane`);
+    console.log(`  ${lad.tStat >= 2 ? 'PASS' : 'FAIL'}  K5`);
+    return;
   }
 
   if (flag('swing')) {
@@ -2675,6 +3169,9 @@ function main() {
     const P = POLICIES[opt('policy', 'flyThrough')] || POLICIES.flyThrough;
     console.log(JSON.stringify(crateMission({ level: opt('level', 'k-drop'), seed: num('seed', 1),
       policyName: opt('policy', 'flyThrough'), engage: P.engage, policy: P.policy,
+      enemies: opt('enemies') !== null ? num('enemies') : undefined,
+      preLost: num('prelost', 0), noDrops: flag('nodrops'), gun: opt('gun') || undefined,
+      groundFire: !flag('noground'),
       silkBand: P.silkBand, stopOnDeath: false }), null, 2));
     return;
   }

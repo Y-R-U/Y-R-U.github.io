@@ -1,0 +1,135 @@
+{
+  "id": "a2-05",
+  "act": 2,
+  "index": 5,
+  "name": "The Long Grey Shape",
+  "length": 30800,
+  "column": {
+    "ground": 0,
+    "ceiling": -7500,
+    "concordLine": -26666.666666666668
+  },
+  "bands": {
+    "deck": {
+      "coverage": 1
+    }
+  },
+  "terrain": {
+    "profile": "plain",
+    "amp": 30,
+    "detail": 0.3,
+    "wavelength": 4200
+  },
+  "weather": {
+    "wind": [
+      [
+        0,
+        5
+      ],
+      [
+        1500,
+        5
+      ]
+    ]
+  },
+  "player": {
+    "start": {
+      "x": 600,
+      "y": -4000
+    },
+    "airframe": "kite_b2",
+    "fuel": 1,
+    "ammo": 500
+  },
+  "beats": [
+    {
+      "x": 1488,
+      "spawn": "kestrel",
+      "n": 2,
+      "band": "deck",
+      "from": "ahead",
+      "k": 0.442
+    },
+    {
+      "x": 10267,
+      "event": "cloudbank",
+      "len": 10267
+    },
+    {
+      "x": 15480,
+      "crate": {
+        "y": -3333,
+        "owner": "neutral"
+      }
+    },
+    {
+      "x": 15480,
+      "boss": "zeppelin-l30",
+      "band": "deck",
+      "y": -3333,
+      "n": 1
+    },
+    {
+      "x": 22476,
+      "crate": {
+        "y": -3333,
+        "owner": "neutral"
+      }
+    },
+    {
+      "x": 29472,
+      "crate": {
+        "y": -3333,
+        "owner": "neutral"
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "type": "reach",
+      "x": 30800
+    },
+    {
+      "type": "destroy",
+      "what": "boss",
+      "ref": "zeppelin-l30"
+    },
+    {
+      "type": "survive",
+      "maxDeaths": 0
+    }
+  ],
+  "stars": [
+    {
+      "id": "clean",
+      "desc": "Not a scratch",
+      "stat": "damageTaken",
+      "op": "==",
+      "value": 0
+    },
+    {
+      "id": "greedy",
+      "desc": "Every crate recovered",
+      "stat": "cratesMissed",
+      "op": "<=",
+      "value": 0
+    },
+    {
+      "id": "quick",
+      "desc": "Under 110 s",
+      "stat": "time",
+      "op": "<=",
+      "value": 110
+    }
+  ],
+  "landmarks": [
+    {
+      "x": 5878,
+      "kind": "chateau"
+    }
+  ],
+  "reward": {
+    "crates": 3,
+    "scrip": 120
+  }
+}

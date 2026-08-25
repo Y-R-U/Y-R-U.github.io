@@ -1,0 +1,131 @@
+{
+  "id": "a1-12",
+  "index": 12,
+  "name": "What They Take",
+  "length": 25200,
+  "column": {
+    "ground": 0,
+    "ceiling": -3000,
+    "concordLine": -26666.666666666668
+  },
+  "weather": {
+    "wind": [
+      [
+        0,
+        5
+      ],
+      [
+        1500,
+        5
+      ]
+    ]
+  },
+  "beats": [
+    {
+      "x": 1488,
+      "spawn": "ox",
+      "n": 2,
+      "band": "floor",
+      "from": "ahead",
+      "k": 0.324
+    },
+    {
+      "x": 1488,
+      "crate": {
+        "y": -2350,
+        "owner": "neutral"
+      }
+    },
+    {
+      "x": 5340,
+      "crate": {
+        "y": -2350,
+        "owner": "neutral"
+      }
+    },
+    {
+      "x": 9191,
+      "crate": {
+        "y": -2350,
+        "owner": "neutral"
+      }
+    },
+    {
+      "x": 12680,
+      "spawn": "kestrel",
+      "n": 4,
+      "band": "belt",
+      "from": "ahead",
+      "k": 0.324
+    },
+    {
+      "x": 13043,
+      "crate": {
+        "y": -2350,
+        "owner": "neutral"
+      }
+    },
+    {
+      "x": 16894,
+      "crate": {
+        "y": -2350,
+        "owner": "neutral"
+      }
+    },
+    {
+      "x": 20746,
+      "crate": {
+        "y": -2350,
+        "owner": "neutral"
+      }
+    }
+  ],
+  "objectives": [
+    {
+      "type": "reach",
+      "x": 25200
+    },
+    {
+      "type": "collect",
+      "what": "crate",
+      "n": 5
+    },
+    {
+      "type": "survive",
+      "maxDeaths": 0
+    }
+  ],
+  "stars": [
+    {
+      "id": "clean",
+      "desc": "Not a scratch",
+      "stat": "damageTaken",
+      "op": "==",
+      "value": 0
+    },
+    {
+      "id": "greedy",
+      "desc": "5 of 6 crates",
+      "stat": "cratesMissed",
+      "op": "<=",
+      "value": 1
+    },
+    {
+      "id": "quick",
+      "desc": "Under 90 s",
+      "stat": "time",
+      "op": "<=",
+      "value": 90
+    }
+  ],
+  "landmarks": [
+    {
+      "x": 22973,
+      "kind": "bridge"
+    }
+  ],
+  "reward": {
+    "crates": 6,
+    "scrip": 118
+  }
+}

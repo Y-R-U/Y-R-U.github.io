@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>kitehawk — a level, laid out</title>
+<style>
+  html,body{margin:0;background:#101014;color:#cfc;font:12px ui-monospace,monospace}
+  #wrap{position:relative;width:max-content;margin:8px auto}
+  #gl{display:block}
+  #hud{position:fixed;top:0;left:0;padding:6px 8px;background:rgba(0,0,0,.72);white-space:pre;
+       line-height:1.45;max-width:62ch}
+  #keys{position:fixed;bottom:0;left:0;padding:6px 8px;background:rgba(0,0,0,.72);white-space:pre}
+  #errs{position:fixed;top:0;right:0;padding:6px 8px;background:rgba(120,0,0,.85);color:#fee;
+        white-space:pre-wrap;max-width:46ch;line-height:1.4}
+</style>
+</head>
+<body>
+<div id="wrap"><canvas id="gl"></canvas></div>
+<div id="hud"></div>
+<div id="keys"></div>
+<div id="errs"></div>
+<script type="module">
+/**
+ * P9 deliverable 8 — the level harness. A level file, drawn, with the SHIPPED
+ * loader, the SHIPPED validator, the SHIPPED terrain and the SHIPPED spawner.
+ * Nothing on this page re-implements any of them; it fetches the JSON that
+ * `tools/genlevels.mjs` writes and puts a camera in front of it. That is the
+ * only arrangement in which what you are looking at is what the gates measured
+ * (crates.html's rule, one system over).
+ *
+ *   ?level=a1-12        which file in data/levels/ (default a1-01)
+ *   ?w=844&h=390        the frame. LANDSCAPE IS THE DEFAULT (D123) and the page
+ *                       picks its profile with viewport.js's own `modeFor`, so
+ *                       it cannot keep a second copy of the threshold — that is
+ *                       exactly the defect D131 caught in sky.html.
+ *   ?x=12000            park the camera at a world x instead of scrubbing
+ *   ?rate=1400          scrub speed in wu/s (default: cruise)
+ *   ?pause=1            hold still
+ *
+ * **A malformed level fails LOUDLY** — that is the validator's contract and this
+ * page is the "debug overlay" half of it. Errors are printed to the console AND
+ * painted top-right in red, and the level is NOT drawn.
+ */
+import { mount, qp, flatGrade } from './harness.js';
+import { LAYER } from '../../js/gfx/renderer.js';
+import { modeFor } from '../../js/core/viewport.js';
+import { VIEW_PROFILE } from '../../js/core/viewprofile.js';
+import { BANDS, CEILING_WU, GROUND_WU, CRUISE_WU_S } from '../../js/core/bands.js';
+import { M_PER_WU } from '../../js/core/math.js';
+import { createRNG } from '../../js/core/rng.js';
+import { createLevel } from '../../js/data/level.js';
+import { validateLevel, formatErrors } from '../../js/data/validate.js';
+import { createTerrain } from '../../js/sim/terrain.js';
+import { createWorld } from '../../js/sim/entities.js';
+import { createSpawner, SPAWN_LEAD_WU } from '../../js/sim/spawner.js';
+
+const ID = String(qp('level', 'a1-01'));
+const PARK = qp('x', -1);
+const RATE = qp('rate', CRUISE_WU_S);
+const PAUSE = qp('pause', 0);
+
+const W = qp('w', 844), H = qp('h', 390);
+const MODE = modeFor(W, H);
+const worldH = VIEW_PROFILE[MODE].worldH;
+
+const { R } = await mount({ w: W, h: H, dpr: 1, worldH });
+flatGrade(R);
+R.setAmbient(0.62, 0.65, 0.74);
+R.setClearColor(0.44, 0.54, 0.66);
+
+/* ---------------------------------------------------------- the level --- */
+
+const raw = await (await fetch(`../../data/levels/${ID}.json`)).json();
+const level = createLevel(raw);
+const res = validateLevel(level);
+for (const line of formatErrors(level.id, res.errors)) console.error(line);
+errs.textContent = res.ok ? '' :
+  `LEVEL ${level.id} REFUSED — ${res.errors.length} fault(s)\n\n` +
+  formatErrors(level.id, res.errors).join('\n');
+
+const terrain = createTerrain(level);
+const rng = createRNG(1);
+
+/**
+ * The spawner runs against a STUB world. This page is a layout view, not a
+ * mission: what it shows is where each beat puts its group, which is a property
+ * of `js/sim/spawner.js` and of the level, and nothing here should depend on
+ * flight, damage or AI. `tools/sim.mjs --levelrun` is the one that flies it.
+ */
+const marks = [];
+const stub = {
+  ctx: { rng },
+  alloc: {},
+  spawn: (type, o) => { marks.push({ kind: 'spawn', id: type.id, x: o.xM / M_PER_WU, y: o.yM / M_PER_WU });
+                        return { hp: { structure: 0 }, hpMax: { structure: 0 }, type, flight: { sx: o.xM, sy: o.yM } }; },
+  crates: { drop: (o) => marks.push({ kind: 'crate', id: 'crate', x: o.xM / M_PER_WU, y: o.yM / M_PER_WU }) },
+};
+const sp = createSpawner(stub, level, {
+  onBeat: (b, camWu) => marks.push({ kind: b.boss ? 'boss' : 'event', id: b.boss || b.event || 'beat',
+                                     x: (b.y !== undefined ? b.x : camWu + SPAWN_LEAD_WU), y: b.y ?? -600 }),
+});
+
+/* ------------------------------------------------------------ drawing --- */
+
+const BAND_TINT = [[0.34, 0.31, 0.26], [0.40, 0.40, 0.36], [0.46, 0.49, 0.50],
+                   [0.55, 0.58, 0.62], [0.58, 0.64, 0.72], [0.62, 0.72, 0.86]];
+const MARK_TINT = { spawn: [0.78, 0.22, 0.20], crate: [0.92, 0.86, 0.42],
+                    boss: [0.86, 0.40, 0.86], event: [0.42, 0.78, 0.90] };
+
+/** A box in world units, as two triangles' worth of polygon. */
+const box = (x, y, w, h, tint, layer) =>
+  R.poly([x, y, x + w, y, x + w, y + h, x, y + h], tint, layer);
+
+const cam = { x: level.player.start.x, y: level.player.start.y, zoom: 1 };
+let scrub = level.player.start.x;
+const DT = 1 / 60;
+
+function frame() {
+  if (!PAUSE && PARK < 0) {
+    scrub += RATE * DT;
+    if (scrub > level.length + 2000) scrub = 0;
+  } else if (PARK >= 0) scrub = PARK;
+  sp.update(scrub);
+
+  cam.x = scrub;
+  cam.y = level.player.start.y;
+
+  R.begin(cam);
+  R.light({ dx: -0.42, dy: -0.91, intensity: 1.0, r: 1.0, g: 0.95, b: 0.84 });
+
+  if (res.ok) {
+    // the ladder, so a beat's band reads as a place rather than a number
+    for (let i = 0; i < BANDS.length; i++) {
+      const b = BANDS[i];
+      const mod = level.bandMods[b.id];
+      const tint = BAND_TINT[i].map((c) => c * (mod && mod.coverage ? 1 + 0.25 * mod.coverage : 1));
+      box(cam.x - 4000, b.y1, 8000, b.y0 - b.y1, tint, LAYER.SKY);
+    }
+
+    // the silhouette, sampled from the SHIPPED terrain module
+    const step = 40;
+    const pts = [];
+    for (let x = cam.x - 4000; x < cam.x + 4000; x += step) { pts.push(x, terrain.yAt(x)); }
+    pts.push(cam.x + 4000, GROUND_WU + 400, cam.x - 4000, GROUND_WU + 400);
+    R.poly(pts, [0.28, 0.27, 0.22], LAYER.GROUND);
+
+    // ART §4's landmarks: the level gives x and a kind, the TERRAIN gives y.
+    for (const l of level.landmarks)
+      box(l.x - 60, terrain.yAt(l.x) - 260, 120, 260, [0.86, 0.80, 0.62], LAYER.ACTORS);
+
+    // D126's signature altitudes, one near each band boundary
+    for (const s of level.signatures)
+      box(cam.x - 4000, s.y - 6, 8000, 12, [0.30, 0.34, 0.30], LAYER.SKY);
+
+    // every beat, on the level's own x axis
+    for (const b of level.beats)
+      box(b.x - 8, CEILING_WU, 16, GROUND_WU - CEILING_WU, [0.24, 0.26, 0.30], LAYER.SKY);
+
+    // what the spawner actually produced, where it produced it
+    for (const m of marks)
+      box(m.x - 55, m.y - 55, 110, 110, MARK_TINT[m.kind] || [1, 1, 1], LAYER.ACTORS);
+
+    // the player start, and the camera's own head
+    box(level.player.start.x - 40, level.player.start.y - 40, 80, 80, [0.30, 0.90, 0.40], LAYER.ACTORS);
+    box(scrub - 3, CEILING_WU, 6, GROUND_WU - CEILING_WU, [0.95, 0.95, 0.35], LAYER.ACTORS);
+  }
+  R.end();
+
+  hud.textContent =
+    `${level.id}  "${level.name}"   act ${level.act} index ${level.index}\n` +
+    `frame ${W}x${H} ${MODE}, worldH ${worldH} wu — the profile comes from viewport.modeFor\n` +
+    `length ${level.length} wu (${(level.length * M_PER_WU / 1000).toFixed(2)} km, ` +
+    `${(level.length / CRUISE_WU_S).toFixed(0)} s at cruise)\n` +
+    `terrain ${level.terrain.profile} amp ${level.terrain.amp} wl ${level.terrain.wavelength}` +
+    `${terrain.errors.length ? '  ERRORS: ' + terrain.errors.length : ''}\n` +
+    `wind ${JSON.stringify(level.wind)} m/s   ${level.weather.timeOfDay}\n` +
+    `beats ${sp.state.fired}/${level.beats.length} fired   spawn lead ${SPAWN_LEAD_WU} wu   ` +
+    `pool misses ${sp.state.poolMisses}   unknown types ${sp.state.unknownTypes}\n` +
+    `camera ${scrub.toFixed(0)} wu` +
+    `${sp.state.lastBeat ? `   last beat @${sp.state.lastBeat.x}: ` +
+      `${sp.state.lastBeat.spawn || sp.state.lastBeat.boss || sp.state.lastBeat.event || 'crate'}` : ''}\n` +
+    `validate  ${res.ok ? 'clean' : res.errors.length + ' FAULT(S) — see right'}`;
+
+  requestAnimationFrame(frame);
+}
+
+keys.textContent = 'r rewind   space pause   [ ] step 500 wu   ?level=a1-12  ?x=12000  ?w=390&h=844';
+let paused = !!PAUSE;
+addEventListener('keydown', (e) => {
+  if (e.key === 'r') { scrub = 0; sp.reset(); marks.length = 0; }
+  if (e.key === ' ') paused = !paused;
+  if (e.key === '[') scrub = Math.max(0, scrub - 500);
+  if (e.key === ']') scrub += 500;
+});
+
+window.__level = { level, res, terrain, spawner: sp, marks,
+                   frame: { w: W, h: H, mode: MODE, worldH } };
+frame();
+</script>
+</body>
+</html>

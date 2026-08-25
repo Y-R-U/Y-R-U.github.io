@@ -16,6 +16,8 @@
  */
 
 import { VIEW_PROFILE, slotRect } from '../core/viewprofile.js';
+import { GROUND_WU, CEILING_WU } from '../core/bands.js';
+import { CARD_MAX_CHARS } from '../core/content.js';
 
 /* ------------------------------------------------------------------ px --- */
 
@@ -109,7 +111,10 @@ export const METRICS = Object.freeze({
   CARD_PAD_X: 14,
   CARD_PAD_Y: 8,
   CARD_RULE: 2,             // the speaker's colour, as a rule down the leading edge
-  CARD_MAX_CHARS: 44,       // §7.5, hard — a wrapped radio line eats two lines of sky
+  // §7.5, hard — a wrapped radio line eats two lines of sky. The VALUE lives in
+  // js/core/content.js so js/data/validate.js can refuse the same line this
+  // refuses to draw, without js/data importing js/ui (P9 REQUEST-8).
+  CARD_MAX_CHARS,
   BANNER_Y_FRAC: 0.022,
   BANNER_H: 22,
   WIND_W: 60,               // DESIGN §2.7
@@ -151,11 +156,51 @@ export const TIMING = Object.freeze({
  * re-declared numbers: `PIP_RANGE_WU` is the camera's own `zoomLockRange`,
  * imported rather than copied, because D72 cost a whole gate to a harness that
  * kept a second copy of a renderer constant and let it drift.
+ *
+ * P8c: this was a frozen module constant reading `VIEW_PROFILE.portrait`
+ * BY NAME, in both orientations — the same class of bug the paragraph above
+ * warns about, one line under it. Harmless while both profiles carry 1400, and
+ * a silent portrait dependency the moment D120's derived admission radius is
+ * per-profile. It is now a function of the profile and `resolveLayout` attaches
+ * the result as `L.ranges`.
  */
-export const RANGES = Object.freeze({
-  PIP_RANGE_WU: VIEW_PROFILE.portrait.zoomLockRange,
-  CHEV_RANGE_WU: VIEW_PROFILE.portrait.zoomLockRange * 2,
+export const rangesFor = (profile) => ({
+  PIP_RANGE_WU: profile.zoomLockRange,
+  CHEV_RANGE_WU: profile.zoomLockRange * 2,
 });
+
+/**
+ * The `?hudbug=framepip` break-switch's window — "a pip derived from the FRAME".
+ * It lives HERE, with the other absolute metrics, because H1 forbids px literals
+ * anywhere else and because there were two copies of it: the harness's was
+ * repaired and `js/ui/hud.js`'s was not, which is a break-switch that goes red in
+ * the test and stays green in the browser (P8c).
+ *
+ * It was a flat `CHEV_MERGE_PX` 26 tape-px. The tape is 53.0 px per 1,000 wu in
+ * portrait and 24.0 in landscape, so 26 px is 490 wu of column in portrait and
+ * 1,083 wu in landscape — nearly TWICE landscape's whole frame. A substitute
+ * WIDER than the frame warns EARLIER than the frame, so H7 cannot tell it from
+ * the tape and the switch stays green. A break-switch that cannot go red in the
+ * primary orientation is worse than none.
+ *
+ * So: the same fraction of each profile's own column. Portrait is the reference
+ * and reproduces its shipped 26.00 px exactly.
+ */
+const TAPE_SPAN_WU = GROUND_WU - CEILING_WU;
+const REF_W = 390, REF_H = 844;
+// Memoised on first use, not at module scope: `resolveLayout` and the helpers
+// it closes over are declared below this point.
+let FRAMEPIP_FRAC = 0;
+export function framePipWindowPx(view, tapeRect) {
+  if (!FRAMEPIP_FRAC) {
+    const P = VIEW_PROFILE.portrait;
+    const ref = { mode: 'portrait', w: REF_W, h: REF_H, dpr: 2, profile: P, worldH: P.worldH,
+                  worldW: REF_W / (REF_H / P.worldH), scale: REF_H / P.worldH,
+                  safe: { top: 0, right: 0, bottom: 0, left: 0 } };
+    FRAMEPIP_FRAC = METRICS.CHEV_MERGE_PX / (resolveLayout(ref).tape.h / TAPE_SPAN_WU) / P.worldH;
+  }
+  return FRAMEPIP_FRAC * view.worldH * (tapeRect.h / TAPE_SPAN_WU);
+}
 
 /* -------------------------------------------------------------- resolve --- */
 
@@ -181,6 +226,7 @@ export function resolveLayout(view, out = null, o = null) {
   const ph = Math.max(1, view.h - s.top - s.bottom);
   L.play = rect(px, py, pw, ph);
   L.hud = P.hud;
+  L.ranges = rangesFor(P);
 
   /* --- coaming. One strip in portrait, two corners in landscape (ART §10) */
   const coamH = ph * METRICS.COAM_FRAC;

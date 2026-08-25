@@ -17,7 +17,8 @@ import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-export async function falsify({ row, h7, h14, cdp = false } = {}) {
+/** P8b, additive: `mode` steers only the H7 arms. Default portrait, unchanged. */
+export async function falsify({ row, h7, h14, cdp = false, mode = 'portrait' } = {}) {
   const M = await import('./hudcheck.mjs');
   row = row || M.row;
   h7 = h7 || M.h7;
@@ -32,11 +33,11 @@ export async function falsify({ row, h7, h14, cdp = false } = {}) {
   console.log('\n-- falsification: each switch MUST go red --');
 
   /* --- H7: the tape ---------------------------------------------------- */
-  const base7 = await h7(60, { quiet: true });
-  const noTape = await h7(60, { notape: true, quiet: true });
+  const base7 = await h7(60, { quiet: true, mode });
+  const noTape = await h7(60, { notape: true, quiet: true, mode });
   expect('notape', 'H7', noTape.arms.far.warned === 0,
          `warned ${noTape.arms.far.warned}/${noTape.arms.far.usable} (baseline ${base7.arms.far.warned})`);
-  const framePip = await h7(60, { framepip: true, quiet: true });
+  const framePip = await h7(60, { framepip: true, quiet: true, mode });
   const fpMed = framePip.arms.far.median;
   expect('framepip', 'H7', !(framePip.arms.far.warned === framePip.arms.far.usable && fpMed >= 0.6),
          `median lead ${Number.isFinite(fpMed) ? fpMed.toFixed(2) : 'n/a'} s, warned ` +
@@ -114,5 +115,6 @@ export async function falsify({ row, h7, h14, cdp = false } = {}) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  await falsify({ cdp: process.argv.includes('--cdp') });
+  const mi = process.argv.indexOf('--mode');
+  await falsify({ cdp: process.argv.includes('--cdp'), mode: mi >= 0 ? process.argv[mi + 1] : 'portrait' });
 }

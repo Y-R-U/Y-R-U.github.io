@@ -45,7 +45,7 @@ try {
   await cdp.viewport(390, 844, 1, true);
 
   /* --- 1. shape, on a booted game with a scripted player ---------------- */
-  await cdp.goto(`${base}/index.html?preserve=1&dpr=1&nosave`);
+  await cdp.goto(`${base}/index.html?preserve=1&dpr=1&nosave&scene=boot`);
   if (!await cdp.waitFor('window.__state && window.__state.tick > 0', 20000)) throw new Error('did not boot');
   await cdp.eval(`window.__kh.player = { x: 120, y: -4200, vx: 300, vy: -40, hull: 64 };
     window.__kh.entities = [{ id: 'a', hostile: true }, { id: 'b', hostile: true }, { id: 'c', kind: 'crate' }];`);
@@ -72,7 +72,7 @@ try {
   ok('?nosave writes nothing to localStorage', wroteWithNosave === null, `key is ${wroteWithNosave === null ? 'absent' : 'PRESENT'}`);
 
   /* --- 3. a real save round trip ---------------------------------------- */
-  await cdp.goto(`${base}/index.html?preserve=1&dpr=1`);
+  await cdp.goto(`${base}/index.html?preserve=1&dpr=1&scene=boot`);
   await cdp.waitFor('window.__kh && window.__kh.save', 20000);
   const round = await cdp.eval(`(() => {
     const sv = window.__kh.save;
@@ -85,8 +85,13 @@ try {
     const parsed = JSON.parse(raw);
     return { bytes: raw.length, v: parsed.v, checksum: parsed.checksum, crates: parsed.economy.crates, bias: parsed.settings.zoomBias };
   })()`);
-  ok('save writes, versions and checksums', round.v === 3 && /^fnv1a:[0-9a-f]{8}$/.test(round.checksum) && round.crates === 46,
-    `v${round.v} ${round.bytes} bytes checksum ${round.checksum}`);
+  // The version comes from the SHIPPED save object, never a literal here: P10
+  // bumped it 3 -> 4 and a hard-coded 3 would have turned a correct migration
+  // into a gate failure, which is the same class of defect as a harness keeping
+  // its own copy of a constant the code under test also declares (D72).
+  const SAVE_V = await cdp.eval('window.__kh.save.version');
+  ok('save writes, versions and checksums', round.v === SAVE_V && /^fnv1a:[0-9a-f]{8}$/.test(round.checksum) && round.crates === 46,
+    `v${round.v} (shipped v${SAVE_V}) ${round.bytes} bytes checksum ${round.checksum}`);
 
   const reloaded = await cdp.eval(`(() => { const sv = window.__kh.save; sv.load(); return { crates: sv.data.economy.crates, bias: sv.data.settings.zoomBias, act: sv.data.story.act }; })()`);
   ok('save loads back identically', reloaded.crates === 46 && reloaded.bias === 'wide' && reloaded.act === 2, JSON.stringify(reloaded));

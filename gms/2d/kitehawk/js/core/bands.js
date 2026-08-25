@@ -25,6 +25,30 @@ export const BANDS = Object.freeze([
   { id: 'blue',  name: 'Blue',  m0: 1125, m1: 1500, y0: -7500, y1: -10000 },
 ].map(Object.freeze));
 
+/**
+ * Best climb rate, 13.5 m/s (R-01's envelope, which may not move) -> 90 wu/s.
+ *
+ * It lives HERE, in the pure band module, because it is the rate at which the
+ * ladder is traversed and three separate things need it: the sky's crossfade
+ * derivation (`js/gfx/sky.js` re-exports this line), P9's ladder-reading model
+ * in `js/sim/world.js`, and the P4/P4b instrument. `js/sim/` may not import
+ * `js/gfx/` (corecheck), so a second copy was the only alternative -- and
+ * sky.js's own FG_OCCLUDE_MUL comment records what a second copy of a shared
+ * constant did to gate A6 last time.
+ */
+export const BEST_CLIMB_WU_S = 13.5 / M_PER_WU;
+
+/**
+ * Cruise, 42 m/s -> 280 wu/s (D126). It lives beside the climb rate because the
+ * two are only ever used as a RATIO: `js/sim/terrain.js`'s slope bound is
+ * `BEST_CLIMB_WU_S / CRUISE_WU_S` and wrote both as bare literals, and P9's
+ * level generator needs the same number a third time to turn DESIGN §8's `t(s)`
+ * column into a level length. 42 m/s is also the speed every aeroplane in
+ * `js/sim/` is launched at, so the second copy already existed.
+ */
+export const CRUISE_MS = 42;
+export const CRUISE_WU_S = CRUISE_MS / M_PER_WU;
+
 /** D28: the playable ceiling. Nothing the player can reach exists above it. */
 export const CEILING_WU = -10000;
 export const GROUND_WU = 0;

@@ -39,7 +39,7 @@ import { BANDS, CEILING_WU, GROUND_WU, bandAt } from '../core/bands.js';
  * Sanity: 180 wu total is 27 m, and the thinnest band (Mud) is 700 wu, so no two crossfades
  * can ever overlap.
  */
-export const BEST_CLIMB_WU_S = 13.5 / 0.15;
+export { BEST_CLIMB_WU_S } from '../core/bands.js';
 export const BAND_FEATHER_WU = 90;
 
 // Overridable ONLY so a deliberately broken control can exist: setting it near zero makes

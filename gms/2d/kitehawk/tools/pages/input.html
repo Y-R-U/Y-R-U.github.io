@@ -97,7 +97,7 @@ function hud() {
   const z = slotRect(view.profile.stickZone, view, rect);
   document.getElementById('hud').textContent =
     `view       ${view.mode} ${view.w}x${view.h} dpr ${view.dpr}  safe ${JSON.stringify(view.safe)}\n` +
-    `stickR     ${input.stickRadius().toFixed(2)} css px   (max(36, w * 0.208), R-12)\n` +
+    `stickR     ${input.stickRadius().toFixed(2)} css px   (max(36, min(zone.w, zone.h) * 0.208), R-12 as amended by P8c)\n` +
     `stick zone ${z.x.toFixed(0)},${z.y.toFixed(0)} ${z.w.toFixed(0)}x${z.h.toFixed(0)}\n` +
     `axis       X ${input.axisX.toFixed(3)}  Y ${input.axisY.toFixed(3)}   (Y<0 = nose UP)\n` +
     `raw        X ${input.axisRaw.x.toFixed(3)}  Y ${input.axisRaw.y.toFixed(3)}\n` +

@@ -12,7 +12,17 @@
  */
 
 const KEY = 'kitehawk.save';
-const VERSION = 3;
+/**
+ * v4 (P10) — the story model gets `unlocked`, `attempts` and `lastPlayed`, and
+ * the hangar's airframe id is corrected from `"kitehawk-i"` to `"kite_b1"`.
+ *
+ * `"kitehawk-i"` is not an id `js/data/tables.js` builds, and `playerType()`
+ * returns the reference airframe for an unknown id **silently** — the same
+ * defect D149 found in `ARCHITECTURE.md` §7.1's worked level, in a second place
+ * nobody had looked. A save carrying it would have furnished a hangar with an
+ * aeroplane that does not exist, and read clean.
+ */
+const VERSION = 4;
 const WRITE_DELAY = 400;
 
 function fnv1a(str) {
@@ -30,12 +40,19 @@ export function freshSave(now) {
     profile: { name: '', flags: {} },
     economy: { crates: 0, scrip: 0 },
     hangar: {
-      airframe: 'kitehawk-i',
-      owned: ['kitehawk-i'],
+      airframe: 'kite_b1',
+      owned: ['kite_b1'],
       upgrades: { engine: 0, wings: 0, guns: 0, armour: 0, fuel: 0, ammo: 0 },
       traits: [],
     },
-    story: { act: 1, level: 1, beatsSeen: [] },
+    /**
+     * `unlocked` is a LIST OF IDS rather than a high-water index. The map has
+     * to be able to show act 2's worked level while act 1 is still half done —
+     * P9 ships four levels out of a hundred and they are not contiguous — and a
+     * ladder index cannot express that without lying about the 96 that do not
+     * exist yet.
+     */
+    story: { act: 1, level: 1, beatsSeen: [], unlocked: ['a1-01'], lastPlayed: '' },
     levels: {},
     modes: { survival: {}, race: {}, duel: {}, daily: {} },
     settings: {
@@ -191,6 +208,58 @@ export function createSave(bus, opts = {}) {
       save.write();
       return true;
     } catch { return false; }
+  };
+
+  /* --------------------------------------------------------- the story --- */
+
+  /**
+   * v3 -> v4. **Every version bump ships a migration, never a wipe** — losing a
+   * hangar to a schema change is the one bug a player never forgives (§6.11).
+   * A v3 save keeps its crates, its scrip and its stars; only the two fields
+   * that named an aeroplane the game does not build are rewritten.
+   */
+  save.registerMigration(3, (d) => {
+    const h = d.hangar || (d.hangar = {});
+    if (h.airframe === 'kitehawk-i') h.airframe = 'kite_b1';
+    if (Array.isArray(h.owned)) h.owned = h.owned.map((id) => (id === 'kitehawk-i' ? 'kite_b1' : id));
+    const st = d.story || (d.story = {});
+    if (!Array.isArray(st.unlocked)) st.unlocked = ['a1-01'];
+    if (typeof st.lastPlayed !== 'string') st.lastPlayed = '';
+    d.v = 4;
+    return d;
+  });
+
+  save.isUnlocked = (id) => save.data.story.unlocked.includes(id);
+
+  save.unlock = (id) => {
+    if (!id || save.data.story.unlocked.includes(id)) return false;
+    save.data.story.unlocked.push(id);
+    save.write();
+    return true;
+  };
+
+  /**
+   * Bank one attempt. §9.4: **a mission never costs progress.** A failed run
+   * still records the attempt, still banks whatever it caught, and never takes
+   * a star, a crate or an unlock away — so this only ever moves numbers upward,
+   * apart from the repair fee, which is the entire cost of failing.
+   */
+  save.recordRun = (id, r, nextId) => {
+    const L = save.data.levels[id] || (save.data.levels[id] = { best: 0, stars: [], runs: 0, fails: 0 });
+    L.runs++;
+    if (!r.won) L.fails++;
+    else {
+      L.fails = 0;
+      if (!L.best || r.time < L.best) L.best = +r.time.toFixed(1);
+      for (const s of r.stars) if (s.got && !L.stars.includes(s.id)) L.stars.push(s.id);
+    }
+    const e = save.data.economy;
+    e.crates += r.cratesCaught || 0;
+    e.scrip = Math.max(0, e.scrip + (r.scrip || 0) + (r.crateValue || 0) - (r.repair || 0));
+    save.data.story.lastPlayed = id;
+    if (r.won && nextId) save.unlock(nextId);
+    save.write();
+    return L;
   };
 
   // A phone rarely gives you an unload event and never gives you two.

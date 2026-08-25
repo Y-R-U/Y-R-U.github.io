@@ -1,0 +1,80 @@
+{
+  "id": "a1-01",
+  "name": "First Light",
+  "length": 14000,
+  "column": {
+    "ground": 0,
+    "ceiling": -3000,
+    "concordLine": -26666.666666666668
+  },
+  "weather": {
+    "wind": [
+      [
+        0,
+        2
+      ],
+      [
+        1500,
+        2
+      ]
+    ]
+  },
+  "beats": [
+    {
+      "x": 1488,
+      "spawn": "kestrel",
+      "n": 2,
+      "band": "belt",
+      "from": "ahead",
+      "k": 0.15
+    }
+  ],
+  "objectives": [
+    {
+      "type": "reach",
+      "x": 14000
+    },
+    {
+      "type": "destroy",
+      "what": "aircraft",
+      "n": 2
+    },
+    {
+      "type": "survive",
+      "maxDeaths": 0
+    }
+  ],
+  "stars": [
+    {
+      "id": "clean",
+      "desc": "Not a scratch",
+      "stat": "damageTaken",
+      "op": "==",
+      "value": 0
+    },
+    {
+      "id": "thorough",
+      "desc": "Nothing left flying",
+      "stat": "kills",
+      "op": ">=",
+      "value": 2
+    },
+    {
+      "id": "quick",
+      "desc": "Under 50 s",
+      "stat": "time",
+      "op": "<=",
+      "value": 50
+    }
+  ],
+  "landmarks": [
+    {
+      "x": 7744,
+      "kind": "bridge"
+    }
+  ],
+  "reward": {
+    "crates": 0,
+    "scrip": 25
+  }
+}

@@ -110,7 +110,7 @@ export async function suite({ W = 390, H = 844, gpu = false, bug = '', quiet = f
 
   try {
     await cdp.viewport(W, H, 1, true);
-    await cdp.goto(`${base}/index.html?preserve=1&dpr=1&nosave&debug${bug ? '&inputbug=' + bug : ''}`);
+    await cdp.goto(`${base}/index.html?preserve=1&dpr=1&nosave&debug&scene=boot${bug ? '&inputbug=' + bug : ''}`);
     const up = await cdp.waitFor('window.__kh && window.__kh.input', 20000);
     if (!up) throw new Error('game did not boot');
     await cdp.frames(4);

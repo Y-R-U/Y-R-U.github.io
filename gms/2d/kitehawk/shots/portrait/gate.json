@@ -1,0 +1,203 @@
+{
+  "when": "2026-08-24T15:59:31.059Z",
+  "runs": 64,
+  "sep": 1400,
+  "minHullWu": 64,
+  "flight": {
+    "turnWu": 263,
+    "recoveryWu": 585,
+    "zoomNeutral": true,
+    "f6pass": true,
+    "f7pass": true
+  },
+  "results": {
+    "portrait": {
+      "rows": [
+        {
+          "id": "P0[zoomFill 0.85]",
+          "what": "zoom window non-empty and usable",
+          "value": "legible >= 0.6294, contain <= 0.4170 (W 0.4170 / H 1.4530), raw overlap -0.2124, in-clamp [0.7800, 0.4170] = -0.3630",
+          "verdict": "FAIL",
+          "note": "boxW p90 941.9 wu over 198138 ENGAGED ticks / 252 engagements"
+        },
+        {
+          "id": "P0[90% fill]",
+          "what": "zoom window non-empty and usable",
+          "value": "legible >= 0.6294, contain <= 0.4170 (W 0.4170 / H 1.5385), raw overlap -0.2124, in-clamp [0.7800, 0.4170] = -0.3630",
+          "verdict": "FAIL",
+          "note": "boxW p90 941.9 wu over 198138 ENGAGED ticks / 252 engagements"
+        },
+        {
+          "id": "P1",
+          "what": "a combat turn fits",
+          "value": "263 wu at combat; visible at zoomIntimate 378.8 wu",
+          "verdict": "NEITHER",
+          "note": "NEITHER: PASS needs <= 235 wu at zoomIntimate, FAIL needs \"does not fit at all\". 263 is in the gap."
+        },
+        {
+          "id": "P1b[zoomFill 0.85]",
+          "what": "Vne dive recovery fits inside the clamp",
+          "value": "585 wu needs z <= 1.4530",
+          "verdict": "PASS",
+          "note": "never binds — above zoomIntimate"
+        },
+        {
+          "id": "P1b[90% fill]",
+          "what": "Vne dive recovery fits inside the clamp",
+          "value": "585 wu needs z <= 1.5385",
+          "verdict": "PASS",
+          "note": "never binds — above zoomIntimate"
+        },
+        {
+          "id": "P2",
+          "what": "warning on a diving attacker",
+          "value": "n=315 approaches: total median 1.75s, in-frame median 0.03s, in-frame p05 0.00s",
+          "verdict": "FAIL",
+          "note": "80/315 = 25.4% reached gun range having NEVER been on screen"
+        },
+        {
+          "id": "P3",
+          "what": "enemy silhouette legibility across the range",
+          "value": "hull 64 wu: 42.1 px at zoomWide, 64.8 px at delivered p90 (1.201), 54.0 px at zoomCombat",
+          "verdict": "PASS",
+          "note": ""
+        },
+        {
+          "id": "P3b",
+          "what": "P3 not passed by pinning the camera wide",
+          "value": "0.00% of duel time at zoom >= 1.25",
+          "verdict": "PASS",
+          "note": "VACUOUS: zoomIntimate is 1.22 and the clamp is absolute (§4.3.3), so zoom >= 1.25 is UNREACHABLE. This criterion cannot fail."
+        },
+        {
+          "id": "P3c",
+          "what": "legibility survives peak framing demand",
+          "value": "0/252 = 0.0% of engagements fit at 85% fill AND hull >= 40 px at the same instant",
+          "verdict": "FAIL",
+          "note": "measured per ENGAGEMENT, not per duel — a duel is mostly transit (D115)"
+        },
+        {
+          "id": "P4c",
+          "what": "the zoom controller does not pump",
+          "value": "5.83 raw rev/min, 2.13 UNEXPLAINED rev/min, 0.00% PUMP windows, travel ratio 0.948",
+          "verdict": "PASS",
+          "note": "re-specified per D114 + REPORT-3: PASS = zero PUMP windows AND <= 6 unexplained rev/min"
+        },
+        {
+          "id": "P6",
+          "what": "horizontal awareness",
+          "value": "100/801 = 12.5% of damage events had the attacker off screen for the preceding 1.0 s",
+          "verdict": "NEITHER",
+          "note": "edge chevrons are a §4.2 precondition but the criterion as worded credits only ON-SCREEN presence"
+        },
+        {
+          "id": "P9",
+          "what": "zoom is sim-neutral",
+          "value": "sim.mjs F14 byte-identical",
+          "verdict": "PASS",
+          "note": "delegated to the blessed gate F14, not re-implemented"
+        }
+      ],
+      "engagements": 252,
+      "engTicks": 198138,
+      "ticks": 487934,
+      "engagedPct": 0.40607541183848633,
+      "boxWp90": 941.8986068517759,
+      "onScreenEng": 0.3132311823072808
+    },
+    "landscape": {
+      "rows": [
+        {
+          "id": "P0[zoomFill 0.85]",
+          "what": "zoom window non-empty and usable",
+          "value": "legible >= 0.7628, contain <= 0.8137 (W 1.0937 / H 0.8137), raw overlap 0.0509, in-clamp [0.7800, 0.8137] = 0.0337",
+          "verdict": "NEITHER",
+          "note": "boxW p90 941.9 wu over 198138 ENGAGED ticks / 252 engagements"
+        },
+        {
+          "id": "P0[90% fill]",
+          "what": "zoom window non-empty and usable",
+          "value": "legible >= 0.7628, contain <= 0.8615 (W 1.0937 / H 0.8615), raw overlap 0.0987, in-clamp [0.7800, 0.8615] = 0.0815",
+          "verdict": "PASS",
+          "note": "boxW p90 941.9 wu over 198138 ENGAGED ticks / 252 engagements"
+        },
+        {
+          "id": "P1",
+          "what": "a combat turn fits",
+          "value": "263 wu at combat; visible at zoomIntimate 993.4 wu",
+          "verdict": "NEITHER",
+          "note": "NEITHER: PASS needs <= 235 wu at zoomIntimate, FAIL needs \"does not fit at all\". 263 is in the gap."
+        },
+        {
+          "id": "P1b[zoomFill 0.85]",
+          "what": "Vne dive recovery fits inside the clamp",
+          "value": "585 wu needs z <= 0.8137",
+          "verdict": "PASS",
+          "note": ""
+        },
+        {
+          "id": "P1b[90% fill]",
+          "what": "Vne dive recovery fits inside the clamp",
+          "value": "585 wu needs z <= 0.8615",
+          "verdict": "PASS",
+          "note": ""
+        },
+        {
+          "id": "P2",
+          "what": "warning on a diving attacker",
+          "value": "n=315 approaches: total median 1.75s, in-frame median 1.28s, in-frame p05 0.00s",
+          "verdict": "FAIL",
+          "note": "18/315 = 5.7% reached gun range having NEVER been on screen"
+        },
+        {
+          "id": "P3",
+          "what": "enemy silhouette legibility across the range",
+          "value": "hull 64 wu: 34.8 px at zoomWide, 53.5 px at delivered p90 (1.201), 44.6 px at zoomCombat",
+          "verdict": "PASS",
+          "note": ""
+        },
+        {
+          "id": "P3b",
+          "what": "P3 not passed by pinning the camera wide",
+          "value": "0.00% of duel time at zoom >= 1.25",
+          "verdict": "PASS",
+          "note": "VACUOUS: zoomIntimate is 1.22 and the clamp is absolute (§4.3.3), so zoom >= 1.25 is UNREACHABLE. This criterion cannot fail."
+        },
+        {
+          "id": "P3c",
+          "what": "legibility survives peak framing demand",
+          "value": "3/252 = 1.2% of engagements fit at 85% fill AND hull >= 40 px at the same instant",
+          "verdict": "FAIL",
+          "note": "measured per ENGAGEMENT, not per duel — a duel is mostly transit (D115)"
+        },
+        {
+          "id": "P4c",
+          "what": "the zoom controller does not pump",
+          "value": "5.65 raw rev/min, 2.91 UNEXPLAINED rev/min, 0.00% PUMP windows, travel ratio 1.059",
+          "verdict": "PASS",
+          "note": "re-specified per D114 + REPORT-3: PASS = zero PUMP windows AND <= 6 unexplained rev/min"
+        },
+        {
+          "id": "P6",
+          "what": "horizontal awareness",
+          "value": "119/801 = 14.9% of damage events had the attacker off screen for the preceding 1.0 s",
+          "verdict": "NEITHER",
+          "note": "edge chevrons are a §4.2 precondition but the criterion as worded credits only ON-SCREEN presence"
+        },
+        {
+          "id": "P9",
+          "what": "zoom is sim-neutral",
+          "value": "sim.mjs F14 byte-identical",
+          "verdict": "PASS",
+          "note": "delegated to the blessed gate F14, not re-implemented"
+        }
+      ],
+      "engagements": 252,
+      "engTicks": 198138,
+      "ticks": 487934,
+      "engagedPct": 0.40607541183848633,
+      "boxWp90": 941.8986068517759,
+      "onScreenEng": 0.47946885504042636
+    }
+  }
+}

@@ -32,7 +32,7 @@
     const m = await import('./js/main.js');
     if (m.boot) await m.boot();
   } catch (err) {
-    say('js/main.js is not built yet — the engine is. Debug pages: tools/pages/boot.html, parallax.html, parts.html');
+    say('KITEHAWK could not start. Debug pages: tools/pages/boot.html, hud.html, level.html');
     console.warn('[boot]', err);
   }
 </script>
