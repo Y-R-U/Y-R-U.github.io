@@ -1,0 +1,23 @@
+{
+ "votes": {
+  "shipping__pc_m__int1__shipped": 0,
+  "shipping__pc_m__int2__shipped": 1,
+  "shipping__pc_m__int3__shipped": 1,
+  "shipping__pc_m__close__shipped": 1,
+  "shipping__pc_f__int1__shipped": 1,
+  "shipping__pc_f__int2__shipped": 1,
+  "shipping__pc_f__int3__shipped": 0,
+  "shipping__pc_f__close__shipped": 1,
+  "shipping__pc_n__int1__shipped": 1,
+  "shipping__pc_n__int2__shipped": 1,
+  "shipping__pc_n__int3__shipped": 1,
+  "shipping__pc_n__close__shipped": 1,
+  "dad__bm_lewis \u2014 even__dad1__ship": 1,
+  "dad__bm_lewis \u2014 even__dad2__ship": 1,
+  "dad__bm_lewis \u2014 weary__dad1__ship": 1,
+  "dad__bm_lewis \u2014 weary__dad2__ship": 1
+ },
+ "notes": "",
+ "round": "r4",
+ "at": "2026-08-25T12:11:58.969Z"
+}

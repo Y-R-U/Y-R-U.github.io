@@ -24,3 +24,8 @@ tools/vo/vw/
 # committed — they are the evidence the cast note in gen_story.py cites.
 tools/vo/vcmp/
 tools/vo/audition/clips/
+
+# The bench's scratch takes — one file per press of SPEAK, thousands of them in a tuning session,
+# and every one reproducible from the text printed beside it in the page. The BENCH is committed;
+# what it renders is not.
+tools/vo/bench/takes/
