@@ -464,10 +464,29 @@
   // roomCount caps how many rooms appear in any single run (always
   // clamped to the number actually defined in rooms{}). groupCount is
   // how many task chains get placed at run start.
+  //
+  // `range` = the turn budget. Calibrated 2026-08 against a headless sim of
+  // the game.js turn rules (spendTurns / isCaught / scares / forced reveal)
+  // over 500 seeds per difficulty. Reference points, medians:
+  //
+  //   difficulty   perfect-knowledge   1st-play cost   budget   1st-play win
+  //   easy              16 turns          31 turns      36-44        95%
+  //   medium            20                38            44-52        91%
+  //   hard              24                46            48-56        72%
+  //
+  // The old 70-120 budgets were 3-4x what a first-time player actually
+  // spends, so nothing ever ran out of time and the escalating SCARE_TIERS
+  // in game.js (which key off turn/turnLimit) never left tier 1.
+  //
+  // NOTE the budget must be sized against the *first-play* column, not the
+  // perfect-knowledge one: placed task steps are indistinguishable from
+  // flavour buttons until clicked, so search — not execution — is most of
+  // the cost, and search scales with roomCount. That is why the gap over
+  // the theoretical minimum has to GROW with difficulty, not shrink.
   const difficulties = {
-    easy:   { label: "Easy",   range: [100, 120], visibleGoals: 4, roomCount: 8,  groupCount: 1 },
-    medium: { label: "Medium", range: [90, 110],  visibleGoals: 2, roomCount: 10, groupCount: 2 },
-    hard:   { label: "Hard",   range: [70, 92],   visibleGoals: 1, roomCount: 12, groupCount: 3 },
+    easy:   { label: "Easy",   range: [36, 44], visibleGoals: 4, roomCount: 8,  groupCount: 1 },
+    medium: { label: "Medium", range: [44, 52], visibleGoals: 2, roomCount: 10, groupCount: 2 },
+    hard:   { label: "Hard",   range: [48, 56], visibleGoals: 1, roomCount: 12, groupCount: 3 },
   };
 
   const gameNames = [
