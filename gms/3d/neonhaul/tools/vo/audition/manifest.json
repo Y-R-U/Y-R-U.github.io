@@ -1,5 +1,7 @@
 {
  "lines": {
+  "dad1": "They took the car and they have not been back. That is as done as it gets.",
+  "dad2": "\u2026There is a desk under the Tallow Yard. Ask for the Quartermaster. And do not tell them whose kid you are, because they already know.",
   "int1": "But\u2014",
   "int2": "Wait\u2014",
   "int3": "Just wait\u2014",
@@ -144,6 +146,50 @@
    "note": "neutral",
    "text": "Shit \u2014 they wouldn't let me get a word in. What sort of crap has my Dad got himself into? I shouldn't even be flying this. I need to make that money fast.",
    "armNote": ""
+  },
+  {
+   "id": "dad__bm_lewis \u2014 even__dad1__ship",
+   "group": "dad",
+   "voice": "bm_lewis \u2014 even",
+   "line": "dad1",
+   "arm": "ship",
+   "file": "clips/dad__bm_lewis \u2014 even__dad1__ship.mp3",
+   "note": "his own voice, untouched",
+   "text": "They took the car and they have not been back. That is as done as it gets.",
+   "armNote": "as it ships today \u2014 the word on its own with a comma"
+  },
+  {
+   "id": "dad__bm_lewis \u2014 even__dad2__ship",
+   "group": "dad",
+   "voice": "bm_lewis \u2014 even",
+   "line": "dad2",
+   "arm": "ship",
+   "file": "clips/dad__bm_lewis \u2014 even__dad2__ship.mp3",
+   "note": "his own voice, untouched",
+   "text": "\u2026There is a desk under the Tallow Yard. Ask for the Quartermaster. And do not tell them whose kid you are, because they already know.",
+   "armNote": "as it ships today \u2014 the word on its own with a comma"
+  },
+  {
+   "id": "dad__bm_lewis \u2014 weary__dad1__ship",
+   "group": "dad",
+   "voice": "bm_lewis \u2014 weary",
+   "line": "dad1",
+   "arm": "ship",
+   "file": "clips/dad__bm_lewis \u2014 weary__dad1__ship.mp3",
+   "note": "slower and a shade lower \u2014 he did not want to be asked",
+   "text": "They took the car and they have not been back. That is as done as it gets.",
+   "armNote": "as it ships today \u2014 the word on its own with a comma"
+  },
+  {
+   "id": "dad__bm_lewis \u2014 weary__dad2__ship",
+   "group": "dad",
+   "voice": "bm_lewis \u2014 weary",
+   "line": "dad2",
+   "arm": "ship",
+   "file": "clips/dad__bm_lewis \u2014 weary__dad2__ship.mp3",
+   "note": "slower and a shade lower \u2014 he did not want to be asked",
+   "text": "\u2026There is a desk under the Tallow Yard. Ask for the Quartermaster. And do not tell them whose kid you are, because they already know.",
+   "armNote": "as it ships today \u2014 the word on its own with a comma"
   }
  ],
  "groups": [
@@ -151,6 +197,11 @@
    "id": "shipping",
    "title": "What ships now",
    "blurb": "The twelve clips the game plays, as they stand now. Two things changed since you last heard these: the male take is am_echo instead of am_liam, and the monologue\u2019s second \u201cshit\u201d is now \u201ccrap\u201d. Nothing else is on this page \u2014 the voice, the carrier treatments and the Lewis pitch ladder are all settled."
+  },
+  {
+   "id": "dad",
+   "title": "Dad \u2014 is Lewis right for him?",
+   "blurb": "His two real lines from the shady-door scene, in bm_lewis. Two readings. Heads up: that scene is a silent text panel today and the player has two lines in it as well, so voicing Dad alone would leave you mute opposite him \u2014 tell me if it should become a voiced scene."
   }
  ]
 }

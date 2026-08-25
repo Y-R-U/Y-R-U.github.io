@@ -117,7 +117,7 @@ let MAN = null, VOTES = {}, NOTES = '', cur = null, rows = [];
 // changed when am_echo was cast, so a stored "bad" from round 1 would have sat there looking like a
 // verdict on a take that no longer exists. Versioning the key throws the old votes away, which is
 // the honest option: a stale vote against new audio is worse than no vote.
-const ROUND = 'r3';
+const ROUND = 'r4';
 const LS = 'neonhaul-vo-audition-' + ROUND;
 function loadLocal(){ try{ const d = JSON.parse(localStorage.getItem(LS)||'{}');
   VOTES = d.votes||{}; NOTES = d.notes||''; }catch(e){} }

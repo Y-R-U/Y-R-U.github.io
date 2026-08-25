@@ -46,6 +46,9 @@ CLIPS = os.path.join(HERE, 'clips')
 STORY = os.path.join(ROOT, 'assets', 'audio', 'story')
 
 LINES = {
+    'dad1': 'They took the car and they have not been back. That is as done as it gets.',
+    'dad2': '…There is a desk under the Tallow Yard. Ask for the Quartermaster. And do not tell '
+            'them whose kid you are, because they already know.',
     'int1': 'But—',
     'int2': 'Wait—',
     'int3': 'Just wait—',
@@ -102,6 +105,16 @@ def main():
             add('shipping', f'pc_{g}', line, 'shipped',
                 os.path.join(STORY, f'pc_{g}_{line}.mp3'), who)
 
+    # DAD, auditioned on his own two lines. Aaron: *"maybe the dad can use the Lewis voice?"* —
+    # bm_lewis rated 4/4 and his one objection to it, that it reads old, is the brief here. Note
+    # that Story.THREAD_SCENE is a SILENT text panel today: this is a casting question first and a
+    # question about whether to voice that scene at all second.
+    for take, who in (('even', 'his own voice, untouched'),
+                      ('weary', 'slower and a shade lower — he did not want to be asked')):
+        for slot in ('dad1', 'dad2'):
+            add('dad', f'bm_lewis — {take}', slot, 'ship',
+                os.path.join(VCMP, f'D_{take}_{slot}.room.mp3'), who)
+
     man = {'lines': LINES, 'arms': ARMS, 'current': CURRENT, 'items': items,
            'groups': [
                {'id': 'shipping', 'title': 'What ships now',
@@ -110,6 +123,11 @@ def main():
                          'and the monologue\u2019s second \u201cshit\u201d is now \u201ccrap\u201d. '
                          'Nothing else is on this page \u2014 the voice, the carrier treatments and '
                          'the Lewis pitch ladder are all settled.'},
+               {'id': 'dad', 'title': 'Dad — is Lewis right for him?',
+                'blurb': 'His two real lines from the shady-door scene, in bm_lewis. Two readings. '
+                         'Heads up: that scene is a silent text panel today and the player has two '
+                         'lines in it as well, so voicing Dad alone would leave you mute opposite '
+                         'him — tell me if it should become a voiced scene.'},
            ]}
     json.dump(man, open(os.path.join(HERE, 'manifest.json'), 'w'), indent=1)
     print(f'{len(items)} clips -> {CLIPS}')
