@@ -13,18 +13,15 @@ This is the GitHub Pages repo for `https://y-r-u.github.io/`. It contains many b
 ```text
 /                      Home page and project registry
 /assets/               Shared screenshots and media
-/ai/                   AI knowledge base and asset zips
 /app/pwa/              PWA apps: fnote, timezones, edit2d, khydro, reader
-/d/                    Image Editor
-/d2/                   Draw & Paint
-/e/                    Code Editor
-/e2/                   Code Editor V2
-/m/                    Mobile Editor
-/m2/                   AB Edit
-/n/                    WebRTC Test
-/q/                    Goal Tracker
-/k/                    K-Hydro Track
-/t5/                   Top 5 Review
+/app/d/                Image Editor
+/app/d2/               Draw & Paint
+/app/e/                Code Editor
+/app/e2/               Code Editor V2
+/app/m/                Mobile Editor
+/app/m2/               AB Edit
+/app/q/                Goal Tracker
+/app/k/                K-Hydro Track
 /gms/                  Games
 /gms/pwa/              PWA games
 /gms/3d/               Three.js 3D games

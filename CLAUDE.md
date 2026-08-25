@@ -14,18 +14,15 @@ A GitHub Pages site at https://y-r-u.github.io/ containing a growing collection 
 ```
 /                      Root — index.html (home/landing), projects.js (project registry)
 /assets/               Shared assets: screenshots, home video
-/ai/                   AI knowledge base and asset zips
 /app/pwa/              PWA apps (fnote, timezones, edit2d, khydro)
-/d/                    Image Editor
-/d2/                   Draw & Paint
-/e/                    Code Editor (Monaco)
-/e2/                   Code Editor V2
-/m/                    Mobile Editor
-/m2/                   AB Edit
-/n/                    WebRTC Test
-/q/                    Goal Tracker
-/k/                    K-Hydro Track
-/t5/                   Top 5 Review
+/app/d/                Image Editor
+/app/d2/               Draw & Paint
+/app/e/                Code Editor (Monaco)
+/app/e2/               Code Editor V2
+/app/m/                Mobile Editor
+/app/m2/               AB Edit
+/app/q/                Goal Tracker
+/app/k/                K-Hydro Track
 /gms/                  All games
   /gms/a/              Asteroids
   /gms/c/              Pocket Legends CCG

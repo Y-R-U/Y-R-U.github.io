@@ -32,43 +32,35 @@ const PROJECTS = [
   //  APPS (sorted by date, oldest first)
   // ══════════════════════════════════════════
 
-  { name: "Code Editor",    path: "/e/",                screenshot: "code-editor",    type: "app",
+  { name: "Code Editor",    path: "/app/e/",                screenshot: "code-editor",    type: "app",
     desc: "Monaco-based live HTML/JS/CSS code editor with project save/load and instant preview.",
     date: "2024-06-20", creator: "Claude" },
 
-  { name: "Mobile Editor",  path: "/m/",                screenshot: "mobile-editor",  type: "app",
+  { name: "Mobile Editor",  path: "/app/m/",                screenshot: "mobile-editor",  type: "app",
     desc: "Minimal textarea-based live HTML/JS/CSS code editor optimized for mobile devices.",
     date: "2024-06-24", creator: "Claude" },
 
-  { name: "Goal Tracker",   path: "/q/",                screenshot: "goal-tracker",   type: "app",
+  { name: "Goal Tracker",   path: "/app/q/",                screenshot: "goal-tracker",   type: "app",
     desc: "Goal-setting and progress tracking app. Set targets, log progress, and visualize achievements.",
     date: "2024-07-10", creator: "Claude" },
 
-  { name: "Top 5 Review",   path: "/t5/",               screenshot: "top5-review",    type: "app",
-    desc: "Dante's Top 5 Review: create ranked lists and reviews for movies, music, games, and more.",
-    date: "2024-07-16", creator: "Claude" },
-
-  { name: "Image Editor",   path: "/d/",                screenshot: "image-editor",   type: "app",
+  { name: "Image Editor",   path: "/app/d/",                screenshot: "image-editor",   type: "app",
     desc: "Edit images in-browser with layers, drawing tools, selection, and shape primitives.",
     date: "2024-09-11", creator: "Claude" },
 
-  { name: "Code Editor V2", path: "/e2/",               screenshot: "code-editor-v2", type: "app",
+  { name: "Code Editor V2", path: "/app/e2/",               screenshot: "code-editor-v2", type: "app",
     desc: "Enhanced Monaco Editor with project loading via projectData.js and compressed storage.",
     date: "2025-02-02", creator: "Claude" },
 
-  { name: "AB Edit",        path: "/m2/",               screenshot: "ab-edit",        type: "app",
+  { name: "AB Edit",        path: "/app/m2/",               screenshot: "ab-edit",        type: "app",
     desc: "Code editor with separate HTML/JS/CSS tabs and a companion preview view.",
     date: "2025-02-15", creator: "Claude" },
 
-  { name: "K-Hydro Track",  path: "/k/",                screenshot: "k-hydro",        type: "app",
+  { name: "K-Hydro Track",  path: "/app/k/",                screenshot: "k-hydro",        type: "app",
     desc: "Hydroponic plant management app with growth tracking, nutrient logs, harvest data, and photo journals.",
     date: "2025-05-08", creator: "Claude" },
 
-  { name: "WebRTC Test",    path: "/n/",                screenshot: "webrtc-test",    type: "app",
-    desc: "WebRTC STUN peer connection test tool using manual copy/paste signaling for P2P data channels.",
-    date: "2025-09-02", creator: "Claude" },
-
-  { name: "Draw & Paint",   path: "/d2/",               screenshot: "draw-editor",    type: "app",
+  { name: "Draw & Paint",   path: "/app/d2/",               screenshot: "draw-editor",    type: "app",
     desc: "Drawing & image editor with layers, pen, shapes, text, arrows, stroke/fill controls, and PNG export.",
     date: "2026-03-04", creator: "Claude" },
 
@@ -369,11 +361,11 @@ const PROJECTS = [
     desc: "Worms in 3D, fought by feuding insect mobs on narrow cliff-edge ridges of dirt and grass. Four factions with one procedural googly-eyed model each — The Picnic Mob (mobster ants in fedoras), Dung & Sons Ltd. (builder dung beetles in hard hats), House Silk (gothic spiders in top hats) and Sting Corp. (middle-management wasps in ties) — take turns pacing the crumbling ridge, judging the wind and lobbing acorn RPGs, bouncing berry bombs, rolling dung balls and spit, slapping each other into the void, or calling down THE SHOE (the Human's flip-flop) and a Bee-52 carpet-bombing run. Every explosion blows a crater out of the ground, and knockback is lethal — the pond, sink, jam or BBQ coals below are always waiting. The camera is the star: it swoops to each bug at turn start, rides every projectile in slow motion with an orbital drift, pulls out for the impact beat, chases screaming bugs all the way down to the splash, and epic moments earn an instant replay from a random angle — worm's eye, drone cam, victim cam, side dolly or ledge security cam. Every turn opens facing your nearest enemy, and a target button hops the camera between foes so nobody hides. The bugs never stop talking (speech bubbles + squeaky procedural gibberish voices): ants make you offers you can't refuse, beetles cite health and safety violations, spiders recite doom poetry, wasps schedule your destruction ('per my last sting—'), and everyone screams something memorable on the way down. A 10-chapter story — THE LAST SANDWICH — opens with an in-engine cutscene of the picnic fumble that started the war and ends against a giant zen mantis on the sandwich itself; plus quick grudges vs 1-3 AI factions on four arenas (garden fence, midnight kitchen, picnic blanket, BBQ at dusk), sudden-death rising jam, a cosmetic hat shop, daily streak chests, and three AI heat levels from Mild Salsa to Nuclear. Three.js, no build step, fully procedural art and audio, mobile-first.",
     date: "2026-07-15", creator: "Fable 5" },
 
-  { name: "MC Addons",          path: "/mcaddons/", screenshot: "mcaddons", type: "app",
+  { name: "MC Addons",          path: "/app/mcaddons/", screenshot: "mcaddons", type: "app",
     desc: "Minecraft Bedrock addon downloads. A dark, pixel-styled page serving .mcaddon files straight into Minecraft — starting with the Trolling Addon: Speed Minecarts that stack more speed on every powered rail, Skin Mocker statues that copy whoever places them, Stalkers that shadow the nearest other player from exactly 30 blocks and teleport only when no one's watching, Hunters that lurk on a random fuse then snap and chase, Pure Sky camo blocks that vanish into the ceiling, an unbreakable God Pickaxe and a Chunk Miner that pours a whole chunk away like falling sand. Every item shown with its crafting recipe in an interactive crafting grid; file list pulls live from the repo. Full pack source + pixel-art generator included.",
     date: "2026-07-15", creator: "Fable 5" },
 
-  { name: "Addon Studio",       path: "/mcaddons/studio/", screenshot: "mcstudio", type: "app",
+  { name: "Addon Studio",       path: "/app/mcaddons/studio/", screenshot: "mcstudio", type: "app",
     desc: "An all-in-one Minecraft Bedrock add-on editor that replaces every app the usual guides tell you to install — Blockbench, VS Code, Paint.NET, a JSON validator, a zip tool and the game itself. Answer a few plain questions to make a mob, item, food, weapon or block and it writes the real, current-format JSON; paint the textures with UV guides that show exactly which square is the front of the head; build the 3D shape out of boxes with auto-UV packing; animate it with a keyframe timeline or one-tap Walk/Attack/Dance presets; then play with it in a first-person voxel world that loads your actual pack files, simulates the real behaviour components and shows Minecraft-style content-log errors. Every mistake is explained in words a child can act on. Exports a genuine .mcaddon. Built for a kid to use alone — every popup, hint and sound has its own off switch.",
     date: "2026-07-28", creator: "Opus 5" },
 
@@ -435,13 +427,10 @@ const PROJECTS = [
   //  NON-PROJECT DIRECTORIES (tracked, not displayed)
   // ══════════════════════════════════════════
 
-  { name: "AI Resources",       path: "/ai/",                type: "other",  note: "AI knowledge base and asset zips" },
   { name: "Shared Assets",      path: "/assets/",            type: "other",  note: "Shared assets including screenshots and home video" },
   { name: "Game Assets",        path: "/gms/assets/",        type: "other",  note: "Game-specific shared assets" },
-  { name: "Y-R-U Mirror",       path: "/Y-R-U/",            type: "other",  note: "Repository mirror / branch checkout" },
-  { name: "K-Hydro PWA",        path: "/app/pwa/khydro/",   type: "other",  note: "PWA version of K-Hydro Track (main entry at /k/)" },
+  { name: "K-Hydro PWA",        path: "/app/pwa/khydro/",   type: "other",  note: "PWA version of K-Hydro Track (main entry at /app/k/)" },
   { name: "Bounce Merge 2D",    path: "/gms/failed/merge1/", type: "other",  note: "Earlier 2D version of Bounce Merge (superseded by 3D version)" },
-  { name: "i2 backup",          path: "/i2.html",           type: "other",  note: "Older version of the main index.html" },
   { name: ".github",            path: "/.github/",          type: "other",  note: "GitHub workflows and CI configuration" },
   { name: ".claude",            path: "/.claude/",          type: "other",  note: "Claude Code configuration" },
 ];
