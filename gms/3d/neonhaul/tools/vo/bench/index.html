@@ -21,6 +21,10 @@ input[type=range]{width:112px}
 .ph{background:#0d1116;border:1px solid var(--line);border-radius:9px;padding:9px 11px;margin:8px 0;
   font:13px/1.5 ui-monospace,Menlo,monospace;color:#c8b98a;word-break:break-word}
 .ph b{color:var(--dim);font-weight:400;font-family:-apple-system,sans-serif}
+.ph .n{color:var(--dim)}
+.ph b.warn{color:#e0a33f}
+i.w{font-style:normal;color:#5f7fa8;background:#0b1a2a;border-radius:3px;padding:0 2px}
+.take .txt i.w{color:#5f7fa8}
 .take{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin:9px 0}
 .take .top{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
 .take .txt{flex:1;min-width:150px;font:14px/1.4 ui-monospace,Menlo,monospace;word-break:break-word}
@@ -37,7 +41,10 @@ code{background:#0d1116;padding:1px 5px;border-radius:4px;font-size:13px}
 </style>
 
 <h1>Kokoro bench</h1>
-<p class="sub">Type the exact line, hear it, keep what works. Nothing here touches the game.</p>
+<p class="sub">Type the exact line, hear it, keep what works. Nothing here touches the game.<br>
+Whitespace and invisible characters are passed through untouched and shown as
+<i class="w">·</i> <i class="w">⏎</i> <i class="w">⇥</i> <i class="w">⍽nbsp</i>, so you can see what
+you actually sent.</p>
 
 <textarea id="text" placeholder="But&#8212;"></textarea>
 
@@ -49,6 +56,7 @@ code{background:#0d1116;padding:1px 5px;border-radius:4px;font-size:13px}
 <div class="ctl">
   <label class="f"><input type="checkbox" id="chain" checked> through the game's chain</label>
   <label class="f"><input type="checkbox" id="forsay" checked> apply for_say()</label>
+  <label class="f"><input type="checkbox" id="escapes"> decode \n \t \xNN</label>
   <button class="go" id="go">SPEAK</button>
 </div>
 
@@ -113,18 +121,29 @@ function play(t) {
 function setStatus(s, err) { const e = $('#status'); e.textContent = s; e.className = 'status' + (err ? ' err' : ''); }
 
 async function speak() {
-  const text = $('#text').value.trim();
-  if (!text) { setStatus('type a line first'); return; }
+  // NOT trimmed. Leading/trailing whitespace is part of the input under test — see the note in
+  // server.py. The textarea's value goes out byte for byte.
+  const text = $('#text').value;
+  if (text === '') { setStatus('type a line first'); return; }
   $('#go').disabled = true; setStatus('rendering…');
   try {
     const r = await fetch('say', { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, voice: $('#voice').value, speed: +$('#speed').value,
-        pitch: +$('#pitch').value, chain: $('#chain').checked, for_say: $('#forsay').checked }) });
+        pitch: +$('#pitch').value, chain: $('#chain').checked, for_say: $('#forsay').checked,
+        escapes: $('#escapes').checked }) });
     const d = await r.json();
     if (d.error) { setStatus(d.error, true); $('#ph').hidden = true; return; }
-    setStatus(`${d.sec.toFixed(2)}s · ${d.rms.toFixed(1)} dBFS · ${d.ms} ms`);
+    setStatus(`${d.sec.toFixed(2)}s · ${d.rms.toFixed(1)} dBFS · ${d.ms} ms`
+      + (d.chunks > 1 ? `  ⚠ ${d.chunks} chunks — kokoro split this and joined the pieces` : ''));
     $('#ph').hidden = false;
-    $('#ph').innerHTML = `<b>sent to kokoro:</b> ${esc(d.sent)}<br><b>phonemes:</b> ${esc(d.phonemes)}`;
+    $('#ph').innerHTML =
+      `<b>you typed:</b> ${vis(d.raw)}  <span class="n">${d.raw.length} chars</span>`
+      + (d.changed ? `<br><b>sent to kokoro:</b> ${vis(d.sent)}  <span class="n">${d.chars} chars</span>`
+                   : `<br><b>sent to kokoro:</b> <span class="n">unchanged</span>`)
+      + `<br><b>python repr:</b> ${esc(d.sent_repr)}`
+      + `<br><b>phonemes:</b> ${esc(d.phonemes)}`
+      + (d.chunks > 1 ? `<br><b class="warn">⚠ ${d.chunks} chunks.</b> A newline forces a split; the
+         pieces are generated separately and butted together, which is not a pause the model chose.` : '');
     d.vote = null;
     TAKES.unshift(d); save(); render(); play(d);
   } catch (e) { setStatus(String(e), true); }
@@ -132,6 +151,20 @@ async function speak() {
 }
 
 const esc = s => String(s ?? '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+
+// Every character that does not draw ink, drawn. A trailing space, a non-breaking space and a
+// carriage return are indistinguishable in rendered HTML and are exactly the combinations being
+// hunted, so they are marked rather than shown.
+const MARK = { ' ': '·', '\n': '⏎', '\r': '⏎r', '\t': '⇥', '\u00a0': '⍽nbsp', '\u200b': '⌷zwsp',
+               '\u2014': '—', '\u2013': '–', '\u2026': '…', '\u2019': '’' };
+function vis(s) {
+  return String(s ?? '').split('').map(ch => {
+    if (MARK[ch]) return `<i class="w">${MARK[ch]}</i>`;
+    const c = ch.codePointAt(0);
+    if (c < 0x20 || c === 0x7f) return `<i class="w">\\x${c.toString(16).padStart(2, '0')}</i>`;
+    return esc(ch);
+  }).join('');
+}
 
 function render() {
   const box = $('#takes'); box.innerHTML = '';
@@ -141,7 +174,7 @@ function render() {
     const top = document.createElement('div'); top.className = 'top';
     const p = document.createElement('button'); p.className = 'b'; p.textContent = '▶';
     p.onclick = () => play(t);
-    const tx = document.createElement('div'); tx.className = 'txt'; tx.textContent = t.raw;
+    const tx = document.createElement('div'); tx.className = 'txt'; tx.innerHTML = vis(t.raw);
     const y = document.createElement('button'); y.className = 'b y' + (t.vote === 1 ? ' on' : ''); y.textContent = '✓';
     const n = document.createElement('button'); n.className = 'b n' + (t.vote === 0 ? ' on' : ''); n.textContent = '✗';
     y.onclick = () => { t.vote = t.vote === 1 ? null : 1; save(); render(); };

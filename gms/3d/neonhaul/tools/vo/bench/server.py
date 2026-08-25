@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""§S2-T — the Kokoro bench: type the exact text, hear it, keep what works.
+r"""§S2-T — the Kokoro bench: type the exact text, hear it, keep what works.
 
 Aaron: *"if you want me to fix the glitches, plug in kokoro and allow me to edit the exact text and
 regen, I'll edit till it sounds good and you will see what works vs what was bad. may be good for
@@ -15,6 +15,13 @@ WHY A SERVER AND NOT A SCRIPT. `KPipeline` is ~6 s to load and ~1 s to generate.
 per edit would spend the whole session loading the same 82 M weights, and a six-second wait per
 tweak is the difference between iterating and giving up. This loads both English pipelines once and
 holds them.
+
+EXACT MEANS EXACT. Aaron: *"everything after previous word up until next word … includes any white
+space, special chars including words and carriage returns etc. as certain combos can cause issues."*
+So the text is passed through byte for byte — no strip, no collapse — and the page prints `repr()`
+of what was sent alongside the audio, because a trailing space and a trailing non-breaking space
+look the same on screen and do not sound the same. `escapes` decodes `\n` / `\t` / `\xNN` typed as
+literal backslash sequences, since a textarea cannot produce a lone carriage return.
 
 WHAT IT SHOWS THAT A TAPE CANNOT — **the phonemes**. Aaron: *"some words need to change due to
 kokoro being blind to context, e.g. words sound different based on context, e.g. read. therefore we
@@ -96,6 +103,13 @@ def render(text, voice, speed, pitch, chain):
     return out, {
         'id': tid, 'sec': round(len(a) / SR, 3), 'rms': round(rms, 2),
         'phonemes': ' | '.join((r.phonemes or '') for r in res),
+        # CHUNKS. Kokoro segments the text and generates each piece separately; the pieces are then
+        # concatenated. A newline forces a split, so "But,\nWait," renders as TWO takes joined end
+        # to end and runs half a second longer than the same words separated by spaces. That join is
+        # not a pause the model chose, and it is the first thing to suspect when a line reads with
+        # an odd gap in it. It is also why `keep_words` refuses a multi-chunk take: the timestamps
+        # it cuts on are per chunk.
+        'chunks': len(res),
         'file': os.path.basename(out),
     }
 
@@ -128,9 +142,22 @@ class H(http.server.SimpleHTTPRequestHandler):
             j = json.loads(self.rfile.read(n) or b'{}')
         except Exception as e:
             return self.send_error(400, str(e))
-        raw = (j.get('text') or '').strip()
-        if not raw:
+        # EXACT. Aaron: *"what i mean by exact text btw is everything after previous word up until
+        # next word. that includes any white space, special chars including words and carriage
+        # returns etc. as certain combos can cause issues."* The first version of this line called
+        # .strip(), so a leading space or a trailing newline — precisely the kind of combination he
+        # is hunting — could never reach the model. Nothing is trimmed, collapsed or normalised
+        # here; the only transform is `for_say`, and that one is a toggle and is shown.
+        raw = j.get('text')
+        if not isinstance(raw, str) or raw == '':
             return self._json({'error': 'no text'}, 400)
+        # Optional escape decoding, so an invisible character can be typed deliberately. A textarea
+        # cannot produce a lone \r or a \t, and those are exactly the ones that bite.
+        if j.get('escapes'):
+            try:
+                raw = raw.encode('utf-8').decode('unicode_escape').encode('latin-1').decode('utf-8')
+            except Exception as e:
+                return self._json({'error': f'bad escape sequence: {e}'}, 200)
         voice = j.get('voice') or 'am_echo'
         if voice not in VOICES:
             return self._json({'error': f'unknown voice {voice}'}, 400)
@@ -138,13 +165,20 @@ class H(http.server.SimpleHTTPRequestHandler):
         # point of the bench being honest: an em dash BECOMES a comma on the way to Kokoro, and a
         # line tuned without that step is tuned against a different input than the one that ships.
         text = for_say(raw) if j.get('for_say', True) else raw
+        if text == '':
+            return self._json({'error': 'that reduced to an empty string before it reached kokoro'}, 200)
         t0 = time.time()
         try:
             path, meta = render(text, voice, j.get('speed', 1.0), j.get('pitch', 1.0),
                                 bool(j.get('chain', True)))
         except Exception as e:
             return self._json({'error': str(e)}, 200)
-        meta.update({'sent': text, 'raw': raw, 'voice': voice, 'ms': int((time.time() - t0) * 1000),
+        # repr() of both, so the page can show the exact characters rather than a rendering of them:
+        # a trailing space and a trailing non-breaking space look identical in HTML and do not sound
+        # identical.
+        meta.update({'sent': text, 'raw': raw, 'sent_repr': repr(text), 'raw_repr': repr(raw),
+                     'chars': len(text), 'changed': text != raw,
+                     'voice': voice, 'ms': int((time.time() - t0) * 1000),
                      'speed': j.get('speed', 1.0), 'pitch': j.get('pitch', 1.0),
                      'chain': bool(j.get('chain', True))})
         return self._json(meta)
