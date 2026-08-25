@@ -66,7 +66,18 @@ SR = 22050
 #   boss   bm_george — GB male, and the slowest-reading voice in the English set (148 wpm at
 #          speed 1.0 against a 144-198 cast range). Unhurried is the character: he is not worried
 #          about how this conversation ends. Slowed further and pitched down 3 %.
-#   pc_m   am_liam, the youngest-sounding male, which is what "young male ~20" asks for.
+#   pc_m   am_echo. The original cast was `am_liam`, picked on the reasoning that it was the
+#          youngest-sounding male and "young male ~20" is what the brief asks for. Aaron on the
+#          shipped build: *"the male voice sounds awful, at least the first 3 times he speaks."*
+#          §S2-S put all eleven installed male voices through THIS chain at THESE settings and had
+#          him rate them blind-ish, four lines each (tools/vo/audition/). am_liam scored 1/4 — and
+#          scored 1/4 again, independently, in the section that re-rated the shipped clips, which
+#          is the only cross-check that tape had. am_echo, am_michael, bm_lewis and bm_fable all
+#          scored 4/4; he picked am_echo. bm_daniel scored 0/4.
+#
+#          Speed and pitch are UNCHANGED at 1.04/1.02 on purpose: those are the numbers the
+#          audition rendered at, so the take he approved is the take that ships. Changing either
+#          would make the rating a claim about a clip nobody heard.
 #   pc_f   af_sky, light and young. The Haul Control operators are af_sarah/bf_emma/af_alloy, so
 #          the player does not end up sounding like dispatch.
 #   pc_n   Aaron's spec is "a high male or low female read". This is af_sky — pc_f's OWN voice —
@@ -80,7 +91,7 @@ SR = 22050
 VOICES = {
     'boss': {'voice': 'bm_george', 'speed': 0.88, 'pitch': 0.97, 'gain': 1.0,
              'who': 'the Criminal Leader — low, unhurried, bored of this conversation'},
-    'pc_m': {'voice': 'am_liam', 'speed': 1.04, 'pitch': 1.02, 'gain': 1.0,
+    'pc_m': {'voice': 'am_echo', 'speed': 1.04, 'pitch': 1.02, 'gain': 1.0,
              'who': 'the player, young male ~20'},
     'pc_f': {'voice': 'af_sky', 'speed': 1.04, 'pitch': 1.04, 'gain': 1.0,
              'who': 'the player, young female ~20'},
@@ -107,7 +118,8 @@ PC = [
     # "but now I’m going to have to" was cut in S2-M. Aaron: *"It doesn’t sound good and is
     # implied anyway."* He is right on both counts — the clause is the line explaining itself, and
     # "I need to make that money fast" two sentences later already says it.
-    ('close', 'Shit — they wouldn’t let me get a word in. What sort of shit has my Dad got '
+    # Aaron, 2026-08-25: *"the line that says shit twice, the 2nd one needs to be crap instead."*
+    ('close', 'Shit — they wouldn’t let me get a word in. What sort of crap has my Dad got '
               'himself into? I shouldn’t even be flying this. I need to make that money fast.'),
 ]
 

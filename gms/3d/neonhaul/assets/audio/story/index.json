@@ -9,7 +9,7 @@
    "who": "the Criminal Leader \u2014 low, unhurried, bored of this conversation"
   },
   "pc_m": {
-   "voice": "am_liam",
+   "voice": "am_echo",
    "speed": 1.04,
    "pitch": 1.02,
    "gain": 1.0,
@@ -31,9 +31,9 @@
   }
  },
  "takeSec": {
-  "m": 7.44,
-  "f": 8.0,
-  "n": 8.08
+  "m": 7.67,
+  "f": 7.98,
+  "n": 8.13
  },
  "clips": [
   {
@@ -87,30 +87,30 @@
   },
   {
    "slot": "pc_m_int1",
-   "sec": 0.63,
-   "rms": -18.0,
-   "bytes": 4459,
+   "sec": 0.75,
+   "rms": -19.4,
+   "bytes": 5086,
    "src": "kokoro"
   },
   {
    "slot": "pc_m_int2",
-   "sec": 0.69,
-   "rms": -17.0,
-   "bytes": 4772,
+   "sec": 0.8,
+   "rms": -16.4,
+   "bytes": 5399,
    "src": "kokoro"
   },
   {
    "slot": "pc_m_int3",
-   "sec": 0.91,
-   "rms": -16.9,
-   "bytes": 6026,
+   "sec": 0.99,
+   "rms": -17.6,
+   "bytes": 6496,
    "src": "kokoro"
   },
   {
    "slot": "pc_m_close",
-   "sec": 7.44,
-   "rms": -16.3,
-   "bytes": 45210,
+   "sec": 7.67,
+   "rms": -16.0,
+   "bytes": 46620,
    "src": "kokoro"
   },
   {
@@ -136,9 +136,9 @@
   },
   {
    "slot": "pc_f_close",
-   "sec": 8.0,
-   "rms": -15.6,
-   "bytes": 48658,
+   "sec": 7.98,
+   "rms": -15.7,
+   "bytes": 48501,
    "src": "kokoro"
   },
   {
@@ -164,9 +164,9 @@
   },
   {
    "slot": "pc_n_close",
-   "sec": 8.08,
-   "rms": -15.6,
-   "bytes": 49128,
+   "sec": 8.13,
+   "rms": -15.7,
+   "bytes": 49441,
    "src": "kokoro"
   }
  ]

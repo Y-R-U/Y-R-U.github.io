@@ -16,3 +16,11 @@ __pycache__/
 # re-split without regenerating; never shipped (~40 MB and redundant with the cut clips).
 tools/vo/raw/
 tools/vo/vw/
+
+# §S2-S audition intermediates — 23 MB of per-voice Kokoro takes and their treated copies, and the
+# 1.6 MB of mp3 the audition page is assembled FROM them. Same rule as raw/ above: the takes that
+# ship are committed, the material they were chosen out of is not. build.py rebuilds clips/ from
+# vcmp/, and voice_probe.py + pitch_probe.py rebuild vcmp/. The ratings themselves (votes.json) ARE
+# committed — they are the evidence the cast note in gen_story.py cites.
+tools/vo/vcmp/
+tools/vo/audition/clips/

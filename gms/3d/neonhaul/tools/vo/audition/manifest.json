@@ -1,0 +1,156 @@
+{
+ "lines": {
+  "int1": "But\u2014",
+  "int2": "Wait\u2014",
+  "int3": "Just wait\u2014",
+  "close": "Shit \u2014 they wouldn't let me get a word in. What sort of crap has my Dad got himself into? I shouldn't even be flying this. I need to make that money fast."
+ },
+ "arms": {
+  "ship": "as it ships today \u2014 the word on its own with a comma",
+  "carry": "full sentence, cut at the end of the key word",
+  "carry_ov": "full sentence, cut 45 ms INTO the next word",
+  "bang": "key word takes an exclamation mark, sentence carries on behind it"
+ },
+ "current": "am_echo",
+ "items": [
+  {
+   "id": "shipping__pc_m__int1__shipped",
+   "group": "shipping",
+   "voice": "pc_m",
+   "line": "int1",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_m__int1__shipped.mp3",
+   "note": "male \u2014 now am_echo",
+   "text": "But\u2014",
+   "armNote": ""
+  },
+  {
+   "id": "shipping__pc_m__int2__shipped",
+   "group": "shipping",
+   "voice": "pc_m",
+   "line": "int2",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_m__int2__shipped.mp3",
+   "note": "male \u2014 now am_echo",
+   "text": "Wait\u2014",
+   "armNote": ""
+  },
+  {
+   "id": "shipping__pc_m__int3__shipped",
+   "group": "shipping",
+   "voice": "pc_m",
+   "line": "int3",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_m__int3__shipped.mp3",
+   "note": "male \u2014 now am_echo",
+   "text": "Just wait\u2014",
+   "armNote": ""
+  },
+  {
+   "id": "shipping__pc_m__close__shipped",
+   "group": "shipping",
+   "voice": "pc_m",
+   "line": "close",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_m__close__shipped.mp3",
+   "note": "male \u2014 now am_echo",
+   "text": "Shit \u2014 they wouldn't let me get a word in. What sort of crap has my Dad got himself into? I shouldn't even be flying this. I need to make that money fast.",
+   "armNote": ""
+  },
+  {
+   "id": "shipping__pc_f__int1__shipped",
+   "group": "shipping",
+   "voice": "pc_f",
+   "line": "int1",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_f__int1__shipped.mp3",
+   "note": "female",
+   "text": "But\u2014",
+   "armNote": ""
+  },
+  {
+   "id": "shipping__pc_f__int2__shipped",
+   "group": "shipping",
+   "voice": "pc_f",
+   "line": "int2",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_f__int2__shipped.mp3",
+   "note": "female",
+   "text": "Wait\u2014",
+   "armNote": ""
+  },
+  {
+   "id": "shipping__pc_f__int3__shipped",
+   "group": "shipping",
+   "voice": "pc_f",
+   "line": "int3",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_f__int3__shipped.mp3",
+   "note": "female",
+   "text": "Just wait\u2014",
+   "armNote": ""
+  },
+  {
+   "id": "shipping__pc_f__close__shipped",
+   "group": "shipping",
+   "voice": "pc_f",
+   "line": "close",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_f__close__shipped.mp3",
+   "note": "female",
+   "text": "Shit \u2014 they wouldn't let me get a word in. What sort of crap has my Dad got himself into? I shouldn't even be flying this. I need to make that money fast.",
+   "armNote": ""
+  },
+  {
+   "id": "shipping__pc_n__int1__shipped",
+   "group": "shipping",
+   "voice": "pc_n",
+   "line": "int1",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_n__int1__shipped.mp3",
+   "note": "neutral",
+   "text": "But\u2014",
+   "armNote": ""
+  },
+  {
+   "id": "shipping__pc_n__int2__shipped",
+   "group": "shipping",
+   "voice": "pc_n",
+   "line": "int2",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_n__int2__shipped.mp3",
+   "note": "neutral",
+   "text": "Wait\u2014",
+   "armNote": ""
+  },
+  {
+   "id": "shipping__pc_n__int3__shipped",
+   "group": "shipping",
+   "voice": "pc_n",
+   "line": "int3",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_n__int3__shipped.mp3",
+   "note": "neutral",
+   "text": "Just wait\u2014",
+   "armNote": ""
+  },
+  {
+   "id": "shipping__pc_n__close__shipped",
+   "group": "shipping",
+   "voice": "pc_n",
+   "line": "close",
+   "arm": "shipped",
+   "file": "clips/shipping__pc_n__close__shipped.mp3",
+   "note": "neutral",
+   "text": "Shit \u2014 they wouldn't let me get a word in. What sort of crap has my Dad got himself into? I shouldn't even be flying this. I need to make that money fast.",
+   "armNote": ""
+  }
+ ],
+ "groups": [
+  {
+   "id": "shipping",
+   "title": "What ships now",
+   "blurb": "The twelve clips the game plays, as they stand now. Two things changed since you last heard these: the male take is am_echo instead of am_liam, and the monologue\u2019s second \u201cshit\u201d is now \u201ccrap\u201d. Nothing else is on this page \u2014 the voice, the carrier treatments and the Lewis pitch ladder are all settled."
+  }
+ ]
+}

@@ -585,3 +585,62 @@ the setting the gate actually operates at — not merely whether it goes red at 
 that only exercises the extreme is evidence about the extreme. Where an operator or a predicate is
 the risk, make **the operator itself** the arm: P1 now prints what the same probe returns with
 `Math.min`, beside the number it hid.
+
+## 18. §S2-S — pc_m is recast to `am_echo`; the carrier idea is REFUTED by the listener
+
+Aaron on the shipped intro: *"the male voice sounds awful, at least the first 3 times he speaks …
+it still sounds like a computer speaking."* His "first 3 times" pins the interruptions — `int1`
+`int2` `int3`, which `for_say()` hands Kokoro as one word plus a comma ("But,"). That gave two
+candidate causes, and they are different fixes:
+
+* **A — the voice.** `am_liam` was cast on the reasoning that it is the youngest-sounding male.
+* **B — the input.** A neural TTS has no prosody to work with in a bare word, so synthesise the
+  whole sentence and keep only the opening word, cut on the model's own `end_ts` (`keep_words` in
+  `kokoro_say.py`). This was **Aaron's own suggestion**: *"you could generate more text around it
+  with punctuation around the key words and separate the words after if that helps?"*
+
+Both went in front of him as 104 rated clips (`tools/vo/audition/`, ratings in `votes.json`).
+
+**A is the cause. B is refuted, and refuted by the person whose ear is the acceptance test.** Of the
+36 carrier clips, `carry` and `carry_ov` were rated bad almost everywhere they appeared, including
+on voices whose plain read he rated 4/4 — `am_michael` scored 4/4 on the shipped punctuation and 0/3
+on `carry`. The idea was sound, the implementation worked exactly as designed, and it sounds worse.
+It is kept in the tree because `keep_words` is opt-in and cost nothing to leave, but **nothing calls
+it**, and the 207-clip chatter pool renders byte-identically.
+
+`am_liam` scored **1/4**, and scored 1/4 again in the independently-presented section that re-rated
+the shipped clips — the only cross-check that tape had, and it agreed with itself. `am_echo`,
+`am_michael`, `bm_lewis` and `bm_fable` all scored 4/4; Aaron picked `am_echo`. `bm_daniel` scored
+0/4. Speed and pitch stay at **1.04 / 1.02**, the settings the audition rendered at, so the take he
+approved is the take that ships.
+
+**Pitch is not the axis, and a number said so twice before a person did.** An F0 screen over the
+shipped clips reported the male take moving 12.83 semitones against the female take's 10.05 — the
+male one is "more expressive" by that measure, and it is the one he called a computer. Measured
+across all eleven voices, median F0 does not order the ratings at all: `am_liam` (rated 1/4) reads
+at 129.7 Hz, **higher** than `am_echo` (rated 4/4) at 113.1 Hz. This is the second time in this
+project a believable number has scored a voice pool against the listener — whisper put the 1990s
+`say` pool at 90.7 %.
+
+**Asked, tested, and answered NO:** Aaron's *"Lewis is probably my favourite voice but is an older
+voice, may work of made higher in pitch?"* — and, having heard the ladder, *"the higher pitch on
+Lewis did not work. stick with echo."* `bm_lewis` is the lowest-pitched voice
+that rated well (99.8 Hz). `pitch_probe.py` re-treats its existing takes up a ladder that straddles
+`am_echo` — 1.02/1.12/1.22/1.32, measured at 99.8/107.0/110.8/120.5 Hz — because the shift is a
+resample, so formants move with it and it should read younger rather than merely higher. The first
+draft of that ladder (1.02–1.14) moved F0 by 1.2 semitones and was **too narrow to hear**, which a
+spectral-centroid check failed to notice: centroid was flat across every rung, and a deliberate
+1.50 control proved the centroid blind rather than the ladder broken. The widened ladder was
+audible and still wrong, which is the useful outcome — the objection to bm_lewis is not its pitch.
+
+**So all three questions this section opened are closed, and the audition page is now only the
+twelve clips that ship.** Aaron: *"don't leave old stuff on the Web page. only keep stuff for me to
+review only."* `build.py` builds the shipping group alone; the ratings stay on disk as the evidence
+the cast note cites, and `voice_probe.py` / `carrier_probe.py` / `pitch_probe.py` stay as the record
+of what was tried, wired to nothing.
+
+**Unexplained and left that way:** *"Some had strange glitches at the end of But and Wait."* Both
+words end in /t/, so the plausible story is that `room()`'s trailing `silenceremove` eats the
+plosive release. Measured, it does not — shipped clips carry MORE high-frequency tail energy than
+the raw takes, and no arm of the audition shows a waveform discontinuity. No mechanism was found,
+so none is claimed. If it persists on `am_echo`, it is still open.

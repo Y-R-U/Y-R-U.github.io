@@ -16,7 +16,7 @@ which sections a piece of work needs.
 
 ## The one lesson this project is built around
 
-**Measurements that silently measure nothing.** Nineteen instances so far: silent audio clips
+**Measurements that silently measure nothing.** Twenty-one instances so far: silent audio clips
 reported OK; a layer compared against itself returning exactly 0.0; `&&`-guarded isolation that
 no-ops; a gate parser reading a key that did not exist; `solidAt()` returning `null` for an
 ungenerated chunk and being banked as "clear"; an occlusion gate that sampled a region the tower
@@ -25,6 +25,17 @@ did not occupy and had passed for two phases.
 So: **when you assert a gate works, prove it can fail.** Break what it guards and confirm it
 catches it. A difference of exactly zero is a broken experiment far more often than a real result.
 A test may never use `&&` to make its own setup optional.
+
+**Twenty and twenty-one were both found in one afternoon of §S2-S, by the same habit.** Aaron
+reported "strange glitches at the end of But and Wait", so a probe measured the last 5 ms of each
+story clip for a hard cut. It returned **0.000 for all nineteen files** — every mp3 ends in encoder
+padding, so the probe had measured the codec, not the speech. Rewritten to strip the padding first
+it gave plausible per-clip numbers, and its falsification arm — a clip guillotined in half — still
+read CLEAN, because the cut had landed in the gap between two words. **A falsification arm can miss
+by testing the easy case.** Cutting at the loudest sample instead took it to tail 1.000, and only
+then was the clean bill of health on the real clips worth anything. Twenty-one, an hour later: a
+page check that fetched all 124 audition clips reported `{}` — `JSON.stringify` of a pending
+promise — so "every clip loads" was a fact about a Promise object.
 
 **And the nineteenth adds a clause the first eighteen did not have.** `gates_p11` P1 asserted that
 no building stands on the painted road corridor, reported zero, and passed for two phases — its

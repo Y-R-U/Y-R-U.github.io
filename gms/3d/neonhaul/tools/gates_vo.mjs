@@ -5,6 +5,7 @@
 // V1  every slot the intro script names exists on disk
 // V2  the SCRIPT table's written `sec` is the real length of the file
 // V3  no line is cut off: every beat outlasts its clip by a readable margin
+// V4  the bubble text and the synthesised text are the same words
 //
 // Why this suite exists. The holds in storyui.js were hand-tuned against the ABOGEN boss takes.
 // S2-L replaced the Boss with the SUNO performance — a slower read of the same words — and nothing
@@ -20,7 +21,7 @@
 //
 // V3's falsification is the shipped bug itself: the same check run against the pre-S2-M holds.
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SCRIPT, MONOLOGUE, beatHold } from '../js/storyui.js';
@@ -118,6 +119,42 @@ const MIN_GAP = 0.4;
   }
   check('V3-falsify the SHIPPED holds are caught by this check', wouldCatch.length >= 7,
     `${wouldCatch.length} slots would have failed on the pre-S2-M table: ${wouldCatch.slice(0, 8).join(' ')}`);
+}
+
+// ── V4 ─────────────────────────────────────────────────────────────────────
+// The bubble shows the text and the clip says it. gen_story.py's header has demanded they match
+// word for word since S2-E, and nothing enforced it — the two lists just sat in different files in
+// different languages. They were then hand-edited in lockstep twice (S2-M cut a clause; S2-S
+// changed the monologue's second "shit" to "crap" at Aaron's request), which is exactly the edit
+// that goes wrong silently: a mismatch is not a crash, and the ONLY witness is a player who reads
+// one thing and hears another. So the contract is now checked rather than documented.
+{
+  const py = readFileSync(resolve(ROOT, 'tools/vo/gen_story.py'), 'utf8');
+  // Both files build these strings by implicit concatenation across lines, so the literals are
+  // joined the way each language joins them rather than matched with one regex per line.
+  const pyLines = new Map();
+  for (const m of py.matchAll(/\(\s*'(boss_\d+|int\d|close)'\s*,\s*((?:'(?:[^'\\]|\\.)*'\s*)+)\)/g)) {
+    const joined = [...m[2].matchAll(/'((?:[^'\\]|\\.)*)'/g)].map(x => x[1]).join('');
+    pyLines.set(m[1], joined);
+  }
+  const diff = [];
+  for (const row of ROWS) {
+    if (row.cut) continue;
+    const want = pyLines.get(row.voice);
+    if (want === undefined) { diff.push(`${row.voice}: not found in gen_story.py`); continue; }
+    if (want !== row.text) diff.push(`${row.voice}: bubble ${JSON.stringify(row.text.slice(0, 48))} vs synth ${JSON.stringify(want.slice(0, 48))}`);
+  }
+  check('V4 the bubble text and the synthesised text are the same words', diff.length === 0,
+    diff.length ? diff.join(' · ') : `all ${ROWS.filter(r => !r.cut).length} spoken rows match gen_story.py character for character`);
+
+  // Falsify on the edit that was actually made, not on a scrambled string: put the second "shit"
+  // back and confirm the check goes red. An arm that mangles a line beyond recognition proves only
+  // that the comparison runs.
+  const reverted = ROWS.filter(r => !r.cut).map(r => ({ ...r, text: r.text.replace('sort of crap', 'sort of shit') }));
+  const caught = reverted.filter(r => pyLines.get(r.voice) !== r.text);
+  check('V4-falsify one word changed in one line is seen', caught.length === 1,
+    caught.length === 1 ? `reverting "crap" to "shit" in the monologue trips exactly this row: ${caught[0].voice}`
+      : `expected 1 row to trip, ${caught.length} did`);
 }
 
 console.log(`\n${ok.length}/${ok.length + fail.length} gates green${fail.length ? '  FAILED: ' + fail.join(', ') : ''}`);

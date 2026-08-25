@@ -1,0 +1,304 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEONHAUL — VO audition</title>
+<style>
+:root{--bg:#0e1116;--panel:#161b23;--line:#232a35;--ink:#e6edf6;--dim:#8b97a8;
+      --good:#2ecc71;--bad:#ff5c6c;--accent:#35e6ff;--warn:#ffb04a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+     font:15px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{position:sticky;top:0;z-index:10;background:rgba(14,17,22,.96);
+       border-bottom:1px solid var(--line);padding:12px 16px;backdrop-filter:blur(8px)}
+h1{margin:0 0 2px;font-size:17px;letter-spacing:.02em}
+.sub{color:var(--dim);font-size:13px}
+.bar{height:5px;background:var(--line);border-radius:3px;margin-top:9px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+button{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);
+       border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+main{padding:16px;max-width:1000px;margin:0 auto}
+section{margin:0 0 26px}
+h2{font-size:15px;margin:22px 0 4px;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
+.blurb{color:var(--dim);font-size:13px;margin:0 0 12px}
+.voice{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+       margin:0 0 12px;overflow:hidden}
+.voice>h3{margin:0;padding:11px 14px;font-size:14px;background:#1b212b;
+          border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.tag{font-size:11px;color:#0e1116;background:var(--warn);border-radius:20px;padding:2px 9px;font-weight:600}
+.tally{margin-left:auto;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+.line{border-bottom:1px solid var(--line)}
+.line:last-child{border-bottom:0}
+.linehd{padding:9px 14px 3px;font-size:12px;color:var(--dim)}
+.linehd b{color:var(--ink);font-weight:600}
+.row{display:flex;gap:9px;align-items:center;padding:7px 14px 9px;flex-wrap:wrap}
+.row.playing{background:#1d2530}
+.play{min-width:78px}
+.play.on{border-color:var(--accent);color:var(--accent)}
+.arm{font-size:13px;min-width:82px}
+.armnote{color:var(--dim);font-size:12px;flex:1;min-width:130px}
+.vote{display:flex;gap:6px;margin-left:auto}
+.vote button{min-width:46px;font-size:15px;line-height:1}
+.vote button.sel[data-v="1"]{background:var(--good);border-color:var(--good);color:#07130c}
+.vote button.sel[data-v="0"]{background:var(--bad);border-color:var(--bad);color:#1a0508}
+textarea{width:100%;min-height:80px;background:var(--panel);color:var(--ink);
+         border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;resize:vertical}
+#out{width:100%;min-height:190px;font:12px/1.45 ui-monospace,Menlo,monospace}
+.save{font-size:12px;color:var(--dim)}
+.save.ok{color:var(--good)} .save.err{color:var(--bad)}
+kbd{background:#20262f;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:11px}
+.keys{display:none}
+@media(min-width:760px){ .keys{display:inline} }
+
+/* ── PHONE ─────────────────────────────────────────────────────────────────
+   This is the layout that matters: Aaron auditions on his phone, not at the desk. The desktop row
+   puts play / label / note / votes on one line, which at 390 px wraps into four ragged lines with
+   tap targets too small to hit while listening. So the row becomes a grid — play on the left,
+   label above the note, votes on the right — and every control clears the 44 px Apple asks for.
+   The header also loses the keyboard hint, which is not much use without a keyboard. */
+@media(max-width:759px){
+  body{font-size:16px}
+  header{padding:10px 12px}
+  main{padding:12px}
+  h1{font-size:16px}
+  .tools{gap:6px}
+  .tools button{flex:1 1 auto;min-height:44px;padding:8px 10px}
+  .save{flex-basis:100%}
+  .row{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;
+       padding:8px 12px 10px}
+  .play{min-width:0;min-height:46px;padding:8px 14px;font-size:15px;grid-row:span 2}
+  .arm{min-width:0;align-self:end;font-weight:600}
+  .armnote{grid-column:2;align-self:start;font-size:12px;min-width:0}
+  .vote{grid-column:3;grid-row:span 2;margin-left:0;gap:8px}
+  /* Most rows carry no note — the shipping section's label is the line itself. Left as a two-row
+     grid they kept an empty second row and a 10 px gap, which over a hundred clips is a screen and
+     a half of nothing. One row when there is nothing to put in the second. */
+  .row.nonote{grid-template-columns:auto 1fr auto;align-items:center}
+  .row.nonote .play,.row.nonote .vote{grid-row:auto}
+  .row.nonote .arm{align-self:center}
+  .vote button{min-width:52px;min-height:46px;font-size:19px}
+  .linehd{padding:10px 12px 2px}
+  .voice>h3{padding:10px 12px;flex-wrap:wrap}
+  .tally{margin-left:0;flex-basis:100%}
+  #out{min-height:150px}
+}
+</style>
+
+<header>
+  <h1>NEONHAUL — voice audition</h1>
+  <div class="sub" id="prog">loading…</div>
+  <div class="bar"><i id="pbar"></i></div>
+  <div class="tools">
+    <button id="copy">Copy answers</button>
+    <button id="playbad">Play unrated</button>
+    <button id="reset">Clear all</button>
+    <span class="save" id="save">not saved yet</span>
+    <span class="sub keys"><kbd>space</kbd> play · <kbd>g</kbd> good · <kbd>b</kbd> bad · <kbd>↑↓</kbd> move</span>
+  </div>
+</header>
+
+<main>
+  <div id="app"></div>
+  <h2>Anything else</h2>
+  <p class="blurb">Free text — what specifically sounds wrong, which voice you want, anything.</p>
+  <textarea id="notes" placeholder="e.g. am_michael is the one, carry_ov on the interruptions…"></textarea>
+  <h2>Answers</h2>
+  <p class="blurb">Auto-saved to the server as you go. This box is the same thing as text — hit
+    <b>Copy answers</b> and paste it back to Claude.</p>
+  <textarea id="out" readonly></textarea>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+let MAN = null, VOTES = {}, NOTES = '', cur = null, rows = [];
+
+// Bumped for round 2. The shipping section's pc_m clips kept their ids but the AUDIO behind them
+// changed when am_echo was cast, so a stored "bad" from round 1 would have sat there looking like a
+// verdict on a take that no longer exists. Versioning the key throws the old votes away, which is
+// the honest option: a stale vote against new audio is worse than no vote.
+const ROUND = 'r3';
+const LS = 'neonhaul-vo-audition-' + ROUND;
+function loadLocal(){ try{ const d = JSON.parse(localStorage.getItem(LS)||'{}');
+  VOTES = d.votes||{}; NOTES = d.notes||''; }catch(e){} }
+function saveLocal(){ try{ localStorage.setItem(LS, JSON.stringify({votes:VOTES,notes:NOTES})); }catch(e){} }
+
+let saveT = null;
+function save(){
+  saveLocal(); render(); 
+  clearTimeout(saveT);
+  saveT = setTimeout(async () => {
+    const el = $('#save'); el.className='save'; el.textContent='saving…';
+    try{
+      const r = await fetch('save', {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({votes:VOTES, notes:NOTES, round:ROUND, at:new Date().toISOString()})});
+      if(!r.ok) throw new Error(r.status);
+      el.className='save ok'; el.textContent='saved to votes_' + ROUND + '.json';
+    }catch(e){ el.className='save err'; el.textContent='server save failed — kept in this browser, use Copy answers'; }
+  }, 400);
+}
+
+function summary(){
+  const L = [];
+  L.push('NEONHAUL VO audition — ' + new Date().toLocaleString());
+  const n = Object.keys(VOTES).length;
+  L.push(`rated ${n} of ${MAN.items.length}`);
+  for (const g of MAN.groups){
+    const items = MAN.items.filter(i => i.group===g.id && VOTES[i.id]!==undefined);
+    if(!items.length) continue;
+    L.push(''); L.push('## ' + g.title);
+    const byV = {};
+    for (const i of items) (byV[i.voice] = byV[i.voice] || []).push(i);
+    for (const v of Object.keys(byV)){
+      const good = byV[v].filter(i=>VOTES[i.id]==1), bad = byV[v].filter(i=>VOTES[i.id]==0);
+      L.push(`${v}: ${good.length} good / ${bad.length} bad`);
+      const fmt = a => a.map(i => i.arm==='ship'||i.arm==='shipped' ? i.line : `${i.line}/${i.arm}`).join(' ');
+      if(good.length) L.push('   good: ' + fmt(good));
+      if(bad.length)  L.push('   bad : ' + fmt(bad));
+    }
+  }
+  if(NOTES.trim()){ L.push(''); L.push('## notes'); L.push(NOTES.trim()); }
+  return L.join('\n');
+}
+
+// ONE audio element, reused. Safari on iOS treats each `new Audio()` as needing its own user
+// gesture, so building a fresh one per clip made the auto-advance play silently fail on a phone —
+// which is the device this page is for. A single element created up front and re-pointed keeps the
+// gesture that started playback.
+const audio = new Audio();
+audio.preload = 'auto';
+function play(id){
+  const it = MAN.items.find(i=>i.id===id); if(!it) return;
+  cur = id;
+  audio.pause();
+  audio.src = it.file;
+  audio.currentTime = 0;
+  audio.play().catch(e => {
+    // Never fail silently: a phone that refuses to play looks exactly like a clip of silence, and
+    // rating silence as "bad" would be a wrong answer collected convincingly.
+    const el = $('#save'); el.className = 'save err';
+    el.textContent = 'playback blocked — tap play once more';
+  });
+  document.querySelectorAll('.row').forEach(r=>r.classList.toggle('playing', r.dataset.id===id));
+  document.querySelectorAll('.play').forEach(b=>b.classList.toggle('on', b.dataset.id===id));
+  const el = document.querySelector(`.row[data-id="${CSS.escape(id)}"]`);
+  if(el) el.scrollIntoView({block:'center', behavior:'smooth'});
+}
+function vote(id, v){
+  if(VOTES[id]===v) delete VOTES[id]; else VOTES[id]=v;
+  save();
+  const i = rows.indexOf(id);
+  if(i>=0 && i+1<rows.length){ cur = rows[i+1]; play(cur); }
+}
+
+function render(){
+  $('#prog').textContent = `${Object.keys(VOTES).length} of ${MAN.items.length} rated`;
+  $('#pbar').style.width = (100*Object.keys(VOTES).length/MAN.items.length).toFixed(1)+'%';
+  $('#out').value = summary();
+  document.querySelectorAll('.vote button').forEach(b=>{
+    b.classList.toggle('sel', String(VOTES[b.dataset.id]) === b.dataset.v);
+  });
+  document.querySelectorAll('.tally').forEach(t=>{
+    const items = MAN.items.filter(i=>i.group===t.dataset.g && i.voice===t.dataset.v);
+    const g = items.filter(i=>VOTES[i.id]==1).length, b = items.filter(i=>VOTES[i.id]==0).length;
+    t.textContent = g||b ? `${g} good · ${b} bad` : `${items.length} clips`;
+  });
+}
+
+function build(){
+  const app = $('#app'); app.innerHTML=''; rows=[];
+  for (const g of MAN.groups){
+    const items = MAN.items.filter(i=>i.group===g.id);
+    if(!items.length) continue;
+    const sec = document.createElement('section');
+    sec.innerHTML = `<h2>${g.title}</h2><p class="blurb">${g.blurb}</p>`;
+    const voices = [...new Set(items.map(i=>i.voice))];
+    for (const v of voices){
+      const vi = items.filter(i=>i.voice===v);
+      const box = document.createElement('div'); box.className='voice';
+      const isCur = vi.some(i=>i.note==='current cast');
+      const who = vi.find(i=>i.note && i.note!=='current cast');
+      box.innerHTML = `<h3>${v}${isCur?' <span class="tag">current cast</span>':''}` +
+        (who?` <span class="armnote">${who.note}</span>`:'') +
+        `<span class="tally" data-g="${g.id}" data-v="${v}"></span></h3>`;
+      // The arm note explains how one treatment differs from another, so it is only worth space
+      // where a card actually HAS more than one. In the voice section every row is "ship", and
+      // repeating "as it ships today — the word on its own with a comma" under all four lines cost
+      // three wrapped lines per clip for information the section blurb already gives once.
+      const manyArms = new Set(vi.map(i=>i.arm)).size > 1;
+      const lines = [...new Set(vi.map(i=>i.line))];
+      for (const ln of lines){
+        const li = vi.filter(i=>i.line===ln);
+        const d = document.createElement('div'); d.className='line';
+        const txt = MAN.lines[ln];
+        d.innerHTML = `<div class="linehd"><b>${ln}</b> — “${txt.length>90?txt.slice(0,90)+'…':txt}”</div>`;
+        for (const it of li){
+          rows.push(it.id);
+          const note = manyArms ? (it.armNote || '') : '';
+          const r = document.createElement('div');
+          r.className = 'row' + (note ? '' : ' nonote');
+          r.dataset.id = it.id;
+          r.innerHTML =
+            `<button class="play" data-id="${it.id}">▶ play</button>` +
+            `<span class="arm">${it.arm}</span>` +
+            (note ? `<span class="armnote">${note}</span>` : '') +
+            `<span class="vote">` +
+              `<button data-id="${it.id}" data-v="1" title="sounds good">✓</button>` +
+              `<button data-id="${it.id}" data-v="0" title="sounds wrong">✗</button>` +
+            `</span>`;
+          d.appendChild(r);
+        }
+        box.appendChild(d);
+      }
+      sec.appendChild(box);
+    }
+    app.appendChild(sec);
+  }
+  app.addEventListener('click', e=>{
+    const p = e.target.closest('.play'); if(p) return play(p.dataset.id);
+    const b = e.target.closest('.vote button'); if(b) return vote(b.dataset.id, +b.dataset.v);
+  });
+}
+
+document.addEventListener('keydown', e=>{
+  if(e.target.tagName==='TEXTAREA') return;
+  const i = rows.indexOf(cur);
+  if(e.key===' '){ e.preventDefault(); if(cur) play(cur); else play(rows[0]); }
+  else if(e.key==='g'||e.key==='1'){ if(cur) vote(cur,1); }
+  else if(e.key==='b'||e.key==='0'){ if(cur) vote(cur,0); }
+  else if(e.key==='ArrowDown'){ e.preventDefault(); play(rows[Math.min(rows.length-1,i+1)]||rows[0]); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); play(rows[Math.max(0,i-1)]||rows[0]); }
+});
+
+$('#copy').onclick = async () => {
+  const t = summary();
+  try{ await navigator.clipboard.writeText(t); $('#copy').textContent='Copied ✓';
+       setTimeout(()=>$('#copy').textContent='Copy answers',1400); }
+  catch(e){ $('#out').select(); document.execCommand('copy'); }
+};
+$('#playbad').onclick = () => { const n = rows.find(r=>VOTES[r]===undefined); if(n) play(n); };
+// Two clicks rather than confirm(). NEONHAUL's own rule is no alert/confirm/prompt anywhere, and
+// beyond house style a modal dialog blocks everything — including the automation that tested this
+// page — until somebody dismisses it by hand.
+let armed = 0;
+$('#reset').onclick = () => {
+  const b = $('#reset');
+  if(!armed){ armed = 1; b.textContent = 'Click again to clear';
+    setTimeout(()=>{ armed = 0; b.textContent = 'Clear all'; }, 3000); return; }
+  armed = 0; b.textContent = 'Clear all'; VOTES = {}; save();
+};
+$('#notes').oninput = e => { NOTES = e.target.value; save(); };
+
+(async ()=>{
+  MAN = await (await fetch('manifest.json')).json();
+  loadLocal();
+  // Its OWN round's file. Round 1's votes are still on disk in votes.json and votes_r1.json, kept
+  // as the record behind the recast — but they rate audio four of these ids no longer point at.
+  try{ const r = await fetch(ROUND === 'r1' ? 'votes.json' : `votes_${ROUND}.json`); if(r.ok){ const d = await r.json();
+        if(d && d.votes && Object.keys(d.votes).length >= Object.keys(VOTES).length){
+          VOTES = d.votes; NOTES = d.notes||NOTES; } } }catch(e){}
+  $('#notes').value = NOTES;
+  build(); render();
+  cur = rows[0];
+})();
+</script>
