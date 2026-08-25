@@ -15,3 +15,7 @@ app/3d/gallery/models/
 # Western shooter — still loads the raw local-only assets directly.
 gms/3d/western/
 gms/2d/scare_batch.log
+
+# Transient regen-helper run log
+regen_helper.out
+__pycache__/

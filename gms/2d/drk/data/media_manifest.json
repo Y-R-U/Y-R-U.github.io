@@ -1,0 +1,337 @@
+{
+  "version": "0.1",
+  "updated_at": "2026-06-09 13:02:52",
+  "characters": {
+    "alex": {
+      "name": "Alex Vale",
+      "scenes": {
+        "character_card": {
+          "type": "image",
+          "path": "images/characters/alex_card.png",
+          "prompt": "adult man age 27, stylish urban life simulator protagonist, confident but slightly tired expression, tailored black overshirt, clean white tee, silver watch, modern city nightlife styling, vertical 576x1024 dating sim character reference card, full body, centered, cinematic realistic lighting, sharp face detail, tasteful mature tone, no text, no watermark"
+        },
+        "home_base": {
+          "type": "image",
+          "path": "images/scenes/alex_home_base.png",
+          "prompt": "Alex Vale adult man age 27, same identity and face as reference card, in his compact city loft apartment in soft morning light, casual white tee, standing near a window with a city view, a small desk with a laptop and rent notices, a neatly made bed, relaxed but determined expression, cinematic realistic, vertical 576x1024 life sim home base scene, no readable text, no watermark",
+          "backgroundId": "loft",
+          "generated_at": "2026-06-09 12:58:36",
+          "mode": "edit",
+          "references": [
+            "images/characters/alex_card.png",
+            "images/backgrounds/loft.png"
+          ]
+        },
+        "home_night": {
+          "type": "image",
+          "path": "images/scenes/alex_home_night.png",
+          "prompt": "Alex Vale adult man age 27, same identity and face as reference card, in his compact city loft apartment at night, warm lamp light and moody green neon from the window, casual clothes, sitting on the edge of a neatly made bed with the glow of a laptop, contemplative expression, cinematic realistic, vertical 576x1024 life sim home base scene, no readable text, no watermark",
+          "backgroundId": "loft",
+          "generated_at": "2026-06-09 13:02:52",
+          "mode": "edit",
+          "references": [
+            "images/characters/alex_card.png",
+            "images/backgrounds/loft.png"
+          ]
+        }
+      }
+    },
+    "mara": {
+      "name": "Mara Voss",
+      "scenes": {
+        "character_card": {
+          "type": "image",
+          "path": "images/characters/mara_card.png",
+          "prompt": "adult woman age 28, venture scout romance character, poised confident expression, sleek black suit dress, emerald earrings, elegant mature fashion, standing in a finance lounge, vertical 576x1024 dating sim character reference card, full body, centered, cinematic realistic lighting, sharp face detail, tasteful mature tone, no text, no watermark"
+        },
+        "market_scene": {
+          "type": "image",
+          "path": "images/scenes/mara_market_scene.png",
+          "prompt": "Mara Voss adult woman venture scout, same identity as reference card, standing beside a dark trading desk inside the market floor background, black suit dress, emerald earrings, confident evaluating expression, cinematic mature dating sim scene, vertical 576x1024, tasteful, no explicit nudity, no readable text, no watermark",
+          "backgroundId": "market_floor",
+          "generated_at": "2026-06-05 00:22:04",
+          "mode": "edit",
+          "references": [
+            "images/characters/mara_card.png",
+            "images/backgrounds/market_floor.png"
+          ],
+          "loopVideo": "videos/looping/mara_market_loop_576.mp4"
+        },
+        "cafe_date": {
+          "type": "image",
+          "path": "images/scenes/mara_cafe_date.png",
+          "prompt": "Mara Voss adult woman venture scout, same identity as reference card, seated in the velvet cafe booth with warm candlelight and rainy window, jacket relaxed but elegant, direct intimate eye contact, mature romantic dating sim scene, vertical 576x1024, tasteful, no explicit nudity, no readable text, no watermark",
+          "backgroundId": "velvet_cafe",
+          "generated_at": "2026-06-05 00:25:22",
+          "mode": "edit",
+          "references": [
+            "images/characters/mara_card.png",
+            "images/backgrounds/velvet_cafe.png"
+          ],
+          "loopVideo": "videos/looping/mara_cafe_loop_192.mp4"
+        },
+        "rooftop_scene": {
+          "type": "image",
+          "path": "images/scenes/mara_rooftop_scene.png",
+          "prompt": "Mara Voss adult woman venture scout, same identity as reference card, standing at a rooftop bar glass rail with city lights behind her, black evening dress under tailored blazer, subtle smile, poised romantic tension, mature dating sim scene, vertical 576x1024, tasteful, no explicit nudity, no readable text, no watermark",
+          "backgroundId": "roof_bar",
+          "generated_at": "2026-06-05 00:28:50",
+          "mode": "edit",
+          "references": [
+            "images/characters/mara_card.png",
+            "images/backgrounds/roof_bar.png"
+          ],
+          "loopVideo": "videos/looping/mara_rooftop_loop_320.mp4"
+        },
+        "bedroom_fadeout": {
+          "type": "image",
+          "path": "images/scenes/mara_bedroom_fadeout.png",
+          "prompt": "safe after-date fade-out scene with Mara Voss adult woman, same identity as reference card, elegant satin robe over modest sleepwear, sitting on a neatly made bed in soft city light, intimate but non-explicit, romantic mature dating sim image, vertical 576x1024, no nudity, no sexual act, no readable text, no watermark",
+          "backgroundId": "loft",
+          "generated_at": "2026-06-05 00:32:14",
+          "mode": "edit",
+          "references": [
+            "images/characters/mara_card.png",
+            "images/backgrounds/loft.png"
+          ]
+        }
+      }
+    },
+    "sienna": {
+      "name": "Sienna Park",
+      "scenes": {
+        "character_card": {
+          "type": "image",
+          "path": "images/characters/sienna_card.png",
+          "prompt": "adult woman age 25, nightlife host romance character, playful confident expression, stylish crimson cocktail dress with a tailored black jacket, city rooftop mood, tasteful mature fashion, vertical 576x1024 dating sim character reference card, full body, centered, cinematic realistic lighting, sharp face detail, no explicit nudity, no text, no watermark"
+        },
+        "cafe_date": {
+          "type": "image",
+          "path": "images/scenes/sienna_cafe_date.png",
+          "prompt": "Sienna Park adult woman nightlife host, same identity and face as reference card, seated in the velvet cafe booth with warm candlelight and a rainy window behind her, crimson cocktail dress with a tailored black jacket, playful flirtatious half-smile, leaning in close, mature romantic dating sim scene, vertical 576x1024, tasteful, no explicit nudity, no readable text, no watermark",
+          "backgroundId": "velvet_cafe",
+          "generated_at": "2026-06-08 20:35:10",
+          "mode": "edit",
+          "references": [
+            "images/characters/sienna_card.png",
+            "images/backgrounds/velvet_cafe.png"
+          ]
+        },
+        "rooftop_scene": {
+          "type": "image",
+          "path": "images/scenes/sienna_rooftop_scene.png",
+          "prompt": "Sienna Park adult woman nightlife host, same identity and face as reference card, standing at a rooftop bar glass rail with glittering city lights behind her, crimson cocktail dress and black jacket, laughing with a cocktail in hand, lively magnetic energy, mature dating sim scene, vertical 576x1024, tasteful, no explicit nudity, no readable text, no watermark",
+          "backgroundId": "roof_bar",
+          "generated_at": "2026-06-08 20:40:47",
+          "mode": "edit",
+          "references": [
+            "images/characters/sienna_card.png",
+            "images/backgrounds/roof_bar.png"
+          ]
+        },
+        "bedroom_fadeout": {
+          "type": "image",
+          "path": "images/scenes/sienna_bedroom_fadeout.png",
+          "prompt": "safe after-date fade-out scene with Sienna Park adult woman, same identity and face as reference card, a deep red satin robe over modest sleepwear, sitting on a neatly made bed in soft city light, intimate but non-explicit, romantic mature dating sim image, vertical 576x1024, no nudity, no sexual act, no readable text, no watermark",
+          "backgroundId": "loft",
+          "generated_at": "2026-06-08 20:47:30",
+          "mode": "edit",
+          "references": [
+            "images/characters/sienna_card.png",
+            "images/backgrounds/loft.png"
+          ]
+        }
+      }
+    },
+    "june": {
+      "name": "June Ramos",
+      "scenes": {
+        "character_card": {
+          "type": "image",
+          "path": "images/characters/june_card.png",
+          "prompt": "adult woman age 29, paramedic and amateur boxer romance character, warm grounded expression, athletic jacket over fitted training top, practical black pants, mature realistic style, vertical 576x1024 dating sim character reference card, full body, centered, cinematic realistic lighting, sharp face detail, tasteful, no text, no watermark"
+        },
+        "cafe_date": {
+          "type": "image",
+          "path": "images/scenes/june_cafe_date.png",
+          "prompt": "June Ramos adult woman paramedic and amateur boxer, same identity and face as reference card, seated in the velvet cafe booth with warm candlelight, an athletic jacket over a fitted top, warm genuine relaxed smile, honest grounded presence, mature romantic dating sim scene, vertical 576x1024, tasteful, no explicit nudity, no readable text, no watermark",
+          "backgroundId": "velvet_cafe",
+          "generated_at": "2026-06-08 20:53:55",
+          "mode": "edit",
+          "references": [
+            "images/characters/june_card.png",
+            "images/backgrounds/velvet_cafe.png"
+          ]
+        },
+        "rooftop_scene": {
+          "type": "image",
+          "path": "images/scenes/june_rooftop_scene.png",
+          "prompt": "June Ramos adult woman paramedic and amateur boxer, same identity and face as reference card, at a rooftop bar rail with city lights, a casual elegant fitted top, easy confident athletic posture, warm direct eye contact, mature dating sim scene, vertical 576x1024, tasteful, no explicit nudity, no readable text, no watermark",
+          "backgroundId": "roof_bar",
+          "generated_at": "2026-06-08 20:58:41",
+          "mode": "edit",
+          "references": [
+            "images/characters/june_card.png",
+            "images/backgrounds/roof_bar.png"
+          ]
+        },
+        "bedroom_fadeout": {
+          "type": "image",
+          "path": "images/scenes/june_bedroom_fadeout.png",
+          "prompt": "safe after-date fade-out scene with June Ramos adult woman, same identity and face as reference card, soft cotton sleepwear and an open hoodie, sitting on a neatly made bed in soft warm light, intimate but non-explicit, romantic mature dating sim image, vertical 576x1024, no nudity, no sexual act, no readable text, no watermark",
+          "backgroundId": "loft",
+          "generated_at": "2026-06-08 21:03:12",
+          "mode": "edit",
+          "references": [
+            "images/characters/june_card.png",
+            "images/backgrounds/loft.png"
+          ]
+        }
+      }
+    },
+    "valentina": {
+      "name": "Valentina Ricci",
+      "scenes": {
+        "character_card": {
+          "type": "image",
+          "path": "images/characters/valentina_card.png",
+          "prompt": "adult woman age 31, art gallery owner romance character, elegant knowing expression, tailored ivory blouse, black high-waist trousers, refined jewelry, mature cinematic fashion, vertical 576x1024 dating sim character reference card, full body, centered, realistic editorial lighting, sharp face detail, tasteful, no text, no watermark"
+        },
+        "cafe_date": {
+          "type": "image",
+          "path": "images/scenes/valentina_cafe_date.png",
+          "prompt": "Valentina Ricci adult woman art gallery owner, same identity and face as reference card, seated in the velvet cafe booth with warm candlelight and a rainy window, tailored ivory blouse and refined jewelry, elegant knowing half-smile, cultured composed poise, mature romantic dating sim scene, vertical 576x1024, tasteful, no explicit nudity, no readable text, no watermark",
+          "backgroundId": "velvet_cafe",
+          "generated_at": "2026-06-08 21:07:42",
+          "mode": "edit",
+          "references": [
+            "images/characters/valentina_card.png",
+            "images/backgrounds/velvet_cafe.png"
+          ]
+        },
+        "rooftop_scene": {
+          "type": "image",
+          "path": "images/scenes/valentina_rooftop_scene.png",
+          "prompt": "Valentina Ricci adult woman art gallery owner, same identity and face as reference card, at a rooftop bar with glittering city lights, sleek refined evening wear, composed magnetic expression, a glass of wine in hand, mature dating sim scene, vertical 576x1024, tasteful, no explicit nudity, no readable text, no watermark",
+          "backgroundId": "roof_bar",
+          "generated_at": "2026-06-08 21:12:16",
+          "mode": "edit",
+          "references": [
+            "images/characters/valentina_card.png",
+            "images/backgrounds/roof_bar.png"
+          ]
+        },
+        "bedroom_fadeout": {
+          "type": "image",
+          "path": "images/scenes/valentina_bedroom_fadeout.png",
+          "prompt": "safe after-date fade-out scene with Valentina Ricci adult woman, same identity and face as reference card, an elegant ivory silk robe over modest sleepwear, seated on a neatly made bed in soft city light, intimate but non-explicit, romantic mature dating sim image, vertical 576x1024, no nudity, no sexual act, no readable text, no watermark",
+          "backgroundId": "loft",
+          "generated_at": "2026-06-08 21:16:50",
+          "mode": "edit",
+          "references": [
+            "images/characters/valentina_card.png",
+            "images/backgrounds/loft.png"
+          ]
+        }
+      }
+    }
+  },
+  "backgrounds": {
+    "loft": {
+      "name": "Starter Loft",
+      "path": "images/backgrounds/loft.png",
+      "prompt": "vertical 576x1024 cinematic realistic background, compact city loft apartment at dawn, clean sheets, laptop on small desk, rent notices, moody green neon from window, no people, no readable text, no watermark"
+    },
+    "market_floor": {
+      "name": "Market Floor",
+      "path": "images/backgrounds/market_floor.png",
+      "prompt": "vertical 576x1024 cinematic realistic background, boutique trading office at night, glowing monitors, city skyline, elegant finance atmosphere, no people, no readable text, no watermark"
+    },
+    "velvet_cafe": {
+      "name": "Velvet Cafe",
+      "path": "images/backgrounds/velvet_cafe.png",
+      "prompt": "vertical 576x1024 cinematic realistic background, intimate upscale cafe booth, emerald velvet seats, soft candlelight, rainy city window, no people, no readable text, no watermark"
+    },
+    "roof_bar": {
+      "name": "Rooftop Bar",
+      "path": "images/backgrounds/roof_bar.png",
+      "prompt": "vertical 576x1024 cinematic realistic background, stylish rooftop bar with city lights, glass rail, black marble tables, romantic mature atmosphere, no people, no readable text, no watermark"
+    }
+  },
+  "loopingVideos": {
+    "mara_market_loop_576": {
+      "type": "LOOPING",
+      "path": "videos/looping/mara_market_loop_576.mp4",
+      "scene": "mara:market_scene",
+      "prompt": "subtle looping motion, Mara Voss breathes and shifts her weight beside the trading desk, city market screens glow softly, preserve identity, outfit, composition, and background, mature dating sim, no text, no watermark",
+      "width": 576,
+      "height": 1024,
+      "numFrames": 25,
+      "seed": 240611,
+      "generated_at": "2026-06-05 00:35:21"
+    },
+    "mara_cafe_loop_192": {
+      "type": "LOOPING",
+      "path": "videos/looping/mara_cafe_loop_192.mp4",
+      "scene": "mara:cafe_date",
+      "prompt": "subtle looping cafe date motion, candle flickers, Mara Voss gives a small knowing smile and slight head movement, preserve identity and composition, mature romantic dating sim, no text, no watermark",
+      "width": 192,
+      "height": 320,
+      "numFrames": 25,
+      "seed": 240612,
+      "generated_at": "2026-06-05 00:36:17"
+    },
+    "mara_rooftop_loop_320": {
+      "type": "LOOPING",
+      "path": "videos/looping/mara_rooftop_loop_320.mp4",
+      "scene": "mara:rooftop_scene",
+      "prompt": "subtle looping rooftop motion, night breeze moves Mara Voss hair and blazer slightly, city lights shimmer, preserve identity and tasteful mature tone, no text, no watermark",
+      "width": 320,
+      "height": 512,
+      "numFrames": 25,
+      "seed": 240613,
+      "generated_at": "2026-06-05 00:37:17"
+    }
+  },
+  "transitionVideos": [
+    {
+      "name": "mara_card_to_cafe_192",
+      "type": "TRANSITION",
+      "path": "videos/transitions/mara_card_to_cafe_192.mp4",
+      "from": "mara:character_card",
+      "to": "mara:cafe_date",
+      "prompt": "smooth cinematic transition from Mara Voss formal character card into an intimate cafe date booth, camera glides closer, preserve identity and elegant outfit, mature dating sim, no text, no watermark",
+      "width": 192,
+      "height": 320,
+      "numFrames": 25,
+      "seed": 240621,
+      "generated_at": "2026-06-05 00:38:09"
+    },
+    {
+      "name": "mara_cafe_to_rooftop_320",
+      "type": "TRANSITION",
+      "path": "videos/transitions/mara_cafe_to_rooftop_320.mp4",
+      "from": "mara:cafe_date",
+      "to": "mara:rooftop_scene",
+      "prompt": "smooth cinematic transition from the candlelit cafe date to the rooftop bar at night, Mara Voss remains elegant and composed, preserve identity, mature romantic game scene, no text, no watermark",
+      "width": 320,
+      "height": 512,
+      "numFrames": 25,
+      "seed": 240622,
+      "generated_at": "2026-06-05 00:39:21"
+    },
+    {
+      "name": "mara_rooftop_to_fadeout_576",
+      "type": "TRANSITION",
+      "path": "videos/transitions/mara_rooftop_to_fadeout_576.mp4",
+      "from": "mara:rooftop_scene",
+      "to": "mara:bedroom_fadeout",
+      "prompt": "safe romantic fade-out transition from rooftop city lights to a modest bedroom fade-out scene, Mara Voss remains tasteful and non-explicit, soft cinematic motion, no nudity, no sexual act, no text, no watermark",
+      "width": 576,
+      "height": 1024,
+      "numFrames": 25,
+      "seed": 240623,
+      "generated_at": "2026-06-05 00:41:38"
+    }
+  ]
+}

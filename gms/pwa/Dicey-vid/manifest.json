@@ -1,0 +1,22 @@
+{
+    "name": "Dicey-vid - Video Board Experiment",
+    "short_name": "Dicey-vid",
+    "description": "A board game experiment with generated image tiles and active spot videos.",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#0f0e17",
+    "theme_color": "#1a1a2e",
+    "icons": [
+        {
+            "src": "img/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "img/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

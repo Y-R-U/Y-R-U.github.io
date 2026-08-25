@@ -1,0 +1,788 @@
+{
+  "version": 1,
+  "title": "Dicey-vid",
+  "notes": [
+    "Images are shown on every board spot.",
+    "Videos are tiny, LTX-friendly multiples of 64, and only active spots should play.",
+    "Square stills target 512x512; portrait and landscape stills use similar area."
+  ],
+  "limits": {
+    "maxActiveVideos": 4,
+    "imageModel": "flux2-klein-9b-mlx-4bit",
+    "videoService": "LTX local API"
+  },
+  "spots": [
+    {
+      "index": 0,
+      "id": "00_start",
+      "label": "START",
+      "type": "go",
+      "skillId": "",
+      "category": "go",
+      "orientation": "square",
+      "image": "media/images/00_start.svg",
+      "video": "media/videos/00_start.mp4",
+      "imageDimensions": [
+        512,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        192
+      ],
+      "imagePrompt": "START, sunlit start plaza with golden dice monument, low-poly premium board game tile art, balanced square board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "START, tiny seamless looping board-space animation, subtle parallax, drifting lights, sunlit start plaza with golden dice monument, no people, no readable text, no watermark, smooth loop",
+      "accent": "#f5c518",
+      "price": 0,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 1,
+      "id": "01_pickpocket",
+      "label": "Pickpocket",
+      "type": "skill",
+      "skillId": "pickpocket",
+      "category": "attack",
+      "orientation": "portrait",
+      "image": "media/images/01_pickpocket.svg",
+      "video": "media/videos/01_pickpocket.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Pickpocket, sleight hand market alley, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Pickpocket, tiny seamless looping board-space animation, subtle parallax, drifting lights, sleight hand market alley, no people, no readable text, no watermark, smooth loop",
+      "accent": "#e74c3c",
+      "price": 100,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 2,
+      "id": "02_fate",
+      "label": "Fate",
+      "type": "fate",
+      "skillId": "",
+      "category": "fate",
+      "orientation": "portrait",
+      "image": "media/images/02_fate.svg",
+      "video": "media/videos/02_fate.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Fate, mystic dice portal with swirling violet energy, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Fate, tiny seamless looping board-space animation, subtle parallax, drifting lights, mystic dice portal with swirling violet energy, no people, no readable text, no watermark, smooth loop",
+      "accent": "#9b59b6",
+      "price": 0,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 3,
+      "id": "03_bodyguard",
+      "label": "Bodyguard",
+      "type": "skill",
+      "skillId": "bodyguard",
+      "category": "defense",
+      "orientation": "portrait",
+      "image": "media/images/03_bodyguard.svg",
+      "video": "media/videos/03_bodyguard.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Bodyguard, shielded safehouse guard, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Bodyguard, tiny seamless looping board-space animation, subtle parallax, drifting lights, shielded safehouse guard, no people, no readable text, no watermark, smooth loop",
+      "accent": "#2980b9",
+      "price": 100,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 4,
+      "id": "04_toll_gate",
+      "label": "Tax",
+      "type": "tax",
+      "skillId": "",
+      "category": "tax",
+      "orientation": "portrait",
+      "image": "media/images/04_toll_gate.svg",
+      "video": "media/videos/04_toll_gate.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Tax, busy toll gate and coin counter booth, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Tax, tiny seamless looping board-space animation, subtle parallax, drifting lights, busy toll gate and coin counter booth, no people, no readable text, no watermark, smooth loop",
+      "accent": "#e67e22",
+      "price": 0,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 5,
+      "id": "05_goldmine",
+      "label": "Gold Mine",
+      "type": "skill",
+      "skillId": "goldmine",
+      "category": "defense",
+      "orientation": "portrait",
+      "image": "media/images/05_goldmine.svg",
+      "video": "media/videos/05_goldmine.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Gold Mine, crystal gold mine vault, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Gold Mine, tiny seamless looping board-space animation, subtle parallax, drifting lights, crystal gold mine vault, no people, no readable text, no watermark, smooth loop",
+      "accent": "#f39c12",
+      "price": 150,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 6,
+      "id": "06_ambush",
+      "label": "Ambush",
+      "type": "skill",
+      "skillId": "ambush",
+      "category": "attack",
+      "orientation": "portrait",
+      "image": "media/images/06_ambush.svg",
+      "video": "media/videos/06_ambush.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Ambush, hidden bridge ambush point, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Ambush, tiny seamless looping board-space animation, subtle parallax, drifting lights, hidden bridge ambush point, no people, no readable text, no watermark, smooth loop",
+      "accent": "#c0392b",
+      "price": 150,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 7,
+      "id": "07_fate",
+      "label": "Fate",
+      "type": "fate",
+      "skillId": "",
+      "category": "fate",
+      "orientation": "portrait",
+      "image": "media/images/07_fate.svg",
+      "video": "media/videos/07_fate.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Fate, mystic dice portal with swirling violet energy, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Fate, tiny seamless looping board-space animation, subtle parallax, drifting lights, mystic dice portal with swirling violet energy, no people, no readable text, no watermark, smooth loop",
+      "accent": "#9b59b6",
+      "price": 0,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 8,
+      "id": "08_hospital",
+      "label": "Hospital",
+      "type": "jail",
+      "skillId": "",
+      "category": "jail",
+      "orientation": "square",
+      "image": "media/images/08_hospital-flux.png",
+      "video": "media/videos/08_hospital-custom.mp4",
+      "imageDimensions": [
+        512,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        192
+      ],
+      "imagePrompt": "Hospital, clean recovery ward with blue medical light, no UI, no readable text, no watermark",
+      "videoPrompt": "Looping video, Static Camera, no movement, Hospital, flickering roof light, computer screen blinking, dull small flashing light, blue medical light, no people, no readable text, no watermark, smooth loop",
+      "accent": "#3498db",
+      "price": 0,
+      "status": "LTX video generated from the current image.",
+      "lastImageDurationSecs": 31.2,
+      "lastImageMode": "flux",
+      "lastVideoDurationSecs": 44.1,
+      "lastVideoMode": "ltx"
+    },
+    {
+      "index": 9,
+      "id": "09_sabotage",
+      "label": "Sabotage",
+      "type": "skill",
+      "skillId": "sabotage",
+      "category": "attack",
+      "orientation": "landscape",
+      "image": "media/images/09_sabotage.svg",
+      "video": "media/videos/09_sabotage.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Sabotage, sparking machine room trap, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Sabotage, tiny seamless looping board-space animation, subtle parallax, drifting lights, sparking machine room trap, no people, no readable text, no watermark, smooth loop",
+      "accent": "#e67e22",
+      "price": 120,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 10,
+      "id": "10_healer",
+      "label": "Healer",
+      "type": "skill",
+      "skillId": "healer",
+      "category": "defense",
+      "orientation": "landscape",
+      "image": "media/images/10_healer.svg",
+      "video": "media/videos/10_healer.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Healer, neon medical garden, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Healer, tiny seamless looping board-space animation, subtle parallax, drifting lights, neon medical garden, no people, no readable text, no watermark, smooth loop",
+      "accent": "#27ae60",
+      "price": 120,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 11,
+      "id": "11_shakedown",
+      "label": "Shakedown",
+      "type": "skill",
+      "skillId": "shakedown",
+      "category": "attack",
+      "orientation": "landscape",
+      "image": "media/images/11_shakedown.svg",
+      "video": "media/videos/11_shakedown.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Shakedown, street checkpoint pressure, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Shakedown, tiny seamless looping board-space animation, subtle parallax, drifting lights, street checkpoint pressure, no people, no readable text, no watermark, smooth loop",
+      "accent": "#d35400",
+      "price": 180,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 12,
+      "id": "12_fate",
+      "label": "Fate",
+      "type": "fate",
+      "skillId": "",
+      "category": "fate",
+      "orientation": "landscape",
+      "image": "media/images/12_fate.svg",
+      "video": "media/videos/12_fate.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Fate, mystic dice portal with swirling violet energy, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Fate, tiny seamless looping board-space animation, subtle parallax, drifting lights, mystic dice portal with swirling violet energy, no people, no readable text, no watermark, smooth loop",
+      "accent": "#9b59b6",
+      "price": 0,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 13,
+      "id": "13_forge",
+      "label": "Shield Forge",
+      "type": "skill",
+      "skillId": "forge",
+      "category": "defense",
+      "orientation": "landscape",
+      "image": "media/images/13_forge.svg",
+      "video": "media/videos/13_forge.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Shield Forge, glowing armor forge, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Shield Forge, tiny seamless looping board-space animation, subtle parallax, drifting lights, glowing armor forge, no people, no readable text, no watermark, smooth loop",
+      "accent": "#2ecc71",
+      "price": 200,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 14,
+      "id": "14_jinx",
+      "label": "Jinx",
+      "type": "skill",
+      "skillId": "jinx",
+      "category": "attack",
+      "orientation": "landscape",
+      "image": "media/images/14_jinx.svg",
+      "video": "media/videos/14_jinx.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Jinx, glowing misfortune shrine, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Jinx, tiny seamless looping board-space animation, subtle parallax, drifting lights, glowing misfortune shrine, no people, no readable text, no watermark, smooth loop",
+      "accent": "#8e44ad",
+      "price": 80,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 15,
+      "id": "15_tollbooth",
+      "label": "Toll Booth",
+      "type": "skill",
+      "skillId": "tollbooth",
+      "category": "attack",
+      "orientation": "landscape",
+      "image": "media/images/15_tollbooth.svg",
+      "video": "media/videos/15_tollbooth.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Toll Booth, armored road toll booth, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Toll Booth, tiny seamless looping board-space animation, subtle parallax, drifting lights, armored road toll booth, no people, no readable text, no watermark, smooth loop",
+      "accent": "#e74c3c",
+      "price": 130,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 16,
+      "id": "16_rest_stop",
+      "label": "Rest",
+      "type": "rest",
+      "skillId": "",
+      "category": "rest",
+      "orientation": "square",
+      "image": "media/images/16_rest_stop.svg",
+      "video": "media/videos/16_rest_stop.mp4",
+      "imageDimensions": [
+        512,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        192
+      ],
+      "imagePrompt": "Rest, quiet roadside rest garden with shield lanterns, low-poly premium board game tile art, balanced square board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Rest, tiny seamless looping board-space animation, subtle parallax, drifting lights, quiet roadside rest garden with shield lanterns, no people, no readable text, no watermark, smooth loop",
+      "accent": "#2ecc71",
+      "price": 0,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 17,
+      "id": "17_taxman",
+      "label": "Tax Collector",
+      "type": "skill",
+      "skillId": "taxman",
+      "category": "attack",
+      "orientation": "portrait",
+      "image": "media/images/17_taxman.svg",
+      "video": "media/videos/17_taxman.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Tax Collector, bureaucratic toll tower, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Tax Collector, tiny seamless looping board-space animation, subtle parallax, drifting lights, bureaucratic toll tower, no people, no readable text, no watermark, smooth loop",
+      "accent": "#e74c3c",
+      "price": 200,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 18,
+      "id": "18_fate",
+      "label": "Fate",
+      "type": "fate",
+      "skillId": "",
+      "category": "fate",
+      "orientation": "portrait",
+      "image": "media/images/18_fate.svg",
+      "video": "media/videos/18_fate.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Fate, mystic dice portal with swirling violet energy, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Fate, tiny seamless looping board-space animation, subtle parallax, drifting lights, mystic dice portal with swirling violet energy, no people, no readable text, no watermark, smooth loop",
+      "accent": "#9b59b6",
+      "price": 0,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 19,
+      "id": "19_mirror",
+      "label": "Mirror Shield",
+      "type": "skill",
+      "skillId": "mirror",
+      "category": "defense",
+      "orientation": "portrait",
+      "image": "media/images/19_mirror.svg",
+      "video": "media/videos/19_mirror.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Mirror Shield, reflective glass shield room, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Mirror Shield, tiny seamless looping board-space animation, subtle parallax, drifting lights, reflective glass shield room, no people, no readable text, no watermark, smooth loop",
+      "accent": "#3498db",
+      "price": 160,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 20,
+      "id": "20_black_market",
+      "label": "Tax",
+      "type": "tax",
+      "skillId": "",
+      "category": "tax",
+      "orientation": "portrait",
+      "image": "media/images/20_black_market.svg",
+      "video": "media/videos/20_black_market.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Tax, busy toll gate and coin counter booth, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Tax, tiny seamless looping board-space animation, subtle parallax, drifting lights, busy toll gate and coin counter booth, no people, no readable text, no watermark, smooth loop",
+      "accent": "#e67e22",
+      "price": 0,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 21,
+      "id": "21_vault",
+      "label": "Vault",
+      "type": "skill",
+      "skillId": "vault",
+      "category": "defense",
+      "orientation": "portrait",
+      "image": "media/images/21_vault.svg",
+      "video": "media/videos/21_vault.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Vault, locked steel money vault, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Vault, tiny seamless looping board-space animation, subtle parallax, drifting lights, locked steel money vault, no people, no readable text, no watermark, smooth loop",
+      "accent": "#2c3e50",
+      "price": 140,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 22,
+      "id": "22_bounty",
+      "label": "Bounty Hunter",
+      "type": "skill",
+      "skillId": "bounty",
+      "category": "attack",
+      "orientation": "portrait",
+      "image": "media/images/22_bounty.svg",
+      "video": "media/videos/22_bounty.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Bounty Hunter, target board rooftop pursuit, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Bounty Hunter, tiny seamless looping board-space animation, subtle parallax, drifting lights, target board rooftop pursuit, no people, no readable text, no watermark, smooth loop",
+      "accent": "#c0392b",
+      "price": 170,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 23,
+      "id": "23_fate",
+      "label": "Fate",
+      "type": "fate",
+      "skillId": "",
+      "category": "fate",
+      "orientation": "portrait",
+      "image": "media/images/23_fate.svg",
+      "video": "media/videos/23_fate.mp4",
+      "imageDimensions": [
+        384,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        256
+      ],
+      "imagePrompt": "Fate, mystic dice portal with swirling violet energy, low-poly premium board game tile art, vertical portrait board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Fate, tiny seamless looping board-space animation, subtle parallax, drifting lights, mystic dice portal with swirling violet energy, no people, no readable text, no watermark, smooth loop",
+      "accent": "#9b59b6",
+      "price": 0,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 24,
+      "id": "24_injury",
+      "label": "Injury",
+      "type": "goToJail",
+      "skillId": "",
+      "category": "goToJail",
+      "orientation": "square",
+      "image": "media/images/24_injury.svg",
+      "video": "media/videos/24_injury.mp4",
+      "imageDimensions": [
+        512,
+        512
+      ],
+      "videoDimensions": [
+        192,
+        192
+      ],
+      "imagePrompt": "Injury, warning flare roadblock near emergency bay, low-poly premium board game tile art, balanced square board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Injury, tiny seamless looping board-space animation, subtle parallax, drifting lights, warning flare roadblock near emergency bay, no people, no readable text, no watermark, smooth loop",
+      "accent": "#e94560",
+      "price": 0,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 25,
+      "id": "25_pickpocket",
+      "label": "Pickpocket",
+      "type": "skill",
+      "skillId": "pickpocket",
+      "category": "attack",
+      "orientation": "landscape",
+      "image": "media/images/25_pickpocket.svg",
+      "video": "media/videos/25_pickpocket.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Pickpocket, sleight hand market alley, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Pickpocket, tiny seamless looping board-space animation, subtle parallax, drifting lights, sleight hand market alley, no people, no readable text, no watermark, smooth loop",
+      "accent": "#e74c3c",
+      "price": 100,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 26,
+      "id": "26_bodyguard",
+      "label": "Bodyguard",
+      "type": "skill",
+      "skillId": "bodyguard",
+      "category": "defense",
+      "orientation": "landscape",
+      "image": "media/images/26_bodyguard.svg",
+      "video": "media/videos/26_bodyguard.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Bodyguard, shielded safehouse guard, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Bodyguard, tiny seamless looping board-space animation, subtle parallax, drifting lights, shielded safehouse guard, no people, no readable text, no watermark, smooth loop",
+      "accent": "#2980b9",
+      "price": 100,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 27,
+      "id": "27_fate",
+      "label": "Fate",
+      "type": "fate",
+      "skillId": "",
+      "category": "fate",
+      "orientation": "landscape",
+      "image": "media/images/27_fate.svg",
+      "video": "media/videos/27_fate.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Fate, mystic dice portal with swirling violet energy, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Fate, tiny seamless looping board-space animation, subtle parallax, drifting lights, mystic dice portal with swirling violet energy, no people, no readable text, no watermark, smooth loop",
+      "accent": "#9b59b6",
+      "price": 0,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 28,
+      "id": "28_goldmine",
+      "label": "Gold Mine",
+      "type": "skill",
+      "skillId": "goldmine",
+      "category": "defense",
+      "orientation": "landscape",
+      "image": "media/images/28_goldmine.svg",
+      "video": "media/videos/28_goldmine.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Gold Mine, crystal gold mine vault, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Gold Mine, tiny seamless looping board-space animation, subtle parallax, drifting lights, crystal gold mine vault, no people, no readable text, no watermark, smooth loop",
+      "accent": "#f39c12",
+      "price": 150,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 29,
+      "id": "29_ambush",
+      "label": "Ambush",
+      "type": "skill",
+      "skillId": "ambush",
+      "category": "attack",
+      "orientation": "landscape",
+      "image": "media/images/29_ambush.svg",
+      "video": "media/videos/29_ambush.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Ambush, hidden bridge ambush point, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Ambush, tiny seamless looping board-space animation, subtle parallax, drifting lights, hidden bridge ambush point, no people, no readable text, no watermark, smooth loop",
+      "accent": "#c0392b",
+      "price": 150,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 30,
+      "id": "30_healer",
+      "label": "Healer",
+      "type": "skill",
+      "skillId": "healer",
+      "category": "defense",
+      "orientation": "landscape",
+      "image": "media/images/30_healer.svg",
+      "video": "media/videos/30_healer.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Healer, neon medical garden, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Healer, tiny seamless looping board-space animation, subtle parallax, drifting lights, neon medical garden, no people, no readable text, no watermark, smooth loop",
+      "accent": "#27ae60",
+      "price": 120,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    },
+    {
+      "index": 31,
+      "id": "31_sabotage",
+      "label": "Sabotage",
+      "type": "skill",
+      "skillId": "sabotage",
+      "category": "attack",
+      "orientation": "landscape",
+      "image": "media/images/31_sabotage.svg",
+      "video": "media/videos/31_sabotage.mp4",
+      "imageDimensions": [
+        512,
+        384
+      ],
+      "videoDimensions": [
+        256,
+        192
+      ],
+      "imagePrompt": "Sabotage, sparking machine room trap, low-poly premium board game tile art, wide landscape board-tile composition, cinematic lighting, crisp readable silhouettes, rich color contrast, no UI, no readable text, no watermark",
+      "videoPrompt": "Sabotage, tiny seamless looping board-space animation, subtle parallax, drifting lights, sparking machine room trap, no people, no readable text, no watermark, smooth loop",
+      "accent": "#e67e22",
+      "price": 120,
+      "status": "Starter placeholder. Use debug mode to re-roll with local Flux/LTX when available."
+    }
+  ]
+}

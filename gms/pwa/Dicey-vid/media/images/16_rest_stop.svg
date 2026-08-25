@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d2d23"/>
+      <stop offset="0.58" stop-color="#1b5241"/>
+      <stop offset="1" stop-color="#2ecc71"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="38%" r="54%">
+      <stop offset="0" stop-color="#b8ede0" stop-opacity="0.5"/>
+      <stop offset="0.42" stop-color="#2ecc71" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#0d2d23" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12.8" stdDeviation="10.2" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="url(#sky)"/>
+  <rect width="512" height="512" fill="url(#glow)"/>
+  <circle cx="92.2" cy="102.4" r="46.1" fill="#b8ede0" opacity="0.18"/>
+  <polygon points="0,512 0,361 85,381 171,283 256,324 341,346 427,328 512,271 512,512" fill="#144d33" opacity="0.9"/>
+  <polygon points="0,512 0,420 85,395 171,377 256,366 341,434 427,370 512,364 512,512" fill="#18633e" opacity="0.95"/>
+  <polygon points="0,512 0,446 85,402 171,395 256,425 341,443 427,429 512,384 512,512" fill="#0d3925" opacity="0.98"/>
+  <g filter="url(#softShadow)">
+    <circle cx="256.0" cy="194.6" r="122.9" fill="#08111f" opacity="0.72"/>
+    <circle cx="256.0" cy="194.6" r="95.8" fill="#2ecc71" opacity="0.72"/>
+    <path d="M 176.1 204.4 L 256.0 111.0 L 335.9 204.4 L 256.0 275.7 Z" fill="#b8ede0" opacity="0.3"/>
+    <text x="256.0" y="216.7" text-anchor="middle" font-family="Arial, sans-serif" font-size="88.5" font-weight="900" fill="#ffffff">R</text>
+  </g>
+  <g opacity="0.36">
+    <path d="M 41.0 450.6 C 143.4 399.4, 297.0 496.6, 471.0 399.4" stroke="#b8ede0" stroke-width="9.2" fill="none"/>
+    <path d="M 20.5 61.4 L 143.4 25.6 L 266.2 61.4 L 389.1 25.6 L 491.5 56.3" stroke="#ffffff" stroke-width="2" fill="none" opacity="0.28"/>
+  </g>
+</svg>

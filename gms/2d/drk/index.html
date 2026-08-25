@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>DRK: Desire, Risk & Kapital</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app-shell">
+    <header class="topbar">
+      <!-- DEV NOTE: tapping the DRK logo toggles debug mode. Remove this logo-debug toggle before any public deployment. -->
+      <div class="brand" id="brand-toggle" title="DRK (tap to toggle debug — dev only)">
+        <div class="eyebrow">v0.1 life sim</div>
+        <h1>DRK</h1>
+      </div>
+      <div class="topbar-meta">
+        <button class="cog-button" id="cog-desktop" type="button" aria-label="Settings">⚙</button>
+        <div class="resource-chip energy" id="top-energy-chip">
+          <span>Energy</span>
+          <strong id="top-energy">72</strong>
+          <div class="chip-meter"><i id="top-energy-bar"></i></div>
+        </div>
+        <button class="resource-chip metric-chip" id="metric-chip" type="button" aria-label="Cycle cash / debt / net worth">
+          <span id="metric-label">Cash</span>
+          <strong id="metric-value">$420</strong>
+        </button>
+        <div class="day-chip">
+          <span id="day-label">Day 1</span>
+          <strong id="slot-label">Morning</strong>
+        </div>
+      </div>
+    </header>
+
+    <!-- mobile edge tabs: settings, your panels, and the romance roster -->
+    <nav class="edge-nav" id="edge-nav" aria-label="Panels">
+      <button class="edge-tab cog-tab" type="button" data-cog="1" aria-label="Settings"><span>⚙</span></button>
+      <button class="edge-tab" type="button" data-drawer="you"><span>You</span></button>
+      <button class="edge-tab" type="button" data-drawer="goals"><span>Goals</span></button>
+      <button class="edge-tab girl-tab" type="button" data-girl="mara"><span>Mara</span></button>
+      <button class="edge-tab girl-tab" type="button" data-girl="sienna"><span>Sienna</span></button>
+      <button class="edge-tab girl-tab" type="button" data-girl="june"><span>June</span></button>
+      <button class="edge-tab girl-tab" type="button" data-girl="valentina"><span>Valentina</span></button>
+    </nav>
+    <div class="drawer-backdrop" id="drawer-backdrop"></div>
+
+    <main class="layout">
+      <!-- STATUS RAIL / "You" drawer -->
+      <aside class="status-rail drawer" id="drawer-you" data-drawer-panel="you">
+        <div class="drawer-head">
+          <strong>You</strong>
+          <button class="icon-button drawer-close" type="button" data-drawer-close aria-label="Close">x</button>
+        </div>
+        <section class="panel-block identity-block">
+          <div class="avatar-dot" id="player-avatar">AV</div>
+          <div>
+            <div class="muted-label">You are</div>
+            <h2 id="player-name">Alex Vale</h2>
+            <p id="player-summary">A charming broke analyst trying to turn $420 into freedom, status, and a serious love life.</p>
+          </div>
+        </section>
+
+        <section class="panel-block">
+          <div class="block-header"><span>Resources</span><span class="muted-label" id="net-label">Net $0</span></div>
+          <div class="resource-grid" id="resource-grid"></div>
+        </section>
+
+        <section class="panel-block">
+          <div class="block-header"><span>Attributes</span></div>
+          <div class="attr-list" id="attr-list"></div>
+        </section>
+      </aside>
+
+      <!-- GOALS RAIL / "Goals" drawer -->
+      <aside class="goals-rail drawer" id="drawer-goals" data-drawer-panel="goals">
+        <div class="drawer-head">
+          <strong>Goals</strong>
+          <button class="icon-button drawer-close" type="button" data-drawer-close aria-label="Close">x</button>
+        </div>
+        <section class="panel-block">
+          <div class="block-header"><span>Goals</span><span class="muted-label" id="goal-progress">0/4</span></div>
+          <div class="objective-list" id="objective-list"></div>
+        </section>
+      </aside>
+
+      <!-- CENTER STAGE -->
+      <section class="stage">
+        <div class="media-frame" id="media-frame">
+          <div class="media-bg" id="media-bg"></div>
+          <img id="scene-image" class="scene-media" src="" alt="">
+          <video id="scene-video" class="scene-media hidden" playsinline muted loop></video>
+          <video id="transition-video" class="scene-media hidden" playsinline muted></video>
+          <button class="media-debug-hotspot" id="media-debug-hotspot" type="button" aria-label="Open media debug"></button>
+          <button class="media-corner-btn" id="home-button" type="button" aria-label="Home base" title="Home base">⌂</button>
+          <div class="media-caption" id="media-caption" role="button" tabindex="0" aria-label="Tap the name for a full view">
+            <span id="scene-kicker">Character Card</span>
+            <strong id="scene-title">Mara Voss</strong>
+            <span class="caption-fs" aria-hidden="true">⤢</span>
+          </div>
+        </div>
+
+        <!-- romance roster: desktop only (mobile selects via the girl notches) -->
+        <div class="stage-strip">
+          <div class="block-header inline"><span>Romance</span><span class="muted-label" id="focus-label">Focus: Mara</span></div>
+          <div class="character-strip" id="character-strip"></div>
+        </div>
+
+        <div class="panel-block story-block collapsed" id="story-block">
+          <div class="block-header">
+            <span>Latest</span>
+            <button class="ghost-button story-toggle" id="story-toggle" type="button" aria-label="Expand">▾</button>
+          </div>
+          <p id="story-text"></p>
+        </div>
+      </section>
+
+      <!-- CONTEXT RAIL / "Her" drawer -->
+      <aside class="context-rail drawer" id="drawer-her" data-drawer-panel="her">
+        <div class="drawer-head">
+          <strong>In focus</strong>
+          <button class="icon-button drawer-close" type="button" data-drawer-close aria-label="Close">x</button>
+        </div>
+        <div class="context-default" id="context-default">
+          <div class="date-card" id="date-card"></div>
+        </div>
+      </aside>
+
+      <!-- ACTION SURFACE (docks right on desktop, bottom sheet on mobile) -->
+      <div class="play-panel hidden" id="play-panel">
+        <div class="play-panel-header">
+          <div>
+            <div class="eyebrow" id="play-panel-kicker">Panel</div>
+            <h2 id="play-panel-title">Action</h2>
+          </div>
+          <div class="inline-actions">
+            <button class="ghost-button panel-collapse" id="play-panel-collapse" type="button">Minimize</button>
+            <button class="icon-button" id="play-panel-close" type="button" aria-label="Close">x</button>
+          </div>
+        </div>
+        <div class="play-panel-body" id="play-panel-body"></div>
+      </div>
+
+      <!-- ACTION BAR -->
+      <nav class="actions-panel" aria-label="Actions">
+        <button class="action-button" data-action="work" data-en="12" type="button"><span class="action-label">Work</span><small class="action-cost">EN 12+</small></button>
+        <button class="action-button" data-action="trade" type="button"><span class="action-label">Trade</span><small class="action-cost">Markets</small></button>
+        <button class="action-button" data-action="gamble" data-en="3" type="button"><span class="action-label">Gamble</span><small class="action-cost">EN 3+</small></button>
+        <button class="action-button" data-action="train" data-en="12" type="button"><span class="action-label">Train</span><small class="action-cost">EN 12+</small></button>
+        <button class="action-button" data-action="date" data-en="14" type="button"><span class="action-label">Date</span><small class="action-cost">EN 14+</small></button>
+        <button class="action-button rest-button" data-action="rest" type="button"><span class="action-label">Rest</span><small class="action-cost">Recover</small></button>
+      </nav>
+    </main>
+  </div>
+
+  <div id="game-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modal-title">Panel</h2>
+        <button class="icon-button" id="modal-close" type="button" aria-label="Close">x</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="debug-modal" class="debug-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="debug-card">
+      <div class="debug-header">
+        <div>
+          <div class="eyebrow">Local media studio</div>
+          <h2>DRK Debug</h2>
+        </div>
+        <button class="icon-button" id="debug-close" type="button" aria-label="Close">x</button>
+      </div>
+      <div id="debug-body"></div>
+    </div>
+  </div>
+
+  <script src="js/fx.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/debug.js"></script>
+</body>
+</html>
