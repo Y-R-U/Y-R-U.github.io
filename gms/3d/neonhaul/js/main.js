@@ -35,7 +35,7 @@ import { planLaneRoute, trafficSeed } from './lanes.js';
 import { SettingsPanel } from './settings.js';
 import { CraftFields, PlayerCraft, CRAFT_DEFS, CRAFT_U, SHOT_CRAFT,
   BODY_TINTS, TRIM_TINTS, TRIM_RUNS, RIM_DIM, LIGHT_RIG, POLICE_RIG, setCityRefl } from './craft.js';
-import { Traffic } from './traffic.js';
+import { Traffic, setSteerBudget } from './traffic.js';
 import { Cockpit, ChaseHud } from './hud.js';
 import { Minimap } from './minimap.js';
 import { UI, DockUI, CabinPanel, holdFor, CHATTER_MULT } from './ui.js';
@@ -3469,7 +3469,13 @@ window.__game = {
   // The road population, at the LIVE vehicle clock. `trafficList` is the flying half; this is the
   // half that drives the streets, and `hidden` on each row is the flag both the mesh and the
   // streak are suppressed by.
-  roadList: (limit = 0, t) => (traffic ? traffic.roadList(t === undefined ? vehT : +t, camera.position, limit) : []),
+  // S2-R: `live` is false whenever the caller names a `t`, so the frame-state fields (`hidden`,
+  // `drawn`, `streak`, `off`, `sx/sz`, `near`) come back NULL rather than as last frame's answer
+  // to a different moment. See traffic.js's roadList header — that conflation produced a wrong
+  // measurement once already. Pin with `stepVehicles(t)` and then call this with no `t`.
+  roadList: (limit = 0, t) => (traffic
+    ? traffic.roadList(t === undefined ? vehT : +t, camera.position, limit, t === undefined)
+    : []),
   // Gate-only, and an OVERRIDE rather than a set: it pins the road population to an exact moment
   // and optionally advances the DOORS by `dt` without unfreezing the world, so "drive a 32 m
   // haulier into a doorway and photograph it" is arithmetic instead of a wait for luck. Use it
@@ -3763,11 +3769,29 @@ window.__game = {
   setTraffic(on) { return traffic ? traffic.setEnabled(on !== false) : false; },
   setTrafficYield(on) { if (traffic) traffic.yieldOn = on !== false; return traffic ? traffic.yieldOn : null; },
   setTrafficAvoid(on) { if (traffic) traffic.avoid = on !== false; return traffic ? traffic.avoid : null; },
+  // S2-R. gates_steer's falsification levers. Setting the lateral budget to 0 forces every
+  // obstructed craft down the CLIMB branch, which is how that branch is shown to work at all —
+  // on the shipped city it never fires, and an unexercised branch is not a working one.
+  setSteerBudget: (air, road, climb) => setSteerBudget(air, road, climb),
+  // Everything the steer did on the last frame, as counts. `trapped` minus `trappedLm` is the
+  // figure that has to be zero: a seeded mass the lateral steer failed to clear is a budget bug,
+  // where a landmark it failed to clear is the known, bounded residue.
+  steerStats: () => (traffic ? {
+    steered: traffic.stats.steered, climbed: traffic.stats.climbed,
+    trapped: traffic.stats.trapped, trappedLm: traffic.stats.trappedLm,
+    avoidedPartial: traffic.stats.avoidedPartial, avoided: traffic.stats.avoided,
+    roadSteered: traffic.stats.roadSteered, meshes: traffic.stats.meshes,
+  } : null),
   // decision 6's falsification switch. Nothing in the game sets it; gates_p5 sets it to show the
   // "no patrol ever steers toward the player" assertion CAN fail, which is the only thing that
   // makes the passing run mean anything.
   setTrafficPursue(on) { if (traffic) traffic.pursue = !!on; return traffic ? traffic.pursue : null; },
   trafficList: (limit = 0) => (traffic ? traffic.list(vehT, camera.position, limit) : []),
+  // S2-R. The promoted craft AS DRAWN — after the yield, the lateral steer and any climb.
+  // `trafficList` reports `posOf`, which is the position before all three; a gate that asks
+  // whether a craft ended up inside a building has to read this one or it is measuring the input
+  // to the fix and calling it the output.
+  trafficDrawn: () => (traffic ? traffic.drawnList() : []),
   // `t` is optional and PINNED by the determinism gate: freezing the clock stops it at whatever
   // boot left it at, which differs between page loads, so a hash taken at "the frozen time" compares
   // two different moments. Passing a literal makes the comparison a comparison.

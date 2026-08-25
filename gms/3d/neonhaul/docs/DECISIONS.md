@@ -529,3 +529,59 @@ chunk-streaming race. It is clearly the dominant failure mode here.
 
 **Standing rule from here:** a test may never use `&&` to make its own setup optional. If a
 precondition is missing, fail loudly. Silence is the bug.
+
+## 16. §S2-R — road MARKINGS are deleted, not restyled; the deck is obsidian
+
+**Settled 2026-08-25 by Aaron**, on the shipped build:
+
+> Roads are part of the problem, they don't match up to buildings so look silly. We shouldn't draw
+> them like this, it should look like a cool black surface/futuristic … in this cyber city we can
+> imagine everything is auto-driven/most things fly and the only thing currently on the ground are
+> some auto-trains, so why would road lines exist. … the black road could be a black partly
+> reflecting surface perhaps, obsidian kind of look?
+
+So `materials.js` `ROAD_BODY` carries **no carriageway at all** — no lane dashes, no edge lines, no
+junction hatching, no kerb, and no `onRoad` term. This is a deletion and not a restyle, and the
+reason is measurable rather than aesthetic: the paint was drawn on the idealised 51.2 m lot lattice,
+and **502 of 4,132 seeded footprints (12.15 %) stand on it, the worst reaching 8.36 m in.** Moving
+12 % of the city to fit the paint was never the cheaper option.
+
+**Do not reintroduce a lane marking, a kerb line, or any deck feature on a 51.2 m period**, or on
+any period that beats against it. That includes "just a faint guide line for the trams": the trams
+are auto-driven, the whole deck is drivable, and a line on it re-creates exactly the mismatch this
+removed. `gates_steer` S8 is a **source** check on `ROAD_BODY` for this reason — a pixel test would
+pass on markings merely dimmed to zero.
+
+## 17. §S2-R — the traffic steer is SIDEWAYS, and it is outside the determinism hash
+
+Aaron chose, from three options put to him: *weave sideways, climb only over low masses* for the
+flying population, and *steer around on the black deck* for the street population — and, offered a
+fix at source in `city.js` that would have cleared every lane, **chose to keep the building overhang
+instead**, because it is what creates the road tunnels he likes.
+
+Two consequences that must not be undone by a later phase:
+
+1. **`city.js`'s split-mass jitter stays as it is.** It is the reason `split` halves are thrown over
+   the street line, which is the reason corridors cross masses at all, which is the reason
+   `js/tunnels.js` has crossings to dress. Tidying it would silently gut a shipped feature.
+2. **The steer is a RENDER-TIME displacement and is deliberately outside `hash()`.** `posOf` and
+   `roadPosOf` remain the definition of where a vehicle is; the golden hash `f29beaf9` is unmoved.
+   Anything that folds the offset into the analytic position makes traffic depend on which chunks
+   have streamed, and determinism stops meaning what `gates_p5` and `determinism.mjs` say it means.
+
+## T11 — falsify a gate at the margin it OPERATES on, not at the extreme
+
+`gates_p11` P1 asserted no building stands on the painted road corridor, reported zero, and passed
+for two phases. Its test used `Math.min` where it needed `Math.max`, demanding a footprint encroach
+on both axes simultaneously. **Its two falsification arms passed the whole time** — they widened the
+road to 26.4 m and 38.0 m, where every mass trips both axes, so both went red on cue while the check
+measured nothing.
+
+Every one of the eighteen prior instances was a control that did not exist or did not run. This is
+the first where the control existed, ran, and was itself fooled.
+
+**The obligation:** when adding or reviewing a falsification arm, ask what it would have caught at
+the setting the gate actually operates at — not merely whether it goes red at some setting. An arm
+that only exercises the extreme is evidence about the extreme. Where an operator or a predicate is
+the risk, make **the operator itself** the arm: P1 now prints what the same probe returns with
+`Math.min`, beside the number it hid.

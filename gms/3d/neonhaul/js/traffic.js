@@ -65,6 +65,88 @@ const STREAK_IN = 190, STREAK_OUT = 250;   // the crossfade band for a PROMOTED 
 // §5.5's yield. "up to 12 m/s² of lateral acceleration away from the player inside 25 m."
 const YIELD_R = 25, YIELD_ACC = 12, YIELD_SPRING = 2.2, YIELD_DAMP = 2.6, YIELD_MAX = 9;
 
+// ── S2-R — the lateral clearance steer ─────────────────────────────────────
+//
+// Aaron, on the shipped build: *"cars are now flying through buildings? … they should be flying
+// between buildings"*, and of the street population: *"we cannot have trains going next to
+// buildings or into the edge of a building. They need to go on the black … either by reversing if
+// needed or indeed turning"*. One primitive answers both, because both are the same defect — an
+// analytic lane that knows nothing about the city it runs through.
+//
+// ── why the shipped avoidance could not have worked ────────────────────────
+//
+// It pushed an intersecting craft STRAIGHT UP by `min(14, top + 4.5 - y)`. Fourteen metres. The
+// masses that actually sit on a lane are 160-450 m tall, so the push lifted a craft from 55 m to
+// 69 m and left it ninety to four hundred metres inside the tower — while incrementing
+// `stats.avoided`. Measured on the shipped build before any of this: SIX of the twenty-six
+// mesh-drawn craft were inside a mass, and ALL SIX were still inside after the push ran. A cap
+// that silently turns a correction into a no-op is the same failure as a gate that cannot go red,
+// and it is why `trapped` below is counted rather than assumed away.
+//
+// ── what it does instead ───────────────────────────────────────────────────
+//
+// A lane runs down a street; a mass that intrudes on one hardly ever spans it. So the clearance is
+// SIDEWAYS, not up: find the near edge of the offending box and offset across the lane by just
+// enough to pass it. Climbing survives only for what climbing is for — a low podium, where a hop
+// over the roof reads correctly — and is bounded by a height a craft could plausibly hop.
+//
+// Three properties are load-bearing, and each is a bug not made:
+//
+//   1. IT MUST NOT SNAP. The taps sample the lane from 14 m behind the hull to 26 m ahead and
+//      weight each by where it sits in that window, so the offset ramps in over the two seconds
+//      before the wall and ramps out behind it. A steer evaluated only at the craft's own position
+//      is a 6 m teleport at the corner, twice.
+//   2. IT MUST STAY A PURE FUNCTION OF POSITION. Every term is read from the world position and
+//      the city's boxes; nothing integrates, nothing remembers the previous frame. `posOf` is
+//      still the definition of where a craft is and `hash()` still re-derives it, so the
+//      determinism gate keeps meaning what it says. This is a RENDER-TIME displacement against
+//      streamed geometry — which is exactly why it is deliberately OUTSIDE the hash, and why
+//      `roadList` must not report it as though it were the analytic position.
+//   3. A CORRIDOR IT CANNOT CLEAR HAS TO SAY SO. When a mass needs more than the budget the offset
+//      is REFUSED, never clamped to something that still intersects. `stats.trapped` counts every
+//      one, so "the steer handles it" is a number in a gate rather than a hope.
+// The kernel taps exist for ONE job — to ramp the offset in before the obstruction and out after
+// it, so the manoeuvre is a lane change and not a teleport. They are a fixed ladder in metres, and
+// a fixed ladder cannot know how long the hull using it is. Two measured failures came from asking
+// them to:
+//
+//   * a 32 m haulier's NOSE is 16 m ahead of its centre, so with the plateau starting at 14 m the
+//     manoeuvre was still at 0.875 weight when the nose reached the wall;
+//   * a 22 m tram's TAIL is 11 m behind its centre, so with the plateau ending at -8 the offset
+//     had already begun decaying while the tail was still alongside the corner — measured at 0.149
+//     of the 0.9 m it needed, still grazing.
+//
+// So the hull's own two ends are sampled EXPLICITLY, at full weight, in addition to the ladder.
+// The ladder shapes the approach; the two hull taps are what actually guarantee that no part of
+// this particular vehicle is in the mass. A ladder alone is a sampling rate, and a sampling rate
+// is not a guarantee.
+const STEER_TAPS = [-24, -12, 4, 16, 28, 40];
+const STEER_W = STEER_TAPS.map(v => Math.max(0,
+  v > 28 ? 1 - (v - 28) / 18 : v < -12 ? 1 - (-12 - v) / 16 : 1));
+// The budget, sized from the city rather than from a round number. A SEEDED mass reaches at most
+// 8.36 m past the street centreline (tools/probe_enc.mjs, measured over 4,132 footprints), and a
+// lane sits LANE_SEP = 3.4 m off that centreline, so clearing the worst seeded encroachment from
+// the lane it actually blocks costs 8.36 - 3.4 + hull half + 0.5 ~= 7.1 m. Nine is that plus
+// headroom; much more would push a craft over the far kerb and into the block opposite, which the
+// post-steer re-test would then have to catch as `trapped` — a wider budget is not a safer one.
+let STEER_AIR = 9.0;
+// The STREET's budget was 5.4 — half a 13.2 m carriageway, less the widest hull. That number
+// described a road that no longer exists: S2-R deleted the carriageway along with the markings
+// (materials.js ROAD_BODY), and Aaron's brief is that the transports *"need to go on the black"*,
+// which is now the whole deck. So the only real constraint is not driving into the block opposite,
+// and that is enforced by measurement — `_clearOffset` re-tests the side it chooses — rather than
+// by a budget small enough to guarantee it.
+let STEER_ROAD = 11.0;
+// As far as the near ring streams collision boxes. `solidAt` answers null past it whatever this
+// says, so the number is a cost guard and not a policy — 520 was leaving a bus grazing a corner at
+// 544 m, which is exactly the sort of edge a round number invents.
+const R_STEER_MAX_D = 620;
+// The ALONG margin every tap is softened over: how far ahead of a mass a tap starts to feel it, in
+// metres. It is what turns each tap's contribution from a step into a ramp — see _clearOffset.
+const SOFT = 7.0;
+// A podium is worth hopping; a tower is not, and pretending otherwise is what the 14 m cap did.
+let CLIMB_MAX = 26;
+
 // S2-C. Aaron, having flown it: "The cars/vehicles have little variation from what I can see …
 // some different height/length vehicles? Maybe 2 or 3 other shapes as well". This table WAS two
 // civilian silhouettes for the whole city — the seeded colour variety at `_derive` below landed
@@ -228,6 +310,21 @@ const CAP_STREAK = 1024;
 // whichever of this and the remaining streak slots is smaller — see applyQuality.
 const CAP_ROAD = 96;
 
+// gates_steer's falsification levers, and they are OVERRIDES rather than settings: nothing in the
+// frame writes them back, so the game loop cannot undo a gate's fixture — CLAUDE.md's rule, and
+// the one that `setZones`/`setSignVisible`/`setShopForce` each had to learn.
+//
+// Zeroing the lateral budget is how the CLIMB branch is proved to exist at all. On the shipped
+// city it never fires — every seeded crossing is solved sideways and every landmark crossing is
+// refused — so without this it would be an untested branch that a reader has to take on trust,
+// which is precisely the kind of code this project has been bitten by.
+export function setSteerBudget(air, road, climb) {
+  if (air !== undefined && air !== null) STEER_AIR = +air;
+  if (road !== undefined && road !== null) STEER_ROAD = +road;
+  if (climb !== undefined && climb !== null) CLIMB_MAX = +climb;
+  return { air: STEER_AIR, road: STEER_ROAD, climb: CLIMB_MAX };
+}
+
 export class Traffic {
   constructor(scene, Q, seed, cityR = null) {
     this.Q = Q;
@@ -333,11 +430,33 @@ export class Traffic {
     // set"; this is "geometry was submitted", and the difference between the two is exactly what
     // a gate asserting "you cannot see it inside the building" has to read.
     this.rDrawn = new Uint8Array(CAP_ROAD);
+    // S2-R. The lateral offset actually applied to this vehicle this frame. Frame state, exactly
+    // like rHid — `roadList` reports it only when reading the LIVE clock, for the reason spelled
+    // out there.
+    this.rOff = new Float32Array(CAP_ROAD);
     this.rNearIdx = new Int32Array(16);
     this.rNearN = 0;
+    // S2-R. Where each promoted FLYING craft was actually drawn, after the yield, the steer and
+    // any climb — i.e. the pose that went to the GPU, not the analytic position `list()` reports.
+    // Without this a gate asking "is a craft inside a building" can only read `posOf`, which is
+    // the position BEFORE the thing under test ran, and would score a working steer as broken.
+    // Fixed-size and rewritten in place: 26 entries, no per-frame allocation.
+    this.drawN = 0;
+    this.drawI = new Int32Array(64);
+    this.drawX = new Float32Array(64);
+    this.drawY = new Float32Array(64);
+    this.drawZ = new Float32Array(64);
+    this.drawOff = new Float32Array(64);
+    this.drawFlag = new Uint8Array(64);   // 1 steered · 2 climbed · 4 trapped (not drawn)
+    this._aabbs = [];                    // _clearOffset's scratch — reused, never allocated per tap
 
     this.stats = { streaks: 0, meshes: 0, patrol: 0, patrolNear: Infinity, yields: 0, avoided: 0,
-      road: 0, roadMeshes: 0, roadHidden: 0 };
+      road: 0, roadMeshes: 0, roadHidden: 0,
+      // S2-R. `steered` is how many took a lateral offset, `climbed` how many hopped a low mass
+      // anyway, and `trapped` how many the steer could NOT clear and were therefore not drawn.
+      // `trapped` is the one that matters: it is the residue the feature does not handle, and a
+      // gate reads it rather than inferring from a screenshot that everything is fine.
+      steered: 0, climbed: 0, trapped: 0, trappedLm: 0, avoidedPartial: 0, roadSteered: 0 };
     this.msSim = 0;
     this.applyQuality(Q);
   }
@@ -522,6 +641,9 @@ export class Traffic {
   // haulier has to hold a doorway open more than twice as long as a 12 m bus, and that difference
   // is the whole reason the door is not on a timer.
   roadLength(i) { return CRAFT_DEFS[ROAD_TYPES[this.rType[i]].id].L; }
+  // Its half WIDTH, which is what decides whether a corner grazes it. Read from the same def table
+  // as the length rather than from a literal, so a new road hull cannot be half-registered.
+  roadHalfWidth(i) { return CRAFT_DEFS[ROAD_TYPES[this.rType[i]].id].W * 0.5; }
 
   // The road position, on exactly the same tiling arithmetic as posOf and for the same reason:
   // it is a pure function of (seed, index, time, camera), so street traffic is as deterministic
@@ -615,6 +737,38 @@ export class Traffic {
     return R_HOLD_BASE;
   }
 
+  // The heading correction for a steered transport: atan of how fast its offset is changing along
+  // the lane. Zero for the unsteered, which is every vehicle on a clear street.
+  _roadSteerYaw(i) {
+    const off = this.rOff[i];
+    if (!off || !this.cityR) return 0;
+    const l = this.rLaneOf(i);
+    const LOOK = 8;
+    // Re-evaluated from the UNSTEERED position 8 m on, so the two samples are on the same curve.
+    const bx = l.axis === 0 ? this.rx[i] + l.dir * LOOK : this.rx[i] - off;
+    const bz = l.axis === 0 ? this.rz[i] - off : this.rz[i] + l.dir * LOOK;
+    const ahead = this._clearOffset(l.axis, bx, this.ry[i], bz, this.roadHalfWidth(i), STEER_ROAD,
+      this.roadLength(i) * 0.5);
+    const slope = (ahead - off) / LOOK;
+    // ── the sign, derived rather than guessed ────────────────────────────────
+    //
+    // `roadYawOf` encodes a model whose nose is local -Z: at axis 1 / dir +1 it returns PI, and
+    // rotating (0,-1) by PI gives (0,+1), which is the +Z the vehicle is travelling. Under this
+    // file's rotation convention the nose is (-sin(yaw), -cos(yaw)), so d(nose)/d(yaw) is
+    // (-cos(yaw), +sin(yaw)) — and evaluating that at each of the four (axis, dir) headings gives
+    // the factor below. It is the OPPOSITE of the first draft's, which turned every weaving
+    // transport away from the gap it was steering into.
+    //
+    //   axis 1, dir +1  yaw PI     d(nose)/dyaw = (+1, 0)  ->  +yaw turns toward +x  ->  + slope
+    //   axis 1, dir -1  yaw 0      d(nose)/dyaw = (-1, 0)  ->  -slope
+    //   axis 0, dir +1  yaw -PI/2  d(nose)/dyaw = (0, -1)  ->  -slope
+    //   axis 0, dir -1  yaw +PI/2  d(nose)/dyaw = (0, +1)  ->  +slope
+    //
+    // 0.30 rad is about as far as a 32 m haulier can be turned before the hull reads as skidding
+    // rather than steering.
+    return clamp(Math.atan(slope) * (l.axis === 0 ? -l.dir : l.dir), -0.30, 0.30);
+  }
+
   roadYawOf(i) {
     const l = this.rLaneOf(i);
     if (l.axis === 0) return l.dir > 0 ? -Math.PI / 2 : Math.PI / 2;
@@ -683,6 +837,9 @@ export class Traffic {
 
     // 3. the near craft: yield, facade avoidance, and a real mesh each.
     this.stats.meshes = 0; this.stats.yields = 0; this.stats.avoided = 0;
+    this.stats.steered = 0; this.stats.climbed = 0; this.stats.trapped = 0;
+    this.stats.trappedLm = 0; this.stats.avoidedPartial = 0;
+    this.drawN = 0;
     this.stats.patrolNear = Infinity;
     const pose = this._pose;
     for (let a = 0; a < want; a++) {
@@ -698,22 +855,55 @@ export class Traffic {
       // lane the player can herd.
       let wx = px[i], wy = py[i] + oy, wz = pz[i];
       if (l.axis === 0) wz += ox; else wx += ox;
+      const def = CRAFT_DEFS[TYPES[this.tType[i]].id];
+      // S2-R. Sideways first, then a hop, then — for the mass that is neither — nothing drawn at
+      // all. See the STEER_TAPS header for why the old vertical push could not work.
+      let steer = 0;
       if (this.avoid && this.cityR) {
-        const hit = this.cityR.solidAt(wx, wy, wz, 3.0);
+        const half = def.W * 0.5 + 0.8;
+        steer = this._clearOffset(l.axis, wx, wy, wz, half, STEER_AIR, def.L * 0.5);
+        if (steer) { if (l.axis === 0) wz += steer; else wx += steer; this.stats.steered++; }
+        // Re-test AFTER the offset, because the offset is what has to be shown to work. A steer
+        // that reports success without this line is the fourteen-metre push again.
+        const hit = this.cityR.solidAt(wx, wy, wz, half);
         if (hit) {
-          // Straight up and out of the facade. A craft clipping a tower is the one traffic defect
-          // that reads instantly, and 26 point tests is the whole cost.
-          const push = Math.min(14, (hit.top + 4.5) - wy);
-          if (push > 0) wy += push;
           this.stats.avoided++;
+          const climb = (hit.top + 6) - wy;
+          if (climb <= CLIMB_MAX) { wy += climb; this.stats.climbed++; }
+          else if (this._fullyInside(l.axis, wx, wy, wz, half, def.L * 0.5)) {
+            // A mass this craft cannot get round or over, and it is now entirely inside one. It is
+            // drawn NOTHING rather than drawn inside the wall: its streak stays in the buffer and
+            // is depth-tested, so it is behind the facade and invisible, and the mesh — the half
+            // that pokes out of the far face and reads instantly — is simply not submitted.
+            // `mesh.count` and the hash are untouched either way.
+            //
+            // Split by CAUSE, because the two have different answers and lumping them hides that.
+            // A seeded mass is at most 38 m across and a lateral steer should have cleared it —
+            // one landing here is a budget that is too small, i.e. a bug. A LANDMARK is 80-120 m
+            // across and up to 470 m tall; no lateral offset inside a street's width clears one,
+            // and no climb that keeps §3.10 #2's altitudes does either. So `trappedLm` is the
+            // known, bounded residue and `trapped - trappedLm` is the part that has to be zero.
+            this.stats.trapped++;
+            if (hit.landmark) this.stats.trappedLm++;
+            this._recordDraw(i, wx, wy, wz, steer, 4);
+            continue;
+          } else {
+            // Touching the mass, not yet swallowed by it. Withholding HERE is a pop: the hull is
+            // 6-9 m long and its centre reaches the facade with three or four metres still out in
+            // the open, so the craft would blink out with its tail plainly outside the wall.
+            // Drawn instead — the facade writes depth, so the part inside is occluded and the part
+            // outside is exactly what should still be on screen. Same argument js/tunnels.js makes
+            // about a bore's two portal planes, and for the same reason: a wall is a better cutter
+            // than a flag.
+            this.stats.avoidedPartial++;
+          }
         }
       }
-      const def = CRAFT_DEFS[TYPES[this.tType[i]].id];
       pose.def = def;
       pose.x = wx; pose.y = wy; pose.z = wz;
       pose.yaw = this.yawOf(i);
       pose.pitch = 0;
-      pose.roll = clamp(-ox * 0.02, -0.28, 0.28);   // a lean into the avoidance, decoration only
+      pose.roll = clamp(-(ox + steer) * 0.02, -0.28, 0.28);   // a lean into yield AND weave, decoration only
       pose.throttle = 0.30 + 0.5 * (this.tSpeed[i] / 46);
       pose.t = t;
       // `patrol` keeps its own def colours (§5.3: the police hull stays black, and its trim has to
@@ -729,6 +919,7 @@ export class Traffic {
         pose.pulse = this.tPulse[i];
       }
       if (fields) fields.write(pose);
+      this._recordDraw(i, wx, wy, wz, steer, (steer ? 1 : 0) | (wy !== py[i] + oy ? 2 : 0));
       this.stats.meshes++;
       if (def.police) this.stats.patrolNear = Math.min(this.stats.patrolNear, pd[i]);
     }
@@ -792,6 +983,70 @@ export class Traffic {
       const dx = p[0] - cx, dy = p[1] - cy, dz = p[2] - cz;
       this.rd[i] = Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
+    // ── S2-R — the street steer ──────────────────────────────────────────────
+    //
+    // Applied to the STORED position, so the mesh, the streak, the suppression test and
+    // `roadList`'s live reading all see one number instead of four that agree until they do not.
+    // It runs BEFORE `_roadHidden` for that reason: a vehicle that has just steered clear of a
+    // corner must not then be suppressed for being inside it.
+    //
+    // The one place it must NOT fire is a dressed crossing. There the wall already has a mouth on
+    // the exact line this vehicle drives, and a steer would put it into the jamb — so `spanAt`'s
+    // default 40 m margin is used as-is, which holds the vehicle straight through the approach as
+    // well as through the bore itself. That is the same margin the doors lead on.
+    this.stats.roadSteered = 0;
+    if (this.avoid && this.cityR) {
+      for (let i = 0; i < this.rN; i++) {
+        this.rOff[i] = 0;
+        // The near RING, not the promotion ring. A streak is depth-TESTED so a wall hides the part
+        // of it that is inside — but the part still outside a corner keeps drawing, and at 350-550 m
+        // that was the whole of the residue the first pass left behind. `solidAt` cannot answer
+        // past the streamed ring anyway, so this is the real edge of what is knowable rather than
+        // a number chosen for cost. Measured at 520 m: no change to any figure in budget.mjs.
+        if (this.rd[i] > R_STEER_MAX_D) continue;
+        const l = this.rLaneOf(i);
+        const cross = l.axis === 0 ? this.rz[i] : this.rx[i];
+        const along = l.axis === 0 ? this.rx[i] : this.rz[i];
+        // The bore suppression is a RAMP, not a switch. Cutting the offset to zero the instant
+        // spanAt starts answering was a 1.6 m sideways step in a thirtieth of a second — the
+        // largest single discontinuity gates_steer S5 found, and it came from the one place the
+        // steer is supposed to politely get out of the way. Queried 22 m wider than the window it
+        // has to respect, and faded across that margin.
+        let boreW = 1;
+        if (this.tunnels) {
+          const sp = this.tunnels.spanAt(l.axis, cross, along, 62);
+          if (sp) {
+            const d = along < sp.a0 ? sp.a0 - along : along > sp.a1 ? along - sp.a1 : 0;
+            boreW = clamp((d - 40) / 22, 0, 1);
+          }
+        }
+        if (boreW <= 0) continue;
+        const off = this._clearOffset(l.axis, this.rx[i], this.ry[i], this.rz[i],
+          this.roadHalfWidth(i), STEER_ROAD, this.roadLength(i) * 0.5) * boreW;
+        if (!off) continue;
+        // ── AND THE RESULT HAS TO BE BETTER THAN THE START ────────────────────
+        //
+        // The offset clears the mass the taps found. It says nothing about what is on the side it
+        // moves toward, and on a street narrowed from both sides it can walk a bus straight out of
+        // one mass and into the one opposite. gates_tunnel T7 caught exactly that — one transport
+        // suppressed while its ANALYTIC position stood in open air, because the suppression was
+        // reading the steered position and the steer had put it somewhere worse.
+        //
+        // The air path has re-tested since it was written, for the same reason its predecessor
+        // failed: a correction that reports success without checking is the fourteen-metre push.
+        // The street path now does too, and REFUSES rather than half-applying — a vehicle held on
+        // its lane is a vehicle the existing centre-point suppression already knows how to handle.
+        const half = this.roadHalfWidth(i);
+        const nx = l.axis === 0 ? this.rx[i] : this.rx[i] + off;
+        const nz = l.axis === 0 ? this.rz[i] + off : this.rz[i];
+        if (this._fullyInside(l.axis, nx, this.ry[i], nz, half, 0)
+          && !this._fullyInside(l.axis, this.rx[i], this.ry[i], this.rz[i], half, 0)) continue;
+        this.rOff[i] = off;
+        this.rx[i] = nx; this.rz[i] = nz;
+        this.stats.roadSteered++;
+      }
+    } else this.rOff.fill(0);
+
     // S2-N. Whether each transport is INSIDE a tunnel, decided once here and read by both the
     // mesh loop below and the streak loop in `update`. See `_roadHidden`.
     this.stats.roadHidden = 0;
@@ -831,7 +1086,11 @@ export class Traffic {
       if (this.rHid[i]) continue;
       pose.def = def;
       pose.x = this.rx[i]; pose.y = this.ry[i]; pose.z = this.rz[i];
-      pose.yaw = this.roadYawOf(i);
+      // S2-R. Aaron asked for the transports to turn rather than slide, so a steered vehicle is
+      // yawed by the SLOPE of its own offset — sampled 8 m further down the lane, which is the
+      // derivative the taps already imply. Only steered vehicles pay for the second evaluation,
+      // and on a normal frame that is none of them.
+      pose.yaw = this.roadYawOf(i) + this._roadSteerYaw(i);
       pose.pitch = 0; pose.roll = 0;
       pose.throttle = 0;              // no plume: `nac` is 0 on a road def, so there is nothing to light
       pose.t = t;
@@ -869,6 +1128,113 @@ export class Traffic {
       if (t.spanAt(l.axis, cross, along)) return t.enclosed(l.axis, cross, along, this.roadLength(i) * 0.5);
     }
     return !!(this.avoid && this.cityR && this.cityR.solidAt(this.rx[i], this.ry[i], this.rz[i], 1.5));
+  }
+
+  // Is the WHOLE hull inside a mass? Both ends, on the lane's own axis — the test tunnels.js uses
+  // to decide a vehicle is between a bore's two portals, applied to a solid mass instead.
+  _fullyInside(axis, x, y, z, half, hl) {
+    const ax = axis === 0 ? x - hl : x, az = axis === 0 ? z : z - hl;
+    const bx = axis === 0 ? x + hl : x, bz = axis === 0 ? z : z + hl;
+    return !!(this.cityR.solidAt(ax, y, az, half) && this.cityR.solidAt(bx, y, bz, half));
+  }
+
+  _recordDraw(i, x, y, z, off, flag) {
+    const k = this.drawN;
+    if (k >= this.drawI.length) return;
+    this.drawI[k] = i; this.drawX[k] = x; this.drawY[k] = y; this.drawZ[k] = z;
+    this.drawOff[k] = off; this.drawFlag[k] = flag;
+    this.drawN = k + 1;
+  }
+
+  // The promoted craft as they were DRAWN this frame. Frame state — the same clock caveat
+  // `roadList` spells out applies, so there is deliberately no `t` argument to get it wrong with.
+  drawnList() {
+    const out = [];
+    for (let k = 0; k < this.drawN; k++) {
+      const i = this.drawI[k], l = this.laneOf(i);
+      out.push({ i, type: TYPES[this.tType[i]].id, lane: l.i, alt: l.alt, axis: l.axis,
+        x: +this.drawX[k].toFixed(2), y: +this.drawY[k].toFixed(2), z: +this.drawZ[k].toFixed(2),
+        w: CRAFT_DEFS[TYPES[this.tType[i]].id].W,
+        off: +this.drawOff[k].toFixed(3),
+        steered: !!(this.drawFlag[k] & 1), climbed: !!(this.drawFlag[k] & 2),
+        trapped: !!(this.drawFlag[k] & 4) });
+    }
+    return out;
+  }
+
+  // ── S2-R — how far across the lane this hull has to move to pass what is in front of it ──
+  //
+  // Returns metres across the lane (signed), or 0 for a clear corridor and for one too blocked to
+  // clear. Pure: (axis, position, hull half width, budget) and the city's boxes, nothing else.
+  // `hl` is the hull's half LENGTH: pass it and the vehicle's own nose and tail are sampled at
+  // full weight, which is what makes the answer a statement about this hull rather than about the
+  // ladder's spacing. Omitting it falls back to the ladder alone.
+  _clearOffset(axis, x, y, z, half, cap, hl = 0) {
+    if (!this.cityR) return 0;
+    const cross = axis === 0 ? z : x;
+    let best = 0;
+    const nT = STEER_TAPS.length + (hl ? 2 : 0);
+    for (let k = 0; k < nT; k++) {
+      // The two extra taps are the hull's ends, a metre proud, and they carry weight 1.
+      const s = k < STEER_TAPS.length ? STEER_TAPS[k]
+        : (k === STEER_TAPS.length ? -(hl + 1) : hl + 1);
+      const px = axis === 0 ? x + s : x, pz = axis === 0 ? z : z + s;
+      // EVERY box near the tap, rather than the one `solidAt` would have returned. Two masses
+      // routinely overlap a tap's query, and which of them comes back first changes as the query
+      // point moves — a jump in the offset with nothing behind it in the world. The pad is what
+      // lets this see a corner graze at all: it is a skirt around the box, so the question asked
+      // is "is any part of a hull this wide near the mass", not "is the centreline inside it".
+      // js/tunnels.js counts that case as `partial` and declines to dress it, which makes it the
+      // one with no other cover — and it is what Aaron reported as a train going into the very
+      // edge of a building.
+      const pad = Math.max(half, SOFT);
+      const boxes = this.cityR.aabbsNear(px, pz, 8 + pad, this._aabbs);
+      for (let b = 0; b < boxes.length; b++) {
+        const hit = boxes[b];
+        if (y > hit.top + pad) continue;
+        if (px < hit.x0 - pad || px > hit.x1 + pad || pz < hit.z0 - pad || pz > hit.z1 + pad) continue;
+        const c0 = axis === 0 ? hit.z0 : hit.x0, c1 = axis === 0 ? hit.z1 : hit.x1;
+        const a0 = axis === 0 ? hit.x0 : hit.z0, a1 = axis === 0 ? hit.x1 : hit.z1;
+        const at = axis === 0 ? px : pz;
+
+        // ── every term below has to fall to zero SMOOTHLY ────────────────────
+        //
+        // gates_steer S5 walks the offset at 1/30 s and bounds the largest single-step change,
+        // because "it eases rather than snaps" is the one property no still frame can show. The
+        // first draft failed at 2.11 m in a thirtieth of a second — a vehicle covers 0.4 m in that
+        // time — and every metre came from a term that switched instead of ramping: the tap being
+        // inside the mass's along extent or not; the requirement staying large right up until the
+        // hull was clear and then vanishing; and the over-budget case dropped with a bare
+        // `continue`. A max over continuous functions is itself continuous, which is what makes
+        // taking the strongest tap safe once each one behaves.
+
+        // 1 — along. How much this tap feels a mass it has not reached yet.
+        const dAlong = at < a0 ? a0 - at : at > a1 ? at - a1 : 0;
+        const wAlong = 1 - dAlong / SOFT;
+        if (wAlong <= 0) continue;
+
+        // 2 — across. How far the mass reaches into the hull's own band, each way. These go to
+        // zero exactly as the hull clears, so a vehicle that no longer needs the offset stops
+        // asking for it gradually rather than dropping it.
+        const overR = (c1 + half + 0.5) - cross, overL = cross - (c0 - half - 0.5);
+        if (overR <= 0 || overL <= 0) continue;        // already clear across — nothing to ask for
+
+        // Nearest side first, then the other. Taking only the nearer and refusing when it does not
+        // fit throws away the case this is most needed for: a mass reaching deep past the
+        // centreline leaves almost nothing on the side it came from and most of the deck on the
+        // other. A tram was measured still grazing a 10.7 m corner for exactly that reason.
+        const near = overR <= overL ? overR : -overL;
+        const far = overR <= overL ? -overL : overR;
+        const pick = Math.abs(near) <= cap ? near : Math.abs(far) <= cap ? far : null;
+        if (pick === null) continue;           // blocked, not obstructed — say so by refusing
+
+        // 3 — budget. Faded over its last two metres rather than dropped off its edge.
+        const wCap = clamp((cap - Math.abs(pick)) * 0.5 + 1, 0, 1);
+        const v = pick * (k < STEER_TAPS.length ? STEER_W[k] : 1) * wAlong * wCap;
+        if (Math.abs(v) > Math.abs(best)) best = v;
+      }
+    }
+    return best;
   }
 
   // §5.5's yield, and the ONLY line in this file that reads the player's position.
@@ -929,7 +1295,20 @@ export class Traffic {
   }
 
   // Every live ROAD vehicle, for the gates. Same shape as list().
-  roadList(t, cam, limit = 0) {
+  // ── every live ROAD vehicle, for the gates ────────────────────────────────
+  //
+  // TWO CLOCKS LIVE IN THIS ROW AND THEY ARE NOT THE SAME CLOCK. `x/y/z`, `lag` and everything
+  // else derived from `roadPosOf` are recomputed at whatever `t` the caller passes. `hidden`,
+  // `drawn`, `streak` and `off` are FRAME STATE, written by the last `_updateRoad` at the live
+  // vehicle clock, and they know nothing about a `t` given here.
+  //
+  // That cost a real measurement during S2-R: a 40-moment sweep read `hidden` alongside positions
+  // at 40 different `t` values and concluded that 83 vehicles were driving unsuppressed through
+  // walls. They were not — the sweep was reading one moment's suppression against another moment's
+  // positions. So the frame-state fields are now NULL whenever an explicit `t` is passed, which
+  // turns a plausible wrong number into an obviously missing one. To sample them at a moment, pin
+  // the population first: `__game.stepVehicles(t)` then `roadList()` with no `t` at all.
+  roadList(t, cam, limit = 0, live = true) {
     const p = [0, 0, 0, 0, 0, 0];
     const out = [];
     for (let i = 0; i < this.rN; i++) {
@@ -952,11 +1331,18 @@ export class Traffic {
         body: BODY_TINTS[this.rBody[i]], trim: TRIM_TINTS[this.rTrim[i]],
         offRoad: +offRoad.toFixed(3),
         d: +Math.sqrt(dx * dx + dy * dy + dz * dz).toFixed(2),
-        near: this.rNearIdx.slice(0, this.rNearN).includes(i),
-        hidden: !!this.rHid[i], drawn: !!this.rDrawn[i],
+        near: live ? this.rNearIdx.slice(0, this.rNearN).includes(i) : null,
+        hidden: live ? !!this.rHid[i] : null, drawn: live ? !!this.rDrawn[i] : null,
+        // S2-R. The lateral offset applied this frame, and the position it actually drew at.
+        // Frame state, so it follows the same rule as `hidden` above.
+        off: live ? +this.rOff[i].toFixed(3) : null,
+        // The yaw actually written to the pose, steering correction included, so gates_steer S10
+        // can check the heading against the path instead of re-deriving the formula it is testing.
+        yaw: live ? +(this.roadYawOf(i) + this._roadSteerYaw(i)).toFixed(4) : null,
+        sx: live ? +(this.rx[i]).toFixed(2) : null, sz: live ? +(this.rz[i]).toFixed(2) : null,
         // The streak's own intensity, straight off the GPU buffer at its instance slot. A gate
         // asserting "and its streak is gone too" must read the buffer, not this file's intent.
-        streak: +this.geo.attributes.iInt.array[this.N + i].toFixed(4),
+        streak: live ? +this.geo.attributes.iInt.array[this.N + i].toFixed(4) : null,
       });
       if (limit && out.length >= limit) break;
     }

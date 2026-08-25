@@ -590,12 +590,25 @@ if (!pickBore) {
 
     // FALSIFY: unhook the tunnel layer. traffic.js falls back to the centre-point solidAt rule it
     // shipped with, and the STRADDLE instant — the one this whole phase exists to fix — must flip.
+    // §S2-R: THE ROAD STEER HAS TO COME OFF TOO, or this arm isolates nothing.
+    //
+    // `setTunnels(false)` unhooks the bore rule and leaves traffic.js's lateral steer running —
+    // and the steer's whole job is to get a hull off a mass it would otherwise clip. With the
+    // tunnel layer gone, `spanAt` stops answering, the steer stops holding this transport straight
+    // through the approach, and it simply drives round the crossing. The arm then reads "not
+    // hidden, still drawn" and looks identical to the shipped path, so the falsification quietly
+    // stops falsifying: what it would be comparing is a steered vehicle against an unsteered one,
+    // not the old suppression rule against the new one.
+    //
+    // Zeroing the street budget puts the vehicle back on its lane so the two RULES can be compared.
+    await hook(S, 'setSteerBudget', null, 0, null);
     await hook(S, 'setTunnels', false);
     await settleDoors(straddle.t);
     const noTun = await readV();
     await settleDoors(mid.t);
     const noTunMid = await readV();
     await hook(S, 'setTunnels', true);
+    await hook(S, 'setSteerBudget', null, 11, null);
     await settleDoors(straddle.t);
     const reTun = await readV();
     check('T3-falsify with the tunnel layer unhooked the SAME instant reads the old way',

@@ -59,7 +59,9 @@ export const U = {
   // the first two are §3.1's LOT and ROAD, so the markings land on the streets the city generator
   // actually left between its lots rather than on a texture's own phase.
   uRoad: { value: new THREE.Vector4(51.2, 13.2, 1.0, 0.055) },
-  uRoadCol: { value: new THREE.Color(0xffb066).convertSRGBToLinear() },
+  // S2-R: cooled off P11's sodium (0xffb066). The deck lighting is now recessed service panels
+  // in black glass, not a street lamp over tarmac — see ROAD_BODY's header.
+  uRoadCol: { value: new THREE.Color(0xbfd8e8).convertSRGBToLinear() },
   // §4 again — the water film's missing view-angle term. See patchFilmFresnel.
   uFilmFres: { value: new THREE.Vector2(2.4, 0.12) },     // (exponent, floor at normal incidence)
   // ── S2-H — street-level shopfronts (js/shops.js) ─────────────────────────
@@ -782,67 +784,155 @@ export function farMaterial() {
 //
 // The road is also LIT. It was black, and markings on a black surface are black. §3.11.1's rule is
 // about BLENDED layers; this is a term inside an opaque material that was already being shaded.
+//
+// ── S2-R — WHY THE MARKINGS ARE GONE ────────────────────────────────────────
+//
+// Aaron, on the shipped build: *"Roads are part of the problem, they don't match up to buildings
+// so look silly … in this cyber city we can imagine everything is auto-driven/most things fly and
+// the only thing currently on the ground are some auto-trains, so why would road lines exist."*
+//
+// Both halves of that are right, and the first half is measurable. `tools/probe_enc.mjs` takes
+// city.js's OWN output over a 13x13 chunk block and asks how many seeded footprints sit on the
+// carriageway P11 was painting: **502 of 4,132 — 12.15 % — and the worst reaches 8.36 m into it.**
+// 89 of them cross the street centreline outright. The paint was never describing this city's
+// streets; it was describing the idealised 51.2 m lattice the generator jitters away from, and a
+// lane line that runs under a tower is exactly the "decal laid over the city" gates_p11 P1 was
+// written to prevent.
+//
+// **gates_p11 P1 asserted that number was ZERO and passed for two phases.** Its encroachment test
+// was `Math.min(half - (dx - w/2), half - (dz - w/2))` — `min`, so it demanded a footprint
+// encroach on BOTH axes at once, which a lot-bound mass essentially never does. Its falsification
+// arms still went non-zero, because widening the road to 38 m trips both axes at once and hides
+// the operator entirely. That is the nineteenth silent zero on this project and the first one
+// whose control arm was ALSO fooled: a falsification that only exercises the extreme can pass over
+// a bug that lives in the ordinary case. The gate now reads `max` and asserts the real figure.
+//
+// So the markings are not restyled, they are DELETED — dashes, edge lines, junction hatch, kerb
+// and the carriageway concept itself. Nothing on this deck needs telling where to go.
+//
+// ── what replaces them ──────────────────────────────────────────────────────
+//
+// The deck still has to read as a SURFACE. P11's diagnosis stands: a ground with no structure
+// reads as a sheet of haze, and paint was how it got structure. Aaron's own answer is the
+// replacement — *"a black partly reflecting surface perhaps, obsidian kind of look"* — so the
+// structure now comes from the way volcanic glass actually breaks, which needs no lattice and
+// therefore cannot disagree with the city:
+//
+//   1. FRACTURE PLATES. Obsidian breaks conchoidally into big irregular shells, each with its own
+//      polish. A domain-warped cell id on a ~19 m pitch varies ROUGHNESS, not albedo — the plates
+//      show up as the reflection breaking across a seam, which is what glass does and what a
+//      single uniform mirror never does.
+//   2. CONCHOIDAL RIPPLE inside a plate: faint curved bands, roughness only.
+//   3. The deck is otherwise near-black and gets its brightness from what it REFLECTS. That was
+//      already P11's finding about wet tarmac and it is more true of glass, so `metalness` comes
+//      down and Fresnel does the work — a dielectric is dark looking down and bright at a grazing
+//      angle, which is the whole obsidian read.
+//   4. SERVICE LIGHTING, sparse and deliberately NOT on a grid. Aaron: *"perhaps occasional
+//      lighting"*. A hashed cell on a 25.6 m pitch, roughly one in six lit, at a hashed position
+//      inside its own cell — so no two are the same distance apart and nothing lines up into a
+//      row that could be mistaken for a lane. They are recessed panels, cool white, and they are
+//      the only emissive left on the deck.
+//
+// Everything is still a fixed width in METRES and still faded by fwidth() at the distance a pixel
+// stops resolving it, for the reason P11 gives: a feature that outlives its resolution is moire,
+// and crawling ground detail is what a critic marks under Finish.
 const ROAD_BODY = /* glsl */`
   vec2 wxz = vWorldPosition.xz;
-  float LOT = uRoad.x, HALF = uRoad.y * 0.5;
-  vec2 dl = abs( fract( wxz / LOT + 0.5 ) - 0.5 ) * LOT;      // metres to the nearest centreline
-  float onX = step( dl.x, HALF );        // inside the carriageway running along Z
-  float onZ = step( dl.y, HALF );
-  float onRoad = max( onX, onZ );
-
-  // centre dashes, one carriageway each way, suppressed inside the junction
-  float dashX = ( 1.0 - smoothstep( 0.10, 0.26, dl.x ) ) * step( 0.42, fract( wxz.y / 9.0 ) ) * ( 1.0 - onZ );
-  float dashZ = ( 1.0 - smoothstep( 0.10, 0.26, dl.y ) ) * step( 0.42, fract( wxz.x / 9.0 ) ) * ( 1.0 - onX );
-  // solid edge lines a metre inside the kerb
-  float edgeX = ( 1.0 - smoothstep( 0.09, 0.22, abs( dl.x - ( HALF - 1.1 ) ) ) ) * ( 1.0 - onZ );
-  float edgeZ = ( 1.0 - smoothstep( 0.09, 0.22, abs( dl.y - ( HALF - 1.1 ) ) ) ) * ( 1.0 - onX );
-  // junction hatching — 45 deg bars, the thing that makes a crossroads read as a crossroads
-  float hatch = onX * onZ * ( 1.0 - smoothstep( 0.18, 0.34, abs( fract( ( wxz.x + wxz.y ) / 4.4 ) - 0.5 ) ) );
-  float paint = clamp( dashX + dashZ + edgeX + edgeZ + hatch * 0.30, 0.0, 1.0 ) * onRoad;
-
-  // the kerb: a 0.5 m raised band at the carriageway edge, DARKER than the road, which is what
-  // gives the street an edge instead of bleeding into the block
-  float kerb = max( ( 1.0 - smoothstep( 0.0, 0.5, abs( dl.x - HALF ) ) ) * ( 1.0 - onZ ),
-                    ( 1.0 - smoothstep( 0.0, 0.5, abs( dl.y - HALF ) ) ) * ( 1.0 - onX ) );
-
-  // service deck between the roads: drain grates on a 6.4 m pitch, only off the carriageway
-  vec2 gz = abs( fract( wxz / 6.4 ) - 0.5 );
-  float grate = ( 1.0 - onRoad ) * step( max( gz.x, gz.y ), 0.09 );
-
-  // Every feature above is a fixed width in METRES, so past the distance where one pixel covers a
-  // whole lane line the grid turns into moire — and crawling road markings is exactly what a
-  // critic marks under Finish. fwidth() of the world coordinate is the size of a pixel in metres,
-  // so this fades the markings out at precisely the distance they stop being resolvable, whatever
-  // the resolution or the field of view. The fog takes the rest.
   float mPerPx = fwidth( wxz.x ) + fwidth( wxz.y );
   float sharp = 1.0 - smoothstep( 0.30, 1.30, mPerPx );
-  paint *= sharp; kerb *= sharp; grate *= sharp;
 
-  diffuseColor.rgb = mix( diffuseColor.rgb, vec3( 0.26, 0.252, 0.208 ) * uRoad.z, paint * 0.92 );
-  diffuseColor.rgb = mix( diffuseColor.rgb, vec3( 0.030, 0.031, 0.036 ), kerb * 0.85 );
-  diffuseColor.rgb = mix( diffuseColor.rgb, vec3( 0.018, 0.019, 0.021 ), grate );
-  roughnessFactor = mix( roughnessFactor, 0.44, paint );
-  roughnessFactor = mix( roughnessFactor, 0.82, kerb * 0.8 );
+  // 1 — the fracture plates. Two cheap warps before the cell lookup, so a plate boundary is a
+  // ragged curve rather than the axis-aligned box a raw floor() would give.
+  vec2 wq = wxz / 19.4;
+  wq += 0.34 * vec2( sin( wxz.y * 0.031 + 1.7 ), sin( wxz.x * 0.027 ) );
+  wq += 0.17 * vec2( sin( wxz.y * 0.084 ), sin( wxz.x * 0.091 + 2.3 ) );
+  vec2 pc = floor( wq );
+  float plate = deckHash( pc.x, pc.y );
+  // Each plate's own polish. 0.10 is a mirror shell, 0.46 is a matte weathered one; the spread is
+  // what makes the reflection break at a seam.
+  float polish = mix( 0.055, 0.34, plate );
 
-  // Street lighting: pools along the carriageway on a low-frequency beat, plus the paint catching
-  // it. Warm, because every plate's street is sodium and every plate's sky is not.
-  float pool = 0.42 + 0.58 * ( 0.5 + 0.5 * sin( wxz.x * 0.0616 ) * sin( wxz.y * 0.0491 ) );
-  // The ASPHALT stays nearly black — 1475810_04's wet tarmac is dark and gets its brightness from
-  // what it reflects, not from being lit. It is the PAINT and the kerb that catch the street
-  // lighting, which is what makes markings read at all on a near-black deck.
-  // Paint is white, so the light it returns is only half the lamp's colour; asphalt and kerb are
-  // near-black and return the lamp's own hue. Without that split every marking reads as a neon
-  // strip laid in the road rather than as paint under a street light.
-  vec3 paintLit = mix( uRoadCol, vec3( 1.0 ), 0.45 );
-  totalEmissiveRadiance += uRoad.w * pool * ( uRoadCol * ( onRoad * 0.20 + kerb * 0.34 ) + paintLit * paint * 2.0 );
+  // 2 — conchoidal ripple WITHIN the plate: shells centred on the plate's own hashed focus, so the
+  // arcs do not continue across a seam. Long wavelength on purpose — at the 15 m the first draft
+  // used the deck read as corduroy, which is a fabric and not a fracture.
+  vec2 focus = ( pc + vec2( deckHash( pc.x, pc.y + 31.0 ), deckHash( pc.x + 17.0, pc.y ) ) ) * 19.4;
+  float rr = length( wxz - focus );
+  float shell = sin( rr * 0.115 + plate * 6.28 );
+  polish += 0.045 * shell * sharp;
+
+  // A seam is a hairline of DARKER, rougher glass where two shells meet — the only line left on
+  // this deck, and it is a fracture, not a marking.
+  vec2 fw = abs( fract( wq ) - 0.5 );
+  float seam = ( 1.0 - smoothstep( 0.44, 0.499, max( fw.x, fw.y ) ) ) * sharp;
+
+  // 3 — the surface. Albedo stays near-black: glass is dark and everything you see in it is a
+  // reflection. The map's slab joints and grime survive as the fine grain inside a plate.
+  diffuseColor.rgb *= mix( 1.0, 0.62, plate * 0.5 );
+  diffuseColor.rgb = mix( diffuseColor.rgb, vec3( 0.016, 0.017, 0.021 ), seam * 0.7 );
+  // The roughness MAP still carries §3.6's puddles; a puddle on glass is still smoother than the
+  // glass, so it is taken as a floor rather than replaced.
+  roughnessFactor = min( roughnessFactor, clamp( polish, 0.04, 0.62 ) );
+  roughnessFactor = mix( roughnessFactor, 0.55, seam * 0.8 );
+
+  // 2b — the thing that actually sells fractured glass, and the reason plates alone did not: each
+  // shell sits at its OWN very slight angle, so two neighbours catch different parts of the sky
+  // and the seam between them is a step in the reflection rather than a step in the shading. This
+  // is injected at emissivemap_fragment, which three.js runs AFTER normal_fragment_maps, so
+  // normal is in scope and already has the map applied. The tilt is deliberately tiny — past
+  // about 0.06 the deck stops being a glass floor and becomes crumpled foil.
+  vec2 tilt = vec2( deckHash( pc.x + 3.0, pc.y + 11.0 ), deckHash( pc.x + 23.0, pc.y + 5.0 ) ) - 0.5;
+  tilt += 0.35 * vec2( cos( rr * 0.115 + plate * 6.28 ), sin( rr * 0.115 + plate * 6.28 ) );
+  normal = normalize( normal + vec3( tilt.x, 0.0, tilt.y ) * 0.052 * sharp );
+
+  // 4 — the service lighting. Sparse, hashed placement, and NOT on the road lattice: 25.6 m cells,
+  // about one in six lit, each panel at its own hashed spot inside its cell. Rectangular and
+  // small, so it reads as a recessed deck panel rather than as a glowing dot.
+  vec2 lc = floor( wxz / 25.6 );
+  float lit = step( 0.83, deckHash( lc.x + 5.0, lc.y - 3.0 ) );
+  vec2 lp = ( lc + vec2( 0.18 + 0.64 * deckHash( lc.x + 41.0, lc.y ),
+                         0.18 + 0.64 * deckHash( lc.x, lc.y + 53.0 ) ) ) * 25.6;
+  vec2 lr = abs( wxz - lp );
+  // 2.6 x 0.5 m, turned a quarter for half the cells so they do not all point one way.
+  float turn = step( 0.5, deckHash( lc.x - 7.0, lc.y + 7.0 ) );
+  vec2 halfSize = mix( vec2( 1.05, 0.19 ), vec2( 0.19, 1.05 ), turn );
+  float panel = ( 1.0 - smoothstep( 0.0, 0.16, max( lr.x - halfSize.x, lr.y - halfSize.y ) ) ) * lit * sharp;
+  // Its own spill on the glass around it, which is what stops the panel reading as a sticker.
+  float spill = ( 1.0 - smoothstep( 0.0, 5.2, length( lr ) ) ) * lit;
+
+  diffuseColor.rgb = mix( diffuseColor.rgb, vec3( 0.10, 0.105, 0.115 ), panel * 0.9 );
+  roughnessFactor = mix( roughnessFactor, 0.38, panel );
+
+  // The emissive. uRoad.w is still the layer's master glow (main.js setRoadGlow, and gates_p11
+  // P5 differences the frame with it at 0), and uRoadCol is still its tint — cooled from P11's
+  // sodium, because a sodium lamp over black glass is a street light and this is not a street.
+  //
+  // AND THE DECK STILL HAS TO BE LIT. P11's wash came from onRoad, which went with the
+  // carriageway, and gates_p11 P5 caught the hole immediately: forcing the whole road term to zero
+  // moved the frame by 0.08 of a channel, against a 0.25 bar it used to clear easily. That is not
+  // a gate being fussy — a deck lit only at sparse panels is a black void with dots on it, and the
+  // foreground of wet_street went exactly there.
+  //
+  // So the wash comes back, but NOT on the lot lattice. Its periods are 43.7 m and 29.1 m, chosen
+  // to be incommensurate with 51.2 so no beat between them can re-draw the grid that was just
+  // removed — and modulated by the plate hash, so what the eye reads is the glass catching the
+  // city unevenly rather than a repeating swell.
+  float wash = 0.34 + 0.66 * ( 0.5 + 0.5 * sin( wxz.x / 43.7 + 1.3 ) * sin( wxz.y / 29.1 ) );
+  wash *= mix( 0.72, 1.18, plate );
+
+  vec3 panelLit = mix( uRoadCol, vec3( 1.0 ), 0.55 );
+  totalEmissiveRadiance += uRoad.w
+    * ( uRoadCol * wash * 0.34 + panelLit * panel * 3.4 + uRoadCol * spill * 0.42 );
 `;
+
 
 export function patchRoad(mat) {
   return addPatch(mat, 'road', shader => {
     shader.uniforms.uRoad = U.uRoad;
     shader.uniforms.uRoadCol = U.uRoadCol;
     shader.fragmentShader = patch(shader.fragmentShader, '#include <common>',
-      '#include <common>\nuniform vec4 uRoad;\nuniform vec3 uRoadCol;', 'road/frag-decl');
+      '#include <common>\nuniform vec4 uRoad;\nuniform vec3 uRoadCol;\n'
+      + 'float deckHash( float a, float b ) { return fract( sin( a * 12.9898 + b * 78.233 ) * 43758.5453 ); }',
+      'road/frag-decl');
     // vWorldPosition comes from patchFog, which groundMaterial also carries. Replacing the whole
     // include rather than injecting after it, for the same reason §4.2 gives about fog_fragment:
     // a patch that misses is silent, and patch() is what makes it loud.
@@ -866,6 +956,18 @@ export function patchFilmFresnel(mat) {
   });
 }
 
+// S2-R: obsidian is a DIELECTRIC, and that is the whole difference between this and P11's deck.
+//
+// At `metalness: 0.62` a near-black albedo gives a dim tinted mirror that returns the same amount
+// of light whatever angle you look from — which is why the old deck needed paint to have any
+// structure at all, and why `patchFilmFresnel` had to be invented for the film sitting on top of
+// it. Volcanic glass reflects ~4 % looking straight down and approaches 100 % at a grazing angle,
+// so dropping metalness hands the job to the Fresnel term the BRDF already computes: dark under
+// the craft, and the whole skyline laid out along the street ahead. Nothing else in the frame had
+// to change to get that.
+//
+// `roughness: 1.0` stays, because it is a MULTIPLIER on `roughnessMap` — §3.6's puddle mask is
+// still the floor the fracture plates are clamped against.
 export function groundMaterial(atlas, env) {
   atlas.ground.repeat.set(64, 64);
   atlas.groundRough.repeat.set(64, 64);
@@ -874,9 +976,9 @@ export function groundMaterial(atlas, env) {
     map: atlas.ground,
     roughnessMap: atlas.groundRough,
     roughness: 1.0,
-    metalness: 0.62,
+    metalness: 0.16,
     envMap: env || null,
-    envMapIntensity: 1.1,
+    envMapIntensity: 1.55,
     fog: true,
     depthWrite: false,
   });

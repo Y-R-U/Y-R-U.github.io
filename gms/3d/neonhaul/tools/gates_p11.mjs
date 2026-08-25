@@ -61,12 +61,37 @@ function frameDelta(p, q) {
   return { mean: +(s / (p.length / 3)).toFixed(4), peak: +peak.toFixed(1) };
 }
 
-// ── the node half: the road corridor is the gap the generator leaves ────────
-// This one needs no browser. §3.1 lays 5x5 lots of 51.2 m in a 256 m chunk with a 13.2 m road
-// between them, and P11's ROAD_BODY paints its markings from world XZ on exactly that pitch. If
-// the two ever disagree, lane lines run through building footprints and the "road" reads as a
-// decal laid over the city rather than as the street the city was built around.
-function roadCorridor(city, half) {
+// ── the node half: the road corridor was NOT the gap the generator leaves ───
+//
+// §3.1 lays 5x5 lots of 51.2 m in a 256 m chunk with a 13.2 m road between them, and P11's
+// ROAD_BODY painted its markings from world XZ on exactly that pitch. This check asserted that no
+// seeded footprint stood on that carriageway, reported ZERO, and passed for two phases.
+//
+// It was wrong, and the way it was wrong is worth more than the check ever was.
+//
+//   const enc = Math.min(half - (dx - b.w / 2), half - (dz - b.d / 2));   // <- min
+//
+// A building encroaches on the street if it crosses the corridor on EITHER axis. `Math.min`
+// demands BOTH at once — a footprint inside the junction on the x lattice AND the z lattice
+// simultaneously — which a lot-bound mass essentially never is. So the check answered a question
+// nobody asked and returned the zero that question deserves.
+//
+// The falsification arms did not save it. They widened the road to 26.4 m and 38.0 m, and at those
+// widths every mass encroaches on both axes, so both arms went red exactly as required. **A
+// control that only exercises the extreme can sail straight over a bug that lives in the ordinary
+// case** — which is a sharper version of this project's standing lesson than any of the eighteen
+// instances before it, because here the control existed, ran, and passed.
+//
+// With `max`, the real figure over the same 13x13 chunk block is **502 of 4,132 footprints —
+// 12.15 % — the worst reaching 8.36 m into the carriageway**, and 89 crossing the centreline
+// outright. Aaron, looking at the shipped build: *"Roads are part of the problem, they don't match
+// up to buildings so look silly."* He was reading this number off the screen.
+//
+// §S2-R deleted the painted carriageway rather than trying to move 12 % of the city onto it. So
+// this check no longer guards a corridor — it RECORDS the measurement that removed one, and its
+// falsification arm is now the operator itself: the same probe with `min` still reads zero, which
+// is the bug, reproduced, beside the number it hid.
+function roadCorridor(city, half, op = Math.max) {
   let n = 0, bad = 0, worst = 0;
   for (let cz = -6; cz <= 6; cz++) {
     for (let cx = -6; cx <= 6; cx++) {
@@ -75,7 +100,7 @@ function roadCorridor(city, half) {
         n++;
         const dx = Math.abs((((b.x / 51.2) % 1) + 1.5) % 1 - 0.5) * 51.2;
         const dz = Math.abs((((b.z / 51.2) % 1) + 1.5) % 1 - 0.5) * 51.2;
-        const enc = Math.min(half - (dx - b.w / 2), half - (dz - b.d / 2));
+        const enc = op(half - (dx - b.w / 2), half - (dz - b.d / 2));
         if (enc > 0) { bad++; if (enc > worst) worst = enc; }
       }
     }
@@ -92,16 +117,21 @@ async function main() {
     names: JSON.parse(readFileSync(resolve(ROOT, 'data/names.json'), 'utf8')),
     seed: 1313165134,
   });
-  const ship = roadCorridor(city, 6.6);
+  const real = roadCorridor(city, 6.6);
+  const oldOp = roadCorridor(city, 6.6, Math.min);
   const falsA = roadCorridor(city, 13.2);
   const falsB = roadCorridor(city, 19.0);
-  check('P1 the painted road corridor IS the gap §3.1 leaves between lots',
-    ship.bad === 0 && falsA.pct > 50 && falsB.pct > 90,
-    `${ship.n} seeded footprints over a 13x13 chunk block against ROAD_BODY's own 51.2 m pitch and `
-    + `13.2 m road width: ${ship.bad} encroach (${ship.pct} %).\n      `
-    + `FALSIFICATION — the same probe with the road widened to 26.4 m: ${falsA.bad} encroach `
-    + `(${falsA.pct} %, worst ${falsA.worst} m); at 38.0 m: ${falsB.bad} (${falsB.pct} %). `
-    + `A zero that cannot become non-zero is not a measurement.`);
+  check('P1 the city does NOT sit on a 13.2 m carriageway — which is why S2-R deleted the paint',
+    real.bad > 400 && real.worst > 8 && oldOp.bad === 0 && falsA.pct > 50 && falsB.pct > 90,
+    `${real.n} seeded footprints over a 13x13 chunk block against the 51.2 m pitch and 13.2 m road `
+    + `width P11 painted: ${real.bad} encroach (${real.pct} %), the worst by ${real.worst} m.\n      `
+    + `THE OPERATOR IS THE FALSIFICATION. The same probe with this check's original Math.min — `
+    + `which requires a footprint to encroach on BOTH axes at once — reads ${oldOp.bad}. That zero `
+    + `is what passed here for two phases, and the width arms below passed alongside it: at 26.4 m `
+    + `${falsA.bad} encroach (${falsA.pct} %, worst ${falsA.worst} m), at 38.0 m ${falsB.bad} `
+    + `(${falsB.pct} %). A control that only exercises the extreme can pass over a bug in the `
+    + `ordinary case — the arms went red on cue and the check was still measuring nothing.\n      `
+    + `See js/materials.js ROAD_BODY and tools/gates_steer.mjs S8.`);
 
   // ── the browser half ─────────────────────────────────────────────────────
   const ctx = await open({ w: 1000, h: 562, dpr: 1, headed: false });

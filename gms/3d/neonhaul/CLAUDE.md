@@ -16,7 +16,7 @@ which sections a piece of work needs.
 
 ## The one lesson this project is built around
 
-**Measurements that silently measure nothing.** Eighteen instances so far: silent audio clips
+**Measurements that silently measure nothing.** Nineteen instances so far: silent audio clips
 reported OK; a layer compared against itself returning exactly 0.0; `&&`-guarded isolation that
 no-ops; a gate parser reading a key that did not exist; `solidAt()` returning `null` for an
 ungenerated chunk and being banked as "clear"; an occlusion gate that sampled a region the tower
@@ -25,6 +25,17 @@ did not occupy and had passed for two phases.
 So: **when you assert a gate works, prove it can fail.** Break what it guards and confirm it
 catches it. A difference of exactly zero is a broken experiment far more often than a real result.
 A test may never use `&&` to make its own setup optional.
+
+**And the nineteenth adds a clause the first eighteen did not have.** `gates_p11` P1 asserted that
+no building stands on the painted road corridor, reported zero, and passed for two phases — its
+encroachment test used `Math.min` where it needed `Math.max`, so it demanded a footprint encroach
+on both axes at once, which never happens. The real figure is **502 of 4,132 — 12.15 %, the worst
+by 8.36 m**. *Its falsification arms passed the whole time*, because they widened the road to 26.4
+and 38.0 m and at those widths every mass trips both axes.
+
+So: **a control that only exercises the extreme can sail straight over a bug in the ordinary case.**
+Falsify a gate at the margin it actually operates on, not at a setting so extreme that any
+implementation goes red. See `docs/S2R_NOTES.md`.
 
 ## Layout
 
@@ -86,8 +97,14 @@ node tools/shot.mjs --shot=fog_city  # a render + its perf snapshot
 ```
 
 Suites: `p1a p2 p3a p3b p4 p5 p6 p7a p7b p8 p11 wire`, plus the season-2 suites
-`s2a s2c s2d s2e s2f s2g s2h s2i s2j s2k`, `end`, `boot`, `tunnel`, `road`, `vo`, and `determinism`, `t10_falsify`,
-`budget`, `soak`, `sim_s2f`, `sim_s2i`, `fleet_rate`.
+`s2a s2c s2d s2e s2f s2g s2h s2i s2j s2k`, `end`, `boot`, `tunnel`, `road`, `steer`, `vo`, and
+`determinism`, `t10_falsify`, `budget`, `soak`, `sim_s2f`, `sim_s2i`, `fleet_rate`.
+
+**`gates_steer`** (2026-08-25, §S2-R) covers the obsidian deck and the lateral clearance steer.
+11/11. Its S5 is the one that is easy to lose: it walks each vehicle's lateral offset at 1/30 s and
+bounds the largest single-step change, because *"it eases rather than snaps"* is the one property
+no still frame can show. It excludes tile wraps by design — the along period is 1,024 m and a
+vehicle reaching the tile edge legitimately reappears in different surroundings.
 
 **`gates_end`** (2026-08-23) is the ARC's curtain — the beat that fires when the player owns a hull
 outright, debt-free, in act two. 19/19 portrait and landscape. It also carries the two controls for
@@ -163,6 +180,21 @@ back short (`gates_s2i.mjs`'s `advance()`).
 - **`solidAt()` returns `null` for an ungenerated chunk**, which is indistinguishable from open air.
   Any remote probe must assert `__game.cityChunkLive(x, z)` first, or it will conclude a defect does
   not exist. It once did exactly that across 242 pads.
+- **`solidAt()` also returns a mass as solid when a bore runs through it** — the AABB has no hole in
+  it. So a transport driving through a lit, doored tunnel answers "inside a building" to any naive
+  probe. §S2-R's first sweep counted exactly that and reported the tunnel layer as a **regression**
+  when it was the feature working. Consult `__game.tunnelList()` before calling an in-mass vehicle a
+  defect.
+- **`roadList(0, t)` reads TWO CLOCKS.** `x/y/z` and `lag` are recomputed at the `t` you pass;
+  `hidden`, `drawn`, `streak`, `off`, `sx/sz` and `near` are frame state from the last
+  `_updateRoad` at the live vehicle clock. A 40-moment sweep that mixed them concluded 83 vehicles
+  were driving unsuppressed through walls; none were. Those fields now return **`null`** when an
+  explicit `t` is given. To sample them at a moment: `stepVehicles(t)` then `roadList()` with no `t`.
+- **A gate must measure the DRAWN position, not the analytic one.** `trafficList` and `roadList`'s
+  `x/z` report `posOf`/`roadPosOf` — the position *before* the yield, the steer and any climb. A
+  check asking "did this craft end up inside a building" that reads those is measuring the input to
+  the fix and will score a working one as broken. Use `__game.trafficDrawn()` and `roadList()`'s
+  `sx/sz`.
 - **The game loop overwrites test fixtures.** `setZones`, `setSignVisible` and the cabin visibility
   all had isolation that the next frame silently undid — the gate reported success and measured the
   unchanged scene. Every isolation hook is now an override that outranks game logic.
@@ -187,6 +219,26 @@ back short (`gates_s2i.mjs`'s `advance()`).
   **Whisper intelligibility is not an acceptance test for a voice**: it scored the macOS `say` pool
   at 90.7 % and that pool is what Aaron called *"a computer voice from the 90s"*. Build
   `tools/vo/gen_chatter.py --demo` and listen to it.
+
+## §S2-R — the deck has no roads on it, and traffic knows the city is there
+
+`materials.js` `ROAD_BODY` no longer paints a carriageway: no lane dashes, no edge lines, no
+junction hatch, no kerb. Aaron: *"in this cyber city we can imagine everything is auto-driven … so
+why would road lines exist"* — and the paint was on a 51.2 m lattice that **12.15 % of the
+buildings stand on**. The deck is black obsidian: fracture plates varying roughness, a per-plate
+normal tilt, sparse hashed service panels, and an irregular wash whose 43.7/29.1 m periods are
+incommensurate with 51.2 so nothing can beat back into a grid. `groundMaterial` is a **dielectric**
+now (`metalness` 0.62 → 0.16) — Fresnel does the work paint used to.
+
+`traffic.js` gained one shared **lateral clearance steer** for both populations, replacing a
+vertical push capped at 14 m that could not clear a 160–450 m tower and counted itself a success
+anyway. Read `docs/S2R_NOTES.md` before touching any of it; the four properties that keep the steer
+honest (no snap, pure function of position, hull ends sampled explicitly, all boxes not just the
+first) each exist because a measurement caught them missing.
+
+**The residue is three landmark shapes `tunnels.js` will not dress** — `kiln` (drum), `hollow`
+(bridged), `spindle` (nested) — and `gates_steer` S2b fails if a fourth name joins them. Dressing
+landmark crossings, at altitude as well as at deck level, is the named next step.
 
 ## Where the art stands
 

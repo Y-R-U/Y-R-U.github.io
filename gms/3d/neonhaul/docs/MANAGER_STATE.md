@@ -5,7 +5,44 @@ first, then `DECISIONS.md` (all of it, including Tracked obligations), then `MAN
 then `ART_PASS.md`.** `BUILD_PLAN.md` is 218 KB — never read it whole; each phase brief names its
 own sections.
 
-Last updated: 2026-08-18, after **P11**. Read the P11 section first, then P7b, then the integration section.
+Last updated: 2026-08-25, after **§S2-R**. Read the S2-R section immediately below first. Read the P11 section first, then P7b, then the integration section.
+
+## §S2-R (2026-08-25) — the obsidian deck, and traffic that knows the city is there
+
+Aaron's three reports, all one defect: an analytic lattice that has never known where the buildings
+are. **Read `docs/S2R_NOTES.md` in full before touching `js/traffic.js`'s steer or ROAD_BODY.**
+
+Landed:
+
+- **The painted carriageway is DELETED** from `materials.js` `ROAD_BODY` — dashes, edge lines,
+  junction hatch, kerb, the `onRoad` concept. The deck is black obsidian (fracture plates, per-plate
+  normal tilt, sparse hashed service panels, an irregular wash on periods incommensurate with 51.2).
+  `groundMaterial` is now a dielectric, `metalness` 0.62 → **0.16**.
+- **One lateral clearance steer** in `js/traffic.js`, shared by the flying and road populations,
+  replacing a vertical push capped at 14 m that could not clear a 160–450 m tower and reported
+  success anyway.
+- **`gates_steer`** — 11 checks, each with a falsification arm. **`gates_p11` P1 was rewritten**: it
+  had `Math.min` where it needed `Math.max` and had reported a false zero for two phases.
+
+Numbers that must not be quietly re-derived from the old, wrong instruments:
+
+| | |
+|---|---|
+| seeded footprints on the old painted carriageway | **502 of 4,132 — 12.15 %**, worst 8.36 m |
+| lane crossings, 17×17 chunks | 196 — **146 seeded** (≤38 m span), **50 landmark** (80–210 m) |
+| flying craft drawn inside a mass | **0** (control with avoidance off: 149) |
+| road transports buried in a **seeded** mass | **0** (was up to 16 m) |
+| worst single-frame lateral step | **0.126 m** (first draft: 2.11 m) |
+| golden determinism hash | `f29beaf9`, 25,039 buildings — **unmoved**, the steer is outside it |
+
+**THE RESIDUE IS THREE NAMED LANDMARK SHAPES** that `js/tunnels.js` declines to dress: `kiln`
+(drum past `ROUND_LIMIT`), `hollow` (`bridged` pair), `spindle` (nested part). 117 flying craft are
+withheld inside them and 27 of 2,235 road vehicle-moments (1.21 %) are buried in them. `gates_steer`
+S2b fails if a **fourth** name appears — a bare percentage would have hidden that.
+
+**Named next step, not yet started:** extend `tunnels.js` to dress landmark crossings, and to dress
+them at ALTITUDE. It is the same answer Aaron already likes at street level (*"an auto door slides
+open and train goes into a dark tunnel"*) and it closes both residues at once.
 
 ## ⚠ THREE AGENTS IN PARALLEL — A ONE-OFF BATCH, NOT THE NEW DEFAULT
 
