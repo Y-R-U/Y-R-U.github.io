@@ -29,7 +29,13 @@ i.w{font-style:normal;color:#5f7fa8;background:#0b1a2a;border-radius:3px;padding
 .take .top{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
 .take .txt{flex:1;min-width:150px;font:14px/1.4 ui-monospace,Menlo,monospace;word-break:break-word}
 .take .meta{color:var(--dim);font-size:12px;margin-top:5px}
-.take.good{border-color:var(--ok)} .take.bad{border-color:var(--no);opacity:.75}
+.rolls{display:flex;flex-direction:column;gap:6px;margin-top:9px}
+.roll{display:flex;gap:8px;align-items:center;padding:5px 7px;border:1px solid var(--line);border-radius:9px}
+.roll.good{border-color:var(--ok)} .roll.bad{border-color:var(--no);opacity:.7}
+.roll .n{flex:1;color:var(--dim);font-size:12px}
+.meta.warn{color:#e0a33f}
+.b.arm{background:var(--no);border-color:var(--no);color:#fff}
+#count{color:var(--dim);font-size:13px}
 .b{padding:9px 12px;min-height:44px;min-width:46px;border-radius:9px;border:1px solid var(--line);
   background:#131920;color:var(--tx);cursor:pointer;font-size:15px}
 .b.on.y{background:var(--ok);border-color:var(--ok);color:#06210f}
@@ -76,6 +82,10 @@ you actually sent.</p>
   instruction to it.</p>
 </details>
 
+<div class="ctl" style="margin-top:16px">
+  <button class="b" id="clear">Clear takes</button>
+  <span class="n" id="count"></span>
+</div>
 <div id="takes"></div>
 
 <details open>
@@ -201,35 +211,83 @@ function vis(s) {
   }).join('');
 }
 
+// Grouped by INPUT, not flattened into a list. Aaron pressed SPEAK repeatedly while the clips were
+// 404ing and ended up with a wall of the same line — but the takes are not duplicates: Kokoro is
+// NOT deterministic. The same text, voice and speed produce genuinely different audio every time
+// (max sample difference 0.18 on the raw take, at identical length). So re-rolling a line until one
+// reads well is a real technique, and collapsing identical inputs would throw the good take away.
+// One card per input; every take inside it stays separately playable and separately rated.
+function keyOf(t) {
+  return [t.raw, t.voice, (+t.speed).toFixed(2), (+t.pitch).toFixed(2),
+          t.chain ? 1 : 0, t.for_say === false ? 0 : 1].join('\u0000');
+}
+
 function render() {
   const box = $('#takes'); box.innerHTML = '';
-  for (const t of TAKES.slice(0, 40)) {
-    const d = document.createElement('div');
-    d.className = 'take' + (t.vote === 1 ? ' good' : t.vote === 0 ? ' bad' : '');
-    const top = document.createElement('div'); top.className = 'top';
-    const p = document.createElement('button'); p.className = 'b'; p.textContent = '▶';
-    p.onclick = () => { unlock(); play(t); };
-    const tx = document.createElement('div'); tx.className = 'txt'; tx.innerHTML = vis(t.raw);
-    const y = document.createElement('button'); y.className = 'b y' + (t.vote === 1 ? ' on' : ''); y.textContent = '✓';
-    const n = document.createElement('button'); n.className = 'b n' + (t.vote === 0 ? ' on' : ''); n.textContent = '✗';
-    y.onclick = () => { t.vote = t.vote === 1 ? null : 1; save(); render(); };
-    n.onclick = () => { t.vote = t.vote === 0 ? null : 0; save(); render(); };
-    top.append(p, tx, y, n);
-    const m = document.createElement('div'); m.className = 'meta';
-    m.textContent = `${t.voice} · speed ${(+t.speed).toFixed(2)} · pitch ${(+t.pitch).toFixed(2)}`
-      + `${t.chain ? '' : ' · RAW'}${t.for_say === false ? ' · no for_say' : ''} · ${t.sec.toFixed(2)}s`;
-    const ph = document.createElement('div'); ph.className = 'meta'; ph.textContent = t.phonemes;
-    d.append(top, m, ph); box.appendChild(d);
+  const groups = new Map();
+  for (const t of TAKES) {
+    const k = keyOf(t);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(t);
   }
-  const rated = TAKES.filter(t => t.vote !== null && t.vote !== undefined);
+  for (const [, list] of [...groups].slice(0, 25)) {
+    const head = list[0];
+    const d = document.createElement('div');
+    d.className = 'take';
+    const h = document.createElement('div'); h.className = 'txt';
+    h.innerHTML = vis(head.raw) + ` <span class="n">${head.raw.length} chars`
+      + (list.length > 1 ? ` · ${list.length} takes` : '') + '</span>';
+    const m = document.createElement('div'); m.className = 'meta';
+    m.textContent = `${head.voice} · speed ${(+head.speed).toFixed(2)} · pitch ${(+head.pitch).toFixed(2)}`
+      + `${head.chain ? '' : ' · RAW'}${head.for_say === false ? ' · no for_say' : ''}`;
+    const ph = document.createElement('div'); ph.className = 'meta'; ph.textContent = head.phonemes;
+    d.append(h, m, ph);
+    if (head.chunks > 1) {
+      const w = document.createElement('div'); w.className = 'meta warn';
+      w.textContent = `⚠ ${head.chunks} chunks — kokoro split this and joined the pieces`;
+      d.appendChild(w);
+    }
+    const rowbox = document.createElement('div'); rowbox.className = 'rolls';
+    list.forEach((t, i) => {
+      const r = document.createElement('div'); r.className = 'roll'
+        + (t.vote === 1 ? ' good' : t.vote === 0 ? ' bad' : '');
+      const p = document.createElement('button'); p.className = 'b';
+      p.textContent = '▶ ' + (list.length - i);
+      p.onclick = () => { unlock(); play(t); };
+      const sec = document.createElement('span'); sec.className = 'n'; sec.textContent = t.sec.toFixed(2) + 's';
+      const y = document.createElement('button'); y.className = 'b y' + (t.vote === 1 ? ' on' : ''); y.textContent = '✓';
+      const n = document.createElement('button'); n.className = 'b n' + (t.vote === 0 ? ' on' : ''); n.textContent = '✗';
+      y.onclick = () => { t.vote = t.vote === 1 ? null : 1; save(); render(); };
+      n.onclick = () => { t.vote = t.vote === 0 ? null : 0; save(); render(); };
+      r.append(p, sec, y, n); rowbox.appendChild(r);
+    });
+    d.appendChild(rowbox);
+    box.appendChild(d);
+  }
+
+  const rated = TAKES.filter(t => t.vote === 0 || t.vote === 1);
   $('#out').value = rated.length ? rated.map(t =>
     `${t.vote ? 'GOOD' : 'BAD '}  ${t.voice}  speed ${(+t.speed).toFixed(2)} pitch ${(+t.pitch).toFixed(2)}`
-    + `${t.chain ? '' : ' RAW'}\n      text: ${t.raw}\n      sent: ${t.sent}\n      ipa : ${t.phonemes}`
+    + `${t.chain ? '' : ' RAW'}`
+    + `\n      typed: ${t.raw_repr || JSON.stringify(t.raw)}`
+    + `\n      sent : ${t.sent_repr || JSON.stringify(t.sent)}`
+    + `\n      ipa  : ${t.phonemes}`
   ).join('\n\n') : '(mark takes with ✓ or ✗ and they collect here)';
+  $('#count').textContent = TAKES.length ? `${TAKES.length} takes · ${rated.length} rated` : '';
 }
 
 $('#go').onclick = () => { unlock(); speak(); };
 $('#text').addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') speak(); });
+let armed = false;
+$('#clear').onclick = () => {
+  // Two clicks, not a confirm(). This project bans alert/confirm/prompt outright — a modal blocks
+  // the page and, in the browser-automation harness, blocks everything after it.
+  if (!armed) { armed = true; $('#clear').textContent = 'Tap again to clear'; $('#clear').classList.add('arm');
+    setTimeout(() => { armed = false; $('#clear').textContent = 'Clear takes'; $('#clear').classList.remove('arm'); }, 3000);
+    return; }
+  TAKES = []; armed = false; $('#clear').textContent = 'Clear takes'; $('#clear').classList.remove('arm');
+  save(); render(); setStatus2('');
+};
 $('#copy').onclick = async () => {
   try { await navigator.clipboard.writeText($('#out').value); $('#copy').textContent = 'Copied'; }
   catch (e) { $('#out').select(); }
