@@ -46,7 +46,8 @@ import http.server, json, os, socket, socketserver, subprocess, sys, threading, 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 VO = os.path.dirname(HERE)
-TAKES = os.path.join(HERE, 'takes')
+TAKES = os.path.join(HERE, 'takes')     # scratch: one live take per line, swept on every start
+KEEP = os.path.join(HERE, 'keep')       # approved: ONE file per slot, stable name, survives
 PORT = int(os.environ.get('PORT', '8789'))
 SR = 24000
 sys.path.insert(0, VO)
@@ -61,7 +62,82 @@ bf_alice bf_emma bf_isabella bf_lily bm_daniel bm_fable bm_george bm_lewis""".sp
 # The story cast, so a line can be auditioned at the settings it would actually ship at rather than
 # at whatever the sliders happen to be on. Imported rather than restated — if gen_story.py recasts,
 # this follows.
-from gen_story import VOICES as CAST, room, for_say                    # noqa: E402
+from gen_story import (VOICES as CAST, BOSS, PC, room, for_say,                 # noqa: E402
+                       suno_src, OUT as STORY_OUT)
+
+def dad_lines():
+    """Dad's two lines, parsed out of js/story.js THREAD_SCENE — the only place they exist.
+
+    He is not in gen_story.py at all: THREAD_SCENE is a silent text panel today, so these are lines
+    the game DISPLAYS and has never spoken. Aaron cast bm_lewis for him off the §S2-T audition.
+    """
+    import re
+    js = open(os.path.join(os.path.dirname(os.path.dirname(VO)), 'js', 'story.js')).read()
+    seg = js[js.index('export const THREAD_SCENE'):js.index('export function newThread')]
+    out, n = [], 0
+    for m in re.finditer(r"who: '(\w+)', text: ((?:'(?:[^'\\]|\\.)*'\s*\+?\s*)+)", seg):
+        if m.group(1) != 'dad':
+            continue
+        n += 1
+        out.append((f'dad{n}', ''.join(re.findall(r"'((?:[^'\\]|\\.)*)'", m.group(2)))))
+    return out
+
+
+def script():
+    """Every spoken line in the story, with what it is, who says it, and what ships for it.
+
+    Three populations, and they are NOT interchangeable — which is the whole reason this is one
+    list rather than a text box:
+
+      player  Kokoro, three takes per line (m/f/n). Editable and re-renderable right here.
+      boss    a SUNO PERFORMANCE, not synthesis. The text can be changed, but the take cannot be
+              re-rendered from this page — that means recording it again in SUNO. Marked, so a
+              tweak is never quietly auditioned in the wrong voice.
+      dad     cast (bm_lewis) but NEVER RECORDED. There is no shipped clip to compare against.
+    """
+    rows = []
+    for slot, text in BOSS:
+        rows.append({'id': slot, 'who': 'boss', 'label': slot.replace('_', ' '), 'text': text,
+                     'voice': CAST['boss']['voice'], 'speed': CAST['boss']['speed'],
+                     'pitch': CAST['boss']['pitch'], 'shipped': slot,
+                     'engine': 'suno' if suno_src(slot) else 'kokoro'})
+    for slot, text in PC:
+        for g in ('m', 'f', 'n'):
+            c = CAST[f'pc_{g}']
+            rows.append({'id': f'pc_{g}_{slot}', 'who': f'pc_{g}', 'label': f'{slot} · {g}',
+                         'text': text, 'voice': c['voice'], 'speed': c['speed'],
+                         'pitch': c['pitch'], 'shipped': f'pc_{g}_{slot}', 'engine': 'kokoro'})
+    for slot, text in dad_lines():
+        rows.append({'id': slot, 'who': 'dad', 'label': slot, 'text': text,
+                     'voice': 'bm_lewis', 'speed': 1.0, 'pitch': 1.0,
+                     'shipped': None, 'engine': 'kokoro'})
+    return {'rows': rows}
+
+
+SHIPPED_SLOTS = set()
+
+def _ok_id(i):
+    return isinstance(i, str) and len(i) == 10 and all(c in '0123456789abcdef' for c in i)
+
+
+def _ok_slot(s):
+    """A slot the SCRIPT names, and nothing else. The keeper filename is built from this, so an
+    allow-list is the only safe source for it — 'slot' arriving from a page is a filename."""
+    return isinstance(s, str) and s in SHIPPED_SLOTS
+
+
+def sweep():
+    """takes/ is scratch and is emptied on every start.
+
+    Nothing outside a live page ever refers to a scratch take: the page replaces its own take when
+    you re-speak a line, and an approved one has already been MOVED to keep/. 146 files and 3.9 MB
+    had piled up before keepers existed, which is what this exists to stop."""
+    n = 0
+    for f in os.listdir(TAKES):
+        if f.endswith(('.wav', '.mp3')):
+            os.remove(os.path.join(TAKES, f)); n += 1
+    return n
+
 
 _pipes, _lock = {}, threading.Lock()
 _np = _sf = _KP = None
@@ -130,13 +206,82 @@ class H(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(b)
 
-    def do_GET(self):
-        if self.path.split('?')[0] == '/voices':
+    def do_HEAD(self):
+        # Routed the SAME as GET. It was not, so a HEAD on /shipped/<slot> 404'd while the GET
+        # behind the audio element was fine — and play()'s error path probes with HEAD, so a
+        # blocked autoplay came back reported as a missing file. That is the third time in this
+        # bench a diagnostic has confidently named the wrong cause; a probe that is not routed the
+        # way the real request is routed is not probing the real request.
+        return self.do_GET(head=True)
+
+    def do_GET(self, head=False):
+        path = self.path.split('?')[0]
+        if path == '/script':
+            d = script()
+            for r in d['rows']:
+                k = os.path.join(KEEP, r['id'] + '.mp3')
+                r['kept'] = f"keep/{r['id']}.mp3" if os.path.isfile(k) else None
+            return self._json(d)
+        if path.startswith('/shipped/'):
+            # Slot name only, and it must be one the script actually names. The clips live outside
+            # this server's document root, so this is a deliberate hole in it and is kept to an
+            # allow-list rather than a sanitised path.
+            slot = path[len('/shipped/'):]
+            if slot not in SHIPPED_SLOTS:
+                return self.send_error(404)
+            f = os.path.join(STORY_OUT, slot + '.mp3')
+            if not os.path.isfile(f):
+                return self.send_error(404)
+            b = open(f, 'rb').read()
+            self.send_response(200)
+            self.send_header('Content-Type', 'audio/mpeg')
+            self.send_header('Content-Length', str(len(b)))
+            self.end_headers()
+            return None if head else self.wfile.write(b)
+        if path == '/voices':
             return self._json({'voices': VOICES,
                                'cast': {k: v for k, v in CAST.items()}})
-        return super().do_GET()
+        return super().do_HEAD() if head else super().do_GET()
 
     def do_POST(self):
+        if self.path.rstrip('/') == '/keep':
+            # Promote a scratch take to the slot's keeper. Aaron: *"I don't want endless copies of
+            # the file. let me just correct and play, if i hit tick, that entry is the only one
+            # worth saving."* So a keeper has a name derived from the SLOT, not from the take —
+            # ticking a new one overwrites the old, and there is never more than one per line.
+            n = int(self.headers.get('Content-Length') or 0)
+            try:
+                j = json.loads(self.rfile.read(n) or b'{}')
+            except Exception as e:
+                return self.send_error(400, str(e))
+            tid, slot = j.get('id'), j.get('slot')
+            if not _ok_id(tid) or not _ok_slot(slot):
+                return self._json({'error': 'bad id or slot'}, 400)
+            moved = []
+            for ext in ('.wav', '.mp3'):
+                src = os.path.join(TAKES, tid + ext)
+                if os.path.isfile(src):
+                    os.replace(src, os.path.join(KEEP, slot + ext))
+                    moved.append(ext)
+            if not moved:
+                return self._json({'error': 'that take is no longer on disk'}, 200)
+            return self._json({'ok': True, 'kept': f'keep/{slot}.mp3'})
+
+        if self.path.rstrip('/') == '/unkeep':
+            n = int(self.headers.get('Content-Length') or 0)
+            try:
+                slot = (json.loads(self.rfile.read(n) or b'{}') or {}).get('slot')
+            except Exception as e:
+                return self.send_error(400, str(e))
+            if not _ok_slot(slot):
+                return self._json({'error': 'bad slot'}, 400)
+            gone = 0
+            for ext in ('.wav', '.mp3'):
+                f = os.path.join(KEEP, slot + ext)
+                if os.path.isfile(f):
+                    os.remove(f); gone += 1
+            return self._json({'ok': True, 'removed': gone})
+
         if self.path.rstrip('/') == '/delete':
             n = int(self.headers.get('Content-Length') or 0)
             try:
@@ -230,10 +375,15 @@ class TS(socketserver.ThreadingMixIn, http.server.HTTPServer):
 
 if __name__ == '__main__':
     os.makedirs(TAKES, exist_ok=True)
+    os.makedirs(KEEP, exist_ok=True)
+    # Every line id is a valid keeper slot, including dad's, which has no shipped clip.
+    SHIPPED_SLOTS.update(r['shipped'] for r in script()['rows'] if r['shipped'])
+    SHIPPED_SLOTS.update(r['id'] for r in script()['rows'])
+    swept = sweep()
     print('NEONHAUL Kokoro bench — loading the model (~6 s) …', flush=True)
     warm()
     print(f'  this machine   http://127.0.0.1:{PORT}/')
     print(f'  ON YOUR PHONE  http://{lan()}:{PORT}/')
-    print(f'  takes -> {TAKES}')
+    print(f'  swept {swept} scratch take(s); keepers in {KEEP}')
     print('  ctrl-c to stop', flush=True)
     TS(('0.0.0.0', PORT), H).serve_forever()
