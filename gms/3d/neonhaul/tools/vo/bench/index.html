@@ -35,6 +35,10 @@ i.w{font-style:normal;color:#5f7fa8;background:#0b1a2a;border-radius:3px;padding
 .roll .n{flex:1;color:var(--dim);font-size:12px}
 .meta.warn{color:#e0a33f}
 .b.arm{background:var(--no);border-color:var(--no);color:#fff}
+.b.x{color:var(--dim);padding:8px 10px;min-width:40px}
+.b.x:hover{color:var(--no);border-color:var(--no)}
+.b.cardx{float:right;margin-left:8px;font-size:12px;min-height:34px;padding:5px 9px}
+.b.undo{padding:5px 10px;min-height:32px;margin-left:6px}
 #count{color:var(--dim);font-size:13px}
 .b{padding:9px 12px;min-height:44px;min-width:46px;border-radius:9px;border:1px solid var(--line);
   background:#131920;color:var(--tx);cursor:pointer;font-size:15px}
@@ -241,6 +245,16 @@ function render() {
     m.textContent = `${head.voice} · speed ${(+head.speed).toFixed(2)} · pitch ${(+head.pitch).toFixed(2)}`
       + `${head.chain ? '' : ' · RAW'}${head.for_say === false ? ' · no for_say' : ''}`;
     const ph = document.createElement('div'); ph.className = 'meta'; ph.textContent = head.phonemes;
+    if (list.length > 1) {
+      const xa = document.createElement('button'); xa.className = 'b x cardx';
+      xa.textContent = `✕ all ${list.length}`;
+      xa.onclick = () => drop(list.slice());
+      h.appendChild(xa);
+    } else {
+      const xa = document.createElement('button'); xa.className = 'b x cardx'; xa.textContent = '✕';
+      xa.onclick = () => drop(list.slice());
+      h.appendChild(xa);
+    }
     d.append(h, m, ph);
     if (head.chunks > 1) {
       const w = document.createElement('div'); w.className = 'meta warn';
@@ -259,7 +273,10 @@ function render() {
       const n = document.createElement('button'); n.className = 'b n' + (t.vote === 0 ? ' on' : ''); n.textContent = '✗';
       y.onclick = () => { t.vote = t.vote === 1 ? null : 1; save(); render(); };
       n.onclick = () => { t.vote = t.vote === 0 ? null : 0; save(); render(); };
-      r.append(p, sec, y, n); rowbox.appendChild(r);
+      const x = document.createElement('button'); x.className = 'b x'; x.textContent = '✕';
+      x.title = 'delete this take';
+      x.onclick = () => drop([t]);
+      r.append(p, sec, y, n, x); rowbox.appendChild(r);
     });
     d.appendChild(rowbox);
     box.appendChild(d);
@@ -278,6 +295,42 @@ function render() {
 
 $('#go').onclick = () => { unlock(); speak(); };
 $('#text').addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') speak(); });
+// Delete is one tap with an UNDO, not a two-tap arm. Clearing everything is worth a confirmation
+// step; removing one bad re-roll is not, and friction on the tidy-up is what leaves the list a mess.
+// The undo holds the records AND puts the positions back, so it restores order, not just presence.
+let undoBuf = null, undoT = null;
+function drop(items) {
+  const ids = new Set(items.map(t => t.id));
+  const removed = [];
+  TAKES.forEach((t, i) => { if (ids.has(t.id)) removed.push({ i, t }); });
+  if (!removed.length) return;
+  TAKES = TAKES.filter(t => !ids.has(t.id));
+  undoBuf = removed;
+  save(); render();
+  const n = removed.length;
+  setStatus2Undo(`${n} take${n > 1 ? 's' : ''} deleted`, () => {
+    for (const { i, t } of undoBuf) TAKES.splice(i, 0, t);
+    undoBuf = null; save(); render(); setStatus2('');
+  });
+  clearTimeout(undoT);
+  undoT = setTimeout(() => {
+    // Only once undo has lapsed are the files actually removed from disk, so an undo never has to
+    // re-render audio that a nondeterministic model would not reproduce.
+    if (undoBuf) {
+      fetch('delete', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: undoBuf.map(r => r.t.id) }) }).catch(() => {});
+      undoBuf = null;
+    }
+    setStatus2('');
+  }, 8000);
+}
+
+function setStatus2Undo(msg, fn) {
+  const e = $('#status2'); e.hidden = false; e.textContent = msg + '  ';
+  const b = document.createElement('button'); b.className = 'b undo'; b.textContent = 'Undo';
+  b.onclick = fn; e.appendChild(b);
+}
+
 let armed = false;
 $('#clear').onclick = () => {
   // Two clicks, not a confirm(). This project bans alert/confirm/prompt outright — a modal blocks
@@ -285,8 +338,22 @@ $('#clear').onclick = () => {
   if (!armed) { armed = true; $('#clear').textContent = 'Tap again to clear'; $('#clear').classList.add('arm');
     setTimeout(() => { armed = false; $('#clear').textContent = 'Clear takes'; $('#clear').classList.remove('arm'); }, 3000);
     return; }
+  const all = TAKES.slice();
   TAKES = []; armed = false; $('#clear').textContent = 'Clear takes'; $('#clear').classList.remove('arm');
-  save(); render(); setStatus2('');
+  save(); render();
+  undoBuf = all.map((t, i) => ({ i, t }));
+  setStatus2Undo(`${all.length} takes cleared`, () => {
+    TAKES = undoBuf.map(r => r.t); undoBuf = null; save(); render(); setStatus2('');
+  });
+  clearTimeout(undoT);
+  undoT = setTimeout(() => {
+    if (undoBuf) {
+      fetch('delete', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: undoBuf.map(r => r.t.id) }) }).catch(() => {});
+      undoBuf = null;
+    }
+    setStatus2('');
+  }, 8000);
 };
 $('#copy').onclick = async () => {
   try { await navigator.clipboard.writeText($('#out').value); $('#copy').textContent = 'Copied'; }

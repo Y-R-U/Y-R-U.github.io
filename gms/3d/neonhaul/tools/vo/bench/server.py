@@ -137,6 +137,26 @@ class H(http.server.SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self):
+        if self.path.rstrip('/') == '/delete':
+            n = int(self.headers.get('Content-Length') or 0)
+            try:
+                ids = (json.loads(self.rfile.read(n) or b'{}') or {}).get('ids') or []
+            except Exception as e:
+                return self.send_error(400, str(e))
+            # The id is the ONLY thing accepted, and it must look like one we minted: ten hex
+            # characters. Taking a filename from the page and joining it onto a directory is how a
+            # scratch endpoint becomes an arbitrary-file-delete, and 'takes/../../js/main.js' is a
+            # perfectly ordinary-looking string.
+            gone = 0
+            for i in ids:
+                if not (isinstance(i, str) and len(i) == 10 and all(c in '0123456789abcdef' for c in i)):
+                    continue
+                for ext in ('.wav', '.mp3'):
+                    f = os.path.join(TAKES, i + ext)
+                    if os.path.isfile(f):
+                        os.remove(f)
+                        gone += 1
+            return self._json({'ok': True, 'removed': gone})
         if self.path.rstrip('/') != '/say':
             return self.send_error(404)
         n = int(self.headers.get('Content-Length') or 0)
