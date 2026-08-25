@@ -110,7 +110,11 @@ def render(text, voice, speed, pitch, chain):
         # an odd gap in it. It is also why `keep_words` refuses a multi-chunk take: the timestamps
         # it cuts on are per chunk.
         'chunks': len(res),
-        'file': os.path.basename(out),
+        # The URL the page will fetch, NOT the bare filename. Takes are written to bench/takes/ and
+        # the server's document root is bench/, so a bare basename 404s — which it did, for every
+        # take, while the page reported "playback blocked" because that is what its catch-all said
+        # instead of what the browser actually raised.
+        'file': 'takes/' + os.path.basename(out),
     }
 
 

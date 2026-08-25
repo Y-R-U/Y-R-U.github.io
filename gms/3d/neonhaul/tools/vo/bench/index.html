@@ -61,6 +61,7 @@ you actually sent.</p>
 </div>
 
 <div class="status" id="status"></div>
+<div class="status err" id="status2" hidden></div>
 <div class="ph" id="ph" hidden></div>
 
 <details>
@@ -112,13 +113,47 @@ for (const k of ['speed', 'pitch']) {
 
 function save() { try { localStorage.setItem(LS, JSON.stringify(TAKES.slice(0, 200))); } catch (e) {} }
 
-function play(t) {
+// iOS Safari will only start audio from inside a user gesture, and an element that has never been
+// played in one stays locked even when a later src is fine. So the FIRST tap unlocks the shared
+// element synchronously — before any await — and every later take reuses it.
+let unlocked = false;
+function unlock() {
+  if (unlocked) return;
+  unlocked = true;
+  try { AU.src = 'data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA'
+    + 'gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID/////////////////////////////////AAAAOkxBTUUzLjEwMAGuAAAAAAAAAAAUgJAU'
+    + 'QQABrgAAAnGMHkkIAAAAAAAAAAAAAAAAAAAA//sQxAADwAABpAAAACAAADSAAAAETEFNRTMuMTAwVVU=';
+    const p = AU.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+}
+
+// Say what actually went wrong. The previous version asserted "playback blocked" for every failure,
+// which is how a 404 on every single clip — the takes are served from takes/, and the page was
+// asking for the bare filename — spent an evening looking like an autoplay policy.
+async function play(t) {
   curId = t.id;
-  AU.src = t.file + '?c=' + t.id;
-  AU.play().catch(() => setStatus('playback blocked — tap SPEAK or a play button once more', true));
+  const url = t.file + '?c=' + t.id;
+  try {
+    AU.src = url;
+    await AU.play();
+    setStatus2('');
+  } catch (e) {
+    // CHECK THE FILE FIRST. NotAllowedError is raised before the src is even fetched, so an
+    // autoplay block MASKS a missing clip — testing e.name first reported "autoplay blocked" for a
+    // URL that 404s, which is exactly the misdiagnosis this whole function was rewritten to end.
+    // A missing file is a real defect; an autoplay block is a condition of the page being idle.
+    let why = `${e.name}: ${e.message}`;
+    let missing = false;
+    try {
+      const r = await fetch(url, { method: 'HEAD' });
+      if (!r.ok) { missing = true; why = `the clip did not load — HTTP ${r.status} for ${t.file}`; }
+    } catch (fe) { missing = true; why = `the clip could not be fetched — ${fe}`; }
+    if (!missing && e.name === 'NotAllowedError') why = 'the browser blocked autoplay — tap ▶ on the take';
+    setStatus2(why);
+  }
 }
 
 function setStatus(s, err) { const e = $('#status'); e.textContent = s; e.className = 'status' + (err ? ' err' : ''); }
+function setStatus2(s) { const e = $('#status2'); e.textContent = s || ''; e.hidden = !s; }
 
 async function speak() {
   // NOT trimmed. Leading/trailing whitespace is part of the input under test — see the note in
@@ -173,7 +208,7 @@ function render() {
     d.className = 'take' + (t.vote === 1 ? ' good' : t.vote === 0 ? ' bad' : '');
     const top = document.createElement('div'); top.className = 'top';
     const p = document.createElement('button'); p.className = 'b'; p.textContent = '▶';
-    p.onclick = () => play(t);
+    p.onclick = () => { unlock(); play(t); };
     const tx = document.createElement('div'); tx.className = 'txt'; tx.innerHTML = vis(t.raw);
     const y = document.createElement('button'); y.className = 'b y' + (t.vote === 1 ? ' on' : ''); y.textContent = '✓';
     const n = document.createElement('button'); n.className = 'b n' + (t.vote === 0 ? ' on' : ''); n.textContent = '✗';
@@ -193,7 +228,7 @@ function render() {
   ).join('\n\n') : '(mark takes with ✓ or ✗ and they collect here)';
 }
 
-$('#go').onclick = speak;
+$('#go').onclick = () => { unlock(); speak(); };
 $('#text').addEventListener('keydown', e => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') speak(); });
 $('#copy').onclick = async () => {
   try { await navigator.clipboard.writeText($('#out').value); $('#copy').textContent = 'Copied'; }
