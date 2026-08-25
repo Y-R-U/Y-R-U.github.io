@@ -102,12 +102,12 @@ export function beatHold(row, measured) {
 // Aaron's line, verbatim. It is the whole point of the scene's last beat: the player has to know
 // where they stand, and the reason the borrowed hull is above their licence is so that
 // *"I shouldn't even be flying this"* is literally true when they look at the dash.
-// `sec` is pc_n's take, the longest of the three; the other two are 7.67 (m) and 7.98 (f), and the
+// `sec` is pc_n's take, the longest of the three; the other two are 8.38 (m) and 8.63 (f), and the
 // derived hold picks the right one per gender at play time. One written number could not — it was
 // 11.0, which over-held the male take by 2.3 s and under-held nothing, so the defect here read as
 // a dead pause rather than as a truncation and nobody caught it.
 export const MONOLOGUE = {
-  who: 'pc', voice: 'close', sec: 8.13, pad: 1.4,
+  who: 'pc', voice: 'close', sec: 8.81, pad: 1.4,
   text: 'Shit — they wouldn’t let me get a word in. What sort of crap has my Dad got himself into? '
     + 'I shouldn’t even be flying this. I need to make that money fast.',
 };

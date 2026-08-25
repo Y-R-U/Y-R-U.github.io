@@ -1,0 +1,14 @@
+{
+  "at": "2026-08-26T01:34:40",
+  "source": "pasted by Aaron after Copy failed on the LAN page",
+  "changes": {
+    "pc_m_int1": {"was": "But—", "now": "But!", "approved": true, "kept": true},
+    "pc_m_int2": {"was": "Wait—", "now": "Wait!", "approved": true, "kept": true},
+    "pc_f_int2": {"was": "Wait—", "now": "Wait!", "approved": false, "kept": false},
+    "pc_m_close": {
+      "was": "Shit — they wouldn’t let me get a word in. What sort of crap has my Dad got himself into? I shouldn’t even be flying this. I need to make that money fast.",
+      "now": "Shit!;-,;-,;-\nThey wouldn’t let me get a word in. What sort of crap has my Dad got himself into? ;-,;-,;-,;-\nI shouldn’t even be flying this.;-,;-,;-,;-\nI need to make that money fast.",
+      "approved": true, "kept": true
+    }
+  }
+}

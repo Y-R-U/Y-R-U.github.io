@@ -14,6 +14,7 @@ h1{font-size:17px;margin:0 0 3px}
 h2{font-size:14px;color:var(--dim);margin:20px 0 8px;font-weight:600;letter-spacing:.04em}
 .ln{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin:9px 0}
 .ln.ok{border-color:var(--ok)} .ln.no{border-color:var(--no)}
+.ln.active{box-shadow:0 0 0 2px var(--hi);border-color:var(--hi)}
 .hd{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .slot{font:12px ui-monospace,Menlo,monospace;color:var(--hi)}
 .badge{font-size:11px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--dim)}
@@ -44,6 +45,10 @@ details{margin:16px 0;border:1px solid var(--line);border-radius:10px;padding:9p
 summary{cursor:pointer;font-size:14px}
 code{background:#0d1116;padding:1px 5px;border-radius:4px;font-size:12px}
 #free{display:none}
+.sticky{position:sticky;bottom:0;padding:10px 0 12px;background:linear-gradient(transparent,var(--bg) 28%);
+  display:flex;justify-content:center}
+.sticky button{min-width:220px}
+body{padding-bottom:8px}
 </style>
 
 <h1>NEONHAUL — story lines</h1>
@@ -55,6 +60,7 @@ code{background:#0d1116;padding:1px 5px;border-radius:4px;font-size:12px}
 </div>
 
 <div id="script"></div>
+<div class="sticky"><button class="go" id="savebar">Save to server</button></div>
 
 <div id="free">
   <p class="sub">A blank box, for trying something that isn't a script line yet.</p>
@@ -86,13 +92,17 @@ code{background:#0d1116;padding:1px 5px;border-radius:4px;font-size:12px}
   <summary>Send back to Claude</summary>
   <p class="sub" style="margin-top:8px">Approvals, rejections and every text change you made.</p>
   <button id="copy">Copy</button>
+  <button class="go" id="save">Save to server</button>
+  <p class="sub" style="margin-top:8px">Copy needs a secure context and this page is plain http on
+  your LAN, so on a phone use <b>Save to server</b> &mdash; it writes straight to
+  <code>answers.json</code> and I can read it from there.</p>
   <textarea id="out" readonly></textarea>
 </details>
 
 <script>
 const $ = s => document.querySelector(s);
 const LS = 'neonhaul-story-lines';
-let ROWS = [], ST = {}, VOICES = [];
+let ROWS = [], ST = {}, VOICES = [], ACTIVE = null;
 try { ST = JSON.parse(localStorage.getItem(LS) || '{}'); } catch (e) {}
 const save = () => { try { localStorage.setItem(LS, JSON.stringify(ST)); } catch (e) {} };
 // ONE take per line, not a history. Aaron: *"I don't want endless copies of the file. let me just
@@ -115,8 +125,9 @@ function vis(s) {
   }).join('');
 }
 
-// One reused element, unlocked on the first real tap — iOS keeps an <audio> that has never played
-// inside a gesture locked even when a later src is fine.
+// One reused element, unlocked on the first real tap. Every mobile browser gates audio on a user
+// gesture — Chrome on Android (what Aaron uses) and Safari on iOS both do — and an element that
+// has never been played inside one stays locked even when a later src is perfectly fine.
 const AU = new Audio();
 let unlocked = false;
 function unlock() {
@@ -150,6 +161,24 @@ const GROUPS = [
   ['boss', 'THE BOSS — your SUNO performance, not synthesis', r => r.who === 'boss'],
 ];
 
+// Rebuild ONE card, in place. build() replaced all 21 nodes on every tick, edit and render, which
+// throws away scroll position — and on a phone, mid-list, that is the whole page jumping. The card
+// keeps its position in the DOM and the rest of the list is never touched.
+function refreshCard(id) {
+  const old = document.querySelector(`.ln[data-id="${id}"]`);
+  const r = ROWS.find(x => x.id === id);
+  if (!old || !r) return build();
+  const fresh = lineCard(r);
+  // Do not steal focus or scroll: replaceChild leaves the surrounding layout exactly as it was,
+  // and the caret is only restored if the edit box was the thing being used.
+  const hadFocus = old.contains(document.activeElement) && document.activeElement.tagName === 'TEXTAREA';
+  const selStart = hadFocus ? document.activeElement.selectionStart : null;
+  old.replaceWith(fresh);
+  if (hadFocus) { const ta = fresh.querySelector('textarea'); ta.focus();
+    if (selStart !== null) try { ta.setSelectionRange(selStart, selStart); } catch (e) {} }
+  refreshOut();
+}
+
 function build() {
   const box = $('#script'); box.innerHTML = '';
   for (const [, title, pick] of GROUPS) {
@@ -164,8 +193,17 @@ function build() {
 function lineCard(r) {
   const s = st(r.id);
   const d = document.createElement('div');
-  d.className = 'ln' + (s.vote === 1 ? ' ok' : s.vote === 0 ? ' no' : '');
+  d.dataset.id = r.id;
+  d.className = 'ln' + (s.vote === 1 ? ' ok' : s.vote === 0 ? ' no' : '')
+    + (ACTIVE === r.id ? ' active' : '');
 
+  d.addEventListener('focusin', () => {
+    if (ACTIVE === r.id) return;
+    const prev = ACTIVE ? document.querySelector(`.ln[data-id="${ACTIVE}"]`) : null;
+    ACTIVE = r.id;
+    if (prev) prev.classList.remove('active');
+    d.classList.add('active');
+  });
   const hd = document.createElement('div'); hd.className = 'hd';
   hd.innerHTML = `<span class="slot">${r.id}</span>`
     + `<span class="badge">${r.voice}</span>`
@@ -176,8 +214,18 @@ function lineCard(r) {
 
   const ta = document.createElement('textarea');
   ta.value = s.text === null ? r.text : s.text;
-  ta.oninput = () => { s.text = ta.value; save(); hd.querySelector('.badge.edited')
-    || (ta.value !== r.text && build()); refreshOut(); };
+  ta.oninput = () => {
+    s.text = ta.value; save();
+    // Only the badge can change while typing, so toggle it directly. Rebuilding the card on every
+    // keystroke moved the caret and, on a phone, closed the keyboard.
+    const has = !!hd.querySelector('.badge.edited');
+    const want = ta.value !== r.text;
+    if (has !== want) {
+      if (want) hd.insertAdjacentHTML('beforeend', '<span class="badge edited">edited</span>');
+      else hd.querySelector('.badge.edited').remove();
+    }
+    refreshOut();
+  };
   d.appendChild(ta);
 
   const row = document.createElement('div'); row.className = 'row';
@@ -200,7 +248,7 @@ function lineCard(r) {
       s.cur = dta; s.vote = null; save();
       ipa.innerHTML = `<b class="n">sent:</b> ${vis(dta.sent)} &nbsp; <b class="n">ipa:</b> ${esc(dta.phonemes)}`
         + (dta.chunks > 1 ? `<div class="warn">⚠ ${dta.chunks} chunks — a newline split this; the pieces were generated separately and joined</div>` : '');
-      build(); play(dta.file, setErrById(r.id));
+      ACTIVE = r.id; refreshCard(r.id); play(dta.file, setErrById(r.id));
     } catch (e) { setErr(String(e)); }
     finally { go.disabled = false; go.textContent = 'SPEAK EDIT'; }
   };
@@ -220,7 +268,7 @@ function lineCard(r) {
   y.onclick = async () => {
     if (s.vote === 1) {                       // untick — the keeper goes
       await post('unkeep', { slot: r.id });
-      s.kept = null; s.vote = null; save(); build(); return;
+      s.kept = null; s.vote = null; save(); ACTIVE = r.id; refreshCard(r.id); return;
     }
     if (s.cur) {
       const res = await post('keep', { id: s.cur.id, slot: r.id });
@@ -228,17 +276,17 @@ function lineCard(r) {
       s.kept = res.kept + '?v=' + Date.now();  // the name is stable, so bust the cache
       s.cur = null;
     }
-    s.vote = 1; save(); build();
+    s.vote = 1; save(); ACTIVE = r.id; refreshCard(r.id);
   };
   const n = document.createElement('button');
   n.className = '' + (s.vote === 0 ? ' on n' : ''); n.textContent = '✗';
-  n.onclick = () => { s.vote = s.vote === 0 ? null : 0; save(); build(); };
+  n.onclick = () => { s.vote = s.vote === 0 ? null : 0; save(); ACTIVE = r.id; refreshCard(r.id); };
   row.append(y, n);
 
   if (s.text !== null && s.text !== r.text) {
     const rv = document.createElement('button'); rv.className = 'x'; rv.textContent = '↺';
     rv.title = 'revert to the shipped text';
-    rv.onclick = () => { s.text = null; save(); build(); };
+    rv.onclick = () => { s.text = null; save(); ACTIVE = r.id; refreshCard(r.id); };
     row.appendChild(rv);
   }
   d.append(row, ipa);
@@ -272,11 +320,48 @@ function refreshOut() {
   $('#out').value = L.join('\n');
 }
 
-$('#copy').onclick = async () => {
-  try { await navigator.clipboard.writeText($('#out').value); $('#copy').textContent = 'Copied'; }
-  catch (e) { $('#out').select(); }
-  setTimeout(() => { $('#copy').textContent = 'Copy'; }, 1400);
+// navigator.clipboard is undefined outside a SECURE CONTEXT, and this page is plain http on a LAN
+// address, so on any phone browser it simply is not there — Chrome on Android is no different from
+// Safari here. The old catch swallowed that and left a button that looked like it had worked.
+// Try the modern API, fall back to execCommand on a real selection, and if BOTH fail say so.
+// `Save to server` below is the path that does not depend on any of this.
+async function copyOut(btn) {
+  const ta = $('#out'); const txt = ta.value;
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(txt);
+      btn.textContent = 'Copied'; return true;
+    }
+  } catch (e) {}
+  try {
+    ta.removeAttribute('readonly');
+    ta.focus(); ta.setSelectionRange(0, txt.length);
+    const ok = document.execCommand('copy');
+    ta.setAttribute('readonly', '');
+    if (ok) { btn.textContent = 'Copied'; return true; }
+  } catch (e) {}
+  btn.textContent = 'Select it and copy';
+  $('#out').scrollIntoView({ block: 'center' });
+  return false;
+}
+$('#copy').onclick = async e => {
+  await copyOut(e.target);
+  setTimeout(() => { e.target.textContent = 'Copy'; }, 2000);
 };
+
+async function saveAnswers(btn) {
+  const label = btn.textContent;
+  btn.textContent = 'saving…';
+  const payload = { at: new Date().toISOString(), text: $('#out').value,
+    lines: ROWS.map(r => { const s = ST[r.id] || {};
+      return { id: r.id, was: r.text, now: s.text === null || s.text === undefined ? r.text : s.text,
+               vote: s.vote ?? null, kept: !!s.kept }; }) };
+  const res = await post('answers', payload);
+  btn.textContent = res && res.ok ? 'Saved ✓' : 'save failed';
+  setTimeout(() => { btn.textContent = label; }, 2200);
+}
+$('#save').onclick = e => saveAnswers(e.target);
+$('#savebar').onclick = e => saveAnswers(e.target);
 
 // ── free tab ──────────────────────────────────────────────────────────────
 for (const k of ['fspeed', 'fpitch']) $('#' + k).oninput = e => { $('#' + k + 'v').textContent = (+e.target.value).toFixed(2); };

@@ -6,6 +6,7 @@
 // V2  the SCRIPT table's written `sec` is the real length of the file
 // V3  no line is cut off: every beat outlasts its clip by a readable margin
 // V4  the bubble text and the synthesised text are the same words
+// V5  a say-override differs from its line in punctuation only, never in vocabulary
 //
 // Why this suite exists. The holds in storyui.js were hand-tuned against the ABOGEN boss takes.
 // S2-L replaced the Boss with the SUNO performance — a slower read of the same words — and nothing
@@ -132,10 +133,15 @@ const MIN_GAP = 0.4;
   const py = readFileSync(resolve(ROOT, 'tools/vo/gen_story.py'), 'utf8');
   // Both files build these strings by implicit concatenation across lines, so the literals are
   // joined the way each language joins them rather than matched with one regex per line.
-  const pyLines = new Map();
-  for (const m of py.matchAll(/\(\s*'(boss_\d+|int\d|close)'\s*,\s*((?:'(?:[^'\\]|\\.)*'\s*)+)\)/g)) {
-    const joined = [...m[2].matchAll(/'((?:[^'\\]|\\.)*)'/g)].map(x => x[1]).join('');
-    pyLines.set(m[1], joined);
+  // A row is ('slot', 'shown…') or ('slot', 'shown…', 'say…'). Each element is itself written as
+  // implicit string concatenation across lines, so elements are split on the commas that separate
+  // them and the literals within an element are then joined.
+  const pyLines = new Map(), pySay = new Map();
+  for (const m of py.matchAll(/\(\s*'(boss_\d+|int\d|close)'\s*,\s*([\s\S]*?)\),\n/g)) {
+    const parts = m[2].split(/,\s*\n?\s*(?=')/);
+    const lit = t => [...t.matchAll(/'((?:[^'\\]|\\.)*)'/g)].map(x => x[1]).join('');
+    pyLines.set(m[1], lit(parts[0]));
+    if (parts.length > 1) pySay.set(m[1], lit(parts[1]));
   }
   const diff = [];
   for (const row of ROWS) {
@@ -146,6 +152,30 @@ const MIN_GAP = 0.4;
   }
   check('V4 the bubble text and the synthesised text are the same words', diff.length === 0,
     diff.length ? diff.join(' · ') : `all ${ROWS.filter(r => !r.cut).length} spoken rows match gen_story.py character for character`);
+
+  // A `say` override may differ in PUNCTUATION and must not differ in WORDS. Without this the
+  // bubble and the audio are two strings nobody compares, and the player reads one sentence while
+  // hearing another — a defect with no crash, no log line and no witness but a person who happens
+  // to be looking at the screen while listening.
+  const words = t => t.toLowerCase().replace(/\u2019/g, "'").replace(/[^a-z0-9']+/g, ' ').trim();
+  const drift = [];
+  for (const [slot, say] of pySay) {
+    if (words(say) !== words(pyLines.get(slot) || '')) {
+      drift.push(`${slot}: speaks ${JSON.stringify(words(say).slice(0, 40))} but shows ${JSON.stringify(words(pyLines.get(slot) || '').slice(0, 40))}`);
+    }
+  }
+  check('V5 a say-override speaks the same WORDS the bubble shows', drift.length === 0,
+    drift.length ? drift.join(' · ')
+      : `${pySay.size} override(s) — ${[...pySay.keys()].join(' ')} — differ from their line in punctuation only`);
+
+  const swaps = [['crap', 'muffin'], ['Wait', 'Stop'], ['But', 'And']];
+  const caughtDrift = [...pySay].filter(([slot, say]) => {
+    let m = say;
+    for (const [a, b] of swaps) m = m.replace(new RegExp(`\\b${a}\\b`), b);
+    return m !== say && words(m) !== words(pyLines.get(slot) || '');
+  });
+  check('V5-falsify one word swapped inside an override is seen', caughtDrift.length === pySay.size,
+    `${caughtDrift.length}/${pySay.size} overrides go red when a single word in them is changed`);
 
   // Falsify on the edit that was actually made, not on a scrambled string: put the second "shit"
   // back and confirm the check goes red. An arm that mangles a line beyond recognition proves only

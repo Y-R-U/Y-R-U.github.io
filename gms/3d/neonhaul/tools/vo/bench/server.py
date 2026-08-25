@@ -47,6 +47,7 @@ import http.server, json, os, socket, socketserver, subprocess, sys, threading, 
 HERE = os.path.dirname(os.path.abspath(__file__))
 VO = os.path.dirname(HERE)
 TAKES = os.path.join(HERE, 'takes')     # scratch: one live take per line, swept on every start
+ANSWERS = os.path.join(HERE, 'answers.json')
 KEEP = os.path.join(HERE, 'keep')       # approved: ONE file per slot, stable name, survives
 PORT = int(os.environ.get('PORT', '8789'))
 SR = 24000
@@ -244,6 +245,25 @@ class H(http.server.SimpleHTTPRequestHandler):
         return super().do_HEAD() if head else super().do_GET()
 
     def do_POST(self):
+        if self.path.rstrip('/') == '/answers':
+            # The reliable way to get results off the phone. navigator.clipboard does not exist
+            # outside a secure context, and this server is plain http on a LAN address, so Copy
+            # could never have worked from a phone at all — on Android or on iOS. Saving to the
+            # server needs no clipboard, no permission and no secure context.
+            n = int(self.headers.get('Content-Length') or 0)
+            if n > 2_000_000:
+                return self.send_error(413)
+            try:
+                body = json.loads(self.rfile.read(n) or b'{}')
+            except Exception as e:
+                return self.send_error(400, str(e))
+            tmp = ANSWERS + '.tmp'
+            with open(tmp, 'w') as f:
+                json.dump(body, f, indent=1, ensure_ascii=False)
+            os.replace(tmp, ANSWERS)
+            print(f"  saved answers -> {os.path.basename(ANSWERS)}", flush=True)
+            return self._json({'ok': True})
+
         if self.path.rstrip('/') == '/keep':
             # Promote a scratch take to the slot's keeper. Aaron: *"I don't want endless copies of
             # the file. let me just correct and play, if i hit tick, that entry is the only one

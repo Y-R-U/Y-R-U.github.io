@@ -16,6 +16,8 @@ __pycache__/
 # re-split without regenerating; never shipped (~40 MB and redundant with the cut clips).
 tools/vo/raw/
 tools/vo/vw/
+# (raw/approved/ is inside raw/ and so is already local-only — the approved WAVs are the source a
+# shipped clip was built from, kept the same way the SUNO sources are.)
 
 # §S2-S audition intermediates — 23 MB of per-voice Kokoro takes and their treated copies, and the
 # 1.6 MB of mp3 the audition page is assembled FROM them. Same rule as raw/ above: the takes that
@@ -29,3 +31,9 @@ tools/vo/audition/clips/
 # and every one reproducible from the text printed beside it in the page. The BENCH is committed;
 # what it renders is not.
 tools/vo/bench/takes/
+# The bench's working copies of approved takes. The COPY THAT MATTERS is promoted by hand into
+# tools/vo/raw/approved/ (local, like raw/suno) and the treated clip it produces is what ships.
+tools/vo/bench/keep/
+# Whatever the page last saved. answers_manual.json — the pasted record of a real review — is
+# committed; this one is a scratch file that any tap overwrites.
+tools/vo/bench/answers.json

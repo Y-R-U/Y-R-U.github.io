@@ -51,6 +51,17 @@ RAW = os.path.join(VO, 'raw/story')
 # named for a slot REPLACES that slot's synthesis. Nothing here is generated and nothing here is
 # ever overwritten — see suno_src().
 RAW_SUNO = os.path.join(VO, 'raw/suno')
+# Takes Aaron approved on the bench (tools/vo/bench), moved here by hand from bench/keep/.
+#
+# Kokoro is NOT deterministic: the same text, voice and speed produce a different performance every
+# run. So "regenerate with the approved text" does NOT reproduce the take that was approved — it
+# rolls again. When he ticks a specific take, THAT audio is the deliverable, and re-synthesising it
+# would quietly ship a performance nobody signed off.
+#
+# A wav here is the RAW Kokoro take, so it still goes through stage 2 (room) exactly like a fresh
+# one — this replaces synthesis, not treatment. Same rule as raw/suno above: present means used,
+# absent is the normal case, nothing here is ever generated or overwritten.
+RAW_OK = os.path.join(VO, 'raw/approved')
 SUNO_EXT = ('.mp3', '.wav', '.m4a', '.flac')
 FFMPEG = os.environ.get('FFMPEG', '/opt/homebrew/bin/ffmpeg')
 FFPROBE = os.environ.get('FFPROBE', '/opt/homebrew/bin/ffprobe')
@@ -111,17 +122,52 @@ BOSS = [
                 'Then, if I am in a mood, we sell whoever was driving to whoever is buying.'),
     ('boss_07', 'Make the money. Soon.'),
 ]
+# ── WHAT IS SHOWN vs WHAT IS SPOKEN ────────────────────────────────────────
+#
+# A row is (slot, text) or (slot, text, say). `text` is the line — it is what the bubble shows and
+# it MUST match js/storyui.js word for word (gates_vo V4). `say` is optional and is what Kokoro is
+# handed instead.
+#
+# They diverge because good typography and good prosody want different characters. An interruption
+# is written with an em dash, because that is what being cut off looks like on a page — and
+# `for_say()` turns an em dash into a comma, which is the punctuation of somebody trailing off
+# politely rather than being talked over. Aaron found the fix on the bench: *"i used it to fix 'But'
+# (say 'But!' instead)."* The exclamation mark is a stage direction for the synthesiser and has no
+# business on screen.
+#
+# The risk this introduces is obvious and is gated: two strings that are allowed to differ can
+# silently come to say DIFFERENT THINGS, and the player would read one sentence and hear another.
+# So V4 also asserts that a `say` override reduces to the same WORDS as the line it speaks for —
+# punctuation may differ, vocabulary may not.
 PC = [
-    ('int1', 'But—'),
-    ('int2', 'Wait—'),
+    ('int1', 'But—', 'But!'),
+    ('int2', 'Wait—', 'Wait!'),
     ('int3', 'Just wait—'),
     # "but now I’m going to have to" was cut in S2-M. Aaron: *"It doesn’t sound good and is
     # implied anyway."* He is right on both counts — the clause is the line explaining itself, and
     # "I need to make that money fast" two sentences later already says it.
     # Aaron, 2026-08-25: *"the line that says shit twice, the 2nd one needs to be crap instead."*
+    # The `say` here is Aaron's, tuned on the bench and approved on the take it produced. The
+    # `;-,;-,;-` runs phonemise to a bare `;,;,;` — a run of punctuation with no words in it, which
+    # buys a beat between the sentences; the line goes 8.45 s to 9.1 s. His version also contained
+    # newlines, which do NOTHING here: for_say() collapses whitespace, so they were already spaces
+    # by the time Kokoro saw them, and the take he approved was rendered from exactly this string.
     ('close', 'Shit — they wouldn’t let me get a word in. What sort of crap has my Dad got '
-              'himself into? I shouldn’t even be flying this. I need to make that money fast.'),
+              'himself into? I shouldn’t even be flying this. I need to make that money fast.',
+     'Shit!;-,;-,;- They wouldn’t let me get a word in. What sort of crap has my Dad got '
+     'himself into? ;-,;-,;-,;- I shouldn’t even be flying this.;-,;-,;-,;- I need to make '
+     'that money fast.'),
 ]
+
+def spoken(row):
+    """The text handed to the synthesiser for a script row: the `say` override if it has one."""
+    return row[2] if len(row) > 2 else row[1]
+
+
+def shown(row):
+    """The text the bubble shows. Always element 1, never the override."""
+    return row[1]
+
 
 # Seconds per word the cast above actually produces, measured rather than assumed — used only by
 # the duration sanity check, which exists to catch a clip that decoded but said one word.
@@ -251,6 +297,12 @@ def suno_src(slot):
         if os.path.exists(p):
             return p
     return None
+
+
+def approved_src(slot):
+    """The bench-approved raw take for a slot, or None."""
+    p = os.path.join(RAW_OK, slot + '.wav')
+    return p if os.path.exists(p) else None
 
 
 def produced(src, dst, gain, bitrate='48k'):
@@ -463,7 +515,7 @@ def main():
         path = os.path.join(VO, 'script_boss.json')
         with open(path, 'w') as f:
             json.dump({'group': 'boss',
-                       'lines': [{'file': f'{slot}.mp3', 'text': for_say(t)} for slot, t in BOSS]},
+                       'lines': [{'file': f'{r[0]}.mp3', 'text': for_say(spoken(r))} for r in BOSS]},
                       f, indent=1, ensure_ascii=False)
         print(path)
         return 0
@@ -473,20 +525,27 @@ def main():
 
     plan = []
     if args.only != 'pc':
-        for slot, text in BOSS:
+        for row in BOSS:
+            slot, text = row[0], spoken(row)
             plan.append((slot, 'boss', text))
     if args.only != 'boss':
         for g in ['m', 'f', 'n']:
-            for stem, text in PC:
+            for row in PC:
+                stem, text = row[0], spoken(row)
                 plan.append((f'pc_{g}_{stem}', f'pc_{g}', text))
 
     covered = {slot for slot, _, _ in plan if suno_src(slot)}
     if covered:
         print(f"suno: {len(covered)} slot(s) performed, not synthesised — {', '.join(sorted(covered))}")
+    approved = {slot for slot, _, _ in plan if slot not in covered and approved_src(slot)}
+    if approved:
+        print(f"approved: {len(approved)} take(s) reused, not re-rolled — {', '.join(sorted(approved))}")
 
     if not args.verify:
+        for slot in approved:
+            shutil.copyfile(approved_src(slot), os.path.join(RAW, f'{slot}.wav'))
         need = [(os.path.join(RAW, f'{slot}.wav'), vk, text)
-                for slot, vk, text in plan if slot not in covered]
+                for slot, vk, text in plan if slot not in covered and slot not in approved]
         if need:
             synth(need)
         for slot, vk, text in plan:
@@ -501,7 +560,8 @@ def main():
     print(f"{len(results) - len(bad)}/{len(results)} ok · {total} B total · "
           f"mean {total // max(1, len(results))} B")
     clips = [{'slot': r['slot'], 'sec': r['sec'], 'rms': r['rms'], 'bytes': r['bytes'],
-              'src': 'suno' if r['slot'] in covered else 'kokoro'} for r in results]
+              'src': 'suno' if r['slot'] in covered
+                     else 'approved' if r['slot'] in approved else 'kokoro'} for r in results]
     # `--only` builds a SUBSET, and writing the manifest from that subset deletes the other twelve
     # clips from it — the files stay on disk and the game stops being told they exist. Found by
     # running `--only boss` while wiring the SUNO path in; it had been true since S2-E.
@@ -511,7 +571,7 @@ def main():
             prev = json.load(f)
         keep = {c['slot']: c for c in prev.get('clips', [])}
         keep.update({c['slot']: c for c in clips})
-        order = [s for s, _ in BOSS] + [f'pc_{g}_{stem}' for g in ('m', 'f', 'n') for stem, _ in PC]
+        order = [r[0] for r in BOSS] + [f'pc_{g}_{r[0]}' for g in ('m', 'f', 'n') for r in PC]
         clips = [keep[s] for s in order if s in keep]
     manifest = {'version': 1, 'voices': VOICES, 'takeSec': f0s, 'clips': clips}
     with open(path, 'w') as f:
