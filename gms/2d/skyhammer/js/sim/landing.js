@@ -80,9 +80,31 @@ export function approachBox(pad, plane) {
   };
 }
 
+/**
+ * The engine's idle target while you are near a pad. Lives here, next to the gate, because it is
+ * part of the landing rule and not part of the flight model — and because a number that only one
+ * call site reads is a number no gate can sabotage.
+ *
+ * It used to be `landSpeed * 0.8`, which is BELOW stall in every tier (198 against a 210 stall in
+ * a kestrel, 358 against 380 in a vector). So the aeroplane stalled every time it came near a
+ * carrier, and `flyToward` answers a stall by dragging the nose down at PHYS.stallDrop — the game
+ * took the controls away at exactly the moment the player needed to place the aeroplane in a
+ * 90-unit box, and put a STALL ribbon on the HUD while it did it. That was tolerable only while
+ * `speed < landSpeed` was an accept condition. It no longer is, so idling below stall buys
+ * nothing and costs the whole approach.
+ *
+ * `stall * 1.15` clears the stall RECOVERY threshold (`stall * 1.12`) with margin, so the flag can
+ * neither latch nor linger, and still slows you a long way: 242 against a 430 cruise in a kestrel,
+ * 437 against 900 in a vector. The ladder survives — the slow aeroplanes are still the easy ones.
+ */
+export function idleTarget(def) {
+  return Math.max((def.landSpeed || def.stall * 1.5) * 0.8, def.stall * 1.15);
+}
+
 export function makeLanding(world) {
   return {
     approachBox,
+    idleTarget,
 
     /** True inside the approach box of any pad. See plane.js. */
     nearPad(p) {

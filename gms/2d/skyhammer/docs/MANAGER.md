@@ -190,6 +190,15 @@ fix. Run `tools/campaign_gate.mjs`, and read the runtime line, not the structura
     148–269 units) is what makes that position the right one, and the gate checks every tier's
     touchdown lands inside the deck's ±170. Put the square amidships and the fast tiers roll off
     the bow — that is FALSIFY 1.
+- **The near-pad idle target was below stall in every tier, and had been all along.**
+  `landSpeed * 0.8` is 198 against a 210 stall in a kestrel and 358 against 380 in a vector, so the
+  aeroplane stalled *every* time it came near a carrier — and `flyToward` answers a stall by
+  dragging the nose down. **The game took the controls away at exactly the moment the player needed
+  to place it in a small box.** Only survivable while `speed < landSpeed` was an accept condition;
+  now it bought nothing. `landing.idleTarget` is `max(landSpeed * 0.8, stall * 1.15)`, above the
+  `stall * 1.12` recovery threshold so the flag can neither latch nor linger. It moved out of
+  `plane.js` and next to the gate for one reason: **a number only one call site reads is a number
+  no gate can sabotage.**
 - **`gfx/models/ground.js` imports `sim/landing.js`.** Deliberate, and the point of the exercise:
   the drawn approach box must BE the accept test, not a picture of it. Two copies of the rule had
   already drifted once — `ui/tutorial.js` carried a restatement under a comment promising it

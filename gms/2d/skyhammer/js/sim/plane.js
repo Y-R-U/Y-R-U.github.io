@@ -117,10 +117,11 @@ export function stepPlayer(p, world, dt) {
     p.hasWant = true;
   }
 
-  // Near a landing pad the engine comes back to idle, otherwise nothing under
-  // cruise is reachable in level flight and CONTRACTS §9 could never trigger.
+  // Near a landing pad the engine comes back to idle, so the aeroplane is slow enough to be
+  // PLACED — the approach square is 90 units wide and you cross it in 0.45 s at approach speed
+  // and 0.2 s at cruise. The target itself is `landing.idleTarget`, stated once next to the gate.
   if (!p._cfg) p._cfg = { ...p.def };
-  p._cfg.cruise = world.landing.nearPad(p) ? p.def.landSpeed * 0.8 : p.def.cruise;
+  p._cfg.cruise = world.landing.nearPad(p) ? world.landing.idleTarget(p.def) : p.def.cruise;
   p._cfg.stall = p.def.stall; p._cfg.vmax = p.def.vmax; p._cfg.turnRate = p.def.turnRate;
   flyToward(p, p.hasWant ? p.want : null, dt, p._cfg);
 

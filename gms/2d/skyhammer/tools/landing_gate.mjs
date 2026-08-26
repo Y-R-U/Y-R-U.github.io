@@ -67,11 +67,19 @@ const clampN = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
 // Each one is a REPLACEMENT world.landing.check, written the way the rule would look if the
 // claim in landing.js were false. They deliberately do not call approachBox.
 
-/** The rule two revisions ago: your AABB overlaps the pad's, anywhere on it, level and slow. */
+/**
+ * The obvious alternative design, and the geometry the first revision of this rule actually used:
+ * accept anywhere the plane's AABB overlaps the pad's — a 460 x 190 slab on the ship's centre —
+ * with today's direction rule and nothing else.
+ *
+ * It is stated with the CURRENT two conditions on purpose. The historical rule also demanded
+ * `speed < landSpeed` and `|ang| < 0.25`, and comparing that against a square that tests neither
+ * measures the conditions rather than the geometry, which is not the claim. The claim is that a
+ * 90-unit square somewhere specific is a real target and "be over the boat" is not.
+ */
 const sabOldSlab = (world) => (p) => {
   if (p.script || p.landed || p.dead) return;
-  if (Math.abs(p.ang) >= 0.25 || p.vx <= 0) return;
-  if (p.speed >= (p.def.landSpeed || p.def.stall * 1.3)) return;
+  if (p.vx <= 0) return;
   for (const e of world.ents) {
     if (e.kind !== 'pad' || e.dead) continue;
     if (Math.abs(p.x - e.x) > e.w + p.w || Math.abs(p.y - e.y) > e.h + p.h) continue;
@@ -122,7 +130,18 @@ const sabHuge = (world) => (p) => {
   }
 };
 
-const SAB = { slab: sabOldSlab, mid: sabAmidships, nodir: sabNoDir, huge: sabHuge };
+/**
+ * The only sabotage here that is not a `check` replacement. The near-pad idle target as it stood
+ * while `speed < landSpeed` was an accept condition: `landSpeed * 0.8`, which is below stall in
+ * every tier, so the aeroplane stalls in level flight near the ship and the nose drops on its own.
+ */
+const sabSubStall = (world) => {
+  const real = world.landing.check.bind(world.landing);
+  world.landing.idleTarget = (def) => (def.landSpeed || def.stall * 1.5) * 0.8;
+  return real;
+};
+
+const SAB = { slab: sabOldSlab, mid: sabAmidships, nodir: sabNoDir, huge: sabHuge, substall: sabSubStall };
 
 /**
  * One approach.
@@ -142,7 +161,7 @@ function attempt(planeId, startDx, holdY, profile, sab) {
   p.speed = p.def.cruise;
 
   const bot = profile === 'approach' ? makeAutopilot() : null;
-  let t = 0, entrySpeed = null, wentAround = false;
+  let t = 0, entrySpeed = null, wentAround = false, stalledNear = 0;
   const limit = profile === 'approach' ? 60 * 240 : 60 * 120;
   while (!world.over && !p.landed && t < limit) {
     if (bot) bot.step(world, 1 / 60);
@@ -153,11 +172,17 @@ function attempt(planeId, startDx, holdY, profile, sab) {
     if (!p.script) entrySpeed = p.speed;      // the last speed before the settle took over
     world.step(); world.drainEvents();
     if (!west && p.vx < -1) wentAround = true;
+    // The stall flag near the ship IN LEVEL FLIGHT is a defect, not a statistic: flyToward
+    // answers a stall by dragging the nose down, i.e. the game takes the controls away exactly
+    // where the player is trying to place the aeroplane in a 90-unit box. The |ang| filter is
+    // load-bearing — stalling out of a deliberate 0.8 rad climb is the flight model working, and
+    // the autopilot's go-around does exactly that. Only the level case is the throttle's fault.
+    if (!p.script && !p.landed && Math.abs(p.x - pad.x) < 1500 && p.stalling && Math.abs(p.ang) < 0.3) stalledNear++;
     if (!bot && (west ? p.x < pad.x - 3000 : p.x > pad.x + 3000)) break;
     if (bot && p.x > world.level.length - 200) break;
     t++;
   }
-  return { landed: p.landed, entrySpeed: p.landed ? entrySpeed : null, wentAround,
+  return { landed: p.landed, entrySpeed: p.landed ? entrySpeed : null, wentAround, stalledNear,
            touchdownX: p.landed ? p.x - pad.x : null };
 }
 
@@ -165,10 +190,12 @@ function sweep(profile, sab) {
   const rows = [];
   for (const def of PLANES) {
     let landed = 0, first = 0, tried = 0, esLo = Infinity, esHi = -Infinity, tdLo = Infinity, tdHi = -Infinity;
+    let stalls = 0;
     for (const dx of STARTS) {
       for (const alt of ALTS) {
         const r = attempt(def.id, dx, alt, profile, sab);
         tried++;
+        if (r.stalledNear) stalls++;
         if (r.landed) {
           landed++;
           if (!r.wentAround) first++;
@@ -178,7 +205,7 @@ function sweep(profile, sab) {
       }
     }
     rows.push({ id: def.id, cruise: def.cruise, landSpeed: def.landSpeed ?? Math.round(def.stall * 1.5),
-                landed, first, tried, esLo, esHi, tdLo, tdHi });
+                landed, first, tried, esLo, esHi, tdLo, tdHi, stalls });
   }
   return rows;
 }
@@ -213,11 +240,17 @@ const wrong = report('WRONGWAY (crude pass, flying west)', sweep('wrongway', nul
 console.log(`\n("speed at the gate" is the speed on the tick before the settle took over. It is well over`);
 console.log(` landSpeed on purpose — arriving fast is allowed now; only position and direction are tested.)`);
 console.log(`(the deck is pad.x -170 .. +170; every touchdown above must be inside that or the aeroplane landed on water)`);
+// The LEVEL profile is the instrument for this one: it holds altitude by construction, so every
+// stall it records is the near-pad throttle's doing and nothing else.
+const stalled = level.rows.filter((r) => r.stalls);
 const off = offDeck(level, appr);
 console.log(off.length ? `OFF-DECK TOUCHDOWNS: ${off.map((r) => r.id).join(', ')}` : `every touchdown, both forward profiles, finished on the deck`);
 console.log(wrong.tot === 0 ? `no aeroplane, in any tier, landed while flying away from the ship` : `WRONG-WAY LANDINGS: ${wrong.tot}`);
+console.log(stalled.length
+  ? `STALLED IN LEVEL FLIGHT NEAR THE SHIP: ${stalled.map((r) => `${r.id} ${r.stalls}/${r.tried}`).join(', ')}`
+  : `no tier stalled in level flight within 1500 units of the ship, on any of the ${level.att} passes`);
 
-const clean = appr.tiersOk === PLANES.length && !off.length && wrong.tot === 0;
+const clean = appr.tiersOk === PLANES.length && !off.length && wrong.tot === 0 && !stalled.length;
 
 if (a.falsify) {
   if (!clean) {
@@ -251,13 +284,24 @@ if (a.falsify) {
   console.log(`         wrong-way landings: ${wrong.tot}/${wrong.att} with the rule, ${nodir.tot}/${nodir.att} without it`);
   results.push(['direction rule', nodir.tot > 0]);
 
-  // 4. THE TIGHTENING ITSELF. Claim: this square is meaningfully harder to blunder into than the
-  //    460x190 slab on the ship's centre that preceded it.
-  console.log(`\n--- FALSIFY 4: accept window pinned back to the old pad-centred slab ---`);
-  const slab = report('LEVEL    (old slab)', sweep('level', 'slab'), false);
+  // 4. THE GEOMETRY. Claim: a 90-unit square in one specific place is a real target, and the
+  //    obvious alternative — "accept anywhere over the boat", the 460x190 slab this rule started
+  //    life as — is something a pilot who is not trying to land blunders into.
+  console.log(`\n--- FALSIFY 4: accept window replaced by "your AABB overlaps the boat" ---`);
+  const slab = report('LEVEL    (overlap the boat)', sweep('level', 'slab'), false);
   console.log(`         crude-pass ratio: ${level.tot}/${level.att} with the square, ${slab.tot}/${slab.att} with the slab` +
               `  (x${(slab.tot / Math.max(1, level.tot)).toFixed(2)})`);
-  results.push(['tightening vs the old slab', slab.tot >= level.tot * 1.5]);
+  results.push(['square geometry vs "over the boat"', slab.tot >= level.tot * 1.5]);
+
+  // 5. THE NEAR-PAD THROTTLE. Claim: `landing.idleTarget` sits above stall, so the game does not
+  //    take the nose off the player mid-approach. Put it back to the `landSpeed * 0.8` it was
+  //    while speed gated the landing, and the level profile's stall counter must go off.
+  console.log(`\n--- FALSIFY 5: near-pad idle pushed back below stall ---`);
+  const sub = report('LEVEL    (idle below stall)', sweep('level', 'substall'), false);
+  const subStalls = sub.rows.filter((r) => r.stalls);
+  console.log(`         tiers stalling near the ship: ${subStalls.length}/9 with the idle below stall,` +
+              ` ${stalled.length}/9 with it above`);
+  results.push(['near-pad idle above stall', subStalls.length > 0]);
 
   const bad = results.filter(([, ok]) => !ok);
   console.log(bad.length
