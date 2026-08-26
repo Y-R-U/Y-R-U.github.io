@@ -121,6 +121,9 @@ export async function createUI(opts) {
     host.className = 'screen s-' + name;
     root.appendChild(host);
     mod.mount(host, ctx, ctx.args);
+    // main.js listens so the music can follow the screen. The router does not know or care what
+    // a track is; it just says where the player now is.
+    if (opts.onScreen) { try { opts.onScreen(name, ctx.args); } catch (e) { console.warn('[ui] onScreen', e); } }
     requestAnimationFrame(() => host.classList.add('in'));
     return host;
   }
@@ -151,6 +154,7 @@ export async function createUI(opts) {
     currentName = null;
     root.removeAttribute('data-screen');
     resetHud();
+    if (opts.onScreen) { try { opts.onScreen(null); } catch { /* the menus are gone; nothing to do */ } }
   };
   ctx.screenName = () => currentName;
 

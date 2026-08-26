@@ -158,6 +158,27 @@ let finished = false;
 let hudCtx = null;
 let camPanel = null;
 
+// ----------------------------------------------------------------- menu music
+// The victory / defeat sting plays over the results screen and then that track ends, and nothing
+// started anything else — so walking back out to the menus left the game silent until the next
+// mission. The music follows the screen now.
+//
+// `null` for a screen means "leave whatever is playing alone": results has just been handed the
+// victory sting deliberately, and pause and settings sit over music that should keep going.
+const MENU_MUSIC = {
+  title: 'title', modeselect: 'title', levelselect: 'title',
+  hangar: 'hangar', brief: 'brief',
+  settings: null, pause: null, results: null,
+};
+
+function menuMusic(screen) {
+  if (!screen) return;                       // the menus closed; startLevel owns the music now
+  const ctxName = MENU_MUSIC[screen];
+  if (!ctxName) return;
+  audio.music(ctxName);
+  setIntensity(0);
+}
+
 // ------------------------------------------------------------- music intensity
 // Drives the march -> heavy drop. Deliberately smoothed and slow: the audio layer has its own
 // hysteresis, but feeding it a value that spikes on every flak burst would fight it.
@@ -467,6 +488,7 @@ if (OPT.ui) {
       // menu sitting over a game that was already running again.
       resume: () => { setPaused(false); ui.close(); },
       quit: () => { setPaused(true); leaveLevel(); },
+      onScreen: menuMusic,
     });
     window.__ui = ui;
     uiRef = ui;

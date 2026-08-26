@@ -5,10 +5,11 @@ import { cash } from '../units.js';
 import { startAttract, stopAttract } from '../attract.js';
 import { nextLevel, totalStars, maxStars, getMoney } from '../model.js';
 import { buzz } from '../prefs.js';
-import { goFullscreen as go, autoFullscreenDevice } from '../../core/fullscreen.js';
+import { goFullscreen as go, autoFullscreenDevice, toggleFullscreen, isFullscreen, fullscreenSupported } from '../../core/fullscreen.js';
 
 let armed = false;   // module-level: only ever prompt for the first tap once per load
 let armEl = null;
+let sync = null;   // fullscreen button label follower, torn down in unmount()
 
 export function mount(root, ctx) {
   const { data, save } = ctx;
@@ -25,7 +26,11 @@ export function mount(root, ctx) {
     el('div.chip.stars', {}, el('span.star-dot'), el('span', {}, `${stars}/${starMax}`))
   ));
 
+  // Fullscreen lives on the TITLE screen, not only on pause. Aaron: quitting to write notes on a
+  // phone left no way back into fullscreen short of starting a level to reach the pause menu, or
+  // reloading. It has to be a button because the browser only honours the request from a gesture.
   root.appendChild(el('div.title-tr', {},
+    fsBtn(),
     btn('icon ghost hangar', '', () => ctx.go('hangar'), { aria: 'Hangar' }),
     btn('icon ghost cog', '', () => ctx.go('settings', { from: 'title' }), { aria: 'Settings' })
   ));
@@ -74,9 +79,23 @@ export function mount(root, ctx) {
   }
 }
 
+function fsBtn() {
+  if (!fullscreenSupported()) return null;
+  const b = btn('icon ghost fsx', '', async () => {
+    await toggleFullscreen(document.documentElement);
+    sync();
+  }, { aria: 'Fullscreen' });
+  // the browser can drop fullscreen without asking us (Escape, a swipe, the system UI)
+  sync = () => { b.classList.toggle('on', isFullscreen()); b.setAttribute('aria-label', isFullscreen() ? 'Leave fullscreen' : 'Fullscreen'); };
+  sync();
+  document.addEventListener('fullscreenchange', sync);
+  return b;
+}
+
 export function unmount() {
   stopAttract();
   armEl = null;
+  if (sync) { document.removeEventListener('fullscreenchange', sync); sync = null; }
 }
 
 /**

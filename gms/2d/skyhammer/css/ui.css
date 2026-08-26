@@ -37,6 +37,26 @@
 #ui:not([data-screen]) { pointer-events: none; }
 #ui[data-screen] { pointer-events: auto; }
 
+/* The backdrop lives on the ROUTER, not on the screen.
+   .screen fades in from opacity 0 over .22s and carries its own background on a ::before INSIDE
+   itself, so for the whole of that fade there was nothing between the player and the bright game
+   canvas — every menu-to-menu move flashed the playfield. data-screen is set before the incoming
+   screen mounts and is only cleared when the menus are dismissed entirely, so painting here
+   covers the gap in both directions. Pause and results are excluded on purpose: they are meant
+   to show the frozen game behind their own scrim. */
+#ui[data-screen]:not([data-screen="pause"]):not([data-screen="results"])::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 80% at 62% 104%, rgba(255, 176, 96, .38) 0%, rgba(255, 176, 96, 0) 58%),
+    linear-gradient(180deg, #3d5573 0%, #6c6a86 34%, #9d7d8a 60%, #c68a70 82%, #7a4e36 100%);
+  z-index: -3;
+}
+/* The title's attract canvas covers the frame itself; it just must not be a bright playfield
+   underneath while it fades up. */
+#ui[data-screen="title"]::before { background: #0b0d12; }
+
 .screen {
   position: absolute;
   inset: 0;
@@ -119,6 +139,13 @@
 .btn.hangar::before {
   background-size: 22px 22px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffc46b' stroke-width='1.9' stroke-linejoin='round'%3E%3Cpath d='M3 20V11l9-6 9 6v9'/%3E%3Cpath d='M7 20v-6h10v6'/%3E%3C/svg%3E");
+}
+.btn.fsx::before {
+  background-size: 20px 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffc46b' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'/%3E%3C/svg%3E");
+}
+.btn.fsx.on::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffc46b' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5'/%3E%3C/svg%3E");
 }
 .btn.arrow::before {
   background-size: 22px 22px;
