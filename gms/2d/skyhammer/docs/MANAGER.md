@@ -154,8 +154,18 @@ fix. Run `tools/campaign_gate.mjs`, and read the runtime line, not the structura
 5. **The five bosses have still never been looked at.** Only `boss_ironduke` has been seen, and
    only from a distance. Hold the captures until ART reports, or you will be looking at a
    half-edited scene and drawing conclusions from it.
-6. **Nothing has ever run on a real phone.** The fps readout exists now (Settings → Show frame
-   rate) purely so that measurement can happen. Aaron felt it was "fast at least".
+6. ~~Nothing has ever run on a real phone.~~ **MEASURED 2026-08-27, and it is fine.** Aaron, on a
+   Samsung S22 Ultra (4.5 years old, high end for its day, 120 Hz panel): **mostly 100-120 fps**,
+   with two momentary dips to ~80 and nothing sustained. Read that as riding the display refresh
+   rather than being GPU-bound — the sim is a fixed 60 Hz accumulator and the renderer
+   interpolates, so anything above 60 is headroom, not wasted work.
+
+   What this does and does not tell us: it says the ceiling is comfortable and the art pass has
+   room. It says nothing about the floor — a mid-range or older phone has not been touched, and
+   `prefs.reduceFx` exists for exactly that and has never been exercised on hardware. The two
+   dips are worth an eye if they ever get worse: the plausible causes are a palette re-bake on a
+   biome change and the explosion plate bakes, both of which are one-off costs at a moment the
+   player is likely to notice.
 7. **Acts 2-5 carry placeholder names** ("Wider War 3") and are untuned beyond being winnable.
 
 ### Two things Aaron is owed, personally
