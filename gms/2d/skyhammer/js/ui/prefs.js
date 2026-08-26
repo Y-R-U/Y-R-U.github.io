@@ -11,6 +11,7 @@ export const DEFAULTS = Object.freeze({
   speedUnit: 'mph',   // mph | kmh | kn
   altUnit: 'ft',      // ft | m
   musicOff: {},       // { [trackId]: true } — the tracks the player has switched off
+  fps: false,         // corner frame-rate readout — off by default, on for measuring a real device
 });
 
 let bound = null;     // { save, audio }

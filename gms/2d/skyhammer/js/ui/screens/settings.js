@@ -35,7 +35,10 @@ export function mount(root, ctx) {
   list.appendChild(row('Sound effects', 'Guns, blasts, the radio.', 'sfx'));
   list.appendChild(row('Haptics', 'A short buzz on hits and kills.', 'haptics'));
   list.appendChild(row('Reduce effects', 'Fewer particles and no bloom — for older phones.', 'reduceFx'));
-  list.appendChild(row('Fullscreen', 'Go fullscreen on launch, and again when you resume.', 'fullscreen'));
+  // Phones auto-request fullscreen; desktop is offered a button instead, so the copy has to be
+  // honest about which behaviour this switch actually governs.
+  list.appendChild(row('Fullscreen', 'Take fullscreen automatically on phones. Desktop is always asked, never grabbed.', 'fullscreen'));
+  list.appendChild(row('Show frame rate', 'A small readout in the corner. Nobody has measured this game on a real phone yet.', 'fps'));
 
   list.appendChild(pickRow('Thumb layout', 'Which side the four weapon buttons sit on.',
     [{ id: 'left', label: 'LEFT' }, { id: 'right', label: 'RIGHT' }],

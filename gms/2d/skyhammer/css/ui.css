@@ -892,3 +892,19 @@
   .screen, .toast, .pop-scrim { transition: none; }
   .ev-dot, .radio-dot, .arm-inner { animation: none; }
 }
+
+/* ------------------------------------------------ boss taunt on the briefing
+   STORY.BOSS_TAUNT, which was written and never displayed. Deliberately unlike the CONTROL
+   radio card above it — this is the thing you are flying at, not your own side talking. */
+.brief-taunt {
+  margin: 10px 0 2px;
+  padding: 9px 12px;
+  border-left: 2px solid #b6462f;
+  background: linear-gradient(90deg, rgba(120, 34, 20, 0.30), rgba(120, 34, 20, 0.04));
+  border-radius: 3px;
+}
+.taunt-head {
+  font: 700 9px/1 system-ui, sans-serif; letter-spacing: 0.20em;
+  color: #ff9b7a; margin-bottom: 5px;
+}
+.taunt-line { font: 500 13px/1.45 Georgia, serif; color: #f0d3c4; margin: 0; }

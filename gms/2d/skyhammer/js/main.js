@@ -190,7 +190,9 @@ function startLevel(id, mode) {
   save.load();
   const level = levelById(id || OPT.level);
   currentMode = mode || 'story';
-  world = createWorld({ level, seed: OPT.seed ?? level.seed, save: save.data });
+  // `mode` is passed through to the sim, which consults sim/modes.js for the rule table. Story
+  // is the no-op case, so a world built without a mode behaves exactly as it always has.
+  world = createWorld({ level, seed: OPT.seed ?? level.seed, save: save.data, mode: currentMode });
   bot = OPT.auto ? makeAutopilot() : null;
   finished = false;
   paused = false;

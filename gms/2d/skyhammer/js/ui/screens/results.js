@@ -55,7 +55,10 @@ export function mount(root, ctx) {
 
   root.appendChild(el('div.res-body', {}, left, right));
 
-  const beat = milestone(data, a.levelId);
+  // The act's closing line takes precedence over a milestone: an act outro is a bigger moment,
+  // and stacking two radio cards on one debrief reads as noise. STORY.ACT_OUTRO was written and
+  // nothing had ever read it.
+  const beat = (win ? actOutro(data, lv, data.LEVELS) : null) || milestone(data, a.levelId);
   if (beat) {
     left.appendChild(el('div.res-beat', {},
       el('div.radio-head', {}, el('span.radio-dot'), beatSpeaker(data, beat)),
@@ -92,6 +95,21 @@ function milestone(data, levelId) {
   const S = data && data.STORY;
   if (!S || !S.MILESTONE_BEATS || !levelId) return null;
   return S.MILESTONE_BEATS.find((b) => b.after === levelId) || null;
+}
+
+/**
+ * The act-closing beat, on the debrief of the level that ends an act — i.e. the last level whose
+ * `act` matches before the number changes. Keyed off position in LEVELS rather than a flag, so
+ * appending generated levels to an act moves the outro along with it automatically.
+ */
+function actOutro(data, lv, LEVELS) {
+  const O = data && data.STORY && data.STORY.ACT_OUTRO;
+  if (!O || !lv || !Array.isArray(LEVELS)) return null;
+  const i = LEVELS.indexOf(lv);
+  if (i < 0) return null;
+  const next = LEVELS[i + 1];
+  if (next && next.act === lv.act) return null;      // not the last level of the act
+  return O[lv.act] || null;
 }
 
 function beatSpeaker(data, beat) {

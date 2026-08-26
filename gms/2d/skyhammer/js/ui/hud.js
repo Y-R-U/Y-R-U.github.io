@@ -150,9 +150,46 @@ export function drawHud(g, world, screen) {
   drawPause(g);
   drawTakeoff(g, world);
   drawVignette(g, world, screen, t);
+  if (prefs.fps) drawFps(g, screen);
 
   g.globalAlpha = 1;
   g.globalCompositeOperation = 'source-over';
+  g.restore();
+}
+
+/* --------------------------------------------------------------------- fps
+   Measured HERE rather than read off the loop's own stats, because this is the number that
+   matters: how often a frame actually reaches the glass on the player's device. Nobody has run
+   this game on a real phone yet, so the readout exists to be looked at, not to be pretty. */
+
+let fpsLast = 0, fpsAcc = 0, fpsN = 0, fpsShown = 0, fpsWorst = 0;
+
+function drawFps(g, screen) {
+  const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+  if (fpsLast) {
+    const ms = now - fpsLast;
+    if (ms > 0 && ms < 500) { fpsAcc += ms; fpsN++; if (ms > fpsWorst) fpsWorst = ms; }
+  }
+  fpsLast = now;
+  if (fpsAcc >= 500) {
+    fpsShown = 1000 / (fpsAcc / fpsN);
+    fpsAcc = 0; fpsN = 0;
+    fpsWorst *= 0.6;                   // decay, so one hitch does not brand the readout forever
+  }
+  const txt = `${fpsShown.toFixed(0)} fps  ${fpsWorst.toFixed(0)}ms worst`;
+  g.save();
+  g.font = '600 10px ui-monospace, Menlo, monospace';
+  // Bottom-left: the only corner nothing else claims. Top-right is the weapon strip, top-centre
+  // the minimap, top-left the status bars, bottom-right the thumb buttons.
+  g.textAlign = 'left';
+  g.textBaseline = 'bottom';
+  const x = 8, y = screen.h - 6;
+  g.globalAlpha = 0.85;
+  g.fillStyle = 'rgba(6,8,12,0.55)';
+  const wpx = g.measureText(txt).width + 8;
+  g.fillRect(x - 2, y - 13, wpx, 15);
+  g.fillStyle = fpsShown < 45 ? '#ff9b7a' : '#9fe8b0';
+  g.fillText(txt, x + 2, y - 1);
   g.restore();
 }
 

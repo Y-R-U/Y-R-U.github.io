@@ -65,6 +65,7 @@ export function mount(root, ctx) {
       el('div.radio-head', {}, el('span.radio-dot'), speakerName(data, actIntro(lv, data, LEVELS, idx)) || 'CONTROL'),
       el('p.radio-line', {}, (actIntro(lv, data, LEVELS, idx) || {}).text || lv.intro || '—')
     ),
+    bossTaunt(lv, data),
     opfor(lv, data),
     plane ? el('div.brief-plane', {},
       planeCanvas(plane.shape, 160, 68),
@@ -124,6 +125,22 @@ export function mount(root, ctx) {
 }
 
 export function unmount() {}
+
+/**
+ * The boss's line, on the briefing for a level that actually spawns one. STORY.BOSS_TAUNT was
+ * written for exactly this and nothing read it. Keyed off the spawned enemy id rather than a
+ * flag on the level, so it cannot drift out of step with what the mission really contains.
+ */
+function bossTaunt(lv, data) {
+  const T = data && data.STORY && data.STORY.BOSS_TAUNT;
+  if (!T) return null;
+  const ids = [...(lv.spawns || []), ...(lv.waves || [])].map((x) => x.def || x.kind);
+  const id = ids.find((k) => T[k]);
+  if (!id) return null;
+  return el('div.brief-taunt', {},
+    el('div.taunt-head', {}, 'THREAT'),
+    el('p.taunt-line', {}, T[id]));
+}
 
 /** The act-opening beat, if this is the first mission of its act; else null. */
 function actIntro(lv, data, LEVELS, idx) {
