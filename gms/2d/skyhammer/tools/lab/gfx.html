@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SKYHAMMER — gfx lab</title>
+<style>
+  html,body { margin:0; height:100%; background:#05070c; overflow:hidden; font:13px/1.35 ui-monospace,Menlo,monospace; color:#cfd8e3; }
+  #wrap { position:fixed; inset:0; }
+  canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+  #hud { pointer-events:none; }
+  #ui { position:fixed; left:8px; bottom:8px; right:8px; display:flex; flex-wrap:wrap; gap:4px; z-index:5; }
+  #ui button, #ui select { font:600 12px ui-monospace,Menlo,monospace; background:#141c27; color:#cfd8e3;
+    border:1px solid #2b3a4d; border-radius:5px; padding:5px 8px; cursor:pointer; }
+  #ui button.on { background:#2a4a2f; border-color:#4d7a55; }
+  body.photo #ui { display:none; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../../vendor/three/three.module.js", "three/addons/": "../../vendor/three/addons/" } }
+</script>
+</head>
+<body>
+<div id="wrap"><canvas id="gl"></canvas><canvas id="hud"></canvas></div>
+<div id="ui"></div>
+<script type="module" src="./lab.js"></script>
+</body>
+</html>

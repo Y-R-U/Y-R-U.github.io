@@ -1,0 +1,72 @@
+// Campaign map: every level grouped by act, locked/unlocked, stars. Scrolls vertically.
+
+import { el, btn, topbar, toast } from '../widgets.js';
+import { iconCanvas } from '../icons.js';
+import * as M from '../model.js';
+
+let scrollMemo = 0;
+
+export function mount(root, ctx) {
+  const { data, save } = ctx;
+  const LEVELS = data.LEVELS;
+
+  root.appendChild(topbar(ctx, 'CAMPAIGN', { back: () => ctx.go('title'), screen: 'levelselect' }));
+
+  if (!LEVELS.length) {
+    root.appendChild(el('div.empty', {}, 'No levels in data/levels.js yet'));
+    return;
+  }
+
+  const groups = M.acts(LEVELS, data.ACTS);
+  const scroller = el('div.map-scroll');
+
+  const jump = el('div.act-jump');
+  for (const g of groups) {
+    jump.appendChild(btn('chipbtn', 'ACT ' + g.act, () => {
+      const h = scroller.querySelector(`[data-act="${g.act}"]`);
+      if (h) scroller.scrollTo({ top: h.offsetTop - 6, behavior: 'smooth' });
+    }));
+  }
+  jump.appendChild(el('div.spacer'));
+  jump.appendChild(el('div.chip.stars', {}, el('span.star-dot'),
+    el('span', {}, `${M.totalStars(save, LEVELS)}/${LEVELS.length * 3}`)));
+  root.appendChild(jump);
+
+  for (const g of groups) {
+    const got = g.levels.reduce((n, x) => n + M.levelStars(save, x.level.id), 0);
+    scroller.appendChild(el('div.act-head', { dataAct: String(g.act) },
+      el('span.act-n', {}, 'ACT ' + g.act),
+      el('span.act-name', {}, g.name),
+      el('span.act-stars', {}, `${got}/${g.levels.length * 3}`)
+    ));
+
+    const grid = el('div.lv-grid');
+    for (const { level, index } of g.levels) {
+      const unlocked = M.levelUnlocked(save, LEVELS, index);
+      const stars = M.levelStars(save, level.id);
+      const num = level.id.split('-').pop();
+      const tile = el('div.lv' + (unlocked ? '' : '.locked') + (stars ? '.done' : ''), { title: level.name });
+      if (unlocked) {
+        tile.appendChild(el('span.lv-n', {}, num));
+        tile.appendChild(el('span.lv-name', {}, level.name));
+        tile.appendChild(el('span.lv-stars', {},
+          el('i.s' + (stars > 0 ? '.on' : '')), el('i.s' + (stars > 1 ? '.on' : '')), el('i.s' + (stars > 2 ? '.on' : ''))));
+        tile.addEventListener('click', () => {
+          scrollMemo = scroller.scrollTop;
+          ctx.go('brief', { levelId: level.id, mode: 'story' });
+        });
+      } else {
+        tile.appendChild(iconCanvas('lock', 18, 'rgba(190,175,150,0.4)'));
+        tile.appendChild(el('span.lv-n.dim', {}, num));
+        tile.addEventListener('click', () => toast('Fly the previous mission first', 'bad'));
+      }
+      grid.appendChild(tile);
+    }
+    scroller.appendChild(grid);
+  }
+
+  root.appendChild(scroller);
+  requestAnimationFrame(() => { scroller.scrollTop = scrollMemo; });
+}
+
+export function unmount() {}

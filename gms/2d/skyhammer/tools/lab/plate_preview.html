@@ -1,0 +1,91 @@
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SKYHAMMER plate preview (background bakes only)</title>
+<style>html,body{margin:0;background:#111;overflow:hidden}canvas{display:block;width:100vw;height:100vh}</style>
+<canvas id=c></canvas>
+<script type="module">
+// Preview harness for the PROCEDURAL BACKGROUND BAKES ONLY (sky strip, 16 cloud sprites,
+// mountain + hill bands, earth band). Not a game renderer. Exists so the cloud/sky textures
+// that transfer to the Three.js build can actually be looked at before they are handed over.
+import { getPalette, paletteKey } from '../../js/gfx/palette.js';
+import { makeView } from '../../js/gfx/dead2d/view.js';
+import { makeSky } from '../../js/gfx/dead2d/sky.js';
+import { makeClouds } from '../../js/gfx/dead2d/clouds.js';
+import { makeTerrainPainter } from '../../js/gfx/dead2d/terrain_paint.js';
+
+const q = new URLSearchParams(location.search);
+const biome = q.get('biome') || 'farmland';
+const tod = q.get('tod') || 'dawn';
+const camX0 = Number(q.get('camx') || 3000);
+
+// The dead2d modules predate the palette restructure; adapt the new pure-data shape to the old flat one.
+const adapt = (p) => ({
+  sky: p.sky.stops, bloom: p.sky.glow, bloomK: p.sky.glowK,
+  sunX: p.sun.screenX, sunCol: p.sun.col, sunK: p.sun.discK,
+  earth: p.earth.albedo, earthDeep: p.earth.deep, earthRim: p.earth.rim,
+  grass: p.earth.grass, snow: p.earth.snow,
+  far: p.band.far, mid: p.band.mid, treeline: p.band.treeline, haze: p.band.haze, hazeK: p.fog.k,
+  cloudTop: p.cloud.top, cloudBot: p.cloud.bot, cloudA: p.cloud.alpha,
+  fire: p.fx.fire, accent: p.fx.accent, prop: p.prop, water: p.water, star: p.star,
+});
+
+const key = paletteKey(biome, tod);
+const pal = adapt(getPalette(biome, tod));
+
+const terrain = {
+  heightAt(x) {
+    if (biome === 'sea') return -260;
+    // NOTE: with CAM.baseY -170 and vh 900, keeping the crest near y ~ -20 is what gives the
+    // reference's ~10% earth band. Heights in the 60-420 range bury the frame in ground.
+    const b = Number(q.get('gy') ?? (biome === 'alpine' ? 40 : -30));
+    return b + Math.sin(x * 0.00042) * 55 + Math.sin(x * 0.00121 + 1.7) * 26
+             + Math.sin(x * 0.0037 + 0.4) * 9;
+  },
+};
+const world = { terrain, level: { biome, timeOfDay: tod } };
+
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const view = makeView();
+const sky = makeSky(), clouds = makeClouds(), terr = makeTerrainPainter();
+sky.setPalette(pal, key); clouds.setPalette(pal, key); terr.setPalette(pal, key, biome);
+
+const dpr = Math.min(2, Number(q.get('dpr')) || window.devicePixelRatio || 1);
+let W = 0, H = 0;
+function resize() {
+  W = Math.round(innerWidth); H = Math.round(innerHeight);
+  canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+}
+resize(); addEventListener('resize', resize);
+
+let t0 = performance.now(), frames = 0, ms = [];
+function frame(now) {
+  const t = (now - t0) / 1000;
+  const camX = camX0 + t * 260;
+  const vw = Math.max(1150, Math.min(2200, 900 * (W / H)));
+  view.set(W, H, { x: camX, y: -170, vw, vh: 900, scale: H / 900, shakeX: 0, shakeY: 0 }, -170);
+
+  const t1 = performance.now();
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  sky.draw(ctx, view);
+  clouds.draw(ctx, view, 0);
+  terr.drawFar(ctx, view);
+  clouds.draw(ctx, view, 1);
+  terr.drawMid(ctx, view);
+  clouds.draw(ctx, view, 2);
+  terr.drawNear(ctx, view, world, t);
+  const dt = performance.now() - t1;
+  ms.push(dt); if (ms.length > 180) ms.shift();
+  frames++;
+
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.font = '11px monospace'; ctx.fillStyle = 'rgba(0,0,0,.5)';
+  ctx.fillRect(4, 4, 240, 18);
+  ctx.fillStyle = '#8f8';
+  const sorted = [...ms].sort((a, b) => a - b);
+  const p95 = sorted[Math.floor(sorted.length * 0.95)] || 0;
+  ctx.fillText(`${key} ${W}x${H} draw p95 ${p95.toFixed(2)}ms`, 8, 17);
+  window.__state = { key, W, H, p95, frames };
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>

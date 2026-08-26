@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SKYHAMMER · UI lab</title>
+<link rel="stylesheet" href="../../css/ui.css">
+<style>
+  html, body { margin: 0; height: 100%; background: #0c0906; overflow: hidden; }
+  /* shot.mjs captures document.querySelector('canvas'), so #shot must be the FIRST canvas. */
+  #shot { position: fixed; top: 0; left: 0; }
+  #shot.off { left: -99999px; }
+  #labbar {
+    position: fixed; bottom: 0; left: 0; z-index: 200;
+    font: 11px/1 ui-sans-serif, system-ui, sans-serif; color: #b8a68c;
+    background: rgba(0,0,0,.7); padding: 3px 7px; border-top-right-radius: 6px;
+    pointer-events: none;
+  }
+  #labbar.hide { display: none; }
+</style>
+</head>
+<body>
+<canvas id="shot" class="off"></canvas>
+<div id="ui"></div>
+<div id="labbar"></div>
+
+<script type="module">
+import { createUI, SCREENS } from '../../js/ui/ui.js';
+import { drawHud, hudRects, resetHud, setProjector } from '../../js/ui/hud.js';
+import { all as allRects } from '../../js/ui/hitrects.js';
+import { setPref } from '../../js/ui/prefs.js';
+import { ENEMIES } from '../../js/data/enemies.js';
+
+const q = new URLSearchParams(location.search);
+const want = q.get('screen') || 'title';
+const dpr = Number(q.get('dpr')) || Math.min(2, devicePixelRatio || 1);
+
+/* ---------------------------------------------------------------- fake save */
+
+function fakeSave() {
+  const preset = q.get('save') || 'mid';
+  const base = {
+    money: 0, planes: null, planeId: null, upgrades: {}, weapons: null, loadout: [null, null, null, null],
+    levels: {}, settings: null,
+  };
+  if (preset === 'new') {
+    base.money = 300;
+  } else if (preset === 'rich') {
+    base.money = 96000;
+    base.planes = ['kestrel', 'harrier1', 'tempest', 'sabre'];
+    base.planeId = 'sabre';
+    base.upgrades = { sabre: { armor: 11, speed: 8, turn: 6, gun: 13, ammo: 5 } };
+    base.weapons = ['bomb_std', 'bomb_heavy', 'cluster', 'rocket', 'homing', 'napalm', 'bunker'];
+    base.loadout = ['bomb_heavy', 'rocket', 'napalm', 'homing'];
+    base.levels = { 'a1-01': { done: true, stars: 3, best: 68 }, 'a1-02': { done: true, stars: 2, best: 131 } };
+  } else {
+    base.money = 4820;
+    base.planes = ['kestrel', 'harrier1'];
+    base.planeId = 'harrier1';
+    base.upgrades = { harrier1: { armor: 4, speed: 3, turn: 2, gun: 6, ammo: 1 }, kestrel: { armor: 7 } };
+    base.weapons = ['bomb_std', 'cluster', 'rocket'];
+    base.loadout = ['bomb_std', 'rocket', null, null];
+    base.levels = { 'a1-01': { done: true, stars: 3, best: 74 } };
+  }
+  return { data: base, flush() {} };
+}
+
+const CONTEXTS = ['title', 'hangar', 'battle', 'battle', 'battle', 'boss', 'sting_win', 'sting_lose'];
+function fakeMusic(n) {
+  const out = [];
+  const names = ['Dawn Patrol', 'Angels One Five', 'Flak Alley', 'The Long Front', 'Iron Skies',
+    'Vapour Trails', 'Scramble', 'Hangar Doors', 'Last Light', 'Chalk and Sea',
+    'Bomber Stream', 'Nightfighter', 'Contrail Waltz', 'Sortie', 'Home Plate', 'Splash One'];
+  for (let i = 0; i < n; i++) {
+    const ctxId = CONTEXTS[i % CONTEXTS.length];
+    out.push({
+      id: 'demo_' + i, file: 'probe_ww2.mp3', name: names[i % names.length],
+      context: ctxId, intensity: i % 2 ? 'heavy' : 'march',
+      acts: i % 3 === 0 ? [] : [1 + (i % 4), 2 + (i % 4)],
+      bpm: 84 + (i * 7) % 60, key: 'Dm', pairId: 'p' + (i >> 1),
+      seconds: 62 + (i * 13) % 120, kb: 900,
+    });
+  }
+  return out;
+}
+
+const audio = {
+  unlock() { log('audio.unlock()'); },
+  sfx(id) { log('sfx ' + id); },
+  music(id) { log('music ' + id); },
+  setMusic(v) { log('music ' + (v ? 'on' : 'off')); },
+  setSfx(v) { log('sfx ' + (v ? 'on' : 'off')); },
+  duck() {},
+};
+
+const lines = [];
+function log(s) { lines.push(s); bar(); }
+function bar() {
+  document.getElementById('labbar').textContent =
+    `${want} · ${innerWidth}x${innerHeight} · ${lines.slice(-2).join(' | ')}`;
+}
+
+/* --------------------------------------------------------------- fake world */
+
+function fakeWorld(data) {
+  const len = 16000;
+  const cam = { x: 4200, y: -170, vw: 1950, vh: 900, scale: 1, shakeX: 0, shakeY: 0, shakeMag: 0 };
+  const player = {
+    kind: 'player', x: cam.x + 700, y: Number(q.get('alt') || 470), ang: -0.12,
+    hp: 96, hpMax: 220, fuel: 96, fuelMax: 600,
+    speed: Number(q.get('speed') || 430),
+    stalling: q.get('stall') === '1',
+    def: { slots: 4, stall: 230 },
+    slots: [
+      { id: 'bomb_heavy', ammo: 3, cd: 0, cdMax: 0.55 },
+      { id: 'rocket', ammo: 9, cd: 0.09, cdMax: 0.14 },
+      { id: 'napalm', ammo: 1, cd: 0, cdMax: 0.7 },
+      { id: 'nuke', ammo: 0, cd: 0, cdMax: 3 },
+    ],
+    slot: 1,
+  };
+  const ents = [player];
+  const mk = (o) => { ents.push(Object.assign({ hp: 1, hpMax: 1, w: 20, h: 20, r: 40, dead: false }, o)); };
+  mk({ kind: 'fighter', x: cam.x + 1500, y: 620, hp: 70, hpMax: 130, w: 25, h: 8, r: 40 });
+  mk({ kind: 'fighter', x: cam.x + 260, y: q.get('occlude') === '0' ? 430 : 730, hp: 130, hpMax: 130, w: 25, h: 8, r: 40 });
+  mk({ kind: 'fighter', x: 12800, y: 500, hp: 130, hpMax: 130 });
+  mk({ kind: 'balloon', x: cam.x + 980, y: q.get('occlude') === '0' ? 380 : 690, w: 19, h: 26, r: 30 });
+  mk({ kind: 'balloon', x: 9400, y: 560 });
+  const noAa = q.get('aa') === 'none';
+  const aaRow = noAa ? ENEMIES.bunker : (ENEMIES[q.get('aa') || 'flakHeavy'] || ENEMIES.flakHeavy);
+  mk({ kind: 'ground', x: cam.x + 420, y: 60, hp: 110, hpMax: 220, w: 30, h: 19, r: 40, objective: true, def: ENEMIES.bunker });
+  mk({ kind: 'ground', x: cam.x + 1180, y: 55, hp: 220, hpMax: 220, w: 30, h: 19, r: 40, objective: true, def: noAa ? ENEMIES.bunker : ENEMIES.tank });
+  mk({ kind: 'flak', x: cam.x + 1620, y: 50, hp: 40, hpMax: 90, w: 20, h: 16, r: 34, def: aaRow });
+  mk({ kind: 'ground', x: 13400, y: 60, hp: 180, hpMax: 220, objective: true });
+  mk({ kind: 'pad', x: 15600, y: 120, w: 170, h: 80, r: 180 });
+
+  return {
+    t: 63.4, frame: 3804,
+    level: { id: 'a1-02', name: 'Flak Alley', length: len },
+    cam, player, ents, projs: [], debris: [], events: [],
+    mission: { objectives: [{ type: 'destroy', count: 4, have: 2 }, { type: 'kill', kind: 'fighter', count: 3, have: 3, done: true }] },
+    stats: {}, over: null,
+  };
+}
+
+/* --------------------------------------------------------------- the canvas */
+
+const shot = document.getElementById('shot');
+const g = shot.getContext('2d');
+
+function sizeShot() {
+  shot.width = Math.round(innerWidth * dpr);
+  shot.height = Math.round(innerHeight * dpr);
+  shot.style.width = innerWidth + 'px';
+  shot.style.height = innerHeight + 'px';
+}
+addEventListener('resize', () => { sizeShot(); bar(); });
+sizeShot();
+
+/* ---------------- DOM -> canvas so the frozen capture tool can see the menus */
+
+let cssText = '';
+async function loadCss() {
+  try { cssText = await (await fetch('../../css/ui.css')).text(); } catch (e) { console.warn('css fetch', e); }
+}
+
+function cloneWithCanvases(node) {
+  const clone = node.cloneNode(true);
+  const src = node.querySelectorAll('canvas');
+  const dst = clone.querySelectorAll('canvas');
+  for (let i = 0; i < src.length; i++) {
+    const img = document.createElement('img');
+    img.setAttribute('src', src[i].toDataURL('image/png'));
+    img.setAttribute('width', String(src[i].clientWidth || src[i].width));
+    img.setAttribute('height', String(src[i].clientHeight || src[i].height));
+    img.setAttribute('style', dst[i].getAttribute('style') || '');
+    img.setAttribute('class', dst[i].getAttribute('class') || '');
+    dst[i].replaceWith(img);
+  }
+  return clone;
+}
+
+let rasterising = false;
+async function rasterise() {
+  if (rasterising || want === 'hud') return;
+  rasterising = true;
+  try {
+    const w = innerWidth, h = innerHeight;
+    const clone = cloneWithCanvases(document.getElementById('ui'));
+    clone.setAttribute('style', `position:absolute;inset:0;width:${w}px;height:${h}px`);
+    const body = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+    body.setAttribute('style', `width:${w}px;height:${h}px;position:relative;background:#0c0906`);
+    body.appendChild(clone);
+    const style = document.createElementNS('http://www.w3.org/1999/xhtml', 'style');
+    style.textContent = cssText;
+    body.insertBefore(style, body.firstChild);
+
+    const xml = new XMLSerializer().serializeToString(body);
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">` +
+      `<foreignObject width="100%" height="100%">${xml}</foreignObject></svg>`;
+    const img = new Image();
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    await img.decode();
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.fillStyle = '#0c0906';
+    g.fillRect(0, 0, w, h);
+    g.drawImage(img, 0, 0, w, h);
+  } catch (e) {
+    console.warn('[lab] rasterise failed:', e && e.message);
+  } finally {
+    rasterising = false;
+  }
+}
+window.__rasterise = rasterise;
+
+/* -------------------------------------------------------------------- audit */
+
+const TAPPABLE = '.btn, .slot:not(.locked), .wchip, .lv, .switch, .nudge, .mode-card:not(.locked)';
+
+function audit() {
+  const bad = [];
+  const rows = [];
+  if (want === 'hud') {
+    for (const r of hudRects()) {
+      rows.push({ id: r.id, w: Math.round(r.w), h: Math.round(r.h) });
+      if (Math.min(r.w, r.h) < 44) bad.push(`${r.id} ${Math.round(r.w)}x${Math.round(r.h)}`);
+    }
+  } else {
+    for (const n of document.querySelectorAll(TAPPABLE)) {
+      const r = n.getBoundingClientRect();
+      if (!r.width || !r.height) continue;
+      const id = (n.getAttribute('aria-label') || n.textContent || n.className).trim().slice(0, 26) || n.className;
+      rows.push({ id, w: Math.round(r.width), h: Math.round(r.height) });
+      if (Math.min(r.width, r.height) < 44) bad.push(`${id} ${Math.round(r.width)}x${Math.round(r.height)}`);
+    }
+  }
+  const res = { screen: want, size: `${innerWidth}x${innerHeight}`, count: rows.length, tooSmall: bad };
+  console.log('[audit] ' + JSON.stringify(res));
+  if (bad.length) for (const b of bad) console.log('[audit-fail] ' + b);
+  return { rows, ...res };
+}
+window.__audit = audit;
+
+/* ------------------------------------------------- HUD mechanism self-tests
+ * These do not look at how the HUD LOOKS. They assert the two things that broke against the real
+ * renderer and could not break in the lab's flat fake world:
+ *   1. the overlay is cleared, so nothing smears across frames;
+ *   2. world-anchored marks go through the projector, not the flat transform.
+ * Both are falsified in UI_NOTES by breaking hud.js and watching them fail.
+ * Everything runs synchronously in one task, so the lab's own rAF loop cannot interleave.
+ */
+
+function wipe() {
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.clearRect(0, 0, shot.width, shot.height);
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function frame() { return g.getImageData(0, 0, shot.width, shot.height).data; }
+
+function countIn(px, py, r) {
+  const d = g.getImageData(Math.round((px - r) * dpr), Math.round((py - r) * dpr),
+    Math.round(2 * r * dpr), Math.round(2 * r * dpr)).data;
+  let n = 0;
+  for (let i = 3; i < d.length; i += 4) if (d[i] > 8) n++;
+  return n;
+}
+
+/**
+ * A HUD that does not clear leaves frame A behind when frame B is drawn over it.
+ * Compares the PIXELS, not a pixel count: the first version of this test counted painted
+ * pixels and passed against a build that plainly smeared, because the damage vignette paints
+ * 43% of the screen and swallowed the difference.
+ */
+function clearTest() {
+  const w = innerWidth, h = innerHeight;
+  // full health: the damage vignette paints 43% of the screen and would mask everything
+  const lo = fakeWorld(); lo.player.y = 150; lo.player.hp = lo.player.hpMax;
+  const hi = fakeWorld(); hi.player.y = 2200; hi.player.hp = hi.player.hpMax;
+  // Strip the AA rows from both: the threat scan is throttled on world.t, and two draws at the
+  // SAME t leave the second frame reading the first frame's `hot`. That is a test artefact (the
+  // game never draws two frames at one t) but it is a real difference, and it masqueraded as a
+  // smear until the control run proved the HUD deterministic.
+  for (const wd of [lo, hi]) for (const e of wd.ents) e.def = null;
+
+  wipe(); resetHud(); drawHud(g, hi, { w, h });
+  const b = frame().slice();
+  wipe(); resetHud(); drawHud(g, hi, { w, h });     // control: the HUD must be deterministic
+  const b2 = frame().slice();
+  wipe(); resetHud(); drawHud(g, lo, { w, h }); drawHud(g, hi, { w, h });
+  const ab = frame();
+
+  const diffOf = (x) => { let n = 0; for (let i = 3; i < b.length; i += 4) if (Math.abs(b[i] - x[i]) > 8) n++; return n; };
+  const control = diffOf(b2);
+  const diff = diffOf(ab);
+  const pass = diff === 0 && control === 0;
+  console.log('[cleartest] ' + JSON.stringify({ pass, smearPx: diff, controlPx: control }));
+  if (!pass) console.log('[cleartest-fail] HUD does not clear: ' + diff + ' px of frame A survived');
+  return { pass, diff };
+}
+window.__cleartest = clearTest;
+
+/**
+ * Pin the projector so every world point lands on one spot. A world-anchored mark must LEAVE
+ * its flat-transform position and appear at the pinned one. Tests both halves, because a mark
+ * that merely gets drawn twice would pass a "did anything appear" check.
+ */
+function projTest() {
+  const w = innerWidth, h = innerHeight;
+  const world = fakeWorld();
+  world.player.hp = world.player.hpMax;             // kill the vignette, see note in clearTest
+  const e = world.ents.find((x) => x.kind === 'flak');
+  e.hp = e.hpMax * 0.5;
+  const cam = world.cam, sc = h / cam.vh;
+  const flat = { x: (e.x - cam.x) * sc, y: (cam.y + cam.vh - (e.y + (e.h || 20) + 14)) * sc };
+  const HIT = { x: Math.round(w * 0.62), y: Math.round(h * 0.42) };
+  const R = 16;   // small enough to clear the thumb buttons 18 px below the flat position
+
+  setProjector(null);
+  wipe(); resetHud(); drawHud(g, world, { w, h });
+  const flatBefore = countIn(flat.x, flat.y, R);
+
+  setProjector(() => HIT);
+  wipe(); resetHud(); drawHud(g, world, { w, h });
+  const flatAfter = countIn(flat.x, flat.y, R);
+  const hitAfter = countIn(HIT.x, HIT.y, R);
+  setProjector(null);
+
+  const pass = flatBefore > 120 && hitAfter > 120 && flatAfter < 30;
+  console.log('[projtest] ' + JSON.stringify({ pass, flat: [Math.round(flat.x), Math.round(flat.y)], flatBefore, flatAfter, hitAfter }));
+  if (!pass) console.log('[projtest-fail] world marks do not follow the projector');
+  return { pass, flatBefore, flatAfter, hitAfter };
+}
+window.__projtest = projTest;
+
+
+/* --------------------------------------------------------------------- boot */
+
+await loadCss();
+
+const save = fakeSave();
+const musicN = q.get('music') === 'none' ? 0 : Number(q.get('music') || 0);
+const ctx = await createUI({
+  root: document.getElementById('ui'),
+  save,
+  audio,
+  data: musicN ? { MUSIC: fakeMusic(musicN) } : undefined,
+  start: (levelId, mode) => { log(`start(${levelId}, ${mode})`); ctx.go('results', { levelId, mode, record: false, result: demoResult(levelId) }); },
+  resume: () => { log('resume()'); ctx.go('title'); },
+  quit: () => log('quit()'),
+});
+
+// after createUI, because bindPrefs() re-reads settings out of the (empty) fake save
+for (const [k, pref] of [['hand', 'hand'], ['cur', 'currency'], ['su', 'speedUnit'], ['au', 'altUnit']]) {
+  if (q.get(k)) setPref(pref, q.get(k));
+}
+if (q.get('off')) setPref('musicOff', Object.fromEntries(q.get('off').split(',').map((id) => [id, true])));
+
+function demoResult(levelId) {
+  return { win: q.get('lose') !== '1', time: 96, kills: 11, ground: 7, accuracy: 0.41, money: 520, stars: 2 };
+}
+
+const ARGS = {
+  brief: { levelId: q.get('level') || 'a1-02', mode: 'story' },
+  results: { levelId: q.get('level') || 'a1-02', mode: 'story', record: false, result: demoResult() },
+  pause: { levelId: q.get('level') || 'a1-02', mode: 'story', stats: { t: 84, kills: 9, money: 430 } },
+  settings: { from: q.get('from') || 'title' },
+  modeselect: { focus: q.get('focus') || null },
+};
+
+const world = fakeWorld();
+
+if (want === 'hud') {
+  shot.classList.remove('off');
+  document.getElementById('ui').style.display = 'none';
+  resetHud();
+  let t0 = performance.now();
+  const loop = () => {
+    const w = innerWidth, h = innerHeight;
+    world.t = 63.4 + (performance.now() - t0) / 1000;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    backdrop(w, h, world);
+    // the lab paints its stand-in scenery onto this same canvas, so the HUD must not clear it
+    drawHud(g, world, { w, h, clear: false });
+    requestAnimationFrame(loop);
+  };
+  loop();
+  setTimeout(audit, 400);
+} else if (SCREENS[want]) {
+  ctx.go(want, ARGS[want] || {});
+  setTimeout(() => { audit(); rasterise(); }, 350);
+  setInterval(rasterise, 500);
+} else {
+  document.getElementById('ui').innerHTML =
+    '<div class="screen in"><div class="empty">no such screen: ' + want + '<br>try ' + Object.keys(SCREENS).join(', ') + ', hud</div></div>';
+  setTimeout(rasterise, 300);
+}
+
+window.__state = { get screen() { return want; }, get rects() { return allRects(); } };
+bar();
+if (q.get('bar') === '0') document.getElementById('labbar').classList.add('hide');
+
+/** A stand-in for gfx/renderer.js so the HUD can be judged over real scenery. */
+function backdrop(w, h, world) {
+  const cam = world.cam;
+  const sc = h / cam.vh;
+  const horizon = (cam.y + cam.vh) * sc;
+  const sky = g.createLinearGradient(0, 0, 0, horizon);
+  sky.addColorStop(0, '#5b7fa6'); sky.addColorStop(0.45, '#b58fa0');
+  sky.addColorStop(0.8, '#f0b183'); sky.addColorStop(1, '#ffd9a0');
+  g.fillStyle = sky;
+  g.fillRect(0, 0, w, h);
+  g.fillStyle = '#2b2016';
+  g.beginPath();
+  g.moveTo(0, h); g.lineTo(0, horizon - 6);
+  g.quadraticCurveTo(w * 0.5, horizon - 26, w, horizon - 6);
+  g.lineTo(w, h); g.closePath(); g.fill();
+
+  for (const e of world.ents) {
+    if (e.dead) continue;
+    const x = (e.x - cam.x) * sc;
+    const y = (cam.y + cam.vh - e.y) * sc;
+    if (x < -60 || x > w + 60) continue;
+    g.fillStyle = e === world.player ? '#241d17'
+      : e.kind === 'fighter' ? '#3a2a22'
+        : e.kind === 'balloon' ? '#7a5a3a' : '#1d1712';
+    const ww = (e.w || 20) * sc * 2, hh = (e.h || 16) * sc * 2;
+    g.fillRect(x - ww / 2, y - hh / 2, Math.max(6, ww), Math.max(6, hh));
+    if (e === world.player) {
+      g.strokeStyle = '#ffc46b'; g.lineWidth = 2;
+      g.strokeRect(x - ww / 2, y - hh / 2, Math.max(6, ww), Math.max(6, hh));
+    }
+  }
+}
+</script>
+</body>
+</html>

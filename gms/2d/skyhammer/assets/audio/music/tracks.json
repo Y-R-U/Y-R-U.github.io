@@ -1,0 +1,207 @@
+{
+  "title_theme": {
+    "name": "Before the Scramble",
+    "context": "title",
+    "intensity": "march",
+    "acts": [],
+    "bpm": 100,
+    "key": "Dm",
+    "pairId": ""
+  },
+  "title_chrome": {
+    "name": "Cold Start",
+    "context": "title",
+    "intensity": "march",
+    "acts": [],
+    "bpm": 100,
+    "key": "Em",
+    "pairId": ""
+  },
+
+  "battle_ww2_march": {
+    "name": "Dawn Patrol",
+    "context": "battle",
+    "intensity": "march",
+    "acts": [1, 2],
+    "bpm": 128,
+    "key": "Dm",
+    "pairId": "battle_ww2"
+  },
+  "battle_ww2_heavy": {
+    "name": "Dawn Patrol Redline",
+    "context": "battle",
+    "intensity": "heavy",
+    "acts": [1, 2, 3],
+    "bpm": 128,
+    "key": "Dm",
+    "pairId": "battle_ww2"
+  },
+
+  "battle_drift_march": {
+    "name": "Compass Spinning",
+    "context": "battle",
+    "intensity": "march",
+    "acts": [3],
+    "bpm": 130,
+    "key": "Am",
+    "pairId": "battle_drift"
+  },
+  "battle_drift_heavy": {
+    "name": "Compass Spinning Overdrive",
+    "context": "battle",
+    "intensity": "heavy",
+    "acts": [3, 4],
+    "bpm": 130,
+    "key": "Am",
+    "pairId": "battle_drift"
+  },
+
+  "battle_chrome_march": {
+    "name": "Chrome Sky Anthem",
+    "context": "battle",
+    "intensity": "march",
+    "acts": [4, 5],
+    "bpm": 140,
+    "key": "Em",
+    "pairId": "battle_chrome"
+  },
+  "battle_chrome_heavy": {
+    "name": "Chrome Sky Overload",
+    "context": "battle",
+    "intensity": "heavy",
+    "acts": [4, 5],
+    "bpm": 140,
+    "key": "Em",
+    "pairId": "battle_chrome"
+  },
+
+  "boss_march": {
+    "name": "The Big One",
+    "context": "boss",
+    "intensity": "march",
+    "acts": [],
+    "bpm": 140,
+    "key": "Fm",
+    "pairId": "boss"
+  },
+  "boss_heavy": {
+    "name": "The Big One Unchained",
+    "context": "boss",
+    "intensity": "heavy",
+    "acts": [],
+    "bpm": 140,
+    "key": "Fm",
+    "pairId": "boss"
+  },
+
+  "battle_tense": {
+    "name": "Nothing on the Horizon",
+    "context": "battle",
+    "intensity": "march",
+    "acts": [1, 2],
+    "bpm": 110,
+    "key": "Gm",
+    "pairId": ""
+  },
+  "battle_grim": {
+    "name": "Mud and Magnesium",
+    "context": "battle",
+    "intensity": "march",
+    "acts": [2, 3],
+    "bpm": 120,
+    "key": "Cm",
+    "pairId": ""
+  },
+  "battle_triumph": {
+    "name": "Wings Over Everything",
+    "context": "battle",
+    "intensity": "march",
+    "acts": [1, 2],
+    "bpm": 138,
+    "key": "Bb",
+    "pairId": ""
+  },
+  "battle_groove_heavy": {
+    "name": "Low and Heavy",
+    "context": "battle",
+    "intensity": "heavy",
+    "acts": [3, 4],
+    "bpm": 112,
+    "key": "Dm",
+    "pairId": ""
+  },
+  "battle_thrash_heavy": {
+    "name": "Full Throttle",
+    "context": "battle",
+    "intensity": "heavy",
+    "acts": [4, 5],
+    "bpm": 160,
+    "key": "Em",
+    "pairId": ""
+  },
+  "battle_bigbeat_heavy": {
+    "name": "Newsreel Breakbeat",
+    "context": "battle",
+    "intensity": "heavy",
+    "acts": [3, 4, 5],
+    "bpm": 128,
+    "key": "Am",
+    "pairId": ""
+  },
+
+  "hangar_radio": {
+    "name": "Hangar Wireless",
+    "context": "hangar",
+    "intensity": "march",
+    "acts": [],
+    "bpm": 97,
+    "key": "",
+    "pairId": ""
+  },
+  "hangar_radio_swing": {
+    "name": "Grease and Swing",
+    "context": "hangar",
+    "intensity": "march",
+    "acts": [],
+    "bpm": 94,
+    "key": "",
+    "pairId": ""
+  },
+  "hangar_radio_ballad": {
+    "name": "Last Dance Before Dawn",
+    "context": "hangar",
+    "intensity": "march",
+    "acts": [],
+    "bpm": 73,
+    "key": "",
+    "pairId": ""
+  },
+  "hangar_brief": {
+    "name": "The Briefing",
+    "context": "hangar",
+    "intensity": "march",
+    "acts": [],
+    "bpm": 111,
+    "key": "",
+    "pairId": ""
+  },
+
+  "victory": {
+    "name": "Victory Roll",
+    "context": "sting_win",
+    "intensity": "march",
+    "acts": [],
+    "bpm": 0,
+    "key": "Bb",
+    "pairId": ""
+  },
+  "defeat": {
+    "name": "Down in the Drink",
+    "context": "sting_lose",
+    "intensity": "march",
+    "acts": [],
+    "bpm": 0,
+    "key": "Dm",
+    "pairId": ""
+  }
+}

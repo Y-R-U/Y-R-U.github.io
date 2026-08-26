@@ -1,0 +1,52 @@
+// Every weapon row. sim/weapons.js is the only file that reads these.
+
+export const WEAPONS = {
+  // ---- main guns (auto-fire, never in a slot) ----
+  mg_303:   { id:'mg_303',   slotType:'main', name:'.303 Brownings', cooldown:0.11, dmg:7,  proj:'bullet', speed:1500, spread:0.020 },
+  mg_50:    { id:'mg_50',    slotType:'main', name:'.50 Cal',        cooldown:0.10, dmg:11, proj:'bullet', speed:1600, spread:0.017 },
+  cannon20: { id:'cannon20', slotType:'main', name:'20mm Cannon',    cooldown:0.13, dmg:19, proj:'shell',  speed:1700, spread:0.014 },
+  cannon25: { id:'cannon25', slotType:'main', name:'25mm Autocannon',cooldown:0.115,dmg:22, proj:'shell',  speed:1780, spread:0.013 },
+  cannon30: { id:'cannon30', slotType:'main', name:'30mm ADEN',      cooldown:0.12, dmg:27, proj:'shell',  speed:1850, spread:0.012 },
+  vulcan:   { id:'vulcan',   slotType:'main', name:'Vulcan Cannon',  cooldown:0.06, dmg:14, proj:'shell',  speed:1950, spread:0.020 },
+  gatling:  { id:'gatling',  slotType:'main', name:'Rotary Cannon',  cooldown:0.05, dmg:16, proj:'shell',  speed:2000, spread:0.022 },
+  railgun:  { id:'railgun',  slotType:'main', name:'Railgun',        cooldown:0.16, dmg:46, proj:'shell',  speed:2400, spread:0.006 },
+  plasma:   { id:'plasma',   slotType:'main', name:'Plasma Repeater',cooldown:0.08, dmg:38, proj:'plasma', speed:2200, spread:0.008 },
+
+  // ---- specials (thumb-button slots) ----
+  bomb_std:   { id:'bomb_std', slotType:'special', name:'Bomb',        tier:1, ammo:6,  price:0,
+                cooldown:0.30, proj:'bomb', dmg:140, blastR:190, gravity:1, shake:0.45, icon:'bomb' },
+  bomb_heavy: { id:'bomb_heavy', slotType:'special', name:'Heavy Bomb', tier:2, ammo:4, price:900,
+                cooldown:0.55, proj:'bomb', dmg:340, blastR:300, gravity:1, shake:0.8, icon:'bomb2' },
+  cluster:    { id:'cluster', slotType:'special', name:'Cluster Bomb', tier:2, ammo:4, price:1200,
+                cooldown:0.60, proj:'cluster', dmg:70, blastR:120, gravity:1, submunitions:7, shake:0.6, icon:'cluster' },
+  rocket:     { id:'rocket',  slotType:'special', name:'Rockets',      tier:2, ammo:12, price:1100,
+                cooldown:0.14, proj:'rocket', dmg:95, blastR:110, gravity:0, speed:1250, shake:0.25, icon:'rocket' },
+  homing:     { id:'homing',  slotType:'special', name:'Seeker',       tier:3, ammo:8, price:3400,
+                cooldown:0.45, proj:'rocket', dmg:150, blastR:140, gravity:0, speed:900, homing:2.6, shake:0.35, icon:'seeker' },
+  napalm:     { id:'napalm',  slotType:'special', name:'Firebomb',     tier:3, ammo:3, price:3000,
+                cooldown:0.7, proj:'bomb', dmg:120, blastR:420, gravity:1, burn:6, shake:0.9, icon:'fire' },
+  bunker:     { id:'bunker',  slotType:'special', name:'Bunker Buster',tier:4, ammo:2, price:6500,
+                cooldown:1.0, proj:'bomb', dmg:900, blastR:260, gravity:1, pierce:1, shake:1.1, icon:'spike' },
+  nuke:       { id:'nuke',    slotType:'special', name:'Tactical Nuke',tier:5, ammo:1, price:22000,
+                cooldown:3.0, proj:'nuke', dmg:5000, blastR:1400, gravity:1, shake:3.0, whiteout:1, icon:'nuke' },
+
+  // ---- the fun ones — not realistic, priced to slot into the escalation anyway ----
+  party_bomb: { id:'party_bomb', slotType:'special', name:'Party Bomb', tier:1, ammo:8, price:350,
+                cooldown:0.22, proj:'bomb', dmg:55, blastR:150, gravity:1, moneyMult:1.5, shake:0.3, icon:'confetti',
+                flavor:'Confetti, streamers, and enough propellant to end a career.' },
+  chicken_bomb:{ id:'chicken_bomb', slotType:'special', name:'Chicken Bomb', tier:2, ammo:5, price:1000,
+                cooldown:0.4, proj:'bomb', dmg:110, blastR:160, gravity:1, fuseDelay:1.2, shake:0.5, icon:'chicken',
+                flavor:'Parachutes down clucking. Detonates on landing. Quartermaster refuses to explain.' },
+  boomerang:  { id:'boomerang', slotType:'special', name:'Boomerbomb', tier:2, ammo:10, price:1250,
+                cooldown:0.30, proj:'rocket', dmg:80, blastR:100, gravity:0, speed:1000, returns:1, shake:0.3, icon:'boomerang',
+                flavor:'Flies out, hits something, flies back, hits something else. Never explained. Never stopped.' },
+  kraken_torp:{ id:'kraken_torp', slotType:'special', name:'Kraken Torpedo', tier:3, ammo:4, price:2600,
+                cooldown:0.9, proj:'rocket', dmg:260, blastR:180, gravity:0, speed:700, pierce:1, shake:0.7, icon:'torpedo',
+                flavor:'Named for morale, not marine biology. Mostly.' },
+  disco_emp:  { id:'disco_emp', slotType:'special', name:'Disco Ball', tier:3, ammo:3, price:2800,
+                cooldown:1.0, proj:'bomb', dmg:40, blastR:280, gravity:1, stunR:280, stunTime:2.5, shake:0.5, icon:'disco',
+                flavor:'Blinds every gun crew in range. Somehow also plays music.' },
+  orbital_strike:{ id:'orbital_strike', slotType:'special', name:'Orbital Strike', tier:6, ammo:2, price:42000,
+                cooldown:4.0, proj:'nuke', dmg:3200, blastR:900, gravity:1, shake:2.2, whiteout:1, icon:'orbital',
+                flavor:"Requisitioned from a satellite company that has no idea what it's actually for." },
+};

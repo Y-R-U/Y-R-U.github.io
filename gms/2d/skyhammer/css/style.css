@@ -1,0 +1,86 @@
+/* Shell only: the game is canvas. Screens live in js/ui and style themselves. */
+
+:root {
+  --ink: #f2e9dc;
+  --dim: #9aa3ad;
+  --gold: #ffc46b;
+  --bg: #0d0f14;
+  --panel: #161a22;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0; height: 100%; width: 100%;
+  background: var(--bg); color: var(--ink);
+  font-family: ui-rounded, "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  overflow: hidden; overscroll-behavior: none;
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+#stage { position: fixed; inset: 0; touch-action: none; }
+
+#gl, #hud {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
+#hud { pointer-events: none; }
+
+#ui {
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+#ui[data-screen] { pointer-events: auto; }
+#ui.hidden { display: none; }
+
+.overlay {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(120% 90% at 50% 40%, #1c2330 0%, #0b0d12 100%);
+  z-index: 40; text-align: center; padding: 24px;
+}
+.overlay.hidden { display: none; }
+
+.tap-inner { max-width: 30rem; }
+
+h1 {
+  margin: 0 0 .3em; font-size: clamp(2rem, 9vw, 3.4rem);
+  letter-spacing: .14em; font-weight: 800; color: var(--ink);
+  text-shadow: 0 0 26px rgba(255,196,107,.28);
+}
+.sub { margin: 0 0 1.4em; color: var(--dim); font-size: clamp(.9rem, 3.4vw, 1.05rem); }
+.hint { margin: 1.4em 0 0; color: #6b737d; font-size: .78rem; line-height: 1.5; }
+
+button {
+  font: inherit; font-weight: 700; letter-spacing: .1em;
+  padding: .85em 2.2em; border-radius: 999px; border: 1px solid rgba(255,196,107,.55);
+  background: linear-gradient(#2a3140, #1a2029); color: var(--gold);
+  cursor: pointer; touch-action: manipulation;
+}
+button:active { transform: translateY(1px); }
+
+.pop {
+  background: var(--panel); border: 1px solid #2b3342; border-radius: 14px;
+  padding: 1.4em 1.6em; max-width: 26rem;
+}
+#popup { background: rgba(6,8,12,.72); z-index: 60; }
+
+/* Rotate nag: CSS only, no polling. */
+#rotate { display: none; z-index: 50; }
+@media (orientation: portrait) and (max-width: 900px) {
+  #rotate { display: flex; }
+  #tap { display: none; }
+}
+.rot-glyph {
+  width: 74px; height: 46px; margin: 0 auto 1.4em;
+  border: 3px solid var(--gold); border-radius: 8px;
+  animation: rot 2.4s ease-in-out infinite;
+}
+@keyframes rot {
+  0%, 40%   { transform: rotate(90deg) scale(.86); }
+  60%, 100% { transform: rotate(0deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .rot-glyph { animation: none; } }

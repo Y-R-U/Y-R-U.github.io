@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0d0f14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>SKYHAMMER</title>
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+</head>
+<body>
+  <div id="stage">
+    <canvas id="gl"></canvas>
+    <canvas id="hud"></canvas>
+    <div id="ui"></div>
+  </div>
+
+  <div id="tap" class="overlay">
+    <div class="tap-inner">
+      <h1>SKYHAMMER</h1>
+      <p class="sub">Put a thumb anywhere. The nose follows it.</p>
+      <button id="tapbtn" type="button">TAP TO FLY</button>
+      <p class="hint">Landscape, sound on. Desktop: hold the mouse, or use the arrow keys.</p>
+    </div>
+  </div>
+
+  <div id="rotate" class="overlay">
+    <div class="tap-inner">
+      <div class="rot-glyph"></div>
+      <p class="sub">Turn your device sideways</p>
+    </div>
+  </div>
+
+  <div id="popup" class="overlay hidden"><div class="pop"><p id="popmsg"></p><button id="popok" type="button">OK</button></div></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

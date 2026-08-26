@@ -1,0 +1,9 @@
+# Dev artefacts, not shipped.
+shots/
+docs/refs/
+
+# Raw generated audio. 54 MB of Suno originals; only the compressed files in
+# assets/audio/music/ ship. Regenerate with tools/gen_music.py or re-fetch the
+# UUIDs tabulated in docs/MUSIC_NOTES.md, then ./tools/compress_music.sh.
+assets/audio/music/raw/
+assets/audio/music/probe_*.mp3
