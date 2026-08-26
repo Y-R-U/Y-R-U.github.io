@@ -34,7 +34,16 @@ BEHAVIOUR.fighter = (e, world, dt) => {
   const ahead = world.cam.x + world.cam.vw + 3000;
   if (e.x < behind || e.x > ahead || e.y < world.terrain.heightAt(e.x) - 40) {
     if (e.y < world.terrain.heightAt(e.x)) killEnt(world, e, 2);
-    else e.despawn = true;
+    // Deleting a fighter the mission still needs is what made half the generated campaign
+    // unwinnable: 76 of 76 fighter objectives asked for exactly as many fighters as they
+    // spawned, and a straight-flying row headed the other way was gone before you could shoot
+    // it. mission.tag() already marks these, so recycle rather than delete. The despawn
+    // DISTANCE was never the bug — dropping an ent an open objective depends on was.
+    else if (e.objective && e.x < behind && world.player) {
+      e.x = world.cam.x + world.cam.vw + 700;
+      e.y = Math.max(world.terrain.heightAt(e.x) + 320, world.player.y);
+      e.ang = Math.PI; e.facing = -1;
+    } else e.despawn = true;
   }
 };
 

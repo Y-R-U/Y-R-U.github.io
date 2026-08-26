@@ -100,9 +100,13 @@ export function makeAutopilot() {
 
       if (landNow) {
         phase = 'land';
-        const ty = pad.deckY + 60;
-        if (p.x < pad.x - 1100) a = Math.atan2((ty + 260 - p.y), pad.x - 1100 - p.x);
-        else a = Math.max(-0.14, Math.min(0.14, Math.atan2((ty - p.y) * 0.6, 500)));
+        // Descend EARLY and arrive level. Diving on final adds gravAssist speed (~36/s at
+        // 0.14 rad nose-down) faster than the near-pad throttle bleeds it off, so a bot that
+        // descends all the way in crosses the §9 box still above landSpeed and never triggers.
+        const ty = pad.deckY + 80;
+        const run = pad.x - 1000 - p.x;
+        if (run > 0) a = Math.max(-0.5, Math.min(0.5, Math.atan2((ty - p.y) * 1.2, Math.max(run, 400))));
+        else a = Math.max(-0.05, Math.min(0.05, (ty - p.y) * 0.0012));
       } else if (hurt && phase !== 'evade' && phaseT > 3) {
         phase = 'evade'; phaseT = 0;
       } else if (phase === 'evade') {
@@ -146,8 +150,14 @@ export function makeAutopilot() {
         }
       }
 
-      if (p.y < floor) a = Math.max(a, 0.6);
-      if (p.y < gAhead + 190) a = 1.0;
+      // The terrain floor guard sits at ground + 340, which over water is ABOVE the top of the
+      // approach box (deckY + 175). It is a hard clamp, not a preference: with it in place the
+      // bot cannot descend into the box at all and never lands, on any seed. During the
+      // approach it has to key off the deck instead of the terrain.
+      const lowLimit = (phase === 'land' && pad) ? pad.deckY + 24 : floor;
+      const hardLimit = (phase === 'land' && pad) ? pad.deckY + 8 : gAhead + 190;
+      if (p.y < lowLimit) a = Math.max(a, 0.6);
+      if (p.y < hardLimit) a = 1.0;
       if (p.y > 2150) a = Math.min(a, -0.2);
       world.setStickAngle(Math.max(-1.3, Math.min(1.3, a)));
 

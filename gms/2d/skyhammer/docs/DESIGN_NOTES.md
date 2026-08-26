@@ -280,3 +280,175 @@ Every gate quoted above was broken on purpose first and confirmed to go red:
 | tutorial hint harness | `t-01` climb trigger replaced with `() => false` | `steps=[steer:done, climb:timeout]`, `tutorialDone=false`, exit 1 |
 | independent campaign checker | injected enemy id `ghost_tank` into `a3-07` | `act 3: 19/20`, exit 1 |
 | `makeTutorial` null path | asserted `makeTutorial(a1-01) === null` | passes; costs nothing on non-tutorial levels |
+
+---
+
+# FOLLOW-UPS — generator, autopilot, landing ladder, gates — 2026-08-27
+
+## 1. The 48 unwinnable levels: fixed in the generator, and the diagnosis was wrong at first
+
+**Runtime first, because the structural number is the instrument that fooled us.** Same gate,
+same autopilot, same 4 seeds per level, before and after:
+
+| act | levels never locked BEFORE | AFTER |
+|---|---|---|
+| 2 | 9/20 | **20/20** |
+| 3 | 13/20 | **20/20** |
+| 4 | 2/20 | **20/20** |
+| 5 | 5/20 | **18/20** |
+| **generated total** | **29/80** | **78/80** |
+
+Structural was 102/102 clean throughout — before and after. It never moved. Autopilot wins over
+the same runs went act 2 23->32, act 3 25->42, act 4 7->11, act 5 10->11 (of 80 each).
+
+### What it actually was
+
+The first diagnosis — "zero slack plus a despawn rule" — was only half right, and slack alone
+barely helped: `FIGHTER_SLACK = 0.7` on its own took 48 down to 23 and no further. Counting
+despawns **per enemy row** is what found it:
+
+```
+id                 spawned  killed  DESPAWNED  despawn%
+he111                  48      20         28      58%
+cyber_interceptor      44      20         23      52%
+bomber                 68      32         33      49%
+jet_fighter            96      60         16      17%
+proto_jet / bf109 / scout / fw190 / mig_ghost / stealth_drone / drone_swarm   0-4%
+```
+
+`bomber` and `he111` are `ai:'straight'`. They fly the *other way* at 330-350 while the player
+does 490-920 and they never turn around, so they are behind the camera within seconds and
+deleted. They were in the generic fighter pool that kill objectives were sized on. Half of every
+such wave was gone by construction, and no amount of slack survives that.
+
+### Three changes to `tools/gen_levels.mjs`, all principled, none seed-fitted
+
+1. **Objective waves are drawn only from rows that can stay in the fight** — `chasers =
+   pool.fighter.filter(id => ENEMIES[id].ai !== 'straight')`. Heavies still appear (one wave of
+   1 on every third level) as a bonus target worth 180-200; they still count toward the
+   objective if you catch one (§15.2), but the objective is never sized on them.
+2. **Waves are back-loaded and the last one is always late** — positions now depend on the wave
+   count (`[0.30,0.72]`, `[0.22,0.52,0.80]`, `[0.18,0.42,0.64,0.85]`) with shares weighted to
+   the back. A fighter is only ever lost by ending up *behind* you, so a wave that triggers at
+   85% of the level, ahead of a player with 1600 units left, cannot be outrun. a4-02 stayed
+   broken purely because its last of two waves fired at 44%.
+3. **`FIGHTER_SLACK = 0.6`** — the objective asks for 60% of the fighters the level spawns. This
+   is the generator's own existing idiom (ground already spawns `groundCount` and asks for
+   `groundCount - 1`), and it changes no enemy counts, so difficulty axis 1 (DESIGN §6) is
+   untouched. Buying reachability by adding 40% more enemies would have been the riskier trade
+   in a game whose balance is still unmeasured.
+
+Enemy counts, biomes, times, weather, lengths, ground/flak/balloon spawns and pads are all
+byte-identical to before — the rng draws ahead of the wave block were left alone deliberately so
+the regeneration churns only what it had to.
+
+### The residual 2 ARE the despawn rule, and here is the proof
+
+`a5-09` and `a5-18` still trip at 4 seeds, each short by exactly one kill, and both are
+`jet_fighter`/`cyber_interceptor` levels. `cyber_interceptor` (cruise 980, `ai:'dogfight'`) is
+the one row that is faster than the act's player aircraft *and* deliberately extends away for
+1.4 s every time it closes inside 300 (`ai.js`, the `break` state). It leaks 52% and no
+generator lever reaches it.
+
+**My conclusion: the despawn distance is not the bug, but deleting an ent the mission still
+needs is.** `mission.tag()` already marks every ent that counts toward an open objective as
+`e.objective`. Proven by swapping `BEHAVIOUR.fighter` at runtime (no repo file touched):
+
+```js
+// js/sim/behaviour.js, BEHAVIOUR.fighter — the off-the-back branch only
+if (e.x < behind) {
+  if (e.objective) {                     // the mission still needs this one: recycle, never delete
+    e.x = world.cam.x + world.cam.vw + 700;
+    e.y = Math.max(world.terrain.heightAt(e.x) + 320, world.player.y);
+    e.ang = Math.PI; e.facing = -1;
+  } else e.despawn = true;
+}
+```
+
+With that branch in place the **whole campaign goes 100/100 levels never locked over 400 runs**
+(acts 1-5, 4 seeds each), against 98/100 stock, and the autopilot's win count is unchanged — it
+costs nothing else. **Routing request: this is one branch in `js/sim/behaviour.js`, which I do
+not own.** Until it lands, 78/80 generated is the ceiling and the two outliers are one kill
+short on some seeds rather than permanently dead.
+
+## 2. Autopilot landing fix — applied to `js/sim/autopilot.js`
+
+Eight lines, both halves needed: descend early and arrive level (a dive adds gravAssist faster
+than the near-pad throttle removes it), and key the floor guard off the deck rather than the
+terrain during the approach (`ground + 340` is above the top of the box at `deckY + 175`, a hard
+clamp).
+
+**Landings, 8 seeds per level — the objective completing, not just wins:**
+
+| level | landed BEFORE | landed AFTER | wins BEFORE | wins AFTER |
+|---|---|---|---|---|
+| `t-02` | **0/8** | **8/8** | 0/8 | 8/8 |
+| `a1-03` | **0/8** | **2/8** | 0/8 | 2/8 |
+| `a1-15` | **0/8** | **6/8** | 0/8 | 6/8 |
+
+16/24 landings against 0/24. `a1-03`'s six failures are the bot being shot down by `bf109`s well
+short of the pad — it is a weak-pilot problem (D29), not a landing one; on the seeds where it
+survives to the carrier it puts down.
+
+## 3. Late planes: the data is not wrong, `sim/landing.js` is
+
+`js/data/planes.js` is **unchanged**, deliberately. Ideal level approach, every tier:
+
+| plane | cruise | stall | landSpeed | min speed reached | lands? |
+|---|---|---|---|---|---|
+| kestrel | 430 | 210 | 247 | 0 | YES |
+| harrow | 490 | 230 | 271 | 0 | YES |
+| tempest | 560 | 260 | 306 | 0 | YES |
+| meteor | 620 | 270 | 318 | 0 | YES |
+| sabre | 680 | 300 | 354 | 0 | YES |
+| vampire | 740 | 320 | 377 | **330** | no |
+| revenant | 790 | 340 | 401 | **360** | no |
+| specter | 840 | 360 | 424 | **390** | no |
+| vector | 900 | 380 | 448 | **424** | no |
+
+`landSpeed` is already a consistent `stall * 1.178` across all nine tiers; nothing in the table
+is out of family. The broken number is in the sim: `landing.js`'s near-pad slow zone is a fixed
+`e.w * 4 = 680` world units, while the distance needed to bleed `cruise` down to `landSpeed` at
+`SPEED_EASE = 0.9/s` is `0.8L*t + (cruise - L)/0.9` — 516 units for a kestrel and **1219 for a
+vector**. The zone does not scale with the aircraft, so the fast half of the ladder runs out of
+runway.
+
+**Measured, one line, `js/sim/landing.js` `nearPad()`:** replace `e.w * 4` with
+`Math.max(e.w * 4, p.def.cruise * 2.2)`.
+
+| variant | tiers that can land |
+|---|---|
+| stock | **5/9** |
+| `landSpeed = stall * 1.35` (data only) | 6/9 |
+| `landSpeed = stall * 1.60` (data only) | 8/9 — and a 900-cruise plane "landing" at 608 is not landing |
+| **`nearPad` zone = `cruise * 2.2` (sim only, stock landSpeed)** | **9/9** |
+
+That is why I did not touch `planes.js`: the only data change that gets close makes the mechanic
+meaningless and still leaves `vector` unable to land. **Routing request: `js/sim/landing.js`.**
+If more forgiveness is wanted on a phone *after* that lands, `landSpeed = stall * 1.35` is the
+dial — it widens the trigger band without changing anything else, and 9/9 still holds with it.
+
+## 4. Both gates now live in `tools/`, with sabotage modes
+
+```
+node tools/tutorial_gate.mjs [--falsify]
+node tools/campaign_gate.mjs [--seeds N] [--act N] [--structural-only] [--falsify]
+```
+
+`tutorial_gate.mjs` flies each tutorial with a scripted pilot that does what each hint asks and
+asserts every hint advanced with `why === 'done'`, never on a timeout, plus
+`makeTutorial(a1-01) === null`. `--falsify` jams the `climb` trigger to `() => false`; the gate
+goes red on "the hint script never finished — stuck on 'climb'".
+
+`campaign_gate.mjs` runs the structural check *and* the runtime one, and prints the runtime
+number first because the structural one was green while half the campaign was unplayable.
+`--falsify` breaks each instrument with something only that instrument can see:
+
+- structural: `a3-07` gets the enemy id `ghost_tank` -> `unknown spawn id`
+- runtime: `a2-04` gets one early wave of three `he111` and a kill objective of exactly 3. The
+  structural check reads "needs 3, 3 exist" and **stays green**; at runtime all three are
+  deleted behind the camera and the level is locked. That is the exact bug class this file
+  exists for, so a runtime check that misses it is measuring nothing.
+
+Both falsify runs pass (each caught only by its own instrument). `--falsify` ignores `--act` so
+a filter cannot hide the sabotaged level and turn "did not fire" into "was never asked".

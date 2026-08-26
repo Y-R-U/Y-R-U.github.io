@@ -20,6 +20,9 @@ import { LEVELS as ACT1_LEVELS } from '../js/data/levels.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = join(__dirname, '..', 'js', 'data', 'levels_gen.js');
 const GEN_SEED = 0x5cf1a1;
+// Fraction of the fighters a level spawns that its kill objective demands. See the wave
+// block in buildLevel() for why this is not 1.0.
+const FIGHTER_SLACK = 0.6;
 
 // ---------------------------------------------------------------- deterministic RNG
 function mulberry32(a) {
@@ -137,19 +140,56 @@ function buildLevel(n) {
     spawns.push({ at: Math.max(length - 900, 1000), kind: 'pad', padId: (p % 10 === 0) ? 'carrier' : 'airstrip', y: 'ground' });
   }
 
+  // Fighters are the ONLY objective target that can vanish: sim/behaviour.js permanently
+  // despawns one that falls 1600 units behind the camera, and every static target counts
+  // however it died (CONTRACTS §15.2). So a fighter objective that demands exactly as many
+  // fighters as the level spawns locks the mission the first time the player outruns one.
+  // Two defences, and both are needed:
+  //   1. spread the same fighters over MORE waves along MORE of the level, so there is always
+  //      another formation ahead of wherever the player actually is, not only behind them;
+  //   2. require fewer kills than are spawned — the same slack idiom this generator already
+  //      uses for ground ("spawn groundCount, require groundCount - 1").
+  // Enemy COUNTS are deliberately unchanged: they are difficulty axis 1 (DESIGN §6) and
+  // balance is still unmeasured, so buying reachability by adding 40% more enemies would be
+  // the riskier trade.
+  // An `ai:'straight'` heavy (bomber, he111) flies the other way at 330-350 while the player
+  // does 490-920 and NEVER turns around, so it is behind the camera within seconds and gone.
+  // Measured over acts 2-5: he111 58% despawned, bomber 49%, against 0-4% for every chaser.
+  // A kill objective must therefore be supplied by rows that can stay in the fight; heavies
+  // are spawned as a bonus target (they still count toward the objective if you catch one,
+  // §15.2) but the objective is never sized on them.
+  const chasers = pool.fighter.filter((id) => ENEMIES[id].ai !== 'straight');
+  const heavies = pool.fighter.filter((id) => ENEMIES[id].ai === 'straight');
+
+  // Back-loaded on purpose. A fighter is only ever lost by ending up BEHIND the player, so the
+  // later a wave triggers the safer it is: the last one spawns at 85% of the level, ahead of a
+  // player who has ~1600 units of level left and nowhere to outrun it to. Same total fighters,
+  // just weighted toward the end.
+  // Positions depend on the COUNT so the last wave is always late whatever the count — a
+  // two-wave level whose final wave triggered at 44% left three quarters of the map for the
+  // player to outrun it in, which is exactly how a4-02 stayed broken.
+  const WAVE_POS = [[0.30, 0.72], [0.22, 0.52, 0.80], [0.18, 0.42, 0.64, 0.85]];
+  const WAVE_SHARE = [[0.4, 0.6], [0.22, 0.33, 0.45], [0.15, 0.2, 0.3, 0.35]];
   const waves = [];
+  const waveCount = Math.min(4, Math.max(2, Math.ceil(fighterCount / 4)));
+  const WAVE_AT = WAVE_POS[waveCount - 2];
+  const share = WAVE_SHARE[waveCount - 2];
   let remaining = fighterCount;
-  const waveCount = remaining > 5 ? 2 : 1;
   for (let w = 0; w < waveCount; w++) {
-    const n2 = w === waveCount - 1 ? remaining : Math.ceil(remaining / waveCount);
+    const n2 = w === waveCount - 1 ? remaining : Math.min(remaining, Math.max(1, Math.round(fighterCount * share[w])));
     remaining -= n2;
-    waves.push({ at: Math.round(length * (0.25 + w * 0.4)), kind: pick(rng, pool.fighter), n: n2, spacing: 400 });
+    if (n2 <= 0) continue;
+    waves.push({ at: Math.round(length * WAVE_AT[w]), kind: pick(rng, chasers), n: n2, spacing: 400 });
   }
+  if (heavies.length && p % 3 === 0) {
+    waves.push({ at: Math.round(length * 0.55), kind: pick(rng, heavies), n: 1, spacing: 0 });
+  }
+  const fighterNeed = Math.max(1, Math.ceil(fighterCount * FIGHTER_SLACK));
 
   const objectives = [];
   objectives.push({ type: 'destroy', kind: 'ground', count: Math.max(1, groundCount - 1) });
   if (flakCount > 0) objectives.push({ type: 'destroy', kind: 'flak', count: flakCount });
-  objectives.push({ type: 'kill', kind: 'fighter', count: fighterCount });
+  objectives.push({ type: 'kill', kind: 'fighter', count: fighterNeed });
   if (wantCollect) objectives.push({ type: 'collect', count: Math.max(1, balloonCount - 1) });
   if (wantLand) objectives.push({ type: 'land', padId: (p % 10 === 0) ? 'carrier' : 'airstrip' });
 

@@ -10,7 +10,12 @@ export function makeLanding(world) {
     nearPad(p) {
       for (const e of world.ents) {
         if (e.kind !== 'pad' || e.dead) continue;
-        if (Math.abs(p.x - e.x) < e.w * 4 && Math.abs(p.y - e.y) < e.h * 4) return true;
+        // The zone has to scale with the AIRCRAFT, not the pad. A fixed e.w*4 = 680 units is
+        // ample for a kestrel, which needs 516 to bleed cruise down to landSpeed, and hopeless
+        // for a vector, which needs 1219 — which is why every tier-6+ plane was physically
+        // unable to land and every `land` objective in acts 3-5 was impossible in one.
+        const reach = Math.max(e.w * 4, (p.def && p.def.cruise ? p.def.cruise * 2.2 : 0));
+        if (Math.abs(p.x - e.x) < reach && Math.abs(p.y - e.y) < e.h * 4) return true;
       }
       return false;
     },
