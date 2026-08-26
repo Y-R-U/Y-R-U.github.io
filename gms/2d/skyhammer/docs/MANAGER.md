@@ -112,49 +112,75 @@ is withdrawn — his words: "I like the look of the current plane"). Build out t
 original brief, **checking in regularly so he can judge the music and the feel**, then playtest
 the whole thing again.
 
-## Not built at all — do these first
+## State on 2026-08-27
 
-1. **Title / attract screen.** Auto-playing AI dogfight behind the logo, with smallish buttons
-   around the edges for game modes, special events, hangar, settings. Cheapest good version: run
-   a real level with the reference autopilot, HUD hidden, UI buttons over the top.
-2. **Music playback.** 22 tracks sit in `assets/audio/music/` with a manifest at
-   `js/data/music.js` and a full per-track on/off list already in Settings — and `core/audio.js`
-   has **no file playback at all**. Honour `prefs.musicOff` via `pickTrack()`; the settings screen
-   already calls `audio.setDisabledTracks()` if that method ever appears.
-3. **The march → heavy drop.** Aaron asked for this twice and cares about it. Four matched pairs
-   share a `pairId`, BPM and key; crossfade on combat intensity. Two pairs are BPM-locked, two
-   drift ~2.7 BPM — **crossfade quickly, never beat-sync-layer those two.**
-4. **Tutorial levels** (Aaron's idea, and they double as the test harness): one that teaches
-   flying and the auto-gun, one that teaches bombs and **landing** — the landing box has never
-   been tried by a human.
-5. **Game modes.** Survival / Time Attack / Boss Rush / weekly event exist only as data in
-   `js/data/modes.js`. Nothing runs them.
-6. **Story beats and act intros** — written in `js/data/story.js`, never displayed. Milestones on
-   the debrief, act intros on the brief (D35).
+Aaron's brief after the compact: **complete the full requirement list, with regular check-ins so
+he can judge the music and the feel.** Plus two of his own: no auto-fullscreen on desktop, and
+the plane should roll upright rather than fly inverted after a direction change. Both done.
 
-## Built but never verified end to end by a human
+The dominant discovery of this session is that **most of what was "missing" had been built and
+never connected**. In order of how badly each one hurt:
 
-7. Landing on a carrier, and the TAKE OFF button.
-8. Hangar loop: buy plane → buy upgrade → assign bombs to slots → fly with them → money banked.
-9. Level select, results screen, stars.
-10. **All five bosses. Never once seen.**
-11. Haptics on hit.
+| What | Was | Now |
+|---|---|---|
+| The entire front end | only loaded behind `?ui=1` | the default; `?level=` still flies straight in so every capture gate still works |
+| `css/ui.css`, 894 lines | never linked from `index.html` | linked; every menu had been rendering as unstyled flow content in the top-left |
+| Acts 2-5 | generated into `levels_gen.js`, never imported | `CAMPAIGN` export, 102 levels, five acts on the map |
+| Level progress | written to `levelsDone`, read from `levels` | one store; nothing would ever have unlocked from flying |
+| The Haptics setting | governed only the UI's own tap buzz | `prefs.apply()` now reaches `haptics.setEnabled`; every hit used to buzz regardless |
+| `STORY.BOSS_TAUNT`, `ACT_OUTRO` | written, never read | on the briefing and the debrief |
+| Act 0 | folded into Act 1 by `l.act \|\| 1` | its own TRAINING section |
 
-## Known weak
+### Completability
 
-12. Ground props are dark lumps that do not separate from each other.
-13. **Biomes do not express themselves** — `city/dusk` draws the same mountains and bushes as
-    farmland. Highest-value art fix.
-14. Water and alpine are the least-finished biomes.
-15. Sound effects are procedural stubs. Aaron: "gunfire is ok for now, could be improved."
-16. Acts 2-5 are generated, with placeholder names ("Wider War 7"), and untuned.
-17. 14 music tracks end abruptly and will not loop cleanly; `title_theme` needs ~2 s off the front;
-    `battle_groove_heavy` came back at 76 s and should be regenerated.
+**102/102 missions are reachable.** They were not. 48 of the 80 generated levels could not be
+finished: every fighter objective spawned exactly as many fighters as it demanded, and
+`behaviour.js` deleted any fighter 1600 units behind the camera. The structural checker was green
+throughout — **it is the instrument that hid the bug**, and that is the lesson to carry, not the
+fix. Run `tools/campaign_gate.mjs`, and read the runtime line, not the structural one.
 
-## Never measured
+### Still open
 
-18. **Real device performance.** Every number is desktop headless. Aaron: "couldn't see an fps but
-    it felt fast." Put a real fps readout behind a setting.
+1. **Music playback** — 22 tracks, a manifest and settings toggles all exist; `core/audio.js` has
+   never played a file. In flight with the AUDIO agent, along with the march→heavy drop.
+2. **Biome identity and ground props** — a `city` at dusk draws the same mountains and bushes as
+   `farmland` at dawn. In flight with the ART agent, plus three landing defects: no translucent
+   green approach box at all (`SHAPES.pad` is aliased to `SHAPES.carrier`), the carrier floating
+   ~120 units above the water, and the plane vanishing inside the deck once landed.
+3. **Game modes** — Survival / Time Attack / Boss Rush / weekly event are rule tables that
+   nothing consumes. In flight with the MODES agent. `createWorld({ ..., mode })` is wired;
+   `'story'` must stay a byte-for-byte no-op.
+4. **SFX** are procedural stubs. Aaron: "gunfire — is ok for now, could be improved."
+5. **The five bosses have still never been looked at.** Only `boss_ironduke` has been seen, and
+   only from a distance. Hold the captures until ART reports, or you will be looking at a
+   half-edited scene and drawing conclusions from it.
+6. **Nothing has ever run on a real phone.** The fps readout exists now (Settings → Show frame
+   rate) purely so that measurement can happen. Aaron felt it was "fast at least".
+7. **Acts 2-5 carry placeholder names** ("Wider War 3") and are untuned beyond being winnable.
+
+### Two things Aaron is owed, personally
+
+- **Listen to the tracks.** Nobody has. They were selected by measurement, not by ear.
+- **Try a landing.** It now works end to end, but he has never done one.
+
+## Gates, and what each is actually for
+
+Every one has a sabotage mode. **A gate that has never been seen to fail is not evidence** — and
+this session produced a live example of why: the `behaviour.js` recycle fix made
+`campaign_gate.mjs`'s own runtime sabotage impossible to trigger, so that half of the gate went
+unfalsified the moment the game got better. Good for the game, bad for the instrument.
+
+| gate | proves |
+|---|---|
+| `tools/gate_boot.mjs` | front end is the default, `?level=` still direct, desktop takes no fullscreen, the wing-levelling roll actually rolls and the sim heading is untouched. `--falsify`, `--falsify-boot` |
+| `tools/gate_hangar.mjs` | buy → money leaves → **the sim sees it** → survives a reload. The third link is the one that matters |
+| `tools/gate_feel.mjs` | a hit buzzes, and the setting silences it. Stubs `navigator.vibrate` before module evaluation — `haptics.js` latches `typeof navigator.vibrate` at import |
+| `tools/campaign_gate.mjs` | every objective still reachable after real autopilot runs. **Read the runtime line first** |
+| `tools/tutorial_gate.mjs` | every hint advanced on its trigger, never on a timeout |
+| `tools/contrastgate.mjs` | the player reads against sky and ground (ART.md §2) |
+
+A gate caught a false pass in its own first draft this session: `null < 9000` is true, so a bare
+comparison passed on a broken read. Type-guard the comparison, not just the value.
 
 ## Settled recently, do not re-open
 
@@ -168,7 +194,25 @@ the whole thing again.
   context with every attribute set until he updated it. `tools/lab/webgl_probe.html` settles it in
   ten seconds. The renderer's retry ladder stays regardless.
 - Capture tooling composites `#gl` and `#hud`; **DOM screens are still invisible to it** — that is
-  how a dead title screen shipped. Verify menus in a real browser, not with `shot.mjs`.
+  how a dead title screen shipped. Verify menus in a real browser, not with `shot.mjs`. For DOM
+  screens use `Page.captureScreenshot` through `cdp.send` directly: it works on the 2D attract
+  canvas and on menus, and only hangs on an animating WebGL surface under SwiftShader (use
+  `--gpu`). That is how every menu screenshot in `shots/mgr/` was taken.
+- **Desktop is never put into fullscreen unasked** (Aaron's ruling). Phones and tablets still
+  auto-request it. Desktop gets a chip on the first flight and a button on the pause screen,
+  because the browser only honours the request from a real gesture. `autoFullscreenDevice()` in
+  `core/fullscreen.js` is the single test; don't add a second one.
+- **Wing-levelling is visual only.** `FLIP` in `tuning.js`: the model rolls 180° about its nose
+  axis once the heading has held the other side of vertical for `dwell`. `e.ang` is never touched
+  and the aeroplane flies exactly as it did. The dwell and the near-vertical dead zone are load-
+  bearing — without them a loop strobes the model twice per revolution.
+- **Tutorials are not graded.** `stars: false`, act 0. Timing a teaching level against par
+  punishes the experimenting it exists to encourage. `model.gradedLevels`/`maxStars` keep them out
+  of both halves of every star total.
+- **`LEVELS` and `CAMPAIGN` are two exports on purpose.** `LEVELS` is the 22 hand-authored
+  missions, because `tools/gen_levels.mjs` imports it and appends the generated set itself — one
+  merged export makes the generator see 80 duplicate ids. Everything player-facing reads
+  `CAMPAIGN`.
 
 ## Fixed 2026-08-26, after Aaron's playtest
 
