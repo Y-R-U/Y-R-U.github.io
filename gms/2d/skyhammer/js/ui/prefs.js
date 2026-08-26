@@ -1,5 +1,7 @@
 // Player settings. Lives inside save.data.settings so ENGINE's save file is the only store.
 
+import { haptics } from '../core/haptics.js';
+
 export const DEFAULTS = Object.freeze({
   music: true,
   sfx: true,
@@ -75,6 +77,10 @@ function persist() {
 }
 
 function apply() {
+  // haptics.buzz() from the frame loop reads the module's own flag, not this one. Nothing ever
+  // set it, so the Haptics switch silently governed only the UI's own taps while every hit in
+  // the air kept buzzing regardless of the setting.
+  try { haptics.setEnabled(!!prefs.haptics); } catch { /* no navigator.vibrate here */ }
   const a = bound && bound.audio;
   if (a) {
     if (typeof a.setMusic === 'function') a.setMusic(prefs.music);
