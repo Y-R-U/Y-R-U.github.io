@@ -1,6 +1,10 @@
 // The only glue. Owns boot, the frame, and the sim -> presentation fan-out.
 
-import { LEVELS } from './data/levels.js';
+// CAMPAIGN, not LEVELS: LEVELS is the 22 hand-authored missions, CAMPAIGN is those plus the 80
+// generated ones (acts 2-5). The two exports are separate on purpose — tools/gen_levels.mjs
+// imports LEVELS and appends the generated set itself, and folding them into one export makes
+// the generator see 80 duplicate ids.
+import { CAMPAIGN as LEVELS } from './data/levels.js';
 import { createWorld } from './sim/world.js';
 import { makeAutopilot } from './sim/autopilot.js';
 import { input, attachInput, pollInput, clearAll, syncKeyAngle } from './core/input.js';

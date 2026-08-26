@@ -22,22 +22,24 @@ export function mount(root, ctx) {
 
   const jump = el('div.act-jump');
   for (const g of groups) {
-    jump.appendChild(btn('chipbtn', 'ACT ' + g.act, () => {
+    jump.appendChild(btn('chipbtn', M.actLabel(g.act), () => {
       const h = scroller.querySelector(`[data-act="${g.act}"]`);
       if (h) scroller.scrollTo({ top: h.offsetTop - 6, behavior: 'smooth' });
     }));
   }
   jump.appendChild(el('div.spacer'));
   jump.appendChild(el('div.chip.stars', {}, el('span.star-dot'),
-    el('span', {}, `${M.totalStars(save, LEVELS)}/${LEVELS.length * 3}`)));
+    el('span', {}, `${M.totalStars(save, LEVELS)}/${M.maxStars(LEVELS)}`)));
   root.appendChild(jump);
 
   for (const g of groups) {
-    const got = g.levels.reduce((n, x) => n + M.levelStars(save, x.level.id), 0);
+    // ungraded levels (the tutorials, stars:false) count toward neither half of the act total
+    const graded = M.gradedLevels(g.levels.map((x) => x.level));
+    const got = graded.reduce((n, l) => n + M.levelStars(save, l.id), 0);
     scroller.appendChild(el('div.act-head', { dataAct: String(g.act) },
-      el('span.act-n', {}, 'ACT ' + g.act),
+      el('span.act-n', {}, M.actLabel(g.act)),
       el('span.act-name', {}, g.name),
-      el('span.act-stars', {}, `${got}/${g.levels.length * 3}`)
+      graded.length ? el('span.act-stars', {}, `${got}/${graded.length * 3}`) : null
     ));
 
     const grid = el('div.lv-grid');

@@ -30,7 +30,7 @@ export async function loadGameData(override) {
   const optional = [
     ['../data/planes.js', (m) => { out.PLANES = m.PLANES; out.UPGRADES = m.UPGRADES; }],
     ['../data/weapons.js', (m) => { out.WEAPONS = m.WEAPONS; }],
-    ['../data/levels.js', (m) => { out.LEVELS = m.LEVELS; }],
+    ['../data/levels.js', (m) => { out.LEVELS = m.CAMPAIGN || m.LEVELS; }],   // CAMPAIGN = hand-authored + generated acts 2-5
     ['../data/enemies.js', (m) => { out.ENEMIES = m.ENEMIES; }],
     ['../data/tuning.js', (m) => { out.CAM = m.CAM; out.COMBAT = m.COMBAT; out.ECON = m.ECON; out.PHYS = m.PHYS; }],
     ['../data/modes.js', (m) => { out.MODES = buildModes(m); out.modesRaw = m; }],

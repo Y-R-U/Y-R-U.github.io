@@ -261,23 +261,39 @@ export function starsFor(time, par, ECON) {
   return 1;
 }
 
-export function totalStars(save, LEVELS) {
-  return LEVELS.reduce((n, l) => n + levelStars(save, l.id), 0);
+/**
+ * Levels that are graded at all. Tutorials carry `stars:false` — timing a teaching level against
+ * par punishes exactly the experimenting it is there to encourage — so they must count toward
+ * neither the numerator nor the denominator of the star total.
+ */
+export function gradedLevels(LEVELS) {
+  return (LEVELS || []).filter((l) => l && l.stars !== false);
 }
+
+export function totalStars(save, LEVELS) {
+  return gradedLevels(LEVELS).reduce((n, l) => n + levelStars(save, l.id), 0);
+}
+
+export function maxStars(LEVELS) { return gradedLevels(LEVELS).length * 3; }
 
 /** Group levels by act, in order, for the campaign map. */
 export function acts(LEVELS, ACTS) {
   const map = new Map();
   LEVELS.forEach((l, i) => {
-    const a = l.act || 1;
+    // `l.act || 1` folded the act-0 tutorials into Act 1, because 0 is falsy. They are their own
+    // section: two teaching missions do not belong inside DAWN PATROL.
+    const a = l.act == null ? 1 : l.act;
     if (!map.has(a)) map.set(a, { act: a, name: (ACTS && ACTS[a] && ACTS[a].name) || actName(a), levels: [] });
     map.get(a).levels.push({ level: l, index: i });
   });
   return [...map.values()].sort((x, y) => x.act - y.act);
 }
 
-const ACT_NAMES = ['', 'Dawn Patrol', 'The Long Front', 'Iron Skies', 'Jet Age', 'Last Light'];
+const ACT_NAMES = ['Flight School', 'Dawn Patrol', 'The Long Front', 'Iron Skies', 'Jet Age', 'Last Light'];
 function actName(n) { return ACT_NAMES[n] || 'Act ' + n; }
+
+/** Act 0 is the tutorial pair; it gets a name, not a number, on the campaign map. */
+export function actLabel(n) { return n === 0 ? 'TRAINING' : 'ACT ' + n; }
 
 /** What the player could buy next with the money they have — the results-screen nudge. */
 export function affordableNudge(save, PLANES, WEAPONS, UPGRADES, ECON) {

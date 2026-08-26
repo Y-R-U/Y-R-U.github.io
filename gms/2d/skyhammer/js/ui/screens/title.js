@@ -3,7 +3,7 @@
 import { el, btn, coinChip } from '../widgets.js';
 import { cash } from '../units.js';
 import { startAttract, stopAttract } from '../attract.js';
-import { nextLevel, totalStars, getMoney } from '../model.js';
+import { nextLevel, totalStars, maxStars, getMoney } from '../model.js';
 import { buzz } from '../prefs.js';
 import { goFullscreen as go, autoFullscreenDevice } from '../../core/fullscreen.js';
 
@@ -18,7 +18,7 @@ export function mount(root, ctx) {
 
   const next = nextLevel(save, data.LEVELS);
   const stars = totalStars(save, data.LEVELS);
-  const starMax = (data.LEVELS.length || 0) * 3;
+  const starMax = maxStars(data.LEVELS);
 
   root.appendChild(el('div.title-tl', {},
     coinChip(ctx),
