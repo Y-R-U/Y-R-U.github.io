@@ -321,8 +321,14 @@ if (OPT.auto) {
   tapEl.classList.add('hidden');
   startLevel(OPT.level);
 } else {
-  document.getElementById('tapbtn').addEventListener('click', boot);
+  const tapBtn = document.getElementById('tapbtn');
+  tapBtn.addEventListener('click', boot);
   tapEl.addEventListener('pointerdown', (e) => { if (e.target.id !== 'tapbtn') boot(); });
+  // Arm it only now. Everything above this line can throw, and a button that looks ready while
+  // its handler does not exist yet is indistinguishable from a broken game.
+  tapBtn.disabled = false;
+  tapBtn.classList.remove('loading');
+  tapBtn.textContent = 'TAP TO FLY';
 }
 
 if (OPT.ui) {

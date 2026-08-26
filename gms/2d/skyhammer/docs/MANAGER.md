@@ -169,3 +169,12 @@ the whole thing again.
   ten seconds. The renderer's retry ladder stays regardless.
 - Capture tooling composites `#gl` and `#hud`; **DOM screens are still invisible to it** — that is
   how a dead title screen shipped. Verify menus in a real browser, not with `shot.mjs`.
+
+## Fixed 2026-08-26, after Aaron's playtest
+
+- **The start button no longer lies during load.** It ships as a disabled, pulsing `LOADING…` and
+  `main.js` arms it — enabling it, clearing the class, setting the label — only on the line *after*
+  the click handler is attached. Everything above that line can throw, and a button that looks
+  ready while its handler does not exist is indistinguishable from a broken game. This is the same
+  root cause as the dead TAP TO FLY: markup renders before the module finishes evaluating.
+  Verified under 8x CPU throttling, where the load window is actually visible.
