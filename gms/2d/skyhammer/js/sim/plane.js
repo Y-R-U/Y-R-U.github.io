@@ -26,6 +26,13 @@ export function effectivePlaneDef(planeId, upgrades = {}) {
 
 const p0 = (save, i) => (save.loadout && save.loadout[i]) || null;
 
+function clampLoadout(list, def) {
+  const n = Math.max(0, Math.min(4, def.slots != null ? def.slots : 4));
+  const out = [null, null, null, null];
+  for (let i = 0; i < n; i++) out[i] = (list && list[i]) || null;
+  return out;
+}
+
 export function syncSlots(p) {
   for (let i = 0; i < 4; i++) {
     const s = p.slots[i];
@@ -45,14 +52,19 @@ export function makePlayer(world, save) {
     dead: false, t: 0, ai: null, parts: null,
     want: 0, hasWant: false, stalling: false, fuel: FUEL, lowFuelFired: false,
     mainCool: 0, cool: [0, 0, 0, 0], ammo: [0, 0, 0, 0],
-    loadout: save.loadout.slice(0, 4),
+    // Clamped to the AIRFRAME's hardpoints, not blindly to four. The hangar was letting a weapon
+    // into a slot the aeroplane does not have, and this armed it anyway with real ammo while
+    // hud.js — which does clamp — drew no button for it. The sim is the last line of defence and
+    // it had none, so a hand-edited or already-corrupt save could still fly an invisible weapon.
+    loadout: clampLoadout(save.loadout, def),
     landed: false, script: null, invuln: 0, hitFlash: 0,
     fuelMax: FUEL,
     // js/ui/hud.js reads this shape; the sim keeps using the flat arrays above.
-    slots: [0, 1, 2, 3].map((i) => ({ id: p0(save, i), ammo: 0, cd: 0, cdMax: 1 })),
+    slots: [0, 1, 2, 3].map((i) => ({ id: null, ammo: 0, cd: 0, cdMax: 1 })),
   };
   for (let i = 0; i < 4; i++) {
     const w = WEAPONS[p.loadout[i]];
+    p.slots[i].id = p.loadout[i] || null;
     p.ammo[i] = w ? Math.round((w.ammo || 0) + def.ammoBonus) : 0;
     p.slots[i].cdMax = w ? w.cooldown : 1;
   }

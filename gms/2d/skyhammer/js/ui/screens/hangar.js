@@ -14,6 +14,13 @@ export function mount(root, ctx) {
   const { data, save } = ctx;
   const PLANES = data.PLANES, WEAPONS = data.WEAPONS, UPGRADES = data.UPGRADES, ECON = data.ECON;
 
+  // The carousel BROWSES. Everything you can spend or commit — upgrades, stores, hardpoints —
+  // belongs to the aeroplane you actually fly, and must be read from here rather than from
+  // PLANES[carouselIdx]. Browsing used to unlock the hardpoints of a plane you did not own and
+  // let you load a bomb into one; the sim then flew your own aeroplane, which had no such slot,
+  // and the bomb was nowhere on the HUD.
+  const activePlane = () => M.currentPlane(save, PLANES);
+
   const cur = M.currentPlane(save, PLANES);
   if (cur) {
     const i = PLANES.findIndex((p) => p.id === cur.id);
@@ -48,14 +55,21 @@ export function mount(root, ctx) {
     }
 
     bay.appendChild(el('div.bay-head', {},
-      btn('icon arrow left', '', () => { carouselIdx = (carouselIdx - 1 + PLANES.length) % PLANES.length; renderBay(); renderPane(); renderBar(); }, { aria: 'Previous aircraft' }),
-      el('div.bay-name', {},
-        el('div.bay-title', {}, p.name),
-        el('div.bay-meta', {}, `TIER ${p.tier} · ${String(p.era).toUpperCase()} · ${M.slotCount(p)} HARDPOINTS`)
-      ),
-      btn('icon arrow right', '', () => { carouselIdx = (carouselIdx + 1) % PLANES.length; renderBay(); renderPane(); renderBar(); }, { aria: 'Next aircraft' })
+      arrow('left', -1),
+      el('div.bay-name', {}, el('div.bay-title', {}, p.name)),
+      arrow('right', 1)
     ));
+    // The spec line sits under the head, not inside it: the bigger arrows leave the name box too
+    // narrow to hold it on one line and it wrapped.
+    bay.appendChild(el('div.bay-meta', { style: { textAlign: 'center' } },
+      `TIER ${p.tier} · ${String(p.era).toUpperCase()} · ${M.slotCount(p)} HARDPOINTS`));
     bay.appendChild(art);
+    swipeSource(art);
+
+    const act = activePlane();
+    if (act && act.id !== p.id) {
+      bay.appendChild(el('div.bay-preview', { style: PREVIEW_CSS }, `PREVIEW · YOU FLY THE ${act.name.toUpperCase()}`));
+    }
 
     bay.appendChild(el('div.bay-stats', {},
       statBar('ARM', p.hp, 700), statBar('SPD', p.cruise, 950),
@@ -69,8 +83,8 @@ export function mount(root, ctx) {
       bay.appendChild(btn('wide ok', 'IN SERVICE', null, { disabled: true }));
     } else if (owned) {
       bay.appendChild(btn('wide', 'SELECT', () => {
-        M.selectPlane(save, PLANES, p.id);
-        M.normaliseLoadout(save, p);
+        M.selectPlane(save, PLANES, p.id);   // stows the old loadout and recalls this plane's
+        selSlot = 0;
         toast(`${p.name} rolled out`);
         renderBay(); renderPane(); renderBar();
       }));
@@ -87,7 +101,7 @@ export function mount(root, ctx) {
             { label: 'Buy it', kind: 'go', act: () => {
               if (M.buyPlane(save, PLANES, p.id)) {
                 M.selectPlane(save, PLANES, p.id);
-                M.normaliseLoadout(save, p);
+                selSlot = 0;
                 buzz(24);
                 toast(`${p.name} delivered`, 'good');
                 refreshCoins(ctx); renderBay(); renderPane(); renderBar();
@@ -97,6 +111,55 @@ export function mount(root, ctx) {
         });
       }));
     }
+  }
+
+  const PREVIEW_CSS = {
+    font: '800 8px/1.5 var(--ui-font)', letterSpacing: '.12em', textTransform: 'uppercase',
+    color: 'rgba(255,196,107,.72)', textAlign: 'center', margin: '0 0 3px',
+    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+  };
+
+  function step(dir) {
+    carouselIdx = (carouselIdx + dir + PLANES.length) % PLANES.length;
+    renderBay(); renderPane(); renderBar();
+  }
+
+  /**
+   * 52 px of picture, 78 x 72 of target. A 44 px box at the edge of a landscape phone is the
+   * spec floor and Aaron missed it repeatedly. The pad is a transparent sibling that extends
+   * the pressable area outward without moving anything; it must NOT live inside the <button>,
+   * because Blink then declines to hit-test the parts of it that overhang in both axes at once
+   * and the corners quietly stay dead. Less headroom at the top on purpose — the topbar's back
+   * button is directly above.
+   */
+  function arrow(dir, delta) {
+    const b = btn('icon arrow ' + dir, '', () => step(delta), { aria: dir === 'left' ? 'Previous aircraft' : 'Next aircraft' });
+    Object.assign(b.style, { width: '52px', minWidth: '52px', height: '52px', minHeight: '52px' });
+    const pad = el('span', { style: {
+      position: 'absolute', top: '-6px', bottom: '-14px', left: '-13px', right: '-13px',
+      borderRadius: '16px', cursor: 'pointer', touchAction: 'manipulation',
+    }, 'aria-hidden': 'true' });
+    pad.addEventListener('pointerdown', (e) => e.stopPropagation());
+    pad.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); buzz(10); step(delta); });
+    return el('div.arrow-wrap', { style: {
+      position: 'relative', zIndex: '4', display: 'flex', flex: '0 0 auto', touchAction: 'manipulation',
+    } }, pad, b);
+  }
+
+  /** A horizontal drag across the aeroplane changes aeroplane. Nothing else on the art is tappable. */
+  function swipeSource(node) {
+    let x0 = 0, y0 = 0, live = false;
+    const down = (e) => { live = true; x0 = e.clientX; y0 = e.clientY; };
+    const up = (e) => {
+      if (!live) return;
+      live = false;
+      const dx = e.clientX - x0, dy = e.clientY - y0;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.6) { buzz(8); step(dx < 0 ? 1 : -1); }
+    };
+    node.addEventListener('pointerdown', down);
+    node.addEventListener('pointerup', up);
+    node.addEventListener('pointercancel', () => { live = false; });
+    cleanup.push(() => { node.removeEventListener('pointerdown', down); node.removeEventListener('pointerup', up); });
   }
 
   function statBar(label, v, max) {
@@ -110,7 +173,9 @@ export function mount(root, ctx) {
 
   function renderPane() {
     pane.textContent = '';
-    const p = PLANES[carouselIdx];
+    // Upgrades are global (D31) and apply to the aeroplane in service, so these rows must show
+    // its numbers. Bound to the carousel they read out the stats of a plane you cannot fly.
+    const p = activePlane();
     pane.appendChild(el('div.pane-h', {}, el('span', {}, 'UPGRADES'), el('span.pane-h-r', {}, p ? p.name : '')));
     const list = el('div.pane-list');
     pane.appendChild(list);
@@ -119,6 +184,7 @@ export function mount(root, ctx) {
 
   function renderUpgrades(list, p) {
     if (!UPGRADES.length) { list.appendChild(el('div.empty', {}, 'No UPGRADES in data/planes.js')); return; }
+    if (!p) { list.appendChild(el('div.empty', {}, 'No aircraft in service')); return; }
     for (const u of UPGRADES) {
       const lvl = M.upgradeLevel(save, p.id, u.id);
       const maxed = lvl >= u.max;
@@ -216,7 +282,7 @@ export function mount(root, ctx) {
   /* ---------------------------------------------------------- loadout bar */
 
   function assign(weaponId) {
-    const p = PLANES[carouselIdx];
+    const p = activePlane();
     const n = M.slotCount(p);
     const l = M.loadout(save);
     let i = selSlot < n ? selSlot : 0;
@@ -229,9 +295,16 @@ export function mount(root, ctx) {
 
   function renderBar() {
     bar.textContent = '';
-    const p = PLANES[carouselIdx];
+    // The hardpoints belong to the aeroplane in service, not the one on the turntable.
+    const p = activePlane();
     const n = M.slotCount(p);
+    const spill = M.overflowWeapons(save, p);
     const l = M.normaliseLoadout(save, p);
+    if (spill.length) {
+      const names = spill.map((id) => (WEAPONS[id] || {}).name || id).join(', ');
+      toast(`${names} unloaded to stores — ${p ? p.name : 'this airframe'} has ${n} hardpoint${n === 1 ? '' : 's'}`);
+    }
+    if (selSlot >= n) selSlot = n - 1;
     const owned = M.ownedWeapons(save, WEAPONS);
 
     const shelf = el('div.shelf');
@@ -254,9 +327,10 @@ export function mount(root, ctx) {
 
     const slots = el('div.slots');
     const selFull = selSlot < n && l[selSlot];
+    const head = `${p ? p.name.toUpperCase() + ' ' : ''}LOADOUT ${l.slice(0, n).filter(Boolean).length}/${n}`;
     slots.appendChild(el('div.slots-lab', {}, selFull
-      ? `LOADOUT ${l.slice(0, n).filter(Boolean).length}/${n} — TAP ${selSlot + 1} AGAIN TO CLEAR`
-      : `LOADOUT ${l.slice(0, n).filter(Boolean).length}/${n}`));
+      ? `${head} — TAP ${selSlot + 1} TO UNLOAD`
+      : head));
     const row = el('div.slots-row');
     for (let i = 0; i < 4; i++) {
       const locked = i >= n;
@@ -275,7 +349,9 @@ export function mount(root, ctx) {
       }
       if (!locked) {
         s.addEventListener('click', () => {
-          if (i === selSlot && l[i]) M.setSlot(save, i, null);   // tap the selected slot again to clear it
+          // Tapping the selected slot again unloads it. setSlot stows the weapon, so it
+          // reappears in stores rather than being destroyed.
+          if (i === selSlot && l[i]) M.setSlot(save, i, null);
           selSlot = i;
           buzz(8);
           renderBar();
@@ -295,7 +371,7 @@ export function mount(root, ctx) {
     let ghost = null, startX = 0, startY = 0, moved = false, pid = null;
     const down = (e) => {
       pid = e.pointerId; startX = e.clientX; startY = e.clientY; moved = false;
-      node.setPointerCapture && node.setPointerCapture(pid);
+      try { node.setPointerCapture(pid); } catch { /* capture is a nicety; the drag works without it */ }
       node.addEventListener('pointermove', move);
       node.addEventListener('pointerup', up);
       node.addEventListener('pointercancel', up);

@@ -16,7 +16,9 @@
   --red: #e0603c;
   --blue: #6fb6d8;
 
-  --topbar: 44px;
+  /* 46, not 44: a 44px button inside a 44px bar with a 1px border has no room, and the back
+     arrow ended up 2px above the top of the screen — the least reachable place on a phone. */
+  --topbar: 46px;
   --loadbar: 70px;
 
   --ui-font: ui-sans-serif, system-ui, -apple-system, "Avenir Next", "Segoe UI", Roboto, sans-serif;
@@ -57,9 +59,15 @@
    underneath while it fades up. */
 #ui[data-screen="title"]::before { background: #0b0d12; }
 
+/* index.html sets viewport-fit=cover and nothing ever honoured the insets, so on a notched phone
+   in landscape the top bar and the edge buttons sat under the cutout and the gesture bar. Padding
+   goes on .screen rather than on #ui: an absolutely positioned child resolves inset:0 against the
+   PADDING box, so the screen's own background pseudo-elements still reach the physical edges
+   while the controls move inside the safe area. */
 .screen {
   position: absolute;
   inset: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   display: flex;
   flex-direction: column;
   opacity: 0;
@@ -605,11 +613,15 @@
 .btn.chipbtn { min-height: 44px; padding: 0 12px; font-size: 9px; border-radius: 22px; }
 
 .map-scroll {
+  position: relative;                 /* the jump chips read section.offsetTop against THIS box */
   flex: 1 1 auto; min-height: 0;
   overflow-y: auto; overscroll-behavior: contain;
   padding: 0 10px 12px;
   -webkit-overflow-scrolling: touch;
 }
+/* Static wrapper per act. The sticky .act-head cannot be the scroll target — while it is stuck
+   it reports the stuck position, so every jump resolved to the same place. */
+.act-sec { position: relative; }
 .act-head {
   position: sticky; top: 0; z-index: 1;
   display: flex; align-items: baseline; gap: 8px;
@@ -620,7 +632,14 @@
 .act-n { font: 900 11px/1 var(--ui-font); letter-spacing: .2em; color: var(--gold); }
 .act-name { font: 700 11px/1 var(--ui-font); letter-spacing: .1em; color: var(--text); text-transform: uppercase; }
 .act-stars { margin-left: auto; font: 700 9px/1 var(--ui-font); color: var(--dim); }
-.lv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 6px; padding: 2px 0 8px; }
+/* TEN fixed columns, not auto-fill. auto-fill with a 70 px floor gave 10 columns at 844 wide but
+   dropped to 9 below ~775 px — the act of 20 became three rows, of which only two were on screen,
+   which is exactly the "18 not 20" Aaron saw in a windowed browser. Ten columns is the rule the
+   grid is meant to express, so state it. */
+.lv-grid {
+  display: grid; grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 6px; padding: 2px 0 8px; max-width: 1180px;
+}
 .lv {
   position: relative;
   height: 56px;
@@ -807,7 +826,7 @@
 
 /* Two columns: switches on the left, the track list on the right with its own scroller.
    One 390 px-tall scroller for both would bury the tracks under the switches. */
-.set-body { flex: 1 1 auto; min-height: 0; display: flex; gap: 8px; padding: 6px 10px 4px; }
+.set-body { flex: 1 1 auto; min-height: 0; display: flex; gap: 8px; padding: 6px 10px 8px; }
 .set-col {
   flex: 1 1 0; min-width: 0; min-height: 0; overflow-y: auto;
   display: flex; flex-direction: column; gap: 4px; padding-right: 3px;
@@ -860,8 +879,13 @@
   font: 800 11px/1 var(--ui-font);
 }
 .set-sample-t { font: 700 8px/1 var(--ui-font); letter-spacing: .18em; color: var(--dim); }
-.set-foot { display: flex; align-items: center; gap: 10px; padding: 2px 12px 8px; }
-.set-ver { font: 700 8px/1 var(--ui-font); letter-spacing: .18em; color: rgba(184, 166, 140, .6); }
+/* The name/version and the DONE button sit in the top bar. There is no footer: it cost 54 px of
+   a 390 px screen whose whole job is two scrolling lists. */
+.set-ver {
+  font: 700 8px/1 var(--ui-font); letter-spacing: .18em; color: rgba(184, 166, 140, .6);
+  white-space: nowrap; flex: 0 0 auto; margin-left: 4px;
+}
+.topbar .btn.go.done { padding: 0 14px; font-size: 11px; flex: 0 0 auto; }
 
 /* ------------------------------------------------------------ popup + toast */
 
@@ -908,6 +932,8 @@
 
 @media (max-height: 400px) {
   :root { --topbar: 42px; --loadbar: 68px; }
+  .lv { height: 50px; }
+  .act-jump { padding: 4px 10px 3px; }
   .brief-name { font-size: 19px; }
   .res-verdict { font-size: 22px; }
   .logo-word { font-size: clamp(26px, 6.4vw, 46px); }

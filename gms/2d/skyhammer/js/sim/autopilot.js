@@ -2,8 +2,10 @@
 // tools/sim.mjs and `?auto=1` exercise exactly the player's code path.
 
 import { WEAPONS } from '../data/weapons.js';
+import { approachBox } from './landing.js';
 
 const G = 900;
+const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
 
 function objectiveWants(world) {
   const tags = new Set(), kinds = new Set();
@@ -60,6 +62,7 @@ export function makeAutopilot() {
   let phase = 'cruise';
   let phaseT = 0;
   let takeoffCool = 0;
+  let goAround = false;         // overshot the gate; climb clear and fly the circuit again
 
   return {
     get mode() { return phase; },
@@ -72,7 +75,7 @@ export function makeAutopilot() {
       takeoffCool -= dt;
       for (let i = 0; i < 4; i++) world.slots[i] = false;
 
-      if (p.landed) { if (takeoffCool <= 0) { world.takeOff(); takeoffCool = 2; } return; }
+      if (p.landed) { goAround = false; if (takeoffCool <= 0) { world.takeOff(); takeoffCool = 2; } return; }
       if (p.script) return;
 
       const want = objectiveWants(world);
@@ -97,16 +100,34 @@ export function makeAutopilot() {
       for (let i = 0; i < 4; i++) { const w = WEAPONS[p.loadout[i]]; if (w && w.gravity) bombs += p.ammo[i]; }
 
       let a = 0.05;
+      let reverse = false;                  // a heading past the +/-1.3 clamp, i.e. fly west
+      const gate = landNow ? approachBox(pad, p) : null;
 
-      if (landNow) {
+      if (landNow && gate) {
         phase = 'land';
-        // Descend EARLY and arrive level. Diving on final adds gravAssist speed (~36/s at
-        // 0.14 rad nose-down) faster than the near-pad throttle bleeds it off, so a bot that
-        // descends all the way in crosses the §9 box still above landSpeed and never triggers.
-        const ty = pad.deckY + 80;
-        const run = pad.x - 1000 - p.x;
-        if (run > 0) a = Math.max(-0.5, Math.min(0.5, Math.atan2((ty - p.y) * 1.2, Math.max(run, 400))));
-        else a = Math.max(-0.05, Math.min(0.05, (ty - p.y) * 0.0012));
+        // The gate is a small window over the STERN, not a slab over the ship, so the bot flies
+        // a real approach: descend early onto the box's top half, then hold a gentle sink
+        // through it. Two things it must not do — dive (gravAssist adds ~36/s at 0.14 rad
+        // nose-down, faster than the near-pad throttle bleeds it off, so a diving arrival
+        // crosses the window still above landSpeed) and climb (landing.js GATE.angMax is +0.02;
+        // ballooning up through the window is rejected outright).
+        if (!goAround && p.x > gate.x1 + 260) goAround = true;
+        if (goAround && p.x < gate.x0 - 2400) goAround = false;
+
+        if (goAround) {
+          if (p.y < gate.deckY + 700) a = 0.8;          // climb clear of the deck first
+          else { a = Math.PI; reverse = true; }         // then fly the circuit back west
+        } else {
+          const entryY = gate.y + gate.hh * 0.45;       // aim at the upper half of the window
+          const run = gate.x0 - p.x;
+          if (run > 500) {
+            a = clamp(Math.atan2((entryY - p.y) * 1.1, Math.max(run, 500)), -0.42, 0.45);
+          } else {
+            a = clamp(-0.05 + (gate.y - p.y) * 0.0016, -0.15, 0.10);
+            // once inside the band, sink or nothing — never climb, or the gate rejects us
+            if (p.y > gate.y0 + 22) a = Math.min(a, -0.008);
+          }
+        }
       } else if (hurt && phase !== 'evade' && phaseT > 3) {
         phase = 'evade'; phaseT = 0;
       } else if (phase === 'evade') {
@@ -150,16 +171,20 @@ export function makeAutopilot() {
         }
       }
 
-      // The terrain floor guard sits at ground + 340, which over water is ABOVE the top of the
-      // approach box (deckY + 175). It is a hard clamp, not a preference: with it in place the
-      // bot cannot descend into the box at all and never lands, on any seed. During the
-      // approach it has to key off the deck instead of the terrain.
-      const lowLimit = (phase === 'land' && pad) ? pad.deckY + 24 : floor;
-      const hardLimit = (phase === 'land' && pad) ? pad.deckY + 8 : gAhead + 190;
-      if (p.y < lowLimit) a = Math.max(a, 0.6);
-      if (p.y < hardLimit) a = 1.0;
-      if (p.y > 2150) a = Math.min(a, -0.2);
-      world.setStickAngle(Math.max(-1.3, Math.min(1.3, a)));
+      // The terrain floor guard sits at ground + 340, which over water is ABOVE the whole
+      // approach window. It is a hard clamp, not a preference: with it in place the bot cannot
+      // descend into the gate at all and never lands, on any seed. During the approach it has to
+      // key off the deck instead of the terrain — and the recovery climb has to sit BELOW the
+      // gate's floor, because a 0.6 rad pull-up inside the window fails GATE.angMax.
+      const lowLimit = (phase === 'land' && gate && !goAround) ? gate.y0 - 6 : floor;
+      const hardLimit = (phase === 'land' && gate) ? gate.deckY + 8 : gAhead + 190;
+      if (!reverse) {
+        if (p.y < lowLimit) a = Math.max(a, 0.6);
+        if (p.y < hardLimit) a = 1.0;
+        if (p.y > 2150) a = Math.min(a, -0.2);
+        a = clamp(a, -1.3, 1.3);
+      }
+      world.setStickAngle(a);
 
       // --- ordnance ---
       if (!best || phase === 'evade' || phase === 'land') return;

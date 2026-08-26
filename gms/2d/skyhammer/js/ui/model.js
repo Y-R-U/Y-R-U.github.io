@@ -68,9 +68,25 @@ export function buyPlane(save, PLANES, id) {
   return true;
 }
 
+/**
+ * Switching airframe remembers the loadout you had on the old one and recalls the one you last
+ * flew on the new one. Without the memory, moving to a plane with fewer hardpoints threw the
+ * overflow away and moving back left the slots empty — a silent loss of things you had bought.
+ * Anything the new airframe cannot carry is stowed, not binned (see `normaliseLoadout`).
+ */
 export function selectPlane(save, PLANES, id) {
   if (!ownsPlane(save, PLANES, id)) return false;
-  d(save).planeId = id;
+  const s = d(save);
+  const from = s.planeId;
+  if (!s.loadouts || typeof s.loadouts !== 'object') s.loadouts = {};
+  if (from) s.loadouts[from] = loadout(save).slice(0, 4);
+  s.planeId = id;
+  const recalled = s.loadouts[id];
+  if (Array.isArray(recalled)) {
+    const l = loadout(save);
+    for (let i = 0; i < 4; i++) l[i] = recalled[i] || null;
+  }
+  normaliseLoadout(save, (PLANES || []).find((p) => p.id === id));
   flush(save);
   return true;
 }
@@ -139,11 +155,28 @@ export function specialWeapons(WEAPONS) {
     .sort((a, b) => (a.tier || 0) - (b.tier || 0) || (a.price || 0) - (b.price || 0));
 }
 
+/**
+ * A weapon leaving a hardpoint always lands back in stores. Nothing the player has ever had may
+ * be destroyed by a tap: the fresh save ships `loadout:['bomb_std','rocket',…]` while `weapons`
+ * is unset, so clearing that rocket used to erase the only record it existed and put it back
+ * behind a £1,100 price tag. `stow` is the choke point every removal goes through.
+ */
+function stow(save, id) {
+  if (!id) return false;
+  const s = d(save);
+  if (!Array.isArray(s.weapons)) s.weapons = [];
+  if (s.weapons.includes(id)) return false;
+  s.weapons.push(id);
+  return true;
+}
+
 export function ownedWeapons(save, WEAPONS) {
   const s = d(save);
-  if (!Array.isArray(s.weapons)) {
-    s.weapons = specialWeapons(WEAPONS).filter((w) => !w.price).map((w) => w.id);
-  }
+  let changed = false;
+  if (!Array.isArray(s.weapons)) { s.weapons = []; changed = true; }
+  for (const w of specialWeapons(WEAPONS)) if (!w.price && !s.weapons.includes(w.id)) { s.weapons.push(w.id); changed = true; }
+  for (const id of loadout(save)) if (stow(save, id)) changed = true;
+  if (changed) flush(save);
   return s.weapons;
 }
 
@@ -183,16 +216,25 @@ export function setSlot(save, i, weaponId) {
     const dup = l.indexOf(weaponId);
     if (dup >= 0 && dup !== i) l[dup] = null;   // a weapon can only sit in one slot
   }
+  if (l[i] && l[i] !== weaponId) stow(save, l[i]);
   l[i] = weaponId || null;
   flush(save);
 }
 
-/** Trim anything sitting past the current plane's slot count. */
+/** Ids sitting past this plane's hardpoint count — what a switch would have to unload. */
+export function overflowWeapons(save, plane) {
+  const l = loadout(save);
+  const out = [];
+  for (let i = slotCount(plane); i < 4; i++) if (l[i]) out.push(l[i]);
+  return out;
+}
+
+/** Unload anything past the plane's hardpoint count — back to stores, never to the bin. */
 export function normaliseLoadout(save, plane) {
   const l = loadout(save);
   const n = slotCount(plane);
   let changed = false;
-  for (let i = n; i < 4; i++) if (l[i]) { l[i] = null; changed = true; }
+  for (let i = n; i < 4; i++) if (l[i]) { stow(save, l[i]); l[i] = null; changed = true; }
   if (changed) flush(save);
   return l;
 }
@@ -240,10 +282,23 @@ export function recordLevel(save, levelId, res) {
 }
 
 /** A level is unlocked if it is the first, or the one before it is done. */
+/**
+ * Act 0 is the two tutorials. They are always available and they never gate anything: being made
+ * to fly Flight School before Dawn Patrol will unlock is not a thing anyone asked for, and with
+ * CAMPAIGN putting them at indices 0-1 the naive "previous level" rule locked a1-01 behind them.
+ * So walk back to the previous level that actually gates.
+ */
 export function levelUnlocked(save, LEVELS, index) {
   if (index <= 0) return true;
   if ((d(save).unlockAll)) return true;
-  return levelDone(save, LEVELS[index - 1].id);
+  const lv = LEVELS[index];
+  if (lv && lv.act === 0) return true;
+  for (let i = index - 1; i >= 0; i--) {
+    const prev = LEVELS[i];
+    if (!prev || prev.act === 0) continue;
+    return levelDone(save, prev.id);
+  }
+  return true;
 }
 
 export function nextLevel(save, LEVELS) {

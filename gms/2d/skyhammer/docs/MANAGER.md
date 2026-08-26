@@ -173,6 +173,30 @@ fix. Run `tools/campaign_gate.mjs`, and read the runtime line, not the structura
 - **Listen to the tracks.** Nobody has. They were selected by measurement, not by ear.
 - **Try a landing.** It now works end to end, but he has never done one.
 
+## Rulings from Aaron's second playtest
+
+- **The landing gate is the deck projected back along your own roll-out.** Not a taste dial:
+  the settle carries you `landSpeed * 1.2 / 2` further (148 units in a kestrel, 269 in a vector),
+  so the accept window is the deck's two ends shifted back by that. Width comes out at 300 units
+  for every tier and the *time* inside varies, 1.21 s down to 0.67 s — the difficulty ladder is a
+  consequence of the aircraft, not a number anyone chose. The one dial if it proves too tight on
+  a phone is `GATE.ceil` (120 → 160 buys 40% more altitude tolerance and changes nothing else).
+- **`gfx/models/ground.js` imports `sim/landing.js`.** Deliberate, and the point of the exercise:
+  the drawn approach box must BE the accept test, not a picture of it. Two copies of the rule had
+  already drifted once — `ui/tutorial.js` carried a restatement under a comment promising it
+  could not drift. A copy of a rule is not a shared rule. One pure function, no cycle.
+- **The menu backdrop belongs to the router, not the screen.** `.screen` fades in from opacity 0,
+  so anything painted inside it cannot cover the transition.
+- **Music follows the screen** (`ui.js` → `main.js#menuMusic`). `null` in `MENU_MUSIC` means
+  "leave whatever is playing alone" — pause, settings and results all sit over music that should
+  keep going.
+- **Nothing leaves a hardpoint without landing in `save.weapons`** (`model.js#stow`). Rockets
+  existed only as an entry in `loadout`, so clearing the slot destroyed them permanently.
+- **`sim/plane.js` clamps the loadout to `def.slots`.** The last line of defence, which it did
+  not have: it armed every index with real ammo while the HUD drew buttons only for the ones the
+  airframe has.
+- **Tutorials never gate the campaign** (`model.js#levelUnlocked` walks back past act 0).
+
 ## Gates, and what each is actually for
 
 Every one has a sabotage mode. **A gate that has never been seen to fail is not evidence** — and
@@ -188,6 +212,8 @@ unfalsified the moment the game got better. Good for the game, bad for the instr
 | `tools/campaign_gate.mjs` | every objective still reachable after real autopilot runs. **Read the runtime line first** |
 | `tools/tutorial_gate.mjs` | every hint advanced on its trigger, never on a timeout |
 | `tools/contrastgate.mjs` | the player reads against sky and ground (ART.md §2) |
+| `tools/gate_screens.mjs` | music-list scroll survives a toggle, preview parks the game music and gives it back, act jump chips scroll both ways, an act of 20 is 2 rows at every width |
+| `tools/landing_gate.mjs` | all 9 tiers can land, every touchdown finishes on the deck, and the DRAWN box equals the accept test |
 
 A gate caught a false pass in its own first draft this session: `null < 9000` is true, so a bare
 comparison passed on a broken read. Type-guard the comparison, not just the value.

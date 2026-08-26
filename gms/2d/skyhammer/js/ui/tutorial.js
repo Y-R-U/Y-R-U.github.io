@@ -2,6 +2,8 @@
 // overlay canvas. Reads world state only — it never writes to a sim object and never touches
 // the HUD's layout state; the safe band below is recomputed from the same numbers hud.js uses.
 
+import { approachBox } from '../sim/landing.js';
+
 const FADE_IN = 0.32, FADE_OUT = 0.28, GAP = 0.22;
 
 /* ------------------------------------------------------------------ probes */
@@ -25,11 +27,16 @@ function nearestAhead(w, pred, span) {
 
 const padOf = (w) => w.ents.find((e) => e.kind === 'pad' && !e.dead) || null;
 
-/** The §9 approach box, in the sim's own terms so this cannot drift from landing.js. */
+/**
+ * The §9 approach gate, READ from landing.js rather than restated. The previous version carried a
+ * copy of the predicate under a comment promising it could not drift from landing.js — and it
+ * drifted the moment the gate was reworked from a pad-centred slab into a real approach window.
+ * A copy of a rule is not a shared rule.
+ */
 function inBox(w) {
   const p = w.player, pad = padOf(w);
-  if (!p || !pad) return false;
-  return Math.abs(p.x - pad.x) <= pad.w + p.w && Math.abs(p.y - pad.y) <= pad.h + p.h;
+  const g = p && pad && approachBox(pad, p);
+  return !!g && g.inside;
 }
 
 const ammoTotal = (p) => {
@@ -81,7 +88,7 @@ const SCRIPTS = {
       text: (w) => {
         const pad = padOf(w), p = w.player;
         if (pad && p.x > pad.x + 320) return 'Overshot. Loop around and cross the deck left to right.';
-        if (inBox(w)) return 'In the box. Hold her level and let the speed bleed off.';
+        if (inBox(w)) return 'In the box. Nose flat or a touch down — never climbing.';
         if (p.speed > (p.def.landSpeed || 250) * 1.4) return 'Too fast. Stop climbing and let her slow down.';
         return 'Wings level, nose flat. She puts herself down once she is slow enough.';
       },

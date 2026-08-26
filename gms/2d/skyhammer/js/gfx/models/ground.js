@@ -5,6 +5,8 @@
 import * as THREE from 'three';
 import { builder, normaliseStructure } from './parts.js';
 import { mix, shade } from '../palette.js';
+// The accept window is DERIVED here, never restated. See makeApproachBox at the bottom of the file.
+import { approachBox } from '../../sim/landing.js';
 
 // depth (z half-extent, world units) per shape family — small; this is a side-scroller.
 export const DEPTH = {
@@ -353,21 +355,27 @@ export function depthFor(shape) { return DEPTH[shape] ?? DEPTH._default; }
 
 // ------------------------------------------------------------- the landing approach box
 //
-// Aaron, verbatim: "land on boat/aircraft carrier via small transparent green box".
+// Aaron, verbatim: "land on boat/aircraft carrier via small transparent green box" — and then,
+// on seeing the honest drawing of the old rule: "the landing box is huge. it should be a small
+// green box above the left side of the ship. basically you need to come into it like you are
+// actually landing before the auto land takes over."
 //
 // THE ONE RULE: the drawn volume must be the volume the sim actually accepts, or the cue is worse
-// than no cue. `js/sim/landing.js: check()` accepts when
+// than no cue. This file used to RESTATE `landing.js check()`'s predicate from the same four ent
+// fields, which was correct but was a drift hazard the moment the rule changed — and the rule
+// then changed. It no longer restates anything: `sim/landing.js` exports `approachBox(pad, plane)`
+// and `place()` reads `x/y/hw/hh` straight off it. That rectangle is simultaneously what is drawn
+// and what `check()` tests the aeroplane's centre against; there is no second, invisible,
+// more-forgiving box behind it.
 //
-//     |p.x - pad.x| <= pad.w + p.w      and      |p.y - pad.y| <= pad.h + p.h
-//     |p.ang| < 0.25,  p.vx > 0,  p.speed < (def.landSpeed || def.stall * 1.3)
+// The box is not centred on the ship any more. `approachBox` derives its right edge from the
+// settle roll-out (`landSpeed * 1.2 / 2` — 148 units in a kestrel, 269 in a vector) so that the
+// roll-out always stops on the deck, which puts the window over the STERN, and in the fastest
+// aircraft entirely behind it. That is the mechanic, not a bug: a vector has to be established on
+// the approach before it reaches the ramp.
 //
-// so `place()` below takes the pad ent and the player ent and derives the half-extents from the
-// same four numbers rather than restating them. It cannot restate the FORM of the test, though:
-// landing.js does not export the box, so if that predicate is ever rewritten this drawing has to
-// follow. The durable fix is for `sim/landing.js` to export the box and for this to consume it —
-// that is the SIM agent's file, not this one.
-//
-// WIRING (one call site, in whichever file owns the ent -> mesh walk, i.e. `js/gfx/actors.js`):
+// WIRING (one call site, in whichever file owns the ent -> mesh walk, i.e. `js/gfx/actors.js`) —
+// UNCHANGED by the rewrite, `place()` still takes exactly (pad, player, t):
 //     const approach = makeApproachBox();        // once, next to the other meshes
 //     root.add(approach.root);
 //     ... per frame, for the nearest live `kind === 'pad'` ent:
@@ -385,7 +393,7 @@ export function makeApproachBox() {
   const box = new THREE.Mesh(geo, fill);
   root.add(box);
 
-  // A wireframe edge as well as the fill: at 82 CSS px tall a translucent fill alone is a faint
+  // A wireframe edge as well as the fill: at 43 CSS px tall a translucent fill alone is a faint
   // wash over a bright sky, and the EDGE is what the eye actually flies to.
   const edges = new THREE.LineSegments(
     new THREE.EdgesGeometry(geo),
@@ -398,22 +406,20 @@ export function makeApproachBox() {
     hide() { root.visible = false; },
     /**
      * @param pad     the `kind === 'pad'` ent
-     * @param player  the player ent (its w/h are HALF the box, exactly as landing.js reads them)
+     * @param player  the player ent
      * @param t       seconds, for the pulse
      */
     place(pad, player, t = 0) {
       if (!pad || !player) { root.visible = false; return; }
-      const hw = pad.w + player.w;          // landing.js: |p.x - e.x| <= e.w + p.w
-      const hh = pad.h + player.h;          // landing.js: |p.y - e.y| <= e.h + p.h
+      const g = approachBox(pad, player);   // the accept test itself, not a picture of it
+      if (!g) { root.visible = false; return; }
       root.visible = true;
-      root.position.set(pad.x, pad.y, -6);
-      box.scale.set(hw, hh, 26);
-      edges.scale.set(hw, hh, 26);
+      root.position.set(g.x, g.y, -6);
+      box.scale.set(g.hw, g.hh, 26);
+      edges.scale.set(g.hw, g.hh, 26);
       // green while the attitude and speed would be accepted, amber while they would not: the box
       // is a promise, and it should stop promising when the approach is wrong.
-      const def = player.def || {};
-      const ok = Math.abs(player.ang || 0) < 0.25 && (player.vx || 0) > 0
-              && (player.speed || 0) < (def.landSpeed || (def.stall || 0) * 1.3);
+      const ok = g.ready;
       const pulse = 0.5 + 0.5 * Math.sin(t * 3.4);
       fill.color.setHex(ok ? 0x5ee06a : 0xe0a83a);
       edges.material.color.setHex(ok ? 0x8dff9a : 0xffc46b);

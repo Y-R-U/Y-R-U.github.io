@@ -23,8 +23,12 @@ export function mount(root, ctx) {
   const jump = el('div.act-jump');
   for (const g of groups) {
     jump.appendChild(btn('chipbtn', M.actLabel(g.act), () => {
-      const h = scroller.querySelector(`[data-act="${g.act}"]`);
-      if (h) scroller.scrollTo({ top: h.offsetTop - 6, behavior: 'smooth' });
+      // data-act is on the STATIC section wrapper, never on the sticky .act-head: a stuck header
+      // reports its stuck position from offsetTop/getBoundingClientRect, so every chip resolved to
+      // roughly the same number and every jump — forwards or back — clamped to the bottom of the
+      // list. .map-scroll is position:relative so this offsetTop is the scroll offset itself.
+      const sec = scroller.querySelector(`.act-sec[data-act="${g.act}"]`);
+      if (sec) scroller.scrollTo({ top: Math.max(0, sec.offsetTop - 4), behavior: 'smooth' });
     }));
   }
   jump.appendChild(el('div.spacer'));
@@ -36,7 +40,9 @@ export function mount(root, ctx) {
     // ungraded levels (the tutorials, stars:false) count toward neither half of the act total
     const graded = M.gradedLevels(g.levels.map((x) => x.level));
     const got = graded.reduce((n, l) => n + M.levelStars(save, l.id), 0);
-    scroller.appendChild(el('div.act-head', { dataAct: String(g.act) },
+    const sec = el('section.act-sec', { dataAct: String(g.act) });
+    scroller.appendChild(sec);
+    sec.appendChild(el('div.act-head', {},
       el('span.act-n', {}, M.actLabel(g.act)),
       el('span.act-name', {}, g.name),
       graded.length ? el('span.act-stars', {}, `${got}/${graded.length * 3}`) : null
@@ -64,7 +70,7 @@ export function mount(root, ctx) {
       }
       grid.appendChild(tile);
     }
-    scroller.appendChild(grid);
+    sec.appendChild(grid);
   }
 
   root.appendChild(scroller);

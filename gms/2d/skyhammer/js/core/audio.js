@@ -279,13 +279,13 @@ function onDeckError(d, e) {
 }
 
 /** Start `track` on a free deck and hand over from whatever is playing. */
-function start(track, fade) {
+function start(track, fade, atTime) {
   if (!track) return false;
   const cur = liveDeck();
   if (cur && cur.track && cur.track.id === track.id && cur.state === 'live') return true;
   const d = freeDeck(cur);
   if (!d) { log('no-deck', { id: track.id }); return false; }
-  loadInto(d, track, track.startAt || 0);
+  loadInto(d, track, atTime != null ? atTime : (track.startAt || 0));
   d.state = 'live';
   d.gain.gain.cancelScheduledValues(ctx.currentTime);
   d.gain.gain.value = 0; d.from = 0; d.to = 0; d.dur = 0;
@@ -299,11 +299,17 @@ function start(track, fade) {
   return true;
 }
 
+let held = false, heldTrack = null, heldAt = 0;
+
 function trimOf(t) { const g = Number(t && t.gainTrim); return g > 0 ? g : 1; }
 
 /** Resolve the standing request into an actual track, skipping dead files and disabled ids. */
 function applyRequest() {
   if (!unlocked || !manifestReady || !pickTrack) { want.pending = true; return; }
+  // A hold parks the decks for something else (the settings screen's track preview). Every route
+  // back into playback has to respect it, or a stray setPref — prefs.apply() calls setMusic on
+  // EVERY change — resurrects the music underneath the preview.
+  if (held) { want.pending = true; return; }
   want.pending = false;
   const skip = Object.assign(Object.create(null), disabled, bad);
   for (let i = 0; i < MAX_REPICKS; i++) {
@@ -571,7 +577,34 @@ export const audio = {
       if (!musicOn) { setTimeout(() => { if (!musicOn) { try { d.el.pause(); } catch { /* gone */ } } }, 280); }
       else if (d.state === 'live' && d.wantPlay) { const p = d.el.play(); if (p && p.catch) p.catch(() => {}); }
     }
-    if (musicOn && !liveDeck() && want.context) applyRequest();
+    if (musicOn && !liveDeck() && want.context && !held) applyRequest();
+  },
+
+  /**
+   * Park the decks without touching the `musicOn` PREFERENCE, and give them back on release —
+   * same track, same position. This is not `setMusic(false)`: that is the player's own setting,
+   * and prefs.js writes it back on the next change. Used by the settings screen so previewing a
+   * track does not play over the game's music, and so leaving mid-preview is not silent.
+   */
+  holdMusic(on) {
+    const next = !!on;
+    if (next === held) return held;
+    held = next;
+    if (!unlocked) return held;
+    if (held) {
+      const d = liveDeck();
+      heldTrack = d && d.track ? d.track : null;
+      heldAt = d && d.el ? d.el.currentTime : 0;
+      want.pending = false;
+      stopAllMusic(0.3);
+      log('hold', { id: heldTrack ? heldTrack.id : null, at: heldAt });
+    } else {
+      if (heldTrack) start(heldTrack, 0.6, heldAt);
+      else if (want.context) applyRequest();
+      log('release', { id: heldTrack ? heldTrack.id : null });
+      heldTrack = null; heldAt = 0;
+    }
+    return held;
   },
 
   setSfx(on) { sfxOn = !!on; if (sfxBus) sfxBus.gain.value = sfxOn ? 1 : 0; },
