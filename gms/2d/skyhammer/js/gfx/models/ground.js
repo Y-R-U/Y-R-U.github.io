@@ -355,27 +355,30 @@ export function depthFor(shape) { return DEPTH[shape] ?? DEPTH._default; }
 
 // ------------------------------------------------------------- the landing approach box
 //
-// Aaron, verbatim: "land on boat/aircraft carrier via small transparent green box" — and then,
-// on seeing the honest drawing of the old rule: "the landing box is huge. it should be a small
-// green box above the left side of the ship. basically you need to come into it like you are
-// actually landing before the auto land takes over."
+// Aaron, verbatim: "land on boat/aircraft carrier via small transparent green box" — then, on
+// seeing the honest drawing of the derived window: "it should be a small square at the start of
+// the boat a little above and a little to the left of the boat... if the box is pretty small like
+// 40px x 40px then only hitting the box when moving the correct direction is the challenge."
 //
 // THE ONE RULE: the drawn volume must be the volume the sim actually accepts, or the cue is worse
 // than no cue. This file used to RESTATE `landing.js check()`'s predicate from the same four ent
-// fields, which was correct but was a drift hazard the moment the rule changed — and the rule
-// then changed. It no longer restates anything: `sim/landing.js` exports `approachBox(pad, plane)`
-// and `place()` reads `x/y/hw/hh` straight off it. That rectangle is simultaneously what is drawn
-// and what `check()` tests the aeroplane's centre against; there is no second, invisible,
-// more-forgiving box behind it.
+// fields, which was correct but was a drift hazard the moment the rule changed — and the rule has
+// now changed twice. It no longer restates anything: `sim/landing.js` exports
+// `approachBox(pad, plane)` and `place()` reads `x/y/hw/hh` straight off it. That square is
+// simultaneously what is drawn and what `check()` tests the aeroplane's centre against; there is
+// no second, invisible, more-forgiving box behind it.
 //
-// The box is not centred on the ship any more. `approachBox` derives its right edge from the
-// settle roll-out (`landSpeed * 1.2 / 2` — 148 units in a kestrel, 269 in a vector) so that the
-// roll-out always stops on the deck, which puts the window over the STERN, and in the fastest
-// aircraft entirely behind it. That is the mechanic, not a bug: a vector has to be established on
-// the approach before it reaches the ramp.
+// It is a SQUARE, GATE.size = 90 world units on a side, sitting off the ship's left end. Ninety
+// units is not a taste dial: camera.js renders exactly VH = 900 world units of height, so the box
+// is always one tenth of the viewport tall — about 40 CSS px on a phone in landscape, which is
+// the size that was asked for, expressed in the only unit the sim can actually reason in.
+//
+// AMBER now means one thing and one thing only: you are flying AWAY from the ship. It used to
+// mean "one of speed, attitude or direction is wrong" without saying which, so an amber box was
+// an unreadable complaint. See the gate's own comment for why the other two conditions went.
 //
 // WIRING (one call site, in whichever file owns the ent -> mesh walk, i.e. `js/gfx/actors.js`) —
-// UNCHANGED by the rewrite, `place()` still takes exactly (pad, player, t):
+// UNCHANGED by either rewrite, `place()` still takes exactly (pad, player, t):
 //     const approach = makeApproachBox();        // once, next to the other meshes
 //     root.add(approach.root);
 //     ... per frame, for the nearest live `kind === 'pad'` ent:
@@ -417,8 +420,8 @@ export function makeApproachBox() {
       root.position.set(g.x, g.y, -6);
       box.scale.set(g.hw, g.hh, 26);
       edges.scale.set(g.hw, g.hh, 26);
-      // green while the attitude and speed would be accepted, amber while they would not: the box
-      // is a promise, and it should stop promising when the approach is wrong.
+      // Green while you are closing on the ship, amber while you are running away from it. The
+      // box is a promise, and the only way to make it stop promising is to turn round.
       const ok = g.ready;
       const pulse = 0.5 + 0.5 * Math.sin(t * 3.4);
       fill.color.setHex(ok ? 0x5ee06a : 0xe0a83a);

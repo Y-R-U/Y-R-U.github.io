@@ -247,11 +247,28 @@ never requires a sim change downstream.
 
 ## 9. Landing (Aaron's spec, item 11)
 
-A `pad` ent draws as a **translucent green box** (world-space, ~340×160 units) on a carrier deck,
-airstrip or road. Auto-land triggers when **all** hold: plane AABB overlaps the pad,
-`|ang| < 0.25 rad`, `vx > 0`, and `speed < plane.def.landSpeed`. On trigger the sim takes control
-and flies a scripted 1.2 s settle to the deck. Taking off again is a single **TAKE OFF** button
-that scripts a 1.0 s launch. Landing refuels, rearms and is how some missions are completed.
+A `pad` ent is a carrier deck, airstrip or road, 340×160 world units. Off its **left end** sits a
+**translucent green square** — `GATE.size` = 90 units a side (one tenth of the 900-unit viewport,
+so ~40 CSS px on a phone), centred `GATE.lead` = 20 units left of the deck and `GATE.rise` = 55
+above it. Auto-land triggers when **both** hold: the plane's **centre** is inside that square, and
+`vx > 0` (moving toward the ship). Nothing else — not speed, not attitude. The square goes amber
+only while you are flying away from the ship.
+
+The square's POSITION is derived, not chosen: the settle carries the aeroplane
+`landSpeed × 1.2 / 2` (148–269 units across the tiers) further along the deck, so triggering
+anywhere in the square puts every tier's touchdown inside the deck's ±170.
+
+Revision 1 was "plane AABB overlaps the pad, `|ang| < 0.25`, `vx > 0`, `speed < landSpeed`" — a
+460×190 slab, i.e. "be roughly near the boat". Revision 2 derived a 300-unit window over the stern
+and kept the speed and attitude tests. Aaron rejected both: *"as long as you are moving toward boat
+and hit the small square you are good, almost cheat mode auto land. but if the box is pretty small
+like 40px x 40px then only hitting the box when moving the correct direction is the challenge."*
+The difficulty is all in placing the aeroplane, none of it in a checklist you cannot see.
+
+`js/sim/landing.js` exports `approachBox(pad, plane)`; **the sim tests it and the gfx draws it, and
+neither restates it**. On trigger the sim takes control and flies a scripted 1.2 s settle to the
+deck. Taking off again is a single **TAKE OFF** button that scripts a 1.0 s launch. Landing
+refuels, rearms and is how some missions are completed. Gate: `tools/landing_gate.mjs`.
 
 ---
 

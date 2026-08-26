@@ -171,16 +171,25 @@ fix. Run `tools/campaign_gate.mjs`, and read the runtime line, not the structura
 ### Two things Aaron is owed, personally
 
 - **Listen to the tracks.** Nobody has. They were selected by measurement, not by ear.
-- **Try a landing.** It now works end to end, but he has never done one.
+- **Try a landing.** Third revision of the rule, and the first one he asked for by name.
 
 ## Rulings from Aaron's second playtest
 
-- **The landing gate is the deck projected back along your own roll-out.** Not a taste dial:
-  the settle carries you `landSpeed * 1.2 / 2` further (148 units in a kestrel, 269 in a vector),
-  so the accept window is the deck's two ends shifted back by that. Width comes out at 300 units
-  for every tier and the *time* inside varies, 1.21 s down to 0.67 s — the difficulty ladder is a
-  consequence of the aircraft, not a number anyone chose. The one dial if it proves too tight on
-  a phone is `GATE.ceil` (120 → 160 buys 40% more altitude tolerance and changes nothing else).
+- **Landing is a 90-unit square off the bow, and TWO conditions.** Third revision, and Aaron
+  rejected the first two for the same reason each time: *"it should be fairly simple... as long as
+  you are moving toward boat and hit the small square you are good, almost cheat mode auto land.
+  but if the box is pretty small like 40px x 40px then only hitting the box when moving the correct
+  direction is the challenge."* Inside the square, and `vx > 0`. Not speed, not attitude.
+  **Three invisible thresholds is not difficulty, it is an unreadable complaint** — the box went
+  amber and never said which of the three you had failed or by how much. Amber now means exactly
+  one thing: you are flying away from the ship.
+  - `GATE.size` 90 world units, because `camera.js` renders exactly VH = 900 units of height, so
+    the box is always a tenth of the viewport — ~40 CSS px on a phone, expressed in the only unit
+    the sim can reason in. It is the ONE dial if it proves too tight on a phone.
+  - `GATE.lead` 20 and `GATE.rise` 55 place it; the settle roll-out (`landSpeed × 1.2 / 2`,
+    148–269 units) is what makes that position the right one, and the gate checks every tier's
+    touchdown lands inside the deck's ±170. Put the square amidships and the fast tiers roll off
+    the bow — that is FALSIFY 1.
 - **`gfx/models/ground.js` imports `sim/landing.js`.** Deliberate, and the point of the exercise:
   the drawn approach box must BE the accept test, not a picture of it. Two copies of the rule had
   already drifted once — `ui/tutorial.js` carried a restatement under a comment promising it
@@ -200,9 +209,13 @@ fix. Run `tools/campaign_gate.mjs`, and read the runtime line, not the structura
 ## Gates, and what each is actually for
 
 Every one has a sabotage mode. **A gate that has never been seen to fail is not evidence** — and
-this session produced a live example of why: the `behaviour.js` recycle fix made
-`campaign_gate.mjs`'s own runtime sabotage impossible to trigger, so that half of the gate went
-unfalsified the moment the game got better. Good for the game, bad for the instrument.
+this session produced two live examples of why, both the same shape — **a fix made a sabotage
+impossible, and the gate went quietly green**. The `behaviour.js` recycle fix made
+`campaign_gate.mjs`'s runtime sabotage untriggerable. Then dropping the speed condition from the
+landing gate made `landing_gate.mjs`'s near-pad-zone sabotage vacuous: pinning the throttle zone
+back to the old fixed reach stopped changing anything, because nothing tested speed any more. It
+was deleted rather than left in to look thorough. **When you change a rule, re-run `--falsify`
+before you believe the plain run.**
 
 | gate | proves |
 |---|---|
@@ -213,7 +226,7 @@ unfalsified the moment the game got better. Good for the game, bad for the instr
 | `tools/tutorial_gate.mjs` | every hint advanced on its trigger, never on a timeout |
 | `tools/contrastgate.mjs` | the player reads against sky and ground (ART.md §2) |
 | `tools/gate_screens.mjs` | music-list scroll survives a toggle, preview parks the game music and gives it back, act jump chips scroll both ways, an act of 20 is 2 rows at every width |
-| `tools/landing_gate.mjs` | all 9 tiers can land, every touchdown finishes on the deck, and the DRAWN box equals the accept test |
+| `tools/landing_gate.mjs` | all 9 tiers can land, every touchdown finishes on the deck, and **no aeroplane in any tier lands while flying away**. Four sabotages: square moved amidships, square inflated 5x, direction rule deleted, window pinned back to the old slab |
 
 A gate caught a false pass in its own first draft this session: `null < 9000` is true, so a bare
 comparison passed on a broken read. Type-guard the comparison, not just the value.

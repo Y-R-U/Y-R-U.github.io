@@ -5,99 +5,78 @@ import { refuel } from './plane.js';
 const SETTLE = 1.2, LAUNCH = 1.0;
 
 /**
- * The approach gate. Every number here has a physical reason; none of them is a taste dial that
- * happens to look right.
+ * THE APPROACH GATE.
  *
- * The rule used to be "your AABB overlaps the pad's, anywhere" — for a kestrel on the t-02
- * carrier that is a 460 x 190 slab centred on the ship, so "landing" was "be roughly near the
- * boat, level, and slow". Aaron: *"it should be a small green box above the left side of the
- * ship. basically you need to come into it like you are actually landing before the auto land
- * takes over."*
+ * Aaron, after flying the derived-window version: *"it should be fairly simple. it should be a
+ * small square at the start of the boat a little above and a little to the left of the boat, you
+ * need to be moving toward the boat (not away) and that's is about it... as long as you are moving
+ * toward boat and hit the small square you are good, almost cheat mode auto land. but if the box
+ * is pretty small like 40px x 40px then only hitting the box when moving the correct direction is
+ * the challenge."*
  *
- * So the gate is a window over the APPROACH (stern) end of the deck. THE WINDOW IS THE DECK,
- * SHIFTED BACK ALONG YOUR OWN ROLL-OUT — that one sentence is the whole design, and nothing in it
- * is a taste dial:
+ * So the difficulty is ALL in placing the aeroplane, and none of it in a checklist. There were
+ * three other conditions here — speed below landSpeed, wings level, not climbing — and every one
+ * of them was invisible: the box went amber and you were not told which of the three had failed,
+ * or by how much. A small target you can see is a better test of flying than three thresholds you
+ * cannot. Two conditions remain, and both are things the player can read off the screen:
  *
- *  - Roll-out. The settle script flies `landSpeed -> 0` over SETTLE seconds, so it carries the
- *    aeroplane `landSpeed * SETTLE / 2` further down the deck: 148 units in a kestrel, 269 in a
- *    vector. Project the deck's two ends back by that and you have the only set of x from which
- *    the roll-out actually finishes on the ship. Trigger ahead of it and you slide off the bow;
- *    trigger behind it and you "land" in the sea astern, which the first cut of this gate did.
- *    `deckMargin` keeps 20 units of deck in reserve at each end.
- *  - So the width is the DECK's length, 340 - 40 = 300 units, the same in every tier — and the
- *    time you get inside it is not: 1.21 s in a kestrel at its landing speed, 0.67 s in a vector.
- *    That is the difficulty ladder falling out of the deck being a fixed length, which is what
- *    happens to real aeroplanes, rather than a number someone chose.
- *  - `floor` / `ceil`. The band is measured from the DECK, not from the pad ent's centre. The
- *    settle parks the aeroplane at `deckY + 12`, so a floor at +20 is "almost down"; the old rule
- *    reached to `deckY - 15`, i.e. inside the hull. The ceiling at +120 is a bit over two
- *    aeroplane-heights above the deck — low enough that you can only be there by having descended.
- *  - `angMin/angMax`. The 0.25 rad wings-level limit is unchanged; what is new is that the upper
- *    bound is +0.02 instead of +0.25, so you may be level or sinking but you may NOT be climbing
- *    through the gate. Note `vy = sin(ang) * speed`, so a descent-rate condition and an attitude
- *    condition are the same condition — which is the reason to state it as an attitude: the pilot
- *    can read it off the nose, and it needs no instrument the game does not already draw.
+ *   1. your centre is inside the square
+ *   2. you are moving toward the ship (vx > 0; the square sits off its left end)
  *
- * Deliberately NOT a condition: a MINIMUM sink rate. `PHYS.gravAssist` is 260, so a sustained
- * nose-down of `a` settles the speed at `landSpeed*0.8 + 260*sin(a)/0.9`, which crosses
- * `landSpeed` at 0.172 rad in a kestrel and 0.315 in a vector. The whole usable descent window in
- * the slowest aeroplane is therefore 0.172 rad wide, and a minimum sink eats it from the other
- * end — a 0.08 rad floor would leave 0.09 rad to hold with a thumb on a phone. The band already
- * forces the descent: you cannot be 20-120 units over the deck at the stern without having come
- * down to get there, and the no-climb rule stops you ballooning up through it.
+ * The numbers:
+ *
+ *  - `size` 90 world units. `camera.js` renders VH = 900 world units of height, so the on-screen
+ *    size is 90 * H/900 = H/10: about 40 CSS px on a phone in landscape, which is the size Aaron
+ *    asked for, and it scales with the viewport instead of being a px constant the sim cannot see.
+ *  - `lead` 20 units left of the deck's left end, so the square straddles the start of the boat —
+ *    65 units of it out over the water, 25 over the deck.
+ *  - `rise` 55 above the deck. With the half-size that is a band of deckY+10 .. deckY+100; the
+ *    settle parks the aeroplane at deckY+12, so the bottom edge is "already down" and the top is
+ *    about two aeroplane-heights up.
+ *
+ * The one thing that is still derived rather than chosen: the square has to sit where the settle
+ * ROLL-OUT finishes on the ship. stepScript flies landSpeed -> 0 over SETTLE seconds, carrying the
+ * aeroplane landSpeed * SETTLE / 2 further along the deck — 148 units in a kestrel, 269 in a
+ * vector. Trigger anywhere in this square and the touchdown lands between pad.x-87 (slowest, from
+ * the square's left edge) and pad.x+124 (fastest, from its right edge), both comfortably inside
+ * the deck's -170 .. +170. That is checked for every tier by tools/landing_gate.mjs, and it is why
+ * the square is at the START of the boat rather than the middle: put it amidships and the fast
+ * tiers roll off the bow.
  */
 export const GATE = {
-  deckMargin: 20,    // deck held in reserve at BOTH ends past the roll-out
-  floor: 20,         // band bottom, above deckY
-  ceil: 120,         // band top, above deckY
-  angMin: -0.25,     // nose-down limit (unchanged from §9)
-  angMax: 0.02,      // may be level, may not be climbing
+  size: 90,     // world units, square. ~40 CSS px on a phone: on-screen px = size * H / 900.
+  lead: 20,     // centre this far LEFT of the deck's left end
+  rise: 55,     // centre this far ABOVE the deck
 };
-
-const landSpeedOf = (def) => (def && def.landSpeed) || ((def && def.stall) || 190) * 1.3;
 
 /**
  * The single source of truth for the approach window. `sim` tests against it and `gfx` draws it;
- * nobody restates it. ONE rectangle: `x/y/hw/hh` is both the box to draw and the region the
+ * nobody restates it. ONE square: `x/y/hw/hh` is both the box to draw and the region the
  * aeroplane's centre must be in. There is no second, invisible, more-forgiving box behind it —
  * that gap is exactly how a drawn cue starts lying.
  *
- * The old rule was `|p.x - pad.x| <= pad.w + p.w`, i.e. CONTRACTS §9's "plane AABB overlaps the
- * pad". The aircraft half-extents are deliberately gone: the x window's REAR edge is the physical
- * constraint that the roll-out must finish on the ship, and inflating it by the aeroplane's own
- * nose put the touchdown up to `p.w` units astern of the stern, i.e. in the water.
- *
  * @param pad    a `kind === 'pad'` ent
- * @param plane  the player ent (needs `def`, and for the flags `ang`, `vx`, `speed`)
+ * @param plane  the player ent (only `x`, `y` and `vx` are read)
  */
 export function approachBox(pad, plane) {
   if (!pad || !plane) return null;
-  const def = plane.def || {};
   const deckY = pad.deckY !== undefined ? pad.deckY : pad.y - pad.h;
-  const land = landSpeedOf(def);
+  const h = GATE.size * 0.5;
+  const x = pad.x - pad.w - GATE.lead;
+  const y = deckY + GATE.rise;
 
-  const roll = land * SETTLE * 0.5;                 // x gained during the settle
-  // the deck's two ends, each projected back along this aeroplane's roll-out
-  const x0 = pad.x - pad.w - roll + GATE.deckMargin;
-  const x1 = pad.x + pad.w - roll - GATE.deckMargin;
-  const y0 = deckY + GATE.floor, y1 = deckY + GATE.ceil;
-
-  const ang = plane.ang || 0;
-  const attitudeOk = ang > GATE.angMin && ang < GATE.angMax;
-  const speedOk = (plane.speed || 0) < land;
+  // Toward the ship, which is east of the square. Not a speed test and not an attitude test: you
+  // may arrive fast, banked or climbing, as long as you are going the right way.
   const dirOk = (plane.vx || 0) > 0;
-
-  const x = (x0 + x1) * 0.5, y = (y0 + y1) * 0.5;
-  const hw = (x1 - x0) * 0.5, hh = (y1 - y0) * 0.5;
-  const inside = Math.abs(plane.x - x) <= hw && Math.abs(plane.y - y) <= hh;
+  const inside = Math.abs(plane.x - x) <= h && Math.abs(plane.y - y) <= h;
 
   return {
-    x, y, hw, hh,                                    // draw this; test against this
-    x0, x1, y0, y1, deckY, roll,
-    attitudeOk, speedOk, dirOk,
-    ready: attitudeOk && speedOk && dirOk,           // would the state be accepted, position aside
+    x, y, hw: h, hh: h,                              // draw this; test against this
+    x0: x - h, x1: x + h, y0: y - h, y1: y + h, deckY,
+    dirOk,
+    ready: dirOk,                                    // amber ONLY while flying away from the ship
     inside,
-    accept: inside && attitudeOk && speedOk && dirOk,
+    accept: inside && dirOk,
   };
 }
 

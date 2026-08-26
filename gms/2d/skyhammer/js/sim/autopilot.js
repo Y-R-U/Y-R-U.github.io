@@ -105,12 +105,12 @@ export function makeAutopilot() {
 
       if (landNow && gate) {
         phase = 'land';
-        // The gate is a small window over the STERN, not a slab over the ship, so the bot flies
-        // a real approach: descend early onto the box's top half, then hold a gentle sink
-        // through it. Two things it must not do — dive (gravAssist adds ~36/s at 0.14 rad
-        // nose-down, faster than the near-pad throttle bleeds it off, so a diving arrival
-        // crosses the window still above landSpeed) and climb (landing.js GATE.angMax is +0.02;
-        // ballooning up through the window is rejected outright).
+        // The gate is a 90-unit square off the ship's bow, not a slab over the ship, so the bot
+        // flies a real approach: descend early onto the square's top half, then hold a gentle
+        // sink through it. Speed and attitude are no longer accept conditions, so nothing here
+        // is required by the RULE any more — the shallow, early, unhurried profile is required
+        // by the TARGET, which is 90 units wide and takes 0.45 s to cross at approach speed. A
+        // dive arrives with too much vertical rate to stay in the band for a whole tick.
         if (!goAround && p.x > gate.x1 + 260) goAround = true;
         if (goAround && p.x < gate.x0 - 2400) goAround = false;
 
@@ -124,7 +124,8 @@ export function makeAutopilot() {
             a = clamp(Math.atan2((entryY - p.y) * 1.1, Math.max(run, 500)), -0.42, 0.45);
           } else {
             a = clamp(-0.05 + (gate.y - p.y) * 0.0016, -0.15, 0.10);
-            // once inside the band, sink or nothing — never climb, or the gate rejects us
+            // once inside the band, sink or nothing: climbing back out of a 90-unit-tall square
+            // is how the bot used to miss it and fly a whole circuit for another go
             if (p.y > gate.y0 + 22) a = Math.min(a, -0.008);
           }
         }
@@ -175,7 +176,7 @@ export function makeAutopilot() {
       // approach window. It is a hard clamp, not a preference: with it in place the bot cannot
       // descend into the gate at all and never lands, on any seed. During the approach it has to
       // key off the deck instead of the terrain — and the recovery climb has to sit BELOW the
-      // gate's floor, because a 0.6 rad pull-up inside the window fails GATE.angMax.
+      // square's floor, or it fires inside the square and throws the bot straight back out of it.
       const lowLimit = (phase === 'land' && gate && !goAround) ? gate.y0 - 6 : floor;
       const hardLimit = (phase === 'land' && gate) ? gate.deckY + 8 : gAhead + 190;
       if (!reverse) {

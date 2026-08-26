@@ -33,10 +33,9 @@ const padOf = (w) => w.ents.find((e) => e.kind === 'pad' && !e.dead) || null;
  * drifted the moment the gate was reworked from a pad-centred slab into a real approach window.
  * A copy of a rule is not a shared rule.
  */
-function inBox(w) {
+function gateOf(w) {
   const p = w.player, pad = padOf(w);
-  const g = p && pad && approachBox(pad, p);
-  return !!g && g.inside;
+  return (p && pad && approachBox(pad, p)) || null;
 }
 
 const ammoTotal = (p) => {
@@ -82,15 +81,16 @@ const SCRIPTS = {
       done: (s, w) => objDone(w, 'destroy') },
     { id: 'approach', timeout: 45,
       ready: (s, w) => { const pad = padOf(w); return !!pad && pad.x - w.player.x < 3400; },
-      text: 'Carrier ahead. Come down to deck height and line up.',
+      text: 'Carrier ahead. Get down to deck height and line up on the green box.',
       done: (s, w) => { const pad = padOf(w), p = w.player; return !!pad && Math.abs(p.y - pad.y) < 170 && pad.x - p.x < 1500; } },
     { id: 'final', timeout: 999,
+      // Two conditions, so at most two things to say. The old version had four lines for three
+      // invisible thresholds and could not tell you which one you had failed.
       text: (w) => {
-        const pad = padOf(w), p = w.player;
-        if (pad && p.x > pad.x + 320) return 'Overshot. Loop around and cross the deck left to right.';
-        if (inBox(w)) return 'In the box. Nose flat or a touch down — never climbing.';
-        if (p.speed > (p.def.landSpeed || 250) * 1.4) return 'Too fast. Stop climbing and let her slow down.';
-        return 'Wings level, nose flat. She puts herself down once she is slow enough.';
+        const pad = padOf(w), p = w.player, g = gateOf(w);
+        if (g && g.inside && !g.dirOk) return 'In the box, but flying away. Turn back toward the ship.';
+        if (pad && p.x > pad.x) return 'Past it. Loop around and come back at the box from the left.';
+        return 'Fly into the green box off her bow, heading at the ship. She lands herself.';
       },
       done: (s, w) => w.player.landed || (w.player.script && w.player.script.kind === 'land') },
     { id: 'takeoff', timeout: 999,
