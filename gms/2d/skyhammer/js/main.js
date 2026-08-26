@@ -8,7 +8,7 @@ import { makeLoop } from './core/loop.js';
 import { save } from './core/save.js';
 import { audio } from './core/audio.js';
 import { haptics } from './core/haptics.js';
-import { goFullscreen, isFullscreen } from './core/fullscreen.js';
+import { goFullscreen, isFullscreen, toggleFullscreen, autoFullscreenDevice, fullscreenSupported } from './core/fullscreen.js';
 import { applyCamParams, makeCamPanel } from './core/camtune.js';
 
 const Q = new URLSearchParams(location.search);
@@ -17,9 +17,14 @@ const OPT = {
   seed: Q.has('seed') ? Number(Q.get('seed')) : null,
   auto: Q.get('auto') === '1',
   nofs: Q.get('nofs') === '1' || Q.has('nofs'),
-  ui: Q.get('ui') === '1',
   camtune: Q.get('camtune') === '1',
 };
+// The whole front end — title, hangar, level select, results, settings — was built and then only
+// ever loaded behind `?ui=1`, so a normal player dropped straight into a1-01 and never saw any of
+// it. It is the default now. `?level=` still goes straight to that level so every existing
+// capture gate keeps working, and `?ui=0` forces the old behaviour.
+OPT.ui = Q.get('ui') !== '0' && !OPT.auto;
+OPT.lobby = OPT.ui && !Q.has('level') && !OPT.auto && Q.get('lobby') !== '0';
 
 const stage = document.getElementById('stage');
 const glCanvas = document.getElementById('gl');
@@ -107,6 +112,14 @@ try {
   // A setter, not a per-frame argument, so a refactor of the frame loop cannot quietly drop it.
   if (typeof m.setProjector === 'function' && !renderer.isDebug) { hudProjector = m.setProjector; hudProjector(renderer); }
 } catch (e) { console.warn('[main] ui/hud.js not available, using the debug HUD', e && e.message); }
+
+// The tutorial overlay is optional and lives behind its own module so a missing or broken one
+// can never cost us the game. It draws onto the same 2D overlay, after the HUD.
+let makeTutorial = null;
+try {
+  const m = await import('./ui/tutorial.js');
+  if (typeof m.makeTutorial === 'function') makeTutorial = m.makeTutorial;
+} catch { /* not written yet — fine */ }
 if (renderer.isDebug) renderer.ownHud = !drawHud;
 
 // ------------------------------------------------------------------- state
@@ -114,6 +127,9 @@ let world = null;
 let bot = null;
 let paused = false;
 let uiRef = null;
+let tutorial = null;
+let currentMode = 'story';
+let flownOnce = false;
 let prefsRef = null;   // the live prefs object, once the UI layer has bound it
 
 function setPaused(v) { paused = !!v; return paused; }
@@ -125,13 +141,42 @@ function togglePause() {
   // user gesture, so it is a legitimate moment to ask again.
   if (!paused && !isFullscreen()) tryFullscreen();
   try {
-    if (paused && uiRef && uiRef.go) uiRef.go('pause');
+    if (paused && uiRef && uiRef.go) {
+      uiRef.go('pause', {
+        levelId: world && world.level && world.level.id, mode: currentMode,
+        stats: world ? { t: world.t, kills: world.stats.kills, money: world.stats.money } : {},
+      });
+    }
     else if (!paused && uiRef && uiRef.close) uiRef.close();
   } catch { /* the pause screen is optional; the sim state is what matters */ }
 }
 let finished = false;
 let hudCtx = null;
 let camPanel = null;
+
+// ------------------------------------------------------------- music intensity
+// Drives the march -> heavy drop. Deliberately smoothed and slow: the audio layer has its own
+// hysteresis, but feeding it a value that spikes on every flak burst would fight it.
+let intensity = 0;
+function setIntensity(v) {
+  intensity = Math.max(0, Math.min(1, v));
+  if (typeof audio.setIntensity === 'function') audio.setIntensity(intensity);
+}
+
+function combatHeat(w) {
+  const p = w && w.player;
+  if (!p || p.dead) return 0;
+  let air = 0, boss = 0;
+  for (const e of w.ents) {
+    if (e.dead || e.team === 0) continue;
+    if (Math.abs(e.x - p.x) > 1600) continue;
+    if (e.kind === 'boss') boss = 1;
+    else if (e.kind === 'fighter') air += 1;
+    else air += 0.2;                       // flak and ground guns count, but not as much
+  }
+  const hurt = 1 - (p.hpMax ? Math.max(0, p.hp / p.hpMax) : 1);
+  return boss ? 1 : Math.min(1, air * 0.24 + hurt * 0.45);
+}
 
 function popup(msg, onOk) {
   popMsg.textContent = msg;
@@ -141,9 +186,10 @@ function popup(msg, onOk) {
 
 function levelById(id) { return LEVELS.find((l) => l.id === id) || LEVELS[0]; }
 
-function startLevel(id) {
+function startLevel(id, mode) {
   save.load();
   const level = levelById(id || OPT.level);
+  currentMode = mode || 'story';
   world = createWorld({ level, seed: OPT.seed ?? level.seed, save: save.data });
   bot = OPT.auto ? makeAutopilot() : null;
   finished = false;
@@ -151,9 +197,21 @@ function startLevel(id) {
   applyCamParams(world, Q);
   if (camPanel) camPanel.sync();
   resize();
-  audio.music('flight');
+  tutorial = makeTutorial ? (() => { try { return makeTutorial(world); } catch (e) { console.warn('[main] tutorial', e && e.message); return null; } })() : null;
+  audio.music(level.boss ? 'boss' : 'battle', { act: level.act || 1 });
+  setIntensity(0);
+  if (uiRef && uiRef.close) uiRef.close();
   loop.reset();
   if (!loop.running) loop.start();
+  if (!flownOnce) { flownOnce = true; if (!autoFullscreenDevice()) offerFullscreen(); }
+}
+
+/** Drop the world when the player goes back to a menu, so a frozen mission is not left behind. */
+function leaveLevel() {
+  world = null; bot = null; tutorial = null; finished = false;
+  loop.stop && loop.stop();
+  audio.music('title');
+  setIntensity(0);
 }
 
 // -------------------------------------------------------------------- size
@@ -193,6 +251,9 @@ function update() {
   const events = world.drainEvents();
   fanOut(events);
   pending.push(...events);
+  if (tutorial) { try { tutorial.step(world, 1 / 60); } catch (e) { console.warn('[main] tutorial.step', e && e.message); tutorial = null; } }
+
+  if ((world.frame & 15) === 0) setIntensity(intensity + (combatHeat(world) - intensity) * 0.5);
 
   if (world.over && !finished) {
     finished = true;
@@ -200,12 +261,24 @@ function update() {
     save.record(res);
     audio.sfx(res.outcome === 'win' ? 'win' : 'lose');
     haptics.buzz(res.outcome === 'win' ? 'kill' : 'boom');
-    if (!OPT.auto) {
+    audio.music(res.outcome === 'win' ? 'victory' : 'defeat');
+    setIntensity(0);
+    if (OPT.auto) { /* the harness reads window.__state; no screen */ }
+    else if (uiRef && uiRef.go) {
+      // save.record() above has already banked the money and the stars, so the results screen
+      // must not do it again — record:false and moneyAlreadyBanked:true are what stop a win
+      // paying out twice.
+      setPaused(true);
+      uiRef.go('results', {
+        levelId: world.level.id, mode: currentMode, record: false, moneyAlreadyBanked: true,
+        result: { win: res.outcome === 'win', time: res.time, stars: res.stars, money: res.money, outcome: res.outcome },
+      });
+    } else {
       popup(
         res.outcome === 'win'
           ? `MISSION COMPLETE — ${res.stars}★  $${res.money}  ${res.time.toFixed(0)}s`
           : res.outcome === 'bingo' ? 'OUT OF FUEL' : 'YOU WENT DOWN',
-        () => startLevel(world.level.id));
+        () => startLevel(world.level.id, currentMode));
     }
   }
 }
@@ -237,6 +310,10 @@ function render(alpha) {
     const r = hudCanvas.getBoundingClientRect();
     try { drawHud(hudCtx, world, { w: r.width, h: r.height }); }
     catch (e) { console.warn('[main] drawHud', e && e.message); drawHud = null; if (renderer.isDebug) renderer.ownHud = true; }
+    if (tutorial && tutorial.draw) {
+      try { tutorial.draw(hudCtx, world, { w: r.width, h: r.height }); }
+      catch (e) { console.warn('[main] tutorial.draw', e && e.message); tutorial = null; }
+    }
   }
   audio.tick(1 / 60);
 }
@@ -300,21 +377,81 @@ let booted = false;
 function boot() {
   if (booted) return;                       // pointerdown and click can both land
   booted = true;
-  // Start the game FIRST, then ask for fullscreen. The old order awaited requestFullscreen,
-  // and a request that neither resolves nor rejects — which happens when the browser will not
-  // honour the gesture — left the whole boot stalled with the title still up and no error
-  // anywhere. Nothing about entering fullscreen should be able to stop the game starting.
+  // Start FIRST, then ask for fullscreen. The old order awaited requestFullscreen, and a request
+  // that neither resolves nor rejects — which happens when the browser will not honour the
+  // gesture — left the whole boot stalled with the title still up and no error anywhere.
+  // Nothing about entering fullscreen may be able to stop the game starting.
   audio.unlock();
   tapEl.classList.add('hidden');
-  startLevel(OPT.level);
+  if (OPT.lobby && uiRef) { uiRef.go('title'); audio.music('title'); }
+  else startLevel(OPT.level);
   tryFullscreen();
 }
 
-/** Fullscreen is a preference and a best effort; nothing may depend on it succeeding. */
+/**
+ * Fullscreen is a preference and a best effort; nothing may depend on it succeeding.
+ *
+ * AARON'S RULING: desktop never takes fullscreen by itself. There it is a window you can already
+ * resize and grabbing it is rude; on a phone the browser chrome eats a third of a landscape
+ * screen and there is no alternative. So auto-request on coarse-pointer devices only, and give
+ * desktop a button instead — the chip below on the first flight, and the pause screen after that.
+ */
 function tryFullscreen() {
   if (OPT.nofs || OPT.auto) return;
   if (prefsRef && prefsRef.fullscreen === false) return;
+  // Desktop gets nothing here. The chip is offered from startLevel() on the FIRST FLIGHT, not on
+  // the menu — on the title screen it collides with the hangar and settings icons, and offering
+  // fullscreen for a menu you are about to leave is pointless.
+  if (!autoFullscreenDevice()) return;
   try { Promise.resolve(goFullscreen(document.documentElement)).catch(() => {}); } catch { /* ignore */ }
+}
+
+// ------------------------------------------------------- desktop fullscreen chip
+const chipEl = document.getElementById('fschip');
+const chipBtn = document.getElementById('fsbtn');
+let chipShown = false, chipTimer = 0;
+
+function hideChip() {
+  clearTimeout(chipTimer);
+  if (chipEl) chipEl.classList.add('hidden');
+}
+
+/** Show it once per session, briefly, on the first flight. Pressing it IS the gesture. */
+function offerFullscreen() {
+  if (chipShown || !chipEl || !chipBtn) return;
+  if (isFullscreen() || !fullscreenSupported()) return;
+  if (prefsRef && prefsRef.fullscreen === false) return;
+  chipShown = true;
+  chipEl.classList.remove('hidden');
+  chipTimer = setTimeout(hideChip, 7000);
+}
+
+if (chipBtn) {
+  chipBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    await toggleFullscreen(document.documentElement);
+    hideChip();
+  });
+  chipBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+}
+
+// Built BEFORE the tap button is armed: boot() hands straight to the title screen, and a uiRef
+// that is still null at that moment would silently drop the player into a level instead.
+if (OPT.ui) {
+  try {
+    const { createUI } = await import('./ui/ui.js');
+    const ui = await createUI({
+      root: document.getElementById('ui'), save, audio,
+      start: (levelId, mode) => { ui.close(); setPaused(false); startLevel(levelId, mode); },
+      // Unpausing has to take the pause SCREEN down too. Flipping only the sim flag left the
+      // menu sitting over a game that was already running again.
+      resume: () => { setPaused(false); ui.close(); },
+      quit: () => { setPaused(true); leaveLevel(); },
+    });
+    window.__ui = ui;
+    uiRef = ui;
+    try { prefsRef = (await import('./ui/prefs.js')).prefs; } catch { /* prefs optional */ }
+  } catch (e) { console.warn('[main] ui unavailable', e && e.message); }
 }
 
 if (OPT.auto) {
@@ -328,22 +465,7 @@ if (OPT.auto) {
   // its handler does not exist yet is indistinguishable from a broken game.
   tapBtn.disabled = false;
   tapBtn.classList.remove('loading');
-  tapBtn.textContent = 'TAP TO FLY';
-}
-
-if (OPT.ui) {
-  try {
-    const { createUI } = await import('./ui/ui.js');
-    const ui = await createUI({
-      root: document.getElementById('ui'), save, audio,
-      start: (levelId) => { ui.close(); setPaused(false); startLevel(levelId); },
-      resume: () => { setPaused(false); },
-      quit: () => { setPaused(true); },
-    });
-    window.__ui = ui;
-    uiRef = ui;
-    try { prefsRef = (await import('./ui/prefs.js')).prefs; } catch { /* prefs optional */ }
-  } catch (e) { console.warn('[main] ui unavailable', e && e.message); }
+  tapBtn.textContent = OPT.lobby ? 'TAP TO START' : 'TAP TO FLY';
 }
 
 if (OPT.camtune) camPanel = makeCamPanel(() => world, document.body);

@@ -5,6 +5,7 @@ import { cash } from '../units.js';
 import { startAttract, stopAttract } from '../attract.js';
 import { nextLevel, totalStars, getMoney } from '../model.js';
 import { buzz } from '../prefs.js';
+import { goFullscreen as go, autoFullscreenDevice } from '../../core/fullscreen.js';
 
 let armed = false;   // module-level: only ever prompt for the first tap once per load
 let armEl = null;
@@ -56,7 +57,9 @@ export function mount(root, ctx) {
 
   root.appendChild(el('div.title-foot', {}, `${cash(getMoney(save))} banked · tap PLAY to fly`));
 
-  if (!armed) {
+  // The boot overlay's TAP TO START already unlocked audio, so a second "tap anywhere" prompt on
+  // top of the title screen is just noise. Only ask when nothing has taken a gesture yet.
+  if (!armed && !(ctx.audio && ctx.audio.ready)) {
     armEl = el('div.arm', {}, el('div.arm-inner', {}, 'TAP ANYWHERE TO BEGIN'));
     const arm = (e) => {
       e.preventDefault();
@@ -76,18 +79,12 @@ export function unmount() {
   armEl = null;
 }
 
+/**
+ * Desktop never takes fullscreen unasked (Aaron's ruling) — it gets the chip and the pause-screen
+ * button instead. This only fires on phones and tablets, where the browser chrome eats a third of
+ * a landscape screen and there is no window to resize.
+ */
 function goFullscreen() {
-  const de = document.documentElement;
-  try {
-    if (!document.fullscreenElement && de.requestFullscreen) {
-      const p = de.requestFullscreen({ navigationUI: 'hide' });
-      if (p && p.catch) p.catch(() => {});
-    }
-  } catch { /* denied or unsupported — not fatal */ }
-  try {
-    if (screen.orientation && screen.orientation.lock) {
-      const p = screen.orientation.lock('landscape');
-      if (p && p.catch) p.catch(() => {});
-    }
-  } catch { /* iOS has no orientation lock */ }
+  if (!autoFullscreenDevice()) return;
+  go(document.documentElement);
 }

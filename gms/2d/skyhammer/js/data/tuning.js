@@ -42,6 +42,18 @@ export const CTRL = {
   mouseAnchorOnDown: true,
 };
 
+// Wing-levelling. VISUAL ONLY — the sim never sees this and e.ang is never touched. Once the nose
+// has been committed to the other side of vertical for `dwell` seconds, the model rolls 180 deg
+// about its own nose axis so the pilot ends up the right way up for the new direction of travel.
+// The dwell is the whole trick: without it a loop strobes the model twice per revolution, and a
+// plane wobbling either side of vertical flickers. Aaron's ruling: "shouldn't change how it flies,
+// it is just a visual effect to right the plane to the direction of travel".
+export const FLIP = {
+  dwell: 1.2,     // seconds committed to the new direction before the roll starts
+  dur: 0.42,      // seconds the 180 deg roll itself takes
+  deadCos: 0.10,  // |cos(ang)| under this is "near vertical": neither commit nor reset the dwell
+};
+
 // Terrain framing. These are a LOOK constraint, not a taste preference — see D21.
 // Earth band % of frame = (surfaceY - CAM.baseY) / CAM.vh. The reference sits near 10%.
 export const TERRAIN = {

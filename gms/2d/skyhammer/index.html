@@ -9,6 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>SKYHAMMER</title>
 <link rel="stylesheet" href="css/style.css">
+<!-- The DOM screens. 894 lines of it existed and was never linked, so every menu rendered as
+     unstyled flow content in the top-left corner. Loads after style.css on purpose. -->
+<link rel="stylesheet" href="css/ui.css">
 <script type="importmap">
 {
   "imports": {
@@ -40,6 +43,10 @@
       <p class="sub">Turn your device sideways</p>
     </div>
   </div>
+
+  <!-- Sibling of #stage on purpose: inside it, a tap on the chip would bubble to the steering
+       listener and yank the nose across the screen. -->
+  <div id="fschip" class="hidden"><button id="fsbtn" type="button" aria-label="Go fullscreen"><span class="fs-glyph"></span>FULLSCREEN</button></div>
 
   <div id="popup" class="overlay hidden"><div class="pop"><p id="popmsg"></p><button id="popok" type="button">OK</button></div></div>
 

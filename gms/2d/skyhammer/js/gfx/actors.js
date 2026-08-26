@@ -10,13 +10,15 @@ import { makeModelCache, classify, depthFor } from './models/index.js';
 import { MAT, patchRim, patchHaze, makeTex, makeBin } from './materials.js';
 import { getPlate } from './plates.js';
 import { livery, mix, shade, lum } from './palette.js';
+import { FLIP } from '../data/tuning.js';
 
 const CAP0 = 24;
 const RS = new WeakMap();     // ent -> render state
 
 function stateOf(e) {
   let s = RS.get(e);
-  if (!s) { s = { lean: 0, shake: 0, flash: 0, spin: Math.random() * 6.28, seen: 0 }; RS.set(e, s); }
+  if (!s) { s = { lean: 0, shake: 0, flash: 0, spin: Math.random() * 6.28, seen: 0,
+                  face: 0, faceT: 0, roll: 0, rollFrom: 0, rollTo: 0, rollP: 1 }; RS.set(e, s); }
   return s;
 }
 
@@ -24,6 +26,39 @@ export function bumpHit(ent, mag = 1) {
   const s = stateOf(ent);
   s.shake = Math.min(1.4, s.shake + mag);
   s.flash = Math.min(1, s.flash + mag * 0.8);
+}
+
+/**
+ * Wing-levelling roll, in radians about the model's own nose axis. VISUAL ONLY: this reads
+ * `ang` and writes nothing back, so the sim is untouched and the plane still flies exactly as
+ * it did upside down. Committing needs the nose to hold the new side of vertical for FLIP.dwell
+ * — otherwise a loop rolls the model twice per revolution and a plane hovering near vertical
+ * flickers. Near-vertical is treated as neither side: it does not commit and does not reset.
+ */
+function rollFor(st, ang, dt) {
+  const c = Math.cos(ang);
+  const face = c < 0 ? -1 : 1;
+  if (!st.face) {                                   // first frame: already levelled, no animation
+    st.face = face; st.roll = face < 0 ? Math.PI : 0;
+    st.rollFrom = st.roll; st.rollTo = st.roll; st.rollP = 1;
+    return st.roll;
+  }
+  if (Math.abs(c) > FLIP.deadCos) {
+    if (face === st.face) st.faceT = 0;
+    else {
+      st.faceT += dt;
+      if (st.faceT >= FLIP.dwell) {
+        st.face = face; st.faceT = 0;
+        st.rollFrom = st.roll; st.rollTo = face < 0 ? Math.PI : 0; st.rollP = 0;
+      }
+    }
+  }
+  if (st.rollP < 1) {
+    st.rollP = Math.min(1, st.rollP + dt / FLIP.dur);
+    const k = st.rollP * st.rollP * (3 - 2 * st.rollP);     // smoothstep, so it eases in and out
+    st.roll = st.rollFrom + (st.rollTo - st.rollFrom) * k;
+  }
+  return st.roll;
 }
 
 export function makeActors(camApi, scene) {
@@ -111,6 +146,10 @@ export function makeActors(camApi, scene) {
       obj.add(disc);
       obj.userData.disc = disc;
     }
+    // ZXY so rotation.x is a roll about the ALREADY-HEADED nose axis. In the default XYZ order
+    // the x term would rotate about the parent's axis instead, which pitches the plane out of the
+    // side-on plane rather than rolling it.
+    obj.rotation.order = 'ZXY';
     obj.userData.mesh = mesh;
     root.add(obj);
     s = { obj, shape, livery: liv, kind };
@@ -188,7 +227,7 @@ export function makeActors(camApi, scene) {
           live.add(e.id);
           const len = kind === 'air' ? (d.len || (e.w ? e.w * 2 : 120)) : 1;
           s.obj.position.set(ex + (Math.random() - 0.5) * st.shake * 6, ey + (Math.random() - 0.5) * st.shake * 6, 0);
-          s.obj.rotation.set(0, 0, e.ang || 0);
+          s.obj.rotation.set(kind === 'air' ? rollFor(st, e.ang || 0, dt) : 0, 0, e.ang || 0);
           if (kind === 'air') s.obj.scale.setScalar(len);
           else s.obj.scale.set(e.w || d.w || 100, e.h || d.h || 60, depthFor(shape));
           if (s.obj.userData.disc) {

@@ -3,6 +3,9 @@
 import { el, btn, popup, secs } from '../widgets.js';
 import { cash } from '../units.js';
 import * as M from '../model.js';
+import { isFullscreen, toggleFullscreen, fullscreenSupported } from '../../core/fullscreen.js';
+
+let fsSync = null;
 
 export function mount(root, ctx) {
   const a = ctx.args || {};
@@ -27,6 +30,7 @@ export function mount(root, ctx) {
         actions: [{ label: 'Keep flying' }, { label: 'Restart', kind: 'go', act: () => ctx.start(a.levelId, a.mode || 'story') }],
       })),
       btn('wide ghost', 'SETTINGS', () => ctx.go('settings', { from: 'pause', pauseArgs: a })),
+      fsBtn(),
       btn('wide danger', 'QUIT TO MAP', () => popup({
         title: 'Abandon the sortie?',
         body: 'You keep nothing from this run.',
@@ -41,4 +45,26 @@ export function mount(root, ctx) {
   }
 }
 
-export function unmount() {}
+/**
+ * Desktop never takes fullscreen on its own any more (Aaron's ruling), so this is the way in.
+ * It lives on the pause screen because pressing a button IS the user gesture the browser
+ * demands — a programmatic request outside one is silently refused.
+ */
+function fsBtn() {
+  if (!fullscreenSupported()) return el('span.pause-nofs', {}, '');
+  const label = () => (isFullscreen() ? 'EXIT FULLSCREEN' : 'FULLSCREEN');
+  const b = btn('wide ghost fs', label(), async () => {
+    await toggleFullscreen(document.documentElement);
+    b.textContent = label();
+  });
+  // The browser can drop fullscreen without us asking (Escape, a swipe, the system UI), so the
+  // label has to follow the real state rather than what we last did. Torn down in unmount() —
+  // the old DOM mutation events that would have done it automatically are gone from Chrome.
+  fsSync = () => { b.textContent = label(); };
+  document.addEventListener('fullscreenchange', fsSync);
+  return b;
+}
+
+export function unmount() {
+  if (fsSync) { document.removeEventListener('fullscreenchange', fsSync); fsSync = null; }
+}

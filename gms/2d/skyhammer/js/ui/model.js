@@ -199,10 +199,20 @@ export function normaliseLoadout(save, plane) {
 
 /* ---------------------------------------------------------------- progress */
 
+/**
+ * `levelsDone` is the store core/save.js writes when a mission is actually flown, and the one
+ * carried in the fresh-save shape. The UI used to keep its own parallel `levels` map, so every
+ * completed mission was recorded twice into two different keys and the campaign map read the one
+ * the game never wrote — nothing would ever have unlocked from flying. One store now; a legacy
+ * `levels` entry is still honoured on read so an existing save does not lose its stars.
+ */
 export function levelRecord(save, levelId) {
   const s = d(save);
-  if (!s.levels || typeof s.levels !== 'object') s.levels = {};
-  return s.levels[levelId] || null;
+  if (!s.levelsDone || typeof s.levelsDone !== 'object') s.levelsDone = {};
+  const rec = s.levelsDone[levelId];
+  if (rec) return rec;
+  const legacy = s.levels && s.levels[levelId];
+  return legacy || null;
 }
 
 export function levelStars(save, levelId) {
@@ -211,17 +221,20 @@ export function levelStars(save, levelId) {
 }
 
 export function levelDone(save, levelId) {
-  return levelStars(save, levelId) > 0 || !!(levelRecord(save, levelId) || {}).done;
+  const r = levelRecord(save, levelId);
+  // core/save.js records a win as {stars,best} with no `done` flag, and a genuine 0-star win is
+  // possible, so the presence of a record counts as done on its own.
+  return !!r && (r.done === true || (r.stars || 0) > 0 || r.best != null);
 }
 
 export function recordLevel(save, levelId, res) {
   const s = d(save);
-  if (!s.levels || typeof s.levels !== 'object') s.levels = {};
-  const prev = s.levels[levelId] || {};
-  s.levels[levelId] = {
+  if (!s.levelsDone || typeof s.levelsDone !== 'object') s.levelsDone = {};
+  const prev = levelRecord(save, levelId) || {};
+  s.levelsDone[levelId] = {
     done: true,
     stars: Math.max(prev.stars || 0, res.stars || 0),
-    best: prev.best != null ? Math.min(prev.best, res.time || Infinity) : res.time,
+    best: prev.best != null && isFinite(prev.best) ? Math.min(prev.best, res.time || Infinity) : res.time,
   };
   flush(save);
 }
