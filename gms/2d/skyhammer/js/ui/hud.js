@@ -29,6 +29,8 @@ let takeoffShown = false;
 // hit / damage feedback state, driven off world.t so no dt is needed
 let lastHp = -1, flashT = -99, lastT = 0, dtHud = 0;
 
+const CEIL = (PHYS && PHYS.ceiling) || 2400;   // minimap vertical axis maxes at the service ceiling
+
 // altitude ribbon state
 const ALT = { top: 0, hot: false, scanAt: -99, vis: 0.28, str: '', strKey: -1, unitId: '' };
 
@@ -186,7 +188,7 @@ function layout(w, h, n) {
   L.takeoff.y = h - 54 - PAD - 2;
 
   const mapW = Math.min(320, Math.round(w * 0.34));
-  L.map.w = mapW; L.map.h = 20;
+  L.map.w = mapW; L.map.h = 52;   // tall enough to show ALTITUDE, not just position (D-U16)
   L.map.x = Math.round(w / 2 - mapW / 2);
   L.map.y = PAD;
 
@@ -345,27 +347,37 @@ function drawMinimap(g, world, screen) {
   g.beginPath(); g.moveTo(m.x + 3, m.y + m.h - 4.5); g.lineTo(m.x + m.w - 3, m.y + m.h - 4.5); g.stroke();
 
   const px = (x) => m.x + 3 + (m.w - 6) * Math.max(0, Math.min(1, x / len));
+  // Vertical axis is ALTITUDE. The whole point of the taller strip: an enemy loitering high up
+  // used to be indistinguishable from one on the deck, in a game where the top of the sky is
+  // worth going to.
+  const groundY = m.y + m.h - 4.5;
+  const topY = m.y + 4;
+  const py = (wy) => groundY - (groundY - topY) * Math.max(0, Math.min(1, (wy || 0) / CEIL));
 
   for (let i = 0; i < ents.length; i++) {
     const e = ents[i];
     if (e.dead) continue;
     const x = px(e.x);
     switch (e.kind) {
-      case 'balloon': case 'pickup':
+      case 'balloon': case 'pickup': {
+        const y = py(e.y);
         g.fillStyle = '#7fd45a';
-        g.fillRect(x - 1, m.y + 4, 2, 4);
+        g.fillRect(x - 1.5, y - 3, 3, 6);
         break;
-      case 'fighter': case 'boss':
+      }
+      case 'fighter': case 'boss': {
+        const y = py(e.y);
         g.fillStyle = '#e0603c';
-        g.beginPath(); g.moveTo(x, m.y + 3); g.lineTo(x + 3, m.y + 8); g.lineTo(x - 3, m.y + 8); g.closePath(); g.fill();
+        g.beginPath(); g.moveTo(x, y - 4); g.lineTo(x + 3.5, y + 3); g.lineTo(x - 3.5, y + 3); g.closePath(); g.fill();
         break;
+      }
       case 'flak': case 'ground':
         g.fillStyle = e.objective ? GOLD : 'rgba(220,190,150,0.55)';
-        g.fillRect(x - 1.5, m.y + m.h - 9, 3, 5);
+        g.fillRect(x - 1.5, groundY - 6, 3, 6);
         break;
       case 'pad':
         g.fillStyle = '#7fd45a';
-        g.fillRect(x - 4, m.y + m.h - 8, 8, 4);
+        g.fillRect(x - 5, groundY - 5, 10, 4);
         break;
       default: break;
     }
@@ -396,9 +408,8 @@ function drawMinimap(g, world, screen) {
 function drawObjectives(g, world) {
   const mi = world.mission;
   if (!mi || !mi.objectives || !mi.objectives.length) return;
-  const x = L.map.x, y = L.map.y + L.map.h + 6;
   g.font = '600 10px ui-sans-serif, system-ui, sans-serif';
-  g.textAlign = 'center';
+  g.textAlign = 'left';
   let out = '';
   for (let i = 0; i < mi.objectives.length; i++) {
     const o = mi.objectives[i];
@@ -408,12 +419,15 @@ function drawObjectives(g, world) {
     const done = o.done || have >= need;
     out += (i ? '   ' : '') + (done ? '✓ ' : '') + shortObj(o) + ' ' + Math.min(have, need) + '/' + need;
   }
-  g.fillStyle = 'rgba(12,9,6,0.5)';
+  // To the RIGHT of the strip now that the strip is tall — under it would push into the play
+  // area, and the top-right weapon icons leave a clear gap here.
   const tw = g.measureText(out).width + 14;
-  rrect(g, x + L.map.w / 2 - tw / 2, y - 1, tw, 15, 4); g.fill();
+  const bx = L.map.x + L.map.w + 8;
+  const by = L.map.y + L.map.h / 2 - 8;
+  g.fillStyle = 'rgba(12,9,6,0.5)';
+  rrect(g, bx, by, tw, 16, 4); g.fill();
   g.fillStyle = '#f0e0c6';
-  g.fillText(out, x + L.map.w / 2, y + 7);
-  g.textAlign = 'left';
+  g.fillText(out, bx + 7, by + 11);
 }
 
 function shortObj(o) {

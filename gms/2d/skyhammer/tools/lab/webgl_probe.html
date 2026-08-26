@@ -1,0 +1,33 @@
+<!doctype html><meta charset=utf8><title>WebGL probe</title>
+<body style="font:14px/1.6 system-ui;padding:20px;background:#111;color:#ddd">
+<h2>WebGL probe</h2><pre id=o>running…</pre>
+<script>
+const L=[];
+function t(name, attrs){
+  const c=document.createElement('canvas');
+  let gl=null, err='';
+  try { gl = c.getContext('webgl2', attrs) || c.getContext('webgl', attrs) || c.getContext('experimental-webgl', attrs); }
+  catch(e){ err = e.message; }
+  L.push(name.padEnd(34)+ (gl ? 'OK' : 'FAIL '+err));
+  return gl;
+}
+const g = t('default attrs', {});
+t('high-performance + antialias', {powerPreference:'high-performance', antialias:true});
+t('low-power', {powerPreference:'low-power'});
+t('failIfMajorPerfCaveat:false', {failIfMajorPerformanceCaveat:false});
+L.push('');
+if (g) {
+  const d = g.getExtension('WEBGL_debug_renderer_info');
+  L.push('VERSION  : '+g.getParameter(g.VERSION));
+  L.push('VENDOR   : '+g.getParameter(g.VENDOR));
+  L.push('RENDERER : '+g.getParameter(g.RENDERER));
+  if (d) { L.push('UNMASKED VENDOR  : '+g.getParameter(d.UNMASKED_VENDOR_WEBGL));
+           L.push('UNMASKED RENDERER: '+g.getParameter(d.UNMASKED_RENDERER_WEBGL)); }
+  L.push('MAX TEXTURE: '+g.getParameter(g.MAX_TEXTURE_SIZE));
+} else {
+  L.push('NO CONTEXT AT ALL — this browser cannot do WebGL right now.');
+  L.push('Almost always: hardware acceleration is off, or the GPU is blocklisted.');
+  L.push('Check chrome://gpu  and  chrome://settings/system');
+}
+document.getElementById('o').textContent = L.join('\n');
+</script>
