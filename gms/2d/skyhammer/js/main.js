@@ -3,7 +3,7 @@
 import { LEVELS } from './data/levels.js';
 import { createWorld } from './sim/world.js';
 import { makeAutopilot } from './sim/autopilot.js';
-import { input, attachInput, pollInput, clearAll } from './core/input.js';
+import { input, attachInput, pollInput, clearAll, syncKeyAngle } from './core/input.js';
 import { makeLoop } from './core/loop.js';
 import { save } from './core/save.js';
 import { audio } from './core/audio.js';
@@ -174,6 +174,9 @@ function update() {
   // DOM overlay — the HUD's own pause button and the Escape key would both be dead. The edge it
   // returns used to be discarded here, which is why the pause button did nothing at all.
   const r = hudCanvas.getBoundingClientRect();
+  // keep the keyboard's heading glued to the plane while no key is held, so the first press
+  // turns from where the nose actually is rather than snapping to a remembered angle
+  if (world.player) syncKeyAngle(world.player.ang);
   const pauseEdge = pollInput(r.width, r.height);
   if (pauseEdge) togglePause();
   if (paused) return;

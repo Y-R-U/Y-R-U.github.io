@@ -188,7 +188,7 @@ function layout(w, h, n) {
   L.takeoff.y = h - 54 - PAD - 2;
 
   const mapW = Math.min(320, Math.round(w * 0.34));
-  L.map.w = mapW; L.map.h = 52;   // tall enough to show ALTITUDE, not just position (D-U16)
+  L.map.w = mapW; L.map.h = 35;   // tall enough to read altitude, short enough to stay out of the way
   L.map.x = Math.round(w / 2 - mapW / 2);
   L.map.y = PAD;
 
@@ -321,21 +321,28 @@ function drawMinimap(g, world, screen) {
   const len = (world.level && world.level.length) || 1;
   const cam = world.cam;
 
-  // occlusion: does anything that matters sit behind the strip right now?
+  // Occlusion: anything worth seeing behind the strip fades it — including the player's own
+  // aeroplane, which matters most of all now the camera follows you up into the top of the frame.
   let occluding = false;
   const ents = world.ents || [];
-  for (let i = 0; i < ents.length; i++) {
-    const e = ents[i];
-    if (e.dead) continue;
-    const k = e.kind;
-    if (k !== 'balloon' && k !== 'pickup' && k !== 'fighter' && k !== 'boss' && k !== 'flak') continue;
+  const sc = worldScale();
+  const behind = (e, pad) => {
     const q = proj(e.x, e.y);
-    const sx = q.x, sy = q.y;
-    const r = (e.r || 40) * worldScale();
-    if (sx + r > m.x && sx - r < m.x + m.w && sy + r > m.y && sy - r < m.y + m.h) { occluding = true; break; }
+    const r = (e.r || 40) * sc + pad;
+    return q.x + r > m.x && q.x - r < m.x + m.w && q.y + r > m.y && q.y - r < m.y + m.h;
+  };
+  if (world.player && !world.player.dead && behind(world.player, 10)) occluding = true;
+  if (!occluding) {
+    for (let i = 0; i < ents.length; i++) {
+      const e = ents[i];
+      if (e.dead || e === world.player) continue;
+      const k = e.kind;
+      if (k !== 'balloon' && k !== 'pickup' && k !== 'fighter' && k !== 'boss' && k !== 'flak' && k !== 'ground') continue;
+      if (behind(e, 0)) { occluding = true; break; }
+    }
   }
 
-  g.globalAlpha = occluding ? 0.35 : 1;
+  g.globalAlpha = occluding ? 0.22 : 1;
 
   g.fillStyle = occluding ? 'rgba(12,9,6,0.80)' : 'rgba(12,9,6,0.70)';
   rrect(g, m.x, m.y, m.w, m.h, 4); g.fill();

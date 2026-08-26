@@ -65,18 +65,34 @@ function up(ev) {
   if (ev.pointerId === steerId) { steerId = null; input.aim.active = false; }
 }
 
-const KEYAIM = { ArrowUp: [0, 1], ArrowDown: [0, -1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
+// Keyboard steering is a RATE control, not a compass: hold Right/D and the nose keeps turning
+// clockwise for as long as you hold it, Left/A anticlockwise. Aaron's ruling — pointing the nose
+// at a fixed compass direction felt wrong on a keyboard, where there is no finger position to
+// read. Touch stays the relative position control of CONTRACTS §3b; only keys differ.
+const KEY_CW = new Set(['ArrowRight', 'd', 'D']);
+const KEY_CCW = new Set(['ArrowLeft', 'a', 'A']);
+const KEYAIM = { ArrowUp: 1, ArrowDown: 1, ArrowLeft: 1, ArrowRight: 1 };
+
+let keyAngle = 0;        // the heading the keys are steering toward, world radians
+
+/** main.js calls this while no steering key is held, so pressing one never snaps the nose. */
+export function syncKeyAngle(ang) {
+  if (!input.aim.fromKeys) keyAngle = ang;
+}
 
 function keyAim(w, h) {
-  let kx = 0, ky = 0;
-  for (const k of input.keys) { const v = KEYAIM[k]; if (v) { kx += v[0]; ky += v[1]; } }
+  let dir = 0;
+  for (const k of input.keys) {
+    if (KEY_CW.has(k)) dir -= 1;
+    if (KEY_CCW.has(k)) dir += 1;
+  }
   const a = input.aim;
-  if (!kx && !ky) { if (a.fromKeys) { a.active = false; a.fromKeys = false; } return; }
-  const m = Math.hypot(kx, ky) || 1;
+  if (!dir) { if (a.fromKeys) { a.active = false; a.fromKeys = false; } return; }
+  keyAngle += dir * (CTRL.kbdRate || 3) * (1 / 60);
   a.fromKeys = true; a.active = true;
   a.ax = w * 0.5; a.ay = h * 0.5;
-  a.sx = a.ax + (kx / m) * 80;
-  a.sy = a.ay - (ky / m) * 80;     // screen y is down
+  a.sx = a.ax + Math.cos(keyAngle) * 80;
+  a.sy = a.ay - Math.sin(keyAngle) * 80;     // screen y is down, world y is up
 }
 
 function keydown(ev) {
