@@ -29,6 +29,27 @@ const popEl = document.getElementById('popup');
 const popMsg = document.getElementById('popmsg');
 const popOk = document.getElementById('popok');
 
+// A dead TAP TO FLY button with the reason only in the console is the worst failure this game
+// can have — it looks like the game simply does not work. Surface anything fatal on the page.
+addEventListener('error', (e) => noteEl('Error: ' + (e.message || 'unknown') + ' — tap to dismiss'));
+addEventListener('unhandledrejection', (e) => noteEl('Error: ' + ((e.reason && e.reason.message) || e.reason || 'unknown')));
+
+/** Surface a problem in the page instead of only in a console nobody has open. */
+function noteEl(msg) {
+  try {
+    let n = document.getElementById('bootnote');
+    if (!n) {
+      n = document.createElement('div');
+      n.id = 'bootnote';
+      n.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99;padding:8px 12px;'
+        + 'font:12px/1.4 system-ui,sans-serif;color:#ffd9a0;background:rgba(40,12,8,0.92);text-align:center';
+      document.body.appendChild(n);
+      n.addEventListener('click', () => n.remove());
+    }
+    n.textContent = msg;
+  } catch { /* nothing left to do */ }
+}
+
 // ---------------------------------------------------------------- renderer
 // The seam: makeRenderer({ gl, hud }). gfx/debug.js ignores `gl` and draws the
 // grey box into the 2D overlay; the real 3D renderer takes both. One-line swap.
@@ -50,10 +71,28 @@ if (wantDebug) {
 // Detaching the empty WebGL canvas is what keeps the screenshot gate honest.
 if (usingDebugRenderer && glCanvas.parentNode) glCanvas.remove();
 
-const renderer = makeRenderer({ gl: usingDebugRenderer ? null : glCanvas, hud: hudCanvas });
+// Constructing the renderer can throw even when the import succeeded — a machine with WebGL
+// disabled or blocked fails here, inside THREE.WebGLRenderer. This used to abort module
+// evaluation, which meant the TAP TO FLY listener further down was never attached and the
+// button silently did nothing. Fall back to the grey box instead, and tell the player why.
+let renderer;
+function buildRenderer() {
+  return makeRenderer({ gl: usingDebugRenderer ? null : glCanvas, hud: hudCanvas });
+}
+try {
+  renderer = buildRenderer();
+} catch (e) {
+  console.warn('[main] 3D renderer would not start, falling back to the grey box', e && e.message);
+  ({ makeRenderer } = await import('./gfx/debug.js'));
+  usingDebugRenderer = true;
+  if (glCanvas.parentNode) glCanvas.remove();
+  renderer = makeRenderer({ gl: null, hud: hudCanvas });
+  noteEl('This device would not start 3D — running in reduced graphics.');
+}
 
 // The HUD is UI's; if it is not importable yet the grey box draws its own thumb buttons.
 let drawHud = null;
+let hudProjector = null;   // re-applied when the GL context is rebuilt
 try {
   const m = await import('./ui/hud.js');
   if (typeof m.drawHud === 'function') drawHud = m.drawHud;
@@ -61,7 +100,7 @@ try {
   // degree perspective and the terrain is curved in the vertex shader, so a flat transform is off
   // by ~19 px at the screen edges — enough to detach a 5 px bar from the prop it belongs to.
   // A setter, not a per-frame argument, so a refactor of the frame loop cannot quietly drop it.
-  if (typeof m.setProjector === 'function' && !renderer.isDebug) m.setProjector(renderer);
+  if (typeof m.setProjector === 'function' && !renderer.isDebug) { hudProjector = m.setProjector; hudProjector(renderer); }
 } catch (e) { console.warn('[main] ui/hud.js not available, using the debug HUD', e && e.message); }
 if (renderer.isDebug) renderer.ownHud = !drawHud;
 
@@ -69,6 +108,17 @@ if (renderer.isDebug) renderer.ownHud = !drawHud;
 let world = null;
 let bot = null;
 let paused = false;
+let uiRef = null;
+
+function setPaused(v) { paused = !!v; return paused; }
+
+function togglePause() {
+  setPaused(!paused);
+  try {
+    if (paused && uiRef && uiRef.go) uiRef.go('pause');
+    else if (!paused && uiRef && uiRef.close) uiRef.close();
+  } catch { /* the pause screen is optional; the sim state is what matters */ }
+}
 let finished = false;
 let hudCtx = null;
 let camPanel = null;
@@ -109,9 +159,14 @@ addEventListener('orientationchange', () => setTimeout(resize, 120));
 
 // ------------------------------------------------------------------- frame
 function update() {
-  if (!world || paused) return;
+  if (!world) return;
+  // pollInput must run even while paused, or the only way out of the pause screen would be the
+  // DOM overlay — the HUD's own pause button and the Escape key would both be dead. The edge it
+  // returns used to be discarded here, which is why the pause button did nothing at all.
   const r = hudCanvas.getBoundingClientRect();
-  pollInput(r.width, r.height);
+  const pauseEdge = pollInput(r.width, r.height);
+  if (pauseEdge) togglePause();
+  if (paused) return;
 
   if (bot) bot.step(world, 1 / 60);
   else {
@@ -175,15 +230,73 @@ function render(alpha) {
 
 const loop = makeLoop({ update, render });
 
+// ------------------------------------------------------- webgl context loss
+// Mobile browsers throw away the WebGL context when the tab is backgrounded, the screen locks,
+// or memory gets tight. Without this the player comes back to a permanently black canvas and
+// the game looks broken. preventDefault() on the loss event is REQUIRED — without it the
+// browser never fires 'restored' at all and there is nothing to recover from.
+let contextLost = false;
+
+if (!usingDebugRenderer) {
+  glCanvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    contextLost = true;
+    setPaused(true);
+    noteEl('Graphics paused while the app was in the background — restoring…');
+  }, false);
+
+  glCanvas.addEventListener('webglcontextrestored', () => {
+    try {
+      if (renderer && typeof renderer.dispose === 'function') renderer.dispose();
+      renderer = buildRenderer();
+      if (hudProjector) hudProjector(renderer);
+      renderer.resize();
+      contextLost = false;
+      const n = document.getElementById('bootnote'); if (n) n.remove();
+      setPaused(false);
+    } catch (err) {
+      console.warn('[main] context restore failed', err && err.message);
+      noteEl('Graphics could not be restored — reload the page.');
+    }
+  }, false);
+
+  // Coming back from the background does not always fire the events above, so check directly.
+  const recheck = () => {
+    if (document.hidden || usingDebugRenderer) return;
+    const gl = glCanvas.getContext('webgl2') || glCanvas.getContext('webgl');
+    if (gl && gl.isContextLost && gl.isContextLost() && !contextLost) {
+      contextLost = true;
+      setPaused(true);
+      noteEl('Graphics were dropped while away — tap to reload.');
+      const n = document.getElementById('bootnote');
+      if (n) n.addEventListener('click', () => location.reload());
+    } else if (!contextLost) {
+      renderer.resize();      // orientation or window size may have changed while hidden
+    }
+  };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(recheck, 60); });
+  addEventListener('pageshow', () => setTimeout(recheck, 60));
+  addEventListener('focus', () => setTimeout(recheck, 60));
+}
+
 // -------------------------------------------------------------------- boot
 attachInput(stage);
 document.addEventListener('visibilitychange', () => { if (document.hidden) clearAll(); });
 
-async function boot() {
-  if (!OPT.nofs && !OPT.auto) await goFullscreen(document.documentElement);
+let booted = false;
+function boot() {
+  if (booted) return;                       // pointerdown and click can both land
+  booted = true;
+  // Start the game FIRST, then ask for fullscreen. The old order awaited requestFullscreen,
+  // and a request that neither resolves nor rejects — which happens when the browser will not
+  // honour the gesture — left the whole boot stalled with the title still up and no error
+  // anywhere. Nothing about entering fullscreen should be able to stop the game starting.
   audio.unlock();
   tapEl.classList.add('hidden');
   startLevel(OPT.level);
+  if (!OPT.nofs && !OPT.auto) {
+    try { Promise.resolve(goFullscreen(document.documentElement)).catch(() => {}); } catch { /* ignore */ }
+  }
 }
 
 if (OPT.auto) {
@@ -199,11 +312,12 @@ if (OPT.ui) {
     const { createUI } = await import('./ui/ui.js');
     const ui = await createUI({
       root: document.getElementById('ui'), save, audio,
-      start: (levelId) => { ui.close(); startLevel(levelId); },
-      resume: () => { paused = false; },
-      quit: () => { paused = true; },
+      start: (levelId) => { ui.close(); setPaused(false); startLevel(levelId); },
+      resume: () => { setPaused(false); },
+      quit: () => { setPaused(true); },
     });
     window.__ui = ui;
+    uiRef = ui;
   } catch (e) { console.warn('[main] ui unavailable', e && e.message); }
 }
 
@@ -237,7 +351,7 @@ Object.defineProperty(window, '__state', {
 window.__game = {
   get world() { return world; },
   start: startLevel, renderer, audio, save, input, loop,
-  pause: (v) => { paused = v === undefined ? !paused : !!v; return paused; },
+  pause: (v) => { if (v === undefined) togglePause(); else setPaused(v); return paused; },
   camTune: {
     get: () => (world ? { ...world.camTune } : null),
     set: (o) => { if (world) { Object.assign(world.camTune, o); if (camPanel) camPanel.sync(); } return world && { ...world.camTune }; },
