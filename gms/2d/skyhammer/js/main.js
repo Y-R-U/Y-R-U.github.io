@@ -8,7 +8,7 @@ import { makeLoop } from './core/loop.js';
 import { save } from './core/save.js';
 import { audio } from './core/audio.js';
 import { haptics } from './core/haptics.js';
-import { goFullscreen } from './core/fullscreen.js';
+import { goFullscreen, isFullscreen } from './core/fullscreen.js';
 import { applyCamParams, makeCamPanel } from './core/camtune.js';
 
 const Q = new URLSearchParams(location.search);
@@ -87,7 +87,12 @@ try {
   usingDebugRenderer = true;
   if (glCanvas.parentNode) glCanvas.remove();
   renderer = makeRenderer({ gl: null, hud: hudCanvas });
-  noteEl('This device would not start 3D — running in reduced graphics.');
+  // Say what actually happened. "would not start 3D" on a machine that plainly runs 3D is a
+  // misdiagnosis, and this catch fires for ANY error out of makeRenderer, not only WebGL ones.
+  noteEl((e && e.webglUnavailable
+    ? 'This browser would not give the game a WebGL context — running in reduced graphics.'
+    : 'Graphics failed to start (' + ((e && e.message) || 'unknown') + ') — running in reduced graphics.')
+    + '  Tap to dismiss.');
 }
 
 // The HUD is UI's; if it is not importable yet the grey box draws its own thumb buttons.
@@ -109,11 +114,16 @@ let world = null;
 let bot = null;
 let paused = false;
 let uiRef = null;
+let prefsRef = null;   // the live prefs object, once the UI layer has bound it
 
 function setPaused(v) { paused = !!v; return paused; }
 
 function togglePause() {
   setPaused(!paused);
+  // Leaving fullscreen on mobile (a swipe, the system UI, a notification) previously stranded
+  // the player — nothing re-requested it and only a reload got it back. Resuming is a real
+  // user gesture, so it is a legitimate moment to ask again.
+  if (!paused && !isFullscreen()) tryFullscreen();
   try {
     if (paused && uiRef && uiRef.go) uiRef.go('pause');
     else if (!paused && uiRef && uiRef.close) uiRef.close();
@@ -294,9 +304,14 @@ function boot() {
   audio.unlock();
   tapEl.classList.add('hidden');
   startLevel(OPT.level);
-  if (!OPT.nofs && !OPT.auto) {
-    try { Promise.resolve(goFullscreen(document.documentElement)).catch(() => {}); } catch { /* ignore */ }
-  }
+  tryFullscreen();
+}
+
+/** Fullscreen is a preference and a best effort; nothing may depend on it succeeding. */
+function tryFullscreen() {
+  if (OPT.nofs || OPT.auto) return;
+  if (prefsRef && prefsRef.fullscreen === false) return;
+  try { Promise.resolve(goFullscreen(document.documentElement)).catch(() => {}); } catch { /* ignore */ }
 }
 
 if (OPT.auto) {
@@ -318,6 +333,7 @@ if (OPT.ui) {
     });
     window.__ui = ui;
     uiRef = ui;
+    try { prefsRef = (await import('./ui/prefs.js')).prefs; } catch { /* prefs optional */ }
   } catch (e) { console.warn('[main] ui unavailable', e && e.message); }
 }
 

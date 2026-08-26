@@ -20,10 +20,33 @@ export function makeRenderer(arg, opts = {}) {
   const preserve = q.get('preserve') === '1' || !!opts.preserve;
   const dprCap = q.has('dpr') ? Number(q.get('dpr')) : 2;
 
-  const renderer = new THREE.WebGLRenderer({
-    canvas, antialias: true, alpha: false, powerPreference: 'high-performance',
-    preserveDrawingBuffer: preserve, stencil: false,
-  });
+  // A retry ladder, not a single attempt. `powerPreference: 'high-performance'` is refused
+  // outright by some desktop drivers (GPU switching, certain Windows/Intel setups), and so is
+  // antialias on older hardware — and the failure looks identical to "this machine has no
+  // WebGL", which it is not. Walk down to plainer attributes before ever giving up.
+  const attempts = [
+    { antialias: true,  alpha: false, powerPreference: 'high-performance' },
+    { antialias: true,  alpha: false },
+    { antialias: false, alpha: false },
+    { antialias: false, alpha: false, failIfMajorPerformanceCaveat: false },
+    { antialias: false },
+  ];
+  let renderer = null, lastErr = null;
+  for (const a of attempts) {
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas, preserveDrawingBuffer: preserve, stencil: false, ...a,
+      });
+      if (a !== attempts[0]) console.warn('[gfx] WebGL started on fallback attributes', JSON.stringify(a));
+      break;
+    } catch (e) { lastErr = e; }
+  }
+  if (!renderer) {
+    const err = new Error('WebGL unavailable after ' + attempts.length + ' attribute sets: '
+      + (lastErr && lastErr.message ? lastErr.message : 'unknown'));
+    err.webglUnavailable = true;
+    throw err;
+  }
   renderer.setClearColor(0x000000, 1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;

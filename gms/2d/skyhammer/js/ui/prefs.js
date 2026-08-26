@@ -5,6 +5,7 @@ export const DEFAULTS = Object.freeze({
   sfx: true,
   haptics: true,
   reduceFx: false,
+  fullscreen: true,   // ask for fullscreen on start and on resume; some people hate it
   hand: 'right',      // 'right' | 'left' — mirrors the in-flight thumb buttons
   currency: 'gbp',    // symbol only, no conversion — see units.js
   speedUnit: 'mph',   // mph | kmh | kn
