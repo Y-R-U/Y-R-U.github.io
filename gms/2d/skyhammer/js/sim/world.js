@@ -12,15 +12,23 @@ import { makeSpawner } from './spawn.js';
 import { makeMission } from './mission.js';
 import { makeLanding } from './landing.js';
 import { killEnt } from './damage.js';
+import { resolveLevel, makeMode } from './modes.js';
 
 export const DT = 1 / 60;
 
 const DEFAULT_SAVE = { planeId: 'kestrel', upgrades: {}, loadout: ['bomb_std', 'rocket', null, null] };
 
-export function createWorld({ level, seed, save }) {
+export function createWorld({ level, seed, save, mode, modeCtx }) {
   const sd = (seed ?? level.seed) >>> 0;
   const sv = { ...DEFAULT_SAVE, ...(save || {}) };
   if (!sv.loadout) sv.loadout = DEFAULT_SAVE.loadout;
+
+  // sim/modes.js is the only thing that knows what a mode id means. For 'story' (and for
+  // no mode at all) resolveLevel returns the very object it was handed and makeMode
+  // returns null, so every hook below is dead code and Story is bit-identical.
+  const modeId = mode || 'story';
+  const mctx = { seed: sd, save: sv, ...(modeCtx || {}) };
+  level = resolveLevel(modeId, level, mctx);
 
   let idc = 1;
   const world = {
@@ -36,6 +44,7 @@ export function createWorld({ level, seed, save }) {
     player: null,
     ents: [], projs: [], debris: [], events: [],
     mission: null, spawner: null, landing: null,
+    modeId, mode: null,          // mode stays null for Story
     stats: { kills: {}, money: 0, shots: 0, hits: 0, collected: 0, time: 0, damageTaken: 0, hurtBy: {} },
     over: null,
     results: null,
@@ -96,6 +105,7 @@ export function createWorld({ level, seed, save }) {
     },
 
     finish() {
+      if (world.mode) world.mode.beforeFinish();
       const par = level.par || 120;
       const f = world.t / par;
       const stars = world.over !== 'win' ? 0 : f <= ECON.starTimes[0] ? 3 : f <= ECON.starTimes[1] ? 2 : 1;
@@ -112,17 +122,26 @@ export function createWorld({ level, seed, save }) {
         collected: world.stats.collected,
         objectives: world.mission.objectives.map((o) => ({ label: o.label, have: Math.round(o.have * 10) / 10, need: o.need, done: o.done })),
       };
+      if (world.mode) world.mode.afterFinish(world.results);
       world.push({ e: 'ui', what: 'results', results: world.results });
     },
 
     step() {
       const dt = DT;
       world.frame++;
-      if (world.over) { stepCamera(world, dt); stepShake(world, dt); return; }
+      if (world.over) {
+        // plane.js sets over='bingo' directly and never finishes, so results stayed null and
+        // main.js threw on res.outcome every frame — running out of fuel in Story crashed the
+        // loop. This was guarded on world.mode while the mode layer's byte-identical-Story proof
+        // was being taken; that proof is done, and every outcome must produce a result.
+        if (!world.results) world.finish();
+        stepCamera(world, dt); stepShake(world, dt); return;
+      }
       world.t += dt;
       world.stats.time = world.t;
 
       world.spawner.step();
+      if (world.mode) world.mode.step(dt);
 
       const p = world.player;
       const ents = world.ents;
@@ -160,6 +179,8 @@ export function createWorld({ level, seed, save }) {
   world.mission = makeMission(world);
   world.landing = makeLanding(world);
   world.spawner = makeSpawner(world);
+  world.mode = makeMode(world, modeId, mctx);
+  if (world.mode) world.mode.init();
   world.player.y = Math.max(620, world.terrain.heightAt(world.player.x) + 420);
   world.setViewport(1600, 900);
   stepCamera(world, 1);

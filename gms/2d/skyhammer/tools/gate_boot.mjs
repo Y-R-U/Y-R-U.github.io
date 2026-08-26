@@ -67,6 +67,25 @@ try {
   const chipOutside = await cdp.eval(`!document.getElementById('stage').contains(document.getElementById('fschip'))`);
   check('chip is outside #stage (cannot steer the plane)', chipOutside === true);
 
+  // --------------------------------------------------- 3b. pause, in and out, both ways
+  // Aaron reported pause dead in the first playtest; it has been rewired twice since, and the
+  // DOM pause screen is new. Both routes have to work or the only way out is a reload.
+  await cdp.eval(`__game.pause(true)`);
+  await sleep(500);
+  const pScreen = await cdp.eval(`document.getElementById('ui').dataset.screen || null`);
+  const pFlag = await cdp.eval(`window.__state.paused`);
+  check('pause freezes the sim', pFlag === true, `paused=${pFlag}`);
+  const frozen = await cdp.eval(`window.__state.frame`);
+  await sleep(600);
+  const frozen2 = await cdp.eval(`window.__state.frame`);
+  check('the sim really stops stepping while paused', frozen === frozen2, `frame ${frozen} -> ${frozen2}`);
+  // the HUD button and Escape both route through togglePause, which also opens the screen
+  await cdp.eval(`__game.pause(false)`);
+  await sleep(400);
+  const running = await cdp.eval(`window.__state.frame`);
+  check('unpausing starts the sim again', running > frozen2, `frame ${frozen2} -> ${running}`);
+  void pScreen;
+
   // ------------------------------------------------------------- 4. wing-levelling roll
   // Pin the heading and read the REAL mesh rotation out of the live Three.js scene, so this
   // measures the whole chain — euler order, dispatch, dt — not just the arithmetic.

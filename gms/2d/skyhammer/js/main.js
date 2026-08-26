@@ -261,9 +261,13 @@ function update() {
 
   if ((world.frame & 15) === 0) setIntensity(intensity + (combatHeat(world) - intensity) * 0.5);
 
-  if (world.over && !finished) {
+  // `world.results` guarded, not assumed: a mode or an outcome that sets `over` without
+  // finishing must not be able to take the frame loop down with it. That exact null cost the
+  // game every out-of-fuel run in Story.
+  if (world.over && !finished && world.results) {
     finished = true;
     const res = world.results;
+    res.mode = currentMode;          // the sim does not know what the menu called this run
     save.record(res);
     audio.sfx(res.outcome === 'win' ? 'win' : 'lose');
     haptics.buzz(res.outcome === 'win' ? 'kill' : 'boom');
@@ -275,9 +279,12 @@ function update() {
       // must not do it again — record:false and moneyAlreadyBanked:true are what stop a win
       // paying out twice.
       setPaused(true);
+      // Spread `res` rather than picking fields: the mode layer decorates its own results with
+      // medal / bossesDown / headline / lines[], and a hand-written field list silently drops
+      // whatever a future mode adds. `win` is derived because outcome is the sim's word for it.
       uiRef.go('results', {
         levelId: world.level.id, mode: currentMode, record: false, moneyAlreadyBanked: true,
-        result: { win: res.outcome === 'win', time: res.time, stars: res.stars, money: res.money, outcome: res.outcome },
+        result: { ...res, win: res.outcome === 'win' },
       });
     } else {
       popup(
@@ -308,6 +315,10 @@ function fanOut(events) {
 }
 
 function render(alpha) {
+  // Above the world guard: the music layer has to keep ticking on the title screen and in the
+  // hangar, where there is no world to draw. audio.js carries its own low-rate safety ticker for
+  // when the frame loop is stopped entirely, and stands it down whenever this is calling.
+  audio.tick(1 / 60);
   if (!world) return;
   renderer.draw(world, paused ? 0 : alpha, pending);
   pending.length = 0;
@@ -321,7 +332,6 @@ function render(alpha) {
       catch (e) { console.warn('[main] tutorial.draw', e && e.message); tutorial = null; }
     }
   }
-  audio.tick(1 / 60);
 }
 
 const loop = makeLoop({ update, render });
@@ -376,6 +386,10 @@ if (!usingDebugRenderer) {
 }
 
 // -------------------------------------------------------------------- boot
+// Load the save BEFORE the UI is built. startLevel() was the only caller, so on a fresh page the
+// campaign map, hangar, star totals and the Time Attack picker all rendered against an empty
+// object — three completed missions in localStorage, and the menus saw none of them.
+save.load();
 attachInput(stage);
 document.addEventListener('visibilitychange', () => { if (document.hidden) clearAll(); });
 
@@ -488,6 +502,7 @@ Object.defineProperty(window, '__state', {
       fps: s.fps, p50: s.p50, p95: s.p95, p99: s.p99, worst: s.worst, frames: s.frames,
       drawCalls: world.ents.length + world.projs.length,
       level: world.level.id, seed: world.seed, t: world.t, frame: world.frame,
+      mode: currentMode, modeInfo: world.mode ? world.mode.info() : null,
       plane: { x: p.x, y: p.y, ang: p.ang, speed: p.speed, hp: p.hp, hpMax: p.hpMax, fuel: p.fuel, stalling: p.stalling, landed: p.landed, dead: p.dead },
       stick: { active: world.stick.active, ax: world.stick.ax, ay: world.stick.ay, sx: world.stick.sx, sy: world.stick.sy, want: p.want },
       cam: { x: world.cam.x, y: world.cam.y, vw: world.cam.vw, vh: world.cam.vh, zoom: world.cam.scale, shake: world.cam.shakeMag },

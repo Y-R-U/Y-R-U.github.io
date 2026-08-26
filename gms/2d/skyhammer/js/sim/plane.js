@@ -117,7 +117,10 @@ export function stepPlayer(p, world, dt) {
     p.lowFuelFired = true;
     world.push({ e: 'ui', what: 'lowfuel' });
   }
-  if (p.fuel <= 0 && !world.over) { world.over = 'bingo'; }
+  // finish() in the same tick, not on the next one: main.js reads world.results as soon as it
+  // sees world.over, and a one-frame window where over is set and results is still null threw
+  // TypeError out of the frame loop.
+  if (p.fuel <= 0 && !world.over) { world.over = 'bingo'; world.finish(); }
 
   // --- bounds ---
   if (p.x < 40) { p.x = 40; if (p.vx < 0) p.ang = wrapAngle(Math.PI - p.ang); }

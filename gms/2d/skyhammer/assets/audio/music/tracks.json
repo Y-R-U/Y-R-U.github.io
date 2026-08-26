@@ -6,7 +6,10 @@
     "acts": [],
     "bpm": 100,
     "key": "Dm",
-    "pairId": ""
+    "pairId": "",
+    "startAt": 2.0,
+    "loopFadeS": 3.5,
+    "_why": "0.53 s of true digital silence then a 5 s intro swell (-38 dB at 0.5 s, -28 dB at 2 s, -18 dB at 5 s). The measured head-silence default of 0.53 would still open the title screen on near-nothing, so start at 2.0 and use a long cross-loop so the outgoing pass covers the rest of the ramp."
   },
   "title_chrome": {
     "name": "Cold Start",

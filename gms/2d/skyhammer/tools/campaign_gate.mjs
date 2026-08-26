@@ -45,30 +45,55 @@ const { makeAutopilot } = await import(join(ROOT, 'js/sim/autopilot.js'));
 /* ------------------------------------------------------------------ sabotage */
 
 /**
- * Two deliberate breaks, one per instrument, and the runtime one is chosen so that the
- * structural check CANNOT see it:
- *   a3-07 gets an enemy id that does not exist  -> STRUCTURAL must go red
- *   a2-04's fighter objective is set to exactly as many fighters as the level spawns -> the
- *     structural check reads "needs N, N exist" and stays green, while the mission is locked
- *     the first time the player outruns one. That is the real bug this file exists for, so a
- *     runtime check that does not catch it is measuring nothing.
+ * THREE deliberate breaks — one per instrument, plus a second for the runtime half, because
+ * the runtime half now has to cover two different ways a level can be dead while every count
+ * on paper adds up. Each break is chosen so the OTHER instrument stays green through it.
+ *
+ *   a3-07  an enemy id that does not exist            -> STRUCTURAL only
+ *   a2-04  both fighter waves parked past the end of the level. The waves are still declared,
+ *          so the structural check reads "needs 3, 4 exist" and stays green; at runtime a wave
+ *          arms at `at - cam.vw * 0.4` and the player is clamped to `length - 40`, so it can
+ *          never fire and the objective can never move.                    -> RUNTIME only
+ *   a4-11  every ground target moved past the end of the level. Declared, alive, matching the
+ *          objective, counted by the sim's own mission.shortfall() as available supply — and
+ *          permanently out of reach of a player who cannot fly past `length - 40`.
+ *                                                                          -> RUNTIME only
+ *
+ * The previous runtime sabotage (an early wave of straight-flying he111 that despawned behind
+ * the camera) is deliberately retired: the recycle branch in sim/behaviour.js made that class
+ * of defect impossible, so the sabotage could no longer fail and stopped being evidence.
+ *
+ * If a regeneration changes these levels enough that a break cannot be applied, this exits 2
+ * rather than silently running a falsification that sabotages nothing.
  */
 function sabotage(levels) {
-  return levels.map((l) => {
-    if (l.id === 'a3-07') return { ...l, spawns: l.spawns.map((s, i) => (i === 0 ? { ...s, kind: 'ghost_tank' } : s)) };
-    if (l.id === 'a2-04') {
-      // One early wave of `he111` — cruise 350, ai 'straight', so it flies the other way and
-      // never turns back — and a kill objective sized at exactly that wave. The structural
-      // check reads "needs 3, 3 exist" and stays green; at runtime all three are behind the
-      // camera within seconds and deleted, and the mission is locked. Deterministic.
-      return {
-        ...l,
-        waves: [{ at: Math.round(l.length * 0.05), kind: 'he111', n: 3, spacing: 400 }],
-        objectives: l.objectives.map((o) => (o.type === 'kill' ? { ...o, count: 3 } : o)),
-      };
+  const applied = { structural: false, deadWave: false, strandedGround: false };
+  const out = levels.map((l) => {
+    if (l.id === 'a3-07' && (l.spawns || []).length) {
+      applied.structural = true;
+      return { ...l, spawns: l.spawns.map((sp, i) => (i === 0 ? { ...sp, kind: 'ghost_tank' } : sp)) };
+    }
+    if (l.id === 'a2-04' && (l.waves || []).length && (l.objectives || []).some((o) => o.type === 'kill')) {
+      applied.deadWave = true;
+      return { ...l, waves: l.waves.map((w) => ({ ...w, at: Math.round(l.length * 1.6) })) };
+    }
+    if (l.id === 'a4-11' && (l.objectives || []).some((o) => o.type === 'destroy' && o.kind === 'ground')) {
+      const moved = (l.spawns || []).map((sp) => {
+        const def = ENEMIES[sp.kind];
+        return def && def.kind === 'ground' ? { ...sp, at: l.length + 4000 } : sp;
+      });
+      if (moved.some((sp, i) => sp.at !== l.spawns[i].at)) applied.strandedGround = true;
+      return { ...l, spawns: moved };
     }
     return l;
   });
+  const missing = Object.entries(applied).filter(([, v]) => !v).map(([k]) => k);
+  if (missing.length) {
+    console.log(`cannot falsify: sabotage(s) [${missing.join(', ')}] no longer apply to their target level.`);
+    console.log('Re-point them at a level with the right shape — a falsification that sabotages nothing is worse than none.');
+    process.exit(2);
+  }
+  return out;
 }
 
 // --falsify always runs the whole campaign: an --act filter could hide the sabotaged level and
@@ -134,12 +159,63 @@ function kitFor(l) {
   return { planeId: ACT_PLANE[act], loadout: ACT_LOADOUT[act], upgrades: { armor: lv, speed: lv, turn: lv, gun: lv, ammo: Math.min(10, lv) } };
 }
 
+const GUN_REACH = 1500;   // main-gun bullet speed; a static target further past the player's
+                          // hard x clamp than this can never be engaged, however alive it is
+
+/**
+ * The gate's own answer, deliberately NOT sim/mission.js's.
+ *
+ * `mission.shortfall()` counts every untriggered wave and every live ent as supply the player
+ * can still reach. Neither is true in general: sim/plane.js clamps the player to
+ * `length - 40`, and sim/spawn.js only arms a wave once the player passes `at - cam.vw * 0.4`.
+ * A wave parked past the end of the level and a bunker parked past the end of the level are
+ * both permanently unwinnable, and both report a shortfall of zero. So this recomputes
+ * availability with the player's actual reach and reports the difference.
+ *
+ * Keeping both answers is the point: they use the same matching rule from two different
+ * places, and if they ever disagree that is information rather than noise.
+ */
+function reachShortfall(world) {
+  const l = world.level;
+  const playerMaxX = l.length - 40;
+  const engageX = playerMaxX + GUN_REACH;
+  const out = [];
+  for (const o of world.mission.objectives) {
+    if (o.done || o.type === 'survive') continue;
+    if (o.type === 'land') {
+      const pad = world.ents.find((e) => e.kind === 'pad' && !e.dead && (!o.padId || e.padId === o.padId));
+      if (!pad || pad.x > engageX) out.push({ label: o.label, have: 0, need: 1, avail: 0, stranded: pad ? 1 : 0 });
+      continue;
+    }
+    let avail = 0, stranded = 0;
+    for (const e of world.ents) {
+      if (e.dead || !e.def) continue;
+      if (!matches(o, { kind: e.kind, tag: e.def.tag })) continue;
+      // A fighter flies to the player, so its spawn x does not strand it. Everything else sits.
+      if (e.kind === 'fighter' || e.x <= engageX) avail++; else stranded++;
+    }
+    for (const wv of l.waves || []) {
+      if (world.spawner.triggered(wv)) continue;
+      const row = ENEMIES[wv.def || wv.kind];
+      if (!row || !matches(o, row)) continue;
+      if (wv.at - world.cam.vw * 0.4 <= playerMaxX) avail += wv.n || 1;
+      else stranded += wv.n || 1;
+    }
+    const missing = o.need - o.have - avail;
+    if (missing > 0) out.push({ label: o.label, have: o.have, need: o.need, avail, stranded });
+  }
+  return out;
+}
+
 function runtime(l, seed) {
   const world = createWorld({ level: l, seed, save: kitFor(l) });
   const bot = makeAutopilot();
   let t = 0;
   while (!world.over && t < 60 * 400) { bot.step(world, 1 / 60); world.step(); world.drainEvents(); t++; }
-  return { shortfall: world.mission.shortfall(world), outcome: world.over || 'timeout', t };
+  const sim = world.mission.shortfall(world).map((x) => ({ ...x, src: 'sim' }));
+  const reach = reachShortfall(world).map((x) => ({ ...x, src: 'reach' }));
+  const seen = new Set(sim.map((x) => x.label));
+  return { shortfall: [...sim, ...reach.filter((x) => !seen.has(x.label))], outcome: world.over || 'timeout', t };
 }
 
 /* --------------------------------------------------------------------- run */
@@ -165,7 +241,7 @@ for (const l of pick) {
     if (r.outcome === 'win') acts[act].wins++;
     if (r.shortfall.length && !locked) locked = r.shortfall;
   }
-  if (locked) runProblems.push(`${l.id}: ` + locked.map((s) => `${s.label} have ${s.have}/${s.need}, ${s.avail} left`).join('; '));
+  if (locked) runProblems.push(`${l.id}: ` + locked.map((s) => `${s.label} have ${s.have}/${s.need}, ${s.avail} reachable` + (s.stranded ? `, ${s.stranded} out of reach` : '') + ` [${s.src}]`).join('; '));
   else acts[act].rOk++;
 }
 
@@ -187,11 +263,20 @@ if (!a.quiet) {
 
 const failed = runProblems.length + structProblems.length;
 if (a.falsify) {
-  const sawStruct = structProblems.some((p) => p.startsWith('a3-07'));
-  const sawRun = a.structuralOnly || runProblems.some((p) => p.startsWith('a2-04'));
-  const ok = sawStruct && sawRun;
-  console.log(`\nFALSIFY: structural sabotage caught = ${sawStruct}, runtime sabotage caught = ${sawRun}`);
-  console.log(ok ? 'FALSIFY PASS — both instruments go red when the data is broken' : 'FALSIFY FAIL — a check did not fire; it is not evidence');
+  const hit = (list, id) => list.some((p) => p.startsWith(id + ':'));
+  const sawStruct = hit(structProblems, 'a3-07');
+  const sawDeadWave = a.structuralOnly || hit(runProblems, 'a2-04');
+  const sawStranded = a.structuralOnly || hit(runProblems, 'a4-11');
+  // Each break must be invisible to the other instrument, or it is not testing what it claims.
+  const structStayedClean = !hit(structProblems, 'a2-04') && !hit(structProblems, 'a4-11');
+  const ok = sawStruct && sawDeadWave && sawStranded && structStayedClean;
+  console.log('\nFALSIFY');
+  console.log(`  a3-07 unknown enemy id        -> structural caught: ${sawStruct}`);
+  console.log(`  a2-04 waves past level end    -> runtime caught:    ${sawDeadWave}`);
+  console.log(`  a4-11 ground past level end   -> runtime caught:    ${sawStranded}`);
+  console.log(`  the two runtime breaks stayed invisible to the structural check: ${structStayedClean}`);
+  console.log(ok ? 'FALSIFY PASS — every instrument goes red on a defect only it can see'
+                 : 'FALSIFY FAIL — a check did not fire, or fired for the wrong reason; it is not evidence');
   process.exit(ok ? 0 : 1);
 }
 console.log(failed ? `\nFAIL — ${failed} problem(s)` : '\nOK');

@@ -452,3 +452,274 @@ number first because the structural one was green while half the campaign was un
 
 Both falsify runs pass (each caught only by its own instrument). `--falsify` ignores `--act` so
 a filter cannot hide the sabotaged level and turn "did not fire" into "was never asked".
+
+---
+
+# MODES — `js/sim/modes.js` (MODES agent, 2026-08-27)
+
+`js/data/modes.js` held fully specified rule tables that nothing consumed. `js/sim/modes.js`
+is now the single place a mode id turns into behaviour, and `world.js` consults it through
+five additive lines. **Story is the no-op case and that is the safety property.**
+
+## The API, as built
+
+```js
+resolveMode(modeId, ctx)          // -> { id, base, event }
+resolveLevel(modeId, level, ctx)  // BEFORE the world exists -> the level to build
+makeMode(world, modeId, ctx)      // AFTER the world exists  -> null | runtime
+runtime = { id, base, event, notes[], init(), step(dt), beforeFinish(), afterFinish(res), info() }
+```
+
+`ctx` is `{ seed, save, eventId?, event?, date? }`. `world.js` calls `resolveLevel` before
+`makeTerrain`, `makeMode` after `makeSpawner`, `mode.step(dt)` after `spawner.step()`,
+`mode.beforeFinish()` at the top of `finish()` and `mode.afterFinish(results)` at the bottom.
+Nothing else in the sim knows a mode exists — **`js/sim/spawn.js` was not modified at all**;
+survival and boss rush build ents through its existing exported `makeEnt`.
+
+`'event'` is not a mode of its own. It resolves to a **base mode plus a modifier set**
+(`{ base: ev.forcesMode || 'story', event: ev }`), so every event modifier composes on top of
+whatever is actually being flown.
+
+### Two design decisions worth knowing
+
+- **The kill hook wraps `world.mission.onKill`**, which is the only kill funnel reachable
+  without editing `damage.js` (not MODES' file). It runs **before** the inner call, never
+  after: the inner call can complete the last objective, which wins the level and snapshots
+  `world.results` inside that same call — a hook running after it has its money silently
+  dropped. This was a real bug, caught by `a1-06 balloon_rush` paying $350 where $420 was
+  arithmetically right (6 balloons x 35 x (3-1)). Do not reorder those two lines.
+- **Boss Rush replaces `world.stats.money` wholesale** in `beforeFinish`. Per-boss kill money
+  is ~53,500 across the five and would make `BOSS_RUSH.reward` (30,000) meaningless. DESIGN §9
+  says "one lump-sum payout plus partial credit per boss downed", so that is literally what it
+  pays: 30,000 cleared, else 3,000 x bosses downed.
+
+## Measured numbers
+
+**Survival escalation**, act-5 kit, harness god-mode so the curve is measured rather than the
+reference bot's survivability (identical across all seeds — the schedule is time-driven):
+
+| min | tier | interval | hpMult | countMult | spawns/min | alive |
+|---|---|---|---|---|---|---|
+| 1 | 1 | 3.20s | 1.00 | 1.00 | 19 | 10 |
+| 4 | 4 | 2.66s | 1.50 | 1.45 | 32 | 12 |
+| 8 | 7 | 2.12s | 2.40 | 2.10 | 58 | 63 |
+| 10 | 9 (+2 overflow) | 1.76s | 3.01 | 2.36 | 73 | 63 |
+| 11 | 9 (+2) | 1.76s | 3.01 | 2.36 | 80 | 62 |
+
+Overflow tier width is the **last declared gap (80s)**, since `tiers[]` stops at 420s. Live
+ground/flak are capped at 64 and recycled beyond 5200 units from the player, so past minute 8
+the added pressure arrives as hp rather than as count — that is deliberate, and the reason the
+escalation gate checks `hpMult` compounding separately from spawn rate.
+
+Reference-bot survival (8 seeds, no god-mode): act-1 median **37.2s**, act-5 median **49.3s**,
+best 133.1s. **Every single death was `died:terrain`** — the bot flies into the ground. That is
+a weak-pilot reading (D29), not a difficulty reading.
+
+Supply drops fire at exactly 90/180/270s, pay $400, refuel and rearm always, and heal +25% hpMax
+unless the week is `iron_economy`.
+
+**Boss Rush**, reference bot, 3 seeds each:
+
+| kit | outcome | bosses down |
+|---|---|---|
+| act-1 | dead ~37s | 2/5 (dies to Black Sigma) |
+| act-3 | dead ~32s / win 39.8s | 4/5, 4/5, 5/5 |
+| act-5 | win ~29s | 5/5 every seed |
+
+Verified stage by stage that each boss was a real ent, fought from full hp, and killed by losing
+its `weak` part — not skipped. **The act-5 nuke ends any boss in one drop** (dmg 5000, blastR
+1400 vs a 2200 core), which is why act-5 clears in 29s. That is a weapon-balance reading for
+DESIGN, not a mode bug.
+
+**Time Attack — par is far too generous.** 30 runs over 10 act-1 levels: every win the reference
+bot managed came in at **f = 0.20–0.27 of par**, against `goldTimeFactor 0.55`. Gold is not a
+challenge, it is the default; the `reward.none` tier (f > 0.8) was **never once reached**. Either
+`par` comes down ~2.5x on act-1 or `goldTimeFactor` goes to ~0.25. The medal ladder itself is
+correct and was falsified in both directions.
+
+**Weekly event** is stable within an ISO week and cycles all 7 over a year (49–56 days each).
+Note that `forceTimeOfDay`/`forceWeather` are presentation-only — `night_ops` produces a
+bit-identical sim outcome to the same level flown in Story.
+
+## Data gaps found
+
+1. **`iron_economy` had no `forcesMode`**, so `survivalNoHeal` was dead data: mode select routes
+   to `survival` OR `event`, never both, and the event resolved to a Story base. Added
+   `forcesMode: 'survival'` to `js/data/modes.js`, mirroring `boss_gauntlet`. Manager may reverse.
+2. **There is no rival-ace enemy row.** `ace_rematch` promises "The Baron"; `enemies.js` has no
+   such row, so `extraRivalWave` adds the toughest fighter of the level's act
+   (`bf109/fw190/mig_ghost/jet_fighter/cyber_interceptor`) as a 2-ship wave at 55% of the level.
+   A real `ace_baron` row with its own name, hp and shape would be better.
+3. `balloonDensityMult` carries a **floor of 6** because "balloons everywhere" multiplied by a
+   level's zero balloons is still zero. `flakDensityMult` has no floor — it only multiplies.
+4. All five `BOSS_RUSH.order` ids **exist** and are `kind:'boss'`. A missing one is dropped and
+   reported in `results.missingBosses` / `mode.notes`, and `bossesDeclared` stays at the declared
+   count so a 5/5 against a declared 6 is visible rather than silent. Never substituted.
+
+## Gates, and the record of them failing
+
+Every check below was broken on purpose and seen red before being trusted (CONTRACTS §13).
+
+| # | break | result |
+|---|---|---|
+| A | `makeMode` returns a runtime for Story | 304/306 story hashes mismatched |
+| B | Story dispatches the survival spawner | all 306 mismatched, both comparisons |
+| C | `resolveLevel` hands Story a copy | 44/44 level-identity checks red |
+| D | survival tier pinned to a constant | 21/21 escalation checks red, spawns/min flat at 19 |
+| E | overflow compounding removed | **6/7 checks still green** — only "hpMult keeps compounding past tier 7" caught it |
+| F | `BOSS_RUSH.order` emptied | run "wins" in 1.6s, 0/0, note emitted |
+| G | non-existent `boss_kraken` inserted | dropped + named in notes, `declared 6 / total 5` |
+| H | stage advances without the boss dying | **"5/5 GAUNTLET CLEARED $30000"** — only the per-boss detail line caught ORBITAL MOTHER at 2688/4300 hp, 0/1 weak parts |
+| I/J/K | gold/silver factors set to 0 and to 10 | medals collapsed to silver-only / none-only / all-gold, reward money tracked |
+| L | event `moneyMult` ignored | Payday $560 -> $280, exactly the Story baseline |
+| M | `densify()` no-op | flak 2->6 became 2->2, balloons 1->6 became 1->1 |
+| N | `forceTimeOfDay`/`forceWeather` ignored | `night_ops` stayed dusk/overcast |
+| O | `extraRivalWave` dropped | `ace_rematch` waves 2->3 became 2->2 |
+| P | `survivalNoHeal` ignored | iron_economy healed 176->323 |
+| Q | bonus drop never scheduled | refuel check red |
+
+**E and H are the ones that matter**: both leave a green summary and only one detail line red.
+E is "the escalation silently flatlined"; H is "5/5 because the stage was skipped, not fought".
+
+### The instrument was wrong before the game was
+
+The first boss gate polled `world.ents` each tick and reported **15 false FAILs** — every boss
+"still at 614/1320 hp with 0 weak parts dead". `world.js` splices a dead ent out of `world.ents`
+on the same tick it dies, so polling can only ever see the tick *before* the killing blow. The
+fix is to keep a **reference** to each boss ent and read its final state after the run. The
+bosses were correct the whole time. Distrust the harness first.
+
+## Pre-existing bugs found, owned by other agents
+
+1. **`js/main.js`: `save.load()` is only called inside `startLevel()` (line ~194).** On a fresh
+   page load, before any level is flown, `save.data` is the FRESH object — so the campaign map,
+   the hangar, star totals and the Time Attack picker all render as though the player has never
+   played. Verified in a real browser: `localStorage` held three completed missions, the UI saw
+   `levelsDone: {}`, and one explicit `save.load()` fixed it. **ENGINE.**
+2. **`js/sim/plane.js`: fuel exhaustion sets `world.over = 'bingo'` but never calls
+   `world.finish()`**, so `world.results` stays `null` and `main.js` reads `res.outcome` off it.
+   `world.js` now calls `finish()` on that path **for modes only** (`if (world.mode && !world.results)`),
+   deliberately leaving Story's bingo path byte-identical. SIM should fix it properly in `plane.js`.
+
+---
+
+# RE-FALSIFYING THE GATES AFTER THE SIM FIXES — 2026-08-27
+
+Both routing requests landed (`behaviour.js` recycle branch, `landing.js` cruise-scaled pad
+zone), and **the fix killed one of the gates.** The runtime sabotage in `campaign_gate.mjs` was
+"an early wave of straight-flying `he111` sized exactly to the objective" — precisely the defect
+the recycle branch made impossible. It could no longer fail, so the runtime half of the gate was
+unfalsified, which by this project's rule means it was not evidence. And it is the half that
+matters: the structural half sat green through all 48 broken levels.
+
+## 1. Two new runtime sabotages, because the runtime check had two real blind spots
+
+Looking for a sabotage the fixed sim can still fail turned up something better: **two defect
+classes that `sim/mission.js`'s own `shortfall()` cannot see either.** It counts every
+untriggered wave and every live ent as supply the player can still reach. Neither is true.
+
+- `sim/plane.js` clamps the player to `level.length - 40`.
+- `sim/spawn.js` only arms a wave once the player passes `at - cam.vw * 0.4`.
+
+So a wave parked past the end of the level never fires, and a bunker parked past the end of the
+level is never reachable — and both report a shortfall of **zero**. Measured against the current
+repo sim:
+
+```
+A) wave at length*1.6, objective needs 4      -> objective 0/4, mission.shortfall() = []
+B) two bunkers at length+4000, objective 2    -> objective 0/2, mission.shortfall() = []
+```
+
+Both are also invisible to the structural check, because every count on paper adds up.
+
+`campaign_gate.mjs` now computes **its own** reach-aware shortfall alongside the sim's, using
+the player's hard x clamp plus `GUN_REACH = 1500` and the wave arming rule, and fails on either.
+Both answers are kept and labelled `[sim]` / `[reach]` on purpose: same matching rule, two
+different places, and a disagreement between them is information. On the same two probes:
+
+```
+A)  mission.shortfall() = []   gate reach check = ["Shoot down fighter x4: 0 reachable, 4 out of reach"]
+B)  mission.shortfall() = []   gate reach check = ["Destroy bunker x2: 0 reachable, 2 out of reach"]
+```
+
+**Routing note, low priority:** `mission.shortfall()` has the same two blind spots. Nothing
+player-facing reads it — only the harness does — so the gate compensating is enough for now, but
+if it ever feeds the brief or the HUD it should learn the same reach rule.
+
+### The sabotage set is now three, each invisible to the other instrument
+
+| sabotage | break | caught by | other instrument |
+|---|---|---|---|
+| `a3-07` | enemy id `ghost_tank` | structural | runtime green |
+| `a2-04` | both fighter waves moved to `length * 1.6` | runtime `[reach]` | **structural green** — 4 declared, 3 needed |
+| `a4-11` | every ground target moved to `length + 4000` | runtime `[reach]` | **structural green** — 6 declared, 5 needed |
+
+```
+a2-04: Shoot down fighter x3 have 0/3, 0 reachable, 4 out of reach [reach]
+a4-11: Destroy ground x5   have 0/5, 0 reachable, 6 out of reach [reach]
+a3-07: unknown spawn id 'ghost_tank'
+
+  a3-07 unknown enemy id        -> structural caught: true
+  a2-04 waves past level end    -> runtime caught:    true
+  a4-11 ground past level end   -> runtime caught:    true
+  the two runtime breaks stayed invisible to the structural check: true
+FALSIFY PASS — every instrument goes red on a defect only it can see
+```
+
+The falsify run now also asserts that the two runtime breaks do **not** trip the structural
+check, so a sabotage cannot quietly start being caught by the wrong instrument and still read as
+a pass. And if a regeneration ever changes those three levels enough that a break no longer
+applies, `--falsify` exits 2 with "a falsification that sabotages nothing is worse than none"
+rather than running and reporting green. `--falsify` still ignores `--act`.
+
+The retired `he111` sabotage is documented in the file as retired, with the reason. It is worth
+keeping the note: a sabotage going stale because the bug was fixed is a good outcome that looks
+exactly like a broken gate.
+
+## 2. Landing, re-verified against the repo — `tools/landing_gate.mjs`
+
+Nothing patched or stubbed; this flies the real `js/sim/landing.js`. Grid per tier: 5 start
+distances x 6 approach altitudes = 30 approaches, deliberately spanning **both sides** of the
+§9 window (offsets -60 and +240 are outside it) and including a 400-unit start that is far too
+late, so `landed/attempted` characterises how tight the window is rather than confirming a
+happy path.
+
+| plane | tier | cruise | stall | landSpeed | min speed reached | landed/attempted |
+|---|---|---|---|---|---|---|
+| kestrel | 1 | 430 | 210 | 247 | 0 | 20/30 |
+| harrow | 2 | 490 | 230 | 271 | 0 | 20/30 |
+| tempest | 3 | 560 | 260 | 306 | 0 | 19/30 |
+| meteor | 4 | 620 | 270 | 318 | 0 | 19/30 |
+| sabre | 5 | 680 | 300 | 354 | 0 | 19/30 |
+| vampire | 6 | 740 | 320 | 377 | 0 | 19/30 |
+| revenant | 7 | 790 | 340 | 401 | 0 | 19/30 |
+| specter | 8 | 840 | 360 | 424 | 0 | 18/30 |
+| vector | 9 | 900 | 380 | 448 | 0 | 14/30 |
+
+**9/9 tiers can land, 167/270 approaches put the aeroplane on the deck.** A min speed of 0 means
+the landing script ran to completion — every tier now reaches the trigger. `vector` at 14/30 is
+the honest tail: it lands, but it needs the approach established further out than a kestrel
+does, which is the correct shape for the top of the ladder rather than a bug.
+
+`--falsify` pins the near-pad reach back to the old fixed `e.w * 4 = 680` and passes only if
+tiers 6-9 stop landing:
+
+```
+vampire  740  320  377   330*   0/30
+phantom  790  340  401   359*   0/30
+specter  840  360  424   389*   0/30
+vector   900  380  448   424*   0/30
+5/9 tiers can land   88/270 approaches
+FALSIFY PASS — the gate goes red when the zone stops scaling with the aircraft
+```
+
+That is the original bug reproduced exactly, which is the strongest form of this check: the gate
+is proven against the real historical defect, not an invented one.
+
+## 3. The three gates as they stand
+
+```
+node tools/tutorial_gate.mjs  [--falsify]
+node tools/campaign_gate.mjs  [--seeds N] [--act N] [--structural-only] [--falsify]
+node tools/landing_gate.mjs   [--falsify]
+```

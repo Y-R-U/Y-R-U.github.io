@@ -70,14 +70,14 @@ export const BIOME = {
   }),
   coast: P({
     earth: P({ albedo: '#22303a', deep: '#101820', rim: '#5d7b84', grass: '#3a4a38' }),
-    band:  P({ far: '#7e91a4', mid: '#3c4c50', treeline: '#28353a' }),
+    band:  P({ far: '#5c6f7d', mid: '#33454b', treeline: '#243136' }),
     prop:  P({ body: '#586067', dark: '#2a3138', roof: '#495158', metal: '#7c848a', glass: '#26313a', lit: '#bcd0d6' }),
     water: P({ deep: '#1f4c68', shallow: '#3f8aa8', foam: '#e8f2f4', glint: '#ffffff', specK: 0.55, specTight: 90 }),
     skyline: 'cliffs', veg: 'scrub', vegK: 0.5,
   }),
   sea: P({
     earth: P({ albedo: '#22303a', deep: '#0d151c', rim: '#5f7f88', grass: '#3a4a38' }),
-    band:  P({ far: '#8497a8', mid: '#3f5157', treeline: '#2a373c' }),
+    band:  P({ far: '#607382', mid: '#37484f', treeline: '#26333a' }),
     prop:  P({ body: '#5a636b', dark: '#2b3239', roof: '#4a535a', metal: '#828a90', glass: '#26313a', lit: '#c2d4da' }),
     water: P({ deep: '#1b435e', shallow: '#4380a0', foam: '#e9f4f6', glint: '#ffffff', specK: 0.7, specTight: 120 }),
     skyline: 'flat', veg: 'none', vegK: 0,
@@ -234,7 +234,11 @@ export function resolvePalette(biome, tod, weather) {
       hazeFar: distTint,
     }),
     cloud: P({
-      top: mix('#ffffff', mix(T.sky.glow, stops[1][1], 0.35), 0.42 + W.skyFlat * 0.2),
+      // The lit top is keyed off the SKY's own luminance. It used to start from pure white
+      // regardless of the hour, so at city/night the cloud bands read as white paint on a black
+      // sky instead of dark shapes catching a little skyglow (GFX_NOTES §9.4).
+      top: mix(mix(stops[1][1], '#ffffff', Math.min(1, 0.18 + lum(stops[1][1]) * 1.55)),
+               mix(T.sky.glow, stops[1][1], 0.35), 0.42 + W.skyFlat * 0.2),
       bot: mix(desat(stops[Math.max(0, stops.length - 3)][1], 0.2), fogCol, 0.25),
       alpha: Math.min(1, 0.80 * W.cloudAlpha),
       cover: W.cloudCover,

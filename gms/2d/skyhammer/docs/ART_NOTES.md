@@ -273,3 +273,163 @@ Per CONTRACTS §13, gates must be proven to fail before they are trusted.
 | console-error check via `tools/shot.mjs --console` | Not deliberately falsified. It did surface a real fault by accident: a zsh word-splitting bug silently fed `biome="city dusk"` to three captures, which fell back to `farmland/dawn` and produced three identically-wrong stills. **The HUD readout printing the resolved palette key is what caught it — the filenames looked fine.** Keep a resolved-state readout burned into any debug capture. |
 
 Nothing in this document is backed by a gate. It is backed by looking at the images listed in §5.
+
+---
+
+# 9. Biome expression + prop readability pass — ART agent, 2026-08-27
+
+Everything below was measured or looked at. Files touched: `js/gfx/bakers.js`,
+`js/gfx/terrain.js`, `js/gfx/models/ground.js`, `js/gfx/palette.js`. Nothing else.
+
+## 9.1 The root cause of "biomes do not express themselves"
+
+It was not a palette problem. **`palette.js` already published `skyline` per biome
+(`hills / cliffs / flat / city / peaks / mesa`) and nothing read it.** The `mountains` and `hills`
+bakers drew one snow-capped ridged range for all six biomes, and `terrain.js` scattered one
+vegetation species keyed only off `pal.veg`. So a city grew bushes, a sea level had mountains, and
+`coast` was force-fed alpine snow caps by an explicit `biome === 'coast'` test in the mountains
+baker. Wiring the existing flag through is most of the fix.
+
+Biome now shows up in **three places**, deliberately, because one alone is not enough at a glance:
+
+| layer | what it carries | file |
+|---|---|---|
+| far band (p 0.14) | the landform: peaks / rolling hills / cliffs / mesas / city skyline / open-sea haze bank + convoy | `bakers.js` |
+| near band (p 0.35) | the settlement: barns and windmills / a harbour / a nearer skyline / a conifer shelf / dunes / ships | `bakers.js` |
+| playfield (p 1.0) | surface treatment + two instanced dressing slots | `terrain.js` |
+
+## 9.2 Two rules the background plates now obey
+
+**1. World-y is not a free parameter.** Each band's quad spans a known world-y range at rest
+(`mountains` −231…+539, `hills` −259…+270, from `BANDS` in `backdrop.js`). A skyline whose ground
+line has to sit *on the horizon* — ships, a harbour, a city's feet — must be authored against that
+mapping, not against a fraction of the plate. The first version of `flat` put the sea line at 90%
+of the plate height, i.e. world y −154, and the whole convoy was invisible under the terrain.
+`SPAN` / `fyFor(h)` in `bakers.js` is that mapping; use it.
+
+**2. Aerial perspective is per-row, against the sky actually behind that row.** The old `hazeOver`
+laid one `band.hazeFar` tint over the plate, **heaviest at the top**. That is backwards for a band
+standing on the horizon: the base sits against the bright hazy horizon and the top rises into a
+much darker sky, so hazing the top hardest made every ridge read as a pale wall in front of a
+darker sky. Coast cliffs and desert mesas both came out as white slabs before this was fixed.
+`hazeOver` now samples the authored sky gradient at the world y of each row (`skyColAt`) and mixes
+toward that: pale-blue mountain tops at midday, dark ones at dusk, no per-palette exception.
+
+Related: `bandCols()`. Both bands used to be painted from `band.far`, so the near band was the same
+value as the mountains — ART_NOTES §5's "the mid-hills band is invisible" defect had survived into
+3D. The near band is now painted from `band.mid` and is visibly darker in every capture.
+
+**Seamlessness (D24) has two forms here.** Continuous ridges keep the integer-harmonic rule.
+Discrete objects — buildings, ships, mesas, barns, pilings — are generated in `[0, TILE_W)` and
+drawn three times at `x−TILE_W, x, x+TILE_W` (`wrap3`). Anything overhanging a seam is completed by
+its own copy. Do not assume an object "probably won't cross".
+
+## 9.3 Playfield dressing (`terrain.js`)
+
+`buildVeg`/`placeVeg` became a two-slot system: slot A the biome's soft element, slot B its hard
+one. **Two `InstancedMesh`es total, whatever is on screen.** Measured cost: **+1 to +3 GL draw
+calls** on land biomes, 0 on sea (sea gets no dressing at all, which is correct).
+
+- farmland — broadleaf clumps + **hedgerows** (long, low, dark bars). The hedgerow is the single
+  strongest "this is farmland" mark at 35 px.
+- city — **ruined masonry** (boxes of wildly varying height) + chimney stacks.
+- coast — scrub + **jetty pilings**, gated to `waterAt(x) !== null || h < 26` so a jetty never
+  appears in a field.
+- alpine — conifers + rock outcrops. desert — boulders + cacti. sea — nothing.
+
+`surfaceOf(pal)` also treats the lit chamfer per biome, in vertex colours, for free: farmland gets
+a hedged field patchwork, city paved blocks and rubble cut by the odd street, desert wind ripples,
+coast/sea a sand shelf below y=40. **Shoreline foam is computed from neighbours** (a column is a
+shore if either neighbour differs in wetness) — that two-pass build is what makes a shore read as a
+shore instead of as a colour change.
+
+## 9.4 Ground props: what actually separated them
+
+The rim strength on the shared prop material lives in `actors.js`, which this pass did not own, so
+none of the improvement came from lighting. All of it is geometry and albedo:
+
+- **`rim()`** — a thin hot strip along each prop's own top edge (`tint: 0` so the builder's vertical
+  shading cannot wash it out). ART.md §2's dark-core-plus-hot-rim law applied to structures. At 35 px
+  the bright *line* is what the eye separates on, not the mass.
+- **`base()`** — a darker plinth at the foot, so a prop stops melting into the terrain crest.
+- **`V.light / mid / dark / metal`** — a value key per family. Every prop used to be built from the
+  same `P.body`. Now dwellings are the lightest thing on the ground (hut), defences the darkest
+  (bunker), industry mid with **bright** drums (depot). Silhouettes were pushed apart too: the hut's
+  gable is steeper and taller than its walls, the bunker lower and wider with a bright concrete lip.
+
+> **The trap in `parts.js: normaliseStructure`.** It scales x AND y to fit exactly 2 units, so the
+> aspect ratio you author is thrown away and every prop ends up in the same box. Silhouette
+> differences must therefore live in the *profile within* the box (roof pitch, round vs square top,
+> lattice vs mass), never in overall proportion. That is why a bunker and a hut used to look alike.
+
+## 9.5 Water
+
+`sea` levels are **100% water and dead flat at 11.1% band** — one ruled line across the level. Three
+things now carry it: a swell term in the vertex colours (`mix(shallow, deep, 0.15..0.50)` from two
+crossed sines), a rebuilt `water` plate (long soft swell bands + randomised crest streaks + hot
+sparkle points, wrapped in x), and a stronger, taller glint band (`specK*0.85`, 210 units).
+
+**Unresolved, and it is a sim number not an art one:** `sim/terrain.js` gives `sea` a bias of −1.60
+but `bedAt` is then lifted by the profile's `lift` (+35 for `rolling`), so a *coast* level is 38–42%
+wet while `sea` happens to be 100%. If a sea level ever wanted islands the two would fight.
+
+## 9.6 Carrier / pad (manager's defects 2 and 3)
+
+`carrier` and `pad` are now the **only shapes that skip `normaliseStructure`** (see `RAW`), because
+that helper anchors a model's lowest point at y=0 and `actors.js` puts y=0 at `deckY` — which put
+the bottom of the *hull* on the deck line and floated the ship `deckY` (=120) units above the water.
+The model is authored in final instance units instead: **y=0 is the deck**, y=−1.25 is the keel
+(=−120 world = the water line), x=±1 is the ship's length.
+
+It is also pushed to **z −162…−45**, entirely behind the gameplay plane, because a carrier centred
+on z=0 swallowed the aeroplane the instant it landed. At a 20° FOV 2551 units back, 45 units of
+depth costs under 2% of screen size.
+
+`makeApproachBox()` (exported from `models/ground.js`) is the translucent green landing volume.
+It derives its half-extents from `pad.w + player.w` and `pad.h + player.h` — **the same four numbers
+`sim/landing.js: check()` reads** — and turns amber when attitude/speed would be rejected. It is
+**not wired**: nothing in `js/gfx/**` that this pass owned walks `world.ents`, so the one call site
+belongs in `actors.js`. Verified by runtime injection instead (see §9.7).
+
+> `sim/landing.js` does not export its box, so this drawing restates the *form* of the predicate
+> even though it does not restate the *numbers*. If that predicate is ever rewritten the cue drifts
+> silently. The durable fix is for `landing.js` to export the box — SIM's file, not this one.
+
+## 9.7 Evidence
+
+All at 844×390, dpr 1, `--gpu` (ANGLE Metal), one level per biome and per time of day.
+Before/after pairs composited in `shots/art_compare/`; raw frames in `shots/art_before/`,
+`shots/art_after/`, lab frames in `shots/art_lab/`.
+
+| gate | before | after |
+|---|---|---|
+| `node tools/contrastgate.mjs` | PASS 8/8 | **PASS 8/8** (rms 0.396 / 0.635 / 0.408 / 0.400 — unchanged to 3 dp) |
+| `node tools/contrastgate.mjs --sabotage` | FAIL 0/8 | **FAIL 0/8** (0.117 / 0.216 / 0.090 / 0.084, all < floor 0.28) |
+| `tools/sim.mjs` terrain framing | ok | **ok** — no sim file was touched, band means are bit-identical |
+| console errors, 8 levels | 0 | **0** |
+
+Earth band, measured against the D25 profile ranges (all `rolling`, want 10–20%):
+farmland 15.4–15.8% (crest 27.7%), city 15.3–15.5% (22.3%), coast 14.4–14.6% (26.3%),
+desert 15.2% (27.4%), alpine 15.8% (30.3%), sea 11.1% (flat). **All inside 10–30%.**
+
+Frame timing, autopilot, t=6 s, 12 levels: fps 59.3–59.9 before → 59.3–59.6 after; p50 17.0 ms
+both; p95 19.0 before → 18–19 after; `worst` is the boot spike either way. GL draw calls
+(`renderer.stats.drawCalls`, the real number — note `window.__state.drawCalls` is
+`ents.length + projs.length`, **not** a GL count) 24–28 before-equivalent → **25–33** after,
+60.0 fps throughout.
+
+The landing box was proven against the sim rather than eyeballed: injected at runtime with
+`makeApproachBox()` on `?level=t-02`, `renderer.project()` put the drawn volume at screen
+x 138.3–337.6, y 219.6–309.6 for `pad{x:7000, y:200, w:170, h:80}` and `player{w:60, h:15}` —
+i.e. exactly `pad.x ± 230` and `pad.y ± 95` (= `deckY−15 … deckY+175`), and the tutorial's own
+"In the box" prompt fired on the same frame the box was drawn green-adjacent.
+`shots/art_wip/padbox_844x390_t15.png`, `shots/art_wip/padland_844x390_t19.png`.
+
+## 9.8 Still weak
+
+1. **Coast cliffs are close to sky value at midday.** Correct aerial perspective, wrong read: the
+   headland nearly disappears. It wants a darker `band.far` for `coast` or a cap on the day haze.
+2. **The city skyline's spires read a little like rockets** at small sizes.
+3. **`skyHills`'s field strips are invisible in the far band** — too small at that distance. They
+   only pay off on the near band and on the terrain chamfer.
+4. **Nothing here has been seen on a phone.** Every number above is desktop headless.

@@ -50,6 +50,25 @@ export const save = {
   record(results) {
     if (!results) return 0;
     const d = save.data;
+    // Per-mode bests. modeselect.js reads save.data.modes[id] for the rail's "NOT FLOWN" /
+    // best-time / bosses-down line and nothing had ever written it, so every mode read as
+    // never flown however many times you played it. Story keeps its per-level record instead.
+    if (results.mode && results.mode !== 'story') {
+      if (!d.modes || typeof d.modes !== 'object') d.modes = {};
+      const prev = d.modes[results.mode] || {};
+      const row = { ...prev, runs: (prev.runs || 0) + 1 };
+      // Survival is scored by how long you lasted, so higher is better; a Time Attack best is
+      // the fastest clear. Only track a time at all when the run actually ended in one.
+      if (results.mode === 'survival') row.best = Math.max(prev.best || 0, results.time || 0);
+      else if (results.outcome === 'win') row.best = Math.min(prev.best != null ? prev.best : Infinity, results.time || Infinity);
+      if (results.bossesDown != null) row.bossesDown = Math.max(prev.bossesDown || 0, results.bossesDown);
+      if (results.medal) {
+        const rank = { none: 1, silver: 2, gold: 3 };
+        if ((rank[results.medal] || 0) >= (rank[prev.medal] || 0)) row.medal = results.medal;
+      }
+      if (row.best === Infinity) delete row.best;
+      d.modes[results.mode] = row;
+    }
     const prev = d.levelsDone[results.levelId] || { stars: 0, best: Infinity };
     if (results.outcome === 'win') {
       d.levelsDone[results.levelId] = {

@@ -57,7 +57,10 @@ export const WEEKLY_EVENTS = [
   { id: 'balloon_rush',   name: 'Balloon Rush',  desc: 'Balloons everywhere, worth triple.', balloonDensityMult: 4.0, balloonMoneyMult: 3.0 },
   { id: 'ace_rematch',    name: 'Ace Rematch',   desc: 'The Baron shows up as an extra wave on every level.', extraRivalWave: true },
   { id: 'boss_gauntlet',  name: 'Boss Gauntlet', desc: 'This week is just Boss Rush with a bonus.', forcesMode: 'bossrush', bonusMoneyMult: 1.5 },
-  { id: 'iron_economy',   name: 'Iron Economy',  desc: 'No repairs between waves in Survival. Higher payout.', survivalNoHeal: true, moneyMult: 1.4 },
+  // forcesMode is what makes survivalNoHeal reachable at all: without it the event resolves to a
+  // Story base and the flag is dead data, since mode select routes to 'survival' OR 'event', never
+  // both. Same shape as boss_gauntlet. (MODES agent, 2026-08-27 — manager may reverse.)
+  { id: 'iron_economy',   name: 'Iron Economy',  desc: 'No repairs between waves in Survival. Higher payout.', forcesMode: 'survival', survivalNoHeal: true, moneyMult: 1.4 },
 ];
 
 function isoWeekNumber(date) {

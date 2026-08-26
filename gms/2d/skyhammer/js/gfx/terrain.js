@@ -26,6 +26,49 @@ const KEEP = 2;          // chunks kept either side of the visible span
 
 const hash = (n) => { const s = Math.sin(n * 127.1) * 43758.5453; return s - Math.floor(s); };
 
+// Per-biome surface treatment for the lit chamfer. This is the cheapest biome signal there is —
+// it costs nothing but vertex colours and it is the difference between "a green strip" and
+// "farmland". Everything here is a function of x alone, so it is stable across chunk rebuilds.
+function surfaceOf(pal) {
+  const b = pal.biome;
+  const E = pal.earth;
+  const grassTop = mix(E.grass, E.rim, 0.60);
+  const grassBot = shade(E.grass, -0.34);
+
+  if (b === 'farmland') {
+    // field strips: a hedged patchwork, boundaries every ~380-900 units
+    const tints = [mix(grassTop, '#8a8a48', 0.30), shade(grassTop, -0.16), mix(grassTop, E.rim, 0.28), shade(grassTop, 0.10)];
+    return (x) => {
+      const f = Math.floor(x / 470 + hash(Math.floor(x / 1900)) * 2);
+      const edge = Math.abs((x / 470) % 1 - 0.5) > 0.46;      // the hedgerow line itself
+      const c = tints[Math.floor(hash(f * 1.7) * tints.length) % tints.length];
+      return [edge ? shade(pal.band.treeline, 0.05) : c, grassBot];
+    };
+  }
+  if (b === 'city') {
+    // paved blocks and rubble, cut by the odd lighter street
+    const rubble = mix(E.grass, E.albedo, 0.35);
+    const paved = shade(mix(E.grass, '#6a6672', 0.45), -0.05);
+    return (x) => {
+      const f = Math.floor(x / 210);
+      const h1 = hash(f * 2.3);
+      const street = h1 > 0.86;
+      return [street ? shade(paved, 0.22) : (h1 > 0.45 ? paved : rubble), grassBot];
+    };
+  }
+  if (b === 'desert') {
+    // wind ripples: a long sine crossed with a short one, warm on the crests
+    const hot = mix(grassTop, E.rim, 0.45), cool = shade(grassTop, -0.20);
+    return (x) => [mix(cool, hot, 0.5 + 0.5 * Math.sin(x * 0.0042) * Math.sin(x * 0.017)), grassBot];
+  }
+  if (b === 'coast' || b === 'sea') {
+    // a sand shelf near the water line, grass above it
+    const sand = mix(grassTop, '#c2ac86', 0.55);
+    return (x, h) => [h < 40 ? mix(sand, grassTop, Math.max(0, h / 40)) : grassTop, grassBot];
+  }
+  return () => [grassTop, grassBot];
+}
+
 function buildChunk(i, terrain, pal) {
   const x0 = i * CHUNK;
   const cols = Math.ceil(CHUNK / STEP) + 1;
@@ -36,19 +79,27 @@ function buildChunk(i, terrain, pal) {
 
   const isSea = terrain.waterY !== null;
   const W = pal.water;
-  const grassTop = mix(pal.earth.grass, pal.earth.rim, 0.60);
-  const grassBot = shade(pal.earth.grass, -0.34);
   const faceTop = pal.earth.albedo;
   const faceBot = pal.earth.deep;
   const snow = pal.earth.snow;
+  const surf = surfaceOf(pal);
+
+  // Two passes: the shoreline needs to know about its NEIGHBOURS, and a foam line where the water
+  // meets the land is most of what makes a shore read as a shore rather than as a colour change.
+  const hs = new Float64Array(cols), wet = new Uint8Array(cols);
+  for (let j = 0; j < cols; j++) {
+    const x = x0 + j * STEP;
+    hs[j] = terrain.heightAt(x);
+    wet[j] = isSea && terrain.waterAt(x) !== null ? 1 : 0;
+  }
 
   const c = new THREE.Color();
   const put = (o, hex, k) => { c.set(hex); if (k) c.multiplyScalar(k); c.toArray(col, o * 3); };
 
   for (let j = 0; j < cols; j++) {
     const x = x0 + j * STEP;
-    const h = terrain.heightAt(x);
-    const water = isSea && terrain.waterAt(x) !== null;
+    const h = hs[j];
+    const water = !!wet[j];
     const jt = 0.88 + hash(x * 0.037) * 0.24;
     const o = j * 4;
 
@@ -58,15 +109,21 @@ function buildChunk(i, terrain, pal) {
     pos[(o + 3) * 3] = x; pos[(o + 3) * 3 + 1] = FLOOR;     pos[(o + 3) * 3 + 2] = FZ;
 
     if (water) {
-      put(o + 0, W ? W.shallow : '#2f6f90', jt);
-      put(o + 1, W ? mix(W.shallow, W.deep, 0.55) : '#1f4c68', jt);
-      put(o + 2, W ? mix(W.shallow, W.deep, 0.75) : '#1f4c68');
+      const shore = (j > 0 && !wet[j - 1]) || (j < cols - 1 && !wet[j + 1]);
+      const swell = 0.5 + 0.5 * Math.sin(x * 0.0031) * Math.sin(x * 0.0119 + 1.3);
+      const top = W ? mix(W.shallow, W.deep, 0.15 + swell * 0.35) : '#2f6f90';
+      put(o + 0, shore && W ? mix(top, W.foam, 0.62) : top, jt);
+      put(o + 1, W ? mix(W.shallow, W.deep, 0.62 + swell * 0.18) : '#1f4c68', jt);
+      put(o + 2, W ? mix(W.shallow, W.deep, 0.80) : '#1f4c68');
       put(o + 3, W ? W.deep : '#12293a');
       wat[o] = wat[o + 1] = wat[o + 2] = wat[o + 3] = 1;
     } else {
+      const [gt, gb] = surf(x, h);
       const snowK = snow ? Math.max(0, Math.min(1, (h - 40) / 120)) : 0;
-      put(o + 0, snowK > 0.02 ? mix(grassTop, snow, snowK) : grassTop, jt);
-      put(o + 1, snowK > 0.02 ? mix(grassBot, snow, snowK * 0.6) : grassBot, jt);
+      const beach = isSea && ((j > 0 && wet[j - 1]) || (j < cols - 1 && wet[j + 1]));
+      const t0 = snowK > 0.02 ? mix(gt, snow, snowK) : gt;
+      put(o + 0, beach && W ? mix(t0, W.foam, 0.42) : t0, jt);
+      put(o + 1, snowK > 0.02 ? mix(gb, snow, snowK * 0.6) : gb, jt);
       put(o + 2, faceTop, jt * 0.98);
       put(o + 3, faceBot);
     }
@@ -108,7 +165,7 @@ export function makeTerrain(camApi) {
   root.add(glint);
 
   const chunks = new Map();   // i -> { mesh, ridge }
-  let terrain = null, pal = null, palKey = '', glintTex = null, veg = null, vegMat = null;
+  let terrain = null, pal = null, palKey = '', glintTex = null, dressMat = null;
 
   function chunkFor(i) {
     let c = chunks.get(i);
@@ -132,65 +189,131 @@ export function makeTerrain(camApi) {
     chunks.clear();
   }
 
-  // ---- vegetation: clustered, size-varied, standing on the crest so it breaks the silhouette
-  const VEG_CAP = 260;
-  function buildVeg() {
-    if (veg) { root.remove(veg); veg.geometry.dispose(); veg = null; }
-    if (!pal || pal.vegK <= 0.02) return;
-    const conifer = pal.veg === 'conifer';
-    const g = conifer
-      ? new THREE.ConeGeometry(0.5, 1.6, 5, 1)
-      : new THREE.SphereGeometry(0.55, 6, 4);
-    const n = g.attributes.position.count;
-    const cols = new Float32Array(n * 3);
-    // NEAR vegetation is a silhouette, so it takes its colour from the earth, not from the hazed
-    // distant treeline — using the distant tint made foreground trees read as pale tan blobs.
-    const c1 = new THREE.Color(shade(mix(pal.earth.grass, pal.earth.deep, 0.55), -0.15));
-    const c2 = new THREE.Color(mix(pal.earth.grass, pal.earth.rim, 0.22));
-    for (let i = 0; i < n; i++) {
-      const yy = g.attributes.position.getY(i);
-      const t = Math.max(0, Math.min(1, yy + 0.5));
-      const c = c1.clone().lerp(c2, t * 0.8);
-      cols[i * 3] = c.r; cols[i * 3 + 1] = c.g; cols[i * 3 + 2] = c.b;
+  // ---- GROUND DRESSING: two instanced slots of biome furniture standing on the crest.
+  //
+  // This is the second half of "biomes express themselves" (the first half is the two background
+  // plates). It is what stops a city level growing bushes. Slot A is the biome's soft/organic
+  // element, slot B its hard/structural one; both are ONE InstancedMesh each, so the whole thing
+  // costs two draw calls however many pieces are on screen.
+  const DRESS_CAP = 190;
+
+  // kind -> unit geometry, authored around the origin and scaled at placement time.
+  function dressGeo(kind) {
+    switch (kind) {
+      case 'conifer':  return new THREE.ConeGeometry(0.5, 1.6, 5, 1);
+      case 'poplar':   return new THREE.ConeGeometry(0.30, 1.9, 5, 1);
+      case 'scrub':    return new THREE.SphereGeometry(0.5, 5, 3);
+      case 'boulder':  return new THREE.DodecahedronGeometry(0.55, 0);
+      case 'chimney':  return new THREE.CylinderGeometry(0.16, 0.26, 1.0, 6, 1);
+      case 'cactus':   return new THREE.CylinderGeometry(0.22, 0.26, 1.0, 6, 1);
+      case 'block':    return new THREE.BoxGeometry(1, 1, 1);
+      default:         return new THREE.SphereGeometry(0.55, 6, 4);   // broadleaf
     }
-    g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
-    vegMat = vegMat || MAT.prop({ flatShading: true });
-    veg = new THREE.InstancedMesh(g, vegMat, VEG_CAP);
-    veg.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    veg.castShadow = false;
-    veg.frustumCulled = false;
-    veg.count = 0;
-    root.add(veg);
+  }
+
+  // biome -> [slotA, slotB]. `spacing` is world units between candidate sites, `k` the density
+  // gate, `lo/hi` the size range, `flat` squashes width against height.
+  function dressPlan(p) {
+    const B = p.biome;
+    const soft = [shade(mix(p.earth.grass, p.earth.deep, 0.55), -0.15), mix(p.earth.grass, p.earth.rim, 0.22)];
+    const hard = [shade(p.prop.dark, -0.10), mix(p.prop.body, p.earth.rim, 0.18)];
+    const rock = [shade(mix(p.earth.albedo, p.earth.grass, 0.4), -0.05), mix(p.earth.rim, p.earth.grass, 0.5)];
+    if (B === 'city') return [
+      // ruined masonry: boxes of wildly different heights read as broken walls, not as bushes
+      { kind: 'block', col: hard, spacing: 40, k: 0.62, lo: 26, hi: 96, wide: 1.5, flat: 0.9, wet: false },
+      { kind: 'chimney', col: [shade(p.prop.dark, -0.2), p.prop.roof], spacing: 150, k: 0.42, lo: 70, hi: 160, wide: 0.34, flat: 1, wet: false },
+    ];
+    if (B === 'alpine') return [
+      { kind: 'conifer', col: soft, spacing: 44, k: 0.92, lo: 30, hi: 76, wide: 0.9, flat: 1.5, wet: false },
+      { kind: 'boulder', col: rock, spacing: 130, k: 0.5, lo: 22, hi: 52, wide: 1.4, flat: 0.7, wet: false },
+    ];
+    if (B === 'desert') return [
+      { kind: 'boulder', col: rock, spacing: 62, k: 1.0, lo: 18, hi: 46, wide: 1.5, flat: 0.6, wet: false },
+      { kind: 'cactus', col: [shade(p.earth.grass, -0.3), mix(p.earth.grass, p.earth.rim, 0.3)], spacing: 130, k: 0.9, lo: 40, hi: 82, wide: 0.30, flat: 1, wet: false },
+    ];
+    if (B === 'coast') return [
+      { kind: 'scrub', col: soft, spacing: 60, k: 0.55, lo: 20, hi: 44, wide: 1.2, flat: 0.7, wet: false },
+      // pilings only where the ground is at or near the water line — a jetty in a field is worse
+      // than no jetty at all.
+      { kind: 'block', col: [shade(p.prop.dark, -0.15), p.prop.roof], spacing: 34, k: 0.7, lo: 26, hi: 52, wide: 0.22, flat: 1, wet: true },
+    ];
+    if (B === 'sea') return [null, null];
+    return [   // farmland and anything unknown
+      { kind: 'broadleaf', col: soft, spacing: 52, k: 0.95, lo: 26, hi: 56, wide: 1.15, flat: 0.95, wet: false },
+      // hedgerows: long, low and dark. The single strongest "this is farmland" mark at 35 px.
+      { kind: 'block', col: [shade(mix(p.earth.grass, p.earth.deep, 0.7), -0.2), mix(p.earth.grass, p.earth.rim, 0.15)], spacing: 96, k: 0.8, lo: 14, hi: 24, wide: 5.0, flat: 1, wet: false },
+    ];
+  }
+
+  const slots = [];   // { mesh, spec }
+  function buildDress() {
+    for (const s of slots) { root.remove(s.mesh); s.mesh.geometry.dispose(); }
+    slots.length = 0;
+    if (!pal) return;
+    const plan = dressPlan(pal);
+    dressMat = dressMat || MAT.prop({ flatShading: true });
+    for (let si = 0; si < plan.length; si++) {
+      const spec = plan[si];
+      if (!spec) continue;
+      const g = dressGeo(spec.kind);
+      const n = g.attributes.position.count;
+      const cols = new Float32Array(n * 3);
+      // NEAR dressing is a silhouette, so it takes its colour from the earth, not from the hazed
+      // distant treeline — the distant tint made foreground trees read as pale tan blobs.
+      const c1 = new THREE.Color(spec.col[0]), c2 = new THREE.Color(spec.col[1]);
+      let lo = Infinity, hi = -Infinity;
+      for (let i = 0; i < n; i++) { const y = g.attributes.position.getY(i); if (y < lo) lo = y; if (y > hi) hi = y; }
+      for (let i = 0; i < n; i++) {
+        const t = Math.max(0, Math.min(1, (g.attributes.position.getY(i) - lo) / Math.max(0.001, hi - lo)));
+        const c = c1.clone().lerp(c2, t * 0.85);
+        cols[i * 3] = c.r; cols[i * 3 + 1] = c.g; cols[i * 3 + 2] = c.b;
+      }
+      g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+      const mesh = new THREE.InstancedMesh(g, dressMat, DRESS_CAP);
+      mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      mesh.castShadow = false;
+      mesh.frustumCulled = false;
+      mesh.count = 0;
+      mesh.userData.lo = lo; mesh.userData.hi = hi;
+      root.add(mesh);
+      slots.push({ mesh, spec, si });
+    }
   }
 
   const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), S = new THREE.Vector3(), Pv = new THREE.Vector3();
   let lastVegX = 1e9;
 
-  function placeVeg(x0, x1) {
-    if (!veg || !terrain) return;
+  function placeDress(x0, x1) {
+    if (!terrain || !slots.length) return;
     if (Math.abs(x0 - lastVegX) < 10) return;
     lastVegX = x0;
-    const conifer = pal.veg === 'conifer';
-    let n = 0;
-    const SPACING = 46;
-    const i0 = Math.floor(x0 / SPACING), i1 = Math.ceil(x1 / SPACING);
-    for (let i = i0; i <= i1 && n < VEG_CAP; i++) {
-      // clustering: a low-frequency mask gates a high-frequency scatter
-      const clump = hash(i * 0.031) * 0.6 + hash(i * 0.0071) * 0.4;
-      if (clump > pal.vegK * 0.95 + 0.12) continue;
-      if (hash(i * 7.77) > 0.72) continue;
-      const x = i * SPACING + (hash(i * 3.3) - 0.5) * SPACING * 0.9;
-      if (terrain.waterAt && terrain.waterAt(x) !== null) continue;
-      const h = terrain.heightAt(x);
-      const sc = 26 + hash(i * 1.7) * (conifer ? 46 : 30);
-      Pv.set(x, h + sc * (conifer ? 0.72 : 0.5) - 6, 10 + hash(i * 5.1) * 90);
-      S.set(sc * (conifer ? 0.9 : 1.15), sc * (conifer ? 1.5 : 0.95), sc);
-      Q.set(0, 0, 0, 1);
-      M.compose(Pv, Q, S);
-      veg.setMatrixAt(n++, M);
+    const K = pal.vegK;
+    for (const s of slots) {
+      const sp = s.spec;
+      let n = 0;
+      const i0 = Math.floor(x0 / sp.spacing), i1 = Math.ceil(x1 / sp.spacing);
+      const salt = 13.7 * (s.si + 1);
+      for (let i = i0; i <= i1 && n < DRESS_CAP; i++) {
+        // clustering: a low-frequency mask gates a high-frequency scatter
+        const clump = hash(i * 0.031 + salt) * 0.6 + hash(i * 0.0071 + salt) * 0.4;
+        if (clump > sp.k * (0.35 + K * 0.75) + 0.12) continue;
+        if (hash(i * 7.77 + salt) > 0.74) continue;
+        const x = i * sp.spacing + (hash(i * 3.3 + salt) - 0.5) * sp.spacing * 0.9;
+        const wetHere = terrain.waterAt ? terrain.waterAt(x) !== null : false;
+        const h = terrain.heightAt(x);
+        if (sp.wet) { if (!wetHere && h > 26) continue; }
+        else if (wetHere) continue;
+        const sc = sp.lo + hash(i * 1.7 + salt) * (sp.hi - sp.lo);
+        const hgt = sc * sp.flat;
+        Pv.set(x, h + hgt * 0.5 - 6, 10 + hash(i * 5.1 + salt) * 90);
+        S.set(sc * sp.wide, hgt, sc * Math.min(1.2, sp.wide));
+        Q.set(0, 0, 0, 1);
+        M.compose(Pv, Q, S);
+        s.mesh.setMatrixAt(n++, M);
+      }
+      s.mesh.count = n;
+      s.mesh.instanceMatrix.needsUpdate = true;
     }
-    veg.count = n;
-    veg.instanceMatrix.needsUpdate = true;
   }
 
   return {
@@ -202,11 +325,11 @@ export function makeTerrain(camApi) {
       glintTex = bin.keep(makeTex(getPlate('water', p, key), { wrapX: true, wrapY: true, repeatX: 6, repeatY: 3 }));
       glintMat.map = glintTex;
       glintMat.color.set(p.water ? p.water.glint : '#ffffff');
-      glintMat.opacity = p.water ? p.water.specK * 0.5 : 0;
+      glintMat.opacity = p.water ? p.water.specK * 0.85 : 0;
       glintMat.visible = !!p.water;
       glintMat.needsUpdate = true;
       clearChunks();
-      buildVeg();
+      buildDress();
     },
 
     setTerrain(t) { terrain = t; clearChunks(); lastVegX = 1e9; },
@@ -223,25 +346,26 @@ export function makeTerrain(camApi) {
           chunks.delete(i);
         }
       }
-      placeVeg(x0, x1);
+      placeDress(x0, x1);
 
       glint.visible = !!pal.water && glintMat.visible;
       if (glint.visible) {
-        const gw = vw * 1.25, gh = 150;
+        const gw = vw * 1.25, gh = 210;
         glint.scale.set(gw, gh, 1);
-        glint.position.set(camX, -gh * 0.42, FZ + 3);
+        glint.position.set(camX, -gh * 0.34, FZ + 3);
         glintTex.repeat.set(gw / 900, 1);
       }
       if (glintTex) { glintTex.offset.x = (camX * 0.0006 + t * 0.012) % 1; glintTex.offset.y = (t * 0.02) % 1; }
     },
 
     chunkCount() { return chunks.size; },
-    setVegVisible(v) { if (veg) veg.visible = v; },
+    setVegVisible(v) { for (const s of slots) s.mesh.visible = v; },
     dispose() {
       clearChunks(); bin.dispose(); groundMat.dispose(); glintMat.dispose();
-      if (veg) veg.geometry.dispose();
+      for (const s of slots) s.mesh.geometry.dispose();
+      slots.length = 0;
       glintGeo.dispose();
-      if (vegMat) vegMat.dispose();
+      if (dressMat) dressMat.dispose();
     },
   };
 }

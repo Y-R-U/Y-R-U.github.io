@@ -7,6 +7,7 @@
 
 import * as THREE from 'three';
 import { makeModelCache, classify, depthFor } from './models/index.js';
+import { makeApproachBox } from './models/ground.js';
 import { MAT, patchRim, patchHaze, makeTex, makeBin } from './materials.js';
 import { getPlate } from './plates.js';
 import { livery, mix, shade, lum } from './palette.js';
@@ -103,6 +104,13 @@ export function makeActors(camApi, scene) {
   halo.renderOrder = 8;
   halo.visible = false;
   root.add(halo);
+
+  // The translucent green landing box Aaron asked for. ART built the factory; it lives here
+  // because it needs the PLAYER ent every frame — the accept window is pad.w + player.w wide, so
+  // it cannot be baked into the pad model. It restates the shape of landing.js's predicate; if
+  // that predicate ever moves, this has to move with it (see ART_NOTES §9).
+  const approach = makeApproachBox();
+  root.add(approach.root);
 
   const propGeo = new THREE.CircleGeometry(0.5, 18);
   const propMat = MAT.alpha(null, { color: 0xffffff, opacity: 0.30, depthWrite: false, side: THREE.DoubleSide });
@@ -282,6 +290,20 @@ export function makeActors(camApi, scene) {
         }
       }
 
+      // nearest live pad to the player, and only while actually flying: a box drawn around a
+      // deck you are already parked on is noise.
+      const pl = world.player;
+      let nearPad = null, nearD = Infinity;
+      if (pl && !pl.dead && !pl.landed) {
+        for (const e of ents) {
+          if (e.dead || e.kind !== 'pad') continue;
+          const d = Math.abs(e.x - pl.x);
+          if (d < nearD) { nearD = d; nearPad = e; }
+        }
+      }
+      if (nearPad && nearD < camApi.vw * 1.1) approach.place(nearPad, pl, t);
+      else approach.hide();
+
       for (const it of inst.values()) {
         it.mesh.count = it.n;
         it.mesh.instanceMatrix.needsUpdate = true;
@@ -321,6 +343,7 @@ export function makeActors(camApi, scene) {
     dispose() {
       cache.clear(); bin.dispose();
       for (const it of inst.values()) it.mesh.dispose();
+      if (approach.dispose) approach.dispose();
       shadowGeo.dispose(); haloGeo.dispose(); propGeo.dispose();
       groundMat.dispose(); airMat.dispose(); playerMat.dispose();
       shadowMat.dispose(); haloMat.dispose(); propMat.dispose();
