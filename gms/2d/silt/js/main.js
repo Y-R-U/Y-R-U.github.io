@@ -12,7 +12,7 @@ const canvas = document.getElementById('game');
 const view = createViewport(canvas, { cols: DEFAULT_CFG.cols, rows: DEFAULT_CFG.rows });
 const save = createSave();
 
-let R = null, UI = null, AUDIO = null, MODES = null;
+let R = null, UI = null, AUDIO = null, MODES = null, INPUT = null;
 let world = null, bot = null, mode = null;
 let state = 'boot';
 let acc = 0, last = 0, frames = 0, fpsT = 0, fps = 0;
@@ -62,7 +62,7 @@ async function boot() {
     });
   }
 
-  createInput(canvas, view, {
+  INPUT = createInput(canvas, view, {
     onMove: (d) => { if (state === 'play' && world) world.moveBy(d); },
     onRotate: () => { if (state === 'play' && world && world.rotate()) AUDIO.sfx('rotate'); },
     onHardDrop: () => { if (state === 'play' && world) { world.hardDrop(); AUDIO.sfx('drop'); } },
@@ -89,6 +89,18 @@ function findMode(id) {
   return modeList().find((m) => m.id === id) || modeList()[0];
 }
 
+/** 'auto' follows the mode; anything else is an explicit player override. */
+function biomeFor(m) {
+  const pref = save.settings.biome;
+  if (pref && pref !== 'auto') return pref;
+  return (m && m.biome) || 'dune';
+}
+
+function applyBiome(name) {
+  try { R.setBiome && R.setBiome(name); } catch (e) { try { R.setBiome && R.setBiome('dune'); } catch (e2) {} }
+  AUDIO.music && AUDIO.music(name, { fade: 900 });
+}
+
 function makeWorld(m, opts = {}) {
   const cfg = MODES && MODES.configFor
     ? { ...MODES.configFor(m.id, opts), ...opts }
@@ -101,7 +113,7 @@ function makeWorld(m, opts = {}) {
 
 const api = {
   get rng() { return world.rng; },
-  biome: (n) => R.setBiome && R.setBiome(n),
+  biome: (n) => applyBiome(n),
   shake: () => {},
   banner: (t) => UI && UI.banner && UI.banner(t),
   setGravity: (x, y) => world.setGravity(x, y),
@@ -113,36 +125,43 @@ function startAttract() {
   const list = modeList().filter((m) => m.id !== 'alchemy');
   mode = list[(Math.random() * list.length) | 0];
   world = makeWorld(mode, { seed: (Math.random() * 1e9) | 0 });
+  applyBiome(biomeFor(mode));
   if (MODES && MODES.startMode) MODES.startMode(mode, world, api); else if (mode.onStart) mode.onStart(world, api);
   attractBot = new Bot(world);
   bot = null;
   state = 'attract';
   if (window.SiltCloud && window.SiltCloud.setPlaying) window.SiltCloud.setPlaying(false);
-  if (R.setBiome) R.setBiome((mode.worldCfg && mode.worldCfg.biome) || save.settings.biome || 'dune');
   UI && UI.show('attract');
-  AUDIO.music && AUDIO.music((mode.worldCfg && mode.worldCfg.biome) || 'dune', { fade: 1200 });
 }
 
 function startGame(id, opts = {}) {
   mode = findMode(id);
   world = makeWorld(mode, opts);
+  applyBiome(biomeFor(mode));
   if (MODES && MODES.startMode) MODES.startMode(mode, world, api); else if (mode.onStart) mode.onStart(world, api);
   bot = opts.auto ? new Bot(world) : null;
   attractBot = null;
   state = 'play';
   if (window.SiltCloud && window.SiltCloud.setPlaying) window.SiltCloud.setPlaying(true);
-  if (R.setBiome) R.setBiome((mode.worldCfg && mode.worldCfg.biome) || save.settings.biome || 'dune');
   UI && UI.show('hud');
-  AUDIO.music && AUDIO.music((mode.worldCfg && mode.worldCfg.biome) || 'dune', { fade: 800 });
 }
 
 function endGame() {
   state = 'over';
   if (window.SiltCloud && window.SiltCloud.setPlaying) window.SiltCloud.setPlaying(false);
   const isBest = save.recordGame(mode.id, world.score, world.chains, world.cellsCleared);
-  AUDIO.sfx('fail');
+  const a = world.alchemy;
+  const won = !!(a && a.won);
+  if (won && a.id) save.recordLevel(a.id, a.stars || 1);
+  AUDIO.sfx(won ? 'chain' : 'fail', won ? 800 : undefined);
   if (window.SiltCloud && window.SiltCloud.gameFinished) window.SiltCloud.gameFinished();
-  UI && UI.results({ score: world.score, chains: world.chains, best: save.bestFor(mode.id), isBest, mode: mode.name });
+  UI && UI.results({
+    score: world.score, chains: world.chains, best: save.bestFor(mode.id), isBest,
+    mode: mode.name, modeId: mode.id,
+    won, alchemy: a || null,
+    stars: won ? (a.stars || 1) : 0,
+    bestStars: a && a.id ? save.starsFor(a.id) : 0,
+  });
 }
 
 function simTick() {
@@ -227,6 +246,8 @@ window.__game = {
   get view() { return view; },
   get renderer() { return R; },
   start: startGame, attract: startAttract, save,
+  get input() { return INPUT; },
+  startLevel(n) { return startGame('alchemy', { level: n | 0 }); },
   step(n = 1) { for (let i = 0; i < n; i++) simTick(); },
   modes: () => modeList().map((m) => m.id),
 };

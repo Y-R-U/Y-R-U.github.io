@@ -170,3 +170,34 @@ an unreachable target, watches how far the bot gets, then sets the objective to
 main.js now delegates to the modes lane's stepMode(): world.tick -> onChain ->
 onTick. onTick LAST is what lets the scorer diff world.score across a tick
 boundary, so mode scoring cannot rot when the engine's own award is retuned.
+
+## Lane B mode HUDs — done, and it found that EVERY MODE WAS DUNE
+The biome system was dead. main.js read `mode.worldCfg.biome`, but modes declare
+`biome` at the TOP level, so it resolved undefined and fell through to the
+settings default — and it ran AFTER startMode, overwriting the api.biome() call
+the mode had just made. Every mode rendered and played music as dune.
+
+Fixed: biomeFor(mode) prefers an explicit player override and otherwise follows
+the mode; applyBiome runs BEFORE startMode so a mode's own call wins; and
+api.biome now drives music as well as the renderer. Settings biome default is
+now 'auto' rather than 'dune'. VERIFIED per mode rather than assumed — tide now
+renders abyss and alchemy renders kiln, where before both were dune.
+
+quartz (HOURGLASS) and lumen (JELLY LAB) exist in js/data/biomes.js but not in
+js/gfx/biomes.js, so they still fall back — applyBiome catches an unknown name
+and falls back to dune rather than throwing. The renderer lane is adding both.
+
+Also fixed from lane B's list:
+- ALCHEMY win results: a completed level and a timed-out one showed the identical
+  card. results() now carries won/stars/bestStars/alchemy, and a win records
+  stars to save.
+- ALCHEMY levels past 1 were unreachable — play() only ever passed {seed}. Level
+  now flows through, __game.startLevel(n) exists, and per-level stars live in
+  save.recordLevel/starsFor/unlockedUpTo. Stars only ever go up, so a replay
+  cannot cost a rating already earned.
+- __game.input exposed so the shell can use the sanctioned onPaint route.
+
+Still open from lane B's report, for the modes lane if it is ever revisited:
+hourglass.until and alchemy.left are SECONDS not ticks (undocumented in the
+contract), and alchemy.stars is the earned count rather than the thresholds, so
+modehud.js reaches into levelById to read them.
