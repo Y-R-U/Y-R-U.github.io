@@ -1,0 +1,4 @@
+shots/
+dev/shots/
+*.log
+.DS_Store

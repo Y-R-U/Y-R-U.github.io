@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>SILT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0c14" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="description" content="SILT — a falling-sand puzzle where the sand is lit, not drawn. Build a chain of one colour from wall to wall and watch it dissolve." />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div id="stage">
+  <canvas id="game"></canvas>
+</div>
+<div id="ui"></div>
+<div id="safe-probe"></div>
+<div id="callout" hidden></div>
+<script>
+// No CDN, ever, and no importmap — SILT has no third-party dependencies. A bare
+// CDN import makes the whole module graph hostage to one network fetch, and when
+// it fails there is no error and no retry: the page simply never boots. That bug
+// cost this repo a lot of debugging; the fix is to have nothing to fetch.
+(function () {
+  var show = function (m) {
+    var el = document.getElementById('callout');
+    if (el) { el.textContent = m; el.hidden = false; }
+  };
+  window.addEventListener('error', function (e) {
+    show('Error: ' + (e.message || e.error) + (e.filename ? ' @ ' + e.filename.split('/').pop() + ':' + e.lineno : ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    show('Unhandled: ' + (e.reason && e.reason.message ? e.reason.message : e.reason));
+  });
+})();
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

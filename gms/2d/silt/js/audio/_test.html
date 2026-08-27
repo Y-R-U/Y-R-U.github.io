@@ -1,0 +1,147 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SILT — audio bench</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; padding:18px 16px 48px; background:#0d1013; color:#dfe6ea;
+         font:15px/1.45 ui-sans-serif,system-ui,-apple-system,sans-serif; }
+  h1 { font-size:15px; letter-spacing:.18em; text-transform:uppercase; color:#8fb6c9; margin:0 0 4px; }
+  p.sub { margin:0 0 18px; color:#6b7c86; font-size:12.5px; }
+  section { border-top:1px solid #1e262c; padding:14px 0; }
+  h2 { font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#5d7180; margin:0 0 10px; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; }
+  button { flex:1 1 92px; min-height:46px; border:1px solid #2b3740; border-radius:10px;
+           background:#161c22; color:#dfe6ea; font:600 14px/1 inherit; letter-spacing:.02em; }
+  button:active { background:#22303a; }
+  button.on { border-color:#4d8fb0; color:#9fd6f0; }
+  button[disabled] { opacity:.4; }
+  label { display:flex; align-items:center; gap:10px; margin:10px 0; font-size:13px; color:#9fb0bb; }
+  label span { width:78px; color:#6b7c86; }
+  input[type=range] { flex:1; accent-color:#4d8fb0; }
+  code { color:#7fb7d4; }
+  #log { margin-top:14px; font:12px/1.5 ui-monospace,Menlo,monospace; color:#5d7180; white-space:pre-wrap; }
+  #gate { position:fixed; inset:0; display:grid; place-items:center; background:#0d1013; z-index:9; }
+  #gate button { flex:none; padding:18px 34px; font-size:16px; }
+</style>
+
+<h1>SILT audio bench</h1>
+<p class="sub">Every sound below is synthesised — there are no sample files. Magnitude is the raw
+game quantity (cells in a chain, grains in a piece), not a 0–1 knob.</p>
+
+<section>
+  <h2>SFX — small</h2>
+  <div class="row" id="small"></div>
+  <h2 style="margin-top:14px">SFX — large</h2>
+  <div class="row" id="large"></div>
+  <label><span>magnitude</span><input id="mag" type="range" min="0" max="2400" value="600"><b id="magv">600</b></label>
+  <div class="row"><button id="custom">play at magnitude</button><button id="storm">chain storm</button></div>
+</section>
+
+<section>
+  <h2>Music</h2>
+  <div class="row" id="music"></div>
+  <div class="row" style="margin-top:8px"><button id="stop">stop music</button><button id="duck">duck 0.6 / 800ms</button></div>
+</section>
+
+<section>
+  <h2>Mix</h2>
+  <label><span>music</span><input id="vm" type="range" min="0" max="100" value="55"></label>
+  <label><span>sfx</span><input id="vs" type="range" min="0" max="100" value="90"></label>
+</section>
+
+<div id="log">not unlocked</div>
+
+<div id="gate"><button id="go">tap to unlock audio</button></div>
+
+<script type="module">
+import { createAudio, TRACKS } from './index.js';
+import { VOICES, MAG, makeIR } from './synth.js';
+
+const A = createAudio();
+window.__audio = A;
+const log = (s) => { document.getElementById('log').textContent = s; };
+const NAMES = ['land', 'chain', 'dissolve', 'rotate', 'drop', 'fail'];
+const SMALL = { land: 60, chain: 220, dissolve: 220, rotate: 1, drop: 12, fail: 1 };
+const LARGE = { land: 480, chain: 2200, dissolve: 2200, rotate: 1, drop: 190, fail: 1 };
+
+function buttons(host, mags) {
+  for (const n of NAMES) {
+    const b = document.createElement('button');
+    b.textContent = n;
+    b.onclick = () => { A.sfx(n, mags[n]); log(`sfx('${n}', ${mags[n]})  →  m=${MAG[n](mags[n]).toFixed(2)}`); };
+    host.appendChild(b);
+  }
+}
+buttons(document.getElementById('small'), SMALL);
+buttons(document.getElementById('large'), LARGE);
+
+const mus = document.getElementById('music');
+for (const id of Object.keys(TRACKS)) {
+  const b = document.createElement('button');
+  b.textContent = id;
+  b.onclick = () => {
+    [...mus.children].forEach((c) => c.classList.toggle('on', c === b));
+    A.music(id, { fade: 1.5 });
+    log(`music('${id}') — silent if assets/audio/${TRACKS[id]} is missing`);
+  };
+  mus.appendChild(b);
+}
+document.getElementById('stop').onclick = () => { A.music(null, { fade: 1 }); [...mus.children].forEach((c) => c.classList.remove('on')); };
+document.getElementById('duck').onclick = () => A.duck(0.6, 800);
+
+const mag = document.getElementById('mag'), magv = document.getElementById('magv');
+mag.oninput = () => { magv.textContent = mag.value; };
+let pick = 'chain';
+document.getElementById('custom').onclick = () => A.sfx(pick, +mag.value);
+document.getElementById('storm').onclick = () => {
+  // what a real cascade sounds like: land, chain, duck, dissolve
+  A.sfx('land', 300);
+  setTimeout(() => { A.sfx('chain', +mag.value); A.duck(0.45, 900); }, 220);
+  setTimeout(() => A.sfx('dissolve', +mag.value), 520);
+};
+
+document.getElementById('vm').oninput = (e) => A.setVolume(e.target.value / 100, null);
+document.getElementById('vs').oninput = (e) => A.setVolume(null, e.target.value / 100);
+
+document.getElementById('go').onclick = async () => {
+  const ok = await A.unlock();
+  document.getElementById('gate').remove();
+  A.preload();
+  log(ok ? 'unlocked — ' + JSON.stringify(A.state()) : 'no Web Audio here; everything is a silent no-op');
+};
+
+/* ---- ?measure : render every cue offline and report peak/RMS -------------- */
+if (location.search.includes('measure')) {
+  window.__measure = (async () => {
+    const out = {};
+    for (const n of NAMES) {
+      out[n] = {};
+      for (const [tag, mags] of [['small', SMALL], ['large', LARGE]]) {
+        const oc = new OfflineAudioContext(1, 48000 * 2.5, 48000);
+        const bus = oc.createGain(); bus.gain.value = 1; bus.connect(oc.destination);
+        const conv = oc.createConvolver(); conv.buffer = makeIR(oc, 1.4, 3.4);
+        const wet = oc.createGain(); wet.gain.value = 0.32;
+        const wo = oc.createGain(); wo.gain.value = 0.5;
+        wet.connect(conv); conv.connect(wo); wo.connect(bus);
+        VOICES[n](oc, bus, wet, 0.02, MAG[n](mags[n]));
+        const buf = await oc.startRendering();
+        const d = buf.getChannelData(0);
+        let peak = 0, sum = 0, lastLoud = 0;
+        for (let i = 0; i < d.length; i++) {
+          const a = Math.abs(d[i]);
+          if (a > peak) peak = a;
+          sum += d[i] * d[i];
+          if (a > 0.004) lastLoud = i;
+        }
+        out[n][tag] = {
+          peak: +peak.toFixed(4),
+          rms: +Math.sqrt(sum / d.length).toFixed(5),
+          len: +(lastLoud / 48000).toFixed(3),
+        };
+      }
+    }
+    window.__audio_measure = out;
+    return out;
+  })();
+}
+</script>

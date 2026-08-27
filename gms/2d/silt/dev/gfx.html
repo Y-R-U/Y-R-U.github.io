@@ -1,0 +1,248 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SILT · gfx bench</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #05060a; overflow: hidden;
+    font: 12px/1.35 ui-monospace, "SF Mono", Menlo, monospace; color: #cfd6e4; }
+  #gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #panel { position: fixed; left: 8px; top: 8px; z-index: 5; display: flex; flex-direction: column; gap: 6px;
+    max-width: 250px; }
+  .card { background: rgba(6,9,16,.74); border: 1px solid rgba(255,255,255,.10); border-radius: 8px;
+    padding: 7px 8px; backdrop-filter: blur(8px); }
+  .row { display: flex; flex-wrap: wrap; gap: 4px; }
+  button { font: inherit; color: #cfd6e4; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 5px; padding: 3px 7px; cursor: pointer; }
+  button:hover { background: rgba(255,255,255,.14); }
+  button.on { background: #2a6cf0; border-color: #2a6cf0; color: #fff; }
+  h4 { margin: 0 0 4px; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; opacity: .5; font-weight: 600; }
+  #perf .perf-top { display: flex; justify-content: space-between; align-items: baseline; }
+  #perf .perf-fps { font-size: 20px; font-weight: 700; }
+  #perf .perf-fps s, #perf s { text-decoration: none; font-size: 9px; opacity: .5; margin-left: 3px; display: block; }
+  #perf .perf-verdict { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; opacity: .75; }
+  #perf .perf-bar { height: 3px; background: rgba(255,255,255,.10); border-radius: 2px; margin: 5px 0; overflow: hidden; }
+  #perf .perf-bar i { display: block; height: 100%; background: #46d17a; }
+  #perf .perf-bar i.warn { background: #f0b429; } #perf .perf-bar i.bad { background: #f2555a; }
+  #perf .perf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 6px; margin-top: 4px; }
+  #perf .perf-grid div { line-height: 1.1; }
+  #perf .perf-grid b { font-size: 12px; font-weight: 600; }
+  #perf .perf-grid .warn b { color: #f0b429; } #perf .perf-grid .bad b { color: #f2555a; }
+  #perf .ok .perf-verdict { color: #46d17a; }
+  #hint { position: fixed; right: 8px; bottom: 8px; z-index: 5; opacity: .35; font-size: 10px; text-align: right; }
+</style>
+
+<canvas id="gl"></canvas>
+<div id="panel">
+  <div class="card" id="perf"></div>
+  <div class="card"><h4>biome</h4><div class="row" id="biomes"></div></div>
+  <div class="card"><h4>scene</h4><div class="row" id="scenes"></div></div>
+  <div class="card"><h4>quality</h4><div class="row" id="quals"></div></div>
+</div>
+<div id="hint">1/2/3 biome &nbsp; q quality &nbsp; space pause &nbsp; r reseed</div>
+
+<script type="module">
+import { World } from '../js/sim/world.js';
+import { SAND, WATER, JELLY, OIL, LAVA, ICE, CRYSTAL, ASH, WALL } from '../js/sim/materials.js';
+import { createRenderer, BIOME_NAMES } from '../js/gfx/renderer.js';
+
+const P = new URLSearchParams(location.search);
+const canvas = document.getElementById('gl');
+const R = await createRenderer(canvas, {});
+
+/* ------------------------------------------------------------------ scenes */
+
+function driveBot(w, drops, rnd) {
+  for (let i = 0; i < drops; i++) {
+    let guard = 0;
+    while (!w.piece && !w.over && guard++ < 40) w.tick();
+    if (w.over) break;
+    w.moveBy(Math.round((rnd() - 0.5) * 13) * 8);
+    if (rnd() < 0.55) w.rotate();
+    w.hardDrop();
+    for (let k = 0; k < 14; k++) w.tick();
+  }
+  for (let k = 0; k < 260; k++) w.tick();
+}
+
+function pour(w, m, x, y, ww, hh, tint, ticks) {
+  w.g.fill(x, y, ww, hh, m, tint);
+  for (let k = 0; k < (ticks || 220); k++) w.tick();
+}
+
+const SCENES = {
+  dune: (w, rnd) => { driveBot(w, 30, rnd); },
+
+  tide: (w, rnd) => {
+    driveBot(w, 24, rnd);
+    pour(w, WATER, 8, 4, 96, 26, 4, 320);
+  },
+
+  kiln: (w, rnd) => {
+    driveBot(w, 26, rnd);
+    pour(w, LAVA, 34, 2, 44, 12, 0, 200);
+    w.g.fill(4, 150, 18, 10, ASH, 0);
+  },
+
+  jelly: (w, rnd) => {
+    driveBot(w, 20, rnd);
+    // BLOB kind is skipped by the CA, so these sit exactly where they are put —
+    // which is what blobs.js will drive later. Good enough to light.
+    for (let i = 0; i < 5; i++) {
+      const x = 8 + ((i * 23) % 88), y = 96 + (i % 3) * 22;
+      w.g.fill(x, y, 16, 16, JELLY, 1 + (i % 4));
+    }
+    for (let k = 0; k < 60; k++) w.tick();
+  },
+
+  glass: (w, rnd) => {
+    driveBot(w, 22, rnd);
+    w.g.fill(10, 120, 30, 22, ICE, 3);
+    w.g.fill(64, 108, 26, 26, CRYSTAL, 0);
+    pour(w, OIL, 20, 4, 70, 14, 5, 260);
+  },
+
+  dissolve: (w, rnd) => {
+    driveBot(w, 30, rnd);
+    // Force a spanning chain, then walk the countdown by hand so the frame lands
+    // exactly where we want it in the 26-tick dissolve.
+    const g = w.g, cols = g.cols;
+    let y = 150;
+    for (let x = 0; x < cols; x++) {
+      y += Math.round((rnd() - 0.5) * 3);
+      for (let k = -4; k <= 4; k++) {
+        const yy = Math.max(0, Math.min(g.rows - 1, y + k));
+        if (g.mat[g.idx(x, yy)] !== 0) g.set(g.idx(x, yy), SAND, 1);
+      }
+    }
+    w.clears.detect();
+    const step = +(P.get('dt') || 9);
+    for (let i = 0; i < step; i++) w.clears.advance(w.stats);
+  },
+
+  mixed: (w, rnd) => {
+    driveBot(w, 26, rnd);
+    pour(w, WATER, 6, 6, 42, 18, 4, 240);
+    pour(w, LAVA, 74, 4, 26, 10, 0, 160);
+    w.g.fill(46, 130, 14, 14, JELLY, 3);
+    let guard = 0;
+    while (!w.piece && guard++ < 40) w.tick();
+    for (let k = 0; k < 22; k++) w.tick();
+  },
+
+  empty: () => {},
+};
+
+/* ------------------------------------------------------------------- state */
+let world, sceneName = P.get('scene') || 'dune';
+let paused = P.get('anim') === '0';
+let botOn = P.get('bot') !== '0';
+let botAcc = 0;
+
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+function build(name) {
+  sceneName = name;
+  const seed = +(P.get('seed') || 7);
+  world = new World({ seed, tints: 5, tintMode: P.get('tint') || 'mono' });
+  (SCENES[name] || SCENES.dune)(world, mulberry(seed * 2654435761 % 2147483647));
+  window.__state = world.snapshot();
+  paint();
+}
+
+/* ------------------------------------------------------------------ chrome */
+const mk = (host, items, get, set) => {
+  host.innerHTML = '';
+  for (const it of items) {
+    const b = document.createElement('button');
+    b.textContent = it;
+    b.onclick = () => { set(it); paint(); };
+    host.appendChild(b);
+  }
+  host._items = items; host._get = get;
+};
+const biomesEl = document.getElementById('biomes');
+const scenesEl = document.getElementById('scenes');
+const qualsEl = document.getElementById('quals');
+mk(biomesEl, BIOME_NAMES, () => R.biome, (v) => R.setBiome(v));
+mk(scenesEl, Object.keys(SCENES), () => sceneName, (v) => build(v));
+mk(qualsEl, ['high', 'low'], () => R.tier, (v) => R.setQuality(v));
+function paint() {
+  for (const host of [biomesEl, scenesEl, qualsEl]) {
+    const cur = host._get();
+    [...host.children].forEach((b, i) => b.classList.toggle('on', host._items[i] === cur));
+  }
+}
+
+addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  if (k === '1' || k === '2' || k === '3') { R.setBiome(BIOME_NAMES[+k - 1]); paint(); }
+  else if (k === 'q') { R.setQuality(R.tier === 'high' ? 'low' : 'high'); paint(); }
+  else if (k === ' ') { paused = !paused; e.preventDefault(); }
+  else if (k === 'r') build(sceneName);
+  else if (k === 'b') botOn = !botOn;
+});
+
+/* ------------------------------------------------------------------- frame */
+function fit() {
+  R.resize(innerWidth, innerHeight, devicePixelRatio);
+}
+addEventListener('resize', fit);
+fit();
+
+if (P.has('biome')) R.setBiome(P.get('biome'));
+if (P.has('q')) R.setQuality(P.get('q'));
+build(sceneName);
+
+const SIM_DT = 1 / 60;
+let acc = 0, last = performance.now(), perfAcc = 0;
+const perfEl = document.getElementById('perf');
+const preTicks = +(P.get('ticks') || 0);
+for (let i = 0; i < preTicks; i++) world.tick();
+
+let shake = 0, prevChains = 0;
+
+function frame(now) {
+  let dt = (now - last) / 1000; last = now;
+  if (!(dt > 0) || dt > 0.25) dt = SIM_DT;
+
+  if (!paused) {
+    acc += dt;
+    let steps = 0;
+    while (acc >= SIM_DT && steps++ < 6) {
+      acc -= SIM_DT;
+      if (botOn && world.piece) {
+        botAcc += SIM_DT;
+        if (botAcc > 0.30) { botAcc = 0; world.moveBy(Math.round((Math.random() - 0.5) * 5) * 8); if (Math.random() < 0.2) world.rotate(); }
+      }
+      if (botOn && world.piece && world.piece.y > 150) world.hardDrop();
+      world.tick();
+      if (world.over) build(sceneName);
+    }
+    if (world.chains !== prevChains) { shake = Math.min(1, shake + 0.55); prevChains = world.chains; }
+    shake = Math.max(0, shake - dt * 2.2);
+  }
+
+  R.draw(world, { biome: R.biome, shake }, acc / SIM_DT);
+
+  perfAcc += dt;
+  if (perfAcc > 0.25) { perfAcc = 0; perfEl.innerHTML = R.statsHtml(); }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ---------------------------------------------------------- headless hooks */
+Object.defineProperty(window, '__state', { configurable: true, get: () => world.snapshot() });
+window.__gfx = {
+  ready: false,
+  R, get world() { return world; },
+  build, setBiome: (b) => { R.setBiome(b); paint(); },
+  setQuality: (q) => { R.setQuality(q); paint(); },
+  pause: (v) => { paused = v; },
+  stats: () => R.stats(),
+  hidePanel: () => { document.getElementById('panel').style.display = 'none'; document.getElementById('hint').style.display = 'none'; },
+};
+// two frames so the resolve target is sized and the first upload has landed
+requestAnimationFrame(() => requestAnimationFrame(() => { window.__gfx.ready = true; }));
+</script>
