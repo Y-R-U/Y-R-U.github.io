@@ -29,27 +29,42 @@ export const BIOMES = {
     name: 'dune',
     tints: [
       [0, 0, 0],
-      [0.400, 0.252, 0.098],   // ochre
-      [0.420, 0.165, 0.105],   // terracotta
-      [0.320, 0.288, 0.232],   // bone
-      [0.090, 0.265, 0.280],   // deep teal
-      [0.310, 0.130, 0.280],   // aubergine
-      [0.230, 0.245, 0.120],   // olive
-      [0.330, 0.282, 0.196],
+      // Three piece tints that separate by HUE, not by lightness: gold, fired
+      // red, verdigris. A warm-grey third colour (the old "bone") is the same
+      // hue as the key light, so under a warm rig it is the piece you cannot
+      // name — and naming it is the whole game.
+      [0.400, 0.238, 0.072],   // ochre gold
+      [0.415, 0.108, 0.052],   // fired terracotta
+      [0.115, 0.300, 0.238],   // verdigris — the cool one
+      [0.075, 0.185, 0.245],   // brine 4..7: mechanically distinct indices,
+      [0.070, 0.175, 0.240],   // visually one body of water
+      [0.082, 0.196, 0.238],
+      [0.068, 0.170, 0.232],
     ],
-    sky: { top: [0.0185, 0.0150, 0.0195], bot: [0.0055, 0.0045, 0.0080] },
-    glow: { col: [0.300, 0.170, 0.078], pos: [0.14, 1.08], amt: 0.72, band: 0.09 },
-    mote: { col: [1.00, 0.83, 0.52], amt: 0.20 },
+    // Dune is the DEFAULT biome and the first thing anyone ever sees, so the air
+    // inside the vessel has to be warm and lit, not dead space above a pile.
+    // The vessel structure stays — dark walls, pooled floor, lit lip — it is
+    // just no longer sitting in the dark.
+    sky: { top: [0.034, 0.0250, 0.0150], bot: [0.052, 0.0375, 0.0215] },
+    // The sun spills in over the top-left lip. Tight enough to actually fall off
+    // down the frame — a wide one just floods the whole vessel flat.
+    glow: { col: [0.400, 0.292, 0.172], pos: [0.16, 1.04], amt: 0.32, band: 0.13, tight: 4.0 },
+    // Negative roof term: dune's light comes from ABOVE, so the ceiling band is
+    // the bright end of the vessel, not the dark one.
+    well:  [0.76, 1.00, 0.46, -0.16],
+    well2: [0.14, 2.60, 0.22, 0.30],
+    mote: { col: [1.00, 0.86, 0.58], amt: 0.30 },
     key:  { dir: [-0.50, 0.866], col: [1.38, 1.03, 0.66] },
     fill: { dir: [0.56, 0.50], col: [0.26, 0.38, 0.62] },
     amb:  [0.140, 0.114, 0.108],
     rim:  [1.00, 0.80, 0.55],
     emis: [1.70, 1.18, 0.55],
     surf: { rim: 0.36, spec: 0.70, sss: 0.75, grain: 0.70, refr: 0.038, ao: 0.85, shadow: 0.58, relief: 0.55 },
+    piece: [0.62, 0.26, 0.085],   // chroma push, luma pull, own-hue rim
     grade: {
-      exposure: 1.14, sat: 1.06, contrast: 1.16, vignette: 0.60, grain: 0.026,
-      bloom: 0.78, threshold: 0.74, knee: 0.42,
-      shadowTint: [0.86, 0.94, 1.11], highTint: [1.11, 1.02, 0.87],
+      exposure: 1.10, sat: 1.08, contrast: 1.10, vignette: 0.56, grain: 0.026,
+      bloom: 0.78, threshold: 0.80, knee: 0.42,
+      shadowTint: [0.94, 0.95, 1.04], highTint: [1.12, 1.02, 0.86],
     },
   },
 
@@ -68,7 +83,9 @@ export const BIOMES = {
     ],
     mats: { sand: [0.18, 0.24, 0.28], ash: [0.07, 0.09, 0.11], wall: [0.020, 0.032, 0.045] },
     sky: { top: [0.0040, 0.0140, 0.0250], bot: [0.0010, 0.0040, 0.0105] },
-    glow: { col: [0.030, 0.165, 0.245], pos: [0.50, 1.03], amt: 0.78, band: 0.16 },
+    glow: { col: [0.030, 0.165, 0.245], pos: [0.50, 1.03], amt: 0.78, band: 0.16, tight: 4.5 },
+    well:  [0.46, 0.80, 0.54, 0.38],
+    well2: [0.17, 3.40, 0.30, 0.30],
     mote: { col: [0.50, 1.00, 1.00], amt: 0.42 },
     key:  { dir: [0.30, 0.954], col: [0.52, 0.94, 1.16] },
     fill: { dir: [-0.40, -0.917], col: [0.58, 0.18, 0.62] },
@@ -76,9 +93,10 @@ export const BIOMES = {
     rim:  [0.45, 0.96, 1.12],
     emis: [0.55, 1.55, 1.65],
     surf: { rim: 0.60, spec: 1.05, sss: 1.35, grain: 0.70, refr: 0.052, ao: 0.90, shadow: 0.50, relief: 0.50 },
+    piece: [0.42, 0.16, 0.065],
     grade: {
       exposure: 1.18, sat: 1.06, contrast: 1.10, vignette: 0.70, grain: 0.024,
-      bloom: 1.05, threshold: 0.60, knee: 0.40,
+      bloom: 0.92, threshold: 0.70, knee: 0.40,
       shadowTint: [0.80, 0.98, 1.22], highTint: [0.92, 1.05, 1.12],
     },
   },
@@ -88,27 +106,30 @@ export const BIOMES = {
     name: 'kiln',
     tints: [
       [0, 0, 0],
-      [0.520, 0.205, 0.055],   // ember
+      [0.560, 0.215, 0.050],   // ember
+      [0.400, 0.375, 0.345],   // ash white
+      [0.135, 0.122, 0.130],   // char
+      [0.360, 0.375, 0.095],   // sulphur
+      [0.430, 0.070, 0.060],   // blood
       [0.420, 0.310, 0.100],   // brass
-      [0.150, 0.135, 0.140],   // char
-      [0.430, 0.075, 0.065],   // blood
-      [0.400, 0.370, 0.335],   // ash white
-      [0.380, 0.380, 0.100],   // sulphur
       [0.230, 0.150, 0.270],
     ],
     mats: { sand: [0.22, 0.145, 0.095], wall: [0.055, 0.038, 0.034] },
     sky: { top: [0.0130, 0.0095, 0.0110], bot: [0.0400, 0.0130, 0.0058] },
-    glow: { col: [0.340, 0.105, 0.030], pos: [0.50, -0.02], amt: 0.90, band: 0.20 },
+    glow: { col: [0.340, 0.105, 0.030], pos: [0.50, -0.04], amt: 0.58, band: 0.16, tight: 4.5 },
+    well:  [0.46, 0.80, 0.54, 0.38],
+    well2: [0.17, 3.40, 0.30, 0.30],
     mote: { col: [1.00, 0.55, 0.18], amt: 0.50 },
     key:  { dir: [0.45, 0.893], col: [1.46, 1.06, 0.72] },
-    fill: { dir: [0.0, -1.0], col: [1.12, 0.34, 0.08] },
+    fill: { dir: [0.0, -1.0], col: [0.52, 0.19, 0.055] },
     amb:  [0.120, 0.066, 0.046],
     rim:  [1.22, 0.56, 0.18],
     emis: [2.05, 0.92, 0.28],
     surf: { rim: 0.42, spec: 0.85, sss: 1.00, grain: 0.90, refr: 0.040, ao: 0.82, shadow: 0.62, relief: 0.58 },
+    piece: [0.56, 0.22, 0.080],
     grade: {
       exposure: 1.12, sat: 1.02, contrast: 1.14, vignette: 0.66, grain: 0.030,
-      bloom: 0.98, threshold: 0.66, knee: 0.42,
+      bloom: 0.46, threshold: 1.00, knee: 0.45,
       shadowTint: [0.95, 0.90, 1.02], highTint: [1.16, 0.98, 0.79],
     },
   },

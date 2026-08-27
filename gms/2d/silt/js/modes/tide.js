@@ -1,5 +1,7 @@
 import { EMPTY, SAND, WATER } from '../sim/materials.js';
-import { F_CLEARING } from '../sim/grid.js';
+import { Grid, F_CLEARING } from '../sim/grid.js';
+import { BRINE_FIRST, BRINE_COUNT } from '../data/biomes.js';
+import { Clears } from '../sim/clears.js';
 import { safeApi } from './api.js';
 import { makeScorer } from './score.js';
 
@@ -17,8 +19,22 @@ import { makeScorer } from './score.js';
 // whole submerged region to a height every rise step is both correct and
 // self-healing: it refills the holes a chain punched, without special-casing.
 //
-// Water colour is i.i.d. per 2x2 cluster, never in wide coherent bands. See
-// tideTint() — that one line is what stops the tide paying for itself.
+// THE RISING TIDE IS INERT. It has to be: water is TINTABLE and a chain is any
+// one tint spanning wall to wall, so a full-width band of tide is a chain by
+// definition and clears itself the instant it appears.
+//
+// "Inert" means tint 0 IF the engine actually treats tint 0 as no-colour — and
+// today it does not. clears.detect() reads `t = tint[start]` with no zero
+// guard, so a wall-to-wall band of tint-0 water spans and clears exactly like a
+// coloured one. Measured, not assumed: tintZeroIsInert() builds a 24x6 grid, fills
+// two full-width rows with tint-0 water, and asks the shipping Clears whether
+// that is a chain. The mode uses tint 0 the moment that answer flips, and until
+// then uses BRINE tints — colour indices above the piece tint range, which no
+// piece can ever match. Either way the tide cannot complete its own chain.
+//
+// D4 survives because the resource is delivered as WATER PIECES instead: every
+// third piece is tinted water, and water spreads, so dropping blue water into
+// the tide lets that colour run sideways and finish a run of blue sand.
 
 const S = new WeakMap();
 
@@ -33,11 +49,16 @@ export const TIDE_CFG = {
   buoyEvery: 3,         // ticks between buoyancy passes
   buoySamples: 30,      // cells sampled per pass — O(1), not a scan
   buoyChance: 0.34,
-  brineTints: 2,        // extra water-only colours that match no piece: inert
-                        // filler that BLOCKS paths instead of making them.
-                        // Without it the water body is so well connected that
-                        // the mode fires ~52 chains a game and a chain stops
-                        // meaning anything.
+  brineTints: BRINE_COUNT,  // water-only colours ABOVE the piece tint range. No
+                        // piece can match them, so the tide is filler that
+                        // blocks paths instead of making them. FIVE of them,
+                        // not one or two: a single brine colour is p=1 and
+                        // spans on sight, two is p=0.5 and still sits above the
+                        // 0.407 percolation threshold (measured — the bare tide
+                        // self-cleared). Five puts each at p=0.2, comfortably
+                        // below it. Every biome paints 4..8 as near-identical
+                        // shades of its water, so the player sees one body.
+  seq: [SAND, SAND, WATER],   // every third piece is the tinted resource
   waterWeight: 0.45,    // water cells score less than sand cells
 };
 const CFG = TIDE_CFG;
@@ -60,25 +81,47 @@ function h2(a, b, seed) {
  * coloured bands were the first version and they measured at 100 chains a game
  * — the tide drained itself faster than it rose and no run ever ended.
  */
-function tideTint(x, y, tints, seed) {
+export function tideTint(x, y, tints, seed, inert) {
+  if (inert) return 0;
   const sx = (x / CFG.segW) | 0, by = (y / CFG.bandH) | 0;
-  return 1 + (h2(sx, by, seed) % (tints + CFG.brineTints));
+  void tints;
+  return BRINE_FIRST + (h2(sx, by, seed) % CFG.brineTints);
 }
 
-function floodTo(world, st) {
-  const g = world.g, cols = g.cols, rows = g.rows;
-  const top = Math.max(0, rows - st.line);
-  const tints = world.cfg.tints;
+/**
+ * Does the shipping clear detector treat tint 0 as no-colour? Probed against
+ * the real Clears on a throwaway grid, so the answer is whatever the engine
+ * actually does today rather than what anyone remembers it doing.
+ */
+export function tintZeroIsInert() {
+  const g = new Grid(24, 6);
+  g.fill(0, 4, 24, 2, WATER, 0);
+  return new Clears(g, { diagonal: true }).detect() === 0;
+}
+
+/**
+ * Level the submerged region to `line` rows above the floor, filling only the
+ * empty cells. Exported because the tide gates flood a bare grid with it — the
+ * gate must exercise the shipping fill, not a copy of it.
+ */
+export function floodGrid(g, line, tints, seed, inert) {
+  const cols = g.cols, rows = g.rows;
+  const top = Math.max(0, rows - line);
   let made = 0;
   for (let y = rows - 1; y >= top; y--) {
     const row = y * cols;
     for (let x = 0; x < cols; x++) {
       const i = row + x;
       if (g.mat[i] !== EMPTY) continue;
-      g.set(i, WATER, tideTint(x, y, tints, st.seed));
+      g.set(i, WATER, tideTint(x, y, tints, seed, inert));
       made++;
     }
   }
+  return made;
+}
+
+function floodTo(world, st) {
+  const made = floodGrid(world.g, st.line, world.cfg.tints, st.seed, st.inert);
   st.made += made;
   return made;
 }
@@ -133,8 +176,11 @@ export default {
     const st = {
       scorer: makeScorer({ per: 24, curve: 9000 }),
       seed: (world.cfg.seed ^ 0x71de5a1e) >>> 0,
+      inert: tintZeroIsInert(),
       line: 6,
       accum: 0,
+      k: 0,
+      lastNext: world.nextPiece,
       made: 0,
       drained: 0,
       warned: false,
@@ -152,6 +198,12 @@ export default {
     api = safeApi(api);
     const rows = world.g.rows;
     const limit = rows - CFG.topMargin;
+
+    if (world.nextPiece !== st.lastNext) {
+      st.lastNext = world.nextPiece;
+      st.k++;
+      world.cfg.mat = CFG.seq[st.k % CFG.seq.length];
+    }
 
     const rise = Math.min(CFG.riseMax, CFG.riseBase + CFG.riseAccel * world.t);
     st.accum += rise / 60;

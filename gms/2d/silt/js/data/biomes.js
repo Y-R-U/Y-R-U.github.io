@@ -6,7 +6,15 @@
 // tint colours for 1..MAX_TINTS. Tint 0 means "untinted": tintable material
 // that carries no colour, which is what scenery and tide fill use.
 
-export const MAX_TINTS = 5;
+export const MAX_TINTS = 8;
+
+// Tint indices 1..3 are the piece colours. 4..8 are BRINE: the shades TIDE
+// floods with. They must be five distinct INDICES so no one of themoccupies enough of
+// the board to percolate — but they should read to the eye as one body of
+// water, so each biome sets them to near-identical shades of its own water
+// colour. Mechanically five colours, visually one.
+export const BRINE_FIRST = 4;
+export const BRINE_COUNT = 5;
 
 // #rrggbb strings. The renderer is free to convert once at upload time.
 const COMMON_UNLIT = { empty: '#00000000' };
@@ -32,8 +40,11 @@ export const BIOMES = {
       '#f2b33d',   // 1 amber
       '#d9603b',   // 2 terracotta
       '#8fc7b0',   // 3 verdigris  (the cool one — reads instantly against 1 & 2)
-      '#b189d6',   // 4 (unused at 3 tints)
-      '#e8e2c8',   // 5
+      '#4f7f96',   // 4 brine
+      '#568799',   // 5 brine
+      '#4a7891',   // 6 brine
+      '#5a8ea0',   // 7 brine
+      '#45718b',   // 8 brine
     ],
     mats: {
       wall: '#3b2a18', sand: '#c9a25e', water: '#4f8fb0', jelly: '#d98fb4',
@@ -60,8 +71,11 @@ export const BIOMES = {
       '#41e8c4',   // 1 aqua glow
       '#7a6cff',   // 2 violet glow
       '#ffd447',   // 3 lantern gold
-      '#ff5fa2',
-      '#c9f7ff',
+      '#12587a',   // 4 brine
+      '#166486',   // 5 brine
+      '#0f4f70',   // 6 brine
+      '#1b6f90',   // 7 brine
+      '#0c4666',   // 8 brine
     ],
     mats: {
       wall: '#0a1a26', sand: '#3d5b6b', water: '#1d6f96', jelly: '#5fe0d0',
@@ -88,8 +102,11 @@ export const BIOMES = {
       '#ffb027',   // 1 ember
       '#3fb6ff',   // 2 quench blue
       '#b7f04a',   // 3 sulphur
-      '#ff58d0',
-      '#fff0d2',
+      '#2f7fa8',   // 4 brine
+      '#3689b2',   // 5 brine
+      '#2a769e',   // 6 brine
+      '#3d93bb',   // 7 brine
+      '#256d95',   // 8 brine
     ],
     mats: {
       wall: '#241012', sand: '#a56a44', water: '#3fa2d6', jelly: '#e0709a',
@@ -116,8 +133,11 @@ export const BIOMES = {
       '#ff4d7d',   // 1 raspberry
       '#2ecf7a',   // 2 lime
       '#3d7dff',   // 3 cobalt
-      '#ffc32e',
-      '#a45cff',
+      '#8fcfe8',   // 4 brine
+      '#9ad7ee',   // 5 brine
+      '#84c7e2',   // 6 brine
+      '#a5dff3',   // 7 brine
+      '#7abfdb',   // 8 brine
     ],
     mats: {
       wall: '#98a6b6', sand: '#cbb994', water: '#7cc3e8', jelly: '#ff6f9c',
@@ -144,8 +164,11 @@ export const BIOMES = {
       '#e4c66a',   // 1 brass
       '#7fd4e8',   // 2 glass blue
       '#e07a8f',   // 3 rose quartz
-      '#9ee07a',
-      '#f0eef6',
+      '#5f93ad',   // 4 brine
+      '#679cb6',   // 5 brine
+      '#578aa4',   // 6 brine
+      '#70a5bf',   // 7 brine
+      '#4f819b',   // 8 brine
     ],
     mats: {
       wall: '#2b3040', sand: '#d8c39a', water: '#6fa8c8', jelly: '#d98fb4',

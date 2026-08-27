@@ -89,7 +89,7 @@ export function createSettings(deps) {
           set('haptics', v);
           if (v && navigator.vibrate) navigator.vibrate(8);
         })),
-      h('div', { class: 'row', style: { justifyContent: 'center' } },
+      h('div', { class: 'row row--note', style: { justifyContent: 'center' } },
         h('span', { class: 'row-sub', style: { marginTop: '0', textAlign: 'center' },
           text: 'SILT — a falling-sand puzzle. Best scores live on this device.' })),
     );

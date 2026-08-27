@@ -64,7 +64,7 @@ export function createWordmark() {
       </linearGradient>
       <filter id="${id}f" x="-8" y="-8" width="350" height="116"
               filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-        <feTurbulence type="fractalNoise" baseFrequency="0.25" numOctaves="3" seed="3" result="n"/>
+        <feTurbulence type="fractalNoise" baseFrequency="0.42 0.55" numOctaves="3" seed="3" result="n"/>
         <feColorMatrix in="n" type="matrix" result="ng"
           values="0.34 0.34 0.34 0 0  0.34 0.34 0.34 0 0  0.34 0.34 0.34 0 0  0 0 0 0 1"/>
         <feComposite in="SourceGraphic" in2="ng" operator="arithmetic"
@@ -150,6 +150,8 @@ export function createWordmark() {
       if (raf) cancelAnimationFrame(raf), raf = 0;
       el.classList.remove('is-pouring');
     },
+    /** Jump the cycle to a given point. Only the capture tool uses this. */
+    seek(ms) { t0 = performance.now() - ms; lastWrite = -1e9; },
     /** Skip the pour and sit at full strength — used when the sheet is over it. */
     settle() { this.stop(); setB(B_SOLID); halo.style.opacity = '1'; },
   };

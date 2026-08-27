@@ -19,9 +19,21 @@ export function safeApi(api = {}) {
   };
 }
 
-/** True only when the host can actually redirect gravity. */
+/**
+ * True only when gravity can actually be redirected. The host api is preferred
+ * — it may want to tell the renderer too — but World.setGravity is the thing
+ * that does the work, so either route counts.
+ */
 export function hasGravity(api, world) {
-  return typeof (api && api.setGravity) === 'function' && !!(world && world.gravity);
+  return typeof (api && api.setGravity) === 'function'
+      || typeof (world && world.setGravity) === 'function';
+}
+
+/** The gravity setter to actually call, or null. */
+export function gravitySetter(api, world) {
+  if (api && typeof api.setGravity === 'function') return (x, y) => api.setGravity(x, y);
+  if (world && typeof world.setGravity === 'function') return (x, y) => world.setGravity(x, y);
+  return null;
 }
 
 function fallbackRng() {

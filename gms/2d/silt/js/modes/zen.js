@@ -1,5 +1,6 @@
 import { EMPTY, SAND, WATER, OIL, LAVA, ICE, JELLY, WALL, FIRE, CRYSTAL, ASH, LIFE } from '../sim/materials.js';
 import { safeApi } from './api.js';
+import { BRINE_FIRST, BRINE_COUNT } from '../data/biomes.js';
 
 // ZEN — sandbox. No score, no fail, every material on the palette.
 //
@@ -28,7 +29,16 @@ export const PALETTE = [
   { mat: EMPTY,   name: 'Erase',   tinted: false },
 ];
 
-/** Paint a filled disc. The one call the UI needs; everything else is data. */
+/**
+ * Paint a filled disc. The one call the UI needs; everything else is data.
+ *
+ * WATCH THE TINT. A chain is one tint spanning wall to wall, so a single stroke
+ * of tinted material drawn all the way across the board IS a chain and will
+ * dissolve under the player's finger. That is legal in a sandbox — it is the
+ * same rule the scored modes run on — but anything that seeds a board rather
+ * than responding to a finger (seedScene below, ALCHEMY scenery, a fixture)
+ * must use untinted or brine-tinted material, or stop short of a wall.
+ */
 export function paint(world, cx, cy, { mat = SAND, tint = 1, radius = 5, density = 1 } = {}, rng = null) {
   const g = world.g;
   const r2 = radius * radius;
@@ -61,7 +71,12 @@ export function seedScene(world, rng) {
     const h = 10 + rng.int(28);
     g.fill(x, rows - 6 - h, w, h, WALL);
   }
-  g.fill(0, rows - 26, cols, 20, WATER, 0);
+  // Brine, not tint 0: a wall-to-wall band of ANY single tint is a chain, and
+  // tint 0 is a tint as far as clears.detect is concerned. Brine indices match
+  // no piece colour, so the pool sits there instead of dissolving on frame one.
+  for (let y = rows - 26; y < rows - 6; y++)
+    for (let x = 0; x < cols; x++)
+      g.set(y * cols + x, WATER, BRINE_FIRST + ((x * 7 + y * 3) % BRINE_COUNT));
   for (let k = 0; k < 3; k++) {
     const x = 6 + rng.int(cols - 12);
     paint(world, x, 24 + rng.int(40), { mat: SAND, tint: 1 + rng.int(3), radius: 7 + rng.int(6) }, rng);

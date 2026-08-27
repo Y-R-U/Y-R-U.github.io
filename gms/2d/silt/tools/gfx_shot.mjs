@@ -23,7 +23,7 @@ const args = Object.fromEntries(process.argv.slice(2).map((a) => {
   return m ? [m[1], m[2] === undefined ? true : m[2]] : [a, true];
 }));
 
-const SCENES = ['dune', 'tide', 'kiln', 'jelly', 'glass', 'dissolve', 'mixed'];
+const SCENES = ['dune', 'tide', 'kiln', 'jelly', 'glass', 'dissolve', 'mixed', 'tints'];
 const BIOMES = ['dune', 'abyss', 'kiln'];
 const W = +(args.w || 420), H = +(args.h || 900);
 const SHOTS = join(ROOT, 'shots');
@@ -112,6 +112,7 @@ try {
     if (args.q) q.set('q', args.q);
     if (args.dt) q.set('dt', args.dt);
     if (args.tint) q.set('tint', args.tint);
+    for (const k of ['ptint', 'fill', 'py', 'ticks']) if (args[k]) q.set(k, args[k]);
 
     await cdp.goto(`${base}/dev/gfx.html?${q}`);
     const ok = await cdp.waitFor('window.__gfx && window.__gfx.ready', 60000);

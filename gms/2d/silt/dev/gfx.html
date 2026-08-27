@@ -44,6 +44,7 @@
 
 <script type="module">
 import { World } from '../js/sim/world.js';
+import { step } from '../js/sim/step.js';
 import { SAND, WATER, JELLY, OIL, LAVA, ICE, CRYSTAL, ASH, WALL } from '../js/sim/materials.js';
 import { createRenderer, BIOME_NAMES } from '../js/gfx/renderer.js';
 
@@ -66,9 +67,11 @@ function driveBot(w, drops, rnd) {
   for (let k = 0; k < 260; k++) w.tick();
 }
 
+// Raw step, NOT world.tick: a full-width single-tint pour IS a spanning chain,
+// so tick() detects it and clears the whole pour away before it ever settles.
 function pour(w, m, x, y, ww, hh, tint, ticks) {
   w.g.fill(x, y, ww, hh, m, tint);
-  for (let k = 0; k < (ticks || 220); k++) w.tick();
+  for (let k = 0; k < (ticks || 220); k++) step(w.g, w.rng, w.stats);
 }
 
 const SCENES = {
@@ -84,7 +87,7 @@ const SCENES = {
   kiln: (w, rnd) => {
     driveBot(w, 26, rnd);
     pour(w, LAVA, 34, 2, 44, 12, 0, 200);
-    w.g.fill(4, 150, 18, 10, ASH, 0);
+    pour(w, ASH, 4, 150, 18, 10, 0, 140);
   },
 
   jelly: (w, rnd) => {
@@ -134,6 +137,35 @@ const SCENES = {
     for (let k = 0; k < 22; k++) w.tick();
   },
 
+  // PIECE LEGIBILITY. The player's whole decision is "which tint am I holding",
+  // so the in-flight piece has to be readable at a glance over an empty board
+  // AND over a nearly-full one. ?ptint= picks the tint, ?fill= the pile depth.
+  piece: (w, rnd) => {
+    driveBot(w, +(P.get('fill') || 14), rnd);
+    let guard = 0;
+    while (!w.piece && guard++ < 60) w.tick();
+    if (w.piece) {
+      const t = +(P.get('ptint') || 1);
+      for (const c of w.piece.cells) c.tint = t;
+      w.piece.y = Math.round(w.g.rows * +(P.get('py') || 0.48));
+      w.piece.x = Math.round(w.g.cols * 0.42 / 8) * 8;
+    }
+  },
+
+  // Same idea, all three tints in ONE frame so they can be compared directly.
+  // These are grid cells flagged F_PIECE rather than world.piece — the renderer
+  // cannot tell the difference, and one image beats three.
+  tints: (w, rnd) => {
+    driveBot(w, +(P.get('fill') || 14), rnd);
+    w.piece = null;
+    const g = w.g;
+    const put = (x, y, tint) => {
+      g.fill(x, y, 16, 16, SAND, tint);
+      for (let j = 0; j < 16; j++) for (let i = 0; i < 16; i++) g.flags[g.idx(x + i, y + j)] |= 16;
+    };
+    put(10, 40, 1); put(48, 70, 2); put(86, 40, 3);
+  },
+
   // V-FLIP ORACLE. Material in the bottom 10 rows and nowhere else. tools/gfx_shot.mjs
   // --check diffs this against `empty` and asserts the lit pixels land at the BOTTOM
   // of the image. Do not delete: the board was rendered upside down once already.
@@ -153,7 +185,7 @@ function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Ma
 function build(name) {
   sceneName = name;
   const seed = +(P.get('seed') || 7);
-  world = new World({ seed, tints: 4, tintMode: P.get('tint') || 'mono' });
+  world = new World({ seed, tints: +(P.get('tints') || 3), tintMode: P.get('tint') || 'mono' });
   (SCENES[name] || SCENES.dune)(world, mulberry(seed * 2654435761 % 2147483647));
   paint();
 }

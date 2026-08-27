@@ -1,5 +1,6 @@
-import { SAND, CRYSTAL } from '../sim/materials.js';
+import { SAND, CRYSTAL, STEAM, FIRE, EMPTY } from '../sim/materials.js';
 import { applyScene, makeTracker, OBJECTIVE_LABEL } from '../data/levelgen.js';
+import { pieceBounds, BLK } from '../sim/pieces.js';
 import { LEVELS } from '../data/levels.js';
 import { safeApi } from './api.js';
 import { makeScorer } from './score.js';
@@ -19,7 +20,46 @@ import { makeScorer } from './score.js';
 
 const S = new WeakMap();
 
-export const ALCHEMY_CFG = { hardFailAtLimit: true };
+export const ALCHEMY_CFG = { hardFailAtLimit: true, ventRows: 6, corridorPad: 6, corridorDepth: 12 };
+
+/**
+ * Gas must not block the falling piece.
+ *
+ * Quenching lava makes STEAM in bulk and steam climbs. In the CA, water sinks
+ * straight through steam — density 30 against 2 — but the falling piece is not
+ * in the grid, and collides() treats every non-empty cell as solid, gas
+ * included. So the rising steam front caught each incoming water piece in
+ * mid-air, the piece landed near the ceiling, and the next spawn topped the
+ * board out: measured, every quench level died at 3.3s with the objective at
+ * 15% done.
+ *
+ * The correct fix is for collides() to ignore GAS, which is world/pieces and
+ * not this lane. Until then the mode clears gas out of two places only — the
+ * spawn crown, and the corridor immediately below the piece — which reproduces
+ * the CA's own answer without touching the sim.
+ */
+function vent(world) {
+  const g = world.g;
+  const end = Math.min(g.n, ALCHEMY_CFG.ventRows * g.cols);
+  for (let i = 0; i < end; i++) {
+    const m = g.mat[i];
+    if (m === STEAM || m === FIRE) g.set(i, EMPTY, 0);
+  }
+  const p = world.piece;
+  if (!p) return;
+  const b = pieceBounds(p);
+  const x0 = Math.max(0, p.x + b.minX * BLK - ALCHEMY_CFG.corridorPad);
+  const x1 = Math.min(g.cols - 1, p.x + (b.maxX + 1) * BLK + ALCHEMY_CFG.corridorPad);
+  const y0 = Math.max(0, p.y + (b.maxY + 1) * BLK);
+  const y1 = Math.min(g.rows - 1, y0 + ALCHEMY_CFG.corridorDepth);
+  for (let y = y0; y <= y1; y++) {
+    const row = y * g.cols;
+    for (let x = x0; x <= x1; x++) {
+      const m = g.mat[row + x];
+      if (m === STEAM || m === FIRE) g.set(row + x, EMPTY, 0);
+    }
+  }
+}
 
 // The working level set. tools/genlevels.mjs swaps in candidate levels and then
 // plays them through THIS module, so the validator measures the shipping code
@@ -85,7 +125,7 @@ export default {
     api.biome(this.biome);
     world.alchemy = {
       id: lv.id, name: lv.name, act: lv.act, arch: lv.arch,
-      label: this.label(lv), value: 0, target: st.tracker.target,
+      label: this.label(lv), value: 0, target: st.tracker.target, base: st.tracker.baseline,
       frac: 0, left: lv.limitS, stars: 0, won: false,
     };
   },
@@ -95,6 +135,7 @@ export default {
     if (!st) return;
     api = safeApi(api);
     const lv = st.lv;
+    vent(world);
 
     if (world.nextPiece !== st.lastNext) {
       st.lastNext = world.nextPiece;
@@ -120,7 +161,7 @@ export default {
     world.alchemy = {
       id: lv.id, name: lv.name, act: lv.act, arch: lv.arch,
       label: this.label(lv),
-      value: st.tracker.value, target: st.tracker.target,
+      value: st.tracker.value, target: st.tracker.target, base: st.tracker.baseline,
       frac: st.tracker.frac(), left: Math.max(0, left),
       stars: st.stars, won: st.won,
     };

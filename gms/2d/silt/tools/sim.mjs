@@ -17,6 +17,14 @@ import { step } from '../js/sim/step.js';
 import { makeRng } from '../js/core/rng.js';
 import { Bot } from '../js/ai/bot.js';
 import { SAND, WATER, EMPTY, MAT_COUNT, TINTABLE } from '../js/sim/materials.js';
+
+// Drive the SHIPPING mode, not the bare engine. The engine carries a fallback
+// scoring formula that every mode deliberately replaces, so a gate run against
+// a raw World reports a score no player will ever see — it read 747473 here
+// while the real FLOW mode scored 276 for the same work.
+let FLOW = null;
+try { FLOW = (await import('../js/modes/index.js')).MODES.find((m) => m.id === 'flow'); } catch { /* modes not built yet */ }
+const modeApi = (w) => ({ rng: w.rng, biome() {}, shake() {}, banner() {}, setGravity(x, y) { w.setGravity(x, y); }, sfx() {} });
 import { F_CLEARING } from '../js/sim/grid.js';
 
 const args = process.argv.slice(2);
@@ -127,15 +135,21 @@ function gateDeterminism() {
 function gatePlay() {
   let totalChains = 0, totalScore = 0, stalls = 0, lengths = [];
   for (let n = 0; n < GAMES; n++) {
-    const w = new World({ seed: 1000 + n });
+    const w = new World({ seed: 1000 + n, ...(FLOW ? FLOW.worldCfg : {}) });
     if (BREAK === 'clears') w.clears.detect = () => 0;
+    const api = modeApi(w);
+    if (FLOW && FLOW.onStart) FLOW.onStart(w, api);
     const bot = new Bot(w);
     let t = 0;
     const CAP = SIM_HZ * 240;
     let lastCells = -1, sameFor = 0;
     for (; t < CAP && !w.over; t++) {
+      const chainsBefore = w.chains;
+      if (FLOW && FLOW.onTick) FLOW.onTick(w, api);
       bot.update();
       w.tick();
+      if (w.chains > chainsBefore && FLOW && FLOW.onChain) FLOW.onChain(w, api, w.clears.lastChain.slice());
+      if (!Number.isFinite(w.score)) { fail('G5-play', `score went non-finite at tick ${t} (game ${n})`); break; }
       if (w.g.count === lastCells) sameFor++; else { sameFor = 0; lastCells = w.g.count; }
       if (sameFor > SIM_HZ * 12) { stalls++; break; }
     }

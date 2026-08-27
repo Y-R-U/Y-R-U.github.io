@@ -87,14 +87,19 @@ export function makeTracker(world, level) {
     target: o.target,
     value: 0,
     done: false,
-    baseline: o.type === 'purge' ? countMat(world.g, o.mat || SAND) : 0,
+    // Captured after applyScene: a crucible level starts with crystal pillars
+    // already on the board, and "forge 400 crystal" must mean 400 MORE.
+    baseline: o.type === 'purge' ? countMat(world.g, o.mat || SAND)
+            : o.type === 'crystal' ? countMat(world.g, CRYSTAL) : 0,
     _every: 12,
     update(w) {
       switch (o.type) {
         case 'chains': t.value = w.chains; t.done = t.value >= o.target; break;
         case 'dissolve': t.value = w.cellsCleared; t.done = t.value >= o.target; break;
         case 'crystal':
-          if (w.ticks % t._every === 0 || t.value === 0) t.value = countMat(w.g, CRYSTAL);
+          if (w.ticks % t._every === 0 || t.value === 0) {
+            t.value = Math.max(0, countMat(w.g, CRYSTAL) - t.baseline);
+          }
           t.done = t.value >= o.target;
           break;
         case 'purge': {
@@ -130,6 +135,28 @@ function pool(level, rng, mat, hMin, hMax) {
   const h = rng.irange(hMin, hMax);
   const inset = rng.irange(2, 8);
   return { x: inset, y: level.rows - 4 - h, w: level.cols - inset * 2, h, mat };
+}
+
+/**
+ * Several separate puddles rather than one basin.
+ *
+ * Quenching crusts a lava surface with crystal, and crystal is permanent — so
+ * one basin can be sealed by the first water piece and then yields nothing ever
+ * again. Measured: a single 54-wide pool caps out at 65 crystal and the level
+ * is unwinnable above that. Separate puddles each carry their own surface, so
+ * the ceiling on the objective scales with how many there are.
+ */
+function puddles(level, rng, mat, n, hMin, hMax) {
+  const out = [];
+  const usable = level.cols - 6;
+  const slot = Math.floor(usable / n);
+  for (let k = 0; k < n; k++) {
+    const w = Math.max(6, Math.min(slot - 3, rng.irange(8, 18)));
+    const h = rng.irange(hMin, hMax);
+    const x = 3 + k * slot + rng.irange(0, Math.max(0, slot - w));
+    out.push({ x, y: level.rows - 4 - h, w, h, mat });
+  }
+  return out;
 }
 
 function pillars(level, rng, mat, n, hMin, hMax) {
@@ -180,8 +207,8 @@ export function genLevel(i, count, seed) {
     seed: (seed ^ Math.imul(i + 1, 0x85ebca6b)) >>> 0,
     name: `${NAMES_A[i % NAMES_A.length]} ${NAMES_B[(i * 7 + 3) % NAMES_B.length]}`,
     act: 1 + Math.min(4, Math.floor(d * 5)),
-    cols: snap(56 + d * 24 + rng.range(-4, 4), BLK),
-    rows: Math.round(136 + d * 48),
+    cols: snap(64 + d * 24 + rng.range(-4, 4), BLK),
+    rows: Math.round(168 + d * 48),
     tints,
     tintMode: 'mono',
     diagonal: true,
@@ -189,7 +216,7 @@ export function genLevel(i, count, seed) {
     fallRate: Math.round(18 + d * 20 + rng.range(-2, 2)),
     fallAccel: +(0.4 + d * 0.6).toFixed(2),
     fallMax: Math.round(58 + d * 42),
-    limitS: 75,
+    limitS: Math.round(60 + d * 40),
     seq: [SAND],
     scene: [],
     objective: { type: 'chains', target: 2 },
@@ -205,23 +232,26 @@ export function genLevel(i, count, seed) {
     case 'span':
       level.seq = [SAND];
       s.push(...pillars(level, rng, CRYSTAL, 1 + Math.round(d * 4), 6, 10 + Math.round(d * 20)));
-      level.objective = { type: 'chains', target: 2 + Math.round(d * 4) };
+      level.objective = { type: 'chains', target: 2 + Math.round(d * 5) };
       break;
 
     case 'excavate':
-      level.seq = [SAND, SAND, ICE];
+      // ICE was in this palette and had to come out: it is STATIC, so an ice
+      // slab never shatters or settles, the stack tops out in seconds and the
+      // level is unbeatable. Static materials belong in scenery, not in hands.
+      level.seq = [SAND, SAND, WATER];
       s.push(...mounds(level, rng, SAND, 2 + Math.round(d * 3), tints));
       s.push(...pillars(level, rng, WALL, Math.round(d * 3), 5, 14));
-      level.objective = { type: 'dissolve', target: Math.round(1600 + d * 5200) };
+      level.objective = { type: 'dissolve', target: Math.round(1400 + d * 4200) };
       break;
 
     case 'quench':
       // Lava on the floor, water in your hand. Crystal is permanent, so every
       // point of progress also builds a wall you have to live with.
       level.seq = [WATER, WATER, SAND];
-      s.push(pool(level, rng, LAVA, 4 + Math.round(d * 5), 8 + Math.round(d * 8)));
+      s.push(...puddles(level, rng, LAVA, 2 + Math.round(d * 4), 4 + Math.round(d * 4), 7 + Math.round(d * 6)));
       s.push(...pillars(level, rng, WALL, Math.round(d * 2), 6, 16));
-      level.objective = { type: 'crystal', target: Math.round(160 + d * 900) };
+      level.objective = { type: 'crystal', target: Math.round(150 + d * 700) };
       break;
 
     case 'crucible':
@@ -229,8 +259,9 @@ export function genLevel(i, count, seed) {
       // a lava piece is 256 cells of it.
       level.seq = [SAND, LAVA, SAND, WATER];
       s.push(pool(level, rng, WATER, 6 + Math.round(d * 6), 12 + Math.round(d * 10)));
+      void puddles;
       s.push(...pillars(level, rng, CRYSTAL, Math.round(d * 3), 5, 12));
-      level.objective = { type: 'crystal', target: Math.round(220 + d * 1100) };
+      level.objective = { type: 'crystal', target: Math.round(200 + d * 850) };
       break;
 
     case 'slag': {

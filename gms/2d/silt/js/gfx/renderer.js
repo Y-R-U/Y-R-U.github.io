@@ -91,7 +91,7 @@ export async function createRenderer(canvas, opts = {}) {
   let vw = 4, vh = 4, dpr = 1;
   let cols = 112, rows = 224;
   const bgT = makeTarget(gl, 4, 4, { float });
-  const fieldT = makeTarget(gl, 4, 4, { float, attachments: 2 });
+  const fieldT = makeTarget(gl, 4, 4, { float, attachments: 3 });   // colour+density, aux, piece
   const occA = makeTarget(gl, 4, 4, { float });
   const occB = makeTarget(gl, 4, 4, { float });
   const smA = makeTarget(gl, 4, 4, { float });
@@ -120,7 +120,7 @@ export async function createRenderer(canvas, opts = {}) {
     superSample = ss;
     resizeTarget(gl, occA, cols, rows);
     resizeTarget(gl, occB, cols, rows);
-    resizeTarget(gl, bgT, vw, vh);
+    resizeTarget(gl, bgT, Math.ceil(vw / 2), Math.ceil(vh / 2));
   }
 
   /* -------------------------------------------------------------- biomes */
@@ -201,7 +201,7 @@ export async function createRenderer(canvas, opts = {}) {
     /* 1 — backdrop */
     bindTarget(gl, bgT);
     pBg.use()
-      .u2f('u_res', vw, vh)
+      .u2f('u_res', bgT.w, bgT.h)
       .u4f('u_rect', rect[0], rect[1], rect[2], rect[3])
       .u1f('u_time', time)
       .u3f('u_skyTop', B.sky.top[0], B.sky.top[1], B.sky.top[2])
@@ -209,6 +209,9 @@ export async function createRenderer(canvas, opts = {}) {
       .u3f('u_glowCol', B.glow.col[0], B.glow.col[1], B.glow.col[2])
       .u2f('u_glowPos', B.glow.pos[0], B.glow.pos[1])
       .u1f('u_glowAmt', B.glow.amt).u1f('u_bandAmt', B.glow.band)
+      .u1f('u_glowTight', B.glow.tight)
+      .u4f('u_well', B.well[0], B.well[1], B.well[2], B.well[3])
+      .u4f('u_well2', B.well2[0], B.well2[1], B.well2[2], B.well2[3])
       .u3f('u_moteCol', B.mote.col[0], B.mote.col[1], B.mote.col[2])
       .u1f('u_moteAmt', B.mote.amt);
     drawTri(); passes++;
@@ -256,6 +259,7 @@ export async function createRenderer(canvas, opts = {}) {
       .tex('u_occ', 2, occA.tex)
       .tex('u_bg', 3, bgT.tex)
       .tex('u_smooth', 4, smA.tex)
+      .tex('u_piece', 5, fieldT.texs[2])
       .u2f('u_res', vw, vh).u2f('u_grid', cols, rows)
       .u4f('u_rect', rect[0], rect[1], rect[2], rect[3])
       .u2f('u_ftex', 1 / fieldT.w, 1 / fieldT.h)
@@ -269,7 +273,8 @@ export async function createRenderer(canvas, opts = {}) {
       .u3f('u_emisCol', B.emis[0], B.emis[1], B.emis[2])
       .u1f('u_rimAmt', S.rim).u1f('u_specAmt', S.spec).u1f('u_sssAmt', S.sss)
       .u1f('u_grainAmt', S.grain).u1f('u_refrAmt', S.refr)
-      .u1f('u_aoAmt', S.ao).u1f('u_shadowAmt', S.shadow).u1f('u_relief', S.relief);
+      .u1f('u_aoAmt', S.ao).u1f('u_shadowAmt', S.shadow).u1f('u_relief', S.relief)
+      .u3f('u_pieceCtl', B.piece[0], B.piece[1], B.piece[2]);
     drawTri(); passes++;
 
     /* 6 — dissolve motes, additive on top of the lit scene */

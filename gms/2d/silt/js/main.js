@@ -32,7 +32,8 @@ async function loadOptional(path, fallback) {
 async function boot() {
   const gfx = await loadOptional('./gfx/renderer.js', null);
   if (gfx && gfx.createRenderer) {
-    R = await gfx.createRenderer(canvas, { preserveDrawingBuffer: q.has('preserve'), quality: q.get('q') || 'auto' });
+    const quality = q.get('q') || save.settings.quality || 'auto';
+    R = await gfx.createRenderer(canvas, { preserveDrawingBuffer: q.has('preserve'), quality });
   } else {
     const dbg = await import('./core/debugdraw.js');
     R = await dbg.createRenderer(canvas);
@@ -45,6 +46,7 @@ async function boot() {
   AUDIO = audioMod && audioMod.createAudio ? audioMod.createAudio() : {
     unlock: async () => {}, music() {}, sfx() {}, duck() {}, setVolume() {},
   };
+  try { AUDIO.setVolume(save.settings.music, save.settings.sfx); } catch (e) {}
   window.addEventListener('pointerdown', () => { AUDIO.unlock && AUDIO.unlock(); }, { once: true });
   window.addEventListener('keydown', () => { AUDIO.unlock && AUDIO.unlock(); }, { once: true });
 
@@ -147,7 +149,11 @@ function simTick() {
   world.tick();
   if (world.chains > before) {
     AUDIO.sfx('chain', world.lastChainSize);
-    if (mode && mode.onChain) mode.onChain(world, api, world.lastChainSize);
+    // The CELLS ARRAY, not the count — the contract says cells and every mode
+    // does `cells.length`. Passing a number made that undefined, and a single
+    // NaN then poisoned world.score for the rest of the run.
+    // Sliced because clears.lastChain is reused on the next detection.
+    if (mode && mode.onChain) mode.onChain(world, api, world.clears.lastChain.slice());
   }
 }
 
@@ -195,6 +201,25 @@ Object.defineProperty(window, '__state', {
 });
 window.__game = {
   get world() { return world; },
+  get audio() { return AUDIO; },
+  setQuality(v) { try { R.setQuality && R.setQuality(v); } catch (e) {} },
+  /** Poke the sand on the attract screen. Goes through grid.set so the ledger stays honest. */
+  pour(gx, gy, mat, tint) {
+    if (!world) return 0;
+    const g = world.g;
+    const x = Math.round(gx), y = Math.round(gy), r = 3;
+    let n = 0;
+    for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
+      if (dx * dx + dy * dy > r * r) continue;
+      const px = x + dx, py = y + dy;
+      if (!g.inb(px, py)) continue;
+      const i = g.idx(px, py);
+      if (g.mat[i] !== 0) continue;
+      g.set(i, mat || world.cfg.mat, tint || (1 + (world.rng.int(world.cfg.tints))));
+      n++;
+    }
+    return n;
+  },
   get view() { return view; },
   get renderer() { return R; },
   start: startGame, attract: startAttract, save,

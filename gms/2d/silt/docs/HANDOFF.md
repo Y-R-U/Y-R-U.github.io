@@ -57,3 +57,34 @@ Two bugs that lane's own gates caught, both worth remembering:
   larger is contact.
 - Load as a per-column average is wrong for a press — weight on 16 columns of a
   50-column pancake averages to nothing. It is total overburden vs body mass.
+
+## Lane B shell — done
+Attract screen, mode sheet, HUD, pause, results, settings, events. The SILT
+wordmark is a thresholded noise mask over stroked SVG paths (no webfont, nothing
+to fetch): a vertical grey ramp plus fractal noise through a slope-9 transfer, so
+sliding the intercept makes grains land from above, hold, then blow away.
+Controls are anchored to the letterboxed board rect mirrored into CSS vars, with
+two deliberate exceptions found by screenshot — the bottom edge follows the safe
+area rather than the board, and the column has a 430px floor.
+
+## Integration bugs lane B found in the MANAGER's files, now fixed
+1. onChain was passed world.lastChainSize (a NUMBER) where CONTRACTS.md section C
+   and every mode expect `cells` (an ARRAY). A number is truthy, so
+   `cells ? cells.length : ...` produced undefined, chainPoints(undefined) was
+   NaN, and world.score stayed NaN for the rest of the run. Now passes
+   clears.lastChain.slice() — sliced because that array is reused on the next
+   detection. The play gate now also fails loudly if score goes non-finite.
+2. AUDIO was local to main.js so the settings sliders could not reach it. Exposed
+   as __game.audio, and saved volumes are applied at boot.
+3. save.settings.quality was never read; ?q= now overrides it rather than
+   replacing it.
+4. Added __game.pour(x,y) so the attract-screen sand poke goes through the
+   sanctioned grid.set path.
+5. silt.lastmode added to SAVE_KEYS so the cloud layer mirrors it.
+
+## Scoring lives in the mode, not the engine
+score.js records the score each tick and REPLACES the engine's own award when a
+chain fires, so there is no double count. Consequence: tools/sim.mjs was
+measuring the engine's fallback formula and reported 747473 for work the real
+FLOW mode scores at 276. The play gate now drives the shipping FLOW mode through
+its real hooks; it reports 6.3 chains and ~1265 points per game over a 117s life.

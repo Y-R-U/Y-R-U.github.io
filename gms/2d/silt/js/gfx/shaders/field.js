@@ -8,7 +8,9 @@ uniform vec4  u_rect;      // board rect in screen uv: x, y, w, h
 uniform float u_time;
 uniform vec3  u_skyTop, u_skyBot, u_glowCol, u_moteCol;
 uniform vec2  u_glowPos;
-uniform float u_glowAmt, u_moteAmt, u_bandAmt;
+uniform float u_glowAmt, u_moteAmt, u_bandAmt, u_glowTight;
+uniform vec4  u_well;      // interior: base, floor pool, side falloff, roof falloff
+uniform vec4  u_well2;     // outside, pool exponent, pool tint, lip
 out vec4 frag;
 
 void main() {
@@ -19,7 +21,7 @@ void main() {
 
   // one tight key glow — gives the whole frame a direction before a grain is drawn
   vec2 d = (uv - u_glowPos) * vec2(asp, 1.0);
-  c += u_glowCol * exp(-dot(d, d) * 4.5) * u_glowAmt;
+  c += u_glowCol * exp(-dot(d, d) * u_glowTight) * u_glowAmt;
 
   // slow drifting haze so a flat gradient never bands
   float n = fbm3(vec2(uv.x * 2.6 * asp, uv.y * 2.0) + vec2(u_time * 0.013, -u_time * 0.021));
@@ -46,17 +48,19 @@ void main() {
   vec2 e = min(b, 1.0 - b);
   float inside = step(0.0, min(e.x, e.y));
 
-  vec3 outer = c * 0.17;
-  float pool = exp(-max(b.y, 0.0) * 3.4);
+  vec3 outer = c * u_well2.x;
+  float pool = exp(-max(b.y, 0.0) * u_well2.y);
   float side = ss(0.0, 0.085, e.x);
   float roof = ss(0.0, 0.26, 1.0 - b.y);
-  vec3 inner = c * (0.46 + 0.80 * pool) * (0.46 + 0.54 * side) * (0.62 + 0.38 * roof);
-  inner += u_glowCol * pow(pool, 1.7) * 0.30;
+  vec3 inner = c * (u_well.x + u_well.y * pool)
+                 * ((1.0 - u_well.z) + u_well.z * side)
+                 * ((1.0 - u_well.w) + u_well.w * roof);
+  inner += u_glowCol * pow(pool, 1.7) * u_well2.z;
   inner *= 0.90 + 0.20 * fbm3(vec2(b.x * 3.0, b.y * 7.0) + 19.0);   // faint wall grain
   c = mix(outer, inner, inside);
 
   float lip = inside * (1.0 - ss(0.0, 0.0045, min(e.x, e.y)));
-  c += u_glowCol * lip * 0.30;
+  c += u_glowCol * lip * u_well2.w;
 
   frag = vec4(max(c, 0.0), 1.0);
 }`;
@@ -88,6 +92,7 @@ uniform float u_dissolve;      // DISSOLVE_TICKS
 
 layout(location = 0) out vec4 oField;   // rgb = voted colour, a = density
 layout(location = 1) out vec4 oAux;     // fluid, emissive, translucent, dissolve flash
+layout(location = 2) out vec4 oPiece;   // rgb = the piece's own tint, a = piece coverage
 
 void main() {
   // board space, y measured UP from the floor; texture row 0 is the ceiling,
@@ -97,8 +102,8 @@ void main() {
   ivec2 ic = ivec2(floor(cell));
   ivec2 gi = ivec2(u_grid);
 
-  float dens = 0.0, flash = 0.0, colW = 0.0;
-  vec3 colAcc = vec3(0.0), props = vec3(0.0);
+  float dens = 0.0, flash = 0.0, colW = 0.0, pieceW = 0.0;
+  vec3 colAcc = vec3(0.0), props = vec3(0.0), pieceCol = vec3(0.0);
 
   for (int j = -R; j <= R; j++) {
     for (int i = -R; i <= R; i++) {
@@ -135,7 +140,6 @@ void main() {
 
       vec4 pr = u_matProp[m];
       props += pr.xyz * w;
-      if ((fl & 16) != 0) props.y += 0.045 * w;   // the live piece breathes
 
       int ti = int(s.g * 255.0 + 0.5);
       vec3 col = u_matCol[m];
@@ -143,6 +147,12 @@ void main() {
       float cw = pow(w, VOTE);
       colAcc += col * cw;
       colW += cw;
+
+      // The airborne piece gets its own channel. It is the one object the
+      // player has to IDENTIFY rather than admire, and an isolated blob with no
+      // occlusion under it takes the whole light rig at once, which is exactly
+      // where every hue turns to cream. The lighting pass needs to know.
+      if ((fl & 16) != 0) { pieceW += w; pieceCol += col * w; }
     }
   }
 
@@ -150,6 +160,7 @@ void main() {
   if (dens > 1e-5) { colAcc /= colW; props /= dens; flash /= dens; }
   oField = vec4(colAcc, min(dn, 1.35));
   oAux = vec4(props, flash);
+  oPiece = vec4(pieceW > 1e-5 ? pieceCol / pieceW : vec3(0.0), min(pieceW * KNORM, 1.0));
 }`;
 
 /* ---------------------------------------------------------- occlusion field
@@ -196,7 +207,7 @@ void main() {
 export const LIGHT_FS = (REFRACT) => HEAD + LIB + `
 #define REFRACT ${REFRACT ? 1 : 0}
 
-uniform sampler2D u_field, u_aux, u_occ, u_bg, u_smooth;
+uniform sampler2D u_field, u_aux, u_occ, u_bg, u_smooth, u_piece;
 uniform vec2  u_res, u_grid;
 uniform vec4  u_rect;
 uniform vec2  u_ftex;        // 1 / resolve target size
@@ -206,6 +217,7 @@ uniform vec2  u_keyDir, u_fillDir;
 uniform vec3  u_keyCol, u_fillCol, u_ambCol, u_rimCol, u_emisCol;
 uniform float u_rimAmt, u_specAmt, u_sssAmt, u_grainAmt;
 uniform float u_refrAmt, u_aoAmt, u_shadowAmt, u_relief;
+uniform vec3  u_pieceCtl;    // chroma push, luma pull, own-hue rim
 
 out vec4 frag;
 
@@ -220,7 +232,11 @@ void main() {
 
   vec4 f = texture(u_field, bc);
   vec4 ax = texture(u_aux, bc);
+  vec4 pf = texture(u_piece, bc);
   float d = texture(u_smooth, bc).r;
+
+  // How much of this pixel is the AIRBORNE piece. Settled material is 0.
+  float piece = clamp(pf.a * 1.3, 0.0, 1.0);
 
   float occ = texture(u_occ, bc).r;
   // cast shadow: is the ground TOWARD the light denser than here?
@@ -253,8 +269,8 @@ void main() {
 
   // ---- grain, in CELL space so it belongs to the board, not to the screen
   vec2 cs = bc * u_grid;
-  vec2 sc = cs * vec2(0.052, 0.285);
-  float st = fbm3(sc) * 0.64 + vn(sc * 2.3 + 5.1) * 0.36;
+  vec2 sc = cs * vec2(0.042, 0.155);
+  float st = vn(sc) * 0.46 + vn(sc * 2.15 + 5.1) * 0.29 + vn(sc * 4.7 + 12.2) * 0.16 + vn(sc * 9.3 + 2.4) * 0.09;
   float gn = st * 0.80 + vn(cs * 0.42 + 31.7) * 0.20;
   float gc = vn(sc * 1.05 + 3.3);
   vec2 gd = vec2(vn(sc * 1.05 + 7.1) - gc, vn(sc * 1.05 + 19.3) - gc);
@@ -273,19 +289,36 @@ void main() {
   n = normalize(n + vec3(-(luma(cR) - luma(cL)), -(luma(cU) - luma(cD)), 0.0) * 1.45 * grain);
 
   vec3 albedo = f.rgb;
+
+  // ---- the piece in flight is a READ, not a picture.
+  // It is the only thing on screen the player has to identify rather than
+  // admire, and it is also the worst-lit object in the scene: a small blob with
+  // nothing under it takes the whole rig unoccluded, lands at the top of the
+  // ACES curve, and every hue there flattens toward cream. Two moves, both
+  // needed: push the albedo's distance from grey, and pull its luma DOWN off
+  // the shoulder so the curve stops eating the chroma. Third move below: rim it
+  // in its own hue instead of the key's.
+  vec3 pHue = vec3(0.0);
+  if (piece > 0.002) {
+    float pl = luma(pf.rgb);
+    pHue = max(mix(vec3(pl), pf.rgb, 1.0 + u_pieceCtl.x), 0.0);
+    albedo = mix(albedo, pHue * (1.0 - u_pieceCtl.y), piece);
+  }
+
   albedo *= 1.0 + grain * u_grainAmt * (gn - 0.5) * 0.26;
+  albedo *= 1.0 + grain * (h12(floor(cs) + 0.5) - 0.5) * 0.13;
 
   // Liquids. In a single-layer field there is no scene behind the water to
   // refract — the backdrop IS the empty vessel — so what sells it is motion and
   // specular, not displacement. Refraction stays on for the rim only.
   float caustic = 0.0;
   if (fluid > 0.02) {
-    vec2 wv = cs * vec2(0.30, 0.85) + vec2(u_time * 0.55, u_time * 0.13);
+    vec2 wv = cs * vec2(0.115, 0.30) + vec2(u_time * 0.22, u_time * 0.055);
     float wa = vn(wv);
     vec2 wn = vec2(vn(wv + vec2(0.7, 0.0)) - wa, vn(wv + vec2(0.0, 0.7)) - wa);
-    n = normalize(n + vec3(wn * fluid * 2.1, 0.0));
+    n = normalize(n + vec3(wn * fluid * 2.6, 0.0));
     albedo *= 1.0 + fluid * (vn(wv * 0.55 + 3.7) - 0.5) * 0.40;
-    caustic = fluid * pow(max(wa - 0.60, 0.0) * 3.2, 2.0);
+    caustic = fluid * pow(max(wa - 0.58, 0.0) * 2.9, 2.0);
   }
   albedo *= 1.0 - seam * 0.22 * grain;
 
@@ -324,13 +357,19 @@ void main() {
   float shin = mix(220.0, 9.0, rough);
   vec3 H = normalize(L + V);
   float spec = pow(max(dot(n, H), 0.0), shin) * mix(1.0, 0.05, rough);
-  col += u_keyCol * spec * u_specAmt;
-  col += (u_keyCol + u_rimCol) * caustic * 0.30;
+  col += u_keyCol * spec * u_specAmt * (1.0 - 0.60 * piece);
+  col += (u_keyCol + u_rimCol) * caustic * 0.16;
 
   // ---- fresnel rim, strongest on liquids and glass
   float fres = pow(1.0 - clamp(n.z, 0.0, 1.0), 3.0);
   float edge = ss(0.62, 0.44, d);
-  col += u_rimCol * (fres * (0.25 + 0.75 * (fluid + trans)) + edge * 0.22) * u_rimAmt;
+  // On a piece the soft shell is most of the blob, so a rim in the KEY's colour
+  // paints the whole thing cream. Hand that budget to the tint instead.
+  col += u_rimCol * (fres * (0.25 + 0.75 * (fluid + trans)) + edge * 0.22) * u_rimAmt * (1.0 - 0.88 * piece);
+  if (piece > 0.002) {
+    vec3 pn = pHue / max(luma(pHue), 0.02);
+    col += pn * (edge * 0.40 + fres * 1.00) * piece * u_pieceCtl.z;
+  }
 
   // ---- subsurface: thin material glows, thick material does not
   float thick = max(ss(0.0, 0.85, occ), depth);
@@ -348,8 +387,16 @@ void main() {
   }
 #endif
 
-  // ---- emissive
-  col += albedo * emis * (2.2 + 0.9 * sin(u_time * 3.1 + cs.x * 0.4 + cs.y * 0.7));
+  // ---- emissive. A uniformly glowing blob is a light bulb, not lava: molten
+  //      rock is dark chilled skin torn open by hot veins, drifting slowly.
+  if (emis > 0.02) {
+    vec2 lv = cs * 0.16 + vec2(u_time * 0.030, -u_time * 0.055);
+    float crust = fbm3(lv);
+    float veins = 1.0 - abs(2.0 * vn(lv * 2.3 + 7.0) - 1.0);
+    float hot = ss(0.36, 0.80, crust) * 0.55 + pow(veins, 6.0) * 1.30;
+    col = mix(col, col * 0.26, emis * (1.0 - ss(0.08, 0.62, hot)));
+    col += albedo * emis * (0.10 + 1.25 * hot) * (0.90 + 0.16 * sin(u_time * 2.3 + cs.y * 0.3));
+  }
 
   // ---- dissolve flash. Hot core, colour-preserving halo, travelling band.
   float fl = ax.w;
@@ -357,9 +404,9 @@ void main() {
     float crack = ss(0.30, 0.72, gn + fl * 0.35);
     // Keep the chain's own colour hot rather than clipping it to white — a
     // dissolving ochre band should read as ochre on fire, not as a light leak.
-    col += albedo * (1.20 + 2.00 * crack) * fl;
+    col += albedo * (1.00 + 1.70 * crack) * fl;
     col += u_emisCol * (0.14 + 0.30 * crack) * fl;
-    col += u_emisCol * fl * fl * fl * 0.42;
+    col += u_emisCol * fl * fl * fl * 0.34;
   }
 
   frag = vec4(mix(bg, col, cover), 1.0);

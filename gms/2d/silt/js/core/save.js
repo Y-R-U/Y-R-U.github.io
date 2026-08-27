@@ -4,11 +4,12 @@
 const K_BEST = 'silt.best';
 const K_SET = 'silt.settings';
 const K_STATS = 'silt.stats';
+const K_LASTMODE = 'silt.lastmode';   // written by js/ui — the mode PLAY resumes
 
 const read = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
 const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 
-export const SAVE_KEYS = [K_BEST, K_SET, K_STATS];
+export const SAVE_KEYS = [K_BEST, K_SET, K_STATS, K_LASTMODE];
 
 export function createSave() {
   let best = read(K_BEST, {});

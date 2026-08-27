@@ -37,19 +37,20 @@ export function createUI(handlers = {}) {
   const attract = h('div', { class: 'scr scr-attract' },
     h('div', { class: 'veil veil-top' }),
     h('div', { class: 'veil veil-bot' }),
-    h('div', { class: 'brandbox' },
-      wm.el,
-      h('div', { class: 'tagline', html: 'Span the board &nbsp;<em>&middot;</em>&nbsp; watch it dissolve' })),
-    h('div', { class: 'bestline' }),
-    h('div', { class: 'hint', text: 'touch the sand' }),
-    h('div', { class: 'corner corner-tl' },
-      tap(h('button', { class: 'gb gb--icon', 'aria-label': 'Daily and events' },
-        icon(GLYPH.spark), h('span', { class: 'pip' })), () => openDaily())),
-    h('div', { class: 'corner corner-tr' },
-      tap(h('button', { class: 'gb gb--icon', 'aria-label': 'Settings' }, icon(GLYPH.gear)), () => settings.show())),
-    h('div', { class: 'attract-btns' },
-      tap(h('button', { class: 'gb gb--pill gb--primary' }, icon(GLYPH.play), 'Play'), () => play(lastStarted)),
-      tap(h('button', { class: 'gb gb--pill' }, icon(GLYPH.grid), 'Modes'), () => openModes())),
+    h('div', { class: 'frame' },
+      h('div', { class: 'brandbox' },
+        wm.el,
+        h('div', { class: 'tagline', html: 'Span the board &nbsp;<em>&middot;</em>&nbsp; watch it dissolve' })),
+      h('div', { class: 'bestline' }),
+      h('div', { class: 'hint', text: 'touch the sand' }),
+      h('div', { class: 'corner corner-tl' },
+        tap(h('button', { class: 'gb gb--icon', 'aria-label': 'Daily and events' },
+          icon(GLYPH.spark), h('span', { class: 'pip' })), () => openDaily())),
+      h('div', { class: 'corner corner-tr' },
+        tap(h('button', { class: 'gb gb--icon', 'aria-label': 'Settings' }, icon(GLYPH.gear)), () => settings.show())),
+      h('div', { class: 'attract-btns' },
+        tap(h('button', { class: 'gb gb--pill gb--primary' }, icon(GLYPH.play), 'Play'), () => play(lastStarted)),
+        tap(h('button', { class: 'gb gb--pill' }, icon(GLYPH.grid), 'Modes'), () => openModes()))),
   );
   const bestline = attract.querySelector('.bestline');
 
@@ -65,25 +66,28 @@ export function createUI(handlers = {}) {
   const hud = h('div', { class: 'scr scr-hud' },
     h('div', { class: 'veil veil-top' }),
     h('div', { class: 'veil veil-bot' }),
-    h('div', { class: 'hud-top' },
-      h('div', { class: 'hud-score' }, hudMode, hudVal,
-        h('div', { class: 'hud-pills' }, pillChains, pillCombo)),
-      nextBox),
-    h('div', { class: 'hud-pause' },
-      tap(h('button', { class: 'gb gb--icon', 'aria-label': 'Pause' }, icon(GLYPH.pause)), () => pause())),
-    hudHint,
+    h('div', { class: 'frame' },
+      h('div', { class: 'hud-top' },
+        h('div', { class: 'hud-score' }, hudMode, hudVal,
+          h('div', { class: 'hud-pills' }, pillChains, pillCombo)),
+        nextBox),
+      h('div', { class: 'hud-pause' },
+        tap(h('button', { class: 'gb gb--icon', 'aria-label': 'Pause' }, icon(GLYPH.pause)), () => pause())),
+      hudHint),
   );
 
   /* --------------------------------------------------------------- pause */
 
   const pauseScore = h('div', { class: 'bigscore t-num', text: '0' });
+  const pauseTitle = h('h2', { class: 'card-title', text: 'FLOW' });
   const pauseScreen = h('div', { class: 'scr scr-pause' },
     h('div', { class: 'modal-wrap' },
       h('div', { class: 'modal-scrim', onclick: () => resume() }),
       h('div', { class: 'card' },
         h('div', { class: 'card-kicker', text: 'paused' }),
+        pauseTitle,
         pauseScore,
-        h('div', { class: 'card-kicker', style: { marginTop: '-4px' }, text: 'points' }),
+        h('div', { class: 'card-kicker', text: 'points' }),
         h('div', { class: 'card-btns' },
           tap(h('button', { class: 'gb gb--primary' }, icon(GLYPH.play), 'Resume'), () => resume()),
           h('div', { class: 'card-row' },
@@ -135,7 +139,8 @@ export function createUI(handlers = {}) {
     .catch(() => { modes = mergeModes(guessShipped()); buildModes(); });
 
   function guessShipped() {
-    const ids = (window.__game && window.__game.modes && window.__game.modes()) || ['flow'];
+    let ids = ['flow'];
+    try { ids = (window.__game && window.__game.modes && window.__game.modes()) || ids; } catch { /* pre-boot */ }
     return ids.map((id) => ({ id }));
   }
 
@@ -154,12 +159,7 @@ export function createUI(handlers = {}) {
     H.onStart(m.id, opts || {});
   }
 
-  function pause() {
-    H.onPause();
-    const st = window.__state;
-    pauseScore.textContent = fmt((st && st.score) || lastScore || 0);
-    show('pause');
-  }
+  function pause() { H.onPause(); show('pause'); }
   function resume() { H.onResume(); show('hud'); }
 
   function closeSheets() {
@@ -204,7 +204,9 @@ export function createUI(handlers = {}) {
   function openDaily() {
     const save = window.__game && window.__game.save;
     const day = (save && save.today && save.today()) || new Date().toISOString().slice(0, 10);
-    const ready = modes.filter((m) => m.ready);
+    // ALCHEMY is hand-built levels and ZEN cannot end, so neither means anything
+    // as a seeded one-shot. The daily is only ever an endless, scoring mode.
+    const ready = modes.filter((m) => m.ready && m.id !== 'alchemy' && m.id !== 'zen');
     const hsh = dayHash(day);
     const pick = ready.length ? ready[hsh % ready.length] : modes[0];
     const seed = hsh % 1000000;
@@ -221,7 +223,7 @@ export function createUI(handlers = {}) {
         h('span', { class: 'mcard-txt' },
           h('span', { class: 'mcard-name', text: "Today's run" }),
           h('span', { class: 'mcard-blurb', text: `${pick.name} on seed ${seed}. The same board for everyone, until midnight UTC.` })),
-        h('span', { class: 'mcard-meta' }, h('span', { class: 't-cap', text: 'go' }))),
+        h('span', { class: 'mcard-meta' }, icon(GLYPH.play))),
       h('div', { class: 'row' },
         h('div', {}, h('span', { class: 'row-lab', text: 'Runs played' })),
         h('div', { class: 'row-ctl' }, h('b', { class: 't-num', text: fmt(stats.games) }))),
@@ -294,13 +296,27 @@ export function createUI(handlers = {}) {
   let bannerAt = 0;
   function banner(text) {
     if (!text) return;
+    // The attract loop runs a real mode, so it fires real mode banners — and
+    // they land straight on top of the wordmark. The title screen is not a
+    // scoreboard; only a run the player is actually in gets to shout.
+    if (current !== 'hud' && current !== 'pause') return;
     const now = performance.now();
     if (now - bannerAt < 140) return;         // a mode firing twice on one tick
+    const live = bannerHost.lastElementChild;
+    if (live && live.textContent === String(text)) return;
     bannerAt = now;
     const el = h('div', { class: 'banner', text: String(text) });
     bannerHost.append(el);
     setTimeout(() => el.remove(), 2400);
     while (bannerHost.childElementCount > 3) bannerHost.firstElementChild.remove();
+  }
+
+  /** Seven digits do not fit at 54px. Step the size instead of letting it clip. */
+  function setBig(el, n) {
+    const t = fmt(n);
+    el.textContent = t;
+    el.classList.toggle('long', t.length >= 8);
+    el.classList.toggle('vlong', t.length >= 11);
   }
 
   /* --------------------------------------------------------------- screens */
@@ -332,6 +348,11 @@ export function createUI(handlers = {}) {
       clearTimeout(hintT);
       hintT = setTimeout(() => hudHint.classList.add('gone'), 4200);
     }
+    if (target === 'pause') {
+      const st = window.__state;
+      pauseTitle.textContent = lastMode || 'RUN';
+      setBig(pauseScore, (st && st.score) || Math.max(lastScore, 0));
+    }
     if (target === 'results' || target === 'pause') closeSheets();
   }
 
@@ -343,10 +364,13 @@ export function createUI(handlers = {}) {
   function setHud(s) {
     if (!s) return;
     if (s.mode && s.mode !== lastMode) { lastMode = s.mode; hudMode.textContent = s.mode; }
-    if (s.score !== lastScore) {
-      const jump = s.score > lastScore && lastScore >= 0;
-      lastScore = s.score;
-      hudVal.textContent = fmt(s.score);
+    // Coerce, because NaN !== NaN would re-run the bump animation every frame
+    // for the rest of the run. (World.score does go NaN today — see HANDOFF.)
+    const score = Number.isFinite(s.score) ? s.score : 0;
+    if (score !== lastScore) {
+      const jump = score > lastScore && lastScore >= 0;
+      lastScore = score;
+      hudVal.textContent = fmt(score);
       if (jump) { hudVal.classList.remove('bump'); void hudVal.offsetWidth; hudVal.classList.add('bump'); }
     }
     if (s.chains !== lastChains) { lastChains = s.chains; pillChains.lastElementChild.textContent = fmt(s.chains); }
@@ -359,6 +383,40 @@ export function createUI(handlers = {}) {
   }
 
   /* --------------------------------------------------------------- touch */
+
+  // Mirror the letterboxed board rect into CSS. Everything in .frame hangs off
+  // these, so the shell tracks the sand through rotation, a notch and a desktop
+  // window without a single JS-driven layout pass.
+  function syncBoard() {
+    const v = window.__game && window.__game.view;
+    const b = v && v.board;
+    if (!b || !(b.w > 1)) return;
+    root.style.setProperty('--board-x', b.x + 'px');
+    root.style.setProperty('--board-y', b.y + 'px');
+    root.style.setProperty('--board-w', b.w + 'px');
+    root.style.setProperty('--board-h', b.h + 'px');
+    const safe = v.safe || { left: 0, right: 0, bottom: 0 };
+    const gap = Math.max(0, v.h - (b.y + b.h));
+    root.style.setProperty('--board-b', Math.min(gap, safe.bottom || 0) + 'px');
+
+    // The controls track the board, but they must never be NARROWER than a
+    // thumb needs: a mode with a 64-column board letterboxes to ~245 px on a
+    // phone, and PLAY + MODES do not fit in that. Widen to a comfortable
+    // minimum, then re-centre on the board and clamp inside the safe area.
+    const avail = v.w - safe.left - safe.right;
+    const w = Math.max(b.w, Math.min(avail, 430));
+    const x = Math.max(safe.left, Math.min(b.x + (b.w - w) / 2, v.w - safe.right - w));
+    root.style.setProperty('--ui-x', x + 'px');
+    root.style.setProperty('--ui-w', w + 'px');
+  }
+  {
+    const v = window.__game && window.__game.view;
+    if (v && v.onResize) v.onResize(syncBoard);
+    syncBoard();
+    // setBoard() fires before the UI exists on the very first world, so take one
+    // more reading once the first frame has been through main's loop.
+    requestAnimationFrame(syncBoard);
+  }
 
   createSandTouch(attract, () => current === 'attract' && !modeSheet.open && !dailySheet.open && !settings.open);
 
@@ -383,14 +441,15 @@ export function createUI(handlers = {}) {
     results(r = {}) {
       lastScore = -1; lastChains = -1; lastCombo = -1;
       resTitle.textContent = r.mode || 'RUN';
-      resScore.textContent = fmt(r.score);
+      setBig(resScore, r.score);
       resChains.textContent = fmt(r.chains);
       resBest.textContent = fmt(Math.max(r.best || 0, r.score || 0));
       resRibbon.classList.toggle('hide', !r.isBest);
-      resKicker.textContent = r.isBest ? 'personal best' : 'run over';
+      resKicker.textContent = 'run over';
       show('results');
     },
     openModes, openSettings: () => settings.show(), openDaily,
+    wmSeek: (ms) => wm.seek(ms),
     get screen() { return current; },
   };
   window.__ui = api;

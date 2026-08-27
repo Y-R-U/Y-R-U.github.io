@@ -1,19 +1,23 @@
 import { EMPTY, SAND } from '../sim/materials.js';
 import { F_CLEARING } from '../sim/grid.js';
 import { pieceBounds, BLK } from '../sim/pieces.js';
-import { safeApi, hasGravity } from './api.js';
+import { safeApi, hasGravity, gravitySetter } from './api.js';
 import { makeScorer } from './score.js';
 
 // HOURGLASS — the board turns over.
 //
-// Two implementations, chosen by capability probe:
+// Two implementations. The sim DOES now have a gravity vector, and flipping it
+// is one line — but measured, that version is unplayable and it is not this
+// lane's to fix: World.spawn always enters a piece at the top and World.tick
+// always moves it down, so under GRAV_UP the pile pours onto the ceiling and
+// the very next piece lands in it and tops out. A true vector hourglass needs
+// piece spawn and piece fall to follow world.grav in world.js/pieces.js.
+// HOURGLASS_CFG.useGravityVector flips to it the day that lands.
 //
-//  * If the host sim has a gravity vector (api.setGravity plus world.gravity)
-//    we just flip the vector and the CA pours the other way.
-//  * Otherwise we rotate the CONTENTS 180 degrees, which is observationally the
-//    same thing under a fixed downward gravity and needs nothing from the sim
-//    beyond set/swap. It also rotates rather than mirrors, so the left and
-//    right walls swap — a wall-to-wall chain stays a wall-to-wall chain.
+// Until then: rotate the CONTENTS 180 degrees. Under a fixed downward gravity
+// that is observationally the same thing, needs nothing from the sim beyond
+// set/swap, and rotates rather than mirrors — so the left and right walls swap
+// and a wall-to-wall chain is still a wall-to-wall chain.
 //
 // The rotation has one hazard that is not obvious and that cost a rebuild: a
 // pile filling the bottom half lands against the CEILING after the flip, the
@@ -24,6 +28,7 @@ import { makeScorer } from './score.js';
 const S = new WeakMap();
 
 export const HOURGLASS_CFG = {
+  useGravityVector: false,   // see the note above; measured unplayable today
   flipEvery: 30,        // seconds
   warnAt: 3,            // seconds of warning before a flip
   settleMax: 420,       // ticks; hard ceiling on the pour window
@@ -47,6 +52,9 @@ function flushDissolving(world) {
 function rotate180(world, st) {
   const g = world.g, n = g.n;
   flushDissolving(world);
+  // Soft bodies hold their own centroids and would be left pointing at the wrong
+  // cells. HOURGLASS is a sand mode, so dropping them is free insurance.
+  if (world.blobs && world.blobs.clearAll) world.blobs.clearAll();
   st.mat.set(g.mat); st.tint.set(g.tint); st.life.set(g.life); st.heat.set(g.heat);
   for (let i = 0; i < n; i++) {
     const src = n - 1 - i;
@@ -103,7 +111,8 @@ export default {
       settle: 0,
       warned: false,
       dir: 1,
-      vector: hasGravity(api, world),
+      vector: HOURGLASS_CFG.useGravityVector && hasGravity(api, world),
+      grav: gravitySetter(api, world),
       mat: new Uint8Array(n), tint: new Uint8Array(n),
       life: new Uint8Array(n), heat: new Uint8Array(n),
     };
@@ -140,8 +149,8 @@ export default {
       st.flips++;
       st.warned = false;
       st.nextFlip = world.t + HOURGLASS_CFG.flipEvery;
-      if (st.vector) {
-        api.setGravity(0, st.dir);
+      if (st.vector && st.grav) {
+        st.grav(0, st.dir);
       } else {
         rotate180(world, st);
         st.settle = HOURGLASS_CFG.settleMax;
