@@ -136,6 +136,114 @@ export const BIOMES = {
       shadowTint: [0.95, 0.90, 1.02], highTint: [1.16, 0.98, 0.79],
     },
   },
+
+  /* --------------------------------------------------------------- lumen */
+  // JELLY LAB. Clinical and bright: high ambient, low rim, subsurface doing most
+  // of the work so a soft body reads as translucent gel rather than a painted
+  // blob. The data lane asks for a WHITE lab backdrop; taken literally that
+  // kills both of this renderer's load-bearing effects — the dissolve is
+  // ADDITIVE and disappears on white, and the airborne piece has nothing to
+  // separate from. So the sky sits at a pale lab grey, ~4x dune and by far the
+  // brightest biome, and the vessel keeps its frame.
+  lumen: {
+    name: 'lumen',
+    tints: [
+      [0, 0, 0],
+      // Hue triad again, not a lightness ramp: raspberry, lime, cobalt. All
+      // three are high-chroma because a bright neutral backdrop eats pastels.
+      [0.470, 0.075, 0.185],   // raspberry
+      [0.095, 0.400, 0.165],   // lime
+      [0.070, 0.185, 0.500],   // cobalt — the deep one
+      [0.135, 0.290, 0.355],   // brine 4..7: pale aqua, one body of water and
+      [0.128, 0.280, 0.348],   // nowhere near cobalt's deep blue
+      [0.142, 0.300, 0.362],
+      [0.124, 0.272, 0.342],
+    ],
+    mats: {
+      wall: [0.100, 0.110, 0.126], sand: [0.300, 0.272, 0.220],
+      water: [0.070, 0.210, 0.285], ash: [0.140, 0.145, 0.150],
+      crystal: [0.430, 0.470, 0.545], ice: [0.320, 0.415, 0.480],
+      oil: [0.070, 0.062, 0.052],
+    },
+    // The one LIGHT biome in the set, and the number that makes it one. Kept
+    // just under the bloom threshold so the backdrop never blooms into the
+    // piece, and the vessel outside stays dark so the board reads as a lightbox.
+    sky: { top: [0.1900, 0.1955, 0.2030], bot: [0.2460, 0.2520, 0.2600] },
+    // Overhead softbox, not a sun. Wide and weak: a lab is lit from a ceiling
+    // panel and has no direction to speak of.
+    glow: { col: [0.150, 0.158, 0.172], pos: [0.50, 1.04], amt: 0.70, band: 0.06, tight: [1.0, 3.4] },
+    well:  [0.96, 0.20, 0.26, -0.10],
+    well2: [0.13, 3.10, 0.06, 0.30],
+    mote: { col: [0.86, 0.94, 1.00], amt: 0.18 },
+    key:  { dir: [-0.28, 0.960], col: [1.06, 1.09, 1.14] },
+    fill: { dir: [0.52, -0.30], col: [0.30, 0.34, 0.41] },
+    amb:  [0.176, 0.186, 0.200],
+    rim:  [0.66, 0.80, 0.94],
+    emis: [1.70, 1.80, 1.62],
+    // "Flat and bright" is the mood, but SILT's whole read is the sculpted heap,
+    // so AO and the cast shadow stay strong even though the key is weak — on a
+    // pale backdrop contact darkening is what gives the pile any form at all.
+    surf: { rim: 0.26, spec: 0.86, sss: 1.55, grain: 0.52, refr: 0.044, ao: 0.86, shadow: 0.54, relief: 0.52 },
+    // Worst case for the ACES shoulder in the whole game: a bright backdrop and
+    // the highest ambient, so an unoccluded piece is pinned at the top of the
+    // curve. The push and the pull are both the strongest here.
+    piece: [0.74, 0.34, 0.100],
+    grade: {
+      exposure: 1.00, sat: 1.24, contrast: 1.13, vignette: 0.36, grain: 0.016,
+      bloom: 0.52, threshold: 0.88, knee: 0.40,
+      shadowTint: [0.97, 1.00, 1.06], highTint: [1.02, 1.00, 0.97],
+    },
+  },
+
+  /* -------------------------------------------------------------- quartz */
+  // HOURGLASS. Cool mineral glass and brass. The board rotates 180 degrees every
+  // ~30 s, so the backdrop is deliberately SYMMETRIC top to bottom — the key
+  // glow is a horizontal band at the waist and the floor pool is matched by a
+  // negative roof term, so a flip does not swing the light across the frame.
+  quartz: {
+    name: 'quartz',
+    tints: [
+      [0, 0, 0],
+      [0.445, 0.298, 0.055],   // brass
+      [0.055, 0.262, 0.440],   // glass blue
+      // Rose quartz pushed toward magenta rather than salmon: B well above G, so
+      // it can never collapse into brass on the shoulder the way a warm pink
+      // would. Same failure mode as dune's old "bone", one hue round.
+      [0.450, 0.090, 0.238],   // rose
+      [0.088, 0.198, 0.272],   // brine 4..7
+      [0.082, 0.190, 0.266],
+      [0.094, 0.208, 0.278],
+      [0.078, 0.184, 0.260],
+    ],
+    mats: {
+      wall: [0.030, 0.034, 0.050], sand: [0.288, 0.244, 0.180],
+      water: [0.032, 0.140, 0.230], crystal: [0.380, 0.440, 0.600],
+      ice: [0.300, 0.420, 0.520], ash: [0.075, 0.080, 0.092],
+    },
+    // Top and bottom are within 5% of each other on purpose. HOURGLASS turns the
+    // board over, so the pile spends half its life against the ceiling — an
+    // asymmetric gradient would put it in the dark every other flip.
+    sky: { top: [0.0180, 0.0200, 0.0288], bot: [0.0173, 0.0193, 0.0281] },
+    // The waist of the hourglass. Anisotropic the other way round from every
+    // other biome: nearly flat across, tight vertically, so it is a band and not
+    // a sun. Symmetric under a flip by construction.
+    glow: { col: [0.240, 0.272, 0.380], pos: [0.50, 0.50], amt: 0.90, band: 0.13, tight: [1.9, 15.0] },
+    well:  [0.80, 0.26, 0.40, -0.24],
+    well2: [0.16, 4.20, 0.16, 0.72],
+    mote: { col: [0.84, 0.90, 1.00], amt: 0.34 },
+    key:  { dir: [0.26, 0.966], col: [1.02, 1.10, 1.30] },
+    fill: { dir: [-0.44, -0.60], col: [0.36, 0.27, 0.14] },
+    amb:  [0.104, 0.118, 0.152],
+    rim:  [1.00, 0.84, 0.48],   // brass fittings on cool glass
+    emis: [1.55, 1.50, 1.32],
+    surf: { rim: 0.44, spec: 1.00, sss: 0.90, grain: 0.60, refr: 0.048, ao: 0.86, shadow: 0.54, relief: 0.52 },
+    piece: [0.66, 0.28, 0.092],
+    grade: {
+      exposure: 1.06, sat: 1.20, contrast: 1.08, vignette: 0.42, grain: 0.022,
+      bloom: 0.72, threshold: 0.80, knee: 0.42,
+      shadowTint: [0.92, 0.96, 1.11], highTint: [1.09, 1.03, 0.90],
+    },
+  },
 };
 
 export const BIOME_NAMES = Object.keys(BIOMES);

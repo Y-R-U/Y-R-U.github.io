@@ -24,7 +24,7 @@ const args = Object.fromEntries(process.argv.slice(2).map((a) => {
 }));
 
 const SCENES = ['dune', 'tide', 'kiln', 'jelly', 'glass', 'dissolve', 'mixed', 'tints'];
-const BIOMES = ['dune', 'abyss', 'kiln'];
+const BIOMES = ['dune', 'abyss', 'kiln', 'lumen', 'quartz'];
 const W = +(args.w || 420), H = +(args.h || 900);
 const SHOTS = join(ROOT, 'shots');
 mkdirSync(SHOTS, { recursive: true });

@@ -40,7 +40,7 @@
   <div class="card"><h4>scene</h4><div class="row" id="scenes"></div></div>
   <div class="card"><h4>quality</h4><div class="row" id="quals"></div></div>
 </div>
-<div id="hint">1/2/3 biome &nbsp; q quality &nbsp; space pause &nbsp; r reseed</div>
+<div id="hint">1-5 biome &nbsp; q quality &nbsp; space pause &nbsp; r reseed</div>
 
 <script type="module">
 import { World } from '../js/sim/world.js';
@@ -216,7 +216,7 @@ function paint() {
 
 addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase();
-  if (k === '1' || k === '2' || k === '3') { R.setBiome(BIOME_NAMES[+k - 1]); paint(); }
+  if (k >= '1' && k <= '9' && +k <= BIOME_NAMES.length) { R.setBiome(BIOME_NAMES[+k - 1]); paint(); }
   else if (k === 'q') { R.setQuality(R.tier === 'high' ? 'low' : 'high'); paint(); }
   else if (k === ' ') { paused = !paused; e.preventDefault(); }
   else if (k === 'r') build(sceneName);
