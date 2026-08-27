@@ -21,6 +21,13 @@
  *   node tools/uishot.mjs --only=attract
  *   node tools/uishot.mjs --probe         click every control, assert the result
  *   node tools/uishot.mjs --probe --falsify   strip the listeners; every check must go red
+ *   node tools/uishot.mjs --only=modehud  one HUD shot per mode, state driven until real
+ *   node tools/uishot.mjs --only=levels   the ALCHEMY campaign picker, empty and part-played
+ *   node tools/uishot.mjs --flow          attract -> every mode -> pause -> results -> attract,
+ *                                         then a real ALCHEMY level played to a win
+ *   node tools/uishot.mjs --win --only=none   just the ALCHEMY win/loss cards
+ *   node tools/uishot.mjs --flow --falsify    HUD ignores the mode again and the results card
+ *                                         forgets it was ALCHEMY; every panel and win check must go red
  */
 import { harness, ROOT } from './cdp.mjs';
 import { join, dirname } from 'node:path';
@@ -66,12 +73,36 @@ async function shot(name) {
 const want = (n) => !ONLY || ONLY.includes(n);
 
 /**
+ * A REAL touch, through CDP's input pipeline.
+ *
+ * A `new PointerEvent(...)` dispatched by hand is not a pointer: it has no
+ * active pointer id, so core/input.js's setPointerCapture throws NotFoundError
+ * and the handler dies before it does anything. That is why the ZEN brush used
+ * to need a window-capture workaround to be testable at all. Input.dispatchTouchEvent
+ * produces a pointer Chrome believes in, which is both the honest thing to drive
+ * the UI with and the only way to test the sanctioned paint route.
+ */
+async function touch(x, y, moves = []) {
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y, id: 1 }] });
+  for (const [mx, my] of moves) {
+    await new Promise((r) => setTimeout(r, 30));
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: mx, y: my, id: 1 }] });
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+}
+
+/**
  * Screenshots prove layout, not wiring. This clicks the real buttons and
  * asserts what the game did — the only way to catch a control that renders
  * perfectly and is attached to nothing.
  */
 async function probe() {
   const fails = [];
+  // A true phone, with TOUCH EMULATION ON. Not cosmetic: Input.dispatchTouchEvent
+  // is dropped by a page with no touch points, so the ZEN brush silently pours
+  // nothing and the check reads as a broken palette rather than a probe that
+  // never touched anything.
+  await cdp.viewport(390, 844, 1, true);
   // A fresh page. Running after the capture pass left the shell on the results
   // screen with three sheets built, and the probe read that as three failures —
   // its own fault, not the UI's.
@@ -135,21 +166,108 @@ async function probe() {
     (await q('[...document.querySelectorAll(".sheet-wrap")].every(e => !e.classList.contains("is-on"))')) === true);
 
   await q('window.__game.attract()');
+  // The settings sheet closed one line ago and its scrim transitions out over
+  // 300 ms — it is still hit-testable, and sandtouch correctly refuses to pour
+  // through a sheet. Wait for it, or the check measures the transition.
+  await new Promise((r) => setTimeout(r, 400));
   const before = await q('window.__game.world.g.count');
   // Aim at the middle of the BOARD, not the middle of the window: on a desktop
   // viewport the board is a narrow centred column and a hard-coded phone
   // coordinate lands in the black margin, where pouring is correctly a no-op.
-  await cdp.eval(`(() => { const c = document.getElementById('game');
-    const b = window.__game.view.board;
+  //
+  // A REAL touch, for two reasons. A hand-made PointerEvent throws inside
+  // core/input.js's setPointerCapture, and it throws AFTER the handler has
+  // latched st.down — so every later gesture in the run was ignored as "a
+  // pointer is already down". That is what made the ZEN brush look dead three
+  // hundred lines below a test that had nothing to do with it.
+  {
+    const b = JSON.parse(await q('JSON.stringify(window.__game.view.board)'));
     const x = b.x + b.w / 2, y = b.y + b.h * 0.35;
-    for (const t of ['pointerdown', 'pointermove']) {
-      c.dispatchEvent(new PointerEvent(t, { bubbles: true, clientX: x, clientY: y, pointerId: 1 }));
-    } })()`);
+    await touch(x, y, [[x + 4, y + 4]]);
+  }
   const after = await q('window.__game.world.g.count');
   ok('touching the sand on attract pours grains', after > before, `${before} -> ${after}`);
 
   await q('window.__ui.banner("TEST")');
   ok('attract suppresses mode banners', (await q('document.querySelectorAll(".banner").length')) === 0);
+
+  // ZEN. Started through the API rather than a card, so the two checks below
+  // are about the palette itself and not about whether a card still works.
+  await q('window.__game.start("zen", { seed: 5 })');
+  await cdp.frames(10);
+  ok('zen builds the material palette',
+    (await q('document.querySelectorAll(".zp-chip").length')) === 11 &&
+    (await q('document.querySelector(".hud-score").classList.contains("off")')) === true);
+
+  const m0 = await q('window.__ui.zen.material.name');
+  await click('.zp-chip', 5);                            // Lava
+  const m1 = await q('window.__ui.zen.material.name');
+  ok('a palette chip selects that material', m0 !== m1 && m1 === 'Lava', `${m0} -> ${m1}`);
+
+  // Painting listens on the WINDOW in the capture phase, so it must both pour
+  // and swallow the drag — if core/input.js still sees it, the falling piece
+  // slides sideways under the brush.
+  await click('.zp-chip', 0);                            // Sand
+  ok('zen paints through the sanctioned input route',
+    (await q('window.__ui.zen.route')) === 'input', String(await q('window.__ui.zen.route')));
+  const px = await q('window.__game.world.piece ? window.__game.world.piece.x : -1');
+  const c0 = await q('window.__game.world.g.count');
+  {
+    const b = JSON.parse(await q('JSON.stringify(window.__game.view.board)'));
+    const y = b.y + b.h * 0.3;
+    const x0 = b.x + b.w * 0.4;
+    await touch(x0, y, [1, 2, 3, 4, 5, 6].map((k) => [x0 + k * 9, y]));
+  }
+  const c1 = await q('window.__game.world.g.count');
+  const px2 = await q('window.__game.world.piece ? window.__game.world.piece.x : -1');
+  ok('painting in zen pours grains', c1 > c0, `${c0} -> ${c1}`);
+  ok('painting does not also drag the piece', px === -1 || px2 === px, `${px} -> ${px2}`);
+
+  /* ------------------------------------------------- the ALCHEMY campaign */
+  // The picker is the only way into 96 levels, so every claim it makes — what
+  // is open, what is shut, and which level a tile actually starts — has to be
+  // clicked rather than photographed.
+  await q('window.__game.attract()');
+  await q('window.__ui.openModes()');
+  await new Promise((r) => setTimeout(r, 240));
+  await click('.sheet-wrap.is-on .mcard', 4);            // ALCHEMY
+  await new Promise((r) => setTimeout(r, 320));
+  const total = await q('document.querySelectorAll(".sheet--lv .lvt").length');
+  ok('the ALCHEMY card opens the campaign rather than level 1',
+    total > 0 && (await q('window.__state.mode')) !== 'alchemy', `${total} tiles`);
+
+  const unlocked = await q(`window.__game.save.unlockedUpTo(${total || 1})`);
+  const shut = await q('document.querySelectorAll(".sheet--lv .lvt.is-locked").length');
+  ok('every level past the unlock point is locked',
+    total > 0 && shut === total - unlocked && shut > 0, `${shut} of ${total} shut, unlocked ${unlocked}`);
+
+  await click('.sheet--lv .lvt.is-locked');
+  ok('a locked level refuses to start',
+    (await q('window.__state.mode')) !== 'alchemy' &&
+    (await q('document.querySelectorAll(".sheet-wrap.is-on .sheet--lv").length')) === 1);
+
+  const scroll0 = await q('document.querySelector(".sheet--lv .sheet-body").scrollTop');
+  await click('.lv-acts .lv-chip', 3);                   // act IV
+  await new Promise((r) => setTimeout(r, 520));
+  const scroll1 = await q('document.querySelector(".sheet--lv .sheet-body").scrollTop');
+  ok('an act chip jumps the grid to that act', scroll1 > scroll0, `${scroll0} -> ${scroll1}`);
+
+  await click('.sheet--lv .lvt:not(.is-locked)');
+  ok('a level tile starts ALCHEMY on that level',
+    (await q('window.__state.mode')) === 'alchemy' &&
+    (await q('window.__game.world.cfg.levelId')) === 1,
+    `${await q('window.__state.mode')} lv ${await q('window.__game.world.cfg.levelId')}`);
+  ok('starting a level closes the campaign',
+    (await q('[...document.querySelectorAll(".sheet-wrap")].every(e => !e.classList.contains("is-on"))')) === true);
+
+  await q('window.__game.attract()');
+  await q('window.__ui.openLevels()');
+  await new Promise((r) => setTimeout(r, 320));
+  await click('.lv-cont');
+  ok('Continue starts the next unlocked level',
+    (await q('window.__state.mode')) === 'alchemy' &&
+    (await q('window.__game.world.cfg.levelId')) === unlocked,
+    `lv ${await q('window.__game.world.cfg.levelId')} of unlocked ${unlocked}`);
 
   if (args.falsify) {
     // Six of the thirteen checks hang off a listener inside #ui and MUST flip:
@@ -162,7 +280,19 @@ async function probe() {
     //   - 'touching the sand'  sandtouch listens on WINDOW, not on #ui, so
     //     cloning #ui is out of its reach by construction
     //   - 'attract suppresses banners'  a guard, not a handler
-    const MUST = 6;
+    //   - 'painting pours', 'does not drag the piece', 'the sanctioned route'
+    //     the brush now paints through core/input.js, which listens on the
+    //     CANVAS and pours through the mode — also out of #ui's reach
+    //   - 'starting a level closes the campaign'  vacuously true once the tile
+    //     click did nothing, because the campaign never opened
+    // The seventh that MUST flip is the palette chip, whose tap handler lives on
+    // #ui. Six more come from the ALCHEMY campaign, every one of them a listener
+    // inside #ui: the mode card that opens it, the lock state it renders, the
+    // refusal to start a locked level, the act chips, a tile, and Continue.
+    // In practice fifteen go red, because the ZEN field-gating that hides the
+    // score is applied by setHud to the detached originals, so the clone shows a
+    // score panel a ZEN player should never see — a real failure, not a bonus.
+    const MUST = 13;
     console.log(`\nfalsification arm: ${fails.length} checks went red, ${MUST} required`);
     if (fails.length < MUST) { console.log('ARM TOO WEAK — these checks are not evidence'); process.exitCode = 1; }
     else console.log('arm ok: every listener-dependent check is capable of failing');
@@ -172,8 +302,408 @@ async function probe() {
   if (fails.length) process.exitCode = 1;
 }
 
+
+/**
+ * Drive the SHIPPING bot over the shipping host loop until a predicate holds.
+ *
+ * __game.step() runs the sim and the mode hooks but NOT the bot, so stepping
+ * alone piles every piece in one column and the mode state that the HUD is
+ * supposed to show never becomes interesting. `cond` is evaluated with `w`
+ * bound to the world.
+ */
+async function drive(cond, max = 40000) {
+  const raw = await cdp.eval(`(async () => {
+    const { Bot } = await import('${base}/gms/2d/silt/js/ai/bot.js');
+    const w = window.__game.world;
+    const bot = new Bot(w);
+    const hit = (w) => (${cond});
+    let i = 0, reached = false;
+    for (; i < ${max}; i++) {
+      bot.update(); window.__game.step(1);
+      if (hit(w)) { reached = true; break; }
+      if (w.over) break;
+    }
+    return JSON.stringify({ i, reached, over: w.over, t: +w.t.toFixed(1), score: w.score, chains: w.chains });
+  })()`);
+  return JSON.parse(raw);
+}
+
+/**
+ * Push the world's real state through the shell exactly the way main.js's frame
+ * loop does. Nothing here is invented — every field is read off the live world
+ * and the live mode — it only removes the dependency on a rAF landing between
+ * the last sim step and the capture.
+ */
+/**
+ * Every bar in the mode HUD animates to its new value over ~0.3 s. The first
+ * round of shots was taken 90 ms after the pump, so TIDE's 70% waterline was
+ * photographed at 15% and read as a rail that does not track the flood. Let the
+ * transitions land before the shutter.
+ */
+const settle = () => new Promise((r) => setTimeout(r, 480));
+
+async function pump() {
+  await cdp.eval(`(async () => {
+    const M = await import('${base}/gms/2d/silt/js/modes/index.js');
+    const w = window.__game.world, m = M.byId(window.__state.mode);
+    window.__ui.setHud({
+      score: w.score, chains: w.chains, combo: w.combo, next: w.nextPiece,
+      mode: m.name, modeId: m.id, hud: m.hud,
+      tide: w.tide, hourglass: w.hourglass, alchemy: w.alchemy, zen: w.zen,
+    });
+    return 1;
+  })()`);
+}
+
+// What each mode has to be doing before its HUD is worth photographing. A shot
+// of TIDE at 4% waterline or HOURGLASS twenty seconds from a flip proves the
+// panel renders and nothing about whether it communicates.
+const MODE_SHOTS = [
+  ['flow',      'w.chains >= 2', 30000],
+  ['tide',      'w.tide && w.tide.frac > 0.7', 40000],
+  ['jelly',     'w.chains >= 1', 30000],
+  ['hourglass', 'w.hourglass && w.hourglass.flips >= 1 && !w.hourglass.settling && w.hourglass.until < 2.2', 40000],
+  ['alchemy',   'w.alchemy && w.alchemy.frac >= 0.4', 40000],
+  ['zen',       'w.g.count > w.g.cols * w.g.rows * 0.18', 20000],
+];
+
+async function modeShots(tag) {
+  for (const [id, cond, max] of MODE_SHOTS) {
+    await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=${id}&seed=4242`);
+    const up = await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000);
+    if (!up) { console.log(`  !! ${id} never came up`); continue; }
+    await cdp.frames(20);
+    if (id === 'zen') {
+      // ZEN is the palette. Paint with it, through the shell's own brush, so the
+      // shot shows what the control actually does.
+      await cdp.eval(`(() => {
+        const b = document.querySelectorAll('.zp-chip')[1]; b && b.click();     // Water
+        const v = window.__game.view.board;
+        for (let k = 0; k < 26; k++) {
+          window.__ui.zen.stroke(v.x + v.w * (0.22 + 0.03 * k), v.y + v.h * (0.30 + 0.004 * k));
+        }
+        return 1; })()`);
+    }
+    const r = await drive(cond, max);
+    if (!r.reached) console.log(`  ~~ ${id} never reached its shot condition (${JSON.stringify(r)})`);
+    await pump();
+    await settle();
+    await shot(`${tag}-hud-${id}`);
+  }
+
+  // ALCHEMY's win state. Driving all the way to a completed level takes about a
+  // minute of sim; endGame() then flips the shell to results, so the HUD is put
+  // back on screen and re-pumped from the SAME finished world — the panel below
+  // is the real objective, won.
+  await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=alchemy&seed=4242`);
+  if (await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000)) {
+    await cdp.frames(20);
+    const r = await drive('w.alchemy && w.alchemy.won', 60000);
+    console.log('  alchemy win: ' + JSON.stringify(r));
+    await cdp.eval('window.__ui.show("hud")');
+    await pump();
+    await settle();
+    await shot(`${tag}-hud-alchemy-won`);
+  }
+}
+
+/**
+ * The whole game, end to end, through the real controls: attract -> mode sheet
+ * -> every one of the six modes starts, ticks and shows the panels IT declared
+ * -> pause -> resume -> results -> back to attract.
+ *
+ * The panel assertions are the point. A HUD that renders beautifully for the
+ * mode the author happened to be looking at, and silently shows nothing for the
+ * other five, passes every screenshot check ever written.
+ */
+const PANELS = {
+  flow:      { obj: 0, flip: 0, rail: 0, pal: 0, score: 1, next: 1 },
+  tide:      { obj: 0, flip: 0, rail: 1, pal: 0, score: 1, next: 1 },
+  jelly:     { obj: 0, flip: 0, rail: 0, pal: 0, score: 1, next: 1 },
+  hourglass: { obj: 0, flip: 1, rail: 0, pal: 0, score: 1, next: 1 },
+  alchemy:   { obj: 1, flip: 0, rail: 0, pal: 0, score: 1, next: 1 },
+  zen:       { obj: 0, flip: 0, rail: 0, pal: 1, score: 0, next: 0 },
+};
+
+/** The results card as it was before ALCHEMY had one of its own. */
+async function blindResults() {
+  await cdp.eval(`(() => {
+    const g = window.__ui.results;
+    window.__ui.results = (r) => g({ score: r.score, chains: r.chains, best: r.best,
+      isBest: r.isBest, mode: r.mode });
+    return 1; })()`);
+}
+
+async function endToEnd() {
+  const fails = [];
+  const ok = (name, cond, detail = '') => {
+    if (!cond) fails.push(name + (detail ? ': ' + detail : ''));
+    console.log(`  ${cond ? 'ok  ' : 'FAIL'}  ${name}${detail ? '  ' + detail : ''}`);
+  };
+  const q = (e) => cdp.eval(e);
+  const click = (sel, n = 0) => cdp.eval(
+    `(() => { const e = document.querySelectorAll(${JSON.stringify(sel)})[${n}];
+      if (!e) return 'missing'; e.click(); return 'clicked'; })()`);
+
+  await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&soak&seed=7`);
+  await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000);
+  await cdp.frames(20);
+
+  if (args.falsify) {
+    // D9. The arm is the HUD as it was BEFORE this work: main.js hands over the
+    // mode's field list and its published state, and the shell drops both on the
+    // floor. Every per-mode check below must go red against it — if one stays
+    // green it was never testing that the panel is wired to the mode at all.
+    await cdp.eval(`(() => {
+      const f = window.__ui.setHud;
+      window.__ui.setHud = (s) => f({ ...s,
+        hud: ['score', 'chains', 'combo', 'next'], modeId: undefined,
+        tide: undefined, hourglass: undefined, alchemy: undefined, zen: undefined });
+      return 1; })()`);
+    // ...and the results card as it was BEFORE this work: score, chains, best,
+    // and no idea which mode produced them.
+    await blindResults();
+  }
+
+  ok('attract is the first screen', (await q('window.__ui.screen')) === 'attract');
+
+  await q('window.__ui.openModes()');
+  await new Promise((r) => setTimeout(r, 420));
+  const cards = await q('document.querySelectorAll(".sheet-wrap.is-on .mcard:not(.locked)").length');
+  ok('mode sheet offers all six modes', cards === 6, String(cards));
+
+  const order = await q(`JSON.stringify([...document.querySelectorAll('.sheet-wrap.is-on .mcard')]
+    .map(e => e.querySelector('.mcard-name').textContent))`);
+  console.log('  cards: ' + order);
+
+  for (let i = 0; i < 6; i++) {
+    await q('window.__ui.openModes()');
+    await new Promise((r) => setTimeout(r, 220));
+    await click('.sheet-wrap.is-on .mcard', i);
+    // ALCHEMY's card opens the campaign, not a level: 96 hand-built problems
+    // behind a single button would be a button that starts the wrong one.
+    const viaPicker = (await q('document.querySelectorAll(".sheet-wrap.is-on .sheet--lv").length')) === 1;
+    if (viaPicker) {
+      await new Promise((r) => setTimeout(r, 320));
+      await click('.sheet--lv .lvt:not(.is-locked)');
+      await new Promise((r) => setTimeout(r, 120));
+    }
+    const id = await q('window.__state.mode');
+    if (id === 'alchemy') ok('alchemy: its card opens the campaign picker', viaPicker);
+    await cdp.frames(50);
+    const st = await cdp.state();
+    ok(`${id}: starts and the sim advances`, st.state === 'play' && st.ticks > 8, `ticks ${st.ticks}`);
+    ok(`${id}: score is finite`, Number.isFinite(st.score), String(st.score));
+
+    const on = (sel) => `(() => { const e = document.querySelector(${JSON.stringify(sel)});
+      return e ? (!e.classList.contains('hide') && !e.classList.contains('off')) : false; })()`;
+    const seen = {
+      obj: +(await q(on('.obj'))), flip: +(await q(on('.flip'))),
+      rail: +(await q(on('.rail'))), pal: +(await q(on('.zen-pal'))),
+      score: +(await q(on('.hud-score'))), next: +(await q(on('.next'))),
+    };
+    const want = PANELS[id];
+    ok(`${id}: HUD shows exactly what the mode declared`,
+      want && Object.keys(want).every((k) => seen[k] === want[k]),
+      JSON.stringify(seen));
+
+    if (id === 'alchemy') {
+      const lab = await q('document.querySelector(".obj-label").textContent');
+      const cnt = await q('document.querySelector(".obj-count").textContent');
+      ok('alchemy: the objective is legible on screen', !!lab && /\d/.test(cnt), `${lab} | ${cnt}`);
+    }
+    if (id === 'tide') {
+      const hgt = await q('document.querySelector(".rail i").style.height');
+      ok('tide: the waterline rail has a height', parseFloat(hgt) > 0, hgt);
+    }
+    if (id === 'hourglass') {
+      const num = await q('document.querySelector(".flip-num").textContent');
+      ok('hourglass: the flip clock counts down', /\d/.test(num), num);
+    }
+    if (id === 'zen') {
+      // On screen, not merely constructed: eleven chips in a hidden element is
+      // not a palette, and counting them alone passes against a HUD that never
+      // learned the mode is ZEN.
+      const chips = await q(`(() => {
+        const p = document.querySelector('.zen-pal');
+        return (p && !p.classList.contains('hide')) ? p.querySelectorAll('.zp-chip').length : 0; })()`);
+      ok('zen: the material palette is on screen', chips === 11, String(chips));
+    }
+
+    await click('.hud-pause .gb');
+    ok(`${id}: pause halts the sim`, (await q('window.__state.state')) === 'pause');
+    await click('.scr-pause .gb--primary');
+    ok(`${id}: resume resumes`, (await q('window.__state.state')) === 'play');
+
+    if (id === 'zen') {
+      // ZEN cannot end. Its onTick vents the crown and clears world.over, so
+      // asking it for a results screen is asking it to stop being a sandbox.
+      await q('window.__game.world.over = true');
+      await cdp.frames(6);
+      ok('zen: has no fail state', (await q('window.__state.state')) === 'play');
+      await click('.hud-pause .gb');
+      await click('.scr-pause .card-row .gb', 1);              // QUIT
+      ok('zen: quit returns to attract', (await q('window.__ui.screen')) === 'attract');
+    } else {
+      await q('window.__game.world.over = true');
+      await cdp.frames(8);
+      ok(`${id}: tops out into results`, (await q('window.__ui.screen')) === 'results');
+      const rs = await q('document.querySelector(".scr-results .bigscore").textContent');
+      ok(`${id}: results carry a score`, /\d/.test(rs), rs);
+      await click('.scr-results .card-row .gb', 1);            // HOME
+      ok(`${id}: home returns to attract`, (await q('window.__ui.screen')) === 'attract');
+    }
+  }
+
+  if (args.falsify) {
+    // Eight: the four "HUD shows exactly what the mode declared" lines for TIDE,
+    // HOURGLASS, ALCHEMY and ZEN, plus the four detail checks that read the
+    // objective text, the rail height, the flip clock and the palette. FLOW and
+    // JELLY stay green on purpose — they declare no mode panel, so the arm
+    // cannot change what their HUD should look like, and a gate that went red
+    // for them would be measuring something other than what it claims.
+    const MUST = 8;
+    console.log(`\nfalsification arm: ${fails.length} checks went red, ${MUST} required`);
+    if (fails.length < MUST) { console.log('ARM TOO WEAK — these checks are not evidence'); process.exitCode = 1; }
+    else console.log('arm ok: every per-mode panel check is capable of failing');
+    return;
+  }
+  console.log(fails.length ? '\nEND-TO-END FAILURES:\n  ' + fails.join('\n  ') : '\nend-to-end: all green');
+  if (fails.length) process.exitCode = 1;
+}
+
+/**
+ * The ALCHEMY win card, driven by a level actually being solved.
+ *
+ * Nothing here is staged. The bot plays a real level through the real host loop
+ * until the mode declares it won; main.js's own endGame() is what calls
+ * UI.results(), so what is photographed and asserted is the card a player gets.
+ * The losing half is driven the same way — by pushing the world's clock past the
+ * level's limit, which is the mode's own fail condition — because "a timed-out
+ * level and a completed one must never look the same" is a claim about two
+ * cards, and one of them cannot be checked by looking at the other.
+ */
+async function alchemyWin() {
+  const fails = [];
+  const ok = (name, cond, detail = '') => {
+    if (!cond) fails.push(name + (detail ? ': ' + detail : ''));
+    console.log(`  ${cond ? 'ok  ' : 'FAIL'}  ${name}${detail ? '  ' + detail : ''}`);
+  };
+  const q = (e) => cdp.eval(e);
+  const click = (sel, n = 0) => cdp.eval(
+    `(() => { const e = document.querySelectorAll(${JSON.stringify(sel)})[${n}];
+      if (!e) return 'missing'; e.click(); return 'clicked'; })()`);
+  const cardState = `(() => { const e = document.querySelector('.card--alc');
+    if (!e || e.classList.contains('hide')) return 'none';
+    return e.classList.contains('is-won') ? 'won' : 'lost'; })()`;
+
+  await cdp.viewport(390, 844, 1, true);
+  await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=alchemy&seed=4242`);
+  if (!await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000)) {
+    console.log('  !! shell never came up'); process.exitCode = 1; return;
+  }
+  await cdp.frames(20);
+  if (args.falsify) await blindResults();
+
+  const lv = JSON.parse(await q('JSON.stringify(window.__game.world.alchemy)'));
+  const r = await drive('w.alchemy && w.alchemy.won', 90000);
+  console.log('  played: ' + JSON.stringify(r));
+  ok('the bot solves a real ALCHEMY level', r.reached);
+  // Hand back to the host loop — endGame() is main.js's call, not this tool's.
+  await cdp.frames(30);
+  ok('a solved level lands on the results screen', (await q('window.__ui.screen')) === 'results');
+  ok('a solved level shows the WIN card', (await q(cardState)) === 'won', String(await q(cardState)));
+
+  const earned = await q('window.__game.world.alchemy.stars');
+  const lit = await q('document.querySelectorAll(".bigstars-row svg.on").length');
+  const offered = await q('document.querySelectorAll(".bigstars-row svg").length');
+  ok('the win card shows the stars this run earned', lit === earned && lit > 0, `${lit} lit, mode says ${earned}`);
+  ok('the stars still on offer are visible too', offered === 3, String(offered));
+  const title = await q('document.querySelector(".alc-title").textContent');
+  ok('the win card names the level', title === lv.name, `${title} | ${lv.name}`);
+  const nxt = await q('document.querySelector(".card--alc .gb--primary").textContent');
+  ok('the win card offers the next level',
+    /next level/i.test(nxt) && nxt.indexOf('lv ' + (lv.id + 1)) >= 0, nxt);
+  await settle();
+  if (SHOTS) await shot('phone-alchemy-win');
+
+  await click('.card--alc .gb--primary');
+  await cdp.frames(12);
+  ok('NEXT LEVEL starts the level after this one',
+    (await q('window.__state.mode')) === 'alchemy' &&
+    (await q('window.__game.world.cfg.levelId')) === lv.id + 1,
+    `lv ${await q('window.__game.world.cfg.levelId')}`);
+  ok('the stars are banked against the level', (await q(`window.__game.save.starsFor(${lv.id})`)) >= earned);
+
+  // Now lose one, on the mode's own terms. Let the bot get part of the way
+  // first: a losing card photographed at 0% proves the card exists and nothing
+  // about whether it can say how close you came.
+  const part = await drive('w.alchemy && w.alchemy.frac > 0.4', 30000);
+  console.log('  part-played: ' + JSON.stringify(part));
+  await q('window.__game.world.t = 1e4');
+  await cdp.frames(24);
+  ok('a level that runs out of time shows the OUT OF TIME card', (await q(cardState)) === 'lost',
+    String(await q(cardState)));
+  ok('a timed-out level shows no earned stars',
+    (await q('document.querySelectorAll(".bigstars-row svg.on").length')) === 0);
+  // Two ways to lose, and the card has to name the right one. Which one the bot
+  // hit is the WORLD's answer, not this tool's, so ask the world.
+  const left = await q('window.__game.world.alchemy.left');
+  const kick = await q('document.querySelector(".alc-kicker").textContent');
+  ok('the two cards do not read the same', !/complete/i.test(kick) && /time|topped/i.test(kick), kick);
+  ok('the losing card names the failure the world actually had',
+    left > 0 ? /topped out/i.test(kick) : /out of time/i.test(kick), `${kick} with ${left}s left`);
+  const objn = await q('(document.querySelector(".alc-obj-num") || {}).textContent || ""');
+  ok('the losing card says how close the objective got', /\d+\s*\/\s*\d+/.test(objn), objn);
+  await settle();
+  if (SHOTS) await shot('phone-alchemy-lost');
+
+  // And the clock specifically, from a healthy board, so the timeout branch is
+  // exercised rather than left to whether the bot happened to top out.
+  await q('window.__game.startLevel(3)');
+  await cdp.frames(24);
+  await q('window.__game.world.t = 1e4');
+  await cdp.frames(24);
+  const kick2 = await q('document.querySelector(".alc-kicker").textContent');
+  ok('a level whose clock runs out says OUT OF TIME',
+    (await q(cardState)) === 'lost' && /out of time/i.test(kick2), kick2);
+
+  // The two halves of this work, tied together: the card sends you back to the
+  // campaign and the campaign already knows what you just did.
+  await click('.card--alc .card-row .gb', 0);                 // LEVELS
+  await new Promise((r) => setTimeout(r, 360));
+  const tiles = await q('document.querySelectorAll(".sheet--lv .lvt").length');
+  const onTile = await q(`(() => { const t = document.querySelectorAll('.sheet--lv .lvt')[${lv.id - 1}];
+    return t ? t.querySelectorAll('.lvt-stars svg.on').length : -1; })()`);
+  ok('the results card opens the campaign with the new stars already on the tile',
+    tiles > 0 && onTile === earned, `${tiles} tiles, lv ${lv.id} shows ${onTile} of ${earned}`);
+
+  if (args.falsify) {
+    // Eight. The arm blinds the results card to WHICH mode finished, which is
+    // exactly the state this work replaced, so every claim about the alchemy
+    // card must collapse: the card itself, the two star counts, the level name,
+    // the next-level button, that the button starts the next level, that the
+    // kicker changes, and the objective line on the loss.
+    // Four cannot move and are named rather than counted: the bot still solves
+    // the level, results is still the screen, the save still banks the stars,
+    // and "no stars on a timed-out level" is vacuously true against a card that
+    // never draws stars at all.
+    const MUST = 9;
+    console.log(`\nfalsification arm: ${fails.length} checks went red, ${MUST} required`);
+    if (fails.length < MUST) { console.log('ARM TOO WEAK — these checks are not evidence'); process.exitCode = 1; }
+    else console.log('arm ok: every alchemy-result check is capable of failing');
+    return;
+  }
+  console.log(fails.length ? '\nALCHEMY RESULT FAILURES:\n  ' + fails.join('\n  ') : '\nalchemy results: all green');
+  if (fails.length) process.exitCode = 1;
+}
+
+const SHOTS = !(args.flow || args.win) || args.shots;
+
+const LOOP_SHOTS = ['attract', 'attract-pour', 'modes', 'events', 'settings', 'hud', 'pause', 'results', 'banner'];
+
 try {
-  for (const S of SIZES) {
+  for (const S of (SHOTS && LOOP_SHOTS.some(want) ? SIZES : [])) {
     await cdp.viewport(S.w, S.h, 1, S.tag === 'phone');
     await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&soak&seed=4242`);
     const up = await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000);
@@ -274,6 +804,41 @@ try {
     }
   }
 
+  if (SHOTS && want('levels')) {
+    console.log('\nalchemy campaign');
+    for (const S of SIZES) {
+      await cdp.viewport(S.w, S.h, 1, S.tag === 'phone');
+      await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&soak&seed=4242`);
+      if (!await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000)) continue;
+      await cdp.frames(20);
+      await cdp.eval('window.__ui.openLevels()');
+      await new Promise((r) => setTimeout(r, 700));
+      await shot(`${S.tag}-levels-new`);
+      // The picker at level 1 shows one open tile and ninety-five shut ones,
+      // which proves the lock but says nothing about what the screen looks like
+      // to somebody playing it. Bank real progress through the real save API —
+      // the same call main.js makes on a win — and shoot it again.
+      await cdp.eval(`(() => { const s = window.__game.save;
+        [3,3,2,3,1,2,3,2,1,3,2,3,1,2,3,3,2,1,3,3,2,1,2].forEach((n, i) => s.recordLevel(i + 1, n));
+        return 1; })()`);
+      await cdp.eval('window.__ui.openLevels()');
+      await new Promise((r) => setTimeout(r, 700));
+      await shot(`${S.tag}-levels`);
+      // Do not leave staged progress in the profile for the gates that follow.
+      await cdp.eval(`(() => { try { localStorage.removeItem('silt.levels'); } catch (e) {} return 1; })()`);
+    }
+  }
+
+  if (SHOTS && want('modehud')) {
+    console.log('\nper-mode HUD');
+    for (const S of SIZES) {
+      await cdp.viewport(S.w, S.h, 1, S.tag === 'phone');
+      await modeShots(S.tag);
+    }
+  }
+
+  if (args.flow) { console.log('\nend-to-end flow'); await endToEnd(); }
+  if (args.flow || args.win) { console.log('\nalchemy: a level played to a win'); await alchemyWin(); }
   if (args.probe) { console.log('\ninteraction probe'); await probe(); }
 
   const errs = cdp.errors.filter((e) => !/favicon/.test(e));

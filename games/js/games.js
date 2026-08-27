@@ -14,6 +14,14 @@
 
 export const GAMES = [
   {
+    id: "silt", name: "SILT", tag: "Sand, lit not drawn",
+    path: "/gms/2d/silt/", shot: "silt", accent: "#e0a24a",
+    blurb: "Drop sand, watch it flow, span the board with one colour and it dissolves into drifting light. Six modes, five biomes, ninety-six chemistry puzzles.",
+    // soon until Aaron has actually played it — this hub is curated and the
+    // three games above were held back for exactly the same reason.
+    soon: true,
+  },
+  {
     id: "racketeer", name: "Racketeer", tag: "Tennis, but dirty",
     path: "/gms/2d/racketeer/", shot: "racketeer", accent: "#3ecf6d",
     blurb: "You run automatically — just swipe. Curve the ball, heckle the umpire, and unleash Clive the attack pigeon across a 100-level story.",

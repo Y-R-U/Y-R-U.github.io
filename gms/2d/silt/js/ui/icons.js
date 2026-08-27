@@ -11,6 +11,12 @@ export const GLYPH = {
   back:    '<path d="M15 5 8 12l7 7"/>',
   home:    '<path d="M4 10.6 12 4l8 6.6V19a1.4 1.4 0 0 1-1.4 1.4H5.4A1.4 1.4 0 0 1 4 19Z"/>',
   again:   '<path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 3.6V8h-4.4"/>',
+  // No inline fill: every star on screen is a FILL, and a path-level
+  // fill:currentColor outranks the .on class that decides whether it is earned.
+  // That is not a style nit — it drew three gold stars on a level nobody had
+  // played, on the very first screenshot of the picker.
+  star:    '<path d="M12 3.1l2.65 5.86 6.35.62-4.8 4.3 1.4 6.28L12 16.9l-5.6 3.26 1.4-6.28-4.8-4.3 6.35-.62Z"/>',
+  lock:    '<rect x="4.6" y="10.4" width="14.8" height="9.8" rx="2.6"/><path d="M8.2 10.4V7.8a3.8 3.8 0 0 1 7.6 0v2.6"/>',
 };
 
 // One per mode. Each says something true about how the mode plays: FLOW is a

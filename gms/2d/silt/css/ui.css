@@ -208,13 +208,19 @@
 
 /* --------------------------------------------------------------------- hud */
 
-.hud-top {
+/* The score block, the NEXT tile and any mode panel stack downward from one
+   anchor, so a panel a mode did not ask for costs no layout at all. */
+.hud-stack {
   position: absolute;
   top: 10px;
   left: var(--edge);
   right: var(--edge);
-  display: flex; align-items: flex-start; gap: 12px;
 }
+.hud-top { display: flex; align-items: flex-start; gap: 12px; }
+
+/* Field gating. A mode's own hud[] decides what exists; .off is "this mode does
+   not have one", .hide is "it has one and it is not worth showing yet". */
+.hud-score.off, .next.off, .pill.off, .panel.hide, .rail.hide, .zen-pal.hide { display: none; }
 .hud-score { flex: 1; min-width: 0; }
 .hud-mode { display: block; }
 .hud-val {
@@ -285,11 +291,253 @@
 }
 .hud-hint.gone { opacity: 0; }
 
+/* ------------------------------------------------------------- mode panels */
+/* ALCHEMY's objective and HOURGLASS's flip clock. Both sit under the score, in
+   the top veil that already exists to keep type legible over bright sand, and
+   both are two lines high — this is a game about watching sand and a HUD that
+   grows a third line has stopped being a HUD. */
+
+.panel {
+  position: relative;
+  margin-top: 16px;
+  padding: 9px 12px 10px;
+  border: 1px solid rgba(255,238,212,.13);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255,240,220,.055), rgba(255,240,220,.012)),
+    rgba(10,9,12,.5);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 8px 24px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,244,226,.1);
+}
+/* --------------------------------------------------------- objective (ALCHEMY) */
+/* THE priority. Without it the player is being asked to complete a goal that
+   exists nowhere on screen, and ALCHEMY is not a mode, it is a blank board. */
+
+.obj { --ac: #b189d6; }
+.obj::before {
+  content: ''; position: absolute; left: 0; top: 11px; bottom: 11px;
+  width: 2px; border-radius: 0 2px 2px 0;
+  background: var(--ac); box-shadow: 0 0 12px var(--ac);
+}
+.obj-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.obj-label {
+  font-size: 13.5px; font-weight: 600; letter-spacing: .012em;
+  color: #fff7ec; text-shadow: 0 1px 7px rgba(0,0,0,.75);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.obj-count { font-size: 12px; font-weight: 700; letter-spacing: .04em; color: rgba(255,214,150,.94); white-space: nowrap; }
+
+.obj-bar { margin-top: 7px; height: 4px; border-radius: 3px; background: rgba(255,255,255,.09); overflow: hidden; }
+.obj-bar i {
+  display: block; height: 100%; width: 0; border-radius: 3px;
+  background: linear-gradient(90deg, rgba(177,137,214,.55), var(--ac));
+  box-shadow: 0 0 12px var(--ac);
+  transition: width .3s var(--ease), background .3s;
+}
+
+.obj-foot { display: flex; align-items: center; gap: 9px; margin-top: 7px; }
+.obj-lv {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700;
+  color: rgba(246,239,228,.4);
+}
+.obj-stars { display: inline-flex; gap: 3px; flex: 0 0 auto; }
+/* Two different statements. While the clock runs a lit pip means "this star is
+   still on offer" and is drawn quietly; once the level is WON the same pip means
+   "you have this" and is drawn as a prize. Conflating them read, on the first
+   screenshot, as three stars already banked at four seconds in. */
+.obj-stars svg { display: block; width: 11px; height: 11px; fill: rgba(246,239,228,.14); stroke: none; transition: fill .3s, filter .3s; }
+.obj-stars svg.on { fill: rgba(255,208,122,.5); }
+.obj.is-won .obj-stars svg.on { fill: #ffd07a; filter: drop-shadow(0 0 6px rgba(255,190,90,.8)); }
+.obj-clock { flex: 0 0 auto; min-width: 40px; text-align: right; font-size: 12.5px; font-weight: 600; color: rgba(246,239,228,.82); }
+
+.obj.is-late { border-color: rgba(255,190,120,.3); }
+.obj.is-late .obj-clock { color: #ffca8c; }
+.obj.is-urgent { border-color: rgba(255,130,70,.5); box-shadow: 0 0 24px rgba(255,110,40,.22), inset 0 1px 0 rgba(255,244,226,.1); }
+.obj.is-urgent .obj-clock { color: #ff9e6c; animation: ticktock .95s steps(2, end) infinite; }
+@keyframes ticktock { 0%, 58% { opacity: 1; } 59%, 100% { opacity: .38; } }
+
+.obj.is-won { border-color: rgba(150,240,190,.4); }
+.obj.is-won::before { background: #7fe6a8; box-shadow: 0 0 14px #7fe6a8; }
+.obj.is-won .obj-label { color: #c9ffdd; font-size: 12px; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; }
+.obj.is-won .obj-bar i { background: #7fe6a8; box-shadow: 0 0 16px rgba(127,230,168,.75); }
+.obj.is-won .obj-clock { color: rgba(201,255,221,.8); }
+
+/* ---------------------------------------------------------- flip (HOURGLASS) */
+
+.flip { --ac: #ff8a3c; }
+.flip-head { display: flex; align-items: center; gap: 8px; }
+.flip-glyph { display: inline-flex; flex: 0 0 auto; transition: transform .7s var(--ease-out); }
+.flip-glyph svg {
+  display: block; width: 15px; height: 15px;
+  stroke: var(--ac); fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+}
+.flip-lab { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; font-weight: 700; color: rgba(246,239,228,.58); }
+.flip-count { flex: 1; text-align: left; font-size: 9px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; color: rgba(246,239,228,.3); }
+.flip-num { flex: 0 0 auto; font-size: 17px; font-weight: 500; color: #fff3e2; transition: color .3s; }
+
+.flip-bar { margin-top: 8px; height: 4px; border-radius: 3px; background: rgba(255,255,255,.09); overflow: hidden; }
+.flip-bar i {
+  display: block; height: 100%; width: 0; border-radius: 3px;
+  background: linear-gradient(90deg, rgba(255,138,60,.4), var(--ac));
+  box-shadow: 0 0 12px var(--ac);
+  transition: width .2s linear;
+}
+
+.flip.is-soon { border-color: rgba(255,175,95,.4); }
+.flip.is-soon .flip-num { color: #ffca8c; }
+.flip.is-now {
+  border-color: rgba(255,120,50,.62);
+  animation: flipnag .62s var(--ease) infinite alternate;
+}
+.flip.is-now .flip-num { color: #ffb57f; font-size: 21px; }
+.flip.is-now .flip-lab { color: #ffd2a8; }
+@keyframes flipnag {
+  from { box-shadow: 0 8px 24px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,244,226,.1); }
+  to   { box-shadow: 0 0 30px rgba(255,120,30,.44), inset 0 1px 0 rgba(255,244,226,.1); }
+}
+
+/* The flip is the loudest thing in the game, so it is telegraphed on the BOARD
+   rect — an inset glow at the four edges, which warns without covering a grain. */
+.flipring {
+  position: absolute; pointer-events: none; z-index: 1;
+  left: var(--board-x, 0px); top: var(--board-y, 0px);
+  width: var(--board-w, 100%); height: var(--board-h, 100%);
+  opacity: 0; transition: opacity .28s var(--ease);
+  box-shadow: inset 0 0 0 2px rgba(255,146,64,.5), inset 0 0 80px 6px rgba(255,110,25,.26);
+}
+.flipring.on { opacity: 1; animation: ringnag .68s var(--ease) infinite alternate; }
+@keyframes ringnag { from { opacity: .4; } to { opacity: 1; } }
+
+/* ---------------------------------------------------------------- rail (TIDE) */
+/* The threat in TIDE is vertical, so the readout is too: an 8 px column on the
+   board's right edge — 2% of the width — that fills as the flood climbs. A
+   percentage in a pill cannot say "the ceiling is coming down"; a rising bar
+   next to the sand can. */
+
+.rail {
+  position: absolute; z-index: 2; width: 11px;
+  left: calc(var(--board-x, 0px) + var(--board-w, 100%) - 26px);
+  top: calc(var(--board-y, 0px) + 150px);
+  height: calc(var(--board-h, 70vh) - 172px);
+  border-radius: 6px;
+  border: 1px solid rgba(255,238,212,.2);
+  background: rgba(3,6,11,.66);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.5), inset 0 0 0 1px rgba(0,0,0,.4);
+  pointer-events: none;
+  /* Quarter marks, so the rail is a gauge and not a glowing stripe. */
+  background-image: repeating-linear-gradient(0deg,
+    rgba(246,239,228,.16) 0 1px, transparent 1px 25%);
+  background-size: 100% 100%;
+}
+.rail i {
+  position: absolute; left: 1px; right: 1px; bottom: 1px; height: 0;
+  border-radius: 5px;
+  background: linear-gradient(0deg, rgba(52,214,180,.95), rgba(140,248,226,.7));
+  box-shadow: 0 0 16px rgba(65,232,196,.65), inset 0 0 0 1px rgba(190,255,244,.25);
+  transition: height .18s linear, background .5s, box-shadow .5s;
+}
+/* The waterline itself. Brighter than the body, and it is what the eye tracks. */
+.rail i::after {
+  content: ''; position: absolute; left: -4px; right: -4px; top: -2px;
+  height: 3px; border-radius: 2px;
+  background: #d6fff5; box-shadow: 0 0 12px 3px rgba(130,246,222,.9);
+}
+/* Where the mode calls HIGH WATER. */
+.rail-mark { position: absolute; left: -5px; right: -5px; bottom: 82%; height: 1px; background: rgba(255,130,80,.7); box-shadow: 0 0 6px rgba(255,110,60,.6); }
+
+.rail.warm i { background: linear-gradient(0deg, rgba(242,179,61,.75), rgba(255,214,130,.5)); box-shadow: 0 0 16px rgba(242,179,61,.5); }
+.rail.warm i::after { background: #ffe6b4; box-shadow: 0 0 10px 2px rgba(255,200,110,.85); }
+.rail.hot i { background: linear-gradient(0deg, rgba(255,92,48,.82), rgba(255,152,92,.56)); box-shadow: 0 0 20px rgba(255,90,40,.6); }
+.rail.hot i::after { background: #ffd4bd; box-shadow: 0 0 12px 3px rgba(255,120,60,.9); }
+.rail.hot { animation: railnag .8s var(--ease) infinite alternate; }
+@keyframes railnag {
+  from { box-shadow: 0 6px 18px rgba(0,0,0,.35); border-color: rgba(255,238,212,.14); }
+  to   { box-shadow: 0 0 22px rgba(255,90,40,.45); border-color: rgba(255,140,90,.5); }
+}
+
+.pill--tide { border-color: rgba(65,232,196,.32); color: #b9f0e2; background: rgba(5,42,38,.44); }
+.pill--tide b { color: #e8fff9; }
+
+/* ------------------------------------------------------------ zen palette */
+/* ZEN declares hud: [] — no score, no chains, no fail state — so the readouts go
+   away entirely and the only control the mode needs takes the bottom edge. */
+
+.scr-hud.is-bare .hud-hint { bottom: calc(var(--edge) + 152px); }
+/* The top veil exists to keep the score legible. ZEN has no score, so it is
+   just a gradient over sand nobody asked to have dimmed. */
+.scr-hud.is-bare .veil-top { opacity: 0; }
+
+.zen-pal {
+  position: absolute; left: 0; right: 0;
+  bottom: calc(var(--edge) + 56px);
+  padding: 0 var(--edge);
+  pointer-events: none;
+}
+.zp-head {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: max-content; max-width: 100%; margin: 0 auto 9px;
+  padding: 5px 12px; border-radius: 13px;
+  border: 1px solid rgba(255,238,212,.12);
+  background: rgba(10,9,12,.5);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2);
+}
+.zp-name {
+  font-size: 10px; letter-spacing: .24em; text-transform: uppercase; font-weight: 700;
+  color: rgba(246,239,228,.72); text-shadow: 0 1px 4px rgba(0,0,0,.9);
+}
+.zp-tints { display: none; gap: 5px; }
+.zen-pal.is-tinted .zp-tints { display: inline-flex; }
+.zp-tint {
+  pointer-events: auto; width: 16px; height: 16px; padding: 0; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.22); background: var(--sw); cursor: pointer;
+  opacity: .48; transition: opacity .18s, transform .18s, box-shadow .18s;
+}
+.zp-tint.on { opacity: 1; transform: scale(1.12); box-shadow: 0 0 0 2px rgba(255,240,214,.7); }
+
+.zp-sizes { display: inline-flex; align-items: center; gap: 3px; }
+.zp-size { pointer-events: auto; width: 20px; height: 20px; padding: 0; border: 0; background: none; display: grid; place-items: center; cursor: pointer; }
+.zp-size i { display: block; width: 5px; height: 5px; border-radius: 50%; background: rgba(246,239,228,.36); transition: background .18s, box-shadow .18s; }
+.zp-size:nth-child(2) i { width: 8px; height: 8px; }
+.zp-size:nth-child(3) i { width: 12px; height: 12px; }
+.zp-size.on i { background: #ffd9a4; box-shadow: 0 0 8px rgba(255,190,110,.8); }
+
+.zp-chips {
+  display: flex; justify-content: center; align-items: center; gap: 5px; flex-wrap: nowrap;
+  width: max-content; max-width: 100%; margin: 0 auto;
+  padding: 7px 8px 9px; border-radius: 19px;
+  border: 1px solid rgba(255,238,212,.12);
+  background: rgba(10,9,12,.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2); backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: 0 10px 28px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,244,226,.09);
+}
+.zp-chip {
+  pointer-events: auto; flex: 0 0 auto;
+  width: 26px; height: 26px; padding: 0; border-radius: 50%; cursor: pointer;
+  border: 1px solid rgba(255,255,255,.2);
+  background: var(--sw);
+  box-shadow: 0 3px 10px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
+  opacity: .85;
+  transition: transform .16s var(--ease), box-shadow .18s, opacity .18s;
+}
+.zp-chip.on {
+  opacity: 1; transform: translateY(-4px) scale(1.12);
+  box-shadow: 0 0 0 2px rgba(255,238,208,.85), 0 6px 16px rgba(0,0,0,.55);
+}
+.zp-chip--erase { background: rgba(255,255,255,.05); position: relative; }
+.zp-chip--erase::after {
+  content: ''; position: absolute; inset: 5px; border-radius: 50%;
+  border: 1px solid rgba(246,239,228,.45);
+  background: linear-gradient(45deg, transparent 44%, rgba(246,239,228,.62) 46%, rgba(246,239,228,.62) 54%, transparent 56%);
+}
+
 /* ------------------------------------------------------------------ banner */
 
 .banner-host {
   position: absolute; left: 0; right: 0;
   top: calc(var(--board-y, var(--sat)) + 96px);
+  transition: top .3s var(--ease);
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   pointer-events: none; z-index: 4;
 }
@@ -305,6 +553,9 @@
   animation: bannerIn .42s var(--ease-out) both, bannerOut .45s 1.7s var(--ease) both;
   white-space: nowrap;
 }
+/* A mode panel lives where the banners drop in. Push them clear of it. */
+#ui.has-panel .banner-host { top: calc(var(--board-y, var(--sat)) + 182px); }
+
 @keyframes bannerIn { from { opacity: 0; transform: translateY(-14px) scale(.94); } to { opacity: 1; transform: none; } }
 @keyframes bannerOut { to { opacity: 0; transform: translateY(-8px) scale(.98); } }
 
@@ -549,3 +800,202 @@ input[type=range]::-moz-range-thumb { width: 15px; height: 15px; border-radius: 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
 }
+
+/* ------------------------------------------------------- alchemy campaign */
+/* Ninety-six levels in five acts. The grid scrolls; everything you PRESS to
+   navigate — the act jumps and Continue — is pinned to the bottom of the sheet,
+   because a picker that needs the top of a long scroller to change section has
+   quietly become a two-handed control in a one-handed game. */
+
+.sheet--lv { height: min(88%, 760px); }
+.sheet--lv .sheet-body { flex: 1 1 auto; gap: 22px; padding-bottom: 10px; }
+
+.lv-empty { padding: 30px 0; text-align: center; color: var(--faint); font-size: 12px; }
+
+.lv-act { position: relative; scroll-margin-top: 6px; }
+
+.lv-legend {
+  flex: 0 0 auto;
+  display: flex; justify-content: space-between; gap: 4px;
+  padding: 0 2px 11px; margin-top: -4px;
+}
+.lv-key {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 8px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700;
+  color: rgba(246,239,228,.34);
+}
+.lv-key i { width: 5px; height: 5px; border-radius: 50%; background: var(--ac); box-shadow: 0 0 6px var(--ac); }
+.lv-act-head { display: flex; align-items: baseline; gap: 8px; padding: 0 2px 7px; }
+.lv-act-n {
+  font-size: 11px; font-weight: 700; letter-spacing: .26em; text-transform: uppercase;
+  color: rgba(255,214,150,.86);
+}
+.lv-act-name {
+  flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600;
+  color: rgba(246,239,228,.42);
+}
+.lv-act-meta { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 3px; font-size: 11px; color: rgba(246,239,228,.5); }
+.lv-act-meta b { color: #ffd79a; font-weight: 700; }
+.lv-act-meta svg { width: 10px; height: 10px; fill: rgba(255,208,122,.7); stroke: none; }
+
+.lv-act-bar { height: 2px; border-radius: 2px; background: rgba(255,255,255,.08); overflow: hidden; margin: 0 2px 11px; }
+.lv-act-bar i {
+  display: block; height: 100%; width: 0; border-radius: 2px;
+  background: linear-gradient(90deg, rgba(177,137,214,.6), #ffd07a);
+  box-shadow: 0 0 10px rgba(255,190,90,.5);
+}
+.lv-act.is-shut .lv-act-n, .lv-act.is-shut .lv-act-name { color: rgba(246,239,228,.26); }
+/* The act you are actually in gets a rule down its left edge — the one section
+   in a long scroll that says "you are here". */
+.lv-act.is-here::before {
+  content: ''; position: absolute; left: -10px; top: 2px; bottom: 6px; width: 2px;
+  border-radius: 2px; background: #b189d6; box-shadow: 0 0 12px #b189d6;
+}
+
+.lv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+.lvt {
+  pointer-events: auto; position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  aspect-ratio: 1 / .94; padding: 0;
+  border: 1px solid rgba(255,238,212,.12);
+  border-radius: var(--r-sm);
+  background: linear-gradient(160deg, rgba(255,240,220,.05), rgba(255,240,220,.012));
+  color: var(--ink); font: inherit; cursor: pointer;
+  transition: transform .16s var(--ease), border-color .2s, background .2s, opacity .2s;
+}
+.lvt:active { transform: scale(.94); }
+/* The archetype, as a dot in the corner. Five kinds of problem, and a run of
+   one colour down the grid is the player learning that acts have a shape. */
+.lvt::after {
+  content: ''; position: absolute; top: 6px; right: 6px;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--ac, #f2b33d); opacity: .75;
+  box-shadow: 0 0 6px var(--ac, #f2b33d);
+}
+.lvt-n { font-size: 17px; font-weight: 500; letter-spacing: -.01em; color: #fff6ea; }
+.lvt-stars { display: inline-flex; gap: 2.5px; height: 10px; }
+/* An unearned star must not be able to read as an earned one. A dim GREY pip
+   passes that test on a dark tile and fails it on the lit "play me next" tile,
+   where .13 white over amber is indistinguishable from gold — which is exactly
+   what the first screenshot showed: level 1, never played, wearing three stars.
+   A dark pip is unambiguous on both. */
+.lvt-stars svg { width: 10px; height: 10px; fill: rgba(8,6,4,.5); stroke: none; }
+.lvt-stars svg.on { fill: #ffd07a; filter: drop-shadow(0 0 4px rgba(255,190,90,.55)); }
+
+.lvt.is-done { border-color: color-mix(in srgb, var(--ac) 34%, transparent); background: linear-gradient(160deg, color-mix(in srgb, var(--ac) 12%, transparent), rgba(255,240,220,.014)); }
+/* The next level to play is the one thing on this screen the eye must find. */
+.lvt.is-next {
+  border-color: rgba(255,206,130,.6);
+  background: linear-gradient(160deg, rgba(255,196,110,.22), rgba(255,150,40,.06));
+  box-shadow: 0 0 0 1px rgba(255,196,110,.22), 0 6px 20px rgba(150,66,0,.4);
+  animation: lvpulse 2.4s var(--ease) infinite;
+}
+.lvt.is-next .lvt-n { color: #fff; }
+@keyframes lvpulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(255,196,110,.22), 0 6px 20px rgba(150,66,0,.4); }
+  55% { box-shadow: 0 0 0 1px rgba(255,206,130,.5), 0 6px 26px rgba(190,90,0,.6); }
+}
+
+.lvt.is-locked { background: rgba(255,255,255,.016); border-color: rgba(255,238,212,.07); }
+.lvt.is-locked .lvt-n { color: rgba(246,239,228,.24); font-weight: 400; }
+.lvt.is-locked::after { opacity: .18; box-shadow: none; }
+.lvt-lock { display: block; height: 9px; }
+.lvt-lock svg { width: 11px; height: 11px; stroke: rgba(246,239,228,.34); fill: none; stroke-width: 1.7; display: block; margin-top: -1px; }
+.lvt.nope { animation: nope .34s var(--ease); }
+@keyframes nope {
+  0%, 100% { transform: translateX(0); }
+  22% { transform: translateX(-4px); } 58% { transform: translateX(4px); }
+}
+
+/* The footer. Act jumps and Continue, inside the thumb arc. */
+.lv-foot {
+  flex: 0 0 auto; position: relative;
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid rgba(255,238,212,.1);
+}
+.lv-acts { display: flex; gap: 5px; flex: 0 0 auto; }
+.lv-chip {
+  pointer-events: auto;
+  min-width: 32px; height: 40px; padding: 0 6px;
+  border: 1px solid rgba(255,238,212,.12); border-radius: 13px;
+  background: rgba(255,240,220,.03);
+  color: rgba(246,239,228,.5); font: inherit; font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  cursor: pointer; transition: color .2s, background .2s, border-color .2s;
+}
+.lv-chip.on { color: #ffe7c4; background: rgba(255,214,150,.16); border-color: rgba(255,206,130,.34); }
+.lv-chip.is-shut { color: rgba(246,239,228,.24); }
+.lv-cont { flex: 1; height: 46px; padding: 0 12px; gap: 7px; font-size: 12px; white-space: nowrap; }
+.lv-cont b { font-weight: 700; font-size: 11px; letter-spacing: .1em; color: rgba(255,236,204,.72); }
+.lv-cont:disabled { opacity: .35; }
+
+.lv-note {
+  position: absolute; left: 0; right: 0; top: -20px;
+  text-align: center; font-size: 10px; letter-spacing: .1em; font-weight: 600;
+  color: rgba(255,190,120,.9); opacity: 0; transition: opacity .24s var(--ease);
+  pointer-events: none;
+}
+.lv-note.is-on { opacity: 1; }
+
+/* ------------------------------------------------------- alchemy results */
+/* A level that timed out and a level that was SOLVED must never look the same. */
+
+.card.hide { display: none; }
+
+.card--alc .alc-kicker { color: #ffbb80; }
+.card--alc.is-won .alc-kicker { color: #9df0bd; }
+.card--alc .alc-title {
+  margin-top: 7px; font-size: 17px; letter-spacing: .24em;
+}
+
+.bigstars { margin: 18px 0 2px; display: flex; flex-direction: column; align-items: center; gap: 9px; }
+.bigstars-row { display: inline-flex; gap: 10px; }
+.bigstars-row svg { width: 38px; height: 38px; fill: rgba(246,239,228,.1); stroke: none; }
+.bigstars-row svg.on {
+  fill: #ffd07a; filter: drop-shadow(0 0 14px rgba(255,180,70,.7));
+  animation: starpop .5s var(--ease-out) both;
+}
+.bigstars-row svg.on:nth-child(2) { animation-delay: .13s; }
+.bigstars-row svg.on:nth-child(3) { animation-delay: .26s; }
+@keyframes starpop {
+  from { opacity: 0; transform: scale(.4) rotate(-24deg); }
+  60% { opacity: 1; transform: scale(1.18) rotate(4deg); }
+  to { opacity: 1; transform: none; }
+}
+/* On a loss the stars are context, not the headline — the objective line below
+   is what the player needs. Same three pips, quieter, so the two cards read as
+   the same card in two states rather than as two unrelated screens. */
+.card--alc:not(.is-won) .bigstars-row svg { width: 27px; height: 27px; fill: rgba(246,239,228,.075); }
+.card--alc:not(.is-won) .bigstars { margin-top: 14px; }
+.alc-lv { letter-spacing: .24em; }
+
+.alc-goal { margin-top: 12px; min-height: 26px; display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.ribbon--win { border-color: rgba(150,240,190,.45); background: rgba(60,190,120,.16); color: #c9ffdd; box-shadow: 0 0 24px rgba(90,220,150,.2); margin-top: 0; }
+.alc-nudge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; font-weight: 650;
+  color: rgba(246,239,228,.44);
+}
+.stars { display: inline-flex; gap: 2px; }
+.stars svg { width: 11px; height: 11px; fill: rgba(246,239,228,.13); stroke: none; }
+.stars svg.on { fill: rgba(255,208,122,.85); }
+.stars--stat svg { width: 13px; height: 13px; }
+.stars--inline svg.on { fill: #ffd07a; }
+
+.alc-obj { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; width: 100%; }
+.alc-obj-lab { font-size: 12.5px; font-weight: 600; color: rgba(246,239,228,.86); }
+.alc-obj-num { font-size: 12px; font-weight: 700; color: rgba(255,190,120,.95); }
+.alc-obj-bar { width: 100%; height: 4px; border-radius: 3px; background: rgba(255,255,255,.09); overflow: hidden; }
+.alc-obj-bar i {
+  display: block; height: 100%; width: 0; border-radius: 3px;
+  background: linear-gradient(90deg, rgba(255,138,60,.5), #ffb066);
+  box-shadow: 0 0 12px rgba(255,150,60,.6);
+  transition: width .7s var(--ease-out);
+}
+
+.card--alc .statrow { margin-top: 18px; align-items: center; }
+.card--alc .statrow > div { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.card--alc .card-row .gb { font-size: 11px; letter-spacing: .1em; }
+.lv-cont-n { margin-left: 2px; font-weight: 700; letter-spacing: .1em; color: rgba(255,236,204,.75); }

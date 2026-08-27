@@ -29,7 +29,11 @@ export function createInput(el, view, handlers = {}) {
     st.t0 = st.lastT = performance.now();
     st.lastY = p.y;
     st.travel = 0; st.carry = 0; st.soft = false;
-    el.setPointerCapture && el.setPointerCapture(e.pointerId);
+    // MUST be guarded. setPointerCapture throws NotFoundError for any pointer id
+    // Chrome does not consider active, and it throws AFTER st.down is latched —
+    // leaving the input layer stuck "pointer down", silently ignoring every
+    // later gesture for the rest of the session.
+    try { el.setPointerCapture && el.setPointerCapture(e.pointerId); } catch (err) { /* not capturable */ }
     if (H.onPaint) H.onPaint(view.toGrain(p.x, p.y), true);
   }
 

@@ -5,6 +5,9 @@ import { createSheet } from './sheet.js';
 import { createSettings } from './settings.js';
 import { mergeModes } from './modelist.js';
 import { createSandTouch } from './sandtouch.js';
+import { createModeHud } from './modehud.js';
+import { createZenPalette } from './zenpalette.js';
+import { createLevelPicker, levelById, levelCount, secs, stars } from './levels.js';
 
 /**
  * SILT shell.
@@ -20,6 +23,11 @@ import { createSandTouch } from './sandtouch.js';
  */
 
 const LAST_MODE_KEY = 'silt.lastmode';
+
+const HINT = {
+  play: 'drag to move · tap to turn · swipe to drop',
+  zen: 'pick a material · drag to pour',
+};
 
 export function createUI(handlers = {}) {
   const H = { onStart() {}, onPause() {}, onResume() {}, onQuit() {}, ...handlers };
@@ -59,20 +67,31 @@ export function createUI(handlers = {}) {
   const hudMode = h('span', { class: 'hud-mode t-cap', text: 'FLOW' });
   const hudVal = h('span', { class: 'hud-val t-num', text: '0' });
   const pillChains = h('span', { class: 'pill' }, 'Chains', h('b', { text: '0' }));
+  const pillTide = h('span', { class: 'pill pill--tide off' }, 'Tide', h('b', { text: '0%' }));
   const pillCombo = h('span', { class: 'pill pill--combo hide' }, 'Combo', h('b', { text: 'x1' }));
   const nextBox = h('div', { class: 'next' });
-  const hudHint = h('div', { class: 'hud-hint', text: 'drag to move · tap to turn · swipe down to drop' });
+  const hudHint = h('div', { class: 'hud-hint', text: HINT.play });
+
+  // The per-mode panels. Two of them hang off the CONTROL frame (they are type,
+  // and type follows the buttons); two hang off the BOARD rect, because a
+  // waterline and a flip warning are statements about the sand itself.
+  const modeHud = createModeHud();
+  const zenPal = createZenPalette(() => current === 'hud' && lastModeId === 'zen' && !sheetsOpen());
+
+  const hudScore = h('div', { class: 'hud-score' }, hudMode, hudVal,
+    h('div', { class: 'hud-pills' }, pillChains, pillTide, pillCombo));
 
   const hud = h('div', { class: 'scr scr-hud' },
     h('div', { class: 'veil veil-top' }),
     h('div', { class: 'veil veil-bot' }),
+    ...modeHud.boardEls,
     h('div', { class: 'frame' },
-      h('div', { class: 'hud-top' },
-        h('div', { class: 'hud-score' }, hudMode, hudVal,
-          h('div', { class: 'hud-pills' }, pillChains, pillCombo)),
-        nextBox),
+      h('div', { class: 'hud-stack' },
+        h('div', { class: 'hud-top' }, hudScore, nextBox),
+        ...modeHud.panels),
       h('div', { class: 'hud-pause' },
         tap(h('button', { class: 'gb gb--icon', 'aria-label': 'Pause' }, icon(GLYPH.pause)), () => pause())),
+      zenPal.el,
       hudHint),
   );
 
@@ -103,31 +122,57 @@ export function createUI(handlers = {}) {
   const resRibbon = h('div', { class: 'ribbon hide', text: 'new best' });
   const resChains = h('b', { class: 't-num', text: '0' });
   const resBest = h('b', { class: 't-num', text: '0' });
+  const runCard = h('div', { class: 'card' },
+    resKicker, resTitle, resScore, resRibbon,
+    h('div', { class: 'statrow' },
+      h('div', {}, h('span', { class: 't-cap', text: 'chains' }), resChains),
+      h('div', {}, h('span', { class: 't-cap', text: 'best' }), resBest)),
+    h('div', { class: 'card-btns' },
+      tap(h('button', { class: 'gb gb--primary' }, icon(GLYPH.again), 'Play again'),
+        () => play(lastStarted)),
+      h('div', { class: 'card-row' },
+        tap(h('button', { class: 'gb gb--ghost' }, icon(GLYPH.grid), 'Modes'), () => { H.onQuit(); openModes(); }),
+        tap(h('button', { class: 'gb gb--ghost' }, icon(GLYPH.home), 'Home'), () => H.onQuit()))));
+
+  /* ---------------------------------------------------- the ALCHEMY card */
+  // A level that ran out of time and a level that was SOLVED are not the same
+  // event and must never be able to look the same. The run card can only say
+  // how many points a dead run scored, which is the least interesting fact
+  // about a puzzle: what a player wants is the stars they took, the stars they
+  // left behind, and the next problem.
+
+  const alcKicker = h('div', { class: 'card-kicker alc-kicker', text: 'level complete' });
+  const alcTitle = h('h2', { class: 'card-title alc-title', text: '' });
+  const alcStars = h('div', { class: 'bigstars' });
+  const alcGoal = h('div', { class: 'alc-goal' });
+  const alcStats = h('div', { class: 'statrow' });
+  const alcPrimary = tap(h('button', { class: 'gb gb--primary' }), () => alcGo());
+  const alcCard = h('div', { class: 'card card--alc hide' },
+    alcKicker, alcTitle, alcStars, alcGoal, alcStats,
+    h('div', { class: 'card-btns' },
+      alcPrimary,
+      h('div', { class: 'card-row' },
+        tap(h('button', { class: 'gb gb--ghost' }, icon(GLYPH.grid), 'Levels'), () => openLevels()),
+        tap(h('button', { class: 'gb gb--ghost' }, icon(GLYPH.home), 'Home'), () => H.onQuit()))));
+
+  let alcGo = () => {};
+
   const results = h('div', { class: 'scr scr-results' },
     h('div', { class: 'modal-wrap' },
       h('div', { class: 'modal-scrim' }),
-      h('div', { class: 'card' },
-        resKicker, resTitle, resScore, resRibbon,
-        h('div', { class: 'statrow' },
-          h('div', {}, h('span', { class: 't-cap', text: 'chains' }), resChains),
-          h('div', {}, h('span', { class: 't-cap', text: 'best' }), resBest)),
-        h('div', { class: 'card-btns' },
-          tap(h('button', { class: 'gb gb--primary' }, icon(GLYPH.again), 'Play again'),
-            () => play(lastStarted)),
-          h('div', { class: 'card-row' },
-            tap(h('button', { class: 'gb gb--ghost' }, icon(GLYPH.grid), 'Modes'), () => { H.onQuit(); openModes(); }),
-            tap(h('button', { class: 'gb gb--ghost' }, icon(GLYPH.home), 'Home'), () => H.onQuit()))))),
+      runCard, alcCard),
   );
 
   /* -------------------------------------------------------------- sheets */
 
   const modeSheet = createSheet('MODES', 'six ways for sand to fall');
   const dailySheet = createSheet('EVENTS', 'today and this device');
+  const levelSheet = createLevelPicker((n) => playLevel(n));
   const settings = createSettings({ blip: () => { const a = window.__game && window.__game.audio; a && a.sfx && a.sfx('rotate'); } });
 
   const bannerHost = h('div', { class: 'banner-host' });
 
-  root.append(attract, hud, pauseScreen, results, modeSheet.el, dailySheet.el, settings.el, bannerHost);
+  root.append(attract, hud, pauseScreen, results, modeSheet.el, dailySheet.el, levelSheet.el, settings.el, bannerHost);
 
   /* --------------------------------------------------------------- logic */
 
@@ -162,12 +207,30 @@ export function createUI(handlers = {}) {
   function pause() { H.onPause(); show('pause'); }
   function resume() { H.onResume(); show('hud'); }
 
+  /**
+   * Start one ALCHEMY level. Goes through __game.startLevel — the host's own
+   * entry point — so the shell is not a second place that knows how a level is
+   * configured, and falls back to the plain onStart contract if it is absent.
+   */
+  function playLevel(n) {
+    closeSheets();
+    writeLast('alchemy');
+    const g = window.__game;
+    if (g && g.startLevel) g.startLevel(n);
+    else H.onStart('alchemy', { level: n });
+  }
+
   function closeSheets() {
-    modeSheet.hide(); dailySheet.hide();
+    modeSheet.hide(); dailySheet.hide(); levelSheet.hide();
     if (settings.open) settings.hide();
   }
 
+  function sheetsOpen() { return modeSheet.open || dailySheet.open || levelSheet.open || settings.open; }
+
   function openModes() { buildModes(); modeSheet.show(); }
+
+  /** ALCHEMY is a campaign, so its entry point is the campaign, not level 1. */
+  function openLevels() { modeSheet.hide(); levelSheet.show(); }
 
   function buildModes() {
     const save = window.__game && window.__game.save;
@@ -184,15 +247,27 @@ export function createUI(handlers = {}) {
           h('span', { class: 'mcard-blurb', text: m.blurb })),
         h('span', { class: 'mcard-meta' },
           m.ready
-            ? (best ? [h('span', { class: 't-cap', text: 'best' }), h('b', { text: fmt(best) })]
-                    : h('span', { class: 't-cap', text: m.tag }))
+            ? (m.id === 'alchemy' ? alchemyMeta(save)
+              : best ? [h('span', { class: 't-cap', text: 'best' }), h('b', { text: fmt(best) })]
+                     : h('span', { class: 't-cap', text: m.tag }))
             : h('span', { class: 'tag-soon', text: 'soon' })));
       // --ac is read by a color-mix() in ui.css, so it has to be a real custom
       // property on the element, not a class.
       card.style.setProperty('--ac', MODE_ACCENT[m.id] || '#f2b33d');
-      if (m.ready) tap(card, () => play(m.id));
+      if (m.ready) tap(card, () => (m.id === 'alchemy' ? openLevels() : play(m.id)));
       return card;
     }));
+  }
+
+  /** ALCHEMY's best is not a score, it is how far through the campaign you are. */
+  function alchemyMeta(save) {
+    const total = levelCount();
+    if (!total || !save || !save.unlockedUpTo) return h('span', { class: 't-cap', text: 'puzzles' });
+    const at = Math.min(save.unlockedUpTo(total), total);
+    const done = save.levels ? Object.keys(save.levels).length : 0;
+    return done
+      ? [h('span', { class: 't-cap', text: 'level' }), h('b', { text: at + ' / ' + total })]
+      : h('span', { class: 't-cap', text: total + ' levels' });
   }
 
   function dayHash(s) {
@@ -311,6 +386,81 @@ export function createUI(handlers = {}) {
     while (bannerHost.childElementCount > 3) bannerHost.firstElementChild.remove();
   }
 
+  /* ------------------------------------------------------- alchemy result */
+
+  function statCell(cap, value) {
+    return h('div', {}, h('span', { class: 't-cap', text: cap }),
+      value && value.nodeType ? value : h('b', { class: 't-num', text: String(value) }));
+  }
+
+  /**
+   * Won and lost are two different cards wearing one shell. The won card leads
+   * with the stars, because that is the number a puzzle player is playing for;
+   * the lost card leads with how close the objective got, because "run over"
+   * with a score on it says nothing about a level you nearly had.
+   */
+  function alchemyResult(r, a) {
+    const lv = levelById(a.id);
+    const won = !!r.won;
+    const total = levelCount();
+    const got = won ? (r.stars || 1) : 0;
+    const bestSt = Math.max(r.bestStars || 0, got);
+    const limit = lv ? lv.limitS : null;
+    const spent = limit != null ? Math.max(0, limit - (a.left || 0)) : null;
+
+    // Two ways to fail a level and they are not the same mistake: the clock ran
+    // out, or the board filled up. Printing "out of time" over a board that
+    // topped out at thirty-eight seconds of a sixty-second level tells the
+    // player to hurry, which is the opposite of the advice they need.
+    alcCard.classList.toggle('is-won', won);
+    alcKicker.textContent = won ? 'level complete'
+      : (a.left > 0 ? 'topped out' : 'out of time');
+    alcTitle.textContent = a.name || ('Level ' + a.id);
+
+    alcStars.replaceChildren(stars(got, 'bigstars-row'),
+      h('span', { class: 'alc-lv t-cap', text: 'lv ' + a.id + (a.arch ? ' · ' + a.arch : '') }));
+
+    if (won) {
+      // The star you did NOT take is the reason to play the level again, so name
+      // the time that would have earned it rather than just dimming a pip.
+      const nextStar = lv && got < 3 ? lv.stars[got] : null;
+      alcGoal.replaceChildren(
+        got >= 3
+          ? h('div', { class: 'ribbon ribbon--win', text: 'perfect' })
+          : h('div', { class: 'alc-nudge' },
+              stars(got + 1, 'stars stars--inline'),
+              h('span', { text: nextStar != null ? 'under ' + secs(nextStar) : 'faster' })));
+      alcStats.replaceChildren(
+        statCell('time', spent == null ? '—' : secs(spent)),
+        statCell('score', fmt(r.score)),
+        statCell('best', stars(bestSt, 'stars stars--stat')));
+    } else {
+      const frac = Math.max(0, Math.min(1, a.frac || 0));
+      const bar = h('i');
+      alcGoal.replaceChildren(
+        h('div', { class: 'alc-obj' },
+          h('span', { class: 'alc-obj-lab', text: a.label || 'Objective' }),
+          h('span', { class: 'alc-obj-num t-num', text: fmt(a.value) + ' / ' + fmt(a.target) })),
+        h('div', { class: 'alc-obj-bar' }, bar));
+      requestAnimationFrame(() => { bar.style.width = (frac * 100).toFixed(1) + '%'; });
+      alcStats.replaceChildren(
+        statCell('reached', Math.round(frac * 100) + '%'),
+        statCell('score', fmt(r.score)),
+        statCell('best', stars(bestSt, 'stars stars--stat')));
+    }
+
+    const hasNext = won && total && a.id < total;
+    const last = won && total && a.id >= total;
+    alcPrimary.replaceChildren(...[
+      icon(won ? GLYPH.play : GLYPH.again),
+      document.createTextNode(hasNext ? 'Next level' : last ? 'Back to levels' : 'Try again'),
+      hasNext ? h('b', { class: 'lv-cont-n', text: 'lv ' + (a.id + 1) }) : null,
+    ].filter(Boolean));
+    alcGo = hasNext ? () => playLevel(a.id + 1)
+          : last ? () => { H.onQuit(); openLevels(); }
+          : () => playLevel(a.id);
+  }
+
   /** Seven digits do not fit at 54px. Step the size instead of letting it clip. */
   function setBig(el, n) {
     const t = fmt(n);
@@ -347,6 +497,13 @@ export function createUI(handlers = {}) {
       hudHint.classList.remove('gone');
       clearTimeout(hintT);
       hintT = setTimeout(() => hudHint.classList.add('gone'), 4200);
+      // A new run may be a different mode; make the next setHud re-read the
+      // field list rather than inheriting the last run's panels.
+      lastFields = '';
+    } else {
+      zenPal.show(false);
+      modeHud.reset();
+      root.classList.remove('has-panel');
     }
     if (target === 'pause') {
       const st = window.__state;
@@ -361,9 +518,43 @@ export function createUI(handlers = {}) {
   /* ---------------------------------------------------------------- hud IO */
 
   let lastScore = -1, lastChains = -1, lastCombo = -1, lastMode = '';
+  let lastModeId = '', lastFields = '', lastTidePct = '', fields = null;
+
+  /**
+   * Which panels a mode gets is the MODE's decision, published as its `hud`
+   * array. An absent array means "everything" — that is a mode that predates the
+   * field list, not a mode that wants a blank HUD. ZEN's `hud: []` is the real
+   * empty case and it has to survive the difference.
+   */
+  function applyFields(s) {
+    const F = Array.isArray(s.hud) ? new Set(s.hud) : null;
+    const has = (k) => !F || F.has(k);
+    lastModeId = s.modeId || '';
+
+    hud.classList.toggle('is-bare', !!F && F.size === 0);
+    hudScore.classList.toggle('off', !has('score'));
+    nextBox.classList.toggle('off', !has('next'));
+    pillChains.classList.toggle('off', !has('chains'));
+    pillTide.classList.toggle('off', !has('tide'));
+    pillCombo.classList.toggle('off', !has('combo'));
+    hudHint.textContent = HINT[lastModeId] || HINT.play;
+    zenPal.show(lastModeId === 'zen');
+    // A mode panel occupies the band the banner used to drop into, and a banner
+    // landing on the objective is how ALCHEMY's "COMPLETE" ended up printed
+    // twice, on top of itself. Move the banners below the panel instead.
+    root.classList.toggle('has-panel', !F || F.has('objective') || F.has('flip'));
+    modeHud.reset();
+    return F;
+  }
+
   function setHud(s) {
     if (!s) return;
     if (s.mode && s.mode !== lastMode) { lastMode = s.mode; hudMode.textContent = s.mode; }
+
+    // The field list only changes when the mode does, and rebuilding it every
+    // rAF would allocate a Set 60 times a second for a run that lasts minutes.
+    const fkey = (s.modeId || s.mode || '') + '|' + (Array.isArray(s.hud) ? s.hud.join(',') : '*');
+    if (fkey !== lastFields) { lastFields = fkey; fields = applyFields(s); }
     // Coerce, because NaN !== NaN would re-run the bump animation every frame
     // for the rest of the run. (World.score does go NaN today — see HANDOFF.)
     const score = Number.isFinite(s.score) ? s.score : 0;
@@ -378,6 +569,12 @@ export function createUI(handlers = {}) {
       lastCombo = s.combo;
       pillCombo.classList.toggle('hide', !(s.combo > 1));
       pillCombo.lastElementChild.textContent = 'x' + (s.combo || 1);
+    }
+
+    const tide = modeHud.update(s, fields);
+    if (tide) {
+      const pct = Math.round(Math.max(0, Math.min(1, tide.frac || 0)) * 100) + '%';
+      if (pct !== lastTidePct) { lastTidePct = pct; pillTide.lastElementChild.textContent = pct; }
     }
     drawNext(s.next);
   }
@@ -427,7 +624,7 @@ export function createUI(handlers = {}) {
 
   window.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
-    if (settings.open || modeSheet.open || dailySheet.open) closeSheets();
+    if (sheetsOpen()) closeSheets();
     else if (current === 'hud') pause();
     else if (current === 'pause') resume();
   });
@@ -440,16 +637,23 @@ export function createUI(handlers = {}) {
     banner,
     results(r = {}) {
       lastScore = -1; lastChains = -1; lastCombo = -1;
-      resTitle.textContent = r.mode || 'RUN';
-      setBig(resScore, r.score);
-      resChains.textContent = fmt(r.chains);
-      resBest.textContent = fmt(Math.max(r.best || 0, r.score || 0));
-      resRibbon.classList.toggle('hide', !r.isBest);
-      resKicker.textContent = 'run over';
+      const alc = r.modeId === 'alchemy' && r.alchemy ? r.alchemy : null;
+      runCard.classList.toggle('hide', !!alc);
+      alcCard.classList.toggle('hide', !alc);
+      if (alc) alchemyResult(r, alc);
+      else {
+        resTitle.textContent = r.mode || 'RUN';
+        setBig(resScore, r.score);
+        resChains.textContent = fmt(r.chains);
+        resBest.textContent = fmt(Math.max(r.best || 0, r.score || 0));
+        resRibbon.classList.toggle('hide', !r.isBest);
+        resKicker.textContent = 'run over';
+      }
       show('results');
     },
-    openModes, openSettings: () => settings.show(), openDaily,
+    openModes, openLevels, openSettings: () => settings.show(), openDaily,
     wmSeek: (ms) => wm.seek(ms),
+    zen: zenPal,
     get screen() { return current; },
   };
   window.__ui = api;

@@ -12,22 +12,22 @@ step, no CDN, no dependencies.
 |---|---|---|
 | P0 | Skeleton, viewport, input, main.js, test hooks, boot gate | **done** |
 | P1 | Sim core: grid, materials, chunks, step, clears, pieces, bot, oracle | **done** |
-| P2 | WebGL2 density-field renderer | lane A |
-| P3 | FLOW playable and balanced | lane C |
-| P4 | Jelly soft-body, TIDE, JELLY LAB | lanes C + D |
-| P5 | Reactions, HOURGLASS, ZEN | lanes C + D |
-| P6 | ALCHEMY levels | lane C |
-| P7 | Shell, attract screen, audio, ship | lanes B + E + manager |
+| P2 | WebGL2 density-field renderer | **done** |
+| P3 | FLOW playable and balanced | **done** |
+| P4 | Jelly soft-body, TIDE, JELLY LAB | **done** |
+| P5 | Reactions, HOURGLASS, ZEN | **done** |
+| P6 | ALCHEMY levels (96, all validated) | **done** |
+| P7 | Shell, attract screen, audio, ship | **done** |
 
 ## Lanes
 
 | Lane | Owns | Status |
 |---|---|---|
 | manager | `js/main.js`, `js/core/**`, `js/sim/{grid,step,clears,pieces,world,materials}.js`, `tools/{sim,boot,cdp}.mjs`, `docs/**`, git | P0+P1 done |
-| A renderer | `js/gfx/**`, `dev/gfx.html`, `tools/gfx_shot.mjs` | running |
-| B shell/ui | `index.html`, `css/**`, `js/ui/**` | running |
-| C modes | `js/modes/**`, `js/data/**`, `tools/modesim.mjs` | running |
-| D jelly | `js/sim/blobs.js`, `js/sim/reactions.js`, `tools/jellysim.mjs` | running |
+| A renderer | `js/gfx/**`, `dev/gfx.html`, `tools/gfx_shot.mjs` | **done** |
+| B shell/ui | `index.html`, `css/**`, `js/ui/**` | **done** |
+| C modes | `js/modes/**`, `js/data/**`, `tools/modesim.mjs` | **done** |
+| D jelly | `js/sim/blobs.js`, `js/sim/reactions.js`, `tools/jellysim.mjs` | **done** |
 | E audio | `js/audio/**`, `assets/audio/**` | **done** |
 
 ## Gates
@@ -42,14 +42,34 @@ node tools/boot.mjs --gpu             the only honest timings
 
 All green as of P1. `tools/sim.mjs` reports 0.25 ms/tick against a 4 ms budget.
 
-## Outstanding
+## Shipped
 
-- `js/core/debugdraw.js` is a PLACEHOLDER Canvas2D renderer that draws exactly
-  the pixel look this project exists to avoid. **Delete it once lane A lands.**
-  `main.js` only falls back to it when `js/gfx/renderer.js` is absent, and
-  `__state.placeholder` reports when it is in use.
-- FLOW is far too easy: the bot survives ~110 s and scores ~750k. Lane C is
-  rebalancing fall speed and rescaling scoring into the thousands.
-- `projects.js` entry and `assets/screenshots/silt.jpg` are deliberately held
-  back until the real renderer exists — the card's screenshot is this game's
-  entire first impression and a pixel-look placeholder would misrepresent it.
+Listed in `projects.js` with `wip: true`, screenshot at
+`assets/screenshots/silt.jpg`. Added to the games.br8t.com hub as `soon: true`
+with its path already in `games/deploy.sh`, so bringing it across is a one-line
+change once it has actually been played. That hub is curated and three finished
+games are held back for the same reason.
+
+`js/core/debugdraw.js` is retained deliberately: it is the Canvas2D fallback
+`main.js` uses only when `js/gfx/renderer.js` fails to load, and
+`__state.placeholder` reports when it is live. It draws the pixel look this
+project exists to avoid, so if a screenshot ever looks like cells, check that
+flag first.
+
+## Known open items
+
+- `hourglass.until` and `alchemy.left` are SECONDS, not ticks, and neither is in
+  CONTRACTS.md. The HUD renders them as seconds.
+- `alchemy.stars` is the count earned, not the thresholds, so `js/ui/modehud.js`
+  reaches into `levelById` to show which star is still on offer. The mode
+  publishing them would remove that reach-in.
+- ALCHEMY tops out as often as it times out. The result card names both, but
+  whether that is the intended fail mix is a balance question.
+- The cool tint reads slightly greener in flight than settled. With three tints
+  and one cool, the mapping stays unambiguous.
+- ZEN and FLOW/JELLY share a HUD shape by declaration, not by accident.
+
+## Next session
+
+Playtest first, then tune. The build has never been played by a human — every
+balance number in here comes from the bot, which is a proxy and not a player.
