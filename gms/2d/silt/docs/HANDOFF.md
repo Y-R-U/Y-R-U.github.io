@@ -33,3 +33,27 @@ js/cloud.js wired to /lib/auth/localsync.js over silt.best / silt.settings /
 silt.stats only — never board state. canPester is false while playing, so the
 sign-in nudge only appears on attract, menus and results, and it is a callout
 pill rather than a modal.
+
+## Lane D jelly + reactions — done, wired by manager
+Blobs are an area-preserving ellipse (a = R/q, b = R*q, so pi*a*b === n for every
+q) rasterised each tick as the n nearest admissible cells. The rasteriser IS the
+collision solver: cells inside terrain are not admissible, so a body moulds
+around what it lands on and its centroid is pushed out. |target| = |current| = n
+means entering and exiting cell counts are equal by construction, so blob motion
+provably cannot move g.count.
+
+Verified in a real 3000-tick JELLY world: 16 blobs, q spanning 0.34 at the bottom
+(pancaked under overburden) to 0.89 at the top (resting), ledger exact throughout.
+
+Reactions moved to a dense MAT_COUNT^2 table. The seven original rules are
+byte-identical — independently confirmed here, because tools/sim.mjs produced the
+exact same 12-game score (747473) after the swap.
+
+Two bugs that lane's own gates caught, both worth remembering:
+- One tick of gravity is 0.055 cell, BELOW lattice quantisation. A contact test
+  of "asked to descend vs actually descended" therefore fires every tick for a
+  symmetric blob and hangs it in mid-air. Fixed with a free-integrated position
+  tethered to the rasterised centroid: sub-cell disagreement is quantisation,
+  larger is contact.
+- Load as a per-column average is wrong for a press — weight on 16 columns of a
+  50-column pancake averages to nothing. It is total overburden vs body mass.

@@ -1,9 +1,9 @@
 import {
-  EMPTY, SAND, WATER, OIL, LAVA, ICE, CRYSTAL, FIRE, STEAM,
-  KIND, DENSITY, SPREAD, SLIP, LIFE, FLAMMABLE,
+  EMPTY, KIND, DENSITY, SPREAD, SLIP, LIFE,
   POWDER, LIQUID, GAS, STATIC, BLOB, NONE,
 } from './materials.js';
 import { CHUNK, F_CLEARING, F_BLOB } from './grid.js';
+import { applyReaction as react } from './reactions.js';
 
 export const F_DIR = 8;   // liquid remembers which way it was flowing
 
@@ -97,27 +97,6 @@ function stepGas(g, i, x, y, m, rng, G) {
   const d = rng.chance(0.5) ? 1 : -1;
   t = canMove(g, x + px * d, y + py * d, m, 0);
   if (t >= 0) { g.swap(i, t); return true; }
-  return false;
-}
-
-/**
- * Neighbour chemistry. Crystal is the interesting rule: it is permanent and
- * unclearable, so quenching lava solves the immediate problem and leaves behind
- * a wall you chose to build.
- */
-function react(g, i, ni, rng, stats) {
-  const a = g.mat[i], b = g.mat[ni];
-  if (a === LAVA) {
-    if (b === WATER) { g.set(i, CRYSTAL); g.set(ni, STEAM); g.life[ni] = LIFE[STEAM]; stats.reactions++; return true; }
-    if (b === ICE)   { g.set(ni, WATER, g.tint[ni]); stats.reactions++; return true; }
-    if (b === OIL)   { g.set(ni, FIRE); g.life[ni] = LIFE[FIRE]; stats.reactions++; return true; }
-    if (b === SAND && rng.chance(0.06)) { g.set(ni, CRYSTAL); stats.reactions++; return true; }
-  }
-  if (a === FIRE) {
-    if (FLAMMABLE[b] && rng.chance(0.28)) { g.set(ni, FIRE); g.life[ni] = LIFE[FIRE]; stats.reactions++; return true; }
-    if (b === ICE)   { g.set(ni, WATER, g.tint[ni]); stats.reactions++; return true; }
-    if (b === WATER) { g.set(i, STEAM); g.life[i] = LIFE[STEAM]; stats.reactions++; return true; }
-  }
   return false;
 }
 

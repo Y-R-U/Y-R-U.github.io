@@ -1,4 +1,4 @@
-import { Grid, F_CLEARING, F_BLOB } from './grid.js';
+import { F_CLEARING, F_BLOB } from './grid.js';
 import { EMPTY, JELLY, KIND, DENSITY, LIQUID, GAS } from './materials.js';
 
 /**
@@ -49,17 +49,16 @@ export const Q_MIN = 0.34;        // hard pancake
 export const Q_MAX = 1.90;        // hard stretch
 export const REST_Q = 0.88;       // a resting lump is already slightly flat
 export const LOAD_SQUASH = 0.62;  // how hard weight above flattens the blob
-export const LOAD_LOOK = 26;      // rows of overburden that count toward load
-export const LOAD_UNIT = 90;      // density normaliser (sand 60, crystal 200)
+export const LOAD_LOOK = 60;      // rows of overburden that count toward load
+export const LOAD_UNIT = 110;     // force-per-cell of body mass that counts as full load
 export const IMPACT_MIN = 0.35;   // below this a landing does not register
-export const IMPACT_GAIN = 0.30;
+export const IMPACT_GAIN = 0.19;  // a terminal-velocity splat should squash hard, not saturate the clamp
+export const IMPACT_CAP = 0.34;
 export const BOUNCE = 0.12;
+export const CONTACT = 0.5;       // sub-cell tether slack: below this it is quantisation, above it is a collision
 export const GROW = 1.55;         // candidate window, in ellipse radii
 const BANDS = 128;                // radial buckets for the counting sort
 const MAX_ID = 65535;             // g.blob is a Uint16Array
-
-let _tmpVel = 0;                  // silences unused warnings in strict bundlers
-void _tmpVel; void Grid;
 
 export class Blobs {
   constructor(g) {
@@ -69,9 +68,25 @@ export class Blobs {
     this._nextId = 1;
     this.ticks = 0;
 
-    /** Set false to disable merging — the falsification arm in jellysim uses this. */
+    /**
+     * Feel knobs, per instance so a mode can tune jelly without editing this
+     * file. Defaults are the exported constants; JELLY LAB in particular will
+     * want a lower `qMin` (how flat a pancake load can press) and a higher
+     * `loadSquash` (how hard weight presses it) than the default board.
+     */
     this.merging = true;
     this.gravity = GRAVITY;
+    this.qMin = Q_MIN;
+    this.qMax = Q_MAX;
+    this.restQ = REST_Q;
+    this.loadSquash = LOAD_SQUASH;
+    this.loadLook = LOAD_LOOK;
+    this.loadUnit = LOAD_UNIT;
+    this.springK = SPRING_K;
+    this.springC = SPRING_C;
+    this.impactGain = IMPACT_GAIN;
+    this.impactCap = IMPACT_CAP;
+    this.bounce = BOUNCE;
 
     const n = g.n;
     this._cand = new Int32Array(n);     // candidate cells inside the window
@@ -86,7 +101,6 @@ export class Blobs {
     this._colStamp = 0;
     this._enter = new Int32Array(n);
     this._exit = new Int32Array(n);
-    this._payI = new Int32Array(n);
     this._payM = new Uint8Array(n);
     this._payT = new Uint8Array(n);
     this._payH = new Uint8Array(n);
@@ -127,7 +141,7 @@ export class Blobs {
     // A spawned shape keeps its own aspect and then springs toward round: an
     // I-piece of jelly lands as a wide splat and jiggles up, which is the whole
     // reason the piece is worth dropping as jelly.
-    b.q = clamp(Math.sqrt(b.hHalf / Math.max(0.5, b.wHalf)), Q_MIN, Q_MAX);
+    b.q = clamp(Math.sqrt(b.hHalf / Math.max(0.5, b.wHalf)), this.qMin, this.qMax);
     b.vq = 0;
 
     for (let k = 0; k < list.length; k++) {
@@ -209,6 +223,7 @@ export class Blobs {
       cells: null,
       px: 0, py: 0, vx: 0, vy: 0,
       q: 1, vq: 0, R: 0, a: 0, b: 0,
+      cx: 0, cy: 0,
       wHalf: 1, hHalf: 1,
       grounded: false, impact: 0, load: 0,
       frozen: false, age: 0,
@@ -231,6 +246,7 @@ export class Blobs {
       if (y < miny) miny = y; if (y > maxy) maxy = y;
     }
     b.px = sx / b.n; b.py = sy / b.n;
+    b.cx = b.px; b.cy = b.py;
     b.wHalf = (maxx - minx + 1) / 2;
     b.hHalf = (maxy - miny + 1) / 2;
     b.R = Math.sqrt(b.n) * TAU_R;
@@ -349,30 +365,28 @@ export class Blobs {
     // Spring. Airborne it stretches with speed; grounded it is squashed by its
     // own weight plus whatever is standing on it.
     const qRest = b.grounded
-      ? clamp(REST_Q - b.load * LOAD_SQUASH, Q_MIN, 1.0)
-      : clamp(1 + Math.min(0.30, Math.abs(b.vy) * 0.15), 1.0, Q_MAX);
-    b.vq += -SPRING_K * (b.q - qRest) - SPRING_C * b.vq;
-    b.q = clamp(b.q + b.vq, Q_MIN, Q_MAX);
-    if (b.q <= Q_MIN || b.q >= Q_MAX) b.vq *= 0.5;
+      ? clamp(this.restQ - b.load * this.loadSquash, this.qMin, 1.0)
+      : clamp(1 + Math.min(0.30, Math.abs(b.vy) * 0.15), 1.0, this.qMax);
+    b.vq += -this.springK * (b.q - qRest) - this.springC * b.vq;
+    b.q = clamp(b.q + b.vq, this.qMin, this.qMax);
+    if (b.q <= this.qMin || b.q >= this.qMax) b.vq *= 0.5;
     this._axes(b);
-
-    const prevPy = b.py;
 
     // Try the full move; back off to half, then to deform-in-place. A rejection
     // only happens when the body genuinely cannot fit, e.g. wedged in a pocket.
-    let placed = 0;
+    let placed = 0, blocked = false;
     let usedX = b.px, usedY = b.py;
     for (let attempt = 0; attempt < 3; attempt++) {
       const f = attempt === 0 ? 1 : attempt === 1 ? 0.5 : 0;
       usedX = b.px + b.vx * f;
       usedY = b.py + b.vy * f;
       placed = this._target(b, usedX, usedY);
-      if (placed >= b.n) break;
+      if (placed >= b.n) { blocked = f < 1; break; }
       placed = 0;
     }
     if (placed < b.n) {
       // Cannot even deform in place — revert the spring and leave the cells be.
-      b.q = clamp(b.q - b.vq, Q_MIN, Q_MAX);
+      b.q = clamp(b.q - b.vq, this.qMin, this.qMax);
       b.vq = 0;
       this._axes(b);
       b.vy = 0;
@@ -387,21 +401,34 @@ export class Blobs {
     for (let k = 0; k < b.n; k++) { const i = b.cells[k]; sx += i % cols; sy += (i / cols) | 0; }
     const acx = sx / b.n, acy = sy / b.n;
 
-    // The rasteriser IS the collision solver: contact is simply "it asked to
-    // fall and did not". Comparing travel-wanted with travel-achieved is stable
-    // where an absolute penetration test is not — a resting blob still asks to
-    // move by one tick of gravity every tick, and must stay grounded.
-    const wanted = usedY - prevPy;
-    const fell = acy - prevPy;
-    b.px += (acx - b.px) * 0.5;
-    b.py = acy;
+    b.cx = acx; b.cy = acy;        // the body the renderer should draw around
 
-    if (wanted > 0.01 && fell < wanted * 0.5) {
+    /*
+     * The rasteriser IS the collision solver, but it works on a lattice and one
+     * tick of gravity is 0.055 of a cell. Comparing "asked to descend" against
+     * "actually descended" therefore reads as a collision every time the chosen
+     * cell set happens not to shift — which for a symmetric blob in open air is
+     * every tick, and the blob hangs in mid-air. (Found by the wobble
+     * falsification arm: pinning the spring removed the shape change that was
+     * accidentally breaking the symmetry.)
+     *
+     * So the dynamics position is integrated freely and merely TETHERED to the
+     * body: sub-cell disagreement is quantisation and is allowed to accumulate,
+     * and only a disagreement bigger than the lattice can explain is contact.
+     */
+    b.px = usedX; b.py = usedY;
+    let hit = blocked ? 1 : 0;
+    if (b.py - acy > CONTACT) { hit = 1; b.py = acy + CONTACT; }
+    else if (acy - b.py > CONTACT) { hit = -1; b.py = acy - CONTACT; }
+    if (b.px - acx > CONTACT) { b.px = acx + CONTACT; if (b.vx > 0) b.vx = 0; }
+    else if (acx - b.px > CONTACT) { b.px = acx - CONTACT; if (b.vx < 0) b.vx = 0; }
+
+    if (hit === 1) {
       const v = b.vy;
-      if (v > IMPACT_MIN) { b.impact = v; b.vq -= Math.min(0.55, v * IMPACT_GAIN); }
-      b.vy = v > 0.9 ? -v * BOUNCE : 0;
+      if (v > IMPACT_MIN) { b.impact = v; b.vq -= Math.min(this.impactCap, v * this.impactGain); }
+      b.vy = v > 0.9 ? -v * this.bounce : 0;
       b.grounded = true;
-    } else if (fell < wanted - 0.5) {
+    } else if (hit === -1) {
       b.vy = 0;                    // squeezed upward by something below
       b.grounded = true;
     } else {
@@ -416,10 +443,20 @@ export class Blobs {
     }
   }
 
-  /** Weight of the overburden above the blob, normalised to roughly 0..1. */
+  /**
+   * Overburden above the body, as TOTAL force against the body's own mass —
+   * not a per-column average.
+   *
+   * The average is the intuitive version and it is wrong for a press: weight
+   * concentrated on sixteen columns of a fifty-column pancake averages down to
+   * almost nothing, and the blob shrugs off a piston it should be flattened by.
+   * A soft body transmits pressure through itself, so what matters is how much
+   * is bearing down in total versus how much jelly there is to resist it.
+   */
   _load(b) {
     const g = this.g, cols = g.cols, mat = g.mat, flags = g.flags, blob = g.blob;
     const top = this._colTop, seen = this._colSeen, stamp = ++this._colStamp;
+    const LOOK = this.loadLook;
     let minx = 1e9, maxx = -1e9;
     for (let k = 0; k < b.n; k++) {
       const i = b.cells[k];
@@ -428,12 +465,11 @@ export class Blobs {
       else if (y < top[x]) top[x] = y;
       if (x < minx) minx = x; if (x > maxx) maxx = x;
     }
-    let sum = 0, ncol = 0;
+    let sum = 0;
     for (let x = minx; x <= maxx; x++) {
       if (seen[x] !== stamp) continue;
-      ncol++;
       let y = top[x] - 1;
-      for (let s = 0; s < LOAD_LOOK && y >= 0; s++, y--) {
+      for (let s = 0; s < LOOK && y >= 0; s++, y--) {
         const i = y * cols + x;
         const m = mat[i];
         if (m === EMPTY) break;
@@ -441,7 +477,7 @@ export class Blobs {
         sum += DENSITY[m];
       }
     }
-    return ncol ? Math.min(1, sum / (ncol * LOAD_LOOK * LOAD_UNIT)) : 0;
+    return Math.min(1, sum / (b.n * this.loadUnit));
   }
 
   // -------------------------------------------------------------- rasterising
@@ -537,16 +573,15 @@ export class Blobs {
 
     // 1. salvage whatever is standing in the entering cells
     let np = 0;
-    const payI = this._payI, payM = this._payM, payT = this._payT;
+    const payM = this._payM, payT = this._payT;
     const payH = this._payH, payL = this._payL, payF = this._payF;
     for (let k = 0; k < nn; k++) {
       const i = enter[k];
       if (g.mat[i] === EMPTY) continue;
-      payI[np] = i; payM[np] = g.mat[i]; payT[np] = g.tint[i];
+      payM[np] = g.mat[i]; payT[np] = g.tint[i];
       payH[np] = g.heat[i]; payL[np] = g.life[i]; payF[np] = g.flags[i];
       np++;
     }
-    void payI;
 
     // 2. vacate, 3. occupy, 4. re-place the salvage. Exiting and entering sets
     //    are disjoint, so no step can undo another.
@@ -650,7 +685,7 @@ export class Blobs {
     }
     host.n = w;
     host.vx = mvx / w; host.vy = mvy / w;
-    const q = clamp(mq / w, Q_MIN, Q_MAX);
+    const q = clamp(mq / w, this.qMin, this.qMax);
     host.vq = mvq / w;
     host.grounded = grounded;
     this._measure(host);

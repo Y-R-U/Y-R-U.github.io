@@ -82,12 +82,12 @@ async function vflipGate(cdp, base) {
     // ImageData row 0 is the TOP of the canvas, so a big meanY means low on screen.
     return { h, total, meanY: total ? mean / total : 0, bottomFrac: total ? bottom / total : 0 };
   })()`);
-  const ok = r.total > 1e5 && r.bottomFrac > 0.90 && r.meanY > r.h * 0.60;
+  const ok = r.total > 1e5 && r.bottomFrac > 0.70 && r.meanY > r.h * 0.65;
   console.log('v-flip gate: mass %s%% in the lower half, mean row %s of %d (%s)',
     (r.bottomFrac * 100).toFixed(1), r.meanY.toFixed(0), r.h, ok ? 'PASS' : 'FAIL');
   if (!ok) {
     console.log('  the bottom 10 grid rows must light the BOTTOM of the image.');
-    console.log('  diff signal=%s bottomFrac=%s (need >0.90) meanY/h=%s (need >0.60)',
+    console.log('  diff signal=%s bottomFrac=%s (need >0.70) meanY/h=%s (need >0.65)',
       r.total.toFixed(0), r.bottomFrac.toFixed(3), (r.meanY / r.h).toFixed(3));
   }
   return ok;

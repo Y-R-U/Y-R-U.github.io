@@ -23,16 +23,21 @@ import { makeScorer } from './score.js';
 const S = new WeakMap();
 
 export const TIDE_CFG = {
-  topMargin: 10,        // drown when the waterline gets this close to the ceiling
-  riseBase: 1.15,       // rows per second at t=0
-  riseAccel: 0.006,     // rows per second, per second
-  riseMax: 2.6,
+  topMargin: 28,        // drown when the waterline gets this close to the ceiling
+  riseBase: 1.1,        // rows per second at t=0
+  riseAccel: 0.008,     // rows per second, per second
+  riseMax: 3.2,
   segW: 2,              // width of a tide colour cluster, in cells
   bandH: 2,             // height of a tide colour cluster, in rows
-  drainPerRow: 1.35,    // rows of tide bought by clearing one row's worth of water
+  drainPerRow: 0.2,     // rows of tide bought by clearing one row's worth of water
   buoyEvery: 3,         // ticks between buoyancy passes
   buoySamples: 30,      // cells sampled per pass — O(1), not a scan
   buoyChance: 0.34,
+  brineTints: 2,        // extra water-only colours that match no piece: inert
+                        // filler that BLOCKS paths instead of making them.
+                        // Without it the water body is so well connected that
+                        // the mode fires ~52 chains a game and a chain stops
+                        // meaning anything.
   waterWeight: 0.45,    // water cells score less than sand cells
 };
 const CFG = TIDE_CFG;
@@ -57,7 +62,7 @@ function h2(a, b, seed) {
  */
 function tideTint(x, y, tints, seed) {
   const sx = (x / CFG.segW) | 0, by = (y / CFG.bandH) | 0;
-  return 1 + (h2(sx, by, seed) % tints);
+  return 1 + (h2(sx, by, seed) % (tints + CFG.brineTints));
 }
 
 function floodTo(world, st) {

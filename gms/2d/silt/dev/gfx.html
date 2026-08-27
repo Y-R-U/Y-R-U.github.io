@@ -75,8 +75,10 @@ const SCENES = {
   dune: (w, rnd) => { driveBot(w, 30, rnd); },
 
   tide: (w, rnd) => {
-    driveBot(w, 24, rnd);
-    pour(w, WATER, 8, 4, 96, 26, 4, 320);
+    // Fewer pieces so the water has somewhere to BE. A pour over a nearly full
+    // board just glazes it and never reads as a body of water.
+    driveBot(w, 13, rnd);
+    pour(w, WATER, 4, 6, 104, 34, 1, 420);
   },
 
   kiln: (w, rnd) => {
@@ -106,17 +108,18 @@ const SCENES = {
   dissolve: (w, rnd) => {
     driveBot(w, 30, rnd);
     // Force a spanning chain, then walk the countdown by hand so the frame lands
-    // exactly where we want it in the 26-tick dissolve.
-    const g = w.g, cols = g.cols;
-    let y = 150;
+    // exactly where we want it inside the 26-tick dissolve. The band has to HUG
+    // the pile surface: a flat band at a fixed row misses the heap in some
+    // columns and then nothing spans, which reads as "the dissolve is broken".
+    const g = w.g, cols = g.cols, rows = g.rows;
+    let n = 0;
     for (let x = 0; x < cols; x++) {
-      y += Math.round((rnd() - 0.5) * 3);
-      for (let k = -4; k <= 4; k++) {
-        const yy = Math.max(0, Math.min(g.rows - 1, y + k));
-        if (g.mat[g.idx(x, yy)] !== 0) g.set(g.idx(x, yy), SAND, 1);
-      }
+      let top = rows - 1;
+      for (let y = 0; y < rows; y++) if (g.mat[g.idx(x, y)] !== 0) { top = y; break; }
+      const y0 = Math.min(rows - 8, top + 1 + ((rnd() * 3) | 0));
+      for (let k = 0; k < 7; k++) { g.set(g.idx(x, y0 + k), SAND, 1); n++; }
     }
-    w.clears.detect();
+    window.__forcedChain = { painted: n, detected: w.clears.detect() };
     const step = +(P.get('dt') || 9);
     for (let i = 0; i < step; i++) w.clears.advance(w.stats);
   },
@@ -150,7 +153,7 @@ function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Ma
 function build(name) {
   sceneName = name;
   const seed = +(P.get('seed') || 7);
-  world = new World({ seed, tints: 5, tintMode: P.get('tint') || 'mono' });
+  world = new World({ seed, tints: 4, tintMode: P.get('tint') || 'mono' });
   (SCENES[name] || SCENES.dune)(world, mulberry(seed * 2654435761 % 2147483647));
   paint();
 }

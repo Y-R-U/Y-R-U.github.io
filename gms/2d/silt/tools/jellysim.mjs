@@ -8,7 +8,7 @@
 //   node tools/jellysim.mjs --break all     run every arm in turn
 //   node tools/jellysim.mjs --table         print the reaction table and exit
 //
-// Arms: ledger orphan rng merge split dissolve fall wobble spread reactions
+// Arms: ledger orphan rng merge split dissolve fall wobble spread lab reactions
 //
 // A gate that has never been proven to fail is not evidence. Every gate below
 // has an arm that breaks exactly the thing it claims to guard, and `--break all`
@@ -24,15 +24,15 @@ import {
 } from '../js/sim/reactions.js';
 import {
   EMPTY, WALL, SAND, WATER, JELLY, OIL, LAVA, ICE, ASH, CRYSTAL, FIRE, STEAM,
-  MAT_COUNT, TINTABLE, LIFE, KIND, STATIC,
+  MAT_COUNT, TINTABLE, LIFE,
 } from '../js/sim/materials.js';
 
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 const has = (k) => args.includes(k);
-const TICKS = +opt('--ticks', 1400);
-const ARMS = ['ledger', 'orphan', 'rng', 'merge', 'split', 'dissolve', 'fall', 'wobble', 'spread', 'reactions'];
-let BREAK = opt('--break', null);
+const TICKS = +opt('--ticks', 900);
+const ARMS = ['ledger', 'orphan', 'rng', 'merge', 'split', 'dissolve', 'fall', 'wobble', 'spread', 'lab', 'reactions'];
+const BREAK = opt('--break', null);
 
 if (has('--table')) {
   console.log(`SILT reactions — ${RULES.length} rules, ${PAIRS.length} concrete pairs\n`);
@@ -192,7 +192,7 @@ function gateLedger() {
   s.g.fill(24, s.floor - 14, 30, 14, WATER, 1);
   s.g.fill(2, s.floor - 6, 8, 6, OIL, 2);
   s.g.wakeAll();
-  const err = soak(s, Math.min(TICKS, 900), {
+  const err = soak(s, TICKS, {
     spawnEvery: 90, rainEvery: 25, maxBlobs: 5,
     arm: (t) => BREAK === 'ledger' && t === 200 ? (s.g.mat[s.g.idx(5, 5)] = SAND, true) : false,
   });
@@ -208,7 +208,7 @@ function gateLedger() {
 // soak(); this gate exists to prove the check can catch a planted fault.
 function gateOrphans() {
   const s = scene(23);
-  const err = soak(s, Math.min(TICKS, 700), {
+  const err = soak(s, TICKS, {
     spawnEvery: 70, maxBlobs: 6, tints: 3,
     arm: (t, sc, blobs, g) => {
       if (BREAK !== 'orphan' || t !== 300) return false;
@@ -235,7 +235,7 @@ function runSeeded(seed, ticks) {
 }
 
 function gateDeterminism() {
-  const T = Math.min(TICKS, 600);
+  const T = TICKS;
   const a = runSeeded(5, T), b = runSeeded(5, T);
   if (a.g !== b.g) return fail('G3-determinism', `same seed, grid diverged ${a.g} vs ${b.g}`);
   if (a.b !== b.b) return fail('G3-determinism', `same seed, blob state diverged ${a.b} vs ${b.b}`);
@@ -267,9 +267,8 @@ function gateMerge() {
 
   // and the negative: different tints must never fuse
   const s2 = scene(32, { terrain: false });
-  const C = s2.blobs.spawn(blobCells(s2.g, 16, s2.floor - 10, 8, 8), 1);
-  const D = s2.blobs.spawn(blobCells(s2.g, 24, s2.floor - 10, 8, 8), 2);
-  void C; void D;
+  s2.blobs.spawn(blobCells(s2.g, 16, s2.floor - 10, 8, 8), 1);
+  s2.blobs.spawn(blobCells(s2.g, 24, s2.floor - 10, 8, 8), 2);
   for (let t = 0; t < 60; t++) { s2.blobs.step(s2.rng, s2.stats); step(s2.g, s2.rng, s2.stats); }
   const e2 = checkGrid(s2.g, 'merge-neg') || auditBlobs(s2.blobs, 'merge-neg');
   if (e2) return fail('G5-merge', e2);
@@ -447,7 +446,64 @@ function gateSpread() {
   return { w: `${before.w}->${after.w}`, q: `${qBefore.toFixed(2)}->${b.q.toFixed(2)}`, load: +b.load.toFixed(2) };
 }
 
-// ---------------------------------------------------------- G11 reactions
+// ------------------------------------------------------------ G11 jelly lab
+// The mode-defining moment, end to end: pile weight on a big blob until the
+// pressure squeezes it from wall to wall, and the plain-grid chain detector —
+// which knows nothing about blobs — sees a spanning tint component and fires.
+// Everything else in this file tests a part; this tests the point.
+function gateLab() {
+  const cols = 60, rows = 140;
+  const g = new Grid(cols, rows);
+  const rng = makeRng(9);
+  const floor = rows - 4;
+  g.fill(0, floor, cols, 4, WALL);
+  const blobs = new Blobs(g);
+  if (BREAK === 'lab') blobs.loadSquash = 0;   // deaf to weight: it can never spread
+  const clears = new Clears(g, { diagonal: true });
+  const stats = { created: 0, destroyed: 0, reactions: 0, reactionsEnabled: false };
+
+  for (let k = 0; k < 6; k++) blobs.spawn(blobCells(g, 15 + k * 5, floor - 30 + k, 5, 26), 1);
+  g.wakeAll();
+
+  let widest = 0, spanned = false, chainCells = 0, blobCleared = 0;
+  for (let t = 0; t < 1600; t++) {
+    // Weight lands in a central column: the flanks stay clear so the jelly has
+    // somewhere to go. Burying the corners in sand would block the very cells
+    // it has to reach, which is itself a real lesson for the mode's layouts.
+    if (t % 2 === 0 && t < 1100) {
+      for (let x = 22; x < 38; x++) { const i = g.idx(x, 2); if (g.mat[i] === EMPTY) g.set(i, SAND, 2); }
+    }
+    blobs.step(rng, stats);
+    let e = auditBlobs(blobs, `lab t${t} post-blob`);
+    if (e) return fail('G11-lab', e);
+
+    const b = blobs.list()[0];
+    if (b) {
+      const ex = extents(g, b);
+      if (ex.w > widest) widest = ex.w;
+      if (ex.minx === 0 && ex.maxx === cols - 1) spanned = true;
+    }
+    step(g, rng, stats);
+    clears.advance(stats);
+    if (t % 3 === 0) {
+      const n = clears.detect();
+      if (n > 0) {
+        chainCells += n;
+        for (const i of clears.lastChain) if (g.flags[i] & F_BLOB) blobCleared++;
+      }
+    }
+    e = checkGrid(g, `lab t${t}`) || auditBlobs(blobs, `lab t${t}`, true);
+    if (e) return fail('G11-lab', e);
+    if (blobCleared > 0 && t > 1200) break;
+  }
+
+  if (!spanned) return fail('G11-lab', `pressure never squeezed the blob wall to wall (widest ${widest}/${cols})`);
+  if (blobCleared === 0) return fail('G11-lab', 'the blob spanned the board but no chain claimed any of its cells');
+  if (g.count !== g.recount()) fail('G11-lab', 'ledger drift during the lab run');
+  return { widest, cols, chainCells, blobCleared };
+}
+
+// ---------------------------------------------------------- G12 reactions
 // Exhaustive over the whole MAT_COUNT^2 space, not just the pairs someone
 // remembered. For every ordered pair: run applyReaction many times and demand
 // that the ledger holds, the products are real materials, the tint policy is
@@ -485,56 +541,56 @@ function gateReactions() {
         const hit = applyReaction(g, i, ni, rng, stats);
 
         if (!rules.length) {
-          if (hit) { fail('G11-reactions', `${MNAME[a]}+${MNAME[b]} fired with no rule registered`); trial = TRIALS; continue; }
-          if (g.mat[i] !== a || g.mat[ni] !== b) { fail('G11-reactions', `${MNAME[a]}+${MNAME[b]} mutated cells without firing`); trial = TRIALS; }
+          if (hit) { fail('G12-reactions', `${MNAME[a]}+${MNAME[b]} fired with no rule registered`); trial = TRIALS; continue; }
+          if (g.mat[i] !== a || g.mat[ni] !== b) { fail('G12-reactions', `${MNAME[a]}+${MNAME[b]} mutated cells without firing`); trial = TRIALS; }
           continue;
         }
         if (!hit) continue;
         fires++; totalFires++;
         fired.add(stats.lastRule);
-        if (stats.reactions !== 1) { fail('G11-reactions', `${stats.lastRule}: stats.reactions ${stats.reactions}, expected 1`); trial = TRIALS; continue; }
+        if (stats.reactions !== 1) { fail('G12-reactions', `${stats.lastRule}: stats.reactions ${stats.reactions}, expected 1`); trial = TRIALS; continue; }
 
         const ma = g.mat[i], mb = g.mat[ni];
         if (ma >= MAT_COUNT || mb >= MAT_COUNT) {
-          fail('G11-reactions', `${MNAME[a]}+${MNAME[b]} (${stats.lastRule}) produced invalid material ${Math.max(ma, mb)}`);
+          fail('G12-reactions', `${MNAME[a]}+${MNAME[b]} (${stats.lastRule}) produced invalid material ${Math.max(ma, mb)}`);
           trial = TRIALS; continue;
         }
         const expect = before - stats.destroyed + stats.created;
         if (g.count !== expect || g.count !== g.recount()) {
-          fail('G11-reactions', `${stats.lastRule}: ledger ${before} -> ${g.count}, recount ${g.recount()}, expected ${expect}`);
+          fail('G12-reactions', `${stats.lastRule}: ledger ${before} -> ${g.count}, recount ${g.recount()}, expected ${expect}`);
           trial = TRIALS; continue;
         }
         if (ma === EMPTY || mb === EMPTY) {
-          if (!stats.destroyed) { fail('G11-reactions', `${stats.lastRule}: emptied a cell without accounting for it`); trial = TRIALS; continue; }
+          if (!stats.destroyed) { fail('G12-reactions', `${stats.lastRule}: emptied a cell without accounting for it`); trial = TRIALS; continue; }
         }
         for (const [cell, m] of [[i, ma], [ni, mb]]) {
-          if (!TINTABLE[m] && g.tint[cell] !== 0) { fail('G11-reactions', `${stats.lastRule}: untintable ${MNAME[m]} kept tint ${g.tint[cell]}`); trial = TRIALS; break; }
-          if (LIFE[m] && g.life[cell] !== LIFE[m]) { fail('G11-reactions', `${stats.lastRule}: ${MNAME[m]} has life ${g.life[cell]}, expected ${LIFE[m]}`); trial = TRIALS; break; }
-          if ((g.flags[cell] & F_BLOB) && m !== JELLY) { fail('G11-reactions', `${stats.lastRule}: left F_BLOB on ${MNAME[m]}`); trial = TRIALS; break; }
+          if (!TINTABLE[m] && g.tint[cell] !== 0) { fail('G12-reactions', `${stats.lastRule}: untintable ${MNAME[m]} kept tint ${g.tint[cell]}`); trial = TRIALS; break; }
+          if (LIFE[m] && g.life[cell] !== LIFE[m]) { fail('G12-reactions', `${stats.lastRule}: ${MNAME[m]} has life ${g.life[cell]}, expected ${LIFE[m]}`); trial = TRIALS; break; }
+          if ((g.flags[cell] & F_BLOB) && m !== JELLY) { fail('G12-reactions', `${stats.lastRule}: left F_BLOB on ${MNAME[m]}`); trial = TRIALS; break; }
         }
       }
       if (rules.length && fires === 0) {
-        fail('G11-reactions', `${MNAME[a]}+${MNAME[b]} has ${rules.length} rule(s) but never fired in ${TRIALS} trials`);
+        fail('G12-reactions', `${MNAME[a]}+${MNAME[b]} has ${rules.length} rule(s) but never fired in ${TRIALS} trials`);
       }
     }
   }
 
   for (const r of PAIRS) {
-    if (!fired.has(r.name)) fail('G11-reactions', `rule "${r.name}" (${MNAME[r.a]}+${MNAME[r.b]}) was never exercised`);
+    if (!fired.has(r.name)) fail('G12-reactions', `rule "${r.name}" (${MNAME[r.a]}+${MNAME[r.b]}) was never exercised`);
   }
   // permanence: nothing in the table consumes crystal
   for (let b = 1; b < MAT_COUNT; b++) {
-    for (const r of rulesFor(CRYSTAL, b)) if (r.self !== null && r.self !== CRYSTAL) fail('G11-reactions', `rule "${r.name}" destroys crystal — crystal is meant to be permanent`);
-    for (const r of rulesFor(b, CRYSTAL)) if (r.other !== null && r.other !== CRYSTAL) fail('G11-reactions', `rule "${r.name}" destroys crystal — crystal is meant to be permanent`);
+    for (const r of rulesFor(CRYSTAL, b)) if (r.self !== null && r.self !== CRYSTAL) fail('G12-reactions', `rule "${r.name}" destroys crystal — crystal is meant to be permanent`);
+    for (const r of rulesFor(b, CRYSTAL)) if (r.other !== null && r.other !== CRYSTAL) fail('G12-reactions', `rule "${r.name}" destroys crystal — crystal is meant to be permanent`);
   }
   // jelly is never the `a` side, because step.js never processes an F_BLOB cell
   for (let b = 1; b < MAT_COUNT; b++) {
-    if (rulesFor(JELLY, b).length) fail('G11-reactions', `jelly appears as the driving side in a rule with ${MNAME[b]}; step.js will never run it`);
+    if (rulesFor(JELLY, b).length) fail('G12-reactions', `jelly appears as the driving side in a rule with ${MNAME[b]}; step.js will never run it`);
   }
   return { pairs: pairsWithRules, rules: PAIRS.length, fires: totalFires };
 }
 
-// ------------------------------------------------------------ G12 parity
+// ------------------------------------------------------------ G13 parity
 // The manager swaps step.js's inline react() for applyReaction in one line, so
 // the seven original pairs must behave IDENTICALLY afterwards. Expectations
 // below are transcribed straight from the react() source; if the table drifts
@@ -558,9 +614,9 @@ function gateParity() {
 
   for (const [name, a, ta, b, tb, p, exp] of ORIGINAL) {
     const rules = rulesFor(a, b);
-    if (rules.length !== 1) { fail('G12-parity', `${MNAME[a]}+${MNAME[b]} has ${rules.length} rules, expected exactly 1`); continue; }
-    if (rules[0].name !== name) { fail('G12-parity', `${MNAME[a]}+${MNAME[b]} is now "${rules[0].name}", expected "${name}"`); continue; }
-    if (rules[0].p !== p) { fail('G12-parity', `${name}: probability ${rules[0].p}, original was ${p}`); continue; }
+    if (rules.length !== 1) { fail('G13-parity', `${MNAME[a]}+${MNAME[b]} has ${rules.length} rules, expected exactly 1`); continue; }
+    if (rules[0].name !== name) { fail('G13-parity', `${MNAME[a]}+${MNAME[b]} is now "${rules[0].name}", expected "${name}"`); continue; }
+    if (rules[0].p !== p) { fail('G13-parity', `${name}: probability ${rules[0].p}, original was ${p}`); continue; }
     let ok = false;
     for (let trial = 0; trial < 800 && !ok; trial++) {
       g.reset();
@@ -571,12 +627,12 @@ function gateParity() {
       ok = true;
       for (const [cell, key] of [[i, 'i'], [ni, 'ni']]) {
         const [m, tint, life] = exp[key];
-        if (g.mat[cell] !== m) fail('G12-parity', `${name}: ${key} is ${MNAME[g.mat[cell]]}, original produced ${MNAME[m]}`);
-        if (g.tint[cell] !== tint) fail('G12-parity', `${name}: ${key} tint ${g.tint[cell]}, original produced ${tint}`);
-        if (life && g.life[cell] !== life) fail('G12-parity', `${name}: ${key} life ${g.life[cell]}, original produced ${life}`);
+        if (g.mat[cell] !== m) fail('G13-parity', `${name}: ${key} is ${MNAME[g.mat[cell]]}, original produced ${MNAME[m]}`);
+        if (g.tint[cell] !== tint) fail('G13-parity', `${name}: ${key} tint ${g.tint[cell]}, original produced ${tint}`);
+        if (life && g.life[cell] !== life) fail('G13-parity', `${name}: ${key} life ${g.life[cell]}, original produced ${life}`);
       }
     }
-    if (!ok) fail('G12-parity', `${name} never fired in 800 trials`);
+    if (!ok) fail('G13-parity', `${name} never fired in 800 trials`);
   }
 
   // Lock the whole pair set, so a new rule cannot silently alter an old board.
@@ -586,12 +642,12 @@ function gateParity() {
   ].sort();
   const actual = PAIRS.map((r) => `${MNAME[r.a]}+${MNAME[r.b]}`).sort();
   if (actual.join(',') !== expected.join(',')) {
-    fail('G12-parity', `pair set changed:\n      have ${actual.join(' ')}\n      want ${expected.join(' ')}`);
+    fail('G13-parity', `pair set changed:\n      have ${actual.join(' ')}\n      want ${expected.join(' ')}`);
   }
   return { pairs: actual.length };
 }
 
-// -------------------------------------------------- G13 reactions in anger
+// -------------------------------------------------- G14 reactions in anger
 // The table above is exercised in a vacuum. This one runs it through the real
 // step loop with blobs present, which is where an F_BLOB cell turning into
 // water is either handled or a source of orphans.
@@ -611,15 +667,15 @@ function gateChemLive() {
   const jelly0 = blobs.cellCount;
   // No fresh drops: the whole point is to watch the jelly that is already here
   // get eaten, so the cell count has to be a clean before/after.
-  const err = soak(s, Math.min(TICKS, 900), { chem: true });
-  if (err) return fail('G13-chem-live', err);
-  if (stats.reactions === 0) fail('G13-chem-live', 'no reaction fired in a board built entirely out of reagents');
+  const err = soak(s, TICKS, { chem: true });
+  if (err) return fail('G14-chem-live', err);
+  if (stats.reactions === 0) fail('G14-chem-live', 'no reaction fired in a board built entirely out of reagents');
   const melted = jelly0 - blobs.cellCount;
-  if (melted <= 0) fail('G13-chem-live', 'jelly dropped onto lava and fire lost no cells at all');
+  if (melted <= 0) fail('G14-chem-live', 'jelly dropped onto lava and fire lost no cells at all');
   return { reactions: stats.reactions, blobs: blobs.list().length, melted };
 }
 
-// --------------------------------------------------------------- G14 perf
+// --------------------------------------------------------------- G15 perf
 function gatePerf() {
   const s = scene(7, { cols: 112, rows: 224 });
   const { g, rng, blobs, stats } = s;
@@ -629,7 +685,7 @@ function gatePerf() {
   const t0 = process.hrtime.bigint();
   for (let t = 0; t < N; t++) blobs.step(rng, stats);
   const ms = Number(process.hrtime.bigint() - t0) / 1e6 / N;
-  if (ms > 2) fail('G14-perf', `${ms.toFixed(3)} ms/tick of blob work exceeds the 2 ms budget`);
+  if (ms > 2) fail('G15-perf', `${ms.toFixed(3)} ms/tick of blob work exceeds the 2 ms budget`);
   return { ms, blobs: blobs.list().length, cells: blobs.cellCount };
 }
 
@@ -647,6 +703,7 @@ function runAll() {
   out.fall = gateFall();
   out.wobble = gateWobble();
   out.spread = gateSpread();
+  out.lab = gateLab();
   out.react = gateReactions();
   out.parity = gateParity();
   out.chem = gateChemLive();
@@ -686,13 +743,12 @@ if (!BREAK) {
   if (R.fall) console.log(`  fall      fell ${R.fall.fell} rows, rests at y=${R.fall.rest}`);
   if (R.wobble) console.log(`  wobble    impact ${R.wobble.impact}, ${R.wobble.crossings} oscillations, amp ${R.wobble.amp}`);
   if (R.spread) console.log(`  spread    width ${R.spread.w} under load ${R.spread.load} (q ${R.spread.q})`);
+  if (R.lab) console.log(`  jelly-lab pressure spread the body to ${R.lab.widest}/${R.lab.cols}, chain took ${R.lab.blobCleared} jelly cells`);
   if (R.react) console.log(`  reactions ${R.react.rules} rules over ${R.react.pairs} pairs, ${R.react.fires} fires, ${MAT_COUNT * MAT_COUNT} pairs swept`);
   if (R.parity) console.log(`  parity    ${R.parity.pairs} concrete pairs, all seven originals byte-identical`);
   if (R.chem) console.log(`  chem-live ${R.chem.reactions} reactions live, ${R.chem.melted} jelly cells melted`);
   if (R.perf) console.log(`  perf      ${R.perf.ms.toFixed(3)} ms/tick for ${R.perf.blobs} blobs / ${R.perf.cells} cells`);
 }
-
-void KIND; void STATIC; void F_CLEARING; void STEAM; void FIRE;
 
 if (failures.length) {
   console.log('\nFAIL');

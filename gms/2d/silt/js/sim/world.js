@@ -1,8 +1,9 @@
 import { Grid, COLS, ROWS } from './grid.js';
 import { step, GRAV_DOWN, GRAV_UP } from './step.js';
 import { Clears } from './clears.js';
-import { makePiece, spawnPiece, collides, tryRotate, tryMove, dropDistance, shatter, overflowed } from './pieces.js';
-import { SAND } from './materials.js';
+import { makePiece, spawnPiece, collides, tryRotate, tryMove, dropDistance, shatter, overflowed, forEachCell } from './pieces.js';
+import { SAND, JELLY } from './materials.js';
+import { Blobs } from './blobs.js';
 import { makeRng } from '../core/rng.js';
 
 export const SIM_HZ = 60;
@@ -29,6 +30,7 @@ export class World {
     this.g = new Grid(this.cfg.cols, this.cfg.rows);
     this.rng = makeRng(this.cfg.seed);
     this.clears = new Clears(this.g, { diagonal: this.cfg.diagonal });
+    this.blobs = new Blobs(this.g);
     this.stats = { created: 0, destroyed: 0, reactions: 0, reactionsEnabled: this.cfg.reactions };
 
     this.piece = null;
@@ -72,6 +74,18 @@ export class World {
     this.piece = null;
     if (overflowed(this.g, p)) { this.over = true; return; }
     shatter(this.g, p, this.stats);
+    // A jelly piece is a soft body, not loose grains. A blob is single-tint but
+    // a duo/mixed piece is not, so group by tint and spawn one body per group —
+    // touching same-tint bodies merge themselves.
+    if (p.mat === JELLY) {
+      const byTint = new Map();
+      forEachCell(p, (x, y, tint) => {
+        if (y < 0 || y >= this.g.rows || x < 0 || x >= this.g.cols) return;
+        if (!byTint.has(tint)) byTint.set(tint, []);
+        byTint.get(tint).push({ x, y });
+      });
+      for (const [tint, cells] of byTint) if (cells.length) this.blobs.spawn(cells, tint);
+    }
   }
 
   moveBy(dx) {
@@ -107,6 +121,10 @@ export class World {
     this.ticks++;
     this.t += 1 / SIM_HZ;
 
+    // Blobs move before the cellular step: the grid is authoritative, and a
+    // blob that has already rasterised itself is terrain as far as sand is
+    // concerned.
+    this.blobs.step(this.rng, this.stats);
     step(g, this.rng, this.stats, this.grav);
     this.clears.advance(this.stats);
 
@@ -147,6 +165,7 @@ export class World {
       fallRate: +this.fallRate.toFixed(2),
       cells: this.g.count,
       dissolving: this.clears.dissolving.length,
+      blobs: this.blobs.list().length,
       piece: this.piece ? { key: this.piece.key, x: this.piece.x, y: this.piece.y, rot: this.piece.rot } : null,
       next: this.nextPiece ? this.nextPiece.key : null,
       created: this.stats.created,

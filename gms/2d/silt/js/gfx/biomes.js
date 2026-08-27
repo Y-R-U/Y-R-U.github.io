@@ -10,7 +10,7 @@ export const TINT_SLOTS = 8;   // index 0 unused (0 == untinted), 1..7 usable
 const BASE = {
   empty:   { col: [0, 0, 0],                 props: [0, 0, 0, 0] },
   wall:    { col: [0.048, 0.046, 0.056],     props: [0, 0, 0, 0] },
-  sand:    { col: [0.44, 0.31, 0.16],        props: [0, 0, 0.06, 1.00] },
+  sand:    { col: [0.300, 0.200, 0.115],     props: [0, 0, 0.06, 0.75] },
   water:   { col: [0.030, 0.150, 0.280],        props: [1, 0, 0.55, 0.55] },
   jelly:   { col: [0.260, 0.105, 0.340],        props: [0, 0, 1.00, 0.90] },
   oil:     { col: [0.042, 0.036, 0.060],     props: [1, 0, 0.10, 0.30] },
@@ -29,25 +29,25 @@ export const BIOMES = {
     name: 'dune',
     tints: [
       [0, 0, 0],
-      [0.470, 0.300, 0.115],   // ochre
-      [0.330, 0.120, 0.075],   // terracotta
-      [0.530, 0.480, 0.385],   // bone
-      [0.070, 0.215, 0.235],   // deep teal
-      [0.215, 0.095, 0.200],   // aubergine
-      [0.235, 0.250, 0.125],   // olive
-      [0.420, 0.360, 0.250],
+      [0.400, 0.252, 0.098],   // ochre
+      [0.420, 0.165, 0.105],   // terracotta
+      [0.320, 0.288, 0.232],   // bone
+      [0.090, 0.265, 0.280],   // deep teal
+      [0.310, 0.130, 0.280],   // aubergine
+      [0.230, 0.245, 0.120],   // olive
+      [0.330, 0.282, 0.196],
     ],
     sky: { top: [0.0185, 0.0150, 0.0195], bot: [0.0055, 0.0045, 0.0080] },
-    glow: { col: [0.300, 0.165, 0.075], pos: [0.16, 0.95], amt: 0.62, band: 0.09 },
+    glow: { col: [0.300, 0.170, 0.078], pos: [0.14, 1.08], amt: 0.72, band: 0.09 },
     mote: { col: [1.00, 0.83, 0.52], amt: 0.20 },
     key:  { dir: [-0.50, 0.866], col: [1.38, 1.03, 0.66] },
     fill: { dir: [0.56, 0.50], col: [0.26, 0.38, 0.62] },
-    amb:  [0.155, 0.130, 0.125],
+    amb:  [0.140, 0.114, 0.108],
     rim:  [1.00, 0.80, 0.55],
     emis: [1.70, 1.18, 0.55],
-    surf: { rim: 0.55, spec: 0.90, sss: 0.90, grain: 0.85, refr: 0.038, ao: 0.85, shadow: 0.58, relief: 0.55 },
+    surf: { rim: 0.36, spec: 0.70, sss: 0.75, grain: 0.70, refr: 0.038, ao: 0.85, shadow: 0.58, relief: 0.55 },
     grade: {
-      exposure: 1.06, sat: 1.11, contrast: 1.05, vignette: 0.56, grain: 0.026,
+      exposure: 1.14, sat: 1.06, contrast: 1.16, vignette: 0.60, grain: 0.026,
       bloom: 0.78, threshold: 0.74, knee: 0.42,
       shadowTint: [0.86, 0.94, 1.11], highTint: [1.11, 1.02, 0.87],
     },
@@ -58,12 +58,12 @@ export const BIOMES = {
     name: 'abyss',
     tints: [
       [0, 0, 0],
-      [0.050, 0.330, 0.400],   // cyan
-      [0.180, 0.105, 0.420],   // violet
-      [0.420, 0.080, 0.235],   // magenta
-      [0.065, 0.350, 0.195],   // jade
-      [0.045, 0.115, 0.360],   // deep blue
-      [0.440, 0.230, 0.075],   // coral
+      [0.055, 0.340, 0.410],   // cyan
+      [0.235, 0.140, 0.520],   // violet
+      [0.470, 0.095, 0.265],   // magenta
+      [0.075, 0.360, 0.205],   // jade
+      [0.075, 0.180, 0.520],   // deep blue
+      [0.470, 0.250, 0.085],   // coral
       [0.330, 0.420, 0.470],
     ],
     mats: { sand: [0.18, 0.24, 0.28], ash: [0.07, 0.09, 0.11], wall: [0.020, 0.032, 0.045] },
@@ -72,12 +72,12 @@ export const BIOMES = {
     mote: { col: [0.50, 1.00, 1.00], amt: 0.42 },
     key:  { dir: [0.30, 0.954], col: [0.52, 0.94, 1.16] },
     fill: { dir: [-0.40, -0.917], col: [0.58, 0.18, 0.62] },
-    amb:  [0.045, 0.085, 0.115],
+    amb:  [0.042, 0.078, 0.104],
     rim:  [0.45, 0.96, 1.12],
     emis: [0.55, 1.55, 1.65],
-    surf: { rim: 0.85, spec: 1.05, sss: 1.35, grain: 0.70, refr: 0.052, ao: 0.90, shadow: 0.50, relief: 0.50 },
+    surf: { rim: 0.60, spec: 1.05, sss: 1.35, grain: 0.70, refr: 0.052, ao: 0.90, shadow: 0.50, relief: 0.50 },
     grade: {
-      exposure: 1.12, sat: 1.18, contrast: 1.06, vignette: 0.68, grain: 0.024,
+      exposure: 1.18, sat: 1.06, contrast: 1.10, vignette: 0.70, grain: 0.024,
       bloom: 1.05, threshold: 0.60, knee: 0.40,
       shadowTint: [0.80, 0.98, 1.22], highTint: [0.92, 1.05, 1.12],
     },
@@ -88,12 +88,12 @@ export const BIOMES = {
     name: 'kiln',
     tints: [
       [0, 0, 0],
-      [0.480, 0.185, 0.050],   // ember
-      [0.410, 0.300, 0.095],   // brass
-      [0.095, 0.085, 0.090],   // char
-      [0.345, 0.055, 0.050],   // blood
-      [0.470, 0.435, 0.395],   // ash white
-      [0.395, 0.395, 0.100],   // sulphur
+      [0.520, 0.205, 0.055],   // ember
+      [0.420, 0.310, 0.100],   // brass
+      [0.150, 0.135, 0.140],   // char
+      [0.430, 0.075, 0.065],   // blood
+      [0.400, 0.370, 0.335],   // ash white
+      [0.380, 0.380, 0.100],   // sulphur
       [0.230, 0.150, 0.270],
     ],
     mats: { sand: [0.22, 0.145, 0.095], wall: [0.055, 0.038, 0.034] },
@@ -102,12 +102,12 @@ export const BIOMES = {
     mote: { col: [1.00, 0.55, 0.18], amt: 0.50 },
     key:  { dir: [0.45, 0.893], col: [1.46, 1.06, 0.72] },
     fill: { dir: [0.0, -1.0], col: [1.12, 0.34, 0.08] },
-    amb:  [0.135, 0.072, 0.048],
+    amb:  [0.120, 0.066, 0.046],
     rim:  [1.22, 0.56, 0.18],
     emis: [2.05, 0.92, 0.28],
-    surf: { rim: 0.62, spec: 0.85, sss: 1.00, grain: 0.90, refr: 0.040, ao: 0.82, shadow: 0.62, relief: 0.58 },
+    surf: { rim: 0.42, spec: 0.85, sss: 1.00, grain: 0.90, refr: 0.040, ao: 0.82, shadow: 0.62, relief: 0.58 },
     grade: {
-      exposure: 1.02, sat: 1.12, contrast: 1.08, vignette: 0.62, grain: 0.030,
+      exposure: 1.12, sat: 1.02, contrast: 1.14, vignette: 0.66, grain: 0.030,
       bloom: 0.98, threshold: 0.66, knee: 0.42,
       shadowTint: [0.95, 0.90, 1.02], highTint: [1.16, 0.98, 0.79],
     },

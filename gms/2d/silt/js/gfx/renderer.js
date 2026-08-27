@@ -12,7 +12,7 @@ import {
   makeFS, makeTarget, resizeTarget, bindTarget, disposeTarget,
   makeDataTexture, uploadData, floatTargetsOK, makeProgram,
 } from './shaders/gl.js';
-import { BG_FS, RESOLVE_FS, OCC_DOWN_FS, OCC_BLUR_FS, LIGHT_FS } from './shaders/field.js';
+import { BG_FS, RESOLVE_FS, DENS_X_FS, OCC_DOWN_FS, OCC_BLUR_FS, LIGHT_FS } from './shaders/field.js';
 import { PART_VS, PART_FS } from './shaders/post.js';
 import { createPostFX } from './postfx.js';
 import { BIOMES, BIOME_NAMES, bakeBiome } from './biomes.js';
@@ -24,7 +24,7 @@ import { DISSOLVE_TICKS } from '../sim/clears.js';
 export { BUDGETS, BIOME_NAMES };
 
 const TIERS = {
-  high: { R: 2, SIG: 0.78, refract: true, mips: 3, motes: 900, texel: 2.2, maxSS: 4 },
+  high: { R: 2, SIG: 0.80, refract: true, mips: 3, motes: 900, texel: 2.2, maxSS: 4 },
   low:  { R: 1, SIG: 0.60, refract: false, mips: 2, motes: 220, texel: 3.2, maxSS: 2 },
 };
 
@@ -67,6 +67,7 @@ export async function createRenderer(canvas, opts = {}) {
 
   /* ------------------------------------------------------------ programs */
   const pBg = makeFS(gl, BG_FS, 'bg');
+  const pDensX = makeFS(gl, DENS_X_FS, 'dens-x');
   const pOccDown = makeFS(gl, OCC_DOWN_FS, 'occ-down');
   const pOccBlur = makeFS(gl, OCC_BLUR_FS, 'occ-blur');
   const pMotes = makeProgram(gl, PART_VS, PART_FS, 'motes');
@@ -93,11 +94,14 @@ export async function createRenderer(canvas, opts = {}) {
   const fieldT = makeTarget(gl, 4, 4, { float, attachments: 2 });
   const occA = makeTarget(gl, 4, 4, { float });
   const occB = makeTarget(gl, 4, 4, { float });
+  const smA = makeTarget(gl, 4, 4, { float });
+  const smB = makeTarget(gl, 4, 4, { float });
   let stateTex = makeDataTexture(gl, cols, rows);
   let sb = new StateBuffer(cols, rows);
   let motes = new Motes(gl, TIERS[tierName].motes);
 
   let rect = [0, 0, 1, 1];   // board in screen uv (y up)
+  let superSample = 2;
 
   function layout() {
     const T = TIERS[tierName];
@@ -111,6 +115,9 @@ export async function createRenderer(canvas, opts = {}) {
     const pxPerCell = bw / cols;
     const ss = Math.max(2, Math.min(T.maxSS, Math.round(pxPerCell / T.texel)));
     resizeTarget(gl, fieldT, cols * ss, rows * ss);
+    resizeTarget(gl, smA, cols * ss, rows * ss);
+    resizeTarget(gl, smB, cols * ss, rows * ss);
+    superSample = ss;
     resizeTarget(gl, occA, cols, rows);
     resizeTarget(gl, occB, cols, rows);
     resizeTarget(gl, bgT, vw, vh);
@@ -178,7 +185,7 @@ export async function createRenderer(canvas, opts = {}) {
 
     // a fresh chain fires a one-frame bloom-fed flash
     if (sb.clearMaxT >= DISSOLVE_TICKS && lastChainMax < DISSOLVE_TICKS) {
-      flash = [B.emis[0] * 0.10, B.emis[1] * 0.10, B.emis[2] * 0.10, 0.26];
+      flash = [B.emis[0] * 0.08, B.emis[1] * 0.08, B.emis[2] * 0.08, 0.11];
     }
     lastChainMax = sb.clearMaxT;
     flash[3] = Math.max(0, flash[3] - dt * 2.4);
@@ -218,9 +225,19 @@ export async function createRenderer(canvas, opts = {}) {
       .u4fv('u_matProp[0]', baked.matProp);
     drawTri(); passes++;
 
-    /* 3 — occlusion field */
+    /* 3 — silhouette blur. Separable, so the radius can be as wide as the look
+           needs without a 49-tap kernel in the resolve pass. */
+    const sr = 1.15 * superSample;
+    bindTarget(gl, smB);
+    pDensX.use().tex('u_src', 0, fieldT.texs[0]).u2f('u_dir', sr / fieldT.w, 0);
+    drawTri(); passes++;
+    bindTarget(gl, smA);
+    pOccBlur.use().tex('u_src', 0, smB.tex).u2f('u_dir', 0, sr / fieldT.h);
+    drawTri(); passes++;
+
+    /* 4 — occlusion field */
     bindTarget(gl, occA);
-    pOccDown.use().tex('u_src', 0, fieldT.texs[0]).u2f('u_texel', 1 / fieldT.w, 1 / fieldT.h);
+    pOccDown.use().tex('u_src', 0, smA.tex).u2f('u_texel', 1 / fieldT.w, 1 / fieldT.h);
     drawTri(); passes++;
     pOccBlur.use();
     bindTarget(gl, occB);
@@ -230,7 +247,7 @@ export async function createRenderer(canvas, opts = {}) {
     pOccBlur.tex('u_src', 0, occB.tex).u2f('u_dir', 0, 1.7 / occA.h);
     drawTri(); passes++;
 
-    /* 4 — lighting */
+    /* 5 — lighting */
     const S = B.surf;
     bindTarget(gl, post.scene);
     pLight.use()
@@ -238,6 +255,7 @@ export async function createRenderer(canvas, opts = {}) {
       .tex('u_aux', 1, fieldT.texs[1])
       .tex('u_occ', 2, occA.tex)
       .tex('u_bg', 3, bgT.tex)
+      .tex('u_smooth', 4, smA.tex)
       .u2f('u_res', vw, vh).u2f('u_grid', cols, rows)
       .u4f('u_rect', rect[0], rect[1], rect[2], rect[3])
       .u2f('u_ftex', 1 / fieldT.w, 1 / fieldT.h)
@@ -254,7 +272,7 @@ export async function createRenderer(canvas, opts = {}) {
       .u1f('u_aoAmt', S.ao).u1f('u_shadowAmt', S.shadow).u1f('u_relief', S.relief);
     drawTri(); passes++;
 
-    /* 5 — dissolve motes, additive on top of the lit scene */
+    /* 6 — dissolve motes, additive on top of the lit scene */
     if (motes.alive) {
       motes.upload(rect, dpr);
       gl.enable(gl.BLEND);
@@ -267,7 +285,7 @@ export async function createRenderer(canvas, opts = {}) {
       passes++;
     }
 
-    /* 6 — post */
+    /* 7 — post */
     const G = B.grade;
     const sh = o.shake || 0;
     shakeSeed += dt * 47;
@@ -308,8 +326,8 @@ export async function createRenderer(canvas, opts = {}) {
   }
 
   function dispose() {
-    for (const t of [bgT, fieldT, occA, occB]) disposeTarget(gl, t);
-    for (const p of [pBg, pOccDown, pOccBlur, pMotes, pResolve, pLight]) p && p.dispose();
+    for (const t of [bgT, fieldT, occA, occB, smA, smB]) disposeTarget(gl, t);
+    for (const p of [pBg, pDensX, pOccDown, pOccBlur, pMotes, pResolve, pLight]) p && p.dispose();
     post.dispose();
     motes.dispose();
     gl.deleteTexture(stateTex);
