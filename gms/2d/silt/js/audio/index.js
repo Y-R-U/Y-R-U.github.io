@@ -27,6 +27,10 @@ export const TRACKS = {
 const MAX_VOICES = 28;
 
 export function createAudio(opts = {}) {
+  // A host may hand us its own context (the offline harness does exactly this,
+  // and a game that already owns one can too). If it does, unlocking it is the
+  // host's business — we skip the gesture dance and trust it.
+  const hosted = !!opts.context;
   let ctx = null;
   let ready = false;      // unlocked and running
   let dead = false;       // no Web Audio at all — permanent no-op
@@ -93,19 +97,24 @@ export function createAudio(opts = {}) {
     try {
       if (!ctx) {
         const AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) { dead = true; return false; }
-        ctx = new AC({ latencyHint: 'interactive' });
+        if (!hosted && !AC) { dead = true; return false; }
+        ctx = hosted ? opts.context : new AC({ latencyHint: 'interactive' });
         build();
-        try {
-          document.addEventListener('visibilitychange', onVisibility, { passive: true });
-        } catch (e) { /* no document — fine */ }
+        if (!hosted) {
+          try {
+            document.addEventListener('visibilitychange', onVisibility, { passive: true });
+          } catch (e) { /* no document — fine */ }
+        }
       }
-      if (ctx.state !== 'running') { try { await ctx.resume(); } catch (e) {} }
-      // iOS wants an actual buffer played from inside the gesture
-      const b = ctx.createBuffer(1, 1, ctx.sampleRate);
-      const s = ctx.createBufferSource();
-      s.buffer = b; s.connect(ctx.destination); s.start(0);
-      ready = ctx.state === 'running';
+      if (hosted) { ready = true; }
+      else {
+        if (ctx.state !== 'running') { try { await ctx.resume(); } catch (e) {} }
+        // iOS wants an actual buffer played from inside the gesture
+        const b = ctx.createBuffer(1, 1, ctx.sampleRate);
+        const s = ctx.createBufferSource();
+        s.buffer = b; s.connect(ctx.destination); s.start(0);
+        ready = ctx.state === 'running';
+      }
       if (ready && pending !== null) {
         const id = pending; pending = null;
         music(id, { fade: 1.2 });

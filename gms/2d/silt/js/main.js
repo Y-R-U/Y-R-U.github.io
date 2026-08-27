@@ -113,6 +113,7 @@ function startAttract() {
   attractBot = new Bot(world);
   bot = null;
   state = 'attract';
+  if (window.SiltCloud && window.SiltCloud.setPlaying) window.SiltCloud.setPlaying(false);
   if (R.setBiome) R.setBiome((mode.worldCfg && mode.worldCfg.biome) || save.settings.biome || 'dune');
   UI && UI.show('attract');
   AUDIO.music && AUDIO.music((mode.worldCfg && mode.worldCfg.biome) || 'dune', { fade: 1200 });
@@ -125,6 +126,7 @@ function startGame(id, opts = {}) {
   bot = opts.auto ? new Bot(world) : null;
   attractBot = null;
   state = 'play';
+  if (window.SiltCloud && window.SiltCloud.setPlaying) window.SiltCloud.setPlaying(true);
   if (R.setBiome) R.setBiome((mode.worldCfg && mode.worldCfg.biome) || save.settings.biome || 'dune');
   UI && UI.show('hud');
   AUDIO.music && AUDIO.music((mode.worldCfg && mode.worldCfg.biome) || 'dune', { fade: 800 });
@@ -132,6 +134,7 @@ function startGame(id, opts = {}) {
 
 function endGame() {
   state = 'over';
+  if (window.SiltCloud && window.SiltCloud.setPlaying) window.SiltCloud.setPlaying(false);
   const isBest = save.recordGame(mode.id, world.score, world.chains, world.cellsCleared);
   AUDIO.sfx('fail');
   if (window.SiltCloud && window.SiltCloud.gameFinished) window.SiltCloud.gameFinished();

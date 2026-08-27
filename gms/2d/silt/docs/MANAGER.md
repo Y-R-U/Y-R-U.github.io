@@ -25,10 +25,10 @@ step, no CDN, no dependencies.
 |---|---|---|
 | manager | `js/main.js`, `js/core/**`, `js/sim/{grid,step,clears,pieces,world,materials}.js`, `tools/{sim,boot,cdp}.mjs`, `docs/**`, git | P0+P1 done |
 | A renderer | `js/gfx/**`, `dev/gfx.html`, `tools/gfx_shot.mjs` | running |
-| B shell/ui | `index.html`, `css/**`, `js/ui/**` | not started |
+| B shell/ui | `index.html`, `css/**`, `js/ui/**` | running |
 | C modes | `js/modes/**`, `js/data/**`, `tools/modesim.mjs` | running |
 | D jelly | `js/sim/blobs.js`, `js/sim/reactions.js`, `tools/jellysim.mjs` | running |
-| E audio | `js/audio/**`, `assets/audio/**` | running |
+| E audio | `js/audio/**`, `assets/audio/**` | **done** |
 
 ## Gates
 

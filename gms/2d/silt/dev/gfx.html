@@ -131,6 +131,11 @@ const SCENES = {
     for (let k = 0; k < 22; k++) w.tick();
   },
 
+  // V-FLIP ORACLE. Material in the bottom 10 rows and nowhere else. tools/gfx_shot.mjs
+  // --check diffs this against `empty` and asserts the lit pixels land at the BOTTOM
+  // of the image. Do not delete: the board was rendered upside down once already.
+  vflip: (w) => { w.g.fill(0, w.g.rows - 10, w.g.cols, 10, SAND, 1); },
+
   empty: () => {},
 };
 
@@ -147,7 +152,6 @@ function build(name) {
   const seed = +(P.get('seed') || 7);
   world = new World({ seed, tints: 5, tintMode: P.get('tint') || 'mono' });
   (SCENES[name] || SCENES.dune)(world, mulberry(seed * 2654435761 % 2147483647));
-  window.__state = world.snapshot();
   paint();
 }
 

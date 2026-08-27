@@ -17,25 +17,25 @@ import { makeScorer } from './score.js';
 // whole submerged region to a height every rise step is both correct and
 // self-healing: it refills the holes a chain punched, without special-casing.
 //
-// Water is laid in coarse coloured blocks, never a uniform row — a single-tint
-// row spans left to right by definition and would clear itself the instant it
-// appeared, which is exactly the failure that killed the first version.
+// Water colour is i.i.d. per 2x2 cluster, never in wide coherent bands. See
+// tideTint() — that one line is what stops the tide paying for itself.
 
 const S = new WeakMap();
 
-const CFG = {
+export const TIDE_CFG = {
   topMargin: 10,        // drown when the waterline gets this close to the ceiling
   riseBase: 1.15,       // rows per second at t=0
   riseAccel: 0.006,     // rows per second, per second
   riseMax: 2.6,
-  segW: 19,             // width of a colour block, in cells
-  bandH: 13,            // height of a colour block, in rows
+  segW: 2,              // width of a tide colour cluster, in cells
+  bandH: 2,             // height of a tide colour cluster, in rows
   drainPerRow: 1.35,    // rows of tide bought by clearing one row's worth of water
   buoyEvery: 3,         // ticks between buoyancy passes
   buoySamples: 30,      // cells sampled per pass — O(1), not a scan
   buoyChance: 0.34,
   waterWeight: 0.45,    // water cells score less than sand cells
 };
+const CFG = TIDE_CFG;
 
 function h2(a, b, seed) {
   let h = (seed ^ 0x9e3779b9) >>> 0;
@@ -45,12 +45,19 @@ function h2(a, b, seed) {
   return (h ^ (h >>> 15)) >>> 0;
 }
 
-/** Colour of the tide at (x,y). Adjacent blocks differ by construction. */
+/**
+ * Colour of the tide at (x,y).
+ *
+ * i.i.d. per small cluster, NOT in coherent bands. This is the load-bearing
+ * choice in the mode. Site percolation on the 8-connected lattice turns over at
+ * p ~= 0.407; three tints put each colour at 0.333, safely below it, so a water
+ * body on its own almost never spans and the tide cannot pay for itself. Wide
+ * coloured bands were the first version and they measured at 100 chains a game
+ * — the tide drained itself faster than it rose and no run ever ended.
+ */
 function tideTint(x, y, tints, seed) {
   const sx = (x / CFG.segW) | 0, by = (y / CFG.bandH) | 0;
-  const base = sx + (h2(0, by, seed) % tints);
-  const jitter = (h2(sx, by, seed) % 11) === 0 ? 1 : 0;   // rare, deliberate
-  return 1 + ((base + jitter) % tints);
+  return 1 + (h2(sx, by, seed) % tints);
 }
 
 function floodTo(world, st) {

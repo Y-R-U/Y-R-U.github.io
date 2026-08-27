@@ -84,8 +84,9 @@ layout(location = 0) out vec4 oField;   // rgb = voted colour, a = density
 layout(location = 1) out vec4 oAux;     // fluid, emissive, translucent, dissolve flash
 
 void main() {
-  // board space, y measured UP from the floor; texture row 0 is the ceiling
-  vec2 cell = vec2(v_uv.x, 1.0 - v_uv.y) * u_grid;
+  // board space, y measured UP from the floor; texture row 0 is the ceiling,
+  // so the row index counts back down from rows-1.
+  vec2 cell = v_uv * u_grid;
   ivec2 ic = ivec2(floor(cell));
   ivec2 gi = ivec2(u_grid);
 
@@ -215,7 +216,14 @@ void main() {
   vec2 e = u_ftex * 1.35;
   float gx = dens(bc + vec2(e.x, 0.0)) - dens(bc - vec2(e.x, 0.0));
   float gy = dens(bc + vec2(0.0, e.y)) - dens(bc - vec2(0.0, e.y));
-  vec3 n = normalize(vec3(-gx, -gy, u_relief * (0.20 + 0.80 * (1.0 - abs(d - 0.5) * 1.2))));
+  vec3 nS = normalize(vec3(-gx, -gy, u_relief * 0.85));
+
+  vec2 oe = vec2(2.6) / vec2(u_grid);
+  float ox = texture(u_occ, clamp(bc + vec2(oe.x, 0.0), 0.0, 1.0)).r - texture(u_occ, clamp(bc - vec2(oe.x, 0.0), 0.0, 1.0)).r;
+  float oy = texture(u_occ, clamp(bc + vec2(0.0, oe.y), 0.0, 1.0)).r - texture(u_occ, clamp(bc - vec2(0.0, oe.y), 0.0, 1.0)).r;
+  vec3 nB = normalize(vec3(-ox * 2.6, -oy * 2.6, 0.55));
+
+  vec3 n = normalize(nS * (0.35 + 0.65 * ss(0.85, 0.35, d)) + nB * 1.05);
 
   float fluid = clamp(ax.x, 0.0, 1.0);
   float emis  = clamp(ax.y, 0.0, 1.0);
@@ -223,14 +231,15 @@ void main() {
   float grain = clamp(1.0 - fluid - trans, 0.0, 1.0);
 
   // ---- grain, in CELL space so it belongs to the board, not to the screen
-  vec2 cs = vec2(bc.x, 1.0 - bc.y) * u_grid;
-  float gn = fbm3(cs * 0.62) * 0.62 + vn(cs * 2.35) * 0.38;
-  float gn2 = vn(cs * 5.5 + 31.7);
-  vec2 gd = vec2(vn(cs * 2.35 + 7.1) - gn2, vn(cs * 2.35 + 19.3) - gn2);
-  n = normalize(n + vec3(gd * u_grainAmt * grain * 2.4, 0.0));
+  vec2 cs = bc * u_grid;
+  float gn = fbm3(cs * 0.155) * 0.55 + vn(cs * 0.62) * 0.30 + vn(cs * 1.55) * 0.15;
+  float gn2 = vn(cs * 1.9 + 31.7);
+  float gc = vn(cs * 0.62 + 3.3);
+  vec2 gd = vec2(vn(cs * 0.62 + 7.1) - gc, vn(cs * 0.62 + 19.3) - gc);
+  n = normalize(n + vec3(gd * u_grainAmt * grain * 0.85, 0.0));
 
   vec3 albedo = f.rgb;
-  albedo *= 1.0 - grain * u_grainAmt * (0.55 - gn) * 1.15;
+  albedo *= 1.0 + grain * u_grainAmt * (gn - 0.5) * 0.85;
 
   // ---- rig
   vec3 L = normalize(vec3(u_keyDir, 0.72));
@@ -256,7 +265,7 @@ void main() {
   vec3 H = normalize(L + V);
   float spec = pow(max(dot(n, H), 0.0), shin) * mix(1.0, 0.16, rough);
   // powder sparkle: a few grains catch the key light outright
-  spec += grain * pow(max(gn2 - 0.72, 0.0) * 3.4, 2.0) * ndl * 0.55;
+  spec += grain * pow(max(gn2 - 0.80, 0.0) * 5.0, 3.0) * ndl * ndl * 0.30;
   col += u_keyCol * spec * u_specAmt;
 
   // ---- fresnel rim, strongest on liquids and glass

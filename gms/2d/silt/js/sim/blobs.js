@@ -665,8 +665,18 @@ function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 /**
  * Structural audit — used by tools/jellysim.mjs, and cheap enough for a debug
  * overlay. @returns an error string, or null when the world is consistent.
+ *
+ * Two modes, because the two directions are true at different moments:
+ *
+ *  - STRICT (default) also asserts blob -> grid, i.e. every cell a blob lists is
+ *    still its jelly. That holds only immediately after `blobs.step()`. Later in
+ *    the same tick a chain can dissolve a jelly cell or fire can melt one, and
+ *    the blob will not know until it reconciles at the top of the next tick.
+ *  - `gridOnly` asserts grid -> blob, which is true at every instant: no cell may
+ *    carry F_BLOB without a live blob that lists it, and no two blobs may claim
+ *    the same cell. That is the invariant the rasteriser could actually break.
  */
-export function auditBlobs(blobs, label = 'blobs') {
+export function auditBlobs(blobs, label = 'blobs', gridOnly = false) {
   const g = blobs.g;
   const owner = new Map();
   for (const b of blobs.list()) {
@@ -679,12 +689,17 @@ export function auditBlobs(blobs, label = 'blobs') {
       if (i < 0 || i >= g.n) return `${label}: blob ${b.id} cell ${i} out of range`;
       if (seen.has(i)) return `${label}: blob ${b.id} lists cell ${i} twice`;
       seen.add(i);
-      if (owner.has(i)) return `${label}: cell ${i} claimed by blobs ${owner.get(i)} and ${b.id}`;
-      owner.set(i, b.id);
+      const held = g.mat[i] === JELLY && (g.flags[i] & F_BLOB) !== 0 && g.blob[i] === b.id;
+      if (held) {
+        if (owner.has(i)) return `${label}: cell ${i} claimed by blobs ${owner.get(i)} and ${b.id}`;
+        owner.set(i, b.id);
+        if (g.tint[i] !== b.tint) return `${label}: blob ${b.id} cell ${i} tint ${g.tint[i]} != ${b.tint}`;
+        continue;
+      }
+      if (gridOnly) continue;      // the world took it back; reconcile will drop it
       if (g.mat[i] !== JELLY) return `${label}: blob ${b.id} cell ${i} is material ${g.mat[i]}, not jelly`;
       if ((g.flags[i] & F_BLOB) === 0) return `${label}: blob ${b.id} cell ${i} lacks F_BLOB`;
-      if (g.blob[i] !== b.id) return `${label}: blob ${b.id} cell ${i} says blob ${g.blob[i]}`;
-      if (g.tint[i] !== b.tint) return `${label}: blob ${b.id} cell ${i} tint ${g.tint[i]} != ${b.tint}`;
+      return `${label}: blob ${b.id} cell ${i} says blob ${g.blob[i]}`;
     }
   }
   for (let i = 0; i < g.n; i++) {

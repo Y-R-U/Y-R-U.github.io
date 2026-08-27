@@ -105,6 +105,33 @@ function extents(g, b) {
   return { minx, maxx, miny, maxy, w: maxx - minx + 1, h: maxy - miny + 1 };
 }
 
+/**
+ * The neighbour-visiting loop from step.js, verbatim in shape — left, right,
+ * down, up, one reaction per cell per tick, F_CLEARING and F_BLOB cells never
+ * drive. Only the `react()` call is swapped for `applyReaction`, which is
+ * exactly the one-line change the manager will make. The chemistry itself is
+ * the shipping module, not a copy.
+ */
+const NB = [-1, 1];
+function chemPass(g, rng, stats) {
+  const cols = g.cols, rows = g.rows;
+  for (let y = rows - 1; y >= 0; y--) {
+    for (let x = 0; x < cols; x++) {
+      const i = y * cols + x;
+      if (g.mat[i] === EMPTY) continue;
+      if (g.flags[i] & (F_CLEARING | F_BLOB)) continue;
+      let r = false;
+      for (let n = 0; n < 2 && !r; n++) {
+        const nx = x + NB[n];
+        if (nx < 0 || nx >= cols) continue;
+        r = applyReaction(g, i, i + NB[n], rng, stats);
+      }
+      if (!r && y + 1 < rows) r = applyReaction(g, i, i + cols, rng, stats);
+      if (!r && y - 1 >= 0) applyReaction(g, i, i - cols, rng, stats);
+    }
+  }
+}
+
 /** A board with a floor, a slab of terrain and a stream of jelly drops. */
 function scene(seed, o = {}) {
   const cols = o.cols || 64, rows = o.rows || 96;
@@ -141,10 +168,16 @@ function soak(s, ticks, o = {}) {
     if (o.arm && o.arm(t, s, blobs, g)) { /* the falsification arm ran */ }
 
     blobs.step(rng, stats);
+    // Immediately after the soft-body tick the blob list and the grid agree
+    // exactly, so the strict audit belongs HERE and nowhere else.
+    err = auditBlobs(blobs, `tick ${t} post-blob`);
+    if (err) return err;
+
+    if (o.chem) chemPass(g, rng, stats);
     step(g, rng, stats);
     if (clears) { clears.advance(stats); if (t % 3 === 0) clears.detect(); }
 
-    err = checkGrid(g, `tick ${t}`) || auditBlobs(blobs, `tick ${t}`);
+    err = checkGrid(g, `tick ${t}`) || auditBlobs(blobs, `tick ${t}`, true);
     if (err) return err;
   }
   return null;
@@ -197,7 +230,7 @@ function runSeeded(seed, ticks) {
   s.g.fill(46, s.floor - 3, 6, 3, LAVA);
   s.g.wakeAll();
   if (BREAK === 'rng') s.rng.next = Math.random;
-  soak(s, ticks, { spawnEvery: 60, rainEvery: 20, maxBlobs: 5, tints: 2 });
+  soak(s, ticks, { spawnEvery: 60, rainEvery: 20, maxBlobs: 5, tints: 2, chem: true });
   return { g: hashGrid(s.g), b: hashBlobs(s.blobs), cells: s.g.count };
 }
 
@@ -250,6 +283,10 @@ function gateMerge() {
 function gateSplit() {
   const s = scene(41, { terrain: false });
   const { g, rng, blobs } = s;
+  // Merging is off for this gate: two halves of one body are same-tint and
+  // touching by definition, so with it on they would correctly fuse straight
+  // back and the split would be invisible. G5 owns merging.
+  blobs.merging = false;
   const id = blobs.spawn(blobCells(g, 10, s.floor - 6, 30, 6), 1);
   for (let t = 0; t < 6; t++) { blobs.step(rng, s.stats); step(g, rng, s.stats); }
   const before = blobs.get(id);
@@ -268,7 +305,7 @@ function gateSplit() {
   if (BREAK === 'split') blobs._split = () => {};
 
   blobs.step(rng, s.stats); step(g, rng, s.stats);
-  const e = checkGrid(g, 'split') || auditBlobs(blobs, 'split');
+  const e = checkGrid(g, 'split') || auditBlobs(blobs, 'split');   // strict: post-blob
   if (e) return fail('G6-split', e);
   const live = blobs.list();
   if (live.length !== 2) return fail('G6-split', `cut body became ${live.length} blobs, expected 2`);
@@ -305,11 +342,13 @@ function gateDissolve() {
   let froze = false;
   for (let t = 0; t < DISSOLVE_TICKS + 20; t++) {
     blobs.step(rng, stats);
+    let e = auditBlobs(blobs, `dissolve t${t} post-blob`);
+    if (e) return fail('G7-dissolve', e);
     const b = blobs.get(id);
     if (b && b.frozen) froze = true;
     clears.advance(stats);
     step(g, rng, stats);
-    const e = checkGrid(g, `dissolve t${t}`) || auditBlobs(blobs, `dissolve t${t}`);
+    e = checkGrid(g, `dissolve t${t}`) || auditBlobs(blobs, `dissolve t${t}`, true);
     if (e) return fail('G7-dissolve', e);
   }
   if (!froze) fail('G7-dissolve', 'the blob never registered as frozen while dissolving');
@@ -405,7 +444,6 @@ function gateSpread() {
   if (b.load <= 0.02) return fail('G10-spread', `no load measured under a sand column (load ${b.load.toFixed(3)})`);
   if (b.q >= qBefore - 0.03) return fail('G10-spread', `load did not squash the body (q ${qBefore.toFixed(3)} -> ${b.q.toFixed(3)})`);
   if (after.w <= before.w + 2) return fail('G10-spread', `load did not spread the body (w ${before.w} -> ${after.w})`);
-  if (b.n !== before.w * 0 + b.n) fail('G10-spread', 'impossible');
   return { w: `${before.w}->${after.w}`, q: `${qBefore.toFixed(2)}->${b.q.toFixed(2)}`, load: +b.load.toFixed(2) };
 }
 
@@ -496,12 +534,69 @@ function gateReactions() {
   return { pairs: pairsWithRules, rules: PAIRS.length, fires: totalFires };
 }
 
-// -------------------------------------------------- G12 reactions in anger
-// The table above is exercised in a vacuum. This one runs it inside the real
+// ------------------------------------------------------------ G12 parity
+// The manager swaps step.js's inline react() for applyReaction in one line, so
+// the seven original pairs must behave IDENTICALLY afterwards. Expectations
+// below are transcribed straight from the react() source; if the table drifts
+// from it, this goes red rather than a seed quietly changing.
+function gateParity() {
+  const g = new Grid(8, 8);
+  const rng = makeRng(5);
+  const i = g.idx(3, 3), ni = g.idx(4, 3);
+  const T = 1, U = 2;
+
+  // [a, aTint, b, bTint, p, expected mat/tint/life at i and ni]
+  const ORIGINAL = [
+    ['quench', LAVA, 0, WATER, T, 1, { i: [CRYSTAL, 0, 0], ni: [STEAM, 0, LIFE[STEAM]] }],
+    ['thaw-lava', LAVA, 0, ICE, T, 1, { i: [LAVA, 0, 0], ni: [WATER, T, 0] }],
+    ['ignite', LAVA, 0, OIL, U, 1, { i: [LAVA, 0, 0], ni: [FIRE, 0, LIFE[FIRE]] }],
+    ['glass', LAVA, 0, SAND, T, 0.06, { i: [LAVA, 0, 0], ni: [CRYSTAL, 0, 0] }],
+    ['spread', FIRE, 0, OIL, U, 0.28, { i: [FIRE, 0, 0], ni: [FIRE, 0, LIFE[FIRE]] }],
+    ['thaw-fire', FIRE, 0, ICE, T, 1, { i: [FIRE, 0, 0], ni: [WATER, T, 0] }],
+    ['douse', FIRE, 0, WATER, T, 1, { i: [STEAM, 0, LIFE[STEAM]], ni: [WATER, T, 0] }],
+  ];
+
+  for (const [name, a, ta, b, tb, p, exp] of ORIGINAL) {
+    const rules = rulesFor(a, b);
+    if (rules.length !== 1) { fail('G12-parity', `${MNAME[a]}+${MNAME[b]} has ${rules.length} rules, expected exactly 1`); continue; }
+    if (rules[0].name !== name) { fail('G12-parity', `${MNAME[a]}+${MNAME[b]} is now "${rules[0].name}", expected "${name}"`); continue; }
+    if (rules[0].p !== p) { fail('G12-parity', `${name}: probability ${rules[0].p}, original was ${p}`); continue; }
+    let ok = false;
+    for (let trial = 0; trial < 800 && !ok; trial++) {
+      g.reset();
+      g.set(i, a, ta); g.set(ni, b, tb);
+      if (LIFE[a]) g.life[i] = LIFE[a];
+      if (LIFE[b]) g.life[ni] = LIFE[b];
+      if (!applyReaction(g, i, ni, rng, { reactions: 0 })) continue;
+      ok = true;
+      for (const [cell, key] of [[i, 'i'], [ni, 'ni']]) {
+        const [m, tint, life] = exp[key];
+        if (g.mat[cell] !== m) fail('G12-parity', `${name}: ${key} is ${MNAME[g.mat[cell]]}, original produced ${MNAME[m]}`);
+        if (g.tint[cell] !== tint) fail('G12-parity', `${name}: ${key} tint ${g.tint[cell]}, original produced ${tint}`);
+        if (life && g.life[cell] !== life) fail('G12-parity', `${name}: ${key} life ${g.life[cell]}, original produced ${life}`);
+      }
+    }
+    if (!ok) fail('G12-parity', `${name} never fired in 800 trials`);
+  }
+
+  // Lock the whole pair set, so a new rule cannot silently alter an old board.
+  const expected = [
+    'lava+water', 'lava+ice', 'lava+oil', 'lava+sand', 'fire+oil', 'fire+ice', 'fire+water',
+    'fire+jelly', 'lava+jelly', 'ice+jelly', 'steam+ice', 'lava+ash',
+  ].sort();
+  const actual = PAIRS.map((r) => `${MNAME[r.a]}+${MNAME[r.b]}`).sort();
+  if (actual.join(',') !== expected.join(',')) {
+    fail('G12-parity', `pair set changed:\n      have ${actual.join(' ')}\n      want ${expected.join(' ')}`);
+  }
+  return { pairs: actual.length };
+}
+
+// -------------------------------------------------- G13 reactions in anger
+// The table above is exercised in a vacuum. This one runs it through the real
 // step loop with blobs present, which is where an F_BLOB cell turning into
 // water is either handled or a source of orphans.
 function gateChemLive() {
-  const s = scene(101, { terrain: false, reactions: true });
+  const s = scene(101, { terrain: false, reactions: false });
   const { g, rng, blobs, stats } = s;
   g.fill(0, s.floor - 2, g.cols, 2, LAVA);
   g.fill(4, s.floor - 22, 10, 8, ICE, 1);
@@ -513,13 +608,18 @@ function gateChemLive() {
   blobs.spawn(blobCells(g, 30, s.floor - 34, 10, 8), 2);
   g.wakeAll();
 
-  const err = soak(s, Math.min(TICKS, 900), { spawnEvery: 150, maxBlobs: 5, tints: 2 });
-  if (err) return fail('G12-chem-live', err);
-  if (stats.reactions === 0) fail('G12-chem-live', 'no reaction fired in a board built entirely out of reagents');
-  return { reactions: stats.reactions, blobs: blobs.list().length };
+  const jelly0 = blobs.cellCount;
+  // No fresh drops: the whole point is to watch the jelly that is already here
+  // get eaten, so the cell count has to be a clean before/after.
+  const err = soak(s, Math.min(TICKS, 900), { chem: true });
+  if (err) return fail('G13-chem-live', err);
+  if (stats.reactions === 0) fail('G13-chem-live', 'no reaction fired in a board built entirely out of reagents');
+  const melted = jelly0 - blobs.cellCount;
+  if (melted <= 0) fail('G13-chem-live', 'jelly dropped onto lava and fire lost no cells at all');
+  return { reactions: stats.reactions, blobs: blobs.list().length, melted };
 }
 
-// --------------------------------------------------------------- G13 perf
+// --------------------------------------------------------------- G14 perf
 function gatePerf() {
   const s = scene(7, { cols: 112, rows: 224 });
   const { g, rng, blobs, stats } = s;
@@ -529,7 +629,7 @@ function gatePerf() {
   const t0 = process.hrtime.bigint();
   for (let t = 0; t < N; t++) blobs.step(rng, stats);
   const ms = Number(process.hrtime.bigint() - t0) / 1e6 / N;
-  if (ms > 2) fail('G13-perf', `${ms.toFixed(3)} ms/tick of blob work exceeds the 2 ms budget`);
+  if (ms > 2) fail('G14-perf', `${ms.toFixed(3)} ms/tick of blob work exceeds the 2 ms budget`);
   return { ms, blobs: blobs.list().length, cells: blobs.cellCount };
 }
 
@@ -548,6 +648,7 @@ function runAll() {
   out.wobble = gateWobble();
   out.spread = gateSpread();
   out.react = gateReactions();
+  out.parity = gateParity();
   out.chem = gateChemLive();
   out.perf = gatePerf();
   return out;
@@ -586,7 +687,8 @@ if (!BREAK) {
   if (R.wobble) console.log(`  wobble    impact ${R.wobble.impact}, ${R.wobble.crossings} oscillations, amp ${R.wobble.amp}`);
   if (R.spread) console.log(`  spread    width ${R.spread.w} under load ${R.spread.load} (q ${R.spread.q})`);
   if (R.react) console.log(`  reactions ${R.react.rules} rules over ${R.react.pairs} pairs, ${R.react.fires} fires, ${MAT_COUNT * MAT_COUNT} pairs swept`);
-  if (R.chem) console.log(`  chem-live ${R.chem.reactions} reactions in the real step loop`);
+  if (R.parity) console.log(`  parity    ${R.parity.pairs} concrete pairs, all seven originals byte-identical`);
+  if (R.chem) console.log(`  chem-live ${R.chem.reactions} reactions live, ${R.chem.melted} jelly cells melted`);
   if (R.perf) console.log(`  perf      ${R.perf.ms.toFixed(3)} ms/tick for ${R.perf.blobs} blobs / ${R.perf.cells} cells`);
 }
 
