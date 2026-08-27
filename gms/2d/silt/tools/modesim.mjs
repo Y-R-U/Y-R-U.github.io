@@ -21,7 +21,7 @@ import { Bot } from '../js/ai/bot.js';
 import { EMPTY, MAT_COUNT, CRYSTAL, TINTABLE, SAND, WATER } from '../js/sim/materials.js';
 import { Clears } from '../js/sim/clears.js';
 import { MODES, byId, configFor } from '../js/modes/index.js';
-import tide, { floodGrid, tideTint, tintZeroIsInert, TIDE_CFG } from '../js/modes/tide.js';
+import { floodGrid, tintZeroIsInert } from '../js/modes/tide.js';
 import { safeApi } from '../js/modes/api.js';
 import alchemy, { setLevels, starsFor } from '../js/modes/alchemy.js';
 import jelly from '../js/modes/jelly.js';

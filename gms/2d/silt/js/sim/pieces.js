@@ -1,4 +1,4 @@
-import { EMPTY } from './materials.js';
+import { EMPTY, KIND, GAS } from './materials.js';
 import { F_BLOB } from './grid.js';
 
 // A piece is tetromino-shaped at BLOCK scale; each block is BLK x BLK grains
@@ -75,7 +75,10 @@ export function collides(g, p, ox, oy) {
       const row = y * cols;
       for (let gx = 0; gx < BLK; gx++) {
         const i = row + x0 + gx;
-        if (mat[i] !== EMPTY || (flags[i] & F_BLOB)) return true;
+        // Gas is not an obstacle. The CA already lets liquids sink through it,
+        // but the piece is not in the grid, so without this a steam cap from
+        // quenching lava tops the board out within seconds.
+        if ((mat[i] !== EMPTY && KIND[mat[i]] !== GAS) || (flags[i] & F_BLOB)) return true;
       }
     }
   }

@@ -123,3 +123,50 @@ Now 100.0%, mean row 852/900, and re-falsified after the change.
 The cool tint reads green in flight and bluer once settled. With three tints and
 only one cool, the mapping stays unambiguous, so it is polish rather than a
 legibility failure.
+
+## Lane C modes — done. It falsified the manager's TIDE fix.
+My "make the rising tide untinted" instruction DOES NOT WORK, and lane C proved
+it rather than implementing it: clears.detect() reads `t = tint[start]` with no
+zero guard, so a wall-to-wall band of tint 0 spans and clears exactly like a
+coloured one — and untinting makes it WORSE, one uniform body instead of a
+mosaic. What ships is the same idea in an index the engine already honours:
+brine tints 4-7, above the piece range, so no piece can ever match them. Four
+rather than five because lane A's TINT_SLOTS is 8. Gate B2 checks this across
+both lanes and `--break slots` proves it red.
+
+D4 survives intact: TIDE's piece sequence is [SAND, SAND, WATER], so a dropped
+blue water piece spreads sideways to finish a run of blue sand. Gated three ways
+— bare tide flooding to the ceiling clears 0 chains; tint-1 water bridging
+tint-1 sand clears 336 cells; the same board with mismatched water clears 0,
+which is the control that stops the first two passing on a detector that clears
+everything.
+
+Balance after rebalancing FLOW from fallRate 22/0.55 (189s, 1.24M pts) to
+34/0.9/max 120: FLOW 131s, TIDE 110s, JELLY 89s, HOURGLASS 120s, ALCHEMY 36s per
+level, no stalls anywhere.
+
+ALCHEMY ships 96 levels from 140 candidates (18 unreachable, 13 trivial, 13 too
+few wins). The generator stopped guessing targets: it runs each level once with
+an unreachable target, watches how far the bot gets, then sets the objective to
+0.6 of that. Hand-set targets were wrong in both directions at once.
+
+## Three sim findings from lane C, two fixed by the manager
+1. FIXED: collides() treated gas as solid. The CA lets liquids sink through
+   steam, but the piece is not in the grid, so a steam cap from quenching lava
+   topped the board out within seconds. collides() now ignores KIND === GAS.
+2. NOT FIXED, deliberately: HOURGLASS does not use the gravity vector. World
+   .spawn always enters at the top and World.tick always moves the piece down,
+   so under GRAV_UP the pile pours onto the ceiling and the next piece tops out.
+   Measured: vector path 32.6s / 0.5 chains, rotate-180 path 158.6s / 10 chains.
+   It ships as a 180-degree content rotation, which is a permutation so the
+   ledger stays exact. HOURGLASS_CFG.useGravityVector flips it over the day
+   piece spawn and fall follow world.grav. The rotation is arguably the better
+   implementation anyway.
+3. FIXED by lane C: world.combo only ever incremented, so it was a chain counter
+   rather than a combo. score.js owns a real one with a 150-tick window and
+   writes it back so the HUD stays honest.
+
+## Host loop
+main.js now delegates to the modes lane's stepMode(): world.tick -> onChain ->
+onTick. onTick LAST is what lets the scorer diff world.score across a tick
+boundary, so mode scoring cannot rot when the engine's own award is retuned.

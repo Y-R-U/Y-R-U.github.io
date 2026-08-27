@@ -90,7 +90,9 @@ function findMode(id) {
 }
 
 function makeWorld(m, opts = {}) {
-  const cfg = { ...(m.worldCfg || {}), ...opts };
+  const cfg = MODES && MODES.configFor
+    ? { ...MODES.configFor(m.id, opts), ...opts }
+    : { ...(m.worldCfg || {}), ...opts };
   if (cfg.seed === undefined) cfg.seed = (Math.random() * 1e9) | 0;
   const w = new World(cfg);
   view.setBoard(w.g.cols, w.g.rows);
@@ -111,7 +113,7 @@ function startAttract() {
   const list = modeList().filter((m) => m.id !== 'alchemy');
   mode = list[(Math.random() * list.length) | 0];
   world = makeWorld(mode, { seed: (Math.random() * 1e9) | 0 });
-  if (mode.onStart) mode.onStart(world, api);
+  if (MODES && MODES.startMode) MODES.startMode(mode, world, api); else if (mode.onStart) mode.onStart(world, api);
   attractBot = new Bot(world);
   bot = null;
   state = 'attract';
@@ -124,7 +126,7 @@ function startAttract() {
 function startGame(id, opts = {}) {
   mode = findMode(id);
   world = makeWorld(mode, opts);
-  if (mode.onStart) mode.onStart(world, api);
+  if (MODES && MODES.startMode) MODES.startMode(mode, world, api); else if (mode.onStart) mode.onStart(world, api);
   bot = opts.auto ? new Bot(world) : null;
   attractBot = null;
   state = 'play';
@@ -145,16 +147,12 @@ function endGame() {
 
 function simTick() {
   const before = world.chains;
-  if (mode && mode.onTick) mode.onTick(world, api);
   world.tick();
-  if (world.chains > before) {
-    AUDIO.sfx('chain', world.lastChainSize);
-    // The CELLS ARRAY, not the count — the contract says cells and every mode
-    // does `cells.length`. Passing a number made that undefined, and a single
-    // NaN then poisoned world.score for the rest of the run.
-    // Sliced because clears.lastChain is reused on the next detection.
-    if (mode && mode.onChain) mode.onChain(world, api, world.clears.lastChain.slice());
-  }
+  if (world.chains > before) AUDIO.sfx('chain', world.lastChainSize);
+  // Delegate to the modes lane's reference host loop: world.tick -> onChain ->
+  // onTick. onTick running LAST is what lets the scorer diff world.score across
+  // a tick boundary, so it stays correct if the engine's own award is retuned.
+  if (mode && MODES && MODES.stepMode) MODES.stepMode(mode, world, api, before);
 }
 
 function frame(now) {
@@ -186,7 +184,13 @@ function frame(now) {
 
   if (world && R) R.draw(world, { view, t: now / 1000, biome: save.settings.biome, state });
   if (UI && UI.setHud && state === 'play') {
-    UI.setHud({ score: world.score, chains: world.chains, combo: world.combo, next: world.nextPiece, mode: mode.name });
+    UI.setHud({
+      score: world.score, chains: world.chains, combo: world.combo,
+      next: world.nextPiece, mode: mode.name, modeId: mode.id,
+      hud: mode.hud,
+      // modes publish their own state; the shell shows what it recognises
+      tide: world.tide, hourglass: world.hourglass, alchemy: world.alchemy, zen: world.zen,
+    });
   }
 }
 
