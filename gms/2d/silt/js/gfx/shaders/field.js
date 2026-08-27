@@ -8,7 +8,8 @@ uniform vec4  u_rect;      // board rect in screen uv: x, y, w, h
 uniform float u_time;
 uniform vec3  u_skyTop, u_skyBot, u_glowCol, u_moteCol;
 uniform vec2  u_glowPos;
-uniform float u_glowAmt, u_moteAmt, u_bandAmt, u_glowTight;
+uniform float u_glowAmt, u_moteAmt, u_bandAmt;
+uniform vec2  u_glowTight;   // anisotropic: a low x makes the key a wide wash, a high y a shaft
 uniform vec4  u_well;      // interior: base, floor pool, side falloff, roof falloff
 uniform vec4  u_well2;     // outside, pool exponent, pool tint, lip
 out vec4 frag;
@@ -21,7 +22,7 @@ void main() {
 
   // one tight key glow — gives the whole frame a direction before a grain is drawn
   vec2 d = (uv - u_glowPos) * vec2(asp, 1.0);
-  c += u_glowCol * exp(-dot(d, d) * u_glowTight) * u_glowAmt;
+  c += u_glowCol * exp(-dot(d * d, u_glowTight)) * u_glowAmt;
 
   // slow drifting haze so a flat gradient never bands
   float n = fbm3(vec2(uv.x * 2.6 * asp, uv.y * 2.0) + vec2(u_time * 0.013, -u_time * 0.021));

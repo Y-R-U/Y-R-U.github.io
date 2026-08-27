@@ -81,10 +81,9 @@ function h2(a, b, seed) {
  * coloured bands were the first version and they measured at 100 chains a game
  * — the tide drained itself faster than it rose and no run ever ended.
  */
-export function tideTint(x, y, tints, seed, inert) {
+export function tideTint(x, y, seed, inert) {
   if (inert) return 0;
   const sx = (x / CFG.segW) | 0, by = (y / CFG.bandH) | 0;
-  void tints;
   return BRINE_FIRST + (h2(sx, by, seed) % CFG.brineTints);
 }
 
@@ -104,7 +103,7 @@ export function tintZeroIsInert() {
  * empty cells. Exported because the tide gates flood a bare grid with it — the
  * gate must exercise the shipping fill, not a copy of it.
  */
-export function floodGrid(g, line, tints, seed, inert) {
+export function floodGrid(g, line, seed, inert) {
   const cols = g.cols, rows = g.rows;
   const top = Math.max(0, rows - line);
   let made = 0;
@@ -113,7 +112,7 @@ export function floodGrid(g, line, tints, seed, inert) {
     for (let x = 0; x < cols; x++) {
       const i = row + x;
       if (g.mat[i] !== EMPTY) continue;
-      g.set(i, WATER, tideTint(x, y, tints, seed, inert));
+      g.set(i, WATER, tideTint(x, y, seed, inert));
       made++;
     }
   }
@@ -121,7 +120,7 @@ export function floodGrid(g, line, tints, seed, inert) {
 }
 
 function floodTo(world, st) {
-  const made = floodGrid(world.g, st.line, world.cfg.tints, st.seed, st.inert);
+  const made = floodGrid(world.g, st.line, st.seed, st.inert);
   st.made += made;
   return made;
 }

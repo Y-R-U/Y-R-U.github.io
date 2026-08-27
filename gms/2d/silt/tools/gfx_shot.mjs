@@ -53,7 +53,7 @@ if (args.all) {
  * on the flipped build before it was trusted on the fixed one.
  */
 async function vflipGate(cdp, base) {
-  await cdp.goto(`${base}/dev/gfx.html?preserve=1&dpr=1&scene=empty&biome=dune&anim=0&bot=0`);
+  await cdp.goto(`${base}/dev/gfx.html?preserve=1&dpr=1&scene=empty&biome=dune&anim=0&bot=0&t=3.5`);
   if (!await cdp.waitFor('window.__gfx && window.__gfx.ready', 60000)) throw new Error('harness never became ready');
   const r = await cdp.eval(`(async () => {
     const g = window.__gfx;
@@ -112,7 +112,11 @@ try {
     if (args.q) q.set('q', args.q);
     if (args.dt) q.set('dt', args.dt);
     if (args.tint) q.set('tint', args.tint);
-    for (const k of ['ptint', 'fill', 'py', 'ticks']) if (args[k]) q.set(k, args[k]);
+    for (const k of ['ptint', 'fill', 'py', 'ticks', 'tints']) if (args[k]) q.set(k, args[k]);
+    // Pin the renderer clock so two captures of the same build are the same
+    // image. Without it the haze, motes and grain move between runs and any
+    // diff measures dust. --anim wants motion, so it opts out.
+    if (!args.anim) q.set('t', String(args.t || 6.0));
 
     await cdp.goto(`${base}/dev/gfx.html?${q}`);
     const ok = await cdp.waitFor('window.__gfx && window.__gfx.ready', 60000);

@@ -88,3 +88,38 @@ chain fires, so there is no double count. Consequence: tools/sim.mjs was
 measuring the engine's fallback formula and reported 747473 for work the real
 FLOW mode scores at 276. The play gate now drives the shipping FLOW mode through
 its real hooks; it reports 6.3 chains and ~1265 points per game over a 117s life.
+
+## Renderer polish — done
+Piece tint legibility was neither a palette nor a lighting bug but both. An
+airborne piece is the only object in the scene with no occlusion beneath it, so
+it takes the entire light rig at once and lands on the ACES shoulder where every
+hue flattens toward cream — and dune's third tint was "bone", a warm grey of the
+same hue as the key light. Measured: dune piece (211,184,138) vs abyss
+(120,168,228).
+
+Fixed with a third MRT carrying the piece's own tint (chosen over encoding
+piece-ness in a spare bit: the negative-flash trick dies on the RGBA8 fallback
+and the split-range trick breaks under bilinear filtering), plus airborne-specific
+lighting that pushes chroma away from grey, pulls luma down off the shoulder and
+rims the piece in its OWN hue rather than the key's. Palettes now separate by
+HUE, not lightness — dune gold/vermilion/verdigris, kiln ember/quench/sulphur.
+Kiln had the identical bug and was fixed too.
+
+Dune's roof term is now negative so its light comes from above, and the red
+corner smear was the key glow itself: retuned gold, tighter, and falling off
+consistently with the key direction so it reads as sun over the lip.
+
+It got FASTER despite the extra attachment — 3.48 -> 2.72 ms gpu p95 high tier —
+because removing the old emissive "live piece" marker stops the piece region
+entering the expensive fbm3 + vein-noise branch. Budget is 11 ms.
+
+Gate note worth keeping: the flip gate first dropped 88.6% -> 70.6% after the
+brighter backdrop, NOT a flip regression — animated haze and grain between the
+two grabbed frames was diluting the diff. Pinning the renderer clock with ?t=
+made captures bit-identical run to run, so image diffs mean something again.
+Now 100.0%, mean row 852/900, and re-falsified after the change.
+
+## Known nit, not a blocker
+The cool tint reads green in flight and bluer once settled. With three tints and
+only one cool, the mapping stays unambiguous, so it is polish rather than a
+legibility failure.

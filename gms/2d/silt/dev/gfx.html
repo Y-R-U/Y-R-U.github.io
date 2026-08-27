@@ -234,6 +234,7 @@ if (P.has('biome')) R.setBiome(P.get('biome'));
 if (P.has('q')) R.setQuality(P.get('q'));
 build(sceneName);
 
+const FIXED_T = P.has('t') ? +P.get('t') : null;
 const SIM_DT = 1 / 60;
 let acc = 0, last = performance.now(), perfAcc = 0;
 const perfEl = document.getElementById('perf');
@@ -263,7 +264,12 @@ function frame(now) {
     shake = Math.max(0, shake - dt * 2.2);
   }
 
-  R.draw(world, { biome: R.biome, shake }, acc / SIM_DT);
+  // ?t= pins the renderer clock. Every animated term in the chain (haze, motes,
+  // grain, water) is driven by it, so without this two captures of the SAME
+  // build differ everywhere and an image diff measures noise. The v-flip gate
+  // diffs two frames, so it needs this to measure the board and not the dust.
+  R.draw(world, FIXED_T !== null ? { t: FIXED_T, biome: R.biome, shake }
+                                 : { biome: R.biome, shake }, acc / SIM_DT);
 
   perfAcc += dt;
   if (perfAcc > 0.25) { perfAcc = 0; perfEl.innerHTML = R.statsHtml(); }

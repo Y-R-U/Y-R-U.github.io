@@ -6,7 +6,7 @@
 // tint colours for 1..MAX_TINTS. Tint 0 means "untinted": tintable material
 // that carries no colour, which is what scenery and tide fill use.
 
-export const MAX_TINTS = 8;
+export const MAX_TINTS = 7;
 
 // Tint indices 1..3 are the piece colours. 4..8 are BRINE: the shades TIDE
 // floods with. They must be five distinct INDICES so no one of themoccupies enough of
@@ -14,7 +14,11 @@ export const MAX_TINTS = 8;
 // water, so each biome sets them to near-identical shades of its own water
 // colour. Mechanically five colours, visually one.
 export const BRINE_FIRST = 4;
-export const BRINE_COUNT = 5;
+export const BRINE_COUNT = 4;   // indices 4..7. The renderer's own palette
+                                // (js/gfx/biomes.js) has TINT_SLOTS = 8, so 8
+                                // is off the end of it — four brine colours is
+                                // the ceiling, and p = 0.25 per colour is still
+                                // clear of the 0.407 percolation threshold.
 
 // #rrggbb strings. The renderer is free to convert once at upload time.
 const COMMON_UNLIT = { empty: '#00000000' };
@@ -44,7 +48,6 @@ export const BIOMES = {
       '#568799',   // 5 brine
       '#4a7891',   // 6 brine
       '#5a8ea0',   // 7 brine
-      '#45718b',   // 8 brine
     ],
     mats: {
       wall: '#3b2a18', sand: '#c9a25e', water: '#4f8fb0', jelly: '#d98fb4',
@@ -75,7 +78,6 @@ export const BIOMES = {
       '#166486',   // 5 brine
       '#0f4f70',   // 6 brine
       '#1b6f90',   // 7 brine
-      '#0c4666',   // 8 brine
     ],
     mats: {
       wall: '#0a1a26', sand: '#3d5b6b', water: '#1d6f96', jelly: '#5fe0d0',
@@ -106,7 +108,6 @@ export const BIOMES = {
       '#3689b2',   // 5 brine
       '#2a769e',   // 6 brine
       '#3d93bb',   // 7 brine
-      '#256d95',   // 8 brine
     ],
     mats: {
       wall: '#241012', sand: '#a56a44', water: '#3fa2d6', jelly: '#e0709a',
@@ -137,7 +138,6 @@ export const BIOMES = {
       '#9ad7ee',   // 5 brine
       '#84c7e2',   // 6 brine
       '#a5dff3',   // 7 brine
-      '#7abfdb',   // 8 brine
     ],
     mats: {
       wall: '#98a6b6', sand: '#cbb994', water: '#7cc3e8', jelly: '#ff6f9c',
@@ -168,7 +168,6 @@ export const BIOMES = {
       '#679cb6',   // 5 brine
       '#578aa4',   // 6 brine
       '#70a5bf',   // 7 brine
-      '#4f819b',   // 8 brine
     ],
     mats: {
       wall: '#2b3040', sand: '#d8c39a', water: '#6fa8c8', jelly: '#d98fb4',

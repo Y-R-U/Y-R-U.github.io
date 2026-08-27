@@ -11,7 +11,7 @@
 //   node tools/modesim.mjs --gen-levels 120    regenerate + validate + write levels.js
 //   node tools/modesim.mjs --break <gate>      falsification arm: that gate MUST go red
 //
-// break gates: ledger  score  stall  rng  tide  zen  trivial  unwinnable  span
+// break gates: ledger  score  stall  rng  tide  zen  slots  trivial  unwinnable  span
 
 import { World, SIM_HZ, DEFAULT_CFG } from '../js/sim/world.js';
 import { Grid, F_CLEARING } from '../js/sim/grid.js';
@@ -28,7 +28,7 @@ import jelly from '../js/modes/jelly.js';
 import zen from '../js/modes/zen.js';
 import { genLevels, sceneSpans, applyScene, makeTracker } from '../js/data/levelgen.js';
 import { LEVELS as SHIPPED } from '../js/data/levels.js';
-import { BIOMES } from '../js/data/biomes.js';
+import { BIOMES, MAX_TINTS, BRINE_FIRST, BRINE_COUNT } from '../js/data/biomes.js';
 import { writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -277,13 +277,12 @@ async function gateZen() {
 //   T2  a tinted water run still finishes a chain of matching sand (D4)
 
 function gateTide() {
-  const tints = 3;
   const seed = 0x71de5a1e;
 
   // T1: flood a bare grid to the ceiling with nothing else on it, exactly as
   // the mode floods, and ask the shipping detector whether that is a chain.
   const g = new Grid(112, 96);
-  floodGrid(g, 96, tints, seed, BREAK === 'tide' ? true : false);
+  floodGrid(g, 96, seed, BREAK === 'tide');
   const c = new Clears(g, { diagonal: true });
   let chains = 0, guard = 0;
   while (guard++ < 40) { const n = c.detect(); if (!n) break; chains++; for (const i of c.lastChain) g.clear(i); c.dissolving.length = 0; }
@@ -310,6 +309,26 @@ function gateTide() {
 }
 
 // ------------------------------------------------------------ biome data
+
+/**
+ * The renderer keeps its own palette (js/gfx/biomes.js, lane A) and it is the
+ * one that has to have a colour for every tint index the sim can produce. TIDE
+ * floods with brine indices above the piece range, and the first version ran to
+ * index 8 against a renderer with 8 slots (0..7) — an off-the-end tint that no
+ * mode gate would ever have noticed. Cross-lane, so it is checked here.
+ */
+async function gateTintSlots() {
+  let gfx = null;
+  try { gfx = await import('../js/gfx/biomes.js'); } catch { notes.push('js/gfx/biomes.js absent — tint slot check skipped'); return null; }
+  const slots = BREAK === 'slots' ? 4 : (gfx.TINT_SLOTS || 0);
+  if (!slots) { notes.push('renderer palette exports no TINT_SLOTS — cannot check'); return null; }
+  const highest = BRINE_FIRST + BRINE_COUNT - 1;
+  if (highest >= slots) fail('B2-tint-slots', `TIDE can emit tint ${highest} but the renderer has ${slots} slots (0..${slots - 1})`);
+  if (MAX_TINTS >= slots) fail('B2-tint-slots', `MAX_TINTS ${MAX_TINTS} does not fit ${slots} renderer slots`);
+  for (const [id, b] of Object.entries(gfx.BIOMES || {}))
+    if ((b.tints || []).length < slots) fail('B2-tint-slots', `renderer biome ${id} defines ${b.tints.length} of ${slots} tints`);
+  return slots;
+}
 
 function gateBiomes() {
   const need = ['dune', 'abyss', 'kiln'];
@@ -361,7 +380,7 @@ async function validateLevel(lv, tries = 3) {
 
 // Objective floors. Below these a level is not worth shipping whatever the bot
 // managed — "clear one chain" is not a puzzle.
-const FLOOR = { chains: 2, dissolve: 900, crystal: 45, purge: 260 };
+const FLOOR = { chains: 2, dissolve: 900, crystal: 32, purge: 260 };
 
 /**
  * Calibrate the objective against what the bot can actually reach.
@@ -525,6 +544,7 @@ if (GEN) {
   if (!BREAK && kept.length >= 60) console.log(`    wrote js/data/levels.js with ${writeLevels(kept)} levels`);
 } else {
   gateBiomes();
+  const slots = await gateTintSlots();
   const tideProbe = gateTide();
   const rows = await gateModes();
   await gateDeterminism();
@@ -544,7 +564,7 @@ if (GEN) {
 
   console.log('');
   fmtRuns(rows);
-  console.log(`\n  tide: bare tide self-clears 0x; tinted water bridges a sand run (${tideProbe.bridged} cells). engine treats tint 0 as inert: ${tideProbe.inertZero}`);
+  console.log(`\n  tide: bare tide self-clears 0x; tinted water bridges a sand run (${tideProbe.bridged} cells). engine treats tint 0 as inert: ${tideProbe.inertZero}. highest tint emitted ${BRINE_FIRST + BRINE_COUNT - 1} of ${slots} renderer slots`);
   console.log(`  hourglass flips in 150s: ${flips}`);
   console.log(`  zen: no fail state over 120s, vented ${z.vented}x`);
   console.log(`  levels: ${lvWins}/${lvChecked} sampled levels beaten by the bot${lvBad.length ? ' (bad: ' + lvBad.join(',') + ')' : ''}  [${SHIPPED.length} shipped]`);

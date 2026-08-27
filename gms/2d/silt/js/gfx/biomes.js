@@ -45,15 +45,15 @@ export const BIOMES = {
     // inside the vessel has to be warm and lit, not dead space above a pile.
     // The vessel structure stays — dark walls, pooled floor, lit lip — it is
     // just no longer sitting in the dark.
-    sky: { top: [0.034, 0.0250, 0.0150], bot: [0.052, 0.0375, 0.0215] },
+    sky: { top: [0.018, 0.0122, 0.0062], bot: [0.026, 0.0176, 0.0086] },
     // The sun spills in over the top-left lip. Tight enough to actually fall off
     // down the frame — a wide one just floods the whole vessel flat.
-    glow: { col: [0.400, 0.292, 0.172], pos: [0.16, 1.04], amt: 0.32, band: 0.13, tight: 4.0 },
+    glow: { col: [0.480, 0.330, 0.158], pos: [0.16, 1.04], amt: 0.80, band: 0.20, tight: [5.0, 7.0] },
     // Negative roof term: dune's light comes from ABOVE, so the ceiling band is
     // the bright end of the vessel, not the dark one.
-    well:  [0.76, 1.00, 0.46, -0.16],
-    well2: [0.14, 2.60, 0.22, 0.30],
-    mote: { col: [1.00, 0.86, 0.58], amt: 0.30 },
+    well:  [0.70, 1.05, 0.46, -0.20],
+    well2: [0.14, 3.60, 0.34, 0.50],
+    mote: { col: [1.00, 0.78, 0.44], amt: 0.40 },
     key:  { dir: [-0.50, 0.866], col: [1.38, 1.03, 0.66] },
     fill: { dir: [0.56, 0.50], col: [0.26, 0.38, 0.62] },
     amb:  [0.140, 0.114, 0.108],
@@ -62,8 +62,8 @@ export const BIOMES = {
     surf: { rim: 0.36, spec: 0.70, sss: 0.75, grain: 0.70, refr: 0.038, ao: 0.85, shadow: 0.58, relief: 0.55 },
     piece: [0.62, 0.26, 0.085],   // chroma push, luma pull, own-hue rim
     grade: {
-      exposure: 1.10, sat: 1.08, contrast: 1.10, vignette: 0.56, grain: 0.026,
-      bloom: 0.78, threshold: 0.80, knee: 0.42,
+      exposure: 1.16, sat: 1.26, contrast: 1.06, vignette: 0.50, grain: 0.026,
+      bloom: 0.94, threshold: 0.70, knee: 0.42,
       shadowTint: [0.94, 0.95, 1.04], highTint: [1.12, 1.02, 0.86],
     },
   },
@@ -83,7 +83,7 @@ export const BIOMES = {
     ],
     mats: { sand: [0.18, 0.24, 0.28], ash: [0.07, 0.09, 0.11], wall: [0.020, 0.032, 0.045] },
     sky: { top: [0.0040, 0.0140, 0.0250], bot: [0.0010, 0.0040, 0.0105] },
-    glow: { col: [0.030, 0.165, 0.245], pos: [0.50, 1.03], amt: 0.78, band: 0.16, tight: 4.5 },
+    glow: { col: [0.030, 0.165, 0.245], pos: [0.50, 1.03], amt: 0.78, band: 0.16, tight: [4.5, 4.5] },
     well:  [0.46, 0.80, 0.54, 0.38],
     well2: [0.17, 3.40, 0.30, 0.30],
     mote: { col: [0.50, 1.00, 1.00], amt: 0.42 },
@@ -106,17 +106,20 @@ export const BIOMES = {
     name: 'kiln',
     tints: [
       [0, 0, 0],
-      [0.560, 0.215, 0.050],   // ember
-      [0.400, 0.375, 0.345],   // ash white
-      [0.135, 0.122, 0.130],   // char
-      [0.360, 0.375, 0.095],   // sulphur
-      [0.430, 0.070, 0.060],   // blood
-      [0.420, 0.310, 0.100],   // brass
-      [0.230, 0.150, 0.270],
+      // Same rule as dune: the three piece tints separate by HUE. The old set
+      // (ember / ash white / char) was one hot colour, one that goes cream
+      // under a hot rig, and one that vanishes into a dark frame entirely.
+      [0.560, 0.205, 0.045],   // ember
+      [0.075, 0.235, 0.415],   // quench blue
+      [0.330, 0.372, 0.072],   // sulphur
+      [0.062, 0.170, 0.238],   // brine 4..7
+      [0.058, 0.162, 0.232],
+      [0.068, 0.180, 0.242],
+      [0.055, 0.156, 0.228],
     ],
     mats: { sand: [0.22, 0.145, 0.095], wall: [0.055, 0.038, 0.034] },
     sky: { top: [0.0130, 0.0095, 0.0110], bot: [0.0400, 0.0130, 0.0058] },
-    glow: { col: [0.340, 0.105, 0.030], pos: [0.50, -0.04], amt: 0.58, band: 0.16, tight: 4.5 },
+    glow: { col: [0.340, 0.105, 0.030], pos: [0.50, -0.04], amt: 0.58, band: 0.16, tight: [4.5, 4.5] },
     well:  [0.46, 0.80, 0.54, 0.38],
     well2: [0.17, 3.40, 0.30, 0.30],
     mote: { col: [1.00, 0.55, 0.18], amt: 0.50 },

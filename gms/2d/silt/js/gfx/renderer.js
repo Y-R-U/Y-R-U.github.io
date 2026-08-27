@@ -209,7 +209,7 @@ export async function createRenderer(canvas, opts = {}) {
       .u3f('u_glowCol', B.glow.col[0], B.glow.col[1], B.glow.col[2])
       .u2f('u_glowPos', B.glow.pos[0], B.glow.pos[1])
       .u1f('u_glowAmt', B.glow.amt).u1f('u_bandAmt', B.glow.band)
-      .u1f('u_glowTight', B.glow.tight)
+      .u2f('u_glowTight', B.glow.tight[0], B.glow.tight[1])
       .u4f('u_well', B.well[0], B.well[1], B.well[2], B.well[3])
       .u4f('u_well2', B.well2[0], B.well2[1], B.well2[2], B.well2[3])
       .u3f('u_moteCol', B.mote.col[0], B.mote.col[1], B.mote.col[2])

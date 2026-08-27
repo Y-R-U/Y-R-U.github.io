@@ -198,6 +198,32 @@ function archetypeFor(i, d, rng) {
   return ARCHETYPES[i % ARCHETYPES.length];
 }
 
+/**
+ * A smelter rack: lava caps on wall pillars at varied heights.
+ *
+ * Puddles on the floor were the first quench design and they failed for a
+ * reason worth keeping: a water piece is 256 cells, it floods the entire floor
+ * in one drop, and it crusts every puddle at once — the objective completed in
+ * four seconds and all 26 quench levels were rejected as trivial. Lava at
+ * different heights cannot be reached by one drop; the water pours off each
+ * shelf onto the next and the crystal accrues over the run instead of in a
+ * single frame.
+ */
+function shelves(level, rng, n) {
+  const out = [];
+  const usable = level.cols - 6;
+  const slot = Math.floor(usable / n);
+  const maxH = Math.floor((level.rows - 8) * 0.62);
+  for (let k = 0; k < n; k++) {
+    const w = Math.max(7, Math.min(slot - 4, rng.irange(8, 15)));
+    const h = rng.irange(10, maxH);
+    const x = 3 + k * slot + rng.irange(0, Math.max(0, slot - w));
+    out.push({ x, y: level.rows - 4 - h, w, h, mat: WALL });
+    out.push({ x, y: level.rows - 4 - h - 4, w, h: 4, mat: LAVA });
+  }
+  return out;
+}
+
 export function genLevel(i, count, seed) {
   const rng = rngFor((seed ^ Math.imul(i + 1, 0x9e3779b1)) >>> 0);
   const d = count > 1 ? i / (count - 1) : 0;
@@ -248,9 +274,9 @@ export function genLevel(i, count, seed) {
     case 'quench':
       // Lava on the floor, water in your hand. Crystal is permanent, so every
       // point of progress also builds a wall you have to live with.
-      level.seq = [WATER, WATER, SAND];
-      s.push(...puddles(level, rng, LAVA, 2 + Math.round(d * 4), 4 + Math.round(d * 4), 7 + Math.round(d * 6)));
-      s.push(...pillars(level, rng, WALL, Math.round(d * 2), 6, 16));
+      level.seq = [SAND, SAND, WATER];
+      s.push(...shelves(level, rng, 3 + Math.round(d * 3)));
+      s.push(...puddles(level, rng, LAVA, 2 + Math.round(d * 2), 4, 6 + Math.round(d * 4)));
       level.objective = { type: 'crystal', target: Math.round(150 + d * 700) };
       break;
 
@@ -259,7 +285,7 @@ export function genLevel(i, count, seed) {
       // a lava piece is 256 cells of it.
       level.seq = [SAND, LAVA, SAND, WATER];
       s.push(pool(level, rng, WATER, 6 + Math.round(d * 6), 12 + Math.round(d * 10)));
-      void puddles;
+
       s.push(...pillars(level, rng, CRYSTAL, Math.round(d * 3), 5, 12));
       level.objective = { type: 'crystal', target: Math.round(200 + d * 850) };
       break;
