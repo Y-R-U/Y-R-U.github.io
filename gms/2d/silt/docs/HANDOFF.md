@@ -201,3 +201,45 @@ Still open from lane B's report, for the modes lane if it is ever revisited:
 hourglass.until and alchemy.left are SECONDS not ticks (undocumented in the
 contract), and alchemy.stars is the earned count rather than the thresholds, so
 modehud.js reaches into levelById to read them.
+
+## Phone playtest pass (Aaron, 2026-08-28)
+Six items from real device use. Five fixed here, jelly width with the modes lane.
+
+THE BOARD RECT WAS COMPUTED TWICE. js/core/viewport.js fitted it inside the safe
+area with a top bias; js/gfx/renderer.js independently fitted the whole canvas
+with a 0.985 shrink. Measured at 390x844: FLOW viewport {0, 22.4, 390x780} vs
+renderer {2.9, 37.9, 384.1x768.3} — a ~16px vertical offset. Input converts
+touches through the VIEWPORT rect, so every touch was off from what was drawn
+(worst in ZEN painting), and the shell's controls framed a board the renderer
+did not draw. view.board is now the single source of truth and opts.view is a
+REQUIRED renderer input, recorded in CONTRACTS.md section A.
+
+The new gate fills every cell, finds each drawn edge from the row/column diff
+plateau, and asserts it matches view.board within 2px — at TWO viewport shapes,
+390x844 and 900x520, because one shape leaves two edges untested and both were
+wrong. Falsified by handing the renderer the old shrunk rect: red, with
+left +3.0 right -3.0 top +5.6 bottom -6.4.
+
+Material overlapped the vessel because LIGHT_FS ran over a +/-0.02 margin outside
+u_rect on a clamped lookup, smearing the edge row outward — 15.6px under the
+floor and 4.8px through each wall. The RESOLVE_FS clamp that keeps piles flush
+is untouched; wall pixel values are unchanged, so no thinning came back.
+
+TIDE's water had two causes. Abyss's brine tints 4-7 were four DIFFERENT colours
+where every other biome uses four near-identical shades, so the flood was a
+mosaic of lozenges; and the subsurface term was INVERSELY proportional to
+thickness, making the thinnest flood the palest thing on screen. Now depth-aware:
+six taps measure the fluid column above each pixel and scale composite alpha.
+Isolating spec/rim/sss/refraction individually changed nothing — the water was
+past the ACES shoulder — so only the composite could move it. See
+[[isolate-before-tuning]].
+
+## The boot gate was green on a completely broken renderer
+Found by lane A, and it is the manager's bug. main.js falls back to the Canvas2D
+placeholder whenever js/gfx/renderer.js fails to load, so a syntax error in the
+renderer produced eight green checks and exit 0 while the game drew the exact
+pixel look this project exists to avoid. MANAGER.md documented "check the
+placeholder flag first" — documenting was not enough. boot.mjs now ASSERTS
+!__state.placeholder, with a --falsify placeholder arm proven to go red. This is
+also why a whole set of shell-lane screenshots came back pixelated: they were
+captured while lane A was mid-edit and the page had silently fallen back.

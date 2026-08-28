@@ -93,6 +93,87 @@ async function vflipGate(cdp, base) {
   return ok;
 }
 
+/**
+ * BOARD-RECT GATE. The renderer used to compute its OWN letterbox fit —
+ * `Math.min(vw/cols, vh/rows) * 0.985`, centred — while core/viewport.js
+ * computed a different one that respects the safe-area insets and biases the
+ * board upward. input.js converts touches through view.board and the shell
+ * anchors its controls to it, so every touch was ~16 px off what was drawn.
+ * view.board is now the only board rect there is, and this proves it.
+ *
+ * It does not eyeball anything: it fills every cell, diffs against an empty
+ * board, and finds the drawn edges from the row/column diff profiles at half
+ * the plateau — a threshold the bloom halo outside the lip never reaches.
+ * Falsify with --falsify=rect, which hands the renderer a 0.985-shrunk rect
+ * through dev/gfx.html's ?boardfudge= while the gate still reads view.board.
+ */
+async function boardRectGate(cdp, base, fudge, vp) {
+  await cdp.viewport(vp[0], vp[1], 1, true);
+  const q = new URLSearchParams({ preserve: '1', dpr: '1', scene: 'empty', biome: 'dune', anim: '0', bot: '0', t: '3.5' });
+  if (fudge) q.set('boardfudge', String(fudge));
+  await cdp.goto(`${base}/dev/gfx.html?${q}`);
+  if (!await cdp.waitFor('window.__gfx && window.__gfx.ready', 60000)) throw new Error('harness never became ready');
+  const r = await cdp.eval(`(async () => {
+    const g = window.__gfx;
+    g.hidePanel();
+    const grab = () => new Promise(res => requestAnimationFrame(() => requestAnimationFrame(() => {
+      const c = document.getElementById('gl');
+      const o = document.createElement('canvas'); o.width = c.width; o.height = c.height;
+      const x = o.getContext('2d'); x.drawImage(c, 0, 0);
+      res(x.getImageData(0, 0, o.width, o.height));
+    })));
+    g.build('empty'); const A = await grab();
+    g.build('full');  const B = await grab();
+    const w = A.width, h = A.height;
+    const cols = new Float64Array(w), rows = new Float64Array(h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      const d = Math.abs(B.data[i] - A.data[i]) + Math.abs(B.data[i+1] - A.data[i+1]) + Math.abs(B.data[i+2] - A.data[i+2]);
+      cols[x] += d; rows[y] += d;
+    }
+    // half-plateau edge finder: the fill is a solid rectangle, so each profile
+    // is a plateau with steep sides. The median of the middle half is the
+    // plateau height whatever the vignette does to the corners.
+    const edges = (p) => {
+      const n = p.length;
+      const mid = [...p].slice(Math.floor(n * 0.25), Math.ceil(n * 0.75)).sort((a, b) => a - b);
+      const plateau = mid[mid.length >> 1];
+      if (!(plateau > 0)) return null;
+      const th = plateau * 0.5;
+      let lo = 0, hi = n - 1;
+      while (lo < n && p[lo] < th) lo++;
+      while (hi >= 0 && p[hi] < th) hi--;
+      return { lo, hi, plateau };
+    };
+    const ex = edges(cols), ey = edges(rows);
+    const s = document.getElementById('gl').width / g.view.w;   // css px -> device px
+    const b = g.view.board;
+    return { ex, ey, s, w, h,
+      want: { x0: b.x * s, x1: (b.x + b.w) * s, y0: b.y * s, y1: (b.y + b.h) * s } };
+  })()`);
+  if (!r || !r.ex || !r.ey) { console.log('board-rect gate: no diff signal at all (FAIL)'); return false; }
+  // profile index i covers [i, i+1), so the drawn span is [lo, hi+1)
+  const got = { x0: r.ex.lo, x1: r.ex.hi + 1, y0: r.ey.lo, y1: r.ey.hi + 1 };
+  const TOL = 2.0;
+  const err = {
+    left: got.x0 - r.want.x0, right: got.x1 - r.want.x1,
+    top: got.y0 - r.want.y0, bottom: got.y1 - r.want.y1,
+  };
+  const worst = Math.max(...Object.values(err).map(Math.abs));
+  const ok = worst <= TOL;
+  console.log('board-rect gate %dx%d: drawn %s vs view.board %s — worst edge %s px (%s)',
+    vp[0], vp[1],
+    `[${got.x0},${got.y0},${got.x1},${got.y1}]`,
+    `[${r.want.x0.toFixed(1)},${r.want.y0.toFixed(1)},${r.want.x1.toFixed(1)},${r.want.y1.toFixed(1)}]`,
+    worst.toFixed(1), ok ? 'PASS' : 'FAIL');
+  if (!ok) {
+    console.log('  the drawn board MUST be view.board. Edge errors (drawn - view, px):');
+    console.log('   left %s  right %s  top %s  bottom %s   (tolerance %s)',
+      err.left.toFixed(1), err.right.toFixed(1), err.top.toFixed(1), err.bottom.toFixed(1), TOL);
+  }
+  return ok;
+}
+
 const { cdp, base, close } = await harness({ gpu: !!args.gpu });
 let failed = false;
 try {
@@ -101,6 +182,20 @@ try {
 
   if (args.check) {
     if (!await vflipGate(cdp, base)) failed = true;
+    const fudge = args.falsify === 'rect' ? 0.985 : 0;
+    // 390x844 letterboxes the board VERTICALLY (a real phone); 900x520 letterboxes
+    // it HORIZONTALLY. One shape alone leaves two of the four edges untested,
+    // and the bottom and the sides were both wrong.
+    let rectOk = true;
+    for (const vp of [[390, 844], [900, 520]]) {
+      if (!await boardRectGate(cdp, base, fudge, vp)) rectOk = false;
+    }
+    await cdp.viewport(W, H, 1, true);
+    if (fudge) {
+      // the falsification arm passes only when the gate goes RED
+      console.log('falsify=rect: gate went %s (%s)', rectOk ? 'GREEN' : 'RED', rectOk ? 'FAIL — the gate is not evidence' : 'PASS');
+      if (rectOk) failed = true;
+    } else if (!rectOk) failed = true;
     if (!args.all && !args.scene && !args.perf) jobs.length = 0;
   }
 

@@ -228,8 +228,20 @@ void main() {
   vec2 b = (v_uv - u_rect.xy) / u_rect.zw;
   vec3 bg = texture(u_bg, v_uv).rgb;
 
-  if (b.x < -0.02 || b.y < -0.02 || b.x > 1.02 || b.y > 1.02) { frag = vec4(bg, 1.0); return; }
+  // CLIP TO THE VESSEL. The resolve kernel deliberately extends the floor and
+  // the walls (cs = clamp(...) in RESOLVE_FS) so a pile sits FLUSH against
+  // them instead of thinning out — but this pass used to run over a 2% margin
+  // outside u_rect on a clamped lookup, which smeared that same edge material
+  // out past the lip. At 390x844 that is ~16 px under the floor and ~8 px
+  // through each wall, which is exactly what it looked like on a phone.
+  // The clamp stays (no thinning); the smear does not.
+  if (b.x < 0.0 || b.y < 0.0 || b.x > 1.0 || b.y > 1.0) { frag = vec4(bg, 1.0); return; }
   vec2 bc = clamp(b, 0.0, 1.0);
+  // half-pixel feather on the lip itself, so the cut is a straight edge and not
+  // a staircase
+  vec2 bpx = u_rect.zw * u_res;                     // board size in screen px
+  vec2 ed = min(b, 1.0 - b) * bpx;                  // distance to the lip, px
+  float clip = clamp(min(ed.x, ed.y) + 0.5, 0.0, 1.0);
 
   vec4 f = texture(u_field, bc);
   vec4 ax = texture(u_aux, bc);
@@ -247,7 +259,7 @@ void main() {
   float contact = texture(u_occ, clamp(bc - u_keyDir * 0.022, 0.0, 1.0)).r;
   bg *= 1.0 - u_aoAmt * 0.55 * ss(0.05, 0.95, contact);
 
-  float cover = ss(0.42, 0.62, d);
+  float cover = ss(0.42, 0.62, d) * clip;
   if (cover <= 0.001) { frag = vec4(bg, 1.0); return; }
 
   // ---- normal from the density gradient
@@ -309,6 +321,42 @@ void main() {
   albedo *= 1.0 + grain * u_grainAmt * (gn - 0.5) * 0.26;
   albedo *= 1.0 + grain * (h12(floor(cs) + 0.5) - 0.5) * 0.13;
 
+  // ---- how much water is standing ABOVE this pixel.
+  // Water only reads as water if you can see through it, and the amount you
+  // can see through is the column, not the material. TIDE's first flood used to
+  // read as a flat opaque slab and only started looking like water once it got
+  // deep — that was two things, both here: cover went to 1.0 the moment a cell
+  // was full, and the subsurface term is INVERSELY proportional to thickness,
+  // so the thinnest layer in the frame took the brightest glow in the frame.
+  // Six taps up the board, only ever for a clear fluid, so it costs nothing on
+  // sand, lava or an empty column.
+  //
+  // clear is a GATE, not a strength: water and steam are 1, oil and lava 0.
+  // Weighting by fluid*trans directly instead diluted the whole effect to 0.55
+  // and the first flood still came out a slab.
+  float clear = ss(0.25, 0.52, fluid * trans) * (1.0 - ss(0.02, 0.20, emis));
+  float body = 1.0;                              // 0 = film, 1 = closed up
+  if (clear > 0.01) {
+    // Geometrically spaced taps with trapezoid weights: six samples that
+    // resolve the first two cells AND still reach 34, because the difference
+    // between one cell of water and four is the whole read.
+    const float DS[6] = float[6](1.5, 3.5, 7.0, 13.0, 22.0, 34.0);
+    const float DW[6] = float[6](2.5, 2.75, 4.75, 7.5, 10.5, 12.0);
+    float column = 0.0;
+    for (int i = 0; i < 6; i++) {
+      vec2 sp = bc + vec2(0.0, DS[i] / u_grid.y);
+      if (sp.y > 1.0) break;                     // above the lip there is only air
+      column += DW[i] * clamp(texture(u_aux, sp).x, 0.0, 1.0) * ss(0.35, 0.60, texture(u_smooth, sp).r);
+    }
+    // Not Beer-Lambert: this is a cross-section, not a look-down, and physical
+    // absorption over nine cells of water is nothing. What has to be true is
+    // the READ — a first flood is a film you see the vessel floor through, a
+    // late one is a body with weight. Measured against captures at 390x844:
+    // a 9-cell pool lands near 0.2 alpha, a 30-cell one near 0.9.
+    body = pow(clamp(column / 34.0, 0.0, 1.0), 1.6);
+  }
+  float film = clear * (1.0 - body);             // 1 where the water is only a skin
+
   // Liquids. In a single-layer field there is no scene behind the water to
   // refract — the backdrop IS the empty vessel — so what sells it is motion and
   // specular, not displacement. Refraction stays on for the rim only.
@@ -358,8 +406,9 @@ void main() {
   float shin = mix(220.0, 9.0, rough);
   vec3 H = normalize(L + V);
   float spec = pow(max(dot(n, H), 0.0), shin) * mix(1.0, 0.05, rough);
-  col += u_keyCol * spec * u_specAmt * (1.0 - 0.60 * piece);
-  col += (u_keyCol + u_rimCol) * caustic * 0.16;
+  // a film is nearly all surface: what little it shows is the glint off it
+  col += u_keyCol * spec * u_specAmt * (1.0 - 0.60 * piece) * (1.0 + film * 0.6);
+  col += (u_keyCol + u_rimCol) * caustic * 0.16 * (1.0 + film * 0.8);
 
   // ---- fresnel rim, strongest on liquids and glass
   float fres = pow(1.0 - clamp(n.z, 0.0, 1.0), 3.0);
@@ -374,7 +423,10 @@ void main() {
 
   // ---- subsurface: thin material glows, thick material does not
   float thick = max(ss(0.0, 0.85, occ), depth);
-  vec3 sss = albedo * u_keyCol * exp(-thick * 3.1) * (trans * 1.35 + grain * 0.12);
+  // ...but a THIN LAYER OF LIQUID is not thin material catching the light, it is
+  // a window. exp(-thick) alone made the shallowest flood the palest thing on
+  // screen, which is the opposite of what water does.
+  vec3 sss = albedo * u_keyCol * exp(-thick * 3.1) * (trans * 1.35 * mix(1.0, body, clear) + grain * 0.12);
   col += sss * u_sssAmt;
 
   // ---- refraction: displace the backdrop along the surface normal
@@ -410,5 +462,8 @@ void main() {
     col += u_emisCol * fl * fl * fl * 0.34;
   }
 
-  frag = vec4(mix(bg, col, cover), 1.0);
+  // ---- transmittance. Everything above is how the material LOOKS; this is how
+  // much of it there is to look through. Only clear fluids ever leave 1.0.
+  float alpha = mix(1.0, 0.10 + 0.85 * body, clear);
+  frag = vec4(mix(bg, col, cover * alpha), 1.0);
 }`;

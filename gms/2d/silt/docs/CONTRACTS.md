@@ -54,13 +54,17 @@ plus flat lookups `KIND DENSITY SPREAD SLIP TINTABLE FLAMMABLE LIFE`.
 import { createRenderer } from './gfx/renderer.js';
 const R = await createRenderer(canvas, { preserveDrawingBuffer, quality });
 R.resize(cssW, cssH, dpr);
-R.draw(world, { t, biome, shake }, alpha);   // called once per rAF
+R.draw(world, { view, t, biome, shake }, alpha);   // called once per rAF
 R.setBiome(name);
 R.stats();        // { fps, gpuMs, gpuSupported, passes, tier }
 R.dispose();
 ```
 
 - WebGL2 only. **No CDN, no importmap, no dependencies.**
+- **`opts.view` is REQUIRED.** The board rect is an INPUT, not something the
+  renderer derives: use `opts.view.board` ({x,y,w,h} in css px) verbatim. It was
+  computed twice once — here and in `js/core/viewport.js` — and the two disagreed
+  by ~16px vertically, so touches landed off from what was drawn.
 - Honour `?preserve=1` (needed for headless capture) and `?dpr=1`.
 - Must render `world.piece` as an overlay — the falling piece is NOT in the grid.
   Enumerate it with `forEachCell(piece, (x,y,tint) => …)` from `sim/pieces.js`.

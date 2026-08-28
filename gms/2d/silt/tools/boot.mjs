@@ -23,6 +23,12 @@ const GPU = args.includes('--gpu');
 // property, so the assignment silently did nothing and every check stayed green.
 // That is the exact failure this arm exists to catch, so it is worth the comment.
 const fi = args.indexOf('--falsify');
+// The renderer must be the REAL one. main.js falls back to the Canvas2D
+// placeholder whenever js/gfx/renderer.js fails to load, which means a syntax
+// error in the renderer produced a fully green boot gate — eight checks ok,
+// exit 0 — with the game drawing the exact pixel look this project exists to
+// avoid. Documenting "check the flag" was not enough; assert it.
+const ALLOW_PLACEHOLDER = args.includes('--allow-placeholder');
 const SOAK = args.includes('--soak') ? 3600 : 700;   // frames; --soak for the long run
 const FALSIFY = fi >= 0 ? (args[fi + 1] && !args[fi + 1].startsWith('--') ? args[fi + 1] : 'boot') : null;
 
@@ -46,6 +52,11 @@ try {
   if (FALSIFY === 'freeze') {
     await cdp.waitFor('window.__game && window.__game.world', 8000);
     await cdp.eval('window.__game.world.tick = function () {}');
+  }
+  if (FALSIFY === 'placeholder') {
+    await cdp.send('Network.setBlockedURLs', { urls: ['*/silt/js/gfx/renderer.js'] });
+    await cdp.goto(url);
+    await cdp.waitFor('window.__state && window.__state.state === "play"', 12000);
   }
   if (FALSIFY === 'error') {
     await cdp.eval('setTimeout(function () { throw new Error("deliberate falsification error"); }, 0)');
@@ -75,7 +86,9 @@ try {
   check(`survives ${SOAK} frames`, !!(s2 && s2.ticks > s1.ticks), s2 ? `ticks ${s2.ticks}` : 'dead');
   check('mass ledger sane', !!(s2 && s2.cells >= 0 && s2.cells <= 112 * 224), s2 ? `cells ${s2.cells}` : '');
 
-  if (s2 && s2.placeholder) console.log('\n  NOTE: still on the PLACEHOLDER Canvas2D renderer (js/gfx/renderer.js absent).');
+  check('real renderer, not the placeholder',
+    ALLOW_PLACEHOLDER || !(s2 && s2.placeholder),
+    s2 && s2.placeholder ? 'js/gfx/renderer.js failed to load — game is drawing cells' : `tier ${s2 && s2.gfx && s2.gfx.tier}`);
 
   await cdp.capture(join(HERE, '../shots/boot.png'), 'canvas');
   console.log(`\n  state: ${JSON.stringify({ ticks: s2?.ticks, score: s2?.score, chains: s2?.chains, cells: s2?.cells, fps: s2?.fps, tier: s2?.gfx?.tier })}`);

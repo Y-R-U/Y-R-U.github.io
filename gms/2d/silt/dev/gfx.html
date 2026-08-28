@@ -47,10 +47,26 @@ import { World } from '../js/sim/world.js';
 import { step } from '../js/sim/step.js';
 import { SAND, WATER, JELLY, OIL, LAVA, ICE, CRYSTAL, ASH, WALL } from '../js/sim/materials.js';
 import { createRenderer, BIOME_NAMES } from '../js/gfx/renderer.js';
+import { createViewport } from '../js/core/viewport.js';
 
 const P = new URLSearchParams(location.search);
 const canvas = document.getElementById('gl');
 const R = await createRenderer(canvas, {});
+
+// The board rect has ONE source — core/viewport.js — in the bench exactly as in
+// the game, so a shot taken here is a shot of what the player is touching.
+const view = createViewport(canvas);
+
+// ?boardfudge= shrinks the rect handed to the renderer about its centre WITHOUT
+// touching view.board. It is the falsification arm for the board-rect gate:
+// ?boardfudge=0.985 is precisely the second fit the renderer used to carry.
+const FUDGE = +(P.get('boardfudge') || 1);
+const drawView = FUDGE === 1 ? view : {
+  get board() {
+    const b = view.board, w = b.w * FUDGE, h = b.h * FUDGE;
+    return { x: b.x + (b.w - w) / 2, y: b.y + (b.h - h) / 2, w, h, scale: b.scale * FUDGE };
+  },
+};
 
 /* ------------------------------------------------------------------ scenes */
 
@@ -171,6 +187,12 @@ const SCENES = {
   // of the image. Do not delete: the board was rendered upside down once already.
   vflip: (w) => { w.g.fill(0, w.g.rows - 10, w.g.cols, 10, SAND, 1); },
 
+  // BOARD-RECT ORACLE. Every cell filled, so the lit region IS the board and
+  // nothing else. tools/gfx_shot.mjs --check diffs this against `empty` and
+  // asserts the drawn bounds match view.board. Do not tick it: a wall-to-wall
+  // band of one tint is a chain and would dissolve the oracle away.
+  full: (w) => { w.g.fill(0, 0, w.g.cols, w.g.rows, SAND, 1); },
+
   empty: () => {},
 };
 
@@ -186,6 +208,7 @@ function build(name) {
   sceneName = name;
   const seed = +(P.get('seed') || 7);
   world = new World({ seed, tints: +(P.get('tints') || 3), tintMode: P.get('tint') || 'mono' });
+  view.setBoard(world.g.cols, world.g.rows);
   (SCENES[name] || SCENES.dune)(world, mulberry(seed * 2654435761 % 2147483647));
   paint();
 }
@@ -225,9 +248,9 @@ addEventListener('keydown', (e) => {
 
 /* ------------------------------------------------------------------- frame */
 function fit() {
-  R.resize(innerWidth, innerHeight, devicePixelRatio);
+  R.resize(view.w, view.h, view.dpr);
 }
-addEventListener('resize', fit);
+view.onResize(fit);
 fit();
 
 if (P.has('biome')) R.setBiome(P.get('biome'));
@@ -268,8 +291,8 @@ function frame(now) {
   // grain, water) is driven by it, so without this two captures of the SAME
   // build differ everywhere and an image diff measures noise. The v-flip gate
   // diffs two frames, so it needs this to measure the board and not the dust.
-  R.draw(world, FIXED_T !== null ? { t: FIXED_T, biome: R.biome, shake }
-                                 : { biome: R.biome, shake }, acc / SIM_DT);
+  R.draw(world, FIXED_T !== null ? { view: drawView, t: FIXED_T, biome: R.biome, shake }
+                                 : { view: drawView, biome: R.biome, shake }, acc / SIM_DT);
 
   perfAcc += dt;
   if (perfAcc > 0.25) { perfAcc = 0; perfEl.innerHTML = R.statsHtml(); }
@@ -281,7 +304,7 @@ requestAnimationFrame(frame);
 Object.defineProperty(window, '__state', { configurable: true, get: () => world.snapshot() });
 window.__gfx = {
   ready: false,
-  R, get world() { return world; },
+  R, view, get world() { return world; },
   build, setBiome: (b) => { R.setBiome(b); paint(); },
   setQuality: (q) => { R.setQuality(q); paint(); },
   pause: (v) => { paused = v; },

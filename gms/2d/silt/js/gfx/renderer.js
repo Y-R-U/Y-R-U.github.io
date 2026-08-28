@@ -103,11 +103,24 @@ export async function createRenderer(canvas, opts = {}) {
   let rect = [0, 0, 1, 1];   // board in screen uv (y up)
   let superSample = 2;
 
+  // THE BOARD RECT HAS EXACTLY ONE SOURCE: core/viewport.js `view.board`, in css
+  // px, y down from the top-left. It is what input.js converts touches against
+  // and what the shell anchors its controls to, so a second fit here — there was
+  // one, a centred aspect fit times 0.985 — put the drawn vessel ~16 px above
+  // the frame the player was touching. Everything the renderer needs comes in
+  // through draw(world, { view }).
+  let board = { x: 0, y: 0, w: 1, h: 1 };
+  let cssW = 1, cssH = 1;
+
   function layout() {
     const T = TIERS[tierName];
-    const scale = Math.min(vw / cols, vh / rows) * 0.985;
-    const bw = Math.max(1, cols * scale), bh = Math.max(1, rows * scale);
-    rect = [(vw - bw) / 2 / vw, (vh - bh) / 2 / vh, bw / vw, bh / vh];
+    // css px -> device px without going through dpr: vw/cssW is the ratio that
+    // actually sized the drawing buffer, whatever the caller passed.
+    const sx = vw / Math.max(1, cssW), sy = vh / Math.max(1, cssH);
+    const bw = Math.max(1, board.w * sx), bh = Math.max(1, board.h * sy);
+    // uv y counts UP from the bottom of the canvas; view.board.y counts DOWN
+    // from the top. This is the only place the two conventions meet.
+    rect = [board.x * sx / vw, (vh - board.y * sy - bh) / vh, bw / vw, bh / vh];
 
     // Resolve at roughly one texel per T.texel screen pixels: fine enough that
     // the bilinear upsample never facets, coarse enough that the 25-tap kernel
@@ -147,15 +160,28 @@ export async function createRenderer(canvas, opts = {}) {
   buildTier(tierName);
 
   /* ---------------------------------------------------------------- API  */
-  function resize(cssW, cssH, devicePR) {
+  function resize(w, h, devicePR) {
     const capped = Math.min(2, devicePR || window.devicePixelRatio || 1);
     dpr = qs('dpr') === '1' ? 1 : capped;
-    vw = Math.max(1, Math.round(cssW * dpr));
-    vh = Math.max(1, Math.round(cssH * dpr));
+    cssW = w; cssH = h;
+    vw = Math.max(1, Math.round(w * dpr));
+    vh = Math.max(1, Math.round(h * dpr));
     canvas.width = vw; canvas.height = vh;
-    canvas.style.width = cssW + 'px';
-    canvas.style.height = cssH + 'px';
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
     post.resize(vw, vh);
+    // Degenerate default only — the whole canvas — for the frame between resize
+    // and the first draw(). A caller that never passes opts.view gets a board
+    // filling the canvas rather than a second, competing aspect fit.
+    if (board.w <= 1) board = { x: 0, y: 0, w, h };
+    layout();
+  }
+
+  /** view.board (css px) is the board. Re-layout only when it actually moves. */
+  function setBoardRect(b) {
+    if (!b || !(b.w > 0) || !(b.h > 0)) return;
+    if (b.x === board.x && b.y === board.y && b.w === board.w && b.h === board.h) return;
+    board = { x: b.x, y: b.y, w: b.w, h: b.h };
     layout();
   }
 
@@ -169,6 +195,7 @@ export async function createRenderer(canvas, opts = {}) {
     stats.beginFrame();
 
     if (o.biome && o.biome !== biomeName) setBiome(o.biome);
+    if (o.view && o.view.board) setBoardRect(o.view.board);
 
     // grid geometry can change between modes
     if (world.g.cols !== cols || world.g.rows !== rows) {

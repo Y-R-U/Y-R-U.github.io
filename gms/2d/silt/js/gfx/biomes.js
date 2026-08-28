@@ -76,10 +76,16 @@ export const BIOMES = {
       [0.055, 0.340, 0.410],   // cyan
       [0.235, 0.140, 0.520],   // violet
       [0.470, 0.095, 0.265],   // magenta
-      [0.075, 0.360, 0.205],   // jade
-      [0.075, 0.180, 0.520],   // deep blue
-      [0.470, 0.250, 0.085],   // coral
-      [0.330, 0.420, 0.470],
+      // brine 4..7. Every other biome already followed the rule in
+      // data/biomes.js — four distinct INDICES so no one colour percolates,
+      // near-identical SHADES so the player sees one body of water. Abyss did
+      // not: it carried jade / deep blue / CORAL / pale grey here, and since
+      // TIDE floods in 2x2 clusters that painted the tide as a mosaic of
+      // lozenges. It is the only mode that uses this biome.
+      [0.050, 0.215, 0.330],
+      [0.045, 0.202, 0.322],
+      [0.058, 0.228, 0.340],
+      [0.042, 0.195, 0.315],
     ],
     mats: { sand: [0.18, 0.24, 0.28], ash: [0.07, 0.09, 0.11], wall: [0.020, 0.032, 0.045] },
     sky: { top: [0.0040, 0.0140, 0.0250], bot: [0.0010, 0.0040, 0.0105] },
