@@ -514,6 +514,94 @@ that n). Left alone.
 already wrong at 96 and it is wrong at 100; it is a shell-visible string and not
 part of this job, so it is flagged rather than edited.
 
+### FOLLOW-UP: the FLOOR fix manufactured a second defect, and HEADROOM resolves both
+
+The manager ran `tools/uishot.mjs --win`, which plays a real ALCHEMY level in a
+browser, and it went red: the bot could not solve **level 1** on seed 4242. The
+gate was pinned to one seed and has been fixed to try three, because 2-of-3 is
+the bar the campaign ships against — the same false-alarm shape as the A1 sample
+described above. But it pointed at something real in the data.
+
+**Level 1 shipped `target 2` against `reach 2` — 100% of the bot's measured
+ceiling, on the first level a human will ever play.** Ten of the 77 non-purge
+levels were above 0.8 x reach: four span at exactly 1.00, six quench at crystal
+32 against reaches of 32 to 38.
+
+They were all made by my own FLOOR fix. Measured, not assumed: the ORIGINAL
+96-level table has **0** tight levels and **2** below-floor ones; the table after
+the FLOOR clamp had **0** below-floor and **10** tight. The clamp
+`target = max(FLOOR, 0.6 x reach)` fires exactly when reach is small, and the
+smaller the reach the closer to 100% of it the floor sits. Enforcing one rule
+then the other in either order just moves the defect.
+
+`tools/modesim.mjs` now resolves them together in `resolveTarget()`: cap the
+target at `HEADROOM (0.8) x reach`, then take the floor; if the cap is below the
+floor there is no target satisfying both and the level is rejected. The
+"lower the target to the cap" branch cannot fire while the calibrator asks for
+0.6 and the cap is 0.8 — it is written out anyway so raising the calibration
+fraction can never quietly bring tight levels back.
+
+Result on the shipped table: **0 tight, 0 below floor**, max target/reach 0.80,
+and level 1 is now `target 4 / reach 6` (0.67) finishing in 55% of its limit
+where it used to need 74%.
+
+### Regenerated under both rules
+
+160 candidates -> **107 kept, 53 rejected**. Acts **21 / 20 / 22 / 22 / 22**,
+ids contiguous, aspect 0.500 throughout.
+
+| rejected | why |
+|---|---|
+| 33 | **no headroom** (the new rule) |
+| 14 | trivially complete |
+| 3 | only 1/3 wins |
+| 2 | unreachable |
+| 1 | only 0/3 wins |
+
+Those 33 rejections are the acceptance path demonstrably working on real data
+rather than on an injected fault.
+
+`node tools/modesim.mjs --levels`: **107/107 beaten by the bot on at least 2 of 3
+seeds**, aspect 0.500-0.500, 0 tight, 0 below floor.
+
+Keep rate across three seed families at 30 candidates: **22 / 20 / 19**, tight 0
+in all three, against 23 / 20 / 21 before the rule — the rule costs about one
+level in thirty.
+
+| archetype | before (100) | after (107) |
+|---|---|---|
+| span | 12 (5 at 3/3) | **10** (4 at 3/3) |
+| excavate | 29 | 32 |
+| quench | 7 | 4 |
+| crucible | 29 | 32 |
+| slag | 23 | 29 |
+| tight levels | 10 | **0** |
+| below-floor targets | 0 | 0 |
+| 3/3 wins | 85/100 | 96/107 |
+| med/limit p50 | 0.48 | 0.51 |
+
+**span is 10, above the 8 the manager set as the stop line**, and its median
+target now sits at 0.67 of reach rather than 1.00. Quench falls 7 -> 4 because
+six of its seven levels were the tight ones: crystal saturates around 32-38 (see
+the saturation measurement above) and a 32 floor leaves no room in that. Losing
+them is correct — a quench level asking for 32 when the bot can only ever make 35
+is not a level — but it is more evidence that quench needs a different objective,
+not a different number.
+
+### One level still runs the clock down, and it is NOT a headroom case
+
+`id 20` (act 1, slag/purge) has a median completion of **66.2s against a 67s
+limit — 0.99**. It wins 3/3 seeds and its fastest run is 49s, so it is beatable,
+but the median player has no room. Two more purge levels sit at 0.86-0.87. All
+three are `purge`, which is the one objective type HEADROOM does not cover: its
+target is a level to reduce TO, so margin there is structurally 0.6 of the
+progress the bot made and the tightness is in the CLOCK, not the target.
+
+I have not invented a second rule for this — a time-margin rule on
+`measured.med / limitS` was not asked for and would change what ships. Flagging
+it: if it wants fixing, the lever is `limitS` for purge levels, and the rule
+would be a cap on `measured.med / limitS` in the same acceptance path.
+
 ### Verified in a real browser, not only in node
 
 The board rect is computed in `js/core/viewport.js`, which node never runs, so
@@ -540,17 +628,120 @@ readings of level 1, which looked like a pass and proved nothing.
 
 | gate | result |
 |---|---|
-| `node tools/sim.mjs` | PASS, 0.076 ms/tick |
+| `node tools/sim.mjs` | PASS, 0.078 ms/tick |
 | `node tools/jellysim.mjs` | PASS |
-| `node tools/modesim.mjs` | PASS, aspect 0.500-0.500 across 100, 0 below floor |
-| `node tools/modesim.mjs --levels` | PASS, 100/100 beaten on >= 2 of 3 seeds |
+| `node tools/modesim.mjs` | PASS, aspect 0.500-0.500 across 107, 0 below floor, 0 tight |
+| `node tools/modesim.mjs --levels` | PASS, 107/107 beaten on >= 2 of 3 seeds |
 | `node tools/boot.mjs` | PASS, 12 checks, real renderer |
 | `--break trivial` | red, arm confirmed |
 | `--break unwinnable` | red, arm confirmed |
 | `--break span` | red, arm confirmed |
-| `--break aspect` (shipped path) | red, `1/100 board(s) letterbox` |
+| `--break aspect` (shipped path) | red, `1/107 board(s) letterbox` |
 | `--break aspect` (generation path) | red, `1/30 board(s) letterbox` |
+| `--break headroom` (shipped path) | red, `1/107 level(s) ship a target above 0.8` |
 | A4 vs the real old `levels.js` | red, `96/96 board(s) letterbox` |
+| A5 vs a real artifact | the 10 tight levels it removed were measured with ids and ratios, but that intermediate table was overwritten by the regeneration, so the standing evidence is the arm plus the 33 live rejections |
 
 Not run, and not claimed: `tools/gfx_shot.mjs --check` and `tools/uishot.mjs
---probe`. Both belong to lanes editing concurrently and neither reads level data.
+--probe` / `--win`. Both belong to lanes editing concurrently; the manager ran
+them and reported the `--win` result acted on above.
+
+
+## Review pass: the gates that could not fail — 2026-08-28, manager
+
+A read-only review agent went over the whole tree with instructions to
+distrust the gates as much as the code. Nine confirmed findings; the shape of
+almost all of them is the same, and it is the shape D9 warns about.
+
+### What was actually broken
+
+1. **A lost GPU context was terminal, silent and invisible.** `js/gfx/renderer.js`
+   sets `lost = true` on `webglcontextlost` and there is no
+   `webglcontextrestored` handler anywhere — so a backgrounded tab, a recycled
+   GPU process or a driver reset left the canvas black FOREVER while the sim
+   kept ticking at 60Hz, the HUD kept updating and the score kept climbing on a
+   board nobody could see. `js/main.js` now rebuilds the renderer through the
+   same factory boot() uses; the renderer holds its GL resources in closure
+   state, so there is nothing to restore piecemeal.
+
+   **Every check in the boot gate was green through this**, because
+   `renders frames` reads main.js's requestAnimationFrame counter and a rAF
+   counter has nothing to do with pixels. There is now a real pixel count and
+   the recovery is asserted: `0 lit while lost, 3843 of 4096 lit after,
+   1 rebuild`. `--falsify context` (`?ctxbug=1`) proves it can go red.
+
+2. **One bad value in localStorage bricked the game permanently.** `read()` in
+   `js/core/save.js` was `v ? JSON.parse(v) : d`, and the string "null" is
+   TRUTHY — so it returned null and `save.settings.quality` threw inside boot()
+   on every subsequent visit, with no in-game way to clear it. SILT never writes
+   null itself, but `lib/auth/localsync.js` mirrors a remote payload into these
+   keys unvalidated. Now shape-checked: a save that cannot be read is a save
+   that resets.
+
+3. **The Biome setting was a one-way door.** Default is `auto`, meaning "follow
+   the mode's own biome" — and `auto` was not one of the options. The segment
+   opened with nothing lit, and one tap pinned every mode to one biome forever,
+   silently undoing the whole per-mode biome fix. Auto is now the first option.
+
+4. **Screen shake was wired to nothing.** Six modes call `api.shake()`,
+   CONTRACTS.md lists it in both the api and the draw opts, and the renderer
+   implements it fully — but main.js stubbed the api out AND never passed
+   `shake` to draw(). It looked wired because `dev/gfx.html` drives it
+   correctly; the only host that never did was the game. Same for the
+   interpolation `alpha`, which shipped hardcoded to 1.
+
+5. **The Haptics setting did nothing.** The only `vibrate()` call in the tree
+   was the toggle's own confirmation buzz and nothing ever read the flag. Now
+   fired on landing and on a chain — and the row is hidden where
+   `navigator.vibrate` does not exist, which includes every iPhone. A switch
+   that cannot do the thing it names is worse than an absent one.
+
+6. **`shatter()` never counted a destruction.** A cell overwritten from
+   non-EMPTY is destroyed, and it was not counted, so
+   `count === start + created - destroyed` was false whenever a piece landed
+   into gas — which is most of ALCHEMY, since `collides()` deliberately ignores
+   GAS. `g.count` stayed correct throughout because `set()` guards it on its
+   own, which is exactly why no gate noticed. `tools/sim.mjs` now checks the
+   IDENTITY as a delta across each game, with a `--break identity` arm that
+   reproduces the old behaviour rather than fabricating a number.
+
+7. **`boot.mjs`'s "mass ledger sane" was a bounds check wearing a ledger's
+   name.** `cells >= 0 && cells <= 112*224` stayed green with `g.count` set to 7
+   on a live 512-cell board, and 112x224 is not even the board any more. It now
+   asks the grid to recount itself, with a `--falsify ledger` arm.
+
+8. **Seventeen of ZEN's eighteen controls were under 44px** — a 16px tint dot,
+   in the one mode whose entire interaction IS the palette. Nothing could catch
+   it: `el.click()` does not care how big an element is. `tools/uishot.mjs --hit`
+   now measures the REAL tappable extent by probing `elementFromPoint` outward
+   from each control's centre, which sees pseudo-elements, overlap by later
+   siblings, and anything invisible sitting on top. Bar is 32x44 (an iOS
+   keyboard key) across five screens; `--hitbug` collapses the targets and all
+   five go red.
+
+   Three things that fix taught: `inset` is relative to the PADDING box, so a
+   1px border quietly eats 2px off every span; abutting hit boxes are won by the
+   LATER sibling, so a row of controls can only ever be as wide as its pitch;
+   and the chip row wraps at 390px, so its row-gap has to carry a full target
+   height or the two lines eat each other.
+
+9. `?seed=0` was silently ignored (`+q.get('seed') || undefined`). A test hook
+   that quietly does something else is worse than one that is missing.
+
+### Two hazards closed, no bug attached
+
+`js/modes/index.js` passed the live `clears.lastChain` array to `onChain`; main.js
+had been changed to `.slice()` it because that array is reused on the next
+detection, and routing the host loop through `stepMode` dropped the copy. No
+shipped mode holds it past the call, so nothing was broken — the copy is back
+because the hazard it exists for is real. And `createSandTouch`'s predicate named
+three of the four sheets; it now calls `sheetsOpen()`, which is the one list.
+
+### The pattern
+
+Seven of the nine were invisible to a green suite, and in five cases the check
+that should have caught it was measuring an adjacent quantity that cannot fail:
+a rAF counter for pixels, a bounds test for a ledger, a click for a touch target,
+a DOM query for what a player can see. CLAUDE.md's rule holds per GATE and not
+per CHECK, and that gap is what a lost context cost. Every gate added in this
+pass has an arm, and every arm was watched going red.

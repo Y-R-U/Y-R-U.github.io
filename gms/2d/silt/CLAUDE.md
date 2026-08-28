@@ -34,7 +34,16 @@ node tools/modesim.mjs             per-mode balance + ALCHEMY level validation
 node tools/boot.mjs                boot + soak on a true 390x844 viewport
 node tools/gfx_shot.mjs --check    v-flip regression
 node tools/uishot.mjs --probe      real button clicks
+node tools/uishot.mjs --hit        every control is 32x44 to a thumb
 ```
+
+**Every CHECK — not every gate — needs an arm, and each one must be watched
+going red.** That distinction cost a real bug: the boot gate had arms, but not
+for `renders frames`, which reads a requestAnimationFrame counter and therefore
+cannot fail for a rendering fault. A lost GPU context left the canvas black
+forever and all eight checks stayed green. Look for the check that is measuring
+an adjacent quantity: a rAF counter for pixels, a bounds test for a ledger, an
+`el.click()` for a touch target, a `querySelector` for what a player can see.
 
 **Every gate has a `--break` / `--falsify` arm, and each one is proven to go
 red.** Do not trust a gate you have not seen fail — the boot gate's first
@@ -65,6 +74,7 @@ a deliberately broken page.
 
 `?auto` bot plays · `?mode=` · `?seed=` · `?q=high|low` · `?preserve=1` · `?dpr=1`
 `?soak` attract screen, no account layer · `?attract=<id>` pins the title mode
-`?attractbug=vent` falsification arm: leaves an exhausted attract board running
+Falsification arms, never shipped set: `?attractbug=vent` leaves an exhausted
+attract board running · `?ctxbug=1` skips the GPU-context rebuild
 `window.__state` (lazy getter, never stale) · `window.__game`
 Under `?auto` the account layer is never imported, so soak runs stay hermetic.

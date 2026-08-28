@@ -69,14 +69,25 @@ export function createSettings(deps) {
       if (m && Array.isArray(m.BIOME_NAMES) && m.BIOME_NAMES.length) biomes = m.BIOME_NAMES;
     } catch { /* lane A not landed; the three defaults are right anyway */ }
 
-    sheet.body.replaceChildren(
+    // .filter(Boolean): replaceChildren is a DOM call, not h()'s child list —
+    // a null argument becomes the literal text "null" on the page.
+    sheet.body.replaceChildren(...[
       row('Music', null, slider(st.music, (v) => { set('music', v); applyVolume(); })),
       row('Effects', null, slider(st.sfx, (v) => { set('sfx', v); applyVolume(); deps.blip && deps.blip(); })),
+      // AUTO FIRST, and it is not a nicety. 'auto' is the default and it means
+      // "follow the mode's own biome" — but it was not one of the options, so
+      // the segment opened with nothing lit (reading as broken), and one tap
+      // pinned EVERY mode to a single biome with no way back short of clearing
+      // localStorage. That silently undid the per-mode biome work: pick Abyss
+      // once and ALCHEMY, which declares kiln, renders abyss forever.
       row('Biome', 'palette and light rig',
-        seg(biomes.map((b) => [b, b[0].toUpperCase() + b.slice(1)]), st.biome, (v) => {
+        seg([['auto', 'Auto'], ...biomes.map((b) => [b, b[0].toUpperCase() + b.slice(1)])], st.biome, (v) => {
           set('biome', v);
-          const R = window.__game && window.__game.renderer;
-          if (R && R.setBiome) R.setBiome(v);
+          const g = window.__game;
+          // 'auto' has no biome of its own to show; ask the host what the mode
+          // it is currently running wants, which is the same call startGame makes.
+          if (v === 'auto') { g && g.applyBiome && g.applyBiome(); return; }
+          if (g && g.renderer && g.renderer.setBiome) g.renderer.setBiome(v);
         })),
       row('Quality', 'lower this if the sand stutters',
         seg(QUALITY, st.quality, (v) => {
@@ -84,15 +95,19 @@ export function createSettings(deps) {
           const R = window.__game && window.__game.renderer;
           if (R && R.setQuality) R.setQuality(v);
         })),
-      row('Haptics', 'a tick on landing and on a chain',
+      // Only offered where it can actually happen. iOS Safari has no
+      // navigator.vibrate, and a switch that cannot do the thing it names is
+      // worse than an absent one — this row promised "a tick on landing and on
+      // a chain" for a whole release while nothing read the flag at all.
+      navigator.vibrate ? row('Haptics', 'a tick on landing and on a chain',
         toggle(st.haptics !== false, (v) => {
           set('haptics', v);
-          if (v && navigator.vibrate) navigator.vibrate(8);
-        })),
+          if (v) navigator.vibrate(8);
+        })) : null,
       h('div', { class: 'row row--note', style: { justifyContent: 'center' } },
         h('span', { class: 'row-sub', style: { marginTop: '0', textAlign: 'center' },
           text: 'SILT — a falling-sand puzzle. Best scores live on this device.' })),
-    );
+    ].filter(Boolean));
   }
 
   return {

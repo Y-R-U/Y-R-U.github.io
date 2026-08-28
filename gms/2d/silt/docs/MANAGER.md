@@ -16,7 +16,7 @@ step, no CDN, no dependencies.
 | P3 | FLOW playable and balanced | **done** |
 | P4 | Jelly soft-body, TIDE, JELLY LAB | **done** |
 | P5 | Reactions, HOURGLASS, ZEN | **done** |
-| P6 | ALCHEMY levels (96, all validated) | **done** |
+| P6 | ALCHEMY levels (107, all validated) | **done** |
 | P7 | Shell, attract screen, audio, ship | **done** |
 
 ## Lanes
@@ -65,6 +65,17 @@ flag first.
   publishing them would remove that reach-in.
 - ALCHEMY tops out as often as it times out. The result card names both, but
   whether that is the intended fail mix is a balance question.
+- **Three slag levels are tight on the CLOCK, not the target**: ids 17, 20 and
+  42 have a median completion of 86-99% of their limit, and 20 is in act I. The
+  HEADROOM rule cannot see them — a purge target is a level to reduce TO, so its
+  margin is structurally 0.6 of progress and the tightness lives in `limitS`.
+  A human is likely faster than the bot at a purge, so this is a playtest
+  question before it is a generator question. If it needs fixing, the rule
+  belongs in the same acceptance path and the lever is `limitS`.
+- **Quench is down to 4 levels.** Six of its seven were rejected for no
+  headroom, correctly: crystal saturates at 32-38 against a floor of 32, because
+  crystal permanently seals the lava body that makes it. Quench needs a
+  different objective, not a different number.
 - The cool tint reads slightly greener in flight than settled. With three tints
   and one cool, the mapping stays unambiguous.
 - ZEN and FLOW/JELLY share a HUD shape by declaration, not by accident.

@@ -24,6 +24,46 @@ const fail = (msg) => {
   console.error(msg);
 };
 
+let ctxRestores = 0;
+
+/**
+ * A LOST GPU CONTEXT IS OTHERWISE PERMANENT, SILENT AND INVISIBLE.
+ *
+ * Backgrounding a tab, a recycled GPU process under memory pressure, a driver
+ * reset — all routine on a phone. The renderer stops drawing the moment it
+ * sees `webglcontextlost` and nothing ever clears that flag, so the canvas
+ * goes black for good while the sim keeps ticking at 60Hz, the HUD keeps
+ * updating and the score keeps climbing on a board nobody can see. No error,
+ * no callout, and every boot check stays green: the fps counter measures
+ * requestAnimationFrame, which has nothing to do with pixels.
+ *
+ * Rebuilding through the same factory the boot path uses is the whole fix. The
+ * renderer holds its GL resources in closure state, so there is nothing to
+ * restore piecemeal — the context object is the same one after a restore, and
+ * a fresh renderer simply allocates fresh resources on it. The lost renderer's
+ * handles die with it.
+ *
+ * ?ctxbug=1 skips this, so tools/boot.mjs can watch the recovery check go red.
+ * Never ship a build that sets it.
+ */
+function watchContext(gfx) {
+  if (!gfx || !gfx.createRenderer || q.has('ctxbug')) return;
+  let rebuilding = false;
+  canvas.addEventListener('webglcontextrestored', async () => {
+    if (rebuilding) return;
+    rebuilding = true;
+    try {
+      const quality = q.get('q') || save.settings.quality || 'auto';
+      R = await gfx.createRenderer(canvas, { preserveDrawingBuffer: q.has('preserve'), quality });
+      R.resize(view.w, view.h, view.dpr);
+      applyBiome(biomeFor(mode));
+      ctxRestores++;
+    } catch (e) {
+      fail('SILT lost the GPU context and could not rebuild it: ' + (e && e.message ? e.message : e));
+    } finally { rebuilding = false; }
+  });
+}
+
 /** Lanes land at different times; the game must boot with any of them missing. */
 async function loadOptional(path, fallback) {
   try { return await import(path); } catch (e) { console.warn('optional module missing:', path, e.message); return fallback; }
@@ -41,6 +81,7 @@ async function boot() {
   }
   R.resize(view.w, view.h, view.dpr);
   view.onResize((v) => R.resize(v.w, v.h, v.dpr));
+  watchContext(gfx);
 
   const audioMod = await loadOptional('./audio/index.js', null);
   AUDIO = audioMod && audioMod.createAudio ? audioMod.createAudio() : {
@@ -73,7 +114,12 @@ async function boot() {
     import('./cloud.js').then((m) => { window.SiltCloud = m; }).catch(() => {});
   }
 
-  if (q.has('auto')) startGame(q.get('mode') || 'flow', { seed: +q.get('seed') || undefined, auto: true });
+  // Number.isFinite, not `|| undefined`: ?seed=0 is a legitimate seed and the
+  // truthiness test silently handed it a random one instead. A test hook that
+  // quietly does something else is worse than one that is missing.
+  const qSeed = +q.get('seed');
+  if (q.has('auto')) startGame(q.get('mode') || 'flow',
+    { seed: q.has('seed') && Number.isFinite(qSeed) ? qSeed : undefined, auto: true });
   else startAttract();
 
   last = performance.now();
@@ -111,10 +157,21 @@ function makeWorld(m, opts = {}) {
   return w;
 }
 
+/**
+ * Screen shake, which the shipped game did not have.
+ *
+ * Six modes call api.shake() on a chain or a flip, CONTRACTS.md lists it in
+ * both the mode api and the draw opts, and js/gfx/renderer.js implements it
+ * fully — but main.js stubbed the api out AND never passed `shake` to draw(),
+ * so every one of those calls went nowhere. It looked wired because dev/gfx.html
+ * drives it correctly; the only host that never did was the game.
+ */
+let shakeAmt = 0;
+
 const api = {
   get rng() { return world.rng; },
   biome: (n) => applyBiome(n),
-  shake: () => {},
+  shake: (v) => { shakeAmt = Math.min(1, shakeAmt + (v || 0)); },
   banner: (t) => UI && UI.banner && UI.banner(t),
   setGravity: (x, y) => world.setGravity(x, y),
   sfx: (n, mag) => AUDIO.sfx(n, mag),
@@ -217,10 +274,31 @@ function endGame() {
   });
 }
 
+/**
+ * A tick you can feel — and only if the player asked for one.
+ *
+ * `settings.haptics` shipped reading "a tick on landing and on a chain" and was
+ * wired to nothing: the only vibrate() call in the tree was the toggle's own
+ * confirmation buzz, and nothing ever read the flag. iOS Safari has no
+ * navigator.vibrate at all, which is why js/ui/settings.js now hides the row
+ * rather than offering a switch that cannot do anything.
+ */
+function haptic(ms) {
+  if (save.settings.haptics === false) return;
+  try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { /* not permitted */ }
+}
+
 function simTick() {
   const before = world.chains;
+  // land() nulls the piece and returns; the next spawn is a whole tick later,
+  // so this transition is the landing and cannot be confused with a respawn.
+  const hadPiece = !!world.piece;
   world.tick();
-  if (world.chains > before) AUDIO.sfx('chain', world.lastChainSize);
+  if (hadPiece && !world.piece && !world.over) { AUDIO.sfx('land'); if (state === 'play') haptic(8); }
+  if (world.chains > before) {
+    AUDIO.sfx('chain', world.lastChainSize);
+    if (state === 'play') haptic(Math.min(38, 12 + world.lastChainSize / 90));
+  }
   // Delegate to the modes lane's reference host loop: world.tick -> onChain ->
   // onTick. onTick running LAST is what lets the scorer diff world.score across
   // a tick boundary, so it stays correct if the engine's own award is retuned.
@@ -256,7 +334,13 @@ function frame(now) {
     if (n >= MAX_STEPS) acc = 0;
   }
 
-  if (world && R) R.draw(world, { view, t: now / 1000, biome: save.settings.biome, state });
+  shakeAmt = Math.max(0, shakeAmt - dt * 2.2);
+  // `acc * SIM_HZ` is the fraction of a tick the renderer is between frames.
+  // It shipped hardcoded to 1, which is the "always exactly on a tick" lie.
+  if (world && R) {
+    R.draw(world, { view, t: now / 1000, biome: save.settings.biome, state, shake: shakeAmt },
+      Math.max(0, Math.min(1, acc * SIM_HZ)));
+  }
   if (UI && UI.setHud && state === 'play') {
     UI.setHud({
       score: world.score, chains: world.chains, combo: world.combo,
@@ -275,7 +359,7 @@ Object.defineProperty(window, '__state', {
     const s = world.snapshot();
     const rs = R && R.stats ? R.stats() : {};
     return { ...s, state, fps: +fps.toFixed(1), mode: mode && mode.id, runs: attractRuns,
-      placeholder: !!(R && R.placeholder), gfx: rs };
+      restores: ctxRestores, placeholder: !!(R && R.placeholder), gfx: rs };
   },
 });
 window.__game = {
@@ -301,6 +385,8 @@ window.__game = {
   },
   get view() { return view; },
   get renderer() { return R; },
+  /** Re-apply the biome the CURRENT mode wants — what settings' Auto asks for. */
+  applyBiome: () => applyBiome(biomeFor(mode)),
   start: startGame, attract: startAttract, save,
   get input() { return INPUT; },
   startLevel(n) { return startGame('alchemy', { level: n | 0 }); },

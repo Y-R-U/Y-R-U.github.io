@@ -6,6 +6,8 @@
 //   node tools/boot.mjs --gpu           real GPU (ANGLE Metal); the only honest timings
 //   node tools/boot.mjs --falsify       break the page on purpose; every check MUST go red
 //   node tools/boot.mjs --falsify vent  leave an exhausted attract board running
+//   node tools/boot.mjs --falsify context   lose the GPU context, do not rebuild
+//   node tools/boot.mjs --falsify ledger    poke g.count behind the ledger's back
 //
 // Always ?preserve=1&dpr=1 headless: captureScreenshot hangs on an animating
 // WebGL canvas, and dpr 2 under SwiftShader takes minutes a frame.
@@ -32,6 +34,22 @@ const fi = args.indexOf('--falsify');
 const ALLOW_PLACEHOLDER = args.includes('--allow-placeholder');
 const SOAK = args.includes('--soak') ? 3600 : 700;   // frames; --soak for the long run
 const FALSIFY = fi >= 0 ? (args[fi + 1] && !args[fi + 1].startsWith('--') ? args[fi + 1] : 'boot') : null;
+
+/**
+ * How much of the canvas is actually LIT, sampled through a 64x64 downscale.
+ * ?preserve=1 is what makes the drawing buffer readable at all; without it the
+ * canvas is legitimately blank by the time anything can look at it.
+ */
+const PIXELS = `(() => {
+  const c = document.getElementById('game');
+  const t = document.createElement('canvas'); t.width = 64; t.height = 64;
+  const x = t.getContext('2d');
+  x.drawImage(c, 0, 0, 64, 64);
+  const d = x.getImageData(0, 0, 64, 64).data;
+  let n = 0;
+  for (let i = 0; i < d.length; i += 4) if (d[i] + d[i + 1] + d[i + 2] > 24) n++;
+  return n;
+})()`;
 
 const fails = [];
 const check = (name, ok, detail = '') => {
@@ -85,11 +103,56 @@ try {
   await cdp.frames(SOAK);
   const s2 = await cdp.state();
   check(`survives ${SOAK} frames`, !!(s2 && s2.ticks > s1.ticks), s2 ? `ticks ${s2.ticks}` : 'dead');
-  check('mass ledger sane', !!(s2 && s2.cells >= 0 && s2.cells <= 112 * 224), s2 ? `cells ${s2.cells}` : '');
+  // A REAL LEDGER CHECK. This was `cells >= 0 && cells <= 112*224` — a bounds
+  // test wearing a ledger's name. Setting g.count to 7 on a live 512-cell board
+  // left it green, and the hardcoded 112x224 is not even the board any more:
+  // JELLY is 88x192 and ALCHEMY runs 80x160 to 104x208. Ask the grid to count
+  // itself, which is what tools/sim.mjs has always done.
+  if (FALSIFY === 'ledger') await cdp.eval('window.__game.world.g.count = 7');
+  const ledger = await cdp.eval(`(() => { const g = window.__game.world.g;
+    return JSON.stringify({ count: g.count, real: g.recount(), cols: g.cols, rows: g.rows }); })()`);
+  const L = JSON.parse(ledger);
+  check('mass ledger honest', L.count === L.real && L.count <= L.cols * L.rows,
+    `${L.count} vs ${L.real} counted, board ${L.cols}x${L.rows}`);
 
   check('real renderer, not the placeholder',
     ALLOW_PLACEHOLDER || !(s2 && s2.placeholder),
     s2 && s2.placeholder ? 'js/gfx/renderer.js failed to load — game is drawing cells' : `tier ${s2 && s2.gfx && s2.gfx.tier}`);
+
+  // ------------------------------------------------------------- GPU context
+  // THE FPS COUNTER IS NOT A PIXEL. `renders frames` reads main.js's rAF
+  // counter, which keeps ticking happily on a canvas that has drawn nothing
+  // since the GPU context went away — and a lost context IS permanent unless
+  // something rebuilds: the renderer stops on webglcontextlost and there was
+  // nothing to clear the flag. Every check in this gate stayed green on a
+  // completely black screen. So count the pixels, then take the context away
+  // and count them again.
+  {
+    const bug = FALSIFY === 'context' ? '&ctxbug=1' : '';
+    await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=flow&seed=99${bug}`);
+    await cdp.waitFor('window.__state && window.__state.state === "play"', 12000);
+    await cdp.frames(90);
+    const lit = await cdp.eval(PIXELS);
+    check('the canvas is actually drawing', lit > 200, `${lit} of 4096 sampled pixels lit`);
+
+    // Keep the extension INSTANCE. restoreContext() on a freshly fetched handle
+    // is silently a no-op in Chrome — the event never fires and the recovery
+    // looks broken when it is the test that is. It also needs real wall-clock
+    // time either side, not frames.
+    await cdp.eval(`(() => { const gl = document.getElementById('game').getContext('webgl2');
+      window.__lose = gl && gl.getExtension('WEBGL_lose_context');
+      if (window.__lose) window.__lose.loseContext(); return !!window.__lose; })()`);
+    await new Promise((r) => setTimeout(r, 300));
+    const black = await cdp.eval(PIXELS);
+    await cdp.eval('window.__lose && window.__lose.restoreContext()');
+    await new Promise((r) => setTimeout(r, 1500));
+    await cdp.frames(60);
+    const after = await cdp.eval(PIXELS);
+    const st = await cdp.state();
+    check('a lost GPU context is rebuilt, not left black',
+      after > 200 && !!(st && st.restores >= 1),
+      `${black} lit while lost, ${after} of 4096 lit after, ${st ? st.restores : '?'} rebuild(s)`);
+  }
 
   // ---------------------------------------------------------------- attract
   // The title screen must never show the sim in trouble. ZEN has no fail state

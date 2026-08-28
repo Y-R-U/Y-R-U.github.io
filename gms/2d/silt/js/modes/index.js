@@ -41,7 +41,12 @@ export function biomeFor(modeId) {
 export function stepMode(mode, world, api, chainsBefore) {
   const before = chainsBefore === undefined ? world.chains : chainsBefore;
   if (world.chains > before && mode.onChain) {
-    mode.onChain(world, api, world.clears.lastChain);
+    // .slice(), because clears reuses that array on the next detection. main.js
+    // was changed to copy it after a mode held one and read a later chain's
+    // cells; routing the host loop through here quietly dropped the copy. No
+    // shipped mode keeps it past the call, so this is the hazard being closed
+    // rather than a bug being fixed — but the hazard is why the copy exists.
+    mode.onChain(world, api, world.clears.lastChain.slice());
   }
   if (mode.onTick) mode.onTick(world, api);
 }

@@ -72,6 +72,11 @@
 
 .gb--icon { width: 42px; height: 42px; border-radius: 15px; gap: 0; color: rgba(246,239,228,.9); }
 .gb--icon svg { width: 19px; height: 19px; }
+/* 42 px drawn is the right SIZE — these are quiet corner controls and a 48 px
+   disc in the corner of a title screen shouts. 42 px TAPPED is not: it is under
+   the 44 px minimum on every one of them, including the close button that every
+   sheet is dismissed with. The disc stays 42 and the target becomes 50. */
+.gb--icon::after { content: ''; position: absolute; inset: -4px; border-radius: 19px; }
 
 .gb--pill { height: 52px; padding: 0 20px; border-radius: 26px; }
 
@@ -530,7 +535,12 @@
 }
 .zp-head {
   display: flex; align-items: center; justify-content: center; gap: 10px;
-  width: max-content; max-width: 100%; margin: 0 auto 9px;
+  /* 9px of separation was fine when the controls in these two rows were 16 and
+     26 px of drawn dot. Now that each one claims 44 px of THUMB, the head row
+     and the chip row overlap, and the chips — later in the DOM — win, clipping
+     the tint and brush targets they sit under. The gap is what buys both rows
+     their height. */
+  width: max-content; max-width: 100%; margin: 0 auto 22px;
   padding: 5px 12px; border-radius: 13px;
   border: 1px solid rgba(255,238,212,.12);
   background: rgba(10,9,12,.5);
@@ -540,25 +550,51 @@
   font-size: 10px; letter-spacing: .24em; text-transform: uppercase; font-weight: 700;
   color: rgba(246,239,228,.72); text-shadow: 0 1px 4px rgba(0,0,0,.9);
 }
-.zp-tints { display: none; gap: 5px; }
+/* THE PALETTE IS ZEN'S ENTIRE INTERACTION, and it shipped with seventeen of its
+   eighteen controls under 44 px — a 16 px tint dot, chosen with the other thumb
+   already on the board. The dots stay small (eleven materials have to fit one
+   row on a 390 px phone; growing them is not available) and the HIT BOX grows
+   instead, to at least 32x44 — an iOS keyboard key, which is the precedent for
+   a dense row of targets that people hit accurately all day.
+
+   `inset` is relative to the PADDING box, so a 1 px border quietly eats 2 px off
+   every span — the numbers here are two wider than the arithmetic suggests.
+
+   A pseudo-element, not padding: padding would move the dots apart and re-flow the row.
+   Nothing here can be checked by clicking, because el.click() does not care how
+   big an element is — tools/uishot.mjs --hit measures the REAL tappable extent
+   by probing elementFromPoint outward from each control's centre. */
+.zp-tints { display: none; gap: 18px; }
 .zen-pal.is-tinted .zp-tints { display: inline-flex; }
 .zp-tint {
-  pointer-events: auto; width: 16px; height: 16px; padding: 0; border-radius: 50%;
+  pointer-events: auto; position: relative;
+  width: 16px; height: 16px; padding: 0; border-radius: 50%;
   border: 1px solid rgba(255,255,255,.22); background: var(--sw); cursor: pointer;
   opacity: .48; transition: opacity .18s, transform .18s, box-shadow .18s;
 }
+.zp-tint::before { content: ''; position: absolute; inset: -16px -13px; border-radius: 12px; }
 .zp-tint.on { opacity: 1; transform: scale(1.12); box-shadow: 0 0 0 2px rgba(255,240,214,.7); }
 
-.zp-sizes { display: inline-flex; align-items: center; gap: 3px; }
-.zp-size { pointer-events: auto; width: 20px; height: 20px; padding: 0; border: 0; background: none; display: grid; place-items: center; cursor: pointer; }
+.zp-sizes { display: inline-flex; align-items: center; gap: 12px; }
+.zp-size { pointer-events: auto; position: relative; width: 20px; height: 20px; padding: 0; border: 0; background: none; display: grid; place-items: center; cursor: pointer; }
+.zp-size::before { content: ''; position: absolute; inset: -12px -6px; border-radius: 12px; }
 .zp-size i { display: block; width: 5px; height: 5px; border-radius: 50%; background: rgba(246,239,228,.36); transition: background .18s, box-shadow .18s; }
 .zp-size:nth-child(2) i { width: 8px; height: 8px; }
 .zp-size:nth-child(3) i { width: 12px; height: 12px; }
 .zp-size.on i { background: #ffd9a4; box-shadow: 0 0 8px rgba(255,190,110,.8); }
 
 .zp-chips {
-  display: flex; justify-content: center; align-items: center; gap: 5px; flex-wrap: nowrap;
-  width: max-content; max-width: 100%; margin: 0 auto;
+  /* WRAPS, and it has to. Eleven materials at a 34 px pitch is 374 px, which
+     fits a 390 px phone and does not fit a 375 px SE — and a thumb-sized target
+     is worth more than a single unbroken row. `width: max-content` was what
+     stopped it wrapping; with `auto` the row breaks onto a second line only on
+     the phones that need it. */
+  /* The row-gap is 18, not 8, because the row DOES wrap at 390: eleven chips at
+     a 34 px pitch is 382 and the palette has 362 to give. A wrapped row whose
+     lines are 34 apart has each line eating 10 px of the other's target — the
+     middle chips measured 38 tall while their neighbours measured 50. */
+  display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 18px 8px;
+  width: auto; max-width: 100%; margin: 0 auto;
   padding: 7px 8px 9px; border-radius: 19px;
   border: 1px solid rgba(255,238,212,.12);
   background: rgba(10,9,12,.5);
@@ -566,14 +602,18 @@
   box-shadow: 0 10px 28px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,244,226,.09);
 }
 .zp-chip {
-  pointer-events: auto; flex: 0 0 auto;
-  width: 26px; height: 26px; padding: 0; border-radius: 50%; cursor: pointer;
+  pointer-events: auto; flex: 0 0 auto; position: relative;
+  width: 24px; height: 24px; padding: 0; border-radius: 50%; cursor: pointer;
   border: 1px solid rgba(255,255,255,.2);
   background: var(--sw);
   box-shadow: 0 3px 10px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
   opacity: .85;
   transition: transform .16s var(--ease), box-shadow .18s, opacity .18s;
 }
+/* ::before, not ::after: .zp-chip--erase already owns ::after for its slash.
+   ?hitbug=1 in tools/uishot.mjs collapses these to prove the hit gate can fail. */
+.zp-chip::before { content: ''; position: absolute; inset: -13px -8px; border-radius: 14px; }
+
 .zp-chip.on {
   opacity: 1; transform: translateY(-4px) scale(1.12);
   box-shadow: 0 0 0 2px rgba(255,238,208,.85), 0 6px 16px rgba(0,0,0,.55);
@@ -803,9 +843,13 @@ input[type=range]::-moz-range-thumb { width: 15px; height: 15px; border-radius: 
   pointer-events: auto;
   border: 0; background: transparent; color: rgba(246,239,228,.5);
   font: inherit; font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-  padding: 6px 10px; border-radius: 9px; cursor: pointer;
+  padding: 12px 10px; border-radius: 9px; cursor: pointer;
+  position: relative;
   transition: background .18s, color .18s;
 }
+/* 24 px tall, in a settings sheet operated with one thumb. The extra padding
+   takes the drawn button to 36 and this takes the target to 44. */
+.seg button::after { content: ''; position: absolute; inset: -4px 0; }
 .seg button.on { background: rgba(255,214,150,.16); color: #ffe7c4; box-shadow: inset 0 0 0 1px rgba(255,206,130,.22); }
 
 .tog {
@@ -814,6 +858,7 @@ input[type=range]::-moz-range-thumb { width: 15px; height: 15px; border-radius: 
   border: 1px solid rgba(255,238,212,.14); background: rgba(0,0,0,.3);
   cursor: pointer; transition: background .22s, border-color .22s;
 }
+.tog::before { content: ''; position: absolute; inset: -11px 0; }
 .tog::after {
   content: ''; position: absolute; top: 2px; left: 2px;
   width: 19px; height: 19px; border-radius: 50%;
@@ -1015,13 +1060,14 @@ input[type=range]::-moz-range-thumb { width: 15px; height: 15px; border-radius: 
 }
 .lv-acts { display: flex; gap: 5px; flex: 0 0 auto; }
 .lv-chip {
-  pointer-events: auto;
+  pointer-events: auto; position: relative;
   min-width: 32px; height: 40px; padding: 0 6px;
   border: 1px solid rgba(255,238,212,.12); border-radius: 13px;
   background: rgba(255,240,220,.03);
   color: rgba(246,239,228,.5); font: inherit; font-size: 11px; font-weight: 700; letter-spacing: .08em;
   cursor: pointer; transition: color .2s, background .2s, border-color .2s;
 }
+.lv-chip::after { content: ''; position: absolute; inset: -3px 0; }
 .lv-chip.on { color: #ffe7c4; background: rgba(255,214,150,.16); border-color: rgba(255,206,130,.34); }
 .lv-chip.is-shut { color: rgba(246,239,228,.24); }
 .lv-cont { flex: 1; height: 46px; padding: 0 12px; gap: 7px; font-size: 12px; white-space: nowrap; }

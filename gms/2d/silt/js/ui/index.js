@@ -682,7 +682,11 @@ export function createUI(handlers = {}) {
     requestAnimationFrame(syncBoard);
   }
 
-  createSandTouch(attract, () => current === 'attract' && !modeSheet.open && !dailySheet.open && !settings.open);
+  // sheetsOpen(), not a hand-written list: the original named three of the four
+  // sheets and left out the campaign picker. Nothing leaked through — guarded()
+  // in sandtouch.js blocks a tap on any .sheet structurally — but two lists of
+  // the same thing is how the next sheet gets forgotten.
+  createSandTouch(attract, () => current === 'attract' && !sheetsOpen());
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) wm.stop();

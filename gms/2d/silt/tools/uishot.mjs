@@ -854,6 +854,111 @@ async function attractFit(S, ok) {
     g.bs.map((b) => `${b.w.toFixed(0)}x${b.h.toFixed(0)}`).join(' '));
 }
 
+/**
+ * MEASURE THE TAPPABLE EXTENT, not the drawn box.
+ *
+ * `el.click()` does not care how big an element is, so every interaction check
+ * in this file was green against a ZEN palette whose tint dots were 16 px —
+ * seventeen of its eighteen controls under the 44 px minimum, in the one mode
+ * whose entire interaction IS the palette. getBoundingClientRect is not the
+ * answer either: it cannot see a ::before that widens the target, which is
+ * exactly how the fix works.
+ *
+ * So probe. From each control's centre, walk outwards until elementFromPoint
+ * stops landing on that control, and report the box that survives. That
+ * measures pseudo-elements, overlap by later siblings, and anything invisible
+ * sitting on top — a real thumb's answer rather than the stylesheet's.
+ *
+ * The bar is 32x44, not 44x44: eleven materials have to share one row on a
+ * 390 px phone, and an iOS keyboard key is 32 wide. Full height is what makes
+ * those hittable.
+ */
+const HIT_PROBE = `(() => {
+  const SEL = '.gb, .mcard, .lvt, .lv-chip, .seg button, .tog, .zp-chip, .zp-tint, .zp-size';
+  const out = [];
+  for (const el of document.querySelectorAll(SEL)) {
+    const r = el.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) continue;
+    const cs = getComputedStyle(el);
+    if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity === 0) continue;
+    // A control half-scrolled out of a sheet measures small because it IS half
+    // there, which is not a design fault. Judge only what is fully on screen:
+    // the campaign picker scrolls 100 tiles and its top and bottom rows were
+    // reporting as undersized targets every run.
+    let clip = null;
+    for (let a = el.parentElement; a; a = a.parentElement) {
+      const acs = getComputedStyle(a);
+      if (/(auto|scroll)/.test(acs.overflowY + acs.overflowX)) { clip = a.getBoundingClientRect(); break; }
+    }
+    if (clip && (r.top < clip.top - 1 || r.bottom > clip.bottom + 1)) continue;
+    if (r.top < 0 || r.bottom > innerHeight) continue;
+    const cx = Math.round(r.left + r.width / 2), cy = Math.round(r.top + r.height / 2);
+    const mine = (x, y) => {
+      if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) return false;
+      const hit = document.elementFromPoint(x, y);
+      return !!hit && (hit === el || el.contains(hit));
+    };
+    if (!mine(cx, cy)) continue;                 // covered by something else entirely
+    const reach = (dx, dy) => { let n = 0; while (n < 30 && mine(cx + dx * (n + 1), cy + dy * (n + 1))) n++; return n; };
+    const w = reach(-1, 0) + reach(1, 0) + 1;
+    const h = reach(0, -1) + reach(0, 1) + 1;
+    out.push({ w, h, dw: Math.round(r.width), dh: Math.round(r.height),
+      cls: el.className.split(' ')[0] || el.tagName,
+      lab: (el.textContent || el.getAttribute('aria-label') || '').trim().slice(0, 14) });
+  }
+  return JSON.stringify(out);
+})()`;
+
+async function hitGate() {
+  const fails = [];
+  const ok = (name, cond, detail = '') => {
+    if (!cond) fails.push(name + (detail ? ': ' + detail : ''));
+    console.log(`  ${cond ? 'ok  ' : 'FAIL'}  ${name}${detail ? '  ' + detail : ''}`);
+  };
+  const MIN_W = 32, MIN_H = 44;
+
+  await cdp.viewport(390, 844, 1, true);
+  for (const [name, url, open] of [
+    ['title screen', '?preserve=1&dpr=1&soak&seed=3', null],
+    ['modes sheet', '?preserve=1&dpr=1&soak&seed=3', 'window.__ui.openModes()'],
+    ['settings', '?preserve=1&dpr=1&soak&seed=3', 'window.__ui.openSettings()'],
+    ['campaign', '?preserve=1&dpr=1&soak&seed=3', 'window.__ui.openLevels()'],
+    ['zen palette', '?preserve=1&dpr=1&auto&mode=zen&seed=3', null],
+  ]) {
+    await cdp.goto(`${base}/gms/2d/silt/index.html${url}`);
+    if (!await cdp.waitFor('window.__ui && window.__state', 20000)) { ok(`${name}: came up`, false); continue; }
+    await cdp.frames(20);
+    // The arm collapses the hit boxes back to the drawn dots.
+    if (args.hitbug) {
+      await cdp.eval(`(() => { const s = document.createElement('style');
+        s.textContent = '.zp-chip::before, .zp-tint::before, .zp-size::before { inset: 0 } ' +
+          '.gb--icon::after, .seg button::after, .lv-chip::after { inset: 0 } ' +
+          '.tog::before { inset: 0 } .seg button { padding: 6px 10px }';
+        document.head.append(s); return 1; })()`);
+    }
+    if (open) { await cdp.eval(open); await new Promise((r) => setTimeout(r, 500)); }
+    const list = JSON.parse(await cdp.eval(HIT_PROBE));
+    const small = list.filter((b) => b.w < MIN_W || b.h < MIN_H);
+    if (args.hitdump) console.log('    ' + list.map((b) => `${b.cls}${b.lab ? '"' + b.lab + '"' : ''} tap ${b.w}x${b.h} drawn ${b.dw}x${b.dh}`).join('\n    '));
+    ok(`${name}: every control is at least ${MIN_W}x${MIN_H} to a thumb`,
+      list.length > 0 && small.length === 0,
+      `${list.length} controls, ${small.length} too small` +
+      (small.length ? ' — ' + small.slice(0, 4).map((b) => `${b.cls}${b.lab ? ' "' + b.lab + '"' : ''} ${b.w}x${b.h}`).join(', ') : ''));
+  }
+
+  if (args.falsify || args.hitbug) {
+    // All five screens carry at least one control whose target is built by a
+    // pseudo-element, so all five must go red. Anything less means a screen is
+    // being measured against nothing.
+    console.log(`\nfalsification arm: ${fails.length} of 5 checks went red`);
+    if (fails.length < 5) { console.log('ARM TOO WEAK — these sizes are not evidence'); process.exitCode = 1; }
+    else console.log('arm ok: the hit probe can see a control shrink');
+    return;
+  }
+  console.log(fails.length ? '\nHIT FAILURES:\n  ' + fails.join('\n  ') : '\nhit targets: all green');
+  if (fails.length) process.exitCode = 1;
+}
+
 const LAYOUT_MODES = ['flow', 'tide', 'jelly', 'hourglass', 'alchemy', 'zen'];
 
 async function layoutGate() {
@@ -1225,6 +1330,7 @@ try {
   if (args.layout) { console.log('\ntop-control layout'); await layoutGate(); }
   if (args.flow) { console.log('\nend-to-end flow'); await endToEnd(); }
   if (args.flow || args.win) { console.log('\nalchemy: a level played to a win'); await alchemyWin(); }
+  if (args.hit || args.hitbug) { console.log('\nthumb-sized hit targets'); await hitGate(); }
   if (args.probe) { console.log('\ninteraction probe'); await probe(); }
 
   const errs = cdp.errors.filter((e) => !/favicon/.test(e));

@@ -7,7 +7,26 @@ const K_STATS = 'silt.stats';
 const K_LASTMODE = 'silt.lastmode';   // written by js/ui — the mode PLAY resumes
 const K_LEVELS = 'silt.levels';       // ALCHEMY per-level stars: { [levelId]: stars }
 
-const read = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
+/**
+ * `v ? JSON.parse(v) : d` is not enough. The string "null" is TRUTHY, so it
+ * parses to null and is handed back in place of the default — and then
+ * `save.settings.quality` throws inside boot(), the page never comes up again
+ * on any subsequent visit, and there is no in-game way to clear it. SILT never
+ * writes null itself, but lib/auth/localsync.js mirrors a remote payload
+ * straight into these keys unvalidated, so a bad or partial payload is one
+ * hop from a permanent brick. Shape-check what comes back: a save that cannot
+ * be read is a save that gets reset, never a save that stops the game.
+ */
+const read = (k, d) => {
+  try {
+    const v = localStorage.getItem(k);
+    if (!v) return d;
+    const o = JSON.parse(v);
+    if (o === null || typeof o !== typeof d) return d;
+    if (typeof d === 'object' && (Array.isArray(o) !== Array.isArray(d))) return d;
+    return o;
+  } catch { return d; }
+};
 const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 
 export const SAVE_KEYS = [K_BEST, K_SET, K_STATS, K_LASTMODE, K_LEVELS];

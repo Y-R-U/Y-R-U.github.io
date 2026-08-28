@@ -133,7 +133,15 @@ export function shatter(g, p, stats) {
       for (let gx = 0; gx < BLK; gx++) {
         const x = x0 + gx;
         if (x < 0 || x >= g.cols) continue;
-        g.set(y * g.cols + x, p.mat, c.tint);
+        const i = y * g.cols + x;
+        // A cell overwritten from non-EMPTY is DESTROYED, and it was never
+        // counted. g.count stayed right — set() guards that — but the identity
+        // count === initial + created - destroyed did not, and it is the one
+        // the whole project leans on. It fires whenever a piece lands into gas,
+        // which is most of ALCHEMY: collides() deliberately ignores GAS so a
+        // water piece drops straight through the steam a quench threw up.
+        if (g.mat[i] !== EMPTY && stats) stats.destroyed++;
+        g.set(i, p.mat, c.tint);
         placed++;
       }
     }

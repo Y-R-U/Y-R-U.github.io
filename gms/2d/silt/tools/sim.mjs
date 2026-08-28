@@ -6,6 +6,7 @@
 //   node tools/sim.mjs                 run every gate
 //   node tools/sim.mjs --games 40      longer play gate
 //   node tools/sim.mjs --break <gate>  falsification arm: that gate MUST go red
+//     arms: mass  ledger  rng  clears  identity
 //
 // A gate that has never been proven to fail is not evidence, so --break exists
 // to show each one actually detecting the fault it claims to guard.
@@ -131,6 +132,32 @@ function gateDeterminism() {
   if (c.hash === a.hash) fail('G4-seeds', 'different seeds produced an identical board — is the seed wired up?');
 }
 
+/**
+ * THE IDENTITY, which is a different claim from the ledger.
+ *
+ * `count === recount()` only says the ledger agrees with the grid. It says
+ * nothing about whether every cell that appeared was CREATED and every cell
+ * that vanished was DESTROYED — and shatter() overwrote non-empty cells without
+ * counting one destruction, which happens every time a piece lands into gas.
+ * The count check was green through all of it, because g.set keeps count right
+ * on its own no matter who is or is not writing the stats.
+ *
+ * Measured as a DELTA across a window rather than from zero: a mode may paint a
+ * starting scene through g.fill, which moves count without touching stats, and
+ * that is not a fault — it is setup.
+ */
+function baseline(w) { return { n: w.g.count, c: w.stats.created, d: w.stats.destroyed }; }
+
+function identity(w, b, label) {
+  const got = w.g.count - b.n;
+  const want = (w.stats.created - b.c) - (w.stats.destroyed - b.d);
+  if (got !== want) {
+    return `${label}: identity broken — the board gained ${got} cells but ` +
+      `created-destroyed says ${want} (created ${w.stats.created - b.c}, destroyed ${w.stats.destroyed - b.d})`;
+  }
+  return null;
+}
+
 // --------------------------------------------------------------- G5 play
 function gatePlay() {
   let totalChains = 0, totalScore = 0, stalls = 0, lengths = [];
@@ -139,6 +166,11 @@ function gatePlay() {
     if (BREAK === 'clears') w.clears.detect = () => 0;
     const api = modeApi(w);
     if (FLOW && FLOW.onStart) FLOW.onStart(w, api);
+    // AFTER onStart: the scene a mode paints is setup, not gameplay.
+    const base = baseline(w);
+    // The arm reproduces the shipped bug exactly — a stats object that cannot
+    // count a destruction — rather than fabricating a number.
+    if (BREAK === 'identity') Object.defineProperty(w.stats, 'destroyed', { get: () => 0, set() {} });
     const bot = new Bot(w);
     let t = 0;
     const CAP = SIM_HZ * 240;
@@ -153,7 +185,7 @@ function gatePlay() {
       if (w.g.count === lastCells) sameFor++; else { sameFor = 0; lastCells = w.g.count; }
       if (sameFor > SIM_HZ * 12) { stalls++; break; }
     }
-    const err = check(w, `G5 game ${n}`);
+    const err = check(w, `G5 game ${n}`) || identity(w, base, `G5 game ${n}`);
     if (err) fail('G5-play', err);
     totalChains += w.chains; totalScore += w.score; lengths.push(t);
   }

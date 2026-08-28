@@ -97,7 +97,7 @@ export function worldCfgFor(opts = {}) {
 export default {
   id: 'alchemy',
   name: 'ALCHEMY',
-  blurb: 'Water quenches lava into crystal — and crystal is forever. Ninety graded problems.',
+  blurb: 'Water quenches lava into crystal — and crystal is forever. A graded campaign of measured problems.',
   biome: 'kiln',
   hud: ['score', 'objective', 'clock', 'next'],
   get levels() { return ACTIVE; },

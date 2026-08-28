@@ -16,7 +16,7 @@
 //   node tools/modesim.mjs --break <gate>      falsification arm: that gate MUST go red
 //
 // break gates: ledger  score  stall  rng  tide  zen  slots  trivial  unwinnable  span
-//              aspect
+//              aspect  headroom
 
 import { World, SIM_HZ, DEFAULT_CFG } from '../js/sim/world.js';
 import { Grid, F_CLEARING } from '../js/sim/grid.js';
@@ -391,6 +391,53 @@ async function validateLevel(lv, tries = 3) {
 const FLOOR = { chains: 2, dissolve: 900, crystal: 32, purge: 260 };
 
 /**
+ * A shipped target may not exceed this fraction of the bot's measured reach.
+ *
+ * A level whose objective sits at 100% of the ceiling the bot could find has no
+ * room in it: one unlucky seed, one slower human, and it is unwinnable rather
+ * than hard. The campaign shipped ten of them — level ONE among them, at target
+ * 2 against reach 2 — and none of the existing gates could see it, because each
+ * one is individually winnable, non-trivial and correctly starred.
+ */
+const HEADROOM = 0.8;
+
+/**
+ * FLOOR and HEADROOM have to be resolved TOGETHER, not applied in sequence.
+ *
+ * The calibrated target is 0.6 of reach. Clamping that UP to FLOOR is what
+ * manufactures a tight level: it fires exactly when reach is small, and the
+ * smaller the reach the closer to 100% of it the floor sits. All ten tight
+ * levels in the shipped table were made this way — four span at target 2 /
+ * reach 2, six quench at crystal 32 against a reach of 32 to 38. Enforcing
+ * FLOOR first and then testing HEADROOM would just relabel them; enforcing
+ * HEADROOM first and then clamping to FLOOR would put the floor back.
+ *
+ * So: cap the target at HEADROOM x reach, then take the floor. If the cap is
+ * below the floor there is no target that satisfies both and the level is
+ * rejected — a floor breach is the thing the floor exists to stop, and a level
+ * with no headroom is not worth shipping to save it.
+ *
+ * The `target = cap` branch cannot fire while the calibrator asks for 0.6 and
+ * HEADROOM is 0.8. It is written out anyway so that raising the calibration
+ * fraction can never quietly reintroduce tight levels.
+ */
+function resolveTarget(cal, floor) {
+  const cap = Math.floor(HEADROOM * cal.reach);
+  const want = Math.max(floor, cal.target);
+  if (want <= cap) return { target: want };
+  if (cap < floor) {
+    return { reject: `no headroom: a ${floor} floor is ${(floor / Math.max(1, cal.reach)).toFixed(2)}x the bot's reach of ${Math.round(cal.reach)}, over the ${HEADROOM} cap` };
+  }
+  return { target: cap };
+}
+
+/** How close a shipped level's target sits to the reach it was measured against. */
+function tightLevels(levels) {
+  return levels.filter((lv) => lv.objective.type !== 'purge' && lv.reach > 0
+    && lv.objective.target > HEADROOM * lv.reach);
+}
+
+/**
  * A4 — every shipped board must fill the screen like the rest of the game.
  *
  * js/core/viewport.js letterboxes the grid preserving aspect, so what the
@@ -490,25 +537,23 @@ async function generateLevels(count) {
       const cal = await calibrate(lv, 0.6);
       if (cal.err) { rejected.push([lv.id, lv.arch, 'invariant: ' + cal.err]); continue; }
       if (BREAK !== 'trivial' && BREAK !== 'unwinnable') {
-        if (cal.reach < FLOOR[lv.objective.type]) {
-          rejected.push([lv.id, lv.arch, `unreachable: bot only reached ${Math.round(cal.reach)} of a ${FLOOR[lv.objective.type]} floor`]);
-          continue;
-        }
-        // FLOOR is a property of the OBJECTIVE, so it has to be enforced on the
-        // target the level SHIPS with, not only on the reach the calibrator
-        // measured. Applying it to reach alone was always wrong and the old
-        // narrow board merely hid it: the target is 0.6 of reach, so a level the
-        // bot only just clears the floor on ships at 0.6 of the floor. Widening
-        // the board made spanning chains scarcer, reach fell to exactly 2 on
-        // five span levels, and the campaign came out with "Clear 1 chains" on
-        // LEVEL ONE. If the floor is then out of reach, validateLevel's 2-of-3
-        // rule throws the level out, which is the right answer.
-        // Not purge: there the target is a level to reduce TO, so a bigger
-        // number is easier and the floor means something else entirely.
-        lv.objective.target = lv.objective.type === 'purge'
-          ? cal.target
-          : Math.max(FLOOR[lv.objective.type], cal.target);
         lv.reach = Math.round(cal.reach);
+        const floor = FLOOR[lv.objective.type];
+        if (lv.objective.type === 'purge') {
+          // purge is "reduce sand TO n", so a bigger number is EASIER and the
+          // floor means something else: it is applied to the progress the bot
+          // made, and the target already sits at 0.6 of that, which is the same
+          // headroom the other objectives get.
+          if (cal.reach < floor) {
+            rejected.push([lv.id, lv.arch, `unreachable: bot only removed ${Math.round(cal.reach)} of a ${floor} floor`]);
+            continue;
+          }
+          lv.objective.target = cal.target;
+        } else {
+          const r = resolveTarget(cal, floor);
+          if (r.reject) { rejected.push([lv.id, lv.arch, r.reject]); continue; }
+          lv.objective.target = r.target;
+        }
       }
     }
     const v = await validateLevel(lv, 3);
@@ -580,6 +625,7 @@ if (GEN) {
   const why = {};
   for (const [, , r] of rejected) why[r.split(':')[0]] = (why[r.split(':')[0]] || 0) + 1;
   for (const [k, v] of Object.entries(why)) console.log(`    rejected ${v}  ${k}`);
+  console.log(`    tight (target > ${HEADROOM} x reach): ${tightLevels(kept).length} of ${kept.length} kept`);
   const byArch = {};
   for (const lv of kept) (byArch[lv.arch] = byArch[lv.arch] || []).push(lv);
   for (const [a, ls] of Object.entries(byArch)) {
@@ -621,6 +667,18 @@ if (GEN) {
     'shipped levels',
   );
 
+  // A5 costs no simulation either — `reach` is recorded on every shipped level
+  // by the generator that measured it, so the margin can be re-derived from the
+  // table itself. Under --break headroom one level is pushed to 100% of its
+  // reach in a COPY, which is exactly the shape of the ten this rule removed.
+  const tight = tightLevels(BREAK === 'headroom'
+    ? SHIPPED.map((lv, i) => (i === 0 ? { ...lv, objective: { ...lv.objective, type: 'chains', target: lv.reach } } : lv))
+    : SHIPPED);
+  if (tight.length) {
+    fail('A5-headroom', `${tight.length}/${SHIPPED.length} level(s) ship a target above ${HEADROOM} of the bot's measured reach — ` +
+      tight.slice(0, 5).map((lv) => `${lv.id} ${lv.arch} ${lv.objective.target}/${lv.reach}`).join(' ') + (tight.length > 5 ? ' …' : ''));
+  }
+
   // Shipped levels: a sample by default, all of them under --levels.
   //
   // The bar here is the SAME bar the generator shipped the level under — two
@@ -650,6 +708,7 @@ if (GEN) {
   console.log(`  zen: no fail state over 120s, vented ${z.vented}x`);
   console.log(`  levels: ${lvWins}/${lvChecked} sampled levels beaten by the bot at least 2 of 3 seeds${lvBad.length ? ' (bad: ' + lvBad.join(',') + ')' : ''}  [${SHIPPED.length} shipped]`);
   console.log(`  board aspect: ${asp.lo.toFixed(3)}-${asp.hi.toFixed(3)} across ${SHIPPED.length} levels, floor ${MIN_ASPECT} (${asp.bad} below)`);
+  console.log(`  objective headroom: ${tight.length} of ${SHIPPED.length} levels above ${HEADROOM} of measured reach`);
   console.log(`  jelly soft-body solver: ${jelly.isSoft ? 'probed' : '?'} — blobs.js ${await import('../js/sim/blobs.js').then(() => 'present').catch(() => 'ABSENT, running rigid fallback')}`);
 }
 
