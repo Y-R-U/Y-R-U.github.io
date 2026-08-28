@@ -12,7 +12,8 @@
  *   node tools/gfx_shot.mjs --scene=dissolve --biome=kiln --dt=9
  *   node tools/gfx_shot.mjs --all                 # scene x biome matrix
  *   node tools/gfx_shot.mjs --perf --gpu          # timed run, real GPU
- *   node tools/gfx_shot.mjs --check               # V-flip regression gate (exit 1 on fail)
+ *   node tools/gfx_shot.mjs --check               # v-flip + board-rect + thin-scenery + sand gates
+ *   node tools/gfx_shot.mjs --check --falsify=rect|thin|sand    # watch one go red
  */
 import { harness, ROOT } from './cdp.mjs';
 import { join } from 'node:path';
@@ -23,7 +24,7 @@ const args = Object.fromEntries(process.argv.slice(2).map((a) => {
   return m ? [m[1], m[2] === undefined ? true : m[2]] : [a, true];
 }));
 
-const SCENES = ['dune', 'tide', 'kiln', 'jelly', 'glass', 'dissolve', 'mixed', 'tints'];
+const SCENES = ['dune', 'tide', 'kiln', 'jelly', 'glass', 'dissolve', 'mixed', 'tints', 'wall', 'thin'];
 const BIOMES = ['dune', 'abyss', 'kiln', 'lumen', 'quartz'];
 const W = +(args.w || 420), H = +(args.h || 900);
 const SHOTS = join(ROOT, 'shots');
@@ -174,6 +175,233 @@ async function boardRectGate(cdp, base, fudge, vp) {
   return ok;
 }
 
+/**
+ * THIN-SCENERY GATE. A player on a phone, on the hand-authored tutorial level
+ * 2: "Am I meant to see the dividers? Because I don't see them until water hits
+ * them." He was, and he was right about the cause.
+ *
+ * `js/data/tutorial.js` separates that level's three lava pits with WALL
+ * dividers exactly TWO cells wide, and `pillars()` in `js/data/levelgen.js`
+ * builds WALL and CRYSTAL pillars two to five cells wide right through the
+ * generated campaign. The renderer resolves the grid into a density field and
+ * then blurs it — which is what makes a heap read as a dune — and that blur
+ * erodes a 2-cell column to a smoothed density of 0.32 against a cover
+ * threshold of 0.42. Not dim: ABSENT. `cover` was exactly zero and the lighting
+ * pass returned the backdrop, so the divider was the sky.
+ *
+ * WHAT IT MEASURES. `dev/gfx.html` scene `thin` is a width ladder — 1, 2, 3, 4
+ * and 6 cells of WALL plus 2-cell CRYSTAL and ICE, on an 80x160 board with the
+ * two dividers at x=26 and x=53 taken from the tutorial cell for cell — and
+ * scene `thinbare` is the identical board with the structures removed. The gate
+ * grabs both, and for each structure averages the per-channel difference over
+ * every device-pixel column that lands inside it.
+ *
+ * Diffing against a bare board rather than against a gutter in the same frame
+ * is deliberate. Every biome's key glow makes one end of the board several
+ * units brighter than the other, which is the same size as the effect being
+ * measured, and the bloom halo off a wide pillar reaches into the gutter beside
+ * it. Two captures of the same board, one with the scenery and one without,
+ * have neither problem — and with the renderer clock pinned by ?t= they are
+ * otherwise bit-identical.
+ *
+ * Per-channel, not luma, because a wall that matches the sky's brightness but
+ * not its hue is still visible — and hue is what actually fixed kiln.
+ *
+ * THE BAR IS 18, and it is calibrated from this ladder rather than picked.
+ * Measured before the fix, in this metric:
+ *
+ *     width   kiln  lumen  abyss  quartz  dune     visible in the capture?
+ *       1      1.3   1.5    1.0    2.0     1.5     no, in any biome
+ *       2      3.5   3.9    2.3    5.1     3.6     no — the reported bug
+ *       3      5.7  10.4   33.5   22.1    31.8     only where it scored >20
+ *       4     21.8  32.9   64.0   51.4    49.5     yes, everywhere
+ *       6     20.2  27.5   47.4   29.0    39.2     yes, everywhere
+ *
+ * 10.4 is the highest score of any structure a human could not find in the
+ * capture; ~20 is the lowest score of one nobody could miss. 18 sits above the
+ * first and at the second, with the shipping numbers landing 23-52 on the
+ * 2-cell case. A relative floor rides alongside it: at least 3x the change the
+ * same structures make to the empty board around them, so the bar cannot be
+ * met by bloom spill alone.
+ *
+ * TWO BIOMES WITH OPPOSITE BACKDROPS, always. `kiln` puts its scenery in front
+ * of the brightest part of a hot red vessel and `lumen` in front of a lit aqua
+ * panel; a fix that only worked against a dark sky would pass on abyss and be
+ * half a fix. Both are checked, and abyss/quartz/dune are reported alongside.
+ *
+ * Falsify with --falsify=thin, which sets ?staticbug=1. That does not imitate
+ * the old renderer, it IS the old renderer: the resolve pass is told nothing is
+ * static, so the static coverage attachment is zero everywhere and `cover`
+ * falls back to ss(0.42, 0.62, d) exactly.
+ */
+const THIN_BAR = 18.0;      // per-channel mean difference, 0-255
+const THIN_RATIO = 3.0;     // ... and at least this many times the spill floor
+const THIN_MATS = { 1: 'WALL', 7: 'ICE', 9: 'CRYSTAL' };
+
+const THIN_PROBE = `(async () => {
+  const g = window.__gfx;
+  g.hidePanel();
+  const grab = () => new Promise(res => requestAnimationFrame(() => requestAnimationFrame(() => {
+    const c = document.getElementById('gl');
+    const o = document.createElement('canvas'); o.width = c.width; o.height = c.height;
+    const x = o.getContext('2d'); x.drawImage(c, 0, 0);
+    res(x.getImageData(0, 0, o.width, o.height));
+  })));
+  g.build('thin');      const S = await grab();
+  const wr = g.world.g, cols = wr.cols, rows = wr.rows;
+  const mats = []; for (let cx = 0; cx < cols; cx++) mats.push(wr.mat[wr.idx(cx, rows - 16)]);
+  g.build('thinbare');  const E = await grab();
+
+  const c = document.getElementById('gl');
+  const b = g.view.board, s = c.width / g.view.w;
+  const bx = b.x * s, bw = b.w * s, by = b.y * s, bh = b.h * s;
+  const py = (cy) => Math.round(by + (cy + 0.5) / rows * bh);
+  // rows strictly INSIDE the structures: above the floor slab, below their tops
+  const yA = py(rows - 24), yB = py(rows - 8);
+  const lo = Math.min(yA, yB), hi = Math.max(yA, yB);
+  const W = S.width;
+  const dV = new Float64Array(W), sV = new Float64Array(W), eV = new Float64Array(W);
+  const cc = new Int32Array(W).fill(-1);
+  for (let X = 0; X < W; X++) {
+    let d = 0, sv = 0, ev = 0, n = 0;
+    for (let Y = lo; Y <= hi; Y++) {
+      const i = (Y * W + X) * 4;
+      d += (Math.abs(S.data[i] - E.data[i]) + Math.abs(S.data[i+1] - E.data[i+1]) + Math.abs(S.data[i+2] - E.data[i+2])) / 3;
+      sv += (S.data[i] + S.data[i+1] + S.data[i+2]) / 3;
+      ev += (E.data[i] + E.data[i+1] + E.data[i+2]) / 3;
+      n++;
+    }
+    dV[X] = d / n; sV[X] = sv / n; eV[X] = ev / n;
+    const q = Math.floor((X + 0.5 - bx) / bw * cols);
+    if (q >= 0 && q < cols) cc[X] = q;
+  }
+  const runs = []; let st = 0;
+  for (let cx = 1; cx <= cols; cx++)
+    if (cx === cols || mats[cx] !== mats[st]) { runs.push({ mat: mats[st], x0: st, x1: cx - 1, w: cx - st }); st = cx; }
+  const band = (x0, x1) => {
+    let d = 0, sv = 0, ev = 0, n = 0;
+    for (let X = 0; X < W; X++) if (cc[X] >= x0 && cc[X] <= x1) { d += dV[X]; sv += sV[X]; ev += eV[X]; n++; }
+    return { d: n ? d / n : 0, sv: n ? sv / n : 0, ev: n ? ev / n : 0, n };
+  };
+  const out = [];
+  for (const r of runs) {
+    if (r.mat === 0 || r.w > 20) continue;         // 0 is empty, >20 is the floor slab
+    out.push({ mat: r.mat, w: r.w, x0: r.x0, ...band(r.x0, r.x1) });
+  }
+  // Spill floor: the middle of the widest EMPTY run. Bloom and the contact
+  // shade reach into a gutter, so this is what "nothing is there" is worth.
+  let big = null;
+  for (const r of runs) if (r.mat === 0 && (!big || r.w > big.w)) big = r;
+  const q0 = big.x0 + Math.floor(big.w * 0.3), q1 = big.x1 - Math.floor(big.w * 0.3);
+  return { out, floor: band(q0, q1).d, pxPerCell: bw / cols, cols, rows };
+})()`;
+
+async function thinSceneryGate(cdp, base, falsify) {
+  // All five are asserted. kiln and lumen are the two that matter and the two
+  // the bar was set against — kiln stands its scenery in front of the brightest
+  // part of a hot vessel and lumen in front of a lit aqua panel, so a fix that
+  // only worked against a dark sky passes abyss and fails these — but there is
+  // no reason to leave the other three unguarded, and under the arm all five go
+  // red, which is what says so.
+  const biomes = ['kiln', 'lumen', 'abyss', 'quartz', 'dune'];
+  const OPPOSED = ['kiln', 'lumen'];
+  // The low tier compiles a DIFFERENT resolve shader — R=1, SIG=0.60, nine taps
+  // instead of twenty-five — and the renderer drops to it on its own after
+  // sixty slow frames, on exactly the phones this game is for. The static tent
+  // only reaches one cell either side, so R=1 is enough for it to remain a
+  // partition of unity, but "is enough" is an argument and this is the
+  // measurement. Both tiers on the two biomes the bar was set against.
+  const runs = biomes.map((b) => [b, null])
+    .concat(OPPOSED.map((b) => [b, 'low']));
+  let ok = true;
+  console.log('thin-scenery gate: a 2-cell static structure must differ from the bare board');
+  console.log('  by >= %s per channel and >= %sx the spill floor%s',
+    THIN_BAR.toFixed(0), THIN_RATIO.toFixed(0), falsify ? '   [--falsify=thin]' : '');
+  for (const [biome, tier] of runs) {
+    const q = new URLSearchParams({
+      preserve: '1', dpr: '1', scene: 'thin', biome, anim: '0', bot: '0', t: '6',
+      cols: '80', rows: '160',
+    });
+    if (tier) q.set('q', tier);
+    if (falsify) q.set('staticbug', '1');
+    await cdp.goto(`${base}/dev/gfx.html?${q}`);
+    if (!await cdp.waitFor('window.__gfx && window.__gfx.ready', 60000)) {
+      console.log('  %s/%s: harness never became ready (FAIL)', biome, tier || 'high'); ok = false; continue;
+    }
+    const r = await cdp.eval(THIN_PROBE);
+    const two = r.out.filter((o) => o.w === 2);
+    const bad = two.filter((o) => o.d < THIN_BAR || o.d < r.floor * THIN_RATIO);
+    const ladder = r.out.map((o) => `${THIN_MATS[o.mat] || o.mat}${o.w}=${o.d.toFixed(1)}`).join(' ');
+    console.log('  %s %s %s floor %s | %s  (%s)',
+      biome.padEnd(7), (tier || 'high').padEnd(4), OPPOSED.includes(biome) ? '*' : ' ',
+      r.floor.toFixed(1), ladder, bad.length ? 'FAIL' : 'ok');
+    if (bad.length) {
+      ok = false;
+      for (const o of bad)
+        console.log('     %s %d cells wide reads %s against the bare board — bar %s, floor %s',
+          THIN_MATS[o.mat] || o.mat, o.w, o.d.toFixed(1), THIN_BAR.toFixed(1), (r.floor * THIN_RATIO).toFixed(1));
+    }
+  }
+  console.log('thin-scenery gate: %s', ok ? 'PASS' : 'FAIL');
+  return ok;
+}
+
+/**
+ * SAND-IS-UNTOUCHED GATE, and it is the other half of the one above. The fix
+ * for thin scenery lives inside the shared resolve and lighting passes, so the
+ * hazard is that it quietly re-grades sand, water, jelly, oil, lava and the
+ * dissolve as well — and no amount of looking at a wall would ever show that.
+ *
+ * Every one of these scenes contains no STATIC material at all, so the static
+ * coverage attachment is zero across the whole board and the render must come
+ * out BIT-IDENTICAL to the same page with ?staticbug=1, which is the old
+ * renderer. Not "close", not "within a tolerance": zero differing bytes.
+ *
+ * This check cannot fail for the reason its sibling fails, so it has its own
+ * arm — --falsify=sand puts a WALL slab into the scene through ?sandbug=1,
+ * which makes the two renders legitimately differ and the check go red.
+ */
+async function sandUntouchedGate(cdp, base, falsify) {
+  const GRAB = `(async () => {
+    window.__gfx.hidePanel();
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const c = document.getElementById('gl');
+    const o = document.createElement('canvas'); o.width = c.width; o.height = c.height;
+    const x = o.getContext('2d'); x.drawImage(c, 0, 0);
+    const d = x.getImageData(0, 0, o.width, o.height).data;
+    const a = new Array(d.length / 4 * 3);
+    for (let i = 0, k = 0; i < d.length; i += 4) { a[k++] = d[i]; a[k++] = d[i+1]; a[k++] = d[i+2]; }
+    return a;
+  })()`;
+  let ok = true;
+  for (const [scene, biome] of [['dune', 'dune'], ['tide', 'abyss'], ['jelly', 'lumen'], ['mixed', 'kiln'], ['dissolve', 'dune']]) {
+    const grab = async (bug) => {
+      // motes=0: the dissolve garnish is seeded from Math.random and stepped by
+      // the real frame dt, so a dissolving board is the one thing ?t= cannot
+      // pin. Without this the dissolve scene differs from ITSELF and the check
+      // reads as a fault in a change that never touched it.
+      const q = new URLSearchParams({ preserve: '1', dpr: '1', scene, biome, anim: '0', bot: '0', t: '6', seed: '7', motes: '0' });
+      if (bug) q.set('staticbug', '1');
+      if (falsify) q.set('sandbug', '1');
+      await cdp.goto(`${base}/dev/gfx.html?${q}`);
+      if (!await cdp.waitFor('window.__gfx && window.__gfx.ready', 60000)) return null;
+      await cdp.frames(6);
+      return cdp.eval(GRAB);
+    };
+    const A = await grab(false), B = await grab(true);
+    if (!A || !B) { console.log('  %s: never became ready (FAIL)', scene); ok = false; continue; }
+    let n = 0, max = 0;
+    for (let i = 0; i < A.length; i++) { const d = Math.abs(A[i] - B[i]); if (d) { n++; if (d > max) max = d; } }
+    const pass = n === 0;
+    if (!pass) ok = false;
+    console.log('  %s/%s %s of %d subpixels differ from the old renderer, worst %d (%s)',
+      scene.padEnd(8), biome.padEnd(6), String(n).padStart(7), A.length, max, pass ? 'PASS' : 'FAIL');
+  }
+  console.log('sand-untouched gate: %s', ok ? 'PASS' : 'FAIL');
+  return ok;
+}
+
+
 const { cdp, base, close } = await harness({ gpu: !!args.gpu });
 let failed = false;
 try {
@@ -196,6 +424,22 @@ try {
       console.log('falsify=rect: gate went %s (%s)', rectOk ? 'GREEN' : 'RED', rectOk ? 'FAIL — the gate is not evidence' : 'PASS');
       if (rectOk) failed = true;
     } else if (!rectOk) failed = true;
+
+    const thinArm = args.falsify === 'thin';
+    const thinOk = await thinSceneryGate(cdp, base, thinArm);
+    if (thinArm) {
+      console.log('falsify=thin: gate went %s (%s)', thinOk ? 'GREEN' : 'RED',
+        thinOk ? 'FAIL — the gate is not evidence' : 'PASS');
+      if (thinOk) failed = true;
+    } else if (!thinOk) failed = true;
+
+    const sandArm = args.falsify === 'sand';
+    const sandOk = await sandUntouchedGate(cdp, base, sandArm);
+    if (sandArm) {
+      console.log('falsify=sand: gate went %s (%s)', sandOk ? 'GREEN' : 'RED',
+        sandOk ? 'FAIL — the gate is not evidence' : 'PASS');
+      if (sandOk) failed = true;
+    } else if (!sandOk) failed = true;
     if (!args.all && !args.scene && !args.perf) jobs.length = 0;
   }
 

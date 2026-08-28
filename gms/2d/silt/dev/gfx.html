@@ -51,7 +51,7 @@ import { createViewport } from '../js/core/viewport.js';
 
 const P = new URLSearchParams(location.search);
 const canvas = document.getElementById('gl');
-const R = await createRenderer(canvas, {});
+const R = await createRenderer(canvas, P.has('motes') ? { motes: +P.get('motes') } : {});
 
 // The board rect has ONE source — core/viewport.js — in the bench exactly as in
 // the game, so a shot taken here is a shot of what the player is touching.
@@ -200,6 +200,44 @@ const SCENES = {
     for (let k = 0; k < 120; k++) step(w.g, w.rng, w.stats);
   },
 
+  // THIN STATIC SCENERY. The one that was invisible on a phone: tutorial level
+  // 2 separates three lava pits with WALL dividers exactly TWO cells wide, and
+  // levelgen's pillars() builds 2-to-5-wide WALL and CRYSTAL pillars right
+  // through the campaign. A density field blurred wide enough to make heaps
+  // read as dunes erodes a 2-cell column below the cover threshold entirely,
+  // so this scene is a WIDTH LADDER with empty board between every structure —
+  // 1,2,3,4,5,6 cells of WALL plus 2-cell CRYSTAL and ICE — and the two
+  // dividers at x=26 and x=53 are the tutorial's own geometry, cell for cell.
+  // No sand: this measures the scenery against the SKY, which is the read that
+  // failed.
+  thin: (w) => {
+    const g = w.g;
+    const y0 = g.rows - 26, h = 22;
+    g.fill(0, g.rows - 4, g.cols, 4, WALL, 0);        // the floor slab
+    // Gaps of eight cells or more between structures: the bloom halo off a wide
+    // pillar reaches several cells, and a gutter measured next to one is not an
+    // empty board. Widths chosen to bracket the failure — the tutorial's 2 and
+    // levelgen's 2..5 — with 1 and 6 as the ends of the ladder.
+    g.fill(4,  y0, 2, h, WALL, 0);
+    g.fill(14, y0, 2, h, CRYSTAL, 0);
+    g.fill(24, y0, 2, h, ICE, 0);
+    g.fill(34, y0, 1, h, WALL, 0);
+    g.fill(43, y0, 3, h, WALL, 0);
+    g.fill(54, y0, 4, h, WALL, 0);
+    g.fill(66, y0, 6, h, WALL, 0);
+  },
+
+  // The control for `thin`: the identical board with every structure removed
+  // but the floor slab kept, so a per-pixel diff of the two isolates exactly
+  // what the scenery did and nothing else. Comparing a structure column against
+  // an empty column in the SAME frame cannot do that — the biome's key glow
+  // makes the backdrop several units brighter on one side of the board than the
+  // other, which is the same size as the effect being measured.
+  thinbare: (w) => {
+    const g = w.g;
+    g.fill(0, g.rows - 4, g.cols, 4, WALL, 0);
+  },
+
   // V-FLIP ORACLE. Material in the bottom 10 rows and nowhere else. tools/gfx_shot.mjs
   // --check diffs this against `empty` and asserts the lit pixels land at the BOTTOM
   // of the image. Do not delete: the board was rendered upside down once already.
@@ -225,9 +263,23 @@ function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Ma
 function build(name) {
   sceneName = name;
   const seed = +(P.get('seed') || 7);
-  world = new World({ seed, tints: +(P.get('tints') || 3), tintMode: P.get('tint') || 'mono' });
+  const wc = { seed, tints: +(P.get('tints') || 3), tintMode: P.get('tint') || 'mono' };
+  // ?cols=/?rows= so a gate can reproduce a real level's board. Tutorial 2 is 80x160.
+  if (P.has('cols')) wc.cols = +P.get('cols');
+  if (P.has('rows')) wc.rows = +P.get('rows');
+  world = new World(wc);
   view.setBoard(world.g.cols, world.g.rows);
   (SCENES[name] || SCENES.dune)(world, mulberry(seed * 2654435761 % 2147483647));
+  // FALSIFICATION ARM for the sand-untouched gate, never shipped set. That gate
+  // asserts a scene containing NO static material renders bit-identically with
+  // and without ?staticbug=1, which is a property no amount of breaking the
+  // static path can violate — so the arm has to break the PREMISE instead and
+  // put a wall in the scene. Then the two renders legitimately differ and the
+  // check goes red, which is the only way to know it can.
+  if (P.has('sandbug')) {
+    const g = world.g;
+    g.fill(Math.floor(g.cols * 0.30), Math.floor(g.rows * 0.55), 3, Math.floor(g.rows * 0.30), WALL, 0);
+  }
   paint();
 }
 

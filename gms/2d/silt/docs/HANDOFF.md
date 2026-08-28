@@ -1293,3 +1293,87 @@ and is held to its own bar by `tools/tutgate.mjs`.
 - Level 1's 2-of-3 win rate was measured, not fixed. It ships at the bar.
 - A5 has still never fired on a real artifact, only on its arm and on live
   rejections — 40 of them this time.
+
+---
+
+## S+9 — the built world was not being drawn
+
+Reported from a phone, and phrased as a question about difficulty rather than a
+bug: *"am I meant to see the dividers or whatever is separating the sections?
+because I don't see them until water hits them."*
+
+They were meant to be seen. A 2-cell WALL was not dim, it was **absent**.
+
+The resolve pass builds a gaussian density field and blurs it separably — that
+blur is what rounds a heap into a dune, and it is the right thing for poured
+material. But `cover = smoothstep(0.42, 0.62, d)`, and the peak smoothed density
+at the centre of a static column runs 0.178 / 0.338 / 0.502 / 0.675 / 0.864 at
+widths 1 / 2 / 3 / 4 / 6. At two cells `cover` is exactly zero: `LIGHT_FS`
+returned the backdrop and the wall was never covered by a single pixel.
+
+Isolation, not argument, is what settled it: driving the wall albedo to 4.0
+(24x shipped) moved a 3-cell wall by 124 brightness units and the 2-cell wall by
+**0.2**, the noise floor. No albedo can light a pixel that is never covered.
+
+**The fix is a fourth MRT attachment carrying crisp static coverage.** WALL, ICE
+and CRYSTAL accumulate through a bilinear tent — a partition of unity, so the
+interior is exactly 1.0 at any thickness down to one cell and the silhouette
+falls off over one cell at its true extent. Sand and liquids never enter it.
+`cover = max(smoothstep(0.42,0.62,d), sCov)`. The static list comes from the
+sim's own `KIND` table, not a hand-kept copy.
+
+Albedo was a real second cause, but only on kiln and lumen, and it was **hue,
+not value**: a warm grey wall in the same hue family as a hot vessel reads at
+16.5/255 even once covered. Both walls were rolled at the same value. This is
+dune's old "bone" finding a third time.
+
+2-cell WALL against a bare board, per-channel mean, before -> after:
+kiln 3.5 -> 23.6, lumen 4.0 -> 31.3, abyss 2.2 -> 54.3, quartz 5.1 -> 39.3,
+dune 3.6 -> 40.0. CRYSTAL goes 4.0 -> 57.5 on kiln.
+
+### Scope: this was never about one level
+
+`pillars()` in `js/data/levelgen.js` builds scenery **2 to 5 cells wide** across
+the generated campaign, and the falsification arm shows 3-cell scenery scoring
+7.0 on kiln — below the bar too. Every ALCHEMY level with thin structure has
+been shipping obstacles the player could not see. Any level that felt
+arbitrarily hard is now suspect for this reason and not for its numbers.
+
+### Gates
+
+- **thin-scenery** — `thin` / `thinbare` scenes (width ladder 1/2/3/4/6 WALL plus
+  2-cell CRYSTAL and ICE, and the tutorial's x=26 / x=53 dividers verbatim),
+  diffed per-channel per pixel column. Bar **18**, calibrated rather than picked:
+  10.4 is the best score of any structure a human cannot find in the
+  before-captures, ~20 the worst of one nobody misses. Also >= 3x the measured
+  bloom-spill floor. Five biomes, both tiers on kiln and lumen — the low tier
+  compiles a different resolve shader (R=1) and had to be covered separately.
+- **sand-untouched** — five scenes with no static material must render
+  bit-identically to the old path. 0 of 1,134,000 subpixels differ.
+- Arms: `--falsify=thin` sets `?staticbug=1`, which does not imitate the old
+  renderer, it **is** the old renderer, and reproduces the original numbers
+  (kiln WALL2 = 3.5) with all five biomes red. `--falsify=sand` puts a wall into
+  the sand scenes so the identity legitimately breaks.
+
+Verified independently of the lane that did the work: same capture pipeline,
+`?staticbug=1` on and off, tutorial 2 on a 390x844 viewport. Off: one unbroken
+lava band, no dividers at all. On: two stone ribs, three obvious pits.
+
+### What it costs, honestly
+
+- Sand costs nothing, and that is now gated rather than asserted.
+- **Static scenery is hard-edged now.** Wide WALL and CRYSTAL blocks used to have
+  soft rounded corners from the blur and are now cut rectangles with a lit bevel.
+  Masonry should read as built — but this changes every ALCHEMY level, not only
+  the thin ones.
+- A 6-cell quartz wall scores 24.5 where it scored 29.0: the rim band on its
+  outer cell went from a full cell to the half-cell cut face. Still over bar.
+- gpuP95 2.78 ms of an 11 ms budget; A/B with the branch off was inside noise.
+
+### A gotcha worth more than the fix
+
+**`?t=` does NOT make captures bit-identical on any frame with a live dissolve.**
+Motes are seeded from `Math.random` and stepped by real dt, so an image gate over
+a dissolving board compares noise. `opts.motes = 0` closes it. The claim that
+`?t=` pins a frame has been in this document since P2 and was false for a whole
+class of frame the entire time.

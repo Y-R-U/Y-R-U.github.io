@@ -15,7 +15,7 @@ import {
 import { BG_FS, RESOLVE_FS, DENS_X_FS, OCC_DOWN_FS, OCC_BLUR_FS, LIGHT_FS } from './shaders/field.js';
 import { PART_VS, PART_FS } from './shaders/post.js';
 import { createPostFX } from './postfx.js';
-import { BIOMES, BIOME_NAMES, bakeBiome } from './biomes.js';
+import { BIOMES, BIOME_NAMES, bakeBiome, MAT_STATIC } from './biomes.js';
 import { StateBuffer } from './state.js';
 import { Motes } from './particles.js';
 import { Stats, BUDGETS } from './stats.js';
@@ -27,6 +27,19 @@ const TIERS = {
   high: { R: 2, SIG: 0.80, refract: true, mips: 3, motes: 900, texel: 2.2, maxSS: 4 },
   low:  { R: 1, SIG: 0.60, refract: false, mips: 2, motes: 220, texel: 3.2, maxSS: 2 },
 };
+
+// How the built world is lit once it is drawn: bevel strength on the cut face,
+// and the share of the rim and the subsurface budgets a THIN rib keeps — both
+// were set on poured, blobby material and blow a 2-cell rib out to a neon bar
+// at full strength. Per-biome override via B.staticCtl; nothing needs one yet.
+const DEFAULT_STATIC_CTL = [1.40, 0.55, 0.50];
+
+// FALSIFICATION ARM, never shipped set: ?staticbug=1 tells the resolve pass that
+// nothing is static, so oSolid is 0 everywhere. sCov, sEdge and sThin all
+// collapse to 0, `cover` falls back to ss(0.42, 0.62, d) exactly and the
+// occlusion union degenerates to max(smooth, 0). That is not an imitation of
+// the old renderer, it IS the old renderer — which is what makes it evidence.
+const NO_STATIC = new Float32Array(MAT_STATIC.length);
 
 const qs = (k) => {
   try { return new URLSearchParams(location.search).get(k); } catch { return null; }
@@ -53,6 +66,15 @@ export async function createRenderer(canvas, opts = {}) {
 
   const float = floatTargetsOK(gl);
   if (float) gl.getExtension('OES_texture_float_linear');   // ignored if absent; half-float filters anyway
+
+  const staticOff = opts.staticOff !== undefined ? !!opts.staticOff : qs('staticbug') === '1';
+  // Dissolve motes are the one term in this renderer that no clock pin can make
+  // reproducible: they are seeded from Math.random and stepped by the real frame
+  // dt, so two captures of a dissolving board differ everywhere however hard ?t=
+  // is held. opts.motes scales the budget so a gate that needs a repeatable
+  // frame can take the garnish off. Bench and gates only; the game never sets it.
+  const moteScale = opts.motes === undefined ? 1 : Math.max(0, +opts.motes || 0);
+  const moteCount = (name) => Math.round(TIERS[name].motes * moteScale);
 
   const forcedQ = opts.quality || qs('q');
   let tierName = (forcedQ === 'high' || forcedQ === 'low') ? forcedQ : 'high';
@@ -91,14 +113,17 @@ export async function createRenderer(canvas, opts = {}) {
   let vw = 4, vh = 4, dpr = 1;
   let cols = 112, rows = 224;
   const bgT = makeTarget(gl, 4, 4, { float });
-  const fieldT = makeTarget(gl, 4, 4, { float, attachments: 3 });   // colour+density, aux, piece
+  // Four attachments: colour+density, aux, piece, and the crisp STATIC coverage
+  // that makes the built world legible at two cells. WebGL2 guarantees
+  // MAX_DRAW_BUFFERS >= 4, so four is the floor and not a gamble.
+  const fieldT = makeTarget(gl, 4, 4, { float, attachments: 4 });
   const occA = makeTarget(gl, 4, 4, { float });
   const occB = makeTarget(gl, 4, 4, { float });
   const smA = makeTarget(gl, 4, 4, { float });
   const smB = makeTarget(gl, 4, 4, { float });
   let stateTex = makeDataTexture(gl, cols, rows);
   let sb = new StateBuffer(cols, rows);
-  let motes = new Motes(gl, TIERS[tierName].motes);
+  let motes = new Motes(gl, moteCount(tierName));
 
   let rect = [0, 0, 1, 1];   // board in screen uv (y up)
   let superSample = 2;
@@ -252,7 +277,8 @@ export async function createRenderer(canvas, opts = {}) {
       .u1f('u_dissolve', DISSOLVE_TICKS)
       .u3fv('u_tint[0]', baked.tints)
       .u3fv('u_matCol[0]', baked.matCol)
-      .u4fv('u_matProp[0]', baked.matProp);
+      .u4fv('u_matProp[0]', baked.matProp)
+      .u1fv('u_matStatic[0]', staticOff ? NO_STATIC : MAT_STATIC);
     drawTri(); passes++;
 
     /* 3 — silhouette blur. Separable, so the radius can be as wide as the look
@@ -267,7 +293,8 @@ export async function createRenderer(canvas, opts = {}) {
 
     /* 4 — occlusion field */
     bindTarget(gl, occA);
-    pOccDown.use().tex('u_src', 0, smA.tex).u2f('u_texel', 1 / fieldT.w, 1 / fieldT.h);
+    pOccDown.use().tex('u_src', 0, smA.tex).tex('u_solid', 1, fieldT.texs[3])
+      .u2f('u_texel', 1 / fieldT.w, 1 / fieldT.h);
     drawTri(); passes++;
     pOccBlur.use();
     bindTarget(gl, occB);
@@ -279,6 +306,7 @@ export async function createRenderer(canvas, opts = {}) {
 
     /* 5 — lighting */
     const S = B.surf;
+    const S2 = B.staticCtl || DEFAULT_STATIC_CTL;
     bindTarget(gl, post.scene);
     pLight.use()
       .tex('u_field', 0, fieldT.texs[0])
@@ -287,6 +315,7 @@ export async function createRenderer(canvas, opts = {}) {
       .tex('u_bg', 3, bgT.tex)
       .tex('u_smooth', 4, smA.tex)
       .tex('u_piece', 5, fieldT.texs[2])
+      .tex('u_solid', 6, fieldT.texs[3])
       .u2f('u_res', vw, vh).u2f('u_grid', cols, rows)
       .u4f('u_rect', rect[0], rect[1], rect[2], rect[3])
       .u2f('u_ftex', 1 / fieldT.w, 1 / fieldT.h)
@@ -301,7 +330,8 @@ export async function createRenderer(canvas, opts = {}) {
       .u1f('u_rimAmt', S.rim).u1f('u_specAmt', S.spec).u1f('u_sssAmt', S.sss)
       .u1f('u_grainAmt', S.grain).u1f('u_refrAmt', S.refr)
       .u1f('u_aoAmt', S.ao).u1f('u_shadowAmt', S.shadow).u1f('u_relief', S.relief)
-      .u3f('u_pieceCtl', B.piece[0], B.piece[1], B.piece[2]);
+      .u3f('u_pieceCtl', B.piece[0], B.piece[1], B.piece[2])
+      .u3f('u_staticCtl', S2[0], S2[1], S2[2]);
     drawTri(); passes++;
 
     /* 6 — dissolve motes, additive on top of the lit scene */
@@ -344,7 +374,7 @@ export async function createRenderer(canvas, opts = {}) {
     if (!probed && frames === 12) stats.reset();
     if (!probed && frames > 60) {
       probed = true;
-      if (stats.frame.med > 20.5) { buildTier('low'); motes.dispose(); motes = new Motes(gl, TIERS.low.motes); stats.reset(); }
+      if (stats.frame.med > 20.5) { buildTier('low'); motes.dispose(); motes = new Motes(gl, moteCount('low')); stats.reset(); }
     }
   }
 
@@ -353,7 +383,7 @@ export async function createRenderer(canvas, opts = {}) {
     probed = true;
     buildTier(name);
     motes.dispose();
-    motes = new Motes(gl, TIERS[name].motes);
+    motes = new Motes(gl, moteCount(name));
     stats.reset();
   }
 

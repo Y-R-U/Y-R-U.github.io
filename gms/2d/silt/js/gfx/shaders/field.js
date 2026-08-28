@@ -88,22 +88,30 @@ uniform vec2  u_grid;
 uniform vec3  u_tint[8];
 uniform vec3  u_matCol[12];
 uniform vec4  u_matProp[12];   // fluid, emissive, translucent, tintMix
+uniform float u_matStatic[12]; // 1 for the built world: WALL, ICE, CRYSTAL
 uniform float u_time;
 uniform float u_dissolve;      // DISSOLVE_TICKS
 
 layout(location = 0) out vec4 oField;   // rgb = voted colour, a = density
 layout(location = 1) out vec4 oAux;     // fluid, emissive, translucent, dissolve flash
 layout(location = 2) out vec4 oPiece;   // rgb = the piece's own tint, a = piece coverage
+layout(location = 3) out vec4 oSolid;   // r = crisp STATIC coverage. See below.
 
 void main() {
   // board space, y measured UP from the floor; texture row 0 is the ceiling,
   // so the row index counts back down from rows-1.
   vec2 cell = v_uv * u_grid;
-  cell += (vec2(vn(cell * 0.33 + 4.7), vn(cell * 0.33 + 21.9)) - 0.5) * 0.85;
+  vec2 jit = (vec2(vn(cell * 0.33 + 4.7), vn(cell * 0.33 + 21.9)) - 0.5) * 0.85;
+  cell += jit;
+  // The built world takes 40% of the same wander. Enough that a rib is chiselled
+  // rather than ruled; little enough that a 2-cell divider stays where the sim
+  // put it — at 4.9 device px per cell the full jitter moved the drawn edge by
+  // two px, and a wall a player plans around should not lie about where it is.
+  vec2 cellS = cell - jit * 0.60;
   ivec2 ic = ivec2(floor(cell));
   ivec2 gi = ivec2(u_grid);
 
-  float dens = 0.0, flash = 0.0, colW = 0.0, pieceW = 0.0;
+  float dens = 0.0, flash = 0.0, colW = 0.0, pieceW = 0.0, solid = 0.0;
   vec3 colAcc = vec3(0.0), props = vec3(0.0), pieceCol = vec3(0.0);
 
   for (int j = -R; j <= R; j++) {
@@ -149,6 +157,26 @@ void main() {
       colAcc += col * cw;
       colW += cw;
 
+      // THE BUILT WORLD GETS ITS OWN, UNBLURRED COVERAGE.
+      // The gaussian above plus the separable blur that follows it is what
+      // rounds a heap into a dune, and it is fatal to anything thin: a 2-cell
+      // column resolves to a smoothed density of 0.338 against a cover
+      // threshold of 0.42, so it is not dimly drawn, it is NOT DRAWN — which is
+      // exactly what a player reported about the tutorial's 2-cell dividers.
+      //
+      // Sand is poured and should be rounded. WALL, ICE and CRYSTAL are BUILT:
+      // permanent, never flowing, and the thing a player plans around. They get
+      // a bilinear TENT instead of a gaussian — a partition of unity, so the
+      // interior of a static body is exactly 1.0 at any thickness down to one
+      // cell, and the silhouette falls off over a single cell at its true
+      // extent rather than being averaged away. It is evaluated at cellS —
+      // 40% of the sampling jitter — so the edge is chiselled rather than
+      // ruled without wandering far from where the sim put the wall.
+      if (u_matStatic[m] > 0.5) {
+        vec2 sd = cellS - cc;
+        solid += max(0.0, 1.0 - abs(sd.x)) * max(0.0, 1.0 - abs(sd.y)) * fill;
+      }
+
       // The airborne piece gets its own channel. It is the one object the
       // player has to IDENTIFY rather than admire, and an isolated blob with no
       // occlusion under it takes the whole light rig at once, which is exactly
@@ -162,6 +190,7 @@ void main() {
   oField = vec4(colAcc, min(dn, 1.35));
   oAux = vec4(props, flash);
   oPiece = vec4(pieceW > 1e-5 ? pieceCol / pieceW : vec3(0.0), min(pieceW * KNORM, 1.0));
+  oSolid = vec4(clamp(solid, 0.0, 1.0), 0.0, 0.0, 1.0);
 }`;
 
 /* ---------------------------------------------------------- occlusion field
@@ -179,15 +208,22 @@ void main() {
   frag = vec4(s, 0.0, 0.0, 1.0);
 }`;
 
+/* Occlusion takes the UNION of the smoothed density and the crisp static
+   coverage. A wall is stuff: it should darken the backdrop it stands in front
+   of, cast a shadow across the sand beside it and cut its own ambient. It
+   already did when it was wide, because a wide body survives the blur; a thin
+   one did not, so a 2-cell divider cast no shadow at all. Same semantics at
+   every thickness. */
 export const OCC_DOWN_FS = HEAD + `
-uniform sampler2D u_src;
+uniform sampler2D u_src, u_solid;
 uniform vec2 u_texel;
 out vec4 frag;
+float d(vec2 p) { return max(texture(u_src, p).r, texture(u_solid, p).r); }
 void main() {
-  float a = texture(u_src, v_uv + u_texel * vec2(-1, -1)).r;
-  a += texture(u_src, v_uv + u_texel * vec2(1, -1)).r;
-  a += texture(u_src, v_uv + u_texel * vec2(-1, 1)).r;
-  a += texture(u_src, v_uv + u_texel * vec2(1, 1)).r;
+  float a = d(v_uv + u_texel * vec2(-1, -1));
+  a += d(v_uv + u_texel * vec2(1, -1));
+  a += d(v_uv + u_texel * vec2(-1, 1));
+  a += d(v_uv + u_texel * vec2(1, 1));
   frag = vec4(a * 0.25, 0.0, 0.0, 1.0);
 }`;
 
@@ -208,7 +244,7 @@ void main() {
 export const LIGHT_FS = (REFRACT) => HEAD + LIB + `
 #define REFRACT ${REFRACT ? 1 : 0}
 
-uniform sampler2D u_field, u_aux, u_occ, u_bg, u_smooth, u_piece;
+uniform sampler2D u_field, u_aux, u_occ, u_bg, u_smooth, u_piece, u_solid;
 uniform vec2  u_res, u_grid;
 uniform vec4  u_rect;
 uniform vec2  u_ftex;        // 1 / resolve target size
@@ -219,6 +255,7 @@ uniform vec3  u_keyCol, u_fillCol, u_ambCol, u_rimCol, u_emisCol;
 uniform float u_rimAmt, u_specAmt, u_sssAmt, u_grainAmt;
 uniform float u_refrAmt, u_aoAmt, u_shadowAmt, u_relief;
 uniform vec3  u_pieceCtl;    // chroma push, luma pull, own-hue rim
+uniform vec3  u_staticCtl;   // bevel strength, thin-rib rim share, thin-rib sss share
 
 out vec4 frag;
 
@@ -248,6 +285,33 @@ void main() {
   vec4 pf = texture(u_piece, bc);
   float d = texture(u_smooth, bc).r;
 
+  // ---- the BUILT WORLD, on its own crisp coverage.
+  // d (u_smooth) is the poured-material field: a gaussian resolve followed by a
+  // wide separable blur, which is what turns a heap into a dune and is fatal to
+  // anything thin. Peak smoothed density at the centre of a static column,
+  // computed from the shipped kernel (R=2, SIG=0.80, blur radius 1.15 cells)
+  // and matching the measured ladder exactly:
+  //     1 cell 0.178   2 cells 0.338   3 cells 0.502   4 cells 0.675
+  // against a cover threshold of ss(0.42, 0.62). So one- and two-cell scenery
+  // was not dim, it was ABSENT: cover resolved to exactly zero and the lighting
+  // pass returned the backdrop.
+  //
+  // Established by isolation rather than argued — driving the wall albedo to
+  // 4.0, twenty-four times what ships, moved a 3-cell wall by 124 brightness
+  // units and a 2-cell wall by 0.2, which is the noise floor. No albedo can
+  // light a pixel that is never covered.
+  //
+  // solid is a partition-of-unity tent over STATIC materials only, so it is
+  // 1.0 inside a body of any thickness and falls off over one cell at the true
+  // silhouette. Sand and every liquid are untouched by all of this.
+  float solid = texture(u_solid, bc).r;
+  float sCov  = ss(0.34, 0.66, solid);
+  // 1 on the outer half-cell of a static body, 0 in its interior: the cut face.
+  float sEdge = sCov * (1.0 - ss(0.55, 0.99, solid));
+  // 1 where the built world is carrying this pixel on its own (a thin rib), 0
+  // where there is enough poured material for the density field to shade it.
+  float sThin = sCov * (1.0 - ss(0.28, 0.60, d));
+
   // How much of this pixel is the AIRBORNE piece. Settled material is 0.
   float piece = clamp(pf.a * 1.3, 0.0, 1.0);
 
@@ -259,7 +323,7 @@ void main() {
   float contact = texture(u_occ, clamp(bc - u_keyDir * 0.022, 0.0, 1.0)).r;
   bg *= 1.0 - u_aoAmt * 0.55 * ss(0.05, 0.95, contact);
 
-  float cover = ss(0.42, 0.62, d) * clip;
+  float cover = max(ss(0.42, 0.62, d), sCov) * clip;
   if (cover <= 0.001) { frag = vec4(bg, 1.0); return; }
 
   // ---- normal from the density gradient
@@ -274,6 +338,21 @@ void main() {
   vec3 nB = normalize(vec3(-ox * 3.4, -oy * 3.4, 0.42));
 
   vec3 n = normalize(nS * (0.30 + 0.70 * ss(0.85, 0.35, d)) + nB * 1.25);
+
+  // A thin rib has almost no density gradient to be shaded from, so it would
+  // come out as a flat sticker. Take its normal from the coverage it actually
+  // has: zero slope across the interior (a hewn face IS flat) and a hard bevel
+  // over the outer cell, which is what gives a 2-cell divider a lit side and a
+  // shadowed side instead of one average colour.
+  if (sThin > 0.002) {
+    vec2 sg = u_ftex * 2.0;
+    float sx = texture(u_solid, clamp(bc + vec2(sg.x, 0.0), 0.0, 1.0)).r
+             - texture(u_solid, clamp(bc - vec2(sg.x, 0.0), 0.0, 1.0)).r;
+    float sy = texture(u_solid, clamp(bc + vec2(0.0, sg.y), 0.0, 1.0)).r
+             - texture(u_solid, clamp(bc - vec2(0.0, sg.y), 0.0, 1.0)).r;
+    vec3 nSol = normalize(vec3(-sx * u_staticCtl.x, -sy * u_staticCtl.x, u_relief * 0.62));
+    n = normalize(mix(n, nSol, sThin));
+  }
 
   float fluid = clamp(ax.x, 0.0, 1.0);
   float emis  = clamp(ax.y, 0.0, 1.0);
@@ -412,10 +491,22 @@ void main() {
 
   // ---- fresnel rim, strongest on liquids and glass
   float fres = pow(1.0 - clamp(n.z, 0.0, 1.0), 3.0);
-  float edge = ss(0.62, 0.44, d);
+  // On poured material the edge is where the density falls off. On the built
+  // world that measure is meaningless — a thin rib is ALL falloff and would
+  // take a full-body rim, glowing like a neon strip — so where static coverage
+  // owns the pixel the edge is its own cut face instead.
+  float edge = mix(ss(0.62, 0.44, d), sEdge, sCov);
   // On a piece the soft shell is most of the blob, so a rim in the KEY's colour
   // paints the whole thing cream. Hand that budget to the tint instead.
-  col += u_rimCol * (fres * (0.25 + 0.75 * (fluid + trans)) + edge * 0.22) * u_rimAmt * (1.0 - 0.88 * piece);
+  // The rim budget was set on poured, blobby, backlit material. Handed whole to
+  // a 2-cell rib — which is nearly all edge — it turns masonry into a light
+  // fitting: measured, a 2-cell CRYSTAL rib came out at 155 against a 20-unit
+  // abyss sky, brighter than any sand in the frame. u_staticCtl.y is the share
+  // a THIN one gets. Keyed on sThin and not on sCov on purpose: a wide slab
+  // already had a rim it had earned, and cutting that was a measured 29 -> 20
+  // regression on a 6-cell quartz wall for no reason at all.
+  float rimScale = mix(1.0, u_staticCtl.y, sThin);
+  col += u_rimCol * (fres * (0.25 + 0.75 * (fluid + trans)) + edge * 0.22) * u_rimAmt * rimScale * (1.0 - 0.88 * piece);
   if (piece > 0.002) {
     vec3 pn = pHue / max(luma(pHue), 0.02);
     col += pn * (edge * 0.40 + fres * 1.00) * piece * u_pieceCtl.z;
@@ -427,6 +518,11 @@ void main() {
   // a window. exp(-thick) alone made the shallowest flood the palest thing on
   // screen, which is the opposite of what water does.
   vec3 sss = albedo * u_keyCol * exp(-thick * 3.1) * (trans * 1.35 * mix(1.0, body, clear) + grain * 0.12);
+  // Same story one term along: exp(-thick) says a thin rib is lit through, and
+  // for a translucent one it says so loudly. u_staticCtl.z is how much of that
+  // a THIN piece of the built world keeps — a wide slab is unaffected, because
+  // sThin is 0 wherever the density field can shade the body on its own.
+  sss *= 1.0 - sThin * (1.0 - u_staticCtl.z);
   col += sss * u_sssAmt;
 
   // ---- refraction: displace the backdrop along the surface normal

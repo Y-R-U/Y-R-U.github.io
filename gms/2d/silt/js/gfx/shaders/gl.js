@@ -53,6 +53,7 @@ export function makeProgram(gl, vsSrc, fsSrc, label = '') {
     u2f(n, a, b) { const l = this.loc(n); if (l !== null) gl.uniform2f(l, a, b); return this; },
     u3f(n, a, b, c) { const l = this.loc(n); if (l !== null) gl.uniform3f(l, a, b, c); return this; },
     u4f(n, a, b, c, d) { const l = this.loc(n); if (l !== null) gl.uniform4f(l, a, b, c, d); return this; },
+    u1fv(n, arr) { const l = this.loc(n); if (l !== null) gl.uniform1fv(l, arr); return this; },
     u3fv(n, arr) { const l = this.loc(n); if (l !== null) gl.uniform3fv(l, arr); return this; },
     u4fv(n, arr) { const l = this.loc(n); if (l !== null) gl.uniform4fv(l, arr); return this; },
     tex(n, unit, texture) {

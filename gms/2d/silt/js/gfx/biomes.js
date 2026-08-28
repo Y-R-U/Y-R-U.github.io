@@ -1,7 +1,7 @@
 // A biome is a palette + a light rig + a grade. Nothing else. Swapping one at
 // runtime must never touch a shader, a target or a program — only these numbers.
 
-import { MAT_COUNT } from '../sim/materials.js';
+import { MAT_COUNT, KIND, STATIC } from '../sim/materials.js';
 
 export const TINT_SLOTS = 8;   // index 0 unused (0 == untinted), 1..7 usable
 
@@ -162,7 +162,15 @@ export const BIOMES = {
       [0.068, 0.180, 0.242],
       [0.055, 0.156, 0.228],
     ],
-    mats: { sand: [0.22, 0.145, 0.095], wall: [0.155, 0.115, 0.092] },
+    // Wall was [0.155, 0.115, 0.092] — a WARM grey, the same hue family as a hot
+    // red vessel and the ochre sand in front of it, and kiln puts its scenery
+    // right where the key glow makes the backdrop brightest. Measured against a
+    // bare board, a 2-cell divider read 16.5 of 255 per channel; the same VALUE
+    // rolled neutral reads 23.4. It is dune's old "bone" one more time — the
+    // separation that pays is HUE, not lightness — and rolling it costs nothing,
+    // because the wall stays exactly as dark as it was and so never starts
+    // competing with the sand it holds up.
+    mats: { sand: [0.22, 0.145, 0.095], wall: [0.150, 0.132, 0.128] },
     sky: { top: [0.0130, 0.0095, 0.0110], bot: [0.0400, 0.0130, 0.0058] },
     glow: { col: [0.340, 0.105, 0.030], pos: [0.50, -0.04], amt: 0.58, band: 0.16, tight: [4.5, 4.5] },
     well:  [0.46, 0.80, 0.54, 0.38],
@@ -222,7 +230,11 @@ export const BIOMES = {
       [0.105, 0.229, 0.288],
     ],
     mats: {
-      wall: [0.120, 0.132, 0.148], sand: [0.155, 0.200, 0.212],
+      // Warm stone under a cold lamp, and for the same reason as kiln's: the
+      // wall was [0.120, 0.132, 0.148], a blue-grey against a teal panel, which
+      // is the one biome where the backdrop is the BRIGHT side of the contrast.
+      // Rolling it warm took a 2-cell divider from 22.5 to 30.7 per channel.
+      wall: [0.162, 0.140, 0.126], sand: [0.155, 0.200, 0.212],
       water: [0.055, 0.190, 0.245], ash: [0.108, 0.114, 0.120],
       crystal: [0.150, 0.215, 0.262], ice: [0.160, 0.230, 0.278],
       oil: [0.062, 0.056, 0.048],
@@ -321,6 +333,19 @@ export const BIOMES = {
 };
 
 export const BIOME_NAMES = Object.keys(BIOMES);
+
+/**
+ * Which materials are the BUILT WORLD rather than poured material. Taken from
+ * the sim's own KIND table, never a hand-kept list here: a material that stops
+ * being static in materials.js must stop being drawn as masonry in the same
+ * commit, and a fourth copy of "which ones are the walls" is how that rots.
+ */
+const MAT_STATIC = (() => {
+  const a = new Float32Array(MAT_COUNT);
+  for (let i = 0; i < MAT_COUNT; i++) a[i] = KIND[i] === STATIC ? 1 : 0;
+  return a;
+})();
+export { MAT_STATIC };
 
 /** Flatten a biome into the typed arrays the resolve shader wants. */
 export function bakeBiome(b) {
