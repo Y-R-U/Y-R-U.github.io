@@ -6,7 +6,7 @@
 //   node tools/sim.mjs                 run every gate
 //   node tools/sim.mjs --games 40      longer play gate
 //   node tools/sim.mjs --break <gate>  falsification arm: that gate MUST go red
-//     arms: mass  ledger  rng  clears  identity
+//     arms: mass  ledger  rng  clears  identity  ramp
 //
 // A gate that has never been proven to fail is not evidence, so --break exists
 // to show each one actually detecting the fault it claims to guard.
@@ -158,6 +158,59 @@ function identity(w, b, label) {
   return null;
 }
 
+/**
+ * G8 — A RUN HAS TO END, even for a player who is trying not to lose.
+ *
+ * Every difficulty number in this project came from the shipping bot, and the
+ * bot is not trying to survive: it plays to score, tops itself out in about two
+ * minutes, and its games ending was read for months as evidence that a game can
+ * be lost. It is not. A browser playtest dumped 185 pieces against one wall
+ * over eight minutes and never died, because a pile that never reaches the
+ * spawn column cannot top out and a wall-to-wall clear rescues the board every
+ * time it gets close.
+ *
+ * So this gate plays the strategy the bot never will: hug alternating walls,
+ * never soft-drop, let every piece fall at its own rate — a pace a person can
+ * actually keep up, which is the whole point. The first version of this probe
+ * soft-dropped and stacked 63 pieces in twenty seconds; it died every time and
+ * measured a strategy no human can execute.
+ *
+ * With `fallTime` at 0, this strategy survives a median of 646 SECONDS. The
+ * bound below is what the time ramp buys, and `--break ramp` sets fallTime back
+ * to 0 to prove the gate is measuring it.
+ */
+const SURVIVOR_CAP_S = 480;
+
+function gateFinite() {
+  const cfg = FLOW ? FLOW.worldCfg : {};
+  const lens = [];
+  for (let n = 0; n < 4; n++) {
+    const w = new World({ seed: 4000 + n, ...cfg, ...(BREAK === 'ramp' ? { fallTime: 0 } : {}) });
+    const api = modeApi(w);
+    if (FLOW && FLOW.onStart) FLOW.onStart(w, api);
+    const CAP = SIM_HZ * (SURVIVOR_CAP_S + 240);
+    let t = 0, side = 0, last = null;
+    for (; t < CAP && !w.over; t++) {
+      if (w.piece !== last) { last = w.piece; side ^= 1; }
+      const p = w.piece;
+      // Hug a wall. No soft drop: the sand must be given time to settle, or
+      // this measures stacking speed instead of survivability.
+      if (p) { const target = side === 0 ? 0 : w.g.cols; if (p.x > target) w.moveBy(-8); else if (p.x < target) w.moveBy(8); }
+      const before = w.chains;
+      w.tick();
+      if (w.chains > before && FLOW && FLOW.onChain) FLOW.onChain(w, api, w.clears.lastChain.slice());
+      if (FLOW && FLOW.onTick) FLOW.onTick(w, api);
+    }
+    lens.push(t / SIM_HZ);
+    if (!w.over) { fail('G8-finite', `a wall-hugging run survived the whole ${(CAP / SIM_HZ) | 0}s cap on seed ${4000 + n}`); return lens; }
+  }
+  const worst = Math.max(...lens);
+  if (worst > SURVIVOR_CAP_S) {
+    fail('G8-finite', `a player who only tries to survive lasts ${worst.toFixed(0)}s — over the ${SURVIVOR_CAP_S}s bound`);
+  }
+  return lens;
+}
+
 // --------------------------------------------------------------- G5 play
 function gatePlay() {
   let totalChains = 0, totalScore = 0, stalls = 0, lengths = [];
@@ -224,9 +277,14 @@ gateMass();
 gateLedger();
 gateDeterminism();
 const play = gatePlay();
+const finite = gateFinite();
 const perf = gatePerf();
 
 if (play) console.log(`  play      ${GAMES} games, avg ${(play.avg / SIM_HZ).toFixed(1)}s, ${play.totalChains} chains, ${play.totalScore} pts`);
+if (finite) {
+  console.log(`  finite    a survivor lasts ${Math.min(...finite).toFixed(0)}-${Math.max(...finite).toFixed(0)}s ` +
+    `against a ${SURVIVOR_CAP_S}s bound`);
+}
 if (perf) console.log(`  perf      ${perf.toFixed(3)} ms/tick`);
 
 if (failures.length) {

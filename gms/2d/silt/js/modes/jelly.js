@@ -69,6 +69,12 @@ export default {
     reactions: false,
     cols: 88,
     rows: 192,
+    // HALF the shared time ramp. At the default 0.08 this mode lost a third of
+    // its chains — 14.8 a game down to 9.4 — because a soft body needs time to
+    // spread before the next one lands on it, and the balance here was hard
+    // won: see the board-size note above. 0.04 keeps the run finite (that is
+    // what the ramp is for) at 13.8 chains and 109s, which is the tuning.
+    fallTime: 0.04,
     fallRate: 30,
     fallAccel: 1.2,
     fallMax: 90,

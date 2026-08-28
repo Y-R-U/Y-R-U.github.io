@@ -97,6 +97,9 @@ export default {
   seedScene,
 
   worldCfg: {
+    // A sandbox does not get faster. There is nothing to lose, so a ramp would
+    // only take the brush away from you.
+    fallTime: 0,
     mat: SAND,
     tints: 3,
     tintMode: 'mono',

@@ -91,6 +91,13 @@ export function worldCfgFor(opts = {}) {
     fallRate: lv.fallRate,
     fallAccel: lv.fallAccel,
     fallMax: lv.fallMax,
+    // NO TIME RAMP. The endless modes need one — without it a player who only
+    // tries to survive lasts ten minutes — but a level is already finite: its
+    // tension is the objective against `limitS`, and a speed ramp on top would
+    // compound the clock it is measured against. Two levels immediately fell to
+    // 1-of-3 wins when they inherited the default, which is the campaign saying
+    // the same thing: these levels were tuned against their own clock.
+    fallTime: 0,
   };
 }
 

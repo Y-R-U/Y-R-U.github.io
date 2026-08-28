@@ -17,6 +17,7 @@ export const DEFAULT_CFG = {
   mat: SAND,
   fallRate: 22,          // grains per second
   fallAccel: 0.55,       // grains/sec added per cleared chain
+  fallTime: 0.08,        // grains/sec added per SECOND of play
   fallMax: 70,
   reactions: false,
   shapes: null,
@@ -37,6 +38,7 @@ export class World {
     this.nextPiece = makePiece(this.rng, this.cfg);
     this.fallAccum = 0;
     this.fallRate = this.cfg.fallRate;
+    this.chainBoost = 0;      // the speed a player has earned by clearing
     this.softDrop = false;
 
     this.score = 0;
@@ -121,6 +123,24 @@ export class World {
     this.ticks++;
     this.t += 1 / SIM_HZ;
 
+    /**
+     * SPEED IS A FUNCTION OF TIME AS WELL AS OF CHAINS.
+     *
+     * The ramp used to be chain-driven only, which had it backwards: clearing
+     * well was punished with speed and stalling was rewarded with a game that
+     * stayed slow forever. Measured, a player who dumps every piece against one
+     * wall and never blocks the spawn column survives 9 to 11 minutes and 600
+     * placements — the run does end, but no phone game should ask that of you
+     * before it does. The bot's own games average two minutes, which is why no
+     * gate ever saw this: the bot is not trying to survive.
+     *
+     * `fallTime` is the term that makes a run finite regardless of how it is
+     * played. `chainBoost` is kept separate so the two contributions stay
+     * legible, and so the mode-facing meaning of fallAccel does not change.
+     */
+    this.fallRate = Math.min(this.cfg.fallMax,
+      this.cfg.fallRate + this.chainBoost + this.cfg.fallTime * this.t);
+
     // Blobs move before the cellular step: the grid is authoritative, and a
     // blob that has already rasterised itself is terrain as far as sand is
     // concerned.
@@ -137,7 +157,7 @@ export class World {
         this.lastChainSize = n;
         // Superlinear in chain size so one huge chain beats several small ones.
         this.score += Math.round(n * (1 + n / 220) * (1 + this.combo * 0.35));
-        this.fallRate = Math.min(this.cfg.fallMax, this.fallRate + this.cfg.fallAccel);
+        this.chainBoost += this.cfg.fallAccel;
       }
     }
 

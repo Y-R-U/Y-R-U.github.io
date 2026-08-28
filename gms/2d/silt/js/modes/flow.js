@@ -14,6 +14,16 @@ import { makeScorer } from './score.js';
 // fallRate 34 / accel 0.9 / max 120 was picked by sweep: median run 101s,
 // 13/16 seeds inside the 70-170s band, ~9 chains. The old 22/0.55 default put
 // the bot at 189s and 1.2M points.
+//
+// That sweep measured the BOT, which plays to score and tops itself out in two
+// minutes. It says nothing about a player trying to survive — and a player who
+// hugs one wall and never blocks the spawn column lasted 646 seconds, because
+// the ramp was driven by chains alone: clearing well was punished with speed
+// and stalling was rewarded with a game that stayed slow for ever. The time
+// term in world.js (`fallTime`, 0.08 grains/sec per second) is what makes a run
+// finite either way. Measured over 20 bot games it costs a normal run nothing
+// — 7.5 chains against 7.7, median 107s against 101s — while halving the
+// survivor's ceiling to 311s. Gate G8 in tools/sim.mjs holds that line.
 
 const S = new WeakMap();
 

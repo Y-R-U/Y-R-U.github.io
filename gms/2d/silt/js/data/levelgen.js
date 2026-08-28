@@ -20,11 +20,16 @@ import {
 
 export const ARCHETYPES = ['quench', 'crucible', 'span', 'excavate', 'slag'];
 
+// Grouped, because the HUD's own counter under this line is grouped: the card
+// read "Dissolve 9035 grains" over "8,577 / 9,035" and the mismatch was the
+// first thing a playtester noticed about it.
+const N = (v) => Math.round(v).toLocaleString('en-US');
+
 export const OBJECTIVE_LABEL = {
-  chains: (o) => `Clear ${o.target} chains`,
-  dissolve: (o) => `Dissolve ${o.target} grains`,
-  crystal: (o) => `Forge ${o.target} crystal`,
-  purge: (o) => `Reduce sand to ${o.target}`,
+  chains: (o) => `Clear ${N(o.target)} chains`,
+  dissolve: (o) => `Dissolve ${N(o.target)} grains`,
+  crystal: (o) => `Forge ${N(o.target)} crystal`,
+  purge: (o) => `Reduce sand to ${N(o.target)}`,
 };
 
 const NAMES_A = ['Cold', 'Slow', 'Bright', 'Deep', 'First', 'Iron', 'Salt', 'Glass', 'Amber', 'Quiet',

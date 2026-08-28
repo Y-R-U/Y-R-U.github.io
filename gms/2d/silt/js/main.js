@@ -99,7 +99,7 @@ async function boot() {
       onStart: (id, opts) => startGame(id, opts),
       onPause: () => { if (state === 'play') state = 'pause'; },
       onResume: () => { if (state === 'pause') state = 'play'; },
-      onQuit: () => startAttract(),
+      onQuit: () => { recordAbandoned(); startAttract(); },
     });
   }
 
@@ -254,6 +254,22 @@ function startGame(id, opts = {}) {
   state = 'play';
   if (window.SiltCloud && window.SiltCloud.setPlaying) window.SiltCloud.setPlaying(true);
   UI && UI.show('hud');
+}
+
+/**
+ * A run you walked away from still happened.
+ *
+ * `recordGame` only ran from endGame(), so quitting from the pause card threw
+ * the whole run away — a playtester finished a session with three runs and
+ * fourteen chains recorded against ten runs and thirty-six chains actually
+ * played, and read the counters as broken. They were honest about a definition
+ * nobody would guess.
+ */
+function recordAbandoned() {
+  if (state !== 'play' && state !== 'pause') return;
+  if (!world || !mode || world.over) return;
+  if (world.chains === 0 && world.score === 0) return;   // nothing happened; not a run
+  save.recordGame(mode.id, world.score, world.chains, world.cellsCleared);
 }
 
 function endGame() {
