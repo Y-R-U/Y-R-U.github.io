@@ -273,3 +273,284 @@ My first version of this filter keyed on cols, which excluded the widened JELLY
 it is also shorter. Now compares fitted aspect against the widest mode with a
 15% tolerance, so all five endless modes demo on the title screen and none of
 them letterbox.
+
+## ALCHEMY re-boarded to a 0.500 aspect — 2026-08-28, lane C
+
+Aaron, on a phone: "I do want alchemy to match the game boards of the others
+otherwise it doesn't look right." He is right, and the reason is the one JELLY
+already taught: `js/core/viewport.js` letterboxes the grid preserving aspect, so
+what the player sees is `cols/rows`, not the column count.
+
+### Before / after, measured through the viewport's own fit at 390x844
+
+| board | cols x rows | cols/rows | fitted width | % of 390 |
+|---|---|---|---|---|
+| FLOW / TIDE / HOURGLASS / ZEN | 112x224 | 0.500 | 390px | 100% |
+| JELLY LAB | 88x192 | 0.458 | 387px | 99% |
+| ALCHEMY **was**, act I | 64x168 | 0.381 | 322px | 82% |
+| ALCHEMY **was**, act V | 88x216 | 0.407 | 344px | 88% |
+| ALCHEMY **was**, narrowest shipped | 64x181 | 0.354 | 298px | 77% |
+| ALCHEMY **now**, act I | 80x160 | 0.500 | 390px | 100% |
+| ALCHEMY **now**, act V | 104x208 | 0.500 | 390px | 100% |
+
+All 100 shipped levels are now exactly 0.500. The old set ranged 0.354-0.431 and
+**every one of the 96 was below the 0.46 floor** — see the falsification note
+below, where that is what proves the new gate works.
+
+### The formula
+
+`js/data/levelgen.js` now carries a `BOARD` object rather than two independent
+expressions:
+
+```
+cols    = snap(80 + d*24, 8)      // 80 -> 104
+rows    = cols * 2                // DERIVED. rows is never chosen.
+fallRate= 18 * (cols*rows^2) / (64*168^2)   +/- 2
+fallMax = fallRate * (3.2 - d*0.6)
+```
+
+Three things changed and each was measured, not assumed.
+
+**1. rows is derived from cols.** That is the whole fix: an aspect cannot drift
+if only one of the two numbers is free.
+
+**2. The `rng.range(-4,4)` jitter on cols is gone.** At BLK=8 it only ever moved
+cols by one block, and because rows did not move with it, it was the thing that
+walked the aspect around inside a band (0.354 to 0.431 on boards that were
+nominally the same size). Variety still comes from the scene, the fall jitter and
+the calibrated objective.
+
+**3. Tempo is now DERIVED FROM THE BOARD, and this is the change beyond board
+dims that the brief asked me to declare.** A piece deposits ~256 grains and takes
+`rows/fallRate` seconds to arrive, so a board fills at `256*fallRate/(cols*rows^2)`
+of itself per second. Holding that constant means fallRate must scale with
+`cols*rows^2` — and the shipped campaign already did, by accident: 64x168 ->
+88x216 is a factor of 2.27 on `cols*rows^2` while its hand-written ramp went
+18 -> 38, a factor of 2.11. **The ramp WAS the board compensation, not a
+difficulty ramp on top of it.** Reshaping the board without re-deriving the
+tempo therefore silently changes how fast every act plays. New range 19-47
+grains/s against the old 18-38, which is the same fill time on a board that is
+14% larger at act V. `fallMax` is now expressed as a multiple of `fallRate`
+(3.2x easing to 2.6x) — the exact ratio the old hand-written 58->100 held — so it
+survives any future reshape too.
+
+### Why 80->104 and not the suggested 88->112
+
+Four formulas were swept at aspect 0.500 against the old board, 30 candidates
+each, through the shipping modules. Keep rate barely moved, but the archetypes
+did:
+
+| formula | act I - act V | kept /30 (3 seed families) | med/limit | span kept |
+|---|---|---|---|---|
+| old (shipped) | 64x168 - 88x216 | 25 / 19 / 23 | 0.48-0.51 | 6 / 3 / 5 |
+| 72 -> 96 | 72x144 - 96x192 | 23 / 21 | 0.42-0.51 | 5 / 5 |
+| **80 -> 104** | 80x160 - 104x208 | 22 / 22 | 0.47-0.51 | 4 / 4 |
+| 88 -> 112 | 88x176 - 112x224 | 21 / 24 | 0.50-0.54 | 3 / 5 |
+
+88->112 is the widest and it is span (the chain-objective archetype) that pays,
+exactly as D3 predicts — a spanning chain is percolation, and percolation gets
+harder with width no matter what the tempo is. 72->96 keeps span best but puts
+act I at 5.4 css px per cell, coarser than any other mode. 80->104 sits between
+JELLY's 88 and FLOW's 112 and matched the shipped campaign's difficulty most
+closely, so it is the one that shipped. THREE SEED FAMILIES, per the JELLY rule —
+and it was needed: the OLD formula alone swung 25 / 19 / 23 across families, so
+any single-family comparison here would have been noise.
+
+Final three-family check on the shipping implementation (`--gen-levels 30
+--gen-seed`): 23 / 20 / 21 kept, against the old formula's 25 / 19 / 23.
+Indistinguishable.
+
+### THE FLOOR WAS BEING ENFORCED ON THE WRONG NUMBER
+
+The first regenerated campaign came out with **"Clear 1 chains" on level one**,
+and four more like it. `FLOOR` (chains 2, dissolve 900, crystal 32) was checked
+against the calibrator's `reach` and never against the target the level actually
+ships with — and the target is 0.6 of reach, so a level that only just clears the
+floor ships at 0.6 of the floor. This was always wrong; the old narrow board
+merely hid it for chains, and even there two crystal levels shipped under their
+floor (ids 10 and 73, targets 20 and 24 against a floor of 32). Widening the
+board made spanning chains scarcer, reach fell to exactly 2 on five span levels,
+and the bug walked into the first level of the game.
+
+`FLOOR` is now applied to the shipped target for chains/dissolve/crystal (not
+purge, where the target is a level to reduce TO, so a bigger number is easier and
+the floor means something else). If the floor is then out of reach, the 2-of-3
+win rule throws the level out, which is the right answer.
+
+**This turned out to be what quench was waiting for.** Clamping crystal targets
+up to 32 pushes them past the 6-second triviality threshold that had been
+rejecting nearly every quench candidate: quench goes from **2 levels of 96 to 7
+of 100**, at a healthy med/limit of 0.43. It does not fix the saturation
+described above — quench still earns most of its crystal in the first fifteen
+seconds — but it is an archetype again rather than a rounding error.
+
+### The regenerated campaign
+
+145 candidates -> **100 kept, 45 rejected** (the old set was 96 from 140).
+
+| rejected | why |
+|---|---|
+| 17 | trivially complete (bot finished the calibrated target inside 6s) |
+| 15 | unreachable (bot never reached the objective floor) |
+| 10 | only 1/3 wins |
+| 3 | only 0/3 wins |
+
+Acts after renumbering: **20 / 21 / 20 / 20 / 19** — even.
+Board sizes: 80x160 x16, 88x176 x36, 96x192 x32, 104x208 x16.
+Levels shipping below their objective floor: **0**, against 2 before.
+
+`node tools/modesim.mjs --levels` replays the shipped file rather than the
+generator's own candidates: **100/100 levels beaten by the bot on at least 2 of 3
+seeds**, aspect 0.500-0.500, zero below the floor.
+
+Difficulty, from the generator's own measured runs:
+
+| archetype | before (96) | | after (100) | |
+|---|---|---|---|---|
+| | n, med win, med/limit | 3/3 wins | n, med win, med/limit | 3/3 wins |
+| span | 15, 45.1s, 0.62 | 9 | 12, 38.4s, 0.50 | 5 |
+| excavate | 28, 55.2s, 0.66 | 28 | 29, 54.4s, 0.68 | 29 |
+| quench | 2, 17.4s, 0.27 | 2 | 7, 33.2s, 0.43 | 4 |
+| crucible | 28, 37.2s, 0.44 | 23 | 29, 36.2s, 0.43 | 29 |
+| slag | 23, 20.4s, 0.26 | 19 | 23, 23.4s, 0.29 | 18 |
+| **all** | **p50 0.53, p90 0.73, max 0.89** | 81/96 | **p50 0.48, p90 0.73, max 0.83** | 85/100 |
+
+The campaign is if anything slightly EASIER than the one it replaces: the median
+level is finished in 48% of its limit against 53% before, the worst level now
+needs 83% of its limit where the worst before needed 89%, and 85% of levels are
+beaten on all three validation seeds against 84%.
+
+**The one honest regression: span is more seed-sensitive.** It wins faster when
+it wins (med/limit 0.62 -> 0.50) but only 5 of 12 win all three seeds against 9
+of 15 before. Percolation again — a wider board makes the wall-to-wall chain a
+coin toss more often. It is inside the shipping bar (2 of 3) and the median got
+easier, but if span ever needs strengthening, narrowing is the lever, not tempo.
+
+### QUENCH SATURATES — measured, and only half fixed
+
+Before the floor fix below it shipped 1 level of 99, where the old set shipped 2
+of 96: a rounding error on an archetype that gets 1/5 of the candidate slots. So
+I measured why rather than guessing. Crystal-over-time on three quench candidates, objective
+target removed so the run shows the ceiling:
+
+```
+lv13 88x176 lava0=436  crystal 0s:0  5s:30  10s:48  15s:48 ... 75s:69   lava consumed: 19 of 436
+lv14 88x176 lava0=416  crystal 0s:0  5s:18  10s:18  15s:32 ... 75s:33   lava consumed: 16 of 416
+lv15 88x176 lava0=331  crystal 0s:0  5s:16  10s:16  15s:37 ... 75s:37   lava consumed: 29 of 331
+```
+
+**Quench saturates in the first 15 seconds and then nothing happens for the
+remaining minute.** Only the exposed lava SURFACE ever converts — about 4% of the
+lava on the board — because crystal is permanent and the first water to touch a
+body seals it forever. So `reach` is roughly "total exposed lava width", it is
+achieved almost instantly, and a target of 0.6 x reach is therefore hit inside
+the 6-second triviality threshold. The `shelves()` design was meant to prevent
+exactly this and it does not: staggering the heights spreads the first contact
+over ten seconds, not over the level.
+
+This is a mode-design problem, not a board problem — the same saturation is
+visible at 64, 72, 80 and 88 columns — so I have not touched the quench content.
+The objective-floor fix below raises quench to 7 shipped levels by asking for
+enough crystal that the level cannot end in six seconds, which is a real
+improvement, but the underlying shape is unchanged: the crystal still all arrives
+in the first fifteen seconds and the rest of the level is the clock running out.
+Whoever picks it up: the objective has to stop being "how much crystal" and start
+being something the crust does not end. Re-exposing buried lava is the only
+mechanism on the board that could do it.
+
+### The new permanent gate: A4-aspect
+
+`tools/modesim.mjs` now asserts `cols/rows >= 0.46` on **every** shipped level
+(never the sample — it costs no simulation) and on every generated candidate.
+0.46 rather than 0.50 so JELLY's 0.458 stays legal; it is the narrowest board
+anyone has judged acceptable on a phone.
+
+Nothing else in the suite would ever have caught this. Every one of those 96 old
+levels was winnable, non-trivial, correctly starred and completely wrong.
+
+Falsified three ways, all red:
+- `--break aspect` in the shipped path: `A4-aspect: shipped levels: 1/100 board(s)
+  letterbox below 0.46 — 1 80x256=0.313`
+- `--break aspect` in the generation path: `1/30 board(s) ... 10 88x282=0.312`
+- **and against the real artifact**: dropping the OLD `levels.js` back in and
+  running the gate gives `board aspect: 0.354-0.431 across 96 levels, floor 0.46
+  (96 below)` and `A4-aspect: 96/96 board(s) letterbox`. The gate catches the
+  actual bug it was written for, not just a synthetic one.
+
+`--gen-seed` was added at the same time, because "three seed families" is not a
+rule you can follow against a hardcoded seed.
+
+### A gate that was green by luck, and went red on a good level
+
+An intermediate regeneration turned `A1-levels` red on its level 81 (a slag
+level, 96x192) with "unbeatable by the bot". It was not. Its own record said
+`measured.wins: 2`, and playing it at the three validation seeds gave seed 900
+lose, 1213 win at 51.2s, 1526 win at 21.0s. (That campaign was superseded, so
+level 81 in the shipped file today is a different level — the point is the gate,
+not the level.)
+
+The default sampled check played ONE seed (900) and demanded a win. **That is a
+stricter property than any level was ever guaranteed to have** — the shipping bar
+is two wins out of three, so an accepted level is allowed to lose one seed. The
+old campaign contained fifteen 2/3 levels and two of them (ids 1 and 91) sat in
+the sampled positions; the gate was green only because both happened to win on
+seed 900. Regeneration re-rolled that coin.
+
+Fixed by asserting the bar the generator actually shipped under: `validateLevel(lv, 3)`
+and `wins >= 2`, in both the sampled and the `--levels` path. A gate that fires on
+a level meeting its contract is a false alarm, and a false alarm is how a real one
+gets ignored.
+
+### Considered and deliberately not changed
+
+`ALCHEMY_CFG.ventRows / corridorPad / corridorDepth` are in cells and the board
+did change size, but all three are sized against the PIECE and the ceiling, not
+the board: the spawn crown is 6 rows regardless of width, and the corridor is 6
+cells either side of a piece whose size did not change. Top-outs did not move
+enough to justify touching them (1 -> 2-3 per 30 candidates in the sweep, noise at
+that n). Left alone.
+
+`js/modes/alchemy.js` still says "Ninety graded problems" in its blurb. It was
+already wrong at 96 and it is wrong at 100; it is a shell-visible string and not
+part of this job, so it is flagged rather than edited.
+
+### Verified in a real browser, not only in node
+
+The board rect is computed in `js/core/viewport.js`, which node never runs, so
+the aspect claim was checked end to end on a true 390x844 headless viewport via
+`tools/cdp.mjs`, at all three board sizes the campaign uses:
+
+```
+level  1   80x160   board {x:0, y:22.4, w:390, h:780}   "Clear 2 chains"
+level 40   88x176   board {x:0, y:22.4, w:390, h:780}   "Reduce sand to 379"
+level 99  104x208   board {x:0, y:22.4, w:390, h:780}   "Dissolve 20690 grains"
+```
+
+That is byte-identical to the FLOW rect recorded earlier in this file
+(`FLOW viewport {0, 22.4, 390x780}`). ALCHEMY now frames exactly like the rest of
+the game at every act, and `placeholder` was false on all three, so it was the
+real renderer drawing it.
+
+Note for whoever tries to reproduce this: **`?level=` is not a URL hook.** The
+page always starts ALCHEMY on level 1; use `window.__game.startLevel(n)` after
+boot. My first pass at this check passed `&level=99` and got three identical
+readings of level 1, which looked like a pass and proved nothing.
+
+### Gates, all run against the shipped artifact
+
+| gate | result |
+|---|---|
+| `node tools/sim.mjs` | PASS, 0.076 ms/tick |
+| `node tools/jellysim.mjs` | PASS |
+| `node tools/modesim.mjs` | PASS, aspect 0.500-0.500 across 100, 0 below floor |
+| `node tools/modesim.mjs --levels` | PASS, 100/100 beaten on >= 2 of 3 seeds |
+| `node tools/boot.mjs` | PASS, 12 checks, real renderer |
+| `--break trivial` | red, arm confirmed |
+| `--break unwinnable` | red, arm confirmed |
+| `--break span` | red, arm confirmed |
+| `--break aspect` (shipped path) | red, `1/100 board(s) letterbox` |
+| `--break aspect` (generation path) | red, `1/30 board(s) letterbox` |
+| A4 vs the real old `levels.js` | red, `96/96 board(s) letterbox` |
+
+Not run, and not claimed: `tools/gfx_shot.mjs --check` and `tools/uishot.mjs
+--probe`. Both belong to lanes editing concurrently and neither reads level data.

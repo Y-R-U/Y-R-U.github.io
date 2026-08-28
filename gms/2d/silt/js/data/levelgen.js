@@ -53,6 +53,49 @@ function rngFor(seed) {
 const BLK = 8;
 const snap = (v, m) => Math.max(m, Math.round(v / m) * m);
 
+const FILL_REF = 64 * 168 * 168;      // cols*rows^2 of the shipped act-I board
+
+/**
+ * Board dimensions, as a function of campaign depth d (0..1).
+ *
+ * The player never sees the column count — the viewport letterboxes the grid
+ * preserving aspect, so what reads on a phone is cols/rows. Every other mode
+ * sits at 0.500 (112x224) or 0.458 (JELLY, 88x192); ALCHEMY shipped at 0.381
+ * rising to 0.407 and filled 322px of a 390px screen, which reads as a
+ * different, broken game. So the board still GROWS across the campaign, but it
+ * grows at a FIXED ASPECT: rows is derived from cols, never chosen.
+ *
+ * The old cols jitter (+/-4 before snapping) is gone: at BLK=8 it only ever
+ * moved cols by one block anyway, and with rows independent it was the thing
+ * that walked the aspect around inside a band. Variety now comes from the
+ * scene, the fall tuning and the calibrated objective, all of which still jitter.
+ *
+ * Exported as a mutable object so tools can sweep it; the shipped levels are
+ * baked from whatever it says at generation time.
+ */
+export const BOARD = {
+  aspect: 2,                                       // rows / cols
+  cols: (d) => snap(80 + d * 24, BLK),             // 80 -> 104
+  rowsFor(cols, d) { return Math.round(cols * this.aspect); },
+
+  /**
+   * Tempo follows the board, it is not a second difficulty knob.
+   *
+   * A piece deposits ~256 grains and takes rows/fallRate seconds to arrive, so
+   * the board fills at 256*fallRate/(cols*rows^2) of itself per second. Holding
+   * that constant means fallRate must scale with cols*rows^2 — and the shipped
+   * campaign already did, by accident: 64x168 -> 88x216 is a factor of 2.27 on
+   * cols*rows^2 and its hand-written ramp went 18 -> 38, a factor of 2.11. The
+   * ramp WAS the compensation, not an extra ramp on top of it, which is why
+   * re-shaping the board without re-deriving the tempo made every act play at a
+   * different speed than the one that was tuned.
+   *
+   * FILL_REF is cols*rows^2 for the shipped act-I board, whose 18 grains/s is
+   * the only tempo a human has ever been near.
+   */
+  fallRate(cols, rows) { return (cols * rows * rows) / FILL_REF * 18; },
+};
+
 /** Paint one level's starting board. Deterministic: no rng at play time. */
 export function applyScene(world, level) {
   const g = world.g;
@@ -233,15 +276,13 @@ export function genLevel(i, count, seed) {
     seed: (seed ^ Math.imul(i + 1, 0x85ebca6b)) >>> 0,
     name: `${NAMES_A[i % NAMES_A.length]} ${NAMES_B[(i * 7 + 3) % NAMES_B.length]}`,
     act: 1 + Math.min(4, Math.floor(d * 5)),
-    cols: snap(64 + d * 24 + rng.range(-4, 4), BLK),
-    rows: Math.round(168 + d * 48),
+    cols: 0, rows: 0,               // filled below from BOARD
     tints,
     tintMode: 'mono',
     diagonal: true,
     reactions: true,
-    fallRate: Math.round(18 + d * 20 + rng.range(-2, 2)),
+    fallRate: 0, fallMax: 0,          // derived from the board, below
     fallAccel: +(0.4 + d * 0.6).toFixed(2),
-    fallMax: Math.round(58 + d * 42),
     limitS: Math.round(60 + d * 40),
     seq: [SAND],
     scene: [],
@@ -249,6 +290,14 @@ export function genLevel(i, count, seed) {
     stars: [75, 50, 32],
     arch: 'span',
   };
+
+  level.cols = BOARD.cols(d, rng);
+  level.rows = BOARD.rowsFor(level.cols, d);
+  level.fallRate = Math.max(6, Math.round(BOARD.fallRate(level.cols, level.rows) + rng.range(-2, 2)));
+  // fallMax is the ceiling chain acceleration may reach, and the shipped
+  // campaign held it at 3.2x the starting rate easing to 2.6x. Expressed
+  // against fallRate it survives any reshape of the board.
+  level.fallMax = Math.round(level.fallRate * (3.2 - d * 0.6));
 
   const arch = archetypeFor(i, d, rng);
   level.arch = arch;

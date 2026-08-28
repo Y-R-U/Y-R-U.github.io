@@ -9,9 +9,14 @@
 //   node tools/modesim.mjs --games 8           more runs per mode
 //   node tools/modesim.mjs --levels            validate every shipped level
 //   node tools/modesim.mjs --gen-levels 120    regenerate + validate + write levels.js
+//   node tools/modesim.mjs --gen-levels 30 --gen-seed 0xA113
+//                                              a second seed family, no write —
+//                                              one family is never enough to
+//                                              believe a balance number
 //   node tools/modesim.mjs --break <gate>      falsification arm: that gate MUST go red
 //
 // break gates: ledger  score  stall  rng  tide  zen  slots  trivial  unwinnable  span
+//              aspect
 
 import { World, SIM_HZ, DEFAULT_CFG } from '../js/sim/world.js';
 import { Grid, F_CLEARING } from '../js/sim/grid.js';
@@ -42,6 +47,9 @@ const BREAK = opt('--break', null);
 const ONLY = opt('--mode', null);
 const GEN = has('--gen-levels') ? +(opt('--gen-levels', 120) || 120) : 0;
 const ALL_LEVELS = has('--levels');
+// Generation is deterministic in this seed. Sweeping it is how a balance claim
+// gets three independent families instead of one lucky one.
+const GEN_SEED = Number(opt('--gen-seed', '0x5117'));
 
 const failures = [];
 const fail = (gate, msg) => { failures.push(`${gate}: ${msg}`); };
@@ -383,6 +391,39 @@ async function validateLevel(lv, tries = 3) {
 const FLOOR = { chains: 2, dissolve: 900, crystal: 32, purge: 260 };
 
 /**
+ * A4 — every shipped board must fill the screen like the rest of the game.
+ *
+ * js/core/viewport.js letterboxes the grid preserving aspect, so what the
+ * player sees is cols/rows, NOT the column count. FLOW/TIDE/HOURGLASS/ZEN are
+ * 112x224 = 0.500 and JELLY LAB is 88x192 = 0.458; ALCHEMY shipped at 0.381
+ * rising to 0.407, filling 322px of a 390px phone against everyone else's 387,
+ * and on a real device read as a different, broken game. The generator now
+ * derives rows from cols so the aspect cannot drift — this gate is what stops
+ * that guarantee from being quietly lost again, because nothing else in the
+ * suite would notice: every level would still be winnable, still non-trivial,
+ * still correctly starred, and still wrong.
+ *
+ * 0.46 rather than 0.50 so JELLY LAB's shape stays legal — it is the narrowest
+ * board anyone has judged acceptable on a phone.
+ */
+const MIN_ASPECT = 0.46;
+
+function gateAspect(levels, where) {
+  const bad = [];
+  let lo = Infinity, hi = 0;
+  for (const lv of levels) {
+    const a = lv.cols / lv.rows;
+    lo = Math.min(lo, a); hi = Math.max(hi, a);
+    if (!(a >= MIN_ASPECT)) bad.push(`${lv.id} ${lv.cols}x${lv.rows}=${a.toFixed(3)}`);
+  }
+  if (bad.length) {
+    fail('A4-aspect', `${where}: ${bad.length}/${levels.length} board(s) letterbox below ${MIN_ASPECT} — ` +
+      bad.slice(0, 5).join(' ') + (bad.length > 5 ? ' …' : ''));
+  }
+  return { lo, hi, bad: bad.length };
+}
+
+/**
  * Calibrate the objective against what the bot can actually reach.
  *
  * Hand-picked targets were wrong in both directions at once — quench levels
@@ -425,7 +466,7 @@ function starsFrom(times, limitS) {
 }
 
 async function generateLevels(count) {
-  const cands = genLevels(count, 0x5117);
+  const cands = genLevels(count, GEN_SEED);
   if (BREAK === 'trivial') cands[3].objective = { type: 'chains', target: 0 };
   if (BREAK === 'unwinnable') cands[4].objective = { type: 'chains', target: 100000 };
   if (BREAK === 'span') {
@@ -433,6 +474,15 @@ async function generateLevels(count) {
     c.scene.push({ x: 0, y: c.rows - 12, w: c.cols, h: 4, mat: 2, tint: 1 });
   }
   setLevels(cands);
+
+  // A4 is a pure function of the board formula, so it is judged on the
+  // candidates: if the formula drifted, no amount of validation downstream will
+  // put the aspect back. Under --break aspect one candidate is stretched in a
+  // COPY, so the arm proves the check without perturbing the generation run.
+  gateAspect(
+    BREAK === 'aspect' ? cands.map((lv, i) => (i === 9 ? { ...lv, rows: Math.round(lv.rows * 1.6) } : lv)) : cands,
+    `${count} generated candidates`,
+  );
 
   const kept = [], rejected = [];
   for (const lv of cands) {
@@ -444,7 +494,20 @@ async function generateLevels(count) {
           rejected.push([lv.id, lv.arch, `unreachable: bot only reached ${Math.round(cal.reach)} of a ${FLOOR[lv.objective.type]} floor`]);
           continue;
         }
-        lv.objective.target = cal.target;
+        // FLOOR is a property of the OBJECTIVE, so it has to be enforced on the
+        // target the level SHIPS with, not only on the reach the calibrator
+        // measured. Applying it to reach alone was always wrong and the old
+        // narrow board merely hid it: the target is 0.6 of reach, so a level the
+        // bot only just clears the floor on ships at 0.6 of the floor. Widening
+        // the board made spanning chains scarcer, reach fell to exactly 2 on
+        // five span levels, and the campaign came out with "Clear 1 chains" on
+        // LEVEL ONE. If the floor is then out of reach, validateLevel's 2-of-3
+        // rule throws the level out, which is the right answer.
+        // Not purge: there the target is a level to reduce TO, so a bigger
+        // number is easier and the floor means something else entirely.
+        lv.objective.target = lv.objective.type === 'purge'
+          ? cal.target
+          : Math.max(FLOOR[lv.objective.type], cal.target);
         lv.reach = Math.round(cal.reach);
       }
     }
@@ -551,14 +614,32 @@ if (GEN) {
   const flips = await gateHourglass();
   const z = await gateZen();
 
+  // A4 costs no simulation, so it is always run over ALL 96 shipped levels,
+  // never the sample.
+  const asp = gateAspect(
+    BREAK === 'aspect' ? SHIPPED.map((lv, i) => (i === 0 ? { ...lv, rows: Math.round(lv.rows * 1.6) } : lv)) : SHIPPED,
+    'shipped levels',
+  );
+
   // Shipped levels: a sample by default, all of them under --levels.
+  //
+  // The bar here is the SAME bar the generator shipped the level under — two
+  // wins out of the three seeds 900/1213/1526 — and it has to be, because a
+  // level accepted at 2/3 is a level that loses one seed on purpose. The first
+  // version of this check played ONE seed and demanded a win, which is a
+  // stricter property than any level was ever guaranteed to have: it was green
+  // only because both 2/3 levels that landed in the shipped sample (ids 1 and
+  // 91) happened to win on seed 900. Regenerating the campaign re-rolled that
+  // coin and it came up red on a level whose own `measured.wins: 2` says it is
+  // fine. A gate that fires on a level meeting its contract is a false alarm,
+  // and a false alarm is how a real one gets ignored.
   const pick = ALL_LEVELS ? SHIPPED : SHIPPED.filter((_, i) => i % Math.ceil(SHIPPED.length / 10) === 0);
   let lvWins = 0, lvChecked = 0, lvBad = [];
   for (const lv of pick) {
-    const v = await validateLevel(lv, ALL_LEVELS ? 2 : 1);
+    const v = await validateLevel(lv, 3);
     lvChecked++;
     if (v.selfClearing || v.trivial) { fail('A2-trivial', `level ${lv.id} (${lv.arch}) completes itself`); lvBad.push(lv.id); }
-    else if (v.wins < 1) { fail('A1-levels', `level ${lv.id} (${lv.arch}) unbeatable by the bot`); lvBad.push(lv.id); }
+    else if (v.wins < 2) { fail('A1-levels', `level ${lv.id} (${lv.arch}) beaten by the bot only ${v.wins}/3 times`); lvBad.push(lv.id); }
     else lvWins++;
   }
 
@@ -567,7 +648,8 @@ if (GEN) {
   console.log(`\n  tide: bare tide self-clears 0x; tinted water bridges a sand run (${tideProbe.bridged} cells). engine treats tint 0 as inert: ${tideProbe.inertZero}. highest tint emitted ${BRINE_FIRST + BRINE_COUNT - 1} of ${slots} renderer slots`);
   console.log(`  hourglass flips in 150s: ${flips}`);
   console.log(`  zen: no fail state over 120s, vented ${z.vented}x`);
-  console.log(`  levels: ${lvWins}/${lvChecked} sampled levels beaten by the bot${lvBad.length ? ' (bad: ' + lvBad.join(',') + ')' : ''}  [${SHIPPED.length} shipped]`);
+  console.log(`  levels: ${lvWins}/${lvChecked} sampled levels beaten by the bot at least 2 of 3 seeds${lvBad.length ? ' (bad: ' + lvBad.join(',') + ')' : ''}  [${SHIPPED.length} shipped]`);
+  console.log(`  board aspect: ${asp.lo.toFixed(3)}-${asp.hi.toFixed(3)} across ${SHIPPED.length} levels, floor ${MIN_ASPECT} (${asp.bad} below)`);
   console.log(`  jelly soft-body solver: ${jelly.isSoft ? 'probed' : '?'} — blobs.js ${await import('../js/sim/blobs.js').then(() => 'present').catch(() => 'ABSENT, running rigid fallback')}`);
 }
 
