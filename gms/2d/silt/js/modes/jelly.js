@@ -20,15 +20,39 @@ import { makeScorer } from './score.js';
 // measured, 28 chains a game and the run never ended at all in 220s.
 //
 // The feel knobs are per-instance for exactly this reason, so the mode presses
-// them rather than editing blobs.js. qMin 0.62 (against a 0.34 default) stops a
-// body flattening into a puddle and loadSquash 0.25 (against 0.62) stops the
-// stack above forcing it to, so jelly stays lumpy and a span has to be BUILT.
-// With the fall speed raised to match, that is 103s and 18 chains a game.
+// them rather than editing blobs.js. qMin stops a body flattening into a puddle
+// and loadSquash stops the stack above forcing it to, so jelly stays lumpy and
+// a span has to be BUILT.
+//
+// BOARD SIZE. This shipped at 64 x 224, an aspect of 0.286 that letterboxed to
+// a 241px column on a 390px phone — the only mode not filling its screen, which
+// reads as broken rather than deliberate. It was 64 wide because a 256-grain
+// body is only ~29 cells across at qMin 0.62, so a wider board needs more
+// bodies per span and the clear rate collapses: widening to 96 or 112 at the
+// old feel drops the mode to 2-3 chains a game with a third of runs never
+// clearing anything at all. Measured, not assumed.
+//
+// The fix is TWO changes that pull in the same direction, because the player
+// sees the ASPECT, not the column count:
+//   - 192 rows instead of 224. The span stays 88 cells, but 88/192 = 0.458
+//     fills essentially the whole width of a 390x844 screen where 88/224 would
+//     still letterbox to 85%.
+//   - qMin 0.38 / loadSquash 0.42 instead of 0.62 / 0.25, which is the same
+//     lumpiness RELATIVE TO THE BOARD: a body is ~48 of 88 cells wide here
+//     against ~29 of 64 before, so it still takes the same handful of bodies to
+//     reach across and a span is still built rather than given.
+//
+// Over 60 games across five independent seed families that is 104s and 12.5
+// chains a game at 78% fill, against 84s / 12.5 / 80% for the 64-wide board it
+// replaces — and 5 of 60 runs under four chains against the old board's 9 of
+// 60. The fall speed is untouched: the tempo is the one thing that did not need
+// to move. Three seed families is the minimum here; a 112-wide tuning passed
+// two families at 12 chains a game and collapsed to 6.5 on the third.
 
 const S = new WeakMap();
 
 // Soft-body feel, pressed onto the solver instance. Never edit blobs.js.
-export const JELLY_FEEL = { qMin: 0.62, loadSquash: 0.25 };
+export const JELLY_FEEL = { qMin: 0.38, loadSquash: 0.42 };
 
 export default {
   id: 'jelly',
@@ -43,8 +67,8 @@ export default {
     tintMode: 'mono',
     diagonal: true,
     reactions: false,
-    cols: 64,
-    rows: 224,
+    cols: 88,
+    rows: 192,
     fallRate: 30,
     fallAccel: 1.2,
     fallMax: 90,

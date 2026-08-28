@@ -123,26 +123,27 @@ const api = {
 /**
  * Title screen: the bot plays a random mode behind the buttons.
  *
- * Only modes whose board is the STANDARD width are eligible. The attract screen
- * reloads into a different mode each visit, and a mode with a narrower board
- * letterboxes to a thin column — so the title screen appeared to change width at
- * random between visits, which reads as broken rather than varied. Filtering by
- * the most common width is self-correcting: a mode re-enters the rotation the
- * moment its board matches, without anyone having to maintain a list here.
+ * Only modes whose board fills a comparable share of the screen are eligible.
+ * The attract screen reloads into a different mode each visit, and a board with
+ * a much narrower aspect letterboxes to a thin column — so the title screen
+ * appeared to change width at random between visits, which reads as broken
+ * rather than varied.
+ *
+ * Judged on ASPECT, not column count: what the player sees is the fitted board,
+ * and the two are not the same thing. JELLY is 88 columns against everything
+ * else's 112 yet fills 99% of the width, because it is also shorter. A column
+ * count test excluded it for a difference nobody can see.
  */
 function attractCandidates() {
-  const all = modeList();
-  const widthOf = (m) => (MODES && MODES.configFor ? MODES.configFor(m.id, {}).cols : (m.worldCfg && m.worldCfg.cols) || DEFAULT_CFG.cols);
-  const tally = new Map();
-  for (const m of all) {
-    const w = widthOf(m);
-    tally.set(w, (tally.get(w) || 0) + 1);
-  }
-  let standard = DEFAULT_CFG.cols, best = -1;
-  for (const [w, n] of tally) if (n > best) { best = n; standard = w; }
-  // alchemy is excluded regardless: it is level-driven and has no endless run
-  const list = all.filter((m) => m.id !== 'alchemy' && widthOf(m) === standard);
-  return list.length ? list : all.filter((m) => m.id !== 'alchemy');
+  const all = modeList().filter((m) => m.id !== 'alchemy');   // level-driven, no endless run
+  const aspectOf = (m) => {
+    const c = MODES && MODES.configFor ? MODES.configFor(m.id, {}) : (m.worldCfg || DEFAULT_CFG);
+    return (c.cols || DEFAULT_CFG.cols) / (c.rows || DEFAULT_CFG.rows);
+  };
+  let widest = 0;
+  for (const m of all) widest = Math.max(widest, aspectOf(m));
+  const list = all.filter((m) => aspectOf(m) >= widest * 0.85);
+  return list.length ? list : all;
 }
 
 function startAttract() {

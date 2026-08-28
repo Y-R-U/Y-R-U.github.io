@@ -243,3 +243,33 @@ placeholder flag first" — documenting was not enough. boot.mjs now ASSERTS
 !__state.placeholder, with a --falsify placeholder arm proven to go red. This is
 also why a whole set of shell-lane screenshots came back pixelated: they were
 captured while lane A was mid-edit and the page had silently fallen back.
+
+## JELLY LAB widened: 64x224 -> 88x192
+Aaron: "jelly is a very narrow board (the only one of this narrow size?)". It was
+241px of a 390px screen — 62%. Now 387px, 99%, matching the other modes to 3px.
+
+TRIMMING ROWS WAS THE LEVER, NOT WIDENING COLUMNS. The player sees the aspect,
+not the column count. Width alone is fatal here: at shipping feel and fall,
+64 cols gives 12.8 chains/game and 80 gives 4.8, 96 gives 2.1. Going 224 -> 192
+rows lets an 88-cell span fill the screen where 88x224 still letterboxes to 85%,
+and it means the fall rate never had to move — every 112-wide tuning needed the
+tempo roughly doubled and still played worse.
+
+Chosen 88x192 with qMin 0.38 / loadSquash 0.42, decided over 60 games in five
+seed families: 12.5 chains/game, exactly matching the old board, with a LOWER dud
+rate (5/60 vs 9/60).
+
+Methodology note worth keeping: THREE SEED FAMILIES IS THE FLOOR for this mode.
+A 112x224 tuning measured 11.6 and 12.2 chains/game on two families and was
+nearly shipped; the third gave 6.5 with 9/24 duds.
+
+ALCHEMY stays 64x168 — it renders 322px of 390 (83%), nowhere near jelly's old
+62%, and its cols/rows are baked into all 96 level records with scene rects in
+those coordinates, so widening it means a full regeneration and revalidation.
+
+## Attract eligibility is judged on ASPECT, not column count
+My first version of this filter keyed on cols, which excluded the widened JELLY
+(88 vs 112) for a difference nobody can see — it fills 99% of the width because
+it is also shorter. Now compares fitted aspect against the widest mode with a
+15% tolerance, so all five endless modes demo on the title screen and none of
+them letterbox.
