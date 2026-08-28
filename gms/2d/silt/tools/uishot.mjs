@@ -79,6 +79,35 @@ async function shot(name) {
 const want = (n) => !ONLY || ONLY.includes(n);
 
 /**
+ * WHAT IS ACTUALLY IN FRONT at the centre of `sel`.
+ *
+ * querySelector proves an element exists in the DOM. It says nothing about
+ * whether a player can see it, and that gap shipped two real bugs: the settings
+ * sheet and the level picker both slid up BEHIND the modal card that opened
+ * them (`.sheet-wrap` was z-index 6 against `.modal-wrap`'s 7), and every
+ * DOM-shaped check in this file stayed green through it — including one that
+ * counted 96 level tiles nobody could see. Hit-test, do not count.
+ *
+ * Returns the layer the topmost element at that point belongs to.
+ */
+async function frontLayer(sel) {
+  return cdp.eval(`(() => {
+    const e = document.querySelector(${JSON.stringify(sel)});
+    if (!e) return 'missing';
+    const r = e.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) return 'collapsed';
+    const x = Math.round(r.left + r.width / 2);
+    const y = Math.round(r.top + Math.min(r.height / 2, 70));
+    const hit = document.elementFromPoint(x, y);
+    if (!hit) return 'none';
+    if (hit.closest('.sheet-wrap')) return 'sheet';
+    if (hit.closest('.modal-wrap')) return 'modal';
+    if (hit.closest('#ui')) return 'ui';
+    return 'canvas';
+  })()`);
+}
+
+/**
  * A REAL touch, through CDP's input pipeline.
  *
  * A `new PointerEvent(...)` dispatched by hand is not a pointer: it has no
@@ -131,15 +160,53 @@ async function probe() {
       if (!e) return 'missing'; e.click(); return 'clicked'; })()`);
   const q = (e) => cdp.eval(e);
 
+  // The z-order arm. The listener-stripping arm above makes the two front-layer
+  // checks go red for the WRONG reason — no sheet opens at all, so they report
+  // 'missing'. This one puts the shipped bug back exactly: sheets at z-index 6,
+  // under .modal-wrap's 7. Everything else must stay green and those two must
+  // say 'modal'. Never ship a build that sets it.
+  if (args.zbug) {
+    await cdp.eval(`(() => { const s = document.createElement('style');
+      s.textContent = '.sheet-wrap { z-index: 6 }'; document.head.append(s); return 1; })()`);
+  }
+
   ok('attract is the first screen', (await q('window.__ui.screen')) === 'attract');
 
-  ok('PLAY starts a run',
+  // Three doors on the title screen. STORY is the campaign, QUICK PLAY is an
+  // endless mode picked for you, and the icon between them is the full list.
+  ok('STORY opens the campaign',
     (await click('.attract-btns .gb--primary')) === 'clicked' &&
-    (await q('window.__state.state')) === 'play' && (await q('window.__ui.screen')) === 'hud');
+    (await q('document.querySelectorAll(".sheet--lv .lvt").length')) > 0 &&
+    (await q('window.__state.state')) === 'attract');
+  await new Promise((r) => setTimeout(r, 340));
+  ok('the campaign is the front layer', (await frontLayer('.sheet-wrap.is-on .sheet')) === 'sheet',
+    String(await frontLayer('.sheet-wrap.is-on .sheet')));
+  await click('.sheet-wrap.is-on .sheet-head .gb');
+  await new Promise((r) => setTimeout(r, 340));
+
+  const qpMode = async () => q('window.__state.mode');
+  ok('QUICK PLAY starts an endless run',
+    (await click('.attract-btns .gb:last-child')) === 'clicked' &&
+    (await q('window.__state.state')) === 'play' && (await q('window.__ui.screen')) === 'hud' &&
+    ['alchemy', 'zen'].indexOf(await qpMode()) < 0,
+    String(await qpMode()));
 
   await click('.hud-pause .gb');
   ok('pause button pauses the sim',
     (await q('window.__state.state')) === 'pause' && (await q('window.__ui.screen')) === 'pause');
+
+  // The bug this replaces: SETTINGS on the pause card slid the sheet up BEHIND
+  // the card, so it could not be seen until the run was resumed. A DOM check
+  // cannot see that; only a hit-test can.
+  await click('.scr-pause .card-row .gb', 0);                 // SETTINGS
+  await new Promise((r) => setTimeout(r, 400));
+  ok('settings opens IN FRONT of the pause card',
+    (await frontLayer('.sheet-wrap.is-on .sheet')) === 'sheet',
+    String(await frontLayer('.sheet-wrap.is-on .sheet')));
+  ok('opening settings does not resume the run', (await q('window.__state.state')) === 'pause');
+  await click('.sheet-wrap.is-on .sheet-head .gb');
+  await new Promise((r) => setTimeout(r, 340));
+  ok('closing settings leaves you on the pause card', (await q('window.__ui.screen')) === 'pause');
 
   await click('.scr-pause .gb--primary');
   ok('resume resumes', (await q('window.__state.state')) === 'play');
@@ -195,7 +262,8 @@ async function probe() {
   ok('touching the sand on attract pours grains', after > before, `${before} -> ${after}`);
 
   await q('window.__ui.banner("TEST")');
-  ok('attract suppresses mode banners', (await q('document.querySelectorAll(".banner").length')) === 0);
+  ok('attract suppresses mode banners', (await q('document.querySelectorAll(".banner").length')) === 0,
+    await q('[...document.querySelectorAll(".banner")].map(e => e.textContent).join("|")'));
 
   // ZEN. Started through the API rather than a card, so the two checks below
   // are about the palette itself and not about whether a card still works.
@@ -736,6 +804,56 @@ async function sheetFit(S, ok) {
       .join(' · ') + (got[0][2] ? ` · card ${got[0][2].minCard}` : ''));
 }
 
+/**
+ * The three doors on the title screen have to FIT, side by side, on the
+ * narrowest phone the game supports. STORY and QUICK PLAY are text pills whose
+ * width follows their label, so this is a real constraint and not a formality:
+ * an SE is 375 px wide and the row is two pills plus the modes icon.
+ */
+async function attractFit(S, ok) {
+  // ?soak, not a bare load: it gives the attract screen without importing the
+  // account layer, so the gate never signs an anonymous player in to Firebase.
+  await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&soak&seed=7`);
+  if (!await cdp.waitFor('window.__ui && window.__state', 20000)) {
+    ok(`${S.tag}: attract came up`, false); return;
+  }
+  await cdp.frames(20);
+  // The arm. Every check below has to be able to go red, so it breaks all three
+  // things they measure at once: pills too fat for the row, and an icon target
+  // under the 44 px minimum. A count of buttons cannot be broken by CSS, so
+  // there is no separate "there are three of them" check to leave stranded —
+  // the count is folded into the fit.
+  if (args.falsify) {
+    await cdp.eval(`(() => { const s = document.createElement('style');
+      s.textContent = '.attract-btns .gb--pill { padding: 0 62px } ' +
+                      '.attract-btns .gb--icon { width: 28px; height: 28px }';
+      document.head.append(s); return 1; })()`);
+    await new Promise((r) => setTimeout(r, 120));
+  }
+  const g = JSON.parse(await cdp.eval(`(() => {
+    const row = document.querySelector('.attract-btns');
+    const bs = [...row.querySelectorAll('.gb')].map((e) => {
+      const r = e.getBoundingClientRect();
+      return { x: r.left, right: r.right, y: r.top, bottom: r.bottom, w: r.width, h: r.height,
+               label: (e.textContent || e.getAttribute('aria-label') || '').trim() };
+    });
+    const r = row.getBoundingClientRect();
+    return JSON.stringify({ bs, row: { x: r.left, right: r.right }, vw: innerWidth });
+  })()`));
+
+  const inside = g.bs.length === 3 && g.bs.every((b) => b.x >= g.row.x - 1 && b.right <= g.row.right + 1);
+  ok(`${S.tag}: three doors fit inside the frame`, inside,
+    g.bs.map((b) => `${b.label} ${b.x.toFixed(0)}-${b.right.toFixed(0)}`).join(' · ') +
+    ` in ${g.row.x.toFixed(0)}-${g.row.right.toFixed(0)}`);
+
+  let gap = Infinity;
+  for (let i = 1; i < g.bs.length; i++) gap = Math.min(gap, g.bs[i].x - g.bs[i - 1].right);
+  ok(`${S.tag}: they do not touch each other`, g.bs.length === 3 && gap >= 8, `${gap.toFixed(0)} px apart`);
+  ok(`${S.tag}: every door is a 44 px target`,
+    g.bs.length === 3 && g.bs.every((b) => b.h >= 44 && b.w >= 44),
+    g.bs.map((b) => `${b.w.toFixed(0)}x${b.h.toFixed(0)}`).join(' '));
+}
+
 const LAYOUT_MODES = ['flow', 'tide', 'jelly', 'hourglass', 'alchemy', 'zen'];
 
 async function layoutGate() {
@@ -751,6 +869,7 @@ async function layoutGate() {
     console.log(`\n  --- ${S.tag} ${S.w}x${S.h}`);
     await cdp.viewport(S.w, S.h, 1, true);
     await sheetFit(S, ok);
+    await attractFit(S, ok);
     for (const id of LAYOUT_MODES) {
       await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=${id}&seed=4242`);
       if (!await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000)) {
@@ -844,6 +963,12 @@ async function alchemyWin() {
   }
   await cdp.frames(20);
   if (args.falsify) await blindResults();
+  // Same z-order arm as the probe: put the shipped bug back and the campaign
+  // opens behind the card that asked for it.
+  if (args.zbug) {
+    await cdp.eval(`(() => { const s = document.createElement('style');
+      s.textContent = '.sheet-wrap { z-index: 6 }'; document.head.append(s); return 1; })()`);
+  }
 
   const lv = JSON.parse(await q('JSON.stringify(window.__game.world.alchemy)'));
   const r = await drive('w.alchemy && w.alchemy.won', 90000);
@@ -917,6 +1042,11 @@ async function alchemyWin() {
     return t ? t.querySelectorAll('.lvt-stars svg.on').length : -1; })()`);
   ok('the results card opens the campaign with the new stars already on the tile',
     tiles > 0 && onTile === earned, `${tiles} tiles, lv ${lv.id} shows ${onTile} of ${earned}`);
+  // Counting tiles is not seeing them. This check counted 96 of them while the
+  // picker was rendering BEHIND the result card that opened it, invisible to
+  // the player, and stayed green for the whole of that bug's life.
+  ok('the campaign opens IN FRONT of the result card',
+    (await frontLayer('.sheet--lv')) === 'sheet', String(await frontLayer('.sheet--lv')));
 
   if (args.falsify) {
     // Eight. The arm blinds the results card to WHICH mode finished, which is

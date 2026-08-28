@@ -42,6 +42,9 @@ export function createUI(handlers = {}) {
   /* ------------------------------------------------------------- attract */
 
   const wm = createWordmark();
+  const storyLab = h('b', { class: 'btn-sub t-num', text: '' });
+  const storyBtn = h('button', { class: 'gb gb--pill gb--primary' },
+    icon(MODE_GLYPH.alchemy), 'Story', storyLab);
   const attract = h('div', { class: 'scr scr-attract' },
     h('div', { class: 'veil veil-top' }),
     h('div', { class: 'veil veil-bot' }),
@@ -56,9 +59,17 @@ export function createUI(handlers = {}) {
           icon(GLYPH.spark), h('span', { class: 'pip' })), () => openDaily())),
       h('div', { class: 'corner corner-tr' },
         tap(h('button', { class: 'gb gb--icon', 'aria-label': 'Settings' }, icon(GLYPH.gear)), () => settings.show())),
+      // Three doors, not one. "Play" used to resume whatever mode was last
+      // started, which is the least legible thing a title screen can do: a
+      // first-time player has no last mode, and a returning one cannot tell
+      // what the button will boot. The campaign gets its own door — it is the
+      // only part of SILT with a beginning — and everything else is one tap
+      // behind QUICK PLAY, which picks an endless mode for you. MODES stays as
+      // the icon between them for a player who wants to choose.
       h('div', { class: 'attract-btns' },
-        tap(h('button', { class: 'gb gb--pill gb--primary' }, icon(GLYPH.play), 'Play'), () => play(lastStarted)),
-        tap(h('button', { class: 'gb gb--pill' }, icon(GLYPH.grid), 'Modes'), () => openModes()))),
+        storyBtn,
+        tap(h('button', { class: 'gb gb--icon', 'aria-label': 'All modes' }, icon(GLYPH.grid)), () => openModes()),
+        tap(h('button', { class: 'gb gb--pill' }, icon(GLYPH.play), 'Quick play'), () => quickPlay()))),
   );
   const bestline = attract.querySelector('.bestline');
 
@@ -191,8 +202,13 @@ export function createUI(handlers = {}) {
   // it arrives after the shell is already up. A mode that is not there yet must
   // read as SOON, never as a button that boots nothing.
   import('../modes/index.js')
-    .then((m) => { modes = mergeModes(m && (m.MODES || m.default)); buildModes(); })
-    .catch(() => { modes = mergeModes(guessShipped()); buildModes(); });
+    .then((m) => { modes = mergeModes(m && (m.MODES || m.default)); buildModes(); paintStory(); })
+    .catch(() => { modes = mergeModes(guessShipped()); buildModes(); paintStory(); });
+
+  // The level table arrives on its own import inside levels.js. Asking for the
+  // same module here costs nothing once it is cached and tells the Story button
+  // how far the campaign has got the moment it can know.
+  import('../modes/alchemy.js').then(() => paintStory()).catch(() => {});
 
   function guessShipped() {
     let ids = ['flow'];
@@ -242,6 +258,39 @@ export function createUI(handlers = {}) {
 
   /** ALCHEMY is a campaign, so its entry point is the campaign, not level 1. */
   function openLevels() { modeSheet.hide(); levelSheet.show(); }
+
+  /** The campaign, or the mode sheet while lane C's levels are still loading. */
+  function openStory() {
+    const alc = modes.find((m) => m.id === 'alchemy');
+    if (alc && alc.ready && levelCount()) openLevels(); else openModes();
+  }
+  tap(storyBtn, () => openStory());
+
+  /**
+   * One tap, a mode you did not choose.
+   *
+   * ALCHEMY is a campaign with a fixed order and ZEN has no score and no end,
+   * so neither is a "quick game" — the pool is the endless scoring modes only.
+   * It also avoids handing back the mode you just played, so two taps in a row
+   * are two different games rather than a coin that keeps landing the same way.
+   */
+  function quickPlay() {
+    const pool = modes.filter((m) => m.ready && m.id !== 'alchemy' && m.id !== 'zen');
+    if (!pool.length) { play(lastStarted); return; }
+    const fresh = pool.length > 1 ? pool.filter((m) => m.id !== lastStarted) : pool;
+    const pick = fresh[(Math.random() * fresh.length) | 0] || pool[0];
+    play(pick.id);
+    banner(pick.name);
+  }
+
+  /** How far through the campaign the Story button is offering to take you. */
+  function paintStory() {
+    const total = levelCount();
+    const save = window.__game && window.__game.save;
+    if (!total || !save || !save.unlockedUpTo) { storyLab.textContent = ''; return; }
+    const at = Math.min(save.unlockedUpTo(total), total);
+    storyLab.textContent = at > 1 ? 'lv ' + at : '';
+  }
 
   function buildModes() {
     const save = window.__game && window.__game.save;
@@ -500,9 +549,16 @@ export function createUI(handlers = {}) {
       bestline.replaceChildren(...(best > 0
         ? [h('span', { class: 't-cap', text: 'best' }), h('b', { class: 't-num', text: fmt(best) })]
         : []));
+      paintStory();
     } else {
       wm.stop();
     }
+
+    // A banner belongs to the run that fired it. Left alone they outlive it by
+    // up to 2.4s, so quitting mid-chain carried a "COMBO x4" onto the title
+    // screen — which is the exact thing the guard in banner() exists to prevent,
+    // arriving by the other door.
+    if (target !== 'hud' && target !== 'pause') bannerHost.replaceChildren();
 
     if (target === 'hud') {
       hudHint.classList.remove('gone');

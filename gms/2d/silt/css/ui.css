@@ -171,12 +171,37 @@
 .attract-btns {
   position: absolute; left: 0; right: 0;
   bottom: var(--edge);
-  display: flex; justify-content: space-between;
+  display: flex; justify-content: space-between; align-items: center;
   padding: 0 var(--edge);
   pointer-events: none;
 }
 .attract-btns .gb { opacity: 0; animation: rise .9s 1.05s var(--ease-out) forwards; }
-.attract-btns .gb:last-child { animation-delay: 1.18s; }
+.attract-btns .gb:nth-child(2) { animation-delay: 1.12s; }
+.attract-btns .gb:last-child { animation-delay: 1.25s; }
+
+/* A narrow phone still has to hold two text pills and an icon in one row. On a
+   375 px SE the shipped padding leaves 3 px between STORY and the modes icon,
+   which is a row that has technically fitted and visibly has not. */
+@media (max-width: 385px) {
+  .attract-btns .gb--pill { padding: 0 15px; gap: 7px; }
+}
+
+/* The middle door is an icon, and an icon is not an excuse for a small target:
+   42 px is under the 44 px minimum every other control in the row clears. It
+   matches the in-game pause button instead, which is the other 48 px icon a
+   thumb goes for without looking. */
+.attract-btns .gb--icon { width: 48px; height: 48px; border-radius: 17px; }
+.attract-btns .gb--icon::after { content: ''; position: absolute; inset: -6px; border-radius: 23px; }
+
+/* The level a button is offering, riding inside it: "Story  lv 12". A number
+   on the button is the difference between a door and a door you remember
+   leaving by. Blank until the campaign is past level 1, so a new player is
+   never shown a counter that says nothing. */
+.btn-sub {
+  font-size: 11.5px; font-weight: 700; letter-spacing: .1em;
+  color: rgba(255,228,186,.7);
+  font-variant-numeric: tabular-nums;
+}
 
 /* Ripple left where a finger touched the sand. */
 .ripple {
@@ -593,7 +618,13 @@
   position: absolute; inset: 0;
   opacity: 0; visibility: hidden;
   transition: opacity .3s var(--ease), visibility .3s;
-  z-index: 6;
+  /* ABOVE .modal-wrap, which is 7. A sheet is only ever opened by a press, and
+     two of those presses live ON a modal: SETTINGS on the pause card and LEVELS
+     on the ALCHEMY result card. At z-index 6 both sheets slid up BEHIND the card
+     that launched them — the settings panel could not be seen until the run was
+     resumed, and the level picker was invisible entirely. Nothing opens a modal
+     from a sheet, so the last thing pressed is always the sheet. */
+  z-index: 8;
 }
 .sheet-wrap.is-on { opacity: 1; visibility: visible; }
 
