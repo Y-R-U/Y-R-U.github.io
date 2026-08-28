@@ -54,11 +54,17 @@ a deliberately broken page.
   Anything seeding such a board needs `step()` directly, mixed tints, or the
   brine tints 4-7 that no piece can match.
 - **4+ tints kills the game.** See D3 — it is percolation maths, not tuning.
+- **A mode may swallow `world.over`.** ZEN vents its ceiling and HOURGLASS
+  absolves a failed spawn during the settle window after a flip, so the attract
+  loop cannot use `world.over` alone to decide a run has ended — it reads the
+  mode's own published state instead. See `attractExhausted()` in `js/main.js`.
 - **Headless Chrome has no audio output device**, so a real-time AudioContext
   advances ~5 ms then suspends. Verify audio through an OfflineAudioContext.
 
 ## Test hooks
 
 `?auto` bot plays · `?mode=` · `?seed=` · `?q=high|low` · `?preserve=1` · `?dpr=1`
+`?soak` attract screen, no account layer · `?attract=<id>` pins the title mode
+`?attractbug=vent` falsification arm: leaves an exhausted attract board running
 `window.__state` (lazy getter, never stale) · `window.__game`
 Under `?auto` the account layer is never imported, so soak runs stay hermetic.

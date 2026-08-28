@@ -5,6 +5,7 @@
 //   node tools/boot.mjs                 headless boot + soak + capture
 //   node tools/boot.mjs --gpu           real GPU (ANGLE Metal); the only honest timings
 //   node tools/boot.mjs --falsify       break the page on purpose; every check MUST go red
+//   node tools/boot.mjs --falsify vent  leave an exhausted attract board running
 //
 // Always ?preserve=1&dpr=1 headless: captureScreenshot hangs on an animating
 // WebGL canvas, and dpr 2 under SwiftShader takes minutes a frame.
@@ -89,6 +90,41 @@ try {
   check('real renderer, not the placeholder',
     ALLOW_PLACEHOLDER || !(s2 && s2.placeholder),
     s2 && s2.placeholder ? 'js/gfx/renderer.js failed to load — game is drawing cells' : `tier ${s2 && s2.gfx && s2.gfx.tier}`);
+
+  // ---------------------------------------------------------------- attract
+  // The title screen must never show the sim in trouble. ZEN has no fail state
+  // — its ceiling vents, erasing the top 26 rows and playing on — so a full
+  // board on the attract loop used to read as a band of sand being sliced flat
+  // over and over while the run never ended. Pin the attract screen to ZEN,
+  // fill the board, and the run must START AGAIN.
+  {
+    const bug = FALSIFY === 'vent' ? '&attractbug=vent' : '';
+    await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&soak&attract=zen&seed=7${bug}`);
+    const up = await cdp.waitFor('window.__state && window.__state.state === "attract"', 12000);
+    await cdp.frames(40);
+    const a0 = await cdp.state();
+    check('the title screen can be pinned to one mode', up && a0 && a0.mode === 'zen',
+      a0 ? String(a0.mode) : 'no state');
+
+    // Column-striped tints on purpose. A wall-to-wall band of ONE tint IS a
+    // chain and dissolves on the first tick, which would empty the board this
+    // check needs full; tints two columns apart can never connect, diagonals
+    // included.
+    const filled = await cdp.eval(`(() => {
+      const w = window.__game.world, g = w.g;
+      for (let y = 8; y < g.rows; y++)
+        for (let x = 0; x < g.cols; x++) g.set(y * g.cols + x, 2, 4 + (x % 2));
+      g.wakeAll(); w.piece = null; return g.count; })()`);
+    await cdp.frames(150);
+    const a1 = await cdp.state();
+    // Count the RESTARTS, not the ticks. A restarted world's tick counter climbs
+    // from zero, so 150 frames after a restart it reads higher than it did
+    // before — the tick number cannot tell a fresh run from an unbroken one.
+    check('a topped-out attract run restarts rather than venting',
+      !!(a0 && a1 && a1.runs > a0.runs), a1 ? `run ${a0.runs} -> ${a1.runs}, filled ${filled}` : 'dead');
+    check('the restarted run is playing, not stuck', !!(a1 && a1.state === 'attract' && a1.cells > 0),
+      a1 ? `${a1.state}, ${a1.cells} cells` : 'dead');
+  }
 
   await cdp.capture(join(HERE, '../shots/boot.png'), 'canvas');
   console.log(`\n  state: ${JSON.stringify({ ticks: s2?.ticks, score: s2?.score, chains: s2?.chains, cells: s2?.cells, fps: s2?.fps, tier: s2?.gfx?.tier })}`);

@@ -136,6 +136,10 @@ const api = {
  */
 function attractCandidates() {
   const all = modeList().filter((m) => m.id !== 'alchemy');   // level-driven, no endless run
+  // ?attract=<id> pins the title screen to one mode. A test that has to wait
+  // for a random pick to land on the mode it is about is a flaky test.
+  const forced = q.get('attract');
+  if (forced) { const one = all.filter((m) => m.id === forced); if (one.length) return one; }
   const aspectOf = (m) => {
     const c = MODES && MODES.configFor ? MODES.configFor(m.id, {}) : (m.worldCfg || DEFAULT_CFG);
     return (c.cols || DEFAULT_CFG.cols) / (c.rows || DEFAULT_CFG.rows);
@@ -146,9 +150,33 @@ function attractCandidates() {
   return list.length ? list : all;
 }
 
+/**
+ * A title screen must never show the sim in trouble.
+ *
+ * ZEN is a sandbox and a sandbox has no fail state, so its ceiling VENTS: top
+ * out and it erases the top 26 rows and plays on. That is right for a player
+ * painting in it and wrong on the attract loop, where it reads as a band of
+ * sand being sliced flat over and over while the run never ends. The board
+ * filling up ENDS an attract run whatever the mode chooses to do about it.
+ *
+ * Read from the mode's own published state, not from a reach-in: `world.over`
+ * cannot be used here because HOURGLASS legitimately clears it during the
+ * settle window after every flip, and the title screen would restart on each
+ * turn of the glass.
+ */
+function attractExhausted() {
+  return !!(world.zen && world.zen.vented > 0);
+}
+
+let attractRuns = 0;   // how many title-screen runs this session; __state.runs
+
 function startAttract() {
+  attractRuns++;
   const list = attractCandidates();
-  mode = list[(Math.random() * list.length) | 0];
+  // Not the mode that just ended, when there is anything else to show. A title
+  // screen that reloads into the same mode reads as a game that only has one.
+  const pool = mode && list.length > 1 ? list.filter((m) => m.id !== mode.id) : list;
+  mode = pool[(Math.random() * pool.length) | 0] || list[0];
   world = makeWorld(mode, { seed: (Math.random() * 1e9) | 0 });
   applyBiome(biomeFor(mode));
   if (MODES && MODES.startMode) MODES.startMode(mode, world, api); else if (mode.onStart) mode.onStart(world, api);
@@ -216,7 +244,9 @@ function frame(now) {
       if (state === 'attract') {
         attractBot.update();
         simTick();
-        if (world.over) { startAttract(); break; }
+        // ?attractbug=vent leaves the exhausted board running, so tools/boot.mjs
+        // can watch this check go red. Never ship a build that sets it.
+        if (world.over || (attractExhausted() && !q.has('attractbug'))) { startAttract(); break; }
       } else {
         if (bot) bot.update();
         simTick();
@@ -244,7 +274,8 @@ Object.defineProperty(window, '__state', {
     if (!world) return { boot: true, state };
     const s = world.snapshot();
     const rs = R && R.stats ? R.stats() : {};
-    return { ...s, state, fps: +fps.toFixed(1), mode: mode && mode.id, placeholder: !!(R && R.placeholder), gfx: rs };
+    return { ...s, state, fps: +fps.toFixed(1), mode: mode && mode.id, runs: attractRuns,
+      placeholder: !!(R && R.placeholder), gfx: rs };
   },
 });
 window.__game = {
