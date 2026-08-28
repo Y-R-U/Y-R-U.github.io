@@ -182,6 +182,24 @@ const SCENES = {
     put(10, 40, 1); put(48, 70, 2); put(86, 40, 3);
   },
 
+  // WALL AS SCENERY. ALCHEMY builds pillars, shelves and a floor slab out of
+  // WALL, so the one material that never moves is also the one the player looks
+  // at longest. A flat decal here is a bug you only see next to sand.
+  wall: (w, rnd) => {
+    const g = w.g;
+    g.fill(0, g.rows - 5, g.cols, 5, WALL, 0);            // floor slab
+    g.fill(14, g.rows - 34, 12, 29, WALL, 0);             // pillar
+    g.fill(70, g.rows - 26, 10, 21, WALL, 0);             // short pillar
+    g.fill(30, g.rows - 46, 46, 5, WALL, 0);              // shelf
+    // ALCHEMY's 'span' levels build their pillars out of CRYSTAL, not WALL, so
+    // both are in this frame: the two materials sit side by side and any claim
+    // about "the pale block in level 1" can be checked against the right one.
+    g.fill(44, g.rows - 32, 8, 27, CRYSTAL, 0);
+    g.fill(92, g.rows - 22, 6, 17, CRYSTAL, 0);
+    driveBot(w, 10, rnd);
+    for (let k = 0; k < 120; k++) step(w.g, w.rng, w.stats);
+  },
+
   // V-FLIP ORACLE. Material in the bottom 10 rows and nowhere else. tools/gfx_shot.mjs
   // --check diffs this against `empty` and asserts the lit pixels land at the BOTTOM
   // of the image. Do not delete: the board was rendered upside down once already.

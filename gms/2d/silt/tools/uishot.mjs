@@ -28,6 +28,16 @@
  *   node tools/uishot.mjs --win --only=none   just the ALCHEMY win/loss cards
  *   node tools/uishot.mjs --flow --falsify    HUD ignores the mode again and the results card
  *                                         forgets it was ALCHEMY; every panel and win check must go red
+ *   node tools/uishot.mjs --payout        a real chain, and what it pays on the board
+ *   node tools/uishot.mjs --payout --falsify  the shell blinded to score and chains; all 8 must go red
+ *   node tools/uishot.mjs --payout --paybug   a perfect payout drawn back in the corner; EXACTLY the
+ *                                         position check must go red
+ *   node tools/uishot.mjs --legible       ink and smear for floating type, on the brightest
+ *                                         and darkest boards in the game
+ *   node tools/uishot.mjs --legible --dirtbug   the halo back; every SMEAR line must go red
+ *   node tools/uishot.mjs --legible --flatbug   no shadow at all; the bright-board INK lines must
+ *   node tools/uishot.mjs --copy          the two ALCHEMY card labels a player could misread
+ *   node tools/uishot.mjs --copy --falsify    the copy as it shipped; 3 must go red
  *   node tools/uishot.mjs --layout        where the top controls ACTUALLY land, per mode
  *   node tools/uishot.mjs --layout --falsify  the naive version of the swap; every position must go red
  *   node tools/uishot.mjs --se            add a 375x667 iPhone SE pass to any of the above
@@ -36,6 +46,7 @@ import { harness, ROOT } from './cdp.mjs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { mkdirSync, writeFileSync } from 'node:fs';
+import { inflateSync } from 'node:zlib';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE = join(HERE, '../../../..');          // repo root, so /lib/auth would resolve
@@ -818,6 +829,16 @@ async function attractFit(S, ok) {
     ok(`${S.tag}: attract came up`, false); return;
   }
   await cdp.frames(20);
+  // MEASURE THE ROW A RETURNING PLAYER SEES, not the one a fresh profile shows.
+  // STORY carries the level it will resume — "Story  lv 25" — and that is 30 px
+  // wider than "Story". This gate ran on an empty profile, so the label was
+  // never there, and the version it certified had the three doors touching at
+  // 390 px and overflowing an SE for everybody who had played before. A check
+  // that can only ever see the easy state is not a check.
+  await cdp.eval(`(() => { const s = window.__game.save;
+    for (let i = 1; i <= 24; i++) s.recordLevel(i, 3); return 1; })()`);
+  await cdp.eval('window.__ui.show("attract")');
+  await new Promise((r) => setTimeout(r, 240));
   // The arm. Every check below has to be able to go red, so it breaks all three
   // things they measure at once: pills too fat for the row, and an icon target
   // under the 44 px minimum. A count of buttons cannot be broken by CSS, so
@@ -825,8 +846,11 @@ async function attractFit(S, ok) {
   // the count is folded into the fit.
   if (args.falsify) {
     await cdp.eval(`(() => { const s = document.createElement('style');
-      s.textContent = '.attract-btns .gb--pill { padding: 0 62px } ' +
-                      '.attract-btns .gb--icon { width: 28px; height: 28px }';
+      // !important, because the row now has a higher-specificity rule of its own
+      // for the returning-player state and the arm has to out-rank it. An arm
+      // that loses a specificity fight is an arm that proves nothing.
+      s.textContent = '.attract-btns .gb--pill { padding: 0 62px !important } ' +
+                      '.attract-btns .gb--icon { width: 28px !important; height: 28px !important }';
       document.head.append(s); return 1; })()`);
     await new Promise((r) => setTimeout(r, 120));
   }
@@ -841,17 +865,25 @@ async function attractFit(S, ok) {
     return JSON.stringify({ bs, row: { x: r.left, right: r.right }, vw: innerWidth });
   })()`));
 
-  const inside = g.bs.length === 3 && g.bs.every((b) => b.x >= g.row.x - 1 && b.right <= g.row.right + 1);
-  ok(`${S.tag}: three doors fit inside the frame`, inside,
+  // `wide` rides INSIDE both fit checks rather than standing as a check of its
+  // own. It is a statement about the fixture, not about the layout — it can
+  // never go red against a broken stylesheet, and this gate's arm requires
+  // every one of its checks to be capable of that. Carried this way, the day
+  // paintStory stops labelling the button both fit lines fail instead of
+  // quietly going back to measuring the easy row.
+  const wide = /lv\s*\d/.test(g.bs[0] ? g.bs[0].label : '');
+  const inside = wide && g.bs.length === 3 && g.bs.every((b) => b.x >= g.row.x - 1 && b.right <= g.row.right + 1);
+  ok(`${S.tag}: three doors fit, with a level showing on STORY`, inside,
     g.bs.map((b) => `${b.label} ${b.x.toFixed(0)}-${b.right.toFixed(0)}`).join(' · ') +
     ` in ${g.row.x.toFixed(0)}-${g.row.right.toFixed(0)}`);
 
   let gap = Infinity;
   for (let i = 1; i < g.bs.length; i++) gap = Math.min(gap, g.bs[i].x - g.bs[i - 1].right);
-  ok(`${S.tag}: they do not touch each other`, g.bs.length === 3 && gap >= 8, `${gap.toFixed(0)} px apart`);
+  ok(`${S.tag}: they do not touch each other`, wide && g.bs.length === 3 && gap >= 8, `${gap.toFixed(0)} px apart`);
   ok(`${S.tag}: every door is a 44 px target`,
     g.bs.length === 3 && g.bs.every((b) => b.h >= 44 && b.w >= 44),
     g.bs.map((b) => `${b.w.toFixed(0)}x${b.h.toFixed(0)}`).join(' '));
+  await cdp.eval(`(() => { try { localStorage.removeItem('silt.levels'); } catch (e) {} return 1; })()`);
 }
 
 /**
@@ -1188,7 +1220,731 @@ async function alchemyWin() {
   if (fails.length) process.exitCode = 1;
 }
 
-const SHOTS = !(args.flow || args.win || args.layout) || args.shots;
+/* ------------------------------------------------------------------ payout */
+/**
+ * DOES A CHAIN PAY?
+ *
+ * The complaint this gate exists for: "chains read beautifully ... but the
+ * chain doesn't read as a SCORE. There is no floating +74, no chain-size
+ * callout — just sparks and a small CHAINS 5 pill in the corner."
+ *
+ * Every check here is one a player could make by looking, and every one of them
+ * is capable of being wrong in a way `querySelector('.payout')` is not:
+ *
+ *  - THE NUMBER IS THE AWARD, not merely a number. World.score moves only on a
+ *    chain, so `score after - score before` is the exact award, and the payout
+ *    is compared against it. A payout printing the running total, or the chain
+ *    count, or a constant, fails this line while satisfying "a number appeared".
+ *  - IT IS ON THE BOARD. Its centre must lie inside the board rect and OUTSIDE
+ *    the top-left control column — the corner is precisely where the reward
+ *    already was, and moving it three pixels would otherwise pass.
+ *  - IT LEAVES. A number that never goes away is a HUD field, not a payout.
+ *  - NOTHING IS ON TOP OF IT. elementFromPoint ignores pointer-events:none, so
+ *    the payout can never be the hit itself; what it CAN prove is that no sheet
+ *    or card is covering the spot, which is the bug class that hid the level
+ *    picker behind the card that opened it.
+ *
+ * The arm (--payout --falsify) is the shell as it was before this work: the
+ * frame loop still hands over the score, the chain count and the combo, and the
+ * shell drops all three on the floor. Every check below must go red against it.
+ */
+async function payoutGate() {
+  const fails = [];
+  const ok = (name, cond, detail = '') => {
+    if (!cond) fails.push(name + (detail ? ': ' + detail : ''));
+    console.log(`  ${cond ? 'ok  ' : 'FAIL'}  ${name}${detail ? '  ' + detail : ''}`);
+  };
+  const q = (e) => cdp.eval(e);
+
+  // Read the payout the way a player reads it: what it says, where it is, and
+  // whether anything is in front of it.
+  // The board rect comes from the VIEW — js/core/viewport.js's own letterboxed
+  // answer, the same rect the renderer draws into — and not from the payout's
+  // own container, which would make "is it on the board" tautologically true of
+  // wherever the container happens to be. Same for the corner: the box tested
+  // against is the live control column, measured, not a hardcoded rectangle.
+  const READ = `JSON.stringify((() => {
+    const n = document.querySelector('.payout:not(.is-out)');
+    const stack = document.querySelector('.hud-stack');
+    const all = document.querySelectorAll('.payout').length;
+    if (!n) return { all, live: 0 };
+    const cs = getComputedStyle(n);
+    const r = n.getBoundingClientRect();
+    const b = window.__game.view.board;
+    const cx = Math.round(r.left + r.width / 2), cy = Math.round(r.top + r.height / 2);
+    const front = document.elementFromPoint(cx, cy);
+    const sr = stack ? stack.getBoundingClientRect() : null;
+    const overlaps = (a, c) => !!a && !!c && a.left < c.right && a.right > c.left
+                                         && a.top < c.bottom && a.bottom > c.top;
+    return {
+      all, live: 1,
+      text: n.querySelector('.payout-num').textContent,
+      cap: n.querySelector('.payout-cap').textContent,
+      capOn: n.querySelector('.payout-cap').classList.contains('on'),
+      tier: n.classList.contains('is-huge') ? 'huge' : n.classList.contains('is-big') ? 'big' : 'plain',
+      shown: cs.display !== 'none' && cs.visibility !== 'hidden' && +cs.opacity > 0.05
+             && r.width > 8 && r.height > 8,
+      onBoard: cx >= b.x && cx <= b.x + b.w && cy >= b.y && cy <= b.y + b.h,
+      inCorner: overlaps(r, sr),
+      covered: !!(front && front.closest && (front.closest('.sheet-wrap') || front.closest('.modal-wrap'))),
+      cx, cy, board: [Math.round(b.x), Math.round(b.y), Math.round(b.w), Math.round(b.h)],
+    };
+  })())`;
+
+  const PROG = `JSON.stringify((() => {
+    const p = document.querySelector('.hud-prog');
+    if (!p) return null;
+    const cs = getComputedStyle(p);
+    const fill = p.querySelector('i');
+    return { off: p.classList.contains('off') || cs.display === 'none',
+             w: fill ? fill.style.width : '', lab: p.querySelector('.hud-prog-lab').textContent,
+             best: p.classList.contains('is-best') };
+  })())`;
+
+  /**
+   * Play, through the real bot and the real host loop, until one more chain has
+   * landed — pushing the shell exactly as main.js's frame loop does, on every
+   * tick. Nothing is staged: the payload is read off the live world each step.
+   */
+  async function toNextChain(max = 40000) {
+    return JSON.parse(await cdp.eval(`(async () => {
+      const M = await import('${base}/gms/2d/silt/js/modes/index.js');
+      const { Bot } = await import('${base}/gms/2d/silt/js/ai/bot.js');
+      const w = window.__game.world, m = M.byId(window.__state.mode);
+      if (!window.__pbot || window.__pbot.w !== w) window.__pbot = { w, b: new Bot(w) };
+      const push = () => window.__ui.setHud({
+        score: w.score, chains: w.chains, combo: w.combo, next: w.nextPiece,
+        mode: m.name, modeId: m.id, hud: m.hud,
+        tide: w.tide, hourglass: w.hourglass, alchemy: w.alchemy, zen: w.zen });
+      const c0 = w.chains, s0 = w.score;
+      push();
+      let i = 0;
+      for (; i < ${max}; i++) {
+        window.__pbot.b.update(); window.__game.step(1); push();
+        if (w.chains > c0 || w.over) break;
+      }
+      return JSON.stringify({ i, c0, c1: w.chains, s0, s1: w.score, over: w.over });
+    })()`));
+  }
+
+  /** Two adjacent frames — the shape the frame loop delivers during a cascade. */
+  async function twoFrames(gain1, gain2) {
+    return cdp.eval(`(async () => {
+      const M = await import('${base}/gms/2d/silt/js/modes/index.js');
+      const w = window.__game.world, m = M.byId(window.__state.mode);
+      const base = { combo: 1, next: w.nextPiece, mode: m.name, modeId: m.id, hud: m.hud };
+      const s0 = w.score, c0 = w.chains;
+      window.__ui.setHud({ ...base, score: s0, chains: c0 });
+      window.__ui.setHud({ ...base, score: s0 + ${gain1}, chains: c0 + 1 });
+      window.__ui.setHud({ ...base, score: s0 + ${gain1} + ${gain2}, chains: c0 + 2 });
+      return 1; })()`);
+  }
+
+  // --se runs the whole gate on the short phone instead. The payout is placed in
+  // BOARD percentages and the best rail lives in the score column, so both are
+  // things a 375x667 viewport can break without 390x844 noticing.
+  const S = SIZES[SIZES.length - 1];
+  console.log(`  --- ${S.tag} ${S.w}x${S.h}`);
+  await cdp.viewport(S.w, S.h, 1, true);
+  await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=flow&seed=4242`);
+  if (!await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000)) {
+    console.log('  !! shell never came up'); process.exitCode = 1; return;
+  }
+  await cdp.frames(20);
+
+  if (args.falsify) {
+    // The shell as it shipped: main.js hands over score, chains and combo every
+    // frame and none of them reaches the board. Everything below must go red.
+    await cdp.eval(`(() => { const f = window.__ui.setHud;
+      window.__ui.setHud = (s) => f({ ...s, score: 0, chains: 0, combo: 0 });
+      return 1; })()`);
+  }
+  // The SECOND arm, and the one that matters most, because the first cannot
+  // reach it: a payout that is drawn perfectly, says exactly the right number,
+  // and does it back in the corner the reward already lived in. Everything about
+  // this work is WHERE the number is, so exactly one check — the position — must
+  // go red here and every other line must stay green. If they all go red the
+  // arm is too blunt to prove anything; if none does, the position check is
+  // decoration.
+  if (args.paybug) {
+    await cdp.eval(`(() => {
+      const r = document.querySelector('.hud-stack').getBoundingClientRect();
+      const s = document.createElement('style');
+      s.textContent = '.payout-host { left: ' + r.left + 'px !important; top: ' + r.top +
+        'px !important; width: ' + r.width + 'px !important; height: ' + r.height + 'px !important; }';
+      document.head.append(s); return 1; })()`);
+  }
+
+  /* --------------------------------------------------- one chain, one payout */
+  const r1 = await toNextChain();
+  console.log('  first chain: ' + JSON.stringify(r1));
+  const p1 = JSON.parse(await q(READ));
+  const award = r1.s1 - r1.s0;
+  const expect = '+' + award.toLocaleString('en-US');
+
+  ok('a chain puts a payout on screen', p1.live === 1 && p1.shown, JSON.stringify(p1));
+  // --payout --shots: catch it in a still. A thing that exists for a second and
+  // a half cannot be reviewed any other way.
+  if (args.shots) await shot(`${S.tag}-payout`);
+  ok('the payout is the points THAT chain earned', p1.text === expect,
+    `${p1.text || '(none)'} vs the score's own delta ${expect}`);
+  ok('the payout is on the board, not in the corner pill',
+    !!p1.onBoard && !p1.inCorner && !p1.covered,
+    `at ${p1.cx},${p1.cy} onBoard ${p1.onBoard} inCorner ${p1.inCorner} covered ${p1.covered}`);
+
+  const saw = p1.live === 1;
+  await new Promise((r) => setTimeout(r, 2400));
+  const gone = JSON.parse(await q(READ));
+  ok('the payout rises and goes — it is not a HUD field', saw && gone.all === 0,
+    `saw ${saw}, ${gone.all} left after 2.4s`);
+
+  /* ---------------------------------------- a cascade is ONE number, not five */
+  await twoFrames(award, award);
+  await new Promise((r) => setTimeout(r, 120));
+  const p2 = JSON.parse(await q(READ));
+  ok('two chains in quick succession merge into one number',
+    p2.all === 1 && p2.text === '+' + (award * 2).toLocaleString('en-US'),
+    `${p2.all} payouts, reading ${p2.text}`);
+  ok('a merged payout says how many chains', p2.capOn && /×\s*2/.test(p2.cap || ''), p2.cap);
+  if (args.shots) await shot(`${S.tag}-payout-combo`);
+
+  /* ------------------------- a big clear must not print like a small one */
+  await new Promise((r) => setTimeout(r, 2400));
+  await twoFrames(award, 0);
+  await new Promise((r) => setTimeout(r, 100));
+  const small = JSON.parse(await q(READ));
+  await new Promise((r) => setTimeout(r, 2400));
+  await twoFrames(award * 12, 0);
+  await new Promise((r) => setTimeout(r, 100));
+  const big = JSON.parse(await q(READ));
+  ok('a much larger chain does not look like an ordinary one',
+    small.tier === 'plain' && (big.tier === 'big' || big.tier === 'huge'),
+    `${award} -> ${small.tier}, ${award * 12} -> ${big.tier}`);
+  if (args.shots) await shot(`${S.tag}-payout-huge`);
+
+  /* --------------------------------------------- progress with nothing scored */
+  // The other half of the complaint: HOURGLASS and JELLY can be played for
+  // minutes at zero. Bank a best, start a fresh run, and the score gains a rail
+  // that says how far into that best this run has got.
+  const bestScore = Math.max(400, award * 8);
+  await q(`window.__game.save.recordGame('flow', ${bestScore}, 5, 100)`);
+  // Back to the title first. UI.show() refuses to re-enter the screen it is
+  // already on, so starting a run straight over a running one never gives the
+  // shell the "new run" transition — which is a property of the shell worth
+  // knowing about, not something to route around silently.
+  await q('window.__game.attract()');
+  await cdp.frames(4);
+  await q(`window.__game.start('flow', { seed: 4242 })`);
+  await cdp.frames(12);
+  const r2 = await toNextChain();
+  const pr = JSON.parse(await q(PROG));
+  await new Promise((r) => setTimeout(r, 600));
+  const pr2 = JSON.parse(await q(PROG));
+  const want = Math.min(100, Math.round((r2.s1 / bestScore) * 100)) + '%';
+  ok('a run at nothing still shows where it is against your best',
+    !!pr && !pr.off && pr2.w === want && parseFloat(pr2.w) > 0 &&
+    pr2.lab === 'best ' + bestScore.toLocaleString('en-US'),
+    pr ? `${pr2.w} (want ${want}) · "${pr2.lab}"` : 'no rail');
+
+  // Past the best, the rail is pinned at 100% — so the PERCENTAGE cannot be
+  // what tells you that you have overtaken it, and a rail that says nothing at
+  // the one moment it is about would be worse than no rail. Push the score past
+  // the best and the label has to change.
+  const over = JSON.parse(await cdp.eval(`(async () => {
+    const M = await import('${base}/gms/2d/silt/js/modes/index.js');
+    const w = window.__game.world, m = M.byId(window.__state.mode);
+    window.__ui.setHud({ score: ${bestScore + 1}, chains: w.chains, combo: 1, next: w.nextPiece,
+      mode: m.name, modeId: m.id, hud: m.hud });
+    return ${PROG}; })()`));
+  ok('overtaking your best is what the rail is FOR', over && over.best && /new best/i.test(over.lab),
+    over ? `${over.w} "${over.lab}"` : 'no rail');
+  if (args.shots) await shot(`${S.tag}-payout-prog`);
+
+  /* ---------------------------------------- and if nothing has scored at all */
+  // The rail only helps a player who already has a best. A first run in
+  // HOURGLASS has neither, and that is the run the playtester sat in: two
+  // minutes at zero with nothing on screen changing. After 25 s with no chain
+  // the hint line comes back and says what pays — once, and only to a player
+  // who is not already chaining. Both halves are checked, on real runs: a nudge
+  // that fires at a player mid-combo is worse than no nudge at all.
+  const HINT = `(document.querySelector('.hud-hint') || {}).textContent || ''`;
+  const HINTON = `(() => { const e = document.querySelector('.hud-hint');
+    return !!e && !e.classList.contains('gone') && +getComputedStyle(e).opacity > 0.05; })()`;
+
+  // This is still the FLOW run from the rail check, and it has really chained.
+  // nudgeSeek only winds the clock back; every other condition on the nudge has
+  // to hold, and "this player has never chained" does not.
+  const g0 = await q(HINT);
+  await q('window.__ui.nudgeSeek(26000)');
+  await pump();
+  await new Promise((r) => setTimeout(r, 260));
+  ok('a player who IS chaining is never nagged', (await q(HINT)) === g0,
+    `chains ${r2.c1}, hint "${await q(HINT)}"`);
+
+  await q('window.__game.attract()');
+  await cdp.frames(4);
+  await q(`window.__game.start('hourglass', { seed: 4242 })`);
+  await cdp.frames(10);
+  const h0 = await q(HINT);
+  await q('window.__ui.nudgeSeek(26000)');
+  await pump();
+  await new Promise((r) => setTimeout(r, 160));
+  const h1 = await q(HINT);
+  const hLines = await q(`(() => { const e = document.querySelector('.hud-hint');
+    return e ? Math.round(e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).fontSize) / 1.3) : 0; })()`);
+  ok('a run with nothing scored is told what pays',
+    h1 !== h0 && /wall to wall/i.test(h1) && (await q(HINTON)) === true, `"${h0}" -> "${h1}"`);
+  // ...on one line. The first wording of it wrapped, and the wrap put the last
+  // word two pixels off the bottom of an SE.
+  ok('the nudge fits on one line', hLines === 1, `${hLines} lines`);
+  if (args.shots) await shot(`${S.tag}-payout-nudge`);
+
+  await q(`(() => { try { localStorage.removeItem('silt.best'); } catch (e) {} return 1; })()`);
+
+  if (args.falsify || args.paybug) {
+    // --falsify blinds the shell to the score and the chain count. Eight lines
+    // collapse — no payout, nothing to compare against the award, nothing on the
+    // board, nothing that leaves, no merge, no caption, no tier, a rail pinned at
+    // 0% — and a ninth flips the other way: a shell told the player has zero
+    // chains nags one who is mid-combo. Nine.
+    // "a run with nothing scored is told what pays" is the one line the arm
+    // cannot move, and it is named rather than counted: the arm's whole effect
+    // is to make every run look chainless, which is the state that line asserts.
+    // --paybug must flip EXACTLY ONE, the position — see the arm itself.
+    const MUST = args.paybug ? 1 : 10;   // the one-line fit cannot move; the arm changes no copy
+    const EXACT = !!args.paybug;
+    console.log(`\nfalsification arm: ${fails.length} checks went red, ${MUST}${EXACT ? ' exactly' : ''} required`);
+    if (fails.length < MUST || (EXACT && fails.length > MUST)) {
+      console.log(EXACT
+        ? 'ARM MISCALIBRATED — this arm must prove the POSITION check alone, and it did not'
+        : 'ARM TOO WEAK — the payout is not evidence');
+      process.exitCode = 1;
+    } else console.log('arm ok: every payout check is capable of failing');
+    return;
+  }
+  console.log(fails.length ? '\nPAYOUT FAILURES:\n  ' + fails.join('\n  ') : '\npayout: all green');
+  if (fails.length) process.exitCode = 1;
+}
+
+/* -------------------------------------------------------------- card copy */
+/**
+ * TWO THINGS A PLAYER COULD MISREAD.
+ *
+ *  1. "TIME 10s" on the ALCHEMY win card. That card also knows about a
+ *     countdown, so a bare "time" is ambiguous by construction — taken, or
+ *     left? It is elapsed, and the star thresholds beside it are elapsed times
+ *     too, so it has to say so.
+ *  2. "Dissolve 9035 grains" over "8,577 / 9,035". The headline is generated in
+ *     js/data/levelgen.js from a raw integer while the counter under it is
+ *     formatted, and one card cannot print the same quantity two ways.
+ *
+ * The second check is the one that could quietly become meaningless: a sample
+ * of levels that all happen to have three-digit targets would pass it forever
+ * while the bug sat there. So the sample is required to CONTAIN a target big
+ * enough to separate — if it does not, the gate fails rather than passing on
+ * nothing.
+ */
+async function copyGate() {
+  const fails = [];
+  const ok = (name, cond, detail = '') => {
+    if (!cond) fails.push(name + (detail ? ': ' + detail : ''));
+    console.log(`  ${cond ? 'ok  ' : 'FAIL'}  ${name}${detail ? '  ' + detail : ''}`);
+  };
+  const q = (e) => cdp.eval(e);
+  const BARE = /\d{4,}/;         // four digits in a row with no separator
+
+  await cdp.viewport(390, 844, 1, true);
+  await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=alchemy&seed=4242`);
+  if (!await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000)) {
+    console.log('  !! shell never came up'); process.exitCode = 1; return;
+  }
+  await cdp.frames(20);
+  if (args.falsify) {
+    // The copy as it shipped: the headline printed raw, and a time caption that
+    // does not say which time it is. Both checks must go red.
+    await cdp.eval(`(() => {
+      const raw = (t) => String(t).replace(/(\\d),(?=\\d{3})/g, '$1');
+      const undo = () => {
+        for (const e of document.querySelectorAll('.obj-label, .alc-obj-lab')) {
+          const r = raw(e.textContent);
+          if (r !== e.textContent) e.textContent = r;
+        }
+        for (const e of document.querySelectorAll('.card--alc .statrow .t-cap')) {
+          if (/time taken/i.test(e.textContent)) e.textContent = 'time';
+        }
+      };
+      new MutationObserver(undo).observe(document.getElementById('ui'),
+        { subtree: true, childList: true, characterData: true });
+      setInterval(undo, 25);
+      return 1; })()`);
+  }
+
+  /* ------------------------------------- the objective headline, level by level */
+  const LEVELS = [1, 12, 30, 48, 66, 84];
+  const seen = [];
+  for (const n of LEVELS) {
+    await q(`window.__game.startLevel(${n})`);
+    await cdp.frames(6);
+    await pump();
+    await new Promise((r) => setTimeout(r, 60));
+    seen.push(JSON.parse(await q(`JSON.stringify({
+      lv: ${n},
+      target: (window.__game.world.alchemy || {}).target || 0,
+      head: (document.querySelector('.obj-label') || {}).textContent || '',
+      count: (document.querySelector('.obj-count') || {}).textContent || '' })`)));
+  }
+  const big = seen.filter((r) => r.target >= 1000);
+  ok('the sample contains an objective big enough to need separators',
+    big.length > 0, seen.map((r) => `lv${r.lv} ${r.target}`).join(' '));
+  ok('no objective headline prints an unseparated thousand',
+    seen.length === LEVELS.length && !seen.some((r) => BARE.test(r.head)),
+    seen.map((r) => `"${r.head}" | ${r.count}`).join(' · '));
+
+  /* ------------------------------------------------ the two ALCHEMY result cards */
+  // The card is a pure function of the payload main.js hands it, so hand it one
+  // rather than spending a minute of sim to arrive at the same DOM.
+  const lvBig = (big[0] || seen[0]).lv;
+  const alcPayload = (won) => `(() => {
+    const a = window.__game.world.alchemy;
+    window.__ui.results({ modeId: 'alchemy', won: ${won}, stars: ${won ? 2 : 0}, bestStars: 1,
+      score: 1071, chains: 7, mode: 'ALCHEMY',
+      alchemy: { ...a, won: ${won}, left: ${won ? 14 : 0} } });
+    return 1; })()`;
+
+  await q(`window.__game.startLevel(${lvBig})`);
+  await cdp.frames(6);
+  await q(alcPayload(true));
+  await new Promise((r) => setTimeout(r, 420));
+  const caps = JSON.parse(await q(`JSON.stringify(
+    [...document.querySelectorAll('.card--alc .statrow .t-cap')].map((e) => e.textContent))`));
+  const timeCap = caps[0] || '';
+  ok('the win card says WHOSE time 45s is', /taken|elapsed|spent/i.test(timeCap),
+    `"${timeCap}" — ${caps.join(' / ')}`);
+  // ...and it must still fit on one line in a third of the card.
+  const wrapped = await q(`(() => {
+    const e = document.querySelector('.card--alc .statrow .t-cap');
+    return e ? e.getBoundingClientRect().height > 18 : true; })()`);
+  ok('the time caption still fits on one line', wrapped === false, String(wrapped));
+  if (args.shots) await shot('phone-copy-win');
+
+  await q(`window.__game.startLevel(${lvBig})`);
+  await cdp.frames(6);
+  await q(alcPayload(false));
+  await new Promise((r) => setTimeout(r, 420));
+  const lost = JSON.parse(await q(`JSON.stringify({
+    lab: (document.querySelector('.alc-obj-lab') || {}).textContent || '',
+    num: (document.querySelector('.alc-obj-num') || {}).textContent || '' })`));
+  ok('the losing card prints its headline and its counter the same way',
+    !!lost.lab && !BARE.test(lost.lab) && !BARE.test(lost.num), `${lost.lab} | ${lost.num}`);
+  if (args.shots) await shot('phone-copy-lost');
+
+  if (args.falsify) {
+    // Three: the headline across the level sample, the headline on the losing
+    // card, and the time caption. The "sample is big enough" line cannot move —
+    // it is about the LEVELS, not about the copy — and neither can the one-line
+    // fit, which the arm's shorter caption only makes easier.
+    const MUST = 3;
+    console.log(`\nfalsification arm: ${fails.length} checks went red, ${MUST} required`);
+    if (fails.length < MUST) { console.log('ARM TOO WEAK — this copy is not evidence'); process.exitCode = 1; }
+    else console.log('arm ok: both copy fixes are capable of failing');
+    return;
+  }
+  console.log(fails.length ? '\nCOPY FAILURES:\n  ' + fails.join('\n  ') : '\ncard copy: all green');
+  if (fails.length) process.exitCode = 1;
+}
+
+/* ------------------------------------------------------------- legibility */
+/**
+ * CAN YOU READ IT ON THE BRIGHTEST BOARD, AND IS IT CLEAN ON IT?
+ *
+ * The defect this exists for shipped twice in one afternoon. Light type over
+ * the sand carried a broad dark blur — invisible on the old grey `lumen` wash,
+ * and the moment lumen became a luminous aqua light panel the same blur was a
+ * dirty grey thumbprint across the brightest part of the frame. The payout's
+ * halo was the single most noticeable thing on that screen.
+ *
+ * Both halves have to be measured, because fixing either one alone is how you
+ * get the other. A metric that only asked "is the type visible" would have
+ * SCORED THE THUMBPRINT HIGHEST: darkening two hundred pixels of background is
+ * an enormous amount of visible change. A metric that only asked "is the
+ * background undisturbed" is passed perfectly by type nobody can read.
+ *
+ * So: screenshot the frozen page twice, once with the element visible and once
+ * with it hidden, and difference them.
+ *   INK    mean |Δluma| inside the element's own box — how much of the glyph
+ *          actually reaches the eye. White-on-white scores near zero.
+ *   SMEAR  the share of pixels in a 70 px ring AROUND the box that the element
+ *          darkens at all — how much board it dirties to achieve that.
+ * A keyline is high ink at near-zero smear. A halo is high ink at high smear.
+ * Nothing else in this suite can tell them apart.
+ *
+ * Two arms, and they pull in opposite directions on purpose:
+ *   --dirtbug  puts the halo back. INK stays fine; SMEAR must blow up.
+ *   --flatbug  strips every shadow. SMEAR is perfect; INK must collapse on the
+ *              bright biome and — this is the point — stay fine on the dark one,
+ *              because white type on a black board never needed the help.
+ */
+
+/** Chrome's screenshot, unpacked. 8-bit RGB/RGBA, no interlace: what CDP sends. */
+function pngPixels(b64) {
+  const buf = Buffer.from(b64, 'base64');
+  let pos = 8, w = 0, h = 0, ct = 6, bd = 8;
+  const idat = [];
+  while (pos + 8 <= buf.length) {
+    const len = buf.readUInt32BE(pos);
+    const type = buf.toString('ascii', pos + 4, pos + 8);
+    const data = buf.subarray(pos + 8, pos + 8 + len);
+    if (type === 'IHDR') { w = data.readUInt32BE(0); h = data.readUInt32BE(4); bd = data[8]; ct = data[9]; }
+    else if (type === 'IDAT') idat.push(data);
+    else if (type === 'IEND') break;
+    pos += 12 + len;
+  }
+  if (bd !== 8 || (ct !== 6 && ct !== 2)) throw new Error(`unexpected PNG: depth ${bd} colour ${ct}`);
+  const bpp = ct === 6 ? 4 : 3, stride = w * bpp;
+  const raw = inflateSync(Buffer.concat(idat));
+  const out = Buffer.alloc(h * stride);
+  let p = 0;
+  for (let y = 0; y < h; y++) {
+    const f = raw[p++];
+    const line = raw.subarray(p, p + stride); p += stride;
+    const cur = out.subarray(y * stride, (y + 1) * stride);
+    const prev = y > 0 ? out.subarray((y - 1) * stride, y * stride) : null;
+    for (let x = 0; x < stride; x++) {
+      const a = x >= bpp ? cur[x - bpp] : 0;
+      const b = prev ? prev[x] : 0;
+      const c = (prev && x >= bpp) ? prev[x - bpp] : 0;
+      let v = line[x];
+      if (f === 1) v += a;
+      else if (f === 2) v += b;
+      else if (f === 3) v += (a + b) >> 1;
+      else if (f === 4) {
+        const pa = Math.abs(b - c), pb = Math.abs(a - c), pc = Math.abs(a + b - 2 * c);
+        v += (pa <= pb && pa <= pc) ? a : (pb <= pc ? b : c);
+      }
+      cur[x] = v & 255;
+    }
+  }
+  const luma = new Float32Array(w * h);
+  for (let i = 0, j = 0; i < w * h; i++, j += bpp) {
+    luma[i] = 0.2126 * out[j] + 0.7152 * out[j + 1] + 0.0722 * out[j + 2];
+  }
+  return { w, h, luma };
+}
+
+async function parkRenderer(on) {
+  await cdp.eval(`(() => { const R = window.__game && window.__game.renderer;
+    if (!R) return 0;
+    if (${on ? 'true' : 'false'}) { if (!R.__parked) { R.__parked = R.draw; R.draw = function () {}; } }
+    else if (R.__parked) { R.draw = R.__parked; R.__parked = null; }
+    return 1; })()`).catch(() => {});
+}
+
+async function rawShot() {
+  const p = cdp.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+  const to = new Promise((_, rej) => setTimeout(() => rej(new Error('captureScreenshot hung')), 25000));
+  return (await Promise.race([p, to])).data;
+}
+
+/** ink + smear for one element, against whatever board is behind it right now. */
+async function inkAndSmear(sel, ring = 70) {
+  await parkRenderer(true);
+  await new Promise((r) => setTimeout(r, 120));
+  // The TEXT's box, not the element's. `.hint` is a full-width centred line, so
+  // its element box is nine tenths empty background — averaging the difference
+  // over that dilutes a perfectly readable line down to nothing and the gate
+  // fails a bug that is not there. A Range over the contents gives the glyphs'
+  // own extent; the 3 px pad is the keyline.
+  const box = JSON.parse(await cdp.eval(`JSON.stringify((() => {
+    const e = document.querySelector(${JSON.stringify(sel)});
+    if (!e) return null;
+    const cs = getComputedStyle(e);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.05) return null;
+    const rg = document.createRange(); rg.selectNodeContents(e);
+    let r = rg.getBoundingClientRect();
+    if (!(r.width > 3 && r.height > 3)) r = e.getBoundingClientRect();
+    if (!(r.width > 3 && r.height > 3)) return null;
+    return { x: Math.round(r.left) - 3, y: Math.round(r.top) - 3,
+             w: Math.round(r.width) + 6, h: Math.round(r.height) + 6 };
+  })())`));
+  if (!box) { await parkRenderer(false); return null; }
+
+  const on = await rawShot();
+  await cdp.eval(`(() => { document.querySelector(${JSON.stringify(sel)}).style.visibility = 'hidden'; return 1; })()`);
+  await new Promise((r) => setTimeout(r, 90));
+  const off = await rawShot();
+  await cdp.eval(`(() => { document.querySelector(${JSON.stringify(sel)}).style.visibility = ''; return 1; })()`);
+  await parkRenderer(false);
+
+  const A = pngPixels(on), B = pngPixels(off);
+  if (A.w !== B.w || A.h !== B.h) return null;
+  const at = (P, x, y) => P.luma[y * P.w + x];
+  // INK is the mean of the STRONGEST tenth of the differences in the box, not
+  // the mean of all of them. Glyph coverage varies wildly — 9.5 px caps with
+  // .3em tracking put ink on a few percent of their own box, a 46 px numeral on
+  // a third of it — and a flat mean scores the two on how fat their letters
+  // are rather than on whether either can be read. The strongest tenth is the
+  // stroke against the board behind it, which is the thing in question, and it
+  // still collapses to nothing for white type on a white board.
+  const deltas = [];
+  let bg = 0, ringHit = 0, ringN = 0;
+  const x0 = Math.max(0, box.x), y0 = Math.max(0, box.y);
+  const x1 = Math.min(A.w, box.x + box.w), y1 = Math.min(A.h, box.y + box.h);
+  for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+    deltas.push(Math.abs(at(A, x, y) - at(B, x, y))); bg += at(B, x, y);
+  }
+  const inkN = deltas.length || 1;
+  deltas.sort((a, b) => b - a);
+  const top = Math.max(1, Math.round(deltas.length * 0.1));
+  let inkSum = 0;
+  for (let i = 0; i < top; i++) inkSum += deltas[i];
+  const rx0 = Math.max(0, box.x - ring), ry0 = Math.max(0, box.y - ring);
+  const rx1 = Math.min(A.w, box.x + box.w + ring), ry1 = Math.min(A.h, box.y + box.h + ring);
+  for (let y = ry0; y < ry1; y++) for (let x = rx0; x < rx1; x++) {
+    if (x >= x0 - 3 && x < x1 + 3 && y >= y0 - 3 && y < y1 + 3) continue;   // the glyph box itself
+    ringN++;
+    if (Math.abs(at(A, x, y) - at(B, x, y)) > 4) ringHit++;
+  }
+  return {
+    ink: +(inkSum / top).toFixed(2),
+    smear: +(ringHit / Math.max(1, ringN)).toFixed(4),
+    bg: Math.round(bg / Math.max(1, inkN)),
+  };
+}
+
+async function legibilityGate() {
+  const fails = [];
+  const ok = (name, cond, detail = '') => {
+    if (!cond) fails.push(name + (detail ? ': ' + detail : ''));
+    console.log(`  ${cond ? 'ok  ' : 'FAIL'}  ${name}${detail ? '  ' + detail : ''}`);
+  };
+  const q = (e) => cdp.eval(e);
+  // 75 sits in the gap the arms measure out, not on a hunch: with the keyline
+  // the six ink readings are 104, 121, 127, 171, 180 and 209; strip it and the
+  // three on a bright field fall to 17, 23 and 61. Nothing lands near 75 in
+  // either direction.
+  const MIN_INK = 75;
+  const MAX_SMEAR = 0.06;  // above this the element is dirtying the board around it
+
+  const arm = async () => {
+    if (args.dirtbug) {
+      // The shipped defect, exactly: a broad dark blur and a soft radial veil
+      // behind every piece of floating type.
+      await cdp.eval(`(() => { const s = document.createElement('style');
+        s.textContent = '.payout-num, .payout-cap, .tagline, .hint, .hud-hint {' +
+          ' text-shadow: 0 2px 20px rgba(0,0,0,.9), 0 0 26px rgba(0,0,0,.85) !important; }' +
+          '.payout { position: absolute; }' +
+          '.payout::before { content: ""; position: absolute; left: 50%; top: 50%; z-index: -1;' +
+          ' width: 260px; height: 160px; transform: translate(-50%, -50%);' +
+          ' background: radial-gradient(closest-side, rgba(6,5,9,.66) 0%, rgba(6,5,9,.44) 42%,' +
+          ' rgba(6,5,9,.14) 72%, rgba(6,5,9,0) 100%); }';
+        document.head.append(s); return 1; })()`);
+    }
+    if (args.flatbug) {
+      await cdp.eval(`(() => { const s = document.createElement('style');
+        s.textContent = '.payout-num, .payout-cap, .tagline, .hint, .hud-hint { text-shadow: none !important; }';
+        document.head.append(s); return 1; })()`);
+    }
+  };
+
+  await cdp.viewport(390, 844, 1, true);
+
+  /* ----------------------------------------------- the payout, both extremes */
+  // JELLY LAB is `lumen`, the brightest board in the game; TIDE is `abyss`, the
+  // darkest. One number, one treatment, and it has to survive both.
+  for (const [mode, what] of [['jelly', 'the brightest board'], ['tide', 'the darkest board']]) {
+    await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=${mode}&seed=4242`);
+    if (!await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000)) {
+      ok(`${mode}: shell came up`, false); continue;
+    }
+    await cdp.frames(20);
+    await arm();
+    const r = await drive('w.chains >= 1', 40000);
+    if (!r.reached) { ok(`${mode}: the bot reached a chain`, false, JSON.stringify(r)); continue; }
+    await pump();
+    await new Promise((r2) => setTimeout(r2, 200));
+    const m = await inkAndSmear('.payout-num');
+    ok(`the payout is legible on ${what} (${mode})`, !!m && m.ink >= MIN_INK,
+      m ? `ink ${m.ink} on a board averaging ${m.bg}/255, want >= ${MIN_INK}` : 'no payout on screen');
+    ok(`the payout does not dirty ${what} (${mode})`, !!m && m.smear <= MAX_SMEAR,
+      m ? `${(m.smear * 100).toFixed(1)}% of the surrounding board disturbed, want <= ${(MAX_SMEAR * 100)}%` : 'no payout');
+    if (args.shots) await shot(`phone-legibility-${mode}`);
+  }
+
+  /* ------------------------------------------ the small copy, at both extremes */
+  // The tagline and TOUCH THE SAND are the same trap in 9 px type, and the
+  // playtest flagged them on the new lumen panel.
+  //
+  // These are measured against a FORCED field rather than against whatever the
+  // bot happened to build, and that is deliberate: a real board puts a
+  // different background under a 9 px line every run, so a threshold against it
+  // measures the seed as much as the stylesheet. The shell's own veils are left
+  // in place — they are part of its answer to this problem — and the biome is
+  // replaced with the two extremes it has to survive: a near-white light panel
+  // and near-black. This is exactly the change that caused the bug: a biome
+  // that went bright underneath type that assumed dark.
+  const field = (col) => cdp.eval(`(() => {
+    let s = document.getElementById('__field');
+    if (!s) { s = document.createElement('style'); s.id = '__field'; document.head.append(s); }
+    s.textContent = '#game { visibility: hidden !important } #stage { background: ${col} !important }';
+    return 1; })()`);
+
+  await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&soak&attract=jelly&seed=4242`);
+  if (await cdp.waitFor('window.__ui && window.__state', 20000)) {
+    await cdp.frames(40);
+    await arm();
+    // The tagline and the hint fade in on a 1.6 s delay. Measured before that
+    // lands, a perfectly legible line reads as "not on screen" — and the gate
+    // would be timing the animation rather than looking at the type.
+    await cdp.waitFor('+getComputedStyle(document.querySelector(".hint")).opacity > 0.9', 9000);
+    await q('window.__ui.wmSeek(3400)');
+    await cdp.frames(8);
+    for (const [col, what] of [['#eefbf6', 'a white board'], ['#05060a', 'a black board']]) {
+      await field(col);
+      await new Promise((r) => setTimeout(r, 120));
+      for (const [sel, name] of [['.tagline', 'the tagline'], ['.hint', 'TOUCH THE SAND']]) {
+        const m = await inkAndSmear(sel, 40);
+        ok(`${name} is legible on ${what}`, !!m && m.ink >= MIN_INK,
+          m ? `ink ${m.ink} over ${m.bg}/255, want >= ${MIN_INK}` : 'not on screen');
+        if (col === '#eefbf6') {
+          ok(`${name} does not dirty ${what}`, !!m && m.smear <= MAX_SMEAR,
+            m ? `${(m.smear * 100).toFixed(1)}% disturbed` : 'not on screen');
+        }
+      }
+      if (args.shots) await shot(`phone-legibility-attract-${col === '#eefbf6' ? 'white' : 'black'}`);
+    }
+  } else ok('attract came up for the copy pass', false);
+
+  if (args.dirtbug || args.flatbug) {
+    // --dirtbug is a halo: everything stays readable and every SMEAR line blows.
+    // --flatbug is bare type: nothing smears and the INK lines blow — but only
+    //   the ones on the bright board. White type on `abyss` never needed a
+    //   shadow, so a gate that went red there too would be measuring the
+    //   stylesheet rather than the pixels.
+    // --dirtbug: at least three. The halo dirties the board under the payout on
+    //   lumen and under both lines of attract copy on a white field, and it
+    //   drags two of their ink readings down with it — five in practice.
+    // --flatbug: EXACTLY three, and which three is the point. The three ink
+    //   readings on a bright field must collapse; the three on a black field
+    //   must not, because white type on black never needed a keyline and a
+    //   check that went red there would be reading the stylesheet rather than
+    //   the pixels. No smear line may move either — bare type dirties nothing.
+    const MUST = 3, EXACT = !!args.flatbug;
+    console.log(`\nfalsification arm: ${fails.length} checks went red, ${MUST}${EXACT ? ' exactly' : ' or more'} required`);
+    console.log('  ' + (fails.length ? fails.join('\n  ') : '(none)'));
+    const bright = fails.length === MUST && fails.every((f) => /jelly|white board/.test(f));
+    if (fails.length < MUST || (EXACT && !bright)) {
+      console.log(EXACT
+        ? 'ARM MISCALIBRATED — bare type must fail on the bright fields and only there'
+        : 'ARM TOO WEAK — this legibility is not evidence');
+      process.exitCode = 1;
+    } else console.log('arm ok: ink and smear can both be seen to fail');
+    return;
+  }
+  console.log(fails.length ? '\nLEGIBILITY FAILURES:\n  ' + fails.join('\n  ') : '\nlegibility: all green');
+  if (fails.length) process.exitCode = 1;
+}
+
+const SHOTS = !(args.flow || args.win || args.layout || args.payout || args.copy || args.legible) || args.shots;
 
 const LOOP_SHOTS = ['attract', 'attract-pour', 'modes', 'events', 'settings', 'hud', 'pause', 'results', 'banner'];
 
@@ -1330,6 +2086,9 @@ try {
   if (args.layout) { console.log('\ntop-control layout'); await layoutGate(); }
   if (args.flow) { console.log('\nend-to-end flow'); await endToEnd(); }
   if (args.flow || args.win) { console.log('\nalchemy: a level played to a win'); await alchemyWin(); }
+  if (args.payout) { console.log('\ndoes a chain pay?'); await payoutGate(); }
+  if (args.copy) { console.log('\ncard copy'); await copyGate(); }
+  if (args.legible || args.dirtbug || args.flatbug) { console.log('\ntype over sand'); await legibilityGate(); }
   if (args.hit || args.hitbug) { console.log('\nthumb-sized hit targets'); await hitGate(); }
   if (args.probe) { console.log('\ninteraction probe'); await probe(); }
 

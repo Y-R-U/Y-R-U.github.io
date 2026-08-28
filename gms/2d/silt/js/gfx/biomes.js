@@ -7,17 +7,56 @@ export const TINT_SLOTS = 8;   // index 0 unused (0 == untinted), 1..7 usable
 
 // Base material look. (colour is linear-ish and may exceed 1 for emissives.)
 // props = [fluid, emissive, translucent, tintMix]
+//
+// What the four slots actually drive, in LIGHT_FS: `fluid` adds ANIMATED wave
+// normals, caustics and refraction; `emissive` opens the lava crust/vein path;
+// `translucent` drives subsurface, the fresnel rim and refraction; `tintMix` is
+// read in RESOLVE_FS and is how much of the cell's tint replaces the material
+// colour. Roughness and micro-grain are NOT slots — they are derived, as
+// `grain = 1 - fluid - translucent`, so opacity and roughness are one axis:
+// there is no way to say "smoother than sand but still opaque". See the note
+// on wall below.
 const BASE = {
   empty:   { col: [0, 0, 0],                 props: [0, 0, 0, 0] },
-  wall:    { col: [0.048, 0.046, 0.056],     props: [0, 0, 0, 0] },
+  // Hewn stone, not powder. This used to be 0.048 — near black — and every
+  // biome override was darker still, so a WALL pillar came out as a flat black
+  // cutout: AO, the cast shadow, the bevel the density gradient puts on its
+  // edges and the grain normals were all being applied to an albedo of nothing.
+  // The value is the whole fix. Structure has to sit UNDER the material it
+  // holds up, so it is a low-chroma warm grey at about half of sand's value —
+  // far enough apart in chroma to read as a different substance at the same
+  // glance, dark enough not to compete with the play material.
+  //
+  // props: opaque, and untintable on purpose (scenery must never look like a
+  // chain), with a whisper of translucency so a cut edge bleeds the way stone
+  // does. That also trims grain from a flat 1.0 to 0.90 — just under sand's
+  // 0.94. It cannot go further: a genuinely hewn face wants to be much less
+  // powdery than sand and still opaque, and this table cannot express that. So
+  // can the grain PATTERN: the noise in LIGHT_FS is stretched 4:1 horizontally
+  // to read as sand bedding, and every non-fluid material shares it, so stone
+  // is currently bedded sandstone whatever the numbers say. Both want a slot
+  // and a branch in the shader, which is not a change to make from here.
+  wall:    { col: [0.165, 0.145, 0.120],     props: [0, 0, 0.10, 0] },
   sand:    { col: [0.300, 0.200, 0.115],     props: [0, 0, 0.06, 0.75] },
   water:   { col: [0.030, 0.150, 0.280],        props: [1, 0, 0.55, 0.55] },
   jelly:   { col: [0.260, 0.105, 0.340],        props: [0, 0, 1.00, 0.90] },
   oil:     { col: [0.042, 0.036, 0.060],     props: [1, 0, 0.10, 0.30] },
   lava:    { col: [2.60, 0.62, 0.10],        props: [0.85, 1, 0.20, 0] },
-  ice:     { col: [0.290, 0.430, 0.540],        props: [0.35, 0, 0.90, 0.45] },
+  ice:     { col: [0.155, 0.235, 0.300],        props: [0.28, 0, 0.62, 0.45] },
   ash:     { col: [0.105, 0.098, 0.094],     props: [0, 0, 0, 0] },
-  crystal: { col: [0.345, 0.390, 0.560],        props: [0.30, 0, 0.85, 0.35] },
+  // Quenched mineral glass. The same fault as wall, from the opposite end, and
+  // this is the one actually in the level-1 capture: ALCHEMY's 'span' levels
+  // build their pillars out of CRYSTAL, not WALL. At 0.345/0.390/0.560 with
+  // translucent 0.85 the subsurface term saturated the entire slab, so a pillar
+  // rendered as a flat white block with no shading left in it — the "pale grey
+  // block with a flat top". Darker glass hands the read back to the fresnel rim
+  // and the specular instead of a blown interior.
+  //
+  // fluid 0.30 -> 0.10 as well: fluid is what puts the ANIMATED wave normals on
+  // a surface, and crystal is the one material the game promises is permanent.
+  // It was quietly flowing. The trim also lifts grain off exactly 0.0 (it is
+  // now 0.28), so a cut face has some micro-relief instead of none.
+  crystal: { col: [0.150, 0.205, 0.290],        props: [0.10, 0, 0.62, 0.35] },
   fire:    { col: [3.40, 1.35, 0.30],        props: [0.90, 1, 0, 0] },
   steam:   { col: [0.400, 0.440, 0.480],        props: [0.60, 0, 0.90, 0] },
 };
@@ -87,7 +126,7 @@ export const BIOMES = {
       [0.058, 0.228, 0.340],
       [0.042, 0.195, 0.315],
     ],
-    mats: { sand: [0.18, 0.24, 0.28], ash: [0.07, 0.09, 0.11], wall: [0.020, 0.032, 0.045] },
+    mats: { sand: [0.18, 0.24, 0.28], ash: [0.07, 0.09, 0.11], wall: [0.105, 0.118, 0.130] },
     sky: { top: [0.0040, 0.0140, 0.0250], bot: [0.0010, 0.0040, 0.0105] },
     glow: { col: [0.030, 0.165, 0.245], pos: [0.50, 1.03], amt: 0.78, band: 0.16, tight: [4.5, 4.5] },
     well:  [0.46, 0.80, 0.54, 0.38],
@@ -123,7 +162,7 @@ export const BIOMES = {
       [0.068, 0.180, 0.242],
       [0.055, 0.156, 0.228],
     ],
-    mats: { sand: [0.22, 0.145, 0.095], wall: [0.055, 0.038, 0.034] },
+    mats: { sand: [0.22, 0.145, 0.095], wall: [0.155, 0.115, 0.092] },
     sky: { top: [0.0130, 0.0095, 0.0110], bot: [0.0400, 0.0130, 0.0058] },
     glow: { col: [0.340, 0.105, 0.030], pos: [0.50, -0.04], amt: 0.58, band: 0.16, tight: [4.5, 4.5] },
     well:  [0.46, 0.80, 0.54, 0.38],
@@ -144,60 +183,89 @@ export const BIOMES = {
   },
 
   /* --------------------------------------------------------------- lumen */
-  // JELLY LAB. Clinical and bright: high ambient, low rim, subsurface doing most
-  // of the work so a soft body reads as translucent gel rather than a painted
-  // blob. The data lane asks for a WHITE lab backdrop; taken literally that
-  // kills both of this renderer's load-bearing effects — the dissolve is
-  // ADDITIVE and disappears on white, and the airborne piece has nothing to
-  // separate from. So the sky sits at a pale lab grey, ~4x dune and by far the
-  // brightest biome, and the vessel keeps its frame.
+  // JELLY LAB. A specimen tank standing on a LIGHT TABLE, in a dark room.
+  //
+  // This started life as "clinical and bright" — a pale neutral lab grey at
+  // ~4x dune, high ambient, weak key. Both halves of that were wrong on a
+  // phone. Grey is not a light, it is the absence of one: with no chroma in
+  // the field there was nothing for sat to work on, the vignette turned the
+  // corners into dishwater, and the wordmark's drop shadow read as dirt
+  // instead of depth. And a 3:1 key-to-ambient ratio (abyss and dune both run
+  // ~10:1) filled every shadow, so the heap had no form and the blobs sat on
+  // the board like gouache on card.
+  //
+  // Kept: it is still by far the LIGHTEST biome — nothing else in the set gets
+  // within two stops of the panel's core — the vessel surround is still dark so
+  // the board reads as a lit panel, and subsurface still does most of the work
+  // on a soft body. Changed: the brightness is now a SOURCE rather than a fill.
+  // A broad aqua shaft across the middle of the tank, deepening to almost black
+  // at the ceiling and at the floor, so the empty air has a direction, the heap
+  // has something to silhouette against, and every additive term this renderer
+  // owns — dissolve flash, motes, rim, bloom — has somewhere dark to land.
   lumen: {
     name: 'lumen',
     tints: [
       [0, 0, 0],
-      // Hue triad again, not a lightness ramp: raspberry, lime, cobalt. All
-      // three are high-chroma because a bright neutral backdrop eats pastels.
-      [0.470, 0.075, 0.185],   // raspberry
-      [0.095, 0.400, 0.165],   // lime
-      [0.070, 0.185, 0.500],   // cobalt — the deep one
-      [0.135, 0.290, 0.355],   // brine 4..7: pale aqua, one body of water and
-      [0.128, 0.280, 0.348],   // nowhere near cobalt's deep blue
-      [0.142, 0.300, 0.362],
-      [0.124, 0.272, 0.342],
+      // Hue triad, not a lightness ramp. The field now sits at hue ~185, so
+      // the triad is chosen to straddle it: raspberry and cobalt were always
+      // clear of it, but the old lime (0.095/0.400/0.165) was a blue-green
+      // only ~50 degrees off a teal panel. Rolled toward chartreuse — G still
+      // dominant, R lifted well above B — which widens it against BOTH the
+      // field and cobalt. All three stay high-chroma: a bright backdrop eats
+      // pastels.
+      [0.500, 0.080, 0.150],   // raspberry
+      [0.240, 0.375, 0.100],   // chartreuse — the warm one
+      [0.095, 0.170, 0.480],   // cobalt — the deep one
+      [0.115, 0.245, 0.300],   // brine 4..7: one body of water, deeper than the
+      [0.109, 0.236, 0.293],   // panel behind it so it still reads as liquid
+      [0.121, 0.254, 0.307],
+      [0.105, 0.229, 0.288],
     ],
     mats: {
-      wall: [0.100, 0.110, 0.126], sand: [0.300, 0.272, 0.220],
-      water: [0.070, 0.210, 0.285], ash: [0.140, 0.145, 0.150],
-      crystal: [0.430, 0.470, 0.545], ice: [0.320, 0.415, 0.480],
-      oil: [0.070, 0.062, 0.052],
+      wall: [0.120, 0.132, 0.148], sand: [0.155, 0.200, 0.212],
+      water: [0.055, 0.190, 0.245], ash: [0.108, 0.114, 0.120],
+      crystal: [0.150, 0.215, 0.262], ice: [0.160, 0.230, 0.278],
+      oil: [0.062, 0.056, 0.048],
     },
-    // The one LIGHT biome in the set, and the number that makes it one. Kept
-    // just under the bloom threshold so the backdrop never blooms into the
-    // piece, and the vessel outside stays dark so the board reads as a lightbox.
-    sky: { top: [0.1900, 0.1955, 0.2030], bot: [0.2460, 0.2520, 0.2600] },
-    // Overhead softbox, not a sun. Wide and weak: a lab is lit from a ceiling
-    // panel and has no direction to speak of.
-    glow: { col: [0.150, 0.158, 0.172], pos: [0.50, 1.04], amt: 0.70, band: 0.06, tight: [1.0, 3.4] },
-    well:  [0.96, 0.20, 0.26, -0.10],
-    well2: [0.13, 3.10, 0.06, 0.30],
-    mote: { col: [0.86, 0.94, 1.00], amt: 0.18 },
-    key:  { dir: [-0.28, 0.960], col: [1.06, 1.09, 1.14] },
-    fill: { dir: [0.52, -0.30], col: [0.30, 0.34, 0.41] },
-    amb:  [0.176, 0.186, 0.200],
-    rim:  [0.66, 0.80, 0.94],
-    emis: [1.70, 1.80, 1.62],
-    // "Flat and bright" is the mood, but SILT's whole read is the sculpted heap,
-    // so AO and the cast shadow stay strong even though the key is weak — on a
-    // pale backdrop contact darkening is what gives the pile any form at all.
-    surf: { rim: 0.26, spec: 0.86, sss: 1.55, grain: 0.52, refr: 0.044, ao: 0.86, shadow: 0.54, relief: 0.52 },
-    // Worst case for the ACES shoulder in the whole game: a bright backdrop and
-    // the highest ambient, so an unoccluded piece is pinned at the top of the
-    // curve. The push and the pull are both the strongest here.
-    piece: [0.74, 0.34, 0.100],
+    // The dark room the tank stands in, not the panel — the panel is the glow
+    // below. Near-symmetric top to bottom and deliberately almost black: a
+    // uniformly bright field was the original mistake, and a second one at a
+    // saturated mid-teal was no better, because it put the material and the
+    // backdrop in the same value band and nothing separated. The light has to
+    // be a SOURCE with falloff, not a fill.
+    sky: { top: [0.010, 0.026, 0.034], bot: [0.014, 0.034, 0.032] },
+    // The lamp under the table, diffused up through the acrylic. Broad and
+    // strong, and deliberately BELOW the wordmark: the attract title sits in
+    // the top fifth, where the panel is at its deepest, so gold letters and
+    // their shadow both have something to sit against. It also puts the hot
+    // zone behind the falling piece and behind the crest of the heap.
+    glow: { col: [0.130, 0.360, 0.335], pos: [0.50, 0.56], amt: 2.35, band: 0.18, tight: [4.0, 12.0] },
+    // Sides pulled in hard (0.40) and a positive roof term: the acrylic edges
+    // and the top of the tank are where the light runs out, so the panel is
+    // framed by its own falloff rather than by the post vignette.
+    well:  [0.94, 0.26, 0.40, 0.24],
+    well2: [0.11, 3.30, 0.20, 0.55],
+    mote: { col: [0.72, 1.00, 0.96], amt: 0.34 },
+    key:  { dir: [0.40, 0.916], col: [1.20, 1.34, 1.32] },
+    // Fill comes from BELOW and carries the panel's own aqua. It is the one
+    // biome where the bounce is motivated by the fiction rather than invented.
+    fill: { dir: [0.0, -1.0], col: [0.14, 0.42, 0.44] },
+    // A third of what it was. This is the change that gives the heap form back.
+    amb:  [0.062, 0.098, 0.104],
+    rim:  [0.60, 1.10, 1.05],
+    emis: [1.30, 1.95, 1.85],
+    // Backlit gel: rim and spec both up, subsurface still the loudest term in
+    // the set, AO and cast shadow strong so a heap in front of a lit panel
+    // still reads as a heap.
+    surf: { rim: 0.42, spec: 0.95, sss: 1.45, grain: 0.76, refr: 0.056, ao: 0.92, shadow: 0.62, relief: 0.56 },
+    // Still the hardest piece read in the game — a small blob against the
+    // brightest field — but with the ambient down it is no longer pinned to
+    // the top of the ACES curve, so the push and the pull can both ease off.
+    piece: [0.62, 0.24, 0.095],
     grade: {
-      exposure: 1.00, sat: 1.24, contrast: 1.13, vignette: 0.36, grain: 0.016,
-      bloom: 0.52, threshold: 0.88, knee: 0.40,
-      shadowTint: [0.97, 1.00, 1.06], highTint: [1.02, 1.00, 0.97],
+      exposure: 1.02, sat: 1.22, contrast: 1.12, vignette: 0.24, grain: 0.018,
+      bloom: 0.80, threshold: 0.86, knee: 0.42,
+      shadowTint: [0.86, 1.02, 1.08], highTint: [1.12, 1.03, 0.92],
     },
   },
 
@@ -222,9 +290,9 @@ export const BIOMES = {
       [0.078, 0.184, 0.260],
     ],
     mats: {
-      wall: [0.030, 0.034, 0.050], sand: [0.288, 0.244, 0.180],
-      water: [0.032, 0.140, 0.230], crystal: [0.380, 0.440, 0.600],
-      ice: [0.300, 0.420, 0.520], ash: [0.075, 0.080, 0.092],
+      wall: [0.118, 0.126, 0.152], sand: [0.288, 0.244, 0.180],
+      water: [0.032, 0.140, 0.230], crystal: [0.140, 0.185, 0.290],
+      ice: [0.150, 0.225, 0.290], ash: [0.075, 0.080, 0.092],
     },
     // Top and bottom are within 5% of each other on purpose. HOURGLASS turns the
     // board over, so the pile spends half its life against the ceiling — an

@@ -20,6 +20,18 @@ import { MODE_GLYPH } from './icons.js';
  * nothing costs no layout.
  */
 
+/**
+ * The objective headline is generated in js/data/levelgen.js as
+ * `Dissolve ${o.target} grains` — a raw integer — while the counter directly
+ * underneath it is formatted, so one card printed "Dissolve 9035 grains" over
+ * "8,577 / 9,035". Only runs of four digits or more are touched, which leaves
+ * "lv 3" alone, and it is idempotent, so it survives the real fix landing in
+ * levelgen rather than fighting it.
+ */
+function fmtLabel(t) {
+  return String(t == null ? '' : t).replace(/\d{4,}/g, (d) => Number(d).toLocaleString('en-US'));
+}
+
 const STAR = '<path d="M12 3.1l2.65 5.86 6.35.62-4.8 4.3 1.4 6.28L12 16.9l-5.6 3.26 1.4-6.28-4.8-4.3 6.35-.62Z"/>';
 
 /** m:ss, but seconds with a decimal under ten — the last ten seconds are the mode. */
@@ -109,7 +121,7 @@ export function createModeHud() {
     if (key === lastObj) return;
     lastObj = key;
 
-    objLabel.textContent = a.won ? 'Complete' : (a.label || 'Objective');
+    objLabel.textContent = a.won ? 'Complete' : fmtLabel(a.label || 'Objective');
     objCount.textContent = a.won ? '' : fmt(a.value) + ' / ' + fmt(a.target);
     objFill.style.width = (frac * 100).toFixed(1) + '%';
     objLv.textContent = a.id != null ? ('lv ' + a.id + (a.name ? ' · ' + a.name : '')) : '';

@@ -38,6 +38,31 @@
 
   --edge: 14px;
 
+  /* TYPE OVER SAND.
+     A blurred dark halo behind light type is only legible on a dark field. It
+     was invisible on the old grey `lumen` wash and, the moment lumen became a
+     luminous aqua panel, the payout's halo became a dirty grey thumbprint over
+     the brightest part of the frame — the single most noticeable thing on the
+     screen, on a game whose whole pitch is that it looks expensive.
+     A KEYLINE has the opposite property: it is contrast that costs no area. On
+     `abyss` it disappears under the glyph; on `lumen` it is the only reason the
+     glyph has an edge at all. Every piece of type that floats over the board
+     with no glass behind it uses one. */
+  --keyline:
+    0 0 1px rgba(6,5,9,.92),
+    1px 0 0 rgba(6,5,9,.9), -1px 0 0 rgba(6,5,9,.9),
+    0 1px 0 rgba(6,5,9,.9), 0 -1px 0 rgba(6,5,9,.9),
+    1px 1px 0 rgba(6,5,9,.72), -1px 1px 0 rgba(6,5,9,.72),
+    1px -1px 0 rgba(6,5,9,.72), -1px -1px 0 rgba(6,5,9,.72),
+    0 1px 4px rgba(6,5,9,.6);
+  --keyline-lg:
+    0 0 2px rgba(6,5,9,.95),
+    2px 0 0 rgba(6,5,9,.92), -2px 0 0 rgba(6,5,9,.92),
+    0 2px 0 rgba(6,5,9,.92), 0 -2px 0 rgba(6,5,9,.92),
+    1.5px 1.5px 0 rgba(6,5,9,.88), -1.5px 1.5px 0 rgba(6,5,9,.88),
+    1.5px -1.5px 0 rgba(6,5,9,.88), -1.5px -1.5px 0 rgba(6,5,9,.88),
+    0 2px 7px rgba(6,5,9,.62);
+
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }

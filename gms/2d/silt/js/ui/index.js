@@ -7,6 +7,7 @@ import { mergeModes } from './modelist.js';
 import { createSandTouch } from './sandtouch.js';
 import { createModeHud } from './modehud.js';
 import { createZenPalette } from './zenpalette.js';
+import { createPayout } from './payout.js';
 import { createLevelPicker, levelById, levelCount, secs, stars } from './levels.js';
 
 /**
@@ -28,6 +29,26 @@ const HINT = {
   play: 'drag to move · tap to turn · swipe to drop',
   zen: 'pick a material · drag to pour',
 };
+
+// A run that has not chained yet is a run scoring nothing, and after half a
+// minute of that a player is entitled to know whether the game is broken or
+// they are. Fired once, worded as the rule rather than as a scolding.
+const NO_CHAIN_HINT = 'span wall to wall in one colour to score';
+const NO_CHAIN_AFTER = 25000;
+
+/**
+ * Thousands separators in a string generated somewhere else.
+ *
+ * `js/data/levelgen.js` builds "Dissolve 9035 grains" while the counter under it
+ * reads "8,577 / 9,035", and one card cannot print the same quantity two ways.
+ * Only runs of four digits or more are touched, so "lv 3" and "Level 12" are
+ * left alone, and it is idempotent: once the commas are in, no run is long
+ * enough to match again. The real fix belongs in levelgen — lane C's file — and
+ * this survives it rather than fighting it.
+ */
+function fmtLabel(t) {
+  return String(t == null ? '' : t).replace(/\d{4,}/g, (d) => Number(d).toLocaleString('en-US'));
+}
 
 export function createUI(handlers = {}) {
   const H = { onStart() {}, onPause() {}, onResume() {}, onQuit() {}, ...handlers };
@@ -89,8 +110,27 @@ export function createUI(handlers = {}) {
   const modeHud = createModeHud();
   const zenPal = createZenPalette(() => current === 'hud' && lastModeId === 'zen' && !sheetsOpen());
 
+  // The payout. It hangs off the BOARD rect rather than the control frame, for
+  // the same reason the tide rail and the flip ring do: it is a statement about
+  // the sand, and the whole complaint it answers is that the reward for a chain
+  // was living in a corner.
+  const payout = createPayout();
+
+  // Progress when the score cannot supply any.
+  //
+  // HOURGLASS and JELLY can be played for minutes at zero, and a zero that never
+  // moves is indistinguishable from a broken game. This is a 3 px rail under the
+  // pills filling toward your best run in THIS mode — the only honest "are you
+  // getting anywhere" the shell can answer without reading the sim. It is off
+  // for ALCHEMY, which already carries an objective bar, and off in ZEN, which
+  // has no score to make progress against.
+  const progFill = h('i');
+  const progLab = h('span', { class: 'hud-prog-lab t-cap', text: '' });
+  const hudProg = h('div', { class: 'hud-prog off' },
+    h('span', { class: 'hud-prog-bar' }, progFill), progLab);
+
   const hudScore = h('div', { class: 'hud-score' }, hudMode, hudVal,
-    h('div', { class: 'hud-pills' }, pillChains, pillTide, pillCombo));
+    h('div', { class: 'hud-pills' }, pillChains, pillTide, pillCombo), hudProg);
 
   // The top of the HUD is two columns, and which control sits in which is a
   // playtest result rather than a preference. PAUSE used to live in the
@@ -106,6 +146,7 @@ export function createUI(handlers = {}) {
     h('div', { class: 'veil veil-top' }),
     h('div', { class: 'veil veil-bot' }),
     ...modeHud.boardEls,
+    payout.el,
     h('div', { class: 'frame' },
       h('div', { class: 'hud-stack' },
         h('div', { class: 'hud-main' }, hudScore, ...modeHud.panels),
@@ -287,9 +328,15 @@ export function createUI(handlers = {}) {
   function paintStory() {
     const total = levelCount();
     const save = window.__game && window.__game.save;
-    if (!total || !save || !save.unlockedUpTo) { storyLab.textContent = ''; return; }
-    const at = Math.min(save.unlockedUpTo(total), total);
-    storyLab.textContent = at > 1 ? 'lv ' + at : '';
+    const at = (total && save && save.unlockedUpTo) ? Math.min(save.unlockedUpTo(total), total) : 1;
+    const lab = at > 1 ? 'lv ' + at : '';
+    storyLab.textContent = lab;
+    // "Story lv 25" is 30 px wider than "Story", and the three doors already
+    // sit edge to edge on a 390 px phone: measured, the gaps between them go to
+    // ZERO the moment a returning player has a level to show. Published as a
+    // class so the row can tighten only for the player who has one — a new
+    // player keeps the roomier pill. See #ui.has-story-lv in ui.css.
+    root.classList.toggle('has-story-lv', !!lab);
   }
 
   function buildModes() {
@@ -491,7 +538,10 @@ export function createUI(handlers = {}) {
               stars(got + 1, 'stars stars--inline'),
               h('span', { text: nextStar != null ? 'under ' + secs(nextStar) : 'faster' })));
       alcStats.replaceChildren(
-        statCell('time', spent == null ? '—' : secs(spent)),
+        // "TIME 10s" on a card that also knows about a countdown is ambiguous
+        // by construction: taken, or left? It is the elapsed time, and the star
+        // thresholds beside it are elapsed times too, so say so.
+        statCell('time taken', spent == null ? '—' : secs(spent)),
         statCell('score', fmt(r.score)),
         statCell('best', stars(bestSt, 'stars stars--stat')));
     } else {
@@ -499,7 +549,7 @@ export function createUI(handlers = {}) {
       const bar = h('i');
       alcGoal.replaceChildren(
         h('div', { class: 'alc-obj' },
-          h('span', { class: 'alc-obj-lab', text: a.label || 'Objective' }),
+          h('span', { class: 'alc-obj-lab', text: fmtLabel(a.label || 'Objective') }),
           h('span', { class: 'alc-obj-num t-num', text: fmt(a.value) + ' / ' + fmt(a.target) })),
         h('div', { class: 'alc-obj-bar' }, bar));
       requestAnimationFrame(() => { bar.style.width = (frac * 100).toFixed(1) + '%'; });
@@ -536,7 +586,16 @@ export function createUI(handlers = {}) {
   function show(name) {
     if (name === 'menu') { show('attract'); openModes(); return; }
     const target = SCREENS[name] ? name : 'attract';
-    if (target === current && target !== 'attract') return;
+    // 'hud' is NOT idempotent, and skipping it was a real trap. Everything a
+    // new run needs reset — the payout baseline, the nudge clock, the best-run
+    // rail, the field list — lives in the hud branch below, so
+    // __game.start() called OVER a live run inherited the last run's state. No
+    // player path hits it (results and attract both pass through another
+    // screen first) but the payout gate did, and had to detour via attract()
+    // to get a clean run. Re-entering costs a hint that shows again, which
+    // after a resume is no loss.
+    if (target === current && target !== 'attract' && target !== 'hud') return;
+    const from = current;
     current = target;
 
     for (const k in SCREENS) SCREENS[k].classList.toggle('is-on', k === target);
@@ -559,14 +618,28 @@ export function createUI(handlers = {}) {
     // screen — which is the exact thing the guard in banner() exists to prevent,
     // arriving by the other door.
     if (target !== 'hud' && target !== 'pause') bannerHost.replaceChildren();
+    // A payout belongs to the run that earned it. It is a second and a half of
+    // life, so quitting on a chain used to be able to carry a +2,140 onto the
+    // results card — the same class of leak the banner line above exists for.
+    if (target !== 'hud') payout.reset();
 
     if (target === 'hud') {
+      hudHint.textContent = HINT[lastModeId] || HINT.play;
       hudHint.classList.remove('gone');
       clearTimeout(hintT);
       hintT = setTimeout(() => hudHint.classList.add('gone'), 4200);
       // A new run may be a different mode; make the next setHud re-read the
       // field list rather than inheriting the last run's panels.
       lastFields = '';
+      // Coming back from PAUSE is the same run continuing: resetting the payout
+      // baseline there would make the first chain after a pause pay out the
+      // whole run's score in one number.
+      if (from !== 'pause') {
+        payout.reset();
+        payMark = (window.__state && window.__state.score) || 0;
+        lastChains = -1; progPct = -1;
+        runAt = performance.now(); nudged = false;
+      }
     } else {
       zenPal.show(false);
       modeHud.reset();
@@ -586,6 +659,12 @@ export function createUI(handlers = {}) {
 
   let lastScore = -1, lastChains = -1, lastCombo = -1, lastMode = '';
   let lastModeId = '', lastFields = '', lastTidePct = '', fields = null;
+  // The payout is a DIFF, and the diff needs its own mark: `lastScore` moves on
+  // every frame the score does, so it cannot also be the baseline a chain is
+  // measured from. World.score only ever moves on a chain (world.js awards
+  // there and score.js replaces that award in onChain), so this difference is
+  // the exact award and not an approximation of it.
+  let payMark = 0, runAt = 0, nudged = false, progBest = 0, progPct = -1, progOn = false;
 
   /**
    * Which panels a mode gets is the MODE's decision, published as its `hud`
@@ -610,6 +689,18 @@ export function createUI(handlers = {}) {
     // landing on the objective is how ALCHEMY's "COMPLETE" ended up printed
     // twice, on top of itself. Move the banners below the panel instead.
     root.classList.toggle('has-panel', !F || F.has('objective') || F.has('flip'));
+
+    // The best-run rail. ALCHEMY already answers "am I getting anywhere" with an
+    // objective bar and a clock, so it does not get a second one; ZEN has no
+    // score to make progress against. What is left is exactly the four endless
+    // modes, two of which are the ones a playtester sat in at zero for minutes.
+    const save = window.__game && window.__game.save;
+    progBest = (has('score') && !has('objective') && save && save.bestFor)
+      ? (save.bestFor(lastModeId) || 0) : 0;
+    progOn = progBest > 0;
+    hudProg.classList.toggle('off', !progOn);
+    progPct = -1;
+
     modeHud.reset();
     return F;
   }
@@ -631,11 +722,51 @@ export function createUI(handlers = {}) {
       hudVal.textContent = fmt(score);
       if (jump) { hudVal.classList.remove('bump'); void hudVal.offsetWidth; hudVal.classList.add('bump'); }
     }
-    if (s.chains !== lastChains) { lastChains = s.chains; pillChains.lastElementChild.textContent = fmt(s.chains); }
+    if (s.chains !== lastChains) {
+      // A chain landed between this frame and the last. `s.chain`, if the sim
+      // ever publishes it, carries the grain count and where on the board it
+      // went; without it the payout still knows what it was worth and rises
+      // from mid-board. The shell does not go looking in the grid for the rest.
+      const d = s.chains - lastChains;
+      if (lastChains >= 0 && d > 0) {
+        const c = s.chain || null;
+        payout.chain({ gain: score - payMark, chains: d,
+          size: c && c.size, x: c && c.x, y: c && c.y });
+      }
+      payMark = score;
+      lastChains = s.chains;
+      pillChains.lastElementChild.textContent = fmt(s.chains);
+    }
     if (s.combo !== lastCombo) {
       lastCombo = s.combo;
       pillCombo.classList.toggle('hide', !(s.combo > 1));
       pillCombo.lastElementChild.textContent = 'x' + (s.combo || 1);
+    }
+
+    if (progOn) {
+      // The rail is capped at 100%, so the percentage alone cannot tell "at your
+      // best" from "past it" — and past it is the whole moment. Beating it is
+      // part of the key, or the label never flips.
+      const beat = score > progBest;
+      const pct = Math.min(100, Math.round((score / progBest) * 100));
+      const key = pct + (beat ? 1 : 0) * 1000;
+      if (key !== progPct) {
+        progPct = key;
+        progFill.style.width = pct + '%';
+        hudProg.classList.toggle('is-best', beat);
+        progLab.textContent = beat ? 'new best' : 'best ' + fmt(progBest);
+      }
+    }
+
+    // Zero for half a minute with no chain is the state a playtester sat in and
+    // could not read. Say the rule once, then go quiet again.
+    if (!nudged && runAt && lastChains <= 0 && (!fields || fields.has('score'))
+        && performance.now() - runAt > NO_CHAIN_AFTER) {
+      nudged = true;
+      hudHint.textContent = NO_CHAIN_HINT;
+      hudHint.classList.remove('gone');
+      clearTimeout(hintT);
+      hintT = setTimeout(() => hudHint.classList.add('gone'), 6000);
     }
 
     const tide = modeHud.update(s, fields);
@@ -707,7 +838,7 @@ export function createUI(handlers = {}) {
     setHud,
     banner,
     results(r = {}) {
-      lastScore = -1; lastChains = -1; lastCombo = -1;
+      lastScore = -1; lastChains = -1; lastCombo = -1; payMark = 0;
       const alc = r.modeId === 'alchemy' && r.alchemy ? r.alchemy : null;
       runCard.classList.toggle('hide', !!alc);
       alcCard.classList.toggle('hide', !alc);
@@ -724,6 +855,10 @@ export function createUI(handlers = {}) {
     },
     openModes, openLevels, openSettings: () => settings.show(), openDaily,
     wmSeek: (ms) => wm.seek(ms),
+    /** Wind this run's clock back, so a gate can reach the chainless nudge in
+     *  under 25 real seconds. Same idea as wmSeek: it moves the CLOCK, it does
+     *  not fake the outcome — every condition on the nudge still has to hold. */
+    nudgeSeek: (ms) => { if (runAt) runAt -= ms; },
     zen: zenPal,
     get screen() { return current; },
   };

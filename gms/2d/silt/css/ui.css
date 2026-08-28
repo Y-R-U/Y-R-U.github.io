@@ -140,12 +140,12 @@
   margin-top: 20px;
   font-size: 10.5px; font-weight: 600;
   letter-spacing: .38em; text-transform: uppercase;
-  color: rgba(246,239,228,.46);
+  color: rgba(246,239,228,.72);
   text-align: center;
-  text-shadow: 0 1px 12px rgba(0,0,0,.8);
+  text-shadow: var(--keyline);
   opacity: 0; animation: rise 1.1s .5s var(--ease-out) forwards;
 }
-.tagline em { font-style: normal; color: rgba(255,206,130,.78); }
+.tagline em { font-style: normal; color: rgba(255,206,130,.92); }
 
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
@@ -158,18 +158,18 @@
 .bestline .t-cap { display: block; margin-bottom: 3px; }
 .bestline b {
   font-size: 15px; font-weight: 600; letter-spacing: .06em;
-  color: rgba(255,214,150,.92);
-  text-shadow: 0 1px 4px rgba(0,0,0,.9);
+  color: rgba(255,214,150,.96);
+  text-shadow: var(--keyline);
 }
-.bestline .t-cap { text-shadow: 0 1px 4px rgba(0,0,0,.9); }
+.bestline .t-cap { color: rgba(246,239,228,.62); text-shadow: var(--keyline); }
 
 .hint {
   position: absolute; left: 0; right: 0;
   bottom: calc(var(--edge) + 70px);
   text-align: center; font-size: 9.5px; letter-spacing: .3em;
   text-transform: uppercase; font-weight: 600;
-  color: rgba(246,239,228,.4);
-  text-shadow: 0 1px 3px rgba(0,0,0,.9), 0 0 14px rgba(0,0,0,.8);
+  color: rgba(246,239,228,.68);
+  text-shadow: var(--keyline);
   opacity: 0; animation: rise 1.2s 1.6s var(--ease-out) forwards;
 }
 
@@ -189,6 +189,17 @@
    which is a row that has technically fitted and visibly has not. */
 @media (max-width: 385px) {
   .attract-btns .gb--pill { padding: 0 15px; gap: 7px; }
+}
+
+/* ...and the same row is 30 px wider again once STORY carries "lv 25", which
+   is every returning player and nobody the gates had a profile for: measured,
+   the three doors go from an 8 px gap to touching at 390 px and to overflowing
+   an SE. Tighten only when the label is there — a new player, who has no label,
+   keeps the roomier pill. */
+#ui.has-story-lv .attract-btns .gb--pill { padding: 0 13px; gap: 6px; }
+#ui.has-story-lv .btn-sub { font-size: 11px; letter-spacing: .06em; }
+@media (max-width: 385px) {
+  #ui.has-story-lv .attract-btns .gb--pill { padding: 0 11px; gap: 5px; }
 }
 
 /* The middle door is an icon, and an icon is not an excuse for a small target:
@@ -291,6 +302,36 @@
 .pill--combo b { color: #fff0d2; }
 .pill.hide { display: none; }
 
+/* Progress when the score cannot supply any.
+
+   A run sat at 0 for two minutes is indistinguishable from a broken game, and
+   HOURGLASS and JELLY can genuinely be played that way. This is your best run
+   in this mode as a 3 px rail under the pills — the only "are you getting
+   anywhere" the shell can answer honestly without reading the sim. See
+   applyFields for who gets one. */
+.hud-prog {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 9px; max-width: 190px;
+}
+.hud-prog.off { display: none; }
+.hud-prog-bar {
+  position: relative; flex: 1 1 auto; height: 3px; border-radius: 2px;
+  background: rgba(246,239,228,.15);
+  overflow: hidden;
+}
+.hud-prog-bar i {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255,196,110,.5), rgba(255,214,150,.92));
+  transition: width .45s var(--ease-out);
+}
+.hud-prog-lab { color: rgba(246,239,228,.4); font-size: 9px; letter-spacing: .18em; }
+.hud-prog.is-best .hud-prog-bar i {
+  background: linear-gradient(90deg, rgba(255,180,70,.7), #ffd894);
+  box-shadow: 0 0 12px rgba(255,160,50,.6);
+}
+.hud-prog.is-best .hud-prog-lab { color: #ffd79a; }
+
 /* next piece — second in the control column, so it sits UNDER the account
    avatar rather than beside it. The avatar is 40 px tall in the top-right
    corner and publishes its footprint as --br8t-account-space; the pause button
@@ -339,8 +380,8 @@
   bottom: calc(var(--edge) + 6px);
   text-align: center; font-size: 9px; letter-spacing: .24em;
   text-transform: uppercase; font-weight: 600;
-  color: rgba(246,239,228,.44);
-  text-shadow: 0 1px 3px rgba(0,0,0,.9), 0 0 14px rgba(0,0,0,.8);
+  color: rgba(246,239,228,.7);
+  text-shadow: var(--keyline);
   transition: opacity .8s var(--ease);
 }
 .hud-hint.gone { opacity: 0; }
@@ -623,6 +664,89 @@
   content: ''; position: absolute; inset: 5px; border-radius: 50%;
   border: 1px solid rgba(246,239,228,.45);
   background: linear-gradient(45deg, transparent 44%, rgba(246,239,228,.62) 46%, rgba(246,239,228,.62) 54%, transparent 56%);
+}
+
+/* ----------------------------------------------------------------- payout */
+/* What a chain is worth, on the board where the chain happened.
+
+   The whole point is the position: the score lives top-left in 30 px of white
+   and a dissolve used to move a 10 px pill in the corner. This is the same
+   quantity, printed over the sand, in the same light weight as the score so it
+   reads as the score arriving rather than as a slot machine.
+
+   pointer-events stays none the entire way down. This element sits over the
+   middle of the board, which is precisely where a thumb rests for a whole run —
+   one auto here and the piece stops responding. */
+
+.payout-host {
+  position: absolute;
+  left: var(--board-x, 0px); top: var(--board-y, 0px);
+  width: var(--board-w, 100%); height: var(--board-h, 100%);
+  pointer-events: none; z-index: 3;
+}
+.payout {
+  position: absolute;
+  transform: translate(-50%, -50%) translateY(12px) scale(.88);
+  opacity: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  white-space: nowrap;
+  transition: opacity .22s var(--ease-out), transform .22s var(--ease-out);
+}
+/* The hold is a slow drift, not a freeze: 900 ms of stillness over moving sand
+   reads as a stuck element. */
+.payout.is-in {
+  opacity: 1;
+  transform: translate(-50%, -50%) translateY(-16px) scale(1);
+  transition: opacity .24s var(--ease-out), transform 1.5s linear;
+}
+.payout.is-out {
+  opacity: 0;
+  transform: translate(-50%, -50%) translateY(-52px) scale(.99);
+  transition: opacity .62s var(--ease), transform .62s var(--ease-out);
+}
+/* A dissolve is the brightest thing that ever happens on this board, and the
+   payout lands in the middle of it. The first version veiled the sand behind
+   the number with a soft radial — which is what the rest of the shell does for
+   type over sand, and it was the wrong instrument here: a veil is a dark area,
+   and JELLY LAB's board is a near-white light panel, so the veil read as a
+   grey thumbprint smeared across the brightest thing in the game.
+   The keyline (see style.css) is the fix, because it is contrast with no area
+   to it. The amber glow stays: it costs nothing on a bright field, where it is
+   invisible, and it is what makes the number feel lit on a dark one. */
+.payout-num {
+  font-size: 30px; line-height: 1; font-weight: 300; letter-spacing: -.01em;
+  color: #fff8ec;
+  text-shadow: var(--keyline-lg), 0 0 22px rgba(255,196,120,.3);
+}
+.payout-num.hit { animation: payhit .3s var(--ease-out); }
+@keyframes payhit { 0% { transform: scale(1.16); } 100% { transform: scale(1); } }
+
+/* The caption only exists when there is something to say — a cascade, or a
+   clear big enough that the number alone undersells it. An always-on second
+   line is a label, and a label is not a reward. */
+.payout-cap {
+  display: none;
+  font-size: 10px; letter-spacing: .26em; font-weight: 700;
+  color: #ffe2b0;
+  text-shadow: var(--keyline);
+}
+.payout-cap.on { display: block; }
+
+/* Magnitude. Judged against this run's own mean award — see payout.js — so a
+   300-grain clear and a 7,000-grain clear cannot print the same. */
+.payout.is-big .payout-num {
+  font-size: 38px; color: #ffeacb;
+  text-shadow: 0 2px 22px rgba(0,0,0,.85), 0 0 34px rgba(255,176,72,.46);
+}
+.payout.is-huge .payout-num {
+  font-size: 46px; font-weight: 350; color: #ffd894;
+  text-shadow: 0 2px 24px rgba(0,0,0,.88), 0 0 46px rgba(255,150,40,.62);
+}
+.payout.is-huge .payout-cap { color: rgba(255,226,176,.94); }
+
+@media (prefers-reduced-motion: reduce) {
+  .payout, .payout.is-in, .payout.is-out { transition-duration: .01ms; }
+  .payout-num.hit { animation: none; }
 }
 
 /* ------------------------------------------------------------------ banner */
@@ -1140,5 +1264,9 @@ input[type=range]::-moz-range-thumb { width: 15px; height: 15px; border-radius: 
 
 .card--alc .statrow { margin-top: 18px; align-items: center; }
 .card--alc .statrow > div { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+/* "TIME 10s" could not be told apart from time REMAINING on a card that also
+   carries a countdown, so the caption is now TIME TAKEN — which is one word
+   wider than the third of a card it has to sit in. */
+.card--alc .statrow .t-cap { letter-spacing: .13em; white-space: nowrap; }
 .card--alc .card-row .gb { font-size: 11px; letter-spacing: .1em; }
 .lv-cont-n { margin-left: 2px; font-weight: 700; letter-spacing: .1em; color: rgba(255,236,204,.75); }

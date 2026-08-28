@@ -304,6 +304,32 @@ function haptic(ms) {
   try { navigator.vibrate && navigator.vibrate(ms); } catch (e) { /* not permitted */ }
 }
 
+/**
+ * WHERE the chain went, in board coordinates the shell can use directly.
+ *
+ * The payout rises off the band that ignited rather than out of the middle of
+ * the screen, and the shell must not go looking in the grid for that — it is a
+ * pure function of the sim, so the sim publishes it. Normalised 0..1 across the
+ * board, which is the only form that survives a mode changing the grid size.
+ *
+ * A chain is a connected component spanning both walls, so its centroid is
+ * always mid-board horizontally; the y is the part that carries information.
+ */
+let lastChainAt = null;
+
+function markChain() {
+  const cells = world.clears.lastChain;
+  if (!cells || !cells.length) { lastChainAt = null; return; }
+  const g = world.g;
+  let sx = 0, sy = 0;
+  for (let k = 0; k < cells.length; k++) { const i = cells[k]; sx += i % g.cols; sy += (i / g.cols) | 0; }
+  lastChainAt = {
+    x: (sx / cells.length) / g.cols,
+    y: (sy / cells.length) / g.rows,
+    size: world.lastChainSize,
+  };
+}
+
 function simTick() {
   const before = world.chains;
   // land() nulls the piece and returns; the next spawn is a whole tick later,
@@ -314,6 +340,7 @@ function simTick() {
   if (world.chains > before) {
     AUDIO.sfx('chain', world.lastChainSize);
     if (state === 'play') haptic(Math.min(38, 12 + world.lastChainSize / 90));
+    markChain();
   }
   // Delegate to the modes lane's reference host loop: world.tick -> onChain ->
   // onTick. onTick running LAST is what lets the scorer diff world.score across
@@ -364,6 +391,7 @@ function frame(now) {
       hud: mode.hud,
       // modes publish their own state; the shell shows what it recognises
       tide: world.tide, hourglass: world.hourglass, alchemy: world.alchemy, zen: world.zen,
+      chain: lastChainAt,
     });
   }
 }
