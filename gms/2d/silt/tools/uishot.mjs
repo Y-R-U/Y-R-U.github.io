@@ -399,6 +399,11 @@ async function probe() {
 async function drive(cond, max = 40000) {
   const raw = await cdp.eval(`(async () => {
     const { Bot } = await import('${base}/gms/2d/silt/js/ai/bot.js');
+    // PARK THE HOST LOOP FIRST. Under ?auto the page is already running its own
+    // bot against this world, and stepping it from here as well put two bots on
+    // one piece — the same seed produced 3 stars on one run and 2 on the next,
+    // and the star check below blamed the campaign for it.
+    window.__game.hold(true);
     const w = window.__game.world;
     const bot = new Bot(w);
     const hit = (w) => (${cond});
@@ -408,6 +413,7 @@ async function drive(cond, max = 40000) {
       if (hit(w)) { reached = true; break; }
       if (w.over) break;
     }
+    window.__game.hold(false);
     return JSON.stringify({ i, reached, over: w.over, t: +w.t.toFixed(1), score: w.score, chains: w.chains });
   })()`);
   return JSON.parse(raw);
@@ -1221,7 +1227,10 @@ async function alchemyWin() {
   const onTile = await q(`(() => { const t = document.querySelectorAll('.sheet--lv .lvt')[${lv.id - 1}];
     return t ? t.querySelectorAll('.lvt-stars svg.on').length : -1; })()`);
   ok('the results card opens the campaign with the new stars already on the tile',
-    tiles > 0 && onTile === earned, `${tiles} tiles, lv ${lv.id} shows ${onTile} of ${earned}`);
+    // >= not ===: the save banks the BEST stars a level has ever given you, and
+    // this gate wins level 1 twice. Its sibling check further down already knew
+    // that. It only surfaced when honest star thresholds made level 1 vary.
+    tiles > 0 && onTile >= earned, `${tiles} tiles, lv ${lv.id} shows ${onTile} of ${earned}`);
   // Counting tiles is not seeing them. This check counted 96 of them while the
   // picker was rendering BEHIND the result card that opened it, invisible to
   // the player, and stayed green for the whole of that bug's life.

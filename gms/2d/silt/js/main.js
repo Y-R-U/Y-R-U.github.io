@@ -226,6 +226,7 @@ function attractExhausted() {
 }
 
 let attractRuns = 0;   // how many title-screen runs this session; __state.runs
+let held = false;      // __game.hold(true): the host loop stops stepping the sim
 
 function startAttract() {
   attractRuns++;
@@ -356,7 +357,7 @@ function frame(now) {
   frames++; fpsT += dt;
   if (fpsT >= 0.5) { fps = frames / fpsT; frames = 0; fpsT = 0; }
 
-  if (state === 'play' || state === 'attract') {
+  if (!held && (state === 'play' || state === 'attract')) {
     acc += dt;
     let n = 0;
     while (acc >= 1 / SIM_HZ && n < MAX_STEPS) {
@@ -434,6 +435,16 @@ window.__game = {
   start: startGame, attract: startAttract, save,
   get input() { return INPUT; },
   startLevel(n) { return startGame('alchemy', { level: n | 0 }); },
+  /**
+   * PARK THE HOST LOOP so a tool can step the sim itself.
+   *
+   * Without this, a harness that drives the world with step() while the page's
+   * own ?auto bot is still running has TWO bots issuing moves into one world.
+   * They fight over the same piece and the run is neither the tool's nor the
+   * game's — which is exactly what made a star count come out as 2 on one run
+   * and 3 on the next from the same seed.
+   */
+  hold(v) { held = !!v; return held; },
   step(n = 1) { for (let i = 0; i < n; i++) simTick(); },
   modes: () => modeList().map((m) => m.id),
 };

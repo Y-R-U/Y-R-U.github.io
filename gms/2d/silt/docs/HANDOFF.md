@@ -745,3 +745,295 @@ a rAF counter for pixels, a bounds test for a ledger, a click for a touch target
 a DOM query for what a player can see. CLAUDE.md's rule holds per GATE and not
 per CHECK, and that gap is what a lost context cost. Every gate added in this
 pass has an arm, and every arm was watched going red.
+
+
+## The opening grace, honest stars, and a masher — 2026-08-28, lane C
+
+The build was finally played by a human. Two reports, and the second one turned
+out to be about the mechanic that had just been added to fix it.
+
+### (a) The opening was too hard, and the reason is structural
+
+"I've failed a bunch of times, the first level I think I got 3 stars, and since
+then I've had 3 one-stars and a single two-star mixed with failures. Maybe after
+you have played 10 levels or more it should be around that difficulty? So maybe
+reduce the points needed for the first 10 levels or so by 10 to 20%."
+
+He is describing a campaign with no allowance in it, and the allowance was
+missing for a reason worth naming rather than tuning around: **every target is
+0.6 of what `js/ai/bot.js` reached, and every star time is a multiple of what
+the BOT took.** The bot has played the game a thousand times. Level 1 therefore
+opened at the bot's own pace with nothing subtracted for not yet knowing what
+sand does.
+
+Measured, on the table he actually played and with the span bonus switched off
+because it did not exist yet — first ten levels, three seeds each, thirty runs:
+
+| | fail | 1-star | 2-star | 3-star |
+|---|---|---|---|---|
+| what he played | 2 | 2 | 13 | 13 |
+
+That is the BOT's result. He is slower than the bot, which is why his own run of
+the same ten levels was worse than this — failures plus three 1-stars.
+
+### The curve: ONE number, applied to both halves
+
+Two complaints are hiding in his sentence and they need different levers. A
+level you FAIL is a target problem; a level you 1-STAR is a threshold problem.
+He reported both, so both are eased, by the same fraction `g`:
+
+```
+target  = round(reach * 0.6 * (1 - g))      ask for less
+2-star  = med  * 1.15 * (1 + g)             rate more generously
+3-star  = fast * 1.05 * (1 + g)
+```
+
+```
+levels 1-9    g = 0.20     the full allowance
+levels 10-18  g tapers linearly 0.18 -> 0.02
+level 19+     g = 0        the measured baseline, unchanged
+```
+
+Top of the asked-for 10-20% band rather than the middle, because 10% would not
+have moved a failure and he reported failures. Linear taper rather than a step
+so no level is visibly harder than the one before it, reaching baseline at 19 —
+inside the "roughly 15 to 20" the job asked for. The two halves compound on
+purpose: a shorter level is also a faster one, so the clock relief lands on
+times that have already come down.
+
+`hold` and `zero` index the KEPT list, not the candidate list — `graceAt(kept.length)`
+is evaluated as each candidate is accepted, so a rejection slides the ramp along
+instead of punching a hole in it.
+
+**After, same measurement, same ten positions on the regenerated table:**
+
+| | fail | 1-star | 2-star | 3-star | mean |
+|---|---|---|---|---|---|
+| what he played | 2 | 2 | 13 | 13 | 2.23 |
+| now | **0** | 1 | 8 | 21 | **2.67** |
+
+All ten now win 3 of 3 seeds; nine of the ten sit at target/reach 0.48 where the
+campaign baseline is 0.60.
+
+### (b) Mashing beat thinking — and the fix for it was making that WORSE
+
+"The way to get points faster is to swipe down around the board fast. Not
+strategy." A star is a pure time threshold, so thinking cost wall-clock and
+bought nothing. The answer already shipped was `ALCHEMY_CFG.spanSeconds`:
+`min(8, n^2/1.2e6)` for every chain over 900 cells, summed, quadratic so that
+one 4,000-grain span would beat four 1,000-grain ones.
+
+Nothing in this suite could tell whether it worked, because every gate is played
+by the bot, which places deliberately. So `tools/modesim.mjs --masher` now plays
+three ABLATIONS of the same bot, changing one thing at a time:
+
+| | placement | drop |
+|---|---|---|
+| `bot` | chain-building | soft |
+| `swift` | chain-building | HARD |
+| `masher` | flattest landing only | HARD |
+
+`masher` deletes the two terms in `Bot._score` that encode intent — same-tint
+adjacency and wall contact — and keeps only "do not build a tower". It is not a
+bad player, it is a player with no plan.
+
+**The first masher picked a column at random. Throw that instrument away:** it
+lost 26 of 36 runs by topping the board out, which made the mechanic look like a
+triumph and proved nothing, because a masher who cannot finish a level is not
+the player who filed the report. Its ten wins were all three-star. A weak
+adversary is a believable wrong metric.
+
+Against the fair one, on the shipped table, 18 runs:
+
+| | drops/s | chains/run | median chain | best-of-run share | bonus/run |
+|---|---|---|---|---|---|
+| bot | 2.25 | 3.9 | 1199 | 0.577 | **6.3s** |
+| masher | 10.42 | **103.3** | **1537** | 0.648 | **260.7s** |
+
+**Mashing does not make smaller chains. It makes bigger ones**, because chain
+size is a function of how much sand is standing on the board and throughput is
+what puts it there — and it makes twenty-six times as many. A per-chain bonus
+times 26x the chances is a mashing amplifier however superlinear it is in size.
+The mechanic added to beat mashing was paying a masher 41x what it paid a
+deliberate player, and was the strongest reason to mash in the game.
+
+### The bonus, rebuilt: paid ONCE, on a SHARE
+
+Two changes, each aimed at one of those two numbers.
+
+**Paid once.** The bonus is your WIDEST span, not the sum — you are paid the
+improvement each time you beat your own best. 26x the chances then buys 26x of
+nothing and the count advantage is gone outright.
+
+**Paid on a share.** The unit is the fraction of the standing board the span
+took, not its raw cell count, so a full board does not pay more than a clean one
+for the same act. Best-of-run share is bot 0.577 against masher 0.648 — 1.12x,
+where raw cells gave 1.84x.
+
+`spanShare: (f) => min(8, max(0, f - 0.30) * 17.8)`. Nothing below 0.30 of the
+board, full 8s at 0.75, and the 900-cell floor still keeps incidental chains
+from paying. Measured after: **bot 3.6s/run, masher 3.1s/run — 0.88x, from 41x.**
+
+### What that does NOT fix, said plainly
+
+**It stops the bonus rewarding mashing. It does not make thinking beat mashing,
+and no time bonus can.** On the regenerated table, 12 levels x 3 seeds:
+
+| | wins | mean stars | stars per WIN | 3-star |
+|---|---|---|---|---|
+| bot | 35/36 | 2.33 | 2.40 | 15 |
+| swift | 30/36 | 2.50 | 3.00 | 30 |
+| masher | 30/36 | **2.50** | **3.00** | **30** |
+
+Head to head over 12 levels: strategy 2, mashing 9, tie 1. **The masher
+three-stars every single level it finishes.** Its only price is the fail rate,
+6 in 36 against the bot's 1.
+
+The reason is not the bonus and not the floor. It is that **every objective in
+this campaign is a volume race** — clear N chains, dissolve N grains, forge N
+crystal, reduce sand to N — and volume is exactly what throughput buys. `swift`
+is the control that proves the placement heuristic is not the variable: give the
+deliberate bot a hard drop and it scores identically to the masher.
+
+The lever that would actually settle it is an objective volume cannot buy, or a
+piece economy that charges for the drop (which would make `elapsed` count pieces
+as well as seconds — entirely inside `alchemy.js`, but it changes what the HUD
+clock means and is a design call, not a regeneration pass). **Not invented here.**
+
+### A measurement fault that was quietly recording losses as wins' opposite
+
+`playLevel` capped a run at `limitS + 5`. That was correct while the effective
+clock and the wall clock were the same thing and became wrong the moment a span
+started buying seconds back. Level 8 on the old table, seed 1213, earns 26.1s of
+bonus and legitimately runs to 68.4s against a 63s limit — the cap cut it off at
+68.0 and recorded a LOSS on a level the bot had won. Now `limitS * 2 + 30`,
+which costs nothing because the mode ends the level itself.
+
+### New gates, both armed
+
+**A6-grace** — the ramp has to be in the TABLE, not just in the generator, and
+it checks two things because they fail separately. That `lv.grace` matches the
+documented curve catches a table generated by an older tool. That a graced
+level's 2-star is actually at least `1.15 * (1 + g)` of its recorded median
+catches the worse case: the annotation surviving while the relief does not, so
+the table LOOKS eased and is not. `--break grace` injects one fault of each kind
+into two different levels and both must be reported.
+
+0.2s of slack on the second half, and it is arithmetic not judgement: `med` and
+`stars` are both stored to one decimal, so re-deriving the threshold can
+overshoot by up to 0.12s. Five levels tripped on exactly that. The relief being
+looked for is 0.23 x med, which is 6-8s.
+
+**A7-masher** — opt-in, and it does NOT assert that strategy wins, because
+measurement says it does not and a gate that is red by design is a gate nobody
+reads. It asserts the property the mechanic actually promises and the first
+version violated 41x: the bonus may not be bought with throughput. `--break masher`
+restores `min(8, n^2/1.2e6)` summed, verbatim.
+
+### Regenerated
+
+190 candidates -> **119 kept, 71 rejected**. Acts **18 / 28 / 26 / 23 / 24**,
+ids contiguous, aspect 0.500 throughout, 0 tight, 0 below floor, max
+target/reach 0.780, med/limit p50 0.42, 104/119 at 3 of 3 wins.
+
+| rejected | why |
+|---|---|
+| 32 | no headroom |
+| 23 | trivially complete |
+| 9 | only 1/3 wins |
+| 4 | only 0/3 wins |
+| 3 | unreachable |
+
+Keep rate 63%, against 67% before the grace. Three more seed families at 30
+candidates: **20 / 17 / 22 kept**, 0 tight in all three.
+
+| archetype | before (107) | after (119) |
+|---|---|---|
+| span | 10 | 12 |
+| excavate | 32 | 38 |
+| quench | 4 | 4 |
+| crucible | 32 | 38 |
+| slag | 29 | 27 |
+
+A first pass at 165 candidates kept only 95, one short of the 96 floor. That is
+the grace costing levels — 26 trivial rejections against 14 before — and it is
+the honest cost of asking for less.
+
+### THE CAMPAIGN NO LONGER OPENS ON A SPAN LEVEL, and it is not a bug
+
+`archetypeFor` teaches chains in candidates 1-6. All six were culled:
+
+```
+candidate 1 span: no headroom: a 2 floor is 1.00x the bot's reach of 2
+candidate 2 span: only 1/3 wins
+candidate 3 span: no headroom: a 2 floor is 1.00x the bot's reach of 2
+candidate 4 span: no headroom: a 2 floor is 2.00x the bot's reach of 1
+candidate 5 span: only 1/3 wins
+candidate 6 span: no headroom: a 2 floor is 2.00x the bot's reach of 1
+```
+
+Four of them top the board out at ~41s against a 60s limit and reach one or two
+chains. The old table shipped candidate 5 at 2/3 wins; it is a coin flip and it
+came up tails. **The early span boards are structurally fragile** — an 80-wide
+board, three tints and a single crystal pillar is a hard first chain — and the
+campaign now opens on `excavate` ("Dissolve 7,228 grains", target/reach 0.48,
+med 30.7s of a 61s limit, 3/3 wins), which is a gentler opening but not the
+ladder `levelgen.js` intends. **If the chain-teaching opening matters, the lever
+is `pillars()` and the span scene at d≈0, not the acceptance path.**
+
+### Gates
+
+| gate | result |
+|---|---|
+| `node tools/sim.mjs` | PASS, 0.088 ms/tick |
+| `node tools/jellysim.mjs` | PASS |
+| `node tools/modesim.mjs` | PASS, aspect 0.500-0.500, 0 tight, 0 grace faults |
+| `node tools/modesim.mjs --levels` | PASS, 119/119 beaten on >= 2 of 3 seeds |
+| `node tools/boot.mjs` | PASS, 14 checks, real renderer |
+| `node tools/gfx_shot.mjs --check` | PASS, board-rect 0.4px worst edge |
+| `node tools/uishot.mjs --probe` | PASS |
+| `node tools/uishot.mjs --hit` | PASS, 54 controls, 0 too small |
+| `node tools/uishot.mjs --win --only=none` | **1 RED — see below** |
+| `--break ledger / score / stall / rng / tide / zen / slots` | all red, arms confirmed |
+| `--break trivial / unwinnable / span` (gen path) | all red, arms confirmed |
+| `--break aspect` (shipped) | red, `1/119 board(s) letterbox` |
+| `--break aspect` (gen path) | red, `1/30 board(s) letterbox` |
+| `--break headroom` | red, `1/119 level(s) ship a target above 0.8` |
+| `--break grace` | red, BOTH halves: `1 2-star 35.3s not eased to 42.4s` and `2 grace -1 want 0.20` |
+| `--break masher` | red, `11.7x` |
+
+### The one red, and why it is the tool and not the table
+
+`uishot.mjs --win`: *"the results card opens the campaign with the new stars
+already on the tile — 119 tiles, lv 1 shows 2 of 1"*. Reproducible.
+
+`drive()` (uishot.mjs:399) constructs **its own Bot** and steps the world with
+`__game.step(1)` while the page's own `?auto` bot is also running `bot.update()`
+in the rAF loop. Two bots on one world is a race, and it is the only
+nondeterminism in the browser: an independent CDP probe of the same URL, seed
+and viewport that does NOT add a second bot wins level 1 at `t 31.8, elapsed
+26.36, 3 stars` on both of two consecutive loads, banking `{"1":3}`.
+
+The `--win` section wins level 1 twice — once for the card, once after
+re-loading `wonUrl` — and captures `earned` from the FIRST. `save.recordLevel`
+banks the MAXIMUM. So the tile legitimately shows the better of two runs while
+`earned` holds the worse, and line 1224 compares them with `===` where its
+sibling at line 1181 already, correctly, uses `>=`.
+
+**Why now:** on the old table every level-1 run landed 3 stars, because the
+thresholds were generous by the entire span bonus, so the two runs always
+agreed. Honest thresholds make level 1 land at 1, 2 or 3 depending on how the
+two bots interleave, and the latent equality assertion surfaced.
+
+`tools/uishot.mjs` belongs to lane B and was not touched. The fix is `onTile >= earned`,
+or capture `earned` after the final win. **Not verified beyond the above** — I
+did not edit the tool to confirm the second run's star count directly.
+
+### Also flagged, not acted on
+
+- **Quench is still 4 levels** and its median win is 14.0s against limits of
+  60-100s. Same finding as before: crystal saturates and the objective is wrong,
+  not the number.
+- **span is 12**, above the 8 the manager once set as a stop line.
+- `world.alchemy.bonus` is now always equal to the widest span, not a running
+  total. Nothing reads it but the HUD and the gates.

@@ -13,10 +13,12 @@
 //                                              a second seed family, no write —
 //                                              one family is never enough to
 //                                              believe a balance number
+//   node tools/modesim.mjs --masher            strategy vs mashing on shipped levels
+//   node tools/modesim.mjs --masher --levels   ... on all of them
 //   node tools/modesim.mjs --break <gate>      falsification arm: that gate MUST go red
 //
 // break gates: ledger  score  stall  rng  tide  zen  slots  trivial  unwinnable  span
-//              aspect  headroom
+//              aspect  headroom  grace
 
 import { World, SIM_HZ, DEFAULT_CFG } from '../js/sim/world.js';
 import { Grid, F_CLEARING } from '../js/sim/grid.js';
@@ -25,10 +27,11 @@ import { makeRng } from '../js/core/rng.js';
 import { Bot } from '../js/ai/bot.js';
 import { EMPTY, MAT_COUNT, CRYSTAL, TINTABLE, SAND, WATER } from '../js/sim/materials.js';
 import { Clears } from '../js/sim/clears.js';
+import { BLK, pieceBounds } from '../js/sim/pieces.js';
 import { MODES, byId, configFor } from '../js/modes/index.js';
 import { floodGrid, tintZeroIsInert } from '../js/modes/tide.js';
 import { safeApi } from '../js/modes/api.js';
-import alchemy, { setLevels, starsFor } from '../js/modes/alchemy.js';
+import alchemy, { setLevels, starsFor, ALCHEMY_CFG } from '../js/modes/alchemy.js';
 import jelly from '../js/modes/jelly.js';
 import zen from '../js/modes/zen.js';
 import { genLevels, sceneSpans, applyScene, makeTracker } from '../js/data/levelgen.js';
@@ -47,6 +50,7 @@ const BREAK = opt('--break', null);
 const ONLY = opt('--mode', null);
 const GEN = has('--gen-levels') ? +(opt('--gen-levels', 120) || 120) : 0;
 const ALL_LEVELS = has('--levels');
+const MASHER = has('--masher');
 // Generation is deterministic in this seed. Sweeping it is how a balance claim
 // gets three independent families instead of one lucky one.
 const GEN_SEED = Number(opt('--gen-seed', '0x5117'));
@@ -88,6 +92,71 @@ function hashGrid(g) {
   return h >>> 0;
 }
 
+// ------------------------------------------------------------------ agents
+
+/**
+ * THE MASHER — the instrument the gates could not be.
+ *
+ * A star is a time threshold, so before the span bonus existed the optimal way
+ * to play ALCHEMY was to swipe every piece straight down as fast as the hand
+ * moves and never think about where it lands. The player found that in five
+ * levels. `ALCHEMY_CFG.spanShare` is the answer to it, and nothing in this
+ * suite could tell whether the answer works, because every gate is played by
+ * `js/ai/bot.js`, which DOES place deliberately. A mechanic meant to beat
+ * mashing has to be measured against a masher.
+ *
+ * These are ABLATIONS of the shipping bot, not separate players, so exactly one
+ * thing changes at a time:
+ *
+ *   bot      chain-building placement, soft drop      thinking, at thinking speed
+ *   swift    chain-building placement, HARD drop      thinking, at mashing speed
+ *   masher   flattest landing only, HARD drop         no intent, at mashing speed
+ *
+ * `masher` deletes the two terms in `Bot._score` that encode intent — same-tint
+ * adjacency and wall contact — and keeps only "do not build a tower". It is not
+ * a bad player; it is a player with no plan. `swift` is the control that
+ * separates the two variables: if swift beats masher, the bonus is paying for
+ * PLACEMENT, and if bot beats masher the bonus also covers the wall-clock that
+ * placement costs, which is the actual complaint.
+ *
+ * The first version of this picked a column at random. It lost 26 of 36 runs by
+ * topping the board out, which made the mechanic look like a triumph and proved
+ * nothing: a masher who cannot finish a level is not the player who reported
+ * the problem. Its ten wins were ALL three-star. A weak adversary is a
+ * believable wrong metric, so it was thrown away for this one.
+ */
+class HardDropper extends Bot {
+  update() {
+    const w = this.w;
+    if (w.over || !w.piece) { this.plan = null; return; }
+    if (!this.plan || this.plan.forPiece !== w.piece) {
+      const d = this.decide();
+      if (!d) return;
+      this.plan = { ...d, forPiece: w.piece };
+    }
+    const p = w.piece;
+    if (p.rot !== this.plan.rot) {
+      if (!w.rotate()) this.plan.rot = p.rot;
+      this.plan.forPiece = w.piece;
+      return;
+    }
+    if (p.x < this.plan.x) w.moveBy(Math.min(3, this.plan.x - p.x));
+    else if (p.x > this.plan.x) w.moveBy(-Math.min(3, p.x - this.plan.x));
+    if (w.piece && w.piece.x === this.plan.x) w.hardDrop();
+  }
+}
+
+class Masher extends HardDropper {
+  /** Bot._score with both intent terms removed. Keep the stack low, nothing else. */
+  _score(p, ox, oy) {
+    let maxTop = this.w.g.rows;
+    for (const c of p.cells) { const y0 = oy + c.by * BLK; if (y0 < maxTop) maxTop = y0; }
+    return (this.w.g.rows - maxTop) * -3.2;
+  }
+}
+
+const AGENTS = { bot: Bot, swift: HardDropper, masher: Masher };
+
 // ------------------------------------------------------------------ runner
 
 /**
@@ -122,13 +191,13 @@ async function playMode(mode, o = {}) {
   const err0 = check(world, `${mode.id} t0`);
   if (err0) { r.err = err0; return r; }
 
-  const bot = new Bot(world);
+  const agent = new (AGENTS[o.agent] || Bot)(world);
   const CAP = SIM_HZ * capS;
   let last = -1, same = 0;
   let t = 0;
   for (; t < CAP && !world.over; t++) {
     if (BREAK === 'stall' && t > 600) { same++; if (same > SIM_HZ * 12) { r.stalled = true; break; } continue; }
-    bot.update();
+    agent.update();
     const before = world.chains;
     world.tick();
     if (world.chains > before && mode.onChain) {
@@ -352,11 +421,29 @@ function gateBiomes() {
 
 // ---------------------------------------------------------- ALCHEMY levels
 
+/**
+ * How long a run may take in WALL-CLOCK seconds.
+ *
+ * The mode ends the level itself, at `world.t >= limitS + bonus`; this cap is
+ * only the safety net against a run that never ends. It used to be `limitS + 5`,
+ * which was correct when the effective clock and the wall clock were the same
+ * thing — and became a silent measurement fault the moment a big span started
+ * buying seconds back. Measured on the shipped table, level 8 seed 1213 earns
+ * 26.1s of bonus and legitimately runs to 68.4s against a 63s limit: the old cap
+ * cut it off at 68.0 and recorded a LOSS on a level the bot had won. A generous
+ * cap costs nothing, because the run still stops when the mode says so.
+ */
+const capFor = (lv) => lv.limitS * 2 + 30;
+
 /** Run one level through the real ALCHEMY module. */
-async function playLevel(lv, seed, capS) {
-  const r = await playMode(alchemy, { seed, capS: capS ?? lv.limitS + 5, opts: { level: lv.id } });
+async function playLevel(lv, seed, capS, agent) {
+  const r = await playMode(alchemy, { seed, capS: capS ?? capFor(lv), opts: { level: lv.id }, agent });
   const a = r.world.alchemy || {};
-  return { ...r, won: !!a.won, at: r.s, value: a.value, target: a.target };
+  // `at` is the EFFECTIVE clock, not the wall clock: a big span buys seconds
+  // back and a star is judged on what is left. Calibrating thresholds from
+  // world.t would make every one of them generous by the bonus earned.
+  return { ...r, won: !!a.won, at: a.elapsed != null ? a.elapsed : r.s, wall: +r.world.t.toFixed(1),
+           bonus: a.bonus || 0, value: a.value, target: a.target };
 }
 
 /**
@@ -402,6 +489,55 @@ const FLOOR = { chains: 2, dissolve: 900, crystal: 32, purge: 260 };
 const HEADROOM = 0.8;
 
 /**
+ * THE OPENING GRACE — one number, applied to both halves of "too hard".
+ *
+ * The player reached level 5 having failed several times, taken three 1-stars
+ * and one 2-star, and asked for "the points needed for the first 10 levels
+ * reduced by 10 to 20%". Two different complaints are hiding in that sentence
+ * and they need two different levers:
+ *
+ *   a level you FAIL is a TARGET problem     -> ask for less
+ *   a level you 1-STAR is a THRESHOLD problem -> rate more generously
+ *
+ * Both are the same underlying fault, which is worth naming because it is
+ * structural and not a tuning miss: every target is 0.6 of what `js/ai/bot.js`
+ * reached, and every star time is a multiple of what the BOT took. The bot is
+ * faster than a person who has never seen the game. So level 1 opens at the
+ * bot's own pace with no allowance at all for not yet knowing what sand does.
+ *
+ * `g` is that allowance, as a fraction, and it is applied twice:
+ *
+ *   target  = round(reach * 0.6 * (1 - g))     ask for less
+ *   2-star  = med  * 1.15 * (1 + g)            rate more generously
+ *   3-star  = fast * 1.05 * (1 + g)
+ *
+ * so at g = 0.20 a level asks for 48% of the bot's reach instead of 60%, and
+ * pays two stars at 1.38x the bot's median instead of 1.15x. The two compound
+ * on purpose: a shorter level is also a faster one, so the clock relief lands
+ * on times that have already come down.
+ *
+ *   levels 1-9   g = 0.20   the full allowance, the top of the asked-for band
+ *   levels 10-18 g tapers linearly 0.18 -> 0.02
+ *   level 19+    g = 0      the measured baseline, unchanged
+ *
+ * Top of the 10-20% band rather than the middle because he reported failures as
+ * well as 1-stars, and 10% would not have moved a failure. Linear taper rather
+ * than a step so there is no level where the campaign visibly gets harder in one
+ * jump; it reaches baseline at 19, inside the "roughly 15 to 20" it was asked to.
+ *
+ * `hold` and `zero` are indices into the KEPT list, not into the candidate list,
+ * so a rejection cannot shift the ramp off the levels a player actually sees.
+ */
+const GRACE = { max: 0.20, hold: 8, zero: 18 };
+
+/** idx is the 0-based position in the SHIPPED campaign, i.e. level id - 1. */
+function graceAt(idx) {
+  if (idx < GRACE.hold) return GRACE.max;
+  if (idx >= GRACE.zero) return 0;
+  return +(GRACE.max * (GRACE.zero - idx) / (GRACE.zero - GRACE.hold)).toFixed(3);
+}
+
+/**
  * FLOOR and HEADROOM have to be resolved TOGETHER, not applied in sequence.
  *
  * The calibrated target is 0.6 of reach. Clamping that UP to FLOOR is what
@@ -435,6 +571,43 @@ function resolveTarget(cal, floor) {
 function tightLevels(levels) {
   return levels.filter((lv) => lv.objective.type !== 'purge' && lv.reach > 0
     && lv.objective.target > HEADROOM * lv.reach);
+}
+
+/**
+ * A6 — the opening grace has to be IN THE TABLE, not just in the generator.
+ *
+ * Two separate things can go wrong and only one of them is about the curve.
+ * The curve can be lost outright — someone regenerates with an older tool, or
+ * the ramp is reindexed off the levels a player sees — and the campaign quietly
+ * goes back to opening at the bot's own pace. Or the annotation can survive
+ * while the relief does not, which is worse, because the table then LOOKS eased.
+ *
+ * So this checks both, and the second half is the one that matters: a graced
+ * level's 2-star must actually be at least `1.15 x (1 + g)` of the median the
+ * bot recorded. An ungraced table has it at exactly 1.15x and cannot pass. The
+ * only escape is `limitS`, which caps the 2-star from above — a level whose
+ * eased 2-star runs past its own time limit is capped, not ungraced.
+ *
+ * Costs no simulation: `measured` and `grace` are both written by the generator
+ * that ran the levels, so the relief can be re-derived from the file.
+ */
+function graceFaults(levels) {
+  const bad = [];
+  for (const lv of levels) {
+    const want = graceAt(lv.id - 1);
+    const got = typeof lv.grace === 'number' ? lv.grace : -1;
+    if (Math.abs(got - want) > 0.005) { bad.push(`${lv.id} grace ${got} want ${want.toFixed(2)}`); continue; }
+    if (!want || !lv.measured || !lv.stars) continue;
+    const eased = Math.min(lv.limitS, lv.measured.med * 1.15 * (1 + want));
+    // 0.2s of slack, and it is arithmetic rather than judgement: `measured.med`
+    // and `stars` are both stored to one decimal, so re-deriving the threshold
+    // from the rounded median can overshoot the rounded threshold by up to
+    // 0.05 * 1.38 + 0.05 = 0.12s. Five levels tripped on exactly that. The
+    // relief this is looking for is 0.23 * med, which is 6-8s — three orders
+    // away from the slack, so nothing real hides under it.
+    if (lv.stars[1] < eased - 0.2) bad.push(`${lv.id} 2-star ${lv.stars[1]}s not eased to ${eased.toFixed(1)}s (med ${lv.measured.med}s, g ${want})`);
+  }
+  return bad;
 }
 
 /**
@@ -504,11 +677,19 @@ async function calibrate(lv, frac) {
   return { reach: best, target: Math.round(best * frac) };
 }
 
-function starsFrom(times, limitS) {
+/**
+ * Star times from the EFFECTIVE clock, eased by the opening grace.
+ *
+ * `times` are `world.alchemy.elapsed` — wall clock minus whatever the run's big
+ * spans bought back. Every star time in the shipped table before this pass was
+ * measured from `world.t`, which is why the bot three-starred levels it used to
+ * two-star: the thresholds were generous by exactly the bonus each run earned.
+ */
+function starsFrom(times, limitS, g = 0) {
   const s = [...times].sort((a, b) => a - b);
   const fast = s[0], mid = s[(s.length / 2) | 0];
-  const two = Math.min(limitS, +(mid * 1.15).toFixed(1));
-  const three = Math.min(two - 0.5, +(fast * 1.05).toFixed(1));
+  const two = Math.min(limitS, +(mid * 1.15 * (1 + g)).toFixed(1));
+  const three = Math.min(two - 0.5, +(fast * 1.05 * (1 + g)).toFixed(1));
   return [limitS, two, Math.max(1, three)];
 }
 
@@ -533,8 +714,14 @@ async function generateLevels(count) {
 
   const kept = [], rejected = [];
   for (const lv of cands) {
+    // The grace is a property of a level's position in the CAMPAIGN, and the
+    // campaign is the kept list — so the index this candidate would occupy if
+    // it survives is exactly how many levels have been kept so far. Rejections
+    // therefore slide the ramp along instead of punching holes in it.
+    const g = graceAt(kept.length);
+    lv.grace = g;
     if (!sceneSpans(lv)) {
-      const cal = await calibrate(lv, 0.6);
+      const cal = await calibrate(lv, 0.6 * (1 - g));
       if (cal.err) { rejected.push([lv.id, lv.arch, 'invariant: ' + cal.err]); continue; }
       if (BREAK !== 'trivial' && BREAK !== 'unwinnable') {
         lv.reach = Math.round(cal.reach);
@@ -561,7 +748,7 @@ async function generateLevels(count) {
     if (v.trivial) { rejected.push([lv.id, lv.arch, 'trivially complete']); continue; }
     if (v.err) { rejected.push([lv.id, lv.arch, 'invariant: ' + v.err]); continue; }
     if (v.wins < 2) { rejected.push([lv.id, lv.arch, `only ${v.wins}/3 wins`]); continue; }
-    lv.stars = starsFrom(v.times, lv.limitS);
+    lv.stars = starsFrom(v.times, lv.limitS, g);
     lv.measured = { wins: v.wins, med: +med(v.times).toFixed(1), fast: +Math.min(...v.times).toFixed(1) };
     kept.push(lv);
   }
@@ -584,6 +771,99 @@ export default LEVELS;
 `;
   writeFileSync(join(HERE, '../js/data/levels.js'), out);
   return renum.length;
+}
+
+// -------------------------------------------------- strategy vs mashing
+
+/**
+ * A7 — is the span bonus farmable by throughput?
+ *
+ * This is the only check in the suite that is about the DESIGN rather than the
+ * data, and it is opt-in (`--masher`) because it plays every sampled level
+ * three times over. It exists because the span bonus was added to answer a
+ * specific complaint — "swipe down fast is the only way to get to 3 stars" —
+ * and no green gate could have told anyone whether the answer landed.
+ *
+ * IT DOES NOT ASSERT THAT STRATEGY WINS, because measurement says it does not
+ * and a gate that is red by design is a gate nobody reads. What it asserts is
+ * the property the mechanic actually promises and the first version violated by
+ * a factor of forty-one: THE BONUS MUST NOT BE BOUGHT WITH THROUGHPUT. A masher
+ * may not collect materially more seconds than a deliberate player. The star
+ * comparison is printed either way, and flagged as a note when mashing is level
+ * with strategy or ahead of it, which is currently the honest state of things.
+ *
+ * `--break masher` restores the original mechanic exactly — `min(8, n^2/1.2e6)`
+ * summed over every chain over the floor — which is the fault this rule exists
+ * to catch, reproduced rather than fabricated.
+ */
+async function gateMasher() {
+  if (BREAK === 'masher') {
+    ALCHEMY_CFG.spanShare = null;
+    ALCHEMY_CFG.spanSummedQuadratic = (n) => Math.min(8, (n * n) / 1.2e6);
+  }
+  const step = Math.max(1, Math.ceil(SHIPPED.length / 12));
+  const pick = ALL_LEVELS ? SHIPPED : SHIPPED.filter((_, i) => i % step === 0);
+  const SEEDS = [900, 1213, 1526];
+  const WHO = ['bot', 'swift', 'masher'];
+  const acc = {};
+  for (const w of WHO) acc[w] = { wins: 0, runs: 0, stars: 0, dist: [0, 0, 0, 0], bonus: 0, drops: 0, big: 0, at: [] };
+  const rows = [];
+  for (const lv of pick) {
+    const per = {};
+    for (const who of WHO) {
+      per[who] = [];
+      for (const seed of SEEDS) {
+        const r = await playLevel(lv, seed, undefined, who);
+        const a = acc[who];
+        a.runs++; a.bonus += r.bonus;
+        a.big += r.sizes.filter((n) => n >= ALCHEMY_CFG.spanMinCells).length;
+        const st = r.won ? starsFor(lv, r.at) : 0;
+        if (r.won) { a.wins++; a.at.push(r.at); }
+        a.stars += st; a.dist[st]++;
+        per[who].push(st);
+      }
+    }
+    const b = mean(per.bot), m = mean(per.masher);
+    rows.push({ lv, b, m, s: mean(per.swift) });
+    console.log(`  level ${String(lv.id).padStart(3)} ${lv.arch.padEnd(9)} ` +
+      WHO.map((w) => `${w} ${per[w].join('')}`).join('  ') +
+      `   ${b > m ? 'strategy' : b < m ? 'MASHING' : 'tie'}`);
+  }
+  console.log('');
+  for (const who of WHO) {
+    const a = acc[who];
+    console.log(`  ${who.padEnd(7)} win ${String(a.wins).padStart(3)}/${a.runs}  mean stars ${(a.stars / a.runs).toFixed(2)}  ` +
+      `stars per WIN ${(a.wins ? a.stars / a.wins : 0).toFixed(2)}  ` +
+      `dist fail:${a.dist[0]} 1:${a.dist[1]} 2:${a.dist[2]} 3:${a.dist[3]}  ` +
+      `big spans ${(a.big / a.runs).toFixed(1)}/run  bonus ${(a.bonus / a.runs).toFixed(1)}s/run`);
+  }
+  const bs = acc.bot.stars / acc.bot.runs, ms = acc.masher.stars / acc.masher.runs;
+  const won = rows.filter((r) => r.b > r.m).length, lost = rows.filter((r) => r.b < r.m).length;
+  console.log(`  head to head over ${rows.length} levels: strategy ${won}, mashing ${lost}, tie ${rows.length - won - lost}`);
+
+  // THE BAR: the bonus may not be bought with throughput. 1.3x rather than 1.0x
+  // because the masher takes more chains and therefore more samples of the same
+  // distribution, so the best-of-run it collects is legitimately a little higher
+  // than the bot's even with the count advantage removed — measured at 1.12x on
+  // the share, against 41x for the summed per-chain version this replaced.
+  const bb = acc.bot.bonus / acc.bot.runs, mb = acc.masher.bonus / acc.masher.runs;
+  const ratio = bb > 0 ? mb / bb : (mb > 0 ? Infinity : 1);
+  console.log(`  span bonus per run: bot ${bb.toFixed(1)}s, masher ${mb.toFixed(1)}s — mashing collects ${ratio.toFixed(2)}x`);
+  if (!(ratio <= 1.3)) {
+    fail('A7-masher', `the span bonus is farmable by throughput — a masher collects ${mb.toFixed(1)}s/run against ` +
+      `a deliberate player's ${bb.toFixed(1)}s (${ratio.toFixed(1)}x): the mechanic added to beat mashing is rewarding it`);
+  }
+
+  // Reported, never failed: whether thinking actually out-stars mashing. It
+  // does not, and the reason is that every objective here is a volume race.
+  const bw = acc.bot.wins ? acc.bot.stars / acc.bot.wins : 0;
+  const mw = acc.masher.wins ? acc.masher.stars / acc.masher.wins : 0;
+  if (!(bs > ms)) notes.push(`mashing out-stars strategy over the whole sample: ${ms.toFixed(2)} vs ${bs.toFixed(2)} stars/run`);
+  if (acc.masher.wins && !(bw > mw)) {
+    notes.push(`on the levels it finishes, mashing rates as well as strategy or better: ${mw.toFixed(2)} vs ${bw.toFixed(2)} stars/win ` +
+      `— strategy is ahead only on the fail rate (${acc.bot.dist[0]}/${acc.bot.runs} vs ${acc.masher.dist[0]}/${acc.masher.runs} losses)`);
+  }
+  return { bs, ms, bw, mw, bb, mb, ratio, won, lost, rows: rows.length };
 }
 
 // ------------------------------------------------------------------- report
@@ -618,13 +898,21 @@ if (BREAK === 'ledger') {
 
 console.log(BREAK ? `SILT mode gates  [FALSIFY: ${BREAK}]` : 'SILT mode gates');
 
-if (GEN) {
+if (MASHER) {
+  console.log(`\nALCHEMY: deliberate placement vs mashing, ${ALL_LEVELS ? 'all' : 'a sample of'} shipped levels, 3 seeds each`);
+  await gateMasher();
+} else if (GEN) {
   const t0 = Date.now();
   const { kept, rejected } = await generateLevels(GEN);
   console.log(`\nALCHEMY generation: ${GEN} candidates -> ${kept.length} kept, ${rejected.length} rejected  (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
   const why = {};
   for (const [, , r] of rejected) why[r.split(':')[0]] = (why[r.split(':')[0]] || 0) + 1;
   for (const [k, v] of Object.entries(why)) console.log(`    rejected ${v}  ${k}`);
+  // The first dozen by candidate id, because the OPENING of the campaign is the
+  // part a player actually sees and a silent cull there reshapes the ladder:
+  // `archetypeFor` teaches chains in candidates 1-6, and if all six are thrown
+  // out the campaign opens on whatever archetype happened to survive.
+  for (const [id, arch, r] of rejected.filter(([id]) => id <= 12)) console.log(`    . candidate ${id} ${arch}: ${r}`);
   console.log(`    tight (target > ${HEADROOM} x reach): ${tightLevels(kept).length} of ${kept.length} kept`);
   const byArch = {};
   for (const lv of kept) (byArch[lv.arch] = byArch[lv.arch] || []).push(lv);
@@ -679,6 +967,33 @@ if (GEN) {
       tight.slice(0, 5).map((lv) => `${lv.id} ${lv.arch} ${lv.objective.target}/${lv.reach}`).join(' ') + (tight.length > 5 ? ' …' : ''));
   }
 
+  // A6 — the opening grace. The rule has two halves and they can fail
+  // separately, so `--break grace` injects one fault of each kind into a COPY
+  // and both must be reported:
+  //
+  //   level 1  correct annotation, UNGRACED star times — a table where the ramp
+  //            is recorded but never actually landed, which is the fault that
+  //            would otherwise look eased and not be
+  //   level 2  the annotation deleted — a table generated by an older tool
+  //
+  // Arming only the second would leave the first unproven, and the first is the
+  // one worth having.
+  const graceBad = graceFaults(BREAK === 'grace'
+    ? SHIPPED.map((lv, i) => {
+        if (i === 0) return { ...lv, stars: [lv.limitS, Math.min(lv.limitS, +(lv.measured.med * 1.15).toFixed(1)), lv.stars[2]] };
+        if (i === 1) { const c = { ...lv }; delete c.grace; return c; }
+        return lv;
+      })
+    : SHIPPED);
+  if (graceBad.length) {
+    fail('A6-grace', `${graceBad.length}/${SHIPPED.length} level(s) do not carry the opening grace — ` +
+      graceBad.slice(0, 5).join(' · ') + (graceBad.length > 5 ? ' …' : ''));
+  }
+  if (BREAK === 'grace') {
+    if (!graceBad.some((b) => b.startsWith('1 2-star'))) notes.push('!! level 1 was given ungraced star times and A6 kept it');
+    if (!graceBad.some((b) => b.startsWith('2 grace'))) notes.push('!! level 2 had its grace annotation deleted and A6 kept it');
+  }
+
   // Shipped levels: a sample by default, all of them under --levels.
   //
   // The bar here is the SAME bar the generator shipped the level under — two
@@ -709,6 +1024,7 @@ if (GEN) {
   console.log(`  levels: ${lvWins}/${lvChecked} sampled levels beaten by the bot at least 2 of 3 seeds${lvBad.length ? ' (bad: ' + lvBad.join(',') + ')' : ''}  [${SHIPPED.length} shipped]`);
   console.log(`  board aspect: ${asp.lo.toFixed(3)}-${asp.hi.toFixed(3)} across ${SHIPPED.length} levels, floor ${MIN_ASPECT} (${asp.bad} below)`);
   console.log(`  objective headroom: ${tight.length} of ${SHIPPED.length} levels above ${HEADROOM} of measured reach`);
+  console.log(`  opening grace: levels 1-${GRACE.hold + 1} at ${(GRACE.max * 100).toFixed(0)}%, easing to baseline by level ${GRACE.zero + 1} (${graceBad.length} faults)`);
   console.log(`  jelly soft-body solver: ${jelly.isSoft ? 'probed' : '?'} — blobs.js ${await import('../js/sim/blobs.js').then(() => 'present').catch(() => 'ABSENT, running rigid fallback')}`);
 }
 
