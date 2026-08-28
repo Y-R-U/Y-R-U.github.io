@@ -71,7 +71,9 @@ const FILL_REF = 64 * 168 * 168;      // cols*rows^2 of the shipped act-I board
  * shipped `pieces` is overwritten by tools/modesim.mjs with a headroomed
  * multiple of what the bot actually spent hitting the calibrated target.
  *
- * 56 was chosen by sweeping it — see the note in modesim's BUDGET block.
+ * 56 was chosen by sweeping it — see the note in modesim's BUDGET block. It is
+ * now 56 actual drops: the mode counts landings rather than spawns, so a
+ * calibration run gets the whole budget instead of one short of it.
  */
 export const CALIBRATION_PIECES = 56;
 

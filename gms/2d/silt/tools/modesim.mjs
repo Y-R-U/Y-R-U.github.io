@@ -55,7 +55,12 @@ const BREAK = opt('--break', null);
 const ONLY = opt('--mode', null);
 const GEN = has('--gen-levels') ? +(opt('--gen-levels', 120) || 120) : 0;
 const ALL_LEVELS = has('--levels');
-const MASHER = has('--masher');
+// `--break masher` implies `--masher`. Without this the arm runs the DEFAULT
+// suite, which never calls gateMasher, and reports "falsify arm did NOT trip a
+// gate — the gate is not testing what it claims". That reads as a blind gate
+// and is in fact a mistyped command, which is the worst way for a falsification
+// arm to fail: it accuses the thing it was meant to prove.
+const MASHER = has('--masher') || BREAK === 'masher';
 // Generation is deterministic in this seed. Sweeping it is how a balance claim
 // gets three independent families instead of one lucky one.
 const GEN_SEED = Number(opt('--gen-seed', '0x5117'));
@@ -93,6 +98,24 @@ const BUDGET_HEAD = +opt('--budget-head', 1.6);
  * used to count. Eight pieces is about the same span of play at the bot's
  * measured 2.25 drops a second, and it is the first number a regeneration
  * should question if an archetype disappears.
+ *
+ * IT STAYS AT 8 ACROSS THE COUNTER CORRECTION, AND THAT IS A DECISION.
+ *
+ * `used` used to count SPAWNS, which is one ahead of the drops a player has
+ * actually made — the first piece exists before anything has been placed. So a
+ * win recorded at `used` 8 was a level beaten in SEVEN drops, and this bar,
+ * which reads `< 8`, was in practice throwing out levels beaten in six or
+ * fewer. The comment said eight and the code did seven.
+ *
+ * Now that `used` is `world.landed`, 8 finally means what this comment has
+ * always claimed: a level the bot finishes in seven drops or fewer is not
+ * shipped. Lowering it to 7 would exactly restore the old behaviour and would
+ * keep the three levels the correction just cost — 28, 57 and 83 of the shipped
+ * table, all measured at 7 real drops — but that is re-adopting an off-by-one
+ * as a design choice in order to save three levels. Seven drops is about three
+ * seconds of play. If a demonstration that short belongs in the campaign it
+ * belongs in the hand-authored tutorial, which is where the campaign already
+ * keeps its demonstrations.
  */
 const TRIVIAL_PIECES = +opt('--trivial-pieces', 8);
 
@@ -992,13 +1015,14 @@ function budgetFaults(levels) {
  * ahead 9 levels to 2) and both are won under the budget.
  *
  * STARS PER WIN IS REPORTED AND NOT ASSERTED, and the reason is measurement
- * rather than convenience. On the shipped table it is a dead heat: 2.42 for the
- * masher against 2.41 for the bot, from 24 wins and 34. That is not the budget
- * being generous — it is survivorship. Conditioning on a win throws away every
- * run the masher lost and keeps the boards where its gamble came off, and on a
- * volume objective a lucky masher really has spent its pieces as efficiently as
- * a thoughtful player. It three-stars 54% of its wins against the bot's 50%,
- * which is the same number twice.
+ * rather than convenience. Over all 118 levels the bot is ahead, 2.42 to 2.26,
+ * so asserting it would pass — but on the twelve-level sample it is a dead heat
+ * (2.34 to 2.30) and on earlier tables it has landed on both sides. That is not
+ * the budget being generous — it is survivorship. Conditioning on a win throws
+ * away every run the masher lost and keeps the boards where its gamble came
+ * off, and on a volume objective a lucky masher really has spent its pieces as
+ * efficiently as a thoughtful player. The fail rate is where the difference
+ * actually lives: 84 losses in 354 runs against the bot's 18.
  *
  * Making that bar green would need an objective that volume cannot buy — the
  * design problem named at the top of `js/modes/alchemy.js` and not solved by
@@ -1006,8 +1030,9 @@ function budgetFaults(levels) {
  * and a gate that is always red is a gate nobody reads. So it is a note.
  *
  * MARGIN 0.25 rather than "strictly greater": 36 runs is a small sample and a
- * bar that a coin could clear is not a bar. Measured gap on the shipped table
- * is 0.67.
+ * bar that a coin could clear is not a bar. Measured gap is 0.58 over all 118
+ * levels and 0.56 on the stratified sample — the sample tracks the campaign to
+ * within 0.02 stars, which is the property the aliased stride did not have.
  *
  * `--break masher` RESTORES THE DESIGN THIS PASS REPLACED: four times the
  * pieces, so a drop costs nothing, and stars judged on the WALL CLOCK against
@@ -1027,6 +1052,10 @@ function budgetFaults(levels) {
  * pieces are what make thinking pay, and the budget is the fail state that puts
  * a price on running the board into the ground. An arm that only loosens the
  * cap is testing the half that matters least.
+ *
+ * The arm reproduces the design it replaced almost exactly: masher 3.00 stars
+ * per win against the bot's 2.28 and head to head strategy 3, mashing 9, where
+ * the clock campaign historically measured 3.00 against 2.40 and 2 to 9.
  */
 const MASHER_BREAK_SCALE = 4;
 const MASHER_MARGIN = 0.25;
@@ -1055,9 +1084,59 @@ function starOnClock(th, wall) {
   return 1;
 }
 
+/**
+ * THE DEFAULT SAMPLE WAS ALIASED AGAINST THE GENERATOR'S ARCHETYPE CYCLE.
+ *
+ * It used to be a stride: every tenth shipped level. `archetypeFor` assigns
+ * archetype by candidate index and, past the taught opening, does it with
+ * `ARCHETYPES[i % 5]` — so a stride of ten over a period-five cycle samples
+ * ONE archetype class, and rejections only partly scramble it. Measured on the
+ * shipped table, the ten possible offsets give samples of 7 excavate, 6
+ * crucible, 5 crucible … out of 12, against a campaign that is 33% each.
+ *
+ * That is not a cosmetic complaint. Head to head is a per-level majority vote,
+ * so on twelve levels it is decided by two or three of them, and the crucible-
+ * heavy offsets are exactly the ones the masher does well on: replaying the
+ * full-table run through each of the ten strides, THREE OF THEM REPORT MASHING
+ * LEVEL OR AHEAD on a campaign where strategy leads 67 to 30. The shipped
+ * offset was one of the three. A gate that goes red on a third of the arbitrary
+ * samples of a green campaign is a gate that gets ignored, and it would have
+ * been wrong in the other direction just as often.
+ *
+ * So the sample is stratified: each archetype gets slots in proportion to how
+ * many levels it has, and within an archetype the picks are the midpoints of
+ * equal slices — a systematic sample, not an edge one. Deterministic, no rng.
+ *
+ * QUENCH GETS ZERO SLOTS AND THAT IS CORRECT. It is 2 levels of 118, so its
+ * proportional share rounds to none. Flooring every archetype at one would hand
+ * 1.7% of the campaign 8% of the sample, and it is the archetype the masher
+ * scores best on — a floor would bias the estimator towards the answer, which
+ * is the fault being fixed, not a second opinion on it. `--masher --levels`
+ * plays every level and is where an archetype this rare is actually judged.
+ */
+function masherSample(levels, k = 12) {
+  if (levels.length <= k) return levels;
+  const by = new Map();
+  for (const lv of levels) {
+    if (!by.has(lv.arch)) by.set(lv.arch, []);
+    by.get(lv.arch).push(lv);
+  }
+  const archs = [...by.keys()];                       // insertion order: deterministic
+  const raw = archs.map((a) => by.get(a).length * k / levels.length);
+  const alloc = raw.map(Math.floor);
+  const total = () => alloc.reduce((x, y) => x + y, 0);
+  const order = archs.map((_, i) => i).sort((x, y) => (raw[y] - alloc[y]) - (raw[x] - alloc[x]));
+  for (let i = 0; total() < k; i++) alloc[order[i % order.length]]++;
+  const pick = [];
+  archs.forEach((a, i) => {
+    const L = by.get(a), n = alloc[i];
+    for (let j = 0; j < n; j++) pick.push(L[Math.min(L.length - 1, Math.floor((j + 0.5) * L.length / n))]);
+  });
+  return pick.sort((p, q) => p.id - q.id);
+}
+
 async function gateMasher() {
-  const step = Math.max(1, Math.ceil(SHIPPED.length / 12));
-  const pick = (ALL_LEVELS ? SHIPPED : SHIPPED.filter((_, i) => i % step === 0)).map(masherLevel);
+  const pick = (ALL_LEVELS ? SHIPPED : masherSample(SHIPPED)).map(masherLevel);
   if (BREAK === 'masher') setLevels(pick);
   const SEEDS = [900, 1213, 1526];
   const WHO = ['bot', 'swift', 'masher'];

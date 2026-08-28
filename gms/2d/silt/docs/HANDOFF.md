@@ -1377,3 +1377,240 @@ Motes are seeded from `Math.random` and stepped by real dt, so an image gate ove
 a dissolving board compares noise. `opts.motes = 0` closes it. The claim that
 `?t=` pins a frame has been in this document since P2 and was false for a whole
 class of frame the entire time.
+
+## Recalibrated against the corrected piece counter — 2026-08-29, lane C
+
+The manager fixed the counter: `used` was SPAWNS, which is one ahead of the
+drops a player has actually made, and it now reads `world.landed`. Every number
+the previous section measured was therefore one piece high, and a settle window
+was added so a reaction started by the last drop gets to finish. This is that
+table re-measured. Same formula, same grace ramp, same invariants, nothing
+redesigned.
+
+**119 levels -> 118.** 195 candidates, 118 kept, 77 rejected (60.5%, against
+61%). Acts **23 / 22 / 22 / 23 / 28**, ids contiguous, aspect 0.500 throughout,
+0 tight, 0 grace faults, 0 budget faults, and 26 of 118 ship at the 2-of-3 bar
+exactly as 26 of 119 did before.
+
+### What the one-piece correction actually moved
+
+Measured two ways, because the correction has two halves pulling opposite ways.
+
+**First, in isolation.** Replaying the SHIPPED table at its shipped budgets on
+the generator's own three seeds — same levels, same targets, same budgets, so
+the counter is the only thing that changed — gives **307 of 311 matched runs at
+exactly -1** and four at 0, mean -0.987. It is a clean, uniform one-piece
+correction and nothing else. It also turned **10 losses into wins** across the
+table: that is the settle window, plus the fact that a level called "56 pieces"
+now actually hands over 56 drops instead of 55.
+
+**Second, through the generator.** 115 of the 118 shipped levels are the same
+candidate as before (matched by `seed`, which survives renumbering), and they
+split cleanly in two:
+
+| | n | median win | budget | 2-star | 3-star |
+|---|---|---|---|---|---|
+| target unchanged — pure counter | 67 | **-1** | **-2** | **-1** | **-1** |
+| target changed — counter + the recovered 56th drop | 48 | +1 | +1 | +1 | +1 |
+| all matched levels | 115 | -1 | -1 | -1 | -1 |
+
+So the headline is small and it is not one-directional. The counter takes one
+piece off the median win, which takes one or two off the budget and one off each
+star bar. But `reach` is measured inside CAL_PIECES drops, and the calibrator
+now gets the drop it was always supposed to have — on 48 levels that raised the
+reach enough to move the calibrated target (median +85), and those levels cost
+MORE to win, not less. Across the whole table the medians land at -1 and the
+means at roughly zero.
+
+Level 1 is the same level in both tables and is the whole story in one row:
+
+```
+was   budget 79   stars 79/68/47   bot spent 37, 49
+now   budget 77   stars 77/67/46   bot spent 36, 48
+```
+
+**The campaign's floor rose, which is the part worth having.** Shortest median
+win 8 drops -> **18**; smallest budget 13 pieces -> **29**. The table no longer
+contains a level that is over in eight drops.
+
+### TRIVIAL_PIECES stays at 8, and that is a decision
+
+`used` counted spawns, so a win recorded at 8 was a level beaten in SEVEN drops,
+and `min(uses) < 8` was in practice throwing out levels beaten in six or fewer.
+**The comment said eight and the code did seven.** With the counter corrected, 8
+finally means what it has always claimed.
+
+Lowering it to 7 would exactly restore the old behaviour under a new name. It
+was measured rather than argued — a full 195-candidate generation at
+`--trivial-pieces 7`:
+
+| | kept | trivial rejections | quench | slag | quench median win |
+|---|---|---|---|---|---|
+| 8 (shipped) | 118 | 22 | 2 | 24 | 46 pieces |
+| 7 | 121 | 18 | 3 | 26 | **18 pieces** |
+
+So the price is exactly **three levels of 121**, and what those three are is
+visible in the last column: admitting them more than halves the quench
+archetype's median winning spend, from 46 drops to 18. They are demonstrations,
+not puzzles. Seven drops is about three seconds of play, and the campaign
+already has somewhere for a three-second demonstration — the hand-authored
+tutorial, which is three levels long and held to its own bar by `tutgate.mjs`.
+Buying three of those back by re-adopting an off-by-one as a design choice is
+the wrong trade.
+
+The three levels the correction actually cost are named: ids **28 (quench), 57
+and 83 (slag)** of the previous table, and replaying that table shows they are
+the only three levels in it the bot ever won in under eight real drops.
+
+### The masher: strategy still wins
+
+All 118 shipped levels, 3 agents x 3 seeds:
+
+| | wins | mean stars/run | stars per WIN | fails |
+|---|---|---|---|---|
+| bot | 336/354 | **2.30** | **2.42** | 18 |
+| swift | 263/354 | 1.59 | 2.14 | 91 |
+| masher | 270/354 | **1.72** | **2.26** | 84 |
+
+Head to head: **strategy 67, mashing 30, tie 21.** The previous table measured
+2.32 against 1.68 and 71-25-23, so the gap narrowed slightly (0.64 -> 0.58
+stars, bar 0.25) and the verdict did not move. Stars per WIN is still reported
+and not asserted, and the bot is still ahead on it, 2.42 to 2.26.
+
+### THE SAMPLE WAS ALIASED AGAINST THE ARCHETYPE CYCLE
+
+`--masher` without `--levels` went RED on this table: head to head 5-5-2 on its
+twelve-level sample, of a campaign where strategy leads 67 to 30. Chasing that
+found a fault in the instrument, not in the budgets.
+
+The sample was every tenth shipped level. `archetypeFor` assigns archetype by
+candidate index and, past the taught opening, does it as `ARCHETYPES[i % 5]` —
+**a stride of ten over a period-five cycle samples one archetype class.**
+Rejections scramble it only partly. Replaying the full-table run through each of
+the ten possible offsets:
+
+```
+offset 0   strategy  5  mashing  5   gap +0.36   RED    5 crucible of 12
+offset 2   strategy  9  mashing  2   gap +0.92   pass   7 excavate of 12
+offset 3   strategy  6  mashing  6   gap +0.36   RED    6 crucible of 12
+offset 7   strategy  5  mashing  5   gap +0.28   RED    5 crucible of 12
+```
+
+**Three of the ten strides call a 67-30 campaign level or worse**, and the
+shipped offset was one of them. The crucible-heavy strides are the red ones,
+which is exactly the archetype the masher does best on. The bias had no
+preferred direction — offset 2 overstates the case for strategy just as badly.
+
+The sample is now stratified by archetype: proportional slots, midpoints of
+equal slices within each archetype, deterministic, no rng. It reproduces the
+full-table aggregate to within 0.02 stars (sample 2.28 / 1.72 against the
+campaign's 2.30 / 1.72), where the stride misestimated the masher by 0.28. Both
+bars stayed asserted — the fix makes the gate a better instrument, not a softer
+one, and the arm still trips.
+
+**Quench gets zero slots and that is correct.** It is 2 levels of 118, so its
+proportional share rounds to none. Flooring every archetype at one would hand
+1.7% of the campaign 8% of the sample, and it is the archetype the masher scores
+best on — a floor would bias the estimator towards the answer, which is the
+fault being fixed rather than a second opinion on it.
+
+### A falsification arm that accused the gate instead of the command
+
+`node tools/modesim.mjs --break masher` printed `falsify arm "masher" did NOT
+trip a gate — the gate is not testing what it claims`. The gate was fine. The
+arm needs `--masher` to be set, and `--break masher` alone runs the DEFAULT
+suite, which never calls `gateMasher` at all — so the arm silently tested
+nothing and reported it in the exact words that mean the opposite. `--break
+masher` now implies `--masher`. Invoked properly it goes red on both bars
+(2.25 against 2.28 stars/run, and strategy 3 mashing 9) and still reproduces the
+clock campaign it replaced: masher 3.00 stars per win against the bot's 2.28,
+where the historical numbers were 3.00 against 2.40 and 2 to 9.
+
+### Archetype spread, and quench for the fifth time
+
+| archetype | previous (119) | this table (118) |
+|---|---|---|
+| span | 12 | **14** |
+| excavate | 39 | 39 |
+| quench | 3 | **2** |
+| crucible | 39 | 39 |
+| slag | 26 | 24 |
+
+**Quench is 2.** Sixteen of its candidates finish inside eight drops and twenty
+more cannot clear the crystal floor with headroom. This is the fifth pass to
+record it and the finding has not changed: crystal saturates, and no budget
+fixes a level that is over in six drops. The objective has to stop being "how
+much crystal".
+
+Span went 12 -> 14, and level 1 is still the span level `Slow Melt` — target 2
+chains against a reach of 5, budget 77, won on 2 of 3 seeds.
+
+### Seed families
+
+30 candidates each, four families. The previous pass measured 21 / 18 / 21 on
+the first three seeds and this one measures **21 / 18 / 21**, unchanged, with a
+fourth family added and recorded so the next pass can reproduce the set:
+
+| seed | kept /30 | tight |
+|---|---|---|
+| `0x5117` | 21 | 0 |
+| `0xA113` | 18 | 0 |
+| `0xBEEF` | 21 | 0 |
+| `0xB0B5` | 17 | 0 |
+
+### Gates, all run against the shipped artifact
+
+| gate | result |
+|---|---|
+| `node tools/sim.mjs` | PASS, 0.208 ms/tick |
+| `node tools/jellysim.mjs` | PASS |
+| `node tools/modesim.mjs` | PASS, aspect 0.500-0.500, 0 tight, 0 grace faults, 0 budget faults |
+| `node tools/modesim.mjs --levels` | PASS, **118/118** beaten on >= 2 of 3 seeds |
+| `node tools/modesim.mjs --masher` | PASS, bot 2.28 vs masher 1.72, head to head 6-4-2 |
+| `node tools/modesim.mjs --masher --levels` | PASS, bot 2.30 vs masher 1.72, head to head 67-30-21 |
+| `node tools/tutgate.mjs` | PASS, the tutorial still teaches and the grace offset still lines up |
+| `node tools/boot.mjs` | PASS, real renderer, tier high |
+| `node tools/gfx_shot.mjs --check` | PASS, 0.4px worst edge |
+| `node tools/uishot.mjs --probe` / `--hit` | PASS |
+| `node tools/uishot.mjs --win --only=none` | PASS, including OUT OF PIECES and **121 tiles** (3 tutorial + 118) |
+| `--break ledger / score / stall / rng / tide / zen / slots` | all red, arms confirmed |
+| `--break trivial / unwinnable / span` (gen path) | all red, arms confirmed |
+| `--break aspect` (shipped) | red, `1/118 board(s) letterbox` |
+| `--break aspect` (gen path) | red, `1/30 board(s) letterbox` |
+| `--break headroom` | red, `1/118 level(s) ship a target above 0.8` — `1 span 5/5` |
+| `--break grace` | red, BOTH halves: `1 2-star 56 pieces not eased to 67` and `118 grace -1 want 0.00` |
+| `--break budget` | red, `1 budget 154 is 3.21x the 48 pieces the bot spent` |
+| `--break masher` | red, BOTH bars: `2.25 vs 2.28 stars/run` and `strategy 3, mashing 9` |
+
+### The grace offset, re-checked
+
+`PRELUDE` is still 3 and the ramp still lands where it should: table ids 1-6 sit
+at the full 0.20 (campaign levels 4-9), the taper runs id 7-15, and id 16 is
+campaign level 19 at baseline. Verified against `tutorial.js` directly as well
+as through A6, which reports 0 faults. `tutgate.mjs` and `tutorial.js` were not
+touched.
+
+### Two things that were red and were not real
+
+- **`boot.mjs` and `gfx_shot.mjs --check` both failed with `renderer.js failed
+  to load — game is drawing cells` / `harness never became ready`, and both pass
+  cleanly on a second run.** They were sharing the machine with six node sim
+  processes and the WebGL context fell back to the placeholder tier. The browser
+  gates must not be run concurrently with the sim fleet; a contention failure
+  there is indistinguishable from a real renderer regression, which is the worst
+  property a gate can have.
+- The `--break masher` non-trip above. Both are recorded because both looked
+  exactly like the fault they were not.
+
+### Not verified, said plainly
+
+- **Still no human has played a piece-budget level**, and that is now two passes
+  of bot-measured numbers deep. The 1.6x headroom is still an argument about a
+  human rather than a measurement of one.
+- The masher is an ablation of the same bot, not a person.
+- Level 1 ships at 2 of 3 seeds, as it did before. Measured, not fixed.
+- A5 has still never fired on a real artifact, only on its arm and on live
+  rejections — 39 of them this time.
+- The stratified sample is a better estimator than the stride, which was
+  measured; that it is a GOOD estimator is not proven, only that it tracks the
+  full-table aggregate to 0.02 stars on this one table.

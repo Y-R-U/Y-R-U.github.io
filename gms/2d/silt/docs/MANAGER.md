@@ -16,7 +16,7 @@ step, no CDN, no dependencies.
 | P3 | FLOW playable and balanced | **done** |
 | P4 | Jelly soft-body, TIDE, JELLY LAB | **done** |
 | P5 | Reactions, HOURGLASS, ZEN | **done** |
-| P6 | ALCHEMY levels (107, all validated) | **done** |
+| P6 | ALCHEMY levels (3 authored + 118 generated, all validated) | **done** |
 | P7 | Shell, attract screen, audio, ship | **done** |
 
 ## Lanes
@@ -72,10 +72,19 @@ flag first.
 - The clock-tight slag levels are moot: `limitS` no longer exists in ALCHEMY.
   Whether the same shape recurs in the piece budget is an open question for the
   regenerated table.
-- **Quench is down to 4 levels.** Six of its seven were rejected for no
-  headroom, correctly: crystal saturates at 32-38 against a floor of 32, because
-  crystal permanently seals the lava body that makes it. Quench needs a
-  different objective, not a different number.
+- **Quench is down to 2 levels**, and this is the FIFTH pass to record it.
+  Sixteen candidates finish inside eight drops and twenty more cannot clear the
+  crystal floor with headroom, because crystal permanently seals the lava body
+  that makes it. The objective has to stop being "how much crystal" — it is not
+  a number that needs tuning, and no further regeneration will fix it. The hand
+  authored First Quench is currently carrying the whole archetype.
+- **Browser gates must not share the machine with the sim fleet.** boot.mjs and
+  gfx_shot came back red under six concurrent node sims — WebGL fell back to the
+  placeholder tier — and both passed cleanly alone. A contention red there is
+  indistinguishable from a real renderer regression.
+- **Static scenery below three cells used to be invisible**, campaign-wide, not
+  merely dim: see S+9 in HANDOFF. Any level whose difficulty was judged before
+  2026-08-29 was judged with some of its obstacles unrendered.
 - The cool tint reads slightly greener in flight than settled. With three tints
   and one cool, the mapping stays unambiguous.
 - ZEN and FLOW/JELLY share a HUD shape by declaration, not by accident.
