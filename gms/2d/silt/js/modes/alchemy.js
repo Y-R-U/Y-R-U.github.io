@@ -42,6 +42,7 @@ export const ALCHEMY_CFG = {
    * pressure enough without a clock that punishes deliberation.
    */
   piecesFail: true,
+  settleTicks: 96,        // 1.6s for the last drop to finish doing its work
   // THE WIDEST SPAN BUYS TIME. Paid ONCE, on a SHARE of the board. See below.
   spanShare: (f) => Math.min(8, Math.max(0, f - 0.30) * 17.8),
   spanMinCells: 900,
@@ -225,6 +226,8 @@ export default {
       won: false,
       stars: 0,
       used: 0,            // pieces spent
+      landedAt: world.landed,
+      settle: -1,         // ticks left for a late reaction once the budget is out
     };
     st.scorer.sync(world);
     S.set(world, st);
@@ -245,16 +248,17 @@ export default {
     const lv = st.lv;
     vent(world);
 
-    // A new nextPiece means the one before it has been SPAWNED — the piece
-    // transition the material rotation already rides on. Counting spawns rather
-    // than landings means the piece in your hand is one you have paid for,
-    // which is the only reading that makes the number on screen honest.
     if (world.nextPiece !== st.lastNext) {
       st.lastNext = world.nextPiece;
       st.k++;
-      st.used++;
       world.cfg.mat = lv.seq[st.k % lv.seq.length];
     }
+
+    // PIECES YOU HAVE DROPPED, from the sim's own count of committed pieces.
+    // This used to count spawns, which is one ahead from the first frame — the
+    // level said "2 pieces used" to a player who dropped one and won with it.
+    // The piece in your hand is not spent until you place it.
+    st.used = world.landed - st.landedAt;
 
     const done = st.tracker.update(world);
     const budget = budgetOf(lv);
@@ -267,19 +271,25 @@ export default {
       world.over = true;
       api.banner(['', 'COMPLETE', 'COMPLETE', 'PERFECT'][st.stars] || 'COMPLETE');
       api.shake(0.6);
-    } else if (!st.won && ALCHEMY_CFG.piecesFail && st.used > budget) {
-      // THE SPAWN THAT OVERRAN THE BUDGET NEVER HAPPENED.
-      //
-      // The first version ended the run when the budget hit zero AND no piece
-      // was in the air, meaning to let the last one finish falling. But a
-      // hard-dropped piece lands inside world.tick() and the next spawn happens
-      // before this hook ever runs, so a player who hard-drops was never once
-      // seen with an empty hand — measured, a masher played FORTY pieces of a
-      // twenty-piece budget. The one strategy the budget exists to stop was the
-      // one strategy exempt from it.
-      world.piece = null;
-      world.over = true;
-      world.won = false;
+    } else if (!st.won && ALCHEMY_CFG.piecesFail && st.used >= budget) {
+      /**
+       * Out of pieces — but not out of level yet.
+       *
+       * The last drop is often the one that does the work, and the work is not
+       * instantaneous: a quench takes a second for the crust to form, a chain
+       * takes DISSOLVE_TICKS to come apart, and the crystal and purge trackers
+       * only recount every twelfth tick. Ending the run the moment the final
+       * piece landed would cut off the reaction the player spent it on and call
+       * it a loss. So the budget stops the SUPPLY and a settle window lets the
+       * board finish saying what happened.
+       *
+       * The window ends early once nothing is dissolving and no piece is in the
+       * air, so a level that is plainly over does not sit there.
+       */
+      if (st.settle < 0) { st.settle = ALCHEMY_CFG.settleTicks; world.piece = null; }
+      const quiet = !world.piece && world.clears.dissolving.length === 0;
+      st.settle -= quiet ? 2 : 1;
+      if (st.settle <= 0) { world.over = true; world.won = false; }
     }
 
     world.alchemy = {

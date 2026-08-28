@@ -39,6 +39,7 @@ export class World {
     this.fallAccum = 0;
     this.fallRate = this.cfg.fallRate;
     this.chainBoost = 0;      // the speed a player has earned by clearing
+    this.landed = 0;          // pieces committed to the board
     this.softDrop = false;
 
     this.score = 0;
@@ -75,6 +76,13 @@ export class World {
     const p = this.piece;
     this.piece = null;
     if (overflowed(this.g, p)) { this.over = true; return; }
+    // PIECES COMMITTED. Counted here because this is the one place a piece is
+    // actually spent, whether it arrived by gravity or by a hard drop — and a
+    // mode that counts SPAWNS instead is a piece ahead of the player from the
+    // first frame, since the first piece spawns before anyone has dropped
+    // anything. ALCHEMY reported "2 pieces used" to a player who had dropped
+    // one and won with it.
+    this.landed++;
     shatter(this.g, p, this.stats);
     // A jelly piece is a soft body, not loose grains. A blob is single-tint but
     // a duo/mixed piece is not, so group by tint and spawn one body per group —
@@ -183,6 +191,7 @@ export class World {
       cellsCleared: this.cellsCleared,
       lastChainSize: this.lastChainSize,
       fallRate: +this.fallRate.toFixed(2),
+      landed: this.landed,
       cells: this.g.count,
       dissolving: this.clears.dissolving.length,
       blobs: this.blobs.list().length,

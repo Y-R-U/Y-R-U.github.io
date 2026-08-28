@@ -4,7 +4,7 @@
 //
 //   node tools/tutgate.mjs
 //   node tools/tutgate.mjs --break <arm>   that check MUST go red
-//     arms: budget  trivial  masher  aspect
+//     arms: budget  trivial  masher  aspect  oneshot
 //
 // A generated level has to be beatable by the deliberate bot on two seeds in
 // three. A TUTORIAL has to be beatable by a player who has understood nothing
@@ -65,7 +65,10 @@ function play(lv, seed, who) {
   // gate stayed green against a "broken" build. That is the same shape as the
   // arm in D9 that assigned to an accessor property and silently did nothing.
   const restore = lv.pieces;
+  const restoreTarget = lv.objective.target;
   if (BREAK === 'budget') lv.pieces = 2;
+  // Put the shipped fault back: a target so low the first drop satisfies it.
+  if (BREAK === 'oneshot') lv.objective.target = lv.objective.type === 'purge' ? 1e9 : 1;
   const w = new World({ ...worldCfgFor({ level: lv.id }), seed });
   const api = mkApi(w);
   alchemy.onStart(w, api);
@@ -78,6 +81,7 @@ function play(lv, seed, who) {
     alchemy.onTick(w, api);
   }
   lv.pieces = restore;
+  lv.objective.target = restoreTarget;
   const a = w.alchemy || {};
   return { won: !!a.won, stars: a.won ? a.stars : 0, used: a.used || 0, budget: a.budget || 0 };
 }
@@ -116,6 +120,20 @@ for (const lv of TUTORIAL) {
   check(`${lv.id}: falls to careless play too`,
     BREAK === 'masher' ? mashWins === 0 : mashWins >= 2,
     `${mashWins}/3, pieces ${mashRuns.map((r) => r.used).join('/')}`);
+
+  // A LESSON HAS TO HAPPEN MORE THAN ONCE.
+  //
+  // First Quench shipped winnable on a single drop: the player put one piece
+  // down, was told they had won, and never found out what they had done —
+  // "I drop a single piece and it says i win... what is the point of the level?"
+  // A tutorial level that ends on the first piece has demonstrated nothing,
+  // however correct its objective is.
+  const cheapest = Math.min(...botRuns.filter((r) => r.won).map((r) => r.used), Infinity);
+  // No inversion here on purpose. The arm makes the LEVEL winnable on one drop
+  // and this assertion is left exactly as it ships — an arm that flips the
+  // comparison instead of breaking the thing is testing the arm, not the check.
+  check(`${lv.id}: cannot be won on the first drop`, cheapest >= 2,
+    `cheapest win spent ${cheapest} piece${cheapest === 1 ? '' : 's'}`);
 
   // The stars have to be reachable AND not free, or the rating says nothing.
   const best = Math.min(...botRuns.filter((r) => r.won).map((r) => r.used));

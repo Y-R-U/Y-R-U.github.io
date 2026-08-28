@@ -74,36 +74,42 @@ export const TUTORIAL = [
     fallRate: 16,
     fallAccel: 0,
     fallMax: 16,
-    // TEN, because this level is genuinely two pours long and pretending
-    // otherwise would hand the player twenty pieces they never spend. Crystal
-    // is a step function: the first water over a pool converts almost all of
-    // what that pool will ever give and then the crust seals it. So the lesson
-    // is a demonstration, the budget says so, and the stars are scaled to it —
-    // three pieces is a clean pour, eight is having sloshed it about.
-    pieces: 10,
+    // Twenty-two against a three-pour level, because a tutorial has to survive
+    // a careless player: aimed, it costs three drops, and sprayed it costs ten
+    // to nineteen. The gap between those two numbers IS the lesson, and the
+    // star bars sit in it.
+    pieces: 22,
     // Water in hand from the first piece: the reaction IS the level, so it must
     // not wait behind two loads of sand the way a generated quench level does.
     seq: [WATER],
-    // FIVE SMALL POOLS, not two big ones, and the reason is the mechanic itself:
-    // crystal SEALS the lava that makes it. Two wide pools gave up 70 crystal to
-    // the first three water pieces and then nothing at all ever again — the
-    // level was won before the player had understood what they had done, and
-    // the whole budget after that was inert. Five separate pools cannot be
-    // sealed by one pour, so each one is another go at the same idea.
+    // THREE WALLED PITS, and the walls are the entire point.
+    //
+    // The first version put five open pools on a flat floor and it taught
+    // nothing: water spreads five cells a step, so one pour ran the length of
+    // the board, quenched every pool at once and won the level on the first
+    // piece. A player drops one thing, is told they have won, and never finds
+    // out what they did. The lesson has to happen more than once to be a
+    // lesson, and it has to be AIMED to be a decision.
+    //
+    // Pits fix both — but only if a pit can HOLD a whole piece. Five narrow
+    // ones did not: a water piece is 256 cells, which overflowed a thirteen-
+    // wide pit and ran into its neighbours, so two pours still did the whole
+    // board. Three pits twenty-two wide with walls twenty-two tall each take a
+    // full pour and keep it, which makes this a level about aiming three times.
     scene: [
       { x: 0, y: 156, w: 80, h: 4, mat: WALL },
-      { x: 4, y: 152, w: 11, h: 4, mat: LAVA },
-      { x: 20, y: 152, w: 11, h: 4, mat: LAVA },
-      { x: 36, y: 152, w: 11, h: 4, mat: LAVA },
-      { x: 52, y: 152, w: 11, h: 4, mat: LAVA },
-      { x: 66, y: 152, w: 11, h: 4, mat: LAVA },
+      { x: 26, y: 134, w: 2, h: 22, mat: WALL },
+      { x: 53, y: 134, w: 2, h: 22, mat: WALL },
+      { x: 2, y: 150, w: 22, h: 6, mat: LAVA },
+      { x: 30, y: 150, w: 21, h: 6, mat: LAVA },
+      { x: 57, y: 150, w: 21, h: 6, mat: LAVA },
     ],
-    // 55 of a measured ceiling of ~85. Five pools of eleven cells is 220 lava
-    // and only about two fifths of it can ever become crystal, however long you
-    // pour: the crust seals what is underneath. Asking for more than the board
-    // contains is the mistake the generated quench levels kept making.
-    objective: { type: 'crystal', target: 55 },
-    stars: [10, 5, 3],
+    // 68 of a measured ceiling of 76. Every pit has to be quenched, so the
+    // lesson happens three times and the level cannot be won by accident on the
+    // first drop — which is exactly what the player reported: "I drop a single
+    // piece and it says I win... what is the point of the level?"
+    objective: { type: 'crystal', target: 68 },
+    stars: [22, 8, 4],
     arch: 'quench',
     reach: 200,
     teaches: 'Water quenches lava into crystal — and crystal never moves again.',
