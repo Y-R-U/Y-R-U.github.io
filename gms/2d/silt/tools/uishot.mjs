@@ -28,6 +28,9 @@
  *   node tools/uishot.mjs --win --only=none   just the ALCHEMY win/loss cards
  *   node tools/uishot.mjs --flow --falsify    HUD ignores the mode again and the results card
  *                                         forgets it was ALCHEMY; every panel and win check must go red
+ *   node tools/uishot.mjs --layout        where the top controls ACTUALLY land, per mode
+ *   node tools/uishot.mjs --layout --falsify  the naive version of the swap; every position must go red
+ *   node tools/uishot.mjs --se            add a 375x667 iPhone SE pass to any of the above
  */
 import { harness, ROOT } from './cdp.mjs';
 import { join, dirname } from 'node:path';
@@ -45,6 +48,9 @@ const args = Object.fromEntries(process.argv.slice(2).map((a) => {
 }));
 const ONLY = args.only ? String(args.only).split(',') : null;
 const SIZES = [{ tag: 'phone', w: 390, h: 844 }];
+// A short phone. 390x844 is the design size and it hides a whole class of bug:
+// the mode sheet fitted there by four pixels and scrolled by ninety on an SE.
+if (args.se) SIZES.push({ tag: 'se', w: 375, h: 667 });
 if (args.desktop) SIZES.push({ tag: 'desk', w: 1280, h: 800 });
 
 const { cdp, base, close } = await harness({ root: SITE, gpu: true });
@@ -572,6 +578,240 @@ async function endToEnd() {
   if (fails.length) process.exitCode = 1;
 }
 
+
+/* ------------------------------------------------------------------ layout */
+/**
+ * WHERE THE TOP CONTROLS LAND, measured, in every mode.
+ *
+ * Playtest moved PAUSE up into the corner the NEXT tile used to hold and
+ * dropped NEXT beneath it, under the account avatar. Every claim that change
+ * makes is geometric, so every one of them is measured here rather than looked
+ * at: pause is top-right and clear of the avatar, NEXT is below pause and clear
+ * of the avatar, no mode panel runs under either, TIDE's rail does not either,
+ * and the button still offers 44 px of target now that it is out of the thumb
+ * arc.
+ *
+ * The avatar itself never loads under ?auto — that is deliberate, it keeps soak
+ * runs hermetic — so the gate publishes --br8t-account-space by hand at the
+ * 52 px /lib/auth/ui.js sets, and then measures a second time with it cleared.
+ * A corner that is only ever tested at 0px is a corner nobody has tested.
+ */
+
+/** The account layer's FAB, from /lib/auth/ui.js: 40 px inset 10 px, top-right. */
+const avatarBox = (vw) => ({ x: vw - 50, y: 10, right: vw - 10, bottom: 50 });
+const hits = (a, b) => !!a && !!b && a.x < b.right && a.right > b.x && a.y < b.bottom && a.bottom > b.y;
+
+const GEOM = `JSON.stringify((() => {
+  const R = (sel) => {
+    const e = document.querySelector(sel);
+    if (!e) return null;
+    const cs = getComputedStyle(e);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return null;
+    const r = e.getBoundingClientRect();
+    if (!(r.width > 0 && r.height > 0)) return null;
+    return { x: r.x, y: r.y, w: r.width, h: r.height, right: r.right, bottom: r.bottom };
+  };
+  // The real target, not the painted one: walk out from the centre asking the
+  // document what is under each point, and stop at the first miss. A button
+  // drawn at 48 px with an 8 px expanded hit area answers 64; one drawn at 48
+  // with no expansion answers 48; and a check that measured the CSS width
+  // instead would have believed either.
+  const pb = document.querySelector('.hud-pause .gb');
+  let hit = 0;
+  if (pb) {
+    const r = pb.getBoundingClientRect(), cx = r.x + r.width / 2, cy = r.y + r.height / 2;
+    for (let k = 8; k <= 44; k++) {
+      const inside = [[cx - k, cy], [cx + k, cy], [cx, cy - k], [cx, cy + k]].every(([x, y]) => {
+        const el = document.elementFromPoint(x, y);
+        return !!(el && el.closest && el.closest('.hud-pause'));
+      });
+      if (!inside) break;
+      hit = k * 2;
+    }
+  }
+  return {
+    vw: innerWidth, vh: innerHeight, hit,
+    space: getComputedStyle(document.documentElement).getPropertyValue('--br8t-account-space').trim(),
+    stack: R('.hud-stack'), pause: R('.hud-pause'), next: R('.next'),
+    obj: R('.obj'), flip: R('.flip'), rail: R('.rail'),
+  };
+})())`;
+
+/**
+ * D9's arm for this gate: the NAIVE version of the same swap, which is what a
+ * reasonable person writes first. Pause goes to the top of the markup but stays
+ * pinned bottom-left, NEXT is absolutely placed in the corner without the
+ * layout being told to leave it room, the panels stay full width, and the
+ * button keeps its old 42 px with no expanded target. Every check below must go
+ * red against it or it is not measuring position at all.
+ */
+async function breakLayout() {
+  await cdp.eval(`(() => {
+    const s = document.createElement('style');
+    s.textContent = \`
+      .hud-stack { display: block !important; }
+      .hud-main, .hud-side { display: contents !important; }
+      .hud-pause { position: fixed !important; left: 14px !important; bottom: 14px !important; }
+      .hud-pause .gb { width: 42px !important; height: 42px !important; }
+      .hud-pause .gb::after { inset: 0 !important; }
+      .next { position: absolute !important; right: 0 !important; top: 200px !important; }
+      /* ...and the mode sheet as it was: six cards that miss the bottom of a
+         real phone by the height of its home indicator. */
+      .sheet { padding: 10px 16px calc(var(--sab) + 16px) !important; }
+      .grabber { margin: 0 auto 12px !important; }
+      .sheet-head { padding: 0 4px 12px !important; }
+      .sheet-body { gap: 8px !important; }
+      .mcard { padding: 12px 14px !important; }
+      .mcard-blurb { display: block !important; margin-top: 4px !important; line-height: 1.38 !important; }\`;
+    document.head.appendChild(s);
+    return 1; })()`);
+}
+
+/**
+ * Does the mode list FIT?
+ *
+ * Measured at two bottom safe areas, because that is the whole bug: six cards
+ * cleared a 390x844 desk viewport by four pixels and then scrolled by thirty in
+ * the hand, where 34 px of home indicator comes off the same sheet. A gate that
+ * only ever measures --sab: 0 would have called the shipped version green.
+ * The tap-target floor rides along in the same check: the fix was to tighten
+ * the cards, and tightening them into 40 px rows would be a worse bug than the
+ * scrollbar.
+ */
+const SHEET_FIT = `JSON.stringify((() => {
+  const body = document.querySelector('.sheet-wrap.is-on .sheet-body');
+  const sheet = document.querySelector('.sheet-wrap.is-on .sheet');
+  if (!body || !sheet) return null;
+  const cards = [...body.querySelectorAll('.mcard')];
+  return {
+    cards: cards.length,
+    overflow: body.scrollHeight - body.clientHeight,
+    sheetH: +sheet.getBoundingClientRect().height.toFixed(1),
+    cap: +(innerHeight * 0.88).toFixed(1),
+    minCard: +Math.min(...cards.map((c) => c.getBoundingClientRect().height)).toFixed(1),
+  };
+})())`;
+
+async function sheetFit(S, ok) {
+  const tag = S.tag;
+  await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&soak&seed=4242`);
+  if (!await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000)) {
+    ok(`${tag}: shell came up for the mode sheet`, false); return;
+  }
+  await cdp.frames(20);
+  if (args.falsify) await breakLayout();
+  await cdp.eval('window.__ui.openModes()');
+  await new Promise((r) => setTimeout(r, 700));
+
+  const read = async (h, sab) => {
+    if (h !== S.h) await cdp.viewport(S.w, h, 1, true);
+    await cdp.eval(sab
+      ? `document.documentElement.style.setProperty('--sab', '${sab}')`
+      : `document.documentElement.style.removeProperty('--sab')`);
+    await new Promise((r) => setTimeout(r, 160));
+    return JSON.parse(await cdp.eval(SHEET_FIT));
+  };
+  // Three viewports the same phone actually has. The third is the one that
+  // caught this: iOS Safari with both bars showing keeps about 88% of the
+  // device height, and 88% of THAT is what the sheet is allowed. A 390x844
+  // number alone says the shipped sheet was fine, and it was not.
+  // The home indicator goes with the notch, so only a phone tall enough to
+  // have one is charged 34 px for it — billing an SE for a home indicator it
+  // does not have is a test failing against a device that cannot exist.
+  const SAFARI = Math.round(S.h * 0.883);
+  const bar = S.h >= 800 ? '34px' : null;
+  const cases = [
+    ['standalone', S.h, null],
+    ['home bar', S.h, bar],
+    ['safari', SAFARI, bar],
+  ];
+  const got = [];
+  for (const [name, h, sab] of cases) got.push([name, h, await read(h, sab)]);
+  await cdp.eval(`document.documentElement.style.removeProperty('--sab')`);
+  await cdp.viewport(S.w, S.h, 1, true);
+
+  const fits = got.every(([, , m]) => m && m.cards === 6 && m.overflow === 0 && m.minCard >= 44);
+  ok(`${tag}: the mode sheet fits without scrolling, cards still 44 px`, fits,
+    got.map(([n, h, m]) => m ? `${n} ${S.w}x${h} ${m.sheetH}/${m.cap} over ${m.overflow}` : `${n} no sheet`)
+      .join(' · ') + (got[0][2] ? ` · card ${got[0][2].minCard}` : ''));
+}
+
+const LAYOUT_MODES = ['flow', 'tide', 'jelly', 'hourglass', 'alchemy', 'zen'];
+
+async function layoutGate() {
+  const fails = [];
+  let total = 0;
+  const ok = (name, cond, detail = '') => {
+    total++;
+    if (!cond) fails.push(name + (detail ? ': ' + detail : ''));
+    console.log(`  ${cond ? 'ok  ' : 'FAIL'}  ${name}${detail ? '  ' + detail : ''}`);
+  };
+
+  for (const S of SIZES) {
+    console.log(`\n  --- ${S.tag} ${S.w}x${S.h}`);
+    await cdp.viewport(S.w, S.h, 1, true);
+    await sheetFit(S, ok);
+    for (const id of LAYOUT_MODES) {
+      await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=${id}&seed=4242`);
+      if (!await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000)) {
+        ok(`${id}: shell came up`, false); continue;
+      }
+      await cdp.frames(20);
+      if (args.falsify) await breakLayout();
+      await pump();
+      await settle();
+
+      const tag = `${S.tag} ${id}`;
+      for (const space of ['52px', '0px']) {
+        await cdp.eval(`document.documentElement.style.setProperty('--br8t-account-space', '${space}')`);
+        await new Promise((r) => setTimeout(r, 90));
+        const g = JSON.parse(await cdp.eval(GEOM));
+        const av = space === '52px' ? avatarBox(g.vw) : null;
+
+        // Both, together: a control column with no measurable box is a layout
+        // that has stopped existing, which is exactly what the arm below does
+        // to ZEN — the mode that declares hud: [] and has nothing else in it.
+        if (!g.pause || !g.stack) { ok(`${tag} @${space}: the top control column is on screen`, false); continue; }
+
+        ok(`${tag} @${space}: pause is the top-right control, clear of the avatar`,
+          g.pause.y - g.stack.y < 6 && g.pause.right > g.vw * 0.55 && !hits(g.pause, av),
+          `pause ${g.pause.x.toFixed(0)},${g.pause.y.toFixed(0)} ${g.pause.w}x${g.pause.h} stack y ${g.stack.y.toFixed(0)}`);
+
+        ok(`${tag} @${space}: pause offers a 44 px target`, g.hit >= 44, `${g.hit} px`);
+
+        if (g.next) {
+          ok(`${tag} @${space}: NEXT is below pause, in the corner, clear of the avatar`,
+            g.next.y >= g.pause.bottom - 0.5 && Math.abs(g.next.right - g.stack.right) < 1.5 && !hits(g.next, av),
+            `next y ${g.next.y.toFixed(0)} vs pause bottom ${g.pause.bottom.toFixed(0)}, right ${g.next.right.toFixed(0)} vs ${g.stack.right.toFixed(0)}`);
+
+          const panel = g.obj || g.flip;
+          if (panel) {
+            ok(`${tag} @${space}: the mode panel stops short of the control column`,
+              panel.right <= g.next.x + 1 && !hits(panel, g.next),
+              `panel right ${panel.right.toFixed(0)} vs next left ${g.next.x.toFixed(0)}`);
+          }
+          if (g.rail) {
+            ok(`${tag} @${space}: the waterline rail clears the NEXT tile`, !hits(g.rail, g.next),
+              `rail y ${g.rail.y.toFixed(0)} vs next bottom ${g.next.bottom.toFixed(0)}`);
+          }
+        }
+      }
+    }
+  }
+
+  if (args.falsify) {
+    console.log(`\nfalsification arm: ${fails.length} of ${total} checks went red`);
+    if (fails.length < total) {
+      console.log('ARM TOO WEAK — these positions are not evidence:\n  ' +
+        '(the checks that stayed green are the ones the naive layout happens to satisfy)');
+      process.exitCode = 1;
+    } else console.log('arm ok: every position check is capable of failing');
+    return;
+  }
+  console.log(fails.length ? '\nLAYOUT FAILURES:\n  ' + fails.join('\n  ') : '\nlayout: all green');
+  if (fails.length) process.exitCode = 1;
+}
+
 /**
  * The ALCHEMY win card, driven by a level actually being solved.
  *
@@ -698,7 +938,7 @@ async function alchemyWin() {
   if (fails.length) process.exitCode = 1;
 }
 
-const SHOTS = !(args.flow || args.win) || args.shots;
+const SHOTS = !(args.flow || args.win || args.layout) || args.shots;
 
 const LOOP_SHOTS = ['attract', 'attract-pour', 'modes', 'events', 'settings', 'hud', 'pause', 'results', 'banner'];
 
@@ -837,6 +1077,7 @@ try {
     }
   }
 
+  if (args.layout) { console.log('\ntop-control layout'); await layoutGate(); }
   if (args.flow) { console.log('\nend-to-end flow'); await endToEnd(); }
   if (args.flow || args.win) { console.log('\nalchemy: a level played to a win'); await alchemyWin(); }
   if (args.probe) { console.log('\ninteraction probe'); await probe(); }

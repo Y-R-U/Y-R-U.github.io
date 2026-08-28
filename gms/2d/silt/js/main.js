@@ -120,9 +120,33 @@ const api = {
   sfx: (n, mag) => AUDIO.sfx(n, mag),
 };
 
-/** Title screen: the bot plays a random mode behind the buttons. */
+/**
+ * Title screen: the bot plays a random mode behind the buttons.
+ *
+ * Only modes whose board is the STANDARD width are eligible. The attract screen
+ * reloads into a different mode each visit, and a mode with a narrower board
+ * letterboxes to a thin column — so the title screen appeared to change width at
+ * random between visits, which reads as broken rather than varied. Filtering by
+ * the most common width is self-correcting: a mode re-enters the rotation the
+ * moment its board matches, without anyone having to maintain a list here.
+ */
+function attractCandidates() {
+  const all = modeList();
+  const widthOf = (m) => (MODES && MODES.configFor ? MODES.configFor(m.id, {}).cols : (m.worldCfg && m.worldCfg.cols) || DEFAULT_CFG.cols);
+  const tally = new Map();
+  for (const m of all) {
+    const w = widthOf(m);
+    tally.set(w, (tally.get(w) || 0) + 1);
+  }
+  let standard = DEFAULT_CFG.cols, best = -1;
+  for (const [w, n] of tally) if (n > best) { best = n; standard = w; }
+  // alchemy is excluded regardless: it is level-driven and has no endless run
+  const list = all.filter((m) => m.id !== 'alchemy' && widthOf(m) === standard);
+  return list.length ? list : all.filter((m) => m.id !== 'alchemy');
+}
+
 function startAttract() {
-  const list = modeList().filter((m) => m.id !== 'alchemy');
+  const list = attractCandidates();
   mode = list[(Math.random() * list.length) | 0];
   world = makeWorld(mode, { seed: (Math.random() * 1e9) | 0 });
   applyBiome(biomeFor(mode));

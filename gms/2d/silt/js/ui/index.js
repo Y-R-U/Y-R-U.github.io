@@ -81,16 +81,27 @@ export function createUI(handlers = {}) {
   const hudScore = h('div', { class: 'hud-score' }, hudMode, hudVal,
     h('div', { class: 'hud-pills' }, pillChains, pillTide, pillCombo));
 
+  // The top of the HUD is two columns, and which control sits in which is a
+  // playtest result rather than a preference. PAUSE used to live in the
+  // bottom-left thumb arc and NEXT in the top-right; on a real phone the thumb
+  // is on the board for the whole run, so the button under it was being hit by
+  // accident and the tile you actually want to READ was the one furthest from
+  // the eye. They are swapped: PAUSE takes the top slot (and grows past 44 px,
+  // since it is no longer where the thumb already rests) and NEXT drops beneath
+  // it, under the account avatar. Both live in one column so the mode panels —
+  // ALCHEMY's objective, HOURGLASS's flip clock — are laid out BESIDE them and
+  // can never run underneath either.
   const hud = h('div', { class: 'scr scr-hud' },
     h('div', { class: 'veil veil-top' }),
     h('div', { class: 'veil veil-bot' }),
     ...modeHud.boardEls,
     h('div', { class: 'frame' },
       h('div', { class: 'hud-stack' },
-        h('div', { class: 'hud-top' }, hudScore, nextBox),
-        ...modeHud.panels),
-      h('div', { class: 'hud-pause' },
-        tap(h('button', { class: 'gb gb--icon', 'aria-label': 'Pause' }, icon(GLYPH.pause)), () => pause())),
+        h('div', { class: 'hud-main' }, hudScore, ...modeHud.panels),
+        h('div', { class: 'hud-side' },
+          h('div', { class: 'hud-pause' },
+            tap(h('button', { class: 'gb gb--icon', 'aria-label': 'Pause' }, icon(GLYPH.pause)), () => pause())),
+          nextBox)),
       zenPal.el,
       hudHint),
   );

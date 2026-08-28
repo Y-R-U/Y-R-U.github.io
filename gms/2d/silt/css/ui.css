@@ -120,7 +120,7 @@
 
 .corner { position: absolute; }
 .corner-tl { top: var(--edge); left: var(--edge); }
-.corner-tr { top: var(--edge); right: calc(var(--edge) + var(--br8t-account-space)); }
+.corner-tr { top: var(--edge); right: calc(var(--edge) + var(--br8t-account-space, 0px)); }
 .corner-bl { bottom: var(--edge); left: var(--edge); }
 .corner-br { bottom: var(--edge); right: var(--edge); }
 
@@ -208,20 +208,27 @@
 
 /* --------------------------------------------------------------------- hud */
 
-/* The score block, the NEXT tile and any mode panel stack downward from one
-   anchor, so a panel a mode did not ask for costs no layout at all. */
+/* Two columns from one anchor. LEFT is everything the mode says about the run —
+   score, pills, and any panel it declared — and it takes all the width that is
+   left. RIGHT is the two controls, PAUSE above NEXT.
+   The split is what keeps them apart: a panel is a sibling of the control
+   column, not a full-width strip underneath it, so ALCHEMY's objective and
+   HOURGLASS's flip clock cannot slide under the NEXT tile at any width.
+   A panel a mode did not ask for is display:none and still costs no layout. */
 .hud-stack {
   position: absolute;
   top: 10px;
   left: var(--edge);
   right: var(--edge);
+  display: flex; align-items: flex-start; gap: 12px;
 }
-.hud-top { display: flex; align-items: flex-start; gap: 12px; }
+.hud-main { flex: 1 1 auto; min-width: 0; }
+.hud-side { flex: 0 0 auto; display: flex; flex-direction: column; align-items: flex-end; gap: 16px; }
 
 /* Field gating. A mode's own hud[] decides what exists; .off is "this mode does
    not have one", .hide is "it has one and it is not worth showing yet". */
 .hud-score.off, .next.off, .pill.off, .panel.hide, .rail.hide, .zen-pal.hide { display: none; }
-.hud-score { flex: 1; min-width: 0; }
+.hud-score { min-width: 0; }
 .hud-mode { display: block; }
 .hud-val {
   display: block; margin-top: 1px;
@@ -254,7 +261,12 @@
 .pill--combo b { color: #fff0d2; }
 .pill.hide { display: none; }
 
-/* next piece */
+/* next piece — second in the control column, so it sits UNDER the account
+   avatar rather than beside it. The avatar is 40 px tall in the top-right
+   corner and publishes its footprint as --br8t-account-space; the pause button
+   above carries that offset, which is what leaves this tile a clear corner to
+   drop into. With no account layer the variable is 0px and the two controls
+   simply stack flush to the right edge. */
 .next {
   flex: 0 0 auto;
   width: 56px; height: 56px; border-radius: 16px;
@@ -263,7 +275,6 @@
   -webkit-backdrop-filter: var(--blur); backdrop-filter: var(--blur);
   box-shadow: 0 8px 22px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,244,226,.12);
   padding: 8px;
-  margin-right: var(--br8t-account-space);
   position: relative;
 }
 .next::after {
@@ -274,15 +285,28 @@
 }
 .next svg { width: 100%; height: 100%; display: block; overflow: visible; }
 
-.hud-pause {
-  position: absolute;
-  bottom: var(--edge);
-  left: var(--edge);
-}
+/* Pause, at the top of the control column. Two things it has to do that it did
+   not have to do in the bottom-left corner:
+   1. clear the account avatar, which floats FIXED in the top-right corner and
+      publishes its width as --br8t-account-space. Nudging left by exactly that
+      is what puts the avatar and this button side by side instead of on top of
+      one another — and the 0px fallback means it is flush right when the
+      account layer is not loaded at all (every ?auto run, and the site without
+      a signed-in profile).
+   2. survive not being under a thumb any more. 48 px painted, and a hit area
+      pushed out 8 px on every side, so the real target is 64 px — well past the
+      44 px floor for a control you now have to reach for. */
+.hud-pause { flex: 0 0 auto; margin-right: var(--br8t-account-space, 0px); }
+.hud-pause .gb { width: 48px; height: 48px; border-radius: 17px; }
+.hud-pause .gb svg { width: 21px; height: 21px; }
+.hud-pause .gb::after { content: ''; position: absolute; inset: -8px; border-radius: 25px; }
 
+/* The hint used to be lifted clear of the pause button in the bottom-left
+   corner. That corner is empty now, so it sits on the edge like the caption it
+   is. (ZEN still lifts it over the palette — see .is-bare below.) */
 .hud-hint {
   position: absolute; left: 0; right: 0;
-  bottom: calc(var(--edge) + 54px);
+  bottom: calc(var(--edge) + 6px);
   text-align: center; font-size: 9px; letter-spacing: .24em;
   text-transform: uppercase; font-weight: 600;
   color: rgba(246,239,228,.44);
@@ -418,8 +442,12 @@
 .rail {
   position: absolute; z-index: 2; width: 11px;
   left: calc(var(--board-x, 0px) + var(--board-w, 100%) - 26px);
-  top: calc(var(--board-y, 0px) + 150px);
-  height: calc(var(--board-h, 70vh) - 172px);
+  /* Starts below the control column, which is taller now that PAUSE and NEXT
+     are stacked in it — the rail runs down the same right-hand edge, so this
+     offset is the one number that keeps the waterline out from under the NEXT
+     tile on a narrow board. */
+  top: calc(var(--board-y, 0px) + 178px);
+  height: calc(var(--board-h, 70vh) - 200px);
   border-radius: 6px;
   border: 1px solid rgba(255,238,212,.2);
   background: rgba(3,6,11,.66);
@@ -581,9 +609,16 @@
   width: var(--ui-w, 100%);
   max-width: 100%;
   pointer-events: auto;
+  /* Six mode cards very nearly fit a 390x844 phone, and "very nearly" is the
+     worst outcome available: the player gets a scrollbar that travels about
+     thirty pixels, which reads as a broken screen rather than as a list. Every
+     number from here down to .mcard-blurb was tightened until the whole list
+     clears 88% with real headroom — a phone's bottom safe area is 34 px and it
+     comes off this sheet, so a layout that fits EXACTLY on the desk fits by
+     -34 px in the hand. See the max-height query below for short screens. */
   max-height: 88%;
   display: flex; flex-direction: column;
-  padding: 10px 16px calc(var(--sab) + 16px);
+  padding: 9px 16px calc(var(--sab) + 14px);
   border-radius: 30px 30px 0 0;
   border-top: 1px solid rgba(255,238,212,.16);
   background:
@@ -597,13 +632,13 @@
 .sheet-wrap.is-on .sheet { transform: none; }
 
 .grabber {
-  width: 38px; height: 4px; border-radius: 2px; margin: 0 auto 12px;
+  width: 38px; height: 4px; border-radius: 2px; margin: 0 auto 9px;
   background: rgba(246,239,228,.2); flex: 0 0 auto;
 }
 
 .sheet-head {
   display: flex; align-items: baseline; justify-content: space-between;
-  padding: 0 4px 12px; flex: 0 0 auto;
+  padding: 0 4px 8px; flex: 0 0 auto;
 }
 .sheet-title {
   font-size: 15px; font-weight: 700; letter-spacing: .3em; text-transform: uppercase;
@@ -614,7 +649,7 @@
 .sheet-body {
   min-height: 0; overflow-y: auto; overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  display: flex; flex-direction: column; gap: 8px;
+  display: flex; flex-direction: column; gap: 7px;
   padding-bottom: 4px;
   touch-action: pan-y;
 }
@@ -624,7 +659,7 @@
 .mcard {
   pointer-events: auto;
   display: flex; align-items: center; gap: 13px;
-  width: 100%; padding: 12px 14px;
+  width: 100%; padding: 10px 13px;
   border: 1px solid rgba(255,238,212,.11);
   border-radius: var(--r-lg);
   background: linear-gradient(120deg, rgba(255,240,220,.055), rgba(255,240,220,.014));
@@ -652,7 +687,7 @@
   text-transform: uppercase; color: #fff4e6;
 }
 .mcard-blurb {
-  display: block; margin-top: 4px; font-size: 11.5px; line-height: 1.38;
+  display: block; margin-top: 3px; font-size: 11.5px; line-height: 1.32;
   color: rgba(246,239,228,.5); letter-spacing: .005em;
 }
 .mcard-meta { flex: 0 0 auto; text-align: right; white-space: nowrap; }
@@ -663,6 +698,37 @@
   display: inline-block; padding: 3px 7px; border-radius: 7px;
   border: 1px solid rgba(246,239,228,.18);
   font-size: 8px; letter-spacing: .2em; font-weight: 700; color: var(--faint);
+}
+
+/* Short screens — an iPhone SE at 375x667, and, the case that actually bit, a
+   390x844 phone in iOS Safari, which keeps about 745 CSS px once both bars are
+   showing. The list still has to FIT there, because a sheet that scrolls by
+   forty pixels is the bug this pass exists to remove, so below the threshold
+   the third line of the blurb goes rather than the sixth mode. 800 px is where
+   a full three-line list stops clearing 88% with a 34 px home indicator under
+   it; above it nothing here applies and every blurb is whole. Tap targets are
+   untouched — the smallest card is still 70 px tall. */
+@media (max-height: 800px) {
+  .sheet { padding-bottom: calc(var(--sab) + 10px); }
+  .sheet-body { gap: 5px; }
+  .mcard { padding: 9px 12px; }
+  .mcard-blurb {
+    display: -webkit-box; -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+  }
+}
+
+/* Genuinely short: an SE in Safari is 589 CSS px, and six cards cannot be made
+   to fit that without taking the type below where it is worth reading. This
+   tier buys back most of the scroll rather than all of it, on purpose — the
+   line is drawn at the smallest card still being a 44 px target. */
+@media (max-height: 620px) {
+  .grabber { margin: 0 auto 6px; }
+  .sheet-head { padding: 0 4px 6px; }
+  .sheet-body { gap: 4px; }
+  .mcard { padding: 8px 12px; }
+  .mcard-art { width: 42px; height: 42px; border-radius: 14px; }
+  .mcard-blurb { font-size: 11px; line-height: 1.28; }
 }
 
 /* ------------------------------------------------------------- settings */
