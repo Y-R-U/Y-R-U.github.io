@@ -1053,6 +1053,20 @@ input[type=range]::-moz-range-thumb { width: 15px; height: 15px; border-radius: 
 .card-row { display: flex; gap: 9px; }
 .card-row .gb { flex: 1; }
 
+/* The replay button rides BESIDE the forward move, not under it: the primary
+   keeps the width it had and the secondary is an icon, so the card's shape does
+   not change between a won level and a lost one.
+
+   This block sits AFTER `.card-btns .gb { width: 100% }` on purpose. Same
+   specificity, so source order decides it, and written earlier the button came
+   out 294 px wide — the full card — while every check about it stayed green,
+   because a gate that asks "is it at least 44px" cannot notice a button that is
+   six times too big. */
+.alc-lead { display: flex; align-items: stretch; gap: 9px; }
+.alc-lead .gb--primary { flex: 1 1 auto; width: auto; }
+.card-btns .alc-again { flex: 0 0 auto; width: 52px; padding: 0; }
+.alc-again.hide { display: none; }
+
 /* --------------------------------------------------------------- desktop */
 
 /* The frame does the layout work, so a wide window needs almost nothing here. */

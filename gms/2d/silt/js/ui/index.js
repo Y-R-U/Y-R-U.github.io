@@ -210,15 +210,26 @@ export function createUI(handlers = {}) {
   const alcGoal = h('div', { class: 'alc-goal' });
   const alcStats = h('div', { class: 'statrow' });
   const alcPrimary = tap(h('button', { class: 'gb gb--primary' }), () => alcGo());
+  // REPLAY, on a won level as much as a lost one. A star rating you can see is
+  // an invitation to beat it, and until now the only way back into a level you
+  // had just three-starred-with-one-star was through the campaign sheet, two
+  // taps away and scrolled to the wrong act. It rides beside the primary rather
+  // than under it, small, because the forward move is still the default.
+  const alcAgain = h('button', { class: 'gb gb--icon alc-again', 'aria-label': 'Play this level again' },
+    icon(GLYPH.again));
+  const alcLead = h('div', { class: 'alc-lead' }, alcAgain, alcPrimary);
   const alcCard = h('div', { class: 'card card--alc hide' },
     alcKicker, alcTitle, alcStars, alcGoal, alcStats,
     h('div', { class: 'card-btns' },
-      alcPrimary,
+      alcLead,
       h('div', { class: 'card-row' },
         tap(h('button', { class: 'gb gb--ghost' }, icon(GLYPH.grid), 'Levels'), () => openLevels()),
         tap(h('button', { class: 'gb gb--ghost' }, icon(GLYPH.home), 'Home'), () => H.onQuit()))));
 
   let alcGo = () => {};
+  let againGo = () => {};
+  const tapAgain = (fn) => { againGo = fn; };
+  tap(alcAgain, () => againGo());
 
   const results = h('div', { class: 'scr scr-results' },
     h('div', { class: 'modal-wrap' },
@@ -569,6 +580,10 @@ export function createUI(handlers = {}) {
     alcGo = hasNext ? () => playLevel(a.id + 1)
           : last ? () => { H.onQuit(); openLevels(); }
           : () => playLevel(a.id);
+    // On a LOST level the primary is already "Try again", so a second replay
+    // button would be the same button twice.
+    alcAgain.classList.toggle('hide', !won);
+    tapAgain(() => playLevel(a.id));
   }
 
   /** Seven digits do not fit at 54px. Step the size instead of letting it clip. */

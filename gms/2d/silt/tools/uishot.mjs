@@ -1114,11 +1114,13 @@ async function alchemyWin() {
   // bot beats 3 of 3: the win card was fine, the seed was not. What is under
   // test here is the CARD.
   let lv = JSON.parse(await q('JSON.stringify(window.__game.world.alchemy)'));
+  let wonUrl = `${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=alchemy&seed=4242`;
   let r = await drive('w.alchemy && w.alchemy.won', 90000);
   for (const seed of [900, 1213]) {
     if (r.reached) break;
     console.log(`  seed ${seed}: the bot did not solve it, trying another`);
-    await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=alchemy&seed=${seed}`);
+    wonUrl = `${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=alchemy&seed=${seed}`;
+    await cdp.goto(wonUrl);
     await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000);
     await cdp.frames(20);
     lv = JSON.parse(await q('JSON.stringify(window.__game.world.alchemy)'));
@@ -1143,6 +1145,32 @@ async function alchemyWin() {
     /next level/i.test(nxt) && nxt.indexOf('lv ' + (lv.id + 1)) >= 0, nxt);
   await settle();
   if (SHOTS) await shot('phone-alchemy-win');
+
+  // REPLAY sits beside NEXT LEVEL on a WON level, and must restart the level you
+  // just finished rather than the one after it — the two buttons are adjacent
+  // and one of them being wired to the other is the whole risk.
+  const againVis = await q(`(() => { const e = document.querySelector('.alc-again');
+    if (!e || e.classList.contains('hide')) return 'hidden';
+    const r = e.getBoundingClientRect();
+    // Both bounds. A minimum-only check let a 294px replay button — the whole
+    // card, sitting on top of NEXT LEVEL's row — pass as "shown".
+    const w = Math.round(r.width), h = Math.round(r.height);
+    return w >= 44 && h >= 44 && w <= 90 ? 'shown ' + w + 'x' + h : 'wrong size ' + w + 'x' + h; })()`);
+  ok('a won level offers a replay button', /^shown/.test(againVis), String(againVis));
+  await click('.alc-again');
+  await cdp.frames(12);
+  ok('replay restarts THIS level, not the next one',
+    (await q('window.__game.world.cfg.levelId')) === lv.id,
+    `lv ${await q('window.__game.world.cfg.levelId')} vs ${lv.id}`);
+  // Back to the win card for the checks below, by RELOADING THE SEED THAT WON.
+  // Restarting through startLevel() gives the level a fresh random seed and the
+  // bot only beats a level on two seeds out of three, so that route fails this
+  // gate about a third of the time for a reason that has nothing to do with it.
+  await cdp.goto(wonUrl);
+  await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000);
+  await cdp.frames(20);
+  await drive('w.alchemy && w.alchemy.won', 90000);
+  await cdp.frames(30);
 
   await click('.card--alc .gb--primary');
   await cdp.frames(12);
