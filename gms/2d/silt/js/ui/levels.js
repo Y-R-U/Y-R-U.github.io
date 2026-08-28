@@ -50,12 +50,16 @@ import('../modes/alchemy.js')
 export function levelById(id) { return LEVELS.find((l) => l.id === id) || null; }
 export function levelCount() { return LEVELS.length; }
 
-/** m:ss for anything past a minute, one decimal below ten — the same clock the HUD uses. */
-export function secs(s) {
-  s = Math.max(0, s || 0);
-  if (s < 10) return s.toFixed(1) + 's';
-  if (s < 60) return s.toFixed(0) + 's';
-  return Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0');
+/**
+ * A piece count, with its noun. THE NOUN IS NOT OPTIONAL — the campaign's
+ * currency used to be seconds, and a bare "11" beside a star is exactly the
+ * number a returning player reads as a time. It is also the only unit the
+ * campaign has, so it is defined here beside `stars()` rather than in whichever
+ * screen happens to print it first.
+ */
+export function pieces(n) {
+  const v = Math.max(0, Math.round(n || 0));
+  return v + (v === 1 ? ' piece' : ' pieces');
 }
 
 /** Three pips. `lit` of them filled — the same object on a tile, a card and a stat. */

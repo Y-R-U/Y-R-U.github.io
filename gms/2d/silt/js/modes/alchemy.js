@@ -2,6 +2,7 @@ import { SAND, CRYSTAL, STEAM, FIRE, EMPTY } from '../sim/materials.js';
 import { applyScene, makeTracker, OBJECTIVE_LABEL } from '../data/levelgen.js';
 import { pieceBounds, BLK } from '../sim/pieces.js';
 import { LEVELS } from '../data/levels.js';
+import { TUTORIAL } from '../data/tutorial.js';
 import { safeApi } from './api.js';
 import { makeScorer } from './score.js';
 
@@ -22,6 +23,25 @@ const S = new WeakMap();
 
 export const ALCHEMY_CFG = {
   hardFailAtLimit: true, ventRows: 6, corridorPad: 6, corridorDepth: 12,
+  /**
+   * A LEVEL IS A HANDFUL OF PIECES, NOT A STOPWATCH.
+   *
+   * Stars used to be time thresholds, so thinking cost wall-clock and bought
+   * nothing: measured, a bot that hard-drops with no placement thought at all
+   * three-starred every level it finished (3.00 stars per win against a
+   * deliberate bot's 2.40), and a bot with real intent that ALSO hard-dropped
+   * scored identically to the mindless one — placement was not the variable,
+   * speed was. Every objective here is a volume race and volume is exactly what
+   * throughput buys, so no bonus paid in seconds could ever fix it. A time
+   * bonus I shipped for precisely that purpose turned out to pay a masher 41x
+   * what it paid a thoughtful player.
+   *
+   * Pieces invert it. Each drop costs one, thinking is free, and the fastest
+   * way to spend your budget is to spend it carelessly. `limitS` is gone from
+   * this mode: the board filling up is still the other way to lose, and that is
+   * pressure enough without a clock that punishes deliberation.
+   */
+  piecesFail: true,
   // THE WIDEST SPAN BUYS TIME. Paid ONCE, on a SHARE of the board. See below.
   spanShare: (f) => Math.min(8, Math.max(0, f - 0.30) * 17.8),
   spanMinCells: 900,
@@ -125,11 +145,22 @@ function vent(world) {
   }
 }
 
-// The working level set. tools/genlevels.mjs swaps in candidate levels and then
+/**
+ * The campaign is three hand-authored levels followed by the generated table.
+ *
+ * The tutorial is kept in its own file and PREPENDED rather than merged into
+ * levels.js, because levels.js is regenerated wholesale and anything written
+ * into it by hand is destroyed the next time. Ids are renumbered across the
+ * join so the campaign still reads 1..N to a player and to the save.
+ */
+const CAMPAIGN = [...TUTORIAL, ...LEVELS].map((lv, i) => (lv.id === i + 1 ? lv : { ...lv, id: i + 1 }));
+
+// The working level set. tools/modesim.mjs swaps in candidate levels and then
 // plays them through THIS module, so the validator measures the shipping code
-// path rather than a copy of it.
-let ACTIVE = LEVELS;
-export function setLevels(list) { ACTIVE = (list && list.length) ? list : LEVELS; }
+// path rather than a copy of it. A candidate list replaces the campaign whole —
+// the generator must never be validating against the tutorial.
+let ACTIVE = CAMPAIGN;
+export function setLevels(list) { ACTIVE = (list && list.length) ? list : CAMPAIGN; }
 export function activeLevels() { return ACTIVE; }
 
 export function levelById(id) {
@@ -168,9 +199,12 @@ export function worldCfgFor(opts = {}) {
 export default {
   id: 'alchemy',
   name: 'ALCHEMY',
-  blurb: 'Water quenches lava into crystal — and crystal is forever. A graded campaign of measured problems.',
+  blurb: 'Water quenches lava into crystal — and crystal is forever. One solution each, and a handful of pieces to find it.',
   biome: 'kiln',
-  hud: ['score', 'objective', 'clock', 'next'],
+  // 'pieces', not 'clock'. The shell keys its panel on 'objective' so the stale
+  // name was harmless, but a mode's own contract naming a resource the mode no
+  // longer has is how the next reader is misled.
+  hud: ['score', 'objective', 'pieces', 'next'],
   get levels() { return ACTIVE; },
   levelById,
   worldCfgFor,
@@ -190,8 +224,7 @@ export default {
       lastNext: world.nextPiece,
       won: false,
       stars: 0,
-      bonus: 0,           // seconds bought back — always equal to `best`
-      best: 0,            // the widest span so far, in seconds
+      used: 0,            // pieces spent
     };
     st.scorer.sync(world);
     S.set(world, st);
@@ -199,7 +232,9 @@ export default {
     world.alchemy = {
       id: lv.id, name: lv.name, act: lv.act, arch: lv.arch,
       label: this.label(lv), value: 0, target: st.tracker.target, base: st.tracker.baseline,
-      frac: 0, left: lv.limitS, stars: 0, won: false,
+      frac: 0, stars: 0, won: false,
+      // `left` is PIECES remaining, not seconds. CONTRACTS.md A.4.
+      left: budgetOf(lv), budget: budgetOf(lv), used: 0,
     };
   },
 
@@ -210,24 +245,39 @@ export default {
     const lv = st.lv;
     vent(world);
 
+    // A new nextPiece means the one before it has been SPAWNED — the piece
+    // transition the material rotation already rides on. Counting spawns rather
+    // than landings means the piece in your hand is one you have paid for,
+    // which is the only reading that makes the number on screen honest.
     if (world.nextPiece !== st.lastNext) {
       st.lastNext = world.nextPiece;
       st.k++;
+      st.used++;
       world.cfg.mat = lv.seq[st.k % lv.seq.length];
     }
 
     const done = st.tracker.update(world);
-    const left = lv.limitS + st.bonus - world.t;
+    const budget = budgetOf(lv);
+    const left = Math.max(0, budget - st.used);
 
     if (done && !st.won) {
       st.won = true;
-      // Stars are judged on the clock the PLAYER faced, which the bonus moved.
-      st.stars = starsFor(lv, world.t - st.bonus);
+      st.stars = starsFor(lv, st.used);
       world.won = true;
       world.over = true;
       api.banner(['', 'COMPLETE', 'COMPLETE', 'PERFECT'][st.stars] || 'COMPLETE');
       api.shake(0.6);
-    } else if (!st.won && ALCHEMY_CFG.hardFailAtLimit && left <= 0) {
+    } else if (!st.won && ALCHEMY_CFG.piecesFail && st.used > budget) {
+      // THE SPAWN THAT OVERRAN THE BUDGET NEVER HAPPENED.
+      //
+      // The first version ended the run when the budget hit zero AND no piece
+      // was in the air, meaning to let the last one finish falling. But a
+      // hard-dropped piece lands inside world.tick() and the next spawn happens
+      // before this hook ever runs, so a player who hard-drops was never once
+      // seen with an empty hand — measured, a masher played FORTY pieces of a
+      // twenty-piece budget. The one strategy the budget exists to stop was the
+      // one strategy exempt from it.
+      world.piece = null;
       world.over = true;
       world.won = false;
     }
@@ -236,12 +286,12 @@ export default {
       id: lv.id, name: lv.name, act: lv.act, arch: lv.arch,
       label: this.label(lv),
       value: st.tracker.value, target: st.tracker.target, base: st.tracker.baseline,
-      frac: st.tracker.frac(), left: Math.max(0, left),
-      stars: st.stars, won: st.won, bonus: +st.bonus.toFixed(1),
-      // The clock the PLAYER faced, which is what a star is judged on. Anything
-      // calibrating star thresholds has to read this and not world.t, or every
-      // threshold comes out generous by exactly the bonus the run earned.
-      elapsed: +Math.max(0, world.t - st.bonus).toFixed(2),
+      frac: st.tracker.frac(),
+      stars: st.stars, won: st.won,
+      // PIECES, not seconds: `left` is what remains of the budget and `used` is
+      // what a star is judged on. Anything calibrating a threshold reads `used`.
+      left, budget, used: st.used,
+      seconds: +world.t.toFixed(2),
     };
     st.scorer.tick(world);
   },
@@ -253,33 +303,34 @@ export default {
     const n = cells ? cells.length : world.lastChainSize;
     const pts = st.scorer.award(world, n);
     api.shake(Math.min(1, n / 3000));
-    if (n >= ALCHEMY_CFG.spanMinCells) {
-      // The share of the STANDING board this span took. g.count still includes
-      // the chain here — detect() only flags the cells, it does not remove them
-      // until they dissolve — so this is the board as it was when the span
-      // closed, which is the board the player was looking at.
-      // `spanSummedQuadratic` is never set in shipping code. It exists so that
-      // tools/modesim.mjs --break masher can restore the ORIGINAL mechanic
-      // verbatim and watch the gate that replaced it go red.
-      const q = ALCHEMY_CFG.spanSummedQuadratic;
-      if (q) { st.bonus += q(n); return pts; }
-      const gain = ALCHEMY_CFG.spanShare(n / Math.max(1, world.g.count));
-      const inc = gain - st.best;
-      if (inc >= 0.5) {
-        st.best = gain;
-        st.bonus = gain;      // paid ONCE: the total IS the widest span
-        api.banner(`+${inc.toFixed(1)}S WIDEST SPAN`);
-      }
-    }
+    // No span bonus. It paid seconds, and seconds no longer decide anything
+    // here — see the note on ALCHEMY_CFG. The budget is what rewards a span
+    // now: a wide one clears more of the board per piece spent, which is the
+    // same incentive expressed in the currency the mode actually counts.
     return pts;
   },
 };
 
-/** stars[] is [oneStar, twoStar, threeStar] in seconds, fastest last. */
-export function starsFor(lv, seconds) {
+/**
+ * How many pieces this level gives you.
+ *
+ * `pieces` is the shipped field. `limitS` is what the old time-limited table
+ * carried, and a level from before the change is read as ONE PIECE PER SECOND
+ * of its old limit — deliberately generous, because the fallback exists so an
+ * un-regenerated table still boots and plays, not so it plays well. A stricter
+ * ratio made every early level unwinnable the moment the clock came out.
+ */
+export function budgetOf(lv) {
+  if (lv && lv.pieces > 0) return lv.pieces | 0;
+  if (lv && lv.limitS > 0) return Math.max(8, Math.round(lv.limitS));
+  return 30;
+}
+
+/** stars[] is [oneStar, twoStar, threeStar] in PIECES USED, fewest last. */
+export function starsFor(lv, used) {
   const s = lv.stars;
-  if (seconds <= s[2]) return 3;
-  if (seconds <= s[1]) return 2;
-  if (seconds <= s[0]) return 1;
+  if (used <= s[2]) return 3;
+  if (used <= s[1]) return 2;
+  if (used <= s[0]) return 1;
   return 1;   // completing at all is worth a star
 }

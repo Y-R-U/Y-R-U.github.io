@@ -444,19 +444,67 @@
 .obj-stars svg { display: block; width: 11px; height: 11px; fill: rgba(246,239,228,.14); stroke: none; transition: fill .3s, filter .3s; }
 .obj-stars svg.on { fill: rgba(255,208,122,.5); }
 .obj.is-won .obj-stars svg.on { fill: #ffd07a; filter: drop-shadow(0 0 6px rgba(255,190,90,.8)); }
-.obj-clock { flex: 0 0 auto; min-width: 40px; text-align: right; font-size: 12.5px; font-weight: 600; color: rgba(246,239,228,.82); }
+/* A pip that has just been spent flares on its way out, then settles into the
+   unlit fill. Without it a star is simply absent on the next glance, which is
+   too late to connect to the drop that cost it. */
+.obj-stars svg.out { animation: pipout .55s var(--ease-out); transform-origin: 50% 50%; }
+@keyframes pipout {
+  0%   { fill: rgba(255,208,122,.85); transform: scale(1.5); }
+  40%  { fill: rgba(255,150,80,.7); }
+  100% { fill: rgba(246,239,228,.14); transform: scale(1); }
+}
 
-.obj.is-late { border-color: rgba(255,190,120,.3); }
-.obj.is-late .obj-clock { color: #ffca8c; }
-.obj.is-urgent { border-color: rgba(255,130,70,.5); box-shadow: 0 0 24px rgba(255,110,40,.22), inset 0 1px 0 rgba(255,244,226,.1); }
-.obj.is-urgent .obj-clock { color: #ff9e6c; animation: ticktock .95s steps(2, end) infinite; }
-@keyframes ticktock { 0%, 58% { opacity: 1; } 59%, 100% { opacity: .38; } }
+/* ------------------------------------------------- the budget (ALCHEMY)
+   Where the clock was. A clock is bare type that moves on its own; this is an
+   INVENTORY — a chip, with the glyph and the noun of the thing it holds — so
+   "18" cannot be misread as eighteen seconds. It never blinks: nothing here
+   changes unless the player spends, and animating it idly would put the
+   stopwatch back by the other door. */
+.obj-pieces {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 5px;
+  height: 20px; padding: 0 8px 0 6px; border-radius: 10px;
+  border: 1px solid rgba(255,238,212,.14);
+  background: rgba(12,10,10,.4);
+  transition: border-color .3s, background .3s, box-shadow .3s;
+}
+.obj-pieces svg { display: block; width: 11px; height: 11px; fill: rgba(246,239,228,.5); stroke: none; transition: fill .3s; }
+.obj-left {
+  font-size: 13px; font-weight: 700; line-height: 1; letter-spacing: .01em;
+  color: #fff3df; font-variant-numeric: tabular-nums; transition: color .3s;
+}
+.obj-unit {
+  font-size: 8.5px; letter-spacing: .15em; text-transform: uppercase; font-weight: 700;
+  color: rgba(246,239,228,.44); transition: color .3s;
+}
+/* The one moving part, and it moves only when a piece is spent. */
+.obj-pieces.spend { animation: spend .38s var(--ease-out); }
+@keyframes spend {
+  0%   { transform: translateY(-3px); }
+  55%  { transform: translateY(1px); }
+  100% { transform: none; }
+}
+
+.obj.is-low .obj-pieces { border-color: rgba(255,190,120,.34); background: rgba(52,28,6,.46); }
+.obj.is-low .obj-left { color: #ffca8c; }
+.obj.is-low .obj-pieces svg { fill: rgba(255,202,140,.72); }
+.obj.is-low { border-color: rgba(255,190,120,.3); }
+.obj.is-last { border-color: rgba(255,130,70,.5); box-shadow: 0 0 24px rgba(255,110,40,.22), inset 0 1px 0 rgba(255,244,226,.1); }
+.obj.is-last .obj-pieces {
+  border-color: rgba(255,130,70,.6); background: rgba(70,26,4,.55);
+  box-shadow: 0 0 16px rgba(255,110,40,.26);
+}
+.obj.is-last .obj-left { color: #ff9e6c; }
+.obj.is-last .obj-unit { color: rgba(255,158,108,.72); }
+.obj.is-last .obj-pieces svg { fill: #ff9e6c; }
 
 .obj.is-won { border-color: rgba(150,240,190,.4); }
 .obj.is-won::before { background: #7fe6a8; box-shadow: 0 0 14px #7fe6a8; }
 .obj.is-won .obj-label { color: #c9ffdd; font-size: 12px; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; }
 .obj.is-won .obj-bar i { background: #7fe6a8; box-shadow: 0 0 16px rgba(127,230,168,.75); }
-.obj.is-won .obj-clock { color: rgba(201,255,221,.8); }
+.obj.is-won .obj-pieces { border-color: rgba(150,240,190,.34); background: rgba(10,40,26,.44); }
+.obj.is-won .obj-left { color: #c9ffdd; }
+.obj.is-won .obj-unit { color: rgba(201,255,221,.66); }
+.obj.is-won .obj-pieces svg { fill: rgba(201,255,221,.7); }
 
 /* ---------------------------------------------------------- flip (HOURGLASS) */
 

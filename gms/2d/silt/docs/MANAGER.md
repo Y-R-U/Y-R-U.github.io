@@ -58,20 +58,20 @@ flag first.
 
 ## Known open items
 
-- `hourglass.until` and `alchemy.left` are SECONDS, not ticks, and neither is in
-  CONTRACTS.md. The HUD renders them as seconds.
+- `hourglass.until` is SECONDS, not ticks, and is not in CONTRACTS.md. The HUD
+  renders it as seconds.
+- **`alchemy.left` is PIECES**, not seconds — the mode has no clock any more.
+  It publishes `left` / `budget` / `used` in pieces and `seconds` as wall-clock
+  for information only. `starsFor(lv, used)` takes pieces; `lv.stars` is three
+  piece counts, fewest last.
 - `alchemy.stars` is the count earned, not the thresholds, so `js/ui/modehud.js`
   reaches into `levelById` to show which star is still on offer. The mode
   publishing them would remove that reach-in.
 - ALCHEMY tops out as often as it times out. The result card names both, but
   whether that is the intended fail mix is a balance question.
-- **Three slag levels are tight on the CLOCK, not the target**: ids 17, 20 and
-  42 have a median completion of 86-99% of their limit, and 20 is in act I. The
-  HEADROOM rule cannot see them — a purge target is a level to reduce TO, so its
-  margin is structurally 0.6 of progress and the tightness lives in `limitS`.
-  A human is likely faster than the bot at a purge, so this is a playtest
-  question before it is a generator question. If it needs fixing, the rule
-  belongs in the same acceptance path and the lever is `limitS`.
+- The clock-tight slag levels are moot: `limitS` no longer exists in ALCHEMY.
+  Whether the same shape recurs in the piece budget is an open question for the
+  regenerated table.
 - **Quench is down to 4 levels.** Six of its seven were rejected for no
   headroom, correctly: crystal saturates at 32-38 against a floor of 32, because
   crystal permanently seals the lava body that makes it. Quench needs a

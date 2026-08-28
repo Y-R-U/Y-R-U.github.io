@@ -61,6 +61,21 @@ const snap = (v, m) => Math.max(m, Math.round(v / m) * m);
 const FILL_REF = 64 * 168 * 168;      // cols*rows^2 of the shipped act-I board
 
 /**
+ * The PROVISIONAL piece budget a candidate is generated with.
+ *
+ * A level is a number of PIECES, not a stopwatch — `limitS` is gone from this
+ * file, because nothing downstream reads it any more. But a candidate has to be
+ * playable before it has been measured, and the objective calibrator needs a
+ * budget to run against: `reach` now means "the furthest the bot got inside
+ * this many pieces", so this number sets the SCALE of the whole campaign. The
+ * shipped `pieces` is overwritten by tools/modesim.mjs with a headroomed
+ * multiple of what the bot actually spent hitting the calibrated target.
+ *
+ * 56 was chosen by sweeping it — see the note in modesim's BUDGET block.
+ */
+export const CALIBRATION_PIECES = 56;
+
+/**
  * Board dimensions, as a function of campaign depth d (0..1).
  *
  * The player never sees the column count — the viewport letterboxes the grid
@@ -288,11 +303,13 @@ export function genLevel(i, count, seed) {
     reactions: true,
     fallRate: 0, fallMax: 0,          // derived from the board, below
     fallAccel: +(0.4 + d * 0.6).toFixed(2),
-    limitS: Math.round(60 + d * 40),
+    // Provisional: overwritten with the measured budget by tools/modesim.mjs.
+    // A candidate must be playable before it can be measured.
+    pieces: CALIBRATION_PIECES,
     seq: [SAND],
     scene: [],
     objective: { type: 'chains', target: 2 },
-    stars: [75, 50, 32],
+    stars: [CALIBRATION_PIECES, 32, 24],   // PIECES USED, fewest last. Measured later.
     arch: 'span',
   };
 

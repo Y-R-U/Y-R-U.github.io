@@ -8,7 +8,7 @@ import { createSandTouch } from './sandtouch.js';
 import { createModeHud } from './modehud.js';
 import { createZenPalette } from './zenpalette.js';
 import { createPayout } from './payout.js';
-import { createLevelPicker, levelById, levelCount, secs, stars } from './levels.js';
+import { createLevelPicker, levelById, levelCount, pieces, stars } from './levels.js';
 
 /**
  * SILT shell.
@@ -28,6 +28,12 @@ const LAST_MODE_KEY = 'silt.lastmode';
 const HINT = {
   play: 'drag to move · tap to turn · swipe to drop',
   zen: 'pick a material · drag to pour',
+  // THE RULE ALCHEMY IS PLAYED BY, said in the place this shell already says
+  // rules. A level is a handful of pieces, not a stopwatch, and a player who
+  // has learned that mashing wins will not work that out from a number that
+  // merely counts down — the sentence has to name BOTH halves: the drop costs
+  // something, and the thinking does not.
+  alchemy: 'each drop spends a piece · thinking costs nothing',
 };
 
 // A run that has not chained yet is a run scoring nothing, and after half a
@@ -523,16 +529,26 @@ export function createUI(handlers = {}) {
     const total = levelCount();
     const got = won ? (r.stars || 1) : 0;
     const bestSt = Math.max(r.bestStars || 0, got);
-    const limit = lv ? lv.limitS : null;
-    const spent = limit != null ? Math.max(0, limit - (a.left || 0)) : null;
+    // What the level COST, in the currency it is scored in. The mode publishes
+    // it outright now; deriving it from a limit and a remainder was only ever a
+    // workaround for a clock that published neither.
+    //
+    // CLAMPED TO THE BUDGET, and that is not rounding a number down to flatter
+    // anyone. The mode fails a run on `used > budget` and explicitly disowns the
+    // spawn that crossed the line — `world.piece = null`, the piece never
+    // happened — so an unclamped card reports "19 of 18" for a player who was
+    // handed eighteen and played eighteen.
+    const budget = a.budget > 0 ? (a.budget | 0) : null;
+    const spent = a.used == null ? null
+      : Math.min(budget == null ? Infinity : budget, Math.max(0, a.used | 0));
 
-    // Two ways to fail a level and they are not the same mistake: the clock ran
-    // out, or the board filled up. Printing "out of time" over a board that
-    // topped out at thirty-eight seconds of a sixty-second level tells the
-    // player to hurry, which is the opposite of the advice they need.
+    // Two ways to fail a level and they are not the same mistake: the budget ran
+    // out, or the board filled up. Printing "out of pieces" over a board that
+    // topped out with nine still in hand tells the player to be quicker with a
+    // resource they had plenty of, which is the opposite of the advice they need.
     alcCard.classList.toggle('is-won', won);
     alcKicker.textContent = won ? 'level complete'
-      : (a.left > 0 ? 'topped out' : 'out of time');
+      : (a.left > 0 ? 'topped out' : 'out of pieces');
     alcTitle.textContent = a.name || ('Level ' + a.id);
 
     alcStars.replaceChildren(stars(got, 'bigstars-row'),
@@ -541,18 +557,23 @@ export function createUI(handlers = {}) {
     if (won) {
       // The star you did NOT take is the reason to play the level again, so name
       // the time that would have earned it rather than just dimming a pip.
+      // The star you did NOT take is a piece count, and naming it is the whole
+      // instruction: "in 11 pieces" tells a player to place better, where
+      // "under 42s" told them to hurry. `in`, not `under` — lane C's own
+      // starsFor awards the star AT the threshold, and "under 11" is wrong by one.
       const nextStar = lv && got < 3 ? lv.stars[got] : null;
       alcGoal.replaceChildren(
         got >= 3
           ? h('div', { class: 'ribbon ribbon--win', text: 'perfect' })
           : h('div', { class: 'alc-nudge' },
               stars(got + 1, 'stars stars--inline'),
-              h('span', { text: nextStar != null ? 'under ' + secs(nextStar) : 'faster' })));
+              h('span', { class: 'alc-next', text: nextStar != null ? 'in ' + pieces(nextStar) : 'in fewer pieces' })));
       alcStats.replaceChildren(
-        // "TIME 10s" on a card that also knows about a countdown is ambiguous
-        // by construction: taken, or left? It is the elapsed time, and the star
-        // thresholds beside it are elapsed times too, so say so.
-        statCell('time taken', spent == null ? '—' : secs(spent)),
+        // "PIECES 12" on a card that also knows about a budget is ambiguous by
+        // construction: spent, or left? It is what the level cost, and the star
+        // threshold beside it is a cost too, so say so — and print the budget
+        // next to it, because twelve is only good or bad against eighteen.
+        statCell('pieces used', spent == null ? '—' : (budget ? spent + ' of ' + budget : String(spent))),
         statCell('score', fmt(r.score)),
         statCell('best', stars(bestSt, 'stars stars--stat')));
     } else {
@@ -566,7 +587,12 @@ export function createUI(handlers = {}) {
       requestAnimationFrame(() => { bar.style.width = (frac * 100).toFixed(1) + '%'; });
       alcStats.replaceChildren(
         statCell('reached', Math.round(frac * 100) + '%'),
-        statCell('score', fmt(r.score)),
+        // What it cost to get that far belongs on the losing card too: on a
+        // top-out it says how much of the budget is still unspent, and on a
+        // spent budget it is the sentence itself. It takes the score's cell,
+        // and that is the right trade — a score is decoration on a puzzle you
+        // failed, while "18 of 18" is the reason you failed it.
+        statCell('pieces used', spent == null ? '—' : (budget ? spent + ' of ' + budget : String(spent))),
         statCell('best', stars(bestSt, 'stars stars--stat')));
     }
 
@@ -654,6 +680,10 @@ export function createUI(handlers = {}) {
         payMark = (window.__state && window.__state.score) || 0;
         lastChains = -1; progPct = -1;
         runAt = performance.now(); nudged = false;
+        // A replay is the same level id, so without this the budget banner
+        // would fire once per level ever rather than once per attempt — and the
+        // attempt is the thing being taught.
+        alcLevel = -1; alcOffer = 0;
       }
     } else {
       zenPal.show(false);
@@ -706,7 +736,7 @@ export function createUI(handlers = {}) {
     root.classList.toggle('has-panel', !F || F.has('objective') || F.has('flip'));
 
     // The best-run rail. ALCHEMY already answers "am I getting anywhere" with an
-    // objective bar and a clock, so it does not get a second one; ZEN has no
+    // objective bar and a piece budget, so it does not get a second one; ZEN has no
     // score to make progress against. What is left is exactly the four endless
     // modes, two of which are the ones a playtester sat in at zero for minutes.
     const save = window.__game && window.__game.save;
@@ -785,11 +815,50 @@ export function createUI(handlers = {}) {
     }
 
     const tide = modeHud.update(s, fields);
+    if (s.alchemy && (!fields || fields.has('objective'))) alchemyEconomy(s.alchemy);
     if (tide) {
       const pct = Math.round(Math.max(0, Math.min(1, tide.frac || 0)) * 100) + '%';
       if (pct !== lastTidePct) { lastTidePct = pct; pillTide.lastElementChild.textContent = pct; }
     }
     drawNext(s.next);
+  }
+
+  /**
+   * THE ECONOMY, SAID OUT LOUD — and then not said again.
+   *
+   * ALCHEMY's currency is pieces now, not seconds, and the number in the HUD
+   * cannot teach that on its own to a player who has already learned that
+   * mashing wins: it looks like every countdown they have ever seen. Two
+   * moments carry it, both in the shell's existing quiet voice rather than a
+   * tutorial box.
+   *
+   *   THE BUDGET, at the top of a level. `18 PIECES` in the same banner the
+   *   mode itself uses for COMPLETE. Only while the campaign is young — a
+   *   banner that fires on all ninety levels is wallpaper, and by then the chip
+   *   in the HUD is doing the job.
+   *
+   *   THE COST, the first time a drop takes a star off the table. That is the
+   *   instant the economy becomes real and it is exactly the one a masher needs:
+   *   nothing was slow, a piece was wasted. It can fire at most twice a level.
+   *
+   * The third and largest part is not here at all — it is HINT.alchemy, which
+   * states the rule in words for four seconds at the start of every run.
+   */
+  const STAR_LOST = { 2: 'TWO STARS LEFT', 1: 'ONE STAR LEFT' };
+  let alcLevel = -1, alcOffer = 0;
+
+  function alchemyEconomy(a) {
+    if (a.id !== alcLevel) {
+      alcLevel = a.id;
+      alcOffer = modeHud.offer;
+      const save = window.__game && window.__game.save;
+      const done = (save && save.levels) ? Object.keys(save.levels).length : 0;
+      if (a.budget > 0 && done < 4) banner(a.budget + ' PIECES');
+      return;
+    }
+    const now = modeHud.offer;
+    if (!a.won && now > 0 && now < alcOffer) banner(STAR_LOST[now] || 'A STAR SPENT');
+    alcOffer = now;
   }
 
   /* --------------------------------------------------------------- touch */

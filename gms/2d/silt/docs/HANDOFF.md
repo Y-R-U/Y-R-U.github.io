@@ -1037,3 +1037,259 @@ did not edit the tool to confirm the second run's star count directly.
 - **span is 12**, above the 8 the manager once set as a stop line.
 - `world.alchemy.bonus` is now always equal to the widest span, not a running
   total. Nothing reads it but the HUD and the gates.
+
+
+## The campaign, regenerated on a piece budget — 2026-08-29, lane C
+
+The manager replaced the clock with a piece economy in `js/modes/alchemy.js`:
+a level is a number of PIECES, `starsFor` takes pieces used, and `limitS` is
+gone. This is the campaign rebuilt in that currency — 119 levels, and the masher
+comparison is now the acceptance test rather than a curiosity.
+
+**Headline: mashing lost.** On all 119 shipped levels, 3 agents x 3 seeds:
+
+| | wins | mean stars/run | stars per WIN | fails |
+|---|---|---|---|---|
+| bot | 341/357 | **2.32** | **2.43** | 16 |
+| swift | 252/357 | 1.56 | 2.21 | 105 |
+| masher | 265/357 | **1.68** | **2.27** | 92 |
+
+Head to head over 119 levels: **strategy 71, mashing 25, tie 23.** The clock
+campaign measured 2.33 against 2.50 stars a run and strategy 2 to mashing 9,
+with the masher three-starring every level it finished. It is a reversal on
+every column, including the one the old design could never win: stars per WIN,
+2.43 against 2.27, where it used to be 2.40 against 3.00.
+
+### The budget, and its headroom
+
+```
+CAL_PIECES  = 56     calibrate the objective inside this many drops
+target      = round(reach * 0.6 * (1 - g))          unchanged, in the new reach
+budget      = max(TRIVIAL+2, ceil(med(uses) * 1.6), max(uses))
+```
+
+`uses` is how many pieces each WINNING validation run cost. Shipped spread:
+13-87 pieces, median 58, and the budget sits at a median **1.61x** the median
+winning spend (max 1.92x).
+
+**Why 1.6, and why it is not really free.** It is the allowance for a human
+being worse at placement than a machine that has played the level a thousand
+times — but the grace pins it from below. A graced level's 2-star threshold is
+`med * 1.15 * 1.20 = 1.38 * med`, and the budget has to sit above it or the
+1-star band collapses into the 2-star one. So anything under about 1.55 is
+structurally illegal while the opening grace exists, and 1.6 is the first round
+number above that floor. The `max(uses)` term is a separate promise: the budget
+can never sit below the most expensive run the generator's own validation
+counted as a win.
+
+**Why the validation still holds after the budget is written.** The runs are
+played at CAL_PIECES, which is more generous than the budget that gets written
+afterwards — but a budget only ever ENDS a run, it never changes one, and the
+sim is deterministic, so a run at the shipped budget is identical to the
+validation run right up to the drop that would have overrun it. `--levels`
+replays all 119 at their shipped budgets and reproduces 119/119.
+
+**Why CAL_PIECES is 56.** Swept at 30 candidates: 40 / 56 / 72 / 96 kept
+19 / 21 / 22 / 23 and gave median winning spends of 27-29 / 32-35 / 34-43 /
+41-58 pieces. It is the campaign's length dial. 96 makes an excavate level cost
+58 drops, which is a long sit on a phone; 40 costs a span level in act I. 56
+sits where a level is 30-40 deliberate drops.
+
+### Star thresholds: same shape, new unit
+
+```
+3 stars   ceil(fastest * 1.05 * (1 + g))     economical
+2 stars   ceil(median  * 1.15 * (1 + g))     competent, capped at the budget
+1 star    the budget                          you finished
+```
+
+Integers, rounded UP in the player's favour, with `three < two` enforced so the
+bands cannot collapse on a short level. The grace ramp survives unchanged in
+shape and is expressed in the new currency: target eased by `(1 - g)`, both
+thresholds by `(1 + g)`.
+
+**The ramp is now indexed on the CAMPAIGN, not on this table.** Three
+hand-authored tutorial levels are prepended and renumbered in front of these, so
+`graceAt` is called with `PRELUDE + index`, `PRELUDE` read from `tutorial.js`
+itself. The player still meets the full 20% allowance for levels 1-9 and
+baseline by 19; in this file that is ids 1-6 and 16. A6 checks the same offset,
+so a table generated against the wrong origin goes red.
+
+### SPAN IS BACK IN ACT I, and level 1 is a span level
+
+Under the clock all six chain-teaching candidates were culled — four for no
+headroom, at a reach of one or two chains against a floor of two. Under a piece
+budget candidate 2 survives, so **the campaign's first generated level is
+`span`, "Clear 2 chains", reach 5, budget 79.** Span overall is 12 levels, same
+as the clock table.
+
+The reason is worth recording because it was not obvious: a span level's reach
+is not limited by topping out, it is limited by how many drops it is given. The
+sweep proves it — span kept 3 / 4 / 5 / 5 of six early candidates at CAL_PIECES
+40 / 56 / 72 / 96. The clock was the constraint all along, because a spanning
+chain is percolation and percolation wants attempts, not seconds.
+
+**Two honest caveats on it.** Level 1 wins 2 of 3 seeds, which is the shipping
+bar but is the weakest place in the campaign to spend it. And its median win is
+49 pieces of a 79 budget, so it is one of the longer levels in the game sitting
+at the front. Both are survivable because the hand-authored `First Span` now
+teaches the verb before it, but if the opening needs to be gentler the lever is
+`pillars()` and the span scene at d≈0, not the acceptance path.
+
+### Regenerated
+
+195 candidates -> **119 kept, 76 rejected** (61%). Acts **23 / 23 / 22 / 24 / 27**,
+ids contiguous, aspect 0.500 throughout, 0 tight, 0 below floor, 0 budget faults.
+
+| rejected | why |
+|---|---|
+| 40 | no headroom |
+| 18 | trivially complete (bot finished inside 8 drops) |
+| 11 | only 1/3 wins |
+| 5 | unreachable |
+| 2 | only 0/3 wins |
+
+The generation report now prints rejections BY ARCHETYPE, because a keep rate is
+an average and the average hides the only thing worth knowing — which archetype
+the acceptance path is quietly emptying:
+
+```
+span      lost 27: 20 no headroom, 6 only 1/3 wins, 1 only 0/3 wins
+quench    lost 36: 15 trivially complete, 20 no headroom, 1 only 1/3 wins
+slag      lost 13: 3 trivially complete, 5 unreachable, 4 only 1/3, 1 only 0/3
+```
+
+| archetype | clock table (119) | piece table (119) |
+|---|---|---|
+| span | 12 | 12 |
+| excavate | 38 | 39 |
+| quench | 4 | **3** |
+| crucible | 38 | 39 |
+| slag | 27 | 26 |
+
+Three seed families at 30 candidates: **18 / 21 / 21 kept**, 0 tight in all
+three, against 20 / 17 / 22 before.
+
+**Quench is 3 and it is the same finding for the fourth time.** Crystal
+saturates: fifteen of its candidates finish inside eight drops and twenty more
+cannot clear the crystal floor with headroom. The piece economy does not touch
+it, because a level that is over in six seconds is over in six drops. The
+objective has to stop being "how much crystal".
+
+### The falsification arm that was green against a broken campaign
+
+`--break masher` first scaled every budget AND every star threshold by four —
+"the campaign as it would ship if the budgets were set with no regard for what
+they cost". **It stayed green.** Not a wiring bug: the fault simply is not the
+fault. Scaling the budget hands everybody three stars and leaves the deliberate
+bot ahead on the fail rate.
+
+Chasing it produced the most useful measurement in this pass. **A generous
+budget alone does not bring mashing back.** It converts a masher's losses into
+ONE-STAR wins, because the star thresholds are counted in pieces and a masher
+cannot hit them — and most of a masher's losses are not budget exhaustion at
+all, it tops the board out (10 of 36 losses survive a 4x budget). So the
+load-bearing half of the piece economy is **the CURRENCY, not the cap**: stars
+denominated in pieces are what make thinking pay, and the budget is the fail
+state that charges for running the board into the ground.
+
+The arm now restores the design this pass replaced — four times the pieces so a
+drop costs nothing, and stars scored on the WALL CLOCK against thresholds
+calibrated from the bot's own runs. It goes red on both bars, and it reproduces
+the original measurement almost exactly: masher 3.00 stars per win against the
+bot's 2.37, head to head strategy 3 mashing 8. The historical numbers were 3.00
+against 2.40, strategy 2 mashing 9.
+
+### What A7 asserts now, and the one thing it deliberately does not
+
+Mean stars per RUN with a 0.25 margin, and the head-to-head count. Both were
+lost under the clock and both are won under the budget.
+
+**Stars per WIN is reported and not asserted.** On the full table the bot is
+ahead (2.43 to 2.27) so it would pass — but on the 12-level sample the default
+run uses it is a dead heat (2.48 to 2.27 today; 2.41 to 2.42 on an earlier
+table, i.e. it can land either side). That is survivorship, not generosity:
+conditioning on a win throws away every run the masher lost and keeps the boards
+where its gamble came off, and on a volume objective a lucky masher really has
+spent its pieces as well as a thoughtful player. Asserting a statistic that
+flips sign on a 36-run sample would give the suite a gate that goes red for
+reasons nobody can act on.
+
+### A8-budget — the new permanent gate
+
+`pieces` is the fail condition, so it is the most load-bearing number on a level
+and it is derived rather than authored. A8 re-derives it from `measured.spend`
+at no simulation cost and catches both ways it can rot:
+
+- **too tight** — a budget under the most expensive run the generator itself
+  counted as a win, which turns a recorded win into a loss. That is the fault
+  this project has already paid for once in the other direction, when a
+  wall-clock cap cut off a winning run and logged a defeat.
+- **too generous** — over 2.4x the median winning spend. Nothing else in the
+  suite can see this: such a level is still winnable, non-trivial, correctly
+  shaped, inside its headroom and correctly graced.
+
+It also asserts `stars` is three descending piece counts ending at the budget.
+`--break budget` doubles one level's budget in a copy: red, `budget 158 is 3.22x
+the 49 pieces the bot spent`.
+
+### A measurement fault found in the gates themselves, and fixed
+
+The mode's ACTIVE list is now the CAMPAIGN — the tutorial prepended to this
+table and RENUMBERED across the join — so `levelById(1)` is a tutorial level and
+`levels.js` entry 1 answers to id 4. Every gate here addresses a level by
+`lv.id` taken from `levels.js`. **The whole suite would have been validating a
+table three places out of step with the one it reported on**: the sampled level
+checks, the masher comparison and every star threshold would have measured a
+different level from the one they named, and all of it would have been green.
+`tools/modesim.mjs` now calls `setLevels(SHIPPED)` at startup, the way the
+generator already does with its candidates. The tutorial is lane C's own file
+and is held to its own bar by `tools/tutgate.mjs`.
+
+### Everything that read a clock, and what it reads now
+
+| was | now |
+|---|---|
+| `capFor = limitS * 2 + 30` | `budget * (rows / fallRate) + 60` — the slowest a piece can fall, per piece it is allowed. A safety net that cannot end a run before the mode does. |
+| `calibrate(capS: limitS + 2)` | `capFor(lv)`, with `lv.pieces = CAL_PIECES` set before the call |
+| `playLevel().at` (effective clock) | `.used` (pieces). Renamed deliberately — a field named for a moment in time holding a count is how a masher got recorded as a three-star player. |
+| trivial: bot won inside 6s | inside 8 drops |
+| `starsFrom(times, limitS, g)` | `starsFrom(uses, budget, g)`, integers |
+| A6 `min(limitS, med*1.15*(1+g))` with 0.2s slack | `min(budget, ceil(...))`, exact — piece counts are integers, so the slack the rounded seconds needed is gone |
+| A7 "the bonus may not be bought with throughput" | "deliberate play must out-star mashing" |
+| `levelgen: limitS = 60 + d*40` | `pieces = CALIBRATION_PIECES`, provisional, overwritten by the measured budget |
+
+### Gates, all run against the shipped artifact
+
+| gate | result |
+|---|---|
+| `node tools/sim.mjs` | PASS, 0.079 ms/tick |
+| `node tools/jellysim.mjs` | PASS |
+| `node tools/modesim.mjs` | PASS, aspect 0.500-0.500, 0 tight, 0 grace faults, 0 budget faults |
+| `node tools/modesim.mjs --levels` | PASS, **119/119** beaten on >= 2 of 3 seeds |
+| `node tools/modesim.mjs --masher` | PASS, bot 2.28 vs masher 1.64, head to head 7-2-3 |
+| `node tools/modesim.mjs --masher --levels` | PASS, bot 2.32 vs masher 1.68, head to head 71-25-23 |
+| `node tools/boot.mjs` | PASS, real renderer |
+| `node tools/gfx_shot.mjs --check` | PASS, 0.4px worst edge |
+| `node tools/uishot.mjs --probe` / `--hit` | PASS |
+| `node tools/uishot.mjs --win --only=none` | PASS — including `a level whose budget runs out says OUT OF PIECES`, and 122 tiles (3 tutorial + 119) |
+| `--break ledger / score / stall / rng / tide / zen / slots` | all red, arms confirmed |
+| `--break trivial / unwinnable / span` (gen path) | all red, arms confirmed |
+| `--break aspect` (shipped) | red, `1/119 board(s) letterbox` |
+| `--break aspect` (gen path) | red, `1/30 board(s) letterbox` |
+| `--break headroom` | red, `1/119 level(s) ship a target above 0.8` |
+| `--break grace` | red, BOTH halves: `1 2-star 57 pieces not eased to 68` and `119 grace -1 want 0.00` |
+| `--break budget` | red, `1 budget 158 is 3.22x the 49 pieces the bot spent` |
+| `--break masher` | red, BOTH bars: `2.17 vs 2.31 stars/run` and `strategy 3, mashing 8` |
+
+### Not verified, said plainly
+
+- **No human has played a piece-budget level.** Every number here is the bot's,
+  and the 1.6x headroom is an argument about a human, not a measurement of one.
+  It is the first thing to check on a phone: whether 58 drops is a level or a
+  chore, and whether running out of pieces reads as fair.
+- The masher is an ablation of the same bot, not a person. It is the best
+  adversary this suite has and it is still a proxy.
+- Level 1's 2-of-3 win rate was measured, not fixed. It ships at the bar.
+- A5 has still never fired on a real artifact, only on its arm and on live
+  rejections — 40 of them this time.

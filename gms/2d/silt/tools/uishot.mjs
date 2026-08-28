@@ -37,7 +37,7 @@
  *   node tools/uishot.mjs --legible --dirtbug   the halo back; every SMEAR line must go red
  *   node tools/uishot.mjs --legible --flatbug   no shadow at all; the bright-board INK lines must
  *   node tools/uishot.mjs --copy          the two ALCHEMY card labels a player could misread
- *   node tools/uishot.mjs --copy --falsify    the copy as it shipped; 3 must go red
+ *   node tools/uishot.mjs --copy --falsify    the copy as it shipped, priced in seconds; 5 must go red
  *   node tools/uishot.mjs --layout        where the top controls ACTUALLY land, per mode
  *   node tools/uishot.mjs --layout --falsify  the naive version of the swap; every position must go red
  *   node tools/uishot.mjs --se            add a 375x667 iPhone SE pass to any of the above
@@ -420,6 +420,53 @@ async function drive(cond, max = 40000) {
 }
 
 /**
+ * RUN THE PIECE BUDGET OUT, from wherever the board currently is.
+ *
+ * A level used to be ended from outside by winding `world.t` past its limit.
+ * There is no limit any more — a level is a number of PIECES — and there is no
+ * equivalent single field to poke, because the count of pieces spent lives in
+ * the mode's own per-world state and is deliberately not reachable from here.
+ *
+ * So squeeze the level instead of the run: set the BUDGET to one, which the
+ * mode re-reads from the level on every tick, and let the mode's own fail
+ * branch fire. That is the shipping code path — `used > budget`, the same
+ * comparison a player loses to — rather than a state this tool invented, which
+ * is the whole difference between testing the loss and staging it.
+ */
+async function starve(minUsed = 6) {
+  // Spend a realistic handful AND get somewhere first, so the card being
+  // photographed is the one a player reaches rather than a level squeezed on
+  // its second piece. Both halves are needed: pieces alone starved a "reduce
+  // sand to 290" board at 0% reached, which is the exact card the comment below
+  // says proves nothing, and progress alone let the bot win the level outright.
+  // If neither lands inside the budget the run still starves — a level that
+  // never moves is a fact about the level, not a reason to skip the check.
+  const primed = await drive(
+    `w.alchemy && w.alchemy.used >= ${minUsed} && w.alchemy.frac >= 0.25`, 30000);
+  const out = await cdp.eval(`(async () => {
+    const M = await import('${base}/gms/2d/silt/js/modes/alchemy.js');
+    const w = window.__game.world;
+    const lv = M.levelById(w.cfg.levelId);
+    // ONE UNDER what has already been spent, so the overrun is by exactly one —
+    // the same margin every real loss has, and the card then reads "9 of 9"
+    // rather than the "2 of 1" a squeeze to a budget of one photographs.
+    lv.pieces = Math.max(1, (w.alchemy.used | 0) - 1);
+    // Stepped WITHOUT a bot. Playing on to reach the overrun means placing
+    // pieces, and a placed piece can complete the objective — twice now this
+    // gate has recorded a WIN where it was asking for a loss, on a tutorial
+    // level the bot finishes in three more drops. Nothing needs to be placed:
+    // the mode re-reads the budget every tick.
+    window.__game.hold(true);
+    for (let i = 0; i < 4 && !w.over; i++) window.__game.step(1);
+    window.__game.hold(false);
+    return JSON.stringify({ budget: M.budgetOf(lv), used: w.alchemy.used,
+                            over: w.over, won: !!w.won });
+  })()`);
+  await cdp.frames(24);
+  return { primed: primed.i, ...JSON.parse(out) };
+}
+
+/**
  * Push the world's real state through the shell exactly the way main.js's frame
  * loop does. Nothing here is invented — every field is read off the live world
  * and the live mode — it only removes the dependency on a rAF landing between
@@ -581,6 +628,18 @@ async function endToEnd() {
     }
     const id = await q('window.__state.mode');
     if (id === 'alchemy') ok('alchemy: its card opens the campaign picker', viaPicker);
+    if (id === 'alchemy') {
+      // THE BUDGET, ANNOUNCED. A level is a number of pieces now, and the number
+      // in the corner is the same shape a countdown has always been — so the
+      // shell says it once, in the banner the mode itself uses for COMPLETE.
+      // Measured EARLY on purpose: a banner is 2.4 s of life and a check that
+      // runs after a second of frames is timing the animation, not the copy.
+      await cdp.frames(10);
+      const bn = await q(`[...document.querySelectorAll('.banner')].map((e) => e.textContent).join('|')`);
+      const bud = await q('window.__game.world.alchemy.budget');
+      ok('alchemy: the level announces its piece budget', bn.indexOf(bud + ' PIECES') >= 0,
+        `"${bn}" for a budget of ${bud}`);
+    }
     await cdp.frames(50);
     const st = await cdp.state();
     ok(`${id}: starts and the sim advances`, st.state === 'play' && st.ticks > 8, `ticks ${st.ticks}`);
@@ -602,6 +661,54 @@ async function endToEnd() {
       const lab = await q('document.querySelector(".obj-label").textContent');
       const cnt = await q('document.querySelector(".obj-count").textContent');
       ok('alchemy: the objective is legible on screen', !!lab && /\d/.test(cnt), `${lab} | ${cnt}`);
+      // THE OTHER HALF OF THE PANEL, and the one that changed meaning. It used
+      // to be a clock. Reading the number alone would pass against a HUD still
+      // printing seconds — the digits look the same — so this asserts BOTH that
+      // the number is the mode's own remaining-piece count and that the noun
+      // beside it says what the number is.
+      const chip = JSON.parse(await q(`JSON.stringify({
+        n: (document.querySelector('.obj-left') || {}).textContent || '',
+        unit: (document.querySelector('.obj-unit') || {}).textContent || '',
+        left: window.__game.world.alchemy.left,
+        budget: window.__game.world.alchemy.budget })`));
+      ok('alchemy: the HUD counts PIECES LEFT, and says so',
+        /^pieces?$/.test(chip.unit) && chip.n === String(chip.left) && chip.budget > 0,
+        JSON.stringify(chip));
+
+      // RUNNING OUT, when the unit is pieces. The panel is a pure function of
+      // the payload, so walk the budget down one piece at a time and record
+      // where each warning turns on. What is asserted is the SHAPE — nothing at
+      // a full budget, amber strictly before red, red before the last piece —
+      // rather than a threshold, which would only be this gate reciting the
+      // stylesheet back to itself.
+      const warn = JSON.parse(await q(`(() => {
+        const a = window.__game.world.alchemy, o = document.querySelector('.obj');
+        const put = (left) => window.__ui.setHud({ score: 0, chains: 0, combo: 1,
+          mode: 'ALCHEMY', modeId: 'alchemy', hud: ['score', 'objective', 'clock', 'next'],
+          alchemy: { ...a, left, used: a.budget - left, won: false } });
+        put(a.budget);
+        const atFull = o.classList.contains('is-low') || o.classList.contains('is-last');
+        let low = 0, last = 0;
+        for (let n = a.budget; n >= 1; n--) {
+          put(n);
+          if (!low && o.classList.contains('is-low')) low = n;
+          if (!last && o.classList.contains('is-last')) last = n;
+        }
+        put(a.left);
+        return JSON.stringify({ budget: a.budget, atFull, low, last }); })()`));
+      ok('alchemy: the budget warns as it runs out, and not before',
+        !warn.atFull && warn.low > 0 && warn.last > 0 &&
+        warn.low < warn.budget && warn.low > warn.last,
+        JSON.stringify(warn));
+
+      // ...and walking the budget down crosses a star threshold, which is the
+      // moment the economy is actually taught: a pip going quietly dark is a
+      // thing you notice one drop too late to connect to the drop that did it.
+      const said = await q(`[...document.querySelectorAll('.banner')].map((e) => e.textContent).join('|')`);
+      ok('alchemy: spending a star is said, not just dimmed', /stars? left/i.test(said), `"${said}"`);
+      // The teaching moment in one frame: the budget chip, the pip that just
+      // went out, and the sentence that says why.
+      if (args.shots) { await settle(); await shot('phone-alchemy-economy'); }
     }
     if (id === 'tide') {
       const hgt = await q('document.querySelector(".rail i").style.height');
@@ -647,13 +754,15 @@ async function endToEnd() {
   }
 
   if (args.falsify) {
-    // Eight: the four "HUD shows exactly what the mode declared" lines for TIDE,
-    // HOURGLASS, ALCHEMY and ZEN, plus the four detail checks that read the
-    // objective text, the rail height, the flip clock and the palette. FLOW and
-    // JELLY stay green on purpose — they declare no mode panel, so the arm
-    // cannot change what their HUD should look like, and a gate that went red
-    // for them would be measuring something other than what it claims.
-    const MUST = 8;
+    // Twelve: the four "HUD shows exactly what the mode declared" lines for
+    // TIDE, HOURGLASS, ALCHEMY and ZEN, plus the eight detail checks that read
+    // the objective text, ALCHEMY's piece budget in the banner, in the panel, as
+    // it runs down and as it costs a star, the rail height, the flip clock and
+    // the palette. FLOW and JELLY stay green on
+    // purpose — they declare no mode panel, so the arm cannot change what their
+    // HUD should look like, and a gate that went red for them would be
+    // measuring something other than what it claims.
+    const MUST = 12;
     console.log(`\nfalsification arm: ${fails.length} checks went red, ${MUST} required`);
     if (fails.length < MUST) { console.log('ARM TOO WEAK — these checks are not evidence'); process.exitCode = 1; }
     else console.log('arm ok: every per-mode panel check is capable of failing');
@@ -1105,13 +1214,19 @@ async function alchemyWin() {
     console.log('  !! shell never came up'); process.exitCode = 1; return;
   }
   await cdp.frames(20);
-  if (args.falsify) await blindResults();
-  // Same z-order arm as the probe: put the shipped bug back and the campaign
-  // opens behind the card that asked for it.
-  if (args.zbug) {
-    await cdp.eval(`(() => { const s = document.createElement('style');
-      s.textContent = '.sheet-wrap { z-index: 6 }'; document.head.append(s); return 1; })()`);
-  }
+  // Both arms live on the PAGE — a patched method and an injected stylesheet —
+  // and this gate navigates twice after setting them. Re-apply them there too;
+  // see the note at the reload below for what that was costing.
+  const rearm = async () => {
+    if (args.falsify) await blindResults();
+    // Same z-order arm as the probe: put the shipped bug back and the campaign
+    // opens behind the card that asked for it.
+    if (args.zbug) {
+      await cdp.eval(`(() => { const s = document.createElement('style');
+        s.textContent = '.sheet-wrap { z-index: 6 }'; document.head.append(s); return 1; })()`);
+    }
+  };
+  await rearm();
 
   // MORE THAN ONE SEED, because a level is only guaranteed to fall to the bot
   // on TWO of three seeds — that is the bar tools/modesim.mjs ships it against.
@@ -1129,6 +1244,7 @@ async function alchemyWin() {
     await cdp.goto(wonUrl);
     await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000);
     await cdp.frames(20);
+    await rearm();
     lv = JSON.parse(await q('JSON.stringify(window.__game.world.alchemy)'));
     r = await drive('w.alchemy && w.alchemy.won', 90000);
   }
@@ -1149,6 +1265,21 @@ async function alchemyWin() {
   const nxt = await q('document.querySelector(".card--alc .gb--primary").textContent');
   ok('the win card offers the next level',
     /next level/i.test(nxt) && nxt.indexOf('lv ' + (lv.id + 1)) >= 0, nxt);
+  // WHAT THE LEVEL COST, in the currency the stars were judged in. The card
+  // said "TIME TAKEN 45s" for as long as a star was a stopwatch; a card that
+  // still reports seconds beside a star earned on pieces is telling the player
+  // to hurry, which is now precisely the wrong lesson.
+  const spentCell = JSON.parse(await q(`JSON.stringify((() => {
+    const d = [...document.querySelectorAll('.card--alc .statrow > div')]
+      .find((e) => /piece/i.test(e.querySelector('.t-cap').textContent));
+    return d ? { cap: d.querySelector('.t-cap').textContent,
+                 val: d.querySelector('b').textContent } : null; })())`));
+  ok('the win card says what the level COST, in pieces',
+    !!spentCell && /\d/.test(spentCell.val), JSON.stringify(spentCell));
+  const usedNow = await q('window.__game.world.alchemy.used');
+  const leading = spentCell && (/^(\d+)/.exec(spentCell.val) || [])[1];
+  ok('the cost it prints is the one the mode counted', leading === String(usedNow),
+    `card ${leading} vs used ${usedNow}`);
   await settle();
   if (SHOTS) await shot('phone-alchemy-win');
 
@@ -1175,6 +1306,13 @@ async function alchemyWin() {
   await cdp.goto(wonUrl);
   await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000);
   await cdp.frames(20);
+  // RE-ARM AFTER THE RELOAD. Both arms are page state — blindResults() patches
+  // a live object, --zbug injects a stylesheet — and a navigation throws both
+  // away with the page. For as long as this reload has been here, every check
+  // after it has been running against the HEALTHY shell while --falsify
+  // reported a number that looked like enough, and --zbug went green outright:
+  // the one check it exists for lives past this line.
+  await rearm();
   await drive('w.alchemy && w.alchemy.won', 90000);
   await cdp.frames(30);
 
@@ -1186,38 +1324,71 @@ async function alchemyWin() {
     `lv ${await q('window.__game.world.cfg.levelId')}`);
   ok('the stars are banked against the level', (await q(`window.__game.save.starsFor(${lv.id})`)) >= earned);
 
-  // Now lose one, on the mode's own terms. Let the bot get part of the way
-  // first: a losing card photographed at 0% proves the card exists and nothing
-  // about whether it can say how close you came.
-  const part = await drive('w.alchemy && w.alchemy.frac > 0.4', 30000);
-  console.log('  part-played: ' + JSON.stringify(part));
-  await q('window.__game.world.t = 1e4');
-  await cdp.frames(24);
-  ok('a level that runs out of time shows the OUT OF TIME card', (await q(cardState)) === 'lost',
+  // Now lose one, on the mode's own terms.
+  //
+  // ON A GENERATED LEVEL, not on whichever level NEXT LEVEL happened to open.
+  // Acts I's first three are hand-authored to be unfailable and the bot
+  // finishes them in two or three drops, so this gate kept recording a WIN
+  // where it was asking for a loss — the level ended before it could be
+  // starved. A volume race deep in the campaign cannot be won in a handful of
+  // pieces, which is what makes the loss reachable at all.
+  const campaign = await cdp.eval(
+    `(async () => (await import('${base}/gms/2d/silt/js/modes/alchemy.js')).activeLevels().length)()`);
+  // MORE THAN ONE LEVEL, for the same reason this gate already tries more than
+  // one seed: whether the bot can be starved before it wins is a property of
+  // the level it is put on, not of the card under test. The first attempt was
+  // pinned to one level and duly recorded a WIN on the run where a single
+  // "reduce sand to N" chain took the objective from 0.3 to complete.
+  const lossLv = Math.max(4, Math.min(20, campaign));
+  const CANDIDATES = [lossLv, Math.min(campaign, lossLv + 7), Math.min(campaign, lossLv + 14)];
+  const loseByBudget = async (minUsed) => {
+    let st = null;
+    for (const n of CANDIDATES) {
+      await q(`window.__game.startLevel(${n})`);
+      await cdp.frames(24);
+      st = await starve(minUsed);
+      console.log(`  starved lv ${n}: ` + JSON.stringify(st));
+      if (st.over && !st.won) return st;
+      console.log('  the bot solved it before it could be starved; trying a later level');
+    }
+    return st;
+  };
+  // Let the bot spend a real handful first: a losing card photographed on its
+  // second piece proves the card exists and nothing about whether it can say
+  // how close you came.
+  await loseByBudget(8);
+  ok('a level that runs out of pieces shows the OUT OF PIECES card', (await q(cardState)) === 'lost',
     String(await q(cardState)));
-  ok('a timed-out level shows no earned stars',
+  ok('a failed level shows no earned stars',
     (await q('document.querySelectorAll(".bigstars-row svg.on").length')) === 0);
   // Two ways to lose, and the card has to name the right one. Which one the bot
   // hit is the WORLD's answer, not this tool's, so ask the world.
   const left = await q('window.__game.world.alchemy.left');
   const kick = await q('document.querySelector(".alc-kicker").textContent');
-  ok('the two cards do not read the same', !/complete/i.test(kick) && /time|topped/i.test(kick), kick);
+  ok('the two cards do not read the same', !/complete/i.test(kick) && /piece|topped/i.test(kick), kick);
   ok('the losing card names the failure the world actually had',
-    left > 0 ? /topped out/i.test(kick) : /out of time/i.test(kick), `${kick} with ${left}s left`);
+    left > 0 ? /topped out/i.test(kick) : /out of pieces/i.test(kick), `${kick} with ${left} pieces left`);
   const objn = await q('(document.querySelector(".alc-obj-num") || {}).textContent || ""');
   ok('the losing card says how close the objective got', /\d+\s*\/\s*\d+/.test(objn), objn);
+  // ...and the percentage beside it is the objective the world actually
+  // reached. A card that always prints 0% would satisfy the line above.
+  const reached = JSON.parse(await q(`JSON.stringify((() => {
+    const d = [...document.querySelectorAll('.card--alc .statrow > div')]
+      .find((e) => /reached/i.test(e.querySelector('.t-cap').textContent));
+    return { shown: d ? d.querySelector('b').textContent : null,
+             frac: window.__game.world.alchemy.frac }; })())`));
+  ok('the percentage it prints is the progress the world actually made',
+    reached.shown === Math.round(Math.max(0, Math.min(1, reached.frac)) * 100) + '%',
+    JSON.stringify(reached));
   await settle();
   if (SHOTS) await shot('phone-alchemy-lost');
 
-  // And the clock specifically, from a healthy board, so the timeout branch is
-  // exercised rather than left to whether the bot happened to top out.
-  await q('window.__game.startLevel(3)');
-  await cdp.frames(24);
-  await q('window.__game.world.t = 1e4');
-  await cdp.frames(24);
+  // And the budget specifically, from a healthy board, so the out-of-pieces
+  // branch is exercised rather than left to whether the bot happened to top out.
+  await loseByBudget(3);
   const kick2 = await q('document.querySelector(".alc-kicker").textContent');
-  ok('a level whose clock runs out says OUT OF TIME',
-    (await q(cardState)) === 'lost' && /out of time/i.test(kick2), kick2);
+  ok('a level whose budget runs out says OUT OF PIECES',
+    (await q(cardState)) === 'lost' && /out of pieces/i.test(kick2), kick2);
 
   // The two halves of this work, tied together: the card sends you back to the
   // campaign and the campaign already knows what you just did.
@@ -1238,16 +1409,21 @@ async function alchemyWin() {
     (await frontLayer('.sheet--lv')) === 'sheet', String(await frontLayer('.sheet--lv')));
 
   if (args.falsify) {
-    // Eight. The arm blinds the results card to WHICH mode finished, which is
+    // Fourteen. The arm blinds the results card to WHICH mode finished, which is
     // exactly the state this work replaced, so every claim about the alchemy
     // card must collapse: the card itself, the two star counts, the level name,
-    // the next-level button, that the button starts the next level, that the
-    // kicker changes, and the objective line on the loss.
-    // Four cannot move and are named rather than counted: the bot still solves
-    // the level, results is still the screen, the save still banks the stars,
-    // and "no stars on a timed-out level" is vacuously true against a card that
-    // never draws stars at all.
-    const MUST = 9;
+    // the next-level button, that the button starts the next level, the two
+    // OUT OF PIECES kickers, that the two cards do not read the same, the
+    // objective line on the loss, the replay button, and — since the currency
+    // changed — that the card names what the level cost, that the number it
+    // prints is the count the mode actually kept, and that the percentage
+    // beside it is the progress the world actually made.
+    // Six cannot move and are named rather than counted: the bot still solves
+    // the level, results is still the screen, replay still restarts this level,
+    // the save still banks the stars, the campaign still opens in front, and
+    // "no stars on a failed level" is vacuously true against a card that never
+    // draws stars at all.
+    const MUST = 15;
     console.log(`\nfalsification arm: ${fails.length} checks went red, ${MUST} required`);
     if (fails.length < MUST) { console.log('ARM TOO WEAK — these checks are not evidence'); process.exitCode = 1; }
     else console.log('arm ok: every alchemy-result check is capable of failing');
@@ -1597,8 +1773,9 @@ async function copyGate() {
   }
   await cdp.frames(20);
   if (args.falsify) {
-    // The copy as it shipped: the headline printed raw, and a time caption that
-    // does not say which time it is. Both checks must go red.
+    // The copy as it shipped: the headline printed raw, and the campaign counted
+    // in SECONDS — an unqualified "time" caption over an elapsed clock, and a
+    // next-star nudge that tells you to be quicker. All four checks must go red.
     await cdp.eval(`(() => {
       const raw = (t) => String(t).replace(/(\\d),(?=\\d{3})/g, '$1');
       const undo = () => {
@@ -1607,7 +1784,11 @@ async function copyGate() {
           if (r !== e.textContent) e.textContent = r;
         }
         for (const e of document.querySelectorAll('.card--alc .statrow .t-cap')) {
-          if (/time taken/i.test(e.textContent)) e.textContent = 'time';
+          if (/piece/i.test(e.textContent)) e.textContent = 'time';
+        }
+        for (const e of document.querySelectorAll('.alc-next')) {
+          const t = e.textContent.replace(/in (\\d+) pieces?/i, 'under $1s');
+          if (t !== e.textContent) e.textContent = t;
         }
       };
       new MutationObserver(undo).observe(document.getElementById('ui'),
@@ -1645,7 +1826,8 @@ async function copyGate() {
     const a = window.__game.world.alchemy;
     window.__ui.results({ modeId: 'alchemy', won: ${won}, stars: ${won ? 2 : 0}, bestStars: 1,
       score: 1071, chains: 7, mode: 'ALCHEMY',
-      alchemy: { ...a, won: ${won}, left: ${won ? 14 : 0} } });
+      alchemy: { ...a, won: ${won}, left: ${won ? 14 : 0},
+                 used: ${won ? 12 : 34}, budget: ${won ? 26 : 34} } });
     return 1; })()`;
 
   await q(`window.__game.startLevel(${lvBig})`);
@@ -1654,14 +1836,24 @@ async function copyGate() {
   await new Promise((r) => setTimeout(r, 420));
   const caps = JSON.parse(await q(`JSON.stringify(
     [...document.querySelectorAll('.card--alc .statrow .t-cap')].map((e) => e.textContent))`));
-  const timeCap = caps[0] || '';
-  ok('the win card says WHOSE time 45s is', /taken|elapsed|spent/i.test(timeCap),
-    `"${timeCap}" — ${caps.join(' / ')}`);
+  const costCap = caps[0] || '';
+  // A LEVEL IS A NUMBER OF PIECES, NOT A NUMBER OF SECONDS, and the card is
+  // where a player who has been mashing finds that out. "TIME 45s" was already
+  // ambiguous — taken or left? — and against piece-priced stars it is worse
+  // than ambiguous, it is the wrong instruction: hurry.
+  ok('the win card counts what a level actually costs', /piece/i.test(costCap),
+    `"${costCap}" — ${caps.join(' / ')}`);
+  ok('no cell on the win card is priced in seconds',
+    !caps.some((c) => /time|second/i.test(c)), caps.join(' / '));
   // ...and it must still fit on one line in a third of the card.
   const wrapped = await q(`(() => {
     const e = document.querySelector('.card--alc .statrow .t-cap');
     return e ? e.getBoundingClientRect().height > 18 : true; })()`);
-  ok('the time caption still fits on one line', wrapped === false, String(wrapped));
+  ok('the cost caption still fits on one line', wrapped === false, String(wrapped));
+  // The star you did not take is the reason to replay, and it has to be named
+  // in the unit that would earn it. "under 42s" sends a player back to mash.
+  const nudge = await q(`(document.querySelector('.alc-next') || {}).textContent || ''`);
+  ok('the next star is named in pieces', /^in \d+ pieces?$/.test(nudge), `"${nudge}"`);
   if (args.shots) await shot('phone-copy-win');
 
   await q(`window.__game.startLevel(${lvBig})`);
@@ -1676,11 +1868,12 @@ async function copyGate() {
   if (args.shots) await shot('phone-copy-lost');
 
   if (args.falsify) {
-    // Three: the headline across the level sample, the headline on the losing
-    // card, and the time caption. The "sample is big enough" line cannot move —
-    // it is about the LEVELS, not about the copy — and neither can the one-line
-    // fit, which the arm's shorter caption only makes easier.
-    const MUST = 3;
+    // Five: the headline across the level sample, the headline on the losing
+    // card, the cost caption, that no cell is priced in seconds, and the
+    // next-star nudge. The "sample is big enough" line cannot move — it is
+    // about the LEVELS, not about the copy — and neither can the one-line fit,
+    // which the arm's shorter caption only makes easier.
+    const MUST = 5;
     console.log(`\nfalsification arm: ${fails.length} checks went red, ${MUST} required`);
     if (fails.length < MUST) { console.log('ARM TOO WEAK — this copy is not evidence'); process.exitCode = 1; }
     else console.log('arm ok: both copy fixes are capable of failing');

@@ -15,10 +15,15 @@
 //                                              believe a balance number
 //   node tools/modesim.mjs --masher            strategy vs mashing on shipped levels
 //   node tools/modesim.mjs --masher --levels   ... on all of them
+//   node tools/modesim.mjs --gen-levels 30 --cal-pieces 64 --budget-head 1.8
+//                                              sweep the piece economy: the
+//                                              calibration budget sets how long
+//                                              a level is, the headroom sets how
+//                                              much slack a human gets
 //   node tools/modesim.mjs --break <gate>      falsification arm: that gate MUST go red
 //
 // break gates: ledger  score  stall  rng  tide  zen  slots  trivial  unwinnable  span
-//              aspect  headroom  grace
+//              aspect  headroom  grace  budget  masher
 
 import { World, SIM_HZ, DEFAULT_CFG } from '../js/sim/world.js';
 import { Grid, F_CLEARING } from '../js/sim/grid.js';
@@ -31,10 +36,10 @@ import { BLK, pieceBounds } from '../js/sim/pieces.js';
 import { MODES, byId, configFor } from '../js/modes/index.js';
 import { floodGrid, tintZeroIsInert } from '../js/modes/tide.js';
 import { safeApi } from '../js/modes/api.js';
-import alchemy, { setLevels, starsFor, ALCHEMY_CFG } from '../js/modes/alchemy.js';
+import alchemy, { setLevels, starsFor, budgetOf, ALCHEMY_CFG } from '../js/modes/alchemy.js';
 import jelly from '../js/modes/jelly.js';
 import zen from '../js/modes/zen.js';
-import { genLevels, sceneSpans, applyScene, makeTracker } from '../js/data/levelgen.js';
+import { genLevels, sceneSpans, applyScene, makeTracker, CALIBRATION_PIECES } from '../js/data/levelgen.js';
 import { LEVELS as SHIPPED } from '../js/data/levels.js';
 import { BIOMES, MAX_TINTS, BRINE_FIRST, BRINE_COUNT } from '../js/data/biomes.js';
 import { writeFileSync } from 'fs';
@@ -54,6 +59,70 @@ const MASHER = has('--masher');
 // Generation is deterministic in this seed. Sweeping it is how a balance claim
 // gets three independent families instead of one lucky one.
 const GEN_SEED = Number(opt('--gen-seed', '0x5117'));
+
+/**
+ * THE PIECE ECONOMY — the two numbers that decide what a level costs.
+ *
+ * A level is a number of PIECES now, not a stopwatch, so `limitS` is gone from
+ * the generator and from the shipped table. That moves two decisions into this
+ * file that used to be a formula in levelgen.js:
+ *
+ * CAL_PIECES is the budget the objective is CALIBRATED against, and it sets the
+ * scale of the whole campaign: `reach` means "the furthest the bot got inside
+ * this many pieces", the target is a fraction of that, and the budget is a
+ * multiple of what it cost to hit the target. Raise it and every level gets
+ * longer and asks for more; lower it and the campaign becomes a series of
+ * sprints. It is also the ceiling on `reach`, which is why span levels — whose
+ * reach is a small integer count of wall-to-wall chains — are the archetype
+ * most sensitive to it.
+ *
+ * BUDGET_HEAD is the headroom over what the BOT spent. It is the only allowance
+ * in the economy for a human being worse at placement than a machine that has
+ * played the level a thousand times, so it is deliberately not 1.0 and not 1.2.
+ *
+ * Both are swept, not assumed — `--cal-pieces` / `--budget-head` exist so the
+ * sweep is reproducible. See the shipped numbers in docs/HANDOFF.md.
+ */
+const CAL_PIECES = +opt('--cal-pieces', CALIBRATION_PIECES);
+const BUDGET_HEAD = +opt('--budget-head', 1.6);
+
+/**
+ * A level the bot finishes inside this many drops is not a puzzle.
+ *
+ * The old rule was six SECONDS, which is the same idea in the currency the mode
+ * used to count. Eight pieces is about the same span of play at the bot's
+ * measured 2.25 drops a second, and it is the first number a regeneration
+ * should question if an archetype disappears.
+ */
+const TRIVIAL_PIECES = +opt('--trivial-pieces', 8);
+
+/**
+ * The hand-authored tutorial is PREPENDED to this table and renumbered, so a
+ * generated level's position in the CAMPAIGN is its index plus the tutorial's
+ * length. The opening grace is a property of that campaign position — a player
+ * meeting level 1 of this table has already played the tutorial — so every
+ * grace lookup goes through this offset. Read from the tutorial itself rather
+ * than hardcoded, and 0 if lane C's file is not there yet.
+ */
+const PRELUDE = await import('../js/data/tutorial.js')
+  .then((m) => (m.TUTORIAL || []).length).catch(() => 0);
+
+/**
+ * EVERY GATE BELOW PLAYS `js/data/levels.js`, AND NOTHING ELSE.
+ *
+ * The mode's own ACTIVE list is the CAMPAIGN — the hand-authored tutorial
+ * prepended to this table and RENUMBERED across the join — so with a tutorial
+ * of three, `levelById(1)` is a tutorial level and levels.js entry 1 answers to
+ * id 4. Every gate here addresses a level by `lv.id` taken from levels.js, so
+ * without this line the whole suite would quietly be validating a table three
+ * places out of step with the one it is reporting on: the sampled level checks,
+ * the masher comparison and the star calibration would all have been measuring
+ * a different level from the one they named. The generator already does exactly
+ * this with its candidate list, for exactly this reason.
+ *
+ * The tutorial is held to its own, stricter bar by `tools/tutgate.mjs`.
+ */
+setLevels(SHIPPED);
 
 const failures = [];
 const fail = (gate, msg) => { failures.push(`${gate}: ${msg}`); };
@@ -115,9 +184,10 @@ function hashGrid(g) {
  * `masher` deletes the two terms in `Bot._score` that encode intent — same-tint
  * adjacency and wall contact — and keeps only "do not build a tower". It is not
  * a bad player; it is a player with no plan. `swift` is the control that
- * separates the two variables: if swift beats masher, the bonus is paying for
- * PLACEMENT, and if bot beats masher the bonus also covers the wall-clock that
- * placement costs, which is the actual complaint.
+ * separates the two variables: if swift beats masher the campaign is rewarding
+ * PLACEMENT, and if bot also beats swift it is rewarding deliberation on top of
+ * it. Under a clock the two scored identically — placement was not the
+ * variable, speed was, and that is the whole reason the clock is gone.
  *
  * The first version of this picked a column at random. It lost 26 of 36 runs by
  * topping the board out, which made the mechanic look like a triumph and proved
@@ -422,28 +492,34 @@ function gateBiomes() {
 // ---------------------------------------------------------- ALCHEMY levels
 
 /**
- * How long a run may take in WALL-CLOCK seconds.
+ * THE RUN IS CAPPED BY PIECES. This is only the wall-clock safety net.
  *
- * The mode ends the level itself, at `world.t >= limitS + bonus`; this cap is
- * only the safety net against a run that never ends. It used to be `limitS + 5`,
- * which was correct when the effective clock and the wall clock were the same
- * thing — and became a silent measurement fault the moment a big span started
- * buying seconds back. Measured on the shipped table, level 8 seed 1213 earns
- * 26.1s of bonus and legitimately runs to 68.4s against a 63s limit: the old cap
- * cut it off at 68.0 and recorded a LOSS on a level the bot had won. A generous
- * cap costs nothing, because the run still stops when the mode says so.
+ * A level ends when the objective is met, when the board tops out, or when the
+ * budget is spent — none of which is a stopwatch, so nothing here may end a run
+ * on time and call it a loss. That fault has already been paid for once: the
+ * cap used to be `limitS + 5`, and the moment a span bonus started buying
+ * seconds back it cut a winning run off at 68.0s and recorded a LOSS on a level
+ * the bot had won.
+ *
+ * So the cap is derived from the budget rather than from a clock: `rows /
+ * fallRate` is how long ONE piece takes to fall the whole board untouched,
+ * which is the slowest a piece can possibly be, and the run gets that for every
+ * piece it is allowed plus a minute. In practice it never binds — the mode ends
+ * the level itself — and that is exactly the property a safety net should have.
  */
-const capFor = (lv) => lv.limitS * 2 + 30;
+const capFor = (lv) => Math.ceil(budgetOf(lv) * (lv.rows / Math.max(1, lv.fallRate)) + 60);
 
 /** Run one level through the real ALCHEMY module. */
 async function playLevel(lv, seed, capS, agent) {
   const r = await playMode(alchemy, { seed, capS: capS ?? capFor(lv), opts: { level: lv.id }, agent });
   const a = r.world.alchemy || {};
-  // `at` is the EFFECTIVE clock, not the wall clock: a big span buys seconds
-  // back and a star is judged on what is left. Calibrating thresholds from
-  // world.t would make every one of them generous by the bonus earned.
-  return { ...r, won: !!a.won, at: a.elapsed != null ? a.elapsed : r.s, wall: +r.world.t.toFixed(1),
-           bonus: a.bonus || 0, value: a.value, target: a.target };
+  // `used` is PIECES SPENT, and it is the only currency anything downstream
+  // calibrates against: targets, star thresholds and the budget itself. It used
+  // to be `at`, an effective clock, and the rename is deliberate — a number
+  // named for a moment in time that holds a count is how a masher got recorded
+  // as a three-star player.
+  return { ...r, won: !!a.won, used: a.used || 0, budget: a.budget || budgetOf(lv),
+           wall: +r.world.t.toFixed(1), value: a.value, target: a.target };
 }
 
 /**
@@ -452,7 +528,7 @@ async function playLevel(lv, seed, capS, agent) {
  * nobody can beat, gate A2 catches levels that beat themselves.
  */
 async function validateLevel(lv, tries = 3) {
-  const out = { lv, wins: 0, times: [], trivial: false, selfClearing: false };
+  const out = { lv, wins: 0, uses: [], trivial: false, selfClearing: false };
 
   if (sceneSpans(lv)) { out.selfClearing = true; return out; }
 
@@ -467,9 +543,9 @@ async function validateLevel(lv, tries = 3) {
   for (let k = 0; k < tries; k++) {
     const r = await playLevel(lv, 900 + k * 313);
     if (r.err) { out.err = r.err; break; }
-    if (r.won) { out.wins++; out.times.push(r.at); }
+    if (r.won) { out.wins++; out.uses.push(r.used); }
   }
-  if (out.times.length && Math.min(...out.times) < 6) out.trivial = true;
+  if (out.uses.length && Math.min(...out.uses) < TRIVIAL_PIECES) out.trivial = true;
   return out;
 }
 
@@ -530,7 +606,12 @@ const HEADROOM = 0.8;
  */
 const GRACE = { max: 0.20, hold: 8, zero: 18 };
 
-/** idx is the 0-based position in the SHIPPED campaign, i.e. level id - 1. */
+/**
+ * idx is the 0-based position in the CAMPAIGN THE PLAYER SEES, which is this
+ * table's index plus the hand-authored tutorial in front of it — see PRELUDE.
+ * The ramp is about how many levels a player has played, not about which file
+ * the level came out of.
+ */
 function graceAt(idx) {
   if (idx < GRACE.hold) return GRACE.max;
   if (idx >= GRACE.zero) return 0;
@@ -585,27 +666,31 @@ function tightLevels(levels) {
  * So this checks both, and the second half is the one that matters: a graced
  * level's 2-star must actually be at least `1.15 x (1 + g)` of the median the
  * bot recorded. An ungraced table has it at exactly 1.15x and cannot pass. The
- * only escape is `limitS`, which caps the 2-star from above — a level whose
- * eased 2-star runs past its own time limit is capped, not ungraced.
+ * only escape is the BUDGET, which caps the 2-star from above — a level whose
+ * eased 2-star runs past the pieces it is given is capped, not ungraced.
  *
  * Costs no simulation: `measured` and `grace` are both written by the generator
  * that ran the levels, so the relief can be re-derived from the file.
  */
+function easedTwoStar(lv, g) {
+  return Math.min(budgetOf(lv), Math.ceil(lv.measured.med * 1.15 * (1 + g)));
+}
+
 function graceFaults(levels) {
   const bad = [];
   for (const lv of levels) {
-    const want = graceAt(lv.id - 1);
+    const want = graceAt(PRELUDE + lv.id - 1);
     const got = typeof lv.grace === 'number' ? lv.grace : -1;
     if (Math.abs(got - want) > 0.005) { bad.push(`${lv.id} grace ${got} want ${want.toFixed(2)}`); continue; }
     if (!want || !lv.measured || !lv.stars) continue;
-    const eased = Math.min(lv.limitS, lv.measured.med * 1.15 * (1 + want));
-    // 0.2s of slack, and it is arithmetic rather than judgement: `measured.med`
-    // and `stars` are both stored to one decimal, so re-deriving the threshold
-    // from the rounded median can overshoot the rounded threshold by up to
-    // 0.05 * 1.38 + 0.05 = 0.12s. Five levels tripped on exactly that. The
-    // relief this is looking for is 0.23 * med, which is 6-8s — three orders
-    // away from the slack, so nothing real hides under it.
-    if (lv.stars[1] < eased - 0.2) bad.push(`${lv.id} 2-star ${lv.stars[1]}s not eased to ${eased.toFixed(1)}s (med ${lv.measured.med}s, g ${want})`);
+    const eased = easedTwoStar(lv, want);
+    // No slack any more, and that is the piece economy paying for itself: the
+    // old version needed 0.2s of it because medians and thresholds were both
+    // stored to one decimal and re-deriving one from the other could overshoot
+    // by 0.12s. A piece count is an integer, so this comparison is exact.
+    if (lv.stars[1] < eased) {
+      bad.push(`${lv.id} 2-star ${lv.stars[1]} pieces not eased to ${eased} (med ${lv.measured.med}, budget ${budgetOf(lv)}, g ${want})`);
+    }
   }
   return bad;
 }
@@ -651,15 +736,22 @@ function gateAspect(levels, where) {
  * asked for 2 chains on a 56-wide board and were over in 3 seconds. So the
  * generator no longer guesses: it runs the level once with an unreachable
  * target, watches how far the bot gets, and sets the objective to a fraction of
- * that. Targets are therefore measured, and the star times below are measured
- * against the measured target.
+ * that. Targets are therefore measured, and the star thresholds below are
+ * measured against the measured target.
+ *
+ * WHAT CHANGED WITH THE PIECE ECONOMY: `reach` used to mean "the furthest the
+ * bot got before its clock ran out", and now means "the furthest it got inside
+ * CAL_PIECES drops". That is the same idea in the currency the mode counts, but
+ * it is not the same number, and it is why every target in this table moved
+ * when the clock was removed. The calibration run is played at CAL_PIECES,
+ * which is set on the candidate before this is called.
  */
 async function calibrate(lv, frac) {
   const saved = lv.objective.target;
   lv.objective.target = lv.objective.type === 'purge' ? -1 : 1e9;
   let best = 0, low = Infinity, base = 0;
   const r = await playMode(alchemy, {
-    seed: 777, capS: lv.limitS + 2, opts: { level: lv.id },
+    seed: 777, capS: capFor(lv), opts: { level: lv.id },
     sample: (w) => {
       const a = w.alchemy; if (!a) return;
       base = a.base;
@@ -678,19 +770,51 @@ async function calibrate(lv, frac) {
 }
 
 /**
- * Star times from the EFFECTIVE clock, eased by the opening grace.
+ * Star thresholds in PIECES USED, eased by the opening grace.
  *
- * `times` are `world.alchemy.elapsed` — wall clock minus whatever the run's big
- * spans bought back. Every star time in the shipped table before this pass was
- * measured from `world.t`, which is why the bot three-starred levels it used to
- * two-star: the thresholds were generous by exactly the bonus each run earned.
+ * Same shape as the star times this replaces, same two multipliers, different
+ * unit — and the unit is the whole point. A star used to be a wall-clock
+ * threshold, so the cheapest route to three of them was to swipe every piece
+ * down as fast as a hand moves; measured, a bot with no placement thought at
+ * all three-starred every level it finished. Denominated in pieces, the same
+ * behaviour is the most expensive thing a player can do.
+ *
+ *   3 stars   the fastest of the bot's three runs, plus 5%     economical
+ *   2 stars   its median, plus 15%                             competent
+ *   1 star    anything inside the budget                       you finished
+ *
+ * `budget` caps the two-star from above, so a level cannot promise a threshold
+ * it will not let you reach. Everything here is an integer because a piece is:
+ * the rounding is UP, in the player's favour, and `three < two` is enforced so
+ * the bands can never collapse into each other on a short level.
  */
-function starsFrom(times, limitS, g = 0) {
-  const s = [...times].sort((a, b) => a - b);
+function starsFrom(uses, budget, g = 0) {
+  const s = [...uses].sort((a, b) => a - b);
   const fast = s[0], mid = s[(s.length / 2) | 0];
-  const two = Math.min(limitS, +(mid * 1.15 * (1 + g)).toFixed(1));
-  const three = Math.min(two - 0.5, +(fast * 1.05 * (1 + g)).toFixed(1));
-  return [limitS, two, Math.max(1, three)];
+  const two = Math.min(budget, Math.ceil(mid * 1.15 * (1 + g)));
+  const three = Math.max(1, Math.min(two - 1, Math.ceil(fast * 1.05 * (1 + g))));
+  return [budget, two, three];
+}
+
+/**
+ * THE BUDGET: what the bot spent, plus headroom for not being the bot.
+ *
+ * `uses` is how many pieces each winning validation run cost. The budget is a
+ * headroomed multiple of the MEDIAN of those, floored so it can never sit below
+ * the most expensive run the bot actually needed — a budget that turns one of
+ * the generator's own wins into a loss is the measurement fault this campaign
+ * has already paid for once, in the other direction.
+ *
+ * BUDGET_HEAD is the only allowance in the economy for a human. Aaron plays
+ * this on a phone; he is worse than the bot at placement and far more
+ * thoughtful than a masher, and a budget that only the bot's exact play fits is
+ * a budget nobody can use. It is also the number that decides whether mashing
+ * still wins: every piece of slack here is a piece a careless player can waste,
+ * so it is swept against `--masher` rather than chosen.
+ */
+function budgetFrom(uses) {
+  const spent = med(uses);
+  return Math.max(TRIVIAL_PIECES + 2, Math.ceil(spent * BUDGET_HEAD), Math.max(...uses));
 }
 
 async function generateLevels(count) {
@@ -718,8 +842,13 @@ async function generateLevels(count) {
     // campaign is the kept list — so the index this candidate would occupy if
     // it survives is exactly how many levels have been kept so far. Rejections
     // therefore slide the ramp along instead of punching holes in it.
-    const g = graceAt(kept.length);
+    const g = graceAt(PRELUDE + kept.length);
     lv.grace = g;
+    // Calibrate against the calibration budget, not against whatever the
+    // candidate was born with: `reach` is defined as what the bot can do inside
+    // CAL_PIECES drops, and the shipped budget is not known until the level has
+    // been played.
+    lv.pieces = CAL_PIECES;
     if (!sceneSpans(lv)) {
       const cal = await calibrate(lv, 0.6 * (1 - g));
       if (cal.err) { rejected.push([lv.id, lv.arch, 'invariant: ' + cal.err]); continue; }
@@ -748,8 +877,20 @@ async function generateLevels(count) {
     if (v.trivial) { rejected.push([lv.id, lv.arch, 'trivially complete']); continue; }
     if (v.err) { rejected.push([lv.id, lv.arch, 'invariant: ' + v.err]); continue; }
     if (v.wins < 2) { rejected.push([lv.id, lv.arch, `only ${v.wins}/3 wins`]); continue; }
-    lv.stars = starsFrom(v.times, lv.limitS, g);
-    lv.measured = { wins: v.wins, med: +med(v.times).toFixed(1), fast: +Math.min(...v.times).toFixed(1) };
+
+    // THE BUDGET IS SET AFTER THE LEVEL HAS BEEN PLAYED, AND THE VALIDATION
+    // STILL HOLDS. Those runs were played at CAL_PIECES, which is more generous
+    // than the budget about to be written — but the budget only ever ENDS a
+    // run, it never changes one, and the sim is deterministic. So a run at the
+    // shipped budget is byte-identical to the validation run right up to the
+    // drop that would have overrun it, and `budgetFrom` is floored at the most
+    // expensive win, so no win the generator counted can be lost. That
+    // equality is not an argument to be taken on trust: `--levels` replays the
+    // whole shipped table at its shipped budgets and must reproduce the same
+    // 2-of-3.
+    lv.pieces = budgetFrom(v.uses);
+    lv.stars = starsFrom(v.uses, lv.pieces, g);
+    lv.measured = { wins: v.wins, med: med(v.uses), fast: Math.min(...v.uses), spend: v.uses.slice().sort((a, b) => a - b) };
     kept.push(lv);
   }
   return { kept, rejected, cands };
@@ -762,8 +903,12 @@ function writeLevels(kept) {
 //
 // Every level here was played to completion by js/ai/bot.js at least twice out
 // of three seeds, was proved not to complete itself on frame one, and had its
-// star times measured rather than guessed. \`measured\` records what the bot did:
-// wins out of three, median and fastest completion in seconds.
+// star thresholds measured rather than guessed.
+//
+// A level is a number of PIECES, not a stopwatch: \`pieces\` is the budget,
+// \`stars\` are piece counts with the fewest last, and \`measured\` records what
+// the bot spent — wins out of three, and the median, fastest and full sorted
+// list of pieces used across the runs it won.
 export const LEVELS = [
 ${body}
 ];
@@ -773,52 +918,173 @@ export default LEVELS;
   return renum.length;
 }
 
+/**
+ * A8 — the budget has to be the one that was MEASURED.
+ *
+ * `pieces` is the fail condition now, so it is the single most load-bearing
+ * number on a level, and it is derived rather than authored: a headroomed
+ * multiple of what the bot spent. Two ways that can rot, and both are silent.
+ *
+ * TOO TIGHT is a level the generator's own validation says is winnable and a
+ * player cannot win — a budget below the most expensive run the bot needed
+ * turns a recorded win into a loss, which is the measurement fault this project
+ * has already paid for once in the other direction (a wall-clock cap that cut a
+ * winning run off and logged it as a defeat).
+ *
+ * TOO GENEROUS is the one that matters more, because nothing else in the suite
+ * can see it. Every objective in this campaign is a volume race; the budget is
+ * the only thing stopping throughput from buying it. Slack here is slack a
+ * careless player can waste, so a budget far above what the level costs is a
+ * budget that has quietly re-legalised mashing — and it would still be green on
+ * A1, A2, A4, A5 and A6, because the level is still winnable, non-trivial,
+ * correctly shaped, inside its headroom and correctly graced.
+ *
+ * Costs no simulation: `measured.spend` is what the generator recorded.
+ * `--break budget` doubles one level's budget in a COPY.
+ */
+const BUDGET_SLACK_MAX = 2.4;    // a budget over this multiple of the median win is not measured, it is a gift
+
+function budgetFaults(levels) {
+  const bad = [];
+  for (const lv of levels) {
+    const b = budgetOf(lv);
+    const m = lv.measured;
+    if (!(b > 0)) { bad.push(`${lv.id} no piece budget`); continue; }
+    const st = lv.stars || [];
+    if (st.length !== 3 || st[0] !== b || !(st[1] < st[0]) || !(st[2] < st[1])) {
+      bad.push(`${lv.id} stars ${st.join('/')} are not three descending piece counts ending at the budget ${b}`);
+      continue;
+    }
+    if (!m || !m.spend || !m.spend.length) continue;
+    const worst = Math.max(...m.spend);
+    if (b < worst) bad.push(`${lv.id} budget ${b} is under the ${worst} pieces its own worst winning run needed`);
+    else if (b > m.med * BUDGET_SLACK_MAX) {
+      bad.push(`${lv.id} budget ${b} is ${(b / m.med).toFixed(2)}x the ${m.med} pieces the bot spent — over the ${BUDGET_SLACK_MAX}x bar`);
+    }
+  }
+  return bad;
+}
+
 // -------------------------------------------------- strategy vs mashing
 
 /**
- * A7 — is the span bonus farmable by throughput?
+ * A7 — DOES MASHING STILL BEAT THINKING? This one asserts now.
  *
- * This is the only check in the suite that is about the DESIGN rather than the
- * data, and it is opt-in (`--masher`) because it plays every sampled level
- * three times over. It exists because the span bonus was added to answer a
- * specific complaint — "swipe down fast is the only way to get to 3 stars" —
- * and no green gate could have told anyone whether the answer landed.
+ * It used to be a report. A star was a wall-clock threshold, so thinking cost
+ * time and bought nothing, and the honest measurement was that a bot with no
+ * placement thought at all three-starred every level it finished: 3.00 stars
+ * per win against a deliberate bot's 2.40, and mashing ahead 9 levels to 2 head
+ * to head. The gate could not assert what the design was failing to deliver, so
+ * it asserted the narrower thing the span bonus promised, and printed the star
+ * comparison as a note.
  *
- * IT DOES NOT ASSERT THAT STRATEGY WINS, because measurement says it does not
- * and a gate that is red by design is a gate nobody reads. What it asserts is
- * the property the mechanic actually promises and the first version violated by
- * a factor of forty-one: THE BONUS MUST NOT BE BOUGHT WITH THROUGHPUT. A masher
- * may not collect materially more seconds than a deliberate player. The star
- * comparison is printed either way, and flagged as a note when mashing is level
- * with strategy or ahead of it, which is currently the honest state of things.
+ * The piece economy is the answer to that complaint, and this is the test of
+ * it, so the note is now the bar: A DELIBERATE PLAYER MUST OUT-STAR A MASHER.
+ * Stars are piece counts, every drop costs one, and there is no clock to punish
+ * deliberation — if mashing still wins, the budgets are too generous and the
+ * campaign is not finished. That is a real acceptance criterion rather than a
+ * curiosity, and unlike the version it replaces it is a property the design
+ * actually claims.
  *
- * `--break masher` restores the original mechanic exactly — `min(8, n^2/1.2e6)`
- * summed over every chain over the floor — which is the fault this rule exists
- * to catch, reproduced rather than fabricated.
+ * WHAT IS ASSERTED, AND THE ONE THING THAT IS NOT. The bars are mean stars per
+ * RUN — the whole player experience, fails included — and the head-to-head
+ * count. Both were lost under the clock (2.50 vs 2.33 stars a run, mashing
+ * ahead 9 levels to 2) and both are won under the budget.
+ *
+ * STARS PER WIN IS REPORTED AND NOT ASSERTED, and the reason is measurement
+ * rather than convenience. On the shipped table it is a dead heat: 2.42 for the
+ * masher against 2.41 for the bot, from 24 wins and 34. That is not the budget
+ * being generous — it is survivorship. Conditioning on a win throws away every
+ * run the masher lost and keeps the boards where its gamble came off, and on a
+ * volume objective a lucky masher really has spent its pieces as efficiently as
+ * a thoughtful player. It three-stars 54% of its wins against the bot's 50%,
+ * which is the same number twice.
+ *
+ * Making that bar green would need an objective that volume cannot buy — the
+ * design problem named at the top of `js/modes/alchemy.js` and not solved by
+ * any budget. Asserting it would give this suite a gate that is red by design,
+ * and a gate that is always red is a gate nobody reads. So it is a note.
+ *
+ * MARGIN 0.25 rather than "strictly greater": 36 runs is a small sample and a
+ * bar that a coin could clear is not a bar. Measured gap on the shipped table
+ * is 0.67.
+ *
+ * `--break masher` RESTORES THE DESIGN THIS PASS REPLACED: four times the
+ * pieces, so a drop costs nothing, and stars judged on the WALL CLOCK against
+ * thresholds calibrated from the bot's own runs, exactly as the shipped table
+ * did before. That is the fault reproduced rather than fabricated, and it took
+ * two attempts to get right — the first arm scaled the budget AND the star
+ * thresholds by four, which does not re-legalise mashing at all: it just hands
+ * everybody three stars and leaves the bot ahead on the fail rate, and the arm
+ * stayed green against a campaign that was supposed to be broken.
+ *
+ * That failure is worth more than the arm. It measures WHICH HALF of the piece
+ * economy is doing the work. A generous budget alone does not bring mashing
+ * back — it converts a masher's losses into ONE-STAR wins, because the star
+ * thresholds are still counted in pieces and a masher cannot hit them. Most of
+ * a masher's losses are not even budget exhaustion; it tops the board out. So
+ * the load-bearing half is the CURRENCY, not the cap: stars denominated in
+ * pieces are what make thinking pay, and the budget is the fail state that puts
+ * a price on running the board into the ground. An arm that only loosens the
+ * cap is testing the half that matters least.
  */
+const MASHER_BREAK_SCALE = 4;
+const MASHER_MARGIN = 0.25;
+
+function masherLevel(lv) {
+  if (BREAK !== 'masher') return lv;
+  return { ...lv, pieces: budgetOf(lv) * MASHER_BREAK_SCALE };
+}
+
+/**
+ * The star rule this pass deleted: wall-clock thresholds, calibrated on the
+ * bot's own winning runs at 1.15x the median and 1.05x the fastest. Used only
+ * by `--break masher`. Falls back to the piece thresholds if the bot never won
+ * the level, because a threshold calibrated on nothing is not a fault, it is a
+ * hole.
+ */
+function timeStarsFrom(botRuns) {
+  const t = botRuns.filter((r) => r.won).map((r) => r.wall).sort((a, b) => a - b);
+  if (!t.length) return null;
+  return [Infinity, t[(t.length / 2) | 0] * 1.15, t[0] * 1.05];
+}
+
+function starOnClock(th, wall) {
+  if (wall <= th[2]) return 3;
+  if (wall <= th[1]) return 2;
+  return 1;
+}
+
 async function gateMasher() {
-  if (BREAK === 'masher') {
-    ALCHEMY_CFG.spanShare = null;
-    ALCHEMY_CFG.spanSummedQuadratic = (n) => Math.min(8, (n * n) / 1.2e6);
-  }
   const step = Math.max(1, Math.ceil(SHIPPED.length / 12));
-  const pick = ALL_LEVELS ? SHIPPED : SHIPPED.filter((_, i) => i % step === 0);
+  const pick = (ALL_LEVELS ? SHIPPED : SHIPPED.filter((_, i) => i % step === 0)).map(masherLevel);
+  if (BREAK === 'masher') setLevels(pick);
   const SEEDS = [900, 1213, 1526];
   const WHO = ['bot', 'swift', 'masher'];
   const acc = {};
-  for (const w of WHO) acc[w] = { wins: 0, runs: 0, stars: 0, dist: [0, 0, 0, 0], bonus: 0, drops: 0, big: 0, at: [] };
+  for (const w of WHO) acc[w] = { wins: 0, runs: 0, stars: 0, dist: [0, 0, 0, 0], used: 0, big: 0, spent: [] };
   const rows = [];
   for (const lv of pick) {
     const per = {};
+    const runs = {};
+    for (const who of WHO) {
+      runs[who] = [];
+      for (const seed of SEEDS) runs[who].push(await playLevel(lv, seed, undefined, who));
+    }
+    // The falsification arm scores on the clock, so its thresholds have to be
+    // calibrated on this level's bot runs before anything is scored.
+    const clock = BREAK === 'masher' ? timeStarsFrom(runs.bot) : null;
     for (const who of WHO) {
       per[who] = [];
-      for (const seed of SEEDS) {
-        const r = await playLevel(lv, seed, undefined, who);
+      for (const r of runs[who]) {
         const a = acc[who];
-        a.runs++; a.bonus += r.bonus;
+        a.runs++; a.used += r.used;
         a.big += r.sizes.filter((n) => n >= ALCHEMY_CFG.spanMinCells).length;
-        const st = r.won ? starsFor(lv, r.at) : 0;
-        if (r.won) { a.wins++; a.at.push(r.at); }
+        // Stars are PIECES USED. Scoring `r.wall` here — a wall clock — is
+        // exactly how the old design made a masher a three-star player, which
+        // is why the arm above has to reach for it deliberately.
+        const st = r.won ? (clock ? starOnClock(clock, r.wall) : starsFor(lv, r.used)) : 0;
+        if (r.won) { a.wins++; a.spent.push(r.used); }
         a.stars += st; a.dist[st]++;
         per[who].push(st);
       }
@@ -835,35 +1101,36 @@ async function gateMasher() {
     console.log(`  ${who.padEnd(7)} win ${String(a.wins).padStart(3)}/${a.runs}  mean stars ${(a.stars / a.runs).toFixed(2)}  ` +
       `stars per WIN ${(a.wins ? a.stars / a.wins : 0).toFixed(2)}  ` +
       `dist fail:${a.dist[0]} 1:${a.dist[1]} 2:${a.dist[2]} 3:${a.dist[3]}  ` +
-      `big spans ${(a.big / a.runs).toFixed(1)}/run  bonus ${(a.bonus / a.runs).toFixed(1)}s/run`);
+      `big spans ${(a.big / a.runs).toFixed(1)}/run  pieces ${(a.used / a.runs).toFixed(1)}/run  ` +
+      `spent on a WIN ${a.spent.length ? med(a.spent) : '-'}`);
   }
   const bs = acc.bot.stars / acc.bot.runs, ms = acc.masher.stars / acc.masher.runs;
   const won = rows.filter((r) => r.b > r.m).length, lost = rows.filter((r) => r.b < r.m).length;
   console.log(`  head to head over ${rows.length} levels: strategy ${won}, mashing ${lost}, tie ${rows.length - won - lost}`);
 
-  // THE BAR: the bonus may not be bought with throughput. 1.3x rather than 1.0x
-  // because the masher takes more chains and therefore more samples of the same
-  // distribution, so the best-of-run it collects is legitimately a little higher
-  // than the bot's even with the count advantage removed — measured at 1.12x on
-  // the share, against 41x for the summed per-chain version this replaced.
-  const bb = acc.bot.bonus / acc.bot.runs, mb = acc.masher.bonus / acc.masher.runs;
-  const ratio = bb > 0 ? mb / bb : (mb > 0 ? Infinity : 1);
-  console.log(`  span bonus per run: bot ${bb.toFixed(1)}s, masher ${mb.toFixed(1)}s — mashing collects ${ratio.toFixed(2)}x`);
-  if (!(ratio <= 1.3)) {
-    fail('A7-masher', `the span bonus is farmable by throughput — a masher collects ${mb.toFixed(1)}s/run against ` +
-      `a deliberate player's ${bb.toFixed(1)}s (${ratio.toFixed(1)}x): the mechanic added to beat mashing is rewarding it`);
-  }
-
-  // Reported, never failed: whether thinking actually out-stars mashing. It
-  // does not, and the reason is that every objective here is a volume race.
   const bw = acc.bot.wins ? acc.bot.stars / acc.bot.wins : 0;
   const mw = acc.masher.wins ? acc.masher.stars / acc.masher.wins : 0;
-  if (!(bs > ms)) notes.push(`mashing out-stars strategy over the whole sample: ${ms.toFixed(2)} vs ${bs.toFixed(2)} stars/run`);
-  if (acc.masher.wins && !(bw > mw)) {
-    notes.push(`on the levels it finishes, mashing rates as well as strategy or better: ${mw.toFixed(2)} vs ${bw.toFixed(2)} stars/win ` +
-      `— strategy is ahead only on the fail rate (${acc.bot.dist[0]}/${acc.bot.runs} vs ${acc.masher.dist[0]}/${acc.masher.runs} losses)`);
+  const bp = acc.bot.spent.length ? med(acc.bot.spent) : 0;
+  const mp = acc.masher.spent.length ? med(acc.masher.spent) : 0;
+  console.log(`  pieces spent on a win: bot ${bp}, masher ${mp}` +
+    `${bp ? ` — mashing costs ${(mp / bp).toFixed(2)}x` : ''}`);
+
+  // THE BAR.
+  if (!(bs >= ms + MASHER_MARGIN)) {
+    fail('A7-masher', `mashing is not behind deliberate play: ${ms.toFixed(2)} vs ${bs.toFixed(2)} stars/run, ` +
+      `a gap of ${(bs - ms).toFixed(2)} against a required ${MASHER_MARGIN} — the piece budgets are too generous`);
   }
-  return { bs, ms, bw, mw, bb, mb, ratio, won, lost, rows: rows.length };
+  if (!(won > lost)) {
+    fail('A7-masher', `head to head, mashing is not behind: strategy ${won}, mashing ${lost}, tie ` +
+      `${rows.length - won - lost} over ${rows.length} levels`);
+  }
+  // Reported, never failed — see the note above on survivorship.
+  if (acc.masher.wins && !(bw > mw)) {
+    notes.push(`on the levels it finishes, mashing rates as well as deliberate play: ${mw.toFixed(2)} vs ${bw.toFixed(2)} ` +
+      `stars/win, from ${acc.masher.wins} wins against ${acc.bot.wins} — the fail rate (${acc.masher.dist[0]}/${acc.masher.runs} ` +
+      `vs ${acc.bot.dist[0]}/${acc.bot.runs}) is where the budget charges for it`);
+  }
+  return { bs, ms, bw, mw, bp, mp, won, lost, rows: rows.length };
 }
 
 // ------------------------------------------------------------------- report
@@ -908,6 +1175,19 @@ if (MASHER) {
   const why = {};
   for (const [, , r] of rejected) why[r.split(':')[0]] = (why[r.split(':')[0]] || 0) + 1;
   for (const [k, v] of Object.entries(why)) console.log(`    rejected ${v}  ${k}`);
+  // Rejections BY ARCHETYPE, because a keep rate is an average and an average
+  // hides the only thing worth knowing here: which archetype the acceptance
+  // path is quietly emptying. Quench went to two levels of ninety-six once and
+  // nobody noticed until it was counted.
+  const byRej = {};
+  for (const [, arch, r] of rejected) {
+    const k = r.split(':')[0];
+    (byRej[arch] = byRej[arch] || {})[k] = ((byRej[arch] || {})[k] || 0) + 1;
+  }
+  for (const [arch, m] of Object.entries(byRej)) {
+    console.log(`    ${arch.padEnd(9)} lost ${Object.values(m).reduce((x, y) => x + y, 0)}: ` +
+      Object.entries(m).map(([k, v]) => `${v} ${k}`).join(', '));
+  }
   // The first dozen by candidate id, because the OPENING of the campaign is the
   // part a player actually sees and a silent cull there reshapes the ladder:
   // `archetypeFor` teaches chains in candidates 1-6, and if all six are thrown
@@ -917,7 +1197,7 @@ if (MASHER) {
   const byArch = {};
   for (const lv of kept) (byArch[lv.arch] = byArch[lv.arch] || []).push(lv);
   for (const [a, ls] of Object.entries(byArch)) {
-    console.log(`    ${a.padEnd(9)} ${String(ls.length).padStart(3)} levels  median win ${med(ls.map((l) => l.measured.med)).toFixed(1)}s  3-star ${med(ls.map((l) => l.stars[2])).toFixed(1)}s`);
+    console.log(`    ${a.padEnd(9)} ${String(ls.length).padStart(3)} levels  median win ${med(ls.map((l) => l.measured.med))} pieces  budget ${med(ls.map((l) => l.pieces))}  3-star ${med(ls.map((l) => l.stars[2]))}`);
   }
   if (GEN >= 60 && kept.length < 60) fail('A1-levels', `only ${kept.length} levels survived validation, need 60`);
   // Falsification arms. Each injects one deliberately bad level; the arm is
@@ -978,10 +1258,18 @@ if (MASHER) {
   //
   // Arming only the second would leave the first unproven, and the first is the
   // one worth having.
+  // The first half of the arm needs a level whose UNGRACED 2-star is actually a
+  // different integer from its graced one — piece counts are small, and on a
+  // very short level `ceil(med * 1.15)` and `ceil(med * 1.38)` can be the same
+  // number, which would arm the check against a fault it cannot see. So the
+  // victim is chosen by that property rather than by position, and named in the
+  // confirmation below.
+  const ungraced = (lv) => Math.min(budgetOf(lv), Math.ceil(lv.measured.med * 1.15));
+  const armId = (SHIPPED.find((lv) => lv.grace > 0 && lv.measured && ungraced(lv) < easedTwoStar(lv, lv.grace)) || {}).id;
   const graceBad = graceFaults(BREAK === 'grace'
     ? SHIPPED.map((lv, i) => {
-        if (i === 0) return { ...lv, stars: [lv.limitS, Math.min(lv.limitS, +(lv.measured.med * 1.15).toFixed(1)), lv.stars[2]] };
-        if (i === 1) { const c = { ...lv }; delete c.grace; return c; }
+        if (lv.id === armId) return { ...lv, stars: [budgetOf(lv), ungraced(lv), lv.stars[2]] };
+        if (i === SHIPPED.length - 1) { const c = { ...lv }; delete c.grace; return c; }
         return lv;
       })
     : SHIPPED);
@@ -990,8 +1278,21 @@ if (MASHER) {
       graceBad.slice(0, 5).join(' · ') + (graceBad.length > 5 ? ' …' : ''));
   }
   if (BREAK === 'grace') {
-    if (!graceBad.some((b) => b.startsWith('1 2-star'))) notes.push('!! level 1 was given ungraced star times and A6 kept it');
-    if (!graceBad.some((b) => b.startsWith('2 grace'))) notes.push('!! level 2 had its grace annotation deleted and A6 kept it');
+    if (!graceBad.some((b) => b.startsWith(`${armId} 2-star`))) notes.push(`!! level ${armId} was given an ungraced 2-star and A6 kept it`);
+    const lastId = SHIPPED[SHIPPED.length - 1].id;
+    if (!graceBad.some((b) => b.startsWith(`${lastId} grace`))) notes.push(`!! level ${lastId} had its grace annotation deleted and A6 kept it`);
+  }
+
+  // A8 — the piece budget. Costs no simulation: it is re-derived from what the
+  // generator recorded spending. Under --break budget one level is handed twice
+  // the pieces in a COPY, which is the "too generous" half of the rule and the
+  // one nothing else in the suite could see.
+  const budgetBad = budgetFaults(BREAK === 'budget'
+    ? SHIPPED.map((lv, i) => (i === 0 ? { ...lv, pieces: budgetOf(lv) * 2, stars: [budgetOf(lv) * 2, lv.stars[1], lv.stars[2]] } : lv))
+    : SHIPPED);
+  if (budgetBad.length) {
+    fail('A8-budget', `${budgetBad.length}/${SHIPPED.length} level(s) do not carry a measured piece budget — ` +
+      budgetBad.slice(0, 5).join(' · ') + (budgetBad.length > 5 ? ' …' : ''));
   }
 
   // Shipped levels: a sample by default, all of them under --levels.
@@ -1024,7 +1325,12 @@ if (MASHER) {
   console.log(`  levels: ${lvWins}/${lvChecked} sampled levels beaten by the bot at least 2 of 3 seeds${lvBad.length ? ' (bad: ' + lvBad.join(',') + ')' : ''}  [${SHIPPED.length} shipped]`);
   console.log(`  board aspect: ${asp.lo.toFixed(3)}-${asp.hi.toFixed(3)} across ${SHIPPED.length} levels, floor ${MIN_ASPECT} (${asp.bad} below)`);
   console.log(`  objective headroom: ${tight.length} of ${SHIPPED.length} levels above ${HEADROOM} of measured reach`);
-  console.log(`  opening grace: levels 1-${GRACE.hold + 1} at ${(GRACE.max * 100).toFixed(0)}%, easing to baseline by level ${GRACE.zero + 1} (${graceBad.length} faults)`);
+  console.log(`  opening grace: campaign levels 1-${GRACE.hold + 1} at ${(GRACE.max * 100).toFixed(0)}%, easing to baseline by level ${GRACE.zero + 1} ` +
+    `(${PRELUDE} tutorial level(s) in front, so this table's 1-${Math.max(0, GRACE.hold + 1 - PRELUDE)} are at the full allowance; ${graceBad.length} faults)`);
+  const budgets = SHIPPED.map(budgetOf);
+  const slack = SHIPPED.filter((lv) => lv.measured && lv.measured.med).map((lv) => budgetOf(lv) / lv.measured.med);
+  console.log(`  piece budgets: ${Math.min(...budgets)}-${Math.max(...budgets)} pieces (median ${med(budgets)}), ` +
+    `${med(slack).toFixed(2)}x the median winning spend (max ${Math.max(...slack).toFixed(2)}x, bar ${BUDGET_SLACK_MAX}x, ${budgetBad.length} faults)`);
   console.log(`  jelly soft-body solver: ${jelly.isSoft ? 'probed' : '?'} — blobs.js ${await import('../js/sim/blobs.js').then(() => 'present').catch(() => 'ABSENT, running rigid fallback')}`);
 }
 

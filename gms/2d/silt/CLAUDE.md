@@ -31,6 +31,8 @@ the right wall the whole chain dissolves.
 node tools/sim.mjs                 mass, ledger, determinism, play (drives the SHIPPING mode), perf
 node tools/jellysim.mjs            blob ledger, merge, split, wobble, reactions
 node tools/modesim.mjs             per-mode balance + ALCHEMY level validation
+node tools/modesim.mjs --masher    strategy vs mashing: strategy MUST win
+node tools/tutgate.mjs             the three hand-authored tutorial levels
 node tools/boot.mjs                boot + soak on a true 390x844 viewport
 node tools/gfx_shot.mjs --check    v-flip regression
 node tools/uishot.mjs --probe      real button clicks
@@ -63,6 +65,18 @@ a deliberately broken page.
   Anything seeding such a board needs `step()` directly, mixed tints, or the
   brine tints 4-7 that no piece can match.
 - **4+ tints kills the game.** See D3 — it is percolation maths, not tuning.
+  Fewer than three is a TEACHING device and nothing else: the tutorial's first
+  level uses one tint so the span rule fires by itself, and three tints in a
+  twenty-piece level cleared nothing at all on two seeds in three.
+- **ALCHEMY has no clock.** A level gives you PIECES. Stars were time
+  thresholds, which made mashing the optimal strategy in a puzzle game — a bot
+  hard-dropping with no thought three-starred every level it finished, and a bot
+  with real placement intent that also hard-dropped scored identically to it. No
+  bonus paid in seconds could fix it, because every objective here is a volume
+  race and volume is what throughput buys. `--masher` is the gate that holds the
+  line, and the load-bearing half is the CURRENCY, not the cap: multiplying the
+  budgets by four does not re-legalise mashing, it just converts a masher's
+  losses into one-star wins.
 - **A mode may swallow `world.over`.** ZEN vents its ceiling and HOURGLASS
   absolves a failed spawn during the settle window after a flip, so the attract
   loop cannot use `world.over` alone to decide a run has ended — it reads the

@@ -17,6 +17,10 @@ export const GLYPH = {
   // played, on the very first screenshot of the picker.
   star:    '<path d="M12 3.1l2.65 5.86 6.35.62-4.8 4.3 1.4 6.28L12 16.9l-5.6 3.26 1.4-6.28-4.8-4.3 6.35-.62Z"/>',
   lock:    '<rect x="4.6" y="10.4" width="14.8" height="9.8" rx="2.6"/><path d="M8.2 10.4V7.8a3.8 3.8 0 0 1 7.6 0v2.6"/>',
+  // An L-tromino: the thing a level GIVES you a countable number of. Drawn as
+  // three cells rather than one block so it cannot be read as a generic chip —
+  // the counter beside it has to say "pieces" at a glance and never "seconds".
+  piece:   '<rect x="4.4" y="4.4" width="6.6" height="6.6" rx="1.4"/><rect x="4.4" y="13" width="6.6" height="6.6" rx="1.4"/><rect x="13" y="13" width="6.6" height="6.6" rx="1.4"/>',
 };
 
 // One per mode. Each says something true about how the mode plays: FLOW is a

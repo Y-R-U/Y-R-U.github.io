@@ -1,5 +1,5 @@
 import { h, icon, fmt } from './dom.js';
-import { MODE_GLYPH } from './icons.js';
+import { GLYPH, MODE_GLYPH } from './icons.js';
 
 /**
  * The per-mode HUD.
@@ -34,13 +34,29 @@ function fmtLabel(t) {
 
 const STAR = '<path d="M12 3.1l2.65 5.86 6.35.62-4.8 4.3 1.4 6.28L12 16.9l-5.6 3.26 1.4-6.28-4.8-4.3 6.35-.62Z"/>';
 
-/** m:ss, but seconds with a decimal under ten — the last ten seconds are the mode. */
+/** m:ss, but seconds with a decimal under ten. HOURGLASS's flip is still a clock. */
 function clock(s) {
   s = Math.max(0, s || 0);
   if (s < 10) return s.toFixed(1);
   const m = Math.floor(s / 60);
   return m + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 }
+
+/**
+ * WHERE THE WARNING STARTS, WHEN THE UNIT IS PIECES.
+ *
+ * A clock's last ten seconds are a slide you can watch arrive. A budget is
+ * discrete and it only moves when the player moves it, so the warning has to be
+ * a share of the budget rather than a fixed count — three left of fourteen and
+ * three left of sixty-one are not the same situation — and it must not blink,
+ * because a thing that changes on its own is a clock and this one does not.
+ *
+ * Twenty per cent and eight per cent, floored so a small budget still warns at
+ * all and capped so a large one does not spend a third of the level shouting.
+ */
+const LOW_FRAC = 0.20, LAST_FRAC = 0.08;
+const lowAt = (budget) => Math.min(8, Math.max(3, Math.round(budget * LOW_FRAC)));
+const lastAt = (budget) => Math.min(3, Math.max(1, Math.round(budget * LAST_FRAC)));
 
 function pips(n) {
   const els = [];
@@ -56,11 +72,19 @@ export function createModeHud() {
   const objFill = h('i');
   const objLv = h('span', { class: 'obj-lv' });
   const objStars = h('span', { class: 'obj-stars' }, ...pips(3));
-  const objClock = h('span', { class: 'obj-clock t-num' });
+  // THE BUDGET, WHERE THE CLOCK USED TO BE — and deliberately not shaped like
+  // one. A clock is a bare numeral that changes on its own; this is a numeral
+  // the player moves, wearing the glyph and the noun of the thing it counts, so
+  // "18" can never be read as eighteen seconds. It is a chip rather than plain
+  // type for the same reason: a clock is part of the readout, a budget is an
+  // inventory.
+  const objLeft = h('b', { class: 'obj-left t-num' });
+  const objUnit = h('span', { class: 'obj-unit', text: 'pieces' });
+  const objPieces = h('span', { class: 'obj-pieces' }, icon(GLYPH.piece), objLeft, objUnit);
   const objective = h('div', { class: 'panel obj hide' },
     h('div', { class: 'obj-head' }, objLabel, objCount),
     h('div', { class: 'obj-bar' }, objFill),
-    h('div', { class: 'obj-foot' }, objLv, objStars, objClock));
+    h('div', { class: 'obj-foot' }, objLv, objStars, objPieces));
 
   /* -------------------------------------------------------- flip (HOURGLASS) */
 
@@ -89,20 +113,27 @@ export function createModeHud() {
   // Cached so the DOM is only touched when a number actually moves; setHud runs
   // every rAF and this panel is on screen for whole minutes at a time.
   let lastObj = '', lastFlip = '', lastTide = -1, lastRailCls = '';
+  // The last piece count seen, so a SPEND can be told from a repaint, and the
+  // star currently on offer, so the shell can say something about it losing one
+  // without this file deciding what that something is.
+  let lastUsed = -1, offer = 0;
   // The flip period, so the bar can DEPLETE rather than guess. Latching it from
   // the first `until` seen is wrong: join a run two seconds before a flip and the
   // period becomes two seconds, so the bar reads empty at the exact moment it
   // should be screaming. Take it from the mode's own config, and only ever raise.
   let flipPeriod = 30;
 
-  // ALCHEMY's star thresholds are TIMES, and the mode publishes only the star
-  // count it has already earned (0 until the level is won). The thresholds live
-  // on the level, so read them from lane C's own level table rather than
+  // ALCHEMY's star thresholds are PIECE COUNTS, and the mode publishes only the
+  // star count it has already earned (0 until the level is won). The thresholds
+  // live on the level, so read them from lane C's own level table rather than
   // guessing — then the three pips can show the star still on offer while the
-  // clock is running, which is the only version of them that affects play.
-  let levelOf = null;
+  // budget is still being spent, which is the only version of them that affects
+  // play. `starsFor` is lane C's own comparison; using it here rather than
+  // re-deriving one is what stops the HUD and the result card disagreeing about
+  // what a drop just cost.
+  let levelOf = null, starsOf = null;
   import('../modes/alchemy.js')
-    .then((m) => { if (m && m.levelById) levelOf = m.levelById; })
+    .then((m) => { levelOf = m && m.levelById; starsOf = m && m.starsFor; })
     .catch(() => { /* lane C absent: pips fall back to the earned count */ });
   import('../modes/hourglass.js')
     .then((m) => { const n = m && m.HOURGLASS_CFG && m.HOURGLASS_CFG.flipEvery; if (n > 0) flipPeriod = n; })
@@ -110,35 +141,52 @@ export function createModeHud() {
 
   function setObjective(a) {
     const lv = levelOf && a.id != null ? levelOf(a.id) : null;
-    const limit = lv && lv.limitS;
-    const th = lv && lv.stars;
+    const budget = a.budget > 0 ? a.budget : 0;
+    const used = Math.max(0, a.used | 0);
+    const left = Math.max(0, a.left | 0);
     const frac = Math.max(0, Math.min(1, a.frac || 0));
-    const live = a.won ? (a.stars || 1)
-      : (th && limit != null ? starOnOffer(th, limit - a.left) : 0);
+    // The star STILL ON OFFER, judged on pieces spent. Fewer is better, so this
+    // only ever falls — which is the whole lesson: a careless drop is not slower,
+    // it is one star nearer the floor.
+    const live = a.won ? (a.stars || 1) : (lv && starsOf ? starsOf(lv, used) : 0);
 
-    const key = [a.label, a.value, a.target, a.won, live, Math.round(a.left * 10),
+    const key = [a.label, a.value, a.target, a.won, live, left, used, budget,
                  Math.round(frac * 200), a.id].join('|');
     if (key === lastObj) return;
-    lastObj = key;
+    const spent = lastUsed >= 0 && used > lastUsed && !a.won;
+    lastObj = key; lastUsed = used;
 
     objLabel.textContent = a.won ? 'Complete' : fmtLabel(a.label || 'Objective');
     objCount.textContent = a.won ? '' : fmt(a.value) + ' / ' + fmt(a.target);
     objFill.style.width = (frac * 100).toFixed(1) + '%';
     objLv.textContent = a.id != null ? ('lv ' + a.id + (a.name ? ' · ' + a.name : '')) : '';
-    objClock.textContent = clock(a.left);
+    // Won, the interesting number is no longer what is left in your hand: it is
+    // what the level cost you, because that is the number the stars were judged
+    // on and the number to beat on a replay.
+    objLeft.textContent = String(a.won ? used : left);
+    objUnit.textContent = a.won ? 'spent' : (left === 1 ? 'piece' : 'pieces');
 
     objective.classList.toggle('is-won', !!a.won);
-    objective.classList.toggle('is-late', !a.won && a.left <= 10);
-    objective.classList.toggle('is-urgent', !a.won && a.left <= 5);
-    const stars = objStars.children;
-    for (let i = 0; i < stars.length; i++) stars[i].classList.toggle('on', i < live);
-  }
+    objective.classList.toggle('is-low', !a.won && budget > 0 && left <= lowAt(budget));
+    objective.classList.toggle('is-last', !a.won && budget > 0 && left <= lastAt(budget));
+    // A spend is the one event in this panel the player caused, so it is the one
+    // thing that moves. Re-triggered rather than transitioned: two drops in a
+    // second have to read as two.
+    if (spent) { objPieces.classList.remove('spend'); void objPieces.offsetWidth; objPieces.classList.add('spend'); }
 
-  /** stars[] is [oneStar, twoStar, threeStar] in seconds, fastest last. */
-  function starOnOffer(th, elapsed) {
-    if (elapsed <= th[2]) return 3;
-    if (elapsed <= th[1]) return 2;
-    return 1;
+    const stars = objStars.children;
+    for (let i = 0; i < stars.length; i++) {
+      const on = i < live;
+      // A pip that has just gone out flares as it goes. A star quietly missing
+      // on the next glance is a thing you notice too late to learn from.
+      if (!on && stars[i].classList.contains('on')) {
+        stars[i].classList.remove('out'); void stars[i].getBoundingClientRect();
+        stars[i].classList.add('out');
+      }
+      if (on) stars[i].classList.remove('out');
+      stars[i].classList.toggle('on', on);
+    }
+    offer = live;
   }
 
   function setFlip(g) {
@@ -200,8 +248,13 @@ export function createModeHud() {
       return wantTide ? s.tide : null;
     },
 
+    /** The star ALCHEMY is currently offering, 0 when no level is running. */
+    get offer() { return offer; },
+
     reset() {
-  
+      lastObj = ''; lastUsed = -1; offer = 0;
+      objPieces.classList.remove('spend');
+      for (const p of objStars.children) p.classList.remove('out');
       flipring.classList.remove('on');
     },
   };

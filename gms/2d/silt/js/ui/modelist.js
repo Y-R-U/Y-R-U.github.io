@@ -23,7 +23,7 @@ export const CATALOGUE = [
   },
   {
     id: 'alchemy', name: 'ALCHEMY', tag: 'puzzles',
-    blurb: 'Hand-built boards of lava, ice and oil. One solution each, and no clock.',
+    blurb: 'Hand-built boards of lava, ice and oil. One solution each, and a handful of pieces to find it.',
   },
   {
     id: 'zen', name: 'ZEN', tag: 'no fail',
