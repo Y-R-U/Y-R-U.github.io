@@ -240,3 +240,19 @@ Rules the generator must hold to, because the systems assume them:
 - `length` must leave **≥ 60 m of clear road after the last item** so the run
   ends on a finish line and not on a wall.
 - A boss item pins the squad (`RUN.speedBoss`) until its hp reaches 0.
+
+---
+
+## Known open issue: the chapter-4 crowd cap
+
+Chapter 4 at `reqPower` pins at `RUN.maxTroops` (900) on most levels, so squad
+growth stops mattering across the back half of the game — SQUAD sensitivity
+measures 0.0 there. It is the cap doing its job, not a bug: a real run takes the
+best of three lanes on every row while the balance model banks one, so runs
+saturate even against an end target pulled down to `0.72 × maxTroops`.
+
+Raising the cap is the fix, but it is not a one-line change: every chapter-4
+level is written against a 900-man ceiling and would need re-simulating. Note
+that `state.troops` and the *rendered* body count are already separate —
+`army.js` keeps counting past `ctx.quality.maxCrowd` and widens spacing instead
+— so the ceiling that needs raising is the balance one, not the draw one.
