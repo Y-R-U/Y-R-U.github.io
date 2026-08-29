@@ -12,7 +12,16 @@
 
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
-const puppeteer = require(process.env.HB_PUPPETEER || 'puppeteer-core');
+let puppeteer;
+try {
+  puppeteer = require(process.env.HB_PUPPETEER || 'puppeteer-core');
+} catch {
+  // Cost a whole 4-level run once. puppeteer-core is deliberately not vendored
+  // into this repo (no npm here), so it only resolves via NODE_PATH.
+  console.error('smoke: cannot resolve puppeteer-core. See dev/README.md — set\n'
+    + '  NODE_PATH=<...>/scratchpad/pup/node_modules');
+  process.exit(2);
+}
 
 const CHROME = process.env.HB_CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const BASE = process.env.HB_BASE || 'http://localhost:8899/gms/3d/homebound/index.html';
