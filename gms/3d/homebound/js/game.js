@@ -10,7 +10,7 @@ import { P, addCash, clearLevel, bumpStats, unlock, save } from './save.js';
 
 import { ctx, updateCamera, render } from './render.js';
 import { updateInput, updateAutoThumb } from './input.js';
-import { resetWorld, updateWorld } from './world.js';
+import { resetWorld, updateWorld, roadHalfAt } from './world.js';
 import { resetArmy, updateArmy, addTroops, killTroops, setTier } from './army.js';
 import { resetGates, updateGates, gateChoices } from './gates.js';
 import { resetBarriers, updateBarriers } from './barriers.js';
@@ -246,8 +246,14 @@ export function updateGame(dt) {
 
     // Lateral: the leader chases targetX at a bounded rate, so a flick across
     // the screen is a fast slide and not a teleport.
+    //
+    // Clamped to the road's half-width AT THIS z, not the constant. A
+    // `{kind:'narrow'}` pinched the geometry but not the player, so the squad
+    // walked straight through the parapet and out over the water.
+    const half = (roadHalfAt?.(state.z) ?? ROAD.halfW) || ROAD.halfW;
     const dx = clamp(state.targetX - state.x, -RUN.steerRate * dt, RUN.steerRate * dt);
-    state.x = clamp(state.x + dx, -ROAD.halfW, ROAD.halfW);
+    state.x = clamp(state.x + dx, -half, half);
+    state.targetX = clamp(state.targetX, -half, half);
 
     // Forward: constant, except where the level says to hold station.
     const hold = state.bossMax > 0 && state.bossHp > 0;

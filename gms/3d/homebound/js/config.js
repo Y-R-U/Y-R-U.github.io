@@ -76,11 +76,14 @@ export const PAL = {
 export const ROAD = {
   halfW: 5.5,                // playable half-width, so 11 m across
   segLen: 40,                // one road tile
-  segAhead: 14,              // tiles kept alive in front of the squad
+  // A ceiling, not a target: world.js derives the live count from scene.fog.far,
+  // because tiles past the fog paint fog-coloured pixels over the backdrop and
+  // cost the same as tiles you can see.
+  segAhead: 6,
   segBehind: 3,
   bankW: 9,                  // rock shoulder before the water starts
   waterY: -2.6,
-  wallEvery: 0,              // set per-level: parapet walls like the reference
+  wallEvery: 5,              // metres per parapet bay
 };
 
 // --------------------------------------------------------------------------

@@ -79,14 +79,26 @@ export function updateX(dt)    // per frame, dt in seconds, already clamped
 export function disposeX()
 ```
 
-Systems never import each other sideways. They talk over `bus.js`.
+Systems never import each other sideways. They talk over `bus.js`. Three
+exceptions are documented rather than pretended away:
+
+- **`gates.js` and `barriers.js` apply their own damage.** Their hit tests return
+  an object with the damage method on it, and that method emits `gate:hit`
+  itself. `combat.js` calls the method and must **not** also emit — doing both
+  doubles every gate's growth rate. The bus table below reads as if combat were
+  the producer; it is not.
+- **`army.js` owns `state.troops`** and **`enemies.js` owns `state.bossHp`,
+  `state.bossMax` and `state.kills`**, because `applyEffect` and the hit
+  resolution hand straight to them.
+- **`combat.js` may import `killTroops` from `army.js`.** Enemy fire has to land
+  somewhere and a bus round-trip for it would be theatre.
 
 ### The bus is the integration surface — these names are exact
 
 ```
 run:start      {level}
 run:end        {win, stats}
-army:count     {count, delta, reason}      // reason: gate|kill|barrier|trap
+army:count     {count, delta, reason}      // gate|kill|barrier|trap|enemy|promote
 army:tier      {tier, prev}
 gate:hit       {gate, damage}
 gate:grow      {gate, value}
