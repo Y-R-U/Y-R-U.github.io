@@ -1,0 +1,68 @@
+/* HOMEBOUND — base layer only. Screen chrome lives in the UI systems' own
+   sections further down this file; this top block is the frame they sit in. */
+
+:root {
+  --ink: #0f1a22;
+  --paper: #f4efe4;
+  --steel: #8f989f;
+  --olive: #6b7355;
+  --gold: #f5c518;
+  --blue: #2f7ee0;
+  --red: #d8352f;
+  --green: #35b34a;
+  --shadow: 0 4px 0 rgba(0,0,0,.35);
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --ui: 900 clamp(13px, 3.6vw, 17px)/1.1 "Arial Black", Impact, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; padding: 0; height: 100%; overflow: hidden;
+  background: #1d3a4d; color: #fff;
+  font: var(--ui); letter-spacing: .02em;
+  -webkit-user-select: none; user-select: none;
+  overscroll-behavior: none; touch-action: none;
+}
+#stage { position: fixed; inset: 0; }
+#stage canvas { display: block; width: 100%; height: 100%; }
+
+.screen-layer { position: fixed; inset: 0; pointer-events: none; }
+.screen-layer > * { pointer-events: auto; }
+.hidden { display: none !important; }
+
+button {
+  font: inherit; color: inherit; border: 0; background: none;
+  cursor: pointer; padding: 0;
+}
+
+/* ── loading ─────────────────────────────────────────────────────────── */
+.loading {
+  position: fixed; inset: 0; z-index: 90;
+  display: grid; place-content: center; gap: 18px; justify-items: center;
+  background: linear-gradient(#173042, #0d1b26);
+  transition: opacity .45s ease;
+}
+.loading.gone { opacity: 0; pointer-events: none; }
+.load-logo { font-size: clamp(30px, 10vw, 54px); letter-spacing: .06em; }
+.load-logo span { color: var(--gold); }
+.load-bar { width: min(62vw, 280px); height: 8px; border-radius: 99px; background: rgba(255,255,255,.14); overflow: hidden; }
+.load-bar i { display: block; height: 100%; width: 12%; background: var(--gold); transition: width .3s ease; }
+#load-text { margin: 0; font-size: 12px; opacity: .6; letter-spacing: .2em; }
+
+/* ── popup ───────────────────────────────────────────────────────────── */
+.popup { position: fixed; inset: 0; z-index: 80; display: grid; place-content: center;
+  background: rgba(6,14,20,.72); backdrop-filter: blur(3px); padding: 24px; }
+.popup-card { width: min(88vw, 400px); background: #22323d; border: 3px solid #0f1a22;
+  border-radius: 18px; padding: 20px; box-shadow: 0 10px 0 rgba(0,0,0,.4); text-align: center; }
+.popup-card h2 { margin: 0 0 10px; font-size: 22px; }
+#popup-body { font-weight: 700; font-size: 14px; line-height: 1.5; opacity: .9; }
+.popup-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+
+/* ── dev ─────────────────────────────────────────────────────────────── */
+#dev-overlay {
+  position: fixed; left: 6px; top: calc(var(--safe-t) + 6px); z-index: 95;
+  font: 700 10px/1.35 ui-monospace, Menlo, monospace; letter-spacing: 0;
+  background: rgba(0,0,0,.6); color: #9fe4f5; padding: 6px 8px; border-radius: 6px;
+  white-space: pre; pointer-events: none;
+}

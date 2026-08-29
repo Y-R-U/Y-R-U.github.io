@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#8fb4cc" />
+  <meta name="description" content="HOMEBOUND — a decorated soldier fights his way home through a country still at war. Drag to steer, shoot the gates, grow the army." />
+  <title>HOMEBOUND</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231d3a4d'/%3E%3Cpath d='M16 5 4 15h3v12h18V15h3z' fill='%23f5c518'/%3E%3Crect x='13' y='19' width='6' height='8' fill='%231d3a4d'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="stage"></div>
+
+  <!-- ══════════════════ IN-RUN HUD ══════════════════ -->
+  <div id="hud" class="screen-layer hidden">
+    <div class="hud-top">
+      <div class="troop-chip">
+        <span class="tc-icon" id="tc-icon">🪖</span>
+        <b id="tc-count">1</b>
+        <i id="tc-delta"></i>
+      </div>
+      <div class="hud-progress">
+        <div class="prog-track"><i id="prog-fill"></i><span id="prog-flag">🏁</span></div>
+        <span id="prog-label">CH.1 · LEVEL 1</span>
+      </div>
+      <div class="hud-right">
+        <div class="cash-chip">💰 <b id="run-cash">0</b></div>
+        <button id="btn-pause" aria-label="Pause">❙❙</button>
+      </div>
+    </div>
+
+    <div id="boss-bar" class="hidden">
+      <span id="boss-name">HEAVY</span>
+      <div class="bb-track"><i id="boss-fill"></i></div>
+      <b id="boss-hp">0</b>
+    </div>
+
+    <div id="tier-banner" class="hidden"><span></span></div>
+    <div id="run-toast" class="toast"></div>
+    <div id="bubble-layer"></div>
+    <div id="tut-layer"></div>
+    <div id="dmg-flash"></div>
+    <div id="drag-hint" class="hidden">DRAG TO MOVE</div>
+  </div>
+
+  <!-- ══════════════════ SCREENS ══════════════════ -->
+  <div id="main-screen" class="screen-layer hidden"></div>
+  <div id="home-screen" class="screen-layer hidden"></div>
+  <div id="store-screen" class="screen-layer hidden"></div>
+  <div id="outro" class="screen-layer hidden"></div>
+
+  <div id="popup" class="popup hidden">
+    <div class="popup-card">
+      <h2 id="popup-title"></h2>
+      <div id="popup-body"></div>
+      <div class="popup-row" id="popup-actions"></div>
+    </div>
+  </div>
+
+  <div id="loading" class="loading">
+    <div class="load-logo">HOME<span>BOUND</span></div>
+    <div class="load-bar"><i></i></div>
+    <p id="load-text">MOVING OUT</p>
+  </div>
+
+  <div id="dev-overlay" class="hidden"></div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "../../lib/three/0.160.0/three.module.js",
+      "three/addons/": "../../lib/three/0.160.0/addons/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
