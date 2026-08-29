@@ -16,6 +16,7 @@
 import { TIERS, tierAt } from './config.js';
 import { state } from './state.js';
 import { markStory, storySeen } from './save.js';
+import { pauseRun, run } from './game.js';
 import { on, emit } from './bus.js';
 import { $, el, fmt, clamp, approach } from './utils.js';
 
@@ -67,7 +68,8 @@ let dragHintT = 0;
 let tut = null;            // { key, t, offDone } while a tutorial card is up
 let paused = false;
 let lastShield = -1;
-const bubbles = [];        // { node, t }
+const beatQ = [];          // story beats waiting for a tap
+let beatOn = false;
 
 export function initHud() {
   if (inited) return;
@@ -117,12 +119,14 @@ export function initHud() {
     if (toastT <= 0) nextToast();
   });
 
+  initBeatTaps();
+
   on('army:count', onCount);
   on('army:tier', onTier);
   on('boss:hp', onBoss);
   on('hud:toast', (o) => { toastQ.push(o); if (toastT <= 0) nextToast(); });
   on('story:bubble', onBubble);
-  on('run:end', () => { setPaused(false); hideTut(); });
+  on('run:end', () => { setPaused(false); hideTut(); beatQ.length = 0; endBeats(); });
 
   // The drag hint dies the moment the player drags, which is the only proof
   // that reads as "understood". Listening on the stage rather than importing
@@ -253,11 +257,7 @@ export function updateHud(dt) {
     if (tut.t <= 0) hideTut();
   }
 
-  for (let i = bubbles.length - 1; i >= 0; i--) {
-    const b = bubbles[i];
-    b.t -= dt;
-    if (b.t <= 0) { b.node.classList.add('out'); bubbles.splice(i, 1); setTimeout(() => b.node.remove(), 260); }
-  }
+  // Story beats have no timer — they are dismissed by a tap and nothing else.
 }
 
 // --------------------------------------------------------------------------
@@ -306,15 +306,55 @@ function onBoss({ frac }) {
   if (f <= 0) setTimeout(() => R.boss.classList.add('hidden'), 400);
 }
 
+// Story beats HOLD THE GAME. They used to be timed bubbles stacked at the
+// bottom of a screen that was travelling at 12.5 m/s, so the player was reading
+// a line about his family while a wall of red arrived — and mostly did not read
+// it at all. A beat now pauses the run, sits in the middle of the frame, and
+// waits for a tap. That is worth the interruption precisely because there are
+// never more than two of them in a level.
 function onBubble({ who, text, ms }) {
-  const sp = SPEAKERS[who] || SPEAKERS.ME;
-  const n = el('div', `bubble ${sp.cls}`);
-  n.innerHTML = `<span class="bub-chip">${sp.chip}</span><div class="bub-body"><b>${sp.name}</b><p></p></div>`;
-  n.querySelector('p').textContent = text || '';
-  R.bubbles.appendChild(n);
-  // Three on screen at once is already a wall of text over a moving game.
-  while (R.bubbles.children.length > 3) R.bubbles.firstChild.remove();
-  bubbles.push({ node: n, t: Math.max(1.2, (ms || 2600) / 1000) });
+  if (run.autoplay) return;              // never over the main screen's backdrop
+  beatQ.push({ who, text });
+  if (!beatOn) showBeat();
+}
+
+function showBeat() {
+  const b = beatQ.shift();
+  if (!b) { endBeats(); return; }
+  beatOn = true;
+  pauseRun(true);
+
+  const sp = SPEAKERS[b.who] || SPEAKERS.ME;
+  R.bubbles.innerHTML = '';
+  const card = el('div', `beat ${sp.cls}`);
+  card.innerHTML =
+    `<span class="beat-chip">${sp.chip}</span>` +
+    `<b class="beat-who"></b><p class="beat-text"></p>` +
+    `<span class="beat-go">TAP TO CONTINUE</span>`;
+  card.querySelector('.beat-who').textContent = sp.name;
+  card.querySelector('.beat-text').textContent = b.text || '';
+  R.bubbles.appendChild(card);
+  R.bubbles.classList.add('on');
+}
+
+function endBeats() {
+  beatOn = false;
+  R.bubbles.classList.remove('on');
+  R.bubbles.innerHTML = '';
+  // Only give the run back if the player did not pause it themselves while a
+  // beat was up — otherwise dismissing a line silently un-pauses the game.
+  if (!paused) pauseRun(false);
+}
+
+// One listener, on the layer itself: the card fills the screen while it is up,
+// so anywhere is a valid tap and nobody has to find a button.
+function initBeatTaps() {
+  R.bubbles?.addEventListener('pointerdown', (e) => {
+    if (!beatOn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    showBeat();
+  });
 }
 
 function nextToast() {
@@ -355,8 +395,9 @@ function hideTut() {
 }
 
 function clearBubbles() {
-  bubbles.length = 0;
-  if (R?.bubbles) R.bubbles.innerHTML = '';
+  beatQ.length = 0;
+  beatOn = false;
+  if (R?.bubbles) { R.bubbles.innerHTML = ''; R.bubbles.classList.remove('on'); }
 }
 
 // --------------------------------------------------------------------------

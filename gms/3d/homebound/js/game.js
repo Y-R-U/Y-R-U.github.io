@@ -2,7 +2,7 @@
 // the moment a run ends. Systems do not call each other — they are called from
 // here, in this order, once each.
 
-import { RUN, ROAD, TIERS, EFFECTS, ECON, GAMBLE, UPGRADE_BY_ID, AUTO_MODE, DEV_MODE } from './config.js';
+import { RUN, ROAD, TIERS, EFFECTS, ECON, GAMBLE, PAL, UPGRADE_BY_ID, AUTO_MODE, DEV_MODE } from './config.js';
 import { state, resetRunState, tierDef } from './state.js';
 import { emit, on } from './bus.js';
 import { clamp, approach } from './utils.js';
@@ -131,6 +131,27 @@ function advanceUnlocks() {
   }
 }
 
+// THE CORE LOOP. gates.js emits `gate:pass` and this applies it.
+//
+// This wire did not exist for the first eight commits of the project, and
+// nothing caught it: the gate resolved, the panel burst, the sound played, the
+// sign flew off — and the squad never changed. It survived every screenshot
+// review because every review URL passed `?troops=N`, which supplies an army
+// the gates never had to provide. `dev/smoke.mjs` now plays a level with no
+// such help and asserts the squad grew, because "it looked right" is exactly
+// the test this bug was built to pass.
+on('gate:pass', ({ gate, effect }) => {
+  if (!effect) return;
+  applyEffect(effect, gate ? { x: gate.x, y: 1.6, z: gate.z } : null);
+});
+
+// A button plate does its thing, and still pays out if the level gave it a
+// fallback effect — a press that rewards nothing reads as a broken gate.
+on('gate:press', ({ gate, action }) => {
+  if (gate?.effect) applyEffect(gate.effect, { x: gate.x, y: 1.6, z: gate.z });
+  if (action) emit('level:trigger', { id: action, action, z: gate?.z ?? state.z });
+});
+
 // `army:count` is an announcement, not a request — so barriers.js saying "that
 // body-check cost you 40 men" was landing nowhere and walking into a live wall
 // was free. Map that one reason onto a real kill here. The guard stops army.js's
@@ -167,16 +188,29 @@ function starsFor() {
   return kept > 0.7 ? 3 : kept > 0.35 ? 2 : 1;
 }
 
+// Money you physically picked up during the run is paid IN FULL and shown on
+// its own line. Folding it into the same pot as the clear bonus — and then
+// scaling the lot by winMul — meant a player who collected $70 from a gate
+// could be handed $53 at the end, which reads as the game taking money off you
+// for winning. Only the BONUS is conditional on how the run went.
 function payout(stats) {
   const lvl = run.level || {};
-  const base = (lvl.reward ?? ECON.baseReward) + state.cash;
-  const troopPay = state.peakTroops * ECON.perTroop;
-  // Rate off the shop's own table, never a second copy of the number.
   const incomeMul = 1 + (P().upgrades.income || 0) * (UPGRADE_BY_ID.income?.per ?? 0);
   const repeat = lvl.mode === 'story' && lvl.chapter && P().cleared[`c${lvl.chapter}l${lvl.level}`]
     ? ECON.replayFactor : 1;
-  const winMul = stats.win ? 1 : 0.25;   // losing still pays; a dead end is not a punishment
-  return Math.round((base + troopPay) * incomeMul * repeat * winMul);
+  const winMul = stats.win ? 1 : 0.25;   // a lost run still pays; a dead end is not a punishment
+
+  const collected = Math.round(state.cash * incomeMul);
+  const squad = Math.round(state.peakTroops * ECON.perTroop * incomeMul * repeat * winMul);
+  const clear = Math.round((lvl.reward ?? ECON.baseReward) * incomeMul * repeat * winMul);
+
+  stats.breakdown = [
+    { label: 'COLLECTED', note: 'gates', value: collected },
+    { label: 'SQUAD', note: `${state.peakTroops} strong`, value: squad },
+    { label: stats.win ? 'LEVEL CLEAR' : 'GROUND TAKEN', note: '', value: clear },
+  ].filter((r) => r.value > 0);
+
+  return collected + squad + clear;
 }
 
 // Pause is a flag on the run, not a stop on the frame loop: the world still
@@ -210,6 +244,7 @@ export function applyEffect(effect, at) {
   const { type } = effect;
   let value = effect.value;
   const def = EFFECTS[type];
+  const troopsBefore = state.troops;
 
   switch (type) {
     case 'troops': addTroops(Math.round(value), 'gate'); break;
@@ -225,6 +260,26 @@ export function applyEffect(effect, at) {
   }
   state.gatesTaken++;
   if (def?.good && value > state.bestGate) state.bestGate = Math.round(value);
+
+  // Say what it did, in the units the player cares about. The sign said `+14`;
+  // this says `+14 MEN` and the troop counter ticks under it. Reporting the
+  // RESULT rather than echoing the sign is the difference between "I collected
+  // a +14" and "I have fourteen more men".
+  const before = troopsBefore;
+  const gained = state.troops - before;
+  const say = type === 'cash' ? `+$${Math.round(value)}`
+    : type === 'shield' ? `+${Math.round(value)} SHIELD`
+    : type === 'weapon' ? 'GUN UP'
+    : type === 'power' ? 'RAPID FIRE'
+    : type === 'tier' ? tierDef().name
+    : gained > 0 ? `+${gained} MEN`
+    : gained < 0 ? `${gained} MEN` : null;
+  if (say && at) {
+    emit('fx:number', {
+      pos: { x: at.x ?? state.x, y: (at.y ?? 1.6) + 1.4, z: at.z ?? state.z },
+      text: say, color: def?.good === false ? PAL.enemy : PAL.friendTrim,
+    });
+  }
   emit('effect:apply', { type, value, at, good: def?.good !== false });
 }
 

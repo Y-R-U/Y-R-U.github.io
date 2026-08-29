@@ -859,3 +859,47 @@ button {
   0% { transform: scale(1.28); background: #a98ef0; }
   100% { transform: scale(1); background: #6b4fb8; }
 }
+
+/* ── outro payout breakdown ──────────────────────────────────────────────
+   A single EARNED total makes money the player watched themselves collect
+   look like it never arrived. The COLLECTED row is the one they are checking. */
+.o-breakdown { list-style: none; margin: 10px 0 0; padding: 12px 14px 4px; border-top: 2px dashed rgba(255,255,255,.16); }
+.o-breakdown li { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 4px 0; font-size: 13px; }
+.o-breakdown li span { opacity: .78; letter-spacing: .04em; }
+.o-breakdown li em { font-style: normal; opacity: .55; font-size: .85em; margin-left: 5px; }
+.o-breakdown li b { color: var(--gold); font-variant-numeric: tabular-nums; }
+.o-breakdown li:first-child b { color: #7fe08a; }
+
+/* ── story beats ─────────────────────────────────────────────────────────
+   A held card in the middle of the frame, not a timed bubble at the bottom of a
+   screen moving at 12.5 m/s. The whole layer is the tap target. */
+#bubble-layer { position: fixed; inset: 0; display: none; z-index: 60;
+  align-items: center; justify-content: center; padding: 24px;
+  background: rgba(6,14,20,.58); backdrop-filter: blur(2px); }
+#bubble-layer.on { display: flex; }
+
+.beat {
+  position: relative; width: min(86vw, 400px);
+  background: var(--paper); color: var(--ink);
+  border: 3px solid var(--ink); border-radius: 20px;
+  padding: 30px 22px 18px; text-align: center;
+  box-shadow: 0 10px 0 rgba(0,0,0,.45);
+  animation: beatIn .22s cubic-bezier(.2,1.4,.5,1) both;
+}
+@keyframes beatIn { from { transform: scale(.86) translateY(10px); opacity: 0; } }
+
+.beat-chip {
+  position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
+  width: 52px; height: 52px; display: grid; place-content: center; font-size: 26px;
+  background: var(--paper); border: 3px solid var(--ink); border-radius: 50%;
+}
+.beat-who { display: block; font-size: 11px; letter-spacing: .22em; opacity: .5; margin-bottom: 8px; }
+.beat-text { margin: 0 0 16px; font-size: 17px; line-height: 1.45; font-weight: 800; }
+.beat-go {
+  display: block; font-size: 10px; letter-spacing: .2em; opacity: .42;
+  animation: beatGo 1.3s ease-in-out infinite;
+}
+@keyframes beatGo { 50% { opacity: .9; } }
+
+.beat.sp-radio { background: #dbe6ec; }
+.beat.sp-family { background: #f6e6cf; }

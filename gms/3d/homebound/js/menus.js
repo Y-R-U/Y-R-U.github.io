@@ -468,6 +468,7 @@ function buildOutro() {
         <div class="stars" id="o-stars"></div>
         <h2 id="o-name">LEVEL 1</h2>
         <div class="o-reward"><i>EARNED</i><b id="o-cash">$0</b></div>
+        <ul class="o-breakdown" id="o-breakdown"></ul>
         <div class="stat-rows" id="o-stats"></div>
         <p class="o-note" id="o-note"></p>
         <div class="outro-actions">
@@ -515,6 +516,16 @@ export function showOutro(result) {
   $('#o-name', outroEl).textContent = r.level?.name || 'THE ROAD';
   $('#o-cash', outroEl).textContent = exact(r.reward ?? 0);
 
+  // Itemised, because a single total makes money you watched yourself pick up
+  // look like it never arrived. `COLLECTED` is the line the player is checking.
+  const bd = $('#o-breakdown', outroEl);
+  if (bd) {
+    bd.innerHTML = (r.breakdown || []).map((row) => `
+      <li><span>${row.label}${row.note ? ` <em>${row.note}</em>` : ''}</span><b>${exact(row.value)}</b></li>
+    `).join('');
+    bd.classList.toggle('hidden', !(r.breakdown || []).length);
+  }
+
   const st = $('#o-stars', outroEl);
   st.innerHTML = '';
   for (let i = 0; i < 3; i++) {
@@ -555,6 +566,11 @@ export function showOutro(result) {
 function fakeResult() {
   return {
     win: true, stars: 3, peakTroops: 428, kills: 613, reward: 1240,
+    breakdown: [
+      { label: 'COLLECTED', note: 'gates', value: 340 },
+      { label: 'SQUAD', note: '428 strong', value: 599 },
+      { label: 'LEVEL CLEAR', note: '', value: 301 },
+    ],
     gatesTaken: 22, bestGate: 96, dist: 640,
     level: { chapter: 1, level: 3, name: 'RIVER CROSSING' },
   };
