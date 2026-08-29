@@ -187,6 +187,14 @@ Headless: `node dev/shot.mjs <url-suffix> <out.png>` against
 **rAF is throttled when the page is hidden** — the harness drives
 `window.__hb.step(dt)` manually and then screenshots.
 
+**`node dev/smoke.mjs` is the gate. Run it before you hand work back.** It plays
+levels end to end and asserts the squad actually grew, that every gate taken was
+also applied, that something grew under fire, and that the run reached an
+ending. It exists because `gate:pass` was never wired to `applyEffect` for eight
+commits and every screenshot review missed it — because every review URL passed
+`?troops=N` and handed the run the very army the gates were supposed to provide.
+**Never let the harness supply the thing under test.** See `dev/README.md`.
+
 ---
 
 ## The LevelDef — the contract between `levels.js` and everything it fills
