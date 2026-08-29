@@ -38,11 +38,14 @@
  *   node tools/uishot.mjs --legible --flatbug   no shadow at all; the bright-board INK lines must
  *   node tools/uishot.mjs --copy          the two ALCHEMY card labels a player could misread
  *   node tools/uishot.mjs --copy --falsify    the copy as it shipped, priced in seconds; 5 must go red
+ *   node tools/uishot.mjs --copy --downbug    countdown objectives rendered as value/target again,
+ *                                         which is the line that shipped; EXACTLY those must go red
  *   node tools/uishot.mjs --layout        where the top controls ACTUALLY land, per mode
  *   node tools/uishot.mjs --layout --falsify  the naive version of the swap; every position must go red
  *   node tools/uishot.mjs --se            add a 375x667 iPhone SE pass to any of the above
  */
 import { harness, ROOT } from './cdp.mjs';
+import { activeLevels } from '../js/modes/alchemy.js';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -1767,7 +1770,8 @@ async function copyGate() {
   const BARE = /\d{4,}/;         // four digits in a row with no separator
 
   await cdp.viewport(390, 844, 1, true);
-  await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=alchemy&seed=4242`);
+  await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=alchemy&seed=4242`
+    + (args.downbug ? '&downbug=1' : ''));
   if (!await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000)) {
     console.log('  !! shell never came up'); process.exitCode = 1; return;
   }
@@ -1818,6 +1822,63 @@ async function copyGate() {
     seen.length === LEVELS.length && !seen.some((r) => BARE.test(r.head)),
     seen.map((r) => `"${r.head}" | ${r.count}`).join(' · '));
 
+  /* ----------------------------- an objective that counts DOWN, read by a player */
+  //
+  // "Reduce sand to 394" shipped rendered as "590 / 394" — the same value/target
+  // shape as the three objectives that count UP. So it read as already complete
+  // before the first piece, and the number ROSE with every drop, because on a
+  // purge level each piece adds 256 grains you then have to clear. Reported from
+  // a phone as: "level 18: impossible to finish? my score STARTS higher than the
+  // completion score and therefore i can never pass a target that has already
+  // passed."
+  //
+  // The sample is derived from the shipped table rather than hard-coded, so a
+  // regenerated campaign cannot quietly leave this gate pointing at nothing, and
+  // the emptiness of the sample is itself a failure rather than a pass.
+  const DOWN_IDS = activeLevels().filter((l) => l.objective.type === 'purge').map((l) => l.id);
+  const pick = [DOWN_IDS[0], DOWN_IDS[DOWN_IDS.length >> 1], DOWN_IDS[DOWN_IDS.length - 1]]
+    .filter((v, i, a) => v != null && a.indexOf(v) === i);
+  ok('the campaign still contains an objective that counts down',
+    pick.length > 0, `${DOWN_IDS.length} purge level(s), first is lv ${DOWN_IDS[0]}`);
+
+  for (const n of pick) {
+    await q(`window.__game.startLevel(${n})`);
+    await cdp.frames(6);
+    await pump();
+    await new Promise((r) => setTimeout(r, 60));
+    const r = JSON.parse(await q(`JSON.stringify({
+      down: !!(window.__game.world.alchemy || {}).down,
+      value: (window.__game.world.alchemy || {}).value || 0,
+      target: (window.__game.world.alchemy || {}).target || 0,
+      count: (document.querySelector('.obj-count') || {}).textContent || '' })`));
+    // The mode publishes the direction; the arm is in the HUD, so this stays
+    // green under it. If it ever goes red the fault is upstream of the readout.
+    ok(`lv ${n}: the mode says this objective counts down`, r.down,
+      `value ${r.value} target ${r.target}`);
+    // The level is worth playing at all: a countdown that starts at or under its
+    // ceiling is a level that is already won, which is what the player thought
+    // they were looking at.
+    ok(`lv ${n}: the countdown does not start already satisfied`, r.value > r.target,
+      `${r.value} vs ${r.target}`);
+    // THE READOUT ITSELF. Not "does it contain the right digits" — it must not
+    // be a value/target pair at all, because that shape is what said "passed".
+    const togo = Math.max(0, r.value - r.target).toLocaleString('en-US');
+    ok(`lv ${n}: reads as work remaining, not as a score already past the bar`,
+      !r.count.includes('/') && r.count.trim() === `${togo} to go`,
+      `"${r.count}" (value ${r.value}, target ${r.target})`);
+  }
+
+  // And the three objectives that count UP are untouched: the fix must not have
+  // turned every objective into a countdown.
+  await q(`window.__game.startLevel(1)`);
+  await cdp.frames(6); await pump();
+  await new Promise((r) => setTimeout(r, 60));
+  const upRead = JSON.parse(await q(`JSON.stringify({
+    down: !!(window.__game.world.alchemy || {}).down,
+    count: (document.querySelector('.obj-count') || {}).textContent || '' })`));
+  ok('an objective that counts up still reads value / target',
+    !upRead.down && upRead.count.includes('/'), `"${upRead.count}"`);
+
   /* ------------------------------------------------ the two ALCHEMY result cards */
   // The card is a pure function of the payload main.js hands it, so hand it one
   // rather than spending a minute of sim to arrive at the same DOM.
@@ -1867,6 +1928,19 @@ async function copyGate() {
     !!lost.lab && !BARE.test(lost.lab) && !BARE.test(lost.num), `${lost.lab} | ${lost.num}`);
   if (args.shots) await shot('phone-copy-lost');
 
+  if (args.downbug) {
+    // Exactly one check per sampled level: the readout. The direction the mode
+    // publishes, the levels being worth playing, and the up-counting objectives
+    // are all outside the arm and must stay green — an arm that reddens those
+    // would be proving the harness rather than the fix.
+    const MUST = pick.length;
+    console.log(`\ndownbug arm: ${fails.length} checks went red, ${MUST} required`);
+    const onlyRead = fails.every((f) => /reads as work remaining/.test(f));
+    if (fails.length < MUST) { console.log('ARM TOO WEAK — the countdown readout is not evidence'); process.exitCode = 1; }
+    else if (!onlyRead) { console.log('ARM TOO BROAD — it reddened checks it does not own:\n  ' + fails.join('\n  ')); process.exitCode = 1; }
+    else console.log('arm ok: the countdown readout is capable of failing');
+    return;
+  }
   if (args.falsify) {
     // Five: the headline across the level sample, the headline on the losing
     // card, the cost caption, that no cell is priced in seconds, and the

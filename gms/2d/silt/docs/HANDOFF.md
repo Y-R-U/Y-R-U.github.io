@@ -1614,3 +1614,72 @@ touched.
 - The stratified sample is a better estimator than the stride, which was
   measured; that it is a GOOD estimator is not proven, only that it tracks the
   full-table aggregate to 0.02 stars on this one table.
+
+---
+
+## S+10 — the objective that read as already won
+
+From a phone, on campaign level 18: *"impossible to finish? it appears my score
+STARTS higher than the completion score and therefore i can never pass a target
+that has already passed."*
+
+The level is not impossible. The bot wins it on 3 of 3 generator seeds in a
+median of 27 drops. **The readout was wrong, and it was wrong in the most
+expensive possible way: it told the player the level was over before it began.**
+
+`purge` is the only objective of the four that counts DOWN. It is a ceiling —
+`done` is `value <= target`, and `OBJECTIVE_LABEL` says so: *"Reduce sand to
+394"*. But `js/ui/modehud.js` rendered every objective the same way,
+`fmt(value) + ' / ' + fmt(target)`, so the strip read **"590 / 394"** on the
+first frame. Worse, on a purge level every piece you drop ADDS 256 grains you
+then have to clear: level 18 peaks near **3,900** before collapsing under 394.
+So the number the player was watching started past the bar and then ran away
+from it, all while the label told them to reduce.
+
+The tracker was right the whole time. `frac()` already inverts correctly for
+purge, so the progress BAR was honest while the number beside it was not — which
+is why nothing caught it: the two disagreed and only one was gated.
+
+### The fix
+
+`makeTracker` publishes `down: o.type === 'purge'`, alchemy passes it through in
+both snapshots, and the HUD renders a down objective as **"196 to go"** — what
+still has to be cleared, a number that can only reach zero. `onStart` also
+publishes the baseline as the opening value instead of 0, which had the strip
+read "0 / 394" for one frame before jumping to 590.
+
+**24 of 118 levels are purge, and campaign 18 is the FIRST one.** Every player
+meets this archetype for the first time on the level that was unreadable.
+
+### The gate
+
+`node tools/uishot.mjs --copy` gains four checks, and the sample is derived from
+the shipped table (`activeLevels().filter(purge)`) rather than hard-coded, so a
+regenerated campaign cannot leave it pointing at nothing — an empty sample is a
+failure, not a pass. Per sampled level: the mode publishes the direction, the
+level does not start already satisfied, and the readout is not a value/target
+pair. Plus one check that an UP objective still reads "0 / 2", so the fix cannot
+have turned everything into a countdown.
+
+Arm: `--copy --downbug` sets `?downbug=1`, which restores the exact line that
+shipped. It reddens **exactly** the three readout checks and nothing else — the
+arm is refused as TOO BROAD if it reddens a check it does not own, because the
+direction the mode publishes and the levels being worth playing are not the
+readout's to break.
+
+**The arm was inert on its first run and the gate caught it.** `--downbug` was
+wired into the wrong `cdp.goto` — there are two navigations in this file with
+identical wait conditions and the anchored replace took the first. It ran,
+changed nothing, and every check stayed green. That is the fourth arm on this
+project found green because it was not touching the thing it named; the only
+reason it was caught is that an arm is required to go red rather than merely to
+run.
+
+### Left alone, on purpose
+
+The progress bar sits at 0% for most of a purge level, because `frac` measures
+baseline -> target and the value spends the level above its baseline. That is
+honest — no net progress toward the floor has been made — but it is dead
+feedback for minutes at a time, and a bar measured from the running peak would
+fill and empty as the player buries and digs. Worth a look with a human on the
+phone before choosing.

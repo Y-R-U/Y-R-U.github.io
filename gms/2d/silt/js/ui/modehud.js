@@ -32,6 +32,16 @@ function fmtLabel(t) {
   return String(t == null ? '' : t).replace(/\d{4,}/g, (d) => Number(d).toLocaleString('en-US'));
 }
 
+/**
+ * FALSIFICATION ARM, never set in play: ?downbug=1 renders a countdown
+ * objective the way it shipped — as `value / target`. This is not an imitation
+ * of the bug, it is the line that WAS there, so a gate that goes red under it
+ * is testing the fix and not a mock of it.
+ */
+const DOWNBUG = (() => {
+  try { return new URLSearchParams(location.search).get('downbug') === '1'; } catch { return false; }
+})();
+
 const STAR = '<path d="M12 3.1l2.65 5.86 6.35.62-4.8 4.3 1.4 6.28L12 16.9l-5.6 3.26 1.4-6.28-4.8-4.3 6.35-.62Z"/>';
 
 /** m:ss, but seconds with a decimal under ten. HOURGLASS's flip is still a clock. */
@@ -150,14 +160,26 @@ export function createModeHud() {
     // it is one star nearer the floor.
     const live = a.won ? (a.stars || 1) : (lv && starsOf ? starsOf(lv, used) : 0);
 
+    // A DOWN objective counts to zero, not up to a target.
+    //
+    // "Reduce sand to 394" was rendered "3,918 / 394" — the same value/target
+    // shape as the three objectives that count UP — so the number was already
+    // past the bar before the first piece and rose every time the player dropped
+    // one. Every purge level in the campaign is a dig-yourself-out: the count
+    // peaks near 4,000 on level 18 before collapsing under 394, and the readout
+    // said the level was over from the start. What still has to go is the only
+    // quantity that makes the level legible, and it can only ever reach 0.
+    const togo = a.down ? Math.max(0, (a.value | 0) - (a.target | 0)) : 0;
     const key = [a.label, a.value, a.target, a.won, live, left, used, budget,
-                 Math.round(frac * 200), a.id].join('|');
+                 Math.round(frac * 200), a.id, togo].join('|');
     if (key === lastObj) return;
     const spent = lastUsed >= 0 && used > lastUsed && !a.won;
     lastObj = key; lastUsed = used;
 
     objLabel.textContent = a.won ? 'Complete' : fmtLabel(a.label || 'Objective');
-    objCount.textContent = a.won ? '' : fmt(a.value) + ' / ' + fmt(a.target);
+    objCount.textContent = a.won ? ''
+      : (a.down && !DOWNBUG) ? fmt(togo) + ' to go'
+      : fmt(a.value) + ' / ' + fmt(a.target);
     objFill.style.width = (frac * 100).toFixed(1) + '%';
     objLv.textContent = a.id != null ? ('lv ' + a.id + (a.name ? ' · ' + a.name : '')) : '';
     // Won, the interesting number is no longer what is left in your hand: it is

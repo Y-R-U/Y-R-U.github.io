@@ -152,6 +152,13 @@ export function makeTracker(world, level) {
     target: o.target,
     value: 0,
     done: false,
+    // WHICH WAY THE NUMBER HAS TO MOVE. Three objectives count up to a target;
+    // `purge` counts DOWN to a ceiling, and it is the only one whose live value
+    // starts above the number it is chasing. Without this published, the HUD
+    // renders both the same way and a purge level reads as already complete
+    // before the first piece — reported from a phone as "impossible to finish:
+    // my score STARTS higher than the completion score".
+    down: o.type === 'purge',
     // Captured after applyScene: a crucible level starts with crystal pillars
     // already on the board, and "forge 400 crystal" must mean 400 MORE.
     baseline: o.type === 'purge' ? countMat(world.g, o.mat || SAND)

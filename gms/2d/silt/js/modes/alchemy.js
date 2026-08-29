@@ -234,7 +234,11 @@ export default {
     api.biome(this.biome);
     world.alchemy = {
       id: lv.id, name: lv.name, act: lv.act, arch: lv.arch,
-      label: this.label(lv), value: 0, target: st.tracker.target, base: st.tracker.baseline,
+      // A `down` objective's opening value is its BASELINE, not zero: publishing
+      // zero made the strip read "0 / 394" for one frame and then jump to 590,
+      // which is the same lie told twice.
+      label: this.label(lv), value: st.tracker.down ? st.tracker.baseline : 0,
+      target: st.tracker.target, base: st.tracker.baseline, down: !!st.tracker.down,
       frac: 0, stars: 0, won: false,
       // `left` is PIECES remaining, not seconds. CONTRACTS.md A.4.
       left: budgetOf(lv), budget: budgetOf(lv), used: 0,
@@ -296,7 +300,7 @@ export default {
       id: lv.id, name: lv.name, act: lv.act, arch: lv.arch,
       label: this.label(lv),
       value: st.tracker.value, target: st.tracker.target, base: st.tracker.baseline,
-      frac: st.tracker.frac(),
+      down: !!st.tracker.down, frac: st.tracker.frac(),
       stars: st.stars, won: st.won,
       // PIECES, not seconds: `left` is what remains of the budget and `used` is
       // what a star is judged on. Anything calibrating a threshold reads `used`.

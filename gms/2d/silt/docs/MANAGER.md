@@ -64,6 +64,11 @@ flag first.
   It publishes `left` / `budget` / `used` in pieces and `seconds` as wall-clock
   for information only. `starsFor(lv, used)` takes pieces; `lv.stars` is three
   piece counts, fewest last.
+- **`alchemy.down` is TRUE for a purge objective**, which counts down to a
+  ceiling rather than up to a target. Anything rendering `value`/`target` must
+  branch on it: without that branch the HUD says a purge level is already won
+  before the first piece. 24 of 118 levels are purge and campaign 18 is the
+  first of them.
 - `alchemy.stars` is the count earned, not the thresholds, so `js/ui/modehud.js`
   reaches into `levelById` to show which star is still on offer. The mode
   publishing them would remove that reach-in.
