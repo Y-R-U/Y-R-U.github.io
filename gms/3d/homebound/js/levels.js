@@ -1,29 +1,24 @@
 // HOMEBOUND — level generation.
 //
 // ===========================================================================
-// MANAGER: three small asks, none of them urgent, all of them assumptions this
-// file's balance rests on. Nothing here breaks if they are ignored — the extra
-// fields are additive and a system that does not read them still works.
+// MANAGER: two small asks. Everything from the last round landed — enemies.js
+// reads the per-item `hp`/`dps`, game.js fires `{kind:'bubble'}` items from the
+// z-loop, gates.js honours PRESS `action`, and gates.js:342 now scales growth by
+// `growDmgScale`, which this file's budget model matches exactly.
 //
-//  1. `enemies.js` — enemy items carry two EXTRA fields beyond the contract:
-//     `hp` (per unit) and `dps` (per unit). They are sized here against the
-//     squad's expected DPS at that point in the level, which is the only way a
-//     level-90 fight and a level-3 fight can both take ~2 seconds. Falling back
-//     to `TIERS[tier].hp` makes every enemy in chapter 4 free.
-//     The balance also assumes **an enemy that reaches the squad costs roughly
-//     one man**, scaled by `state.armour`. `count` is therefore literally "how
-//     many men this group costs you if you ignore it", which is what makes the
-//     numbers on this page mean anything.
+//  1. `state.js:applyBaseUpgrades` — STARTING SQUAD grants `1 + up.squad`, but
+//     `UPGRADES.squad.fmt` promises `${1 + v * 2} men`. The doubling landed in
+//     the label and not in the grant, so the store advertises twice what it
+//     gives. Everything measured here uses what state.js actually does; when
+//     the grant is fixed, every "extra men at the finish per level of SQUAD"
+//     number in dev/ doubles with it and nothing needs re-tuning.
 //
-//  2. `game.js` — `{kind:'bubble'}` items are in the LevelDef contract but
-//     nothing consumes them. One line in the z-loop (`emit('story:bubble', it)`
-//     when the squad passes one) would let a level place a line at a moment
-//     rather than at the door. Until then `story.js` fires on run:start /
-//     run:end only, which is why this file emits no bubble items at all.
-//
-//  3. `gates.js` — PRESS gates carry `action` (one of 'airstrike' | 'mines' |
-//     'bridge' | 'cage') AND a fallback `effect`, so a gates.js that only knows
-//     how to call `applyEffect` still gives the player something for the shot.
+//  2. `hud.js` TUTORIALS has no `gamble` entry, and chapter 1 level 6 now ships
+//     `tutorial: 'gamble'`. Suggested copy, in the house style:
+//       gamble: { icon: '?', head: 'THE PURPLE GATE',
+//                 body: 'It will not say what it does. Usually good. Not always.',
+//                 done: 'gate:pass' }
+// ===========================================================================
 // ===========================================================================
 //
 // WHAT THIS FILE IS
@@ -75,8 +70,10 @@
 //
 // Pure data. No Three.js, no DOM, no Math.random.
 
-import { GATE, BARRIER, TIERS, RUN, ROAD, GUN, EFFECTS } from './config.js';
+import { GATE, BARRIER, TIERS, RUN, ROAD, GUN, EFFECTS, ECON, SHIELD_PER } from './config.js';
 import { seededRng, clamp } from './utils.js';
+import { storySeen } from './save.js';
+import { beatsFor } from './story.js';
 import {
   chapterOf, levelCount, reqPowerFor, rewardFor, isBoss, bossRank,
   isChapterFinale, themeFor, impliedUpgrades,
@@ -123,8 +120,16 @@ function rowsToTarget(start, target) {
   return clamp(n, 5, 20);
 }
 
-const LADDER_GAP = 7.0;      // z between rungs. 0.56 s of fire each.
-const ROW_GAP = 9.0;         // z between ordinary gate rows
+// MIN_ROW_GAP is a READABILITY constant, not a pacing one. A gate panel is 3 m
+// tall and the camera looks down the road at a shallow angle from CAM.back
+// behind, so two rows closer than about 18 m physically overlap on screen and
+// the player cannot tell which sign belongs to which row. The first build of
+// this file used 7 m and three rows stacked into one unreadable pile of panels.
+// 18 m is 1.44 s at RUN.speed, which is also about how long a player needs to
+// read a row, decide, and steer to it.
+const MIN_ROW_GAP = 18.0;
+const LADDER_GAP = 19.0;     // z between rungs. The reference chain has air in it.
+const ROW_GAP = 20.0;        // z between ordinary gate rows
 const TAIL = 72;             // clear road after the last item. Contract wants ≥60.
 const RUNWAY = 74;           // clear road before the first item, so the drag hint lands
 
@@ -150,11 +155,33 @@ function budgetFor(chapter, level, opts = {}) {
     tier: Math.max(startTier, Math.min(up.start || 0, TIERS.length - 1)),
     dmgMul: 1 + (up.damage || 0) * 0.08,
     rateMul: 1 + (up.rate || 0) * 0.04,
-    armour: Math.min(0.75, (up.armour || 0) * 0.05),
+    // BODY ARMOUR now pays twice. The shield pool is the half that matters at
+    // the squad sizes chapter 1 is actually played at — 3 points absorbs a whole
+    // barrier body-check when the squad is eight men — so the model has to carry
+    // it or every early margin here is measured against the wrong player.
+    shield: (up.armour || 0) * SHIELD_PER,
+    armour: Math.min(0.6, (up.armour || 0) * 0.02),
     power,
   };
   // state.js:squadDps(). The one number every hp in this file is divided by.
   sim.dps = () => TIERS[sim.tier].dps * sim.dmgMul * sim.troops;
+
+  // ...except for anything that PUNISHES a weak run. Measured over 147 levels,
+  // the model lands within 5% of an actual run at the median but spreads from
+  // 0.30x to 1.28x, mostly because a promotion the model took and the player
+  // declined (or the reverse) swings squad DPS by the tier merge ratio.
+  //
+  // The two failure modes are not symmetric. A boss sized too small dies fast
+  // and is anticlimactic; a boss sized too large pins the squad for twenty
+  // seconds, and an unbreakable full-span wall costs BARRIER.killOnTouch of the
+  // army for a mistake the player could not have avoided. So full-span walls
+  // and bosses are sized against the low end of that spread and everything
+  // else — partial barriers you can drive around, enemy blocks you can decline
+  // to fight — is sized against the expected line.
+  // 0.9, measured: with cash gates no longer out-bidding troop gates the model
+  // never over-predicts any more (p90 of model/run is 0.97), so the pessimism
+  // only has to cover the last 10%. It was 0.55 while the spread reached 1.28x.
+  sim.weakDps = () => sim.dps() * 0.90;
   // Bullets per second that can land on a gate. combat.js only spawns
   // GUN.fireCap tracers, and GATE.growPerHit is per hit, so the growth rate
   // saturates at 26 shooters — which is why gate *base* values, not gate
@@ -169,11 +196,24 @@ function budgetFor(chapter, level, opts = {}) {
 // ceiling 24x base.
 function grownValue(base, sec, sim) {
   const cap = base * GATE.growMax;
+  // GATE.growDmgScale: the number on the sign answers to FIREPOWER, not just to
+  // how many bullets land. This is the only reason the damage upgrade is worth
+  // buying in a chapter where the only thing to shoot is gates.
+  const dScale = 1 + (sim.dmgMul - 1) * GATE.growDmgScale;
   let v = base;
   const hits = Math.floor(sec * sim.hitsPerSec());
-  for (let i = 0; i < hits && v < cap; i++) v = v * (1 + GATE.growPerHit) + GATE.growFlat;
+  for (let i = 0; i < hits && v < cap; i++) v += (GATE.growFlat + v * GATE.growPerHit) * dScale;
   return Math.min(cap, v);
 }
+
+// What fraction of a gate's geometric window the MODEL assumes goes into that
+// gate. Not 1.0, and that matters more than it looks: gate growth is capped at
+// GATE.growMax x base, so if the model assumes a perfect farm then every gate is
+// written to hit its ceiling exactly and a player with a better gun gets nothing
+// extra out of it — FIREPOWER would compound into nothing. Leaving 45% of the
+// window unspent is both realistic (there is always something else to shoot) and
+// the headroom a bigger dmgMul converts into more men.
+const MODEL_FOCUS = 0.55;
 
 // Inverse of `grownValue`: the number to paint on the sign so that farming it
 // for `sec` seconds is worth `target` men. Solved numerically rather than
@@ -257,9 +297,10 @@ function enemy(z, x, w, count, tier, form, sim, opts = {}) {
   };
 }
 
-function barrier(z, x, w, sec, sim) {
+function barrier(z, x, w, sec, sim, weak = false) {
   // The painted number IS the hp, like the 140 and 300 in the reference.
-  const value = nice(Math.max(20, sim.dps() * sec));
+  // `weak` is for the walls you cannot drive around — see sim.weakDps.
+  const value = nice(Math.max(20, (weak ? sim.weakDps() : sim.dps()) * sec));
   return { kind: 'barrier', z, x, w, hp: value, value };
 }
 
@@ -277,10 +318,106 @@ const pickup = (z, x, effect) => ({ kind: 'pickup', z, x, effect });
 // How much of your squad a threat beat costs if you ignore it completely.
 // Four or five of these at chapter-4 rates is death, which is the point: you
 // cannot farm every gate and you cannot kill every enemy.
-const lossFrac = (c) => 0.13 + 0.25 * c.d;
+// Measured, not guessed: at 0.25 the model and an actual run diverged by 2.1x
+// over five threat beats, because the model assumed the player thins a block by
+// 58% and a greedy run — busy growing gates — manages far less. Six beats of
+// compounding turns a 16%-a-beat assumption into a 2x error at the boss.
+const lossFrac = (c) => 0.12 + 0.16 * c.d;
 // Seconds of undivided fire a group is worth. Longer late so a fight is a
 // commitment rather than a speed bump.
 const killSec = (c) => 1.1 + 1.6 * c.d;
+
+// --------------------------------------------------------------------------
+// THE ROW.
+//
+// Every gate row in the game comes out of here, because a row has two rules and
+// both of them are easy to break one beat at a time:
+//
+//  1. NO FREE LANE. Three lanes, three offers — or two offers and the third
+//     lane physically blocked at that z by a column, a wall or a pinch. A row
+//     with an empty lane is not a choice, it is a row you drive around, and the
+//     first build of this file was full of them: gates on the outside two lanes
+//     and an unpunished ride straight down the middle.
+//  2. The offers are DIFFERENT THINGS. A wooden gate that grows under fire, a
+//     glass gate that pays now for nothing, and a third lane that is usually a
+//     smaller reward and is sometimes a red trap — so the lazy lane has a price.
+//
+// `blocked` names the lane a threat already owns, if any.
+// --------------------------------------------------------------------------
+function row(c, z, richLane, opts = {}) {
+  const r = c.r;
+  // The two big offers sit as far apart as the road allows, so choosing one is
+  // a commitment across the width rather than a nudge.
+  const fixedLane = richLane === 0 ? r.pick([-1, 1]) : -richLane;
+  const spare = [-1, 0, 1].find((l) => l !== richLane && l !== fixedLane);
+  const hasSpare = opts.blocked !== spare;
+  c.rowIndex++;
+
+  // THE MULTIPLIER. Exactly one guaranteed per level, in the back half.
+  //
+  // Without it a level is pure addition, and pure addition is why STARTING
+  // SQUAD was worth nothing: beginning with nine men instead of one means
+  // FINISHING with eight more men. A x2 makes every gate taken before it matter
+  // again, retroactively, and that is the only thing that turns a bigger start
+  // into a bigger finish. Back half, so there is something to grow *for* on the
+  // way to it.
+  // A forced `?` (the chapter-1 level-6 lesson) outranks the multiplier for the
+  // spare lane; the multiplier simply waits for the next row that has one.
+  const forced = hasSpare && opts.forceGamble;
+  const mult = hasSpare && !forced && !c.multDone &&
+    c.rowIndex >= c.multRow && z >= c.multZMin;
+  const rich = richGate(c, z, opts.share ?? 1, opts.capSec, { bank: !mult });
+  const fixed = fixedGate(c, rich, opts.fixedFrac ?? 0.45);
+  c.items.push(gate(z, richLane, rich));
+  c.items.push(gate(z, fixedLane, fixed, GLASS));
+
+  if (mult) {
+    const v = c.d > 0.45 && r.chance(0.35) ? 3 : 2;
+    c.items.push(gate(z, spare, { type: 'mult', value: v }, { grow: false }));
+    c.multDone = true;
+    // The model takes it: it is worth a whole squad and the other two lanes are
+    // worth a fraction of one, so everything sized after this assumes the x2.
+    c.sim.troops = Math.min(c.ceiling, c.sim.troops * v);
+  } else if (forced || (hasSpare && c.gambleRate > 0 && r() < c.gambleRate)) {
+    // The `?`. Always placed opposite a gate whose number you CAN read, so the
+    // choice is "take the known thing, or find out" — the only framing in which
+    // a gate that hides its own effect is fair rather than arbitrary.
+    c.items.push(gate(z, spare, { type: 'gamble', value: 0 }, { grow: false }));
+  } else if (hasSpare) {
+    c.items.push(thirdGate(c, z, spare, rich));
+  }
+  return rich;
+}
+
+// The third lane. Deliberately a different KIND of thing from the two big
+// offers — money, armour, a gun, or a trap — so a row reads as three decisions
+// and not as one number repeated. The trap is the important one: it is what
+// stops the leftover lane being a free ride.
+function thirdGate(c, z, lane, rich) {
+  const r = c.r;
+  const roll = r();
+  if (roll < c.trapRate) return trapGate(z, lane, c.sim, r);
+  // Troop gates are the bread and butter and these weights say so. Two of a
+  // row's three lanes already pay men; holding the third lane to ~14% cash and
+  // ~10% each of shield/gun keeps the measured mix around two thirds troops.
+  // WHERE cash goes is the brake on it. Only on rows inside a beat that has
+  // something shooting at you, and weighted to the front half where the men it
+  // displaces still have a whole level to compound in. Money you take on an
+  // empty road costs nothing; money you take with a column of red at your
+  // shoulder costs the fight, which is the decision the gate is supposed to be.
+  const cashRate = !c.beatThreat ? 0 : (c.rowIndex < c.multRow ? 0.42 : 0.14);
+  if (roll < c.trapRate + cashRate) return gate(z, lane, cashGate(c, c.lastSec || 1.2, 0.8));
+  if (roll < c.trapRate + cashRate + 0.20) {
+    return gate(z, lane, { type: 'shield', value: nice(Math.max(3, c.sim.troops * 0.10)) }, { grow: false });
+  }
+  if (roll < c.trapRate + cashRate + 0.30) return gate(z, lane, { type: 'weapon', value: r.int(1, 2) }, { grow: false });
+  // A smaller fixed price. Same verb as the glass gate opposite, less of it —
+  // the row still has a cheap seat. Priced off `lastGrown` like `fixedGate`,
+  // NOT off the wooden gate's 24x ceiling: a one-man squad cannot reach that
+  // ceiling in one window, and pricing against it put a +58 in the third lane
+  // of level one beside a wooden gate that could only ever reach +21.
+  return gate(z, lane, { type: 'troops', value: nice(Math.max(1, (c.lastGrown || 4) * 0.22)) }, GLASS);
+}
 
 // Rows are the level's real currency. A beat asks for N and gets at most a bit
 // over half of what is left, so one long ladder cannot eat the whole level and
@@ -293,10 +430,19 @@ function takeRows(c, want) {
   return clamp(want, 1, Math.max(1, Math.ceil(avail * 0.55)));
 }
 
+// The one place the model loses men, so the one place BODY ARMOUR is felt:
+// the shield pool absorbs 1:1 before anyone dies, then the percentage applies.
+function hurtModel(c, men) {
+  let n = Math.max(0, men) * (1 - c.sim.armour);
+  const absorbed = Math.min(c.sim.shield, n);
+  c.sim.shield -= absorbed;
+  n -= absorbed;
+  c.sim.troops = Math.max(1, c.sim.troops - n);
+}
+
 // Book-keeping: the player kills most of what they shoot at, but not all.
 function spendThreat(c, count) {
-  const survivors = count * (0.28 + 0.14 * c.d);
-  c.sim.troops = Math.max(1, c.sim.troops - survivors * (1 - c.sim.armour));
+  hurtModel(c, count * (0.30 + 0.24 * c.d));
 }
 function bankGate(c, base, sec = 0.55) {
   c.sim.troops = Math.min(RUN.maxTroops * 0.85, c.sim.troops + grownValue(base, sec, c.sim));
@@ -309,7 +455,7 @@ function bankGate(c, base, sec = 0.55) {
 // RUN.maxTroops. Past either, the rich lane banks CASH instead. The gate is
 // still a bet you rewrite by shooting it; it just pays money, which is what a
 // row is worth once the crowd is as big as the road can hold.
-function richGate(c, z, share = 1, capSec = Infinity) {
+function richGate(c, z, share = 1, capSec = Infinity, o = {}) {
   // THE WINDOW IS GEOMETRY. A gate pops in at GATE.approachFade and stops being
   // the nearest target the moment the row behind it takes over, so the seconds
   // of fire it can receive are `min(approachFade, gapFromLastRow) / RUN.speed`.
@@ -328,31 +474,62 @@ function richGate(c, z, share = 1, capSec = Infinity) {
   // signs climb into three figures. Both regimes are real; pretending the first
   // one does not exist is what produced a whole level of identical `+1`s.
   const want = Math.max(GATE.growMax * 0.85, c.sim.troops * c.rowGain) * share;
-  const b = nice(growBase(c.sim, want, sec));
-  const gain = grownValue(b, sec, c.sim);
+  // The base is solved against MODEL_FOCUS of the window, so the sign is written
+  // for a player who is also busy with something else. `lastGrown` is what the
+  // whole window is worth — the glass gate beside it and the cash gate opposite
+  // are both priced against THAT, and the gap between the two is the room a
+  // better gun has to work in.
+  const b = nice(growBase(c.sim, want, sec * MODEL_FOCUS));
+  const gain = grownValue(b, sec * MODEL_FOCUS, c.sim);
+  c.lastGrown = grownValue(b, sec, c.sim);
+  c.lastSec = sec;
   // Out of budget, or the squad is at RUN.maxTroops and more men are wasted:
   // the row banks money instead. `lastGrown` is what farming this row is worth
   // at the CURRENT squad, which is what the glass gate beside it is priced off.
   if (c.rowsLeft <= c.reserve || c.sim.troops + gain > c.ceiling) {
-    c.lastGrown = Math.max(2, c.sim.troops * 0.05);
-    return cashGrow(c, 0.06);
+    // Out of budget. The row still has to be worth stopping for, so it pays
+    // money — at half temptation, because a squad already at target does not
+    // need bribing away from men it cannot use.
+    c.lastGrown = Math.max(2, c.sim.troops * 0.25);
+    return cashGate(c, sec, 0.5);
   }
   c.rowsLeft--;
-  c.lastGrown = gain;
-  bankGate(c, b, sec);
+  if (o.bank !== false) c.sim.troops = Math.min(c.ceiling, c.sim.troops + gain);
   return { type: 'troops', value: b };
 }
-// Cash is denominated in the LEVEL'S OWN REWARD, never in absolute money — a
-// $200 gate is generous in chapter 1 and an insult in chapter 4. `share` is the
-// fraction of the level's clear reward this one gate is worth once grown; six
-// or seven of them across a level add ~35% on top of the clear.
+// CASH IS PRICED OFF THE MEN IT DISPLACES, not off the level's reward.
 //
-// Growable cash gates are divided by GATE.growMax because they reach it: a cash
-// gate written at face value grows 24x and pays more than the level does.
-const cashGrow = (c, share) => ({
-  type: 'cash', value: Math.max(1, Math.round(c.reward * share / GATE.growMax)),
+// A share-of-reward price is a trap for anyone who has not done the arithmetic.
+// Take `+40` on row three and those men are still with you at the finish, by
+// which time every multiplier and grown gate after them has compounded them into
+// a few hundred — worth `ECON.perTroop` each at payout, and worth rather more
+// than that in the fights they won on the way. A `$30` sign beside that is not
+// an option, it is a punishment for reading it.
+//
+//     cash ~ T_competing x M(z) x ECON.perTroop x ECON.cashTempt
+//
+// `T_competing` is what the troop gate on this row is actually worth over its
+// whole window (`c.lastGrown`); `M(z)` is how much the squad still has to grow
+// from here, which the budget model knows because it is walking the level as it
+// writes it; `cashTempt` is the thumb on the scale that makes money genuinely
+// tempting rather than merely fair.
+//
+// Two things fall out of this for free and both are good. Early cash gates are
+// enormous numbers, because early men compound the most and the money has to
+// beat that. Late ones are modest, because by then a man is nearly just a man.
+// And the brake on cash is never that it pays badly — it is that you arrive at
+// the boss with the army you started with.
+function cashGate(c, sec, tempt = 1) {
+  const ahead = clamp(c.endTarget / Math.max(1, c.sim.troops), 1, 40);   // M(z)
+  const worth = (c.lastGrown || 4) * ahead * ECON.perTroop * ECON.cashTempt * tempt;
+  return { type: 'cash', value: nice(growBase(c.sim, worth, sec * MODEL_FOCUS)) };
+}
+// Non-growable cash, for the pickups lying beside the road.
+const cashFlat = (c, tempt = 0.4) => ({
+  type: 'cash',
+  value: nice(Math.max(5, (c.lastGrown || 4) * clamp(c.endTarget / Math.max(1, c.sim.troops), 1, 40) *
+    ECON.perTroop * ECON.cashTempt * tempt)),
 });
-const cashFlat = (c, share) => ({ type: 'cash', value: nice(Math.max(5, c.reward * share)) });
 
 // THE OTHER LANE — and the reason a row is a decision.
 //
@@ -391,7 +568,7 @@ function runway(c, len) {
   // An off-lane pickup rewards drifting wide when there is nothing to shoot.
   if (r.chance(0.35) && len > 50) {
     c.items.push(pickup(c.z + len * 0.55, (r.chance(0.5) ? -1 : 1) * 5.0,
-      r.chance(0.6) ? cashFlat(c, 0.05)
+      r.chance(0.6) ? cashFlat(c, 0.35)
         : { type: 'shield', value: nice(Math.max(3, c.sim.troops * 0.08)) }));
   }
   return c.z + len;
@@ -416,20 +593,14 @@ const SEC = { wallPre: 0.90 };
 function open(c, rows) {
   const r = c.r;
   rows = takeRows(c, rows);
+  c.beatThreat = false;
   for (let i = 0; i < rows; i++) {
-    // The two sides are deliberately unequal — a row where both lanes pay the
-    // same is not a row, it is a wall with a hole in it.
-    const hi = richGate(c, c.z);
-    const lo = fixedGate(c, hi, r.range(0.40, 0.52));
-    const flip = r.chance(0.5) ? 1 : -1;
-    c.items.push(gate(c.z, flip, hi));
-    c.items.push(gate(c.z, -flip, lo, GLASS));
-    if (rows >= 3 && r.chance(0.25)) {
-      c.items.push(gate(c.z, 0, { type: 'shield', value: nice(Math.max(3, c.sim.troops * 0.12)) }, { grow: false }));
-    }
+    // Nothing is blocking a lane on an empty road, so every one of these is a
+    // full three-lane row.
+    row(c, c.z, r.pick([-1, 1]), { fixedFrac: r.range(0.40, 0.52) });
     c.z += ROW_GAP;
   }
-  return c.z + 14;
+  return c.z + 10;
 }
 
 // THE REFERENCE FRAME. A cheap chain down one side, an expensive chain down the
@@ -438,36 +609,44 @@ function open(c, rows) {
 function ladder(c, rows) {
   const r = c.r;
   rows = takeRows(c, rows);
+  c.beatThreat = true;
   const rich = r.chance(0.5) ? 1 : -1;
   const start = c.z;
-  const span = rows * LADDER_GAP;
+  const span = (rows - 1) * LADDER_GAP;
 
   // A partial wall in front of the rich side: the good chain has a toll, and it
   // is the first thing you meet, so it is sized against the squad that arrives.
-  c.items.push(barrier(start + 4, laneX(rich), 4.4, 0.6 + 0.4 * c.d, c.sim));
+  // 14 m in front of the first rung: the squad commits to a lane at
+  // GATE.approachFade (26 m) out, so a toll any closer than this is one it
+  // cannot shoot off in time and simply pays 22% for.
+  c.items.push(barrier(start + 10, laneX(rich), 4.4, 0.45 + 0.3 * c.d, c.sim));
 
-  // The column and the chain are INTERLEAVED, not appended. A ladder is 40–60 m
+  // The column and the chain are INTERLEAVED, not appended. A ladder is 100 m+
   // long and the squad can triple over its length, so a column emitted up front
   // in one loop is sized for the squad that entered and is free by the far end
   // — which quietly removes the threat from the beat the whole game is built on.
-  const groups = clamp(Math.round(rows / 3), 2, 4);
-  const every = Math.max(1, Math.floor(rows / groups));
+  //
+  // Alternating rungs: one with a block of red holding the centre (2 gates, the
+  // reference frame exactly), one without (3 gates). Either way the middle lane
+  // is never a free ride, and the red reads as chunks rather than a dotted line
+  // because half as many groups carry the same total threat.
+  const withCol = Math.ceil(rows / 2);
+  const total = c.sim.troops * lossFrac(c) * 1.35;
   for (let i = 0; i < rows; i++) {
-    const z = start + 10 + i * LADDER_GAP;
-    if (i % every === 0 && c.items.filter((x) => x.kind === 'enemy' && x.z >= start).length < groups) {
-      const count = c.sim.troops * lossFrac(c) * 0.55;
+    const z = start + 24 + i * LADDER_GAP;
+    let blocked = null;
+    if (i % 2 === 0) {
+      const count = total / withCol;
       c.items.push(enemy(z, 0, WIDE, count, c.enemyTier,
-        i === 0 ? 'block' : 'column', c.sim, { killSec: killSec(c) * 0.7 }));
+        i === 0 ? 'block' : 'column', c.sim, { killSec: killSec(c) * 0.8 }));
       spendThreat(c, count);
+      blocked = 0;
     }
-    // You are sweeping past at 0.56 s a rung with a column in your face, so the
-    // model banks each rung at well under a full farm.
-    const hi = richGate(c, z);
-    const lo = fixedGate(c, hi, 0.42);
-    c.items.push(gate(z, rich, hi));
-    c.items.push(gate(z, -rich, lo, GLASS));
+    // You are sweeping past with a column in your face, so the model banks each
+    // rung at well under a full farm.
+    row(c, z, rich, { blocked, fixedFrac: 0.42 });
   }
-  return start + span + 30;
+  return start + 24 + span + 20;
 }
 
 // Good gates and a blocking group on the SAME lane. The dodge exists; it costs
@@ -475,6 +654,7 @@ function ladder(c, rows) {
 function pressure(c, rows) {
   const r = c.r;
   rows = takeRows(c, rows);
+  c.beatThreat = true;
   const lane = r.pick([-1, 1]);
   const start = c.z;
   const count = c.sim.troops * lossFrac(c);
@@ -483,13 +663,10 @@ function pressure(c, rows) {
     'block', c.sim, { killSec: killSec(c) }));
 
   for (let i = 0; i < rows; i++) {
-    const z = start + 8 + i * ROW_GAP;
-    const good = richGate(c, z);
-    // The safe lane is on the far side of the road from the block, so taking it
-    // is also the dodge. It pays less, and it pays without a shot fired.
-    c.items.push(gate(z, lane, good));
-    const safe = r.chance(0.35) ? cashGrow(c, 0.05) : fixedGate(c, good, 0.40);
-    c.items.push(gate(z, -lane, safe, safe.type === 'cash' ? {} : GLASS));
+    // The rich lane IS the blocked lane: the safe gate opposite is also the
+    // dodge, and it pays less. The centre carries the third offer, so splitting
+    // the difference is a decision rather than an escape.
+    row(c, start + 14 + i * ROW_GAP, lane, { fixedFrac: 0.40 });
   }
   spendThreat(c, count);
   return start + rows * ROW_GAP + 46;
@@ -500,55 +677,54 @@ function pressure(c, rows) {
 function wall(c) {
   const r = c.r;
   const start = c.z;
+  c.beatThreat = true;
   // In front of the wall the row is deliberately stingy — farming it costs you
   // wall progress — and behind it the row is the prize for having broken it.
-  const val = richGate(c, start, 0.6, SEC.wallPre);
-  c.items.push(gate(start, 1, val));
-  c.items.push(gate(start, -1, fixedGate(c, val, 0.46), GLASS));
+  row(c, start, r.pick([-1, 1]), { share: 0.6, capSec: SEC.wallPre, fixedFrac: 0.46 });
 
   // Full span: 11 m of road, no lane left. `sec` is seconds of undivided fire,
   // and the gate row above has already eaten some of the approach.
-  const wz = start + 34;
-  c.items.push(barrier(wz, 0, ROAD.halfW * 2, 1.1 + 0.7 * c.d, c.sim));
+  const wz = start + 54;
+  // Full span, no lane left, 22% of the squad if you body it — so it is sized
+  // against the weak line and given a long clear approach to break it in.
+  c.items.push(barrier(wz, 0, ROAD.halfW * 2, 1.1 + 0.7 * c.d, c.sim, true));
   // Bodying the wall is the failure state this beat is testing for; the model
   // assumes the player breaks it but late, and clips it.
-  c.sim.troops = Math.max(1, c.sim.troops * (1 - BARRIER.killOnTouch * 0.35 * (1 - c.sim.armour)));
+  hurtModel(c, c.sim.troops * BARRIER.killOnTouch * 0.35);
   // Payoff on the far side, so breaking through reads as a reward.
-  const after = richGate(c, wz + 16, 1.5);
-  c.items.push(gate(wz + 16, 0, after));
-  c.items.push(gate(wz + 16, r.pick([-1, 1]), { type: 'shield', value: nice(Math.max(3, c.sim.troops * 0.10)) }, { grow: false }));
-  return wz + 48;
+  row(c, wz + 24, r.pick([-1, 1]), { share: 1.5, fixedFrac: 0.44 });
+  return wz + 56;
 }
 
 // The fixed-price version: a partial wall you can simply drive around, with the
 // good lane behind it.
 function blocker(c) {
+  c.beatThreat = true;
   const r = c.r;
   const lane = r.pick([-1, 1]);
   const start = c.z;
   c.items.push(barrier(start, laneX(lane), 4.6, 0.7 + 0.5 * c.d, c.sim));
   // The good lane is the blocked one, so the "just drive around it" option is
   // also the "take the small number" option.
-  const val = richGate(c, start + 26);
-  c.items.push(gate(start + 26, lane, val));
-  c.items.push(gate(start + 26, -lane, fixedGate(c, val, 0.40), GLASS));
-  return start + 62;
+  row(c, start + 30, lane, { fixedFrac: 0.40 });
+  return start + 66;
 }
 
 // Three offers, three different verbs, nothing shooting at you. The only beat
 // in the game that is purely a decision — which is why there is at most one.
 function fork(c) {
+  c.beatThreat = false;
   const r = c.r;
   const big = richGate(c, c.z, 1.6);
   const canPromote = c.sim.tier < TIERS.length - 1;
   const promo = canPromote && r.chance(0.55);
   // Three offers, three sign colours. Two greens in one row is a fork the
   // player has to read twice, and a fork you read twice is a fork you miss.
-  const mid = promo ? { type: 'tier', value: 1 } : { type: 'mult', value: r.pick([2, 2, 3]) };
-  const right = promo
-    ? { type: 'shield', value: nice(Math.max(4, c.sim.troops * 0.16)) }
-    : (r.chance(0.5) ? { type: 'weapon', value: r.int(1, 3) }
-      : { type: 'shield', value: nice(Math.max(4, c.sim.troops * 0.16)) });
+  // NOT a multiplier: the level already guarantees exactly one, in the back
+  // half, and a second one in the front stacks into a run that hits
+  // RUN.maxTroops with a third of the road still to walk.
+  const mid = promo ? { type: 'tier', value: 1 } : { type: 'weapon', value: r.int(2, 4) };
+  const right = { type: 'shield', value: nice(Math.max(4, c.sim.troops * 0.16)) };
   c.items.push(gate(c.z, -1, big));
   c.items.push(gate(c.z, 0, mid, { grow: false }));
   c.items.push(gate(c.z, 1, right, { grow: false }));
@@ -561,9 +737,10 @@ function fork(c) {
 function trapline(c, rows) {
   const r = c.r;
   rows = takeRows(c, rows);
+  c.beatThreat = false;
   const start = c.z;
   for (let i = 0; i < rows; i++) {
-    const z = start + i * (ROW_GAP + 1.5);
+    const z = start + i * (ROW_GAP + 2);
     const good = richGate(c, z);
     const poor = fixedGate(c, good, 0.30);
     // Three lanes, three different things: the red glass trap, the wooden gate
@@ -575,16 +752,17 @@ function trapline(c, rows) {
     for (const lane of [-1, 0, 1]) {
       if (lane === bad) c.items.push(trapGate(z, lane, c.sim, r));
       else if (lane === growLane) c.items.push(gate(z, lane, good));
-      else if (lane === 0 && r.chance(0.5)) continue;    // rows of 2 are fine
+      // No gaps: a trapline row you can drive around is not a trapline row.
       else c.items.push(gate(z, lane, poor, GLASS));
     }
   }
-  return start + rows * (ROW_GAP + 1.5) + 34;
+  return start + rows * (ROW_GAP + 2) + 24;
 }
 
 // A button plate placed where pressing it pays: right before a group big enough
 // that you would rather not shoot it man by man.
 function press(c) {
+  c.beatThreat = true;
   const r = c.r;
   const start = c.z;
   const action = r.pick(['airstrike', 'mines', 'cage', 'bridge']);
@@ -592,17 +770,30 @@ function press(c) {
   c.items.push(gate(start, lane, { type: 'power', value: 5, id: 'rapid' }, {
     panel: 'button', grow: false, action, hp: Math.max(10, Math.round(c.sim.dps() * 0.08)),
   }));
-  c.items.push(gate(start, -lane, cashGrow(c, 0.07)));
+  c.items.push(gate(start, -lane, cashGate(c, 1.6, 1.0)));
+  c.items.push(gate(start, 0, { type: 'shield', value: nice(Math.max(3, c.sim.troops * 0.10)) }, { grow: false }));
   const count = c.sim.troops * lossFrac(c) * 1.15;
-  c.items.push(enemy(start + 30, 0, WIDE, count, c.enemyTier, 'block', c.sim,
+  c.items.push(enemy(start + 36, 0, WIDE, count, c.enemyTier, 'block', c.sim,
     { killSec: killSec(c) * 1.15 }));
   spendThreat(c, count * 0.8);           // the press is worth about 20% of it
-  return start + 66;
+  return start + 72;
+}
+
+// Two quiet rows, the first of which carries a `?` opposite a glass gate whose
+// number is unusually generous. That pairing is the lesson: the safe thing is
+// visibly good, so taking the `?` has to be a decision and not a shrug.
+function gambleRow(c) {
+  c.beatThreat = false;
+  const start = c.z;
+  row(c, start, c.r.pick([-1, 1]), { forceGamble: true, fixedFrac: 0.62 });
+  row(c, start + ROW_GAP + 6, c.r.pick([-1, 1]), { fixedFrac: 0.45 });
+  return start + 2 * ROW_GAP + 28;
 }
 
 // The road pinches. No gates inside the pinch — the pinch IS the beat, and a
 // gate at ±3.6 would be hanging over the water.
 function narrows(c) {
+  c.beatThreat = true;
   const r = c.r;
   const start = c.z;
   const len = 34 + Math.round(18 * c.d);
@@ -616,30 +807,31 @@ function narrows(c) {
   spendThreat(c, count);
   // The reward sits 12 m past the exit, so its fire window opens while the
   // skirmishers are still on you.
-  const zz = start + len + 12;
-  const v = richGate(c, zz);
-  c.items.push(gate(zz, 1, v));
-  c.items.push(gate(zz, -1, fixedGate(c, v, 0.44), GLASS));
-  return zz + 40;
+  const zz = start + len + 18;
+  row(c, zz, r.pick([-1, 1]), { fixedFrac: 0.44 });
+  return zz + 36;
 }
 
 // ▲ with a bill attached. game.js:promote divides your count by TIERS[i].merge,
 // so taking this with 40 men leaves you 20 — and the fight is 40 m away.
 function promoteBeat(c) {
+  c.beatThreat = true;
   const r = c.r;
   const start = c.z;
   const canPromote = c.sim.tier < TIERS.length - 1;
   const merge = TIERS[Math.min(TIERS.length - 1, c.sim.tier + 1)].merge;
+  // The one row in the game with a hand-placed centre lane: ▲ is the decision
+  // and it belongs in the middle, with the two ways of declining it either side.
   const keep = richGate(c, start);
-
+  const side = r.pick([-1, 1]);
   c.items.push(gate(start, 0, canPromote
     ? { type: 'tier', value: 1 }
     : { type: 'mult', value: 2 }, { grow: false }));
-  c.items.push(gate(start, -1, keep));
-  c.items.push(gate(start, 1, fixedGate(c, keep, 0.50), GLASS));
+  c.items.push(gate(start, side, keep));
+  c.items.push(gate(start, -side, fixedGate(c, keep, 0.50), GLASS));
 
   const count = c.sim.troops * lossFrac(c) * 1.3;
-  c.items.push(enemy(start + 34, 0, WIDE, count,
+  c.items.push(enemy(start + 30, 0, WIDE, count,
     clamp(c.enemyTier + (canPromote ? 1 : 0), 0, TIERS.length - 1),
     'block', c.sim, { killSec: killSec(c) * 1.1 }));
 
@@ -656,28 +848,24 @@ function promoteBeat(c) {
 
   // A row 12 m past the block, so its fire window opens while the block is
   // still standing. Without this the promotion is a decision made in silence.
-  const zz = start + 46;
-  const v = richGate(c, zz, 1.2);
-  c.items.push(gate(zz, -1, v));
-  c.items.push(gate(zz, 1, fixedGate(c, v, 0.34), GLASS));
-  return zz + 44;
+  const zz = start + 56;
+  row(c, zz, r.pick([-1, 1]), { share: 1.2, fixedFrac: 0.40 });
+  return zz + 40;
 }
 
 // A column walking at you with money behind it. `speed` is the whole beat —
 // the fire window closes faster than the road does.
 function convoy(c) {
+  c.beatThreat = true;
   const start = c.z;
   const count = c.sim.troops * lossFrac(c) * 1.2;
   c.items.push(enemy(start + 24, 0, WIDE, count, c.enemyTier, 'column', c.sim,
     { killSec: killSec(c) * 0.85, speed: 6 + 5 * c.d }));
   for (let i = 0; i < 2; i++) {
-    const z = start + 44 + i * ROW_GAP;
-    const v = richGate(c, z);
-    c.items.push(gate(z, -1, cashGrow(c, 0.07)));
-    c.items.push(gate(z, 1, v));
+    row(c, start + 50 + i * ROW_GAP, c.r.pick([-1, 1]), { fixedFrac: 0.44 });
   }
   spendThreat(c, count);
-  return start + 44 + 2 * ROW_GAP + 40;
+  return start + 50 + 2 * ROW_GAP + 30;
 }
 
 // --------------------------------------------------------------------------
@@ -697,29 +885,26 @@ const BOSS_NAMES = [
 ];
 
 function bossBeat(c, name, seconds) {
+  c.beatThreat = true;
   const start = c.z;
   c.reserve = 0;                 // the rows held back all level are for this
   // A short top-up first: walking into a pin with a thin squad is a loss you
   // could not see coming, and the reference always gives you the +99 chain
   // before the giant.
   for (let i = 0; i < 2; i++) {
-    const z = start + i * ROW_GAP;
-    const v = richGate(c, z, 1.3);
-    c.items.push(gate(z, -1, v));
-    c.items.push(gate(z, 1, fixedGate(c, v, 0.48), GLASS));
+    row(c, start + i * ROW_GAP, c.r.pick([-1, 1]), { share: 1.3, fixedFrac: 0.48 });
   }
-  const bz = start + 2 * ROW_GAP + 46;
-  const dps = c.sim.dps();
-  const hp = Math.round(dps * seconds);
+  const bz = start + 2 * ROW_GAP + 44;
+  const hp = Math.round(c.sim.weakDps() * seconds);
   // The boss should take 12–22% of the squad over the hold. Anything more and
   // the level is decided by the boss instead of by the road that led to it.
-  const bite = 0.12 + 0.10 * c.d;
+  const bite = 0.10 + 0.08 * c.d;
   c.items.push({
     kind: 'boss', z: bz, hp, name, tier: Math.min(TIERS.length - 1, c.enemyTier + 2),
     // EXTRA (MANAGER note 1): what it does to you while you hold station.
-    dps: Math.round((c.sim.troops * bite / seconds) * 100) / 100,
+    dps: Math.round((c.sim.troops * bite / (seconds * 0.90)) * 100) / 100,
   });
-  c.sim.troops = Math.max(1, c.sim.troops * (1 - bite * (1 - c.sim.armour)));
+  hurtModel(c, c.sim.troops * bite);
   return bz + 40;
 }
 
@@ -732,7 +917,7 @@ function bossBeat(c, name, seconds) {
 // two is only a decision once you have a count worth dividing.
 // --------------------------------------------------------------------------
 const TUTORIALS = [
-  null, 'gates', 'grow', 'barrier', 'trap', 'promote',
+  null, 'gates', 'grow', 'barrier', 'trap', 'promote', 'gamble',
 ];
 
 function recipeFor(chapter, level, c) {
@@ -744,13 +929,14 @@ function recipeFor(chapter, level, c) {
   // sometimes has no walls in it is not a mission, it is a random level.
   if (c.spec?.recipe) return c.spec.recipe.slice();
 
-  if (chapter === 1 && level <= 5) {
+  if (chapter === 1 && level <= 6) {
     switch (level) {
       case 1: return ['open3', 'open3'];
       case 2: return ['open2', 'openLadder', 'open2'];
       case 3: return ['open2', 'blocker', 'wall', 'open2'];
       case 4: return ['open2', 'trapline2', 'pressure2'];
       case 5: return ['open2', 'promote', 'open3'];
+      case 6: return ['open2', 'gambleRow', 'pressure2', 'open2'];
     }
   }
 
@@ -880,18 +1066,38 @@ export function buildLevel(spec) {
     // Cash gates are priced as a share of this, so a $ sign always means the
     // same thing relative to what finishing the level pays.
     reward: spec?.reward ?? rewardFor(chapter, level),
+    // How often the leftover lane of a row is a red trap rather than a small
+    // reward. Zero until the game has actually taught traps — the tutorial for
+    // them is chapter 1 level 4, and punishing a lane the player has not been
+    // told about is not difficulty, it is a gotcha.
+    trapRate: (chapter === 1 && level < 4) ? 0 : clamp(0.10 + 0.26 * d, 0, 0.35),
+    // The `?` gate is taught at chapter 1 level 6 and only appears at random
+    // after that. Never in the first two levels: a gate whose sign does not say
+    // what it does is a mechanic, and a mechanic before the basics have landed
+    // is just confusion.
+    gambleRate: (chapter === 1 && level < 6) ? 0 : clamp(0.10 + 0.08 * d, 0, 0.18),
     // Enemy tier trails the player's expected tier by design: a fight you can
     // out-shoot reads as your army being good, which is the fantasy of ch.4.
     enemyTier: clamp(Math.floor(d * (chapter >= 4 ? 5 : chapter >= 3 ? 3 : 2)), 0, TIERS.length - 2),
   };
 
-  // The target is an END SIZE, not a multiplier. RUN.maxTroops is 900 and the
-  // reference crowd is a dense 11 m block, so a finished level wants 60–400 men
-  // on screen — and the multiplier that gets you there has to fall as the
-  // starting squad climbs from 1 (level 1) to 41 (a maxed SQUAD upgrade).
-  // Targeting the multiplier instead is how the first pass of this file hit the
-  // 900 cap on chapter 1 level 2.
-  const endTarget = spec?.endTarget ?? (120 + 520 * d);
+  // The target is an END SIZE, but it is NOT a fixed destination — that was the
+  // hidden reason STARTING SQUAD felt worthless. A level that always finishes at
+  // 300 men normalises the squad you brought straight back out of the result:
+  // start with 1 or start with 21, the generator writes smaller gates and you
+  // finish in the same place. So the target is `whichever is larger` of a floor
+  // (chapter 1 level 1 has to feel like a crowd even from one man) and a
+  // multiple of what you actually walked in with. Above the floor, every extra
+  // starting man is worth `levelMul` men at the finish line.
+  // Headroom under RUN.maxTroops matters as much as the target itself. Aim at
+  // the cap and a chapter-4 run spends its whole second half pinned at 900,
+  // where no gate does anything and no upgrade can be felt — measured, that is
+  // exactly what a 22x multiple produced. 14-28x lands runs around 400-650 with
+  // the ceiling still visible up ahead.
+  const levelMul = 14 + 14 * d;
+  const floorTarget = 90 + 190 * d;
+  const endTarget = spec?.endTarget ??
+    clamp(Math.max(floorTarget, sim.troops * levelMul), 60, RUN.maxTroops * 0.72);
 
   const beats = recipeFor(chapter, level, c);
   // Growth is additive, so the budget is divided by ROWS, not compounded across
@@ -902,15 +1108,39 @@ export function buildLevel(spec) {
   // is spent in ROWS, not compounded across beats. `rowGain` is the geometric
   // rate that lands `troopRows` rows on `endTarget`; `richGate` floors it at
   // one base-1 gate's worth so early rows still snowball.
-  const troopRows = rowsToTarget(start0, endTarget);
+  // One row in the back half is a x2, so the additive rows only have to carry
+  // the squad halfway. `+1` for the multiplier row itself.
+  const troopRows = rowsToTarget(start0, endTarget / 2) + 1;
   c.rowGain = ROW_GAIN;
   c.rowsLeft = troopRows;
   c.reserve = beats.includes('boss') ? 2 : 0;    // the boss top-up gets its men
   c.lastGrown = 4;
+  c.lastSec = 1.2;
   c.lastRowZ = 0;                               // the first row gets a full window
+  c.endTarget = endTarget;                      // cashGate prices M(z) off this
+  c.rowIndex = 0;
+  c.multDone = false;
+  c.beatThreat = false;
+  // Back half, but not the very last row: a x2 you meet on the finish line has
+  // nothing left to multiply into and nothing after it to spend the squad on.
+  // In ROWS, not metres: the budget knows how many rows pay men, and roughly
+  // half as many again arrive after the budget runs out, so `0.9 x troopRows`
+  // lands the multiplier around 60% of the way down the road. `verifyLevel`
+  // checks the metres afterwards and complains if it drifts forward.
+  c.multRow = Math.max(3, Math.round(troopRows * 0.9));
+  // ...and in metres as well. Row counts alone put the multiplier at 20% of the
+  // road on levels whose long beats all come afterwards. The final length is not
+  // known while the level is still being written, so estimate it from the beat
+  // count — ~105 m a beat, measured — and demand the multiplier sit past 45% of
+  // that. `verifyLevel` checks the real number once the level exists.
+  c.multZMin = (RUNWAY + beats.length * 105 + TAIL) * 0.45;
 
   c.z = RUNWAY;
-  c.ceiling = Math.min(RUN.maxTroops * 0.85, endTarget * 1.25);
+  // The model has to stop short of `endTarget`, not overshoot it: a run takes
+  // the best of three lanes on every row while the model only banks one, so the
+  // squad that actually turns up runs ~14% ahead of the line. Budgeting to 1.12x
+  // is what keeps chapter 4 off the RUN.maxTroops ceiling until the last beat.
+  c.ceiling = Math.min(RUN.maxTroops * 0.72, endTarget * 1.12);
   runwayProps(c, RUNWAY);
 
   let bossIdx = 0;
@@ -932,6 +1162,7 @@ export function buildLevel(spec) {
       case 'trapline': c.z = trapline(c, clamp(2 + Math.round(d), 2, 3)); break;
       case 'trapline2': c.z = trapline(c, 2); break;
       case 'pressure2': c.z = pressure(c, 2); break;
+      case 'gambleRow': c.z = gambleRow(c); break;
       case 'press': c.z = press(c); break;
       case 'narrows': c.z = narrows(c); break;
       case 'promote': c.z = promoteBeat(c); break;
@@ -941,7 +1172,12 @@ export function buildLevel(spec) {
         const finale = isChapterFinale(chapter, level);
         const nm = finale && chapter === 1 ? 'THE FRONT GATE'
           : BOSS_NAMES[(rank - 1 + chapter * 3) % BOSS_NAMES.length];
-        c.z = bossBeat(c, nm, finale ? 9 : 5.5 + 2 * d);
+        // Nominal seconds against sim.weakDps(), so a run on the expected line
+        // kills it in ~0.58 of these and a bad run still gets there.
+        // Nominal seconds against sim.weakDps(). Measured TTK across all 16
+        // bosses at exactly reqPower: 4.0–8.7 s. A boss that takes four minutes
+        // is a bug; one that takes eight seconds is a set piece.
+        c.z = bossBeat(c, nm, finale ? 12 : 9 + 2.5 * d);
         bossIdx++;
         break;
       }
@@ -952,9 +1188,90 @@ export function buildLevel(spec) {
     c.z += 10 + r.range(0, 14);           // seam between beats, never rhythmic
   }
 
-  const items = c.items.slice().sort((a, b2) => a.z - b2.z || a.x - b2.x);
-  const lastZ = items.length ? items[items.length - 1].z : RUNWAY;
+  // `|| 0` matters: boss and bubble items carry no `x`, and `undefined -
+  // undefined` is NaN, which makes a comparator silently non-deterministic.
+  // `|| 0` matters: boss and bubble items carry no `x`, and `undefined -
+  // undefined` is NaN, which makes a comparator silently non-deterministic.
+  // Safety net for the multiplier guarantee. A level whose back half is all
+  // two-gate ladder rungs never finds a spare lane, so the last full row gives
+  // up its glass gate instead. `verifyLevel` asserts the result.
+  if (!c.multDone) {
+    const rows = new Map();
+    for (const g of c.items) if (g.kind === 'gate') {
+      const k = g.z.toFixed(3);
+      if (!rows.has(k)) rows.set(k, []);
+      rows.get(k).push(g);
+    }
+    const zs = [...rows.keys()].map(Number).sort((a, b2) => a - b2);
+    for (let i = zs.length - 1; i >= 0; i--) {
+      const row3 = rows.get(zs[i].toFixed(3));
+      const victim = row3.find((g) => g.panel === 'glass' && g.effect?.type === 'troops');
+      if (!victim || zs[i] > (zs[zs.length - 1] - 30)) continue;
+      victim.effect = { type: 'mult', value: 2 };
+      victim.panel = 'wood'; victim.grow = false;
+      c.multDone = true;
+      break;
+    }
+  }
+
+  // `|| 0` matters: boss and bubble items carry no `x`, and `undefined -
+  // undefined` is NaN, which makes a comparator silently non-deterministic.
+  const byZ = (a, b2) => (a.z - b2.z) || ((a.x || 0) - (b2.x || 0));
+  const physical = c.items.slice().sort(byZ);
+  const lastZ = physical.length ? physical[physical.length - 1].z : RUNWAY;
   const length = Math.round(lastZ + TAIL);
+
+  // The multiplier guarantee, enforced now that the level's real length exists.
+  // `row()` places it from a row count and an estimated length, which is close
+  // but not exact; here the metres are known, so a level whose multiplier drifted
+  // into the front half trades it with a glass troop gate further down the road.
+  // A level with no spare lane in its back half at all — an all-ladder finish —
+  // gets one made for it the same way.
+  {
+    const rows = new Map();
+    for (const g of c.items) if (g.kind === 'gate') {
+      const k = g.z.toFixed(3);
+      if (!rows.has(k)) rows.set(k, []);
+      rows.get(k).push(g);
+    }
+    const zs = [...rows.keys()].map(Number).sort((a, b2) => a - b2);
+    const back = length * 0.45, front = length * 0.85;
+    const mults = c.items.filter((g) => g.kind === 'gate' && g.effect?.type === 'mult');
+    if (!mults.some((m) => m.z >= back)) {
+      for (let i = zs.length - 1; i >= 0; i--) {
+        if (zs[i] < back || zs[i] > front) continue;
+        const victim = rows.get(zs[i].toFixed(3)).find((g) => g.panel === 'glass' && g.effect?.type === 'troops');
+        if (!victim) continue;
+        victim.effect = { type: 'mult', value: d > 0.45 && r.chance(0.35) ? 3 : 2 };
+        victim.panel = 'wood'; victim.grow = false;
+        // Exactly one per level: whatever was in the front half goes back to
+        // being a plain gate so the two do not stack.
+        for (const m of mults) {
+          m.effect = { type: 'troops', value: nice(Math.max(2, m.z / length * endTarget * 0.12)) };
+          m.panel = 'glass'; m.grow = false;
+        }
+        break;
+      }
+    }
+  }
+
+  // Story bubbles are PLACED, not broadcast. game.js fires them from the z-loop,
+  // so the opening line lands as the squad sets off and the closing one as it
+  // walks the last stretch to the finish — a line at a moment rather than a line
+  // at the door. They sit outside the length calculation because a bubble is not
+  // a wall; the ≥60 m of clear road is measured against physical items only.
+  //
+  // This is the one part of a level that is not pure from the seed: a beat you
+  // have already read does not come back. `story.js` retires them on run:start.
+  if (mode === 'story') {
+    const lines = beatsFor(chapter, level);
+    const say = (b, z) => {
+      if (b && !storySeen(b.id)) c.items.push({ kind: 'bubble', z, who: b.who, text: b.text, ms: b.ms });
+    };
+    say(lines?.in, Math.max(14, RUNWAY - 30));
+    say(lines?.out, lastZ + 26);
+  }
+  const items = c.items.slice().sort(byZ);
 
   const def = {
     id: mode === 'story' ? `c${chapter}l${level}` : `${mode}:${spec?.id || seed}`,
@@ -1168,6 +1485,37 @@ export function verifyLevel(def) {
     if (!rows.has(k)) rows.set(k, []);
     rows.get(k).push(g);
   }
+  // Rows must be far enough apart to READ. A panel is 3 m tall and the camera
+  // looks down the road from CAM.back behind it, so rows closer than MIN_ROW_GAP
+  // physically overlap on screen into one pile of signs.
+  const rowZ = [...rows.keys()].map(Number).sort((a, b) => a - b);
+  for (let i = 1; i < rowZ.length; i++) {
+    const gap = rowZ[i] - rowZ[i - 1];
+    if (gap < MIN_ROW_GAP - 0.01) bad.push(`gate rows ${gap.toFixed(1)} m apart at z=${rowZ[i].toFixed(0)} — they overlap on screen`);
+  }
+
+  // NO FREE LANE. Three lanes, and each one must cost or offer something at
+  // that z: a gate, or a threat wide enough to cover it. A row you can drive
+  // around is not a choice, it is scenery.
+  const covers = (o, x) => {
+    if (o.kind === 'enemy' || o.kind === 'barrier') return Math.abs((o.x || 0) - x) < (o.w || 0) / 2 + 1.6;
+    if (o.kind === 'boss') return true;
+    if (o.kind === 'narrow') return Math.abs(x) + GATE.width / 2 > o.halfW;   // off-road = not free
+    return false;
+  };
+  let freeLanes = 0;
+  for (const [k, row] of rows) {
+    const z = parseFloat(k);
+    const near = it.filter((o) => (o.kind === 'enemy' || o.kind === 'barrier' || o.kind === 'boss') && Math.abs(o.z - z) < 12)
+      .concat(it.filter((o) => o.kind === 'narrow' && z >= o.z - 6 && z <= o.z + o.len + 6));
+    for (const lx of LANES) {
+      if (row.some((g) => Math.abs(g.x - lx) < 1e-6)) continue;
+      if (near.some((o) => covers(o, lx))) continue;
+      freeLanes++;
+    }
+  }
+  if (freeLanes) bad.push(`${freeLanes} rows have a free lane (no gate, nothing blocking it)`);
+
   let singles = 0;
   for (const [k, row] of rows) {
     if (row.length < 2) { singles++; continue; }
@@ -1183,7 +1531,10 @@ export function verifyLevel(def) {
   }
   if (singles > 1) bad.push(`${singles} lone gates (rows of 1 should be rare)`);
 
-  const lastZ = it.length ? it[it.length - 1].z : 0;
+  // Bubbles are dialogue, not geometry — the "60 m of clear road" rule is about
+  // not ending the run on a wall, and a line of speech is not a wall.
+  const solid = it.filter((x) => x.kind !== 'bubble');
+  const lastZ = solid.length ? solid[solid.length - 1].z : 0;
   if (def.length - lastZ < 60) bad.push(`tail is ${(def.length - lastZ).toFixed(0)} m, needs ≥60`);
 
   // Gates must never hang over the water inside a narrow section.
@@ -1204,6 +1555,17 @@ export function verifyLevel(def) {
       return threats.some((t) => t.z > z - GUN.range && t.z < z + 20);
     });
     if (!tense) bad.push('no gate row shares a fire window with a threat — this is a corridor');
+  }
+
+  // Every level carries at least one multiplier. Without one the level is pure
+  // addition and the STARTING SQUAD upgrade buys nothing you can feel.
+  // A `fork` beat can also offer one, early, and that is a bonus rather than a
+  // problem — what matters is that at least one sits in the back half, where
+  // there is a run's worth of growth behind it to multiply.
+  const mults = it.filter((g) => g.kind === 'gate' && g.effect?.type === 'mult');
+  if (!mults.length) bad.push('no multiplier gate — a level of pure addition');
+  else if (!mults.some((m) => m.z >= def.length * 0.45)) {
+    bad.push(`multipliers all in the front ${(mults[mults.length - 1].z / def.length * 100).toFixed(0)}% — nothing to grow for`);
   }
 
   if (def.reqPower > 1055) bad.push(`reqPower ${def.reqPower} exceeds the powerOf() ceiling of 1055`);

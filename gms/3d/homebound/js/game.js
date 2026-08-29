@@ -2,7 +2,7 @@
 // the moment a run ends. Systems do not call each other — they are called from
 // here, in this order, once each.
 
-import { RUN, ROAD, TIERS, EFFECTS, ECON, AUTO_MODE, DEV_MODE } from './config.js';
+import { RUN, ROAD, TIERS, EFFECTS, ECON, GAMBLE, UPGRADE_BY_ID, AUTO_MODE, DEV_MODE } from './config.js';
 import { state, resetRunState, tierDef } from './state.js';
 import { emit, on } from './bus.js';
 import { clamp, approach } from './utils.js';
@@ -171,7 +171,8 @@ function payout(stats) {
   const lvl = run.level || {};
   const base = (lvl.reward ?? ECON.baseReward) + state.cash;
   const troopPay = state.peakTroops * ECON.perTroop;
-  const incomeMul = 1 + (P().upgrades.income || 0) * 0.06;
+  // Rate off the shop's own table, never a second copy of the number.
+  const incomeMul = 1 + (P().upgrades.income || 0) * (UPGRADE_BY_ID.income?.per ?? 0);
   const repeat = lvl.mode === 'story' && lvl.chapter && P().cleared[`c${lvl.chapter}l${lvl.level}`]
     ? ECON.replayFactor : 1;
   const winMul = stats.win ? 1 : 0.25;   // losing still pays; a dead end is not a punishment
@@ -195,6 +196,17 @@ export const isPaused = () => run.active && !state.running;
 
 export function applyEffect(effect, at) {
   if (!effect) return;
+  // The `?` gate resolves to a real effect the moment you pass it, then falls
+  // through to the switch below as whatever it rolled. Resolving here rather
+  // than at spawn means the sign genuinely cannot be read ahead of time, which
+  // is the entire product.
+  if (effect.type === 'gamble') {
+    const rolled = rollGamble();
+    emit('hud:toast', { text: rolled.label, icon: rolled.good ? '🎲' : '💀' });
+    sfx(rolled.good ? 'gate' : 'lose');
+    applyEffect(rolled.effect, at);
+    return;
+  }
   const { type } = effect;
   let value = effect.value;
   const def = EFFECTS[type];
@@ -214,6 +226,24 @@ export function applyEffect(effect, at) {
   state.gatesTaken++;
   if (def?.good && value > state.bestGate) state.bestGate = Math.round(value);
   emit('effect:apply', { type, value, at, good: def?.good !== false });
+}
+
+// Roll one `?` gate. Payouts that would be trivial late are scaled off the
+// squad you actually have, so a `+8` reinforcement at level 2 is a doubling and
+// at level 90 is still worth stopping for.
+export function rollGamble() {
+  let total = 0;
+  for (const o of GAMBLE) total += o.w;
+  let r = Math.random() * total;
+  let pick = GAMBLE[GAMBLE.length - 1];
+  for (const o of GAMBLE) { r -= o.w; if (r <= 0) { pick = o; break; } }
+
+  let value = pick.value ?? 0;
+  if (pick.scale) value = Math.max(pick.min || 1, Math.round(state.troops * pick.scale));
+  if (pick.byLevel) value += pick.byLevel * (run.level?.level || 1);
+
+  const good = EFFECTS[pick.type]?.good !== false;
+  return { label: pick.label, good, effect: { type: pick.type, value, id: pick.id } };
 }
 
 // Promotion converts men into fewer, better men. That conversion is the entire

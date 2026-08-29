@@ -4,7 +4,7 @@
 // to it) and `enemies.js` owns `state.bossHp`/`state.bossMax`. Everything else
 // asks over the bus. That rule is why six systems share one object without a race.
 
-import { RUN, TIERS } from './config.js';
+import { RUN, TIERS, SHIELD_PER, UPGRADE_BY_ID } from './config.js';
 
 export const state = {
   phase: 'boot',        // boot | main | run | outro | home | store
@@ -75,13 +75,24 @@ export function resetRunState(level, profile) {
 // Base upgrades are folded in once, at run start. Nothing during a run ever
 // reads the profile — that keeps the autoplay backdrop on the main screen from
 // having to care whose save it is running under.
+// Every rate here is read from `UPGRADES[id].per` rather than written out
+// again. The two copies drifted once already — the squad upgrade's step was
+// doubled in the shop label and not in the grant, so the store promised men it
+// never handed over — and a store card that lies about what it sells is the
+// worst bug this file can have.
+const per = (id) => UPGRADE_BY_ID[id]?.per ?? 0;
+
 export function applyBaseUpgrades(profile) {
   const up = profile?.upgrades || {};
-  state.troops = Math.max(state.troops, 1 + (up.squad || 0));
+  state.troops = Math.max(state.troops, 1 + (up.squad || 0) * per('squad'));
   state.tier = Math.max(state.tier, Math.min(up.start || 0, TIERS.length - 1));
-  state.dmgMul = 1 + (up.damage || 0) * 0.08;
-  state.rateMul = 1 + (up.rate || 0) * 0.04;
-  state.armour = Math.min(0.75, (up.armour || 0) * 0.05);
+  state.dmgMul = 1 + (up.damage || 0) * per('damage');
+  state.rateMul = 1 + (up.rate || 0) * per('rate');
+  // BODY ARMOUR pays out twice: a shield pool you watch drain, which is the
+  // half that matters when the squad is eight men, and a percentage that only
+  // becomes the dominant half once losses are counted in dozens.
+  state.shield = (up.armour || 0) * SHIELD_PER;
+  state.armour = Math.min(0.6, (up.armour || 0) * per('armour'));
   state.peakTroops = state.troops;
 }
 

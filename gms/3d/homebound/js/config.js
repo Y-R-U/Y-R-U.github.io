@@ -147,6 +147,11 @@ export const GATE = {
   height: 3.0,
   growPerHit: 0.055,
   growFlat: 0.35,
+  // Growth answers to FIREPOWER. Without this term the damage upgrade is inert
+  // for the whole opening chapter: there is nothing to shoot but gates, and
+  // gate growth counted hits, not damage. A gun that hits harder must make the
+  // number climb faster, because the number IS what the gun is for.
+  growDmgScale: 0.85,        // 0 = hits only, 1 = fully proportional to dmgMul
   growMax: 24,               // multiple of the gate's base value
   glassHp: 30,
   approachFade: 26,          // metres over which a gate FINISHES fading in;
@@ -194,7 +199,27 @@ export const EFFECTS = {
   power:   { sign: 'purple', fmt: (v) => '⚡ ' + v + 's',good: true,  grow: false },
   loss:    { sign: 'red',    fmt: (v) => '-' + v,            good: false, grow: false },
   divide:  { sign: 'red',    fmt: (v) => '÷' + v,       good: false, grow: false },
+  gamble:  { sign: 'purple', fmt: () => '?',            good: true,  grow: false },
 };
+
+// The `?` gate. Mostly good, occasionally ruinous — a gate you take because you
+// are behind, and regret about one time in seven. It is the only gate whose
+// sign does not tell you what it does, which is why it must be unmistakable:
+// one purple panel with a question mark and nothing else.
+//
+// Weights sum to 110. `divide` at 14 is a 12.7% chance of losing half the
+// squad, which is enough to make the choice cost something without making the
+// gate a trap nobody takes.
+export const GAMBLE = [
+  { w: 22, type: 'mult',   value: 2,          label: '×2 SQUAD' },
+  { w: 10, type: 'mult',   value: 3,          label: '×3 SQUAD' },
+  { w: 20, type: 'troops', scale: 0.35, min: 8, label: 'REINFORCEMENTS' },
+  { w: 14, type: 'cash',   value: 120, byLevel: 18, label: 'PAYDAY' },
+  { w: 12, type: 'power',  value: 8, id: 'rapid', label: 'RAPID FIRE' },
+  { w: 10, type: 'weapon', value: 4,          label: 'GUN UPGRADE' },
+  { w:  8, type: 'shield',  value: 15,        label: 'BODY ARMOUR' },
+  { w: 14, type: 'divide', value: 2,          label: 'AMBUSH · HALF LOST' },
+];
 
 // --------------------------------------------------------------------------
 // Economy. The house is the money sink; the runs are the tap. Chapter 2 exists
@@ -203,6 +228,19 @@ export const EFFECTS = {
 export const ECON = {
   baseReward: 120,
   perTroop: 1.4,
+
+  // A cash gate is competing against a troop gate, and troops are not worth
+  // their face value — they compound. Take 40 men early and they ride every
+  // multiplier and every grown gate for the rest of the level, then cash out at
+  // `perTroop` on top of everything they killed on the way. A cash gate priced
+  // at its own face value is therefore never the right pick, and a row offering
+  // one is a fake choice.
+  //
+  // So cash is priced off what the troops it displaces would have been worth at
+  // the finish line, times this. Above 1.0 on purpose: money has to be actively
+  // tempting, and the thing that stops it being a free lunch is that taking it
+  // leaves you weaker for the rest of the run, not that it pays badly.
+  cashTempt: 1.5,
   perLevel: 18,
   bossBonus: 2.0,
   replayFactor: 0.45,        // repeating a cleared story level pays less
@@ -211,11 +249,25 @@ export const ECON = {
 };
 
 // Base upgrades bought between runs. `cost(n)` is the price of level n→n+1.
+// Shield points per level of BODY ARMOUR. Three is deliberate: a barrier body-
+// check costs BARRIER.killOnTouch (22%) of the squad, so at the 5-15 men the
+// first chapter is played at, one level of armour eats a whole wall hit.
+export const SHIELD_PER = 3;
+
 export const UPGRADES = [
-  { id: 'squad',  name: 'STARTING SQUAD',  icon: '👥', max: 40, base: 90,  growth: 1.28, per: 1,    fmt: (v) => `${1 + v} men` },
+  // Two men a level, not one. Early gates are additive, so a bigger start is
+  // only worth buying if it survives to meet a multiplier — see the guarantee
+  // in levels.js that every level carries at least one.
+  { id: 'squad',  name: 'STARTING SQUAD',  icon: '👥', max: 40, base: 90,  growth: 1.28, per: 2,    fmt: (v) => `${1 + v * 2} men` },
   { id: 'damage', name: 'FIREPOWER',       icon: '🎯', max: 40, base: 110, growth: 1.30, per: 0.08, fmt: (v) => `+${Math.round(v * 8)}%` },
   { id: 'rate',   name: 'FIRE RATE',       icon: '⚡', max: 30, base: 140, growth: 1.32, per: 0.04, fmt: (v) => `+${Math.round(v * 4)}%` },
-  { id: 'armour', name: 'ARMOUR',          icon: '🛡', max: 30, base: 130, growth: 1.31, per: 0.05, fmt: (v) => `-${Math.round(v * 5)}% losses` },
+  // ARMOUR was a pure percentage, which is invisible at the squad sizes the
+  // opening chapter actually plays at: at level 1 it was `floor(1 x 0.95) = 0`,
+  // so it silently made every single-man loss free and did nothing else you
+  // could ever see. It now buys a SHIELD — a concrete pool of hits absorbed
+  // before anyone dies, shown in the HUD and spent in front of you — plus a
+  // smaller percentage that only starts to matter once squads are large.
+  { id: 'armour', name: 'BODY ARMOUR',    icon: '🛡', max: 30, base: 130, growth: 1.31, per: 0.02, fmt: (v) => `${v * SHIELD_PER} shield · -${Math.round(v * 2)}% losses` },
   { id: 'start',  name: 'DEPLOY TIER',     icon: '▲', max: 5,  base: 900, growth: 2.10, per: 1,    fmt: (v) => TIERS[Math.min(v, TIERS.length - 1)].name },
   { id: 'income', name: 'PAY GRADE',       icon: '💰', max: 30, base: 160, growth: 1.34, per: 0.06, fmt: (v) => `+${Math.round(v * 6)}%` },
 ];

@@ -28,6 +28,9 @@ const TUTORIALS = {
   promote: { icon: '▲', head: 'PROMOTE', body: 'A green gate trades men for better men. Fewer, stronger.', done: 'army:tier' },
   barrier: { icon: '🧱', head: 'WALLS HAVE HP', body: 'Shoot the number down. Body it while it stands and you lose men.', done: 'barrier:broken' },
   trap:  { icon: '⛔', head: 'RED IS A TRAP', body: 'Steer around it — or shoot it off the road before you arrive.', done: 'gate:break' },
+  // The one gate whose sign will not tell you. Say the odds honestly — the
+  // gamble is only interesting if the player knows it is one.
+  gamble: { icon: '🎲', head: 'NOBODY KNOWS', body: 'A ? pays out at random. Usually well. Sometimes it takes half your men.', done: 'gate:pass' },
 };
 
 // Who is talking in a story bubble. The chip is a two-glyph portrait rather
@@ -62,6 +65,7 @@ let bossT = 0;             // seconds since the last boss:hp, hides a stale bar
 let dragHintT = 0;
 let tut = null;            // { key, t, offDone } while a tutorial card is up
 let paused = false;
+let lastShield = -1;
 const bubbles = [];        // { node, t }
 
 export function initHud() {
@@ -74,6 +78,8 @@ export function initHud() {
     icon: $('#tc-icon'),
     count: $('#tc-count'),
     delta: $('#tc-delta'),
+    shield: $('#tc-shield'),
+    shieldN: $('#tc-shield b'),
     fill: $('#prog-fill'),
     flag: $('#prog-flag'),
     label: $('#prog-label'),
@@ -176,6 +182,18 @@ export function showHud(onOff) {
 // backdrop deliberately has no HUD over it.
 // --------------------------------------------------------------------------
 export function updateHud(dt) {
+  // The shield pip only exists while there is a shield. BODY ARMOUR used to be
+  // a percentage nobody could see working; a number that visibly drains as
+  // walls and bullets eat it is the entire point of the change.
+  if (R.shield) {
+    const sh = Math.round(state.shield || 0);
+    if (sh !== lastShield) {
+      lastShield = sh;
+      R.shield.classList.toggle('hidden', sh <= 0);
+      if (R.shieldN) R.shieldN.textContent = sh;
+      if (sh > 0) { R.shield.classList.remove('pulse'); void R.shield.offsetWidth; R.shield.classList.add('pulse'); }
+    }
+  }
   if (!inited || R.root.classList.contains('hidden')) return;
 
   // Counter. Snap the last unit so the number never sits on 199 of 200.

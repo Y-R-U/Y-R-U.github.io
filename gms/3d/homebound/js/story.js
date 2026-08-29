@@ -10,14 +10,15 @@
 //
 // WHERE THE LINES FIRE
 //
-//   `run:start`   the opening line for that level
+//   the road     `levels.js` places the `in` and `out` beats in the LevelDef as
+//                 `{kind:'bubble'}` items and game.js fires them from the
+//                 z-loop, so a line lands at a moment on the road rather than
+//                 at the door. This file only RETIRES them, on run:start.
 //   `boss:hp`     (first frame only) the boss line, on boss levels
-//   `run:end`     the closing line, win only
+//   `run:end`     the two scenes — arriving at the house, and the armistice
 //
-// That is deliberately the whole hook list. game.js does not yet dispatch
-// `{kind:'bubble'}` items (see the MANAGER note in levels.js), and a story that
-// depends on an unwritten hook is a story that does not ship. If that hook
-// lands later, `beatAt(chapter, level, z)` below is ready for it.
+// The intro is the exception: it plays before the squad has gone anywhere, so
+// it goes on the bus.
 //
 // A beat never replays: `save.js:markStory` keeps the ids, so the second run of
 // level 7 is silent. Story is not a tax on grinding.
@@ -231,13 +232,20 @@ export function initStory() {
     const p = P();
     if (!p.story.introDone) {
       p.story.introDone = true;
-      // The intro IS level one's opening line — stacking the level's own beat
-      // behind it puts five bubbles on the player's first thirty seconds.
+      // The intro IS level one's opening line — the level's own `in` bubble is
+      // already on the road ahead, so retire it rather than say both. `out`
+      // still plays from the road; it is retired below like any other.
       if (current?.in?.id) markStory(current.in.id);
+      if (current?.out?.id) markStory(current.out.id);
       playSequence(introBeats(), 500);
       return;
     }
-    if (current?.in) playBeat(current.in, 600);
+    // `in` and `out` are bubble items in the level that is about to play; this
+    // marks them read so the second run of the level is silent. Marking on
+    // start rather than on delivery costs a line if the player quits mid-run,
+    // which is cheaper than a line that repeats every replay forever.
+    if (current?.in?.id) markStory(current.in.id);
+    if (current?.out?.id) markStory(current.out.id);
   });
 
   // First frame of the boss bar. `boss:hp` fires every frame, so the flag.
@@ -249,7 +257,6 @@ export function initStory() {
 
   on('run:end', ({ win, level }) => {
     if (!current) return;
-    if (win && current.out) playBeat(current.out, 700);
     // Two scenes in the whole game, both on the outro screen where the run is
     // already over: arriving at the house, and the day the war ends.
     if (win && level?.chapter === 1 && level?.level === 24) {
