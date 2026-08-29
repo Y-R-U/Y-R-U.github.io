@@ -8,6 +8,7 @@
 // `aPart` attribute:
 //
 //   0 body   1 leg-left   2 leg-right   3 arm-left   4 arm-right   5 head
+//   6 spinner (rotates about model Y — rotors, turret fans)
 //
 // Parts 1-4 swing fore/aft, the body bobs, the head counter-bobs. A geometry
 // with no `aPart` still works — it just bobs as one lump.
@@ -52,7 +53,10 @@ export function outlineMat(thickness = 0.035, color = PAL.signStroke) {
     s.uniforms.uThick = { value: thickness };
     s.vertexShader = 'uniform float uThick;\n' + s.vertexShader.replace(
       '#include <begin_vertex>',
-      '#include <begin_vertex>\n  transformed += normalize(objectNormal) * uThick;'
+      // MeshBasicMaterial only declares objectNormal when it has an env map or
+      // a skeleton, so without this include the outline program fails to link
+      // and every crowd in the game silently loses its outline.
+      '#include <beginnormal_vertex>\n#include <begin_vertex>\n  transformed += normalize(objectNormal) * uThick;'
     );
     m.userData.shader = s;
   };
@@ -107,6 +111,16 @@ const CROWD_BODY = /* glsl */`
 
   transformed.z += dz;
   transformed.y += dy;
+
+  // Part 6 spins about the model's Y axis. Everything else here is a translate,
+  // which is enough for a stride but cannot turn a rotor — and a helicopter
+  // whose blades are welded still is worse than no helicopter.
+  if (part > 5.5) {
+    float a = uTime * 26.0 + aPhase;
+    float ca = cos(a), sa = sin(a);
+    transformed.xz = vec2(transformed.x * ca - transformed.z * sa,
+                          transformed.x * sa + transformed.z * ca);
+  }
 `;
 
 function injectCrowd(mat, uniforms, tinted) {

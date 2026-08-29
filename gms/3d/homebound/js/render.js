@@ -94,7 +94,7 @@ export function resize() {
   // Portrait phones are tall and narrow: at a fixed vertical FOV the corridor
   // fills the width and everything interesting is off the sides. Widen the
   // vertical FOV as the frame gets taller so the 11 m road always fits.
-  ctx.camera.fov = clamp(CAM.fov * (0.62 / Math.min(0.9, Math.max(0.4, ctx.aspect))), 42, 74);
+  ctx.camera.fov = clamp(CAM.fov * (0.58 / Math.min(0.9, Math.max(0.4, ctx.aspect))), 38, 66);
   ctx.camera.updateProjectionMatrix();
 }
 
@@ -129,7 +129,7 @@ export function updateCamera(dt, opts = {}) {
 
   // A little roll toward the drag. It is 3° and nobody notices it consciously,
   // which is the point.
-  roll = approach(roll, clamp((state.targetX - state.x) * 0.06, -1, 1) * CAM.tiltMax, 0.9, dt);
+  roll = approach(roll, clamp((state.x - state.targetX) * 0.06, -1, 1) * CAM.tiltMax, 0.9, dt);
   cam.rotation.z += roll;
 
   // Keep the shadow box travelling with the squad or the crowd walks out of it.

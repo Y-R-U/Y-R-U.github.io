@@ -1,6 +1,8 @@
-// Live run state. One mutable singleton every system reads and only `game.js`
-// writes — systems that want to change it emit on the bus instead. That rule is
-// the reason six systems can share one object without a race.
+// Live run state. One mutable singleton every system reads. `game.js` owns the
+// writes, with two documented exceptions it delegates to: `army.js` owns
+// `state.troops` (because `applyEffect` hands troops/loss/mult/divide straight
+// to it) and `enemies.js` owns `state.bossHp`/`state.bossMax`. Everything else
+// asks over the bus. That rule is why six systems share one object without a race.
 
 import { RUN, TIERS } from './config.js';
 

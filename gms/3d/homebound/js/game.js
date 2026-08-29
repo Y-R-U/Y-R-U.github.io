@@ -6,7 +6,7 @@ import { RUN, ROAD, TIERS, EFFECTS, ECON, AUTO_MODE, DEV_MODE } from './config.j
 import { state, resetRunState, tierDef } from './state.js';
 import { emit, on } from './bus.js';
 import { clamp, approach } from './utils.js';
-import { P, addCash, clearLevel, bumpStats } from './save.js';
+import { P, addCash, clearLevel, bumpStats, unlock, save } from './save.js';
 
 import { ctx, updateCamera, render } from './render.js';
 import { updateInput, updateAutoThumb } from './input.js';
@@ -18,6 +18,7 @@ import { resetEnemies, updateEnemies, enemyCount } from './enemies.js';
 import { resetCombat, updateCombat } from './combat.js';
 import { resetVfx, updateVfx } from './vfx.js';
 import { resetHud, updateHud, showHud } from './hud.js';
+import { updateMenus } from './menus.js';
 import { sfx, music } from './audio.js';
 
 export const run = {
@@ -28,6 +29,11 @@ export const run = {
 };
 
 let outroT = 0;
+
+// A cursor into the level's items for the kinds nobody else owns: bubbles,
+// pickups and triggers. The list is sorted by z, so "what have we just passed"
+// is a pointer that only ever moves forward — no scanning, no per-frame filter.
+let itemCursor = 0;
 
 // --------------------------------------------------------------------------
 // Starting and ending
@@ -50,6 +56,7 @@ export function startRun(level, { autoplay = false } = {}) {
   resetEnemies(level);
   resetCombat(level);
   resetVfx();
+  itemCursor = 0;
   if (!autoplay) { resetHud(level); showHud(true); }
 
   emit('run:start', { level, autoplay });
@@ -81,13 +88,70 @@ export function endRun(win) {
       kills: state.kills, distance: Math.round(state.dist),
       bestSquad: state.peakTroops, bestGate: state.bestGate,
     });
-    if (win && run.level?.chapter) clearLevel(run.level.chapter, run.level.level, stats);
+    if (win && run.level?.chapter) {
+      clearLevel(run.level.chapter, run.level.level, stats);
+      advanceUnlocks();
+    }
     sfx(win ? 'win' : 'lose');
     music('menu');
   }
   emit('run:end', stats);
   return stats;
 }
+
+// The unlock ladder. It lives here rather than in the UI because the order the
+// buttons light up IS the shape of the game, and it must hold whether the
+// player got there through story, a mission or a debug jump.
+//
+//   store   after c1l3 — the tutorial teaches gates first, then teaches that
+//                        you are allowed to come back stronger
+//   home    at the end of chapter 1 — the whole point of chapter 1
+//   events  once the house has been seen, because chapter 2 is "go earn"
+//   ch.3    when the debt is clear
+//   ch.4    when contract work is done
+function advanceUnlocks() {
+  const p = P();
+  const lvl = run.level || {};
+  const { levelCount } = chaptersRef;
+  if (lvl.chapter === 1 && lvl.level >= 3) unlock('store');
+  if (lvl.chapter === 1 && levelCount && lvl.level >= levelCount(1)) {
+    unlock('home');
+    p.home.owned = true;
+    p.home.lastCollect = Date.now();
+    if (p.chapter < 2) p.chapter = 2;
+    save(true);
+  }
+  if (lvl.chapter === 3 && levelCount && lvl.level >= levelCount(3)) {
+    if (p.chapter < 4) { p.chapter = 4; p.level = 1; save(true); }
+  }
+}
+
+// `army:count` is an announcement, not a request — so barriers.js saying "that
+// body-check cost you 40 men" was landing nowhere and walking into a live wall
+// was free. Map that one reason onto a real kill here. The guard stops army.js's
+// own re-announcement from recursing.
+let applyingBarrier = false;
+on('army:count', (e) => {
+  if (e.reason !== 'barrier' || e.delta >= 0 || applyingBarrier) return;
+  applyingBarrier = true;
+  try { killTroops(-e.delta, 'barrier'); } finally { applyingBarrier = false; }
+});
+
+// chapters.js is being written alongside this file; bind late so a missing
+// export degrades to "no unlock" rather than a boot failure.
+const chaptersRef = {};
+import('./chapters.js').then((m) => Object.assign(chaptersRef, m)).catch(() => {});
+
+on('debt:paid', ({ left }) => {
+  if (left > 0) return;
+  const p = P();
+  unlock('events');
+  if (p.chapter < 3) { p.chapter = 3; p.level = 1; save(true); }
+});
+
+on('unlock', ({ what }) => {
+  if (what === 'home') unlock('events');
+});
 
 // Three stars is "you finished with an army", one is "you finished". The middle
 // band is deliberately generous — stars are a nudge to replay, not a gate.
@@ -174,12 +238,15 @@ export function updateGame(dt) {
     state.z += v * dt;
     state.dist = state.z;
 
+    consumePassedItems();
+
     for (const k of Object.keys(state.powerups)) {
       state.powerups[k] -= dt;
       if (state.powerups[k] <= 0) delete state.powerups[k];
     }
   }
 
+  updateMenus(dt);
   updateWorld(dt);
   updateArmy(dt);
   updateGates(dt);
@@ -192,6 +259,23 @@ export function updateGame(dt) {
 
   if (run.active && state.running) checkEnd();
   render();
+}
+
+// Bubbles fire on the way past; pickups need the leader to be near them in x.
+// Anything else with a `kind` belongs to a system and is skipped here.
+function consumePassedItems() {
+  const items = run.level?.items;
+  if (!items) return;
+  while (itemCursor < items.length && items[itemCursor].z <= state.z) {
+    const it = items[itemCursor++];
+    if (it.kind === 'bubble') {
+      if (!run.autoplay) emit('story:bubble', { who: it.who, text: it.text, ms: it.ms || 2600 });
+    } else if (it.kind === 'pickup') {
+      if (Math.abs(it.x - state.x) < 2.2) applyEffect(it.effect, { x: it.x, y: 1, z: it.z });
+    } else if (it.kind === 'trigger') {
+      emit('level:trigger', { id: it.id, action: it.action, z: it.z });
+    }
+  }
 }
 
 function checkEnd() {

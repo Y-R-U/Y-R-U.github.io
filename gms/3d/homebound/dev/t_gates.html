@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>HOMEBOUND — gate bench</title>
+<style>
+  html,body{margin:0;height:100%;background:#8fb4cc;overflow:hidden}
+  #stage{position:fixed;inset:0}
+  #hud{position:fixed;left:8px;top:8px;font:700 12px/1.35 ui-monospace,monospace;
+       color:#fff;text-shadow:0 1px 2px #000;white-space:pre;z-index:5}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="hud"></div>
+
+<script type="importmap">
+{ "imports": {
+    "three": "../../../lib/three/0.160.0/three.module.js",
+    "three/addons/": "../../../lib/three/0.160.0/addons/"
+} }
+</script>
+<script type="module">
+// Private bench for signs.js / gates.js / barriers.js. It does NOT import
+// world.js, army.js, combat.js or vfx.js — those belong to other agents and are
+// being rewritten under me. Everything here is a stand-in so a bad frame is
+// unambiguously my bug.
+//
+//   node dev/shot.mjs '' out.png --steps 300
+//   with HB_BASE=http://localhost:8899/gms/3d/homebound/dev/t_gates.html
+//
+// ?z=NN parks the squad at a fixed z instead of running.
+// ?fire=0 stops the fake bullets so gates hold their base value.
+
+import * as THREE from 'three';
+import { PAL, ROAD, GATE, RUN } from '../js/config.js';
+import { state } from '../js/state.js';
+import { on } from '../js/bus.js';
+import { initRender, ctx, updateCamera, render, drawCalls } from '../js/render.js';
+import { initSigns, panelMaterial } from '../js/signs.js';
+import { initGates, resetGates, updateGates, gateHitTest, gateChoices } from '../js/gates.js';
+import { initBarriers, resetBarriers, updateBarriers, barrierHitTest } from '../js/barriers.js';
+
+const Q = new URLSearchParams(location.search);
+const PARK = parseFloat(Q.get('z') || '0');
+const FIRE = Q.get('fire') !== '0';
+
+initRender(document.getElementById('stage'));
+
+// --- stand-in ground, so the bench does not depend on world.js ---
+const road = new THREE.Mesh(
+  new THREE.PlaneGeometry(ROAD.halfW * 2, 2000),
+  new THREE.MeshLambertMaterial({ color: PAL.road })
+);
+road.rotation.x = -Math.PI / 2; road.receiveShadow = true; road.position.z = 600;
+ctx.scene.add(road);
+for (const s of [-1, 1]) {
+  const bank = new THREE.Mesh(
+    new THREE.BoxGeometry(ROAD.bankW, 1.4, 2000),
+    new THREE.MeshLambertMaterial({ color: PAL.bank })
+  );
+  bank.position.set(s * (ROAD.halfW + ROAD.bankW / 2), -0.7, 600);
+  ctx.scene.add(bank);
+}
+
+initSigns();
+initGates(ctx);
+initBarriers(ctx);
+
+// --- a level that contains one of everything, in reading order ---
+const L = [-3.6, 0, 3.6];
+const items = [];
+const row = (z, gates) => gates.forEach((g, i) => items.push({
+  kind: 'gate', z, x: g.x ?? L[i], w: 3.2, panel: g.panel || 'wood',
+  grow: g.grow !== false, hp: g.hp || GATE.glassHp,
+  effect: g.effect, action: g.action || null,
+}));
+
+row(60,  [{ effect: { type: 'troops', value: 1 } },
+          { effect: { type: 'troops', value: 5 } },
+          { effect: { type: 'mult', value: 2 } }]);
+row(110, [{ effect: { type: 'cash', value: 40 } },
+          { effect: { type: 'loss', value: 12 }, grow: false },
+          { effect: { type: 'divide', value: 2 }, grow: false }]);
+items.push({ kind: 'barrier', z: 150, x: 0, w: 6, hp: 300, value: 300 });
+row(190, [{ effect: { type: 'tier', value: 1 }, grow: false },
+          { effect: { type: 'shield', value: 20 } },
+          { effect: { type: 'weapon', value: 3 } }]);
+row(240, [{ panel: 'glass', effect: { type: 'loss', value: 30 }, grow: false },
+          { panel: 'button', effect: { type: 'power', value: 8 }, grow: false, action: 'bridge' },
+          { panel: 'glass', effect: { type: 'troops', value: 50 }, grow: false }]);
+row(290, [{ effect: { type: 'troops', value: 3 }, x: -3.6 },
+          { effect: { type: 'power', value: 8 }, x: 3.6, grow: false }]);
+items.push({ kind: 'barrier', z: 330, x: -3.6, w: 5, hp: 140, value: 140 });
+items.push({ kind: 'barrier', z: 330, x: 3.6, w: 5, hp: 900, value: 900 });
+items.sort((a, b) => a.z - b.z);
+
+const level = { id: 'bench', length: 420, items };
+state.troops = 120; state.tier = 0; state.running = true;
+resetGates(level);
+resetBarriers(level);
+
+// --- log every gate event so the bench proves the bus contract, not just pixels
+const tally = {};
+const lastEv = {};
+for (const e of ['gate:hit', 'gate:grow', 'gate:pass', 'gate:break', 'gate:press',
+                 'barrier:broken', 'army:count', 'fx:explosion', 'fx:number']) {
+  tally[e] = 0;
+  on(e, (p) => {
+    tally[e]++;
+    if (e === 'gate:pass') lastEv.pass = `${p.effect.type} ${p.effect.value}`;
+    if (e === 'gate:press') lastEv.press = String(p.action);
+    if (e === 'army:count') lastEv.army = `${p.delta} ${p.reason}`;
+    if (e === 'barrier:broken') lastEv.wall = String(p.value);
+  });
+}
+window.__tally = tally;
+
+// --- fake bullets: one stream at the squad's x, so whatever gate the leader is
+// under is the gate that grows. That is the real game's rule, cheaply.
+let fireT = 0;
+function fire(dt) {
+  if (!FIRE) return;
+  fireT += dt;
+  while (fireT > 0.016) {
+    fireT -= 0.016;
+    const z = state.z + 18 + Math.random() * 26;
+    const x = state.x + (Math.random() - 0.5) * 1.2;
+    const g = gateHitTest(x, 1.6, z, 0.35);
+    if (g) { g.hit(2.2); continue; }
+    const b = barrierHitTest(x, 1.2, z, 0.35);
+    if (b) b.hit(3.0);
+  }
+}
+
+// ?atlas dumps the two atlas canvases straight onto the page, so a bad cell is
+// diagnosed by looking at the atlas rather than at a 40 px sign in a 3D scene.
+if (Q.has('atlas')) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;inset:0;background:#222;z-index:9;overflow:auto';
+  for (const m of [panelMaterial('face'), panelMaterial('glyph')]) {
+    const c = document.createElement('canvas');
+    c.width = m.map.image.width; c.height = m.map.image.height;
+    c.style.cssText = 'width:420px;display:block;image-rendering:pixelated;background:#555';
+    c.getContext('2d').drawImage(m.map.image, 0, 0);
+    wrap.appendChild(c);
+  }
+  document.body.appendChild(wrap);
+}
+
+let booted = false, t = 0;
+function step(dt) {
+  t += dt;
+  if (PARK) { state.z = PARK; state.x = 0; }
+  else {
+    state.z += RUN.speed * dt;
+    // sweep across the lanes so every gate in a row gets taken over a run
+    state.x = Math.sin(t * 0.55) * 3.9;
+    state.targetX = state.x;
+  }
+  fire(dt);
+  updateGates(dt);
+  updateBarriers(dt);
+  updateCamera(dt);
+  render();
+  const cs = gateChoices(state.z) || [];
+  document.getElementById('hud').textContent =
+    `${drawCalls()} calls   z ${state.z.toFixed(0)}  x ${state.x.toFixed(1)}\n` +
+    `choices ${cs.map((c) => `${c.x.toFixed(1)}:${c.score.toFixed(0)}`).join(' ')}\n` +
+    `hit ${tally['gate:hit']} grow ${tally['gate:grow']} pass ${tally['gate:pass']}\n` +
+    `break ${tally['gate:break']} press ${tally['gate:press']} wall ${tally['barrier:broken']}\n` +
+    `last ${lastEv.pass || '-'} | ${lastEv.press || '-'} | ${lastEv.army || '-'} | ${lastEv.wall || '-'}`;
+}
+booted = true;
+
+window.__hb = { get ready() { return booted; }, step, state, ctx, drawCalls, tally, lastEv };
+let last = performance.now();
+(function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  step(dt);
+})(last);
+</script>
+</body>
+</html>

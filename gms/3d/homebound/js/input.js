@@ -1,11 +1,17 @@
 // One thumb. A drag anywhere on the stage moves the squad's target x by the
 // drag delta — relative, not absolute, because an absolute mapping means the
 // squad teleports the instant you put your thumb down.
+//
+// SCREEN_X is -1 and that is not a typo. The camera looks along +Z, so three's
+// lookAt yaws it 180 degrees and world +X lands on the LEFT of the screen. Drag
+// deltas are in screen space and have to be flipped before they touch world x,
+// or the squad walks away from your thumb.
 
 import { RUN, ROAD, AUTO_MODE, IS_TOUCH } from './config.js';
 import { state } from './state.js';
 import { clamp } from './utils.js';
 
+const SCREEN_X = -1;
 let dragging = false, lastX = 0, held = false;
 let autoT = 0, autoTarget = 0;
 
@@ -13,7 +19,7 @@ export function initInput(el) {
   const down = (x) => { dragging = true; held = true; lastX = x; };
   const move = (x) => {
     if (!dragging) return;
-    const d = (x - lastX) * RUN.dragScale;
+    const d = (x - lastX) * RUN.dragScale * SCREEN_X;
     lastX = x;
     state.targetX = clamp(state.targetX + d, -ROAD.halfW, ROAD.halfW);
   };
@@ -40,8 +46,9 @@ let keyState = new Set();
 export const isHeld = () => held;
 
 export function updateInput(dt) {
-  if (keyState.has('ArrowLeft') || keyState.has('a')) state.targetX = clamp(state.targetX - RUN.steerRate * dt, -ROAD.halfW, ROAD.halfW);
-  if (keyState.has('ArrowRight') || keyState.has('d')) state.targetX = clamp(state.targetX + RUN.steerRate * dt, -ROAD.halfW, ROAD.halfW);
+  const step = RUN.steerRate * dt * SCREEN_X;
+  if (keyState.has('ArrowLeft') || keyState.has('a')) state.targetX = clamp(state.targetX - step, -ROAD.halfW, ROAD.halfW);
+  if (keyState.has('ArrowRight') || keyState.has('d')) state.targetX = clamp(state.targetX + step, -ROAD.halfW, ROAD.halfW);
 }
 
 // The AI thumb. It runs the main screen's autoplay backdrop and `?auto`. It

@@ -88,10 +88,14 @@ export const ROAD = {
 // frame — this is the single most important thing for the reference look.
 // --------------------------------------------------------------------------
 export const CAM = {
-  fov: 52,
-  back: 15.5,
-  height: 11.5,
-  look: 13,                  // metres ahead of the squad the camera aims at
+  fov: 46,
+  // The blob's spring settles about 7 m behind the leader, so `back` is
+  // measured to the TAIL of the squad, not to the man in front. At 13 the
+  // hindmost rank was off the bottom of the phone and the player could not see
+  // his own casualties.
+  back: 21.0,
+  height: 17.0,
+  look: 26,                  // metres ahead of the squad the camera aims at
   perUnit: 0.0175,           // extra back/height per unit in the squad
   maxExtra: 9,
   lag: 0.92,                 // approach() rate
@@ -107,7 +111,8 @@ export const RUN = {
   speedBoss: 0,              // squad holds station at the boss
   steerRate: 26,             // metres/sec the leader can slide sideways
   dragScale: 0.055,          // screen px → metres
-  formSpacing: 0.62,         // metres between men in the spiral
+  formSpacing: 0.62,         // metres between NEIGHBOURS, not the spiral's r
+                             // constant — a golden-angle disc needs r = s/sqrt(pi)
   formPull: 7.5,             // how hard a man chases his formation slot
   formJitter: 0.13,
   startTroops: 1,
@@ -141,7 +146,9 @@ export const GATE = {
   growFlat: 0.35,
   growMax: 24,               // multiple of the gate's base value
   glassHp: 30,
-  approachFade: 26,          // metres at which a gate pops in
+  approachFade: 26,          // metres over which a gate FINISHES fading in;
+                             // gates.js spawns them well before this so a row is
+                             // readable with time to steer, not 2s before impact
   signTexSize: 256,
 };
 

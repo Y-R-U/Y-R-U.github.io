@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>HOMEBOUND — combat/vfx bench</title>
+<link rel="icon" href="data:," />
+<style>
+  html,body{margin:0;height:100%;background:#8fb4cc;overflow:hidden}
+  #stage{position:fixed;inset:0}
+  #stage canvas{display:block;width:100%;height:100%}
+  #hud{position:fixed;left:6px;top:6px;z-index:99;font:700 12px/1.35 ui-monospace,Menlo,monospace;
+       color:#9fe4f5;background:rgba(20,32,44,.72);padding:6px 8px;border-radius:6px;white-space:pre}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="hud"></div>
+
+<script type="importmap">
+{ "imports": { "three": "../../../lib/three/0.160.0/three.module.js",
+               "three/addons/": "../../../lib/three/0.160.0/addons/" } }
+</script>
+
+<script type="module">
+// Private bench for combat.js / vfx.js / enemies.js.
+//
+// index.html boots eleven systems and a level generator, so a look-tuning pass
+// on the gunfire means walking 140 m of road before anything is on screen —
+// two minutes a frame under swiftshader. This page stages the exact fight I
+// want to look at, at z 0, and drives the same update order game.js uses.
+//
+//   node dev/shot.mjs '?case=block' out.png --steps 90
+//   HB_BASE=http://localhost:8899/gms/3d/homebound/dev/t_combat.html node dev/shot.mjs ...
+
+import { initRender, ctx, updateCamera, render, drawCalls } from '../js/render.js';
+import { state, resetRunState } from '../js/state.js';
+import { initUnits } from '../js/units.js';
+import { initWorld, resetWorld, updateWorld } from '../js/world.js';
+import { initArmy, resetArmy, updateArmy } from '../js/army.js';
+import { initEnemies, resetEnemies, updateEnemies, enemyCount, bossState } from '../js/enemies.js';
+import { initCombat, resetCombat, updateCombat } from '../js/combat.js';
+import { initVfx, resetVfx, updateVfx, explode } from '../js/vfx.js';
+import { initAudio } from '../js/audio.js';
+import { emit } from '../js/bus.js';
+
+const Q = new URLSearchParams(location.search);
+const CASE = Q.get('case') || 'block';
+const TROOPS = parseInt(Q.get('troops') || '0', 10) || 200;
+const TIER = parseInt(Q.get('tier') || '0', 10) || 0;
+
+const CASES = {
+  // The reference frame: a dense rectangle filling the road, close enough that
+  // the leading edge is inside the muzzle bloom.
+  block: [{ kind: 'enemy', z: 26, x: 0, w: 11, count: 260, tier: 0, form: 'block', speed: 0 }],
+  // Same, but walking in.
+  column: [{ kind: 'enemy', z: 40, x: 0, w: 10, count: 180, tier: 0, form: 'column', speed: 3 }],
+  skirmish: [{ kind: 'enemy', z: 30, x: 0, w: 5.2, count: 40, tier: 1, form: 'skirmish', speed: 0 }],
+  boss: [{ kind: 'boss', z: 24, x: 0, hp: 2400, name: 'THE COLONEL', tier: 6 },
+         { kind: 'enemy', z: 40, x: 0, w: 11, count: 120, tier: 0, form: 'block', speed: 0 }],
+  bossdead: [{ kind: 'boss', z: 24, x: 0, hp: 60, name: 'THE COLONEL', tier: 6 }],
+  boom: [],
+};
+
+const level = {
+  id: 't', chapter: 1, level: 12, seed: 7, name: 'BENCH', theme: 'valley',
+  length: 900, startTroops: TROOPS, startTier: TIER, reqPower: 0, reward: 0,
+  mode: 'story', tutorial: null, items: CASES[CASE] || CASES.block,
+};
+
+const stage = document.getElementById('stage');
+const hudEl = document.getElementById('hud');
+let booted = false, t = 0, boomT = 0;
+
+initRender(stage);
+initUnits(ctx);
+initWorld(ctx);
+initArmy(ctx);
+initEnemies(ctx);
+initCombat(ctx);
+initVfx(ctx);
+initAudio();
+
+resetRunState(level, null);
+state.troops = state.peakTroops = TROOPS;
+state.tier = TIER;
+state.phase = 'run';
+state.running = true;
+
+resetWorld(level);
+resetArmy(level);
+resetEnemies(level);
+resetCombat(level);
+resetVfx();
+emit('run:start', { level, autoplay: false });
+
+// The squad holds station: this bench is about what the fight looks like, not
+// about traversal, and a moving camera makes two screenshots incomparable.
+function step(dt) {
+  t += dt;
+  state.t += dt;
+  if (CASE === 'boom') {
+    boomT -= dt;
+    if (boomT <= 0) {
+      boomT = 0.5;
+      explode({ x: (Math.random() - 0.5) * 6, y: 0.8, z: 18 + Math.random() * 10 }, 1.2 + Math.random() * 1.2);
+    }
+  }
+  updateWorld(dt);
+  updateArmy(dt);
+  updateEnemies(dt);
+  updateCombat(dt);
+  updateVfx(dt);
+  updateCamera(dt);
+  render();
+  const b = bossState();
+  hudEl.textContent =
+    `${CASE}  ${drawCalls()} calls\n` +
+    `troops ${state.troops}  tier ${state.tier}\n` +
+    `enemies ${enemyCount()}\n` +
+    (b ? `boss ${Math.round(b.hp)}/${b.max}\n` : '') +
+    `t ${t.toFixed(1)}s`;
+}
+
+booted = true;
+window.__hb = { get ready() { return booted; }, step, state, ctx, drawCalls, bus: { emit } };
+
+let last = performance.now();
+(function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  step(dt);
+})(last);
+</script>
+</body>
+</html>

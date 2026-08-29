@@ -72,6 +72,17 @@ export function spiralXY(i, spacing) {
   return [Math.cos(a) * r, Math.sin(a) * r];
 }
 
+// Out-param form. At 900 men the array-returning version allocates 54k throwaway
+// pairs a second, which is the difference between a smooth run and a GC hitch
+// every few seconds on a phone.
+export function spiralInto(i, spacing, out, o = 0) {
+  const r = spacing * Math.sqrt(i + 0.5);
+  const a = i * GOLDEN;
+  out[o] = Math.cos(a) * r;
+  out[o + 1] = Math.sin(a) * r;
+  return out;
+}
+
 export function el(tag, cls, html) {
   const n = document.createElement(tag);
   if (cls) n.className = cls;
