@@ -15,6 +15,7 @@
 
 import { TIERS, tierAt } from './config.js';
 import { state } from './state.js';
+import { markStory, storySeen } from './save.js';
 import { on, emit } from './bus.js';
 import { $, el, fmt, clamp, approach } from './utils.js';
 
@@ -104,6 +105,17 @@ export function initHud() {
   // in menus.js — this wants to be a real API.
   R.pause?.addEventListener('click', () => setPaused(true));
   on('ui:resume', () => setPaused(false));
+
+  // Glass shattering under your own fire is the least obvious rule in the game,
+  // and it is not worth a tutorial card because it teaches itself the first
+  // time it happens — provided the game says out loud what just happened. Once
+  // per save, the first time a pane goes.
+  on('gate:break', () => {
+    if (storySeen('tip:glass')) return;
+    markStory('tip:glass');
+    toastQ.push({ text: 'YOUR OWN FIRE BREAKS GLASS · COME IN LATE TO TAKE ONE', icon: '🔷' });
+    if (toastT <= 0) nextToast();
+  });
 
   on('army:count', onCount);
   on('army:tier', onTier);

@@ -24,9 +24,21 @@ const MAX_PLANKS = 72;
 
 const B_W = 6;                   // nominal width the geometry is built at
 const B_H = 2.30;
-const NUM_Y = B_H * 0.50;
-const NUM_Z = -0.36;             // proud of the plank face, toward the camera
-const NUM_H = B_H * 0.80;        // the number IS the wall; it fills the planks
+// The number is the ENTIRE information content of a barrier — a wall with no
+// number on it is a wall you have no reason to shoot — so it is sized to
+// dominate the plank face the way `140` and `300` do in dev/ref1.jpg and
+// dev/ref3.jpg, where the digits are most of the height of the wood.
+//
+// These are the panel box handed to signs.js, not the glyph size: `label()`
+// takes CAP_1 (0.62) of the height as the cap height and FIT_W (0.88) of the
+// width as the ink limit. So NUM_BOX_H below buys a cap of 0.66 x B_H = 1.52 m
+// on a 2.30 m wall, which fills the 1.89 m plank band between the steel rails
+// with ~0.19 m of clearance top and bottom. It was 0.44 x the band before, and
+// at level 12 that came out around 20 px on a phone.
+const NUM_Y = B_H * 0.50;        // the plank band's centre, rails excluded
+const NUM_Z = -0.38;             // proud of the plank face and the front rails
+const NUM_BOX_H = B_H * 1.06;
+const NUM_BOX_W = 0.92;          // fraction of the wall's own width
 
 const FADE_START = 74;           // matches the fog near plane; see gates.js
 const POP_M = 12;
@@ -251,7 +263,7 @@ export function updateBarriers(dt) {
       // glyphs so it still fills the plank face instead of shrinking to fit.
       const txt = b.hp >= 1000 ? fmt(b.hp) : String(Math.ceil(b.hp));
       b.shown = txt;
-      labels.label(txt, '', b.x, NUM_Y * s, b.z + NUM_Z * s, b.w * 0.72 * s, NUM_H * s, 0);
+      labels.label(txt, '', b.x, NUM_Y * s, b.z + NUM_Z * s, b.w * NUM_BOX_W * s, NUM_BOX_H * s, 0);
     }
   }
 

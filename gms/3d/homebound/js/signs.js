@@ -16,7 +16,12 @@
 //                 dark stroke, built once at boot. Every digit, letter and
 //                 symbol the game can put on a sign.
 //   PANEL ATLAS   one 1024² canvas, 4x4 cells: the five saturated sign colours,
-//                 four glass-crack stages, the button plate.
+//                 four glass-crack stages, the button plate, the plank wall and
+//                 the gamble gate's steel-and-window plate.
+//
+// The glyph atlas's METRICS are measured off its own pixels rather than off the
+// font — see below — and the fitting that uses them (`fitRun`) is what keeps a
+// gate readable as its number climbs from `+1` to `+358`.
 //
 // A label is then a handful of instanced quads (one per glyph) sharing ONE
 // InstancedMesh with a per-instance `aCell` attribute picking the atlas cell.
@@ -52,15 +57,46 @@ const G_SIZE = G_CELL * G_COLS;
 // Order is the cell order. Keep it under 64. Letters are here because
 // `EFFECTS.tier.fmt()` says "▲ PROMOTE" and a sign that reads "PROMOTE" is
 // worth the eleven extra cells.
-const GLYPH_SET = '0123456789+-$%.:s' + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + '×÷▲⌖♥⚡';
+const GLYPH_SET = '0123456789+-$%.:s' + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + '×÷▲⌖♥⚡?';
 
+// Metrics are MEASURED off the rasterised atlas, not taken from the font.
+//
+// `measureText` lies for this job in three ways that all end with a number
+// hanging off the side of a sign: it reports the advance (ink + side bearings)
+// rather than the ink, it knows nothing about the 17 px stroke we add on top of
+// it, and it reports nothing at all for the six symbols, which are paths. On top
+// of that "Arial Black" is not on every device, so a headless Chrome and a phone
+// can pick different fonts with different widths for the same string.
+//
+// So after the atlas is drawn we read it back once and take the alpha bounding
+// box of each cell. Everything downstream — advance, how tall a digit actually
+// is inside its cell, how far off-centre it sits — is then true by construction
+// for whatever font actually rendered, and the fitting maths cannot drift from
+// the pixels. One `getImageData` and a stride-2 scan at boot, never again.
 const glyphCell = new Map();      // char → cell index
-const glyphAdv = new Float32Array(G_COLS * G_ROWS);   // advance, in cell heights
+const glyphAdv = new Float32Array(G_COLS * G_ROWS);   // ink width + tracking, in cells
+const glyphInkH = new Float32Array(G_COLS * G_ROWS);  // ink height, in cells
+const glyphSym = new Uint8Array(G_COLS * G_ROWS);     // 1 = a hand-drawn symbol
 const SPACE_ADV = 0.30;
+// Negative: the reference's digits touch at the stroke. The white cores stay
+// apart, which is what makes "+99" read as one fat block instead of three.
+const TRACK = -0.012;
+// Filled in by measureBox(): the digit is the reference glyph, because every
+// label that matters is mostly digits.
+let REF_INK_H = 0.59;             // a digit's ink height as a fraction of a cell
+let REF_DY = 0;                   // digit ink centre offset from the cell centre
 
 // Hand-drawn symbols. The font versions of these are thin, inconsistent across
 // platforms, and '⌖' is outright missing on most — a tofu box on a gate face is
 // unshippable, so the six that matter are paths.
+//
+// SYM_H is each path's vertical extent in units of the `s` it is drawn at. The
+// atlas uses it to solve for the `s` that makes every symbol's inked height
+// equal, so '♥ 20' and '× 2' put their digits at the same size as '+20' does.
+// Drawn at one flat scale they do not: '⚡' spans 0.92 of `s` and '×' only 0.63,
+// so the heart in "♥20" came out half again as tall as the panel's digits and
+// shoved them down to 70% — a purple gate read as a heart with a footnote.
+const SYM_H = { '▲': 0.78, '×': 0.629, '÷': 0.86, '♥': 0.72, '⚡': 0.92, '⌖': 0.96, '?': 1.075 };
 const SYM = {
   '▲': (g, s) => { g.moveTo(0, -0.44 * s); g.lineTo(0.46 * s, 0.34 * s); g.lineTo(-0.46 * s, 0.34 * s); g.closePath(); },
   '×': (g, s) => {
@@ -98,56 +134,122 @@ const SYM = {
     g.rect(-0.48 * s, -0.05 * s, 0.24 * s, 0.10 * s);
     g.rect(0.24 * s, -0.05 * s, 0.24 * s, 0.10 * s);
   },
+  // The gamble gate's whole sign. Unlike the five above it is a CENTRELINE, not
+  // an outline: `{ body }` marks it, and the atlas strokes it twice — once at
+  // body + stroke in ink, once at body in white. A '?' built the other way, out
+  // of overlapping filled shapes, gets the dark stroke drawn along every seam
+  // where the bowl meets its own tail, and the hook comes out with a black scar
+  // across it. A skeleton has no seams, and round caps give it the same soft
+  // fat terminals as Arial Black's digits.
+  // Proportioned off Arial Black's own '?' so it sits in a row of digits without
+  // looking like a different typeface: ink 0.76 as wide as it is tall, a bowl
+  // whose outer diameter is 0.76 of the height, and a stem ending at 0.72 down.
+  // The gap before the dot is wider than the font's, because our 17 px stroke
+  // is not the font's — at the typographic gap the two dark outlines close over
+  // the white entirely and the '?' comes out as an '!'.
+  // The counter is the hard constraint, not the outline. The dark stroke is
+  // drawn UNDER the white, so it eats SW *inward* as well as outward: a bowl
+  // whose inner diameter is under ~20 px in the cell closes up completely and
+  // the glyph renders as a filled blob with a dot beneath it. Bowl radius,
+  // body and the descender are solved together against that — inner diameter
+  // 0.38 of `s` leaves ~7 px of counter after the stroke, which is the same
+  // slit the '0' and '8' in the atlas have.
+  '?': {
+    body: 0.21,
+    path: (g, s) => {
+      // The bowl, and the 119° it does NOT sweep is the shape: the opening
+      // faces straight down, so the hook's left terminal sits at lower-left and
+      // its right terminal at upper-right, where the tail takes over. Sweep any
+      // further round and the tail re-enters the bowl instead of descending
+      // below it — the counter closes and the glyph reads as a 'Q'.
+      g.arc(0, -0.10 * s, 0.30 * s, Math.PI * 0.78, Math.PI * 2.12);
+      // tail, dropping below the bowl and curling in to the stem
+      g.quadraticCurveTo(0.27 * s, 0.13 * s, 0.03 * s, 0.16 * s);
+      g.lineTo(0, 0.185 * s);
+      // the dot: a stub segment, so the round cap IS the dot
+      g.moveTo(0, 0.455 * s);
+      g.lineTo(0, 0.465 * s);
+    },
+  },
 };
 
 const FONT = (px) => `900 ${px}px "Arial Black", "Helvetica Neue", Impact, system-ui, sans-serif`;
 
 let glyphTex = null, panelTex = null;
 
+const FS = 80;                         // font size inside a 128 cell
+const SW = 17;                         // stroke width — the reference's is FAT
+// A symbol is drawn 1.12x a digit's inked height. Bigger than the digits it
+// sits next to, because it carries the meaning at distance; not so much bigger
+// that it owns the panel. At this height the widest symbol ('⌖', 0.96 of its
+// own scale) lands at ±42 px in a 64 px half-cell — comfortably clear of the
+// cell edge, which matters because a symbol that bleeds corrupts its
+// NEIGHBOUR'S measurement as well as its own picture.
+const SYM_INK = 1.12;
+
+function cellXY(i) { return [(i % G_COLS) * G_CELL, ((i / G_COLS) | 0) * G_CELL]; }
+
 function buildGlyphAtlas() {
   const c = document.createElement('canvas');
   c.width = c.height = G_SIZE;
-  const g = c.getContext('2d');
-  // Sized to leave a margin inside the cell: the glyph plus its stroke has to
-  // stay clear of the cell edge or mip level 3 smears its neighbour into it.
-  const FS = 80;                       // font size inside a 128 cell
-  const SW = 17;                       // stroke width — the reference's is FAT
+  const g = c.getContext('2d', { willReadFrequently: true });
   g.lineJoin = 'round';
   g.miterLimit = 2;
   g.textAlign = 'center';
   g.textBaseline = 'middle';
+  for (let i = 0; i < GLYPH_SET.length; i++) glyphCell.set(GLYPH_SET[i], i);
 
+  // Two passes, because the symbols are sized off the digits. Text first, so
+  // REF_INK_H is known; then the symbols, solved to match it.
   for (let i = 0; i < GLYPH_SET.length; i++) {
     const ch = GLYPH_SET[i];
-    const col = i % G_COLS, row = (i / G_COLS) | 0;
-    const cx = col * G_CELL + G_CELL / 2, cy = row * G_CELL + G_CELL / 2;
-    glyphCell.set(ch, i);
-
+    if (SYM[ch]) continue;
+    const [x0, y0] = cellXY(i);
     g.save();
-    g.translate(cx, cy);
-    let w;
-    if (SYM[ch]) {
-      g.beginPath();
-      SYM[ch](g, G_CELL);
+    clipCell(g, x0, y0);
+    g.translate(x0 + G_CELL / 2, y0 + G_CELL / 2);
+    g.font = FONT(FS);
+    g.lineWidth = SW;
+    g.strokeStyle = hex(PAL.signStroke);
+    g.strokeText(ch, 0, 4);            // +4: Arial Black sits high in its box
+    g.fillStyle = '#ffffff';
+    g.fillText(ch, 0, 4);
+    g.restore();
+  }
+  measureText(g);
+
+  const target = REF_INK_H * SYM_INK;
+  for (let i = 0; i < GLYPH_SET.length; i++) {
+    const ch = GLYPH_SET[i];
+    if (!SYM[ch]) continue;
+    const [x0, y0] = cellXY(i);
+    // inkHeight = (extent * s + SW) / G_CELL, solved for s. SYM_H already
+    // carries a centreline symbol's body width, so one formula covers both.
+    const s = (target * G_CELL - SW) / SYM_H[ch];
+    const sym = SYM[ch];
+    glyphSym[i] = 1;
+    g.save();
+    clipCell(g, x0, y0);
+    g.translate(x0 + G_CELL / 2, y0 + G_CELL / 2);
+    g.beginPath();
+    (sym.path || sym)(g, s);
+    g.strokeStyle = hex(PAL.signStroke);
+    if (sym.body) {
+      g.lineCap = 'round';
+      g.lineWidth = sym.body * s + SW;
+      g.stroke();
+      g.lineWidth = sym.body * s;
+      g.strokeStyle = '#ffffff';
+      g.stroke();
+      g.lineCap = 'butt';
+    } else {
       g.lineWidth = SW;
-      g.strokeStyle = hex(PAL.signStroke);
       g.stroke();
       g.fillStyle = '#ffffff';
       g.fill();
-      w = 0.86 * G_CELL;
-    } else {
-      g.font = FONT(FS);
-      w = g.measureText(ch).width;
-      g.lineWidth = SW;
-      g.strokeStyle = hex(PAL.signStroke);
-      g.strokeText(ch, 0, 4);          // +4: Arial Black sits high in its box
-      g.fillStyle = '#ffffff';
-      g.fillText(ch, 0, 4);
     }
     g.restore();
-    // Tight tracking. The reference's "+99" is almost touching, which is what
-    // lets three glyphs fill a 3 m panel instead of floating in the middle.
-    glyphAdv[i] = (w + SW * 0.55) / G_CELL;
+    measureCell(g, i, x0, y0);
   }
 
   const t = new THREE.CanvasTexture(c);
@@ -158,6 +260,66 @@ function buildGlyphAtlas() {
   return t;
 }
 
+// A glyph that spills out of its cell corrupts its neighbour's picture AND its
+// neighbour's measurement, so every draw is clipped. The worst case is then one
+// clipped glyph instead of a ruined row — which a font substitution on some
+// device could otherwise hand us at any time.
+function clipCell(g, x0, y0) {
+  g.beginPath();
+  g.rect(x0, y0, G_CELL, G_CELL);
+  g.clip();
+}
+
+// Alpha bounding box of one cell → advance, ink height, and (for '0') the
+// vertical offset the whole run is corrected by. Stride 2, so a cell is 4k
+// samples rather than 16k; the 2 px of slop that costs is padded back on, and
+// 2 px in a 128 px cell is 1.5% of a glyph — well inside the margin the fitting
+// leaves anyway.
+function measureBox(data, i, x0, y0, stride) {
+  const A = 24;                                  // alpha above which a pixel is ink
+  let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+  for (let y = 0; y < G_CELL; y += 2) {
+    const rowOff = ((y0 + y) * stride + x0) * 4 + 3;
+    for (let x = 0; x < G_CELL; x += 2) {
+      if (data[rowOff + x * 4] <= A) continue;
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+  }
+  if (maxX < minX) {                             // blank cell (should not happen)
+    glyphAdv[i] = SPACE_ADV; glyphInkH[i] = 0;
+    return;
+  }
+  glyphAdv[i] = (maxX - minX + 3) / G_CELL + TRACK;   // +1 span, +2 stride slop
+  glyphInkH[i] = (maxY - minY + 3) / G_CELL;
+  if (GLYPH_SET[i] === '0') {
+    REF_INK_H = glyphInkH[i];
+    // How far the digit's ink centre sits BELOW the cell centre, in cells. A
+    // quad whose centre is at panel-centre + REF_DY*size therefore puts the
+    // digit's ink on the panel centre: the glyph quad no longer has to be
+    // centred, only the NUMBER does.
+    REF_DY = ((minY + maxY + 1) / 2 - G_CELL / 2) / G_CELL;
+  }
+}
+
+// Every text cell in one read — the symbols are not drawn yet.
+function measureText(g) {
+  const data = g.getImageData(0, 0, G_SIZE, G_SIZE).data;
+  for (let i = 0; i < GLYPH_SET.length; i++) {
+    if (SYM[GLYPH_SET[i]]) continue;
+    const [x0, y0] = cellXY(i);
+    measureBox(data, i, x0, y0, G_SIZE);
+  }
+}
+
+// One symbol, read back on its own so the second pass costs six 128² reads
+// rather than a second full-atlas one.
+function measureCell(g, i, x0, y0) {
+  measureBox(g.getImageData(x0, y0, G_CELL, G_CELL).data, i, 0, 0, G_CELL);
+}
+
 // --------------------------------------------------------------------------
 // Panel atlas
 // --------------------------------------------------------------------------
@@ -166,7 +328,7 @@ const P_CELL = 256, P_COLS = 4, P_ROWS = 4;
 export const PANEL_CELL = {
   blue: 0, yellow: 1, green: 2, red: 3, purple: 4,
   glass0: 5, glass1: 6, glass2: 7, glass3: 8,
-  button: 9, plank: 10,
+  button: 9, plank: 10, mystery: 11,
 };
 const SIGN_HEX = {
   blue: PAL.signBlue, yellow: PAL.signYellow, green: PAL.signGreen,
@@ -239,6 +401,73 @@ function drawGlassPlate(g, w, h, stage) {
   g.restore();
 }
 
+// The gamble gate. Every other sign in the game is a flat field with the answer
+// printed on it; this one has no answer to print, so it is built to look like a
+// different KIND of object rather than a purple version of the same one: a
+// steel bezel bolted over the panel, a lozenge cut out of it, and the '?' laid
+// in the hole. The lozenge is what does the work — the eye reads "a plate with
+// something behind it" before it reads the colour, and that is the whole tell:
+// this gate is hiding something.
+function drawMysteryPlate(g, w, h) {
+  const ink = Math.round(w * 0.022);
+  const rim = Math.round(w * 0.055);
+  g.fillStyle = hex(PAL.signStroke);
+  g.fillRect(0, 0, w, h);
+  g.fillStyle = hex(PAL.steel);
+  g.fillRect(ink, ink, w - ink * 2, h - ink * 2);
+  // the steel bezel's own bevel, so it sits proud of what is behind it
+  g.globalAlpha = 0.30; g.fillStyle = '#ffffff';
+  g.fillRect(ink, ink, w - ink * 2, h * 0.055);
+  g.globalAlpha = 0.28; g.fillStyle = '#000000';
+  g.fillRect(ink, h - ink - h * 0.055, w - ink * 2, h * 0.055);
+  g.globalAlpha = 1;
+
+  // The window the '?' sits in. An OCTAGON, not the diamond this started as: a
+  // diamond has almost no width where a tall glyph needs it most, so the '?'
+  // bowl and its dot both broke out through the top and bottom points and the
+  // plate read as a badge with a sticker over it. A chamfered rectangle is the
+  // same "cut through the bezel" idea and actually contains the glyph.
+  const cx = w / 2, cy = h / 2;
+  const win = (k, dy) => {
+    const rx = w * 0.435 * k, ry = h * 0.435 * k, ch = Math.min(rx, ry) * 0.42;
+    g.beginPath();
+    g.moveTo(cx - rx + ch, cy - ry + dy);
+    g.lineTo(cx + rx - ch, cy - ry + dy);
+    g.lineTo(cx + rx, cy - ry + ch + dy);
+    g.lineTo(cx + rx, cy + ry - ch + dy);
+    g.lineTo(cx + rx - ch, cy + ry + dy);
+    g.lineTo(cx - rx + ch, cy + ry + dy);
+    g.lineTo(cx - rx, cy + ry - ch + dy);
+    g.lineTo(cx - rx, cy - ry + ch + dy);
+    g.closePath();
+    g.fill();
+  };
+  g.fillStyle = hex(PAL.signStroke);
+  win(1, 0);
+  const deep = new THREE.Color(PAL.signPurple).multiplyScalar(0.52);
+  g.fillStyle = '#' + deep.getHexString();
+  win(0.94, 0);
+  g.fillStyle = hex(PAL.signPurple);
+  win(0.86, h * 0.012);
+  // a soft top-lit sheen inside the window
+  g.save();
+  g.beginPath();
+  const rx = w * 0.435 * 0.86, ry = h * 0.435 * 0.86, ch = Math.min(rx, ry) * 0.42;
+  g.rect(cx - rx, cy - ry, rx * 2, ry * 2 - ch);
+  g.clip();
+  g.globalAlpha = 0.22; g.fillStyle = '#ffffff';
+  g.fillRect(0, 0, w, h * 0.40);
+  g.globalAlpha = 1;
+  g.restore();
+
+  // bolts in the four corners of the bezel — the same fastening language as the
+  // button plate, so the two "mechanism" gates read as a family
+  g.fillStyle = hex(PAL.signStroke);
+  for (const [px, py] of [[0.075, 0.085], [0.925, 0.085], [0.075, 0.915], [0.925, 0.915]]) {
+    g.beginPath(); g.arc(px * w, py * h, w * 0.030, 0, Math.PI * 2); g.fill();
+  }
+}
+
 function drawButtonPlate(g, w, h) {
   const b = Math.round(w * 0.05);
   g.fillStyle = hex(PAL.signStroke);
@@ -301,6 +530,7 @@ function buildPanelAtlas() {
   for (let s = 0; s < 4; s++) cell(PANEL_CELL['glass' + s], (x) => drawGlassPlate(x, P_CELL, P_CELL, s));
   cell(PANEL_CELL.button, (x) => drawButtonPlate(x, P_CELL, P_CELL));
   cell(PANEL_CELL.plank, (x) => drawPlanks(x, P_CELL, P_CELL));
+  cell(PANEL_CELL.mystery, (x) => drawMysteryPlate(x, P_CELL, P_CELL));
 
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
@@ -309,7 +539,12 @@ function buildPanelAtlas() {
   return t;
 }
 
-export const panelCellFor = (type) => PANEL_CELL[EFFECTS[type]?.sign || 'blue'] ?? 0;
+// The gamble gate breaks the "sign colour is the tell" rule on purpose — it is
+// the one gate whose payload you cannot read off it — so it gets its own plate
+// rather than the purple field a `♥` or `⚡` gate uses. Everything else maps
+// straight through EFFECTS[type].sign.
+export const panelCellFor = (type) =>
+  (type === 'gamble' ? PANEL_CELL.mystery : PANEL_CELL[EFFECTS[type]?.sign || 'blue']) ?? 0;
 
 // The colour a gate of this type "is". Wood panels get it baked into the atlas;
 // glass panes get it as an instance tint over the neutral pane, so glass keeps
@@ -489,36 +724,136 @@ export function splitLabel(text) {
   return _split;
 }
 
-function runWidth(text, size) {
+// Ink width of a run at glyph size `size`, horizontally squeezed by `xs`.
+function runWidth(text, size, xs) {
   let w = 0;
   for (let i = 0; i < text.length; i++) {
     const c = glyphCell.get(text[i]);
-    w += c === undefined ? SPACE_ADV * size : glyphAdv[c] * size;
+    w += c === undefined ? SPACE_ADV : glyphAdv[c];
   }
-  return w;
+  return w * size * xs;
+}
+
+// Ink height of the TALLEST glyph in the run, in cells. A run of digits is
+// REF_INK_H; a run that is a single '▲' is much taller, and sizing off this is
+// what keeps a symbol from bursting out of the top of its panel.
+function runInkH(text) {
+  let h = 0;
+  for (let i = 0; i < text.length; i++) {
+    const c = glyphCell.get(text[i]);
+    if (c !== undefined && glyphInkH[c] > h) h = glyphInkH[c];
+  }
+  return h || REF_INK_H;
+}
+
+// --------------------------------------------------------------------------
+// Fitting
+// --------------------------------------------------------------------------
+// THE RULE: A LABEL NEVER OVERFLOWS ITS PANEL, AND LOSES HEIGHT LAST.
+//
+// The mechanic drives every gate toward more digits — `+1` becomes `+358` under
+// sustained fire — so "lay glyphs at a fixed advance and hope" is not a policy,
+// it is a countdown. But the obvious fix, scaling the whole run down until it
+// fits, is what made a grown gate unreadable: four glyphs at a uniform 0.57
+// scale put `+360` at 27% of the panel height, a third the size of the `+3`
+// next to it, exactly when the number matters most.
+//
+// So we squeeze the way `toon.js:signText` does for the baked path: keep the
+// cap height, compress the advance and the glyph width together. A condensed
+// digit loses nothing at 40 m — its stroke is still the same weight vertically
+// and it is still the full height of the sign. Only when the squeeze passes
+// XS_MIN does the height start to give, and even then it gives at 1/XS_MIN of
+// the rate. `+360` lands at 44% of the panel instead of 27%, and `+24` at 58%.
+//
+// The three numbers, and why:
+//   FIT_W   0.85  the coloured field inside the plate's border is 0.86 of the
+//                 panel; the reference's "+99" runs right to that edge, so this
+//                 leaves the glyph's dark stroke a half-centimetre clear of the
+//                 plate's dark rim instead of merging into it.
+//   CAP_1   0.62  a single line's cap height. The reference's is ~0.65 of the
+//                 panel, measured off ref1's "+99".
+//   XS_MIN  0.62  a digit's natural ink is 0.84 as wide as it is tall; at 0.62
+//                 it is 0.52, which is condensed but still unmistakably fat.
+const FIT_W = 0.85;
+const CAP_1 = 0.62;
+const CAP_BIG = 0.44;              // the symbol line of a split label
+const CAP_SMALL = 0.19;            // the word under it
+const XS_MIN = 0.62;
+// A label that is ONE hand-drawn symbol and nothing else is a poster, not a
+// number: the gamble gate's '?' is the only sign in the game that does not say
+// what it does, so it has to be the loudest thing on the road. It has no
+// second glyph competing for the width, so it can take the height a number
+// cannot. Restricted to symbols on purpose — a barrier counting 10 → 9 must not
+// suddenly jump a size on its last digit.
+const CAP_HERO = 0.70;
+const isHero = (big, small) => {
+  if (small || big.length !== 1) return false;
+  const c = glyphCell.get(big);
+  return c !== undefined && !!glyphSym[c];
+};
+
+const _fit = { size: 0, xs: 1, w: 0 };
+function fitRun(text, capH, maxW) {
+  let size = capH / runInkH(text);
+  let xs = 1;
+  const w = runWidth(text, size, 1);
+  if (w > maxW) {
+    xs = maxW / w;
+    // Past the floor, trade height for width at the floor's rate rather than
+    // squeezing further — 0.5-wide glyphs stop reading before small ones do.
+    if (xs < XS_MIN) { size *= xs / XS_MIN; xs = XS_MIN; }
+  }
+  _fit.size = size; _fit.xs = xs;
+  _fit.w = Math.min(w, maxW);
+  return _fit;
+}
+
+/**
+ * Width, glyph size and squeeze a label would get in a panel of `pw` x `ph`.
+ * Nothing in the run uses it — `dev/t_gates.html` does, so the fit can be
+ * asserted in numbers instead of squinted at in a screenshot.
+ */
+export function labelMetrics(text, pw, ph) {
+  if (!matCache) initSigns();
+  const { big, small } = splitLabel(text);
+  const f = fitRun(big, ph * (small ? CAP_BIG : isHero(big, small) ? CAP_HERO : CAP_1), pw * FIT_W);
+  const out = { text, big, small, w: f.w, size: f.size, xs: f.xs, cap: 0, smallW: 0, fits: false };
+  out.cap = f.size * runInkH(big);
+  if (small) {
+    const g = fitRun(small, ph * CAP_SMALL, pw * FIT_W);
+    out.smallW = g.w;
+  }
+  out.fits = out.w <= pw * FIT_W + 1e-4 && out.smallW <= pw * FIT_W + 1e-4;
+  return out;
 }
 
 // Write one run of glyphs as instance matrices. `tilt` leans the quad back about
 // X exactly as the panel does, so the number sits ON the sign rather than
-// hovering in front of it.
-function writeRun(slot, limit, text, cx, cy, cz, size, tiltC, tiltS) {
+// hovering in front of it. `xs` squeezes x only: the quad is scaled `size * xs`
+// across and `size` tall, so the glyph condenses and never shrinks.
+function writeRun(slot, limit, text, cx, cy, cz, size, xs, tiltC, tiltS) {
   let n = 0;
-  const total = runWidth(text, size);
+  const total = runWidth(text, size, xs);
   let px = -total / 2;                 // screen-space, left edge of the run
+  const sx = size * xs;
+  // Recentre the digit's ink on the panel; see REF_DY. Up the panel's local y
+  // is +y*cos and +z*sin, exactly as in label().
+  const dy = REF_DY * size;
+  const oy = cy + dy * tiltC, oz = cz + dy * tiltS;
   for (let i = 0; i < text.length && slot + n < limit; i++) {
     const cell = glyphCell.get(text[i]);
-    const adv = cell === undefined ? SPACE_ADV * size : glyphAdv[cell] * size;
+    const adv = (cell === undefined ? SPACE_ADV : glyphAdv[cell]) * sx;
     if (cell !== undefined) {
       const lx = px + adv / 2;
       const o = (slot + n) * 16;
-      // rotX(tilt) * scale(size), translated. Written by hand: a Matrix4
+      // rotX(tilt) * scale(sx, size, 1), translated. Written by hand: a Matrix4
       // compose per glyph per frame is measurable at 500 glyphs.
-      glyphArr[o] = size;      glyphArr[o + 1] = 0;             glyphArr[o + 2] = 0;             glyphArr[o + 3] = 0;
+      glyphArr[o] = sx;        glyphArr[o + 1] = 0;             glyphArr[o + 2] = 0;             glyphArr[o + 3] = 0;
       glyphArr[o + 4] = 0;     glyphArr[o + 5] = tiltC * size;  glyphArr[o + 6] = tiltS * size;  glyphArr[o + 7] = 0;
       glyphArr[o + 8] = 0;     glyphArr[o + 9] = -tiltS * size; glyphArr[o + 10] = tiltC * size; glyphArr[o + 11] = 0;
       glyphArr[o + 12] = cx + SCREEN_X * lx;
-      glyphArr[o + 13] = cy;
-      glyphArr[o + 14] = cz;
+      glyphArr[o + 13] = oy;
+      glyphArr[o + 14] = oz;
       glyphArr[o + 15] = 1;
       glyphCells.array[slot + n] = cell;
       n++;
@@ -555,31 +890,27 @@ export function labelWriter(band) {
       if (cur + LBL_CAP > limit) return false;
       const slot = cur;
       const tc = Math.cos(tilt), ts = Math.sin(tilt);
-      const maxW = pw * 0.85;
+      const maxW = pw * FIT_W;
       let n = 0;
       if (small) {
         // symbol over word: the symbol carries the meaning at distance, the
         // word confirms it once you are close enough to read it.
-        let s1 = ph * 0.54;
-        const w1 = runWidth(big, s1);
-        if (w1 > maxW) s1 *= maxW / w1;
+        let f = fitRun(big, ph * CAP_BIG, maxW);
         // Moving up the panel's local y also moves +z, because the panel leans
         // back. Getting this sign backwards pushes the LOWER line behind the
         // panel it belongs to and the depth test eats it — the sign renders
         // with its symbol and no word, which looks like a font problem and is
         // not one.
-        const y1 = ph * 0.19;
-        n += writeRun(slot + n, limit, big, cx, cy + y1 * tc, cz + y1 * ts, s1, tc, ts);
-        let s2 = ph * 0.25;
-        const w2 = runWidth(small, s2);
-        if (w2 > maxW) s2 *= maxW / w2;
-        const y2 = -ph * 0.27;
-        n += writeRun(slot + n, limit, small, cx, cy + y2 * tc, cz + y2 * ts, s2, tc, ts);
+        const y1 = ph * 0.17;
+        n += writeRun(slot + n, limit, big, cx, cy + y1 * tc, cz + y1 * ts, f.size, f.xs, tc, ts);
+        f = fitRun(small, ph * CAP_SMALL, maxW);
+        const y2 = -ph * 0.28;
+        n += writeRun(slot + n, limit, small, cx, cy + y2 * tc, cz + y2 * ts, f.size, f.xs, tc, ts);
       } else {
-        let s1 = ph * 0.80;   // the number is the sign; leave it a hair of margin
-        const w1 = runWidth(big, s1);
-        if (w1 > maxW) s1 *= maxW / w1;
-        n += writeRun(slot + n, limit, big, cx, cy, cz, s1, tc, ts);
+        // The number IS the sign. It gets the full cap height and gives up
+        // width first — see fitRun.
+        const f = fitRun(big, ph * (isHero(big, small) ? CAP_HERO : CAP_1), maxW);
+        n += writeRun(slot + n, limit, big, cx, cy, cz, f.size, f.xs, tc, ts);
       }
       cur = slot + LBL_CAP;
       return true;
@@ -618,6 +949,7 @@ export function signTexture(spec = {}) {
   return canvasTex(key, S, S, (g, w, h) => {
     if (panel === 'glass') drawGlassPlate(g, w, h, 0);
     else if (panel === 'button') drawButtonPlate(g, w, h);
+    else if (type === 'gamble') drawMysteryPlate(g, w, h);
     else drawSignPlate(g, w, h, SIGN_HEX[EFFECTS[type]?.sign || 'blue']);
     if (value == null) return;
     const text = EFFECTS[type]?.fmt ? EFFECTS[type].fmt(value) : String(value);

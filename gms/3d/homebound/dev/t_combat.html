@@ -49,10 +49,32 @@ const CASE = Q.get('case') || 'block';
 const TROOPS = parseInt(Q.get('troops') || '0', 10) || 200;
 const TIER = parseInt(Q.get('tier') || '0', 10) || 0;
 
+// `count` here is the LEVELDEF's balance number, not the crowd size —
+// enemies.js decides how many bodies to draw for it (see its header). So the
+// interesting cases to stage are the two ENDS of that mapping, not one middle:
+// `small` is what a real early level actually asks for and is the case that
+// used to render as three ranks of red, and `block` is a late-chapter fight.
+// Both should fill the road and run 15 m+ up it; if `small` does not, BODY_MIN
+// is wrong.
+//
+// WARNING: this bench stages everything at z 24-40 with the squad parked, which
+// FLATTERS block depth — the whole formation is inside the near half of the
+// frame and nothing is fogged. Tune here, but sign off on a real-game frame:
+//   node dev/shot.mjs '?dev&start=run&level=12&troops=150' out.png --steps 500
 const CASES = {
   // The reference frame: a dense rectangle filling the road, close enough that
   // the leading edge is inside the muzzle bloom.
   block: [{ kind: 'enemy', z: 26, x: 0, w: 11, count: 260, tier: 0, form: 'block', speed: 0 }],
+  // What levels.js actually emits around level 12. Mechanically worth five men;
+  // it must still read as a wall.
+  small: [{ kind: 'enemy', z: 26, x: 0, w: 9, count: 5, tier: 0, form: 'block', speed: 0 }],
+  // The dodgeable one. `w` is read as a FRACTION of the road, so this has to
+  // leave a lane open at the far side and stay off the parapet.
+  lane: [{ kind: 'enemy', z: 28, x: -3.6, w: 6, count: 40, tier: 0, form: 'block', speed: 0 }],
+  // Two walls inside the stream window at once — the case that makes them share
+  // the body pool.
+  pair: [{ kind: 'enemy', z: 26, x: 0, w: 9, count: 40, tier: 0, form: 'block', speed: 0 },
+         { kind: 'enemy', z: 62, x: 0, w: 9, count: 90, tier: 0, form: 'block', speed: 0 }],
   // Same, but walking in.
   column: [{ kind: 'enemy', z: 40, x: 0, w: 10, count: 180, tier: 0, form: 'column', speed: 3 }],
   skirmish: [{ kind: 'enemy', z: 30, x: 0, w: 5.2, count: 40, tier: 1, form: 'skirmish', speed: 0 }],
@@ -114,10 +136,15 @@ function step(dt) {
   updateCamera(dt);
   render();
   const b = bossState();
+  // Staging read-out. `?dev` publishes __hbEnemies; without it this line is
+  // simply absent. Width and depth are the two numbers this bench exists for —
+  // a block that is not ~10 m wide and 15 m+ deep is not the reference.
+  const gs = window.__hbEnemies?.dump?.() || [];
   hudEl.textContent =
     `${CASE}  ${drawCalls()} calls\n` +
     `troops ${state.troops}  tier ${state.tier}\n` +
     `enemies ${enemyCount()}\n` +
+    gs.map((g) => `${g.form} ${g.alive}/${g.bodies}  ${g.width}x${g.depth}m\n`).join('') +
     (b ? `boss ${Math.round(b.hp)}/${b.max}\n` : '') +
     `t ${t.toFixed(1)}s`;
 }

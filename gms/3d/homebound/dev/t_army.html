@@ -20,11 +20,17 @@
 import * as THREE from 'three';
 import { TIERS, PAL } from '../js/config.js';
 import { flatMat } from '../js/toon.js';
-import { makeTierCrowd, tierHover } from '../js/units.js';
+import { makeTierCrowd, tierHover, tierSpacing } from '../js/units.js';
 
 const Q = new URLSearchParams(location.search);
 const ONLY = Q.get('tier');                 // one tier, filling the frame
 const TOP = Q.has('top');                   // the game's camera angle
+// ?mob=<tier> packs a real-sized block at the RUN camera's distance and angle.
+// The bench is for modelling; this is the only view on it worth a colour
+// decision, because a unit that looks great at 3 m is a blue blob at 25 m and
+// 25 m is the game. Even so: sign off on dev/shot.mjs frames, never on here.
+const MOB = Q.get('mob');
+const MOBN = parseInt(Q.get('n') || '150', 10) || 150;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -52,12 +58,13 @@ ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
 
-const list = ONLY ? TIERS.filter((t) => t.id === ONLY) : TIERS;
+const list = MOB ? TIERS.filter((t) => t.id === MOB)
+  : ONLY ? TIERS.filter((t) => t.id === ONLY) : TIERS;
 const crowds = list.map((t, k) => {
   const i = TIERS.indexOf(t);
-  const c = makeTierCrowd(i, { max: 8 });
+  const c = makeTierCrowd(i, { max: MOB ? MOBN : 8 });
   scene.add(c.group);
-  c.count = ONLY ? 3 : 1;
+  c.count = MOB ? MOBN : ONLY ? 3 : 1;
   c.i = i; c.k = k;
   return c;
 });
@@ -70,11 +77,21 @@ for (const c of crowds) {
 
 const COLS = ONLY ? 3 : 8;
 const GAPX = ONLY ? 2.2 : 3.6, GAPZ = 4.2;
+// Same golden-angle disc army.js lays the squad out on, at the same spacing,
+// so the packing that the palette has to survive is the real one.
+const GOLDEN = Math.PI * (3 - Math.sqrt(5));
 function place(t) {
   for (const c of crowds) {
     const t2 = TIERS[c.i];
     const y = tierHover(c.i);
-    if (ONLY) {
+    if (MOB) {
+      const sp = tierSpacing(c.i);
+      const cc = Math.sqrt((sp.x * sp.z) / Math.PI);
+      for (let j = 0; j < MOBN; j++) {
+        const r = Math.sqrt(j + 0.5) * cc, ang = j * GOLDEN;
+        c.set(j, Math.cos(ang) * r, y, Math.sin(ang) * r, t2.scale, 0, 1, j * 1.7);
+      }
+    } else if (ONLY) {
       for (let j = 0; j < 3; j++) {
         c.set(j, (j - 1) * GAPX, y, 0, t2.scale, j === 1 ? 0 : (j - 1) * 0.7, 1, j * 2.1);
       }
@@ -88,9 +105,11 @@ function place(t) {
 }
 
 document.getElementById('lbl').textContent =
-  (ONLY ? ONLY.toUpperCase() : list.map((t) => t.name).join('  ·  ')) + (TOP ? '  [top]' : '');
+  (MOB ? `${MOB.toUpperCase()} x${MOBN}  [run camera]`
+       : ONLY ? ONLY.toUpperCase() : list.map((t) => t.name).join('  ·  ')) + (TOP ? '  [top]' : '');
 
-if (ONLY) camera.position.set(0, 2.0, -6.4), camera.lookAt(0, 0.95, 0);
+if (MOB) camera.position.set(0, 17, -21), camera.lookAt(0, 0.6, 5);
+else if (ONLY) camera.position.set(0, 2.0, -6.4), camera.lookAt(0, 0.95, 0);
 else if (TOP) camera.position.set(0, 13, -13), camera.lookAt(0, 0.6, -2.1);
 else camera.position.set(0, 5.0, -26), camera.lookAt(0, 1.0, 0);
 

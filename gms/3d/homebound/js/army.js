@@ -252,7 +252,17 @@ export function killTroops(count, reason = 'kill') {
     state.shield -= absorbed;
     want -= absorbed;
   }
-  if (state.armour > 0) want = Math.floor(want * (1 - state.armour));
+  // Unbiased probabilistic rounding, NOT Math.floor. Flooring a fractional
+  // reduction is a rounding lottery at the squad sizes chapter 1 is played at:
+  // at armour 0.05, floor(1 * 0.95) is 0, so one level of the upgrade made the
+  // player permanently immune to every single-man loss and did nothing else —
+  // which reads to the player as "armour does nothing" because the only losses
+  // it ever changed were the ones too small to notice. Rounding by chance
+  // honours the fraction in expectation: 5% armour costs a man 95% of the time.
+  if (state.armour > 0) {
+    const reduced = want * (1 - state.armour);
+    want = Math.floor(reduced) + (Math.random() < (reduced % 1) ? 1 : 0);
+  }
   const lost = Math.min(want, state.troops);
   if (lost <= 0) {
     if (want !== count) emit('army:count', { count: state.troops, delta: 0, reason });

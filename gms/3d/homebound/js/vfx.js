@@ -941,6 +941,11 @@ export function initVfx(ctx) {
     on('army:count', (e) => {
       const d = e?.delta || 0;
       if (!d) return;
+      // A promotion converts a hundred men into thirty and reports it as a
+      // delta of -70. That is a REWARD; flashing the screen red for it would
+      // teach the player that the one unambiguously good gate is a trap.
+      // hud.js has the tier banner, so this stays out of the way entirely.
+      if (e.reason === 'promote') return;
       const x = state.x, z = state.z + 1.2;
       if (d < 0) {
         floatNumber({ x, y: 1.6, z }, String(d), '#ff5b52');

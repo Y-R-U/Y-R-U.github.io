@@ -129,10 +129,25 @@ export const RUN = {
 // the only way the reference look and 60 fps coexist.
 // --------------------------------------------------------------------------
 export const GUN = {
+  // THE PREMISE OF THE GAME LIVES ON THIS NUMBER. Bullets originate within
+  // `laneHalf` of the LEADER, not at the man who fired them, and travel
+  // parallel — so the squad's fire is a column one lane wide at every distance.
+  //
+  // Firing straight down +Z from each man's own position meant an eighty-strong
+  // blob was five metres across and sprayed all three lanes at once: "shoot the
+  // gate you want" was a fiction, every wooden gate in a row grew equally and
+  // every pane of glass shattered before you reached it, so a three-choice row
+  // silently collapsed to one. Converging on a point failed the same way for a
+  // different reason — past the convergence point the fire splays out again and
+  // sweeps the whole road, and gates are decided at 40-60 m.
+  //
+  // The muzzle flashes stay on the real men. Only the bullets move to the lane,
+  // exactly as `fireCap` visible shooters already stand in for the whole squad.
+  laneHalf: 1.2,             // gates are 3.45 m wide on a 3.6 m lane pitch
   fireCap: 26,               // most units that actually spawn tracers
   bulletSpeed: 78,
   bulletLife: 1.6,
-  spread: 0.055,
+  spread: 0.015,             // parallel-ish: 0.055 was +/-3.3 m at 60 m, two lanes wide
   range: 62,
   poolSize: 420,
 };
@@ -153,7 +168,21 @@ export const GATE = {
   // number climb faster, because the number IS what the gun is for.
   growDmgScale: 0.85,        // 0 = hits only, 1 = fully proportional to dmgMul
   growMax: 24,               // multiple of the gate's base value
-  glassHp: 30,
+
+  // Glass durability is denominated in SECONDS OF THE SQUAD'S OWN FIRE, not in
+  // flat hit points, because squad dps spans three orders of magnitude between
+  // level 1 and chapter 4. A flat 30 hp meant a one-man squad could study a
+  // glass gate for five seconds while an eighty-man squad vaporised it in 0.4 —
+  // so past the opening levels every glass pane in the firing lane shattered
+  // before the player reached it, and a three-choice row silently collapsed to
+  // one. Denominated this way, "break the glass" is always the same deliberate
+  // commitment whatever the army is, and glass stays a gate you can take.
+  // Long enough that a normal approach does not shatter the pane you were
+  // steering for, short enough that deliberately parking in its lane does. The
+  // approach window is about 5.4 s, so committing early breaks it and arriving
+  // late takes it — which is the skill.
+  glassSeconds: 4.5,
+  glassHp: 30,               // floor, for a squad too small for the rate to matter
   approachFade: 26,          // metres over which a gate FINISHES fading in;
                              // gates.js spawns them well before this so a row is
                              // readable with time to steer, not 2s before impact

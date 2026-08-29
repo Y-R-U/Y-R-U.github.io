@@ -19,7 +19,7 @@
 
 import * as THREE from 'three';
 import { GATE, EFFECTS, PAL, DEV_MODE } from './config.js';
-import { state } from './state.js';
+import { state, squadDps } from './state.js';
 import { emit } from './bus.js';
 import { clamp, smoothstep, fmt } from './utils.js';
 import {
@@ -28,28 +28,32 @@ import {
   cbox, ccone, cmerge,
 } from './signs.js';
 
-// MANAGER: three requests, all in frozen files.
+// MANAGER: one open request, and one finding you asked for.
 //
-// 1. `input.js` steers the wrong way. The camera looks along +Z, so three's
-//    lookAt puts screen-right on world -X; `move()` adds a positive drag delta
-//    to `state.targetX`, which slides the squad screen-LEFT. Same for the
+// 1. OPEN — `input.js` steers the wrong way. The camera looks along +Z, so
+//    three's lookAt puts screen-right on world -X; `move()` adds a positive drag
+//    delta to `state.targetX`, which slides the squad screen-LEFT. Same for the
 //    ArrowRight key. Negating `RUN.dragScale`'s sign at the two call sites fixes
 //    it. Gate lanes are laid out in world x, so this decides which sign the
 //    player thinks they are steering at.
 //
-// 2. `GATE.approachFade = 26` read literally as "gates appear 26 m out" gives
-//    2.0 s between seeing a row and crossing it at `RUN.speed`. That is not
-//    enough time to read three signs and pick one, and the reference frames
-//    show gates a long way down the road. This file treats `approachFade` as
-//    the distance the pop-in has FINISHED by, and spawns at 2.6x that (68 m,
-//    exactly the fog near plane). If you would rather it be literal, raise
-//    `GATE.approachFade` to ~68 and I will drop the multiplier.
+// 2. FINDING, no change wanted — `GATE.width` / `GATE.height` are fine as they
+//    are, and I am not asking for them to move. Once a label is more than one
+//    glyph its size is set by the panel's WIDTH, not its height: three digits
+//    have to share the width, and PANEL_W is already 3.45 m against a 3.6 m
+//    lane pitch, so the panels of a full row of three nearly touch and cannot
+//    grow. Making the panel TALLER would buy nothing — for anything past two
+//    glyphs the cap height that comes out of the fit depends only on the width
+//    budget and the squeeze floor (see signs.js:fitRun), so a taller sign would
+//    give a bigger `+1` and an identical `+360`. The readability at CAM.back 21
+//    was bought inside signs.js instead: a digit now fills 62% of the panel
+//    height where it filled 43%, because the glyph is sized off its INK rather
+//    than off its atlas cell, which was 41% padding.
 //
-// 3. Nothing consumes a *request* to change the troop count. `barriers.js` emits
-//    `army:count {count, delta, reason:'barrier'}` when the squad bodies a live
-//    wall, as briefed, but `army:count` is currently only an announcement that
-//    army.js publishes. Either army.js should listen for it, or game.js should
-//    map `reason:'barrier'` onto `killTroops`. Until then a wall hit is free.
+// Both previous requests here are resolved: `approachFade` is now documented as
+// the distance the fade finishes by, so the 2.6x spawn multiplier below is the
+// intended reading, and game.js maps `army:count {reason:'barrier'}` onto
+// killTroops, so bodying a live wall costs men.
 
 // --------------------------------------------------------------------------
 // Geometry constants. The panel is deliberately as tall as the whole gate: the
@@ -96,6 +100,13 @@ const halfW = (g) => PANEL_W * 0.5 * (g.w / G_W);
 // Module state
 // --------------------------------------------------------------------------
 let sceneRef = null;
+// What a pane of glass is worth right now. Sampled at spawn rather than every
+// frame: a gate that got tougher while you were shooting it would be unreadable,
+// and a row spawned together should be internally consistent.
+function glassHpNow() {
+  return Math.max(GATE.glassHp, squadDps() * GATE.glassSeconds);
+}
+
 let frameMesh = null, faceMesh = null, glassMesh = null, shardMesh = null;
 let faceCells = null, glassCells = null;
 let frameArr = null, faceArr = null, glassArr = null, shardArr = null;
@@ -247,7 +258,10 @@ function acquire(def) {
   // A gate grows if the level says so AND the effect table allows it AND it is
   // not glass. Glass is the fixed-price option — that is what it is *for*.
   g.grow = !!def.grow && g.panel !== 'glass' && (EFFECTS[g.type]?.grow !== false);
-  g.hpMax = g.panel === 'glass' ? (def.hp || GATE.glassHp) : (def.hp || GATE.glassHp);
+  // Glass is priced in seconds of the squad's fire (see GATE.glassSeconds).
+  // A level may still pin an explicit `hp` when it wants a specific pane to be
+  // a set-piece rather than a choice.
+  g.hpMax = def.hp || (g.panel === 'glass' ? glassHpNow() : GATE.glassHp);
   g.hp = g.hpMax;
   g.cell = g.panel === 'button' ? PANEL_CELL.button
     : g.panel === 'glass' ? PANEL_CELL.glass0
@@ -323,9 +337,19 @@ function hitGate(g, damage = 1) {
 
   if (!g.grow) return false;      // a wood trap is not negotiable either
 
+  // FIREPOWER has to be visible on the sign. Growth used to count HITS and
+  // ignore damage, which made the damage upgrade completely inert through the
+  // opening chapter — there is nothing to shoot but gates there, so the player
+  // bought the upgrade that sounds most important and watched nothing change.
+  //
+  // It is deliberately not fully proportional: at 1.0 a late-game gun would
+  // slam every gate into `growMax` in a fraction of a second and the choice of
+  // WHERE to point it would stop mattering. `growDmgScale` 0.85 keeps a better
+  // gun visibly faster on the number while leaving the cap worth aiming for.
+  const mul = 1 + (state.dmgMul - 1) * GATE.growDmgScale;
   const cap = g.base * GATE.growMax;
   if (g.value >= cap) return false;
-  g.value = Math.min(cap, g.value + GATE.growFlat + g.value * GATE.growPerHit);
+  g.value = Math.min(cap, g.value + (GATE.growFlat + g.value * GATE.growPerHit) * mul);
   relabel(g);
   emit('gate:grow', { gate: g, value: g.value });
   return true;

@@ -315,11 +315,15 @@ function fireStream(dt, interval) {
   for (let s = 0; s < shots; s++) {
     const i = shotIdx++ % k;
     const x = pos[i * 3], y = pos[i * 3 + 1] || 1.28, z = pos[i * 3 + 2];
+    // The bullet leaves from the LEADER'S lane; the flash stays on the man who
+    // fired it. See GUN.laneHalf — a parallel volley from the whole blob is as
+    // wide as the blob and hits every gate in the row at once.
+    const bx = state.x + rand(-GUN.laneHalf, GUN.laneHalf);
     let dx = rand(-GUN.spread, GUN.spread);
     let dy = rand(-0.004, 0.014);
     const inv = 1 / Math.hypot(dx, dy, 1);
     dx *= inv; dy *= inv;
-    spawn(x, y, z + 0.35, dx, dy, inv, GUN.bulletSpeed, per, 0, pierceN, len);
+    spawn(bx, y, z + 0.35, dx, dy, inv, GUN.bulletSpeed, per, 0, pierceN, len);
     muzzleFlash(x, y + 0.06, z + 0.5, flashScale);
   }
 

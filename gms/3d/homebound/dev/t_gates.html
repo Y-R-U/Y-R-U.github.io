@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <title>HOMEBOUND — gate bench</title>
+<!-- The bench has no icon of its own, and without this Chrome asks for
+     /favicon.ico, gets a 404, and dev/shot.mjs exits 2 on a clean frame. -->
+<link rel="icon" href="data:," />
 <style>
   html,body{margin:0;height:100%;background:#8fb4cc;overflow:hidden}
   #stage{position:fixed;inset:0}
@@ -38,7 +41,7 @@ import { PAL, ROAD, GATE, RUN } from '../js/config.js';
 import { state } from '../js/state.js';
 import { on } from '../js/bus.js';
 import { initRender, ctx, updateCamera, render, drawCalls } from '../js/render.js';
-import { initSigns, panelMaterial } from '../js/signs.js';
+import { initSigns, panelMaterial, labelMetrics } from '../js/signs.js';
 import { initGates, resetGates, updateGates, gateHitTest, gateChoices } from '../js/gates.js';
 import { initBarriers, resetBarriers, updateBarriers, barrierHitTest } from '../js/barriers.js';
 
@@ -91,7 +94,11 @@ row(240, [{ panel: 'glass', effect: { type: 'loss', value: 30 }, grow: false },
           { panel: 'button', effect: { type: 'power', value: 8 }, grow: false, action: 'bridge' },
           { panel: 'glass', effect: { type: 'troops', value: 50 }, grow: false }]);
 row(290, [{ effect: { type: 'troops', value: 3 }, x: -3.6 },
+          { effect: { type: 'gamble', value: 1 }, x: 0, grow: false },
           { effect: { type: 'power', value: 8 }, x: 3.6, grow: false }]);
+// the gamble gate again, alone and up close, because its whole job is to be
+// unmistakable at a glance and that is only checkable in a screenshot
+row(380, [{ effect: { type: 'gamble', value: 1 }, x: 0, grow: false }]);
 items.push({ kind: 'barrier', z: 330, x: -3.6, w: 5, hp: 140, value: 140 });
 items.push({ kind: 'barrier', z: 330, x: 3.6, w: 5, hp: 900, value: 900 });
 items.sort((a, b) => a.z - b.z);
@@ -133,6 +140,40 @@ function fire(dt) {
     if (b) b.hit(3.0);
   }
 }
+
+// --- the fit table -------------------------------------------------------
+// Overflow is a numbers bug, not a taste one: either the ink of a label is
+// inside its panel or it is not. `window.__fit()` answers that for every string
+// the game can put on a sign, so a regression shows up as a FAIL in a headless
+// run instead of as a trailing digit hanging off a sign three screenshots later.
+//
+// Panel box is gates.js's PANEL_W x PANEL_H (GATE.width * 1.08 by
+// GATE.height * 1.10); barrier box is barriers.js's NUM_BOX_W x NUM_BOX_H.
+const G_PANEL = [GATE.width * 1.08, GATE.height * 1.10];
+const B_PANEL = [6 * 0.92, 2.30 * 1.06];
+const CASES = [
+  ['+1', G_PANEL], ['+3', G_PANEL], ['+24', G_PANEL], ['+99', G_PANEL],
+  ['+360', G_PANEL], ['+1.2K', G_PANEL], ['+24.6K', G_PANEL],
+  ['×2', G_PANEL], ['×12', G_PANEL], ['÷2', G_PANEL],
+  ['▲ PROMOTE', G_PANEL], ['⌖ GUN +3', G_PANEL], ['⌖ GUN +12', G_PANEL],
+  ['♥ 20', G_PANEL], ['⚡ 8s', G_PANEL], ['$40', G_PANEL], ['$1.4K', G_PANEL],
+  ['-30', G_PANEL], ['-300', G_PANEL], ['?', G_PANEL],
+  ['49', B_PANEL], ['140', B_PANEL], ['300', B_PANEL], ['1.2K', B_PANEL],
+];
+window.__fit = () => {
+  const rows = CASES.map(([t, [pw, ph]]) => {
+    const m = labelMetrics(t, pw, ph);
+    return {
+      text: t, panel: `${pw.toFixed(2)}x${ph.toFixed(2)}`,
+      ink: +m.w.toFixed(3), max: +(pw * 0.85).toFixed(3),
+      pctOfPanel: +(m.w / pw).toFixed(3),
+      cap: +m.cap.toFixed(3), capPct: +(m.cap / ph).toFixed(3),
+      xs: +m.xs.toFixed(3), smallW: +m.smallW.toFixed(3),
+      fits: m.fits && m.w <= pw,
+    };
+  });
+  return { rows, allFit: rows.every((r) => r.fits) };
+};
 
 // ?atlas dumps the two atlas canvases straight onto the page, so a bad cell is
 // diagnosed by looking at the atlas rather than at a 40 px sign in a 3D scene.

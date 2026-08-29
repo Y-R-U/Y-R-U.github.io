@@ -14,6 +14,7 @@
 //      on a phone starts glitching and the mix turns to mud anyway.
 
 import { P } from './save.js';
+import { on } from './bus.js';
 import { TIERS } from './config.js';
 
 let actx = null;             // created on the first gesture, never before
@@ -47,7 +48,22 @@ export function initAudio() {
   for (const ev of ['pointerdown', 'touchstart', 'keydown', 'mousedown']) {
     window.addEventListener(ev, wake, { once: true, passive: true });
   }
+
+  // gates.js does not call `sfx` — it announces on the bus and leaves the mix
+  // to whoever owns it, which is this file. Subscribing here rather than asking
+  // for calls in a frozen module keeps the gate verbs audible without anyone
+  // else having to know what a chime is.
+  on('gate:pass', () => sfx('gate'));
+  on('gate:press', () => sfx('gate', { vol: 1.2 }));
+  on('gate:grow', (e) => { growStep = (growStep + 1) % 12; sfx('grow', { step: growStep }); });
+  on('effect:apply', (e) => { if (e?.type === 'cash') sfx('coin'); });
+  on('army:tier', () => { growStep = 0; });
 }
+
+// Each successive hit on the same gate walks a semitone up. It is the oldest
+// trick in the genre and it is the whole reason growing a `+1` into a `+99`
+// feels like a slot machine paying out.
+let growStep = 0;
 
 function ensure() {
   if (actx) { if (actx.state === 'suspended') actx.resume(); return actx; }
@@ -244,6 +260,20 @@ export function sfx(name, opts) {
     }
     case 'pickup': {
       tone('sine', 880, 1320, t, 0.11, 0.12 * vol);
+      break;
+    }
+    // Shop sounds. house.js and store.js call these; they are the only two
+    // sounds in the game that are allowed to be cheerful outside a run.
+    case 'coin': {
+      if (!gate('coin', 0.04)) return null;
+      tone('square', 1180, 1180, t, 0.05, 0.07 * vol);
+      tone('square', 1760, 1760, t + 0.035, 0.09, 0.06 * vol);
+      break;
+    }
+    case 'buy': {
+      tone('triangle', 523, 523, t, 0.1, 0.14 * vol);
+      tone('triangle', 784, 784, t + 0.06, 0.18, 0.13 * vol);
+      noise(t, 0.06, 0.06 * vol, 'highpass', 3000, 1800, 0.6);
       break;
     }
     case 'win': {
