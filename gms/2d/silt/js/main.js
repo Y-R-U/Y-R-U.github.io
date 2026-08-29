@@ -172,7 +172,7 @@ const api = {
   get rng() { return world.rng; },
   biome: (n) => applyBiome(n),
   shake: (v) => { shakeAmt = Math.min(1, shakeAmt + (v || 0)); },
-  banner: (t) => UI && UI.banner && UI.banner(t),
+  banner: (t, kind) => UI && UI.banner && UI.banner(t, kind),
   setGravity: (x, y) => world.setGravity(x, y),
   sfx: (n, mag) => AUDIO.sfx(n, mag),
 };

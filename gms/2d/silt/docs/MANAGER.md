@@ -64,11 +64,15 @@ flag first.
   It publishes `left` / `budget` / `used` in pieces and `seconds` as wall-clock
   for information only. `starsFor(lv, used)` takes pieces; `lv.stars` is three
   piece counts, fewest last.
-- **`alchemy.down` is TRUE for a purge objective**, which counts down to a
-  ceiling rather than up to a target. Anything rendering `value`/`target` must
-  branch on it: without that branch the HUD says a purge level is already won
-  before the first piece. 24 of 118 levels are purge and campaign 18 is the
-  first of them.
+- **EVERY objective counts UP to a target.** `purge` (reduce standing sand to a
+  ceiling) is gone from the campaign: it moved backwards 5 times out of 6,
+  because every piece dropped added 256 grains to the number the player was
+  asked to reduce. Slag levels are `dissolve` volume races now. `modesim` gate
+  A9 plays 14 levels and fails if published progress ever falls — do not
+  reintroduce an objective that can, whatever its type.
+- **`ARCH_HINT` in levelgen is the only thing that teaches.** One line per
+  archetype, shown when the first level of that kind starts. The per-level
+  `teaches` field is still written and still displayed by nothing.
 - `alchemy.stars` is the count earned, not the thresholds, so `js/ui/modehud.js`
   reaches into `levelById` to show which star is still on offer. The mode
   publishing them would remove that reach-in.

@@ -493,8 +493,15 @@ export function createUI(handlers = {}) {
   /* -------------------------------------------------------------- banner */
 
   let bannerAt = 0;
-  function banner(text) {
+  // FALSIFICATION ARM, never set in play: ?nohint=1 takes the archetype hints
+  // away again, which is the state the game shipped in — a campaign that
+  // carried a `teaches` line on every level and displayed it to nobody.
+  const NO_NOTES = (() => {
+    try { return new URLSearchParams(location.search).get('nohint') === '1'; } catch { return false; }
+  })();
+  function banner(text, kind) {
     if (!text) return;
+    if (kind === 'note' && NO_NOTES) return;
     // The attract loop runs a real mode, so it fires real mode banners — and
     // they land straight on top of the wordmark. The title screen is not a
     // scoreboard; only a run the player is actually in gets to shout.
@@ -504,9 +511,9 @@ export function createUI(handlers = {}) {
     const live = bannerHost.lastElementChild;
     if (live && live.textContent === String(text)) return;
     bannerAt = now;
-    const el = h('div', { class: 'banner', text: String(text) });
+    const el = h('div', { class: 'banner' + (kind === 'note' ? ' banner--note' : ''), text: String(text) });
     bannerHost.append(el);
-    setTimeout(() => el.remove(), 2400);
+    setTimeout(() => el.remove(), kind === 'note' ? 4200 : 2400);
     while (bannerHost.childElementCount > 3) bannerHost.firstElementChild.remove();
   }
 

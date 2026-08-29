@@ -25,6 +25,29 @@ export const ARCHETYPES = ['quench', 'crucible', 'span', 'excavate', 'slag'];
 // first thing a playtester noticed about it.
 const N = (v) => Math.round(v).toLocaleString('en-US');
 
+/**
+ * ONE LINE PER ARCHETYPE, shown the first time a level of that kind starts.
+ *
+ * `teaches` has existed on every hand-authored level since the tutorial was
+ * written and NOTHING HAS EVER DISPLAYED IT — the campaign carried a lesson per
+ * level and showed it to nobody. The generated levels do not even carry the
+ * field. So the lesson belongs to the archetype, which is the unit a player
+ * actually meets: five of them across 118 levels.
+ *
+ * `slag` is why this exists. Its objective counts DOWN to a ceiling while every
+ * piece dropped adds 256 grains to the pile, so the number rises about five
+ * times for every time it falls, and the game never said that was the point:
+ * "score is broken? it jumps around all over the place, sometimes higher
+ * sometimes lower".
+ */
+export const ARCH_HINT = {
+  span:     'Join one colour wall to wall and the whole band dissolves.',
+  excavate: 'Drop onto the colour already there — matching sand comes apart.',
+  quench:   'Water turns lava to crystal, and crystal never moves again.',
+  slag:     'Break the heap apart. Every grain you clear counts.',
+  crucible: 'Forge crystal by quenching lava — the pillars already there do not count.',
+};
+
 export const OBJECTIVE_LABEL = {
   chains: (o) => `Clear ${N(o.target)} chains`,
   dissolve: (o) => `Dissolve ${N(o.target)} grains`,
@@ -163,6 +186,18 @@ export function makeTracker(world, level) {
     // already on the board, and "forge 400 crystal" must mean 400 MORE.
     baseline: o.type === 'purge' ? countMat(world.g, o.mat || SAND)
             : o.type === 'crystal' ? countMat(world.g, CRYSTAL) : 0,
+    // THE BEST BOARD REACHED SO FAR, and the only thing a purge level reports.
+    //
+    // The live count rises 256 every time a piece lands, and on a slag level it
+    // rises about five times for every time it falls. Shown live it reads as a
+    // fine for playing: "I drop a block it says 458? drop another it says 708?
+    // this feels broken... it feels more like punishment/cost to using blocks."
+    //
+    // The low-water mark only ever falls. Dropping costs nothing on the readout,
+    // clearing is the only thing that moves it, and it still hits zero at the
+    // exact moment the level is won, because the win is `value <= target` and
+    // best == value whenever the board is at its lowest.
+    best: 0,
     _every: 12,
     update(w) {
       switch (o.type) {
@@ -176,19 +211,42 @@ export function makeTracker(world, level) {
           break;
         case 'purge': {
           if (w.ticks % t._every === 0 || t.value === 0) t.value = countMat(w.g, o.mat || SAND);
+          if (!t.best || t.value < t.best) t.best = t.value;
           t.done = t.value <= o.target;
           break;
         }
       }
       return t.done;
     },
-    /** 0..1, for the HUD ring. */
+    /**
+     * 0..1 — PROGRESS MADE, which is what the result card prints as "REACHED".
+     * For a purge level that is genuinely 0 while the board is above where it
+     * started: no ground has been gained. Do not repoint this at the live gauge
+     * below, however dead it looks on the HUD — a losing card that says REACHED
+     * 67% to a player who achieved nothing is the same class of lie as the one
+     * that said a level was already won.
+     */
     frac() {
       if (o.type === 'purge') {
         const span = Math.max(1, t.baseline - o.target);
         return Math.max(0, Math.min(1, (t.baseline - t.value) / span));
       }
       return Math.max(0, Math.min(1, t.value / Math.max(1, o.target)));
+    },
+    /**
+     * 0..1 — HOW CLOSE THE BOARD IS TO THE CEILING RIGHT NOW, for the live bar.
+     *
+     * A separate quantity from frac() on purpose. Measured from the baseline the
+     * bar read 0 for almost the whole of a slag level, because every piece ADDS
+     * 256 grains and the value spends the run above where it started: the gauge
+     * was blank exactly when the number beside it was hardest to read. A ratio
+     * moves in both directions, is bounded however high the pile gets, and
+     * reaches 1 at the moment the level is won.
+     */
+    gauge() {
+      if (o.type !== 'purge') return t.frac();
+      // Off the low-water mark, so the bar fills and never empties.
+      return Math.max(0, Math.min(1, o.target / Math.max(1, t.best || t.baseline)));
     },
   };
   return t;
@@ -376,7 +434,23 @@ export function genLevel(i, count, seed) {
       const ms = mounds(level, rng, SAND, n, tints);
       s.push(...ms);
       const start = ms.reduce((a, m) => a + m.w * m.h, 0);
-      level.objective = { type: 'purge', mat: SAND, target: Math.round(start * (0.55 - d * 0.2)) };
+      // A VOLUME RACE, NOT A STANDING-COUNT FLOOR.
+      //
+      // This was `purge`: reduce the sand ON THE BOARD to a ceiling. It is a
+      // fine rule and an unreadable one, because every piece dropped adds 256
+      // grains to the very number the player is asked to reduce — it rises
+      // about five times for every time it falls. Reported from a phone twice,
+      // the second time exactly: "this is meant to reward strategy? it feels
+      // more like punishment/cost to using blocks. dropping blocks should just
+      // not add score, only falls."
+      //
+      // Nothing about the readout fixes that. Shown live the number punishes
+      // you for playing; shown as a low-water mark it sits still for half a
+      // minute and then jumps to zero, because these levels are won by one
+      // collapse rather than by increments. Cumulative clearing is the only
+      // quantity here that moves when the player does something good and never
+      // when they merely take a turn.
+      level.objective = { type: 'dissolve', target: Math.round(start * (1.6 + d * 1.4)) };
       break;
     }
   }

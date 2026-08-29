@@ -818,6 +818,18 @@
   animation: bannerIn .42s var(--ease-out) both, bannerOut .45s 1.7s var(--ease) both;
   white-space: nowrap;
 }
+/* A HINT IS A SENTENCE, and the banner above is built for one shouted word:
+   nowrap, uppercase, .3em of tracking. Left as-is, "Every piece you drop ADDS
+   sand" runs off both edges of a phone. This is the same chip, told it may
+   breathe and wrap. It lives longer too — a sentence has to be read, not
+   glimpsed — which js/ui/index.js handles by holding a note on screen. */
+.banner--note {
+  font-size: 12.5px; font-weight: 600; letter-spacing: .006em; text-transform: none;
+  white-space: normal; max-width: min(300px, 82vw); text-align: center; line-height: 1.35;
+  padding: 10px 16px; color: #ffeccd;
+  animation: bannerIn .42s var(--ease-out) both, bannerOut .5s 3.4s var(--ease) both;
+}
+
 /* A mode panel lives where the banners drop in. Push them clear of it. */
 #ui.has-panel .banner-host { top: calc(var(--board-y, var(--sat)) + 182px); }
 

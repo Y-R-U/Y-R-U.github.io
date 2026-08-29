@@ -38,8 +38,8 @@
  *   node tools/uishot.mjs --legible --flatbug   no shadow at all; the bright-board INK lines must
  *   node tools/uishot.mjs --copy          the two ALCHEMY card labels a player could misread
  *   node tools/uishot.mjs --copy --falsify    the copy as it shipped, priced in seconds; 5 must go red
- *   node tools/uishot.mjs --copy --downbug    countdown objectives rendered as value/target again,
- *                                         which is the line that shipped; EXACTLY those must go red
+ *   node tools/uishot.mjs --copy --nohint     the archetype hints taken away again, which is how
+ *                                         the game shipped; EXACTLY those must go red
  *   node tools/uishot.mjs --layout        where the top controls ACTUALLY land, per mode
  *   node tools/uishot.mjs --layout --falsify  the naive version of the swap; every position must go red
  *   node tools/uishot.mjs --se            add a 375x667 iPhone SE pass to any of the above
@@ -460,7 +460,14 @@ async function starve(minUsed = 6) {
     // level the bot finishes in three more drops. Nothing needs to be placed:
     // the mode re-reads the budget every tick.
     window.__game.hold(true);
-    for (let i = 0; i < 4 && !w.over; i++) window.__game.step(1);
+    // LONG ENOUGH FOR THE MODE TO ACTUALLY SAY SO. Running out of pieces opens a
+    // settle window — ALCHEMY_CFG.settleTicks, drained two per quiet tick — so a
+    // late chain still counts and the loss is declared at the end of it. Four
+    // ticks checked before any of that had happened, read over:false, and the
+    // driver concluded "the bot solved it before it could be starved" about a
+    // level that was in the middle of losing. It then walked the whole candidate
+    // list and failed the gate with a stale WIN card on screen.
+    for (let i = 0; i < 400 && !w.over; i++) window.__game.step(1);
     window.__game.hold(false);
     return JSON.stringify({ budget: M.budgetOf(lv), used: w.alchemy.used,
                             over: w.over, won: !!w.won });
@@ -1771,7 +1778,7 @@ async function copyGate() {
 
   await cdp.viewport(390, 844, 1, true);
   await cdp.goto(`${base}/gms/2d/silt/index.html?preserve=1&dpr=1&auto&mode=alchemy&seed=4242`
-    + (args.downbug ? '&downbug=1' : ''));
+    + (args.nohint ? '&nohint=1' : ''));
   if (!await cdp.waitFor('window.__ui && window.__state && window.__state.state', 20000)) {
     console.log('  !! shell never came up'); process.exitCode = 1; return;
   }
@@ -1822,62 +1829,44 @@ async function copyGate() {
     seen.length === LEVELS.length && !seen.some((r) => BARE.test(r.head)),
     seen.map((r) => `"${r.head}" | ${r.count}`).join(' · '));
 
-  /* ----------------------------- an objective that counts DOWN, read by a player */
+  /* --------------------------------- the rule each kind of level turns on */
   //
-  // "Reduce sand to 394" shipped rendered as "590 / 394" — the same value/target
-  // shape as the three objectives that count UP. So it read as already complete
-  // before the first piece, and the number ROSE with every drop, because on a
-  // purge level each piece adds 256 grains you then have to clear. Reported from
-  // a phone as: "level 18: impossible to finish? my score STARTS higher than the
-  // completion score and therefore i can never pass a target that has already
-  // passed."
+  // `teaches` had been written into level data since the tutorial and displayed
+  // by NOTHING — a campaign carrying a lesson per level and showing it to
+  // nobody. The rule now belongs to the archetype, which is the unit a player
+  // actually meets, and is shown once when a level of that kind starts.
   //
-  // The sample is derived from the shipped table rather than hard-coded, so a
-  // regenerated campaign cannot quietly leave this gate pointing at nothing, and
-  // the emptiness of the sample is itself a failure rather than a pass.
-  const DOWN_IDS = activeLevels().filter((l) => l.objective.type === 'purge').map((l) => l.id);
-  const pick = [DOWN_IDS[0], DOWN_IDS[DOWN_IDS.length >> 1], DOWN_IDS[DOWN_IDS.length - 1]]
-    .filter((v, i, a) => v != null && a.indexOf(v) === i);
-  ok('the campaign still contains an objective that counts down',
-    pick.length > 0, `${DOWN_IDS.length} purge level(s), first is lv ${DOWN_IDS[0]}`);
+  // The sample is derived from the shipped table, so a regenerated campaign
+  // cannot leave this pointing at nothing: an archetype with no levels is a
+  // failure here, not a silent pass.
+  const ARCHES = [...new Set(activeLevels().map((l) => l.arch))];
+  const firstOf = ARCHES.map((a) => activeLevels().find((l) => l.arch === a));
+  ok('every archetype in the campaign has a level to teach it on',
+    firstOf.every(Boolean) && ARCHES.length >= 4, ARCHES.join(' '));
 
-  for (const n of pick) {
-    await q(`window.__game.startLevel(${n})`);
+  for (const lv of firstOf) {
+    // A note lives 4.2 s and this loop starts a level every few hundred ms, so
+    // without emptying the host first `.banner--note` returns the note from the
+    // PREVIOUS level — which read the excavate line on a slag level, and would
+    // just as happily have read the right line for the wrong reason.
+    await q(`(() => { const b = document.querySelector('.banner-host'); if (b) b.textContent = ''; return 1; })()`);
+    await q(`window.__game.startLevel(${lv.id})`);
     await cdp.frames(6);
     await pump();
     await new Promise((r) => setTimeout(r, 60));
     const r = JSON.parse(await q(`JSON.stringify({
-      down: !!(window.__game.world.alchemy || {}).down,
-      value: (window.__game.world.alchemy || {}).value || 0,
-      target: (window.__game.world.alchemy || {}).target || 0,
+      arch: (window.__game.world.alchemy || {}).arch || '',
+      note: ((document.querySelector('.banner--note') || {}).textContent || ''),
       count: (document.querySelector('.obj-count') || {}).textContent || '' })`));
-    // The mode publishes the direction; the arm is in the HUD, so this stays
-    // green under it. If it ever goes red the fault is upstream of the readout.
-    ok(`lv ${n}: the mode says this objective counts down`, r.down,
-      `value ${r.value} target ${r.target}`);
-    // The level is worth playing at all: a countdown that starts at or under its
-    // ceiling is a level that is already won, which is what the player thought
-    // they were looking at.
-    ok(`lv ${n}: the countdown does not start already satisfied`, r.value > r.target,
-      `${r.value} vs ${r.target}`);
-    // THE READOUT ITSELF. Not "does it contain the right digits" — it must not
-    // be a value/target pair at all, because that shape is what said "passed".
-    const togo = Math.max(0, r.value - r.target).toLocaleString('en-US');
-    ok(`lv ${n}: reads as work remaining, not as a score already past the bar`,
-      !r.count.includes('/') && r.count.trim() === `${togo} to go`,
-      `"${r.count}" (value ${r.value}, target ${r.target})`);
+    ok(`lv ${lv.id} (${lv.arch}): names the rule its archetype turns on`,
+      r.note.length > 12 && r.arch === lv.arch, `"${r.note}"`);
+    // AND THE READOUT COUNTS UP TO A TARGET, on every archetype. The one that
+    // counted down to a ceiling is gone: it rose 256 every time a piece landed,
+    // which read as a fine for playing. tools/modesim.mjs A9 holds the table to
+    // that by simulation; this is the shape of it on screen.
+    ok(`lv ${lv.id} (${lv.arch}): the objective reads as progress toward a target`,
+      /\d[\d,]*\s*\/\s*\d/.test(r.count), `"${r.count}"`);
   }
-
-  // And the three objectives that count UP are untouched: the fix must not have
-  // turned every objective into a countdown.
-  await q(`window.__game.startLevel(1)`);
-  await cdp.frames(6); await pump();
-  await new Promise((r) => setTimeout(r, 60));
-  const upRead = JSON.parse(await q(`JSON.stringify({
-    down: !!(window.__game.world.alchemy || {}).down,
-    count: (document.querySelector('.obj-count') || {}).textContent || '' })`));
-  ok('an objective that counts up still reads value / target',
-    !upRead.down && upRead.count.includes('/'), `"${upRead.count}"`);
 
   /* ------------------------------------------------ the two ALCHEMY result cards */
   // The card is a pure function of the payload main.js hands it, so hand it one
@@ -1928,17 +1917,16 @@ async function copyGate() {
     !!lost.lab && !BARE.test(lost.lab) && !BARE.test(lost.num), `${lost.lab} | ${lost.num}`);
   if (args.shots) await shot('phone-copy-lost');
 
-  if (args.downbug) {
-    // Exactly one check per sampled level: the readout. The direction the mode
-    // publishes, the levels being worth playing, and the up-counting objectives
-    // are all outside the arm and must stay green — an arm that reddens those
-    // would be proving the harness rather than the fix.
-    const MUST = pick.length;
-    console.log(`\ndownbug arm: ${fails.length} checks went red, ${MUST} required`);
-    const onlyRead = fails.every((f) => /reads as work remaining/.test(f));
-    if (fails.length < MUST) { console.log('ARM TOO WEAK — the countdown readout is not evidence'); process.exitCode = 1; }
-    else if (!onlyRead) { console.log('ARM TOO BROAD — it reddened checks it does not own:\n  ' + fails.join('\n  ')); process.exitCode = 1; }
-    else console.log('arm ok: the countdown readout is capable of failing');
+  if (args.nohint) {
+    // One per archetype: the hint. The objective readouts and the archetype
+    // coverage are outside the arm and must stay green — an arm that reddens
+    // those would be proving the harness rather than the fix.
+    const MUST = firstOf.length;
+    console.log(`\nnohint arm: ${fails.length} checks went red, ${MUST} required`);
+    const onlyHints = fails.every((f) => /names the rule/.test(f));
+    if (fails.length < MUST) { console.log('ARM TOO WEAK — the archetype hints are not evidence'); process.exitCode = 1; }
+    else if (!onlyHints) { console.log('ARM TOO BROAD — it reddened checks it does not own:\n  ' + fails.join('\n  ')); process.exitCode = 1; }
+    else console.log('arm ok: the archetype hints are capable of failing');
     return;
   }
   if (args.falsify) {

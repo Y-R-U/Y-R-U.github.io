@@ -1362,6 +1362,57 @@ if (MASHER) {
     if (!graceBad.some((b) => b.startsWith(`${lastId} grace`))) notes.push(`!! level ${lastId} had its grace annotation deleted and A6 kept it`);
   }
 
+  /* -------------------------------------------------------------- A9 */
+  // A9 — NO OBJECTIVE MAY EVER MOVE BACKWARDS.
+  //
+  // The rule a player states as: a score that goes DOWN when I take a turn is
+  // not a score, it is a fine. Slag levels used to ask you to reduce the sand
+  // standing on the board while every piece you dropped added 256 grains to it,
+  // so the number rose about five times for every time it fell:
+  //
+  //   "I drop a block it says 458? drop another it says 708? this feels broken
+  //    ... it feels more like punishment/cost to using blocks. dropping blocks
+  //    should just not add score, only falls."
+  //
+  // No readout fixes that. Live, it punishes you for playing; off a low-water
+  // mark it sits still for half a minute and then jumps to zero. The objective
+  // itself has to be a quantity that only moves when the player does something
+  // good, so this is checked by PLAYING levels and watching the published
+  // progress, not by inspecting the objective type — a future objective that
+  // counts up and still slips backwards is the same defect wearing a safe name.
+  {
+    const countSand = (w) => { let n = 0; const m = w.g.mat; for (let i = 0; i < m.length; i++) if (m[i] === SAND) n++; return n; };
+    const sample = SHIPPED.filter((lv, i) => i % 9 === 0).slice(0, 14);
+    const drops = [];
+    for (const lv of sample) {
+      const w = new World({ ...configFor('alchemy', { level: lv.id }), seed: 4242 });
+      const api = safeApi({ rng: w.rng, biome() {}, shake() {}, banner() {}, sfx() {},
+                            setGravity(x, y) { w.setGravity(x, y); } });
+      alchemy.onStart(w, api);
+      const bot = new Bot(w);
+      let peak = 0, worst = 0;
+      for (let t = 0; t < SIM_HZ * 90 && !w.over; t++) {
+        bot.update();
+        const c = w.chains; w.tick();
+        if (w.chains > c) alchemy.onChain(w, api, w.clears.lastChain.slice());
+        alchemy.onTick(w, api);
+        // The arm reports the STANDING sand the way the old purge rule did, so
+        // the check sees the objective that actually shipped rather than a mock
+        // of it: on those levels the count really did climb and fall.
+        const v = BREAK === 'backwards' ? countSand(w) : (w.alchemy.value | 0);
+        if (v > peak) peak = v;
+        if (peak - v > worst) worst = peak - v;
+      }
+      if (worst > 0) drops.push(`${lv.id}/${lv.arch} fell ${worst}`);
+    }
+    if (drops.length) {
+      fail('A9-backwards', `${drops.length}/${sample.length} level(s) show progress running backwards — ` +
+        drops.slice(0, 5).join(' · ') + (drops.length > 5 ? ' …' : ''));
+    } else {
+      notes.push(`objective direction: ${sample.length} level(s) played, progress never ran backwards`);
+    }
+  }
+
   // A8 — the piece budget. Costs no simulation: it is re-derived from what the
   // generator recorded spending. Under --break budget one level is handed twice
   // the pieces in a COPY, which is the "too generous" half of the rule and the

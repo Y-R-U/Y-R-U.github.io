@@ -1683,3 +1683,88 @@ honest — no net progress toward the floor has been made — but it is dead
 feedback for minutes at a time, and a bar measured from the running peak would
 fill and empty as the player buries and digs. Worth a look with a human on the
 phone before choosing.
+
+---
+
+## S+11 — the objective that fined you for playing
+
+Same player, same levels, one round later. The countdown from S+10 was correct
+and still wrong:
+
+> "I retry level 18 and it says something like 256 to go, I drop a block it says
+> 458? drop another it says 708? etc, this feels broken... ah, this is meant to
+> reward strategy? it feels more like punishment/cost to using blocks. dropping
+> blocks should just not add score, only falls."
+
+That is the whole diagnosis, and it is not about a readout. **`purge` asked the
+player to reduce the sand standing on the board while every piece they dropped
+added 256 grains to that same number.** Measured over 180 s of bot play on
+level 18: **29 rises, 6 falls.** The one action available moved the objective
+backwards five times out of six.
+
+### Both readouts were dead ends, and they are worth recording as such
+
+- **Live value** (what shipped, and what S+10 kept): rises on every drop. A fine
+  for taking a turn.
+- **Low-water mark** (only ever falls — literally what was asked for): on a
+  winning run it read `196` for twenty-four seconds and then `0`. These levels
+  are won by one collapse, not by increments, so a monotone view of the same
+  quantity has nothing to show. No punishment, no feedback either.
+
+The quantity itself has no incremental structure. So the objective changed.
+
+### Slag is now a volume race
+
+`{ type: 'purge', mat: SAND, target: start * (0.55 - d*0.2) }`
+-> `{ type: 'dissolve', target: start * (1.6 + d*1.4) }`
+
+Cumulative clearing only moves when the player clears something, never when they
+merely take a turn — the exact property asked for, and the same shape as the
+other three objectives, so the strip is `0 / 6,441` like everything else.
+
+**The 24 shipped slag levels were converted by measurement, not by formula.**
+For each, the bot played 5 seeds under the old rule and recorded the cumulative
+clearing at the moment it won; the new target is that median, capped at 0.70 of
+measured reach so the headroom gate has room. `reach` was rewritten from the
+same runs. The point is that a level ends at about the drop it used to end at.
+
+Still green afterwards, unchanged: 118/118 beaten at 2-of-3, headroom 0/118,
+budgets 29-95 at 1.61x, grace 0 faults. Masher head-to-head moved 67-30-21 ->
+**60-32-26**, still over the bar.
+
+### A9-backwards, and why it plays instead of inspects
+
+`node tools/modesim.mjs` gains: **no objective may ever move backwards.** It
+PLAYS 14 shipped levels and watches the published progress fall — it does not
+inspect the objective type. A future objective that counts up and still slips
+backwards is the same defect wearing a safe name, and a type check would wave it
+through. Arm: `--break backwards` reports standing sand the way purge did and
+takes all 14 red (`28/slag fell 2427`).
+
+### The archetype hint, and a field nobody was reading
+
+`teaches` has been written into level data since the tutorial was authored and
+**was displayed by nothing** — the campaign carried a lesson per level and showed
+it to nobody, and the generated levels do not even carry the field. Lessons now
+belong to the ARCHETYPE, which is the unit a player meets, and one line is shown
+when the first level of a kind starts (`ARCH_HINT` in `js/data/levelgen.js`,
+rendered as a `banner--note`: a sentence that wraps, not the shouted single word
+a mode banner is built for). Gated per archetype in `uishot --copy`, arm
+`--nohint`.
+
+### Removed
+
+`down` / `best` / `gauge` on the alchemy snapshot, the HUD countdown branch, the
+direction arrow and the `?downbug=1` arm — all of it existed to render an
+objective the campaign no longer contains. A9 is what stops it coming back.
+
+### Two harness faults found on the way
+
+- **`starve()` checked four ticks after cutting the budget**, but running out of
+  pieces opens a ~96-tick settle window so a late chain still counts. It read
+  over:false, concluded "the bot solved it before it could be starved", walked
+  the entire candidate list and failed the gate with a stale WIN card on screen.
+  The mode was fine; the tool was asking too early.
+- A comment containing backticks, added inside a `cdp.eval` template literal,
+  silently ended the literal — `node --check` catches this in a second and is
+  worth running on this file after any edit.
