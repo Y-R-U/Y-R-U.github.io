@@ -11,7 +11,7 @@ import { loadProfile, P } from './save.js';
 import { emit, on } from './bus.js';
 import { $, clamp } from './utils.js';
 
-import { initRender, ctx, render, drawCalls } from './render.js';
+import { initRender, ctx, render, drawCalls, setDrawing } from './render.js';
 import { initInput } from './input.js';
 import { initWorld } from './world.js';
 import { initUnits } from './units.js';
@@ -121,6 +121,7 @@ window.__hb = {
   bus: { emit, on },
   profile: () => P(),
   drawCalls,
+  setDrawing,
   // Fast-forward a run without waiting for real time. Used by the harness to
   // stage a frame deep into a level.
   seek(seconds, dt = 1 / 60) { for (let i = 0; i < seconds / dt; i++) step(dt); },

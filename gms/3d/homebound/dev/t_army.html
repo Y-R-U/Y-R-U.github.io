@@ -20,7 +20,7 @@
 import * as THREE from 'three';
 import { TIERS, PAL } from '../js/config.js';
 import { flatMat } from '../js/toon.js';
-import { makeTierCrowd, tierHover, tierSpacing } from '../js/units.js';
+import { makeTierCrowd, tierHover, tierSpacing, applyRank } from '../js/units.js';
 
 const Q = new URLSearchParams(location.search);
 const ONLY = Q.get('tier');                 // one tier, filling the frame
@@ -31,6 +31,17 @@ const TOP = Q.has('top');                   // the game's camera angle
 // 25 m is the game. Even so: sign off on dev/shot.mjs frames, never on here.
 const MOB = Q.get('mob');
 const MOBN = parseInt(Q.get('n') || '150', 10) || 150;
+// STACK RANK. army.js draws a stack of men as one body once the squad outgrows
+// the draw budget, and marks the rank two ways that live in units.js: a palette
+// lift (applyRank) and a size bump capped at 1.35x total. Both are invisible in
+// isolation and obvious side by side, so `?ranks=<tier>` puts eight of them in a
+// row at the same distance. `?rank=N` applies one rank to every crowd instead.
+const RANKS = Q.get('ranks');
+const RANK = parseInt(Q.get('rank') || '0', 10) || 0;
+const RANK_N = 8;
+const STACK_STEP = 0.068, STACK_MAX = 1.35;   // must match army.js
+const LADDER = [1, 2, 5, 10, 20, 50, 100, 200, 500];
+const rankScale = (def, r) => Math.max(1, Math.min(1 + STACK_STEP * r, STACK_MAX / def.scale)) * def.scale;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -58,7 +69,10 @@ ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
 
-const list = MOB ? TIERS.filter((t) => t.id === MOB)
+// The rank row is the one mode that needs EIGHT crowds of the same tier: the
+// palette lives on the material, so two ranks cannot share one crowd.
+const list = RANKS ? new Array(RANK_N).fill(TIERS.find((t) => t.id === RANKS) || TIERS[0])
+  : MOB ? TIERS.filter((t) => t.id === MOB)
   : ONLY ? TIERS.filter((t) => t.id === ONLY) : TIERS;
 const crowds = list.map((t, k) => {
   const i = TIERS.indexOf(t);
@@ -66,6 +80,8 @@ const crowds = list.map((t, k) => {
   scene.add(c.group);
   c.count = MOB ? MOBN : ONLY ? 3 : 1;
   c.i = i; c.k = k;
+  c.rank = RANKS ? k : RANK;
+  applyRank(c, i, c.rank);
   return c;
 });
 
@@ -84,7 +100,9 @@ function place(t) {
   for (const c of crowds) {
     const t2 = TIERS[c.i];
     const y = tierHover(c.i);
-    if (MOB) {
+    if (RANKS) {
+      c.set(0, (c.k - (RANK_N - 1) / 2) * 1.5, y, 0, rankScale(t2, c.rank), 0, 1, c.k * 1.9);
+    } else if (MOB) {
       const sp = tierSpacing(c.i);
       const cc = Math.sqrt((sp.x * sp.z) / Math.PI);
       for (let j = 0; j < MOBN; j++) {
@@ -105,10 +123,12 @@ function place(t) {
 }
 
 document.getElementById('lbl').textContent =
-  (MOB ? `${MOB.toUpperCase()} x${MOBN}  [run camera]`
-       : ONLY ? ONLY.toUpperCase() : list.map((t) => t.name).join('  ·  ')) + (TOP ? '  [top]' : '');
+  (RANKS ? `${RANKS.toUpperCase()} by stack rank —  ` + LADDER.slice(0, RANK_N).map((v) => 'x' + v).join('  ·  ')
+     : MOB ? `${MOB.toUpperCase()} x${MOBN}  [run camera]${RANK ? '  rank ' + RANK : ''}`
+     : ONLY ? ONLY.toUpperCase() : list.map((t) => t.name).join('  ·  ')) + (TOP ? '  [top]' : '');
 
-if (MOB) camera.position.set(0, 17, -21), camera.lookAt(0, 0.6, 5);
+if (RANKS) camera.position.set(0, 3.4, -11.5), camera.lookAt(0, 1.0, 0);
+else if (MOB) camera.position.set(0, 17, -21), camera.lookAt(0, 0.6, 5);
 else if (ONLY) camera.position.set(0, 2.0, -6.4), camera.lookAt(0, 0.95, 0);
 else if (TOP) camera.position.set(0, 13, -13), camera.lookAt(0, 0.6, -2.1);
 else camera.position.set(0, 5.0, -26), camera.lookAt(0, 1.0, 0);

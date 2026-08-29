@@ -600,6 +600,15 @@ function open(c, rows) {
     row(c, c.z, r.pick([-1, 1]), { fixedFrac: r.range(0.40, 0.52) });
     c.z += ROW_GAP;
   }
+  // One coin by the roadside. Cash GATES only appear on beats with something
+  // shooting at you (see thirdGate), which is right — but it means the opening
+  // levels have no cash in them at all, and a new player watches the money bag
+  // sit on 0 through the whole tutorial and reads it as broken. This is not
+  // economy, it is vocabulary: it teaches what the bag counts, off-lane, for
+  // the price of drifting wide.
+  // Side and position are derived, NOT drawn from `r` — one extra draw here
+  // reshuffles every gate downstream and turns a winnable level into a loss.
+  c.items.push(pickup(c.z - ROW_GAP * 0.5, LANES[c.items.length & 1 ? 0 : 2], cashFlat(c, 0.5)));
   return c.z + 10;
 }
 

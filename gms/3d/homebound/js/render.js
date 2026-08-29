@@ -142,8 +142,15 @@ export function updateCamera(dt, opts = {}) {
 
 export function addShake(a) { shake = Math.min(1.4, shake + a); }
 
+// The harness can turn drawing off. Simulation is cheap; DRAWING is what costs
+// — under software GL a 300-man crowd takes ~1.5s a frame, so a headless run of
+// a late level times out long before it finishes. Everything else still runs,
+// so gates, combat and the AI thumb are tested exactly as they ship.
+let drawing = true;
+export function setDrawing(on) { drawing = on; }
+
 export function render() {
-  if (ctx.renderer) ctx.renderer.render(ctx.scene, ctx.camera);
+  if (drawing && ctx.renderer) ctx.renderer.render(ctx.scene, ctx.camera);
 }
 
 export function drawCalls() { return ctx.renderer?.info.render.calls ?? 0; }
