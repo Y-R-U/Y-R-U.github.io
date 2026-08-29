@@ -100,6 +100,11 @@ export const CAM = {
   height: 17.0,
   look: 26,                  // metres ahead of the squad the camera aims at
   perUnit: 0.0175,           // extra back/height per unit in the squad
+  // Tried dropping height to 13.5 with look 20 to make distant enemy blocks
+  // read larger. It does the opposite: a lower camera compresses depth, so the
+  // block shrinks vertically AND a third of the frame becomes empty near road.
+  // 17 stays. If a wall still reads small, the lever is where levels.js places
+  // it, not the camera.
   maxExtra: 9,
   lag: 0.92,                 // approach() rate
   shakeDecay: 0.86,

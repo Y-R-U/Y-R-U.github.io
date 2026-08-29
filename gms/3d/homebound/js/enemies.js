@@ -166,8 +166,9 @@ const EDGE = 0.42;          // keep the outermost file off the parapet
 // front the player shoots at and the part that dissolves, and every rank past
 // the knee opens quadratically. Those ranks are never seen closer than fifteen
 // metres and are usually half-lost in fog, where perspective has closed the
-// gaps for us anyway — so the block reaches 14-19 m up the road instead of 9,
-// and reads as a column that has no end rather than as a slab.
+// gaps for us anyway. Measured: a full-road block runs 13.8 m deep and a
+// lane-blocker, which gets half the files and therefore twice the ranks, runs
+// 36.5 m — a column that has no end rather than a slab.
 const RANK_KNEE = 9;
 const RANK_OPEN = 0.006;
 // ...but not without limit. A narrow group gets few files and therefore many
@@ -253,8 +254,11 @@ function buildCrowd(max) {
     });
   } catch (e) { c = null; }
   if (c && typeof c.set === 'function' && c.group) return c;
+  // Same outline treatment as the tier path above, or the fallback block reads
+  // as a different, darker army than the real one.
   return makeCrowd(fallbackGeo(), {
-    color: PAL.enemy, max, outline: 0.032, outlineColor: 0x4a0f0e, castShadow: true,
+    color: PAL.enemy, max, outline: 0.027, outlineColor: 0x6d1512,
+    emissiveIntensity: 0.18, castShadow: true,
   });
 }
 
