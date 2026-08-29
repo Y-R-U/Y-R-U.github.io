@@ -668,7 +668,11 @@ export function updateArmy(dt) {
 // the blob, at a size a phone can actually read. Every body carries the same
 // stack value anyway, so a spread sample says everything a full set would.
 const GLYPH_SET = '0123456789+-$%.:s' + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + '×÷▲⌖♥⚡?';
-const BADGE_LABELS = 8;
+// FOUR, not eight. Every body on the field carries the SAME rung, so a badge is
+// a legend ("each of these is 200 men"), not a per-unit statistic — the 5th
+// through 8th copies of `x200` add no information and cost legibility, which at
+// 12,000 men read as a smear of white digits across the far half of the blob.
+const BADGE_LABELS = 4;
 const BADGE_GLYPHS = 7;
 const BADGE_CAP = 0.46;      // glyph ink height, metres
 const BADGE_INK = 0.59;      // a digit's ink as a fraction of its atlas cell
@@ -681,7 +685,7 @@ const BADGE_LIFT = 0.85;     // clear air above the unit's own head
 // occupies 0.777*CAP of it; two badges are legible apart if they differ by that
 // much, which in world z is (0.777/0.629)*CAP — times 1.7 for air, because a
 // badge touching the one above it is only marginally better than overlapping.
-const BADGE_SEP_Z = (0.777 / 0.629) * BADGE_CAP * 1.7;
+const BADGE_SEP_Z = (0.777 / 0.629) * BADGE_CAP * 2.2;
 
 let badgeMesh = null, badgeGeo = null, badgeCells = null, badgeArr = null;
 let badgeGlyph = null, badgeLen = 0;

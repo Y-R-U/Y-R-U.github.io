@@ -50,7 +50,16 @@ try {
 
 await page.evaluate(async (n, d) => {
   if (!window.__hb?.step) { await new Promise((r) => setTimeout(r, 2500)); return; }
-  for (let i = 0; i < n; i++) window.__hb.step(d);
+  for (let i = 0; i < n; i++) {
+    // Story beats PAUSE the run and wait for a tap, so an unattended harness
+    // photographs the beat card and a squad frozen at z=1. Tap it the way a
+    // thumb does. Pass `&hold` in the url-suffix to photograph the card itself.
+    const layer = document.querySelector('#bubble-layer');
+    if (!location.search.includes('hold') && layer && layer.classList.contains('on')) {
+      layer.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    }
+    window.__hb.step(d);
+  }
 }, steps, dt);
 
 await new Promise((r) => setTimeout(r, 250));
