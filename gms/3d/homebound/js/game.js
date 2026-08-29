@@ -19,6 +19,7 @@ import { resetCombat, updateCombat } from './combat.js';
 import { resetVfx, updateVfx } from './vfx.js';
 import { resetHud, updateHud, showHud } from './hud.js';
 import { updateMenus } from './menus.js';
+import { updateHouse } from './house.js';
 import { sfx, music } from './audio.js';
 
 export const run = {
@@ -72,7 +73,7 @@ export function endRun(win) {
   run.endedAt = state.t;
 
   const stats = {
-    win, level: run.level,
+    win, level: run.level, autoplay: run.autoplay,
     troops: state.troops, peakTroops: state.peakTroops,
     kills: state.kills, cash: state.cash,
     dist: state.dist, gatesTaken: state.gatesTaken, bestGate: state.bestGate,
@@ -88,7 +89,11 @@ export function endRun(win) {
       kills: state.kills, distance: Math.round(state.dist),
       bestSquad: state.peakTroops, bestGate: state.bestGate,
     });
-    if (win && run.level?.chapter) {
+    // Only story levels are "cleared". `levels.js:missionSpec` stamps chapter 5
+    // on a mission, so recording one marked it cleared and every repeat after
+    // that paid ECON.replayFactor — which is exactly backwards for the mode
+    // whose whole job is to be farmed.
+    if (win && run.level?.chapter && run.level.mode === 'story') {
       clearLevel(run.level.chapter, run.level.level, stats);
       advanceUnlocks();
     }
@@ -167,10 +172,22 @@ function payout(stats) {
   const base = (lvl.reward ?? ECON.baseReward) + state.cash;
   const troopPay = state.peakTroops * ECON.perTroop;
   const incomeMul = 1 + (P().upgrades.income || 0) * 0.06;
-  const repeat = lvl.chapter && P().cleared[`c${lvl.chapter}l${lvl.level}`] ? ECON.replayFactor : 1;
+  const repeat = lvl.mode === 'story' && lvl.chapter && P().cleared[`c${lvl.chapter}l${lvl.level}`]
+    ? ECON.replayFactor : 1;
   const winMul = stats.win ? 1 : 0.25;   // losing still pays; a dead end is not a punishment
   return Math.round((base + troopPay) * incomeMul * repeat * winMul);
 }
+
+// Pause is a flag on the run, not a stop on the frame loop: the world still
+// draws, the camera still eases, and the menus still animate over the top of a
+// frozen battle. Stopping the loop makes a paused game look like a crash.
+export function pauseRun(on = true) {
+  if (!run.active) return false;
+  state.running = !on;
+  emit(on ? 'run:pause' : 'run:resume', { level: run.level });
+  return on;
+}
+export const isPaused = () => run.active && !state.running;
 
 // --------------------------------------------------------------------------
 // Effects — the one place a gate, a pickup or a boss reward changes the squad
@@ -247,6 +264,7 @@ export function updateGame(dt) {
   }
 
   updateMenus(dt);
+  updateHouse(dt);
   updateWorld(dt);
   updateArmy(dt);
   updateGates(dt);
