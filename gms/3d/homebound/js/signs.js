@@ -96,7 +96,7 @@ let REF_DY = 0;                   // digit ink centre offset from the cell centr
 // Drawn at one flat scale they do not: '⚡' spans 0.92 of `s` and '×' only 0.63,
 // so the heart in "♥20" came out half again as tall as the panel's digits and
 // shoved them down to 70% — a purple gate read as a heart with a footnote.
-const SYM_H = { '▲': 0.78, '×': 0.629, '÷': 0.86, '♥': 0.72, '⚡': 0.92, '⌖': 0.96, '?': 1.075 };
+const SYM_H = { '▲': 0.78, '×': 0.629, '÷': 0.86, '♥': 0.72, '⚡': 0.92, '⌖': 0.96, '?': 0.956 };
 const SYM = {
   '▲': (g, s) => { g.moveTo(0, -0.44 * s); g.lineTo(0.46 * s, 0.34 * s); g.lineTo(-0.46 * s, 0.34 * s); g.closePath(); },
   '×': (g, s) => {
@@ -141,34 +141,60 @@ const SYM = {
   // where the bowl meets its own tail, and the hook comes out with a black scar
   // across it. A skeleton has no seams, and round caps give it the same soft
   // fat terminals as Arial Black's digits.
-  // Proportioned off Arial Black's own '?' so it sits in a row of digits without
-  // looking like a different typeface: ink 0.76 as wide as it is tall, a bowl
-  // whose outer diameter is 0.76 of the height, and a stem ending at 0.72 down.
-  // The gap before the dot is wider than the font's, because our 17 px stroke
-  // is not the font's — at the typographic gap the two dark outlines close over
-  // the white entirely and the '?' comes out as an '!'.
-  // The counter is the hard constraint, not the outline. The dark stroke is
-  // drawn UNDER the white, so it eats SW *inward* as well as outward: a bowl
-  // whose inner diameter is under ~20 px in the cell closes up completely and
-  // the glyph renders as a filled blob with a dot beneath it. Bowl radius,
-  // body and the descender are solved together against that — inner diameter
-  // 0.38 of `s` leaves ~7 px of counter after the stroke, which is the same
-  // slit the '0' and '8' in the atlas have.
+  //
+  // WHY THIS GLYPH IS SOLVED IN PIXELS AND NOT IN TASTE
+  //
+  // The dark stroke is drawn UNDER the white, so SW eats inward as well as
+  // outward: every white feature is `body*s` wide and every gap between two
+  // white features loses `SW` to ink. On an 84 px glyph — what SYM_INK 1.12
+  // used to give this cell — SW alone is 20% of the height, and the budget
+  // simply does not close: a bowl big enough to hold a counter leaves nothing
+  // for a descender, a gap and a dot. The first version spent it all on the
+  // bowl, wrapped the tail back INSIDE it, and shipped a 7 px counter. At gate
+  // distance that counter is 5 screen px, mipmapping closes it, and the sign
+  // reads 'Q'. It is the only sign in the game with no number on it, so that
+  // is 100% of the sign gone.
+  //
+  // Two things buy the budget back:
+  //   1. SYM_TARGET below draws this one glyph at 0.86 of the cell instead of
+  //      0.66. On-screen size is unchanged — `fitRun` sizes every run off the
+  //      MEASURED ink height, so a taller cell drawing just means a smaller
+  //      quad — but SW stops being 20% of the glyph and becomes 15%.
+  //   2. `body` drops 0.21 → 0.10. The digits' own white core is only ~8.5 px
+  //      wide (Arial Black's stem minus the 8.5 px the stroke eats inward), so
+  //      10 px here is if anything still fatter than the numbers it never sits
+  //      next to.
+  //
+  // The layout, in atlas px at the resulting s = 100 (all of it verified off
+  // the rasterised cell, not off the font):
+  //   ink stroke   27 px      (body*s 10 white + SW 17 dark)
+  //   bowl         R 26 centreline → counter 2R - 27 = 25 px, 23% of the glyph
+  //   aperture     ~10 px between the bowl's left terminal and the stem
+  //   stem         ends 4 px below the bowl's lowest centreline point
+  //   gap          17 px of clear white separation before the dot
+  //   dot          27 px across, its own round cap
+  // Everything is offset up by 0.155*s so the ink is centred in the cell: at
+  // this size the glyph is 110 px of a 128 px cell and an uncentred path would
+  // be clipped by `clipCell`.
   '?': {
-    body: 0.21,
+    body: 0.126,
+    // 0.83 centreline extent + 0.10 body; see the SYM_H comment above.
     path: (g, s) => {
-      // The bowl, and the 119° it does NOT sweep is the shape: the opening
-      // faces straight down, so the hook's left terminal sits at lower-left and
-      // its right terminal at upper-right, where the tail takes over. Sweep any
-      // further round and the tail re-enters the bowl instead of descending
-      // below it — the counter closes and the glyph reads as a 'Q'.
-      g.arc(0, -0.10 * s, 0.30 * s, Math.PI * 0.78, Math.PI * 2.12);
-      // tail, dropping below the bowl and curling in to the stem
-      g.quadraticCurveTo(0.27 * s, 0.13 * s, 0.03 * s, 0.16 * s);
-      g.lineTo(0, 0.185 * s);
+      // The bowl sweeps 210° and leaves 150° open at the bottom. The opening is
+      // what makes it a '?' and not a 'Q', and it has to be paid for twice —
+      // once in the aperture between the two terminals, and once in the tail,
+      // which must stay OUTSIDE the bowl radius all the way down. The old path
+      // curled the tail back through the counter, which is the same as filling
+      // it in.
+      g.arc(0, -0.155 * s, 0.26 * s, Math.PI * 0.955, Math.PI * 2.122);
+      // Tail: out of the bowl's 4-o'clock terminal, down and back to the
+      // centreline. The control point sits low and right so the curve hugs the
+      // outside of the bowl instead of cutting the corner through it.
+      g.quadraticCurveTo(0.240 * s, 0.085 * s, 0.030 * s, 0.128 * s);
+      g.lineTo(0, 0.145 * s);
       // the dot: a stub segment, so the round cap IS the dot
-      g.moveTo(0, 0.455 * s);
-      g.lineTo(0, 0.465 * s);
+      g.moveTo(-0.015 * s, 0.415 * s);
+      g.lineTo(0.015 * s, 0.415 * s);
     },
   },
 };
@@ -186,6 +212,15 @@ const SW = 17;                         // stroke width — the reference's is FA
 // cell edge, which matters because a symbol that bleeds corrupts its
 // NEIGHBOUR'S measurement as well as its own picture.
 const SYM_INK = 1.12;
+// How much of the CELL a glyph's ink is allowed to fill, overriding SYM_INK for
+// one symbol. This changes nothing on screen — `fitRun` sizes every run off the
+// measured ink height, so a glyph drawn bigger in its cell just gets a smaller
+// quad — it changes how much of the fixed SW = 17 px dark stroke the glyph has
+// to spend. At 0.66 of the cell the stroke is a fifth of the '?', and there is
+// no budget left for a counter; at 0.86 it is a seventh and the glyph closes.
+// Only worth doing for a glyph whose interior detail is the whole message, and
+// only safe up to ~0.88: `clipCell` crops anything that reaches the cell edge.
+const SYM_TARGET = { '?': 0.88 };
 
 function cellXY(i) { return [(i % G_COLS) * G_CELL, ((i / G_COLS) | 0) * G_CELL]; }
 
@@ -225,7 +260,7 @@ function buildGlyphAtlas() {
     const [x0, y0] = cellXY(i);
     // inkHeight = (extent * s + SW) / G_CELL, solved for s. SYM_H already
     // carries a centreline symbol's body width, so one formula covers both.
-    const s = (target * G_CELL - SW) / SYM_H[ch];
+    const s = ((SYM_TARGET[ch] ?? target) * G_CELL - SW) / SYM_H[ch];
     const sym = SYM[ch];
     glyphSym[i] = 1;
     g.save();
@@ -878,7 +913,23 @@ export function labelWriter(band) {
   if (!matCache) initSigns();
   const base = bandBase[band];
   const limit = base + BANDS[band].labels * LBL_CAP;
+  // How many of each block's LBL_CAP slots the LAST frame actually filled.
+  //
+  // This is the whole reason the stray glyphs happened. `end()` only ever wiped
+  // from `cur` upward — i.e. whole blocks that no label claimed this frame — so
+  // it caught a gate despawning off the end of the row but never caught a block
+  // being re-claimed by a SHORTER label. A row is written in z order, so the
+  // moment the nearest gate is released every remaining gate shifts down one
+  // block: the block that held '+10' gets '+1', `writeRun` writes two slots and
+  // walks away, and slot three still holds the '0' — with the DEAD gate's
+  // matrix in it. Nothing ever touches that slot again, so a '0' hangs in the
+  // air at the old gate's x and z for the rest of the run. Barriers counting
+  // 10 → 9 leak the same way inside a single label.
+  // Allocated once per writer; `end()` is still allocation-free.
+  const used = new Uint8Array(BANDS[band].labels);
   let cur = base, high = base;
+  // Zero one slot's matrix: scale 0 → degenerate triangles, rasterized away.
+  const kill = (i) => { const o = i * 16; glyphArr[o] = glyphArr[o + 5] = glyphArr[o + 10] = 0; };
   return {
     begin() { high = cur; cur = base; },
     /**
@@ -912,16 +963,22 @@ export function labelWriter(band) {
         const f = fitRun(big, ph * (isHero(big, small) ? CAP_HERO : CAP_1), maxW);
         n += writeRun(slot + n, limit, big, cx, cy, cz, f.size, f.xs, tc, ts);
       }
+      // Wipe this block's own tail. Only as far as the previous frame reached,
+      // so a two-glyph label costs at most a handful of writes and a block that
+      // has not shrunk costs none.
+      const bi = (slot - base) / LBL_CAP;
+      for (let i = n; i < used[bi]; i++) kill(slot + i);
+      used[bi] = n;
       cur = slot + LBL_CAP;
       return true;
     },
     end() {
       const top = Math.max(cur, high);
-      for (let i = cur; i < top; i++) {
-        const o = i * 16;
-        // scale 0 → degenerate triangles, rasterized away for free
-        glyphArr[o] = glyphArr[o + 5] = glyphArr[o + 10] = 0;
-      }
+      for (let i = cur; i < top; i++) kill(i);
+      // Blocks past the last one written this frame are empty again, so their
+      // tails start clean too — otherwise a released gate's leftover count would
+      // make `label()` skip slots the next time the band grows back.
+      for (let b = (cur - base) / LBL_CAP; b < used.length; b++) used[b] = 0;
       glyphMesh.instanceMatrix.needsUpdate = true;
       glyphCells.needsUpdate = true;
     },

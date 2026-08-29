@@ -34,6 +34,9 @@
 //   with HB_BASE=http://localhost:8899/gms/3d/homebound/dev/t_gates.html
 //
 // ?z=NN parks the squad at a fixed z instead of running.
+// ?x=NN parks the fake gun on one lane, so a side gate can be shot on purpose
+//       — a glass pane at x = ±3.6 is never hit by the default centre stream,
+//       which is how the oversized glass debris got shipped unlooked-at.
 // ?fire=0 stops the fake bullets so gates hold their base value.
 
 import * as THREE from 'three';
@@ -47,6 +50,7 @@ import { initBarriers, resetBarriers, updateBarriers, barrierHitTest } from '../
 
 const Q = new URLSearchParams(location.search);
 const PARK = parseFloat(Q.get('z') || '0');
+const PARK_X = Q.has('x') ? parseFloat(Q.get('x')) : null;
 const FIRE = Q.get('fire') !== '0';
 
 initRender(document.getElementById('stage'));
@@ -193,11 +197,11 @@ if (Q.has('atlas')) {
 let booted = false, t = 0;
 function step(dt) {
   t += dt;
-  if (PARK) { state.z = PARK; state.x = 0; }
+  if (PARK) { state.z = PARK; state.x = PARK_X ?? 0; }
   else {
     state.z += RUN.speed * dt;
     // sweep across the lanes so every gate in a row gets taken over a run
-    state.x = Math.sin(t * 0.55) * 3.9;
+    state.x = PARK_X ?? Math.sin(t * 0.55) * 3.9;
     state.targetX = state.x;
   }
   fire(dt);

@@ -123,9 +123,35 @@ const sh = {
   rx: new Float32Array(MAX_SHARDS), ry: new Float32Array(MAX_SHARDS),
   wx: new Float32Array(MAX_SHARDS), wy: new Float32Array(MAX_SHARDS),
   s: new Float32Array(MAX_SHARDS), life: new Float32Array(MAX_SHARDS),
+  // Per-shard aspect on the one shared box. A panel chunk is a chunk; a glass
+  // shard is a sliver. See SHARD_KIND.
+  ax: new Float32Array(MAX_SHARDS), ay: new Float32Array(MAX_SHARDS), az: new Float32Array(MAX_SHARDS),
 };
 // Hoisted: a literal here would allocate an array every time a shard expires.
-const SH_FIELDS = ['x', 'y', 'z', 'vx', 'vy', 'vz', 'rx', 'ry', 'wx', 'wy', 's', 'life'];
+const SH_FIELDS = ['x', 'y', 'z', 'vx', 'vy', 'vz', 'rx', 'ry', 'wx', 'wy', 's', 'life',
+  'ax', 'ay', 'az'];
+
+// Two debris profiles out of one pool, one geometry and one draw call.
+//
+// `panel` is the payoff when you run a gate down: fat chunks of the sign in the
+// sign's own blue or red, thrown at you.
+//
+// `glass` used to be the same profile in PAL.glass, and that is the bug this
+// splits. The base box is 0.34 m and `panel` scales it up to 2.1x, so a shard
+// came out a 0.7 m cube — the size of a soldier's torso — in the one hue on the
+// road that is the exact complement of the enemy red, and it bounced and lay
+// about for over a second at ground level. Read at 60 m through fog, a handful
+// of them standing in front of a red block are not debris, they are cyan men.
+// Nothing was mistinting the crowd; the crowd was fine. Glass now shatters like
+// glass: thin slivers, roughly a hand's width, gone in half the time, and more
+// of them so the break still reads as a break.
+const SHARD_KIND = {
+  panel: { n: 14, s0: 1.00, s1: 2.10, ax: 1, ay: 1, az: 1, life0: 0.85, life1: 1.20, spin: 14, up: 2.4 },
+  // Longest edge 0.43 m against a 1.7 m soldier: a quarter of a man, so a shard
+  // is ~7 screen px where a body in the same block is ~30. That is the number
+  // the old profile got wrong, not the hue.
+  glass: { n: 20, s0: 0.65, s1: 1.25, ax: 0.42, ay: 1.00, az: 0.30, life0: 0.42, life1: 0.66, spin: 22, up: 3.0 },
+};
 let shCount = 0;
 const _v = new THREE.Vector3(), _q = new THREE.Quaternion();
 const _e = new THREE.Euler(), _s = new THREE.Vector3(), _m = new THREE.Matrix4();
@@ -330,7 +356,7 @@ function hitGate(g, damage = 1) {
       emit('gate:break', { gate: g });
       emit('fx:explosion', { pos: { x: g.x, y: PANEL_Y, z: g.z }, scale: 1.0, color: PAL.glass });
       emit('fx:shake', { amount: 0.22 });
-      shatter(g, PAL.glass, 14);
+      shatter(g, PAL.glass, 'glass');
     }
     return true;
   }
@@ -375,10 +401,12 @@ function resolve(g) {
 // The panel bursts apart while the sign flies up — that half second is the
 // payoff for the two seconds of choosing that preceded it.
 function burst(g, color) {
-  shatter(g, color, 14);
+  shatter(g, color, 'panel');
 }
 
-function shatter(g, color, n) {
+function shatter(g, color, kind) {
+  const p = SHARD_KIND[kind] || SHARD_KIND.panel;
+  const n = p.n;
   _col.set(color);
   for (let i = 0; i < n && shCount < MAX_SHARDS; i++) {
     const k = shCount++;
@@ -387,12 +415,13 @@ function shatter(g, color, n) {
     sh.y[k] = PANEL_Y + Math.sin(a) * 0.9;
     sh.z[k] = g.z + FACE_Z;
     sh.vx[k] = Math.cos(a) * 4.2 + (Math.random() - 0.5);
-    sh.vy[k] = 2.4 + Math.random() * 4.4;
+    sh.vy[k] = p.up + Math.random() * 4.4;
     sh.vz[k] = -2.2 - Math.random() * 2.6;      // toward the camera; it reads
     sh.rx[k] = Math.random() * 6.28; sh.ry[k] = Math.random() * 6.28;
-    sh.wx[k] = (Math.random() - 0.5) * 14; sh.wy[k] = (Math.random() - 0.5) * 14;
-    sh.s[k] = 1.0 + Math.random() * 1.1;
-    sh.life[k] = 0.85 + Math.random() * 0.35;
+    sh.wx[k] = (Math.random() - 0.5) * p.spin; sh.wy[k] = (Math.random() - 0.5) * p.spin;
+    sh.s[k] = p.s0 + Math.random() * (p.s1 - p.s0);
+    sh.life[k] = p.life0 + Math.random() * (p.life1 - p.life0);
+    sh.ax[k] = p.ax; sh.ay[k] = p.ay; sh.az[k] = p.az;
     shardMesh.instanceColor.array[k * 3] = _col.r;
     shardMesh.instanceColor.array[k * 3 + 1] = _col.g;
     shardMesh.instanceColor.array[k * 3 + 2] = _col.b;
@@ -542,7 +571,7 @@ function updateShards(dt) {
     _v.set(sh.x[i], sh.y[i], sh.z[i]);
     _q.setFromEuler(_e.set(sh.rx[i], sh.ry[i], 0));
     const k = sh.s[i] * Math.min(1, sh.life[i] * 3);
-    _s.set(k, k, k);
+    _s.set(k * sh.ax[i], k * sh.ay[i], k * sh.az[i]);
     _m.compose(_v, _q, _s);
     _m.toArray(shardArr, i * 16);
   }
