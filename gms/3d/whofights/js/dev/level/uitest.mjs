@@ -284,6 +284,26 @@ try {
   await page.click('#wf-dev .lv-hs', 0);
   await shot(page, '08-academy-hotspots');
 
+  // ── one set of hotspot wireframes, not two ───────────────────────────────────────────────
+  // window.__wf.debug only exists once the debug tab has mounted, which is also when its overlay
+  // group is built — so this is checked from the state a real session would be in.
+  await page.clickText('#wf-dev nav button', 'Debug');
+  await sleep(600);
+  await page.clickText('#wf-dev nav button', 'Level');
+  await page.waitFor('!!document.querySelector("#wf-dev .lv-hs")', 8000);
+  ok('the overlay hangs off the debug tab\u2019s group, not beside it',
+    await page.eval(`(async () => {
+      await window.__wf.debug.overlays.ensure();
+      window.__wf.hotspots.refresh();
+      const root = window.__wf.app.scene.getObjectByName('wf-debug-overlays');
+      return !!root?.getObjectByName('wf-hotspot-overlay'); })()`));
+  ok('and it turns the debug tab\u2019s own hotspot wireframes off rather than doubling them',
+    await page.eval(`(async () => {
+      await window.__wf.debug.overlays.show('hotspots', true);
+      window.__wf.hotspots.show(true);
+      await new Promise(r => setTimeout(r, 300));
+      return !window.__wf.debug.overlays.visible('hotspots'); })()`));
+
   // ── attach a hotspot to a character ───────────────────────────────────────────────────────
   await page.clickText('#wf-dev .lv-row button', '＋ On a character');
   await page.waitFor('!!document.querySelector("#wf-dev .lv-warn select")', 6000);
@@ -352,6 +372,7 @@ try {
   await sleep(1200);
   await shot(page, '09-overlay-in-world');
   ok('the overlay is still on with the hub shut', await page.eval('window.__wf.hotspots.visible'));
+
   await page.eval('window.__wf.setScenario("doorway")');
   await sleep(1200);
   await shot(page, '10-overlay-doorway');

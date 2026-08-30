@@ -29,7 +29,7 @@ test('hash moves with every field it is documented to cover', () => {
 test('clip names follow §8', () => {
   eq(clipKey('greeter', 'idle', 0), 'greeter__idle__01');
   eq(clipKey('greeter', 'idle', 11), 'greeter__idle__12');
-  eq(clipFile('greeter__idle__01'), 'audio/vo/greeter__idle__01.mp3');
+  eq(clipFile('greeter__idle__01'), 'audio/vo/greeter__idle__01.ogg');
   eq(rawFile('greeter__idle__01'), 'audio/vo/raw/greeter__idle__01.wav');
 });
 
@@ -38,7 +38,7 @@ test('kokoro writes into raw/, and the shipped clip is the mp3', () => {
   eq(p.jobs[0].out, 'raw/vail__idle__01', 'the tts out name lands under audio/vo/raw');
   const { index } = applyResults({ clips: {} }, p.jobs, p.jobs.map(() => ({ ok: true, seconds: 1 })));
   const rec = index.clips.vail__idle__01;
-  eq(rec.file, 'audio/vo/vail__idle__01.mp3');
+  eq(rec.file, 'audio/vo/vail__idle__01.ogg');
   eq(rec.raw, 'audio/vo/raw/vail__idle__01.wav');
   eq(rec.encoded, false, 'a synthesised take is not an encoded one');
   eq(playableFile(rec, 'vail__idle__01'), rec.raw, 'before encoding, the raw is what plays');
@@ -153,7 +153,7 @@ test('a shortened list leaves orphans, and prune names them', () => {
   const after = planJobs({ cast: cast(), barks: shorter, index, who: ['vail'] });
   const { index: pruned, orphans } = pruneIndex(index, after.live);
   eq(orphans.map(o => o.key), ['vail__idle__02']);
-  eq(orphans[0].file, 'audio/vo/vail__idle__02.mp3');
+  eq(orphans[0].file, 'audio/vo/vail__idle__02.ogg');
   eq(Object.keys(pruned.clips).length, 3);
 });
 

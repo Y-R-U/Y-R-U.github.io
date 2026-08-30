@@ -10,11 +10,11 @@ export const BARK_CATEGORIES = ['idle', 'greet', 'farewell', 'curious', 'grumble
 
 export const VO_DIR = 'audio/vo';
 export const RAW_DIR = 'audio/vo/raw';
-// mp3, not ogg/opus. Pitch here is a resample through WebAudio decodeAudioData (play.js), and mp3
-// is the one lossy format every browser decodes that way without a caveat — Opus-in-Ogg through
-// decodeAudioData has a history of failing on Safari/iOS, which is half the audience for a mobile
-// game. 48 kbps mono at kokoro's native 24 kHz is ~8x smaller than the wav.
-export const CODEC = { ext: '.mp3', bitrate: '48k', rate: 24000, channels: 1 };
+// The dev server's /api/encode owns the ffmpeg arguments; this only names the profile and the
+// extension it produces. Opus at 24 kbps measures 17x smaller than the wav on a speech take, twice
+// what mp3 manages at the same listening quality. `voice` (mp3) is the fallback if Opus-in-Ogg ever
+// fails a browser's decodeAudioData, which is the call play.js makes to apply pitch.
+export const CODEC = { profile: 'voice-opus', ext: '.ogg' };
 export const INDEX_DOC = 'data/vo.json';
 export const INDEX_MIRROR = 'audio/vo/index.json';
 

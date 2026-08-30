@@ -6,85 +6,252 @@
       "cam": "two",
       "once": true,
       "lines": [
-        { "who": "narrator", "text": "The hall swallows the sound of your boots. Somebody has been waiting for you.", "vo": "narrator_hall_01" },
-        { "who": "greeter", "text": "A dark robe, at the Academy. Well. Nobody minds the colour so long as you can hold a line.", "vo": "greeter_hello_01" },
-        { "who": "greeter", "text": "Contracts are on the boards behind me. Iron first — everyone starts on iron.", "vo": "greeter_hello_02" }
+        {
+          "who": "narrator",
+          "text": "The hall swallows the sound of your boots. Somebody has been waiting for you.",
+          "vo": "narrator_hall_01"
+        },
+        {
+          "who": "greeter",
+          "text": "A dark robe, at the Academy. Well. Nobody minds the colour so long as you can hold a line.",
+          "vo": "greeter_hello_01"
+        },
+        {
+          "who": "greeter",
+          "text": "Contracts are on the boards behind me. Iron first — everyone starts on iron.",
+          "vo": "greeter_hello_02"
+        }
       ],
       "choices": [
-        { "say": "Who are you?", "goto": "academy.greeter.who", "sets": [] },
-        { "say": "What is a contract?", "goto": "academy.greeter.contracts", "sets": [] },
-        { "say": "I'll read them myself.", "goto": "academy.greeter.brushoff",
-          "sets": [{ "k": "flag", "name": "academy.brushed.vail", "value": true }] }
+        {
+          "say": "Who are you?",
+          "goto": "academy.greeter.who",
+          "sets": []
+        },
+        {
+          "say": "What is a contract?",
+          "goto": "academy.greeter.contracts",
+          "sets": []
+        },
+        {
+          "say": "I'll read them myself.",
+          "goto": "academy.greeter.brushoff",
+          "sets": [
+            {
+              "k": "flag",
+              "name": "academy.brushed.vail",
+              "value": true
+            }
+          ]
+        }
       ],
       "next": null,
-      "sets": [{ "k": "flag", "name": "academy.met.vail", "value": true }]
+      "sets": [
+        {
+          "k": "flag",
+          "name": "academy.met.vail",
+          "value": true
+        }
+      ]
     },
-
     "academy.greeter.who": {
       "name": "Vail — who are you",
       "cam": "close",
       "lines": [
-        { "who": "greeter", "text": "Vail. I keep the boards honest and the floor swept. Both are harder than they sound.", "vo": "greeter_who_01" }
+        {
+          "who": "greeter",
+          "text": "Vail. I keep the boards honest and the floor swept. Both are harder than they sound.",
+          "vo": "greeter_who_01"
+        }
       ],
       "choices": [
-        { "say": "And the contracts?", "goto": "academy.greeter.contracts", "sets": [] },
-        { "say": "Thank you.", "goto": "academy.greeter.done", "sets": [] }
+        {
+          "say": "And the contracts?",
+          "goto": "academy.greeter.contracts",
+          "sets": []
+        },
+        {
+          "say": "Thank you.",
+          "goto": "academy.greeter.done",
+          "sets": []
+        }
       ],
       "next": null,
-      "sets": [{ "k": "flag", "name": "academy.knows.vail", "value": true }]
+      "sets": [
+        {
+          "k": "flag",
+          "name": "academy.knows.vail",
+          "value": true
+        }
+      ]
     },
-
     "academy.greeter.contracts": {
       "name": "Vail — what is a contract",
       "cam": "two",
       "lines": [
-        { "who": "greeter", "text": "Somebody wants something fought. You take the board's word for it and go and fight it.", "vo": "greeter_contracts_01" },
-        { "who": "greeter", "text": "Iron pays little and forgives much. Gold does neither.", "vo": "greeter_contracts_02" }
+        {
+          "who": "greeter",
+          "text": "Somebody wants something fought. You take the board's word for it and go and fight it.",
+          "vo": "greeter_contracts_01"
+        },
+        {
+          "who": "greeter",
+          "text": "Iron pays little and forgives much. Gold does neither.",
+          "vo": "greeter_contracts_02"
+        }
       ],
       "choices": [
-        { "say": "And the fourth board?", "goto": "academy.greeter.newadventures", "sets": [] },
-        { "say": "Iron it is.", "goto": "academy.greeter.done",
-          "sets": [{ "k": "flag", "name": "academy.chose.iron", "value": true }] }
+        {
+          "say": "And the fourth board?",
+          "goto": "academy.greeter.newadventures",
+          "sets": []
+        },
+        {
+          "say": "Iron it is.",
+          "goto": "academy.greeter.done",
+          "sets": [
+            {
+              "k": "flag",
+              "name": "academy.chose.iron",
+              "value": true
+            }
+          ]
+        }
       ],
       "next": null,
-      "sets": [{ "k": "flag", "name": "academy.knows.contracts", "value": true }]
+      "sets": [
+        {
+          "k": "flag",
+          "name": "academy.knows.contracts",
+          "value": true
+        }
+      ]
     },
-
     "academy.greeter.newadventures": {
       "name": "Vail — New Adventures",
       "cam": "two",
       "lines": [
-        { "who": "greeter", "text": "New Adventures. Nothing pinned to it yet. It goes up before the work does.", "vo": "greeter_new_01" }
+        {
+          "who": "greeter",
+          "text": "New Adventures. Nothing pinned to it yet. It goes up before the work does.",
+          "vo": "greeter_new_01"
+        }
       ],
       "choices": [
-        { "say": "Who pins them up?", "goto": "academy.greeter.who",
-          "if": ["not", ["flag", "academy.knows.vail"]], "sets": [] },
-        { "say": "I'll keep an eye on it.", "goto": "academy.greeter.done", "sets": [] }
+        {
+          "say": "Who pins them up?",
+          "goto": "academy.greeter.who",
+          "if": [
+            "not",
+            [
+              "flag",
+              "academy.knows.vail"
+            ]
+          ],
+          "sets": []
+        },
+        {
+          "say": "I'll keep an eye on it.",
+          "goto": "academy.greeter.done",
+          "sets": []
+        }
       ],
       "next": null,
       "sets": []
     },
-
     "academy.greeter.brushoff": {
       "name": "Vail — brushed off",
       "cam": "two",
       "lines": [
-        { "who": "greeter", "text": "Read away. They do not bite, and neither do I. Mostly.", "vo": "greeter_brush_01" }
+        {
+          "who": "greeter",
+          "text": "Read away. They do not bite, and neither do I. Mostly.",
+          "vo": "greeter_brush_01"
+        }
       ],
       "choices": [],
       "next": "academy.greeter.done",
       "sets": []
     },
-
     "academy.greeter.done": {
       "name": "Vail — parting",
       "cam": "none",
       "lines": [
-        { "who": "greeter", "text": "Boards are behind me. Come back when you have taken one.", "vo": "greeter_done_01" }
+        {
+          "who": "greeter",
+          "text": "Boards are behind me. Come back when you have taken one.",
+          "vo": "greeter_done_01"
+        }
       ],
       "choices": [],
       "next": null,
-      "sets": [{ "k": "flag", "name": "academy.greeted", "value": true }]
+      "sets": [
+        {
+          "k": "flag",
+          "name": "academy.greeted",
+          "value": true
+        }
+      ]
+    },
+    "academy.door.yard": {
+      "name": "Door — the yard passage",
+      "lines": [
+        {
+          "who": "narrator",
+          "text": "A dark passage runs on towards the yard. Cold air comes back along it."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "academy.door.armoury.locked": {
+      "name": "Door — armoury, locked",
+      "lines": [
+        {
+          "who": "narrator",
+          "text": "Studded oak, and a lock that has been oiled recently. It does not move."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "academy.door.armoury": {
+      "name": "Door — armoury, open",
+      "lines": [
+        {
+          "who": "narrator",
+          "text": "The lock turns. Beyond it the air smells of oil and cold iron."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "academy.door.dorm.locked": {
+      "name": "Door — dormitory, locked",
+      "lines": [
+        {
+          "who": "narrator",
+          "text": "Boarded, and barred from the far side. Someone wants their sleep."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "academy.door.dorm": {
+      "name": "Door — dormitory, open",
+      "lines": [
+        {
+          "who": "narrator",
+          "text": "The bar lifts. A stair goes up into the dark, and someone above turns over."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
     }
   }
 }

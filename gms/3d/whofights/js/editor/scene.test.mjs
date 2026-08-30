@@ -1,5 +1,6 @@
 import { test, eq, ok } from '../../tools/harness.mjs';
-import { normalise, normaliseHotspot, SCENE_VERSION, TYPES } from './scene.js';
+import { normalise, normaliseHotspot, SCENE_VERSION, TYPES, TRIGGERS } from './scene.js';
+import { VERB_IDS } from '../game/actions.js';
 import { readFileSync } from 'node:fs';
 
 const doc = raw => normalise(raw).doc;
@@ -90,8 +91,19 @@ test('the shipped academy level normalises with nothing dropped', () => {
   const r = normalise(raw);
   eq(r.dropped, 0, `dropped: ${r.warnings.join('; ')}`);
   eq(r.warnings, []);
-  eq(r.doc.hotspots.length, 2);
   eq(r.doc.shots.length, 4);
+  // Counts are content, and content grows. What has to hold is that every hotspot in the file is
+  // one the runtime can actually evaluate.
+  ok(r.doc.hotspots.length >= 2, 'the academy still has its doorway and its greeter');
+  const ids = new Set();
+  for (const h of r.doc.hotspots) {
+    ok(h.id && !ids.has(h.id), `hotspot ids must be present and unique: ${h.id}`);
+    ids.add(h.id);
+    ok(TRIGGERS.includes(h.trigger), `${h.id}: unknown trigger ${h.trigger}`);
+    ok(h.attach ? h.r > 0 : !!h.shape, `${h.id}: no shape and nothing to follow`);
+    ok(h.actions.length > 0, `${h.id}: does nothing`);
+    for (const a of h.actions) ok(VERB_IDS.includes(a.k), `${h.id}: unknown action ${a.k}`);
+  }
   const boards = r.doc.objects.filter(o => o.type === 'billboard');
   eq(boards.map(b => b.p.text).sort(),
     ['Bronze Contracts', 'Gold Contracts', 'Iron Contracts', 'New Adventures']);

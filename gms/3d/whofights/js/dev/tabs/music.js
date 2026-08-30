@@ -8,6 +8,7 @@ import { library } from '../music/library.js';
 import { sets } from '../music/sets.js';
 import { assign } from '../music/assign.js';
 import { generate } from '../music/generate.js';
+import { compress } from '../music/compress.js';
 
 // The tab can be mounted from index.html or from js/dev/selftest.html, so audio and the studio are
 // addressed from the module's own URL rather than the page's.
@@ -18,6 +19,7 @@ const VIEWS = [
   ['sets', 'Sets', sets],
   ['assign', 'Assign', assign],
   ['generate', 'Generate', generate],
+  ['compress', 'Compress', compress],
 ];
 
 registerTab({

@@ -46,6 +46,29 @@ export async function clipsOnDisk(api) {
     .map(f => f.name.slice(0, -CODEC.ext.length)));
 }
 
+// The dev server's encode route. js/dev/api.js has no wrapper for it and is not this agent's file,
+// so it is called directly off api.base. Its own CPU queue, so it never waits on the GPU slot.
+export async function encodeClip(api, key, { profile = CODEC.profile } = {}) {
+  const base = api.base;
+  if (!base) return { ok: false, error: 'no dev server' };
+  const go = async (path, opts) => {
+    try {
+      const r = await fetch(`${base}${path}`, opts);
+      return await r.json();
+    } catch (e) { return { ok: false, error: String(e.message || e) }; }
+  };
+  const start = await go('/api/encode', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ src: rawFile(key), profile, out: key }) });
+  if (!start.ok || !start.job) return start;
+  for (let i = 0; i < 400; i++) {
+    await new Promise(r => setTimeout(r, i < 6 ? 200 : 800));
+    const s = await go(`/api/job/${encodeURIComponent(start.job)}`);
+    if (s.state === 'done') return { ok: true, bytes: s.after?.bytes ?? 0, from: s.source?.bytes ?? 0 };
+    if (s.state === 'error') return { ok: false, error: s.error || 'encode failed' };
+  }
+  return { ok: false, error: 'gave up waiting for the encode job' };
+}
+
 // audio/vo/raw is outside /api/ls's whitelist, but the dev server still serves it statically, so a
 // HEAD answers the same question one file at a time. Bounded to the keys actually being planned.
 export async function rawsOnDisk(keys, { concurrency = 12 } = {}) {

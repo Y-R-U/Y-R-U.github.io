@@ -11,6 +11,11 @@ export const DUCK_IN = 200;
 export const DUCK_OUT = 600;
 export const RETARGET_MS = 120;    // volume/mute changes glide rather than step
 export const HANDOVER_MIN = 250;   // shortest cross-fade between two tracks of one set
+// ACE-Step takes do not all resolve. A track marked ends:"abrupt" stops dead, so the runtime has
+// to fade it out itself no matter how short the set's own fade is; one marked starts:"quiet" ramps
+// in from near-silence already, and fading it in on top of that dips the bed twice.
+export const ABRUPT_FADE = 1500;
+export const QUIET_IN = 300;
 
 const clamp01 = v => (v < 0 ? 0 : v > 1 ? 1 : v);
 const num = (v, d) => (Number.isFinite(+v) ? +v : d);
@@ -36,6 +41,8 @@ export function pickNext(tracks, { shuffle = true, lastId = null, cursor = 0, rn
 }
 
 export const fadeOf = s => Math.max(0, num(s?.fadeMs, 1200));
+export const fadeInFor = (t, ms) => (t?.starts === 'quiet' ? Math.min(ms, QUIET_IN) : ms);
+export const fadeOutFor = (t, ms) => (t?.ends === 'abrupt' ? Math.max(ms, ABRUPT_FADE) : ms);
 export const volOf = s => clamp01(num(s?.volume, 0.7));
 
 export class MusicPlan {
@@ -139,7 +146,7 @@ export class MusicPlan {
     this.lastId = pick.id;
     const t = this.trackOf(pick.id);
     if (!t) { this.problems.push(`set "${s.id}" names missing track "${pick.id}"`); return []; }
-    return [this.playOp(this.voice(t, s.id, now, 'bed', fadeMs))];
+    return [this.playOp(this.voice(t, s.id, now, 'bed', fadeInFor(t, fadeMs)))];
   }
 
   voice(t, setId, now, role, fadeMs) {
@@ -193,10 +200,12 @@ export class MusicPlan {
       const fade = Math.max(HANDOVER_MIN, fadeOf(s));
       for (const v of this.beds().slice()) {
         if (v.over || v.setId !== this.setId || !(v.seconds > 0)) continue;
-        if (this.head(v, now) < v.seconds - fade / 1000) continue;
+        // Only the natural end needs the abrupt-take fade; a set change is the author's call.
+        const out = fadeOutFor(this.trackOf(v.trackId), fade);
+        if (this.head(v, now) < v.seconds - out / 1000) continue;
         v.over = true;
         ops.push(...this.startNext(now, fade));
-        this.fadeOut(v, now, fade);
+        this.fadeOut(v, now, out);
       }
     }
     for (const v of this.voices.slice()) {

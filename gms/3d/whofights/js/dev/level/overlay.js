@@ -1,6 +1,11 @@
 // Every hotspot in the level, drawn on the ground in the running world: colour-coded by the first
-// verb it runs, labelled, red when something about it is broken. It outlives the dev hub — the
-// game can turn it on through window.__wf.hotspots — so nothing here assumes an overlay is open.
+// verb it runs, labelled, red when something about it is broken, with drag handles on the selected
+// one. It outlives the dev hub — the game can turn it on through window.__wf.hotspots — so nothing
+// here assumes an overlay is open.
+//
+// The debug tab owns a hotspot wireframe too (js/dev/debug/overlays.js), coloured by trigger, for
+// reading a level rather than authoring one. This hangs off *its* group rather than beside it, and
+// asks it to stand down whenever this one is showing, so the two never draw the same rings twice.
 
 import * as THREE from 'three';
 import { centreOf, handlesOf, shapeAt, colourOf, radiusOf } from './hotspot.js';
@@ -23,9 +28,22 @@ export class HotspotOverlay {
     this.selected = new Set();
     this.problems = new Map();
     this.labels = true;
-    app.scene.add(this.root);
+    this.reparent();
     this.sys = { update: () => this.tick() };
     app.systems.push(this.sys);
+  }
+
+  // The debug tab builds its group lazily, so this is re-checked rather than resolved once.
+  reparent() {
+    const host = this.app.scene?.getObjectByName('wf-debug-overlays') || this.app.scene;
+    if (host && this.root.parent !== host) host.add(this.root);
+  }
+
+  // Their rings and these rings are the same rings. Only one set at a time.
+  standDown() {
+    if (!this.root.visible) return;
+    const o = window.__wf?.debug?.overlays;
+    if (o?.visible?.('hotspots')) Promise.resolve(o.show('hotspots', false)).catch(() => {});
   }
 
   groundY(x, z) {
@@ -35,13 +53,20 @@ export class HotspotOverlay {
 
   get visible() { return this.root.visible; }
 
-  show(on = true) { this.root.visible = !!on; return this.root.visible; }
+  show(on = true) {
+    this.root.visible = !!on;
+    this.reparent();
+    this.standDown();
+    return this.root.visible;
+  }
   toggle() { return this.show(!this.root.visible); }
 
   set(list, { selected, problems } = {}) {
     this.list = Array.isArray(list) ? list : [];
     if (selected) this.selected = selected instanceof Set ? selected : new Set(selected);
     if (problems) this.problems = problems;
+    this.reparent();
+    this.standDown();
     this.rebuild();
   }
 
@@ -212,8 +237,16 @@ function outline(shape, flat) {
 }
 
 // depthTest is off so a hotspot behind a wall is still findable; renderOrder keeps the overlay
-// above the world's own transparent passes.
-function mark(o) { o.renderOrder = 30; o.frustumCulled = false; return o; }
+// above the world's own transparent passes. `raycast` and `wfDebug` are the debug tab's convention
+// and hold here too: an overlay must never be what a pick ray hits.
+const NOOP = () => {};
+function mark(o) {
+  o.renderOrder = 30;
+  o.frustumCulled = false;
+  o.raycast = NOOP;
+  o.userData.wfDebug = true;
+  return o;
+}
 
 function labelSprite(text, colour) {
   if (typeof document === 'undefined') return null;
@@ -248,6 +281,8 @@ function labelSprite(text, colour) {
   s.scale.set((tex.image.width / tex.image.height) * hgt, hgt, 1);
   s.renderOrder = 31;
   s.frustumCulled = false;
+  s.raycast = NOOP;
+  s.userData.wfDebug = true;
   return s;
 }
 

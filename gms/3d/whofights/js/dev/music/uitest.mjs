@@ -154,6 +154,29 @@ async function tabRun() {
     await sleep(300);
     await p.shot(`${OUT}/06-generate.png`);
 
+    // Recompress: the A/B, and the fact that nothing here awards a score.
+    await p.clickText('#wf-dev .mus-sub button', 'Compress');
+    await p.waitFor('!!document.querySelector("#wf-dev .mus-side")');
+    await sleep(400);
+    check('the compress view lists the ffmpeg profiles from the server, not its own copy',
+      await p.waitFor(`document.querySelectorAll('#wf-dev main select option').length >= 4`, 8000),
+      await p.eval(`[...document.querySelectorAll('#wf-dev main select option')].map(o => o.textContent).join(' | ')`));
+    await p.clickText('#wf-dev .mus-side button', 'Who Fights');
+    await p.waitFor(`!!document.querySelector('#wf-dev [data-act=encode]')`);
+    await sleep(400);
+    check('it re-encodes from the raw take, not the shipped file',
+      /audio\/music\/raw\//.test(await p.eval(`document.querySelector('#wf-dev main table').textContent`)),
+      await p.eval(`document.querySelector('#wf-dev main table').textContent.slice(0, 160)`));
+    await p.click('#wf-dev [data-act=encode]');
+    const enc = await p.waitFor(`!!document.querySelector('#wf-dev [data-act=promote]')`, 120000);
+    check('a preview comes back and can be A/B-ed against what ships', enc,
+      await p.eval(`document.querySelector('#wf-dev [data-role=encode-note]')?.textContent || ''`));
+    check('and no number is offered as a verdict',
+      !/\b(score|quality|intelligib|%)\b/i.test(await p.eval(`document.querySelector('#wf-dev main').textContent`)));
+    await p.shot(`${OUT}/11-compress.png`);
+    const prev = await fetch(`${BASE}/audio/music/_preview/menu_bed_01.mp3`, { method: 'HEAD' });
+    check('the preview sits beside the shipped file so both play from one origin', prev.ok, `HTTP ${prev.status}`);
+
     // The studio, at the URL the tab itself asks for — window.open is stubbed so the button's own
     // logic is what is under test.
     await p.eval(`(() => { window.__open = null; window.open = u => { window.__open = u; return { closed: false, focus() {} }; }; })()`);
@@ -354,6 +377,7 @@ async function realGenerateRun() {
     await p.waitFor('[...document.querySelectorAll("#wf-dev nav button")].some(b => b.textContent.includes("Sound & music"))', 10000);
     await p.clickText('#wf-dev nav button', 'Sound & music');
     await p.waitFor('!!document.querySelector("#wf-dev .mus-sub")');
+    await p.waitFor(`[...document.querySelectorAll('#wf-dev .mus-sub button')].some(b => b.textContent === 'Generate')`, 8000);
     await p.clickText('#wf-dev .mus-sub button', 'Generate');
     await p.waitFor('!!document.querySelector("#wf-dev textarea")');
     await p.eval(`(() => {

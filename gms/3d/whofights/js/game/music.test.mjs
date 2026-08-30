@@ -324,3 +324,57 @@ test('ctx.music still wins, so a test can intercept without a runtime', async ()
   runAction({ k: 'music', set: 'hall' }, { music: a => seen.push(a.set) });
   eq(seen, ['hall']);
 });
+
+// Four of the twenty-five ACE-Step takes stop dead rather than resolving, and several ramp in from
+// near-silence. Both are carried in the manifest and handled here, not by ear in a browser.
+const ENDS = {
+  version: 1,
+  tracks: [
+    { id: 'a', file: 'a.mp3', seconds: 10, ends: 'abrupt' },
+    { id: 'b', file: 'b.mp3', seconds: 10, starts: 'quiet' },
+    { id: 'c', file: 'c.mp3', seconds: 10 },
+  ],
+  sets: [{ id: 'fast', tracks: ['a', 'c'], shuffle: false, fadeMs: 400, volume: 1 },
+    { id: 'slow', tracks: ['b'], shuffle: false, fadeMs: 4000, volume: 1 }],
+};
+
+test('a track that ends abruptly is faded out early, however short the set fade is', async () => {
+  const { ABRUPT_FADE } = await import('./music.js');
+  const p = new MusicPlan({ manifest: ENDS, rnd: () => 0 });
+  p.playSet('fast', 0);                       // picks `a`, which stops dead at 10 s
+  eq(p.tick(8000).length, 0, 'too early — the fade would end before the stop');
+  const ops = p.tick(10000 - ABRUPT_FADE + 50);
+  eq(ops.filter(o => o.op === 'play').length, 1, 'handed over a full ABRUPT_FADE before the stop');
+  const out = p.voices.find(v => v.out);
+  eq(out.env.ms, ABRUPT_FADE);
+});
+
+test('a clean-ending track keeps the set fade it was authored with', () => {
+  const p = new MusicPlan({ manifest: ENDS, rnd: () => 0 });
+  p.playSet('fast', 0);
+  p.tick(8600);                                // hands `a` over to `c`
+  const c = p.beds().find(v => v.trackId === 'c');
+  ok(c, 'c is playing');
+  p.tick(c.born + 9700);
+  const out = p.voices.filter(v => v.out).pop();
+  eq(out.trackId, 'c');
+  eq(out.env.ms, 400);
+});
+
+test('a track that ramps in from silence is not faded in on top of its own ramp', async () => {
+  const { QUIET_IN } = await import('./music.js');
+  const p = new MusicPlan({ manifest: ENDS, rnd: () => 0 });
+  p.playSet('slow', 0);                        // 4000ms set fade, but `b` fades itself in
+  eq(p.voices[0].env.ms, QUIET_IN);
+  near(p.gains(QUIET_IN).get(1), 1);
+});
+
+test('fadeInFor and fadeOutFor are pure and cope with an unmarked track', async () => {
+  const { fadeInFor, fadeOutFor, ABRUPT_FADE, QUIET_IN } = await import('./music.js');
+  eq(fadeInFor(null, 900), 900);
+  eq(fadeInFor({ starts: 'quiet' }, 100), 100, 'never lengthens a fade');
+  eq(fadeInFor({ starts: 'quiet' }, 4000), QUIET_IN);
+  eq(fadeOutFor(null, 400), 400);
+  eq(fadeOutFor({ ends: 'abrupt' }, 400), ABRUPT_FADE);
+  eq(fadeOutFor({ ends: 'abrupt' }, 6000), 6000, 'never shortens one');
+});

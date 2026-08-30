@@ -9,19 +9,18 @@
 //   node tools/vo/gen_barks.mjs --sync             # only rewrite audio/vo/index.json
 //   node tools/vo/gen_barks.mjs --prune            # list index entries whose line is gone
 //   node tools/vo/gen_barks.mjs --encode           # encode whatever has no mp3 yet
-//   node tools/vo/gen_barks.mjs --reencode --bitrate=64k    # every clip again, from the raws
+//   node tools/vo/gen_barks.mjs --reencode --profile=voice-opus-hi   # again, from the raws
 //
 // What ships is audio/vo/<key>.mp3. The kokoro take is kept at audio/vo/raw/<key>.wav — gitignored,
 // and there only so a clip can be re-encoded at another bitrate without paying for kokoro again.
-// TODO: the dev server is growing a queued POST /api/encode (the sound agent owns it). When it
-// lands, encode() here should call it and the tab should stop having to say "run the CLI".
+// Encoding is the dev server's POST /api/encode (the sound agent's route) on its own CPU queue —
+// not ffmpeg here, so there is one place the profiles are defined and one place they change.
 //
 // data/vo.json is the ledger the tools read and write (the dev server only writes under data/);
 // audio/vo/index.json is its mirror, which is where DEV_CONTRACT §8 says the sidecar lives.
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { planJobs, applyResults, pruneIndex, blankIndex, validateIndex, mergeClips, needsEncoding,
   clipFile, rawFile, CODEC, INDEX_DOC, INDEX_MIRROR, VO_DIR, RAW_DIR } from '../../js/dev/chars/vo.js';
@@ -53,8 +52,7 @@ const write = (rel, doc) => {
   return abs;
 };
 
-// ffmpeg, not a library: it is already on this machine, and an encoder is not something to write.
-function encode(keys, { bitrate = CODEC.bitrate } = {}) {
+async function encode(keys, { profile = CODEC.profile } = {}) {
   const done = [], failed = [];
   for (const key of keys) {
     const src = path.join(ROOT, rawFile(key));
@@ -65,18 +63,21 @@ function encode(keys, { bitrate = CODEC.bitrate } = {}) {
       fs.renameSync(legacy, src);
     }
     if (!fs.existsSync(src)) { failed.push({ key, error: `no raw take at ${rawFile(key)}` }); continue; }
-    const out = path.join(ROOT, clipFile(key));
-    fs.mkdirSync(path.dirname(out), { recursive: true });
-    const r = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-i', src,
-      '-ac', String(CODEC.channels), '-ar', String(CODEC.rate), '-c:a', 'libmp3lame',
-      '-b:a', bitrate, out], { encoding: 'utf8' });
-    if (r.status !== 0 || !fs.existsSync(out)) {
-      failed.push({ key, error: (r.stderr || r.error?.message || `ffmpeg exited ${r.status}`).trim().slice(-200) });
-      continue;
-    }
-    done.push({ key, bytes: fs.statSync(out).size, from: fs.statSync(src).size });
+    const r = await post('/api/encode', { src: rawFile(key), profile, out: key }, 120000);
+    const j = r.ok && r.job ? await waitJob(r.job) : r;
+    if (!j.ok || j.state === 'error') { failed.push({ key, error: j.error || j.note || 'encode failed' }); continue; }
+    done.push({ key, bytes: j.after?.bytes ?? 0, from: j.source?.bytes ?? fs.statSync(src).size });
   }
   return { done, failed };
+}
+
+async function waitJob(id) {
+  for (let i = 0; i < 600; i++) {
+    const s = await fetch(`${BASE}/api/job/${id}`).then(r => r.json()).catch(() => null);
+    if (s && (s.state === 'done' || s.state === 'error')) return s;
+    await new Promise(r => setTimeout(r, i < 6 ? 250 : 1000));
+  }
+  return { ok: false, error: 'gave up waiting for the encode job' };
 }
 
 function markEncoded(index, done) {
@@ -122,13 +123,13 @@ if (flag('sync')) { sync(); process.exit(0); }
 if (flag('encode') || flag('reencode')) {
   const keys = flag('reencode') ? Object.keys(index.clips || {}) : needsEncoding(index).map(n => n.key);
   if (!keys.length) { console.log('nothing to encode'); sync(); process.exit(0); }
-  const bitrate = opt('bitrate') || CODEC.bitrate;
-  const { done, failed } = encode(keys, { bitrate });
+  const profile = opt('profile') || CODEC.profile;
+  const { done, failed } = await encode(keys, { profile });
   index = markEncoded(index, done);
   writeLedger(index);
   sync();
   const from = done.reduce((s2, d) => s2 + d.from, 0), to = done.reduce((s2, d) => s2 + d.bytes, 0);
-  console.log(`encoded ${done.length} clips at ${bitrate}: ${(from / 1e6).toFixed(1)} MB of wav → ${(to / 1e6).toFixed(2)} MB of mp3`);
+  console.log(`encoded ${done.length} clips as ${profile}: ${(from / 1e6).toFixed(1)} MB of wav → ${(to / 1e6).toFixed(2)} MB shipped`);
   for (const f of failed) console.error(`  FAILED ${f.key}: ${f.error}`);
   process.exit(failed.length ? 1 : 0);
 }
@@ -173,7 +174,7 @@ for (let n = 0; n < plan.jobs.length; n += CHUNK) {
   const applied = applyResults(index, chunk, r.results);
   index = applied.index;
   failed.push(...applied.failed);
-  const enc = encode(chunk.filter(j => !applied.failed.some(f => f.key === j.key)).map(j => j.key));
+  const enc = await encode(chunk.filter(j => !applied.failed.some(f => f.key === j.key)).map(j => j.key));
   index = markEncoded(index, enc.done);
   failed.push(...enc.failed);
   writeLedger(index);

@@ -3,7 +3,7 @@
 
 import { BARK_CATEGORIES, effectiveBarks, clipKey, clipFile, hashLine, planJobs, applyResults,
   needsEncoding, playableFile, speedOf, pitchOf, synthSpeed } from './vo.js';
-import { loadIndex, saveIndex, clipsOnDisk, rawsOnDisk } from './voindex.js';
+import { loadIndex, saveIndex, clipsOnDisk, rawsOnDisk, encodeClip } from './voindex.js';
 import { playClip } from './play.js';
 
 const CHUNK = 40;   // one kokoro model load per request (~6 s) against a run you can watch
@@ -239,6 +239,16 @@ export function createBarks(ctx, host) {
       index = applied.index;
       fails.push(...applied.failed);
       done += chunk.length;
+
+      // Synthesis writes a wav under audio/vo/raw; what ships is the encode of it. Both happen
+      // here so a clip is never left half-made, and `encoded` only goes true once the file exists.
+      const made = chunk.filter(j => !applied.failed.some(f => f.key === j.key));
+      for (let m = 0; m < made.length; m++) {
+        prog.innerHTML = `encoding ${m + 1} of ${made.length} <span class="dim">(${done} synthesised)</span>`;
+        const e = await encodeClip(ctx.api, made[m].key);
+        if (e.ok) index.clips[made[m].key] = { ...index.clips[made[m].key], encoded: true, bytes: e.bytes };
+        else fails.push({ key: made[m].key, error: `encode: ${e.error}` });
+      }
       const save = await saveIndex(ctx.api, index);
       if (!save.ok) ctx.toast(`vo index did not save: ${save.error}`, 'bad');
       indexWhere = save.where || indexWhere;
@@ -249,14 +259,13 @@ export function createBarks(ctx, host) {
     el.querySelector('[data-act=cancel]').hidden = true;
     el.querySelector('[data-act=genall]').disabled = false;
     const secs = ((Date.now() - t0) / 1000).toFixed(0);
-    // The tab can synthesise but not encode: the dev server has no encode route yet, so the mp3s
-    // that actually ship are made by the CLI. Say so rather than leaving wavs looking finished.
     const unenc = needsEncoding(index).length;
     prog.innerHTML = `${done - fails.length} of ${jobs.length} written in ${secs}s`
       + (cancel ? ' <span class="warnc">— stopped</span>' : '')
       + (fails.length ? ` <span class="bad">— ${fails.length} refused</span>` : '')
       + (unenc ? ` <span class="warnc">— ${unenc} still to encode:</span>
           <code>node tools/vo/gen_barks.mjs --encode</code>` : '');
+    onDisk = await clipsOnDisk(ctx.api);
     // kokoro_say.py refuses a silent or too-short take on purpose. Those have to be read, not
     // swallowed: a clip that "exists" but says nothing is the bug this whole check exists for.
     q('fails').hidden = !fails.length;

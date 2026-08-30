@@ -67,11 +67,6 @@ export const project = (x, y, back) => [back ? uBack(x) : uFront(x), vOf(y)];
 export const px = (x, y, back) => [(back ? BACK_CX - x * S : FRONT_CX + x * S), FEET_ROW - y * S];
 export const PANEL = { frontCx: FRONT_CX, backCx: BACK_CX, feetRow: FEET_ROW, split: ATLAS.w / 2 };
 
-function lerpSection(a, b, t) {
-  const m = (k) => a[k] + (b[k] - a[k]) * t;
-  return { y: m('y'), x: m('x'), z: m('z'), w: m('w'), d: m('d') };
-}
-
 // A face whose normal is nearly parallel to the projection plane has no area in UV — the two
 // z-extremes of a limb's side collapse onto one column of texels and smear it down the whole side.
 // So those faces are folded INWARD, into the part's own silhouette: the side of an arm samples the
@@ -91,11 +86,9 @@ export function faces() {
     for (const flip of part.mirror ? [1, -1] : [1]) {
       const p = flip === 1 ? part : { ...part, id: part.mirror };
       const S4 = part.sections.map(s => ({ ...s, x: s.x * flip }));
-      const back = false;
 
       for (let i = 0; i < S4.length - 1; i++) {
         const a = S4[i], b = S4[i + 1];
-        const span = Math.abs(b.y - a.y);
         const L = s => s.x - s.w / 2, R = s => s.x + s.w / 2;
         const F = s => s.z + s.d / 2, K = s => s.z - s.d / 2;
 

@@ -5,7 +5,7 @@
       "who": "player",
       "category": "spot",
       "i": 0,
-      "file": "audio/vo/player__spot__01.mp3",
+      "file": "audio/vo/player__spot__01.ogg",
       "raw": "audio/vo/raw/player__spot__01.wav",
       "encoded": true,
       "text": "Uh oh.",
@@ -17,13 +17,13 @@
       "seconds": 1.375,
       "rms": -24.69,
       "at": 1788096745043,
-      "bytes": 8877
+      "bytes": 3697
     },
     "player__spot__02": {
       "who": "player",
       "category": "spot",
       "i": 1,
-      "file": "audio/vo/player__spot__02.mp3",
+      "file": "audio/vo/player__spot__02.ogg",
       "raw": "audio/vo/raw/player__spot__02.wav",
       "encoded": true,
       "text": "Right. Here we go.",
@@ -35,13 +35,13 @@
       "seconds": 2,
       "rms": -24.54,
       "at": 1788096745043,
-      "bytes": 12621
+      "bytes": 5403
     },
     "greeter__greet__01": {
       "who": "greeter",
       "category": "greet",
       "i": 0,
-      "file": "audio/vo/greeter__greet__01.mp3",
+      "file": "audio/vo/greeter__greet__01.ogg",
       "raw": "audio/vo/raw/greeter__greet__01.wav",
       "encoded": true,
       "text": "You must be the new one. Stand up straight.",
@@ -53,13 +53,13 @@
       "seconds": 3.025,
       "rms": -23.88,
       "at": 1788096745043,
-      "bytes": 18813
+      "bytes": 8329
     },
     "greeter__greet__02": {
       "who": "greeter",
       "category": "greet",
       "i": 1,
-      "file": "audio/vo/greeter__greet__02.mp3",
+      "file": "audio/vo/greeter__greet__02.ogg",
       "raw": "audio/vo/raw/greeter__greet__02.wav",
       "encoded": true,
       "text": "Welcome to the Adventurer Academy. Try to look like you belong.",
@@ -71,13 +71,13 @@
       "seconds": 4.5,
       "rms": -24.05,
       "at": 1788096745043,
-      "bytes": 27597
+      "bytes": 12555
     },
     "greeter__greet__03": {
       "who": "greeter",
       "category": "greet",
       "i": 2,
-      "file": "audio/vo/greeter__greet__03.mp3",
+      "file": "audio/vo/greeter__greet__03.ogg",
       "raw": "audio/vo/raw/greeter__greet__03.wav",
       "encoded": true,
       "text": "You're late. Everyone is, on their first day.",
@@ -89,13 +89,13 @@
       "seconds": 3.175,
       "rms": -24.34,
       "at": 1788096745043,
-      "bytes": 19677
+      "bytes": 8656
     },
     "greeter__greet__04": {
       "who": "greeter",
       "category": "greet",
       "i": 3,
-      "file": "audio/vo/greeter__greet__04.mp3",
+      "file": "audio/vo/greeter__greet__04.ogg",
       "raw": "audio/vo/raw/greeter__greet__04.wav",
       "encoded": true,
       "text": "Good. You found the hall.",
@@ -107,13 +107,13 @@
       "seconds": 2.175,
       "rms": -24.25,
       "at": 1788096745043,
-      "bytes": 13629
+      "bytes": 5802
     },
     "greeter__greet__05": {
       "who": "greeter",
       "category": "greet",
       "i": 4,
-      "file": "audio/vo/greeter__greet__05.mp3",
+      "file": "audio/vo/greeter__greet__05.ogg",
       "raw": "audio/vo/raw/greeter__greet__05.wav",
       "encoded": true,
       "text": "Ah. You'll do.",
@@ -125,13 +125,13 @@
       "seconds": 1.825,
       "rms": -24.55,
       "at": 1788096745043,
-      "bytes": 11613
+      "bytes": 4775
     },
     "player__idle__01": {
       "who": "player",
       "category": "idle",
       "i": 0,
-      "file": "audio/vo/player__idle__01.mp3",
+      "file": "audio/vo/player__idle__01.ogg",
       "raw": "audio/vo/raw/player__idle__01.wav",
       "encoded": true,
       "text": "Bored now.",
@@ -143,13 +143,13 @@
       "seconds": 1.5,
       "rms": -23.97,
       "at": 1788096745043,
-      "bytes": 9597
+      "bytes": 4008
     },
     "player__idle__02": {
       "who": "player",
       "category": "idle",
       "i": 1,
-      "file": "audio/vo/player__idle__02.mp3",
+      "file": "audio/vo/player__idle__02.ogg",
       "raw": "audio/vo/raw/player__idle__02.wav",
       "encoded": true,
       "text": "What now?",
@@ -161,13 +161,13 @@
       "seconds": 1.4,
       "rms": -24.31,
       "at": 1788096745043,
-      "bytes": 9021
+      "bytes": 3805
     },
     "player__idle__03": {
       "who": "player",
       "category": "idle",
       "i": 2,
-      "file": "audio/vo/player__idle__03.mp3",
+      "file": "audio/vo/player__idle__03.ogg",
       "raw": "audio/vo/raw/player__idle__03.wav",
       "encoded": true,
       "text": "I should be doing something.",
@@ -179,13 +179,13 @@
       "seconds": 2.425,
       "rms": -25.22,
       "at": 1788096745043,
-      "bytes": 15213
+      "bytes": 6595
     },
     "player__curious__01": {
       "who": "player",
       "category": "curious",
       "i": 0,
-      "file": "audio/vo/player__curious__01.mp3",
+      "file": "audio/vo/player__curious__01.ogg",
       "raw": "audio/vo/raw/player__curious__01.wav",
       "encoded": true,
       "text": "Did you see that?",
@@ -197,13 +197,13 @@
       "seconds": 1.85,
       "rms": -25.4,
       "at": 1788096745043,
-      "bytes": 11757
+      "bytes": 4923
     },
     "player__curious__02": {
       "who": "player",
       "category": "curious",
       "i": 1,
-      "file": "audio/vo/player__curious__02.mp3",
+      "file": "audio/vo/player__curious__02.ogg",
       "raw": "audio/vo/raw/player__curious__02.wav",
       "encoded": true,
       "text": "What's that?",
@@ -215,13 +215,13 @@
       "seconds": 1.425,
       "rms": -24.25,
       "at": 1788096745043,
-      "bytes": 9165
+      "bytes": 3837
     },
     "player__curious__03": {
       "who": "player",
       "category": "curious",
       "i": 2,
-      "file": "audio/vo/player__curious__03.mp3",
+      "file": "audio/vo/player__curious__03.ogg",
       "raw": "audio/vo/raw/player__curious__03.wav",
       "encoded": true,
       "text": "Hm.",
@@ -233,13 +233,13 @@
       "seconds": 0.9,
       "rms": -25.47,
       "at": 1788096745043,
-      "bytes": 5997
+      "bytes": 2517
     },
     "player__success__01": {
       "who": "player",
       "category": "success",
       "i": 0,
-      "file": "audio/vo/player__success__01.mp3",
+      "file": "audio/vo/player__success__01.ogg",
       "raw": "audio/vo/raw/player__success__01.wav",
       "encoded": true,
       "text": "Ha!",
@@ -251,13 +251,13 @@
       "seconds": 1,
       "rms": -24.44,
       "at": 1788096745043,
-      "bytes": 6573
+      "bytes": 2773
     },
     "player__success__02": {
       "who": "player",
       "category": "success",
       "i": 1,
-      "file": "audio/vo/player__success__02.mp3",
+      "file": "audio/vo/player__success__02.ogg",
       "raw": "audio/vo/raw/player__success__02.wav",
       "encoded": true,
       "text": "Got it.",
@@ -269,13 +269,13 @@
       "seconds": 1.075,
       "rms": -24.19,
       "at": 1788096745043,
-      "bytes": 7005
+      "bytes": 2953
     },
     "player__success__03": {
       "who": "player",
       "category": "success",
       "i": 2,
-      "file": "audio/vo/player__success__03.mp3",
+      "file": "audio/vo/player__success__03.ogg",
       "raw": "audio/vo/raw/player__success__03.wav",
       "encoded": true,
       "text": "Nice.",
@@ -287,13 +287,13 @@
       "seconds": 1.1,
       "rms": -23.78,
       "at": 1788096745043,
-      "bytes": 7149
+      "bytes": 2964
     },
     "player__failure__01": {
       "who": "player",
       "category": "failure",
       "i": 0,
-      "file": "audio/vo/player__failure__01.mp3",
+      "file": "audio/vo/player__failure__01.ogg",
       "raw": "audio/vo/raw/player__failure__01.wav",
       "encoded": true,
       "text": "Nope.",
@@ -305,13 +305,13 @@
       "seconds": 1.075,
       "rms": -23.22,
       "at": 1788096745043,
-      "bytes": 7005
+      "bytes": 2980
     },
     "player__failure__02": {
       "who": "player",
       "category": "failure",
       "i": 1,
-      "file": "audio/vo/player__failure__02.mp3",
+      "file": "audio/vo/player__failure__02.ogg",
       "raw": "audio/vo/raw/player__failure__02.wav",
       "encoded": true,
       "text": "That went badly.",
@@ -323,13 +323,13 @@
       "seconds": 1.975,
       "rms": -25.14,
       "at": 1788096745043,
-      "bytes": 12477
+      "bytes": 5346
     },
     "player__failure__03": {
       "who": "player",
       "category": "failure",
       "i": 2,
-      "file": "audio/vo/player__failure__03.mp3",
+      "file": "audio/vo/player__failure__03.ogg",
       "raw": "audio/vo/raw/player__failure__03.wav",
       "encoded": true,
       "text": "Ow. And no.",
@@ -341,13 +341,13 @@
       "seconds": 1.9,
       "rms": -24.87,
       "at": 1788096745043,
-      "bytes": 12045
+      "bytes": 5023
     },
     "player__hurt__01": {
       "who": "player",
       "category": "hurt",
       "i": 0,
-      "file": "audio/vo/player__hurt__01.mp3",
+      "file": "audio/vo/player__hurt__01.ogg",
       "raw": "audio/vo/raw/player__hurt__01.wav",
       "encoded": true,
       "text": "Ow!",
@@ -359,13 +359,13 @@
       "seconds": 0.975,
       "rms": -24.72,
       "at": 1788096745043,
-      "bytes": 6429
+      "bytes": 2649
     },
     "player__hurt__02": {
       "who": "player",
       "category": "hurt",
       "i": 1,
-      "file": "audio/vo/player__hurt__02.mp3",
+      "file": "audio/vo/player__hurt__02.ogg",
       "raw": "audio/vo/raw/player__hurt__02.wav",
       "encoded": true,
       "text": "That's going to bruise.",
@@ -377,13 +377,13 @@
       "seconds": 2.2,
       "rms": -24.51,
       "at": 1788096745043,
-      "bytes": 13773
+      "bytes": 5971
     },
     "player__hurt__03": {
       "who": "player",
       "category": "hurt",
       "i": 2,
-      "file": "audio/vo/player__hurt__03.mp3",
+      "file": "audio/vo/player__hurt__03.ogg",
       "raw": "audio/vo/raw/player__hurt__03.wav",
       "encoded": true,
       "text": "Right. Ow.",
@@ -395,13 +395,13 @@
       "seconds": 1.575,
       "rms": -24.27,
       "at": 1788096745043,
-      "bytes": 10029
+      "bytes": 4230
     },
     "player__combat__01": {
       "who": "player",
       "category": "combat",
       "i": 0,
-      "file": "audio/vo/player__combat__01.mp3",
+      "file": "audio/vo/player__combat__01.ogg",
       "raw": "audio/vo/raw/player__combat__01.wav",
       "encoded": true,
       "text": "Come on!",
@@ -413,13 +413,13 @@
       "seconds": 1.275,
       "rms": -24.51,
       "at": 1788096745043,
-      "bytes": 8301
+      "bytes": 3486
     },
     "player__combat__02": {
       "who": "player",
       "category": "combat",
       "i": 1,
-      "file": "audio/vo/player__combat__02.mp3",
+      "file": "audio/vo/player__combat__02.ogg",
       "raw": "audio/vo/raw/player__combat__02.wav",
       "encoded": true,
       "text": "Take that!",
@@ -431,13 +431,13 @@
       "seconds": 1.425,
       "rms": -24.71,
       "at": 1788096745043,
-      "bytes": 9165
+      "bytes": 3882
     },
     "player__combat__03": {
       "who": "player",
       "category": "combat",
       "i": 2,
-      "file": "audio/vo/player__combat__03.mp3",
+      "file": "audio/vo/player__combat__03.ogg",
       "raw": "audio/vo/raw/player__combat__03.wav",
       "encoded": true,
       "text": "Still standing!",
@@ -449,13 +449,13 @@
       "seconds": 1.9,
       "rms": -24.32,
       "at": 1788096745043,
-      "bytes": 12045
+      "bytes": 5045
     },
     "player__thanks__01": {
       "who": "player",
       "category": "thanks",
       "i": 0,
-      "file": "audio/vo/player__thanks__01.mp3",
+      "file": "audio/vo/player__thanks__01.ogg",
       "raw": "audio/vo/raw/player__thanks__01.wav",
       "encoded": true,
       "text": "Thanks.",
@@ -467,13 +467,13 @@
       "seconds": 1.025,
       "rms": -24.02,
       "at": 1788096745043,
-      "bytes": 6717
+      "bytes": 2786
     },
     "player__thanks__02": {
       "who": "player",
       "category": "thanks",
       "i": 1,
-      "file": "audio/vo/player__thanks__02.mp3",
+      "file": "audio/vo/player__thanks__02.ogg",
       "raw": "audio/vo/raw/player__thanks__02.wav",
       "encoded": true,
       "text": "Cheers.",
@@ -485,13 +485,13 @@
       "seconds": 1.2,
       "rms": -24.28,
       "at": 1788096745043,
-      "bytes": 7725
+      "bytes": 3209
     },
     "greeter__idle__01": {
       "who": "greeter",
       "category": "idle",
       "i": 0,
-      "file": "audio/vo/greeter__idle__01.mp3",
+      "file": "audio/vo/greeter__idle__01.ogg",
       "raw": "audio/vo/raw/greeter__idle__01.wav",
       "encoded": true,
       "text": "The hall is quieter without students in it. I have mixed feelings.",
@@ -503,13 +503,13 @@
       "seconds": 4.475,
       "rms": -23.84,
       "at": 1788096745043,
-      "bytes": 27453
+      "bytes": 12608
     },
     "greeter__idle__02": {
       "who": "greeter",
       "category": "idle",
       "i": 1,
-      "file": "audio/vo/greeter__idle__02.mp3",
+      "file": "audio/vo/greeter__idle__02.ogg",
       "raw": "audio/vo/raw/greeter__idle__02.wav",
       "encoded": true,
       "text": "Somebody has moved the training dummies. Again.",
@@ -521,13 +521,13 @@
       "seconds": 3.75,
       "rms": -24.08,
       "at": 1788096745043,
-      "bytes": 23133
+      "bytes": 10317
     },
     "greeter__idle__03": {
       "who": "greeter",
       "category": "idle",
       "i": 2,
-      "file": "audio/vo/greeter__idle__03.mp3",
+      "file": "audio/vo/greeter__idle__03.ogg",
       "raw": "audio/vo/raw/greeter__idle__03.wav",
       "encoded": true,
       "text": "Standards. Standards.",
@@ -539,13 +539,13 @@
       "seconds": 2.225,
       "rms": -24.16,
       "at": 1788096745043,
-      "bytes": 13917
+      "bytes": 5924
     },
     "greeter__idle__04": {
       "who": "greeter",
       "category": "idle",
       "i": 3,
-      "file": "audio/vo/greeter__idle__04.mp3",
+      "file": "audio/vo/greeter__idle__04.ogg",
       "raw": "audio/vo/raw/greeter__idle__04.wav",
       "encoded": true,
       "text": "I have taught four hundred of you. Most are still alive.",
@@ -557,13 +557,13 @@
       "seconds": 3.725,
       "rms": -24.13,
       "at": 1788096745043,
-      "bytes": 22989
+      "bytes": 10352
     },
     "greeter__idle__05": {
       "who": "greeter",
       "category": "idle",
       "i": 4,
-      "file": "audio/vo/greeter__idle__05.mp3",
+      "file": "audio/vo/greeter__idle__05.ogg",
       "raw": "audio/vo/raw/greeter__idle__05.wav",
       "encoded": true,
       "text": "One does not simply stand about. One supervises.",
@@ -575,13 +575,13 @@
       "seconds": 4.025,
       "rms": -24.07,
       "at": 1788096745043,
-      "bytes": 24717
+      "bytes": 11156
     },
     "greeter__farewell__01": {
       "who": "greeter",
       "category": "farewell",
       "i": 0,
-      "file": "audio/vo/greeter__farewell__01.mp3",
+      "file": "audio/vo/greeter__farewell__01.ogg",
       "raw": "audio/vo/raw/greeter__farewell__01.wav",
       "encoded": true,
       "text": "Off you go. The world is waiting, impatiently.",
@@ -593,13 +593,13 @@
       "seconds": 3.525,
       "rms": -24,
       "at": 1788096745043,
-      "bytes": 21693
+      "bytes": 9744
     },
     "greeter__farewell__02": {
       "who": "greeter",
       "category": "farewell",
       "i": 1,
-      "file": "audio/vo/greeter__farewell__02.mp3",
+      "file": "audio/vo/greeter__farewell__02.ogg",
       "raw": "audio/vo/raw/greeter__farewell__02.wav",
       "encoded": true,
       "text": "Dismissed.",
@@ -611,13 +611,13 @@
       "seconds": 1.35,
       "rms": -24.42,
       "at": 1788096745043,
-      "bytes": 8733
+      "bytes": 3597
     },
     "greeter__farewell__03": {
       "who": "greeter",
       "category": "farewell",
       "i": 2,
-      "file": "audio/vo/greeter__farewell__03.mp3",
+      "file": "audio/vo/greeter__farewell__03.ogg",
       "raw": "audio/vo/raw/greeter__farewell__03.wav",
       "encoded": true,
       "text": "Come back when you have something to report.",
@@ -629,13 +629,13 @@
       "seconds": 3.075,
       "rms": -23.87,
       "at": 1788096745043,
-      "bytes": 19101
+      "bytes": 8439
     },
     "greeter__farewell__04": {
       "who": "greeter",
       "category": "farewell",
       "i": 3,
-      "file": "audio/vo/greeter__farewell__04.mp3",
+      "file": "audio/vo/greeter__farewell__04.ogg",
       "raw": "audio/vo/raw/greeter__farewell__04.wav",
       "encoded": true,
       "text": "Mind the step. It has had three of you this month.",
@@ -647,13 +647,13 @@
       "seconds": 3.175,
       "rms": -24.15,
       "at": 1788096745043,
-      "bytes": 19677
+      "bytes": 8708
     },
     "greeter__curious__01": {
       "who": "greeter",
       "category": "curious",
       "i": 0,
-      "file": "audio/vo/greeter__curious__01.mp3",
+      "file": "audio/vo/greeter__curious__01.ogg",
       "raw": "audio/vo/raw/greeter__curious__01.wav",
       "encoded": true,
       "text": "Interesting. Fetch me a lantern.",
@@ -665,13 +665,13 @@
       "seconds": 2.675,
       "rms": -24.17,
       "at": 1788096745043,
-      "bytes": 16653
+      "bytes": 7214
     },
     "greeter__curious__02": {
       "who": "greeter",
       "category": "curious",
       "i": 1,
-      "file": "audio/vo/greeter__curious__02.mp3",
+      "file": "audio/vo/greeter__curious__02.ogg",
       "raw": "audio/vo/raw/greeter__curious__02.wav",
       "encoded": true,
       "text": "Do not touch it. Look at it.",
@@ -683,13 +683,13 @@
       "seconds": 2.4,
       "rms": -24.1,
       "at": 1788096745043,
-      "bytes": 14925
+      "bytes": 6526
     },
     "greeter__curious__03": {
       "who": "greeter",
       "category": "curious",
       "i": 2,
-      "file": "audio/vo/greeter__curious__03.mp3",
+      "file": "audio/vo/greeter__curious__03.ogg",
       "raw": "audio/vo/raw/greeter__curious__03.wav",
       "encoded": true,
       "text": "That was not on the timetable.",
@@ -701,13 +701,13 @@
       "seconds": 2.575,
       "rms": -24.16,
       "at": 1788096745043,
-      "bytes": 16077
+      "bytes": 6987
     },
     "greeter__grumble__01": {
       "who": "greeter",
       "category": "grumble",
       "i": 0,
-      "file": "audio/vo/greeter__grumble__01.mp3",
+      "file": "audio/vo/greeter__grumble__01.ogg",
       "raw": "audio/vo/raw/greeter__grumble__01.wav",
       "encoded": true,
       "text": "Nobody reads the notices.",
@@ -719,13 +719,13 @@
       "seconds": 2.625,
       "rms": -23.71,
       "at": 1788096745043,
-      "bytes": 16365
+      "bytes": 7065
     },
     "greeter__grumble__02": {
       "who": "greeter",
       "category": "grumble",
       "i": 1,
-      "file": "audio/vo/greeter__grumble__02.mp3",
+      "file": "audio/vo/greeter__grumble__02.ogg",
       "raw": "audio/vo/raw/greeter__grumble__02.wav",
       "encoded": true,
       "text": "Chalk. We are out of chalk again.",
@@ -737,13 +737,13 @@
       "seconds": 2.575,
       "rms": -23.84,
       "at": 1788096765726,
-      "bytes": 16077
+      "bytes": 7012
     },
     "greeter__grumble__03": {
       "who": "greeter",
       "category": "grumble",
       "i": 2,
-      "file": "audio/vo/greeter__grumble__03.mp3",
+      "file": "audio/vo/greeter__grumble__03.ogg",
       "raw": "audio/vo/raw/greeter__grumble__03.wav",
       "encoded": true,
       "text": "I did ask for a bigger hall.",
@@ -755,13 +755,13 @@
       "seconds": 2.5,
       "rms": -24.25,
       "at": 1788096765726,
-      "bytes": 15645
+      "bytes": 6820
     },
     "greeter__success__01": {
       "who": "greeter",
       "category": "success",
       "i": 0,
-      "file": "audio/vo/greeter__success__01.mp3",
+      "file": "audio/vo/greeter__success__01.ogg",
       "raw": "audio/vo/raw/greeter__success__01.wav",
       "encoded": true,
       "text": "Adequate. Do it again.",
@@ -773,13 +773,13 @@
       "seconds": 2.2,
       "rms": -24.27,
       "at": 1788096765726,
-      "bytes": 13773
+      "bytes": 5981
     },
     "greeter__success__02": {
       "who": "greeter",
       "category": "success",
       "i": 1,
-      "file": "audio/vo/greeter__success__02.mp3",
+      "file": "audio/vo/greeter__success__02.ogg",
       "raw": "audio/vo/raw/greeter__success__02.wav",
       "encoded": true,
       "text": "Better. Much better.",
@@ -791,13 +791,13 @@
       "seconds": 2.175,
       "rms": -24.26,
       "at": 1788096765726,
-      "bytes": 13629
+      "bytes": 5861
     },
     "greeter__success__03": {
       "who": "greeter",
       "category": "success",
       "i": 2,
-      "file": "audio/vo/greeter__success__03.mp3",
+      "file": "audio/vo/greeter__success__03.ogg",
       "raw": "audio/vo/raw/greeter__success__03.wav",
       "encoded": true,
       "text": "There. That is what it should look like.",
@@ -809,13 +809,13 @@
       "seconds": 2.725,
       "rms": -24.15,
       "at": 1788096765726,
-      "bytes": 16941
+      "bytes": 7422
     },
     "greeter__success__04": {
       "who": "greeter",
       "category": "success",
       "i": 3,
-      "file": "audio/vo/greeter__success__04.mp3",
+      "file": "audio/vo/greeter__success__04.ogg",
       "raw": "audio/vo/raw/greeter__success__04.wav",
       "encoded": true,
       "text": "Good. Now do it when someone is shouting at you.",
@@ -827,13 +827,13 @@
       "seconds": 3.225,
       "rms": -23.95,
       "at": 1788096765726,
-      "bytes": 19965
+      "bytes": 8782
     },
     "greeter__failure__01": {
       "who": "greeter",
       "category": "failure",
       "i": 0,
-      "file": "audio/vo/greeter__failure__01.mp3",
+      "file": "audio/vo/greeter__failure__01.ogg",
       "raw": "audio/vo/raw/greeter__failure__01.wav",
       "encoded": true,
       "text": "That is why we practise.",
@@ -845,13 +845,13 @@
       "seconds": 2.4,
       "rms": -24.19,
       "at": 1788096765726,
-      "bytes": 14925
+      "bytes": 6492
     },
     "greeter__failure__02": {
       "who": "greeter",
       "category": "failure",
       "i": 1,
-      "file": "audio/vo/greeter__failure__02.mp3",
+      "file": "audio/vo/greeter__failure__02.ogg",
       "raw": "audio/vo/raw/greeter__failure__02.wav",
       "encoded": true,
       "text": "Again. Slower.",
@@ -863,13 +863,13 @@
       "seconds": 1.9,
       "rms": -24.36,
       "at": 1788096765726,
-      "bytes": 12045
+      "bytes": 4980
     },
     "greeter__failure__03": {
       "who": "greeter",
       "category": "failure",
       "i": 2,
-      "file": "audio/vo/greeter__failure__03.mp3",
+      "file": "audio/vo/greeter__failure__03.ogg",
       "raw": "audio/vo/raw/greeter__failure__03.wav",
       "encoded": true,
       "text": "Nobody was born knowing this.",
@@ -881,13 +881,13 @@
       "seconds": 2.625,
       "rms": -24.04,
       "at": 1788096765726,
-      "bytes": 16365
+      "bytes": 7081
     },
     "greeter__hurt__01": {
       "who": "greeter",
       "category": "hurt",
       "i": 0,
-      "file": "audio/vo/greeter__hurt__01.mp3",
+      "file": "audio/vo/greeter__hurt__01.ogg",
       "raw": "audio/vo/raw/greeter__hurt__01.wav",
       "encoded": true,
       "text": "Ow!",
@@ -899,13 +899,13 @@
       "seconds": 0.775,
       "rms": -25.64,
       "at": 1788096765726,
-      "bytes": 5277
+      "bytes": 2230
     },
     "greeter__hurt__02": {
       "who": "greeter",
       "category": "hurt",
       "i": 1,
-      "file": "audio/vo/greeter__hurt__02.mp3",
+      "file": "audio/vo/greeter__hurt__02.ogg",
       "raw": "audio/vo/raw/greeter__hurt__02.wav",
       "encoded": true,
       "text": "That hurt more than expected.",
@@ -917,13 +917,13 @@
       "seconds": 2.45,
       "rms": -24.01,
       "at": 1788096765726,
-      "bytes": 15357
+      "bytes": 6664
     },
     "greeter__hurt__03": {
       "who": "greeter",
       "category": "hurt",
       "i": 2,
-      "file": "audio/vo/greeter__hurt__03.mp3",
+      "file": "audio/vo/greeter__hurt__03.ogg",
       "raw": "audio/vo/raw/greeter__hurt__03.wav",
       "encoded": true,
       "text": "Careful!",
@@ -935,13 +935,13 @@
       "seconds": 1.175,
       "rms": -24.54,
       "at": 1788096765726,
-      "bytes": 7581
+      "bytes": 3185
     },
     "greeter__hurt__04": {
       "who": "greeter",
       "category": "hurt",
       "i": 3,
-      "file": "audio/vo/greeter__hurt__04.mp3",
+      "file": "audio/vo/greeter__hurt__04.ogg",
       "raw": "audio/vo/raw/greeter__hurt__04.wav",
       "encoded": true,
       "text": "Right. Now I'm cross.",
@@ -953,13 +953,13 @@
       "seconds": 2.125,
       "rms": -24.34,
       "at": 1788096765726,
-      "bytes": 13341
+      "bytes": 5650
     },
     "greeter__hurt__05": {
       "who": "greeter",
       "category": "hurt",
       "i": 4,
-      "file": "audio/vo/greeter__hurt__05.mp3",
+      "file": "audio/vo/greeter__hurt__05.ogg",
       "raw": "audio/vo/raw/greeter__hurt__05.wav",
       "encoded": true,
       "text": "Ah — that's a bruise.",
@@ -971,13 +971,13 @@
       "seconds": 2.175,
       "rms": -24.49,
       "at": 1788096765726,
-      "bytes": 13629
+      "bytes": 5773
     },
     "greeter__hurt__06": {
       "who": "greeter",
       "category": "hurt",
       "i": 5,
-      "file": "audio/vo/greeter__hurt__06.mp3",
+      "file": "audio/vo/greeter__hurt__06.ogg",
       "raw": "audio/vo/raw/greeter__hurt__06.wav",
       "encoded": true,
       "text": "Was that necessary?",
@@ -989,13 +989,13 @@
       "seconds": 2.175,
       "rms": -24.17,
       "at": 1788096765726,
-      "bytes": 13629
+      "bytes": 5840
     },
     "greeter__hurt__07": {
       "who": "greeter",
       "category": "hurt",
       "i": 6,
-      "file": "audio/vo/greeter__hurt__07.mp3",
+      "file": "audio/vo/greeter__hurt__07.ogg",
       "raw": "audio/vo/raw/greeter__hurt__07.wav",
       "encoded": true,
       "text": "Stop that!",
@@ -1007,13 +1007,13 @@
       "seconds": 1.35,
       "rms": -24.29,
       "at": 1788096765726,
-      "bytes": 8733
+      "bytes": 3627
     },
     "greeter__hurt__08": {
       "who": "greeter",
       "category": "hurt",
       "i": 7,
-      "file": "audio/vo/greeter__hurt__08.mp3",
+      "file": "audio/vo/greeter__hurt__08.ogg",
       "raw": "audio/vo/raw/greeter__hurt__08.wav",
       "encoded": true,
       "text": "Ouch. Genuinely, ouch.",
@@ -1025,13 +1025,13 @@
       "seconds": 2.35,
       "rms": -24.07,
       "at": 1788096765726,
-      "bytes": 14637
+      "bytes": 6290
     },
     "greeter__hurt__09": {
       "who": "greeter",
       "category": "hurt",
       "i": 8,
-      "file": "audio/vo/greeter__hurt__09.mp3",
+      "file": "audio/vo/greeter__hurt__09.ogg",
       "raw": "audio/vo/raw/greeter__hurt__09.wav",
       "encoded": true,
       "text": "I felt that in my teeth.",
@@ -1043,13 +1043,13 @@
       "seconds": 2.5,
       "rms": -23.92,
       "at": 1788096765726,
-      "bytes": 15645
+      "bytes": 6791
     },
     "greeter__hurt__10": {
       "who": "greeter",
       "category": "hurt",
       "i": 9,
-      "file": "audio/vo/greeter__hurt__10.mp3",
+      "file": "audio/vo/greeter__hurt__10.ogg",
       "raw": "audio/vo/raw/greeter__hurt__10.wav",
       "encoded": true,
       "text": "Enough!",
@@ -1061,13 +1061,13 @@
       "seconds": 1.075,
       "rms": -24.64,
       "at": 1788096765726,
-      "bytes": 7005
+      "bytes": 2909
     },
     "greeter__combat__01": {
       "who": "greeter",
       "category": "combat",
       "i": 0,
-      "file": "audio/vo/greeter__combat__01.mp3",
+      "file": "audio/vo/greeter__combat__01.ogg",
       "raw": "audio/vo/raw/greeter__combat__01.wav",
       "encoded": true,
       "text": "Come on, then!",
@@ -1079,13 +1079,13 @@
       "seconds": 1.75,
       "rms": -24.36,
       "at": 1788096765726,
-      "bytes": 11037
+      "bytes": 4585
     },
     "greeter__combat__02": {
       "who": "greeter",
       "category": "combat",
       "i": 1,
-      "file": "audio/vo/greeter__combat__02.mp3",
+      "file": "audio/vo/greeter__combat__02.ogg",
       "raw": "audio/vo/raw/greeter__combat__02.wav",
       "encoded": true,
       "text": "Stand still, would you!",
@@ -1097,13 +1097,13 @@
       "seconds": 2.125,
       "rms": -23.95,
       "at": 1788096765726,
-      "bytes": 13341
+      "bytes": 5729
     },
     "greeter__combat__03": {
       "who": "greeter",
       "category": "combat",
       "i": 2,
-      "file": "audio/vo/greeter__combat__03.mp3",
+      "file": "audio/vo/greeter__combat__03.ogg",
       "raw": "audio/vo/raw/greeter__combat__03.wav",
       "encoded": true,
       "text": "This is the loud part.",
@@ -1115,13 +1115,13 @@
       "seconds": 2.3,
       "rms": -24,
       "at": 1788096765726,
-      "bytes": 14349
+      "bytes": 6132
     },
     "greeter__combat__04": {
       "who": "greeter",
       "category": "combat",
       "i": 3,
-      "file": "audio/vo/greeter__combat__04.mp3",
+      "file": "audio/vo/greeter__combat__04.ogg",
       "raw": "audio/vo/raw/greeter__combat__04.wav",
       "encoded": true,
       "text": "Left! Go left!",
@@ -1133,13 +1133,13 @@
       "seconds": 1.925,
       "rms": -24.27,
       "at": 1788096765726,
-      "bytes": 12189
+      "bytes": 5105
     },
     "greeter__combat__05": {
       "who": "greeter",
       "category": "combat",
       "i": 4,
-      "file": "audio/vo/greeter__combat__05.mp3",
+      "file": "audio/vo/greeter__combat__05.ogg",
       "raw": "audio/vo/raw/greeter__combat__05.wav",
       "encoded": true,
       "text": "Almost had it.",
@@ -1151,13 +1151,13 @@
       "seconds": 1.975,
       "rms": -23.79,
       "at": 1788096765726,
-      "bytes": 12477
+      "bytes": 5241
     },
     "greeter__combat__06": {
       "who": "greeter",
       "category": "combat",
       "i": 5,
-      "file": "audio/vo/greeter__combat__06.mp3",
+      "file": "audio/vo/greeter__combat__06.ogg",
       "raw": "audio/vo/raw/greeter__combat__06.wav",
       "encoded": true,
       "text": "Keep your guard up!",
@@ -1169,13 +1169,13 @@
       "seconds": 2,
       "rms": -24.61,
       "at": 1788096765726,
-      "bytes": 12621
+      "bytes": 5349
     },
     "greeter__combat__07": {
       "who": "greeter",
       "category": "combat",
       "i": 6,
-      "file": "audio/vo/greeter__combat__07.mp3",
+      "file": "audio/vo/greeter__combat__07.ogg",
       "raw": "audio/vo/raw/greeter__combat__07.wav",
       "encoded": true,
       "text": "I've got this. Probably.",
@@ -1187,13 +1187,13 @@
       "seconds": 2.275,
       "rms": -24.14,
       "at": 1788096765726,
-      "bytes": 14205
+      "bytes": 6226
     },
     "greeter__combat__08": {
       "who": "greeter",
       "category": "combat",
       "i": 7,
-      "file": "audio/vo/greeter__combat__08.mp3",
+      "file": "audio/vo/greeter__combat__08.ogg",
       "raw": "audio/vo/raw/greeter__combat__08.wav",
       "encoded": true,
       "text": "Get behind me.",
@@ -1205,13 +1205,13 @@
       "seconds": 1.85,
       "rms": -24.21,
       "at": 1788096765726,
-      "bytes": 11757
+      "bytes": 4929
     },
     "greeter__combat__09": {
       "who": "greeter",
       "category": "combat",
       "i": 8,
-      "file": "audio/vo/greeter__combat__09.mp3",
+      "file": "audio/vo/greeter__combat__09.ogg",
       "raw": "audio/vo/raw/greeter__combat__09.wav",
       "encoded": true,
       "text": "Down you go.",
@@ -1223,13 +1223,13 @@
       "seconds": 1.525,
       "rms": -24.47,
       "at": 1788096765726,
-      "bytes": 9741
+      "bytes": 4070
     },
     "greeter__combat__10": {
       "who": "greeter",
       "category": "combat",
       "i": 9,
-      "file": "audio/vo/greeter__combat__10.mp3",
+      "file": "audio/vo/greeter__combat__10.ogg",
       "raw": "audio/vo/raw/greeter__combat__10.wav",
       "encoded": true,
       "text": "Any time now!",
@@ -1241,13 +1241,13 @@
       "seconds": 1.875,
       "rms": -24.43,
       "at": 1788096765726,
-      "bytes": 11901
+      "bytes": 4936
     },
     "greeter__combat__11": {
       "who": "greeter",
       "category": "combat",
       "i": 10,
-      "file": "audio/vo/greeter__combat__11.mp3",
+      "file": "audio/vo/greeter__combat__11.ogg",
       "raw": "audio/vo/raw/greeter__combat__11.wav",
       "encoded": true,
       "text": "Watch the flank!",
@@ -1259,13 +1259,13 @@
       "seconds": 1.8,
       "rms": -24.02,
       "at": 1788096765726,
-      "bytes": 11325
+      "bytes": 4830
     },
     "greeter__spot__01": {
       "who": "greeter",
       "category": "spot",
       "i": 0,
-      "file": "audio/vo/greeter__spot__01.mp3",
+      "file": "audio/vo/greeter__spot__01.ogg",
       "raw": "audio/vo/raw/greeter__spot__01.wav",
       "encoded": true,
       "text": "There! Look.",
@@ -1277,13 +1277,13 @@
       "seconds": 1.5,
       "rms": -24.53,
       "at": 1788096765726,
-      "bytes": 9597
+      "bytes": 3959
     },
     "greeter__spot__02": {
       "who": "greeter",
       "category": "spot",
       "i": 1,
-      "file": "audio/vo/greeter__spot__02.mp3",
+      "file": "audio/vo/greeter__spot__02.ogg",
       "raw": "audio/vo/raw/greeter__spot__02.wav",
       "encoded": true,
       "text": "We are not alone.",
@@ -1295,13 +1295,13 @@
       "seconds": 1.975,
       "rms": -24.26,
       "at": 1788096765726,
-      "bytes": 12477
+      "bytes": 5276
     },
     "greeter__spot__03": {
       "who": "greeter",
       "category": "spot",
       "i": 2,
-      "file": "audio/vo/greeter__spot__03.mp3",
+      "file": "audio/vo/greeter__spot__03.ogg",
       "raw": "audio/vo/raw/greeter__spot__03.wav",
       "encoded": true,
       "text": "Trouble. Two of them.",
@@ -1313,13 +1313,13 @@
       "seconds": 2,
       "rms": -23.85,
       "at": 1788096765726,
-      "bytes": 12621
+      "bytes": 5387
     },
     "greeter__spot__04": {
       "who": "greeter",
       "category": "spot",
       "i": 3,
-      "file": "audio/vo/greeter__spot__04.mp3",
+      "file": "audio/vo/greeter__spot__04.ogg",
       "raw": "audio/vo/raw/greeter__spot__04.wav",
       "encoded": true,
       "text": "Something is coming.",
@@ -1331,13 +1331,13 @@
       "seconds": 2.05,
       "rms": -24.16,
       "at": 1788096765726,
-      "bytes": 12909
+      "bytes": 5454
     },
     "greeter__spot__05": {
       "who": "greeter",
       "category": "spot",
       "i": 4,
-      "file": "audio/vo/greeter__spot__05.mp3",
+      "file": "audio/vo/greeter__spot__05.ogg",
       "raw": "audio/vo/raw/greeter__spot__05.wav",
       "encoded": true,
       "text": "Weapons out.",
@@ -1349,13 +1349,13 @@
       "seconds": 1.7,
       "rms": -24.05,
       "at": 1788096765726,
-      "bytes": 10749
+      "bytes": 4543
     },
     "greeter__spot__06": {
       "who": "greeter",
       "category": "spot",
       "i": 5,
-      "file": "audio/vo/greeter__spot__06.mp3",
+      "file": "audio/vo/greeter__spot__06.ogg",
       "raw": "audio/vo/raw/greeter__spot__06.wav",
       "encoded": true,
       "text": "Well, that's ugly.",
@@ -1367,13 +1367,13 @@
       "seconds": 2,
       "rms": -24.17,
       "at": 1788096765726,
-      "bytes": 12621
+      "bytes": 5391
     },
     "greeter__spot__07": {
       "who": "greeter",
       "category": "spot",
       "i": 6,
-      "file": "audio/vo/greeter__spot__07.mp3",
+      "file": "audio/vo/greeter__spot__07.ogg",
       "raw": "audio/vo/raw/greeter__spot__07.wav",
       "encoded": true,
       "text": "Did anyone else see teeth?",
@@ -1385,13 +1385,13 @@
       "seconds": 2.475,
       "rms": -23.9,
       "at": 1788096765726,
-      "bytes": 15501
+      "bytes": 6710
     },
     "greeter__spot__08": {
       "who": "greeter",
       "category": "spot",
       "i": 7,
-      "file": "audio/vo/greeter__spot__08.mp3",
+      "file": "audio/vo/greeter__spot__08.ogg",
       "raw": "audio/vo/raw/greeter__spot__08.wav",
       "encoded": true,
       "text": "Company.",
@@ -1403,13 +1403,13 @@
       "seconds": 1.35,
       "rms": -24.25,
       "at": 1788096765726,
-      "bytes": 8733
+      "bytes": 3646
     },
     "greeter__spot__09": {
       "who": "greeter",
       "category": "spot",
       "i": 8,
-      "file": "audio/vo/greeter__spot__09.mp3",
+      "file": "audio/vo/greeter__spot__09.ogg",
       "raw": "audio/vo/raw/greeter__spot__09.wav",
       "encoded": true,
       "text": "Eyes up!",
@@ -1421,13 +1421,13 @@
       "seconds": 1.2,
       "rms": -24.68,
       "at": 1788096765726,
-      "bytes": 7725
+      "bytes": 3264
     },
     "greeter__spot__10": {
       "who": "greeter",
       "category": "spot",
       "i": 9,
-      "file": "audio/vo/greeter__spot__10.mp3",
+      "file": "audio/vo/greeter__spot__10.ogg",
       "raw": "audio/vo/raw/greeter__spot__10.wav",
       "encoded": true,
       "text": "Right. Deep breath.",
@@ -1439,13 +1439,13 @@
       "seconds": 1.975,
       "rms": -24.1,
       "at": 1788096765726,
-      "bytes": 12477
+      "bytes": 5321
     },
     "greeter__thanks__01": {
       "who": "greeter",
       "category": "thanks",
       "i": 0,
-      "file": "audio/vo/greeter__thanks__01.mp3",
+      "file": "audio/vo/greeter__thanks__01.ogg",
       "raw": "audio/vo/raw/greeter__thanks__01.wav",
       "encoded": true,
       "text": "Noted, and appreciated.",
@@ -1457,13 +1457,13 @@
       "seconds": 2.525,
       "rms": -24.06,
       "at": 1788096778484,
-      "bytes": 15789
+      "bytes": 6783
     },
     "greeter__thanks__02": {
       "who": "greeter",
       "category": "thanks",
       "i": 1,
-      "file": "audio/vo/greeter__thanks__02.mp3",
+      "file": "audio/vo/greeter__thanks__02.ogg",
       "raw": "audio/vo/raw/greeter__thanks__02.wav",
       "encoded": true,
       "text": "You needn't have. Thank you.",
@@ -1475,13 +1475,13 @@
       "seconds": 2.275,
       "rms": -24.15,
       "at": 1788096778484,
-      "bytes": 14205
+      "bytes": 6159
     },
     "greeter__refuse__01": {
       "who": "greeter",
       "category": "refuse",
       "i": 0,
-      "file": "audio/vo/greeter__refuse__01.mp3",
+      "file": "audio/vo/greeter__refuse__01.ogg",
       "raw": "audio/vo/raw/greeter__refuse__01.wav",
       "encoded": true,
       "text": "No. And that is a complete sentence.",
@@ -1493,13 +1493,13 @@
       "seconds": 2.95,
       "rms": -24.16,
       "at": 1788096778484,
-      "bytes": 18237
+      "bytes": 8011
     },
     "greeter__refuse__02": {
       "who": "greeter",
       "category": "refuse",
       "i": 1,
-      "file": "audio/vo/greeter__refuse__02.mp3",
+      "file": "audio/vo/greeter__refuse__02.ogg",
       "raw": "audio/vo/raw/greeter__refuse__02.wav",
       "encoded": true,
       "text": "Not until you have earned it.",
@@ -1511,13 +1511,13 @@
       "seconds": 2.4,
       "rms": -24.21,
       "at": 1788096778484,
-      "bytes": 14925
+      "bytes": 6430
     },
     "greeter__refuse__03": {
       "who": "greeter",
       "category": "refuse",
       "i": 2,
-      "file": "audio/vo/greeter__refuse__03.mp3",
+      "file": "audio/vo/greeter__refuse__03.ogg",
       "raw": "audio/vo/raw/greeter__refuse__03.wav",
       "encoded": true,
       "text": "Ask me when you can hold a stance for a minute.",
@@ -1529,13 +1529,13 @@
       "seconds": 3.05,
       "rms": -24.11,
       "at": 1788096778484,
-      "bytes": 18957
+      "bytes": 8330
     },
     "greeter__wander__01": {
       "who": "greeter",
       "category": "wander",
       "i": 0,
-      "file": "audio/vo/greeter__wander__01.mp3",
+      "file": "audio/vo/greeter__wander__01.ogg",
       "raw": "audio/vo/raw/greeter__wander__01.wav",
       "encoded": true,
       "text": "Places to be.",
@@ -1547,13 +1547,13 @@
       "seconds": 1.925,
       "rms": -24.09,
       "at": 1788096778484,
-      "bytes": 12189
+      "bytes": 5093
     },
     "greeter__wander__02": {
       "who": "greeter",
       "category": "wander",
       "i": 1,
-      "file": "audio/vo/greeter__wander__02.mp3",
+      "file": "audio/vo/greeter__wander__02.ogg",
       "raw": "audio/vo/raw/greeter__wander__02.wav",
       "encoded": true,
       "text": "Mind your backs.",
@@ -1565,13 +1565,13 @@
       "seconds": 1.825,
       "rms": -24.13,
       "at": 1788096778484,
-      "bytes": 11613
+      "bytes": 4878
     },
     "greeter__wander__03": {
       "who": "greeter",
       "category": "wander",
       "i": 2,
-      "file": "audio/vo/greeter__wander__03.mp3",
+      "file": "audio/vo/greeter__wander__03.ogg",
       "raw": "audio/vo/raw/greeter__wander__03.wav",
       "encoded": true,
       "text": "Coming through.",
@@ -1583,13 +1583,13 @@
       "seconds": 1.675,
       "rms": -24.14,
       "at": 1788096778484,
-      "bytes": 10605
+      "bytes": 4416
     },
     "greeter__wander__04": {
       "who": "greeter",
       "category": "wander",
       "i": 3,
-      "file": "audio/vo/greeter__wander__04.mp3",
+      "file": "audio/vo/greeter__wander__04.ogg",
       "raw": "audio/vo/raw/greeter__wander__04.wav",
       "encoded": true,
       "text": "Long way round, this.",
@@ -1601,13 +1601,13 @@
       "seconds": 2.2,
       "rms": -23.68,
       "at": 1788096778484,
-      "bytes": 13773
+      "bytes": 5896
     },
     "greeter__wander__05": {
       "who": "greeter",
       "category": "wander",
       "i": 4,
-      "file": "audio/vo/greeter__wander__05.mp3",
+      "file": "audio/vo/greeter__wander__05.ogg",
       "raw": "audio/vo/raw/greeter__wander__05.wav",
       "encoded": true,
       "text": "Nearly there. Probably.",
@@ -1619,13 +1619,13 @@
       "seconds": 2.225,
       "rms": -24.02,
       "at": 1788096778484,
-      "bytes": 13917
+      "bytes": 6003
     },
     "greeter__wander__06": {
       "who": "greeter",
       "category": "wander",
       "i": 5,
-      "file": "audio/vo/greeter__wander__06.mp3",
+      "file": "audio/vo/greeter__wander__06.ogg",
       "raw": "audio/vo/raw/greeter__wander__06.wav",
       "encoded": true,
       "text": "One foot, then the other.",
@@ -1637,13 +1637,13 @@
       "seconds": 2.3,
       "rms": -24.09,
       "at": 1788096778484,
-      "bytes": 14349
+      "bytes": 6174
     },
     "greeter__wander__07": {
       "who": "greeter",
       "category": "wander",
       "i": 6,
-      "file": "audio/vo/greeter__wander__07.mp3",
+      "file": "audio/vo/greeter__wander__07.ogg",
       "raw": "audio/vo/raw/greeter__wander__07.wav",
       "encoded": true,
       "text": "I know a shortcut. I don't.",
@@ -1655,13 +1655,13 @@
       "seconds": 2.55,
       "rms": -24.24,
       "at": 1788096778484,
-      "bytes": 15933
+      "bytes": 6905
     },
     "greeter__wander__08": {
       "who": "greeter",
       "category": "wander",
       "i": 7,
-      "file": "audio/vo/greeter__wander__08.mp3",
+      "file": "audio/vo/greeter__wander__08.ogg",
       "raw": "audio/vo/raw/greeter__wander__08.wav",
       "encoded": true,
       "text": "Walk faster, it's cold.",
@@ -1673,13 +1673,13 @@
       "seconds": 2.4,
       "rms": -23.9,
       "at": 1788096778484,
-      "bytes": 14925
+      "bytes": 6491
     },
     "greeter__wander__09": {
       "who": "greeter",
       "category": "wander",
       "i": 8,
-      "file": "audio/vo/greeter__wander__09.mp3",
+      "file": "audio/vo/greeter__wander__09.ogg",
       "raw": "audio/vo/raw/greeter__wander__09.wav",
       "encoded": true,
       "text": "Just passing.",
@@ -1691,13 +1691,13 @@
       "seconds": 1.775,
       "rms": -23.95,
       "at": 1788096778484,
-      "bytes": 11181
+      "bytes": 4738
     },
     "greeter__weather__01": {
       "who": "greeter",
       "category": "weather",
       "i": 0,
-      "file": "audio/vo/greeter__weather__01.mp3",
+      "file": "audio/vo/greeter__weather__01.ogg",
       "raw": "audio/vo/raw/greeter__weather__01.wav",
       "encoded": true,
       "text": "Rain. The training yard will be a swamp.",
@@ -1709,13 +1709,13 @@
       "seconds": 2.975,
       "rms": -24.03,
       "at": 1788096778484,
-      "bytes": 18381
+      "bytes": 8073
     },
     "greeter__weather__02": {
       "who": "greeter",
       "category": "weather",
       "i": 1,
-      "file": "audio/vo/greeter__weather__02.mp3",
+      "file": "audio/vo/greeter__weather__02.ogg",
       "raw": "audio/vo/raw/greeter__weather__02.wav",
       "encoded": true,
       "text": "Good drilling weather. You will disagree.",
@@ -1727,7 +1727,7 @@
       "seconds": 2.95,
       "rms": -23.93,
       "at": 1788096778484,
-      "bytes": 18237
+      "bytes": 7989
     }
   }
 }
