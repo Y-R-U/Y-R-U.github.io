@@ -146,7 +146,16 @@ Two other one-word changes to `tools/devserver.mjs`: `/api/skin` added to `WRITE
 restarted to pick those up**; the studio falls back to `art/skins/index.json` when it has not been,
 which is also what makes it work with no dev server at all.
 
-## 10. What is not done
+## 10. One thing to know about the file layout
+
+`js/world/dummy.js` imports `tools/skin/layout.mjs`, so that file is a **runtime dependency of the
+shipped game**, not only of the tools. It is 200 lines, pure, and imports nothing, so shipping it
+costs nothing — but it does mean `tools/` is no longer purely authoring-time. The alternative was
+two copies of the rig, one for the mesh and one for the template, which is the exact drift this
+whole design exists to prevent. If that bothers anyone, move `layout.mjs` under `js/world/` and
+point both importers at it; nothing else changes.
+
+## 11. What is not done
 
 - **Nothing writes `data/characters.json`.** The contract now has `body: "dummy"` with `sex` and
   `skin`; wiring a dummy into `js/game/characters.js` and placing one in the level is the next

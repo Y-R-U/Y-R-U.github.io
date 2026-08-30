@@ -1,0 +1,13 @@
+{
+  "id": "baker_t2i",
+  "job": "85f6d6e9c83e",
+  "prompt": "Character texture sheet of a market baker in a flour-dusted apron, rolled shirt sleeves and brown breeches. Two full-body figures side by side at the same size: the left one is the front view, the right one is the back view of the same character. Standing straight, arms hanging down at the sides, legs together, feet flat. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred.",
+  "seed": 11,
+  "mode": "txt2img",
+  "model": "flux2-klein-4b",
+  "steps": 14,
+  "ref": null,
+  "seconds": 130.212,
+  "padded": 153957,
+  "at": "2026-08-30T14:32:25.353Z"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "ranger_t2i",
+  "job": "3f6da4de57f2",
+  "prompt": "Character texture sheet of a woodland ranger in green leather armour and a brown hooded cloak. Two full-body figures side by side at the same size: the left one is the front view, the right one is the back view of the same character. Standing straight, arms hanging down at the sides, legs together, feet flat. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred.",
+  "seed": 11,
+  "mode": "txt2img",
+  "model": "flux2-klein-4b",
+  "steps": 14,
+  "ref": null,
+  "seconds": 106.155,
+  "padded": 152017,
+  "at": "2026-08-30T14:30:14.135Z"
+}
