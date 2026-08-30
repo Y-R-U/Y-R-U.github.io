@@ -1024,6 +1024,63 @@ and let it release as the two converge.
 
 ---
 
+## D49 — the shot never stops on its own, and there is one tap that stops it
+
+Aaron, on 2026-08-30, after a long match on the phone: *"after a while the animation stopped
+showing? I.e it stopped switching to outside view to watch the shot fly over to enemy … I think I
+can see it from in the cabin."* He read it as ammunition — it happened as his salvos ran out and he
+fired his last heavy — but the ordnance was a coincidence. `game.turns` counts BOTH sides, so his
+seventh shot was turn 13, and turn 13 was where §7.4's third pacing tier took over: `instant`, which
+does no camera work at all. The build was doing exactly what it was specified to do and it read as a
+break.
+
+The first fix kept the auto-degrade and made its last tier a shorter shot instead of no shot. Aaron
+threw that out too: *"I wouldn't auto stop animation at all! it should just be an easy toggle to
+turn off/on."*
+
+**Ruling: pace is not a function of the turn count. There are two paces — the shot, and no shot —
+and the player picks, from a control that is in the frame.** `PACE` carries no `fromTurn` at all;
+`short` is gone; `paceForTurn` is gone; `present.pace()` reads one setting and returns `full` or
+`instant`. The switch is a camera button next to pause in the HUD, one tap, with the same
+struck-through-glyph treatment as the fleet-blank eye, and it writes the same setting the panel
+does. Saves written before this hold `cine: 'auto'`; anything that is not an explicit `'off'` plays
+the shot.
+
+§7.4 is not wrong that forty turns of a nine-second cutscene is a risk. It is wrong that the fix is
+to take the decision away from the player. Hold-anywhere fast-forward (4×, and it still lands the
+result) is the in-the-moment escape hatch; the button is the standing one.
+
+Two things fell out of the abandoned first attempt that are worth not rediscovering:
+
+- **`paceForTurn` lived twice**, in `present.js` and in `director.js`, each a loop over
+  `Object.entries(PACE)` taking the *last* match — correct only for as long as the keys happened to
+  be in ascending `fromTurn` order. Both are gone now, but any future tier selection must be one
+  function, not two that agree by accident.
+- **A falsification arm has to reproduce the old world exactly.** Putting `instant.fromTurn = 13`
+  back while a newer tier still sat on 13 tied, the newer tier won the tie, and the arm came back
+  green while proving nothing.
+
+And the second half of the same report: *"when a bullet type runs out, auto switch to the infinity
+bullet."* Firing your last heavy greyed the button out and left `heavy` armed — the ghost was still
+a four-cell footprint, FIRE was still live, and the shot came back refused at the rules with "no
+heavy charges left". **A spent kind falls back to `shell`**, which has no charges and cannot run
+out, with a toast saying so. `hud.setKind()` exists for that swap because `hud.arm()` calls back
+into `onArm`, and doing it from inside `refresh()` would re-enter `refresh()`.
+
+`tools/gates_pace.mjs` — 19 gates, four falsification arms, `--mobile` for portrait and `--png` for
+frames. Three of its own bugs are the lesson:
+
+- The instrumentation timed the **enemy's** shot, not the player's. `beat()` starts the enemy's beat
+  synchronously inside `nextTurn()`, before the await on `fire()` resolves, so a patch left
+  installed until `fire()` returns measures the wrong shot while every number it prints stays
+  believable.
+- The **first shot of a session runs 3× long** in headless while the tracer and impact shaders
+  compile. Comparing it against a later shot measures the shader cache, not the pace. There is a
+  warm-up shot now, and it is reported as not measured.
+- The toggle gates went red and the obvious reading was "the first tap does nothing". The button was
+  fine; the step before it had left cinematics off, so the first tap turned them **on**. A gate that
+  does not set its own starting state is measuring the previous gate.
+
 ## Standing rules for every agent on this project
 
 1. **Touch only `gms/3d/waterline/`.** The repo has unrelated uncommitted work in

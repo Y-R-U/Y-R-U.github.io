@@ -34,12 +34,6 @@ export class Director {
   // Hold-anywhere fast-forward. Not a skip: the result still lands, it just lands quickly.
   setRate(x) { this.rate = Math.max(0.05, x || 1); }
 
-  paceForTurn(turn) {
-    let mode = 'full';
-    for (const [name, cfg] of Object.entries(PACE)) if (cfg.fromTurn && turn >= cfg.fromTurn) mode = name;
-    return mode;
-  }
-
   compile(id, ctx = {}) {
     const gen = this.sequences.get(id);
     if (!gen) return null;

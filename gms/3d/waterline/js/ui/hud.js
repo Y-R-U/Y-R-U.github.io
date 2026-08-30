@@ -18,6 +18,12 @@ const EYE = '<svg viewBox="0 0 24 24" aria-hidden="true">'
   + '<path d="M1.6 12S5.5 5.5 12 5.5 22.4 12 22.4 12 18.5 18.5 12 18.5 1.6 12 1.6 12Z"/>'
   + '<circle cx="12" cy="12" r="3.1"/>'
   + '<path class="eye-bar" d="M3.4 20.6 20.6 3.4"/></svg>';
+// Same idea for the cinematics switch: one glyph — a camera — with a bar struck through it when
+// the shot is off, rather than two glyphs the eye has to tell apart at 17 px.
+const CAM = '<svg viewBox="0 0 24 24" aria-hidden="true">'
+  + '<path d="M2.6 7.4h11.2v9.2H2.6z"/>'
+  + '<path d="m13.8 12.6 5.9 3.3V8.1l-5.9 3.3z"/>'
+  + '<path class="cam-bar" d="M3.4 20.6 20.6 3.4"/></svg>';
 const STATE = ['', 'miss', 'hit', 'sunk'];
 
 export function buildHUD(mount, opts = {}) {
@@ -35,6 +41,7 @@ export function buildHUD(mount, opts = {}) {
     </div>
     <div class="hud-top">
       <button class="hud-pause" data-pause aria-label="Pause">❚❚</button>
+      <button class="hud-cine" data-cine aria-pressed="true" aria-label="Shot cinematics">${CAM}</button>
       <div class="hud-who">
         <b data-turn>—</b>
         <s data-opponent></s>
@@ -74,9 +81,10 @@ export function buildHUD(mount, opts = {}) {
 
   let handlers = {
     onArm: opts.onArm, onConfirm: opts.onConfirm, onPause: opts.onPause,
-    onFleet: opts.onFleet, onPrivate: opts.onPrivate,
+    onFleet: opts.onFleet, onPrivate: opts.onPrivate, onCine: opts.onCine,
   };
   let hidden = false;
+  let cine = true;
   let kind = 'shell';
   let armed = null;
   let yours = false;
@@ -94,6 +102,7 @@ export function buildHUD(mount, opts = {}) {
   });
   fireEl.onclick = () => handlers.onConfirm?.(armed, kind);
   q('[data-pause]').onclick = () => handlers.onPause?.();
+  q('[data-cine]').onclick = () => handlers.onCine?.(!cine);
   q('[data-fleet]').onclick = () => handlers.onFleet?.();
   // A sibling of the box's own button, never nested inside it: a button in a button is invalid and
   // the inner one's tap would still have run the outer handler.
@@ -150,6 +159,11 @@ export function buildHUD(mount, opts = {}) {
     show(on) { root.hidden = !on; },
     arm(k) { kind = k; handlers.onArm?.(k); sync(); },
 
+    // Same, WITHOUT calling back into onArm. flow.js swaps the kind itself when one runs out, from
+    // inside refresh() — notifying it there would re-enter refresh() through armKind().
+    setKind(k) { kind = k; sync(); },
+    label: k => KIND_LABEL[k] || k,
+
     // `note` is the warning about what is under the ghost — firing into already-resolved cells is
     // legal and wasted, and nothing else in the game says so.
     setArmed(cells, text, note) {
@@ -182,6 +196,17 @@ export function buildHUD(mount, opts = {}) {
       btn.setAttribute('aria-label', hidden ? 'Show your fleet' : 'Hide your fleet');
     },
     get private() { return hidden; },
+
+    // The cinematics switch, in the frame rather than two taps down in a settings panel. flow.js
+    // calls this from BOTH the button and the settings panel, so the two never disagree.
+    setCine(on) {
+      cine = !!on;
+      const b = q('[data-cine]');
+      b.classList.toggle('off', !cine);
+      b.setAttribute('aria-pressed', cine ? 'true' : 'false');
+      b.setAttribute('aria-label', cine ? 'Shot cinematics on' : 'Shot cinematics off');
+    },
+    get cine() { return cine; },
 
     setTurn(text) { q('[data-turn]').textContent = text; },
     setOpponent(name) { q('[data-opponent]').textContent = name || ''; },

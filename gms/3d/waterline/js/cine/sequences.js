@@ -107,7 +107,6 @@ export function registerSequences(director, world) {
   // the lens. The last two beats are posed from ctx.gun, not from the window: an offset authored
   // against the window anchor frames whatever happens to be 120 m out of it, which is sea.
   director.registerSequence('fire_out', function* (rig, ctx) {
-    const short = ctx.pace !== 'full';
     const gun = ctx.gun || v(0, 20, 36);
     const aim = ctx.aim || v(0, 8, 900);
     const a = atTable(), b = atWindow(), w = win();
@@ -153,18 +152,18 @@ export function registerSequences(director, world) {
     const o = w.clone().add(v(0, -1.4, 22)).lerp(stn, 0.20);
 
     rig.on(() => rig.freeLook(false));
-    rig.exposure(CINE.exposure.interior, CINE.exposure.exterior, short ? 420 : 760, CINE.exposure.lagMs);
+    rig.exposure(CINE.exposure.interior, CINE.exposure.exterior, 760, CINE.exposure.lagMs);
     rig.drift(0.12, 0.3, 0.2);
-    rig.move(a, b, tableLook(), win().add(v(0.3, -0.6, 26)), short ? 260 : 520, EASE.inCubic);
-    yield { until: short ? 260 : 520 };
+    rig.move(a, b, tableLook(), win().add(v(0.3, -0.6, 26)), 520, EASE.inCubic);
+    yield { until: 520 };
 
-    rig.fov(fov, short ? 300 : 640);
-    rig.move(b, o, win().add(v(0.3, -0.6, 26)), hold, short ? 300 : 640, EASE.out);
-    yield { until: short ? 300 : 640 };
+    rig.fov(fov, 640);
+    rig.move(b, o, win().add(v(0.3, -0.6, 26)), hold, 640, EASE.out);
+    yield { until: 640 };
 
     rig.drift(0.3, 0.7, 0.23);
-    rig.move(o, stn, hold, hold, short ? 260 : 560, EASE.inOut);
-    yield { until: short ? 260 : 560 };
+    rig.move(o, stn, hold, hold, 560, EASE.inOut);
+    yield { until: 560 };
 
     // the guns go off in our face. The flash is fired HERE rather than after the sequence returns:
     // played out, it landed on the first frame of shell_chase and was never seen from this pose.
@@ -293,7 +292,6 @@ export function registerSequences(director, world) {
     const own = ctx.own || v(0, 12, 0);            // the deck you are standing on
     const foe = ctx.foe || v(0, 8, -900);          // where the flashes are
     const mark = ctx.at || own.clone().add(v(14, 2, 20));   // where it lands on you
-    const short = ctx.pace !== 'full';
 
     // both stations are solved against your own hull, which is what they have to contain: the
     // first beat looks past it at the enemy line, the second closes on the plating that was hit
@@ -307,31 +305,30 @@ export function registerSequences(director, world) {
     const eyeA = own.clone().addScaledVector(dirA, kA);
     rig.fov(FOV);
     rig.drift(0.3, 0.9, 0.19);
-    rig.move(eyeA, eyeA.clone().add(v(7, -2, 4)), foe, foe, short ? 520 : 1000, EASE.out);
-    yield { until: short ? 520 : 1000 };
+    rig.move(eyeA, eyeA.clone().add(v(7, -2, 4)), foe, foe, 1000, EASE.out);
+    yield { until: 1000 };
 
     // swing to the struck plating — the red indicator is the point of the whole beat
     const eyeB = mark.clone().addScaledVector(dirB, kB);
     rig.kick(1.4, 560, 16);
-    rig.move(eyeA.clone().add(v(7, -2, 4)), eyeB, foe, mark, short ? 420 : 820, EASE.inOut);
-    yield { until: short ? 420 : 820 };
+    rig.move(eyeA.clone().add(v(7, -2, 4)), eyeB, foe, mark, 820, EASE.inOut);
+    yield { until: 820 };
 
-    rig.move(eyeB, eyeB.clone().add(v(9, -2, 7)), mark, mark, short ? 400 : 900, EASE.out);
-    yield { until: short ? 400 : 900 };
+    rig.move(eyeB, eyeB.clone().add(v(9, -2, 7)), mark, mark, 900, EASE.out);
+    yield { until: 900 };
   });
 
   director.registerSequence('bridge_return', function* (rig, ctx) {
-    const short = ctx.pace !== 'full';
     const from = ctx.from || outNear();
-    rig.exposure(CINE.exposure.exterior, CINE.exposure.interior, short ? 380 : 700, CINE.exposure.lagMs);
-    rig.fov(48, short ? 320 : 700);
+    rig.exposure(CINE.exposure.exterior, CINE.exposure.interior, 700, CINE.exposure.lagMs);
+    rig.fov(48, 700);
     rig.drift(0.1, 0.28, 0.16);
-    rig.move(from, atWindow(), from.clone().add(v(0, -4, 40)), win().add(v(0, -0.4, 8)), short ? 320 : 620, EASE.inOut);
-    yield { until: short ? 320 : 620 };
-    rig.move(atWindow(), atTable(), win().add(v(0, -0.4, 8)), tableLook(), short ? 300 : 620, EASE.settle);
+    rig.move(from, atWindow(), from.clone().add(v(0, -4, 40)), win().add(v(0, -0.4, 8)), 620, EASE.inOut);
+    yield { until: 620 };
+    rig.move(atWindow(), atTable(), win().add(v(0, -0.4, 8)), tableLook(), 620, EASE.settle);
     rig.drift(0.05, 0.14, 0.13);
     rig.on(() => rig.freeLook(true));
-    yield { until: short ? 300 : 620 };
+    yield { until: 620 };
   });
 
   // P3 — appended, nothing above is touched. Out of the window, up over your own formation to watch
@@ -467,7 +464,7 @@ function buildPresenter(director, world) {
     // Play one resolved shot, start to finish. `events` is exactly what sim.fire() returned.
     async present(events, { mySide = 0, turn = 1, caption = null, pace = null } = {}) {
       const vfx = vfxOf();
-      director.setPace(pace || director.paceForTurn(turn));
+      director.setPace(pace || 'full');
       const mode = director.pace;
       const shot = events.find(e => e.t === 'shot');
       if (!shot) return;

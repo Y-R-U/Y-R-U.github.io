@@ -8,18 +8,14 @@
 // The caption is C6's too (D2, `caption.forShot`). C7 must not reimplement it and does not: the
 // caption object goes through this call and nothing here writes the element.
 
-import { PACE } from '../config.js';
-
 export function createPresenter({ hook, getTable, settings }) {
   const cine = () => hook.cine || {};
 
-  function paceFor(turns) {
-    const s = settings().cine;
-    if (s === 'off') return 'instant';
-    if (s === 'full') return 'full';
-    let mode = 'full';
-    for (const [name, cfg] of Object.entries(PACE)) if (cfg.fromTurn && turns >= cfg.fromTurn) mode = name;
-    return mode;
+  // One switch, two answers, and the turn count is not part of it (D49). 'auto' is a setting
+  // written by builds before D49 and it meant "degrade as the match runs" — anything that is not an
+  // explicit 'off' now plays the shot.
+  function paceFor() {
+    return settings().cine === 'off' ? 'instant' : 'full';
   }
 
   const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -44,7 +40,7 @@ export function createPresenter({ hook, getTable, settings }) {
 
     async play(events, by, game) {
       const c = cine();
-      const pace = paceFor(game.turns);
+      const pace = paceFor();
       if (typeof c.present === 'function') {
         await c.present(events, { mySide: 0, turn: game.turns, caption: hook.ui?.caption, pace });
         return;

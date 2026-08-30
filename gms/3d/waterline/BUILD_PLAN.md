@@ -610,6 +610,10 @@ This is the risk that kills the game, and "add a skip button" does not solve it 
 find it, and a skip loses the result read.
 
 **Decided: pacing auto-degrades, and the player can override upward.**
+**Superseded by D49 — it does not auto-degrade at all.** The table below shipped, Aaron played a
+long match on it, and the turn-13 tier read as the game breaking. There are two paces now and one
+button. Kept here because the *risk* it names is real and the next person to feel it will reach for
+this section.
 
 | Turns | Pace | Runtime | Beats kept |
 |---|---|---|---|

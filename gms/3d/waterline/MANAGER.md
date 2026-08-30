@@ -32,6 +32,21 @@ each review:
 Renders are recovered from `critique/<shot>_r<n>.png` using `.keys/` to pick our side, so history
 survives even though `shots/` only ever holds the latest render.
 
+## Phase 1.6 — 2026-08-30, from the phone
+
+| | what | state |
+|---|---|---|
+| 1 | the shot cutscene stops playing after a while | **done** — D49. §7.4's turn-13 `instant` tier, not the ordnance. Auto-degrade is gone entirely |
+| 2 | it should be an easy on/off toggle instead | **done** — camera button beside pause in the HUD, same setting as the panel |
+| 3 | a spent ordnance kind should fall back to the shell | **done** — D49 |
+
+`node tools/gates_pace.mjs` — 19 gates, four falsification arms, ~2 min (three real 7 s cutscenes).
+`--mobile --quick` is the fast one: the layout and toggle gates at 390×844 with nothing fired.
+`--png` writes `shots/hud_cine_*.png` so the button can be looked at rather than asserted about.
+Two harness traps already paid for: piping it through `tail` hides all output until it exits, so a
+slow run looks like a hung one; and under touch emulation `Input.dispatchMouseEvent` is swallowed —
+portrait needs `dispatchTouchEvent`.
+
 ## Phase 1.5 — Aaron's list after playing the shipped build
 
 Six items, filed 2026-08-07 after a phone test. Rulings are D30–D33; P1's own findings are D34–D36.

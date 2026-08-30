@@ -92,8 +92,14 @@ function boot() {
     onPause: () => pause(),
     onFleet: () => openLayout(),
     onPrivate: on => save.patch('settings', { hideFleet: !!on }),
+    onCine: on => {
+      save.patch('settings', { cine: on ? 'on' : 'off' });
+      hud.setCine(on);
+      overlay.toast(on ? 'Cinematics on' : 'Cinematics off — results land on the chart');
+    },
   });
   hud.setPrivate(settings().hideFleet);
+  hud.setCine(cineOn());
   setup.bind({
     onResume: () => resumeMatch(),
     onDiscard: () => { clearMatch(); showTitle(); },
@@ -166,7 +172,10 @@ function session(key, value) {
   return null;
 }
 
-const settings = () => save.get('settings', { cine: 'auto', place: 'auto', sound: true, flyout: 'on', hideFleet: false });
+const settings = () => save.get('settings', { cine: 'on', place: 'auto', sound: true, flyout: 'on', hideFleet: false });
+// D49 — the shot plays unless it is explicitly switched off. Saves written before D49 hold 'auto',
+// which used to mean "degrade with the turn count"; anything that is not 'off' now plays it.
+const cineOn = () => settings().cine !== 'off';
 // A save written before P3 has no `flyout` key, so anything that is not an explicit 'off' is on.
 const flyoutOn = () => settings().flyout !== 'off';
 
@@ -244,8 +253,8 @@ function showSettings() {
     id: 'settings',
     title: 'Settings',
     fields: [
-      { key: 'cine', label: 'Cinematics', type: 'select', value: s.cine,
-        options: [['auto', 'Auto (shorten as the match runs)'], ['full', 'Always full'], ['off', 'Off — stay on the table']] },
+      { key: 'cine', label: 'Cinematics', type: 'select', value: cineOn() ? 'on' : 'off',
+        options: [['on', 'Watch every shot'], ['off', 'Off — stay on the table']] },
       { key: 'place', label: 'Fleet', type: 'select', value: s.place,
         options: [['auto', 'Auto-place'], ['manual', 'Place it myself']] },
       { key: 'flyout', label: 'Fly-out', type: 'select', value: flyoutOn() ? 'on' : 'off',
@@ -255,7 +264,10 @@ function showSettings() {
       { label: 'Reset progress', value: 'reset' },
       { label: 'Done', value: 'done', primary: true },
     ],
-    onChange: (key, value) => save.patch('settings', { [key]: value }),
+    onChange: (key, value) => {
+      save.patch('settings', { [key]: value });
+      if (key === 'cine') hud.setCine(cineOn());
+    },
   }).then(v => { if (v === 'reset') confirmReset(); });
 }
 
@@ -333,7 +345,7 @@ function enterMatch(game, cfg, flyover) {
   useTable(cfg.w, cfg.h);
   // Cinematics off means no flyover to open under a noon sky, so there is nothing for the blend to
   // arrive from — it would be 4 s of the sky changing over a board already being played.
-  playScene(flyover && settings().cine !== 'off');
+  playScene(flyover && cineOn());
   go('play');
   present.reset();
   const v = refresh();
@@ -355,7 +367,7 @@ async function opening(flyover) {
   hud.setBusy(true);
   aim.release();
   await present.open(flyover);
-  if (flyover && settings().cine !== 'off') beginDusk();
+  if (flyover && cineOn()) beginDusk();
   flow.busy = false;
   hud.setBusy(false);
   nextTurn();
@@ -515,7 +527,7 @@ async function flyout(v) {
   catch (e) { console.warn('[waterline] reform', e); layoutFleets(v); return; }
 
   const director = hook.cine?.director;
-  if (!flyoutOn() || settings().cine === 'off' || !director?.has?.('fleet_reform')) {
+  if (!flyoutOn() || !cineOn() || !director?.has?.('fleet_reform')) {
     move.finish();
     overlay.toast('Fleet re-formed');
     return;
@@ -753,10 +765,21 @@ function refresh() {
   const v = sim.view(g, 0);
   flow.view = v;
   table.setState(v);
+  const kinds = kindAvailability(v);
+  // Firing your last heavy used to leave `heavy` armed with its button greyed out: the ghost was
+  // still a four-cell footprint, FIRE was still live, and the shot came back refused at the rules.
+  // A spent kind falls back to the shell, which has no charges and never runs out.
+  const spent = hud.kind !== 'shell' && !kinds.find(k => k.kind === hud.kind)?.enabled;
+  if (spent) {
+    const was = hud.kind;
+    hud.setKind('shell');
+    aim.setKind('shell');
+    overlay.toast(`${hud.label(was)} spent — shell armed`);
+  }
   hud.setState(v, {
     yours: g.sideToMove === 0 && g.phase === 'AIM',
     busy: flow.busy,
-    kinds: kindAvailability(v),
+    kinds,
   });
   return v;
 }
@@ -811,7 +834,7 @@ async function beat(events, by) {
   aim.release();
   hud.setBusy(true);
   const v0 = refresh();
-  const move = by === 0 ? restageEnemy(v0, present.pace(flow.game.turns)) : null;
+  const move = by === 0 ? restageEnemy(v0, present.pace()) : null;
   syncDamage(v0, false);
   try { await present.play(events, by, flow.game); }
   catch (e) { console.warn('[waterline] presenter', e); }
@@ -958,6 +981,7 @@ export function debugHandle() {
     aimAt: (r, c, kind) => { if (kind) hud.arm(kind); return aim.setAnchor(r, c, kind); },
     fire: shot => fire(shot ?? aim.shot()),
     view: () => (flow.game ? sim.view(flow.game, 0) : null),
+    pace: () => present.pace(),
     title: () => showTitle(),
     dusking: () => dusking,
     openLayout: () => openLayout(),

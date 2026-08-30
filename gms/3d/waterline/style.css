@@ -124,6 +124,12 @@ body.wl-play:not(.wl-perf) #hud { display: none; }
 }
 .hud-note p[hidden] { display: none; }
 .hud-pause { min-width: 44px; padding: 0; font-size: 11px; opacity: .8; }
+/* the cinematics switch, next to pause: one tap, in the frame, no panel */
+.hud-cine { min-width: 44px; padding: 0; display: grid; place-items: center; opacity: .8; }
+.hud-cine svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
+.hud-cine .cam-bar { display: none; stroke-width: 2.4; }
+.hud-cine.off { color: var(--amber); border-color: rgba(255,166,60,.6); }
+.hud-cine.off .cam-bar { display: inline; }
 /* both sit straight on top of a lit chart, so they carry their own contrast */
 .hud-who, .hud-read { text-shadow: 0 1px 6px rgba(0,0,0,.9), 0 0 18px rgba(0,0,0,.6); }
 .hud-who { flex: 1; padding: 6px 4px; pointer-events: none; }

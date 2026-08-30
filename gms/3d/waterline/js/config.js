@@ -81,11 +81,13 @@ export const TABLE = {
   latticeColour: 0xffcf8a,
 };
 
-// Pacing auto-degrades with turn count; the player can pin it back up in settings.
+// Two paces, and the player picks. BUILD_PLAN §7.4 had this degrade with the turn count — full,
+// then short at turn 4, then no camera at all at turn 13 — and D49 threw that out: `game.turns`
+// counts both sides, so the third tier arrived on the seventh shot and read as the game breaking.
+// Aaron: "I wouldn't auto stop animation at all! it should just be an easy toggle to turn off/on."
 export const PACE = {
-  full: { fromTurn: 1, ms: 9000 },
-  short: { fromTurn: 4, ms: 4500 },
-  instant: { fromTurn: 13, ms: 1400 },
+  full: { ms: 9000 },
+  instant: { ms: 1400 },          // the toggle off: the result lands, the camera stays on the table
   fastForward: 4,                 // hold-anywhere multiplier. Fast-forward, never skip
 };
 
@@ -97,7 +99,7 @@ export const CINE = {
   exposure: { interior: 1.02, exterior: 0.90, ms: 600, lagMs: 260 },
   // cutAt is the fraction of the sequence at which the interior becomes the exterior.
   matchCut: { pegStretch: 8, cutAt: 0.52, interiorFrac: [0.18, 0.34], tolerance: 0.04 },
-  shellMs: { full: 2600, short: 1800, instant: 0 },
+  shellMs: { full: 2600, instant: 0 },
   caption: { ms: 1400 },
 };
 
@@ -196,9 +198,9 @@ export const UI = {
   resumeMaxDays: 30,
 
   // D43 — how long the enemy escorts take to steam to the arrangement a shot's result demands.
-  // Both are shorter than `fire_out` at that pace (1280 / 2180 ms), because the move has to be
-  // over before the round is in the air. `instant` has no fire_out, so it has no cover and snaps.
-  drama: { steamMs: { full: 1900, short: 1100, instant: 0 } },
+  // Shorter than `fire_out` (2180 ms), because the move has to be over before the round is in the
+  // air. `instant` has no fire_out to hide it under, so it snaps.
+  drama: { steamMs: { full: 1900, instant: 0 } },
 
   // D33 — the own-grid box opens the fleet editor, and saving flies the camera out to watch the
   // escorts re-form. `reformMs` is both how long the ships take and how long the bird's-eye beat
