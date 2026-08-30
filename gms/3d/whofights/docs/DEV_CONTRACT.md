@@ -169,7 +169,7 @@ Generated clips: `audio/vo/<characterId>__<category>__<nn>.wav`, and a sidecar
 { "version":1,
   "tracks": [ {"id":"tavern_01","title":"…","file":"audio/music/tavern_01.mp3",
                "kind":"song|instrumental","mood":"…","seconds":142,"prompt":"…","lyrics":"…",
-               "source":"suno|acestep"} ],
+               "source":"suno|acestep","ends":"clean|abrupt","starts":"clean|quiet"} ],
   "sets":   [ {"id":"academy_hall","label":"Academy hall","tracks":["…"],"shuffle":true,
                "fadeMs":1500,"volume":0.7} ] }
 ```
@@ -179,6 +179,12 @@ Tracks are generated on **Suno**, in Aaron's logged-in browser — the recipe is
 lapses before long, after which local **ACE-Step** (`/api/music`) is the only music route this
 project has — so the ACE-Step path stays first-class and every track must be re-makeable from what
 `docs/MUSIC.md` records about it. `source` records which tool made each track.
+
+`ends` and `starts` describe the take, not the wish. `ends:"abrupt"` forces at least a 1500 ms
+fade on the *natural* handover whatever the set's `fadeMs` says — `combat` is 400 ms and clicked —
+and takes 400 ms off an abrupt sting's tail. `starts:"quiet"` caps the fade-in at 300 ms so a take
+that already ramps itself is not dipped twice. A deliberate set change still uses the author's
+`fadeMs`; only the natural end gets the longer one.
 
 A music set is played by a hotspot action `{"k":"music","set":"academy_hall"}`, or by a level's
 `"music"` field as its default.

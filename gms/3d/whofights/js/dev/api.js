@@ -117,8 +117,10 @@ async function queued(path, job, onProgress) {
     const s = await api.job(id);
     if (!s.ok) return s;
     onProgress?.(s);
-    if (s.state === 'done') return { ok: true, ...s };
-    if (s.state === 'error') return { ok: false, error: s.error || 'job failed', ...s };
+    // Spread first: `s` is the poll's own envelope and carries ok:true because the *poll*
+    // succeeded. Spreading it last put that back over ok:false and a failed job read as a win.
+    if (s.state === 'done') return { ...s, ok: true };
+    if (s.state === 'error') return { ...s, ok: false, error: s.error || 'job failed' };
     if (ticks > 1200) return { ok: false, error: 'gave up waiting after ~40 min', job: id };
   }
 }

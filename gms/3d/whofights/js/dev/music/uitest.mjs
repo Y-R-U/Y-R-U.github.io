@@ -308,7 +308,10 @@ async function generateRun() {
   console.log('\ngeneration, with the backend unreachable');
   const port = await freePort();
   const srv = spawn(process.execPath, [path.join(ROOT, 'tools/devserver.mjs'), '--port', String(port)],
-    { env: { ...process.env, WF_ACE: 'http://127.0.0.1:9' }, stdio: 'ignore', cwd: ROOT });
+    // Every backend is pointed at a dead port, not just ACE-Step: otherwise freeVRAM waits on the
+  // real flux/LTX queues, which belong to other agents, and this becomes a test of their workload.
+  { env: { ...process.env, WF_ACE: 'http://127.0.0.1:9', WF_FLUX: 'http://127.0.0.1:9', WF_LTX: 'http://127.0.0.1:9' },
+    stdio: 'ignore', cwd: ROOT });
   // Believe nothing the page says until node has confirmed which server is answering: a leaked
   // devserver on the same port once made a "failed to reach ACE-Step" test report a success.
   let up = null;

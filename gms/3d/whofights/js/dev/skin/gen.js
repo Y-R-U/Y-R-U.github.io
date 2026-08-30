@@ -5,10 +5,18 @@ import api from '../api.js';
 
 export async function listSkins() {
   const r = await api.ls('art/skins');
-  if (!r.ok) return [];
-  return (r.files || []).filter(f => f.name.endsWith('.png'))
-    .map(f => ({ id: f.name.replace(/\.png$/, ''), size: f.size, mtime: f.mtime }))
-    .sort((a, b) => b.mtime - a.mtime);
+  if (r.ok) {
+    const files = (r.files || []).filter(f => f.name.endsWith('.png') && !f.name.endsWith('_raw.png'));
+    if (files.length) {
+      return files.map(f => ({ id: f.name.replace(/\.png$/, ''), size: f.size, mtime: f.mtime }))
+        .sort((a, b) => b.mtime - a.mtime);
+    }
+  }
+  // No dev server, or a build of it that predates art/skins being on the /api/ls whitelist.
+  try {
+    const idx = await (await fetch(artURL('art/skins/index.json'))).json();
+    return (idx.skins || []).map(s => ({ id: s.id, mtime: Date.parse(s.at) || 0 }));
+  } catch { return []; }
 }
 
 // /api/load is confined to data/, so the sidecar is read as the static file it is.

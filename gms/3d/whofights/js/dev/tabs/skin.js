@@ -18,8 +18,43 @@ const PRESETS = [
 ];
 
 const state = { shape: 'm', mode: 'edit', busy: false, skin: null };
+let live = null;   // the mounted preview; module-level because studio.html calls mount() on the
+                   // module namespace, where `this` is frozen and `this._preview` throws.
+
+// js/dev/dev.css belongs to the dev-infrastructure agent, so this tab carries its own few rules and
+// prefixes every class, per DEVTOOLS.md §3.
+const CSS = `
+#wf-dev .skin-wrap{gap:14px}
+#wf-dev .skin-side{min-width:290px;max-width:330px;display:flex;flex-direction:column;gap:6px}
+#wf-dev .skin-side label{font:11px system-ui;letter-spacing:.06em;text-transform:uppercase;color:#7f93aa}
+#wf-dev .skin-side textarea{width:100%;box-sizing:border-box}
+#wf-dev .skin-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-start}
+#wf-dev .skin-list{display:flex;flex-wrap:wrap;gap:4px;max-height:220px;overflow:auto}
+#wf-dev .skin-main{display:flex;flex-direction:column;gap:8px;min-width:0}
+#wf-dev .skin-stage{height:min(58vh,540px);background:#121820;border-radius:6px;overflow:hidden}
+#wf-dev .skin-canvas{width:100%;height:100%;display:block}
+#wf-dev .skin-sheets{display:flex;gap:10px;flex-wrap:wrap}
+#wf-dev .skin-sheets figure{margin:0;width:150px}
+#wf-dev .skin-sheets img{width:150px;height:150px;object-fit:contain;background:#0b0f14;border-radius:4px}
+#wf-dev .skin-state.warnc{color:#e8c06a}
+#wf-dev .skin-wrap button{background:#1e2734;border:1px solid #2f3d4e;color:#c8d4e2;border-radius:4px;padding:4px 9px;cursor:pointer}
+#wf-dev .skin-wrap button:hover{background:#283444}
+#wf-dev .skin-wrap button.primary{background:#2c5f8f;border-color:#3d7cb5;color:#eaf3fb}
+#wf-dev .skin-wrap button:disabled{opacity:.5;cursor:default}
+#wf-dev .skin-wrap input,#wf-dev .skin-wrap textarea{background:#0e141c;border:1px solid #2a3646;color:#dbe6f2;border-radius:4px;padding:4px 6px;font:13px ui-monospace,Menlo,monospace}
+#wf-dev .skin-row label{display:flex;gap:5px;align-items:center;text-transform:none;letter-spacing:0}
+`;
+
+function ensureCSS() {
+  if (document.getElementById('wf-skin-css')) return;
+  const st = document.createElement('style');
+  st.id = 'wf-skin-css';
+  st.textContent = CSS;
+  document.head.appendChild(st);
+}
 
 export async function mount(el, ctx) {
+  ensureCSS();
   el.innerHTML = `
     <div class="split skin-wrap">
       <div class="side skin-side">
@@ -73,7 +108,8 @@ export async function mount(el, ctx) {
   $('.skin-guide').src = artURL('art/skin/uv_guide.png');
 
   const preview = new SkinPreview($('.skin-canvas'));
-  this._preview = preview;
+  live?.dispose();
+  live = preview;
   await preview.start();
   preview.setShape(state.shape);
 
@@ -165,7 +201,7 @@ export async function mount(el, ctx) {
   views.appendChild(check);
 }
 
-export function unmount() { this._preview?.dispose(); this._preview = null; }
+export function unmount() { live?.dispose(); live = null; }
 
 // Registering is harmless when the hub never imports this file, and correct the moment it does.
 import('../hub.js').then(h => h.registerTab({ id: 'skin', label: 'Skins', order: 35, mount, unmount }))

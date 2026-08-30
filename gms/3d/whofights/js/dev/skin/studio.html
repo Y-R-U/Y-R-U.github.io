@@ -1,0 +1,37 @@
+<!doctype html><meta charset="utf-8"><title>skin studio</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- The Skin tab, standalone. js/dev/hub.js's SLOTS list has no `skin` id and belongs to another
+     agent, so until one line is added there this page is how the control is reached:
+     http://localhost:8796/js/dev/skin/studio.html -->
+<script type="importmap">
+{ "imports": {
+  "three": "/lib/three/0.160.0/three.module.js",
+  "three/addons/": "/lib/three/0.160.0/addons/"
+} }
+</script>
+<link rel="stylesheet" href="../dev.css">
+<style>
+  html,body{margin:0;min-height:100%;background:#0f151d;color:#c8d4e2;font:13px system-ui}
+  #wf-dev{position:static;display:block}
+  main{padding:14px}
+  h1{font:600 14px system-ui;letter-spacing:.08em;text-transform:uppercase;color:#7f93aa;margin:14px 14px 0}
+</style>
+<div id="wf-dev"><h1>Who Fights · skin studio</h1><main></main><div class="toasts"></div></div>
+<script type="module">
+import * as tab from '../tabs/skin.js';
+
+const host = document.querySelector('#wf-dev main');
+const toasts = document.querySelector('.toasts');
+const toast = (msg, kind = '') => {
+  const t = document.createElement('div');
+  t.className = `toast ${kind}`;
+  t.textContent = msg;
+  t.onclick = () => t.remove();
+  toasts.appendChild(t);
+  setTimeout(() => t.remove(), kind === 'bad' ? 9000 : 3500);
+};
+
+const ctx = { toast, close() {}, get app() { return null; }, get world() { return null; } };
+await tab.mount.call(tab, host, ctx);
+window.__wfSkinStudio = { tab, ready: true };
+</script>

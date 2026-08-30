@@ -144,7 +144,25 @@ function guide() {
   return cv;
 }
 
+// Flux2's edit mode encodes the reference at full resolution, and a 1024² reference costs ~8x the
+// time of the same job with a 512² one for no visible gain — the mannequin has no detail to lose.
+// 512 is what the tools default to; the full-size copy is kept for comparison.
+function half(cv) {
+  const out = new Canvas(cv.w / 2 | 0, cv.h / 2 | 0, [255, 255, 255, 255]);
+  for (let y = 0; y < out.h; y++) for (let x = 0; x < out.w; x++) {
+    let r = 0, g = 0, b = 0;
+    for (const [dy, dx] of [[0, 0], [0, 1], [1, 0], [1, 1]]) {
+      const i = ((y * 2 + dy) * cv.w + x * 2 + dx) * 4;
+      r += cv.d[i]; g += cv.d[i + 1]; b += cv.d[i + 2];
+    }
+    out.px(x, y, [r / 4, g / 4, b / 4]);
+  }
+  return out;
+}
+
 mkdirSync(OUT, { recursive: true });
-writeFileSync(resolve(OUT, 'pose_ref.png'), poseRef().png());
+const pose = poseRef();
+writeFileSync(resolve(OUT, 'pose_ref_1024.png'), pose.png());
+writeFileSync(resolve(OUT, 'pose_ref.png'), half(pose).png());
 writeFileSync(resolve(OUT, 'uv_guide.png'), guide().png());
-console.log(`wrote art/skin/pose_ref.png and art/skin/uv_guide.png  (${faces().length} quads / ${faces().length * 2} tris)`);
+console.log(`wrote art/skin/pose_ref.png (512), pose_ref_1024.png and uv_guide.png  (${faces().length} quads / ${faces().length * 2} tris)`);

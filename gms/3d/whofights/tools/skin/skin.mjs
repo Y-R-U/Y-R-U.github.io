@@ -9,10 +9,11 @@
 // The dev tab posts the same fields through the dev server's /api/skin; this file is the one that
 // owns the prompt wrapper, and both routes call buildPrompt().
 
-import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ATLAS } from './layout.mjs';
+import { dilate } from './dilate.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const FLUX = process.env.WF_FLUX || 'http://localhost:7867';
@@ -88,13 +89,30 @@ export async function generate({ desc, prompt, mode = 'edit', seed, steps = 14, 
   }
 }
 
+// The raw sheet is kept beside the padded one: it is what a human should look at when judging a
+// generation, and the padded copy is what the model wears.
 export function writeSkin(name, r) {
   const dir = resolve(ROOT, 'art/skins');
   mkdirSync(dir, { recursive: true });
-  writeFileSync(resolve(dir, `${name}.png`), r.buf);
+  const pad = dilate(r.buf);
+  writeFileSync(resolve(dir, `${name}_raw.png`), r.buf);
+  writeFileSync(resolve(dir, `${name}.png`), pad.buf);
   const { buf, ...meta } = r;
-  writeFileSync(resolve(dir, `${name}.json`), JSON.stringify({ id: name, ...meta, at: new Date().toISOString() }, null, 2));
+  const sidecar = { id: name, ...meta, padded: pad.filled, at: new Date().toISOString() };
+  writeFileSync(resolve(dir, `${name}.json`), JSON.stringify(sidecar, null, 2));
+  reindex(dir);
   return `art/skins/${name}.png`;
+}
+
+// An index file so the studio still lists skins with no dev server behind it — /api/ls is the fast
+// path, this is the one that works from a plain static server.
+export function reindex(dir = resolve(ROOT, 'art/skins')) {
+  const skins = readdirSync(dir).filter(f => f.endsWith('.json') && f !== 'index.json')
+    .map(f => { try { return JSON.parse(readFileSync(resolve(dir, f), 'utf8')); } catch { return null; } })
+    .filter(Boolean)
+    .map(({ id, seed, mode, model, steps, at, prompt }) => ({ id, seed, mode, model, steps, at, prompt }))
+    .sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  writeFileSync(resolve(dir, 'index.json'), JSON.stringify({ version: 1, skins }, null, 2));
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
