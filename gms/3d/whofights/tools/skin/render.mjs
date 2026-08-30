@@ -18,7 +18,7 @@ const VIEWS = ['front', 'left', 'back', 'right'];
 const W = +(args.w || 420), H = +(args.h || 620);
 
 const skins = args.all
-  ? readdirSync(resolve(ROOT, 'art/skins')).filter(f => f.endsWith('.png')).map(f => `art/skins/${f}`)
+  ? readdirSync(resolve(ROOT, 'art/skins')).filter(f => f.endsWith('.png') && !f.endsWith('_raw.png')).map(f => `art/skins/${f}`)
   : [args.skin || 'art/skin/uv_guide.png'];
 
 const page = await open({ w: W, h: H, dpr: 1 });
@@ -29,7 +29,10 @@ async function waitReady(ms = 20000) {
   for (;;) {
     const r = await S('Runtime.evaluate', { expression: 'window.__wfSkinBench?.ready === true', returnByValue: true });
     if (r.result?.value) return;
-    if (Date.now() - t0 > ms) throw new Error('bench never became ready — check the console');
+    if (Date.now() - t0 > ms) {
+      for (const l of page.logs) console.error('  ' + l);
+      throw new Error('bench never became ready — see the console lines above');
+    }
     await new Promise(r2 => setTimeout(r2, 200));
   }
 }
@@ -42,6 +45,9 @@ for (const skin of skins) {
       const url = `${base}/js/dev/skin/bench.html?skin=${encodeURIComponent(`${base}/${skin}`)}&shape=${shape}&view=${v}`;
       await S('Page.navigate', { url });
       await waitReady();
+      // The bench's own HUD prints the full skin URL, which wraps across the top of every tile.
+      await S('Runtime.evaluate', { expression:
+        `document.getElementById('hud').textContent = ${JSON.stringify(`${shape} · ${skin.split('/').pop()} · ${v}`)}` });
       // The texture decodes after ready; two frames of settling beats a blank first tile.
       await new Promise(r => setTimeout(r, 450));
       const shot = await S('Page.captureScreenshot', { format: 'png' });

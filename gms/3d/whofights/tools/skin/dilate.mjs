@@ -39,6 +39,7 @@ export function dilate(buf, passes = 20) {
   }
 
   let filled = 0;
+  const grown = new Uint8Array(w * h);
   for (let pass = 0; pass < passes; pass++) {
     const grow = [];
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
@@ -59,8 +60,28 @@ export function dilate(buf, passes = 20) {
       const i = grow[k];
       d[i * 4] = grow[k + 1]; d[i * 4 + 1] = grow[k + 2]; d[i * 4 + 2] = grow[k + 3];
       bg[i] = 0;
+      grown[i] = 1;
       filled++;
     }
+  }
+
+  // Growth propagates each source texel outward in a straight ray, so an outline and a highlight
+  // side by side come out as a comb of alternating light and dark teeth — and the folded side
+  // strips run that comb down the limb, which is far more visible than a flat band would be.
+  // Blurring the grown region only (never the drawing) turns the comb into a wash of the edge's
+  // own average colour, which is what the side of a limb should look like anyway.
+  const src = Uint8ClampedArray.from(d);
+  for (let pass = 0; pass < 4; pass++) {
+    for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+      const i = y * w + x;
+      if (!grown[i]) continue;
+      let r = 0, g = 0, b = 0;
+      for (const j of [i - 1, i + 1, i - w, i + w, i - w - 1, i - w + 1, i + w - 1, i + w + 1, i]) {
+        r += src[j * 4]; g += src[j * 4 + 1]; b += src[j * 4 + 2];
+      }
+      d[i * 4] = r / 9; d[i * 4 + 1] = g / 9; d[i * 4 + 2] = b / 9;
+    }
+    src.set(d);
   }
 
   const cv = new Canvas(w, h);

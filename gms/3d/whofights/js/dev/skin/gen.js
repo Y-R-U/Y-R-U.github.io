@@ -31,8 +31,11 @@ export const skinURL = id => new URL(`../../../art/skins/${id}.png`, import.meta
 export const artURL = rel => new URL(`../../../${rel}`, import.meta.url).href;
 
 export async function generate(body, onProgress) {
-  const base = api.base || (await api.status()) && api.base;
-  if (!base) return { ok: false, error: 'no dev server — generation needs one', offline: true };
+  // '' is api's answer for "the page is already served by the dev server", which is the normal
+  // case and is falsy. Only null means there is nothing to talk to.
+  if (api.base === null) await api.status();
+  const base = api.base;
+  if (base === null) return { ok: false, error: 'no dev server — generation needs one', offline: true };
   let start;
   try {
     const res = await fetch(`${base}/api/skin`, {

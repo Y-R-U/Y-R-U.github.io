@@ -2,31 +2,13 @@
   "version": 1,
   "skins": [
     {
-      "id": "knight_t2i",
-      "seed": 11,
-      "mode": "txt2img",
+      "id": "nomad_ui",
+      "seed": 96629,
+      "mode": "edit",
       "model": "flux2-klein-4b",
       "steps": 14,
-      "at": "2026-08-30T14:34:32.657Z",
-      "prompt": "Character texture sheet of a rusted iron knight in battered plate armour with a red tabard. Two full-body figures side by side at the same size: the left one is the front view, the right one is the back view of the same character. Standing straight, arms hanging down at the sides, legs together, feet flat. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
-    },
-    {
-      "id": "baker_t2i",
-      "seed": 11,
-      "mode": "txt2img",
-      "model": "flux2-klein-4b",
-      "steps": 14,
-      "at": "2026-08-30T14:32:25.353Z",
-      "prompt": "Character texture sheet of a market baker in a flour-dusted apron, rolled shirt sleeves and brown breeches. Two full-body figures side by side at the same size: the left one is the front view, the right one is the back view of the same character. Standing straight, arms hanging down at the sides, legs together, feet flat. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
-    },
-    {
-      "id": "ranger_t2i",
-      "seed": 11,
-      "mode": "txt2img",
-      "model": "flux2-klein-4b",
-      "steps": 14,
-      "at": "2026-08-30T14:30:14.135Z",
-      "prompt": "Character texture sheet of a woodland ranger in green leather armour and a brown hooded cloak. Two full-body figures side by side at the same size: the left one is the front view, the right one is the back view of the same character. Standing straight, arms hanging down at the sides, legs together, feet flat. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
+      "at": "2026-08-30T22:03:50.195Z",
+      "prompt": "Paint this grey mannequin reference sheet as a sand-worn desert nomad in layered dust-coloured wraps and a face scarf. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
     },
     {
       "id": "undead_s77",
@@ -38,24 +20,6 @@
       "prompt": "Paint this grey mannequin reference sheet as a bone-white skeletal undead warrior in torn grey rags. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
     },
     {
-      "id": "undead_s11",
-      "seed": 11,
-      "mode": "edit",
-      "model": "flux2-klein-4b",
-      "steps": 14,
-      "at": "2026-08-30T14:24:20.997Z",
-      "prompt": "Paint this grey mannequin reference sheet as a bone-white skeletal undead warrior in torn grey rags. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
-    },
-    {
-      "id": "watch_s77",
-      "seed": 77,
-      "mode": "edit",
-      "model": "flux2-klein-4b",
-      "steps": 14,
-      "at": "2026-08-30T14:20:17.344Z",
-      "prompt": "Paint this grey mannequin reference sheet as a city watch sergeant in a deep blue surcoat over mail, with a steel helm. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
-    },
-    {
       "id": "watch_s11",
       "seed": 11,
       "mode": "edit",
@@ -65,66 +29,12 @@
       "prompt": "Paint this grey mannequin reference sheet as a city watch sergeant in a deep blue surcoat over mail, with a steel helm. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
     },
     {
-      "id": "baker_s77",
-      "seed": 77,
-      "mode": "edit",
-      "model": "flux2-klein-4b",
-      "steps": 14,
-      "at": "2026-08-30T14:12:03.418Z",
-      "prompt": "Paint this grey mannequin reference sheet as a market baker in a flour-dusted apron, rolled shirt sleeves and brown breeches. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
-    },
-    {
-      "id": "baker_s11",
-      "seed": 11,
-      "mode": "edit",
-      "model": "flux2-klein-4b",
-      "steps": 14,
-      "at": "2026-08-30T14:07:50.866Z",
-      "prompt": "Paint this grey mannequin reference sheet as a market baker in a flour-dusted apron, rolled shirt sleeves and brown breeches. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
-    },
-    {
-      "id": "ranger_s77",
-      "seed": 77,
-      "mode": "edit",
-      "model": "flux2-klein-4b",
-      "steps": 14,
-      "at": "2026-08-30T14:03:47.121Z",
-      "prompt": "Paint this grey mannequin reference sheet as a woodland ranger in green leather armour and a brown hooded cloak. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
-    },
-    {
       "id": "knight_s33",
       "seed": 33,
       "mode": "edit",
       "model": "flux2-klein-4b",
       "steps": 14,
       "at": "2026-08-30T13:59:32.051Z",
-      "prompt": "Paint this grey mannequin reference sheet as a rusted iron knight in battered plate armour with a red tabard. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
-    },
-    {
-      "id": "ranger_s11",
-      "seed": 11,
-      "mode": "edit",
-      "model": "flux2-klein-4b",
-      "steps": 14,
-      "at": "2026-08-30T13:55:10.866Z",
-      "prompt": "Paint this grey mannequin reference sheet as a woodland ranger in green leather armour and a brown hooded cloak. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
-    },
-    {
-      "id": "knight_s22",
-      "seed": 22,
-      "mode": "edit",
-      "model": "flux2-klein-4b",
-      "steps": 14,
-      "at": "2026-08-30T13:50:40.119Z",
-      "prompt": "Paint this grey mannequin reference sheet as a rusted iron knight in battered plate armour with a red tabard. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
-    },
-    {
-      "id": "knight_s11",
-      "seed": 11,
-      "mode": "edit",
-      "model": "flux2-klein-4b",
-      "steps": 14,
-      "at": "2026-08-30T13:45:45.666Z",
       "prompt": "Paint this grey mannequin reference sheet as a rusted iron knight in battered plate armour with a red tabard. Keep both figures exactly where they are: same pose, same outline, same height, same width, same position on the sheet. The left figure is the front of the character and the right figure is the same character seen from behind. Paint clothing, armour, skin and detail onto the mannequin without changing its silhouette. Arms hang straight down at the sides, legs straight, feet on the ground. flat matte hand-painted game texture, even flat lighting, no cast shadows, no ground shadow, plain solid white background, no text, no labels, no watermark, no border, full body from head to feet, orthographic, centred."
     }
   ]
