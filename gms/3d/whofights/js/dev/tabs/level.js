@@ -467,7 +467,7 @@ async function drawNew(kind) {
 
 function attachNew() {
   const cast = refs().characters;
-  const ids = Object.keys(cast).filter(id => cast[id]?.body === 'robed');
+  const ids = Object.keys(cast).filter(id => cast[id]?.body && cast[id].body !== 'none');
   if (!ids.length) return S.ctx.toast('no character in data/characters.json has a body to stand next to', 'bad');
   let who = ids[0];
   askRow('Which character?', select(ids.map(id => ({ v: id, label: `${cast[id].name} (${id})` })), who, v => { who = v; }),

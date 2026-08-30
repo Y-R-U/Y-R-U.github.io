@@ -305,6 +305,19 @@ async function runFlux(body, note) {
   }
 }
 
+async function runSkin(body, note) {
+  const { abs, rel } = assetPath('art/skins', body.id, '.png');
+  const { generate, writeSkin } = await import('./skin/skin.mjs');
+  await freeVRAM('flux', note);
+  note('submitting to mflux');
+  const r = await generate({
+    prompt: body.prompt, mode: body.mode, seed: body.seed, steps: body.steps || 14,
+    model: body.model, ref: body.ref, onNote: (st, m) => note(m || st),
+  });
+  writeSkin(body.id, r);
+  return { url: rel, bytes: r.buf.length, seed: r.seed, prompt: r.prompt, job: r.job, abs };
+}
+
 // Bare `fetch` throws a context-free "fetch failed" for a backend that is simply not running, which
 // reaches the tab as an unreadable job error.
 async function reach(url, opts) {
@@ -574,7 +587,7 @@ async function serveStatic(req, res, urlPath) {
 const notFound = res => { res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found'); };
 
 // ── routes ─────────────────────────────────────────────────────────────────
-const WRITE_ROUTES = new Set(['/api/save', '/api/tts', '/api/tts/batch', '/api/music', '/api/flux', '/api/encode']);
+const WRITE_ROUTES = new Set(['/api/save', '/api/tts', '/api/tts/batch', '/api/music', '/api/flux', '/api/encode', '/api/skin']);
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
@@ -675,6 +688,21 @@ async function route(req, res, p, url) {
     const job = enqueue(kind, note => (kind === 'music' ? runMusic(body, note) : runFlux(body, note)), { out: rel });
     return send(res, 200, { ok: true, job: job.id, state: job.state, position: job.position,
       out: rel, waiting: pending.length, note: 'poll /api/job/<id>' });
+  }
+
+  // Additive route, owned by the skinning experiment. It is /api/flux plus the two things a skin
+  // needs and an image does not: the pose reference uploaded to mflux as an edit input, and a
+  // sidecar recording the prompt, so any skin in the game can be regenerated from what it shipped
+  // with. Same GPU queue as everything else.
+  if (p === '/api/skin') {
+    const { buildPrompt } = await import('./skin/skin.mjs');
+    const id = body.id || 'skin';
+    const { rel } = assetPath('art/skins', id, '.png');
+    const mode = body.mode === 'txt2img' ? 'txt2img' : 'edit';
+    const prompt = body.raw && body.prompt ? String(body.prompt) : buildPrompt(String(body.desc || ''), mode);
+    const job = enqueue('flux', note => runSkin({ ...body, id, mode, prompt }, note), { out: rel });
+    return send(res, 200, { ok: true, job: job.id, state: job.state, position: job.position,
+      out: rel, prompt, waiting: pending.length, note: 'poll /api/job/<id>' });
   }
 
   if (p === '/api/encode') {

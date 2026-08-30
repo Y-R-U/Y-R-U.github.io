@@ -1,0 +1,34 @@
+<!doctype html><meta charset="utf-8"><title>skin bench</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- The dummy on its own, with the importmap and no game. tools/skin/render.mjs drives this page
+     over CDP; ?skin=, ?shape= and ?view= are its handles. -->
+<script type="importmap">
+{ "imports": {
+  "three": "/lib/three/0.160.0/three.module.js",
+  "three/addons/": "/lib/three/0.160.0/addons/"
+} }
+</script>
+<style>
+  html,body{margin:0;height:100%;background:#121820;color:#8aa;font:13px system-ui}
+  canvas{display:block;width:100vw;height:100vh}
+  #hud{position:fixed;left:10px;top:8px;font:12px ui-monospace,Menlo,monospace;pointer-events:none}
+</style>
+<canvas id="c"></canvas>
+<div id="hud">…</div>
+<script type="module">
+import { SkinPreview } from './preview.js';
+
+const q = new URLSearchParams(location.search);
+const p = new SkinPreview(document.getElementById('c'));
+await p.start();
+p.setShape(q.get('shape') || 'm');
+if (q.get('view')) p.view(q.get('view'));
+if (q.get('spin')) { p.auto = false; p.spin = +q.get('spin'); }
+let note = 'no skin';
+if (q.get('skin')) {
+  try { await p.setSkin(q.get('skin')); note = q.get('skin'); }
+  catch (e) { note = `FAILED ${e.message}`; }
+}
+document.getElementById('hud').textContent = `${p.shape} · ${note}`;
+window.__wfSkinBench = { preview: p, ready: true, note };
+</script>

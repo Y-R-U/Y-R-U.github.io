@@ -61,7 +61,9 @@ export class Characters {
       const a = people.place({
         npc: c.id,
         zi: ZI[c.robe] ?? 1,
-        vi: c.gender === 'f' ? 1 : 0,
+        // DEV_CONTRACT §7: gender is metadata and orders the voice list — it must not pick a mesh.
+        // This used to map f → variant 1, the stout body, which also has no staff.
+        vi: 0,
         kind: w ? 'stroll' : 'idle',
         x: c.place.x, z: c.place.z,
         heading: c.place.yaw,

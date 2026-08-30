@@ -136,7 +136,7 @@ export function hotspotProblems(h, refs = {}) {
   if (!h.id) out.push('no id');
   if (!h.attach && !h.shape) out.push('neither a shape nor a character to follow — the loader will drop it');
   if (h.attach && refs.characters && !refs.characters[h.attach]) out.push(`follows "${h.attach}", who is not in data/characters.json`);
-  if (h.attach && refs.characters?.[h.attach] && refs.characters[h.attach].body === 'none') {
+  if (h.attach && refs.characters?.[h.attach] && (refs.characters[h.attach].body || 'none') === 'none') {
     out.push(`follows "${h.attach}", who has no body — it can never fire`);
   }
   if (!TRIGGERS.includes(h.trigger)) out.push(`unknown trigger "${h.trigger}"`);

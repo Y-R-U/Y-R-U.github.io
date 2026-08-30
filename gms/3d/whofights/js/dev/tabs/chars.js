@@ -11,6 +11,14 @@ import { createBarks } from '../chars/barkui.js';
 import { groupedVoices, LANGS, voice as voiceInfo, AUDITION } from '../chars/voices.js';
 import { speedOf, pitchOf, pitchRate, synthSpeed, countBarks } from '../chars/vo.js';
 
+// DEV_CONTRACT §7. `dummy` is another agent's rig (js/world/dummy.js) — listed so a dummy
+// character opened here keeps its body instead of being silently rewritten to robed.
+const BODIES = [
+  { id: 'robed', label: 'robed — the hooded rig, stands in the world' },
+  { id: 'dummy', label: 'dummy — the configurable rig (owned by the skin tab)' },
+  { id: 'none', label: 'none — a voice only' },
+];
+
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const num = (v, d) => (Number.isFinite(+v) ? +v : d);
 
@@ -218,6 +226,13 @@ registerTab({
 
   async startPreview() {
     const slot = this.mainEl.querySelector('[data-role=canvasslot]');
+    // The preview draws the hooded rig. A dummy character is the skin tab's rig, and showing it a
+    // robe would be the exact kind of lie this panel exists to avoid.
+    if (this.chr()?.body === 'dummy') {
+      slot.innerHTML = `<div class="empty"><b>Dummy rig</b>this preview draws the hooded figure only
+        <br><span class="dim">the dummy body and its skin live in the Skin tab</span></div>`;
+      return;
+    }
     slot.appendChild(this.canvasEl);
     if (this.previewFailed) {
       slot.innerHTML = `<div class="empty"><b>No 3D preview</b>${esc(this.previewFailed)}<br>
@@ -243,14 +258,14 @@ registerTab({
   pushPreview() {
     const c = this.chr();
     if (!this.preview || !c) return;
-    const variant = c.gender === 'f' ? 1 : 0;
     const height = num(c.height, 1);
+    const variant = 0;
     this.preview.apply({ robe: ['light', 'neutral', 'dark'].includes(c.robe) ? c.robe : 'neutral',
       height, variant });
     const line = this.mainEl.querySelector('[data-role=rigline]');
     if (line) {
       line.textContent = `${metresOf(height, variant).toFixed(2)} m · robe ${c.robe || 'neutral'}`
-        + ` · mesh variant ${variant} (${variant ? 'stout' : 'slim'}) · ${c.body === 'robed' ? 'in the world' : 'voice only'}`;
+        + ` · ${c.body === 'robed' ? 'in the world' : 'voice only'}`;
     }
   },
 
@@ -264,9 +279,8 @@ registerTab({
       <h2>Appearance</h2>
       <div class="chars-f">
         <label>Name</label><input type="text" data-f="name" value="${esc(c.name)}">
-        <label>Body</label><select data-f="body">
-          <option value="robed">robed — stands in the world</option>
-          <option value="none">none — a voice only</option></select>
+        <label>Body</label><select data-f="body">${BODIES.map(b =>
+          `<option value="${b.id}">${esc(b.label)}</option>`).join('')}</select>
         <label>Robe</label><select data-f="robe">
           <option value="light">light</option><option value="neutral">neutral</option>
           <option value="dark">dark</option></select>
@@ -274,7 +288,7 @@ registerTab({
           value="${num(c.height, 1)}"><span class="val" data-val="height"></span></span>
         <label>Gender</label><span><select data-f="gender">
           <option value="f">f</option><option value="m">m</option><option value="x">x</option></select>
-          <span class="dim" style="font-size:11px"> orders the voice list — and today also picks the mesh variant</span></span>
+          <span class="dim" style="font-size:11px"> metadata — it orders the voice list below and nothing else</span></span>
       </div>
 
       <div class="chars-unwired">
@@ -326,7 +340,7 @@ registerTab({
       <table class="chars-reach">
         <tr><th>robe</th><td class="good">yes</td><td class="dim">zones.js material + geometry set</td></tr>
         <tr><th>height</th><td class="good">yes</td><td class="dim">people.js agent <code>scale</code>, uniform</td></tr>
-        <tr><th>gender</th><td class="warnc">indirectly</td><td class="dim">characters.js maps f → mesh variant 1</td></tr>
+        <tr><th>gender</th><td class="dim">no</td><td class="dim">metadata; orders the voice list only (§7)</td></tr>
         <tr><th>body, place</th><td class="good">yes</td><td class="dim">whether and where a figure is spawned</td></tr>
         <tr><th>build</th><td class="bad">no</td><td class="dim">normalised, never read</td></tr>
         <tr><th>hood</th><td class="bad">no</td><td class="dim">the rig has only a hood-up mesh</td></tr>
@@ -361,7 +375,7 @@ registerTab({
         }, key, ev === 'input');
         setVal(key);
         if (key === 'name') this.mainEl.querySelector('[data-role=title]').textContent = v || this.sel;
-        if (['robe', 'height', 'gender'].includes(key)) this.pushPreview();
+        if (['robe', 'height'].includes(key)) this.pushPreview();
         if (key === 'gender') this.paintVoices();
         if (key === 'body') this.paintMain();
         if (key === 'voicePitch' || key === 'voiceSpeed' || key === 'voice') this.paintVoiceState();

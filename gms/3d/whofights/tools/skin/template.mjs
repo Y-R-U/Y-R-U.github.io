@@ -128,9 +128,9 @@ function guide() {
     cv.line([ax, 130], [ax + 9, 146], ink, 3);
     cv.text('UP', ax, 214, ink, 2, 'centre');
   }
-  const eyeY = PANEL.feetRow - 1.685 * SCALE;
+  const eyeY = PANEL.feetRow - 1.665 * SCALE;
   for (const dx of [-0.043, 0.043]) {
-    const [ex] = px(dx, 1.685, false);
+    const [ex] = px(dx, 1.665, false);
     cv.fill([[ex - 7, eyeY - 4], [ex + 7, eyeY - 4], [ex + 7, eyeY + 4], [ex - 7, eyeY + 4]], [20, 20, 24]);
   }
 

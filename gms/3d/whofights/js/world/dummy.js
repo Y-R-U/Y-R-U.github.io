@@ -7,17 +7,18 @@
 // carry a character in this renderer.
 
 import * as THREE from 'three';
-import { faces, RIG_TOP, ATLAS } from '../../tools/skin/layout.mjs';
+import { faces, SHAPES, SHAPE_IDS, RIG_TOP, ATLAS } from '../../tools/skin/layout.mjs';
 import { track, untrack } from '../engine/budget.js';
 
-export { RIG_TOP, ATLAS };
+export { RIG_TOP, ATLAS, SHAPES, SHAPE_IDS };
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 
-export function dummyGeometry() {
+// `shape` is 'm' | 'f' | 'n'. All three share one UV set, so one skin fits any of them.
+export function dummyGeometry(shape = 'm') {
   const pos = [], nor = [], uv = [];
-  for (const f of faces()) {
+  for (const f of faces(shape)) {
     const e1 = sub(f.pos[1], f.pos[0]), e2 = sub(f.pos[2], f.pos[0]);
     const n = cross(e1, e2);
     const len = Math.hypot(n[0], n[1], n[2]) || 1;
@@ -58,7 +59,7 @@ export function loadSkin(url, { anisotropy = 4, label = url } = {}) {
       // The skin is a single 1024² albedo. Untracked it is 5.6 MB the readout never mentions.
       track(tex, { w: tex.image.width, h: tex.image.height, label: `skin:${label}` });
       res(tex);
-    }, undefined, rej);
+    }, undefined, e => rej(new Error(`could not load ${url}`)));
   });
 }
 
@@ -69,9 +70,10 @@ export function disposeSkin(tex) {
 }
 
 export class Dummy extends THREE.Mesh {
-  constructor(map = null) {
-    super(dummyGeometry(), dummyMaterial(map));
-    this.name = 'dummy';
+  constructor({ shape = 'm', map = null } = {}) {
+    super(dummyGeometry(shape), dummyMaterial(map));
+    this.name = `dummy:${shape}`;
+    this.shape = shape;
   }
 
   setSkin(tex) {

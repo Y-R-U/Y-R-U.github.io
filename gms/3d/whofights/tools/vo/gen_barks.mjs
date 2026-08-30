@@ -94,9 +94,12 @@ async function post(route, body, ms = 900000) {
   return r.json();
 }
 
+// The raw takes, not the shipped clips: planJobs asks "does the kokoro take still exist?", and
+// after the raw/ split audio/vo holds no wavs at all — reading it here replanned the whole cast
+// on every run while reporting nothing wrong.
 function onDiskSet() {
   try {
-    return new Set(fs.readdirSync(path.join(ROOT, VO_DIR))
+    return new Set(fs.readdirSync(path.join(ROOT, RAW_DIR))
       .filter(f => f.endsWith('.wav')).map(f => f.slice(0, -4)));
   } catch { return new Set(); }
 }

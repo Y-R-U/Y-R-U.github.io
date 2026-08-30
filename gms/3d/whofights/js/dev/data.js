@@ -15,7 +15,9 @@ export const KINDS = {
   levels: {
     collection: true,
     file: id => `data/levels/${id}.json`,
-    blank: id => ({ version: 3, id, name: id, objects: [], hotspots: [] }),
+    // Must match SCENE_VERSION in js/editor/scene.js, which is 1. Not imported: scene.js pulls in
+    // three via field.js, and this module has to load in selftest.html, which has no importmap.
+    blank: id => ({ version: 1, id, name: id, objects: [], hotspots: [] }),
     validate: d => {
       const e = [];
       if (!d || typeof d !== 'object') return ['must be an object'];
