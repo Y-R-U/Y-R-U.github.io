@@ -130,12 +130,14 @@ Full field list (all optional except `name` and `body`):
 
 | field | values |
 |---|---|
-| `body` | `robed` \| `none` |
+| `body` | `robed` \| `dummy` \| `none` — **two rigs.** `robed` is the hooded cloak (`people.js`), the default look and what the player starts as. `dummy` is the configurable humanoid: a UV'd crash-test-dummy base in male and female shapes, skinned with a generated texture. `none` is a narrator or voice-only NPC. |
+| `sex` | `f` \| `m` — **`dummy` only.** Picks the body shape. Nothing else reads it. |
+| `skin` (dummy) | id of a generated skin under `art/skins/`. |
 | `robe` | `light` \| `dark` \| `neutral` |
 | `height` | 0.85–1.20 (multiplier) |
 | `build` | 0.85–1.20 (width multiplier) |
-| `gender` | `f` \| `m` \| `x` (drives nothing but the default voice list order) |
-| `skin`, `hair` | `#rrggbb` |
+| `gender` | `f` \| `m` \| `x` — **metadata only.** It must not pick a mesh, a rig or a variant. Voice is always chosen explicitly per character; gender may at most order the voice list. |
+| `hair` | `#rrggbb` — `dummy` only; the cowl hides it on `robed`. |
 | `hood` | `up` \| `down` |
 | `voice` | kokoro voice id, e.g. `am_echo` |
 | `voiceSpeed` | 0.7–1.3, default 1.0 |

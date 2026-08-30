@@ -122,6 +122,19 @@ an already-compressed file.
 
 ## Known problems
 
+- **Aaron, playing it: "I can't fully look around."** Root cause was `PITCH_MIN/PITCH_MAX` in
+  `js/player.js` — hard clamps at −0.35 / +1.05 rad (−20° / +60°), and indoors a further cap at
+  0.50 rad (~29°), which made the new 11 m hall roof unreachable. Widened to −0.90 / +1.30 and the
+  indoor cap to 0.95, all three now knobs (`camPitchDown`, `camPitchUp`, `camPitchIn`) in the
+  Controls group so they can be tuned live. **Not yet confirmed by Aaron in play** — if it is still
+  restrictive, the indoor cap should scale with the actual ceiling height rather than being one
+  number for a cottage and a great hall alike.
+- Nothing in the hall has a collider — you walk through tables, presses and the hearth.
+- Hall masonry reads as brick rather than ashlar; one number (`INTERIOR_TILE.stone`).
+- Flat blue window panels at mid-wall height read as placeholder rectangles.
+- The tracer misses boot — hooks install on first Debug-tab open. One line in `js/dev/boot.js`.
+- No running world clock: `time` is a lighting knob, `js/game/clock.js` is uncalled arithmetic.
+
 - The great hall reads as a timber box — flat-lit, plank texture on every surface, beams sized off
   cottage constants. That is what the interior art agent is fixing.
 - Portrait crops the outer two contract boards from the authored `hall` framing.

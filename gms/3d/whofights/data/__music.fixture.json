@@ -422,18 +422,6 @@
       "shuffle": false,
       "fadeMs": 200,
       "volume": 0.85
-    },
-    {
-      "id": "set_1",
-      "label": "New set",
-      "tracks": [
-        "menu_bed_01",
-        "hall_bed_01",
-        "hall_bed_02"
-      ],
-      "shuffle": true,
-      "fadeMs": 1500,
-      "volume": 0.6
     }
   ]
 }

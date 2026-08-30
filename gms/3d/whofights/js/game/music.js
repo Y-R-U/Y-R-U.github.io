@@ -208,6 +208,13 @@ export class MusicPlan {
         this.fadeOut(v, now, out);
       }
     }
+    // A sting is not cross-faded into anything, so an abrupt take would be heard hitting its own
+    // dead stop. Take the last 400 ms off it.
+    for (const v of this.voices) {
+      if (v.role !== 'sting' || v.out || !(v.seconds > 0)) continue;
+      if (this.trackOf(v.trackId)?.ends !== 'abrupt') continue;
+      if (this.head(v, now) >= v.seconds - 0.4) this.fadeOut(v, now, 400);
+    }
     for (const v of this.voices.slice()) {
       const dead = v.out && v.deadAt != null && now >= v.deadAt;
       const past = !v.out && v.seconds > 0 && this.head(v, now) >= v.seconds + 0.35;

@@ -78,73 +78,78 @@ const foldV = (s, sign, span) => Math.min(s.d * 0.5, Math.max(0.02, span * 0.45)
 
 // Emits { pos:[[x,y,z]x4], uv:[[u,v]x4], panel:'front'|'back', kind, part } quads.
 // Every quad is planar-shaded, matching the faceted look of everything else in js/world/.
+// Winding is normalised against an intended outward direction rather than reasoned about per case:
+// arms and legs list their sections top-down and the torso lists them bottom-up, so every hand-
+// derived sign was wrong for half the rig.
 export function faces() {
   const out = [];
-  const push = (part, kind, panel, pos, uv) => out.push({ part: part.id, label: part.label, kind, panel, pos, uv });
+
+  const emit = (part, kind, panel, pos, uv, outward) => {
+    const e1 = sub(pos[1], pos[0]), e2 = sub(pos[2], pos[0]);
+    const n = cross(e1, e2);
+    const bad = n[0] * outward[0] + n[1] * outward[1] + n[2] * outward[2] < 0;
+    out.push({ part: part.id, label: part.label, kind, panel,
+      pos: bad ? pos.slice().reverse() : pos, uv: bad ? uv.slice().reverse() : uv });
+  };
 
   for (const part of PARTS) {
     for (const flip of part.mirror ? [1, -1] : [1]) {
       const p = flip === 1 ? part : { ...part, id: part.mirror };
       const S4 = part.sections.map(s => ({ ...s, x: s.x * flip }));
+      const L = s => s.x - s.w / 2, R = s => s.x + s.w / 2;
+      const F = s => s.z + s.d / 2, K = s => s.z - s.d / 2;
 
       for (let i = 0; i < S4.length - 1; i++) {
         const a = S4[i], b = S4[i + 1];
-        const L = s => s.x - s.w / 2, R = s => s.x + s.w / 2;
-        const F = s => s.z + s.d / 2, K = s => s.z - s.d / 2;
 
-        // Front and back panels of the segment: a pure projection, no fold.
-        push(p, 'front', 'front',
+        emit(p, 'front', 'front',
           [[L(a), a.y, F(a)], [R(a), a.y, F(a)], [R(b), b.y, F(b)], [L(b), b.y, F(b)]],
-          [project(L(a), a.y, 0), project(R(a), a.y, 0), project(R(b), b.y, 0), project(L(b), b.y, 0)]);
-        push(p, 'back', 'back',
+          [project(L(a), a.y, 0), project(R(a), a.y, 0), project(R(b), b.y, 0), project(L(b), b.y, 0)],
+          [0, 0, 1]);
+        emit(p, 'back', 'back',
           [[R(a), a.y, K(a)], [L(a), a.y, K(a)], [L(b), b.y, K(b)], [R(b), b.y, K(b)]],
-          [project(R(a), a.y, 1), project(L(a), a.y, 1), project(L(b), b.y, 1), project(R(b), b.y, 1)]);
+          [project(R(a), a.y, 1), project(L(a), a.y, 1), project(L(b), b.y, 1), project(R(b), b.y, 1)],
+          [0, 0, -1]);
 
         // Sides, split at the segment's own centre z so each half folds into the panel it faces.
         for (const sign of [1, -1]) {
           const X = sign > 0 ? R : L;
+          const fa = foldU(a, sign), fb = foldU(b, sign);
           for (const half of [0, 1]) {
             const zEdge = half ? K : F;
             const bk = half ? 1 : 0;
-            const fa = foldU(a, sign), fb = foldU(b, sign);
-            const quad = [
-              [X(a), a.y, zEdge(a)], [X(a), a.y, a.z], [X(b), b.y, b.z], [X(b), b.y, zEdge(b)],
-            ];
-            const uvq = [
-              project(X(a), a.y, bk), project(X(a) + fa, a.y, bk),
-              project(X(b) + fb, b.y, bk), project(X(b), b.y, bk),
-            ];
-            push(p, 'side', half ? 'back' : 'front',
-              sign > 0 === !half ? quad : quad.slice().reverse(),
-              sign > 0 === !half ? uvq : uvq.slice().reverse());
+            emit(p, 'side', half ? 'back' : 'front',
+              [[X(a), a.y, zEdge(a)], [X(a), a.y, a.z], [X(b), b.y, b.z], [X(b), b.y, zEdge(b)]],
+              [project(X(a), a.y, bk), project(X(a) + fa, a.y, bk),
+                project(X(b) + fb, b.y, bk), project(X(b), b.y, bk)],
+              [sign, 0, 0]);
           }
         }
       }
 
-      // Caps. Same fold, in v.
+      // Caps, folded in v. `sign` is which way the cap faces, read off the rig rather than assumed.
       for (const end of [0, 1]) {
         const s = S4[end ? S4.length - 1 : 0];
-        const sign = end ? 1 : -1;
         const near = S4[end ? S4.length - 2 : 1];
-        const span = Math.abs(near.y - s.y);
-        const L = s.x - s.w / 2, R = s.x + s.w / 2, F = s.z + s.d / 2, K = s.z - s.d / 2;
-        const f = foldV(s, sign, span);
+        const sign = Math.sign(s.y - near.y) || (end ? 1 : -1);
+        const f = foldV(s, sign, Math.abs(near.y - s.y));
         for (const half of [0, 1]) {
-          const zEdge = half ? K : F;
+          const zEdge = half ? K(s) : F(s);
           const bk = half ? 1 : 0;
-          const quad = [[L, s.y, zEdge], [R, s.y, zEdge], [R, s.y, s.z], [L, s.y, s.z]];
-          const uvq = [project(L, s.y, bk), project(R, s.y, bk),
-            project(R, s.y + f, bk), project(L, s.y + f, bk)];
-          const flipWind = (sign > 0) === !!half;
-          push(p, 'cap', half ? 'back' : 'front',
-            flipWind ? quad.slice().reverse() : quad,
-            flipWind ? uvq.slice().reverse() : uvq);
+          emit(p, 'cap', half ? 'back' : 'front',
+            [[L(s), s.y, zEdge], [R(s), s.y, zEdge], [R(s), s.y, s.z], [L(s), s.y, s.z]],
+            [project(L(s), s.y, bk), project(R(s), s.y, bk),
+              project(R(s), s.y + f, bk), project(L(s), s.y + f, bk)],
+            [0, sign, 0]);
         }
       }
     }
   }
   return out;
 }
+
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 
 // What the template labels, and where. Anchored to the rig so a proportion change moves the label
 // with the island it names.

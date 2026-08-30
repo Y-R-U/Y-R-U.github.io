@@ -49,8 +49,10 @@ export async function clipsOnDisk(api) {
 // The dev server's encode route. js/dev/api.js has no wrapper for it and is not this agent's file,
 // so it is called directly off api.base. Its own CPU queue, so it never waits on the GPU slot.
 export async function encodeClip(api, key, { profile = CODEC.profile } = {}) {
+  // api.base is '' when the dev server IS the page's origin, so this has to test for null, not
+  // for falsy. `if (!base)` rejected every same-origin encode as "no dev server".
   const base = api.base;
-  if (!base) return { ok: false, error: 'no dev server' };
+  if (base === null || base === undefined) return { ok: false, error: 'no dev server' };
   const go = async (path, opts) => {
     try {
       const r = await fetch(`${base}${path}`, opts);

@@ -4,6 +4,10 @@
 import { el, clock, esc } from './ui.js';
 
 export function library(host, C) {
+  bindShape((id, key, v) => C.mutate(d => {
+    const t = (d.tracks || []).find(x => x.id === id);
+    if (t) t[key] = v;
+  }, `track ${key}`));
   const wrap = el('div');
   const bar = el('div', 'row');
   const find = el('input');
@@ -51,6 +55,7 @@ export function library(host, C) {
       el('span', 'mus-tag', t.mood || '—'),
       el('span', 'mus-tag', (t.source || 'acestep') === 'suno' ? 'Suno' : 'ACE'),
       el('span', 'mus-t', clock(t.seconds)));
+    if (t.ends === 'abrupt') r.append(el('span', 'mus-tag warnc', 'stops dead'));
     const sets = el('span', 'dim');
     sets.style.cssText = 'flex:0 0 auto;font-size:11px';
     sets.textContent = inSets.length ? `in ${inSets.join(', ')}` : 'in no set';
@@ -64,15 +69,39 @@ export function library(host, C) {
     const box = el('div');
     box.append(r);
     const why = el('div', 'mus-why');
-    why.innerHTML = `<div class="dim">file</div><pre>${esc(t.file)}</pre>
+    why.append(shape(t));
+    why.insertAdjacentHTML('beforeend', `<div class="dim">file</div><pre>${esc(t.file)}</pre>
       <div class="dim">prompt</div><pre>${esc(t.prompt) || '<span class="warnc">no prompt recorded — this track cannot be remade</span>'}</pre>
-      ${t.lyrics ? `<div class="dim">lyrics</div><pre>${esc(t.lyrics)}</pre>` : ''}`;
+      ${t.lyrics ? `<div class="dim">lyrics</div><pre>${esc(t.lyrics)}</pre>` : ''}`);
     box.append(why);
     return box;
   }
 
   paint();
   return { paint };
+}
+
+// How the take begins and ends is a fact about the file, and the runtime fades on it — so it is
+// carried in the manifest rather than measured again at load.
+function shape(t) {
+  const wrap = el('div', 'row');
+  wrap.append(el('span', 'dim', 'shape of the take'));
+  wrap.append(pick(['clean', 'abrupt'], ['ends cleanly', 'stops dead — fade it out'], t.ends || 'clean',
+    v => shapeSet(t.id, 'ends', v)));
+  wrap.append(pick(['clean', 'quiet'], ['starts at level', 'ramps in from quiet'], t.starts || 'clean',
+    v => shapeSet(t.id, 'starts', v)));
+  return wrap;
+}
+
+let onShape = null;
+export function bindShape(fn) { onShape = fn; }
+const shapeSet = (id, key, v) => onShape?.(id, key, v);
+
+function pick(values, labels, current, onPick) {
+  const s = sel(values, labels);
+  s.value = current;
+  s.onchange = () => onPick(s.value);
+  return s;
 }
 
 function sel(values, labels) {

@@ -15,9 +15,9 @@
       "ttsSpeed": 1,
       "hash": "11c0e486",
       "seconds": 1.375,
-      "rms": -24.69,
-      "at": 1788096745043,
-      "bytes": 3697
+      "rms": -24.65,
+      "at": 1788097061639,
+      "bytes": 3630
     },
     "player__spot__02": {
       "who": "player",
@@ -33,9 +33,9 @@
       "ttsSpeed": 1,
       "hash": "a4c7b192",
       "seconds": 2,
-      "rms": -24.54,
-      "at": 1788096745043,
-      "bytes": 5403
+      "rms": -24.55,
+      "at": 1788097061639,
+      "bytes": 5458
     },
     "greeter__greet__01": {
       "who": "greeter",
@@ -52,8 +52,8 @@
       "hash": "70648d52",
       "seconds": 3.025,
       "rms": -23.88,
-      "at": 1788096745043,
-      "bytes": 8329
+      "at": 1788097061639,
+      "bytes": 8312
     },
     "greeter__greet__02": {
       "who": "greeter",
@@ -70,8 +70,8 @@
       "hash": "55b80c47",
       "seconds": 4.5,
       "rms": -24.05,
-      "at": 1788096745043,
-      "bytes": 12555
+      "at": 1788097061639,
+      "bytes": 12561
     },
     "greeter__greet__03": {
       "who": "greeter",
@@ -88,8 +88,8 @@
       "hash": "8e6ca498",
       "seconds": 3.175,
       "rms": -24.34,
-      "at": 1788096745043,
-      "bytes": 8656
+      "at": 1788097061639,
+      "bytes": 8663
     },
     "greeter__greet__04": {
       "who": "greeter",
@@ -105,8 +105,8 @@
       "ttsSpeed": 0.98,
       "hash": "0ad7edbd",
       "seconds": 2.175,
-      "rms": -24.25,
-      "at": 1788096745043,
+      "rms": -24.24,
+      "at": 1788097061639,
       "bytes": 5802
     },
     "greeter__greet__05": {
@@ -123,9 +123,9 @@
       "ttsSpeed": 0.98,
       "hash": "fd2f54db",
       "seconds": 1.825,
-      "rms": -24.55,
-      "at": 1788096745043,
-      "bytes": 4775
+      "rms": -24.56,
+      "at": 1788097061639,
+      "bytes": 4798
     },
     "player__idle__01": {
       "who": "player",
@@ -141,9 +141,9 @@
       "ttsSpeed": 1,
       "hash": "e3bbdbd8",
       "seconds": 1.5,
-      "rms": -23.97,
-      "at": 1788096745043,
-      "bytes": 4008
+      "rms": -23.96,
+      "at": 1788097061639,
+      "bytes": 3996
     },
     "player__idle__02": {
       "who": "player",
@@ -159,9 +159,9 @@
       "ttsSpeed": 1,
       "hash": "d123b347",
       "seconds": 1.4,
-      "rms": -24.31,
-      "at": 1788096745043,
-      "bytes": 3805
+      "rms": -24.28,
+      "at": 1788097061639,
+      "bytes": 3798
     },
     "player__idle__03": {
       "who": "player",
@@ -177,9 +177,9 @@
       "ttsSpeed": 1,
       "hash": "2f94feba",
       "seconds": 2.425,
-      "rms": -25.22,
-      "at": 1788096745043,
-      "bytes": 6595
+      "rms": -25.2,
+      "at": 1788097061639,
+      "bytes": 6589
     },
     "player__curious__01": {
       "who": "player",
@@ -195,9 +195,9 @@
       "ttsSpeed": 1,
       "hash": "e028b127",
       "seconds": 1.85,
-      "rms": -25.4,
-      "at": 1788096745043,
-      "bytes": 4923
+      "rms": -25.37,
+      "at": 1788097061639,
+      "bytes": 4908
     },
     "player__curious__02": {
       "who": "player",
@@ -213,9 +213,9 @@
       "ttsSpeed": 1,
       "hash": "35901aa2",
       "seconds": 1.425,
-      "rms": -24.25,
-      "at": 1788096745043,
-      "bytes": 3837
+      "rms": -24.28,
+      "at": 1788097061639,
+      "bytes": 3844
     },
     "player__curious__03": {
       "who": "player",
@@ -231,9 +231,9 @@
       "ttsSpeed": 1,
       "hash": "64926767",
       "seconds": 0.9,
-      "rms": -25.47,
-      "at": 1788096745043,
-      "bytes": 2517
+      "rms": -25.48,
+      "at": 1788097061639,
+      "bytes": 2524
     },
     "player__success__01": {
       "who": "player",
@@ -249,9 +249,9 @@
       "ttsSpeed": 1,
       "hash": "6bdbfc9c",
       "seconds": 1,
-      "rms": -24.44,
-      "at": 1788096745043,
-      "bytes": 2773
+      "rms": -24.46,
+      "at": 1788097061639,
+      "bytes": 2783
     },
     "player__success__02": {
       "who": "player",
@@ -267,9 +267,9 @@
       "ttsSpeed": 1,
       "hash": "f55b2393",
       "seconds": 1.075,
-      "rms": -24.19,
-      "at": 1788096745043,
-      "bytes": 2953
+      "rms": -24.2,
+      "at": 1788097061639,
+      "bytes": 2930
     },
     "player__success__03": {
       "who": "player",
@@ -285,9 +285,9 @@
       "ttsSpeed": 1,
       "hash": "9ee30fdd",
       "seconds": 1.1,
-      "rms": -23.78,
-      "at": 1788096745043,
-      "bytes": 2964
+      "rms": -23.76,
+      "at": 1788097061639,
+      "bytes": 2954
     },
     "player__failure__01": {
       "who": "player",
@@ -303,9 +303,9 @@
       "ttsSpeed": 1,
       "hash": "987642e0",
       "seconds": 1.075,
-      "rms": -23.22,
-      "at": 1788096745043,
-      "bytes": 2980
+      "rms": -23.24,
+      "at": 1788097061639,
+      "bytes": 2960
     },
     "player__failure__02": {
       "who": "player",
@@ -321,9 +321,9 @@
       "ttsSpeed": 1,
       "hash": "dffb5527",
       "seconds": 1.975,
-      "rms": -25.14,
-      "at": 1788096745043,
-      "bytes": 5346
+      "rms": -25.16,
+      "at": 1788097061639,
+      "bytes": 5313
     },
     "player__failure__03": {
       "who": "player",
@@ -339,9 +339,9 @@
       "ttsSpeed": 1,
       "hash": "4380a498",
       "seconds": 1.9,
-      "rms": -24.87,
-      "at": 1788096745043,
-      "bytes": 5023
+      "rms": -24.85,
+      "at": 1788097061639,
+      "bytes": 5047
     },
     "player__hurt__01": {
       "who": "player",
@@ -357,9 +357,9 @@
       "ttsSpeed": 1,
       "hash": "1df547c5",
       "seconds": 0.975,
-      "rms": -24.72,
-      "at": 1788096745043,
-      "bytes": 2649
+      "rms": -24.76,
+      "at": 1788097061639,
+      "bytes": 2656
     },
     "player__hurt__02": {
       "who": "player",
@@ -375,9 +375,9 @@
       "ttsSpeed": 1,
       "hash": "f208ff28",
       "seconds": 2.2,
-      "rms": -24.51,
-      "at": 1788096745043,
-      "bytes": 5971
+      "rms": -24.52,
+      "at": 1788097061639,
+      "bytes": 6000
     },
     "player__hurt__03": {
       "who": "player",
@@ -394,8 +394,8 @@
       "hash": "8d32d908",
       "seconds": 1.575,
       "rms": -24.27,
-      "at": 1788096745043,
-      "bytes": 4230
+      "at": 1788097061639,
+      "bytes": 4268
     },
     "player__combat__01": {
       "who": "player",
@@ -412,8 +412,8 @@
       "hash": "dda06b40",
       "seconds": 1.275,
       "rms": -24.51,
-      "at": 1788096745043,
-      "bytes": 3486
+      "at": 1788097061639,
+      "bytes": 3457
     },
     "player__combat__02": {
       "who": "player",
@@ -429,9 +429,9 @@
       "ttsSpeed": 1,
       "hash": "c185f3f5",
       "seconds": 1.425,
-      "rms": -24.71,
-      "at": 1788096745043,
-      "bytes": 3882
+      "rms": -24.74,
+      "at": 1788097061639,
+      "bytes": 3865
     },
     "player__combat__03": {
       "who": "player",
@@ -447,9 +447,9 @@
       "ttsSpeed": 1,
       "hash": "511b753d",
       "seconds": 1.9,
-      "rms": -24.32,
-      "at": 1788096745043,
-      "bytes": 5045
+      "rms": -24.33,
+      "at": 1788097061639,
+      "bytes": 5020
     },
     "player__thanks__01": {
       "who": "player",
@@ -465,9 +465,9 @@
       "ttsSpeed": 1,
       "hash": "f80864b1",
       "seconds": 1.025,
-      "rms": -24.02,
-      "at": 1788096745043,
-      "bytes": 2786
+      "rms": -24.03,
+      "at": 1788097061639,
+      "bytes": 2785
     },
     "player__thanks__02": {
       "who": "player",
@@ -484,8 +484,8 @@
       "hash": "8f38b51a",
       "seconds": 1.2,
       "rms": -24.28,
-      "at": 1788096745043,
-      "bytes": 3209
+      "at": 1788097061639,
+      "bytes": 3194
     },
     "greeter__idle__01": {
       "who": "greeter",
@@ -502,8 +502,8 @@
       "hash": "d5249121",
       "seconds": 4.475,
       "rms": -23.84,
-      "at": 1788096745043,
-      "bytes": 12608
+      "at": 1788097061639,
+      "bytes": 12569
     },
     "greeter__idle__02": {
       "who": "greeter",
@@ -519,9 +519,9 @@
       "ttsSpeed": 0.98,
       "hash": "2f3d00e9",
       "seconds": 3.75,
-      "rms": -24.08,
-      "at": 1788096745043,
-      "bytes": 10317
+      "rms": -24.07,
+      "at": 1788097061639,
+      "bytes": 10332
     },
     "greeter__idle__03": {
       "who": "greeter",
@@ -537,9 +537,9 @@
       "ttsSpeed": 0.98,
       "hash": "e0d2e9db",
       "seconds": 2.225,
-      "rms": -24.16,
-      "at": 1788096745043,
-      "bytes": 5924
+      "rms": -24.15,
+      "at": 1788097061639,
+      "bytes": 5920
     },
     "greeter__idle__04": {
       "who": "greeter",
@@ -556,8 +556,8 @@
       "hash": "8cfef1cf",
       "seconds": 3.725,
       "rms": -24.13,
-      "at": 1788096745043,
-      "bytes": 10352
+      "at": 1788097061639,
+      "bytes": 10315
     },
     "greeter__idle__05": {
       "who": "greeter",
@@ -573,9 +573,9 @@
       "ttsSpeed": 0.98,
       "hash": "9e192175",
       "seconds": 4.025,
-      "rms": -24.07,
-      "at": 1788096745043,
-      "bytes": 11156
+      "rms": -24.08,
+      "at": 1788097061639,
+      "bytes": 11135
     },
     "greeter__farewell__01": {
       "who": "greeter",
@@ -591,9 +591,9 @@
       "ttsSpeed": 0.98,
       "hash": "2bdec70b",
       "seconds": 3.525,
-      "rms": -24,
-      "at": 1788096745043,
-      "bytes": 9744
+      "rms": -24.01,
+      "at": 1788097061639,
+      "bytes": 9726
     },
     "greeter__farewell__02": {
       "who": "greeter",
@@ -609,9 +609,9 @@
       "ttsSpeed": 0.98,
       "hash": "c5d4a4fa",
       "seconds": 1.35,
-      "rms": -24.42,
-      "at": 1788096745043,
-      "bytes": 3597
+      "rms": -24.44,
+      "at": 1788097061639,
+      "bytes": 3578
     },
     "greeter__farewell__03": {
       "who": "greeter",
@@ -628,8 +628,8 @@
       "hash": "a8b4c32e",
       "seconds": 3.075,
       "rms": -23.87,
-      "at": 1788096745043,
-      "bytes": 8439
+      "at": 1788097061639,
+      "bytes": 8432
     },
     "greeter__farewell__04": {
       "who": "greeter",
@@ -646,8 +646,8 @@
       "hash": "da96f0f2",
       "seconds": 3.175,
       "rms": -24.15,
-      "at": 1788096745043,
-      "bytes": 8708
+      "at": 1788097061639,
+      "bytes": 8746
     },
     "greeter__curious__01": {
       "who": "greeter",
@@ -663,9 +663,9 @@
       "ttsSpeed": 0.98,
       "hash": "c6a6f31a",
       "seconds": 2.675,
-      "rms": -24.17,
-      "at": 1788096745043,
-      "bytes": 7214
+      "rms": -24.16,
+      "at": 1788097061639,
+      "bytes": 7192
     },
     "greeter__curious__02": {
       "who": "greeter",
@@ -682,8 +682,8 @@
       "hash": "c37c7314",
       "seconds": 2.4,
       "rms": -24.1,
-      "at": 1788096745043,
-      "bytes": 6526
+      "at": 1788097061639,
+      "bytes": 6513
     },
     "greeter__curious__03": {
       "who": "greeter",
@@ -699,9 +699,9 @@
       "ttsSpeed": 0.98,
       "hash": "7aa0cd35",
       "seconds": 2.575,
-      "rms": -24.16,
-      "at": 1788096745043,
-      "bytes": 6987
+      "rms": -24.15,
+      "at": 1788097061639,
+      "bytes": 6990
     },
     "greeter__grumble__01": {
       "who": "greeter",
@@ -717,9 +717,9 @@
       "ttsSpeed": 0.98,
       "hash": "3416b739",
       "seconds": 2.625,
-      "rms": -23.71,
-      "at": 1788096745043,
-      "bytes": 7065
+      "rms": -23.7,
+      "at": 1788097061639,
+      "bytes": 7072
     },
     "greeter__grumble__02": {
       "who": "greeter",
@@ -735,9 +735,9 @@
       "ttsSpeed": 0.98,
       "hash": "75659192",
       "seconds": 2.575,
-      "rms": -23.84,
-      "at": 1788096765726,
-      "bytes": 7012
+      "rms": -23.83,
+      "at": 1788097086729,
+      "bytes": 7049
     },
     "greeter__grumble__03": {
       "who": "greeter",
@@ -754,7 +754,7 @@
       "hash": "debdc76b",
       "seconds": 2.5,
       "rms": -24.25,
-      "at": 1788096765726,
+      "at": 1788097086729,
       "bytes": 6820
     },
     "greeter__success__01": {
@@ -772,8 +772,8 @@
       "hash": "63692f99",
       "seconds": 2.2,
       "rms": -24.27,
-      "at": 1788096765726,
-      "bytes": 5981
+      "at": 1788097086729,
+      "bytes": 6000
     },
     "greeter__success__02": {
       "who": "greeter",
@@ -790,8 +790,8 @@
       "hash": "89cbf43a",
       "seconds": 2.175,
       "rms": -24.26,
-      "at": 1788096765726,
-      "bytes": 5861
+      "at": 1788097086729,
+      "bytes": 5826
     },
     "greeter__success__03": {
       "who": "greeter",
@@ -807,9 +807,9 @@
       "ttsSpeed": 0.98,
       "hash": "5310f9ba",
       "seconds": 2.725,
-      "rms": -24.15,
-      "at": 1788096765726,
-      "bytes": 7422
+      "rms": -24.16,
+      "at": 1788097086729,
+      "bytes": 7393
     },
     "greeter__success__04": {
       "who": "greeter",
@@ -825,9 +825,9 @@
       "ttsSpeed": 0.98,
       "hash": "02c6fa9f",
       "seconds": 3.225,
-      "rms": -23.95,
-      "at": 1788096765726,
-      "bytes": 8782
+      "rms": -23.96,
+      "at": 1788097086729,
+      "bytes": 8810
     },
     "greeter__failure__01": {
       "who": "greeter",
@@ -844,8 +844,8 @@
       "hash": "f6cbb3fb",
       "seconds": 2.4,
       "rms": -24.19,
-      "at": 1788096765726,
-      "bytes": 6492
+      "at": 1788097086729,
+      "bytes": 6484
     },
     "greeter__failure__02": {
       "who": "greeter",
@@ -862,8 +862,8 @@
       "hash": "a076f9c7",
       "seconds": 1.9,
       "rms": -24.36,
-      "at": 1788096765726,
-      "bytes": 4980
+      "at": 1788097086729,
+      "bytes": 4956
     },
     "greeter__failure__03": {
       "who": "greeter",
@@ -879,9 +879,9 @@
       "ttsSpeed": 0.98,
       "hash": "02662de5",
       "seconds": 2.625,
-      "rms": -24.04,
-      "at": 1788096765726,
-      "bytes": 7081
+      "rms": -24.06,
+      "at": 1788097086729,
+      "bytes": 7096
     },
     "greeter__hurt__01": {
       "who": "greeter",
@@ -898,8 +898,8 @@
       "hash": "d23ce634",
       "seconds": 0.775,
       "rms": -25.64,
-      "at": 1788096765726,
-      "bytes": 2230
+      "at": 1788097086729,
+      "bytes": 2207
     },
     "greeter__hurt__02": {
       "who": "greeter",
@@ -916,8 +916,8 @@
       "hash": "8ff5adcb",
       "seconds": 2.45,
       "rms": -24.01,
-      "at": 1788096765726,
-      "bytes": 6664
+      "at": 1788097086729,
+      "bytes": 6686
     },
     "greeter__hurt__03": {
       "who": "greeter",
@@ -934,8 +934,8 @@
       "hash": "35729b60",
       "seconds": 1.175,
       "rms": -24.54,
-      "at": 1788096765726,
-      "bytes": 3185
+      "at": 1788097086729,
+      "bytes": 3158
     },
     "greeter__hurt__04": {
       "who": "greeter",
@@ -951,9 +951,9 @@
       "ttsSpeed": 0.98,
       "hash": "5ddb9cd2",
       "seconds": 2.125,
-      "rms": -24.34,
-      "at": 1788096765726,
-      "bytes": 5650
+      "rms": -24.33,
+      "at": 1788097086729,
+      "bytes": 5649
     },
     "greeter__hurt__05": {
       "who": "greeter",
@@ -970,8 +970,8 @@
       "hash": "0b7457ce",
       "seconds": 2.175,
       "rms": -24.49,
-      "at": 1788096765726,
-      "bytes": 5773
+      "at": 1788097086729,
+      "bytes": 5754
     },
     "greeter__hurt__06": {
       "who": "greeter",
@@ -987,9 +987,9 @@
       "ttsSpeed": 0.98,
       "hash": "0f4568d1",
       "seconds": 2.175,
-      "rms": -24.17,
-      "at": 1788096765726,
-      "bytes": 5840
+      "rms": -24.16,
+      "at": 1788097086729,
+      "bytes": 5810
     },
     "greeter__hurt__07": {
       "who": "greeter",
@@ -1005,9 +1005,9 @@
       "ttsSpeed": 0.98,
       "hash": "050dc58d",
       "seconds": 1.35,
-      "rms": -24.29,
-      "at": 1788096765726,
-      "bytes": 3627
+      "rms": -24.32,
+      "at": 1788097086729,
+      "bytes": 3623
     },
     "greeter__hurt__08": {
       "who": "greeter",
@@ -1023,9 +1023,9 @@
       "ttsSpeed": 0.98,
       "hash": "9c198891",
       "seconds": 2.35,
-      "rms": -24.07,
-      "at": 1788096765726,
-      "bytes": 6290
+      "rms": -24.08,
+      "at": 1788097086729,
+      "bytes": 6310
     },
     "greeter__hurt__09": {
       "who": "greeter",
@@ -1041,9 +1041,9 @@
       "ttsSpeed": 0.98,
       "hash": "da89e837",
       "seconds": 2.5,
-      "rms": -23.92,
-      "at": 1788096765726,
-      "bytes": 6791
+      "rms": -23.93,
+      "at": 1788097086729,
+      "bytes": 6731
     },
     "greeter__hurt__10": {
       "who": "greeter",
@@ -1060,8 +1060,8 @@
       "hash": "6f9f0ab6",
       "seconds": 1.075,
       "rms": -24.64,
-      "at": 1788096765726,
-      "bytes": 2909
+      "at": 1788097086729,
+      "bytes": 2901
     },
     "greeter__combat__01": {
       "who": "greeter",
@@ -1077,8 +1077,8 @@
       "ttsSpeed": 0.98,
       "hash": "ddfd8a2a",
       "seconds": 1.75,
-      "rms": -24.36,
-      "at": 1788096765726,
+      "rms": -24.38,
+      "at": 1788097086729,
       "bytes": 4585
     },
     "greeter__combat__02": {
@@ -1095,8 +1095,8 @@
       "ttsSpeed": 0.98,
       "hash": "79f5bd22",
       "seconds": 2.125,
-      "rms": -23.95,
-      "at": 1788096765726,
+      "rms": -23.94,
+      "at": 1788097086729,
       "bytes": 5729
     },
     "greeter__combat__03": {
@@ -1113,9 +1113,9 @@
       "ttsSpeed": 0.98,
       "hash": "9f42e19d",
       "seconds": 2.3,
-      "rms": -24,
-      "at": 1788096765726,
-      "bytes": 6132
+      "rms": -24.01,
+      "at": 1788097086729,
+      "bytes": 6141
     },
     "greeter__combat__04": {
       "who": "greeter",
@@ -1131,9 +1131,9 @@
       "ttsSpeed": 0.98,
       "hash": "20a710d3",
       "seconds": 1.925,
-      "rms": -24.27,
-      "at": 1788096765726,
-      "bytes": 5105
+      "rms": -24.28,
+      "at": 1788097086729,
+      "bytes": 5108
     },
     "greeter__combat__05": {
       "who": "greeter",
@@ -1149,9 +1149,9 @@
       "ttsSpeed": 0.98,
       "hash": "4ba60857",
       "seconds": 1.975,
-      "rms": -23.79,
-      "at": 1788096765726,
-      "bytes": 5241
+      "rms": -23.8,
+      "at": 1788097086729,
+      "bytes": 5210
     },
     "greeter__combat__06": {
       "who": "greeter",
@@ -1168,8 +1168,8 @@
       "hash": "ba3fa134",
       "seconds": 2,
       "rms": -24.61,
-      "at": 1788096765726,
-      "bytes": 5349
+      "at": 1788097086729,
+      "bytes": 5378
     },
     "greeter__combat__07": {
       "who": "greeter",
@@ -1185,9 +1185,9 @@
       "ttsSpeed": 0.98,
       "hash": "f184426b",
       "seconds": 2.275,
-      "rms": -24.14,
-      "at": 1788096765726,
-      "bytes": 6226
+      "rms": -24.13,
+      "at": 1788097086729,
+      "bytes": 6215
     },
     "greeter__combat__08": {
       "who": "greeter",
@@ -1203,9 +1203,9 @@
       "ttsSpeed": 0.98,
       "hash": "6bee53b9",
       "seconds": 1.85,
-      "rms": -24.21,
-      "at": 1788096765726,
-      "bytes": 4929
+      "rms": -24.23,
+      "at": 1788097086729,
+      "bytes": 4947
     },
     "greeter__combat__09": {
       "who": "greeter",
@@ -1221,9 +1221,9 @@
       "ttsSpeed": 0.98,
       "hash": "427e1208",
       "seconds": 1.525,
-      "rms": -24.47,
-      "at": 1788096765726,
-      "bytes": 4070
+      "rms": -24.48,
+      "at": 1788097086729,
+      "bytes": 4096
     },
     "greeter__combat__10": {
       "who": "greeter",
@@ -1240,8 +1240,8 @@
       "hash": "be7383f1",
       "seconds": 1.875,
       "rms": -24.43,
-      "at": 1788096765726,
-      "bytes": 4936
+      "at": 1788097086729,
+      "bytes": 4934
     },
     "greeter__combat__11": {
       "who": "greeter",
@@ -1257,9 +1257,9 @@
       "ttsSpeed": 0.98,
       "hash": "7f718076",
       "seconds": 1.8,
-      "rms": -24.02,
-      "at": 1788096765726,
-      "bytes": 4830
+      "rms": -24.01,
+      "at": 1788097086729,
+      "bytes": 4804
     },
     "greeter__spot__01": {
       "who": "greeter",
@@ -1275,9 +1275,9 @@
       "ttsSpeed": 0.98,
       "hash": "6b516613",
       "seconds": 1.5,
-      "rms": -24.53,
-      "at": 1788096765726,
-      "bytes": 3959
+      "rms": -24.52,
+      "at": 1788097086729,
+      "bytes": 3968
     },
     "greeter__spot__02": {
       "who": "greeter",
@@ -1293,9 +1293,9 @@
       "ttsSpeed": 0.98,
       "hash": "4d3090c9",
       "seconds": 1.975,
-      "rms": -24.26,
-      "at": 1788096765726,
-      "bytes": 5276
+      "rms": -24.25,
+      "at": 1788097086729,
+      "bytes": 5275
     },
     "greeter__spot__03": {
       "who": "greeter",
@@ -1311,9 +1311,9 @@
       "ttsSpeed": 0.98,
       "hash": "39133041",
       "seconds": 2,
-      "rms": -23.85,
-      "at": 1788096765726,
-      "bytes": 5387
+      "rms": -23.82,
+      "at": 1788097086729,
+      "bytes": 5403
     },
     "greeter__spot__04": {
       "who": "greeter",
@@ -1329,9 +1329,9 @@
       "ttsSpeed": 0.98,
       "hash": "55a248e0",
       "seconds": 2.05,
-      "rms": -24.16,
-      "at": 1788096765726,
-      "bytes": 5454
+      "rms": -24.14,
+      "at": 1788097086729,
+      "bytes": 5444
     },
     "greeter__spot__05": {
       "who": "greeter",
@@ -1347,9 +1347,9 @@
       "ttsSpeed": 0.98,
       "hash": "14dcf7e6",
       "seconds": 1.7,
-      "rms": -24.05,
-      "at": 1788096765726,
-      "bytes": 4543
+      "rms": -24.08,
+      "at": 1788097086729,
+      "bytes": 4547
     },
     "greeter__spot__06": {
       "who": "greeter",
@@ -1365,9 +1365,9 @@
       "ttsSpeed": 0.98,
       "hash": "37905271",
       "seconds": 2,
-      "rms": -24.17,
-      "at": 1788096765726,
-      "bytes": 5391
+      "rms": -24.18,
+      "at": 1788097086729,
+      "bytes": 5379
     },
     "greeter__spot__07": {
       "who": "greeter",
@@ -1383,9 +1383,9 @@
       "ttsSpeed": 0.98,
       "hash": "2317cba9",
       "seconds": 2.475,
-      "rms": -23.9,
-      "at": 1788096765726,
-      "bytes": 6710
+      "rms": -23.89,
+      "at": 1788097086729,
+      "bytes": 6709
     },
     "greeter__spot__08": {
       "who": "greeter",
@@ -1401,9 +1401,9 @@
       "ttsSpeed": 0.98,
       "hash": "70d03dfc",
       "seconds": 1.35,
-      "rms": -24.25,
-      "at": 1788096765726,
-      "bytes": 3646
+      "rms": -24.28,
+      "at": 1788097086729,
+      "bytes": 3656
     },
     "greeter__spot__09": {
       "who": "greeter",
@@ -1420,8 +1420,8 @@
       "hash": "54d43a6f",
       "seconds": 1.2,
       "rms": -24.68,
-      "at": 1788096765726,
-      "bytes": 3264
+      "at": 1788097086729,
+      "bytes": 3275
     },
     "greeter__spot__10": {
       "who": "greeter",
@@ -1437,9 +1437,9 @@
       "ttsSpeed": 0.98,
       "hash": "cb970c0d",
       "seconds": 1.975,
-      "rms": -24.1,
-      "at": 1788096765726,
-      "bytes": 5321
+      "rms": -24.11,
+      "at": 1788097086729,
+      "bytes": 5306
     },
     "greeter__thanks__01": {
       "who": "greeter",
@@ -1455,9 +1455,9 @@
       "ttsSpeed": 0.98,
       "hash": "e8b584f2",
       "seconds": 2.525,
-      "rms": -24.06,
-      "at": 1788096778484,
-      "bytes": 6783
+      "rms": -24.07,
+      "at": 1788097107072,
+      "bytes": 6818
     },
     "greeter__thanks__02": {
       "who": "greeter",
@@ -1473,9 +1473,9 @@
       "ttsSpeed": 0.98,
       "hash": "9071199e",
       "seconds": 2.275,
-      "rms": -24.15,
-      "at": 1788096778484,
-      "bytes": 6159
+      "rms": -24.16,
+      "at": 1788097107072,
+      "bytes": 6149
     },
     "greeter__refuse__01": {
       "who": "greeter",
@@ -1492,7 +1492,7 @@
       "hash": "e45043f1",
       "seconds": 2.95,
       "rms": -24.16,
-      "at": 1788096778484,
+      "at": 1788097107072,
       "bytes": 8011
     },
     "greeter__refuse__02": {
@@ -1510,8 +1510,8 @@
       "hash": "ca824cad",
       "seconds": 2.4,
       "rms": -24.21,
-      "at": 1788096778484,
-      "bytes": 6430
+      "at": 1788097107072,
+      "bytes": 6374
     },
     "greeter__refuse__03": {
       "who": "greeter",
@@ -1527,9 +1527,9 @@
       "ttsSpeed": 0.98,
       "hash": "4422ba89",
       "seconds": 3.05,
-      "rms": -24.11,
-      "at": 1788096778484,
-      "bytes": 8330
+      "rms": -24.12,
+      "at": 1788097107072,
+      "bytes": 8320
     },
     "greeter__wander__01": {
       "who": "greeter",
@@ -1545,9 +1545,9 @@
       "ttsSpeed": 0.98,
       "hash": "96b70a4f",
       "seconds": 1.925,
-      "rms": -24.09,
-      "at": 1788096778484,
-      "bytes": 5093
+      "rms": -24.08,
+      "at": 1788097107072,
+      "bytes": 5115
     },
     "greeter__wander__02": {
       "who": "greeter",
@@ -1563,9 +1563,9 @@
       "ttsSpeed": 0.98,
       "hash": "934e3038",
       "seconds": 1.825,
-      "rms": -24.13,
-      "at": 1788096778484,
-      "bytes": 4878
+      "rms": -24.14,
+      "at": 1788097107072,
+      "bytes": 4880
     },
     "greeter__wander__03": {
       "who": "greeter",
@@ -1581,9 +1581,9 @@
       "ttsSpeed": 0.98,
       "hash": "636a4563",
       "seconds": 1.675,
-      "rms": -24.14,
-      "at": 1788096778484,
-      "bytes": 4416
+      "rms": -24.13,
+      "at": 1788097107072,
+      "bytes": 4444
     },
     "greeter__wander__04": {
       "who": "greeter",
@@ -1600,8 +1600,8 @@
       "hash": "ce22d9e0",
       "seconds": 2.2,
       "rms": -23.68,
-      "at": 1788096778484,
-      "bytes": 5896
+      "at": 1788097107072,
+      "bytes": 5914
     },
     "greeter__wander__05": {
       "who": "greeter",
@@ -1617,9 +1617,9 @@
       "ttsSpeed": 0.98,
       "hash": "05cf52d3",
       "seconds": 2.225,
-      "rms": -24.02,
-      "at": 1788096778484,
-      "bytes": 6003
+      "rms": -24.01,
+      "at": 1788097107072,
+      "bytes": 5986
     },
     "greeter__wander__06": {
       "who": "greeter",
@@ -1635,9 +1635,9 @@
       "ttsSpeed": 0.98,
       "hash": "51b5e85b",
       "seconds": 2.3,
-      "rms": -24.09,
-      "at": 1788096778484,
-      "bytes": 6174
+      "rms": -24.08,
+      "at": 1788097107072,
+      "bytes": 6161
     },
     "greeter__wander__07": {
       "who": "greeter",
@@ -1653,9 +1653,9 @@
       "ttsSpeed": 0.98,
       "hash": "f95fd8bd",
       "seconds": 2.55,
-      "rms": -24.24,
-      "at": 1788096778484,
-      "bytes": 6905
+      "rms": -24.23,
+      "at": 1788097107072,
+      "bytes": 6922
     },
     "greeter__wander__08": {
       "who": "greeter",
@@ -1671,9 +1671,9 @@
       "ttsSpeed": 0.98,
       "hash": "6b0157a0",
       "seconds": 2.4,
-      "rms": -23.9,
-      "at": 1788096778484,
-      "bytes": 6491
+      "rms": -23.91,
+      "at": 1788097107072,
+      "bytes": 6505
     },
     "greeter__wander__09": {
       "who": "greeter",
@@ -1690,8 +1690,8 @@
       "hash": "fc7e0920",
       "seconds": 1.775,
       "rms": -23.95,
-      "at": 1788096778484,
-      "bytes": 4738
+      "at": 1788097107072,
+      "bytes": 4734
     },
     "greeter__weather__01": {
       "who": "greeter",
@@ -1707,9 +1707,9 @@
       "ttsSpeed": 0.98,
       "hash": "8f409760",
       "seconds": 2.975,
-      "rms": -24.03,
-      "at": 1788096778484,
-      "bytes": 8073
+      "rms": -24.04,
+      "at": 1788097107072,
+      "bytes": 8099
     },
     "greeter__weather__02": {
       "who": "greeter",
@@ -1725,9 +1725,9 @@
       "ttsSpeed": 0.98,
       "hash": "2c5d27bc",
       "seconds": 2.95,
-      "rms": -23.93,
-      "at": 1788096778484,
-      "bytes": 7989
+      "rms": -23.92,
+      "at": 1788097107072,
+      "bytes": 8007
     }
   }
 }

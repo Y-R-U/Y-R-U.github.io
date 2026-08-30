@@ -158,12 +158,12 @@ async function tabRun() {
     await p.clickText('#wf-dev .mus-sub button', 'Compress');
     await p.waitFor('!!document.querySelector("#wf-dev .mus-side")');
     await sleep(400);
-    check('the compress view lists the ffmpeg profiles from the server, not its own copy',
-      await p.waitFor(`document.querySelectorAll('#wf-dev main select option').length >= 4`, 8000),
-      await p.eval(`[...document.querySelectorAll('#wf-dev main select option')].map(o => o.textContent).join(' | ')`));
     await p.clickText('#wf-dev .mus-side button', 'Who Fights');
     await p.waitFor(`!!document.querySelector('#wf-dev [data-act=encode]')`);
     await sleep(400);
+    check('the compress view lists the ffmpeg profiles from the server, not its own copy',
+      await p.waitFor(`document.querySelectorAll('#wf-dev main select option').length >= 4`, 8000),
+      await p.eval(`[...document.querySelectorAll('#wf-dev main select option')].map(o => o.textContent).join(' | ')`));
     check('it re-encodes from the raw take, not the shipped file',
       /audio\/music\/raw\//.test(await p.eval(`document.querySelector('#wf-dev main table').textContent`)),
       await p.eval(`document.querySelector('#wf-dev main table').textContent.slice(0, 160)`));

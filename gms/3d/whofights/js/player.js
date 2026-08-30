@@ -6,7 +6,7 @@ import { heightAt as fieldY, CENTERS, PLAY } from './world/terrain.js';
 import { walkStep, groundAt, setStepUp } from './world/colliders.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
-const PITCH_MIN = -0.35, PITCH_MAX = 1.05;
+let PITCH_MIN = -0.90, PITCH_MAX = 1.30;
 const LOOK_HOLD = 0.8;
 
 const wrapPi = a => Math.atan2(Math.sin(a), Math.cos(a));
@@ -94,10 +94,15 @@ export class Player {
     q.register({ key: 'camHeightIn', label: 'Camera height indoors', type: 'range', min: 1, max: 3.5, step: 0.05, default: 2.05, group: 'Controls' },
       v => { this.heightIn = v; });
     // Eye rises dist·sin(pitch) above the aim, so this and camDistIn together set how close the
-    // camera gets to the ceiling: at 0.50 / 2.10 the eye + its radius reaches 3.32 m above the
-    // floor, against the 3.40 m minimum room height.
-    q.register({ key: 'camPitchIn', label: 'Camera max pitch indoors', type: 'range', min: 0.2, max: 0.9, step: 0.02, default: 0.50, group: 'Controls' },
+    // camera gets to the ceiling. The 3.40 m minimum room height is what bounds this in a cottage;
+    // the great hall is 11 m to the ridge and wants the whole range, so the cap is a knob, not a
+    // constant, and camRadius still stops the eye entering the ceiling itself.
+    q.register({ key: 'camPitchIn', label: 'Camera max pitch indoors', type: 'range', min: 0.2, max: 1.3, step: 0.02, default: 0.95, group: 'Controls' },
       v => { this.pitchMaxIn = v; });
+    q.register({ key: 'camPitchDown', label: 'Camera look down', type: 'range', min: -1.4, max: -0.2, step: 0.02, default: -0.90, group: 'Controls' },
+      v => { PITCH_MIN = v; });
+    q.register({ key: 'camPitchUp', label: 'Camera look up', type: 'range', min: 0.6, max: 1.5, step: 0.02, default: 1.30, group: 'Controls' },
+      v => { PITCH_MAX = v; });
     q.register({ key: 'camRadius', label: 'Camera collision radius', type: 'range', min: 0, max: 0.8, step: 0.02, default: 0.26, group: 'Controls' },
       v => { this.camRadius = v; });
     q.register({ key: 'camArmMin', label: 'Camera arm minimum', type: 'range', min: 0.2, max: 1.2, step: 0.05, default: 0.40, group: 'Controls' },
