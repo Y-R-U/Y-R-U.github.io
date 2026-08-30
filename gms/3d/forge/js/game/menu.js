@@ -5,6 +5,7 @@ import { el, clear } from './ui.js';
 import { sheetOf } from './sheet.js';
 import { markOf, nameOf } from './towns.js';
 import { storageHealthy, storageError } from './savestore.js';
+import { PRESET_ROWS, SHADOW_ROWS } from './graphics.js';
 
 const clock2 = h => `${String(Math.floor(h)).padStart(2, '0')}:${String(Math.floor((h % 1) * 60)).padStart(2, '0')}`;
 const cap = s => s.replace(/^./, c => c.toUpperCase());
@@ -36,6 +37,7 @@ export class Menu {
 
   close() {
     if (!this.view) return;
+    this.stop();
     this.view = null;
     this.root.remove();
     this.dim.remove();
@@ -44,6 +46,7 @@ export class Menu {
   }
 
   draw(view) {
+    this.stop();
     clear(this.sheet);
     if (view === 'character') this.drawCharacter();
     if (view === 'settings') this.drawSettings();
@@ -59,7 +62,10 @@ export class Menu {
     return h;
   }
 
+  stop() { clearInterval(this.timer); this.timer = 0; }
+
   drawPause() {
+    this.stop();
     clear(this.root);
     const m = el('menu');
     const add = (label, fn, cls) => {
@@ -185,8 +191,25 @@ export class Menu {
     const body = el('div', 'g-body');
     const set = el('div', 'g-set');
 
-    // Flip is first because a left-handed player has to find it, and §7 says the quality panel is
-    // exactly where they will not look.
+    // Quality is first: a player whose game is stuttering is looking for exactly this, and the
+    // developer panel is where they will never think to look.
+    const q = this.o.quality();
+    const note = el('em');
+    const setPreset = this.segRow(set, 'Quality', note, PRESET_ROWS, v => { this.o.onSetting('preset', v); sync(); });
+    const setScale = this.rangeRow(set, 'Render scale', 'renderScale', q.renderScale, 0.5, 1.25, 0.05,
+      v => `${Math.round(v * 100)}%`, () => sync());
+    const setShadow = this.segRow(set, 'Shadows', null, SHADOW_ROWS, v => { this.o.onSetting('shadows', v); sync(); });
+    const sync = () => {
+      const g = this.o.quality();
+      const fps = Math.round(this.o.fps?.() || 0);
+      note.textContent = fps ? `${g.label} · ${fps} fps` : g.label;
+      setPreset(g.custom ? null : g.preset);
+      setScale(g.renderScale);
+      setShadow(g.shadows);
+    };
+    sync();
+    this.timer = setInterval(sync, 600);
+
     this.toggleRow(set, 'Left-handed layout', 'flip', st.flip);
     this.rangeRow(set, 'Text size', 'uiScale', st.uiScale, 0.85, 1.4, 0.05, v => `${Math.round(v * 100)}%`);
     this.toggleRow(set, 'Reduced motion', 'motion', !st.motion, v => (v ? 0 : 1));
@@ -203,14 +226,34 @@ export class Menu {
     this.sheet.append(body);
   }
 
-  rangeRow(parent, label, key, value, min, max, step, fmt) {
+  rangeRow(parent, label, key, value, min, max, step, fmt, after) {
     const row = el('label');
     const out = el('em', null, fmt(value));
     const input = el('input');
     Object.assign(input, { type: 'range', min, max, step, value });
-    input.oninput = () => { out.textContent = fmt(+input.value); this.o.onSetting(key, +input.value); };
+    input.oninput = () => { out.textContent = fmt(+input.value); this.o.onSetting(key, +input.value); after?.(); };
     row.append(el('span', null, label), input, out);
     parent.append(row);
+    return v => { input.value = v; out.textContent = fmt(+v); };
+  }
+
+  // A row of buttons rather than a <select>: one tap on a phone, and the whole ladder is visible
+  // so a player can see there is something below Low. Returns its own highlight setter.
+  segRow(parent, label, note, options, onPick) {
+    const row = el('div', 'g-seg');
+    const head = el('b');
+    head.append(el('span', null, label));
+    if (note) head.append(note);
+    const box = el('div');
+    const buttons = options.map(([value, text]) => {
+      const b = el('button', null, text);
+      b.onclick = () => onPick(value);
+      box.append(b);
+      return [value, b];
+    });
+    row.append(head, box);
+    parent.append(row);
+    return active => { for (const [v, b] of buttons) b.classList.toggle('on', v === active); };
   }
 
   toggleRow(parent, label, key, value, map = v => v) {

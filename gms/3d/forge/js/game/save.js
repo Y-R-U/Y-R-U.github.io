@@ -5,6 +5,7 @@
 // is actually working, and it handles the saved-by-a-newer-build case.
 
 import { SCHOOLS, FACTIONS, blankSchools } from '../sim/schools.js';
+import { PRESET_ORDER, shadowMode } from './graphics.js';
 import { xpToReach, MAX_LEVEL } from '../sim/xp.js';
 
 export const SAVE_VERSION = 1;
@@ -62,8 +63,11 @@ export function blank(seed = (Date.now() & 0x7fffffff)) {
     ledger: { day: 0, sold: {} },
     daily: { day: 0, standing: {}, mended: [], reforgeT: null },
     board: { day: -1, town: null, ids: [] },
+    // `preset: null` is "this machine has never chosen": the engine's own device guess stands and
+    // the auto-detect is allowed to lower it once. A null dial follows whatever the preset says.
     settings: { flip: false, haptics: true, aimAssist: 1, uiScale: 1, holdAssist: false,
-      factionMarks: false, motion: 1, volume: 0.8, mute: false, ambience: 1 },
+      factionMarks: false, motion: 1, volume: 0.8, mute: false, ambience: 1,
+      preset: null, renderScale: null, shadows: null },
     onboard: {},
   };
 }
@@ -175,6 +179,9 @@ export function clampAll(raw, warnings = [], { defs = null, items = null, truths
     volume: clamp(st.volume, 0, 1, 0.8, 'settings.volume', warnings),
     mute: bool(st.mute),
     ambience: clamp(st.ambience, 0, 1, 1, 'settings.ambience', warnings),
+    preset: PRESET_ORDER.includes(st.preset) ? st.preset : null,
+    renderScale: st.renderScale == null ? null : clamp(st.renderScale, 0.5, 1.25, 1, 'settings.renderScale', warnings),
+    shadows: shadowMode(st.shadows),
   };
   d.onboard = obj(raw.onboard);
   return d;

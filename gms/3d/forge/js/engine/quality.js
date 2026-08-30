@@ -27,7 +27,7 @@ const PRESETS = {
     aniso: 8, texCap: 1024, foliage: 1.0, viewDist: 260, lightCap: 40, lodDetail: 70,
   },
   ultra: {
-    label: 'Ultra', renderScale: 1.25, shadows: 'softhigh', shadowMap: 4096, shadowDist: 180,
+    label: 'Ultra', renderScale: 1.25, shadows: 'soft', shadowMap: 4096, shadowDist: 180,
     aniso: 16, texCap: 2048, foliage: 1.4, viewDist: 400, lightCap: 64, lodDetail: 70,
   },
 };
@@ -71,12 +71,13 @@ export class Quality {
   usePreset(name) {
     if (!PRESETS[name]) return;
     this.presetName = name;
+    // Only the rebuild knobs the preset actually moves. No preset names one, so switching preset
+    // costs nothing — it used to fire a full world rebuild that changed not one vertex, which in
+    // game is a multi-second freeze on every tap of the quality picker.
+    const rebuild = [...this.knobs.values()].some(({ schema }) => schema.rebuild
+      && PRESETS[name][schema.key] !== undefined && PRESETS[name][schema.key] !== this.settings[schema.key]);
     Object.assign(this.settings, PRESETS[name]);
-    let rebuild = false;
-    for (const { schema, apply } of this.knobs.values()) {
-      apply(this.settings[schema.key], this.settings);
-      rebuild = rebuild || !!schema.rebuild;
-    }
+    for (const { schema, apply } of this.knobs.values()) apply(this.settings[schema.key], this.settings);
     if (rebuild) this.rebuilder?.('*', this.settings);
     this.emit('*');
   }

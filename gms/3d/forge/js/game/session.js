@@ -9,10 +9,11 @@ import { Hud } from './hud.js';
 import { Menu } from './menu.js';
 import { Market } from './market.js';
 import { Audio } from './audio.js';
-import { gameHost, el } from './ui.js';
+import { gameHost, el, toast } from './ui.js';
 import { nearestAnchor, lineage, contains } from './areas.js';
 import { pickContext } from './context.js';
 import { blank, rollDay, checkPosition, POSITION, addItem, itemCount, clampQuests } from './save.js';
+import { resolve as quality, pickPreset, setDial, autoChoice, labelOf, DIALS, AUTO_AFTER } from './graphics.js';
 import { acquire, power, critChance, resolveHit, damageTaken } from '../sim/combat.js';
 import { ENEMIES, PERISHABLE } from '../sim/tables.js';
 import { appendLog } from './journal.js';
@@ -203,6 +204,8 @@ export class Session {
       onJournal: () => this.toggleJournal(),
       onWait: hour => this.clock.advanceTo(hour),
       onSetting: (k, v) => this.setting(k, v),
+      quality: () => this.qualityState(),
+      fps: () => this.app.stats?.snapshot?.fps || 0,
       onFree: () => this.free(),
       onShow: () => this.journal.show('quests'),
       onReset: () => this.quests.resetStep(this.doc.tracked),
@@ -232,6 +235,10 @@ export class Session {
       v => { this.knob.suspicion = v; });
     q.register({ key: 'graftChannel', label: 'Graft channel (s)', type: 'range', min: 0.2, max: 6, step: 0.1, default: GRAFT.channel, group: 'Graft' },
       v => { this.knob.channel = v; });
+    // The constructor's applySettings ran before `app.add` handed the knobs over, so this is the
+    // first moment the saved quality can be put on the renderer. main.js applies `?preset=` after
+    // this, and that is the order the URL override needs.
+    this.applyQuality();
   }
 
   async start(params = new URLSearchParams()) {
@@ -252,6 +259,7 @@ export class Session {
     this.doc.onboard = settle(this.obCtx(), this.doc.onboard);
     for (const bed of ['day', 'dusk', 'wind']) this.audio.ambience(bed, true);
     if (this.notices.length) this.notice(`This save was made by an older build. ${this.notices.length} things were adjusted.`);
+    if (this.doc.settings.preset == null && this.app.stats) this.autoQuality();
     return this;
   }
 
@@ -455,9 +463,49 @@ export class Session {
 
   setting(key, value) {
     if (key === 'devPanel') { document.body.classList.toggle('devpanel', !!value); return; }
+    if (key === 'preset' || DIALS.includes(key)) {
+      Object.assign(this.doc.settings, key === 'preset'
+        ? pickPreset(value)
+        : setDial(this.doc.settings, key, value, this.q?.presetName));
+      this.applyQuality();
+      this.autosave.mark();
+      return;
+    }
     this.doc.settings[key] = value;
     this.applySettings();
     this.autosave.mark();
+  }
+
+  // Read off the renderer, not off the document, so the readout is what is actually being drawn —
+  // including when `?preset=` has overridden the save.
+  qualityState() {
+    if (!this.q) return quality(this.doc.settings);
+    return quality({ preset: this.q.presetName, renderScale: this.q.get('renderScale'), shadows: this.q.get('shadows') },
+      this.q.presetName);
+  }
+
+  applyQuality() {
+    if (!this.q) return;
+    const g = quality(this.doc.settings, this.q.presetName);
+    if (this.q.presetName !== g.preset) this.q.usePreset(g.preset);
+    for (const k of DIALS) if (this.q.get(k) !== g[k]) this.q.set(k, g[k]);
+  }
+
+  // A machine that has never chosen. Sampled once the world has settled, and only ever on a save
+  // with no quality choice of its own, so it can never argue with a player who has made one.
+  autoQuality() {
+    setTimeout(() => {
+      if (this.doc.settings.preset != null) return;
+      const pick = autoChoice(this.app.stats.snapshot?.fps || 0, this.q?.presetName);
+      if (!pick) return;
+      this.doc.settings.preset = pick.preset;
+      this.autosave.mark();
+      if (!pick.lowered) return;
+      this.applyQuality();
+      // A toast, not a notice: this arrives seconds into a first game and must not be a card the
+      // player has to dismiss before they can move.
+      toast(this.host, `Quality lowered to ${labelOf(pick.preset)} — change it in Settings.`, { ms: 8000 });
+    }, AUTO_AFTER * 1000);
   }
 
   applySettings() {

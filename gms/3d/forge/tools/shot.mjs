@@ -8,13 +8,18 @@
 
 import { spawn, execSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, existsSync, rmSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import http from 'node:http';
 import { createReadStream, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+// The importmap resolves `three` to ../../lib/three/, which is outside this directory, so the
+// static server is rooted two levels up and the page is fetched under its own path. Serving ROOT
+// itself 404s the module and the page then boots to nothing with no error anywhere.
+const WEB_ROOT = resolve(ROOT, '../..');
+const WEB_PATH = '/' + relative(WEB_ROOT, ROOT).split(/[\\/]/).join('/');
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
 export function parseArgs(argv = process.argv.slice(2)) {
@@ -45,7 +50,7 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/jav
 function serve(port) {
   return new Promise((res, rej) => {
     const s = http.createServer((req, rp) => {
-      let p = join(ROOT, decodeURIComponent(req.url.split('?')[0]));
+      let p = join(WEB_ROOT, decodeURIComponent(req.url.split('?')[0]));
       if (!existsSync(p) || statSync(p).isDirectory()) p = join(p, 'index.html');
       if (!existsSync(p)) { rp.writeHead(404); return rp.end('404'); }
       rp.writeHead(200, { 'content-type': MIME[extname(p)] || 'application/octet-stream' });
@@ -162,7 +167,7 @@ export async function open({ w = 1600, h = 900, dpr = 2, mobile = false, headed 
   }
 
   return {
-    S, logs, base: `http://127.0.0.1:${port}`,
+    S, logs, base: `http://127.0.0.1:${port}${WEB_PATH}`,
     async close() {
       await S('Browser.close').catch(() => {});
       cleanup(proc);
