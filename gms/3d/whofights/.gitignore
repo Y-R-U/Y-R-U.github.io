@@ -3,3 +3,4 @@ audio/vo/raw/
 audio/music/raw/
 audio/*/_preview/
 data/levels/__scratch.json
+tools/vo/.jobs-*.json

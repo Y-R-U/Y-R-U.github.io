@@ -26,7 +26,7 @@ const MOUNTS = [
   ['/assets/', path.resolve(ROOT, '../../../assets')],
 ];
 
-const LS_DIRS = new Set(['data', 'data/levels', 'audio/vo', 'audio/music', 'art', 'tools/vo', 'js/dev/tabs']);
+const LS_DIRS = new Set(['data', 'data/levels', 'audio/vo', 'audio/music', 'art', 'art/skin', 'art/skins', 'tools/vo', 'js/dev/tabs']);
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.mjs': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
