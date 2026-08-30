@@ -50,20 +50,12 @@ developer tools."*
 - **Music library**, 25 tracks so far, generated on Suno in Aaron's browser.
 - 168/168 tests pass. `spawn` renders at 70 calls / 137k tris.
 
-## In flight — six agents
+## All agents finished
 
-| what | owns | state |
-|---|---|---|
-| Music library | `audio/music/**`, `data/music.json`, `docs/MUSIC.md`, `docs/SUNO.md`, `tools/music/**` | **DONE** — 25 ACE-Step tracks, 17.8 MB. **Suno never ran**: browser tools refused by the permission classifier. |
-| Level editor + hotspots | `js/dev/tabs/level.js`, `js/dev/level/`, `js/editor/**` | running; owes a fix to `js/editor/scene.test.mjs` (hard-codes 2 hotspots, level now has 7) |
-| Conversation editor | `js/dev/tabs/convo.js`, `js/dev/convo/` | **DONE** 172/172 tests, 33 real-click checks |
-| Character viewer + voices + barks | `js/dev/tabs/chars.js`, `js/dev/chars/`, `data/barks.json` | **DONE**; resumed to encode VO via `/api/encode` `voice-opus` |
-| Music box + sound studio + runtime | `js/dev/tabs/music.js`, `js/dev/music/`, `js/game/music.js`, `audio/studio/` | running |
-| Debug panels | `js/dev/tabs/debug.js`, `js/dev/debug/` | **DONE** — 10 sub-tabs, 40/40 click checks; also built `POST /api/encode` |
-| Interior art pass | `js/world/interior.js`, `materials.js`, `lighting.js`, `boards.js`, hall dressing in `academy.json` | running |
-
-**If they were killed by the usage limit**, the tab files already exist and parse. Re-brief only
-what is genuinely unfinished — read each tab file first rather than restarting it blind.
+Every tab is built and verified. FORGE quality control shipped and is live. Music library is 25
+ACE-Step tracks (Suno never ran — browser tools were refused by the permission classifier). Voice
+is 96 clips at 736 KB. The dummy rig and Flux skinning work, with a measured verdict in
+`docs/SKIN.md`.
 
 ## Integration facts discovered the hard way
 
@@ -99,14 +91,14 @@ tool**. Machines keep only the checks they are good at — silent, truncated, cl
 a rename, so the bytes the ear approved are the bytes that ship. Re-encode from `raw/`, never from
 an already-compressed file.
 
-## Not started
+## Skinning — done, with a measured verdict
 
-- **Flux character-skinning experiment.** Aaron asked: can we make a base dummy model, skin it from
-  a Flux-generated image, template it, and regenerate from a prompt typed into the debug tool?
-  Deliberately held back because it needs sole ownership of the GPU and ACE-Step was resident.
-  **Start this once `:8001` reports unloaded.** It is genuinely a research task — an honest verdict
-  is a fine deliverable. Note this engine's characters are faceted vertex-coloured geometry with no
-  UVs, so a UV'd dummy has to be built before anything can be skinned onto it.
+`edit` mode ships 8 of 12 generations as-is; `txt2img` 0 of 3. The failure mode is the head: the
+reference mannequin's head is a blank grey egg and "do not change the outline" beats "paint a
+face", so a bare-headed subject returns in a good costume under a grey mask. **Name what is on the
+head** and the hit rate goes from two thirds to near ninety. Good for a cast and a bestiary; not
+for a hero, and it cannot do the same character in a different tabard. The highest-value next hour
+is giving `pose_ref.png` a head with a brow, nose and jaw.
 
 ## Aaron's decisions so far — do not relitigate
 
