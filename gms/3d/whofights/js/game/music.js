@@ -246,14 +246,14 @@ export class MusicRuntime {
 
   load(manifest) { this.plan.load(manifest); return this; }
   playSet(id, opts) { return this.apply(this.plan.playSet(id, this.now(), opts)); }
-  stopMusic(ms) { return this.apply(this.plan.stop(this.now(), ms)); }
+  stop(ms) { return this.apply(this.plan.stop(this.now(), ms)); }
   sting(id) { return this.apply(this.plan.sting(id, this.now())); }
   state() { return { ...this.plan.state(this.now()), blocked: this.blocked, armed: this.armed }; }
 
   // `{"k":"music", …}` straight off a hotspot.
   action(a) {
     if (!a) return;
-    if (a.stop === true) return this.stopMusic(a.fadeMs);
+    if (a.stop === true) return this.stop(a.fadeMs);
     if (typeof a.set !== 'string') return;
     return a.sting ? this.sting(a.set) : this.playSet(a.set, { restart: !!a.restart });
   }

@@ -9,6 +9,12 @@ export const BARK_CATEGORIES = ['idle', 'greet', 'farewell', 'curious', 'grumble
   'failure', 'hurt', 'combat', 'spot', 'thanks', 'refuse', 'wander', 'weather'];
 
 export const VO_DIR = 'audio/vo';
+export const RAW_DIR = 'audio/vo/raw';
+// mp3, not ogg/opus. Pitch here is a resample through WebAudio decodeAudioData (play.js), and mp3
+// is the one lossy format every browser decodes that way without a caveat — Opus-in-Ogg through
+// decodeAudioData has a history of failing on Safari/iOS, which is half the audience for a mobile
+// game. 48 kbps mono at kokoro's native 24 kHz is ~8x smaller than the wav.
+export const CODEC = { ext: '.mp3', bitrate: '48k', rate: 24000, channels: 1 };
 export const INDEX_DOC = 'data/vo.json';
 export const INDEX_MIRROR = 'audio/vo/index.json';
 
@@ -23,7 +29,11 @@ export const synthSpeed = (speed, pitch) =>
   Math.round(Math.min(2, Math.max(0.5, speed / pitchRate(pitch))) * 10000) / 10000;
 
 export const clipKey = (who, category, i) => `${who}__${category}__${String(i + 1).padStart(2, '0')}`;
-export const clipFile = key => `${VO_DIR}/${key}.wav`;
+// What ships, and what it was encoded from. The raw is kept so a clip can be re-encoded at another
+// bitrate without paying for kokoro again; audio/vo/raw/ is gitignored.
+export const clipFile = key => `${VO_DIR}/${key}${CODEC.ext}`;
+export const rawFile = key => `${RAW_DIR}/${key}.wav`;
+export const rawOut = key => `raw/${key}`;
 
 export function hashLine(text, voice, speed, pitch) {
   const s = `${String(text)}|${voice || ''}|${(+speed || 1).toFixed(3)}|${(+pitch || 0).toFixed(2)}`;
@@ -77,7 +87,7 @@ export function planJobs({ cast, barks, index, who, categories, force = false, o
         const have = clips[key];
         const present = onDisk ? onDisk.has(key) : true;
         if (!force && have && have.hash === hash && present) return skip.push({ key, why: 'unchanged' });
-        jobs.push({ key, out: key, who: id, category: cat, i, text, voice, speed, pitch,
+        jobs.push({ key, out: rawOut(key), who: id, category: cat, i, text, voice, speed, pitch,
           ttsSpeed: synthSpeed(speed, pitch), hash,
           why: !have ? 'new' : !present ? 'file missing' : force ? 'forced' : 'changed' });
       });
@@ -89,8 +99,10 @@ export function planJobs({ cast, barks, index, who, categories, force = false, o
 export function blankIndex() { return { version: 1, clips: {} }; }
 
 // `results` are the dev server's /api/tts/batch records, positionally matched to `jobs`.
+// Everything outside `clips` is carried through untouched — the conversation tab wants a `lines`
+// section in the same ledger, and rebuilding the document from scratch would delete it.
 export function applyResults(index, jobs, results) {
-  const next = { version: 1, clips: { ...(index?.clips || {}) } };
+  const next = { ...(index || {}), version: 1, clips: { ...(index?.clips || {}) } };
   const failed = [];
   jobs.forEach((j, n) => {
     const r = results?.[n];
@@ -99,7 +111,10 @@ export function applyResults(index, jobs, results) {
       delete next.clips[j.key];
       return;
     }
+    // `encoded` stays false until the mp3 exists. A record that names a file nothing has written
+    // is the same lie as a silent clip that "exists".
     next.clips[j.key] = { who: j.who, category: j.category, i: j.i, file: clipFile(j.key),
+      raw: rawFile(j.key), encoded: false,
       text: j.text, voice: j.voice, speed: j.speed, pitch: j.pitch, ttsSpeed: j.ttsSpeed,
       hash: j.hash, seconds: r.seconds ?? null, rms: r.rms ?? null, at: Date.now() };
   });
@@ -108,14 +123,31 @@ export function applyResults(index, jobs, results) {
 
 // Entries whose line no longer exists. The wav stays on disk — nothing here may delete files — so
 // they are reported as orphans and the tab offers the list.
+// What still needs an mp3. Kept out of the encoder so the CLI and the tab agree on the question.
+export function needsEncoding(index, encodedOnDisk = null) {
+  return Object.entries(index?.clips || {})
+    .filter(([k, v]) => !v.encoded || (encodedOnDisk && !encodedOnDisk.has(k)))
+    .map(([k, v]) => ({ key: k, raw: v.raw || rawFile(k), file: v.file || clipFile(k) }));
+}
+
+// The playable path: the shipped clip once it exists, the raw take before that.
+export const playableFile = (rec, key) => (rec?.encoded ? (rec.file || clipFile(key))
+  : (rec?.raw || rawFile(key)));
+
 export function pruneIndex(index, live) {
-  const next = { version: 1, clips: {} };
+  const next = { ...(index || {}), version: 1, clips: {} };
   const orphans = [];
   for (const [k, v] of Object.entries(index?.clips || {})) {
     if (live.has(k)) next.clips[k] = v;
     else orphans.push({ key: k, file: v?.file || clipFile(k) });
   }
   return { index: next, orphans };
+}
+
+// This tab's authority over the ledger is `clips` and nothing else. Re-read before every write and
+// fold only that key in, so a section another tab added between our load and our save survives.
+export function mergeClips(current, mine) {
+  return { ...(current || {}), version: 1, clips: { ...(mine?.clips || {}) } };
 }
 
 export function validateIndex(doc) {
@@ -127,6 +159,7 @@ export function validateIndex(doc) {
     if (typeof v.hash !== 'string') e.push(`${k}: no hash`);
     if (typeof v.text !== 'string' || !v.text.trim()) e.push(`${k}: no text`);
     if (v.file && v.file !== clipFile(k)) e.push(`${k}: file ${v.file} does not match its key`);
+    if (v.raw && v.raw !== rawFile(k)) e.push(`${k}: raw ${v.raw} does not match its key`);
     if (!BARK_CATEGORIES.includes(v.category)) e.push(`${k}: unknown category ${v.category}`);
   }
   return e;

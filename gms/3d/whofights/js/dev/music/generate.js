@@ -40,7 +40,9 @@ export function generate(host, C) {
   const hint = el('small', 'dim');
 
   const go = el('button', 'primary', 'Generate');
+  go.dataset.act = 'generate';
   const row = el('div', 'row');
+  progress.dataset.role = 'progress';
   row.append(go, progress);
 
   const two = el('div', 'mus-two');
@@ -100,7 +102,10 @@ export function generate(host, C) {
     busy = false;
     go.disabled = false;
     const secs = Math.round((Date.now() - started) / 1000);
-    if (!r.ok) {
+    // api.js's queued() builds its failure as {ok:false, ...s} and the spread puts the job's own
+    // ok:true back on top, so a failed job arrives looking successful. Read the state, not ok.
+    const failed = !r.ok || r.state === 'error' || (!!r.error && !r.url);
+    if (failed) {
       progress.className = 'bad';
       progress.textContent = `failed after ${secs}s — ${r.error || 'no reason given'}${r.offline ? ' (dev server unreachable)' : ''}`;
       paintStatus();

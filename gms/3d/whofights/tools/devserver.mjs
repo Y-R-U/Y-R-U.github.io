@@ -376,6 +376,170 @@ function run(cmd, args, ms) {
   });
 }
 
+
+// ── audio encoding ─────────────────────────────────────────────────────────
+// Compression quality is a listening judgement, not a measurement — this house already has a scar
+// from a machine score that rated 1990s-sounding speech at 90.7 %. So the server only runs ffmpeg
+// and reports sizes; which profile is good enough is decided by ear in the tools.
+//
+// Every encode reads a **raw** source. Re-encoding an already-compressed file stacks generation
+// loss, and that is audible well before it is measurable.
+
+const ENCODE_SRC_DIRS = ['audio/music/raw', 'audio/vo/raw', 'audio/music', 'audio/vo'];
+const ENCODE_OUT_DIRS = ['audio/music', 'audio/vo'];
+
+// Music filters lifted verbatim from ../../2d/skyhammer/tools/compress_music.sh, which is where
+// these numbers were measured. `radio` is steep on purpose: a single lowpass is a gentle rolloff
+// that does not read as a wireless, and the band limiting is what makes 40 kbps inaudible.
+const RADIO_FILTER = 'highpass=f=450:poles=2,highpass=f=450:poles=2,lowpass=f=2600:poles=2,'
+  + 'lowpass=f=2600:poles=2,lowpass=f=2600:poles=2,acompressor=threshold=-20dB:ratio=5:attack=8:release=180,'
+  + 'volume=1.7,alimiter=limit=0.94';
+const FULL_FILTER = 'acompressor=threshold=-18dB:ratio=3:attack=12:release=250,volume=1.15,alimiter=limit=0.95';
+
+const ENCODE_PROFILES = {
+  full: { ext: '.mp3', label: 'Music full — 56 kbps mono @ 32 kHz', kind: 'music',
+    args: ['-af', FULL_FILTER, '-ac', '1', '-ar', '32000', '-b:a', '56k'] },
+  radio: { ext: '.mp3', label: 'Music radio — bandpassed, 40 kbps mono @ 22 kHz', kind: 'music',
+    args: ['-af', RADIO_FILTER, '-ac', '1', '-ar', '22050', '-b:a', '40k'] },
+  rich: { ext: '.mp3', label: 'Music rich — 96 kbps stereo @ 44.1 kHz', kind: 'music',
+    args: ['-af', FULL_FILTER, '-ac', '2', '-ar', '44100', '-b:a', '96k'] },
+  lossless: { ext: '.mp3', label: 'Music untouched — 192 kbps stereo, for A/B only', kind: 'music',
+    args: ['-ac', '2', '-ar', '44100', '-b:a', '192k'] },
+  voice: { ext: '.mp3', label: 'Voice — 32 kbps mono @ 24 kHz', kind: 'voice',
+    args: ['-ac', '1', '-ar', '24000', '-b:a', '32k'] },
+  'voice-lo': { ext: '.mp3', label: 'Voice small — 24 kbps mono @ 22 kHz', kind: 'voice',
+    args: ['-ac', '1', '-ar', '22050', '-b:a', '24k'] },
+  // Opus at 24 kbps beats mp3 at twice that on speech, and 96 clips is where it starts to matter.
+  'voice-opus': { ext: '.ogg', label: 'Voice opus — 24 kbps mono @ 24 kHz', kind: 'voice',
+    args: ['-c:a', 'libopus', '-ac', '1', '-ar', '24000', '-b:a', '24k', '-application', 'voip'] },
+  'voice-opus-hi': { ext: '.ogg', label: 'Voice opus clear — 40 kbps mono @ 24 kHz', kind: 'voice',
+    args: ['-c:a', 'libopus', '-ac', '1', '-ar', '24000', '-b:a', '40k', '-application', 'voip'] },
+};
+
+function underDir(rel, dirs, what) {
+  if (typeof rel !== 'string' || !rel.trim()) throw new Error(`${what} required`);
+  const clean = rel.replace(/^\/+/, '');
+  if (clean.includes('\0') || clean.includes('..')) throw new Error(`bad ${what}`);
+  const abs = path.resolve(ROOT, clean);
+  for (const d of dirs) {
+    const base = path.resolve(ROOT, d) + path.sep;
+    if (abs.startsWith(base)) return { abs, rel: path.relative(ROOT, abs).split(path.sep).join('/') };
+  }
+  throw new Error(`${what} must be under ${dirs.join(' or ')}`);
+}
+
+async function mediaInfo(abs) {
+  const st = await fsp.stat(abs).catch(() => null);
+  if (!st) return null;
+  let probe = {};
+  try {
+    const { stdout } = await run('ffprobe', ['-v', 'error', '-show_entries',
+      'format=duration,bit_rate:stream=sample_rate,channels,codec_name', '-of', 'json', abs], 20000);
+    const j = JSON.parse(stdout);
+    const s0 = (j.streams || [])[0] || {};
+    probe = { seconds: +(+(j.format?.duration || 0)).toFixed(2), bitrate: +j.format?.bit_rate || null,
+      sampleRate: +s0.sample_rate || null, channels: s0.channels ?? null, codec: s0.codec_name || null };
+  } catch { /* ffprobe missing, or a file it will not read */ }
+  return { bytes: st.size, ...probe };
+}
+
+// The preview lives beside the shipped file so the tool can play both from the same origin, and in
+// a directory of its own so a discarded take is never mistaken for the real one.
+const previewOf = out => path.join(path.dirname(out), '_preview', path.basename(out));
+
+function checkEncode(body) {
+  if (!ENCODE_PROFILES[body.profile || 'full']) throw new Error(`unknown profile "${body.profile}"`);
+  underDir(body.src, ENCODE_SRC_DIRS, 'src');
+  assetPath(outDirFor(body), stripDir(body), ENCODE_PROFILES[body.profile || 'full'].ext);
+}
+
+const outDirFor = body => ENCODE_OUT_DIRS.find(d => (body.out || '').replace(/^\/+/, '').startsWith(`${d}/`))
+  || (ENCODE_PROFILES[body.profile || 'full'].kind === 'voice' ? 'audio/vo' : 'audio/music');
+
+const stripDir = body => (body.out || '').replace(/^\/+/, '').replace(new RegExp(`^${outDirFor(body)}/`), '');
+
+async function runEncode(body, note) {
+  const profile = ENCODE_PROFILES[body.profile || 'full'];
+  if (!profile) throw new Error(`unknown profile "${body.profile}"`);
+  const src = underDir(body.src, ENCODE_SRC_DIRS, 'src');
+  if (!(await fsp.stat(src.abs).catch(() => null))) throw new Error(`no source at ${src.rel}`);
+
+  const named = assetPath(outDirFor(body), stripDir(body), profile.ext);
+  const outRel = body.preview ? previewOf(named.rel) : named.rel;
+  const outAbs = path.resolve(ROOT, outRel);
+  if (outAbs === src.abs) throw new Error('refusing to encode a file over itself');
+
+  const before = await mediaInfo(outAbs);
+  note(`encoding ${src.rel} → ${outRel} (${body.profile || 'full'})`);
+  await fsp.mkdir(path.dirname(outAbs), { recursive: true });
+  // ffmpeg writes progressively, so a kill mid-run would leave a truncated clip where the old one
+  // was. Encode beside it and rename, the same rule /api/save follows.
+  const tmp = `${outAbs}.tmp-${process.pid}-${Math.random().toString(36).slice(2)}${profile.ext}`;
+  try {
+    await run('ffmpeg', ['-y', '-loglevel', 'error', '-i', src.abs, ...profile.args, tmp], 20 * 60 * 1000);
+    await fsp.rename(tmp, outAbs);
+  } catch (e) {
+    await fsp.rm(tmp, { force: true });
+    throw e;
+  }
+  const after = await mediaInfo(outAbs);
+  const source = await mediaInfo(src.abs);
+  return {
+    src: src.rel, out: outRel, url: `/${outRel}`, profile: body.profile || 'full',
+    label: profile.label, preview: !!body.preview,
+    source, before, after,
+    ratio: after && source?.bytes ? +(source.bytes / after.bytes).toFixed(2) : null,
+  };
+}
+
+// Keeping a preview is a rename, not a re-encode: the bytes the ear approved are the bytes that
+// ship. A discarded preview is simply left where it is.
+async function promotePreview(body) {
+  const from = underDir(body.promote, ENCODE_OUT_DIRS, 'promote');
+  if (!path.dirname(from.abs).endsWith(`${path.sep}_preview`)) throw new Error('promote must name a file under _preview/');
+  const to = path.resolve(path.dirname(path.dirname(from.abs)), path.basename(from.abs));
+  const outRel = path.relative(ROOT, to).split(path.sep).join('/');
+  await fsp.rename(from.abs, to);
+  return { ok: true, out: outRel, url: `/${outRel}`, from: from.rel, ...(await mediaInfo(to)) };
+}
+
+// Encoding is CPU, not GPU, so it gets a queue of its own rather than waiting behind ACE-Step and
+// mflux. Same job records, so /api/job/<id> and /api/queue read it without knowing the difference.
+const encodePending = [];
+let encodeRunning = null;
+
+function enqueueEncode(body) {
+  const id = `encode-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+  const job = { id, kind: 'encode', state: 'queued', note: 'queued', at: Date.now(),
+    out: body.out || '', run: note => runEncode(body, note) };
+  jobs.set(id, job);
+  encodePending.push(job);
+  job.position = encodePending.length;
+  setTimeout(pumpEncode, 0);
+  return job;
+}
+
+async function pumpEncode() {
+  if (encodeRunning || !encodePending.length) return;
+  const job = encodePending.shift();
+  encodePending.forEach((j, i) => { j.position = i + 1; });
+  encodeRunning = job;
+  job.state = 'running';
+  job.position = 0;
+  try {
+    job.result = await job.run(n => { job.note = n; });
+    job.state = 'done';
+    job.note = 'done';
+  } catch (e) {
+    job.state = 'error';
+    job.error = String(e && e.message || e);
+    job.note = job.error;
+  }
+  job.endedAt = Date.now();
+  encodeRunning = null;
+  setTimeout(pumpEncode, 10);
+}
+
 // ── static ─────────────────────────────────────────────────────────────────
 async function serveStatic(req, res, urlPath) {
   const decoded = decodeURIComponent(urlPath);
@@ -410,7 +574,7 @@ async function serveStatic(req, res, urlPath) {
 const notFound = res => { res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found'); };
 
 // ── routes ─────────────────────────────────────────────────────────────────
-const WRITE_ROUTES = new Set(['/api/save', '/api/tts', '/api/tts/batch', '/api/music', '/api/flux']);
+const WRITE_ROUTES = new Set(['/api/save', '/api/tts', '/api/tts/batch', '/api/music', '/api/flux', '/api/encode']);
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
@@ -511,6 +675,20 @@ async function route(req, res, p, url) {
     const job = enqueue(kind, note => (kind === 'music' ? runMusic(body, note) : runFlux(body, note)), { out: rel });
     return send(res, 200, { ok: true, job: job.id, state: job.state, position: job.position,
       out: rel, waiting: pending.length, note: 'poll /api/job/<id>' });
+  }
+
+  if (p === '/api/encode') {
+    if (body.promote) return send(res, 200, await promotePreview(body));
+    if (body.profiles) {
+      return send(res, 200, { ok: true, profiles: Object.entries(ENCODE_PROFILES)
+        .map(([id, v]) => ({ id, label: v.label, kind: v.kind, ext: v.ext, args: v.args.join(' ') })) });
+    }
+    // Validated here, not inside the job: a bad path or an unknown profile is a mistake in the
+    // request, and the caller should hear about it now rather than by polling.
+    checkEncode(body);
+    const job = enqueueEncode(body);
+    return send(res, 200, { ok: true, job: job.id, state: job.state, position: job.position,
+      out: job.out, waiting: encodePending.length, note: 'poll /api/job/<id>' });
   }
 
   return send(res, 404, { ok: false, error: `no route ${p}` });

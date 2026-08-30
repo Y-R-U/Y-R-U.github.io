@@ -56,8 +56,10 @@ async function mount(el, ctx) {
 
   S.offs.push(ctx.data.onAny(({ kind, id, why }) => {
     if (kind === 'levels' && id === S.id) { applyToWorld(); syncOverlay(); }
-    // A repaint mid-keystroke would take the caret with it; the field already holds the value.
-    if (why === 'set' && document.activeElement && S.host.contains(document.activeElement)) return refreshChrome();
+    // A repaint mid-keystroke would take the caret with it, and the field already holds the value.
+    // Only a text field earns that: a button or a select that changed the document needs the
+    // redraw, and skipping it is how an action card silently fails to appear.
+    if (why === 'set' && typingInPanel()) return refreshChrome();
     paint();
   }));
   S.onKey = e => onKey(e);
@@ -65,6 +67,12 @@ async function mount(el, ctx) {
   applyToWorld();
   syncOverlay();
 }
+
+const typingInPanel = () => {
+  const a = document.activeElement;
+  return !!a && !!S.host?.contains(a)
+    && (a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && a.type !== 'checkbox'));
+};
 
 function unmount() {
   for (const off of S.offs) off?.();
@@ -134,7 +142,9 @@ function applyToWorld() {
   const d = doc();
   const live = window.__wf?.level;
   if (!d || !isLive() || !live) return;
-  live.hotspots = d.hotspots || [];
+  // The runtime is handed the loaded form, not the authored one: a hotspot half-typed in the
+  // inspector must not reach it with no trigger and no actions array.
+  live.hotspots = (d.hotspots || []).map((x, i) => hp.normaliseHotspot(x, i)).filter(Boolean);
   live.start = d.start;
   live.name = d.name;
   live.music = d.music;
@@ -147,11 +157,11 @@ function armMirror() {
   S.mirrorArmed = false;
   if (!e?.onChange) return;
   if (!isLive()) { S.drift = liveId() ? 'other' : null; return; }
-  S.mirrorArmed = io.sameObjects(doc()?.objects, e.doc.objects);
+  S.mirrorArmed = io.sameAsLoaded(doc(), e.doc.objects);
   if (!S.mirrorArmed) S.drift = 'objects';
   S.mirrorOff?.();
   S.mirrorOff = e.onChange(d => {
-    if (!S.mirrorArmed || !isLive() || io.sameObjects(doc()?.objects, d.objects)) return;
+    if (!S.mirrorArmed || !isLive() || io.sameAsLoaded(doc(), d.objects)) return;
     edit(x => { x.objects = io.exportObjects(d.objects); }, 'moved in the world', true);
   });
 }
@@ -195,7 +205,8 @@ function refreshChrome() {
 function nowBar() {
   const d = doc();
   const dirty = S.ctx.data.dirty('levels', S.id);
-  TAB.label = `Level · ${d?.name || S.id}`;
+  const short = String(d?.name || S.id || '');
+  TAB.label = `Level · ${short.length > 20 ? `${short.slice(0, 19)}…` : short}`;
   S.ctx.hub.registerTab(TAB);
   return h('div', { class: 'lv-now' },
     h('div', {},
@@ -303,6 +314,11 @@ function newLevel() {
     if (!String(name).trim()) return S.ctx.toast('a level needs a name', 'bad');
     const ids = await S.ctx.data.levelIds();
     const id = io.deriveId(name, ids);
+    // A level only half-made — an unsaved draft in this browser — still owns its id, so say so
+    // rather than letting a silent "-2" turn up in the filename.
+    if (id !== io.slugify(name)) {
+      S.ctx.toast(`“${io.slugify(name)}” is already taken, so this one is “${id}”`, 'warn');
+    }
     const d = io.seedLevel(id, String(name).trim());
     S.ctx.data.set('levels', d, id, { label: `new level ${id}` });
     await writeIndex(d);
@@ -741,10 +757,16 @@ function actionCard(hs, a, i, set, r) {
 
   if (a.k === 'say') {
     const nodes = Object.entries(r.conversations).map(([id, n]) => ({ v: id, label: `${n?.name || id} — ${id}` }));
+    const missing = a.node && !r.conversations[a.node];
     card.append(field('Conversation', select(nodes, a.node, v => upd(x => { x.node = v; }), { placeholder: '— pick a node —' })),
-      row(btn('Edit this conversation →', () => editConversation(a.node), 'primary'),
+      row(btn(missing ? `Create “${a.node}” →` : 'Edit this conversation →', () => editConversation(a.node), 'primary'),
         btn('New node…', () => newConversationNode(node => upd(x => { x.node = node; }))),
-        h('span', { class: 'lv-hint', text: a.node && !r.conversations[a.node] ? 'that node does not exist yet' : '' })));
+        missing
+          // A conversation rename does not rewrite level hotspots, so this is the state a hotspot
+          // is left in afterwards: say so, and the picker above is how it gets repointed.
+          ? h('span', { class: 'lv-probs', style: { margin: '0', padding: '4px 8px' },
+            text: `there is no node “${a.node}” — pick another above, or create it` })
+          : null));
   }
   if (a.k === 'goto') {
     const target = a.level;
@@ -803,44 +825,24 @@ function actionCard(hs, a, i, set, r) {
   return card;
 }
 
-// The handoff to the conversation tab. It is a hub tab switch plus the node id, parked on
-// window.__wfDev.jump because hub.show() currently takes only an id.
+// The handoff to the conversation tab, agreed with its owner. hub.show() drops any second
+// argument, so the node id goes through their own entry point; a node that does not exist yet
+// opens their "create it" banner, which is why nothing is pre-created here.
 function editConversation(nodeId) {
   if (!nodeId) return S.ctx.toast('pick a conversation node first, or make a new one', 'warn');
-  const nodes = refs().conversations;
-  if (!nodes[nodeId]) {
-    return confirmAsk(`There is no conversation node “${nodeId}”.`,
-      'It can be created empty now and written in the Conversations tab.', 'Create it', () => {
-        createNode(nodeId);
-        jumpToConvo(nodeId);
-      });
-  }
-  jumpToConvo(nodeId);
-}
-
-function jumpToConvo(nodeId) {
-  const req = { tab: 'convo', node: nodeId, from: 'level', level: S.id, at: Date.now() };
-  if (window.__wfDev) window.__wfDev.jump = req;
-  if (window.__wf?.dev) window.__wf.dev.jump = req;
-  S.ctx.hub.show('convo', { node: nodeId, from: 'level' });
-}
-
-function createNode(id) {
-  S.ctx.data.mutate('conversations', null, d => {
-    d.nodes ||= {};
-    d.nodes[id] = { name: id, cam: 'two', once: false, lines: [], choices: [], next: null, sets: [] };
-  }, { label: `new conversation ${id}` });
+  window.__wfConvo?.open(nodeId);
+  if (window.__wfDev) window.__wfDev.jump = { tab: 'convo', node: nodeId, from: 'level', level: S.id, at: Date.now() };
+  S.ctx.hub.show('convo');
 }
 
 function newConversationNode(onMade) {
   const base = `${S.id}.${(selected()?.name || 'talk').toLowerCase().replace(/[^a-z0-9]+/g, '')}`;
-  textAsk('Id for the new conversation node', base, 'Create', v => {
+  textAsk('Id for the new conversation node', base, 'Use this id', v => {
     const id = String(v).trim();
     if (!id) return;
-    if (refs().conversations[id]) S.ctx.toast('that node already exists — pointing at it', 'warn');
-    else createNode(id);
     onMade(id);
     paint();
+    editConversation(id);
   });
 }
 
@@ -927,8 +929,10 @@ function objectPanel() {
       'This level is not the one the game has loaded, so changes here go into the file but nothing rebuilds on screen.'));
   }
 
+  const picked = objs.filter(o => S.objSel.has(o.id));
+  const allAre = z => picked.length && picked.every(o => o.zone === z);
   const tone = row(h('span', { class: 'lv-hint', text: `${S.objSel.size} selected · tone:` }),
-    ...ZONE_IDS.map(z => btn(zone(z).label, () => setTone(z), '')),
+    ...ZONE_IDS.map(z => btn(zone(z).label, () => setTone(z), allAre(z) ? 'primary' : '')),
     h('span', { class: 'lv-grow' }),
     btn('Pick one in the world', pickObjectInWorld, canBuild ? 'primary' : ''),
     btn('Select all', () => { for (const o of objs) S.objSel.add(o.id); paint(); }),

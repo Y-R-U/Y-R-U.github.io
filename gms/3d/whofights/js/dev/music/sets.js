@@ -9,7 +9,7 @@ import { MusicRuntime } from '../../game/music.js';
 
 export function sets(host, C) {
   const wrap = el('div', 'split');
-  const side = el('div', 'side');
+  const side = el('div', 'side mus-side');
   const main = el('div', 'main');
   wrap.append(side, main);
   host.append(wrap);

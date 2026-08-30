@@ -1,9 +1,9 @@
 import { test, eq, ok, near } from '../../../tools/harness.mjs';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { hashLine, clipKey, clipFile, pitchRate, synthSpeed, effectiveBarks, overriddenCategories,
-  planJobs, applyResults, pruneIndex, validateIndex, validateBarks, countBarks,
-  BARK_CATEGORIES } from './vo.js';
+import { hashLine, clipKey, clipFile, rawFile, pitchRate, synthSpeed, effectiveBarks,
+  overriddenCategories, planJobs, applyResults, pruneIndex, validateIndex, validateBarks,
+  countBarks, needsEncoding, playableFile, BARK_CATEGORIES } from './vo.js';
 
 const root = new URL('../../../', import.meta.url);
 const readDoc = p => JSON.parse(readFileSync(fileURLToPath(new URL(p, root)), 'utf8'));
@@ -29,7 +29,25 @@ test('hash moves with every field it is documented to cover', () => {
 test('clip names follow §8', () => {
   eq(clipKey('greeter', 'idle', 0), 'greeter__idle__01');
   eq(clipKey('greeter', 'idle', 11), 'greeter__idle__12');
-  eq(clipFile('greeter__idle__01'), 'audio/vo/greeter__idle__01.wav');
+  eq(clipFile('greeter__idle__01'), 'audio/vo/greeter__idle__01.mp3');
+  eq(rawFile('greeter__idle__01'), 'audio/vo/raw/greeter__idle__01.wav');
+});
+
+test('kokoro writes into raw/, and the shipped clip is the mp3', () => {
+  const p = planJobs({ cast: cast(), barks: barks(), index: { clips: {} }, who: ['vail'] });
+  eq(p.jobs[0].out, 'raw/vail__idle__01', 'the tts out name lands under audio/vo/raw');
+  const { index } = applyResults({ clips: {} }, p.jobs, p.jobs.map(() => ({ ok: true, seconds: 1 })));
+  const rec = index.clips.vail__idle__01;
+  eq(rec.file, 'audio/vo/vail__idle__01.mp3');
+  eq(rec.raw, 'audio/vo/raw/vail__idle__01.wav');
+  eq(rec.encoded, false, 'a synthesised take is not an encoded one');
+  eq(playableFile(rec, 'vail__idle__01'), rec.raw, 'before encoding, the raw is what plays');
+  eq(needsEncoding(index).length, 4);
+  const done = { ...index, clips: { ...index.clips,
+    vail__idle__01: { ...rec, encoded: true } } };
+  eq(playableFile(done.clips.vail__idle__01, 'vail__idle__01'), rec.file);
+  eq(needsEncoding(done).length, 3);
+  eq(needsEncoding(done, new Set()).length, 4, 'an mp3 missing from disk still needs encoding');
 });
 
 test('the synthesis speed and the playback rate cancel, so pitch keeps the duration', () => {
@@ -120,6 +138,14 @@ test('a refused take leaves no index entry claiming a file exists', () => {
     onDisk: new Set(Object.keys(index.clips)) }).jobs.map(j => j.key), ['vail__idle__02']);
 });
 
+test('another section of the ledger is never rebuilt away', () => {
+  const start = { version: 1, lines: { 'academy.hello#0': { hash: 'abc' } }, clips: {} };
+  const plan = planJobs({ cast: cast(), barks: barks(), index: start, who: ['vail'] });
+  const { index } = applyResults(start, plan.jobs, plan.jobs.map(() => ({ ok: true, seconds: 1 })));
+  eq(index.lines, start.lines, 'the conversation tab keeps its half');
+  eq(pruneIndex(index, new Set()).index.lines, start.lines);
+});
+
 test('a shortened list leaves orphans, and prune names them', () => {
   const plan = planJobs({ cast: cast(), barks: barks(), index: { clips: {} }, who: ['vail'] });
   const { index } = applyResults({ clips: {} }, plan.jobs, plan.jobs.map(() => ({ ok: true, seconds: 1 })));
@@ -127,7 +153,7 @@ test('a shortened list leaves orphans, and prune names them', () => {
   const after = planJobs({ cast: cast(), barks: shorter, index, who: ['vail'] });
   const { index: pruned, orphans } = pruneIndex(index, after.live);
   eq(orphans.map(o => o.key), ['vail__idle__02']);
-  eq(orphans[0].file, 'audio/vo/vail__idle__02.wav');
+  eq(orphans[0].file, 'audio/vo/vail__idle__02.mp3');
   eq(Object.keys(pruned.clips).length, 3);
 });
 

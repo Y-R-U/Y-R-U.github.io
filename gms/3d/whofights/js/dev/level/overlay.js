@@ -163,7 +163,7 @@ export class HotspotOverlay {
     const sprite = labelSprite(text, it.problems.length ? '#ff8a8a' : '#ffffff');
     if (!sprite) return null;
     const c = centreOf(shape);
-    const lift = it.h.attach ? 3.2 : Math.max(2.4, radiusOf(shape) * 0.8 + 1);
+    const lift = (it.h.attach ? 3.0 : Math.max(2.2, radiusOf(shape) * 0.8 + 0.8)) + (it.on ? 1.4 : 0);
     sprite.position.set(c.x, (it.h.attach ? LIFT : this.groundY(c.x, c.z)) + lift, c.z);
     return sprite;
   }
@@ -238,9 +238,14 @@ function labelSprite(text, colour) {
     tex.colorSpace = THREE.SRGBColorSpace;
     labelCache.set(key, tex);
   }
+  // sizeAttenuation off: a label is chrome, not scenery. It stays the same height on screen
+  // whether the camera is on top of the hotspot or across the meadow from it, which is the only
+  // way a ring 3 m away and a ring 200 m away can both be read.
   const s = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: tex, depthTest: false, toneMapped: false, fog: false, transparent: true }));
-  s.scale.set(tex.image.width / 42, tex.image.height / 42, 1);
+    map: tex, depthTest: false, toneMapped: false, fog: false, transparent: true,
+    sizeAttenuation: false }));
+  const hgt = 0.05;
+  s.scale.set((tex.image.width / tex.image.height) * hgt, hgt, 1);
   s.renderOrder = 31;
   s.frustumCulled = false;
   return s;

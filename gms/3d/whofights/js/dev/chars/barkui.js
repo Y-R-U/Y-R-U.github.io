@@ -2,8 +2,8 @@
 // DEV_CONTRACT §8. The categories are fixed; only the lines are authored here.
 
 import { BARK_CATEGORIES, effectiveBarks, clipKey, clipFile, hashLine, planJobs, applyResults,
-  speedOf, pitchOf, synthSpeed } from './vo.js';
-import { loadIndex, saveIndex, clipsOnDisk } from './voindex.js';
+  needsEncoding, playableFile, speedOf, pitchOf, synthSpeed } from './vo.js';
+import { loadIndex, saveIndex, clipsOnDisk, rawsOnDisk } from './voindex.js';
 import { playClip } from './play.js';
 
 const CHUNK = 40;   // one kokoro model load per request (~6 s) against a run you can watch
@@ -58,8 +58,11 @@ export function createBarks(ctx, host) {
     const rec = index.clips?.[key];
     if (!rec) return { k: 'none', label: '—', title: 'never generated' };
     const want = hashLine(text, voice, speed, pitch);
-    if (onDisk && !onDisk.has(key)) return { k: 'bad', label: 'file gone', title: `${clipFile(key)} is not on disk` };
     if (rec.hash !== want) return { k: 'warnc', label: 'stale', title: 'the line, voice, speed or pitch changed since this clip' };
+    // onDisk lists audio/vo, so it sees the shipped mp3. audio/vo/raw is outside the dev server's
+    // /api/ls whitelist, which is why an unencoded clip is reported rather than assumed present.
+    if (!rec.encoded) return { k: 'warnc', label: 'wav only', title: `${rec.raw} is synthesised but not encoded yet — node tools/vo/gen_barks.mjs --encode` };
+    if (onDisk && !onDisk.has(key)) return { k: 'bad', label: 'file gone', title: `${clipFile(key)} is not on disk` };
     return { k: 'good', label: `${(rec.seconds ?? 0).toFixed(1)}s`, title: `${rec.voice} · ${rec.rms ?? '?'} dBFS` };
   }
 
@@ -113,7 +116,9 @@ export function createBarks(ctx, host) {
     }).join('');
 
     q('cats').innerHTML = blocks;
-    q('counts').textContent = `${total} lines for ${c.name} · ${done} clip${done === 1 ? '' : 's'} up to date · index ${indexWhere}`;
+    const unenc = needsEncoding(index).length;
+    q('counts').textContent = `${total} lines for ${c.name} · ${done} clip${done === 1 ? '' : 's'} up to date`
+      + (unenc ? ` · ${unenc} awaiting encode` : '') + ` · index ${indexWhere}`;
     wire();
   }
 
@@ -186,8 +191,9 @@ export function createBarks(ctx, host) {
   async function play(cat, i) {
     const c = chr();
     const key = clipKey(id(), cat, i);
-    if (!index.clips?.[key]) return ctx.toast('no clip yet — press gen', 'warn');
-    try { await playClip(clipFile(key), { pitch: pitchOf(c) }); }
+    const rec = index.clips?.[key];
+    if (!rec) return ctx.toast('no clip yet — press gen', 'warn');
+    try { await playClip(playableFile(rec, key), { pitch: pitchOf(c) }); }
     catch (e) { ctx.toast(`could not play ${key}: ${e.message}`, 'bad'); }
   }
 
@@ -199,8 +205,13 @@ export function createBarks(ctx, host) {
     const all = cast();
     const who = scope === 'all' ? Object.keys(all).filter(k => all[k].voice) : [id()];
     onDisk = await clipsOnDisk(ctx.api);
+    // planJobs' onDisk asks "does the kokoro take still exist?" — a question about audio/vo/raw,
+    // which /api/ls will not list. HEAD each key in scope instead: believing the ledger over the
+    // filesystem is how a deleted take becomes a clip that can never be regenerated.
+    const scoped = planJobs({ cast: all, barks: barks(), index, who, categories });
+    const raws = await rawsOnDisk(scoped.live);
     let { jobs, skip, noVoice } = planJobs({ cast: all, barks: barks(), index, who, categories,
-      force: force || !!only, onDisk });
+      force: force || !!only, onDisk: raws });
     if (only) jobs = jobs.filter(j => only.includes(j.key));
     if (noVoice.length && !jobs.length) return ctx.toast(`${noVoice.length} lines have no voice set`, 'warn');
     if (!jobs.length) return ctx.toast(`nothing to do — ${skip.length} clips already up to date`);
@@ -238,9 +249,14 @@ export function createBarks(ctx, host) {
     el.querySelector('[data-act=cancel]').hidden = true;
     el.querySelector('[data-act=genall]').disabled = false;
     const secs = ((Date.now() - t0) / 1000).toFixed(0);
+    // The tab can synthesise but not encode: the dev server has no encode route yet, so the mp3s
+    // that actually ship are made by the CLI. Say so rather than leaving wavs looking finished.
+    const unenc = needsEncoding(index).length;
     prog.innerHTML = `${done - fails.length} of ${jobs.length} written in ${secs}s`
       + (cancel ? ' <span class="warnc">— stopped</span>' : '')
-      + (fails.length ? ` <span class="bad">— ${fails.length} refused</span>` : '');
+      + (fails.length ? ` <span class="bad">— ${fails.length} refused</span>` : '')
+      + (unenc ? ` <span class="warnc">— ${unenc} still to encode:</span>
+          <code>node tools/vo/gen_barks.mjs --encode</code>` : '');
     // kokoro_say.py refuses a silent or too-short take on purpose. Those have to be read, not
     // swallowed: a clip that "exists" but says nothing is the bug this whole check exists for.
     q('fails').hidden = !fails.length;
@@ -272,9 +288,9 @@ export function createBarks(ctx, host) {
       const c = chr();
       if (!c?.voice) { ctx.toast('pick a voice first', 'warn'); return null; }
       const r = await ctx.api.tts({ voice: c.voice, text,
-        speed: synthSpeed(speedOf(c), pitchOf(c)), out: '__audition' });
+        speed: synthSpeed(speedOf(c), pitchOf(c)), out: 'raw/__audition' });
       if (!r.ok) { ctx.toast(`kokoro refused: ${r.error}`, 'bad'); return r; }
-      try { await playClip('audio/vo/__audition.wav', { pitch: pitchOf(c), bust: true }); }
+      try { await playClip('audio/vo/raw/__audition.wav', { pitch: pitchOf(c), bust: true }); }
       catch (e) { ctx.toast(`could not play the audition: ${e.message}`, 'bad'); }
       return r;
     },

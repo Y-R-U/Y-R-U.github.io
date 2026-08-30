@@ -41,6 +41,7 @@ export const state = {
   keepRunning: false,
   installedAt: 0,
   selected: null,
+  pickPoint: null,
   picking: false,
   lastInput: null,
   counts: { enter: 0, fire: 0, action: 0, node: 0, flag: 0, event: 0, error: 0, warn: 0 },

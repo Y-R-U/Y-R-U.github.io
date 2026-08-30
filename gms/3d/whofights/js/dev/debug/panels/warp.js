@@ -30,7 +30,7 @@ export const panel = {
     manual.append(
       button('Warp there', 'primary', () => go(ctx, {
         x: +inputs.x.value, z: +inputs.z.value, yaw: +inputs.yaw.value, id: 'manual',
-      }, head)),
+      })),
       button('Read current', '', () => {
         const p = where(ctx);
         if (!p) return ctx.toast('no player', 'warn');
@@ -78,7 +78,7 @@ export const panel = {
           row.append(h('span', null, w.label),
             h('span', 'dim', ` ${w.x}, ${w.z}`),
             h('span', 'dbg-t', w.note));
-          row.onclick = () => go(ctx, w, head);
+          row.onclick = () => go(ctx, w);
           list.append(row);
         }
       }
@@ -93,9 +93,7 @@ export const panel = {
   unmount() { clearInterval(this._t); },
 };
 
-function go(ctx, w, head) {
+function go(ctx, w) {
   const r = warpTo(ctx, w);
-  if (!r.ok) return ctx.toast(r.error, 'warn');
-  ctx.toast(`warped to ${w.label || w.id} — close the hub to see it`, 'good');
-  head.dataset.at = `${r.x},${r.z}`;
+  ctx.toast(r.ok ? `warped to ${w.label || w.id} — close the hub to see it` : r.error, r.ok ? 'good' : 'warn');
 }

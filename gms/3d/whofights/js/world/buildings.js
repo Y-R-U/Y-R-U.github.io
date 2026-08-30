@@ -486,7 +486,19 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = 
   }
 
   if (dressed) addQuoins(b, R, { m: T(0, 0, 0), w, d, h: wallTop, from: plinth, surface: S.trim });
-  if (storeys === 2) b.add(S.trim, new THREE.BoxGeometry(w + 0.36, 0.33, d + 0.36), T(0, plinth + (wallTop - plinth) * 0.5 - 0.53, 0));
+  // The mid-height string course. It is one solid box for a cottage, where an interior ceiling is
+  // always below it and nothing ever sees the underside — but a great hall is one room to the
+  // roof, and that box is then a floor slab straight through the middle of it at 5.7 m. (It is
+  // what made the first hall read as a low barn: everything above it, roof included, was hidden.)
+  // A hall gets the same band drawn as four faces round the outside instead.
+  if (storeys === 2) {
+    const by = plinth + (wallTop - plinth) * 0.5 - 0.53;
+    if (!hall) b.add(S.trim, new THREE.BoxGeometry(w + 0.36, 0.33, d + 0.36), T(0, by, 0));
+    else for (const [bw, bd, bx, bz] of [[w + 0.36, 0.36, 0, (d + 0.36) / 2 - 0.18], [w + 0.36, 0.36, 0, -((d + 0.36) / 2 - 0.18)],
+                                         [0.36, d - 0.36, (w + 0.36) / 2 - 0.18, 0], [0.36, d - 0.36, -((w + 0.36) / 2 - 0.18), 0]]) {
+      b.add(S.trim, new THREE.BoxGeometry(bw, 0.33, bd), T(bx, by, bz));
+    }
+  }
 
   // half-timber relief on the upper band of the two long faces
   if (dressed && storeys === 2 && R() < 0.6) {

@@ -10,8 +10,8 @@ export const SIZES = [
   { id: 'phone-l', label: 'Phone landscape', w: 844, h: 390 },
   { id: 'phone-p', label: 'Phone portrait', w: 390, h: 844 },
   { id: 'tablet-l', label: 'Tablet landscape', w: 1180, h: 820 },
-  { id: 'hd', label: '1280 × 720', w: 1280, h: 720 },
-  { id: 'fhd', label: '1920 × 1080', w: 1920, h: 1080 },
+  { id: 'hd', label: 'Desktop 720p', w: 1280, h: 720 },
+  { id: 'fhd', label: 'Desktop 1080p', w: 1920, h: 1080 },
 ];
 
 // A capture is a real frame at real pixel dimensions, so a 4× DPR on a 1920 shot is 33 megapixels

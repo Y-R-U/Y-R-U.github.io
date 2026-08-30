@@ -104,6 +104,12 @@ test('facing points the right way', () => {
   near(facing(0, 0, 10, 0), Math.PI / 2, 1e-6);
 });
 
+test('a waypoint you land on top of keeps the player facing', () => {
+  const enter = waypoints(DOC, {}).find(w => w.id === 'hs.doorway.hall');
+  eq(enter.yaw, null, 'no back-off means no direction to face');
+  eq(waypoints(DOC, {}).find(w => w.id === 'start').yaw, DOC.start.yaw);
+});
+
 test('waypoints gather every place worth jumping to', () => {
   const list = waypoints(DOC, CAST, id => (id === 'greeter' ? { x: 1, z: -19 } : null));
   eq(groupsOf(list), ['Level', 'Hotspots', 'Characters', 'Camera shots', 'Objects']);

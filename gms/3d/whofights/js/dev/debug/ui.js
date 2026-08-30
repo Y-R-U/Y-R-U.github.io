@@ -2,10 +2,13 @@
 // agent, so everything here is injected from this module and every class is `dbg-` prefixed —
 // the game's style.css shares this document and has reshaped a dev toolbar before.
 
-export function h(tag, cls, text) {
+// Extra arguments are appended, string or node alike — `h('div', 'row', a, b)` is the whole
+// reason this exists. Passing a node as the third argument used to stringify it, which renders as
+// a cheerful "[object HTMLDivElement]" and passes every test that is not a screenshot.
+export function h(tag, cls, ...kids) {
   const n = document.createElement(tag);
   if (cls) n.className = cls;
-  if (text !== undefined) n.textContent = text;
+  for (const k of kids) if (k !== null && k !== undefined && k !== false) n.append(k);
   return n;
 }
 
@@ -20,7 +23,6 @@ export function button(label, cls, onclick) {
   return b;
 }
 
-// A labelled on/off switch that reads its own state back, so a panel never has to remember it.
 // Two-step instead of confirm(): the house rule here is no browser dialogs, and a headless test
 // driver answers every confirm() with OK — which is exactly the wrong default for a wipe button.
 export function danger(label, onConfirm, ask = 'Click again to confirm') {
@@ -35,17 +37,6 @@ export function danger(label, onConfirm, ask = 'Click again to confirm') {
     setTimeout(() => { if (armed) disarm(); }, 5000);
   };
   return b;
-}
-
-export function toggle(label, get, set) {
-  const wrap = h('label', 'dbg-toggle');
-  const box = h('input');
-  box.type = 'checkbox';
-  box.checked = !!get();
-  box.onchange = () => { set(box.checked); box.checked = !!get(); };
-  wrap.append(box, h('span', null, label));
-  wrap.sync = () => { box.checked = !!get(); };
-  return wrap;
 }
 
 export function slider({ label, min, max, step, get, set, fmt: f = v => num(v, 2) }) {

@@ -45,7 +45,7 @@ const CSS = `
 #wf-dev .convo-split { display:flex; gap:14px; align-items:stretch; height:100%; min-height:0; }
 #wf-dev .convo-list { flex:0 0 320px; display:flex; flex-direction:column; min-height:0;
   border-right:1px solid var(--line); padding-right:10px; }
-#wf-dev .convo-scroll { overflow:auto; flex:1 1 auto; min-height:0; }
+#wf-dev .convo-scroll { overflow-y:auto; overflow-x:hidden; flex:1 1 auto; min-height:0; }
 #wf-dev .convo-editor { flex:1 1 auto; overflow:auto; min-width:0; padding-right:4px; }
 #wf-dev .convo-node { display:block; width:100%; text-align:left; background:none;
   border:1px solid transparent; border-radius:6px; padding:5px 8px; color:var(--dim); margin-bottom:2px; }

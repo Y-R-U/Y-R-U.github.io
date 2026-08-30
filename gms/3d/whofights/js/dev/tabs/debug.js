@@ -69,14 +69,28 @@ registerTab({
       }
     };
 
+    // The badges are updated in place rather than by rebuilding the bar: a bar that redraws on a
+    // timer eats the click that lands the moment it does.
+    const badges = new Map();
     const paintSubs = () => {
       clear(subs);
+      badges.clear();
       for (const p of PANELS) {
         const b = h('button', p === current ? 'on' : '', p.label);
-        const n = p.badge?.();
-        if (n) b.append(h('span', 'dbg-badge', String(n)));
+        if (p.badge) {
+          const tag = h('span', 'dbg-badge');
+          b.append(tag);
+          badges.set(p, tag);
+        }
         b.onclick = () => show(p.id);
         subs.append(b);
+      }
+      syncBadges();
+    };
+    const syncBadges = () => {
+      for (const [p, tag] of badges) {
+        const n = p.badge();
+        tag.textContent = n ? ` ${n}` : '';
       }
     };
 
@@ -94,12 +108,13 @@ registerTab({
       } catch (e) { fail(body, p, e, ctx); }
     };
 
-    this._paintHead = paintHead;
+    this._badges = setInterval(syncBadges, 1500);
     paintHead();
     show(active || localStorage.getItem(KEY) || 'warp');
   },
 
   unmount() {
+    clearInterval(this._badges);
     try { current?.unmount?.(); } catch { /* a panel timer that has already gone */ }
     current = null;
   },

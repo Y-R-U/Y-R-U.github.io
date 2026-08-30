@@ -61,7 +61,7 @@
       "body": "robed",
       "robe": "light",
       "gender": "f",
-      "height": 1.08,
+      "height": 1.02,
       "hood": "up",
       "voice": "bf_emma",
       "voiceSpeed": 0.98,
@@ -134,8 +134,7 @@
           "Rain. The training yard will be a swamp.",
           "Good drilling weather. You will disagree."
         ]
-      },
-      "voicePitch": -2
+      }
     },
     "narrator": {
       "name": "Narrator",

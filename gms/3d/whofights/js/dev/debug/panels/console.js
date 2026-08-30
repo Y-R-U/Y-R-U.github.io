@@ -44,7 +44,14 @@ export const panel = {
         hud.lane('log', true);
         e.target.className = hud.visible() ? 'primary' : '';
       }),
-      button('Throw a test error', '', () => { setTimeout(() => { throw new Error('debug tab test error'); }, 0); }),
+      // Not an uncaught throw: js/game/failure.js turns one of those into a bar across the
+      // player's screen, and a debug button must not put the game into a failure state.
+      button('Log a test line', '', () => {
+        console.log('debug: a log line');
+        console.warn('debug: a warning');
+        console.error('debug: an error', { from: 'the Console panel test button' });
+        paint();
+      }),
       search);
 
     el.append(section('Console', bar, chips, log,

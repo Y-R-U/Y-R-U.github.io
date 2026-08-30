@@ -54,16 +54,50 @@ developer tools."*
 
 | what | owns | state |
 |---|---|---|
-| Music library | `audio/music/**`, `data/music.json`, `docs/MUSIC.md`, `docs/SUNO.md`, `tools/music/**` | running ~1h; on Suno via browser, plus local ACE-Step comparison takes |
-| Level editor + hotspots | `js/dev/tabs/level.js`, `js/dev/level/`, `js/editor/**` | running |
-| Conversation editor | `js/dev/tabs/convo.js`, `js/dev/convo/` | running |
-| Character viewer + voices + barks | `js/dev/tabs/chars.js`, `js/dev/chars/`, `data/barks.json` | running |
+| Music library | `audio/music/**`, `data/music.json`, `docs/MUSIC.md`, `docs/SUNO.md`, `tools/music/**` | **DONE** — 25 ACE-Step tracks, 17.8 MB. **Suno never ran**: browser tools refused by the permission classifier. |
+| Level editor + hotspots | `js/dev/tabs/level.js`, `js/dev/level/`, `js/editor/**` | running; owes a fix to `js/editor/scene.test.mjs` (hard-codes 2 hotspots, level now has 7) |
+| Conversation editor | `js/dev/tabs/convo.js`, `js/dev/convo/` | **DONE** 172/172 tests, 33 real-click checks |
+| Character viewer + voices + barks | `js/dev/tabs/chars.js`, `js/dev/chars/`, `data/barks.json` | **DONE**; resumed to encode VO via `/api/encode` `voice-opus` |
 | Music box + sound studio + runtime | `js/dev/tabs/music.js`, `js/dev/music/`, `js/game/music.js`, `audio/studio/` | running |
-| Debug panels | `js/dev/tabs/debug.js`, `js/dev/debug/` | running |
+| Debug panels | `js/dev/tabs/debug.js`, `js/dev/debug/` | **DONE** — 10 sub-tabs, 40/40 click checks; also built `POST /api/encode` |
 | Interior art pass | `js/world/interior.js`, `materials.js`, `lighting.js`, `boards.js`, hall dressing in `academy.json` | running |
 
 **If they were killed by the usage limit**, the tab files already exist and parse. Re-brief only
 what is genuinely unfinished — read each tab file first rather than restarting it blind.
+
+## Integration facts discovered the hard way
+
+- **`hub.show(id)` drops extra arguments.** To open the Conversations tab on a specific node, call
+  `window.__wfConvo.open(nodeId)` *then* `ctx.hub.show('convo')`. Passing `{node:id}` as a second
+  argument to `show()` silently does nothing.
+- **`cam` is `none|close|two|wide`** — the arms `dialoguebox.js`'s `CAM` table actually has. The
+  contract never enumerated them; use these four everywhere.
+- **Renaming a conversation node does not rewrite level hotspots** — only internal `goto`/`next`.
+  The convo tab flags nodes nothing triggers; the level tab must flag `say` actions whose target is
+  missing. Between them both directions are covered.
+- **UI tests must run against an rsynced copy on a separate port**, not the live tree. The convo
+  agent's harness copies to `gms/3d/.wf-convotest` on 8797 and deletes it after. Follow that.
+- A transient `bayLines is not defined` from `interior.js` during the art agent's live edit is not
+  a real bug — it is a hoisted export. Re-check before chasing an error in a file you do not own.
+
+## Open question for Aaron
+
+**Conversation-line VO freshness is per-browser** (`wf.dev.convo.vohash`), while bark freshness is
+shared in `data/vo.json`. The ledger is keyed `{character, category, i}`, which a dialogue line has
+no answer for. Clearing the browser would regenerate every line clip. Fix is a `lines` section in
+the ledger keyed by node id + line index. Worth doing; not blocking.
+
+## Audio policy — Aaron's call, binding
+
+Compress at a sensible default, keep raws gitignored, and make the rate choice **a human A/B in the
+tool**. Machines keep only the checks they are good at — silent, truncated, clipped, stops-early.
+**Nothing machine-grades how good audio sounds.** The precedent: whisper scored a clip pool at
+90.7 % intelligibility that Aaron heard as "a computer voice from the 90s".
+
+`POST /api/encode` serves both music and voice, on its own CPU queue (never the GPU slot), with
+8 profiles carrying exact ffmpeg args. `preview:true` writes beside the shipped file; `promote` is
+a rename, so the bytes the ear approved are the bytes that ship. Re-encode from `raw/`, never from
+an already-compressed file.
 
 ## Not started
 

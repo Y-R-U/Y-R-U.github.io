@@ -22,8 +22,10 @@ export function shapeCentre(h, at = null) {
 // `at(id)` is the live position of a placed character, when there is a world to ask.
 export function waypoints(doc, cast = {}, at = null) {
   const out = [];
+  // yaw null means "keep whatever way the player is already facing" — better than inventing a
+  // direction for a waypoint you land exactly on top of.
   const push = (group, id, label, x, z, yaw, note = '') =>
-    out.push({ group, id, label, x: round(x), z: round(z), yaw: yaw || 0, note });
+    out.push({ group, id, label, x: round(x), z: round(z), yaw: Number.isFinite(yaw) ? yaw : null, note });
 
   if (doc?.start) push('Level', 'start', 'Player start', doc.start.x, doc.start.z, doc.start.yaw, 'where a new save begins');
 
@@ -33,7 +35,7 @@ export function waypoints(doc, cast = {}, at = null) {
     // Stand a little short of an interact hotspot so arriving does not immediately fire it; an
     // enter hotspot is the opposite, you want to land inside it.
     const back = h.trigger === 'interact' || h.trigger === 'click' ? Math.min(c.r || 2.5, 2) : 0;
-    push('Hotspots', h.id, h.name || h.id, c.x, c.z + back, facing(c.x, c.z + back, c.x, c.z),
+    push('Hotspots', h.id, h.name || h.id, c.x, c.z + back, back ? facing(c.x, c.z + back, c.x, c.z) : null,
       `${h.trigger}${c.live ? ' · live' : ''}${h.once ? ' · once' : ''}`);
   }
 

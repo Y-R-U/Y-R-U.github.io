@@ -263,7 +263,7 @@ test('the runtime releases an element when the plan stops the voice', () => {
   const rt = new MusicRuntime({ make: () => { const e = fakeEl(); made.push(e); return e; }, now: () => t });
   rt.load(M);
   rt.playSet('hall');
-  rt.stopMusic(0);
+  rt.stop(0);
   t = 100;
   rt.tick();
   eq(made[0].paused, true);

@@ -2,7 +2,8 @@ import { test, eq, ok, near } from '../../../tools/harness.mjs';
 import { normalise } from '../../editor/scene.js';
 import {
   slugify, uniqueId, deriveId, seedLevel, duplicateLevel, indexEntry, indexUpsert, indexRemove,
-  indexMove, exportObjects, sameObjects, textObjects, deleteImpact, yawTowards, yawDegrees,
+  indexMove, exportObjects, sameObjects, sameAsLoaded, textObjects, deleteImpact,
+  yawTowards, yawDegrees,
 } from './levelio.js';
 
 test('slugify keeps a level id filename-safe', () => {
@@ -79,6 +80,16 @@ test('exported objects lose the derived fields and keep the authored ones', () =
   ok(sameObjects(live, out));
   ok(!sameObjects(live, [{ ...live[0], x: 9 }]));
   eq(exportObjects(null), []);
+});
+
+test('a raw file and the world built from it do not read as drift', () => {
+  const authored = seedLevel('keep', 'The Keep');
+  // A hand-written object: no lod, no blk, half its parameters left to their defaults.
+  authored.objects.push({ id: 1, dist: 0, zone: 'light', type: 'sign', x: 3, z: 4, seed: 9, p: { text: 'Hi' } });
+  const world = normalise(authored).doc.objects;
+  ok(!sameObjects(authored.objects, world), 'the raw and loaded forms genuinely differ');
+  ok(sameAsLoaded(authored, world), 'but the file is still exactly what the world was built from');
+  ok(!sameAsLoaded(authored, world.map(o => ({ ...o, x: o.x + 5 }))), 'a real move is still drift');
 });
 
 test('text objects are found for every strings param', () => {

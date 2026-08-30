@@ -30,9 +30,9 @@
       "r": 0,
       "shape": {
         "k": "circle",
-        "x": 0,
-        "z": 1.32,
-        "r": 1.1
+        "x": -0.08,
+        "z": 1.59,
+        "r": 6.38
       },
       "trigger": "enter",
       "once": false,
@@ -41,7 +41,7 @@
       "actions": [
         {
           "k": "say",
-          "node": ""
+          "node": "academy.greeter.hello"
         }
       ]
     }

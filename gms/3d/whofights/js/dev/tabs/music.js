@@ -29,6 +29,12 @@ registerTab({
     const aud = new Auditioner(ROOT);
     const doc = await ctx.data.load('music');
 
+    // The game's own bed would play underneath everything auditioned here. Park it and put it
+    // back on the way out.
+    const game = globalThis.__wfMusic || null;
+    const parked = game?.state?.().setId || null;
+    if (parked) game.stop(300);
+
     const C = {
       ctx, aud, base: ROOT,
       doc: () => ctx.data.get('music') || { version: 1, tracks: [], sets: [] },
@@ -41,6 +47,7 @@ registerTab({
 
     root.innerHTML = '';
     const head = el('div', 'row');
+    head.style.marginBottom = '0';
     const subs = el('div', 'mus-sub');
     const studio = el('button', null, '🎛 Sound studio ↗');
     studio.title = 'the SFX bench — synthesised sounds, triaged';
@@ -48,8 +55,16 @@ registerTab({
     head.append(subs, studio);
 
     const stats = el('div', 'dim');
+    stats.style.fontSize = '11px';
+    const top = el('div', 'mus-top');
+    top.append(head, aud.bar(), stats);
     const body = el('div');
-    root.append(head, aud.bar(), stats, body);
+    root.append(top, body);
+    // The set list sticks below the header, so it has to know how tall the header is.
+    const measure = () => root.style.setProperty('--mus-top', `${top.offsetHeight}px`);
+    measure();
+    const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(measure) : null;
+    ro?.observe(top);
 
     let view = localStorage.getItem('wf.dev.music.view') || 'library';
     let mounted = null;
@@ -82,7 +97,7 @@ registerTab({
 
     paintView();
     this._off = ctx.data.onChange('music', () => { paintStats(); mounted?.paint?.(); });
-    this._stop = () => { mounted?.dispose?.(); aud.stop(); };
+    this._stop = () => { ro?.disconnect(); mounted?.dispose?.(); aud.stop(); if (parked) game.playSet(parked); };
     if (!doc?.tracks?.length) ctx.toast('data/music.json has no tracks yet', 'warn');
   },
 

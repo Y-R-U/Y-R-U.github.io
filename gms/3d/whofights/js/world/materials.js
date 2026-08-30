@@ -155,11 +155,14 @@ export function textureSet(zoneId, set) { return texSets[set](zone(zoneId)); }
 //
 // `slab` is the flag's long edge in metres and `tile` the metres one texture covers; the pair is
 // what stops a 35 m floor reading as brickwork. Cached per zone+size like every other set.
-export function flagSet(zoneId, slab = 1.35, tile = 5.4) {
+export function flagSet(zoneId, slab = 0.9, tile = 3.6) {
   const z = zone(zoneId);
+  // `square` is not a zone read, it is what a flag is: the generator's joint width is a fraction
+  // of the course height, so a rounded block at 0.9 m gives a 0.38 m mortar bed and the floor
+  // comes out as black bars. Square-cut is 0.135 m at the same size, which is a flagstone joint.
   // Worn flat by feet: a shallower joint than a wall, and more chipping than a wall gets.
-  const cfg = { ...z.stone, blockW: slab * 1.18, blockH: slab, blockShape: z.stone.blockShape,
-    jointDepth: z.stone.jointDepth * 0.62, chipping: Math.min(0.85, z.stone.chipping + 0.22),
+  const cfg = { ...z.stone, blockW: slab * 1.18, blockH: slab, blockShape: 'square',
+    jointDepth: z.stone.jointDepth * 0.5, chipping: Math.min(0.85, z.stone.chipping + 0.22),
     roughness: Math.min(1, z.stone.roughness + 0.06) };
   const label = `${z.id}:flag:${slab}:${tile}`;
   return bakeSurface(label, RES.flag, S => stone(S, cfg, tile, hashId(z.id) + 14));
@@ -167,7 +170,7 @@ export function flagSet(zoneId, slab = 1.35, tile = 5.4) {
 
 // Metres per tile the interior kit projects its own UVs at. Exported so interior.js and this
 // file cannot drift: `wall` and `wood` are literally the outdoor numbers.
-export const INTERIOR_TILE = { stone: TILE.wall, wood: TILE.wood, flag: 5.4, beam: 1.35, cloth: 1.0 };
+export const INTERIOR_TILE = { stone: TILE.wall, wood: TILE.wood, flag: 3.6, beam: 1.35, cloth: 1.0 };
 
 export function getMaterial(zoneId, surfaceName) {
   const key = `${zoneId}:${surfaceName}`;

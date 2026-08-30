@@ -90,8 +90,14 @@ function linksBlock(E) {
 
 function problemsBlock(E) {
   const list = nodeProblems(E.nodeId, E.node, E.doc, E.cast);
-  return h('div', { class: `problems${list.length ? '' : ' clean'}`,
+  return h('div', { class: `problems${list.length ? '' : ' clean'}`, 'data-role': 'convo-problems',
     text: list.length ? list.map(p => '• ' + p).join('\n') : 'this node is valid' });
+}
+
+// Typing does not redraw the editor, so this is how the problem list keeps up with the words.
+export function repaintProblems(host, E) {
+  const old = host.querySelector('[data-role=convo-problems]');
+  if (old && E.node) old.replaceWith(problemsBlock(E));
 }
 
 function lineCard(line, i, E) {

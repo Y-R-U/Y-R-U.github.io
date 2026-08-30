@@ -15,6 +15,8 @@ export const panel = {
     const dial = h('canvas', 'dbg-stick');
     dial.width = 180;
     dial.height = 180;
+    dial.style.width = '180px';
+    dial.style.height = '180px';
     const readout = h('div');
     const keys = h('div', 'dbg-chips');
     const raw = h('div');
@@ -37,7 +39,7 @@ export const panel = {
       h('p', 'dbg-note', 'This is the last command the player read, not a fresh one — reading the '
         + 'input here would swallow the frame\'s stick and the character would stall. Press a key or '
         + 'drag on the game with the hub closed and the mini-HUD up to watch it live.'),
-      h('div', 'dbg-cols', dial, readout)),
+      h('div', 'dbg-cols', h('div', null, dial), readout)),
       section('Keys held', keys),
       section('Raw', raw));
 
@@ -54,7 +56,7 @@ export const panel = {
         ['pointers down', String(i.pointers)],
         ['flip sides', i.flip ? 'yes' : 'no'],
         ['age', `${num((performance.now() - i.at) / 1000, 1)} s ago`],
-      ]) : h('div', 'empty', 'no input read yet — the game loop has to run at least once'));
+      ]) : h('div', 'empty', 'nothing read yet — the loop is stopped in here. Close the hub, move, and come back.'));
 
       clear(keys);
       for (const k of i?.keys || []) keys.append(h('span', 'dbg-chip on', k));

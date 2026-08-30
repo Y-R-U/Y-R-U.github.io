@@ -27,8 +27,14 @@ export function num(v, d) { return Number.isFinite(+v) ? +v : d; }
 const CSS = `
 #wf-dev .mus-sub { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
 #wf-dev .mus-sub button.on { background:#1d2a3a; border-color:#3a5878; color:#cfe3ff; }
-#wf-dev .mus-bar { position:sticky; top:0; z-index:3; display:flex; gap:10px; align-items:center;
-  padding:8px 10px; margin:0 0 12px; background:#111823; border:1px solid var(--line); border-radius:8px; }
+/* main is padded 14px 16px; the header spans it edge to edge so nothing shows through behind it,
+   and --mus-top (measured on mount) is what everything else sticks below. */
+#wf-dev .mus-top { position:sticky; top:-14px; z-index:3; padding:10px 16px 8px;
+  margin:-14px -16px 12px; background:#111823; border-bottom:1px solid var(--line); }
+#wf-dev .mus-top .mus-sub { margin-bottom:8px; }
+#wf-dev .mus-bar { display:flex; gap:10px; align-items:center; }
+#wf-dev .mus-side { position:sticky; top:calc(var(--mus-top, 90px) - 14px); align-self:flex-start;
+  max-height:calc(100vh - var(--mus-top, 90px) - 70px); overflow:auto; }
 #wf-dev .mus-bar .mus-now { flex:1 1 auto; min-width:0; font-size:12px; }
 #wf-dev .mus-bar .mus-now b { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 #wf-dev .mus-bar input[type=range] { flex:2 1 240px; accent-color:#5aa0e8; }

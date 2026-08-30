@@ -56,7 +56,7 @@ export const panel = {
         row.append(tw, h('span', null, r.label));
         if (r.kids) row.append(h('span', 'dim', ` (${r.kids})`));
         if (r.tris) row.append(h('span', 'dbg-t', `${fmt(r.tris)} tris`));
-        row.onclick = () => { state.selected = r.node; paint(); };
+        row.onclick = () => { state.selected = r.node; state.pickPoint = null; repaint(); };
         tree.append(row);
       }
     }
@@ -99,13 +99,18 @@ export const panel = {
         ])));
       }
 
+      // A merged ground chunk sits at the origin with its vertices already in world space, so
+      // the node's transform is a poor question to ask the level document. When the selection came
+      // from a pick, the point the ray actually hit is the honest one.
+      const at = state.pickPoint && state.selected === o ? state.pickPoint : p;
       const doc = g.level;
-      const entry = doc ? docEntryAt(doc, p.x, p.z, o2 => TYPES[o2.type].plan(o2.p)) : null;
+      const entry = doc ? docEntryAt(doc, at.x, at.z, o2 => TYPES[o2.type].plan(o2.p)) : null;
       detail.append(section('Level document', entry
         ? table(null, [
           [entry.inside ? 'stands inside' : 'nearest entry', `#${entry.o.id} ${entry.o.type} (${entry.o.zone})`],
           ['distance', entry.inside ? 'inside its footprint' : `${num(entry.dist, 1)} m away`],
           ['at', `${entry.o.x}, ${entry.o.z} · ry ${num(entry.o.ry, 3)}`],
+          ['asked about', `${num(at.x, 2)}, ${num(at.z, 2)}${at === p ? ' (the node\'s own position)' : ' (where the ray hit)'}`],
           ['params', { html: `<span class="dim">${JSON.stringify(entry.o.p)}</span>`, cls: 'wide' }],
         ])
         : h('div', 'dim', 'no level document loaded')));
@@ -119,13 +124,17 @@ export const panel = {
           paintDetail();
         }),
         button('Warp player here', '', () => {
-          const r = warpTo(ctx, { x: p.x, z: p.z, id: o.name || o.type, label: o.name });
-          ctx.toast(r.ok ? `warped to ${num(p.x, 1)}, ${num(p.z, 1)}` : r.error, r.ok ? 'good' : 'warn');
+          const r = warpTo(ctx, { x: at.x, z: at.z, id: o.name || o.type, label: o.name });
+          ctx.toast(r.ok ? `warped to ${num(at.x, 1)}, ${num(at.z, 1)}` : r.error, r.ok ? 'good' : 'warn');
         }),
         button('Log to console', '', () => { console.log('[debug] selected', o); ctx.toast('logged'); }),
       );
       detail.append(acts);
     }
+
+    const g0 = handles(ctx);
+    if (g0.scene && !open.size) open.add(g0.scene.uuid);
+    if (!state.selected) state.selected = g0.scene || null;
 
     const repaint = () => { paint(); paintDetail(); };
     repaint();
@@ -169,6 +178,7 @@ function arm(ctx) {
     const hits = ray.intersectObjects(g.scene.children, true).filter(x => x.object.visible);
     if (!hits.length) return ctx.toast('the ray hit nothing', 'warn');
     state.selected = hits[0].object;
+    state.pickPoint = { x: hits[0].point.x, y: hits[0].point.y, z: hits[0].point.z };
     for (let o = hits[0].object; o; o = o.parent) open.add(o.uuid);
     await window.__wfDev?.open?.();
     ctx.hub.show('debug');

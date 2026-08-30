@@ -8,9 +8,10 @@ import { registerTab } from '../hub.js';
 import { h, ensureCSS, promptCard } from '../convo/dom.js';
 import { deriveLinks, tree } from '../convo/links.js';
 import { blankNode, nodeProblems, uniqueId, slug, voName } from '../convo/model.js';
-import { renderEditor } from '../convo/editor.js';
+import { renderEditor, repaintProblems } from '../convo/editor.js';
 import { createForm, promoteForm } from '../convo/speaker.js';
 import { makeCache, lineHash, ttsJob, clipURL } from '../convo/vo.js';
+import { loadIndex } from '../chars/voindex.js';
 
 const HANDOFF_KEY = 'wf.dev.convo.open';
 let pending = null;
@@ -37,7 +38,7 @@ registerTab({
   async mount(el, ctx, arg) {
     ensureCSS();
     const cache = makeCache();
-    const state = { nodeId: null, search: '', onDisk: new Set(), sidecar: false, levelIds: [], levelList: [], banner: null };
+    const state = { nodeId: null, search: '', onDisk: new Set(), levelIds: [], levelList: [], banner: null };
 
     const doc = await ctx.data.load('conversations');
     await ctx.data.load('characters');
@@ -50,14 +51,10 @@ registerTab({
       if (!state.levelList.some(l => l.id === id)) state.levelList.push({ id, name: lv?.name || id, start: lv?.start });
     }
     await refreshDisk();
-    // audio/vo/index.json is the barks agent's sidecar and carries the same hash for a clip. It is
-    // fetched only when the listing says it is there, so a missing one is not a console 404.
-    if (state.sidecar) {
-      try {
-        const r = await fetch(new URL('../../../audio/vo/index.json', import.meta.url), { cache: 'no-store' });
-        if (r.ok) cache.merge(await r.json());
-      } catch { /* unreadable — the hashes just stay unknown */ }
-    }
+    // data/vo.json is the generated-clip ledger the character tab writes; it carries the same hash
+    // for any clip it made, so a clip generated over there is not regenerated over here.
+    cache.merge((await loadIndex(ctx.api))?.doc?.clips);
+    state.offline = !(await ctx.api.online());
 
     el.innerHTML = '';
     const bannerEl = h('div');
@@ -135,7 +132,7 @@ registerTab({
     // redraws.
     function edit(fn, label, { keep = false, coalesce = false } = {}) {
       ctx.data.mutate('conversations', null, fn, { label: `convo: ${label}`, coalesce });
-      if (keep) paintList();
+      if (keep) { paintList(); repaintProblems(editorEl, E); }
       else paintAll();
     }
 
@@ -160,6 +157,11 @@ registerTab({
     function paintBanner() {
       bannerEl.innerHTML = '';
       const { missing } = derived();
+      if (state.offline) {
+        bannerEl.append(h('div', { class: 'banner' }, h('b', { text: 'no dev server — ' }),
+          'edits are kept in this browser only and no voice-over can be generated. Run ',
+          h('code', { text: 'node tools/devserver.mjs' }), ' to write real files.'));
+      }
       if (state.banner) {
         bannerEl.append(h('div', { class: 'banner' },
           h('b', { text: `${state.banner} does not exist yet. ` }),
@@ -337,7 +339,6 @@ registerTab({
     async function refreshDisk() {
       const ls = await ctx.api.ls('audio/vo');
       state.onDisk = new Set((ls.files || []).filter(f => f.name.endsWith('.wav')).map(f => f.name.slice(0, -4)));
-      state.sidecar = (ls.files || []).some(f => f.name === 'index.json');
     }
 
     function playClip(name) {

@@ -70,6 +70,7 @@ requests for audio) plus:
 | `POST /api/flux` | `{prompt,out,width,height,seed}` | `{ok, job, position}` — then poll |
 | `GET  /api/job/<id>` | — | `{ok, state, note, position, url, error}` |
 | `GET  /api/queue` | — | `{ok, running, waiting, jobs}` |
+| `POST /api/encode` | `{src, profile, out, preview}` | `{ok, job, position}` — then poll. Also `{profiles:true}` and `{promote}` |
 
 `state` is `queued` → `running` → `done` | `error`.
 
@@ -253,6 +254,45 @@ line. It is batched because loading the 82M model costs ~6 s and a line costs ~1
 
 `keep_words` + `overlap` cut a take on the model's own word boundary — give it the whole sentence
 and keep the first n words, which is how you get an interruption that sounds interrupted.
+
+### Re-encoding audio
+
+```jsonc
+POST /api/encode { "profiles": true }                                   // the profile table
+POST /api/encode { "src": "audio/music/raw/tavern_01.mp3", "profile": "radio",
+                   "out": "tavern_01", "preview": true }                // → {job} — poll /api/job/<id>
+POST /api/encode { "promote": "audio/music/_preview/tavern_01.mp3" }    // keep it — a rename
+```
+
+`js/dev/api.js` has **no wrapper for this yet** — it is HTTP only until its owner adds one; a tab
+can reach it with `fetch(`${api.base}/api/encode`, …)` in the meantime.
+
+**Compression quality is a listening judgement, not a measurement.** This house has a scar from a
+machine score that rated 1990s-sounding speech at 90.7 % intelligible; the number was measuring a
+different quantity well. So the server only runs ffmpeg and reports sizes — which profile is good
+enough is decided by ear in the tools. That is what `preview` is for: the take lands in
+`audio/<kind>/_preview/` (gitignored) beside the shipped file so both can be played from the same
+origin and A/B'd, and `promote` is a **rename**, so the bytes the ear approved are the bytes that
+ship. A discarded preview is simply left where it is.
+
+`src` must be under `audio/music/raw`, `audio/vo/raw`, `audio/music` or `audio/vo`, and **should be
+a raw source**: re-encoding an already-compressed file stacks generation loss, which is audible well
+before it is measurable. `out` is a bare name; the directory comes from the profile's `kind`
+(`music` → `audio/music`, `voice` → `audio/vo`) unless `out` already names one.
+
+| profile | |
+|---|---|
+| `full` *(default)* | 56 kbps mono @ 32 kHz, compressor + limiter — the skyhammer full profile |
+| `radio` | stacked bandpass to a 1940s wireless, then 40 kbps mono @ 22 kHz |
+| `rich` | 96 kbps stereo @ 44.1 kHz |
+| `lossless` | 192 kbps stereo — for A/B against, not for shipping |
+| `voice` / `voice-lo` | 32 / 24 kbps mono mp3 @ 24 / 22 kHz |
+| `voice-opus` / `voice-opus-hi` | 24 / 40 kbps mono opus, `-application voip` — half the bytes of mp3 on speech |
+
+The exact ffmpeg arguments come back from `{profiles:true}`, so a tool never has to hard-code them.
+Encoding is CPU, so it runs on **its own queue** and never waits behind ACE-Step or mflux; the jobs
+are ordinary job records, so `/api/job/<id>` and `/api/queue` read them without knowing the
+difference. Output is written to a temp file and renamed, so a killed encode leaves the old clip.
 
 ### Music and images
 

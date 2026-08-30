@@ -221,14 +221,14 @@
       "zone": "light",
       "type": "billboard",
       "inside": 1,
-      "x": -13.6,
-      "z": -30,
+      "x": -10.8,
+      "z": -29.6,
       "ry": 0,
       "seed": 811030,
       "p": {
-        "w": 7.5,
-        "h": 4.6,
-        "lift": 2.4,
+        "w": 6.6,
+        "h": 3.6,
+        "lift": 1.9,
         "text": "Iron Contracts"
       }
     },
@@ -238,14 +238,14 @@
       "zone": "light",
       "type": "billboard",
       "inside": 1,
-      "x": -5.4,
-      "z": -30,
+      "x": -3.6,
+      "z": -29.6,
       "ry": 0,
       "seed": 811031,
       "p": {
-        "w": 7.5,
-        "h": 4.6,
-        "lift": 2.4,
+        "w": 6.6,
+        "h": 3.6,
+        "lift": 1.9,
         "text": "Bronze Contracts"
       }
     },
@@ -255,14 +255,14 @@
       "zone": "light",
       "type": "billboard",
       "inside": 1,
-      "x": 5.4,
-      "z": -30,
+      "x": 3.6,
+      "z": -29.6,
       "ry": 0,
       "seed": 811032,
       "p": {
-        "w": 7.5,
-        "h": 4.6,
-        "lift": 2.4,
+        "w": 6.6,
+        "h": 3.6,
+        "lift": 1.9,
         "text": "Gold Contracts"
       }
     },
@@ -272,14 +272,14 @@
       "zone": "light",
       "type": "billboard",
       "inside": 1,
-      "x": 13.6,
-      "z": -30,
+      "x": 10.8,
+      "z": -29.6,
       "ry": 0,
       "seed": 811033,
       "p": {
-        "w": 7.5,
-        "h": 4.6,
-        "lift": 2.4,
+        "w": 6.6,
+        "h": 3.6,
+        "lift": 1.9,
         "text": "New Adventures"
       }
     }
@@ -330,6 +330,128 @@
         {
           "k": "say",
           "node": "academy.greeter.hello"
+        }
+      ]
+    },
+    {
+      "id": "hs.door.yard",
+      "name": "The passage to the training yard",
+      "shape": {
+        "k": "circle",
+        "x": -15.9,
+        "z": -12.4,
+        "r": 2.6
+      },
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": null,
+      "actions": [
+        {
+          "k": "say",
+          "node": "academy.door.yard"
+        }
+      ]
+    },
+    {
+      "id": "hs.door.armoury.locked",
+      "name": "The armoury door (locked)",
+      "shape": {
+        "k": "circle",
+        "x": 15.9,
+        "z": -19.6,
+        "r": 2.6
+      },
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "not",
+        [
+          "flag",
+          "academy.key.armoury",
+          true
+        ]
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "academy.door.armoury.locked"
+        }
+      ]
+    },
+    {
+      "id": "hs.door.armoury",
+      "name": "The armoury door",
+      "shape": {
+        "k": "circle",
+        "x": 15.9,
+        "z": -19.6,
+        "r": 2.6
+      },
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "flag",
+        "academy.key.armoury",
+        true
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "academy.door.armoury"
+        }
+      ]
+    },
+    {
+      "id": "hs.door.dorm.locked",
+      "name": "The dormitory stair (locked)",
+      "shape": {
+        "k": "circle",
+        "x": 15.9,
+        "z": -12.4,
+        "r": 2.6
+      },
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "not",
+        [
+          "flag",
+          "academy.key.dorm",
+          true
+        ]
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "academy.door.dorm.locked"
+        }
+      ]
+    },
+    {
+      "id": "hs.door.dorm",
+      "name": "The dormitory stair",
+      "shape": {
+        "k": "circle",
+        "x": 15.9,
+        "z": -12.4,
+        "r": 2.6
+      },
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "flag",
+        "academy.key.dorm",
+        true
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "academy.door.dorm"
         }
       ]
     }

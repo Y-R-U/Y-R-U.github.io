@@ -109,7 +109,7 @@ function graph(canvas) {
   }
   if (!rows.length) {
     c.fillStyle = '#5d6b7d';
-    c.fillText('no samples yet — play for a moment with the hub closed', 8, hgt / 2);
+    c.fillText('no samples yet — play for a moment with the hub closed', 8, hgt - 12);
     return;
   }
   const bw = w / Math.max(60, rows.length);

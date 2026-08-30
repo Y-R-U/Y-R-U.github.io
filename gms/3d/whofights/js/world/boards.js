@@ -64,6 +64,10 @@ export function boardPanel(zoneId, { w, h, lift, text }) {
     [new THREE.BoxGeometry(0.26, lift + h, 0.26), (w / 2 - 0.13), (lift + h) / 2, -0.2],
     // a head rail, so a board on an eleven-metre wall has a top edge that reads
     [new THREE.BoxGeometry(w + 0.5, 0.24, 0.34), 0, lift + h + 0.12, -0.05],
+    // A backing board standing proud of the wall behind the face. Nothing in an interior casts a
+    // shadow here — the room is lit by ambient and sconces — so without a dark surround the
+    // boards read as a HUD strip composited over the masonry rather than as timber hung on it.
+    [new THREE.BoxGeometry(w + 0.34, h + 0.34, 0.12), 0, lift + h / 2, -0.15],
   ]);
   boardFace(g, text || 'Billboard', w - 0.5, h - 0.4, lift + h / 2, 0.12);
   g.userData = { kind: 'billboard', zoneId, text };

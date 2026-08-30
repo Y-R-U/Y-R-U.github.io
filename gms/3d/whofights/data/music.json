@@ -156,6 +156,17 @@
       "source": "acestep"
     },
     {
+      "id": "victory_sting_02",
+      "title": "Well Fought",
+      "file": "audio/music/victory_sting_02.mp3",
+      "kind": "instrumental",
+      "mood": "fanfare",
+      "seconds": 26,
+      "prompt": "short warm folk victory sting, instrumental, no vocals. 100 bpm, 6/8. harp arpeggio flourish, fiddle and whistle answer with a bright little tune, tambourine. small and human rather than orchestral. starts on the downbeat, no fade in. the instruments keep playing at full strength right to the very last beat and finish together on a held major chord — no early stop, no dead air at the end. no vocals.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
       "id": "defeat_sting_01",
       "title": "Not This Time",
       "file": "audio/music/defeat_sting_01.mp3",
@@ -184,7 +195,7 @@
       "kind": "song",
       "mood": "rowdy",
       "seconds": 130,
-      "prompt": "rowdy medieval tavern drinking song. gruff male lead vocal with a whole tavern of men and women shouting the chorus back in rough unison. 118 bpm, 4/4, stomping. fiddle, accordion, lute, bodhran, stamping boots and tankards on tables. live, raucous, slightly out of tune and completely joyful. clear diction on the lead vocal.",
+      "prompt": "medieval tavern drinking song. ONE clear male baritone lead vocal, close-miked and mixed loud right at the front — the lead voice is the loudest thing in the mix by far, every word crisp and clearly enunciated. a small crowd joins in only on the chorus, quietly, well behind the lead. 108 bpm, 4/4, stomping but sparse: just acoustic guitar, a single fiddle and a bodhran, plenty of space, no accordion, no brass, no wall of noise. warm and joyful. diction is the priority.",
       "lyrics": "[Verse 1]\n(male) I signed my name on the contract board\n(male) For a copper coin and a borrowed sword\n(male) And I came back muddy and I came back late\n(male) With a story worth twice what they paid\n\n[Chorus]\n(crowd) So pour it out, the ale runs low\n(crowd) Pour it out, the ale runs low\n(crowd) We'll be up at dawn and gone by noon\n(crowd) But the ale runs low tonight\n\n[Verse 2]\n(male) There's a boy at the Academy learning his letters\n(male) He'll be better than me and I hope he does better\n(male) But tonight he's here with a cup in his hand\n(male) And he sings just as loud as the rest of the band\n\n[Chorus]\n(crowd) So pour it out, the ale runs low\n(crowd) Pour it out, the ale runs low\n(crowd) We'll be up at dawn and gone by noon\n(crowd) But the ale runs low tonight\n\n[Outro]\n(crowd) The ale runs low tonight",
       "source": "acestep"
     },
@@ -217,7 +228,7 @@
       "kind": "song",
       "mood": "gruff",
       "seconds": 120,
-      "prompt": "call and response work song, sea-shanty style but landlocked. one gruff male caller, a big rough crowd of men and women answering in unison. 96 bpm, 4/4, heavy downbeat. almost no instruments — stamping feet, hands on a table, a single low accordion drone and a bodhran. voices carry everything. muscular, communal, unaccompanied feel, recorded in a big wooden room.",
+      "prompt": "call and response work song, landlocked shanty. ONE gruff male caller, close-miked, dry and very far forward, singing his lines completely unaccompanied and enunciating every word clearly. a crowd answers only the short 'haul away' response, lower in the mix. 92 bpm, 4/4, heavy downbeat. almost no instruments at all — stamping feet and a single bodhran, nothing else, long silences between phrases. the words must be clearly audible, not vocalised or hummed.",
       "lyrics": "[Verse 1]\n(male) There's a wagon in the mud\n(crowd) Haul away\n(male) And it's loaded to the hub\n(crowd) Haul away\n(male) And the axle's near in two\n(crowd) Haul away\n(male) And there's nothing else to do\n(crowd) Haul away, haul away\n\n[Chorus]\n(crowd) Heave, and the wheel comes round\n(crowd) Heave, and the rope holds sound\n(crowd) One more pull and we're on the road\n(crowd) Haul away, haul away\n\n[Verse 2]\n(male) I have carried worse than this\n(crowd) Haul away\n(male) I have carried it uphill\n(crowd) Haul away\n(male) I have carried it alone\n(crowd) Haul away\n(male) And I'm glad you're here, you know\n(crowd) Haul away, haul away\n\n[Chorus]\n(crowd) Heave, and the wheel comes round\n(crowd) Heave, and the rope holds sound\n(crowd) One more pull and we're on the road\n(crowd) Haul away, haul away",
       "source": "acestep"
     },
@@ -387,6 +398,7 @@
       "label": "One-shot stings",
       "tracks": [
         "victory_sting_01",
+        "victory_sting_02",
         "defeat_sting_01",
         "quest_sting_01"
       ],

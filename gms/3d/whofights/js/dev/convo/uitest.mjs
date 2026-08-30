@@ -73,6 +73,8 @@ await p.clickText('#wf-dev button', '＋ line');
 await sleep(500);
 await typeLine(1, 'And the second thing I always say.');
 check((await pack())[NODE].lines.length === 2, 'two lines');
+check(/no text/.test(await p.eval(`document.querySelector('#wf-dev [data-role=convo-problems]').textContent`)) === false,
+  'the problem list keeps up with what is being typed');
 
 // A speaker made from inside the conversation, per Aaron's brief.
 await pick('#wf-dev .convo-card.line select', 1, '__new_npc');
@@ -142,6 +144,10 @@ await p.clickText('#wf-dev .convo-choicebtn', '▸');
 await sleep(500);
 check(/academy.greeter.who/.test(await transcript()), 'taking it walks on into the node it goes to');
 await p.shot(`${OUT}/5-play.png`);
+await p.clickText('#wf-dev button', 'Transcript');
+await sleep(500);
+check(/run\(\) · \d+ nodes · \d+ lines/.test(await transcript()),
+  'Transcript re-walks the picks through dialogue.run()');
 
 await p.clickText('#wf-dev button', 'Save conversations');
 await sleep(1400);

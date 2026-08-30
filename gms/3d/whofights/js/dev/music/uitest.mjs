@@ -14,6 +14,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { attach, sleep } from '../cdp.mjs';
 
+// A background tab gets no requestAnimationFrame, so the game loop stops and a hotspot never
+// fires — which reads exactly like a broken trigger. Every page this drives is brought to front,
+// and the ones it is finished with are closed.
+async function front(p, port = 9345) {
+  await p.send('Page.bringToFront');
+  return p;
+}
+const closeTab = (id, port = 9345) => fetch(`http://127.0.0.1:${port}/json/close/${id}`).catch(() => {});
+
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const ROOT = path.resolve(new URL('../../..', import.meta.url).pathname);
 const OUT = process.argv[2] || '/tmp/wf-music';
@@ -49,6 +58,8 @@ const proc = await chrome(9345);
 try {
   await tabRun();
   await doorwayRun();
+  await generateRun();
+  if (process.env.WF_REAL_GEN) await realGenerateRun();
 } finally {
   proc.kill();
 }
@@ -61,8 +72,11 @@ process.exit(fails.length ? 1 : 0);
 
 async function tabRun() {
   console.log('\nthe tab, over data/__music.fixture.json');
+  // The fixture is checked in, so the run puts it back exactly as it found it. data/music.json is
+  // never in play: KINDS.music.file is redirected in the page below.
   const before = fs.readFileSync(path.join(ROOT, FIXTURE), 'utf8');
-  const p = await attach(9345, `${BASE}${PAGE}`);
+  const restore = () => fs.writeFileSync(path.join(ROOT, FIXTURE), before);
+  const p = await front(await attach(9345, `${BASE}${PAGE}`));
   try {
     check('page boots', await p.waitFor('!!window.__wf && window.__wf.ready', 40000),
       p.logs().filter(l => l.level === 'exception').map(l => l.text.split('\n')[0]).join(' | '));
@@ -100,17 +114,16 @@ async function tabRun() {
 
     await p.clickText('#wf-dev .side button', '+ New set');
     await sleep(250);
-    check('a new set appears in the document',
-      await p.eval(`(async () => (await import('${BASE}/js/dev/data.js')).default.get('music').sets.some(s => s.id === 'set_1'))()`));
+    const setId = await p.eval(`(async () => { const d = (await import('${BASE}/js/dev/data.js')).default.get('music');
+      return d.sets[d.sets.length - 1].id; })()`);
+    check('a new set appears in the document', /^set_\d+$/.test(setId), setId);
 
     // One at a time: the list repaints after each tick, so a batch of stale nodes ticks one box.
     for (let i = 0; i < 3; i++) {
       await p.click('#wf-dev .mus-pick input[type=checkbox]', i);
       await sleep(250);
-      console.log('    after tick', i, await p.eval(`(async () => JSON.stringify((await import('${BASE}/js/dev/data.js')).default.get('music').sets.find(s => s.id === 'set_1').tracks))()`),
-        'checked:', await p.eval('[...document.querySelectorAll("#wf-dev .mus-pick input[type=checkbox]")].slice(0,4).map(c=>c.checked).join(",")'));
     }
-    const picked = await p.eval(`(async () => (await import('${BASE}/js/dev/data.js')).default.get('music').sets.find(s => s.id === 'set_1').tracks.length)()`);
+    const picked = await p.eval(`(async () => (await import('${BASE}/js/dev/data.js')).default.get('music').sets.find(s => s.id === '${setId}').tracks.length)()`);
     check('ticking adds tracks to the set', picked === 3, `${picked} tracks`);
     await p.shot(`${OUT}/03-set-edited.png`);
 
@@ -148,7 +161,7 @@ async function tabRun() {
     await sleep(200);
     const url = await p.eval('window.__open || ""');
     check('the tab opens the studio with a way back', /audio\/studio\/index\.html\?from=/.test(url), url);
-    const s = await attach(9345, url);
+    const s = await front(await attach(9345, url));
     check('the studio boots', await s.waitFor('!!window.__lab && window.__lab.ready', 20000));
     check('it knows where it came from', (await s.eval('window.__lab.from || ""')).length > 0);
     check('the back control says so',
@@ -160,10 +173,27 @@ async function tabRun() {
     await s.shot(`${OUT}/07-studio.png`);
     console.log('  studio console:', s.logs().filter(l => l.level === 'error' || l.level === 'exception').map(l => l.text).join(' | ') || 'clean');
     s.close();
+    await closeTab(s.targetId);
+    await front(p);
 
-    const bad = p.logs().filter(l => (l.level === 'error' || l.level === 'exception') && !/favicon/.test(l.text));
-    check('no console errors in the tab', bad.length === 0, bad.map(l => l.text).slice(0, 3).join(' | '));
-  } finally { p.close(); }
+    check('no console errors in the tab', noise(p).length === 0, noise(p).map(l => l.text).slice(0, 3).join(' | '));
+  } finally { p.close(); await closeTab(p.targetId); restore(); }
+}
+
+// A fixed port is a trap here — five agents are working in this tree and one of them owns 8796.
+async function freePort() {
+  const net = await import('node:net');
+  return new Promise(res => {
+    const s = net.createServer();
+    s.listen(0, '127.0.0.1', () => { const { port } = s.address(); s.close(() => res(port)); });
+  });
+}
+
+// audio/music/*.mp3 is another agent's directory and it is being rewritten while this runs; a 404
+// on a track is a fact about the library, not a fault in the tab.
+function noise(p) {
+  return p.logs().filter(l => (l.level === 'error' || l.level === 'exception') &&
+    !/favicon/.test(l.text) && !/audio\/music\/.*\.mp3/.test(l.text));
 }
 
 async function waitForFile(before) {
@@ -179,7 +209,7 @@ async function waitForFile(before) {
 
 async function doorwayRun() {
   console.log('\nthe game — the level default, then the doorway');
-  const p = await attach(9345, `${BASE}/index.html`);
+  const p = await front(await attach(9345, `${BASE}/index.html`));
   try {
     check('game boots', await p.waitFor('!!window.__wf && window.__wf.ready', 40000),
       p.logs().filter(l => l.level === 'exception').map(l => l.text.split('\n')[0]).join(' | '));
@@ -208,12 +238,12 @@ async function doorwayRun() {
     check('both tracks are live during the cross-fade', mid.voices.length === 2, JSON.stringify(mid.voices));
     check('the outgoing one is on its way down', mid.voices.some(v => v.out && v.trackId === outdoorTrack), JSON.stringify(mid.voices));
 
-    await sleep(2200);
+    const settled = await p.waitFor('window.__wf.music.state().voices.length === 1', 12000);
     const after = await p.eval('window.__wf.music.state()');
     check('the fade finished and only the new set is playing',
-      after.voices.length === 1 && after.voices[0].gain > 0.3, JSON.stringify(after.voices));
+      settled && after.voices[0].gain > 0.3, JSON.stringify(after.voices));
     check('the element volumes followed the plan',
-      await p.eval('[...window.__wf.music.els.values()].every(e => e.volume > 0.2)'),
+      await p.waitFor('[...window.__wf.music.els.values()].every(e => e.volume > 0.2)', 5000),
       JSON.stringify(await p.eval('[...window.__wf.music.els.values()].map(e => e.volume)')));
 
     // Walking back in must not restart it.
@@ -227,15 +257,124 @@ async function doorwayRun() {
 
     // Mute in the save must silence it without stopping it.
     await p.eval('window.__wf.game.setSetting("mute", true)');
-    await sleep(600);
     check('the save\'s own mute silences the music',
-      await p.eval('[...window.__wf.music.els.values()].every(e => e.volume < 0.02)'),
+      await p.waitFor('[...window.__wf.music.els.values()].every(e => e.volume < 0.02)', 5000),
       JSON.stringify(await p.eval('[...window.__wf.music.els.values()].map(e => e.volume)')));
     await p.eval('window.__wf.game.setSetting("mute", false)');
 
-    await p.eval('document.body.classList.add("nohud")');
+    // A track file that is not there must not stall the set — the runtime treats an element error
+    // as an ended track and moves on.
+    await p.eval(`(() => { const rt = window.__wf.music;
+      rt.plan.tracksById.get(rt.state().playing[0]).file = 'audio/music/__nope.mp3';
+      rt.plan.stop(rt.now(), 0); rt.apply(rt.plan.tick(rt.now())); rt.playSet('academy_hall', { restart: true }); })()`);
+    check('a missing mp3 does not stall the set',
+      await p.waitFor('window.__wf.music.state().voices.length > 0 && window.__wf.music.state().playing.length > 0', 8000),
+      JSON.stringify(await p.eval('window.__wf.music.state()')));
+
     await p.shot(`${OUT}/08-ingame.png`);
-    const bad = p.logs().filter(l => (l.level === 'error' || l.level === 'exception') && !/favicon/.test(l.text));
-    check('no console errors in the game', bad.length === 0, bad.map(l => l.text).slice(0, 3).join(' | '));
-  } finally { p.close(); }
+    check('no console errors in the game', noise(p).length === 0, noise(p).map(l => l.text).slice(0, 3).join(' | '));
+  } finally { p.close(); await closeTab(p.targetId); }
+}
+
+
+// ---------------------------------------------------------------------------------------------
+// Generation, against an ACE-Step that is not there. The real backend is another agent's for now,
+// and the interesting behaviour is the failure anyway: queue, then a reason, then a usable form.
+
+async function generateRun() {
+  console.log('\ngeneration, with the backend unreachable');
+  const port = await freePort();
+  const srv = spawn(process.execPath, [path.join(ROOT, 'tools/devserver.mjs'), '--port', String(port)],
+    { env: { ...process.env, WF_ACE: 'http://127.0.0.1:9' }, stdio: 'ignore', cwd: ROOT });
+  // Believe nothing the page says until node has confirmed which server is answering: a leaked
+  // devserver on the same port once made a "failed to reach ACE-Step" test report a success.
+  let up = null;
+  for (let i = 0; i < 80; i++) {
+    try { const r = await fetch(`http://127.0.0.1:${port}/api/status`); if (r.ok) { up = await r.json(); break; } } catch { /* not yet */ }
+    await sleep(200);
+  }
+  check('the scratch dev server is up with ACE-Step unreachable', !!up && up.ace === false, JSON.stringify(up));
+  const base = `http://localhost:${port}`;
+  const p = await front(await attach(9345, `${base}/index.html`));
+  try {
+    check('second dev server up', await p.waitFor('!!window.__wf && window.__wf.ready', 40000));
+    check('the page is talking to that server and no other',
+      (await p.eval(`(async () => { const a = (await import('${base}/js/dev/api.js')).default;
+        await a.status({ force: true }); return String(a.base); })()`)) === '',
+      'api.base should be same-origin');
+    await p.eval(`(async () => { const m = await import('${base}/js/dev/data.js');
+      m.default.KINDS.music.file = () => '${FIXTURE}'; })()`);
+    await p.click('#wf-dev-btn');
+    await p.waitFor('[...document.querySelectorAll("#wf-dev nav button")].some(b => b.textContent.includes("Sound & music"))', 10000);
+    await p.clickText('#wf-dev nav button', 'Sound & music');
+    await p.waitFor('!!document.querySelector("#wf-dev .mus-sub")');
+    await p.clickText('#wf-dev .mus-sub button', 'Generate');
+    await p.waitFor('!!document.querySelector("#wf-dev textarea")');
+    await sleep(300);
+
+    check('it says ACE-Step is not answering',
+      /not answering/.test(await p.eval('document.querySelector("#wf-dev .banner").textContent')));
+
+    await p.eval(`(() => {
+      const set = (sel, v) => { const e = document.querySelectorAll('#wf-dev main ' + sel); const n = e[0];
+        n.value = v; n.dispatchEvent(new Event('input', { bubbles: true })); };
+      set('input[type=text]', '__uitest_track');
+      document.querySelectorAll('#wf-dev main textarea')[0].value = 'a short test prompt, instrumental, no vocals';
+      document.querySelectorAll('#wf-dev main textarea')[0].dispatchEvent(new Event('input', { bubbles: true }));
+    })()`);
+    await p.click('#wf-dev [data-act=generate]');
+    await sleep(400);
+    check('the button locks while a job is in flight — one GPU slot',
+      await p.eval(`document.querySelector('#wf-dev [data-act=generate]').disabled`));
+
+    const failed = await p.waitFor(`/failed after/.test(document.querySelector('#wf-dev [data-role=progress]')?.textContent || '')`, 90000);
+    check('the failure says why and how long it took', failed,
+      await p.eval(`document.querySelector('#wf-dev [data-role=progress]')?.textContent || '(no line)'`));
+    console.log('    reported:', await p.eval(`document.querySelector('#wf-dev [data-role=progress]')?.textContent || ''`));
+    check('and the button comes back',
+      !(await p.eval(`document.querySelector('#wf-dev [data-act=generate]').disabled`)));
+    await p.shot(`${OUT}/09-generate-failed.png`);
+    check('no console errors while it failed', noise(p).length === 0, noise(p).map(l => l.text).slice(0, 3).join(' | '));
+  } finally { p.close(); await closeTab(p.targetId); srv.kill(); }
+}
+
+
+// Opt-in: WF_REAL_GEN=1 puts one short job through the real ACE-Step. Only run it when nothing
+// else is using the GPU — the queue serialises, but a two-minute wait behind someone else's batch
+// is not a test result.
+async function realGenerateRun() {
+  console.log('\ngeneration, for real');
+  const out = '__toolcheck';
+  const p = await front(await attach(9345, `${BASE}/index.html`));
+  try {
+    await p.waitFor('!!window.__wf && window.__wf.ready', 40000);
+    await p.eval(`(async () => { const m = await import('${BASE}/js/dev/data.js');
+      m.default.KINDS.music.file = () => '${FIXTURE}'; })()`);
+    await p.click('#wf-dev-btn');
+    await p.waitFor('[...document.querySelectorAll("#wf-dev nav button")].some(b => b.textContent.includes("Sound & music"))', 10000);
+    await p.clickText('#wf-dev nav button', 'Sound & music');
+    await p.waitFor('!!document.querySelector("#wf-dev .mus-sub")');
+    await p.clickText('#wf-dev .mus-sub button', 'Generate');
+    await p.waitFor('!!document.querySelector("#wf-dev textarea")');
+    await p.eval(`(() => {
+      const ins = document.querySelectorAll('#wf-dev main input[type=text]');
+      ins[0].value = '${out}'; ins[0].dispatchEvent(new Event('input', { bubbles: true }));
+      ins[1].value = 'Tool check'; ins[1].dispatchEvent(new Event('input', { bubbles: true }));
+      const sec = document.querySelector('#wf-dev main input[type=number]');
+      sec.value = '20'; sec.dispatchEvent(new Event('input', { bubbles: true }));
+      const ta = document.querySelectorAll('#wf-dev main textarea')[0];
+      ta.value = 'short medieval lute flourish, instrumental, no vocals, 90 bpm, resolves and stops';
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    })()`);
+    await p.click('#wf-dev [data-act=generate]');
+    const done = await p.waitFor(`/done in/.test(document.querySelector('#wf-dev [data-role=progress]')?.textContent || '')`, 420000);
+    check('a real generation came back', done,
+      await p.eval(`document.querySelector('#wf-dev [data-role=progress]')?.textContent || ''`));
+    console.log('   ', await p.eval(`document.querySelector('#wf-dev [data-role=progress]')?.textContent || ''`));
+    check('and it can be auditioned before keeping it',
+      await p.waitFor(`!!document.querySelector('#wf-dev audio') && document.querySelector('#wf-dev audio').src.includes('${out}')`, 8000));
+    const r = await fetch(`${BASE}/audio/music/${out}.mp3`, { method: 'HEAD' });
+    check('the file is on disk', r.ok, `HTTP ${r.status}`);
+    await p.shot(`${OUT}/10-generated.png`);
+  } finally { p.close(); await closeTab(p.targetId); }
 }

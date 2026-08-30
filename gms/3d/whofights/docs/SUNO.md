@@ -1,32 +1,48 @@
-# WHO FIGHTS — SUNO prompt sheet
+# WHO FIGHTS — prompt and lyric record
 
-Every track in the game's music library, as a **Style** block and (for the sung ones) a **Lyrics**
-block. Paste the Style block into SUNO's *Style / Description* box and the Lyrics block into its
-*Lyrics* box. Nothing needs editing first.
+**The record of what the music library is and how it was made.** Every track, its exact prompt, its
+exact lyrics, and the settings used. Regenerate any of it — locally or on Suno — from this file.
 
-**You do not need this file.** The whole library already exists, generated locally with ACE-Step —
-see `docs/MUSIC.md`. This sheet is here so you can regenerate any track on SUNO if you prefer its
-take on it.
+**Nothing here was generated on Suno.** The whole library came from **ACE-Step 1.5 turbo** running
+locally on `http://localhost:8001`. The Suno path was attempted and **the browser automation was
+refused by the permission classifier on the first call**, so no Suno tab was opened, no generation
+run, and no credits spent. If Aaron wants Suno takes, that permission has to be granted first; the
+browser recipe is in `../../2d/skyhammer/docs/MUSIC_NOTES.md` and the prompts below drop straight
+into it.
 
-**Where a replacement goes**
+## Settings used (ACE-Step, all 25 tracks)
 
-```
-gms/3d/whofights/audio/music/<id>.mp3
-```
+| field | value |
+|---|---|
+| endpoint | `POST http://localhost:8001/release_task` → poll `/query_result` → fetch `/v1/audio?path=` |
+| model | `acestep-v15-turbo` (the plist default) |
+| `inference_steps` | **4** |
+| `batch_size` | 1 |
+| `thinking` | **true** for the sung tracks, **false** for instrumentals |
+| `audio_duration` | per track below — 20–135 s, all well inside the 480 s cap |
+| `vocal_language` | `en` |
+| `audio_format` | `mp3` (48 kHz stereo 128 k raw, shipped at 32 kHz mono 56 k) |
 
-Save it under exactly the `<id>` shown in each section heading and it drops straight in — the game
-reads `data/music.json`, which points at that filename. If your SUNO take is a different length,
-fix the `seconds` field for that track in `data/music.json` (or re-run
-`node tools/music/build_manifest.mjs` after updating `tools/music/results.json`); the fade/loop
-runtime uses it.
+## If you regenerate on Suno instead
 
-**Instrumentals**: tick SUNO's *Instrumental* switch and leave Lyrics empty. Every instrumental
-Style block below also says "no vocals" in words, because ACE-Step needed telling twice and SUNO
-occasionally does too.
+Save the take as `audio/music/<id>.mp3` — the id in each heading below — and it drops straight in;
+the game reads `data/music.json`, which points at that filename. Then set that track's
+`"source": "suno"` in `tools/music/jobs.json` and re-run
+`node tools/music/build_manifest.mjs` so the manifest records where it came from.
 
-**Lengths.** Beds are 100–135 s and are meant to loop, not to be sat through. The stings are 20–25 s
-and must resolve and stop. Do not let SUNO give you an 8-minute version of a bed — a take that runs
-to the length cap stops rather than ends, and it will sound broken in game.
+Suno wants a **shorter, tag-like** style string than the ACE-Step prompts below; trim them. For the
+instrumentals, tick Suno's *Instrumental* switch as well as saying "no vocals" in the text. **Set
+Duration explicitly — never leave it on Auto**: a take that runs to the 8:00 cap stops rather than
+ends, and these are loops.
+
+## The vocal recipe that worked
+
+Voice character comes from the **prompt**, never from lyric tags — `(male)` / `(female)` /
+`(crowd)` / `(both)` inline in the lyrics only help place vocals across sections. The one thing
+that mattered most: **ask for one close-miked lead and a thin arrangement.** A full band plus a
+crowd singing in unison comes back as mud. Two of the eight songs were regenerated for exactly this
+and the fix was to demand "ONE clear lead vocal, close-miked and mixed loud right at the front […]
+plenty of space, no wall of noise, diction is the priority".
 
 ---
 
@@ -218,12 +234,12 @@ short triumphant medieval fanfare, instrumental, no vocals. 110 bpm. natural tru
 
 ### `victory_sting_02` — Well Fought
 
-*fanfare, target 22s — local take: 22s*
+*fanfare, target 26s — local take: 26s*
 
 **Style**
 
 ```
-short warm folk victory sting, instrumental, no vocals. 100 bpm, 6/8. harp arpeggio flourish, fiddle and whistle answer with a bright little tune, tambourine, ends on a held major chord. small and human rather than orchestral. starts on the downbeat, no fade in. no vocals.
+short warm folk victory sting, instrumental, no vocals. 100 bpm, 6/8. harp arpeggio flourish, fiddle and whistle answer with a bright little tune, tambourine. small and human rather than orchestral. starts on the downbeat, no fade in. the instruments keep playing at full strength right to the very last beat and finish together on a held major chord — no early stop, no dead air at the end. no vocals.
 ```
 
 **Lyrics** — none. Instrumental.
@@ -264,7 +280,7 @@ very short bright medieval flourish, instrumental, no vocals. 96 bpm. plucked lu
 **Style**
 
 ```
-rowdy medieval tavern drinking song. gruff male lead vocal with a whole tavern of men and women shouting the chorus back in rough unison. 118 bpm, 4/4, stomping. fiddle, accordion, lute, bodhran, stamping boots and tankards on tables. live, raucous, slightly out of tune and completely joyful. clear diction on the lead vocal.
+medieval tavern drinking song. ONE clear male baritone lead vocal, close-miked and mixed loud right at the front — the lead voice is the loudest thing in the mix by far, every word crisp and clearly enunciated. a small crowd joins in only on the chorus, quietly, well behind the lead. 108 bpm, 4/4, stomping but sparse: just acoustic guitar, a single fiddle and a bodhran, plenty of space, no accordion, no brass, no wall of noise. warm and joyful. diction is the priority.
 ```
 
 **Lyrics**
@@ -386,7 +402,7 @@ slow celtic folk ballad, solo female vocal. clear unornamented alto voice, close
 **Style**
 
 ```
-call and response work song, sea-shanty style but landlocked. one gruff male caller, a big rough crowd of men and women answering in unison. 96 bpm, 4/4, heavy downbeat. almost no instruments — stamping feet, hands on a table, a single low accordion drone and a bodhran. voices carry everything. muscular, communal, unaccompanied feel, recorded in a big wooden room.
+call and response work song, landlocked shanty. ONE gruff male caller, close-miked, dry and very far forward, singing his lines completely unaccompanied and enunciating every word clearly. a crowd answers only the short 'haul away' response, lower in the mix. 92 bpm, 4/4, heavy downbeat. almost no instruments at all — stamping feet and a single bodhran, nothing else, long silences between phrases. the words must be clearly audible, not vocalised or hummed.
 ```
 
 **Lyrics**

@@ -23,11 +23,6 @@ export function handles(ctx) {
   };
 }
 
-export function playing(ctx) {
-  const g = handles(ctx);
-  return !!(g.player && g.player.enabled);
-}
-
 // Put the player somewhere. Leaves any interior first: the door script owns pos and yaw while it
 // is running, and warping out from under it strands the camera inside a wall.
 export function warpTo(ctx, to) {

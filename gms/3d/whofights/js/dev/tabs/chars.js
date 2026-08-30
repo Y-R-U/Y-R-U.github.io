@@ -23,6 +23,8 @@ const STYLE = `
 #wf-dev .chars-f { display: grid; grid-template-columns: 92px 1fr; gap: 6px 10px; align-items: center; margin-bottom: 6px; }
 #wf-dev .chars-f > label { color: #8494a8; font-size: 12px; }
 #wf-dev .chars-f input[type=range] { width: 150px; vertical-align: middle; }
+#wf-dev .chars-f input[type=color] { width: 46px; height: 26px; padding: 2px; vertical-align: middle; }
+#wf-dev .chars-f input[type=text] { max-width: 320px; }
 #wf-dev .chars-f .val { color: #d7e2f0; font: 12px ui-monospace, Menlo, monospace; margin-left: 8px; }
 #wf-dev .chars-unwired { border-top: 1px dashed #33404f; margin-top: 12px; padding-top: 10px; }
 #wf-dev .chars-unwired .pill { margin-left: 6px; }
@@ -91,6 +93,12 @@ registerTab({
     el.querySelector('[data-role=newid]').onkeydown = e => {
       if (e.key === 'Enter') this.create(el.querySelector('[data-role=newid]'));
     };
+
+    // One canvas and one WebGL context for the life of the tab: paintMain() rewrites its panel on
+    // every selection, and a renderer per repaint runs the browser out of contexts inside a minute.
+    this.canvasEl = document.createElement('canvas');
+    this.canvasEl.width = 320;
+    this.canvasEl.height = 400;
 
     this.barks = createBarks(ctx, {
       cast, id: () => this.sel,
@@ -176,7 +184,7 @@ registerTab({
       </div>
       <div class="chars-cols">
         <div class="chars-view">
-          <canvas data-role="canvas" width="320" height="400"></canvas>
+          <div data-role="canvasslot"></div>
           <div class="row" style="margin-top:6px">
             <label class="dim"><input type="checkbox" data-role="spin" checked> turntable</label>
             <label class="dim"><input type="checkbox" data-role="eyes"> hood eyes</label>
@@ -209,17 +217,19 @@ registerTab({
   },
 
   async startPreview() {
-    const canvas = this.mainEl.querySelector('[data-role=canvas]');
-    this.preview?.dispose();
-    this.preview = null;
-    try {
-      this.preview = await new Preview(canvas).start();
-    } catch (e) {
-      canvas.replaceWith(Object.assign(document.createElement('div'), {
-        className: 'empty', innerHTML: `<b>No 3D preview</b>${esc(e.message)}<br>
-          <span class="dim">the rig needs the importmap — open index.html, not selftest.html</span>` }));
+    const slot = this.mainEl.querySelector('[data-role=canvasslot]');
+    slot.appendChild(this.canvasEl);
+    if (this.previewFailed) {
+      slot.innerHTML = `<div class="empty"><b>No 3D preview</b>${esc(this.previewFailed)}<br>
+        <span class="dim">the rig needs the importmap — open index.html or js/dev/chars/bench.html,
+        not selftest.html</span></div>`;
       return;
     }
+    if (!this.preview) {
+      try { this.preview = await new Preview(this.canvasEl).start(); }
+      catch (e) { this.previewFailed = e.message; return this.startPreview(); }
+    }
+    this.preview.auto = this.mainEl.querySelector('[data-role=spin]').checked;
     for (const [role, key] of [['spin', 'auto'], ['eyes', 'eyes'], ['ruler', 'ruler']]) {
       const box = this.mainEl.querySelector(`[data-role=${role}]`);
       box.onchange = () => {

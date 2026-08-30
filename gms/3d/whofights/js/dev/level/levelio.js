@@ -1,7 +1,7 @@
 // Level bookkeeping with no DOM and no store: deriving an id from a name, seeding a document,
 // keeping data/levels/index.json in step, and working out what deleting one would break.
 
-import { emptyScene, TYPES } from '../../editor/scene.js';
+import { emptyScene, normalise, TYPES } from '../../editor/scene.js';
 
 const round = (v, p = 4) => Math.round((Number.isFinite(+v) ? +v : 0) * 10 ** p) / 10 ** p;
 
@@ -80,6 +80,17 @@ export function exportObjects(objects = []) {
 
 export const sameObjects = (a, b) =>
   JSON.stringify(exportObjects(a)) === JSON.stringify(exportObjects(b));
+
+// The file on disk is raw and the running world is normalised — every default filled in, every
+// id assigned — so comparing the two directly reports drift that is not there. This puts the
+// authored document through the same loader the game used before comparing.
+export function loadedObjects(doc) {
+  const r = normalise(doc);
+  return exportObjects(r.doc ? r.doc.objects : doc?.objects);
+}
+
+export const sameAsLoaded = (authored, world) =>
+  JSON.stringify(loadedObjects(authored)) === JSON.stringify(exportObjects(world));
 
 // Types carrying a `strings` param — the sign and the billboards, the only text in the world.
 export function textObjects(doc) {

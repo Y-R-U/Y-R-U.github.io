@@ -230,6 +230,9 @@ export class Preview {
     this.groundMesh?.material.map?.dispose();
     this.groundMesh?.material.dispose();
     this.groundMesh?.geometry.dispose();
+    // dispose() alone leaves the GL context alive, and a tab that rebuilds its preview exhausts
+    // the browser's context budget in a minute of clicking around the cast.
+    try { this.renderer?.forceContextLoss(); } catch { /* already lost */ }
     this.renderer?.dispose();
   }
 }

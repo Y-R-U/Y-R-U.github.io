@@ -13,6 +13,8 @@ const COL = {
   character: 0x8fe0dc,
 };
 
+const NOOP = () => {};
+
 export const KINDS = ['hotspots', 'colliders', 'interior', 'walk', 'probe', 'grid', 'characters'];
 
 export class Overlays {
@@ -67,6 +69,8 @@ export class Overlays {
     const g = this.groups[kind];
     try { this[`build_${kind}`]?.(g); }
     catch (e) { console.warn(`[debug] overlay ${kind} failed: ${e.message}`); }
+    // A debug wireframe must never be what a pick ray hits, here or anywhere else.
+    g.traverse(o => { o.raycast = NOOP; o.userData.wfDebug = true; });
   }
 
   build_hotspots(out) {
