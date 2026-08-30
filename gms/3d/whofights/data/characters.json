@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "characters": {
+    "player": {
+      "name": "You",
+      "body": "none",
+      "robe": "dark",
+      "gender": "x",
+      "voice": "am_echo",
+      "voiceSpeed": 1,
+      "barks": {
+        "idle": [
+          "Bored now.",
+          "What now?",
+          "I should be doing something."
+        ],
+        "curious": [
+          "Did you see that?",
+          "What's that?",
+          "Hm."
+        ],
+        "success": [
+          "Ha!",
+          "Got it.",
+          "Nice."
+        ],
+        "failure": [
+          "Nope.",
+          "That went badly.",
+          "Ow. And no."
+        ],
+        "hurt": [
+          "Ow!",
+          "That's going to bruise.",
+          "Right. Ow."
+        ],
+        "combat": [
+          "Come on!",
+          "Take that!",
+          "Still standing!"
+        ],
+        "spot": [
+          "Uh oh.",
+          "Right. Here we go."
+        ],
+        "thanks": [
+          "Thanks.",
+          "Cheers."
+        ],
+        "greet": [],
+        "farewell": [],
+        "grumble": [],
+        "refuse": [],
+        "wander": [],
+        "weather": []
+      },
+      "voicePitch": 0
+    },
+    "greeter": {
+      "name": "Instructor Vail",
+      "body": "robed",
+      "robe": "light",
+      "gender": "f",
+      "height": 1.08,
+      "hood": "up",
+      "voice": "bf_emma",
+      "voiceSpeed": 0.98,
+      "place": {
+        "level": "academy",
+        "x": 4,
+        "z": -18,
+        "yaw": 3.14159,
+        "inside": 1,
+        "wander": {
+          "x0": -10,
+          "x1": 10,
+          "z0": -26,
+          "z1": -10,
+          "speed": 0.85
+        }
+      },
+      "barks": {
+        "idle": [
+          "The hall is quieter without students in it. I have mixed feelings.",
+          "Somebody has moved the training dummies. Again.",
+          "Standards. Standards.",
+          "I have taught four hundred of you. Most are still alive.",
+          "One does not simply stand about. One supervises."
+        ],
+        "greet": [
+          "You must be the new one. Stand up straight.",
+          "Welcome to the Adventurer Academy. Try to look like you belong.",
+          "You're late. Everyone is, on their first day.",
+          "Good. You found the hall.",
+          "Ah. You'll do."
+        ],
+        "farewell": [
+          "Off you go. The world is waiting, impatiently.",
+          "Dismissed.",
+          "Come back when you have something to report.",
+          "Mind the step. It has had three of you this month."
+        ],
+        "curious": [
+          "Interesting. Fetch me a lantern.",
+          "Do not touch it. Look at it.",
+          "That was not on the timetable."
+        ],
+        "grumble": [
+          "Nobody reads the notices.",
+          "Chalk. We are out of chalk again.",
+          "I did ask for a bigger hall."
+        ],
+        "success": [
+          "Adequate. Do it again.",
+          "Better. Much better.",
+          "There. That is what it should look like.",
+          "Good. Now do it when someone is shouting at you."
+        ],
+        "failure": [
+          "That is why we practise.",
+          "Again. Slower.",
+          "Nobody was born knowing this."
+        ],
+        "thanks": [
+          "Noted, and appreciated.",
+          "You needn't have. Thank you."
+        ],
+        "refuse": [
+          "No. And that is a complete sentence.",
+          "Not until you have earned it.",
+          "Ask me when you can hold a stance for a minute."
+        ],
+        "weather": [
+          "Rain. The training yard will be a swamp.",
+          "Good drilling weather. You will disagree."
+        ]
+      },
+      "voicePitch": -2
+    },
+    "narrator": {
+      "name": "Narrator",
+      "body": "none",
+      "voice": "bm_fable",
+      "voiceSpeed": 0.95,
+      "barks": {
+        "idle": [],
+        "greet": [],
+        "farewell": [],
+        "curious": [],
+        "grumble": [],
+        "success": [],
+        "failure": [],
+        "hurt": [],
+        "combat": [],
+        "spot": [],
+        "thanks": [],
+        "refuse": [],
+        "wander": [],
+        "weather": []
+      },
+      "voicePitch": 0
+    }
+  }
+}

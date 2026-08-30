@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "clips": {
+    "player__spot__01": {
+      "who": "player",
+      "category": "spot",
+      "i": 0,
+      "file": "audio/vo/player__spot__01.wav",
+      "text": "Well. That is a lot of teeth.",
+      "voice": "am_echo",
+      "speed": 1,
+      "pitch": 0,
+      "ttsSpeed": 1,
+      "hash": "932e5b2c",
+      "seconds": 2.5,
+      "rms": -25.03,
+      "at": 1788095065219
+    },
+    "player__spot__02": {
+      "who": "player",
+      "category": "spot",
+      "i": 1,
+      "file": "audio/vo/player__spot__02.wav",
+      "text": "Right. Here we go.",
+      "voice": "am_echo",
+      "speed": 1,
+      "pitch": 0,
+      "ttsSpeed": 1,
+      "hash": "a4c7b192",
+      "seconds": 2,
+      "rms": -24.55,
+      "at": 1788095065219
+    }
+  }
+}

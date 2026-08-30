@@ -1,0 +1,21 @@
+<!doctype html><meta charset="utf-8"><title>characters bench</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- The dev tools over no game at all, but WITH the importmap, so the character preview can build
+     the real rig. js/dev/selftest.html cannot: it has no importmap and three does not resolve.
+     The dev server mounts /lib/ from gms/lib, so the absolute path works from any depth. -->
+<script type="importmap">
+{ "imports": {
+  "three": "/lib/three/0.160.0/three.module.js",
+  "three/addons/": "/lib/three/0.160.0/addons/"
+} }
+</script>
+<style>html,body{margin:0;height:100%;background:#0f151d;color:#8aa;font:13px system-ui}
+  #hud{position:fixed;left:12px;top:12px;font:12px ui-monospace,Menlo,monospace}</style>
+<div id="hud">characters bench — no game, real rig. ` toggles the hub.</div>
+<script type="module">
+import { bootDev } from '../boot.js';
+const app = { raf: 0, frames: 0, start() { const l = () => { app.raf = requestAnimationFrame(l); app.frames++; }; l(); } };
+app.start();
+window.__wf = { app, ready: true };
+bootDev({ app, world: null });
+</script>

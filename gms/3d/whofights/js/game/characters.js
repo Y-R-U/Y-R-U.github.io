@@ -1,0 +1,97 @@
+// data/characters.json — DEV_CONTRACT §7. Loads the cast, spawns the ones with a `place` in this
+// level as robed figures on the crowd rig, and answers "where is <id>?" for the hotspot runtime.
+//
+// A character with `body: "none"` is a voice and nothing else: a narrator, or an NPC that has not
+// been promoted yet. Promotion is `body: "robed"` plus a `place` — no other change.
+
+const ROBES = ['light', 'neutral', 'dark'];
+const ZI = { light: 0, neutral: 1, dark: 2 };
+
+export function normaliseCast(raw) {
+  const warnings = [];
+  const out = {};
+  const src = raw?.characters && typeof raw.characters === 'object' ? raw.characters : {};
+  for (const [id, c] of Object.entries(src)) {
+    if (!c || typeof c !== 'object') { warnings.push(`${id}: not an object`); continue; }
+    const body = c.body === 'robed' ? 'robed' : 'none';
+    const robe = ROBES.includes(c.robe) ? c.robe : 'neutral';
+    out[id] = {
+      id,
+      name: String(c.name || id),
+      body,
+      robe,
+      height: clamp(c.height, 0.85, 1.20, 1),
+      build: clamp(c.build, 0.85, 1.20, 1),
+      gender: ['f', 'm', 'x'].includes(c.gender) ? c.gender : 'x',
+      hood: c.hood === 'down' ? 'down' : 'up',
+      voice: typeof c.voice === 'string' ? c.voice : null,
+      voiceSpeed: clamp(c.voiceSpeed, 0.7, 1.3, 1),
+      voicePitch: clamp(c.voicePitch, -4, 4, 0),
+      barks: c.barks && typeof c.barks === 'object' ? c.barks : {},
+      place: c.place ? {
+        level: String(c.place.level || ''),
+        x: +c.place.x || 0,
+        z: +c.place.z || 0,
+        yaw: +c.place.yaw || 0,
+        inside: Number.isInteger(+c.place.inside) ? +c.place.inside : null,
+        wander: c.place.wander ? {
+          x0: +c.place.wander.x0, x1: +c.place.wander.x1,
+          z0: +c.place.wander.z0, z1: +c.place.wander.z1,
+          speed: +c.place.wander.speed || 0.8,
+        } : null,
+      } : null,
+    };
+    if (body === 'robed' && !out[id].place) warnings.push(`${id}: has a body but nowhere to stand`);
+  }
+  return { cast: out, warnings };
+}
+
+const clamp = (v, lo, hi, def) => (Number.isFinite(+v) ? Math.min(hi, Math.max(lo, +v)) : def);
+
+export class Characters {
+  // `people` is js/world/people.js; `world` answers floorOf(houseId) for a body standing indoors.
+  constructor(cast, { people, world, level }) {
+    this.cast = cast;
+    this.people = people;
+    this.bodies = new Map();
+    for (const c of Object.values(cast)) {
+      if (c.body !== 'robed' || !c.place || (level && c.place.level !== level)) continue;
+      const w = c.place.wander;
+      const fixY = c.place.inside ? world?.floorOf(c.place.inside) : null;
+      const a = people.place({
+        npc: c.id,
+        zi: ZI[c.robe] ?? 1,
+        vi: c.gender === 'f' ? 1 : 0,
+        kind: w ? 'stroll' : 'idle',
+        x: c.place.x, z: c.place.z,
+        heading: c.place.yaw,
+        speed: w ? w.speed : 0,
+        turn: w ? 0.22 : 0.09,
+        box: w ? [w.x0, w.x1, w.z0, w.z1] : null,
+        scale: c.height,
+        indoor: !!c.place.inside,
+        ...(fixY == null ? {} : { fixY }),
+      });
+      if (a) this.bodies.set(c.id, a);
+    }
+  }
+
+  get(id) { return this.cast[id] || null; }
+  body(id) { return this.bodies.get(id) || null; }
+
+  // The hotspot runtime's `characterAt`.
+  at(id) {
+    const a = this.bodies.get(id);
+    return a ? { x: a.x, z: a.z, y: a.y ?? 0 } : null;
+  }
+
+  report() {
+    return [...this.bodies].map(([id, a]) => ({ id, x: +a.x.toFixed(2), z: +a.z.toFixed(2) }));
+  }
+}
+
+export async function loadCast(url = 'data/characters.json') {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${url}: ${r.status}`);
+  return normaliseCast(await r.json());
+}

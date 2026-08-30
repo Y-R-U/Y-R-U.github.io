@@ -1,0 +1,36 @@
+<!doctype html><meta charset="utf-8"><title>dev tools self-test</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  html,body{margin:0;height:100%;background:#101820;color:#8aa;font:14px system-ui}
+  #hud{position:fixed;left:12px;top:12px;font:12px ui-monospace,Menlo,monospace;line-height:1.6}
+  canvas{display:block;width:100%;height:100%}
+</style>
+<canvas id="c"></canvas>
+<div id="hud"></div>
+<script type="module">
+// Stands in for index.html + js/main.js while the engine is being lifted: a rAF loop the hub can
+// pause, on the same window.__wf handle the real game uses.
+import { bootDev } from './boot.js';
+
+const c = document.getElementById('c'), g = c.getContext('2d');
+const app = {
+  frames: 0, raf: 0,
+  renderer: { info: { render: { calls: 3, triangles: 128000 } } },
+  start() {
+    const loop = () => {
+      app.raf = requestAnimationFrame(loop);
+      app.frames++;
+      c.width = innerWidth; c.height = innerHeight;
+      g.fillStyle = '#101820'; g.fillRect(0, 0, c.width, c.height);
+      g.fillStyle = `hsl(${app.frames % 360} 60% 55%)`;
+      g.fillRect(60 + Math.sin(app.frames / 30) * 40, 120, 90, 90);
+      document.getElementById('hud').textContent =
+        `fake game · frames ${app.frames}\nDEV button bottom right · \` toggles`;
+    };
+    loop();
+  },
+};
+app.start();
+window.__wf = { app, frames: () => app.frames, stats: () => ({ fps: 60, texMB: 12.5, frame: { avg: 4.2 } }), ready: true };
+bootDev({ app, world: { fake: true } });
+</script>

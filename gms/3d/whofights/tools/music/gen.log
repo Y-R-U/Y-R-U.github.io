@@ -1,0 +1,925 @@
+[1/25] menu_bed_01 (120s)
+  task 9368c1ba-937d-4644-9f31-77222a2d0629
+  … 22:02:07 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+medieval fantasy title theme, instrumental, no vocals. slow and noble, 68 bpm, 4/4. solo celtic harp states the melody alone, then a small warm string section joins underneath. a single low horn holds long notes far back. patient, hopeful, a little wistful. clean acoustic recording in a stone hall, natural reverb. loops gently, no big ending.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   1%|1         | 51/3500 [00:00<00:54, 63.41tok/s]
+  … 22:02:14 | INFO | [_load_model_context] Offloaded vae to CPU in 0.1891s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:02:15 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:02:25 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:26<00:06,  6.27s/steps]
+  … 22:03:06 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:03:08 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:03:25 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:03:28 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:03:30 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/a8591071-603b-1cf8-c50e-dfe828684938.mp3 (mp3, 48000Hz, 128k)
+  OK 120s peak -1.4dB rms -18.8dB (84s wall)
+[2/25] hall_bed_01 (120s)
+  task bd659722-35a3-4458-9d6c-1a3da9a8421b
+  … 22:03:31 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+renaissance chamber consort, instrumental, no vocals. stately and curious, 84 bpm, 4/4. harpsichord and plucked lute trade a polite walking figure while viola da gamba and recorder answer. light tambourine on the offbeat. courtly, orderly, slightly inquisitive — the sound of a busy guild hall going about its morning. dry warm acoustic, no drums kit, no synths.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   3%|2         | 89/3500 [00:02<01:23, 41.03tok/s]
+  … 22:03:41 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:03:43 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:03:53 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:24<00:20, 10.10s/steps]
+  … 22:04:33 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:04:38 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:04:54 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:04:55 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/dc18f0f4-832e-5117-2e7a-62cacc5dd631.mp3 (mp3, 48000Hz, 128k)
+  OK 120s peak -1.4dB rms -18.7dB (86s wall)
+[3/25] hall_bed_02 (110s)
+  task 2dc11148-c580-4ec3-a0e1-9747b1625a4a
+  … 22:04:57 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+medieval chamber music, instrumental, no vocals. warm and unhurried, 72 bpm, 6/8 lilt. celtic harp leads, low recorder and bowed cello underneath, occasional soft hand drum. gentle and welcoming rather than grand — background music for a hall where people are talking. acoustic, roomy stone reverb, no vocals at all, no modern instruments.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   1%|1         | 35/3500 [00:00<00:56, 61.66tok/s]
+  … 22:05:05 | INFO | [_load_model_context] Offloaded vae to CPU in 0.1897s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:05:06 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:05:15 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:24<01:13, 24.66s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:26<00:22, 11.08s/steps]
+  … 22:05:58 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:06:02 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:06:24 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:06:27 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:06:29 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/89383e6e-f59a-cbf2-0a8e-98fc0ba3d7fc.mp3 (mp3, 48000Hz, 128k)
+  OK 110s peak -1.5dB rms -18.9dB (93s wall)
+[4/25] meadow_bed_01 (125s)
+  task e71e936c-6c1d-40c5-a812-4810e7a55ce4
+  … 22:06:31 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+pastoral celtic folk instrumental, no vocals. gentle and open, 76 bpm, 6/8. tin whistle carries a simple pentatonic melody over fingerpicked acoustic guitar and harp, soft strings pad far behind, no percussion. sunlit, wide, walking-pace, faintly melancholy. field-recording air and birdsong feel. entirely instrumental.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   0%|          | 3/3500 [00:00<01:58, 29.46tok/s]
+  … MLX Gen (native):   2%|2         | 86/3500 [00:02<01:52, 30.23tok/s]
+  … 22:06:41 | INFO | [_load_model_context] Loaded vae to mps in 0.4736s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:06:44 | INFO | [_load_model_context] Offloaded vae to CPU in 0.5892s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:06:44 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:06:54 | INFO | [_load_model_context] Loaded text_encoder to mps in 9.5283s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:06:55 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:24<01:13, 24.61s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:27<00:23, 11.88s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:29<00:07,  7.37s/steps]
+  … 22:07:43 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:07:46 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:08:14 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:08:18 | INFO | [generate_music] VAE decode completed. Preparing audio tensors...
+  … 22:08:20 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/3b7a92cb-757e-4a9a-445f-8e06026e49f7.mp3 (mp3, 48000Hz, 128k)
+  OK 125s peak -1.4dB rms -20.5dB (110s wall)
+[5/25] meadow_bed_02 (110s)
+  task 6f39ad9b-ea54-46b7-b8cd-1d8516bc861c
+  … 22:08:21 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+bright folk instrumental, no vocals. cheerful travelling music, 104 bpm, 4/4. hammered dulcimer and fiddle play a bouncing melody together, upright bass walks, light bodhran keeps a steady walking pulse. major key, optimistic, breezy, forward motion. acoustic, close and dry. no singing.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   0%|          | 13/3500 [00:00<01:02, 55.64tok/s]
+  … MLX Gen (native):   3%|3         | 105/3500 [00:02<02:03, 27.57tok/s]
+  … 22:08:31 | INFO | [_load_model_context] Offloaded vae to CPU in 0.2312s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:08:31 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:08:41 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:20<01:00, 20.25s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:23<00:20, 10.05s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:25<00:06,  6.61s/steps]
+  … 22:09:27 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:09:30 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:10:03 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:10:06 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:10:09 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/7cec9b0f-b5d3-776e-9b52-96f6b9d3e0f1.mp3 (mp3, 48000Hz, 128k)
+  OK 110s peak -1.7dB rms -19.7dB (109s wall)
+[6/25] meadow_bed_03 (115s)
+  task 0d1617f4-77cb-4282-b3e7-03552eaa30d3
+  … 22:10:10 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+quiet folk instrumental, no vocals. wistful and slow, 62 bpm, 3/4 waltz. solo nylon guitar and low whistle, sparse harp harmonics, a distant bowed string drone. grey weather, thoughtful, unresolved. very soft dynamics, lots of space between notes. purely instrumental, no percussion, no vocals.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   3%|2         | 94/3500 [00:02<02:02, 27.89tok/s]
+  … 22:10:20 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:10:22 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:10:23 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:10:32 | INFO | [_load_model_context] Offloading text_encoder to CPU (RSS: 8669 MB)
+  … 22:10:33 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:27<01:23, 28.00s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:31<00:26, 13.32s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:34<00:08,  8.62s/steps]
+  … 22:11:28 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:11:31 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:12:11 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:12:12 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/480b2ccb-4af2-097c-8ae1-550b73b6c0da.mp3 (mp3, 48000Hz, 128k)
+  OK 115s peak -1.4dB rms -21.1dB (124s wall)
+[7/25] tavern_inst_01 (120s)
+  task 39f55a6f-a1bd-47e9-8869-64a20ca22e91
+  … 22:12:14 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+solo lute noodling in a tavern corner, instrumental, no vocals. loose and unhurried, 70 bpm, free feel. one lute improvising a simple modal tune, sometimes pausing, occasional low fiddle drone underneath. background music nobody is listening to, warm and cosy, fireside. slightly imperfect timing, human. no percussion, no vocals, no other instruments.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   1%|          | 26/3500 [00:00<01:00, 57.28tok/s]
+  … MLX Gen (native):   3%|2         | 103/3500 [00:02<02:01, 27.87tok/s]
+  … 22:12:24 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:12:26 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:12:36 | INFO | [_load_model_context] Offloading text_encoder to CPU (RSS: 8669 MB)
+  … 22:12:37 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:24<01:13, 24.38s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:28<00:24, 12.23s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:31<00:08,  8.36s/steps]
+  … 22:13:30 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:13:33 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:14:26 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:14:28 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/6ce1cb92-286b-ff4e-1080-f90e80f37455.mp3 (mp3, 48000Hz, 128k)
+  OK 120s peak -1.5dB rms -19.1dB (135s wall)
+[8/25] tavern_inst_02 (105s)
+  task 2ac105a2-08aa-40a3-9368-274b4524fa1b
+  … 22:14:29 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+fast irish tavern jig, instrumental, no vocals. rowdy and driving, 132 bpm, 6/8. fiddle and hurdy-gurdy in unison on a minor-key jig, tin whistle doubling on the repeat, bodhran and stamping feet, tambourine. sweaty, boisterous, a crowded floor. live acoustic, no vocals at all.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   0%|          | 10/3500 [00:00<01:24, 41.54tok/s]
+  … MLX Gen (native):   2%|1         | 62/3500 [00:02<02:47, 20.54tok/s]
+  … MLX Gen (native):   4%|4         | 140/3500 [00:05<02:02, 27.34tok/s]
+  … 22:14:41 | INFO | [_load_model_context] Offloaded vae to CPU in 0.2205s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:14:41 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:14:52 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:29<01:28, 29.64s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:33<00:29, 14.73s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:38<00:09, 10.00s/steps]
+  … 22:15:49 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:15:52 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:16:47 | INFO | [generate_music] VAE decode completed. Preparing audio tensors...
+  … 22:16:49 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/d0ce4a12-1312-ea67-918a-4dc3791c7bfa.mp3 (mp3, 48000Hz, 128k)
+  OK 105s peak -1.5dB rms -17.9dB (141s wall)
+[9/25] tension_01 (115s)
+  task 62e4123d-d92f-4a57-bde1-77369c69afd8
+  … 22:16:50 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+dark fantasy tension underscore, instrumental, no vocals. slow and creeping, 58 bpm. sustained low cello drone, sparse detuned dulcimer notes, a struck metal bowl ringing out every few bars, very quiet frame drum heartbeat. minor second dissonance held. dread building without ever arriving. no melody, no vocals, no drum kit.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   1%|1         | 48/3500 [00:02<03:12, 17.96tok/s]
+  … MLX Gen (native):   3%|3         | 111/3500 [00:05<01:59, 28.31tok/s]
+  … MLX Gen (native):   4%|4         | 157/3500 [00:07<02:26, 22.88tok/s]
+  … 22:17:06 | INFO | [_load_model_context] Loaded vae to mps in 0.1586s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:17:07 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:17:19 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:31<01:35, 31.73s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:36<00:31, 15.64s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:40<00:10, 10.39s/steps]
+  … 22:18:21 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:18:25 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:19:17 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:19:20 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/4236bc9b-9618-94e7-1537-89d61a6cd19e.mp3 (mp3, 48000Hz, 128k)
+  OK 115s peak -1.4dB rms -19.1dB (151s wall)
+[10/25] tension_02 (105s)
+  task d7125c47-b5a5-40df-87c7-46ef252feb2a
+  … 22:19:21 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+uneasy medieval underscore, instrumental, no vocals. 66 bpm, sparse. bowed double bass, tremolo violas high and thin, a single low male-register wooden flute playing three lonely notes, distant hand drum. cold stone corridor. suspense, not action. entirely instrumental, no singing, no synthesisers.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   0%|          | 5/3500 [00:00<01:15, 46.58tok/s]
+  … MLX Gen (native):   2%|1         | 65/3500 [00:02<02:25, 23.64tok/s]
+  … MLX Gen (native):   4%|3         | 130/3500 [00:05<02:14, 25.03tok/s]
+  … MLX Gen (native):   6%|5         | 193/3500 [00:07<02:16, 24.31tok/s]
+  … 22:19:36 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:19:38 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:19:49 | INFO | [_load_model_context] Offloading text_encoder to CPU (RSS: 8669 MB)
+  … 22:19:50 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:33<01:41, 33.81s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:39<00:34, 17.08s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:43<00:11, 11.40s/steps]
+  … 22:21:02 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:21:09 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:21:54 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:21:56 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:21:57 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/3249c6db-5eaf-4b56-f33a-5a4806a70b63.mp3 (mp3, 48000Hz, 128k)
+  OK 105s peak -1.4dB rms -17.8dB (159s wall)
+[11/25] combat_01 (110s)
+  task 4373f2ec-9a9d-44ff-9039-46f889b801e4
+  … 22:21:59 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+fantasy battle music, instrumental, no vocals. driving and urgent, 148 bpm, 4/4. big taiko and frame drums on a relentless pattern, low staccato strings ostinato, brass stabs on the accents, a wailing fiddle line over the top. minor key, aggressive, cinematic, no let-up. orchestral and folk instruments only, no vocals, no electric guitar.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   2%|1         | 64/3500 [00:01<01:28, 38.79tok/s]
+  … MLX Gen (native):   3%|2         | 93/3500 [00:04<03:29, 16.26tok/s]
+  … MLX Gen (native):   4%|4         | 151/3500 [00:06<01:32, 36.27tok/s]
+  … 22:22:14 | INFO | [_load_model_context] Loaded vae to mps in 0.1343s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:22:15 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:22:24 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:29<01:29, 29.67s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:33<00:28, 14.38s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:37<00:09,  9.66s/steps]
+  … 22:23:23 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:23:26 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:24:08 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/77c86225-2da9-f36f-73a0-1c9dcac5bc3d.mp3 (mp3, 48000Hz, 128k)
+  OK 110s peak -1.1dB rms -16.5dB (129s wall)
+[12/25] combat_02 (105s)
+  task ad5b9542-0704-4ab5-91c5-ce3fac9ed815
+  … 22:24:09 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+heroic fantasy battle music, instrumental, no vocals. 132 bpm, 4/4, marching. war drums and low toms, french horns and trombones carrying a bold rising theme, strings sawing underneath, clashing cymbals on the phrase ends. defiant and rallying rather than frightening. full orchestra, no vocals whatsoever.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   1%|          | 32/3500 [00:00<00:47, 73.38tok/s]
+  … 22:24:16 | INFO | [_load_model_context] Offloaded vae to CPU in 0.1692s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:24:17 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:24:27 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:29<01:27, 29.01s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:32<00:07,  7.87s/steps]
+  … 22:25:16 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:25:18 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:25:42 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:25:43 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/471d65bd-c64b-cdd4-60d8-660d045a8a13.mp3 (mp3, 48000Hz, 128k)
+  OK 105s peak -1.2dB rms -16dB (96s wall)
+[13/25] night_bed_01 (130s)
+  task 3374fcdd-1369-4511-a05f-d756bad84683
+  … 22:25:45 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+very quiet night ambience with melody, instrumental, no vocals. 54 bpm, extremely sparse. a single low wooden flute plays slow phrases with long silences between them, over a barely-audible bowed drone and the occasional harp harmonic. still, cold, peaceful, lonely. almost ambient. no percussion, no vocals, dynamic range very low.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   4%|4         | 144/3500 [00:02<00:49, 67.15tok/s]
+  … 22:25:54 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:26:04 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:25<01:16, 25.64s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:30<00:26, 13.45s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:34<00:09,  9.05s/steps]
+  … 22:26:54 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:26:58 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:27:32 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:27:38 | INFO | [_load_model_context] Offloaded vae to CPU in 4.4007s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:27:40 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/00e6ec97-3163-efed-d6f2-7869fdf8cf7b.mp3 (mp3, 48000Hz, 128k)
+  OK 130s peak -1.4dB rms -19.1dB (116s wall)
+[14/25] victory_sting_01 (25s)
+  task f62581ec-9cb3-44cd-98f4-767b1b3ef97e
+  … 22:27:41 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+short triumphant medieval fanfare, instrumental, no vocals. 110 bpm. natural trumpets and horns state a bright rising four-bar phrase, timpani roll, strings swell and a cymbal finishes it. major key, celebratory, resolves cleanly on the final chord. begins immediately, no intro. no vocals.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   3%|2         | 100/3500 [00:01<01:11, 47.43tok/s]
+  … 22:27:51 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:28:01 | INFO | [_load_model_context] Loaded text_encoder to mps in 9.9933s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:28:02 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … 22:28:50 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:28:52 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:29:03 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:29:04 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/f1eced19-02f8-02b5-5561-fdf62160c866.mp3 (mp3, 48000Hz, 128k)
+  OK 25s peak -1.2dB rms -18.6dB (85s wall)
+[15/25] victory_sting_02 (22s)
+  task a3a73ecc-f43c-4a2b-a095-be09e9056767
+  … 22:29:06 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+short warm folk victory sting, instrumental, no vocals. 100 bpm, 6/8. harp arpeggio flourish, fiddle and whistle answer with a bright little tune, tambourine, ends on a held major chord. small and human rather than orchestral. starts on the downbeat, no fade in. no vocals.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … 22:29:14 | INFO | [_load_model_context] Loaded vae to mps in 0.1236s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:29:15 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:29:26 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:30<01:31, 30.58s/steps]
+  … 22:30:18 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:30:24 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:30:33 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:30:34 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/f45a4d00-16d0-532a-a83b-491576ecaac9.mp3 (mp3, 48000Hz, 128k)
+  OK 22s peak -1.6dB rms -22.5dB (90s wall)
+[16/25] defeat_sting_01 (22s)
+  task c1620e36-a90d-4902-9b6b-5b9bafe2bfec
+  … 22:30:36 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+short sombre fantasy sting, instrumental, no vocals. 60 bpm. low strings descend through a minor cadence, a single struck bell, muted horn holds the last note and fades. disappointed rather than tragic. no percussion beyond the bell, no vocals. resolves and stops.
+
+# Lyric
+
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   0%|          | 14/3500 [00:00<00:55, 63.14tok/s]
+  … MLX Gen (native):   2%|2         | 77/3500 [00:02<04:43, 12.06tok/s]
+  … 22:30:46 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:30:56 | INFO | [_load_model_context] Offloading text_encoder to CPU (RSS: 8669 MB)
+  … 22:30:57 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:22<00:19,  9.61s/steps]
+  … 22:31:37 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:31:41 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:31:52 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:31:54 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/053f996b-5011-de58-4d10-fc988e54c531.mp3 (mp3, 48000Hz, 128k)
+  OK 22s peak -1.2dB rms -19.1dB (79s wall)
+[17/25] quest_sting_01 — already done, skipping
+[18/25] tavern_song_drinking_01 — already done, skipping
+[19/25] tavern_song_boast_01 (128s, vocals)
+  task 448f274b-116c-4a6a-b012-0acf632f15c3
+  … 22:31:55 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+comic boastful tavern song. one theatrical male baritone lead who clearly thinks a lot of himself, answered by a jeering mixed crowd on the chorus. 108 bpm, 4/4, swaggering. accordion, fiddle, plucked bass, snare rim and tambourine, occasional laughter. music hall energy in a medieval costume. crisp diction, comedic timing, family friendly.
+
+# Lyric
+[Verse 1]
+(male) I have wrestled a bear, or I nearly did
+(male) It was watching me closely from over the ridge
+(male) And I looked at the bear and the bear looked at me
+(male) And we came to an honourable treaty
+
+[Chorus]
+(crowd) He's the bravest man in the guild
+(male) I am
+(crowd) He has never once run from a fight
+(male) Well
+(crowd) He's the bravest man in the guild tonight
+
+[Verse 2]
+(male) I have swum the cold river with a pack on my back
+(male) I have carried three friends and a barrel of tack
+(male) I have stood in the doorway when nobody would
+(male) And I'd do it again if I thought that I could
+
+[Chorus]
+(crowd) He's the bravest man in the guild
+(male) I am
+(crowd) He has never once run from a fight
+(male) Well
+(crowd) He's the bravest man in the guild tonight
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   0%|          | 0/3500 [00:00<?, ?tok/s]
+  … MLX Gen (native):   3%|3         | 113/3500 [00:03<06:18,  8.94tok/s]
+  … MLX Gen (native):   4%|4         | 149/3500 [00:06<03:46, 14.81tok/s]
+  … MLX CFG Gen (native):   3%|3         | 21/650 [00:02<01:56,  5.42tok/s]
+  … MLX CFG Gen (native):   9%|9         | 59/650 [00:04<00:30, 19.24tok/s]
+  … MLX CFG Gen (native):  14%|#4        | 92/650 [00:07<00:27, 20.56tok/s]
+  … MLX CFG Gen (native):  20%|#9        | 127/650 [00:10<00:46, 11.32tok/s]
+  … MLX CFG Gen (native):  26%|##5       | 168/650 [00:12<00:30, 15.72tok/s]
+  … MLX CFG Gen (native):  30%|###       | 197/650 [00:15<00:25, 17.46tok/s]
+  … MLX CFG Gen (native):  37%|###6      | 240/650 [00:17<00:21, 19.17tok/s]
+  … MLX CFG Gen (native):  46%|####5     | 296/650 [00:20<00:14, 24.15tok/s]
+  … MLX CFG Gen (native):  55%|#####4    | 356/650 [00:22<00:12, 24.12tok/s]
+  … MLX CFG Gen (native):  64%|######4   | 416/650 [00:25<00:10, 22.70tok/s]
+  … MLX CFG Gen (native):  71%|#######1  | 464/650 [00:27<00:12, 14.53tok/s]
+  … MLX CFG Gen (native):  77%|#######6  | 499/650 [00:30<00:18,  8.08tok/s]
+  … MLX CFG Gen (native):  83%|########3 | 542/650 [00:32<00:08, 13.24tok/s]
+  … MLX CFG Gen (native):  92%|#########2| 600/650 [00:35<00:02, 17.49tok/s]
+  … 22:32:45 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:32:47 | INFO | ======================================================================
+  … 22:32:49 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:33:01 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:29<00:25, 12.54s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:33<00:08,  8.28s/steps]
+  … 22:33:55 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:33:59 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:34:40 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:34:41 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/c12b0769-6c15-33da-6153-d7b9c29976f6.mp3 (mp3, 48000Hz, 128k)
+  OK 128s peak -1.8dB rms -18dB (168s wall)
+[20/25] tavern_song_ballad_01 (135s, vocals)
+  task ed6e272b-6196-4333-a6b2-05c9e0ccc438
+  … 22:34:43 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+slow celtic folk ballad, solo female vocal. clear unornamented alto voice, close mic, front and centre. 66 bpm, 3/4. fingerpicked nylon guitar and celtic harp only, with a low whistle answering at the end of each line and a soft string pad on the choruses. no percussion. sad, tender, restrained, beautiful. traditional folk phrasing.
+
+# Lyric
+[Verse 1]
+(female) She was seventeen and she signed her name
+(female) On the lowest line of the contract board
+(female) Her mother said the road was long
+(female) Her father said no more
+
+[Chorus]
+(female) But the ridge was green and the morning wide
+(female) And she went up with the sun
+(female) And whatever it is you're waiting for
+(female) She is halfway there, and gone
+
+[Verse 2]
+(female) They say she keeps a lantern lit
+(female) In a tower on the eastern side
+(female) And every year another one
+(female) Goes walking up that ridge
+
+[Chorus]
+(female) And the ridge was green and the morning wide
+(female) And she went up with the sun
+(female) And whatever it is you're waiting for
+(female) She is halfway there, and gone
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   0%|          | 8/3500 [00:00<00:47, 74.17tok/s]
+  … MLX CFG Gen (native):   0%|          | 0/685 [00:00<?, ?tok/s]
+  … MLX CFG Gen (native):  10%|9         | 66/685 [00:02<00:45, 13.60tok/s]
+  … MLX CFG Gen (native):  20%|##        | 140/685 [00:05<00:18, 29.51tok/s]
+  … MLX CFG Gen (native):  29%|##9       | 201/685 [00:07<00:17, 27.86tok/s]
+  … MLX CFG Gen (native):  40%|###9      | 271/685 [00:10<00:17, 24.20tok/s]
+  … MLX CFG Gen (native):  47%|####6     | 321/685 [00:12<00:17, 21.21tok/s]
+  … MLX CFG Gen (native):  54%|#####4    | 373/685 [00:15<00:13, 22.49tok/s]
+  … MLX CFG Gen (native):  63%|######2   | 430/685 [00:17<00:11, 22.50tok/s]
+  … MLX CFG Gen (native):  72%|#######1  | 490/685 [00:20<00:07, 26.89tok/s]
+  … MLX CFG Gen (native):  80%|########  | 550/685 [00:22<00:05, 25.55tok/s]
+  … MLX CFG Gen (native):  90%|########9 | 616/685 [00:25<00:02, 24.39tok/s]
+  … 22:35:18 | INFO | [generate_music] Decoding audio codes for item 0...
+  … 22:35:21 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:35:30 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:28<01:24, 28.01s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:31<00:27, 13.72s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:35<00:09,  9.11s/steps]
+  … 22:36:22 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:36:26 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:37:10 | INFO | [generate_music] VAE decode completed. Preparing audio tensors...
+  … 22:37:12 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/a9e819cc-5bda-9846-0917-eb2f599ad8f6.mp3 (mp3, 48000Hz, 128k)
+  OK 135s peak -1.4dB rms -16dB (150s wall)
+[21/25] tavern_song_work_01 (120s, vocals)
+  task 5e87696b-5f07-4fb2-a543-6c667ba64b1f
+  … 22:37:13 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+call and response work song, sea-shanty style but landlocked. one gruff male caller, a big rough crowd of men and women answering in unison. 96 bpm, 4/4, heavy downbeat. almost no instruments — stamping feet, hands on a table, a single low accordion drone and a bodhran. voices carry everything. muscular, communal, unaccompanied feel, recorded in a big wooden room.
+
+# Lyric
+[Verse 1]
+(male) There's a wagon in the mud
+(crowd) Haul away
+(male) And it's loaded to the hub
+(crowd) Haul away
+(male) And the axle's near in two
+(crowd) Haul away
+(male) And there's nothing else to do
+(crowd) Haul away, haul away
+
+[Chorus]
+(crowd) Heave, and the wheel comes round
+(crowd) Heave, and the rope holds sound
+(crowd) One more pull and we're on the road
+(crowd) Haul away, haul away
+
+[Verse 2]
+(male) I have carried worse than this
+(crowd) Haul away
+(male) I have carried it uphill
+(crowd) Haul away
+(male) I have carried it alone
+(crowd) Haul away
+(male) And I'm glad you're here, you know
+(crowd) Haul away, haul away
+
+[Chorus]
+(crowd) Heave, and the wheel comes round
+(crowd) Heave, and the rope holds sound
+(crowd) One more pull and we're on the road
+(crowd) Haul away, haul away
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   4%|4         | 155/3500 [00:02<00:49, 67.31tok/s]
+  … MLX CFG Gen (native):   6%|5         | 34/610 [00:01<00:39, 14.42tok/s]
+  … MLX CFG Gen (native):  16%|#5        | 95/610 [00:03<00:17, 30.28tok/s]
+  … MLX CFG Gen (native):  26%|##6       | 159/610 [00:06<00:18, 24.57tok/s]
+  … MLX CFG Gen (native):  38%|###7      | 229/610 [00:09<00:16, 23.66tok/s]
+  … MLX CFG Gen (native):  47%|####7     | 288/610 [00:11<00:11, 28.01tok/s]
+  … MLX CFG Gen (native):  58%|#####7    | 351/610 [00:14<00:11, 22.06tok/s]
+  … MLX CFG Gen (native):  68%|######8   | 417/610 [00:16<00:07, 26.01tok/s]
+  … MLX CFG Gen (native):  78%|#######7  | 474/610 [00:19<00:05, 24.10tok/s]
+  … MLX CFG Gen (native):  89%|########8 | 540/610 [00:21<00:02, 24.99tok/s]
+  … 22:37:46 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:37:48 | INFO | [_load_model_context] Offloaded vae to CPU in 0.2339s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:37:48 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:37:59 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:27<01:21, 27.15s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:31<00:27, 13.51s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:33<00:08,  8.56s/steps]
+  … 22:38:51 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:38:55 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:39:33 | INFO | [generate_music] VAE decode completed. Preparing audio tensors...
+  … 22:39:34 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/34aacea2-d784-a5df-2157-46c9835bc64f.mp3 (mp3, 48000Hz, 128k)
+  OK 120s peak -1.5dB rms -16.1dB (142s wall)
+[22/25] tavern_song_jig_01 (125s, vocals)
+  task 69a83965-915c-43d8-acbc-35d5d894e4a3
+  … 22:39:35 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+fast tavern jig with singing, male and female duet trading lines and singing the chorus together in harmony. 138 bpm, 6/8, relentless. fiddle, hurdy-gurdy, tin whistle, bouzouki, bodhran and stamping. breathless, dancing, grinning. live and loud. both voices bright and clear, no growling.
+
+# Lyric
+[Verse 1]
+(female) Well the fiddler's got his elbow up
+(male) And the floor has got a beat
+(both) And there's nobody left sitting down
+(both) With their boots beneath the seat
+
+[Chorus]
+(both) Boots under the table, boots on the floor
+(both) Boots going out through the tavern door
+(both) Dance while the candle's tall
+(both) We ride at dawn and that's all
+
+[Verse 2]
+(male) I've a blister and a broken strap
+(female) And a shoulder full of rain
+(both) But the fiddler doesn't care for that
+(both) So we're up and round again
+
+[Chorus]
+(both) Boots under the table, boots on the floor
+(both) Boots going out through the tavern door
+(both) Dance while the candle's tall
+(both) We ride at dawn and that's all
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   0%|          | 14/3500 [00:00<00:53, 65.44tok/s]
+  … MLX Gen (native):   3%|3         | 120/3500 [00:02<02:01, 27.77tok/s]
+  … MLX CFG Gen (native):   2%|2         | 14/635 [00:00<00:28, 22.03tok/s]
+  … MLX CFG Gen (native):  11%|#         | 67/635 [00:03<00:21, 26.11tok/s]
+  … MLX CFG Gen (native):  20%|#9        | 124/635 [00:05<00:23, 21.34tok/s]
+  … MLX CFG Gen (native):  29%|##8       | 181/635 [00:08<00:22, 20.21tok/s]
+  … MLX CFG Gen (native):  37%|###7      | 238/635 [00:10<00:14, 26.61tok/s]
+  … MLX CFG Gen (native):  46%|####6     | 293/635 [00:13<00:17, 19.62tok/s]
+  … MLX CFG Gen (native):  53%|#####2    | 335/635 [00:15<00:17, 16.89tok/s]
+  … MLX CFG Gen (native):  58%|#####7    | 368/635 [00:18<00:12, 21.02tok/s]
+  … MLX CFG Gen (native):  66%|######5   | 418/635 [00:20<00:12, 17.83tok/s]
+  … MLX CFG Gen (native):  74%|#######3  | 467/635 [00:23<00:08, 20.69tok/s]
+  … MLX CFG Gen (native):  82%|########1 | 519/635 [00:25<00:06, 18.94tok/s]
+  … MLX CFG Gen (native):  90%|######### | 573/635 [00:28<00:02, 25.25tok/s]
+  … MLX CFG Gen (native):  97%|#########6| 613/635 [00:30<00:00, 22.76tok/s]
+  … 22:40:18 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:40:20 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:40:30 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:24<01:12, 24.05s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:28<00:24, 12.41s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:32<00:08,  8.65s/steps]
+  … 22:41:23 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:41:26 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:42:14 | INFO | [generate_music] Done! Generated 1 audio tensors.
+  … 22:42:16 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/005102b2-c571-fcb3-b335-2a6a7fe07c17.mp3 (mp3, 48000Hz, 128k)
+  OK 125s peak -1.3dB rms -19.1dB (161s wall)
+[23/25] tavern_song_lament_01 (130s, vocals)
+  task 2704ef3c-b66d-4dad-9dfb-6b1b8b54716b
+  … 22:42:17 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+slow tavern lament, solo male voice, weathered tenor, singing almost unaccompanied. 58 bpm, 3/4. one quiet lute and a low bowed drone, a second male voice joining softly in harmony only on the last chorus. no percussion. dignified grief, understated, everyone in the room gone quiet. very intimate close recording.
+
+# Lyric
+[Verse 1]
+(male) Ten went out on the northern road
+(male) Ten went out in the spring
+(male) Nine came back with the wagon and the gold
+(male) And nobody wants to sing
+
+[Chorus]
+(male) So fill the cup and set it down
+(male) At the place we always keep
+(male) And say the name, and say it plain
+(male) And let the fire burn deep
+
+[Verse 2]
+(male) She was better on the rope than me
+(male) She was better on the climb
+(male) And she'd tell me now to drink it up
+(male) And stop wasting good time
+
+[Chorus]
+(both) So fill the cup and set it down
+(both) At the place we always keep
+(both) And say the name, and say it plain
+(both) And let the fire burn deep
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   1%|          | 23/3500 [00:00<01:18, 44.39tok/s]
+  … MLX Gen (native):   2%|2         | 72/3500 [00:03<01:24, 40.50tok/s]
+  … MLX Gen (native):   4%|3         | 132/3500 [00:05<04:01, 13.95tok/s]
+  … MLX CFG Gen (native):   4%|4         | 27/660 [00:01<00:49, 12.76tok/s]
+  … MLX CFG Gen (native):  12%|#1        | 78/660 [00:04<00:30, 19.22tok/s]
+  … MLX CFG Gen (native):  18%|#7        | 118/660 [00:06<00:34, 15.79tok/s]
+  … MLX CFG Gen (native):  24%|##3       | 156/660 [00:09<00:48, 10.46tok/s]
+  … MLX CFG Gen (native):  30%|###       | 201/660 [00:11<00:25, 17.80tok/s]
+  … MLX CFG Gen (native):  37%|###6      | 241/660 [00:14<00:21, 19.70tok/s]
+  … MLX CFG Gen (native):  42%|####1     | 277/660 [00:16<00:17, 22.02tok/s]
+  … MLX CFG Gen (native):  48%|####8     | 317/660 [00:19<00:17, 19.53tok/s]
+  … MLX CFG Gen (native):  54%|#####4    | 359/660 [00:21<00:31,  9.52tok/s]
+  … MLX CFG Gen (native):  60%|######    | 396/660 [00:24<00:22, 11.99tok/s]
+  … MLX CFG Gen (native):  67%|######6   | 442/660 [00:26<00:12, 18.13tok/s]
+  … MLX CFG Gen (native):  75%|#######5  | 498/660 [00:29<00:06, 24.87tok/s]
+  … MLX CFG Gen (native):  83%|########3 | 548/660 [00:31<00:04, 25.00tok/s]
+  … MLX CFG Gen (native):  91%|#########1| 602/660 [00:34<00:02, 22.44tok/s]
+  … 22:43:05 | INFO | [generate_music] Decoding audio codes for item 0...
+  … 22:43:07 | INFO | [_load_model_context] Offloaded vae to CPU in 0.2510s (RSS: 8669 -> 8669 MB, delta: +0 MB)
+  … 22:43:07 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:43:16 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:21<01:04, 21.64s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:28<00:25, 12.81s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:32<00:08,  8.86s/steps]
+  … 22:44:07 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:44:10 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:44:58 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:44:59 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:45:01 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/6cfd91e6-bbbe-7156-c1a6-6d64d6312269.mp3 (mp3, 48000Hz, 128k)
+  OK 130s peak -1.2dB rms -18.9dB (167s wall)
+[24/25] tavern_song_anthem_01 (122s, vocals)
+  task 9a93bbdd-95bb-4875-b85f-20b5d9dd8e5f
+  … 22:45:04 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+silly guild anthem sung by a whole tavern, mixed male and female crowd in loud rough unison with a single male voice interjecting the jokes. 124 bpm, 4/4, marching stomp. accordion, brass band oompah, snare drum, tankards, cheering. proud and completely ridiculous. call and response shouting on the chorus. family friendly, clear diction.
+
+# Lyric
+[Verse 1]
+(crowd) We are the finest in the land
+(crowd) It says so on the sign
+(crowd) We painted it ourselves last week
+(crowd) And honestly, it's fine
+
+[Chorus]
+(crowd) Who fights? We fight
+(crowd) Who pays? They pay
+(crowd) Who is going to clean the hall tonight
+(male) Not me
+(crowd) Hooray
+
+[Verse 2]
+(crowd) We've a wizard who has lost his hat
+(crowd) A knight who's lost his horse
+(crowd) A cook who is a better shot
+(crowd) Than anyone, of course
+
+[Chorus]
+(crowd) Who fights? We fight
+(crowd) Who pays? They pay
+(crowd) Who is going to clean the hall tonight
+(male) Not me
+(crowd) Hooray
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   1%|          | 27/3500 [00:00<00:58, 58.89tok/s]
+  … MLX Gen (native):   3%|2         | 93/3500 [00:02<05:11, 10.93tok/s]
+  … MLX Gen (native):   5%|5         | 182/3500 [00:05<01:55, 28.75tok/s]
+  … MLX CFG Gen (native):   3%|2         | 17/620 [00:00<00:23, 25.90tok/s]
+  … MLX CFG Gen (native):   9%|8         | 55/620 [00:03<00:36, 15.51tok/s]
+  … MLX CFG Gen (native):  16%|#6        | 101/620 [00:05<00:38, 13.49tok/s]
+  … MLX CFG Gen (native):  25%|##4       | 154/620 [00:08<00:18, 25.08tok/s]
+  … MLX CFG Gen (native):  30%|###       | 187/620 [00:10<00:24, 17.38tok/s]
+  … MLX CFG Gen (native):  39%|###8      | 239/620 [00:13<00:26, 14.30tok/s]
+  … MLX CFG Gen (native):  46%|####6     | 286/620 [00:15<00:16, 20.79tok/s]
+  … MLX CFG Gen (native):  53%|#####3    | 331/620 [00:18<00:13, 21.17tok/s]
+  … MLX CFG Gen (native):  60%|######    | 373/620 [00:20<00:17, 14.30tok/s]
+  … MLX CFG Gen (native):  68%|######8   | 424/620 [00:23<00:12, 16.19tok/s]
+  … MLX CFG Gen (native):  76%|#######5  | 469/620 [00:25<00:06, 22.49tok/s]
+  … MLX CFG Gen (native):  82%|########2 | 511/620 [00:28<00:05, 18.37tok/s]
+  … MLX CFG Gen (native):  90%|########9 | 557/620 [00:30<00:04, 14.36tok/s]
+  … MLX CFG Gen (native):  98%|#########8| 608/620 [00:33<00:00, 21.87tok/s]
+  … 22:45:51 | INFO | ======================================================================
+  … 22:45:53 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:46:02 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:27<01:23, 27.97s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:32<00:28, 14.16s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:37<00:09,  9.82s/steps]
+  … 22:46:55 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:46:58 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:47:48 | INFO | [Normalization] Audio 0 AFTER: Peak=0.8913
+  … 22:47:50 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/32851b6e-8110-d714-afbe-7f03da9080e7.mp3 (mp3, 48000Hz, 128k)
+  OK 122s peak -1.3dB rms -16.4dB (168s wall)
+[25/25] tavern_song_ballad_02 (132s, vocals)
+  task 76fd49b9-917a-4eb4-a5dc-3588078af376
+  … 22:47:52 | INFO | generate_with_stop_condition: formatted_prompt=<|im_start|>system
+# Instruction
+Generate audio semantic tokens based on the given conditions:
+
+<|im_end|>
+<|im_start|>user
+# Caption
+warm hopeful folk ballad, solo female vocal with a male voice harmonising underneath on the choruses. 72 bpm, 4/4, gently rolling. celtic harp, acoustic guitar, cello, a low whistle, very soft brushed frame drum entering halfway. homecoming, comfort, candlelight. rich and full but never loud. clear tender singing.
+
+# Lyric
+[Verse 1]
+(female) Leave a lantern in the window
+(female) When the road is dark and long
+(female) There's a hundred going out tonight
+(female) And they'll all be coming home
+
+[Chorus]
+(female) So keep the door upon the latch
+(female) Keep the kettle on the coal
+(female) I have walked a hundred colder miles
+(female) And I know the way home
+
+[Verse 2]
+(female) There is nothing on the mountain
+(female) That is worth another year
+(female) I have carried what they asked me to
+(female) And I'm carrying it here
+
+[Chorus]
+(both) So keep the door upon the latch
+(both) Keep the kettle on the coal
+(both) I have walked a hundred colder miles
+(both) And I know the way home
+<|im_end|>
+<|im_start|>assistant
+  … MLX Gen (native):   1%|1         | 49/3500 [00:00<00:55, 62.07tok/s]
+  … MLX Gen (native):   3%|3         | 108/3500 [00:03<04:45, 11.86tok/s]
+  … MLX CFG Gen (native):   1%|1         | 8/670 [00:00<00:23, 27.84tok/s]
+  … MLX CFG Gen (native):   7%|7         | 47/670 [00:02<00:27, 23.02tok/s]
+  … MLX CFG Gen (native):  12%|#2        | 81/670 [00:05<01:14,  7.88tok/s]
+  … MLX CFG Gen (native):  18%|#8        | 121/670 [00:07<00:25, 21.72tok/s]
+  … MLX CFG Gen (native):  23%|##3       | 157/670 [00:10<00:25, 20.25tok/s]
+  … MLX CFG Gen (native):  27%|##7       | 181/670 [00:12<00:51,  9.42tok/s]
+  … MLX CFG Gen (native):  31%|###       | 205/670 [00:15<00:58,  7.99tok/s]
+  … MLX CFG Gen (native):  36%|###5      | 241/670 [00:17<00:16, 26.80tok/s]
+  … MLX CFG Gen (native):  46%|####5     | 305/670 [00:20<00:16, 22.60tok/s]
+  … MLX CFG Gen (native):  54%|#####4    | 365/670 [00:22<00:14, 20.84tok/s]
+  … MLX CFG Gen (native):  62%|######2   | 416/670 [00:25<00:09, 26.41tok/s]
+  … MLX CFG Gen (native):  71%|#######   | 473/670 [00:27<00:09, 21.47tok/s]
+  … MLX CFG Gen (native):  79%|#######9  | 530/670 [00:30<00:06, 22.95tok/s]
+  … MLX CFG Gen (native):  87%|########7 | 584/670 [00:32<00:03, 23.49tok/s]
+  … MLX CFG Gen (native):  96%|#########5| 640/670 [00:35<00:01, 18.16tok/s]
+  … 22:48:39 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:48:42 | INFO | [_load_model_context] Loading text_encoder to mps (RSS: 8669 MB)
+  … 22:48:52 | INFO | [service_generate] Generating audio... (DiT backend: MLX (native))
+  … MLX DiT diffusion:   0%|          | 0/4 [00:00<?, ?steps/s]
+  … MLX DiT diffusion:  25%|##5       | 1/4 [00:28<01:25, 28.47s/steps]
+  … MLX DiT diffusion:  50%|#####     | 2/4 [00:34<00:30, 15.09s/steps]
+  … MLX DiT diffusion:  75%|#######5  | 3/4 [00:41<00:11, 11.51s/steps]
+  … 22:49:53 | INFO | [_load_model_context] Loading vae to mps (RSS: 8669 MB)
+  … 22:49:57 | INFO | [generate_music] Using tiled VAE decode to reduce VRAM usage...
+  … 22:50:58 | INFO | [_load_model_context] Offloading vae to CPU (RSS: 8669 MB)
+  … 22:51:00 | INFO | [generate_music] VAE decode completed. Preparing audio tensors...
+  … 22:51:02 | DEBUG | [AudioSaver] Saved audio to /Users/aaronair/cc/airon/audio/ace-step/.cache/acestep/tmp/api_audio/cf8ca838-61cc-1133-ae4b-c9e014d62069.mp3 (mp3, 48000Hz, 128k)
+  OK 132s peak -1.4dB rms -17.1dB (191s wall)
+
+DONE — 25/25 passing, 48.9 min wall

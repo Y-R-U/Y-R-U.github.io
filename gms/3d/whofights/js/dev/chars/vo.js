@@ -1,0 +1,155 @@
+// Voice-over bookkeeping for the character tab and tools/vo/gen_barks.mjs. Pure — no DOM, no
+// three, no fetch — so both callers share one implementation and node tools/test.mjs can cover it.
+//
+// DEV_CONTRACT §8: clips are audio/vo/<characterId>__<category>__<nn>.wav and the sidecar maps
+// {characterId, category, i} → {file, text, voice, speed, hash}. `hash` is over text|voice|speed|
+// pitch, which is what lets Generate-all skip a line nothing has touched.
+
+export const BARK_CATEGORIES = ['idle', 'greet', 'farewell', 'curious', 'grumble', 'success',
+  'failure', 'hurt', 'combat', 'spot', 'thanks', 'refuse', 'wander', 'weather'];
+
+export const VO_DIR = 'audio/vo';
+export const INDEX_DOC = 'data/vo.json';
+export const INDEX_MIRROR = 'audio/vo/index.json';
+
+const clamp = (v, lo, hi, d) => (Number.isFinite(+v) ? Math.min(hi, Math.max(lo, +v)) : d);
+export const speedOf = c => clamp(c?.voiceSpeed, 0.7, 1.3, 1);
+export const pitchOf = c => clamp(c?.voicePitch, -4, 4, 0);
+
+// Pitch is a playback resample, so it also stretches time. The take is synthesised at the inverse
+// speed and the shift puts the duration back — see docs/HANDOFF notes and the tab's own caption.
+export const pitchRate = semitones => Math.pow(2, clamp(semitones, -4, 4, 0) / 12);
+export const synthSpeed = (speed, pitch) =>
+  Math.round(Math.min(2, Math.max(0.5, speed / pitchRate(pitch))) * 10000) / 10000;
+
+export const clipKey = (who, category, i) => `${who}__${category}__${String(i + 1).padStart(2, '0')}`;
+export const clipFile = key => `${VO_DIR}/${key}.wav`;
+
+export function hashLine(text, voice, speed, pitch) {
+  const s = `${String(text)}|${voice || ''}|${(+speed || 1).toFixed(3)}|${(+pitch || 0).toFixed(2)}`;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
+}
+
+// A character's category list REPLACES the shared one for that category — never a union, because a
+// union gives no way to take a shared line off one character. The tab's "copy shared in" button is
+// how you extend instead.
+export function effectiveBarks(barksDoc, character) {
+  const shared = barksDoc?.shared || {};
+  const own = character?.barks || {};
+  const out = {};
+  for (const c of BARK_CATEGORIES) {
+    const list = Array.isArray(own[c]) ? own[c] : Array.isArray(shared[c]) ? shared[c] : [];
+    out[c] = list.map(l => String(l == null ? '' : l)).filter(l => l.trim());
+  }
+  return out;
+}
+
+export function overriddenCategories(character) {
+  const own = character?.barks || {};
+  return BARK_CATEGORIES.filter(c => Array.isArray(own[c]));
+}
+
+// `onDisk` is the set of basenames api.ls/readdir found under audio/vo. Without it a deleted wav
+// with a live index entry is skipped forever, which looks exactly like a working cache.
+export function planJobs({ cast, barks, index, who, categories, force = false, onDisk = null }) {
+  const ids = who && who.length ? who : Object.keys(cast || {});
+  const cats = categories && categories.length ? categories : BARK_CATEGORIES;
+  const clips = index?.clips || {};
+  const jobs = [], skip = [], noVoice = [], live = new Set();
+
+  for (const id of ids) {
+    const c = cast?.[id];
+    if (!c) continue;
+    const lines = effectiveBarks(barks, c);
+    const voice = c.voice;
+    const speed = speedOf(c), pitch = pitchOf(c);
+    for (const cat of cats) {
+      lines[cat].forEach((text, i) => {
+        const key = clipKey(id, cat, i);
+        live.add(key);
+        if (!voice) { noVoice.push({ key, who: id, category: cat, i, text }); return; }
+        const hash = hashLine(text, voice, speed, pitch);
+        const have = clips[key];
+        const present = onDisk ? onDisk.has(key) : true;
+        if (!force && have && have.hash === hash && present) return skip.push({ key, why: 'unchanged' });
+        jobs.push({ key, out: key, who: id, category: cat, i, text, voice, speed, pitch,
+          ttsSpeed: synthSpeed(speed, pitch), hash,
+          why: !have ? 'new' : !present ? 'file missing' : force ? 'forced' : 'changed' });
+      });
+    }
+  }
+  return { jobs, skip, noVoice, live };
+}
+
+export function blankIndex() { return { version: 1, clips: {} }; }
+
+// `results` are the dev server's /api/tts/batch records, positionally matched to `jobs`.
+export function applyResults(index, jobs, results) {
+  const next = { version: 1, clips: { ...(index?.clips || {}) } };
+  const failed = [];
+  jobs.forEach((j, n) => {
+    const r = results?.[n];
+    if (!r || r.ok === false) {
+      failed.push({ ...j, error: (r && r.error) || 'no result returned' });
+      delete next.clips[j.key];
+      return;
+    }
+    next.clips[j.key] = { who: j.who, category: j.category, i: j.i, file: clipFile(j.key),
+      text: j.text, voice: j.voice, speed: j.speed, pitch: j.pitch, ttsSpeed: j.ttsSpeed,
+      hash: j.hash, seconds: r.seconds ?? null, rms: r.rms ?? null, at: Date.now() };
+  });
+  return { index: next, failed };
+}
+
+// Entries whose line no longer exists. The wav stays on disk — nothing here may delete files — so
+// they are reported as orphans and the tab offers the list.
+export function pruneIndex(index, live) {
+  const next = { version: 1, clips: {} };
+  const orphans = [];
+  for (const [k, v] of Object.entries(index?.clips || {})) {
+    if (live.has(k)) next.clips[k] = v;
+    else orphans.push({ key: k, file: v?.file || clipFile(k) });
+  }
+  return { index: next, orphans };
+}
+
+export function validateIndex(doc) {
+  const e = [];
+  if (!doc || typeof doc !== 'object') return ['not an object'];
+  if (!doc.clips || typeof doc.clips !== 'object') return ['no clips object'];
+  for (const [k, v] of Object.entries(doc.clips)) {
+    if (!v || typeof v !== 'object') { e.push(`${k}: not an object`); continue; }
+    if (typeof v.hash !== 'string') e.push(`${k}: no hash`);
+    if (typeof v.text !== 'string' || !v.text.trim()) e.push(`${k}: no text`);
+    if (v.file && v.file !== clipFile(k)) e.push(`${k}: file ${v.file} does not match its key`);
+    if (!BARK_CATEGORIES.includes(v.category)) e.push(`${k}: unknown category ${v.category}`);
+  }
+  return e;
+}
+
+export function validateBarks(doc) {
+  const e = [];
+  if (!doc?.shared || typeof doc.shared !== 'object') return ['no shared object'];
+  for (const [k, v] of Object.entries(doc.shared)) {
+    if (!BARK_CATEGORIES.includes(k)) e.push(`unknown category ${k}`);
+    else if (!Array.isArray(v)) e.push(`${k} must be an array of lines`);
+    else v.forEach((l, i) => { if (typeof l !== 'string' || !l.trim()) e.push(`shared.${k}[${i}] is empty`); });
+  }
+  for (const k of BARK_CATEGORIES) if (!(k in doc.shared)) e.push(`shared has no ${k} list`);
+  return e;
+}
+
+export function countBarks(barksDoc, cast) {
+  let shared = 0, clips = 0;
+  for (const c of BARK_CATEGORIES) shared += (barksDoc?.shared?.[c] || []).length;
+  for (const c of Object.values(cast || {})) {
+    const eff = effectiveBarks(barksDoc, c);
+    for (const cat of BARK_CATEGORIES) clips += eff[cat].length;
+  }
+  return { shared, clips };
+}

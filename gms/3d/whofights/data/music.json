@@ -1,0 +1,398 @@
+{
+  "version": 1,
+  "tracks": [
+    {
+      "id": "menu_bed_01",
+      "title": "Who Fights",
+      "file": "audio/music/menu_bed_01.mp3",
+      "kind": "instrumental",
+      "mood": "noble",
+      "seconds": 120,
+      "prompt": "medieval fantasy title theme, instrumental, no vocals. slow and noble, 68 bpm, 4/4. solo celtic harp states the melody alone, then a small warm string section joins underneath. a single low horn holds long notes far back. patient, hopeful, a little wistful. clean acoustic recording in a stone hall, natural reverb. loops gently, no big ending.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "hall_bed_01",
+      "title": "The Contract Board",
+      "file": "audio/music/hall_bed_01.mp3",
+      "kind": "instrumental",
+      "mood": "stately",
+      "seconds": 120,
+      "prompt": "renaissance chamber consort, instrumental, no vocals. stately and curious, 84 bpm, 4/4. harpsichord and plucked lute trade a polite walking figure while viola da gamba and recorder answer. light tambourine on the offbeat. courtly, orderly, slightly inquisitive — the sound of a busy guild hall going about its morning. dry warm acoustic, no drums kit, no synths.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "hall_bed_02",
+      "title": "Instructors and Ledgers",
+      "file": "audio/music/hall_bed_02.mp3",
+      "kind": "instrumental",
+      "mood": "warm",
+      "seconds": 110,
+      "prompt": "medieval chamber music, instrumental, no vocals. warm and unhurried, 72 bpm, 6/8 lilt. celtic harp leads, low recorder and bowed cello underneath, occasional soft hand drum. gentle and welcoming rather than grand — background music for a hall where people are talking. acoustic, roomy stone reverb, no vocals at all, no modern instruments.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "meadow_bed_01",
+      "title": "Low Green Country",
+      "file": "audio/music/meadow_bed_01.mp3",
+      "kind": "instrumental",
+      "mood": "pastoral",
+      "seconds": 125,
+      "prompt": "pastoral celtic folk instrumental, no vocals. gentle and open, 76 bpm, 6/8. tin whistle carries a simple pentatonic melody over fingerpicked acoustic guitar and harp, soft strings pad far behind, no percussion. sunlit, wide, walking-pace, faintly melancholy. field-recording air and birdsong feel. entirely instrumental.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "meadow_bed_02",
+      "title": "The Long Track East",
+      "file": "audio/music/meadow_bed_02.mp3",
+      "kind": "instrumental",
+      "mood": "bright",
+      "seconds": 110,
+      "prompt": "bright folk instrumental, no vocals. cheerful travelling music, 104 bpm, 4/4. hammered dulcimer and fiddle play a bouncing melody together, upright bass walks, light bodhran keeps a steady walking pulse. major key, optimistic, breezy, forward motion. acoustic, close and dry. no singing.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "meadow_bed_03",
+      "title": "Rain Over the Fields",
+      "file": "audio/music/meadow_bed_03.mp3",
+      "kind": "instrumental",
+      "mood": "wistful",
+      "seconds": 115,
+      "prompt": "quiet folk instrumental, no vocals. wistful and slow, 62 bpm, 3/4 waltz. solo nylon guitar and low whistle, sparse harp harmonics, a distant bowed string drone. grey weather, thoughtful, unresolved. very soft dynamics, lots of space between notes. purely instrumental, no percussion, no vocals.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "tavern_inst_01",
+      "title": "Room Tone, The Broken Shield",
+      "file": "audio/music/tavern_inst_01.mp3",
+      "kind": "instrumental",
+      "mood": "cosy",
+      "seconds": 120,
+      "prompt": "solo lute noodling in a tavern corner, instrumental, no vocals. loose and unhurried, 70 bpm, free feel. one lute improvising a simple modal tune, sometimes pausing, occasional low fiddle drone underneath. background music nobody is listening to, warm and cosy, fireside. slightly imperfect timing, human. no percussion, no vocals, no other instruments.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "tavern_inst_02",
+      "title": "The Elbow Jig",
+      "file": "audio/music/tavern_inst_02.mp3",
+      "kind": "instrumental",
+      "mood": "rowdy",
+      "seconds": 105,
+      "prompt": "fast irish tavern jig, instrumental, no vocals. rowdy and driving, 132 bpm, 6/8. fiddle and hurdy-gurdy in unison on a minor-key jig, tin whistle doubling on the repeat, bodhran and stamping feet, tambourine. sweaty, boisterous, a crowded floor. live acoustic, no vocals at all.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "tension_01",
+      "title": "Something on the Ridge",
+      "file": "audio/music/tension_01.mp3",
+      "kind": "instrumental",
+      "mood": "tense",
+      "seconds": 115,
+      "prompt": "dark fantasy tension underscore, instrumental, no vocals. slow and creeping, 58 bpm. sustained low cello drone, sparse detuned dulcimer notes, a struck metal bowl ringing out every few bars, very quiet frame drum heartbeat. minor second dissonance held. dread building without ever arriving. no melody, no vocals, no drum kit.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "tension_02",
+      "title": "Torches Out",
+      "file": "audio/music/tension_02.mp3",
+      "kind": "instrumental",
+      "mood": "uneasy",
+      "seconds": 105,
+      "prompt": "uneasy medieval underscore, instrumental, no vocals. 66 bpm, sparse. bowed double bass, tremolo violas high and thin, a single low male-register wooden flute playing three lonely notes, distant hand drum. cold stone corridor. suspense, not action. entirely instrumental, no singing, no synthesisers.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "combat_01",
+      "title": "Close Quarters",
+      "file": "audio/music/combat_01.mp3",
+      "kind": "instrumental",
+      "mood": "combat",
+      "seconds": 110,
+      "prompt": "fantasy battle music, instrumental, no vocals. driving and urgent, 148 bpm, 4/4. big taiko and frame drums on a relentless pattern, low staccato strings ostinato, brass stabs on the accents, a wailing fiddle line over the top. minor key, aggressive, cinematic, no let-up. orchestral and folk instruments only, no vocals, no electric guitar.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "combat_02",
+      "title": "Hold the Line",
+      "file": "audio/music/combat_02.mp3",
+      "kind": "instrumental",
+      "mood": "heroic",
+      "seconds": 105,
+      "prompt": "heroic fantasy battle music, instrumental, no vocals. 132 bpm, 4/4, marching. war drums and low toms, french horns and trombones carrying a bold rising theme, strings sawing underneath, clashing cymbals on the phrase ends. defiant and rallying rather than frightening. full orchestra, no vocals whatsoever.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "night_bed_01",
+      "title": "After the Candles",
+      "file": "audio/music/night_bed_01.mp3",
+      "kind": "instrumental",
+      "mood": "quiet",
+      "seconds": 130,
+      "prompt": "very quiet night ambience with melody, instrumental, no vocals. 54 bpm, extremely sparse. a single low wooden flute plays slow phrases with long silences between them, over a barely-audible bowed drone and the occasional harp harmonic. still, cold, peaceful, lonely. almost ambient. no percussion, no vocals, dynamic range very low.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "victory_sting_01",
+      "title": "Contract Complete",
+      "file": "audio/music/victory_sting_01.mp3",
+      "kind": "instrumental",
+      "mood": "fanfare",
+      "seconds": 25,
+      "prompt": "short triumphant medieval fanfare, instrumental, no vocals. 110 bpm. natural trumpets and horns state a bright rising four-bar phrase, timpani roll, strings swell and a cymbal finishes it. major key, celebratory, resolves cleanly on the final chord. begins immediately, no intro. no vocals.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "defeat_sting_01",
+      "title": "Not This Time",
+      "file": "audio/music/defeat_sting_01.mp3",
+      "kind": "instrumental",
+      "mood": "downbeat",
+      "seconds": 22,
+      "prompt": "short sombre fantasy sting, instrumental, no vocals. 60 bpm. low strings descend through a minor cadence, a single struck bell, muted horn holds the last note and fades. disappointed rather than tragic. no percussion beyond the bell, no vocals. resolves and stops.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "quest_sting_01",
+      "title": "Signed and Sealed",
+      "file": "audio/music/quest_sting_01.mp3",
+      "kind": "instrumental",
+      "mood": "curious",
+      "seconds": 20,
+      "prompt": "very short bright medieval flourish, instrumental, no vocals. 96 bpm. plucked lute run upward, recorder trill, small hand drum tap, finishes on a clean open chord. curious and encouraging, the sound of taking a job. two bars of nothing else. no vocals.",
+      "lyrics": "",
+      "source": "acestep"
+    },
+    {
+      "id": "tavern_song_drinking_01",
+      "title": "The Ale Runs Low",
+      "file": "audio/music/tavern_song_drinking_01.mp3",
+      "kind": "song",
+      "mood": "rowdy",
+      "seconds": 130,
+      "prompt": "rowdy medieval tavern drinking song. gruff male lead vocal with a whole tavern of men and women shouting the chorus back in rough unison. 118 bpm, 4/4, stomping. fiddle, accordion, lute, bodhran, stamping boots and tankards on tables. live, raucous, slightly out of tune and completely joyful. clear diction on the lead vocal.",
+      "lyrics": "[Verse 1]\n(male) I signed my name on the contract board\n(male) For a copper coin and a borrowed sword\n(male) And I came back muddy and I came back late\n(male) With a story worth twice what they paid\n\n[Chorus]\n(crowd) So pour it out, the ale runs low\n(crowd) Pour it out, the ale runs low\n(crowd) We'll be up at dawn and gone by noon\n(crowd) But the ale runs low tonight\n\n[Verse 2]\n(male) There's a boy at the Academy learning his letters\n(male) He'll be better than me and I hope he does better\n(male) But tonight he's here with a cup in his hand\n(male) And he sings just as loud as the rest of the band\n\n[Chorus]\n(crowd) So pour it out, the ale runs low\n(crowd) Pour it out, the ale runs low\n(crowd) We'll be up at dawn and gone by noon\n(crowd) But the ale runs low tonight\n\n[Outro]\n(crowd) The ale runs low tonight",
+      "source": "acestep"
+    },
+    {
+      "id": "tavern_song_boast_01",
+      "title": "I Fought a Bear",
+      "file": "audio/music/tavern_song_boast_01.mp3",
+      "kind": "song",
+      "mood": "comic",
+      "seconds": 128,
+      "prompt": "comic boastful tavern song. one theatrical male baritone lead who clearly thinks a lot of himself, answered by a jeering mixed crowd on the chorus. 108 bpm, 4/4, swaggering. accordion, fiddle, plucked bass, snare rim and tambourine, occasional laughter. music hall energy in a medieval costume. crisp diction, comedic timing, family friendly.",
+      "lyrics": "[Verse 1]\n(male) I have wrestled a bear, or I nearly did\n(male) It was watching me closely from over the ridge\n(male) And I looked at the bear and the bear looked at me\n(male) And we came to an honourable treaty\n\n[Chorus]\n(crowd) He's the bravest man in the guild\n(male) I am\n(crowd) He has never once run from a fight\n(male) Well\n(crowd) He's the bravest man in the guild tonight\n\n[Verse 2]\n(male) I have swum the cold river with a pack on my back\n(male) I have carried three friends and a barrel of tack\n(male) I have stood in the doorway when nobody would\n(male) And I'd do it again if I thought that I could\n\n[Chorus]\n(crowd) He's the bravest man in the guild\n(male) I am\n(crowd) He has never once run from a fight\n(male) Well\n(crowd) He's the bravest man in the guild tonight",
+      "source": "acestep"
+    },
+    {
+      "id": "tavern_song_ballad_01",
+      "title": "The Girl Who Went to the Ridge",
+      "file": "audio/music/tavern_song_ballad_01.mp3",
+      "kind": "song",
+      "mood": "wistful",
+      "seconds": 135,
+      "prompt": "slow celtic folk ballad, solo female vocal. clear unornamented alto voice, close mic, front and centre. 66 bpm, 3/4. fingerpicked nylon guitar and celtic harp only, with a low whistle answering at the end of each line and a soft string pad on the choruses. no percussion. sad, tender, restrained, beautiful. traditional folk phrasing.",
+      "lyrics": "[Verse 1]\n(female) She was seventeen and she signed her name\n(female) On the lowest line of the contract board\n(female) Her mother said the road was long\n(female) Her father said no more\n\n[Chorus]\n(female) But the ridge was green and the morning wide\n(female) And she went up with the sun\n(female) And whatever it is you're waiting for\n(female) She is halfway there, and gone\n\n[Verse 2]\n(female) They say she keeps a lantern lit\n(female) In a tower on the eastern side\n(female) And every year another one\n(female) Goes walking up that ridge\n\n[Chorus]\n(female) And the ridge was green and the morning wide\n(female) And she went up with the sun\n(female) And whatever it is you're waiting for\n(female) She is halfway there, and gone",
+      "source": "acestep"
+    },
+    {
+      "id": "tavern_song_work_01",
+      "title": "Haul Away",
+      "file": "audio/music/tavern_song_work_01.mp3",
+      "kind": "song",
+      "mood": "gruff",
+      "seconds": 120,
+      "prompt": "call and response work song, sea-shanty style but landlocked. one gruff male caller, a big rough crowd of men and women answering in unison. 96 bpm, 4/4, heavy downbeat. almost no instruments — stamping feet, hands on a table, a single low accordion drone and a bodhran. voices carry everything. muscular, communal, unaccompanied feel, recorded in a big wooden room.",
+      "lyrics": "[Verse 1]\n(male) There's a wagon in the mud\n(crowd) Haul away\n(male) And it's loaded to the hub\n(crowd) Haul away\n(male) And the axle's near in two\n(crowd) Haul away\n(male) And there's nothing else to do\n(crowd) Haul away, haul away\n\n[Chorus]\n(crowd) Heave, and the wheel comes round\n(crowd) Heave, and the rope holds sound\n(crowd) One more pull and we're on the road\n(crowd) Haul away, haul away\n\n[Verse 2]\n(male) I have carried worse than this\n(crowd) Haul away\n(male) I have carried it uphill\n(crowd) Haul away\n(male) I have carried it alone\n(crowd) Haul away\n(male) And I'm glad you're here, you know\n(crowd) Haul away, haul away\n\n[Chorus]\n(crowd) Heave, and the wheel comes round\n(crowd) Heave, and the rope holds sound\n(crowd) One more pull and we're on the road\n(crowd) Haul away, haul away",
+      "source": "acestep"
+    },
+    {
+      "id": "tavern_song_jig_01",
+      "title": "Boots Under the Table",
+      "file": "audio/music/tavern_song_jig_01.mp3",
+      "kind": "song",
+      "mood": "joyful",
+      "seconds": 125,
+      "prompt": "fast tavern jig with singing, male and female duet trading lines and singing the chorus together in harmony. 138 bpm, 6/8, relentless. fiddle, hurdy-gurdy, tin whistle, bouzouki, bodhran and stamping. breathless, dancing, grinning. live and loud. both voices bright and clear, no growling.",
+      "lyrics": "[Verse 1]\n(female) Well the fiddler's got his elbow up\n(male) And the floor has got a beat\n(both) And there's nobody left sitting down\n(both) With their boots beneath the seat\n\n[Chorus]\n(both) Boots under the table, boots on the floor\n(both) Boots going out through the tavern door\n(both) Dance while the candle's tall\n(both) We ride at dawn and that's all\n\n[Verse 2]\n(male) I've a blister and a broken strap\n(female) And a shoulder full of rain\n(both) But the fiddler doesn't care for that\n(both) So we're up and round again\n\n[Chorus]\n(both) Boots under the table, boots on the floor\n(both) Boots going out through the tavern door\n(both) Dance while the candle's tall\n(both) We ride at dawn and that's all",
+      "source": "acestep"
+    },
+    {
+      "id": "tavern_song_lament_01",
+      "title": "Ten Went Out",
+      "file": "audio/music/tavern_song_lament_01.mp3",
+      "kind": "song",
+      "mood": "sombre",
+      "seconds": 130,
+      "prompt": "slow tavern lament, solo male voice, weathered tenor, singing almost unaccompanied. 58 bpm, 3/4. one quiet lute and a low bowed drone, a second male voice joining softly in harmony only on the last chorus. no percussion. dignified grief, understated, everyone in the room gone quiet. very intimate close recording.",
+      "lyrics": "[Verse 1]\n(male) Ten went out on the northern road\n(male) Ten went out in the spring\n(male) Nine came back with the wagon and the gold\n(male) And nobody wants to sing\n\n[Chorus]\n(male) So fill the cup and set it down\n(male) At the place we always keep\n(male) And say the name, and say it plain\n(male) And let the fire burn deep\n\n[Verse 2]\n(male) She was better on the rope than me\n(male) She was better on the climb\n(male) And she'd tell me now to drink it up\n(male) And stop wasting good time\n\n[Chorus]\n(both) So fill the cup and set it down\n(both) At the place we always keep\n(both) And say the name, and say it plain\n(both) And let the fire burn deep",
+      "source": "acestep"
+    },
+    {
+      "id": "tavern_song_anthem_01",
+      "title": "Who Fights",
+      "file": "audio/music/tavern_song_anthem_01.mp3",
+      "kind": "song",
+      "mood": "comic",
+      "seconds": 122,
+      "prompt": "silly guild anthem sung by a whole tavern, mixed male and female crowd in loud rough unison with a single male voice interjecting the jokes. 124 bpm, 4/4, marching stomp. accordion, brass band oompah, snare drum, tankards, cheering. proud and completely ridiculous. call and response shouting on the chorus. family friendly, clear diction.",
+      "lyrics": "[Verse 1]\n(crowd) We are the finest in the land\n(crowd) It says so on the sign\n(crowd) We painted it ourselves last week\n(crowd) And honestly, it's fine\n\n[Chorus]\n(crowd) Who fights? We fight\n(crowd) Who pays? They pay\n(crowd) Who is going to clean the hall tonight\n(male) Not me\n(crowd) Hooray\n\n[Verse 2]\n(crowd) We've a wizard who has lost his hat\n(crowd) A knight who's lost his horse\n(crowd) A cook who is a better shot\n(crowd) Than anyone, of course\n\n[Chorus]\n(crowd) Who fights? We fight\n(crowd) Who pays? They pay\n(crowd) Who is going to clean the hall tonight\n(male) Not me\n(crowd) Hooray",
+      "source": "acestep"
+    },
+    {
+      "id": "tavern_song_ballad_02",
+      "title": "The Lantern in the Window",
+      "file": "audio/music/tavern_song_ballad_02.mp3",
+      "kind": "song",
+      "mood": "warm",
+      "seconds": 132,
+      "prompt": "warm hopeful folk ballad, solo female vocal with a male voice harmonising underneath on the choruses. 72 bpm, 4/4, gently rolling. celtic harp, acoustic guitar, cello, a low whistle, very soft brushed frame drum entering halfway. homecoming, comfort, candlelight. rich and full but never loud. clear tender singing.",
+      "lyrics": "[Verse 1]\n(female) Leave a lantern in the window\n(female) When the road is dark and long\n(female) There's a hundred going out tonight\n(female) And they'll all be coming home\n\n[Chorus]\n(female) So keep the door upon the latch\n(female) Keep the kettle on the coal\n(female) I have walked a hundred colder miles\n(female) And I know the way home\n\n[Verse 2]\n(female) There is nothing on the mountain\n(female) That is worth another year\n(female) I have carried what they asked me to\n(female) And I'm carrying it here\n\n[Chorus]\n(both) So keep the door upon the latch\n(both) Keep the kettle on the coal\n(both) I have walked a hundred colder miles\n(both) And I know the way home",
+      "source": "acestep"
+    }
+  ],
+  "sets": [
+    {
+      "id": "menu",
+      "label": "Title / menu",
+      "tracks": [
+        "menu_bed_01",
+        "hall_bed_02"
+      ],
+      "shuffle": false,
+      "fadeMs": 2000,
+      "volume": 0.6
+    },
+    {
+      "id": "academy_hall",
+      "label": "Academy hall",
+      "tracks": [
+        "hall_bed_01",
+        "hall_bed_02",
+        "menu_bed_01"
+      ],
+      "shuffle": true,
+      "fadeMs": 1500,
+      "volume": 0.55
+    },
+    {
+      "id": "outdoors",
+      "label": "Meadows / outdoors",
+      "tracks": [
+        "meadow_bed_01",
+        "meadow_bed_02",
+        "meadow_bed_03"
+      ],
+      "shuffle": true,
+      "fadeMs": 2000,
+      "volume": 0.55
+    },
+    {
+      "id": "tavern",
+      "label": "Tavern (songs + instrumentals)",
+      "tracks": [
+        "tavern_song_drinking_01",
+        "tavern_song_boast_01",
+        "tavern_song_jig_01",
+        "tavern_song_anthem_01",
+        "tavern_song_work_01",
+        "tavern_song_ballad_01",
+        "tavern_song_ballad_02",
+        "tavern_song_lament_01",
+        "tavern_inst_01",
+        "tavern_inst_02"
+      ],
+      "shuffle": true,
+      "fadeMs": 1200,
+      "volume": 0.7
+    },
+    {
+      "id": "tavern_songs",
+      "label": "Tavern — sung only",
+      "tracks": [
+        "tavern_song_drinking_01",
+        "tavern_song_boast_01",
+        "tavern_song_jig_01",
+        "tavern_song_anthem_01",
+        "tavern_song_work_01",
+        "tavern_song_ballad_01",
+        "tavern_song_ballad_02",
+        "tavern_song_lament_01"
+      ],
+      "shuffle": true,
+      "fadeMs": 1200,
+      "volume": 0.7
+    },
+    {
+      "id": "tavern_quiet",
+      "label": "Tavern — late, no singing",
+      "tracks": [
+        "tavern_inst_01",
+        "night_bed_01"
+      ],
+      "shuffle": true,
+      "fadeMs": 2500,
+      "volume": 0.5
+    },
+    {
+      "id": "tension",
+      "label": "Approaching danger",
+      "tracks": [
+        "tension_01",
+        "tension_02"
+      ],
+      "shuffle": true,
+      "fadeMs": 900,
+      "volume": 0.6
+    },
+    {
+      "id": "combat",
+      "label": "Combat",
+      "tracks": [
+        "combat_01",
+        "combat_02"
+      ],
+      "shuffle": true,
+      "fadeMs": 400,
+      "volume": 0.75
+    },
+    {
+      "id": "night",
+      "label": "Night / quiet",
+      "tracks": [
+        "night_bed_01",
+        "meadow_bed_03"
+      ],
+      "shuffle": true,
+      "fadeMs": 2500,
+      "volume": 0.45
+    },
+    {
+      "id": "stings",
+      "label": "One-shot stings",
+      "tracks": [
+        "victory_sting_01",
+        "defeat_sting_01",
+        "quest_sting_01"
+      ],
+      "shuffle": false,
+      "fadeMs": 200,
+      "volume": 0.85
+    }
+  ]
+}

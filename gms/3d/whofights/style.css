@@ -1,0 +1,155 @@
+/* The game shell: boot screen, perf readout, quality panel, touch pads.
+   Every class here is `wf-` prefixed. This stylesheet is loaded on the same document as the dev
+   hub's overlay, and a bare `.row` in here silently reshaped one of its toolbars. */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #0d1013; }
+body {
+  font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  color: #dfe4e6; -webkit-font-smoothing: antialiased; overscroll-behavior: none;
+}
+/* The canvas is a look-drag surface, not a document: without this iOS double-tap-zooms and
+   pinch-zooms the page out from under the camera. */
+#stage {
+  position: fixed; inset: 0;
+  touch-action: none;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#stage canvas { display: block; width: 100%; height: 100%; }
+
+/* ── perf HUD ── */
+#hud { position: fixed; top: env(safe-area-inset-top, 8px); left: 8px; pointer-events: none; z-index: 20; }
+#perf {
+  background: rgba(10,13,15,.78); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.09); border-radius: 6px;
+  padding: 8px 10px 9px; min-width: 216px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+.perf-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.perf-fps { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.perf-fps s { text-decoration: none; font-size: 10px; opacity: .5; margin-left: 3px; }
+.perf-verdict { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+.perf-top.ok .perf-verdict { color: #7cc98d; }
+.perf-top.warn .perf-verdict { color: #e0b24e; }
+.perf-top.bad .perf-verdict { color: #e8705a; }
+.perf-bar { position: relative; height: 3px; margin: 7px 0 8px; background: rgba(255,255,255,.1); border-radius: 2px; overflow: hidden; }
+.perf-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 2px; transition: width .2s; }
+.perf-bar i.ok { background: #4f9c62; } .perf-bar i.warn { background: #c9973a; } .perf-bar i.bad { background: #c9503a; }
+.perf-bar u { position: absolute; left: 100%; top: -2px; width: 1px; height: 7px; background: rgba(255,255,255,.45); }
+.perf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 12px; }
+.perf-grid b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.perf-grid s { text-decoration: none; opacity: .45; font-size: 10px; margin-left: 4px; }
+.perf-grid i { font-style: normal; opacity: .5; font-weight: 400; }
+.perf-grid .warn b { color: #e0b24e; }
+.perf-grid .bad b { color: #e8705a; }
+.perf-grid .warn s, .perf-grid .bad s { opacity: .7; }
+
+/* ── settings panel ── */
+#panel { position: fixed; top: 8px; right: 8px; z-index: 30; width: 268px; max-width: calc(100vw - 16px); }
+#panel-toggle {
+  position: absolute; top: 0; right: 0; width: 38px; height: 38px;
+  background: rgba(10,13,15,.8); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 6px; color: #dfe4e6; font-size: 17px; cursor: pointer;
+}
+#panel-body {
+  display: none; margin-top: 44px; max-height: calc(100vh - 60px); overflow-y: auto;
+  background: rgba(10,13,15,.86); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.09); border-radius: 6px; padding: 4px 12px 12px;
+}
+#panel.open #panel-body { display: block; }
+.wf-grp { padding-top: 12px; }
+.wf-grp + .wf-grp { border-top: 1px solid rgba(255,255,255,.07); margin-top: 10px; }
+.wf-grp h4 {
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  opacity: .45; font-weight: 500; margin-bottom: 8px;
+}
+.wf-presets, .wf-shots { display: flex; flex-wrap: wrap; gap: 4px; }
+.wf-presets button, .wf-shots button {
+  flex: 1 1 auto; padding: 6px 8px; font-size: 11px; cursor: pointer;
+  background: rgba(255,255,255,.05); color: #cfd6d9;
+  border: 1px solid rgba(255,255,255,.1); border-radius: 4px;
+}
+.wf-shots button { flex-basis: 100%; text-align: left; }
+.wf-presets button.on { background: #b9721f; border-color: #b9721f; color: #fff; }
+.wf-adv { margin-top: 12px; border-top: 1px solid rgba(255,255,255,.07); }
+.wf-adv > summary {
+  cursor: pointer; padding: 10px 2px 2px; font-size: 11px; letter-spacing: .08em;
+  text-transform: uppercase; opacity: .5;
+}
+.wf-adv > summary:hover { opacity: .8; }
+.wf-adv[open] > summary { opacity: .75; }
+.wf-adv .wf-grp:first-of-type { border-top: 0; margin-top: 0; }
+.wf-row { display: block; margin-bottom: 9px; }
+.wf-row > span { display: flex; justify-content: space-between; font-size: 11.5px; opacity: .8; margin-bottom: 4px; }
+.wf-row em { font-style: normal; font-family: ui-monospace, Menlo, monospace; opacity: .7; font-variant-numeric: tabular-nums; }
+/* the panel scrolls, so without this a drag on a slider scrolls it instead of moving the knob
+   and the value never changes */
+.wf-row input[type=range] { width: 100%; accent-color: #b9721f; touch-action: none; }
+.wf-row select { width: 100%; background: rgba(255,255,255,.06); color: #dfe4e6; border: 1px solid rgba(255,255,255,.12); border-radius: 4px; padding: 4px; }
+.wf-row:not(.range) { display: flex; align-items: center; justify-content: space-between; }
+.wf-row:not(.range) > span { margin-bottom: 0; }
+
+/* ── touch ── */
+#touch {
+  position: fixed; inset: 0; pointer-events: none; z-index: 15; display: none;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#touch .pad { position: absolute; top: 0; bottom: 0; width: 50%; pointer-events: auto; touch-action: none; }
+#stick { left: 0; } #fire { right: 0; }
+/* the stick floats to wherever the thumb lands, so it is fixed-positioned and driven from JS */
+#stick i {
+  position: fixed; display: none; width: 108px; height: 108px; margin: -54px 0 0 -54px;
+  border: 2px solid rgba(255,255,255,.22); border-radius: 50%; pointer-events: none;
+}
+#stick i::after {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 46px; height: 46px;
+  margin: -23px 0 0 -23px; border-radius: 50%;
+  background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.34);
+  transform: translate(var(--dx, 0), var(--dy, 0));
+}
+/* Sprint is a push past full deflection, so the ring is the only thing that can tell you it took. */
+#stick i.sprint { border-color: rgba(185,114,31,.85); }
+#stick i.sprint::after { background: rgba(185,114,31,.42); border-color: rgba(185,114,31,.9); }
+#fire::after {
+  content: ''; position: absolute; right: 26px; bottom: 26px; width: 66px; height: 66px;
+  border: 2px solid rgba(255,255,255,.2); border-radius: 50%;
+}
+body.flip #fire::after { right: auto; left: 26px; }
+body.touch #touch { display: block; }
+
+/* ── boot ── */
+#boot {
+  position: fixed; inset: 0; z-index: 60; background: #0d1013;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity .35s;
+}
+#boot.gone { opacity: 0; pointer-events: none; }
+#boot .logo { font: 300 40px/1 Optima, Palatino, Georgia, serif; letter-spacing: .22em; }
+#boot .tag { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; opacity: .4; }
+#boot-status { font-size: 11px; opacity: .35; margin-top: 12px; }
+
+#audio-link {
+  /* third slot in the top-right row: cog at 8, editor at 52, 44px pitch */
+  position: fixed; top: 8px; right: 96px; z-index: 30; width: 38px; height: 38px;
+  display: grid; place-items: center; text-decoration: none; font-size: 18px; line-height: 1;
+  background: rgba(10,13,15,.8); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 6px; color: #dfe4e6;
+}
+
+/* screenshot mode: nothing but the render */
+body.shotmode #hud, body.shotmode #panel, body.shotmode #touch, body.shotmode #audio-link { display: none !important; }
+
+/* Play mode: the dev row goes. Both are still there in the editor and under ?shot=, and Settings
+   → Developer panel brings the knob panel back without leaving the game. */
+body.playing #perf, body.playing .ed-toggle, body.playing #audio-link, body.playing #panel { display: none; }
+/* the context button now sits exactly where this decoration was drawn */
+body.playing #fire::after { display: none; }
+body.playing.devpanel #panel { display: block; }
+
+/* Reduced motion stops the UI, never the world. The two animations below are second channels for
+   colour, not decoration, so they keep running. */
+body.calm #game * { transition-duration: 0s !important; animation-duration: .01ms !important; }
+body.calm #game .g-hp.lowhp i { animation-duration: 1.1s !important; }
+body.calm #game .g-chip.rang { animation-duration: 3s !important; }

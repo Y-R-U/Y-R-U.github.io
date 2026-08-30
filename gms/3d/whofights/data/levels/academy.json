@@ -1,0 +1,411 @@
+{
+  "version": 1,
+  "id": "academy",
+  "name": "Adventurer Academy",
+  "music": "outdoors",
+  "start": {
+    "x": -9,
+    "z": 21,
+    "yaw": 3.14159
+  },
+  "districts": [
+    {
+      "zone": "neutral",
+      "cx": 0,
+      "seed": 4021,
+      "dressSeed": 90210,
+      "road": null,
+      "roadWidth": 9,
+      "kerbs": [],
+      "bridge": null
+    }
+  ],
+  "objects": [
+    {
+      "id": 1,
+      "dist": 0,
+      "zone": "light",
+      "type": "house",
+      "lod": "full",
+      "x": 0,
+      "z": -16,
+      "ry": 0,
+      "seed": 811001,
+      "p": {
+        "w": 36,
+        "d": 30,
+        "h": 12,
+        "hall": 1
+      }
+    },
+    {
+      "id": 2,
+      "dist": 0,
+      "zone": "light",
+      "type": "tower",
+      "lod": "full",
+      "x": -20,
+      "z": -2,
+      "ry": 0,
+      "seed": 811002,
+      "p": {
+        "radius": 4.6,
+        "height": 26,
+        "sides": 12
+      }
+    },
+    {
+      "id": 3,
+      "dist": 0,
+      "zone": "light",
+      "type": "tower",
+      "lod": "full",
+      "x": 20,
+      "z": -2,
+      "ry": 0,
+      "seed": 811003,
+      "p": {
+        "radius": 4.6,
+        "height": 26,
+        "sides": 12
+      }
+    },
+    {
+      "id": 4,
+      "dist": 0,
+      "zone": "light",
+      "type": "wallRun",
+      "lod": "full",
+      "x": -33,
+      "z": -2,
+      "ry": 0,
+      "seed": 811004,
+      "p": {
+        "length": 24,
+        "height": 11,
+        "thickness": 3.6
+      }
+    },
+    {
+      "id": 5,
+      "dist": 0,
+      "zone": "light",
+      "type": "wallRun",
+      "lod": "full",
+      "x": 33,
+      "z": -2,
+      "ry": 0,
+      "seed": 811005,
+      "p": {
+        "length": 24,
+        "height": 11,
+        "thickness": 3.6
+      }
+    },
+    {
+      "id": 6,
+      "dist": 0,
+      "zone": "light",
+      "type": "tower",
+      "lod": "full",
+      "x": -45,
+      "z": -2,
+      "ry": 0,
+      "seed": 811006,
+      "p": {
+        "radius": 3.6,
+        "height": 18,
+        "sides": 10
+      }
+    },
+    {
+      "id": 7,
+      "dist": 0,
+      "zone": "light",
+      "type": "tower",
+      "lod": "full",
+      "x": 45,
+      "z": -2,
+      "ry": 0,
+      "seed": 811007,
+      "p": {
+        "radius": 3.6,
+        "height": 18,
+        "sides": 10
+      }
+    },
+    {
+      "id": 8,
+      "dist": 0,
+      "zone": "light",
+      "type": "wallRun",
+      "lod": "full",
+      "x": -33,
+      "z": -30,
+      "ry": 0,
+      "seed": 811008,
+      "p": {
+        "length": 24,
+        "height": 9,
+        "thickness": 3
+      }
+    },
+    {
+      "id": 9,
+      "dist": 0,
+      "zone": "light",
+      "type": "wallRun",
+      "lod": "full",
+      "x": 33,
+      "z": -30,
+      "ry": 0,
+      "seed": 811009,
+      "p": {
+        "length": 24,
+        "height": 9,
+        "thickness": 3
+      }
+    },
+    {
+      "id": 10,
+      "dist": 0,
+      "zone": "light",
+      "type": "wallRun",
+      "lod": "full",
+      "x": -45,
+      "z": -16,
+      "ry": 1.5708,
+      "seed": 811010,
+      "p": {
+        "length": 28,
+        "height": 9,
+        "thickness": 3
+      }
+    },
+    {
+      "id": 11,
+      "dist": 0,
+      "zone": "light",
+      "type": "wallRun",
+      "lod": "full",
+      "x": 45,
+      "z": -16,
+      "ry": 1.5708,
+      "seed": 811011,
+      "p": {
+        "length": 28,
+        "height": 9,
+        "thickness": 3
+      }
+    },
+    {
+      "id": 20,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "sign",
+      "lod": "full",
+      "x": -9,
+      "z": 15,
+      "ry": 0.22,
+      "seed": 811020,
+      "p": {
+        "w": 5.6,
+        "h": 1.7,
+        "post": 2.2,
+        "text": "Adventurer Academy"
+      }
+    },
+    {
+      "id": 30,
+      "dist": 0,
+      "zone": "light",
+      "type": "billboard",
+      "inside": 1,
+      "x": -13.6,
+      "z": -30,
+      "ry": 0,
+      "seed": 811030,
+      "p": {
+        "w": 7.5,
+        "h": 4.6,
+        "lift": 2.4,
+        "text": "Iron Contracts"
+      }
+    },
+    {
+      "id": 31,
+      "dist": 0,
+      "zone": "light",
+      "type": "billboard",
+      "inside": 1,
+      "x": -5.4,
+      "z": -30,
+      "ry": 0,
+      "seed": 811031,
+      "p": {
+        "w": 7.5,
+        "h": 4.6,
+        "lift": 2.4,
+        "text": "Bronze Contracts"
+      }
+    },
+    {
+      "id": 32,
+      "dist": 0,
+      "zone": "light",
+      "type": "billboard",
+      "inside": 1,
+      "x": 5.4,
+      "z": -30,
+      "ry": 0,
+      "seed": 811032,
+      "p": {
+        "w": 7.5,
+        "h": 4.6,
+        "lift": 2.4,
+        "text": "Gold Contracts"
+      }
+    },
+    {
+      "id": 33,
+      "dist": 0,
+      "zone": "light",
+      "type": "billboard",
+      "inside": 1,
+      "x": 13.6,
+      "z": -30,
+      "ry": 0,
+      "seed": 811033,
+      "p": {
+        "w": 7.5,
+        "h": 4.6,
+        "lift": 2.4,
+        "text": "New Adventures"
+      }
+    }
+  ],
+  "hotspots": [
+    {
+      "id": "hs.doorway.hall",
+      "name": "Hall doorway",
+      "shape": {
+        "k": "circle",
+        "x": 0,
+        "z": 2.5,
+        "r": 5
+      },
+      "trigger": "enter",
+      "once": false,
+      "cooldown": 10,
+      "if": null,
+      "actions": [
+        {
+          "k": "flag",
+          "name": "academy.doorway.seen",
+          "value": true
+        },
+        {
+          "k": "event",
+          "name": "academy.doorway",
+          "data": {
+            "level": "academy"
+          }
+        },
+        {
+          "k": "music",
+          "set": "academy_hall"
+        }
+      ]
+    },
+    {
+      "id": "hs.greeter",
+      "name": "Speak to Instructor Vail",
+      "attach": "greeter",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": null,
+      "actions": [
+        {
+          "k": "say",
+          "node": "academy.greeter.hello"
+        }
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "spawn",
+      "label": "The spawn point and the sign",
+      "zone": "neutral",
+      "time": 10.5,
+      "pos": [
+        -9,
+        3.2,
+        28
+      ],
+      "look": [
+        -8.5,
+        2.3,
+        13
+      ],
+      "fov": 55,
+      "keep": 9
+    },
+    {
+      "id": "road",
+      "label": "The road and the castle",
+      "zone": "neutral",
+      "time": 9.5,
+      "pos": [
+        -58,
+        8,
+        46
+      ],
+      "look": [
+        4,
+        8,
+        -4
+      ],
+      "fov": 58,
+      "keep": 11
+    },
+    {
+      "id": "doorway",
+      "label": "The open doorway",
+      "zone": "light",
+      "time": 11,
+      "pos": [
+        0,
+        3.2,
+        12
+      ],
+      "look": [
+        0,
+        3.6,
+        -2
+      ],
+      "fov": 55,
+      "keep": 9
+    },
+    {
+      "id": "hall",
+      "label": "The hall and its four boards",
+      "zone": "light",
+      "time": 11,
+      "inside": 0,
+      "pos": [
+        0,
+        2.6,
+        -3
+      ],
+      "look": [
+        0,
+        3.4,
+        -29
+      ],
+      "fov": 62
+    }
+  ]
+}
