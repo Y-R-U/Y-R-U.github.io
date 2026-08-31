@@ -50,8 +50,8 @@ node tools/skin/uitest.mjs --server=http://localhost:8796 \
 Two to nine minutes per skin in `edit` mode, two in `txt2img`. §6.
 
 **Open the render.** A texture sheet is not evidence; the four-view contact sheet is. Every claim
-in §4, §5 and §7 below came out of looking at one, and two of them contradicted what the sheet
-alone suggested.
+in §4, §5, §7 and §7.1 below came out of looking at one, and two of them contradicted what the
+sheet alone suggested.
 
 ## 3. The rig
 
@@ -166,7 +166,7 @@ nomad (hood and face scarf) and the undead (skull) landed a head that reads.
 So the single most useful thing to know when writing a prompt: **say what is on the head.** A helmet,
 a hood, a mask, a hat, a scarf, a painted face — anything that gives Flux a frame to draw into. That
 one habit is the difference between a two-thirds hit rate and something close to a ninety-percent
-one.
+one. Still worth doing — but §7.1 removed most of the need for it.
 
 The second failure mode is rarer and worth recognising: Flux sometimes reads the grey mannequin as
 the character's own grey skin and leaves whole limbs unpainted rather than painting over them
@@ -175,6 +175,50 @@ the character's own grey skin and leaves whole limbs unpainted rather than paint
 `txt2img` went 0 for 3 and is not close. The figure lands at its own scale and position, so the
 islands sample background: white bands down the arms and legs, a face on a collarbone. It is useful
 for looking at a drawing before spending nine minutes on the real thing, and for nothing else.
+
+## 7.1 The head experiment — giving the reference a brow, a nose and a jaw
+
+§11 proposed it and it works. `template.mjs` now paints a **relief** onto the front panel's head:
+a brow ridge, two sockets under it, a nose with a lit and a shadowed side, cheekbones, a jaw and a
+chin, all as deltas on the grey the rig already shaded. **No marks** — no eye, no mouth, no hair.
+A drawn eye would be a face every character in the cast then inherits; a shaded socket is only an
+anchor. Front panel only: the back of a head has no features, and putting them there asks for a
+second face. `art/skin/pose_ref.png` is the file that changed; the rig did not move.
+
+Measured as a paired A/B — same five subjects, same seeds, same prompts, one arm per pose reference,
+sixteen `edit` generations, every one opened as a four-view contact sheet:
+
+| subject (seed) | prompt names a head? | baseline | with the relief |
+|---|---|---|---|
+| baker (101) | no | blank grey egg | full face, hair, stubble |
+| baker (202) | no | dark blank ovoid, grey hands | full face; hands painted too |
+| ranger (101) | no | blank grey egg, grey forearms | a modelled face — but grey-skinned; forearms still grey |
+| ranger (202) | no | dark blank ovoid | a modelled face — but grey-skinned |
+| scholar (101) | no | face and beard | unchanged |
+| scholar (202) | no | face and beard | unchanged |
+| knight (303) | visor | visored helm | unchanged, no face bleeding through the visor |
+| nomad (303) | hood, scarf | hooded face | unchanged |
+
+**A head is painted in 8/8 against 4/8**, and the four that changed are exactly the four that had
+failed. Nothing regressed: the two subjects that already worked came back the same, and neither
+control grew a face it should not have — the knight's visor is still closed. Silhouettes are intact
+in all sixteen, and the relief never reaches the background, which §5 says is the expensive mistake.
+
+What it does **not** fix is the second failure mode. Both rangers now have a fully modelled face
+painted in the mannequin's own grey rather than in skin: Flux read the reference as the character's
+colour, which is what §7 already describes and is still a re-roll. So the honest split is that the
+relief turns "is there a head at all" from a coin-flip into a near-certainty, and leaves "is the
+head the right colour" exactly where it was.
+
+Judged by looking, not scored. `shots/skin/_HEADS_baseline_vs_face.png` is the strip that makes it
+one glance; the sixteen full sheets are beside it and the skins themselves are in
+`shots/skin/_study/`.
+
+**One cost, worth knowing.** A skin's sidecar records its prompt, seed and the *path* of the pose
+reference, not the reference itself. Changing `pose_ref.png` therefore means the four older
+shipping skins no longer reproduce byte-for-byte from their own sidecars. Nothing on disk changed
+and nothing needs regenerating; it is the regeneration promise in §9 that is now approximate for
+anything made before this.
 
 Cost, measured: 2–9 minutes per `edit` generation on the local `flux2-klein-4b` (the spread is real
 and it is the queue, not the prompt), about 2 minutes for `txt2img`. At a two-thirds hit rate that
@@ -188,7 +232,7 @@ is not is a way to make a hero. There is no control finer than a sentence, no wa
 same character with a different tabard, and no faces at all unless something frames them. Build a
 cast on it; do not build a protagonist on it.
 
-The four kept in `art/skins/` are the shipping examples, one per category:
+The five kept in `art/skins/` are the shipping examples, one per category:
 
 | | |
 |---|---|
@@ -196,6 +240,7 @@ The four kept in `art/skins/` are the shipping examples, one per category:
 | `watch_s11` | a uniformed human with a painted face |
 | `undead_s77` | a monster, and the only kind of subject where the folded sides are invisible |
 | `nomad_ui` | cloth and a hood — and the one the dev tab made, end to end, from a typed sentence |
+| `quartermaster` | leather and a tabard, for `data/characters.json`'s Quartermaster Brann, who is currently wearing `watch_s11` instead |
 
 ## 8. The tab, and reaching it
 
@@ -256,10 +301,11 @@ point both importers at it; nothing else changes.
   and pretending otherwise puts baked highlights on top of the renderer's own lighting.
 - **Hands and feet are stubs**, and a front/back projection barely sees them — the top of a foot is
   a folded strip, not a painted surface. Boots read fine; fingers never will.
-- **Nothing paints a head reliably.** §7. The obvious next experiment is to give `pose_ref.png` a
-  head that is not a blank egg — the suggestion of a brow, a nose and a jaw, enough for Flux to
-  anchor a face on without dictating one. That is a change to `template.mjs` and a re-run of the
-  five subjects, and it is the highest-value hour left in this pipeline.
-- **`art/skins/` keeps four examples, not the study.** `*_raw.png` is gitignored; the seed variants
-  the reliability numbers came from were deleted after they were read. `node tools/skin/render.mjs
+- ~~**Nothing paints a head reliably.**~~ Done — §7.1. What is left of it: the relief gets a head
+  painted, and does nothing about a head painted in the mannequin's grey instead of in skin. If
+  that is worth an hour, the thing to try is tinting the reference off-grey so it cannot be read as
+  a skin tone, and the thing to watch for is the tint bleeding into the costume.
+- **`art/skins/` keeps five examples, not the study.** `*_raw.png` is gitignored; the seed variants
+  the reliability numbers came from were deleted after they were read; §7.1's sixteen are parked in
+  the gitignored `shots/skin/_study/`. `node tools/skin/render.mjs
   --all --shape=m` regenerates the evidence for whatever is on disk.

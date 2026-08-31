@@ -15,6 +15,26 @@ import { fileURLToPath } from 'node:url';
 import { Canvas } from './raster.mjs';
 import { ATLAS, PARTS, PANEL, REGIONS, SCALE, faces, px } from './layout.mjs';
 
+// A blank egg loses to "do not change the outline" and comes back a blank grey mask (SKIN.md §7),
+// so the front head gets a relief: a brow, a nose and a jaw as light and shadow only. Deltas on the
+// grey the rig already shaded, never marks — an eye or a mouth here would be a face every character
+// then inherits, and the point is an anchor, not a portrait.
+const RELIEF = [
+  // [delta, y centre, y sigma, u shape]  — u is −1…1 across the head, negative is the lit side.
+  [+22, 1.688, 0.016, u => plateau(u, 0.55)],                       // brow ridge
+  [-26, 1.656, 0.018, u => bump(Math.abs(u), 0.42, 0.26)],          // the two sockets under it
+  [+24, 1.645, 0.042, u => bump(u, -0.06, 0.085)],                  // nose, lit side
+  [-22, 1.645, 0.042, u => bump(u, 0.10, 0.085)],                   // nose, shadow side
+  [-16, 1.598, 0.012, u => plateau(u, 0.20)],                       // under the tip
+  [+10, 1.630, 0.030, u => bump(u, -0.62, 0.18) + 0.5 * bump(u, 0.62, 0.18)],  // cheekbones
+  [-18, 1.548, 0.024, u => bump(Math.abs(u), 0.64, 0.22)],          // jaw, back to the ear
+  [+14, 1.556, 0.020, u => plateau(u, 0.28)],                       // chin
+  [-20, 1.518, 0.014, u => plateau(u, 0.45)],                       // under the chin
+];
+
+const bump = (v, c, s) => Math.exp(-((v - c) ** 2) / (2 * s * s));
+const plateau = (v, half) => Math.exp(-((v / half) ** 4));
+
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const OUT = resolve(ROOT, 'art/skin');
 
@@ -71,7 +91,7 @@ function sectionAt(sections, y) {
 
 // ---------------------------------------------------------------- pose reference
 
-function poseRef() {
+export function poseRef({ relief = true } = {}) {
   const cv = new Canvas(ATLAS.w, ATLAS.h, [255, 255, 255, 255]);
   const lit = (t, back) => {
     // Key from the upper front-left of the sheet; the back panel is mirrored, so the light is too,
@@ -82,7 +102,37 @@ function poseRef() {
   };
   scanParts(cv, false, (p, t) => { const g = lit(t, false) | 0; return [g, g, g + 4]; });
   scanParts(cv, true, (p, t) => { const g = lit(t, true) | 0; return [g, g, g + 4]; });
+  if (relief) faceRelief(cv);
   return cv;
+}
+
+// Front panel only — the back of a head has no features, and painting them there would ask Flux for
+// a second face. Bounded to the head's own sections above the jaw, so it can never reach the neck.
+export const FACE_BAND = [1.505, 1.720];
+
+function faceRelief(cv) {
+  const head = PARTS.find(p => p.id === 'head');
+  const [lo, hi] = FACE_BAND;
+  for (let row = Math.floor(PANEL.feetRow - hi * SCALE); row <= Math.ceil(PANEL.feetRow - lo * SCALE); row++) {
+    const y = (PANEL.feetRow - row) / SCALE;
+    const s = sectionAt(head.sections, y);
+    if (!s) continue;
+    const halfW = (s.w / 2) * SCALE;
+    const [cx] = px(0, y, false);
+    for (let x = Math.floor(cx - halfW); x <= Math.ceil(cx + halfW); x++) {
+      const u = ((x + 0.5) - cx) / halfW;
+      if (Math.abs(u) > 1) continue;
+      let d = 0;
+      for (const [amp, yc, ys, fu] of RELIEF) d += amp * Math.exp(-((y - yc) ** 2) / (2 * ys * ys)) * fu(u);
+      // Fade to nothing at the silhouette, or the relief spills into the folded side strips.
+      d *= Math.max(0, 1 - Math.abs(u) ** 6);
+      if (Math.abs(d) < 0.5) continue;
+      const i = (row * cv.w + x) * 4;
+      if (cv.d[i] > 250 && cv.d[i + 1] > 250) continue;
+      const g = Math.max(92, Math.min(236, cv.d[i] + d)) | 0;
+      cv.px(x, row, [g, g, g + 4]);
+    }
+  }
 }
 
 // ---------------------------------------------------------------- labelled guide
@@ -160,9 +210,12 @@ function half(cv) {
   return out;
 }
 
-mkdirSync(OUT, { recursive: true });
-const pose = poseRef();
-writeFileSync(resolve(OUT, 'pose_ref_1024.png'), pose.png());
-writeFileSync(resolve(OUT, 'pose_ref.png'), half(pose).png());
-writeFileSync(resolve(OUT, 'uv_guide.png'), guide().png());
-console.log(`wrote art/skin/pose_ref.png (512), pose_ref_1024.png and uv_guide.png  (${faces().length} quads / ${faces().length * 2} tris)`);
+// Guarded, so a test can import poseRef() without the module writing three PNGs as a side effect.
+if (import.meta.url === `file://${process.argv[1]}`) {
+  mkdirSync(OUT, { recursive: true });
+  const pose = poseRef();
+  writeFileSync(resolve(OUT, 'pose_ref_1024.png'), pose.png());
+  writeFileSync(resolve(OUT, 'pose_ref.png'), half(pose).png());
+  writeFileSync(resolve(OUT, 'uv_guide.png'), guide().png());
+  console.log(`wrote art/skin/pose_ref.png (512), pose_ref_1024.png and uv_guide.png  (${faces().length} quads / ${faces().length * 2} tris)`);
+}
