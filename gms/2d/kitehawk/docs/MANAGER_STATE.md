@@ -1,161 +1,44 @@
 # Manager state — KITEHAWK
 
-## ⏸ PAUSED 2026-08-25 ~09:45, weekly usage at max. START HERE.
+## ✅ P10 SHIPPED 2026-08-25 — FIRST PLAYABLE, committed and pushed. START HERE.
 
-**Aaron paused the run because the weekly limit was reached; it resets ~13:55 the same day.** Nothing
-is broken and nothing is half-written — the pause was clean and the handoff docs are current.
+`8929d18` on `main`, pushed. `projects.js` entry added with `wip: true`, screenshot at
+`assets/screenshots/kitehawk.jpg`, registry validator run before and after: **103 entries, 0 dead.**
 
-### Resume in this order
+**It plays.** Title → brief → a level flown on one thumb → OBJECTIVE COMPLETE, 41.1 s, three stars,
+682 real touch moves, **zero console errors**, at 844×390 and again at 390×844. The manager looked at
+`shots/p10/m1-a1-01.png` — see D155.
 
-1. **`--p5gates` RAN and finished: 5/10.** It is no longer unrun. Read this before treating it as a
-   regression — most of it is not:
-   - **C4, C5 and C6 were already failing and are deliberately stale** — D89 says so by name, and D83
-     recorded counter-play at 4 of 11. **Do not re-fit them here**; they belong to P11's balance pass.
-   - **C2 fails** (player TTK 9.78 s) — check against `P5_NOTES` before assuming it moved.
-   - **C7 IS THE ONE TO CHECK FIRST: 46.0% of 774 decisive (±1.8).** D87 recorded **48.9% ± 1.8**
-     across five airframes and 49.6% over 1,200 duels. The interval has moved from one that contained
-     50% to one that does not. **The obvious suspect is D128's minimum enemy hull 64 → 66 wu** — if
-     that constant reaches a collider or damage geometry rather than only framing and art, it changed
-     every duel. **Establish whether it does before touching anything**, and do it the way this project
-     does: re-run C7 with the hull pinned back to 64 and see whether the interval returns. If it does,
-     the fix is to split the constant, not to move it back — Aaron ratified 66 (D128) and the P3 guard
-     depends on it.
+### The next action — P11, the 100 levels and the balance pass
 
-2. **Finish the K5 re-specification (D139).** The P9 agent was stopped at the exact moment it started
-   this and no part of it landed. Re-specify K5 onto **HP per sortie** (continuous), keep the death
-   rate as a reported secondary so the regression stays visible, and **falsify it — remove the
-   reinforcement ladder and the new number must go flat or negative.** `--p6gates` currently reads
-   8/10 with K5 at 0 points, and D139 explains why the ladder is fine and the instrument is not.
-3. **Finish P9**: `level.js`/`act.js` (written to satisfy the validator, not the reverse), then
-   `terrain.js`, `spawner.js`, `genlevels.mjs`, the four worked levels, `level.html`.
-   `docs/P9_NOTES.md` has a status board and the next concrete action at its top.
-4. Then **P10 FIRST PLAYABLE** — commit, push, `projects.js` with `wip: true`. Three things at that
-   point, in order:
-   - **`git pull --rebase` FIRST, and only once no agent is writing.** Other sessions are committing
-     to this tree; `main` moved to `47ffad5` during P9 (a structural restructure — `q m m2 e e2 k d d2
-     mcaddons` are now under `app/`, and `ai/ t5/ n/ i2.html` are deleted). Nothing under
-     `gms/2d/kitehawk/` was touched.
-   - **Run a `projects.js` validator before adding the KITEHAWK entry** — walk `PROJECTS`, and
-     `fs.existsSync` both the `path` and `assets/screenshots/<screenshot>.jpg`. Four lines of node.
-     Session cc-91 ran exactly this tonight and it found **four dead entries where eyeballing had
-     found one**, including a tile dead long before that session started. **A registry-driven page's
-     "is this referenced?" has to be asked of the registry, not of the page that looks like the index.**
-   - **Stage explicitly by path.** Never `git add -A`: other sessions have open work in this tree.
+**Four things must be fixed before P11 spends the tuning register, all with rulings already written:**
 
-**Landed and verified before the pause**, so do not redo: the D137 skygate frame guard, `world.js` §2
-+ `worldgate` 9/9, `validate.js`'s W1 7/7, and REQUEST-8 (`CARD_MAX_CHARS` now lives in
-`js/core/content.js`).
+1. **M1 is nondeterministic — re-specify it first (D153).** It read FAIL then PASS on identical code,
+   because it requires `won: true` and the reference pilot wins a1-01 **10 of 12 seeds**. A gate whose
+   verdict flips run to run is not a gate. Re-spec onto *terminal state reached*, not *won*; whether
+   the bot wins is P11's own question. **Falsify it before it counts** (D141).
+2. **C7's mirror bias (D140).** 46.0% ± 1.8 excludes 50% and is bit-repeatable; the model is unchanged
+   (`--fixtures` 9/9 at blessed hashes). **Run `duel.js`'s `opts.swap` arm FIRST** — if the deficit
+   flips sign with the seats, it is a spawn or harness bug and tuning against it bakes it into all 100
+   levels.
+3. **M2 / the cut-and-deny half of D4's signature mechanic is not exercised** by a competent pilot on
+   act 1 levels — 3 of 36 seeds (D154). It may need a mission that *forces* an unreachable crate. A
+   design question, not a threshold.
+4. **C4, C5, C6 are stale by D89** and belong here.
 
-### The standing rule that came out of this run
+Then **P12 story → P13 hangar → P14 modes → P15 audio → P16 art → P17 ship.**
 
-**A re-specified criterion is not evidence until its break-switch has been RUN and seen to go red.**
-Five criteria were re-specified between P8 and P9, and **D114 — the manager's own — was wrong exactly
-because that step was skipped**: the deliberately-broken controller scored *greener* than the shipped
-one. Eight metrics on this project have now read clean while the thing they measured was broken.
+**P16 carries a criterion, not a note (D155): the player's aeroplane must clear a stated contrast
+ratio against the sky and cloud behind it**, measured the way ART §10 measures HUD marks. It clears
+P3's 34 px silhouette gate and you still have to hunt for it — the right quantity measured badly, for
+the tenth time.
 
----
+### Repo
 
-## ▶ RESUMED 2026-08-25. Context for the above.
-
-**Read order for a fresh or compacted manager: this section → `DECISIONS.md` (all of it, D1–D117;
-it is the authority and it overrides every other document) → `MANAGER_BRIEF.md` → the phase brief you
-need from `BUILD_PLAN.md`. Never read `BUILD_PLAN.md` whole — it is 128 KB and each brief is
-self-contained.**
-
-### Where the build actually is
-
-Everything through **P7 is done, verified and pushed**. The game is **not playable yet** — first
-playable is **P10**, three phases out.
-
-| done | P0 planning · P1 renderer · P2 core/camera/input · audio engine · P3 sky+atlases · P4 flight · P5 combat/AI/duel · P6 crates · P7 HUD · camera-anchor fix |
-|---|---|
-| **in flight** | **P8a — the portrait gate's INSTRUMENT.** One agent builds `tools/gates_portrait.mjs`; the manager keeps the verdict (D117). |
-| then | P8 verdict (manager) → P9 world/level format → **P10 FIRST PLAYABLE** (commit, push, `projects.js` with `wip: true`) → P11 the 100 levels → P12 story → P13 hangar → P14 modes → P15 audio content → P16 art pass → P17 ship |
-
-### P8 has RUN. It does not return a clean verdict, and one call is Aaron's
-
-Read **D113–D122**. The instrument exists (`tools/gates_portrait.mjs`, `p8engage.mjs`,
-`p8stability.mjs`; record at `shots/portrait/gate.json`), measured over **121 engagements /
-95,449 engaged ticks**, portrait *and* landscape, every criterion with a break-switch that was run.
-
-**The two results that matter:**
-
-1. **P0 fails for a reason that is not portrait, and is fixable.** `zoomLockRange` (1400 wu) serves two
-   opposite jobs: capping zoom-IN in `camera.js:267`, and admitting framing-box members in
-   `entities.js:552`. `boxW` is therefore a restatement of the admission radius, p90 reads **935.6 wu
-   against a 585 wu pivot signal, and BOTH orientations fail.** Separate the jobs and portrait P0
-   **passes at 0.1654 against a 0.06 bar**, for 0.5 points of on-screen time; landscape stays NEITHER
-   at 0.0337 at every radius, because it is height-bound. **D120. The 700 wu value is a sweep point and
-   is still underived — derive it before it ships.**
-2. **P2 is the real portrait verdict and it is geometry.** In-frame warning median **0.03 s portrait vs
-   1.28 s landscape**; 25.7% of attackers reach gun range having never been on screen, vs 3.9%.
-   Falsified at portrait's best possible case — pinning the camera at `zoomWide` leaves it FAIL. Cause:
-   the frame reaches **404 wu ahead at the clamp floor against a 440 wu gun range**, so an attacker
-   becomes visible as he opens fire. Landscape reaches 888 wu. **D121.**
-
-Portrait still gets the full **1.75 s** of warning — via the altitude tape and edge chevrons (§4.2),
-not via the picture. **Whether that is enough is a playtest question, not a measurement one.**
-
-**Also recorded, and not to be quietly re-litigated:** D118 — `?track=sticky` is inert against every
-real driver, so D61's headline evidence is void and Z6 tests a dead code path. D119 — **my own D114
-re-specification was wrong**: its break-switch stayed *greener* than shipped; superseded by PUMP
-windows, which falsify in both directions. D122 — P3b cannot fail, P1 has a gap the shipped 263 wu
-sits in, P3c restates P0, and §4.4.1's spec figures have drifted from the shipped gates (1,053 wu dive
-recovery vs a measured 585).
-
-### ✅ AARON RATIFIED THE PIVOT, 2026-08-25: LANDSCAPE-PRIMARY (D123)
-
-Decided on D121: portrait gives **0.03 s** of in-frame warning against landscape's **1.28 s**, and no
-legal zoom changes it — portrait's frame reaches 404 wu ahead against a 440 wu gun range. **D1's
-"mobile-first portrait" is superseded. §4.4 is now read-only history.** `VIEW_PROFILE.landscape` is the
-tuning target; portrait stays a first-class supported config; **no code moves** — §4.1's two profiles
-are the insurance and this is the first time it has been spent.
-
-**The pivot is not free — read D124 before treating landscape as sound.** Landscape's own P0 is
-**NEITHER at 0.0337**, it is *height*-bound on the 585 wu dive recovery, and **no art lever moves it**
-(raising the hull grows raw overlap but the in-clamp width stays pinned by the clamp floor). Verified
-on the harness: clamp floor **`zoomWide` 0.78 → 0.74** *plus* **minimum enemy hull ≥ 66 wu** gives
-**0.0737 — PASS**. Both are needed and both are named levers (§11, §4.4.1). **Raising `zoomFill` to
-0.90 also passes and is rejected** — it is the manoeuvre the brief forbids by name.
-
-### P8 IS CLOSED. The next action is P9 → P10 FIRST PLAYABLE.
-
-P8a built the instrument, P8b audited landscape measure-only, P8c retuned it (D128–D132). Read
-`docs/P8C_NOTES.md` (1,152 lines) for the detail. Where landscape now stands, verified by the manager:
-
-| | value | |
-|---|---|---|
-| P0 in-clamp | **0.0737** | PASS, 23% clear |
-| P3 at the floor | **34.01 px** | PASS by 0.03% — knowingly (D128), guarded by `tools/p3guard.mjs` |
-| P2 in-frame median | **1.23 s** | vs portrait's 0.02 s |
-| P2 p05 | **0.35 s** | **still FAILS** against 0.45 |
-| H5 | **0.00%** | was 23.92% |
-| clamp-discarded lead | **6.0%** | was 49.8% |
-| H11 | **median 15.4%, 9/10 runs over the 2% cap** | **FAILS** — D132, routed to P13/P16 |
-
-**Two reds are open and deliberately not chased: P2's p05 and H11.** Both are ergonomics, and D84 and
-D40 both say the same thing — **playable beats exhaustive, and playtest is the only checkpoint.** They
-get decided with a controller in hand at P10, not by another gate round.
-
-### Before P10 ships, one shipped-code bug must land (D131)
-
-**`js/core/input.js` loses the held stick on `view:change`** — rotate a real phone and the player's
-control drops. `orient.mjs`'s "a held stick survives every rotation" passes *because* of it, so **the
-fix and the assert land together or neither is evidence.** Small, and it is the last of its class.
-
-### Do not touch the cloud atlas (D131)
-
-`tools/pages/sky.html:26` hardcodes `worldH: 1000`, so P8B's landscape A4 failure was measured on a
-frame the game never draws. Fix the harness first; the variety budget may not be wrong at all.
-
-### Then P9 — world, terrain, level format, generator
-
-`BUILD_PLAN.md` §P9. Its first job under D126 is re-proportioning how the altitude ladder *reads* in a
-560 wu frame — signature elements, crossfade timing, the establishing crane — **not its metres**, which
-are physics-facing and fixed by D26. **P4/P4b have never been measurable** and P9 is what makes them so.
-
-Then **P10 FIRST PLAYABLE**: commit, push, `projects.js` with `wip: true`. **That commit needs a
-separate worktree for `main`** — this tree is on another session's branch (see below).
+`main` @ `8929d18`, in sync with origin, 0 behind. Another session (`cc-6d`) has open work in
+`gms/3d/neonhaul/` — **never `git add -A`**, and note a plain `git pull --rebase` will refuse while
+that work is unstaged. Stage `gms/2d/kitehawk/` explicitly, plus the `projects.js` hunk and the
+screenshot. `cc-91` has been told the prefix is free again.
 
 ### The rule the whole resume turned on
 
