@@ -62,6 +62,15 @@ test('a bad action never throws and says why', () => {
   ok(r[1].why.includes('unknown'));
 });
 
+// The swallow is deliberate and stays. It is also why nothing downstream may leave state behind
+// when it throws: the caller sees a result nobody is obliged to read, not an exception.
+test('a sink that throws is reported, not raised', () => {
+  const c = { say: () => { throw new TypeError('id.replace is not a function'); } };
+  const r = runActions([{ k: 'say', node: 'n1' }, { k: 'flag', name: 'a' }], { ...c, flags: {} });
+  eq(r[0], { k: 'say', ok: false, why: 'id.replace is not a function' });
+  eq(r[1].ok, true, 'and the rest of the list still runs');
+});
+
 test('a verb whose sink is missing is still a clean no-op', () => {
   eq(runAction({ k: 'say', node: 'n' }, {}), { k: 'say', ok: true });
 });

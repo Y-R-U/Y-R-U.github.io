@@ -71,7 +71,11 @@ export class Session {
       player,
       names: opts.names || {},
       ctx: () => this.ctx.world(),
-      effects: sets => runActions(sets, this.ctx),
+      // The results were dropped, so a bad action in authored data failed in total silence —
+      // runActions deliberately never throws, which means this is the only place it can be seen.
+      effects: sets => runActions(sets, this.ctx)
+        .filter(r => !r.ok)
+        .map(r => (console.warn(`action "${r.k}" did nothing: ${r.why}`), r)),
       anchors: this.anchors,
       voice: this.voice,
     });

@@ -42,7 +42,11 @@ export class DialogueBox {
     this.world = el('div', 'g-world');
     this.held = 0;
     this.frameYaw = 0;
-    this.armWas = null;
+    // What the conversation borrowed from the player, captured once when it opens. Its presence is
+    // what says a conversation is holding player state — not `scene`, which goes null and comes
+    // back between two nodes of the same conversation.
+    this.saved = null;
+    this.shown = false;
     this.mode = null;
     this.spoke = null;
     this.installStageTap();
@@ -55,20 +59,31 @@ export class DialogueBox {
   play(nodeId) {
     const scene = open(this.pack, nodeId, { ...this.ctx(), seen: this.seen });
     if (!scene) return false;
-    if (!this.scene) this.begin();
+    this.begin();
     this.scene = scene;
     this.nodes.push(nodeId);
     if (!this.seen.includes(nodeId)) this.seen.push(nodeId);
-    this.frame(scene.node.cam);
-    this.draw();
+    // A throw out of draw() used to leave `scene` set behind an empty overlay, and runActions
+    // swallows it, so the look stayed clamped with nothing on screen until a refresh.
+    try {
+      this.frame(scene.node.cam);
+      this.draw();
+    } catch (e) {
+      this.close();
+      throw e;
+    }
     return true;
   }
 
+  // Idempotent: pick() and finish() null `scene` before playing the node they jump to, so this
+  // runs again mid-conversation. Re-capturing there is what ratcheted the arm down a step per
+  // node and re-based the look clamp on wherever the player had turned to.
   begin() {
+    if (this.saved) return;
+    this.saved = { arm: this.player?.dist ?? null, yaw: this.player?.camYaw ?? 0 };
     this.nodes = [];
+    this.frameYaw = this.saved.yaw;
     this.host.append(this.world, this.root);
-    this.frameYaw = this.player?.camYaw ?? 0;
-    this.armWas = this.player?.dist ?? null;
   }
 
   frame(cam) {
@@ -102,6 +117,10 @@ export class DialogueBox {
 
   tick(dt) {
     if (!this.scene) return;
+    // The clamp costs the player the thing they notice first, so it is spent only on a scene that
+    // is really on screen. draw() sets `shown`; a scene it drew nothing for is a state no path
+    // reaches on purpose, so tear it down rather than hold the camera for it.
+    if (!this.shown) return this.close();
     const p = this.player;
     if (p) {
       if (this.wantArm) p.dist += (this.wantArm - p.dist) * (1 - Math.exp(-4 * dt));
@@ -194,6 +213,7 @@ export class DialogueBox {
 
   close() {
     this.scene = null;
+    this.shown = false;
     this.held = 0;
     this.wantArm = null;
     this.mode = null;
@@ -201,15 +221,18 @@ export class DialogueBox {
     this.speaker = null;
     this.spoke = null;
     this.voice?.stop();
-    if (this.armWas !== null && this.player) this.player.dist = this.armWas;
-    this.armWas = null;
+    if (this.saved?.arm != null && this.player) this.player.dist = this.saved.arm;
+    this.saved = null;
     this.root.remove();
     this.world.remove();
     clear(this.root);
     clear(this.world);
   }
 
-  emit(list) { for (const e of list || []) this.sink(e); }
+  // The whole list, not one action at a time: the sink is runActions, which iterates arrays and
+  // silently returns [] for anything else. Emitting singly meant every authored effect in the
+  // game — the flags gating Vail's own branches included — ran nowhere and said nothing.
+  emit(list) { if (list?.length) this.sink(list); }
 
   record(line) { this.onLine(this.scene.id, line); }
 
@@ -234,7 +257,21 @@ export class DialogueBox {
     clear(this.world);
     this.bubble = null;
     this.mode = null;
+    this.shown = false;
     if (!s) return;
+
+    // Choices first, and independent of the line: DEV_CONTRACT §6 allows a node that is nothing
+    // but a branch point, and returning early on its absent line drew an empty overlay.
+    if (s.choosing) {
+      const box = el('div', 'g-choices');
+      visibleChoices(s.node, this.ctx()).forEach((c, i) => {
+        const b = el('button', null, c.say);
+        b.onclick = () => this.pick(i);
+        box.append(b);
+      });
+      this.root.append(box);
+      this.shown = true;
+    }
 
     const line = current(s) || s.node.lines[s.node.lines.length - 1];
     if (line && !s.choosing) this.speak(line);
@@ -253,18 +290,9 @@ export class DialogueBox {
     bubble.onpointerup = () => { if (this.held) { this.held = 0; this.next(); } };
     bubble.onpointercancel = () => { this.held = 0; };
 
-    if (s.choosing) {
-      const box = el('div', 'g-choices');
-      visibleChoices(s.node, this.ctx()).forEach((c, i) => {
-        const b = el('button', null, c.say);
-        b.onclick = () => this.pick(i);
-        box.append(b);
-      });
-      this.root.append(box);
-    }
-
-    // After the choices, so that docking puts the line under them and nearest the thumb.
+    // Appended after the choices, so that docking puts the line under them and nearest the thumb.
     this.bubble = bubble;
+    this.shown = true;
     this.speaker = line.who && line.who !== 'player' && this.anchors?.worldOf(line.who) ? line.who : null;
     this.setMode(this.speaker ? 'float' : 'dock');
   }
