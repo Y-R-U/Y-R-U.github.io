@@ -130,7 +130,8 @@ export class Terrain {
 
   // Building footprint: blocks scatter, drives the AO decal and darkens the ground around it.
   addFootprint(x, z, hw, hd, rot = 0, opts = {}) {
-    const fp = { x, z, hw, hd, rot, ao: opts.ao ?? 1, grow: opts.grow ?? 0.6 };
+    // `hollow`: you can walk inside this one, so the footing pass must not grow inward.
+    const fp = { x, z, hw, hd, rot, ao: opts.ao ?? 1, grow: opts.grow ?? 0.6, hollow: !!opts.hollow };
     this.footprints.push(fp);
     const c = Math.cos(-rot), s = Math.sin(-rot);
     const r = Math.hypot(hw, hd) + fp.grow + 5.25;
@@ -177,6 +178,18 @@ export class Terrain {
   }
 
   blocked(x, z) { return (this.occ[this.gi(x, z)] & 1) === 1; }
+
+  // Inside a building you can walk into. Footprints overlap — the academy's corner towers reach
+  // seven metres into the hall — so this asks every hollow one, not the nearest.
+  hollowAt(x, z) {
+    for (const f of this.footprints) {
+      if (!f.hollow) continue;
+      const dx = x - f.x, dz = z - f.z;
+      const c = Math.cos(-f.rot), s = Math.sin(-f.rot);
+      if (Math.abs(dx * c - dz * s) < f.hw && Math.abs(dx * s + dz * c) < f.hd) return true;
+    }
+    return false;
+  }
 
   // Blocked *and* surfaced. The wall-footing scatter grows through `blocked` on purpose — that
   // ring is exactly where the anti-sticker tufts belong — but not through a paved floor.

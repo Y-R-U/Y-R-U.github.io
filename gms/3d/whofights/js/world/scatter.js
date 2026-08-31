@@ -621,6 +621,11 @@ export class Scatter {
       // Not `blocked`: the wall-footing pass below aims at exactly that ring. `paved` is the one
       // ground a priority tuft must not grow through, and priority is what the cap cannot strip.
       if (T.paved(px, pz)) return;
+      // Nor through the flagstones of a room you can stand in. The footing pass deliberately grows
+      // *inward* of a wall face, which is invisible in a solid cottage and a lawn indoors in the
+      // hall — and the clump that put it there belongs to a corner tower whose footprint overlaps
+      // the hall, so testing only the hall's own ring would have missed it.
+      if (T.hollowAt(px, pz)) return;
       const zi = zoneAt(px, pz);
       const zz = kinds[zi].z, f = kinds[zi].f;
       const gid = ++GID;

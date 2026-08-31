@@ -480,6 +480,8 @@ export class People {
     // still. Asked once a frame and never remembered — nothing here can leave an NPC frozen
     // because nothing here is ever told that a conversation has ended.
     this.holding = null;
+    // Set by js/main.js to the player's position: who a held NPC turns to face.
+    this.facing = null;
 
     this.spawn();
     this.buildMeshes();
@@ -652,6 +654,19 @@ export class People {
           if (!still) a.heading += a.turn * dt * Math.sin(this.time * 0.21 + a.gait);
           heading = a.heading;
         }
+        // Held for a conversation: turn and face whoever is talking to him. Eased rather than
+        // snapped, and derived from `still` like the pose is, so there is no facing state left
+        // pointing at a player who walked off.
+        if (still && this.facing) {
+          const f = this.facing();
+          if (f) {
+            const want = Math.atan2(f.x - x, f.z - z);
+            let d = want - heading;
+            d = Math.atan2(Math.sin(d), Math.cos(d));   // shortest way round, not the long one
+            heading = a.heading = heading + d * (1 - Math.exp(-6 * dt));
+          }
+        }
+
         // The walk cycle, the lean and the bob all read the speed, so one number stands him up.
         const speed = still ? 0 : a.speed;
 

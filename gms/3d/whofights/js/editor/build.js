@@ -125,7 +125,7 @@ export class SceneBuilder {
     for (const o of here) {
       const [hw, hd] = footprint(o);
       seats.set(o.id, { r: T2.range(o.x, o.z, hw, hd, o.ry), hw, hd });
-      if (register) T2.addFootprint(o.x, o.z, hw, hd, o.ry);
+      if (register) T2.addFootprint(o.x, o.z, hw, hd, o.ry, { hollow: !!o.p?.hall });
     }
 
     const cells = new Map();
