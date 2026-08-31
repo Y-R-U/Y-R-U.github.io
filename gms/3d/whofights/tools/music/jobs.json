@@ -4,9 +4,24 @@
     "title": "Who Fights",
     "kind": "instrumental",
     "mood": "noble",
-    "seconds": 120,
-    "prompt": "medieval fantasy title theme, instrumental, no vocals. slow and noble, 68 bpm, 4/4. solo celtic harp states the melody alone, then a small warm string section joins underneath. a single low horn holds long notes far back. patient, hopeful, a little wistful. clean acoustic recording in a stone hall, natural reverb. loops gently, no big ending.",
-    "lyrics": ""
+    "seconds": 117,
+    "source": "suno",
+    "prompt": "medieval fantasy title theme, fully instrumental, no vocals, key of D major, tempo exactly 68 BPM, solo celtic harp states the melody alone then a small warm string section joins underneath, a single low horn holding long notes far back, patient hopeful and a little wistful, clean acoustic recording in a stone hall with natural reverb, loops gently under a menu screen",
+    "lyrics": "",
+    "acePrompt": "medieval fantasy title theme, instrumental, no vocals. slow and noble, 68 bpm, 4/4. solo celtic harp states the melody alone, then a small warm string section joins underneath. a single low horn holds long notes far back. patient, hopeful, a little wistful. clean acoustic recording in a stone hall, natural reverb. loops gently, no big ending.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:00",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "6855c9ac-7365-4656-9f6e-646683f27d60"
+      ],
+      "shipped": "6855c9ac-7365-4656-9f6e-646683f27d60"
+    }
   },
   {
     "id": "hall_bed_01",
@@ -14,8 +29,24 @@
     "kind": "instrumental",
     "mood": "stately",
     "seconds": 120,
-    "prompt": "renaissance chamber consort, instrumental, no vocals. stately and curious, 84 bpm, 4/4. harpsichord and plucked lute trade a polite walking figure while viola da gamba and recorder answer. light tambourine on the offbeat. courtly, orderly, slightly inquisitive — the sound of a busy guild hall going about its morning. dry warm acoustic, no drums kit, no synths.",
-    "lyrics": ""
+    "source": "suno",
+    "prompt": "renaissance chamber consort, fully instrumental, no vocals, key of G major, tempo exactly 84 BPM, harpsichord and plucked lute trading a polite walking figure while viola da gamba and recorder answer, light tambourine on the offbeat, courtly orderly and slightly inquisitive, the sound of a busy guild hall going about its morning, dry warm acoustic, no drum kit, no synths",
+    "lyrics": "",
+    "acePrompt": "renaissance chamber consort, instrumental, no vocals. stately and curious, 84 bpm, 4/4. harpsichord and plucked lute trade a polite walking figure while viola da gamba and recorder answer. light tambourine on the offbeat. courtly, orderly, slightly inquisitive — the sound of a busy guild hall going about its morning. dry warm acoustic, no drums kit, no synths.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:00",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "beab2164-7349-4284-9001-1bd62069ec7a",
+        "fab2654f-b12b-4da5-a57d-8d5c1801c38c"
+      ],
+      "shipped": "beab2164-7349-4284-9001-1bd62069ec7a"
+    }
   },
   {
     "id": "hall_bed_02",
@@ -23,17 +54,49 @@
     "kind": "instrumental",
     "mood": "warm",
     "seconds": 110,
-    "prompt": "medieval chamber music, instrumental, no vocals. warm and unhurried, 72 bpm, 6/8 lilt. celtic harp leads, low recorder and bowed cello underneath, occasional soft hand drum. gentle and welcoming rather than grand — background music for a hall where people are talking. acoustic, roomy stone reverb, no vocals at all, no modern instruments.",
-    "lyrics": ""
+    "source": "suno",
+    "prompt": "medieval chamber music, fully instrumental, no vocals, key of A minor, tempo exactly 72 BPM, 6/8 lilt, celtic harp leads with low recorder and bowed cello underneath and an occasional soft hand drum, warm unhurried and welcoming rather than grand, background music for a hall where people are talking, acoustic with roomy stone reverb, no modern instruments",
+    "lyrics": "",
+    "acePrompt": "medieval chamber music, instrumental, no vocals. warm and unhurried, 72 bpm, 6/8 lilt. celtic harp leads, low recorder and bowed cello underneath, occasional soft hand drum. gentle and welcoming rather than grand — background music for a hall where people are talking. acoustic, roomy stone reverb, no vocals at all, no modern instruments.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "1:50",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "a6d7b4a2-b958-4d27-86c3-9b2dc71e2e95",
+        "9eaa3240-48ea-4c02-b73e-a1e9752df256"
+      ],
+      "shipped": "a6d7b4a2-b958-4d27-86c3-9b2dc71e2e95"
+    }
   },
   {
     "id": "meadow_bed_01",
     "title": "Low Green Country",
     "kind": "instrumental",
     "mood": "pastoral",
-    "seconds": 125,
-    "prompt": "pastoral celtic folk instrumental, no vocals. gentle and open, 76 bpm, 6/8. tin whistle carries a simple pentatonic melody over fingerpicked acoustic guitar and harp, soft strings pad far behind, no percussion. sunlit, wide, walking-pace, faintly melancholy. field-recording air and birdsong feel. entirely instrumental.",
-    "lyrics": ""
+    "seconds": 130,
+    "source": "suno",
+    "prompt": "pastoral celtic folk instrumental, fully instrumental, no vocals, key of G major, tempo exactly 76 BPM, 6/8, tin whistle carrying a simple pentatonic melody over fingerpicked acoustic guitar and harp, a soft string pad far behind, no percussion, sunlit wide walking-pace and faintly melancholy, open air field recording feel",
+    "lyrics": "",
+    "acePrompt": "pastoral celtic folk instrumental, no vocals. gentle and open, 76 bpm, 6/8. tin whistle carries a simple pentatonic melody over fingerpicked acoustic guitar and harp, soft strings pad far behind, no percussion. sunlit, wide, walking-pace, faintly melancholy. field-recording air and birdsong feel. entirely instrumental.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:10",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "6dfecd43-fc95-4cdb-8af9-d45f59d8e1e4",
+        "d6b4369b-9fba-420a-89b9-f9b57c2832ba"
+      ],
+      "shipped": "6dfecd43-fc95-4cdb-8af9-d45f59d8e1e4"
+    }
   },
   {
     "id": "meadow_bed_02",
@@ -41,53 +104,149 @@
     "kind": "instrumental",
     "mood": "bright",
     "seconds": 110,
-    "prompt": "bright folk instrumental, no vocals. cheerful travelling music, 104 bpm, 4/4. hammered dulcimer and fiddle play a bouncing melody together, upright bass walks, light bodhran keeps a steady walking pulse. major key, optimistic, breezy, forward motion. acoustic, close and dry. no singing.",
-    "lyrics": ""
+    "source": "suno",
+    "prompt": "bright folk instrumental, fully instrumental, no vocals, key of D major, tempo exactly 104 BPM, cheerful travelling music, hammered dulcimer and fiddle playing a bouncing melody together, upright bass walking, a light bodhran keeping a steady walking pulse, optimistic breezy and forward-moving, close dry acoustic, no singing",
+    "lyrics": "",
+    "acePrompt": "bright folk instrumental, no vocals. cheerful travelling music, 104 bpm, 4/4. hammered dulcimer and fiddle play a bouncing melody together, upright bass walks, light bodhran keeps a steady walking pulse. major key, optimistic, breezy, forward motion. acoustic, close and dry. no singing.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "1:50",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "17d7a6cd-c988-4488-855f-f2c709c9f2d3",
+        "8b65ea96-765c-4e49-b5cc-9025032cf39f"
+      ],
+      "shipped": "17d7a6cd-c988-4488-855f-f2c709c9f2d3"
+    }
   },
   {
     "id": "meadow_bed_03",
     "title": "Rain Over the Fields",
     "kind": "instrumental",
     "mood": "wistful",
-    "seconds": 115,
-    "prompt": "quiet folk instrumental, no vocals. wistful and slow, 62 bpm, 3/4 waltz. solo nylon guitar and low whistle, sparse harp harmonics, a distant bowed string drone. grey weather, thoughtful, unresolved. very soft dynamics, lots of space between notes. purely instrumental, no percussion, no vocals.",
-    "lyrics": ""
+    "seconds": 120,
+    "source": "suno",
+    "prompt": "quiet folk instrumental, fully instrumental, no vocals, key of E minor, tempo exactly 62 BPM, 3/4 waltz, solo nylon guitar and low whistle, sparse harp harmonics, a distant bowed string drone, grey weather thoughtful and unresolved, very soft dynamics with lots of space between the notes, no percussion",
+    "lyrics": "",
+    "acePrompt": "quiet folk instrumental, no vocals. wistful and slow, 62 bpm, 3/4 waltz. solo nylon guitar and low whistle, sparse harp harmonics, a distant bowed string drone. grey weather, thoughtful, unresolved. very soft dynamics, lots of space between notes. purely instrumental, no percussion, no vocals.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:00",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "fdfa68f7-08f6-43a9-b000-9f03c72e61f9",
+        "1b92a4c9-2791-4f3b-b7e5-93cbe14d7917"
+      ],
+      "shipped": "1b92a4c9-2791-4f3b-b7e5-93cbe14d7917"
+    }
   },
   {
     "id": "tavern_inst_01",
     "title": "Room Tone, The Broken Shield",
     "kind": "instrumental",
     "mood": "cosy",
-    "seconds": 120,
-    "prompt": "solo lute noodling in a tavern corner, instrumental, no vocals. loose and unhurried, 70 bpm, free feel. one lute improvising a simple modal tune, sometimes pausing, occasional low fiddle drone underneath. background music nobody is listening to, warm and cosy, fireside. slightly imperfect timing, human. no percussion, no vocals, no other instruments.",
-    "lyrics": ""
+    "seconds": 119,
+    "source": "suno",
+    "prompt": "solo lute noodling in a tavern corner, fully instrumental, no vocals, key of D minor, tempo exactly 70 BPM, loose and unhurried free feel, one lute improvising a simple modal tune and sometimes pausing, an occasional low fiddle drone underneath, background music nobody is listening to, warm cosy fireside, slightly imperfect human timing, no percussion, no other instruments",
+    "lyrics": "",
+    "acePrompt": "solo lute noodling in a tavern corner, instrumental, no vocals. loose and unhurried, 70 bpm, free feel. one lute improvising a simple modal tune, sometimes pausing, occasional low fiddle drone underneath. background music nobody is listening to, warm and cosy, fireside. slightly imperfect timing, human. no percussion, no vocals, no other instruments.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:00",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "1803182d-862d-4870-844a-066fd1653c94",
+        "a3a2a397-9ea4-441a-a282-b98f76c3f51c"
+      ],
+      "shipped": "1803182d-862d-4870-844a-066fd1653c94"
+    }
   },
   {
     "id": "tavern_inst_02",
     "title": "The Elbow Jig",
     "kind": "instrumental",
     "mood": "rowdy",
-    "seconds": 105,
-    "prompt": "fast irish tavern jig, instrumental, no vocals. rowdy and driving, 132 bpm, 6/8. fiddle and hurdy-gurdy in unison on a minor-key jig, tin whistle doubling on the repeat, bodhran and stamping feet, tambourine. sweaty, boisterous, a crowded floor. live acoustic, no vocals at all.",
-    "lyrics": ""
+    "seconds": 110,
+    "source": "suno",
+    "prompt": "fast irish tavern jig, fully instrumental, no vocals, key of A minor, tempo exactly 132 BPM, 6/8, fiddle and hurdy-gurdy in unison on the jig with tin whistle doubling on the repeat, bodhran, stamping feet and tambourine, sweaty boisterous and rowdy, a crowded floor, live acoustic recording",
+    "lyrics": "",
+    "acePrompt": "fast irish tavern jig, instrumental, no vocals. rowdy and driving, 132 bpm, 6/8. fiddle and hurdy-gurdy in unison on a minor-key jig, tin whistle doubling on the repeat, bodhran and stamping feet, tambourine. sweaty, boisterous, a crowded floor. live acoustic, no vocals at all.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "1:50",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "c84673ad-667e-4a9f-997e-dbb622b7aef4",
+        "03ab64f1-1b60-40a2-a79a-2a21b19e3980"
+      ],
+      "shipped": "c84673ad-667e-4a9f-997e-dbb622b7aef4"
+    }
   },
   {
     "id": "tension_01",
     "title": "Something on the Ridge",
     "kind": "instrumental",
     "mood": "tense",
-    "seconds": 115,
-    "prompt": "dark fantasy tension underscore, instrumental, no vocals. slow and creeping, 58 bpm. sustained low cello drone, sparse detuned dulcimer notes, a struck metal bowl ringing out every few bars, very quiet frame drum heartbeat. minor second dissonance held. dread building without ever arriving. no melody, no vocals, no drum kit.",
-    "lyrics": ""
+    "seconds": 120,
+    "source": "suno",
+    "prompt": "dark fantasy tension underscore, fully instrumental, no vocals, key of C minor, tempo exactly 58 BPM, slow and creeping, a sustained low cello drone, sparse detuned dulcimer notes, a struck metal bowl ringing out every few bars, a very quiet frame drum heartbeat, held minor second dissonance, dread building without ever arriving, no melody, no drum kit",
+    "lyrics": "",
+    "acePrompt": "dark fantasy tension underscore, instrumental, no vocals. slow and creeping, 58 bpm. sustained low cello drone, sparse detuned dulcimer notes, a struck metal bowl ringing out every few bars, very quiet frame drum heartbeat. minor second dissonance held. dread building without ever arriving. no melody, no vocals, no drum kit.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:00",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "cd5216d2-a1f2-4995-b32b-016743378043",
+        "fc53cc10-bec5-41ec-97d3-8b8c840864f0"
+      ],
+      "shipped": "fc53cc10-bec5-41ec-97d3-8b8c840864f0"
+    }
   },
   {
     "id": "tension_02",
     "title": "Torches Out",
     "kind": "instrumental",
     "mood": "uneasy",
-    "seconds": 105,
-    "prompt": "uneasy medieval underscore, instrumental, no vocals. 66 bpm, sparse. bowed double bass, tremolo violas high and thin, a single low male-register wooden flute playing three lonely notes, distant hand drum. cold stone corridor. suspense, not action. entirely instrumental, no singing, no synthesisers.",
-    "lyrics": ""
+    "seconds": 110,
+    "source": "suno",
+    "prompt": "uneasy medieval underscore, fully instrumental, no vocals, key of F minor, tempo exactly 66 BPM, sparse, bowed double bass, high thin tremolo violas, a single low wooden flute playing three lonely notes, a distant hand drum, cold stone corridor, suspense not action, no synthesisers",
+    "lyrics": "",
+    "acePrompt": "uneasy medieval underscore, instrumental, no vocals. 66 bpm, sparse. bowed double bass, tremolo violas high and thin, a single low male-register wooden flute playing three lonely notes, distant hand drum. cold stone corridor. suspense, not action. entirely instrumental, no singing, no synthesisers.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "1:50",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "4da65623-8fe1-4a77-a78a-c21b30e1f5fa",
+        "8e08fb9e-ef9c-4621-8eb1-7cbfbd5b603f"
+      ],
+      "shipped": "4da65623-8fe1-4a77-a78a-c21b30e1f5fa"
+    }
   },
   {
     "id": "combat_01",
@@ -95,17 +254,49 @@
     "kind": "instrumental",
     "mood": "combat",
     "seconds": 110,
-    "prompt": "fantasy battle music, instrumental, no vocals. driving and urgent, 148 bpm, 4/4. big taiko and frame drums on a relentless pattern, low staccato strings ostinato, brass stabs on the accents, a wailing fiddle line over the top. minor key, aggressive, cinematic, no let-up. orchestral and folk instruments only, no vocals, no electric guitar.",
-    "lyrics": ""
+    "source": "suno",
+    "prompt": "fantasy battle music, fully instrumental, no vocals, key of D minor, tempo exactly 148 BPM, driving and urgent, big taiko and frame drums on a relentless pattern, low staccato string ostinato, brass stabs on the accents, a wailing fiddle line over the top, aggressive and cinematic with no let-up, orchestral and folk instruments only, no electric guitar",
+    "lyrics": "",
+    "acePrompt": "fantasy battle music, instrumental, no vocals. driving and urgent, 148 bpm, 4/4. big taiko and frame drums on a relentless pattern, low staccato strings ostinato, brass stabs on the accents, a wailing fiddle line over the top. minor key, aggressive, cinematic, no let-up. orchestral and folk instruments only, no vocals, no electric guitar.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "1:50",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "8a494b72-3616-45ea-a3f8-80c9ae2b55de",
+        "da1d400a-4d79-4ec5-b700-74b0462e2ba0"
+      ],
+      "shipped": "8a494b72-3616-45ea-a3f8-80c9ae2b55de"
+    }
   },
   {
     "id": "combat_02",
     "title": "Hold the Line",
     "kind": "instrumental",
     "mood": "heroic",
-    "seconds": 105,
-    "prompt": "heroic fantasy battle music, instrumental, no vocals. 132 bpm, 4/4, marching. war drums and low toms, french horns and trombones carrying a bold rising theme, strings sawing underneath, clashing cymbals on the phrase ends. defiant and rallying rather than frightening. full orchestra, no vocals whatsoever.",
-    "lyrics": ""
+    "seconds": 110,
+    "source": "suno",
+    "prompt": "heroic fantasy battle music, fully instrumental, no vocals, key of C minor, tempo exactly 132 BPM, marching, war drums and low toms, french horns and trombones carrying a bold rising theme, strings sawing underneath, clashing cymbals on the phrase ends, defiant and rallying rather than frightening, full orchestra",
+    "lyrics": "",
+    "acePrompt": "heroic fantasy battle music, instrumental, no vocals. 132 bpm, 4/4, marching. war drums and low toms, french horns and trombones carrying a bold rising theme, strings sawing underneath, clashing cymbals on the phrase ends. defiant and rallying rather than frightening. full orchestra, no vocals whatsoever.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "1:50",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "dbd94da8-d8f8-489c-8426-5b79cbaf532d",
+        "809b2c48-dcab-43ec-8594-7fe42be447e9"
+      ],
+      "shipped": "dbd94da8-d8f8-489c-8426-5b79cbaf532d"
+    }
   },
   {
     "id": "night_bed_01",
@@ -113,26 +304,74 @@
     "kind": "instrumental",
     "mood": "quiet",
     "seconds": 130,
-    "prompt": "very quiet night ambience with melody, instrumental, no vocals. 54 bpm, extremely sparse. a single low wooden flute plays slow phrases with long silences between them, over a barely-audible bowed drone and the occasional harp harmonic. still, cold, peaceful, lonely. almost ambient. no percussion, no vocals, dynamic range very low.",
-    "lyrics": ""
+    "source": "suno",
+    "prompt": "very quiet night ambience with a melody, fully instrumental, no vocals, key of A minor, tempo exactly 54 BPM, extremely sparse, a single low wooden flute playing slow phrases with long silences between them over a barely audible bowed drone and the occasional harp harmonic, still cold peaceful and lonely, almost ambient, no percussion, very low dynamic range",
+    "lyrics": "",
+    "acePrompt": "very quiet night ambience with melody, instrumental, no vocals. 54 bpm, extremely sparse. a single low wooden flute plays slow phrases with long silences between them, over a barely-audible bowed drone and the occasional harp harmonic. still, cold, peaceful, lonely. almost ambient. no percussion, no vocals, dynamic range very low.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:10",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "3b872223-2c6c-49f4-8fe9-9f7cc8718a07",
+        "cb4e5d76-2061-4f5e-b066-59f3b93a6101"
+      ],
+      "shipped": "cb4e5d76-2061-4f5e-b066-59f3b93a6101"
+    }
   },
   {
     "id": "victory_sting_01",
     "title": "Contract Complete",
     "kind": "instrumental",
     "mood": "fanfare",
-    "seconds": 25,
-    "prompt": "short triumphant medieval fanfare, instrumental, no vocals. 110 bpm. natural trumpets and horns state a bright rising four-bar phrase, timpani roll, strings swell and a cymbal finishes it. major key, celebratory, resolves cleanly on the final chord. begins immediately, no intro. no vocals.",
-    "lyrics": ""
+    "seconds": 30,
+    "source": "suno",
+    "prompt": "short triumphant medieval fanfare, fully instrumental, no vocals, key of C major, tempo exactly 110 BPM, natural trumpets and horns state a bright rising four-bar phrase, timpani roll, strings swell and a cymbal finishes it, celebratory, begins immediately with no intro, resolves cleanly on the final chord and stops",
+    "lyrics": "",
+    "acePrompt": "short triumphant medieval fanfare, instrumental, no vocals. 110 bpm. natural trumpets and horns state a bright rising four-bar phrase, timpani roll, strings swell and a cymbal finishes it. major key, celebratory, resolves cleanly on the final chord. begins immediately, no intro. no vocals.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "0:30",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "bf486ec7-d486-4807-9c05-7b21e64b5924",
+        "e42df26f-ed14-4eb4-95b4-d4ee93f95035"
+      ],
+      "shipped": "bf486ec7-d486-4807-9c05-7b21e64b5924"
+    }
   },
   {
     "id": "victory_sting_02",
     "title": "Well Fought",
     "kind": "instrumental",
     "mood": "fanfare",
-    "seconds": 26,
-    "prompt": "short warm folk victory sting, instrumental, no vocals. 100 bpm, 6/8. harp arpeggio flourish, fiddle and whistle answer with a bright little tune, tambourine. small and human rather than orchestral. starts on the downbeat, no fade in. the instruments keep playing at full strength right to the very last beat and finish together on a held major chord — no early stop, no dead air at the end. no vocals.",
-    "lyrics": ""
+    "seconds": 30,
+    "source": "suno",
+    "prompt": "short warm folk victory sting, fully instrumental, no vocals, key of G major, tempo exactly 100 BPM, 6/8, a harp arpeggio flourish then fiddle and whistle answer with a bright little tune, tambourine, small and human rather than orchestral, starts on the downbeat with no fade in, every instrument plays at full strength to the last beat and they finish together on a held major chord",
+    "lyrics": "",
+    "acePrompt": "short warm folk victory sting, instrumental, no vocals. 100 bpm, 6/8. harp arpeggio flourish, fiddle and whistle answer with a bright little tune, tambourine. small and human rather than orchestral. starts on the downbeat, no fade in. the instruments keep playing at full strength right to the very last beat and finish together on a held major chord — no early stop, no dead air at the end. no vocals.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "0:30",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "81bddc28-1c67-42f1-82e9-9ddb86b07876",
+        "85e01747-1b52-4c65-b7d2-f9b3cf529dc5"
+      ],
+      "shipped": "81bddc28-1c67-42f1-82e9-9ddb86b07876"
+    }
   },
   {
     "id": "defeat_sting_01",
@@ -140,8 +379,24 @@
     "kind": "instrumental",
     "mood": "downbeat",
     "seconds": 22,
-    "prompt": "short sombre fantasy sting, instrumental, no vocals. 60 bpm. low strings descend through a minor cadence, a single struck bell, muted horn holds the last note and fades. disappointed rather than tragic. no percussion beyond the bell, no vocals. resolves and stops.",
-    "lyrics": ""
+    "source": "suno",
+    "prompt": "short sombre fantasy sting, fully instrumental, no vocals, key of D minor, tempo exactly 60 BPM, low strings descending through a minor cadence, a single struck bell, a muted horn holding the last note and fading, disappointed rather than tragic, no percussion beyond the bell, resolves and stops",
+    "lyrics": "",
+    "acePrompt": "short sombre fantasy sting, instrumental, no vocals. 60 bpm. low strings descend through a minor cadence, a single struck bell, muted horn holds the last note and fades. disappointed rather than tragic. no percussion beyond the bell, no vocals. resolves and stops.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "0:30",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "c3627079-78d3-4261-b90c-5b11d7c9ca06",
+        "0929c043-2569-41b5-b53b-e8ccf21ad085"
+      ],
+      "shipped": "c3627079-78d3-4261-b90c-5b11d7c9ca06"
+    }
   },
   {
     "id": "quest_sting_01",
@@ -149,53 +404,149 @@
     "kind": "instrumental",
     "mood": "curious",
     "seconds": 20,
-    "prompt": "very short bright medieval flourish, instrumental, no vocals. 96 bpm. plucked lute run upward, recorder trill, small hand drum tap, finishes on a clean open chord. curious and encouraging, the sound of taking a job. two bars of nothing else. no vocals.",
-    "lyrics": ""
+    "source": "suno",
+    "prompt": "very short bright medieval flourish, fully instrumental, no vocals, key of F major, tempo exactly 96 BPM, a plucked lute run upward, a recorder trill, a small hand drum tap, finishing on a clean open chord, curious and encouraging, the sound of taking a job, begins immediately with no intro",
+    "lyrics": "",
+    "acePrompt": "very short bright medieval flourish, instrumental, no vocals. 96 bpm. plucked lute run upward, recorder trill, small hand drum tap, finishes on a clean open chord. curious and encouraging, the sound of taking a job. two bars of nothing else. no vocals.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "0:20",
+      "lyricsMode": "Instrumental",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "c57601d6-7bbc-49be-90a4-d9c4a0e9e5d4",
+        "09bf8ac7-73b5-4315-8ee8-a2e4da607cb5"
+      ],
+      "shipped": "c57601d6-7bbc-49be-90a4-d9c4a0e9e5d4"
+    }
   },
   {
     "id": "tavern_song_drinking_01",
     "title": "The Ale Runs Low",
     "kind": "song",
     "mood": "rowdy",
-    "seconds": 130,
-    "prompt": "medieval tavern drinking song. ONE clear male baritone lead vocal, close-miked and mixed loud right at the front — the lead voice is the loudest thing in the mix by far, every word crisp and clearly enunciated. a small crowd joins in only on the chorus, quietly, well behind the lead. 108 bpm, 4/4, stomping but sparse: just acoustic guitar, a single fiddle and a bodhran, plenty of space, no accordion, no brass, no wall of noise. warm and joyful. diction is the priority.",
-    "lyrics": "[Verse 1]\n(male) I signed my name on the contract board\n(male) For a copper coin and a borrowed sword\n(male) And I came back muddy and I came back late\n(male) With a story worth twice what they paid\n\n[Chorus]\n(crowd) So pour it out, the ale runs low\n(crowd) Pour it out, the ale runs low\n(crowd) We'll be up at dawn and gone by noon\n(crowd) But the ale runs low tonight\n\n[Verse 2]\n(male) There's a boy at the Academy learning his letters\n(male) He'll be better than me and I hope he does better\n(male) But tonight he's here with a cup in his hand\n(male) And he sings just as loud as the rest of the band\n\n[Chorus]\n(crowd) So pour it out, the ale runs low\n(crowd) Pour it out, the ale runs low\n(crowd) We'll be up at dawn and gone by noon\n(crowd) But the ale runs low tonight\n\n[Outro]\n(crowd) The ale runs low tonight"
+    "seconds": 134,
+    "source": "suno",
+    "prompt": "medieval tavern drinking song, ONE clear male baritone lead vocal, close-miked and mixed loud right at the front, the lead voice is the loudest thing in the mix by far and every word is crisp and clearly enunciated, a small crowd joins in only on the chorus, quietly and well behind the lead, tempo exactly 108 BPM, 4/4, stomping but sparse: acoustic guitar, a single fiddle and a bodhran, plenty of space, no accordion, no brass, no wall of noise, warm and joyful, diction is the priority",
+    "lyrics": "[Verse 1]\n(male) I signed my name on the contract board\n(male) For a copper coin and a borrowed sword\n(male) And I came back muddy and I came back late\n(male) With a story worth twice what they paid\n\n[Chorus]\n(crowd) So pour it out, the ale runs low\n(crowd) Pour it out, the ale runs low\n(crowd) We'll be up at dawn and gone by noon\n(crowd) But the ale runs low tonight\n\n[Verse 2]\n(male) There's a boy at the Academy learning his letters\n(male) He'll be better than me and I hope he does better\n(male) But tonight he's here with a cup in his hand\n(male) And he sings just as loud as the rest of the band\n\n[Chorus]\n(crowd) So pour it out, the ale runs low\n(crowd) Pour it out, the ale runs low\n(crowd) We'll be up at dawn and gone by noon\n(crowd) But the ale runs low tonight\n\n[Outro]\n(crowd) The ale runs low tonight",
+    "acePrompt": "medieval tavern drinking song. ONE clear male baritone lead vocal, close-miked and mixed loud right at the front — the lead voice is the loudest thing in the mix by far, every word crisp and clearly enunciated. a small crowd joins in only on the chorus, quietly, well behind the lead. 108 bpm, 4/4, stomping but sparse: just acoustic guitar, a single fiddle and a bodhran, plenty of space, no accordion, no brass, no wall of noise. warm and joyful. diction is the priority.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:15",
+      "lyricsMode": "Write",
+      "vocalGender": "male",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "803f6525-baaf-41bc-9031-21961dd915a5",
+        "2cb52ab5-2761-4f34-a8ee-3f49accc0d04"
+      ],
+      "shipped": "803f6525-baaf-41bc-9031-21961dd915a5"
+    }
   },
   {
     "id": "tavern_song_boast_01",
     "title": "I Fought a Bear",
     "kind": "song",
     "mood": "comic",
-    "seconds": 128,
-    "prompt": "comic boastful tavern song. one theatrical male baritone lead who clearly thinks a lot of himself, answered by a jeering mixed crowd on the chorus. 108 bpm, 4/4, swaggering. accordion, fiddle, plucked bass, snare rim and tambourine, occasional laughter. music hall energy in a medieval costume. crisp diction, comedic timing, family friendly.",
-    "lyrics": "[Verse 1]\n(male) I have wrestled a bear, or I nearly did\n(male) It was watching me closely from over the ridge\n(male) And I looked at the bear and the bear looked at me\n(male) And we came to an honourable treaty\n\n[Chorus]\n(crowd) He's the bravest man in the guild\n(male) I am\n(crowd) He has never once run from a fight\n(male) Well\n(crowd) He's the bravest man in the guild tonight\n\n[Verse 2]\n(male) I have swum the cold river with a pack on my back\n(male) I have carried three friends and a barrel of tack\n(male) I have stood in the doorway when nobody would\n(male) And I'd do it again if I thought that I could\n\n[Chorus]\n(crowd) He's the bravest man in the guild\n(male) I am\n(crowd) He has never once run from a fight\n(male) Well\n(crowd) He's the bravest man in the guild tonight"
+    "seconds": 93,
+    "source": "suno",
+    "prompt": "comic boastful tavern song, one theatrical male baritone lead who clearly thinks a lot of himself, close-miked and mixed right at the front with crisp diction, answered by a jeering mixed crowd on the chorus only, tempo exactly 108 BPM, 4/4, swaggering, accordion, fiddle, plucked bass, snare rim and tambourine, occasional laughter, music hall energy in a medieval costume, comedic timing, family friendly",
+    "lyrics": "[Verse 1]\n(male) I have wrestled a bear, or I nearly did\n(male) It was watching me closely from over the ridge\n(male) And I looked at the bear and the bear looked at me\n(male) And we came to an honourable treaty\n\n[Chorus]\n(crowd) He's the bravest man in the guild\n(male) I am\n(crowd) He has never once run from a fight\n(male) Well\n(crowd) He's the bravest man in the guild tonight\n\n[Verse 2]\n(male) I have swum the cold river with a pack on my back\n(male) I have carried three friends and a barrel of tack\n(male) I have stood in the doorway when nobody would\n(male) And I'd do it again if I thought that I could\n\n[Chorus]\n(crowd) He's the bravest man in the guild\n(male) I am\n(crowd) He has never once run from a fight\n(male) Well\n(crowd) He's the bravest man in the guild tonight",
+    "acePrompt": "comic boastful tavern song. one theatrical male baritone lead who clearly thinks a lot of himself, answered by a jeering mixed crowd on the chorus. 108 bpm, 4/4, swaggering. accordion, fiddle, plucked bass, snare rim and tambourine, occasional laughter. music hall energy in a medieval costume. crisp diction, comedic timing, family friendly.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:15",
+      "lyricsMode": "Write",
+      "vocalGender": "male",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "a9c712a6-8a16-4a1f-8971-006e01ba3a45",
+        "54b6b358-a398-431e-a047-736d3b864add"
+      ],
+      "shipped": "a9c712a6-8a16-4a1f-8971-006e01ba3a45"
+    }
   },
   {
     "id": "tavern_song_ballad_01",
     "title": "The Girl Who Went to the Ridge",
     "kind": "song",
     "mood": "wistful",
-    "seconds": 135,
-    "prompt": "slow celtic folk ballad, solo female vocal. clear unornamented alto voice, close mic, front and centre. 66 bpm, 3/4. fingerpicked nylon guitar and celtic harp only, with a low whistle answering at the end of each line and a soft string pad on the choruses. no percussion. sad, tender, restrained, beautiful. traditional folk phrasing.",
-    "lyrics": "[Verse 1]\n(female) She was seventeen and she signed her name\n(female) On the lowest line of the contract board\n(female) Her mother said the road was long\n(female) Her father said no more\n\n[Chorus]\n(female) But the ridge was green and the morning wide\n(female) And she went up with the sun\n(female) And whatever it is you're waiting for\n(female) She is halfway there, and gone\n\n[Verse 2]\n(female) They say she keeps a lantern lit\n(female) In a tower on the eastern side\n(female) And every year another one\n(female) Goes walking up that ridge\n\n[Chorus]\n(female) And the ridge was green and the morning wide\n(female) And she went up with the sun\n(female) And whatever it is you're waiting for\n(female) She is halfway there, and gone"
+    "seconds": 129,
+    "source": "suno",
+    "prompt": "slow celtic folk ballad, one solo female vocal, clear unornamented alto voice, close-miked, front and centre, every word clearly enunciated, tempo exactly 66 BPM, 3/4, fingerpicked nylon guitar and celtic harp only with a low whistle answering at the end of each line and a soft string pad on the choruses, no percussion, sad tender restrained and beautiful, traditional folk phrasing",
+    "lyrics": "[Verse 1]\n(female) She was seventeen and she signed her name\n(female) On the lowest line of the contract board\n(female) Her mother said the road was long\n(female) Her father said no more\n\n[Chorus]\n(female) But the ridge was green and the morning wide\n(female) And she went up with the sun\n(female) And whatever it is you're waiting for\n(female) She is halfway there, and gone\n\n[Verse 2]\n(female) They say she keeps a lantern lit\n(female) In a tower on the eastern side\n(female) And every year another one\n(female) Goes walking up that ridge\n\n[Chorus]\n(female) And the ridge was green and the morning wide\n(female) And she went up with the sun\n(female) And whatever it is you're waiting for\n(female) She is halfway there, and gone",
+    "acePrompt": "slow celtic folk ballad, solo female vocal. clear unornamented alto voice, close mic, front and centre. 66 bpm, 3/4. fingerpicked nylon guitar and celtic harp only, with a low whistle answering at the end of each line and a soft string pad on the choruses. no percussion. sad, tender, restrained, beautiful. traditional folk phrasing.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:10",
+      "lyricsMode": "Write",
+      "vocalGender": "female",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "d1094dc2-33fe-4ad2-bf97-8e6c65c0ab2b",
+        "45edc61d-08e9-40e1-b3f6-b6207ef32ef5"
+      ],
+      "shipped": "d1094dc2-33fe-4ad2-bf97-8e6c65c0ab2b"
+    }
   },
   {
     "id": "tavern_song_work_01",
     "title": "Haul Away",
     "kind": "song",
     "mood": "gruff",
-    "seconds": 120,
-    "prompt": "call and response work song, landlocked shanty. ONE gruff male caller, close-miked, dry and very far forward, singing his lines completely unaccompanied and enunciating every word clearly. a crowd answers only the short 'haul away' response, lower in the mix. 92 bpm, 4/4, heavy downbeat. almost no instruments at all — stamping feet and a single bodhran, nothing else, long silences between phrases. the words must be clearly audible, not vocalised or hummed.",
-    "lyrics": "[Verse 1]\n(male) There's a wagon in the mud\n(crowd) Haul away\n(male) And it's loaded to the hub\n(crowd) Haul away\n(male) And the axle's near in two\n(crowd) Haul away\n(male) And there's nothing else to do\n(crowd) Haul away, haul away\n\n[Chorus]\n(crowd) Heave, and the wheel comes round\n(crowd) Heave, and the rope holds sound\n(crowd) One more pull and we're on the road\n(crowd) Haul away, haul away\n\n[Verse 2]\n(male) I have carried worse than this\n(crowd) Haul away\n(male) I have carried it uphill\n(crowd) Haul away\n(male) I have carried it alone\n(crowd) Haul away\n(male) And I'm glad you're here, you know\n(crowd) Haul away, haul away\n\n[Chorus]\n(crowd) Heave, and the wheel comes round\n(crowd) Heave, and the rope holds sound\n(crowd) One more pull and we're on the road\n(crowd) Haul away, haul away"
+    "seconds": 130,
+    "source": "suno",
+    "prompt": "call and response landlocked work shanty, ONE gruff male caller, close-miked, dry and very far forward, singing his lines completely unaccompanied and enunciating every word clearly, a crowd answers only the short haul away response and sits lower in the mix, tempo exactly 92 BPM, 4/4, heavy downbeat, almost no instruments at all, stamping feet and a single bodhran and nothing else, long silences between phrases, the words must be clearly audible and never hummed or vocalised",
+    "lyrics": "[Verse 1]\n(male) There's a wagon in the mud\n(crowd) Haul away\n(male) And it's loaded to the hub\n(crowd) Haul away\n(male) And the axle's near in two\n(crowd) Haul away\n(male) And there's nothing else to do\n(crowd) Haul away, haul away\n\n[Chorus]\n(crowd) Heave, and the wheel comes round\n(crowd) Heave, and the rope holds sound\n(crowd) One more pull and we're on the road\n(crowd) Haul away, haul away\n\n[Verse 2]\n(male) I have carried worse than this\n(crowd) Haul away\n(male) I have carried it uphill\n(crowd) Haul away\n(male) I have carried it alone\n(crowd) Haul away\n(male) And I'm glad you're here, you know\n(crowd) Haul away, haul away\n\n[Chorus]\n(crowd) Heave, and the wheel comes round\n(crowd) Heave, and the rope holds sound\n(crowd) One more pull and we're on the road\n(crowd) Haul away, haul away",
+    "acePrompt": "call and response work song, landlocked shanty. ONE gruff male caller, close-miked, dry and very far forward, singing his lines completely unaccompanied and enunciating every word clearly. a crowd answers only the short 'haul away' response, lower in the mix. 92 bpm, 4/4, heavy downbeat. almost no instruments at all — stamping feet and a single bodhran, nothing else, long silences between phrases. the words must be clearly audible, not vocalised or hummed.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:10",
+      "lyricsMode": "Write",
+      "vocalGender": "male",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "3cd0fd39-1dfa-4013-98a3-c9510a341f79",
+        "3d9014cc-602f-48e5-920b-ee88780fa8bc"
+      ],
+      "shipped": "3d9014cc-602f-48e5-920b-ee88780fa8bc"
+    }
   },
   {
     "id": "tavern_song_jig_01",
     "title": "Boots Under the Table",
     "kind": "song",
     "mood": "joyful",
-    "seconds": 125,
-    "prompt": "fast tavern jig with singing, male and female duet trading lines and singing the chorus together in harmony. 138 bpm, 6/8, relentless. fiddle, hurdy-gurdy, tin whistle, bouzouki, bodhran and stamping. breathless, dancing, grinning. live and loud. both voices bright and clear, no growling.",
-    "lyrics": "[Verse 1]\n(female) Well the fiddler's got his elbow up\n(male) And the floor has got a beat\n(both) And there's nobody left sitting down\n(both) With their boots beneath the seat\n\n[Chorus]\n(both) Boots under the table, boots on the floor\n(both) Boots going out through the tavern door\n(both) Dance while the candle's tall\n(both) We ride at dawn and that's all\n\n[Verse 2]\n(male) I've a blister and a broken strap\n(female) And a shoulder full of rain\n(both) But the fiddler doesn't care for that\n(both) So we're up and round again\n\n[Chorus]\n(both) Boots under the table, boots on the floor\n(both) Boots going out through the tavern door\n(both) Dance while the candle's tall\n(both) We ride at dawn and that's all"
+    "seconds": 130,
+    "source": "suno",
+    "prompt": "fast tavern jig with singing, a male and female duet trading lines and singing the chorus together in close harmony, both voices bright clear and right at the front with crisp diction, no growling, tempo exactly 138 BPM, 6/8, relentless, fiddle, hurdy-gurdy, tin whistle, bouzouki, bodhran and stamping, breathless dancing and grinning, live and loud",
+    "lyrics": "[Verse 1]\n(female) Well the fiddler's got his elbow up\n(male) And the floor has got a beat\n(both) And there's nobody left sitting down\n(both) With their boots beneath the seat\n\n[Chorus]\n(both) Boots under the table, boots on the floor\n(both) Boots going out through the tavern door\n(both) Dance while the candle's tall\n(both) We ride at dawn and that's all\n\n[Verse 2]\n(male) I've a blister and a broken strap\n(female) And a shoulder full of rain\n(both) But the fiddler doesn't care for that\n(both) So we're up and round again\n\n[Chorus]\n(both) Boots under the table, boots on the floor\n(both) Boots going out through the tavern door\n(both) Dance while the candle's tall\n(both) We ride at dawn and that's all",
+    "acePrompt": "fast tavern jig with singing, male and female duet trading lines and singing the chorus together in harmony. 138 bpm, 6/8, relentless. fiddle, hurdy-gurdy, tin whistle, bouzouki, bodhran and stamping. breathless, dancing, grinning. live and loud. both voices bright and clear, no growling.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:10",
+      "lyricsMode": "Write",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "a92fb745-48e3-4e19-8bff-5619a457fc83",
+        "1b87dff2-2bf7-48f3-a0a4-4d1fc7be9521"
+      ],
+      "shipped": "a92fb745-48e3-4e19-8bff-5619a457fc83"
+    }
   },
   {
     "id": "tavern_song_lament_01",
@@ -203,25 +554,73 @@
     "kind": "song",
     "mood": "sombre",
     "seconds": 130,
-    "prompt": "slow tavern lament, solo male voice, weathered tenor, singing almost unaccompanied. 58 bpm, 3/4. one quiet lute and a low bowed drone, a second male voice joining softly in harmony only on the last chorus. no percussion. dignified grief, understated, everyone in the room gone quiet. very intimate close recording.",
-    "lyrics": "[Verse 1]\n(male) Ten went out on the northern road\n(male) Ten went out in the spring\n(male) Nine came back with the wagon and the gold\n(male) And nobody wants to sing\n\n[Chorus]\n(male) So fill the cup and set it down\n(male) At the place we always keep\n(male) And say the name, and say it plain\n(male) And let the fire burn deep\n\n[Verse 2]\n(male) She was better on the rope than me\n(male) She was better on the climb\n(male) And she'd tell me now to drink it up\n(male) And stop wasting good time\n\n[Chorus]\n(both) So fill the cup and set it down\n(both) At the place we always keep\n(both) And say the name, and say it plain\n(both) And let the fire burn deep"
+    "source": "suno",
+    "prompt": "slow tavern lament, one solo male voice, weathered tenor, singing almost unaccompanied, close-miked and intimate and right at the front, every word clearly enunciated, tempo exactly 58 BPM, 3/4, one quiet lute and a low bowed drone, a second male voice joining softly in harmony only on the last chorus, no percussion, dignified grief, understated, everyone in the room has gone quiet",
+    "lyrics": "[Verse 1]\n(male) Ten went out on the northern road\n(male) Ten went out in the spring\n(male) Nine came back with the wagon and the gold\n(male) And nobody wants to sing\n\n[Chorus]\n(male) So fill the cup and set it down\n(male) At the place we always keep\n(male) And say the name, and say it plain\n(male) And let the fire burn deep\n\n[Verse 2]\n(male) She was better on the rope than me\n(male) She was better on the climb\n(male) And she'd tell me now to drink it up\n(male) And stop wasting good time\n\n[Chorus]\n(both) So fill the cup and set it down\n(both) At the place we always keep\n(both) And say the name, and say it plain\n(both) And let the fire burn deep",
+    "acePrompt": "slow tavern lament, solo male voice, weathered tenor, singing almost unaccompanied. 58 bpm, 3/4. one quiet lute and a low bowed drone, a second male voice joining softly in harmony only on the last chorus. no percussion. dignified grief, understated, everyone in the room gone quiet. very intimate close recording.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:10",
+      "lyricsMode": "Write",
+      "vocalGender": "male",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "77645245-9a98-4f85-b665-cc45d8859eee",
+        "86d3446b-c72c-4010-be33-4c7f5d110bbc"
+      ],
+      "shipped": "77645245-9a98-4f85-b665-cc45d8859eee"
+    }
   },
   {
     "id": "tavern_song_anthem_01",
     "title": "Who Fights",
     "kind": "song",
     "mood": "comic",
-    "seconds": 122,
-    "prompt": "silly guild anthem sung by a whole tavern, mixed male and female crowd in loud rough unison with a single male voice interjecting the jokes. 124 bpm, 4/4, marching stomp. accordion, brass band oompah, snare drum, tankards, cheering. proud and completely ridiculous. call and response shouting on the chorus. family friendly, clear diction.",
-    "lyrics": "[Verse 1]\n(crowd) We are the finest in the land\n(crowd) It says so on the sign\n(crowd) We painted it ourselves last week\n(crowd) And honestly, it's fine\n\n[Chorus]\n(crowd) Who fights? We fight\n(crowd) Who pays? They pay\n(crowd) Who is going to clean the hall tonight\n(male) Not me\n(crowd) Hooray\n\n[Verse 2]\n(crowd) We've a wizard who has lost his hat\n(crowd) A knight who's lost his horse\n(crowd) A cook who is a better shot\n(crowd) Than anyone, of course\n\n[Chorus]\n(crowd) Who fights? We fight\n(crowd) Who pays? They pay\n(crowd) Who is going to clean the hall tonight\n(male) Not me\n(crowd) Hooray"
+    "seconds": 131,
+    "source": "suno",
+    "prompt": "silly guild anthem sung by a whole tavern, a mixed male and female crowd in loud rough unison with a single male voice interjecting the jokes, call and response shouting on the chorus, all words clearly audible, tempo exactly 124 BPM, 4/4, marching stomp, accordion, brass band oompah, snare drum, tankards and cheering, proud and completely ridiculous, family friendly, clear diction",
+    "lyrics": "[Verse 1]\n(crowd) We are the finest in the land\n(crowd) It says so on the sign\n(crowd) We painted it ourselves last week\n(crowd) And honestly, it's fine\n\n[Chorus]\n(crowd) Who fights? We fight\n(crowd) Who pays? They pay\n(crowd) Who is going to clean the hall tonight\n(male) Not me\n(crowd) Hooray\n\n[Verse 2]\n(crowd) We've a wizard who has lost his hat\n(crowd) A knight who's lost his horse\n(crowd) A cook who is a better shot\n(crowd) Than anyone, of course\n\n[Chorus]\n(crowd) Who fights? We fight\n(crowd) Who pays? They pay\n(crowd) Who is going to clean the hall tonight\n(male) Not me\n(crowd) Hooray",
+    "acePrompt": "silly guild anthem sung by a whole tavern, mixed male and female crowd in loud rough unison with a single male voice interjecting the jokes. 124 bpm, 4/4, marching stomp. accordion, brass band oompah, snare drum, tankards, cheering. proud and completely ridiculous. call and response shouting on the chorus. family friendly, clear diction.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:10",
+      "lyricsMode": "Write",
+      "vocalGender": "",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "e6bb10ad-d8c0-4f21-be5b-0b9e848c4c6e",
+        "35533c44-a4ae-46fe-83bc-8b244b352cb1"
+      ],
+      "shipped": "35533c44-a4ae-46fe-83bc-8b244b352cb1"
+    }
   },
   {
     "id": "tavern_song_ballad_02",
     "title": "The Lantern in the Window",
     "kind": "song",
     "mood": "warm",
-    "seconds": 132,
-    "prompt": "warm hopeful folk ballad, solo female vocal with a male voice harmonising underneath on the choruses. 72 bpm, 4/4, gently rolling. celtic harp, acoustic guitar, cello, a low whistle, very soft brushed frame drum entering halfway. homecoming, comfort, candlelight. rich and full but never loud. clear tender singing.",
-    "lyrics": "[Verse 1]\n(female) Leave a lantern in the window\n(female) When the road is dark and long\n(female) There's a hundred going out tonight\n(female) And they'll all be coming home\n\n[Chorus]\n(female) So keep the door upon the latch\n(female) Keep the kettle on the coal\n(female) I have walked a hundred colder miles\n(female) And I know the way home\n\n[Verse 2]\n(female) There is nothing on the mountain\n(female) That is worth another year\n(female) I have carried what they asked me to\n(female) And I'm carrying it here\n\n[Chorus]\n(both) So keep the door upon the latch\n(both) Keep the kettle on the coal\n(both) I have walked a hundred colder miles\n(both) And I know the way home"
+    "seconds": 130,
+    "source": "suno",
+    "prompt": "warm hopeful folk ballad, one solo female lead vocal close-miked and right at the front with clear tender singing and crisp diction, a male voice harmonising quietly underneath on the choruses only, tempo exactly 72 BPM, 4/4, gently rolling, celtic harp, acoustic guitar, cello, a low whistle, a very soft brushed frame drum entering halfway, homecoming, comfort, candlelight, rich and full but never loud",
+    "lyrics": "[Verse 1]\n(female) Leave a lantern in the window\n(female) When the road is dark and long\n(female) There's a hundred going out tonight\n(female) And they'll all be coming home\n\n[Chorus]\n(female) So keep the door upon the latch\n(female) Keep the kettle on the coal\n(female) I have walked a hundred colder miles\n(female) And I know the way home\n\n[Verse 2]\n(female) There is nothing on the mountain\n(female) That is worth another year\n(female) I have carried what they asked me to\n(female) And I'm carrying it here\n\n[Chorus]\n(both) So keep the door upon the latch\n(both) Keep the kettle on the coal\n(both) I have walked a hundred colder miles\n(both) And I know the way home",
+    "acePrompt": "warm hopeful folk ballad, solo female vocal with a male voice harmonising underneath on the choruses. 72 bpm, 4/4, gently rolling. celtic harp, acoustic guitar, cello, a low whistle, very soft brushed frame drum entering halfway. homecoming, comfort, candlelight. rich and full but never loud. clear tender singing.",
+    "suno": {
+      "model": "v5.5",
+      "mode": "Advanced",
+      "duration": "2:10",
+      "lyricsMode": "Write",
+      "vocalGender": "female",
+      "weirdness": 50,
+      "styleInfluence": 50,
+      "takes": [
+        "2bf82f07-c910-4d7a-a77c-5638cabd0df1",
+        "d2051015-0173-41bd-97b1-ac1259d78b4f"
+      ],
+      "shipped": "d2051015-0173-41bd-97b1-ac1259d78b4f"
+    }
   }
 ]

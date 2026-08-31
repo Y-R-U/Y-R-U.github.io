@@ -44,6 +44,18 @@
 
 <div id="toast"></div>
 
-<script type="module" src="bench.js"></script>
+<script type="module">
+// DEV_CONTRACT §1 — the sound studio is a dev tool, behind the same gate as the DEV button.
+import { isLocal } from '../../js/dev/gate.js';
+
+if (!isLocal()) {
+  document.body.innerHTML = '<p style="margin:16px;max-width:44em;color:#8aa;font:14px system-ui">'
+    + 'Developer tools are local-only — DEV_CONTRACT §1. Open this from localhost, a .local host or a private LAN address.</p>';
+  window.__wfStudio = { refused: true };
+} else {
+  await import('./bench.js');
+  window.__wfStudio = { refused: false };
+}
+</script>
 </body>
 </html>

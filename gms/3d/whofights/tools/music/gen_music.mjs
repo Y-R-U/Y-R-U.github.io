@@ -41,8 +41,11 @@ async function post(route, body) {
 }
 
 export async function submit(job) {
+  // ACE-Step wants the long, concrete arrangement description, not the Suno tag-style
+  // string. Since the library moved to Suno, `prompt` is the Suno one and `acePrompt`
+  // is the local-fallback text; fall back to `prompt` for jobs that never had a Suno take.
   const body = {
-    prompt: job.prompt,
+    prompt: job.acePrompt || job.prompt,
     lyrics: job.lyrics || '',
     thinking: !!job.lyrics,        // vocals need Phase 1 metadata; instrumentals do not
     audio_duration: job.seconds,

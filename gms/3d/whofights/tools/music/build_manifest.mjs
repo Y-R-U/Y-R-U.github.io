@@ -25,6 +25,15 @@ const SETS = [
 const jobs = JSON.parse(await readFile(path.join(ROOT, 'tools/music/jobs.json'), 'utf8'));
 const results = JSON.parse(await readFile(path.join(ROOT, 'tools/music/results.json'), 'utf8'));
 
+// `ends` and `starts` are measured, not wished for (DEV_CONTRACT §9). They come from
+// results.json, which measures the SHIPPED file — the encoder's compressor changes the tail
+// envelope, so classifying the raw take gives a different (wrong) answer. A job may pin either
+// by hand; the hand value wins. An earlier version of this file dropped both fields, so
+// re-running it silently reverted hand edits in data/music.json.
+const ENDS = new Set(['clean', 'abrupt']);
+const STARTS = new Set(['clean', 'quiet']);
+const pick = (set, ...vals) => vals.find(v => set.has(v)) ?? 'clean';
+
 const tracks = [];
 const missing = [];
 for (const j of jobs) {
@@ -40,6 +49,8 @@ for (const j of jobs) {
     prompt: j.prompt,
     lyrics: j.lyrics || '',
     source: j.source || 'acestep',
+    ends: pick(ENDS, j.ends, r.ends),
+    starts: pick(STARTS, j.starts, r.starts),
   });
 }
 
@@ -51,5 +62,9 @@ await writeFile(path.join(ROOT, 'data/music.json'),
   JSON.stringify({ version: 1, tracks, sets }, null, 2) + '\n');
 
 console.log(`data/music.json — ${tracks.length} tracks, ${sets.length} sets`);
+const abrupt = tracks.filter(t => t.ends === 'abrupt').map(t => t.id);
+const quiet = tracks.filter(t => t.starts === 'quiet').map(t => t.id);
+console.log(`  ends:abrupt   ${abrupt.length}${abrupt.length ? ' — ' + abrupt.join(', ') : ''}`);
+console.log(`  starts:quiet  ${quiet.length}${quiet.length ? ' — ' + quiet.join(', ') : ''}`);
 if (missing.length) console.log(`omitted (no passing take): ${missing.join(', ')}`);
 for (const s of sets) console.log(`  ${s.id.padEnd(14)} ${s.tracks.length}`);
