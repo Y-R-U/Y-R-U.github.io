@@ -13,7 +13,7 @@ import { drawHUD, drawNameTags, handText, FONT, FONT_B } from './ui.js';
 import { load, save as persist, wipe, DEFAULT } from './save.js';
 import * as audio from './audio.js';
 import { buildShop } from './shop.js';
-import { MUSIC, TRACK_NAME, FIGHT_POOL, unlockedFightTracks } from './music.js';
+import { MUSIC, TRACK_NAME, FIGHT_POOL, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
 const qs = new URLSearchParams(location.search);
 const cvs = document.getElementById('game');
@@ -126,15 +126,11 @@ function reachedLevel(level) {
 function fightTrack(level) {
   if (level.kind === 'final') return 'final';
   if (level.kind === 'champion') return 'boss';
-  const pool = unlockedFightTracks(reachedLevel(level));
-  // Count only the fights that actually use the roster. Rotating on level.idx let the
-  // champion fights eat slots, and the last-unlocked track never came up at all.
-  let ordinal = 0;
-  for (let i = 0; i < level.idx; i++) {
-    const k = LEVELS[i].kind;
-    if (k !== 'champion' && k !== 'final') ordinal++;
-  }
-  return pool[ordinal % pool.length].id;
+  const pool = unlockedFightTracks(reachedLevel(level)).map((t) => t.id);
+  const pick = pickFightTrack(pool, S.musicRecent || []);
+  S.musicRecent = [...(S.musicRecent || []), pick].slice(-RECENT_KEEP);
+  persist(S);
+  return pick;
 }
 
 function finishFight(result, m) {

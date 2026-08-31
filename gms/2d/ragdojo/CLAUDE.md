@@ -54,6 +54,7 @@ node tools/gesturetest.mjs    # 10 synthetic gestures through the classifier, wi
 node tools/nangate.mjs        # no hazard level may produce a non-finite fighter position
 node tools/crossgate.mjs      # solid bodies: walk = blocked, jump = crosses, floored = step over
 node tools/uigate.mjs         # first-run coaching, the duck crouch, shop tab highlight
+node tools/musicrota.mjs      # the roster must not repeat, within a run or across refreshes
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -107,8 +108,12 @@ from its output, not by feel.
   ragdoll target origin only. Folding it into `standY` made `onGround` false, which cleared
   `blocking`, which cancelled the crouch — a deadlock that left the fighter hovering.
 - **The fight-music roster unlocks** (`js/music.js`): 4 tracks, then +2 at levels 10, 20 and 30.
-  Rotate by the ordinal of roster-using fights, never by `level.idx` — champions eat slots and
-  the last-unlocked track then never plays. Selecting on tier alone (the version before this)
+  **Track choice must never be a pure function of the level.** Any index-based rotation makes
+  level 1 always play roster slot 0, so replaying or refreshing an early level gives the same
+  song forever and the rest of the roster is unreachable from a fresh save — measured at 60/60
+  identical starts. `pickFightTrack` avoids the recent history instead, persisted in
+  `save.musicRecent`. Rotating by the ordinal of roster-using fights (the version before that)
+  had its own bug: champions ate slots and the last-unlocked track never played at all. Selecting on tier alone (the version before this)
   put `fight1` on 12 of the first 15 fights and never reached `fight2` before level 15, which
   reads as "there is only one song" no matter how many files ship.
 - **Facing is owned by `Match.faceOpponents()`, not by the movement stick.** Fighters always

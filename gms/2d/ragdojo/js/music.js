@@ -61,3 +61,27 @@ export const UNLOCK_GATES = [10, 20, 30];
 export function unlockedFightTracks(reached) {
   return FIGHT_POOL.filter((t) => t.unlockAt <= reached);
 }
+
+/**
+ * Pick a fight track, avoiding whatever was heard recently.
+ *
+ * Rotation used to be a pure function of the level index, which meant level 1 was always
+ * the first track in the roster — so replaying or refreshing on an early level played the
+ * same song every single time, and the rest of the roster was unreachable from a fresh save.
+ * Keeping a short history fixes both the within-run repeats and the across-refresh ones.
+ *
+ * @param poolIds unlocked track ids
+ * @param recent  most-recently-played ids, oldest first
+ */
+export function pickFightTrack(poolIds, recent = [], rnd = Math.random) {
+  if (!poolIds.length) return null;
+  if (poolIds.length === 1) return poolIds[0];
+  const avoid = Math.min(poolIds.length - 1, Math.ceil(poolIds.length / 2));
+  const tail = recent.slice(-avoid);
+  const fresh = poolIds.filter((id) => !tail.includes(id));
+  const choices = fresh.length ? fresh : poolIds.filter((id) => id !== recent[recent.length - 1]);
+  const list = choices.length ? choices : poolIds;
+  return list[Math.floor(rnd() * list.length)];
+}
+
+export const RECENT_KEEP = 6;

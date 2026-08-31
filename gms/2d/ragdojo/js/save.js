@@ -12,6 +12,7 @@ export const DEFAULT = () => ({
   wins: 0, losses: 0, kos: 0, biggestLaunch: 0,
   completed: false, bully: false, bullyLevel: 0, newGamePlus: 0,
   seen: {},
+  musicRecent: [],
 });
 
 export function load() {

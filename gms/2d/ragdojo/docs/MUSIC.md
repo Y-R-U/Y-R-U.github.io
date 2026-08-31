@@ -41,10 +41,19 @@ is fine, so it was kept.
 20 and 30. `menu`, `boss`, `final` and `victory` are contextual and always available — gating
 those would only mean silence where they belong.
 
-Selection rotates through the *unlocked* pool by the ordinal of the fight, counting only the
-levels that use the roster. Rotating on `level.idx` let the champion fights eat slots and the
-last-unlocked track never came up at all. Current spread: every one of the ten is used, and no
-two consecutive fights share a track.
+Selection avoids whatever was played recently (`pickFightTrack`, history in
+`save.musicRecent`), rather than mapping level to slot. Two index-based versions were tried
+first and both were wrong in ways only play testing caught:
+
+- rotating on `level.idx` let the eight champion fights eat slots, so `fight10` — the last
+  thing you unlock — never played at all;
+- rotating on the ordinal of roster-using fights fixed that but was still deterministic, so
+  level 1 always played the first track. Replaying or refreshing an early level gave the same
+  song every time and the rest of the roster was unreachable from a fresh save. Measured:
+  60 fresh starts, 60 plays of `fight1`.
+
+`tools/musicrota.mjs` covers all of it, and `--falsify` restores the index rotation to watch
+it go red.
 
 ## Pipeline
 
