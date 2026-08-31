@@ -56,9 +56,24 @@ await page.evaluate(async (n, d) => {
     // thumb does. Pass `&hold` in the url-suffix to photograph the card itself.
     const layer = document.querySelector('#bubble-layer');
     if (!location.search.includes('hold') && layer && layer.classList.contains('on')) {
-      layer.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      const hit = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
+      if (hit && hit.closest('#bubble-layer')) {
+        hit.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      }
     }
     window.__hb.step(d);
+  }
+  // Drain any beat the LAST step raised — the tap above runs before the step,
+  // so a card triggered on the final frame is still on screen when we shoot.
+  if (!location.search.includes('hold')) {
+    for (let k = 0; k < 8; k++) {
+      const layer = document.querySelector('#bubble-layer');
+      if (!layer || !layer.classList.contains('on')) break;
+      const hit = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
+      if (!hit || !hit.closest('#bubble-layer')) break;
+      hit.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      window.__hb.step(d);
+    }
   }
 }, steps, dt);
 

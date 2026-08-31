@@ -89,7 +89,7 @@ for (const { lv, pow } of LEVELS) {
     await page.evaluate(() => {
       // Simulate, don't draw. See render.js:setDrawing.
       window.__hb.setDrawing?.(false);
-      const seen = { pass: 0, apply: 0, count: 0, grow: 0, kills: 0, beats: 0 };
+      const seen = { pass: 0, apply: 0, count: 0, grow: 0, kills: 0, beats: 0, blocked: 0 };
       window.__smoke = { seen, start: window.__hb.state.troops };
       window.__hb.bus.on('gate:pass', () => seen.pass++);
       window.__hb.bus.on('effect:apply', () => seen.apply++);
@@ -106,11 +106,23 @@ for (const { lv, pow } of LEVELS) {
           // assertion below fails for a reason that has nothing to do with the
           // core loop. Tap the card the way a thumb does, through the real
           // listener.
-          const layer = document.querySelector('#bubble-layer');
-          if (layer && layer.classList.contains('on')) {
-            layer.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+        const layer = document.querySelector('#bubble-layer');
+        if (layer && layer.classList.contains('on')) {
+          // Tap through REAL hit-testing: elementFromPoint respects
+          // pointer-events, which dispatchEvent on the layer does not. The card
+          // spent a release un-dismissable because `#hud > *` is
+          // pointer-events:none — and the harness passed the whole time,
+          // because firing the event at the node skips the hit test a thumb
+          // cannot skip.
+          const cx = innerWidth / 2, cy = innerHeight / 2;
+          const hit = document.elementFromPoint(cx, cy);
+          if (hit && hit.closest('#bubble-layer')) {
+            hit.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
             window.__smoke.seen.beats++;
+          } else {
+            window.__smoke.seen.blocked++;
           }
+        }
           window.__hb.step(1 / 60);
         }
         return window.__hb.state.result != null;
@@ -144,6 +156,10 @@ for (const { lv, pow } of LEVELS) {
   if (r.peak <= r.start) bad.push(`squad never grew (${r.start} -> peak ${r.peak})`);
   if (r.seen.grow === 0) bad.push('no gate ever grew under fire');
   if (r.result == null) bad.push(`run never ended (z ${r.z}/${r.len})`);
+  // A beat card that is on screen but NOT the element under the middle of the
+  // screen cannot be tapped by a thumb. This is the assertion that would have
+  // caught the un-dismissable story panel.
+  if (r.seen.blocked) bad.push(`story card unreachable by a real tap on ${r.seen.blocked} frames`);
   if (errs.length) bad.push(`console: ${errs[0]}`);
 
   const tag = bad.length ? 'FAIL' : ' ok ';

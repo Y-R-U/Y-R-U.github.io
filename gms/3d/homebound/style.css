@@ -876,7 +876,12 @@ button {
 #bubble-layer { position: fixed; inset: 0; display: none; z-index: 60;
   align-items: center; justify-content: center; padding: 24px;
   background: rgba(6,14,20,.58); backdrop-filter: blur(2px); }
-#bubble-layer.on { display: flex; }
+/* `#hud > *` is pointer-events:none so the road stays draggable through the
+   HUD. The beat card is a child of #hud, so without this it was NEVER tappable
+   — every tap fell straight through to the layer underneath and the story
+   could not be dismissed at all. Only when `.on`, so an idle layer still lets
+   the thumb reach the road. */
+#bubble-layer.on { display: flex; pointer-events: auto; }
 
 .beat {
   position: relative; width: min(86vw, 400px);
