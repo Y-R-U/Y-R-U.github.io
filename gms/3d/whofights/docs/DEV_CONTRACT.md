@@ -244,6 +244,13 @@ their own docs row).
   harness-based file into one process, so two files stubbing `globalThis.localStorage` at module
   scope silently break each other depending on import order — it cost four passing tests once.
   Install and tear down inside each test.
+- **Shipped code can poison the suite the same way, and one file already does.**
+  `js/game/fakedom.js` sets every global it installs with `??=` except `globalThis.fetch`, which it
+  assigns outright and never restores — so whichever test loads it hands its file-reading `fetch`
+  to every test that runs after, in the one process `tools/test.mjs` uses. It made a passing test
+  fail with a bogus 404 only when run with the rest of the suite. Prefer `node:http` over global
+  `fetch` in tooling, and treat a test that passes alone but fails in the suite (or the reverse) as
+  an isolation bug, not a flake.
 - Tests: plain `node --test`-free `*.test.mjs` run by `node tools/test.mjs`, the forge style —
   pure modules only, no DOM. If your module can be made pure, make it pure and test it.
 - Before claiming a screen works, **look at it** — `node tools/shot.mjs` or a headless CDP

@@ -3,10 +3,40 @@
 //
 // Real Input.dispatchMouseEvent clicks, not element.click(): a screenshot of a screen nobody
 // clicked proves nothing about whether the click works.
-import { spawn } from 'node:child_process';
+//
+// The websocket is `tools/shot.mjs`'s, not node's. Node's global `WebSocket` offers
+// `permessage-deflate` on every connection and undici hard-caps a *decompressed* message at 4 MiB
+// (`kDefaultMaxDecompressedSize`): over that it aborts the message and destroys the socket with a
+// 1006 / wasClean=false close and no close frame, so a request that only settles on its reply
+// waits for ever. Measured here on 31 Aug: a 3.687 MiB `Page.captureScreenshot` reply came back in
+// 171 ms, a 4.031 MiB one from the same page never came back at all. `shot()` at 1440×900 dpr 1
+// was under the cap by luck; raising the window or the DPR wedged every consumer of this file.
+// Do not swap this back for `new WebSocket`.
+import { spawn, execSync } from 'node:child_process';
 import fs from 'node:fs';
+import http from 'node:http';
+import { CDP, CDP_TIMEOUT } from '../../tools/shot.mjs';
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+
+// node:http, not `fetch`: js/game/fakedom.js replaces the global `fetch` with a file reader at
+// module scope, and tools/test.mjs imports every test into one process — so a global here is
+// whatever the last test file to load decided it was.
+function devtoolsJSON(port, path, method, ms) {
+  return new Promise((res, rej) => {
+    const req = http.request({ host: '127.0.0.1', port, path, method, timeout: ms }, r => {
+      let body = '';
+      r.setEncoding('utf8');
+      r.on('data', d => { body += d; });
+      r.on('end', () => (r.statusCode === 200
+        ? res(JSON.parse(body))
+        : rej(new Error(`the devtools endpoint answered ${r.statusCode} for ${method} ${path}`))));
+    });
+    req.on('timeout', () => req.destroy(new Error(`the devtools endpoint did not answer ${path} in ${ms}ms`)));
+    req.on('error', rej);
+    req.end();
+  });
+}
 
 // `args` are extra Chrome flags. The one that has earned its place is
 // `--host-resolver-rules=MAP anything.example 127.0.0.1`, which is how a local server is reached
@@ -18,35 +48,37 @@ export async function launch({ port = 9333, profile = '/tmp/wf-cdp-profile', w =
     // Same pair tools/shot.mjs uses: without them a WebGL context cannot be created headless and
     // the whole game boot fails before bootDev is ever reached.
     '--use-angle=metal', '--use-gl=angle', '--hide-scrollbars', ...args, 'about:blank'], { stdio: 'ignore' });
+  let up = false;
   for (let i = 0; i < 100; i++) {
-    try { await fetch(`http://127.0.0.1:${port}/json/version`); break; } catch { await sleep(150); }
+    try { await devtoolsJSON(port, '/json/version', 'GET', 3000); up = true; break; }
+    catch { await sleep(150); }
   }
-  return { proc, port };
+  // It used to return anyway and let `attach` fail on a stranger error further down the page.
+  if (!up) { kill(proc, profile); throw new Error(`chrome did not answer on the devtools port ${port} in 15s`); }
+  return { proc, port, profile, kill: () => kill(proc, profile) };
 }
 
-export async function attach(port, url) {
-  const t = await (await fetch(`http://127.0.0.1:${port}/json/new?${encodeURIComponent(url)}`, { method: 'PUT' })).json();
-  const ws = new WebSocket(t.webSocketDebuggerUrl);
-  await new Promise(r => ws.addEventListener('open', r));
-  let id = 0;
-  const waiters = new Map();
+// `proc.kill()` alone leaves chrome's renderer and GPU children alive and still writing the profile
+// dir — that is where the stale headless browsers on this machine came from.
+function kill(proc, profile) {
+  try { proc?.kill(); } catch { /* already gone */ }
+  try { execSync(`pkill -f '${profile}' 2>/dev/null; sleep 0.4`, { stdio: 'ignore', shell: '/bin/sh' }); } catch { /* none left */ }
+  try { fs.rmSync(profile, { recursive: true, force: true }); } catch { /* not ours to remove */ }
+}
+
+export async function attach(port, url, { timeout = CDP_TIMEOUT } = {}) {
+  const t = await devtoolsJSON(port, `/json/new?${encodeURIComponent(url)}`, 'PUT', 15000);
+  const cdp = new CDP(t.webSocketDebuggerUrl, { timeout });
+  await cdp.connect();
   const events = [];
-  ws.addEventListener('message', e => {
-    const m = JSON.parse(e.data);
-    if (m.id && waiters.has(m.id)) { waiters.get(m.id)(m); waiters.delete(m.id); }
-    else if (m.method) {
-      events.push(m);
-      // beforeunload puts up a dialog that blocks navigation until someone answers it.
-      if (m.method === 'Page.javascriptDialogOpening') {
-        ws.send(JSON.stringify({ id: ++id, method: 'Page.handleJavaScriptDialog', params: { accept: true } }));
-      }
+  cdp.on(m => {
+    events.push(m);
+    // beforeunload puts up a dialog that blocks navigation until someone answers it.
+    if (m.method === 'Page.javascriptDialogOpening') {
+      cdp.send('Page.handleJavaScriptDialog', { accept: true }).catch(() => { /* socket already gone */ });
     }
   });
-  const send = (method, params = {}) => new Promise((res, rej) => {
-    const i = ++id;
-    waiters.set(i, m => (m.error ? rej(new Error(`${method}: ${m.error.message}`)) : res(m.result)));
-    ws.send(JSON.stringify({ id: i, method, params }));
-  });
+  const send = (method, params = {}) => cdp.send(method, params);
   await send('Runtime.enable');
   await send('Page.enable');
   await send('Log.enable');
@@ -59,7 +91,8 @@ export async function attach(port, url) {
     async waitFor(expr, ms = 15000) {
       const until = Date.now() + ms;
       for (;;) {
-        try { if (await this.eval(expr)) return true; } catch { /* context still loading */ }
+        // A dead socket would otherwise be swallowed here and reported as a plain timeout.
+        try { if (await this.eval(expr)) return true; } catch (e) { if (cdp.dead) throw e; }
         if (Date.now() > until) return false;
         await sleep(200);
       }
@@ -97,7 +130,7 @@ export async function attach(port, url) {
           return { level: e.params.type, text: e.params.args.map(a => a.value ?? a.description ?? a.type).join(' ') };
         });
     },
-    close() { ws.close(); },
+    close() { cdp.close(); },
   };
 }
 

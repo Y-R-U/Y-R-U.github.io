@@ -24,7 +24,8 @@ fs.mkdirSync(OUT, { recursive: true });
 let fails = 0;
 const check = (cond, what) => { console.log(`${cond ? ' ok ' : 'FAIL'}  ${what}`); if (!cond) fails++; };
 
-const { proc, port } = await launch({});
+const chrome = await launch({});
+const { port } = chrome;
 const p = await attach(port, BASE + PAGE);
 // The real index.html boots an engine first; the button appears when main.js reaches bootDev.
 check(await p.waitFor('!!document.getElementById("wf-dev-btn")'), 'DEV button exists on a local origin');
@@ -104,5 +105,5 @@ check(!logs.length, 'no unexpected console errors');
 fs.rmSync(SCRATCH, { force: true });
 console.log(`\nshots in ${OUT} — look at them.  ${fails ? `${fails} FAILED` : 'all checks passed'}`);
 p.close();
-proc.kill();
+chrome.kill();
 process.exit(fails ? 1 : 0);
