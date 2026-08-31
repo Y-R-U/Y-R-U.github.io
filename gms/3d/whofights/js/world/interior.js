@@ -6,36 +6,26 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { zone } from './zones.js';
 import { Batch, T, openingPts, openingShape, flat, rng, span, taperBox } from './details.js';
-import { textureSet, flagSet, INTERIOR_TILE } from './materials.js';
+import { textureSet, flagSet, ashlarSet, ASHLAR, INTERIOR_TILE } from './materials.js';
 import { stainedTexture, stainedTint } from './textures/stained.js';
+import { clothTexture } from './textures/cloth.js';
 import { stairFits, stairFloor, stairBlock, build as buildStairs } from './stairs.js';
 import { boardPanel } from './boards.js';
 import { pushOut } from './colliders.js';
+import { HALL, bayLines, bayMids, hallBand, hallWindows, hallDoorU } from './hallplan.js';
 
 // Texture metres per tile. `stone` and `wood` are the outdoor kit's own numbers (materials.js
 // INTERIOR_TILE), so a course of masonry indoors is the same course as the facade outside — the
 // old 2.6 m stone was a third of the wall's own tile and turned a 35 m floor into brickwork.
 const UV = { ...INTERIOR_TILE };
+// The hall projects its masonry at the ashlar set's own tile, and hangs its tapestries off
+// their own 0..1 plane UVs. A cottage keeps the outdoor numbers.
+const HALL_UV = { ...INTERIOR_TILE, stone: ASHLAR.tile, hanging: 1 };
 
-// Everything the great hall is shaped by. Registered as knobs through registerHallKnobs() —
-// lighting.js calls it, because that is the module that already gets handed the quality registry.
-// The geometry ones rebuild; the light ones are read live out of this object every frame.
-export const HALL = {
-  plate: 0.52,      // wall-plate height as a fraction of the exterior wall — the rest is roof
-  pitch: 0.55,      // roof rise over half-span
-  // The flat crown of the roof, as a fraction of the half-span. A camp ceiling rather than a
-  // full gable, and not only for the look: buildings.js puts a solid roof slab over the house
-  // and its underside is the real ceiling of the world. Measured over this hall it sits at about
-  // 13.5 m at the ridge and comes down to 8.5 m near the side walls, so an interior roof that
-  // ran to a point would push straight through it. Clipping the top is what fits inside.
-  crown: 0.45,
-  bay: 5.8,         // metres between pilasters, and therefore between roof trusses
-  bake: 1,          // strength of the baked vertex gradient
-  sconces: 6,       // real point lights among the wall sconces
-  sconcePower: 22,
-  dress: 1,         // furniture density
-  shadows: true,    // let the building's own roof shadow its interior
-};
+// The hanging's proportions live here rather than in hallDress(), because the texture has to
+// know the panel's aspect to draw a round device that comes out round on the wall. `topK` is
+// the fraction of the wall the pole hangs at, `hK` the drop as a fraction of the same wall.
+const TAP = { w: 4.0, hK: 0.46, topK: 0.62, fold: 0.12, folds: 3 };
 
 export function registerHallKnobs(q) {
   const G = 'Hall';
@@ -60,6 +50,9 @@ export function registerHallKnobs(q) {
   q.register({ key: 'hallSconcePower', label: 'Sconce power', type: 'range', min: 0, max: 90, step: 1, default: 22, group: G },
     v => { HALL.sconcePower = v; });
 }
+
+// Re-exported: everything that used to live here still imports it from here.
+export { HALL, bayLines };
 
 const _warm = new THREE.Color(), _warm2 = new THREE.Color();
 
@@ -129,10 +122,11 @@ export class Interior {
     this.plugZ = house.door.leafZ - 0.069;
 
     const R = rng((Math.round(w * 31 + d * 71 + wallTop * 17) | 0) + 5);
-    this.mats = materials(z, opts, this.hall);
+    this.mats = materials(z, opts, this.hall ? this : null);
     const b = new Batch(zoneId);
     if (this.hall) {
       this.bays = { x: bayLines(this.rx * 2, HALL.bay), z: bayLines(this.rz * 2, HALL.bay) };
+      this.plan = hallPlan(this, z);
       hallShell(b, this, z);
       hallRoof(b, this);
       hearth(b, this);
@@ -242,7 +236,9 @@ export class Interior {
 
 function materials(z, opts, hall) {
   const wood = textureSet(z.id, 'wood');
-  const stone = textureSet(z.id, 'wall');
+  // A cottage room is the same face as the street outside it. A great hall is dressed on the
+  // inside, at the block size zones.js actually authors — see ashlarSet().
+  const stone = hall ? ashlarSet(z.id) : textureSet(z.id, 'wall');
   const env = opts.env ?? 0.32;
   const mk = (set, o) => {
     const m = new THREE.MeshStandardMaterial({ map: set.map, normalMap: set.normalMap, metalness: 0, ...o });
@@ -294,6 +290,13 @@ function materials(z, opts, hall) {
     cloth,
   };
   if (hall) {
+    // The hanging is the only large block of colour in the room and the only thing in it that is
+    // not stone or timber, so it is the one surface that earns a texture of its own: a border, a
+    // charge and a weave, all read out of the same zone. Its UVs are the plane's own 0..1 — see
+    // HALL_UV — so one device covers one panel instead of tiling across it.
+    out.hanging = mk({ map: clothTexture(z.id, TAP.w / Math.max(0.5, hall.wallH * TAP.hK)), normalMap: wood.normalMap },
+      { roughness: 0.95, color: new THREE.Color(1, 1, 1) });
+    out.hanging.normalScale.set(0.35, 0.35);
     out.flag = mk(flagSet(z.id, 0.9, UV.flag), { roughness: 0.88, color: lift(z.stone.base, 0.44, 0.45, 1.6).multiply(warm) });
     // Roof timber reads darker than joinery or a whole roof turns into one bright lid.
     out.beam = mk(wood, { roughness: Math.min(1, z.wood.roughness + 0.12), color: lift(z.wood.base, 0.30, 0.16, 2.0) });
@@ -306,7 +309,7 @@ function emit(b, mats, group, hall) {
   for (const [surface, geos] of b.parts) {
     if (!geos.length) continue;
     const geo = geos.length === 1 ? geos[0] : mergeGeometries(geos, false);
-    const k = 1 / (UV[surface] || 1);
+    const k = 1 / ((hall ? HALL_UV : UV)[surface] || 1);
     const uv = geo.attributes.uv;
     for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * k, uv.getY(i) * k);
     if (hall) bakeVertexLight(geo, hall);
@@ -730,15 +733,6 @@ function lights(I, z) {
 
 const V2 = (x, y) => new THREE.Vector2(x, y);
 
-// Pier lines across a wall. Always an even number of bays, so a wall has a centre pier and the
-// two end bays match — an odd count puts a pier where the eye wants the middle of the wall.
-export function bayLines(wide, target) {
-  const n = Math.max(2, 2 * Math.round(wide / (2 * Math.max(1, target))));
-  const out = [];
-  for (let i = 0; i <= n; i++) out.push(-wide / 2 + wide * i / n);
-  return out;
-}
-
 // The four wall frames, +z of each pointing INTO the room. (The cottage table above lets the two
 // side faces point outward, which is harmless there because everything it places is a thin skin
 // either side of the line; here the walls carry piers, windows and doorways and the sign matters.)
@@ -750,6 +744,81 @@ function hallFaces(I) {
     { m: T(rx, 0, 0, -Math.PI / 2), wide: rz * 2, lines: I.bays.z, side: 1 },
     { m: T(-rx, 0, 0, Math.PI / 2), wide: rz * 2, lines: I.bays.z, side: -1 },
   ];
+}
+
+// Every hole in the room's four walls, worked out once before anything is drawn.
+//
+// This is the fix for two things Aaron found playing it. *"On the outside of building i see lots
+// of windows, go on the inside and that same wall has none"* — the exterior and the interior each
+// invented their own fenestration, and now both read hallplan.js. *"There appears to be some door
+// hotspots (locked) but I cannot actually see doors where the hotspots are"* — the doorways were
+// always at the authored coordinates, but hallShell drew the wall as a solid plane and hallDress
+// then hung the leaf 0.26 m BEHIND it, so all three were buried in the masonry. The wall is cut
+// now, and the same list that cuts it is the list the leaves and the panes are hung on, so the
+// two cannot drift apart again.
+//
+// Face indices are hallFaces() order: 0 far (the boards), 1 the great doorway, 2 and 3 the sides.
+function hallPlan(I, z) {
+  const { rx, rz, fy, wallH } = I;
+  const kind = z.window.shape;
+  const band = { fy, wallH };
+  const roles = ['boards', 'door', 'side', 'side'];
+  const spans = [rx * 2, rx * 2, rz * 2, rz * 2];
+  const win = roles.map((role, fi) => hallWindows({
+    span: spans[fi], band, kind, role, greatDoorW: I.apW + 0.5,
+  }));
+
+  // The three doorways to the rest of the academy, at the bay midpoints `data/levels/academy.json`
+  // authors its `hs.door.*` hotspots at. Verified against the level document: with the hall at
+  // world (0, −16) these come out at world (−15.9, −12.4) yard, (15.9, −19.6) armoury and
+  // (15.9, −12.4) dormitory — the hotspot centres exactly. Moving either without the other is
+  // what would break them, so they are one list.
+  const [uA, uB] = hallDoorU(rz * 2);
+  const dh = Math.min(3.8, wallH * 0.60);
+  const doors = [
+    { face: 3, u: uA, open: true, w: 2.6, h: dh, id: 'yard' },
+    { face: 2, u: uA, open: false, w: 2.6, h: dh, id: 'armoury' },
+    { face: 2, u: uB, open: false, w: 2.6, h: dh, id: 'dormitory' },
+  ];
+  const holes = win.map((list, fi) => [
+    ...list,
+    ...doors.filter(d => d.face === fi).map(d => ({ x: d.u, y: fy, w: d.w, h: d.h, kind, door: true })),
+  ]);
+  return { win, doors, holes, kind };
+}
+
+// One wall face, drawn as the stone left over once its openings are taken out of it. Columns are
+// split at every opening edge, so within a column the set of openings is fixed and the leftover
+// is a stack of plain rectangles — which keeps wallPanel's subdivision, and therefore the baked
+// vertex gradient, instead of collapsing the whole wall into one barely-triangulated ShapeGeometry.
+function wallWithHoles(b, surface, f, x0, x1, y0, y1, holes) {
+  if (!holes.length) return wallPanel(b, surface, f, x0, x1, y0, y1);
+  const cuts = new Set([x0, x1]);
+  for (const o of holes) {
+    cuts.add(Math.max(x0, Math.min(x1, o.x - o.w / 2)));
+    cuts.add(Math.max(x0, Math.min(x1, o.x + o.w / 2)));
+  }
+  const xs = [...cuts].sort((a, c) => a - c);
+  for (let i = 0; i < xs.length - 1; i++) {
+    const a = xs[i], c = xs[i + 1];
+    if (c - a < 0.02) continue;
+    const mid = (a + c) / 2;
+    const col = holes.filter(o => Math.abs(mid - o.x) < o.w / 2 - 1e-6).sort((p, q) => p.y - q.y);
+    let cur = y0;
+    for (const o of col) {
+      wallPanel(b, surface, f, a, c, cur, Math.max(cur, o.y));
+      cur = Math.max(cur, o.y + o.h);
+    }
+    wallPanel(b, surface, f, a, c, cur, y1);
+  }
+  // An arch is cut as a rectangle, so the two shoulders have to be filled or you see straight
+  // through to the exterior shell 90 mm behind. One spandrel each, at the wall face.
+  for (const o of holes) {
+    if (o.kind === 'square' || o.noSpandrel) continue;
+    const sp = new THREE.Shape([V2(-o.w / 2, 0), V2(o.w / 2, 0), V2(o.w / 2, o.h), V2(-o.w / 2, o.h)]);
+    sp.holes = [openingShape(o.kind, o.w, o.h)];
+    b.add(surface, new THREE.ShapeGeometry(sp, 5), f.m.clone().multiply(T(o.x, o.y, 0.02)));
+  }
 }
 
 // A wall is a subdivided plane, not a box: it is only ever seen from inside, and the extra
@@ -773,13 +842,15 @@ function hallShell(b, I, z) {
   fg.rotateX(-Math.PI / 2);
   b.add('flag', fg, T(0, fy, 0));
 
-  for (const f of hallFaces(I)) {
+  for (const [fi, f] of hallFaces(I).entries()) {
     const hw = f.wide / 2;
     const dw = f.door ? Math.min(I.apW + 0.5, f.wide - 1.2) : 0, dh = I.apH + 0.24;
+    // Every opening in this wall: its windows, its doorways to the rest of the academy, and on
+    // the front wall the great doorway itself. One list, one wall built round it.
+    const holes = [...I.plan.holes[fi]];
+    if (f.door) holes.push({ x: 0, y: fy, w: dw, h: dh, kind: 'arch', noSpandrel: true, door: true });
+    wallWithHoles(b, 'stone', f, -hw, hw, fy, plateY, holes);
     if (f.door) {
-      wallPanel(b, 'stone', f, -hw, -dw / 2, fy, plateY);
-      wallPanel(b, 'stone', f, dw / 2, hw, fy, plateY);
-      wallPanel(b, 'stone', f, -dw / 2, dw / 2, fy + dh, plateY, 0.02, 3, 3);
       // the last few centimetres out to the leaf, lined so the join reads as a reveal
       const gap = Math.max(0.03, I.plugZ - rz);
       for (const s of [-1, 1]) {
@@ -790,17 +861,25 @@ function hallShell(b, I, z) {
       const ring = openingShape('arch', dw + 1.5, dh + 1.1);
       ring.holes = [openingShape('arch', dw, dh)];
       b.add('stone', new THREE.ShapeGeometry(ring, 5), f.m.clone().multiply(T(0, fy, 0.05)));
-    } else {
-      wallPanel(b, 'stone', f, -hw, hw, fy, plateY);
     }
 
     // base course, string course, wall plate — three horizontal lines is what stops eleven
     // metres of masonry reading as one flat field. A course low enough to cross the doorway is
     // drawn as two returns instead: run through the opening it is a knee-high wall standing in
     // the door, which is what you walk into on the way in.
+    // A course run through an opening is a stone bar standing in it — which is what the string
+    // course did across all three inner doorways for as long as they were invisible.
     const course = (surface, geo, y, h, dz) => {
-      const runs = dw && y - h / 2 < fy + dh ? [[-hw, -dw / 2], [dw / 2, hw]] : [[-hw, hw]];
-      for (const [u0, u1] of runs) b.add(surface, geo(u1 - u0), f.m.clone().multiply(T((u0 + u1) / 2, y, dz)));
+      const bars = holes.filter(o => o.door && y - h / 2 < o.y + o.h && y + h / 2 > o.y)
+        .map(o => [o.x - o.w / 2 - 0.1, o.x + o.w / 2 + 0.1]).sort((a, c) => a[0] - c[0]);
+      const runs = [];
+      let u0 = -hw;
+      for (const [a, c] of bars) { if (a > u0) runs.push([u0, a]); u0 = Math.max(u0, c); }
+      runs.push([u0, hw]);
+      for (const [a, c] of runs) {
+        if (c - a < 0.05) continue;
+        b.add(surface, geo(c - a), f.m.clone().multiply(T((a + c) / 2, y, dz)));
+      }
     };
     course('stone', w => box(w, baseH, 0.34), fy + baseH / 2, baseH, 0.17);
     course('stone', w => taperBox(w, 0.20, 0.26, w, 0.34), fy + baseH + 0.13, 0.26, 0.10);
@@ -933,23 +1012,42 @@ function hallDress(b, I, z, R) {
     solid(I, tx, -1.5, 1.35 + 0.22, tl / 2, fy + th);
   }
 
+// A hanging with folds standing proud of the wall, as one continuous surface. The four flat
+// battens this replaces were `cloth` boxes laid on top of a flat plane: they cost geometry, they
+// broke the panel's own UVs into five unrelated pieces, and at 30 m they read as four stripes of
+// exactly the same colour as what was behind them, which is to say as nothing at all. Waving the
+// plane itself is fewer triangles per unit of relief, keeps one 0..1 UV across the whole panel
+// for the woven texture, and gives the sconce beside it something real to catch.
+function folded(w, h, amp = TAP.fold, n = TAP.folds) {
+  const g = new THREE.PlaneGeometry(w, h, n * 5, 8);
+  const p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const u = p.getX(i) / w + 0.5;
+    // cloth hangs tight at the pole and loose at the hem, and is pinned flat at both selvedges
+    const slack = 0.55 + 0.45 * (0.5 - p.getY(i) / h);
+    p.setZ(i, amp * slack * (0.5 - 0.5 * Math.cos(u * Math.PI * 2 * n)));
+  }
+  g.computeVertexNormals();
+  return g;
+}
+
   // ── tapestries ── the cheapest way to break eleven metres of stone, and the only colour in it
   // A hanging has to read as cloth from across the room or it is a grey rectangle set into the
   // wall — which is exactly what a critic pass called the first version. What sells it is a
   // heavy pole with finials, a dark border on all four sides, and folds standing proud enough
   // to catch the sconce beside them.
-  const tapY = fy + wallH * 0.62, tapW = 4.0, tapH = wallH * 0.46;
+  const tapY = fy + wallH * TAP.topK, tapW = TAP.w, tapH = wallH * TAP.hK;
   const hang = (f, u) => {
     const M = (x, y, z, ...r) => f.m.clone().multiply(T(u + x, y, z, ...r));
     b.add('beam', box(tapW + 0.8, 0.22, 0.24), M(0, tapY + 0.11, 0.44));
     for (const sx of [-1, 1]) b.add('beam', new THREE.SphereGeometry(0.17, 8, 6), M(sx * (tapW / 2 + 0.4), tapY + 0.11, 0.44));
-    const g = new THREE.PlaneGeometry(tapW, tapH, 5, 6);
-    b.add('cloth', g, M(0, tapY - tapH / 2, 0.40));
-    for (let i = 0; i < 4; i++) {
-      b.add('cloth', box(0.12, tapH - 0.24, 0.09), M(-tapW / 2 + tapW * (i + 0.5) / 4, tapY - tapH / 2, 0.45));
-    }
+    // keepUV: the kit box-projects world-scale UVs by default, which is right for masonry and
+    // wrong for the one surface here that wants a whole picture across a whole panel.
+    b.add('hanging', folded(tapW, tapH), M(0, tapY - tapH / 2, 0.40), true);
     for (const sx of [-1, 1]) b.add('beam', box(0.20, tapH, 0.13), M(sx * (tapW / 2 - 0.10), tapY - tapH / 2, 0.44));
-    b.add('beam', box(tapW, 0.20, 0.13), M(0, tapY - tapH + 0.10, 0.44));
+    // the hem batten stands further out than the head one: the folds are slack at the bottom and
+    // a rail set at the head's depth would be buried by them
+    b.add('beam', box(tapW, 0.20, 0.13), M(0, tapY - tapH + 0.10, 0.48));
     b.add('beam', box(tapW, 0.20, 0.13), M(0, tapY - 0.10, 0.44));
   };
   const faces = hallFaces(I);
@@ -963,16 +1061,23 @@ function hallDress(b, I, z, R) {
 
   // ── doorways to the rest of the academy ── one open onto a dark stub of passage, two shut.
   // The hotspots that make them locked or not are in the level document; nothing here knows.
-  const dw = 2.6, dh = Math.min(3.8, wallH * 0.60), kind = z.window.shape;
-  const doorAt = (f, u, open) => {
+  const kind = I.plan.kind;
+  const doorAt = (f, u, open, dw, dh) => {
+    // A moulded surround standing proud of the wall, and jambs lining the thickness of it. The
+    // old version drew a flat ring flush with the masonry, which against stone was invisible —
+    // and behind it the wall had no hole at all, so nothing here could be seen from the room.
     const ring = openingShape(kind, dw + 0.9, dh + 0.62);
     ring.holes = [openingShape(kind, dw, dh)];
-    b.add('stone', new THREE.ShapeGeometry(ring, 5), f.m.clone().multiply(T(u, fy, 0.06)));
+    b.add('stone', new THREE.ShapeGeometry(ring, 5), f.m.clone().multiply(T(u, fy, 0.16)));
+    for (const sx of [-1, 1]) b.add('stone', box(0.34, dh + 0.5, 0.34), f.m.clone().multiply(T(u + sx * (dw / 2 + 0.17), fy + (dh + 0.5) / 2, 0.17)));
+    b.add('stone', box(dw + 0.68, 0.34, 0.34), f.m.clone().multiply(T(u, fy + dh + 0.17, 0.17)));
     b.add('stone', taperBox(dw + 1.5, 0.44, 0.24, dw + 1.1, 0.34), f.m.clone().multiply(T(u, fy + dh + 0.42, 0.14)));
     if (open) {
-      // a passage stub: five inward faces. The baked gradient buries anything this far from a
-      // window, so it reads as a dark corridor without a second material.
-      const pd = 3.2, mm = f.m.clone().multiply(T(u, fy, 0.02));
+      // A recess the depth of the masonry, and no deeper. It used to run 3.2 m back — which was
+      // invisible while the wall had no hole in it, and the moment the hole was cut it became a
+      // stone box standing 2.6 m proud of the facade for anyone on the road to see. The room
+      // beyond does not exist yet; until it does, the honest thing is a doorway into the dark.
+      const pd = 0.56, mm = f.m.clone().multiply(T(u, fy, 0.02));
       b.add('stone', new THREE.PlaneGeometry(dw, dh), mm.clone().multiply(T(0, dh / 2, -pd)));
       const fl = new THREE.PlaneGeometry(dw, pd); fl.rotateX(-Math.PI / 2);
       b.add('flag', fl, mm.clone().multiply(T(0, 0.01, -pd / 2)));
@@ -983,29 +1088,33 @@ function hallDress(b, I, z, R) {
         b.add('stone', sw, mm.clone().multiply(T(s * dw / 2, dh / 2, -pd / 2)));
       }
     } else {
-      // Set well back in the reveal, and boarded: a single flat slab flush with the masonry is
-      // what a critic pass read as a missing material rather than as a door.
-      const lz = -0.26, planks = 5;
+      // Boarded, ledged and studded, hung in the hole the wall was cut for. It used to sit at
+      // −0.26 — which is 0.26 m the wrong side of a wall that had no opening in it, so the leaf
+      // was inside the exterior shell's own masonry and could never be seen. There is 0.09 m
+      // between the two surfaces of a hall; the whole door has to live in it and stand forward.
+      const lz = 0.03, planks = 5;
       for (let i = 0; i < planks; i++) {
         const px = -dw / 2 + dw * (i + 0.5) / planks;
-        b.add('beam', box(dw / planks - 0.06, dh - 0.16, 0.16), f.m.clone().multiply(T(u + px, fy + (dh - 0.16) / 2, lz)));
+        b.add('beam', box(dw / planks - 0.06, dh - 0.16, 0.10), f.m.clone().multiply(T(u + px, fy + (dh - 0.16) / 2, lz)));
       }
-      b.add('beam', box(dw - 0.1, dh - 0.16, 0.06), f.m.clone().multiply(T(u, fy + (dh - 0.16) / 2, lz - 0.09)));
+      b.add('beam', box(dw - 0.1, dh - 0.16, 0.05), f.m.clone().multiply(T(u, fy + (dh - 0.16) / 2, lz - 0.045)));
       for (const y of [dh * 0.22, dh * 0.56, dh * 0.88]) {
-        b.add('wood', box(dw - 0.24, 0.18, 0.10), f.m.clone().multiply(T(u, fy + y, lz + 0.13)));
-        for (const sx of [-1, 1]) b.add('wood', box(0.13, 0.13, 0.13), f.m.clone().multiply(T(u + sx * (dw / 2 - 0.24), fy + y, lz + 0.18)));
+        b.add('wood', box(dw - 0.24, 0.18, 0.09), f.m.clone().multiply(T(u, fy + y, lz + 0.09)));
+        for (const sx of [-1, 1]) b.add('wood', box(0.13, 0.13, 0.12), f.m.clone().multiply(T(u + sx * (dw / 2 - 0.24), fy + y, lz + 0.13)));
       }
-      b.add('wood', box(0.5, 0.24, 0.16), f.m.clone().multiply(T(u + dw * 0.28, fy + 1.15, lz + 0.16)));
-      b.add('wood', new THREE.TorusGeometry(0.17, 0.045, 4, 10), f.m.clone().multiply(T(u + dw * 0.28, fy + 0.92, lz + 0.16)));
+      b.add('wood', box(0.5, 0.24, 0.14), f.m.clone().multiply(T(u + dw * 0.28, fy + 1.15, lz + 0.12)));
+      b.add('wood', new THREE.TorusGeometry(0.17, 0.045, 4, 10), f.m.clone().multiply(T(u + dw * 0.28, fy + 0.92, lz + 0.14)));
     }
   };
-  doorAt(faces[3], sideMids[1], true);
-  doorAt(faces[2], sideMids[1], false);
-  doorAt(faces[2], sideMids[2], false);
+  // One list, shared with hallShell (which cut the holes) and with the level document's hotspots.
+  for (const d of I.plan.doors) doorAt(faces[d.face], d.u, d.open, d.w, d.h);
 
   // ── presses and chests ── something along the wall, and no more than that
   for (const s of [-1, 1]) {
-    const cz = s * rz * 0.34;
+    // On a bay LINE, against a pier. At 0.34 of the half-depth a 2.7 m press stood across the
+    // west doorway and hid half of it — which is a good part of why Aaron could not find the
+    // door his hotspot was on. Bay lines carry piers; bay midpoints carry doors and windows.
+    const cz = s * rz * 0.5;
     b.add('wood', box(0.95, 2.7, 2.4), T(-rx + 0.62, fy + 1.35, cz));
     b.add('wood', box(1.1, 0.22, 2.7), T(-rx + 0.66, fy + 2.8, cz));
     b.add('wood', box(0.06, 2.0, 0.16), T(-rx + 1.1, fy + 1.5, cz));
@@ -1078,25 +1187,25 @@ function hallGlass(shellBatch, I, z, opts) {
   paneMat.envMapIntensity = 0.2;
 
   const faces = hallFaces(I);
-  const mids = lines => lines.slice(0, -1).map((v, i) => (v + lines[i + 1]) / 2);
-  const sideMids = mids(faces[2].lines);
-  // A clerestory: high enough to clear the doorways in the same bays, low enough to leave the
-  // wall plate its own band of stone.
-  const sillY = fy + wallH * 0.62;
-  const winH = wallH * 0.30;
-  I.winY = sillY + winH / 2 - fy;
+  // Every light in the room comes out of I.plan, which buildings.js reads too — so the panes sit
+  // in the holes the wall was cut for, at the same places the facade outside has its own.
+  // A low light is left unglazed: it is a real hole through both surfaces with the exterior's
+  // iron bars in it, and it is what you can see out of.
+  const glazed = fi => I.plan.win[fi].filter(o => !o.open)
+    .map(o => ({ x: o.x, y: o.y, w: o.w, h: o.h, kind: o.kind }));
+  const high = I.plan.win[2].filter(o => !o.open);
+  I.winY = high.length ? high[0].y + high[0].h / 2 - fy : wallH * 0.7;
 
   const groups = [];
   // the two long walls: a light in every bay, and the sun through them lands on the floor
   for (const [fi, ry] of [[2, -Math.PI / 2], [3, Math.PI / 2]]) {
-    groups.push({
-      ry, halfW: rz, halfD: rx, shaft: true,
-      panes: sideMids.map(u => ({ x: fi === 2 ? u : -u, y: sillY, w: 2.4, h: winH, kind })),
-    });
+    groups.push({ ry, halfW: rz, halfD: rx, shaft: true, panes: glazed(fi) });
   }
-  // The far wall is the contract wall and gets no clerestory of its own: the four boards and the
-  // gable window over them are what the eye is meant to go to.
-  // and the gable window in each end wall
+  // The two end walls take their own clerestory as well as the gable light above it.
+  for (const [fi, ry] of [[0, 0], [1, Math.PI]]) {
+    const p = glazed(fi);
+    if (p.length) groups.push({ ry, halfW: rx, halfD: rz, shaft: false, panes: p });
+  }
   for (const [fi, ry] of [[0, 0], [1, Math.PI]]) {
     const gwin = faces[fi].gableWin;
     if (!gwin) continue;

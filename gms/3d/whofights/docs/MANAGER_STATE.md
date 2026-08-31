@@ -210,10 +210,72 @@ generate and curate.
   imports shot.mjs's transport rather than being a third copy of it. Measured boundary: 3.687 MiB
   fine, 4.031 MiB wedged. `js/dev/debug/uitest.mjs` was screenshotting at 3.26 MiB — three quarters
   of a megabyte under the cap — so it too was passing on luck and now cannot.
-- Confirmed still true by the 31 Aug hall render (`shots/hall.png`), unlike the struck-through
-  entries above: the masonry reads as brick, and the flat blue window panels read as placeholders.
-- Hall masonry reads as brick rather than ashlar; one number (`INTERIOR_TILE.stone`).
-- Flat blue window panels at mid-wall height read as placeholder rectangles.
+- ~~Confirmed still true by the 31 Aug hall render (`shots/hall.png`), unlike the struck-through
+  entries above: the masonry reads as brick, and the flat blue window panels read as placeholders.~~
+  **Both fixed 31 Aug, uncommitted.** Before/after at the same camera, with the window and door
+  work in the same pair: `shots/hall-pass/1-hall-before.png` and `2-hall-after.png` (and 3–8 for
+  the facade and the two side walls). 64 → 65 draw calls, 137k → 121k triangles, texture budget
+  52.9 → 56.9 MB.
+- ~~Hall masonry reads as brick rather than ashlar; one number (`INTERIOR_TILE.stone`).~~
+  Fixed, but **it was never one number** — a fourth wrong claim in this file. The block size comes
+  from `COURSE` in `materials.js`, which deliberately shrinks every zone's authored `blockW/blockH`
+  to ~0.21 m so a 6 m cottage is not cartoon blockwork; `INTERIOR_TILE.stone` is only the metres
+  the interior projects that bake over, and raising it would have enlarged the chipping and grain
+  with the blocks and halved the texel density. The hall now bakes its own `ashlarSet()` in
+  `materials.js` at the size zones.js actually authors (light is 0.9 × 0.42 m), with a `joint`
+  override in `stone.js` because a shape's joint is a fraction of its course — the `rounded`
+  profile that gives a cottage a 0.09 m bed opens to 0.18 m at hall scale and the wall turns to
+  rubble. Cottages and every exterior are untouched.
+- ~~Flat blue window panels at mid-wall height read as placeholder rectangles.~~ **They were never
+  windows.** Proved by recolouring the one material with a normal map and no albedo map and
+  re-rendering: every mid-blue panel turned red, so they are the five *tapestries* in
+  `hallDress()`, drawn in a flat dyed `z.interior.cloth`. The hall's actual windows are the
+  clerestory leaded lights, which already read correctly. They now take a woven texture from a new
+  `js/world/textures/cloth.js` — sibling to `stained.js`, and driven off the same
+  `z.interior.pattern` name, so a hall's hanging and its window carry the same device — and the
+  four flat `cloth` battens laid on the panel are replaced by folds waved into the plane itself,
+  which is fewer triangles per unit of relief and keeps one 0..1 UV across the whole hanging.
+  *`b.add()` box-projects world-scale UVs unless you pass `keepUV`; the one surface in the room
+  that wants a whole picture across a whole panel has to ask for it.*
+- **Aaron, playing it: *"on the outside of building i see lots of windows, go on the inside and
+  that same wall has none! so obviously there are 2 surfaces? we should try to match up the
+  windows, some of them should be see through right?"*** and ***"there appears to be some door
+  hotspots (locked) but I cannot actual see doors where the hotspots are?"***
+  **Both fixed 31 Aug, uncommitted, and they were one bug.** The hall is two surfaces —
+  `buildings.js house()` outside, `interior.js hallShell()` inside — and the interior one was
+  drawn as a *solid plane*: `wallPanel()` never cut an opening for anything. So the exterior put
+  ~110 windows on a 2 m slot grid at heights of its own choosing while the interior had twelve at
+  bay midpoints at a third, and all three inner doorways were buried in the masonry — the shut
+  leaves hung 0.26 m the wrong side of a wall with no hole in it, and the open one's reveal was a
+  flat stone ring on stone.
+  - Both surfaces now read `js/world/hallplan.js`, which is the only place a hall's fenestration
+    is decided. The exterior uses the *interior's* span for its bay midpoints (`span − 2t − 0.18`)
+    or the two grids drift half a metre and every window misses.
+  - `wallWithHoles()` in `interior.js` builds a wall as the stone left over once its openings are
+    taken out, splitting into columns at every opening edge — which keeps `wallPanel`'s
+    subdivision, and so the baked vertex gradient, instead of collapsing a wall into one
+    ShapeGeometry with three triangles in it.
+  - The low row is **unglazed on both surfaces**: a real hole through both skins, with the
+    exterior's iron bars still in it. That is the "see through" — visible in
+    `shots/hall-pass/4-doorway-after.png`, where you can read the interior ashlar from the lawn.
+  - The board wall gets no wall light at all now, inside or out. The four contract boards stand
+    2.6–6.2 m off the floor across the whole of it and the plate is at 7.2: there is no band left.
+- ~~The locked-door hotspots are not where the doors are.~~ **They always were.** Measured, not
+  assumed: the hall sits at world (0, −16), `bayMids(bayLines(rz*2, HALL.bay))` gives ∓3.6, and
+  the three doorways come out at world (−15.9, −12.4) yard, (15.9, −19.6) armoury and
+  (15.9, −12.4) dormitory — the authored `hs.door.*` centres exactly. Nothing needed moving and
+  `data/` was not touched. What was wrong is that they could not be *seen*: no hole in the wall,
+  and a 2.7 m press standing across the west one. `js/world/hallplan.test.mjs` now pins the three
+  positions against the numbers the level document authors, so the next person to touch the bay
+  grid finds out at once.
+- **A shared RNG stream is a dependency, and this one bit.** `house()` draws `R()` once per window
+  slot. Making a hall's windows deterministic removed ~110 draws and silently re-rolled every
+  later decision in the function — the roof ridge among them — and the exterior roof slab came
+  through the interior gable as a stone chevron floating over the contract boards. Pinning the
+  ridge to the interior's axis (which is what it *should* be — `interior.js` hard-codes it) then
+  put the slab through the interior roof at the side walls instead. The cottage slot loop is
+  therefore still run for a hall and its draws still taken, just not built. **Latent:** a hall's
+  ridge is still a coin toss that agrees with the room inside it only by luck of the seed.
 - The tracer misses boot — hooks install on first Debug-tab open. One line in `js/dev/boot.js`.
 - No running world clock: `time` is a lighting knob, `js/game/clock.js` is uncalled arithmetic.
 

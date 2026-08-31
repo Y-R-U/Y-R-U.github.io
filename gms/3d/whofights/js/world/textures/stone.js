@@ -43,7 +43,10 @@ export function stone(S, st, tileM, seed = 7) {
   const blockCol = [0, 0, 0], out = [0, 0, 0];
   const rgba = new Uint8ClampedArray(S * S * 4);
   const height = new Float32Array(S * S);
-  const jw = sh.joint * ch;
+  // Joint width is a fraction of the course height, so a shape tuned for a 0.22 m course opens
+  // into a rubble bed at 0.42 m. `st.joint` overrides it for the reads that change block size
+  // without meaning to change what the wall is built of. Absent, the shape's own number stands.
+  const jw = (st.joint ?? sh.joint) * ch;
   const relief = st.jointDepth;
 
   for (let py = 0; py < S; py++) {
@@ -75,7 +78,7 @@ export function stone(S, st, tileM, seed = 7) {
       } else {
         p = smoothstep(0, 0.26, t);
       }
-      p += sh.bulge * Math.sin(Math.PI * u) * Math.sin(Math.PI * fy) * p;
+      p += (st.bulge ?? sh.bulge) * Math.sin(Math.PI * u) * Math.sin(Math.PI * fy) * p;
 
       for (const chip of [sp.chipA, sp.chipB]) {
         if (!chip) continue;

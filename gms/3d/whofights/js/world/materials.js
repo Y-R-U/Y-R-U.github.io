@@ -10,7 +10,10 @@ import { roof as roofTex, wood as woodTex, road as roadTex, ground as groundTex,
 import { project, setGroundField as applyGroundField } from './textures/project.js';
 
 const TILE = { wall: 4.2, roof: 1.6, road: 2.4, ground: 3.2, wood: 1.2, glass: 0.92 };
-const RES = { wall: 1024, roof: 256, road: 256, ground: 512, wood: 256, glass: 256, flag: 512 };
+// `ashlar` is half `wall` on purpose: it covers twice the metres per tile, so 512 over 8.4 m is
+// 61 texels a metre against the outdoor wall's 244, and it is the only set in the room that
+// would otherwise put 10 MB on the budget for one surface. See ashlarSet().
+const RES = { wall: 1024, roof: 256, road: 256, ground: 512, wood: 256, glass: 256, flag: 512, ashlar: 512 };
 
 // Course height in metres. zones.js authors blockW/blockH at roughly twice life size, which
 // reads as cartoon blockwork against a 6 m house; the width/height ratio is kept, the absolute
@@ -167,6 +170,32 @@ export function flagSet(zoneId, slab = 0.9, tile = 3.6) {
   const label = `${z.id}:flag:${slab}:${tile}`;
   return bakeSurface(label, RES.flag, S => stone(S, cfg, tile, hashId(z.id) + 14));
 }
+
+// A great hall's inside face is dressed ashlar, and the outdoor wall set cannot be it. COURSE
+// shrinks every zone's authored block to ~0.21 m so a 6 m cottage does not read as cartoon
+// blockwork — but eleven metres of that is a brick wall, which is exactly what a critic pass and
+// Aaron both called it. This read goes back to the size zones.js actually authors (light is
+// 0.9 x 0.42 m) and cuts the joint down to suit: a shape's joint is a fraction of its course, so
+// the same `rounded` profile that gives a cottage a 0.09 m bed opens to 0.18 m at hall scale and
+// the wall turns to rubble. Block *shape* is still the zone's own — this changes how big the
+// stones are and how finely they are cut, not what rock the town is built of.
+//
+// `course` is the block height in metres and `tile` the metres one texture covers; the pair is
+// what stops eleven metres of wall reading as brickwork. Cached per zone+size like every set.
+export function ashlarSet(zoneId, course = ASHLAR.course, tile = ASHLAR.tile) {
+  const z = zone(zoneId);
+  const cfg = { ...z.stone,
+    blockH: course, blockW: course * (z.stone.blockW / z.stone.blockH),
+    joint: 0.13, bulge: Math.min(z.stone.blockShape === 'rounded' ? 0.12 : 0.06, 0.12),
+    jointDepth: z.stone.jointDepth * 0.72,
+    chipping: z.stone.chipping * 0.7,
+  };
+  return bakeSurface(`${z.id}:ashlar:${course}:${tile}`, RES.ashlar, S => stone(S, cfg, tile, hashId(z.id) + 18));
+}
+
+// The hall's own masonry read, in the same shape as INTERIOR_TILE so interior.js can swap one
+// entry of the table rather than carrying a second one.
+export const ASHLAR = { course: 0.42, tile: 8.4 };
 
 // Metres per tile the interior kit projects its own UVs at. Exported so interior.js and this
 // file cannot drift: `wall` and `wood` are literally the outdoor numbers.

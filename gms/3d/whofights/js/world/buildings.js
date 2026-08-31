@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { zone } from './zones.js';
 import { TOWER_FOOT } from '../editor/scene.js';
+import { hallBand, hallWindows } from './hallplan.js';
 import {
   Batch, T, rng, span, openingPts, extrude, rectShape, taperBox, mergedMesh,
   addOpening, addMerlons, addCorbels, addCrest, roofSlab, roofY, gableShape,
@@ -450,8 +451,22 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = 
 
   let doorFace = 0;
   let door = null;
+  // A great hall does not get the cottage's 2 m slot grid. Its windows are the ones the room
+  // inside it has, read out of hallplan.js — the same list interior.js cuts its own walls for —
+  // because the two surfaces disagreeing is what Aaron saw from the road and then from the
+  // bench. `open` lights are left unglazed on purpose: with a hole in both surfaces they are the
+  // ones you can see through, and addOpening still puts iron bars across them.
+  //   The interior face is 0.09 m inside the panel, so its wall is `2t + 0.18` shorter than this
+  // one; both use that shorter span for their bay midpoints or the two grids drift apart.
+  const band = hall ? hallBand(plinth, wallTop, z.interior?.ceiling ?? 1) : null;
+  const ROLE = ['door', 'boards', 'side', 'side'];
   for (const [fi, f] of faces.entries()) {
     const openings = [];
+    // The cottage grid still runs for a hall, and its draws are still taken — they are simply not
+    // built. `R()` is one stream shared by every later decision in this function, the roof ridge
+    // among them, so skipping ~110 draws silently re-rolls the whole building. It did: the roof
+    // flipped axis and its slab came through the gable as a stone chevron over the contract
+    // boards. Anything that changes how often R() is called here changes the building.
     const slots = Math.max(1, Math.floor((f.span - 1.2) / 2.0));
     const step = f.span / (slots + 1);
     for (const [ri, ry] of rows.entries()) {
@@ -459,7 +474,12 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = 
         const x = -f.span / 2 + step * i;
         if (fi === doorFace && ri === 0 && Math.abs(x) < doorReach) continue;
         if (R() < skip) continue;
-        openings.push({ kind, w: winW, h: winH, x, y: ry, reveal: t * 0.8 });
+        if (!hall) openings.push({ kind, w: winW, h: winH, x, y: ry, reveal: t * 0.8 });
+      }
+    }
+    if (hall) {
+      for (const o of hallWindows({ span: f.span - 2 * t - 0.18, band, kind, role: ROLE[fi], greatDoorW: dw + 0.5 })) {
+        openings.push({ kind: o.kind, w: o.w, h: o.h, x: o.x, y: o.y, reveal: t * 0.8, glass: !o.open });
       }
     }
     if (fi === doorFace) {
@@ -517,6 +537,12 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = 
     }
   }
 
+  // LATENT: a hall's ridge is a coin toss here, while interior.js hard-codes the opposite —
+  // *"the ridge runs along the door axis"* — and puts its gable walls on the ±z faces to match.
+  // The two agree only because the draw lands the right way up for this seed. Pinning it to the
+  // interior's axis is the obvious fix and it is NOT taken here: tried, it moves the exterior
+  // roof slab down over the side walls, where the light zone's curved profile puts it straight
+  // through the interior roof, and untangling that is a roof job, not a window one.
   const ridgeX = R() < 0.75 ? w >= d : w < d;
   const spanW = ridgeX ? d : w;
   const ridgeLen = ridgeX ? w : d;
