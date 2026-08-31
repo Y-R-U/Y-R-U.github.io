@@ -853,6 +853,12 @@ body.flip #game .g-open {
 /* Above the board screens, not under them: the nudge to go and talk to Vail is raised by opening
    New Adventures, and a toast behind its own cause is a toast nobody sees. It has no pointer
    events, so nothing it covers stops working. */
+/* …but top centre is where a board screen puts its title, so a toast raised by one goes to the
+   foot of the screen instead of across its own heading. */
+#game .g-toast.g-low {
+  top: auto;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+}
 #game .g-toast {
   position: absolute;
   z-index: 6;
@@ -1092,8 +1098,13 @@ body.flip #game .g-open {
   background: rgba(140, 58, 43, .07);
 }
 #game .g-standing.shut { border-left-color: var(--iron); background: rgba(86, 93, 102, .1); }
-/* Georgia sets old-style figures by default, so "0 of 7 met" read as "o of 7 met". */
-#game .g-standing b { display: block; font-size: calc(15px * var(--ui)); font-variant-numeric: lining-nums; }
+/* Georgia's default figures are old-style, so "0 of 7 met" read as "o of 7 met". It has no `lnum`
+   to ask for; `tnum` is the feature that actually gives it lining figures. */
+#game .g-standing b {
+  display: block;
+  font-size: calc(15px * var(--ui));
+  font-variant-numeric: lining-nums tabular-nums;
+}
 #game .g-standing span { display: block; font-size: calc(13px * var(--ui)); color: var(--faint); }
 
 #game .g-jobs { display: grid; gap: calc(2px * var(--ui)); margin-top: calc(6px * var(--ui)); }

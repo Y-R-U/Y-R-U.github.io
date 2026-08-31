@@ -146,4 +146,4 @@ export class Noticeboard {
 // The toast Aaron asked for: a nudge, never a dialog, and only on the board that has a person
 // standing behind it who can actually do something about the answer.
 export const NUDGE = 'Instructor Vail keeps this board. Speak to her.';
-export const nudge = host => toast(host, NUDGE, { ms: 5200 });
+export const nudge = host => toast(host, NUDGE, { ms: 5200, level: 'g-low' });

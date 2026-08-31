@@ -21,6 +21,7 @@ export const DEFAULTS = {
 };
 
 const num = (v, def) => (Number.isFinite(+v) ? +v : def);
+const clamp = (v, lo, hi, def) => Math.min(hi, Math.max(lo, num(v, def)));
 
 // The action and predicate layers' view of the live save. Getters rather than captured
 // references: loading a slot in the debug Save panel replaces `flags`, `items` and `quests`
@@ -50,7 +51,6 @@ export function startPos(start, at, saved, levelId) {
   if (saved?.at && saved.level && saved.level === levelId) return saved.at;
   return start;
 }
-const clamp = (v, lo, hi, def) => Math.min(hi, Math.max(lo, num(v, def)));
 
 export function blank(t = 0) {
   return {

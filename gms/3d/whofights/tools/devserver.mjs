@@ -200,10 +200,10 @@ function enqueue(kind, run, meta) {
   return job;
 }
 
-// runMusic and runFlux bound themselves, but runSkin hands off to tools/skin/skin.mjs and inherits
-// whatever that does — and one run that never settles used to strand every job behind it until the
-// process was restarted. The abandoned run is not killed, nothing here can kill a fetch already in
-// flight; it just stops holding the slot, and freeVRAM is what keeps its model off the next job.
+// runMusic and runFlux bound themselves; runSkin hands off to tools/skin/skin.mjs and inherits
+// whatever that does, and one run that never settled used to strand every job behind it.
+// Abandoned, not killed — nothing here can stop a fetch already in flight, it just stops holding the
+// slot, and freeVRAM is what keeps the abandoned model off the next job.
 async function runJob(job) {
   job.state = 'running';
   job.position = 0;
@@ -790,8 +790,7 @@ async function route(req, res, p, url) {
   return send(res, 404, { ok: false, error: `no route ${p}` });
 }
 
-// Only the CLI entry point listens, so a test can import the path and origin guards below without
-// standing a server up. That is why none of them had a test.
+// Only the CLI entry point listens, so a test can import the guards above without a server coming up.
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   server.listen(PORT, '0.0.0.0', async () => {
     const s = await status();
