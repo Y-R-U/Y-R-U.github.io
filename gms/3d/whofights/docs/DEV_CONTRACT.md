@@ -19,6 +19,15 @@ files from GitHub Pages. The dev server is an **authoring-only** convenience.
 `::1`, ends in `.local`, is a `file:` origin, or is a private IPv4: `10.*`, `192.168.*`,
 `172.16-31.*`. Nothing else. The DEV button is only inserted into the DOM when `isLocal()`.
 
+**The rule is about the tools, not about one button.** Everything behind it is behind the same
+gate: `index.html?editor` (the FORGE scene editor plus the perf HUD — `bootMode(params, local)`
+does not have an editor mode off a local origin, and `buildEditor` is not called at all), and every
+raw dev page that is a static file in the repo — `js/dev/selftest.html`, `js/dev/skin/studio.html`,
+`js/dev/skin/bench.html`, `js/dev/chars/bench.html`, `audio/studio/index.html`. Each of those
+imports **only** `gate.js` statically and pulls the rest in with a dynamic `import()` inside the
+`else`, because a static import is hoisted above the check and would be fetched whatever the gate
+answered.
+
 `js/dev/api.js` exports the dev server client. Every call returns `{ok, ...}` and never throws.
 `await api.up()` reports which backends answered. When the dev server is absent the tools still
 open, still edit, and fall back to localStorage + a download button — they say so in a banner.
@@ -131,7 +140,7 @@ Full field list (all optional except `name` and `body`):
 | field | values |
 |---|---|
 | `body` | `robed` \| `dummy` \| `none` — **two rigs.** `robed` is the hooded cloak (`people.js`), the default look and what the player starts as. `dummy` is the configurable humanoid: a UV'd crash-test-dummy base in male and female shapes, skinned with a generated texture. `none` is a narrator or voice-only NPC. |
-| `sex` | `f` \| `m` — **`dummy` only.** Picks the body shape. Nothing else reads it. |
+| `sex` | `f` \| `m` — **`dummy` only.** Picks the body shape (`js/world/dummies.js`). Nothing else reads it. |
 | `skin` (dummy) | id of a generated skin under `art/skins/`. |
 | `robe` | `light` \| `dark` \| `neutral` |
 | `height` | 0.85–1.20 (multiplier) |
@@ -145,7 +154,7 @@ Full field list (all optional except `name` and `body`):
 | `barks` | `{ <category>: [line, …] }` — overrides/extends the shared set |
 | `place` | `{level, x, z, yaw}` when the character has a body in the world |
 | `place.inside` | house id — the building whose footprint this body legitimately stands in, so the floor it is put on is that building's, not the terrain |
-| `place.wander` | `{x0, x1, z0, z1, speed}` — a box to stroll inside. Absent means the body stands still. |
+| `place.wander` | `{x0, x1, z0, z1, speed}` — a box to stroll inside. Absent means the body stands still. **`robed` only** — the dummy is one mesh, not a seat in the crowd pool, and `normaliseCast` warns when a dummy is given one. |
 
 A "simple NPC" or a narrator is just a character with `body: "none"`. **Promote to full character**
 = set `body: "robed"` and give it a `place`. That is the whole operation; the UI button does that.
@@ -217,7 +226,7 @@ their own docs row).
 | goto | `{"k":"goto","level":"<id>","at":{"x":0,"z":0,"yaw":0}}` |
 | music | `{"k":"music","set":"<setId>"}` or `{"k":"music","stop":true}` |
 | flag | `{"k":"flag","name":"…","value":true}` |
-| bark | `{"k":"bark","who":"<characterId>","category":"idle"}` |
+| bark | `{"k":"bark","who":"<characterId>","category":"idle"}` — `js/game/barks.js` picks a line from that character's list (its own override, else the shared pool), keeps only the ones `data/vo.json` has an encoded clip for, and plays it through `js/game/voice.js`. Silent while a conversation or a board is open, and one character barks at most every 8 s. |
 | event | `{"k":"event","name":"…","data":{}}` — emitted on `window.__wf.bus` |
 | screen | `{"k":"screen","id":"<screenId>"}` — opens a full-screen sheet (`js/game/noticeboard.js`). Not a modal: the world keeps rendering and a tap off the sheet closes it. |
 

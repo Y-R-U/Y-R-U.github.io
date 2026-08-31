@@ -4,9 +4,13 @@
 
 export const MODES = ['shot', 'editor', 'play'];
 
-export function bootMode(params) {
+// `local` is js/dev/gate.js's isLocal(). The scene editor is a dev tool, and DEV_CONTRACT §1 makes
+// dev tools local-only: off a local origin ?editor is simply not a mode, so the game plays instead
+// of handing a stranger the editor and the perf HUD. It is a required argument on purpose — a
+// permissive default is how a gate like this quietly stops gating.
+export function bootMode(params, local) {
   if (params.has('shot')) return 'shot';
-  if (params.has('editor')) return 'editor';
+  if (params.has('editor') && local) return 'editor';
   return 'play';
 }
 

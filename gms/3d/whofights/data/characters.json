@@ -158,6 +158,22 @@
         "weather": []
       },
       "voicePitch": 0
+    },
+    "quartermaster": {
+      "name": "Quartermaster Brann",
+      "body": "dummy",
+      "sex": "m",
+      "skin": "watch_s11",
+      "gender": "m",
+      "height": 1.04,
+      "voice": null,
+      "place": {
+        "level": "academy",
+        "x": -6,
+        "z": -20,
+        "yaw": 0,
+        "inside": 1
+      }
     }
   }
 }

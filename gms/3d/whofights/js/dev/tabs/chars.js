@@ -23,11 +23,16 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const num = (v, d) => (Number.isFinite(+v) ? +v : d);
 
 const STYLE = `
+/* Three columns on a desktop, not two and a scroll: the barks panel is the thing this tab is used
+   for most, and stacked under the fields it was always below the fold. */
+#wf-dev .chars-split > .side { flex: 0 0 168px; }
 #wf-dev .chars-cols { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
-#wf-dev .chars-view { flex: 0 0 320px; }
-#wf-dev .chars-view canvas { width: 320px; height: 400px; border-radius: 8px; border: 1px solid #232d3b;
+#wf-dev .chars-view { flex: 0 0 260px; }
+#wf-dev .chars-view canvas { width: 260px; height: 325px; border-radius: 8px; border: 1px solid #232d3b;
   background: #121820; display: block; touch-action: none; cursor: grab; }
-#wf-dev .chars-fields { flex: 1 1 360px; min-width: 320px; }
+#wf-dev .chars-fields { flex: 1 1 320px; min-width: 280px; }
+#wf-dev .chars-barks { flex: 1 1 400px; min-width: 340px; }
+@media (max-width: 1180px) { #wf-dev .chars-barks { flex-basis: 100%; } }
 #wf-dev .chars-f { display: grid; grid-template-columns: 92px 1fr; gap: 6px 10px; align-items: center; margin-bottom: 6px; }
 #wf-dev .chars-f > label { color: #8494a8; font-size: 12px; }
 #wf-dev .chars-f input[type=range] { width: 150px; vertical-align: middle; }
@@ -38,7 +43,7 @@ const STYLE = `
 #wf-dev .chars-unwired .pill { margin-left: 6px; }
 #wf-dev .chars-reach td { padding-right: 12px; }
 #wf-dev .bark-cat { border: 1px solid #1e2733; border-radius: 6px; margin-bottom: 6px; background: #101720; }
-#wf-dev .bark-cat > summary { cursor: pointer; padding: 7px 10px; display: flex; gap: 10px; align-items: center; }
+#wf-dev .bark-cat > summary { cursor: pointer; padding: 7px 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 #wf-dev .bark-cat > summary::-webkit-details-marker { color: #5d6b7d; }
 #wf-dev .bark-cat > .row, #wf-dev .bark-cat > .bark-row { padding: 0 10px; }
 #wf-dev .bark-row { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
@@ -77,7 +82,7 @@ registerTab({
     if (!this.sel || !cast()[this.sel]) this.sel = Object.keys(cast())[0] || null;
 
     el.innerHTML = `
-      <div class="split">
+      <div class="split chars-split">
         <div class="side">
           <div class="grouphead">Cast</div>
           <div data-role="list"></div>
@@ -105,8 +110,8 @@ registerTab({
     // One canvas and one WebGL context for the life of the tab: paintMain() rewrites its panel on
     // every selection, and a renderer per repaint runs the browser out of contexts inside a minute.
     this.canvasEl = document.createElement('canvas');
-    this.canvasEl.width = 320;
-    this.canvasEl.height = 400;
+    this.canvasEl.width = 260;
+    this.canvasEl.height = 325;
 
     this.barks = createBarks(ctx, {
       cast, id: () => this.sel,
@@ -167,8 +172,8 @@ registerTab({
   paintList() {
     const cast = this.cast();
     const ids = Object.keys(cast).sort();
-    const body = ids.filter(i => cast[i].body === 'robed');
-    const none = ids.filter(i => cast[i].body !== 'robed');
+    const body = ids.filter(i => cast[i].body !== 'none');
+    const none = ids.filter(i => cast[i].body === 'none');
     const group = (title, list) => (list.length ? `<div class="grouphead">${title}</div>` + list.map(i =>
       `<button data-id="${esc(i)}" class="${i === this.sel ? 'active' : ''}">${esc(cast[i].name || i)}
         <span class="dim">${esc(i)}</span></button>`).join('') : '');
@@ -201,8 +206,7 @@ registerTab({
           <div class="dim" data-role="rigline" style="font:11px ui-monospace,Menlo,monospace"></div>
         </div>
         <div class="chars-fields" data-role="fields"></div>
-      </div>
-      <section data-role="barkslot"></section>`;
+      </div>`;
 
     this.mainEl.querySelector('[data-role=title]').textContent = c.name || this.sel;
     this.mainEl.querySelector('[data-act=dup]').onclick = () => this.duplicate();
@@ -218,7 +222,7 @@ registerTab({
     };
 
     this.paintFields();
-    this.mainEl.querySelector('[data-role=barkslot]').appendChild(this.barks.el);
+    this.mainEl.querySelector('.chars-cols').appendChild(this.barks.el);
     this.barks.setCharacter();
 
     await this.startPreview();
@@ -272,7 +276,7 @@ registerTab({
   paintFields() {
     const c = this.chr();
     const f = this.mainEl.querySelector('[data-role=fields]');
-    const placed = c.body === 'robed';
+    const placed = c.body !== 'none';
     const p = c.place || {};
 
     f.innerHTML = `
@@ -289,6 +293,11 @@ registerTab({
         <label>Gender</label><span><select data-f="gender">
           <option value="f">f</option><option value="m">m</option><option value="x">x</option></select>
           <span class="dim" style="font-size:11px"> metadata — it orders the voice list below and nothing else</span></span>
+        ${c.body !== 'dummy' ? '' : `<label>Shape</label><span><select data-f="sex">
+          <option value="m">m</option><option value="f">f</option></select>
+          <span class="dim" style="font-size:11px"> the dummy body shape — §7's <code>sex</code>, the one field that picks a mesh</span></span>
+        <label>Skin</label><span><code>${esc(c.skin || '— none —')}</code>
+          <span class="dim" style="font-size:11px"> painted and chosen in the Skins tab; a colour here would overwrite the id</span></span>`}
       </div>
 
       <div class="chars-unwired">
@@ -301,8 +310,8 @@ registerTab({
           <label>Hood</label><span><select data-f="hood">
             <option value="up">up</option><option value="down">down</option></select>
             <span class="pill off">unwired</span></span>
-          <label>Skin</label><span><input type="color" data-f="skin" value="${esc(c.skin || '#c8a887')}">
-            <span class="pill off">no geometry — the cowl covers the face and the cavity is flat black</span></span>
+          ${c.body === 'dummy' ? '' : `<label>Skin</label><span><input type="color" data-f="skin" value="${esc(c.skin || '#c8a887')}">
+            <span class="pill off">no geometry — the cowl covers the face and the cavity is flat black</span></span>`}
           <label>Hair</label><span><input type="color" data-f="hair" value="${esc(c.hair || '#3a2a1e')}">
             <span class="pill off">no geometry</span></span>
         </div>
@@ -341,16 +350,20 @@ registerTab({
         <tr><th>robe</th><td class="good">yes</td><td class="dim">zones.js material + geometry set</td></tr>
         <tr><th>height</th><td class="good">yes</td><td class="dim">people.js agent <code>scale</code>, uniform</td></tr>
         <tr><th>gender</th><td class="dim">no</td><td class="dim">metadata; orders the voice list only (§7)</td></tr>
-        <tr><th>body, place</th><td class="good">yes</td><td class="dim">whether and where a figure is spawned</td></tr>
+        <tr><th>body, place</th><td class="good">yes</td><td class="dim">which rig is spawned, and where</td></tr>
+        <tr><th>sex, skin</th><td class="${c.body === 'dummy' ? 'good' : 'dim'}">${c.body === 'dummy' ? 'yes' : 'dummy only'}</td><td class="dim">dummy.js body shape and its art/skins/ texture</td></tr>
         <tr><th>build</th><td class="bad">no</td><td class="dim">normalised, never read</td></tr>
         <tr><th>hood</th><td class="bad">no</td><td class="dim">the rig has only a hood-up mesh</td></tr>
-        <tr><th>skin, hair</th><td class="bad">no</td><td class="dim">dropped by normaliseCast; no geometry exists</td></tr>
+        <tr><th>hair</th><td class="bad">no</td><td class="dim">the cowl hides it and the dummy has no hair mesh</td></tr>
       </table>`;
 
     this.wireFields(f);
   },
 
   wireFields(f) {
+    // A select with no value in the document shows blank, which reads as "cleared" rather than
+    // "never set" — a dummy has no robe and looked like it had lost one.
+    const FALLBACK = { hood: 'up', robe: 'neutral', gender: 'x', sex: 'm', body: 'none' };
     const setVal = k => {
       const s = f.querySelector(`[data-val=${k}]`);
       const i = f.querySelector(`[data-f=${k}]`);
@@ -362,7 +375,7 @@ registerTab({
     for (const i of f.querySelectorAll('[data-f]')) {
       const key = i.dataset.f;
       const c = this.chr();
-      if (i.tagName === 'SELECT' && key !== 'voice') i.value = String(c[key] ?? (key === 'hood' ? 'up' : ''));
+      if (i.tagName === 'SELECT' && key !== 'voice') i.value = String(c[key] ?? FALLBACK[key] ?? '');
       const ev = i.type === 'range' || i.type === 'text' || i.type === 'number' ? 'input' : 'change';
       i.addEventListener(ev, () => {
         const v = i.type === 'range' || i.type === 'number'
@@ -377,8 +390,11 @@ registerTab({
         if (key === 'name') this.mainEl.querySelector('[data-role=title]').textContent = v || this.sel;
         if (['robe', 'height'].includes(key)) this.pushPreview();
         if (key === 'gender') this.paintVoices();
-        if (key === 'body') this.paintMain();
-        if (key === 'voicePitch' || key === 'voiceSpeed' || key === 'voice') this.paintVoiceState();
+        if (key === 'body' || key === 'sex') this.paintMain();
+        if (key === 'voicePitch' || key === 'voiceSpeed' || key === 'voice') {
+          this.paintVoiceState();
+          this.barks.refresh();
+        }
       });
     }
     for (const k of ['height', 'build', 'voiceSpeed', 'voicePitch']) setVal(k);

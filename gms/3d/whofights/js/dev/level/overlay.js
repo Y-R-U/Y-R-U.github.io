@@ -11,6 +11,11 @@ import * as THREE from 'three';
 import { centreOf, handlesOf, shapeAt, colourOf, radiusOf } from './hotspot.js';
 
 const LIFT = 0.18;
+// Labels all sit at the same height, so hotspots a few metres apart smear into one unreadable
+// line — the four contract boards are 7 m apart and did exactly that. Each label after the first
+// in a cluster is lifted a step, so they read as a stack.
+const LABEL_STEP = 2.2;
+const CLUSTER = 10;
 const RING_SEGMENTS = 72;
 const RECT_STEPS = 10;
 const labelCache = new Map();
@@ -92,6 +97,7 @@ export class HotspotOverlay {
     this.root.remove(it.node);
     disposeTree(it.node);
     it.shape = shape;
+    it.live = shape;
     it.node = this.itemNode(it);
     this.root.add(it.node);
   }
@@ -108,6 +114,10 @@ export class HotspotOverlay {
         on: this.selected.has(h.id),
         shape: h.attach ? null : h.shape,
       };
+      it.live = it.shape || shapeAt(h, this.at) || { k: 'circle', x: 0, z: 0, r: h.r || 2.5 };
+      const c = centreOf(it.live);
+      it.tier = this.items.filter(o =>
+        Math.hypot(centreOf(o.live).x - c.x, centreOf(o.live).z - c.z) < CLUSTER).length;
       it.node = this.itemNode(it);
       this.items.push(it);
       this.root.add(it.node);
@@ -116,7 +126,7 @@ export class HotspotOverlay {
 
   itemNode(it) {
     const g = new THREE.Group();
-    const shape = it.shape || shapeAt(it.h, this.at) || { k: 'circle', x: 0, z: 0, r: it.h.r || 2.5 };
+    const shape = it.live;
     // An attached ring rides the character, so it is built flat around the origin and moved each
     // frame; a placed one is built in world space and hugs the ground it was drawn on.
     g.add(this.shapeNode(shape, it.colour, it.on, !!it.h.attach));
@@ -188,7 +198,8 @@ export class HotspotOverlay {
     const sprite = labelSprite(text, it.problems.length ? '#ff8a8a' : '#ffffff');
     if (!sprite) return null;
     const c = centreOf(shape);
-    const lift = (it.h.attach ? 3.0 : Math.max(2.2, radiusOf(shape) * 0.8 + 0.8)) + (it.on ? 1.4 : 0);
+    const lift = (it.h.attach ? 3.0 : Math.max(2.2, radiusOf(shape) * 0.8 + 0.8))
+      + (it.tier || 0) * LABEL_STEP + (it.on ? 1.4 : 0);
     sprite.position.set(c.x, (it.h.attach ? LIFT : this.groundY(c.x, c.z)) + lift, c.z);
     return sprite;
   }

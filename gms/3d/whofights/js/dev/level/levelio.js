@@ -120,6 +120,39 @@ export function deleteImpact(id, { index = [], levels = {}, characters = {} } = 
   return out;
 }
 
+// Changing a level's id is not a rename. The id is the filename, the index key, every character's
+// place.level and the target of every goto action, so it is a set of edits across four documents —
+// returned together so the tab applies them in one go and node can assert them.
+export function retargetLevel(from, to, { index = [], levels = {}, characters = {} } = {}) {
+  const doc = levels[from] ? { ...JSON.parse(JSON.stringify(levels[from])), id: to } : null;
+  // Replaced in place, not removed and re-added: index[0] is the level the game boots into, so
+  // the order is meaning and an id change must not quietly reorder it.
+  const entry = indexEntry(doc || { id: to, name: to });
+  const list = Array.isArray(index) ? index : [];
+  const idx = list.some(e => e?.id === from)
+    ? list.map(e => (e?.id === from ? { ...e, ...entry } : e))
+    : indexUpsert(list, entry);
+  const gotos = {};
+  const notes = [];
+  for (const [lid, d] of Object.entries(levels)) {
+    if (lid === from || !d) continue;
+    let n = 0;
+    const copy = JSON.parse(JSON.stringify(d));
+    for (const h of copy.hotspots || []) {
+      for (const a of h.actions || []) if (a?.k === 'goto' && a.level === from) { a.level = to; n++; }
+    }
+    if (n) { gotos[lid] = copy; notes.push(`${n} goto action${n > 1 ? 's' : ''} in ${lid}`); }
+  }
+  let cast = null;
+  const moved = Object.entries(characters).filter(([, c]) => c?.place?.level === from).map(([k]) => k);
+  if (moved.length) {
+    cast = JSON.parse(JSON.stringify(characters));
+    for (const k of moved) cast[k].place.level = to;
+    notes.push(`${moved.length} character${moved.length > 1 ? 's' : ''} (${moved.join(', ')})`);
+  }
+  return { doc, index: idx, gotos, characters: cast, notes };
+}
+
 // The player start, as a facing rather than a number: forward is (sin yaw, cos yaw) — see
 // js/player.js — so yaw π faces −z, which is what every seeded level uses.
 export const yawTowards = (from, to) => round(Math.atan2(to.x - from.x, to.z - from.z), 5);

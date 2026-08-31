@@ -1,36 +1,58 @@
 <!doctype html><meta charset="utf-8"><title>dev tools self-test</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- The importmap is not decoration: a tab that imports three (the level overlay, the character
+     preview) throws without it, and the hub then cannot tell that from a tab nobody has written.
+     /lib/ is mounted from gms/lib by tools/devserver.mjs, so the absolute path works here. -->
+<script type="importmap">
+{ "imports": {
+  "three": "/lib/three/0.160.0/three.module.js",
+  "three/addons/": "/lib/three/0.160.0/addons/"
+} }
+</script>
 <style>
   html,body{margin:0;height:100%;background:#101820;color:#8aa;font:14px system-ui}
   #hud{position:fixed;left:12px;top:12px;font:12px ui-monospace,Menlo,monospace;line-height:1.6}
   canvas{display:block;width:100%;height:100%}
+  #refuse{margin:16px;font:14px system-ui;color:#8aa;max-width:44em}
 </style>
 <canvas id="c"></canvas>
 <div id="hud"></div>
 <script type="module">
-// Stands in for index.html + js/main.js while the engine is being lifted: a rAF loop the hub can
-// pause, on the same window.__wf handle the real game uses.
-import { bootDev } from './boot.js';
+// Stands in for index.html + js/main.js: a rAF loop the hub can pause, on the same window.__wf
+// handle the real game uses.
+//
+// DEV_CONTRACT §1 is a rule about the tools, not about one button, so this page is behind the same
+// gate. The hub is imported dynamically because a static import is hoisted above the check and
+// would be fetched whatever isLocal() answered.
+import { isLocal } from './gate.js';
 
-const c = document.getElementById('c'), g = c.getContext('2d');
-const app = {
-  frames: 0, raf: 0,
-  renderer: { info: { render: { calls: 3, triangles: 128000 } } },
-  start() {
-    const loop = () => {
-      app.raf = requestAnimationFrame(loop);
-      app.frames++;
-      c.width = innerWidth; c.height = innerHeight;
-      g.fillStyle = '#101820'; g.fillRect(0, 0, c.width, c.height);
-      g.fillStyle = `hsl(${app.frames % 360} 60% 55%)`;
-      g.fillRect(60 + Math.sin(app.frames / 30) * 40, 120, 90, 90);
-      document.getElementById('hud').textContent =
-        `fake game · frames ${app.frames}\nDEV button bottom right · \` toggles`;
-    };
-    loop();
-  },
-};
-app.start();
-window.__wf = { app, frames: () => app.frames, stats: () => ({ fps: 60, texMB: 12.5, frame: { avg: 4.2 } }), ready: true };
-bootDev({ app, world: { fake: true } });
+if (!isLocal()) {
+  document.body.innerHTML = '<p id="refuse">Developer tools are local-only — DEV_CONTRACT §1. '
+    + 'Open this from localhost, a .local host or a private LAN address.</p>';
+  window.__wfSelftest = { refused: true };
+} else {
+  const { bootDev } = await import('./boot.js');
+  const c = document.getElementById('c'), g = c.getContext('2d');
+  const app = {
+    frames: 0, raf: 0,
+    renderer: { info: { render: { calls: 3, triangles: 128000 } } },
+    start() {
+      const loop = () => {
+        app.raf = requestAnimationFrame(loop);
+        app.frames++;
+        c.width = innerWidth; c.height = innerHeight;
+        g.fillStyle = '#101820'; g.fillRect(0, 0, c.width, c.height);
+        g.fillStyle = `hsl(${app.frames % 360} 60% 55%)`;
+        g.fillRect(60 + Math.sin(app.frames / 30) * 40, 120, 90, 90);
+        document.getElementById('hud').textContent =
+          `fake game · frames ${app.frames}\nDEV button bottom right · \` toggles`;
+      };
+      loop();
+    },
+  };
+  app.start();
+  window.__wf = { app, frames: () => app.frames, stats: () => ({ fps: 60, texMB: 12.5, frame: { avg: 4.2 } }), ready: true };
+  window.__wfSelftest = { refused: false };
+  bootDev({ app, world: { fake: true } });
+}
 </script>

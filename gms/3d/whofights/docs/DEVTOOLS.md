@@ -15,7 +15,8 @@ js/dev/api.js         client for the dev server; every call returns {ok,…} and
 js/dev/data.js        the shared document store: load/cache/mutate/undo/save/notify
 js/dev/dev.css        all the overlay styling
 js/dev/tabs/*.js      one file per tab; each calls registerTab()
-js/dev/selftest.html  the hub over a fake game — works with no engine at all
+js/dev/selftest.html  the hub over a fake game — works with no engine at all (it carries the
+                      importmap, so a tab that imports three still loads there)
 js/dev/cdp.mjs        headless-Chrome driver (node only, no puppeteer)
 js/dev/uitest.mjs     clicks through the hub and checks the bytes on disk changed
 js/dev/*.test.mjs     pure-module tests: node js/dev/gate.test.mjs
@@ -50,6 +51,15 @@ and the private IPv4 ranges `10.*`, `192.168.*`, `172.16-31.*`. Nothing else —
 private, `010.0.0.1` is not canonical, `localhost.evil.com` is not localhost. When it is false the
 button is **not created**; it is not hidden with CSS, and nothing under `js/dev/` except `gate.js`
 is even fetched. `node js/dev/gate.test.mjs` covers 56 cases.
+
+The same gate covers `index.html?editor` (`bootMode(params, local)` — the scene editor is a dev
+tool) and the five raw dev pages, which are static files in the repo and would otherwise load
+anywhere: `selftest.html`, `skin/studio.html`, `skin/bench.html`, `chars/bench.html` and
+`audio/studio/index.html`. Each imports gate.js statically and everything else with a dynamic
+`import()` behind the check, since a static import is hoisted above it. Each also sets a
+`window.__wf*` handle with `refused: true|false` so a headless test can read the answer. Drive them
+with `launch({ args: ['--host-resolver-rules=MAP something.example 127.0.0.1'] })`, which is how a
+local server is reached under a hostname the gate calls public.
 
 ---
 
@@ -331,7 +341,10 @@ node js/dev/gate.test.mjs      # 56 assertions, pure
 node js/dev/data.test.mjs      # 51 assertions, fake api + fake storage, no DOM
 node tools/devserver.mjs &
 node js/dev/uitest.mjs /tmp/wf-devshots     # headless Chrome, real clicks, real save
+node js/dev/walk.uitest.mjs                 # runs the player at every wall and asks him to leave
 ```
+
+`walk.uitest.mjs` makes and serves its own copy on 8798 and does not need a dev server running.
 
 `uitest.mjs` drives `index.html` if it exists and `js/dev/selftest.html` otherwise, opens the hub,
 edits a scratch level, saves it and **checks the bytes on disk changed**. It writes and deletes

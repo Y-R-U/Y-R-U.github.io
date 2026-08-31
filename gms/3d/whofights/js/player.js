@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { ZONE_IDS } from './world/zones.js';
 import { heightAt as fieldY, CENTERS, PLAY } from './world/terrain.js';
 import { walkStep, groundAt, setStepUp } from './world/colliders.js';
+import { Unstick } from './unstick.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
 let PITCH_MIN = -0.90, PITCH_MAX = 1.30;
@@ -11,7 +12,7 @@ const LOOK_HOLD = 0.8;
 
 const wrapPi = a => Math.atan2(Math.sin(a), Math.cos(a));
 const lerp = THREE.MathUtils.lerp;
-const _off = new THREE.Vector3(), _back = new THREE.Vector3();
+const _off = new THREE.Vector3(), _back = new THREE.Vector3(), _probe = new THREE.Vector3();
 
 export class Player {
   constructor(people, input, controls) {
@@ -68,7 +69,25 @@ export class Player {
     this.armMin = 0.40;
     this.collide = true;
     this.walkRadius = 0.34;
+    this.unstick = new Unstick();
     this.stepEase = 16;
+  }
+
+  // Where a step from (x0,z0) to (x1,z1) actually lands. The real step and the stuck check both
+  // go through here, so the question "could he have moved?" is asked of the same rules that moved
+  // him. Indoors the room's own walls do the confining, and the house is a solid blocker the
+  // player is legitimately standing inside.
+  resolveStep(x0, z0, x1, z1, y) {
+    _probe.set(THREE.MathUtils.clamp(x1, PLAY.x0, PLAY.x1), y,
+      THREE.MathUtils.clamp(z1, PLAY.z0, PLAY.z1));
+    this.confine?.(_probe);
+    const walked = this.collide && this.floorY === null && !!this.colliders;
+    if (walked) {
+      const r = walkStep(x0, z0, _probe.x, _probe.z, y, this.walkRadius);
+      _probe.x = r.x;
+      _probe.z = r.z;
+    }
+    return { x: _probe.x, z: _probe.z, walked };
   }
 
   registerKnobs(q, app) {
@@ -189,16 +208,19 @@ export class Player {
       this.vel.lerp(want, 1 - Math.exp(-9 * dt));
       const px = this.pos.x, pz = this.pos.z;
       this.pos.addScaledVector(this.vel, dt);
-      this.pos.x = THREE.MathUtils.clamp(this.pos.x, PLAY.x0, PLAY.x1);
-      this.pos.z = THREE.MathUtils.clamp(this.pos.z, PLAY.z0, PLAY.z1);
-      this.confine?.(this.pos);
-      // Indoors the room's own walls do the confining, and the house is a solid blocker the
-      // player is legitimately standing inside.
-      if (this.collide && this.floorY === null && this.colliders) {
-        const r = walkStep(px, pz, this.pos.x, this.pos.z, this.pos.y, this.walkRadius);
-        this.pos.x = r.x;
-        this.pos.z = r.z;
-        if (dt > 1e-4) this.vel.set((r.x - px) / dt, 0, (r.z - pz) / dt);
+      const step = this.resolveStep(px, pz, this.pos.x, this.pos.z, this.pos.y);
+      this.pos.x = step.x;
+      this.pos.z = step.z;
+      if (step.walked && dt > 1e-4) this.vel.set((step.x - px) / dt, 0, (step.z - pz) / dt);
+
+      // A wedge between two colliders reverts every step to where it began, which no amount of
+      // input escapes. Being freed costs a pace backwards; staying wedged costs the session.
+      const out = this.unstick.step(dt, this.pos.x, this.pos.z, this.pos.y, mag > 0.02,
+        (x0, z0, x1, z1, y) => this.resolveStep(x0, z0, x1, z1, y));
+      if (out) {
+        this.pos.x = out.x;
+        this.pos.z = out.z;
+        this.vel.set(0, 0, 0);
       }
       // Eased rather than snapped, so a step or a bridge deck is floated up onto instead of
       // walked into. Fast enough that a slope still reads as the feet being on the ground.

@@ -36,6 +36,7 @@ export function createBarks(ctx, host) {
   let indexWhere = 'blank';
   let onDisk = null;
   let running = false, cancel = false;
+  let soon = 0;
 
   const cast = () => host.cast();
   const id = () => host.id();
@@ -292,6 +293,10 @@ export function createBarks(ctx, host) {
       repaint();
     },
     async refreshDisk() { onDisk = await clipsOnDisk(ctx.api); repaint(); },
+    // A voice, speed or pitch change restages the hash of every one of this character's clips, so
+    // the per-line state and the "N up to date" count are both wrong until the panel is redrawn.
+    // Debounced: this is driven by a slider, and 146 rows per pointer move is a stutter.
+    refresh() { clearTimeout(soon); soon = setTimeout(repaint, 150); },
     // The audition take is scratch: outside the index, one fixed name, overwritten every time.
     async audition(text) {
       const c = chr();

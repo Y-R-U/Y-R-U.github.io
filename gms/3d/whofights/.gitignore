@@ -5,3 +5,4 @@ audio/*/_preview/
 data/levels/__scratch.json
 tools/vo/.jobs-*.json
 art/skins/*_raw.png
+audio/*/*.tmp-*

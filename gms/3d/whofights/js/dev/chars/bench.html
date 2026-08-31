@@ -13,9 +13,20 @@
   #hud{position:fixed;left:12px;top:12px;font:12px ui-monospace,Menlo,monospace}</style>
 <div id="hud">characters bench — no game, real rig. ` toggles the hub.</div>
 <script type="module">
-import { bootDev } from '../boot.js';
-const app = { raf: 0, frames: 0, start() { const l = () => { app.raf = requestAnimationFrame(l); app.frames++; }; l(); } };
-app.start();
-window.__wf = { app, ready: true };
-bootDev({ app, world: null });
+// DEV_CONTRACT §1 — a dev page, so the same gate as the DEV button. The hub is imported
+// dynamically because a static import is hoisted above the check.
+import { isLocal } from '../gate.js';
+
+if (!isLocal()) {
+  document.getElementById('hud').textContent =
+    'Developer tools are local-only — DEV_CONTRACT §1. Open this from localhost, a .local host or a private LAN address.';
+  window.__wfCharsBench = { refused: true };
+} else {
+  const { bootDev } = await import('../boot.js');
+  const app = { raf: 0, frames: 0, start() { const l = () => { app.raf = requestAnimationFrame(l); app.frames++; }; l(); } };
+  app.start();
+  window.__wf = { app, ready: true };
+  window.__wfCharsBench = { refused: false };
+  bootDev({ app, world: null });
+}
 </script>

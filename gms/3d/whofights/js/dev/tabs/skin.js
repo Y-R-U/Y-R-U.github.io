@@ -94,7 +94,7 @@ export async function mount(el, ctx) {
         <div class="skin-stage"><canvas class="skin-canvas"></canvas></div>
         <div class="row skin-row skin-views"></div>
         <div class="skin-sheets">
-          <figure><img class="skin-sheet" alt="the current skin"><figcaption class="dim">skin</figcaption></figure>
+          <figure hidden><img class="skin-sheet" alt="the current skin"><figcaption class="dim">skin</figcaption></figure>
           <figure><img class="skin-ref" alt="the pose reference"><figcaption class="dim">pose reference given to Flux</figcaption></figure>
           <figure><img class="skin-guide" alt="the labelled UV guide"><figcaption class="dim">UV guide (also a test texture)</figcaption></figure>
         </div>
@@ -141,6 +141,7 @@ export async function mount(el, ctx) {
     try {
       await preview.setSkin(skinURL(id));
       $('.skin-sheet').src = `${skinURL(id)}?t=${Date.now()}`;
+      $('.skin-sheet').closest('figure').hidden = false;
       const meta = await readSidecar(id);
       set(meta ? `${id} · seed ${meta.seed} · ${meta.mode}` : id, 'good');
     } catch (e) { set(`could not load ${id}: ${e.message}`, 'bad'); }
@@ -196,6 +197,7 @@ export async function mount(el, ctx) {
   check.onclick = async () => {
     await preview.setSkin(artURL('art/skin/uv_guide.png'));
     $('.skin-sheet').src = artURL('art/skin/uv_guide.png');
+    $('.skin-sheet').closest('figure').hidden = false;
     set('wearing the UV guide — FACE should be on the face', 'warnc');
   };
   views.appendChild(check);

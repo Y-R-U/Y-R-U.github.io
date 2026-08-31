@@ -1,5 +1,6 @@
 // data/characters.json — DEV_CONTRACT §7. Loads the cast, spawns the ones with a `place` in this
-// level as robed figures on the crowd rig, and answers "where is <id>?" for the hotspot runtime.
+// level on whichever of the two rigs their `body` names, and answers "where is <id>?" for the
+// hotspot runtime.
 //
 // A character with `body: "none"` is a voice and nothing else: a narrator, or an NPC that has not
 // been promoted yet. Promotion is `body: "robed"` plus a `place` — no other change.
@@ -45,9 +46,10 @@ export function normaliseCast(raw) {
       } : null,
     };
     if (body !== 'none' && !out[id].place) warnings.push(`${id}: has a body but nowhere to stand`);
-    // js/world/people.js is the hooded rig and only that. Until something spawns js/world/dummy.js
-    // in a level, a dummy character is authored, valid and absent — which has to be said out loud.
-    if (body === 'dummy') warnings.push(`${id}: body "dummy" is not spawned yet — the world only builds robed figures`);
+    // The dummy rig is one mesh, not a seat in the crowd pool, so it does not stroll. A wander box
+    // on one is authored data nothing reads, which has to be said out loud rather than silently
+    // producing a figure that stands still where the author asked for one that walks.
+    if (body === 'dummy' && out[id].place?.wander) warnings.push(`${id}: the dummy rig does not wander — the box is ignored`);
   }
   return { cast: out, warnings };
 }
@@ -55,15 +57,25 @@ export function normaliseCast(raw) {
 const clamp = (v, lo, hi, def) => (Number.isFinite(+v) ? Math.min(hi, Math.max(lo, +v)) : def);
 
 export class Characters {
-  // `people` is js/world/people.js; `world` answers floorOf(houseId) for a body standing indoors.
-  constructor(cast, { people, world, level }) {
+  // `people` is js/world/people.js and `dummies` is js/world/dummies.js — the two rigs of §7.
+  // `world` answers floorOf(houseId) for a body standing indoors.
+  constructor(cast, { people, dummies, world, level }) {
     this.cast = cast;
     this.people = people;
+    this.dummies = dummies;
     this.bodies = new Map();
     for (const c of Object.values(cast)) {
-      if (c.body !== 'robed' || !c.place || (level && c.place.level !== level)) continue;
-      const w = c.place.wander;
+      if (c.body === 'none' || !c.place || (level && c.place.level !== level)) continue;
       const fixY = c.place.inside ? world?.floorOf(c.place.inside) : null;
+      if (c.body === 'dummy') {
+        if (!dummies) { console.warn(`characters: ${c.id} is a dummy but no dummy rig was passed`); continue; }
+        const d = dummies.place({ id: c.id, sex: c.sex, skin: c.skin,
+          x: c.place.x, z: c.place.z, yaw: c.place.yaw, scale: c.height,
+          ...(fixY == null ? {} : { fixY }) });
+        if (d) this.bodies.set(c.id, d);
+        continue;
+      }
+      const w = c.place.wander;
       const a = people.place({
         npc: c.id,
         zi: ZI[c.robe] ?? 1,

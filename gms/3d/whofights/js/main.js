@@ -3,6 +3,7 @@ import { Post } from './engine/post.js';
 import { Lighting } from './world/lighting.js';
 import { World, startDoc } from './world/world.js';
 import { People } from './world/people.js';
+import { Dummies } from './world/dummies.js';
 import { Doors } from './world/doors.js';
 import { Props } from './world/props.js';
 import { Player } from './player.js';
@@ -23,11 +24,13 @@ import { bootMode, playing } from './game/boot.js';
 import { install as installFailure, watchBoot, fail, RELOAD } from './game/failure.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { bootDev } from './dev/boot.js';
+import { isLocal } from './dev/gate.js';
 
 installFailure();
 
 const params = new URLSearchParams(location.search);
-const mode = bootMode(params);
+const local = isLocal();
+const mode = bootMode(params, local);
 
 // Top-level await, above app.start(): the level document *is* the world, so there is nothing to
 // build until it has loaded, and a render is of the world the game actually shows.
@@ -44,6 +47,7 @@ app.expose();
 const lighting = app.add(new Lighting());
 const world = app.add(new World(doc, saved));
 const people = app.add(new People(world.terrain));
+const dummies = app.add(new Dummies(world.terrain));
 
 const controls = new OrbitControls(app.camera, app.renderer.domElement);
 controls.target.set(0, 4, 0);
@@ -78,10 +82,10 @@ const cast = await loadCast().catch(e => {
   return { cast: {}, warnings: [] };
 });
 for (const w of cast.warnings) console.warn(`characters: ${w}`);
-const characters = new Characters(cast.cast, { people, world, level: doc.id });
+const characters = new Characters(cast.cast, { people, dummies, world, level: doc.id });
 
 Object.assign(window.__wf, {
-  world, people, player, doors, characters, level: doc,
+  world, people, dummies, player, doors, characters, level: doc,
   walk: { walkStep, groundAt },
   stairs,
   scenarios: [],
@@ -91,7 +95,10 @@ Object.assign(window.__wf, {
 world.registerScenarios(doors);
 window.__wf.scenarios = allScenarios().map(s => ({ id: s.id, label: s.label, zone: s.zone }));
 
-buildEditor(app, world, controls);
+// The scene editor is a dev tool: it is not built at all off a local origin, so there is nothing
+// for ?editor or a CSS override to reach. The Level tab drives it through window.__wf.editor and
+// is behind the same gate.
+if (local) buildEditor(app, world, controls);
 
 const shot = mode === 'shot' ? getScenario(params.get('shot')) : null;
 
@@ -147,5 +154,6 @@ document.getElementById('boot').classList.add('gone');
 window.__wf.ready = true;
 
 // js/dev/ is the dev-tools agent's directory. Only gate.js is fetched on a live origin; the hub
-// and its tabs load on demand behind the DEV button.
-bootDev({ app, world, player, doors, characters });
+// and its tabs load on demand behind the DEV button. Not under ?shot=: there is no game to author
+// there, and the button was being baked into every reference render.
+if (!shot) bootDev({ app, world, player, dummies, doors, characters });

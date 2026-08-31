@@ -18,20 +18,29 @@
 </style>
 <div id="wf-dev"><h1>Who Fights · skin studio</h1><main></main><div class="toasts"></div></div>
 <script type="module">
-import * as tab from '../tabs/skin.js';
+// DEV_CONTRACT §1 — a dev page, so the same gate as the DEV button. The tab is imported
+// dynamically because a static import is hoisted above the check.
+import { isLocal } from '../gate.js';
 
-const host = document.querySelector('#wf-dev main');
-const toasts = document.querySelector('.toasts');
-const toast = (msg, kind = '') => {
-  const t = document.createElement('div');
-  t.className = `toast ${kind}`;
-  t.textContent = msg;
-  t.onclick = () => t.remove();
-  toasts.appendChild(t);
-  setTimeout(() => t.remove(), kind === 'bad' ? 9000 : 3500);
-};
+if (!isLocal()) {
+  document.querySelector('#wf-dev main').innerHTML =
+    '<p style="max-width:44em">Developer tools are local-only — DEV_CONTRACT §1. Open this from localhost, a .local host or a private LAN address.</p>';
+  window.__wfSkinStudio = { refused: true };
+} else {
+  const tab = await import('../tabs/skin.js');
+  const host = document.querySelector('#wf-dev main');
+  const toasts = document.querySelector('.toasts');
+  const toast = (msg, kind = '') => {
+    const t = document.createElement('div');
+    t.className = `toast ${kind}`;
+    t.textContent = msg;
+    t.onclick = () => t.remove();
+    toasts.appendChild(t);
+    setTimeout(() => t.remove(), kind === 'bad' ? 9000 : 3500);
+  };
 
-const ctx = { toast, close() {}, get app() { return null; }, get world() { return null; } };
-await tab.mount.call(tab, host, ctx);
-window.__wfSkinStudio = { tab, ready: true };
+  const ctx = { toast, close() {}, get app() { return null; }, get world() { return null; } };
+  await tab.mount.call(tab, host, ctx);
+  window.__wfSkinStudio = { tab, ready: true, refused: false };
+}
 </script>

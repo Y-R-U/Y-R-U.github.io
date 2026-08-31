@@ -354,6 +354,44 @@ function renameLevel() {
   });
 }
 
+// The id is the filename, the index key, every character's place.level and every goto target, so
+// this rewrites all four. The dev server has no delete route, so the old file stays on disk — said
+// out loud rather than left to be discovered, the same way deleteLevel says it.
+function changeLevelId() {
+  const from = S.id;
+  textAsk(`Change the id of “${doc()?.name || from}”`, from, 'Change it', async raw => {
+    const to = io.slugify(raw);
+    if (!to || to === from) return;
+    if ((S.ids || []).includes(to)) return S.ctx.toast(`${to} already exists`, 'bad');
+    const levels = Object.fromEntries((S.ids || [])
+      .map(id => [id, S.ctx.data.get('levels', id)]).filter(([, v]) => v));
+    const r = io.retargetLevel(from, to, {
+      index: S.ctx.data.get('levelIndex') || [], levels, characters: refs().characters,
+    });
+    if (!r.doc) return S.ctx.toast(`${from} is not loaded — open it first`, 'bad');
+
+    S.ctx.data.set('levels', r.doc, to, { label: `${from} → ${to}` });
+    S.ctx.data.set('levelIndex', r.index, null, { label: 'level index' });
+    for (const [lid, d] of Object.entries(r.gotos)) S.ctx.data.set('levels', d, lid, { label: `retarget ${lid}` });
+    if (r.characters) {
+      S.ctx.data.mutate('characters', null, d => { d.characters = r.characters; }, { label: `${from} → ${to}` });
+    }
+
+    const writes = [S.ctx.data.save('levels', to), S.ctx.data.save('levelIndex'),
+      ...Object.keys(r.gotos).map(lid => S.ctx.data.save('levels', lid)),
+      ...(r.characters ? [S.ctx.data.save('characters')] : [])];
+    const bad = (await Promise.all(writes)).filter(w => !w.ok);
+    S.ctx.toast(bad.length
+      ? `${bad.length} of ${writes.length} files did not save — ${bad[0].error}`
+      : `now ${to}${r.notes.length ? `, and moved ${r.notes.join(', ')}` : ''}. `
+        + `data/levels/${from}.json is still on disk — remove it by hand.`,
+      bad.length ? 'bad' : 'warn');
+    S.ids = await S.ctx.data.levelIds();
+    S.id = null;
+    switchTo(to);
+  });
+}
+
 async function writeIndex(d) {
   const idx = S.ctx.data.get('levelIndex') || [];
   S.ctx.data.set('levelIndex', io.indexUpsert(idx, io.indexEntry(d)), null, { label: 'level index' });
@@ -663,6 +701,17 @@ function whereCard(hs, set, r) {
     num(s[key], v => set(t => { t.shape = { ...t.shape, [key]: v }; }, 'hotspot size', true), { step }));
   if (s.k === 'circle') card.append(row(f('Centre x', 'x'), f('z', 'z'), f('Radius', 'r')));
   else card.append(row(f('x from', 'x0'), f('to', 'x1')), row(f('z from', 'z0'), f('to', 'z1')));
+  // Walking to the spot and pressing this beats dragging roughly and then typing three numbers,
+  // which was the only way to place one precisely.
+  card.append(row(
+    btn('Put it where I am stood', () => {
+      const p = playerAt();
+      set(t => { t.shape = hp.moveShape(t.shape, p.x - hp.centreOf(t.shape).x, p.z - hp.centreOf(t.shape).z); },
+        'hotspot to the player');
+      syncOverlay();
+      paint();
+    }),
+    h('span', { class: 'lv-hint', text: `the player is at ${playerAt().x}, ${playerAt().z}` })));
   return card;
 }
 
@@ -893,7 +942,8 @@ function startPanel() {
     h('div', { class: 'lv-card' }, h('h3', { text: 'The level' }),
       field('Name', text(d?.name || '', v => edit(x => { x.name = v; }, 'rename level', true))),
       field('Default music', select(sets, d?.music || '', v => edit(x => { x.music = v || null; }, 'level music'), { placeholder: '— none —' })),
-      field('Id', h('code', { text: S.id }), h('span', { class: 'lv-hint', text: 'ids are permanent — duplicate to a new one instead of renaming' })),
+      field('Id', h('code', { text: S.id }), btn('Change it…', changeLevelId),
+        h('span', { class: 'lv-hint', text: 'the id is the filename, the index key and every goto target — all of them are rewritten' })),
       field('Opens first?', h('span', { class: 'lv-hint',
         text: pos === 0 ? 'yes — this is index[0], the level the game boots into' : `no — it is #${pos + 1} in data/levels/index.json` }),
       btn('Move up', () => moveInIndex(-1)), btn('Move down', () => moveInIndex(1)))),

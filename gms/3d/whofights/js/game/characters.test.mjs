@@ -14,10 +14,15 @@ test('the three bodies of DEV_CONTRACT §7 all survive normalisation', () => {
   eq(cast({ x: { name: 'X', body: 'wobbly' } }).cast.x.body, 'none', 'an unknown body is still a voice');
 });
 
-test('a dummy with nowhere to stand, and one nothing can build, are both said out loud', () => {
+test('a body with nowhere to stand, and a wander box nothing reads, are both said out loud', () => {
   const w = cast({ crash: { name: 'Crash', body: 'dummy' } }).warnings.join(' | ');
   ok(/nowhere to stand/.test(w), 'a placed-nowhere body warns whatever rig it is');
-  ok(/not spawned yet/.test(w), 'and a dummy says the world will not build it');
+  const roam = cast({ crash: { name: 'Crash', body: 'dummy',
+    place: { level: 'academy', x: 0, z: 0, wander: { x0: -1, x1: 1, z0: -1, z1: 1 } } } }).warnings.join(' | ');
+  ok(/does not wander/.test(roam), 'the dummy rig does not stroll and has to say so');
+  ok(!cast({ g: { name: 'G', body: 'robed',
+    place: { level: 'a', x: 0, z: 0, wander: { x0: -1, x1: 1, z0: -1, z1: 1 } } } }).warnings.length,
+  'the robed rig does stroll, so it warns about nothing');
   ok(!cast({ n: { name: 'N', body: 'none' } }).warnings.length, 'a narrator warns about nothing');
 });
 

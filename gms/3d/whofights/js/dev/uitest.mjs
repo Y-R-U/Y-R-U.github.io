@@ -14,7 +14,9 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const OUT = process.argv[2] || '/tmp/wf-devshots';
-const BASE = process.argv[3] || 'http://localhost:8796';
+// Positional, not an env var: this pointed at the default port once while ROOT was a scratch copy,
+// and the browser wrote its scratch level into the live tree the copy was made from.
+const BASE = process.argv[3] || process.env.WF_BASE || 'http://localhost:8796';
 const PAGE = fs.existsSync(path.join(ROOT, 'index.html')) ? '/index.html' : '/js/dev/selftest.html';
 const SCRATCH = path.join(ROOT, 'data/levels/__uitest.json');
 
@@ -66,10 +68,17 @@ check(/will not save invalid JSON/.test(await p.eval('[...document.querySelector
 await p.clickText('#wf-dev .main button', 'Revert');
 await sleep(600);
 
-await p.clickText('#wf-dev nav button', 'Level editor');
-await sleep(600);
-check(/not built yet/.test(await p.eval('document.querySelector("#wf-dev main").textContent')), 'an unbuilt tab shows its placeholder');
-await p.shot(`${OUT}/4-placeholder.png`);
+// Every slot has a module now, so none of them may show a placeholder or the crash box. This
+// used to assert the opposite: the level tab threw on selftest.html for want of an importmap and
+// the hub reported it as a tab nobody had written, which sent an agent looking for a file that
+// was already there.
+for (const label of ['Level editor', 'Conversations', 'Characters', 'Skins', 'Sound & music', 'Debug']) {
+  await p.clickText('#wf-dev nav button', label);
+  await sleep(900);
+  const t = await p.eval('document.querySelector("#wf-dev main").textContent');
+  check(!/not built yet|did not load|crashed/.test(t), `the ${label} tab mounts (${t.replace(/\s+/g, ' ').trim().slice(0, 70)})`);
+}
+await p.shot(`${OUT}/4-tabs.png`);
 
 await p.clickText('#wf-dev nav button', 'Status');
 await sleep(1500);

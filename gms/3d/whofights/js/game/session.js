@@ -7,6 +7,7 @@ import { Hud } from './hud.js';
 import { DialogueBox } from './dialoguebox.js';
 import { Anchors } from './bubble.js';
 import { Voice } from './voice.js';
+import { Barks } from './barks.js';
 import { Noticeboard, nudge } from './noticeboard.js';
 import { WorldTap } from './worldtap.js';
 import { Hotspots } from './hotspots.js';
@@ -37,6 +38,7 @@ export class Session {
       emit: (name, data) => this.bus.dispatchEvent(new CustomEvent(name, { detail: data })),
       characterAt: id => this.characters?.at(id) || null,
       screen: id => this.showScreen(id),
+      bark: a => this.bark(a),
     });
 
     this.hotspots = new Hotspots(this.level.hotspots || [], this.ctx);
@@ -50,6 +52,12 @@ export class Session {
     this.voice = new Voice({
       cast: this.characters?.cast || {},
       settings: () => this.doc.settings,
+    });
+
+    this.barks = new Barks({
+      voice: this.voice,
+      cast: this.characters?.cast || {},
+      busy: () => this.dialogue.active || this.board.open,
     });
 
     this.anchors = new Anchors({
@@ -146,6 +154,25 @@ export class Session {
     this.applySettings();
     this.autosave.mark();
     if (pick.lowered) this.toast(`Graphics set to ${resolve(this.doc.settings).label} — change it in Settings.`);
+  }
+
+  // data/barks.json and the bark half of data/vo.json are fetched on the first bark and never at
+  // all if nothing barks, so a level with no bark action pays nothing for the feature. The request
+  // that triggered the load is replayed once it lands rather than dropped.
+  bark(a) {
+    const who = a?.who, category = a?.category || 'idle';
+    if (this.barks.docs) return this.barks.say(who, category);
+    this.loadBarks().then(() => this.barks.say(who, category));
+    return null;
+  }
+
+  loadBarks() {
+    if (!this.barkLoad) {
+      const get = p => fetch(p).then(r => (r.ok ? r.json() : null)).catch(() => null);
+      this.barkLoad = Promise.all([get('data/barks.json'), get('data/vo.json')])
+        .then(([b, v]) => this.barks.setDocs(b, v));
+    }
+    return this.barkLoad;
   }
 
   say(nodeId) {

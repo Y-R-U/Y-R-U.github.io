@@ -12,10 +12,10 @@
 import { CODEC, pitchRate } from '../../game/clip.js';
 export { CODEC, pitchRate };
 
-export const BARK_CATEGORIES = ['idle', 'greet', 'farewell', 'curious', 'grumble', 'success',
-  'failure', 'hurt', 'combat', 'spot', 'thanks', 'refuse', 'wander', 'weather'];
-
-export const VO_DIR = 'audio/vo';
+// The category list, the clip naming and effectiveBarks belong to js/game/barks.js — the game
+// plays barks, so the names it fetches and the names this writes are one implementation.
+import { BARK_CATEGORIES, VO_DIR, clipKey, clipFile, effectiveBarks } from '../../game/barks.js';
+export { BARK_CATEGORIES, VO_DIR, clipKey, clipFile, effectiveBarks };
 export const RAW_DIR = 'audio/vo/raw';
 // The one ledger. The dev server writes only under data/ and so does the browser, so a mirror
 // under audio/vo/ could only ever be the stale copy. DEV_CONTRACT §8.
@@ -28,10 +28,8 @@ export const pitchOf = c => clamp(c?.voicePitch, -4, 4, 0);
 export const synthSpeed = (speed, pitch) =>
   Math.round(Math.min(2, Math.max(0.5, speed / pitchRate(pitch))) * 10000) / 10000;
 
-export const clipKey = (who, category, i) => `${who}__${category}__${String(i + 1).padStart(2, '0')}`;
-// What ships, and what it was encoded from. The raw is kept so a clip can be re-encoded at another
-// bitrate without paying for kokoro again; audio/vo/raw/ is gitignored.
-export const clipFile = key => `${VO_DIR}/${key}${CODEC.ext}`;
+// The raw is kept beside the shipped clip so it can be re-encoded at another bitrate without
+// paying for kokoro again; audio/vo/raw/ is gitignored.
 export const rawFile = key => `${RAW_DIR}/${key}.wav`;
 export const rawOut = key => `raw/${key}`;
 
@@ -43,20 +41,6 @@ export function hashLine(text, voice, speed, pitch) {
     h = Math.imul(h, 0x01000193) >>> 0;
   }
   return h.toString(16).padStart(8, '0');
-}
-
-// A character's category list REPLACES the shared one for that category — never a union, because a
-// union gives no way to take a shared line off one character. The tab's "copy shared in" button is
-// how you extend instead.
-export function effectiveBarks(barksDoc, character) {
-  const shared = barksDoc?.shared || {};
-  const own = character?.barks || {};
-  const out = {};
-  for (const c of BARK_CATEGORIES) {
-    const list = Array.isArray(own[c]) ? own[c] : Array.isArray(shared[c]) ? shared[c] : [];
-    out[c] = list.map(l => String(l == null ? '' : l)).filter(l => l.trim());
-  }
-  return out;
 }
 
 export function overriddenCategories(character) {

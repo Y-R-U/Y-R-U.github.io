@@ -17,6 +17,8 @@ const SLOTS = [
   { id: 'debug', label: 'Debug', order: 90, owner: 'debug agent' },
 ];
 
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
 const tabs = new Map();
 let el = null, navEl = null, mainEl = null, toastEl = null, saveEl = null, pillsEl = null;
 let current = null, mounted = null, opened = false, loadedTabs = false;
@@ -179,18 +181,33 @@ async function loadTabs() {
   // but logs a 404 that every agent then has to learn to ignore.
   const ls = await api.ls('js/dev/tabs');
   const present = ls.ok ? new Set((ls.files || []).map(f => f.name)) : null;
+  const broke = new Map();
   for (const s of SLOTS) {
     if (present && !present.has(`${s.id}.js`)) continue;
     try { await import(`./tabs/${s.id}.js`); }
-    catch (e) { console.warn(`[dev] tab ${s.id} did not load`, e.message); }
+    catch (e) { broke.set(s.id, e); console.warn(`[dev] tab ${s.id} did not load`, e.message); }
   }
-  for (const s of SLOTS) if (!tabs.has(s.id)) registerTab({ ...s, mount: el2 => placeholder(el2, s) });
+  for (const s of SLOTS) {
+    if (!tabs.has(s.id)) registerTab({ ...s, mount: el2 => placeholder(el2, s, broke.get(s.id), present) });
+  }
 }
 
-function placeholder(node, slot) {
-  node.innerHTML = `<div class="empty"><b>${slot.label}</b>
-    owned by another agent — not built yet<br><span class="dim">js/dev/tabs/${slot.id}.js
-    (${slot.owner})</span></div>`;
+// "Not built yet" is only true when the file is genuinely absent. A module that threw on import —
+// most often `import * as THREE from 'three'` on a page with no importmap — used to land here too
+// and report itself as unwritten, which sent an agent looking for a file that was already there.
+function placeholder(node, slot, err, present) {
+  const known = present !== null;
+  if (!err) {
+    node.innerHTML = `<div class="empty"><b>${slot.label}</b>
+      owned by another agent — not built yet<br><span class="dim">js/dev/tabs/${slot.id}.js
+      (${slot.owner})</span></div>`;
+    return;
+  }
+  node.innerHTML = `<div class="empty"><b>${slot.label} did not load</b>${esc(err.message)}
+    <br><span class="dim">js/dev/tabs/${slot.id}.js threw while importing${known ? '' :
+      ' — and with no dev server the hub cannot tell that from a file that is not there'}.
+    A tab that imports three needs the importmap: open index.html or js/dev/chars/bench.html.
+    </span></div>`;
 }
 
 function paintNav() {

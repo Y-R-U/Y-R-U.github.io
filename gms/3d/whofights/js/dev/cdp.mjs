@@ -8,13 +8,16 @@ import fs from 'node:fs';
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
-export async function launch({ port = 9333, profile = '/tmp/wf-cdp-profile', w = 1440, h = 900 } = {}) {
+// `args` are extra Chrome flags. The one that has earned its place is
+// `--host-resolver-rules=MAP anything.example 127.0.0.1`, which is how a local server is reached
+// under a hostname js/dev/gate.js calls public — the only honest way to test the gate.
+export async function launch({ port = 9333, profile = '/tmp/wf-cdp-profile', w = 1440, h = 900, args = [] } = {}) {
   fs.rmSync(profile, { recursive: true, force: true });
   const proc = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}`,
     `--user-data-dir=${profile}`, `--window-size=${w},${h}`, '--no-first-run', '--no-default-browser-check',
     // Same pair tools/shot.mjs uses: without them a WebGL context cannot be created headless and
     // the whole game boot fails before bootDev is ever reached.
-    '--use-angle=metal', '--use-gl=angle', '--hide-scrollbars', 'about:blank'], { stdio: 'ignore' });
+    '--use-angle=metal', '--use-gl=angle', '--hide-scrollbars', ...args, 'about:blank'], { stdio: 'ignore' });
   for (let i = 0; i < 100; i++) {
     try { await fetch(`http://127.0.0.1:${port}/json/version`); break; } catch { await sleep(150); }
   }

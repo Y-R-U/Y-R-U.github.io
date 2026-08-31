@@ -334,6 +334,23 @@
       ]
     },
     {
+      "id": "hs.greeter.near",
+      "name": "Vail notices you",
+      "attach": "greeter",
+      "r": 7,
+      "trigger": "enter",
+      "once": false,
+      "cooldown": 30,
+      "if": null,
+      "actions": [
+        {
+          "k": "bark",
+          "who": "greeter",
+          "category": "greet"
+        }
+      ]
+    },
+    {
       "id": "hs.door.yard",
       "name": "The passage to the training yard",
       "shape": {

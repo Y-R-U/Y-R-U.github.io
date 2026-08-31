@@ -3,7 +3,7 @@ import { normalise } from '../../editor/scene.js';
 import {
   slugify, uniqueId, deriveId, seedLevel, duplicateLevel, indexEntry, indexUpsert, indexRemove,
   indexMove, exportObjects, sameObjects, sameAsLoaded, textObjects, deleteImpact,
-  yawTowards, yawDegrees,
+  retargetLevel, yawTowards, yawDegrees,
 } from './levelio.js';
 
 test('slugify keeps a level id filename-safe', () => {
@@ -126,4 +126,47 @@ test('facing is derived from two points, not typed', () => {
   near(yawTowards({ x: 0, z: 0 }, { x: 10, z: 0 }), Math.PI / 2, 1e-4, '+x is a quarter turn');
   eq(yawDegrees(Math.PI), 180);
   eq(yawDegrees(-Math.PI / 2), 270);
+});
+
+const world = () => ({
+  index: [{ id: 'academy', name: 'Academy', start: { x: 0, z: 0, yaw: 3 } },
+    { id: 'keep', name: 'Keep', start: { x: 1, z: 1, yaw: 0 } }],
+  levels: {
+    academy: { id: 'academy', name: 'Academy', hotspots: [] },
+    keep: { id: 'keep', name: 'Keep', hotspots: [
+      { id: 'hs.a', actions: [{ k: 'goto', level: 'academy' }, { k: 'say', node: 'x' }] },
+      { id: 'hs.b', actions: [{ k: 'goto', level: 'keep' }] }] },
+  },
+  characters: { greeter: { place: { level: 'academy', x: 1, z: 2 } },
+    other: { place: { level: 'keep' } }, narrator: {} },
+});
+
+test('changing a level id rewrites the document, the index, every goto and every place', () => {
+  const w = world();
+  const r = retargetLevel('academy', 'hall', w);
+  eq(r.doc.id, 'hall');
+  eq(r.index.map(e => e.id), ['hall', 'keep'], 'index[0] is the level the game boots into');
+  eq(r.index[0].name, 'Academy');
+  eq(r.gotos.keep.hotspots[0].actions[0].level, 'hall');
+  eq(r.gotos.keep.hotspots[1].actions[0].level, 'keep', 'a goto pointing elsewhere is left alone');
+  eq(r.characters.greeter.place.level, 'hall');
+  eq(r.characters.other.place.level, 'keep');
+  eq(r.characters.narrator.place, undefined);
+  ok(r.notes.length >= 2, r.notes.join(' / '));
+});
+
+test('changing an id does not touch the documents it was given', () => {
+  const w = world();
+  retargetLevel('academy', 'hall', w);
+  eq(w.levels.academy.id, 'academy');
+  eq(w.levels.keep.hotspots[0].actions[0].level, 'academy');
+  eq(w.characters.greeter.place.level, 'academy');
+  eq(w.index.map(e => e.id), ['academy', 'keep']);
+});
+
+test('an id change with nothing pointing at the level is a quiet one', () => {
+  const r = retargetLevel('keep', 'donjon', world());
+  eq(r.gotos, {});
+  eq(r.index.map(e => e.id), ['academy', 'donjon']);
+  eq(r.characters.other.place.level, 'donjon');
 });

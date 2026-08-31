@@ -16,19 +16,27 @@
 <canvas id="c"></canvas>
 <div id="hud">…</div>
 <script type="module">
-import { SkinPreview } from './preview.js';
+// DEV_CONTRACT §1 — a dev page, so the same gate as the DEV button. The preview is imported
+// dynamically because a static import is hoisted above the check.
+import { isLocal } from '../gate.js';
 
-const q = new URLSearchParams(location.search);
-const p = new SkinPreview(document.getElementById('c'));
-await p.start();
-p.setShape(q.get('shape') || 'm');
-if (q.get('view')) p.view(q.get('view'));
-if (q.get('spin')) { p.auto = false; p.spin = +q.get('spin'); }
-let note = 'no skin';
-if (q.get('skin')) {
-  try { await p.setSkin(q.get('skin')); note = q.get('skin'); }
-  catch (e) { note = `FAILED ${e.message}`; }
+if (!isLocal()) {
+  document.body.innerHTML = '<p style="margin:16px;max-width:44em">Developer tools are local-only — DEV_CONTRACT §1. Open this from localhost, a .local host or a private LAN address.</p>';
+  window.__wfSkinBench = { refused: true };
+} else {
+  const { SkinPreview } = await import('./preview.js');
+  const q = new URLSearchParams(location.search);
+  const p = new SkinPreview(document.getElementById('c'));
+  await p.start();
+  p.setShape(q.get('shape') || 'm');
+  if (q.get('view')) p.view(q.get('view'));
+  if (q.get('spin')) { p.auto = false; p.spin = +q.get('spin'); }
+  let note = 'no skin';
+  if (q.get('skin')) {
+    try { await p.setSkin(q.get('skin')); note = q.get('skin'); }
+    catch (e) { note = `FAILED ${e.message}`; }
+  }
+  document.getElementById('hud').textContent = `${p.shape} · ${note}`;
+  window.__wfSkinBench = { preview: p, ready: true, note, refused: false };
 }
-document.getElementById('hud').textContent = `${p.shape} · ${note}`;
-window.__wfSkinBench = { preview: p, ready: true, note };
 </script>
