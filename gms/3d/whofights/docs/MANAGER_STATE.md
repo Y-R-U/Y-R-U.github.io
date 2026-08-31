@@ -125,10 +125,13 @@ generate and curate.
 
 ## Open items not yet assigned
 
-- **Nothing spawns a `body: "dummy"` character.** `js/world/people.js` builds hooded figures only,
-  and `Characters` has no scene handle for `js/world/dummy.js`. The schema, the rig, the skins and
-  the Skin tab all exist; only the spawn is missing. `normaliseCast` warns rather than failing
-  silently. Needs a world-layer agent.
+- ~~Nothing spawns a `body: "dummy"` character.~~ **Done, and this note was stale as of 31 Aug** —
+  `js/main.js:85` passes `dummies` into `Characters`, and `data/characters.json` places a dummy
+  `quartermaster` in the hall. What is actually missing is narrower: it asks for `skin:
+  "watch_s11"` and `art/skins/` holds only `knight_s33`, `nomad_ui` and `undead_s77`, so it renders
+  as an untextured grey mannequin and warns. Assigned 31 Aug with the §11 head experiment.
+  *Check a claim in this file against the code before briefing an agent on it — this one would have
+  sent an agent to build what already existed.*
 - **`hub.js toast()` dismisses a `bad` toast after 9 s**, while DEV_CONTRACT §11 and DEVTOOLS §4
   say a failed save gets a red toast that does not auto-dismiss. Making `bad` permanent would pin
   every validation nag from every tab, so this needs a distinct severity — a design decision for
