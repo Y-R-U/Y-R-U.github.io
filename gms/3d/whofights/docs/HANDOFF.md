@@ -13,8 +13,8 @@ Nothing here has been committed to git.
 ```bash
 open index.html                       # or serve the repo; three comes from ../../lib/three/
 node tools/test.mjs                   # pure unit tests
-node tools/shot.mjs --all --w=1280 --h=720 --dpr=1
-node tools/shot.mjs --shot=hall --w=1280 --h=720 --dpr=1
+node tools/shot.mjs --all           # the small-render flags these lines used to carry were a
+node tools/shot.mjs --shot=hall     # workaround for a 4 MiB websocket cap; see tools/shot.mjs
 ```
 
 `?editor=1` opens the level editor, `?shot=<id>` a named render, anything else plays.
