@@ -1104,9 +1104,19 @@ export function buildLevel(spec) {
   // exactly what a 22x multiple produced. 14-28x lands runs around 400-650 with
   // the ceiling still visible up ahead.
   const levelMul = 14 + 14 * d;
-  const floorTarget = 90 + 190 * d;
+  // Aaron, play-testing the opening: "we need to reduce the amount of troops the
+  // gates can add to the player early in the game." The floor used to open at 90
+  // and a well-steered tutorial run finished on 140 — the first level handed
+  // over most of the growth the whole chapter had to give, so every gate after
+  // it felt like rounding. Opening at 30 leaves the chapter somewhere to go and
+  // still reads as a crowd from one man. The chapter-end figure is unchanged, so
+  // this steepens the curve rather than flattening the game.
+  const floorTarget = 30 + 250 * d;
   const endTarget = spec?.endTarget ??
-    clamp(Math.max(floorTarget, sim.troops * levelMul), 60, RUN.maxTroops * 0.72);
+    // Lower bound 24, not 60: the floor above cannot reach the opening levels
+    // while this clamp holds them at 60, which is most of what a tutorial run
+    // was ever going to gain.
+    clamp(Math.max(floorTarget, sim.troops * levelMul), 24, RUN.maxTroops * 0.72);
 
   const beats = recipeFor(chapter, level, c);
   // Growth is additive, so the budget is divided by ROWS, not compounded across
