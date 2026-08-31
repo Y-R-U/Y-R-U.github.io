@@ -55,6 +55,7 @@ node tools/nangate.mjs        # no hazard level may produce a non-finite fighter
 node tools/crossgate.mjs      # solid bodies: walk = blocked, jump = crosses, floored = step over
 node tools/uigate.mjs         # first-run coaching, the duck crouch, shop tab highlight
 node tools/musicrota.mjs      # the roster must not repeat, within a run or across refreshes
+node tools/portraitgate.mjs   # portrait renders sideways and touch still maps correctly
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -121,6 +122,12 @@ from its output, not by feel.
   crossover. Attacks also root you (`spd * 0` while attacking) — creeping forward mid-power-hit
   walked you over the body you had just floored, which is how a power hit put you on the wrong
   side even with solid bodies.
+- **Portrait rotates the app; it does not block.** A "turn your device" wall hides the very
+  thing that tells you to turn it, so `#app` gets `translateX(100vw) rotate(90deg)` in portrait
+  and the game plays sideways. `Input.localPoint` inverts that exact transform —
+  `getBoundingClientRect()` is useless on a rotated element (it returns the axis-aligned box)
+  and every touch lands somewhere else. The CSS rule and `PORTRAIT_Q` in input.js must stay in
+  step; `tools/portraitgate.mjs` fails if they drift.
 - **Panels scroll internally, not as a whole** (`.sheet` is a flex column; only `.rows`/`.list`
   scroll). Scrolling the whole panel pushed the CONTINUE button off the bottom of a landscape
   phone. There is a `max-height: 470px` media query for the same reason.

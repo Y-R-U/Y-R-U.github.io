@@ -6,6 +6,10 @@ import { classify } from './gestures.js';
 const DEAD = 16;
 const MAX = 58;
 
+/** Matches the portrait rule in style.css. Both must change together. */
+export const PORTRAIT_Q = '(orientation: portrait) and (max-width: 860px)';
+export const isRotated = () => window.matchMedia(PORTRAIT_Q).matches;
+
 export class Input {
   constructor(el, opts = {}) {
     this.el = el;
@@ -58,8 +62,8 @@ export class Input {
   pointer(e) {
     if (!this.enabled) return;
     e.preventDefault();
-    const r = this.el.getBoundingClientRect();
-    const x = e.clientX - r.left, y = e.clientY - r.top;
+    const p = this.localPoint(e);
+    const x = p.x, y = p.y;
     const id = e.pointerId;
 
     if (e.type === 'pointerdown') {
@@ -99,6 +103,21 @@ export class Input {
         this.trailFade = 0.32;
       }
     }
+  }
+
+  /**
+   * Client coords -> element-local coords. In portrait the app carries
+   * `translateX(100vw) rotate(90deg)` with origin 0 0, which maps local (lx, ly) to screen
+   * (innerWidth - ly, lx); this is that inverted. getBoundingClientRect cannot be used for
+   * this — on a rotated element it returns the axis-aligned box, and every touch lands
+   * somewhere else entirely.
+   */
+  localPoint(e) {
+    if (isRotated()) {
+      return { x: e.clientY, y: window.innerWidth - e.clientX };
+    }
+    const r = this.el.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
   }
 
   key(e, down) {

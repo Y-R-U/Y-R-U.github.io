@@ -8,7 +8,7 @@ import { drawDesk, sheetShadow } from './paper.js';
 import { buildArena } from './arena.js';
 import { drawFighter, drawShadow } from './draw.js';
 import { Match } from './match.js';
-import { Input } from './input.js';
+import { Input, isRotated } from './input.js';
 import { drawHUD, drawNameTags, handText, FONT, FONT_B } from './ui.js';
 import { load, save as persist, wipe, DEFAULT } from './save.js';
 import * as audio from './audio.js';
@@ -41,8 +41,22 @@ function resize() {
   cvs.height = Math.round(vh * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-window.addEventListener('resize', resize);
-window.addEventListener('orientationchange', () => setTimeout(resize, 120));
+window.addEventListener('resize', () => { resize(); updateRotateHint(); });
+window.addEventListener('orientationchange', () => setTimeout(() => { resize(); updateRotateHint(); }, 120));
+
+let rotateHintT = null;
+/** Nudge, not a wall: shows briefly in portrait and gets out of the way. */
+function updateRotateHint() {
+  const el = $('rotate');
+  if (!el) return;
+  const on = isRotated() && mode !== 'boot';
+  el.classList.toggle('show', on);
+  if (on) {
+    el.classList.remove('fade');
+    clearTimeout(rotateHintT);
+    rotateHintT = setTimeout(() => el.classList.add('fade'), 4000);
+  }
+}
 
 // ── input ────────────────────────────────────────────────────────────────
 const input = new Input(cvs, {
@@ -76,6 +90,7 @@ function setMode(m) {
   input.enabled = (m === 'fight');
   input.reset();
   $('pauseBtn').classList.toggle('hidden', m !== 'fight');
+  updateRotateHint();
   if (m === 'hub') { show('hub'); startDemo(); audio.play(S.completed ? 'victory' : 'menu'); }
   else if (m === 'fight') { show(null); }
 }
