@@ -219,6 +219,7 @@ their own docs row).
 | flag | `{"k":"flag","name":"…","value":true}` |
 | bark | `{"k":"bark","who":"<characterId>","category":"idle"}` |
 | event | `{"k":"event","name":"…","data":{}}` — emitted on `window.__wf.bus` |
+| screen | `{"k":"screen","id":"<screenId>"}` — opens a full-screen sheet (`js/game/noticeboard.js`). Not a modal: the world keeps rendering and a tap off the sheet closes it. |
 
 ## 11. House rules
 

@@ -12,6 +12,7 @@ const SLOTS = [
   { id: 'convo', label: 'Conversations', order: 20, owner: 'conversation agent' },
   { id: 'chars', label: 'Characters', order: 30, owner: 'character agent' },
   { id: 'music', label: 'Sound & music', order: 40, owner: 'audio agent' },
+  { id: 'skin', label: 'Skins', order: 50, owner: 'skin agent' },
   { id: 'data', label: 'Data', order: 80, owner: 'dev-infrastructure' },
   { id: 'debug', label: 'Debug', order: 90, owner: 'debug agent' },
 ];
