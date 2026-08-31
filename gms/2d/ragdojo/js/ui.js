@@ -3,6 +3,9 @@
 import { stroke, line, rect, circle, hatch, splat, INK } from './ink.js';
 import { glyphPoints } from './gestures.js';
 import { MOVES, moveStats } from './config.js';
+import { P as RIG } from './ragdoll.js';
+
+const P_HEAD = RIG.HEAD;
 
 export const FONT = '"Patrick Hand", "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive';
 export const FONT_B = '"Caveat", "Bradley Hand", "Segoe Print", cursive';
@@ -17,11 +20,26 @@ export function handText(ctx, str, x, y, size, col = INK, align = 'left', weight
 }
 
 /** Sketched health bar with hatched fill. */
-function bar(ctx, x, y, w, h, frac, label, name, rank, align, seed) {
+function bar(ctx, x, y, w, h, frac, label, name, rank, align, seed, marker) {
   ctx.save();
   ctx.globalCompositeOperation = 'multiply';
 
   handText(ctx, label, align === 'right' ? x + w : x, y - 12, 26, '#3a4050', align);
+  // The same blue triangle that floats over the player, so the panel and the body on the
+  // page are visibly the same thing.
+  if (marker) {
+    ctx.save();
+    const mx = x + ctx.measureText(label).width + 46;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#2f6ad0';
+    ctx.beginPath();
+    ctx.moveTo(mx, y - 8);
+    ctx.lineTo(mx - 8, y - 23);
+    ctx.lineTo(mx + 8, y - 23);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
   if (name) handText(ctx, name, align === 'right' ? x + w : x, y + h + 26, 19, '#6a7080', align, 400);
 
   ctx.save();
@@ -61,8 +79,11 @@ export function drawHUD(ctx, vw, vh, m, save, input) {
   const bw = Math.min(300, vw * 0.34);
   const bh = 26;
 
+  ctx.save();
+  ctx.font = `700 26px ${FONT}`;
   bar(ctx, pad + 26, pad + 30, bw, bh, m.player.hp / m.player.maxHp, 'YOU',
-    m.demo ? m.player.name : null, m.player.rank, 'left', 11);
+    m.demo ? m.player.name : null, m.player.rank, 'left', 11, !m.demo);
+  ctx.restore();
 
   const live = m.enemies.filter((e) => !e.dead);
   const boss = m.enemies.find((e) => e.boss);
@@ -84,7 +105,7 @@ export function drawHUD(ctx, vw, vh, m, save, input) {
     const u = 1 - m.announceT / 1.7;
     ctx.save();
     ctx.globalAlpha = Math.min(1, m.announceT * 2.4);
-    ctx.translate(vw / 2, vh * 0.26);
+    ctx.translate(vw / 2, vh * 0.36);
     ctx.rotate(-0.02);
     const s = 1 + Math.max(0, 0.25 - u) * 1.2;
     ctx.scale(s, s);
@@ -218,5 +239,41 @@ function drawTouch(ctx, input) {
     }
   }
   drawStick(ctx, input);
+  ctx.restore();
+}
+
+/**
+ * "YOU" / enemy names over each fighter for the first couple of seconds. Drawn in world
+ * space so the tags track the figures. Early enemies are identical white stick figures,
+ * so without this there is nothing tying the YOU health panel to a body on the page.
+ */
+export function drawNameTags(ctx, m) {
+  if (m.introT <= 0) return;
+  const fade = Math.min(1, m.introT / 0.55);
+  const rise = (1 - Math.min(1, (2.6 - m.introT) / 0.3)) * 14;
+
+  const tag = (f, text, col) => {
+    if (f.dead) return;
+    const hx = f.rag.x[P_HEAD], hy = f.rag.y[P_HEAD];
+    const y = hy - 44 * f.scale - rise;
+    ctx.save();
+    ctx.globalAlpha = fade;
+    ctx.font = `700 ${Math.round(30 * f.scale)}px ${FONT}`;
+    ctx.textAlign = 'center';
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = 'rgba(250,247,238,0.92)';
+    ctx.strokeText(text, hx, y);
+    ctx.fillStyle = col;
+    ctx.fillText(text, hx, y);
+    stroke(ctx, [[hx, y + 8], [hx, y + 20]], { w: 3, passes: 1, wob: 0.5, seed: 61, col, a: 0.85, step: 6 });
+    stroke(ctx, [[hx - 6, y + 14], [hx, y + 21], [hx + 6, y + 14]],
+      { w: 3, passes: 1, wob: 0.5, seed: 62, col, a: 0.85, step: 5 });
+    ctx.restore();
+  };
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'multiply';
+  tag(m.player, 'YOU', '#2f6ad0');
+  for (const e of m.enemies) tag(e, e.name, '#a8322c');
   ctx.restore();
 }

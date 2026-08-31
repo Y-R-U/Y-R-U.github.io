@@ -9,7 +9,7 @@ import { buildArena } from './arena.js';
 import { drawFighter, drawShadow } from './draw.js';
 import { Match } from './match.js';
 import { Input } from './input.js';
-import { drawHUD, handText, FONT, FONT_B } from './ui.js';
+import { drawHUD, drawNameTags, handText, FONT, FONT_B } from './ui.js';
 import { load, save as persist, wipe, DEFAULT } from './save.js';
 import * as audio from './audio.js';
 import { buildShop } from './shop.js';
@@ -245,6 +245,7 @@ function render() {
   for (const p of m.projectiles) p.draw(ctx);
   for (const h of m.hazards) h.drawFront && h.drawFront(ctx);
   m.fx.draw(ctx);
+  if (mode === 'fight') drawNameTags(ctx, m);
 
   ctx.restore();
 

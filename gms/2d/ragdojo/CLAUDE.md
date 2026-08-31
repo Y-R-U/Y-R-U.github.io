@@ -79,6 +79,12 @@ from its output, not by feel.
   a ~5 MB data URL. `tools/shot.mjs` has the page POST the blob to its own server instead.
   `cdp.shot()` (Page.captureScreenshot) is fine here and is the only way to capture DOM menus,
   which canvas-only capture misses entirely.
+- **The player always spawns on the left, under the YOU panel** (world x 560; enemies at
+  1680-560). That was already true when it was first reported as a bug — the real problem was
+  that you cannot tell which identical white stick figure is yours once you cross over. Hence
+  the blue triangle over the player's head, the matching triangle on the YOU panel, the
+  fight-start name tags (`match.introT`), and enemies being drawn in lighter ink. If that
+  association ever needs revisiting, fix identification; do not move the spawn.
 - Enemy-on-enemy hits deal 25% damage. At full damage the enemies finish gauntlets for you.
 - `?autoplay=1` is a real fight with an AI player; `demo` is the menu background match. They
   are different flags.

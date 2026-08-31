@@ -47,6 +47,7 @@ export class Match {
     this.hazardT = 5 + Math.random() * 4;
     this.announce = null;
     this.announceT = 0;
+    this.introT = this.demo ? 0 : 2.6;   // name tags over each fighter at the start
 
     this.build();
   }
@@ -263,6 +264,7 @@ export class Match {
     const d = dt * scale;
     this.time += d;
     if (this.announceT > 0) this.announceT -= dt;
+    if (this.introT > 0) this.introT -= dt;
 
     if (!this.over) {
       if (this.demo || this.autoplay) {

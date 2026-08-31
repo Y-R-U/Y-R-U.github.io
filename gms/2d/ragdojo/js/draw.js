@@ -4,7 +4,7 @@
 import { P, BONE } from './ragdoll.js';
 import { stroke, circle, line, splat, rnd, INK } from './ink.js';
 
-const ENEMY_INK = '#2c2f38';
+const ENEMY_INK = '#4d5360';   // lighter than the player's ink, so you can always pick yourself out
 const FAR = 0.52;          // far-side limbs are lighter, which reads as depth
 
 function limb(ctx, r, a, b, c, o) {
@@ -152,12 +152,21 @@ export function drawFighter(ctx, f, t = 0) {
   ctx.restore();
 
   if (f.isPlayer && !f.dead) {
-    const hx = r.x[P.HEAD], hy = r.y[P.HEAD] - BONE.headR * sc - 20;
-    const bob = Math.sin(t * 4) * 3;
+    const hx = r.x[P.HEAD], hy = r.y[P.HEAD] - BONE.headR * sc - 22;
+    const bob = Math.sin(t * 4) * 3.5;
     ctx.save();
     ctx.globalCompositeOperation = 'multiply';
-    stroke(ctx, [[hx - 8, hy - 10 + bob], [hx, hy + bob], [hx + 8, hy - 10 + bob]],
-      { w: 3, passes: 2, wob: 0.7, seed: 1234, col: '#2f6ad0', a: 0.9, step: 5 });
+    // Solid blue triangle, not a thin chevron — at phone size the outline vanished.
+    ctx.globalAlpha = 0.92;
+    ctx.fillStyle = '#2f6ad0';
+    ctx.beginPath();
+    ctx.moveTo(hx, hy + bob + 11);
+    ctx.lineTo(hx - 10, hy + bob - 8);
+    ctx.lineTo(hx + 10, hy + bob - 8);
+    ctx.closePath();
+    ctx.fill();
+    stroke(ctx, [[hx - 10, hy + bob - 8], [hx + 10, hy + bob - 8]],
+      { w: 2.4, passes: 1, wob: 0.5, seed: 1234, col: '#1b4a9c', a: 0.9, step: 6 });
     ctx.restore();
   }
 }
