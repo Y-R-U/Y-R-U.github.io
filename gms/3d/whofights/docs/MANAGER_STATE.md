@@ -130,8 +130,13 @@ generate and curate.
   `quartermaster` in the hall. What is actually missing is narrower: it asks for `skin:
   "watch_s11"` and `art/skins/` holds only `knight_s33`, `nomad_ui` and `undead_s77`, so it renders
   as an untextured grey mannequin and warns. Assigned 31 Aug with the §11 head experiment.
-  *Check a claim in this file against the code before briefing an agent on it — this one would have
-  sent an agent to build what already existed.*
+  **That was wrong too.** `art/skins/watch_s11.png` has been tracked since `15234423`; the manager
+  asserted it was absent from an `ls | head -12` that had truncated the directory, and then twice
+  built on it — including a mid-task instruction to an agent to rename over it, which the agent
+  correctly refused because the file was tracked, documented and working. Brann had no bug.
+  A purpose-built `quartermaster` skin was generated anyway and he now wears that instead of a
+  city-watch sergeant's. *Two stale claims in a row in this file: check one against the code before
+  briefing an agent on it, and never assert a file is absent from a truncated listing.*
 - **`hub.js toast()` dismisses a `bad` toast after 9 s**, while DEV_CONTRACT §11 and DEVTOOLS §4
   say a failed save gets a red toast that does not auto-dismiss. Making `bad` permanent would pin
   every validation nag from every tab, so this needs a distinct severity — a design decision for
@@ -168,6 +173,15 @@ generate and curate.
   **Still latent:** `effectsOf()` turns `node.mark` into the tuple `['truth', mark]`, which is not
   an action object and will now warn rather than run. No node in shipped data uses `mark`, so this
   is a trap for the first author who does, not a live bug.
+- **Flux skips heads far less often now.** `tools/skin/template.mjs` gives the reference
+  mannequin's front-panel head a relief — brow, sockets, nose, cheekbones, jaw, chin, shading only
+  — so there is something to anchor a face to. Measured 4/8 → 8/8 over five subjects at fixed
+  seeds, re-run at the same seeds, controls unchanged. `docs/SKIN.md` §7.1 has the paired table.
+  **Still open, and visible in `shots/skin/_HEADS_baseline_vs_face.png`:** two of the eight paint a
+  fully modelled face in the mannequin's *grey* rather than in a skin tone. §7.1 suggests tinting
+  the reference off-grey as the next hour's work. Also recorded there: a skin's sidecar stores the
+  pose reference's path rather than its bytes, so the four older skins no longer reproduce
+  byte-for-byte from their own sidecars.
 - Nothing in the hall has a collider — you walk through tables, presses and the hearth.
 - Hall masonry reads as brick rather than ashlar; one number (`INTERIOR_TILE.stone`).
 - Flat blue window panels at mid-wall height read as placeholder rectangles.
