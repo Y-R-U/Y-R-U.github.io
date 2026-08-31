@@ -1,0 +1,98 @@
+<!doctype html><html><head><meta charset="utf-8"><title>ragdojo gfx lab</title>
+<style>html,body{margin:0;background:#20201c}canvas{display:block;width:100vw}</style></head>
+<body><canvas id="c"></canvas><script type="module">
+import { SHEET_W, SHEET_H, GROUND_Y, RANKS, GRAVITY } from '../js/config.js';
+import { makeSheet, drawDesk, sheetShadow } from '../js/paper.js';
+import { Ragdoll, P } from '../js/ragdoll.js';
+import { POSE, fk, sample } from '../js/poses.js';
+import { drawFighter, drawShadow } from '../js/draw.js';
+import { stroke, INK } from '../js/ink.js';
+
+const q = new URLSearchParams(location.search);
+const scene = q.get('scene') || 'stance';
+const c = document.getElementById('c');
+const PAD = 60;
+c.width = SHEET_W + PAD * 2; c.height = SHEET_H + PAD * 2;
+const g = c.getContext('2d');
+const sheet = makeSheet(SHEET_W, SHEET_H, 7);
+
+function mk(rank, scale = 1, facing = 1, seed = 1) {
+  return { rag: new Ragdoll(scale), scale, facing, rank: RANKS[rank], seed,
+    hp: 100, maxHp: 100, hitFlash: 0, isPlayer: false, dead: false, tailPhase: seed };
+}
+function put(f, x, y, poseName, t = 0) {
+  const p = typeof poseName === 'string' ? POSE[poseName] : poseName;
+  f.rag.place(x, y, fk(p, f.facing, f.scale));
+}
+const world = { gravity: GRAVITY, groundY: GROUND_Y, minX: 40, maxX: SHEET_W - 40, ceilY: -400 };
+
+function label(x, y, s) {
+  g.save(); g.globalCompositeOperation = 'multiply';
+  g.font = '600 20px "Patrick Hand", "Bradley Hand", cursive'; g.fillStyle = '#4a5060';
+  g.textAlign = 'center'; g.fillText(s, x, y); g.restore();
+}
+
+function render() {
+  drawDesk(g, c.width, c.height, sheet);
+  sheetShadow(g, PAD, PAD, SHEET_W, SHEET_H);
+  g.save(); g.translate(PAD, PAD);
+  g.drawImage(sheet, 0, 0);
+
+  if (scene === 'stance') {
+    const names = ['guard', 'walkA', 'walkC', 'runA', 'jabHit', 'hookHit', 'kickHit', 'powWind', 'powHit',
+                   'riseHit', 'slamHit', 'dashPose', 'flipKick', 'tossHit', 'block', 'hurt', 'victory', 'bow'];
+    names.forEach((n, i) => {
+      const col = i % 6, row = (i / 6) | 0;
+      const x = 180 + col * 250, y = 250 + row * 270;
+      const f = mk(i % 9, 1, 1, i * 13 + 3);
+      put(f, x, y, n);
+      drawShadow(g, f, y + 52);
+      stroke(g, [[x - 100, y + 52], [x + 100, y + 52]], { w: 1.5, passes: 1, wob: 0.5, col: '#8899aa', a: 0.5 });
+      drawFighter(g, f, 0);
+      label(x, y + 84, n);
+    });
+  } else if (scene === 'ranks') {
+    RANKS.forEach((r, i) => {
+      const x = 150 + (i % 5) * 300, y = 260 + ((i / 5) | 0) * 340;
+      const f = mk(i, 1.5, i % 2 ? -1 : 1, i * 31 + 7);
+      put(f, x, y, 'guard');
+      drawShadow(g, f, y + 80);
+      drawFighter(g, f, 0);
+      label(x, y + 120, r.name.toUpperCase());
+    });
+  } else if (scene === 'ragdoll') {
+    const fs = [];
+    for (let i = 0; i < 6; i++) {
+      const f = mk(i % 9, 1.1, i % 2 ? -1 : 1, i * 17 + 5);
+      put(f, 240 + i * 210, GROUND_Y - 300, 'jumpFall');
+      for (let k = 0; k < 11; k++) {
+        f.rag.px[k] = f.rag.x[k] - (Math.random() * 2 - 1) * 14 - 6;
+        f.rag.py[k] = f.rag.y[k] - (Math.random() * 2 - 1) * 10;
+      }
+      fs.push(f);
+    }
+    for (let s = 0; s < 240; s++) for (const f of fs) f.rag.step(1 / 60, 0, world);
+    for (const f of fs) { drawShadow(g, f, GROUND_Y); drawFighter(g, f, 0); }
+    stroke(g, [[40, GROUND_Y], [SHEET_W - 40, GROUND_Y]], { w: 2, passes: 1, wob: 0.6, col: '#7a90b0', a: 0.6 });
+    label(SHEET_W / 2, GROUND_Y + 90, 'ragdoll — muscles off, 4 s of settling');
+  } else if (scene === 'walk') {
+    for (let i = 0; i < 8; i++) {
+      const f = mk(4, 1.3, 1, 9);
+      const s = sample('walk', i * 0.135);
+      put(f, 180 + i * 180, 420, s.p);
+      drawShadow(g, f, 420 + 70);
+      drawFighter(g, f, 0);
+    }
+    for (let i = 0; i < 8; i++) {
+      const f = mk(7, 1.3, 1, 9);
+      const s = sample('run', i * 0.095);
+      put(f, 180 + i * 180, 760, s.p);
+      drawFighter(g, f, 0);
+    }
+    label(SHEET_W / 2, 560, 'walk cycle'); label(SHEET_W / 2, 900, 'run cycle');
+  }
+  g.restore();
+  window.__ready = true;
+}
+document.fonts.ready.then(render);
+</script></body></html>

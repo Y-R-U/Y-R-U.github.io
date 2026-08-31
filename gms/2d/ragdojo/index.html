@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#3b3428">
+<meta name="description" content="RAGDOJO — a stick-fighting game on a sheet of paper. Draw gestures to fight.">
+<title>RAGDOJO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+
+  <div id="ui">
+    <!-- boot -->
+    <div id="boot" class="screen show">
+      <div class="logo">RAGDOJO</div>
+      <div class="tag">stick fighting, on paper</div>
+      <div id="bootbar"><i></i></div>
+      <div id="bootmsg">sharpening pencils…</div>
+      <button id="startBtn" class="btn big hidden">START</button>
+    </div>
+
+    <!-- hub / between fights -->
+    <div id="hub" class="screen">
+      <div class="corner tl">
+        <button class="icon" id="btnSettings" title="Settings">⚙</button>
+        <button class="icon" id="btnHelp" title="How to play">?</button>
+      </div>
+      <div class="corner tr">
+        <button class="icon" id="btnFull" title="Fullscreen">⛶</button>
+        <button class="icon" id="btnMusic" title="Music">♪</button>
+      </div>
+      <div class="hubcenter">
+        <div id="hubRank" class="rankline"></div>
+        <div id="hubTitle" class="hubtitle"></div>
+        <div id="hubSub" class="hubsub"></div>
+        <button id="btnFight" class="btn big">FIGHT</button>
+      </div>
+      <div class="corner bl">
+        <button class="btn" id="btnShop">SHOP <span id="inkPill" class="pill">0</span></button>
+      </div>
+      <div class="corner br">
+        <div class="stat" id="hubStats"></div>
+      </div>
+    </div>
+
+    <!-- shop -->
+    <div id="shop" class="screen panel-screen">
+      <div class="sheet">
+        <div class="sheethead">
+          <h2>THE SHOP</h2>
+          <div class="inkline">INK <b id="shopInk">0</b></div>
+          <button class="icon close" id="btnShopClose">✕</button>
+        </div>
+        <div class="tabs">
+          <button class="tab on" data-tab="moves">MOVES</button>
+          <button class="tab" data-tab="perks">SKILLS</button>
+        </div>
+        <div id="shopList" class="list"></div>
+      </div>
+    </div>
+
+    <!-- results -->
+    <div id="results" class="screen panel-screen">
+      <div class="sheet narrow">
+        <h2 id="resTitle">WIN</h2>
+        <div id="resBody" class="rows"></div>
+        <button id="btnResult" class="btn big">CONTINUE</button>
+      </div>
+    </div>
+
+    <!-- victory -->
+    <div id="victory" class="screen panel-screen">
+      <div class="sheet narrow">
+        <h2 class="gold">CHAMPION</h2>
+        <div id="vicBody" class="rows"></div>
+        <div class="vicbtns">
+          <button id="btnAgain" class="btn">NEW GAME</button>
+          <button id="btnBully" class="btn bully">BULLY MODE</button>
+        </div>
+        <p class="fine">Bully Mode: keep every upgrade, start again at white belt.</p>
+      </div>
+    </div>
+
+    <!-- settings -->
+    <div id="settings" class="screen panel-screen">
+      <div class="sheet narrow">
+        <div class="sheethead"><h2>SETTINGS</h2><button class="icon close" id="btnSetClose">✕</button></div>
+        <div class="rows" id="setRows"></div>
+        <button id="btnWipe" class="btn danger">ERASE ALL PROGRESS</button>
+      </div>
+    </div>
+
+    <!-- help -->
+    <div id="help" class="screen panel-screen">
+      <div class="sheet">
+        <div class="sheethead"><h2>HOW TO FIGHT</h2><button class="icon close" id="btnHelpClose">✕</button></div>
+        <div class="rows" id="helpRows"></div>
+      </div>
+    </div>
+
+    <div id="pauseBtn" class="hidden"><button class="icon" id="btnPause">❚❚</button></div>
+    <div id="rotate"><div>↻<br>turn your device sideways</div></div>
+  </div>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
