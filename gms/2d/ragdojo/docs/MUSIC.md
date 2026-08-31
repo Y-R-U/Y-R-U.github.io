@@ -1,6 +1,6 @@
 # MUSIC
 
-Seven instrumental tracks, generated on **Suno v5.5** in Aaron's logged-in browser, 2026-09-01.
+Fourteen instrumental tracks, generated on **Suno v5.5** in Aaron's logged-in browser, 2026-09-01.
 Advanced mode, Weirdness 50%, Style Influence 50%, Lyrics → Instrumental, duration set by the
 Custom slider (2:00 for everything except `victory` at 1:00). ~70 credits, two takes each.
 
@@ -13,8 +13,18 @@ Custom slider (2:00 for everything except `victory` at 1:00). ~70 credits, two t
 | `boss` | rank champions | 2:00 | 120 s, 820 KB | -16.5 dB | boss_1 |
 | `final` | the Ink Master | 2:00 | **150 s**, 1024 KB | -16.1 dB | final_2 |
 | `victory` | victory screen | 1:00 | 60 s, 409 KB | -16.9 dB | victory_1 |
+| `fight4` | roster, from level 1 | 2:00 | 118 s, 811 KB | -15.2 dB | fight4_2 |
+| `fight5` | roster, from level 1 | 2:00 | 120 s, 820 KB | -15.0 dB | fight5_2 |
+| `fight6` | roster, from level 11 | 2:00 | 119 s, 814 KB | -15.4 dB | fight6_2 |
+| `fight7` | roster, from level 11 | 2:00 | 119 s, 816 KB | -14.4 dB | fight7_2 |
+| `fight8` | roster, from level 21 | 2:00 | 118 s, 809 KB | -14.3 dB | fight8_2 |
+| `fight9` | roster, from level 31 | 2:00 | 120 s, 824 KB | -14.6 dB | fight9_1 |
+| `fight10` | roster, from level 31 | 2:00 | 120 s, 819 KB | -14.4 dB | fight10_2 |
 
-Total shipped: **5.4 MB**. Raw takes are kept in `assets/audio/raw/` and are **git-ignored** —
+`fight4` take 1 came back at 91 s — Suno cut it short, so take 2 was kept regardless of level.
+
+Total shipped: **11.2 MB**, but tracks are fetched lazily on first play and the roster unlocks
+as you progress, so a new player downloads four fight tracks plus the menu, not fourteen. Raw takes are kept in `assets/audio/raw/` and are **git-ignored** —
 18 MB of source has no business in the repo.
 
 > **Selection was by measurement, not by ear.** Two takes were generated for every track and the
@@ -24,6 +34,17 @@ Total shipped: **5.4 MB**. Raw takes are kept in `assets/audio/raw/` and are **g
 
 `final` came back at 150 s against a 120 s request — Suno overshot, and for a final boss longer
 is fine, so it was kept.
+
+## The unlock roster
+
+`js/music.js` owns it. Ten fight tracks; four from the start, two more at each of levels 10,
+20 and 30. `menu`, `boss`, `final` and `victory` are contextual and always available — gating
+those would only mean silence where they belong.
+
+Selection rotates through the *unlocked* pool by the ordinal of the fight, counting only the
+levels that use the roster. Rotating on `level.idx` let the champion fights eat slots and the
+last-unlocked track never came up at all. Current spread: every one of the ten is used, and no
+two consecutive fights share a track.
 
 ## Pipeline
 

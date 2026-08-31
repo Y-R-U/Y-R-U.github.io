@@ -16,6 +16,13 @@ menu:rd_menu_1
 fight1:rd_fight1_2
 fight2:rd_fight2_1
 fight3:rd_fight3_2
+fight4:rd_fight4_2
+fight5:rd_fight5_2
+fight6:rd_fight6_2
+fight7:rd_fight7_2
+fight8:rd_fight8_2
+fight9:rd_fight9_1
+fight10:rd_fight10_2
 boss:rd_boss_1
 final:rd_final_2
 victory:rd_victory_1

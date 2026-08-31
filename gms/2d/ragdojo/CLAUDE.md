@@ -106,9 +106,19 @@ from its output, not by feel.
 - **A crouch must not move the collision floor.** `duckDrop` is a pose offset applied to the
   ragdoll target origin only. Folding it into `standY` made `onGround` false, which cleared
   `blocking`, which cancelled the crouch — a deadlock that left the fighter hovering.
-- **Fight music alternates within a tier** (`fightTrack` in main.js). Selecting on tier alone
-  put `fight1` on 12 of the first 15 fights and never played `fight2` before level 15, which
-  reads as "there is only one song".
+- **The fight-music roster unlocks** (`js/music.js`): 4 tracks, then +2 at levels 10, 20 and 30.
+  Rotate by the ordinal of roster-using fights, never by `level.idx` — champions eat slots and
+  the last-unlocked track then never plays. Selecting on tier alone (the version before this)
+  put `fight1` on 12 of the first 15 fights and never reached `fight2` before level 15, which
+  reads as "there is only one song" no matter how many files ship.
+- **Facing is owned by `Match.faceOpponents()`, not by the movement stick.** Fighters always
+  turn to the nearest opponent; following the stick left you swinging at empty page after a
+  crossover. Attacks also root you (`spd * 0` while attacking) — creeping forward mid-power-hit
+  walked you over the body you had just floored, which is how a power hit put you on the wrong
+  side even with solid bodies.
+- **Panels scroll internally, not as a whole** (`.sheet` is a flex column; only `.rows`/`.list`
+  scroll). Scrolling the whole panel pushed the CONTINUE button off the bottom of a landscape
+  phone. There is a `max-height: 470px` media query for the same reason.
 - Enemy-on-enemy hits deal 25% damage. At full damage the enemies finish gauntlets for you.
 - `?autoplay=1` is a real fight with an AI player; `demo` is the menu background match. They
   are different flags.

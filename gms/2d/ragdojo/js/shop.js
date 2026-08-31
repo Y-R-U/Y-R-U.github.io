@@ -108,7 +108,14 @@ export function buildShop(listEl, inkEl, S, onChange) {
         row.className = 'crow';
 
         if (locked) {
-          row.innerHTML = `<span class="lv">needs ${RANKS[m.tier].name} bandana</span>`;
+          // Show the price anyway — you want to know what you are saving towards.
+          const b = document.createElement('button');
+          b.className = 'buy';
+          b.textContent = `LEARN · ${moveBuyCost(m)}`;
+          b.disabled = true;
+          row.appendChild(b);
+          row.insertAdjacentHTML('beforeend',
+            `<span class="lv">needs ${RANKS[m.tier].name} bandana</span>`);
         } else if (!st.owned) {
           const cost = moveBuyCost(m);
           const b = document.createElement('button');

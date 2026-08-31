@@ -91,10 +91,16 @@ html, body {
 .sheet {
   background: var(--paper); border: 3px solid var(--ink);
   border-radius: 6px 10px 7px 11px; box-shadow: 6px 8px 0 rgba(0,0,0,.45);
-  width: min(760px, 96vw); max-height: 92vh; overflow: auto; padding: 14px 18px 18px;
+  width: min(760px, 96vw); max-height: 92vh; padding: 14px 18px 18px;
   background-image: repeating-linear-gradient(transparent, transparent 33px, rgba(118,158,196,.35) 33px, rgba(118,158,196,.35) 34px);
   -webkit-overflow-scrolling: touch;
+  /* Only the middle scrolls. The panel used to scroll as a whole, which pushed the
+     CONTINUE button off the bottom of a phone in landscape. */
+  display: flex; flex-direction: column; min-height: 0;
 }
+.sheet > .rows, .sheet > .list { overflow-y: auto; min-height: 0; flex: 1 1 auto; }
+.sheet > h2, .sheet > .sheethead, .sheet > .tabs,
+.sheet > .btn, .sheet > .vicbtns, .sheet > .fine { flex: 0 0 auto; }
 .sheet.narrow { width: min(470px, 94vw); text-align: center; }
 .sheet h2 { font-family: var(--font-b); font-size: 40px; margin: 2px 0 8px; letter-spacing: 1px; }
 .sheet h2.gold { color: #b8860b; font-size: 52px; }
@@ -138,6 +144,11 @@ html, body {
 .toggle { display: flex; justify-content: space-between; align-items: center; padding: 5px 0;
   border-bottom: 1px dashed rgba(32,36,44,.25); }
 
+.rows .r.unlock { color: #b8860b; border-bottom: none; }
+.rows .r.lockedrow { opacity: .45; }
+.musichead { font-size: 15px; letter-spacing: 1px; color: var(--ink-soft);
+  margin: 12px 0 3px; border-bottom: 2px solid rgba(32,36,44,.3); padding-bottom: 2px; }
+
 #pauseBtn { position: absolute; top: max(10px, env(safe-area-inset-top));
   left: 50%; transform: translateX(-50%); }
 #pauseBtn.hidden { display: none; }
@@ -145,3 +156,23 @@ html, body {
 #rotate { position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
   background: var(--desk); color: #e2d8bf; font-size: 26px; text-align: center; line-height: 1.5; z-index: 50; }
 @media (orientation: portrait) and (max-width: 860px) { #rotate { display: flex; } }
+
+/* Landscape phones are short. Everything shrinks so the action button always fits. */
+@media (max-height: 470px) {
+  .sheet { padding: 8px 13px 11px; border-radius: 5px 8px 6px 9px; }
+  .sheet h2 { font-size: 27px; margin: 0 0 5px; }
+  .sheet h2.gold { font-size: 33px; }
+  .rows { font-size: 15px; line-height: 1.3; margin: 3px 0 8px; }
+  .rows .r { padding: 1px 0; }
+  .rows .r.big { font-size: 20px; margin-top: 3px; }
+  .btn { font-size: 18px; padding: 6px 16px; }
+  .btn.big { font-size: 23px; padding: 8px 26px; }
+  .fine { font-size: 12px; margin-top: 6px; }
+  .icon { width: 36px; height: 36px; font-size: 18px; }
+  .card .cname { font-size: 18px; }
+  .card .cdesc { font-size: 13px; }
+  .inkline { font-size: 17px; }
+  .inkline b { font-size: 20px; }
+  .tabs { margin: 4px 0 7px; }
+  .tab { font-size: 17px; padding: 3px 12px; }
+}

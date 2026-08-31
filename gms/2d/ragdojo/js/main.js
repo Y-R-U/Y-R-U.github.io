@@ -13,7 +13,7 @@ import { drawHUD, drawNameTags, handText, FONT, FONT_B } from './ui.js';
 import { load, save as persist, wipe, DEFAULT } from './save.js';
 import * as audio from './audio.js';
 import { buildShop } from './shop.js';
-import { MUSIC } from './music.js';
+import { MUSIC, TRACK_NAME, FIGHT_POOL, unlockedFightTracks } from './music.js';
 
 const qs = new URLSearchParams(location.search);
 const cvs = document.getElementById('game');
@@ -113,19 +113,28 @@ function startFight(levelIdx, bully = false) {
   audio.play(fightTrack(level));
 }
 
+/** How far the player has ever got — unlocks are permanent, including in bully mode. */
+function reachedLevel(level) {
+  return Math.max(S.level || 0, level ? level.idx : 0, S.completed ? TOTAL_LEVELS : 0);
+}
+
 /**
- * Tier sets the base track so the music still escalates, but consecutive fights alternate
- * with the neighbouring track. Picking on tier alone meant 12 of the first 15 fights played
- * fight1 and you never heard fight2 before level 15 — which reads as "there is only one song".
+ * Rotates through the unlocked fight roster. Picking on tier alone meant 12 of the first 15
+ * fights played fight1 and fight2 never appeared before level 15 — which reads as "there is
+ * only one song" no matter how many files ship.
  */
-const FIGHT_TRACKS = ['fight1', 'fight2', 'fight3'];
 function fightTrack(level) {
   if (level.kind === 'final') return 'final';
   if (level.kind === 'champion') return 'boss';
-  const base = level.tier >= 6 ? 2 : level.tier >= 3 ? 1 : 0;
-  // Alternate upward from the low tiers and downward from the top, so no track is starved.
-  const alt = level.idx % 2 ? (base >= FIGHT_TRACKS.length - 1 ? base - 1 : base + 1) : base;
-  return FIGHT_TRACKS[alt];
+  const pool = unlockedFightTracks(reachedLevel(level));
+  // Count only the fights that actually use the roster. Rotating on level.idx let the
+  // champion fights eat slots, and the last-unlocked track never came up at all.
+  let ordinal = 0;
+  for (let i = 0; i < level.idx; i++) {
+    const k = LEVELS[i].kind;
+    if (k !== 'champion' && k !== 'final') ordinal++;
+  }
+  return pool[ordinal % pool.length].id;
 }
 
 function finishFight(result, m) {
@@ -143,13 +152,15 @@ function finishFight(result, m) {
   if (won) { S.wins++; S.kos += m.kos; } else S.losses++;
 
   const wasFinal = L.kind === 'final';
+  const tracksBefore = unlockedFightTracks(reachedLevel(null)).length;
   if (won) {
     if (m.bully) S.bullyLevel = Math.min(TOTAL_LEVELS, L.idx + 1);
     else S.level = Math.min(TOTAL_LEVELS - 1, L.idx + 1);
     if (wasFinal && !m.bully) S.completed = true;
   }
   persist(S);
-  pendingResult = { result, m, earned, bonus, rankGap, wasFinal, bully: m.bully };
+  const gained = unlockedFightTracks(reachedLevel(null)).slice(tracksBefore).map((t) => TRACK_NAME[t.id] || t.id);
+  pendingResult = { result, m, earned, bonus, rankGap, wasFinal, bully: m.bully, gained };
 
   if (won && wasFinal && !m.bully) { showVictory(m); return; }
   showResults(pendingResult);
@@ -170,6 +181,8 @@ function showResults(R) {
     R.bonus > 0 ? row(`Punching up (+${R.rankGap} rank)`, `+${R.bonus}`) : '',
     row('Score', Math.round(m.score)),
     `<div class="r big"><span>INK EARNED</span><b>+${R.earned}</b></div>`,
+    R.gained && R.gained.length
+      ? `<div class="r unlock"><span>♪ NEW MUSIC</span><b>${R.gained.join(' · ')}</b></div>` : '',
   ].join('');
   $('btnResult').textContent = won ? 'CONTINUE' : 'TRY AGAIN';
   overlay('results');
@@ -361,7 +374,8 @@ function openSettings() {
     T('Music', S.settings.music, 'music') +
     T('Sound effects', S.settings.sfx, 'sfx') +
     T('Screen shake', S.settings.shake, 'shake') +
-    `<div class="toggle"><span>Stick side</span><button class="buy" data-fn="hand">${S.settings.hand === 'right' ? 'LEFT STICK' : 'RIGHT STICK'}</button></div>`;
+    `<div class="toggle"><span>Stick side</span><button class="buy" data-fn="hand">${S.settings.hand === 'right' ? 'LEFT STICK' : 'RIGHT STICK'}</button></div>` +
+    musicList();
   rows.querySelectorAll('button').forEach((b) => {
     b.onclick = () => {
       const f = b.dataset.fn;
@@ -375,6 +389,18 @@ function openSettings() {
   });
   overlay('settings');
 }
+/** The soundtrack as a collection, so the gates are visible rather than mysterious. */
+function musicList() {
+  const reached = reachedLevel(null);
+  const rows = FIGHT_POOL.map((t) => {
+    const got = t.unlockAt <= reached;
+    return `<div class="r${got ? '' : ' lockedrow'}"><span>${got ? '♪' : '🔒'} ${TRACK_NAME[t.id] || t.id}</span>` +
+      `<b>${got ? 'unlocked' : 'level ' + (t.unlockAt + 1)}</b></div>`;
+  }).join('');
+  const n = unlockedFightTracks(reached).length;
+  return `<div class="musichead">SOUNDTRACK — ${n} of ${FIGHT_POOL.length} fight tracks</div>${rows}`;
+}
+
 function openHelp() {
   const owned = MOVES.filter((m) => (S.moves[m.id] || {}).owned);
   $('helpRows').innerHTML =

@@ -95,11 +95,11 @@ export class Fighter {
     if (!Number.isFinite(dir)) return;
     if (!this.canAct && this.mode !== 'live') return;
     if (this.attack && this.attack.def.lockMove) return;
-    const spd = this.speed * (this.blocking ? 0.42 : 1) * (this.attack ? 0.35 : 1);
+    const spd = this.speed * (this.blocking ? 0.42 : 1) * (this.attack ? 0 : 1);
     const target = dir * spd;
     const accel = this.onGround ? 14 : 6;
     this.vx += (target - this.vx) * Math.min(1, accel * dt);
-    if (dir !== 0 && !this.attack && this.mode === 'live') this.facing = dir > 0 ? 1 : -1;
+    // Facing is owned by Match.faceOpponents(), not by which way you are walking.
   }
 
   jump() {

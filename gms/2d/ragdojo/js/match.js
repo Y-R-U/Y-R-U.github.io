@@ -328,6 +328,7 @@ export class Match {
 
     for (const f of this.all) f.update(d, this.world, this.resolveHit);
 
+    this.faceOpponents();
     this.separate();
 
     for (let i = 0; i < this.all.length; i++) {
@@ -396,6 +397,25 @@ export class Match {
     this.fx.update(d, GROUND_Y);
     this.checkEnd(dt);
     this.camera(dt);
+  }
+
+  /**
+   * Always turn to face the nearest opponent. Facing used to follow the movement stick, so
+   * crossing someone left you swinging at empty page with your back to them.
+   */
+  faceOpponents() {
+    for (const f of this.all) {
+      if (f.dead || f.attack || f.mode === 'down' || f.mode === 'dead') continue;
+      let best = null, bd = Infinity;
+      for (const o of this.all) {
+        if (o === f || o.dead) continue;
+        if (f !== this.player && o !== this.player) continue;   // enemies square up to the player
+        const d = Math.abs(o.x - f.x);
+        if (d < bd) { bd = d; best = o; }
+      }
+      if (!best || bd < 4) continue;
+      f.facing = best.x > f.x ? 1 : -1;
+    }
   }
 
   /**
