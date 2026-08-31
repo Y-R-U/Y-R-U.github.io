@@ -12,6 +12,7 @@ import {
   playerRankAt, derive, moveStats, MOVES,
 } from './config.js';
 import { sfx } from './audio.js';
+import * as haptic from './haptic.js';
 
 /**
  * Half the width of a standing fighter's body, in world units.
@@ -237,6 +238,11 @@ export class Match {
     if (dealt <= 0) return;
 
     attacker.landedHit();
+    // A carry-forward charge stops on impact. Without this the dash's own momentum ploughs
+    // straight through the body it has just floored — the solid-body rule can't help once
+    // the target is limp — and you come out the far side, which reads as "the attack
+    // switched my side".
+    if (def.dashV > 0 && attacker.attack && attacker.attack.def === def) attacker.vx *= 0.1;
     if (target.brokeGuard) {
       this.fx.text(target.x, target.y - 175, 'GUARD BREAK!', { col: '#c0392b', size: 26 });
       this.fx.shakeBy(10);
@@ -245,6 +251,13 @@ export class Match {
     if (stats && stats.drain) attacker.heal(dealt * stats.drain);
 
     const power = def.p || 0.5;
+    // Only the player's own phone gets buzzed, and only for hits they are part of —
+    // a gauntlet's enemies clobbering each other would otherwise rattle continuously.
+    if (!this.demo) {
+      const wentDown = target.mode === 'down' || target.dead;
+      if (target === this.player) (wentDown ? haptic.down() : haptic.took(power));
+      else if (attacker === this.player) haptic.hit(power);
+    }
     this.fx.burst(from[0], from[1], 20 + power * 26);
     this.fx.shakeBy(4 + power * 9);
     this.fx.stop(0.018 + power * 0.05);
@@ -424,14 +437,17 @@ export class Match {
    * impossible to keep track of which figure was yours.
    *
    * Deliberately does not apply when: either body is airborne (that is the crossing move),
-   * either is floored (you step over a downed fighter), or the mover is mid-dash/flip,
-   * which are supposed to travel through people.
+   * or either is floored (you step over a downed fighter).
+   *
+   * It DOES apply to attacks that carry you forward. Exempting lockMove moves let PENCIL
+   * DASH streak clean through a standing opponent and leave you facing the wrong way, which
+   * is the same complaint as walking through them. The flips are unaffected because they
+   * hop first (onGround false), so they still cross — by jumping, like everything else.
    */
   separate() {
     const solid = (f) =>
       !f.dead && f.onGround &&
-      (f.mode === 'live' || f.mode === 'stagger' || f.mode === 'getup') &&
-      !(f.attack && f.attack.def.lockMove);
+      (f.mode === 'live' || f.mode === 'stagger' || f.mode === 'getup');
 
     for (let i = 0; i < this.all.length; i++) {
       const a = this.all[i];
@@ -496,6 +512,7 @@ export class Match {
       this.kos = this.enemies.length;
       this.koAt = this.time;
       sfx.ko();
+      if (!this.demo) haptic.win();
       const [kx] = this.enemies[this.enemies.length - 1].rag.centre();
       this.fx.text(kx, GROUND_Y - 190, 'K.O.', { col: '#c0392b', size: 64, life: 2.2, vy: -30 });
       this.fx.shakeBy(20);
@@ -511,6 +528,7 @@ export class Match {
       this.endT = 0;
       this.slowmo = 1.4;
       sfx.fail();
+      if (!this.demo) haptic.ko();
       setTimeout(() => this.onEnd('lose', this), this.demo ? 1400 : 2100);
     }
   }

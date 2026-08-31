@@ -6,13 +6,14 @@ export const DEFAULT = () => ({
   totalInk: 0,
   perks: {},
   moves: { power: { owned: true, power: 0, cd: 0 } },
-  settings: { music: true, sfx: true, shake: true, hand: 'right' },
+  settings: { music: true, sfx: true, shake: true, haptics: true, hand: 'right' },
   best: 0,
   score: 0,
   wins: 0, losses: 0, kos: 0, biggestLaunch: 0,
   completed: false, bully: false, bullyLevel: 0, newGamePlus: 0,
   seen: {},
   musicRecent: [],
+  musicOff: {},          // fight tracks the player has switched off
 });
 
 export function load() {

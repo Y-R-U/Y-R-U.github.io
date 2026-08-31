@@ -150,7 +150,7 @@ export const MOVES = [
   {
     id: 'dash', name: 'PENCIL DASH', gesture: 'right', glyph: '→',
     hint: 'Draw a line straight forward',
-    desc: 'Streak forward through anyone in the way, leaving a graphite smear.',
+    desc: 'Shoulder-charge forward and smash into them, leaving a graphite smear.',
     cost: 380, tier: 2,
     dmg: 14, dmgStep: 6, cd: 4.0, cdStep: 0.4, kb: 540,
   },

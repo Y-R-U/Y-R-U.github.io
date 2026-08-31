@@ -16,7 +16,7 @@ globalThis.window = globalThis;
 globalThis.requestAnimationFrame = (fn) => setTimeout(() => fn(Date.now()), 0);
 
 const { Match } = await import('../js/match.js');
-const { LEVELS } = await import('../js/config.js');
+const { LEVELS, moveStats } = await import('../js/config.js');
 const { DEFAULT } = await import('../js/save.js');
 const falsify = process.argv.includes('--falsify');
 
@@ -52,6 +52,46 @@ ok('walking stops at a solid body', walk.minGap >= 30 && walk.minGap < 55, `gap 
 
 const hop = scenario({ jump: true });
 ok('jumping over them DOES cross sides', hop.crossed, `jumped=${hop.jumped}`);
+
+/**
+ * Specials that carry you forward must not deposit you on the far side. Only the move
+ * itself is measured: walking over the body afterwards is the separate, deliberate rule
+ * below, and the target is floored by the hit either way.
+ */
+function chargeScenario(id, gap) {
+  const save = DEFAULT();
+  save.moves[id] = { owned: true, power: 0, cd: 0 };
+  const m = new Match({ level: LEVELS[0], save, onEnd: () => {} });
+  if (falsify) {
+    m.separate = () => {};
+    const land = m.land.bind(m);         // undo the stop-on-impact brake too
+    m.land = (a, t, d, f) => { const v = a.vx; land(a, t, d, f); a.vx = v; };
+  }
+  m.brains.length = 0;
+  const e = m.enemies[0];
+  e.hp = 1e9; m.player.hp = 1e9;
+  m.player.x = e.x - gap;
+  m.player.place(m.player.x, m.world.groundY);
+  const startLeft = m.player.x < e.x;
+  const fired = m.player.special(moveStats(save, id));
+  let crossed = false, hit = false, airborne = false;
+  for (let t = 0; t < 2 && m.player.attack; t += DT) {
+    m.update(DT, null);
+    if (e.mode === 'down' || e.mode === 'dead' || e.mode === 'stagger') hit = true;
+    if (!m.player.onGround) airborne = true;
+    if ((m.player.x < e.x) !== startLeft) crossed = true;
+  }
+  return { fired, hit, crossed, airborne };
+}
+
+const dash = chargeScenario('dash', 150);
+ok('PENCIL DASH connects', dash.fired && dash.hit, `fired=${dash.fired} hit=${dash.hit}`);
+ok('PENCIL DASH does not carry you through the body', !dash.crossed);
+
+const flip = chargeScenario('flipF', 70);
+ok('FLIP KICK connects', flip.fired && flip.hit, `fired=${flip.fired} hit=${flip.hit}`);
+ok('FLIP KICK only crosses by leaving the ground', !flip.crossed || flip.airborne,
+  `crossed=${flip.crossed} airborne=${flip.airborne}`);
 
 // A floored body must not block — you step over it.
 const m = new Match({ level: LEVELS[0], save: DEFAULT(), onEnd: () => {} });

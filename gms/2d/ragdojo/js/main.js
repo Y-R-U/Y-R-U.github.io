@@ -12,6 +12,7 @@ import { Input, isRotated } from './input.js';
 import { drawHUD, drawNameTags, handText, FONT, FONT_B } from './ui.js';
 import { load, save as persist, wipe, DEFAULT } from './save.js';
 import * as audio from './audio.js';
+import * as haptic from './haptic.js';
 import { buildShop } from './shop.js';
 import { MUSIC, TRACK_NAME, FIGHT_POOL, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
@@ -19,6 +20,8 @@ const qs = new URLSearchParams(location.search);
 const cvs = document.getElementById('game');
 const ctx = cvs.getContext('2d', { alpha: false });
 const $ = (id) => document.getElementById(id);
+/** Every button press: the paper click, and a tick on the phone if it has one. */
+const click = () => { audio.sfx.click(); haptic.tap(); };
 
 let S = load();
 if (qs.get('unlock')) { for (const m of MOVES) S.moves[m.id] = { owned: true, power: 2, cd: 2 }; }
@@ -70,7 +73,7 @@ const input = new Input(cvs, {
       match.fx.text(match.player.x, match.player.y - 150, 'NOT LEARNED', { col: '#9aa0ad', size: 22 });
       return;
     }
-    match.playerSpecial(mv.id);
+    if (match.playerSpecial(mv.id)) haptic.gesture();
   },
 });
 
@@ -141,8 +144,7 @@ function reachedLevel(level) {
 function fightTrack(level) {
   if (level.kind === 'final') return 'final';
   if (level.kind === 'champion') return 'boss';
-  const pool = unlockedFightTracks(reachedLevel(level)).map((t) => t.id);
-  const pick = pickFightTrack(pool, S.musicRecent || []);
+  const pick = pickFightTrack(fightPool(reachedLevel(level)), S.musicRecent || []);
   S.musicRecent = [...(S.musicRecent || []), pick].slice(-RECENT_KEEP);
   persist(S);
   return pick;
@@ -196,6 +198,8 @@ function showResults(R) {
       ? `<div class="r unlock"><span>♪ NEW MUSIC</span><b>${R.gained.join(' · ')}</b></div>` : '',
   ].join('');
   $('btnResult').textContent = won ? 'CONTINUE' : 'TRY AGAIN';
+  // A win already continues to the hub; a loss needs its own way out of the retry loop.
+  $('btnResMenu').classList.toggle('hidden', won);
   overlay('results');
   audio.play(won ? 'victory' : 'menu');
   if (won) audio.sfx.bell();
@@ -324,38 +328,48 @@ function frame(t) {
 
 // ── wiring ───────────────────────────────────────────────────────────────
 $('btnFight').onclick = () => {
-  audio.sfx.click();
+  click();
   startFight(S.bully ? S.bullyLevel : S.level, S.bully);
 };
-$('btnShop').onclick = () => { audio.sfx.click(); openShop(); };
-$('btnShopClose').onclick = () => { audio.sfx.click(); overlay(null); refreshHub(); };
-$('btnSettings').onclick = () => { audio.sfx.click(); openSettings(); };
-$('btnSetClose').onclick = () => { audio.sfx.click(); overlay(null); };
-$('btnHelp').onclick = () => { audio.sfx.click(); openHelp(); };
-$('btnHelpClose').onclick = () => { audio.sfx.click(); overlay(null); };
-$('btnPause').onclick = () => { audio.sfx.click(); openSettings(); };
+$('btnShop').onclick = () => { click(); openShop(); };
+$('btnShopClose').onclick = () => { click(); overlay(null); refreshHub(); };
+$('btnSettings').onclick = () => { click(); openSettings(); };
+$('btnSetClose').onclick = () => { click(); overlay(null); };
+$('btnHelp').onclick = () => { click(); openHelp(); };
+$('btnHelpClose').onclick = () => { click(); overlay(null); };
+$('btnPause').onclick = () => { click(); openSettings(); };
 $('btnResult').onclick = () => {
-  audio.sfx.click();
+  click();
   overlay(null);
   const R = pendingResult;
   if (R && R.result === 'lose') startFight(R.m.level.idx, R.bully);
   else { setMode('hub'); refreshHub(); }
 };
+$('btnResMenu').onclick = () => { click(); overlay(null); toMenu(); };
+$('btnQuit').onclick = () => { click(); overlay(null); toMenu(); };
+
+/** Abandon whatever is on screen and go back to the hub. Nothing is scored either way. */
+function toMenu() {
+  match = null;          // drop the fight without firing its onEnd
+  pendingResult = null;
+  setMode('hub');
+  refreshHub();
+}
 $('btnAgain').onclick = () => {
-  audio.sfx.click();
+  click();
   const keep = { best: S.best, completed: true };
   S = { ...DEFAULT(), ...keep, newGamePlus: (S.newGamePlus || 0) + 1 };
   persist(S); overlay(null); setMode('hub'); refreshHub();
 };
 $('btnBully').onclick = () => {
-  audio.sfx.click();
+  click();
   S.bully = true; S.bullyLevel = 0;
   for (const m of MOVES) S.moves[m.id] = { owned: true, power: 5, cd: 5 };
   for (const p of PERKS) S.perks[p.id] = p.max;
   persist(S); overlay(null); setMode('hub'); refreshHub();
 };
 $('btnFull').onclick = () => {
-  audio.sfx.click();
+  click();
   const d = document.documentElement;
   if (!document.fullscreenElement) (d.requestFullscreen || d.webkitRequestFullscreen || (() => {})).call(d);
   else (document.exitFullscreen || document.webkitExitFullscreen || (() => {})).call(document);
@@ -364,7 +378,7 @@ $('btnMusic').onclick = () => {
   S.settings.music = !S.settings.music;
   audio.setMusic(S.settings.music);
   persist(S); refreshHub();
-  audio.sfx.click();
+  click();
 };
 $('btnWipe').onclick = () => {
   wipe();
@@ -385,9 +399,13 @@ function openSettings() {
     T('Music', S.settings.music, 'music') +
     T('Sound effects', S.settings.sfx, 'sfx') +
     T('Screen shake', S.settings.shake, 'shake') +
+    // A dead toggle is worse than no toggle: desktop and iOS Safari cannot vibrate at all.
+    (haptic.supported ? T('Vibration', S.settings.haptics, 'haptics') : '') +
     `<div class="toggle"><span>Stick side</span><button class="buy" data-fn="hand">${S.settings.hand === 'right' ? 'LEFT STICK' : 'RIGHT STICK'}</button></div>` +
     musicList();
-  rows.querySelectorAll('button').forEach((b) => {
+  // Pausing is the only place you can bail out of a fight, so the way out lives here.
+  $('btnQuit').classList.toggle('hidden', mode !== 'fight');
+  rows.querySelectorAll('button[data-fn]').forEach((b) => {
     b.onclick = () => {
       const f = b.dataset.fn;
       if (f === 'hand') S.settings.hand = S.settings.hand === 'right' ? 'left' : 'right';
@@ -395,21 +413,69 @@ function openSettings() {
       applySettings();
       persist(S);
       openSettings();
-      audio.sfx.click();
+      click();
+    };
+  });
+  // Tap a track to hear it; the ON/OFF beside it keeps it out of the fight rotation.
+  rows.querySelectorAll('[data-play]').forEach((el) => {
+    el.onclick = () => {
+      click();
+      if (!S.settings.music) { S.settings.music = true; applySettings(); }
+      audio.play(el.dataset.play, true);
+      persist(S);
+      openSettings();
+    };
+  });
+  rows.querySelectorAll('[data-mute]').forEach((b) => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      click();
+      const id = b.dataset.mute;
+      S.musicOff = { ...(S.musicOff || {}) };
+      if (S.musicOff[id]) delete S.musicOff[id]; else S.musicOff[id] = true;
+      persist(S);
+      openSettings();
     };
   });
   overlay('settings');
 }
-/** The soundtrack as a collection, so the gates are visible rather than mysterious. */
+
+/** Unlocked, not switched off, and never an empty list — silence is not a preference. */
+function fightPool(reached) {
+  const unlocked = unlockedFightTracks(reached).map((t) => t.id);
+  const kept = unlocked.filter((id) => !(S.musicOff || {})[id]);
+  return kept.length ? kept : unlocked;
+}
+
+/**
+ * The soundtrack as a collection: what is playing now, what is unlocked, and which ones
+ * you have switched off. Tapping a row auditions it.
+ */
 function musicList() {
   const reached = reachedLevel(null);
+  const now = audio.current();
+  const off = S.musicOff || {};
+  const live = fightPool(reached);
   const rows = FIGHT_POOL.map((t) => {
-    const got = t.unlockAt <= reached;
-    return `<div class="r${got ? '' : ' lockedrow'}"><span>${got ? '♪' : '🔒'} ${TRACK_NAME[t.id] || t.id}</span>` +
-      `<b>${got ? 'unlocked' : 'level ' + (t.unlockAt + 1)}</b></div>`;
+    if (t.unlockAt > reached) {
+      return `<div class="r lockedrow"><span>🔒 ${TRACK_NAME[t.id] || t.id}</span>` +
+        `<b>level ${t.unlockAt + 1}</b></div>`;
+    }
+    const on = !off[t.id];
+    const playing = now === t.id;
+    // Switching off the last one standing would just mean silence, so it stays locked on.
+    const last = on && live.length === 1 && live[0] === t.id;
+    return `<div class="r trackrow${playing ? ' playing' : ''}${on ? '' : ' mutedrow'}" data-play="${t.id}">` +
+      `<span>${playing ? '▶' : '♪'} ${TRACK_NAME[t.id] || t.id}</span>` +
+      `<button class="buy tiny" data-mute="${t.id}"${last ? ' disabled' : ''}>${on ? 'ON' : 'OFF'}</button></div>`;
   }).join('');
   const n = unlockedFightTracks(reached).length;
-  return `<div class="musichead">SOUNDTRACK — ${n} of ${FIGHT_POOL.length} fight tracks</div>${rows}`;
+  const nowName = TRACK_NAME[now];
+  return `<div class="musichead">SOUNDTRACK — ${n} of ${FIGHT_POOL.length} fight tracks</div>` +
+    (nowName && S.settings.music
+      ? `<div class="nowplaying">NOW PLAYING <b>${nowName}</b></div>`
+      : `<div class="nowplaying off">music is off</div>`) +
+    rows;
 }
 
 function openHelp() {
@@ -426,6 +492,7 @@ function openHelp() {
 function applySettings() {
   audio.setMusic(S.settings.music);
   audio.setSfx(S.settings.sfx);
+  haptic.setEnabled(S.settings.haptics);
   input.hand = S.settings.hand;
 }
 
@@ -466,4 +533,4 @@ boot().catch((err) => {
   setTimeout(() => { throw err; });
 });
 
-window.__ragdojo = { get save() { return S; }, get match() { return match; }, startFight, LEVELS, S };
+window.__ragdojo = { get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, LEVELS, S };

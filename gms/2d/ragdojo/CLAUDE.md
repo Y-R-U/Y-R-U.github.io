@@ -39,6 +39,7 @@ match.js      one fight: hit resolution, projectiles, hazards, camera, score
 hazards.js    the seven page events (pencil, eraser, coffee, wind, tear, rain, scribble)
 fx.js         particles, shake, hitstop, floating text, and the ink baked onto the page
 gestures.js   stroke -> gesture classifier + the glyph paths the shop animates
+haptic.js     vibration feedback — a no-op on desktop and iOS Safari
 input.js      static 4-way stick + tap/draw on the other half
 ui.js         HUD: health bars, move strip, stick, finger trail
 shop.js       upgrades, with each special's gesture animated as you look at it
@@ -57,6 +58,7 @@ node tools/uigate.mjs         # first-run coaching, the duck crouch, shop tab hi
 node tools/musicrota.mjs      # the roster must not repeat, within a run or across refreshes
 node tools/portraitgate.mjs   # portrait renders sideways and touch still maps correctly
 node tools/bootgate.mjs       # a stale/broken module set must report itself, not hang
+node tools/soundtrackgate.mjs # now-playing, auditioning a track, muting one, haptics fire
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -91,7 +93,13 @@ from its output, not by feel.
   `h.x`, and `ScribbleStorm` has no `x`, so levels 36, 42 and 44 quietly broke. Hazards now
   answer `threatX(x)` and `Fighter.move` refuses a non-finite `dir`. `tools/nangate.mjs` covers
   every hazard type. It also poisoned a whole A/B run before it was found — see below.
-- **Bodies are solid on the ground; jumping is the only way to cross sides** (`Match.separate`).
+- **Bodies are solid on the ground; jumping is the only way to cross sides** (`Match.separate`),
+  and that includes attacks that carry you forward. Two separate leaks had to be closed:
+  `separate()` used to exempt `lockMove` attacks, which let PENCIL DASH streak clean through
+  a standing body; and even with that gone, the dash's own momentum ploughed through the
+  body it had just floored, because a limp fighter is not solid. So `Match.land()` also
+  brakes a carry-forward charge (`def.dashV > 0`) on impact. The flips are unaffected —
+  they hop first, so they cross by leaving the ground like everything else.
   `BODY_R` is capped by attack reach, not by how the figures look: a jab puts the hand ~61u in
   front of the pelvis and separation is `BODY_R * (scaleA + scaleB)`, so at 26 the 1.3x-scale
   final boss sat 60u away and the player's basic attack could not reach him at all.
@@ -138,12 +146,23 @@ from its output, not by feel.
 - **Panels scroll internally, not as a whole** (`.sheet` is a flex column; only `.rows`/`.list`
   scroll). Scrolling the whole panel pushed the CONTINUE button off the bottom of a landscape
   phone. There is a `max-height: 470px` media query for the same reason.
+- **Pause is the only way out of a fight, so the way out lives in the settings panel**
+  (`#btnQuit`, shown only when `mode === 'fight'`), and a loss gets its own `MENU` button
+  beside TRY AGAIN. Without them a fight you could not win was a dead end.
+- **The soundtrack list is interactive**: it names what is playing, a row auditions that
+  track, and the ON/OFF beside it drops the track from the fight rotation (`save.musicOff`).
+  `fightPool()` falls back to the full unlocked list if every track is switched off, and the
+  last track still standing has its toggle disabled — silence is not a preference.
+- **Haptics are hooked where the player is involved, not on every hit.** `Match.land()` buzzes
+  only when the player is the attacker or the target; a gauntlet's enemies clobbering each
+  other would otherwise rattle the phone continuously. The Vibration toggle is hidden
+  entirely when `navigator.vibrate` is absent rather than shown as a dead switch.
 - Enemy-on-enemy hits deal 25% damage. At full damage the enemies finish gauntlets for you.
 - `?autoplay=1` is a real fight with an AI player; `demo` is the menu background match. They
   are different flags.
 
 ## Music
 
-Seven Suno v5.5 instrumental tracks in `assets/audio/`, wired through `js/music.js`.
+Fourteen Suno v5.5 instrumental tracks in `assets/audio/`, wired through `js/music.js`.
 See `docs/MUSIC.md` for the prompts and the regeneration recipe. Missing files are tolerated —
 `audio.js` stays silent for any id whose mp3 is absent, so the game runs fine without them.

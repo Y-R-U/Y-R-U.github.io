@@ -153,6 +153,17 @@ html, body {
 .rows .r.lockedrow { opacity: .45; }
 .musichead { font-size: 15px; letter-spacing: 1px; color: var(--ink-soft);
   margin: 12px 0 3px; border-bottom: 2px solid rgba(32,36,44,.3); padding-bottom: 2px; }
+.nowplaying { font-size: 15px; color: var(--blue); padding: 2px 0 4px; }
+.nowplaying b { font-family: var(--font-b); font-size: 19px; margin-left: 6px; }
+.nowplaying.off { color: var(--ink-soft); font-style: italic; }
+.rows .r.trackrow { align-items: center; cursor: pointer; padding: 2px 0; }
+.rows .r.trackrow:active { background: rgba(61,127,214,.12); }
+.rows .r.trackrow.playing { color: var(--blue); font-weight: 600; }
+.rows .r.trackrow.mutedrow span { opacity: .42; text-decoration: line-through; }
+.buy.tiny { font-size: 12px; padding: 1px 7px; border-width: 1.5px; min-width: 38px; }
+
+/* QUIT sits directly above ERASE ALL PROGRESS — keep them from touching. */
+#btnQuit { margin-bottom: 8px; }
 
 #pauseBtn { position: absolute; top: max(10px, env(safe-area-inset-top));
   left: 50%; transform: translateX(-50%); }

@@ -8,6 +8,7 @@ import {
 import { glyphPoints } from './gestures.js';
 import { stroke } from './ink.js';
 import { sfx } from './audio.js';
+import * as haptic from './haptic.js';
 
 let tickHandle = null;
 const glyphs = [];
@@ -68,6 +69,7 @@ export function buildShop(listEl, inkEl, S, onChange) {
       tabs.forEach((x) => x.classList.toggle('on', x === b));
       tab = b.dataset.tab;
       sfx.click();
+      haptic.tap();
       render();
     };
   });

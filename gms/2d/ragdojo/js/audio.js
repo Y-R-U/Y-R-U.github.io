@@ -146,6 +146,9 @@ function fade(a, to, secs, stopAfter = false) {
   step();
 }
 
+/** Whatever is playing (or would be, if music is off). */
+export function current() { return curTrack; }
+
 export function stopMusic() {
   if (curEl) { fade(curEl, 0, 0.35, true); curEl = null; }
 }

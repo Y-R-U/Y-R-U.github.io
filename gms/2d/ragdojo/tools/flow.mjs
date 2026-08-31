@@ -58,6 +58,31 @@ try {
   await c.frames(10);
   await c.shot(join(SHOTS, 'flow_results.png'));
 
+  // Escape routes. Both of these were missing: pause had no way out, and a loss offered
+  // nothing but TRY AGAIN, so a fight you could not win was a dead end.
+  await c.goto(`${srv.base}/index.html?auto=1&dpr=1&level=3`);
+  await c.waitFor('window.__state && window.__state.mode === "fight"', 20000);
+  await c.eval(`document.getElementById('btnPause').click()`);
+  await c.frames(6);
+  ok('pause opens the panel', await c.eval(vis('#settings')));
+  ok('pause offers QUIT TO MENU',
+    await c.eval(`!document.getElementById('btnQuit').classList.contains('hidden')`));
+  await c.eval(`document.getElementById('btnQuit').click()`);
+  await c.waitFor('window.__state && window.__state.mode === "hub"', 8000);
+  ok('quitting a fight returns to the hub', await c.eval(vis('#hub')));
+
+  await c.goto(`${srv.base}/index.html?auto=1&dpr=1&level=3`);
+  await c.waitFor('window.__state && window.__state.mode === "fight"', 20000);
+  await c.frames(20);
+  await c.eval(`window.__ragdojo.match.player.hurt(99999, {from:[0,0], kb:600, stagger:1})`);
+  await c.waitFor('document.getElementById("results").classList.contains("show")', 20000);
+  ok('losing shows the results screen', await c.eval(`document.getElementById('resTitle').textContent`) === 'KNOCKED OUT');
+  ok('a loss offers a way back to the menu',
+    await c.eval(`!document.getElementById('btnResMenu').classList.contains('hidden')`));
+  await c.eval(`document.getElementById('btnResMenu').click()`);
+  await c.waitFor('window.__state && window.__state.mode === "hub"', 8000);
+  ok('MENU after a loss returns to the hub', await c.eval(vis('#hub')));
+
   // Victory: jump to the final fight with a maxed save and kill the boss.
   await c.goto(`${srv.base}/index.html?auto=1&dpr=1&unlock=1&level=44`);
   await c.waitFor('window.__state && window.__state.mode === "fight"', 20000);
