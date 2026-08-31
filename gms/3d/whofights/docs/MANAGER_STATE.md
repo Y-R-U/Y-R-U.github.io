@@ -109,8 +109,30 @@ is giving `pose_ref.png` a head with a brow, nose and jaw.
 | Castle tone | Pale limestone stays. Per-object tone is **already a data field** (`zone` on every object); the editor gets a picker for it, labelled **tone**, not "zone". |
 | White cloak | **Instructor Vail**, a woman, voice `bf_emma`. Confirmed. |
 | FORGE shadows | Three options. Ultra shares High's soft filter. Done. |
-| Music source | **Suno** for the initial library — credits are not a constraint, over-generate and curate. **ACE-Step is the long-term route**, since the Suno subscription lapses; it must stay first-class and every track must be re-makeable from what `docs/MUSIC.md` records. |
+| Music source (superseded) | **Suno** for the initial library — credits are not a constraint, over-generate and curate. **ACE-Step is the long-term route**, since the Suno subscription lapses; it must stay first-class and every track must be re-makeable from what `docs/MUSIC.md` records. |
 | projects.js | Who Fights added, `wip: true`. `wip` removed from SKYHAMMER and Sunderfall. |
+
+## Music — settled 2026-08-31
+
+Chrome browser automation **works**; the earlier refusal was transient. Suno is reachable and
+logged in. Aaron, after listening to the ACE-Step library: *"the local ai music doesn't sound very
+good, it gets ok results sometimes, but should only be used (and will be far more work to use to
+get his results) when we don't have sunoai available."*
+
+So: **Suno is the source while the subscription lasts.** ACE-Step is the documented fallback for
+when it lapses, and stays working, but is not what ships. Credits are not a constraint — over-
+generate and curate.
+
+## Open items not yet assigned
+
+- **Nothing spawns a `body: "dummy"` character.** `js/world/people.js` builds hooded figures only,
+  and `Characters` has no scene handle for `js/world/dummy.js`. The schema, the rig, the skins and
+  the Skin tab all exist; only the spawn is missing. `normaliseCast` warns rather than failing
+  silently. Needs a world-layer agent.
+- **`hub.js toast()` dismisses a `bad` toast after 9 s**, while DEV_CONTRACT §11 and DEVTOOLS §4
+  say a failed save gets a red toast that does not auto-dismiss. Making `bad` permanent would pin
+  every validation nag from every tab, so this needs a distinct severity — a design decision for
+  Aaron, not a bug fix.
 
 ## Known problems
 

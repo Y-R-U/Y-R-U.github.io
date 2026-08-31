@@ -12,6 +12,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { rawFile, clipFile } from '../chars/vo.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const COPY = path.resolve(ROOT, '../.wf-convotest');
@@ -162,11 +163,17 @@ check(/data\//.test(await p.eval(`document.querySelector('#wf-dev .convo-editor 
 if (status.kokoro) {
   await p.eval(`document.querySelector('#wf-dev .convo-editor').scrollTop = 0`);
   await p.clickText('#wf-dev .convo-card.line button', 'Generate');
-  for (let i = 0; i < 60 && !fs.existsSync(path.join(COPY, `audio/vo/${CLIP}.wav`)); i++) await sleep(1000);
+  // Two files, in this order: kokoro's raw take under audio/vo/raw/, then the shipped clip the
+  // game actually fetches. Asserting only on a wav in audio/vo/ was how the tab spent a month
+  // writing uncompressed takes to a path nothing plays.
+  const raw = path.join(COPY, rawFile(CLIP));
+  const clip = path.join(COPY, clipFile(CLIP));
+  for (let i = 0; i < 90 && !fs.existsSync(clip); i++) await sleep(1000);
   await sleep(1500);
-  const wav = path.join(COPY, `audio/vo/${CLIP}.wav`);
-  const size = fs.existsSync(wav) ? fs.statSync(wav).size : 0;
-  check(size > 2000, `kokoro wrote ${CLIP}.wav (${size} bytes)`);
+  const rawSize = fs.existsSync(raw) ? fs.statSync(raw).size : 0;
+  const size = fs.existsSync(clip) ? fs.statSync(clip).size : 0;
+  check(rawSize > 2000, `kokoro wrote ${rawFile(CLIP)} (${rawSize} bytes)`);
+  check(size > 1000 && size < rawSize, `and it was encoded to ${clipFile(CLIP)} (${size} bytes)`);
   check((await pack())[NODE].lines[0].vo === CLIP, 'the clip name is written back onto the line');
   check(/clip up to date/.test(await p.eval(`document.querySelector('#wf-dev .convo-card.line').textContent`)),
     'and the line reports the clip as current');

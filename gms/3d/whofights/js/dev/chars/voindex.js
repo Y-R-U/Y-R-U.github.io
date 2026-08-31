@@ -1,10 +1,8 @@
 // The generated-clip ledger. Not a js/dev/data.js kind — that module is another agent's and its
 // KINDS table is fixed — so this one talks to the api directly and keeps its own save report.
 //
-// DEV_CONTRACT §8 puts the sidecar at audio/vo/index.json. The dev server will only write under
-// data/ (devserver.mjs dataPath), so the authoritative copy the tools read and write is
-// data/vo.json and `node tools/vo/gen_barks.mjs --sync` mirrors it out to audio/vo/index.json.
-// Flagged in the handoff report — one write route for audio/vo/ would collapse the two.
+// DEV_CONTRACT §8: the ledger is data/vo.json and there is only one of it. The dev server writes
+// nothing outside data/ (devserver.mjs dataPath), so that is the only path a browser can save to.
 
 import { INDEX_DOC, CODEC, rawFile, blankIndex, validateIndex, mergeClips } from './vo.js';
 
@@ -33,8 +31,15 @@ export async function saveIndex(api, doc) {
   const r = await api.save(INDEX_DOC, merged);
   if (r.ok) return { ok: true, where: 'server', path: r.path, problems };
   try { localStorage.setItem(LS, JSON.stringify(merged)); }
-  catch (e) { return { ok: false, error: `${r.error}; localStorage also failed: ${e.message}` }; }
-  return { ok: true, where: 'local', problems, note: r.error };
+  catch (e) { return { ok: false, where: 'local', problems,
+    error: `${r.error}; localStorage also failed: ${e.message}` }; }
+  // The draft is kept whatever went wrong, but only "there is no dev server" is a save. A server
+  // that answered and refused leaves data/vo.json as something other than what the tab is showing,
+  // and calling that ok:true is how a tool that has stopped saving goes on looking like one that is.
+  if (r.offline) return { ok: true, where: 'local', problems,
+    note: 'no dev server — kept in this browser only' };
+  return { ok: false, where: 'local', problems, error: r.error,
+    note: `the dev server refused it — kept in this browser only: ${r.error}` };
 }
 
 // What is genuinely on disk. An index entry whose file has been deleted must regenerate, and

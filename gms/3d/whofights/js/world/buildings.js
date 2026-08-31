@@ -480,7 +480,7 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = 
         b.add(S.trim, taperBox(dw + 2.25, 1.35, 0.33, dw + 1.95, 0.9), f.m.clone().multiply(T(0, plinth + dh + hood, t + 0.48)));
         for (const s of [-1, 1]) b.add(S.trim, new THREE.BoxGeometry(0.21, 1.13, 0.21), f.m.clone().multiply(T(s * (dw / 2 + 0.75), plinth + dh + hood - 0.6, t + 0.83)));
       }
-      if (hall) openLeaves(b, S, { m: f.m, dw, dh, t, floor: plinth });
+      if (hall) door.leaves = openLeaves(b, S, { m: f.m, dw, dh, t, floor: plinth, fz: d / 2 - t });
     }
     panel(b, S, { m: f.m, w: f.span, h: wallTop, t, openings });
   }
@@ -494,9 +494,14 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = 
   if (storeys === 2) {
     const by = plinth + (wallTop - plinth) * 0.5 - 0.53;
     if (!hall) b.add(S.trim, new THREE.BoxGeometry(w + 0.36, 0.33, d + 0.36), T(0, by, 0));
-    else for (const [bw, bd, bx, bz] of [[w + 0.36, 0.36, 0, (d + 0.36) / 2 - 0.18], [w + 0.36, 0.36, 0, -((d + 0.36) / 2 - 0.18)],
-                                         [0.36, d - 0.36, (w + 0.36) / 2 - 0.18, 0], [0.36, d - 0.36, -((w + 0.36) / 2 - 0.18), 0]]) {
-      b.add(S.trim, new THREE.BoxGeometry(bw, 0.33, bd), T(bx, by, bz));
+    else for (const [bw, bd, bx, bz, front] of [[w + 0.36, 0.36, 0, (d + 0.36) / 2 - 0.18, 1], [w + 0.36, 0.36, 0, -((d + 0.36) / 2 - 0.18), 0],
+                                                [0.36, d - 0.36, (w + 0.36) / 2 - 0.18, 0, 0], [0.36, d - 0.36, -((w + 0.36) / 2 - 0.18), 0, 0]]) {
+      // On the front the band sits a metre below the head of a six-metre arch, so run straight it
+      // is a stone bar hung across the doorway — the same fault the hall's base course had inside.
+      const cut = front && by - 0.165 < plinth + dh ? dw / 2 + 0.45 : 0;
+      for (const [u0, u1] of cut ? [[-bw / 2, -cut], [cut, bw / 2]] : [[-bw / 2, bw / 2]]) {
+        b.add(S.trim, new THREE.BoxGeometry(u1 - u0, 0.33, bd), T(bx + (u0 + u1) / 2, by, bz));
+      }
     }
   }
 
@@ -602,17 +607,40 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = 
   return finish(b, g, zoneId);
 }
 
-// Two leaves standing open into the room, hinged at the jambs. Static: nothing closes them.
-// 1.9 rad, not π/2: at a right angle a leaf stands square across the reveal and the doorway
-// reads half its width from outside.
-function openLeaves(b, S, { m, dw, dh, t, floor }) {
+// Two leaves standing open into the reveal, hinged at the jambs. Static: nothing closes them.
+// Boarded, ledged and studded — the same door interior.js hangs in the hall's own inner
+// doorways, drawn here with the outdoor kit's one timber surface.
+//
+// The swing was 1.9 rad, and past a right angle a leaf lies flat behind its own jamb: from the
+// road the arch read as empty. Returns each leaf's footprint in the building's frame so the room
+// can stand a collider in it.
+const LEAF_SWING = 1.25;
+
+function openLeaves(b, S, { m, dw, dh, t, floor, fz }) {
   const lw = dw / 2 - 0.06, lh = dh - 0.1;
-  const swing = 1.9;
+  const planks = 5, pw = lw / planks;
+  const out = [];
   for (const s of [-1, 1]) {
-    const hinge = m.clone().multiply(T(s * dw / 2, floor + lh / 2, t * 0.4, -s * swing));
-    b.add('wood', new THREE.BoxGeometry(lw, lh, 0.14), hinge.clone().multiply(T(-s * lw / 2, 0, 0)));
-    for (const y of [-lh * 0.3, lh * 0.3]) {
-      b.add(S.trim, new THREE.BoxGeometry(lw * 0.7, 0.13, 0.18), hinge.clone().multiply(T(-s * lw * 0.36, y, 0)));
+    const ry = -s * LEAF_SWING;
+    const hinge = m.clone().multiply(T(s * dw / 2, floor + lh / 2, t * 0.4, ry));
+    // `u` runs from the hinge along the leaf; the boarded face is the one that swings outward.
+    const at = (u, y, z) => hinge.clone().multiply(T(-s * u, y, z));
+    b.add('wood', new THREE.BoxGeometry(lw, lh, 0.07), at(lw / 2, 0, 0));
+    for (let i = 0; i < planks; i++) {
+      b.add('wood', new THREE.BoxGeometry(pw - 0.05, lh - 0.04, 0.10), at((i + 0.5) * pw, 0, 0.08));
     }
+    // Boards outside, ledges behind them: both faces of a leaf standing open are on show, and a
+    // flat back is the half a critic pass would call an unfinished slab.
+    for (const y of [-lh * 0.32, 0, lh * 0.32]) {
+      b.add(S.trim, new THREE.BoxGeometry(lw - 0.18, 0.16, 0.10), at(lw / 2, y, -0.08));
+      for (const u of [0.22, lw - 0.22]) b.add(S.trim, new THREE.BoxGeometry(0.13, 0.13, 0.13), at(u, y, 0.15));
+    }
+    b.add(S.trim, new THREE.TorusGeometry(0.20, 0.05, 4, 10), at(lw - 0.34, -lh * 0.14, 0.17));
+    const c = Math.cos(ry), sn = Math.sin(ry);
+    out.push({
+      x: s * (dw / 2 - (lw / 2) * c), z: fz + t * 0.4 + s * (lw / 2) * sn,
+      hw: lw / 2, hd: 0.16, ry, top: floor + lh,
+    });
   }
+  return out;
 }

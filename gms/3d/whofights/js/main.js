@@ -15,6 +15,8 @@ import { getScenario, allScenarios } from './scenarios.js';
 import { loadIndex, loadLevel, pickLevel } from './game/level.js';
 import { loadCast, Characters } from './game/characters.js';
 import { Session } from './game/session.js';
+import { parseAt, startPos } from './game/save.js';
+import { load } from './game/savestore.js';
 import { installMusic } from './game/music.js';
 import { gameHost } from './game/ui.js';
 import { bootMode, playing } from './game/boot.js';
@@ -34,7 +36,7 @@ const entry = pickLevel(index, params);
 const level = await loadLevel(entry.id);
 for (const w of level.warnings) console.warn(`level ${entry.id}: ${w}`);
 if (level.dropped) console.warn(`level ${entry.id}: dropped ${level.dropped} bad entries`);
-const { doc, saved } = startDoc(level.doc);
+const { doc, saved } = startDoc(level.doc, entry.id);
 
 const app = new App(document.getElementById('stage'));
 app.expose();
@@ -56,9 +58,15 @@ const doors = app.add(new Doors(world, player, lighting, [world.object3D]));
 app.add(player);
 app.add(new Props(world.terrain, []));
 
-player.pos.set(doc.start.x, 0, doc.start.z);
+// `?at=` is how gotoLevel hands the next level a doorway to arrive at, and the autosave's own
+// `at` is where the last session left him. Neither applies under ?shot= or in the editor, where
+// the authored start is what makes a render reproducible.
+const at = playing(mode)
+  ? startPos(doc.start, parseAt(params.get('at')), load()?.doc, doc.id)
+  : doc.start;
+player.pos.set(at.x, 0, at.z);
 player.pos.y = player.groundY(player.pos.x, player.pos.z);
-player.yaw = player.camYaw = player.moveYaw = doc.start.yaw;
+player.yaw = player.camYaw = player.moveYaw = at.yaw ?? doc.start.yaw;
 
 app.post = new Post(app);
 app.post.registerKnobs(app.quality);
@@ -116,7 +124,7 @@ async function play() {
     .catch(() => null);
   const names = Object.fromEntries(Object.entries(cast.cast).map(([id, c]) => [id, c.name]));
   const session = new Session(app, player, {
-    host, level: doc, characters, names,
+    host, level: doc, characters, names, world, doors,
     conversations: conversations?.nodes || {},
   });
   window.__wf.game = session;

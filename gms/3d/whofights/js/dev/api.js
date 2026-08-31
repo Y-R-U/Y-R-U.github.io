@@ -2,11 +2,21 @@
 // a tool that gets {ok:false} shows a banner, it does not break.
 
 const PORT = 8796;
+
+// The module talks to exactly three things outside itself. api.test.mjs swaps all three for fakes;
+// nothing in the app touches `env`.
+const env = {
+  fetch: (...a) => globalThis.fetch(...a),
+  place: typeof location !== 'undefined' ? location : null,
+  sleep: ms => new Promise(r => setTimeout(r, ms)),
+};
+
 const CANDIDATES = () => {
   const out = [];
-  if (typeof location !== 'undefined' && location.protocol.startsWith('http')) {
+  const loc = env.place;
+  if (loc && loc.protocol.startsWith('http')) {
     out.push('');
-    if (location.port !== String(PORT)) out.push(`${location.protocol}//${location.hostname}:${PORT}`);
+    if (loc.port !== String(PORT)) out.push(`${loc.protocol}//${loc.hostname}:${PORT}`);
   }
   out.push(`http://127.0.0.1:${PORT}`);
   return out;
@@ -24,7 +34,7 @@ async function fetchJSON(url, { method = 'GET', body, timeout = 8000 } = {}) {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), timeout);
   try {
-    const r = await fetch(url, {
+    const r = await env.fetch(url, {
       method,
       signal: ctl.signal,
       headers: body ? { 'Content-Type': 'application/json' } : undefined,
@@ -100,7 +110,14 @@ export const api = {
   music(job, onProgress) { return queued('/api/music', job, onProgress); },
   flux(job, onProgress) { return queued('/api/flux', job, onProgress); },
 
+  // /api/encode is a job like music and flux, but its two synchronous forms are not: {profiles:true}
+  // answers with the table and {promote} is a rename, so neither returns an id to poll.
+  encode(job, onProgress) { return queued('/api/encode', job, onProgress); },
+  encodeProfiles() { return call('/api/encode', { method: 'POST', body: { profiles: true }, timeout: 10000 }); },
+  promote(rel) { return call('/api/encode', { method: 'POST', body: { promote: rel }, timeout: 15000 }); },
+
   job(id) { return call(`/api/job/${encodeURIComponent(id)}`, { timeout: 5000 }); },
+  cancel(id) { return call(`/api/job/${encodeURIComponent(id)}/cancel`, { method: 'POST', timeout: 5000 }); },
   queue() { return call('/api/queue', { timeout: 5000 }); },
 };
 
@@ -113,7 +130,7 @@ async function queued(path, job, onProgress) {
   const id = start.job;
   let ticks = 0;
   for (;;) {
-    await sleep(ticks++ < 4 ? 700 : 2000);
+    await env.sleep(ticks++ < 4 ? 700 : 2000);
     const s = await api.job(id);
     if (!s.ok) return s;
     onProgress?.(s);
@@ -125,6 +142,12 @@ async function queued(path, job, onProgress) {
   }
 }
 
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+export function __setEnv(over = {}) {
+  Object.assign(env, over);
+  base = null;
+  resolving = null;
+  failedAt = 0;
+  last = { ok: false, devserver: false, kokoro: false, ace: false, flux: false };
+}
 
 export default api;

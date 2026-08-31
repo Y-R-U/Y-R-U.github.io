@@ -66,6 +66,19 @@ test('duplicate ids are re-issued rather than colliding', () => {
   eq(new Set(d.objects.map(o => o.id)).size, 2);
 });
 
+// Two hotspots on one id share a single fired/cooldown record in the runtime, so a `once` at one
+// end of the level silently spends its twin at the other.
+test('a duplicate hotspot id is renamed and reported', () => {
+  const shape = { k: 'circle', x: 0, z: 0, r: 2 };
+  const r = normalise({ ...base, hotspots: [
+    { id: 'hs.door', shape }, { id: 'hs.door', shape }, { id: 'hs.door', shape },
+  ] });
+  eq(r.doc.hotspots.map(h => h.id), ['hs.door', 'hs.door#2', 'hs.door#3']);
+  eq(r.warnings.length, 2);
+  ok(r.warnings[0].includes('duplicate hotspot id "hs.door"'));
+  eq(r.dropped, 0, 'renamed, not thrown away');
+});
+
 test('a hotspot needs a shape it can be inside, or an attach', () => {
   ok(!normaliseHotspot({ id: 'a' }));
   ok(!normaliseHotspot({ id: 'a', shape: { k: 'circle', x: 0, z: 0, r: 0 } }));

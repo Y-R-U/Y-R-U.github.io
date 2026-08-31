@@ -82,8 +82,8 @@ export class World {
 }
 
 // A saved scene must never change what a render shows, so `?shot=` always gets the authored file.
-export function startDoc(authored) {
+export function startDoc(authored, id = authored?.id) {
   if (new URLSearchParams(location.search).has('shot')) return { doc: authored, saved: null };
-  const saved = loadScene();
+  const saved = loadScene(id);
   return { doc: saved?.doc || authored, saved };
 }

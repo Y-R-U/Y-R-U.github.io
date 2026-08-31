@@ -134,7 +134,7 @@ function lineCard(line, i, E) {
       text: { fresh: 'clip up to date', stale: 'clip is older than this text', missing: 'no clip yet',
         unnamed: 'unnamed', unknown: 'clip on disk, hash unknown', novoice: 'speaker has no voice' }[state] }),
     h('button', { class: 'convo-mini', text: '▶', title: 'play the clip', disabled: !line.vo || !E.onDisk.has(line.vo),
-      onclick: () => E.playClip(line.vo) }),
+      onclick: () => E.playClip(line.vo, line.who) }),
     h('button', { class: 'convo-mini', text: 'Generate', disabled: !who?.voice,
       onclick: () => E.generateLine(i) }));
 

@@ -319,10 +319,23 @@ export function normalise(raw) {
   if (badType.size) warnings.push(`unknown type${badType.size > 1 ? 's' : ''}: ${[...badType].join(', ')}`);
   if (badZone.size) warnings.push(`unknown zone${badZone.size > 1 ? 's' : ''}: ${[...badZone].join(', ')}`);
 
+  // Two hotspots sharing an id would share one `fired`/`cooldown` record in the runtime, so a
+  // `once` in the yard would silently spend its twin in the hall. Renamed rather than dropped:
+  // both were authored deliberately, and the warning says which one moved.
   const hotspots = [];
+  const seenHs = new Set();
   for (const h of Array.isArray(raw.hotspots) ? raw.hotspots : []) {
     const hs = normaliseHotspot(h, hotspots.length);
-    if (hs) hotspots.push(hs); else dropped++;
+    if (!hs) { dropped++; continue; }
+    if (seenHs.has(hs.id)) {
+      const was = hs.id;
+      let n = 2;
+      while (seenHs.has(`${was}#${n}`)) n++;
+      hs.id = `${was}#${n}`;
+      warnings.push(`duplicate hotspot id "${was}" — the second is now "${hs.id}"`);
+    }
+    seenHs.add(hs.id);
+    hotspots.push(hs);
   }
 
   const start = {

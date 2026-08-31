@@ -16,6 +16,7 @@ export class Input {
     this.sprint = false;
     this.stickSprint = false;
     this.flip = false;
+    this.locked = false;
 
     this.keys = new Set();
     this.pointers = new Map();
@@ -131,7 +132,13 @@ export class Input {
     this.el.knob.classList.remove('sprint');
   }
 
+  // Set every frame from whether something else is driving the player, never latched: a lock
+  // nobody clears is a game that has stopped accepting input, which is worse than what it fixes.
+  lock(v) { this.locked = !!v; }
+
   // Called once per frame by the player; keyboard folds into the same vector the stick fills.
+  // A locked read still drains — a look delta that piled up behind the lock would arrive as one
+  // whip the frame control came back.
   read() {
     const k = this.keys;
     if (this.stickId === null) {
@@ -142,7 +149,8 @@ export class Input {
       this.move.y = y / l * Math.min(1, Math.hypot(x, y));
     }
     this.sprint = k.has('ShiftLeft') || k.has('ShiftRight') || this.stickSprint;
-    const out = { mx: this.move.x, my: this.move.y, lx: this.look.x, ly: this.look.y, attack: this.attackEdge, sprint: this.sprint };
+    const out = this.locked ? { mx: 0, my: 0, lx: 0, ly: 0, attack: false, sprint: false }
+      : { mx: this.move.x, my: this.move.y, lx: this.look.x, ly: this.look.y, attack: this.attackEdge, sprint: this.sprint };
     this.look.x = this.look.y = 0;
     this.attackEdge = false;
     return out;

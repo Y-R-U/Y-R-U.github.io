@@ -204,11 +204,20 @@ for anything driven by a slider or a keystroke, so one drag is one undo.
 
 ### Saving, and knowing whether it landed
 
-`save()` writes through the dev server when it is up. When it is not, it writes to localStorage and
-returns `{ok:true, where:'local', note:'no dev server — saved in this browser only'}` — and the
-document **stays dirty**, because the file on disk did not change. The header says
-`1 in this browser only · characters` for that, and `1 unsaved` for a genuine unsaved edit. If both
-fail you get `{ok:false, error}` and a red toast that does not auto-dismiss.
+`save()` writes through the dev server when it is up. When there is **no dev server** it writes to
+localStorage and returns `{ok:true, where:'local', note:'no dev server — saved in this browser
+only'}` — and the document **stays dirty**, because the file on disk did not change. The header
+says `1 in this browser only · characters` for that, and `1 unsaved` for a genuine unsaved edit.
+
+A dev server that answered and **refused** the write — a path outside `data/`, `EACCES`, a full
+disk — is not that. It comes back `{ok:false, where:'local', error, note}`: the draft is still kept
+so nothing is lost, but the save failed and the toast is red. Only `r.offline` is `ok:true`. If
+localStorage fails as well you get `{ok:false, error}` naming both. Never treat `where:'local'` as
+success on its own — read `ok`.
+
+`note` carries the reason in every local case, and the hub prints it. A tool that shows the same
+sentence for "no dev server" and "the server refused it" is a tool that has stopped saving while
+looking like one that is saving.
 
 Every tool that edits data must show the result of its last save. `data.onSave` and the header
 indicator do it for free; do not add a save button that discards the return value.

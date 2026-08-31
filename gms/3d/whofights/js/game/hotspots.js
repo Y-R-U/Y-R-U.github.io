@@ -54,29 +54,46 @@ export class Hotspots {
     return out;
   }
 
-  // The player pressed the interact button, or tapped this hotspot. Only the nearest one that is
-  // both in range and allowed answers, so a doorway and the person standing in it do not both go.
-  press(p, kinds = ['interact', 'click']) {
-    let best = null, bd = Infinity;
+  // Everything fire() tests bar actually running the actions. A locked door and the open door
+  // behind it are authored on the same circle with opposite predicates, so the nearest hotspot is
+  // routinely one that cannot fire — the press has to look past it, and the prompt has to agree.
+  allowed(h) {
+    const st = this.state.get(h.id);
+    if (!st) return false;
+    if (h.once && st.fired) return false;
+    if (st.cool > 0) return false;
+    return evalPred(h.if, this.ctx.world?.() ?? this.ctx);
+  }
+
+  // Which hotspots of these triggers a press at `p` could answer, nearest first.
+  candidates(p, kinds = ['interact', 'click']) {
+    const near = [];
     for (const h of this.list) {
       if (!kinds.includes(h.trigger)) continue;
       const shape = this.shapeOf(h);
       if (!shape || !p || !inShape(shape, p.x, p.z)) continue;
+      if (!this.allowed(h)) continue;
       const cx = shape.k === 'circle' ? shape.x : (shape.x0 + shape.x1) / 2;
       const cz = shape.k === 'circle' ? shape.z : (shape.z0 + shape.z1) / 2;
-      const d = (p.x - cx) ** 2 + (p.z - cz) ** 2;
-      if (d < bd) { bd = d; best = h; }
+      near.push([(p.x - cx) ** 2 + (p.z - cz) ** 2, h]);
     }
-    if (!best) return null;
-    return this.fire(best, this.state.get(best.id)) ? best.id : null;
+    return near.sort((a, b) => a[0] - b[0]).map(e => e[1]);
   }
+
+  // The player pressed the interact button, or tapped this hotspot. Only one answers, so a
+  // doorway and the person standing in it do not both go.
+  press(p, kinds) {
+    const h = this.candidates(p, kinds)[0];
+    return h && this.fire(h, this.state.get(h.id)) ? h.id : null;
+  }
+
+  // The name of what a press would answer right now, or null.
+  prompt(p, kinds) { return this.candidates(p, kinds)[0]?.name ?? null; }
 
   // `once` and `cooldown` are checked before `if`, so a predicate that is false does not burn the
   // one shot a `once` hotspot has.
   fire(h, st) {
-    if (h.once && st.fired) return false;
-    if (st.cool > 0) return false;
-    if (!evalPred(h.if, this.ctx.world?.() ?? this.ctx)) return false;
+    if (!this.allowed(h)) return false;
     st.fired++;
     st.cool = h.cooldown || 0;
     const results = runActions(h.actions, this.ctx);

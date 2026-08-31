@@ -4,26 +4,27 @@
 //
 //   node tools/devserver.mjs &                     # this needs the dev server for kokoro
 //   node tools/vo/gen_barks.mjs --dry              # what would be generated, and why
-//   node tools/vo/gen_barks.mjs                    # generate what changed, then sync the mirror
+//   node tools/vo/gen_barks.mjs                    # generate what changed
 //   node tools/vo/gen_barks.mjs --who=greeter --cat=idle,greet --force
-//   node tools/vo/gen_barks.mjs --sync             # only rewrite audio/vo/index.json
 //   node tools/vo/gen_barks.mjs --prune            # list index entries whose line is gone
 //   node tools/vo/gen_barks.mjs --encode           # encode whatever has no mp3 yet
 //   node tools/vo/gen_barks.mjs --reencode --profile=voice-opus-hi   # again, from the raws
 //
-// What ships is audio/vo/<key>.mp3. The kokoro take is kept at audio/vo/raw/<key>.wav — gitignored,
+// What ships is audio/vo/<key>.ogg (js/game/clip.js CODEC). The kokoro take is kept at
+// audio/vo/raw/<key>.wav — gitignored,
 // and there only so a clip can be re-encoded at another bitrate without paying for kokoro again.
 // Encoding is the dev server's POST /api/encode (the sound agent's route) on its own CPU queue —
 // not ffmpeg here, so there is one place the profiles are defined and one place they change.
 //
-// data/vo.json is the ledger the tools read and write (the dev server only writes under data/);
-// audio/vo/index.json is its mirror, which is where DEV_CONTRACT §8 says the sidecar lives.
+// data/vo.json is the ledger, and the only one — the dev server writes under data/ and so does the
+// browser, so a second copy under audio/vo/ could only ever go stale. DEV_CONTRACT §8.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { planJobs, applyResults, pruneIndex, blankIndex, validateIndex, mergeClips, needsEncoding,
-  clipFile, rawFile, CODEC, INDEX_DOC, INDEX_MIRROR, VO_DIR, RAW_DIR } from '../../js/dev/chars/vo.js';
+import { planJobs, applyResults, pruneIndex, blankIndex, mergeClips, needsEncoding,
+  clipFile, rawFile, CODEC, INDEX_DOC, VO_DIR, RAW_DIR } from '../../js/dev/chars/vo.js';
+import { waitJob } from './job.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const PORT = +(process.env.WF_DEV_PORT || 8796);
@@ -64,20 +65,11 @@ async function encode(keys, { profile = CODEC.profile } = {}) {
     }
     if (!fs.existsSync(src)) { failed.push({ key, error: `no raw take at ${rawFile(key)}` }); continue; }
     const r = await post('/api/encode', { src: rawFile(key), profile, out: key }, 120000);
-    const j = r.ok && r.job ? await waitJob(r.job) : r;
+    const j = r.ok && r.job ? await waitJob(BASE, r.job) : r;
     if (!j.ok || j.state === 'error') { failed.push({ key, error: j.error || j.note || 'encode failed' }); continue; }
     done.push({ key, bytes: j.after?.bytes ?? 0, from: j.source?.bytes ?? fs.statSync(src).size });
   }
   return { done, failed };
-}
-
-async function waitJob(id) {
-  for (let i = 0; i < 600; i++) {
-    const s = await fetch(`${BASE}/api/job/${id}`).then(r => r.json()).catch(() => null);
-    if (s && (s.state === 'done' || s.state === 'error')) return s;
-    await new Promise(r => setTimeout(r, i < 6 ? 250 : 1000));
-  }
-  return { ok: false, error: 'gave up waiting for the encode job' };
 }
 
 function markEncoded(index, done) {
@@ -104,33 +96,18 @@ function onDiskSet() {
   } catch { return new Set(); }
 }
 
-// Always mirrors what is on disk, never what this run happened to hold.
-function sync() {
-  const index = read(INDEX_DOC) || blankIndex();
-  const problems = validateIndex(index);
-  if (problems.length) {
-    console.error(`refusing to mirror a broken index:\n  ${problems.join('\n  ')}`);
-    process.exit(1);
-  }
-  write(INDEX_MIRROR, index);
-  console.log(`mirrored ${Object.keys(index.clips).length} clips → ${INDEX_MIRROR}`);
-}
-
 const cast = read('data/characters.json')?.characters;
 const barks = read('data/barks.json');
 if (!cast || !barks) { console.error('data/characters.json or data/barks.json is missing'); process.exit(1); }
 let index = read(INDEX_DOC) || blankIndex();
 
-if (flag('sync')) { sync(); process.exit(0); }
-
 if (flag('encode') || flag('reencode')) {
   const keys = flag('reencode') ? Object.keys(index.clips || {}) : needsEncoding(index).map(n => n.key);
-  if (!keys.length) { console.log('nothing to encode'); sync(); process.exit(0); }
+  if (!keys.length) { console.log('nothing to encode'); process.exit(0); }
   const profile = opt('profile') || CODEC.profile;
   const { done, failed } = await encode(keys, { profile });
   index = markEncoded(index, done);
   writeLedger(index);
-  sync();
   const from = done.reduce((s2, d) => s2 + d.from, 0), to = done.reduce((s2, d) => s2 + d.bytes, 0);
   console.log(`encoded ${done.length} clips as ${profile}: ${(from / 1e6).toFixed(1)} MB of wav → ${(to / 1e6).toFixed(2)} MB shipped`);
   for (const f of failed) console.error(`  FAILED ${f.key}: ${f.error}`);
@@ -148,7 +125,6 @@ if (flag('prune')) {
   console.log(orphans.map(o => `${o.key}  ${o.file}`).join('\n'));
   console.log(`\n${orphans.length} entries whose line no longer exists. The wav files are NOT deleted.`);
   writeLedger(next);
-  sync();
   process.exit(0);
 }
 
@@ -160,7 +136,7 @@ if (flag('dry')) {
   for (const j of plan.jobs) console.log(`  ${j.why.padEnd(12)} ${j.key.padEnd(34)} ${j.voice} @${j.ttsSpeed}  ${j.text}`);
   process.exit(0);
 }
-if (!plan.jobs.length) { sync(); process.exit(0); }
+if (!plan.jobs.length) process.exit(0);
 
 const up = await fetch(`${BASE}/api/status`).then(r => r.json()).catch(() => null);
 if (!up?.devserver) { console.error(`no dev server at ${BASE} — run node tools/devserver.mjs`); process.exit(1); }
@@ -185,7 +161,6 @@ for (let n = 0; n < plan.jobs.length; n += CHUNK) {
     + (applied.failed.length ? `, ${applied.failed.length} refused` : '')
     + (enc.failed.length ? `, ${enc.failed.length} not encoded` : ''));
 }
-sync();
 console.log(`\n${plan.jobs.length - failed.length}/${plan.jobs.length} in ${((Date.now() - t0) / 1000).toFixed(0)}s`);
 // kokoro_say.py refuses a silent or too-short take. Those lines are defects in the script, not in
 // the audio pipeline, so they are printed rather than retried.

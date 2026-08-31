@@ -1,12 +1,17 @@
 // The play session: the save document, the settings, the pause menu, the hotspot runtime and the
 // dialogue bubble. Nothing here is constructed under ?shot= or in the editor (js/game/boot.js §0).
 
-import { el, clear, toast } from './ui.js';
+import { toast } from './ui.js';
 import { Menu } from './menu.js';
+import { Hud } from './hud.js';
 import { DialogueBox } from './dialoguebox.js';
+import { Anchors } from './bubble.js';
+import { Voice } from './voice.js';
+import { Noticeboard, nudge } from './noticeboard.js';
+import { WorldTap } from './worldtap.js';
 import { Hotspots } from './hotspots.js';
 import { runActions } from './actions.js';
-import { blank } from './save.js';
+import { blank, docView } from './save.js';
 import { load, Autosave } from './savestore.js';
 import { resolve, setDial, pickPreset, autoChoice, DIALS, AUTO_AFTER } from './graphics.js';
 
@@ -24,16 +29,34 @@ export class Session {
     this.doc.level = this.doc.level || this.level.id;
 
     this.bus = new EventTarget();
-    this.ctx = {
-      flags: this.doc.flags,
+    // Object.assign, not a spread: a spread would read docView's getters once and hand the
+    // context the very objects it exists to stop it holding.
+    this.ctx = Object.assign(docView(() => this.doc), {
       say: id => this.say(id),
       goto: (id, at) => this.gotoLevel(id, at),
       emit: (name, data) => this.bus.dispatchEvent(new CustomEvent(name, { detail: data })),
       characterAt: id => this.characters?.at(id) || null,
-      world: () => ({ flags: this.doc.flags, items: this.doc.items, quests: this.doc.quests }),
-    };
+      screen: id => this.showScreen(id),
+    });
 
     this.hotspots = new Hotspots(this.level.hotspots || [], this.ctx);
+
+    this.board = new Noticeboard({
+      host: this.host,
+      flags: () => this.doc.flags,
+      onOpen: id => { if (id === 'board.new') nudge(this.host); },
+    });
+
+    this.voice = new Voice({
+      cast: this.characters?.cast || {},
+      settings: () => this.doc.settings,
+    });
+
+    this.anchors = new Anchors({
+      app,
+      characters: this.characters,
+      obstacles: [opts.world?.object3D, opts.doors?.object3D].filter(Boolean),
+    });
 
     this.dialogue = new DialogueBox({
       host: this.host,
@@ -41,6 +64,8 @@ export class Session {
       names: opts.names || {},
       ctx: () => this.ctx.world(),
       effects: sets => runActions(sets, this.ctx),
+      anchors: this.anchors,
+      voice: this.voice,
     });
     this.dialogue.load(opts.conversations || {});
 
@@ -60,21 +85,23 @@ export class Session {
       onClose: () => { this.paused = false; document.body.classList.remove('paused'); },
     });
 
-    this.buildHud();
+    this.hud = new Hud({
+      host: this.host,
+      onMenu: () => this.menu.toggle(),
+      onInteract: () => this.interact(),
+    });
+
+    // A tap in the 3D view fires whichever `click` hotspot contains the point the ray landed on,
+    // which is what makes the boards tappable from across the hall as well as from arm's length.
+    this.tap = new WorldTap({
+      app,
+      stage: document.getElementById('stage'),
+      blocked: () => this.menu.open || this.board.open || this.dialogue.active,
+      onPoint: p => this.hotspots.press(p, ['click']),
+    });
+
     this.applySettings();
     this.autosave = new Autosave(() => this.snapshot());
-  }
-
-  buildHud() {
-    const bar = el('div', 'g-bar-top');
-    const pause = el('button', 'g-round', '≡');
-    pause.setAttribute('aria-label', 'Menu');
-    pause.onclick = () => this.menu.toggle();
-    bar.append(pause);
-    this.prompt = el('div', 'g-prompt');
-    this.prompt.hidden = true;
-    this.prompt.onclick = () => this.interact();
-    this.host.append(bar, this.prompt);
   }
 
   snapshot() {
@@ -122,9 +149,11 @@ export class Session {
   }
 
   say(nodeId) {
-    if (!this.dialogue.play(nodeId)) return false;
-    return true;
+    if (this.board.open) this.board.close();
+    return !!this.dialogue.play(nodeId);
   }
+
+  showScreen(id) { return this.board.show(id); }
 
   gotoLevel(id, at) {
     const url = new URL(location.href);
@@ -147,33 +176,15 @@ export class Session {
   update(dt) {
     if (this.menu.open) return;
     this.dialogue.tick?.(dt);
-    if (!this.dialogue.active) this.hotspots.update(dt, this.player.pos);
-    this.showPrompt();
+    const busy = this.dialogue.active || this.board.open;
+    if (!busy) this.hotspots.update(dt, this.player.pos);
+    this.hud.setPrompt(busy ? null : this.reachable());
     this.autoDetect(dt);
     this.doc.played += dt;
     this.autosave.tick(dt);
   }
 
-  // The only HUD element that changes: a tap target appears exactly when something is in reach.
-  showPrompt() {
-    const near = !this.dialogue.active && this.reachable();
-    if (near === this.promptFor) return;
-    this.promptFor = near;
-    this.prompt.hidden = !near;
-    if (near) clear(this.prompt).append(el('b', null, near));
-  }
-
-  reachable() {
-    for (const h of this.hotspots.list) {
-      if (h.trigger !== 'interact' && h.trigger !== 'click') continue;
-      const shape = this.hotspots.shapeOf(h);
-      if (!shape) continue;
-      const p = this.player.pos;
-      const cx = shape.k === 'circle' ? shape.x : (shape.x0 + shape.x1) / 2;
-      const cz = shape.k === 'circle' ? shape.z : (shape.z0 + shape.z1) / 2;
-      const r = shape.k === 'circle' ? shape.r : Math.max(shape.x1 - shape.x0, shape.z1 - shape.z0) / 2;
-      if ((p.x - cx) ** 2 + (p.z - cz) ** 2 <= r * r) return h.name;
-    }
-    return null;
-  }
+  // The prompt names whatever pressing would actually answer — same geometry, same predicates,
+  // same `once` and cooldown as press(). A second copy of that test drifted from it at once.
+  reachable() { return this.hotspots.prompt(this.player.pos); }
 }

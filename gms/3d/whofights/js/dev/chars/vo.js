@@ -1,30 +1,30 @@
 // Voice-over bookkeeping for the character tab and tools/vo/gen_barks.mjs. Pure — no DOM, no
 // three, no fetch — so both callers share one implementation and node tools/test.mjs can cover it.
 //
-// DEV_CONTRACT §8: clips are audio/vo/<characterId>__<category>__<nn>.wav and the sidecar maps
+// DEV_CONTRACT §8: clips are audio/vo/<characterId>__<category>__<nn> + CODEC.ext (the contract
+// says .wav; the compression pass moved the takes to audio/vo/raw/ and ships opus). The sidecar maps
 // {characterId, category, i} → {file, text, voice, speed, hash}. `hash` is over text|voice|speed|
 // pitch, which is what lets Generate-all skip a line nothing has touched.
+
+// CODEC and pitchRate live with the decoder that applies them (js/game/clip.js), so the extension
+// the tools write and the extension the game fetches cannot drift — they have three times already
+// — and the pitch a take is synthesised at cannot drift from the rate it is resampled at.
+import { CODEC, pitchRate } from '../../game/clip.js';
+export { CODEC, pitchRate };
 
 export const BARK_CATEGORIES = ['idle', 'greet', 'farewell', 'curious', 'grumble', 'success',
   'failure', 'hurt', 'combat', 'spot', 'thanks', 'refuse', 'wander', 'weather'];
 
 export const VO_DIR = 'audio/vo';
 export const RAW_DIR = 'audio/vo/raw';
-// The dev server's /api/encode owns the ffmpeg arguments; this only names the profile and the
-// extension it produces. Opus at 24 kbps measures 17x smaller than the wav on a speech take, twice
-// what mp3 manages at the same listening quality. `voice` (mp3) is the fallback if Opus-in-Ogg ever
-// fails a browser's decodeAudioData, which is the call play.js makes to apply pitch.
-export const CODEC = { profile: 'voice-opus', ext: '.ogg' };
+// The one ledger. The dev server writes only under data/ and so does the browser, so a mirror
+// under audio/vo/ could only ever be the stale copy. DEV_CONTRACT §8.
 export const INDEX_DOC = 'data/vo.json';
-export const INDEX_MIRROR = 'audio/vo/index.json';
 
 const clamp = (v, lo, hi, d) => (Number.isFinite(+v) ? Math.min(hi, Math.max(lo, +v)) : d);
 export const speedOf = c => clamp(c?.voiceSpeed, 0.7, 1.3, 1);
 export const pitchOf = c => clamp(c?.voicePitch, -4, 4, 0);
 
-// Pitch is a playback resample, so it also stretches time. The take is synthesised at the inverse
-// speed and the shift puts the duration back — see docs/HANDOFF notes and the tab's own caption.
-export const pitchRate = semitones => Math.pow(2, clamp(semitones, -4, 4, 0) / 12);
 export const synthSpeed = (speed, pitch) =>
   Math.round(Math.min(2, Math.max(0.5, speed / pitchRate(pitch))) * 10000) / 10000;
 
@@ -148,6 +148,12 @@ export function pruneIndex(index, live) {
 // fold only that key in, so a section another tab added between our load and our save survives.
 export function mergeClips(current, mine) {
   return { ...(current || {}), version: 1, clips: { ...(mine?.clips || {}) } };
+}
+
+// The other half of the same rule, for tools/vo/gen_lines.mjs: `lines` is its section and nothing
+// else, so a bark run that finished mid-way through a line run keeps its clips.
+export function mergeLines(current, lines) {
+  return { ...(current || {}), version: 1, lines: { ...(lines || {}) } };
 }
 
 export function validateIndex(doc) {

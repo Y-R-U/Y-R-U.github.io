@@ -21,6 +21,35 @@ export const DEFAULTS = {
 };
 
 const num = (v, def) => (Number.isFinite(+v) ? +v : def);
+
+// The action and predicate layers' view of the live save. Getters rather than captured
+// references: loading a slot in the debug Save panel replaces `flags`, `items` and `quests`
+// wholesale, and a context holding the old objects writes flags nothing ever reads again.
+export function docView(get) {
+  return {
+    get flags() { return get().flags; },
+    world: () => {
+      const d = get();
+      return { flags: d.flags, items: d.items, quests: d.quests };
+    },
+  };
+}
+
+// `?at=x,z,yaw` — how gotoLevel hands the next level a doorway to arrive at.
+export function parseAt(s) {
+  if (typeof s !== 'string') return null;
+  const p = s.split(',').map(Number);
+  if (p.length < 2 || p.length > 3 || !p.every(Number.isFinite)) return null;
+  return { x: p[0], z: p[1], yaw: p[2] ?? 0 };
+}
+
+// Where the player stands at boot. An explicit `at` wins, then where the save left him if that
+// save was made in this level, then the level's own start.
+export function startPos(start, at, saved, levelId) {
+  if (at) return at;
+  if (saved?.at && saved.level && saved.level === levelId) return saved.at;
+  return start;
+}
 const clamp = (v, lo, hi, def) => Math.min(hi, Math.max(lo, num(v, def)));
 
 export function blank(t = 0) {

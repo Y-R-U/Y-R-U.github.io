@@ -132,6 +132,10 @@ export class Player {
   }
 
   update(dt, app) {
+    // Recomputed here every frame rather than switched on and off by whoever takes the player
+    // over: `driven` going false for any reason at all — the script finishing, aborting, throwing,
+    // the player being teleported — gives control back on the next frame with nothing to clear.
+    this.input.lock(this.enabled && !this.free && this.driven);
     // Editor mode switches the player off and expects the orbit camera back, so idle means orbit
     // rather than a frozen view. Scenario shots detach `controls` instead — see main.js.
     // read() self-drains, and a drag the orbit camera owned must not be waiting to be applied

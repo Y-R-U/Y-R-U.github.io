@@ -14,8 +14,19 @@ const ctx = () => {
   };
 };
 
+// `screen` is this project's one addition to §10 — the contract boards had no verb that opens a
+// screen. Reported to the manager for the contract; everything else is the contract's own list.
 test('every contract verb is registered', () => {
-  eq(VERB_IDS.sort(), ['bark', 'event', 'flag', 'goto', 'music', 'say'].sort());
+  eq(VERB_IDS.sort(), ['bark', 'event', 'flag', 'goto', 'music', 'say', 'screen'].sort());
+});
+
+test('screen needs an id and hands it to the session', () => {
+  const seen = [];
+  const c = { screen: id => seen.push(id) };
+  eq(runAction({ k: 'screen', id: 'board.iron' }, c), { k: 'screen', ok: true });
+  eq(seen, ['board.iron']);
+  eq(runAction({ k: 'screen' }, c).ok, false);
+  eq(validateAction({ k: 'screen' }), ['action: screen needs a "id" string']);
 });
 
 test('flag writes into the context, defaulting to true', () => {

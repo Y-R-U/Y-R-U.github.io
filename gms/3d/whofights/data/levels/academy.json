@@ -454,6 +454,86 @@
           "node": "academy.door.dorm"
         }
       ]
+    },
+    {
+      "id": "hs.board.iron",
+      "name": "Read the Iron Contracts board",
+      "shape": {
+        "k": "circle",
+        "x": -10.8,
+        "z": -29.6,
+        "r": 3.2
+      },
+      "trigger": "click",
+      "once": false,
+      "cooldown": 0.4,
+      "if": null,
+      "actions": [
+        {
+          "k": "screen",
+          "id": "board.iron"
+        }
+      ]
+    },
+    {
+      "id": "hs.board.bronze",
+      "name": "Read the Bronze Contracts board",
+      "shape": {
+        "k": "circle",
+        "x": -3.6,
+        "z": -29.6,
+        "r": 3.2
+      },
+      "trigger": "click",
+      "once": false,
+      "cooldown": 0.4,
+      "if": null,
+      "actions": [
+        {
+          "k": "screen",
+          "id": "board.bronze"
+        }
+      ]
+    },
+    {
+      "id": "hs.board.gold",
+      "name": "Read the Gold Contracts board",
+      "shape": {
+        "k": "circle",
+        "x": 3.6,
+        "z": -29.6,
+        "r": 3.2
+      },
+      "trigger": "click",
+      "once": false,
+      "cooldown": 0.4,
+      "if": null,
+      "actions": [
+        {
+          "k": "screen",
+          "id": "board.gold"
+        }
+      ]
+    },
+    {
+      "id": "hs.board.new",
+      "name": "Read the New Adventures board",
+      "shape": {
+        "k": "circle",
+        "x": 10.8,
+        "z": -29.6,
+        "r": 3.2
+      },
+      "trigger": "click",
+      "once": false,
+      "cooldown": 0.4,
+      "if": null,
+      "actions": [
+        {
+          "k": "screen",
+          "id": "board.new"
+        }
+      ]
     }
   ],
   "shots": [

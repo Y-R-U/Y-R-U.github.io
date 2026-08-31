@@ -80,7 +80,7 @@ export function playPanel(E) {
     stage.append(h('div', { class: 'row' },
       h('button', { class: 'primary', text: 'Next ▸', onclick: step }),
       h('button', { text: 'Skip to choices', onclick: () => { state.scene = skip(state.scene, pctx()); draw(); } })));
-    if (state.vo && line.vo && E.onDisk.has(line.vo)) E.playClip(line.vo);
+    if (state.vo && line.vo && E.onDisk.has(line.vo)) E.playClip(line.vo, line.who);
     say('', `${who?.name || line.who}: ${line.text}`);
   }
 

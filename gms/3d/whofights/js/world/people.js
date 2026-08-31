@@ -619,9 +619,9 @@ export class People {
           a.heading += a.turn * dt * Math.sin(this.time * 0.17 + a.gait);
           const wx = a.x + Math.sin(a.heading) * a.speed * dt;
           const wz = a.z + Math.cos(a.heading) * a.speed * dt;
-          // An indoor body is inside a collider box the whole time — walkStep would shove it out
-          // through the wall it is standing behind.
-          const step = a.indoor ? { x: wx, z: wz, hit: false } : walkStep(a.x, a.z, wx, wz, a.y ?? 0, 0.3);
+          // An indoor body stands inside its own building's footprint, so that one box is skipped
+          // by id — everything else in the room, its furniture included, still stops it.
+          const step = walkStep(a.x, a.z, wx, wz, a.y ?? 0, 0.3, a.indoor | 0);
           a.x = step.x; a.z = step.z;
           const b = a.box;
           const out = a.x < b[0] || a.x > b[1] || a.z < b[2] || a.z > b[3];

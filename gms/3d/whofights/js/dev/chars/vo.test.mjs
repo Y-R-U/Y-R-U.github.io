@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { hashLine, clipKey, clipFile, rawFile, pitchRate, synthSpeed, effectiveBarks,
   overriddenCategories, planJobs, applyResults, pruneIndex, validateIndex, validateBarks,
-  countBarks, needsEncoding, playableFile, BARK_CATEGORIES } from './vo.js';
+  countBarks, needsEncoding, playableFile, mergeClips, mergeLines, BARK_CATEGORIES } from './vo.js';
 
 const root = new URL('../../../', import.meta.url);
 const readDoc = p => JSON.parse(readFileSync(fileURLToPath(new URL(p, root)), 'utf8'));
@@ -192,4 +192,15 @@ test('the shipped cast plans a sane run against the shipped pool', () => {
   ok(p.jobs.some(j => j.who === 'greeter' && j.text.startsWith('You must be the new one')),
     "Vail's own greeting is in the plan");
   ok(p.jobs.every(j => j.ttsSpeed >= 0.5 && j.ttsSpeed <= 2), 'every speed is inside kokoro range');
+});
+
+test('the two ledger writers keep out of each other\'s section', () => {
+  const onDisk = { version: 1, clips: { 'vail__idle__01': { hash: 'a' } }, lines: { hello_01: { hash: 'b' } } };
+  eq(mergeLines(onDisk, { hello_01: { hash: 'c' } }),
+    { version: 1, clips: { 'vail__idle__01': { hash: 'a' } }, lines: { hello_01: { hash: 'c' } } },
+    'gen_lines rewrites lines and leaves the barks alone');
+  eq(mergeClips(onDisk, { clips: { 'vail__idle__01': { hash: 'd' } } }),
+    { version: 1, clips: { 'vail__idle__01': { hash: 'd' } }, lines: { hello_01: { hash: 'b' } } },
+    'and gen_barks the other way round');
+  eq(mergeLines(null, { x: 1 }), { version: 1, lines: { x: 1 } }, 'no ledger on disk yet');
 });

@@ -850,9 +850,12 @@ body.flip #game .g-open {
 
 /* Non-modal by construction: no dim, no button, no pointer-events. Top centre is the only band
    with nothing in it — vitals own the left, the day chip and the cog own the right. */
+/* Above the board screens, not under them: the nudge to go and talk to Vail is raised by opening
+   New Adventures, and a toast behind its own cause is a toast nobody sees. It has no pointer
+   events, so nothing it covers stops working. */
 #game .g-toast {
   position: absolute;
-  z-index: 3;
+  z-index: 6;
   top: calc(env(safe-area-inset-top, 0px) + 10px);
   left: 50%;
   transform: translateX(-50%);
@@ -922,4 +925,274 @@ body.flip #game .g-open {
   background: rgba(16, 18, 21, .8);
   color: #e8e3d8;
   font: inherit;
+}
+
+/* ── the speech bubble over the speaker ──────────────────────────────────── */
+
+/* dialoguebox.js moves the one bubble element between this layer and the bottom band, so a
+   narrator and a speaker who has walked off the edge of the screen share the band the box always
+   had and only a visible body gets a bubble. */
+#game .g-world {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+#game .g-say.g-at {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(calc(320px * var(--ui)), 62vw);
+  padding: calc(7px * var(--ui)) calc(13px * var(--ui)) calc(9px * var(--ui));
+  font-size: calc(14px * var(--ui));
+  background: rgba(14, 16, 19, .93);
+  border-color: rgba(232, 227, 216, .22);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, .5);
+  backdrop-filter: blur(3px);
+  animation: g-pop .18s ease-out;
+}
+@keyframes g-pop { from { opacity: 0; } }
+
+/* The tail rides along the bubble's own width, so a bubble clamped against the edge of a phone
+   screen still points back at whoever is talking. */
+#game .g-say.g-at::after {
+  content: '';
+  position: absolute;
+  left: var(--tail, 50%);
+  bottom: calc(-10px * var(--ui));
+  margin-left: calc(-9px * var(--ui));
+  border: calc(9px * var(--ui)) solid transparent;
+  border-top-color: rgba(14, 16, 19, .93);
+  border-bottom: 0;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .45));
+}
+#game .g-say.g-at.g-below::after {
+  bottom: auto;
+  top: calc(-10px * var(--ui));
+  border-top: 0;
+  border-bottom: calc(9px * var(--ui)) solid rgba(14, 16, 19, .93);
+}
+/* Something solid is between the camera and her head. Faded rather than moved: docking on a
+   pillar the player walks past for a third of a second is worse than a bubble that dims. */
+#game .g-say.g-at.g-behind { opacity: .55; }
+#game .g-say.g-at.g-behind::after { display: none; }
+
+/* ── the contract boards ─────────────────────────────────────────────────── */
+
+/* Not a dialog. The world keeps rendering and running behind it, and it closes on the ✕, on
+   Escape, or on a tap anywhere off the parchment. */
+#game .g-boardwrap {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(env(safe-area-inset-top, 0px), 14px) max(env(safe-area-inset-right, 0px), 14px)
+           max(env(safe-area-inset-bottom, 0px), 14px) max(env(safe-area-inset-left, 0px), 14px);
+  background: rgba(7, 8, 10, .66);
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity .2s;
+}
+#game .g-boardwrap.in { opacity: 1; }
+
+#game .g-parch {
+  --parch: #e7dcc1;
+  --ink: #2b2218;
+  --faint: #6d5f49;
+  --wax: #8c3a2b;
+  --iron: #565d66;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: calc(640px * var(--ui));
+  max-height: 100%;
+  color: var(--ink);
+  font: calc(15px * var(--ui))/1.5 Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  /* Aged paper without an image: a warm base, two soft stains, and a fibre grain fine enough to
+     read as tooth rather than as stripes. */
+  background:
+    radial-gradient(120% 80% at 12% 0%, rgba(255, 252, 240, .75), transparent 60%),
+    radial-gradient(90% 70% at 88% 100%, rgba(150, 122, 74, .22), transparent 62%),
+    repeating-linear-gradient(94deg, rgba(120, 96, 56, .045) 0 1px, transparent 1px 4px),
+    var(--parch);
+  border: 1px solid rgba(70, 56, 34, .55);
+  border-radius: 2px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .6), inset 0 0 60px rgba(120, 96, 56, .18);
+  transform: translateY(8px);
+  transition: transform .22s ease-out;
+}
+#game .g-boardwrap.in .g-parch { transform: none; }
+
+#game .g-parch-head {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(14px * var(--ui));
+  flex: 0 0 auto;
+  padding: calc(16px * var(--ui)) calc(16px * var(--ui)) calc(12px * var(--ui)) calc(20px * var(--ui));
+  border-bottom: 1px solid rgba(70, 56, 34, .3);
+}
+/* The wax seal. Nudged off true so it reads as pressed on rather than printed. */
+#game .g-parch .g-seal {
+  flex: 0 0 auto;
+  display: grid;
+  place-content: center;
+  width: calc(44px * var(--ui));
+  height: calc(44px * var(--ui));
+  margin-top: calc(3px * var(--ui));
+  border-radius: 50%;
+  background: radial-gradient(70% 70% at 34% 28%, #b4503b, var(--wax) 62%, #6d2b1f);
+  box-shadow: inset 0 -2px 5px rgba(0, 0, 0, .4), 0 2px 5px rgba(0, 0, 0, .3);
+  color: #f2e2cf;
+  font: 600 calc(19px * var(--ui))/1 Georgia, serif;
+  text-decoration: none;
+  transform: rotate(-7deg);
+}
+#game .g-parch-title { flex: 1 1 auto; min-width: 0; }
+#game .g-parch-title h2 {
+  margin: 0;
+  font: 600 calc(22px * var(--ui))/1.15 Georgia, 'Iowan Old Style', serif;
+  letter-spacing: .01em;
+}
+#game .g-parch-title p {
+  margin: calc(2px * var(--ui)) 0 0;
+  font-size: calc(13px * var(--ui));
+  font-style: italic;
+  color: var(--faint);
+}
+#game .g-parch .g-parch-x {
+  flex: 0 0 auto;
+  width: var(--tap);
+  height: var(--tap);
+  margin: calc(-8px * var(--ui)) calc(-6px * var(--ui)) 0 0;
+  font-size: calc(17px * var(--ui));
+  color: var(--faint);
+  background: none;
+  border: 0;
+}
+#game .g-parch .g-parch-x:active { color: var(--wax); }
+
+#game .g-parch-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: calc(14px * var(--ui)) calc(20px * var(--ui)) calc(18px * var(--ui));
+}
+
+/* Where you stand, said once. `shut` is the ungated state — deliberately not red and not an
+   error: it names the rung above, because the screen is meant to make the rank worth wanting. */
+#game .g-standing {
+  padding: calc(10px * var(--ui)) calc(13px * var(--ui));
+  border-left: calc(3px * var(--ui)) solid var(--wax);
+  background: rgba(140, 58, 43, .07);
+}
+#game .g-standing.shut { border-left-color: var(--iron); background: rgba(86, 93, 102, .1); }
+/* Georgia sets old-style figures by default, so "0 of 7 met" read as "o of 7 met". */
+#game .g-standing b { display: block; font-size: calc(15px * var(--ui)); font-variant-numeric: lining-nums; }
+#game .g-standing span { display: block; font-size: calc(13px * var(--ui)); color: var(--faint); }
+
+#game .g-jobs { display: grid; gap: calc(2px * var(--ui)); margin-top: calc(6px * var(--ui)); }
+
+#game .g-job {
+  padding: calc(13px * var(--ui)) 0 calc(11px * var(--ui));
+  border-bottom: 1px dashed rgba(70, 56, 34, .3);
+}
+#game .g-job:last-child { border-bottom: 0; }
+/* A locked row keeps every word at full contrast. Nothing here is a punishment and greying the
+   text out would make the board look broken rather than closed. */
+#game .g-job.locked { padding-left: calc(11px * var(--ui)); box-shadow: inset calc(2px * var(--ui)) 0 0 rgba(86, 93, 102, .5); }
+
+#game .g-job-h { display: flex; align-items: baseline; gap: calc(12px * var(--ui)); }
+#game .g-job-h h3 {
+  flex: 1 1 auto;
+  margin: 0;
+  font: 600 calc(17px * var(--ui))/1.25 Georgia, 'Iowan Old Style', serif;
+}
+#game .g-job-h b {
+  flex: 0 0 auto;
+  font-weight: 600;
+  color: var(--wax);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+#game .g-job-m {
+  display: flex;
+  align-items: baseline;
+  gap: calc(10px * var(--ui));
+  margin-top: calc(3px * var(--ui));
+  font: calc(11px * var(--ui))/1.55 system-ui, sans-serif;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--faint);
+  font-variant-numeric: lining-nums;
+}
+#game .g-job-m span { flex: 1 1 auto; }
+#game .g-job-m em { flex: 0 0 auto; font-style: normal; letter-spacing: .12em; color: var(--iron); }
+#game .g-job p { margin: calc(6px * var(--ui)) 0 0; font-style: italic; }
+
+/* Outlined, not filled: five filled slate chips down a page of parchment read as five errors. */
+#game .g-job-lock {
+  display: inline-block;
+  margin-top: calc(8px * var(--ui));
+  padding: calc(3px * var(--ui)) calc(9px * var(--ui));
+  border: 1px solid rgba(86, 93, 102, .55);
+  border-radius: 3px;
+  font: calc(11px * var(--ui))/1.5 system-ui, sans-serif;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--iron);
+}
+
+#game .g-steps { margin: calc(10px * var(--ui)) 0 0; padding: 0; list-style: none; counter-reset: step; }
+#game .g-steps li {
+  display: flex;
+  gap: calc(12px * var(--ui));
+  padding: calc(9px * var(--ui)) 0;
+  border-bottom: 1px dashed rgba(70, 56, 34, .3);
+}
+#game .g-steps li:last-child { border-bottom: 0; }
+#game .g-steps u {
+  flex: 0 0 auto;
+  display: grid;
+  place-content: center;
+  width: calc(22px * var(--ui));
+  height: calc(22px * var(--ui));
+  margin-top: calc(2px * var(--ui));
+  border: 1px solid rgba(70, 56, 34, .55);
+  border-radius: 2px;
+  background: rgba(255, 252, 240, .5);
+  text-decoration: none;
+  font-size: calc(14px * var(--ui));
+  color: var(--wax);
+}
+#game .g-steps li.done u { background: rgba(140, 58, 43, .12); }
+#game .g-steps li b { display: block; font-weight: 600; }
+#game .g-steps li span { display: block; font-size: calc(13px * var(--ui)); font-style: italic; color: var(--faint); }
+#game .g-steps li.done b { text-decoration: line-through; text-decoration-color: rgba(70, 56, 34, .5); }
+
+#game .g-parch-foot {
+  margin: calc(16px * var(--ui)) 0 0;
+  padding-top: calc(10px * var(--ui));
+  border-top: 1px solid rgba(70, 56, 34, .3);
+  font-size: calc(12px * var(--ui));
+  font-style: italic;
+  color: var(--faint);
+}
+
+/* Landscape on a phone is about 360px tall: the header has to stop taking a fifth of it, and
+   there is width going spare for a second column of contracts. */
+@media (orientation: landscape) and (max-height: 560px) {
+  #game .g-parch { max-width: calc(860px * var(--ui)); }
+  #game .g-parch-head { padding: calc(10px * var(--ui)) calc(12px * var(--ui)) calc(8px * var(--ui)) calc(16px * var(--ui)); }
+  #game .g-parch .g-seal { width: calc(34px * var(--ui)); height: calc(34px * var(--ui)); font-size: calc(15px * var(--ui)); }
+  #game .g-parch-title h2 { font-size: calc(18px * var(--ui)); }
+  #game .g-parch-title p { font-size: calc(12px * var(--ui)); }
+  #game .g-parch-body { padding: calc(10px * var(--ui)) calc(16px * var(--ui)) calc(14px * var(--ui)); }
+  #game .g-jobs { grid-template-columns: 1fr 1fr; gap: 0 calc(22px * var(--ui)); }
+  #game .g-steps { columns: 2; column-gap: calc(22px * var(--ui)); }
+  #game .g-steps li { break-inside: avoid; }
 }

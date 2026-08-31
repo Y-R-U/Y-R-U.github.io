@@ -3,6 +3,9 @@
 // stay in sync and one undo stack covers the lot.
 
 import apiDefault from './api.js';
+import { normaliseHotspot, SCENE_VERSION } from '../editor/scene.js';
+import { nodeProblems } from './convo/model.js';
+import { validateBarks } from './chars/vo.js';
 
 export const KINDS = {
   levelIndex: {
@@ -15,19 +18,23 @@ export const KINDS = {
   levels: {
     collection: true,
     file: id => `data/levels/${id}.json`,
-    // Must match SCENE_VERSION in js/editor/scene.js, which is 1. Not imported: scene.js pulls in
-    // three via field.js, and this module has to load in selftest.html, which has no importmap.
-    blank: id => ({ version: 1, id, name: id, objects: [], hotspots: [] }),
+    blank: id => ({ version: SCENE_VERSION, id, name: id, objects: [], hotspots: [] }),
     validate: d => {
       const e = [];
       if (!d || typeof d !== 'object') return ['must be an object'];
       if (typeof d.id !== 'string') e.push('no id');
       if (d.hotspots && !Array.isArray(d.hotspots)) e.push('hotspots must be an array');
       for (const [i, h] of (d.hotspots || []).entries()) {
+        const at = h?.id || i;
         if (!h || typeof h.id !== 'string') e.push(`hotspot ${i} has no id`);
-        if (h && !h.attach && !h.shape) e.push(`hotspot ${h?.id || i} has neither shape nor attach`);
+        if (h && !h.attach && !h.shape) e.push(`hotspot ${at} has neither shape nor attach`);
+        // The loader, not a paraphrase of it: a shape it refuses takes the whole hotspot out of the
+        // level, and the only other trace is a console warning nobody is reading at save time.
+        else if (h && !normaliseHotspot(h, i)) {
+          e.push(`hotspot ${at}: the loader drops this shape — a rect needs x0 ≠ x1 and z0 ≠ z1, a circle needs r > 0`);
+        }
         for (const [j, a] of (h?.actions || []).entries()) {
-          if (!a || typeof a.k !== 'string') e.push(`hotspot ${h?.id || i} action ${j} has no k`);
+          if (!a || typeof a.k !== 'string') e.push(`hotspot ${at} action ${j} has no k`);
         }
       }
       return e;
@@ -37,16 +44,11 @@ export const KINDS = {
     file: () => 'data/conversations.json',
     blank: () => ({ version: 1, nodes: {} }),
     validate: d => {
-      const e = [];
       if (!d || typeof d.nodes !== 'object' || !d.nodes) return ['no nodes object'];
-      for (const [id, n] of Object.entries(d.nodes)) {
-        if (!Array.isArray(n?.lines)) e.push(`${id}: lines must be an array`);
-        for (const c of n?.choices || []) {
-          if (c?.goto && !d.nodes[c.goto]) e.push(`${id}: choice goes to missing node ${c.goto}`);
-        }
-        if (n?.next && !d.nodes[n.next]) e.push(`${id}: next is a missing node ${n.next}`);
-      }
-      return e;
+      // The cast is not this validator's to load, and nodeProblems skips the unknown-speaker check
+      // when it is empty; the Conversations tab passes the real one.
+      return Object.entries(d.nodes).flatMap(([id, n]) =>
+        nodeProblems(id, n, d, {}).map(p => `${id}: ${p}`));
     },
   },
   characters: {
@@ -58,8 +60,8 @@ export const KINDS = {
       for (const [id, c] of Object.entries(d.characters)) {
         if (!c?.name) e.push(`${id}: no name`);
         if (!c?.body) e.push(`${id}: no body`);
-        else if (!['robed', 'none'].includes(c.body)) e.push(`${id}: body must be robed or none`);
-        if (c?.body === 'robed' && c.place && typeof c.place.level !== 'string') e.push(`${id}: place needs a level`);
+        else if (!BODIES.includes(c.body)) e.push(`${id}: body must be one of ${BODIES.join(', ')}`);
+        if (c?.body && c.body !== 'none' && c.place && typeof c.place.level !== 'string') e.push(`${id}: place needs a level`);
       }
       return e;
     },
@@ -67,16 +69,9 @@ export const KINDS = {
   barks: {
     file: () => 'data/barks.json',
     blank: () => ({ version: 1, categories: Object.fromEntries(BARK_CATEGORIES.map(c =>
-      [c, { label: c[0].toUpperCase() + c.slice(1), note: '' }])), shared: {} }),
-    validate: d => {
-      const e = [];
-      if (!d?.shared || typeof d.shared !== 'object') return ['no shared object'];
-      for (const k of Object.keys(d.shared)) {
-        if (!BARK_CATEGORIES.includes(k)) e.push(`unknown category ${k}`);
-        if (!Array.isArray(d.shared[k])) e.push(`${k} must be an array of lines`);
-      }
-      return e;
-    },
+      [c, { label: c[0].toUpperCase() + c.slice(1), note: '' }])),
+      shared: Object.fromEntries(BARK_CATEGORIES.map(c => [c, []])) }),
+    validate: validateBarks,
   },
   music: {
     file: () => 'data/music.json',
@@ -93,6 +88,9 @@ export const KINDS = {
     },
   },
 };
+
+// DEV_CONTRACT §7.
+export const BODIES = ['robed', 'dummy', 'none'];
 
 export const BARK_CATEGORIES = ['idle', 'greet', 'farewell', 'curious', 'grumble', 'success',
   'failure', 'hurt', 'combat', 'spot', 'thanks', 'refuse', 'wander', 'weather'];
@@ -249,9 +247,15 @@ export const data = {
       return report(e, { ok: true, where: 'server', path: r.path || file, bytes: r.bytes, problems });
     }
     const w = writeDraft(e.key, e.doc);
-    if (w === true) return report(e, { ok: true, where: 'local', path: LS(e.key), problems,
-      note: r.offline ? 'no dev server — saved in this browser only' : r.error });
-    return report(e, { ok: false, where: 'local', error: `${r.error}; localStorage also failed: ${w}` });
+    if (w !== true) return report(e, { ok: false, where: 'local', problems,
+      error: `${r.error}; localStorage also failed: ${w}` });
+    // The draft is kept whatever went wrong, but only "there is no dev server" is a successful
+    // save. A rejected write means the file on disk is not what the tool is showing, and reporting
+    // that as ok:true is how a tool that has stopped saving goes on looking like one that is.
+    if (r.offline) return report(e, { ok: true, where: 'local', path: LS(e.key), problems,
+      note: 'no dev server — saved in this browser only' });
+    return report(e, { ok: false, where: 'local', path: LS(e.key), problems, error: r.error,
+      note: `the dev server refused it — kept in this browser only: ${r.error}` });
   },
 
   async saveAll() {

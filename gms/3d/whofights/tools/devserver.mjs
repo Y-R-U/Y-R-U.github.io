@@ -91,14 +91,20 @@ async function readBody(req, limit = 32 * 1024 * 1024) {
 }
 
 // ── paths ──────────────────────────────────────────────────────────────────
-// data/ only, .json only, and the resolved path is checked against the resolved root: a symlink or
-// a %2e%2e that survived decoding still cannot escape.
+const SAFE_REL = /^[A-Za-z0-9._\-]+(?:\/[A-Za-z0-9._\-]+)*$/;
+
+// data/ only, .json only, and the resolved path is checked against the resolved root, so neither a
+// symlink nor an escape sequence gets out. Nothing here decodes, so the charset has to be narrow
+// too: a literal `%2e%2e` is a perfectly legal directory name and used to accrete junk under data/
+// that then showed up in /api/ls.
 function dataPath(p) {
   if (typeof p !== 'string' || !p.trim()) throw new Error('path required');
   let rel = p.replace(/^\/+/, '');
   if (!rel.startsWith('data/')) rel = `data/${rel}`;
   if (!rel.endsWith('.json')) throw new Error('only .json files may be written');
-  if (rel.includes('\0')) throw new Error('bad path');
+  if (!SAFE_REL.test(rel) || rel.includes('..')) {
+    throw new Error('path may only contain letters, digits, . _ - and /');
+  }
   const abs = path.resolve(ROOT, rel);
   const base = path.resolve(ROOT, 'data') + path.sep;
   if (!abs.startsWith(base)) throw new Error('path escapes data/');
@@ -106,16 +112,18 @@ function dataPath(p) {
 }
 
 // Output names for generated assets: a flat-ish name under a fixed directory, never a path.
+// The extension is stripped only when it is the one being written. Stripping any trailing dot-suffix
+// turned `tavern.v2` and `tavern.v3` into the same `tavern.mp3`, and both calls reported success.
 function assetPath(dir, name, ext) {
   if (typeof name !== 'string' || !name.trim()) throw new Error('out required');
-  const clean = name.replace(/\.[a-z0-9]+$/i, '');
-  if (!/^[A-Za-z0-9._\-]+(?:\/[A-Za-z0-9._\-]+)*$/.test(clean) || clean.includes('..')) {
+  const clean = name.toLowerCase().endsWith(ext.toLowerCase()) ? name.slice(0, -ext.length) : name;
+  if (!SAFE_REL.test(clean) || clean.includes('..')) {
     throw new Error('out may only contain letters, digits, . _ - and /');
   }
   const abs = path.resolve(ROOT, dir, clean + ext);
   const base = path.resolve(ROOT, dir) + path.sep;
   if (!abs.startsWith(base)) throw new Error('out escapes ' + dir);
-  return { abs, rel: path.relative(ROOT, abs).split(path.sep).join('/') };
+  return { abs, name: clean, rel: path.relative(ROOT, abs).split(path.sep).join('/') };
 }
 
 // Temp file then rename: a killed process leaves either the old document or the new one, never
@@ -173,6 +181,8 @@ async function status() {
 const jobs = new Map();
 const pending = [];
 let running = null;
+const JOB_KEEP = 200;
+const VRAM_POLL_MS = +(process.env.WF_VRAM_POLL_MS || 5000);
 
 function queueSummary() {
   return { running: running ? { id: running.id, kind: running.kind, note: running.note } : null,
@@ -190,49 +200,103 @@ function enqueue(kind, run, meta) {
   return job;
 }
 
-async function pump() {
-  if (running || !pending.length) return;
-  const job = pending.shift();
-  pending.forEach((j, i) => { j.position = i + 1; });
-  running = job;
+// runMusic and runFlux bound themselves, but runSkin hands off to tools/skin/skin.mjs and inherits
+// whatever that does — and one run that never settles used to strand every job behind it until the
+// process was restarted. The abandoned run is not killed, nothing here can kill a fetch already in
+// flight; it just stops holding the slot, and freeVRAM is what keeps its model off the next job.
+async function runJob(job) {
   job.state = 'running';
   job.position = 0;
   job.startedAt = Date.now();
+  const capMin = +(process.env.WF_JOB_MAX_MIN || 45);
+  let timer;
+  const guard = new Promise((_, reject) => {
+    job.abort = why => { clearTimeout(timer); job.abort = null; reject(new Error(why)); };
+    timer = setTimeout(() => job.abort?.(`abandoned after ${capMin} min`), capMin * 60000);
+  });
   try {
-    job.result = await job.run(n => { job.note = n; });
+    job.result = await Promise.race([job.run(n => { job.note = n; }), guard]);
     job.state = 'done';
     job.note = 'done';
   } catch (e) {
     job.state = 'error';
     job.error = String(e && e.message || e);
     job.note = job.error;
+  } finally {
+    clearTimeout(timer);
+    job.abort = null;
+    job.endedAt = Date.now();
   }
-  job.endedAt = Date.now();
+}
+
+// /api/job reads this map, so a record has to outlive its run — but an authoring session that never
+// restarts would otherwise grow it without bound. Insertion order means the oldest go first.
+function prune() {
+  for (const [id, j] of jobs) {
+    if (jobs.size <= JOB_KEEP) return;
+    if (j.state === 'done' || j.state === 'error') jobs.delete(id);
+  }
+}
+
+function cancelJob(j) {
+  if (j.state === 'done' || j.state === 'error') return false;
+  if (j.abort) { j.abort('cancelled'); return true; }
+  for (const q of [pending, encodePending]) {
+    const i = q.indexOf(j);
+    if (i >= 0) q.splice(i, 1);
+  }
+  pending.forEach((x, i) => { x.position = i + 1; });
+  encodePending.forEach((x, i) => { x.position = i + 1; });
+  j.state = 'error';
+  j.error = 'cancelled';
+  j.note = 'cancelled';
+  j.endedAt = Date.now();
+  return true;
+}
+
+async function pump() {
+  if (running || !pending.length) return;
+  const job = pending.shift();
+  pending.forEach((j, i) => { j.position = i + 1; });
+  running = job;
+  await runJob(job);
   running = null;
   statusCache.at = 0;
+  prune();
   setTimeout(pump, 10);
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+// 409 is "mid-job, ask again later", which is not the same as "gone" — swallowing it is how a flux
+// job used to start while ACE-Step was still resident.
 async function unload(base) {
-  try { await fetch(`${base}/admin/unload`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: '{}', signal: AbortSignal.timeout(30000) }); } catch { /* 409 mid-job, or not running */ }
+  try {
+    const r = await fetch(`${base}/admin/unload`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: '{}', signal: AbortSignal.timeout(30000) });
+    return r.status === 409 ? 'busy' : 'gone';
+  } catch { return 'unreachable'; }
 }
 
-// Give the other resident model up to `timeout` to go away. Returning anyway is deliberate: a stuck
-// wait is worse than a job that fails on its own out-of-memory error and says so.
+// ACE-Step reports residency as `loaded` on /admin/status, mflux as `worker_warm` on /api/status.
+const ACE_RESIDENT = { status: `${ACE}/admin/status`, field: 'loaded' };
+const FLUX_RESIDENT = { status: `${FLUX}/api/status`, field: 'worker_warm' };
+
+// Give the other resident model up to 150 s to go away. Returning anyway is deliberate: a stuck wait
+// is worse than a job that fails on its own out-of-memory error and says so. What is not optional is
+// polling the backend we just asked to unload — that is the whole point of the queue.
 async function freeVRAM(forKind, note) {
   note(`waiting for VRAM (${forKind})`);
-  if (forKind === 'flux') await unload(ACE); else await unload(FLUX);
+  const other = forKind === 'flux' ? ACE_RESIDENT : FLUX_RESIDENT;
+  const base = forKind === 'flux' ? ACE : FLUX;
+  let state = await unload(base);
   const deadline = Date.now() + 150000;
   while (Date.now() < deadline) {
-    const ltx = await probe(`${LTX}/api/status`);
-    const flux = forKind === 'music' ? await probe(`${FLUX}/api/status`) : null;
-    const busy = (ltx && ltx.worker_warm) || (flux && flux.worker_warm);
-    if (!busy) return;
+    const [ltx, s] = await Promise.all([probe(`${LTX}/api/status`), probe(other.status)]);
+    if (state !== 'busy' && !(ltx && ltx.worker_warm) && !(s && s[other.field])) return;
     note('waiting for another model to unload');
-    await sleep(5000);
+    await sleep(VRAM_POLL_MS);
+    if (state === 'busy') state = await unload(base);
   }
 }
 
@@ -460,10 +524,16 @@ async function mediaInfo(abs) {
 // a directory of its own so a discarded take is never mistaken for the real one.
 const previewOf = out => path.join(path.dirname(out), '_preview', path.basename(out));
 
+// Everything an encode can be rejected for, resolved once so the route and the job cannot disagree.
 function checkEncode(body) {
-  if (!ENCODE_PROFILES[body.profile || 'full']) throw new Error(`unknown profile "${body.profile}"`);
-  underDir(body.src, ENCODE_SRC_DIRS, 'src');
-  assetPath(outDirFor(body), stripDir(body), ENCODE_PROFILES[body.profile || 'full'].ext);
+  const profile = ENCODE_PROFILES[body.profile || 'full'];
+  if (!profile) throw new Error(`unknown profile "${body.profile}"`);
+  const src = underDir(body.src, ENCODE_SRC_DIRS, 'src');
+  const named = assetPath(outDirFor(body), stripDir(body), profile.ext);
+  const outRel = body.preview ? previewOf(named.rel) : named.rel;
+  const outAbs = path.resolve(ROOT, outRel);
+  if (outAbs === src.abs) throw new Error('refusing to encode a file over itself');
+  return { profile, src, outRel, outAbs };
 }
 
 const outDirFor = body => ENCODE_OUT_DIRS.find(d => (body.out || '').replace(/^\/+/, '').startsWith(`${d}/`))
@@ -472,16 +542,8 @@ const outDirFor = body => ENCODE_OUT_DIRS.find(d => (body.out || '').replace(/^\
 const stripDir = body => (body.out || '').replace(/^\/+/, '').replace(new RegExp(`^${outDirFor(body)}/`), '');
 
 async function runEncode(body, note) {
-  const profile = ENCODE_PROFILES[body.profile || 'full'];
-  if (!profile) throw new Error(`unknown profile "${body.profile}"`);
-  const src = underDir(body.src, ENCODE_SRC_DIRS, 'src');
+  const { profile, src, outRel, outAbs } = checkEncode(body);
   if (!(await fsp.stat(src.abs).catch(() => null))) throw new Error(`no source at ${src.rel}`);
-
-  const named = assetPath(outDirFor(body), stripDir(body), profile.ext);
-  const outRel = body.preview ? previewOf(named.rel) : named.rel;
-  const outAbs = path.resolve(ROOT, outRel);
-  if (outAbs === src.abs) throw new Error('refusing to encode a file over itself');
-
   const before = await mediaInfo(outAbs);
   note(`encoding ${src.rel} → ${outRel} (${body.profile || 'full'})`);
   await fsp.mkdir(path.dirname(outAbs), { recursive: true });
@@ -537,25 +599,18 @@ async function pumpEncode() {
   const job = encodePending.shift();
   encodePending.forEach((j, i) => { j.position = i + 1; });
   encodeRunning = job;
-  job.state = 'running';
-  job.position = 0;
-  try {
-    job.result = await job.run(n => { job.note = n; });
-    job.state = 'done';
-    job.note = 'done';
-  } catch (e) {
-    job.state = 'error';
-    job.error = String(e && e.message || e);
-    job.note = job.error;
-  }
-  job.endedAt = Date.now();
+  await runJob(job);
   encodeRunning = null;
+  prune();
   setTimeout(pumpEncode, 10);
 }
 
 // ── static ─────────────────────────────────────────────────────────────────
 async function serveStatic(req, res, urlPath) {
-  const decoded = decodeURIComponent(urlPath);
+  let decoded;
+  // A malformed escape (`/%zz`) threw straight out of the request handler, and an unhandled
+  // rejection takes the whole server down with it.
+  try { decoded = decodeURIComponent(urlPath); } catch { return notFound(res); }
   let rel = decoded.replace(/^\/+/, '');
   if (rel === '' || rel.endsWith('/')) rel += 'index.html';
   const mount = MOUNTS.find(([prefix]) => decoded.startsWith(prefix));
@@ -564,7 +619,8 @@ async function serveStatic(req, res, urlPath) {
   if (!abs.startsWith(root + path.sep) && abs !== root) return notFound(res);
   let st;
   try { st = await fsp.stat(abs); } catch { return notFound(res); }
-  if (st.isDirectory()) return serveStatic(req, res, decoded.replace(/\/?$/, '/'));
+  // Recurse on the raw path — passing `decoded` decoded it a second time.
+  if (st.isDirectory()) return serveStatic(req, res, urlPath.replace(/\/?$/, '/'));
   const type = MIME[path.extname(abs).toLowerCase()] || 'application/octet-stream';
   const head = { 'Content-Type': type, 'Cache-Control': 'no-store', 'Accept-Ranges': 'bytes' };
   // The sound studio scrubs long wavs; without Range, Safari will not seek in them at all.
@@ -577,17 +633,21 @@ async function serveStatic(req, res, urlPath) {
       return res.end();
     }
     res.writeHead(206, { ...head, 'Content-Range': `bytes ${start}-${end}/${st.size}`, 'Content-Length': end - start + 1 });
-    return fs.createReadStream(abs, { start, end }).pipe(res);
+    return pipe(fs.createReadStream(abs, { start, end }), res);
   }
   res.writeHead(200, { ...head, 'Content-Length': st.size });
   if (req.method === 'HEAD') return res.end();
-  fs.createReadStream(abs).pipe(res);
+  pipe(fs.createReadStream(abs), res);
 }
+
+// An unhandled 'error' on the stream is another way to kill the process outright.
+const pipe = (stream, res) => stream.on('error', () => res.destroy()).pipe(res);
 
 const notFound = res => { res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found'); };
 
 // ── routes ─────────────────────────────────────────────────────────────────
 const WRITE_ROUTES = new Set(['/api/save', '/api/tts', '/api/tts/batch', '/api/music', '/api/flux', '/api/encode', '/api/skin']);
+const isWriteRoute = p => WRITE_ROUTES.has(p) || (p.startsWith('/api/job/') && p.endsWith('/cancel'));
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
@@ -603,7 +663,7 @@ const server = http.createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
     if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
     if (!originOK(req)) return send(res, 403, { ok: false, error: 'origin is not local' });
-    if (WRITE_ROUTES.has(p) && !remoteIsLocal(req)) {
+    if (isWriteRoute(p) && !remoteIsLocal(req)) {
       return send(res, 403, { ok: false, error: `writes are refused from ${req.socket.remoteAddress}` });
     }
     try {
@@ -623,6 +683,14 @@ async function route(req, res, p, url) {
     return send(res, 200, { ok: true, ...queueSummary(),
       jobs: [...jobs.values()].slice(-40).map(j => ({ id: j.id, kind: j.kind, state: j.state,
         note: j.note, position: j.position, out: j.out, at: j.at })) });
+  }
+
+  if (p.startsWith('/api/job/') && p.endsWith('/cancel')) {
+    if (req.method !== 'POST') return send(res, 405, { ok: false, error: 'POST only' });
+    const j = jobs.get(decodeURIComponent(p.slice('/api/job/'.length, -'/cancel'.length)));
+    if (!j) return send(res, 404, { ok: false, error: 'no such job' });
+    if (!cancelJob(j)) return send(res, 200, { ok: false, id: j.id, state: j.state, error: 'job already finished' });
+    return send(res, 200, { ok: true, id: j.id, cancelled: true });
   }
 
   if (p.startsWith('/api/job/')) {
@@ -722,11 +790,19 @@ async function route(req, res, p, url) {
   return send(res, 404, { ok: false, error: `no route ${p}` });
 }
 
-server.listen(PORT, '0.0.0.0', async () => {
-  const s = await status();
-  const nets = Object.values((await import('node:os')).networkInterfaces()).flat()
-    .filter(n => n && n.family === 'IPv4' && !n.internal).map(n => n.address);
-  console.log(`whofights dev server  ${ROOT}`);
-  console.log(`  http://localhost:${PORT}/${nets.map(a => `  http://${a}:${PORT}/`).join('')}`);
-  console.log(`  kokoro ${s.kokoro ? 'ok' : 'MISSING'} · ace ${s.ace ? 'up' : 'down'} · flux ${s.flux ? 'up' : 'down'}`);
-});
+// Only the CLI entry point listens, so a test can import the path and origin guards below without
+// standing a server up. That is why none of them had a test.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  server.listen(PORT, '0.0.0.0', async () => {
+    const s = await status();
+    const nets = Object.values((await import('node:os')).networkInterfaces()).flat()
+      .filter(n => n && n.family === 'IPv4' && !n.internal).map(n => n.address);
+    console.log(`whofights dev server  ${ROOT}`);
+    console.log(`  http://localhost:${PORT}/${nets.map(a => `  http://${a}:${PORT}/`).join('')}`);
+    console.log(`  kokoro ${s.kokoro ? 'ok' : 'MISSING'} · ace ${s.ace ? 'up' : 'down'} · flux ${s.flux ? 'up' : 'down'}`);
+  });
+}
+
+export { ROOT, dataPath, assetPath, underDir, originOK, remoteIsLocal, isWriteRoute, checkEncode,
+  outDirFor, stripDir, ENCODE_PROFILES, ENCODE_SRC_DIRS, ENCODE_OUT_DIRS, LS_DIRS, server,
+  enqueue, cancelJob, prune, jobs, queueSummary, freeVRAM };

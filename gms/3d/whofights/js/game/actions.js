@@ -42,6 +42,14 @@ export const VERBS = {
 
   // Filled in by the VO/barks agent — data/barks.json plus audio/vo/index.json.
   bark: (a, ctx) => { ctx.bark?.(a); return null; },
+
+  // Opens a full-screen game screen — the contract boards are the first. Added to §10 by the
+  // board agent; the id space belongs to whatever screen registry the session installs.
+  screen: (a, ctx) => {
+    if (typeof a.id !== 'string' || !a.id) return 'screen needs an id';
+    ctx.screen?.(a.id, a);
+    return null;
+  },
 };
 
 export const VERB_IDS = Object.keys(VERBS);
@@ -71,7 +79,7 @@ export function validateAction(a, path = 'action') {
   if (!a || typeof a !== 'object') return [`${path}: not an object`];
   if (typeof a.k !== 'string') return [`${path}: missing "k"`];
   if (!VERBS[a.k]) return [`${path}: unknown action "${a.k}"`];
-  const need = { say: 'node', goto: 'level', flag: 'name', event: 'name', bark: 'who' }[a.k];
+  const need = { say: 'node', goto: 'level', flag: 'name', event: 'name', bark: 'who', screen: 'id' }[a.k];
   if (need && typeof a[need] !== 'string') return [`${path}: ${a.k} needs a "${need}" string`];
   if (a.k === 'music' && typeof a.set !== 'string' && a.stop !== true) {
     return [`${path}: music needs a "set" or "stop": true`];

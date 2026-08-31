@@ -1,6 +1,10 @@
 import { test, eq, ok } from '../../../tools/harness.mjs';
+import { readFileSync } from 'node:fs';
 import { voHash, lineHash, ttsJob, makeCache, clipState } from './vo.js';
 import { voiceGroups, voiceInfo, VOICES } from './voices.js';
+import { clipFile, rawFile } from '../chars/vo.js';
+
+const ledger = JSON.parse(readFileSync(new URL('../../../data/vo.json', import.meta.url)));
 
 const fakeStore = () => {
   const m = new Map();
@@ -22,7 +26,7 @@ test('a line hashes with its speaker defaults', () => {
 
 test('a tts job carries the speaker voice and speed', () => {
   eq(ttsJob({ text: 'Hi' }, { voice: 'bf_emma', voiceSpeed: 0.98 }, 'out_01'),
-    { voice: 'bf_emma', text: 'Hi', speed: 0.98, out: 'out_01' });
+    { voice: 'bf_emma', text: 'Hi', speed: 0.98, out: 'raw/out_01' });
 });
 
 test('a pitched voice is synthesised as a speed change, the way the character tab does it', () => {
@@ -54,10 +58,22 @@ test('a clip is only fresh when the words that made it are the words on screen',
   eq(clipState({ line: { text: 'x' }, character: who, cache, onDisk }), 'unnamed');
 });
 
+// Against the real ledger, not a fixture. The fixture said `.wav`, which stopped matching when the
+// takes were compressed, and a test whose fixture contradicts the shipped data cannot fail when the
+// shipped data moves.
 test('the clip ledger teaches the cache what is already on disk', () => {
   const cache = makeCache(fakeStore());
-  cache.merge({ 'greeter__idle__01': { file: 'audio/vo/greeter__idle__01.wav', hash: 'deadbeef' } });
-  eq(cache.get('greeter__idle__01'), 'deadbeef');
+  const [key, rec] = Object.entries(ledger.clips)[0];
+  cache.merge({ [key]: rec });
+  eq(cache.get(key), rec.hash);
+  eq(rec.file, clipFile(key), 'the ledger and the codec agree about the extension');
+});
+
+// The tab used to write straight to audio/vo/<name>.wav, so kokoro put an uncompressed take where
+// the game looks for CODEC.ext and every Play button 404'd.
+test('a conversation line is generated as a raw take, for the encoder to ship', () => {
+  eq(ttsJob({ text: 'Hello.' }, { voice: 'am_echo' }, 'a_01').out, 'raw/a_01');
+  eq(rawFile('a_01'), 'audio/vo/raw/a_01.wav', 'and that is where the dev server puts it');
 });
 
 test('the voice list is the 54 on this machine, English first', () => {

@@ -8,11 +8,11 @@ import { Interior } from './interior.js';
 import { Climb } from './climb.js';
 import { gableRise } from './stairs.js';
 import { lidBands } from './gablelid.js';
+import { pathEase, pathSpeed } from './doorpath.js';
 
 const OUT = 3.10;     // where you are taken to before the door opens
 const IN = 2.35;      // where you end up on the other side
 const OPEN = 1.85;    // radians the leaf swings
-const SEG = [0, 0.22, 0.62, 1];
 
 const smooth = (a, b, x) => THREE.MathUtils.smootherstep(x, a, b);
 const wrapPi = a => Math.atan2(Math.sin(a), Math.cos(a));
@@ -121,11 +121,17 @@ export class Doors {
   buildStanding() {
     for (const I of this.standing.values()) { this.object3D.remove(I.object3D); I.dispose(); }
     this.standing.clear();
+    const walk = [];
     for (const d of this.doors) {
       if (!d.house.hall) continue;
       const I = this.makeInterior(d);
       this.standing.set(d.id, I);
+      // A standing room is always there, so its furniture belongs in the walk world permanently —
+      // which is how the crowd bumps into a table without knowing an interior exists.
+      const oy = d.m.elements[13];
+      for (const b of I.solids) walk.push(walkBox(b, oy, d));
     }
+    this.colliders.setWalkExtra(walk);
   }
 
   // Every door leaf in the world is one instance of one box per zone. The alternative is a mesh
@@ -226,7 +232,12 @@ export class Doors {
       this.since += dt;
       if (!this.climb.update(dt, P) && !this.climb.atLanding(P)) this.watchInside(P);
     }
-    else this.run(dt, P);
+    else {
+      this.guard -= dt;
+      // A throw here would leave the player driven for good, which is a reload to recover from.
+      try { this.run(dt, P); } catch (e) { console.warn(`doors: transition failed — ${e.message}`); this.abort(); }
+      if (this.guard <= 0 && this.state !== 'in' && this.state !== 'out') this.abort();
+    }
 
     if (this.interior) {
       this.interior.update(this.sunLocal(), this.env);
@@ -239,7 +250,9 @@ export class Doors {
   }
 
   watchOutside(P) {
-    if (!this.enabled || this.cool > 0) return;
+    // The room is still standing while the arm grows back after an exit; walking into the door
+    // again in that window turns a held stick into an in-out-in loop.
+    if (!this.enabled || this.cool > 0 || this.releasing) return;
     const d = this.nearest(P.pos);
     if (!d) return;
     // Facing matters, or walking past a front door drags you into the house.
@@ -272,6 +285,12 @@ export class Doors {
     const inner = new THREE.Vector3(d.pos.x - d.n.x * IN, d.pos.y, d.pos.z - d.n.z * IN);
     this.way = enter ? [P.pos.clone(), outer, thresh, inner] : [P.pos.clone(), inner, thresh, outer];
     this.faceYaw = enter ? wrapPi(d.yaw + Math.PI) : d.yaw;
+    this.legs = this.way.slice(1).map((p, i) => p.distanceTo(this.way[i]));
+    this.pathLen = this.legs.reduce((a, v) => a + v, 0);
+    this.ease0 = this.pathLen > 0.05 ? Math.hypot(P.vel.x, P.vel.z) * this.secs / this.pathLen : 0;
+    // Nothing else can strand a driven player: if the script stops advancing for any reason the
+    // guard runs out and abort() hands him back.
+    this.guard = this.secs * 3 + 2;
 
     if (enter) this.open(d.zoneId);
     this.releasing = null;
@@ -300,11 +319,12 @@ export class Doors {
     const u = this.u;
     const enter = this.state === 'entering';
 
-    let seg = 0;
-    while (seg < 2 && u > SEG[seg + 1]) seg++;
-    P.pos.lerpVectors(this.way[seg], this.way[seg + 1], smooth(SEG[seg], SEG[seg + 1], u));
+    let i = 0, acc = 0;
+    const s = pathEase(u, this.ease0) * this.pathLen;
+    while (i < this.legs.length - 1 && acc + this.legs[i] < s) acc += this.legs[i++];
+    P.pos.lerpVectors(this.way[i], this.way[i + 1], this.legs[i] > 1e-4 ? Math.min(1, (s - acc) / this.legs[i]) : 1);
     P.vel.set(0, 0, 0);
-    P.walkSpeed = u < 0.98 ? 2.4 : 0;
+    P.walkSpeed = Math.min(6, pathSpeed(u, this.ease0) * this.pathLen / Math.max(0.2, this.secs));
 
     P.yaw += wrapPi(this.faceYaw - P.yaw) * (1 - Math.exp(-9 * dt));
     P.camYaw += wrapPi(this.faceYaw - P.camYaw) * (1 - Math.exp(-6 * dt));
@@ -435,7 +455,7 @@ export class Doors {
       const dx = p.x - ox, dz = p.z - oz;
       _l.x = THREE.MathUtils.clamp(dx * cs - dz * sn, -rx, rx);
       _l.z = THREE.MathUtils.clamp(dx * sn + dz * cs, -rz, rz);
-      I.blockLocal(_l, p.y - oy);
+      I.blockLocal(_l, p.y - oy, this.player.walkRadius);
       p.x = ox + _l.x * cs + _l.z * sn;
       p.z = oz - _l.x * sn + _l.z * cs;
     };
@@ -521,6 +541,19 @@ export class Doors {
       loft: !!I?.loft, level: I?.level, climb: this.climb.report(),
     };
   }
+}
+
+// A room-local solid as a walk-world box. `rise` 0 makes it a wall rather than a step-up: a hall
+// table is something to walk round, not something to climb onto.
+function walkBox(b, oy, d) {
+  const cs = d.n.z, sn = d.n.x;
+  const ry = Math.atan2(sn, cs) + Math.atan2(b.s, b.c);
+  return {
+    x: d.m.elements[12] + b.x * cs + b.z * sn,
+    z: d.m.elements[14] - b.x * sn + b.z * cs,
+    hw: b.hw, hd: b.hd, c: Math.cos(ry), s: Math.sin(ry),
+    base: oy, top: oy + b.top, rise: 0, id: 0,
+  };
 }
 
 const _m = new THREE.Matrix4(), _hinge = new THREE.Matrix4(), _s = new THREE.Vector3();

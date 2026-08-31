@@ -12,6 +12,12 @@ const INDEX = 'wf.slots';
 const LEGACY = 'wf.scenes';
 const slotKey = name => `wf.slot.${name}`;
 
+// One working scene per level. A single global key meant the editor's copy of whichever level was
+// last touched replaced every level the game was asked for, so `?level=` and the `goto` verb both
+// went nowhere once anything had been dragged.
+const sceneKey = id => (id ? `${KEY}.${id}` : KEY);
+let current = null;
+
 function parse(raw) {
   if (!raw) return null;
   try { return normalise(JSON.parse(raw)); } catch { return { doc: null, error: 'corrupt JSON', dropped: 0, warnings: [] }; }
@@ -19,16 +25,28 @@ function parse(raw) {
 
 // The editor autosaves over the working key as soon as anything is touched, so bytes we could
 // not read are put somewhere they survive that — the only chance of getting them back by hand.
-export function loadScene() {
-  const raw = read(KEY);
+export function loadScene(id = null) {
+  current = id;
+  const key = sceneKey(id);
+  const raw = read(key) || adoptLegacy(id, key);
   const r = parse(raw);
-  if (raw && r && !r.doc) write(`${KEY}.broken`, raw);
+  if (raw && r && !r.doc) write(`${key}.broken`, raw);
   return r;
 }
 
-export const saveScene = doc => write(KEY, JSON.stringify(doc));
+// The pre-per-level key names no level, so it is only claimed by the one it says it holds.
+function adoptLegacy(id, key) {
+  if (!id) return null;
+  const raw = read(KEY);
+  const r = parse(raw);
+  if (!r?.doc || r.doc.id !== id) return null;
+  if (write(key, raw)) drop(KEY);
+  return raw;
+}
 
-export const clearScene = () => drop(KEY);
+export const saveScene = doc => write(sceneKey(current ?? doc?.id), JSON.stringify(doc));
+
+export const clearScene = (id = current) => drop(sceneKey(id));
 
 // One key per copy plus an index, so a corrupt byte costs one copy instead of all of them.
 export function slots() {

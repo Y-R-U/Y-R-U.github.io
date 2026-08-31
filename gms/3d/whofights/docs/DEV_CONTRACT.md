@@ -144,6 +144,8 @@ Full field list (all optional except `name` and `body`):
 | `voicePitch` | semitones −4…+4, default 0 (applied as an ffmpeg/WebAudio post-shift) |
 | `barks` | `{ <category>: [line, …] }` — overrides/extends the shared set |
 | `place` | `{level, x, z, yaw}` when the character has a body in the world |
+| `place.inside` | house id — the building whose footprint this body legitimately stands in, so the floor it is put on is that building's, not the terrain |
+| `place.wander` | `{x0, x1, z0, z1, speed}` — a box to stroll inside. Absent means the body stands still. |
 
 A "simple NPC" or a narrator is just a character with `body: "none"`. **Promote to full character**
 = set `body: "robed"` and give it a `place`. That is the whole operation; the UI button does that.
@@ -159,9 +161,23 @@ A "simple NPC" or a narrator is just a character with `body: "none"`. **Promote 
 Categories (fixed set — add more only by asking): `idle`, `greet`, `farewell`, `curious`,
 `grumble`, `success`, `failure`, `hurt`, `combat`, `spot`, `thanks`, `refuse`, `wander`, `weather`.
 
-Generated clips: `audio/vo/<characterId>__<category>__<nn>.wav`, and a sidecar
-`audio/vo/index.json` mapping `{characterId, category, i} → {file, text, voice, speed, hash}`.
-`hash` is of `text|voice|speed|pitch` so "Generate all" can skip what has not changed.
+Generated clips are `audio/vo/<characterId>__<category>__<nn>.ogg` — Opus in Ogg, named by
+`CODEC` in `js/game/clip.js`, which is where the extension is decided so the encoder, the tools and
+the decoder cannot disagree. The kokoro take is kept beside it at `audio/vo/raw/<key>.wav`, which
+is gitignored and exists only so a clip can be re-encoded without paying for kokoro again.
+
+The ledger is **`data/vo.json`**, and it is the only copy. It has two sections, each with exactly
+one writer: `clips`, keyed `<characterId>__<category>__<nn>` (`tools/vo/gen_barks.mjs` and the
+Characters tab), and `lines`, keyed by a conversation line's own `vo` basename
+(`tools/vo/gen_lines.mjs`). Both fold their own key into whatever is on disk at write time —
+`mergeClips` / `mergeLines` in `js/dev/chars/vo.js` — so two writers in the same window do not
+clobber each other. A record is `{file, raw, text, voice, speed, pitch, hash, encoded, …}`; `hash`
+is of `text|voice|speed|pitch`, so "Generate all" skips what nothing has touched.
+
+It lives under `data/` because that is the only place both writers can reach: the dev server
+refuses to write outside it, and so the browser cannot write anywhere else either. There used to be
+a mirror at `audio/vo/index.json` refreshed by `gen_barks --sync`; nothing read it and any
+in-browser generation left it stale, so it is gone.
 
 ## 9. Music — `data/music.json`
 
@@ -209,6 +225,15 @@ their own docs row).
 - `window.__wf` is the debug handle (forge uses `__forge`). Expose your systems on it.
 - Every tool that edits data must show whether the last save landed. A tool that has silently
   stopped saving looks exactly like one that is saving.
+- **A UI test never touches the live tree.** `rsync` the project to a scratch copy, serve *that* on
+  its own port, and delete it afterwards. This project has lost `data/` twice: once a seed file
+  clobbered through a tab's own Save button, once every file under `data/` deleted and restored
+  from git by a headless run, taking another agent's uncommitted work with it. The audio survived
+  only because it lives outside `data/`.
+- **A `*.test.mjs` must not assign a global at module scope.** `tools/test.mjs` imports every
+  harness-based file into one process, so two files stubbing `globalThis.localStorage` at module
+  scope silently break each other depending on import order — it cost four passing tests once.
+  Install and tear down inside each test.
 - Tests: plain `node --test`-free `*.test.mjs` run by `node tools/test.mjs`, the forge style —
   pure modules only, no DOM. If your module can be made pure, make it pure and test it.
 - Before claiming a screen works, **look at it** — `node tools/shot.mjs` or a headless CDP

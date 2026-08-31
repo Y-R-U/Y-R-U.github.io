@@ -10,6 +10,7 @@ import { textureSet, flagSet, INTERIOR_TILE } from './materials.js';
 import { stainedTexture, stainedTint } from './textures/stained.js';
 import { stairFits, stairFloor, stairBlock, build as buildStairs } from './stairs.js';
 import { boardPanel } from './boards.js';
+import { pushOut } from './colliders.js';
 
 // Texture metres per tile. `stone` and `wood` are the outdoor kit's own numbers (materials.js
 // INTERIOR_TILE), so a course of masonry indoors is the same course as the facade outside — the
@@ -81,6 +82,10 @@ export class Interior {
     this.fillK = 1;
     this.flames = [];
     this.sconces = [];
+    // Everything solid in the room, in this frame, floor-based. blockLocal pushes the player out
+    // of them and doors.js hands the same list to the walk world so the crowd sees them too.
+    this.solids = [];
+    for (const l of house.door.leaves || []) this.solids.push({ ...l, c: Math.cos(l.ry), s: Math.sin(l.ry) });
     const twoUp = !this.hall && wallTop - plinth > 6.6;
     // 3.40 m floor / 4.70 m cap: below 4 m the ceiling is inside the camera frustum from 1.9 m in
     // front of the player, which is WORLD.md §2.2 and the reason for the whole scale pass.
@@ -172,7 +177,12 @@ export class Interior {
     return this.level;
   }
 
-  blockLocal(p, y) {
+  blockLocal(p, y, radius) {
+    for (const b of this.solids) {
+      if (b.top <= y + 0.05) continue;
+      const q = pushOut(b, p.x, p.z, radius);
+      if (q) { p.x = q.x; p.z = q.z; }
+    }
     if (!this.loft) return;
     if (stairBlock(this, p, y, this.onStair ? this.lastH : null)) this.onFlight(stairFloor(this, p.x, p.z));
     else this.onStair = false;
@@ -449,6 +459,7 @@ function hearth(b, I) {
   }
   b.add('wood', box(0.22, 0.14, bw * 0.5), T(x + 0.42, fy + 0.14, 0));
   b.add('wood', box(0.13, 0.13, bw * 0.44), T(x + 0.34, fy + 0.26, 0.06));
+  solid(I, x + 0.31, 0, 0.31, bw / 2 + 0.17, fy + bh);
   I.fire = new THREE.Vector3(x + 0.36, fy + 0.34, 0);
   if (I.hall) I.flames.push({ p: I.fire.clone().setX(x + 0.5), r: 0.85 });
 }
@@ -764,8 +775,8 @@ function hallShell(b, I, z) {
 
   for (const f of hallFaces(I)) {
     const hw = f.wide / 2;
+    const dw = f.door ? Math.min(I.apW + 0.5, f.wide - 1.2) : 0, dh = I.apH + 0.24;
     if (f.door) {
-      const dw = Math.min(I.apW + 0.5, f.wide - 1.2), dh = I.apH + 0.24;
       wallPanel(b, 'stone', f, -hw, -dw / 2, fy, plateY);
       wallPanel(b, 'stone', f, dw / 2, hw, fy, plateY);
       wallPanel(b, 'stone', f, -dw / 2, dw / 2, fy + dh, plateY, 0.02, 3, 3);
@@ -784,11 +795,17 @@ function hallShell(b, I, z) {
     }
 
     // base course, string course, wall plate — three horizontal lines is what stops eleven
-    // metres of masonry reading as one flat field
-    b.add('stone', box(f.wide, baseH, 0.34), f.m.clone().multiply(T(0, fy + baseH / 2, 0.17)));
-    b.add('stone', taperBox(f.wide, 0.20, 0.26, f.wide, 0.34), f.m.clone().multiply(T(0, fy + baseH + 0.13, 0.10)));
-    b.add('stone', box(f.wide, 0.28, 0.34), f.m.clone().multiply(T(0, stringY, 0.17)));
-    b.add('beam', box(f.wide, 0.38, 0.48), f.m.clone().multiply(T(0, plateY - 0.19, 0.24)));
+    // metres of masonry reading as one flat field. A course low enough to cross the doorway is
+    // drawn as two returns instead: run through the opening it is a knee-high wall standing in
+    // the door, which is what you walk into on the way in.
+    const course = (surface, geo, y, h, dz) => {
+      const runs = dw && y - h / 2 < fy + dh ? [[-hw, -dw / 2], [dw / 2, hw]] : [[-hw, hw]];
+      for (const [u0, u1] of runs) b.add(surface, geo(u1 - u0), f.m.clone().multiply(T((u0 + u1) / 2, y, dz)));
+    };
+    course('stone', w => box(w, baseH, 0.34), fy + baseH / 2, baseH, 0.17);
+    course('stone', w => taperBox(w, 0.20, 0.26, w, 0.34), fy + baseH + 0.13, 0.26, 0.10);
+    course('stone', w => box(w, 0.28, 0.34), stringY, 0.28, 0.17);
+    course('beam', w => box(w, 0.38, 0.48), plateY - 0.19, 0.38, 0.24);
 
     // ── piers ── one at every bay line, carrying a corbel where a truss lands on it
     for (const [li, u] of f.lines.entries()) {
@@ -912,6 +929,8 @@ function hallDress(b, I, z, R) {
         b.add('wood', box(0.4, 0.42, 0.1), T(bx, fy + 0.22, -1.5 + tl * u));
       }
     }
+    // one box for the table and both its benches: they are one piece of furniture to walk round
+    solid(I, tx, -1.5, 1.35 + 0.22, tl / 2, fy + th);
   }
 
   // ── tapestries ── the cheapest way to break eleven metres of stone, and the only colour in it
@@ -990,13 +1009,20 @@ function hallDress(b, I, z, R) {
     b.add('wood', box(0.95, 2.7, 2.4), T(-rx + 0.62, fy + 1.35, cz));
     b.add('wood', box(1.1, 0.22, 2.7), T(-rx + 0.66, fy + 2.8, cz));
     b.add('wood', box(0.06, 2.0, 0.16), T(-rx + 1.1, fy + 1.5, cz));
+    solid(I, -rx + 0.66, cz, 0.55, 1.35, fy + 2.9);
   }
   for (let i = 0; i < 3; i++) {
     const cz = -rz * 0.6 + rz * 0.6 * i;
     b.add('wood', box(1.5, 0.85, 0.9), T(rx - 0.9, fy + 0.42, cz));
     b.add('wood', box(1.6, 0.16, 1.0), T(rx - 0.9, fy + 0.9, cz));
     b.add('beam', box(1.62, 0.1, 0.14), T(rx - 0.9, fy + 0.55, cz + span(R, -0.2, 0.2)));
+    solid(I, rx - 0.9, cz, 0.8, 0.5, fy + 0.98);
   }
+}
+
+// An axis-aligned blocker in the room's own frame; `top` is its height above the room's origin.
+function solid(I, x, z, hw, hd, top) {
+  I.solids.push({ x, z, hw, hd, c: 1, s: 0, top });
 }
 
 // The sconces that get a real point light, spread out rather than clustered: taking the first N

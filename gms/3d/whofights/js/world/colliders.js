@@ -13,11 +13,14 @@ export class Colliders {
     this.terrain = terrain;
     this.boxes = [];
     this.extra = [];
+    // Walk boxes that are not in the level document: the furniture a standing interior owns.
+    this.walkExtra = [];
     this.skip = 0;
     this.count = -1;
   }
 
   rebuild(doc) {
+    this.doc = doc;
     this.boxes.length = 0;
     for (const o of doc.objects) {
       const [hw, hd] = TYPES[o.type].plan(o.p);
@@ -38,14 +41,15 @@ export class Colliders {
 
   rebuildWalk(doc) {
     const boxes = [];
-    const put = (x, z, hw, hd, ry, base, top, rise) =>
-      boxes.push({ x, z, hw, hd, c: Math.cos(ry), s: Math.sin(ry), base, top, rise });
+    const put = (x, z, hw, hd, ry, base, top, rise, id = 0) =>
+      boxes.push({ x, z, hw, hd, c: Math.cos(ry), s: Math.sin(ry), base, top, rise, id });
 
     for (const o of doc.objects) {
       const [hw, hd] = TYPES[o.type].plan(o.p);
       const r = this.terrain.range(o.x, o.z, hw, hd, o.ry);
-      put(o.x, o.z, hw + 0.18, hd + 0.18, o.ry, r.lo - 2, r.hi + tall(o), 0);
+      put(o.x, o.z, hw + 0.18, hd + 0.18, o.ry, r.lo - 2, r.hi + tall(o), 0, o.id);
     }
+    for (const b of this.walkExtra) boxes.push(b);
 
     for (const d of doc.districts) {
       if (d.bridge) {
@@ -90,6 +94,13 @@ export class Colliders {
     }
     for (const b of this.extra) best = slab(b, ox, oy, oz, dx, dy, dz, best, pad);
     return best;
+  }
+
+  // Furniture and other geometry a building owns rather than the level document. Replaces the
+  // whole set, so the caller hands over everything every time.
+  setWalkExtra(list) {
+    this.walkExtra = list;
+    if (this.doc) this.rebuildWalk(this.doc);
   }
 
   inside(id, x, y, z, pad = 0) {
@@ -163,33 +174,43 @@ export function groundAt(x, z, y) {
 
 // Resolved end of a step from (x0,z0) to (x1,z1). Penetration is pushed out along the box's own
 // shorter axis, which is what turns a diagonal walk into a slide instead of a dead stop.
-export function walkStep(x0, z0, x1, z1, y, radius = 0.34) {
+// `skip` is a level-document object id whose box is ignored — an NPC placed inside a building is
+// standing in that building's own footprint, which would otherwise shove it out through the wall.
+export function walkStep(x0, z0, x1, z1, y, radius = 0.34, skip = 0) {
   if (!W) return { x: x1, z: z1, y, hit: false };
   // If the walker was already overlapping something when the step began — spawned there, or
   // dropped there by the editor — the start is not a safe place to fall back to, and reverting
   // to it every frame freezes him for good.
-  const startClear = !standing(x0, z0, y);
+  const startClear = !standing(x0, z0, y, skip);
   let x = x1, z = z1, hit = false;
   for (let iter = 0; iter < 3; iter++) {
     let moved = false;
     for (const b of cellAt(x, z)) {
-      if (!blocks(b, y)) continue;
-      const px = x - b.x, pz = z - b.z;
-      let lx = px * b.c - pz * b.s, lz = px * b.s + pz * b.c;
-      const ex = b.hw + radius, ez = b.hd + radius;
-      const ox = ex - Math.abs(lx), oz = ez - Math.abs(lz);
-      if (ox <= 0 || oz <= 0) continue;
-      if (ox < oz) lx = (lx < 0 ? -1 : 1) * ex; else lz = (lz < 0 ? -1 : 1) * ez;
-      x = b.x + lx * b.c + lz * b.s;
-      z = b.z - lx * b.s + lz * b.c;
+      if ((skip && b.id === skip) || !blocks(b, y)) continue;
+      const p = pushOut(b, x, z, radius);
+      if (!p) continue;
+      x = p.x; z = p.z;
       moved = hit = true;
     }
     if (!moved) break;
   }
   // A push-out can land you inside the next box along; if two iterations did not clear it, the
   // start point is the only place known to be legal.
-  if (hit && startClear && standing(x, z, y)) { x = x0; z = z0; }
+  if (hit && startClear && standing(x, z, y, skip)) { x = x0; z = z0; }
   return { x, z, y: groundAt(x, z, y), hit };
+}
+
+// Shortest-axis push of a point out of one oriented box, or null if it was never in it. The walk
+// world and a room's own local frame both resolve a blocked step this way — pushing along the
+// shallower axis is what turns a diagonal walk into a slide rather than a dead stop.
+export function pushOut(b, x, z, radius) {
+  const px = x - b.x, pz = z - b.z;
+  let lx = px * b.c - pz * b.s, lz = px * b.s + pz * b.c;
+  const ex = b.hw + radius, ez = b.hd + radius;
+  const ox = ex - Math.abs(lx), oz = ez - Math.abs(lz);
+  if (ox <= 0 || oz <= 0) return null;
+  if (ox < oz) lx = (lx < 0 ? -1 : 1) * ex; else lz = (lz < 0 ? -1 : 1) * ez;
+  return { x: b.x + lx * b.c + lz * b.s, z: b.z - lx * b.s + lz * b.c };
 }
 
 function blocks(b, y) {
@@ -198,8 +219,8 @@ function blocks(b, y) {
   return b.base <= y + 1.9;
 }
 
-function standing(x, z, y) {
-  for (const b of cellAt(x, z)) if (blocks(b, y) && within(b, x, z, 0.02)) return true;
+function standing(x, z, y, skip = 0) {
+  for (const b of cellAt(x, z)) if (!(skip && b.id === skip) && blocks(b, y) && within(b, x, z, 0.02)) return true;
   return false;
 }
 

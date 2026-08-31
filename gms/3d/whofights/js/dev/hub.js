@@ -130,7 +130,9 @@ function build() {
 
   addEventListener('keydown', e => { if (opened) onKey(e); });
   data.onSave(r => {
-    toast(r.ok ? `saved ${r.path}${r.where === 'local' ? ' (browser only)' : ''}` : `SAVE FAILED — ${r.error}`,
+    // `note` is the whole difference between "there is no dev server" and "the dev server refused
+    // it". Printing only the path made those two the same sentence.
+    toast(r.ok ? `saved ${r.path}${r.note ? ` — ${r.note}` : ''}` : `SAVE FAILED — ${r.error || r.note}`,
       r.ok ? (r.where === 'local' ? 'warn' : 'good') : 'bad');
     paintSave();
     paintNav();

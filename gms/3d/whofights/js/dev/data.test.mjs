@@ -115,11 +115,16 @@ async function fresh(opts) {
   const { storage } = await fresh({ online: false });
   await data.load('conversations');
   eq(data.source('conversations'), 'blank', 'offline with no draft starts blank');
-  data.mutate('conversations', null, d => { d.nodes.hello = { lines: [{ who: 'a', text: 'hi' }] }; });
+  data.mutate('conversations', null, d => { d.nodes.hello = { lines: [{ who: 'a', text: 'hi' }], next: null, choices: [] }; });
+  // set() already wrote a draft, so leaving it there lets save()'s own fallback write be deleted
+  // without a single assertion moving. Clear it first and only save() can put it back.
+  storage.removeItem('wf.dev.doc.conversations');
   const r = await data.save('conversations');
   ok(r.ok && r.where === 'local', 'offline save falls back to localStorage');
   ok(/no dev server/.test(r.note || ''), 'and says so');
-  ok(storage.getItem('wf.dev.doc.conversations'), 'the draft is in storage');
+  ok(storage.getItem('wf.dev.doc.conversations'), 'the fallback wrote the draft itself');
+  eq(JSON.parse(storage.getItem('wf.dev.doc.conversations')).doc.nodes.hello.lines[0].text, 'hi',
+    'and wrote the document, not a placeholder');
 
   // Reload in a new session with the same storage: the draft comes back.
   data.configure({ api: { online: async () => false, load: async () => ({ ok: false, offline: true }), save: async () => ({ ok: false, offline: true }), ls: async () => ({ ok: false }) }, storage, fetch: null, reset: true });
@@ -150,9 +155,20 @@ async function fresh(opts) {
   const seen = [];
   data.onSave(r => seen.push(r));
   const r = await data.save('barks');
-  ok(r.ok && r.where === 'local', 'a rejected server save still lands locally');
-  ok(seen.length === 1 && seen[0].where === 'local', 'onSave saw it');
+  ok(r.ok === false, 'a server rejection is a FAILED save, not a local one');
+  ok(/EACCES/.test(r.error || ''), 'and carries the server\'s reason as `error`');
+  ok(/EACCES/.test(r.note || ''), 'and in `note`, which is what the toast prints');
+  ok(r.where === 'local' && storage.getItem('wf.dev.doc.barks'), 'the draft is still kept');
+  ok(seen.length === 1 && seen[0].ok === false, 'onSave saw a failure');
   ok(data.dirty('barks') === true, 'and the document stays dirty — the file did NOT change');
+
+  // Offline is the one case that is genuinely a save.
+  data.configure({ api: { online: async () => false, load: async () => ({ ok: false, offline: true }),
+    save: async () => ({ ok: false, offline: true, error: 'no dev server' }), ls: async () => ({ ok: false }) },
+    storage: fakeStorage(), fetch: null, reset: true });
+  await data.load('barks');
+  const off = await data.save('barks');
+  ok(off.ok === true && off.where === 'local', 'no dev server at all is still ok:true');
 }
 
 // ── revert ─────────────────────────────────────────────────────────────────
@@ -183,12 +199,30 @@ async function fresh(opts) {
 {
   await fresh();
   eq(data.validate('characters', { version: 1, characters: { a: { name: 'A' } } }), ['a: no body'], 'missing body');
-  eq(data.validate('characters', { version: 1, characters: { a: { name: 'A', body: 'wobbly' } } }), ['a: body must be robed or none'], 'bad body');
-  eq(data.validate('conversations', { version: 1, nodes: { a: { lines: [], choices: [{ goto: 'nope' }] } } }), ['a: choice goes to missing node nope'], 'dangling goto');
+  eq(data.validate('characters', { version: 1, characters: { a: { name: 'A', body: 'wobbly' } } }), ['a: body must be one of robed, dummy, none'], 'bad body');
+  eq(data.validate('characters', { version: 1, characters: { a: { name: 'A', body: 'dummy', skin: 's' } } }), [], 'dummy is a body — DEV_CONTRACT §7');
+  ok(data.validate('conversations', { version: 1, nodes: { a: { lines: [], choices: [{ say: 'x', goto: 'nope' }] } } })
+    .includes('a: choice 1: goes to missing node nope'), 'dangling goto');
+  // The real validator, not a weaker copy of it: convo/model.js nodeProblems catches these and the
+  // old inline one did not.
+  ok(data.validate('conversations', { version: 1, nodes: { a: { lines: [{ who: 'x', text: '' }], next: null } } })
+    .includes('a: line 1: no text'), 'a line with no text');
+  ok(data.validate('conversations', { version: 1, nodes: { a: { lines: [], choices: [], next: null } } })
+    .includes('a: nothing happens here — no lines, no choices, no next'), 'a node that does nothing');
   eq(data.validate('music', { version: 1, tracks: [], sets: [{ id: 's', tracks: ['x'] }] }), ['set s: missing track x'], 'set names a missing track');
   eq(data.validate('levelIndex', [{ name: 'no id' }]), ['entry 0 has no id'], 'index entry with no id');
   eq(data.validate('levels', { id: 'l', hotspots: [{ id: 'h' }] }), ['hotspot h has neither shape nor attach'], 'hotspot with no placement');
-  eq(data.validate('barks', { version: 1, shared: { nonsense: [] } }), ['unknown category nonsense'], 'bark category is a fixed set');
+  // A shape the Save button called fine and js/editor/scene.js then dropped on the floor.
+  ok(data.validate('levels', { id: 'l', hotspots: [{ id: 'flat', shape: { k: 'rect', x0: 4, z0: 0, x1: 4, z1: 9 } }] })
+    .some(p => p.startsWith('hotspot flat: the loader drops this shape')), 'a zero-width rect is a problem');
+  ok(data.validate('levels', { id: 'l', hotspots: [{ id: 'dot', shape: { k: 'circle', x: 0, z: 0, r: 0 } }] })
+    .some(p => p.startsWith('hotspot dot: the loader drops this shape')), 'a zero-radius circle is a problem');
+  eq(data.validate('levels', { id: 'l', hotspots: [{ id: 'ok', shape: { k: 'rect', x0: 0, z0: 0, x1: 4, z1: 9 } }] }), [], 'a real rect is fine');
+  eq(data.validate('levels', data.KINDS.levels.blank('x')), [], 'a blank level is valid');
+  ok(data.validate('barks', { version: 1, shared: { nonsense: [] } }).includes('unknown category nonsense'), 'bark category is a fixed set');
+  ok(data.validate('barks', { version: 1, shared: { ...Object.fromEntries(data.BARK_CATEGORIES.map(c => [c, []])), idle: ['  '] } })
+    .includes('shared.idle[0] is empty'), 'an empty line is a problem — the weak copy never looked');
+  eq(data.validate('barks', data.KINDS.barks.blank()), [], 'a blank barks doc is valid');
   ok(data.validate('levels', null).length === 1, 'null document');
   ok(Object.keys(KINDS).every(k => data.validate(k, undefined).length >= 0), 'no validator throws on undefined');
 }

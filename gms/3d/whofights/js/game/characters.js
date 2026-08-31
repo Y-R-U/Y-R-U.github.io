@@ -6,6 +6,7 @@
 
 const ROBES = ['light', 'neutral', 'dark'];
 const ZI = { light: 0, neutral: 1, dark: 2 };
+const BODIES = ['robed', 'dummy', 'none'];
 
 export function normaliseCast(raw) {
   const warnings = [];
@@ -13,7 +14,7 @@ export function normaliseCast(raw) {
   const src = raw?.characters && typeof raw.characters === 'object' ? raw.characters : {};
   for (const [id, c] of Object.entries(src)) {
     if (!c || typeof c !== 'object') { warnings.push(`${id}: not an object`); continue; }
-    const body = c.body === 'robed' ? 'robed' : 'none';
+    const body = BODIES.includes(c.body) ? c.body : 'none';
     const robe = ROBES.includes(c.robe) ? c.robe : 'neutral';
     out[id] = {
       id,
@@ -23,6 +24,8 @@ export function normaliseCast(raw) {
       height: clamp(c.height, 0.85, 1.20, 1),
       build: clamp(c.build, 0.85, 1.20, 1),
       gender: ['f', 'm', 'x'].includes(c.gender) ? c.gender : 'x',
+      sex: c.sex === 'f' ? 'f' : 'm',
+      skin: typeof c.skin === 'string' ? c.skin : null,
       hood: c.hood === 'down' ? 'down' : 'up',
       voice: typeof c.voice === 'string' ? c.voice : null,
       voiceSpeed: clamp(c.voiceSpeed, 0.7, 1.3, 1),
@@ -41,7 +44,10 @@ export function normaliseCast(raw) {
         } : null,
       } : null,
     };
-    if (body === 'robed' && !out[id].place) warnings.push(`${id}: has a body but nowhere to stand`);
+    if (body !== 'none' && !out[id].place) warnings.push(`${id}: has a body but nowhere to stand`);
+    // js/world/people.js is the hooded rig and only that. Until something spawns js/world/dummy.js
+    // in a level, a dummy character is authored, valid and absent — which has to be said out loud.
+    if (body === 'dummy') warnings.push(`${id}: body "dummy" is not spawned yet — the world only builds robed figures`);
   }
   return { cast: out, warnings };
 }
@@ -71,7 +77,8 @@ export class Characters {
         turn: w ? 0.22 : 0.09,
         box: w ? [w.x0, w.x1, w.z0, w.z1] : null,
         scale: c.height,
-        indoor: !!c.place.inside,
+        // the house whose footprint this body is legitimately standing inside — see people.js
+        indoor: c.place.inside || 0,
         ...(fixY == null ? {} : { fixY }),
       });
       if (a) this.bodies.set(c.id, a);

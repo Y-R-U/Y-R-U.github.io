@@ -10,8 +10,10 @@ import { deriveLinks, tree } from '../convo/links.js';
 import { blankNode, nodeProblems, uniqueId, slug, voName } from '../convo/model.js';
 import { renderEditor, repaintProblems } from '../convo/editor.js';
 import { createForm, promoteForm } from '../convo/speaker.js';
-import { makeCache, lineHash, ttsJob, clipURL } from '../convo/vo.js';
-import { loadIndex } from '../chars/voindex.js';
+import { makeCache, lineHash, ttsJob } from '../convo/vo.js';
+import { loadIndex, encodeClip } from '../chars/voindex.js';
+import { CODEC, clipFile, pitchOf } from '../chars/vo.js';
+import { playClip as playBuffer } from '../../game/clip.js';
 
 const HANDOFF_KEY = 'wf.dev.convo.open';
 let pending = null;
@@ -51,9 +53,12 @@ registerTab({
       if (!state.levelList.some(l => l.id === id)) state.levelList.push({ id, name: lv?.name || id, start: lv?.start });
     }
     await refreshDisk();
-    // data/vo.json is the generated-clip ledger the character tab writes; it carries the same hash
-    // for any clip it made, so a clip generated over there is not regenerated over here.
-    cache.merge((await loadIndex(ctx.api))?.doc?.clips);
+    // data/vo.json is the generated-clip ledger the character tab and tools/vo/gen_lines.mjs write;
+    // it carries the same hash for any clip either made, so a clip generated there is not
+    // regenerated here. `lines` is gen_lines.mjs's section — the one that holds conversation lines.
+    const ledger = (await loadIndex(ctx.api))?.doc;
+    cache.merge(ledger?.clips);
+    cache.merge(ledger?.lines);
     state.offline = !(await ctx.api.online());
 
     el.innerHTML = '';
@@ -336,15 +341,21 @@ registerTab({
       card.scrollIntoView({ block: 'center' });
     }
 
+    // What is actually shipped in audio/vo/, which is CODEC.ext and has been since the compression
+    // pass. This filtered on '.wav' — a set that is always empty — so every line read as `missing`,
+    // every Play 404'd, and "skip if unchanged" could never be true.
     async function refreshDisk() {
       const ls = await ctx.api.ls('audio/vo');
-      state.onDisk = new Set((ls.files || []).filter(f => f.name.endsWith('.wav')).map(f => f.name.slice(0, -4)));
+      state.onDisk = new Set((ls.files || []).filter(f => f.name.endsWith(CODEC.ext))
+        .map(f => f.name.slice(0, -CODEC.ext.length)));
     }
 
-    function playClip(name) {
+    // Through js/game/clip.js, never an <audio>: voicePitch is a resample and an HTMLMediaElement
+    // time-stretches instead, so a bare <audio src> plays every character at the same pitch.
+    function playClip(name, who) {
       if (!name) return;
-      const a = new Audio(clipURL(name, Date.now()));
-      a.play().catch(e => ctx.toast(`cannot play ${name}: ${e.message}`, 'bad'));
+      playBuffer(clipFile(name), { pitch: pitchOf(E.cast?.[who]), bust: true })
+        .catch(e => ctx.toast(`cannot play ${name}: ${e.message}`, 'bad'));
     }
 
     async function generate(indices) {
@@ -365,17 +376,21 @@ registerTab({
       ctx.toast(`generating ${jobs.length} clip${jobs.length > 1 ? 's' : ''}…`);
       const r = await ctx.api.ttsBatch(jobs.map(j => j.job));
       if (!r.ok && !r.results) return ctx.toast(`kokoro: ${r.error}`, 'bad');
-      (r.results || []).forEach((res, n) => {
+      // kokoro wrote raws. Nothing plays a raw — the game fetches CODEC.ext — so each one is
+      // encoded before its hash is cached, or the next Generate would skip a clip that is not there.
+      for (const [n, res] of (r.results || []).entries()) {
         const j = jobs[n];
-        if (!res?.ok) return ctx.toast(`${j.out}: ${res?.error || 'failed'}`, 'bad');
+        if (!res?.ok) { ctx.toast(`${j.out}: ${res?.error || 'failed'}`, 'bad'); continue; }
+        const enc = await encodeClip(ctx.api, j.out);
+        if (!enc.ok) { ctx.toast(`${j.out}: encode failed — ${enc.error}`, 'bad'); continue; }
         cache.set(j.out, j.hash);
-      });
+      }
       edit(d => {
         (r.results || []).forEach((res, n) => { if (res?.ok) d.nodes[nodeId].lines[jobs[n].i].vo = jobs[n].out; });
       }, 'vo names');
       await refreshDisk();
       paintAll();
-      const good = (r.results || []).filter(x => x?.ok).length;
+      const good = jobs.filter(j => cache.get(j.out) === j.hash).length;
       ctx.toast(`${good}/${jobs.length} clips written to audio/vo/`, good ? 'good' : 'bad');
     }
 
