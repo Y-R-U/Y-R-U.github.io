@@ -50,7 +50,9 @@ export async function generate(body, onProgress) {
     const s = await api.job(start.job);
     if (!s.ok) return s;
     onProgress?.(s);
-    if (s.state === 'done') return { ok: true, ...s, out: start.out, prompt: start.prompt };
+    // Spread before ok, not after: `s` carries the poll's own ok, and letting it land last is
+    // how a failed job twice read as a win elsewhere in this project.
+    if (s.state === 'done') return { ...s, ok: true, out: start.out, prompt: start.prompt };
     if (s.state === 'error') return { ok: false, error: s.error || 'job failed' };
     if (i > 900) return { ok: false, error: 'gave up waiting' };
   }

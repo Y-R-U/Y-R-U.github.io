@@ -273,8 +273,9 @@ POST /api/encode { "src": "audio/music/raw/tavern_01.mp3", "profile": "radio",
 POST /api/encode { "promote": "audio/music/_preview/tavern_01.mp3" }    // keep it — a rename
 ```
 
-`js/dev/api.js` has **no wrapper for this yet** — it is HTTP only until its owner adds one; a tab
-can reach it with `fetch(`${api.base}/api/encode`, …)` in the meantime.
+`js/dev/api.js` wraps it: `api.encode()`, `api.encodeProfiles()`, `api.promote()`, `api.cancel()`.
+Use those rather than a raw `fetch` — four tabs each grew their own polling loop with its own
+backoff and its own timeout before the wrapper existed, and one of them bailed silently at 60 s.
 
 **Compression quality is a listening judgement, not a measurement.** This house has a scar from a
 machine score that rated 1990s-sounding speech at 90.7 % intelligible; the number was measuring a
