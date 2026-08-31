@@ -89,11 +89,12 @@ for (const { lv, pow } of LEVELS) {
     await page.evaluate(() => {
       // Simulate, don't draw. See render.js:setDrawing.
       window.__hb.setDrawing?.(false);
-      const seen = { pass: 0, apply: 0, count: 0, grow: 0, kills: 0, beats: 0, blocked: 0 };
+      const seen = { pass: 0, apply: 0, count: 0, grow: 0, kills: 0, beats: 0, blocked: 0, maxed: 0 };
       window.__smoke = { seen, start: window.__hb.state.troops };
       window.__hb.bus.on('gate:pass', () => seen.pass++);
       window.__hb.bus.on('effect:apply', () => seen.apply++);
       window.__hb.bus.on('gate:grow', () => seen.grow++);
+      window.__hb.bus.on('gate:max', () => seen.maxed++);
       window.__hb.bus.on('army:count', (e) => { if (e.delta) seen.count++; });
     });
 
@@ -165,7 +166,7 @@ for (const { lv, pow } of LEVELS) {
   const tag = bad.length ? 'FAIL' : ' ok ';
   console.log(`[${tag}] c1l${String(lv).padEnd(3)} ${(pow ? `pow ${pow}` : 'cold').padEnd(8)} ${r.start} -> ${r.end} (peak ${r.peak})  ` +
               `gates ${r.seen.pass}/${r.seen.apply} grown ${r.seen.grow}  ` +
-              `cash ${r.cash}  beats ${r.seen.beats}  ${r.result || '—'}  ${r.calls} calls`);
+              `cash ${r.cash}  maxed ${r.seen.maxed}  beats ${r.seen.beats}  ${r.result || '—'}  ${r.calls} calls`);
   for (const m of bad) console.log(`        ${m}`);
   if (bad.length) failures++;
   try { await browser.close(); } catch {}

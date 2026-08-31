@@ -293,6 +293,7 @@ function acquire(def) {
     : g.panel === 'glass' ? PANEL_CELL.glass0
     : panelCellFor(g.type);
   g.scale = 0; g.taken = false; g.dead = false; g.burst = -1; g.pressed = false;
+  g.maxed = false;                 // pooled: a reused gate must not start capped
   g.shown = '';
   // Tint sits between white and the sign colour: full saturation kills the
   // sheen and the pane stops reading as glass.
@@ -331,6 +332,14 @@ function relabel(g) {
 // --------------------------------------------------------------------------
 // Damage — the three verbs
 // --------------------------------------------------------------------------
+// A growable gate that has hit its cap is FINISHED — more fire cannot change
+// it, so it has no business standing between the squad and the enemy behind it.
+// Aaron: "I maxxed out 2 gates ... both gates also blocked all bullets from
+// hitting the enemies beyond the gate ... I couldn't shoot them until I was on
+// them." Glass and unpressed buttons keep blocking, because shooting those
+// still DOES something.
+export const isMaxed = (g) => !!g.grow && g.value >= g.base * GATE.growMax;
+
 function hitGate(g, damage = 1) {
   if (!g || g.dead || g.taken) return false;
   emit('gate:hit', { gate: g, damage });
@@ -378,6 +387,14 @@ function hitGate(g, damage = 1) {
   g.value = Math.min(cap, g.value + (GATE.growFlat + g.value * GATE.growPerHit) * mul);
   relabel(g);
   emit('gate:grow', { gate: g, value: g.value });
+  // The frame it caps: say so, once. The player has to know the wall just
+  // became a window, or they keep pouring fire into a number that cannot move.
+  if (g.value >= cap && !g.maxed) {
+    g.maxed = true;
+    emit('gate:max', { gate: g, x: g.x, y: 1.7, z: g.z, value: g.value });
+    emit('fx:number', { pos: { x: g.x, y: PANEL_Y + 0.6, z: g.z }, text: 'MAX',
+                        color: PAL.signYellow });
+  }
   return true;
 }
 
@@ -615,7 +632,7 @@ export function gateHitTest(x, y, z, r = 0.3) {
   for (let i = 0; i < active.length; i++) {
     const g = active[i];
     if (g.taken || g.dead || g.burst >= 0) continue;
-    if (!(g.grow || g.panel === 'glass' || (g.panel === 'button' && !g.pressed))) continue;
+    if (!((g.grow && !isMaxed(g)) || g.panel === 'glass' || (g.panel === 'button' && !g.pressed))) continue;
     const dz = z - g.z;
     if (dz < -r - 0.5 || dz > r + 0.5) continue;
     if (Math.abs(x - g.x) > halfW(g) + r) continue;

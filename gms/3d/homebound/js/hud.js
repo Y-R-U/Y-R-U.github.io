@@ -119,6 +119,16 @@ export function initHud() {
     if (toastT <= 0) nextToast();
   });
 
+  // A capped gate stops blocking fire (gates.js:isMaxed) — otherwise it stands
+  // between the squad and the enemies behind it and the player cannot shoot
+  // past it. Same shape of tip as the glass one: say it once, the first time.
+  on('gate:max', () => {
+    if (storySeen('tip:max')) return;
+    markStory('tip:max');
+    toastQ.push({ text: 'MAXED OUT · YOUR FIRE GOES STRAIGHT THROUGH IT NOW', icon: '🎯' });
+    if (toastT <= 0) nextToast();
+  });
+
   initBeatTaps();
 
   on('army:count', onCount);
