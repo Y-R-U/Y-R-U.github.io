@@ -56,6 +56,7 @@ node tools/crossgate.mjs      # solid bodies: walk = blocked, jump = crosses, fl
 node tools/uigate.mjs         # first-run coaching, the duck crouch, shop tab highlight
 node tools/musicrota.mjs      # the roster must not repeat, within a run or across refreshes
 node tools/portraitgate.mjs   # portrait renders sideways and touch still maps correctly
+node tools/bootgate.mjs       # a stale/broken module set must report itself, not hang
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -122,6 +123,12 @@ from its output, not by feel.
   crossover. Attacks also root you (`spd * 0` while attacking) — creeping forward mid-power-hit
   walked you over the body you had just floored, which is how a power hit put you on the wrong
   side even with solid bodies.
+- **A boot failure must never be silent.** ES modules load individually, so a deploy can leave
+  a browser with a new `main.js` and a cached older `music.js`; the import then throws, nothing
+  in main.js runs, and the boot screen sits on "sharpening pencils…" with no START button —
+  indistinguishable from a hang, and reported as "broken on refresh". index.html carries an
+  **inline** error handler (it has to be inline: a module that fails to parse cannot report
+  itself) that shows the message and a RELOAD which busts the cache with `?v=<now>`.
 - **Portrait rotates the app; it does not block.** A "turn your device" wall hides the very
   thing that tells you to turn it, so `#app` gets `translateX(100vw) rotate(90deg)` in portrait
   and the game plays sideways. `Input.localPoint` inverts that exact transform —

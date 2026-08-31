@@ -65,6 +65,11 @@ html, body {
 #bootbar i { display: block; height: 100%; width: 0%; background: #cbbfa0; transition: width .25s; }
 #bootmsg { color: #9b917a; font-size: 16px; }
 #startBtn { margin-top: 14px; }
+#bootfail { display: none; flex-direction: column; align-items: center; gap: 10px;
+  margin-top: 12px; max-width: min(460px, 88vw); }
+#bootfail:not(.hidden) { display: flex; }
+#bootfailmsg { color: #e8b7bd; font-size: 15px; text-align: center; line-height: 1.35;
+  background: rgba(0,0,0,.35); padding: 8px 12px; border-radius: 9px; word-break: break-word; }
 
 /* ── hub ───────────────────────────────────────────────────────────────── */
 .corner { position: absolute; display: flex; gap: 8px; align-items: center; }

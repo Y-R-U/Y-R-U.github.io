@@ -461,6 +461,9 @@ async function boot() {
   };
   if (qs.get('auto') || qs.get('shot')) setTimeout(() => $('startBtn').click(), 120);
 }
-boot();
+boot().catch((err) => {
+  // Surfaced by the inline handler in index.html; rethrow so it is reported, not swallowed.
+  setTimeout(() => { throw err; });
+});
 
 window.__ragdojo = { get save() { return S; }, get match() { return match; }, startFight, LEVELS, S };

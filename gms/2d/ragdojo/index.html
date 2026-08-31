@@ -23,6 +23,10 @@
       <div id="bootbar"><i></i></div>
       <div id="bootmsg">sharpening pencils…</div>
       <button id="startBtn" class="btn big hidden">START</button>
+      <div id="bootfail" class="hidden">
+        <div id="bootfailmsg"></div>
+        <button id="btnReload" class="btn">RELOAD</button>
+      </div>
     </div>
 
     <!-- hub / between fights -->
@@ -108,6 +112,40 @@
     <div id="rotate"><span>↻</span><span>turn sideways to play</span></div>
   </div>
 </div>
+<script>
+// Inline on purpose: if js/main.js itself fails to load or parse, nothing inside it can
+// report that. Without this the boot screen just sits at "sharpening pencils..." forever,
+// which is indistinguishable from a hang. Most likely cause is a half-cached module set
+// after a deploy, which is why RELOAD busts the cache rather than doing a plain reload.
+(function () {
+  var shown = false;
+  function fail(what) {
+    if (shown) return;
+    shown = true;
+    var box = document.getElementById('bootfail');
+    var msg = document.getElementById('bootfailmsg');
+    var bar = document.getElementById('bootmsg');
+    if (!box || !msg) return;
+    if (bar) bar.textContent = 'something went wrong loading the game';
+    msg.textContent = String(what || 'unknown error').slice(0, 220);
+    box.classList.remove('hidden');
+    document.getElementById('btnReload').onclick = function () {
+      location.href = location.pathname + '?v=' + Date.now();
+    };
+  }
+  window.addEventListener('error', function (e) {
+    fail(e.message || (e.target && e.target.src ? 'failed to load ' + e.target.src : 'load error'));
+  }, true);
+  window.addEventListener('unhandledrejection', function (e) {
+    fail((e.reason && (e.reason.message || e.reason)) || 'promise rejected');
+  });
+  // Belt and braces: if START never appears, say so rather than spinning forever.
+  setTimeout(function () {
+    var b = document.getElementById('startBtn');
+    if (b && b.classList.contains('hidden')) fail('the game did not finish loading');
+  }, 12000);
+})();
+</script>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>
