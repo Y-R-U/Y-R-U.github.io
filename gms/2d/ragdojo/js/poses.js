@@ -80,7 +80,7 @@ export function lerpPose(a, b, u, out = {}) {
 export const POSE = {
   guard:   pose({ t: 0.12, h: -0.08, sl: 0.95, el: 2.45, sr: 1.25, er: 2.15, hl: -0.28, kl: 0.36, hr: 0.30, kr: 0.10 }),
   guardB:  pose({ t: 0.16, h: -0.04, sl: 1.02, el: 2.35, sr: 1.32, er: 2.05, hl: -0.26, kl: 0.30, hr: 0.28, kr: 0.14 }),
-  block:   pose({ t: 0.02, h: 0.16, sl: 1.55, el: 2.30, sr: 1.70, er: 2.25, hl: -0.20, kl: 0.44, hr: 0.22, kr: 0.30, crouch: 0.25 }),
+  block:   pose({ t: 0.30, h: 0.34, sl: 1.85, el: 2.55, sr: 2.00, er: 2.45, hl: -0.63, kl: 1.29, hr: 0.66, kr: 1.25, crouch: 0.45 }),
 
   walkA:   pose({ t: 0.16, h: -0.05, sl: 0.55, el: 1.85, sr: 1.45, er: 1.70, hl: -0.52, kl: 0.62, hr: 0.54, kr: 0.14 }),
   walkB:   pose({ t: 0.14, h: -0.05, sl: 1.00, el: 2.00, sr: 1.10, er: 1.90, hl: -0.10, kl: 0.30, hr: 0.16, kr: 0.42 }),

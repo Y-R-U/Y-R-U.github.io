@@ -51,6 +51,9 @@ Everything here is a real gate — each one has been watched go red.
 
 ```
 node tools/gesturetest.mjs    # 10 synthetic gestures through the classifier, with jitter
+node tools/nangate.mjs        # no hazard level may produce a non-finite fighter position
+node tools/crossgate.mjs      # solid bodies: walk = blocked, jump = crosses, floored = step over
+node tools/uigate.mjs         # first-run coaching, the duck crouch, shop tab highlight
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -79,12 +82,33 @@ from its output, not by feel.
   a ~5 MB data URL. `tools/shot.mjs` has the page POST the blob to its own server instead.
   `cdp.shot()` (Page.captureScreenshot) is fine here and is the only way to capture DOM menus,
   which canvas-only capture misses entirely.
+- **A non-finite position is the worst failure mode this engine has.** It throws nothing and
+  crashes nothing: the fighter simply drops out of every hit test and the fight can never end,
+  which reads as "this level times out". It shipped once — `Brain`'s hazard dodge steered by
+  `h.x`, and `ScribbleStorm` has no `x`, so levels 36, 42 and 44 quietly broke. Hazards now
+  answer `threatX(x)` and `Fighter.move` refuses a non-finite `dir`. `tools/nangate.mjs` covers
+  every hazard type. It also poisoned a whole A/B run before it was found — see below.
+- **Bodies are solid on the ground; jumping is the only way to cross sides** (`Match.separate`).
+  `BODY_R` is capped by attack reach, not by how the figures look: a jab puts the hand ~61u in
+  front of the pelvis and separation is `BODY_R * (scaleA + scaleB)`, so at 26 the 1.3x-scale
+  final boss sat 60u away and the player's basic attack could not reach him at all.
+- **Do not A/B a gameplay change against a noisy sim.** The solid-body rule looked like it cost
+  the final boss two thirds of its win rate. It cost nothing — the levels it "broke" were the
+  scribble levels, and the real culprit was the NaN above. Small-sample sim runs and a swing
+  counter that double-counted `multi` attacks both pointed the wrong way. Isolate the variable,
+  check the instrument, then tune.
 - **The player always spawns on the left, under the YOU panel** (world x 560; enemies at
   1680-560). That was already true when it was first reported as a bug — the real problem was
   that you cannot tell which identical white stick figure is yours once you cross over. Hence
   the blue triangle over the player's head, the matching triangle on the YOU panel, the
   fight-start name tags (`match.introT`), and enemies being drawn in lighter ink. If that
   association ever needs revisiting, fix identification; do not move the spawn.
+- **A crouch must not move the collision floor.** `duckDrop` is a pose offset applied to the
+  ragdoll target origin only. Folding it into `standY` made `onGround` false, which cleared
+  `blocking`, which cancelled the crouch — a deadlock that left the fighter hovering.
+- **Fight music alternates within a tier** (`fightTrack` in main.js). Selecting on tier alone
+  put `fight1` on 12 of the first 15 fights and never played `fight2` before level 15, which
+  reads as "there is only one song".
 - Enemy-on-enemy hits deal 25% damage. At full damage the enemies finish gauntlets for you.
 - `?autoplay=1` is a real fight with an AI player; `demo` is the menu background match. They
   are different flags.

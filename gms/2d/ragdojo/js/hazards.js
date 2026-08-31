@@ -7,6 +7,8 @@ import { GROUND_Y, SHEET_W, SHEET_H } from './config.js';
 class Hazard {
   constructor(a) { this.arena = a; this.dead = false; this.t = 0; }
   threatens() { return false; }
+  /** World x to back away from. Hazards with no single position return null. */
+  threatX() { return Number.isFinite(this.x) ? this.x : null; }
   update(dt) { this.t += dt; }
   drawBack() {}
   drawFront() {}
@@ -318,6 +320,16 @@ export class ScribbleStorm extends Hazard {
     this.strokes = [];
   }
   threatens(x) { return this.strokes.some((s) => s.warn > 0 && Math.abs(x - s.x) < 120); }
+  /** A scribble storm has no position of its own — hand back the nearest pending stroke. */
+  threatX(x) {
+    let best = null, bd = Infinity;
+    for (const s of this.strokes) {
+      if (s.warn <= 0) continue;
+      const d = Math.abs(x - s.x);
+      if (d < bd) { bd = d; best = s.x; }
+    }
+    return best;
+  }
   update(dt, fighters, fx) {
     this.t += dt; this.dur -= dt;
     if (this.dur <= 0 && !this.strokes.length) this.dead = true;

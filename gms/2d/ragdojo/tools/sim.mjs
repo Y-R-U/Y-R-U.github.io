@@ -44,6 +44,7 @@ const DT = 1 / 120;
 /** Play one fight to a result with no renderer and no clock. */
 function runFight(level, save, bully = false) {
   const m = new Match({ level, save, bully, autoplay: true, onEnd: () => {} });
+  if (args.nosep) m.separate = () => {};      // A/B the solid-body rule
   let t = 0;
   while (!m.over && t < MAX_SECONDS) {
     m.update(DT, null);

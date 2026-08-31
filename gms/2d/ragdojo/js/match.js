@@ -13,6 +13,16 @@ import {
 } from './config.js';
 import { sfx } from './audio.js';
 
+/**
+ * Half the width of a standing fighter's body, in world units.
+ *
+ * This is capped by attack reach, not by how the figures look. A jab puts the hand about
+ * 55u in front of the pelvis, and separation is (BODY_R * scaleA + BODY_R * scaleB) — so at
+ * 26 the 1.3x-scale final boss sat 60u away and the player's basic attack could not reach
+ * him at all. Keep BODY_R * 2.3 comfortably under 55.
+ */
+const BODY_R = 19;
+
 export class Match {
   /**
    * @param opts {level, save, demo, bully, onEnd}
@@ -48,6 +58,8 @@ export class Match {
     this.announce = null;
     this.announceT = 0;
     this.introT = this.demo ? 0 : 2.6;   // name tags over each fighter at the start
+    this.onSeen = opts.onSeen || (() => {});
+    this.coach = null;                   // first-run prompt: the tap-to-punch discovery gap
 
     this.build();
   }
@@ -106,11 +118,30 @@ export class Match {
 
   say(text, secs = 1.7) { this.announce = text; this.announceT = secs; }
 
+  /**
+   * Punching is a bare tap with nothing on screen to suggest it, so without this the only
+   * way to find it is the help panel. Each prompt clears the first time you do the thing.
+   */
+  updateCoach() {
+    if (this.demo || this.bully || this.over) { this.coach = null; return; }
+    const seen = this.save.seen || (this.save.seen = {});
+    if (!seen.punch) this.coach = { text: 'TAP THIS SIDE TO PUNCH', sub: 'tap again to combo' };
+    else if (!seen.power) this.coach = { text: 'DRAW  /  FOR A POWER HIT', sub: 'low to high, like a slash' };
+    else this.coach = null;
+  }
+
+  markSeen(key) {
+    const seen = this.save.seen || (this.save.seen = {});
+    if (seen[key]) return;
+    seen[key] = true;
+    this.onSeen();
+  }
+
   // ── player input ─────────────────────────────────────────────────────────
   playerStrike() {
     if (this.over || this.demo) return;
     const k = this.player.strike();
-    if (k) sfx.whoosh();
+    if (k) { sfx.whoosh(); this.markSeen('punch'); }
   }
 
   playerSpecial(id) {
@@ -122,6 +153,7 @@ export class Match {
       return false;
     }
     const ok = this.player.special(m);
+    if (ok && id === 'power') this.markSeen('power');
     if (ok) {
       sfx.whoosh();
       this.fx.text(this.player.x, this.player.y - 165, m.name, { col: '#2f6ad0', size: 26 });
@@ -265,6 +297,7 @@ export class Match {
     this.time += d;
     if (this.announceT > 0) this.announceT -= dt;
     if (this.introT > 0) this.introT -= dt;
+    this.updateCoach();
 
     if (!this.over) {
       if (this.demo || this.autoplay) {
@@ -295,10 +328,15 @@ export class Match {
 
     for (const f of this.all) f.update(d, this.world, this.resolveHit);
 
+    this.separate();
+
     for (let i = 0; i < this.all.length; i++) {
       for (let j = i + 1; j < this.all.length; j++) {
         const a = this.all[i], b = this.all[j];
-        if (Math.abs(a.x - b.x) < 110) repel(a.rag, b.rag, 17);
+        // Limb-level shove is only for bowling a floored body around; upright fighters are
+        // kept apart by separate(), and running both on the same pair makes them jitter.
+        const floored = a.mode === 'down' || a.mode === 'dead' || b.mode === 'down' || b.mode === 'dead';
+        if (floored && Math.abs(a.x - b.x) < 110) repel(a.rag, b.rag, 17);
       }
     }
 
@@ -358,6 +396,55 @@ export class Match {
     this.fx.update(d, GROUND_Y);
     this.checkEnd(dt);
     this.camera(dt);
+  }
+
+  /**
+   * Standing fighters are solid. You cross to the other side of someone by JUMPING over
+   * them, never by walking through them — walking through was the thing that made it
+   * impossible to keep track of which figure was yours.
+   *
+   * Deliberately does not apply when: either body is airborne (that is the crossing move),
+   * either is floored (you step over a downed fighter), or the mover is mid-dash/flip,
+   * which are supposed to travel through people.
+   */
+  separate() {
+    const solid = (f) =>
+      !f.dead && f.onGround &&
+      (f.mode === 'live' || f.mode === 'stagger' || f.mode === 'getup') &&
+      !(f.attack && f.attack.def.lockMove);
+
+    for (let i = 0; i < this.all.length; i++) {
+      const a = this.all[i];
+      if (!solid(a)) continue;
+      for (let j = i + 1; j < this.all.length; j++) {
+        const b = this.all[j];
+        if (!solid(b)) continue;
+        const min = (BODY_R * a.scale) + (BODY_R * b.scale);
+        let dx = b.x - a.x;
+        if (dx === 0) dx = (a.id < b.id ? -0.01 : 0.01);
+        const d = Math.abs(dx);
+        if (d >= min) continue;
+        const s = Math.sign(dx);
+        const overlap = min - d;
+        // Resolve on whoever is walking INTO the other. Splitting it evenly lets an
+        // advancing AI bulldoze a standing player backwards across the page, which reads as
+        // "I can never get a hit in" and pushed champion win rates down by a third.
+        const intoA = Math.max(0, -b.vx * s);   // b moving toward a
+        const intoB = Math.max(0, a.vx * s);    // a moving toward b
+        const drive = intoA + intoB;
+        let wa, wb;
+        if (drive > 1) { wa = intoB / drive; wb = intoA / drive; }
+        else { const ma = 1 / a.mass, mb = 1 / b.mass, sum = ma + mb; wa = ma / sum; wb = mb / sum; }
+        a.x -= s * overlap * wa;
+        b.x += s * overlap * wb;
+        a.x = Math.max(this.world.minX + 24, Math.min(this.world.maxX - 24, a.x));
+        b.x = Math.max(this.world.minX + 24, Math.min(this.world.maxX - 24, b.x));
+        // Kill the closing velocity so they rest against each other instead of buzzing.
+        // Stop dead against each other rather than buzzing.
+        if (a.vx * s > 0) a.vx = 0;
+        if (b.vx * s < 0) b.vx = 0;
+      }
+    }
   }
 
   spawnHazard(kind) {

@@ -60,6 +60,9 @@ export function stopShopTicker() {
 export function buildShop(listEl, inkEl, S, onChange) {
   let tab = 'moves';
   const tabs = document.querySelectorAll('#shop .tab');
+  // Reopening the shop resets `tab` to moves, so the buttons have to be reset too —
+  // otherwise SKILLS stays highlighted while the MOVES list is showing.
+  tabs.forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
   tabs.forEach((b) => {
     b.onclick = () => {
       tabs.forEach((x) => x.classList.toggle('on', x === b));

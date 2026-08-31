@@ -124,6 +124,41 @@ export function drawHUD(ctx, vw, vh, m, save, input) {
   if (input) drawTouch(ctx, input);
 }
 
+/** First-run prompt, sitting on the half of the screen it is talking about. */
+function drawCoach(ctx, vw, vh, m, input) {
+  const right = (input?.hand || 'right') === 'right';
+  const cx = right ? vw * 0.72 : vw * 0.28;
+  const cy = vh * 0.52;
+  const pulse = 0.72 + Math.sin(m.time * 4) * 0.28;
+  ctx.save();
+  ctx.globalCompositeOperation = 'multiply';
+  ctx.globalAlpha = pulse;
+  const size = Math.min(26, vw * 0.035);
+  ctx.font = `700 ${size}px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = 'rgba(250,247,238,0.94)';
+  ctx.strokeText(m.coach.text, cx, cy);
+  ctx.fillStyle = '#2f6ad0';
+  ctx.fillText(m.coach.text, cx, cy);
+  if (m.coach.sub) {
+    ctx.font = `400 ${size * 0.68}px ${FONT}`;
+    ctx.lineWidth = 5;
+    ctx.strokeText(m.coach.sub, cx, cy + size * 0.95);
+    ctx.fillStyle = '#6a7080';
+    ctx.fillText(m.coach.sub, cx, cy + size * 0.95);
+  }
+  // A dashed ring around the half it means.
+  ctx.globalAlpha = pulse * 0.4;
+  ctx.setLineDash([9, 9]);
+  ctx.strokeStyle = '#2f6ad0';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - size * 0.3, vw * 0.19, vh * 0.30, 0, 0, 6.283);
+  ctx.stroke();
+  ctx.restore();
+}
+
 /** Owned specials with their gesture glyph and cooldown sweep. */
 function drawMoveStrip(ctx, vw, vh, m, save, input) {
   const owned = MOVES.filter((mv) => (save.moves[mv.id] || {}).owned);

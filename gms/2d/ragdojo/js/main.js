@@ -104,13 +104,28 @@ function startFight(levelIdx, bully = false) {
   ensureSheet(level);
   match = new Match({
     level, save: S, bully, autoplay: !!qs.get('autoplay'),
+    onSeen: () => persist(S),
     onEnd: (result, m) => finishFight(result, m),
   });
   match.say(bully ? 'BULLY TIME' : level.kind === 'final' ? 'FINAL PAGE' :
     level.kind === 'champion' ? 'CHAMPION' : 'FIGHT!', 1.8);
   setMode('fight');
-  audio.play(level.kind === 'final' ? 'final' : level.kind === 'champion' ? 'boss' :
-    level.tier >= 6 ? 'fight3' : level.tier >= 3 ? 'fight2' : 'fight1');
+  audio.play(fightTrack(level));
+}
+
+/**
+ * Tier sets the base track so the music still escalates, but consecutive fights alternate
+ * with the neighbouring track. Picking on tier alone meant 12 of the first 15 fights played
+ * fight1 and you never heard fight2 before level 15 — which reads as "there is only one song".
+ */
+const FIGHT_TRACKS = ['fight1', 'fight2', 'fight3'];
+function fightTrack(level) {
+  if (level.kind === 'final') return 'final';
+  if (level.kind === 'champion') return 'boss';
+  const base = level.tier >= 6 ? 2 : level.tier >= 3 ? 1 : 0;
+  // Alternate upward from the low tiers and downward from the top, so no track is starved.
+  const alt = level.idx % 2 ? (base >= FIGHT_TRACKS.length - 1 ? base - 1 : base + 1) : base;
+  return FIGHT_TRACKS[alt];
 }
 
 function finishFight(result, m) {
@@ -158,7 +173,7 @@ function showResults(R) {
   ].join('');
   $('btnResult').textContent = won ? 'CONTINUE' : 'TRY AGAIN';
   overlay('results');
-  audio.play('menu');
+  audio.play(won ? 'victory' : 'menu');
   if (won) audio.sfx.bell();
 }
 const row = (k, v) => `<div class="r"><span>${k}</span><b>${v}</b></div>`;

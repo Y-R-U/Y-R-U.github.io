@@ -43,9 +43,11 @@ export class Brain {
       }
     }
     for (const h of info.hazards || []) {
-      if (h.threatens && h.threatens(f.x) && this.jumpCd <= 0) {
-        if (Math.random() < 0.4 + this.skill * 0.55) { f.jump(); this.jumpCd = 0.7; }
-        else f.move(-Math.sign(h.x - f.x), dt);
+      if (!h.threatens || !h.threatens(f.x) || this.jumpCd > 0) continue;
+      if (Math.random() < 0.4 + this.skill * 0.55) { f.jump(); this.jumpCd = 0.7; }
+      else {
+        const hx = h.threatX ? h.threatX(f.x) : h.x;
+        if (Number.isFinite(hx)) f.move(Math.sign(f.x - hx) || 1, dt);
       }
     }
 

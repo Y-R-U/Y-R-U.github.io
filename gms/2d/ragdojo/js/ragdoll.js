@@ -9,7 +9,7 @@ export const P = {
 export const NPTS = 11;
 
 export const BONE = {
-  spine: 50, skull: 17, upperArm: 23, foreArm: 22, thigh: 27, shin: 27, headR: 14.5,
+  spine: 50, skull: 17, upperArm: 26, foreArm: 25, thigh: 27, shin: 27, headR: 14.5,
 };
 
 const LINKS = [
@@ -31,7 +31,7 @@ const MASS = [1.6, 1.3, 1.1, 0.55, 0.45, 0.55, 0.45, 0.85, 0.7, 0.85, 0.7];
  * ground. These are what keep the crumple.
  */
 const RANGES = [
-  [P.NECK, P.HAND_L, 17, 43], [P.NECK, P.HAND_R, 17, 43],
+  [P.NECK, P.HAND_L, 19, 49], [P.NECK, P.HAND_R, 19, 49],
   [P.PELVIS, P.FOOT_L, 21, 51], [P.PELVIS, P.FOOT_R, 21, 51],
   [P.NECK, P.KNEE_L, 32, 999], [P.NECK, P.KNEE_R, 32, 999],
   [P.HEAD, P.HAND_L, 15, 999], [P.HEAD, P.HAND_R, 15, 999],

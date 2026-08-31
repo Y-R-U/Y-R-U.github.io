@@ -54,6 +54,7 @@ export class Fighter {
     this.invuln = 0;
     this.blocking = false;
     this.guardBroken = 0;
+    this.duckDrop = 0;
     this.dead = false;
     this.tailPhase = Math.random() * 6;
 
@@ -89,6 +90,9 @@ export class Fighter {
 
   // ── control ──────────────────────────────────────────────────────────────
   move(dir, dt) {
+    // A non-finite dir silently turns vx, then x, then every hit test into NaN, and the
+    // fighter drops out of the fight with no error. Refuse it at the door.
+    if (!Number.isFinite(dir)) return;
     if (!this.canAct && this.mode !== 'live') return;
     if (this.attack && this.attack.def.lockMove) return;
     const spd = this.speed * (this.blocking ? 0.42 : 1) * (this.attack ? 0.35 : 1);
@@ -249,6 +253,8 @@ export class Fighter {
     this.stunT = Math.max(0, this.stunT - dt);
     this.guardBroken = Math.max(0, (this.guardBroken || 0) - dt);
     this.tailPhase += dt * (6 + Math.abs(this.vx) * 0.02);
+    const wantDrop = (this.blocking && this.onGround) ? 23 * this.scale : 0;
+    this.duckDrop += (wantDrop - this.duckDrop) * Math.min(1, dt * 16);
     for (const k in this.cd) if (this.cd[k] > 0) this.cd[k] -= dt;
     if (this.comboTimer > 0) { this.comboTimer -= dt; if (this.comboTimer <= 0) this.combo = 0; }
 
@@ -337,7 +343,7 @@ export class Fighter {
     }
 
     const s = sample(this.anim, this.animT, this.spin ? this.spin * Math.min(1, this.animT / 0.5) * Math.PI * 2 : 0);
-    this.rag.setTargets(this.x, this.y, fk(s.p, this.facing, this.scale));
+    this.rag.setTargets(this.x, this.y + this.duckDrop, fk(s.p, this.facing, this.scale));
     this.rag.step(dt, this.gain, world);
   }
 
