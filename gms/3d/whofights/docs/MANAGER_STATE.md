@@ -196,6 +196,19 @@ generate and curate.
   the hearth (`:462`), both refectory tables with their benches folded into one box (`:933`), the
   two presses (`:1012`) and the three chests (`:1019`). Tapestries and door reveals sit flush to
   the masonry and correctly have none.
+- **`tools/shot.mjs` wedged on any screenshot over 4 MiB**, which is every render at its own
+  defaults (1600×900 dpr 2 = a 9.1 MB base64 reply). Node's bundled websocket negotiates
+  permessage-deflate and undici destroys the socket over a 4 MiB decompressed message, closing 1006
+  with no frame; a `send` that only settles on a reply then waits for ever. Fixed 31 Aug in
+  `1af64b55` with a hand-rolled transport that negotiates no extension, bounded requests that name
+  themselves on timeout, and a close handler that rejects everything in flight.
+  **It had never worked at those settings** — the last good render was an `--all` sweep at a quarter
+  of the pixels, and `HANDOFF.md` hardcoded the small-render flags as a workaround nobody had
+  explained. *Three separate silent-failure tools on this project now: a check that cannot fail is
+  the recurring shape, and `settle()` — which returned success for a page that never drew a frame —
+  was another.* `js/dev/cdp.mjs` has the same defect and is assigned.
+- Confirmed still true by the 31 Aug hall render (`shots/hall.png`), unlike the struck-through
+  entries above: the masonry reads as brick, and the flat blue window panels read as placeholders.
 - Hall masonry reads as brick rather than ashlar; one number (`INTERIOR_TILE.stone`).
 - Flat blue window panels at mid-wall height read as placeholder rectangles.
 - The tracer misses boot — hooks install on first Debug-tab open. One line in `js/dev/boot.js`.
