@@ -340,6 +340,34 @@ function relabel(g) {
 // still DOES something.
 export const isMaxed = (g) => !!g.grow && g.value >= g.base * GATE.growMax;
 
+// SALVAGE. A glass gate you shot yourself used to pay nothing at all, and Aaron
+// pointed out that destroying it is barely a choice: the squad fires down the
+// lane it is steering into, so the pane you break is the one you were driving
+// for. The counter-play — swing wide and cut in late — is real, but it is a
+// fiddly ask for something you cannot simply decline to do.
+//
+// So the wreckage pays a fraction. Cutting in late still pays nearly three
+// times more, which keeps the decision that glass exists to create; breaking it
+// is now a worse outcome rather than a void one.
+//
+// Only the CONTINUOUS, GOOD effects. A trap must never reward the player for
+// shooting it — that is the whole verb. And `mult` cannot simply be scaled: a
+// x2 at 0.35 is x0.7, which would SHRINK the squad, so it salvages toward 1.
+function salvage(g) {
+  const rate = GATE.salvage || 0;
+  if (!rate || EFFECTS[g.type]?.good === false) return;
+  let value;
+  if (g.type === 'mult') value = 1 + (g.value - 1) * rate;
+  else if (g.type === 'troops' || g.type === 'cash' || g.type === 'shield') {
+    value = Math.floor(g.value * rate);
+    if (value < 1) return;
+  } else return;                  // tier / weapon / power are discrete, not divisible
+
+  emit('gate:pass', { gate: g, effect: { type: g.type, value } });
+  emit('fx:number', { pos: { x: g.x, y: PANEL_Y + 0.6, z: g.z },
+                      text: 'SALVAGE', color: PAL.glass });
+}
+
 function hitGate(g, damage = 1) {
   if (!g || g.dead || g.taken) return false;
   emit('gate:hit', { gate: g, damage });
@@ -362,6 +390,7 @@ function hitGate(g, damage = 1) {
     g.cell = PANEL_CELL['glass' + st];
     if (g.hp <= 0) {
       g.dead = true;
+      salvage(g);
       emit('gate:break', { gate: g });
       emit('fx:explosion', { pos: { x: g.x, y: PANEL_Y, z: g.z }, scale: 1.0, color: PAL.glass });
       emit('fx:shake', { amount: 0.22 });

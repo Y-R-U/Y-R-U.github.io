@@ -11,6 +11,11 @@ const Q = new URLSearchParams(location.search);
 // --------------------------------------------------------------------------
 export const DEV_MODE  = Q.has('dev');
 export const LITE_MODE = Q.has('lite');
+// Suppress story beats. They pause the run and wait for a tap, which is right
+// for a player and useless for a screenshot: the card covers the frame and the
+// squad stands still behind it. Tapping them from the harness is not enough —
+// a later step raises the next one.
+export const NO_BEATS  = Q.has('nobeats');
 export const AUTO_MODE = Q.has('auto');            // AI thumb drives the squad
 export const WIPE_ARG  = Q.has('wipe');
 export const SHOT_ARG  = Q.get('shot') || '';      // staged frame id for the harness
@@ -186,7 +191,7 @@ export const GATE = {
   // steering for, short enough that deliberately parking in its lane does. The
   // approach window is about 5.4 s, so committing early breaks it and arriving
   // late takes it — which is the skill.
-  glassSeconds: 4.5,
+  glassSeconds: 4.5, salvage: 0.35,
   glassHp: 30,               // floor, for a squad too small for the rate to matter
   approachFade: 26,          // metres over which a gate FINISHES fading in;
                              // gates.js spawns them well before this so a row is

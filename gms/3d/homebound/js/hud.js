@@ -13,7 +13,7 @@
 //    and re-textured. resetHud() is called between runs and must not churn the
 //    DOM — a run start is the frame the player is least willing to lose.
 
-import { TIERS, tierAt } from './config.js';
+import { TIERS, tierAt, NO_BEATS } from './config.js';
 import { state } from './state.js';
 import { markStory, storySeen } from './save.js';
 import { pauseRun, run } from './game.js';
@@ -115,7 +115,7 @@ export function initHud() {
   on('gate:break', () => {
     if (storySeen('tip:glass')) return;
     markStory('tip:glass');
-    toastQ.push({ text: 'YOUR OWN FIRE BREAKS GLASS · COME IN LATE TO TAKE ONE', icon: '🔷' });
+    toastQ.push({ text: 'GLASS BREAKS · YOU SALVAGE A THIRD · COME IN LATE FOR ALL', icon: '🔷' });
     if (toastT <= 0) nextToast();
   });
 
@@ -323,7 +323,7 @@ function onBoss({ frac }) {
 // waits for a tap. That is worth the interruption precisely because there are
 // never more than two of them in a level.
 function onBubble({ who, text, ms }) {
-  if (run.autoplay) return;              // never over the main screen's backdrop
+  if (run.autoplay || NO_BEATS) return;  // never over the main screen's backdrop
   beatQ.push({ who, text });
   if (!beatOn) showBeat();
 }
