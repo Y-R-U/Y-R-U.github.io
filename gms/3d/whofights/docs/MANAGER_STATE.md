@@ -144,6 +144,14 @@ generate and curate.
 
 ## Known problems
 
+> **Three entries in this section have now been struck through as already fixed, and one of them
+> sent an agent after work that existed.** Items here are written when a problem is *found* and
+> nothing revisits them when it is *solved*. Verify any claim against the code before briefing
+> anyone on it — `grep` for the function it names, `git ls-files` the asset it says is missing.
+> Strike through what you disprove rather than deleting it; a wrong entry is worth keeping as a
+> record of what was already checked.
+
+
 - **Aaron, playing it: "I can't fully look around."** Root cause was `PITCH_MIN/PITCH_MAX` in
   `js/player.js` — hard clamps at −0.35 / +1.05 rad (−20° / +60°), and indoors a further cap at
   0.50 rad (~29°), which made the new 11 m hall roof unreachable. Widened to −0.90 / +1.30 and the
@@ -182,7 +190,12 @@ generate and curate.
   the reference off-grey as the next hour's work. Also recorded there: a skin's sidecar stores the
   pose reference's path rather than its bytes, so the four older skins no longer reproduce
   byte-for-byte from their own sidecars.
-- Nothing in the hall has a collider — you walk through tables, presses and the hearth.
+- ~~Nothing in the hall has a collider — you walk through tables, presses and the hearth.~~
+  **Stale as of 31 Aug — the third wrong claim in this file.** `js/world/interior.js` has a
+  `solid()` helper, an `I.solids` list and a `pushOut` per frame, and every solid prop is in it:
+  the hearth (`:462`), both refectory tables with their benches folded into one box (`:933`), the
+  two presses (`:1012`) and the three chests (`:1019`). Tapestries and door reveals sit flush to
+  the masonry and correctly have none.
 - Hall masonry reads as brick rather than ashlar; one number (`INTERIOR_TILE.stone`).
 - Flat blue window panels at mid-wall height read as placeholder rectangles.
 - The tracer misses boot — hooks install on first Debug-tab open. One line in `js/dev/boot.js`.
