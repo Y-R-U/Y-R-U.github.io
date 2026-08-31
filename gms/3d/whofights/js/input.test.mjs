@@ -55,3 +55,19 @@ test('lock takes anything truthy and is never latched by read', () => {
   i.lock(undefined);
   ok(i.locked === false);
 });
+
+// The dev hub pauses the render loop, so nothing calls read() while the player drags on the stage
+// behind it. Banking those deltas turned a long drag into one whip of several turns on the frame
+// the loop came back.
+test('a drag made while nothing is reading does not bank up', () => {
+  const i = new Input();
+  i.lookId = 7;
+  i.pointers.set(7, { x: 0, y: 0, x0: 0, y0: 0, t: 0, moved: 0 });
+  i.read();
+  for (let n = 1; n <= 40; n++) i.onMove({ pointerId: 7, clientX: n * 30, clientY: 0 });
+  ok(i.read().lx > 1000, 'a live read still gets the whole drag');
+
+  i.readAt = performance.now() - 1000;
+  for (let n = 1; n <= 40; n++) i.onMove({ pointerId: 7, clientX: 1200 + n * 30, clientY: 0 });
+  eq(i.read().lx, 30, 'only the last move survives a stalled loop');
+});

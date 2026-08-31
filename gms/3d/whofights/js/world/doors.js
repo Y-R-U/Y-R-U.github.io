@@ -9,6 +9,7 @@ import { Climb } from './climb.js';
 import { gableRise } from './stairs.js';
 import { lidBands } from './gablelid.js';
 import { pathEase, pathSpeed } from './doorpath.js';
+import { stalePeek, idleDoorState } from './doorstate.js';
 
 const OUT = 3.10;     // where you are taken to before the door opens
 const IN = 2.35;      // where you end up on the other side
@@ -209,6 +210,10 @@ export class Doors {
 
   update(dt, app) {
     const P = this.player;
+    // Before any early return below, or the field stays where the last frame left it for good.
+    if (stalePeek(this.peeking, P.enabled, P.free)) this.unpeek();
+    const idle = idleDoorState(this.state, this.releasing);
+    if (idle) Object.assign(P, idle);
     this.env.t += dt;
     // Standing rooms are lit whether or not anyone is in them — you can see into them from the
     // road, so they have to keep up with the hour even when nothing else about them is running.
@@ -381,6 +386,13 @@ export class Doors {
     this.close();
   }
 
+  // Handing a peek back is an abort with the flag cleared first, so the next frame runs the state
+  // machine rather than sitting out again.
+  unpeek() {
+    this.peeking = false;
+    this.abort();
+  }
+
   abort() {
     const P = this.player;
     if (this.active) { this.active.swing = 0; this.placeLeaf(this.active); }
@@ -389,6 +401,8 @@ export class Doors {
     this.colliders.extra.length = 0;
     this.colliders.interiorOnly = false;
     this.releasing = null;
+    // Carried into the next exit otherwise, where it spends its 4 s escape hatch on the first frame.
+    this.held = 0;
     this.state = 'out';
     this.close();
   }

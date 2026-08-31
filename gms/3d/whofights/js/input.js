@@ -4,6 +4,8 @@
 
 const STICK_R = 62;
 const TAP_MS = 400, TAP_PX = 16;
+// Longer than a frame, short enough that a stalled loop banks nothing worth applying.
+const STALE_MS = 120;
 // Two thresholds, or a thumb resting on the rim flickers between walk and run every frame.
 const SPRINT_ON = STICK_R * 1.55, SPRINT_OFF = STICK_R * 1.35;
 
@@ -22,6 +24,7 @@ export class Input {
     this.pointers = new Map();
     this.stickId = null;
     this.lookId = null;
+    this.readAt = 0;
 
     this.el = {
       touch: document.getElementById('touch'),
@@ -94,7 +97,10 @@ export class Input {
       this.showStick(p.x0, p.y0, (vx / len) * k * STICK_R, (vy / len) * k * STICK_R);
       e.preventDefault();
     } else if (e.pointerId === this.lookId) {
-      // clamped because nothing drains this while the orbit camera owns the view
+      // A drag made while nothing is reading — the dev hub pauses the loop — would otherwise pile
+      // up and arrive as one whip the frame it comes back, so a stale accumulator is replaced
+      // rather than added to. The clamp is the ceiling for a read that stops without warning.
+      if (performance.now() - this.readAt > STALE_MS) this.look.x = this.look.y = 0;
       this.look.x = Math.max(-2000, Math.min(2000, this.look.x + dx));
       this.look.y = Math.max(-2000, Math.min(2000, this.look.y + dy));
     }
@@ -141,6 +147,7 @@ export class Input {
   // whip the frame control came back.
   read() {
     const k = this.keys;
+    this.readAt = performance.now();
     if (this.stickId === null) {
       const x = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0);
       const y = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0);
