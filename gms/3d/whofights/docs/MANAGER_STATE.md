@@ -156,6 +156,15 @@ generate and curate.
   Ruled out and worth not re-investigating: input-accumulator saturation (it self-drains every
   frame, so it can only ever whip, never shrink the range), a stranded `lookId`, `Input.lock()`
   latching, OrbitControls re-enabling, and `js/unstick.js`.
+- **Conversation effects had never once run.** `DialogueBox.emit` called the sink with one action
+  at a time; the sink is `runActions`, which iterates arrays and returns `[]` for anything else,
+  silently — and `session.js` discarded the results, so nothing could report it. Every authored
+  `sets` in `data/conversations.json` was dead, including `academy.met.vail` and
+  `academy.brushed.vail`, which gate Vail's own branches. Fixed 31 Aug in `07151d25`, pinned by a
+  test wired to the real `runActions` rather than a stub that would accept either shape.
+  **Still latent:** `effectsOf()` turns `node.mark` into the tuple `['truth', mark]`, which is not
+  an action object and will now warn rather than run. No node in shipped data uses `mark`, so this
+  is a trap for the first author who does, not a live bug.
 - Nothing in the hall has a collider — you walk through tables, presses and the hearth.
 - Hall masonry reads as brick rather than ashlar; one number (`INTERIOR_TILE.stone`).
 - Flat blue window panels at mid-wall height read as placeholder rectangles.
