@@ -85,3 +85,22 @@ test('a bubble wider than the screen is pinned to the left edge rather than off 
   const at = place({ pt: { x: 200, y: 400 }, w: 900, h: 80, box: BOX });
   eq(at.x, 10);
 });
+
+// The music bed ducks under a voice line, so it has to ask whether one is sounding. A deadline
+// rather than a flag: nothing reports a finished buffer source, and a flag nobody clears is how
+// two other systems on this project got stuck.
+test('speaking() is a deadline that expires on its own', async () => {
+  const { Voice } = await import('./voice.js');
+  let t = 1000;
+  const v = new Voice({ now: () => t });
+  eq(v.speaking(), false, 'silent before anything is said');
+  v.until = t + 500;
+  eq(v.speaking(), true);
+  t += 400;
+  eq(v.speaking(), true);
+  t += 200;
+  eq(v.speaking(), false, 'no one had to tell it the clip ended');
+  v.until = t + 500;
+  v.stop();
+  eq(v.speaking(), false, 'and stopping a line stops the duck with it');
+});

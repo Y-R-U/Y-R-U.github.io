@@ -7,7 +7,11 @@
 export const VERBS = {
   say: (a, ctx) => {
     if (typeof a.node !== 'string' || !a.node) return 'say needs a conversation id';
-    ctx.say?.(a.node, a);
+    // The session answers false when nothing opened — an id no node matches, or a `once` node the
+    // player has already seen. That was silence indistinguishable from a conversation that played:
+    // the hotspot fired, nothing appeared on screen, and nothing anywhere said why. A context that
+    // does not answer at all (the tools, most tests) is still fine.
+    if (ctx.say?.(a.node, a) === false) return `nothing opened for conversation "${a.node}"`;
     return null;
   },
 

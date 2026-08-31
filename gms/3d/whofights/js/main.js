@@ -135,6 +135,9 @@ async function play() {
     conversations: conversations?.nodes || {},
   });
   window.__wf.game = session;
+  // A wanderer stands still while he is the one talking to you. A predicate, not a call to freeze
+  // and a call to release: there is no path out of a conversation that can forget to unfreeze him.
+  people.holding = () => session.talkers();
   installMusic({ level: doc, session });
   app.systems.push({ update: dt => session.update(dt) });
   applyParams();

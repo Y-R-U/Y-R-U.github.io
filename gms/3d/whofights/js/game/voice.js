@@ -27,14 +27,21 @@ const SPEECH_GAIN = 1.35;
 export class Voice {
   // `cast` is the normalised character map; `settings` is read fresh each line so muting mid-scene
   // takes effect on the next one rather than at the next reload.
-  constructor({ cast = {}, settings = () => ({}) } = {}) {
+  constructor({ cast = {}, settings = () => ({}), now = () => Date.now() } = {}) {
     this.cast = cast;
     this.settings = settings;
+    this.now = now;
     this.missing = new Set();
     this.playing = null;
+    this.until = 0;
   }
 
-  stop() { this.playing = null; try { stopClip(); } catch { /* never started */ } }
+  stop() { this.playing = null; this.until = 0; try { stopClip(); } catch { /* never started */ } }
+
+  // Whether a line is sounding right now — read by the music runtime, which ducks the bed under
+  // it. A deadline, not a flag: a buffer source that never reports back still stops being
+  // "speaking" the moment its own length runs out, so nothing can be left ducked for ever.
+  speaking() { return this.now() < this.until; }
 
   // Returns the clip path it tried, or null. Never throws and never awaits the caller: a line that
   // has no take, or a decode a browser refuses, must not stop the conversation.
@@ -49,6 +56,7 @@ export class Voice {
     const token = {};
     this.playing = token;
     playClip(path, { pitch: pitchOf(this.cast[line.who]), gain })
+      .then(({ seconds }) => { if (this.playing === token) this.until = this.now() + seconds * 1000 + 120; })
       .catch(e => {
         this.missing.add(path);
         console.warn(`vo ${path}: ${e.message}`);

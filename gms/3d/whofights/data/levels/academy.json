@@ -325,11 +325,36 @@
       "trigger": "interact",
       "once": false,
       "cooldown": 1,
-      "if": null,
+      "if": [
+        "not",
+        [
+          "flag",
+          "academy.met.vail"
+        ]
+      ],
       "actions": [
         {
           "k": "say",
           "node": "academy.greeter.hello"
+        }
+      ]
+    },
+    {
+      "id": "hs.greeter.again",
+      "name": "Speak to Instructor Vail",
+      "attach": "greeter",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "flag",
+        "academy.met.vail"
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "academy.greeter.again"
         }
       ]
     },

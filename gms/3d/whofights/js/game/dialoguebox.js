@@ -9,7 +9,7 @@
 // a narrator, or a speaker who has walked behind the camera, gets the same bottom band the box has
 // always used. Choices stay in the band either way — they are the thing a thumb has to hit.
 
-import { open, current, advance, visibleChoices, choose, effectsOf, lineCount } from './dialogue.js';
+import { open, current, advance, visibleChoices, choose, effectsOf, lineCount, speakersIn } from './dialogue.js';
 import { place } from './place.js';
 import { el, clear } from './ui.js';
 
@@ -55,6 +55,13 @@ export class DialogueBox {
   load(pack) { this.pack = pack; }
 
   get active() { return !!this.scene; }
+
+  // Who this conversation is holding still — js/world/people.js stops them wandering off mid
+  // sentence. Derived from the live scene every time it is asked, so a conversation that ends by
+  // any path at all, including close() out of tick() or a throw out of draw(), lets them go again
+  // on the very next frame. A latch here would be the frozen-NPC twin of the peek that pinned
+  // `indoor` for the session.
+  talkers() { return this.scene ? speakersIn(this.pack, this.nodes) : []; }
 
   play(nodeId) {
     const scene = open(this.pack, nodeId, { ...this.ctx(), seen: this.seen });

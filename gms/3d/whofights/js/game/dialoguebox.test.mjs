@@ -159,3 +159,40 @@ test('a node\'s authored effects actually run', () => withDom(() => {
   d.next();
   eq(ctx.flags['academy.met.vail'], true, 'the flag the node sets is set');
 }));
+
+// Aaron, playing it: "npc should stop moving around if talking with the player." js/world/people.js
+// asks this every frame; nothing ever tells it a conversation has ended. Two bugs on this project
+// came from a flag an event set and nothing cleared, so the answer is derived from the live scene
+// and there is no state here to strand.
+test('talkers() names the NPC while the scene is up and nobody once it is not', () => withDom(() => {
+  const p = { camYaw: 0, dist: 7.2 };
+  const d = make(p);
+  eq(d.talkers(), [], 'nobody is being talked to before it opens');
+  d.play('hello');
+  eq(d.talkers(), ['vail']);
+  d.next(); d.next();
+  eq(d.talkers(), ['vail'], 'still held on the choice screen');
+  d.pick(0);
+  eq(d.talkers(), ['vail'], 'and across a goto into the next node');
+  d.next();
+  d.pick(0);
+  d.next();
+  eq(d.talkers(), [], 'released when the conversation ends');
+}));
+
+test('every way a conversation can end releases the NPC it was holding', () => withDom(() => {
+  const p = { camYaw: 0, dist: 7.2 };
+  const d = make(p);
+
+  d.play('hello');
+  d.close();
+  eq(d.talkers(), [], 'a bare close()');
+
+  d.play('hello');
+  d.shown = false;
+  d.tick(1 / 60);
+  eq(d.talkers(), [], 'the blank-overlay teardown out of tick()');
+
+  throws(() => d.play('badwho'));
+  eq(d.talkers(), [], 'a throw out of draw()');
+}));

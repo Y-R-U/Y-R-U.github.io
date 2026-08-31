@@ -1892,6 +1892,42 @@
       "bytes": 10442,
       "encoded": true,
       "at": 1788137172283
+    },
+    "greeter_again_01": {
+      "node": "academy.greeter.again",
+      "i": 0,
+      "who": "greeter",
+      "text": "Back again. The boards have not moved since you last looked at them.",
+      "file": "audio/vo/greeter_again_01.ogg",
+      "raw": "audio/vo/raw/greeter_again_01.wav",
+      "voice": "bf_emma",
+      "speed": 0.98,
+      "pitch": 0,
+      "ttsSpeed": 0.98,
+      "hash": "7ef254fa",
+      "seconds": 4,
+      "rms": -24.03,
+      "bytes": 11166,
+      "encoded": true,
+      "at": 1788173620812
+    },
+    "greeter_again_02": {
+      "node": "academy.greeter.again",
+      "i": 1,
+      "who": "greeter",
+      "text": "Ask, then. It is quicker than watching you decide.",
+      "file": "audio/vo/greeter_again_02.ogg",
+      "raw": "audio/vo/raw/greeter_again_02.wav",
+      "voice": "bf_emma",
+      "speed": 0.98,
+      "pitch": 0,
+      "ttsSpeed": 0.98,
+      "hash": "938cb5e7",
+      "seconds": 3.45,
+      "rms": -24.11,
+      "bytes": 9508,
+      "encoded": true,
+      "at": 1788173621070
     }
   }
 }

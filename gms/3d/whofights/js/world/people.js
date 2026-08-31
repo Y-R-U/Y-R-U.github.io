@@ -444,6 +444,7 @@ export function aoDisc() {
 }
 
 const POOL = 120;
+const EMPTY = [];
 
 export class People {
   constructor(terrain) {
@@ -474,6 +475,11 @@ export class People {
       this.mat[id] = robeMaterial(id, this.uniforms);
     }
     onEnvIntensity(() => this.applyEnv());
+
+    // Set by js/main.js to the session's talkers(): who a conversation on screen is holding
+    // still. Asked once a frame and never remembered — nothing here can leave an NPC frozen
+    // because nothing here is ever told that a conversation has ended.
+    this.holding = null;
 
     this.spawn();
     this.buildMeshes();
@@ -597,6 +603,7 @@ export class People {
     const flat = new THREE.Quaternion();
     const up = new THREE.Vector3();
     const T = this.terrain;
+    const held = (this.holding?.() || EMPTY);
     let ai = 0;
 
     for (const mesh of this.meshes) {
@@ -606,37 +613,47 @@ export class People {
 
       for (let i = 0; i < list.length; i++) {
         const a = list[i];
+        // Standing still because he is talking to you. Re-tested every frame off the live
+        // conversation, so the pose is a consequence of the scene rather than a state anything
+        // has to switch back.
+        const still = !!(a.npc && held.length && held.includes(a.npc));
         let x, z, heading;
         if (a.kind === 'walk') {
-          a.z += a.dir * a.speed * dt;
-          if (a.z > a.zMax) { a.z = a.zMax; a.dir = -1; }
-          if (a.z < a.zMin) { a.z = a.zMin; a.dir = 1; }
+          if (!still) {
+            a.z += a.dir * a.speed * dt;
+            if (a.z > a.zMax) { a.z = a.zMax; a.dir = -1; }
+            if (a.z < a.zMin) { a.z = a.zMin; a.dir = 1; }
+          }
           z = a.z;
           x = roadX(a.pts, z) + a.off;
           const ahead = roadX(a.pts, z + a.dir * 0.6) + a.off;
           heading = Math.atan2(ahead - x, a.dir * 0.6);
         } else if (a.kind === 'stroll') {
-          a.heading += a.turn * dt * Math.sin(this.time * 0.17 + a.gait);
-          const wx = a.x + Math.sin(a.heading) * a.speed * dt;
-          const wz = a.z + Math.cos(a.heading) * a.speed * dt;
-          // An indoor body stands inside its own building's footprint, so that one box is skipped
-          // by id — everything else in the room, its furniture included, still stops it.
-          const step = walkStep(a.x, a.z, wx, wz, a.y ?? 0, 0.3, a.indoor | 0);
-          a.x = step.x; a.z = step.z;
-          const b = a.box;
-          const out = a.x < b[0] || a.x > b[1] || a.z < b[2] || a.z > b[3];
-          if (out) {
-            a.x = Math.min(b[1], Math.max(b[0], a.x));
-            a.z = Math.min(b[3], Math.max(b[2], a.z));
+          if (!still) {
+            a.heading += a.turn * dt * Math.sin(this.time * 0.17 + a.gait);
+            const wx = a.x + Math.sin(a.heading) * a.speed * dt;
+            const wz = a.z + Math.cos(a.heading) * a.speed * dt;
+            // An indoor body stands inside its own building's footprint, so that one box is
+            // skipped by id — everything else in the room, its furniture included, still stops it.
+            const step = walkStep(a.x, a.z, wx, wz, a.y ?? 0, 0.3, a.indoor | 0);
+            a.x = step.x; a.z = step.z;
+            const b = a.box;
+            const out = a.x < b[0] || a.x > b[1] || a.z < b[2] || a.z > b[3];
+            if (out) {
+              a.x = Math.min(b[1], Math.max(b[0], a.x));
+              a.z = Math.min(b[3], Math.max(b[2], a.z));
+            }
+            // Turning away on a blocked step stops a stroller grinding along a wall forever.
+            if (out || step.hit) a.heading += Math.PI * 0.87;
           }
-          // Turning away on a blocked step is what stops a stroller grinding along a wall forever.
-          if (out || step.hit) a.heading += Math.PI * 0.87;
           x = a.x; z = a.z; heading = a.heading;
         } else {
           x = a.x; z = a.z;
-          a.heading += a.turn * dt * Math.sin(this.time * 0.21 + a.gait);
+          if (!still) a.heading += a.turn * dt * Math.sin(this.time * 0.21 + a.gait);
           heading = a.heading;
         }
+        // The walk cycle, the lean and the bob all read the speed, so one number stands him up.
+        const speed = still ? 0 : a.speed;
 
         // The rendered mesh is not the analytic field, and the difference is enough to float a
         // figure or bury its contact disc under the ground. groundAt then lets a bridge deck or a
@@ -646,8 +663,8 @@ export class People {
         const want = a.fixY !== undefined ? a.fixY
           : collidersReady() ? groundAt(x, z, a.y ?? fall) : fall;
         const gy = a.y = a.y === undefined ? want : a.y + (want - a.y) * (1 - Math.exp(-9 * dt));
-        const bob = a.speed > 0 ? Math.sin(this.time * (5.2 + a.speed * 2.4) * 2 + a.gait) * 0.022 * a.speed : 0;
-        e.set(a.speed * 0.045, heading, 0);
+        const bob = speed > 0 ? Math.sin(this.time * (5.2 + speed * 2.4) * 2 + a.gait) * 0.022 * speed : 0;
+        e.set(speed * 0.045, heading, 0);
         q.setFromEuler(e);
         pos.set(x, gy + bob, z);
         scl.setScalar(a.scale);
@@ -669,7 +686,7 @@ export class People {
         }
 
         inst.array[i * 4] = a.phase;
-        inst.array[i * 4 + 1] = a.speed / 3;
+        inst.array[i * 4 + 1] = speed / 3;
         inst.array[i * 4 + 2] = a.gait;
         inst.array[i * 4 + 3] = 0;
       }

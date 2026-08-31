@@ -184,6 +184,10 @@ export class Session {
     return !!this.dialogue.play(nodeId);
   }
 
+  // Which NPCs a conversation on screen is holding still. js/main.js hands this to the crowd rig,
+  // which asks it every frame — see DialogueBox.talkers().
+  talkers() { return this.dialogue.talkers(); }
+
   showScreen(id) { return this.board.show(id); }
 
   gotoLevel(id, at) {

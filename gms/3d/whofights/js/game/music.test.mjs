@@ -1,5 +1,5 @@
 import { test, eq, ok, near } from '../../tools/harness.mjs';
-import { MusicPlan, MusicRuntime, pickNext, envAt, fadeOf, volOf, DUCK, HANDOVER_MIN } from './music.js';
+import { MusicPlan, MusicRuntime, pickNext, envAt, fadeOf, volOf, DUCK, TALK_DUCK, HANDOVER_MIN } from './music.js';
 
 const M = {
   version: 1,
@@ -204,6 +204,55 @@ test('the bed comes back up after the sting', () => {
   p.sting('stings', 2000);
   p.tick(3800);                      // 2 s sting, release 300 ms before the end
   near(p.gains(4400).get(1), 0.5, 1e-6);
+});
+
+// Aaron, playing it: "music should be faded when people talk?"
+test('a conversation on screen pushes the bed down and lets it back up', () => {
+  const p = plan();
+  p.playSet('hall', 0);
+  near(p.gains(2000).get(1), 0.5, 1e-6, 'the bed is at the set volume');
+  p.setTalking(true, 2000);
+  near(p.gains(2250).get(1), 0.5 * TALK_DUCK, 1e-6, 'ducked once the 250 ms ramp is done');
+  p.setTalking(false, 3000);
+  const mid = p.gains(3200).get(1);
+  ok(mid > 0.5 * TALK_DUCK && mid < 0.5, `it rides back up over 700 ms rather than stepping (${mid})`);
+  near(p.gains(3700).get(1), 0.5, 1e-6, 'back at the set volume when the scene closes');
+});
+
+// The sting duck is on a timer and the conversation duck is not, so the one that expires must not
+// take the bed back up under a voice line that is still going.
+test('a sting expiring under an open conversation leaves the bed ducked', () => {
+  const p = plan();
+  p.playSet('hall', 0);
+  p.setTalking(true, 0);
+  p.sting('stings', 1000);
+  p.tick(2800);                       // the sting's own duck releases here
+  near(p.gains(3600).get(1), 0.5 * TALK_DUCK, 1e-6, 'still down for the conversation');
+  p.setTalking(false, 4000);
+  near(p.gains(4700).get(1), 0.5, 1e-6);
+});
+
+// The whole point of asking a predicate instead of being told: nothing has to remember to
+// un-duck, so no way of ending a conversation can leave the music down for the session.
+test('the runtime re-reads whether anybody is talking on every tick', () => {
+  let t = 0, talking = false;
+  const made = [];
+  const rt = new MusicRuntime({ make: () => { const e = fakeEl(); made.push(e); return e; },
+    now: () => t, talking: () => talking, rnd: () => 0 });
+  rt.load(M);
+  rt.playSet('hall');
+  t = 1000; rt.tick();
+  near(made[0].volume, 0.5);
+  talking = true;
+  t = 1100; rt.tick();
+  t = 1400; rt.tick();
+  near(made[0].volume, 0.5 * TALK_DUCK, 1e-6, 'ducked without anyone calling setTalking');
+  // However the conversation ended — a choice, a throw, a torn-down blank overlay — the predicate
+  // simply answers no, and the next tick is the one that hears it.
+  talking = false;
+  t = 1500; rt.tick();
+  t = 2300; rt.tick();
+  near(made[0].volume, 0.5, 1e-6, 'and back up on its own');
 });
 
 test('volume and mute retarget every live voice', () => {

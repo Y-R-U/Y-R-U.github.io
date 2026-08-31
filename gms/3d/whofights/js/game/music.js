@@ -9,6 +9,13 @@
 export const DUCK = 0.35;          // how far a sting pushes the bed down
 export const DUCK_IN = 200;
 export const DUCK_OUT = 600;
+// The other reason to push the bed down is that somebody is talking over it. Unlike a sting it
+// has no length of its own — it holds while the scene is on screen — so it is a state the runtime
+// re-reads every tick rather than a timer. Both reasons resolve through duckTarget(), so a sting
+// releasing mid-conversation cannot take the bed back up under a voice line.
+export const TALK_DUCK = 0.30;
+export const TALK_IN = 250;
+export const TALK_OUT = 700;
 export const RETARGET_MS = 120;    // volume/mute changes glide rather than step
 export const HANDOVER_MIN = 250;   // shortest cross-fade between two tracks of one set
 // ACE-Step takes do not all resolve. A track marked ends:"abrupt" stops dead, so the runtime has
@@ -57,6 +64,7 @@ export class MusicPlan {
     this.lastId = null;
     this.duck = null;
     this.duckUntil = 0;
+    this.talking = false;
     this.problems = [];
     this.load(manifest);
   }
@@ -72,6 +80,34 @@ export class MusicPlan {
   trackOf(id) { return this.tracksById.get(id) || null; }
   master() { return this.mute ? 0 : this.volume; }
   targetFor(setId) { return volOf(this.setOf(setId)) * this.master(); }
+
+  // Every live reason the bed is down, resolved to one gain. Nothing here is remembered: a reason
+  // that has gone away simply stops being counted the next time this is asked.
+  duckTarget() {
+    let to = 1;
+    if (this.duckUntil) to = Math.min(to, DUCK);
+    if (this.talking) to = Math.min(to, TALK_DUCK);
+    return to;
+  }
+
+  // Glide the duck envelope to wherever duckTarget() now says, from wherever it has got to. Safe
+  // to call on a frame that changed nothing — it is a no-op when the envelope already aims there.
+  retargetDuck(now, ms) {
+    const to = this.duckTarget();
+    if (this.duck ? this.duck.to === to : to === 1) return;
+    this.duck = { from: this.duck ? envAt(this.duck, now) : 1, to, t0: now, ms };
+  }
+
+  // Told, every tick, whether anybody is talking — see MusicRuntime.tick, which asks a predicate
+  // rather than waiting to be notified. A conversation that ends by an unexpected path therefore
+  // cannot leave the bed ducked for the rest of the session: the next tick simply says "no".
+  setTalking(on, now) {
+    const want = !!on;
+    if (want === this.talking) return [];
+    this.talking = want;
+    this.retargetDuck(now, want ? TALK_IN : TALK_OUT);
+    return [];
+  }
 
   beds() { return this.voices.filter(v => v.role === 'bed' && !v.out); }
   head(v, now) { return v.head + (now - v.headAt) / 1000; }
@@ -131,9 +167,8 @@ export class MusicPlan {
     const t = this.trackOf(pick.id);
     if (!t) { this.problems.push(`set "${setId}" names missing track "${pick.id}"`); return []; }
     const v = this.voice(t, setId, now, 'sting', 0);
-    const from = this.duck ? envAt(this.duck, now) : 1;
-    this.duck = { from, to: DUCK, t0: now, ms: DUCK_IN };
     this.duckUntil = now + Math.max(500, (v.seconds || 2) * 1000) - 300;
+    this.retargetDuck(now, DUCK_IN);
     return [this.playOp(v)];
   }
 
@@ -193,7 +228,7 @@ export class MusicPlan {
     const ops = [];
     if (this.duckUntil && now >= this.duckUntil) {
       this.duckUntil = 0;
-      this.duck = { from: envAt(this.duck, now), to: 1, t0: now, ms: DUCK_OUT };
+      this.retargetDuck(now, DUCK_OUT);
     }
     const s = this.setOf(this.setId);
     if (s) {
@@ -245,12 +280,17 @@ export class MusicPlan {
 const GESTURES = ['pointerdown', 'keydown', 'touchstart'];
 
 export class MusicRuntime {
-  constructor({ base = '', plan = null, make = null, now = null, settings = null, tickMs = 100, rnd = undefined } = {}) {
+  constructor({ base = '', plan = null, make = null, now = null, settings = null, tickMs = 100,
+    talking = null, rnd = undefined } = {}) {
     this.base = base;
     this.plan = plan || new MusicPlan(rnd ? { rnd } : {});
     this.make = make || (() => new Audio());
     this.now = now || (() => (typeof performance !== 'undefined' ? performance.now() : Date.now()));
     this.settings = settings || (() => null);
+    // Asked on every tick, never pushed: whoever knows a conversation is on screen does not have
+    // to remember to tell the music when it closes, including when it closes by a path nobody
+    // wrote down. §Known problems: a field written by an event and never re-derived is a bug.
+    this.talking = talking || (() => false);
     this.tickMs = tickMs;
     this.els = new Map();
     this.armed = false;
@@ -338,6 +378,7 @@ export class MusicRuntime {
   tick() {
     const now = this.now();
     for (const [id, el] of this.els) if (!el.paused) this.plan.syncHead(id, el.currentTime || 0, now);
+    this.plan.setTalking(this.talking(), now);
     this.readSettings(now);
     this.apply(this.plan.tick(now));
   }
@@ -373,6 +414,10 @@ export function installMusic({ level = null, session = null, base = '', manifest
   const rt = new MusicRuntime({
     base,
     settings: () => session?.doc?.settings || null,
+    // The bed comes down while somebody is talking: for as long as a conversation is on screen,
+    // and for the length of the clip while a bark plays. Voice sits 1.35× above the bed already
+    // (js/game/voice.js), so this is a dip and not a mute.
+    talking: () => !!session?.dialogue?.active || !!session?.voice?.speaking(),
   });
   installed = rt;
   if (typeof globalThis !== 'undefined') {

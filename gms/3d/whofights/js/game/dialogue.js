@@ -45,6 +45,19 @@ export function choose(scene, index, ctx = {}) {
   return { scene: { ...scene, choosing: false, done: true, goto: pick.goto }, goto: pick.goto, effects: pick.sets || [] };
 }
 
+// Who a conversation is being spoken by: every non-player voice in the nodes it has walked so far.
+// js/world/people.js asks this each frame to stand those NPCs still, so it is a question about the
+// scene that is open now and never a record of one that was — there is no state here to strand.
+export function speakersIn(pack, ids = []) {
+  const out = [];
+  for (const id of ids || []) {
+    for (const l of pack?.[id]?.lines || []) {
+      if (l?.who && l.who !== 'player' && !out.includes(l.who)) out.push(l.who);
+    }
+  }
+  return out;
+}
+
 export const effectsOf = node =>
   [...(node?.sets || []), ...(node?.mark ? [['truth', node.mark]] : [])];
 

@@ -82,3 +82,16 @@ test('validateAction catches what the editor must not save', () => {
   eq(validateAction({ k: 'music', stop: true }), []);
   eq(validateAction({ k: 'wibble' }).length, 1);
 });
+
+// A hotspot firing `say` on a node that will not open drew nothing and reported nothing — the
+// exact shape of Aaron's "I can talk to Vail, but the menu of questions no longer shows".
+test('a say that opens nothing is reported rather than swallowed', () => {
+  const c = ctx();
+  c.say = () => false;
+  const r = runAction({ k: 'say', node: 'academy.greeter.hello' }, c);
+  eq(r.ok, false);
+  ok(/academy\.greeter\.hello/.test(r.why), r.why);
+  // Everything that does not answer with a hard false is still fine: most contexts return nothing.
+  eq(runAction({ k: 'say', node: 'x' }, ctx()).ok, true);
+  eq(runAction({ k: 'say', node: 'x' }, {}).ok, true);
+});

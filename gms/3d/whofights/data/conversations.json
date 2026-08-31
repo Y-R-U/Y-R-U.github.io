@@ -4,7 +4,6 @@
     "academy.greeter.hello": {
       "name": "Vail — first hello",
       "cam": "two",
-      "once": true,
       "lines": [
         {
           "who": "narrator",
@@ -53,6 +52,53 @@
           "value": true
         }
       ]
+    },
+    "academy.greeter.again": {
+      "name": "Vail — again",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Back again. The boards have not moved since you last looked at them.",
+          "vo": "greeter_again_01"
+        },
+        {
+          "who": "greeter",
+          "text": "Ask, then. It is quicker than watching you decide.",
+          "vo": "greeter_again_02"
+        }
+      ],
+      "choices": [
+        {
+          "say": "Who are you?",
+          "goto": "academy.greeter.who",
+          "if": [
+            "not",
+            [
+              "flag",
+              "academy.knows.vail"
+            ]
+          ],
+          "sets": []
+        },
+        {
+          "say": "The contracts, then.",
+          "goto": "academy.greeter.contracts",
+          "sets": []
+        },
+        {
+          "say": "The fourth board?",
+          "goto": "academy.greeter.newadventures",
+          "sets": []
+        },
+        {
+          "say": "Nothing. Carry on.",
+          "goto": "academy.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
     },
     "academy.greeter.who": {
       "name": "Vail — who are you",
