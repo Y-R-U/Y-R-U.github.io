@@ -206,7 +206,10 @@ generate and curate.
   of the pixels, and `HANDOFF.md` hardcoded the small-render flags as a workaround nobody had
   explained. *Three separate silent-failure tools on this project now: a check that cannot fail is
   the recurring shape, and `settle()` — which returned success for a page that never drew a frame —
-  was another.* `js/dev/cdp.mjs` has the same defect and is assigned.
+  was another.* `js/dev/cdp.mjs` had the same defect — fixed 31 Aug in `5522f61b`, and it now
+  imports shot.mjs's transport rather than being a third copy of it. Measured boundary: 3.687 MiB
+  fine, 4.031 MiB wedged. `js/dev/debug/uitest.mjs` was screenshotting at 3.26 MiB — three quarters
+  of a megabyte under the cap — so it too was passing on luck and now cannot.
 - Confirmed still true by the 31 Aug hall render (`shots/hall.png`), unlike the struck-through
   entries above: the masonry reads as brick, and the flat blue window panels read as placeholders.
 - Hall masonry reads as brick rather than ashlar; one number (`INTERIOR_TILE.stone`).
