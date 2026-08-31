@@ -143,6 +143,19 @@ generate and curate.
   Controls group so they can be tuned live. **Not yet confirmed by Aaron in play** — if it is still
   restrictive, the indoor cap should scale with the actual ceiling height rather than being one
   number for a cottage and a great hall alike.
+- **Aaron, again: "look can get sick... I can't look all the way round... refresh page fixed it."**
+  A *second*, unrelated cause, found 31 Aug and fixed in `9f68df3c`. `Doors.peek()` set a flag
+  nothing ever cleared, and `Doors.update()` returns on its first line while peeking — so one press
+  of a Camera shot in the ⚙ panel (Menu → Settings → Developer panel, which Aaron has open to tune
+  the pitch knobs) froze every field the door system writes onto the player. Pressed inside the
+  hall it pinned `indoor` at 1, so the indoor cap of 0.95 applied outdoors and the camera stopped
+  tilting up ~20° short. Pressed outdoors it could leave `driven` true, locking look and movement
+  entirely. `indoor`/`driven`/`confine`/`floorY` are now re-derived every frame in
+  `js/world/doorstate.js` rather than latched. **The lesson generalises: a field written by an
+  event and never re-derived is a bug waiting for the frame that misses the event.**
+  Ruled out and worth not re-investigating: input-accumulator saturation (it self-drains every
+  frame, so it can only ever whip, never shrink the range), a stranded `lookId`, `Input.lock()`
+  latching, OrbitControls re-enabling, and `js/unstick.js`.
 - Nothing in the hall has a collider — you walk through tables, presses and the hearth.
 - Hall masonry reads as brick rather than ashlar; one number (`INTERIOR_TILE.stone`).
 - Flat blue window panels at mid-wall height read as placeholder rectangles.
