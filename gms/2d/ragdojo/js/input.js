@@ -6,6 +6,16 @@ import { classify } from './gestures.js';
 const DEAD = 16;
 const MAX = 58;
 
+const STRIKE_KEYS = [' ', 'j', 'r', '0'];
+/** 1-8, in MOVES order — the same order the on-screen move strip is drawn in. */
+export const SPECIAL_KEYS = {
+  '1': 'slash', '2': 'archUp', '3': 'up', '4': 'right',
+  '5': 'circleCW', '6': 'down', '7': 'circleCCW', '8': 'vee',
+};
+/** A real keyboard and a pointer: worth showing key hints for, not worth it on a phone. */
+export const hasKeyboard = () =>
+  typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
 /** Matches the portrait rule in style.css. Both must change together. */
 export const PORTRAIT_Q = '(orientation: portrait) and (max-width: 860px)';
 export const isRotated = () => window.matchMedia(PORTRAIT_Q).matches;
@@ -125,9 +135,11 @@ export class Input {
     this.keys[k] = down;
     if (down && k === ' ') e.preventDefault();
     if (!this.enabled) return;
-    if (down && (k === 'j' || k === ' ')) this.onStrike();
-    const g = { '1': 'slash', '2': 'archUp', '3': 'up', '4': 'right',
-      '5': 'circleCW', '6': 'down', '7': 'circleCCW', '8': 'vee' }[k];
+    // Punch on all of these so the hand you are already using has one under a finger:
+    // space and J for a mouse hand, R in the middle of the number row for arrow-key players,
+    // and 0 for anyone on the num pad with 1-8 on the specials.
+    if (down && STRIKE_KEYS.includes(k)) this.onStrike();
+    const g = SPECIAL_KEYS[k];
     if (down && g) this.onGesture(g);
   }
 

@@ -62,6 +62,8 @@ node tools/soundtrackgate.mjs # now-playing, auditioning a track, muting one, ha
 node tools/hitgate.mjs        # hit windows: range, and one move hitting a line of three
 node tools/crosslog.mjs       # diagnostic, not a gate — what actually causes side swaps
 node tools/stuckgate.mjs      # no save state may dead-end the game
+node tools/progressgate.mjs   # what a new game keeps, and what it makes you earn again
+node tools/keygate.mjs        # desktop keys: punch, 1-8 specials, both movement layouts
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -197,6 +199,16 @@ from its output, not by feel.
   way out but wiping the save. `hubLevel()` is now the single source for both, `startFight`
   clamps defensively, and `save.load()` heals an already-broken save instead of demanding a
   reset. `tools/stuckgate.mjs` walks every save state that could park you out of range.
+- **`completed` and `everWon` are different questions.** `completed` means THIS run is
+  finished and resets with a new game; `everWon` never resets, and is what keeps the music
+  roster and the record book. Conflating them let a fresh white belt open the trophy and
+  press BULLY MODE — which sets `save.bully`, and the hub and shop both read that as black
+  belt standing. Bullying is a reward for finishing the run you are on: `btnBully` is hidden
+  unless `save.completed`.
+- **The record book is the reason to start again.** `save.records` is all-time and survives
+  a new game; everything else does not. The victory screen shows both sections so the
+  difference is visible before you press NEW GAME, and NEW GAME is a two-step button rather
+  than a modal (Aaron dislikes modals) — first press asks, second press wipes.
 - **Anything only reachable by winning is unreachable once you have won.** The victory screen
   held BULLY MODE and NEW GAME, so a finished save that could not start a fight had no way
   to reach them. The hub carries a 🏆 button whenever `save.completed` is set.
@@ -204,6 +216,11 @@ from its output, not by feel.
   ended the game twice over — nothing left to buy, and no reason to earn ink. Finishing a
   bully run reaches the victory screen too (`won && wasFinal`, no bully check), or the hub
   hands you the same final fight for ever.
+- **Desktop keys mirror the thumbs, in two layouts.** WASD or arrows to move; punch on
+  space, J, R or 0; specials on 1-8 in MOVES order. R and 0 exist so the punch is under a
+  finger whichever layout you pick — arrows plus the number row, or WASD plus the num pad.
+  The move strip draws the key number on each circle when `hasKeyboard()` is true; it must
+  stay off on a phone, where the badge would be a lie. `tools/keygate.mjs` checks both.
 - Enemy-on-enemy hits deal 25% damage. At full damage the enemies finish gauntlets for you.
 - `?autoplay=1` is a real fight with an AI player; `demo` is the menu background match. They
   are different flags.

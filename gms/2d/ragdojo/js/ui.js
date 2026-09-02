@@ -2,6 +2,7 @@
 
 import { stroke, line, rect, circle, hatch, splat, INK } from './ink.js';
 import { glyphPoints } from './gestures.js';
+import { SPECIAL_KEYS, hasKeyboard } from './input.js';
 import { MOVES, moveStats } from './config.js';
 import { P as RIG } from './ragdoll.js';
 
@@ -163,6 +164,9 @@ function drawCoach(ctx, vw, vh, m, input) {
 function drawMoveStrip(ctx, vw, vh, m, save, input) {
   const owned = MOVES.filter((mv) => (save.moves[mv.id] || {}).owned);
   if (!owned.length) return;
+  // On a keyboard the gesture is optional — number it so you can just press the key.
+  const gestureKey = {};
+  if (hasKeyboard()) for (const k in SPECIAL_KEYS) gestureKey[SPECIAL_KEYS[k]] = k;
   const side = (input?.hand || 'right') === 'right' ? 1 : -1;
   const size = Math.min(46, vw * 0.062);
   const gap = size * 1.28;
@@ -195,6 +199,22 @@ function drawMoveStrip(ctx, vw, vh, m, save, input) {
       const s = size * 0.52;
       stroke(ctx, pts.map(([px, py]) => [x + px * s, y + py * s]),
         { w: 3, passes: 1, wob: 0.5, seed: 400 + i, col: ready ? '#20242c' : '#a8aebb', a: ready ? 1 : 0.55, step: 5 });
+    }
+    const key = gestureKey[mv.gesture];
+    if (key) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = ready ? 'rgba(255,253,246,0.95)' : 'rgba(232,228,216,0.9)';
+      ctx.beginPath();
+      ctx.arc(x - size * 0.44, y - size * 0.44, size * 0.25, 0, 6.283);
+      ctx.fill();
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = ready ? '#2b3040' : '#a8aebb';
+      ctx.font = `700 ${Math.round(size * 0.42)}px ${FONT_B}`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(key, x - size * 0.44, y - size * 0.42);
+      ctx.restore();
     }
     if (!ready && st) {
       const u = cd / st.cooldown;

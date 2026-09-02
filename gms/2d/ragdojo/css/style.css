@@ -112,12 +112,15 @@ html, body {
 .sheet h2 { font-family: var(--font-b); font-size: 40px; margin: 2px 0 8px; letter-spacing: 1px; }
 .sheet h2.gold { color: #b8860b; font-size: 52px; }
 .sheethead { display: flex; align-items: center; gap: 12px; }
-.sheethead h2 { flex: 1; text-align: left; }
+.sheethead h2 { text-align: left; }
+/* The shop's tabs live in the header row: on a short screen a second row cost exactly the
+   bottom sliver of the first row of cards, which read as the list being cut off. */
+.sheethead .tabs { flex: 1; margin: 0; }
 .sheet.narrow .sheethead h2 { text-align: center; }
 .inkline { font-size: 20px; }
 .inkline b { font-size: 24px; }
 .close { flex: none; }
-.tabs { display: flex; gap: 8px; margin: 6px 0 10px; }
+.tabs { display: flex; gap: 8px; margin: 6px 0 10px; flex-wrap: wrap; }
 .tab { font-family: var(--font); font-size: 19px; padding: 5px 16px; cursor: pointer;
   background: transparent; border: 2.5px solid transparent; border-radius: 10px 7px 11px 6px; color: var(--ink-soft); }
 .tab.on { border-color: var(--ink); background: #fffdf6; color: var(--ink); }
@@ -149,6 +152,9 @@ html, body {
 .rows .r b { font-variant-numeric: tabular-nums; }
 .rows .r.big { font-size: 24px; border-bottom: none; margin-top: 6px; }
 .vicbtns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.vichead { font-size: 14px; letter-spacing: 1.4px; color: var(--ink-soft); text-align: left;
+  margin: 10px 0 2px; border-bottom: 2px solid rgba(32,36,44,.3); padding-bottom: 2px; }
+.vichead:first-child { margin-top: 0; }
 .fine { font-size: 14px; color: var(--ink-soft); margin: 10px 0 0; }
 .toggle { display: flex; justify-content: space-between; align-items: center; padding: 5px 0;
   border-bottom: 1px dashed rgba(32,36,44,.25); }

@@ -8,7 +8,7 @@ import { drawDesk, sheetShadow } from './paper.js';
 import { buildArena } from './arena.js';
 import { drawFighter, drawShadow } from './draw.js';
 import { Match } from './match.js';
-import { Input, isRotated } from './input.js';
+import { Input, isRotated, SPECIAL_KEYS } from './input.js';
 import { drawHUD, drawNameTags, handText, FONT, FONT_B } from './ui.js';
 import { load, save as persist, wipe, DEFAULT } from './save.js';
 import * as audio from './audio.js';
@@ -135,7 +135,7 @@ function startFight(levelIdx, bully = false) {
 
 /** How far the player has ever got — unlocks are permanent, including in bully mode. */
 function reachedLevel(level) {
-  return Math.max(S.level || 0, level ? level.idx : 0, S.completed ? TOTAL_LEVELS : 0);
+  return Math.max(S.level || 0, level ? level.idx : 0, S.everWon ? TOTAL_LEVELS : 0);
 }
 
 /**
@@ -165,13 +165,23 @@ function finishFight(result, m) {
   S.best = Math.max(S.best, m.score);
   S.biggestLaunch = Math.max(S.biggestLaunch, Math.round(m.biggestLaunch));
   if (won) { S.wins++; S.kos += m.kos; } else S.losses++;
+  // All-time, and never wiped by a new game — the record book is the reason to play again.
+  const R = S.records;
+  R.bestScore = Math.max(R.bestScore, Math.round(S.score));
+  R.bestFight = Math.max(R.bestFight, Math.round(m.score));
+  R.longestLaunch = Math.max(R.longestLaunch, Math.round(m.biggestLaunch));
+  R.mostKos = Math.max(R.mostKos, m.kos);
+  if (won) R.wins++;
 
   const wasFinal = L.kind === 'final';
   const tracksBefore = unlockedFightTracks(reachedLevel(null)).length;
   if (won) {
     if (m.bully) S.bullyLevel = Math.min(TOTAL_LEVELS - 1, L.idx + 1);
     else S.level = Math.min(TOTAL_LEVELS - 1, L.idx + 1);
-    if (wasFinal && !m.bully) S.completed = true;
+    if (wasFinal) {
+      S.everWon = true;
+      if (m.bully) S.records.bullyRuns++; else { S.completed = true; S.records.championships++; }
+    }
   }
   persist(S);
   const gained = unlockedFightTracks(reachedLevel(null)).slice(tracksBefore).map((t) => TRACK_NAME[t.id] || t.id);
@@ -210,27 +220,50 @@ function showResults(R) {
 }
 const row = (k, v) => `<div class="r"><span>${k}</span><b>${v}</b></div>`;
 
-function showVictory(bully) {
-  const totalScore = S.score;
+/**
+ * The record book. Shown on a win, and reachable from the hub's trophy any time after your
+ * first one. Two sections, because they answer different questions: what THIS run has done,
+ * and what you have ever done. Only the second survives a new game — which is the whole
+ * reason a new game is worth starting.
+ *
+ * @param bully   the run being celebrated is a bully run
+ * @param justWon called from a victory rather than from the trophy button
+ */
+function showVictory(bully, justWon = true) {
   const wasBully = !!bully;
-  $('victory').querySelector('h2').textContent = wasBully ? 'BULLY CHAMPION' : 'CHAMPION';
-  $('btnBully').textContent = wasBully ? 'BULLY AGAIN' : 'BULLY MODE';
-  $('vicFine').textContent = wasBully
-    ? 'Bully Again: back to white belt with everything you own. Keep Playing leaves you here to shop and replay.'
-    : 'Bully Mode: keep your ink and everything you have bought, and start again at white belt.';
+  const R = S.records;
+  const m = (v) => `${(Math.round(v) / 10).toFixed(1)} m`;
+  $('victory').querySelector('h2').textContent =
+    !justWon ? 'RECORD BOOK' : wasBully ? 'BULLY CHAMPION' : 'CHAMPION';
   $('vicBody').innerHTML = [
+    `<div class="vichead">THIS RUN</div>`,
     row('Fights won', S.wins),
     row('Knockouts', S.kos),
-    row('Longest launch', `${Math.round(S.biggestLaunch / 10)} m`),
+    row('Longest launch', m(S.biggestLaunch)),
     row('Ink collected', S.totalInk),
-    row('Best single fight', Math.round(S.best)),
-    `<div class="r big"><span>FINAL SCORE</span><b>${Math.round(totalScore)}</b></div>`,
+    `<div class="r big"><span>${justWon ? 'FINAL SCORE' : 'SCORE'}</span><b>${Math.round(S.score)}</b></div>`,
+    `<div class="vichead">ALL TIME</div>`,
+    row('Championships', R.championships + (R.bullyRuns ? ` · ${R.bullyRuns} bully` : '')),
+    row('Highest score', R.bestScore),
+    row('Best single fight', R.bestFight),
+    row('Longest launch', m(R.longestLaunch)),
+    row('Most knockouts in a fight', R.mostKos),
+    row('Fights won, all time', R.wins),
   ].join('');
+
+  // Bullying is a reward for finishing THIS run. Offering it from the record book after a
+  // new game handed a white belt a black belt's standing.
+  const canBully = !!S.completed;
+  $('btnBully').classList.toggle('hidden', !canBully);
+  $('btnBully').textContent = wasBully ? 'BULLY AGAIN' : 'BULLY MODE';
+  resetAgainBtn();
+  $('vicFine').textContent = canBully
+    ? 'Bully Mode: keep your ink and everything you have bought, and start again at white belt. New Game wipes this run — only the all-time records above are kept.'
+    : 'New Game wipes this run — your ink, upgrades and progress. Only the all-time records above are kept.';
   overlay('victory');
-  audio.play('victory');
-  audio.sfx.bell();
+  if (justWon) { audio.play('victory'); audio.sfx.bell(); }
   // Confetti of paper scraps over the celebrating figure.
-  if (match) {
+  if (match && justWon) {
     for (let i = 0; i < 90; i++) {
       setTimeout(() => match && match.fx.spawn(
         200 + Math.random() * (SHEET_W - 400), -40, 0, 120, 'scrap', 1,
@@ -268,7 +301,7 @@ function refreshHub() {
   $('btnMusic').classList.toggle('off', !S.settings.music);
   // Once you have finished a run, the options that only appeared on the victory screen have
   // to stay reachable — otherwise the hub hands you the final fight and nothing else.
-  $('btnTrophy').classList.toggle('hidden', !S.completed);
+  $('btnTrophy').classList.toggle('hidden', !S.everWon);
 }
 
 // ── render ───────────────────────────────────────────────────────────────
@@ -349,7 +382,7 @@ $('btnFight').onclick = () => {
   click();
   startFight(hubLevel(), S.bully);
 };
-$('btnTrophy').onclick = () => { click(); showVictory(S.bully); };
+$('btnTrophy').onclick = () => { click(); showVictory(S.bully, false); };
 $('btnShop').onclick = () => { click(); openShop(); };
 $('btnShopClose').onclick = () => { click(); overlay(null); refreshHub(); };
 $('btnSettings').onclick = () => { click(); openSettings(); };
@@ -374,12 +407,29 @@ function toMenu() {
   setMode('hub');
   refreshHub();
 }
+let armAgain = 0;
 $('btnAgain').onclick = () => {
   click();
-  const keep = { best: S.best, completed: true };
+  // Two-step instead of a modal: the first press asks, the second one does it.
+  if (Date.now() > armAgain) {
+    armAgain = Date.now() + 6000;
+    $('btnAgain').textContent = 'SURE? WIPES THIS RUN';
+    $('btnAgain').classList.add('danger');
+    setTimeout(() => { if (Date.now() > armAgain - 200) resetAgainBtn(); }, 6000);
+    return;
+  }
+  resetAgainBtn();
+  // Records, the music roster and the fact that you have won survive. Everything you bought
+  // does not — that is the point of starting again.
+  const keep = { best: S.best, everWon: S.everWon, records: S.records };
   S = { ...DEFAULT(), ...keep, newGamePlus: (S.newGamePlus || 0) + 1 };
   persist(S); overlay(null); setMode('hub'); refreshHub();
 };
+function resetAgainBtn() {
+  armAgain = 0;
+  $('btnAgain').textContent = 'NEW GAME';
+  $('btnAgain').classList.remove('danger');
+}
 $('btnBully').onclick = () => {
   click();
   // Bully mode KEEPS your progress, it does not hand you a maxed save. Maxing everything
@@ -500,13 +550,25 @@ function musicList() {
 
 function openHelp() {
   const owned = MOVES.filter((m) => (S.moves[m.id] || {}).owned);
+  // The gesture number is the move's place in the shop list, so it matches the badges on
+  // the strip along the bottom of the screen.
+  const keyOf = (m) => Object.keys(SPECIAL_KEYS).find((k) => SPECIAL_KEYS[k] === m.gesture);
   $('helpRows').innerHTML =
     `<div class="r"><span>Left thumb</span><b>move · jump · duck</b></div>` +
     `<div class="r"><span>Right thumb — tap</span><b>punch (tap again to combo)</b></div>` +
     `<div class="r"><span>Right thumb — draw</span><b>special move</b></div>` +
-    `<div class="r"><span>Keyboard</span><b>A/D move · W jump · S duck · J hit · 1-8 specials</b></div>` +
-    `<hr style="border:none;border-top:1px dashed rgba(32,36,44,.3);margin:8px 0">` +
-    owned.map((m) => `<div class="r"><span><b style="font-size:24px">${m.glyph}</b> ${m.name}</span><b>${m.hint}</b></div>`).join('');
+    `<div class="vichead">KEYBOARD</div>` +
+    `<div class="r"><span>Move</span><b>A / D &nbsp;or&nbsp; ← / →</b></div>` +
+    `<div class="r"><span>Jump · duck</span><b>W / S &nbsp;or&nbsp; ↑ / ↓</b></div>` +
+    `<div class="r"><span>Punch</span><b>space · J · R · 0 &nbsp;(tap again to combo)</b></div>` +
+    `<div class="r"><span>Specials</span><b>1 – 8, numbered on the strip below</b></div>` +
+    `<p class="fine" style="text-align:left;margin:4px 0 0">Arrows plus R and the top number row, or WASD plus the num pad — either hand works.</p>` +
+    `<div class="vichead">YOUR MOVES</div>` +
+    owned.map((m) => {
+      const k = keyOf(m);
+      return `<div class="r"><span><b style="font-size:24px">${m.glyph}</b> ${m.name}</span>` +
+        `<b>${m.hint}${k ? ` &nbsp;·&nbsp; key ${k}` : ''}</b></div>`;
+    }).join('');
   overlay('help');
 }
 function applySettings() {
@@ -554,3 +616,4 @@ boot().catch((err) => {
 });
 
 window.__ragdojo = { get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, LEVELS, S };
+window.__input = input;
