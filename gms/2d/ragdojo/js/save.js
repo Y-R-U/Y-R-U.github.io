@@ -1,3 +1,5 @@
+import { TOTAL_LEVELS } from './config.js';
+
 const KEY = 'ragdojo.save.v2';
 
 export const DEFAULT = () => ({
@@ -23,6 +25,13 @@ export function load() {
     const s = { ...DEFAULT(), ...JSON.parse(raw) };
     s.settings = { ...DEFAULT().settings, ...(s.settings || {}) };
     s.moves = { power: { owned: true, power: 0, cd: 0 }, ...(s.moves || {}) };
+    // Heal a save parked one past the end of the campaign. Finishing a bully run used to
+    // store level 45 of 45, and LEVELS[45] does not exist: the hub clamped it for display
+    // but FIGHT passed the raw value, so the button threw and did nothing, for ever, across
+    // refreshes. Clamping on load fixes an already-broken save without wiping it.
+    const cap = (v) => Math.max(0, Math.min(TOTAL_LEVELS - 1, Math.round(+v || 0)));
+    s.level = cap(s.level);
+    s.bullyLevel = cap(s.bullyLevel);
     return s;
   } catch { return DEFAULT(); }
 }

@@ -118,7 +118,9 @@ function startDemo() {
 }
 
 function startFight(levelIdx, bully = false) {
-  const level = LEVELS[levelIdx];
+  // Never trust the index: an out-of-range one throws inside the click handler, which looks
+  // exactly like a button that does nothing.
+  const level = LEVELS[Math.max(0, Math.min(TOTAL_LEVELS - 1, levelIdx | 0))];
   ensureSheet(level);
   match = new Match({
     level, save: S, bully, autoplay: !!qs.get('autoplay'),
@@ -167,7 +169,7 @@ function finishFight(result, m) {
   const wasFinal = L.kind === 'final';
   const tracksBefore = unlockedFightTracks(reachedLevel(null)).length;
   if (won) {
-    if (m.bully) S.bullyLevel = Math.min(TOTAL_LEVELS, L.idx + 1);
+    if (m.bully) S.bullyLevel = Math.min(TOTAL_LEVELS - 1, L.idx + 1);
     else S.level = Math.min(TOTAL_LEVELS - 1, L.idx + 1);
     if (wasFinal && !m.bully) S.completed = true;
   }
@@ -177,7 +179,7 @@ function finishFight(result, m) {
 
   // A bully run has a finish line too. Without this you beat the Ink Master a second time
   // and got a plain results card, then the hub handed you the same final fight for ever.
-  if (won && wasFinal) { showVictory(m); return; }
+  if (won && wasFinal) { showVictory(m.bully); return; }
   showResults(pendingResult);
 }
 
@@ -208,9 +210,9 @@ function showResults(R) {
 }
 const row = (k, v) => `<div class="r"><span>${k}</span><b>${v}</b></div>`;
 
-function showVictory(m) {
+function showVictory(bully) {
   const totalScore = S.score;
-  const wasBully = !!m.bully;
+  const wasBully = !!bully;
   $('victory').querySelector('h2').textContent = wasBully ? 'BULLY CHAMPION' : 'CHAMPION';
   $('btnBully').textContent = wasBully ? 'BULLY AGAIN' : 'BULLY MODE';
   $('vicFine').textContent = wasBully
@@ -238,9 +240,14 @@ function showVictory(m) {
 }
 
 // ── hub ──────────────────────────────────────────────────────────────────
+/** The fight the hub is offering. FIGHT must use exactly this, not the raw save value. */
+function hubLevel() {
+  return Math.max(0, Math.min(TOTAL_LEVELS - 1, (S.bully ? S.bullyLevel : S.level) | 0));
+}
+
 function refreshHub() {
   const bullyMode = S.bully;
-  const idx = Math.min(TOTAL_LEVELS - 1, bullyMode ? S.bullyLevel : S.level);
+  const idx = hubLevel();
   const L = LEVELS[idx];
   const pr = RANKS[bullyMode ? RANKS.length - 1 : playerRankAt(idx)];
   const er = RANKS[L.tier];
@@ -259,6 +266,9 @@ function refreshHub() {
     (bullyMode ? '<br><b style="color:#e8b93a">BULLY MODE</b>' : '');
   $('btnFight').textContent = bullyMode ? 'BULLY' : L.kind === 'final' ? 'FINAL FIGHT' : 'FIGHT';
   $('btnMusic').classList.toggle('off', !S.settings.music);
+  // Once you have finished a run, the options that only appeared on the victory screen have
+  // to stay reachable — otherwise the hub hands you the final fight and nothing else.
+  $('btnTrophy').classList.toggle('hidden', !S.completed);
 }
 
 // ── render ───────────────────────────────────────────────────────────────
@@ -337,8 +347,9 @@ function frame(t) {
 // ── wiring ───────────────────────────────────────────────────────────────
 $('btnFight').onclick = () => {
   click();
-  startFight(S.bully ? S.bullyLevel : S.level, S.bully);
+  startFight(hubLevel(), S.bully);
 };
+$('btnTrophy').onclick = () => { click(); showVictory(S.bully); };
 $('btnShop').onclick = () => { click(); openShop(); };
 $('btnShopClose').onclick = () => { click(); overlay(null); refreshHub(); };
 $('btnSettings').onclick = () => { click(); openSettings(); };

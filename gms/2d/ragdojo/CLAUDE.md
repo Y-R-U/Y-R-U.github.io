@@ -61,6 +61,7 @@ node tools/bootgate.mjs       # a stale/broken module set must report itself, no
 node tools/soundtrackgate.mjs # now-playing, auditioning a track, muting one, haptics fire
 node tools/hitgate.mjs        # hit windows: range, and one move hitting a line of three
 node tools/crosslog.mjs       # diagnostic, not a gate — what actually causes side swaps
+node tools/stuckgate.mjs      # no save state may dead-end the game
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -189,6 +190,16 @@ from its output, not by feel.
   cost 4x and 8x the old top price, so `MOVE_MAX_LV` is 7 and every perk `max` grew by 2
   without the early curve changing at all. `derive()` floors `dr`, `kbResist` and `getUp` so
   a fully maxed player is tough rather than invulnerable.
+- **A level index must be clamped everywhere it is used, not just where it is displayed.**
+  Finishing a bully run stored `bullyLevel = 45` of 45. `refreshHub` clamped that for the
+  label, but FIGHT passed the raw value, `LEVELS[45]` was undefined, and the click handler
+  threw inside `ensureSheet` — a button that silently did nothing, on every refresh, with no
+  way out but wiping the save. `hubLevel()` is now the single source for both, `startFight`
+  clamps defensively, and `save.load()` heals an already-broken save instead of demanding a
+  reset. `tools/stuckgate.mjs` walks every save state that could park you out of range.
+- **Anything only reachable by winning is unreachable once you have won.** The victory screen
+  held BULLY MODE and NEW GAME, so a finished save that could not start a fight had no way
+  to reach them. The hub carries a 🏆 button whenever `save.completed` is set.
 - **Bully mode keeps your progress; it does not hand you a maxed save.** Maxing everything
   ended the game twice over — nothing left to buy, and no reason to earn ink. Finishing a
   bully run reaches the victory screen too (`won && wasFinal`, no bully check), or the hub
