@@ -257,9 +257,16 @@ function showVictory(bully, justWon = true) {
   $('btnBully').classList.toggle('hidden', !canBully);
   $('btnBully').textContent = wasBully ? 'BULLY AGAIN' : 'BULLY MODE';
   resetAgainBtn();
-  $('vicFine').textContent = canBully
-    ? 'Bully Mode: keep your ink and everything you have bought, and start again at white belt. New Game wipes this run — only the all-time records above are kept.'
-    : 'New Game wipes this run — your ink, upgrades and progress. Only the all-time records above are kept.';
+  // Every button gets a line. "Bully Mode" and "Keep Playing" sat side by side with only one
+  // of them explained, and the difference between "start the campaign again as a black belt"
+  // and "close this and carry on" is not something a label can carry on its own.
+  const at = `fight ${hubLevel() + 1} of ${TOTAL_LEVELS}`;
+  $('vicFine').innerHTML = [
+    canBully ? `<b>${wasBully ? 'Bully Again' : 'Bully Mode'}</b> — back to fight 1 against white belts,` +
+      ' keeping every upgrade and all your ink.' : '',
+    `<b>Keep Playing</b> — close this and carry on where you are (${at}).`,
+    '<b>New Game</b> — wipe this run. Only the all-time records above are kept.',
+  ].filter(Boolean).map((t) => `<span>${t}</span>`).join('');
   overlay('victory');
   if (justWon) { audio.play('victory'); audio.sfx.bell(); }
   // Confetti of paper scraps over the celebrating figure.

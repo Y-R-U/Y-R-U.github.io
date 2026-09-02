@@ -27,6 +27,11 @@ try {
   ok('a finished run offers BULLY MODE', await c.eval(shown('btnBully')));
   const heads = await c.eval(`[...document.querySelectorAll('#vicBody .vichead')].map(e=>e.textContent).join('|')`);
   ok('it splits this run from all time', heads === 'THIS RUN|ALL TIME', heads);
+  // Two buttons that both leave the screen must each say what they do.
+  const fine = await c.eval(`document.getElementById('vicFine').textContent`);
+  for (const label of ['Bully Mode', 'Keep Playing', 'New Game']) {
+    ok(`the screen explains ${label}`, fine.includes(label), '');
+  }
   const before = await c.eval(`JSON.stringify(window.__ragdojo.save.records)`);
   ok('all-time records are recorded', JSON.parse(before).championships >= 1, before);
 
@@ -58,6 +63,8 @@ try {
   await c.frames(6);
   ok('the record book opens from the hub', await c.eval(vis('#victory')));
   ok('and does NOT offer bully mode to a fresh run', await c.eval(shown('btnBully')) === false);
+  const fine2 = await c.eval(`document.getElementById('vicFine').textContent`);
+  ok('and does not explain a button it is not showing', !fine2.includes('Bully'), fine2.slice(0, 40));
   const title = await c.eval(`document.querySelector('#victory h2').textContent`);
   ok('it calls itself the record book, not a victory', title === 'RECORD BOOK', title);
   ok('the all-time section survived', await c.eval(`document.body.innerHTML.includes('ALL TIME')`));
