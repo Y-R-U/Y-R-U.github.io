@@ -104,6 +104,7 @@ html, body {
   /* Only the middle scrolls. The panel used to scroll as a whole, which pushed the
      CONTINUE button off the bottom of a phone in landscape. */
   display: flex; flex-direction: column; min-height: 0;
+  position: relative;              /* the close button anchors to this */
 }
 .sheet > .rows, .sheet > .list { overflow-y: auto; min-height: 0; flex: 1 1 auto; }
 .sheet > h2, .sheet > .sheethead, .sheet > .tabs,
@@ -119,7 +120,12 @@ html, body {
 .sheet.narrow .sheethead h2 { text-align: center; }
 .inkline { font-size: 20px; }
 .inkline b { font-size: 24px; }
-.close { flex: none; }
+/* Every panel's close sits in the same place — pinned to the sheet's top-right corner.
+   It used to be a flex child of the header, so on the narrow panels it landed just after a
+   centred title instead of in the corner, and two panels had none at all. */
+.close { flex: none; position: absolute; top: 9px; right: 10px; z-index: 2; }
+.sheet > h2, .sheet > .sheethead { padding-right: 48px; }
+.sheet.narrow > h2 { padding: 0 48px; }
 .tabs { display: flex; gap: 8px; margin: 6px 0 10px; flex-wrap: wrap; }
 .tab { font-family: var(--font); font-size: 19px; padding: 5px 16px; cursor: pointer;
   background: transparent; border: 2.5px solid transparent; border-radius: 10px 7px 11px 6px; color: var(--ink-soft); }
@@ -216,6 +222,9 @@ html, body {
   .btn.big { font-size: 23px; padding: 8px 26px; }
   .fine { font-size: 12px; margin-top: 6px; }
   .icon { width: 36px; height: 36px; font-size: 18px; }
+  .close { top: 6px; right: 7px; }
+  .sheet > h2, .sheet > .sheethead { padding-right: 42px; }
+  .sheet.narrow > h2 { padding: 0 42px; }
   .card .cname { font-size: 18px; }
   .card .cdesc { font-size: 13px; }
   .inkline { font-size: 17px; }

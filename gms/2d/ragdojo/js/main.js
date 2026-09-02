@@ -444,7 +444,25 @@ $('btnBully').onclick = () => {
   S.bully = true; S.bullyLevel = 0;
   persist(S); overlay(null); setMode('hub'); refreshHub();
 };
-$('btnVicMenu').onclick = () => { click(); overlay(null); setMode('hub'); refreshHub(); };
+const leaveVictory = () => { click(); overlay(null); setMode('hub'); refreshHub(); };
+$('btnVicMenu').onclick = leaveVictory;
+$('btnVicClose').onclick = leaveVictory;
+$('btnResClose').onclick = () => { click(); overlay(null); toMenu(); };
+
+/**
+ * Tapping the darkened area outside a panel closes it, using that panel's own close action.
+ * Both the press and the release have to land on the backdrop — otherwise dragging a list
+ * and letting go past the edge of the sheet counts as a click on the backdrop and shuts the
+ * panel you were reading. The results card is deliberately absent: after a fight your thumb
+ * is already moving, and a stray tap there should not skip past the report.
+ */
+const DISMISS = { shop: 'btnShopClose', settings: 'btnSetClose', help: 'btnHelpClose', victory: 'btnVicClose' };
+for (const id in DISMISS) {
+  const el = $(id);
+  let downOnBackdrop = false;
+  el.addEventListener('pointerdown', (e) => { downOnBackdrop = e.target === el; });
+  el.addEventListener('click', (e) => { if (downOnBackdrop && e.target === el) $(DISMISS[id]).click(); });
+}
 $('btnFull').onclick = () => {
   click();
   const d = document.documentElement;

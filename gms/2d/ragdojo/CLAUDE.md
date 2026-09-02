@@ -64,6 +64,7 @@ node tools/crosslog.mjs       # diagnostic, not a gate — what actually causes 
 node tools/stuckgate.mjs      # no save state may dead-end the game
 node tools/progressgate.mjs   # what a new game keeps, and what it makes you earn again
 node tools/keygate.mjs        # desktop keys: punch, 1-8 specials, both movement layouts
+node tools/panelgate.mjs      # every panel's X is in the corner, and taps outside dismiss
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -160,6 +161,15 @@ from its output, not by feel.
   `getBoundingClientRect()` is useless on a rotated element (it returns the axis-aligned box)
   and every touch lands somewhere else. The CSS rule and `PORTRAIT_Q` in input.js must stay in
   step; `tools/portraitgate.mjs` fails if they drift.
+- **Every panel closes the same way.** The X is absolutely positioned in the sheet's
+  top-right corner, not a flex child of the header — as a header child it landed just after
+  a centred title on the narrow panels, and results and victory had none at all. Titles
+  carry `padding-right` (both sides when centred) so nothing runs underneath it.
+- **A backdrop tap dismisses a panel, but only if the press AND the release land on it.**
+  Otherwise dragging a list and letting go past the edge of the sheet closes the panel you
+  were reading, because `click` fires on the common ancestor. The results card is
+  deliberately excluded: after a fight your thumb is already moving and a stray tap should
+  not skip the report.
 - **Panels scroll internally, not as a whole** (`.sheet` is a flex column; only `.rows`/`.list`
   scroll). Scrolling the whole panel pushed the CONTINUE button off the bottom of a landscape
   phone. There is a `max-height: 470px` media query for the same reason.
