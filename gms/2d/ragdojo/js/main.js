@@ -2,7 +2,7 @@
 
 import {
   SHEET_W, SHEET_H, GROUND_Y, LEVELS, RANKS, TOTAL_LEVELS,
-  playerRankAt, MOVES, PERKS, moveStats, derive,
+  playerRankAt, MOVES, moveStats, derive,
 } from './config.js';
 import { drawDesk, sheetShadow } from './paper.js';
 import { buildArena } from './arena.js';
@@ -175,7 +175,9 @@ function finishFight(result, m) {
   const gained = unlockedFightTracks(reachedLevel(null)).slice(tracksBefore).map((t) => TRACK_NAME[t.id] || t.id);
   pendingResult = { result, m, earned, bonus, rankGap, wasFinal, bully: m.bully, gained };
 
-  if (won && wasFinal && !m.bully) { showVictory(m); return; }
+  // A bully run has a finish line too. Without this you beat the Ink Master a second time
+  // and got a plain results card, then the hub handed you the same final fight for ever.
+  if (won && wasFinal) { showVictory(m); return; }
   showResults(pendingResult);
 }
 
@@ -208,6 +210,12 @@ const row = (k, v) => `<div class="r"><span>${k}</span><b>${v}</b></div>`;
 
 function showVictory(m) {
   const totalScore = S.score;
+  const wasBully = !!m.bully;
+  $('victory').querySelector('h2').textContent = wasBully ? 'BULLY CHAMPION' : 'CHAMPION';
+  $('btnBully').textContent = wasBully ? 'BULLY AGAIN' : 'BULLY MODE';
+  $('vicFine').textContent = wasBully
+    ? 'Bully Again: back to white belt with everything you own. Keep Playing leaves you here to shop and replay.'
+    : 'Bully Mode: keep your ink and everything you have bought, and start again at white belt.';
   $('vicBody').innerHTML = [
     row('Fights won', S.wins),
     row('Knockouts', S.kos),
@@ -363,11 +371,12 @@ $('btnAgain').onclick = () => {
 };
 $('btnBully').onclick = () => {
   click();
+  // Bully mode KEEPS your progress, it does not hand you a maxed save. Maxing everything
+  // ended the game twice over: nothing left to buy, and nothing left to earn ink for.
   S.bully = true; S.bullyLevel = 0;
-  for (const m of MOVES) S.moves[m.id] = { owned: true, power: 5, cd: 5 };
-  for (const p of PERKS) S.perks[p.id] = p.max;
   persist(S); overlay(null); setMode('hub'); refreshHub();
 };
+$('btnVicMenu').onclick = () => { click(); overlay(null); setMode('hub'); refreshHub(); };
 $('btnFull').onclick = () => {
   click();
   const d = document.documentElement;

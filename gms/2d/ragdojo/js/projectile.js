@@ -28,8 +28,9 @@ export class Projectile {
     if (this.y > world.groundY - 6) {
       this.y = world.groundY - 6;
       if (this.bounces-- > 0) { this.vy *= -0.52; this.vx *= 0.7; }
-      else if (this.type === 'bomb') { this.vy *= -0.25; this.vx *= 0.5; }
-      else { this.dead = true; this.explode = false; }
+      // A bag of flour goes off when it lands, not a second later once everyone has walked
+      // away from it.
+      else { this.dead = true; }
     }
     if (this.x < world.minX || this.x > world.maxX) this.vx *= -0.6;
     if (this.type === 'bomb') { this.fuse -= dt; if (this.fuse <= 0) this.dead = true; }

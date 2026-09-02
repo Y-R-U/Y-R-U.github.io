@@ -59,6 +59,8 @@ node tools/musicrota.mjs      # the roster must not repeat, within a run or acro
 node tools/portraitgate.mjs   # portrait renders sideways and touch still maps correctly
 node tools/bootgate.mjs       # a stale/broken module set must report itself, not hang
 node tools/soundtrackgate.mjs # now-playing, auditioning a track, muting one, haptics fire
+node tools/hitgate.mjs        # hit windows: range, and one move hitting a line of three
+node tools/crosslog.mjs       # diagnostic, not a gate — what actually causes side swaps
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -93,13 +95,25 @@ from its output, not by feel.
   `h.x`, and `ScribbleStorm` has no `x`, so levels 36, 42 and 44 quietly broke. Hazards now
   answer `threatX(x)` and `Fighter.move` refuses a non-finite `dir`. `tools/nangate.mjs` covers
   every hazard type. It also poisoned a whole A/B run before it was found — see below.
-- **Bodies are solid on the ground; jumping is the only way to cross sides** (`Match.separate`),
-  and that includes attacks that carry you forward. Two separate leaks had to be closed:
-  `separate()` used to exempt `lockMove` attacks, which let PENCIL DASH streak clean through
-  a standing body; and even with that gone, the dash's own momentum ploughed through the
-  body it had just floored, because a limp fighter is not solid. So `Match.land()` also
-  brakes a carry-forward charge (`def.dashV > 0`) on impact. The flips are unaffected —
-  they hop first, so they cross by leaving the ground like everything else.
+- **Bodies are solid on the ground; jumping is the only way to cross sides** (`Match.separate`).
+  This took four passes, and only the last one was measured rather than guessed:
+  1. `separate()` exempted `lockMove` attacks, so PENCIL DASH streaked through a standing body.
+  2. With that gone, the dash's own momentum still ploughed through the body it had just
+     floored — a limp fighter is not solid. `Match.land()` brakes a charge (`def.dashV > 0`).
+  3. `tools/crosslog.mjs` then showed the real bulk of it: **a knocked-down body stopped
+     being solid**, so your own follow-through walked you over whoever you had just hit.
+     Floored (not dead) fighters are now solid at `bodyX()` — the ragdoll's live centre,
+     because `f.x` is frozen where they fell — and only the fighter on its feet is pushed.
+     A CORPSE stays walk-through: it lies there for the rest of the fight and would wall you
+     off from the other half of a gauntlet.
+  4. A grounded strike now plants your feet (`beginAttack` damps `vx`). Movement input was
+     already ignored during an attack, but the velocity you arrived with decayed slowly
+     enough to carry you ~50u — out the far side of someone your own hit had launched.
+
+  That took side swaps from 1.9 to 1.1 per fight, and what is left is ragdoll flight: bodies
+  physically sliding past each other, which is the game rather than a bug. Note the caveat in
+  crosslog's header — a floored fighter's `vx` is stale, so it credits a tumble to whoever is
+  still standing.
   `BODY_R` is capped by attack reach, not by how the figures look: a jab puts the hand ~61u in
   front of the pelvis and separation is `BODY_R * (scaleA + scaleB)`, so at 26 the 1.3x-scale
   final boss sat 60u away and the player's basic attack could not reach him at all.
@@ -157,6 +171,28 @@ from its output, not by feel.
   only when the player is the attacker or the target; a gauntlet's enemies clobbering each
   other would otherwise rattle the phone continuously. The Vibration toggle is hidden
   entirely when `navigator.vibrate` is absent rather than shown as a dead switch.
+- **A hitbox is live for its whole frame, not for the instant the frame starts**
+  (`Fighter.update`). A one-tick hitbox reads as "it went straight through them" — the flip
+  kick only connected point-blank. `multi` moves (dash, both flips, the slam shockwave) stay
+  live to the end of the animation, so a somersault threatens everyone it travels over;
+  `A.hitSet` caps each target at one hit, so a longer window never means a bigger hit.
+  `resolveHit` is therefore called every live frame and guards its one-shot parts with
+  `first`. The dash also carries a `sweep`, because a charge that stops at the first body
+  would otherwise be single-target.
+- **Retuning had to follow.** Reliable hitboxes are a bigger buff to whoever throws more
+  specials, and that is the enemy: level 44 fell from 20% to 2% in `tools/sim.mjs`. Cutting
+  enemy special DAMAGE barely moved it (halving it bought 3 points) — the damage was being
+  done by the FREQUENCY of being floored, so the correction is in `Brain.trySpecial`'s
+  cooldown (`max(2.5, cd * (2.8 - skill * 0.5))`), not the damage. Bisect before tuning:
+  five changes shipped together here and only two of them mattered.
+- **The last two levels of every track are the long haul** (`DEEP_LEVELS` in config.js): they
+  cost 4x and 8x the old top price, so `MOVE_MAX_LV` is 7 and every perk `max` grew by 2
+  without the early curve changing at all. `derive()` floors `dr`, `kbResist` and `getUp` so
+  a fully maxed player is tough rather than invulnerable.
+- **Bully mode keeps your progress; it does not hand you a maxed save.** Maxing everything
+  ended the game twice over — nothing left to buy, and no reason to earn ink. Finishing a
+  bully run reaches the victory screen too (`won && wasFinal`, no bully check), or the hub
+  hands you the same final fight for ever.
 - Enemy-on-enemy hits deal 25% damage. At full damage the enemies finish gauntlets for you.
 - `?autoplay=1` is a real fight with an AI player; `demo` is the menu background match. They
   are different flags.

@@ -93,22 +93,32 @@ ok('FLIP KICK connects', flip.fired && flip.hit, `fired=${flip.fired} hit=${flip
 ok('FLIP KICK only crosses by leaving the ground', !flip.crossed || flip.airborne,
   `crossed=${flip.crossed} airborne=${flip.airborne}`);
 
-// A floored body must not block — you step over it.
-const m = new Match({ level: LEVELS[0], save: DEFAULT(), onEnd: () => {} });
-if (falsify) m.separate = () => {};
-m.brains.length = 0;
-const e = m.enemies[0];
-m.player.hp = 1e9;
-m.player.x = e.x - 200; m.player.place(m.player.x, m.world.groundY);
-e.goDown(0, 0, true);                        // knocked out on the floor
-const startLeft = m.player.x < e.x;
-let steppedOver = false;
-for (let t = 0; t < 4; t += DT) {
-  m.player.move(1, DT);
-  m.update(DT, null);
-  if ((m.player.x < e.x) !== startLeft) steppedOver = true;
+/**
+ * A body on the floor. A CORPSE must never block: it lies there for the rest of the fight
+ * and would wall you off from the other half of a gauntlet. Someone merely knocked down is
+ * a different matter — walking over them while they got up was measured as the single
+ * biggest source of accidental side swaps, so they stay solid until they are on their feet.
+ */
+function flooredScenario(dying) {
+  const m = new Match({ level: LEVELS[0], save: DEFAULT(), onEnd: () => {} });
+  if (falsify) m.separate = () => {};
+  m.brains.length = 0;
+  const e = m.enemies[0];
+  m.player.hp = 1e9;
+  e.hp = dying ? 0 : 1e9;
+  m.player.x = e.x - 200; m.player.place(m.player.x, m.world.groundY);
+  e.goDown(0, 0, dying);
+  const startLeft = m.player.x < m.bodyX(e);
+  let crossed = false;
+  for (let t = 0; t < 4; t += DT) {
+    m.player.move(1, DT);
+    m.update(DT, null);
+    if ((m.player.x < m.bodyX(e)) !== startLeft) crossed = true;
+  }
+  return crossed;
 }
-ok('a floored fighter does not block you', steppedOver);
+ok('a CORPSE never blocks you', flooredScenario(true));
+ok('a knocked-down fighter DOES block you', !flooredScenario(false));
 
 console.log(`\n${pass} pass, ${fail} fail`);
 process.exit(fail ? 1 : 0);

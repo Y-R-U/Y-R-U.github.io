@@ -3,7 +3,7 @@
 
 import {
   MOVES, PERKS, MOVE_MAX_LV, moveBuyCost, movePowerCost, moveCdCost, perkCost,
-  playerRankAt, RANKS,
+  moveStats, playerRankAt, RANKS,
 } from './config.js';
 import { glyphPoints } from './gestures.js';
 import { stroke } from './ink.js';
@@ -127,6 +127,15 @@ export function buildShop(listEl, inkEl, S, onChange) {
           b.onclick = () => buy(cost, () => { S.moves[m.id] = { owned: true, power: 0, cd: 0 }; });
           row.appendChild(b);
         } else {
+          // What the move actually does right now, in numbers. "POWER MAX" on its own told
+          // you a track was finished but never what it had bought you.
+          const cur = moveStats(S, m.id);
+          if (cur) {
+            body.insertAdjacentHTML('beforeend',
+              `<div class="cstat">DMG <b>${Math.round(cur.damage)}</b>` +
+              ` · COOLDOWN <b>${cur.cooldown.toFixed(1)}s</b>` +
+              ` · KNOCKBACK <b>${Math.round(cur.knockback)}</b></div>`);
+          }
           const mk = (label, lv, cost, apply) => {
             const wrap = document.createElement('span');
             wrap.className = 'crow';
@@ -166,7 +175,7 @@ export function buildShop(listEl, inkEl, S, onChange) {
         row.className = 'crow';
         const b = document.createElement('button');
         b.className = 'buy';
-        if (maxed) { b.textContent = 'MAX'; b.disabled = true; }
+        if (maxed) { b.textContent = `MAX · ${p.fmt(lv)}`; b.disabled = true; }
         else {
           b.textContent = `UPGRADE · ${cost}`;
           b.disabled = S.ink < cost;

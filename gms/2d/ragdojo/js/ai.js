@@ -144,8 +144,13 @@ export class Brain {
       }
       const m = moveStats(this.fakeSave(id), id);
       if (m) {
-        m.damage = f.baseDmg * (id === 'power' ? 1.8 : id === 'bomb' ? 2.6 : 1.5);
-        m.cooldown = Math.max(1.1, m.cooldown * (1.5 - this.skill * 0.5));
+        // Retuned when hitboxes gained a real hit window. Specials used to whiff often, so
+        // an enemy could throw them almost on cooldown; now that they land, the same cadence
+        // chained knockdowns and killed a champion run outright (level 44 went 20% -> 2% in
+        // tools/sim.mjs). The cooldowns carry the correction, not the damage: it was the
+        // frequency of being floored, not the size of the hits, that did the damage.
+        m.damage = f.baseDmg * 0.85 * (id === 'power' ? 1.8 : id === 'bomb' ? 2.6 : 1.5);
+        m.cooldown = Math.max(2.5, m.cooldown * (2.8 - this.skill * 0.5));
         m.knockback = m.kb * (1 + this.skill * 0.5);
         return f.special(m);
       }

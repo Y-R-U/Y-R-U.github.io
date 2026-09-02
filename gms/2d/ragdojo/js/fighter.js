@@ -135,6 +135,12 @@ export class Fighter {
   beginAttack(key, def) {
     this.attack = { key, def, t: 0, fired: false, hitSet: new Set() };
     this.blocking = false;
+    // A committed strike plants your feet. Movement input is already ignored during an
+    // attack, but the velocity you arrived with decayed slowly enough to carry you ~50u
+    // forward — enough to walk out the far side of someone your own hit had just launched,
+    // which is what "the power hit switched my side" actually was. Carry-forward specials
+    // set their own velocity immediately after this.
+    if (this.onGround) this.vx *= 0.15;
     this.setAnim(def.anim || key, def.spin || 0);
   }
 
@@ -146,10 +152,13 @@ export class Fighter {
     const D = {
       power: { anim: 'power', dmg: m.damage, kb: m.knockback, reach: 40, pt: P.HAND_R, stagger: 1.0, sfx: 'heavy', p: 1.4 },
       rise:  { anim: 'rise',  dmg: m.damage, kb: m.knockback, reach: 36, pt: P.HAND_R, stagger: 1.0, sfx: 'heavy', p: 1.2, launch: -1 },
-      slam:  { anim: 'slam',  dmg: m.damage, kb: m.knockback, reach: 30, pt: P.HAND_R, stagger: 1.0, sfx: 'boom', p: 1.6, aoe: 130 },
-      dash:  { anim: 'dash',  dmg: m.damage, kb: m.knockback, reach: 40, pt: P.NECK,   stagger: 0.9, sfx: 'heavy', p: 1.3, dashV: 1150, multi: true, lockMove: true },
-      flipF: { anim: 'flip',  dmg: m.damage, kb: m.knockback, reach: 40, pt: P.FOOT_R, stagger: 1.0, sfx: 'heavy', p: 1.5, spin: 1, hopV: 560, dashV: 420, lockMove: true },
-      flipB: { anim: 'flip',  dmg: m.damage, kb: m.knockback, reach: 38, pt: P.FOOT_R, stagger: 0.9, sfx: 'heavy', p: 1.3, spin: -1, hopV: 600, dashV: -520, lockMove: true },
+      // multi = the hitbox stays live to the end of the animation, so a somersault or a
+      // shockwave catches everyone it reaches rather than only whoever stood in the one
+      // frame it fired on. A.hitSet still caps each target at one hit per attack.
+      slam:  { anim: 'slam',  dmg: m.damage, kb: m.knockback, reach: 30, pt: P.HAND_R, stagger: 1.0, sfx: 'boom', p: 1.6, aoe: 185, multi: true },
+      dash:  { anim: 'dash',  dmg: m.damage, kb: m.knockback, reach: 44, pt: P.NECK,   stagger: 0.9, sfx: 'heavy', p: 1.3, dashV: 1150, sweep: 160, multi: true, lockMove: true },
+      flipF: { anim: 'flip',  dmg: m.damage, kb: m.knockback, reach: 46, pt: P.FOOT_R, stagger: 1.0, sfx: 'heavy', p: 1.5, spin: 1, hopV: 560, dashV: 420, multi: true, lockMove: true },
+      flipB: { anim: 'flip',  dmg: m.damage, kb: m.knockback, reach: 44, pt: P.FOOT_R, stagger: 0.9, sfx: 'heavy', p: 1.3, spin: -1, hopV: 600, dashV: -520, multi: true, lockMove: true },
       toss:  { anim: 'toss',  dmg: m.damage, kb: m.knockback, reach: 0,  pt: P.HAND_R, stagger: 0.7, sfx: 'twang', p: 0.6, projectile: 'band' },
       bomb:  { anim: 'toss',  dmg: m.damage, kb: m.knockback, reach: 0,  pt: P.HAND_R, stagger: 1.0, sfx: 'twang', p: 1.0, projectile: 'bomb' },
     }[m.id];
@@ -306,8 +315,13 @@ export class Fighter {
       this.animT = A.t;
       this.anim = A.def.anim;
       const hitFrame = (({ jab: 1, hook: 1, kick: 1, power: 1, rise: 1, slam: 1, toss: 1, dash: 0, flip: 1 })[A.def.anim]) ?? 1;
-      if (!A.fired && s.frame >= hitFrame) { A.fired = true; onHit && onHit(this, A); }
-      else if (A.def.multi && A.fired && s.frame >= hitFrame) { onHit && onHit(this, A); }
+      // The hitbox is live for the WHOLE of its frame, not for the single instant the frame
+      // starts — a swing that only connects on one tick reads as "it went straight through
+      // them". `multi` moves (the dash, the flips, the slam's shockwave) stay live to the
+      // end of the animation, so a somersault threatens everyone it travels over. Repeat
+      // targets are rejected by A.hitSet, so a longer window never means a bigger hit.
+      const live = A.def.multi ? s.frame >= hitFrame : s.frame === hitFrame;
+      if (live) { onHit && onHit(this, A); A.fired = true; }
       if (s.done) this.attack = null;
     }
 

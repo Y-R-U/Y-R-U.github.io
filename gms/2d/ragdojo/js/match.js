@@ -163,15 +163,18 @@ export class Match {
   }
 
   // ── hit resolution ───────────────────────────────────────────────────────
+  /** Called every frame the hitbox is live, so anything one-shot is guarded by `first`. */
   resolveHit = (attacker, A) => {
     const def = A.def;
+    const first = !A.fired;
     if (def.projectile) {
+      if (!first) return;
       const [hx, hy] = attacker.strikePoint(def);
       this.projectiles.push(new Projectile({
         type: def.projectile === 'bomb' ? 'bomb' : 'band',
         x: hx, y: hy,
-        vx: attacker.facing * (def.projectile === 'bomb' ? 620 : 780),
-        vy: -420,
+        vx: attacker.facing * (def.projectile === 'bomb' ? 430 : 780),
+        vy: def.projectile === 'bomb' ? -330 : -420,
         owner: attacker, dmg: def.dmg, kb: def.kb,
       }));
       sfx.twang();
@@ -192,15 +195,20 @@ export class Match {
           any = true;
         }
       }
-      this.fx.burst(attacker.x, GROUND_Y - 10, 46);
-      this.fx.shakeBy(16);
-      this.fx.spawn(attacker.x, GROUND_Y, 0, -220, 'dust', 12, { spread: 220, size: 7 });
-      this.fx.mark(attacker.x, GROUND_Y - 4, 16, (Math.random() * 1e6) | 0, '#20242c', 0.4);
-      sfx.boom();
-      if (!any) sfx.thud();
+      if (first) {
+        this.fx.burst(attacker.x, GROUND_Y - 10, 46);
+        this.fx.shakeBy(16);
+        this.fx.spawn(attacker.x, GROUND_Y, 0, -220, 'dust', 12, { spread: 220, size: 7 });
+        this.fx.mark(attacker.x, GROUND_Y - 4, 16, (Math.random() * 1e6) | 0, '#20242c', 0.4);
+        sfx.boom();
+        if (!any) sfx.thud();
+      }
       return;
     }
 
+    // A charge that stops against the first body still has to flatten the rest of the rank
+    // behind it — otherwise making the dash solid turned it into a single-target move.
+    const sweep = (def.sweep || 0) * attacker.scale;
     let hitAny = false;
     for (const t of targets) {
       if (t.dead || A.hitSet.has(t.id)) continue;
@@ -208,12 +216,16 @@ export class Match {
       for (let i = 0; i < NPTS; i++) {
         if (Math.hypot(t.rag.x[i] - hx, t.rag.y[i] - hy) < reach + 12) { close = true; break; }
       }
+      if (!close && sweep) {
+        const rel = (t.x - attacker.x) * attacker.facing;
+        close = rel > 0 && rel < sweep && Math.abs(t.y - attacker.y) < 160;
+      }
       if (!close) continue;
       A.hitSet.add(t.id);
       this.land(attacker, t, def, [hx, hy]);
       hitAny = true;
     }
-    if (!hitAny && !def.multi) sfx.whoosh();
+    if (!hitAny && first && !def.multi) sfx.whoosh();
   };
 
   land(attacker, target, def, from) {
@@ -358,10 +370,13 @@ export class Match {
       const p = this.projectiles[i];
       p.update(d, this.world);
       let hit = false;
+      // A bomb is a bag of flour, not a dart: it goes off near you, not only on contact.
+      // At 26 it sailed a clear head's width over a fighter 150u away and hit nothing.
+      const pr = p.type === 'bomb' ? 42 : 26;
       for (const t of this.all) {
         if (t.dead || t === p.owner) continue;
         for (let k = 0; k < NPTS; k += 2) {
-          if (Math.hypot(t.rag.x[k] - p.x, t.rag.y[k] - p.y) < 26) { hit = true; break; }
+          if (Math.hypot(t.rag.x[k] - p.x, t.rag.y[k] - p.y) < pr) { hit = true; break; }
         }
         if (hit) {
           if (p.type === 'bomb') { this.explode(p); }
@@ -437,17 +452,27 @@ export class Match {
    * impossible to keep track of which figure was yours.
    *
    * Deliberately does not apply when: either body is airborne (that is the crossing move),
-   * or either is floored (you step over a downed fighter).
+   * or either is a corpse (a dead body must never wall you off from the rest of a gauntlet).
    *
-   * It DOES apply to attacks that carry you forward. Exempting lockMove moves let PENCIL
-   * DASH streak clean through a standing opponent and leave you facing the wrong way, which
-   * is the same complaint as walking through them. The flips are unaffected because they
-   * hop first (onGround false), so they still cross — by jumping, like everything else.
+   * It DOES apply to attacks that carry you forward, and it DOES apply to a fighter who is
+   * merely floored and about to get up. Both of those were measured, not guessed:
+   * `tools/crosslog.mjs` attributed roughly half of all side swaps to walking or drifting
+   * through the space a knocked-down body was occupying — you hit them, they fell, and the
+   * ground under them stopped being solid, so your own follow-through carried you over.
+   * That is why the power hit and the dash still "switched sides" after the carry-forward
+   * exemption was removed. A floored body is where its RAGDOLL is, not where the fighter
+   * was standing when it fell, and only the fighter still on its feet gets pushed — a limp
+   * body is driven by the verlet solver and shoving its origin would fight it.
    */
+  bodyX(f) { return f.mode === 'down' ? f.rag.centre()[0] : f.x; }
+
   separate() {
     const solid = (f) =>
-      !f.dead && f.onGround &&
-      (f.mode === 'live' || f.mode === 'stagger' || f.mode === 'getup');
+      !f.dead && (
+        (f.onGround && (f.mode === 'live' || f.mode === 'stagger' || f.mode === 'getup')) ||
+        (f.mode === 'down' && f.rag.grounded)
+      );
+    const limp = (f) => f.mode === 'down';
 
     for (let i = 0; i < this.all.length; i++) {
       const a = this.all[i];
@@ -455,30 +480,36 @@ export class Match {
       for (let j = i + 1; j < this.all.length; j++) {
         const b = this.all[j];
         if (!solid(b)) continue;
-        const min = (BODY_R * a.scale) + (BODY_R * b.scale);
-        let dx = b.x - a.x;
+        if (limp(a) && limp(b)) continue;          // two heaps of paper, let them lie
+        const ax = this.bodyX(a), bx = this.bodyX(b);
+        // A body on the floor is flatter and easier to get past than one standing up.
+        const min = BODY_R * (a.scale * (limp(a) ? 0.62 : 1)) + BODY_R * (b.scale * (limp(b) ? 0.62 : 1));
+        let dx = bx - ax;
         if (dx === 0) dx = (a.id < b.id ? -0.01 : 0.01);
         const d = Math.abs(dx);
         if (d >= min) continue;
         const s = Math.sign(dx);
         const overlap = min - d;
-        // Resolve on whoever is walking INTO the other. Splitting it evenly lets an
-        // advancing AI bulldoze a standing player backwards across the page, which reads as
-        // "I can never get a hit in" and pushed champion win rates down by a third.
-        const intoA = Math.max(0, -b.vx * s);   // b moving toward a
-        const intoB = Math.max(0, a.vx * s);    // a moving toward b
-        const drive = intoA + intoB;
         let wa, wb;
-        if (drive > 1) { wa = intoB / drive; wb = intoA / drive; }
-        else { const ma = 1 / a.mass, mb = 1 / b.mass, sum = ma + mb; wa = ma / sum; wb = mb / sum; }
-        a.x -= s * overlap * wa;
-        b.x += s * overlap * wb;
+        if (limp(a)) { wa = 0; wb = 1; }
+        else if (limp(b)) { wa = 1; wb = 0; }
+        else {
+          // Resolve on whoever is walking INTO the other. Splitting it evenly lets an
+          // advancing AI bulldoze a standing player backwards across the page, which reads
+          // as "I can never get a hit in" and pushed champion win rates down by a third.
+          const intoA = Math.max(0, -b.vx * s);   // b moving toward a
+          const intoB = Math.max(0, a.vx * s);    // a moving toward b
+          const drive = intoA + intoB;
+          if (drive > 1) { wa = intoB / drive; wb = intoA / drive; }
+          else { const ma = 1 / a.mass, mb = 1 / b.mass, sum = ma + mb; wa = ma / sum; wb = mb / sum; }
+        }
+        if (wa) a.x -= s * overlap * wa;
+        if (wb) b.x += s * overlap * wb;
         a.x = Math.max(this.world.minX + 24, Math.min(this.world.maxX - 24, a.x));
         b.x = Math.max(this.world.minX + 24, Math.min(this.world.maxX - 24, b.x));
-        // Kill the closing velocity so they rest against each other instead of buzzing.
         // Stop dead against each other rather than buzzing.
-        if (a.vx * s > 0) a.vx = 0;
-        if (b.vx * s < 0) b.vx = 0;
+        if (!limp(a) && a.vx * s > 0) a.vx = 0;
+        if (!limp(b) && b.vx * s < 0) b.vx = 0;
       }
     }
   }

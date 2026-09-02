@@ -129,6 +129,8 @@ html, body {
 .card .cname { font-size: 20px; line-height: 1.1; }
 .card .cdesc { font-size: 14px; color: var(--ink-soft); line-height: 1.25; margin: 2px 0 4px; }
 .card .chint { font-size: 13px; color: var(--blue); }
+.card .cstat { font-size: 13px; color: var(--ink-soft); margin-top: 3px; letter-spacing: .3px; }
+.card .cstat b { color: var(--ink); font-variant-numeric: tabular-nums; }
 .card .crow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 5px; }
 .card .lv { font-size: 13px; color: var(--ink-soft); }
 .buy { font-family: var(--font); font-size: 15px; padding: 3px 10px; cursor: pointer;

@@ -184,38 +184,50 @@ export const MOVES = [
   },
 ];
 
-export const MOVE_MAX_LV = 5;
+export const MOVE_MAX_LV = 7;
+
+/**
+ * The last two levels of anything are a long-haul goal rather than a purchase: they cost
+ * four and eight times the old top price, so finishing a track is something you grind
+ * towards over a whole campaign (or several) instead of something you tick off.
+ */
+export const DEEP_LEVELS = 2;
+const deepMul = (lv, max) => { const soft = max - DEEP_LEVELS; return lv < soft ? 1 : lv === soft ? 4 : 8; };
+const curveLv = (lv, max) => Math.min(lv, max - DEEP_LEVELS - 1);
 
 /** Upgrade cost curves. Specials get separate power and cooldown tracks. */
 export const moveBuyCost = (m) => m.cost;
-export const movePowerCost = (m, lv) => Math.round((m.cost * 0.5 + 70) * Math.pow(1.62, lv));
-export const moveCdCost = (m, lv) => Math.round((m.cost * 0.42 + 60) * Math.pow(1.58, lv));
+export const movePowerCost = (m, lv) =>
+  Math.round((m.cost * 0.5 + 70) * Math.pow(1.62, curveLv(lv, MOVE_MAX_LV)) * deepMul(lv, MOVE_MAX_LV));
+export const moveCdCost = (m, lv) =>
+  Math.round((m.cost * 0.42 + 60) * Math.pow(1.58, curveLv(lv, MOVE_MAX_LV)) * deepMul(lv, MOVE_MAX_LV));
 
 export const PERKS = [
-  { id: 'hp',    name: 'PAPER THICKNESS', max: 8, base: 90,  growth: 1.52,
+  { id: 'hp',    name: 'PAPER THICKNESS', max: 10, base: 90,  growth: 1.52,
     desc: 'More HP. +14 max health per level.', fmt: (l) => `+${l * 14} HP` },
-  { id: 'atk',   name: 'HEAVIER HAND',    max: 8, base: 110, growth: 1.55,
+  { id: 'atk',   name: 'HEAVIER HAND',    max: 10, base: 110, growth: 1.55,
     desc: 'Standard hits land harder. +11% damage per level.', fmt: (l) => `+${l * 11}% hit` },
-  { id: 'spd',   name: 'QUICK FEET',      max: 5, base: 130, growth: 1.6,
+  { id: 'spd',   name: 'QUICK FEET',      max: 7, base: 130, growth: 1.6,
     desc: 'Move faster. +8% speed per level.', fmt: (l) => `+${l * 8}% speed` },
-  { id: 'jump',  name: 'SPRING LOADED',   max: 4, base: 150, growth: 1.62,
+  { id: 'jump',  name: 'SPRING LOADED',   max: 6, base: 150, growth: 1.62,
     desc: 'Jump higher, fall a little slower.', fmt: (l) => `+${l * 9}% jump` },
-  { id: 'armor', name: 'INK SKIN',        max: 6, base: 170, growth: 1.6,
+  { id: 'armor', name: 'INK SKIN',        max: 8, base: 170, growth: 1.6,
     desc: 'Take less damage and get thrown around less.', fmt: (l) => `-${l * 6}% taken` },
-  { id: 'crit',  name: 'SHARP POINT',     max: 5, base: 200, growth: 1.66,
+  { id: 'crit',  name: 'SHARP POINT',     max: 7, base: 200, growth: 1.66,
     desc: 'Chance to land a double-damage hit.', fmt: (l) => `${l * 6}% crit` },
-  { id: 'combo', name: 'MOMENTUM',        max: 4, base: 230, growth: 1.7,
+  { id: 'combo', name: 'MOMENTUM',        max: 6, base: 230, growth: 1.7,
     desc: 'Each hit in a combo adds more damage than the last.', fmt: (l) => `+${l * 8}% combo` },
-  { id: 'stiff', name: 'STIFF JOINTS',    max: 4, base: 210, growth: 1.64,
+  { id: 'stiff', name: 'STIFF JOINTS',    max: 6, base: 210, growth: 1.64,
     desc: 'Recover from a knockdown faster. Stagger less.', fmt: (l) => `-${l * 14}% down time` },
-  { id: 'drain', name: 'INK DRAIN',       max: 3, base: 320, growth: 1.8,
+  { id: 'drain', name: 'INK DRAIN',       max: 5, base: 320, growth: 1.8,
     desc: 'Heal for a slice of the damage you deal.', fmt: (l) => `${l * 4}% lifesteal` },
-  { id: 'wind',  name: 'SECOND WIND',     max: 4, base: 190, growth: 1.6,
+  { id: 'wind',  name: 'SECOND WIND',     max: 6, base: 190, growth: 1.6,
     desc: 'Start each fight with bonus health that regenerates between rounds.',
     fmt: (l) => `+${l * 8}% heal` },
 ];
 
-export const perkCost = (p, lv) => Math.round(p.base * Math.pow(p.growth, lv));
+export const perkCost = (p, lv) =>
+  Math.round(p.base * Math.pow(p.growth, curveLv(lv, p.max)) * deepMul(lv, p.max));
 
 /** Everything the player's numbers are derived from, in one place. */
 export function derive(save) {
@@ -226,11 +238,13 @@ export function derive(save) {
     atkMul: 1 + L('atk') * 0.11,
     speed: 200 * (1 + L('spd') * 0.08),
     jump: 640 * (1 + L('jump') * 0.09),
-    dr: 1 - L('armor') * 0.06,
-    kbResist: 1 - L('armor') * 0.05,
+    // The deep levels push these further than the original tracks ever did — floor them so
+    // a fully maxed player is tough, not invulnerable, and never negative.
+    dr: Math.max(0.32, 1 - L('armor') * 0.06),
+    kbResist: Math.max(0.4, 1 - L('armor') * 0.05),
     crit: L('crit') * 0.06,
     combo: L('combo') * 0.08,
-    getUp: 1 - L('stiff') * 0.14,
+    getUp: Math.max(0.22, 1 - L('stiff') * 0.14),
     drain: L('drain') * 0.04,
     heal: L('wind') * 0.08,
   };

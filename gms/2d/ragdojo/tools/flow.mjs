@@ -97,10 +97,45 @@ try {
   await c.frames(40);
   await c.shot(join(SHOTS, 'flow_victory.png'));
 
+  // Bully mode must KEEP your progress, not hand you a maxed save — maxing it left nothing
+  // to buy and no reason to earn ink, which ended the game a second time.
+  const beforeBully = await c.eval(`JSON.stringify({
+    moves: window.__ragdojo.save.moves, perks: window.__ragdojo.save.perks, ink: window.__ragdojo.save.ink })`);
   await c.eval(`document.getElementById('btnBully').click()`);
   await c.frames(10);
-  const bullyOn = await c.eval(`window.__ragdojo.save.bully === true && Object.keys(window.__ragdojo.save.moves).length >= 8`);
-  ok('bully mode maxes the save', bullyOn);
+  const afterBully = await c.eval(`JSON.stringify({
+    moves: window.__ragdojo.save.moves, perks: window.__ragdojo.save.perks, ink: window.__ragdojo.save.ink })`);
+  ok('bully mode starts a bully run', await c.eval(`window.__ragdojo.save.bully === true && window.__ragdojo.save.bullyLevel === 0`));
+  ok('bully mode leaves your upgrades exactly as they were', beforeBully === afterBully);
+  const anyLeft = await c.eval(`(async () => {
+    const { PERKS, MOVES, MOVE_MAX_LV } = await import('/js/config.js');
+    const s = window.__ragdojo.save;
+    const perkRoom = PERKS.some((p) => (s.perks[p.id] || 0) < p.max);
+    const moveRoom = MOVES.some((m) => ((s.moves[m.id] || {}).power || 0) < MOVE_MAX_LV);
+    return perkRoom && moveRoom;
+  })()`);
+  ok('there is still something left to buy in bully mode', anyLeft);
+
+  // Finishing a bully run must offer the same choices again, not a dead end.
+  // Straight into localStorage: the reload below reads the saved file, not the live object.
+  await c.eval(`(()=>{
+    const K = 'ragdojo.save.v2';
+    const s = JSON.parse(localStorage.getItem(K) || '{}');
+    s.bully = true; s.bullyLevel = 44; s.completed = true;
+    localStorage.setItem(K, JSON.stringify(s));
+  })()`);
+  await c.goto(`${srv.base}/index.html?auto=1&dpr=1&unlock=1`);
+  await c.waitFor('document.getElementById("hub").classList.contains("show")', 20000);
+  await c.eval(`document.getElementById('btnFight').click()`);
+  await c.waitFor('window.__state && window.__state.mode === "fight"', 20000);
+  await c.frames(20);
+  await c.eval(`window.__ragdojo.match.enemies.forEach(e => e.hurt(99999, {from:[0,0], kb:900, stagger:1}))`);
+  const vic2 = await c.waitFor('document.getElementById("victory").classList.contains("show")', 20000);
+  ok('finishing a BULLY run also reaches the victory screen', vic2);
+  ok('and offers another run', await c.eval(`document.getElementById('btnBully').textContent`) === 'BULLY AGAIN');
+  await c.eval(`document.getElementById('btnVicMenu').click()`);
+  await c.waitFor('window.__state && window.__state.mode === "hub"', 8000);
+  ok('KEEP PLAYING returns to the hub', await c.eval(vis('#hub')));
 
   log(c.errors.length ? `\nCONSOLE ERRORS:\n${c.errors.slice(0, 10).join('\n')}` : '\nno console errors');
   log(`\n${pass} pass, ${fail} fail`);
