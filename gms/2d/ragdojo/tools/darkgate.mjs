@@ -95,11 +95,30 @@ try {
     const t = document.getElementById('btnBully').textContent;
     document.getElementById('btnVicClose').click();
     return t; })()`)).includes('THUG'));
+  // The word has to follow you onto the hub, not just live on the trophy screen.
+  ok('a THUG run says THUG on the FIGHT button',
+     (await c.eval(`document.getElementById('btnFight').textContent`)) === 'THUG');
+  ok('and in the corner where it names the mode',
+     /THUG MODE/.test(await c.eval(`document.getElementById('hubStats').innerHTML`)));
+
+  // Everyone on those streets is holding something.
+  await c.eval(`document.getElementById('btnFight').click()`);
+  await c.frames(8);
+  const armedDark = await c.eval(`(()=>{ const m = window.__ragdojo.match;
+    return { p: !!m.player.armed, e: !!m.enemies[0].armed }; })()`);
+  ok('everyone in the dark is carrying', armedDark.p && armedDark.e, JSON.stringify(armedDark));
+
+  await boot({ everWon: true, completed: true, darkUnlocked: true, theme: 'dark',
+    bully: true, bullyLevel: 12, thugWon: false, stash: { light: { level: 44 } } });
   await c.eval(`document.getElementById('btnDark').click()`);
   await c.frames(8);
   ok('leaving mid-THUG asks the question', await c.eval(`document.getElementById('thug').classList.contains('show')`));
   ok('YES is locked until you win it', await c.eval(`document.getElementById('btnThugYes').disabled`));
   ok('and says so', (await c.eval(`document.getElementById('thugFine').textContent`)) === 'win as THUG to enable');
+  // Fading toward the page is not symmetric. The same 40% that reads as "greyed out" on
+  // cream paper disappears into an inverted one, so dark gets more of it back.
+  const dim = +(await c.eval(`getComputedStyle(document.getElementById('btnThugYes')).opacity`));
+  ok('a disabled button is still readable in the dark', dim >= 0.6, `opacity ${dim}`);
   await c.eval(`document.getElementById('btnThugYes').click()`);
   await c.frames(6);
   ok('a locked YES does nothing', await c.eval(S('s.theme')) === 'dark');
@@ -109,7 +128,8 @@ try {
 
   // Won the thug run: now you may keep the knife.
   await boot({ everWon: true, completed: true, darkUnlocked: true, theme: 'dark',
-    bully: true, bullyLevel: 20, thugWon: true, stash: { light: { level: 44 } } });
+    bully: true, bullyLevel: 20, thugWon: true,
+    stash: { light: { level: 44, completed: true, bully: true, bullyLevel: 6 } } });
   await c.eval(`document.getElementById('btnDark').click()`);
   await c.frames(8);
   ok('a proven THUG gets the choice', !(await c.eval(`document.getElementById('btnThugYes').disabled`)));
@@ -122,6 +142,17 @@ try {
     const cfg = await import('/js/config.js');
     return cfg.activeMoves(window.__ragdojo.save)[0].name;
   })()`)) === 'SHANK');
+  // Still a THUG in the daylight: the word follows the moves, not the colour of the page.
+  ok('a carried-over run is still called THUG in the light',
+     (await c.eval(`document.getElementById('btnFight').textContent`)) === 'THUG');
+  ok('and the corner agrees',
+     /THUG MODE/.test(await c.eval(`document.getElementById('hubStats').innerHTML`)));
+  await c.eval(`document.getElementById('btnFight').click()`);
+  await c.frames(8);
+  const armedLight = await c.eval(`(()=>{ const m = window.__ragdojo.match;
+    return { p: !!m.player.armed, e: !!m.enemies[0].armed }; })()`);
+  ok('you keep the knife but the dojo does not arm its students',
+     armedLight.p && !armedLight.e, JSON.stringify(armedLight));
 
   log(c.errors.length ? `\nCONSOLE ERRORS:\n${c.errors.slice(0, 5).join('\n')}` : '\nno console errors');
   if (c.errors.length) fail++;

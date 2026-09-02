@@ -70,6 +70,10 @@ export class Match {
     const RANKS = ranksFor(this.save.theme);
     const pRank = RANKS[this.bully ? RANKS.length - 1 : playerRankAt(L.idx)];
     const stats = derive(this.save);
+    // Who is holding a knife. You are, if you are in the dark or walked back out of it
+    // still carrying; the people opposite you are only if this is the dark campaign — the
+    // dojo does not arm its students because you turned up with a blade.
+    const dark = this.save.theme === 'dark';
 
     this.player = new Fighter({
       isPlayer: !this.demo,
@@ -83,6 +87,7 @@ export class Match {
       x: 380,
       facing: 1,
       stats,
+      armed: dark || !!this.save.carryDark,
     });
     this.player.place(560, GROUND_Y);
 
@@ -96,6 +101,7 @@ export class Match {
         hp: e.hp, dmg: e.dmg, speed: e.speed, scale: e.scale, mass: e.mass,
         skill: e.skill, moves: e.moves, boss: e.boss,
         facing: -1,
+        armed: dark,
       });
       f.place(SHEET_W - 560 - i * 130 * (n > 1 ? 1 : 0), GROUND_Y);
       this.enemies.push(f);

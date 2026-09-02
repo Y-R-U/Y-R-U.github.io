@@ -8,8 +8,15 @@ export const P = {
 };
 export const NPTS = 11;
 
+/**
+ * Proportions. Longer arms and longer legs than the first pass: the figure used to be all
+ * torso, with stubby limbs that read as a child's drawing of a person rather than a fighter.
+ * Arms 51 -> 57 and legs 54 -> 59 against an unchanged 50 spine. RANGES below are the
+ * matching joint limits and MUST move with these — they are a fraction under full extension,
+ * so a limb that outgrows its range silently locks straight.
+ */
 export const BONE = {
-  spine: 50, skull: 17, upperArm: 26, foreArm: 25, thigh: 27, shin: 27, headR: 14.5,
+  spine: 50, skull: 17, upperArm: 29, foreArm: 28, thigh: 30, shin: 29, headR: 14.5,
 };
 
 const LINKS = [
@@ -31,9 +38,9 @@ const MASS = [1.6, 1.3, 1.1, 0.55, 0.45, 0.55, 0.45, 0.85, 0.7, 0.85, 0.7];
  * ground. These are what keep the crumple.
  */
 const RANGES = [
-  [P.NECK, P.HAND_L, 19, 49], [P.NECK, P.HAND_R, 19, 49],
-  [P.PELVIS, P.FOOT_L, 21, 51], [P.PELVIS, P.FOOT_R, 21, 51],
-  [P.NECK, P.KNEE_L, 32, 999], [P.NECK, P.KNEE_R, 32, 999],
+  [P.NECK, P.HAND_L, 21, 55], [P.NECK, P.HAND_R, 21, 55],
+  [P.PELVIS, P.FOOT_L, 23, 56], [P.PELVIS, P.FOOT_R, 23, 56],
+  [P.NECK, P.KNEE_L, 34, 999], [P.NECK, P.KNEE_R, 34, 999],
   [P.HEAD, P.HAND_L, 15, 999], [P.HEAD, P.HAND_R, 15, 999],
   [P.FOOT_L, P.FOOT_R, 13, 999], [P.HAND_L, P.HAND_R, 11, 999],
   [P.KNEE_L, P.KNEE_R, 12, 999], [P.ELBOW_L, P.ELBOW_R, 12, 999],

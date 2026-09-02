@@ -80,7 +80,12 @@ export function lerpPose(a, b, u, out = {}) {
 export const POSE = {
   guard:   pose({ t: 0.12, h: -0.08, sl: 0.95, el: 2.45, sr: 1.25, er: 2.15, hl: -0.28, kl: 0.36, hr: 0.30, kr: 0.10 }),
   guardB:  pose({ t: 0.16, h: -0.04, sl: 1.02, el: 2.35, sr: 1.32, er: 2.05, hl: -0.26, kl: 0.30, hr: 0.28, kr: 0.14 }),
-  block:   pose({ t: 0.30, h: 0.34, sl: 1.85, el: 2.55, sr: 2.00, er: 2.45, hl: -0.63, kl: 1.29, hr: 0.66, kr: 1.25, crouch: 0.45 }),
+  // The duck. Knees FORWARD over the toes and both feet planted — the old one put all the
+  // weight on one leg and stuck the other straight out in front, which read as sitting down
+  // rather than dropping under a punch. Its lowest foot sits ~21u above the standing one,
+  // which is exactly the pelvis drop Fighter.duckDrop applies, so the crouch and the ground
+  // agree instead of fighting each other through the collision solver.
+  block:   pose({ t: 0.28, h: 0.22, sl: 1.12, el: 2.20, sr: 1.28, er: 2.08, hl: 0.60, kl: -1.75, hr: 1.05, kr: -1.86, crouch: 0.46 }),
 
   walkA:   pose({ t: 0.16, h: -0.05, sl: 0.55, el: 1.85, sr: 1.45, er: 1.70, hl: -0.52, kl: 0.62, hr: 0.54, kr: 0.14 }),
   walkB:   pose({ t: 0.14, h: -0.05, sl: 1.00, el: 2.00, sr: 1.10, er: 1.90, hl: -0.10, kl: 0.30, hr: 0.16, kr: 0.42 }),
@@ -94,7 +99,7 @@ export const POSE = {
 
   jumpUp:  pose({ t: 0.10, h: -0.16, sl: 2.55, el: 0.70, sr: 2.70, er: 0.55, hl: -0.50, kl: 1.25, hr: 0.42, kr: 1.05 }),
   jumpFall:pose({ t: -0.06, h: 0.10, sl: 2.20, el: 1.05, sr: 2.35, er: 0.90, hl: -0.34, kl: 0.55, hr: 0.50, kr: 0.35 }),
-  land:    pose({ t: 0.30, h: 0.10, sl: 0.70, el: 2.10, sr: 0.90, er: 2.00, hl: -0.40, kl: 0.95, hr: 0.44, kr: 0.85, crouch: 0.45 }),
+  land:    pose({ t: 0.30, h: 0.10, sl: 0.70, el: 2.10, sr: 0.90, er: 2.00, hl: 0.20, kl: -0.75, hr: 0.54, kr: -0.90, crouch: 0.45 }),
 
   jabWind: pose({ t: 0.06, h: -0.06, sl: 0.90, el: 2.50, sr: 0.95, er: 2.55, hl: -0.30, kl: 0.38, hr: 0.32, kr: 0.10 }),
   jabHit:  pose({ t: 0.24, h: -0.02, sl: 0.85, el: 2.40, sr: 1.62, er: 0.02, hl: -0.36, kl: 0.42, hr: 0.42, kr: 0.06 }),

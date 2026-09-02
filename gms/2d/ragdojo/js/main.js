@@ -120,8 +120,12 @@ function applyTheme() {
 
 /** True once you have won a bully run in the light — that is what opens the door. */
 const darkOpen = () => !!S.darkUnlocked;
-/** In the dark, the bully run is called being a THUG. */
-const bullyWord = () => (S.theme === 'dark' ? 'THUG' : 'BULLY');
+/**
+ * In the dark, the bully run is called being a THUG — and it stays called that in the
+ * daylight if you walked back out still carrying the knives. The word follows the moves you
+ * are holding, not the colour of the page.
+ */
+const bullyWord = () => (S.theme === 'dark' || S.carryDark ? 'THUG' : 'BULLY');
 /** A thug run has been started but never finished — the state that gates the prompt. */
 const thugInPlay = () => !!(S.stash.dark ? S.stash.dark.bully : false) || (S.theme === 'dark' && S.bully);
 
@@ -154,7 +158,7 @@ function startDemo() {
   ensureSheet(level);
   match = new Match({
     level, demo: true,
-    save: { perks: { hp: 3, atk: 3, spd: 2, armor: 2 }, moves: {} },
+    save: { perks: { hp: 3, atk: 3, spd: 2, armor: 2 }, moves: {}, theme: S.theme, carryDark: S.carryDark },
     onEnd: () => { if (mode === 'hub') setTimeout(startDemo, 700); },
   });
 }
@@ -169,7 +173,7 @@ function startFight(levelIdx, bully = false) {
     onSeen: () => persist(S),
     onEnd: (result, m) => finishFight(result, m),
   });
-  match.say(bully ? 'BULLY TIME' : level.kind === 'final' ? 'FINAL PAGE' :
+  match.say(bully ? `${bullyWord()} TIME` : level.kind === 'final' ? 'FINAL PAGE' :
     level.kind === 'champion' ? 'CHAMPION' : 'FIGHT!', 1.8);
   setMode('fight');
   audio.play(fightTrack(level));
@@ -295,7 +299,7 @@ function showVictory(bully, justWon = true) {
     row('Ink collected', S.totalInk),
     `<div class="r big"><span>${justWon ? 'FINAL SCORE' : 'SCORE'}</span><b>${Math.round(S.score)}</b></div>`,
     `<div class="vichead">ALL TIME</div>`,
-    row('Championships', R.championships + (R.bullyRuns ? ` · ${R.bullyRuns} bully` : '')),
+    row('Championships', R.championships + (R.bullyRuns ? ` · ${R.bullyRuns} ${bullyWord().toLowerCase()}` : '')),
     row('Highest score', R.bestScore),
     row('Best single fight', R.bestFight),
     row('Longest launch', m(R.longestLaunch)),
@@ -360,8 +364,8 @@ function refreshHub() {
   $('inkPill').textContent = S.ink;
   $('hubStats').innerHTML =
     `won ${S.wins} · lost ${S.losses}<br>score ${Math.round(S.score)}` +
-    (bullyMode ? '<br><b style="color:#e8b93a">BULLY MODE</b>' : '');
-  $('btnFight').textContent = bullyMode ? 'BULLY' : L.kind === 'final' ? 'FINAL FIGHT' : 'FIGHT';
+    (bullyMode ? `<br><b style="color:#e8b93a">${bullyWord()} MODE</b>` : '');
+  $('btnFight').textContent = bullyMode ? bullyWord() : L.kind === 'final' ? 'FINAL FIGHT' : 'FIGHT';
   $('btnMusic').classList.toggle('off', !S.settings.music);
   // Once you have finished a run, the options that only appeared on the victory screen have
   // to stay reachable — otherwise the hub hands you the final fight and nothing else.
@@ -644,6 +648,9 @@ function fightPool(reached) {
   return kept.length ? kept : unlocked;
 }
 
+/** The four tracks that play for a reason rather than by rotation. */
+const SET_PIECES = [['menu', 'menu'], ['boss', 'champion'], ['final', 'final fight'], ['victory', 'victory']];
+
 /**
  * The soundtrack as a collection: what is playing now, what is unlocked, and which ones
  * you have switched off. Tapping a row auditions it.
@@ -666,14 +673,26 @@ function musicList() {
       `<span>${playing ? '▶' : '♪'} ${TRACK_NAME[t.id] || t.id}</span>` +
       `<button class="buy tiny" data-mute="${t.id}"${last ? ' disabled' : ''}>${on ? 'ON' : 'OFF'}</button></div>`;
   }).join('');
+  // The set pieces are not part of the rotation and cannot be switched off — a fight has to
+  // sound like something — but they are half of what you hear, so they belong in the list.
+  const setRows = SET_PIECES.map(([role, label]) => {
+    const id = roleTrack(S.theme, role);
+    const playing = now === id;
+    return `<div class="r trackrow${playing ? ' playing' : ''}" data-play="${id}">` +
+      `<span>${playing ? '▶' : '♪'} ${TRACK_NAME[id] || id}</span><b>${label}</b></div>`;
+  }).join('');
   const n = unlockedFightTracks(reached, S.theme).length;
   const nowName = TRACK_NAME[now];
   const pool = poolFor(S.theme);
-  return `<div class="musichead">${S.theme === 'dark' ? 'AFTER DARK' : 'SOUNDTRACK'} — ${n} of ${pool.length} fight tracks</div>` +
+  const total = pool.length + SET_PIECES.length;
+  return `<div class="musichead">${S.theme === 'dark' ? 'AFTER DARK' : 'SOUNDTRACK'} — ${n + SET_PIECES.length} of ${total} tracks</div>` +
     (nowName && S.settings.music
       ? `<div class="nowplaying">NOW PLAYING <b>${nowName}</b></div>`
       : `<div class="nowplaying off">music is off</div>`) +
-    rows;
+    `<div class="musichead">FIGHTS — ${n} of ${pool.length}</div>` +
+    rows +
+    `<div class="musichead">SET PIECES</div>` +
+    setRows;
 }
 
 function openHelp() {

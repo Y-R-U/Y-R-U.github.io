@@ -111,15 +111,18 @@ if (args.level !== undefined) {
   const save = DEFAULT();
   save.level = L.idx;
   if (!args.naked) { save.ink = 200 + L.idx * 260; spend(save); }
-  let wins = 0, secs = 0, timeouts = 0;
+  let wins = 0, secs = 0, timeouts = 0, dealt = 0, taken = 0;
   for (let i = 0; i < RUNS; i++) {
     const r = runFight(L, save);
     if (r.result === 'win') wins++;
     if (r.result === 'timeout') timeouts++;
-    secs += r.seconds;
+    secs += r.seconds; dealt += r.dmgDealt; taken += r.dmgTaken;
   }
   console.log(`level ${L.idx} (${L.title}, ${L.kind}, ${L.enemies.length} enemy)`);
-  console.log(`  win ${(wins / RUNS * 100).toFixed(0)}%  timeout ${timeouts}  avg ${(secs / RUNS).toFixed(1)}s`);
+  // Both damage columns, because a win rate alone cannot tell you WHICH side a change helped.
+  console.log(`  win ${(wins / RUNS * 100).toFixed(0)}%  timeout ${timeouts}  avg ${(secs / RUNS).toFixed(1)}s` +
+    `  dealt ${(dealt / RUNS).toFixed(0)}  taken ${(taken / RUNS).toFixed(0)}` +
+    `  dealt/s ${(dealt / secs).toFixed(1)}  taken/s ${(taken / secs).toFixed(1)}`);
   process.exit(0);
 }
 

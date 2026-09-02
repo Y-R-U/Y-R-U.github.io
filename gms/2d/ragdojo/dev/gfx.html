@@ -16,8 +16,9 @@ c.width = SHEET_W + PAD * 2; c.height = SHEET_H + PAD * 2;
 const g = c.getContext('2d');
 const sheet = makeSheet(SHEET_W, SHEET_H, 7);
 
+const ARMED = q.get('armed') === '1';
 function mk(rank, scale = 1, facing = 1, seed = 1) {
-  return { rag: new Ragdoll(scale), scale, facing, rank: RANKS[rank], seed,
+  return { rag: new Ragdoll(scale), scale, facing, rank: RANKS[rank], seed, armed: ARMED,
     hp: 100, maxHp: 100, hitFlash: 0, isPlayer: false, dead: false, tailPhase: seed };
 }
 function put(f, x, y, poseName, t = 0) {
@@ -75,6 +76,19 @@ function render() {
     for (const f of fs) { drawShadow(g, f, GROUND_Y); drawFighter(g, f, 0); }
     stroke(g, [[40, GROUND_Y], [SHEET_W - 40, GROUND_Y]], { w: 2, passes: 1, wob: 0.6, col: '#7a90b0', a: 0.6 });
     label(SHEET_W / 2, GROUND_Y + 90, 'ragdoll — muscles off, 4 s of settling');
+  } else if (scene === 'closeup') {
+    // Big enough to judge feet, hands and the knife. ?armed=1 arms them.
+    const names = ['guard', 'block', 'walkA', 'runA', 'jabHit', 'kickHit', 'tossHit', 'powHit'];
+    names.forEach((n, i) => {
+      const col = i % 4, row = (i / 4) | 0;
+      const x = 260 + col * 400, y = 330 + row * 460;
+      const f = mk(i % 9, 2.4, 1, i * 13 + 3);
+      put(f, x, y + (n === 'block' ? 21 * 2.4 : 0), n);
+      const ground = y + 55.5 * 2.4;
+      stroke(g, [[x - 150, ground], [x + 150, ground]], { w: 1.5, passes: 1, wob: 0.5, col: '#8899aa', a: 0.5 });
+      drawFighter(g, f, 0);
+      label(x, ground + 40, n);
+    });
   } else if (scene === 'walk') {
     for (let i = 0; i < 8; i++) {
       const f = mk(4, 1.3, 1, 9);

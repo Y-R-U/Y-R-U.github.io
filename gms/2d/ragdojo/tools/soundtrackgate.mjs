@@ -30,10 +30,15 @@ try {
   ok('settings names the track that is playing', !!now, now);
 
   const rows = await c.eval(`document.querySelectorAll('#setRows .trackrow').length`);
-  ok('every unlocked track is listed', rows === 10, `${rows} rows`);
+  ok('every unlocked track is listed', rows === 14, `${rows} rows (10 fights + 4 set pieces)`);
 
-  const marked = await c.eval(`document.querySelectorAll('#setRows .trackrow.playing').length`);
-  ok('menu music is not mistaken for a fight track', marked === 0, `${marked} marked`);
+  // The menu track belongs in the list — you can hear it, so you should be able to name it —
+  // but as a SET PIECE: no ON/OFF, because it is not in the fight rotation to drop out of.
+  const marked = await c.eval(`(()=>{const p=[...document.querySelectorAll('#setRows .trackrow.playing')];
+    return {n:p.length, mutable:p.filter(r=>r.querySelector('[data-mute]')).length,
+            label:p[0]?.querySelector('b')?.textContent || ''};})()`);
+  ok('menu music is listed as a set piece, not a fight track',
+     marked.n === 1 && marked.mutable === 0 && marked.label === 'menu', JSON.stringify(marked));
 
   // Audition: tap the third row.
   await c.eval(`document.querySelectorAll('#setRows .trackrow')[2].click()`);

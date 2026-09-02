@@ -33,6 +33,7 @@ export class Fighter {
     this.mass = o.mass || 1;
     this.moveCount = o.moves || 2;
     this.boss = !!o.boss;
+    this.armed = !!o.armed;             // carrying knives — the dark world's stick figure
     this.stats = o.stats || null;      // player derive() output
 
     this.x = o.x || 0;
@@ -268,7 +269,9 @@ export class Fighter {
     this.stunT = Math.max(0, this.stunT - dt);
     this.guardBroken = Math.max(0, (this.guardBroken || 0) - dt);
     this.tailPhase += dt * (6 + Math.abs(this.vx) * 0.02);
-    const wantDrop = (this.blocking && this.onGround) ? 23 * this.scale : 0;
+    // 21 is not a look — it is the gap between the standing pose's lowest foot and the
+    // crouch pose's, so the duck lands the feet exactly on the ground it was already on.
+    const wantDrop = (this.blocking && this.onGround) ? 21 * this.scale : 0;
     this.duckDrop += (wantDrop - this.duckDrop) * Math.min(1, dt * 16);
     for (const k in this.cd) if (this.cd[k] > 0) this.cd[k] -= dt;
     if (this.comboTimer > 0) { this.comboTimer -= dt; if (this.comboTimer <= 0) this.combo = 0; }

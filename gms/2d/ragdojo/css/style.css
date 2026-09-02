@@ -80,6 +80,13 @@ html, body {
 #btnDark.locked { opacity: .55; }
 #btnDark.on { background: #20242c; color: #f7f2e3; border-color: #f7f2e3; }
 .btn.locked, .btn[disabled].locked { opacity: .4; }
+/* Fading toward the ground is not symmetric: on cream paper a 40% button still reads, but
+   inverted the same button fades into a dark page and disappears. Everything switched off,
+   locked or unaffordable gets more of itself back after dark. */
+#app.dark .btn[disabled], #app.dark .btn.locked, #app.dark .btn[disabled].locked,
+#app.dark .buy[disabled], #app.dark .card.locked, #app.dark .icon.off,
+#app.dark .rows .r.lockedrow, #app.dark .rows .r.trackrow.mutedrow span { opacity: .72; }
+#app.dark #btnDark.locked { opacity: .8; }
 
 /* ── hub ───────────────────────────────────────────────────────────────── */
 .corner { position: absolute; display: flex; gap: 8px; align-items: center; }

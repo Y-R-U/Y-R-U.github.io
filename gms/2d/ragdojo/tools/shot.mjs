@@ -85,7 +85,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   try {
     for (const s of scenes) {
       await c.viewport(+(args.w || 1400), +(args.h || 900), 1, false);
-      await c.goto(`${srv.base}/dev/gfx.html?scene=${s}`);
+      await c.goto(`${srv.base}/dev/gfx.html?scene=${s}${args.armed ? '&armed=1' : ''}`);
       const ok = await c.waitFor('window.__ready', 20000);
       await c.frames(2);
       const size = await grab(c, `gfx_${s}.png`);

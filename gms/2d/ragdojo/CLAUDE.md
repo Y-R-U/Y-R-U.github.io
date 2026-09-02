@@ -260,6 +260,42 @@ the two sets use different ids (`power` vs `d_shank`) in the same `save.moves`.
   dark palette across ink.js, paper.js, arena.js, draw.js, fx.js, ui.js and hazards.js would
   have been ~80 literals to keep in step, and every `globalCompositeOperation = 'multiply'`
   would have had to become `screen`.
+- **The word for a bully run follows the MOVES you are holding, not the page you are on.**
+  `bullyWord()` says THUG whenever `theme === 'dark' || carryDark` — a THUG who walks back
+  into the daylight is still a THUG, and the FIGHT button, the hub's mode line and the record
+  book all have to agree with the trophy screen.
+- **Everyone in the dark is carrying** (`Fighter.armed`, set in `Match.build`). You are armed
+  in the dark or if you carried the knife back out (`carryDark`); the people opposite you only
+  in the dark campaign — the dojo does not arm its students because you turned up with a blade.
+  The blade points AWAY FROM THE BODY (two parts neck->hand to one part elbow->hand), not along
+  the forearm: along the forearm is right for a thrust and wrong for a guard, where the arm
+  folds back and the knife ends up buried in the fighter's own head.
+- **The soundtrack panel has to list the set pieces too.** It listed the fight rotation only,
+  so four of the fourteen tracks you actually hear — menu, champion, final, victory — had no
+  name anywhere in the game, which reads as "there is more music here than the settings admit
+  to". They are listed without an ON/OFF: they are not in the rotation, so there is nothing to
+  drop them out of, and a fight has to sound like something.
+- **Fading toward the ground is not symmetric.** A disabled control at 40% opacity still reads
+  on cream paper and vanishes into an inverted one, so `#app.dark` gives everything disabled,
+  locked, muted or unaffordable more of itself back (.72). The invert filter does not care
+  which direction "faded" means.
+- **Limb length and `RANGES` move together.** The joint limits in ragdoll.js sit a fraction
+  under full extension; a limb that outgrows its range silently locks straight, and the crumple
+  that makes a floored body read as a body goes with it.
+- **A crouch pose and `duckDrop` have to agree.** The duck is a pose whose lowest foot sits
+  ~21u above the standing pose's, and `duckDrop` drops the pelvis by exactly that, so the feet
+  land on the ground they were already on. The old crouch put all the weight on one leg and
+  stuck the other straight out — and with a 23u drop the solver spent every frame shoving the
+  feet back out of the floor. Measure the pose (`fk` is pure and importable in node) rather
+  than eyeballing the number.
+- **Longer limbs are a balance change, and only for the big fighters.** Arms 51->57 and legs
+  54->59 made every fighter a bigger target, but the final boss is scale 1.3, so it grew most:
+  measured per level at n=1000, levels 4 through 39 did not move at all and level 44 went
+  7% -> 18%. Corrected at the source (final `hp` 1.9 -> 2.3, `dmg` 1.4 -> 1.5) rather than by
+  touching the AI, and re-measured back to 7%. Note the instrument: at n=60 the same sweep read
+  11% / 6% / 0% across monotonically increasing boss HP — the harness's random shopping is the
+  variance, so late-game win rates need n in the hundreds or the `dealt/s` / `taken/s` columns
+  (`sim.mjs --level=N`), which have far less spread and say WHICH side a change helped.
 - **A move's `kind` is the mechanic; its `id` is what the save records.** Both sets fill the
   same eight gesture slots at the same eight prices, so `fighter.js` switches on `kind` and
   the two sets are bought and upgraded entirely separately. Dark adds two kinds of its own:

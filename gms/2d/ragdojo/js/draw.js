@@ -25,6 +25,54 @@ function smear(ctx, r, i, col, seed) {
   }
 }
 
+/**
+ * A foot: a short wedge off the ankle, square to the shin and pointing the way the fighter
+ * faces. Without one the legs just stopped in mid-air, which is most of why they read as
+ * unfinished. It follows the shin, so a body on the floor still has feet on the end of it.
+ */
+function foot(ctx, r, knee, ankle, facing, sc, o) {
+  const fx = r.x[ankle], fy = r.y[ankle];
+  let dx = fx - r.x[knee], dy = fy - r.y[knee];
+  const d = Math.hypot(dx, dy) || 1; dx /= d; dy /= d;
+  const px = dy * facing, py = -dx * facing;      // square to the shin, toward the front
+  stroke(ctx, [
+    [fx - px * 3.5 * sc, fy - py * 1.5 * sc],
+    [fx + px * 5 * sc, fy + py * 5 * sc],
+    [fx + px * 11 * sc, fy + py * 3 * sc],
+  ], o);
+}
+
+/** The knuckle end of an arm. Small, but it stops the forearm ending in nothing. */
+function hand(ctx, r, i, sc, o) {
+  circle(ctx, r.x[i], r.y[i], 3.2 * sc, o);
+}
+
+/**
+ * A knife, held blade-forward along the forearm. Everyone in the dark carries one — it is
+ * the fastest read there is that this is not the dojo, and it is the same drawing whether
+ * you are stabbing with it or throwing it.
+ */
+function knife(ctx, r, elbow, hnd, facing, sc, o) {
+  const hx = r.x[hnd], hy = r.y[hnd];
+  // Point the blade AWAY FROM THE BODY, not along the forearm. Along the forearm it is
+  // right for a thrust and wrong for a guard, where the arm folds back and the blade ends
+  // up buried in the fighter's own head. Two parts out from the chest to one along the arm
+  // keeps the thrust reading as a thrust and the guard reading as held-and-ready.
+  let dx = (hx - r.x[P.NECK]) * 2 + (hx - r.x[elbow]);
+  let dy = (hy - r.y[P.NECK]) * 2 + (hy - r.y[elbow]);
+  let d = Math.hypot(dx, dy);
+  if (d < 1e-3) { dx = facing; dy = 0; d = 1; }      // hand tucked into the chest
+  dx /= d; dy /= d;
+  const px = -dy, py = dx;
+  const L = 19 * sc, W = 3.0 * sc;
+  const bx = hx + dx * 4 * sc, by = hy + dy * 4 * sc;        // blade starts past the fist
+  const tx = hx + dx * L, ty = hy + dy * L;
+  stroke(ctx, [[bx + px * W, by + py * W], [bx + dx * L * 0.45 + px * W * 0.8, by + dy * L * 0.45 + py * W * 0.8], [tx, ty]], o);
+  stroke(ctx, [[bx - px * W * 0.4, by - py * W * 0.4], [tx, ty]], o);
+  // Cross guard, so it is a knife and not a splinter.
+  stroke(ctx, [[bx + px * 4.2 * sc, by + py * 4.2 * sc], [bx - px * 4.2 * sc, by - py * 4.2 * sc]], o);
+}
+
 function bandana(ctx, r, f, seed, sc) {
   const hx = r.x[P.HEAD], hy = r.y[P.HEAD];
   const rad = BONE.headR * sc;
@@ -113,16 +161,26 @@ export function drawFighter(ctx, f, t = 0) {
   ctx.globalCompositeOperation = 'multiply';
 
   const farO = { w: w * 0.86, passes: 2, wob: 1.0, seed, col, a: FAR };
+  const nearO = { w, passes: 2, wob: 1.0, seed: seed + 333, col, a: 1 };
+  const thin = (o, k = 0.7) => ({ ...o, w: o.w * k, passes: 1 });
   limb(ctx, r, P.NECK, P.ELBOW_L, P.HAND_L, farO);
+  hand(ctx, r, P.HAND_L, sc, thin(farO));
   limb(ctx, r, P.PELVIS, P.KNEE_L, P.FOOT_L, { ...farO, seed: seed + 111 });
+  foot(ctx, r, P.KNEE_L, P.FOOT_L, f.facing, sc, thin({ ...farO, seed: seed + 112 }, 0.85));
 
   stroke(ctx, [[r.x[P.PELVIS], r.y[P.PELVIS]], [r.x[P.NECK], r.y[P.NECK]]],
     { w: w * 1.12, passes: 2, wob: 0.9, seed: seed + 222, col, a: 1 });
 
-  limb(ctx, r, P.PELVIS, P.KNEE_R, P.FOOT_R, { w, passes: 2, wob: 1.0, seed: seed + 333, col, a: 1 });
+  limb(ctx, r, P.PELVIS, P.KNEE_R, P.FOOT_R, nearO);
+  foot(ctx, r, P.KNEE_R, P.FOOT_R, f.facing, sc, thin({ ...nearO, seed: seed + 334 }, 0.85));
   smear(ctx, r, P.FOOT_R, col, seed + 400);
-  limb(ctx, r, P.NECK, P.ELBOW_R, P.HAND_R, { w, passes: 2, wob: 1.0, seed: seed + 444, col, a: 1 });
+  limb(ctx, r, P.NECK, P.ELBOW_R, P.HAND_R, { ...nearO, seed: seed + 444 });
+  hand(ctx, r, P.HAND_R, sc, thin({ ...nearO, seed: seed + 445 }));
   smear(ctx, r, P.HAND_R, col, seed + 500);
+  if (f.armed && !f.dead) {
+    knife(ctx, r, P.ELBOW_L, P.HAND_L, f.facing, sc, { ...thin(farO, 0.8), seed: seed + 611, step: 5 });
+    knife(ctx, r, P.ELBOW_R, P.HAND_R, f.facing, sc, { ...thin(nearO, 0.8), seed: seed + 622, step: 5 });
+  }
 
   circle(ctx, r.x[P.HEAD], r.y[P.HEAD], BONE.headR * sc, { w: w * 0.95, passes: 2, wob: 0.9, seed: seed + 555, col, a: 1 });
 

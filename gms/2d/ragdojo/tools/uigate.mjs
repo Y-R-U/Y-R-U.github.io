@@ -121,8 +121,12 @@ try {
   await c.eval(`document.getElementById('btnSettings').click()`); await c.frames(6);
   const list=await c.eval(`(()=>{const rows=[...document.querySelectorAll('#setRows .r')];
     return {total:rows.length, locked:rows.filter(r=>r.classList.contains('lockedrow')).length,
-            head:(document.querySelector('.musichead')||{}).textContent};})()`);
-  ok('settings lists the soundtrack', list.total===10, JSON.stringify(list));
+            sets:rows.filter(r=>r.classList.contains('trackrow')&&!r.querySelector('[data-mute]')).length,
+            heads:[...document.querySelectorAll('.musichead')].map(h=>h.textContent)};})()`);
+  // 10 fight tracks plus the 4 set pieces. The set pieces were missing from this list, which
+  // read as "there is more music in this game than the settings panel admits to".
+  ok('settings lists the whole soundtrack', list.total===14, JSON.stringify(list));
+  ok('the set pieces are listed too', list.sets===4, `${list.sets} un-mutable rows`);
   ok('locked tracks are shown as locked', list.locked>0 && list.locked<10, `${list.locked} locked`);
   await c.shot(S+'ui_soundtrack.png');
   console.log(c.errors.length?'\nERRORS '+c.errors.slice(0,4).join(' | '):'\nno console errors');
