@@ -3,7 +3,7 @@
 import { stroke, line, rect, circle, hatch, splat, INK } from './ink.js';
 import { glyphPoints } from './gestures.js';
 import { SPECIAL_KEYS, hasKeyboard } from './input.js';
-import { MOVES, moveStats } from './config.js';
+import { activeMoves, moveStats } from './config.js';
 import { P as RIG } from './ragdoll.js';
 
 const P_HEAD = RIG.HEAD;
@@ -162,7 +162,7 @@ function drawCoach(ctx, vw, vh, m, input) {
 
 /** Owned specials with their gesture glyph and cooldown sweep. */
 function drawMoveStrip(ctx, vw, vh, m, save, input) {
-  const owned = MOVES.filter((mv) => (save.moves[mv.id] || {}).owned);
+  const owned = activeMoves(save).filter((mv) => (save.moves[mv.id] || {}).owned);
   if (!owned.length) return;
   // On a keyboard the gesture is optional — number it so you can just press the key.
   const gestureKey = {};

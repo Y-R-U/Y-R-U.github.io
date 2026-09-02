@@ -10,37 +10,79 @@ export const WALL_PAD = 96;           // fighters stop this far from the sheet e
 export const GRAVITY = 2100;
 export const DT = 1 / 60;
 
-export const RANKS = [
-  { key: 'white',  name: 'White',  col: '#fdfdfa', edge: '#20242c', dojo: 'The Scrap Yard' },
-  { key: 'yellow', name: 'Yellow', col: '#f2cd2e', edge: '#8a6a08', dojo: 'Sunspot Alley' },
-  { key: 'orange', name: 'Orange', col: '#ef8a2b', edge: '#8a4708', dojo: 'Rind Row' },
-  { key: 'green',  name: 'Green',  col: '#49a95a', edge: '#1c5626', dojo: 'The Grass Line' },
-  { key: 'blue',   name: 'Blue',   col: '#3d7fd6', edge: '#153f75', dojo: 'Biro Heights' },
-  { key: 'purple', name: 'Purple', col: '#8c50c6', edge: '#42206a', dojo: 'Bruise District' },
-  { key: 'brown',  name: 'Brown',  col: '#8a5a33', edge: '#402616', dojo: 'The Cardboard Quarter' },
-  { key: 'red',    name: 'Red',    col: '#d5352f', edge: '#6d120f', dojo: 'Red Pen Row' },
-  { key: 'black',  name: 'Black',  col: '#23262d', edge: '#000000', dojo: "The Ink Master's Page" },
-];
+/**
+ * Two campaigns on the same 45-level frame. LIGHT is the dojo: bandanas, a scrap yard, a
+ * pencil. DARK is the same sheet of paper after hours — the page inverts, the bandana
+ * becomes an armband, and you are carrying a knife.
+ */
+export const RANK_SETS = {
+  light: [
+    { key: 'white',  name: 'White',  col: '#fdfdfa', edge: '#20242c', dojo: 'The Scrap Yard' },
+    { key: 'yellow', name: 'Yellow', col: '#f2cd2e', edge: '#8a6a08', dojo: 'Sunspot Alley' },
+    { key: 'orange', name: 'Orange', col: '#ef8a2b', edge: '#8a4708', dojo: 'Rind Row' },
+    { key: 'green',  name: 'Green',  col: '#49a95a', edge: '#1c5626', dojo: 'The Grass Line' },
+    { key: 'blue',   name: 'Blue',   col: '#3d7fd6', edge: '#153f75', dojo: 'Biro Heights' },
+    { key: 'purple', name: 'Purple', col: '#8c50c6', edge: '#42206a', dojo: 'Bruise District' },
+    { key: 'brown',  name: 'Brown',  col: '#8a5a33', edge: '#402616', dojo: 'The Cardboard Quarter' },
+    { key: 'red',    name: 'Red',    col: '#d5352f', edge: '#6d120f', dojo: 'Red Pen Row' },
+    { key: 'black',  name: 'Black',  col: '#23262d', edge: '#000000', dojo: "The Ink Master's Page" },
+  ],
+  dark: [
+    { key: 'nobody',    name: 'Nobody',    col: '#9aa0ad', edge: '#20242c', dojo: 'The Gutter' },
+    { key: 'runner',    name: 'Runner',    col: '#f2cd2e', edge: '#8a6a08', dojo: 'Lamplight Row' },
+    { key: 'fence',     name: 'Fence',     col: '#ef8a2b', edge: '#8a4708', dojo: 'The Pawn Line' },
+    { key: 'bruiser',   name: 'Bruiser',   col: '#49a95a', edge: '#1c5626', dojo: 'The Loading Bay' },
+    { key: 'enforcer',  name: 'Enforcer',  col: '#3d7fd6', edge: '#153f75', dojo: 'Cold Storage' },
+    { key: 'lieutenant',name: 'Lieutenant',col: '#8c50c6', edge: '#42206a', dojo: 'The Velvet Stair' },
+    { key: 'capo',      name: 'Capo',      col: '#8a5a33', edge: '#402616', dojo: 'The Dockside' },
+    { key: 'underboss', name: 'Underboss', col: '#d5352f', edge: '#6d120f', dojo: 'Red Ink Alley' },
+    { key: 'boss',      name: 'The Boss',  col: '#23262d', edge: '#000000', dojo: 'The Last Page, After Dark' },
+  ],
+};
+export const THEMES = ['light', 'dark'];
+export const ranksFor = (theme) => RANK_SETS[theme] || RANK_SETS.light;
+/** What a rank is worn as. "White bandana" in the dojo, "Runner colours" on the street. */
+export const RANK_WORD = { light: 'bandana', dark: 'colours' };
+export const RANKS = RANK_SETS.light;
 
 export const FIGHTS_PER_RANK = 5;
 export const TOTAL_LEVELS = RANKS.length * FIGHTS_PER_RANK;   // 45
 
-const GRUNT_NAMES = [
-  ['Blank', 'Doodle', 'Smudge', 'Crease', 'Nib'],
-  ['Yolk', 'Highlighter', 'Buttercup', 'Wasp', 'Post-It'],
-  ['Rind', 'Satsuma', 'Cone', 'Marigold', 'Ember'],
-  ['Moss', 'Sprout', 'Bogey', 'Lichen', 'Fern'],
-  ['Biro', 'Denim', 'Cobalt', 'Ballpoint', 'Bruise'],
-  ['Plum', 'Beetroot', 'Violet', 'Aubergine', 'Iris'],
-  ['Kraft', 'Cardboard', 'Parcel', 'Twine', 'Sepia'],
-  ['Marker', 'Correction', 'Crimson', 'Scarlet', 'Vermilion'],
-  ['Shade', 'Blot', 'Charcoal', 'Soot', 'Midnight'],
-];
+const GRUNT_SETS = {
+  light: [
+    ['Blank', 'Doodle', 'Smudge', 'Crease', 'Nib'],
+    ['Yolk', 'Highlighter', 'Buttercup', 'Wasp', 'Post-It'],
+    ['Rind', 'Satsuma', 'Cone', 'Marigold', 'Ember'],
+    ['Moss', 'Sprout', 'Bogey', 'Lichen', 'Fern'],
+    ['Biro', 'Denim', 'Cobalt', 'Ballpoint', 'Bruise'],
+    ['Plum', 'Beetroot', 'Violet', 'Aubergine', 'Iris'],
+    ['Kraft', 'Cardboard', 'Parcel', 'Twine', 'Sepia'],
+    ['Marker', 'Correction', 'Crimson', 'Scarlet', 'Vermilion'],
+    ['Shade', 'Blot', 'Charcoal', 'Soot', 'Midnight'],
+  ],
+  dark: [
+    ['Rat', 'Tack', 'Nine Toes', 'Weasel', 'Chalky'],
+    ['Sprint', 'Whistle', 'Pockets', 'Lamppost', 'Yellowjack'],
+    ['Tickets', 'Snide', 'Cousin Ray', 'Hock', 'Bent Penny'],
+    ['Crowbar', 'Pallet', 'Big Moss', 'Hinge', 'Forklift'],
+    ['Icepick', 'Freezer', 'Cold Denim', 'Blue Tony', 'Meathook'],
+    ['Velvet', 'Bishop', 'Plum Suit', 'The Usher', 'Iris'],
+    ['Tarpaulin', 'Crate', 'Salt', 'Rope', 'Barge'],
+    ['Red Nails', 'Ledger', 'Scarlet', 'The Auditor', 'Vermin'],
+    ['Soot', 'Blot', 'Hush', 'The Quiet One', 'Midnight'],
+  ],
+};
 
-const CHAMPIONS = [
-  'CHALK', 'OLD YOLK', 'PIP THE PEELER', 'MOSSFOOT', 'BIRO BLUE',
-  'BARON BRUISE', 'OLD KRAFT', 'RED PEN RITA', 'THE INK MASTER',
-];
+const CHAMPION_SETS = {
+  light: [
+    'CHALK', 'OLD YOLK', 'PIP THE PEELER', 'MOSSFOOT', 'BIRO BLUE',
+    'BARON BRUISE', 'OLD KRAFT', 'RED PEN RITA', 'THE INK MASTER',
+  ],
+  dark: [
+    'SPLIT LIP', 'OLD MERCY', 'THE FENCE', 'CRATE', 'MISTER COLD',
+    'SILK', 'DOCKS DELANEY', 'RED HANDS', 'THE PENMAN',
+  ],
+};
 
 /** Player promotion levels — deliberately drifts above and below the enemy rank. */
 const PROMOTE_AT = [0, 6, 12, 14, 19, 24, 32, 35, 41];
@@ -83,7 +125,10 @@ function enemyStats(tier, kind, i) {
   };
 }
 
-export const LEVELS = (() => {
+function buildLevels(theme) {
+  const RANKS = ranksFor(theme);
+  const GRUNT_NAMES = GRUNT_SETS[theme];
+  const CHAMPIONS = CHAMPION_SETS[theme];
   const out = [];
   for (let t = 0; t < RANKS.length; t++) {
     for (let f = 0; f < FIGHTS_PER_RANK; f++) {
@@ -121,68 +166,150 @@ export const LEVELS = (() => {
     }
   }
   return out;
-})();
+}
+
+export const LEVEL_SETS = { light: buildLevels('light'), dark: buildLevels('dark') };
+export const levelsFor = (theme) => LEVEL_SETS[theme] || LEVEL_SETS.light;
+export const LEVELS = LEVEL_SETS.light;
 
 // ── Gestures ───────────────────────────────────────────────────────────────
 // id must match the classifier in gestures.js
-export const MOVES = [
-  {
-    id: 'power', name: 'POWER HIT', gesture: 'slash', glyph: '/',
-    hint: 'Draw a slash, low to high',
-    desc: 'A committed overhand strike. Sends them tumbling.',
-    owned: true, cost: 0, tier: 0,
-    dmg: 15, dmgStep: 6.5, cd: 2.6, cdStep: 0.26, kb: 620,
-  },
-  {
-    id: 'toss', name: 'RUBBER TOSS', gesture: 'archUp', glyph: '∩',
-    hint: 'Draw the top half of an O',
-    desc: 'Lob a rubber band. Arcs, bounces, stuns on contact.',
-    cost: 140, tier: 0,
-    dmg: 11, dmgStep: 5, cd: 3.2, cdStep: 0.3, kb: 300,
-  },
-  {
-    id: 'rise', name: 'RISING PALM', gesture: 'up', glyph: '↑',
-    hint: 'Draw a line straight up',
-    desc: 'Launcher. Pops them into the air for a juggle.',
-    cost: 260, tier: 1,
-    dmg: 13, dmgStep: 5.5, cd: 3.6, cdStep: 0.34, kb: 480,
-  },
-  {
-    id: 'dash', name: 'PENCIL DASH', gesture: 'right', glyph: '→',
-    hint: 'Draw a line straight forward',
-    desc: 'Shoulder-charge forward and smash into them, leaving a graphite smear.',
-    cost: 380, tier: 2,
-    dmg: 14, dmgStep: 6, cd: 4.0, cdStep: 0.4, kb: 540,
-  },
-  {
-    id: 'flipF', name: 'FLIP KICK', gesture: 'circleCW', glyph: '↻',
-    hint: 'Draw a circle clockwise',
-    desc: 'Somersault forward heel-first. Big arc, big knockback.',
-    cost: 520, tier: 3,
-    dmg: 19, dmgStep: 7.5, cd: 5.0, cdStep: 0.46, kb: 760,
-  },
-  {
-    id: 'slam', name: 'INK SLAM', gesture: 'down', glyph: '↓',
-    hint: 'Draw a line straight down',
-    desc: 'Drive a fist into the page. Shockwave knocks over everything nearby.',
-    cost: 660, tier: 4,
-    dmg: 22, dmgStep: 8, cd: 5.6, cdStep: 0.5, kb: 700,
-  },
-  {
-    id: 'flipB', name: 'REVERSE FLIP', gesture: 'circleCCW', glyph: '↺',
-    hint: 'Draw a circle anticlockwise',
-    desc: 'Backflip out of trouble, kicking on the way up. Your escape button.',
-    cost: 800, tier: 5,
-    dmg: 16, dmgStep: 6.5, cd: 4.4, cdStep: 0.42, kb: 620,
-  },
-  {
-    id: 'bomb', name: 'ERASER BOMB', gesture: 'vee', glyph: 'V',
-    hint: 'Draw a V',
-    desc: 'Lob an eraser. It goes off like a bag of flour and rubs out everything close.',
-    cost: 1100, tier: 6,
-    dmg: 30, dmgStep: 11, cd: 7.5, cdStep: 0.7, kb: 900,
-  },
-];
+/**
+ * Both sets fill the same eight gesture slots at the same eight prices, so the muscle memory
+ * carries across — what changes is what you are holding. `kind` is the mechanic (that is
+ * what fighter.js switches on); `id` is what the save records, so the two sets are bought
+ * and upgraded entirely separately.
+ */
+export const MOVE_SETS = {
+  light: [
+    {
+      id: 'power', kind: 'power', name: 'POWER HIT', gesture: 'slash', glyph: '/',
+      hint: 'Draw a slash, low to high',
+      desc: 'A committed overhand strike. Sends them tumbling.',
+      owned: true, cost: 0, tier: 0,
+      dmg: 15, dmgStep: 6.5, cd: 2.6, cdStep: 0.26, kb: 620,
+    },
+    {
+      id: 'toss', kind: 'toss', name: 'RUBBER TOSS', gesture: 'archUp', glyph: '∩',
+      hint: 'Draw the top half of an O',
+      desc: 'Lob a rubber band. Arcs, bounces, stuns on contact.',
+      cost: 140, tier: 0,
+      dmg: 11, dmgStep: 5, cd: 3.2, cdStep: 0.3, kb: 300,
+    },
+    {
+      id: 'rise', kind: 'rise', name: 'RISING PALM', gesture: 'up', glyph: '↑',
+      hint: 'Draw a line straight up',
+      desc: 'Launcher. Pops them into the air for a juggle.',
+      cost: 260, tier: 1,
+      dmg: 13, dmgStep: 5.5, cd: 3.6, cdStep: 0.34, kb: 480,
+    },
+    {
+      id: 'dash', kind: 'dash', name: 'PENCIL DASH', gesture: 'right', glyph: '→',
+      hint: 'Draw a line straight forward',
+      desc: 'Shoulder-charge forward and smash into them, leaving a graphite smear.',
+      cost: 380, tier: 2,
+      dmg: 14, dmgStep: 6, cd: 4.0, cdStep: 0.4, kb: 540,
+    },
+    {
+      id: 'flipF', kind: 'flipF', name: 'FLIP KICK', gesture: 'circleCW', glyph: '↻',
+      hint: 'Draw a circle clockwise',
+      desc: 'Somersault forward heel-first. Big arc, big knockback.',
+      cost: 520, tier: 3,
+      dmg: 19, dmgStep: 7.5, cd: 5.0, cdStep: 0.46, kb: 760,
+    },
+    {
+      id: 'slam', kind: 'slam', name: 'INK SLAM', gesture: 'down', glyph: '↓',
+      hint: 'Draw a line straight down',
+      desc: 'Drive a fist into the page. Shockwave knocks over everything nearby.',
+      cost: 660, tier: 4,
+      dmg: 22, dmgStep: 8, cd: 5.6, cdStep: 0.5, kb: 700,
+    },
+    {
+      id: 'flipB', kind: 'flipB', name: 'REVERSE FLIP', gesture: 'circleCCW', glyph: '↺',
+      hint: 'Draw a circle anticlockwise',
+      desc: 'Backflip out of trouble, kicking on the way up. Your escape button.',
+      cost: 800, tier: 5,
+      dmg: 16, dmgStep: 6.5, cd: 4.4, cdStep: 0.42, kb: 620,
+    },
+    {
+      id: 'bomb', kind: 'bomb', name: 'ERASER BOMB', gesture: 'vee', glyph: 'V',
+      hint: 'Draw a V',
+      desc: 'Lob an eraser. It goes off like a bag of flour and rubs out everything close.',
+      cost: 1100, tier: 6,
+      dmg: 30, dmgStep: 11, cd: 7.5, cdStep: 0.7, kb: 900,
+    },
+  ],
+  dark: [
+    {
+      id: 'd_shank', kind: 'power', name: 'SHANK', gesture: 'slash', glyph: '/',
+      hint: 'Draw a slash, low to high',
+      desc: 'A committed slash, low to high. Opens them up and puts them on the floor.',
+      owned: true, cost: 0, tier: 0,
+      dmg: 15, dmgStep: 6.5, cd: 2.6, cdStep: 0.26, kb: 620,
+    },
+    {
+      id: 'd_bottle', kind: 'toss', name: 'BOTTLE', gesture: 'archUp', glyph: '∩',
+      hint: 'Draw the top half of an O',
+      desc: 'Lob a bottle. Arcs, bounces, and leaves them seeing stars.',
+      cost: 140, tier: 0,
+      dmg: 11, dmgStep: 5, cd: 3.2, cdStep: 0.3, kb: 300,
+    },
+    {
+      id: 'd_hook', kind: 'rise', name: 'GUT HOOK', gesture: 'up', glyph: '↑',
+      hint: 'Draw a line straight up',
+      desc: 'Blade up under the ribs. Lifts them clean off the page.',
+      cost: 260, tier: 1,
+      dmg: 13, dmgStep: 5.5, cd: 3.6, cdStep: 0.34, kb: 480,
+    },
+    {
+      id: 'd_knife', kind: 'knives', name: 'THROWN KNIVES', gesture: 'right', glyph: '→',
+      hint: 'Draw a line straight forward',
+      desc: 'Two knives, flat and fast. You are always carrying more.',
+      cost: 380, tier: 2,
+      dmg: 14, dmgStep: 6, cd: 4.0, cdStep: 0.4, kb: 540,
+    },
+    {
+      id: 'd_boots', kind: 'flipF', name: 'BOOT PARTY', gesture: 'circleCW', glyph: '↻',
+      hint: 'Draw a circle clockwise',
+      desc: 'Spin into them boots-first. Everyone in the way goes over.',
+      cost: 520, tier: 3,
+      dmg: 19, dmgStep: 7.5, cd: 5.0, cdStep: 0.46, kb: 760,
+    },
+    {
+      id: 'd_molotov', kind: 'slam', name: 'MOLOTOV', gesture: 'down', glyph: '↓',
+      hint: 'Draw a line straight down',
+      desc: 'Smash a burning bottle at your feet. The whole floor goes up.',
+      cost: 660, tier: 4,
+      dmg: 22, dmgStep: 8, cd: 5.6, cdStep: 0.5, kb: 700,
+    },
+    {
+      id: 'd_smoke', kind: 'flipB', name: 'SMOKE AND RUN', gesture: 'circleCCW', glyph: '↺',
+      hint: 'Draw a circle anticlockwise',
+      desc: 'Drop smoke and go backwards over it, boots first. Your way out.',
+      cost: 800, tier: 5,
+      dmg: 16, dmgStep: 6.5, cd: 4.4, cdStep: 0.42, kb: 620,
+    },
+    {
+      id: 'd_sawn', kind: 'gun', name: 'SAWN-OFF', gesture: 'vee', glyph: 'V',
+      hint: 'Draw a V',
+      desc: 'One barrel, flat and level, straight down the street. Nothing about it is subtle.',
+      cost: 1100, tier: 6,
+      dmg: 30, dmgStep: 11, cd: 7.5, cdStep: 0.7, kb: 900,
+    },
+  ],
+};
+export const movesFor = (theme) => MOVE_SETS[theme] || MOVE_SETS.light;
+/**
+ * Which set you are actually holding. Normally the theme's own, but a THUG who has won a
+ * thug run can carry the dark moves back into the light world — that is what `carryDark` is.
+ */
+export const activeMoves = (save) =>
+  (save && (save.theme === 'dark' || save.carryDark)) ? MOVE_SETS.dark : MOVE_SETS.light;
+export const MOVES = MOVE_SETS.light;
+const ALL_MOVES = [...MOVE_SETS.light, ...MOVE_SETS.dark];
+
+/** The standard tap attack, renamed per theme. Same three-hit chain either way. */
+export const STRIKE_WORD = { light: 'PUNCH', dark: 'STAB' };
 
 export const MOVE_MAX_LV = 7;
 
@@ -192,7 +319,11 @@ export const MOVE_MAX_LV = 7;
  * towards over a whole campaign (or several) instead of something you tick off.
  */
 export const DEEP_LEVELS = 2;
-const deepMul = (lv, max) => { const soft = max - DEEP_LEVELS; return lv < soft ? 1 : lv === soft ? 4 : 8; };
+// 1x up to the soft cap, then 4x, 8x, and doubling for every dark level beyond that.
+const deepMul = (lv, max) => {
+  const soft = max - DEEP_LEVELS;
+  return lv < soft ? 1 : Math.pow(2, 2 + (lv - soft));
+};
 const curveLv = (lv, max) => Math.min(lv, max - DEEP_LEVELS - 1);
 
 /** Upgrade cost curves. Specials get separate power and cooldown tracks. */
@@ -226,6 +357,12 @@ export const PERKS = [
     fmt: (l) => `+${l * 8}% heal` },
 ];
 
+/**
+ * The dark streets ask more of you and charge for it: five further levels on every skill,
+ * each one doubling the multiplier again (16x, 32x, 64x, 128x, 256x the old top price).
+ */
+export const DARK_PERK_LEVELS = 5;
+export const perkMax = (p, theme) => p.max + (theme === 'dark' ? DARK_PERK_LEVELS : 0);
 export const perkCost = (p, lv) =>
   Math.round(p.base * Math.pow(p.growth, curveLv(lv, p.max)) * deepMul(lv, p.max));
 
@@ -251,7 +388,7 @@ export function derive(save) {
 }
 
 export function moveStats(save, id) {
-  const m = MOVES.find((x) => x.id === id);
+  const m = ALL_MOVES.find((x) => x.id === id);
   if (!m) return null;
   const s = (save.moves || {})[id];
   if (!s || !s.owned) return null;

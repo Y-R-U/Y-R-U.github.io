@@ -1,5 +1,7 @@
 # MUSIC
 
+Twenty-four instrumental tracks — fourteen for the dojo, ten for after dark.
+
 Fourteen instrumental tracks, generated on **Suno v5.5** in Aaron's logged-in browser, 2026-09-01.
 Advanced mode, Weirdness 50%, Style Influence 50%, Lyrics → Instrumental, duration set by the
 Custom slider (2:00 for everything except `victory` at 1:00). ~70 credits, two takes each.
@@ -35,10 +37,45 @@ as you progress, so a new player downloads four fight tracks plus the menu, not 
 `final` came back at 150 s against a 120 s request — Suno overshot, and for a final boss longer
 is fine, so it was kept.
 
+## After dark (2026-09-02)
+
+Ten more, same pipeline, same settings, for the DARK campaign. Punk, boom bap, downtuned rock
+and trap rather than taiko and erhu. All two takes, 2:00 except `dvictory` at 1:00.
+
+| id | context | shipped | mean vol | take |
+|---|---|---|---|---|
+| `dmenu` | dark hub | 119 s, 819 KB | -14.7 dB | dmenu_1 |
+| `dfight1` | Back Alley — street punk | 118 s, 811 KB | -17.1 dB | dfight1_2 |
+| `dfight2` | Night Streets — boom bap | 119 s, 816 KB | -14.8 dB | dfight2_1 |
+| `dfight3` | Warehouse — downtuned rock | 119 s, 816 KB | -13.7 dB | dfight3_1 |
+| `dfight4` | Running — industrial punk | 119 s, 816 KB | -14.3 dB | dfight4_2 |
+| `dfight5` | Cold Swagger — dark trap | 119 s, 819 KB | -12.5 dB | dfight5_1 |
+| `dfight6` | Riot — hardcore punk | 119 s, 819 KB | -15.0 dB | dfight6_1 |
+| `dboss` | crew champions | 120 s, 821 KB | -10.9 dB | dboss_1 |
+| `dfinal` | The Penman | 119 s, 819 KB | -13.3 dB | dfinal_2 |
+| `dvictory` | dark victory screen | 59 s, 407 KB | -14.0 dB | dvictory_1 |
+
+`dfight1`'s first pair came back at 91 s and 57 s and was re-rolled; `dfight3` and `dvictory`
+each had one short take, and the full-length one was kept.
+
+Two things about the Suno UI had changed since the first batch:
+
+- **Duration is behind a Custom/Auto pair** inside More Options — the slider only exists once
+  Custom is selected.
+- **The slider ignores a synthetic `KeyboardEvent` without `keyCode`.** Radix reads `keyCode`,
+  not `key`. Worse, reading `aria-valuenow` between presses forces a synchronous re-render of
+  the whole workspace list and each step took roughly nine seconds. Real key events through
+  the browser (`computer` action `key`, `repeat: N`) do the whole travel instantly; that is
+  the way to drive it.
+- The download endpoint returns a presigned S3 URL with query parameters, which the browser
+  tool refuses to echo back. Do the fetch, the blob and the `<a download>` entirely inside the
+  page and report only sizes.
+
 ## The unlock roster
 
-`js/music.js` owns it. Ten fight tracks; four from the start, two more at each of levels 10,
-20 and 30. `menu`, `boss`, `final` and `victory` are contextual and always available — gating
+`js/music.js` owns one per theme (`FIGHT_POOLS`). Light: ten fight tracks, four from the
+start, two more at each of levels 10, 20 and 30. Dark: six, four from the start and two at
+level 15. `menu`, `boss`, `final` and `victory` are contextual and always available — gating
 those would only mean silence where they belong.
 
 Selection avoids whatever was played recently (`pickFightTrack`, history in

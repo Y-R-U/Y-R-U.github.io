@@ -2,8 +2,8 @@
 // input at the moment you buy it.
 
 import {
-  MOVES, PERKS, MOVE_MAX_LV, moveBuyCost, movePowerCost, moveCdCost, perkCost,
-  moveStats, playerRankAt, RANKS,
+  PERKS, MOVE_MAX_LV, moveBuyCost, movePowerCost, moveCdCost, perkCost, perkMax,
+  moveStats, playerRankAt, ranksFor, activeMoves, RANK_WORD,
 } from './config.js';
 import { glyphPoints } from './gestures.js';
 import { stroke } from './ink.js';
@@ -87,6 +87,8 @@ export function buildShop(listEl, inkEl, S, onChange) {
     glyphs.length = 0;
     inkEl.textContent = S.ink;
     listEl.innerHTML = '';
+    const RANKS = ranksFor(S.theme);
+    const MOVES = activeMoves(S);
     const rank = S.bully ? RANKS.length - 1 : playerRankAt(S.level);
 
     if (tab === 'moves') {
@@ -117,7 +119,7 @@ export function buildShop(listEl, inkEl, S, onChange) {
           b.disabled = true;
           row.appendChild(b);
           row.insertAdjacentHTML('beforeend',
-            `<span class="lv">needs ${RANKS[m.tier].name} bandana</span>`);
+            `<span class="lv">needs ${RANKS[m.tier].name} ${RANK_WORD[S.theme] || 'bandana'}</span>`);
         } else if (!st.owned) {
           const cost = moveBuyCost(m);
           const b = document.createElement('button');
@@ -162,7 +164,8 @@ export function buildShop(listEl, inkEl, S, onChange) {
       PERKS.forEach((p) => {
         const lv = S.perks[p.id] || 0;
         const cost = perkCost(p, lv);
-        const maxed = lv >= p.max;
+        const max = perkMax(p, S.theme);
+        const maxed = lv >= max;
         const card = document.createElement('div');
         card.className = 'card';
         const body = document.createElement('div');
@@ -182,7 +185,7 @@ export function buildShop(listEl, inkEl, S, onChange) {
           b.onclick = () => buy(cost, () => { S.perks[p.id] = lv + 1; });
         }
         row.appendChild(b);
-        row.insertAdjacentHTML('beforeend', dots(lv, p.max));
+        row.insertAdjacentHTML('beforeend', dots(lv, max));
         body.appendChild(row);
         card.appendChild(body);
         listEl.appendChild(card);

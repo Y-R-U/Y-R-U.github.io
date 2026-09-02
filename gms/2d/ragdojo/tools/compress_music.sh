@@ -26,6 +26,16 @@ fight10:rd_fight10_2
 boss:rd_boss_1
 final:rd_final_2
 victory:rd_victory_1
+dmenu:rd_dmenu_1
+dfight1:rd_dfight1_2
+dfight2:rd_dfight2_1
+dfight3:rd_dfight3_1
+dfight4:rd_dfight4_2
+dfight5:rd_dfight5_1
+dfight6:rd_dfight6_1
+dboss:rd_dboss_1
+dfinal:rd_dfinal_2
+dvictory:rd_dvictory_1
 "
 
 filter="acompressor=threshold=-18dB:ratio=3:attack=12:release=250,volume=1.15,alimiter=limit=0.95"

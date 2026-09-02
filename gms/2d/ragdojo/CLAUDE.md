@@ -65,6 +65,7 @@ node tools/stuckgate.mjs      # no save state may dead-end the game
 node tools/progressgate.mjs   # what a new game keeps, and what it makes you earn again
 node tools/keygate.mjs        # desktop keys: punch, 1-8 specials, both movement layouts
 node tools/panelgate.mjs      # every panel's X is in the corner, and taps outside dismiss
+node tools/darkgate.mjs       # the DARK campaign and its whole unlock chain
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -77,6 +78,27 @@ node tools/projshot.mjs 18    # thumbnail candidates
 so the sim stubs `document` and runs fights with no renderer and no clock — a 45-level
 campaign with its full economy takes seconds. Every balance number in `config.js` was set
 from its output, not by feel.
+
+## Two campaigns
+
+The same 45-level frame, played twice. **LIGHT** is the dojo — bandanas, a scrap yard, a
+pencil case. **DARK** is the same sheet after hours: the page inverts, ranks become gang
+colours, and the specials are what people carry on those streets.
+
+```
+win the dojo            -> DARK appears on the hub, locked
+win a BULLY run         -> save.darkUnlocked, DARK opens
+DARK                    -> a separate run, separate records, dark moves, +5 skill levels
+win the dark campaign   -> the record book offers THUG instead of BULLY
+win the THUG run        -> save.thugWon; "stay a THUG?" can now be answered YES
+YES                     -> the dojo, in daylight, still carrying the knife (save.carryDark)
+```
+
+The ACTIVE run lives at the top level of the save so every consumer reads `save.level` and
+`save.bully` unchanged; the other theme's copy waits in `save.stash` and `setTheme` swaps
+them (`RUN_KEYS` in save.js). Ink, skills and settings are deliberately NOT swapped — you
+take your money and your training into the dark. Moves separate themselves for free, because
+the two sets use different ids (`power` vs `d_shank`) in the same `save.moves`.
 
 ## Gotchas
 
@@ -231,6 +253,17 @@ from its output, not by feel.
   finger whichever layout you pick — arrows plus the number row, or WASD plus the num pad.
   The move strip draws the key number on each circle when `hasKeyboard()` is true; it must
   stay off on a phone, where the badge would be a lie. `tools/keygate.mjs` checks both.
+- **The dark theme is one CSS filter, not a second palette.** `#app.dark` gets
+  `invert(1) hue-rotate(180deg)`: invert flips the luminance, hue-rotate puts the hues back,
+  so ink-on-paper becomes chalk-on-slate while the blue marker stays blue and the health bar
+  stays green. Measured at 16.68 ms/frame against 16.65 without it — free. A hand-maintained
+  dark palette across ink.js, paper.js, arena.js, draw.js, fx.js, ui.js and hazards.js would
+  have been ~80 literals to keep in step, and every `globalCompositeOperation = 'multiply'`
+  would have had to become `screen`.
+- **A move's `kind` is the mechanic; its `id` is what the save records.** Both sets fill the
+  same eight gesture slots at the same eight prices, so `fighter.js` switches on `kind` and
+  the two sets are bought and upgraded entirely separately. Dark adds two kinds of its own:
+  `knives` (a volley — two projectiles, fanned) and `gun` (flat, fast, the length of the page).
 - Enemy-on-enemy hits deal 25% damage. At full damage the enemies finish gauntlets for you.
 - `?autoplay=1` is a real fight with an AI player; `demo` is the menu background match. They
   are different flags.

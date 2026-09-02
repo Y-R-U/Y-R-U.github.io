@@ -16,7 +16,25 @@ export const MUSIC = {
   boss:    'assets/audio/boss.mp3',
   final:   'assets/audio/final.mp3',
   victory: 'assets/audio/victory.mp3',
+  // After dark. Same roles, different world.
+  dmenu:    'assets/audio/dmenu.mp3',
+  dfight1:  'assets/audio/dfight1.mp3',
+  dfight2:  'assets/audio/dfight2.mp3',
+  dfight3:  'assets/audio/dfight3.mp3',
+  dfight4:  'assets/audio/dfight4.mp3',
+  dfight5:  'assets/audio/dfight5.mp3',
+  dfight6:  'assets/audio/dfight6.mp3',
+  dboss:    'assets/audio/dboss.mp3',
+  dfinal:   'assets/audio/dfinal.mp3',
+  dvictory: 'assets/audio/dvictory.mp3',
 };
+
+/** Which track fills each role, per theme. */
+export const ROLE = {
+  light: { menu: 'menu', boss: 'boss', final: 'final', victory: 'victory' },
+  dark:  { menu: 'dmenu', boss: 'dboss', final: 'dfinal', victory: 'dvictory' },
+};
+export const roleTrack = (theme, role) => (ROLE[theme] || ROLE.light)[role];
 
 export const TRACK_NAME = {
   menu: 'Sharpened Pencils',
@@ -33,6 +51,16 @@ export const TRACK_NAME = {
   boss: "Champion's Coil",
   final: 'The Last Page',
   victory: 'Champion of the Dojo',
+  dmenu: 'Waiting on the Corner',
+  dfight1: 'Back Alley',
+  dfight2: 'Night Streets',
+  dfight3: 'Warehouse',
+  dfight4: 'Running',
+  dfight5: 'Cold Swagger',
+  dfight6: 'Riot',
+  dboss: 'Something About to Go Off',
+  dfinal: 'The Last Night',
+  dvictory: 'Walking Away From It',
 };
 
 /**
@@ -43,23 +71,36 @@ export const TRACK_NAME = {
  * It also spreads the download: tracks are fetched lazily on first play, so a new player
  * pulls four files rather than fourteen.
  */
-export const FIGHT_POOL = [
-  { id: 'fight1',  unlockAt: 0 },
-  { id: 'fight4',  unlockAt: 0 },
-  { id: 'fight5',  unlockAt: 0 },
-  { id: 'fight2',  unlockAt: 0 },
-  { id: 'fight6',  unlockAt: 10 },
-  { id: 'fight7',  unlockAt: 10 },
-  { id: 'fight8',  unlockAt: 20 },
-  { id: 'fight3',  unlockAt: 20 },
-  { id: 'fight9',  unlockAt: 30 },
-  { id: 'fight10', unlockAt: 30 },
-];
+export const FIGHT_POOLS = {
+  light: [
+    { id: 'fight1',  unlockAt: 0 },
+    { id: 'fight4',  unlockAt: 0 },
+    { id: 'fight5',  unlockAt: 0 },
+    { id: 'fight2',  unlockAt: 0 },
+    { id: 'fight6',  unlockAt: 10 },
+    { id: 'fight7',  unlockAt: 10 },
+    { id: 'fight8',  unlockAt: 20 },
+    { id: 'fight3',  unlockAt: 20 },
+    { id: 'fight9',  unlockAt: 30 },
+    { id: 'fight10', unlockAt: 30 },
+  ],
+  // Six after dark: four from the street corner, two more once you have a name.
+  dark: [
+    { id: 'dfight2', unlockAt: 0 },
+    { id: 'dfight1', unlockAt: 0 },
+    { id: 'dfight5', unlockAt: 0 },
+    { id: 'dfight3', unlockAt: 0 },
+    { id: 'dfight4', unlockAt: 15 },
+    { id: 'dfight6', unlockAt: 15 },
+  ],
+};
+export const poolFor = (theme) => FIGHT_POOLS[theme] || FIGHT_POOLS.light;
+export const FIGHT_POOL = FIGHT_POOLS.light;
 
-export const UNLOCK_GATES = [10, 20, 30];
+export const UNLOCK_GATES = { light: [10, 20, 30], dark: [15] };
 
-export function unlockedFightTracks(reached) {
-  return FIGHT_POOL.filter((t) => t.unlockAt <= reached);
+export function unlockedFightTracks(reached, theme = 'light') {
+  return poolFor(theme).filter((t) => t.unlockAt <= reached);
 }
 
 /**

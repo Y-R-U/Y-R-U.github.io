@@ -1,8 +1,8 @@
 // Boot, loop, screens, progression.
 
 import {
-  SHEET_W, SHEET_H, GROUND_Y, LEVELS, RANKS, TOTAL_LEVELS,
-  playerRankAt, MOVES, moveStats, derive,
+  SHEET_W, SHEET_H, GROUND_Y, TOTAL_LEVELS,
+  playerRankAt, moveStats, derive, levelsFor, ranksFor, activeMoves, RANK_WORD,
 } from './config.js';
 import { drawDesk, sheetShadow } from './paper.js';
 import { buildArena } from './arena.js';
@@ -10,11 +10,11 @@ import { drawFighter, drawShadow } from './draw.js';
 import { Match } from './match.js';
 import { Input, isRotated, SPECIAL_KEYS } from './input.js';
 import { drawHUD, drawNameTags, handText, FONT, FONT_B } from './ui.js';
-import { load, save as persist, wipe, DEFAULT } from './save.js';
+import { load, save as persist, wipe, DEFAULT, RUN, RUN_KEYS } from './save.js';
 import * as audio from './audio.js';
 import * as haptic from './haptic.js';
 import { buildShop } from './shop.js';
-import { MUSIC, TRACK_NAME, FIGHT_POOL, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
+import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
 const qs = new URLSearchParams(location.search);
 const cvs = document.getElementById('game');
@@ -24,7 +24,11 @@ const $ = (id) => document.getElementById(id);
 const click = () => { audio.sfx.click(); haptic.tap(); };
 
 let S = load();
-if (qs.get('unlock')) { for (const m of MOVES) S.moves[m.id] = { owned: true, power: 2, cd: 2 }; }
+/** The campaign, the ranks and the moves you are holding all follow the current theme. */
+const LEVELS = () => levelsFor(S.theme);
+const RANKS = () => ranksFor(S.theme);
+const MOVES = () => activeMoves(S);
+if (qs.get('unlock')) { for (const m of [...activeMoves({ theme: 'light' }), ...activeMoves({ theme: 'dark' })]) S.moves[m.id] = { owned: true, power: 2, cd: 2 }; }
 let match = null;
 let sheet = null;
 let sheetLevel = -1;
@@ -67,7 +71,7 @@ const input = new Input(cvs, {
   onStrike: () => match && match.playerStrike(),
   onGesture: (g) => {
     if (!match || match.demo) return;
-    const mv = MOVES.find((m) => m.gesture === g);
+    const mv = MOVES().find((m) => m.gesture === g);
     if (!mv) return;
     if (!(S.moves[mv.id] || {}).owned) {
       match.fx.text(match.player.x, match.player.y - 150, 'NOT LEARNED', { col: '#9aa0ad', size: 22 });
@@ -78,13 +82,13 @@ const input = new Input(cvs, {
 });
 
 // ── screens ──────────────────────────────────────────────────────────────
-const SCREENS = ['boot', 'hub', 'shop', 'results', 'victory', 'settings', 'help'];
+const SCREENS = ['boot', 'hub', 'shop', 'results', 'victory', 'settings', 'help', 'thug'];
 function show(name) {
   for (const s of SCREENS) $(s).classList.toggle('show', s === name);
   $('pauseBtn').classList.toggle('hidden', name !== null || !match || match.demo);
 }
 function overlay(name) {   // a panel on top of the hub
-  for (const s of ['shop', 'settings', 'help', 'results', 'victory']) $(s).classList.toggle('show', s === name);
+  for (const s of ['shop', 'settings', 'help', 'results', 'victory', 'thug']) $(s).classList.toggle('show', s === name);
   $('pauseBtn').classList.toggle('hidden', !!name || mode !== 'fight');
 }
 
@@ -94,8 +98,46 @@ function setMode(m) {
   input.reset();
   $('pauseBtn').classList.toggle('hidden', m !== 'fight');
   updateRotateHint();
-  if (m === 'hub') { show('hub'); startDemo(); audio.play(S.completed ? 'victory' : 'menu'); }
+  if (m === 'hub') { show('hub'); startDemo(); audio.play(roleTrack(S.theme, S.completed ? 'victory' : 'menu')); }
   else if (m === 'fight') { show(null); }
+}
+
+// ── themes ───────────────────────────────────────────────────────────────
+/**
+ * DARK is the same 45 fights on the same sheet of paper, after hours. The page inverts
+ * (one CSS filter over the whole app — measurably free, and a true inversion rather than a
+ * second palette to keep in step), the ranks become gang colours, and your pencil-case
+ * specials are replaced by what people carry on those streets.
+ *
+ * The two campaigns are separate runs with separate records, swapped in and out of the top
+ * level of the save. Ink and skills are NOT swapped: you take your money and your training
+ * with you.
+ */
+function applyTheme() {
+  document.getElementById('app').classList.toggle('dark', S.theme === 'dark');
+  document.body.classList.toggle('dark', S.theme === 'dark');
+}
+
+/** True once you have won a bully run in the light — that is what opens the door. */
+const darkOpen = () => !!S.darkUnlocked;
+/** In the dark, the bully run is called being a THUG. */
+const bullyWord = () => (S.theme === 'dark' ? 'THUG' : 'BULLY');
+/** A thug run has been started but never finished — the state that gates the prompt. */
+const thugInPlay = () => !!(S.stash.dark ? S.stash.dark.bully : false) || (S.theme === 'dark' && S.bully);
+
+function setTheme(to, { keepMoves = null } = {}) {
+  if (to === S.theme) return;
+  S.stash[S.theme] = Object.fromEntries(RUN_KEYS.map((k) => [k, S[k]]));
+  const next = S.stash[to] || RUN();
+  for (const k of RUN_KEYS) S[k] = next[k];
+  S.theme = to;
+  if (keepMoves !== null) S.carryDark = keepMoves;
+  else if (to === 'dark') S.carryDark = false;
+  applyTheme();
+  sheetLevel = -1;                    // the sheet is baked per level; force a rebuild
+  persist(S);
+  setMode('hub');
+  refreshHub();
 }
 
 // ── matches ──────────────────────────────────────────────────────────────
@@ -108,7 +150,7 @@ function ensureSheet(level) {
 
 function startDemo() {
   const idx = Math.min(TOTAL_LEVELS - 1, Math.max(0, S.level + (Math.random() * 5 - 2) | 0));
-  const level = LEVELS[idx];
+  const level = LEVELS()[idx];
   ensureSheet(level);
   match = new Match({
     level, demo: true,
@@ -120,7 +162,7 @@ function startDemo() {
 function startFight(levelIdx, bully = false) {
   // Never trust the index: an out-of-range one throws inside the click handler, which looks
   // exactly like a button that does nothing.
-  const level = LEVELS[Math.max(0, Math.min(TOTAL_LEVELS - 1, levelIdx | 0))];
+  const level = LEVELS()[Math.max(0, Math.min(TOTAL_LEVELS - 1, levelIdx | 0))];
   ensureSheet(level);
   match = new Match({
     level, save: S, bully, autoplay: !!qs.get('autoplay'),
@@ -144,8 +186,8 @@ function reachedLevel(level) {
  * only one song" no matter how many files ship.
  */
 function fightTrack(level) {
-  if (level.kind === 'final') return 'final';
-  if (level.kind === 'champion') return 'boss';
+  if (level.kind === 'final') return roleTrack(S.theme, 'final');
+  if (level.kind === 'champion') return roleTrack(S.theme, 'boss');
   const pick = pickFightTrack(fightPool(reachedLevel(level)), S.musicRecent || []);
   S.musicRecent = [...(S.musicRecent || []), pick].slice(-RECENT_KEEP);
   persist(S);
@@ -174,17 +216,25 @@ function finishFight(result, m) {
   if (won) R.wins++;
 
   const wasFinal = L.kind === 'final';
-  const tracksBefore = unlockedFightTracks(reachedLevel(null)).length;
+  const tracksBefore = unlockedFightTracks(reachedLevel(null), S.theme).length;
   if (won) {
     if (m.bully) S.bullyLevel = Math.min(TOTAL_LEVELS - 1, L.idx + 1);
     else S.level = Math.min(TOTAL_LEVELS - 1, L.idx + 1);
     if (wasFinal) {
-      S.everWon = true;
-      if (m.bully) S.records.bullyRuns++; else { S.completed = true; S.records.championships++; }
+      if (m.bully) {
+        S.records.bullyRuns++;
+        // Winning a bully run is the key to the next world: the dojo's opens DARK, and the
+        // dark streets' (a THUG run) is what lets you carry a knife back into the light.
+        if (S.theme === 'light') S.darkUnlocked = true; else S.thugWon = true;
+      } else {
+        S.completed = true;
+        S.records.championships++;
+        if (S.theme === 'light') S.everWon = true;
+      }
     }
   }
   persist(S);
-  const gained = unlockedFightTracks(reachedLevel(null)).slice(tracksBefore).map((t) => TRACK_NAME[t.id] || t.id);
+  const gained = unlockedFightTracks(reachedLevel(null), S.theme).slice(tracksBefore).map((t) => TRACK_NAME[t.id] || t.id);
   pendingResult = { result, m, earned, bonus, rankGap, wasFinal, bully: m.bully, gained };
 
   // A bully run has a finish line too. Without this you beat the Ink Master a second time
@@ -215,7 +265,7 @@ function showResults(R) {
   // A win already continues to the hub; a loss needs its own way out of the retry loop.
   $('btnResMenu').classList.toggle('hidden', won);
   overlay('results');
-  audio.play(won ? 'victory' : 'menu');
+  audio.play(roleTrack(S.theme, won ? 'victory' : 'menu'));
   if (won) audio.sfx.bell();
 }
 const row = (k, v) => `<div class="r"><span>${k}</span><b>${v}</b></div>`;
@@ -234,7 +284,9 @@ function showVictory(bully, justWon = true) {
   const R = S.records;
   const m = (v) => `${(Math.round(v) / 10).toFixed(1)} m`;
   $('victory').querySelector('h2').textContent =
-    !justWon ? 'RECORD BOOK' : wasBully ? 'BULLY CHAMPION' : 'CHAMPION';
+    !justWon ? (S.theme === 'dark' ? 'THE BOOK' : 'RECORD BOOK')
+      : wasBully ? `${bullyWord()} CHAMPION`
+      : S.theme === 'dark' ? 'THE BOSS' : 'CHAMPION';
   $('vicBody').innerHTML = [
     `<div class="vichead">THIS RUN</div>`,
     row('Fights won', S.wins),
@@ -255,20 +307,22 @@ function showVictory(bully, justWon = true) {
   // new game handed a white belt a black belt's standing.
   const canBully = !!S.completed;
   $('btnBully').classList.toggle('hidden', !canBully);
-  $('btnBully').textContent = wasBully ? 'BULLY AGAIN' : 'BULLY MODE';
+  const BW = bullyWord();
+  $('btnBully').textContent = wasBully ? `${BW} AGAIN` : `${BW} MODE`;
   resetAgainBtn();
   // Every button gets a line. "Bully Mode" and "Keep Playing" sat side by side with only one
   // of them explained, and the difference between "start the campaign again as a black belt"
   // and "close this and carry on" is not something a label can carry on its own.
   const at = `fight ${hubLevel() + 1} of ${TOTAL_LEVELS}`;
   $('vicFine').innerHTML = [
-    canBully ? `<b>${wasBully ? 'Bully Again' : 'Bully Mode'}</b> — back to fight 1 against white belts,` +
+    canBully ? `<b>${BW[0] + BW.slice(1).toLowerCase()} ${wasBully ? 'Again' : 'Mode'}</b>` +
+      ` — back to fight 1 against ${S.theme === 'dark' ? 'nobodies' : 'white belts'},` +
       ' keeping every upgrade and all your ink.' : '',
     `<b>Keep Playing</b> — close this and carry on where you are (${at}).`,
     '<b>New Game</b> — wipe this run. Only the all-time records above are kept.',
   ].filter(Boolean).map((t) => `<span>${t}</span>`).join('');
   overlay('victory');
-  if (justWon) { audio.play('victory'); audio.sfx.bell(); }
+  if (justWon) { audio.play(roleTrack(S.theme, 'victory')); audio.sfx.bell(); }
   // Confetti of paper scraps over the celebrating figure.
   if (match && justWon) {
     for (let i = 0; i < 90; i++) {
@@ -288,13 +342,16 @@ function hubLevel() {
 function refreshHub() {
   const bullyMode = S.bully;
   const idx = hubLevel();
-  const L = LEVELS[idx];
-  const pr = RANKS[bullyMode ? RANKS.length - 1 : playerRankAt(idx)];
-  const er = RANKS[L.tier];
+  const L = LEVELS()[idx];
+  const R = RANKS();
+  const pr = R[bullyMode ? R.length - 1 : playerRankAt(idx)];
+  const er = R[L.tier];
   $('hubTitle').textContent = L.kind === 'final' ? 'THE INK MASTER'
     : L.kind === 'champion' ? `${er.name.toUpperCase()} CHAMPION` : L.dojo;
   $('hubSub').textContent = `${L.title}  ·  fight ${idx + 1} of ${TOTAL_LEVELS}`;
-  const gap = L.tier - (bullyMode ? RANKS.length - 1 : playerRankAt(idx));
+  const gap = L.tier - (bullyMode ? R.length - 1 : playerRankAt(idx));
+  const word = RANK_WORD[S.theme] || 'bandana';
+  $('hubRank').title = `Your ${word} against theirs`;
   $('hubRank').innerHTML =
     `<span class="swatch" style="background:${pr.col}"></span>YOU ${pr.name.toUpperCase()}` +
     `<span style="opacity:.5;margin:0 4px">vs</span>` +
@@ -309,6 +366,16 @@ function refreshHub() {
   // Once you have finished a run, the options that only appeared on the victory screen have
   // to stay reachable — otherwise the hub hands you the final fight and nothing else.
   $('btnTrophy').classList.toggle('hidden', !S.everWon);
+  // The DARK button appears the moment you win the dojo, but stays locked until you have
+  // won a bully run — you can see what you are working towards.
+  const dk = $('btnDark');
+  dk.classList.toggle('hidden', !S.everWon);
+  dk.classList.toggle('locked', !darkOpen());
+  dk.classList.toggle('on', S.theme === 'dark');
+  dk.textContent = darkOpen() ? (S.theme === 'dark' ? '☀ LIGHT' : '☾ DARK') : '🔒 DARK';
+  dk.title = darkOpen()
+    ? (S.theme === 'dark' ? 'Back to the dojo' : 'The streets after dark')
+    : 'Win a BULLY run to unlock';
 }
 
 // ── render ───────────────────────────────────────────────────────────────
@@ -390,6 +457,41 @@ $('btnFight').onclick = () => {
   startFight(hubLevel(), S.bully);
 };
 $('btnTrophy').onclick = () => { click(); showVictory(S.bully, false); };
+$('btnDark').onclick = () => {
+  click();
+  if (!darkOpen()) {
+    // Locked, and it says why rather than doing nothing.
+    match && match.fx && match.fx.text(SHEET_W / 2, GROUND_Y - 260,
+      'WIN A BULLY RUN FIRST', { col: '#c0392b', size: 30, life: 2.2 });
+    return;
+  }
+  if (S.theme === 'light') { setTheme('dark'); return; }
+  // Leaving the dark. A thug run that has been started but never finished gets asked the
+  // question; anyone else just walks back into the daylight with their pencil case.
+  if (thugInPlay()) { openThug(); return; }
+  setTheme('light', { keepMoves: false });
+};
+
+/**
+ * "Stay a THUG?" — carry the dark moves into the light world. YES is the reward for winning
+ * a THUG run; until then it is visibly there and visibly out of reach.
+ */
+function openThug() {
+  const won = !!S.thugWon;
+  $('thugRows').innerHTML =
+    `<div class="r"><span>You are walking back into the daylight.</span></div>` +
+    `<div class="r"><span>Keep what you are carrying?</span><b>${won ? 'your call' : 'not yet'}</b></div>`;
+  const yes = $('btnThugYes');
+  yes.disabled = !won;
+  yes.classList.toggle('locked', !won);
+  $('thugFine').textContent = won
+    ? 'Yes: the dojo, with a knife. No: the pencil case, as it was. Come back through DARK to change your mind.'
+    : 'win as THUG to enable';
+  overlay('thug');
+}
+$('btnThugYes').onclick = () => { if (S.thugWon) { click(); overlay(null); setTheme('light', { keepMoves: true }); } };
+$('btnThugNo').onclick = () => { click(); overlay(null); setTheme('light', { keepMoves: false }); };
+$('btnThugClose').onclick = () => { click(); overlay(null); };
 $('btnShop').onclick = () => { click(); openShop(); };
 $('btnShopClose').onclick = () => { click(); overlay(null); refreshHub(); };
 $('btnSettings').onclick = () => { click(); openSettings(); };
@@ -537,7 +639,7 @@ function openSettings() {
 
 /** Unlocked, not switched off, and never an empty list — silence is not a preference. */
 function fightPool(reached) {
-  const unlocked = unlockedFightTracks(reached).map((t) => t.id);
+  const unlocked = unlockedFightTracks(reached, S.theme).map((t) => t.id);
   const kept = unlocked.filter((id) => !(S.musicOff || {})[id]);
   return kept.length ? kept : unlocked;
 }
@@ -551,7 +653,7 @@ function musicList() {
   const now = audio.current();
   const off = S.musicOff || {};
   const live = fightPool(reached);
-  const rows = FIGHT_POOL.map((t) => {
+  const rows = poolFor(S.theme).map((t) => {
     if (t.unlockAt > reached) {
       return `<div class="r lockedrow"><span>🔒 ${TRACK_NAME[t.id] || t.id}</span>` +
         `<b>level ${t.unlockAt + 1}</b></div>`;
@@ -564,9 +666,10 @@ function musicList() {
       `<span>${playing ? '▶' : '♪'} ${TRACK_NAME[t.id] || t.id}</span>` +
       `<button class="buy tiny" data-mute="${t.id}"${last ? ' disabled' : ''}>${on ? 'ON' : 'OFF'}</button></div>`;
   }).join('');
-  const n = unlockedFightTracks(reached).length;
+  const n = unlockedFightTracks(reached, S.theme).length;
   const nowName = TRACK_NAME[now];
-  return `<div class="musichead">SOUNDTRACK — ${n} of ${FIGHT_POOL.length} fight tracks</div>` +
+  const pool = poolFor(S.theme);
+  return `<div class="musichead">${S.theme === 'dark' ? 'AFTER DARK' : 'SOUNDTRACK'} — ${n} of ${pool.length} fight tracks</div>` +
     (nowName && S.settings.music
       ? `<div class="nowplaying">NOW PLAYING <b>${nowName}</b></div>`
       : `<div class="nowplaying off">music is off</div>`) +
@@ -574,7 +677,7 @@ function musicList() {
 }
 
 function openHelp() {
-  const owned = MOVES.filter((m) => (S.moves[m.id] || {}).owned);
+  const owned = MOVES().filter((m) => (S.moves[m.id] || {}).owned);
   // The gesture number is the move's place in the shop list, so it matches the badges on
   // the strip along the bottom of the screen.
   const keyOf = (m) => Object.keys(SPECIAL_KEYS).find((k) => SPECIAL_KEYS[k] === m.gesture);
@@ -597,6 +700,7 @@ function openHelp() {
   overlay('help');
 }
 function applySettings() {
+  applyTheme();
   audio.setMusic(S.settings.music);
   audio.setSfx(S.settings.sfx);
   haptic.setEnabled(S.settings.haptics);
@@ -615,7 +719,7 @@ async function boot() {
   await document.fonts.ready.catch(() => {});
   bump(35, BOOT_MSGS[1]);
   await new Promise((r) => setTimeout(r, 40));
-  ensureSheet(LEVELS[Math.min(TOTAL_LEVELS - 1, S.level)]);
+  ensureSheet(LEVELS()[Math.min(TOTAL_LEVELS - 1, S.level)]);
   bump(70, BOOT_MSGS[2]);
   await new Promise((r) => setTimeout(r, 40));
   startDemo();
@@ -640,5 +744,5 @@ boot().catch((err) => {
   setTimeout(() => { throw err; });
 });
 
-window.__ragdojo = { get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, LEVELS, S };
+window.__ragdojo = { get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };
 window.__input = input;

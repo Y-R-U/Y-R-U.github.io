@@ -3,16 +3,17 @@ import { GRAVITY } from './config.js';
 
 export class Projectile {
   constructor(o) {
-    this.type = o.type;            // band | bomb | crumb
+    this.type = o.type;            // band | bomb | crumb | knife | slug
     this.x = o.x; this.y = o.y;
     this.vx = o.vx; this.vy = o.vy;
     this.owner = o.owner;
     this.dmg = o.dmg;
     this.kb = o.kb;
-    this.life = o.life ?? 4;
+    this.life = o.life ?? (this.type === 'slug' ? 1.4 : 4);
     this.rot = 0;
-    this.spin = (o.vx > 0 ? 1 : -1) * 12;
+    this.spin = (o.vx > 0 ? 1 : -1) * (this.type === 'knife' ? 26 : this.type === 'slug' ? 0 : 12);
     this.bounces = this.type === 'band' ? 2 : 0;
+    this.spinRate = this.type === 'knife' ? 26 : 0;
     this.dead = false;
     this.seed = (Math.random() * 1e6) | 0;
     this.fuse = this.type === 'bomb' ? 1.35 : 0;
@@ -21,7 +22,9 @@ export class Projectile {
   update(dt, world) {
     this.life -= dt;
     if (this.life <= 0) { this.dead = true; return; }
-    this.vy += GRAVITY * (this.type === 'band' ? 0.55 : 0.8) * dt;
+    // A slug does not drop over the width of a sheet of paper; a knife barely does.
+    const drop = { band: 0.55, knife: 0.30, slug: 0 }[this.type] ?? 0.8;
+    this.vy += GRAVITY * drop * dt;
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     this.rot += this.spin * dt;
@@ -58,6 +61,23 @@ export class Projectile {
       ctx.fillStyle = '#c9dbe8';
       ctx.fillRect(-13 * puff, -8 * puff, 8 * puff, 16 * puff);
       ctx.strokeRect(-13 * puff, -8 * puff, 8 * puff, 16 * puff);
+    } else if (this.type === 'knife') {
+      // A blade: a straight spine with a short guard across it.
+      ctx.strokeStyle = '#20242c';
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      ctx.moveTo(-11, 0); ctx.lineTo(11, 0);
+      ctx.moveTo(-4, -4); ctx.lineTo(-4, 4);
+      ctx.stroke();
+    } else if (this.type === 'slug') {
+      // A streak rather than an object — you never really see the shot.
+      ctx.strokeStyle = '#20242c';
+      ctx.lineWidth = 3.2;
+      ctx.globalAlpha = 0.75;
+      ctx.beginPath();
+      ctx.moveTo(-26, 0); ctx.lineTo(14, 0);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
     } else {
       ctx.fillStyle = '#d8cfae';
       ctx.beginPath();

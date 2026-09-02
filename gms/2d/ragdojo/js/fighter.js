@@ -161,9 +161,15 @@ export class Fighter {
       flipB: { anim: 'flip',  dmg: m.damage, kb: m.knockback, reach: 44, pt: P.FOOT_R, stagger: 0.9, sfx: 'heavy', p: 1.3, spin: -1, hopV: 600, dashV: -520, multi: true, lockMove: true },
       toss:  { anim: 'toss',  dmg: m.damage, kb: m.knockback, reach: 0,  pt: P.HAND_R, stagger: 0.7, sfx: 'twang', p: 0.6, projectile: 'band' },
       bomb:  { anim: 'toss',  dmg: m.damage, kb: m.knockback, reach: 0,  pt: P.HAND_R, stagger: 1.0, sfx: 'twang', p: 1.0, projectile: 'bomb' },
-    }[m.id];
+      // Dark-only. Knives replace the charge: two of them, flat and fast, so the slot still
+      // covers ground without walking you through anybody. The sawn-off is the one move in
+      // either set that reaches all the way down the page.
+      knives:{ anim: 'toss',  dmg: m.damage, kb: m.knockback, reach: 0,  pt: P.HAND_R, stagger: 0.8, sfx: 'twang', p: 0.9, projectile: 'knife', volley: 2 },
+      gun:   { anim: 'toss',  dmg: m.damage, kb: m.knockback, reach: 0,  pt: P.HAND_R, stagger: 1.0, sfx: 'boom',  p: 1.6, projectile: 'slug' },
+    }[m.kind || m.id];
     if (!D) return false;
     D.id = m.id;
+    D.kind = m.kind || m.id;
     this.beginAttack(m.id, D);
     if (D.hopV) { this.vy = -D.hopV; this.onGround = false; }
     if (D.dashV) this.vx = D.dashV * this.facing * (m.id === 'flipB' ? 1 : 1);

@@ -8,8 +8,8 @@ import { FX } from './fx.js';
 import { repel, P, NPTS } from './ragdoll.js';
 import { HAZARD_CLASS } from './hazards.js';
 import {
-  SHEET_W, SHEET_H, GROUND_Y, WALL_PAD, GRAVITY, RANKS, LEVELS,
-  playerRankAt, derive, moveStats, MOVES,
+  SHEET_W, SHEET_H, GROUND_Y, WALL_PAD, GRAVITY,
+  playerRankAt, derive, moveStats, activeMoves, ranksFor, STRIKE_WORD,
 } from './config.js';
 import { sfx } from './audio.js';
 import * as haptic from './haptic.js';
@@ -67,6 +67,7 @@ export class Match {
 
   build() {
     const L = this.level;
+    const RANKS = ranksFor(this.save.theme);
     const pRank = RANKS[this.bully ? RANKS.length - 1 : playerRankAt(L.idx)];
     const stats = derive(this.save);
 
@@ -91,7 +92,7 @@ export class Match {
     L.enemies.forEach((e, i) => {
       const f = new Fighter({
         name: e.name,
-        rank: RANKS[e.tier],
+        rank: ranksFor(this.save.theme)[e.tier],
         hp: e.hp, dmg: e.dmg, speed: e.speed, scale: e.scale, mass: e.mass,
         skill: e.skill, moves: e.moves, boss: e.boss,
         facing: -1,
@@ -103,7 +104,7 @@ export class Match {
 
     if (this.autoplay) {
       // Soak/sim player: fights with exactly the moves the save has actually bought.
-      const owned = MOVES.filter((m) => (this.save.moves || {})[m.id]?.owned).map((m) => m.id);
+      const owned = activeMoves(this.save).filter((m) => (this.save.moves || {})[m.id]?.owned).map((m) => m.id);
       this.playerBrain = new Brain(this.player, 0.62, owned, this.save);
     } else if (this.demo) {
       this.playerBrain = new Brain(this.player, 0.55 + Math.random() * 0.3,
@@ -126,7 +127,8 @@ export class Match {
   updateCoach() {
     if (this.demo || this.bully || this.over) { this.coach = null; return; }
     const seen = this.save.seen || (this.save.seen = {});
-    if (!seen.punch) this.coach = { text: 'TAP THIS SIDE TO PUNCH', sub: 'tap again to combo' };
+    const verb = STRIKE_WORD[this.save.theme] || 'PUNCH';
+    if (!seen.punch) this.coach = { text: `TAP THIS SIDE TO ${verb}`, sub: 'tap again to combo' };
     else if (!seen.power) this.coach = { text: 'DRAW  /  FOR A POWER HIT', sub: 'low to high, like a slash' };
     else this.coach = null;
   }
@@ -170,14 +172,24 @@ export class Match {
     if (def.projectile) {
       if (!first) return;
       const [hx, hy] = attacker.strikePoint(def);
-      this.projectiles.push(new Projectile({
-        type: def.projectile === 'bomb' ? 'bomb' : 'band',
-        x: hx, y: hy,
-        vx: attacker.facing * (def.projectile === 'bomb' ? 430 : 780),
-        vy: def.projectile === 'bomb' ? -330 : -420,
-        owner: attacker, dmg: def.dmg, kb: def.kb,
-      }));
-      sfx.twang();
+      const P_ = {
+        bomb:  { vx: 430, vy: -330 },
+        band:  { vx: 780, vy: -420 },
+        knife: { vx: 900, vy: -150 },   // flat and fast, barely an arc
+        slug:  { vx: 1500, vy: 0 },     // level, the length of the page
+      }[def.projectile] || { vx: 780, vy: -420 };
+      // A volley throws more than one, fanned slightly so they do not stack.
+      const n = def.volley || 1;
+      for (let i = 0; i < n; i++) {
+        this.projectiles.push(new Projectile({
+          type: def.projectile,
+          x: hx + attacker.facing * i * 14, y: hy - i * 10,
+          vx: attacker.facing * P_.vx, vy: P_.vy + i * 60,
+          owner: attacker, dmg: def.dmg / n, kb: def.kb,
+        }));
+      }
+      if (def.projectile === 'slug') { sfx.boom(); this.fx.shakeBy(14); }
+      else sfx.twang();
       return;
     }
 
@@ -372,7 +384,7 @@ export class Match {
       let hit = false;
       // A bomb is a bag of flour, not a dart: it goes off near you, not only on contact.
       // At 26 it sailed a clear head's width over a fighter 150u away and hit nothing.
-      const pr = p.type === 'bomb' ? 42 : 26;
+      const pr = p.type === 'bomb' ? 42 : p.type === 'slug' ? 30 : 26;
       for (const t of this.all) {
         if (t.dead || t === p.owner) continue;
         for (let k = 0; k < NPTS; k += 2) {

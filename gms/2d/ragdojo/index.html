@@ -46,8 +46,9 @@
         <button id="btnFight" class="btn big">FIGHT</button>
       </div>
       <div class="corner bl">
+        <button class="btn hidden" id="btnDark">☾ DARK</button>
         <button class="btn" id="btnShop">SHOP <span id="inkPill" class="pill">0</span></button>
-        <button class="btn hidden" id="btnTrophy" title="Your championship">🏆</button>
+        <button class="btn hidden" id="btnTrophy" title="Your record book">🏆</button>
       </div>
       <div class="corner br">
         <div class="stat" id="hubStats"></div>
@@ -105,6 +106,20 @@
         <div class="rows" id="setRows"></div>
         <button id="btnQuit" class="btn hidden">QUIT TO MENU</button>
         <button id="btnWipe" class="btn danger">ERASE ALL PROGRESS</button>
+      </div>
+    </div>
+
+    <!-- leaving the dark while a THUG run is in play -->
+    <div id="thug" class="screen panel-screen">
+      <div class="sheet narrow">
+        <button class="icon close" id="btnThugClose">✕</button>
+        <h2>STAY A THUG?</h2>
+        <div class="rows" id="thugRows"></div>
+        <div class="vicbtns">
+          <button id="btnThugYes" class="btn bully">YES — KEEP THE KNIFE</button>
+          <button id="btnThugNo" class="btn">NO</button>
+        </div>
+        <p class="fine" id="thugFine"></p>
       </div>
     </div>
 

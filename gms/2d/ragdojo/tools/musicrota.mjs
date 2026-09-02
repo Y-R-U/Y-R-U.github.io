@@ -4,7 +4,8 @@
  *   node tools/musicrota.mjs
  *   node tools/musicrota.mjs --falsify   # the old index-based rotation, watch it go red
  */
-import { FIGHT_POOL, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from '../js/music.js';
+import { FIGHT_POOLS, MUSIC, ROLE, poolFor, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from '../js/music.js';
+const FIGHT_POOL = FIGHT_POOLS.light;
 const falsify = process.argv.includes('--falsify');
 let pass = 0, fail = 0;
 const ok = (n, c, x = '') => { c ? pass++ : fail++; console.log(`${c ? 'PASS' : 'FAIL'}  ${n}${x ? '  ' + x : ''}`); };
@@ -51,6 +52,22 @@ const choose = (pool, recent, ordinal) =>
     recent = [...recent, t].slice(-RECENT_KEEP);
   }
   ok('never plays a locked track', bad === 0, `${bad} leaks`);
+}
+
+// Both soundtracks have to be complete and disjoint: a dark fight must never reach for a
+// dojo track, and every id either roster names must exist in the manifest.
+{
+  const light = FIGHT_POOLS.light.map((t) => t.id);
+  const dark = FIGHT_POOLS.dark.map((t) => t.id);
+  ok('the two rosters share nothing', !light.some((id) => dark.includes(id)),
+     `${light.length} light, ${dark.length} dark`);
+  const missing = [...light, ...dark, ...Object.values(ROLE.light), ...Object.values(ROLE.dark)]
+    .filter((id) => !MUSIC[id]);
+  ok('every track id has a file in the manifest', missing.length === 0, missing.join(', ') || 'none');
+  ok('the dark roster unlocks too', poolFor('dark').filter((t) => t.unlockAt > 0).length > 0);
+  const darkFresh = new Set();
+  for (let i = 0; i < 60; i++) darkFresh.add(pickFightTrack(unlockedFightTracks(0, 'dark').map((t) => t.id), []));
+  ok('the dark roster varies from a fresh save', darkFresh.size >= 3, `${darkFresh.size} distinct`);
 }
 
 console.log(`\n${pass} pass, ${fail} fail`);
