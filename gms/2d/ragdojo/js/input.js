@@ -14,7 +14,8 @@ export const SPECIAL_KEYS = {
 };
 /** A real keyboard and a pointer: worth showing key hints for, not worth it on a phone. */
 export const hasKeyboard = () =>
-  typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  typeof window !== 'undefined' && typeof window.matchMedia === 'function' &&
+  window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 /** Matches the portrait rule in style.css. Both must change together. */
 export const PORTRAIT_Q = '(orientation: portrait) and (max-width: 860px)';

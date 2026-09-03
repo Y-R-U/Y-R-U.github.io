@@ -20,7 +20,8 @@ try {
   await c.eval(`window.__ragdojo.match.playerStrike()`);
   await c.frames(4);
   const c2 = await c.eval(`window.__ragdojo.match.coach && window.__ragdojo.match.coach.text`);
-  ok('punching clears it and advances to the power hint', c2 === 'DRAW  /  FOR A POWER HIT', String(c2));
+  // Phone viewport: the hint has to name a finger movement, not a shape to copy.
+  ok('punching clears it and advances to the power hint', c2 === 'SWIPE DIAGONALLY UP', String(c2));
   const saved = await c.eval(`JSON.parse(localStorage.getItem('ragdojo.save.v2')).seen.punch === true`);
   ok('the prompt is remembered across sessions', saved);
 

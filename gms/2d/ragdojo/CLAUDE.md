@@ -67,6 +67,7 @@ node tools/keygate.mjs        # desktop keys: punch, 1-8 specials, both movement
 node tools/panelgate.mjs      # every panel's X is in the corner, and taps outside dismiss
 node tools/darkgate.mjs       # the DARK campaign and its whole unlock chain
 node tools/flipknees.mjs --check  # no pose may bend a knee backwards
+node tools/glyphgate.mjs      # the gesture hints, measured in PIXELS at the sizes drawn
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -280,6 +281,33 @@ the two sets use different ids (`power` vs `d_shank`) in the same `save.moves`.
   on cream paper and vanishes into an inverted one, so `#app.dark` gives everything disabled,
   locked, muted or unaffordable more of itself back (.72). The invert filter does not care
   which direction "faded" means.
+- **A gesture hint is the stroke you draw, and nothing else.** The glyphs used to carry
+  arrowheads so up could be told from down; a nine-year-old read the slash and concluded he
+  was meant to draw an arrow, which is exactly what the picture said. Direction now comes from
+  `glyphStart` — a dot where the finger goes down, drawn by both the move strip and the shop —
+  and from the shop's stroke animating itself out of that dot. Do not put anything in
+  `GLYPH_PATH` that is not part of the swipe.
+- **`drawCoach` was written and never called.** The first-run prompt was built correctly every
+  frame in `Match.updateCoach`, `uigate` asserted `match.coach.text`, the gate passed, and the
+  screen was blank — in every build that ever shipped. A prompt is a pixel fact, not a state
+  fact: `glyphgate` counts prompt-blue pixels on the half of the screen the prompt belongs to,
+  and checks they disappear once you have done the move.
+- **`ink.jitterPath` walks distance along the WHOLE path, not per segment.** The old
+  `carry = (carry - len) % step + step` looks like it carries the remainder and does not: once
+  the carry exceeds a segment's length it adds a whole extra step instead of subtracting the
+  segment, so on a finely sampled path the carry runs away. A 46px arch of 24 short segments
+  emitted ONE sample and `stroke` drew a straight line from its first point to its last — which
+  is why the arch glyph rendered as a dash and both circle glyphs as flecks, at every size the
+  game actually draws them. **It only bites when segments are shorter than `step`, so a big
+  test render hides it completely**: `glyphgate` renders at the real strip (24u) and shop (26u)
+  scales and measures the ink's deviation from the chord as a fraction of the glyph's own size.
+  Verified by putting the old arithmetic back — 6 checks go red, arch 0.60 -> 0.05.
+- **A first-run prompt demonstrates; it does not name a shape.** `coach.demo` carries a gesture
+  id and `drawCoachDemo` traces it on a loop with a fingertip. The wording follows the device:
+  `SWIPE DIAGONALLY UP` on a phone, `DRAG / FOR A POWER HIT · or press 1` with a keyboard.
+  `hasKeyboard()` therefore runs inside `Match`, which means it has to survive the node
+  harnesses — they set `globalThis.window = globalThis`, so guarding on `typeof window` is not
+  enough and it must check `typeof window.matchMedia === 'function'` too.
 - **Knees bend FORWARD, so every `kl`/`kr` in poses.js is NEGATIVE.** The knee value rotates
   the shin relative to the thigh, so a positive one bows the knee backwards — a bird's leg —
   and the entire library was written that way. It is the single thing that most made the legs

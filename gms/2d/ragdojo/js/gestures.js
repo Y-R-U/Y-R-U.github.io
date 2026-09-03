@@ -102,49 +102,32 @@ export function classify(pts, dur = 1) {
 
 /**
  * Glyph paths in a unit box, as polylines walked by arc length so the shop can animate
- * them being drawn. Directional glyphs carry an arrowhead — without one, up/down/right
- * all render as the same little line and the move strip stops being a reminder.
+ * them being drawn.
+ *
+ * EVERY GLYPH IS EXACTLY THE LINE YOU DRAW WITH YOUR FINGER — nothing else. They used to
+ * carry arrowheads to tell up from down, and a child reading the slash reasonably concluded
+ * he was supposed to draw an arrow. Direction is shown instead by `glyphStart`: renderers
+ * put a dot where your finger goes down, and the shop animates the stroke from it.
  */
 function circlePts(cw) {
   const out = [];
-  const n = 30;
+  const n = 34;
+  // A wider gap than a hand-drawn circle needs, because the gap and the start dot are now
+  // the only things separating clockwise from anticlockwise.
   for (let i = 0; i <= n; i++) {
-    const a = -Math.PI / 2 + (cw ? 1 : -1) * (i / n) * Math.PI * 1.86;
+    const a = -Math.PI / 2 + (cw ? 1 : -1) * (i / n) * Math.PI * 1.74;
     out.push([Math.cos(a) * 0.5, Math.sin(a) * 0.5]);
   }
-  // Arrowhead on the open end, so clockwise and anticlockwise are told apart at a glance.
-  const [ex, ey] = out[out.length - 1];
-  const [px, py] = out[out.length - 3];
-  const dx = ex - px, dy = ey - py;
-  const L = Math.hypot(dx, dy) || 1;
-  const ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
-  const b = 0.20;
-  out.push([ex - ux * b + nx * b * 0.7, ey - uy * b + ny * b * 0.7]);
-  out.push([ex, ey]);
-  out.push([ex - ux * b - nx * b * 0.7, ey - uy * b - ny * b * 0.7]);
   return out;
 }
 
-/** shaft + two barbs, traced as one stroke. */
-function arrow(x0, y0, x1, y1) {
-  const dx = x1 - x0, dy = y1 - y0;
-  const L = Math.hypot(dx, dy) || 1;
-  const ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
-  const b = 0.22;
-  return [
-    [x0, y0], [x1, y1],
-    [x1 - ux * b + nx * b * 0.72, y1 - uy * b + ny * b * 0.72],
-    [x1, y1],
-    [x1 - ux * b - nx * b * 0.72, y1 - uy * b - ny * b * 0.72],
-  ];
-}
-
 export const GLYPH_PATH = {
-  slash:     arrow(-0.45, 0.5, 0.45, -0.5),
-  up:        arrow(0, 0.55, 0, -0.5),
-  down:      arrow(0, -0.55, 0, 0.5),
-  right:     arrow(-0.55, 0, 0.5, 0),
+  slash:     [[-0.45, 0.5], [0.45, -0.5]],
+  up:        [[0, 0.55], [0, -0.5]],
+  down:      [[0, -0.55], [0, 0.5]],
+  right:     [[-0.55, 0], [0.5, 0]],
   vee:       [[-0.45, -0.45], [0, 0.45], [0.45, -0.45]],
+  // The top half of a circle, drawn left to right — an arch, not a line with a wandering end.
   archUp:    (() => {
     const out = [];
     for (let i = 0; i <= 24; i++) {
@@ -156,6 +139,9 @@ export const GLYPH_PATH = {
   circleCW:  circlePts(true),
   circleCCW: circlePts(false),
 };
+
+/** Where the finger goes down. Renderers mark it with a dot; it is what replaced the arrows. */
+export const glyphStart = (id) => (GLYPH_PATH[id] || [[0, 0]])[0];
 
 /** Walk the polyline by arc length and return the first `upTo` fraction of it. */
 export function glyphPoints(id, steps = 40, upTo = 1) {

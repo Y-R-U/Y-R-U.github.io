@@ -1,7 +1,7 @@
 // Screen-space HUD. Drawn after the world, in unscaled pixels.
 
 import { stroke, line, rect, circle, hatch, splat, INK } from './ink.js';
-import { glyphPoints } from './gestures.js';
+import { glyphPoints, glyphStart } from './gestures.js';
 import { SPECIAL_KEYS, hasKeyboard } from './input.js';
 import { activeMoves, moveStats } from './config.js';
 import { P as RIG } from './ragdoll.js';
@@ -121,11 +121,21 @@ export function drawHUD(ctx, vw, vh, m, save, input) {
   }
   ctx.restore();
 
+  // This call is the whole point of drawCoach and it was missing: the function was written,
+  // the prompt was built every frame in match.updateCoach, and nothing ever drew it. The gate
+  // asserted `match.coach` — the state — so it passed while the screen stayed empty.
+  if (m.coach && !m.demo && m.introT <= 0) drawCoach(ctx, vw, vh, m, input);
   if (!m.demo) drawMoveStrip(ctx, vw, vh, m, save, input);
   if (input) drawTouch(ctx, input);
 }
 
-/** First-run prompt, sitting on the half of the screen it is talking about. */
+/**
+ * First-run prompt, sitting on the half of the screen it is talking about.
+ *
+ * A gesture prompt DEMONSTRATES the gesture: telling someone to "draw /" and showing them a
+ * static glyph is how you get a player who thinks the glyph itself is the thing to copy.
+ * The stroke traces itself, from a dot where the finger goes down.
+ */
 function drawCoach(ctx, vw, vh, m, input) {
   const right = (input?.hand || 'right') === 'right';
   const cx = right ? vw * 0.72 : vw * 0.28;
@@ -135,6 +145,7 @@ function drawCoach(ctx, vw, vh, m, input) {
   ctx.globalCompositeOperation = 'multiply';
   ctx.globalAlpha = pulse;
   const size = Math.min(26, vw * 0.035);
+  if (m.coach.demo) drawCoachDemo(ctx, vw, vh, m, cx, cy - size * 3.0);
   ctx.font = `700 ${size}px ${FONT}`;
   ctx.textAlign = 'center';
   ctx.lineWidth = 6;
@@ -157,6 +168,34 @@ function drawCoach(ctx, vw, vh, m, input) {
   ctx.beginPath();
   ctx.ellipse(cx, cy - size * 0.3, vw * 0.19, vh * 0.30, 0, 0, 6.283);
   ctx.stroke();
+  ctx.restore();
+}
+
+/** The gesture, drawing itself on a loop: trace, hold, clear, again. */
+function drawCoachDemo(ctx, vw, vh, m, cx, cy) {
+  const id = m.coach.demo;
+  const s = Math.min(vw * 0.085, vh * 0.17);
+  const cyc = (m.time % 2.2) / 2.2;
+  const u = Math.min(1, cyc / 0.62);              // trace over the first 62%, then hold
+  const at = (pts) => pts.map(([x, y]) => [cx + x * s, cy + y * s]);
+  ctx.save();
+  ctx.globalAlpha = 0.9;
+  stroke(ctx, at(glyphPoints(id, 34, 1)),
+    { w: 3, passes: 1, wob: 0.5, seed: 77, col: '#b9b3a2', a: 0.8, step: 5 });
+  const part = at(glyphPoints(id, 34, Math.max(0.02, u)));
+  if (part.length > 1) {
+    stroke(ctx, part, { w: 5, passes: 2, wob: 0.6, seed: 77, col: '#2f6ad0', a: 1, step: 5 });
+    ctx.globalCompositeOperation = 'source-over';
+    // The fingertip, leading the line.
+    const tip = part[part.length - 1];
+    ctx.fillStyle = 'rgba(47,106,208,0.28)';
+    ctx.beginPath(); ctx.arc(tip[0], tip[1], s * 0.20, 0, 6.283); ctx.fill();
+    ctx.fillStyle = '#2f6ad0';
+    ctx.beginPath(); ctx.arc(tip[0], tip[1], s * 0.09, 0, 6.283); ctx.fill();
+    const [gx, gy] = glyphStart(id);
+    ctx.fillStyle = '#6a7080';
+    ctx.beginPath(); ctx.arc(cx + gx * s, cy + gy * s, s * 0.07, 0, 6.283); ctx.fill();
+  }
   ctx.restore();
 }
 
@@ -199,6 +238,16 @@ function drawMoveStrip(ctx, vw, vh, m, save, input) {
       const s = size * 0.52;
       stroke(ctx, pts.map(([px, py]) => [x + px * s, y + py * s]),
         { w: 3, passes: 1, wob: 0.5, seed: 400 + i, col: ready ? '#20242c' : '#a8aebb', a: ready ? 1 : 0.55, step: 5 });
+      // Where the finger starts. Up and down are the same line without it, and it is the
+      // one mark that does not look like part of the shape you are being asked to draw.
+      const [sx, sy] = glyphStart(mv.gesture);
+      ctx.save();
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = ready ? '#2f6ad0' : '#a8aebb';
+      ctx.beginPath();
+      ctx.arc(x + sx * s, y + sy * s, size * 0.09, 0, 6.283);
+      ctx.fill();
+      ctx.restore();
     }
     const key = gestureKey[mv.gesture];
     if (key) {

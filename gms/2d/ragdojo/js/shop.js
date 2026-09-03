@@ -5,7 +5,7 @@ import {
   PERKS, MOVE_MAX_LV, moveBuyCost, movePowerCost, moveCdCost, perkCost, perkMax,
   moveStats, playerRankAt, ranksFor, activeMoves, RANK_WORD,
 } from './config.js';
-import { glyphPoints } from './gestures.js';
+import { glyphPoints, glyphStart } from './gestures.js';
 import { stroke } from './ink.js';
 import { sfx } from './audio.js';
 import * as haptic from './haptic.js';
@@ -28,6 +28,11 @@ function drawGlyph(g, id, u) {
   if (full.length > 1) {
     stroke(ctx, full, { w: 2.4, passes: 1, wob: 0.5, seed: 12, col: '#c9c3b2', a: 1, step: 5 });
   }
+  const [gx, gy] = glyphStart(id);
+  ctx.fillStyle = '#9aa0ad';
+  ctx.beginPath();
+  ctx.arc(w / 2 + gx * s, h / 2 + gy * s, 3, 0, 6.283);
+  ctx.fill();
   const part = glyphPoints(id, 34, Math.max(0.03, u)).map(([x, y]) => [w / 2 + x * s, h / 2 + y * s]);
   if (part.length > 1) {
     stroke(ctx, part, { w: 3.4, passes: 2, wob: 0.6, seed: 12, col: '#20242c', a: 1, step: 5 });

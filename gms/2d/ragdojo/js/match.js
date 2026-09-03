@@ -12,6 +12,7 @@ import {
   playerRankAt, derive, moveStats, activeMoves, ranksFor, STRIKE_WORD,
 } from './config.js';
 import { sfx } from './audio.js';
+import { hasKeyboard } from './input.js';
 import * as haptic from './haptic.js';
 
 /**
@@ -134,9 +135,18 @@ export class Match {
     if (this.demo || this.bully || this.over) { this.coach = null; return; }
     const seen = this.save.seen || (this.save.seen = {});
     const verb = STRIKE_WORD[this.save.theme] || 'PUNCH';
-    if (!seen.punch) this.coach = { text: `TAP THIS SIDE TO ${verb}`, sub: 'tap again to combo' };
-    else if (!seen.power) this.coach = { text: 'DRAW  /  FOR A POWER HIT', sub: 'low to high, like a slash' };
-    else this.coach = null;
+    // Say the thing the player can actually do with the device in their hands, and for the
+    // gesture, SHOW it (`demo`) rather than naming a shape to copy.
+    const keys = hasKeyboard();
+    if (!seen.punch) {
+      this.coach = keys
+        ? { text: `PRESS SPACE TO ${verb}`, sub: 'or tap this side · again to combo' }
+        : { text: `TAP THIS SIDE TO ${verb}`, sub: 'tap again to combo' };
+    } else if (!seen.power) {
+      this.coach = keys
+        ? { text: 'DRAG  /  FOR A POWER HIT', sub: 'low to high · or press 1', demo: 'slash' }
+        : { text: 'SWIPE DIAGONALLY UP', sub: 'anywhere this side — power hit', demo: 'slash' };
+    } else this.coach = null;
   }
 
   markSeen(key) {

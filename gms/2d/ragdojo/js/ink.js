@@ -22,22 +22,33 @@ function wob(seed, u) {
 export const INK = '#20242c';
 export const GRAPHITE = '#3a3f47';
 
-/** Resample a polyline to even spacing and push each sample sideways by noise. */
+/**
+ * Resample a polyline to even spacing and push each sample sideways by noise.
+ *
+ * `next` and `acc` are distances along the WHOLE path, not per segment. Carrying the
+ * leftover with `(carry - len) % step + step` looked equivalent and is not: once the carry
+ * exceeds a segment's length that expression adds a whole extra step instead of subtracting
+ * the segment, so on a finely sampled path the carry runs away and almost nothing gets
+ * sampled. A 46px arch of 24 short segments produced ONE sample, and `stroke` drew a
+ * straight line from its first point to its last — which is why every arc and circle glyph
+ * rendered as a dash.
+ */
 function jitterPath(pts, seed, amp, step) {
   const out = [];
-  let carry = 0, u = 0;
+  let acc = 0, next = 0, u = 0;
   for (let i = 0; i < pts.length - 1; i++) {
     const ax = pts[i][0], ay = pts[i][1], bx = pts[i + 1][0], by = pts[i + 1][1];
     const dx = bx - ax, dy = by - ay;
     const len = Math.hypot(dx, dy);
     if (len < 1e-6) continue;
     const nx = -dy / len, ny = dx / len;
-    for (let d = carry; d < len; d += step) {
-      const t = d / len;
-      const o = wob(seed, u + d * 0.06) * amp;
+    while (next < acc + len) {
+      const t = (next - acc) / len;
+      const o = wob(seed, u + (next - acc) * 0.06) * amp;
       out.push([ax + dx * t + nx * o, ay + dy * t + ny * o]);
+      next += step;
     }
-    carry = (carry - len) % step + step;
+    acc += len;
     u += len * 0.06;
   }
   const last = pts[pts.length - 1];
