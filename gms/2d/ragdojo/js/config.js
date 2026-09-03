@@ -115,8 +115,8 @@ function enemyStats(tier, kind, i) {
   const champ = kind === 'champion';
   const final = kind === 'final';
   return {
-    hp: Math.round(base * (champ ? 1.58 : final ? 2.3 : 1) * (1 + i * 0.04)),
-    dmg: (4.4 + tier * 1.5) * (champ ? 1.2 : final ? 1.5 : 1),
+    hp: Math.round(base * (champ ? 1.74 : final ? 2.3 : 1) * (1 + i * 0.04)),
+    dmg: (4.4 + tier * 1.5) * (champ ? 1.26 : final ? 1.5 : 1),
     speed: 128 + tier * 12 + (champ ? 22 : 0) + (final ? 40 : 0),
     skill: Math.min(0.84, 0.22 + tier * 0.075 + (champ ? 0.10 : 0) + (final ? 0.10 : 0)),
     scale: champ ? 1.14 : final ? 1.3 : 1 + tier * 0.008,

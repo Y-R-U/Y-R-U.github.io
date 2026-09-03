@@ -66,6 +66,7 @@ node tools/progressgate.mjs   # what a new game keeps, and what it makes you ear
 node tools/keygate.mjs        # desktop keys: punch, 1-8 specials, both movement layouts
 node tools/panelgate.mjs      # every panel's X is in the corner, and taps outside dismiss
 node tools/darkgate.mjs       # the DARK campaign and its whole unlock chain
+node tools/flipknees.mjs --check  # no pose may bend a knee backwards
 node tools/sim.mjs            # whole campaign in node, with its economy. Balance lives here.
 node tools/sim.mjs --bully    # maxed player vs white belts
 node tools/touch.mjs          # REAL touch events -> every gesture, tap, and stick direction
@@ -279,6 +280,15 @@ the two sets use different ids (`power` vs `d_shank`) in the same `save.moves`.
   on cream paper and vanishes into an inverted one, so `#app.dark` gives everything disabled,
   locked, muted or unaffordable more of itself back (.72). The invert filter does not care
   which direction "faded" means.
+- **Knees bend FORWARD, so every `kl`/`kr` in poses.js is NEGATIVE.** The knee value rotates
+  the shin relative to the thigh, so a positive one bows the knee backwards — a bird's leg —
+  and the entire library was written that way. It is the single thing that most made the legs
+  look wrong, and it is invisible in isolation: on a nearly straight leg the knee is only a few
+  units off the hip->ankle line, so it reads as "something about the legs" rather than as a
+  backwards joint. Do not fix it by negating the numbers, which moves every foot: take the
+  OTHER branch of the two-link solve (`hip = phi + alpha`, `knee = -(PI - beta)`), which keeps
+  the foot exactly where it was and only moves the knee across the line. `tools/flipknees.mjs`
+  does that and is idempotent; `--check` is the gate.
 - **Limb length and `RANGES` move together.** The joint limits in ragdoll.js sit a fraction
   under full extension; a limb that outgrows its range silently locks straight, and the crumple
   that makes a floored body read as a body goes with it.
@@ -288,11 +298,14 @@ the two sets use different ids (`power` vs `d_shank`) in the same `save.moves`.
   stuck the other straight out — and with a 23u drop the solver spent every frame shoving the
   feet back out of the floor. Measure the pose (`fk` is pure and importable in node) rather
   than eyeballing the number.
-- **Longer limbs are a balance change, and only for the big fighters.** Arms 51->57 and legs
-  54->59 made every fighter a bigger target, but the final boss is scale 1.3, so it grew most:
-  measured per level at n=1000, levels 4 through 39 did not move at all and level 44 went
-  7% -> 18%. Corrected at the source (final `hp` 1.9 -> 2.3, `dmg` 1.4 -> 1.5) rather than by
-  touching the AI, and re-measured back to 7%. Note the instrument: at n=60 the same sweep read
+- **Every change to the FIGURE is a balance change, and it lands on the big fighters.** Hits
+  test all 11 ragdoll points, so anything that spreads the body out makes it easier to hit —
+  and champions are scale 1.14 and the final boss 1.3, so they grow most. Longer limbs
+  (arms 51->57, legs 54->59) left levels 4-39 untouched and took level 44 from 7% to 18%;
+  flipping the knees forward then moved them closer to whoever is in front and took the two
+  hard champions from 51%/22% to 63%/31%. Both were corrected at the source — champion `hp`
+  1.58 -> 1.74 and `dmg` 1.2 -> 1.26, final `hp` 1.9 -> 2.3 and `dmg` 1.4 -> 1.5 — rather than
+  by touching the AI, and re-measured to 56%/19%/6% against a baseline of 51%/22%/7%. Note the instrument: at n=60 the same sweep read
   11% / 6% / 0% across monotonically increasing boss HP — the harness's random shopping is the
   variance, so late-game win rates need n in the hundreds or the `dealt/s` / `taken/s` columns
   (`sim.mjs --level=N`), which have far less spread and say WHICH side a change helped.

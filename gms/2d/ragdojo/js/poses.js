@@ -1,5 +1,12 @@
 // Poses are joint angles, not point positions — far fewer numbers and they interpolate cleanly.
 // Angle 0 points straight DOWN; +PI/2 points forward (+x when facing right); PI points up.
+//
+// KNEES BEND FORWARD, WHICH MEANS EVERY `kl`/`kr` IS NEGATIVE. The knee value rotates the
+// shin relative to the thigh, so a positive one bows the knee BACKWARDS — a bird's leg. The
+// whole library was written that way and it is the single thing that most made the legs look
+// wrong. If you add a pose, place the foot with the hip and then bend the knee negative; if
+// you find yourself wanting a positive knee, you want the same foot on the OTHER solve —
+// `node tools/flipknees.mjs` does exactly that, and `--check` is the gate that keeps it true.
 
 import { P, BONE, NPTS } from './ragdoll.js';
 
@@ -78,65 +85,65 @@ export function lerpPose(a, b, u, out = {}) {
 
 // ── Pose library ───────────────────────────────────────────────────────────
 export const POSE = {
-  guard:   pose({ t: 0.12, h: -0.08, sl: 0.95, el: 2.45, sr: 1.25, er: 2.15, hl: -0.28, kl: 0.36, hr: 0.30, kr: 0.10 }),
-  guardB:  pose({ t: 0.16, h: -0.04, sl: 1.02, el: 2.35, sr: 1.32, er: 2.05, hl: -0.26, kl: 0.30, hr: 0.28, kr: 0.14 }),
+  guard:   pose({ t: 0.12, h: -0.08, sl: 0.95, el: 2.45, sr: 1.25, er: 2.15, hl: 0.07, kl: -0.36, hr: 0.4, kr: -0.1 }),
+  guardB:  pose({ t: 0.16, h: -0.04, sl: 1.02, el: 2.35, sr: 1.32, er: 2.05, hl: 0.03, kl: -0.3, hr: 0.42, kr: -0.14 }),
   // The duck. Knees FORWARD over the toes and both feet planted — the old one put all the
   // weight on one leg and stuck the other straight out in front, which read as sitting down
   // rather than dropping under a punch. Its lowest foot sits ~21u above the standing one,
   // which is exactly the pelvis drop Fighter.duckDrop applies, so the crouch and the ground
   // agree instead of fighting each other through the collision solver.
-  block:   pose({ t: 0.28, h: 0.22, sl: 1.12, el: 2.20, sr: 1.28, er: 2.08, hl: 0.60, kl: -1.75, hr: 1.05, kr: -1.86, crouch: 0.46 }),
+  block:   pose({ t: 0.28, h: 0.22, sl: 1.12, el: 2.20, sr: 1.28, er: 2.08, hl: 0.6, kl: -1.75, hr: 1.05, kr: -1.86, crouch: 0.46 }),
 
-  walkA:   pose({ t: 0.16, h: -0.05, sl: 0.55, el: 1.85, sr: 1.45, er: 1.70, hl: -0.52, kl: 0.62, hr: 0.54, kr: 0.14 }),
-  walkB:   pose({ t: 0.14, h: -0.05, sl: 1.00, el: 2.00, sr: 1.10, er: 1.90, hl: -0.10, kl: 0.30, hr: 0.16, kr: 0.42 }),
-  walkC:   pose({ t: 0.16, h: -0.05, sl: 1.45, el: 1.70, sr: 0.55, er: 1.85, hl: 0.54, kl: 0.14, hr: -0.52, kr: 0.62 }),
-  walkD:   pose({ t: 0.14, h: -0.05, sl: 1.10, el: 1.90, sr: 1.00, er: 2.00, hl: 0.16, kl: 0.42, hr: -0.10, kr: 0.30 }),
+  walkA:   pose({ t: 0.16, h: -0.05, sl: 0.55, el: 1.85, sr: 1.45, er: 1.70, hl: 0.09, kl: -0.62, hr: 0.68, kr: -0.14 }),
+  walkB:   pose({ t: 0.14, h: -0.05, sl: 1.00, el: 2.00, sr: 1.10, er: 1.90, hl: 0.19, kl: -0.3, hr: 0.57, kr: -0.42 }),
+  walkC:   pose({ t: 0.16, h: -0.05, sl: 1.45, el: 1.70, sr: 0.55, er: 1.85, hl: 0.68, kl: -0.14, hr: 0.09, kr: -0.62 }),
+  walkD:   pose({ t: 0.14, h: -0.05, sl: 1.10, el: 1.90, sr: 1.00, er: 2.00, hl: 0.57, kl: -0.42, hr: 0.19, kr: -0.3 }),
 
-  runA:    pose({ t: 0.42, h: -0.22, sl: 0.20, el: 2.20, sr: 2.05, er: 1.95, hl: -0.80, kl: 1.05, hr: 0.86, kr: 0.20 }),
-  runB:    pose({ t: 0.40, h: -0.20, sl: 1.10, el: 2.10, sr: 1.10, er: 2.10, hl: -0.16, kl: 0.40, hr: 0.30, kr: 0.80 }),
-  runC:    pose({ t: 0.42, h: -0.22, sl: 2.05, el: 1.95, sr: 0.20, er: 2.20, hl: 0.86, kl: 0.20, hr: -0.80, kr: 1.05 }),
-  runD:    pose({ t: 0.40, h: -0.20, sl: 1.10, el: 2.10, sr: 1.10, er: 2.10, hl: 0.30, kl: 0.80, hr: -0.16, kr: 0.40 }),
+  runA:    pose({ t: 0.42, h: -0.22, sl: 0.20, el: 2.20, sr: 2.05, er: 1.95, hl: 0.23, kl: -1.05, hr: 1.06, kr: -0.2 }),
+  runB:    pose({ t: 0.40, h: -0.20, sl: 1.10, el: 2.10, sr: 1.10, er: 2.10, hl: 0.23, kl: -0.4, hr: 1.09, kr: -0.8 }),
+  runC:    pose({ t: 0.42, h: -0.22, sl: 2.05, el: 1.95, sr: 0.20, er: 2.20, hl: 1.06, kl: -0.2, hr: 0.23, kr: -1.05 }),
+  runD:    pose({ t: 0.40, h: -0.20, sl: 1.10, el: 2.10, sr: 1.10, er: 2.10, hl: 1.09, kl: -0.8, hr: 0.23, kr: -0.4 }),
 
-  jumpUp:  pose({ t: 0.10, h: -0.16, sl: 2.55, el: 0.70, sr: 2.70, er: 0.55, hl: -0.50, kl: 1.25, hr: 0.42, kr: 1.05 }),
-  jumpFall:pose({ t: -0.06, h: 0.10, sl: 2.20, el: 1.05, sr: 2.35, er: 0.90, hl: -0.34, kl: 0.55, hr: 0.50, kr: 0.35 }),
-  land:    pose({ t: 0.30, h: 0.10, sl: 0.70, el: 2.10, sr: 0.90, er: 2.00, hl: 0.20, kl: -0.75, hr: 0.54, kr: -0.90, crouch: 0.45 }),
+  jumpUp:  pose({ t: 0.10, h: -0.16, sl: 2.55, el: 0.70, sr: 2.70, er: 0.55, hl: 0.73, kl: -1.25, hr: 1.45, kr: -1.05 }),
+  jumpFall:pose({ t: -0.06, h: 0.10, sl: 2.20, el: 1.05, sr: 2.35, er: 0.90, hl: 0.2, kl: -0.55, hr: 0.84, kr: -0.35 }),
+  land:    pose({ t: 0.30, h: 0.10, sl: 0.70, el: 2.10, sr: 0.90, er: 2.00, hl: 0.2, kl: -0.75, hr: 0.54, kr: -0.9, crouch: 0.45 }),
 
-  jabWind: pose({ t: 0.06, h: -0.06, sl: 0.90, el: 2.50, sr: 0.95, er: 2.55, hl: -0.30, kl: 0.38, hr: 0.32, kr: 0.10 }),
-  jabHit:  pose({ t: 0.24, h: -0.02, sl: 0.85, el: 2.40, sr: 1.62, er: 0.02, hl: -0.36, kl: 0.42, hr: 0.42, kr: 0.06 }),
-  jabBack: pose({ t: 0.14, h: -0.06, sl: 0.92, el: 2.45, sr: 1.35, er: 1.60, hl: -0.30, kl: 0.36, hr: 0.32, kr: 0.10 }),
+  jabWind: pose({ t: 0.06, h: -0.06, sl: 0.90, el: 2.50, sr: 0.95, er: 2.55, hl: 0.07, kl: -0.38, hr: 0.42, kr: -0.1 }),
+  jabHit:  pose({ t: 0.24, h: -0.02, sl: 0.85, el: 2.40, sr: 1.62, er: 0.02, hl: 0.05, kl: -0.42, hr: 0.48, kr: -0.06 }),
+  jabBack: pose({ t: 0.14, h: -0.06, sl: 0.92, el: 2.45, sr: 1.35, er: 1.60, hl: 0.05, kl: -0.36, hr: 0.42, kr: -0.1 }),
 
-  hookWind:pose({ t: -0.10, h: -0.10, sl: 0.60, el: 2.60, sr: -0.35, er: 2.70, hl: -0.24, kl: 0.34, hr: 0.26, kr: 0.14 }),
-  hookHit: pose({ t: 0.30, h: 0.04, sl: 1.30, el: 1.80, sr: 1.75, er: 0.30, hl: -0.40, kl: 0.46, hr: 0.48, kr: 0.04 }),
-  hookBack:pose({ t: 0.12, h: -0.04, sl: 1.00, el: 2.30, sr: 1.30, er: 1.70, hl: -0.30, kl: 0.36, hr: 0.32, kr: 0.12 }),
+  hookWind:pose({ t: -0.10, h: -0.10, sl: 0.60, el: 2.60, sr: -0.35, er: 2.70, hl: 0.09, kl: -0.34, hr: 0.4, kr: -0.14 }),
+  hookHit: pose({ t: 0.30, h: 0.04, sl: 1.30, el: 1.80, sr: 1.75, er: 0.30, hl: 0.05, kl: -0.46, hr: 0.52, kr: -0.04 }),
+  hookBack:pose({ t: 0.12, h: -0.04, sl: 1.00, el: 2.30, sr: 1.30, er: 1.70, hl: 0.05, kl: -0.36, hr: 0.44, kr: -0.12 }),
 
-  kickWind:pose({ t: -0.14, h: -0.08, sl: 0.70, el: 2.30, sr: 1.10, er: 2.40, hl: -0.20, kl: 0.30, hr: 0.72, kr: 1.35, crouch: 0.12 }),
-  kickHit: pose({ t: -0.30, h: 0.06, sl: 1.90, el: 1.30, sr: 0.40, er: 2.10, hl: -0.18, kl: 0.18, hr: 1.52, kr: 0.06 }),
-  kickBack:pose({ t: -0.06, h: 0.00, sl: 1.10, el: 2.10, sr: 0.90, er: 2.20, hl: -0.24, kl: 0.32, hr: 0.66, kr: 0.70 }),
+  kickWind:pose({ t: -0.14, h: -0.08, sl: 0.70, el: 2.30, sr: 1.10, er: 2.40, hl: 0.09, kl: -0.3, hr: 2.04, kr: -1.35, crouch: 0.12 }),
+  kickHit: pose({ t: -0.30, h: 0.06, sl: 1.90, el: 1.30, sr: 0.40, er: 2.10, hl: 0, kl: -0.18, hr: 1.58, kr: -0.06 }),
+  kickBack:pose({ t: -0.06, h: 0.00, sl: 1.10, el: 2.10, sr: 0.90, er: 2.20, hl: 0.07, kl: -0.32, hr: 1.35, kr: -0.7 }),
 
-  powWind: pose({ t: -0.34, h: -0.26, sl: 0.40, el: 2.20, sr: -0.85, er: 2.05, hl: -0.46, kl: 0.66, hr: 0.30, kr: 0.30, crouch: 0.22 }),
-  powHit:  pose({ t: 0.52, h: 0.22, sl: 1.20, el: 1.60, sr: 2.42, er: 0.06, hl: -0.56, kl: 0.52, hr: 0.62, kr: 0.10 }),
-  powBack: pose({ t: 0.30, h: 0.10, sl: 1.00, el: 2.10, sr: 1.55, er: 1.20, hl: -0.34, kl: 0.40, hr: 0.38, kr: 0.14 }),
+  powWind: pose({ t: -0.34, h: -0.26, sl: 0.40, el: 2.20, sr: -0.85, er: 2.05, hl: 0.19, kl: -0.66, hr: 0.59, kr: -0.3, crouch: 0.22 }),
+  powHit:  pose({ t: 0.52, h: 0.22, sl: 1.20, el: 1.60, sr: 2.42, er: 0.06, hl: -0.05, kl: -0.52, hr: 0.72, kr: -0.1 }),
+  powBack: pose({ t: 0.30, h: 0.10, sl: 1.00, el: 2.10, sr: 1.55, er: 1.20, hl: 0.05, kl: -0.4, hr: 0.52, kr: -0.14 }),
 
-  riseWind:pose({ t: 0.36, h: 0.20, sl: 0.75, el: 2.40, sr: 0.30, er: 2.75, hl: -0.34, kl: 0.86, hr: 0.34, kr: 0.72, crouch: 0.42 }),
-  riseHit: pose({ t: -0.26, h: -0.30, sl: 1.10, el: 2.00, sr: 3.00, er: 0.10, hl: -0.26, kl: 0.10, hr: 0.28, kr: 0.06 }),
-  riseBack:pose({ t: -0.06, h: -0.10, sl: 1.00, el: 2.20, sr: 2.30, er: 0.90, hl: -0.28, kl: 0.30, hr: 0.30, kr: 0.12 }),
+  riseWind:pose({ t: 0.36, h: 0.20, sl: 0.75, el: 2.40, sr: 0.30, er: 2.75, hl: 0.5, kl: -0.86, hr: 1.05, kr: -0.72, crouch: 0.42 }),
+  riseHit: pose({ t: -0.26, h: -0.30, sl: 1.10, el: 2.00, sr: 3.00, er: 0.10, hl: -0.16, kl: -0.1, hr: 0.34, kr: -0.06 }),
+  riseBack:pose({ t: -0.06, h: -0.10, sl: 1.00, el: 2.20, sr: 2.30, er: 0.90, hl: 0.01, kl: -0.3, hr: 0.42, kr: -0.12 }),
 
-  slamWind:pose({ t: -0.20, h: -0.24, sl: 2.75, el: 0.35, sr: 2.85, er: 0.25, hl: -0.36, kl: 0.60, hr: 0.34, kr: 0.50 }),
-  slamHit: pose({ t: 0.62, h: 0.34, sl: 0.55, el: 0.30, sr: 0.62, er: 0.22, hl: -0.52, kl: 1.05, hr: 0.50, kr: 0.95, crouch: 0.5 }),
-  slamBack:pose({ t: 0.34, h: 0.16, sl: 0.80, el: 1.40, sr: 0.86, er: 1.30, hl: -0.42, kl: 0.72, hr: 0.42, kr: 0.62, crouch: 0.24 }),
+  slamWind:pose({ t: -0.20, h: -0.24, sl: 2.75, el: 0.35, sr: 2.85, er: 0.25, hl: 0.23, kl: -0.6, hr: 0.83, kr: -0.5 }),
+  slamHit: pose({ t: 0.62, h: 0.34, sl: 0.55, el: 0.30, sr: 0.62, er: 0.22, hl: 0.51, kl: -1.05, hr: 1.43, kr: -0.95, crouch: 0.5 }),
+  slamBack:pose({ t: 0.34, h: 0.16, sl: 0.80, el: 1.40, sr: 0.86, er: 1.30, hl: 0.29, kl: -0.72, hr: 1.03, kr: -0.62, crouch: 0.24 }),
 
-  dashPose:pose({ t: 0.86, h: -0.55, sl: -0.55, el: 0.35, sr: 1.95, er: 0.10, hl: -0.72, kl: 0.95, hr: 0.62, kr: 0.30 }),
+  dashPose:pose({ t: 0.86, h: -0.55, sl: -0.55, el: 0.35, sr: 1.95, er: 0.10, hl: 0.21, kl: -0.95, hr: 0.91, kr: -0.3 }),
 
-  flipTuck:pose({ t: 0.20, h: 0.10, sl: 1.70, el: 1.90, sr: 1.80, er: 1.85, hl: -0.20, kl: 1.90, hr: 0.24, kr: 1.75, crouch: 0.3 }),
-  flipKick:pose({ t: 0.05, h: -0.05, sl: 2.20, el: 0.90, sr: 2.30, er: 0.80, hl: -0.30, kl: 0.20, hr: 1.35, kr: 0.10 }),
+  flipTuck:pose({ t: 0.20, h: 0.10, sl: 1.70, el: 1.90, sr: 1.80, er: 1.85, hl: 1.65, kl: -1.9, hr: 1.95, kr: -1.75, crouch: 0.3 }),
+  flipKick:pose({ t: 0.05, h: -0.05, sl: 2.20, el: 0.90, sr: 2.30, er: 0.80, hl: -0.1, kl: -0.2, hr: 1.45, kr: -0.1 }),
 
-  tossWind:pose({ t: -0.24, h: -0.14, sl: 0.80, el: 2.30, sr: -0.60, er: 2.45, hl: -0.30, kl: 0.40, hr: 0.28, kr: 0.16 }),
-  tossHit: pose({ t: 0.30, h: 0.06, sl: 1.05, el: 2.10, sr: 2.55, er: 0.35, hl: -0.40, kl: 0.44, hr: 0.44, kr: 0.08 }),
+  tossWind:pose({ t: -0.24, h: -0.14, sl: 0.80, el: 2.30, sr: -0.60, er: 2.45, hl: 0.09, kl: -0.4, hr: 0.44, kr: -0.16 }),
+  tossHit: pose({ t: 0.30, h: 0.06, sl: 1.05, el: 2.10, sr: 2.55, er: 0.35, hl: 0.03, kl: -0.44, hr: 0.52, kr: -0.08 }),
 
-  hurt:    pose({ t: -0.42, h: 0.34, sl: 1.90, el: 1.30, sr: 2.05, er: 1.20, hl: -0.16, kl: 0.24, hr: 0.36, kr: 0.42 }),
-  taunt:   pose({ t: -0.10, h: -0.20, sl: 2.85, el: 0.60, sr: 0.65, er: 2.30, hl: -0.22, kl: 0.28, hr: 0.26, kr: 0.16 }),
-  victory: pose({ t: -0.14, h: -0.26, sl: 3.05, el: 0.20, sr: 3.15, er: 0.15, hl: -0.30, kl: 0.20, hr: 0.32, kr: 0.14 }),
-  bow:     pose({ t: 1.05, h: 0.30, sl: 0.30, el: 0.20, sr: 0.35, er: 0.15, hl: -0.16, kl: 0.20, hr: 0.18, kr: 0.16 }),
+  hurt:    pose({ t: -0.42, h: 0.34, sl: 1.90, el: 1.30, sr: 2.05, er: 1.20, hl: 0.08, kl: -0.24, hr: 0.77, kr: -0.42 }),
+  taunt:   pose({ t: -0.10, h: -0.20, sl: 2.85, el: 0.60, sr: 0.65, er: 2.30, hl: 0.06, kl: -0.28, hr: 0.42, kr: -0.16 }),
+  victory: pose({ t: -0.14, h: -0.26, sl: 3.05, el: 0.20, sr: 3.15, er: 0.15, hl: -0.1, kl: -0.2, hr: 0.46, kr: -0.14 }),
+  bow:     pose({ t: 1.05, h: 0.30, sl: 0.30, el: 0.20, sr: 0.35, er: 0.15, hl: 0.04, kl: -0.2, hr: 0.34, kr: -0.16 }),
 };
 
 /** frames: [poseName, seconds]. hit: frame index whose start fires the hitbox. */
