@@ -234,11 +234,72 @@ check(await p.waitFor('window.__wf.level.id === "society"', 25000), 'and it brin
 await sleep(1800);
 check(await p.eval('window.__wf.game.run === null'), 'the clock does not survive the level it belonged to');
 
-// ── the sheet again, with a star on it ──────────────────────────────────────────────────────
+// ── the ladder ──────────────────────────────────────────────────────────────────────────────
+// Four stars at iron does not raise you: somebody at a desk does. Nothing called promote() before
+// this, so a player who earned four stars at iron simply stopped.
+await p.eval(`(() => {
+  const g = window.__wf.game;
+  g.doc.flags['society.xp'] = 380;
+  g.syncStanding();
+  return true;
+})()`);
+check(await p.eval('window.__wf.game.progress().stars === 4'), 'four stars at iron');
+check(await p.eval('window.__wf.game.doc.flags["society.promotable"] === true'), 'and the Society knows it');
+const greeter = await p.eval(`(() => {
+  const g = window.__wf.game;
+  const at = g.characters.at('greeter');
+  const open = g.hotspots.candidates(at, ['interact']).filter(h => h.attach === 'greeter');
+  return JSON.stringify(open.map(h => h.id));
+})()`).then(JSON.parse);
+check(greeter.length === 1 && greeter[0] === 'hs.greeter.promote',
+  `Vail has exactly one thing to say and it is the promotion (${greeter.join(', ')})`);
+
+check(await p.eval('window.__wf.game.say("society.greeter.promote")'), 'the promotion conversation opens');
+await sleep(500);
+await p.shot(`${OUT}/promote.png`);
+// Walk it to the end. The rank moves on the parting node's `sets`, so every path through it lands.
+await p.eval(`(() => {
+  const d = window.__wf.game.dialogue;
+  for (let i = 0; i < 40 && d.active; i++) { if (d.scene?.choosing) d.pick(0); else d.next(); }
+  return !d.active;
+})()`);
+check(await p.eval('window.__wf.game.doc.flags["society.rank"] === "bronze"'), 'and it raises you to bronze');
+check(await p.eval('window.__wf.game.doc.flags["society.promotable"] === false'), 'and stops offering');
+check(await p.eval('window.__wf.game.progress().stars === 0'),
+  'bronze starts at no stars, because its ladder begins where iron ended');
+
+// Bronze work is takeable now, and only now.
+await p.eval('window.__wf.game.showScreen("board.bronze"); true');
+await sleep(700);
+check(await p.eval('document.querySelectorAll("#game .g-take-b").length >= 8'),
+  'the bronze board is open and every row can be taken');
+await p.shot(`${OUT}/bronze.png`);
+await p.eval('window.__wf.game.board.close(); true');
+await sleep(400);
+await p.eval('window.__wf.game.takeContract("bronze.quarry"); true');
+check(await p.waitFor('window.__wf.level.id === "arena"', 25000), 'and a bronze contract walks out');
+await sleep(2600);
+s = await state();
+check(s.names.some(n => n.includes('Quarry Warden')), `to something iron never sent (${s.names.join(', ')})`);
+await p.shot(`${OUT}/bronze-arena.png`);
+// Every bronze contract arrives in waves, and on a `clear` one an empty floor brings the next
+// group forward rather than leaving the player waiting out a clock they cannot see.
+await p.eval('window.__wf.game.combat.foes = window.__wf.game.combat.foes.map(f => ({ ...f, hp: 0, state: "dead" })); true');
+check(await p.waitFor('window.__wf.game.combat.foes.length > 1', 8000),
+  'clearing the floor brings the next wave forward instead of running the clock out');
+await p.eval('window.__wf.game.combat.foes = window.__wf.game.combat.foes.map(f => ({ ...f, hp: 0, state: "dead" })); true');
+check(await p.waitFor('window.__wf.level.id === "society"', 30000), 'and back again');
+await sleep(1800);
+
+// ── the sheet again ─────────────────────────────────────────────────────────────────────────
 await p.eval('window.__wf.game.openSheet(); true');
 await sleep(700);
-check(await p.eval('document.querySelectorAll("#game .g-stars u.on").length >= 1'),
-  'the sheet shows the star it earned');
+// No filled star here on purpose: bronze's ladder starts where iron's ended, so one bronze
+// contract is a long way short of its first one. What the sheet has to show is the new rank.
+check(await p.eval('!!document.querySelector("#game .g-rank-bronze")'), 'the sheet reads as bronze');
+check(await p.eval('document.querySelectorAll("#game .g-stars u").length === 4'), 'with four star slots');
+check(await p.eval('document.querySelector("#game .g-parch-title h2").textContent.includes("Bronze")'),
+  'and says so at the top');
 await p.shot(`${OUT}/sheet-star.png`);
 
 console.log(`\n${fails ? `${fails} FAILED` : 'all checks passed'} — shots in ${OUT}`);

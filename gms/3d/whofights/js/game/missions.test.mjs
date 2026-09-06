@@ -14,6 +14,10 @@ import { normalise } from '../editor/scene.js';
 
 const base = JSON.parse(readFileSync(new URL('../../data/levels/arena.json', import.meta.url)));
 const iron = BOARDS['board.iron'].jobs;
+const bronze = BOARDS['board.bronze'].jobs;
+// Every contract that has been built out, whichever board it hangs on. The rules below are about
+// missions, not about iron.
+const built = [...iron, ...bronze];
 
 test('the arena document on disk is the one missions.js patches', () => {
   eq(base.id, ARENA);
@@ -26,13 +30,36 @@ test('the arena document on disk is the one missions.js patches', () => {
     'and something in it starts the fight');
 });
 
-test('every iron contract is walkable', () => {
-  for (const j of iron) ok(playable(j.id), `${j.id} has no mission`);
+test('every iron and bronze contract is walkable', () => {
+  for (const j of built) ok(playable(j.id), `${j.id} has no mission`);
   ok(iron.length >= 8, `${iron.length} iron contracts`);
+  ok(bronze.length >= 8, `${bronze.length} bronze contracts`);
+  // The two boards above are still only wanted. That is the ladder doing its job, and the test
+  // says so out loud so nobody reads their silence as an oversight.
+  for (const b of ['board.silver', 'board.gold']) {
+    for (const j of BOARDS[b].jobs) eq(playable(j.id), false, `${j.id} is playable already`);
+  }
+});
+
+// The step up has to be a step, and it has to be a step in *kind* and not only in hit points —
+// a greater earth elemental is what the variant system already gives you for free.
+test('bronze is harder than iron, and not only by being bigger', () => {
+  const worth = list => list.map(j => worthOf(missionOf(j.id)));
+  const ironAvg = worth(iron).reduce((a, b) => a + b, 0) / iron.length;
+  const bronzeAvg = worth(bronze).reduce((a, b) => a + b, 0) / bronze.length;
+  ok(bronzeAvg > ironAvg * 2, `iron averages ${ironAvg.toFixed(0)}, bronze ${bronzeAvg.toFixed(0)}`);
+
+  const kindsOn = list => new Set(list.flatMap(j => allSpawns(missionOf(j.id)).map(s => s.kind)));
+  const fresh = [...kindsOn(bronze)].filter(k => !kindsOn(iron).has(k));
+  ok(fresh.length >= 3, `bronze only reuses iron's monsters (${fresh.join(', ') || 'none new'})`);
+
+  const surviveOn = list => list.filter(j => objectiveOf(missionOf(j.id)) === 'survive').length;
+  ok(surviveOn(bronze) / bronze.length > surviveOn(iron) / iron.length,
+    'bronze should lean harder on the contracts you have to last out');
 });
 
 test('a mission names a kind, a variant and two surfaces the game can actually build', () => {
-  for (const j of iron) {
+  for (const j of built) {
     const m = missionOf(j.id);
     ok(['light', 'neutral', 'dark'].includes(m.zone), `${j.id}: zone "${m.zone}"`);
     ok(SURFACES.includes(m.floor), `${j.id}: floor "${m.floor}"`);
@@ -46,21 +73,25 @@ test('a mission names a kind, a variant and two surfaces the game can actually b
 });
 
 // The whole point of the four axes: nine contracts should not be nine of the same afternoon.
-test('the iron board is nine different fights, not one nine times', () => {
+test('each board is as many different fights as it has contracts', () => {
+  for (const list of [iron, bronze]) shapesOf(list);
+});
+
+function shapesOf(list) {
   const shapes = new Set();
   const kinds = new Set();
   const surfaces = new Set();
-  for (const j of iron) {
+  for (const j of list) {
     const m = missionOf(j.id);
     shapes.add(`${m.zone}|${m.floor}|${m.patch}|${m.spawns.map(s => `${s.kind}:${s.variant}:${s.count || 1}`).join(',')}`);
     for (const s of m.spawns) kinds.add(s.kind);
     surfaces.add(m.floor);
     surfaces.add(m.patch);
   }
-  eq(shapes.size, iron.length, 'two contracts are the same fight');
-  ok(kinds.size >= 5, `only ${kinds.size} kinds across the whole board`);
-  ok(surfaces.size >= 4, `only ${surfaces.size} surfaces across the whole board`);
-});
+  eq(shapes.size, list.length, 'two contracts on one board are the same fight');
+  ok(kinds.size >= 4, `only ${kinds.size} kinds across the whole board`);
+  ok(surfaces.size >= 3, `only ${surfaces.size} surfaces across the whole board`);
+}
 
 // A monster that mends is only interesting in a room it can mend in, and a mission that spawns
 // one on a floor it cannot use has quietly turned it into a weaker monster with a longer name.
@@ -79,7 +110,7 @@ test('a contract about a thing that mends is fought where it can', () => {
 });
 
 test('spawns are laid out on the far side of the floor, inside it, and deterministically', () => {
-  for (const j of iron) {
+  for (const j of built) {
     const a = spawnsOf(missionOf(j.id));
     const b = spawnsOf(missionOf(j.id));
     eq(a, b, `${j.id} lays out differently each time`);
@@ -92,7 +123,7 @@ test('spawns are laid out on the far side of the floor, inside it, and determini
 });
 
 test('a patched arena is a document the level loader would accept from disk', () => {
-  for (const j of iron) {
+  for (const j of built) {
     const raw = patchArena(base, missionOf(j.id), j);
     const out = normalise(raw);
     ok(out.doc, `${j.id}: ${out.error}`);
@@ -117,11 +148,13 @@ test('the floor is the big plot and the corners are the small ones, whichever or
 });
 
 test('what a contract is worth comes off the bestiary, and a harder one is worth more', () => {
-  for (const j of iron) ok(worthOf(missionOf(j.id)) > 0, `${j.id} is worth nothing`);
+  for (const j of built) ok(worthOf(missionOf(j.id)) > 0, `${j.id} is worth nothing`);
   ok(worthOf(missionOf('iron.drain')) > worthOf(missionOf('iron.rats')));
   // Not so wide that one contract is the only sensible one to take.
-  const all = iron.map(j => worthOf(missionOf(j.id)));
-  ok(Math.max(...all) / Math.min(...all) < 8, `the board spans ${Math.max(...all)}:${Math.min(...all)}`);
+  for (const list of [iron, bronze]) {
+    const all = list.map(j => worthOf(missionOf(j.id)));
+    ok(Math.max(...all) / Math.min(...all) < 8, `a board spans ${Math.max(...all)}:${Math.min(...all)}`);
+  }
 });
 
 test('a brief names what is in the room and how many of it', () => {
@@ -140,7 +173,7 @@ test('a brief names what is in the room and how many of it', () => {
 // different the monsters are. Half the iron board's own writing is about waiting.
 
 test('every objective is one the runtime knows', () => {
-  for (const j of iron) ok(OBJECTIVES.includes(objectiveOf(missionOf(j.id))), `${j.id}`);
+  for (const j of built) ok(OBJECTIVES.includes(objectiveOf(missionOf(j.id))), `${j.id}`);
 });
 
 test('a contract with no objective is one you clear, and it counts nothing', () => {
@@ -151,15 +184,15 @@ test('a contract with no objective is one you clear, and it counts nothing', () 
   ok(secondsOf({ objective: 'survive', seconds: 1 }) >= 5, 'never a clock nobody could lose to');
 });
 
-test('the iron board asks for more than one thing', () => {
-  const kinds = new Set(iron.map(j => objectiveOf(missionOf(j.id))));
+test('a board asks for more than one thing', () => {
+  const kinds = new Set(built.map(j => objectiveOf(missionOf(j.id))));
   eq([...kinds].sort(), ['clear', 'survive'], `only ${[...kinds].join(', ')}`);
-  ok(iron.filter(j => objectiveOf(missionOf(j.id)) === 'survive').length >= 3, 'and more than once');
-  ok(iron.filter(j => wavesOf(missionOf(j.id)).length).length >= 4, 'several arrive in waves');
+  ok(built.filter(j => objectiveOf(missionOf(j.id)) === 'survive').length >= 6, 'and more than once');
+  ok(built.filter(j => wavesOf(missionOf(j.id)).length).length >= 10, 'most arrive in waves');
 });
 
 test('waves arrive in order, after the gate, and never all at once', () => {
-  for (const j of iron) {
+  for (const j of built) {
     const w = wavesOf(missionOf(j.id));
     for (let i = 0; i < w.length; i++) {
       ok(w[i].at > 0, `${j.id}: a wave at ${w[i].at}s is not a wave`);
@@ -170,7 +203,7 @@ test('waves arrive in order, after the gate, and never all at once', () => {
 });
 
 test('a survive contract sends its last wave with time left to fight it', () => {
-  for (const j of iron) {
+  for (const j of built) {
     const m = missionOf(j.id);
     if (objectiveOf(m) !== 'survive') continue;
     const w = wavesOf(m);

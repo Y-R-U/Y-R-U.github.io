@@ -85,6 +85,10 @@ test('Vail always has something to say, whatever the save knows', () => {
     { 'society.met.registrar': true, 'society.test.passed': true, 'society.essences.chosen': true },
     { 'society.test.passed': true, 'society.essences.chosen': true, 'society.registered': true,
       'society.rank': 'iron' },
+    // Four stars at iron: the Registrar has a promotion to hand over and the `member` hotspot has
+    // to step aside for it.
+    { 'society.test.passed': true, 'society.essences.chosen': true, 'society.registered': true,
+      'society.rank': 'iron', 'society.stars': 4, 'society.promotable': true },
     // A save from before 07151d25, when no `sets` ran: the player has met her and nothing wrote
     // it down. It must fall back to a conversation, never to silence.
     { 'society.chose.iron': true }]) {
@@ -111,6 +115,8 @@ test('nobody has two hotspots answering at once', () => {
     { 'society.test.passed': true, 'society.essences.chosen': true },
     { 'society.test.passed': true, 'society.essences.chosen': true, 'society.registered': true,
       'society.rank': 'iron' },
+    { 'society.test.passed': true, 'society.essences.chosen': true, 'society.registered': true,
+      'society.rank': 'iron', 'society.stars': 4, 'society.promotable': true },
   ];
   const bodies = [...new Set(level.hotspots.map(h => h.attach).filter(Boolean))];
   for (const flags of saves) {

@@ -47,6 +47,15 @@ export const VERBS = {
   // Filled in by the VO/barks agent — data/barks.json plus audio/vo/index.json.
   bark: (a, ctx) => { ctx.bark?.(a); return null; },
 
+  // The Society raising you a rank. It is a verb rather than a `flag` because which rank you go
+  // to depends on which one you are on, and a conversation cannot know that — the whole ladder
+  // lives in js/game/progress.js and this asks it. The session answers false when the player is
+  // not eligible, which is a conversation reachable in a state it should not have been.
+  promote: (a, ctx) => {
+    if (!ctx.promote) return 'no ladder in this context';
+    return ctx.promote() === false ? 'not eligible for promotion' : null;
+  },
+
   // Opens a full-screen game screen — the contract boards are the first. Added to §10 by the
   // board agent; the id space belongs to whatever screen registry the session installs.
   screen: (a, ctx) => {

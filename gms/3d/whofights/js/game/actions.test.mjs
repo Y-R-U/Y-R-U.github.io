@@ -14,10 +14,24 @@ const ctx = () => {
   };
 };
 
-// `screen` is this project's one addition to §10 — the contract boards had no verb that opens a
-// screen. Reported to the manager for the contract; everything else is the contract's own list.
+// `screen` and `promote` are this project's two additions to §10 — the contract boards had no verb
+// that opens a screen, and the rank ladder cannot be a `flag` because which rank you go to depends
+// on which one you are on. Both are recorded in docs/DEV_CONTRACT.md §10; everything else is the
+// contract's own list.
 test('every contract verb is registered', () => {
-  eq(VERB_IDS.sort(), ['bark', 'event', 'flag', 'goto', 'music', 'say', 'screen'].sort());
+  eq(VERB_IDS.sort(), ['bark', 'event', 'flag', 'goto', 'music', 'promote', 'say', 'screen'].sort());
+});
+
+test('promote asks the ladder rather than writing a rank itself', () => {
+  const calls = [];
+  eq(runAction({ k: 'promote' }, { promote: () => { calls.push(1); return { to: 'bronze' }; } }),
+    { k: 'promote', ok: true });
+  eq(calls.length, 1);
+  // Not eligible is a failure the executor reports rather than a silent no-op: a conversation
+  // that offers a promotion the player cannot have is a bug in the gating, not in the ladder.
+  eq(runAction({ k: 'promote' }, { promote: () => false }).ok, false);
+  eq(runAction({ k: 'promote' }, {}).ok, false, 'and a context with no ladder says so');
+  eq(validateAction({ k: 'promote' }), []);
 });
 
 test('screen needs an id and hands it to the session', () => {

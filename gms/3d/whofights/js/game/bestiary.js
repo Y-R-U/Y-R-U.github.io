@@ -61,6 +61,30 @@ export const KINDS = {
     note: 'It does not mend and it does not stop. Everything it has is in the first ten seconds.',
     tuning: { hp: 44, speed: 4.4, damage: 10, windup: 0.36, strike: 0.13, recover: 0.55, regen: 0 },
   },
+
+  // ── bronze ────────────────────────────────────────────────────────────────
+  // The step up is not "the same thing with more hit points" — a greater earth elemental already
+  // is that, and the variant system makes it for free. What bronze adds is three fights that ask
+  // a different question: one you cannot outlast, one you cannot outrun, and one you cannot get
+  // ahead of on ground it likes.
+  barrow: {
+    id: 'barrow', name: 'Barrow-Wight', rock: '#26232c', seam: '#cfd6ff',
+    heals: 'dirt',
+    note: 'Slow, very heavy, and the turned earth it came out of puts it back together.',
+    tuning: { hp: 150, speed: 2.0, damage: 21, windup: 0.82, recover: 1.25, regen: 26, regenDelay: 0.4, notice: 34 },
+  },
+  warden: {
+    id: 'warden', name: 'Quarry Warden', rock: '#585048', seam: '#ffb038',
+    heals: 'stone',
+    note: 'Enormous, and it mends off the floor of its own quarry. Fight it anywhere else.',
+    tuning: { hp: 200, speed: 1.6, damage: 26, reach: 3.0, arc: 1.7, windup: 1.05, strike: 0.2, recover: 1.6, regen: 30, regenDelay: 0.5, turn: 2.2 },
+  },
+  hollow: {
+    id: 'hollow', name: 'Hollow Thing', rock: '#1b1426', seam: '#b46cff',
+    heals: null,
+    note: 'It knows where you are from anywhere on the floor and it is faster than you think.',
+    tuning: { hp: 88, speed: 4.0, damage: 16, notice: 120, windup: 0.4, strike: 0.13, recover: 0.62, turn: 5.5, regen: 0 },
+  },
 };
 
 export const KIND_IDS = Object.keys(KINDS);

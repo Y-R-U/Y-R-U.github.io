@@ -24,7 +24,7 @@ import { load as loadEssences, held as heldEssences } from './essences.js';
 import { Casting } from './casting.js';
 import { HealthBars } from './healthbars.js';
 import { ARENA, jobFor, briefOf, patchArena, worthOf, wavesOf, objectiveOf, secondsOf } from './missions.js';
-import { award, sheet as progressSheet, XP_FLAG } from './progress.js';
+import { award, promote as promoteRank, sheet as progressSheet, XP_FLAG, STARS } from './progress.js';
 import { PlayerSheet } from './sheet.js';
 import { MissionPanel } from './missionpanel.js';
 
@@ -57,6 +57,7 @@ export class Session {
       characterAt: id => this.characters?.at(id) || null,
       screen: id => this.showScreen(id),
       bark: a => this.bark(a),
+      promote: () => this.promote(),
     });
 
     this.hotspots = new Hotspots(this.level.hotspots || [], this.ctx);
@@ -169,6 +170,9 @@ export class Session {
     this.installMissions();
     // A save reloaded mid-contract still has one in hand.
     this.mission.set(this.activeContract());
+    // A save from before the ladder existed has no standing flags, and the Registrar's promotion
+    // hotspot is gated on them. Derived rather than stored is the rule; these are the cache.
+    this.syncStanding();
     this.applySettings();
     this.autosave = new Autosave(() => this.snapshot());
   }
@@ -245,6 +249,13 @@ export class Session {
     const r = this.run;
     if (!r || this.combat.ended) return;
     r.t += dt;
+    // On a contract you *clear*, an empty floor with a wave still to come is the player standing
+    // about waiting for a clock they cannot see. The next group comes forward instead — the wave
+    // exists to make the fight two acts, not to make it longer. A `survive` contract keeps its
+    // clock, because there the clock is the whole objective.
+    if (r.objective !== 'survive' && r.waves.length && !this.combat.active) {
+      r.waves[0].at = Math.min(r.waves[0].at, r.t + 1.2);
+    }
     while (r.waves.length && r.t >= r.waves[0].at) {
       const w = r.waves.shift();
       this.combat.reinforce(w.spawns);
@@ -280,6 +291,7 @@ export class Session {
     this.doc.flags[XP_FLAG] = r.xp;
     this.doc.flags[`contract.done.${id}`] = true;
     this.doc.flags['contract.active'] = null;
+    this.syncStanding();
     this.doc.items.marks = (this.doc.items.marks || 0) + job.reward;
     this.autosave.mark();
     this.mission?.set(null);
@@ -298,6 +310,30 @@ export class Session {
   }
 
   progress() { return progressSheet(this.doc.flags); }
+
+  // Two derived flags, written whenever the ladder moves. The predicate language compares a flag
+  // to a value and cannot do arithmetic (js/game/predicate.js), so "four stars and there is a rung
+  // above" has to be a flag rather than a rule a hotspot can express — and a hotspot is where the
+  // Registrar's promotion conversation has to be gated.
+  syncStanding() {
+    const p = this.progress();
+    this.doc.flags['society.stars'] = p.stars;
+    this.doc.flags['society.promotable'] = p.registered && p.stars >= STARS && !!p.nextRank;
+    return p;
+  }
+
+  // The Society raising you. `progress.promote()` is the ladder and answers null below four stars,
+  // so a conversation reachable in a state it should not have been fails loudly rather than
+  // handing out a rank.
+  promote() {
+    const up = promoteRank(this.doc.flags);
+    if (!up) return false;
+    Object.assign(this.doc.flags, { 'society.rank': up.to });
+    this.syncStanding();
+    this.autosave.mark();
+    this.bus.dispatchEvent(new CustomEvent('society.promoted', { detail: up }));
+    return up;
+  }
 
   // The stair is the rank ladder. js/world/climb.js asks before it takes the player over, so a
   // floor you have not earned is a walk that never starts rather than a climb that is undone at

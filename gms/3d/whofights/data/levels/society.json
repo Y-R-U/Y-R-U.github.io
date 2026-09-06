@@ -539,13 +539,42 @@
       "once": false,
       "cooldown": 1,
       "if": [
-        "flag",
-        "society.essences.chosen"
+        "all",
+        [
+          "flag",
+          "society.essences.chosen"
+        ],
+        [
+          "not",
+          [
+            "flag",
+            "society.promotable"
+          ]
+        ]
       ],
       "actions": [
         {
           "k": "say",
           "node": "society.greeter.member"
+        }
+      ]
+    },
+    {
+      "id": "hs.greeter.promote",
+      "name": "Speak to Registrar Vail",
+      "attach": "greeter",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "flag",
+        "society.promotable"
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.greeter.promote"
         }
       ]
     },

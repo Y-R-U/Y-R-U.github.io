@@ -229,6 +229,7 @@ their own docs row).
 | bark | `{"k":"bark","who":"<characterId>","category":"idle"}` — `js/game/barks.js` picks a line from that character's list (its own override, else the shared pool), keeps only the ones `data/vo.json` has an encoded clip for, and plays it through `js/game/voice.js`. Silent while a conversation or a board is open, and one character barks at most every 8 s. |
 | event | `{"k":"event","name":"…","data":{}}` — emitted on `window.__wf.bus` |
 | screen | `{"k":"screen","id":"<screenId>"}` — opens a full-screen sheet (`js/game/noticeboard.js`). Not a modal: the world keeps rendering and a tap off the sheet closes it. |
+| promote | `{"k":"promote"}` — the Society raises the player a rank. A verb rather than a `flag`, because which rank you go *to* depends on which one you are on; the ladder is `js/game/progress.js` and this asks it. Refuses below four stars. |
 
 ## 11. House rules
 

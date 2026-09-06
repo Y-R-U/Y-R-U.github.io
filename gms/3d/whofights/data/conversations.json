@@ -1646,6 +1646,78 @@
           "value": true
         }
       ]
+    },
+    "society.greeter.promote": {
+      "name": "Vail — promotion",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Four stars. I have read the file, which is more than the Chapter does, and the file says you come back and you write it down."
+        },
+        {
+          "who": "greeter",
+          "text": "So. Hold still."
+        },
+        {
+          "who": "narrator",
+          "text": "She takes the seal out of the drawer, breathes on it, and presses it into the wax at the bottom of your sheet without any ceremony whatsoever."
+        }
+      ],
+      "choices": [
+        {
+          "say": "That is it?",
+          "goto": "society.greeter.promote.that",
+          "sets": []
+        },
+        {
+          "say": "Thank you.",
+          "goto": "society.greeter.promote.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.greeter.promote.that": {
+      "name": "Vail — that is it",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "There is a ceremony. It is in the spring and it is four hours long and half the people in it are dead by the following one."
+        },
+        {
+          "who": "greeter",
+          "text": "This is the part that matters. The stair will let you up, and the floor above will let you take work that can kill you at your own expense."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Understood.",
+          "goto": "society.greeter.promote.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.greeter.promote.done": {
+      "name": "Vail — promoted",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Go up. Read twice. Come back down and tell me it was boring."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": [
+        {
+          "k": "promote"
+        }
+      ]
     }
   }
 }

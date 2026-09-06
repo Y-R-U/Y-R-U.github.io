@@ -412,13 +412,50 @@ level is a contract you win from the Society's front hall.
 Iron now reads: **six clear, three survive**, five of them with waves, 12–50 xp, 244 for the whole
 board — about 1.5 clears of it to the first four stars.
 
-### 6.9 What is left
+### 6.9 Bronze, and the ladder that reaches it
 
-- Bronze contracts have no missions yet — the next piece, and it is eight `mission:` blocks in
-  `contracts.js` plus whatever new kinds the bestiary wants. They should lean harder on `survive`
-  and on waves than iron does, and probably want one or two new kinds.
-- Nothing promotes you. `progress.promote()` exists and is tested; no conversation calls it, so
-  four stars at iron is where the ladder currently stops.
+**Nothing promoted you.** `progress.promote()` existed and was tested and no conversation called
+it, so a player who earned four stars at Iron simply stopped. Three pieces fix that:
+
+- **A new action verb, `promote`** (DEV_CONTRACT §10, and the second addition this project has
+  made to that list after `screen`). A verb rather than a `flag` because which rank you go *to*
+  depends on which one you are on, and a conversation cannot know that — the ladder is
+  `js/game/progress.js` and the verb asks it. It refuses below four stars, and the executor
+  reports that refusal rather than swallowing it: a conversation offering a promotion the player
+  cannot have is a bug in the gating.
+- **Two derived flags**, `society.stars` and `society.promotable`, written by
+  `Session.syncStanding()` whenever the ladder moves. The predicate language compares a flag to a
+  value and cannot do arithmetic, so "four stars and there is a rung above" has to be a flag —
+  and a hotspot is where the Registrar's promotion has to be gated. `hs.greeter.member` gained a
+  `not promotable` so the two do not both answer.
+- **`society.greeter.promote`**, where Vail takes the seal out of a drawer, breathes on it, and
+  presses it into the wax with no ceremony whatsoever. The rank moves on the *parting* node so it
+  lands by every path through the conversation.
+
+**Three new monsters**, because the step up should not be "the same thing with more hit points" —
+the variant system already gives that away for free. `barrow` (heavy, mends off turned earth),
+`warden` (enormous, and **mends off stone**, so the arena's own floor is its ground and you have
+to make it come to the corners — the earth elemental's rule inverted), and `hollow` (notices you
+from anywhere on the floor and is faster than you are). Ten kinds by six variants is sixty
+monsters, and `bestiary.test.mjs` still proves every one of them is killable with the proving
+knife inside a minute.
+
+On a `clear` contract, an empty floor now **brings the next wave forward** rather than leaving the
+player standing about waiting out a clock they cannot see — the wave is there to make the fight
+two acts, not to make it longer. A `survive` contract keeps its clock, because there the clock is
+the objective.
+
+**All eight bronze contracts are playable**: four clear, four survive, every one with waves,
+56-137 xp and 705 for the board — about three clears of it to four stars, against iron's one and
+a half. `missions.test.mjs` asserts bronze is more than twice iron per contract, leans harder on
+the contracts you have to last out, and brings at least three monsters iron never sent.
+
+### 6.10 What is left
+
+- **Silver and gold boards have no missions.** They are meant to be wanted rather than taken for
+  now, and `missions.test.mjs` says so out loud so their silence is not read as an oversight.
+  Silver wants something the bestiary does not have — every kind in it is a lump of rock with a
+  seam, and the writing on that board is about processions and things that count.
 - Still no economy behind *Trade offer*, and still no awakening stones.
 - The stair holds shut the landing a climb arrived at until you step off it (see §6.6), which at
   the top and ground floors — one landing each — means two metres of walking before you can turn
