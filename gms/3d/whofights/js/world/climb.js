@@ -7,8 +7,23 @@
 
 import * as THREE from 'three';
 
-const NEAR = 1.6;     // how close to a landing counts as being at it
-const AIM = 0.35;     // how squarely you have to be walking at the stair to be taken up it
+const NEAR = 2.1;     // how close to a landing counts as being at it
+const AIM = 0.30;     // how squarely you have to be walking at the stair to be taken up it
+const GO = 0.45;      // and how fast — enough to be walking, not enough to need a run-up
+// Along the path. The player walks at 5.0 and the Society is five storeys, so a stair that moved
+// at the old 2.2 turned every trip between two boards into a nine-second cutscene. Down is faster
+// than up because it is: you are falling down it in a controlled way.
+const PACE_UP = 4.6;
+const PACE_DOWN = 5.6;
+// How long the handover takes to reach that pace from whatever the player was already doing.
+// Without it the stair snaps them from a stroll to a sprint in one frame, which is the jerk at the
+// bottom of the flight — the walk was smooth, the takeover was not.
+const EASE_IN = 0.28;
+// The camera rates below were tuned against 2.2 m/s. They are rates per second, so at three times
+// the pace they would lag three times as far round the helix — and the arm is set so a camera
+// pointing along the flight just fits up the well. Scaled with the pace, the spiral looks the same
+// at any speed.
+const TUNED_PACE = 2.2;
 const TIGHT = 0.7;    // arm once the camera is level with the floor above: it has to fit up the well
 const WIDE = 1.5;     // arm while it is still clear of that floor, where there is a room to swing into
 const PITCH = 0.06;
@@ -24,12 +39,27 @@ export class Climb {
     this.running = false;
     this.cool = 0;
     this.enabled = true;
-    this.pace = 2.2;   // m/s along the path
+    this.pace = PACE_UP;   // m/s along the path, set per direction when a climb begins
+    this.speed = 0;        // what it is actually doing this frame, eased in from the walk
     // Installed by the play session. Answers null to let a climb happen, or a reason not to —
     // which is how a rank you have not earned stops you at the foot of the stair rather than at
     // the top of it. It is asked at the landing, before the player is ever taken over.
     this.gate = null;
     this.refused = null;
+    // The landing a climb put the player down on. Arriving on the second floor going up leaves
+    // them standing on that floor's DOWN landing — a stick still pushed into the stair takes them
+    // straight back to the first. `moveYaw` at the end of run() is the main defence and is enough
+    // for a held key; this is the one for a stick that is actively steering, which is what the
+    // driven test is and what a thumb on a phone can be. It cost two of the four storeys in the
+    // descent leg of that test.
+    //
+    // It clears by stepping off it — leaving its radius, or standing on the other landing on the
+    // same floor. Deliberately NOT on a timer: a timer long enough to be worth having is a timer
+    // the held stick outlasts, and the descent leg of the stair test lost two of four storeys to
+    // exactly that. The cost is that the top floor and the ground floor have only one landing
+    // each, so arriving there and turning straight round means two metres of walking before the
+    // stair will take you again.
+    this.blocked = null;
   }
 
   bind(d, I) {
@@ -41,6 +71,8 @@ export class Climb {
     this.oz = d.m.elements[14];
     this.running = false;
     this.cool = 0;
+    this.blocked = null;
+    this.pathKey = null;
   }
 
   stop() {
@@ -90,21 +122,40 @@ export class Climb {
   }
 
   watch(P) {
+    const here = this.at(P);
+    if (!here) { this.blocked = null; return false; }
+    const b = this.blocked;
+    if (b) {
+      // Standing on the one they arrived at: nothing happens. Standing on any other means they
+      // have walked off it, so it stops being blocked.
+      if (b.i === here.g.i && b.up === here.g.up) return false;
+      this.blocked = null;
+    }
     if (this.cool > 0) return false;
     const v = Math.hypot(P.vel.x, P.vel.z);
-    if (v < 0.7) return false;
-    const here = this.at(P);
-    if (!here) return false;
+    if (v < GO) return false;
     const { g, l } = here;
-    const s = this.I.stairCentre();
+    const to = g.i + (g.up ? 1 : -1);
     // Facing matters, exactly as at a door: walking past the foot of the stair must not take you
-    // up it. Measured against the line from the landing into the stair, not against where you are
-    // standing, which is the same line however close to the landing you already are.
+    // up it. Two directions count as meaning it, and the better of the two wins:
+    //
+    //   into    the line from the landing to the newel — walking at the stair
+    //   along   the direction the flight actually leaves in — walking the way the treads go
+    //
+    // It used to be `into` alone, which is right for a straight cottage flight and wrong for a
+    // helix: the Society's stair leaves its landing on a tangent, so a player walking exactly the
+    // way the steps go scored nearly zero against a vector pointing at the middle of the well and
+    // simply was not picked up. That is the clunk. `along` alone is no better — it stops noticing
+    // the player who walks straight at the thing, which is how anybody approaches a staircase.
+    const along = this.leaves(g.i, to, l);
+    const c = this.I.stairCentre();
+    const ix = c.x - g.x, iz = c.z - g.z;
+    const il = Math.hypot(ix, iz) || 1;
     const vx = P.vel.x * this.cs - P.vel.z * this.sn;
     const vz = P.vel.x * this.sn + P.vel.z * this.cs;
-    const ix = s.x - g.x, iz = s.z - g.z;
-    if ((vx * ix + vz * iz) / (Math.hypot(ix, iz) * v) < AIM) return false;
-    const to = g.i + (g.up ? 1 : -1);
+    const into = (vx * ix + vz * iz) / (il * v);
+    const walk = along ? (vx * along.x + vz * along.z) / v : -1;
+    if (Math.max(into, walk) < AIM) return false;
     const why = this.gate ? this.gate(g.i, to) : null;
     if (why) {
       // Refused, not driven: the player keeps the stick and simply does not go up. Re-arming on a
@@ -115,6 +166,27 @@ export class Climb {
     }
     this.begin(g.i, to, P, l);
     return true;
+  }
+
+  // Which way the flight goes when it leaves this landing, as a unit vector in room space. Taken
+  // off the path itself rather than from the geometry, so a stair whose shape changes cannot leave
+  // this answer behind — it is the same path the climb is about to walk.
+  leaves(from, to, l) {
+    // Cached per pair. watch() runs every frame the player is standing on a landing, and
+    // stairPath() builds forty-odd waypoint objects each time it is asked.
+    const key = `${from}>${to}`;
+    if (this.pathKey !== key) { this.pathKey = key; this.pathFor = this.I.stairPath(from, to); }
+    const pts = this.pathFor;
+    if (!pts || pts.length < 2) return null;
+    // Measured from where the player is standing rather than from the path's own first point, and
+    // to the first waypoint that is actually somewhere else: a player standing on top of the
+    // landing would otherwise get a zero vector and never be picked up at all.
+    for (let i = 1; i < pts.length; i++) {
+      const dx = pts[i].x - l.x, dz = pts[i].z - l.z;
+      const len = Math.hypot(dx, dz);
+      if (len > 0.35) return { x: dx / len, z: dz / len };
+    }
+    return null;
   }
 
   // The foot of the stair can back onto the same wall as the front door, so the two hotspots can
@@ -143,15 +215,23 @@ export class Climb {
     this.to = to;
     this.up = to > from;
     this.running = true;
+    this.pace = to > from ? PACE_UP : PACE_DOWN;
+    // Handed over at whatever they were already doing, then eased up to the stair's own pace. The
+    // floor is 0.9 rather than 0 so a player who was barely moving still starts moving.
+    this.speed = Math.max(0.9, Math.hypot(P.vel.x, P.vel.z));
     P.driven = true;
     P.vel.set(0, 0, 0);
-    P.walkSpeed = this.pace;
+    P.walkSpeed = this.speed;
     this.armWas = P.distIn;
     this.eyeWas = P.heightIn;
   }
 
   run(dt, P) {
-    this.s = Math.min(this.len, this.s + this.pace * dt);
+    this.speed += (this.pace - this.speed) * (1 - Math.exp(-dt / EASE_IN));
+    P.walkSpeed = this.speed;
+    this.s = Math.min(this.len, this.s + this.speed * dt);
+    // Every camera rate below is per second and was tuned at TUNED_PACE, so they move with it.
+    const r = this.speed / TUNED_PACE;
     let i = 0;
     while (i < this.cum.length - 1 && this.s > this.cum[i]) i++;
     const a = this.pts[i], b = this.pts[i + 1];
@@ -163,17 +243,17 @@ export class Climb {
     this.I.onFlight(ly);
 
     const yaw = this.worldYaw(b.x - a.x, b.z - a.z);
-    P.yaw += wrapPi(yaw - P.yaw) * (1 - Math.exp(-9 * dt));
+    P.yaw += wrapPi(yaw - P.yaw) * (1 - Math.exp(-9 * r * dt));
     // The camera follows the turn a little behind the body, which reads as a spiral rather than as
     // the room swinging round you. It must not lag much more than this: the arm is set so that a
     // camera pointing along the flight stays inside the well, and a big lag swings it into the newel.
-    P.camYaw += wrapPi(yaw - P.camYaw) * (1 - Math.exp(-6 * dt));
+    P.camYaw += wrapPi(yaw - P.camYaw) * (1 - Math.exp(-6 * r * dt));
     // The stair has no colliders, so nothing pushes the camera off a tread or out of a floor. The
     // camera rises with the player and so crosses the slab overhead partway up: the arm is reeled
     // in as it gets there, so it comes up through the well rather than into the boards.
     const room = this.I.headroom(ly) - EYE;
     const arm = THREE.MathUtils.clamp(TIGHT + room * 0.7, TIGHT, WIDE);
-    const k = 1 - Math.exp(-5 * dt);
+    const k = 1 - Math.exp(-5 * r * dt);
     P.distIn += (arm - P.distIn) * k;
     P.heightIn += (EYE - P.heightIn) * k;
     P.camPitch += (PITCH - P.camPitch) * k;
@@ -182,6 +262,10 @@ export class Climb {
     this.restore(P);
     this.running = false;
     this.cool = 0.8;
+    // The flight arrives at the landing on the far floor that faces back the way it came, so that
+    // is the one to hold shut. `moveYaw` below stops a held stick walking straight back onto the
+    // flight; this stops standing still on the arrival landing doing the same thing.
+    this.blocked = { i: this.to, up: !this.up };
     P.driven = false;
     P.walkSpeed = 0;
     P.vel.set(0, 0, 0);
@@ -206,6 +290,7 @@ export class Climb {
   report() {
     return {
       on: this.running, up: !!this.up, from: this.from, to: this.to,
+      pace: +this.pace.toFixed(2), speed: +this.speed.toFixed(2), blocked: this.blocked,
       u: this.running ? +(this.s / this.len).toFixed(3) : 0,
       refused: this.refused?.why || null,
     };

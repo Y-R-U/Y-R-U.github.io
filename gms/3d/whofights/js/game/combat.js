@@ -7,21 +7,16 @@
 // not, so the Society pays nothing for the feature.
 
 import { Elemental } from '../world/elemental.js';
-import { EARTH, spawn, step, wound, isDead } from './foe.js';
-import { make, hurt, inSwing, fraction } from './vitals.js';
-import { isDirt, plotsOf } from './ground.js';
+import { spawn, step, wound, isDead } from './foe.js';
+import { make, hurt, mend, inSwing, fraction } from './vitals.js';
+import { WARD } from './spells.js';
+import { isHealing, plotsOf } from './ground.js';
+import { describe } from './bestiary.js';
+// Re-exported, not redefined: js/game/bestiary.test.mjs has to reach the knife without reaching
+// three, and two copies of a balance number is one copy too many.
+import { KNIFE, PLAYER_HP } from './weapons.js';
 
-export const KNIFE = {
-  damage: 9,
-  reach: 2.6,
-  arc: 1.9,
-  cooldown: 0.75,
-  // How long after the swing starts the blade is actually out there. Resolving on the press makes
-  // a hit land before the animation has moved, which reads as the elemental flinching at nothing.
-  land: 0.16,
-};
-
-export const PLAYER_HP = 100;
+export { KNIFE, PLAYER_HP };
 
 export class Combat {
   constructor({ app, player, level, session }) {
@@ -34,6 +29,9 @@ export class Combat {
     this.cool = 0;
     this.pending = null;
     this.vitals = make(PLAYER_HP);
+    // How long a ward is still standing. One number rather than a list: two wards at once is a
+    // longer ward, which is what a player casting two defensive abilities expects anyway.
+    this.warded = 0;
     this.ended = null;
     this.load(level);
   }
@@ -45,7 +43,9 @@ export class Combat {
     this.level = level;
     this.plots = plotsOf(level);
     this.spec = level?.foes || [];
-    this.onDirt = (x, z) => isDirt(this.plots, x, z);
+    // Resolved once at load, not per frame: a kind and a variant multiply out to a tuning, a name,
+    // two colours and a surface it mends from, and none of that changes while the fight runs.
+    this.book = this.spec.map(s => describe(s));
     // A level with something in it to fight is a level you are handed a knife for. The Society's
     // own floors have none, and the player walks its halls empty-handed.
     this.player.arm?.(this.spec.length > 0);
@@ -64,9 +64,11 @@ export class Combat {
   begin() {
     if (this.foes.length || !this.spec.length) return false;
     this.vitals = make(PLAYER_HP);
-    for (const s of this.spec) {
-      const f = spawn({ x: s.x, z: s.z, yaw: s.yaw || 0 }, EARTH);
-      const body = new Elemental(s.zone || 'neutral', s.scale || 1);
+    this.warded = 0;
+    for (let i = 0; i < this.spec.length; i++) {
+      const s = this.spec[i], b = this.book[i];
+      const f = spawn({ x: s.x, z: s.z, yaw: s.yaw || 0 }, b.tuning);
+      const body = new Elemental(s.zone || 'neutral', b.scale, { rock: b.rock, seam: b.seam });
       this.app.scene.add(body.object3D);
       this.foes.push(f);
       this.bodies.push(body);
@@ -77,6 +79,14 @@ export class Combat {
 
   groundY(x, z) { return this.player.groundY(x, z); }
 
+  // What the bar over its head says it is. The name is the kind and what has been done to it —
+  // "Greater Ember Elemental" — unless the level document wrote one out itself.
+  nameOf(i) { return this.book[i]?.name || 'Something'; }
+
+  // What killing everything in the room is worth. Summed off the bestiary rather than authored on
+  // the contract, so a mission that swaps in a bigger monster pays more without anyone saying so.
+  get worth() { return this.book.reduce((a, b) => a + b.xp, 0); }
+
   update(dt) {
     if (!this.foes.length) return;
     const P = this.player;
@@ -86,6 +96,7 @@ export class Combat {
     // see it when it decides. `castEdge` is the player's own one-frame flag; clearing it here is
     // what stops a held button being a hit every frame.
     this.cool = Math.max(0, this.cool - dt);
+    this.warded = Math.max(0, this.warded - dt);
     if (P.castEdge) {
       P.castEdge = false;
       if (this.cool <= 0 && !this.vitals.dead) {
@@ -100,16 +111,17 @@ export class Combat {
 
     for (let i = 0; i < this.foes.length; i++) {
       const before = this.foes[i];
-      const f = step(before, dt, { player: me, onDirt: this.onDirt }, EARTH);
+      const b = this.book[i];
+      const f = step(before, dt, { player: me, onDirt: (x, z) => isHealing(this.plots, x, z, b.heals) }, b.tuning);
       this.foes[i] = f;
       // It swings on the frame it enters `strike`, and whether that connects is decided here
       // because the foe module has no idea how wide the player is.
       if (f.struck && !this.vitals.dead) {
         const hitMe = inSwing({
           from: { x: f.x, z: f.z }, yaw: f.yaw, to: { x: P.pos.x, z: P.pos.z },
-          reach: EARTH.reach, arc: EARTH.arc, radius: P.walkRadius,
+          reach: b.tuning.reach, arc: b.tuning.arc, radius: P.walkRadius,
         });
-        if (hitMe) this.takeHit(EARTH.damage);
+        if (hitMe) this.takeHit(b.tuning.damage);
       }
       this.bodies[i].sync(f, this.groundY(f.x, f.z), dt);
     }
@@ -126,7 +138,7 @@ export class Combat {
       if (isDead(f)) continue;
       const hit = inSwing({
         from: { x: P.pos.x, z: P.pos.z }, yaw: sw.yaw, to: { x: f.x, z: f.z },
-        reach: KNIFE.reach, arc: KNIFE.arc, radius: EARTH.radius,
+        reach: KNIFE.reach, arc: KNIFE.arc, radius: this.book[i].tuning.radius,
       });
       if (!hit) continue;
       this.foes[i] = wound(f, KNIFE.damage, sw.id);
@@ -136,8 +148,40 @@ export class Combat {
     return landed;
   }
 
+  // ── what a spell does when it arrives ────────────────────────────────────
+  // js/game/casting.js resolves the flight and hands the result here, so the rules about who is
+  // hurt and by how much stay in the one module that owns the fight.
+
+  spellHit(h) {
+    if (!this.foes.length) return false;
+    let landed = false;
+    const id = ++this.swingId;
+    // An index for a thrown bolt, a circle for anything that arrived where the player did.
+    const idx = h.index != null ? [h.index]
+      : this.foes.map((f, i) => i).filter(i => Math.hypot(this.foes[i].x - h.at.x, this.foes[i].z - h.at.z) <= (h.radius || 2.5) + this.book[i].tuning.radius);
+    for (const i of idx) {
+      const f = this.foes[i];
+      if (!f || isDead(f)) continue;
+      this.foes[i] = wound(f, h.damage, id);
+      landed = true;
+    }
+    if (landed) this.session?.bus?.dispatchEvent(new CustomEvent('combat.hit', { detail: { id, spell: true } }));
+    return landed;
+  }
+
+  mend(amount) {
+    if (this.vitals.dead) return false;
+    this.vitals = mend(this.vitals, amount);
+    return true;
+  }
+
+  guard(seconds) { this.warded = Math.max(this.warded, seconds); return true; }
+
   takeHit(amount) {
-    this.vitals = hurt(this.vitals, amount);
+    // A ward does not stop a blade. It takes the weight out of it, which is what every defensive
+    // ability in data/essences.json says it does in one way or another.
+    const taken = this.warded > 0 ? amount * (1 - WARD) : amount;
+    this.vitals = hurt(this.vitals, taken);
     this.session?.bus?.dispatchEvent(new CustomEvent('combat.hurt', {
       detail: { hp: this.vitals.hp, fraction: fraction(this.vitals) },
     }));

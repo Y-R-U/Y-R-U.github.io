@@ -19,3 +19,9 @@ gms/2d/scare_batch.log
 # Transient regen-helper run log
 regen_helper.out
 __pycache__/
+
+# Driven UI-test scratch copies (DEV_CONTRACT §11: a UI test never touches the live tree).
+# They have to live here rather than in /tmp because the games import three from ../../lib/three,
+# which is outside a game's own directory. Each test deletes its own on the way out; this is the
+# guard for a run that was interrupted before it could.
+gms/3d/.wf-*test/

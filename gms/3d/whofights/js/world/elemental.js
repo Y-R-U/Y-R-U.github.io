@@ -12,7 +12,10 @@ import { getEnvIntensity, onEnvIntensity } from './materials.js';
 import { zone } from './zones.js';
 import { rng } from './details.js';
 
-const SEAM = new THREE.Color('#ff7a2a');
+// The earth elemental's own two colours. js/game/bestiary.js hands a different pair per kind, and
+// those two are the whole difference between a thing made of soil and a thing made of brine — see
+// the note in that file about one body and many monsters.
+const SEAM = '#ff7a2a';
 
 function chunk(r, seed, squash = 1) {
   const g = new THREE.IcosahedronGeometry(r, 1);
@@ -27,7 +30,7 @@ function chunk(r, seed, squash = 1) {
 }
 
 export class Elemental {
-  constructor(zoneId = 'neutral', scale = 1) {
+  constructor(zoneId = 'neutral', scale = 1, look = {}) {
     this.object3D = new THREE.Group();
     this.object3D.name = 'elemental';
     this.scale = scale;
@@ -43,9 +46,13 @@ export class Elemental {
     }
     // Its own material, not one out of the ROCK palette: those are seams in a cliff and read as
     // pale stone, and a pale body with hot cracks in it is a bonfire rather than a thing made of
-    // earth. This is the zone's own stone taken well down, so the seam is the only bright thing.
+    // earth. A kind that names no rock colour falls back to the zone's own stone taken well down,
+    // which is what the earth elemental was before there was anything else to be.
+    this.seamColour = new THREE.Color(look.seam || SEAM);
     this.rockMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(zone(zoneId).stone.base).multiplyScalar(0.34),
+      color: look.rock
+        ? new THREE.Color(look.rock)
+        : new THREE.Color(zone(zoneId).stone.base).multiplyScalar(0.34),
       roughness: 0.96, metalness: 0.04,
     });
     this.rockMat.envMapIntensity = getEnvIntensity() * 0.4;
@@ -59,7 +66,7 @@ export class Elemental {
     // The seam: a second, smaller stack drawn additively inside the rock. It reads as light coming
     // out of the cracks rather than as a shell round the outside, which is what a hull would be.
     this.seamMat = new THREE.MeshBasicMaterial({
-      color: SEAM, transparent: true, opacity: 0.28, blending: THREE.AdditiveBlending,
+      color: this.seamColour.clone(), transparent: true, opacity: 0.28, blending: THREE.AdditiveBlending,
       depthWrite: false, side: THREE.FrontSide,
     });
     // Well inside the rock it sits in — about six tenths of each chunk. At eight tenths the glow
@@ -119,7 +126,7 @@ export class Elemental {
     const hurtK = 1 - (f.max ? f.hp / f.max : 1);
     const mend = f.mended > 0 ? 0.5 + 0.5 * Math.sin(this.t * 11) : 0;
     this.seamMat.opacity = 0.16 + 0.34 * hurtK + 0.22 * mend;
-    this.seamMat.color.copy(SEAM).lerp(_white, 0.35 * mend);
+    this.seamMat.color.copy(this.seamColour).lerp(_white, 0.35 * mend);
   }
 
   dispose() {

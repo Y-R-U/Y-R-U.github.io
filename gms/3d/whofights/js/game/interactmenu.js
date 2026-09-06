@@ -96,12 +96,14 @@ export class InteractMenu {
   }
 }
 
-// The spell list, as its own small sheet. Nothing casts yet — js/game/combat.js knows about a
-// knife and nothing else — so it says what each ability is and does not pretend to fire it.
+// The spell list, as its own small sheet. Every row is castable and every row says whether it is:
+// what it costs, and whether the well or the cooldown is the thing standing in the way. A button
+// that looks live and does nothing is worse than one that says why.
 export class SpellList {
-  constructor({ host, abilities = () => [], onCast = () => {} }) {
+  constructor({ host, abilities = () => [], state = () => ({ ready: true }), onCast = () => {} }) {
     this.host = host;
     this.abilities = abilities;
+    this.state = state;
     this.onCast = onCast;
     this.root = null;
     this.onKey = e => { if (e.key === 'Escape') this.close(); };
@@ -120,7 +122,9 @@ export class SpellList {
     head.append(el('u', 'g-seal', '✦'));
     const t = el('div', 'g-parch-title');
     t.append(el('h2', null, 'Abilities'));
-    t.append(el('p', null, list.length ? 'Awakened, and what each of them costs.' : 'You have none yet.'));
+    t.append(el('p', null, list.length
+      ? 'Awakened. Tap one, or press its number in the world.'
+      : 'You have none yet.'));
     head.append(t);
     const x = el('button', 'g-parch-x', '✕');
     x.setAttribute('aria-label', 'Close');
@@ -132,17 +136,23 @@ export class SpellList {
     if (!list.length) {
       body.append(el('p', null, 'Pass the proving and take three essences. The fourth is whatever they come to.'));
     }
-    for (const a of list) {
-      const b = el('button', 'g-abil on g-castable');
+    list.forEach((a, i) => {
+      const st = this.state(a) || { ready: true };
+      const b = el('button', `g-abil on g-castable${st.ready ? '' : ' g-spent'}`);
       const h = el('div', 'g-abil-h');
-      h.append(el('b', null, a.name));
+      h.append(el('b', null, `${i + 1}. ${a.name}`));
       h.append(el('em', null, a.fromName || ''));
       b.append(h);
       b.append(el('span', 'g-abil-cost', a.cost));
       b.append(el('p', null, a.text));
+      // The mana cost and the reason, on one line. `why` is whatever js/game/spells.js refused
+      // with, so the sheet and the toast the number keys raise say the same thing.
+      b.append(el('span', 'g-abil-state', st.ready
+        ? `${st.cost} mana · ready · key ${i + 1}`
+        : (st.cooling > 0 ? `${st.cost} mana · ready in ${st.cooling.toFixed(1)}s` : st.why)));
       b.onclick = () => { this.close(); this.onCast(a); };
       body.append(b);
-    }
+    });
     sheet.append(body);
     this.root.append(sheet);
     this.host.append(this.root);

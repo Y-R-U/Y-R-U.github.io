@@ -29,12 +29,13 @@ export class LevelSwap {
   }
 
   // `hold` is called with the new document once the world is standing but before the first frame
-  // of it is drawn, so the session can re-point everything that reads the level.
-  async to(id, at, hold) {
+  // of it is drawn, so the session can re-point everything that reads the level. `patch` dresses
+  // the raw document on the way in — one arena, many contracts (js/game/missions.js).
+  async to(id, at, hold, patch = null) {
     if (this.busy) return null;
     this.busy = true;
     try {
-      const level = await loadLevel(id);
+      const level = await loadLevel(id, 'data/levels', patch);
       for (const w of level.warnings) console.warn(`level ${id}: ${w}`);
       const { doc, saved } = startDoc(level.doc, id);
       const cast = await loadCast().catch(e => {

@@ -8,6 +8,10 @@
 // touch there is no second button, so a short tap attacks and a long press opens the menu.
 // Space is jump, which is what it is for — it used to be attack, and a jump button and an attack
 // button are not the same button on any keyboard anyone has used.
+//
+// 1 to 4 cast the four awakened abilities. The interact menu is the authored route to a spell and
+// it stays, but reaching a spell through a menu takes about a second and an earth elemental is
+// already swinging by then — a fight needs the abilities under a finger.
 
 const STICK_R = 62;
 const TAP_MS = 400, TAP_PX = 16;
@@ -26,6 +30,9 @@ export class Input {
     this.attackEdge = false;
     this.jumpEdge = false;
     this.interactEdge = false;
+    // 0-3, or null. A slot rather than a boolean, so the player can only ever bank one cast: a
+    // second key pressed in the same frame replaces the first rather than queueing behind it.
+    this.spellEdge = null;
     this.sprint = false;
     this.stickSprint = false;
     this.flip = false;
@@ -50,11 +57,14 @@ export class Input {
       if (e.repeat || typing(e)) return;
       this.keys.add(e.code);
       if (e.code === 'Space') { this.jumpEdge = true; e.preventDefault(); }
+      const slot = /^Digit([1-4])$/.exec(e.code);
+      if (slot) { this.spellEdge = +slot[1] - 1; e.preventDefault(); }
     });
     addEventListener('keyup', e => this.keys.delete(e.code));
     addEventListener('blur', () => {
       this.keys.clear();
       this.jumpEdge = this.interactEdge = this.attackEdge = false;
+      this.spellEdge = null;
       this.stickId = this.lookId = null;
       this.stickSprint = false;
       this.hideStick();
@@ -185,6 +195,7 @@ export class Input {
     this.attackEdge = false;
     this.jumpEdge = false;
     this.interactEdge = false;
+    this.spellEdge = null;
     return out;
   }
 }

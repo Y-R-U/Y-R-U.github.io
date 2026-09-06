@@ -386,7 +386,11 @@ export function normalise(raw) {
       // is not jumped by something that spawned behind them.
       foes: (Array.isArray(raw.foes) ? raw.foes : []).filter(f => f && Number.isFinite(+f.x) && Number.isFinite(+f.z))
         .map(f => ({
+          // `kind` and `variant` are looked up in js/game/bestiary.js, and an id it does not know
+          // falls back there rather than here: one place decides what a monster is.
           kind: typeof f.kind === 'string' ? f.kind : 'earth',
+          variant: typeof f.variant === 'string' ? f.variant : 'none',
+          name: typeof f.name === 'string' && f.name ? f.name : null,
           x: +f.x, z: +f.z, yaw: num(f.yaw, 0),
           scale: Math.min(2.5, Math.max(0.5, num(f.scale, 1))),
           zone: ZONE_IDS.includes(f.zone) ? f.zone : 'neutral',

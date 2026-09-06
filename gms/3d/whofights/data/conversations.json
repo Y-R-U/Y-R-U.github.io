@@ -2,7 +2,7 @@
   "version": 1,
   "nodes": {
     "society.greeter.hello": {
-      "name": "Vail \u2014 first hello",
+      "name": "Vail — first hello",
       "cam": "two",
       "lines": [
         {
@@ -16,7 +16,7 @@
         },
         {
           "who": "greeter",
-          "text": "Contracts are on the boards behind me. Iron first \u2014 everyone starts on iron.",
+          "text": "Contracts are on the boards behind me. Iron first — everyone starts on iron.",
           "vo": "greeter_hello_02"
         }
       ],
@@ -58,7 +58,7 @@
       ]
     },
     "society.greeter.again": {
-      "name": "Vail \u2014 again",
+      "name": "Vail — again",
       "cam": "two",
       "lines": [
         {
@@ -110,7 +110,7 @@
       "sets": []
     },
     "society.greeter.who": {
-      "name": "Vail \u2014 who are you",
+      "name": "Vail — who are you",
       "cam": "close",
       "lines": [
         {
@@ -146,7 +146,7 @@
       ]
     },
     "society.greeter.contracts": {
-      "name": "Vail \u2014 what is a contract",
+      "name": "Vail — what is a contract",
       "cam": "two",
       "lines": [
         {
@@ -193,7 +193,7 @@
       ]
     },
     "society.greeter.floors": {
-      "name": "Vail \u2014 the floors",
+      "name": "Vail — the floors",
       "cam": "two",
       "lines": [
         {
@@ -231,7 +231,7 @@
       ]
     },
     "society.greeter.test": {
-      "name": "Vail \u2014 the proving",
+      "name": "Vail — the proving",
       "cam": "two",
       "lines": [
         {
@@ -274,16 +274,16 @@
       ]
     },
     "society.greeter.proving.lose": {
-      "name": "Vail \u2014 if you lose",
+      "name": "Vail — if you lose",
       "cam": "two",
       "lines": [
         {
           "who": "greeter",
-          "text": "You come back here with a headache and a bill for the healer. Then you go again."
+          "text": "You come back here with a headache and a bill from the healer. Then you go again."
         },
         {
           "who": "greeter",
-          "text": "Nobody has died in the proving room in eleven years. That is not luck, it is the room."
+          "text": "Nobody has died in the proving room in eleven years. That is not luck, that is the room. It is also four people standing behind a grille you cannot see, being paid to be bored."
         }
       ],
       "choices": [
@@ -302,7 +302,7 @@
       "sets": []
     },
     "society.greeter.proving.go": {
-      "name": "Vail \u2014 into the proving room",
+      "name": "Vail — into the proving room",
       "cam": "close",
       "lines": [
         {
@@ -330,23 +330,43 @@
       ]
     },
     "society.greeter.essences": {
-      "name": "Vail \u2014 four essences",
+      "name": "Vail — four essences",
       "cam": "two",
       "lines": [
         {
           "who": "greeter",
-          "text": "You are standing there dripping, so I take it the elemental is gravel. Good."
+          "text": "You are standing there dripping, so I take it the elemental is gravel. Good. Sit down before you fall down."
         },
         {
           "who": "greeter",
-          "text": "Now the part that decides what you become. You take three essences. Whatever those three come to between them is the fourth, and nobody chooses that one \u2014 it chooses itself."
-        },
-        {
-          "who": "greeter",
-          "text": "One ability from each, to begin. You will grow into the rest, or you will not."
+          "text": "Now the part that decides what you become. Three essences. Whatever those three come to between them is the fourth, and nobody chooses that one — it chooses itself."
         }
       ],
       "choices": [
+        {
+          "say": "What is an essence, exactly?",
+          "goto": "society.greeter.essences.what",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.essences"
+            ]
+          ]
+        },
+        {
+          "say": "Nobody chooses the fourth?",
+          "goto": "society.greeter.essences.confluence",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.confluence"
+            ]
+          ]
+        },
         {
           "say": "Show me the essences.",
           "goto": "society.greeter.essences.pick",
@@ -362,7 +382,7 @@
       "sets": []
     },
     "society.greeter.essences.pick": {
-      "name": "Vail \u2014 the essence table",
+      "name": "Vail — the essence table",
       "cam": "none",
       "lines": [
         {
@@ -380,12 +400,12 @@
       ]
     },
     "society.greeter.member": {
-      "name": "Vail \u2014 registered",
+      "name": "Vail — registered",
       "cam": "two",
       "lines": [
         {
           "who": "greeter",
-          "text": "Signed, sealed, and iron rank. The second floor is open to you and Bel will stop looking at you like that."
+          "text": "Signed, sealed and iron rank. The second floor is open to you, and Bel will stop looking at you like that."
         },
         {
           "who": "greeter",
@@ -393,6 +413,30 @@
         }
       ],
       "choices": [
+        {
+          "say": "How do I use any of this?",
+          "goto": "society.greeter.abilities",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.casting"
+            ]
+          ]
+        },
+        {
+          "say": "How does the Society count what I do?",
+          "goto": "society.greeter.stars",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.stars"
+            ]
+          ]
+        },
         {
           "say": "What is on the higher floors?",
           "goto": "society.greeter.floors",
@@ -419,7 +463,7 @@
       ]
     },
     "society.greeter.newadventures": {
-      "name": "Vail \u2014 New Adventures",
+      "name": "Vail — New Adventures",
       "cam": "two",
       "lines": [
         {
@@ -451,7 +495,7 @@
       "sets": []
     },
     "society.greeter.brushoff": {
-      "name": "Vail \u2014 brushed off",
+      "name": "Vail — brushed off",
       "cam": "two",
       "lines": [
         {
@@ -465,7 +509,7 @@
       "sets": []
     },
     "society.greeter.done": {
-      "name": "Vail \u2014 parting",
+      "name": "Vail — parting",
       "cam": "none",
       "lines": [
         {
@@ -484,7 +528,7 @@
       ]
     },
     "society.quartermaster": {
-      "name": "Brann \u2014 the knife",
+      "name": "Brann — the knife",
       "cam": "two",
       "lines": [
         {
@@ -500,7 +544,26 @@
         {
           "say": "Any advice?",
           "goto": "society.quartermaster.advice",
-          "sets": []
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.brann.advice"
+            ]
+          ]
+        },
+        {
+          "say": "What is the wrong lesson?",
+          "goto": "society.quartermaster.lesson",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.brann.lesson"
+            ]
+          ]
         },
         {
           "say": "Thanks.",
@@ -512,7 +575,7 @@
       "sets": []
     },
     "society.quartermaster.advice": {
-      "name": "Brann \u2014 advice",
+      "name": "Brann — advice",
       "cam": "two",
       "lines": [
         {
@@ -524,12 +587,36 @@
           "text": "If it gets a foot in the dirt it starts putting itself back together faster than you are taking it apart. Then you have a long afternoon."
         }
       ],
-      "choices": [],
-      "next": "society.quartermaster.done",
-      "sets": []
+      "choices": [
+        {
+          "say": "What is the wrong lesson?",
+          "goto": "society.quartermaster.lesson",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.brann.lesson"
+            ]
+          ]
+        },
+        {
+          "say": "Stone. Understood.",
+          "goto": "society.quartermaster.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.brann.advice",
+          "value": true
+        }
+      ]
     },
     "society.quartermaster.done": {
-      "name": "Brann \u2014 parting",
+      "name": "Brann — parting",
       "cam": "none",
       "lines": [
         {
@@ -542,7 +629,7 @@
       "sets": []
     },
     "society.stair.refuse.iron": {
-      "name": "Stair \u2014 refused, iron",
+      "name": "Stair — refused, iron",
       "cam": "close",
       "lines": [
         {
@@ -551,7 +638,7 @@
         },
         {
           "who": "doorward",
-          "text": "Vail is at the desk behind you. Get signed, get proved, come back and I will not say a word."
+          "text": "Vail is at the desk behind you. Get signed, get proved, come back, and I will not say a word."
         }
       ],
       "choices": [],
@@ -559,7 +646,7 @@
       "sets": []
     },
     "society.stair.refuse.bronze": {
-      "name": "Stair \u2014 refused, bronze",
+      "name": "Stair — refused, bronze",
       "cam": "close",
       "lines": [
         {
@@ -568,7 +655,7 @@
         },
         {
           "who": "clerk_iron",
-          "text": "Close a few contracts off this board and the stair will let you by. It is not personal \u2014 it is a ledger."
+          "text": "Close a few off this board and the stair will let you by. It is not personal. It is a ledger."
         }
       ],
       "choices": [],
@@ -576,7 +663,7 @@
       "sets": []
     },
     "society.stair.refuse.silver": {
-      "name": "Stair \u2014 refused, silver",
+      "name": "Stair — refused, silver",
       "cam": "close",
       "lines": [
         {
@@ -585,7 +672,7 @@
         },
         {
           "who": "clerk_bronze",
-          "text": "The Society counts what you finish, not what you attempt. Finish more."
+          "text": "The Society counts what you finish, not what you attempt. So finish more, and do try to be dull about it."
         }
       ],
       "choices": [],
@@ -593,7 +680,7 @@
       "sets": []
     },
     "society.stair.refuse.gold": {
-      "name": "Stair \u2014 refused, gold",
+      "name": "Stair — refused, gold",
       "cam": "close",
       "lines": [
         {
@@ -602,7 +689,7 @@
         },
         {
           "who": "clerk_silver",
-          "text": "There are three contracts up there and the Chapter reads the names of everyone who goes up to look at them."
+          "text": "There are three contracts up there. The Chapter reads out the name of everyone who goes up to look at them, and I have heard that list read at funerals."
         }
       ],
       "choices": [],
@@ -610,58 +697,146 @@
       "sets": []
     },
     "society.clerk.iron": {
-      "name": "Clerk \u2014 iron",
+      "name": "Ostrey — iron floor",
       "cam": "two",
       "lines": [
         {
           "who": "clerk_iron",
-          "text": "Iron floor. Nine on the board this morning and there will be nine tomorrow, they are just not the same nine."
+          "text": "Iron floor. Nine on the board this morning and there will be nine tomorrow. They will not be the same nine."
         },
         {
           "who": "clerk_iron",
-          "text": "Take one you can walk to. The road is the part that kills iron adventurers, not the work."
+          "text": "Name at the bottom, date at the top, and the sheet comes back to me either way. Especially the ones that went wrong."
         }
       ],
-      "choices": [],
+      "choices": [
+        {
+          "say": "Which one should I take?",
+          "goto": "society.clerk.iron.pick",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.ostrey.pick"
+            ]
+          ]
+        },
+        {
+          "say": "What kills iron adventurers?",
+          "goto": "society.clerk.iron.road",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.ostrey.road"
+            ]
+          ]
+        },
+        {
+          "say": "Does any of this get me to bronze?",
+          "goto": "society.clerk.iron.stars",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.ostrey.stars"
+            ]
+          ]
+        },
+        {
+          "say": "I will read the board.",
+          "goto": "society.clerk.iron.done",
+          "sets": []
+        }
+      ],
       "next": null,
       "sets": []
     },
     "society.clerk.bronze": {
-      "name": "Clerk \u2014 bronze",
+      "name": "Malle — bronze floor",
       "cam": "two",
       "lines": [
         {
           "who": "clerk_bronze",
-          "text": "Bronze. The Society stops underwriting you here \u2014 if a bronze contract goes wrong, it goes wrong at your expense."
+          "text": "Bronze. Congratulations, the Society stops underwriting you here. If a bronze contract goes wrong it now goes wrong at your expense."
         },
         {
           "who": "clerk_bronze",
-          "text": "The board is still full. There is more of this than there are people willing to do it."
+          "text": "Board is still full, mind. There is more of this than there are people daft enough to do it."
         }
       ],
-      "choices": [],
+      "choices": [
+        {
+          "say": "Underwriting?",
+          "goto": "society.clerk.bronze.money",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.malle.money"
+            ]
+          ]
+        },
+        {
+          "say": "You do not sound impressed.",
+          "goto": "society.clerk.bronze.dry",
+          "sets": []
+        },
+        {
+          "say": "I will look.",
+          "goto": "society.clerk.bronze.done",
+          "sets": []
+        }
+      ],
       "next": null,
       "sets": []
     },
     "society.clerk.silver": {
-      "name": "Clerk \u2014 silver",
+      "name": "Vane — silver floor",
       "cam": "two",
       "lines": [
         {
           "who": "clerk_silver",
-          "text": "Silver. Five on the board, and every one of them started as a bronze contract that somebody did not come back from."
+          "text": "Silver. Five on the board."
         },
         {
           "who": "clerk_silver",
-          "text": "Read the whole sheet. Twice. The clients are not lying to you but they are not telling you everything either."
+          "text": "Every one of them started as a bronze contract somebody did not come back from. That is what makes them silver. Not the danger. The precedent."
         }
       ],
-      "choices": [],
+      "choices": [
+        {
+          "say": "How do I read one properly?",
+          "goto": "society.clerk.silver.read",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.vane.read"
+            ]
+          ]
+        },
+        {
+          "say": "You have been up here a long time.",
+          "goto": "society.clerk.silver.long",
+          "sets": []
+        },
+        {
+          "say": "Five is not many.",
+          "goto": "society.clerk.silver.done",
+          "sets": []
+        }
+      ],
       "next": null,
       "sets": []
     },
     "society.clerk.gold": {
-      "name": "Clerk \u2014 gold",
+      "name": "Ashenrow — gold floor",
       "cam": "two",
       "lines": [
         {
@@ -670,10 +845,26 @@
         },
         {
           "who": "clerk_gold",
-          "text": "I am obliged to say this out loud: taking one of these is not a contract, it is a decision about the rest of your life."
+          "text": "I am obliged to say this part out loud, so: taking one of these is not accepting a contract. It is a decision about the rest of your life. There. Said."
         }
       ],
-      "choices": [],
+      "choices": [
+        {
+          "say": "Why three?",
+          "goto": "society.clerk.gold.three",
+          "sets": []
+        },
+        {
+          "say": "Do you have to say that to everyone?",
+          "goto": "society.clerk.gold.obliged",
+          "sets": []
+        },
+        {
+          "say": "I only came up to look.",
+          "goto": "society.clerk.gold.done",
+          "sets": []
+        }
+      ],
       "next": null,
       "sets": []
     },
@@ -683,16 +874,778 @@
       "lines": [
         {
           "who": "narrator",
-          "text": "A walled floor, half laid in flagstone and half left as bare earth. Something at the far corner is already getting up."
+          "text": "A walled floor, half laid in flagstone and half left as bare earth. The door behind you is not a door any more."
         },
         {
           "who": "narrator",
-          "text": "It mends off the soil. Keep it on the stone."
+          "text": "Something in the far corner is already getting up. It comes apart where the knife goes in, and it puts itself back together anywhere its feet find soil."
+        },
+        {
+          "who": "narrator",
+          "text": "Keep it on the stone."
         }
       ],
       "choices": [],
       "next": null,
       "sets": []
+    },
+    "society.greeter.essences.what": {
+      "name": "Vail — what an essence is",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "A stone about the size of a plum, and it stops being a stone the moment you swallow it. After that it is part of how you are put together."
+        },
+        {
+          "who": "greeter",
+          "text": "Fire does not make you good at fire. It makes fire one of the things you are made of, and then your body works out what to do about that."
+        },
+        {
+          "who": "greeter",
+          "text": "One ability from each to begin. The rest come later, out of stones the Society does not hand out and does not ask where you got."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Nobody chooses the fourth?",
+          "goto": "society.greeter.essences.confluence",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.confluence"
+            ]
+          ]
+        },
+        {
+          "say": "Show me the essences.",
+          "goto": "society.greeter.essences.pick",
+          "sets": []
+        },
+        {
+          "say": "I will think about it.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.essences",
+          "value": true
+        }
+      ]
+    },
+    "society.greeter.essences.confluence": {
+      "name": "Vail — the confluence",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Confluence. Three essences sit together long enough and they agree on something none of them said."
+        },
+        {
+          "who": "greeter",
+          "text": "Some threes the registry knows by name. Some it does not, and then you write it up yourself and the Chapter files it under your name whether you wanted that or not."
+        },
+        {
+          "who": "greeter",
+          "text": "It cannot be traded, refused or swapped. This is the one door in the building that only opens the once."
+        }
+      ],
+      "choices": [
+        {
+          "say": "What is an essence, exactly?",
+          "goto": "society.greeter.essences.what",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.essences"
+            ]
+          ]
+        },
+        {
+          "say": "Then let me choose carefully.",
+          "goto": "society.greeter.essences.pick",
+          "sets": []
+        },
+        {
+          "say": "That is a lot to sign for.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.confluence",
+          "value": true
+        }
+      ]
+    },
+    "society.greeter.abilities": {
+      "name": "Vail — how to cast",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Reach for it the way you reach for a pocket. It is in there now; it does not need words."
+        },
+        {
+          "who": "greeter",
+          "text": "Right hand on the world opens what you can do with it — talk, trade, or cast. One to four if your hands are quicker than the menu, which in a fight they had better be."
+        },
+        {
+          "who": "greeter",
+          "text": "Four of them, and each one comes out looking like whatever it is made of. You will know which is which the first time you throw one."
+        }
+      ],
+      "choices": [
+        {
+          "say": "What does it cost?",
+          "goto": "society.greeter.abilities.cost",
+          "sets": []
+        },
+        {
+          "say": "And how does the Society count what I do?",
+          "goto": "society.greeter.stars",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.stars"
+            ]
+          ]
+        },
+        {
+          "say": "Understood.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.casting",
+          "value": true
+        }
+      ]
+    },
+    "society.greeter.abilities.cost": {
+      "name": "Vail — what it costs",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Mana. You have a shallow well of it and it fills back up on its own, slower than you will want."
+        },
+        {
+          "who": "greeter",
+          "text": "Iron adventurers die with a full well more often than an empty one. Spend it."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Right.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.quartermaster.lesson": {
+      "name": "Brann — the wrong lesson",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "quartermaster",
+          "text": "That the tool did it. Give a man a good blade for his first fight and he spends nine years thinking he won that one."
+        },
+        {
+          "who": "quartermaster",
+          "text": "This one is honest. If the thing falls over, that was you."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Any advice?",
+          "goto": "society.quartermaster.advice",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.brann.advice"
+            ]
+          ]
+        },
+        {
+          "say": "Fair enough.",
+          "goto": "society.quartermaster.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.brann.lesson",
+          "value": true
+        }
+      ]
+    },
+    "society.quartermaster.back": {
+      "name": "Brann — the knife back",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "quartermaster",
+          "text": "Knife."
+        },
+        {
+          "who": "player",
+          "text": "It is a bit blunter than it was."
+        },
+        {
+          "who": "quartermaster",
+          "text": "It was blunt when I gave it to you. You have chipped it, which is different, and which I am writing down."
+        },
+        {
+          "who": "quartermaster",
+          "text": "Go on. Vail wants you at the desk before she loses the paperwork on purpose."
+        }
+      ],
+      "choices": [
+        {
+          "say": "What do adventurers actually carry?",
+          "goto": "society.quartermaster.kit",
+          "sets": []
+        },
+        {
+          "say": "Thank you, Brann.",
+          "goto": "society.quartermaster.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.quartermaster.kit": {
+      "name": "Brann — what to carry",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "quartermaster",
+          "text": "Rope. Twice as much rope as you think. Then a lamp, then something to eat that is not going to go off in a bag."
+        },
+        {
+          "who": "quartermaster",
+          "text": "Everybody buys a sword. Nobody buys rope. Then a contract goes down a hole and I get a form to fill in."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Rope. Noted.",
+          "goto": "society.quartermaster.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.doorward.pass": {
+      "name": "Bel — on the roll",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "doorward",
+          "text": "There she is. On the roll, iron rank, and no longer my problem."
+        },
+        {
+          "who": "doorward",
+          "text": "Second floor. Take the stair slowly the first time — it is taller than it looks from down here and it does the walking for you."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Do you ever go up?",
+          "goto": "society.doorward.up",
+          "sets": []
+        },
+        {
+          "say": "Thanks, Bel.",
+          "goto": "society.doorward.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.doorward.up": {
+      "name": "Bel — does he go up",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "doorward",
+          "text": "Silver, when I was worth something. Then a contract in the Hollows went the way those go."
+        },
+        {
+          "who": "doorward",
+          "text": "Now I stand at the bottom of a staircase and tell people what they are. It is warm and nobody bleeds on me."
+        },
+        {
+          "who": "player",
+          "text": "That does not sound like nothing."
+        },
+        {
+          "who": "doorward",
+          "text": "No. It does not, does it."
+        }
+      ],
+      "choices": [
+        {
+          "say": "I will come back down and tell you how it went.",
+          "goto": "society.doorward.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.doorward.done": {
+      "name": "Bel — parting",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "doorward",
+          "text": "Up you go. Boards do not read themselves, more is the pity."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.iron.pick": {
+      "name": "Ostrey — which one",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "clerk_iron",
+          "text": "The one you can walk to before dark. Not the one that pays."
+        },
+        {
+          "who": "clerk_iron",
+          "text": "Everybody takes the one that pays. I have a drawer of sheets from people who took the one that pays."
+        }
+      ],
+      "choices": [
+        {
+          "say": "What kills iron adventurers?",
+          "goto": "society.clerk.iron.road",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.ostrey.road"
+            ]
+          ]
+        },
+        {
+          "say": "Before dark. Right.",
+          "goto": "society.clerk.iron.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.ostrey.pick",
+          "value": true
+        }
+      ]
+    },
+    "society.clerk.iron.road": {
+      "name": "Ostrey — the road",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "clerk_iron",
+          "text": "The road. Not the work — the road. Four hours out, four hours back, and the thing you were sent for takes ten minutes."
+        },
+        {
+          "who": "clerk_iron",
+          "text": "It is tired that gets you. Take water. Take a second pair of socks. I am entirely serious about the socks."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Which one should I take?",
+          "goto": "society.clerk.iron.pick",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.ostrey.pick"
+            ]
+          ]
+        },
+        {
+          "say": "Socks. Noted.",
+          "goto": "society.clerk.iron.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.ostrey.road",
+          "value": true
+        }
+      ]
+    },
+    "society.clerk.iron.done": {
+      "name": "Ostrey — parting",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "clerk_iron",
+          "text": "Good. Come back and tell me it was boring. Boring is my favourite word."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.bronze.money": {
+      "name": "Malle — who pays",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "clerk_bronze",
+          "text": "Iron, the Society covers your healer and your funeral. It is cheap for them and it keeps the intake up."
+        },
+        {
+          "who": "clerk_bronze",
+          "text": "Bronze, you carry it. Read the fee, then read what it would cost you to be wrong, and take the difference seriously."
+        }
+      ],
+      "choices": [
+        {
+          "say": "You do not sound impressed.",
+          "goto": "society.clerk.bronze.dry",
+          "sets": []
+        },
+        {
+          "say": "Understood.",
+          "goto": "society.clerk.bronze.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.malle.money",
+          "value": true
+        }
+      ]
+    },
+    "society.clerk.bronze.dry": {
+      "name": "Malle — nine years of this",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "clerk_bronze",
+          "text": "Nine years on this floor. I have stamped the sheet of everybody who ever got to silver out of this chapter."
+        },
+        {
+          "who": "clerk_bronze",
+          "text": "Eleven of them. I could tell you all their names. I would rather tell you about the socks, honestly, but Ostrey has that one."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Eleven.",
+          "goto": "society.clerk.bronze.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.bronze.done": {
+      "name": "Malle — parting",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "clerk_bronze",
+          "text": "Go on. And sign it yourself — I am not forging another one."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.silver.read": {
+      "name": "Vane — read it twice",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "clerk_silver",
+          "text": "Twice. Once for what it says and once for what it does not."
+        },
+        {
+          "who": "clerk_silver",
+          "text": "The clients are not lying to you. They are telling you the part they understand, and the part they do not understand is the part that is going to be waiting for you."
+        },
+        {
+          "who": "clerk_silver",
+          "text": "When a sheet is short, ask why it is short."
+        }
+      ],
+      "choices": [
+        {
+          "say": "You have been up here a long time.",
+          "goto": "society.clerk.silver.long",
+          "sets": []
+        },
+        {
+          "say": "Twice. All right.",
+          "goto": "society.clerk.silver.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.vane.read",
+          "value": true
+        }
+      ]
+    },
+    "society.clerk.silver.long": {
+      "name": "Vane — a long time",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "clerk_silver",
+          "text": "I keep the sheets of the ones that came back as well. People only ever ask about the others."
+        },
+        {
+          "who": "player",
+          "text": "How many is that?"
+        },
+        {
+          "who": "clerk_silver",
+          "text": "More. It is always more. Nobody believes me and I stopped minding about a decade ago."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Thank you.",
+          "goto": "society.clerk.silver.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.silver.done": {
+      "name": "Vane — parting",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "clerk_silver",
+          "text": "Take your time on the stair. Nobody up here is in a hurry any more."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.gold.three": {
+      "name": "Ashenrow — why three",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "clerk_gold",
+          "text": "Two have been on that board for a year and the province has arranged itself around them. Roads moved. A village moved."
+        },
+        {
+          "who": "clerk_gold",
+          "text": "The third went up in the spring. I would rather it had not."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Do you have to say that to everyone?",
+          "goto": "society.clerk.gold.obliged",
+          "sets": []
+        },
+        {
+          "say": "I see.",
+          "goto": "society.clerk.gold.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.gold.obliged": {
+      "name": "Ashenrow — obliged",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "clerk_gold",
+          "text": "To everyone who reaches this floor, yes. It is nine words in the charter and I have said them four times in eleven years."
+        },
+        {
+          "who": "clerk_gold",
+          "text": "Twice to the same man. He is the reason it is nine words and not four."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Four times.",
+          "goto": "society.clerk.gold.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.gold.done": {
+      "name": "Ashenrow — parting",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "clerk_gold",
+          "text": "The stair is behind you. Nothing up here is going anywhere."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.greeter.stars": {
+      "name": "Vail — stars",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Stars. Four to a rank. You get them for closing contracts, and a contract that nearly killed you counts for more than one that did not."
+        },
+        {
+          "who": "greeter",
+          "text": "Four stars at iron and the Society will hear an application for bronze. It is not automatic. Somebody reads the file."
+        },
+        {
+          "who": "player",
+          "text": "Who reads it?"
+        },
+        {
+          "who": "greeter",
+          "text": "I do. So bring the sheets back, and write on them like a person and not like somebody hiding something."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Where do I see them?",
+          "goto": "society.greeter.stars.where",
+          "sets": []
+        },
+        {
+          "say": "Understood.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.stars",
+          "value": true
+        }
+      ]
+    },
+    "society.greeter.stars.where": {
+      "name": "Vail — the record",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "You carry a copy. Everyone does — rank, stars, what you took and what it gave you."
+        },
+        {
+          "who": "greeter",
+          "text": "The Society keeps the other one, and ours has more in it than yours does. That is not a threat, it is a filing system."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Fair enough.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.iron.stars": {
+      "name": "Ostrey — getting to bronze",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "clerk_iron",
+          "text": "Four stars, and then Vail decides. Every sheet you bring back is a line on the file."
+        },
+        {
+          "who": "clerk_iron",
+          "text": "The ones that go wrong are lines too, mind. Better lines, sometimes. A person who came back and wrote down exactly how it went is worth two who came back and said it was fine."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Which one should I take?",
+          "goto": "society.clerk.iron.pick",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.knows.ostrey.pick"
+            ]
+          ]
+        },
+        {
+          "say": "Noted.",
+          "goto": "society.clerk.iron.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.ostrey.stars",
+          "value": true
+        }
+      ]
     }
   }
 }

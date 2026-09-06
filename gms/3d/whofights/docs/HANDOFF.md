@@ -278,6 +278,15 @@ generated tracks and is deliberately left tracked.
 - **Every class in `style.css` is `wf-` prefixed** (`.wf-row`, `.wf-grp`, `.wf-presets`,
   `.wf-shots`, `.wf-adv`; `.pad` is scoped to `#touch`). A bare `.row` in there silently reshaped a
   dev-hub toolbar — this stylesheet shares a document with that overlay. Keep new names prefixed.
+- **`js/game/game.css` has the same hazard *inside itself*.** Everything there is `g-` prefixed
+  already, which is not enough: it is one 1500-line stylesheet shared by a dozen screens, and a
+  new screen taking a name an old one owns inherits its layout. Three did in one afternoon —
+  `.g-chip` (the HUD's absolutely-positioned notification) stacked four essence names over the
+  player sheet's title, `.g-sheet` (the full-screen slide-in panel) pinned that sheet to the left
+  edge, and `.g-head` is the pause menu's header. All three were found by opening a screenshot.
+  **`js/game/css.test.mjs` is the guard**: a class with a rule block to itself may have exactly
+  one, and every class the game's JS builds must be one the stylesheet knows about. Run
+  `node tools/test.mjs css` before naming anything.
 - **`tools/shot.mjs` is the corrected version**, rooted two levels up with the page path in `base`,
   so the `../../lib/three/` importmap resolves. Every render in `shots/` was opened and checked;
   they contain real geometry, not blank frames.

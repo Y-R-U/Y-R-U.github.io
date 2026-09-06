@@ -77,6 +77,10 @@ export class Player {
     this.camAim = new THREE.Vector3();
     this.swing = 0;
     this.castEdge = false;
+    // The slot a number key asked for this frame, or null. Parked here rather than read straight
+    // off the input because the player is the only thing that reads input, and js/game/casting.js
+    // must not see a press the player itself refused — driven, free or disabled.
+    this.spellEdge = null;
     this.vy = 0;
     this.airborne = false;
     this.jumpHeight = 1.15;
@@ -299,6 +303,7 @@ export class Player {
         this.yaw += d * (1 - Math.exp(-11 * dt));
       }
       if (cmd.attack) { this.swing = 1; this.castEdge = true; }
+      if (cmd.spell != null) this.spellEdge = cmd.spell;
     } else {
       sp = this.walkSpeed || 0;
     }

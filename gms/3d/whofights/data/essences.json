@@ -10,6 +10,14 @@
         "destructive"
       ],
       "blurb": "The loudest essence on the table and the one every unranked adventurer reaches for first. It is not a bad choice. It is only never a surprising one.",
+      "spell": {
+        "shape": "bolt",
+        "core": "#fff0c4",
+        "edge": "#f0761f",
+        "bloom": "#8d2408",
+        "void": null,
+        "flare": 1.5
+      },
       "abilities": [
         {
           "id": "fire.brand",
@@ -30,7 +38,7 @@
           "name": "Kiln Ward",
           "kind": "defence",
           "cost": "mana, sustained",
-          "text": "A shell of standing heat. It does not stop a blade \u2014 it stops the hand behind it from wanting to try twice."
+          "text": "A shell of standing heat. It does not stop a blade — it stops the hand behind it from wanting to try twice."
         },
         {
           "id": "fire.cinder",
@@ -56,6 +64,14 @@
         "vital"
       ],
       "blurb": "Patient, and the only essence on this table that has kept more adventurers alive than it has killed.",
+      "spell": {
+        "shape": "lance",
+        "core": "#ddf3ff",
+        "edge": "#3f8fbf",
+        "bloom": "#16456b",
+        "void": null,
+        "flare": 1.0
+      },
       "abilities": [
         {
           "id": "water.mend",
@@ -102,6 +118,14 @@
         "vital"
       ],
       "blurb": "Slow, heavy, and the reason the thing in the proving room would not die. Earth does not win fights quickly; it wins them last.",
+      "spell": {
+        "shape": "shards",
+        "core": "#e7d6ac",
+        "edge": "#8a7148",
+        "bloom": "#4a3a22",
+        "void": null,
+        "flare": 0.9
+      },
       "abilities": [
         {
           "id": "earth.skin",
@@ -148,6 +172,14 @@
         "mental"
       ],
       "blurb": "The essence that decides where a fight happens, which is very nearly the same as deciding how it ends.",
+      "spell": {
+        "shape": "cut",
+        "core": "#ffffff",
+        "edge": "#9fc0cc",
+        "bloom": "#5c8390",
+        "void": null,
+        "flare": 1.2
+      },
       "abilities": [
         {
           "id": "wind.step",
@@ -193,7 +225,15 @@
         "entropic",
         "mental"
       ],
-      "blurb": "Void takes things away. Heat, sound, weight, the space between two points \u2014 and, if you are careless with it, the parts of you that were using them.",
+      "blurb": "Void takes things away. Heat, sound, weight, the space between two points — and, if you are careless with it, the parts of you that were using them.",
+      "spell": {
+        "shape": "fold",
+        "core": "#cbb6ff",
+        "edge": "#5b4a75",
+        "bloom": "#2a1f3d",
+        "void": "#05030a",
+        "flare": 0.8
+      },
       "abilities": [
         {
           "id": "void.step",
@@ -240,6 +280,14 @@
         "mental"
       ],
       "blurb": "Doom does not damage. It arranges. Everything it touches goes on to have the worst luck it plausibly could, and then a little more.",
+      "spell": {
+        "shape": "weight",
+        "core": "#d9a3b4",
+        "edge": "#6d2a3c",
+        "bloom": "#2c0f18",
+        "void": "#120309",
+        "flare": 0.7
+      },
       "abilities": [
         {
           "id": "doom.mark",
@@ -286,13 +334,21 @@
         "destructive"
       ],
       "blurb": "The essence that refuses to do the same thing twice. Powerful, unreliable, and disliked by everybody who has to plan around it.",
+      "spell": {
+        "shape": "scatter",
+        "core": "#ffd9f4",
+        "edge": "#b0479b",
+        "bloom": "#4a1350",
+        "void": null,
+        "flare": 1.4
+      },
       "abilities": [
         {
           "id": "chaos.bolt",
           "name": "Wild Strike",
           "kind": "attack",
           "cost": "mana",
-          "text": "A bolt of something. Fire, cold, sound, light, rot \u2014 it is different every time and it is never nothing."
+          "text": "A bolt of something. Fire, cold, sound, light, rot — it is different every time and it is never nothing."
         },
         {
           "id": "chaos.shift",
@@ -332,6 +388,14 @@
         "destructive"
       ],
       "blurb": "Not fire, not force. The plain fact of a thing having been ruined, applied directly and without the intermediate steps.",
+      "spell": {
+        "shape": "ruin",
+        "core": "#ffd9a8",
+        "edge": "#c9483a",
+        "bloom": "#4d1109",
+        "void": "#14060a",
+        "flare": 1.6
+      },
       "abilities": [
         {
           "id": "dest.blow",
@@ -345,7 +409,7 @@
           "name": "Shatter",
           "kind": "attack",
           "cost": "mana",
-          "text": "Anything worked \u2014 a blade, a wall, a bound spell \u2014 comes apart along the seams the work put in it."
+          "text": "Anything worked — a blade, a wall, a bound spell — comes apart along the seams the work put in it."
         },
         {
           "id": "dest.spread",
@@ -377,7 +441,15 @@
         "mental",
         "utility"
       ],
-      "blurb": "Moves things that are not yours to move \u2014 a blade, a footing, an intention. The Society files more complaints about this essence than the other eleven together.",
+      "blurb": "Moves things that are not yours to move — a blade, a footing, an intention. The Society files more complaints about this essence than the other eleven together.",
+      "spell": {
+        "shape": "hand",
+        "core": "#cfeee0",
+        "edge": "#4f7f6b",
+        "bloom": "#1e3b31",
+        "void": null,
+        "flare": 1.0
+      },
       "abilities": [
         {
           "id": "man.hand",
@@ -424,6 +496,14 @@
         "utility"
       ],
       "blurb": "The essence the Society most wants in a party and most rarely gets, because it is the one that never gets to decide how a fight goes.",
+      "spell": {
+        "shape": "bloom",
+        "core": "#eaffc9",
+        "edge": "#6fa844",
+        "bloom": "#2d5218",
+        "void": null,
+        "flare": 1.1
+      },
       "abilities": [
         {
           "id": "life.mend",
@@ -469,7 +549,15 @@
         "mental",
         "entropic"
       ],
-      "blurb": "Not the absence of light \u2014 the presence of somewhere for a thing to be that is not being looked at.",
+      "blurb": "Not the absence of light — the presence of somewhere for a thing to be that is not being looked at.",
+      "spell": {
+        "shape": "shadow",
+        "core": "#9aa6d6",
+        "edge": "#2f3550",
+        "bloom": "#0d1020",
+        "void": "#030409",
+        "flare": 0.6
+      },
       "abilities": [
         {
           "id": "dark.step",
@@ -483,7 +571,7 @@
           "name": "Unlit",
           "kind": "utility",
           "cost": "mana, sustained",
-          "text": "You are hard to look at directly. Not invisible \u2014 people simply keep finding somewhere else to have been looking."
+          "text": "You are hard to look at directly. Not invisible — people simply keep finding somewhere else to have been looking."
         },
         {
           "id": "dark.blind",
@@ -516,6 +604,14 @@
         "destructive"
       ],
       "blurb": "Costly, immediate, and the essence with the worst reputation and the best survival rate at iron rank.",
+      "spell": {
+        "shape": "draw",
+        "core": "#ffb0b0",
+        "edge": "#8c2033",
+        "bloom": "#3a0a12",
+        "void": null,
+        "flare": 1.2
+      },
       "abilities": [
         {
           "id": "blood.price",
@@ -790,7 +886,7 @@
     {
       "id": "plague",
       "name": "Plague",
-      "blurb": "Blood, life and doom \u2014 the three essences the Society requires a written reason for.",
+      "blurb": "Blood, life and doom — the three essences the Society requires a written reason for.",
       "abilities": [
         {
           "id": "plg.spread",

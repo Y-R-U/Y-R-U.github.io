@@ -177,6 +177,26 @@ export class Terrain {
     }
   }
 
+  // An authored floor patch (js/editor/scene.js `plot`). Same mark `addPatch` makes, but no
+  // surface and no colour: the plot draws its own slab over this, so all the terrain has to do is
+  // stop growing things through it. The arena is used by every contract and grass coming up
+  // between its flagstones is the one thing that reads as unfinished from across the room.
+  //
+  // Inflated by half a grid cell, because `paved()` samples the cell a point rounds into: without
+  // it a tuft up to a metre inside the edge lands on a cell whose centre is outside the rect and
+  // grows anyway.
+  addFloor(x, z, hw, hd, rot = 0) {
+    const c = Math.cos(-rot), s = Math.sin(-rot);
+    const ew = hw + GS / 2, ed = hd + GS / 2;
+    const r = Math.hypot(ew, ed);
+    for (let dz = -r; dz <= r; dz += GS) {
+      for (let dx = -r; dx <= r; dx += GS) {
+        const lx = dx * c - dz * s, lz = dx * s + dz * c;
+        if (Math.abs(lx) <= ew && Math.abs(lz) <= ed) this.occ[this.gi(x + dx, z + dz)] |= 1 | PAVED;
+      }
+    }
+  }
+
   blocked(x, z) { return (this.occ[this.gi(x, z)] & 1) === 1; }
 
   // Inside a building you can walk into. Footprints overlap — the academy's corner towers reach

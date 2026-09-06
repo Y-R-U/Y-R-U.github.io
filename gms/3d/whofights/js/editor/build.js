@@ -131,6 +131,10 @@ export class SceneBuilder {
       const [hw, hd] = footprint(o);
       seats.set(o.id, { r: T2.range(o.x, o.z, hw, hd, o.ry), hw, hd });
       if (register) T2.addFootprint(o.x, o.z, hw, hd, o.ry, { hollow: !!o.p?.hall });
+      // A laid floor is not a building: the footprint alone leaves scatter free to grow through
+      // it, because the wall-footing pass deliberately ignores `blocked`. `paved` is the mark that
+      // stops it, and a plot is exactly what that mark is for.
+      if (register && FLOOR_TYPES.has(o.type)) T2.addFloor(o.x, o.z, hw, hd, o.ry);
     }
 
     const cells = new Map();

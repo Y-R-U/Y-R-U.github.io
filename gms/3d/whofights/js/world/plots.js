@@ -23,6 +23,11 @@ const KIT = {
   dirt: { tex: z => textureSet(z, 'road'), tile: 4.0, rough: 0.99, tint: [0.74, 0.56, 0.40] },
   sand: { tex: z => textureSet(z, 'road'), tile: 3.0, rough: 0.99, tint: [1.24, 1.12, 0.86] },
   grass: { tex: z => textureSet(z, 'ground'), tile: 5.0, rough: 0.97, tint: [1, 1, 1] },
+  // Standing water, and burnt ground. Both are the same two baked textures taken a long way with
+  // a tint and a roughness — a real water shader is a feature, and what these have to do is be
+  // legible from across an arena as somewhere a monster mends.
+  water: { tex: z => flagSet(z, 1.15, 4.6), tile: 6.0, rough: 0.18, tint: [0.34, 0.62, 0.86] },
+  ash: { tex: z => textureSet(z, 'road'), tile: 3.6, rough: 1.0, tint: [0.30, 0.28, 0.29] },
 };
 
 const cache = new Map();

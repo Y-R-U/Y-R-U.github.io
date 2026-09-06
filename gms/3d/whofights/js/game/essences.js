@@ -30,8 +30,13 @@ export function normalise(raw) {
       colour: typeof e.colour === 'string' ? e.colour : '#888888',
       tags: Array.isArray(e.tags) ? e.tags.filter(t => typeof t === 'string') : [],
       blurb: String(e.blurb || ''),
+      // What it looks like coming out of a hand — js/game/spells.js reads this and nothing else
+      // does. Kept verbatim rather than field-by-field: the shape names and the palette are that
+      // module's contract with the data, and re-listing them here would be two places to change.
+      spell: e.spell && typeof e.spell === 'object' ? { ...e.spell } : null,
       abilities,
     };
+    if (!essences[id].spell) warnings.push(`${id}: no spell look`);
   }
   const confluences = (Array.isArray(raw?.confluences) ? raw.confluences : [])
     .filter(c => c && c.id && c.name)

@@ -2,12 +2,17 @@
 // world keeps rendering and running behind it, and it closes on the ✕, on Escape, or on a tap
 // anywhere off the sheet.
 //
-// Everything it shows is an example (js/game/contracts.js). The point of the screen is the ladder
-// — what iron is, what gold is, and which rung you are on — so the locked state is stated once at
-// the top and then worn quietly by each row rather than shouted on every one.
+// The point of the screen is the ladder — what iron is, what gold is, and which rung you are on —
+// so the locked state is stated once at the top and then worn quietly by each row rather than
+// shouted on every one.
+//
+// Iron rows are takeable: a job with a `mission` (js/game/missions.js) gets a button that walks
+// the player out to it. The higher boards are still standing there to be wanted; a row with no
+// mission says nothing about it rather than offering a button that apologises.
 
 import { el, toast } from './ui.js';
 import { BOARDS, boardView, adventurerView, RANK_LABEL, RANK_FLOOR } from './contracts.js';
+import { playable } from './missions.js';
 
 const NEW = 'board.new';
 const money = n => `${n.toLocaleString('en-GB')} marks`;
@@ -18,9 +23,10 @@ export function boardTitle(id) {
 }
 
 export class Noticeboard {
-  constructor({ host, flags = () => ({}), onOpen = () => {}, onClose = () => {} }) {
+  constructor({ host, flags = () => ({}), onOpen = () => {}, onClose = () => {}, onTake = null }) {
     this.host = host;
     this.flags = flags;
+    this.onTake = onTake;
     this.onOpen = onOpen;
     this.onClose = onClose;
     this.root = null;
@@ -109,6 +115,15 @@ export class Noticeboard {
       // Named once per row and no more. The band at the top already says where the player stands,
       // and five repetitions of "you are unranked" is a telling-off rather than a rule.
       if (j.lock) card.append(el('div', 'g-job-lock', `⛊ ${j.lock.why}`));
+      else if (this.onTake && playable(j.id)) {
+        const foot = el('div', 'g-job-take');
+        const done = !!this.flags()[`contract.done.${j.id}`];
+        if (done) foot.append(el('em', null, '✓ Closed once already'));
+        const b = el('button', 'g-take-b', done ? 'Take it again' : 'Take this contract');
+        b.onclick = () => { this.close(); this.onTake(j.id); };
+        foot.append(b);
+        card.append(foot);
+      }
       list.append(card);
     }
     body.append(list);

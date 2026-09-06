@@ -561,7 +561,7 @@
       "actions": [
         {
           "k": "bark",
-          "who": "registrar",
+          "who": "greeter",
           "category": "greet"
         }
       ]
@@ -748,11 +748,36 @@
       "trigger": "interact",
       "once": false,
       "cooldown": 1,
-      "if": null,
+      "if": [
+        "not",
+        [
+          "flag",
+          "society.test.passed"
+        ]
+      ],
       "actions": [
         {
           "k": "say",
           "node": "society.quartermaster"
+        }
+      ]
+    },
+    {
+      "id": "hs.quartermaster.back",
+      "name": "Return the proving knife",
+      "attach": "quartermaster",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "flag",
+        "society.test.passed"
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.quartermaster.back"
         }
       ]
     },
@@ -775,6 +800,25 @@
         {
           "k": "say",
           "node": "society.stair.refuse.iron"
+        }
+      ]
+    },
+    {
+      "id": "hs.doorward.pass",
+      "name": "Speak to Warden Bel",
+      "attach": "doorward",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "flag",
+        "society.registered"
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.doorward.pass"
         }
       ]
     }

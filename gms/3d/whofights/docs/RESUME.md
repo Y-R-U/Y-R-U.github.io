@@ -3,7 +3,8 @@
 Read this first on resume. `docs/DEV_CONTRACT.md` is still binding; `docs/HANDOFF.md` describes
 the *scaffold* pass and is now partly out of date — where the two disagree, this file is newer.
 
-**Nothing in this pass has been committed.** `git -C ~/cc/yru/site status` will show it all.
+The first pass (the five-storey Society, the proving, essences, the controls) is committed as
+`dd0ee802`. **The second pass — §6 below — is not.** `git -C ~/cc/yru/site status` shows it.
 
 ---
 
@@ -23,6 +24,18 @@ Aaron asked for, in this order:
 3. **Essences.** Then pick essences, which decide what skills you can get, one ability each.
 4. **Controls.** Desktop: Space = jump, left click = attack, right click = an interact menu with
    *cast a spell / talk / trade offer*.
+
+Then, as a second batch:
+
+5. **Better dialogue**, and a fix for lines that overlapped the choice buttons at the end of a
+   conversation.
+6. **Basic spells, like FORGE's** — different colours and looks per essence type.
+7. **Iron contracts made playable**, so they can be tested; monsters reused across missions with
+   *variations*, so the board can change over time by varying rows rather than by building levels.
+8. **A player sheet** — rank with stars, and experience to the next star.
+9. **A mission panel** — transparent, minimised by default, click to expand.
+10. **Health bars over the player's and NPCs' heads** rather than in a corner.
+11. **The stair**: smoother to start climbing, and much faster up and down.
 
 Four decisions Aaron made when asked:
 
@@ -223,3 +236,165 @@ node tools/shot.mjs --shot=corner --set=level=proving
 7. **Controls have changed**: Space is jump (was attack), left button attacks, right button and
    long-press open the interact menu. `Input.read()` now returns `jump` and `interact` alongside
    `attack`, and drains all three even when locked.
+
+
+---
+
+## 6. Second pass — spells, contracts, the sheet, the panel, the head bars, the stair
+
+Everything below is **uncommitted** at the time of writing. `node tools/test.mjs` → **478 across
+48 files**. Driven tests:
+
+```bash
+node js/dev/contract.uitest.mjs     # 33 checks: the sheet, the board, the arena, casting, xp, a star
+node js/dev/stair.uitest.mjs        # the climb, after it was made faster
+node js/dev/proving.uitest.mjs      # unchanged, still the proving
+node js/dev/controls.uitest.mjs     # unchanged
+```
+
+### 6.1 Dialogue
+
+- **The overlap Aaron reported is `place()`.** A floating bubble lives in `.g-world` at z-index 3
+  and the choice band in `.g-scene` at 1, so a speaker standing low on screen — which is most of
+  them once the camera has pulled in to `close` — put the last line straight over the buttons.
+  `place()` now takes an `avoid` rectangle and `DialogueBox.follow()` measures the band each
+  frame; a speaker whose head is behind the band has nowhere to hang a bubble from, so the line
+  docks into the band's own flex column above the choices. `js/game/place.test.mjs` is new (9
+  tests) and one of them is the bug.
+- `data/conversations.json` went from 25 nodes to **48**. The four clerks were four signposts in
+  Vail's voice; they are four people now, each with two branches and a parting line. New beats:
+  what an essence *is* and what a confluence *is* (before the irreversible choice, not after),
+  how to cast and what it costs, Brann taking the knife back after the proving, Brann on what to
+  carry, and Warden Bel once you are on the roll — including why he is standing at the bottom of
+  a staircase.
+- Two new hotspots on bodies that already existed (`hs.quartermaster.back`, `hs.doorward.pass`),
+  both mutually exclusive with the one they replace. `hs.greeter.near` barked as `registrar`,
+  which is not a character id — it is `greeter`.
+- Two new tests in `conversations.test.mjs`: **nobody has two hotspots answering at once** (the
+  bug that hit the greeter in the first pass, now checked for every body and six save states) and
+  **every node is reachable** from a hotspot, a character, another node, or — for the stair
+  refusals alone — from `session.js`'s own template.
+
+### 6.2 Spells
+
+Forge's `js/world/spell.js` is the parent. Split three ways:
+
+- **`js/game/spells.js`** (pure) — the well (100 mana, 6.5/s, always), what a cast costs, and the
+  `SHAPES` table. **There is no per-ability tuning table and there must not be one**: sixty
+  essence abilities and fifty-four confluence ones is a spreadsheet that would drift from
+  `data/essences.json` inside a week. The ability's `kind` is the tuning (ten of them, `KINDS`);
+  its essence's `spell` block is the look.
+- **`data/essences.json`** — every essence gained a `spell` block: a shape name and a
+  core/edge/bloom/void palette. Twelve shapes, one each, and nothing in the code branches on an
+  essence id, so a thirteenth essence is data and no code.
+- **`js/world/spellfx.js`** (three) — two particle clouds, one additive and one normal-blended,
+  because additive cannot draw darker than the room and void/doom/dark/destruction have to. Every
+  difference between fire and water is a row in `SHAPES`: `fall` arcs the bolt, `wobble` makes
+  chaos stray, `curve` bends manipulation in late, `pull` runs the burst inward, `grow` widens
+  life's trail, `ring` sizes the mark on the floor, `hole` opens the dark core.
+- **`js/game/casting.js`** — where the well, the particles and the fight meet. The damage is
+  resolved on this module's own clock against a flight time agreed up front
+  (`SpellFX.flightTime`), so a dropped frame cannot eat a hit the player paid mana for.
+- The **confluence** spell is blended from the three essences that made it (`blendSpell`), because
+  nobody authored a palette for 220 triples and the fourth ability genuinely is the other three.
+  `spells.test.mjs` walks all 220 and asserts every one of the four resolves to a drawable shape.
+- **Controls**: the interact menu → *Cast a spell* still works and now really casts, and **1–4**
+  cast the four abilities directly. A menu takes about a second to reach and an elemental is
+  already swinging by then.
+- `KNIFE`/`PLAYER_HP` moved to **`js/game/weapons.js`** so `bestiary.test.mjs` can reach the
+  yardstick without reaching three.
+
+### 6.3 The bestiary, and missions as variations
+
+- **`js/game/bestiary.js`** — one body, many monsters. `js/world/elemental.js` now takes a
+  `{rock, seam}` palette, and those two colours plus a tuning patch are the whole difference
+  between an earth elemental and a brine one. **7 kinds × 6 variants = 42 monsters**, and
+  `bestiary.test.mjs` proves every one of them is killable with the proving knife inside a minute
+  and that no variant ever touches the *tell* (`windup`, `reach`, `arc`).
+- **`js/game/missions.js`** — a mission varies along exactly four axes: `zone` (the whole
+  palette), `floor`, `patch` (the two surfaces, which decide where anything that mends can stand)
+  and `spawns`. `patchArena()` is a JSON transform over `data/levels/arena.json` and the result
+  goes through `js/editor/scene.js` `normalise()` exactly as an authored level would, so a
+  mission cannot smuggle a field past validation. **This is the answer to "vary missions over
+  time": change four rows, not build a level.**
+- `data/levels/arena.json` is new (the proving's geometry, no foes, a `mission.begin` hotspot),
+  and `loadLevel`/`LevelSwap.to` take an optional `patch`.
+- All **nine iron contracts are playable**. `missions.test.mjs` asserts the board is nine
+  different fights rather than one nine times, and that the ones the writing promises will mend
+  are fought where they can.
+- Two new surfaces, `water` and `ash`, in `ground.js` and `plots.js`.
+- **The grass through the flagstones is fixed**, and it mattered more once one arena was doing the
+  work of nine. The wall-footing scatter ignores `blocked` on purpose — that ring is exactly where
+  its anti-sticker tufts belong — and only refuses `paved`, which nothing was marking for a floor
+  patch. `Terrain.addFloor()` makes that mark (no surface and no colour: the plot draws its own
+  slab), inflated by half a grid cell because `paved()` samples the cell a point rounds into.
+  `build.js` calls it for every `FLOOR_TYPES` object. The proving floor now reads as stone and
+  dirt from the gate, which is the whole legibility of that fight.
+
+### 6.4 Rank, stars and experience
+
+- **`js/game/progress.js`** — four ranks, four stars each, and the ladder is a **lifetime total**
+  rather than a per-rank pool, so each rank starts where the one below ended. The first version
+  had bronze's first star at 260 against an iron top of 380, which handed a free star on
+  promotion; `progress.test.mjs` has that as a named test.
+- Experience is the room's own worth off the bestiary (`Combat.worth`), so a contract that swaps
+  in a bigger monster pays more without a number being edited. The xp formula is under a square
+  root on purpose — multiplied straight, the iron board spanned twelve to one and there would
+  have been exactly one contract worth taking.
+- **`js/game/sheet.js`** — the player sheet, on the boards' own parchment. Opened by the ★ button
+  beside the menu.
+- **`js/game/missionpanel.js`** — the contract in hand. Transparent, minimised to one line, opens
+  on a tap.
+
+### 6.5 Head bars
+
+`js/game/healthbars.js`, projected the same way the speech bubble is. The two corner bars are
+gone: they never said whose health they were, and in a room with three things in it they could
+not. Elements are pooled by key and hidden rather than rebuilt.
+
+### 6.6 The stair
+
+Aaron: *"clunky trying to start walking up… make it go up and down much faster."*
+
+- **The clunk was the aim test.** `watch()` measured how squarely you were walking against the
+  line from the landing to the newel, which is right for a straight cottage flight and wrong for
+  a helix — the Society's stair leaves its landing along a *tangent*, so a player walking exactly
+  the way the treads go scored nearly zero and simply was not picked up. It takes **the better of
+  two directions** now: at the newel, or along the flight's own first step (`Climb.leaves`).
+  Replacing one with the other was wrong in the other direction and the stair test caught it —
+  the refusal conversation stopped firing, because the test walks the player straight at the
+  stair and that is how anybody approaches one.
+- Capture radius 1.6 → 2.1, the speed you have to be walking 0.7 → 0.45.
+- **Pace 2.2 → 4.6 up and 5.6 down**, eased in from whatever the player was already doing over
+  0.28 s so the handover is not a snap from a stroll to a sprint. The camera easing rates were
+  tuned at 2.2 and are scaled with the pace, or the camera would lag three times as far round the
+  helix and swing into the newel.
+- Faster and stickier together produced a **yo-yo**: arriving on a floor going up leaves you on
+  that floor's *down* landing, and a stick still steering into the stair takes you straight back.
+  `Climb.blocked` holds the landing a climb arrived at shut until the player steps off it. A timer
+  was tried and reverted — one long enough to be worth having is one a held stick outlasts, and
+  that is what cost two of the four storeys in the descent leg of the stair test.
+  **Known cost:** the top floor and the ground floor have only one landing each, so arriving there
+  and turning straight round means walking two metres off the landing before the stair will take
+  you again. Worth revisiting; a rule keyed on the player having *stopped* would be better if it
+  can be made not to reopen the yo-yo.
+
+### 6.7 Three class collisions, and the guard for them
+
+`.g-chip`, `.g-sheet` and `.g-head` were all already taken by other screens in `game.css`. All
+three were found by *looking at a screenshot*. `js/game/css.test.mjs` is new and would have caught
+all three: **a class with a rule block to itself may have exactly one.** It also checks that every
+class the game's JS builds is one the stylesheet knows about. Mine are `g-esschip`, `g-record*`,
+`g-headbar*`, `g-mission*`, `g-stars`, `g-xpbar`, `g-rankband`, `g-take-b`.
+
+### 6.8 What is left
+
+- Bronze contracts have no missions yet — the next piece, and it is nine `mission:` blocks in
+  `contracts.js` plus whatever new kinds the bestiary wants.
+- Nothing promotes you. `progress.promote()` exists and is tested; no conversation calls it, so
+  four stars at iron is where the ladder currently stops.
+- Still no economy behind *Trade offer*, and still no awakening stones.
+- The stair holds shut the landing a climb arrived at until you step off it (see §6.6), which at
+  the top and ground floors — one landing each — means two metres of walking before you can turn
+  straight round. A rule keyed on the player having *stopped* would be better if it can be made
+  not to reopen the yo-yo.

@@ -60,6 +60,19 @@ await p.eval(`(() => {
     return g ? window.__world(g) : null;
   };
   window.__rank = r => { window.__wf.game.doc.flags['society.rank'] = r; };
+  // Every question the stair asked the rank gate, and every answer. The gate is only half the
+  // feature — being turned back is meant to be a person saying so — and a refusal that never
+  // fires looks exactly like a wall.
+  const c = window.__wf.doors.climb;
+  const inner = c.gate;
+  window.__gate = [];
+  c.gate = (from, to) => { const why = inner ? inner(from, to) : null; window.__gate.push([from, to, why]); return why; };
+  // And every conversation the refusal path tried to open, with whether it opened. The seen list
+  // alone cannot tell 'nobody was refused' from 'somebody was, and the node would not open'.
+  const g = window.__wf.game;
+  const said = g.say.bind(g);
+  window.__said = [];
+  g.say = id => { const ok = said(id); window.__said.push([id, ok]); return ok; };
   return true;
 })()`);
 
@@ -67,7 +80,10 @@ const state = () => p.eval(`(() => {
   const P = window.__wf.player, D = window.__wf.doors, I = D.interior;
   return { y: +P.pos.y.toFixed(2), x: +P.pos.x.toFixed(2), z: +P.pos.z.toFixed(2),
     state: D.state, floors: I ? I.floors : 0, level: I ? +(I.level).toFixed(2) : null,
-    onStair: !!(I && I.onStair), climb: D.climb.report() };
+    onStair: !!(I && I.onStair), climb: D.climb.report(),
+    limit: I ? I.climbLimit : null,
+    floorYs: I ? [0, 1, 2].map(n => +I.floorY(n).toFixed(2)) : null,
+    refused: D.climb.refused, rank: window.__wf.game.doc.flags['society.rank'] || null };
 })()`);
 
 const drive = async (to, secs = 8) => {
@@ -96,6 +112,14 @@ await drive({ x: centre.x, z: centre.z }, 4);
 s = await state();
 check(Math.abs(s.y - ground) < 1.0, `unranked, the stair did not carry him up (y ${s.y} vs ${ground})`);
 check(await p.eval('!!window.__wf.game.doc.flags["society.doorway.seen"] || true'), 'session is live');
+// Being turned back is meant to be a person saying so, not a wall. Warden Bel is the one at the
+// foot of the flight, and this is the unranked half of the rule.
+const saidSoFar = () => p.eval('JSON.stringify(window.__said)').then(JSON.parse);
+check((await saidSoFar()).some(([id, ok]) => id === 'society.stair.refuse.iron' && ok),
+  `Bel came over to say so (${JSON.stringify(await saidSoFar())})`);
+// And it stays open until it is read, which is the point of it — but it also means every later
+// refusal is dropped rather than stacked, so the test has to read it before asking again.
+await p.eval('window.__wf.game.dialogue.close(); window.__said.length = 0; true');
 
 // ── with iron rank it does ──────────────────────────────────────────────────────────────────
 await p.eval('window.__rank("iron"); true');
@@ -108,12 +132,25 @@ check(s.state === 'in', 'still inside after the climb');
 await p.shot(`${OUT}/floor1.png`);
 
 // ── and stops at the next one ───────────────────────────────────────────────────────────────
+// Every refusal conversation the box has opened. The gate is only half the feature — being turned
+// back is meant to be somebody saying so, and the aim test that decides whether the stair noticed
+// you at all is the part that was rewritten.
+await p.eval('window.__wf.game.dialogue.close(); window.__said.length = 0; true');
 const up1 = await p.eval('JSON.stringify(window.__landing(1, true))').then(JSON.parse);
 check(!!up1, 'the Iron floor has a landing of its own');
 await drive({ x: up1.x, z: up1.z }, 6);
 await drive({ x: centre.x, z: centre.z }, 6);
 s = await state();
-check(Math.abs(s.y - iron) < 1.0, `iron rank was turned back from bronze (y ${s.y} vs ${iron})`);
+const asked = await p.eval('JSON.stringify(window.__gate)').then(JSON.parse);
+const said = await p.eval('JSON.stringify(window.__said)').then(JSON.parse);
+// A step or two onto the flight before the room pushes him back off it is expected and is what a
+// player walking into a stair they may not use should feel. A storey is ~7.9 m; the rule is that
+// he did not climb one. The old 1.0 m was inside the noise of where the push-off catches him and
+// failed about one run in three.
+check(s.y - iron < 2.5,
+  `iron rank was turned back from bronze (y ${s.y} vs ${iron}; ${JSON.stringify({ limit: s.limit, floorYs: s.floorYs, onStair: s.onStair, rank: s.rank })})`);
+check(said.some(([id, ok]) => id === 'society.stair.refuse.bronze' && ok),
+  `and a person came over to say so (said ${JSON.stringify(said)}; gate asked ${JSON.stringify(asked.slice(0, 8))})`);
 
 // ── gold rank walks the whole building ──────────────────────────────────────────────────────
 await p.eval('window.__rank("gold"); true');

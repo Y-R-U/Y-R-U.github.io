@@ -20,7 +20,13 @@ import { el } from './ui.js';
 import { Combat } from './combat.js';
 import { EssenceSheet } from './essencesheet.js';
 import { InteractMenu, SpellList, optionsFor } from './interactmenu.js';
-import { load as loadEssences } from './essences.js';
+import { load as loadEssences, held as heldEssences } from './essences.js';
+import { Casting } from './casting.js';
+import { HealthBars } from './healthbars.js';
+import { ARENA, jobFor, briefOf, patchArena, worthOf } from './missions.js';
+import { award, sheet as progressSheet, XP_FLAG } from './progress.js';
+import { PlayerSheet } from './sheet.js';
+import { MissionPanel } from './missionpanel.js';
 
 // Where the proving puts you back: in front of the Registrar's desk on the ground floor, facing
 // her, and inside the building rather than out on the road. `inside` is the door index the swap
@@ -59,6 +65,7 @@ export class Session {
       host: this.host,
       flags: () => this.doc.flags,
       onOpen: id => { if (id === 'board.new') nudge(this.host); },
+      onTake: id => this.takeContract(id),
     });
 
     this.voice = new Voice({
@@ -113,6 +120,9 @@ export class Session {
       host: this.host,
       onMenu: () => this.menu.toggle(),
       onInteract: () => this.interact(),
+      // The essence table is loaded lazily, so opening the sheet is what pays for it — a save that
+      // never registers never loads a table of sixty abilities to show four of them.
+      onSheet: () => this.openSheet(),
     });
 
     // A tap in the 3D view fires whichever `click` hotspot contains the point the ray landed on,
@@ -120,7 +130,8 @@ export class Session {
     this.tap = new WorldTap({
       app,
       stage: document.getElementById('stage'),
-      blocked: () => this.menu.open || this.board.open || this.dialogue.active || !!this.essences?.open || this.spells.open,
+      blocked: () => this.menu.open || this.board.open || this.dialogue.active
+        || !!this.essences?.open || this.spells.open || !!this.sheet?.open,
       onPoint: p => this.hotspots.press(p, ['click']),
       onAlt: (p, screen) => this.openInteract(p, screen),
     });
@@ -132,14 +143,32 @@ export class Session {
     this.spells = new SpellList({
       host: this.host,
       abilities: () => this.awakened(),
-      // Nothing casts yet: js/game/combat.js knows about a knife and nothing else. Saying so is
-      // better than a button that appears to work and does not.
-      onCast: a => this.toast(`${a.name} — no target, and nothing to spend yet.`, { ms: 3600, level: 'g-low' }),
+      state: a => this.casting?.state(a),
+      onCast: a => this.castSpell(a),
+    });
+
+    this.heads = new HealthBars({ app, host: this.host });
+    this.mission = new MissionPanel({ host: this.host });
+    this.sheet = new PlayerSheet({
+      host: this.host,
+      progress: () => this.progress(),
+      essences: () => (this.essences?.doc ? heldEssences(this.essences.doc, this.doc.essences) : null),
+      abilities: () => this.awakened(),
+      marks: () => this.doc.items.marks || 0,
+      contract: () => this.activeContract(),
+      played: () => this.doc.played,
     });
 
     this.installStairGate(opts.doors);
     this.combat = new Combat({ app, player, level: this.level, session: this });
+    // Casting is installed on every level, not only ones with something to fight: Vail tells you
+    // to go and try it somewhere the ceiling is not hers, and a game that answers that with
+    // nothing would be lying about what it just gave you.
+    this.casting = new Casting({ app, player, session: this, combat: this.combat });
     this.installCombat();
+    this.installMissions();
+    // A save reloaded mid-contract still has one in hand.
+    this.mission.set(this.activeContract());
     this.applySettings();
     this.autosave = new Autosave(() => this.snapshot());
   }
@@ -153,6 +182,7 @@ export class Session {
     });
     this.bus.addEventListener('combat.end', e => {
       const won = e.detail?.outcome === 'won';
+      if (this.level.id === ARENA) return this.finishContract(won);
       if (this.level.id !== 'proving') return;
       if (won) {
         this.doc.flags['society.test.passed'] = true;
@@ -167,6 +197,71 @@ export class Session {
       }
     });
   }
+
+  // ── contracts ────────────────────────────────────────────────────────────
+  // Taking one off the board is a level swap into the arena with the contract's own four axes
+  // painted on it (js/game/missions.js). What comes back is an outcome, and what an outcome means
+  // is a question about the Society — which is why it is answered here and not in combat.js.
+
+  takeContract(jobId) {
+    const job = jobFor(jobId);
+    if (!job?.mission) { this.toast('Nothing to walk to on that one yet.', { ms: 3000, level: 'g-low' }); return false; }
+    if (this.level.id === ARENA) { this.toast('Finish the one you are on.', { ms: 2600, level: 'g-low' }); return false; }
+    this.board.close();
+    this.doc.flags['contract.active'] = jobId;
+    this.autosave.mark();
+    const brief = briefOf(jobId);
+    this.mission?.set(brief);
+    this.gotoLevel(ARENA, null, raw => patchArena(raw, job.mission, job));
+    setTimeout(() => this.toast(`${job.name} — ${brief.foes}.`, { ms: 5200 }), 1400);
+    return true;
+  }
+
+  activeContract() {
+    const id = this.doc.flags['contract.active'];
+    return id ? briefOf(id) : null;
+  }
+
+  // Both the arena and the proving room begin their fight on a hotspot rather than on load, so a
+  // player who walks in and reads the room is not jumped by something that spawned behind them.
+  installMissions() {
+    this.bus.addEventListener('mission.begin', () => {
+      if (this.combat.begin()) {
+        const b = this.activeContract();
+        this.toast(b?.note || 'Clear the floor.', { ms: 5200 });
+      }
+    });
+  }
+
+  // Won, and the Society writes it down. Experience is the room's own worth, off the bestiary, so
+  // a contract that swapped in a bigger monster pays more without a number being edited anywhere.
+  finishContract(won) {
+    const id = this.doc.flags['contract.active'];
+    const job = id ? jobFor(id) : null;
+    if (!job) return this.gotoLevel('society', BACK_TO_DESK);
+    if (!won) {
+      this.toast('Down, and the contract stands unfinished.', { ms: 4400 });
+      return void setTimeout(() => this.gotoLevel('society', BACK_TO_DESK), 2600);
+    }
+    const gain = worthOf(job.mission);
+    const r = award(this.doc.flags, gain);
+    this.doc.flags[XP_FLAG] = r.xp;
+    this.doc.flags[`contract.done.${id}`] = true;
+    this.doc.flags['contract.active'] = null;
+    this.doc.items.marks = (this.doc.items.marks || 0) + job.reward;
+    this.autosave.mark();
+    this.mission?.set(null);
+    this.toast(`${job.name} — closed. ${gain} experience, ${job.reward} marks.`, { ms: 5200 });
+    if (r.starGained) {
+      setTimeout(() => this.toast(`${r.after.stars} ${r.after.stars === 1 ? 'star' : 'stars'} at ${r.after.rankLabel} rank.`, { ms: 5200 }), 1600);
+    }
+    if (r.rankReady) {
+      setTimeout(() => this.toast(`Four stars. Speak to the desk about ${r.after.nextRankLabel}.`, { ms: 6000 }), 3400);
+    }
+    setTimeout(() => this.gotoLevel('society', BACK_TO_DESK), 2800);
+  }
+
+  progress() { return progressSheet(this.doc.flags); }
 
   // The stair is the rank ladder. js/world/climb.js asks before it takes the player over, so a
   // floor you have not earned is a walk that never starts rather than a climb that is undone at
@@ -309,19 +404,66 @@ export class Session {
 
   // What the save has actually awakened, resolved against the table if it is loaded. Before the
   // essence table has ever been opened this is empty, which is the honest answer.
+  // Memoised on the exact list the save holds and the table that resolved it: this is read every
+  // frame for the mana bar, and it walks every essence and confluence row to do it.
   awakened() {
     const doc = this.essences?.doc;
     const saved = this.doc.essences;
     if (!doc || !saved?.abilities?.length) return [];
+    const key = `${saved.abilities.join(',')}|${saved.confluence}`;
+    if (this.awokeKey === key && this.awokeDoc === doc) return this.awoke;
     const out = [];
     const rows = [...Object.values(doc.essences), ...doc.confluences];
     for (const id of saved.abilities) {
       for (const r of rows) {
         const a = r.abilities.find(x => x.id === id);
-        if (a) { out.push({ ...a, fromName: r.name }); break; }
+        // `from` is what js/game/spells.js looks the palette up by, and `confluence` is what tells
+        // it to blend the three instead. Dropping either was why the fourth spell came out white.
+        if (a) { out.push({ ...a, from: r.id, fromName: r.name, confluence: !doc.essences[r.id] }); break; }
       }
     }
+    this.awokeKey = key;
+    this.awokeDoc = doc;
+    this.awoke = out;
+    this.casting?.setSlots(out);
     return out;
+  }
+
+  // One route in for both ways of casting — the sheet under the interact menu, and the number
+  // keys. A refusal is said out loud: mana that quietly does nothing is the same to a player as a
+  // broken button.
+  castSpell(a) {
+    if (!a) return false;
+    const r = this.casting.cast(a);
+    if (!r.ok) { this.toast(r.why, { ms: 2600, level: 'g-low' }); return false; }
+    this.bus.dispatchEvent(new CustomEvent('spell.cast', { detail: { id: a.id, target: r.target } }));
+    return true;
+  }
+
+  // Drained here rather than in the player, for the reason stairRefusal() is: the press happens
+  // deep inside the movement update, and a cast resolved from there would spawn particles against
+  // a player position that is still being pushed out of a wall.
+  drainCast() {
+    const slot = this.player.spellEdge;
+    if (slot == null) return;
+    this.player.spellEdge = null;
+    if (this.dialogue.active || this.board.open || this.menu.open || this.essences?.open) return;
+    const list = this.awakened();
+    const a = list[slot];
+    if (!a) {
+      if (list.length) this.toast(`Nothing in slot ${slot + 1}.`, { ms: 2000, level: 'g-low' });
+      else this.toast('No essences yet.', { ms: 2400, level: 'g-low' });
+      return;
+    }
+    this.castSpell(a);
+  }
+
+  // The sheet needs the essence table to name what the player took, and that table is fetched on
+  // first use. Opening twice while the fetch is in flight must not open two of them.
+  openSheet() {
+    if (this.sheet.open) return this.sheet.close();
+    if (this.essences || !this.doc.essences?.picked?.length) return this.sheet.show();
+    return this.loadEssenceTable().then(() => this.sheet.show());
   }
 
   showScreen(id) {
@@ -369,7 +511,7 @@ export class Session {
   // reload there is a black screen, a boot splash and the world built twice for a fight that lasts
   // a minute. The fade is not decoration: the swap takes a few frames whatever happens, and a cut
   // straight from the Society's hall to a walled yard reads as a glitch rather than as a door.
-  gotoLevel(id, at) {
+  gotoLevel(id, at, patch = null) {
     if (!this.swap || this.swap.busy) return false;
     this.dialogue.close?.();
     this.board.close();
@@ -377,7 +519,7 @@ export class Session {
     // Two frames of fade before the work starts, or the swap's own hitch eats the transition and
     // the screen goes black only after it has already happened.
     setTimeout(() => {
-      this.swap.to(id, at, (doc, built) => this.adoptLevel(doc, built))
+      this.swap.to(id, at, (doc, built) => this.adoptLevel(doc, built), patch)
         .catch(e => {
           console.warn(`level ${id}: ${e.message}`);
           this.toast(`Could not open ${id}.`);
@@ -390,6 +532,9 @@ export class Session {
   // Everything that reads the level, re-pointed. `hotspots.load` resets the fired/cooldown state
   // with it, which is right: a `once` hotspot in the arena is once per visit to the arena.
   adoptLevel(doc, built) {
+    // Particles in flight were drawn against a world that is about to be disposed, and a banked
+    // spell hit names a foe index in a fight that no longer exists.
+    this.casting.reset();
     this.level = doc;
     this.o.level = doc;
     this.o.world = built.world;
@@ -438,14 +583,53 @@ export class Session {
     // The fight runs whether or not a bubble is up: a conversation that starts mid-swing must not
     // freeze the elemental with its arm back.
     this.combat.update(dt);
-    const busy = this.dialogue.active || this.board.open || !!this.essences?.open || this.menuAt.open || this.spells.open;
+    this.drainCast();
+    this.casting.update(dt);
+    const busy = this.dialogue.active || this.board.open || !!this.essences?.open
+      || this.menuAt.open || this.spells.open || !!this.sheet?.open;
     if (!busy) this.hotspots.update(dt, this.player.pos);
     this.stairRefusal();
     this.hud.setPrompt(busy ? null : this.reachable());
-    this.hud.setVitals(...this.combat.bars());
+    this.heads.track(this.headBars());
+    const live = this.combat.foes.filter(f => f.state !== 'dead' && f.hp > 0).length;
+    this.mission.progress(live, this.combat.foes.length);
     this.autoDetect(dt);
     this.doc.played += dt;
     this.autosave.tick(dt);
+  }
+
+  // Who has a bar over their head this frame. The player's own appears when there is anything to
+  // say with it — a fight, a wound, or mana that is not full — and otherwise the hall is left
+  // clean, which is the whole reason these are not two permanent bars in a corner.
+  headBars() {
+    const out = [];
+    const P = this.player;
+    const [me] = this.combat.bars();
+    const mana = this.awakened().length ? this.casting.mana : null;
+    const fighting = this.combat.foes.length > 0 && !this.combat.ended;
+    const hurt = me != null && me < 0.999;
+    const spent = mana != null && mana < 0.999;
+    if (P.enabled && !P.free && (fighting || hurt || spent)) {
+      out.push({
+        key: 'player', kind: 'me', name: '',
+        // Tighter to the head than a foe's is, because the player is always the nearest body to
+        // the camera and the same world offset is three times the pixels there — at +0.34 the bar
+        // floated half a metre clear of the hood.
+        world: { x: P.pos.x, y: P.pos.y + P.height + 0.08, z: P.pos.z },
+        fraction: me == null ? 1 : me, mana,
+      });
+    }
+    for (let i = 0; i < this.combat.foes.length; i++) {
+      const f = this.combat.foes[i];
+      if (f.state === 'dead' || f.hp <= 0) continue;
+      const spec = this.combat.spec[i] || {};
+      out.push({
+        key: `foe${i}`, kind: 'foe', name: this.combat.nameOf(i),
+        world: { x: f.x, y: this.combat.groundY(f.x, f.z) + 2.5 * (spec.scale || 1), z: f.z },
+        fraction: f.max > 0 ? f.hp / f.max : 0,
+      });
+    }
+    return out;
   }
 
   // The prompt names whatever pressing would actually answer — same geometry, same predicates,

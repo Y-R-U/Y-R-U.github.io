@@ -6,7 +6,9 @@
 // possibly rotated, and they are tested in document order with the LAST match winning, so a patch
 // laid over another patches it exactly the way it looks like it does.
 
-export const SURFACES = ['dirt', 'stone', 'grass', 'sand'];
+// Every surface a level may lay. `dirt`, `water` and `ash` are the three a monster can mend from
+// — see js/game/bestiary.js — which is why an arena is designed around which of them it has.
+export const SURFACES = ['dirt', 'stone', 'grass', 'sand', 'water', 'ash'];
 
 export const DEFAULT_SURFACE = 'grass';
 
@@ -26,6 +28,10 @@ export function surfaceAt(plots, x, z, fallback = DEFAULT_SURFACE) {
 }
 
 export const isDirt = (plots, x, z) => surfaceAt(plots, x, z) === 'dirt';
+
+// The general form. A monster names the surface it mends from and this answers whether it is
+// standing on one; a monster that names nothing never mends, wherever it is stood.
+export const isHealing = (plots, x, z, surface) => !!surface && surfaceAt(plots, x, z) === surface;
 
 // Every plot in a level document, in document order. `plot` objects have no `inside`: a floor
 // patch is the ground, and the ground belongs to the world.

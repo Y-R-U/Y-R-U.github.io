@@ -4,6 +4,7 @@ import { run, open, visibleChoices } from './dialogue.js';
 import { validateAction } from './actions.js';
 import { normaliseCast } from './characters.js';
 import { Hotspots } from './hotspots.js';
+import { RANKS } from './contracts.js';
 
 const pack = JSON.parse(readFileSync(new URL('../../data/conversations.json', import.meta.url))).nodes;
 const cast = normaliseCast(JSON.parse(readFileSync(new URL('../../data/characters.json', import.meta.url)))).cast;
@@ -95,4 +96,59 @@ test('Vail always has something to say, whatever the save knows', () => {
     ok(open(pack, node, { flags, seen: everySeen }), `${node} still opens for ${JSON.stringify(flags)}`);
     ok(visibleChoices(pack[node], { flags }).length >= 2, `${node} offers him questions to ask`);
   }
+});
+
+// Same shape as the greeter rule, and the same bug waiting: two hotspots on one body whose
+// predicates both answer means the player presses a person and gets whichever the array happens
+// to list first. Brann and Bel each got a second one when the proving landed.
+test('nobody has two hotspots answering at once', () => {
+  const level = JSON.parse(readFileSync(new URL('../../data/levels/society.json', import.meta.url)));
+  const saves = [
+    {},
+    { 'society.met.registrar': true },
+    { 'society.met.registrar': true, 'society.test.entered': true },
+    { 'society.test.passed': true },
+    { 'society.test.passed': true, 'society.essences.chosen': true },
+    { 'society.test.passed': true, 'society.essences.chosen': true, 'society.registered': true,
+      'society.rank': 'iron' },
+  ];
+  const bodies = [...new Set(level.hotspots.map(h => h.attach).filter(Boolean))];
+  for (const flags of saves) {
+    for (const who of bodies) {
+      const at = cast[who]?.place;
+      if (!at) continue;
+      const hs = new Hotspots(level.hotspots, { flags, characterAt: () => at });
+      const open = hs.candidates(at, ['interact']).filter(h => h.attach === who);
+      ok(open.length <= 1, `${who}: ${open.length} hotspots for ${JSON.stringify(flags)}`);
+      for (const h of open) {
+        const node = h.actions.find(a => a.k === 'say')?.node;
+        if (node) ok(pack[node], `${h.id} says a node that exists`);
+      }
+    }
+  }
+});
+
+// Every new node has to be reachable, or it is writing nobody will ever see. A node is reached
+// either from a hotspot, a character, another node's `goto`/`next`, or — for the stair refusals
+// alone — from a template in session.js, which is why that one coupling is spelled out here.
+test('every conversation node is reachable from somewhere', () => {
+  const level = JSON.parse(readFileSync(new URL('../../data/levels/society.json', import.meta.url)));
+  const proving = JSON.parse(readFileSync(new URL('../../data/levels/proving.json', import.meta.url)));
+  const reached = new Set();
+  const eat = list => { for (const a of list || []) if (a.k === 'say' && a.node) reached.add(a.node); };
+  for (const l of [level, proving]) for (const h of l.hotspots || []) eat(h.actions);
+  for (const c of Object.values(cast)) eat(c.actions);
+  // js/game/session.js stairRefusal(): `society.stair.refuse.${why}`, one per rank you can be
+  // turned back from. A rank with no node there falls through to a toast, which is the mute
+  // version of the whole feature.
+  for (const rank of RANKS.filter(r => r !== 'none')) {
+    const id = `society.stair.refuse.${rank}`;
+    ok(pack[id], `no refusal written for the ${rank} stair`);
+    reached.add(id);
+  }
+  for (const n of Object.values(pack)) {
+    if (n.next) reached.add(n.next);
+    for (const c of n.choices || []) if (c.goto) reached.add(c.goto);
+  }
+  for (const id of ids) ok(reached.has(id), `${id} is written but nothing opens it`);
 });

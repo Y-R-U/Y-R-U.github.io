@@ -12,10 +12,15 @@ export async function loadIndex(base = 'data/levels') {
   return list.filter(l => l && typeof l.id === 'string');
 }
 
-export async function loadLevel(id, base = 'data/levels') {
+// `patch` is handed the raw JSON before it is normalised, which is how a contract dresses the
+// arena — see js/game/missions.js. Deliberately before rather than after: a patched document goes
+// through exactly the same validation an authored one does, so a mission cannot smuggle a field
+// past it.
+export async function loadLevel(id, base = 'data/levels', patch = null) {
   const r = await fetch(`${base}/${id}.json`);
   if (!r.ok) throw new Error(`level ${id}: ${r.status}`);
-  const out = normalise(await r.json());
+  const raw = await r.json();
+  const out = normalise(patch ? patch(raw) : raw);
   if (!out.doc) throw new Error(`level ${id}: ${out.error}`);
   out.doc.id = out.doc.id || id;
   return out;

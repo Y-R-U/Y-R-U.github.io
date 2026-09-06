@@ -144,19 +144,34 @@ export class DialogueBox {
 
   // Re-places the floating bubble each frame, and drops it into the band the moment its speaker
   // stops being somewhere a bubble can point at.
+  //
+  // The choice band goes to place() as a rectangle to clear. It has to: the band is inside
+  // `.g-scene` at z-index 1 and a floating bubble is inside `.g-world` at 3, so a speaker standing
+  // low on screen — which is most of them, at the end of a conversation, when the camera has
+  // pulled in to `close` — put the last line straight over the buttons the player was being asked
+  // to press. When there is no room left above the band the bubble docks into it instead.
   follow(dt) {
     const b = this.bubble;
     if (!b || !this.anchors || !this.speaker) return;
     const pt = this.anchors.screen(this.speaker);
     const r = b.getBoundingClientRect();
     const box = { x: EDGE, y: EDGE, w: innerWidth - EDGE * 2, h: innerHeight - EDGE * 2 };
-    const at = pt && r.width ? place({ pt, w: r.width, h: r.height, box }) : null;
+    const at = pt && r.width ? place({ pt, w: r.width, h: r.height, box, avoid: this.bandRect() }) : null;
     this.setMode(at ? 'float' : 'dock');
     if (!at) return;
     b.style.transform = `translate(${Math.round(at.x)}px, ${Math.round(at.y)}px)`;
     b.style.setProperty('--tail', `${(at.tail * 100).toFixed(1)}%`);
     b.classList.toggle('g-below', at.below);
     b.classList.toggle('g-behind', this.anchors.sampleOcclusion(dt, pt.world));
+  }
+
+  // The choice band's rectangle, or null when nothing is in it. Measured rather than remembered:
+  // the list is scrollable and its height depends on how many choices survived their predicates.
+  bandRect() {
+    const c = this.choices;
+    if (!c?.isConnected || !c.getBoundingClientRect) return null;
+    const r = c.getBoundingClientRect();
+    return r.height ? { x: r.left, y: r.top, w: r.width, h: r.height } : null;
   }
 
   setMode(mode) {
@@ -225,6 +240,7 @@ export class DialogueBox {
     this.wantArm = null;
     this.mode = null;
     this.bubble = null;
+    this.choices = null;
     this.speaker = null;
     this.spoke = null;
     this.voice?.stop();
@@ -263,6 +279,7 @@ export class DialogueBox {
     clear(this.root);
     clear(this.world);
     this.bubble = null;
+    this.choices = null;
     this.mode = null;
     this.shown = false;
     if (!s) return;
@@ -277,6 +294,7 @@ export class DialogueBox {
         box.append(b);
       });
       this.root.append(box);
+      this.choices = box;
       this.shown = true;
     }
 
