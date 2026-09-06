@@ -113,17 +113,18 @@ check(await p.eval('document.querySelectorAll("#game .g-take-b").length >= 8'),
   'every iron row on the board offers to be taken');
 await p.shot(`${OUT}/board.png`);
 
-await p.eval('window.__wf.game.takeContract("iron.lamps"); true');
+// A `clear` contract for this lap — the lamps are a `survive` one now and have their own below.
+await p.eval('window.__wf.game.takeContract("iron.rats"); true');
 check(await p.waitFor('window.__wf.level.id === "arena"', 25000), 'it walked him out to the arena');
 check(await p.eval('performance.getEntriesByType("navigation").length === 1'), 'without a reload');
 await sleep(2600);
 let s = await state();
 check(s.zone === 'dark', `the contract painted the arena dark (${s.zone})`);
 check(s.surfaces.filter(x => x === 'ash').length === 4, `and laid four ash corners (${s.surfaces.join(',')})`);
-check(s.foes.length === 3, `three of them are standing (${s.foes.length})`);
-check(s.names.every(n => n.includes('Ember')), `and they are ember elementals (${s.names.join(', ')})`);
+check(s.foes.length === 2, `two of them are standing (${s.foes.length})`);
+check(s.names.every(n => n.includes('Shade')), `and they are shades (${s.names.join(', ')})`);
 check(s.panel, 'the mission panel is up');
-check(s.heads === 4, `a bar over each of the three, and over the player (${s.headKeys.join(' | ')})`);
+check(s.heads === 3, `a bar over each of them, and over the player (${s.headKeys.join(' | ')})`);
 check(s.headKeys.some(k => k.startsWith('player@')), 'the player has one of their own');
 check(s.headKeys.every(k => {
   const [, box] = k.split(' ');
@@ -210,6 +211,28 @@ await sleep(2000);
 s = await state();
 check(s.xp > firstXp, `the second contract added to the first (${firstXp} → ${s.xp})`);
 check(s.stars >= 1, `and crossed the first star (${s.stars})`);
+
+// ── a contract you survive rather than clear ────────────────────────────────────────────────
+// The one that proves the clock and the waves: the floor being empty at eleven seconds must not
+// win it, and outlasting the clock must.
+await p.eval('window.__wf.game.takeContract("iron.ledger"); true');
+check(await p.waitFor('window.__wf.level.id === "arena"', 25000), 'a survive contract goes out');
+check(await p.waitFor('!!window.__wf.game.run', 20000), 'and starts a clock');
+const run = await p.eval('JSON.stringify({ o: window.__wf.game.run.objective, s: window.__wf.game.run.seconds, w: window.__wf.game.run.waves.length })').then(JSON.parse);
+check(run.o === 'survive' && run.s > 30 && run.w >= 2, `with an objective and waves (${JSON.stringify(run)})`);
+check(await p.eval('window.__wf.game.combat.expecting === true'), 'and combat knows more is coming');
+// Kill everything early. With a wave outstanding this must NOT end it.
+await p.eval('window.__wf.game.combat.foes = window.__wf.game.combat.foes.map(f => ({ ...f, hp: 0, state: "dead" })); true');
+await sleep(1200);
+check(await p.eval('window.__wf.game.combat.ended === null'), 'an empty floor with a wave still to come is not a win');
+check(await p.eval('!!document.querySelector("#game .g-mission-clock")'), 'the panel is counting down');
+await p.shot(`${OUT}/survive.png`);
+// Wind the clock past the end rather than waiting a minute for it.
+await p.eval('window.__wf.game.run.t = window.__wf.game.run.seconds - 0.2; window.__wf.game.run.waves.length = 0; true');
+check(await p.waitFor('window.__wf.game.combat.ended === "won"', 8000), 'and outlasting it wins');
+check(await p.waitFor('window.__wf.level.id === "society"', 25000), 'and it brings him back');
+await sleep(1800);
+check(await p.eval('window.__wf.game.run === null'), 'the clock does not survive the level it belonged to');
 
 // ── the sheet again, with a star on it ──────────────────────────────────────────────────────
 await p.eval('window.__wf.game.openSheet(); true');

@@ -387,10 +387,36 @@ all three: **a class with a rule block to itself may have exactly one.** It also
 class the game's JS builds is one the stylesheet knows about. Mine are `g-esschip`, `g-record*`,
 `g-headbar*`, `g-mission*`, `g-stars`, `g-xpbar`, `g-rankband`, `g-take-b`.
 
-### 6.8 What is left
+### 6.8 Completing the Iron board — objectives and waves
 
-- Bronze contracts have no missions yet — the next piece, and it is nine `mission:` blocks in
-  `contracts.js` plus whatever new kinds the bestiary wants.
+Nine contracts that all say "kill everything in the room" is one afternoon nine times however
+different the monsters are, and half of the iron board's own writing is about *waiting* — walking
+a lamp round for eight nights, sitting with a ledger until it stops. So a mission has a fifth
+axis, `objective`:
+
+- **`clear`** (the default) — the floor empty, as before.
+- **`survive`** with `seconds` — still standing when the clock runs out. Clearing the floor early
+  also wins it, but only once nothing more is coming.
+
+And `waves`: `[{at, spawns}]`, the same spawn list arriving later rather than at the gate. Each
+wave is fanned from a different quarter of the ring so the second group does not walk out of the
+first's footprints. `Combat.reinforce()` **appends** — it may never move a foe's slot, because
+js/game/casting.js banks a spell hit against an index for the third of a second the bolt is in the
+air. `Combat.expecting` is what stops a `survive` contract being won on an empty floor at eleven
+seconds with a wave still to send.
+
+The clock lives on `Session.run` and is null for a plain `clear` contract, so those pay nothing
+for the feature. It is cleared on a level swap and on finishing, because a clock that outlives its
+level is a contract you win from the Society's front hall.
+
+Iron now reads: **six clear, three survive**, five of them with waves, 12–50 xp, 244 for the whole
+board — about 1.5 clears of it to the first four stars.
+
+### 6.9 What is left
+
+- Bronze contracts have no missions yet — the next piece, and it is eight `mission:` blocks in
+  `contracts.js` plus whatever new kinds the bestiary wants. They should lean harder on `survive`
+  and on waves than iron does, and probably want one or two new kinds.
 - Nothing promotes you. `progress.promote()` exists and is tested; no conversation calls it, so
   four stars at iron is where the ladder currently stops.
 - Still no economy behind *Trade offer*, and still no awakening stones.

@@ -4,7 +4,10 @@
 import { test, eq, ok } from '../../tools/harness.mjs';
 import { readFileSync } from 'node:fs';
 import { BOARDS } from './contracts.js';
-import { ARENA, RING, missionOf, jobFor, playable, spawnsOf, worthOf, briefOf, patchArena } from './missions.js';
+import {
+  ARENA, RING, OBJECTIVES, missionOf, jobFor, playable, spawnsOf, wavesOf, allSpawns,
+  worthOf, briefOf, patchArena, objectiveOf, secondsOf,
+} from './missions.js';
 import { KIND_IDS, VARIANT_IDS, describe } from './bestiary.js';
 import { SURFACES } from './ground.js';
 import { normalise } from '../editor/scene.js';
@@ -123,10 +126,80 @@ test('what a contract is worth comes off the bestiary, and a harder one is worth
 
 test('a brief names what is in the room and how many of it', () => {
   const b = briefOf('iron.lamps');
-  ok(b.foes.includes('3 ×'), `"${b.foes}"`);
+  ok(/\d+ ×/.test(b.foes), `"${b.foes}"`);
   ok(b.foes.includes('Ember'));
   eq(b.job.id, 'iron.lamps');
   ok(b.note.length > 20);
   eq(briefOf('no.such.contract'), null);
   eq(missionOf('gold.ledger'), null, 'the higher boards are still only wanted');
+});
+
+
+// ── objectives and waves ─────────────────────────────────────────────────────────────────────
+// Nine contracts that all say "kill everything in the room" is one afternoon nine times, however
+// different the monsters are. Half the iron board's own writing is about waiting.
+
+test('every objective is one the runtime knows', () => {
+  for (const j of iron) ok(OBJECTIVES.includes(objectiveOf(missionOf(j.id))), `${j.id}`);
+});
+
+test('a contract with no objective is one you clear, and it counts nothing', () => {
+  eq(objectiveOf({}), 'clear');
+  eq(objectiveOf({ objective: 'nonsense' }), 'clear');
+  eq(secondsOf({ objective: 'clear', seconds: 40 }), 0, 'a clear contract has no clock');
+  eq(secondsOf({ objective: 'survive' }), 45, 'and a survive one always has');
+  ok(secondsOf({ objective: 'survive', seconds: 1 }) >= 5, 'never a clock nobody could lose to');
+});
+
+test('the iron board asks for more than one thing', () => {
+  const kinds = new Set(iron.map(j => objectiveOf(missionOf(j.id))));
+  eq([...kinds].sort(), ['clear', 'survive'], `only ${[...kinds].join(', ')}`);
+  ok(iron.filter(j => objectiveOf(missionOf(j.id)) === 'survive').length >= 3, 'and more than once');
+  ok(iron.filter(j => wavesOf(missionOf(j.id)).length).length >= 4, 'several arrive in waves');
+});
+
+test('waves arrive in order, after the gate, and never all at once', () => {
+  for (const j of iron) {
+    const w = wavesOf(missionOf(j.id));
+    for (let i = 0; i < w.length; i++) {
+      ok(w[i].at > 0, `${j.id}: a wave at ${w[i].at}s is not a wave`);
+      if (i) ok(w[i].at > w[i - 1].at, `${j.id}: waves ${i - 1} and ${i} arrive together`);
+      ok(w[i].spawns.length, `${j.id}: an empty wave`);
+    }
+  }
+});
+
+test('a survive contract sends its last wave with time left to fight it', () => {
+  for (const j of iron) {
+    const m = missionOf(j.id);
+    if (objectiveOf(m) !== 'survive') continue;
+    const w = wavesOf(m);
+    if (!w.length) continue;
+    ok(w[w.length - 1].at < secondsOf(m) - 5,
+      `${j.id}: last wave at ${w[w.length - 1].at}s of ${secondsOf(m)}s`);
+  }
+});
+
+test('a wave is laid out somewhere the first group is not', () => {
+  const m = missionOf('iron.lamps');
+  const first = spawnsOf(m);
+  for (const w of wavesOf(m)) {
+    for (const s of w.spawns) {
+      ok(Math.hypot(s.x, s.z) <= RING + 0.01, 'inside the ring');
+      ok(first.every(f => Math.hypot(f.x - s.x, f.z - s.z) > 0.5),
+        'a wave walked out of the first group\'s footprints');
+    }
+  }
+});
+
+test('what a contract is worth counts the waves too', () => {
+  const m = missionOf('iron.lamps');
+  ok(wavesOf(m).length, 'the example has waves');
+  eq(allSpawns(m).length, spawnsOf(m).length + wavesOf(m).reduce((a, w) => a + w.spawns.length, 0));
+  ok(worthOf(m) > spawnsOf(m).reduce((a, s) => a + 1, 0), 'and pays for them');
+});
+
+test('the brief says what is being asked in one line', () => {
+  ok(briefOf('iron.lamps').asks.includes('55'), briefOf('iron.lamps').asks);
+  eq(briefOf('iron.well').asks, 'Clear the floor');
 });

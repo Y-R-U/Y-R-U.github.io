@@ -23,7 +23,7 @@ import { InteractMenu, SpellList, optionsFor } from './interactmenu.js';
 import { load as loadEssences, held as heldEssences } from './essences.js';
 import { Casting } from './casting.js';
 import { HealthBars } from './healthbars.js';
-import { ARENA, jobFor, briefOf, patchArena, worthOf } from './missions.js';
+import { ARENA, jobFor, briefOf, patchArena, worthOf, wavesOf, objectiveOf, secondsOf } from './missions.js';
 import { award, sheet as progressSheet, XP_FLAG } from './progress.js';
 import { PlayerSheet } from './sheet.js';
 import { MissionPanel } from './missionpanel.js';
@@ -213,7 +213,8 @@ export class Session {
     const brief = briefOf(jobId);
     this.mission?.set(brief);
     this.gotoLevel(ARENA, null, raw => patchArena(raw, job.mission, job));
-    setTimeout(() => this.toast(`${job.name} — ${brief.foes}.`, { ms: 5200 }), 1400);
+    // No toast here: the panel names the contract the moment it is taken, and the arrival at the
+    // gate says what is being asked and what is in the room. Two of them landed together.
     return true;
   }
 
@@ -226,11 +227,41 @@ export class Session {
   // player who walks in and reads the room is not jumped by something that spawned behind them.
   installMissions() {
     this.bus.addEventListener('mission.begin', () => {
-      if (this.combat.begin()) {
-        const b = this.activeContract();
-        this.toast(b?.note || 'Clear the floor.', { ms: 5200 });
-      }
+      const b = this.activeContract();
+      if (!this.combat.begin()) return;
+      // The mission's own clock, which is what a `survive` contract is and what sends the waves.
+      // Null for a contract with neither, so a plain `clear` pays nothing for the feature.
+      this.run = (b && (b.objective === 'survive' || b.waves))
+        ? { t: 0, seconds: b.seconds, objective: b.objective, waves: wavesOf(b.mission) }
+        : null;
+      this.combat.expecting = !!this.run?.waves.length;
+      this.toast(b ? `${b.asks} — ${b.foes}. ${b.note}` : 'Clear the floor.', { ms: 6000 });
     });
+  }
+
+  // One frame of the contract in hand. Waves arrive on it, and a `survive` contract is won on it —
+  // by outlasting the clock, or by clearing the floor early once nothing more is coming.
+  runMission(dt) {
+    const r = this.run;
+    if (!r || this.combat.ended) return;
+    r.t += dt;
+    while (r.waves.length && r.t >= r.waves[0].at) {
+      const w = r.waves.shift();
+      this.combat.reinforce(w.spawns);
+      this.toast('Something else is coming.', { ms: 2600, level: 'g-low' });
+    }
+    this.combat.expecting = r.waves.length > 0;
+    if (r.objective === 'survive' && r.t >= r.seconds) {
+      this.run = null;
+      this.combat.finish('won');
+    }
+  }
+
+  // What the panel counts down. Null when there is nothing to count.
+  missionLeft() {
+    const r = this.run;
+    if (!r || r.objective !== 'survive') return null;
+    return Math.max(0, Math.ceil(r.seconds - r.t));
   }
 
   // Won, and the Society writes it down. Experience is the room's own worth, off the bestiary, so
@@ -243,6 +274,7 @@ export class Session {
       this.toast('Down, and the contract stands unfinished.', { ms: 4400 });
       return void setTimeout(() => this.gotoLevel('society', BACK_TO_DESK), 2600);
     }
+    this.run = null;
     const gain = worthOf(job.mission);
     const r = award(this.doc.flags, gain);
     this.doc.flags[XP_FLAG] = r.xp;
@@ -251,12 +283,16 @@ export class Session {
     this.doc.items.marks = (this.doc.items.marks || 0) + job.reward;
     this.autosave.mark();
     this.mission?.set(null);
-    this.toast(`${job.name} — closed. ${gain} experience, ${job.reward} marks.`, { ms: 5200 });
-    if (r.starGained) {
-      setTimeout(() => this.toast(`${r.after.stars} ${r.after.stars === 1 ? 'star' : 'stars'} at ${r.after.rankLabel} rank.`, { ms: 5200 }), 1600);
-    }
+    // One line, not three. The toast slot holds one at a time now, and a win, a star and a
+    // promotion inside four seconds used to be three of them drawn on top of each other.
+    const star = r.starGained
+      ? ` ${r.after.stars} ${r.after.stars === 1 ? 'star' : 'stars'} at ${r.after.rankLabel}.`
+      : '';
+    this.toast(`${job.name} — closed. ${gain} experience, ${job.reward} marks.${star}`, { ms: 5600 });
+    // The promotion is its own beat and worth waiting for: it is the only thing on the ladder the
+    // player has to go and ask a person for.
     if (r.rankReady) {
-      setTimeout(() => this.toast(`Four stars. Speak to the desk about ${r.after.nextRankLabel}.`, { ms: 6000 }), 3400);
+      setTimeout(() => this.toast(`Four stars. Speak to the desk about ${r.after.nextRankLabel} rank.`, { ms: 6500 }), 6000);
     }
     setTimeout(() => this.gotoLevel('society', BACK_TO_DESK), 2800);
   }
@@ -535,6 +571,7 @@ export class Session {
     // Particles in flight were drawn against a world that is about to be disposed, and a banked
     // spell hit names a foe index in a fight that no longer exists.
     this.casting.reset();
+    this.run = null;
     this.level = doc;
     this.o.level = doc;
     this.o.world = built.world;
@@ -575,7 +612,16 @@ export class Session {
 
   interact() { return this.hotspots.press(this.player.pos); }
 
-  toast(text, opts) { return toast(this.host, text, opts); }
+  // One at a time. `toast()` puts every one at the same place and nothing dismisses the last, so
+  // two raised within a few seconds of each other are simply drawn on top of one another — which
+  // is what closing a contract did, because the win, the star and the promotion are three of them
+  // inside four seconds. The session raises nearly all of them, so it is the right place to hold
+  // the slot.
+  toast(text, opts) {
+    this.lastToast?.dismiss?.();
+    this.lastToast = toast(this.host, text, opts);
+    return this.lastToast;
+  }
 
   update(dt) {
     if (this.menu.open) return;
@@ -583,6 +629,7 @@ export class Session {
     // The fight runs whether or not a bubble is up: a conversation that starts mid-swing must not
     // freeze the elemental with its arm back.
     this.combat.update(dt);
+    this.runMission(dt);
     this.drainCast();
     this.casting.update(dt);
     const busy = this.dialogue.active || this.board.open || !!this.essences?.open
@@ -592,7 +639,7 @@ export class Session {
     this.hud.setPrompt(busy ? null : this.reachable());
     this.heads.track(this.headBars());
     const live = this.combat.foes.filter(f => f.state !== 'dead' && f.hp > 0).length;
-    this.mission.progress(live, this.combat.foes.length);
+    this.mission.progress(live, this.combat.foes.length, this.missionLeft());
     this.autoDetect(dt);
     this.doc.played += dt;
     this.autosave.tick(dt);

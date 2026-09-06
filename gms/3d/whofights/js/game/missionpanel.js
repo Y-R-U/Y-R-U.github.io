@@ -42,18 +42,20 @@ export class MissionPanel {
   }
 
   // How the fight is going, pushed each frame by the session. Only the numbers, and only when they
-  // have changed — the panel is on screen for the whole of a fight.
-  progress(left, total) {
-    if (this.left === left && this.total === total) return;
+  // have changed — the panel is on screen for the whole of a fight. `seconds` is the countdown on
+  // a contract that asks you to last, and null on one that asks you to clear.
+  progress(left, total, seconds = null) {
+    if (this.left === left && this.total === total && this.seconds === seconds) return;
     this.left = left;
     this.total = total;
+    this.seconds = seconds;
     this.draw();
   }
 
   draw(force = false) {
     const b = this.brief;
     if (!b) return;
-    const key = `${this.expanded}|${this.left}|${this.total}`;
+    const key = `${this.expanded}|${this.left}|${this.total}|${this.seconds}`;
     if (!force && key === this.shownKey) return;
     this.shownKey = key;
     clear(this.root);
@@ -61,15 +63,20 @@ export class MissionPanel {
     const line = el('div', 'g-mission-line');
     line.append(el('u', null, this.expanded ? '▾' : '▸'));
     line.append(el('b', null, b.job.name));
-    // Standing, not killed: what the player wants to know mid-fight is how many are still coming.
-    if (this.total) line.append(el('em', null, this.left ? `${this.left} left` : 'clear'));
+    // The countdown wins the slot when there is one: on a contract you survive, how long is left
+    // is the whole question and how many are standing is only ever "too many".
+    if (this.seconds != null) line.append(el('em', 'g-mission-clock', `${this.seconds}s`));
+    else if (this.total) line.append(el('em', null, this.left ? `${this.left} left` : 'clear'));
     this.root.append(line);
     if (!this.expanded) return;
 
     const box = el('div', 'g-mission-body');
+    // What is being asked, before what is in the room: a player who opens this mid-fight is
+    // checking whether they may leave yet.
+    box.append(el('b', 'g-mission-asks', b.asks));
     box.append(el('p', null, b.note));
     const row = el('div', 'g-mission-row');
-    row.append(el('span', null, b.foes));
+    row.append(el('span', null, this.total && this.seconds == null ? `${b.foes} · ${this.left} standing` : b.foes));
     row.append(el('em', null, `${b.worth} xp`));
     box.append(row);
     const pay = el('div', 'g-mission-row');

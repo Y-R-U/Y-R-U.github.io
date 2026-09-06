@@ -32,6 +32,9 @@ export class Combat {
     // How long a ward is still standing. One number rather than a list: two wards at once is a
     // longer ward, which is what a player casting two defensive abilities expects anyway.
     this.warded = 0;
+    // True while the mission still has a wave to send. Without it a `survive` contract whose first
+    // group goes down before the second arrives is won on an empty floor at eleven seconds.
+    this.expecting = false;
     this.ended = null;
     this.load(level);
   }
@@ -57,6 +60,7 @@ export class Combat {
     this.foes.length = 0;
     this.ended = null;
     this.pending = null;
+    this.expecting = false;
   }
 
   // Called when the level says the fight starts — a hotspot's `proving.begin` event, not level
@@ -65,16 +69,33 @@ export class Combat {
     if (this.foes.length || !this.spec.length) return false;
     this.vitals = make(PLAYER_HP);
     this.warded = 0;
-    for (let i = 0; i < this.spec.length; i++) {
-      const s = this.spec[i], b = this.book[i];
+    this.stand(this.spec, this.book);
+    this.session?.bus?.dispatchEvent(new CustomEvent('combat.begin', { detail: { foes: this.foes.length } }));
+    return true;
+  }
+
+  // A wave, arriving after the gate. Appended rather than replacing: the indices js/game/casting.js
+  // banks a spell hit against have to stay pointing at the same body for the third of a second the
+  // bolt is in the air, so nothing already standing may move slot.
+  reinforce(specs) {
+    if (!specs?.length || this.ended) return 0;
+    const book = specs.map(s => describe(s));
+    this.spec = [...this.spec, ...specs];
+    this.book = [...this.book, ...book];
+    this.stand(specs, book);
+    this.session?.bus?.dispatchEvent(new CustomEvent('combat.wave', { detail: { foes: specs.length } }));
+    return specs.length;
+  }
+
+  stand(specs, book) {
+    for (let i = 0; i < specs.length; i++) {
+      const s = specs[i], b = book[i];
       const f = spawn({ x: s.x, z: s.z, yaw: s.yaw || 0 }, b.tuning);
       const body = new Elemental(s.zone || 'neutral', b.scale, { rock: b.rock, seam: b.seam });
       this.app.scene.add(body.object3D);
       this.foes.push(f);
       this.bodies.push(body);
     }
-    this.session?.bus?.dispatchEvent(new CustomEvent('combat.begin', { detail: { foes: this.foes.length } }));
-    return true;
   }
 
   groundY(x, z) { return this.player.groundY(x, z); }
@@ -126,7 +147,7 @@ export class Combat {
       this.bodies[i].sync(f, this.groundY(f.x, f.z), dt);
     }
 
-    if (!this.ended && !this.active) this.finish('won');
+    if (!this.ended && !this.active && !this.expecting) this.finish('won');
     if (!this.ended && this.vitals.dead) this.finish('lost');
   }
 
