@@ -50,7 +50,7 @@ export function createWorld(renderer){
  for(let side of[-1,1]){let roof=box(house,'#414f4b',side*1.15,3.18,0,2.7,.18,4.15);roof.rotation.z=-side*.47;for(let r=0;r<5;r++)for(let c=0;c<10;c++){let tile=box(house,['#4c6661','#54706a','#3a5755'][(r+c)%3],side*(.22+r*.51),3.8-r*.26,-1.9+c*.42,.6,.10,.44);tile.rotation.z=-side*.47;}}
  box(house,'#797b69',-1.2,3.7,-.8,.6,2.2,.6);for(let i=0;i<4;i++)box(house,'#b0a68b',-1.2,3.1+i*.5,-.8,.66,.1,.66);
  colliders.push({x:-9,z:13,r:2.7});
- 
+
  // Fern rosettes, meadow flowers and clustered shrubs soften the ground line.
  for(let i=0;i<260;i++){let x=(rand()-.5)*38,z=(rand()-.5)*53;if(!inside(x,z)||Math.abs(x)<3||(x>-12&&x<-6&&z>9&&z<16)||(x>6&&x<10&&z>20))continue;let y=ground(x,z);for(let j=0;j<5;j++){let a=j*1.256;let leaf=mesh(staticRoot,new T.SphereGeometry(.25,5,3),i%3?'#6f8959':'#8c9860',x+Math.cos(a)*.22,y+.15,z+Math.sin(a)*.22);leaf.scale.set(.36,.22,1.7);leaf.rotation.y=-a;leaf.rotation.x=.35;}if(i%3===0){for(let j=0;j<3;j++){let xx=x+(rand()-.5)*.5,zz=z+(rand()-.5)*.5;cyl(staticRoot,'#5c7650',xx,y+.23,zz,.015,.018,.46,3);mesh(staticRoot,new T.IcosahedronGeometry(.085,0),i%2?'#ead298':'#a6bacd',xx,y+.5,zz)}}}
  // Split rail fence, barrels, cottage steps and a little herb garden.
