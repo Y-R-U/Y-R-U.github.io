@@ -1,0 +1,66 @@
+import { createRequire } from 'node:module';
+const { chromium } = createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import assert from 'node:assert/strict';
+const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true, args: ['--use-angle=metal', '--enable-webgl', '--ignore-gpu-blocklist'], timeout: 25000 });
+const errors = [];
+try {
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
+  page.on('pageerror', e => errors.push(e.message));
+  page.on('response', response => { if (response.status() >= 400 && response.url().includes('/secondhand/')) errors.push(`${response.status()} ${response.url()}`); });
+  await page.goto(process.env.SECONDHAND_URL || 'http://localhost:8888/gms/3d/secondhand/', { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => window.secondHand?.metrics.frames > 5);
+  await page.locator('#wind').tap();
+  await page.waitForFunction(() => window.secondHand.state.time > .5);
+  await page.locator('#play').tap();
+  assert.equal(await page.evaluate(() => secondHand.state.playing), false);
+  await page.locator('#play').tap();
+  await page.waitForFunction(() => !secondHand.state.recording && secondHand.state.time === 5, { timeout: 20000 });
+  assert.equal(await page.locator('#release').isDisabled(), true);
+  await page.locator('#rewind').tap();
+  await page.waitForFunction(() => secondHand.state.echo && secondHand.state.time < .4 && !document.getElementById('release').disabled);
+  await page.locator('#release').tap();
+  await page.waitForFunction(() => secondHand.state.time > secondHand.state.dropAt + 1.12);
+  await page.locator('#play').tap();
+  await page.screenshot({ path: '/private/tmp/second-hand-fracture.png' });
+  const snapshot = await page.evaluate(() => ({ time: secondHand.state.time, fragment: secondHand.fragment }));
+  await page.locator('#scrub').evaluate((el, value) => { el.value = String(value); el.dispatchEvent(new Event('input', { bubbles: true })); }, .1);
+  await page.waitForFunction(() => secondHand.state.time < .2 && secondHand.fragment[2] < .9);
+  assert.equal(await page.evaluate(() => secondHand.state.open), false);
+  const intact = await page.evaluate(() => secondHand.fragment);
+  assert.notDeepEqual(intact, snapshot.fragment);
+  await page.locator('#scrub').evaluate((el, value) => { el.value = String(value); el.dispatchEvent(new Event('input', { bubbles: true })); }, Math.floor(snapshot.time * 100) / 100);
+  await page.waitForFunction(() => secondHand.fragment[2] > .9);
+  const sampleA = await page.evaluate(() => secondHand.fragment);
+  await page.locator('#scrub').evaluate(el => { el.value = '.1'; el.dispatchEvent(new Event('input', { bubbles: true })); });
+  await page.locator('#scrub').evaluate((el, value) => { el.value = String(value); el.dispatchEvent(new Event('input', { bubbles: true })); }, Math.floor(snapshot.time * 100) / 100);
+  await page.waitForFunction(expected => secondHand.fragment.every((value, i) => Math.abs(value - expected[i]) < 1e-10), sampleA);
+  assert.deepEqual(await page.evaluate(() => secondHand.fragment), sampleA);
+  await page.locator('#play').tap();
+  await page.waitForFunction(() => secondHand.state.open);
+  await page.locator('#play').tap();
+  await page.screenshot({ path: '/private/tmp/second-hand-open.png' });
+  await page.locator('#take').tap();
+  await page.waitForFunction(() => document.getElementById('complete').open);
+  assert.equal(await page.evaluate(() => secondHand.state.won), true);
+  await page.screenshot({ path: '/private/tmp/second-hand-complete.png' });
+  await page.locator('#watch').tap();
+  await page.waitForFunction(() => secondHand.state.taken && !secondHand.state.playing, { timeout: 20000 });
+  await page.locator('#restart').tap();
+  assert.equal(await page.evaluate(() => secondHand.state.echo), false);
+  await page.locator('#settings').tap();
+  await page.locator('#quality').selectOption('low');
+  await page.getByRole('button', { name: 'Done', exact: true }).tap();
+  await page.locator('#sound').tap();
+  assert.equal(await page.locator('#sound').getAttribute('aria-label'), 'Mute sound');
+  const bounds = [];
+  for (const size of [{width:320,height:568},{width:390,height:844},{width:768,height:1024},{width:1440,height:900},{width:1920,height:1080}]) {
+    await page.setViewportSize(size); await page.waitForTimeout(200);
+    bounds.push(await page.evaluate(() => {
+      const ids = ['wind','release','take','objective','status','remaining','scene'];
+      return { width: innerWidth, height: innerHeight, overflow: document.documentElement.scrollWidth > innerWidth, clipped: ids.filter(id => { const el = document.getElementById(id), r = el.getBoundingClientRect(); return r.x < 0 || r.right > innerWidth + 1 || r.y < 0 || r.bottom > innerHeight + 1 || el.scrollWidth > el.clientWidth + 1; }) };
+    }));
+  }
+  assert(bounds.every(b => !b.overflow && b.clipped.length === 0), JSON.stringify(bounds));
+  assert.deepEqual(errors, []);
+  console.log(JSON.stringify({ result:'PASS', checks: ['touch winding','pause/resume recording','echo power gate','glass fracture','exact reversible physics sampling','vault opening','artefact retrieval','replay','restart','quality','audio','five viewport bounds','no JS/HTTP errors'], bounds, metrics: await page.evaluate(() => secondHand.metrics) }, null, 2));
+} finally { await browser.close(); }

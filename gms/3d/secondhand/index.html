@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e3e7e3">
+  <meta name="description" content="A clockwork heist in sixty borrowed seconds.">
+  <title>SECOND HAND</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">{"imports":{"three":"../../lib/three/0.180.0/three.module.js","three/addons/":"../../lib/three/0.180.0/addons/"}}</script>
+</head>
+<body>
+  <main id="game">
+    <canvas id="scene" aria-label="Interactive clockwork tower"></canvas>
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">II</span><div><h1>SECOND HAND</h1><p>THE MERIDIAN COLLECTION</p></div></div>
+      <div class="header-tools">
+        <button id="sound" class="icon-button" aria-label="Enable sound" title="Enable sound"><i data-lucide="volume-x"></i></button>
+        <button id="settings" class="icon-button" aria-label="Settings" title="Settings"><i data-lucide="sliders-horizontal"></i></button>
+      </div>
+    </header>
+    <section class="mission" aria-label="Current objective">
+      <span class="eyebrow">HEIST 001 <span>/</span> THE CHRONOMETER</span>
+      <h2 id="objective">Wake the machine.</h2>
+      <p id="status" aria-live="polite">The mainspring is still.</p>
+      <div class="seals" aria-label="Heist progress"><span id="seal-power"><b>01</b> POWER</span><span id="seal-glass"><b>02</b> BREACH</span><span id="seal-vault"><b>03</b> ARTEFACT</span></div>
+    </section>
+    <aside class="time-display"><span class="eyebrow">BORROWED TIME</span><div><span id="remaining">60</span><small>.00</small></div><span id="time-state">AWAITING INPUT</span></aside>
+    <div class="view-tools">
+      <button id="view" class="icon-button" title="Orbit view" aria-label="Orbit view"><i data-lucide="orbit"></i></button>
+      <button id="focus" class="icon-button" title="Inspect mechanism" aria-label="Inspect mechanism"><i data-lucide="scan"></i></button>
+      <button id="photo" class="icon-button" title="Hide interface" aria-label="Hide interface"><i data-lucide="camera"></i></button>
+    </div>
+    <button id="restore-ui" class="icon-button" aria-label="Show interface" title="Show interface" hidden><i data-lucide="panel-top"></i></button>
+    <div id="toast" role="status"></div>
+    <footer class="controls">
+      <div class="actions">
+        <button id="wind" class="action" title="Wind the mainspring"><i data-lucide="settings-2"></i><span><strong id="wind-label">Wind spring</strong><small id="wind-state">RECORD 5 SECONDS</small></span><span class="action-number">01</span></button>
+        <button id="release" class="action" disabled title="Release the counterweight"><i data-lucide="arrow-down-to-line"></i><span><strong>Release weight</strong><small id="release-state">NO POWER</small></span><span class="action-number">02</span></button>
+        <button id="take" class="action" disabled title="Retrieve the artefact"><i data-lucide="gem"></i><span><strong>Take artefact</strong><small id="take-state">VAULT SEALED</small></span><span class="action-number">03</span></button>
+      </div>
+      <div class="transport">
+        <button id="rewind" class="icon-button" title="Rewind to the recorded action" aria-label="Rewind to the recorded action" disabled><i data-lucide="rewind"></i></button>
+        <button id="play" class="icon-button" title="Play timeline" aria-label="Play timeline" disabled><i data-lucide="play"></i></button>
+        <div class="timeline"><div class="timeline-caption"><span id="timeline-label">TIMELINE</span><span><b id="elapsed">00.00</b> / 60.00</span></div><div class="track-wrap"><div id="echo-track"></div><div id="drop-marker" hidden></div><input id="scrub" type="range" min="0" max="60" step="0.01" value="0" disabled aria-label="Timeline time in seconds"></div><div class="ticks"><span>00</span><span>15</span><span>30</span><span>45</span><span>60</span></div></div>
+        <button id="restart" class="icon-button" title="Restart heist" aria-label="Restart heist"><i data-lucide="rotate-ccw"></i></button>
+      </div>
+      <div class="footer-line"><span>MERIDIAN <span class="muted">/</span> PRIVATE VAULT</span><span id="record">NO TRACE LEFT</span></div>
+    </footer>
+    <div id="loading"><div class="loading-dial"></div><span>ASSEMBLING THE CHRONOMETER</span></div>
+    <dialog id="preferences"><form method="dialog"><div class="dialog-heading"><h2>Settings</h2><button class="icon-button" aria-label="Close settings"><i data-lucide="x"></i></button></div><label>Render quality<select id="quality"><option value="auto">Adaptive</option><option value="high">High</option><option value="low">Low</option></select></label><label>Camera motion<input id="motion" type="checkbox" checked></label><button class="text-button" value="close">Done</button></form></dialog>
+    <dialog id="complete"><span class="eyebrow">THE MERIDIAN COLLECTION</span><div class="success-mark"><i data-lucide="gem"></i></div><h2>Time, stolen.</h2><p>The chronometer is yours.</p><div class="result"><span>TIME BORROWED<strong id="result-time"></strong></span><span>ECHOES LEFT<strong>01</strong></span></div><button id="watch" class="text-button"><i data-lucide="play"></i> Watch the heist</button><button id="again" class="quiet-button">Another attempt</button></dialog>
+  </main>
+  <script src="vendor/lucide.min.js"></script>
+  <script type="module">
+    import('./main.js').catch(error => {
+      console.error(error);
+      const loading = document.getElementById('loading');
+      loading.querySelector('span').textContent = 'THE VAULT COULD NOT LOAD';
+      loading.querySelector('.loading-dial').style.animation = 'none';
+      const retry = document.createElement('button');
+      retry.className = 'text-button'; retry.style.width = '160px'; retry.textContent = 'Try again';
+      retry.onclick = () => location.reload(); loading.append(retry);
+    });
+  </script>
+</body>
+</html>
