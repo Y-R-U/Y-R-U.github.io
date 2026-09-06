@@ -28,6 +28,11 @@
  */
 const PROJECTS = [
 
+  { name: "Emberwake", path: "/gms/3d/emberwake/", screenshot: "emberwake", type: "game",
+    desc: "An isometric island adventure: forge a sword and dagger, learn ember magic, gather, fish and cook, then defeat the Hollow Warden and relight the beacon. Six skills, three-size translucent interfaces, local saves, and a complete introduction narrated by Kokoro Lewis.",
+    date: "2026-09-07", creator: "OpenAI Codex / GPT-6" },
+
+
   { name: "SECOND HAND", path: "/gms/3d/secondhand/", screenshot: "secondhand", type: "game",
     desc: "A clockwork heist in sixty borrowed seconds. Wind a mechanical tower, rewind your action into an echo, and use its power to break an emerald glass seal. Physically simulated fragments reassemble as time runs backwards; an articulated iris opens around the stolen chronometer. Reflective metal, ceramic columns, touch inspection, sound and a complete heist replay. Three.js, mobile-first portrait.",
     date: "2026-09-06", creator: "OpenAI Codex / GPT-6" },

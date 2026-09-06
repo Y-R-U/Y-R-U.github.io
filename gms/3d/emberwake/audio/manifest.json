@@ -1,0 +1,56 @@
+[
+  {
+    "id": "arrival",
+    "voice": "bm_lewis",
+    "speed": 0.94,
+    "seconds": 16.85
+  },
+  {
+    "id": "keeper",
+    "voice": "bm_lewis",
+    "speed": 0.94,
+    "seconds": 18.77
+  },
+  {
+    "id": "forge",
+    "voice": "bm_lewis",
+    "speed": 0.94,
+    "seconds": 16.3
+  },
+  {
+    "id": "training",
+    "voice": "bm_lewis",
+    "speed": 0.94,
+    "seconds": 17.48
+  },
+  {
+    "id": "well",
+    "voice": "bm_lewis",
+    "speed": 0.94,
+    "seconds": 16.95
+  },
+  {
+    "id": "shadows",
+    "voice": "bm_lewis",
+    "speed": 0.94,
+    "seconds": 17.48
+  },
+  {
+    "id": "warden",
+    "voice": "bm_lewis",
+    "speed": 0.94,
+    "seconds": 18.48
+  },
+  {
+    "id": "beacon",
+    "voice": "bm_lewis",
+    "speed": 0.94,
+    "seconds": 13.0
+  },
+  {
+    "id": "ending",
+    "voice": "bm_lewis",
+    "speed": 0.94,
+    "seconds": 19.45
+  }
+]
