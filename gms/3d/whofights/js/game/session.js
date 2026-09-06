@@ -15,6 +15,17 @@ import { runActions } from './actions.js';
 import { blank, docView } from './save.js';
 import { load, Autosave } from './savestore.js';
 import { resolve, setDial, pickPreset, autoChoice, DIALS, AUTO_AFTER } from './graphics.js';
+import { floorRank, mayEnterFloor, topFloorFor, rankOf, RANK_LABEL } from './contracts.js';
+import { el } from './ui.js';
+import { Combat } from './combat.js';
+import { EssenceSheet } from './essencesheet.js';
+import { InteractMenu, SpellList, optionsFor } from './interactmenu.js';
+import { load as loadEssences } from './essences.js';
+
+// Where the proving puts you back: in front of the Registrar's desk on the ground floor, facing
+// her, and inside the building rather than out on the road. `inside` is the door index the swap
+// stands the room up through — see js/game/levelswap.js.
+const BACK_TO_DESK = { x: -9.5, z: -22.5, yaw: 3.14159, inside: 0 };
 
 export class Session {
   constructor(app, player, opts) {
@@ -24,6 +35,7 @@ export class Session {
     this.host = opts.host;
     this.level = opts.level;
     this.characters = opts.characters;
+    this.swap = opts.swap || null;
 
     const restored = load()?.doc;
     this.doc = restored || blank(Date.now());
@@ -57,7 +69,7 @@ export class Session {
     this.barks = new Barks({
       voice: this.voice,
       cast: this.characters?.cast || {},
-      busy: () => this.dialogue.active || this.board.open,
+      busy: () => this.dialogue.active || this.board.open || !!this.essences?.open || this.menuAt.open || this.spells.open,
     });
 
     this.anchors = new Anchors({
@@ -108,12 +120,87 @@ export class Session {
     this.tap = new WorldTap({
       app,
       stage: document.getElementById('stage'),
-      blocked: () => this.menu.open || this.board.open || this.dialogue.active,
+      blocked: () => this.menu.open || this.board.open || this.dialogue.active || !!this.essences?.open || this.spells.open,
       onPoint: p => this.hotspots.press(p, ['click']),
+      onAlt: (p, screen) => this.openInteract(p, screen),
     });
 
+    this.menuAt = new InteractMenu({
+      host: this.host,
+      onPick: id => this.interactPick(id),
+    });
+    this.spells = new SpellList({
+      host: this.host,
+      abilities: () => this.awakened(),
+      // Nothing casts yet: js/game/combat.js knows about a knife and nothing else. Saying so is
+      // better than a button that appears to work and does not.
+      onCast: a => this.toast(`${a.name} — no target, and nothing to spend yet.`, { ms: 3600, level: 'g-low' }),
+    });
+
+    this.installStairGate(opts.doors);
+    this.combat = new Combat({ app, player, level: this.level, session: this });
+    this.installCombat();
     this.applySettings();
     this.autosave = new Autosave(() => this.snapshot());
+  }
+
+  // The proving, as the only thing in the game that currently cares who won a fight. `combat.js`
+  // reports an outcome and knows nothing about ranks or registers; what an outcome *means* is a
+  // question about this quest, and it is answered here.
+  installCombat() {
+    this.bus.addEventListener('proving.begin', () => {
+      if (this.combat.begin()) this.toast('Keep it off the dirt.', { ms: 5000 });
+    });
+    this.bus.addEventListener('combat.end', e => {
+      const won = e.detail?.outcome === 'won';
+      if (this.level.id !== 'proving') return;
+      if (won) {
+        this.doc.flags['society.test.passed'] = true;
+        this.autosave.mark();
+        this.toast('The elemental is gravel. Back to the desk.', { ms: 4200 });
+        // Long enough to watch it come apart. `at` puts the player back in front of the Registrar
+        // rather than at the Society's own start, which is out on the road.
+        setTimeout(() => this.gotoLevel('society', BACK_TO_DESK), 2600);
+      } else {
+        this.toast('Down. The Society picks you up and charges you for it.', { ms: 4200 });
+        setTimeout(() => this.gotoLevel('society', BACK_TO_DESK), 2600);
+      }
+    });
+  }
+
+  // The stair is the rank ladder. js/world/climb.js asks before it takes the player over, so a
+  // floor you have not earned is a walk that never starts rather than a climb that is undone at
+  // the top — and the answer is a conversation, because being turned back by a person is the
+  // whole point of having a warden standing at the foot of the flight.
+  installStairGate(doors) {
+    if (!doors) return;
+    // Two halves of one rule. `floorLimit` closes the flight itself, so a rank you have not earned
+    // cannot be walked past by hand; `gate` refuses the scripted climb before it starts, so being
+    // turned back is a person saying so rather than a wall you bounce off.
+    doors.floorLimit = () => topFloorFor(rankOf(this.doc.flags));
+    const climb = doors.climb;
+    if (!climb) return;
+    climb.gate = (from, to) => {
+      if (to <= from) return null;                       // going down is always allowed
+      const rank = rankOf(this.doc.flags);
+      if (mayEnterFloor(to, rank)) return null;
+      return floorRank(to) || 'higher';
+    };
+  }
+
+  // Drained rather than handled inside the gate: the gate runs deep in the movement update, and
+  // opening a dialogue box from there would fire it on the frame the player is still being
+  // resolved against the world.
+  stairRefusal() {
+    const climb = this.o.doors?.climb;
+    const r = climb?.refused;
+    if (!r) return;
+    climb.refused = null;
+    if (this.dialogue.active || this.board.open || this.menu.open) return;
+    const node = `society.stair.refuse.${r.why}`;
+    if (!this.say(node)) {
+      this.toast(`${RANK_LABEL[r.why]} rank and above beyond this point.`);
+    }
   }
 
   snapshot() {
@@ -181,6 +268,7 @@ export class Session {
 
   say(nodeId) {
     if (this.board.open) this.board.close();
+    this.essences?.close();
     return !!this.dialogue.play(nodeId);
   }
 
@@ -188,13 +276,149 @@ export class Session {
   // which asks it every frame — see DialogueBox.talkers().
   talkers() { return this.dialogue.talkers(); }
 
-  showScreen(id) { return this.board.show(id); }
+  // `screen` ids are a flat space (DEV_CONTRACT §10). The boards own theirs; the essence table
+  // owns one, and is loaded on the first request rather than at boot — a save that never reaches
+  // the proving never pays for a table of sixty abilities.
+  // Right-click, or a long press. `p` is where the ray landed in the world and `screen` where the
+  // pointer was, because the menu is placed on screen and its contents come from the world.
+  openInteract(p, screen) {
+    // What is under the pointer first, then whatever is within reach of the player: a right-click
+    // on empty floor beside somebody should still offer to talk to them.
+    const target = (p && this.hotspots.candidates(p, ['interact', 'click'])[0])
+      || this.hotspots.candidates(this.player.pos, ['interact'])[0]
+      || null;
+    this.altTarget = target;
+    this.menuAt.show(screen || { x: innerWidth / 2, y: innerHeight / 2 }, optionsFor({
+      target,
+      abilities: this.awakened(),
+      // No economy yet, and no character declares itself a trader. It stays honestly closed.
+      canTrade: false,
+    }));
+  }
 
+  interactPick(id) {
+    if (id === 'spell') return this.spells.show();
+    if (id === 'talk') {
+      const h = this.altTarget;
+      if (h) this.hotspots.fire(h, this.hotspots.state.get(h.id));
+      else this.toast('Nobody in reach.', { ms: 2400, level: 'g-low' });
+      return true;
+    }
+    return false;
+  }
+
+  // What the save has actually awakened, resolved against the table if it is loaded. Before the
+  // essence table has ever been opened this is empty, which is the honest answer.
+  awakened() {
+    const doc = this.essences?.doc;
+    const saved = this.doc.essences;
+    if (!doc || !saved?.abilities?.length) return [];
+    const out = [];
+    const rows = [...Object.values(doc.essences), ...doc.confluences];
+    for (const id of saved.abilities) {
+      for (const r of rows) {
+        const a = r.abilities.find(x => x.id === id);
+        if (a) { out.push({ ...a, fromName: r.name }); break; }
+      }
+    }
+    return out;
+  }
+
+  showScreen(id) {
+    if (id !== 'essences') return this.board.show(id);
+    if (this.essences) return this.essences.show();
+    this.loadEssenceTable().then(ok => { if (ok) this.essences.show(); });
+    return true;
+  }
+
+  loadEssenceTable() {
+    if (!this.essenceLoad) {
+      this.essenceLoad = loadEssences()
+        .then(({ doc, warnings }) => {
+          for (const w of warnings) console.warn(`essences: ${w}`);
+          this.essences = new EssenceSheet({
+            host: this.host,
+            doc,
+            saved: () => (this.doc.essences?.picked?.length ? this.doc.essences : null),
+            onChoose: r => this.takeEssences(r),
+          });
+          return true;
+        })
+        .catch(e => {
+          console.warn(`essences: ${e.message}`);
+          this.toast('The essence table could not be opened.');
+          return false;
+        });
+    }
+    return this.essenceLoad;
+  }
+
+  // The one irreversible choice in the game. The confluence is written down with the three that
+  // made it so a later build whose table has moved on can still say what the player is.
+  takeEssences(r) {
+    this.doc.essences = { picked: r.picked, confluence: r.confluence, abilities: r.abilities };
+    this.doc.flags['society.essences.chosen'] = true;
+    this.autosave.mark();
+    this.toast(`${r.confluenceName}. Four essences, four abilities.`, { ms: 5200 });
+    // She has something new to say the moment this lands — the hotspot that answers on her is
+    // gated on the same flag.
+    this.bus.dispatchEvent(new CustomEvent('essences.chosen', { detail: r }));
+  }
+
+  // In place, not a page reload. The proving is a round trip in the middle of a conversation and a
+  // reload there is a black screen, a boot splash and the world built twice for a fight that lasts
+  // a minute. The fade is not decoration: the swap takes a few frames whatever happens, and a cut
+  // straight from the Society's hall to a walled yard reads as a glitch rather than as a door.
   gotoLevel(id, at) {
-    const url = new URL(location.href);
-    url.searchParams.set('level', id);
-    if (at) url.searchParams.set('at', `${at.x},${at.z},${at.yaw ?? 0}`);
-    location.href = url.toString();
+    if (!this.swap || this.swap.busy) return false;
+    this.dialogue.close?.();
+    this.board.close();
+    this.fade(1);
+    // Two frames of fade before the work starts, or the swap's own hitch eats the transition and
+    // the screen goes black only after it has already happened.
+    setTimeout(() => {
+      this.swap.to(id, at, (doc, built) => this.adoptLevel(doc, built))
+        .catch(e => {
+          console.warn(`level ${id}: ${e.message}`);
+          this.toast(`Could not open ${id}.`);
+        })
+        .finally(() => setTimeout(() => this.fade(0), 120));
+    }, 260);
+    return true;
+  }
+
+  // Everything that reads the level, re-pointed. `hotspots.load` resets the fired/cooldown state
+  // with it, which is right: a `once` hotspot in the arena is once per visit to the arena.
+  adoptLevel(doc, built) {
+    this.level = doc;
+    this.o.level = doc;
+    this.o.world = built.world;
+    this.o.doors = built.doors;
+    this.characters = built.characters;
+    this.doc.level = doc.id;
+    this.hotspots.load(doc.hotspots || []);
+    this.combat.load(doc);
+    this.anchors?.setObstacles?.([built.world?.object3D, built.doors?.object3D].filter(Boolean));
+    this.installStairGate(built.doors);
+    // The debug handle is what every dev tool, every UI test and the level editor read the world
+    // through. Left pointing at the document boot loaded, a swapped level is invisible to all of
+    // them — and to anything that asks `__wf.level.id` which level it is in, which is the first
+    // question a test asks and the first one it got wrong.
+    if (window.__wf) {
+      Object.assign(window.__wf, {
+        level: doc, world: built.world, doors: built.doors, characters: built.characters,
+      });
+    }
+    this.bus.dispatchEvent(new CustomEvent('level', { detail: { id: doc.id } }));
+    this.autosave.mark();
+  }
+
+  fade(on) {
+    if (!this.fadeEl) {
+      this.fadeEl = el('div', 'g-fade');
+      this.host.append(this.fadeEl);
+    }
+    this.fadeEl.classList.toggle('on', !!on);
   }
 
   freePlayer() {
@@ -211,9 +435,14 @@ export class Session {
   update(dt) {
     if (this.menu.open) return;
     this.dialogue.tick?.(dt);
-    const busy = this.dialogue.active || this.board.open;
+    // The fight runs whether or not a bubble is up: a conversation that starts mid-swing must not
+    // freeze the elemental with its arm back.
+    this.combat.update(dt);
+    const busy = this.dialogue.active || this.board.open || !!this.essences?.open || this.menuAt.open || this.spells.open;
     if (!busy) this.hotspots.update(dt, this.player.pos);
+    this.stairRefusal();
     this.hud.setPrompt(busy ? null : this.reachable());
+    this.hud.setVitals(...this.combat.bars());
     this.autoDetect(dt);
     this.doc.played += dt;
     this.autosave.tick(dt);

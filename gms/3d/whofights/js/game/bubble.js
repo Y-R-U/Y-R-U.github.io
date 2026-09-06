@@ -33,6 +33,9 @@ export class Anchors {
     this.app = app;
     this.characters = characters;
     this.obstacles = obstacles;
+    // Replaced on a level swap: the old world's Object3Ds are disposed geometry, and a bubble
+    // sampling occlusion against them would test a line of sight through a world that is gone.
+    this.setObstacles = list => { this.obstacles = list.filter(Boolean); };
     this.age = 0;
     this.occluded = false;
   }

@@ -103,6 +103,18 @@ export class App {
     return system;
   }
 
+  // The other half of add(), for a system the world no longer has. Knobs are left registered: the
+  // registry is keyed by knob name, so the replacement system overwrites its own entries and a
+  // knob whose owner is gone but whose replacement has not registered yet would otherwise be a
+  // hole in the settings panel for the length of a level swap.
+  remove(system) {
+    const i = this.systems.indexOf(system);
+    if (i >= 0) this.systems.splice(i, 1);
+    if (system?.object3D) this.scene.remove(system.object3D);
+    system?.dispose?.();
+    return system;
+  }
+
   resize() {
     const scale = this.quality.get('renderScale') ?? 1;
     const capped = Math.min(devicePixelRatio || 1, this.dprCap ?? 2);

@@ -2,7 +2,7 @@
 // a merged district is one 60k-triangle mesh and raycasting it every frame is not affordable.
 // One oriented box per object is exact enough for a camera and costs a slab test each.
 
-import { TYPES, tall } from '../editor/scene.js';
+import { TYPES, FLOOR_TYPES, tall } from '../editor/scene.js';
 import { BRIDGE, KERB } from '../editor/build.js';
 import { heightAt, waterY } from './terrain.js';
 
@@ -23,6 +23,7 @@ export class Colliders {
     this.doc = doc;
     this.boxes.length = 0;
     for (const o of doc.objects) {
+      if (FLOOR_TYPES.has(o.type)) continue;
       const [hw, hd] = TYPES[o.type].plan(o.p);
       const pad = PAD_BY_TYPE[o.type] ?? 0.2;
       const r = this.terrain.range(o.x, o.z, hw, hd, o.ry);
@@ -47,6 +48,12 @@ export class Colliders {
     for (const o of doc.objects) {
       const [hw, hd] = TYPES[o.type].plan(o.p);
       const r = this.terrain.range(o.x, o.z, hw, hd, o.ry);
+      // A floor patch is something you stand on, not something you walk into: same box, but with
+      // a step-up so `groundAt` puts the player on top of it rather than beside it.
+      if (FLOOR_TYPES.has(o.type)) {
+        put(o.x, o.z, hw, hd, o.ry, r.lo - 2, r.hi + tall(o), WALK.stepUp, 0);
+        continue;
+      }
       put(o.x, o.z, hw + 0.18, hd + 0.18, o.ry, r.lo - 2, r.hi + tall(o), 0, o.id);
     }
     for (const b of this.walkExtra) boxes.push(b);

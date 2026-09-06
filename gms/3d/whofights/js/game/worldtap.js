@@ -11,19 +11,22 @@
 import * as THREE from 'three';
 
 const TAP_MS = 450, TAP_PX = 18;
+// Long enough to be a deliberate hold on touch, where there is no second button.
+const HOLD_MS = 450;
 
 export class WorldTap {
-  constructor({ app, stage, blocked = () => false, onPoint = () => {} }) {
+  constructor({ app, stage, blocked = () => false, onPoint = () => {}, onAlt = () => {} }) {
     this.app = app;
     this.blocked = blocked;
     this.onPoint = onPoint;
+    this.onAlt = onAlt;
     this.ray = new THREE.Raycaster();
     this.ndc = new THREE.Vector2();
     if (!stage?.addEventListener) return;
 
     let p = null;
     stage.addEventListener('pointerdown', e => {
-      p = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), moved: 0 };
+      p = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), moved: 0, button: e.button, touch: e.pointerType === 'touch' };
     });
     stage.addEventListener('pointermove', e => {
       if (p?.id !== e.pointerId) return;
@@ -34,10 +37,17 @@ export class WorldTap {
       const was = p;
       p = null;
       if (was?.id !== e.pointerId) return;
-      if (performance.now() - was.t > TAP_MS || was.moved > TAP_PX) return;
-      if (this.blocked()) return;
+      if (was.moved > TAP_PX || this.blocked()) return;
+      const held = performance.now() - was.t;
+      // The same three edges js/input.js reads, asked of the thing under the pointer rather than
+      // of the player: right button, or a long press where there is no right button.
+      const alt = was.button === 2 || (was.touch && held >= HOLD_MS);
+      if (!alt && held > TAP_MS) return;
       const hit = this.pick(e.clientX, e.clientY);
-      if (hit) this.onPoint(hit);
+      // A right-click that landed on the sky still opens the menu — it simply has nothing under
+      // it, and the menu says so. Only a plain tap needs something to have been tapped.
+      if (alt) this.onAlt(hit, { x: e.clientX, y: e.clientY });
+      else if (hit) this.onPoint(hit);
     });
     stage.addEventListener('pointercancel', () => { p = null; });
   }

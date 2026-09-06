@@ -9,10 +9,12 @@ import { Batch, T, openingPts, openingShape, flat, rng, span, taperBox } from '.
 import { textureSet, flagSet, ashlarSet, ASHLAR, INTERIOR_TILE } from './materials.js';
 import { stainedTexture, stainedTint } from './textures/stained.js';
 import { clothTexture } from './textures/cloth.js';
-import { stairFits, stairFloor, stairBlock, build as buildStairs } from './stairs.js';
+import { stairFits, stairFloor, stairBlock, stairPos, stairLanding, stairPath, build as buildStairs } from './stairs.js';
+import { stair as makeStair, flightY, blockAt, pushOffFlight, landings as stairLandings, pathBetween, floorIndex } from './stairplan.js';
+import { build as buildGrand, railFloor, slab as buildSlab } from './grandstair.js';
 import { boardPanel } from './boards.js';
 import { pushOut } from './colliders.js';
-import { HALL, bayLines, bayMids, hallBand, hallWindows, hallDoorU } from './hallplan.js';
+import { HALL, bayLines, bayMids, hallWindows, hallStoreys } from './hallplan.js';
 
 // Texture metres per tile. `stone` and `wood` are the outdoor kit's own numbers (materials.js
 // INTERIOR_TILE), so a course of masonry indoors is the same course as the facade outside — the
@@ -88,15 +90,34 @@ export class Interior {
       // timber roof takes it from there, so there are two heights, not one: `wallH` is what the
       // stone reaches and `roomH` is the ridge. The old code clamped a single ceiling at 14 m and
       // hung cottage beams under it, which is the "empty barn" the brief is about.
-      this.wallH = Math.max(6, (wallTop - plinth) * ceilK * HALL.plate);
+      //
+      // `floors` stacks that hall. Every storey is the same wall — the same courses, piers,
+      // sconces and window rows — and only the top one carries the roof, so a five-storey guild
+      // house is one loop over this file rather than a second copy of it. At `floors: 1` every
+      // number below is the one it has always been.
+      const S = hallStoreys(plinth, wallTop, ceilK, opts.floors || 1);
+      this.storeys = S.n;
+      this.storeyH = S.storeyH;
+      this.slabTh = S.slabTh;
+      this.ys = S.ys;
+      this.bands = S.bands;
+      this.wallH = S.plate;
       // The ridge runs along the door axis, so from the doorway you look up the length of the
       // roof through truss after truss. Across the door it would put two trusses side-on and
       // nothing in the middle distance.
       this.hs = this.rx;
       this.xc = this.hs * HALL.crown;
       this.rise = (this.hs - this.xc) * HALL.pitch;
-      this.roomH = this.wallH + this.rise;
+      this.plateTop = this.ys[this.storeys - 1] + this.wallH;
+      this.roomH = this.plateTop - this.fy + this.rise;
       this.loft = false;
+      if (this.storeys > 1) {
+        // Set back from the great doorway by its own diameter, so you walk in, the flight is the
+        // thing in front of you, and there is still a vestibule to stand in while you read it.
+        const r1 = THREE.MathUtils.clamp(Math.min(this.rx, this.rz) * 0.37, 3.4, 6.8);
+        this.stair = makeStair({ x: 0, z: this.rz * 0.30, r0: r1 * 0.35, r1, ys: this.ys });
+        this.level = this.fy;
+      }
     } else {
       this.roomH = twoUp
         ? THREE.MathUtils.clamp(((wallTop - plinth) * 0.52 - 0.21) * ceilK, 3.40, 4.50)
@@ -104,7 +125,7 @@ export class Interior {
       this.loft = twoUp && stairFits(this);
     }
     this.ceil = this.fy + this.roomH;
-    this.plateY = this.fy + (this.wallH ?? this.roomH);
+    this.plateY = this.plateTop ?? this.fy + (this.wallH ?? this.roomH);
     if (this.loft) {
       this.deck = this.ceil + 0.33;
       this.roomH2 = THREE.MathUtils.clamp((wallTop - this.deck - 0.15) * ceilK, 3.00, 4.05);
@@ -149,10 +170,28 @@ export class Interior {
 
     for (const o of opts.boards || []) {
       const g = boardPanel(o.zone || zoneId, o.p);
-      g.position.set(o.x, this.fy, o.z);
+      // `o.y` is the floor the board hangs over. A board with no storey named hangs on the
+      // ground floor, which is what every single-storey room has always meant by it.
+      g.position.set(o.x, this.floorY(o.floor), o.z);
       g.rotation.y = o.ry || 0;
       this.object3D.add(g);
     }
+  }
+
+  // The height of a storey's walking surface, by index. Anything authored "on the third floor"
+  // — a board, a body, a hotspot — comes through here, so a storey is a number in the level
+  // document and never a height somebody worked out by hand and then had to work out again.
+  floorY(i = 0) {
+    if (!this.ys) return this.fy;
+    return this.ys[Math.max(0, Math.min(this.ys.length - 1, Math.round(+i || 0)))];
+  }
+
+  // How many walkable levels the room has, which for a cottage is the ground floor plus a loft.
+  get floors() { return this.ys ? this.ys.length : (this.loft ? 2 : 1); }
+
+  floorAt(y) {
+    if (this.stair) return floorIndex(this.stair, y);
+    return this.loft && y > (this.fy + this.deck) / 2 ? 1 : 0;
   }
 
   // Local-frame half extents the player is allowed to walk in.
@@ -165,6 +204,11 @@ export class Interior {
   // Reading it off the height instead fails at the top: the feet ease upward and lag a sprint by
   // more than a metre, so you arrive on the deck still measuring as downstairs and drop through it.
   floorLocal(lx, lz, y) {
+    if (this.stair) {
+      const s = flightY(this.stair, lx, lz, this.onStair ? this.lastH : this.level);
+      if (s !== null && (this.onStair || Math.abs(s - y) < 0.7)) return s;
+      return this.level;
+    }
     if (!this.loft) return this.fy;
     const s = stairFloor(this, lx, lz);
     if (s !== null && (this.onStair || Math.abs(s - y) < 0.7)) return s;
@@ -173,9 +217,28 @@ export class Interior {
 
   blockLocal(p, y, radius) {
     for (const b of this.solids) {
+      // A table on the fourth floor is not in the way on the first. `base` is the floor a solid
+      // stands on; without it every storey's furniture is a bollard on every other storey.
+      if (b.base !== undefined && Math.abs(b.base - this.level) > 0.9) continue;
       if (b.top <= y + 0.05) continue;
       const q = pushOut(b, p.x, p.z, radius);
       if (q) { p.x = q.x; p.z = q.z; }
+    }
+    if (this.stair) {
+      const ref = this.onStair ? this.lastH : null;
+      if (blockAt(this.stair, p, y, ref)) {
+        const h = flightY(this.stair, p.x, p.z, ref ?? y);
+        // `climbLimit` is the highest storey the player is allowed onto — js/game/session.js sets
+        // it from the save's rank through doors.js. Refusing only the scripted climb left the
+        // flight itself open: you could step on at the landing and simply walk up it.
+        if (h > this.floorY(this.climbLimit ?? this.ys.length - 1) + 0.4) {
+          pushOffFlight(this.stair, p);
+          this.onStair = false;
+          return;
+        }
+        this.onFlight(h);
+      } else this.onStair = false;
+      return;
     }
     if (!this.loft) return;
     if (stairBlock(this, p, y, this.onStair ? this.lastH : null)) this.onFlight(stairFloor(this, p.x, p.z));
@@ -187,12 +250,48 @@ export class Interior {
   onFlight(h) {
     this.onStair = true;
     this.lastH = h;
+    if (this.stair) { this.level = this.ys[floorIndex(this.stair, h)]; return; }
     this.level = h > (this.fy + this.deck) / 2 ? this.deck : this.fy;
   }
 
-  landed(top) {
+  // `where` is a landing index for a stacked hall and a boolean "upstairs" for a cottage loft —
+  // js/world/climb.js hands back whichever of the two it was given by landings().
+  landed(where) {
     this.onStair = false;
-    this.level = top ? this.deck : this.fy;
+    if (this.stair) { this.level = this.ys[Math.max(0, Math.min(this.ys.length - 1, where | 0))]; return; }
+    this.level = where ? this.deck : this.fy;
+  }
+
+  // ── the stair, as js/world/climb.js sees it ──
+  // A cottage loft and a five-storey guild house are the same three questions with different
+  // arithmetic behind them, so the auto-walk asks them here rather than importing one stair
+  // module and knowing which rooms it applies to.
+  get climbable() { return !!(this.stair || this.loft); }
+
+  landings() {
+    if (this.stair) return stairLandings(this.stair);
+    if (!this.loft) return [];
+    // A cottage stair is the same two questions with only one flight to answer them: the foot is
+    // where you get on going up, the head is where you get on going down.
+    return [
+      { i: 0, up: true, ...stairLanding(this, false) },
+      { i: 1, up: false, ...stairLanding(this, true) },
+    ];
+  }
+
+  stairCentre() { return this.stair ? { x: this.stair.x, z: this.stair.z } : stairPos(this); }
+
+  stairPath(from, to) {
+    if (this.stair) return pathBetween(this.stair, from, to);
+    return stairPath(this, to > from);
+  }
+
+  // How far above the walking surface the flight has climbed at a given height — js/world/
+  // climb.js reels the camera arm in as it comes up through a well, and needs to know when.
+  headroom(y) {
+    if (!this.stair) return this.deck - y;
+    const f = (y - this.fy) / this.storeyH;
+    return (Math.ceil(f + 1e-6) - f) * this.storeyH;
   }
 
   // `sun` is the direction toward the sun in this room's own frame.
@@ -344,20 +443,25 @@ function bakeVertexLight(geo, I) {
   const K = HALL.bake;
   const { rx, rz, fy, plateY, apW, apH } = I;
   const roofTop = I.ceil;
+  const storeys = I.storeys || 1;
   for (let i = 0; i < n; i++) {
     const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
-    const h = Math.max(0, y - fy);
+    // Which storey this vertex is on, so its window band, its floor wear and its corner shade are
+    // measured from the floor it is actually standing over rather than from the bottom of the
+    // building. A single-storey hall has one answer and this is what it has always done.
+    const st = Math.max(0, Math.min(storeys - 1, Math.floor((y - fy) / I.storeyH + 1e-6)));
+    const h = Math.max(0, y - (I.ys ? I.ys[st] : fy));
     // daylight through the open doors: a pool on the floor that falls off into the room
     const dz = Math.max(0, rz - z);
     const dx = Math.max(0, Math.abs(x) - apW * 0.55);
     const dh = Math.max(0, h - apH * 0.55);
-    const door = Math.exp(-Math.hypot(dz, dx * 1.25, dh * 0.8) / 11);
+    const door = st === 0 ? Math.exp(-Math.hypot(dz, dx * 1.25, dh * 0.8) / 11) : 0;
     // the window band: bright where a wall is at leaded-light height, and on the floor below it
     const wallGap = Math.min(rx - Math.abs(x), rz - Math.abs(z));
     const band = Math.exp(-Math.abs(h - I.winY) / 3.4);
     const win = band * (0.45 + 0.55 * Math.exp(-wallGap / 6));
     // roof gloom, and the shade that collects in every corner and along the floor line
-    const gloom = 1 - 0.30 * smooth(plateY - fy - 2.5, roofTop - fy, h);
+    const gloom = 1 - 0.30 * smooth(plateY - 2.5, roofTop, y);
     const corner = 1 - 0.40 * Math.exp(-wallGap / 1.6) * Math.exp(-h / 3.2)
                      - 0.22 * Math.exp(-wallGap / 0.9);
     let k = 0.52 + 0.42 * door + 0.34 * win;
@@ -759,32 +863,33 @@ function hallFaces(I) {
 //
 // Face indices are hallFaces() order: 0 far (the boards), 1 the great doorway, 2 and 3 the sides.
 function hallPlan(I, z) {
-  const { rx, rz, fy, wallH } = I;
+  const { rx, rz } = I;
   const kind = z.window.shape;
-  const band = { fy, wallH };
   const roles = ['boards', 'door', 'side', 'side'];
   const spans = [rx * 2, rx * 2, rz * 2, rz * 2];
-  const win = roles.map((role, fi) => hallWindows({
-    span: spans[fi], band, kind, role, greatDoorW: I.apW + 0.5,
-  }));
+  // One list per storey per face. Every storey is the same wall — the window rows simply repeat
+  // up the building — and only the ground floor has the great doorway cut through it.
+  //
+  // The three doorways to the rest of the academy used to be authored here, and the level
+  // document carried `hs.door.yard` / `.armoury` / `.dormitory` hotspots on top of them. The
+  // Society has no yard, no dormitory and no armoury: a door onto nothing is a promise the
+  // building cannot keep, so both halves are gone rather than left standing shut.
+  const win = [], holes = [];
+  for (let s = 0; s < (I.storeys || 1); s++) {
+    const band = { fy: I.ys[s], wallH: bandH(I, s) };
+    const row = roles.map((role, fi) => hallWindows({
+      span: spans[fi], band, kind, role, greatDoorW: s === 0 ? I.apW + 0.5 : 0,
+    }));
+    win.push(row);
+    holes.push(row.map(list => [...list]));
+  }
+  return { win, holes, kind };
+}
 
-  // The three doorways to the rest of the academy, at the bay midpoints `data/levels/academy.json`
-  // authors its `hs.door.*` hotspots at. Verified against the level document: with the hall at
-  // world (0, −16) these come out at world (−15.9, −12.4) yard, (15.9, −19.6) armoury and
-  // (15.9, −12.4) dormitory — the hotspot centres exactly. Moving either without the other is
-  // what would break them, so they are one list.
-  const [uA, uB] = hallDoorU(rz * 2);
-  const dh = Math.min(3.8, wallH * 0.60);
-  const doors = [
-    { face: 3, u: uA, open: true, w: 2.6, h: dh, id: 'yard' },
-    { face: 2, u: uA, open: false, w: 2.6, h: dh, id: 'armoury' },
-    { face: 2, u: uB, open: false, w: 2.6, h: dh, id: 'dormitory' },
-  ];
-  const holes = win.map((list, fi) => [
-    ...list,
-    ...doors.filter(d => d.face === fi).map(d => ({ x: d.u, y: fy, w: d.w, h: d.h, kind, door: true })),
-  ]);
-  return { win, doors, holes, kind };
+// The masonry band one storey carries. Every storey but the last runs floor to floor less the
+// slab overhead; the last stops at a wall plate and hands the rest to the open timber roof.
+function bandH(I, s) {
+  return I.bands[s].wallH;
 }
 
 // One wall face, drawn as the stone left over once its openings are taken out of it. Columns are
@@ -830,27 +935,24 @@ function wallPanel(b, surface, f, x0, x1, y0, y1, dz = 0.02, segX = 0, segY = 6)
   b.add(surface, g, f.m.clone().multiply(T((x0 + x1) / 2, (y0 + y1) / 2, dz)));
 }
 
-function hallShell(b, I, z) {
-  const { rx, rz, fy, wallH, plateY, hs, rise } = I;
+function storeyShell(b, I, z, st) {
+  const { rx, rz, hs, rise } = I;
+  const fy = I.ys[st];
+  const wallH = bandH(I, st);
+  const plateY = fy + wallH;
+  const ground = st === 0, top = st === I.storeys - 1;
   const kind = z.window.shape;
   const baseH = 1.25, pierW = 0.9, proud = 0.30, stringY = fy + wallH * 0.55;
-  I.sconces = [];
-
-  // ── floor ── flagged, at the size a flag is. The old floor took the wall texture at 2.6 m a
-  // tile, which over 35 m is 13 repeats of a course of masonry and reads as a brick path.
-  const fg = new THREE.PlaneGeometry(rx * 2, rz * 2, 18, 16);
-  fg.rotateX(-Math.PI / 2);
-  b.add('flag', fg, T(0, fy, 0));
 
   for (const [fi, f] of hallFaces(I).entries()) {
     const hw = f.wide / 2;
     const dw = f.door ? Math.min(I.apW + 0.5, f.wide - 1.2) : 0, dh = I.apH + 0.24;
     // Every opening in this wall: its windows, its doorways to the rest of the academy, and on
     // the front wall the great doorway itself. One list, one wall built round it.
-    const holes = [...I.plan.holes[fi]];
-    if (f.door) holes.push({ x: 0, y: fy, w: dw, h: dh, kind: 'arch', noSpandrel: true, door: true });
+    const holes = [...I.plan.holes[st][fi]];
+    if (f.door && ground) holes.push({ x: 0, y: fy, w: dw, h: dh, kind: 'arch', noSpandrel: true, door: true });
     wallWithHoles(b, 'stone', f, -hw, hw, fy, plateY, holes);
-    if (f.door) {
+    if (f.door && ground) {
       // the last few centimetres out to the leaf, lined so the join reads as a reveal
       const gap = Math.max(0.03, I.plugZ - rz);
       for (const s of [-1, 1]) {
@@ -892,7 +994,7 @@ function hallShell(b, I, z) {
       // The bay grid is the same on every wall, and on the door wall its centre line lands in
       // the middle of the opening. A pier standing in a 5.4 m doorway is the dark bar you could
       // see down the middle of it from the road.
-      if (f.door && Math.abs(u) < I.apW / 2 + pierW) continue;
+      if (f.door && ground && Math.abs(u) < I.apW / 2 + pierW) continue;
       const w = end ? pierW * 1.35 : pierW;
       b.add('stone', box(w, wallH - 0.2, proud), f.m.clone().multiply(T(u, fy + (wallH - 0.2) / 2, proud / 2)));
       b.add('stone', taperBox(w + 0.34, proud + 0.22, 0.30, w, proud), f.m.clone().multiply(T(u, plateY - 0.5, (proud + 0.22) / 2)));
@@ -916,7 +1018,7 @@ function hallShell(b, I, z) {
     // ── gable ── the two walls the ridge runs into carry the roof line up to the apex, with the
     // hall's one big window in it. Above the contract boards at the far end, that window is the
     // only thing in the room the eye goes to before it reads the wall.
-    if (f.gable) {
+    if (f.gable && top) {
       const gh = rise * 0.74, gw = Math.min(gh * 0.66, I.xc * 1.5);
       const sill = rise * 0.15;
       const tri = new THREE.Shape([V2(-hs, 0), V2(hs, 0), V2(I.xc, rise), V2(-I.xc, rise)]);
@@ -926,6 +1028,26 @@ function hallShell(b, I, z) {
     }
   }
   I.winY = 5.2;   // the height the baked gradient pools light at; see hallGlass
+}
+
+// The room, storey by storey. At `floors: 1` the loop runs once and this is the hall it has
+// always been; above that every storey is the same wall and only the last one carries a roof.
+function hallShell(b, I, z) {
+  I.sconces = [];
+  const fg = new THREE.PlaneGeometry(I.rx * 2, I.rz * 2, 18, 16);
+  fg.rotateX(-Math.PI / 2);
+  b.add('flag', fg, T(0, I.fy, 0));
+  for (let st = 0; st < I.storeys; st++) storeyShell(b, I, z, st);
+  if (I.stair) {
+    for (let st = 1; st < I.storeys; st++) {
+      buildSlab(b, I.stair, I.rx, I.rz, I.ys[st], { surface: 'flag', th: I.slabTh, joist: 'beam' });
+      railFloor(b, I.stair, I.ys[st], 'wood');
+    }
+    buildGrand(b, I.stair, { wood: 'wood', stone: 'stone' });
+  }
+  // Where the baked gradient pools its window light. It is a height above the floor you are on,
+  // not an absolute, or every storey above the first is baked as if it were in the roof.
+  I.winY = 5.2;
 }
 
 // ── the open timber roof ────────────────────────────────────────────────────────────────────
@@ -1009,7 +1131,7 @@ function hallDress(b, I, z, R) {
       }
     }
     // one box for the table and both its benches: they are one piece of furniture to walk round
-    solid(I, tx, -1.5, 1.35 + 0.22, tl / 2, fy + th);
+    solid(I, tx, -1.5, 1.35 + 0.22, tl / 2, fy + th, fy);
   }
 
 // A hanging with folds standing proud of the wall, as one continuous surface. The four flat
@@ -1036,7 +1158,8 @@ function folded(w, h, amp = TAP.fold, n = TAP.folds) {
   // wall — which is exactly what a critic pass called the first version. What sells it is a
   // heavy pole with finials, a dark border on all four sides, and folds standing proud enough
   // to catch the sconce beside them.
-  const tapY = fy + wallH * TAP.topK, tapW = TAP.w, tapH = wallH * TAP.hK;
+  const tapW = TAP.w;
+  let tapY = fy + wallH * TAP.topK, tapH = wallH * TAP.hK;
   const hang = (f, u) => {
     const M = (x, y, z, ...r) => f.m.clone().multiply(T(u + x, y, z, ...r));
     b.add('beam', box(tapW + 0.8, 0.22, 0.24), M(0, tapY + 0.11, 0.44));
@@ -1053,61 +1176,17 @@ function folded(w, h, amp = TAP.fold, n = TAP.folds) {
   const faces = hallFaces(I);
   const bayMids = lines => lines.slice(0, -1).map((v, i) => (v + lines[i + 1]) / 2);
   const farMids = bayMids(faces[0].lines);
-  for (const u of [farMids[0], farMids[farMids.length - 1]]) hang(faces[0], u);
   const sideMids = bayMids(faces[2].lines);
-  hang(faces[2], sideMids[sideMids.length - 1]);
-  hang(faces[3], sideMids[0]);
-  hang(faces[3], sideMids[sideMids.length - 1]);
+  for (let st = 0; st < I.storeys; st++) {
+    const sfy = I.ys[st], sw = bandH(I, st);
+    tapY = sfy + sw * TAP.topK;
+    tapH = sw * TAP.hK;
+    for (const u of [farMids[0], farMids[farMids.length - 1]]) hang(faces[0], u);
+    hang(faces[2], sideMids[sideMids.length - 1]);
+    hang(faces[3], sideMids[0]);
+    hang(faces[3], sideMids[sideMids.length - 1]);
+  }
 
-  // ── doorways to the rest of the academy ── one open onto a dark stub of passage, two shut.
-  // The hotspots that make them locked or not are in the level document; nothing here knows.
-  const kind = I.plan.kind;
-  const doorAt = (f, u, open, dw, dh) => {
-    // A moulded surround standing proud of the wall, and jambs lining the thickness of it. The
-    // old version drew a flat ring flush with the masonry, which against stone was invisible —
-    // and behind it the wall had no hole at all, so nothing here could be seen from the room.
-    const ring = openingShape(kind, dw + 0.9, dh + 0.62);
-    ring.holes = [openingShape(kind, dw, dh)];
-    b.add('stone', new THREE.ShapeGeometry(ring, 5), f.m.clone().multiply(T(u, fy, 0.16)));
-    for (const sx of [-1, 1]) b.add('stone', box(0.34, dh + 0.5, 0.34), f.m.clone().multiply(T(u + sx * (dw / 2 + 0.17), fy + (dh + 0.5) / 2, 0.17)));
-    b.add('stone', box(dw + 0.68, 0.34, 0.34), f.m.clone().multiply(T(u, fy + dh + 0.17, 0.17)));
-    b.add('stone', taperBox(dw + 1.5, 0.44, 0.24, dw + 1.1, 0.34), f.m.clone().multiply(T(u, fy + dh + 0.42, 0.14)));
-    if (open) {
-      // A recess the depth of the masonry, and no deeper. It used to run 3.2 m back — which was
-      // invisible while the wall had no hole in it, and the moment the hole was cut it became a
-      // stone box standing 2.6 m proud of the facade for anyone on the road to see. The room
-      // beyond does not exist yet; until it does, the honest thing is a doorway into the dark.
-      const pd = 0.56, mm = f.m.clone().multiply(T(u, fy, 0.02));
-      b.add('stone', new THREE.PlaneGeometry(dw, dh), mm.clone().multiply(T(0, dh / 2, -pd)));
-      const fl = new THREE.PlaneGeometry(dw, pd); fl.rotateX(-Math.PI / 2);
-      b.add('flag', fl, mm.clone().multiply(T(0, 0.01, -pd / 2)));
-      const cl = new THREE.PlaneGeometry(dw, pd); cl.rotateX(Math.PI / 2);
-      b.add('stone', cl, mm.clone().multiply(T(0, dh, -pd / 2)));
-      for (const s of [-1, 1]) {
-        const sw = new THREE.PlaneGeometry(pd, dh); sw.rotateY(-s * Math.PI / 2);
-        b.add('stone', sw, mm.clone().multiply(T(s * dw / 2, dh / 2, -pd / 2)));
-      }
-    } else {
-      // Boarded, ledged and studded, hung in the hole the wall was cut for. It used to sit at
-      // −0.26 — which is 0.26 m the wrong side of a wall that had no opening in it, so the leaf
-      // was inside the exterior shell's own masonry and could never be seen. There is 0.09 m
-      // between the two surfaces of a hall; the whole door has to live in it and stand forward.
-      const lz = 0.03, planks = 5;
-      for (let i = 0; i < planks; i++) {
-        const px = -dw / 2 + dw * (i + 0.5) / planks;
-        b.add('beam', box(dw / planks - 0.06, dh - 0.16, 0.10), f.m.clone().multiply(T(u + px, fy + (dh - 0.16) / 2, lz)));
-      }
-      b.add('beam', box(dw - 0.1, dh - 0.16, 0.05), f.m.clone().multiply(T(u, fy + (dh - 0.16) / 2, lz - 0.045)));
-      for (const y of [dh * 0.22, dh * 0.56, dh * 0.88]) {
-        b.add('wood', box(dw - 0.24, 0.18, 0.09), f.m.clone().multiply(T(u, fy + y, lz + 0.09)));
-        for (const sx of [-1, 1]) b.add('wood', box(0.13, 0.13, 0.12), f.m.clone().multiply(T(u + sx * (dw / 2 - 0.24), fy + y, lz + 0.13)));
-      }
-      b.add('wood', box(0.5, 0.24, 0.14), f.m.clone().multiply(T(u + dw * 0.28, fy + 1.15, lz + 0.12)));
-      b.add('wood', new THREE.TorusGeometry(0.17, 0.045, 4, 10), f.m.clone().multiply(T(u + dw * 0.28, fy + 0.92, lz + 0.14)));
-    }
-  };
-  // One list, shared with hallShell (which cut the holes) and with the level document's hotspots.
-  for (const d of I.plan.doors) doorAt(faces[d.face], d.u, d.open, d.w, d.h);
 
   // ── presses and chests ── something along the wall, and no more than that
   for (const s of [-1, 1]) {
@@ -1130,8 +1209,8 @@ function folded(w, h, amp = TAP.fold, n = TAP.folds) {
 }
 
 // An axis-aligned blocker in the room's own frame; `top` is its height above the room's origin.
-function solid(I, x, z, hw, hd, top) {
-  I.solids.push({ x, z, hw, hd, c: 1, s: 0, top });
+function solid(I, x, z, hw, hd, top, base) {
+  I.solids.push({ x, z, hw, hd, c: 1, s: 0, top, ...(base === undefined ? {} : { base }) });
 }
 
 // The sconces that get a real point light, spread out rather than clustered: taking the first N
@@ -1191,15 +1270,19 @@ function hallGlass(shellBatch, I, z, opts) {
   // in the holes the wall was cut for, at the same places the facade outside has its own.
   // A low light is left unglazed: it is a real hole through both surfaces with the exterior's
   // iron bars in it, and it is what you can see out of.
-  const glazed = fi => I.plan.win[fi].filter(o => !o.open)
-    .map(o => ({ x: o.x, y: o.y, w: o.w, h: o.h, kind: o.kind }));
-  const high = I.plan.win[2].filter(o => !o.open);
+  const glazed = fi => I.plan.win.flatMap(st => st[fi].filter(o => !o.open)
+    .map(o => ({ x: o.x, y: o.y, w: o.w, h: o.h, kind: o.kind })));
+  const high = I.plan.win[0][2].filter(o => !o.open);
   I.winY = high.length ? high[0].y + high[0].h / 2 - fy : wallH * 0.7;
+  // The patch a window throws is projected onto the room's own floor. With a storey overhead that
+  // floor is a ceiling, so a fourth-storey light would drop its sunbeam through four slabs onto
+  // the ground floor. One room, one floor, one shaft.
+  const shafts = I.storeys === 1;
 
   const groups = [];
   // the two long walls: a light in every bay, and the sun through them lands on the floor
   for (const [fi, ry] of [[2, -Math.PI / 2], [3, Math.PI / 2]]) {
-    groups.push({ ry, halfW: rz, halfD: rx, shaft: true, panes: glazed(fi) });
+    groups.push({ ry, halfW: rz, halfD: rx, shaft: shafts, panes: glazed(fi) });
   }
   // The two end walls take their own clerestory as well as the gable light above it.
   for (const [fi, ry] of [[0, 0], [1, Math.PI]]) {
@@ -1212,7 +1295,7 @@ function hallGlass(shellBatch, I, z, opts) {
     groups.push({
       // The door wall faces the sun for most of the day here, so its gable light is the one that
       // actually throws a patch — and it lands in the middle of the floor rather than in a corner.
-      ry, halfW: rx, halfD: rz, shaft: fi === 1,
+      ry, halfW: rx, halfD: rz, shaft: shafts && fi === 1,
       panes: [{ x: 0, y: gwin.y, w: gwin.w, h: gwin.h, kind }],
     });
   }

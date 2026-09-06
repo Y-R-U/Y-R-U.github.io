@@ -27,9 +27,12 @@ export const TOWER_FOOT = 1.3;
 const HOUSE_SIZE = [
   { key: 'w', label: 'Width', min: HOUSE_MIN_W, max: 48, step: 0.5, def: 12 },
   { key: 'd', label: 'Depth', min: 9, max: 42, step: 0.5, def: 10.5 },
-  { key: 'h', label: 'Height', min: 7, max: 27, step: 0.5, def: 9 },
+  { key: 'h', label: 'Height', min: 7, max: 48, step: 0.5, def: 9 },
   // 1 = one over-sized room with a doorway to match, instead of a cottage with a loft.
   { key: 'hall', label: 'Great hall', min: 0, max: 1, step: 1, def: 0 },
+  // Storeys, for a hall only. `h` is still the wall top: the storeys divide it rather than
+  // multiply it, so raising this makes each floor shorter and never makes the building taller.
+  { key: 'floors', label: 'Storeys', min: 1, max: 6, step: 1, def: 1 },
 ];
 
 const MASS_SIZE = [
@@ -148,6 +151,22 @@ export const TYPES = {
     plan: p => [p.w / 2, 0.35], margin: [0.3, 0.3],
     tall: p => p.lift + p.h,
   },
+  // A laid floor patch. The proving room is half flagstone and half bare earth and the elemental
+  // mends itself off the earth, so what the ground is made of is a rule the game reads — see
+  // js/game/ground.js, which answers "is it standing on dirt?" from these and nothing else.
+  //
+  // It is a thin slab rather than a decal because the terrain under it is never quite flat, and a
+  // plane laid on an uneven pad either z-fights with it or floats off it.
+  plot: {
+    label: 'Floor patch', params: [
+      { key: 'w', label: 'Width', min: 1, max: 80, step: 0.5, def: 8 },
+      { key: 'd', label: 'Depth', min: 1, max: 80, step: 0.5, def: 8 },
+      { key: 'th', label: 'Thickness', min: 0.04, max: 0.6, step: 0.02, def: 0.14 },
+    ],
+    strings: [{ key: 'surface', label: 'Surface', def: 'stone' }],
+    plan: p => [p.w / 2, p.d / 2], margin: [0.2, 0.2],
+    tall: p => p.th,
+  },
   retaining: {
     label: 'Retaining wall', params: [
       { key: 'length', label: 'Length', min: 6, max: 120, step: 1, def: 36 },
@@ -160,6 +179,11 @@ export const TYPES = {
 };
 
 export const TYPE_IDS = Object.keys(TYPES);
+
+// Types the camera arm and the walk world must not treat as a wall. A floor patch is 0.14 m of
+// laid stone: you walk onto it, and a 0.14 m box in the collider set is a kerb that stops a
+// sprint dead and a lip the camera arm snags on.
+export const FLOOR_TYPES = new Set(['plot']);
 
 const plan = o => TYPES[o.type].plan(o.p);
 export const tall = o => TYPES[o.type].tall(o.p);
@@ -298,6 +322,9 @@ export function normalise(raw) {
     // Built into a house's interior rather than into the world. build.js leaves it out; doors.js
     // hands it to interior.js when that house is opened.
     if (Number.isInteger(+o.inside) && +o.inside > 0) obj.inside = +o.inside;
+    // Which storey of that house. 0 — and anything authored before there were storeys — is the
+    // ground floor, which is where a single-storey room's furniture has always gone.
+    if (Number.isInteger(+o.floor) && +o.floor > 0) obj.floor = +o.floor;
     if (o.rubble && TYPES[o.type].rubble) {
       obj.rubble = true;
       obj.rubbleSeed = (num(o.rubbleSeed, 0) | 0) || obj.seed;
@@ -351,7 +378,19 @@ export function normalise(raw) {
       music: typeof raw.music === 'string' ? raw.music : null,
       shots: (Array.isArray(raw.shots) ? raw.shots : []).filter(
         s => s && typeof s.id === 'string' && Array.isArray(s.pos) && Array.isArray(s.look)),
+      // `pos[1]`/`look[1]` are heights above the floor, and in a stacked hall which floor has to
+      // be said out loud or every interior shot frames the ground one.
       districts, objects, hotspots,
+      // Who is waiting in this level. js/game/combat.js stands them up when the level says the
+      // fight starts, not when the level loads — a player who walks in and reads the room first
+      // is not jumped by something that spawned behind them.
+      foes: (Array.isArray(raw.foes) ? raw.foes : []).filter(f => f && Number.isFinite(+f.x) && Number.isFinite(+f.z))
+        .map(f => ({
+          kind: typeof f.kind === 'string' ? f.kind : 'earth',
+          x: +f.x, z: +f.z, yaw: num(f.yaw, 0),
+          scale: Math.min(2.5, Math.max(0.5, num(f.scale, 1))),
+          zone: ZONE_IDS.includes(f.zone) ? f.zone : 'neutral',
+        })),
     },
     dropped, warnings,
   };
@@ -372,6 +411,7 @@ export function normaliseHotspot(h, i = 0) {
     attach,
     r: attach ? num(h.r, 2.5) : 0,
     shape,
+    ...(Number.isFinite(+h.y) ? { y: +h.y, yr: Math.max(0.2, num(h.yr, 3)) } : {}),
     trigger: TRIGGERS.includes(h.trigger) ? h.trigger : 'enter',
     once: !!h.once,
     cooldown: Math.max(0, num(h.cooldown, 0)),
@@ -380,16 +420,27 @@ export function normaliseHotspot(h, i = 0) {
   };
 }
 
+// A shape is x/z, because for one storey that is the whole answer. Stack five of them and it
+// stops being one: the Iron board on the second floor and the Silver board on the fourth are the
+// same circle seen from above, and a player on either would trip both. `y` pins a shape to a
+// height and `yr` is how far either side of it still counts — absent, a shape is on every floor,
+// which is what every hotspot authored before there were floors meant.
+const height = s => (Number.isFinite(+s.y) ? { y: +s.y, yr: Math.max(0.2, num(s.yr, 3)) } : null);
+
 function normaliseShape(s) {
   if (!s || typeof s !== 'object') return null;
+  const at = height(s);
   if (s.k === 'circle') {
     const r = num(s.r, 0);
-    return r > 0 ? { k: 'circle', x: num(s.x, 0), z: num(s.z, 0), r } : null;
+    return r > 0 ? { k: 'circle', x: num(s.x, 0), z: num(s.z, 0), r, ...at } : null;
   }
   if (s.k === 'rect') {
     const x0 = num(s.x0, 0), z0 = num(s.z0, 0), x1 = num(s.x1, 0), z1 = num(s.z1, 0);
     if (x0 === x1 || z0 === z1) return null;
-    return { k: 'rect', x0: Math.min(x0, x1), z0: Math.min(z0, z1), x1: Math.max(x0, x1), z1: Math.max(z0, z1) };
+    return {
+      k: 'rect', x0: Math.min(x0, x1), z0: Math.min(z0, z1),
+      x1: Math.max(x0, x1), z1: Math.max(z0, z1), ...at,
+    };
   }
   return null;
 }

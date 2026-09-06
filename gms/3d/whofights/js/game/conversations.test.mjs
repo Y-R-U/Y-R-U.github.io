@@ -32,8 +32,8 @@ test('every `sets` effect is a valid action', () => {
 });
 
 test('the greeter conversation is a worked example, not a stub', () => {
-  const root = pack['academy.greeter.hello'];
-  ok(root, 'the hotspot in academy.json says this node');
+  const root = pack['society.greeter.hello'];
+  ok(root, 'the hotspot in society.json says this node');
   ok(root.lines.length > 1, 'more than one line');
   ok(root.choices.length >= 2, 'it branches');
   ok(root.choices.some(c => (c.sets || []).length), 'a choice has an effect');
@@ -42,17 +42,17 @@ test('the greeter conversation is a worked example, not a stub', () => {
 });
 
 test('taking the first choice every time walks to an end', () => {
-  const r = run(pack, 'academy.greeter.hello', {}, [0, 0, 0, 0, 0]);
+  const r = run(pack, 'society.greeter.hello', {}, [0, 0, 0, 0, 0]);
   ok(r.lines.length >= 4, `walked ${r.lines.length} lines`);
   ok(r.effects.some(a => a.k === 'flag'), 'flags were set on the way through');
 });
 
 test('a choice gated on a flag only appears once that flag is set', () => {
-  const n = pack['academy.greeter.newadventures'];
+  const n = pack['society.greeter.newadventures'];
   const gated = n.choices.find(c => c.if);
   ok(gated, 'the example keeps one gated choice');
   const before = visibleChoices(n, { flags: {} }).length;
-  const after = visibleChoices(n, { flags: { 'academy.knows.vail': true } }).length;
+  const after = visibleChoices(n, { flags: { 'society.knows.vail': true } }).length;
   eq(after, before - 1, 'the gate closes once the player already knows');
 });
 
@@ -66,22 +66,27 @@ test('a `once` node will not reopen', () => {
 });
 
 // Aaron, playing it: "there used to be a menu of questions i could ask after the chat but it no
-// longer shows". `academy.greeter.hello` was `once`, so the second press opened nothing at all and
+// longer shows". `society.greeter.hello` was `once`, so the second press opened nothing at all and
 // the say action reported nothing either. The invariant that fixes it is this one: whatever the
 // flags say, and whatever the player has already been shown, pressing on Vail opens something.
 test('Vail always has something to say, whatever the save knows', () => {
-  const level = JSON.parse(readFileSync(new URL('../../data/levels/academy.json', import.meta.url)));
+  const level = JSON.parse(readFileSync(new URL('../../data/levels/society.json', import.meta.url)));
   const mine = level.hotspots.filter(h => h.attach === 'greeter' && h.trigger === 'interact');
   ok(mine.length >= 2, 'a first meeting and a return visit');
 
   const at = { x: cast.greeter.place.x, z: cast.greeter.place.z };
   const everySeen = Object.keys(pack);          // the worst case: he has said all of it already
-  for (const flags of [{}, { 'academy.met.vail': true },
-    { 'academy.met.vail': true, 'academy.knows.vail': true, 'academy.knows.contracts': true,
-      'academy.greeted': true },
-    // A save from before 07151d25, when no `sets` ran: the player has met him and nothing wrote
+  for (const flags of [{}, { 'society.met.registrar': true },
+    { 'society.met.registrar': true, 'society.knows.vail': true, 'society.knows.contracts': true,
+      'society.greeted': true },
+    // Every rung of the registration path, because each one swaps which hotspot answers.
+    { 'society.met.registrar': true, 'society.test.passed': true },
+    { 'society.met.registrar': true, 'society.test.passed': true, 'society.essences.chosen': true },
+    { 'society.test.passed': true, 'society.essences.chosen': true, 'society.registered': true,
+      'society.rank': 'iron' },
+    // A save from before 07151d25, when no `sets` ran: the player has met her and nothing wrote
     // it down. It must fall back to a conversation, never to silence.
-    { 'academy.chose.iron': true }]) {
+    { 'society.chose.iron': true }]) {
     const hs = new Hotspots(level.hotspots, { flags, characterAt: () => at });
     const open4 = hs.candidates(at, ['interact']).filter(h => h.attach === 'greeter');
     eq(open4.length, 1, `exactly one greeter hotspot answers for ${JSON.stringify(flags)}`);

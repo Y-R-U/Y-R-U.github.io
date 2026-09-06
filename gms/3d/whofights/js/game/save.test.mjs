@@ -48,3 +48,32 @@ test('normalise keeps a written position and drops a junk one', () => {
   eq(normalise({ version: 1, at: 'over there' }).doc.at, null);
   ok(!normalise({ version: 9 }).doc);
 });
+
+// Chosen essences are the one thing in the save that is about who the player IS rather than what
+// they have done, and a chosen set that does not survive a reload is worse than one you cannot
+// choose at all.
+test('essences round-trip, and a save from before them still loads', () => {
+  const d = blank(1);
+  eq(d.essences, { picked: [], confluence: null, abilities: [] });
+
+  const back = normalise({
+    ...blank(1),
+    essences: { picked: ['doom', 'blood', 'dark'], confluence: 'sin', abilities: ['sin.tally', 'fire.brand'] },
+  }).doc;
+  eq(back.essences.picked, ['blood', 'dark', 'doom'], 'a triple is a set, and it is stored sorted');
+  eq(back.essences.confluence, 'sin');
+  eq(back.essences.abilities, ['sin.tally', 'fire.brand']);
+
+  // A save written before this field existed.
+  const old = blank(1);
+  delete old.essences;
+  eq(normalise(old).doc.essences, { picked: [], confluence: null, abilities: [] });
+});
+
+test('a rubbish essence block is cleaned rather than trusted or fatal', () => {
+  const r = normalise({ ...blank(1), essences: { picked: ['fire', 'fire', 7, null], confluence: 12, abilities: 'no' } });
+  eq(r.error, null);
+  eq(r.doc.essences.picked, ['fire'], 'duplicates and non-strings dropped');
+  eq(r.doc.essences.confluence, null);
+  eq(r.doc.essences.abilities, []);
+});

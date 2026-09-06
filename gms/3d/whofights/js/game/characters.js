@@ -38,6 +38,7 @@ export function normaliseCast(raw) {
         z: +c.place.z || 0,
         yaw: +c.place.yaw || 0,
         inside: Number.isInteger(+c.place.inside) ? +c.place.inside : null,
+        floor: Number.isInteger(+c.place.floor) ? +c.place.floor : 0,
         wander: c.place.wander ? {
           x0: +c.place.wander.x0, x1: +c.place.wander.x1,
           z0: +c.place.wander.z0, z1: +c.place.wander.z1,
@@ -66,7 +67,7 @@ export class Characters {
     this.bodies = new Map();
     for (const c of Object.values(cast)) {
       if (c.body === 'none' || !c.place || (level && c.place.level !== level)) continue;
-      const fixY = c.place.inside ? world?.floorOf(c.place.inside) : null;
+      const fixY = c.place.inside ? world?.floorOf(c.place.inside, c.place.floor) : null;
       if (c.body === 'dummy') {
         if (!dummies) { console.warn(`characters: ${c.id} is a dummy but no dummy rig was passed`); continue; }
         const d = dummies.place({ id: c.id, sex: c.sex, skin: c.skin,

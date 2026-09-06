@@ -1,8 +1,8 @@
 {
   "version": 1,
   "nodes": {
-    "academy.greeter.hello": {
-      "name": "Vail — first hello",
+    "society.greeter.hello": {
+      "name": "Vail \u2014 first hello",
       "cam": "two",
       "lines": [
         {
@@ -12,33 +12,37 @@
         },
         {
           "who": "greeter",
-          "text": "A dark robe, at the Academy. Well. Nobody minds the colour so long as you can hold a line.",
-          "vo": "greeter_hello_01"
+          "text": "A dark robe, walking into the Adventure Society off the square. Nobody minds the colour so long as you can hold a line."
         },
         {
           "who": "greeter",
-          "text": "Contracts are on the boards behind me. Iron first — everyone starts on iron.",
+          "text": "Contracts are on the boards behind me. Iron first \u2014 everyone starts on iron.",
           "vo": "greeter_hello_02"
         }
       ],
       "choices": [
         {
           "say": "Who are you?",
-          "goto": "academy.greeter.who",
+          "goto": "society.greeter.who",
           "sets": []
         },
         {
           "say": "What is a contract?",
-          "goto": "academy.greeter.contracts",
+          "goto": "society.greeter.contracts",
+          "sets": []
+        },
+        {
+          "say": "How do I join?",
+          "goto": "society.greeter.test",
           "sets": []
         },
         {
           "say": "I'll read them myself.",
-          "goto": "academy.greeter.brushoff",
+          "goto": "society.greeter.brushoff",
           "sets": [
             {
               "k": "flag",
-              "name": "academy.brushed.vail",
+              "name": "society.brushed.vail",
               "value": true
             }
           ]
@@ -48,13 +52,13 @@
       "sets": [
         {
           "k": "flag",
-          "name": "academy.met.vail",
+          "name": "society.met.registrar",
           "value": true
         }
       ]
     },
-    "academy.greeter.again": {
-      "name": "Vail — again",
+    "society.greeter.again": {
+      "name": "Vail \u2014 again",
       "cam": "two",
       "lines": [
         {
@@ -71,37 +75,42 @@
       "choices": [
         {
           "say": "Who are you?",
-          "goto": "academy.greeter.who",
+          "goto": "society.greeter.who",
+          "sets": [],
           "if": [
             "not",
             [
               "flag",
-              "academy.knows.vail"
+              "society.knows.vail"
             ]
-          ],
+          ]
+        },
+        {
+          "say": "About joining.",
+          "goto": "society.greeter.test",
           "sets": []
         },
         {
           "say": "The contracts, then.",
-          "goto": "academy.greeter.contracts",
+          "goto": "society.greeter.contracts",
           "sets": []
         },
         {
-          "say": "The fourth board?",
-          "goto": "academy.greeter.newadventures",
+          "say": "What is upstairs?",
+          "goto": "society.greeter.floors",
           "sets": []
         },
         {
           "say": "Nothing. Carry on.",
-          "goto": "academy.greeter.done",
+          "goto": "society.greeter.done",
           "sets": []
         }
       ],
       "next": null,
       "sets": []
     },
-    "academy.greeter.who": {
-      "name": "Vail — who are you",
+    "society.greeter.who": {
+      "name": "Vail \u2014 who are you",
       "cam": "close",
       "lines": [
         {
@@ -113,12 +122,17 @@
       "choices": [
         {
           "say": "And the contracts?",
-          "goto": "academy.greeter.contracts",
+          "goto": "society.greeter.contracts",
+          "sets": []
+        },
+        {
+          "say": "How do I join?",
+          "goto": "society.greeter.test",
           "sets": []
         },
         {
           "say": "Thank you.",
-          "goto": "academy.greeter.done",
+          "goto": "society.greeter.done",
           "sets": []
         }
       ],
@@ -126,13 +140,13 @@
       "sets": [
         {
           "k": "flag",
-          "name": "academy.knows.vail",
+          "name": "society.knows.vail",
           "value": true
         }
       ]
     },
-    "academy.greeter.contracts": {
-      "name": "Vail — what is a contract",
+    "society.greeter.contracts": {
+      "name": "Vail \u2014 what is a contract",
       "cam": "two",
       "lines": [
         {
@@ -148,17 +162,22 @@
       ],
       "choices": [
         {
+          "say": "What is upstairs?",
+          "goto": "society.greeter.floors",
+          "sets": []
+        },
+        {
           "say": "And the fourth board?",
-          "goto": "academy.greeter.newadventures",
+          "goto": "society.greeter.newadventures",
           "sets": []
         },
         {
           "say": "Iron it is.",
-          "goto": "academy.greeter.done",
+          "goto": "society.greeter.done",
           "sets": [
             {
               "k": "flag",
-              "name": "academy.chose.iron",
+              "name": "society.chose.iron",
               "value": true
             }
           ]
@@ -168,13 +187,239 @@
       "sets": [
         {
           "k": "flag",
-          "name": "academy.knows.contracts",
+          "name": "society.knows.contracts",
           "value": true
         }
       ]
     },
-    "academy.greeter.newadventures": {
-      "name": "Vail — New Adventures",
+    "society.greeter.floors": {
+      "name": "Vail \u2014 the floors",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Five floors. This one is registration, and it is open to anybody who can find the door."
+        },
+        {
+          "who": "greeter",
+          "text": "Iron above us, then bronze, then silver, then gold. The stair knows what you are. Bel stands at the foot of it in case the stair is not persuasive enough."
+        },
+        {
+          "who": "greeter",
+          "text": "The higher you go the emptier the boards get. There are three gold contracts in the province and two of them have been up for a year."
+        }
+      ],
+      "choices": [
+        {
+          "say": "How do I get to iron?",
+          "goto": "society.greeter.test",
+          "sets": []
+        },
+        {
+          "say": "Understood.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.floors",
+          "value": true
+        }
+      ]
+    },
+    "society.greeter.test": {
+      "name": "Vail \u2014 the proving",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "You join by proving you will still be alive at the end of your first contract. We stopped taking people's word for it."
+        },
+        {
+          "who": "greeter",
+          "text": "One room, one monster, one knife. Brann has the knife. The monster is an earth elemental and it is a weak one, which is not the same as an easy one."
+        },
+        {
+          "who": "greeter",
+          "text": "It mends itself off bare earth. The floor of that room is half stone and half dirt, and that is the whole of the lesson."
+        }
+      ],
+      "choices": [
+        {
+          "say": "I'm ready.",
+          "goto": "society.greeter.proving.go",
+          "sets": []
+        },
+        {
+          "say": "What happens if I lose?",
+          "goto": "society.greeter.proving.lose",
+          "sets": []
+        },
+        {
+          "say": "Not yet.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.test.offered",
+          "value": true
+        }
+      ]
+    },
+    "society.greeter.proving.lose": {
+      "name": "Vail \u2014 if you lose",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "You come back here with a headache and a bill for the healer. Then you go again."
+        },
+        {
+          "who": "greeter",
+          "text": "Nobody has died in the proving room in eleven years. That is not luck, it is the room."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Then let's go.",
+          "goto": "society.greeter.proving.go",
+          "sets": []
+        },
+        {
+          "say": "Later.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.greeter.proving.go": {
+      "name": "Vail \u2014 into the proving room",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Down the passage, then. Keep it off the dirt, or keep it too busy to reach any."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.test.entered",
+          "value": true
+        },
+        {
+          "k": "goto",
+          "level": "proving",
+          "at": {
+            "x": 0,
+            "z": 15,
+            "yaw": 3.14159
+          }
+        }
+      ]
+    },
+    "society.greeter.essences": {
+      "name": "Vail \u2014 four essences",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "You are standing there dripping, so I take it the elemental is gravel. Good."
+        },
+        {
+          "who": "greeter",
+          "text": "Now the part that decides what you become. You take three essences. Whatever those three come to between them is the fourth, and nobody chooses that one \u2014 it chooses itself."
+        },
+        {
+          "who": "greeter",
+          "text": "One ability from each, to begin. You will grow into the rest, or you will not."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Show me the essences.",
+          "goto": "society.greeter.essences.pick",
+          "sets": []
+        },
+        {
+          "say": "Give me a moment.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.greeter.essences.pick": {
+      "name": "Vail \u2014 the essence table",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Three. Take your time, and do not take fire because it is loud."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": [
+        {
+          "k": "screen",
+          "id": "essences"
+        }
+      ]
+    },
+    "society.greeter.member": {
+      "name": "Vail \u2014 registered",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Signed, sealed, and iron rank. The second floor is open to you and Bel will stop looking at you like that."
+        },
+        {
+          "who": "greeter",
+          "text": "Take something small first. The board up there is never empty and it forgives a great deal."
+        }
+      ],
+      "choices": [
+        {
+          "say": "What is on the higher floors?",
+          "goto": "society.greeter.floors",
+          "sets": []
+        },
+        {
+          "say": "Thank you.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.registered",
+          "value": true
+        },
+        {
+          "k": "flag",
+          "name": "society.rank",
+          "value": "iron"
+        }
+      ]
+    },
+    "society.greeter.newadventures": {
+      "name": "Vail \u2014 New Adventures",
       "cam": "two",
       "lines": [
         {
@@ -186,27 +431,27 @@
       "choices": [
         {
           "say": "Who pins them up?",
-          "goto": "academy.greeter.who",
+          "goto": "society.greeter.who",
+          "sets": [],
           "if": [
             "not",
             [
               "flag",
-              "academy.knows.vail"
+              "society.knows.vail"
             ]
-          ],
-          "sets": []
+          ]
         },
         {
           "say": "I'll keep an eye on it.",
-          "goto": "academy.greeter.done",
+          "goto": "society.greeter.done",
           "sets": []
         }
       ],
       "next": null,
       "sets": []
     },
-    "academy.greeter.brushoff": {
-      "name": "Vail — brushed off",
+    "society.greeter.brushoff": {
+      "name": "Vail \u2014 brushed off",
       "cam": "two",
       "lines": [
         {
@@ -216,17 +461,16 @@
         }
       ],
       "choices": [],
-      "next": "academy.greeter.done",
+      "next": "society.greeter.done",
       "sets": []
     },
-    "academy.greeter.done": {
-      "name": "Vail — parting",
+    "society.greeter.done": {
+      "name": "Vail \u2014 parting",
       "cam": "none",
       "lines": [
         {
           "who": "greeter",
-          "text": "Boards are behind me. Come back when you have taken one.",
-          "vo": "greeter_done_01"
+          "text": "The register is here when you want it. The stair is there when you have earned it."
         }
       ],
       "choices": [],
@@ -234,65 +478,216 @@
       "sets": [
         {
           "k": "flag",
-          "name": "academy.greeted",
+          "name": "society.greeted",
           "value": true
         }
       ]
     },
-    "academy.door.yard": {
-      "name": "Door — the yard passage",
+    "society.quartermaster": {
+      "name": "Brann \u2014 the knife",
+      "cam": "two",
       "lines": [
         {
-          "who": "narrator",
-          "text": "A dark passage runs on towards the yard. Cold air comes back along it."
+          "who": "quartermaster",
+          "text": "Proving knife. Society property. It comes back or you pay for it."
+        },
+        {
+          "who": "quartermaster",
+          "text": "It is not a good knife. A good knife would teach you the wrong lesson."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Any advice?",
+          "goto": "society.quartermaster.advice",
+          "sets": []
+        },
+        {
+          "say": "Thanks.",
+          "goto": "society.quartermaster.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.quartermaster.advice": {
+      "name": "Brann \u2014 advice",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "quartermaster",
+          "text": "Elementals of that sort do not chase well and do not think at all. Stand on the stone. Make it come to you across the stone."
+        },
+        {
+          "who": "quartermaster",
+          "text": "If it gets a foot in the dirt it starts putting itself back together faster than you are taking it apart. Then you have a long afternoon."
+        }
+      ],
+      "choices": [],
+      "next": "society.quartermaster.done",
+      "sets": []
+    },
+    "society.quartermaster.done": {
+      "name": "Brann \u2014 parting",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "quartermaster",
+          "text": "Mind the step on the way down. It has had three of you this month."
         }
       ],
       "choices": [],
       "next": null,
       "sets": []
     },
-    "academy.door.armoury.locked": {
-      "name": "Door — armoury, locked",
+    "society.stair.refuse.iron": {
+      "name": "Stair \u2014 refused, iron",
+      "cam": "close",
       "lines": [
         {
-          "who": "narrator",
-          "text": "Studded oak, and a lock that has been oiled recently. It does not move."
+          "who": "doorward",
+          "text": "Hold it. Iron rank up those stairs, and you are not on the roll yet."
+        },
+        {
+          "who": "doorward",
+          "text": "Vail is at the desk behind you. Get signed, get proved, come back and I will not say a word."
         }
       ],
       "choices": [],
       "next": null,
       "sets": []
     },
-    "academy.door.armoury": {
-      "name": "Door — armoury, open",
+    "society.stair.refuse.bronze": {
+      "name": "Stair \u2014 refused, bronze",
+      "cam": "close",
       "lines": [
         {
-          "who": "narrator",
-          "text": "The lock turns. Beyond it the air smells of oil and cold iron."
+          "who": "clerk_iron",
+          "text": "Not that floor. Bronze above us, and you are iron."
+        },
+        {
+          "who": "clerk_iron",
+          "text": "Close a few contracts off this board and the stair will let you by. It is not personal \u2014 it is a ledger."
         }
       ],
       "choices": [],
       "next": null,
       "sets": []
     },
-    "academy.door.dorm.locked": {
-      "name": "Door — dormitory, locked",
+    "society.stair.refuse.silver": {
+      "name": "Stair \u2014 refused, silver",
+      "cam": "close",
       "lines": [
         {
-          "who": "narrator",
-          "text": "Boarded, and barred from the far side. Someone wants their sleep."
+          "who": "clerk_bronze",
+          "text": "Silver, that. Bronze is as far as you go today."
+        },
+        {
+          "who": "clerk_bronze",
+          "text": "The Society counts what you finish, not what you attempt. Finish more."
         }
       ],
       "choices": [],
       "next": null,
       "sets": []
     },
-    "academy.door.dorm": {
-      "name": "Door — dormitory, open",
+    "society.stair.refuse.gold": {
+      "name": "Stair \u2014 refused, gold",
+      "cam": "close",
+      "lines": [
+        {
+          "who": "clerk_silver",
+          "text": "Gold floor. I am going to have to ask you to come back down."
+        },
+        {
+          "who": "clerk_silver",
+          "text": "There are three contracts up there and the Chapter reads the names of everyone who goes up to look at them."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.iron": {
+      "name": "Clerk \u2014 iron",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "clerk_iron",
+          "text": "Iron floor. Nine on the board this morning and there will be nine tomorrow, they are just not the same nine."
+        },
+        {
+          "who": "clerk_iron",
+          "text": "Take one you can walk to. The road is the part that kills iron adventurers, not the work."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.bronze": {
+      "name": "Clerk \u2014 bronze",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "clerk_bronze",
+          "text": "Bronze. The Society stops underwriting you here \u2014 if a bronze contract goes wrong, it goes wrong at your expense."
+        },
+        {
+          "who": "clerk_bronze",
+          "text": "The board is still full. There is more of this than there are people willing to do it."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.silver": {
+      "name": "Clerk \u2014 silver",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "clerk_silver",
+          "text": "Silver. Five on the board, and every one of them started as a bronze contract that somebody did not come back from."
+        },
+        {
+          "who": "clerk_silver",
+          "text": "Read the whole sheet. Twice. The clients are not lying to you but they are not telling you everything either."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.gold": {
+      "name": "Clerk \u2014 gold",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "clerk_gold",
+          "text": "Gold. Three. It is usually two."
+        },
+        {
+          "who": "clerk_gold",
+          "text": "I am obliged to say this out loud: taking one of these is not a contract, it is a decision about the rest of your life."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "proving.brief": {
+      "name": "The proving floor",
+      "cam": "none",
       "lines": [
         {
           "who": "narrator",
-          "text": "The bar lifts. A stair goes up into the dark, and someone above turns over."
+          "text": "A walled floor, half laid in flagstone and half left as bare earth. Something at the far corner is already getting up."
+        },
+        {
+          "who": "narrator",
+          "text": "It mends off the soil. Keep it on the stone."
         }
       ],
       "choices": [],

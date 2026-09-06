@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { zone } from './zones.js';
 import { TOWER_FOOT } from '../editor/scene.js';
-import { hallBand, hallWindows } from './hallplan.js';
+import { hallStoreys, hallWindows } from './hallplan.js';
 import {
   Batch, T, rng, span, openingPts, extrude, rectShape, taperBox, mergedMesh,
   addOpening, addMerlons, addCorbels, addCrest, roofSlab, roofY, gableShape,
@@ -409,7 +409,7 @@ export function tower(zoneId, { radius = 4, height = 18, sides = 16, seed: sv = 
   return finish(b, g, zoneId);
 }
 
-export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = {}) {
+export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, floors = 1, seed: sv = 0 } = {}) {
   const z = zone(zoneId);
   const R = seed(sv, w, d, h);
   const dressed = R() < 0.55;
@@ -458,7 +458,7 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = 
   // ones you can see through, and addOpening still puts iron bars across them.
   //   The interior face is 0.09 m inside the panel, so its wall is `2t + 0.18` shorter than this
   // one; both use that shorter span for their bay midpoints or the two grids drift apart.
-  const band = hall ? hallBand(plinth, wallTop, z.interior?.ceiling ?? 1) : null;
+  const ST = hall ? hallStoreys(plinth, wallTop, z.interior?.ceiling ?? 1, floors) : null;
   const ROLE = ['door', 'boards', 'side', 'side'];
   for (const [fi, f] of faces.entries()) {
     const openings = [];
@@ -478,8 +478,14 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = 
       }
     }
     if (hall) {
-      for (const o of hallWindows({ span: f.span - 2 * t - 0.18, band, kind, role: ROLE[fi], greatDoorW: dw + 0.5 })) {
-        openings.push({ kind: o.kind, w: o.w, h: o.h, x: o.x, y: o.y, reveal: t * 0.8, glass: !o.open });
+      // One row per storey, out of the same split interior.js cuts its floors at. Only the ground
+      // floor has the great doorway to work round; the storeys above it are a plain wall.
+      for (const [si, band] of ST.bands.entries()) {
+        for (const o of hallWindows({
+          span: f.span - 2 * t - 0.18, band, kind, role: ROLE[fi], greatDoorW: si === 0 ? dw + 0.5 : 0,
+        })) {
+          openings.push({ kind: o.kind, w: o.w, h: o.h, x: o.x, y: o.y, reveal: t * 0.8, glass: !o.open });
+        }
       }
     }
     if (fi === doorFace) {
@@ -537,13 +543,14 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = 
     }
   }
 
-  // LATENT: a hall's ridge is a coin toss here, while interior.js hard-codes the opposite —
-  // *"the ridge runs along the door axis"* — and puts its gable walls on the ±z faces to match.
-  // The two agree only because the draw lands the right way up for this seed. Pinning it to the
-  // interior's axis is the obvious fix and it is NOT taken here: tried, it moves the exterior
-  // roof slab down over the side walls, where the light zone's curved profile puts it straight
-  // through the interior roof, and untangling that is a roof job, not a window one.
-  const ridgeX = R() < 0.75 ? w >= d : w < d;
+  // A hall's ridge used to be this coin toss while interior.js hard-codes the opposite — *"the
+  // ridge runs along the door axis"* — and puts its gable walls on the ±z faces to match. The two
+  // agreed only when the draw landed the right way up, which it does about three times in four:
+  // the Adventure Society's seed was the fourth, and its interior roof crown came out through the
+  // slate for anyone in the square to see. The draw is still taken, because R() is one stream and
+  // skipping a call re-rolls every decision after it, but a hall no longer listens to it.
+  const roll = R() < 0.75 ? w >= d : w < d;
+  const ridgeX = hall ? false : roll;
   const spanW = ridgeX ? d : w;
   const ridgeLen = ridgeX ? w : d;
   const profile = z.edges === 'curved' ? 'curved' : 'flat';
@@ -629,7 +636,7 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, seed: sv = 0 } = 
     addChimney(b, R, { m: T(cx, wallTop + rise - 0.6, cz), w: 1.35, h: span(R, 2.55, 4.65), surface: S.wall, cap: S.trim });
   }
 
-  g.userData = { kind: 'house', zoneId, w, d, h, t, plinth, wallTop, hall: !!hall, door };
+  g.userData = { kind: 'house', zoneId, w, d, h, t, plinth, wallTop, hall: !!hall, floors: ST ? ST.n : 1, door };
   return finish(b, g, zoneId);
 }
 

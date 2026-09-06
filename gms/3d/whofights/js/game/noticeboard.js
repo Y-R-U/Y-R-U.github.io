@@ -7,7 +7,7 @@
 // the top and then worn quietly by each row rather than shouted on every one.
 
 import { el, toast } from './ui.js';
-import { BOARDS, boardView, adventurerView, RANK_LABEL } from './contracts.js';
+import { BOARDS, boardView, adventurerView, RANK_LABEL, RANK_FLOOR } from './contracts.js';
 
 const NEW = 'board.new';
 const money = n => `${n.toLocaleString('en-GB')} marks`;
@@ -78,12 +78,15 @@ export class Noticeboard {
     const view = boardView(id, this.flags());
     const b = view.board;
     const body = this.head(sheet, { seal: b.seal[0], title: b.title, strap: b.strap });
+    // Which storey this board hangs on. Five floors of one room look alike from the inside, and a
+    // player who took the stair two flights too far has no other way to know it.
+    if (RANK_FLOOR[b.rank]) body.append(el('div', 'g-parch-where', `Floor ${RANK_FLOOR[b.rank] + 1} · ${b.title}`));
 
     const band = el('div', `g-standing${view.open ? '' : ' shut'}`);
     band.append(el('b', null, view.headline));
     band.append(el('span', null, view.open
       ? 'Take one down and bring it to the desk.'
-      : `Rank is earned on the board below yours. ${RANK_LABEL[b.rank]} opens when the Academy says it does.`));
+      : `Rank is earned on the floor below this one. ${RANK_LABEL[b.rank]} opens when the Society says it does.`));
     body.append(band);
 
     const list = el('div', 'g-jobs');
@@ -116,12 +119,12 @@ export class Noticeboard {
   drawNew(sheet) {
     const view = adventurerView(this.flags());
     const body = this.head(sheet, { seal: '✦', title: 'New Adventures',
-      strap: 'What the Academy asks before it calls you one.' });
+      strap: 'What the Society asks before it calls you one.' });
 
     const band = el('div', `g-standing${view.eligible ? '' : ' shut'}`);
     band.append(el('b', null, view.headline));
     band.append(el('span', null, view.eligible
-      ? 'Bring this list to any instructor and they will sign it.'
+      ? 'Take this back to the desk and the Registrar will sign it.'
       : 'Nothing here is barred to you. It is only unfinished.'));
     body.append(band);
 
@@ -137,13 +140,13 @@ export class Noticeboard {
     }
     body.append(list);
     body.append(el('p', 'g-parch-foot',
-      'Signed for the Academy. The list has been seven items long for two hundred years and the '
-      + 'order has changed nine times.'));
+      'Signed for the Adventure Society. The list has been four items long for two hundred years '
+      + 'and the order has changed nine times.'));
     sheet.append(body);
   }
 }
 
 // The toast Aaron asked for: a nudge, never a dialog, and only on the board that has a person
 // standing behind it who can actually do something about the answer.
-export const NUDGE = 'Instructor Vail keeps this board. Speak to her.';
+export const NUDGE = 'Registrar Vail keeps this board. Speak to her.';
 export const nudge = host => toast(host, NUDGE, { ms: 5200, level: 'g-low' });

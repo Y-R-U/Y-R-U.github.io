@@ -57,7 +57,7 @@
       "voicePitch": 0
     },
     "greeter": {
-      "name": "Instructor Vail",
+      "name": "Registrar Vail",
       "body": "robed",
       "robe": "light",
       "gender": "f",
@@ -66,32 +66,33 @@
       "voice": "bf_emma",
       "voiceSpeed": 0.98,
       "place": {
-        "level": "academy",
-        "x": 4,
-        "z": -18,
-        "yaw": 3.14159,
+        "level": "society",
+        "x": -9.5,
+        "z": -26.5,
+        "yaw": 0.0,
         "inside": 1,
+        "floor": 0,
         "wander": {
-          "x0": -10,
-          "x1": 10,
-          "z0": -26,
-          "z1": -10,
-          "speed": 0.85
+          "x0": -13,
+          "x1": -6,
+          "z0": -28.5,
+          "z1": -24,
+          "speed": 0.7
         }
       },
       "barks": {
         "idle": [
-          "The hall is quieter without students in it. I have mixed feelings.",
+          "The register is open. It is usually open.",
           "Somebody has moved the training dummies. Again.",
           "Standards. Standards.",
-          "I have taught four hundred of you. Most are still alive.",
+          "I have signed in four hundred of you. Most are still alive.",
           "One does not simply stand about. One supervises."
         ],
         "greet": [
           "You must be the new one. Stand up straight.",
-          "Welcome to the Adventurer Academy. Try to look like you belong.",
+          "Welcome to the Adventure Society. Try to look like you belong.",
           "You're late. Everyone is, on their first day.",
-          "Good. You found the hall.",
+          "Good. You found the desk.",
           "Ah. You'll do."
         ],
         "farewell": [
@@ -128,7 +129,7 @@
         "refuse": [
           "No. And that is a complete sentence.",
           "Not until you have earned it.",
-          "Ask me when you can hold a stance for a minute."
+          "Ask me again when you have passed the proving."
         ],
         "weather": [
           "Rain. The training yard will be a swamp.",
@@ -168,11 +169,142 @@
       "height": 1.04,
       "voice": null,
       "place": {
-        "level": "academy",
-        "x": -6,
-        "z": -20,
-        "yaw": 0,
-        "inside": 1
+        "level": "society",
+        "x": 9.5,
+        "z": -26.5,
+        "yaw": 0.0,
+        "inside": 1,
+        "floor": 0
+      }
+    },
+    "doorward": {
+      "name": "Warden Bel",
+      "body": "robed",
+      "robe": "dark",
+      "gender": "m",
+      "height": 1.06,
+      "hood": "up",
+      "voice": "bm_george",
+      "voiceSpeed": 0.96,
+      "voicePitch": 0,
+      "place": {
+        "level": "society",
+        "x": 6.6,
+        "z": -18.6,
+        "yaw": 3.6,
+        "inside": 1,
+        "floor": 0,
+        "wander": {
+          "x0": 4.5,
+          "x1": 8.5,
+          "z0": -20.5,
+          "z1": -16.5,
+          "speed": 0.6
+        }
+      }
+    },
+    "clerk_iron": {
+      "name": "Clerk Ostrey",
+      "body": "robed",
+      "robe": "neutral",
+      "gender": "m",
+      "height": 1.01,
+      "hood": "up",
+      "voice": "bm_lewis",
+      "voiceSpeed": 1.0,
+      "voicePitch": 0,
+      "place": {
+        "level": "society",
+        "x": -6.0,
+        "z": -26.0,
+        "yaw": 0.0,
+        "inside": 1,
+        "floor": 1,
+        "wander": {
+          "x0": -9,
+          "x1": -2,
+          "z0": -28,
+          "z1": -22,
+          "speed": 0.65
+        }
+      }
+    },
+    "clerk_bronze": {
+      "name": "Clerk Malle",
+      "body": "robed",
+      "robe": "light",
+      "gender": "f",
+      "height": 0.99,
+      "hood": "up",
+      "voice": "bf_alice",
+      "voiceSpeed": 1.0,
+      "voicePitch": 0,
+      "place": {
+        "level": "society",
+        "x": -6.0,
+        "z": -26.0,
+        "yaw": 0.0,
+        "inside": 1,
+        "floor": 2,
+        "wander": {
+          "x0": -9,
+          "x1": -2,
+          "z0": -28,
+          "z1": -22,
+          "speed": 0.65
+        }
+      }
+    },
+    "clerk_silver": {
+      "name": "Clerk Vane",
+      "body": "robed",
+      "robe": "neutral",
+      "gender": "f",
+      "height": 1.0,
+      "hood": "up",
+      "voice": "bf_lily",
+      "voiceSpeed": 1.0,
+      "voicePitch": 0,
+      "place": {
+        "level": "society",
+        "x": -6.0,
+        "z": -26.0,
+        "yaw": 0.0,
+        "inside": 1,
+        "floor": 3,
+        "wander": {
+          "x0": -9,
+          "x1": -2,
+          "z0": -28,
+          "z1": -22,
+          "speed": 0.65
+        }
+      }
+    },
+    "clerk_gold": {
+      "name": "Clerk Ashenrow",
+      "body": "robed",
+      "robe": "dark",
+      "gender": "m",
+      "height": 1.05,
+      "hood": "up",
+      "voice": "bm_daniel",
+      "voiceSpeed": 1.0,
+      "voicePitch": 0,
+      "place": {
+        "level": "society",
+        "x": -6.0,
+        "z": -26.0,
+        "yaw": 0.0,
+        "inside": 1,
+        "floor": 4,
+        "wander": {
+          "x0": -9,
+          "x1": -2,
+          "z0": -28,
+          "z1": -22,
+          "speed": 0.65
+        }
       }
     }
   }

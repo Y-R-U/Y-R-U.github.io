@@ -341,7 +341,7 @@
     },
     {
       "id": "academy_hall",
-      "label": "Academy hall",
+      "label": "Society hall",
       "tracks": [
         "hall_bed_01",
         "hall_bed_02",
@@ -384,7 +384,7 @@
     },
     {
       "id": "tavern_songs",
-      "label": "Tavern — sung only",
+      "label": "Tavern \u2014 sung only",
       "tracks": [
         "tavern_song_drinking_01",
         "tavern_song_boast_01",
@@ -401,7 +401,7 @@
     },
     {
       "id": "tavern_quiet",
-      "label": "Tavern — late, no singing",
+      "label": "Tavern \u2014 late, no singing",
       "tracks": [
         "tavern_inst_01",
         "night_bed_01"

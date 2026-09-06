@@ -99,15 +99,15 @@ test('a rect is normalised to min/max corners', () => {
   eq(h.shape, { k: 'rect', x0: -1, z0: 2, x1: 4, z1: 9 });
 });
 
-test('the shipped academy level normalises with nothing dropped', () => {
-  const raw = JSON.parse(readFileSync(new URL('../../data/levels/academy.json', import.meta.url)));
+test('the shipped Society level normalises with nothing dropped', () => {
+  const raw = JSON.parse(readFileSync(new URL('../../data/levels/society.json', import.meta.url)));
   const r = normalise(raw);
   eq(r.dropped, 0, `dropped: ${r.warnings.join('; ')}`);
   eq(r.warnings, []);
-  eq(r.doc.shots.length, 4);
+  ok(r.doc.shots.length >= 4, 'the level keeps its reference renders');
   // Counts are content, and content grows. What has to hold is that every hotspot in the file is
   // one the runtime can actually evaluate.
-  ok(r.doc.hotspots.length >= 2, 'the academy still has its doorway and its greeter');
+  ok(r.doc.hotspots.length >= 2, 'the Society still has its doorway and its registrar');
   const ids = new Set();
   for (const h of r.doc.hotspots) {
     ok(h.id && !ids.has(h.id), `hotspot ids must be present and unique: ${h.id}`);
@@ -119,8 +119,14 @@ test('the shipped academy level normalises with nothing dropped', () => {
   }
   const boards = r.doc.objects.filter(o => o.type === 'billboard');
   eq(boards.map(b => b.p.text).sort(),
-    ['Bronze Contracts', 'Gold Contracts', 'Iron Contracts', 'New Adventures']);
-  ok(boards.every(b => b.inside === 1), 'every board belongs to the hall');
-  eq(r.doc.objects.find(o => o.type === 'sign').p.text, 'Adventurer Academy');
-  eq(r.doc.objects.find(o => o.type === 'house').p.hall, 1);
+    ['Bronze Contracts', 'Gold Contracts', 'Iron Contracts', 'New Adventures',
+      'Registration', 'Silver Contracts']);
+  ok(boards.every(b => b.inside === 1), 'every board belongs to the Society');
+  // One rank to a storey, and nothing sharing one but the two ground-floor notices.
+  const byFloor = boards.reduce((m, b) => ((m[b.floor || 0] = (m[b.floor || 0] || 0) + 1), m), {});
+  eq(byFloor, { 0: 2, 1: 1, 2: 1, 3: 1, 4: 1 });
+  eq(r.doc.objects.find(o => o.type === 'sign').p.text, 'Adventure Society');
+  const society = r.doc.objects.find(o => o.type === 'house');
+  eq(society.p.hall, 1);
+  eq(society.p.floors, 5);
 });

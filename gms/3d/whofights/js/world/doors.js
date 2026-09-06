@@ -10,6 +10,7 @@ import { gableRise } from './stairs.js';
 import { lidBands } from './gablelid.js';
 import { pathEase, pathSpeed } from './doorpath.js';
 import { stalePeek, idleDoorState } from './doorstate.js';
+import { slabBoxes } from './stairplan.js';
 
 const OUT = 3.10;     // where you are taken to before the door opens
 const IN = 2.35;      // where you end up on the other side
@@ -230,6 +231,10 @@ export class Doors {
     if (this.rev !== (this.demo.builder.doc.rev | 0)) this.refresh();
     if (this.snapTo >= 0 && this.state === 'out') { const i = this.snapTo; this.snapTo = -1; this.jump(i); }
 
+    // Pushed in every frame rather than set once: the rank can change while the player is standing
+    // in the building — that is the whole of the registration quest — and a limit captured when
+    // the room was built would keep them off the Iron floor after they had earned it.
+    if (this.interior) this.interior.climbLimit = this.floorLimit ? this.floorLimit() : null;
     if (this.releasing) this.release(P, dt);
     if (this.state === 'out') this.watchOutside(P);
     else if (this.state === 'in') {
@@ -408,7 +413,9 @@ export class Doors {
   }
 
   makeInterior(d) {
-    const I = new Interior(d.zoneId, d.house, { hall: !!d.house.hall, boards: this.boardsFor(d) });
+    const I = new Interior(d.zoneId, d.house, {
+      hall: !!d.house.hall, floors: d.house.floors || 1, boards: this.boardsFor(d),
+    });
     I.object3D.applyMatrix4(d.m);
     this.object3D.add(I.object3D);
     return I;
@@ -439,7 +446,10 @@ export class Doors {
     const cs = d.n.z, sn = d.n.x;
     return list.filter(o => o.type === 'billboard').map(o => {
       const dx = o.x - ox, dz = o.z - oz;
-      return { x: dx * cs - dz * sn, z: dx * sn + dz * cs, ry: (o.ry || 0) - d.yaw, zone: o.zone, p: o.p };
+      return {
+        x: dx * cs - dz * sn, z: dx * sn + dz * cs, ry: (o.ry || 0) - d.yaw,
+        zone: o.zone, p: o.p, floor: o.floor || 0,
+      };
     });
   }
 
@@ -487,6 +497,7 @@ export class Doors {
       wallBox(I.rx + th, 0, th, I.rz + th, y0, y1, cs, sn, ox, oz),
       wallBox(-I.rx - th, 0, th, I.rz + th, y0, y1, cs, sn, ox, oz),
       ...this.lidBoxes(I, oy, y1, th, cs, sn, ox, oz),
+      ...this.slabColliders(I, oy, cs, sn, ox, oz),
     ];
   }
 
@@ -513,6 +524,20 @@ export class Doors {
       for (const s of [-1, 1]) {
         out.push(wallBox(alongX ? 0 : s * c, alongX ? s * c : 0,
           alongX ? run : h, alongX ? h : run, y0, y1, cs, sn, ox, oz));
+      }
+    }
+    return out;
+  }
+
+  // Each storey's floor, as four boxes round the well rather than one lid. The camera must be
+  // stopped by the floor overhead — without it the arm reaches up through the slab and frames the
+  // storey above — but the well has to stay open or the climb comes up into a box.
+  slabColliders(I, oy, cs, sn, ox, oz) {
+    if (!I.stair) return [];
+    const out = [];
+    for (let st = 1; st < I.floors; st++) {
+      for (const b of slabBoxes(I.stair, I.rx, I.rz, I.ys[st], I.slabTh)) {
+        out.push(wallBox(b.cx, b.cz, b.hw, b.hd, oy + b.y0, oy + b.y1, cs, sn, ox, oz));
       }
     }
     return out;

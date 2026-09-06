@@ -1,3 +1,20 @@
 [
-  { "id": "academy", "name": "Adventurer Academy", "start": { "x": -9, "z": 21, "yaw": 3.14159 } }
+  {
+    "id": "society",
+    "name": "Adventure Society",
+    "start": {
+      "x": -2.3,
+      "z": 26.0,
+      "yaw": 3.05581
+    }
+  },
+  {
+    "id": "proving",
+    "name": "The Proving Floor",
+    "start": {
+      "x": 0,
+      "z": 15,
+      "yaw": 3.14159
+    }
+  }
 ]

@@ -7,8 +7,12 @@
 import { evalPred } from './predicate.js';
 import { runActions } from './actions.js';
 
-export function inShape(shape, x, z) {
+// `y` is optional and a shape without one is on every storey — which is what every hotspot
+// authored before the Adventure Society had five of them meant by leaving it out. With one, the
+// Iron board on the second floor and the Silver board on the fourth stop being the same circle.
+export function inShape(shape, x, z, y) {
   if (!shape) return false;
+  if (Number.isFinite(shape.y) && Number.isFinite(y) && Math.abs(y - shape.y) > (shape.yr ?? 3)) return false;
   if (shape.k === 'circle') {
     const dx = x - shape.x, dz = z - shape.z;
     return dx * dx + dz * dz <= shape.r * shape.r;
@@ -34,7 +38,11 @@ export class Hotspots {
   shapeOf(h) {
     if (!h.attach) return h.shape;
     const p = this.ctx.characterAt?.(h.attach);
-    return p ? { k: 'circle', x: p.x, z: p.z, r: h.r || 2.5 } : null;
+    if (!p) return null;
+    // A character carries their own height, so an attached hotspot is on their storey whether or
+    // not the author said so — a registrar on the ground floor is not reachable from the fourth.
+    const y = Number.isFinite(h.y) ? h.y : p.y;
+    return { k: 'circle', x: p.x, z: p.z, r: h.r || 2.5, ...(Number.isFinite(y) ? { y, yr: h.yr ?? 3 } : {}) };
   }
 
   // `p` is the player, `{x, z}`. Returns the ids that fired this frame.
@@ -44,7 +52,7 @@ export class Hotspots {
       const st = this.state.get(h.id);
       st.cool = Math.max(0, st.cool - dt);
       const shape = this.shapeOf(h);
-      const inside = !!shape && !!p && inShape(shape, p.x, p.z);
+      const inside = !!shape && !!p && inShape(shape, p.x, p.z, p.y);
       const was = st.in;
       st.in = inside;
       if (h.trigger === 'enter' && inside && !was) { if (this.fire(h, st)) out.push(h.id); }
@@ -71,7 +79,7 @@ export class Hotspots {
     for (const h of this.list) {
       if (!kinds.includes(h.trigger)) continue;
       const shape = this.shapeOf(h);
-      if (!shape || !p || !inShape(shape, p.x, p.z)) continue;
+      if (!shape || !p || !inShape(shape, p.x, p.z, p.y)) continue;
       if (!this.allowed(h)) continue;
       const cx = shape.k === 'circle' ? shape.x : (shape.x0 + shape.x1) / 2;
       const cz = shape.k === 'circle' ? shape.z : (shape.z0 + shape.z1) / 2;

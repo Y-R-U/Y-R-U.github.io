@@ -11,7 +11,7 @@ const ROOT = path.resolve(new URL('../..', import.meta.url).pathname);
 
 const SETS = [
   { id: 'menu', label: 'Title / menu', tracks: ['menu_bed_01', 'hall_bed_02'], shuffle: false, fadeMs: 2000, volume: 0.6 },
-  { id: 'academy_hall', label: 'Academy hall', tracks: ['hall_bed_01', 'hall_bed_02', 'menu_bed_01'], shuffle: true, fadeMs: 1500, volume: 0.55 },
+  { id: 'academy_hall', label: 'Society hall', tracks: ['hall_bed_01', 'hall_bed_02', 'menu_bed_01'], shuffle: true, fadeMs: 1500, volume: 0.55 },
   { id: 'outdoors', label: 'Meadows / outdoors', tracks: ['meadow_bed_01', 'meadow_bed_02', 'meadow_bed_03'], shuffle: true, fadeMs: 2000, volume: 0.55 },
   { id: 'tavern', label: 'Tavern (songs + instrumentals)', tracks: ['tavern_song_drinking_01', 'tavern_song_boast_01', 'tavern_song_jig_01', 'tavern_song_anthem_01', 'tavern_song_work_01', 'tavern_song_ballad_01', 'tavern_song_ballad_02', 'tavern_song_lament_01', 'tavern_inst_01', 'tavern_inst_02'], shuffle: true, fadeMs: 1200, volume: 0.7 },
   { id: 'tavern_songs', label: 'Tavern — sung only', tracks: ['tavern_song_drinking_01', 'tavern_song_boast_01', 'tavern_song_jig_01', 'tavern_song_anthem_01', 'tavern_song_work_01', 'tavern_song_ballad_01', 'tavern_song_ballad_02', 'tavern_song_lament_01'], shuffle: true, fadeMs: 1200, volume: 0.7 },

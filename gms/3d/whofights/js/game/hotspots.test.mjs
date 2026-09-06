@@ -155,18 +155,41 @@ test('a spent once and a cooling hotspot are not offered', () => {
 });
 
 // The authored file itself, not a replica of it: this is the pattern MANAGER_STATE.md records
-// Aaron signing off, so every locked door in the game shares this test.
-test('every locked door in academy.json opens once its key flag is set', () => {
-  const level = JSON.parse(readFileSync(new URL('../../data/levels/academy.json', import.meta.url)));
-  const doors = [['academy.key.armoury', 'hs.door.armoury', { x: 15.9, z: -19.6 }],
-    ['academy.key.dorm', 'hs.door.dorm', { x: 15.9, z: -12.4 }]];
-  for (const [key, id, at] of doors) {
+// Aaron signing off. It used to be the academy's locked doors — two hotspots on one circle with
+// opposite predicates — and the Society has no locked doors, because a door onto a room that does
+// not exist is a promise the building cannot keep. What replaced it is the same shape one axis
+// over: five storeys of one room means the contract boards are all the same circle seen from
+// above, and only the storey you are standing on may answer.
+test('every contract board in society.json answers on its own storey and no other', () => {
+  const level = JSON.parse(readFileSync(new URL('../../data/levels/society.json', import.meta.url)));
+  const boards = level.hotspots.filter(h => h.id.startsWith('hs.board.') && Number.isFinite(h.shape?.y));
+  ok(boards.length >= 4, 'the four contract boards are pinned to storeys');
+  for (const b of boards) {
     const c = ctx();
     c.world = () => ({ flags: c.flags });
     const h = new Hotspots(level.hotspots, c);
-    eq(h.press(at), `${id}.locked`, `${id} is shut without the key`);
-    c.flags[key] = true;
-    h.update(2, at);
-    eq(h.press(at), id, `${id} opens with the key`);
+    const at = { x: b.shape.x, z: b.shape.z, y: b.shape.y };
+    eq(h.press(at, ['click']), b.id, `${b.id} did not answer on its own floor`);
+    for (const other of boards) {
+      if (other === b) continue;
+      const away = { x: b.shape.x, z: b.shape.z, y: other.shape.y };
+      const g = new Hotspots(level.hotspots, ctx());
+      ok(g.press(away, ['click']) !== b.id, `${b.id} answered from ${other.id}'s floor`);
+    }
   }
+});
+
+// A hotspot with no height is on every floor, which is what everything authored before there were
+// floors meant by leaving it out. That has to keep being true.
+test('a hotspot with no height still fires at any height', () => {
+  const h = new Hotspots([spot({ trigger: 'interact', shape: { k: 'circle', x: 0, z: 0, r: 3 } })], ctx());
+  eq(h.press({ x: 0, z: 0, y: 0 }), 'h');
+  eq(h.press({ x: 0, z: 0, y: 40 }), 'h', 'a shapeless height locked it to the ground');
+});
+
+test('a height band is honoured on rects as well as circles', () => {
+  const shape = { k: 'rect', x0: -2, z0: -2, x1: 2, z1: 2, y: 10, yr: 1.5 };
+  const h = new Hotspots([spot({ trigger: 'interact', shape })], ctx());
+  eq(h.press({ x: 0, z: 0, y: 10 }), 'h');
+  eq(h.press({ x: 0, z: 0, y: 13 }), null, 'three metres up is a different storey');
 });

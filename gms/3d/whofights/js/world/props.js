@@ -239,6 +239,16 @@ export class Props {
     this.build(entries);
   }
 
+  // A level swap takes the whole prop set with the document that named it.
+  dispose() {
+    this.object3D.traverse(o => {
+      if (o.isMesh) { o.geometry?.dispose?.(); if (o.material?.dispose && !o.material.name) o.material.dispose(); }
+    });
+    this.object3D.clear();
+    this.items.length = 0;
+    this.lit.clear();
+  }
+
   groundY(x, z) {
     const fall = this.terrain ? this.terrain.surfaceY(x, z) : heightAt(x, z);
     return collidersReady() ? groundAt(x, z, fall) : fall;

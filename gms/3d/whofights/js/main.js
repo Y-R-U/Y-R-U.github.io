@@ -16,6 +16,7 @@ import { getScenario, allScenarios } from './scenarios.js';
 import { loadIndex, loadLevel, pickLevel } from './game/level.js';
 import { loadCast, Characters } from './game/characters.js';
 import { Session } from './game/session.js';
+import { LevelSwap } from './game/levelswap.js';
 import { parseAt, startPos } from './game/save.js';
 import { load } from './game/savestore.js';
 import { installMusic } from './game/music.js';
@@ -60,7 +61,7 @@ controls.maxPolarAngle = Math.PI * 0.495;
 const player = new Player(people, new Input(), controls);
 const doors = app.add(new Doors(world, player, lighting, [world.object3D]));
 app.add(player);
-app.add(new Props(world.terrain, []));
+const props = app.add(new Props(world.terrain, []));
 
 // `?at=` is how gotoLevel hands the next level a doorway to arrive at, and the autosave's own
 // `at` is where the last session left him. Neither applies under ?shot= or in the editor, where
@@ -130,8 +131,13 @@ async function play() {
     .then(r => (r.ok ? r.json() : null))
     .catch(() => null);
   const names = Object.fromEntries(Object.entries(cast.cast).map(([id, c]) => [id, c.name]));
+  // The world, the doors and the props belong to the level document; the lighting, the two body
+  // pools and the player do not. `adopt` hands the swap what boot built so the first transition
+  // knows what to take down.
+  const swap = new LevelSwap({ app, player, people, dummies, lighting })
+    .adopt({ world, doors, props, characters });
   const session = new Session(app, player, {
-    host, level: doc, characters, names, world, doors,
+    host, level: doc, characters, names, world, doors, swap,
     conversations: conversations?.nodes || {},
   });
   window.__wf.game = session;

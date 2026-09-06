@@ -8,6 +8,8 @@ import { Stream } from './stream.js';
 import { defineScenario, frameCamera } from '../scenarios.js';
 import { SceneBuilder, shadowOnly } from '../editor/build.js';
 import { loadScene } from '../editor/store.js';
+import { hallStoreys } from './hallplan.js';
+import { zone } from './zones.js';
 
 export class World {
   constructor(doc, saved = null) {
@@ -50,12 +52,18 @@ export class World {
 
   update(dt, app) { this.stream.update(dt, app); }
 
-  // Where the floor of a house's interior sits in world y. Characters standing in a hall need it:
-  // the room's floor is a plinth above the ground the terrain would put them on.
-  floorOf(id) {
+  // Where a floor of a house's interior sits in world y. Characters standing in a hall need it:
+  // the room's floor is a plinth above the ground the terrain would put them on, and in a stacked
+  // hall the fourth storey is thirty-five metres above that again. `0.66` is the plinth
+  // buildings.js draws under every house; hallStoreys() takes it from there, so a body on the
+  // Silver floor and the slab it stands on are the same number.
+  floorOf(id, floor = 0) {
     const o = this.doc.objects.find(p => p.id === id);
     if (!o || o.type !== 'house') return null;
-    return this.builder.seat(o).hi + 0.71;
+    const seat = this.builder.seat(o).hi;
+    if (!o.p.hall) return seat + 0.71;
+    const S = hallStoreys(0.66, o.p.h, zone(o.zone).interior?.ceiling ?? 1, o.p.floors || 1);
+    return seat + S.ys[Math.max(0, Math.min(S.n - 1, Math.round(floor) || 0))];
   }
 
   // `pos.y` and `look.y` are heights above the ground at that point, not absolutes, so a shot
@@ -67,7 +75,7 @@ export class World {
         setup: app => {
           if (s.inside !== undefined) doors?.peek(s.inside);
           const g = this.terrain.surfaceY.bind(this.terrain);
-          const base = s.inside !== undefined ? (this.floorOf(this.doc.objects.find(o => o.type === 'house')?.id) ?? 0) : null;
+          const base = s.inside !== undefined ? (this.floorOf(this.doc.objects.find(o => o.type === 'house')?.id, s.floor || 0) ?? 0) : null;
           const gy = p => (base ?? g(p[0], p[2]));
           frameCamera(app, {
             pos: [s.pos[0], gy(s.pos) + s.pos[1], s.pos[2]],

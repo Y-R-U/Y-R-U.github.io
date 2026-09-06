@@ -1,0 +1,990 @@
+{
+  "version": 1,
+  "id": "society",
+  "name": "Adventure Society",
+  "music": "outdoors",
+  "start": {
+    "x": -2.3,
+    "z": 26.0,
+    "yaw": 3.05581
+  },
+  "districts": [
+    {
+      "zone": "neutral",
+      "cx": 0,
+      "seed": 4021,
+      "dressSeed": 90210,
+      "road": null,
+      "roadWidth": 9,
+      "kerbs": [],
+      "bridge": null
+    }
+  ],
+  "objects": [
+    {
+      "id": 1,
+      "dist": 0,
+      "zone": "light",
+      "type": "house",
+      "lod": "full",
+      "x": 0,
+      "z": -16,
+      "ry": 0.0,
+      "seed": 812001,
+      "p": {
+        "w": 40,
+        "d": 32,
+        "h": 40,
+        "hall": 1,
+        "floors": 5
+      }
+    },
+    {
+      "id": 20,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "sign",
+      "lod": "full",
+      "x": -9,
+      "z": 15,
+      "ry": 0.22,
+      "seed": 812020,
+      "p": {
+        "w": 6.4,
+        "h": 1.8,
+        "post": 2.3,
+        "text": "Adventure Society"
+      }
+    },
+    {
+      "id": 30,
+      "dist": 0,
+      "zone": "light",
+      "type": "billboard",
+      "lod": "full",
+      "x": -9.5,
+      "z": -30.6,
+      "ry": 0.0,
+      "seed": 812030,
+      "p": {
+        "w": 7.2,
+        "h": 4.0,
+        "lift": 2.0,
+        "text": "Registration"
+      },
+      "inside": 1,
+      "floor": 0
+    },
+    {
+      "id": 31,
+      "dist": 0,
+      "zone": "light",
+      "type": "billboard",
+      "lod": "full",
+      "x": 9.5,
+      "z": -30.6,
+      "ry": 0.0,
+      "seed": 812031,
+      "p": {
+        "w": 7.2,
+        "h": 4.0,
+        "lift": 2.0,
+        "text": "New Adventures"
+      },
+      "inside": 1,
+      "floor": 0
+    },
+    {
+      "id": 32,
+      "dist": 0,
+      "zone": "light",
+      "type": "billboard",
+      "lod": "full",
+      "x": 0,
+      "z": -30.6,
+      "ry": 0.0,
+      "seed": 812032,
+      "p": {
+        "w": 9.0,
+        "h": 4.0,
+        "lift": 2.0,
+        "text": "Iron Contracts"
+      },
+      "inside": 1,
+      "floor": 1
+    },
+    {
+      "id": 33,
+      "dist": 0,
+      "zone": "light",
+      "type": "billboard",
+      "lod": "full",
+      "x": 0,
+      "z": -30.6,
+      "ry": 0.0,
+      "seed": 812033,
+      "p": {
+        "w": 9.0,
+        "h": 4.0,
+        "lift": 2.0,
+        "text": "Bronze Contracts"
+      },
+      "inside": 1,
+      "floor": 2
+    },
+    {
+      "id": 34,
+      "dist": 0,
+      "zone": "light",
+      "type": "billboard",
+      "lod": "full",
+      "x": 0,
+      "z": -30.6,
+      "ry": 0.0,
+      "seed": 812034,
+      "p": {
+        "w": 9.0,
+        "h": 4.0,
+        "lift": 2.0,
+        "text": "Silver Contracts"
+      },
+      "inside": 1,
+      "floor": 3
+    },
+    {
+      "id": 35,
+      "dist": 0,
+      "zone": "light",
+      "type": "billboard",
+      "lod": "full",
+      "x": 0,
+      "z": -30.6,
+      "ry": 0.0,
+      "seed": 812035,
+      "p": {
+        "w": 9.0,
+        "h": 4.0,
+        "lift": 2.0,
+        "text": "Gold Contracts"
+      },
+      "inside": 1,
+      "floor": 4
+    },
+    {
+      "id": 40,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "mass",
+      "lod": "auto",
+      "x": -44,
+      "z": -24,
+      "ry": 0.0,
+      "seed": 812040,
+      "p": {
+        "w": 14,
+        "d": 12,
+        "h": 11
+      }
+    },
+    {
+      "id": 41,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "mass",
+      "lod": "auto",
+      "x": -44,
+      "z": -6,
+      "ry": 0.0,
+      "seed": 812041,
+      "p": {
+        "w": 12,
+        "d": 11,
+        "h": 9
+      }
+    },
+    {
+      "id": 42,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "mass",
+      "lod": "auto",
+      "x": -44,
+      "z": 12,
+      "ry": 0.0,
+      "seed": 812042,
+      "p": {
+        "w": 13,
+        "d": 10,
+        "h": 10
+      }
+    },
+    {
+      "id": 43,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "mass",
+      "lod": "auto",
+      "x": 44,
+      "z": -24,
+      "ry": 0.0,
+      "seed": 812043,
+      "p": {
+        "w": 14,
+        "d": 12,
+        "h": 11
+      }
+    },
+    {
+      "id": 44,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "mass",
+      "lod": "auto",
+      "x": 44,
+      "z": -6,
+      "ry": 0.0,
+      "seed": 812044,
+      "p": {
+        "w": 12,
+        "d": 11,
+        "h": 9.5
+      }
+    },
+    {
+      "id": 45,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "mass",
+      "lod": "auto",
+      "x": 44,
+      "z": 12,
+      "ry": 0.0,
+      "seed": 812045,
+      "p": {
+        "w": 13,
+        "d": 10,
+        "h": 10
+      }
+    },
+    {
+      "id": 46,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "barn",
+      "lod": "auto",
+      "x": -34,
+      "z": -56,
+      "ry": 0.0,
+      "seed": 812046,
+      "p": {
+        "w": 26,
+        "d": 14,
+        "h": 8.5
+      }
+    },
+    {
+      "id": 47,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "mill",
+      "lod": "auto",
+      "x": 30,
+      "z": -54,
+      "ry": 0.0,
+      "seed": 812047,
+      "p": {
+        "w": 13,
+        "d": 11,
+        "h": 13.5,
+        "wheel": 3.3
+      }
+    },
+    {
+      "id": 48,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "cross",
+      "lod": "auto",
+      "x": 0,
+      "z": 34,
+      "ry": 0.0,
+      "seed": 812048,
+      "p": {
+        "steps": 4,
+        "height": 6.5,
+        "radius": 3.2
+      }
+    },
+    {
+      "id": 49,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "arcade",
+      "lod": "auto",
+      "x": -27,
+      "z": 41,
+      "ry": 0.0,
+      "seed": 812049,
+      "p": {
+        "length": 26,
+        "height": 5.4,
+        "depth": 3.6,
+        "bays": 6
+      }
+    },
+    {
+      "id": 50,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "arcade",
+      "lod": "auto",
+      "x": 27,
+      "z": 41,
+      "ry": 0.0,
+      "seed": 812050,
+      "p": {
+        "length": 26,
+        "height": 5.4,
+        "depth": 3.6,
+        "bays": 6
+      }
+    },
+    {
+      "id": 51,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "mass",
+      "lod": "auto",
+      "x": -47,
+      "z": 41,
+      "ry": 0.0,
+      "seed": 812051,
+      "p": {
+        "w": 16,
+        "d": 12,
+        "h": 10
+      }
+    },
+    {
+      "id": 52,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "mass",
+      "lod": "auto",
+      "x": 47,
+      "z": 41,
+      "ry": 0.0,
+      "seed": 812052,
+      "p": {
+        "w": 16,
+        "d": 12,
+        "h": 10
+      }
+    },
+    {
+      "id": 53,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "pen",
+      "lod": "auto",
+      "x": -16,
+      "z": 57,
+      "ry": 0.0,
+      "seed": 812053,
+      "p": {
+        "w": 14,
+        "d": 10,
+        "h": 1.5
+      }
+    },
+    {
+      "id": 54,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "mass",
+      "lod": "auto",
+      "x": 17,
+      "z": 58,
+      "ry": 0.0,
+      "seed": 812054,
+      "p": {
+        "w": 12,
+        "d": 10,
+        "h": 8
+      }
+    }
+  ],
+  "hotspots": [
+    {
+      "id": "hs.doorway",
+      "name": "The Society doorway",
+      "shape": {
+        "k": "circle",
+        "x": 0,
+        "z": 3.0,
+        "r": 6
+      },
+      "trigger": "enter",
+      "once": false,
+      "cooldown": 10,
+      "if": null,
+      "actions": [
+        {
+          "k": "flag",
+          "name": "society.doorway.seen",
+          "value": true
+        },
+        {
+          "k": "music",
+          "set": "academy_hall"
+        }
+      ]
+    },
+    {
+      "id": "hs.greeter",
+      "name": "Speak to the Registrar",
+      "attach": "greeter",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "all",
+        [
+          "not",
+          [
+            "flag",
+            "society.met.registrar"
+          ]
+        ],
+        [
+          "not",
+          [
+            "flag",
+            "society.test.passed"
+          ]
+        ]
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.greeter.hello"
+        }
+      ]
+    },
+    {
+      "id": "hs.greeter.again",
+      "name": "Speak to the Registrar",
+      "attach": "greeter",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "all",
+        [
+          "flag",
+          "society.met.registrar"
+        ],
+        [
+          "not",
+          [
+            "flag",
+            "society.test.passed"
+          ]
+        ]
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.greeter.again"
+        }
+      ]
+    },
+    {
+      "id": "hs.greeter.essences",
+      "name": "Speak to the Registrar",
+      "attach": "greeter",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "all",
+        [
+          "flag",
+          "society.test.passed"
+        ],
+        [
+          "not",
+          [
+            "flag",
+            "society.essences.chosen"
+          ]
+        ]
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.greeter.essences"
+        }
+      ]
+    },
+    {
+      "id": "hs.greeter.member",
+      "name": "Speak to the Registrar",
+      "attach": "greeter",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "flag",
+        "society.essences.chosen"
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.greeter.member"
+        }
+      ]
+    },
+    {
+      "id": "hs.greeter.near",
+      "name": "The Registrar looks up",
+      "attach": "greeter",
+      "r": 7,
+      "trigger": "enter",
+      "once": false,
+      "cooldown": 30,
+      "if": null,
+      "actions": [
+        {
+          "k": "bark",
+          "who": "registrar",
+          "category": "greet"
+        }
+      ]
+    },
+    {
+      "id": "hs.board.new",
+      "name": "Read the New Adventures board",
+      "shape": {
+        "k": "circle",
+        "x": 9.5,
+        "z": -30.6,
+        "r": 4.0,
+        "y": 3.65,
+        "yr": 3.4
+      },
+      "trigger": "click",
+      "once": false,
+      "cooldown": 0.4,
+      "if": null,
+      "actions": [
+        {
+          "k": "screen",
+          "id": "board.new"
+        }
+      ]
+    },
+    {
+      "id": "hs.board.iron",
+      "name": "Read the Iron Contracts board",
+      "shape": {
+        "k": "circle",
+        "x": 0,
+        "z": -30.6,
+        "r": 4.0,
+        "y": 11.52,
+        "yr": 3.4
+      },
+      "trigger": "click",
+      "once": false,
+      "cooldown": 0.4,
+      "if": null,
+      "actions": [
+        {
+          "k": "screen",
+          "id": "board.iron"
+        }
+      ]
+    },
+    {
+      "id": "hs.board.bronze",
+      "name": "Read the Bronze Contracts board",
+      "shape": {
+        "k": "circle",
+        "x": 0,
+        "z": -30.6,
+        "r": 4.0,
+        "y": 19.39,
+        "yr": 3.4
+      },
+      "trigger": "click",
+      "once": false,
+      "cooldown": 0.4,
+      "if": null,
+      "actions": [
+        {
+          "k": "screen",
+          "id": "board.bronze"
+        }
+      ]
+    },
+    {
+      "id": "hs.board.silver",
+      "name": "Read the Silver Contracts board",
+      "shape": {
+        "k": "circle",
+        "x": 0,
+        "z": -30.6,
+        "r": 4.0,
+        "y": 27.25,
+        "yr": 3.4
+      },
+      "trigger": "click",
+      "once": false,
+      "cooldown": 0.4,
+      "if": null,
+      "actions": [
+        {
+          "k": "screen",
+          "id": "board.silver"
+        }
+      ]
+    },
+    {
+      "id": "hs.board.gold",
+      "name": "Read the Gold Contracts board",
+      "shape": {
+        "k": "circle",
+        "x": 0,
+        "z": -30.6,
+        "r": 4.0,
+        "y": 35.12,
+        "yr": 3.4
+      },
+      "trigger": "click",
+      "once": false,
+      "cooldown": 0.4,
+      "if": null,
+      "actions": [
+        {
+          "k": "screen",
+          "id": "board.gold"
+        }
+      ]
+    },
+    {
+      "id": "hs.clerk.iron",
+      "name": "Speak to the Iron clerk",
+      "attach": "clerk_iron",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": null,
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.clerk.iron"
+        }
+      ]
+    },
+    {
+      "id": "hs.clerk.bronze",
+      "name": "Speak to the Bronze clerk",
+      "attach": "clerk_bronze",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": null,
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.clerk.bronze"
+        }
+      ]
+    },
+    {
+      "id": "hs.clerk.silver",
+      "name": "Speak to the Silver clerk",
+      "attach": "clerk_silver",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": null,
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.clerk.silver"
+        }
+      ]
+    },
+    {
+      "id": "hs.clerk.gold",
+      "name": "Speak to the Gold clerk",
+      "attach": "clerk_gold",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": null,
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.clerk.gold"
+        }
+      ]
+    },
+    {
+      "id": "hs.quartermaster",
+      "name": "Speak to Quartermaster Brann",
+      "attach": "quartermaster",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": null,
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.quartermaster"
+        }
+      ]
+    },
+    {
+      "id": "hs.doorward",
+      "name": "Speak to Warden Bel",
+      "attach": "doorward",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "not",
+        [
+          "flag",
+          "society.registered"
+        ]
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.stair.refuse.iron"
+        }
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "id": "spawn",
+      "label": "The spawn point and the sign",
+      "zone": "neutral",
+      "time": 10.5,
+      "pos": [
+        -9,
+        3.2,
+        30
+      ],
+      "look": [
+        -8.5,
+        2.3,
+        14
+      ],
+      "fov": 55,
+      "keep": 9
+    },
+    {
+      "id": "approach",
+      "label": "The Society from the square",
+      "zone": "neutral",
+      "time": 9.5,
+      "pos": [
+        -4,
+        9,
+        78
+      ],
+      "look": [
+        0,
+        22,
+        -8
+      ],
+      "fov": 60,
+      "keep": 11
+    },
+    {
+      "id": "doorway",
+      "label": "The open doorway",
+      "zone": "light",
+      "time": 11,
+      "pos": [
+        0,
+        3.4,
+        16
+      ],
+      "look": [
+        0,
+        5.0,
+        -2
+      ],
+      "fov": 58,
+      "keep": 9
+    },
+    {
+      "id": "hall",
+      "label": "The ground floor and the grand stair",
+      "zone": "light",
+      "time": 11,
+      "inside": 0,
+      "floor": 0,
+      "pos": [
+        0,
+        2.8,
+        -2.5
+      ],
+      "look": [
+        0,
+        5.6,
+        -22
+      ],
+      "fov": 70
+    },
+    {
+      "id": "well",
+      "label": "Up the stair well from the ground floor",
+      "zone": "light",
+      "time": 11,
+      "inside": 0,
+      "floor": 0,
+      "pos": [
+        0,
+        1.7,
+        -3.5
+      ],
+      "look": [
+        0,
+        30,
+        -12.5
+      ],
+      "fov": 72
+    },
+    {
+      "id": "desk",
+      "label": "The registration desk on the ground floor",
+      "zone": "light",
+      "time": 11,
+      "inside": 0,
+      "floor": 0,
+      "pos": [
+        -13,
+        2.6,
+        -18
+      ],
+      "look": [
+        -9,
+        3.2,
+        -30
+      ],
+      "fov": 62
+    },
+    {
+      "id": "iron",
+      "label": "The Iron floor",
+      "zone": "light",
+      "time": 11,
+      "inside": 0,
+      "floor": 1,
+      "pos": [
+        -16,
+        3.0,
+        -29
+      ],
+      "look": [
+        0,
+        4.0,
+        -11.4
+      ],
+      "fov": 62
+    },
+    {
+      "id": "bronze",
+      "label": "The Bronze floor",
+      "zone": "light",
+      "time": 11,
+      "inside": 0,
+      "floor": 2,
+      "pos": [
+        0,
+        2.8,
+        -4
+      ],
+      "look": [
+        0,
+        4.4,
+        -28
+      ],
+      "fov": 66
+    },
+    {
+      "id": "silver",
+      "label": "The Silver floor",
+      "zone": "light",
+      "time": 11,
+      "inside": 0,
+      "floor": 3,
+      "pos": [
+        0,
+        2.8,
+        -4
+      ],
+      "look": [
+        0,
+        4.4,
+        -28
+      ],
+      "fov": 66
+    },
+    {
+      "id": "gold",
+      "label": "The Gold floor",
+      "zone": "light",
+      "time": 11,
+      "inside": 0,
+      "floor": 4,
+      "pos": [
+        0,
+        2.8,
+        -4
+      ],
+      "look": [
+        0,
+        4.4,
+        -28
+      ],
+      "fov": 66
+    },
+    {
+      "id": "landing",
+      "label": "The stair landing on the Bronze floor",
+      "zone": "light",
+      "time": 11,
+      "inside": 0,
+      "floor": 2,
+      "pos": [
+        9,
+        2.6,
+        -20
+      ],
+      "look": [
+        0,
+        5.5,
+        -11.4
+      ],
+      "fov": 66
+    }
+  ]
+}

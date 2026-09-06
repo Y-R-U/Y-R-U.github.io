@@ -494,6 +494,15 @@ export class People {
   // data/characters.json, placed through `place()`.
   spawn() { this.agents = []; }
 
+  // Empty the crowd without taking the rig down with it. A level swap replaces who is in the
+  // world, not the instanced meshes they are drawn from — those are sized at construction and the
+  // player's own body is one of them, so standing a second pool up would leave him rendering off
+  // the first. `setCrowd` re-seats what is left, which after this is nobody.
+  clear() {
+    this.agents.length = 0;
+    this.setCrowd(this.crowdN ?? POOL);
+  }
+
   buildMeshes() {
     this.meshes = [];
     ZONE_IDS.forEach((id, zi) => {

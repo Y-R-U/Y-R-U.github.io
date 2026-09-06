@@ -1,4 +1,4 @@
-// The analytic world: heights, the academy pad and the road, with no renderer import so node can
+// The analytic world: heights, the Society's pad and the road, with no renderer import so node can
 // measure it. terrain.js turns all of this into meshes and re-exports it.
 //
 // Who Fights is one gentle meadow, not FORGE's valley. The river API is still exported because
@@ -39,7 +39,7 @@ export function fbm(x, y, oct, s) {
 // One place, one pad. `pad` is metres above the valley floor, the same list-of-terraces shape
 // FORGE used, so a later level can step a hillside town without changing this file.
 export const TOWNS = [
-  { id: 'academy', zone: 'neutral', cx: 0, cz: -30, hw: 105, hd: 95, pad: [3] },
+  { id: 'society', zone: 'neutral', cx: 0, cz: -30, hw: 105, hd: 95, pad: [3] },
 ];
 export const CENTERS = TOWNS.map(t => t.cx);
 const TOWN_FADE = 80;
@@ -120,7 +120,7 @@ export const depthAt = (x, z) => waterY(x) - heightAt(x, z);
 
 // One zone across the whole meadow. The boundaries sit far outside BOUNDS, so `zoneMix` always
 // answers neutral and the ground tint never changes along a line. Objects still carry their own
-// zone — the academy is built in `light` stone on neutral ground.
+// zone — the Adventure Society is built in `light` stone on neutral ground.
 export const bound0 = () => X0 - 400;
 export const bound1 = () => X1 + 400;
 
@@ -140,7 +140,7 @@ export function axis(spans) {
   return Float32Array.from(out);
 }
 
-// 4 m over the academy and its meadow, 10 m out to the rim.
+// 4 m over the Society and its meadow, 10 m out to the rim.
 export const XS = axis([[X0, -170, 10], [-170, 170, 4], [170, X1, 10]]);
 export const ZS = axis([[Z0, -170, 10], [-170, 170, 4], [170, Z1, 10]]);
 export const NX = XS.length, NZ = ZS.length;
@@ -173,8 +173,8 @@ export function sampleGrid(hg, x, z) {
 
 const R = (x, z) => [x, z];
 
-// The one road, running east–west across the front of the academy. The level's spawn point sits
-// on it. `ROAD_Z` is what data/levels/academy.json places the sign and the player against.
+// The one road, running east–west across the front of the Society. The level's spawn point sits
+// on it. `ROAD_Z` is what data/levels/society.json places the sign and the player against.
 export const ROAD_Z = 22;
 
 export const ROADS = [

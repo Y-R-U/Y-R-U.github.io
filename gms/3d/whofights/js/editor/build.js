@@ -9,8 +9,9 @@ import {
 } from '../world/details.js';
 import { zone } from '../world/zones.js';
 import { signPost, boardPanel } from '../world/boards.js';
+import { floorPatch } from '../world/plots.js';
 import { heightAt, waterY } from '../world/terrain.js';
-import { footprint, blockOf } from './scene.js';
+import { footprint, blockOf, FLOOR_TYPES } from './scene.js';
 
 // v3's six new types. Each is a `dressing` batch of the shared kit rather than a builder in
 // buildings.js, because none of them has an interior or a door — they are furniture for a town,
@@ -23,7 +24,11 @@ const BUILDERS = {
   cross: kit(cross), arcade: kit(arcade), retaining: kit(retaining),
   // Not `kit()`: a lettered board needs its own texture, so it cannot merge into a shared batch.
   sign: signPost, billboard: boardPanel,
+  // Not `kit()` either: a floor wants the baked texture without the outdoor ground skirt, which
+  // is a material of its own — see js/world/plots.js.
+  plot: floorPatch,
 };
+
 
 // Shared with colliders.js, which used to carry its own copy of these and drift from them.
 export const BRIDGE = {
@@ -142,7 +147,7 @@ export class SceneBuilder {
     // each piece is routed to the block it stands in so it culls with that block.
     const R = rng(d.dressSeed);
     for (const o of here) {
-      if (o.id === this.held || o.type === 'mass') continue;
+      if (o.id === this.held || o.type === 'mass' || FLOOR_TYPES.has(o.type)) continue;
       const s = seats.get(o.id);
       foundation(cellOf(o.x, o.z).dress, { x: o.x, z: o.z, hw: s.hw, hd: s.hd, rot: o.ry, top: s.r.hi, bot: s.r.lo });
     }

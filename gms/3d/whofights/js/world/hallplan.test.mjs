@@ -1,5 +1,5 @@
 import { test, eq, ok, near } from '../../tools/harness.mjs';
-import { HALL, bayLines, bayMids, hallBand, hallWindows, hallDoorU, DOOR_BAYS } from './hallplan.js';
+import { HALL, bayLines, bayMids, hallBand, hallStoreys, hallWindows } from './hallplan.js';
 
 // This module exists because the outside of the hall and the inside of it each invented their own
 // fenestration, and Aaron found the seam by walking through the door. The tests are about the one
@@ -34,16 +34,22 @@ test('every opening sits inside the wall band it is cut in', () => {
   }
 });
 
-test('nothing is cut where a doorway already is', () => {
-  const doors = hallDoorU(inner(H.d));
+// No hall in the game has an inner doorway any more, but `doorBays` is still the mechanism for
+// one, and a mechanism nothing exercises is a mechanism that has already broken.
+test('nothing is cut where a doorway the caller declared already is', () => {
+  const doorBays = [1, 2];
+  const mids = bayMids(bayLines(inner(H.d), HALL.bay));
+  const doors = doorBays.map(i => mids[i]);
   const dh = Math.min(3.8, band.wallH * 0.60);
-  for (const o of at('side', H.d)) {
+  const cut = hallWindows({ span: inner(H.d), band, role: 'side', doorBays });
+  for (const o of cut) {
     for (const u of doors) {
       const overlapX = Math.abs(o.x - u) < o.w / 2 + 1.3;
       const overlapY = o.y < band.fy + dh && o.y + o.h > band.fy;
       ok(!(overlapX && overlapY), `a light at ${o.x} crosses the doorway at ${u}`);
     }
   }
+  ok(cut.length < at('side', H.d).length, 'declaring doorways took nothing out of the wall');
 });
 
 test('nothing is cut where the great doorway already is', () => {
@@ -65,28 +71,42 @@ test('the low row is the one you can see through, and it is not the only row', (
   for (const o of side) eq(o.open, o.row === 0, `row ${o.row} open flag`);
 });
 
-test('a doorway is at a bay midpoint, and the piers are at the bay lines', () => {
-  const lines = bayLines(inner(H.d), HALL.bay);
-  const mids = bayMids(lines);
-  for (const u of hallDoorU(inner(H.d))) {
-    ok(mids.includes(u), 'a doorway left the bay grid');
-    for (const l of lines) ok(Math.abs(l - u) > 1.3, `the doorway at ${u} runs into the pier at ${l}`);
+
+
+// The Adventure Society is this hall stacked five times, and both surfaces of it have to agree on
+// where the storeys are or the fenestration drifts a floor apart — the same fault, one axis over,
+// that this module was written to stop.
+test('a stacked hall splits into storeys both surfaces can read', () => {
+  const S = hallStoreys(H.plinth, 40, H.ceilK, 5);
+  eq(S.n, 5);
+  eq(S.bands.length, 5);
+  for (let i = 1; i < S.ys.length; i++) near(S.ys[i] - S.ys[i - 1], S.storeyH, 1e-9, `storey ${i}`);
+  for (let i = 0; i < S.n - 1; i++) {
+    near(S.bands[i].wallH, S.storeyH - S.slabTh, 1e-9, `band ${i} is floor to floor less the slab`);
+  }
+  ok(S.plateTop < 40, 'the top wall plate is inside the building');
+  // Every storey's windows have to sit inside that storey's own band, or a light is cut through
+  // the floor slab above it.
+  for (const band of S.bands) {
+    for (const o of hallWindows({ span: 38, band, role: 'side' })) {
+      ok(o.y >= band.fy, 'a window starts below its own floor');
+      ok(o.y + o.h <= band.plateY + 1e-9, 'a window runs past its own wall plate');
+    }
   }
 });
 
-test('the three doorways are where data/levels/academy.json puts its hotspots', () => {
-  // The level document is not read here — it must not be, it is data — so the numbers it authors
-  // are written out. With the hall at world (0, −16) and the room's own half-depth 14.4:
-  //   hs.door.yard      x −15.9  z −12.4   west wall
-  //   hs.door.armoury   x  15.9  z −19.6   east wall
-  //   hs.door.dorm      x  15.9  z −12.4   east wall
-  // A doorway's u is measured along its own face; both side faces put +u at ∓z, so a doorway at
-  // u = −3.6 on the west wall and one at u = −3.6 on the east wall are at opposite ends.
-  const HALL_Z = -16, rz = H.d / 2 - H.t - 0.09;
-  const [uA, uB] = hallDoorU(rz * 2);
-  const west = z => HALL_Z - z, east = z => HALL_Z + z;
-  near(west(uA), -12.4, 1e-9, 'yard');
-  near(east(uA), -19.6, 1e-9, 'armoury');
-  near(east(uB), -12.4, 1e-9, 'dormitory');
-  eq(DOOR_BAYS.length, 3 - 1, 'three authored doorways come out of two bay indices, one shared');
+test('one storey is the hall it has always been', () => {
+  const one = hallStoreys(H.plinth, H.wallTop, H.ceilK, 1);
+  eq(one.bands[0], hallBand(H.plinth, H.wallTop, H.ceilK));
+  eq(one.n, 1);
+});
+
+// The academy's three inner doorways are gone with the academy, and the two middle bays of each
+// side wall get their low light back rather than staying blank for a door nothing draws.
+test('a side wall with no doorways keeps every bay of its low row', () => {
+  const full = at('side', H.d);
+  const low = full.filter(o => o.row === 0);
+  const mids = bayMids(bayLines(inner(H.d), HALL.bay));
+  eq(low.length, mids.length, 'a bay is missing its low light');
+  for (const u of mids) ok(low.some(o => Math.abs(o.x - u) < 1e-9), `no low light at bay ${u}`);
 });

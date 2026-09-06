@@ -1092,6 +1092,15 @@ body.flip #game .g-open {
 
 /* Where you stand, said once. `shut` is the ungated state — deliberately not red and not an
    error: it names the rung above, because the screen is meant to make the rank worth wanting. */
+/* Which storey a board hangs on. Five floors of one room look alike from the inside. */
+#game .g-parch-where {
+  font-size: calc(11px * var(--ui));
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 calc(8px * var(--ui));
+}
+
 #game .g-standing {
   padding: calc(10px * var(--ui)) calc(13px * var(--ui));
   border-left: calc(3px * var(--ui)) solid var(--wax);
@@ -1207,3 +1216,185 @@ body.flip #game .g-open {
   #game .g-steps { columns: 2; column-gap: calc(22px * var(--ui)); }
   #game .g-steps li { break-inside: avoid; }
 }
+
+/* The level fade. Over the world and the HUD, under the pause menu — the swap closes any sheet
+   before it starts, but a player who hits pause mid-transition must not be shown a black square
+   with a menu they cannot see the edges of. */
+#game .g-fade {
+  position: absolute;
+  inset: 0;
+  background: #07080a;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+  z-index: 3;
+}
+#game .g-fade.on { opacity: 1; }
+
+/* Health, mine and its. Two bars, centred at the top, and gone the moment nothing can hurt you. */
+/* `hidden` is an attribute, and any `display` rule beats it. The bars are hidden out of
+   combat, and without this they were not. */
+#game .g-hpbar[hidden] { display: none !important; }
+#game .g-hpbar {
+  position: absolute;
+  top: calc(58px * var(--ui));
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  gap: calc(5px * var(--ui));
+  width: min(46vw, calc(300px * var(--ui)));
+}
+#game .g-hpline {
+  height: calc(9px * var(--ui));
+  background: rgba(10, 11, 13, .62);
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: calc(5px * var(--ui));
+  overflow: hidden;
+}
+#game .g-hpline i {
+  display: block;
+  height: 100%;
+  transform-origin: left center;
+  transition: transform 140ms ease-out;
+}
+#game .g-hpmine i { background: linear-gradient(90deg, #7fbf6a, #b9d977); }
+#game .g-hpfoe { height: calc(6px * var(--ui)); }
+#game .g-hpfoe i { background: linear-gradient(90deg, #b8542f, #ff8a3d); }
+
+/* ── the essence table ──────────────────────────────────────────────────────────────────────
+   Twelve on one sheet, because the thing that makes an irreversible choice a choice is being
+   able to see what you are not taking. One column on a phone, two where there is room. */
+#game .g-essences { max-width: min(96vw, calc(880px * var(--ui))); }
+
+#game .g-esslist {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: calc(10px * var(--ui));
+  margin-top: calc(12px * var(--ui));
+}
+@media (min-width: 760px) { #game .g-esslist { grid-template-columns: 1fr 1fr; } }
+
+#game .g-ess {
+  --ess: #888;
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  padding: calc(11px * var(--ui)) calc(13px * var(--ui));
+  border: 1px solid rgba(60, 48, 32, .22);
+  border-left: calc(4px * var(--ui)) solid var(--ess);
+  border-radius: calc(4px * var(--ui));
+  background: rgba(255, 253, 246, .5);
+  cursor: pointer;
+}
+#game button.g-ess:hover { background: rgba(255, 253, 246, .82); }
+#game .g-ess.on {
+  background: rgba(255, 250, 232, .95);
+  box-shadow: inset 0 0 0 1px var(--ess);
+}
+#game .g-ess.conf { border-left-width: calc(6px * var(--ui)); }
+#game article.g-ess { cursor: default; }
+
+#game .g-ess-h { display: flex; align-items: baseline; justify-content: space-between; gap: calc(8px * var(--ui)); }
+#game .g-ess-h h3 { margin: 0; font-size: calc(17px * var(--ui)); }
+#game .g-ess-h em {
+  font-style: normal;
+  font-size: calc(11px * var(--ui));
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ess);
+}
+#game .g-ess > p { margin: calc(5px * var(--ui)) 0 0; font-size: calc(13px * var(--ui)); color: var(--faint); }
+
+#game .g-abils { margin-top: calc(9px * var(--ui)); display: grid; gap: calc(6px * var(--ui)); }
+/* Unawakened slots are shown, dimmed. They are what the essence could become, which is most of
+   what the choice is about — hiding them would make all twelve read the same. */
+#game .g-abil { opacity: .42; padding-left: calc(9px * var(--ui)); border-left: 1px dotted rgba(60, 48, 32, .35); }
+#game .g-abil.on { opacity: 1; border-left: calc(2px * var(--ui)) solid var(--ess); }
+#game .g-abil-h { display: flex; align-items: baseline; justify-content: space-between; gap: calc(6px * var(--ui)); }
+#game .g-abil-h b { font-size: calc(13px * var(--ui)); }
+#game .g-abil-h em {
+  font-style: normal; font-size: calc(10px * var(--ui)); letter-spacing: .07em;
+  text-transform: uppercase; color: var(--faint);
+}
+#game .g-abil-cost { display: block; font-size: calc(11px * var(--ui)); color: var(--faint); font-variant: small-caps; }
+#game .g-abil p { margin: calc(2px * var(--ui)) 0 0; font-size: calc(12.5px * var(--ui)); }
+
+#game .g-grant { margin-top: calc(10px * var(--ui)); display: grid; gap: calc(3px * var(--ui)); }
+#game .g-grant b { font-size: calc(13px * var(--ui)); }
+#game .g-grant-row { display: flex; gap: calc(8px * var(--ui)); font-size: calc(13px * var(--ui)); }
+#game .g-grant-row u { text-decoration: none; color: var(--faint); min-width: calc(96px * var(--ui)); }
+
+#game .g-take {
+  display: block;
+  width: 100%;
+  margin-top: calc(11px * var(--ui));
+  min-height: var(--tap);
+  font: inherit;
+  font-size: calc(15px * var(--ui));
+  color: #f6f1e4;
+  background: #6b3f2c;
+  border: 0;
+  border-radius: calc(4px * var(--ui));
+  cursor: pointer;
+}
+#game .g-take:hover { background: #7d4a33; }
+
+/* ── the interact menu ──────────────────────────────────────────────────────────────────────
+   A short list where you pressed, not a screen. The backdrop catches the next press so one tap
+   closes it; it does not dim, because the world behind it is still running. */
+#game .g-imenu {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+#game .g-imenu.in { opacity: 1; }
+#game .g-imenu-card {
+  position: fixed;
+  min-width: calc(190px * var(--ui));
+  display: grid;
+  padding: calc(4px * var(--ui));
+  gap: calc(2px * var(--ui));
+  background: rgba(16, 17, 20, .93);
+  border: 1px solid rgba(255, 255, 255, .13);
+  border-radius: calc(7px * var(--ui));
+  box-shadow: 0 calc(10px * var(--ui)) calc(30px * var(--ui)) rgba(0, 0, 0, .45);
+}
+#game .g-imenu-b {
+  display: grid;
+  gap: calc(1px * var(--ui));
+  min-height: var(--tap);
+  padding: calc(6px * var(--ui)) calc(11px * var(--ui));
+  text-align: left;
+  font: inherit;
+  color: #eee6d6;
+  background: transparent;
+  border: 0;
+  border-radius: calc(4px * var(--ui));
+  cursor: pointer;
+}
+#game .g-imenu-b:hover { background: rgba(255, 255, 255, .08); }
+#game .g-imenu-b b { font-size: calc(14px * var(--ui)); }
+#game .g-imenu-b span { font-size: calc(11.5px * var(--ui)); color: #9a9384; }
+/* Shown, not hidden. An option that is not available yet is information; a gap where it used to
+   be is a menu that changes shape every time you open it. */
+#game .g-imenu-b.off { opacity: .45; }
+
+#game .g-castable {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-left: calc(2px * var(--ui)) solid var(--wax);
+  padding: calc(6px * var(--ui)) 0 calc(6px * var(--ui)) calc(9px * var(--ui));
+  margin-bottom: calc(6px * var(--ui));
+  cursor: pointer;
+}
+#game .g-castable:hover { background: rgba(255, 253, 246, .5); }

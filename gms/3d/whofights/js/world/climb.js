@@ -1,13 +1,16 @@
-// The scripted walk up and down a spiral stair. Same bargain as the doorway: at the landing you
-// hand over, the flight is walked for you, and you get control back on the floor above.
+// The scripted walk between two floors. Same bargain as the doorway: at the landing you hand
+// over, the flight is walked for you, and you get control back on the floor above.
+//
+// Nothing here knows what kind of stair it is on. A cottage loft and the Society's five-storey
+// helix answer the same three questions — where are the landings, which way does each one go, and
+// what is the path between two floors — and js/world/interior.js answers them for both.
 
 import * as THREE from 'three';
-import { stairPos, stairLanding, stairPath } from './stairs.js';
 
-const NEAR = 0.9;     // how close to a landing counts as being at it
+const NEAR = 1.6;     // how close to a landing counts as being at it
 const AIM = 0.35;     // how squarely you have to be walking at the stair to be taken up it
-const TIGHT = 0.7;    // arm once the camera is level with the loft floor: it has to fit down the well
-const WIDE = 1.5;     // arm while it is still below the deck, where there is a room to swing into
+const TIGHT = 0.7;    // arm once the camera is level with the floor above: it has to fit up the well
+const WIDE = 1.5;     // arm while it is still clear of that floor, where there is a room to swing into
 const PITCH = 0.06;
 const EYE = 1.55;     // aimed at the chest, so the flight ahead is in shot and not just the player
 
@@ -22,6 +25,11 @@ export class Climb {
     this.cool = 0;
     this.enabled = true;
     this.pace = 2.2;   // m/s along the path
+    // Installed by the play session. Answers null to let a climb happen, or a reason not to —
+    // which is how a rank you have not earned stops you at the foot of the stair rather than at
+    // the top of it. It is asked at the landing, before the player is ever taken over.
+    this.gate = null;
+    this.refused = null;
   }
 
   bind(d, I) {
@@ -64,52 +72,62 @@ export class Climb {
 
   // True while it owns the player.
   update(dt, P) {
-    if (!this.I || !this.I.loft || !this.enabled) return false;
+    if (!this.I || !this.I.climbable || !this.enabled) return false;
     this.cool = Math.max(0, this.cool - dt);
     if (this.running) { this.run(dt, P); return true; }
     return this.watch(P);
+  }
+
+  // The landing the player is standing at, or null. Its `up` says which way its flight goes, so
+  // the two sides of one floor's seam are two different intentions and neither has to be guessed.
+  at(P) {
+    const l = this.local(P.pos, _l);
+    for (const g of this.I.landings()) {
+      const dx = l.x - g.x, dz = l.z - g.z;
+      if (dx * dx + dz * dz < NEAR * NEAR && Math.abs(l.y - g.y) < 0.9) return { g, l };
+    }
+    return null;
   }
 
   watch(P) {
     if (this.cool > 0) return false;
     const v = Math.hypot(P.vel.x, P.vel.z);
     if (v < 0.7) return false;
-    const l = this.local(P.pos, _l);
-    const s = stairPos(this.I);
+    const here = this.at(P);
+    if (!here) return false;
+    const { g, l } = here;
+    const s = this.I.stairCentre();
     // Facing matters, exactly as at a door: walking past the foot of the stair must not take you
     // up it. Measured against the line from the landing into the stair, not against where you are
     // standing, which is the same line however close to the landing you already are.
     const vx = P.vel.x * this.cs - P.vel.z * this.sn;
     const vz = P.vel.x * this.sn + P.vel.z * this.cs;
-    for (const top of [false, true]) {
-      const g = stairLanding(this.I, top);
-      const dx = l.x - g.x, dz = l.z - g.z;
-      if (dx * dx + dz * dz > NEAR * NEAR || Math.abs(l.y - g.y) > 0.9) continue;
-      const ix = s.x - g.x, iz = s.z - g.z;
-      if ((vx * ix + vz * iz) / (Math.hypot(ix, iz) * v) < AIM) continue;
-      this.begin(!top, P, l);
-      return true;
+    const ix = s.x - g.x, iz = s.z - g.z;
+    if ((vx * ix + vz * iz) / (Math.hypot(ix, iz) * v) < AIM) return false;
+    const to = g.i + (g.up ? 1 : -1);
+    const why = this.gate ? this.gate(g.i, to) : null;
+    if (why) {
+      // Refused, not driven: the player keeps the stick and simply does not go up. Re-arming on a
+      // cooldown is what stops a held forward key asking the same question sixty times a second.
+      this.cool = 2.0;
+      this.refused = { from: g.i, to, why };
+      return false;
     }
-    return false;
+    this.begin(g.i, to, P, l);
+    return true;
   }
 
-  // The foot of the stair backs onto the same wall as the front door, so the two hotspots can
-  // overlap. The stair wins the overlap: you can always turn round and walk out again. Standing on
-  // the flight counts too — nobody leaves a house from halfway up the stairs.
+  // The foot of the stair can back onto the same wall as the front door, so the two hotspots can
+  // overlap. The stair wins: you can always turn round and walk out again. Standing on the flight
+  // counts too — nobody leaves a building from halfway up the stairs.
   atLanding(P) {
-    if (!this.I || !this.I.loft) return false;
+    if (!this.I || !this.I.climbable) return false;
     if (this.I.onStair) return true;
-    const l = this.local(P.pos, _l);
-    for (const top of [false, true]) {
-      const g = stairLanding(this.I, top);
-      const dx = l.x - g.x, dz = l.z - g.z;
-      if (dx * dx + dz * dz < NEAR * NEAR && Math.abs(l.y - g.y) < 0.9) return true;
-    }
-    return false;
+    return !!this.at(P);
   }
 
-  begin(up, P, l) {
-    const pts = stairPath(this.I, up);
+  begin(from, to, P, l) {
+    const pts = this.I.stairPath(from, to);
     pts[0] = { x: l.x, y: l.y, z: l.z };   // start where they are, so handing over does not jerk
     this.cum = [];
     let total = 0;
@@ -121,7 +139,9 @@ export class Climb {
     this.pts = pts;
     this.len = total;
     this.s = 0;
-    this.up = up;
+    this.from = from;
+    this.to = to;
+    this.up = to > from;
     this.running = true;
     P.driven = true;
     P.vel.set(0, 0, 0);
@@ -148,10 +168,10 @@ export class Climb {
     // the room swinging round you. It must not lag much more than this: the arm is set so that a
     // camera pointing along the flight stays inside the well, and a big lag swings it into the newel.
     P.camYaw += wrapPi(yaw - P.camYaw) * (1 - Math.exp(-6 * dt));
-    // The stair has no colliders, so nothing pushes the camera off a tread or out of the deck. The
-    // camera rises with the player and so crosses the loft floor partway up: the arm is reeled in
-    // as it gets there, so it comes up through the opening rather than into the boards.
-    const room = this.oy + this.I.deck - (P.pos.y + EYE);
+    // The stair has no colliders, so nothing pushes the camera off a tread or out of a floor. The
+    // camera rises with the player and so crosses the slab overhead partway up: the arm is reeled
+    // in as it gets there, so it comes up through the well rather than into the boards.
+    const room = this.I.headroom(ly) - EYE;
     const arm = THREE.MathUtils.clamp(TIGHT + room * 0.7, TIGHT, WIDE);
     const k = 1 - Math.exp(-5 * dt);
     P.distIn += (arm - P.distIn) * k;
@@ -169,17 +189,25 @@ export class Climb {
     // walking when the stair took over — into it. Left alone, holding forward at the top walks you
     // straight back onto the flight and you yo-yo between the floors.
     P.moveYaw = P.camYaw;
-    this.I.landed(this.up);
+    this.I.landed(this.to);
   }
 
   // Test hook: starts a climb without input.
   force(up, P) {
-    if (!this.I || !this.I.loft || this.running) return false;
-    this.begin(up, P, this.local(P.pos, _l));
+    if (!this.I || !this.I.climbable || this.running) return false;
+    const here = this.at(P);
+    const from = here ? here.g.i : (this.I.floorAt ? this.I.floorAt(P.pos.y - this.oy) : 0);
+    const to = from + (up ? 1 : -1);
+    if (to < 0 || to >= this.I.floors) return false;
+    this.begin(from, to, P, this.local(P.pos, _l));
     return true;
   }
 
   report() {
-    return { on: this.running, up: !!this.up, u: this.running ? +(this.s / this.len).toFixed(3) : 0 };
+    return {
+      on: this.running, up: !!this.up, from: this.from, to: this.to,
+      u: this.running ? +(this.s / this.len).toFixed(3) : 0,
+      refused: this.refused?.why || null,
+    };
   }
 }

@@ -1,9 +1,18 @@
 // Keyboard + mouse on desktop, floating stick + attack half on touch.
 // Screen halves: one moves, one looks and attacks. `flip` swaps them for left-handers.
 // Sprint is Shift on a keyboard and a push past full stick deflection on touch.
+//
+// Three edges leave here, and every one of them is a TAP rather than a press, because the same
+// pointer that attacks is the one that turns the camera: a drag has to look and only a drag that
+// went nowhere is a click. On a mouse, button 0 attacks and button 2 opens the interact menu; on
+// touch there is no second button, so a short tap attacks and a long press opens the menu.
+// Space is jump, which is what it is for — it used to be attack, and a jump button and an attack
+// button are not the same button on any keyboard anyone has used.
 
 const STICK_R = 62;
 const TAP_MS = 400, TAP_PX = 16;
+// A press this long that went nowhere is a deliberate hold, not a slow tap.
+const HOLD_MS = 450;
 // Longer than a frame, short enough that a stalled loop banks nothing worth applying.
 const STALE_MS = 120;
 // Two thresholds, or a thumb resting on the rim flickers between walk and run every frame.
@@ -15,6 +24,8 @@ export class Input {
     this.look = { x: 0, y: 0 };
     this.attack = false;
     this.attackEdge = false;
+    this.jumpEdge = false;
+    this.interactEdge = false;
     this.sprint = false;
     this.stickSprint = false;
     this.flip = false;
@@ -38,11 +49,12 @@ export class Input {
     addEventListener('keydown', e => {
       if (e.repeat || typing(e)) return;
       this.keys.add(e.code);
-      if (e.code === 'Space') { this.attackEdge = true; e.preventDefault(); }
+      if (e.code === 'Space') { this.jumpEdge = true; e.preventDefault(); }
     });
     addEventListener('keyup', e => this.keys.delete(e.code));
     addEventListener('blur', () => {
       this.keys.clear();
+      this.jumpEdge = this.interactEdge = this.attackEdge = false;
       this.stickId = this.lookId = null;
       this.stickSprint = false;
       this.hideStick();
@@ -66,7 +78,7 @@ export class Input {
   onDown(e) {
     if (e.target.closest('#panel, #hud')) return;
     if (e.pointerType === 'touch') document.body.classList.add('touch');
-    this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t: performance.now(), moved: 0 });
+    this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t: performance.now(), moved: 0, button: e.button, touch: e.pointerType === 'touch' });
 
     if (e.pointerType !== 'touch') {
       this.lookId = e.pointerId;
@@ -117,7 +129,11 @@ export class Input {
     }
     if (e.pointerId === this.lookId) {
       this.lookId = null;
-      if (p && performance.now() - p.t < TAP_MS && p.moved < TAP_PX) this.attackEdge = true;
+      if (!p || p.moved >= TAP_PX) return;
+      const held = performance.now() - p.t;
+      // Right button, or a long press where there is no right button, opens the interact menu.
+      if (p.button === 2 || (p.touch && held >= HOLD_MS)) this.interactEdge = true;
+      else if (held < TAP_MS) this.attackEdge = true;
     }
   }
 
@@ -156,10 +172,19 @@ export class Input {
       this.move.y = y / l * Math.min(1, Math.hypot(x, y));
     }
     this.sprint = k.has('ShiftLeft') || k.has('ShiftRight') || this.stickSprint;
-    const out = this.locked ? { mx: 0, my: 0, lx: 0, ly: 0, attack: false, sprint: false }
-      : { mx: this.move.x, my: this.move.y, lx: this.look.x, ly: this.look.y, attack: this.attackEdge, sprint: this.sprint };
+    // A locked read still drains every edge as well as the look delta: a jump banked behind a
+    // conversation and applied the frame it closes is a player launched into the air by a button
+    // they pressed a minute ago.
+    const out = this.locked
+      ? { mx: 0, my: 0, lx: 0, ly: 0, attack: false, jump: false, interact: false, sprint: false }
+      : {
+        mx: this.move.x, my: this.move.y, lx: this.look.x, ly: this.look.y,
+        attack: this.attackEdge, jump: this.jumpEdge, interact: this.interactEdge, sprint: this.sprint,
+      };
     this.look.x = this.look.y = 0;
     this.attackEdge = false;
+    this.jumpEdge = false;
+    this.interactEdge = false;
     return out;
   }
 }

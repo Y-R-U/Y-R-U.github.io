@@ -30,9 +30,38 @@ export const bayMids = lines => lines.slice(0, -1).map((v, i) => (v + lines[i + 
 // The masonry band: floor to wall plate. `interior.js` derives `fy`/`wallH` this way and the
 // exterior has no way to know them, so the derivation lives here and both call it.
 export function hallBand(plinth, wallTop, ceilK = 1) {
+  return hallStoreys(plinth, wallTop, ceilK, 1).bands[0];
+}
+
+// How a hall is cut into storeys, and the one place the answer lives. `buildings.js` draws the
+// outside of the Adventure Society and `interior.js` draws the five rooms inside it; if they
+// worked this out separately the fenestration would drift a storey apart the first time either
+// changed, which is the fault this whole module was written to stop.
+//
+// Every storey but the last runs floor to floor less the slab overhead. The last stops at a wall
+// plate and hands the rest to the open timber roof, exactly as a one-storey hall always has —
+// which is why `floors: 1` comes back out of here as the numbers it has always been.
+export const SLAB_T = 0.34;
+
+export function hallStoreys(plinth, wallTop, ceilK = 1, floors = 1) {
   const fy = plinth + 0.05;
-  const wallH = Math.max(6, (wallTop - plinth) * ceilK * HALL.plate);
-  return { fy, wallH, plateY: fy + wallH };
+  const n = Math.max(1, Math.round(floors));
+  // `ceilK` is a zone flavour worth 10% either way, and harmless while only half the wall was
+  // ever used: a one-storey hall's plate sits at 0.52 of it and the roof has the rest to live in.
+  // Stacked, it is not harmless — five storeys of a 1.1 multiplier put the top wall plate above
+  // the wall top outside and the interior's roof crown came out through the slate.
+  const usable = (wallTop - plinth) * (n === 1 ? ceilK : 1);
+  const storeyH = usable / n;
+  // The 6 m floor is what stops a small single-storey hall being squashed into a shed. Stacked,
+  // it is the wrong number by an order: it would make the top storey's masonry taller than the
+  // storeys under it and push the interior ridge up through the roof slab outside.
+  const plate = n === 1 ? Math.max(6, usable * HALL.plate) : Math.max(3.5, storeyH * HALL.plate);
+  const ys = Array.from({ length: n }, (_, i) => fy + i * storeyH);
+  const bands = ys.map((y, i) => {
+    const wallH = i === n - 1 ? plate : storeyH - SLAB_T;
+    return { fy: y, wallH, plateY: y + wallH };
+  });
+  return { fy, n, usable, storeyH, slabTh: SLAB_T, ys, plate, bands, plateTop: ys[n - 1] + plate };
 }
 
 // Two rows, as fractions of `wallH` above `fy`.
@@ -50,15 +79,11 @@ const ROWS = [
   { y: 0.600, h: 0.300, open: false },
 ];
 
-// A side wall's doorways stand at the two middle bays. The windows in those bays' low row would
-// be in the doorway, so both side walls skip both of them — symmetrically, because a wall with a
-// window in one middle bay and a door in the other reads as a mistake.
-export const DOOR_BAYS = [1, 2];
-
-export function hallDoorU(sideSpan) {
-  const mids = bayMids(bayLines(sideSpan, HALL.bay));
-  return DOOR_BAYS.map(i => mids[i]);
-}
+// A side wall used to lose the low row of two middle bays to the academy's inner doorways. The
+// Adventure Society has none — a door onto a room that does not exist is a promise the building
+// cannot keep — so those bays get their light back. `doorBays` is kept as a parameter rather than
+// deleted because a level that does put a doorway in a hall wall will need it again, and it must
+// be the caller's list, not a constant here that every hall obeys whether it has doors or not.
 
 // `band` is what hallBand() returned. `role` is 'door' (the wall with the great doorway),
 // 'boards' (the wall opposite it, where the contract boards hang) or 'side'.
@@ -68,11 +93,11 @@ export function hallDoorU(sideSpan) {
 // clerestory came out four fifths hidden behind a board, which is a window nobody can see and a
 // board nobody can read. Its gable light, which is above the plate, is the one thing in that
 // wall — and it is the thing the room is meant to look at.
-export function hallWindows({ span, band, kind = 'arch', role = 'side', greatDoorW = 0 }) {
+export function hallWindows({ span, band, kind = 'arch', role = 'side', greatDoorW = 0, doorBays = [] }) {
   const { fy, wallH } = band;
   const mids = bayMids(bayLines(span, HALL.bay));
   const w = Math.min(2.4, HALL.bay * 0.42);
-  const blockedByDoor = new Set(role === 'side' ? DOOR_BAYS : []);
+  const blockedByDoor = new Set(role === 'side' ? doorBays : []);
   const out = [];
   if (role === 'boards') return out;
   for (const [ri, r] of ROWS.entries()) {

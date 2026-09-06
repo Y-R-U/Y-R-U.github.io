@@ -10,7 +10,34 @@ const UP = new THREE.Vector3(0, 1, 0);
 let PITCH_MIN = -0.90, PITCH_MAX = 1.30;
 const LOOK_HOLD = 0.8;
 
+// A jump is a separate vertical state, not a change to the step ease. That ease — pos.y chasing
+// the ground — is what floats the player up a stair tread and onto a bridge deck instead of
+// walking into it, and it is tuned; replacing it with gravity would take the stairs with it. So
+// while airborne the ease is off and gravity has the y, and the moment the feet reach the ground
+// the ease has it back. `JUMP_V` is derived from the height rather than typed, so raising the
+// height by a knob does not need the impulse worked out again.
+const GRAVITY = 22;
+const jumpSpeed = h => Math.sqrt(2 * GRAVITY * h);
+
 const wrapPi = a => Math.atan2(Math.sin(a), Math.cos(a));
+
+// A short single-edged blade with a wrapped grip: four boxes, one mesh, no texture. It is seen
+// over the shoulder at two metres and never closer.
+function knifeMesh() {
+  const g = new THREE.Group();
+  const steel = new THREE.MeshStandardMaterial({ color: '#b9bec6', roughness: 0.34, metalness: 0.55 });
+  const grip = new THREE.MeshStandardMaterial({ color: '#3b2f26', roughness: 0.92, metalness: 0 });
+  const blade = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.30, 0.075), steel);
+  blade.position.y = 0.20;
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.11, 4), steel);
+  tip.position.y = 0.40;
+  tip.rotation.y = Math.PI / 4;
+  const guard = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.028, 0.14), steel);
+  const hilt = new THREE.Mesh(new THREE.BoxGeometry(0.038, 0.13, 0.05), grip);
+  hilt.position.y = -0.075;
+  for (const m of [blade, tip, guard, hilt]) { m.castShadow = true; g.add(m); }
+  return g;
+}
 const lerp = THREE.MathUtils.lerp;
 const _off = new THREE.Vector3(), _back = new THREE.Vector3(), _probe = new THREE.Vector3();
 
@@ -29,6 +56,14 @@ export class Player {
     this.mesh.receiveShadow = true;
     this.mesh.customDepthMaterial = people.depth;
     this.object3D.add(this.mesh);
+    // The proving knife. The robed rig has no bones, so it is not held — it is a child of the
+    // body swung about the shoulder, which at third person and this size is indistinguishable
+    // from a hand holding it and costs no rig. `visible` is off until something gives it to you.
+    this.hand = new THREE.Group();
+    this.hand.position.set(0.42, 1.18, 0.16);
+    this.hand.add(knifeMesh());
+    this.hand.visible = false;
+    this.object3D.add(this.hand);
     this.object3D.visible = false;
 
     this.pos = new THREE.Vector3((CENTERS[0] ?? 0), 0, 22);
@@ -42,6 +77,10 @@ export class Player {
     this.camAim = new THREE.Vector3();
     this.swing = 0;
     this.castEdge = false;
+    this.vy = 0;
+    this.airborne = false;
+    this.jumpHeight = 1.15;
+    this.canJump = true;
     this.speed = 5.0;
     this.dist = 7.2;
     this.height = 2.10;
@@ -135,6 +174,10 @@ export class Player {
       v => setStepUp(v));
     q.register({ key: 'stepEase', label: 'Step-up ease rate', type: 'range', min: 4, max: 40, step: 1, default: 16, group: 'Controls' },
       v => { this.stepEase = v; });
+    q.register({ key: 'jumpHeight', label: 'Jump height (m)', type: 'range', min: 0.4, max: 2.5, step: 0.05, default: 1.15, group: 'Controls' },
+      v => { this.jumpHeight = v; });
+    q.register({ key: 'canJump', label: 'Jumping', type: 'toggle', default: true, group: 'Controls' },
+      v => { this.canJump = !!v; });
   }
 
   // The ground renders from the terrain mesh, not the analytic field, and the two disagree by
@@ -143,6 +186,10 @@ export class Player {
     const T = this.people.terrain;
     return T ? T.surfaceY(x, z) : fieldY(x, z);
   }
+
+  // Armed or not. The proving is the first thing that hands the player anything, and the knife is
+  // Society property — it comes back.
+  arm(v = true) { this.hand.visible = !!v; }
 
   setZone(id) {
     this.zoneId = ZONE_IDS.includes(id) ? id : 'neutral';
@@ -180,6 +227,8 @@ export class Player {
 
     const raw = this.input.read();
     const cmd = this.driven ? null : raw;
+    // A door or a stair writes pos directly. Whatever the jump was doing, it is over.
+    if (this.driven && this.airborne) { this.airborne = false; this.vy = 0; }
     let sp = 0;
 
     if (cmd) {
@@ -226,7 +275,23 @@ export class Player {
       // walked into. Fast enough that a slope still reads as the feet being on the ground.
       const gy = this.floorY ? this.floorY(this.pos.x, this.pos.z, this.pos.y)
         : (this.colliders ? groundAt(this.pos.x, this.pos.z, this.pos.y) : this.groundY(this.pos.x, this.pos.z));
-      this.pos.y += (gy - this.pos.y) * (1 - Math.exp(-this.stepEase * dt));
+      if (this.airborne) {
+        this.vy -= GRAVITY * dt;
+        this.pos.y += this.vy * dt;
+        // Landing is only landing on the way down: rising through the floor of the storey above
+        // on a stair well would otherwise stop the jump dead at the ceiling.
+        if (this.vy <= 0 && this.pos.y <= gy) { this.pos.y = gy; this.vy = 0; this.airborne = false; }
+      } else {
+        this.pos.y += (gy - this.pos.y) * (1 - Math.exp(-this.stepEase * dt));
+        // Only from the ground, and never while something else is walking him: a jump out of the
+        // middle of a door script or a stair climb leaves the script writing a position that the
+        // gravity is fighting over.
+        if (cmd.jump && this.canJump && Math.abs(this.pos.y - gy) < 0.35) {
+          this.vy = jumpSpeed(this.jumpHeight);
+          this.airborne = true;
+          this.pos.y += this.vy * dt;
+        }
+      }
 
       sp = Math.hypot(this.vel.x, this.vel.z);
       if (sp > 0.15) {
@@ -244,6 +309,12 @@ export class Player {
 
     this.object3D.position.copy(this.pos);
     this.object3D.rotation.set(sp * 0.03 + arc * 0.22, this.yaw + arc * 0.9, 0, 'YXZ');
+    // The arm comes across and down. `arc` is already the swing's own bell curve, so the blade
+    // and the body lean are one motion rather than two that have to be kept in step.
+    if (this.hand.visible) {
+      this.hand.rotation.set(-0.35 - arc * 1.65, -0.5 + arc * 1.25, arc * 0.7, 'YXZ');
+      this.hand.position.set(0.42 - arc * 0.22, 1.18 - arc * 0.16, 0.16 + arc * 0.4);
+    }
 
     const u = this.people.uniforms.uSelf.value;
     u.set(0, Math.min(1.4, sp / 3), 0, arc * 0.7);

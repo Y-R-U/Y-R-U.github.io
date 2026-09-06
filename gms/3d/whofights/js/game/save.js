@@ -29,9 +29,10 @@ const clamp = (v, lo, hi, def) => Math.min(hi, Math.max(lo, num(v, def)));
 export function docView(get) {
   return {
     get flags() { return get().flags; },
+    get essences() { return get().essences; },
     world: () => {
       const d = get();
-      return { flags: d.flags, items: d.items, quests: d.quests };
+      return { flags: d.flags, items: d.items, quests: d.quests, essences: d.essences };
     },
   };
 }
@@ -52,6 +53,11 @@ export function startPos(start, at, saved, levelId) {
   return start;
 }
 
+// What the player is, as opposed to what they have done. Three essences chosen, the confluence
+// those three came to, and the abilities awakened so far — see js/game/essences.js, which owns
+// every rule about them. Empty until the proving is passed and the table is opened.
+export const blankEssences = () => ({ picked: [], confluence: null, abilities: [] });
+
 export function blank(t = 0) {
   return {
     version: SAVE_VERSION,
@@ -62,6 +68,7 @@ export function blank(t = 0) {
     flags: {},
     items: {},
     quests: {},
+    essences: blankEssences(),
     settings: { ...DEFAULTS },
   };
 }
@@ -88,6 +95,19 @@ export function normalise(raw) {
   }
   for (const [k, q] of Object.entries(raw.quests || {})) {
     if (q && typeof q.s === 'string') doc.quests[k] = { s: q.s, n: num(q.n, 0) };
+  }
+
+  // Ids only. Whether an essence or an ability still exists is data/essences.json's business and
+  // it changes between builds — js/game/essences.js `held()` drops what it no longer knows rather
+  // than the save refusing to load over a table that has moved on.
+  const es = raw.essences;
+  if (es && typeof es === 'object') {
+    const strs = v => (Array.isArray(v) ? v.filter(x => typeof x === 'string' && x) : []);
+    doc.essences = {
+      picked: [...new Set(strs(es.picked))].sort(),
+      confluence: typeof es.confluence === 'string' ? es.confluence : null,
+      abilities: [...new Set(strs(es.abilities))],
+    };
   }
 
   const s = raw.settings || {};

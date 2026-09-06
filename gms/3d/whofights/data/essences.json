@@ -1,0 +1,1141 @@
+{
+  "version": 1,
+  "pick": 3,
+  "essences": {
+    "fire": {
+      "name": "Fire",
+      "colour": "#e2622c",
+      "tags": [
+        "elemental",
+        "destructive"
+      ],
+      "blurb": "The loudest essence on the table and the one every unranked adventurer reaches for first. It is not a bad choice. It is only never a surprising one.",
+      "abilities": [
+        {
+          "id": "fire.brand",
+          "name": "Searing Brand",
+          "kind": "attack",
+          "cost": "stamina",
+          "text": "Your weapon takes fire for the length of one exchange. What it cuts keeps burning after you have moved on."
+        },
+        {
+          "id": "fire.ember",
+          "name": "Ember Step",
+          "kind": "movement",
+          "cost": "mana",
+          "text": "Step through a point of flame and out of another within twenty metres. You arrive hot enough to light dry grass."
+        },
+        {
+          "id": "fire.kiln",
+          "name": "Kiln Ward",
+          "kind": "defence",
+          "cost": "mana, sustained",
+          "text": "A shell of standing heat. It does not stop a blade \u2014 it stops the hand behind it from wanting to try twice."
+        },
+        {
+          "id": "fire.cinder",
+          "name": "Cinderfall",
+          "kind": "conjuration",
+          "cost": "mana",
+          "text": "Ash falls in a wide circle and keeps falling. Everything under it is easy to see and hard to breathe in."
+        },
+        {
+          "id": "fire.render",
+          "name": "Render",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Fire stops being a thing you throw and becomes a thing you are. Ten seconds. You will be no use for an hour afterwards."
+        }
+      ]
+    },
+    "water": {
+      "name": "Water",
+      "colour": "#3f8fbf",
+      "tags": [
+        "elemental",
+        "vital"
+      ],
+      "blurb": "Patient, and the only essence on this table that has kept more adventurers alive than it has killed.",
+      "abilities": [
+        {
+          "id": "water.mend",
+          "name": "Cleanse",
+          "kind": "recovery",
+          "cost": "mana",
+          "text": "Draws poison, rot and fever out through the skin. It hurts about as much as the thing it is taking out."
+        },
+        {
+          "id": "water.hold",
+          "name": "Held Breath",
+          "kind": "defence",
+          "cost": "mana, sustained",
+          "text": "A skin of water over your own. Every blow that lands arrives a fraction slower and a fraction shallower."
+        },
+        {
+          "id": "water.grasp",
+          "name": "Undertow",
+          "kind": "control",
+          "cost": "mana",
+          "text": "The ground under one target becomes something to be dragged through. It can still fight. It cannot still leave."
+        },
+        {
+          "id": "water.mirror",
+          "name": "Still Mirror",
+          "kind": "utility",
+          "cost": "mana",
+          "text": "Any standing water shows you any other standing water you have touched today."
+        },
+        {
+          "id": "water.drown",
+          "name": "Drowning Weight",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Water fills a target that has no room for it. It is a quiet ability and nobody who has seen it used calls it a gentle one."
+        }
+      ]
+    },
+    "earth": {
+      "name": "Earth",
+      "colour": "#8a7148",
+      "tags": [
+        "elemental",
+        "vital"
+      ],
+      "blurb": "Slow, heavy, and the reason the thing in the proving room would not die. Earth does not win fights quickly; it wins them last.",
+      "abilities": [
+        {
+          "id": "earth.skin",
+          "name": "Stone Skin",
+          "kind": "defence",
+          "cost": "mana, sustained",
+          "text": "Your skin takes the hardness of the ground you are standing on. On flagstone that is a great deal. On mud it is not."
+        },
+        {
+          "id": "earth.spike",
+          "name": "Upthrust",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "A column of rock comes up under a target hard enough to take it off its feet and keep it there."
+        },
+        {
+          "id": "earth.mend",
+          "name": "Sediment",
+          "kind": "recovery",
+          "cost": "mana, sustained",
+          "text": "Standing on bare ground, your wounds fill with what you are standing on. It is not pretty and it does not scar well."
+        },
+        {
+          "id": "earth.read",
+          "name": "Weight of the Ground",
+          "kind": "utility",
+          "cost": "free",
+          "text": "You know what has walked over the earth beneath you in the last day, and roughly how heavy it was."
+        },
+        {
+          "id": "earth.wall",
+          "name": "Barrow",
+          "kind": "conjuration",
+          "cost": "mana, heavy",
+          "text": "Raises a wall of packed earth and stone. It will not last the hour, and it does not have to."
+        }
+      ]
+    },
+    "wind": {
+      "name": "Wind",
+      "colour": "#9fc0cc",
+      "tags": [
+        "elemental",
+        "mental"
+      ],
+      "blurb": "The essence that decides where a fight happens, which is very nearly the same as deciding how it ends.",
+      "abilities": [
+        {
+          "id": "wind.step",
+          "name": "Cut Step",
+          "kind": "movement",
+          "cost": "stamina",
+          "text": "One movement, four times as fast, in any direction including up. It is the single most useful thing on this table."
+        },
+        {
+          "id": "wind.blade",
+          "name": "Edge of Air",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "A blade of moving air at thirty metres. It is quiet, and it does not stop at the first thing it meets."
+        },
+        {
+          "id": "wind.hold",
+          "name": "Deadfall",
+          "kind": "control",
+          "cost": "mana",
+          "text": "The air around a target stops moving. So does the target, briefly, and it is astonished."
+        },
+        {
+          "id": "wind.carry",
+          "name": "Carrying Wind",
+          "kind": "utility",
+          "cost": "mana, sustained",
+          "text": "Everything you say is heard clearly by whoever you meant it for, at any distance you can see."
+        },
+        {
+          "id": "wind.storm",
+          "name": "Scour",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "A standing wind over a wide circle. Nothing in it can aim, hear an order, or keep hold of anything light."
+        }
+      ]
+    },
+    "void": {
+      "name": "Void",
+      "colour": "#5b4a75",
+      "tags": [
+        "entropic",
+        "mental"
+      ],
+      "blurb": "Void takes things away. Heat, sound, weight, the space between two points \u2014 and, if you are careless with it, the parts of you that were using them.",
+      "abilities": [
+        {
+          "id": "void.step",
+          "name": "Fold",
+          "kind": "movement",
+          "cost": "mana",
+          "text": "The distance between where you are and somewhere you can see stops applying. Twice a minute, and it is exhausting."
+        },
+        {
+          "id": "void.silence",
+          "name": "Hollow",
+          "kind": "control",
+          "cost": "mana, sustained",
+          "text": "A sphere of nothing carrying. No sound leaves it and no spoken ability works inside it."
+        },
+        {
+          "id": "void.strip",
+          "name": "Unmake Edge",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "Takes the hardness out of what you strike. Armour becomes cloth for as long as it takes you to swing again."
+        },
+        {
+          "id": "void.pocket",
+          "name": "Hollow Pocket",
+          "kind": "utility",
+          "cost": "free",
+          "text": "A space that is not anywhere, big enough for a pack. Nothing living survives being put in it."
+        },
+        {
+          "id": "void.null",
+          "name": "Null",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "A point where magic stops. Yours as well. Adventurers who take this one learn to fight without it first."
+        }
+      ]
+    },
+    "doom": {
+      "name": "Doom",
+      "colour": "#6d2a3c",
+      "tags": [
+        "entropic",
+        "mental"
+      ],
+      "blurb": "Doom does not damage. It arranges. Everything it touches goes on to have the worst luck it plausibly could, and then a little more.",
+      "abilities": [
+        {
+          "id": "doom.mark",
+          "name": "Sentence",
+          "kind": "affliction",
+          "cost": "mana",
+          "text": "The next genuinely bad thing that could happen to a target does. It may be a minute. It is rarely more than five."
+        },
+        {
+          "id": "doom.weight",
+          "name": "Millstone",
+          "kind": "affliction",
+          "cost": "mana, stacking",
+          "text": "Every failure the target has today makes the next one likelier. It stacks, and it does not fall off on its own."
+        },
+        {
+          "id": "doom.read",
+          "name": "Tell",
+          "kind": "utility",
+          "cost": "free",
+          "text": "You know, looking at a person, the most likely way they die. You will wish very quickly that you did not."
+        },
+        {
+          "id": "doom.turn",
+          "name": "Turned Blade",
+          "kind": "defence",
+          "cost": "mana",
+          "text": "One blow that would have landed lands on whoever is nearest to the one who threw it."
+        },
+        {
+          "id": "doom.end",
+          "name": "Foregone",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Name a thing that is already going to happen. It happens now. It is not a large ability and it has ended sieges."
+        }
+      ]
+    },
+    "chaos": {
+      "name": "Chaos",
+      "colour": "#b0479b",
+      "tags": [
+        "entropic",
+        "destructive"
+      ],
+      "blurb": "The essence that refuses to do the same thing twice. Powerful, unreliable, and disliked by everybody who has to plan around it.",
+      "abilities": [
+        {
+          "id": "chaos.bolt",
+          "name": "Wild Strike",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "A bolt of something. Fire, cold, sound, light, rot \u2014 it is different every time and it is never nothing."
+        },
+        {
+          "id": "chaos.shift",
+          "name": "Miscount",
+          "kind": "defence",
+          "cost": "mana",
+          "text": "For one exchange, where you are and where you appear to be stop agreeing."
+        },
+        {
+          "id": "chaos.rot",
+          "name": "Unravelling",
+          "kind": "affliction",
+          "cost": "mana, stacking",
+          "text": "Whatever is holding a thing together starts making mistakes. Rope, bone, discipline, a formation."
+        },
+        {
+          "id": "chaos.gift",
+          "name": "Turn of the Card",
+          "kind": "utility",
+          "cost": "mana",
+          "text": "Something helpful happens. You do not get to say what, and roughly one time in nine it is helpful to somebody else."
+        },
+        {
+          "id": "chaos.storm",
+          "name": "Riot",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Every rule of the fight gets rewritten, once, for everybody. You are not exempt. Neither is the ground."
+        }
+      ]
+    },
+    "destruction": {
+      "name": "Destruction",
+      "colour": "#c9483a",
+      "tags": [
+        "entropic",
+        "destructive"
+      ],
+      "blurb": "Not fire, not force. The plain fact of a thing having been ruined, applied directly and without the intermediate steps.",
+      "abilities": [
+        {
+          "id": "dest.blow",
+          "name": "Ruin",
+          "kind": "attack",
+          "cost": "stamina",
+          "text": "One strike that ignores whatever the target was relying on to stop it. Armour, ward, thickness, luck."
+        },
+        {
+          "id": "dest.shatter",
+          "name": "Shatter",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "Anything worked \u2014 a blade, a wall, a bound spell \u2014 comes apart along the seams the work put in it."
+        },
+        {
+          "id": "dest.spread",
+          "name": "Spoil",
+          "kind": "affliction",
+          "cost": "mana, stacking",
+          "text": "Damage a target has already taken stops healing and starts spreading."
+        },
+        {
+          "id": "dest.brace",
+          "name": "Nothing Left to Break",
+          "kind": "defence",
+          "cost": "mana",
+          "text": "Below a quarter of your health you take no further damage for eight seconds. It is exactly as dangerous as it sounds."
+        },
+        {
+          "id": "dest.end",
+          "name": "Full Stop",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "One object, however large, ceases to be a working object. Bridges. Gates. Occasionally, arms."
+        }
+      ]
+    },
+    "manipulation": {
+      "name": "Manipulation",
+      "colour": "#4f7f6b",
+      "tags": [
+        "mental",
+        "utility"
+      ],
+      "blurb": "Moves things that are not yours to move \u2014 a blade, a footing, an intention. The Society files more complaints about this essence than the other eleven together.",
+      "abilities": [
+        {
+          "id": "man.hand",
+          "name": "Unseen Hand",
+          "kind": "utility",
+          "cost": "mana, sustained",
+          "text": "Move anything you could lift, at thirty metres, as precisely as with your own hands."
+        },
+        {
+          "id": "man.turn",
+          "name": "Redirect",
+          "kind": "defence",
+          "cost": "mana",
+          "text": "A blow aimed at you arrives somewhere else. Preferably at something else."
+        },
+        {
+          "id": "man.bind",
+          "name": "Purchase",
+          "kind": "control",
+          "cost": "mana, sustained",
+          "text": "You have a grip on a target that it cannot break by moving, only by being stronger than you are."
+        },
+        {
+          "id": "man.thread",
+          "name": "Thread the Field",
+          "kind": "utility",
+          "cost": "mana",
+          "text": "Every loose object within twenty metres is available to you at once, and arrives in the order you thought of them."
+        },
+        {
+          "id": "man.puppet",
+          "name": "Borrowed Motion",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "For four seconds a target's body does what you decide instead of what it decides. Legal at silver rank. Barely."
+        }
+      ]
+    },
+    "life": {
+      "name": "Life",
+      "colour": "#6fa844",
+      "tags": [
+        "vital",
+        "utility"
+      ],
+      "blurb": "The essence the Society most wants in a party and most rarely gets, because it is the one that never gets to decide how a fight goes.",
+      "abilities": [
+        {
+          "id": "life.mend",
+          "name": "Knit",
+          "kind": "recovery",
+          "cost": "mana",
+          "text": "Closes a wound properly, at the speed of a fortnight, in about four seconds."
+        },
+        {
+          "id": "life.share",
+          "name": "Held Together",
+          "kind": "recovery",
+          "cost": "mana, sustained",
+          "text": "Wounds taken by anyone in your party are taken a little by all of them. Including you."
+        },
+        {
+          "id": "life.grow",
+          "name": "Overgrowth",
+          "kind": "conjuration",
+          "cost": "mana",
+          "text": "Whatever grows here grows to a man's height in one breath. In a courtyard that is grass. In a wood it is a wall."
+        },
+        {
+          "id": "life.wake",
+          "name": "Second Wind",
+          "kind": "recovery",
+          "cost": "mana, heavy",
+          "text": "One person who has just stopped being able to fight can fight for thirty more seconds."
+        },
+        {
+          "id": "life.tide",
+          "name": "Flood of Living",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Everything within twenty metres heals, including what you are fighting. Used well, it is decisive. Used badly, it is a joke."
+        }
+      ]
+    },
+    "dark": {
+      "name": "Dark",
+      "colour": "#2f3550",
+      "tags": [
+        "mental",
+        "entropic"
+      ],
+      "blurb": "Not the absence of light \u2014 the presence of somewhere for a thing to be that is not being looked at.",
+      "abilities": [
+        {
+          "id": "dark.step",
+          "name": "Shadow Step",
+          "kind": "movement",
+          "cost": "mana",
+          "text": "Move between two shadows within forty metres. In daylight this is a real constraint. At night it is not."
+        },
+        {
+          "id": "dark.cloak",
+          "name": "Unlit",
+          "kind": "utility",
+          "cost": "mana, sustained",
+          "text": "You are hard to look at directly. Not invisible \u2014 people simply keep finding somewhere else to have been looking."
+        },
+        {
+          "id": "dark.blind",
+          "name": "Smother",
+          "kind": "control",
+          "cost": "mana",
+          "text": "Takes the light out of a target's eyes. It lasts about six seconds and feels like a great deal longer."
+        },
+        {
+          "id": "dark.blade",
+          "name": "Blade in the Dark",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "A strike from an unlit position lands where armour is thinnest, whether or not you knew where that was."
+        },
+        {
+          "id": "dark.deep",
+          "name": "The Long Dark",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "A wide sphere of true dark. Everything inside it is blind but you, and you are not entirely."
+        }
+      ]
+    },
+    "blood": {
+      "name": "Blood",
+      "colour": "#8c2033",
+      "tags": [
+        "vital",
+        "destructive"
+      ],
+      "blurb": "Costly, immediate, and the essence with the worst reputation and the best survival rate at iron rank.",
+      "abilities": [
+        {
+          "id": "blood.price",
+          "name": "Price Paid",
+          "kind": "buff",
+          "cost": "health",
+          "text": "Spend your own blood instead of your own mana. Everything you do next is stronger and you will feel it tomorrow."
+        },
+        {
+          "id": "blood.draw",
+          "name": "Draw",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "Opens a wound that is already there. What comes out of it comes to you."
+        },
+        {
+          "id": "blood.bind",
+          "name": "Bloodbound",
+          "kind": "control",
+          "cost": "health",
+          "text": "Two targets share every wound either of them takes. It works on you, which is how it is usually used."
+        },
+        {
+          "id": "blood.sense",
+          "name": "Scent",
+          "kind": "utility",
+          "cost": "free",
+          "text": "You know where every wounded thing within a hundred metres is, and roughly how badly."
+        },
+        {
+          "id": "blood.rite",
+          "name": "Red Rite",
+          "kind": "special",
+          "cost": "health, heavy",
+          "text": "Everything bleeding within ten metres stops bleeding, into you. It ends fights and it ends friendships."
+        }
+      ]
+    }
+  },
+  "confluences": [
+    {
+      "id": "sin",
+      "name": "Sin",
+      "blurb": "The registry's most famous entry, and the reason the Society asks what you took before it asks what you can do.",
+      "abilities": [
+        {
+          "id": "sin.tally",
+          "name": "Tally",
+          "kind": "affliction",
+          "cost": "mana, stacking",
+          "text": "Every affliction on a target counts the others. At six of them the count starts hurting more than the afflictions do."
+        },
+        {
+          "id": "sin.feed",
+          "name": "Feast of Absence",
+          "kind": "recovery",
+          "cost": "free",
+          "text": "Afflictions you inflicted feed you a little of what they take."
+        },
+        {
+          "id": "sin.judge",
+          "name": "Judgement",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Every affliction on every enemy within twenty metres resolves at once, in full."
+        }
+      ],
+      "exact": [
+        "blood",
+        "dark",
+        "doom"
+      ]
+    },
+    {
+      "id": "tempest",
+      "name": "Tempest",
+      "blurb": "Wind and water agreeing on a direction, with fire underneath insisting on urgency.",
+      "abilities": [
+        {
+          "id": "temp.front",
+          "name": "Front",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "A line of driven weather twenty metres long. It arrives before the sound of it does."
+        },
+        {
+          "id": "temp.eye",
+          "name": "The Eye",
+          "kind": "defence",
+          "cost": "mana, sustained",
+          "text": "A still circle around you while everything outside it is not still."
+        },
+        {
+          "id": "temp.break",
+          "name": "Breaking Weather",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Everything not anchored within thirty metres stops being where it was."
+        }
+      ],
+      "exact": [
+        "fire",
+        "water",
+        "wind"
+      ]
+    },
+    {
+      "id": "volcano",
+      "name": "Volcano",
+      "blurb": "Fire and earth, and the patience to wait until waiting is the frightening part.",
+      "abilities": [
+        {
+          "id": "volc.crust",
+          "name": "Crust",
+          "kind": "defence",
+          "cost": "mana, sustained",
+          "text": "Cooling stone over your skin. It cracks as it takes hits, and what is under the cracks is not cool."
+        },
+        {
+          "id": "volc.vent",
+          "name": "Vent",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "The ground opens under a target for as long as it takes to matter."
+        },
+        {
+          "id": "volc.wake",
+          "name": "Wake It",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Everything you have hit in the last minute goes up at once."
+        }
+      ],
+      "exact": [
+        "earth",
+        "fire",
+        "wind"
+      ]
+    },
+    {
+      "id": "mire",
+      "name": "Mire",
+      "blurb": "Water and earth, which is mud, which has stopped more advances than any wall ever built.",
+      "abilities": [
+        {
+          "id": "mire.hold",
+          "name": "Holding Ground",
+          "kind": "control",
+          "cost": "mana, sustained",
+          "text": "A wide circle of ground that lets you leave and does not let anything else."
+        },
+        {
+          "id": "mire.mend",
+          "name": "Silt",
+          "kind": "recovery",
+          "cost": "mana, sustained",
+          "text": "Standing still on open ground, you close faster than you are being opened."
+        },
+        {
+          "id": "mire.swallow",
+          "name": "Swallow",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "The ground under one large thing stops being ground."
+        }
+      ],
+      "exact": [
+        "earth",
+        "water",
+        "wind"
+      ]
+    },
+    {
+      "id": "entropy",
+      "name": "Entropy",
+      "blurb": "Destruction, chaos and void, which between them have no plan at all and do not need one.",
+      "abilities": [
+        {
+          "id": "ent.decay",
+          "name": "Decay Field",
+          "kind": "affliction",
+          "cost": "mana, sustained",
+          "text": "Everything within ten metres ages badly. Bindings fail, edges dull, wards forget what they were for."
+        },
+        {
+          "id": "ent.cascade",
+          "name": "Cascade",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "Damage done to one target is done again, smaller, to the next nearest, and again after that."
+        },
+        {
+          "id": "ent.zero",
+          "name": "Zero",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "One thing within sight is no longer a thing. Nothing replaces it, which is the part people find difficult."
+        }
+      ],
+      "exact": [
+        "chaos",
+        "destruction",
+        "void"
+      ]
+    },
+    {
+      "id": "wraith",
+      "name": "Wraith",
+      "blurb": "Void, dark and wind: three ways of not being where the blow is.",
+      "abilities": [
+        {
+          "id": "wr.pass",
+          "name": "Passage",
+          "kind": "movement",
+          "cost": "mana",
+          "text": "You are briefly not solid. Neither are your clothes. Nothing else comes with you."
+        },
+        {
+          "id": "wr.absent",
+          "name": "Absence",
+          "kind": "defence",
+          "cost": "mana",
+          "text": "The next attack on you finds nobody there and no explanation for it."
+        },
+        {
+          "id": "wr.take",
+          "name": "Take the Light",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "A wide circle in which nothing is lit, nothing is heard, and nothing can leave on its own feet."
+        }
+      ],
+      "exact": [
+        "dark",
+        "void",
+        "wind"
+      ]
+    },
+    {
+      "id": "titan",
+      "name": "Titan",
+      "blurb": "Earth, life and destruction. It is not subtle and it has never needed to be.",
+      "abilities": [
+        {
+          "id": "tit.grow",
+          "name": "Bulk",
+          "kind": "buff",
+          "cost": "mana, sustained",
+          "text": "You are half again your size and rather more than half again your strength."
+        },
+        {
+          "id": "tit.step",
+          "name": "Ground Shock",
+          "kind": "attack",
+          "cost": "stamina",
+          "text": "Everything standing within eight metres of where you land is no longer standing."
+        },
+        {
+          "id": "tit.last",
+          "name": "Last Standing",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "For twelve seconds you cannot be moved, felled, or convinced."
+        }
+      ],
+      "exact": [
+        "destruction",
+        "earth",
+        "life"
+      ]
+    },
+    {
+      "id": "plague",
+      "name": "Plague",
+      "blurb": "Blood, life and doom \u2014 the three essences the Society requires a written reason for.",
+      "abilities": [
+        {
+          "id": "plg.spread",
+          "name": "Contagion",
+          "kind": "affliction",
+          "cost": "mana, stacking",
+          "text": "Afflictions move from a target to whatever it stands near."
+        },
+        {
+          "id": "plg.thrive",
+          "name": "Thrive",
+          "kind": "recovery",
+          "cost": "free",
+          "text": "You heal from the suffering of anything within twenty metres, whoever caused it."
+        },
+        {
+          "id": "plg.harvest",
+          "name": "Harvest",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Every afflicted thing in sight gives up what is left of its strength, to you."
+        }
+      ],
+      "exact": [
+        "blood",
+        "doom",
+        "life"
+      ]
+    },
+    {
+      "id": "mirage",
+      "name": "Mirage",
+      "blurb": "Wind, manipulation and dark: a fight in which nothing is where it says it is.",
+      "abilities": [
+        {
+          "id": "mir.double",
+          "name": "Double",
+          "kind": "defence",
+          "cost": "mana",
+          "text": "Two of you. One of them is not, and it is not always the same one."
+        },
+        {
+          "id": "mir.turn",
+          "name": "Sleight",
+          "kind": "control",
+          "cost": "mana",
+          "text": "A target attacks the thing you would prefer it attacked."
+        },
+        {
+          "id": "mir.field",
+          "name": "Field of Lies",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "For eight seconds nothing within twenty metres is where anybody but you believes it is."
+        }
+      ],
+      "exact": [
+        "dark",
+        "manipulation",
+        "wind"
+      ]
+    },
+    {
+      "id": "crucible",
+      "name": "Crucible",
+      "blurb": "Fire, destruction and manipulation. It takes things apart in a particular order and puts nothing back.",
+      "abilities": [
+        {
+          "id": "cru.melt",
+          "name": "Melt Down",
+          "kind": "affliction",
+          "cost": "mana, stacking",
+          "text": "Armour, wards and conjured things degrade while they are being used."
+        },
+        {
+          "id": "cru.forge",
+          "name": "Forge Grip",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "A weapon you are not holding strikes for you, hot."
+        },
+        {
+          "id": "cru.pour",
+          "name": "Pour",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Everything metal within fifteen metres stops being a shape."
+        }
+      ],
+      "exact": [
+        "destruction",
+        "fire",
+        "manipulation"
+      ]
+    },
+    {
+      "id": "undertow",
+      "name": "Undertow",
+      "blurb": "Water, void and doom. It does not kill things. It arranges for them to be gone.",
+      "abilities": [
+        {
+          "id": "und.drag",
+          "name": "Drag Under",
+          "kind": "control",
+          "cost": "mana",
+          "text": "A target is somewhere it did not agree to be, and it is deeper than it was."
+        },
+        {
+          "id": "und.quiet",
+          "name": "Quiet Water",
+          "kind": "defence",
+          "cost": "mana, sustained",
+          "text": "Sound, heat and force all arrive at you late and reduced."
+        },
+        {
+          "id": "und.pull",
+          "name": "The Pull",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Everything within twelve metres is brought to one point. What happens there is not specified."
+        }
+      ],
+      "exact": [
+        "doom",
+        "void",
+        "water"
+      ]
+    },
+    {
+      "id": "bloom",
+      "name": "Bloom",
+      "blurb": "Life, water and earth. Every farming village in the province would like a word with whoever took this.",
+      "abilities": [
+        {
+          "id": "blm.field",
+          "name": "Green Field",
+          "kind": "recovery",
+          "cost": "mana, sustained",
+          "text": "A circle of ground on which your side heals and the footing is always good."
+        },
+        {
+          "id": "blm.thorn",
+          "name": "Thicket",
+          "kind": "conjuration",
+          "cost": "mana",
+          "text": "A wall of growth that fights back and does not need to be told which side it is on."
+        },
+        {
+          "id": "blm.season",
+          "name": "Turn the Season",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Everything living within thirty metres is restored to how it was this morning."
+        }
+      ],
+      "exact": [
+        "earth",
+        "life",
+        "water"
+      ]
+    },
+    {
+      "id": "conflagrant",
+      "name": "Conflagration",
+      "blurb": "The registry has no name for this exact three, and files it by what it does.",
+      "abilities": [
+        {
+          "id": "cfl.burst",
+          "name": "Burst",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "The three of them agree, briefly and loudly, in one direction."
+        },
+        {
+          "id": "cfl.press",
+          "name": "Press",
+          "kind": "buff",
+          "cost": "mana, sustained",
+          "text": "Everything you do costs a little more and lands a great deal harder."
+        },
+        {
+          "id": "cfl.spend",
+          "name": "Spend It",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "All of it at once. You will need a minute afterwards and you will not have one."
+        }
+      ],
+      "needs": {
+        "elemental": 2,
+        "destructive": 1
+      }
+    },
+    {
+      "id": "attrition",
+      "name": "Attrition",
+      "blurb": "Unnamed, and filed under what it costs the other side.",
+      "abilities": [
+        {
+          "id": "att.grind",
+          "name": "Grind",
+          "kind": "affliction",
+          "cost": "mana, stacking",
+          "text": "Everything you damage stays damaged and gets worse at doing its job."
+        },
+        {
+          "id": "att.hold",
+          "name": "Hold the Line",
+          "kind": "defence",
+          "cost": "mana, sustained",
+          "text": "You take less from everything that has already hit you once."
+        },
+        {
+          "id": "att.outlast",
+          "name": "Outlast",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "For twenty seconds nothing you are fighting recovers anything at all."
+        }
+      ],
+      "needs": {
+        "entropic": 2
+      }
+    },
+    {
+      "id": "quickening",
+      "name": "Quickening",
+      "blurb": "Unnamed, and filed under how fast it makes everything happen.",
+      "abilities": [
+        {
+          "id": "qck.step",
+          "name": "Quicken",
+          "kind": "movement",
+          "cost": "stamina",
+          "text": "Everything you do next happens sooner than it should."
+        },
+        {
+          "id": "qck.read",
+          "name": "Read the Room",
+          "kind": "utility",
+          "cost": "free",
+          "text": "You know where everything in the fight is going to be, a moment before it is."
+        },
+        {
+          "id": "qck.flurry",
+          "name": "Flurry",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Six seconds in which you act about three times as often as anybody else."
+        }
+      ],
+      "needs": {
+        "mental": 2
+      }
+    },
+    {
+      "id": "vigil",
+      "name": "Vigil",
+      "blurb": "Unnamed, and filed under how much longer your party lives with you in it.",
+      "abilities": [
+        {
+          "id": "vgl.ward",
+          "name": "Standing Ward",
+          "kind": "defence",
+          "cost": "mana, sustained",
+          "text": "A shell over everyone near you. It is not thick. It is everywhere."
+        },
+        {
+          "id": "vgl.mend",
+          "name": "Mend the Line",
+          "kind": "recovery",
+          "cost": "mana",
+          "text": "The worst-hurt person within twenty metres stops being the worst hurt."
+        },
+        {
+          "id": "vgl.keep",
+          "name": "Keep",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "For ten seconds nobody on your side can be brought below their last breath."
+        }
+      ],
+      "needs": {
+        "vital": 2
+      }
+    },
+    {
+      "id": "apparatus",
+      "name": "Apparatus",
+      "blurb": "Unnamed, and filed under the number of problems it turns out not to be a fight.",
+      "abilities": [
+        {
+          "id": "app.hand",
+          "name": "Apparatus",
+          "kind": "utility",
+          "cost": "mana, sustained",
+          "text": "Four things you can lift are lifted, at once, wherever you can see."
+        },
+        {
+          "id": "app.pick",
+          "name": "Undo",
+          "kind": "utility",
+          "cost": "mana",
+          "text": "Any made thing you can touch comes apart the way it was put together."
+        },
+        {
+          "id": "app.rig",
+          "name": "Rig",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "Set a condition. When it is met, everything you arranged happens in the order you arranged it."
+        }
+      ],
+      "needs": {
+        "utility": 1,
+        "mental": 1
+      }
+    },
+    {
+      "id": "mixed",
+      "name": "Confluence, Unfiled",
+      "blurb": "Three essences the registry has not seen together. You will be asked to write it up.",
+      "abilities": [
+        {
+          "id": "mix.edge",
+          "name": "Edge",
+          "kind": "attack",
+          "cost": "mana",
+          "text": "Whatever your three are best at, arriving at once at a single point."
+        },
+        {
+          "id": "mix.hold",
+          "name": "Hold",
+          "kind": "defence",
+          "cost": "mana, sustained",
+          "text": "Whatever your three are best at, arriving at once around you."
+        },
+        {
+          "id": "mix.open",
+          "name": "Open Ground",
+          "kind": "special",
+          "cost": "mana, heavy",
+          "text": "A wide effect nobody at the Society has agreed on a description of."
+        }
+      ]
+    }
+  ]
+}
