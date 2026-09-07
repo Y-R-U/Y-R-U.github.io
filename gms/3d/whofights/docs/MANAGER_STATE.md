@@ -4,7 +4,8 @@
 written to survive a usage-limit cutoff. Last written 2026-08-30, ~13:20Z.
 
 `docs/DEV_CONTRACT.md` is the binding spec. `docs/DEVTOOLS.md` is how the dev tools work.
-`docs/HANDOFF.md` is the scaffold agent's record. Read those; this file is only *what is happening*.
+`docs/RESUME.md` is what the game is and `docs/DECISIONS.md` is why. Read those; this file is
+only *what is happening*.
 
 ## The ask, from Aaron
 
@@ -203,7 +204,7 @@ generate and curate.
   `1af64b55` with a hand-rolled transport that negotiates no extension, bounded requests that name
   themselves on timeout, and a close handler that rejects everything in flight.
   **It had never worked at those settings** — the last good render was an `--all` sweep at a quarter
-  of the pixels, and `HANDOFF.md` hardcoded the small-render flags as a workaround nobody had
+  of the pixels, and the scaffold pass hardcoded the small-render flags as a workaround nobody had
   explained. *Three separate silent-failure tools on this project now: a check that cannot fail is
   the recurring shape, and `settle()` — which returned success for a page that never drew a frame —
   was another.* `js/dev/cdp.mjs` had the same defect — fixed 31 Aug in `5522f61b`, and it now

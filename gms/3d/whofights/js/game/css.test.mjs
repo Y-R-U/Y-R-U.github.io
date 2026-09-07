@@ -1,6 +1,6 @@
 // The class-collision guard.
 //
-// docs/HANDOFF.md records this hazard once already: every class in style.css is `wf-` prefixed
+// docs/DECISIONS.md §7 records this hazard: every class in style.css is `wf-` prefixed
 // because a bare `.row` silently reshaped a dev-hub toolbar. game.css is one 1500-line stylesheet
 // shared by a dozen screens, and the same thing happened three times in one afternoon — `.g-chip`
 // was already the HUD's absolutely-positioned notification, so four essence names stacked on top
