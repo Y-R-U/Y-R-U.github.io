@@ -15,3 +15,11 @@
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 @media(min-width:601px){.previewCaption{left:39%;}}
+
+/* Speech belongs to the scene; only the optional transcript pauses play. */
+#speech{position:fixed;left:50%;bottom:216px;transform:translateX(-50%);display:flex;align-items:center;gap:7px;width:min(470px,calc(100vw - 32px));z-index:7;pointer-events:none;filter:drop-shadow(0 2px 3px #071414)}
+#speechCaption{flex:1;min-width:0;text-align:center;color:#ffc68a;font-size:12px;line-height:1.6;text-shadow:0 1px 4px #000,0 1px 10px #000;background:radial-gradient(ellipse,#071c2280,transparent 75%)}#speechSpeaker{display:block;font-size:8px;letter-spacing:1px;color:#e1b881;margin-bottom:3px}#speechText{display:block}#speech button{pointer-events:auto;flex-shrink:0;width:34px;height:34px;padding:7px;background:#10262d70;border-color:#edbb7955;color:#ffd099}#speechOpen svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}#speechNext{font-size:23px;line-height:14px}#speech.idle{width:auto;left:auto;right:28px;bottom:215px;transform:none}#speech.idle #speechCaption,#speech.idle #speechNext{display:none}body.speaking #toast{bottom:300px}body.intro #speech{display:none}.lab #speech{bottom:80px}.lab #speech.idle{bottom:80px}.lab.speaking #toast{bottom:165px}
+@media(max-width:600px){#speech{bottom:278px;width:calc(100vw - 28px);gap:5px}#speechCaption{font-size:11px;line-height:1.55}#speechSpeaker{font-size:7px}#speech button{width:32px;height:34px;padding:6px}#speech.idle{bottom:280px;right:14px}body.speaking #toast{bottom:378px}.lab #speech{bottom:92px}.lab.speaking #toast{bottom:194px}}
+@media(max-height:500px){#speech{bottom:190px;max-width:380px}.lab #speech{bottom:65px}#speechCaption{font-size:10px}.lab.speaking #toast{bottom:140px}}
+
+body.crossing #interact,body.crossing #dodge,body.crossing #toast{visibility:hidden}

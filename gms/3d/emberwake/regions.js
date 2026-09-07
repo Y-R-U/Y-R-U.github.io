@@ -29,13 +29,20 @@ export function createLab(){
  for(let x of [-1.2,5.2]){box(root,'#334b5d',x,.8,-3,.75,1.6,.85);let screen=mesh(root,new T.BoxGeometry(.64,.44,.06),'#83e7d9',x,1.65,-2.64,1);screen.rotation.x=-.3;}
  for(let x of [-8,-4]){box(root,'#93a6a7',x,.95,-7,2.8,.2,1.3);for(const side of [-1,1])box(root,'#516777',x+side, .45,-7,.12,1,.8);box(root,'#183949',x,1.55,-7.3,1.2,.8,.12);mesh(root,new T.BoxGeometry(1,.6,.04),'#7dbfce',x,1.55,-7.21,.7);colliders.push({x,z:-7,r:1.3});}
  prop('hide','Storage cabinets','hide',-8,4.5,g=>{for(let x of [-1,0,1]){box(g,'#506670',x,1.35,-2.5,.96,2.7,.85);box(g,'#a9b8b4',x+.25,1.4,-2.04,.06,.4,.04);}box(g,'#aab49c',.8,.35,.9,.65,.7,.65);});colliders.push({x:-8,z:2,r:1.8});
- prop('device','Use the device','device',-8,5,g=>{cyl(g,'#2e4e59',0,.08,0,.6,.65,.16);});
+ prop('device','Unstable rift','device',6,5);
  const vale=npc('vale','Dr Vale',0,-.5,'#e0e2d8');vale.userData.appearance('male',true);vale.rotation.y=.6;
  const tech=npc('sato','Dr Sato',-5,-5,'#d5e3df');tech.userData.appearance('female',true);tech.rotation.y=-.4;
  box(root,'#263b49',10,1.7,6,.6,3.4,4);box(root,'#73999f',9.66,1.7,6,.05,2.7,2.8);
  const alarm=new T.PointLight('#ff534a',0,25,2);alarm.position.set(9,3,6);scene.add(alarm);w.alarm=alarm;
- const sparks=new T.Group();scene.add(sparks);for(let i=0;i<22;i++){mesh(sparks,new T.IcosahedronGeometry(.08),'#ffb576',9-Math.random()*3,.4+Math.random()*3,4+Math.random()*4,2);}sparks.visible=false;
- w.update=t=>{portal.material.opacity=.18+Math.sin(t*2)*.07;const attack=w.alert;alarm.intensity=attack?35+Math.sin(t*8)*22:0;sparks.visible=!!attack;if(attack){sparks.children.forEach((m,i)=>{m.position.y=.3+((t*(.7+i*.02)+i*.21)%2.7);});}};
+ // The alarm sparks gather into the actual escape doorway, at the interaction target.
+ const rift=new T.Group();rift.position.set(6,1.6,5);rift.rotation.y=.62;scene.add(rift);w.escapeRift=rift;
+ const rim=mesh(rift,new T.TorusGeometry(1.18,.045,6,64),'#ffc985',0,0,0,2);rim.scale.y=1.25;
+ const riftTime={value:0};
+ const veil=new T.Mesh(new T.CircleGeometry(1.14,56),new T.ShaderMaterial({transparent:true,side:T.DoubleSide,depthWrite:false,uniforms:{time:riftTime},vertexShader:`varying vec2 v;void main(){v=uv*2.-1.;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`varying vec2 v;uniform float time;void main(){float r=length(v),a=atan(v.y,v.x);float swirl=sin(a*5.-r*15.+time*3.)*.5+.5;float edge=pow(r,5.);vec3 c=mix(vec3(.05,.27,.3),vec3(1.,.57,.20),edge);c+=swirl*.12*(1.-r);gl_FragColor=vec4(c,(.43+edge*.5)*(1.-smoothstep(.96,1.,r)));}`}));veil.scale.y=1.25;rift.add(veil);
+ const riftLight=new T.PointLight('#ffc079',15,9,2);riftLight.position.set(6,1.8,5);scene.add(riftLight);
+ const sparks=new T.Group();scene.add(sparks);for(let i=0;i<42;i++)mesh(sparks,new T.IcosahedronGeometry(.025+i%3*.012),'#ffc784',0,0,0,2);
+ w.update=t=>{portal.material.opacity=.035;riftTime.value=t;const attack=w.alert,ready=!!w.escapeReady;alarm.intensity=attack?18+Math.sin(t*8)*9:0;rift.visible=ready;riftLight.intensity=ready?12+Math.sin(t*4)*3:0;sparks.visible=!!attack;
+ sparks.children.forEach((m,i)=>{const a=t*(.7+i%3*.12)+i*2.399,r=ready?1.2+(i%5)*.055:.5+(i%7)*.16;const xx=Math.cos(a)*r,yy=Math.sin(a)*r*1.25;m.position.set(6+xx*Math.cos(.62),1.6+yy,5-xx*Math.sin(.62));m.scale.setScalar(.65+Math.sin(t*6+i)*.35);});rim.rotation.z=Math.sin(t)*.025;};
  w.finish();return w;
 }
 export function createMainland(){

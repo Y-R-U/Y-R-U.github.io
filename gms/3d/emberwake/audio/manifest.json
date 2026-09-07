@@ -44,16 +44,16 @@
     "file": "lab_escape-female.mp3",
     "voice": "af_bella",
     "speed": 0.98,
-    "seconds": 5.6,
-    "hash": "90ed9c7712e56bcc2b59ab657ee7b809b3928c785258f4bfe05477eed9c959d8"
+    "seconds": 7.53,
+    "hash": "a48ffde8b98949008e508688bf87d362241c40cd7cb80e6c32a3b6306d40d248"
   },
   {
     "id": "lab_escape",
     "file": "lab_escape-male.mp3",
     "voice": "am_echo",
     "speed": 0.98,
-    "seconds": 5.42,
-    "hash": "4c0bac4d3ff50364a6b2b559aa9127eb66bfcd4b5a365560cca4e4bbca4699d2"
+    "seconds": 6.78,
+    "hash": "4675bd42a88e95782dc7015261306a4305b0132d7249a0ff12eb83f02be53b57"
   },
   {
     "id": "arrival",

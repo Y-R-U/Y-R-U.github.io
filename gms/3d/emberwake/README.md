@@ -15,7 +15,7 @@ Serve the site root and open `/gms/3d/emberwake/`. The game uses ES modules, so 
 
 ## Playable chapter
 
-Create a named male or female lab assistant, meet Dr Vale, hide during the attack and escape through the device. The training island retains its eight-step gathering/crafting/combat progression. Its beacon now teleports to **Lantern Reach**, where three missions restore the town wards, rescue archivist Neri and recover an impossible laboratory record from the observatory. See [STORY.md](STORY.md) for the story draft, rewards and unresolved mysteries.
+Create a named male or female lab assistant, meet Dr Vale, hide during the attack and enter the orange rift opened by the device. The training island retains its eight-step gathering/crafting/combat progression. Its beacon now teleports to **Lantern Reach**, where three missions restore the town wards, rescue archivist Neri and recover an impossible laboratory record from the observatory. See [STORY.md](STORY.md) for the story draft, rewards and unresolved mysteries.
 
 J (or the journal button) opens discovered story notes and mission status. `Show the way` works throughout all three regions. The northern road marks the end of this chapter. Both shores remain explorable, with fishing, cooking, gathering and island training available after completion.
 
@@ -25,7 +25,7 @@ Progress is saved locally under the existing `emberwake-v1` key using schema ver
 
 ## Narration
 
-Bundled MP3 narration uses Reader's local Kokoro engine: **Lewis (`bm_lewis`)** for narration/NPCs, **Bella (`af_bella`)** for female player thoughts, and **Echo (`am_echo`)** for male player thoughts, at 0.98 speed. Most passages last 6–11 seconds. No Reader server is needed to play. Character creation includes voice preview. Dialogue has replay and mute controls, pauses gameplay and stops its clip when advanced. The text remains complete independently of audio.
+Bundled MP3 narration uses Reader's local Kokoro engine: **Lewis (`bm_lewis`)** for narration/NPCs, **Bella (`af_bella`)** for female player thoughts, and **Echo (`am_echo`)** for male player thoughts, at 0.98 speed. Most passages last 6–11 seconds. No Reader server is needed to play. Character creation includes voice preview. Speech appears as short orange subtitles while gameplay continues. Lines advance automatically, including with sound muted; the small arrow skips a line. Tap the message icon to pause and read the full transcript, then return to the same speech. The most recent transcript stays available after its subtitles end. New quest speech queues behind the current line and survives reloads. Replay and mute remain available. Portal travel shows the departure and arrival before displaying new speech.
 
 Regenerate with the local environment containing cached Kokoro weights and ffmpeg:
 
@@ -56,6 +56,7 @@ Run the real browser playthrough with Playwright installed and the site served o
 node tests/browser.mjs
 node tests/interactions.mjs
 node tests/expansion.mjs
+node tests/speech.mjs
 ```
 
 The browser test plays through character creation, the lab escape, gathering, crafting, all three weapon styles, shades, the Warden, three mainland missions and return travel; then checks panel states, skill XP, saved progress, and four viewport sizes. It fails on JavaScript, shader-console or HTTP errors. The interaction checks exercise touch input, dodge timing, defeat recovery, fishing, cooking and narrow-screen skill contents. `window.emberwake` exposes state, objects, movement and rendering metrics for inspection; the normal game flow does not require it.

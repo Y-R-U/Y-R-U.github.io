@@ -6,7 +6,7 @@ This build is a playable first chapter: the lab prologue, the original training 
 
 The player chooses a name and male/female character. Dr Vale welcomes the new assistant at Aster Lab. The device appears to transport a person into another dimension, but this remains a working theory. Vale reports two trips: ten seconds to check conditions, then one minute. On the second trip a man at the gate talked about training and a tutorial, and a woman offered a sword.
 
-A boom interrupts his account. Vale gives the assistant the device and tells them to hide until it is safe. The player walks behind the storage cabinets. Intruders are heard demanding the traveller and the key; they are still approaching. The assistant decides to activate the device rather than wait to be found. The player interacts with the device to escape.
+A boom interrupts his account. Vale gives the assistant the device and tells them to hide until it is safe. The player walks behind the storage cabinets. Intruders are heard demanding the traveller and the key; they are still approaching. The assistant decides to activate the device rather than wait to be found. The device draws the alarm sparks into a visible orange doorway across the lab. The player enters that rift to escape; the marker beside the storage box no longer teleports them.
 
 ## The first shore
 
@@ -14,7 +14,7 @@ The device becomes an ember-like stone. Edda treats arrivals as routine and spea
 
 The existing gathering, forging, sword/dagger practice, magic practice, shades and Warden encounters remain. Dialogue is shorter. The shades are an unexpected breach, not a planned training exercise. The Warden warns that someone is opening doors from the other side.
 
-The beacon is a crossing. After freeing the Warden, activating it takes the player to Lantern Reach. It subsequently works both ways. Old completed island saves can use it immediately.
+The beacon is a crossing. After freeing the Warden, lighting it opens the crossing. Interacting again takes the player to Lantern Reach; finishing Edda’s speech never teleports the player automatically. It subsequently works both ways. Old completed island saves can use it immediately.
 
 ## Lantern Reach
 
@@ -40,6 +40,6 @@ The chapter ends here. The northern road is visibly sealed. Players can review t
 
 ## Voice and pacing
 
-Lewis (`bm_lewis`) reads narration and NPC lines. The player's spoken thoughts use Bella (`af_bella`) for a female character and Echo (`am_echo`) for a male character. A name is displayed rather than inserted into prerecorded audio. Most clips last 6–11 seconds; the ledger reading is approximately 15 seconds. All dialogue is skippable with a button and can be replayed or muted. It does not advance automatically.
+Lewis (`bm_lewis`) reads narration and NPC lines. The player's spoken thoughts use Bella (`af_bella`) for a female character and Echo (`am_echo`) for a male character. A name is displayed rather than inserted into prerecorded audio. Most clips last 6–11 seconds; the ledger reading is approximately 15 seconds. Speech plays as short orange subtitles without pausing movement. It advances automatically and has a small skip arrow. The message icon opens the complete transcript and pauses gameplay; closing it resumes the same speech. Replay and mute remain available. Departure and arrival effects stay unobstructed by speech.
 
 Edit `story.json` for the exact dialogue. `tools/narrate.py` regenerates only changed clips using the local Reader environment. Mission transitions live in `main.js`; persistent progress and migration live in `state.mjs`.
