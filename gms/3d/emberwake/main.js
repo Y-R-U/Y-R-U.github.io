@@ -17,7 +17,8 @@ renderer.info.autoReset=false;renderer.setPixelRatio(Math.min(devicePixelRatio,1
 const worlds={lab:createLab()};let world=worlds.lab,{scene,player}=world;
 const camera=new T.OrthographicCamera(-18,18,12,-12,.1,220);let zoom=24,angle=.62;const focus=new T.Vector3(0,0,8);
 const composer=new EffectComposer(renderer);const renderPass=new RenderPass(scene,camera);composer.addPass(renderPass);const bloom=new UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.24,.5,1.05);composer.addPass(bloom);composer.addPass(new OutputPass());let quality='high';
-function resize(){renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);const aspect=innerWidth/innerHeight;camera.top=zoom/2;camera.bottom=-zoom/2;camera.left=-zoom*aspect/2;camera.right=zoom*aspect/2;camera.updateProjectionMatrix()}resize();addEventListener('resize',resize);
+function resizeCamera(){const aspect=innerWidth/innerHeight;camera.top=zoom/2;camera.bottom=-zoom/2;camera.left=-zoom*aspect/2;camera.right=zoom*aspect/2;camera.updateProjectionMatrix()}
+function resize(){renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);resizeCamera()}resize();addEventListener('resize',resize);
 const ray=new T.Raycaster(),pointer=new T.Vector2(),plane=new T.Plane(new T.Vector3(0,1,0),-.6),keys=new Set();let destination=null,path=[],selected=null,moving=false,started=false,clock=0,last=performance.now(),attackCD=0,dodgeCD=0,dodgeTime=0,actionCD=0,uiTimer=0,saveTimer=0,toastUntil=0,selectedSkill=0,narration=null,currentStory=null,steps=0;const effects=[],floaters=[],enemies=[];let soundCtx=null;
 const stageTitles=['A stranger on the shore','From the shore','Fire & copper','The language of steel','A memory of fire','Shadows in the garden','The last watch','Carry the light','Keeper of the first flame'];
 const stageTexts=['Find Edda beside the keeper’s cottage.','Gather two driftwood and two copper ore. Click a resource to collect it.','Take your materials to the old forge.','Equip sword [1] and dagger [2]. Land three hits with each on the effigy, then visit the rune well.','Equip ember magic [3]. Cast three bolts at the training effigy.','Defeat the three drowned shades in the northern garden.','Defeat the Hollow Warden at the lighthouse. Dodge the red circle before it fills.','Place the recovered embers in the dark beacon.','The crossing is open. Enter the beacon to travel to Lantern Reach.'];
@@ -27,6 +28,25 @@ function save(){if(!started)return;state.x=player.position.x;state.z=player.posi
 function tone(freq=440,duration=.12,type='sine',volume=.04){if(state.muted)return;try{soundCtx ||=new (window.AudioContext||window.webkitAudioContext)();if(soundCtx.state==='suspended')soundCtx.resume();let o=soundCtx.createOscillator(),g=soundCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,soundCtx.currentTime);o.frequency.exponentialRampToValueAtTime(freq*.6,soundCtx.currentTime+duration);g.gain.setValueAtTime(volume,soundCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,soundCtx.currentTime+duration);o.connect(g).connect(soundCtx.destination);o.start();o.stop(soundCtx.currentTime+duration)}catch{}}
 function voiceInfo(line){const selected=line?.voice==='player';return {name:selected?(state.gender==='female'?'BELLA':'ECHO'):'LEWIS',file:line.id+(selected?'-'+state.gender:'')};}
 let speechElapsed=0,speechDuration=0,speechChunks=[],lastStory=null,transcriptStory=null,travel=null;
+// HUD timers count active play time so a transcript or background tab never eats reading time.
+let titleWait=null,questReadTime=4,questSignature='';
+function setQuestExpanded(expanded){
+ $('quest').classList.toggle('compact',!expanded);$('questDetails').hidden=!expanded;
+ $('questToggle').setAttribute('aria-expanded',String(expanded));$('questToggle').title=expanded?'Collapse quest details':'Expand quest details';
+ questReadTime=4;
+}
+function resetQuestHUD(resume){
+ titleWait=resume&&state.pendingStory!=='lab_intro'?2:null;questSignature='';
+ document.body.classList.remove('title-away');$('gameBrand').removeAttribute('aria-hidden');setQuestExpanded(true);
+}
+function tickQuestHUD(dt){
+ if(paused())return;
+ if(titleWait!==null){titleWait-=dt;if(titleWait<=0){titleWait=null;document.body.classList.add('title-away');$('gameBrand').setAttribute('aria-hidden','true');questReadTime=4;}}
+ if(document.body.classList.contains('title-away')&&!$('quest').classList.contains('compact')){
+  questReadTime-=dt;if(questReadTime<=0)setQuestExpanded(false);
+ }
+}
+$('questToggle').onclick=()=>setQuestExpanded($('quest').classList.contains('compact'));
 function speechSpeaker(line){return line.voice==='player'?state.name+' · YOUR THOUGHTS':line.speaker;}
 function fillTranscript(line){transcriptStory=line;$('dialogueKicker').textContent=speechSpeaker(line);$('dialogueTitle').textContent=line.title;$('dialogueText').textContent=line.text;$('continue').textContent='Back to game';}
 function playVoice(line=currentStory||transcriptStory||lastStory){
@@ -46,7 +66,7 @@ function story(id){
  fillTranscript(line);$('speechSpeaker').textContent=speechSpeaker(line);$('speechText').textContent=speechChunks[0];$('speech').hidden=false;$('speech').classList.remove('idle');document.body.classList.add('speaking');playVoice(line);save();
 }
 function finishSpeech(){
- if(!currentStory)return;const id=currentStory.id;narration?.pause();currentStory=null;state.pendingStory=null;$('speech').classList.add('idle');document.body.classList.remove('speaking');
+ if(!currentStory)return;const id=currentStory.id;if(id==='lab_intro')titleWait=2;narration?.pause();currentStory=null;state.pendingStory=null;$('speech').classList.add('idle');document.body.classList.remove('speaking');
  const next={lab_test:'lab_return',lab_return:'lab_attack',lab_hidden:'lab_escape',keeper:'creator',ledger:'ledger_thought',neri_truth:'signal',signal:'chapter_end'};
  if(id==='lab_return'&&state.region==='lab'&&state.labStep===0){state.labStep=1;world.alert=true;document.body.classList.add('labAlert');tone(48,1.2,'sawtooth',.15);burst(new T.Vector3(9,2,6),'#ffc88b',65);}
  if(next[id])state.speechQueue.unshift(next[id]);
@@ -58,7 +78,7 @@ function tickSpeech(dt){
  const chunk=speechChunks.find(c=>(sum+=c.length)>=progress)||speechChunks.at(-1);$('speechText').textContent=chunk;
  if(speechElapsed>=speechDuration)finishSpeech();
 }
-function clearSpeech(){narration?.pause();currentStory=null;state.pendingStory=null;state.speechQueue=[];$('dialogue').hidden=true;$('speech').hidden=true;document.body.classList.remove('speaking');}
+function clearSpeech(){if(currentStory?.id==='lab_intro')titleWait=2;narration?.pause();currentStory=null;state.pendingStory=null;state.speechQueue=[];$('dialogue').hidden=true;$('speech').hidden=true;document.body.classList.remove('speaking');}
 $('speechOpen').onclick=()=>{const line=currentStory||lastStory;if(!line||travel)return;fillTranscript(line);keys.clear();$('dialogue').hidden=false;$('continue').focus();};
 $('continue').onclick=()=>{$('dialogue').hidden=true;if(currentStory&&narration?.paused&&!state.muted&&speechElapsed<speechDuration-1)narration.play().catch(()=>{});$('world').focus();};
 $('speechNext').onclick=()=>{if(!paused())finishSpeech();};
@@ -94,7 +114,7 @@ function gain(skill,amount){const up=addXP(state,skill,amount);floatText(`+${amo
 function advance(stage,id){state.stage=stage;renderUI();save();if(id)story(id)}
 function equip(n){if(n===2&&!state.magic){toast('Attune your ember at the rune well first.');return}state.weapon=n;let d=player.userData;d.blade.scale.y=n===1?.5:1;d.tip.position.y=n===1?.75:1.23;d.hand.visible=n!==2;if(state.region==='lab')d.hand.visible=false;renderUI();save();tone(n===2?700:260,.08)}
 function spawnEnemies(){for(const e of enemies){scene.remove(e.mesh,e.warning)}enemies.length=0;for(const[i,x,z]of(state.region==='lab'?[]:state.region==='mainland'?[[10,9,-8],[11,15,-10],[12,0,-24]]:[[0,-8,-10],[1,2,-12],[2,9,-10],[3,0,-21]])){let boss=i===3||i===12;if(state.region==='mainland'?state.mainKills.includes(i):boss?state.bossDead:state.kills.includes(i))continue;const mesh=makeEnemy(boss);mesh.position.set(x,ground(x,z),z);scene.add(mesh);const warning=new T.Mesh(new T.RingGeometry(.04,1,48),new T.MeshBasicMaterial({color:'#f27159',transparent:true,opacity:.33,side:T.DoubleSide,depthWrite:false}));warning.rotation.x=-Math.PI/2;warning.visible=false;scene.add(warning);enemies.push({id:i,name:state.region==='mainland'?(boss?'Observatory Custodian':'Lost sentinel'):(boss?'Hollow Warden':'Drowned shade'),kind:'enemy',x,z,homeX:x,homeZ:z,hp:boss?230:65,max:boss?230:65,boss,mesh,warning,wind:0,cooldown:1,alive:true,attackX:0,attackZ:0,phase:0})}}
-function init(resume=false){narration?.pause();currentStory=null;travel=null;lastStory=null;$('speech').hidden=true;document.body.classList.remove('speaking');state=resume&&saved?structuredClone(saved):fresh();if(!resume){state.name=cleanName($('heroName').value);state.gender=document.querySelector('[name=gender]:checked').value;state.x=0;state.z=7;}started=true;document.body.classList.remove('intro','creation','crossing');$('welcome').hidden=$('creation').hidden=$('dialogue').hidden=true;$('sound').checked=!state.muted;$('belt').dataset.size=state.belt;$('skills').dataset.size=state.skills;enterRegion(state.region,state.x,state.z);renderUI();lastStory=stories.find(s=>s.id===state.lastSpeech)||null;if(lastStory){$('speech').hidden=false;$('speech').classList.add('idle');}if(state.pendingStory)story(state.pendingStory);else if(!resume)story('lab_intro');else toast(`Welcome back, ${state.name}.`);save();}
+function init(resume=false){narration?.pause();currentStory=null;travel=null;lastStory=null;$('speech').hidden=true;document.body.classList.remove('speaking');state=resume&&saved?structuredClone(saved):fresh();if(!resume){state.name=cleanName($('heroName').value);state.gender=document.querySelector('[name=gender]:checked').value;state.x=0;state.z=7;}resetQuestHUD(resume);started=true;document.body.classList.remove('intro','creation','crossing');$('welcome').hidden=$('creation').hidden=$('dialogue').hidden=true;$('sound').checked=!state.muted;$('belt').dataset.size=state.belt;$('skills').dataset.size=state.skills;enterRegion(state.region,state.x,state.z);renderUI();lastStory=stories.find(s=>s.id===state.lastSpeech)||null;if(lastStory){$('speech').hidden=false;$('speech').classList.add('idle');}if(state.pendingStory)story(state.pendingStory);else if(!resume)story('lab_intro');else toast(`Welcome back, ${state.name}.`);save();}
 function creation(){clearSpeech();started=false;document.body.classList.add('intro','creation');$('welcome').hidden=true;$('creation').hidden=false;state.region='lab';world=worlds.lab;scene=world.scene;player=world.player;renderPass.scene=scene;world.alert=false;world.portraitLight.visible=true;world.objects.filter(o=>o.kind==='vale'||o.kind==='sato').forEach(o=>o.group.visible=false);player.position.set(0,0,4);previewCharacter();}
 function previewCharacter(){const gender=document.querySelector('[name=gender]:checked').value;player.userData.appearance(gender,true);player.userData.hand.visible=false;player.rotation.y=.4;$('previewName').textContent=cleanName($('heroName').value);}
 $('characterForm').onsubmit=e=>{e.preventDefault();init(false);};document.querySelectorAll('[name=gender]').forEach(el=>el.onchange=()=>{narration?.pause();previewCharacter();});$('heroName').oninput=previewCharacter;
@@ -128,8 +148,37 @@ function move(dx,dz){let x=player.position.x,z=player.position.z;if(walkable(x+d
 function nearest(){let list=[...world.objects,...enemies.filter(activeEnemy)];return list.filter(o=>o.kind!=='beacon'||state.stage>=7).sort((a,b)=>Math.hypot(a.x-player.position.x,a.z-player.position.z)-Math.hypot(b.x-player.position.x,b.z-player.position.z))[0]}
 function useNearest(){if(paused())return;const o=nearest();if(o&&Math.hypot(o.x-player.position.x,o.z-player.position.z)<5)go(o.x,o.z,o);else toast('Move closer to a person, resource or enemy.')}
 function paused(){return !started||!!travel||!$('dialogue').hidden||$('settings').open||$('journal').open||document.hidden}
-let drag=null;$('world').addEventListener('pointerdown',e=>{if(paused())return;drag={x:e.clientX,y:e.clientY,button:e.button};$('world').setPointerCapture(e.pointerId)});$('world').addEventListener('pointermove',e=>{if(drag&&drag.button===2){angle-=(e.clientX-drag.x)*.007;drag.x=e.clientX}});$('world').addEventListener('contextmenu',e=>e.preventDefault());$('world').addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null;if(paused()||d.button!==0||Math.hypot(e.clientX-d.x,e.clientY-d.y)>12)return;pointer.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(pointer,camera);let picks=[];for(const o of [...world.objects,...enemies.filter(e=>e.alive)]){const pos=new T.Vector3(o.x,ground(o.x,o.z)+(o.boss?1.7:o.kind==='device'?1.6:.85),o.z);let hit=new T.Vector3();if(ray.ray.intersectSphere(new T.Sphere(pos,o.kind==='beacon'||o.kind==='device'?1.7:o.kind==='fish'?1.2:.95),hit))picks.push({o,d:ray.ray.origin.distanceTo(hit)})}if(picks.length){picks.sort((a,b)=>a.d-b.d);const o=picks[0].o;go(o.x,o.z,o)}else{const hit=new T.Vector3();if(ray.ray.intersectPlane(plane,hit))go(hit.x,hit.z)}});
-$('world').addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(15,Math.min(40,zoom+e.deltaY*.016));resize()},{passive:false});
+let drag=null,pinch=null,multiTouch=false;const touchPoints=new Map();
+function setZoom(value){zoom=Math.max(15,Math.min(40,value));resizeCamera();}
+function pinchDistance(){const [a,b]=[...touchPoints.values()];return Math.hypot(a.x-b.x,a.y-b.y);}
+function resetGesture(){touchPoints.clear();drag=null;pinch=null;multiTouch=false;}
+$('world').addEventListener('pointerdown',e=>{
+ if(paused())return;
+ if(e.pointerType==='touch'){
+  touchPoints.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(touchPoints.size>=2){multiTouch=true;drag=null;pinch={distance:Math.max(1,pinchDistance()),zoom};}
+ }
+ if(!multiTouch)drag={id:e.pointerId,x:e.clientX,y:e.clientY,button:e.button};
+ $('world').setPointerCapture(e.pointerId);
+});
+$('world').addEventListener('pointermove',e=>{
+ if(paused()){resetGesture();return;}
+ if(touchPoints.has(e.pointerId))touchPoints.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pinch&&touchPoints.size>=2){setZoom(pinch.zoom*pinch.distance/Math.max(1,pinchDistance()));return;}
+ if(drag?.id===e.pointerId&&drag.button===2){angle-=(e.clientX-drag.x)*.007;drag.x=e.clientX;}
+});
+function endPointer(e){
+ touchPoints.delete(e.pointerId);
+ // Keep suppressing taps until every finger in a pinch has lifted.
+ if(multiTouch){drag=null;pinch=touchPoints.size>=2?{distance:Math.max(1,pinchDistance()),zoom}:null;if(!touchPoints.size)multiTouch=false;return;}
+ if(drag?.id!==e.pointerId)return;const d=drag;drag=null;
+ if(e.type!=='pointerup'||paused()||d.button!==0||Math.hypot(e.clientX-d.x,e.clientY-d.y)>12)return;
+ pointer.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(pointer,camera);let picks=[];for(const o of [...world.objects,...enemies.filter(e=>e.alive)]){const pos=new T.Vector3(o.x,ground(o.x,o.z)+(o.boss?1.7:o.kind==='device'?1.6:.85),o.z);let hit=new T.Vector3();if(ray.ray.intersectSphere(new T.Sphere(pos,o.kind==='beacon'||o.kind==='device'?1.7:o.kind==='fish'?1.2:.95),hit))picks.push({o,d:ray.ray.origin.distanceTo(hit)})}if(picks.length){picks.sort((a,b)=>a.d-b.d);const o=picks[0].o;go(o.x,o.z,o)}else{const hit=new T.Vector3();if(ray.ray.intersectPlane(plane,hit))go(hit.x,hit.z)}
+}
+for(const event of ['pointerup','pointercancel','lostpointercapture'])$('world').addEventListener(event,endPointer);
+addEventListener('blur',resetGesture);document.addEventListener('visibilitychange',()=>{if(document.hidden)resetGesture();});
+$('world').addEventListener('contextmenu',e=>e.preventDefault());
+$('world').addEventListener('wheel',e=>{e.preventDefault();if(!paused())setZoom(zoom+e.deltaY*.016)},{passive:false});
 addEventListener('keydown',e=>{if(e.code==='Escape'&&!$('dialogue').hidden){$('continue').click();return}if(paused())return;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();keys.add(e.code);if(e.repeat)return;if(e.code.startsWith('Digit')&&Number(e.key)<=3&&Number(e.key)>=1)equip(Number(e.key)-1);if(e.code==='KeyE')useNearest();if(e.code==='Space')dodge();if(e.code==='KeyR')consume();if(e.code==='KeyJ')openJournal();if(e.code==='KeyB')toggle('belt');if(e.code==='KeyK')toggle('skills')});addEventListener('keyup',e=>keys.delete(e.code));addEventListener('blur',()=>{keys.clear();drag=null;save()});document.addEventListener('visibilitychange',()=>{keys.clear();if(document.hidden){narration?.pause();save()}else if(currentStory&&!state.muted&&!paused()&&narration?.paused&&speechElapsed<speechDuration-1)narration.play().catch(()=>{})});
 function toggle(panel){state[panel]=(state[panel]+1)%3;if(innerWidth<=600&&state[panel]===2){const other=panel==='belt'?'skills':'belt';state[other]=0;$(other).dataset.size=0;}$(panel).dataset.size=state[panel];renderUI();save()}
 $('beltToggle').onclick=()=>toggle('belt');$('skillsToggle').onclick=()=>toggle('skills');$('interact').onclick=useNearest;$('dodge').onclick=dodge;$('settingsBtn').onclick=()=>{keys.clear();narration?.pause();$('settings').showModal()};$('sound').onchange=()=>{state.muted=!$('sound').checked;if(state.muted)narration?.pause();save()};$('opacity').oninput=()=>document.documentElement.style.setProperty('--panel',$('opacity').value/100);$('quality').onchange=()=>{quality=$('quality').value;renderer.shadowMap.enabled=quality==='high';renderer.setPixelRatio(quality==='high'?Math.min(devicePixelRatio,1.6):1);resize()};$('restart').onclick=()=>{if($('restart').dataset.confirm==='yes'){$('settings').close();$('restart').dataset.confirm='';$('restart').textContent='Start a new journey…';saved=structuredClone(state);creation()}else{$('restart').dataset.confirm='yes';$('restart').textContent='Replace this journey? Click again to confirm'}};
@@ -152,7 +201,7 @@ const labels=[];
 function project(pos){const p=pos.clone().project(camera);return{x:(p.x*.5+.5)*innerWidth,y:(-p.y*.5+.5)*innerHeight,z:p.z}}
 function updateLabels(){const obj=objective();const beacon=world.objects.find(o=>o.id==='beacon');if(beacon)beacon.name=state.beacon?'Crossing · Lantern Reach':'The dark beacon';for(const{o,el}of labels){let d=Math.hypot(player.position.x-o.x,player.position.z-o.z);el.hidden=!started||d>16||!$('dialogue').hidden;const p=project(new T.Vector3(o.x,o.y+(o.kind==='beacon'?6:o.kind==='edda'?2.5:2.0),o.z));el.style.left=p.x+'px';el.style.top=p.y+'px';el.innerHTML=`${obj===o?'<span>◆</span>':''}${o.name}`;}for(let i=floaters.length-1;i>=0;i--){const f=floaters[i];const p=project(f.pos.clone().add(new T.Vector3(0,(1.2-f.life)*1.2+(f.small?2.4:0),0)));f.el.style.left=p.x+'px';f.el.style.top=p.y+'px';f.el.style.opacity=Math.min(1,f.life*2);if(f.life<=0){f.el.remove();floaters.splice(i,1)}}}
 function tickEnemies(dt){for(const e of enemies){e.mesh.visible=e.alive&&(state.region==='mainland'||state.stage>=5||e.boss);if(!activeEnemy(e))continue;e.cooldown-=dt;const d=Math.hypot(e.x-player.position.x,e.z-player.position.z);if(e.wind>0){e.wind-=dt;const size=e.boss?3.6:1.9;e.warning.scale.setScalar(size*(1-e.wind/(e.boss?1.15:.85)));e.warning.material.opacity=.25+(1-e.wind/(e.boss?1.15:.85))*.35;if(e.wind<=0){e.warning.visible=false;burst(new T.Vector3(e.attackX,ground(e.attackX,e.attackZ)+.1,e.attackZ),'#e58d6f',e.boss?30:12);if(Math.hypot(player.position.x-e.attackX,player.position.z-e.attackZ)<size)hurt(e.boss?32:14);e.cooldown=e.boss?1.65:1.4}}else if(d<(e.boss?3.3:1.7)&&e.cooldown<=0){e.wind=e.boss?1.15:.85;e.attackX=e.x;e.attackZ=e.z;e.warning.position.set(e.x,ground(e.x,e.z)+.12,e.z);e.warning.visible=true;e.warning.scale.setScalar(.1);tone(110,.3,'sine',.018)}else if(d<(e.boss?13:9)&&d>(e.boss?2.7:1.4)){const speed=e.boss?(e.hp<e.max*.5?2.5:1.65):1.8;let dx=(player.position.x-e.x)/d*dt*speed,dz=(player.position.z-e.z)/d*dt*speed;if(walkable(e.x+dx,e.z+dz)){e.x+=dx;e.z+=dz}}e.mesh.position.set(e.x,ground(e.x,e.z)+Math.sin(clock*3+e.id)*.04,e.z);e.mesh.rotation.y=Math.atan2(player.position.x-e.x,player.position.z-e.z);if(e.boss&&e.hp<e.max*.5&&!e.phase){e.phase=1;toast(e.name+' quickens. Watch the circle.');burst(e.mesh.position,'#8de2ce',25)}}}
-function tick(dt){renderer.info.reset();clock+=dt;world.update(clock);tickTravel(dt);tickSpeech(dt);if(!paused()){attackCD=Math.max(0,attackCD-dt);actionCD=Math.max(0,actionCD-dt);dodgeCD=Math.max(0,dodgeCD-dt);state.mana=Math.min(100,state.mana+dt*7);moving=false;
+function tick(dt){renderer.info.reset();clock+=dt;world.update(clock);tickTravel(dt);tickSpeech(dt);tickQuestHUD(dt);if(!paused()){attackCD=Math.max(0,attackCD-dt);actionCD=Math.max(0,actionCD-dt);dodgeCD=Math.max(0,dodgeCD-dt);state.mana=Math.min(100,state.mana+dt*7);moving=false;
  if(dodgeTime>0){dodgeTime=Math.max(0,dodgeTime-dt);move(dodgeDir.x*dt*14,dodgeDir.z*dt*14);moving=true}else{let mx=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0),mz=(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-(keys.has('KeyW')||keys.has('ArrowUp')?1:0);if(mx||mz){destination=null;path=[];selected=null;const d=Math.hypot(mx,mz),dx=(mx*Math.cos(angle)+mz*Math.sin(angle))/d,dz=(-mx*Math.sin(angle)+mz*Math.cos(angle))/d;move(dx*dt*4.5,dz*dt*4.5);player.rotation.y=Math.atan2(dx,dz);moving=true}else if(path.length){const p=path[0],dx=p.x-player.position.x,dz=p.z-player.position.z,d=Math.hypot(dx,dz);if(d<.18)path.shift();else{const speed=Math.min(d,dt*4.3);move(dx/d*speed,dz/d*speed);player.rotation.y=Math.atan2(dx,dz);moving=true}if(!path.length)destination=null}}
  if(selected&&!dodgeTime){if(selected.kind==='enemy'&&!selected.alive)selected=null;else{let range=selected.kind==='device'?.8:selected.kind==='dummy'||selected.kind==='enemy'?(state.weapon===2?9:2.15):2.15,dist=Math.hypot(player.position.x-selected.x,player.position.z-selected.z);if(dist<=range){destination=null;path=[];interact(selected);if(selected&&!['enemy','dummy'].includes(selected.kind))selected=null}else if(!destination&&selected.kind==='enemy')go(selected.x,selected.z,selected)}}
  if(state.region==='lab'&&state.labStep===2&&Math.hypot(player.position.x-6,player.position.z-5)<.8)regionalInteract(findObject('device'));
@@ -211,6 +260,11 @@ function renderQuest(){
  $('quest').querySelector('.eyebrow>span').textContent=region==='lab'?'◆ PROLOGUE':region==='mainland'?'◆ LANTERN REACH':'◆ THE FIRST SHORE';
  if(region==='lab'){$('questTitle').textContent=labTitles[Math.min(2,state.labStep)];$('questText').textContent=labTexts[Math.min(2,state.labStep)];$('chapter').textContent=String(Math.min(3,state.labStep+1)).padStart(2,'0')+' / 03';$('questProgress').textContent='NEW LAB ASSISTANT · '+state.name;}
  if(region==='mainland'){$('questTitle').textContent=mainlandTitles[state.mainStage];$('questText').textContent=mainlandTexts[state.mainStage];$('chapter').textContent=state.mainStage===6?'COMPLETE':(state.mainStage<3?'01':state.mainStage===3?'02':'03')+' / 03';$('questProgress').textContent=state.mainStage===1?`Wards ${state.relays.length} / 3 · Wood ${state.bag.wood} · Copper ${state.bag.ore}`:state.mainStage===3?`Sentinels ${state.mainKills.filter(id=>id!==12).length} / 2`:state.mainStage===6?'CHAPTER COMPLETE · Three mainland missions':'';}
+ // Retain the familiar gold counters, with a useful task when this stage has no counter.
+ if(region==='lab')$('questProgress').textContent=['Meet Dr Vale','Hide behind the cabinets','Enter the orange rift'][Math.min(2,state.labStep)];
+ if(!$('questProgress').textContent)$('questProgress').textContent=$('questText').textContent.split('. ')[0].replace(/\.$/,'');
+ const signature=[region,$('questTitle').textContent,$('questText').textContent,$('questProgress').textContent].join('|');
+ if(signature!==questSignature){questSignature=signature;setQuestExpanded(true);}
 }
 function openJournal(){keys.clear();narration?.pause();$('journalTitle').textContent=state.name+'’s field notes';
  const notes=[['Aster Lab',state.labStep>=3?'An attack forced me through the device. Vale tested it for ten seconds, then one minute. The intruders called it a key.':'My first day as a lab assistant. Dr Vale has just returned from the second test.'],['The first shore',state.stage>0?'Edda calls the maker of this place “the Creator,” as though everyone knows who that is. She expected travellers.':'The device appears to reach another dimension. That is still only the lab’s working theory.']];

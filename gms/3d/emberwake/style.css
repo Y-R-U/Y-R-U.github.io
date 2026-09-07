@@ -23,3 +23,18 @@
 @media(max-height:500px){#speech{bottom:190px;max-width:380px}.lab #speech{bottom:65px}#speechCaption{font-size:10px}.lab.speaking #toast{bottom:140px}}
 
 body.crossing #interact,body.crossing #dodge,body.crossing #toast{visibility:hidden}
+
+/* The opening title yields its corner to a small, expandable quest reminder. */
+#gameBrand{display:flex;align-items:center;gap:14px;transition:transform 1s cubic-bezier(.4,0,.2,1),opacity .8s,filter .8s;pointer-events:none}
+#hudTools{display:flex;align-items:center;gap:10px}#hudTools button{margin:0}
+body.title-away #gameBrand{transform:translateY(-95px);opacity:0;filter:blur(5px)}
+body.title-away #hudTools{position:fixed;right:26px;top:28px}
+#quest{z-index:3;transition:top .7s cubic-bezier(.2,.7,.2,1),padding .3s,background .3s}
+body.title-away #quest{left:30px;right:auto;top:26px}
+#questToggle{display:flex;align-items:center;gap:10px;width:100%;padding:5px 0;min-height:32px;background:none;border:0;text-align:left;color:#efc17d}
+#questProgress{flex:1;color:inherit}.questChevron{font-size:17px;line-height:1;transition:transform .3s}
+#quest.compact{padding:8px 13px;background:rgba(13,29,30,calc(var(--panel) * .7))}
+#quest.compact .questChevron{transform:rotate(180deg)}#quest.compact #track{margin-top:0;padding-top:6px;min-height:28px}
+@media(max-width:1050px){body.title-away #quest{left:20px}}
+@media(max-width:600px){#skills{bottom:auto}#gameBrand{gap:8px}body.title-away #quest{left:max(14px,env(safe-area-inset-left));top:max(16px,env(safe-area-inset-top));width:min(230px,calc(100vw - 146px))}body.title-away.lab #quest{width:min(250px,calc(100vw - 28px))}body.title-away #hudTools{position:static}#questToggle{min-height:36px}#quest.compact #track{min-height:30px}#quest.compact{padding:7px 10px}}
+@media(min-width:601px) and (max-height:620px){#skills,#skills[data-size="2"]{bottom:24px}}

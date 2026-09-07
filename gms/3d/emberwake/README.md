@@ -8,9 +8,10 @@ Serve the site root and open `/gms/3d/emberwake/`. The game uses ES modules, so 
 
 - Click/tap ground to move; click/tap an object or enemy to approach and interact. Combat repeats until the target falls, you move, or you dodge.
 - WASD/arrows: move relative to the camera. E: nearby interaction. 1/2/3: sword/dagger/magic. Space: dodge. R: eat cooked fish.
-- Scroll: zoom. Right-drag: rotate camera.
+- Scroll or pinch with two fingers: zoom in/out. Right-drag: rotate camera. Pinching never issues a move or interaction.
 - B: cycle belt through one row, two rows, and full equipment view. K: cycle skills. Click a skill to inspect total XP, its progress bar, and XP to the next level.
 - Settings: audio, panel opacity, rendering quality, and confirmed new journey.
+- After the opening speech, the title fades upward and the quest takes its top-left corner. Quest updates show their details for four seconds of active play, then collapse to a gold task/counter and `Show the way`. Tap the gold line to reopen or collapse details; gameplay continues.
 - `Show the way` walks toward the current objective. It can be used throughout the introduction.
 
 ## Playable chapter
