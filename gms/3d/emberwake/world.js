@@ -95,14 +95,34 @@ export function makeHuman(cloak='#436f78',trim='#d8c299'){
  cyl(body,'#343d37',0,.88,0,.27,.3,.43,8);box(body,'#806b48',0,.97,0,.59,.10,.37);
  let chest=mesh(body,new T.SphereGeometry(.38,10,8),cloak,0,1.27,0);chest.scale.set(1,1.2,.66);
  const cape=mesh(body,new T.ConeGeometry(.46,1.1,6,1,true),cloak,0,.97,-.18);cape.rotation.x=-.14;cape.scale.z=.5;
- cyl(body,trim,0,1.8,0,.22,.19,.34,8);let hood=mesh(body,new T.SphereGeometry(.255,10,8),'#554b3c',0,1.97,-.025);hood.scale.y=.5;
- box(body,'#393c34',0,1.81,.20,.25,.045,.035);cyl(body,trim,0,1.58,0,.30,.24,.12,8);
+ // A faceted jaw and separate features remain readable in the portrait view.
+ const head=new T.Group();head.position.y=1.84;body.add(head);
+ const faceVertices=[],faceIndices=[],faceRings=[[-.23,.10],[-.16,.18],[-.015,.235],[.145,.23],[.235,.15]];
+ for(const [y,r] of faceRings)for(let i=0;i<8;i++){const a=(i+.5)*Math.PI/4;faceVertices.push(Math.sin(a)*r,y,Math.cos(a)*r*.94);}
+ for(let j=0;j<faceRings.length-1;j++)for(let i=0;i<8;i++){const a=j*8+i,b=j*8+(i+1)%8;faceIndices.push(a,b,a+8,b,b+8,a+8);}
+ const faceGeo=new T.BufferGeometry();faceGeo.setAttribute('position',new T.Float32BufferAttribute(faceVertices,3));faceGeo.setIndex(faceIndices);faceGeo.computeVertexNormals();
+ const face=mesh(head,faceGeo.toNonIndexed(),trim);face.material=mat(trim).clone();face.material.flatShading=true;
+ for(const side of[-1,1]){
+  const ear=mesh(head,new T.IcosahedronGeometry(.05,1),trim,side*.225,-.005,0);ear.scale.set(.7,1.3,.65);
+  box(head,'#e5dfcc',side*.082,.052,.204,.068,.037,.012);
+  box(head,'#384a48',side*.079,.052,.214,.026,.029,.01);
+  const brow=box(head,'#665643',side*.084,.099,.207,.070,.012,.012);brow.rotation.z=side*.08;
+ }
+ const noseGeo=new T.BufferGeometry();noseGeo.setAttribute('position',new T.Float32BufferAttribute([-.025,.04,.198,.025,.04,.198,0,-.034,.267,-.03,-.043,.193,.03,-.043,.193],3));noseGeo.setIndex([0,2,1,0,3,2,1,2,4,3,4,2]);noseGeo.computeVertexNormals();mesh(head,noseGeo,trim);
+ // Two short, softly coloured lip segments avoid a moustache-like dark bar.
+ for(const side of[-1,1]){const lip=box(head,'#ae8573',side*.019,-.105,.181,.04,.009,.009);lip.rotation.z=side*.12;}
+ const hair=mesh(head,new T.SphereGeometry(.27,10,5,0,Math.PI*2,0,Math.PI*.49),'#514638',0,.095,-.015);hair.scale.set(1,.75,1);
+ for(let i=0;i<3;i++){const fringe=mesh(head,new T.IcosahedronGeometry(.10,0),'#5d4d3a',-.145+i*.09,.137+i*.014,.15);fringe.scale.set(.9,.52,.52);fringe.rotation.z=-.22;}
+ const braid=new T.Group();head.add(braid);
+ for(const side of[-1,1]){const lock=mesh(braid,new T.IcosahedronGeometry(.15,1),'#514638',side*.217,-.025,-.045);lock.scale.set(.49,1.55,.75);}
+ for(let i=0;i<6;i++){const knot=mesh(braid,new T.IcosahedronGeometry(.071-i*.005,1),'#5d4d3a',.14+Math.sin(i)*.015,.005-i*.086,-.205-i*.014);knot.scale.y=.85;}
+ mesh(braid,new T.SphereGeometry(.043,6,4),'#87b4ac',.13,-.42,-.275);
+ head.traverse(o=>{if(o.isMesh)o.receiveShadow=false;});
+ cyl(body,trim,0,1.58,0,.18,.17,.14,8);
  const legs=[];for(let side of[-1,1]){const leg=new T.Group();leg.position.set(side*.15,.8,0);body.add(leg);box(leg,'#4c5145',0,-.2,0,.2,.44,.21);box(leg,'#443c30',0,-.58,.06,.22,.34,.32);legs.push(leg);let arm=box(body,cloak,side*.4,1.21,0,.21,.55,.24);arm.rotation.z=side*.15;mesh(body,new T.SphereGeometry(.12,6,4),trim,side*.46,.96,.03);}
  const hand=new T.Group();hand.position.set(.48,1,.05);body.add(hand);box(hand,'#443c2f',0,0,0,.09,.27,.09);box(hand,'#c4ad6e',0,.13,0,.36,.07,.12);const blade=box(hand,'#d0ded3',0,.64,0,.12,.96,.065);blade.rotation.z=-.05;const tip=mesh(hand,new T.ConeGeometry(.085,.25,4),'#d0ded3',0,1.23,0);tip.rotation.y=.78;
- const braid=new T.Group();body.add(braid);for(let i=0;i<6;i++)mesh(braid,new T.SphereGeometry(.105-i*.008,7,5),'#554b3c',.16,1.92-i*.11,-.19-i*.025);
- for(const side of[-1,1]){const lock=mesh(braid,new T.SphereGeometry(.14,7,5),'#554b3c',side*.21,1.76,-.02);lock.scale.y=2;}const hairSides=[];for(const side of [-1,1])hairSides.push(mesh(braid,new T.SphereGeometry(.12,7,5),'#554b3c',side*.2,1.83,-.03));
  const coat=new T.Group();body.add(coat);cyl(coat,'#d4dfd9',0,.98,0,.30,.4,.7,8);box(coat,'#d4dfd9',0,1.32,.04,.68,.57,.35);for(const side of[-1,1]){const sleeve=box(coat,'#cbd9d5',side*.4,1.21,0,.22,.54,.25);sleeve.rotation.z=side*.15;}box(coat,'#4c8e98',.19,1.4,.225,.14,.19,.025);box(coat,'#354d54',0,1.22,.23,.035,.7,.02);
- g.userData.appearance=(gender,lab=false)=>{const female=gender==='female';braid.visible=female;chest.scale.x=female?.87:1;hood.scale.y=female?.85:.5;cape.visible=!lab;coat.visible=lab;g.userData.gender=gender;};g.userData.appearance('male');
+ g.userData.appearance=(gender,lab=false)=>{const female=gender==='female';braid.visible=female;chest.scale.x=female?.87:1;head.scale.x=female?.95:1;hair.scale.y=female?.85:.75;cape.visible=!lab;coat.visible=lab;g.userData.gender=gender;};g.userData.appearance('male');
  g.userData.legs=legs;g.userData.hand=hand;g.userData.blade=blade;g.userData.tip=tip;return g;
 }
 export function makeEnemy(boss=false){const g=new T.Group();cyl(g,boss?'#303c43':'#35464d',0,.85,0,.38,.6,1.5,7);const torso=mesh(g,new T.IcosahedronGeometry(.5,1),boss?'#59625c':'#496263',0,1.4,0);torso.scale.set(1.3,1,.7);mesh(g,new T.IcosahedronGeometry(.27,1),'#9da990',0,1.94,0);for(let x of[-.10,.10])mesh(g,new T.BoxGeometry(.07,.06,.1),'#91f1dc',x,1.97,.22,2);for(let x of[-.58,.58]){let arm=box(g,'#3f514e',x,1.1,0,.21,.85,.27);arm.rotation.z=-x*.6;rock(g,'#84917b',x,1.68,0,.25)}if(boss){g.scale.setScalar(1.65);for(let x of[-.24,0,.24])cyl(g,'#b3a372',x,2.28,0,0,.10,.42,5);box(g,'#8b9283',.82,.94,.1,.13,1.5,.17)}return g}
