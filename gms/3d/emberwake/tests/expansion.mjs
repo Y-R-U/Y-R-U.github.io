@@ -1,0 +1,23 @@
+import {createRequire} from 'node:module';
+import assert from 'node:assert/strict';
+import {fresh} from '../state.mjs';
+const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE||'playwright');
+const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true,args:['--use-angle=metal','--enable-webgl','--ignore-gpu-blocklist']});
+const url=process.env.EMBERWAKE_URL||'http://127.0.0.1:8891/gms/3d/emberwake/';
+const errors=[];const p=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});p.on('pageerror',e=>errors.push(e.message));p.on('console',m=>{if(m.type()==='error')errors.push(m.text())});p.on('response',r=>{if(r.status()>=400)errors.push(r.url())});
+async function load(s){await p.goto(url);await p.waitForFunction(()=>window.emberwake?.metrics.frames>3);await p.evaluate(s=>localStorage.setItem('emberwake-v1',JSON.stringify(s)),s);await p.reload();await p.click('#resume');}
+try{
+ await p.goto(url);await p.click('#start');await p.check('[name=gender][value=female]');await p.fill('#heroName','Mira');await p.screenshot({path:'/private/tmp/emberwake-character-mobile.png'});
+ for(const size of [{width:320,height:568},{width:390,height:844},{width:844,height:390}]){await p.setViewportSize(size);await p.waitForTimeout(100);assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await p.locator('#characterForm .primary').scrollIntoViewIfNeeded();assert(await p.locator('#characterForm .primary').isVisible());}
+ await p.setViewportSize({width:390,height:844});await p.click('#characterForm .primary');assert.equal(await p.evaluate(()=>emberwake.state.name),'Mira');assert.equal(await p.evaluate(()=>emberwake.world.player.userData.gender),'female');
+ // Resume mid-prologue with the correct voice and next action still pending.
+ const s={...fresh(),name:'Mira',gender:'female',labStep:2,x:-8,z:5,pendingStory:'lab_escape'};await load(s);assert.match(await p.locator('#voiceStatus').textContent(),/BELLA/);await p.reload();await p.click('#resume');assert.match(await p.locator('#dialogueTitle').textContent(),/One way out/);await p.click('#continue');await p.click('#track');await p.waitForFunction(()=>emberwake.state.region==='island');assert.match(await p.locator('#voiceStatus').textContent(),/BELLA/);
+ await load({...s,gender:'male'});assert.match(await p.locator('#voiceStatus').textContent(),/ECHO/);assert.equal(await p.evaluate(()=>emberwake.world.player.userData.gender),'male');
+ // A v1 completed island save can take the crossing without replaying its tutorial.
+ const old={...fresh(),version:1,stage:8,beacon:true,crafted:true,magic:true,x:0,z:-24};delete old.region;await load(old);assert.equal(await p.evaluate(()=>emberwake.state.region),'island');await p.click('#track');await p.waitForFunction(()=>!document.querySelector('#dialogue').hidden);await p.click('#continue');await p.waitForFunction(()=>emberwake.state.region==='mainland');await p.click('#continue');
+ // Mainland gates and one-time rewards, using the real interactions at a seeded checkpoint.
+ await load({...fresh(),region:'mainland',stage:8,beacon:true,mainStage:0,x:-3,z:16,crafted:true,magic:true});await p.evaluate(()=>{const g=emberwake;g.interact(g.world.objects.find(o=>o.id==='ledger'));g.interact(g.world.objects.find(o=>o.id==='neri'));});assert.equal(await p.evaluate(()=>emberwake.state.mainStage),0);assert.equal(await p.evaluate(()=>emberwake.state.ledger),false);
+ await load({...fresh(),region:'mainland',stage:8,beacon:true,mainStage:2,relays:['relay1','relay2','relay3'],x:-3,z:16,crafted:true,magic:true});await p.click('#track');await p.waitForFunction(()=>emberwake.state.mainStage===3);await p.click('#continue');assert.equal(await p.evaluate(()=>emberwake.state.bag.fish),6);await p.click('#track');await p.reload();await p.click('#resume');assert.equal(await p.evaluate(()=>emberwake.state.bag.fish),6);assert(await p.evaluate(()=>emberwake.state.reinforced));
+ await p.click('#journalBtn');assert.match(await p.locator('#journalContent').textContent(),/Three wards restored/);await p.getByRole('button',{name:'Back to the journey'}).click();await p.screenshot({path:'/private/tmp/emberwake-mainland-mobile.png'});
+ assert.deepEqual(errors,[]);console.log(JSON.stringify({result:'PASS',checks:['mobile creation and landscape layout','female model and name','Bella and Echo selection','resume during lab dialogue','v1 completed save reaches mainland','mainland sequence gates','reward and upgrades persist once','mission journal'],errors},null,2));
+}catch(e){await p.screenshot({path:'/private/tmp/emberwake-expansion-failure.png'});throw e;}finally{await browser.close();}

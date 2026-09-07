@@ -99,6 +99,12 @@ export function makeHuman(cloak='#436f78',trim='#d8c299'){
  box(body,'#393c34',0,1.81,.20,.25,.045,.035);cyl(body,trim,0,1.58,0,.30,.24,.12,8);
  const legs=[];for(let side of[-1,1]){const leg=new T.Group();leg.position.set(side*.15,.8,0);body.add(leg);box(leg,'#4c5145',0,-.2,0,.2,.44,.21);box(leg,'#443c30',0,-.58,.06,.22,.34,.32);legs.push(leg);let arm=box(body,cloak,side*.4,1.21,0,.21,.55,.24);arm.rotation.z=side*.15;mesh(body,new T.SphereGeometry(.12,6,4),trim,side*.46,.96,.03);}
  const hand=new T.Group();hand.position.set(.48,1,.05);body.add(hand);box(hand,'#443c2f',0,0,0,.09,.27,.09);box(hand,'#c4ad6e',0,.13,0,.36,.07,.12);const blade=box(hand,'#d0ded3',0,.64,0,.12,.96,.065);blade.rotation.z=-.05;const tip=mesh(hand,new T.ConeGeometry(.085,.25,4),'#d0ded3',0,1.23,0);tip.rotation.y=.78;
+ const braid=new T.Group();body.add(braid);for(let i=0;i<6;i++)mesh(braid,new T.SphereGeometry(.105-i*.008,7,5),'#554b3c',.16,1.92-i*.11,-.19-i*.025);
+ for(const side of[-1,1]){const lock=mesh(braid,new T.SphereGeometry(.14,7,5),'#554b3c',side*.21,1.76,-.02);lock.scale.y=2;}const hairSides=[];for(const side of [-1,1])hairSides.push(mesh(braid,new T.SphereGeometry(.12,7,5),'#554b3c',side*.2,1.83,-.03));
+ const coat=new T.Group();body.add(coat);cyl(coat,'#d4dfd9',0,.98,0,.30,.4,.7,8);box(coat,'#d4dfd9',0,1.32,.04,.68,.57,.35);for(const side of[-1,1]){const sleeve=box(coat,'#cbd9d5',side*.4,1.21,0,.22,.54,.25);sleeve.rotation.z=side*.15;}box(coat,'#4c8e98',.19,1.4,.225,.14,.19,.025);box(coat,'#354d54',0,1.22,.23,.035,.7,.02);
+ g.userData.appearance=(gender,lab=false)=>{const female=gender==='female';braid.visible=female;chest.scale.x=female?.87:1;hood.scale.y=female?.85:.5;cape.visible=!lab;coat.visible=lab;g.userData.gender=gender;};g.userData.appearance('male');
  g.userData.legs=legs;g.userData.hand=hand;g.userData.blade=blade;g.userData.tip=tip;return g;
 }
 export function makeEnemy(boss=false){const g=new T.Group();cyl(g,boss?'#303c43':'#35464d',0,.85,0,.38,.6,1.5,7);const torso=mesh(g,new T.IcosahedronGeometry(.5,1),boss?'#59625c':'#496263',0,1.4,0);torso.scale.set(1.3,1,.7);mesh(g,new T.IcosahedronGeometry(.27,1),'#9da990',0,1.94,0);for(let x of[-.10,.10])mesh(g,new T.BoxGeometry(.07,.06,.1),'#91f1dc',x,1.97,.22,2);for(let x of[-.58,.58]){let arm=box(g,'#3f514e',x,1.1,0,.21,.85,.27);arm.rotation.z=-x*.6;rock(g,'#84917b',x,1.68,0,.25)}if(boss){g.scale.setScalar(1.65);for(let x of[-.24,0,.24])cyl(g,'#b3a372',x,2.28,0,0,.10,.42,5);box(g,'#8b9283',.82,.94,.1,.13,1.5,.17)}return g}
+
+export {mesh,mat,box,cyl,rock,mergeStatic};

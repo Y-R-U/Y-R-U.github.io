@@ -29,7 +29,7 @@
 const PROJECTS = [
 
   { name: "Emberwake", path: "/gms/3d/emberwake/", screenshot: "emberwake", type: "game",
-    desc: "An isometric island adventure: forge a sword and dagger, learn ember magic, gather, fish and cook, then defeat the Hollow Warden and relight the beacon. Six skills, three-size translucent interfaces, local saves, and a complete introduction narrated by Kokoro Lewis.",
+    desc: "An isometric RPG: create a lab assistant, escape through an experimental device, train on an island, then uncover a mystery across three mainland missions. Sword, dagger, magic, six skills, translucent interfaces, local saves and Kokoro Lewis, Bella and Echo voices.",
     date: "2026-09-07", creator: "OpenAI Codex / GPT-6" },
 
 

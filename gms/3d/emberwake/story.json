@@ -1,11 +1,226 @@
 [
- {"id":"arrival","speaker":"THE KEEPER'S TALE","title":"The shore that remembered","text":"The sea gave you back at sundown. No ship. No name. Only a warm stone closed inside your hand. Above the shore, the lighthouse stood dark for the first time in a hundred years. And somewhere in that darkness, something had begun to wake.","button":"Step ashore"},
- {"id":"keeper","speaker":"EDDA · KEEPER OF THE LIGHT","title":"A small, stubborn light","text":"Easy now, traveller. You washed up with an ember from our beacon. That means the island chose you, though I imagine you would have preferred a boat. We can mend the light together. First, gather two pieces of driftwood and two copper ore from the shore. The old forge still has a little fire in it.","button":"I'll gather the materials"},
- {"id":"forge","speaker":"EDDA · KEEPER OF THE LIGHT","title":"Something worth holding","text":"Good. Feed the wood and copper to the forge. A blade need not be beautiful to keep you alive. Yours will do both. I have left a sword and dagger pattern on the anvil. Make them, then try each against the training effigy beside the ruins.","button":"To the forge"},
- {"id":"training","speaker":"EDDA · KEEPER OF THE LIGHT","title":"Steel has two voices","text":"The sword has reach, and a sweep that catches more than one enemy. The dagger is quick. Stay close, strike, and move before the answer comes. Land three blows with each. When you are ready, bring that ember to the blue rune well. There is more to you than steel.","button":"Try the two blades"},
- {"id":"well","speaker":"THE VOICE IN THE EMBER","title":"The other fire","text":"You remember this warmth. A hearth. A hand in yours. Then the sea took the memory away. Hold the ember over the well. Let the light find a shape. Cast three bolts at the effigy. Your focus will return between spells. It always does.","button":"Learn ember magic"},
- {"id":"shadows","speaker":"EDDA · KEEPER OF THE LIGHT","title":"What the tide brought in","text":"The ward is breaking. Three drowned shades have crossed into the northern garden. Defeat them and collect the embers they leave behind. Watch the ground for their strikes, and dodge aside. If you need strength, catch a silverfin by the jetty and cook it at my fire.","button":"Enter the garden"},
- {"id":"warden","speaker":"EDDA · KEEPER OF THE LIGHT","title":"The last watch","text":"Those were only echoes. The Hollow Warden waits at the lighthouse. Once, he kept this island safe. Now he has forgotten everything but the watch. Break the shadow holding him. When the circle beneath him burns red, get clear. When he falters, strike. I will keep a fire for you.","button":"Face the Hollow Warden"},
- {"id":"beacon","speaker":"THE HOLLOW WARDEN","title":"A watch, ended","text":"A light. I had forgotten what it looked like. Take the embers to the beacon, traveller. Tell Edda the sea was quiet, at the end. And when you leave this island, leave a little of your warmth behind.","button":"Carry the light"},
- {"id":"ending","speaker":"EDDA · KEEPER OF THE LIGHT","title":"Every journey begins with a shore","text":"Look at that. A hundred ships will find their way home tonight, and none of them will know your name. That is how the best stories begin. Rest here a while. Fish, practise, watch the water. The world beyond the mist can wait until morning. Welcome to Emberwake, keeper of the first flame.","button":"Stay a little longer"}
+  {
+    "id": "lab_intro",
+    "speaker": "ASTER LAB · YOUR FIRST DAY",
+    "title": "The new assistant",
+    "text": "Your first shift. A visitor badge, a desk you have not found yet, and a machine nobody can quite explain. Dr Vale is waiting beside the test platform.",
+    "button": "Meet Dr Vale",
+    "voice": "lewis"
+  },
+  {
+    "id": "lab_test",
+    "speaker": "DR VALE · LAB TECHNICIAN",
+    "title": "Ten seconds. Then sixty.",
+    "text": "Our device seems to reach another dimension. Working theory, of course. I went through for ten seconds. Breathable air. Solid ground. So we tried one minute.",
+    "button": "What did you find?",
+    "voice": "lewis"
+  },
+  {
+    "id": "lab_return",
+    "speaker": "DR VALE · LAB TECHNICIAN",
+    "title": "A very strange welcome",
+    "text": "A whole island! Some fellow at the gate kept saying I needed training. A tutorial, he called it. Then a woman offered me a sword. Can you imagine—",
+    "button": "A boom shakes the lab",
+    "voice": "lewis"
+  },
+  {
+    "id": "lab_attack",
+    "speaker": "DR VALE · LAB TECHNICIAN",
+    "title": "Take it. Hide.",
+    "text": "That was the security door. Take the device. Hide behind the storage cabinets. Whoever they are, they must not get it. If this works out, come out when it is safe.",
+    "button": "Find cover",
+    "voice": "lewis"
+  },
+  {
+    "id": "lab_hidden",
+    "speaker": "BEYOND THE CABINET",
+    "title": "The wrong visitors",
+    "text": "Boots on broken glass. “Where is the traveller?” Vale says nothing. A second voice: “Find the key. Seal this side.” Then footsteps, moving closer.",
+    "button": "Stay quiet",
+    "voice": "lewis"
+  },
+  {
+    "id": "lab_escape",
+    "speaker": "YOU · UNDER YOUR BREATH",
+    "title": "One way out",
+    "text": "They are still coming. Vale said ten seconds was safe. Please let this thing work.",
+    "button": "Activate the device",
+    "voice": "player"
+  },
+  {
+    "id": "arrival",
+    "speaker": "YOU · AN IMPOSSIBLE SHORE",
+    "title": "Beyond the glass",
+    "text": "Salt air. No alarms. The device has folded itself into a warm stone. I need a way back. And someone who can explain this place.",
+    "button": "Step ashore",
+    "voice": "player"
+  },
+  {
+    "id": "keeper",
+    "speaker": "EDDA · KEEPER OF THE LIGHT",
+    "title": "A new arrival",
+    "text": "Another traveller? The Creator always sends you here first. Gather two driftwood and two copper ore. We will get you ready for the mainland.",
+    "button": "The Creator?",
+    "voice": "lewis"
+  },
+  {
+    "id": "creator",
+    "speaker": "YOU · A PRIVATE THOUGHT",
+    "title": "A name everyone knows",
+    "text": "The Creator? She says it like I should know. Did the lab discover this place… or did someone build it?",
+    "button": "Gather the materials",
+    "voice": "player"
+  },
+  {
+    "id": "forge",
+    "speaker": "EDDA · KEEPER OF THE LIGHT",
+    "title": "Fire and copper",
+    "text": "That will do. Use the old forge to make a sword and dagger. There are patterns on the anvil.",
+    "button": "To the forge",
+    "voice": "lewis"
+  },
+  {
+    "id": "training",
+    "speaker": "EDDA · KEEPER OF THE LIGHT",
+    "title": "Two ways to fight",
+    "text": "The sword sweeps. The dagger strikes quickly. Land three hits with each on the effigy, then visit the rune well.",
+    "button": "Practise with steel",
+    "voice": "lewis"
+  },
+  {
+    "id": "well",
+    "speaker": "EDDA · KEEPER OF THE LIGHT",
+    "title": "A little borrowed fire",
+    "text": "Your stone holds an ember. Shape it into a bolt. Try three casts on the effigy. Focus returns between spells.",
+    "button": "Try ember magic",
+    "voice": "lewis"
+  },
+  {
+    "id": "shadows",
+    "speaker": "EDDA · KEEPER OF THE LIGHT",
+    "title": "The garden has changed",
+    "text": "Three shades are loose in the garden. This is not part of the training. Dodge their red circles. Fish and cook at my fire if you need food.",
+    "button": "Clear the garden",
+    "voice": "lewis"
+  },
+  {
+    "id": "warden",
+    "speaker": "EDDA · KEEPER OF THE LIGHT",
+    "title": "The last watch",
+    "text": "The Hollow Warden guards the crossing. Free him from the shadow. Keep clear when his circle fills.",
+    "button": "Face the Warden",
+    "voice": "lewis"
+  },
+  {
+    "id": "beacon",
+    "speaker": "THE HOLLOW WARDEN",
+    "title": "The way onward",
+    "text": "The beacon is a door. Bring it the embers. And traveller… someone has been opening doors from the other side.",
+    "button": "Open the crossing",
+    "voice": "lewis"
+  },
+  {
+    "id": "ending",
+    "speaker": "EDDA · KEEPER OF THE LIGHT",
+    "title": "Beyond the first shore",
+    "text": "Lantern Reach is through the light. Find Mara at the ward station. And keep your stone close. The Creator never gave us one like that.",
+    "button": "Step through to Lantern Reach",
+    "voice": "lewis"
+  },
+  {
+    "id": "main_arrival",
+    "speaker": "YOU · LANTERN REACH",
+    "title": "A world beyond the lesson",
+    "text": "Houses. Roads. People who live here. This is more than a training ground. Maybe someone in town knows how to get home.",
+    "button": "Find Mara",
+    "voice": "player"
+  },
+  {
+    "id": "mara",
+    "speaker": "MARA · WARDKEEPER",
+    "title": "A light for the living",
+    "text": "You came through Edda’s gate? Good. Our three ward lamps failed when the sky shook. Each needs one wood and one copper. Repair them before more shadows get in.",
+    "button": "Repair the three wards",
+    "voice": "lewis"
+  },
+  {
+    "id": "wards_done",
+    "speaker": "MARA · WARDKEEPER",
+    "title": "The town can breathe",
+    "text": "The lamps are holding. Take these blade fittings, and some food. Neri went to the old archive before the failure. Two sentinels have her trapped. Bring her home.",
+    "button": "Find Neri",
+    "voice": "lewis"
+  },
+  {
+    "id": "neri_rescue",
+    "speaker": "NERI · ARCHIVIST",
+    "title": "Someone changed the orders",
+    "text": "Those sentinels were built to protect us. Today they demanded a traveller’s key. The observatory ledger might explain why. Its custodian will not let me near it.",
+    "button": "Investigate the observatory",
+    "voice": "lewis"
+  },
+  {
+    "id": "ledger",
+    "speaker": "THE OBSERVATORY LEDGER",
+    "title": "An impossible entry",
+    "text": "Beneath a century of weathered entries, a fresh line glows: ASTER LAB / RETURN TEST / 00:61. Destination authorised by the Founder. Beneath it: RETURN CHANNEL SUSPENDED.",
+    "button": "That is our lab",
+    "voice": "lewis"
+  },
+  {
+    "id": "ledger_thought",
+    "speaker": "YOU · A PRIVATE THOUGHT",
+    "title": "Sixty-one seconds",
+    "text": "Vale said one minute. This record knows our lab. And it calls the Creator “Founder.” I should show Neri before I touch anything else.",
+    "button": "Return to Neri",
+    "voice": "player"
+  },
+  {
+    "id": "neri_truth",
+    "speaker": "NERI · ARCHIVIST",
+    "title": "A missing beginning",
+    "text": "Our oldest books begin with the Creator’s arrival. Nothing before. Aster is not a word in our language. If your lab made the key, who wrote its name here?",
+    "button": "The stone begins to hum",
+    "voice": "lewis"
+  },
+  {
+    "id": "signal",
+    "speaker": "A VOICE THROUGH THE DEVICE",
+    "title": "Still on the other side",
+    "text": "Assistant? If you can hear me, do not try the return setting. They are listening. Find the second anchor. I left a—",
+    "button": "The signal breaks",
+    "voice": "lewis"
+  },
+  {
+    "id": "chapter_end",
+    "speaker": "YOU · A PRIVATE THOUGHT",
+    "title": "The second anchor",
+    "text": "Vale is alive. Somewhere. The device has saved a broken set of coordinates. First I need to learn who built the anchors, and who is listening.",
+    "button": "Keep exploring Lantern Reach",
+    "voice": "player"
+  },
+  {
+    "id": "edda_repeat",
+    "speaker": "EDDA · KEEPER OF THE LIGHT",
+    "title": "A familiar shore",
+    "text": "The crossing is open both ways now. Rest by the fire whenever you need. Mara will be waiting in Lantern Reach.",
+    "button": "Return to the island",
+    "voice": "lewis"
+  },
+  {
+    "id": "mara_repeat",
+    "speaker": "MARA · WARDKEEPER",
+    "title": "The lamps are holding",
+    "text": "A quiet street is a fine reward. Neri is at the archive. If anyone can make sense of your stone, she can.",
+    "button": "Keep exploring",
+    "voice": "lewis"
+  },
+  {
+    "id": "neri_repeat",
+    "speaker": "NERI · ARCHIVIST",
+    "title": "Work still to do",
+    "text": "I will keep looking for the second anchor. Your journal has everything we know. For now, the road beyond the observatory is sealed.",
+    "button": "Keep exploring",
+    "voice": "lewis"
+  }
 ]

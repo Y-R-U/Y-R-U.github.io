@@ -1,56 +1,274 @@
 [
   {
-    "id": "arrival",
+    "id": "lab_intro",
+    "file": "lab_intro.mp3",
     "voice": "bm_lewis",
-    "speed": 0.94,
-    "seconds": 16.85
+    "speed": 0.98,
+    "seconds": 11.03,
+    "hash": "f49850dd3c2a152e89d655935ba0b263e4d698c7db903647034bb8d074a1ed00"
+  },
+  {
+    "id": "lab_test",
+    "file": "lab_test.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 10.97,
+    "hash": "563c012410eef769efbef77dc8604272ddd8594924d9a89d58706aa64de95090"
+  },
+  {
+    "id": "lab_return",
+    "file": "lab_return.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 10.15,
+    "hash": "a582ed87ee2f9dcbc2bb397dbf47a71a5f7b10d6bfce00818030ad005543bce7"
+  },
+  {
+    "id": "lab_attack",
+    "file": "lab_attack.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 11.4,
+    "hash": "b78ae8fec8be7285cec2c00870e8774c3dd403ebb185f6bb6100e84c8e1539e2"
+  },
+  {
+    "id": "lab_hidden",
+    "file": "lab_hidden.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 10.68,
+    "hash": "e1f10c7b43ac22a71bef43e02262f23b481c62a31db15a11a176119db831bbf3"
+  },
+  {
+    "id": "lab_escape",
+    "file": "lab_escape-female.mp3",
+    "voice": "af_bella",
+    "speed": 0.98,
+    "seconds": 5.6,
+    "hash": "90ed9c7712e56bcc2b59ab657ee7b809b3928c785258f4bfe05477eed9c959d8"
+  },
+  {
+    "id": "lab_escape",
+    "file": "lab_escape-male.mp3",
+    "voice": "am_echo",
+    "speed": 0.98,
+    "seconds": 5.42,
+    "hash": "4c0bac4d3ff50364a6b2b559aa9127eb66bfcd4b5a365560cca4e4bbca4699d2"
+  },
+  {
+    "id": "arrival",
+    "file": "arrival-female.mp3",
+    "voice": "af_bella",
+    "speed": 0.98,
+    "seconds": 9.57,
+    "hash": "734ee14f470daaa20c90b503f8c6b50558ff7258055d53592a8e0468419e69c9"
+  },
+  {
+    "id": "arrival",
+    "file": "arrival-male.mp3",
+    "voice": "am_echo",
+    "speed": 0.98,
+    "seconds": 8.22,
+    "hash": "ba1c3f8887a4c3099d7331e1e6457c7856882e88d29d206d4b53fd4b69078b8c"
   },
   {
     "id": "keeper",
+    "file": "keeper.mp3",
     "voice": "bm_lewis",
-    "speed": 0.94,
-    "seconds": 18.77
+    "speed": 0.98,
+    "seconds": 9.05,
+    "hash": "45c57e81c2b496d73e120e19e89ccd9c523fd0886ee0374075a6ee6a8c8b33e8"
+  },
+  {
+    "id": "creator",
+    "file": "creator-female.mp3",
+    "voice": "af_bella",
+    "speed": 0.98,
+    "seconds": 6.75,
+    "hash": "adb18b76b4a98a62177863611977190a4e6c6bdb3e6455796b9253e58e907815"
+  },
+  {
+    "id": "creator",
+    "file": "creator-male.mp3",
+    "voice": "am_echo",
+    "speed": 0.98,
+    "seconds": 6.12,
+    "hash": "35a6338913392daac5f7c7d8d677c3a01d0f366fd76227aa9add1a3bfef5ed77"
   },
   {
     "id": "forge",
+    "file": "forge.mp3",
     "voice": "bm_lewis",
-    "speed": 0.94,
-    "seconds": 16.3
+    "speed": 0.98,
+    "seconds": 6.5,
+    "hash": "02d5ad7580e3035d13e9035ac83faafddbc63ddd2d47542f920e5fd22c729107"
   },
   {
     "id": "training",
+    "file": "training.mp3",
     "voice": "bm_lewis",
-    "speed": 0.94,
-    "seconds": 17.48
+    "speed": 0.98,
+    "seconds": 7.97,
+    "hash": "5e9ec07cb190bffe10c735bc30d050c40657844231b7fd26aca5f71c72ff0e73"
   },
   {
     "id": "well",
+    "file": "well.mp3",
     "voice": "bm_lewis",
-    "speed": 0.94,
-    "seconds": 16.95
+    "speed": 0.98,
+    "seconds": 8.43,
+    "hash": "eb355fbaedb151fb5a3bc61b3659c7110b79f6d4575c5becfe31af2457cd0de6"
   },
   {
     "id": "shadows",
+    "file": "shadows.mp3",
     "voice": "bm_lewis",
-    "speed": 0.94,
-    "seconds": 17.48
+    "speed": 0.98,
+    "seconds": 9.6,
+    "hash": "c7002094e1cdd15988d3e286207c6b7f3b3232f69bc5f8d7cec3cc7bb9438a4d"
   },
   {
     "id": "warden",
+    "file": "warden.mp3",
     "voice": "bm_lewis",
-    "speed": 0.94,
-    "seconds": 18.48
+    "speed": 0.98,
+    "seconds": 6.85,
+    "hash": "53c1663467182258c58be7d8c2af4e345ea3e83c2ea939d438d2d615bdad9e5e"
   },
   {
     "id": "beacon",
+    "file": "beacon.mp3",
     "voice": "bm_lewis",
-    "speed": 0.94,
-    "seconds": 13.0
+    "speed": 0.98,
+    "seconds": 7.78,
+    "hash": "90b13e9bce4b69856f1befb69def157bb0db28c3cd817dad67950f16c17a21e3"
   },
   {
     "id": "ending",
+    "file": "ending.mp3",
     "voice": "bm_lewis",
-    "speed": 0.94,
-    "seconds": 19.45
+    "speed": 0.98,
+    "seconds": 9.5,
+    "hash": "c19fe0e0d11b355c8cb303da3e761bbd8b55ea7f92bdebc78e89d1605ada3973"
+  },
+  {
+    "id": "main_arrival",
+    "file": "main_arrival-female.mp3",
+    "voice": "af_bella",
+    "speed": 0.98,
+    "seconds": 8.35,
+    "hash": "ffb2cfa28b01a40689bfdc19c89e75c2c0c1e0e0244de245b80a8a0e3a583d11"
+  },
+  {
+    "id": "main_arrival",
+    "file": "main_arrival-male.mp3",
+    "voice": "am_echo",
+    "speed": 0.98,
+    "seconds": 7.15,
+    "hash": "1a8becd699c2051011f13f95b15715e1e735e103c0f3b6d5c4bee3a6f1ab9f47"
+  },
+  {
+    "id": "mara",
+    "file": "mara.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 10.95,
+    "hash": "b6c315f7d002c31e80b9329152ac7fc01e3ff81346c4291cf24ccdf57dceb150"
+  },
+  {
+    "id": "wards_done",
+    "file": "wards_done.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 10.78,
+    "hash": "e3f1eea83a5d38b16f7aa8fea4433c2c5c40fe05973bc5de32fe9d475d75be04"
+  },
+  {
+    "id": "neri_rescue",
+    "file": "neri_rescue.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 10.9,
+    "hash": "8750ec613763bd3d6680772096e6aa4ac0f2a8fdd034d2758b5b861ae66cf463"
+  },
+  {
+    "id": "ledger",
+    "file": "ledger.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 15.32,
+    "hash": "ce3af0806764783d6281606e6303557164bba9ffe2748a6d065071279db57ab0"
+  },
+  {
+    "id": "ledger_thought",
+    "file": "ledger_thought-female.mp3",
+    "voice": "af_bella",
+    "speed": 0.98,
+    "seconds": 8.93,
+    "hash": "0e27bff923c54e83a96ab5f2d0e9afef532adec85acced0c054f8ae68c2ed9da"
+  },
+  {
+    "id": "ledger_thought",
+    "file": "ledger_thought-male.mp3",
+    "voice": "am_echo",
+    "speed": 0.98,
+    "seconds": 7.97,
+    "hash": "0222c24e904e7c5c0bdb054edaa1b1afa4bd0c1b0979a5d3b9f3a578ee3edad8"
+  },
+  {
+    "id": "neri_truth",
+    "file": "neri_truth.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 10.75,
+    "hash": "014681d4158906ed70f96e949d48cb7b55c5093dacb2b63d59c85be5021653d6"
+  },
+  {
+    "id": "signal",
+    "file": "signal.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 8.12,
+    "hash": "d9ca123b1d6b5146b6abd4366e7c5fcd44745e8352573c0b166b3f843e0b582a"
+  },
+  {
+    "id": "chapter_end",
+    "file": "chapter_end-female.mp3",
+    "voice": "af_bella",
+    "speed": 0.98,
+    "seconds": 10.0,
+    "hash": "998712e92e995348fa8d42acb6df0385962d96bf1df5cee04ac7926e432f9fcf"
+  },
+  {
+    "id": "chapter_end",
+    "file": "chapter_end-male.mp3",
+    "voice": "am_echo",
+    "speed": 0.98,
+    "seconds": 8.65,
+    "hash": "b68c4c8f4d5a735d6979407450058724ff00be3201ce2146067c48e9040305cc"
+  },
+  {
+    "id": "edda_repeat",
+    "file": "edda_repeat.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 7.88,
+    "hash": "c0e36e15a184ca6245366b330105d6bda236daed1ca4bd32b7c69e638e116a71"
+  },
+  {
+    "id": "mara_repeat",
+    "file": "mara_repeat.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 8.12,
+    "hash": "29dbf9220d8226b56de55d775f1530be75d0a5b5d7d5a1e8450a4775c6d496d7"
+  },
+  {
+    "id": "neri_repeat",
+    "file": "neri_repeat.mp3",
+    "voice": "bm_lewis",
+    "speed": 0.98,
+    "seconds": 8.93,
+    "hash": "c82ac6e66d620f52bc8a9cf8e58760c879921642aeca0d598dfb4bdf428e29dc"
   }
 ]
