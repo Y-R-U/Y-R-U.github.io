@@ -1,5 +1,5 @@
 import { test, eq, ok, near } from '../../tools/harness.mjs';
-import { EARTH, STATES, spawn, step, wound, isDead, fraction } from './foe.js';
+import { EARTH, STATES, spawn, step, wound, snare, isDead, fraction } from './foe.js';
 import { surfaceAt, isDirt, plotLocal, dirtRun, plotsOf } from './ground.js';
 import { make, hurt, mend, apply, inSwing, bearing } from './vitals.js';
 
@@ -213,4 +213,54 @@ test('death is final and it stops moving', () => {
   eq(f.state, 'dead', 'it got back up');
   eq(f.hp, 0, 'a corpse standing in soil mended');
   eq({ x: f.x, z: f.z }, was, 'a corpse walked');
+});
+
+// ── the rope ────────────────────────────────────────────────────────────────────────────────
+// js/game/items.js's snare rope. It is not a hit: it does no damage, it does not restart the
+// regeneration delay, and — unlike a stagger — it cannot be chained, because only snare() writes
+// `held`. What it buys is the windup that is not thrown.
+
+test('a snared thing stops where it is and throws nothing', () => {
+  let f = spawn({ x: 0, z: 6 });
+  for (let i = 0; i < 120; i++) f = step(f, DT, { player: at(0, 0), ...stone });
+  ok(f.z < 6, 'it never started walking');
+  f = snare(f, 2);
+  const was = { x: f.x, z: f.z, hp: f.hp };
+  let struck = false;
+  for (let i = 0; i < 100; i++) {
+    f = step(f, DT, { player: at(0, 0), ...stone });
+    if (f.struck) struck = true;
+  }
+  eq({ x: f.x, z: f.z }, { x: was.x, z: was.z }, 'a roped thing walked');
+  eq(f.hp, was.hp, 'the rope did damage');
+  eq(struck, false, 'a roped thing threw a blow');
+  eq(f.state, 'stagger');
+});
+
+test('the rope wears off and it comes on again', () => {
+  let f = snare(spawn({ x: 0, z: 3 }), 0.5);
+  for (let i = 0; i < 240; i++) f = step(f, DT, { player: at(0, 0), ...stone });
+  eq(f.held, 0);
+  ok(f.state !== 'stagger' || f.z < 3, 'it never got going again after the rope let go');
+});
+
+test('a longer rope replaces a shorter one and never shortens it', () => {
+  const f = spawn({ x: 0, z: 3 });
+  eq(snare(f, 3).held, 3);
+  eq(snare(snare(f, 3), 1).held, 3, 'a second, shorter rope cut the first one short');
+  eq(snare(snare(f, 1), 3).held, 3);
+});
+
+test('a corpse cannot be roped', () => {
+  const dead = wound(spawn({ x: 0, z: 3 }), 9999, 1);
+  eq(isDead(dead), true);
+  eq(snare(dead, 3).held, 0, 'a dead thing took a rope');
+});
+
+test('the rope does not stop it mending — that is what the floor is for', () => {
+  let f = wound(spawn({ x: 0, z: 3 }), 20, 1);
+  const low = f.hp;
+  f = snare(f, 3);
+  for (let i = 0; i < 120; i++) f = step(f, DT, { player: at(0, 0), ...dirt });
+  ok(f.hp > low, 'a roped thing on soil stopped mending — the rope is not a hit');
 });

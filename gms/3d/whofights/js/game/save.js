@@ -1,7 +1,12 @@
 // The save document, and the one function that makes an untrusted one safe to run. Pure: no DOM,
 // no storage — js/game/savestore.js owns the bytes.
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
+
+// How many number-key slots there are, and therefore the most abilities anybody can hold: four
+// essences at five each. One number, here, because js/game/essences.js caps what can be awakened
+// against it and js/game/actionbar.js draws exactly this many boxes.
+export const SLOTS = 20;
 
 // `preset` is the graphics preset the player chose. It lives in the save rather than in the
 // quality panel's own state because FORGE shipped without a picker and a slow laptop had no way
@@ -30,9 +35,10 @@ export function docView(get) {
   return {
     get flags() { return get().flags; },
     get essences() { return get().essences; },
+    get gear() { return get().gear; },
     world: () => {
       const d = get();
-      return { flags: d.flags, items: d.items, quests: d.quests, essences: d.essences };
+      return { flags: d.flags, items: d.items, quests: d.quests, essences: d.essences, gear: d.gear };
     },
   };
 }
@@ -58,6 +64,14 @@ export function startPos(start, at, saved, levelId) {
 // every rule about them. Empty until the proving is passed and the table is opened.
 export const blankEssences = () => ({ picked: [], confluence: null, abilities: [] });
 
+// What is in each hand. `weapon` is a js/game/weapons.js id and empty means bare hands; `hand` is
+// the small slot beside it that holds one usable thing — a stone, a potion, a rope.
+export const blankGear = () => ({ weapon: '', hand: '' });
+
+// Which ability sits on which number key. Nulls, not a packed list: slot 7 being empty while slot
+// 8 holds something is a thing the player is allowed to arrange.
+export const blankSlots = () => new Array(SLOTS).fill(null);
+
 export function blank(t = 0) {
   return {
     version: SAVE_VERSION,
@@ -69,6 +83,8 @@ export function blank(t = 0) {
     items: {},
     quests: {},
     essences: blankEssences(),
+    gear: blankGear(),
+    slots: blankSlots(),
     settings: { ...DEFAULTS },
   };
 }
@@ -108,6 +124,22 @@ export function normalise(raw) {
       confluence: typeof es.confluence === 'string' ? es.confluence : null,
       abilities: [...new Set(strs(es.abilities))],
     };
+  }
+
+  // Ids only here too, and for the same reason: a weapon or an ability this build has dropped
+  // leaves an empty hand rather than refusing the save.
+  const g = raw.gear;
+  if (g && typeof g === 'object') {
+    doc.gear = {
+      weapon: typeof g.weapon === 'string' ? g.weapon : '',
+      hand: typeof g.hand === 'string' ? g.hand : '',
+    };
+  }
+  if (Array.isArray(raw.slots)) {
+    for (let i = 0; i < SLOTS; i++) {
+      const v = raw.slots[i];
+      doc.slots[i] = typeof v === 'string' && v ? v : null;
+    }
   }
 
   const s = raw.settings || {};

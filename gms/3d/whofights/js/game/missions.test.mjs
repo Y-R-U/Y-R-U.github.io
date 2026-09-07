@@ -3,7 +3,7 @@
 
 import { test, eq, ok } from '../../tools/harness.mjs';
 import { readFileSync } from 'node:fs';
-import { BOARDS } from './contracts.js';
+import { BOARDS, BOARD_IDS } from './contracts.js';
 import {
   ARENA, RING, OBJECTIVES, missionOf, jobFor, playable, spawnsOf, wavesOf, allSpawns,
   worthOf, briefOf, patchArena, objectiveOf, secondsOf,
@@ -30,15 +30,40 @@ test('the arena document on disk is the one missions.js patches', () => {
     'and something in it starts the fight');
 });
 
-test('every iron and bronze contract is walkable', () => {
-  for (const j of built) ok(playable(j.id), `${j.id} has no mission`);
+// Every row on every board is walkable now. Silver and gold were deliberately silent for two
+// passes — docs/RESUME.md §6.10 said silver wanted "something the bestiary does not have" — and
+// what it wanted was the four kinds and the four builds that arrived with them.
+test('every contract on every board is walkable', () => {
+  for (const id of BOARD_IDS) {
+    for (const j of BOARDS[id].jobs) ok(playable(j.id), `${j.id} has no mission`);
+  }
   ok(iron.length >= 8, `${iron.length} iron contracts`);
   ok(bronze.length >= 8, `${bronze.length} bronze contracts`);
-  // The two boards above are still only wanted. That is the ladder doing its job, and the test
-  // says so out loud so nobody reads their silence as an oversight.
-  for (const b of ['board.silver', 'board.gold']) {
-    for (const j of BOARDS[b].jobs) eq(playable(j.id), false, `${j.id} is playable already`);
-  }
+  ok(BOARDS['board.silver'].jobs.length >= 5, 'silver is too thin to play');
+  ok(BOARDS['board.gold'].jobs.length >= 3, 'gold is too thin to play');
+});
+
+// The same test bronze gets, one rung up: each board has to be more than the one below it, and
+// more in KIND and not only in hit points.
+test('each board is harder than the one below it', () => {
+  const worth = list => list.map(j => worthOf(missionOf(j.id)));
+  const avg = list => worth(list).reduce((a, b) => a + b, 0) / list.length;
+  const silver = BOARDS['board.silver'].jobs;
+  const gold = BOARDS['board.gold'].jobs;
+  ok(avg(silver) > avg(bronze), `bronze averages ${avg(bronze).toFixed(0)}, silver ${avg(silver).toFixed(0)}`);
+  ok(avg(gold) > avg(silver), `silver averages ${avg(silver).toFixed(0)}, gold ${avg(gold).toFixed(0)}`);
+  const kinds = list => new Set(list.flatMap(j => spawnsOf(missionOf(j.id)).map(sp => sp.kind)));
+  const freshSilver = [...kinds(silver)].filter(k => !kinds(bronze).has(k) && !kinds(iron).has(k));
+  ok(freshSilver.length >= 3, `silver only reuses what iron and bronze already sent (${freshSilver.join(', ') || 'none new'})`);
+  ok([...kinds(gold)].includes('verge'), 'gold sends nothing gold sends');
+});
+
+// A processional is TALL and a thing that counts is SQUAT. Silver could not be built out of the
+// old bestiary because every kind in it was the same silhouette with two colours swapped.
+test('the higher boards do not all look like the same lump of rock', () => {
+  const builds = list => new Set(list.flatMap(j => spawnsOf(missionOf(j.id)).map(sp => describe(sp).build)));
+  const up = builds([...BOARDS['board.silver'].jobs, ...BOARDS['board.gold'].jobs]);
+  ok(up.size >= 3, `silver and gold between them draw ${up.size} silhouette(s)`);
 });
 
 // The step up has to be a step, and it has to be a step in *kind* and not only in hit points —
@@ -164,7 +189,7 @@ test('a brief names what is in the room and how many of it', () => {
   eq(b.job.id, 'iron.lamps');
   ok(b.note.length > 20);
   eq(briefOf('no.such.contract'), null);
-  eq(missionOf('gold.ledger'), null, 'the higher boards are still only wanted');
+  ok(missionOf('gold.ledger'), 'the top of the ladder is walkable now');
 });
 
 

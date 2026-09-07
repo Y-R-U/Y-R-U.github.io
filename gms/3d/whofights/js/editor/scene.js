@@ -33,6 +33,11 @@ const HOUSE_SIZE = [
   // Storeys, for a hall only. `h` is still the wall top: the storeys divide it rather than
   // multiply it, so raising this makes each floor shorter and never makes the building taller.
   { key: 'floors', label: 'Storeys', min: 1, max: 6, step: 1, def: 1 },
+  // What trade is carried on in here, which is what the room is dressed as: 0 a home, 1 the
+  // Weaponry, 2 the Apothecary, 3 the general shop. A number rather than a name because every
+  // param in this schema is a number with a range — see SHOP_KIND in js/world/interior.js, which
+  // is the list this indexes into and the only place the names live.
+  { key: 'shop', label: 'Trade (0 home, 1 arms, 2 physic, 3 general)', min: 0, max: 3, step: 1, def: 0 },
 ];
 
 const MASS_SIZE = [
@@ -381,6 +386,10 @@ export function normalise(raw) {
       // `pos[1]`/`look[1]` are heights above the floor, and in a stacked hall which floor has to
       // be said out loud or every interior shot frames the ground one.
       districts, objects, hotspots,
+      // A weapon this level LENDS the player, by js/game/weapons.js id, or null. The proving is
+      // the only thing that uses it: the Society hands over a knife at the gate and takes it back
+      // at the desk, and everywhere else what is in your hand is what you own.
+      loaner: typeof raw.loaner === 'string' && raw.loaner ? raw.loaner : null,
       // Who is waiting in this level. js/game/combat.js stands them up when the level says the
       // fight starts, not when the level loads — a player who walks in and reads the room first
       // is not jumped by something that spawned behind them.

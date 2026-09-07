@@ -9,9 +9,34 @@
 // Space is jump, which is what it is for — it used to be attack, and a jump button and an attack
 // button are not the same button on any keyboard anyone has used.
 //
-// 1 to 4 cast the four awakened abilities. The interact menu is the authored route to a spell and
-// it stays, but reaching a spell through a menu takes about a second and an earth elemental is
-// already swinging by then — a fight needs the abilities under a finger.
+// The number row casts. 1-9 and 0 are the first ten abilities and Shift with the same key is the
+// second ten, which is twenty — four essences at five each, and the most anyone can hold. The
+// interact menu is the authored route to a spell and it stays, but reaching a spell through a menu
+// takes about a second and an earth elemental is already swinging by then; a fight needs the
+// abilities under a finger.
+//
+// `read()` returns the banked slot. It did not, for a while, and nothing noticed: the player asks
+// for `cmd.spell` and `read()` was clearing `spellEdge` without ever putting it in what it
+// returned, so the number keys were dead and only the interact menu could cast. The UI test cast
+// by calling the session directly, which is why it stayed green. `input.test.mjs` presses keys
+// now.
+
+// Which ability a key press means, or null if it means nothing. Pure and exported because it is
+// the one piece of the keyboard worth a test, and because js/game/actionbar.js has to be able to
+// print the same label beside a slot that the key press will reach.
+export const SLOT_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+
+export function slotFor(code, shift = false) {
+  const m = /^Digit([0-9])$/.exec(code);
+  if (!m) return null;
+  const d = +m[1];
+  // 0 is the tenth key, not the zeroth: it sits at the end of the row and that is where the tenth
+  // ability is.
+  return (d === 0 ? 9 : d - 1) + (shift ? 10 : 0);
+}
+
+// The label to print on slot `i` — "4", or "⇧4".
+export const keyLabel = i => (i < 0 || i >= 20 ? '' : `${i >= 10 ? '⇧' : ''}${SLOT_KEYS[i % 10]}`);
 
 const STICK_R = 62;
 const TAP_MS = 400, TAP_PX = 16;
@@ -30,7 +55,7 @@ export class Input {
     this.attackEdge = false;
     this.jumpEdge = false;
     this.interactEdge = false;
-    // 0-3, or null. A slot rather than a boolean, so the player can only ever bank one cast: a
+    // 0-19, or null. A slot rather than a boolean, so the player can only ever bank one cast: a
     // second key pressed in the same frame replaces the first rather than queueing behind it.
     this.spellEdge = null;
     this.sprint = false;
@@ -57,8 +82,8 @@ export class Input {
       if (e.repeat || typing(e)) return;
       this.keys.add(e.code);
       if (e.code === 'Space') { this.jumpEdge = true; e.preventDefault(); }
-      const slot = /^Digit([1-4])$/.exec(e.code);
-      if (slot) { this.spellEdge = +slot[1] - 1; e.preventDefault(); }
+      const slot = slotFor(e.code, e.shiftKey);
+      if (slot != null) { this.spellEdge = slot; e.preventDefault(); }
     });
     addEventListener('keyup', e => this.keys.delete(e.code));
     addEventListener('blur', () => {
@@ -190,6 +215,7 @@ export class Input {
       : {
         mx: this.move.x, my: this.move.y, lx: this.look.x, ly: this.look.y,
         attack: this.attackEdge, jump: this.jumpEdge, interact: this.interactEdge, sprint: this.sprint,
+        spell: this.spellEdge,
       };
     this.look.x = this.look.y = 0;
     this.attackEdge = false;

@@ -306,6 +306,83 @@
           "speed": 0.65
         }
       }
+    },
+    "smith": {
+      "name": "Sella Marrow",
+      "body": "dummy",
+      "sex": "f",
+      "skin": "knight_s33",
+      "gender": "f",
+      "height": 1.02,
+      "voice": null,
+      "place": {
+        "level": "society",
+        "x": -28.76,
+        "z": 5.76,
+        "yaw": 1.5708,
+        "inside": 60,
+        "floor": 0
+      }
+    },
+    "apothecary": {
+      "name": "Master Ivens",
+      "body": "dummy",
+      "sex": "m",
+      "skin": "nomad_ui",
+      "gender": "m",
+      "height": 1.0,
+      "voice": null,
+      "place": {
+        "level": "society",
+        "x": 28.73,
+        "z": 6.18,
+        "yaw": -1.5708,
+        "inside": 61,
+        "floor": 0
+      }
+    },
+    "sundry": {
+      "name": "Old Corvel",
+      "body": "dummy",
+      "sex": "m",
+      "skin": "watch_s11",
+      "gender": "m",
+      "height": 0.98,
+      "voice": null,
+      "place": {
+        "level": "society",
+        "x": -28.76,
+        "z": 23.82,
+        "yaw": 1.5708,
+        "inside": 62,
+        "floor": 0
+      }
+    },
+    "archivist": {
+      "name": "Archivist Wren",
+      "body": "robed",
+      "robe": "neutral",
+      "gender": "f",
+      "height": 0.97,
+      "hood": "down",
+      "voice": "bf_isabella",
+      "voiceSpeed": 0.97,
+      "voicePitch": 0,
+      "place": {
+        "level": "society",
+        "x": -6.5,
+        "z": -18.6,
+        "yaw": 0.0,
+        "inside": 1,
+        "floor": 0,
+        "wander": {
+          "x0": -9.0,
+          "x1": -4.0,
+          "z0": -20.5,
+          "z1": -16.5,
+          "speed": 0.5
+        }
+      }
     }
   }
 }

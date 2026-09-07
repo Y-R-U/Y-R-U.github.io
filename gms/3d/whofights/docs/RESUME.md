@@ -1,10 +1,25 @@
-# WHO FIGHTS — Adventure Society pass: where this is up to
+# WHO FIGHTS — where this is up to
 
-Read this first on resume. `docs/DEV_CONTRACT.md` is still binding; `docs/HANDOFF.md` describes
-the *scaffold* pass and is now partly out of date — where the two disagree, this file is newer.
+Read this first on resume. `docs/DEV_CONTRACT.md` is still binding; `docs/HANDOFF.md` describes the
+*scaffold* pass and is out of date — where the two disagree, this file is newer.
 
-The first pass (the five-storey Society, the proving, essences, the controls) is committed as
-`dd0ee802`. **The second pass — §6 below — is not.** `git -C ~/cc/yru/site status` shows it.
+**All four passes are committed.** `node tools/test.mjs` → **609 across 52 files**, and eight driven
+tests:
+
+```bash
+node tools/test.mjs
+node js/dev/proving.uitest.mjs    node js/dev/contract.uitest.mjs
+node js/dev/stair.uitest.mjs      node js/dev/controls.uitest.mjs
+node js/dev/gear.uitest.mjs       node js/dev/shop.uitest.mjs
+node js/dev/bar.uitest.mjs        node js/dev/story.uitest.mjs
+node js/dev/convo/uitest.mjs      # the Conversations tab
+```
+
+**§1 to §5 are the first pass and are history.** They are kept for the reasons behind the decisions
+— what was tried, what broke, and why the code is shaped the way it is — and NOT as a description
+of the game, which has moved a long way past them. Anything in them phrased as "what is left" was
+left in 2026 and has since been done. §6, §7 and §8 are the passes after it, newest last; the
+state of the game today is §8 read backwards.
 
 ---
 
@@ -46,7 +61,9 @@ Four decisions Aaron made when asked:
 
 ---
 
-## 1. Status
+## 1. Status — at the end of the first pass
+
+*Historical. The numbers below are the first pass's; see the top of the file for today's.*
 
 | Phase | State |
 |---|---|
@@ -159,7 +176,10 @@ node tools/shot.mjs --shot=corner --set=level=proving
 
 ---
 
-## 3. What is left
+## 3. What was left at the end of the first pass
+
+*Historical, and all of it since done — the picker screen, the save shape, the essence sheet, the
+economy, awakening stones, and a great many more fights. Kept for the reasoning, not the backlog.*
 
 ### Phase 3, remaining
 1. **The picker screen.** `society.greeter.essences.pick` already fires
@@ -242,8 +262,7 @@ node tools/shot.mjs --shot=corner --set=level=proving
 
 ## 6. Second pass — spells, contracts, the sheet, the panel, the head bars, the stair
 
-Everything below is **uncommitted** at the time of writing. `node tools/test.mjs` → **478 across
-48 files**. Driven tests:
+`node tools/test.mjs` → **478 across 48 files** at the end of this pass. Driven tests:
 
 ```bash
 node js/dev/contract.uitest.mjs     # 33 checks: the sheet, the board, the arena, casting, xp, a star
@@ -461,3 +480,288 @@ the contracts you have to last out, and brings at least three monsters iron neve
   the top and ground floors — one landing each — means two metres of walking before you can turn
   straight round. A rule keyed on the player having *stopped* would be better if it can be made
   not to reopen the yo-yo.
+
+---
+
+## 7. Third pass — gear, money, twenty abilities, and three shops
+
+Aaron's son played the second pass and came back with a list. Read together it is one request: the
+game had a ladder and a fight and nothing in between — no reason to leave the building, nothing to
+spend a contract's pay on, and the four abilities you were handed at registration were the four you
+would ever have. This pass is the loop that fills that gap.
+
+`node tools/test.mjs` → **600 across 52 files**. Driven tests:
+
+```bash
+node js/dev/gear.uitest.mjs      # the knife bug, the bag, equip, absorb, potion, rope
+node js/dev/shop.uitest.mjs      # entering all three shops, the purse, buying, loot
+node js/dev/bar.uitest.mjs       # the bar, the number row, reordering, the Bronze gate, dying
+node js/dev/proving.uitest.mjs   # unchanged
+node js/dev/contract.uitest.mjs  # unchanged
+node js/dev/stair.uitest.mjs     # unchanged
+node js/dev/controls.uitest.mjs  # unchanged
+```
+
+### 7.1 The knife, which was a real bug
+
+*"After the registration battle, for some reason even though the knife is returned it is still in
+other battles."* He was right, and the cause was one line: `Combat.load()` did
+`this.player.arm(this.spec.length > 0)` — it armed the player from *does this level have anything
+to fight in it*, so the Society's knife came back at the gate of every contract however many times
+Brann had taken it off him.
+
+The level lends it now. `data/levels/proving.json` gained **`loaner: "knife"`** (a new level field,
+`js/editor/scene.js`), and everywhere else `Combat.load()` arms whatever `doc.gear.weapon` says —
+in the Society's halls too, because it is the player's weapon and they should be able to see they
+bought it. `Combat.regear()` re-reads it without a level reload, so a sword bought in a shop is in
+your hand before you are out of the door, and it refuses on a level that is lending you something.
+
+### 7.2 Gear, the bag, and the off hand
+
+- **`js/game/weapons.js`** is a table now. `KNIFE` has not moved — sixty monsters are balanced
+  against it and `bestiary.test.mjs` proves it — and everything else is arranged around it:
+  `FISTS` below (the floor, so a player who spent everything is never stuck), and dagger,
+  shortsword, spear, axe above. `items.test.mjs` asserts **every buyable weapon beats the loaner
+  knife**: a shop that sells a downgrade has lied to the player.
+- **`js/game/items.js`** — the bag-facing table. `doc.items` was already a counted bag in the save
+  and already had marks in it; this is what says a key in it means something. Four kinds, and
+  `use()` returns a *description* of what should happen rather than doing it, because "heal 45"
+  means something different with and without a fight and this module must not know.
+- **`js/game/inventory.js`** — `I`, or the ❖ button. What you are carrying on the left, and the
+  small box set aside on the right holding the weapon and the one usable thing in the off hand.
+  Nothing is dragged: a drag behaves differently on every phone.
+- **Left click uses what is in the off hand**, which is what his son asked for. `Session.drainHand()`
+  takes the button *before* the fight sees it — a player who deliberately put a stone in their hand
+  did not also mean to swing.
+- **`js/game/foe.js` gained `snare()`** and a `held` counter, which is the whole of the rope. It is
+  not a hit: no damage, and it does not restart the regeneration delay, so a roped thing on soil
+  goes on mending.
+- Save is **v2**: `doc.gear = {weapon, hand}` and `doc.slots`. Ids only, dropped silently if the
+  table has moved on, the same rule `essences` already followed.
+
+### 7.3 Twenty abilities, and 220 confluences
+
+- **`data/essences.json` went from 5 abilities an essence to 10** — 120, all authored. You may
+  claim **five per essence**, so which five you end up with differs every run. That is the
+  randomisation he asked for, and it is why registration now draws one ability from each of the
+  four rather than always handing out the first.
+- **`js/game/confluence.js`** gives every one of the 220 triples a confluence of its own. The
+  seventeen the registry has on file are authored and win on their own triple; everything else is
+  composed from the three that made it — a name out of the parents' new `words` lists, and ten
+  abilities, one per `kind` in `js/game/spells.js` so a composed confluence covers the whole
+  ladder. `confluence.test.mjs` walks all 220 and asserts they are all different, all ten deep,
+  all uniquely named, and — the one that would ruin a save — **identical on a second parse**.
+- The five tag-rule confluences (`conflagrant`, `attrition`, `quickening`, `vigil`, `apparatus`)
+  were shared between roughly two hundred triples each. Each is pinned to one triple now, so all
+  seventeen keep their writing and nothing is shared. `mixed` is left in the file as the catch-all
+  `normalise()` warns about the absence of; nothing reaches it.
+- `Session.awakened()` walks **the player's own four rows** (`rowsOf`) rather than the whole table.
+  It used to walk `doc.confluences`, which does not contain a composed confluence — every
+  generated confluence ability would have failed to resolve the moment it was awoken.
+- **`MAX_PER_ESSENCE = 5`, `MAX_ABILITIES = SLOTS = 20`.** One number, seen from two ends.
+
+### 7.4 Three shops, an economy, and loot
+
+- **`p.shop` on a house** (0 home, 1 arms, 2 physic, 3 general) swaps the cottage's bed-and-supper
+  dressing for a counter and three cupboards — `SHOP_KIND` and `shopFurniture()` in
+  `js/world/interior.js`. A cupboard is one merged mass on the room's three surfaces, not forty
+  props, which is exactly the trade his son offered.
+- Three houses on the square with signs, three keepers on the dummy rig (Sella, Ivens, Corvel),
+  twelve new conversation nodes. They are entered through the ordinary door script — nothing new
+  was needed for "make sure you can enter the shops".
+- **`js/game/shop.js`** — the counter, on the boards' parchment. It reuses `.g-wares` / `.g-ware` /
+  `.g-till`, which were a FORGE-era trade screen sitting unused in `game.css`; they have been
+  restyled for parchment rather than duplicated.
+- **`js/game/economy.js` holds every price, drop chance and multiplier**, and nothing else in the
+  game may hold one. **`js/dev/debug/panels/economy.js`** is Aaron's asked-for panel: sliders over
+  that object, live, plus a readout that turns them into *"about 40 contracts to twenty abilities,
+  roughly an hour"* and a **Copy as defaults** button so an afternoon of tuning becomes the shipped
+  numbers instead of being lost on reload.
+- **`js/game/loot.js`** — drops go straight into the bag on a kill. Stones are rolled **per
+  contract**, not per kill, or a `survive` contract with three waves would pay four times what a
+  one-monster clear pays for the same afternoon.
+- Vail pays a **registration purse** (the new `purse` verb) — enough for a dagger and a potion and
+  no more.
+- **Iron is 14 contracts and bronze is 12**, built the way `missions.js` intends: five axes varied,
+  no new levels.
+
+### 7.5 The bar, the keys, dying, and the gate
+
+- **The number row is twenty keys**: 1-9 and 0, then the same with Shift. `js/input.js` `slotFor()`
+  is pure and tested. **It also fixes a dead feature** — `read()` was clearing `spellEdge` without
+  ever putting it in what it returned, so `cmd.spell` was permanently undefined and the number keys
+  cast nothing at all. It stayed green for a whole pass because the driven test casts by calling
+  the session directly.
+- **`js/game/actionbar.js`** — ten slots and a `1/2` page flip, which *is* the keyboard. Tap casts,
+  hold opens the twenty-grid, the chevron hides it, right-click opens the grid as two columns of
+  ten. The grid is the reorder, and it is the same gesture on both platforms.
+- **`js/game/slots.js`** — the arrangement. Its one rule is about holes: a new ability fills the
+  first free key by itself, and an arrangement the player made is never rearranged.
+- **Dying costs a star** — `progress.loseStar()` drops you to the bottom of the star you were on,
+  which is proportional rather than a flat number, and never below the rank's own floor. Losing a
+  rank would mean losing the storey you are allowed to stand on.
+- **Bronze waits for all twenty.** A third derived flag, `society.awakened.all`, because the
+  predicate language cannot count; and `society.starred` beside it so Vail has
+  `society.greeter.notyet` to say instead of going quiet at four stars.
+- **The tour** (`js/game/tour.js`) — Vail offers it, three enter-hotspots tick the shops off, and it
+  borrows the contract panel because a player has one thing in hand at a time. No walking guide: a
+  guide who follows you round town is a pathing, camera and conversation problem and teaches less
+  than the shopkeeper standing in their own shop.
+
+### 7.6 What is left
+
+- **The player's own body renders black indoors.** Pre-existing — the crowd rig's material is not
+  lit by the interior's lights — but three shops made it much more visible than one hall did. Worth
+  a pass.
+- **Nothing is sold back.** A player who buys the wrong weapon keeps it; weapons are cheap and you
+  can carry several, but a sell price is half an hour of work and would be kind.
+- **Silver and gold boards still have no missions**, unchanged from §6.10.
+- The economy ships at roughly an hour from registration to Bronze. That number came out of a
+  spreadsheet, not out of watching anyone play — move it in the Economy panel, then press **Copy as
+  defaults**.
+
+---
+
+## 8. Fourth pass — filling the game out
+
+Aaron: *"can you fill out more missions, create more monsters, ensure any new additional
+conversations can be edited in dev tool? basically expand the game more so that more of it can be
+play-tested… come up with a good plan/good side-story missions etc."*
+
+`node tools/test.mjs` → **609 across 52 files**. Two new driven tests, and one old one brought back
+from the dead:
+
+```bash
+node js/dev/story.uitest.mjs     # the boards, the four new silhouettes, the Long Count end to end
+node js/dev/convo/uitest.mjs     # the conversation editor — was failing since the Academy rename
+```
+
+### 8.1 Every board is walkable
+
+**Iron 18, Bronze 16, Silver 8, Gold 5 — 47 contracts, all of them playable.** Silver and gold were
+deliberately silent for two passes (§6.10) because *"silver wants something the bestiary does not
+have — every kind in it is a lump of rock with a seam, and the writing on that board is about
+processions and things that count."* That is what §8.2 is.
+
+Thirteen contracts are new; the eight that already existed on silver and gold kept their writing
+and were given missions that match it. `missions.test.mjs` no longer asserts the higher boards are
+silent — it asserts each board is worth more than the one below it, that silver sends at least
+three monsters iron and bronze never sent, and that silver and gold between them draw at least
+three different silhouettes.
+
+**The boards also wear their own seals now.** Four ranked seal styles have been in `game.css` since
+the boards were written and `noticeboard.js` never asked for one, so iron, bronze, silver and gold
+all wore the same wax red. One argument.
+
+### 8.2 Four new monsters, and four silhouettes
+
+`js/world/elemental.js` gained **`BUILDS`** — `stack` (the original), `tall`, `squat`, `spindly` —
+and a kind may name one. Nothing in it reads a kind id, so a fifteenth monster is still a row of
+data and no code. Six existing kinds were given the build their own writing had always implied
+(the Quarry Warden was described as enormous and drawn person-sized), and a kind may now carry a
+`scale` and a matching `radius`, so a thing the size of a gatehouse is the size of a gatehouse and
+you can still hit it.
+
+Four new kinds, fourteen in all, eighty-four monsters:
+
+| kind | board | build | the question it asks |
+|---|---|---|---|
+| **Processional** | silver | tall | Longest reach in the game, mends off flagstones, walks in a line. You do not break it. |
+| **Tallyman** | silver | squat | Hits for nothing, never stops, mends off every scrap of ash. You outlast it. |
+| **Glasswright** | silver | spindly | 74 hit points and 33 damage. Two mistakes is all you get. |
+| **The Verge** | gold | tall | The biggest thing in the game, and every blade of grass is its ground. |
+
+`bestiary.test.mjs` still proves all eighty-four are killable with the proving knife inside a
+minute, which is the constraint the gold monsters were designed inside rather than around.
+
+### 8.3 The Long Count
+
+A side story running the whole length of the ladder, built out of contracts that were already on
+the boards and pointing at each other by accident: **Sit With the Ledger Until It Stops** (iron),
+**Count the Barrows Out of the Clay Pit** (iron, new), **The Same Hand Is Writing in Marrowgate**
+(bronze, new), **The Thing Under Coldbrook Is Awake and Counting** (silver), **Stop the Bells at
+Marrowgate Ringing Themselves** (silver, new), **Break the Procession at Winterbourne** (silver) and
+**Close the Ledger** (gold). Ninety years, two books, one hand, and a number that goes down.
+
+**Archivist Wren** keeps what the clerks throw away, and she is the arc. She has **one hotspot** and
+a hub node whose **choices** carry the gating — seven hotspots on one body would be seven
+predicates that have to be mutually exclusive in every save state there will ever be, and
+`conversations.test.mjs` checks exactly that. Each step requires the step before it to have been
+heard, so a player who clears the whole board before ever speaking to her still gets the story in
+order. `story.uitest.mjs` sets every `contract.done.*` flag up front and walks all seven, asserting
+exactly one is ever open.
+
+Contracts carry a `story: { arc, step }` marker. Nothing reads it yet — the arc is driven entirely
+by `contract.done.<id>`, which `finishContract()` has always written — but it is there so the
+board can group an arc when somebody wants it to.
+
+**90 conversation nodes**, up from 68.
+
+### 8.4 The conversation editor
+
+Every node above is editable in the Conversations tab without anything being added: the tab reads
+`data/conversations.json` whole. What was broken is that **its driven test still lived in the
+Academy** — every node id and flag `js/dev/convo/uitest.mjs` named was deleted with `academy.json`
+two passes ago, and because it is not in the list of driven tests above, nobody ran it. It has been
+failing for two passes.
+
+It is green again, and it does one more thing than it did: it **deletes its own scratch node**
+through the tab's own Delete before holding the file to `conversations.test.mjs`. A node the tab has
+just created is an orphan by definition, and an orphan is exactly what *"every node is reachable"*
+exists to catch — so the test that proves the tool writes a file the game can read now cleans up
+after itself, and Delete gets tested on the way past.
+
+### 8.5 Something to spend silver money on
+
+A silver contract pays 620-1400 marks and an awakening stone costs 240, so the moment silver opened
+there was nothing above iron rank to want and the purse simply went up. The back of the shop is
+three more weapons — **Warsword** (700), **Wall pike** (1150), **Quarry maul** (1600) — which are
+the same three arguments the first three are (quick, long, heavy) made again at a size you can
+bring to a Verge, and they share the four silhouettes `js/player.js` already draws. The Apothecary
+gained the **Adventurer's draught** (145, heals 110), whose heal is its own rather than the
+Economy panel's slider, because two bottles that move together are not a choice.
+
+`loot.test.mjs` asserts the racks span an order of magnitude top to bottom, that nothing dearer
+hits softer than the thing below it, and that the two bottles are actually different bottles.
+
+### 8.6 The clerks were quoting the old boards
+
+`clerk_iron` said *"Nine on the board this morning"* against eighteen, silver said five against
+eight, and gold said *"Three. It is usually two"* against five. All three are true again, and the
+lines that changed lost their `vo` — a clip whose text has moved is a lie, and `data/vo.json` still
+holds the old records for regeneration through the Characters tab.
+
+Silver and gold also have something to say about their own work now, which they did not need when
+their boards were scenery: **Clerk Vane** on what a Processional, a Tallyman and a Glasswright each
+do to you, and **Clerk Ashenrow** on the Verge and why knowing to fight it on stone and being able
+to are different floors of the building. That is the only in-game briefing on the four new monsters
+and it is worth having before somebody walks into one.
+
+**92 conversation nodes.**
+
+### 8.7 One opening hand in eight could not hurt anything
+
+Found by `contract.uitest.mjs`, which cast the first ability the player happened to have and then
+waited for something to bleed. It drew `fire.kiln`, `life.bark`, `void.shell` and a movement
+confluence — four wards and a step. Registration draws one ability from each of the four at random
+(§7.3) and ten of the twelve essences carry three or four defensive and utility abilities, so about
+one hand in eight came out with nothing that could be thrown at anything.
+
+Survivable, because you have a weapon. Still a rotten first hour: four number keys that all do
+something you cannot see. `awaken()` now guarantees one of the four is a bolt, replacing a draw
+rather than adding a fifth, and `confluence.test.mjs` walks all 1,320 opening hands the table can
+produce and asserts every one of them can throw something.
+
+The driven test's own bug was the same shape: it picked "the first ability that does damage", which
+caught a `movement` ability about one run in three — those bloom where you land, not where you were
+looking. It asks for a `bolt` now.
+
+### 8.8 What is left
+
+- **Nothing gates a contract.** Any row on a board you can reach is takeable, which is why the Long
+  Count is driven by what you have *finished* rather than by what you are *allowed to take*.
+- **Gold pay is still far past anything to spend it on.** The back of the shop (§8.5) covers silver;
+  a gold contract pays up to 9000 and the dearest thing in the game is 1600. Either gold work should
+  pay in something other than marks or there should be a rack above the maul.
+- The four new monsters have never been fought by a person, only by a test. That is what this pass
+  was for.

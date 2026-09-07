@@ -14,12 +14,21 @@ const ctx = () => {
   };
 };
 
-// `screen` and `promote` are this project's two additions to §10 — the contract boards had no verb
-// that opens a screen, and the rank ladder cannot be a `flag` because which rank you go to depends
-// on which one you are on. Both are recorded in docs/DEV_CONTRACT.md §10; everything else is the
-// contract's own list.
+// `screen`, `promote` and `purse` are this project's three additions to §10 — the contract boards
+// had no verb that opens a screen; the rank ladder cannot be a `flag` because which rank you go to
+// depends on which one you are on; and the registration fee cannot be one because how much it is
+// is a pacing number that moves under the debug tab's Economy panel, so a conversation must not be
+// the place it is written down. All three are recorded in docs/DEV_CONTRACT.md §10; everything
+// else is the contract's own list.
 test('every contract verb is registered', () => {
-  eq(VERB_IDS.sort(), ['bark', 'event', 'flag', 'goto', 'music', 'promote', 'say', 'screen'].sort());
+  eq(VERB_IDS.sort(), ['bark', 'event', 'flag', 'goto', 'music', 'promote', 'purse', 'say', 'screen'].sort());
+});
+
+test('purse asks the session rather than writing a number itself', () => {
+  const calls = [];
+  eq(runAction({ k: 'purse' }, { purse: () => { calls.push(1); return true; } }), { k: 'purse', ok: true });
+  eq(calls.length, 1);
+  eq(runAction({ k: 'purse' }, {}), { k: 'purse', ok: false, why: 'no purse in this context' });
 });
 
 test('promote asks the ladder rather than writing a rank itself', () => {

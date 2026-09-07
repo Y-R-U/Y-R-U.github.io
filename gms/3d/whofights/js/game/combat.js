@@ -7,14 +7,14 @@
 // not, so the Society pays nothing for the feature.
 
 import { Elemental } from '../world/elemental.js';
-import { spawn, step, wound, isDead } from './foe.js';
+import { spawn, step, wound, snare, isDead } from './foe.js';
 import { make, hurt, mend, inSwing, fraction } from './vitals.js';
 import { WARD } from './spells.js';
 import { isHealing, plotsOf } from './ground.js';
 import { describe } from './bestiary.js';
 // Re-exported, not redefined: js/game/bestiary.test.mjs has to reach the knife without reaching
 // three, and two copies of a balance number is one copy too many.
-import { KNIFE, PLAYER_HP } from './weapons.js';
+import { KNIFE, PLAYER_HP, weaponOf } from './weapons.js';
 
 export { KNIFE, PLAYER_HP };
 
@@ -36,6 +36,8 @@ export class Combat {
     // group goes down before the second arrives is won on an empty floor at eleven seconds.
     this.expecting = false;
     this.ended = null;
+    // What the swing is worth this level. Resolved at load() and never per frame — see there.
+    this.weapon = weaponOf('');
     this.load(level);
   }
 
@@ -49,15 +51,32 @@ export class Combat {
     // Resolved once at load, not per frame: a kind and a variant multiply out to a tuning, a name,
     // two colours and a surface it mends from, and none of that changes while the fight runs.
     this.book = this.spec.map(s => describe(s));
-    // A level with something in it to fight is a level you are handed a knife for. The Society's
-    // own floors have none, and the player walks its halls empty-handed.
-    this.player.arm?.(this.spec.length > 0);
+    // What is in the hand. A level may LEND one — `loaner` in the level document, which is how the
+    // proving hands over a knife it takes back at the desk — and otherwise it is whatever the
+    // player owns, in the Society's halls as much as in an arena. It is their weapon; they should
+    // be able to see they bought it.
+    //
+    // This used to be `arm(this.spec.length > 0)`, which handed the proving knife back at the gate
+    // of every contract the player ever took however many times the Registrar had taken it off
+    // them. That was the bug: the knife was never the player's and the level never said so.
+    this.weapon = weaponOf(level?.loaner || this.session?.doc?.gear?.weapon || '');
+    this.player.arm?.(this.weapon.heft || (this.weapon.id === 'knife' ? 'knife' : null));
+  }
+
+  // Re-read the gear without reloading the level: buying a sword in a shop has to change what is
+  // in your hand before you walk out of it. A level that lends a weapon keeps lending it.
+  regear() {
+    if (this.level?.loaner) return false;
+    this.weapon = weaponOf(this.session?.doc?.gear?.weapon || '');
+    this.player.arm?.(this.weapon.heft || null);
+    return true;
   }
 
   clear() {
     for (const b of this.bodies) { this.app.scene.remove(b.object3D); b.dispose(); }
     this.bodies.length = 0;
     this.foes.length = 0;
+    this.killed = new Set();
     this.ended = null;
     this.pending = null;
     this.expecting = false;
@@ -91,7 +110,7 @@ export class Combat {
     for (let i = 0; i < specs.length; i++) {
       const s = specs[i], b = book[i];
       const f = spawn({ x: s.x, z: s.z, yaw: s.yaw || 0 }, b.tuning);
-      const body = new Elemental(s.zone || 'neutral', b.scale, { rock: b.rock, seam: b.seam });
+      const body = new Elemental(s.zone || 'neutral', b.scale, { rock: b.rock, seam: b.seam, build: b.build });
       this.app.scene.add(body.object3D);
       this.foes.push(f);
       this.bodies.push(body);
@@ -121,8 +140,9 @@ export class Combat {
     if (P.castEdge) {
       P.castEdge = false;
       if (this.cool <= 0 && !this.vitals.dead) {
-        this.cool = KNIFE.cooldown;
-        this.pending = { t: KNIFE.land, yaw: P.yaw, id: ++this.swingId };
+        const W = this.weapon;
+        this.cool = W.cooldown;
+        this.pending = { t: W.land, yaw: P.yaw, id: ++this.swingId };
       }
     }
     if (this.pending) {
@@ -145,6 +165,15 @@ export class Combat {
         if (hitMe) this.takeHit(b.tuning.damage);
       }
       this.bodies[i].sync(f, this.groundY(f.x, f.z), dt);
+      // Newly down, whatever put it down. Checked here rather than in each of the three places
+      // that can wound something, so a kill by knife, by spell and by the last tick of a fight
+      // are one event and js/game/loot.js only ever has to listen for one.
+      if (!isDead(before) && isDead(f) && !this.killed.has(i)) {
+        this.killed.add(i);
+        this.session?.bus?.dispatchEvent(new CustomEvent('combat.kill', {
+          detail: { index: i, kind: this.book[i].kind, variant: this.book[i].variant, name: this.nameOf(i), xp: this.book[i].xp },
+        }));
+      }
     }
 
     if (!this.ended && !this.active && !this.expecting) this.finish('won');
@@ -159,10 +188,10 @@ export class Combat {
       if (isDead(f)) continue;
       const hit = inSwing({
         from: { x: P.pos.x, z: P.pos.z }, yaw: sw.yaw, to: { x: f.x, z: f.z },
-        reach: KNIFE.reach, arc: KNIFE.arc, radius: this.book[i].tuning.radius,
+        reach: this.weapon.reach, arc: this.weapon.arc, radius: this.book[i].tuning.radius,
       });
       if (!hit) continue;
-      this.foes[i] = wound(f, KNIFE.damage, sw.id);
+      this.foes[i] = wound(f, this.weapon.damage, sw.id);
       landed = true;
     }
     if (landed) this.session?.bus?.dispatchEvent(new CustomEvent('combat.hit', { detail: { id: sw.id } }));
@@ -197,6 +226,21 @@ export class Combat {
   }
 
   guard(seconds) { this.warded = Math.max(this.warded, seconds); return true; }
+
+  // A rope on the nearest thing still standing. Returns what it caught, or null — the caller only
+  // spends the rope if something was actually roped.
+  snareNearest(seconds) {
+    const P = this.player;
+    let best = -1, near = Infinity;
+    for (let i = 0; i < this.foes.length; i++) {
+      if (isDead(this.foes[i])) continue;
+      const d = Math.hypot(this.foes[i].x - P.pos.x, this.foes[i].z - P.pos.z);
+      if (d < near) { near = d; best = i; }
+    }
+    if (best < 0) return null;
+    this.foes[best] = snare(this.foes[best], seconds);
+    return { index: best, name: this.nameOf(best) };
+  }
 
   takeHit(amount) {
     // A ward does not stop a blade. It takes the weight out of it, which is what every defensive

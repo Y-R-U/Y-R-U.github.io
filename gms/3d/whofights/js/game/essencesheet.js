@@ -7,7 +7,7 @@
 // is chosen against the fourth it will make rather than in ignorance of it.
 
 import { el, clear, toast } from './ui.js';
-import { confluenceFor, checkPick, awaken, resolve, held } from './essences.js';
+import { confluenceFor, checkPick, resolve, held, capacity, rowsOf, MAX_PER_ESSENCE } from './essences.js';
 
 const KIND = {
   attack: 'Attack', special: 'Special', defence: 'Defence', recovery: 'Recovery',
@@ -90,8 +90,13 @@ export class EssenceSheet {
 
   // ── already chosen ──
   drawHeld(body, have) {
-    body.append(this.band(`${have.count} abilit${have.count === 1 ? 'y' : 'ies'} awakened of ${have.rows.reduce((n, r) => n + r.abilities.length, 0)}.`,
-      'Awakening stones open the rest. The Society does not hand those out.', true));
+    // Against the CEILING, not against the table. Every essence holds more than anyone can claim
+    // from it — five each — and counting the awakened against forty would tell a player they were
+    // a tenth of the way through something they will finish.
+    const cap = capacity(this.doc, this.saved?.() || null) || have.rows.length * MAX_PER_ESSENCE;
+    body.append(this.band(`${have.count} abilit${have.count === 1 ? 'y' : 'ies'} awakened of ${cap}.`,
+      `Five from each of the four, and no more. Awakening stones open them, one at a time and `
+      + `never the one you asked for — the Society does not hand those out.`, true));
     for (const row of have.rows) body.append(this.essenceCard(row, { showAll: true }));
   }
 
@@ -107,13 +112,16 @@ export class EssenceSheet {
     body.append(band);
 
     if (conf) {
-      const got = awaken(this.doc, this.picked);
+      // What you will wake, NOT which one. Registration draws one ability from each of the four
+      // and the draw is the point — two people who take the same three essences are not meant to
+      // be the same adventurer. Naming four abilities here would be a promise the desk does not
+      // keep, so it names the four essences and says out loud that the rest is a draw.
       const list = el('div', 'g-grant');
-      list.append(el('b', null, 'You will wake one from each:'));
-      for (const a of got) {
+      list.append(el('b', null, 'One from each, drawn when you sign:'));
+      for (const r of rowsOf(this.doc, { picked: this.picked, confluence: conf.id })) {
         const li = el('div', 'g-grant-row');
-        li.append(el('u', null, a.fromName));
-        li.append(el('span', null, a.name));
+        li.append(el('u', null, r.name));
+        li.append(el('span', null, `one of ${r.abilities.length} now · four more with stones`));
         list.append(li);
       }
       body.append(list);
@@ -149,10 +157,12 @@ export class EssenceSheet {
     card.append(el('p', null, e.blurb));
 
     const list = el('div', 'g-abils');
-    for (const [i, a] of e.abilities.entries()) {
-      // While choosing, the first is the one you would actually wake; the rest are what the
-      // essence could become, and they are what makes the choice worth making.
-      const owned = showAll ? a.owned : i === 0;
+    for (const a of e.abilities) {
+      // While choosing, NOTHING is lit. It used to light the first, because the first was the one
+      // registration handed you; the draw is random now, so lighting one would be the sheet
+      // promising an ability the desk may not give. Everything here is what the essence COULD
+      // become, which is what makes an irreversible choice a choice.
+      const owned = showAll ? a.owned : false;
       const row = el('div', `g-abil${owned ? ' on' : ''}`);
       const h = el('div', 'g-abil-h');
       h.append(el('b', null, a.name));

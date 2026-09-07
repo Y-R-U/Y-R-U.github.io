@@ -410,9 +410,18 @@
         {
           "who": "greeter",
           "text": "Take something small first. The board up there is never empty and it forgives a great deal."
+        },
+        {
+          "who": "greeter",
+          "text": "And here. Registration fee, returned — the Society charges it and then gives it back, which is the sort of thing the Society does. Spend it on the square before you take anything."
         }
       ],
       "choices": [
+        {
+          "say": "Spend it on what?",
+          "goto": "society.greeter.shops",
+          "sets": []
+        },
         {
           "say": "How do I use any of this?",
           "goto": "society.greeter.abilities",
@@ -459,6 +468,9 @@
           "k": "flag",
           "name": "society.rank",
           "value": "iron"
+        },
+        {
+          "k": "purse"
         }
       ]
     },
@@ -702,7 +714,7 @@
       "lines": [
         {
           "who": "clerk_iron",
-          "text": "Iron floor. Nine on the board this morning and there will be nine tomorrow. They will not be the same nine."
+          "text": "Iron floor. Eighteen on the board this morning and there will be eighteen tomorrow. They are not the same eighteen and nobody minds which you take."
         },
         {
           "who": "clerk_iron",
@@ -801,7 +813,7 @@
       "lines": [
         {
           "who": "clerk_silver",
-          "text": "Silver. Five on the board."
+          "text": "Silver. Eight on the board, which is four more than I like."
         },
         {
           "who": "clerk_silver",
@@ -809,6 +821,11 @@
         }
       ],
       "choices": [
+        {
+          "say": "What is actually on it?",
+          "goto": "society.clerk.silver.what",
+          "sets": []
+        },
         {
           "say": "How do I read one properly?",
           "goto": "society.clerk.silver.read",
@@ -841,7 +858,7 @@
       "lines": [
         {
           "who": "clerk_gold",
-          "text": "Gold. Three. It is usually two."
+          "text": "Gold. Five. It is usually two."
         },
         {
           "who": "clerk_gold",
@@ -849,6 +866,11 @@
         }
       ],
       "choices": [
+        {
+          "say": "What is in them?",
+          "goto": "society.clerk.gold.verge",
+          "sets": []
+        },
         {
           "say": "Why three?",
           "goto": "society.clerk.gold.three",
@@ -1483,7 +1505,7 @@
       "lines": [
         {
           "who": "clerk_gold",
-          "text": "Two have been on that board for a year and the province has arranged itself around them. Roads moved. A village moved."
+          "text": "Two have been on that board for a year and the province has arranged itself around them. The other three went up this season, which is the part that is keeping me here late."
         },
         {
           "who": "clerk_gold",
@@ -1718,6 +1740,1298 @@
           "k": "promote"
         }
       ]
+    },
+    "society.smith.hello": {
+      "name": "Sella — the Weaponry",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "smith",
+          "text": "You have got the Society’s look about you. New, and holding nothing."
+        },
+        {
+          "who": "player",
+          "text": "They took the knife back."
+        },
+        {
+          "who": "smith",
+          "text": "They always do. It is theirs. Everything on this side of the counter is not, and that is the whole difference between us."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Show me what you have.",
+          "goto": "society.smith.shop",
+          "sets": []
+        },
+        {
+          "say": "What should I be carrying?",
+          "goto": "society.smith.advice",
+          "sets": []
+        },
+        {
+          "say": "Another time.",
+          "goto": "society.smith.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.smith.shop": {
+      "name": "Sella — the racks",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "smith",
+          "text": "Take your time. Nothing here will do you any good if you cannot hold it up at the end of an hour."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": [
+        {
+          "k": "screen",
+          "id": "shop.weaponry"
+        }
+      ]
+    },
+    "society.smith.advice": {
+      "name": "Sella — what to carry",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "smith",
+          "text": "A dagger, first, because it is quick and it is cheap and you will not be sorry you spent the marks."
+        },
+        {
+          "who": "smith",
+          "text": "The spear when you can afford it. It reaches a thing before the thing reaches you, which at iron rank is most of the job."
+        },
+        {
+          "who": "smith",
+          "text": "And the axe when you have stopped missing. It is slow. If you miss with it you have simply given something four seconds."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Show me what you have.",
+          "goto": "society.smith.shop",
+          "sets": []
+        },
+        {
+          "say": "Good to know.",
+          "goto": "society.smith.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.arms",
+          "value": true
+        }
+      ]
+    },
+    "society.smith.done": {
+      "name": "Sella — parting",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "smith",
+          "text": "Come back with marks and I will be delighted to see you."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.apothecary.hello": {
+      "name": "Ivens — the Apothecary",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "apothecary",
+          "text": "Mind the shelf. Half of what is on it is worth more than you are and the other half will take your eyebrows off."
+        },
+        {
+          "who": "apothecary",
+          "text": "You want the red bottles. Everybody wants the red bottles."
+        }
+      ],
+      "choices": [
+        {
+          "say": "What do the red bottles do?",
+          "goto": "society.apothecary.what",
+          "sets": []
+        },
+        {
+          "say": "Let me see them.",
+          "goto": "society.apothecary.shop",
+          "sets": []
+        },
+        {
+          "say": "Not today.",
+          "goto": "society.apothecary.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.apothecary.what": {
+      "name": "Ivens — on healing",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "apothecary",
+          "text": "They close what is open. That is all. They do not mend what is broken underneath it and they do not make you braver."
+        },
+        {
+          "who": "apothecary",
+          "text": "Carry one in your off hand and drink it while the thing is still swinging. A potion in your bag is a potion you did not drink."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Let me see them.",
+          "goto": "society.apothecary.shop",
+          "sets": []
+        },
+        {
+          "say": "Thank you.",
+          "goto": "society.apothecary.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.physic",
+          "value": true
+        }
+      ]
+    },
+    "society.apothecary.shop": {
+      "name": "Ivens — the shelf",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "apothecary",
+          "text": "Go on then. Do not shake them."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": [
+        {
+          "k": "screen",
+          "id": "shop.apothecary"
+        }
+      ]
+    },
+    "society.apothecary.done": {
+      "name": "Ivens — parting",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "apothecary",
+          "text": "You will be back. They always are, and usually bleeding."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.sundry.hello": {
+      "name": "Corvel — General Goods",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "sundry",
+          "text": "Rope, lamp oil, salt, boots. And one thing you cannot afford, which is why you came in."
+        }
+      ],
+      "choices": [
+        {
+          "say": "What is an awakening stone?",
+          "goto": "society.sundry.stone",
+          "sets": []
+        },
+        {
+          "say": "Show me.",
+          "goto": "society.sundry.shop",
+          "sets": []
+        },
+        {
+          "say": "Just looking.",
+          "goto": "society.sundry.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.sundry.stone": {
+      "name": "Corvel — on stones",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "sundry",
+          "text": "A grey lump that is warm on one side. You hold it, it goes somewhere, and something you were always able to do you can suddenly do."
+        },
+        {
+          "who": "player",
+          "text": "Which something?"
+        },
+        {
+          "who": "sundry",
+          "text": "That is the part nobody likes. It is not yours to pick. Five from each of your four and no more, and the order is the stone’s business."
+        },
+        {
+          "who": "sundry",
+          "text": "They come out of monsters, mostly. Which is convenient, because the price of one in here is not a price so much as a discouragement."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Show me.",
+          "goto": "society.sundry.shop",
+          "sets": []
+        },
+        {
+          "say": "I will find my own, then.",
+          "goto": "society.sundry.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.stones",
+          "value": true
+        }
+      ]
+    },
+    "society.sundry.shop": {
+      "name": "Corvel — the shelves",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "sundry",
+          "text": "Everything has a price on it. The stones have two, and the second one is your patience."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": [
+        {
+          "k": "screen",
+          "id": "shop.general"
+        }
+      ]
+    },
+    "society.sundry.done": {
+      "name": "Corvel — parting",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "sundry",
+          "text": "Mind the step on your way out. Everyone forgets the step."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.greeter.shops": {
+      "name": "Vail — the three shops",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Three doors on the square, and you will want all of them eventually."
+        },
+        {
+          "who": "greeter",
+          "text": "Sella at the Weaponry, on your left going out. Buy a dagger today. Bare hands are a thing people write about afterwards, not a thing people survive."
+        },
+        {
+          "who": "greeter",
+          "text": "Ivens the apothecary opposite her, for the red bottles. Carry one in your off hand and drink it while the thing is still swinging."
+        },
+        {
+          "who": "greeter",
+          "text": "And Corvel further up, who sells awakening stones at a price meant to put you off. He is right to. You will find most of yours in the field."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Show me round.",
+          "goto": "society.greeter.tour",
+          "sets": []
+        },
+        {
+          "say": "What is an awakening stone?",
+          "goto": "society.greeter.stones",
+          "sets": []
+        },
+        {
+          "say": "I will go and look.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.shops",
+          "value": true
+        }
+      ]
+    },
+    "society.greeter.stones": {
+      "name": "Vail — awakening stones",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "You have four essences and one ability from each. There are ten in each of them and you may claim five. Twenty, in the end."
+        },
+        {
+          "who": "player",
+          "text": "And a stone wakes one."
+        },
+        {
+          "who": "greeter",
+          "text": "A stone wakes one. Not the one you wanted — that is not how it works and everybody asks. Hold it in your off hand and use it."
+        },
+        {
+          "who": "greeter",
+          "text": "Bronze is not open to you until all twenty are awake. The Society is not being difficult. It is being honest about what a bronze contract does to somebody who is half made."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Twenty, then.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.knows.stones",
+          "value": true
+        }
+      ]
+    },
+    "society.greeter.notyet": {
+      "name": "Vail — four stars, and not ready",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Four stars. The work is not the problem — the work has been good."
+        },
+        {
+          "who": "player",
+          "text": "Then what is?"
+        },
+        {
+          "who": "greeter",
+          "text": "You are half awake. Twenty abilities in four essences, and you are carrying fewer. Bronze does not care how brave you were at iron."
+        },
+        {
+          "who": "greeter",
+          "text": "Stones. Off the things you kill, mostly, and Corvel has them at a price designed to make you go and kill things. Come back when all twenty are open and the seal is already in the drawer."
+        }
+      ],
+      "choices": [
+        {
+          "say": "What is an awakening stone?",
+          "goto": "society.greeter.stones",
+          "sets": []
+        },
+        {
+          "say": "Twenty, then.",
+          "goto": "society.greeter.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.tour.smith.say": {
+      "name": "Tour — the Weaponry",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "smith",
+          "text": "Vail sent you round. She does that with the ones she thinks will come back."
+        },
+        {
+          "who": "smith",
+          "text": "Everything on the racks is yours if you pay for it. Buy the dagger today and the spear when you have the marks — it reaches a thing before the thing reaches you."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.tour.apothecary.say": {
+      "name": "Tour — the Apothecary",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "apothecary",
+          "text": "The tour. Right. Bottles, shelf, do not touch."
+        },
+        {
+          "who": "apothecary",
+          "text": "Red ones close what is open. Carry one in your off hand — a potion in your bag is a potion you did not drink."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.tour.sundry.say": {
+      "name": "Tour — General Goods",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "sundry",
+          "text": "Mind the step. Everyone forgets the step."
+        },
+        {
+          "who": "sundry",
+          "text": "Rope, oil, salt — and the grey lumps on the middle shelf, which are awakening stones and cost more than you have. Most people find theirs in the field. Come back when you have not."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.greeter.tour": {
+      "name": "Vail — the tour",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "greeter",
+          "text": "Then go and look at all three of them before you take anything. It is ten minutes and it will save you an afternoon."
+        },
+        {
+          "who": "greeter",
+          "text": "Sella first, on your left going out. Then Ivens opposite. Then Corvel, further up."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "society.tour",
+          "value": true
+        }
+      ]
+    },
+    "society.wren.hub": {
+      "name": "Wren — the archive desk",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "Adventurer. I am not a clerk, whatever the desk looks like. I keep the things the clerks decide are not worth keeping."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Who are you, exactly?",
+          "goto": "society.wren.who",
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "count.met"
+            ]
+          ]
+        },
+        {
+          "say": "About that tally book.",
+          "goto": "society.wren.1",
+          "sets": [],
+          "if": [
+            "all",
+            [
+              "flag",
+              "count.met"
+            ],
+            [
+              "flag",
+              "contract.done.iron.ledger"
+            ],
+            [
+              "not",
+              [
+                "flag",
+                "count.1.seen"
+              ]
+            ]
+          ]
+        },
+        {
+          "say": "The clay pit came out at twelve.",
+          "goto": "society.wren.2",
+          "sets": [],
+          "if": [
+            "all",
+            [
+              "flag",
+              "count.1.seen"
+            ],
+            [
+              "flag",
+              "contract.done.iron.claypit"
+            ],
+            [
+              "not",
+              [
+                "flag",
+                "count.2.seen"
+              ]
+            ]
+          ]
+        },
+        {
+          "say": "There is a second book.",
+          "goto": "society.wren.3",
+          "sets": [],
+          "if": [
+            "all",
+            [
+              "flag",
+              "count.2.seen"
+            ],
+            [
+              "flag",
+              "contract.done.bronze.secondledger"
+            ],
+            [
+              "not",
+              [
+                "flag",
+                "count.3.seen"
+              ]
+            ]
+          ]
+        },
+        {
+          "say": "The thing under Coldbrook said four numbers.",
+          "goto": "society.wren.4",
+          "sets": [],
+          "if": [
+            "all",
+            [
+              "flag",
+              "count.3.seen"
+            ],
+            [
+              "flag",
+              "contract.done.silver.wake"
+            ],
+            [
+              "not",
+              [
+                "flag",
+                "count.4.seen"
+              ]
+            ]
+          ]
+        },
+        {
+          "say": "The bells were ringing an order.",
+          "goto": "society.wren.5",
+          "sets": [],
+          "if": [
+            "all",
+            [
+              "flag",
+              "count.4.seen"
+            ],
+            [
+              "flag",
+              "contract.done.silver.bells"
+            ],
+            [
+              "not",
+              [
+                "flag",
+                "count.5.seen"
+              ]
+            ]
+          ]
+        },
+        {
+          "say": "I walked in the procession.",
+          "goto": "society.wren.6",
+          "sets": [],
+          "if": [
+            "all",
+            [
+              "flag",
+              "count.5.seen"
+            ],
+            [
+              "flag",
+              "contract.done.silver.procession"
+            ],
+            [
+              "not",
+              [
+                "flag",
+                "count.6.seen"
+              ]
+            ]
+          ]
+        },
+        {
+          "say": "It is closed.",
+          "goto": "society.wren.7",
+          "sets": [],
+          "if": [
+            "all",
+            [
+              "flag",
+              "count.6.seen"
+            ],
+            [
+              "flag",
+              "contract.done.gold.ledger"
+            ],
+            [
+              "not",
+              [
+                "flag",
+                "count.7.seen"
+              ]
+            ]
+          ]
+        },
+        {
+          "say": "Nothing today.",
+          "goto": "society.wren.idle",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.wren.who": {
+      "name": "Wren — who she is",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "Wren. Archivist. The Society writes down what a contract paid and what killed the last person who took it, and then it throws away everything in between."
+        },
+        {
+          "who": "archivist",
+          "text": "I keep the in between. Nine tenths of it is a waste of a shelf. The other tenth is the reason this province still has people in it."
+        },
+        {
+          "who": "player",
+          "text": "And you tell adventurers about it because?"
+        },
+        {
+          "who": "archivist",
+          "text": "Because a pattern nobody is standing inside is a curiosity, and one somebody is standing inside is a warning. Bring me the odd ones. I will tell you what they rhyme with."
+        }
+      ],
+      "choices": [
+        {
+          "say": "I will keep an eye out.",
+          "goto": "society.wren.idle",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "count.met",
+          "value": true
+        }
+      ]
+    },
+    "society.wren.idle": {
+      "name": "Wren — nothing today",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "Then go and be paid for something. Come back when a job has a number in it that will not sit still."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.wren.1": {
+      "name": "Wren — the line in the ledger",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "You sat with it. Good. What did it write?"
+        },
+        {
+          "who": "player",
+          "text": "One line. Four words and a number, in a hand nobody at the Society writes in."
+        },
+        {
+          "who": "archivist",
+          "text": "Say the number."
+        },
+        {
+          "who": "player",
+          "text": "Eleven."
+        },
+        {
+          "who": "archivist",
+          "text": "Eleven. And the four words will have been a place, and the place will have been Lowford, and I would very much like to be wrong about that."
+        },
+        {
+          "who": "archivist",
+          "text": "It has written a place and a number four times in ninety years and every time the number came down by one. It is at eleven. Go and look at Lowford."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Down by one from what?",
+          "goto": "society.wren.1b",
+          "sets": []
+        },
+        {
+          "say": "I will look.",
+          "goto": "society.wren.idle",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "count.1.seen",
+          "value": true
+        }
+      ]
+    },
+    "society.wren.1b": {
+      "name": "Wren — from what",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "From fifteen, in the year the Society took this building. Nobody wrote down what happened at zero because it has not happened yet."
+        },
+        {
+          "who": "archivist",
+          "text": "That is the entire archive on the subject. Four lines, ninety years, one hand. Go to Lowford."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.wren.2": {
+      "name": "Wren — the twelfth barrow",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "Halder counted twelve barrows up out of a pit eleven went down into. How many times?"
+        },
+        {
+          "who": "player",
+          "text": "Four days out of the fortnight. Never the same day twice."
+        },
+        {
+          "who": "archivist",
+          "text": "Four. It is always four."
+        },
+        {
+          "who": "player",
+          "text": "And the twelfth barrow?"
+        },
+        {
+          "who": "archivist",
+          "text": "There is no twelfth barrow. There is a count that has been given one more than it was given, and something in the clay very carefully making the sum come out. It is not hiding. It is showing its working."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Showing it to whom?",
+          "goto": "society.wren.2b",
+          "sets": []
+        },
+        {
+          "say": "I will keep going.",
+          "goto": "society.wren.idle",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "count.2.seen",
+          "value": true
+        }
+      ]
+    },
+    "society.wren.2b": {
+      "name": "Wren — to whom",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "To whatever is keeping the tally, and it is not the thing in the pit. The thing in the pit is a nib."
+        },
+        {
+          "who": "archivist",
+          "text": "Somebody at Marrowgate wrote to the clerks last month about a book that adds a line. Take that one. I want to know whether the hand is the same."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.wren.3": {
+      "name": "Wren — the same hand",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "Well?"
+        },
+        {
+          "who": "player",
+          "text": "Same hand. Same nights. Ninety miles apart and the ink dries at the same hour."
+        },
+        {
+          "who": "archivist",
+          "text": "Then it is not a haunting and it is not a hoax, it is a LEDGER, and it is being kept properly, which is very much worse."
+        },
+        {
+          "who": "archivist",
+          "text": "Two books, one clerk, and nothing between them but ninety miles of very ordinary road."
+        },
+        {
+          "who": "player",
+          "text": "What is it counting?"
+        },
+        {
+          "who": "archivist",
+          "text": "That is the silver question and you are not silver. Get there."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Give me something to work with.",
+          "goto": "society.wren.3b",
+          "sets": []
+        },
+        {
+          "say": "I will get there.",
+          "goto": "society.wren.idle",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "count.3.seen",
+          "value": true
+        }
+      ]
+    },
+    "society.wren.3b": {
+      "name": "Wren — a working theory",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "A count that goes down is not an inventory. It is a notice."
+        },
+        {
+          "who": "archivist",
+          "text": "And a notice ninety miles wide, kept in two books for ninety years, in a hand that does not tire, is somebody being extremely polite about something they intend to do."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.wren.4": {
+      "name": "Wren — four numbers, in order",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "Say them."
+        },
+        {
+          "who": "player",
+          "text": "Four. Three. Three. Two."
+        },
+        {
+          "who": "archivist",
+          "text": "With gaps."
+        },
+        {
+          "who": "player",
+          "text": "A day between each. It stopped at two and it has not said anything for nine days."
+        },
+        {
+          "who": "archivist",
+          "text": "It has not stopped. It is waiting for the rest of the sum, and the rest of the sum is somewhere else — the bells at Marrowgate have been ringing an order for nine nights and the watch has been writing it down like idiots and calling it a nuisance."
+        },
+        {
+          "who": "archivist",
+          "text": "Go and listen to the bells. Bring me the order."
+        }
+      ],
+      "choices": [
+        {
+          "say": "It is arithmetic, then.",
+          "goto": "society.wren.4b",
+          "sets": []
+        },
+        {
+          "say": "The bells it is.",
+          "goto": "society.wren.idle",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "count.4.seen",
+          "value": true
+        }
+      ]
+    },
+    "society.wren.4b": {
+      "name": "Wren — arithmetic",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "Everything is arithmetic if you are patient enough to be frightened by it. This has been patient for ninety years."
+        },
+        {
+          "who": "archivist",
+          "text": "Four, three, three, two. Six bells. Do not tell me what you think it adds up to until you have stood under it."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.wren.5": {
+      "name": "Wren — the order of the bells",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "player",
+          "text": "Nine nights, six bells, no repeats. And the first four nights were four, three, three, two."
+        },
+        {
+          "who": "archivist",
+          "text": "Of course they were."
+        },
+        {
+          "who": "archivist",
+          "text": "It is not sending a message to us. It is checking its own working against something that answers, and the thing that answers walks the boundary at Winterbourne on the first clear night of the month and is one person longer every time."
+        },
+        {
+          "who": "player",
+          "text": "The procession."
+        },
+        {
+          "who": "archivist",
+          "text": "The procession is the count made visible, and two of the people in it are known to the diocesan office by name. Break it, or stand in it, or whatever the seal on that contract turns out to say. And come back."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Known by name how?",
+          "goto": "society.wren.5b",
+          "sets": []
+        },
+        {
+          "say": "Winterbourne, then.",
+          "goto": "society.wren.idle",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "count.5.seen",
+          "value": true
+        }
+      ]
+    },
+    "society.wren.5b": {
+      "name": "Wren — known by name",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "One of them was a silver adventurer who took the Coldbrook contract in the year I came here. The other was the clerk who wrote the second entry in the ledger."
+        },
+        {
+          "who": "archivist",
+          "text": "They are both walking, and neither of them is alive, and the office is describing this as a procession."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.wren.6": {
+      "name": "Wren — what the count is for",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "You stood in it."
+        },
+        {
+          "who": "player",
+          "text": "For ninety seconds. It went round me."
+        },
+        {
+          "who": "archivist",
+          "text": "And it was longer at the end than the beginning, and you were not asked to join it, which is the first useful thing anybody has brought me in nine years."
+        },
+        {
+          "who": "archivist",
+          "text": "It is counting DOWN, and it is counting people it has already got. Eleven. Then Lowford. Then the twelfth barrow that was not a barrow."
+        },
+        {
+          "who": "player",
+          "text": "Eleven what?"
+        },
+        {
+          "who": "archivist",
+          "text": "Eleven more. And then a page that is full, and a book that is finished, and whatever a thing like that does on the day it has nothing left to write."
+        },
+        {
+          "who": "archivist",
+          "text": "There is a gold contract called Close the Ledger. It is one page and you may read it once. I have never been allowed to read it. Take it."
+        }
+      ],
+      "choices": [
+        {
+          "say": "My name comes off the roll if I do.",
+          "goto": "society.wren.6b",
+          "sets": []
+        },
+        {
+          "say": "I will take it.",
+          "goto": "society.wren.idle",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "count.6.seen",
+          "value": true
+        }
+      ]
+    },
+    "society.wren.6b": {
+      "name": "Wren — the roll",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "Yes. On the day you leave, not the day you come back, which is the Society being careful rather than the Society being cruel."
+        },
+        {
+          "who": "archivist",
+          "text": "It has been careful about this for ninety years. That is the part I have never forgiven it for."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.wren.7": {
+      "name": "Wren — closed",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "Sit down. You are bleeding on a floor I have to look at."
+        },
+        {
+          "who": "player",
+          "text": "It is closed."
+        },
+        {
+          "who": "archivist",
+          "text": "Say the number."
+        },
+        {
+          "who": "player",
+          "text": "There was no number. The last page was blank and the hand had stopped."
+        },
+        {
+          "who": "archivist",
+          "text": "Blank."
+        },
+        {
+          "who": "archivist",
+          "text": "Ninety years, two books, eleven to go, and it ends on a blank page because somebody walked in and stood in front of it. I am going to write that down, and the clerks are going to decide it is not worth keeping, and I am going to keep it anyway."
+        },
+        {
+          "who": "archivist",
+          "text": "Your name went back on the roll this morning. Nobody will tell you that, so I am."
+        }
+      ],
+      "choices": [
+        {
+          "say": "What was it counting to?",
+          "goto": "society.wren.7b",
+          "sets": []
+        },
+        {
+          "say": "Thank you, Wren.",
+          "goto": "society.wren.idle",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": [
+        {
+          "k": "flag",
+          "name": "count.7.seen",
+          "value": true
+        },
+        {
+          "k": "flag",
+          "name": "count.closed",
+          "value": true
+        }
+      ]
+    },
+    "society.wren.7b": {
+      "name": "Wren — what it was counting to",
+      "cam": "none",
+      "lines": [
+        {
+          "who": "archivist",
+          "text": "Zero. Everything counts to zero. The question was always what it thought was going to be standing there when it arrived."
+        },
+        {
+          "who": "archivist",
+          "text": "Now it is a blank page in a locked room and the answer is: nothing, and you."
+        }
+      ],
+      "choices": [],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.silver.what": {
+      "name": "Clerk Vane — what is up here",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "clerk_silver",
+          "text": "Nothing on this floor is a lump of rock with a temper. That is the first thing and it catches everyone."
+        },
+        {
+          "who": "clerk_silver",
+          "text": "Processionals walk in a line and reach four metres, and the flagstones they walk on put them back together. You do not stop one. You are in its way until it has gone past."
+        },
+        {
+          "who": "clerk_silver",
+          "text": "Tallymen hit like a cold. Nothing, and nothing, and nothing, for as long as there is ash on the floor — and there is always ash on the floor."
+        },
+        {
+          "who": "player",
+          "text": "And the third thing?"
+        },
+        {
+          "who": "clerk_silver",
+          "text": "Glasswrights. Seventy pounds of nothing moving very fast, and if it lands twice you are a sheet in my drawer. Do not let it land twice."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Which of them would you take?",
+          "goto": "society.clerk.silver.read",
+          "sets": []
+        },
+        {
+          "say": "Understood.",
+          "goto": "society.clerk.silver.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
+    },
+    "society.clerk.gold.verge": {
+      "name": "Clerk Ashenrow — the Verge",
+      "cam": "two",
+      "lines": [
+        {
+          "who": "clerk_gold",
+          "text": "Two of the five have a Verge in them. You will want to know what that is before you sign, and I would rather tell you than have you read it standing up."
+        },
+        {
+          "who": "clerk_gold",
+          "text": "It is the size of a gatehouse. It moves at the speed of grass. And every green thing it is standing on is putting it back together faster than most people can take it apart."
+        },
+        {
+          "who": "player",
+          "text": "So fight it on stone."
+        },
+        {
+          "who": "clerk_gold",
+          "text": "Yes. That is the whole contract, and it has killed four people who also knew that. Knowing it and being able to make it happen are different floors of this building."
+        }
+      ],
+      "choices": [
+        {
+          "say": "Are you obliged to say that?",
+          "goto": "society.clerk.gold.obliged",
+          "sets": []
+        },
+        {
+          "say": "I will read it standing up anyway.",
+          "goto": "society.clerk.gold.done",
+          "sets": []
+        }
+      ],
+      "next": null,
+      "sets": []
     }
   }
 }

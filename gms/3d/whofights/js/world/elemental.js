@@ -17,6 +17,59 @@ import { rng } from './details.js';
 // the note in that file about one body and many monsters.
 const SEAM = '#ff7a2a';
 
+// ── the four silhouettes ────────────────────────────────────────────────────
+// One body, many monsters — and up to the silver board that body was literally one silhouette
+// with two colours swapped, which is what docs/RESUME.md §6.10 said silver could not live on:
+// "every kind in it is a lump of rock with a seam, and the writing on that board is about
+// processions and things that count".
+//
+// So a kind may now name a BUILD. Each is the same idea — chunks of rock with light between them
+// — arranged to a different proportion, and each carries its own seam cores so the glow stays
+// inside the stone rather than standing proud of a body that has moved out from under it.
+//
+//   [radius, x, y, z, squash]        rock
+//   [radius, x, y, z]                seam core, about six tenths of the chunk it sits in
+//
+// Nothing here reads a kind id. A fifteenth monster is a row in js/game/bestiary.js and no code.
+export const BUILDS = {
+  // The original: a lump for a body, two for arms, a smaller one for a head.
+  stack: {
+    rock: [[0.72, 0, 1.02, 0, 0.9], [0.44, 0, 1.86, 0.04, 1],
+      [0.30, -0.78, 1.34, 0, 1], [0.30, 0.78, 1.34, 0, 1],
+      [0.24, -0.94, 0.82, 0.06, 1], [0.24, 0.94, 0.82, 0.06, 1],
+      [0.34, -0.36, 0.34, 0, 1], [0.34, 0.36, 0.34, 0, 1]],
+    seam: [[0.42, 0, 1.02, 0], [0.24, 0, 1.86, 0.04], [0.17, -0.78, 1.34, 0], [0.17, 0.78, 1.34, 0]],
+  },
+  // Narrow and high, arms held in: something walking in a line. Silver's processions.
+  tall: {
+    rock: [[0.46, 0, 1.10, 0, 1.5], [0.40, 0, 2.10, 0, 1.35], [0.34, 0, 2.86, 0.03, 1],
+      [0.20, -0.48, 1.72, 0, 1.6], [0.20, 0.48, 1.72, 0, 1.6],
+      [0.17, -0.52, 1.02, 0.04, 1.4], [0.17, 0.52, 1.02, 0.04, 1.4],
+      [0.40, 0, 0.28, 0, 0.55]],
+    seam: [[0.28, 0, 1.10, 0], [0.24, 0, 2.10, 0], [0.19, 0, 2.86, 0.03], [0.11, 0, 0.28, 0]],
+  },
+  // Wide, low and close to the ground, with a head sunk into it. Things that count.
+  squat: {
+    rock: [[1.02, 0, 0.62, 0, 0.62], [0.42, 0, 1.16, 0.12, 0.8],
+      [0.40, -1.00, 0.52, 0, 0.85], [0.40, 1.00, 0.52, 0, 0.85],
+      [0.30, -0.72, 0.20, 0.30, 1], [0.30, 0.72, 0.20, 0.30, 1],
+      [0.34, 0, 0.22, -0.62, 1]],
+    seam: [[0.58, 0, 0.62, 0], [0.24, 0, 1.16, 0.12], [0.22, -1.00, 0.52, 0], [0.22, 1.00, 0.52, 0]],
+  },
+  // Thin body, long arms, almost no mass: it reads as fast before it has moved.
+  spindly: {
+    rock: [[0.34, 0, 1.24, 0, 1.45], [0.30, 0, 2.02, 0.02, 1],
+      [0.15, -0.62, 1.56, 0, 1], [0.15, 0.62, 1.56, 0, 1],
+      [0.13, -0.98, 1.04, 0.04, 1], [0.13, 0.98, 1.04, 0.04, 1],
+      [0.12, -1.16, 0.46, 0.10, 1], [0.12, 1.16, 0.46, 0.10, 1],
+      [0.18, -0.24, 0.40, 0, 1.3], [0.18, 0.24, 0.40, 0, 1.3]],
+    seam: [[0.20, 0, 1.24, 0], [0.17, 0, 2.02, 0.02], [0.09, -0.62, 1.56, 0], [0.09, 0.62, 1.56, 0]],
+  },
+};
+
+export const BUILD_IDS = Object.keys(BUILDS);
+export const DEFAULT_BUILD = 'stack';
+
 function chunk(r, seed, squash = 1) {
   const g = new THREE.IcosahedronGeometry(r, 1);
   const p = g.attributes.position;
@@ -34,15 +87,15 @@ export class Elemental {
     this.object3D = new THREE.Group();
     this.object3D.name = 'elemental';
     this.scale = scale;
+    const build = BUILDS[look.build] || BUILDS[DEFAULT_BUILD];
+    this.build = BUILDS[look.build] ? look.build : DEFAULT_BUILD;
     const rock = [];
-    const put = (g, x, y, z) => { g.translate(x, y, z); rock.push(g); };
-
-    put(chunk(0.72, 11, 0.9), 0, 1.02, 0);
-    put(chunk(0.44, 12), 0, 1.86, 0.04);
-    for (const s of [-1, 1]) {
-      put(chunk(0.30, 13 + s), s * 0.78, 1.34, 0);
-      put(chunk(0.24, 15 + s), s * 0.94, 0.82, 0.06);
-      put(chunk(0.34, 17 + s), s * 0.36, 0.34, 0);
+    // The seed is the chunk's index, so the same build always comes out the same shape — a monster
+    // the player learnt to read yesterday has to be the same monster today.
+    for (const [i, [r, x, y, z, squash = 1]] of build.rock.entries()) {
+      const g = chunk(r, 11 + i, squash);
+      g.translate(x, y, z);
+      rock.push(g);
     }
     // Its own material, not one out of the ROCK palette: those are seams in a cliff and read as
     // pale stone, and a pale body with hot cracks in it is a bonfire rather than a thing made of
@@ -72,8 +125,7 @@ export class Elemental {
     // Well inside the rock it sits in — about six tenths of each chunk. At eight tenths the glow
     // stood proud of the stone on every silhouette and the thing read as a ball of fire.
     const cores = [];
-    for (const [r, x, y, z] of [[0.42, 0, 1.02, 0], [0.24, 0, 1.86, 0.04],
-      [0.17, -0.78, 1.34, 0], [0.17, 0.78, 1.34, 0]]) {
+    for (const [r, x, y, z] of build.seam) {
       const g = new THREE.IcosahedronGeometry(r, 1);
       g.translate(x, y, z);
       cores.push(g);

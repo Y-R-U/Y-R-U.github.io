@@ -65,9 +65,12 @@ export class Noticeboard {
     this.onClose();
   }
 
-  head(sheet, { seal, title, strap }) {
+  head(sheet, { seal, title, strap, rank = null }) {
     const h = el('header', 'g-parch-head');
-    h.append(el('u', 'g-seal', seal));
+    // The four ranked seals have been in game.css since the boards were written and nothing ever
+    // asked for one, so iron, bronze, silver and gold all wore the same wax red. The player sheet
+    // has always used them (js/game/sheet.js); the boards do now too.
+    h.append(el('u', rank ? `g-seal g-seal-${rank}` : 'g-seal', seal));
     const t = el('div', 'g-parch-title');
     t.append(el('h2', null, title));
     t.append(el('p', null, strap));
@@ -83,7 +86,7 @@ export class Noticeboard {
   drawContracts(sheet, id) {
     const view = boardView(id, this.flags());
     const b = view.board;
-    const body = this.head(sheet, { seal: b.seal[0], title: b.title, strap: b.strap });
+    const body = this.head(sheet, { seal: b.seal[0], title: b.title, strap: b.strap, rank: b.rank });
     // Which storey this board hangs on. Five floors of one room look alike from the inside, and a
     // player who took the stair two flights too far has no other way to know it.
     if (RANK_FLOOR[b.rank]) body.append(el('div', 'g-parch-where', `Floor ${RANK_FLOOR[b.rank] + 1} · ${b.title}`));

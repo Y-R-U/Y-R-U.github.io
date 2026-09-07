@@ -414,7 +414,7 @@ export class Doors {
 
   makeInterior(d) {
     const I = new Interior(d.zoneId, d.house, {
-      hall: !!d.house.hall, floors: d.house.floors || 1, boards: this.boardsFor(d),
+      hall: !!d.house.hall, floors: d.house.floors || 1, shop: d.house.shop | 0, boards: this.boardsFor(d),
     });
     I.object3D.applyMatrix4(d.m);
     this.object3D.add(I.object3D);

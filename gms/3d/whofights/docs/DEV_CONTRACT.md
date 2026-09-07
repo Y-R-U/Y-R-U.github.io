@@ -229,7 +229,26 @@ their own docs row).
 | bark | `{"k":"bark","who":"<characterId>","category":"idle"}` — `js/game/barks.js` picks a line from that character's list (its own override, else the shared pool), keeps only the ones `data/vo.json` has an encoded clip for, and plays it through `js/game/voice.js`. Silent while a conversation or a board is open, and one character barks at most every 8 s. |
 | event | `{"k":"event","name":"…","data":{}}` — emitted on `window.__wf.bus` |
 | screen | `{"k":"screen","id":"<screenId>"}` — opens a full-screen sheet (`js/game/noticeboard.js`). Not a modal: the world keeps rendering and a tap off the sheet closes it. |
-| promote | `{"k":"promote"}` — the Society raises the player a rank. A verb rather than a `flag`, because which rank you go *to* depends on which one you are on; the ladder is `js/game/progress.js` and this asks it. Refuses below four stars. |
+| promote | `{"k":"promote"}` — the Society raises the player a rank. A verb rather than a `flag`, because which rank you go *to* depends on which one you are on; the ladder is `js/game/progress.js` and this asks it. Refuses below four stars, and refuses below twenty awakened abilities. |
+| purse | `{"k":"purse"}` — the Society pays the registration fee. A verb rather than a `flag` because how much it is is a pacing number in `js/game/economy.js` that moves under the debug tab's Economy panel, so a conversation must not be the place it is written down. Paid once; the session's own flag is what makes it once. |
+
+## 10.1 Additions this pass made to the documents
+
+- **A level document may carry `"loaner": "<weaponId>"`** — a weapon the level LENDS the player for
+  as long as they are in it. `data/levels/proving.json` is the only thing that uses it: the Society
+  hands over a knife at the gate and takes it back at the desk. Everywhere else what is in your
+  hand is what `doc.gear.weapon` says you own.
+- **A `house` object's `p` gained `shop`** — 0 a home, 1 the Weaponry, 2 the Apothecary, 3 the
+  general shop. A number because every param in `js/editor/scene.js`'s house schema is a number
+  with a range; `SHOP_KIND` in `js/world/interior.js` is the list it indexes into and the only
+  place the names live.
+- **The save is v2.** `doc.gear = {weapon, hand}` and `doc.slots` (twenty ability ids or nulls, the
+  arrangement of the number row). Ids only, dropped silently against a table that has moved on —
+  the rule `doc.essences` already followed. A v1 save loads and is upgraded with a warning.
+- **Three derived flags** are written by `Session.syncStanding()` beside the two §6.9 added:
+  `society.awakened` (a count), `society.awakened.all` and `society.starred`. The predicate
+  language compares a flag to a value and cannot count, so anything a hotspot has to be gated on
+  has to be a flag first.
 
 ## 11. House rules
 

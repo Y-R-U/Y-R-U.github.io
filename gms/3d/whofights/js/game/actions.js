@@ -56,6 +56,16 @@ export const VERBS = {
     return ctx.promote() === false ? 'not eligible for promotion' : null;
   },
 
+  // The Society paying a new member's registration fee. A verb rather than a `flag`, for the same
+  // reason `promote` is one: how much is a pacing number in js/game/economy.js and moves under the
+  // debug tab's Economy panel, so a conversation must not be the place it is written down. Paid
+  // once — the session's own flag is what makes it once, not `once` on the node.
+  purse: (a, ctx) => {
+    if (!ctx.purse) return 'no purse in this context';
+    ctx.purse();
+    return null;
+  },
+
   // Opens a full-screen game screen — the contract boards are the first. Added to §10 by the
   // board agent; the id space belongs to whatever screen registry the session installs.
   screen: (a, ctx) => {

@@ -25,8 +25,9 @@ import { panel as light } from '../debug/panels/light.js';
 import { panel as capture } from '../debug/panels/capture.js';
 import { panel as consolePanel } from '../debug/panels/console.js';
 import { panel as input } from '../debug/panels/input.js';
+import { panel as economy } from '../debug/panels/economy.js';
 
-const PANELS = [warp, world, overlayPanel.panel, trace, perf, light, save, capture, consolePanel, input];
+const PANELS = [warp, world, economy, overlayPanel.panel, trace, perf, light, save, capture, consolePanel, input];
 const KEY = 'wf.dev.debug.sub';
 let active = null;
 let current = null;

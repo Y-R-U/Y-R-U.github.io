@@ -21,23 +21,84 @@ const jumpSpeed = h => Math.sqrt(2 * GRAVITY * h);
 
 const wrapPi = a => Math.atan2(Math.sin(a), Math.cos(a));
 
-// A short single-edged blade with a wrapped grip: four boxes, one mesh, no texture. It is seen
-// over the shoulder at two metres and never closer.
-function knifeMesh() {
+// What is in the player's hand, by profile rather than by weapon id: js/game/weapons.js decides
+// which weapon uses which `heft`, so a new weapon with an old silhouette costs nothing here.
+//
+// All of them are a handful of boxes and one cone, built around a grip at the local origin. They
+// are seen over the shoulder at two metres and never closer, so the budget is silhouette and
+// nothing else — a spear has to read as long and an axe as heavy from behind, and that is all.
+const STEEL = { color: '#b9bec6', roughness: 0.34, metalness: 0.55 };
+const GRIP = { color: '#3b2f26', roughness: 0.92, metalness: 0 };
+const HAFT = { color: '#6b563d', roughness: 0.88, metalness: 0 };
+
+const HEFT = {
+  // The proving knife, unchanged: a short single-edged blade with a wrapped grip.
+  knife(steel, grip) {
+    return [
+      [new THREE.BoxGeometry(0.035, 0.30, 0.075), steel, 0, 0.20, 0],
+      [new THREE.ConeGeometry(0.045, 0.11, 4), steel, 0, 0.40, 0, Math.PI / 4],
+      [new THREE.BoxGeometry(0.045, 0.028, 0.14), steel, 0, 0, 0],
+      [new THREE.BoxGeometry(0.038, 0.13, 0.05), grip, 0, -0.075, 0],
+    ];
+  },
+  dagger(steel, grip) {
+    return [
+      [new THREE.BoxGeometry(0.030, 0.26, 0.055), steel, 0, 0.17, 0],
+      [new THREE.ConeGeometry(0.036, 0.13, 4), steel, 0, 0.36, 0, Math.PI / 4],
+      [new THREE.BoxGeometry(0.055, 0.024, 0.10), steel, 0, 0.02, 0],
+      [new THREE.BoxGeometry(0.034, 0.14, 0.046), grip, 0, -0.07, 0],
+      [new THREE.BoxGeometry(0.052, 0.045, 0.052), grip, 0, -0.155, 0],
+    ];
+  },
+  sword(steel, grip) {
+    return [
+      [new THREE.BoxGeometry(0.042, 0.60, 0.098), steel, 0, 0.36, 0],
+      [new THREE.ConeGeometry(0.058, 0.16, 4), steel, 0, 0.72, 0, Math.PI / 4],
+      [new THREE.BoxGeometry(0.052, 0.034, 0.30), steel, 0, 0.04, 0],
+      [new THREE.BoxGeometry(0.040, 0.18, 0.052), grip, 0, -0.08, 0],
+      [new THREE.BoxGeometry(0.072, 0.058, 0.072), steel, 0, -0.19, 0],
+    ];
+  },
+  // The one that has to read from behind: a long haft with the grip a third of the way up, so it
+  // stands well clear of the shoulder and the butt stays out of the ground.
+  spear(steel, grip, haft) {
+    return [
+      [new THREE.CylinderGeometry(0.032, 0.032, 1.70, 6), haft, 0, 0.42, 0],
+      [new THREE.BoxGeometry(0.030, 0.24, 0.070), steel, 0, 1.36, 0],
+      [new THREE.ConeGeometry(0.055, 0.26, 4), steel, 0, 1.59, 0, Math.PI / 4],
+      [new THREE.BoxGeometry(0.062, 0.030, 0.062), steel, 0, 1.21, 0],
+      [new THREE.CylinderGeometry(0.040, 0.040, 0.16, 6), grip, 0, 0.02, 0],
+    ];
+  },
+  axe(steel, grip, haft) {
+    return [
+      [new THREE.CylinderGeometry(0.034, 0.030, 0.82, 6), haft, 0, 0.28, 0],
+      [new THREE.BoxGeometry(0.055, 0.26, 0.052), steel, 0, 0.62, 0],
+      [new THREE.BoxGeometry(0.055, 0.30, 0.20), steel, 0, 0.60, 0.12],
+      [new THREE.ConeGeometry(0.10, 0.20, 3), steel, 0, 0.60, 0.24, 0, 0, Math.PI / 2],
+      [new THREE.CylinderGeometry(0.042, 0.042, 0.20, 6), grip, 0, -0.03, 0],
+    ];
+  },
+};
+
+export const HEFTS = Object.keys(HEFT);
+
+function weaponMesh(heft) {
+  const build = HEFT[heft] || HEFT.knife;
   const g = new THREE.Group();
-  const steel = new THREE.MeshStandardMaterial({ color: '#b9bec6', roughness: 0.34, metalness: 0.55 });
-  const grip = new THREE.MeshStandardMaterial({ color: '#3b2f26', roughness: 0.92, metalness: 0 });
-  const blade = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.30, 0.075), steel);
-  blade.position.y = 0.20;
-  const tip = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.11, 4), steel);
-  tip.position.y = 0.40;
-  tip.rotation.y = Math.PI / 4;
-  const guard = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.028, 0.14), steel);
-  const hilt = new THREE.Mesh(new THREE.BoxGeometry(0.038, 0.13, 0.05), grip);
-  hilt.position.y = -0.075;
-  for (const m of [blade, tip, guard, hilt]) { m.castShadow = true; g.add(m); }
+  const steel = new THREE.MeshStandardMaterial(STEEL);
+  const grip = new THREE.MeshStandardMaterial(GRIP);
+  const haft = new THREE.MeshStandardMaterial(HAFT);
+  for (const [geo, mat, x, y, z, ry = 0, rx = 0, rz = 0] of build(steel, grip, haft)) {
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set(x, y, z);
+    m.rotation.set(rx, ry, rz);
+    m.castShadow = true;
+    g.add(m);
+  }
   return g;
 }
+
 const lerp = THREE.MathUtils.lerp;
 const _off = new THREE.Vector3(), _back = new THREE.Vector3(), _probe = new THREE.Vector3();
 
@@ -61,7 +122,7 @@ export class Player {
     // from a hand holding it and costs no rig. `visible` is off until something gives it to you.
     this.hand = new THREE.Group();
     this.hand.position.set(0.42, 1.18, 0.16);
-    this.hand.add(knifeMesh());
+    this.heft = null;
     this.hand.visible = false;
     this.object3D.add(this.hand);
     this.object3D.visible = false;
@@ -191,9 +252,25 @@ export class Player {
     return T ? T.surfaceY(x, z) : fieldY(x, z);
   }
 
-  // Armed or not. The proving is the first thing that hands the player anything, and the knife is
-  // Society property — it comes back.
-  arm(v = true) { this.hand.visible = !!v; }
+  // What is in the hand, by profile. Empty, null and false all mean bare hands.
+  //
+  // This used to be a boolean and js/game/combat.js used to set it from "does this level have
+  // anything to fight in it", which is why the proving knife came back for every contract however
+  // many times the Registrar took it off you. What is held is now the player's own gear and the
+  // one exception — the loaner — is named by the level that lends it.
+  arm(heft = 'knife') {
+    const want = heft === true ? 'knife' : (typeof heft === 'string' && HEFT[heft] ? heft : null);
+    if (want === this.heft) { this.hand.visible = !!want; return; }
+    // Rebuilt rather than kept: five silhouettes held in reserve for a player carrying one is
+    // four sets of geometry sitting in the scene graph for the whole game.
+    for (const c of [...this.hand.children]) {
+      this.hand.remove(c);
+      c.traverse(o => { o.geometry?.dispose?.(); o.material?.dispose?.(); });
+    }
+    this.heft = want;
+    if (want) this.hand.add(weaponMesh(want));
+    this.hand.visible = !!want;
+  }
 
   setZone(id) {
     this.zoneId = ZONE_IDS.includes(id) ? id : 'neutral';

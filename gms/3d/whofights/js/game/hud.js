@@ -11,7 +11,7 @@
 import { el, clear } from './ui.js';
 
 export class Hud {
-  constructor({ host, onMenu = () => {}, onInteract = () => {}, onSheet = null }) {
+  constructor({ host, onMenu = () => {}, onInteract = () => {}, onSheet = null, onBag = null }) {
     this.host = host;
 
     const bar = el('div', 'g-bar-top');
@@ -26,6 +26,15 @@ export class Hud {
       you.setAttribute('aria-label', 'Your sheet');
       you.onclick = onSheet;
       bar.append(you);
+    }
+    // The bag. `I` opens it on a keyboard; on a phone there is no I to press, so it needs a
+    // button — and it needs one anyway, because a player who has just been given a dagger has to
+    // be able to find where the dagger went.
+    if (onBag) {
+      const bag = el('button', 'g-round g-round-bag', '❖');
+      bag.setAttribute('aria-label', 'What you are carrying');
+      bag.onclick = onBag;
+      bar.append(bag);
     }
 
     this.prompt = el('div', 'g-prompt');

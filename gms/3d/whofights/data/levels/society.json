@@ -412,6 +412,114 @@
         "d": 10,
         "h": 8
       }
+    },
+    {
+      "id": 60,
+      "dist": 0,
+      "zone": "light",
+      "type": "house",
+      "lod": "full",
+      "x": -27.0,
+      "z": 6.0,
+      "ry": 1.5708,
+      "seed": 812060,
+      "p": {
+        "w": 14.0,
+        "d": 11.0,
+        "h": 8.0,
+        "hall": 0,
+        "floors": 1,
+        "shop": 1
+      }
+    },
+    {
+      "id": 70,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "sign",
+      "lod": "full",
+      "x": -19.9,
+      "z": 2.6,
+      "ry": 1.5708,
+      "seed": 812070,
+      "p": {
+        "w": 4.6,
+        "h": 1.5,
+        "post": 2.2,
+        "text": "The Weaponry"
+      }
+    },
+    {
+      "id": 61,
+      "dist": 0,
+      "zone": "light",
+      "type": "house",
+      "lod": "full",
+      "x": 27.0,
+      "z": 6.0,
+      "ry": -1.5708,
+      "seed": 812061,
+      "p": {
+        "w": 13.0,
+        "d": 10.5,
+        "h": 7.5,
+        "hall": 0,
+        "floors": 1,
+        "shop": 2
+      }
+    },
+    {
+      "id": 71,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "sign",
+      "lod": "full",
+      "x": 20.1,
+      "z": 2.6,
+      "ry": -1.5708,
+      "seed": 812071,
+      "p": {
+        "w": 4.6,
+        "h": 1.5,
+        "post": 2.2,
+        "text": "Apothecary"
+      }
+    },
+    {
+      "id": 62,
+      "dist": 0,
+      "zone": "light",
+      "type": "house",
+      "lod": "full",
+      "x": -27.0,
+      "z": 24.0,
+      "ry": 1.5708,
+      "seed": 812062,
+      "p": {
+        "w": 13.0,
+        "d": 11.0,
+        "h": 8.0,
+        "hall": 0,
+        "floors": 1,
+        "shop": 3
+      }
+    },
+    {
+      "id": 72,
+      "dist": 0,
+      "zone": "neutral",
+      "type": "sign",
+      "lod": "full",
+      "x": -19.9,
+      "z": 20.6,
+      "ry": 1.5708,
+      "seed": 812072,
+      "p": {
+        "w": 4.6,
+        "h": 1.5,
+        "post": 2.2,
+        "text": "General Goods"
+      }
     }
   ],
   "hotspots": [
@@ -550,12 +658,48 @@
             "flag",
             "society.promotable"
           ]
+        ],
+        [
+          "not",
+          [
+            "flag",
+            "society.starred"
+          ]
         ]
       ],
       "actions": [
         {
           "k": "say",
           "node": "society.greeter.member"
+        }
+      ]
+    },
+    {
+      "id": "hs.greeter.notyet",
+      "name": "Speak to the Registrar",
+      "attach": "greeter",
+      "r": 3.5,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": [
+        "all",
+        [
+          "flag",
+          "society.starred"
+        ],
+        [
+          "not",
+          [
+            "flag",
+            "society.awakened.all"
+          ]
+        ]
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.greeter.notyet"
         }
       ]
     },
@@ -848,6 +992,184 @@
         {
           "k": "say",
           "node": "society.doorward.pass"
+        }
+      ]
+    },
+    {
+      "id": "hs.smith",
+      "name": "Speak to the armourer",
+      "attach": "smith",
+      "r": 3.2,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": null,
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.smith.hello"
+        }
+      ]
+    },
+    {
+      "id": "hs.apothecary",
+      "name": "Speak to the apothecary",
+      "attach": "apothecary",
+      "r": 3.2,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": null,
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.apothecary.hello"
+        }
+      ]
+    },
+    {
+      "id": "hs.sundry",
+      "name": "Speak to the shopkeeper",
+      "attach": "sundry",
+      "r": 3.2,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": null,
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.sundry.hello"
+        }
+      ]
+    },
+    {
+      "id": "hs.tour.smith",
+      "name": "Inside the shop",
+      "shape": {
+        "k": "circle",
+        "x": -27.0,
+        "z": 6.0,
+        "r": 3.5
+      },
+      "trigger": "enter",
+      "once": true,
+      "cooldown": 2,
+      "if": [
+        "all",
+        [
+          "flag",
+          "society.tour"
+        ],
+        [
+          "not",
+          [
+            "flag",
+            "society.tour.smith"
+          ]
+        ]
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.tour.smith.say"
+        },
+        {
+          "k": "flag",
+          "name": "society.tour.smith",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "hs.tour.apothecary",
+      "name": "Inside the shop",
+      "shape": {
+        "k": "circle",
+        "x": 27.0,
+        "z": 6.0,
+        "r": 3.5
+      },
+      "trigger": "enter",
+      "once": true,
+      "cooldown": 2,
+      "if": [
+        "all",
+        [
+          "flag",
+          "society.tour"
+        ],
+        [
+          "not",
+          [
+            "flag",
+            "society.tour.apothecary"
+          ]
+        ]
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.tour.apothecary.say"
+        },
+        {
+          "k": "flag",
+          "name": "society.tour.apothecary",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "hs.tour.sundry",
+      "name": "Inside the shop",
+      "shape": {
+        "k": "circle",
+        "x": -27.0,
+        "z": 24.0,
+        "r": 3.5
+      },
+      "trigger": "enter",
+      "once": true,
+      "cooldown": 2,
+      "if": [
+        "all",
+        [
+          "flag",
+          "society.tour"
+        ],
+        [
+          "not",
+          [
+            "flag",
+            "society.tour.sundry"
+          ]
+        ]
+      ],
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.tour.sundry.say"
+        },
+        {
+          "k": "flag",
+          "name": "society.tour.sundry",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "hs.archivist",
+      "name": "Speak to the Archivist",
+      "attach": "archivist",
+      "r": 3.2,
+      "trigger": "interact",
+      "once": false,
+      "cooldown": 1,
+      "if": null,
+      "actions": [
+        {
+          "k": "say",
+          "node": "society.wren.hub"
         }
       ]
     }

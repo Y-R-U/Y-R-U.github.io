@@ -46,7 +46,12 @@ export class Casting {
   // What the ability sheet shows against each row: ready, cooling, or too dear.
   state(a) {
     const why = refuse(this.well, a);
-    return { ready: !why, why, cooling: cooling(this.well, a), cost: tuning(a).cost };
+    const t = tuning(a);
+    const left = cooling(this.well, a);
+    // `cooling` is seconds left; `fraction` is those seconds as a share of the whole cooldown,
+    // which is what the action bar's wash is scaled by. Both, because the sheet wants the number
+    // and the bar wants the bar.
+    return { ready: !why, why, cooling: left, fraction: t.cooldown > 0 ? Math.min(1, left / t.cooldown) : 0, cost: t.cost };
   }
 
   // The live elemental nearest to where the player is looking, or null. Distance breaks ties

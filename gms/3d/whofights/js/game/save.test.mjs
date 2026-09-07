@@ -1,5 +1,5 @@
 import { test, eq, ok } from '../../tools/harness.mjs';
-import { blank, normalise, docView, parseAt, startPos } from './save.js';
+import { blank, normalise, docView, parseAt, startPos, SLOTS } from './save.js';
 
 // The debug Save panel's slot load is `Object.assign(doc, r.doc)`, and normalise() always mints a
 // fresh flags object — so a context that captured the old one wrote flags nothing ever read.
@@ -76,4 +76,49 @@ test('a rubbish essence block is cleaned rather than trusted or fatal', () => {
   eq(r.doc.essences.picked, ['fire'], 'duplicates and non-strings dropped');
   eq(r.doc.essences.confluence, null);
   eq(r.doc.essences.abilities, []);
+});
+
+// ── gear and slots ──────────────────────────────────────────────────────────
+// Both are ids and nothing else, for the reason `essences` already is: a weapon or an ability this
+// build has dropped should leave an empty hand, not refuse to load somebody's game.
+
+test('a save from before the shops loads with empty hands and empty slots', () => {
+  const { doc, warnings } = normalise({ version: 1, items: { marks: 40 } });
+  eq(doc.gear, { weapon: '', hand: '' });
+  eq(doc.slots.length, SLOTS);
+  eq(doc.slots.filter(Boolean), []);
+  eq(warnings.length, 1, 'the upgrade should be said out loud');
+});
+
+test('gear survives a round trip and nonsense in it does not', () => {
+  eq(normalise({ gear: { weapon: 'spear', hand: 'stone.awakening' } }).doc.gear,
+    { weapon: 'spear', hand: 'stone.awakening' });
+  eq(normalise({ gear: { weapon: 7, hand: null } }).doc.gear, { weapon: '', hand: '' });
+  eq(normalise({ gear: 'a spear' }).doc.gear, { weapon: '', hand: '' });
+});
+
+test('slots keep their holes — an empty 7 beside a full 8 is an arrangement', () => {
+  const slots = new Array(SLOTS).fill(null);
+  slots[0] = 'fire.brand';
+  slots[7] = 'water.hold';
+  const back = normalise({ slots }).doc.slots;
+  eq(back[0], 'fire.brand');
+  eq(back[6], null);
+  eq(back[7], 'water.hold');
+  eq(back.length, SLOTS);
+});
+
+test('a slots array of the wrong length is cut and padded, never trusted', () => {
+  eq(normalise({ slots: ['a', 'b'] }).doc.slots.length, SLOTS);
+  eq(normalise({ slots: new Array(200).fill('x') }).doc.slots.length, SLOTS);
+  eq(normalise({ slots: 'nope' }).doc.slots.filter(Boolean), []);
+  eq(normalise({ slots: [1, {}, 'ok'] }).doc.slots.slice(0, 3), [null, null, 'ok']);
+});
+
+test('the world view a hotspot sees carries the gear', () => {
+  const d = blank(0);
+  d.gear.weapon = 'axe';
+  const view = docView(() => d);
+  eq(view.gear, { weapon: 'axe', hand: '' });
+  eq(view.world().gear.weapon, 'axe');
 });

@@ -24,9 +24,18 @@ import { load as loadEssences, held as heldEssences } from './essences.js';
 import { Casting } from './casting.js';
 import { HealthBars } from './healthbars.js';
 import { ARENA, jobFor, briefOf, patchArena, worthOf, wavesOf, objectiveOf, secondsOf } from './missions.js';
-import { award, promote as promoteRank, sheet as progressSheet, XP_FLAG, STARS } from './progress.js';
+import { award, promote as promoteRank, loseStar, sheet as progressSheet, XP_FLAG, STARS } from './progress.js';
 import { PlayerSheet } from './sheet.js';
 import { MissionPanel } from './missionpanel.js';
+import { Inventory } from './inventory.js';
+import { Shop, isShop, shopOf, refuse as shopRefuse, wares } from './shop.js';
+import { ActionBar } from './actionbar.js';
+import { active as tourOn, complete as tourDone, left as tourLeft, brief as tourBrief, DONE as TOUR_DONE, STOPS as TOUR_STOPS } from './tour.js';
+import { resolve as resolveSlots, normalise as normaliseSlots, assign as assignSlot, filled as slotsFilled } from './slots.js';
+import { use as useItem, take as takeItem, give as giveItem, has as hasItem, nameOf as itemName, usable as itemUsable, isWeapon, purse, MARKS, STONE } from './items.js';
+import { tuning as economy, payFor } from './economy.js';
+import { onKill as lootOnKill, onContract as lootOnContract } from './loot.js';
+import { awakenOne, allAwakened, rowsOf, MAX_ABILITIES } from './essences.js';
 
 // Where the proving puts you back: in front of the Registrar's desk on the ground floor, facing
 // her, and inside the building rather than out on the road. `inside` is the door index the swap
@@ -58,6 +67,7 @@ export class Session {
       screen: id => this.showScreen(id),
       bark: a => this.bark(a),
       promote: () => this.promote(),
+      purse: () => this.payPurse(),
     });
 
     this.hotspots = new Hotspots(this.level.hotspots || [], this.ctx);
@@ -124,7 +134,47 @@ export class Session {
       // The essence table is loaded lazily, so opening the sheet is what pays for it — a save that
       // never registers never loads a table of sixty abilities to show four of them.
       onSheet: () => this.openSheet(),
+      onBag: () => this.openBag(),
     });
+
+    // The bar along the bottom. Built before the shop only so that everything the HUD owns is in
+    // one place; it draws nothing until the player has an ability to put on it.
+    this.bar = new ActionBar({
+      host: this.host,
+      slots: () => this.doc.slots,
+      abilities: () => this.awakened(),
+      state: a => this.casting?.state(a),
+      onCast: a => this.castSpell(a),
+      onAssign: (slot, id) => this.setSlot(slot, id),
+    });
+
+    this.shopUI = new Shop({
+      host: this.host,
+      bag: () => this.doc.items,
+      onBuy: (id, shopId) => this.buy(id, shopId),
+    });
+
+    this.inventory = new Inventory({
+      host: this.host,
+      bag: () => this.doc.items,
+      gear: () => this.doc.gear,
+      onEquip: id => this.equip(id),
+      onHold: id => this.hold(id),
+      onUse: id => this.useFromBag(id),
+    });
+    // `I` for the bag, the way every game with a bag in it has done since Ultima. Its own listener
+    // rather than a route through js/input.js, because the screens already own their keys —
+    // Escape closes each of them from inside — and because a key that opens a sheet has nothing to
+    // do with the movement read.
+    this.onBagKey = e => {
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName) || e.target?.isContentEditable) return;
+      if (e.code !== 'KeyI') return;
+      if (this.dialogue.active || this.menu.open || this.board.open || this.essences?.open || this.shopUI?.open) return;
+      e.preventDefault();
+      this.openBag();
+    };
+    addEventListener('keydown', this.onBagKey);
 
     // A tap in the 3D view fires whichever `click` hotspot contains the point the ray landed on,
     // which is what makes the boards tappable from across the hall as well as from arm's length.
@@ -132,7 +182,8 @@ export class Session {
       app,
       stage: document.getElementById('stage'),
       blocked: () => this.menu.open || this.board.open || this.dialogue.active
-        || !!this.essences?.open || this.spells.open || !!this.sheet?.open,
+        || !!this.essences?.open || this.spells.open || !!this.sheet?.open || !!this.inventory?.open
+        || !!this.shopUI?.open || !!this.bar?.open,
       onPoint: p => this.hotspots.press(p, ['click']),
       onAlt: (p, screen) => this.openInteract(p, screen),
     });
@@ -184,6 +235,10 @@ export class Session {
     this.bus.addEventListener('proving.begin', () => {
       if (this.combat.begin()) this.toast('Keep it off the dirt.', { ms: 5000 });
     });
+    // Something went down, whatever put it down. Loot goes straight into the bag — Aaron's son
+    // asked for that explicitly, and a corpse you have to walk over and press a button on is a
+    // corpse you forget while the next wave is arriving.
+    this.bus.addEventListener('combat.kill', () => this.dropLoot());
     this.bus.addEventListener('combat.end', e => {
       const won = e.detail?.outcome === 'won';
       if (this.level.id === ARENA) return this.finishContract(won);
@@ -282,7 +337,19 @@ export class Session {
     const job = id ? jobFor(id) : null;
     if (!job) return this.gotoLevel('society', BACK_TO_DESK);
     if (!won) {
-      this.toast('Down, and the contract stands unfinished.', { ms: 4400 });
+      // Going down costs a star. Never a rank — see js/game/progress.js loseStar().
+      const down = loseStar(this.doc.flags);
+      if (down) {
+        this.doc.flags[XP_FLAG] = down.xp;
+        this.run = null;
+        this.doc.flags['contract.active'] = null;
+        this.syncStanding();
+        this.mission?.set(null);
+        this.autosave.mark();
+      }
+      this.toast(down?.starLost
+        ? `Down, and the contract stands unfinished. A star with it — ${down.after.stars} of ${STARS} at ${down.after.rankLabel}.`
+        : 'Down, and the contract stands unfinished.', { ms: 5000 });
       return void setTimeout(() => this.gotoLevel('society', BACK_TO_DESK), 2600);
     }
     this.run = null;
@@ -292,7 +359,12 @@ export class Session {
     this.doc.flags[`contract.done.${id}`] = true;
     this.doc.flags['contract.active'] = null;
     this.syncStanding();
-    this.doc.items.marks = (this.doc.items.marks || 0) + job.reward;
+    const paid = payFor(job.reward);
+    giveItem(this.doc.items, MARKS, paid);
+    // The stone roll is per CONTRACT, not per kill — see js/game/loot.js. Sixteen of these is the
+    // whole distance to Bronze, and that distance is meant to be measured in work finished.
+    const stone = lootOnContract();
+    if (stone) giveItem(this.doc.items, stone.id, stone.count);
     this.autosave.mark();
     this.mission?.set(null);
     // One line, not three. The toast slot holds one at a time now, and a win, a star and a
@@ -300,7 +372,8 @@ export class Session {
     const star = r.starGained
       ? ` ${r.after.stars} ${r.after.stars === 1 ? 'star' : 'stars'} at ${r.after.rankLabel}.`
       : '';
-    this.toast(`${job.name} — closed. ${gain} experience, ${job.reward} marks.${star}`, { ms: 5600 });
+    this.toast(`${job.name} — closed. ${gain} experience, ${paid} marks.${star}`
+      + (stone ? ' An awakening stone came out of it.' : ''), { ms: 5600 });
     // The promotion is its own beat and worth waiting for: it is the only thing on the ladder the
     // player has to go and ask a person for.
     if (r.rankReady) {
@@ -318,7 +391,18 @@ export class Session {
   syncStanding() {
     const p = this.progress();
     this.doc.flags['society.stars'] = p.stars;
-    this.doc.flags['society.promotable'] = p.registered && p.stars >= STARS && !!p.nextRank;
+    const woke = this.doc.essences?.abilities?.length || 0;
+    this.doc.flags['society.awakened'] = woke;
+    // The third derived flag, and it exists for the reason the other two do: the predicate
+    // language compares a flag to a value and cannot count, so "every ability awake" has to be a
+    // flag before a hotspot can be gated on it. Aaron's son asked that Bronze wait for all twenty.
+    const all = woke >= MAX_ABILITIES;
+    this.doc.flags['society.awakened.all'] = all;
+    // Four stars, whether or not the abilities are there. Split from `promotable` so the Registrar
+    // has something to answer with when the stars are in and the abilities are not — a desk that
+    // goes quiet is a player who thinks the game is broken.
+    this.doc.flags['society.starred'] = p.registered && p.stars >= STARS && !!p.nextRank;
+    this.doc.flags['society.promotable'] = p.registered && p.stars >= STARS && !!p.nextRank && all;
     return p;
   }
 
@@ -326,6 +410,14 @@ export class Session {
   // so a conversation reachable in a state it should not have been fails loudly rather than
   // handing out a rank.
   promote() {
+    // Four stars AND all twenty. The ladder answers the first; this answers the second, because
+    // js/game/progress.js is the rank ladder and knows nothing about essences.
+    const woke = this.doc.essences?.abilities?.length || 0;
+    if (woke < MAX_ABILITIES) {
+      this.toast(`${MAX_ABILITIES - woke} more abilities to wake before the Society will raise you.`,
+        { ms: 5200, level: 'g-low' });
+      return false;
+    }
     const up = promoteRank(this.doc.flags);
     if (!up) return false;
     Object.assign(this.doc.flags, { 'society.rank': up.to });
@@ -455,16 +547,24 @@ export class Session {
       || this.hotspots.candidates(this.player.pos, ['interact'])[0]
       || null;
     this.altTarget = target;
+    // Whose counter, if the thing under the pointer keeps one. The three keepers on the square are
+    // the only people in the game who trade, and each of them is named by a tour stop.
+    const shop = shopOf(target?.attach);
+    this.tradeWith = shop;
     this.menuAt.show(screen || { x: innerWidth / 2, y: innerHeight / 2 }, optionsFor({
       target,
       abilities: this.awakened(),
-      // No economy yet, and no character declares itself a trader. It stays honestly closed.
-      canTrade: false,
+      canTrade: !!shop,
+      tradeWith: shop,
     }));
   }
 
   interactPick(id) {
     if (id === 'spell') return this.spells.show();
+    if (id === 'trade') {
+      if (!this.tradeWith) { this.toast('Nobody here trades.', { ms: 2400, level: 'g-low' }); return true; }
+      return this.showScreen(this.tradeWith);
+    }
     if (id === 'talk') {
       const h = this.altTarget;
       if (h) this.hotspots.fire(h, this.hotspots.state.get(h.id));
@@ -485,19 +585,37 @@ export class Session {
     const key = `${saved.abilities.join(',')}|${saved.confluence}`;
     if (this.awokeKey === key && this.awokeDoc === doc) return this.awoke;
     const out = [];
-    const rows = [...Object.values(doc.essences), ...doc.confluences];
+    // The player's own four rows, not the whole table. A confluence is composed for the triple
+    // (js/game/confluence.js) and is not in `doc.confluences` unless somebody authored it, so
+    // walking the table used to lose every generated confluence ability the moment it was awoken.
+    const rows = rowsOf(doc, saved);
     for (const id of saved.abilities) {
       for (const r of rows) {
         const a = r.abilities.find(x => x.id === id);
         // `from` is what js/game/spells.js looks the palette up by, and `confluence` is what tells
         // it to blend the three instead. Dropping either was why the fourth spell came out white.
-        if (a) { out.push({ ...a, from: r.id, fromName: r.name, confluence: !doc.essences[r.id] }); break; }
+        if (a) {
+          out.push({
+            ...a,
+            from: r.id,
+            fromName: r.name,
+            // A confluence has no palette of its own — it is blended from the three that made it
+            // (js/game/spells.js) — so on a sheet it wears the Society's gold.
+            colour: doc.essences[r.id] ? r.colour : '#c8a24a',
+            confluence: !doc.essences[r.id],
+          });
+          break;
+        }
       }
     }
     this.awokeKey = key;
     this.awokeDoc = doc;
     this.awoke = out;
+    // A newly woken ability goes onto the first free key by itself. An arrangement the player made
+    // is never rearranged — js/game/slots.js only ever fills holes.
+    this.doc.slots = normaliseSlots(this.doc.slots, out.map(a => a.id));
     this.casting?.setSlots(out);
+    this.bar?.draw(true);
     return out;
   }
 
@@ -520,14 +638,234 @@ export class Session {
     if (slot == null) return;
     this.player.spellEdge = null;
     if (this.dialogue.active || this.board.open || this.menu.open || this.essences?.open) return;
+    if (this.shopUI?.open || this.inventory?.open || this.bar?.open) return;
     const list = this.awakened();
-    const a = list[slot];
+    // The key reaches whatever the player put on it, not the nth thing they happen to have woken.
+    const a = resolveSlots(this.doc.slots, list)[slot] || null;
     if (!a) {
-      if (list.length) this.toast(`Nothing in slot ${slot + 1}.`, { ms: 2000, level: 'g-low' });
+      if (list.length) this.toast(`Nothing on ${slot >= 10 ? 'Shift+' : ''}${(slot % 10) === 9 ? 0 : (slot % 10) + 1}.`, { ms: 2000, level: 'g-low' });
       else this.toast('No essences yet.', { ms: 2400, level: 'g-low' });
       return;
     }
     this.castSpell(a);
+  }
+
+  // The rank the work was, which is what the drop table is keyed on. A contract in hand names its
+  // own board; the proving and anything else are iron.
+  workRank() {
+    const id = this.doc.flags['contract.active'];
+    return (id ? jobFor(id)?.rank : null) || 'iron';
+  }
+
+  dropLoot() {
+    const got = lootOnKill({ rank: this.workRank() });
+    if (!got) return false;
+    giveItem(this.doc.items, got.id, got.count);
+    this.autosave.mark();
+    this.inventory?.refresh();
+    this.toast(`Picked up: ${itemName(got.id)}.`, { ms: 2800 });
+    return true;
+  }
+
+  // The tour of the square, if one is running. Returns whether the panel belongs to it this
+  // frame; everything else about it is flags, so this is the only place it costs anything.
+  tourTick() {
+    if (this.doc.flags['contract.active']) return false;
+    const on = tourOn(this.doc.flags);
+    if (on !== this.tourShown) {
+      this.tourShown = on;
+      this.mission.set(on ? tourBrief(this.doc.flags) : this.activeContract());
+      this.tourSeen = -1;
+    }
+    if (!on) return false;
+    // Redraw the brief when a door is ticked off, so the expanded panel's list of three shows the
+    // tick the moment it is earned.
+    const seen = tourLeft(this.doc.flags);
+    if (seen !== this.tourSeen) {
+      this.tourSeen = seen;
+      this.mission.set(tourBrief(this.doc.flags));
+    }
+    if (tourDone(this.doc.flags)) {
+      this.doc.flags[TOUR_DONE] = true;
+      this.tourShown = false;
+      this.mission.set(this.activeContract());
+      this.autosave.mark();
+      this.toast('That is the square. Everything you will need for a while is behind one of those three doors.', { ms: 6000 });
+      return false;
+    }
+    return true;
+  }
+
+  // Rearranging the bar. `id` is what should end up on `slot`; null empties it. Swapping rather
+  // than overwriting is js/game/slots.js's rule — see the note there.
+  setSlot(slot, id) {
+    this.doc.slots = assignSlot(this.doc.slots, slot, id);
+    this.autosave.mark();
+    this.bar?.draw(true);
+    return true;
+  }
+
+  // ── the shops ───────────────────────────────────────────────────────────
+  // One purchase. The refusal comes from js/game/shop.js so the button's label and what actually
+  // happens can never disagree, and the marks come out of the same counted bag everything else
+  // lives in — there is no separate wallet to get out of step with the purse on the sheet.
+  buy(id, shopId) {
+    const why = shopRefuse(this.doc.items, id, shopId);
+    if (why) { this.toast(why, { ms: 2800, level: 'g-low' }); return false; }
+    const row = wares(shopId).find(w => w.id === id);
+    if (!takeItem(this.doc.items, MARKS, row.price)) return false;
+    giveItem(this.doc.items, id, 1);
+    // Bought a weapon with empty hands? Hold it. Nobody buys their first sword in order to carry
+    // it about in a sack, and making them find the bag to use the thing they just bought is the
+    // kind of small friction that reads as the game being broken.
+    if (isWeapon(id) && !this.doc.gear.weapon) { this.doc.gear.weapon = id; this.combat.regear(); }
+    this.autosave.mark();
+    this.inventory?.refresh();
+    this.toast(`${itemName(id)} — ${row.price} marks. ${purse(this.doc.items)} left.`, { ms: 3400 });
+    this.bus.dispatchEvent(new CustomEvent('shop.bought', { detail: { id, shop: shopId, price: row.price } }));
+    return true;
+  }
+
+  // What the Society hands a new member so the first contract is not fought bare-handed. Called
+  // from the `purse` verb on Vail's parting node, once — the flag is what makes it once.
+  payPurse() {
+    if (this.doc.flags['society.purse.paid']) return false;
+    const n = Math.max(0, Math.round(economy().startingPurse));
+    this.doc.flags['society.purse.paid'] = true;
+    if (n > 0) giveItem(this.doc.items, MARKS, n);
+    this.autosave.mark();
+    if (n > 0) this.toast(`${n} marks, from the Society. Spend them on the square.`, { ms: 5200 });
+    return true;
+  }
+
+  // ── the bag ─────────────────────────────────────────────────────────────
+  // Everything below writes the save and then tells the sheet to redraw. The sheet never decides
+  // anything: it draws what the bag says, and a refusal is a toast rather than a disabled button
+  // with no reason on it.
+
+  openBag() {
+    if (this.inventory.open) return this.inventory.close();
+    return this.inventory.show();
+  }
+
+  // Put a weapon in the hand, or empty it. An id the player does not own is refused rather than
+  // conjured — the shop is the only thing that puts a weapon in the bag.
+  equip(id) {
+    const want = id || '';
+    if (want && (!isWeapon(want) || !hasItem(this.doc.items, want))) {
+      this.toast('You are not carrying that.', { ms: 2400, level: 'g-low' });
+      return false;
+    }
+    this.doc.gear.weapon = want;
+    // The level may be lending you something, in which case what you own stays in the bag until
+    // you are out of it — combat.js refuses to regear a level with a `loaner`.
+    const swapped = this.combat.regear();
+    this.autosave.mark();
+    this.inventory.refresh();
+    if (!swapped) this.toast('Not while you are carrying the Society\u2019s knife.', { ms: 3000, level: 'g-low' });
+    else this.toast(want ? `${itemName(want)} in hand.` : 'Bare hands.', { ms: 2200 });
+    return true;
+  }
+
+  // The other hand: one usable thing, held ready. What "used" means is js/game/items.js's answer,
+  // not this method's.
+  hold(id) {
+    const want = id || '';
+    if (want && (!itemUsable(want) || !hasItem(this.doc.items, want))) {
+      this.toast('That is not something you hold ready.', { ms: 2400, level: 'g-low' });
+      return false;
+    }
+    this.doc.gear.hand = want;
+    this.autosave.mark();
+    this.inventory.refresh();
+    if (want) this.toast(`${itemName(want)} ready. Click to use it.`, { ms: 2600 });
+    return true;
+  }
+
+  // What the world knows that js/game/items.js does not: whether there is a fight, whether the
+  // player is hurt, and whether there is anything left to wake.
+  useContext() {
+    const v = this.combat?.vitals;
+    const fighting = this.combat.foes.length > 0 && !this.combat.ended;
+    const doc = this.essences?.doc;
+    return {
+      fighting,
+      hurt: !!v && v.hp < v.max,
+      registered: !!this.doc.essences?.picked?.length,
+      // Unknown until the table is loaded, and `undefined` is not `true`: a stone must never be
+      // refused because the table has not been fetched yet. useFromBag loads it first.
+      allAwakened: doc ? allAwakened(doc, this.doc.essences) : false,
+    };
+  }
+
+  // One of a thing, used. The only route — the hand slot, the bag button and the left click all
+  // arrive here, so there is one place that spends an item and one place that reports why it did
+  // not.
+  useFromBag(id) {
+    if (!id || !hasItem(this.doc.items, id)) return false;
+    // A stone cannot be judged without the table, and the table is fetched on first use. Load it
+    // and come back rather than refusing something the player has every right to do.
+    if (id === STONE && !this.essences?.doc) {
+      if (!this.doc.essences?.picked?.length) {
+        this.toast('Take your essences first — there is nothing for it to reach.', { ms: 3400, level: 'g-low' });
+        return false;
+      }
+      this.loadEssenceTable().then(ok => { if (ok) this.useFromBag(id); });
+      return false;
+    }
+    const r = useItem(id, this.useContext());
+    if (!r.ok) { this.toast(r.why, { ms: 3000, level: 'g-low' }); return false; }
+    const did = r.kind === 'awaken' ? this.absorb()
+      : r.kind === 'heal' ? this.drink(r.amount)
+        : r.kind === 'snare' ? this.throwRope(r.seconds)
+          : false;
+    if (!did) return false;
+    takeItem(this.doc.items, id, r.spend || 1);
+    if (!hasItem(this.doc.items, id)) this.doc.gear.hand = '';
+    this.autosave.mark();
+    this.inventory.refresh();
+    return true;
+  }
+
+  // A stone, absorbed. Which ability wakes is not a choice and is not meant to be one — see
+  // js/game/essences.js awakenOne().
+  absorb() {
+    const doc = this.essences?.doc;
+    if (!doc) return false;
+    const a = awakenOne(doc, this.doc.essences);
+    if (!a) { this.toast('There is nothing left in you to wake.', { ms: 3000, level: 'g-low' }); return false; }
+    this.doc.essences.abilities = [...this.doc.essences.abilities, a.id];
+    this.awokeKey = null;
+    this.awakened();
+    this.syncStanding();
+    this.toast(`${a.name} — ${a.fromName}. ${a.text}`, { ms: 7000 });
+    this.bus.dispatchEvent(new CustomEvent('ability.awoken', { detail: { id: a.id, from: a.from } }));
+    return true;
+  }
+
+  drink(amount) {
+    if (!this.combat.mend(amount)) return false;
+    this.toast(`${amount} closed up.`, { ms: 2400 });
+    return true;
+  }
+
+  throwRope(seconds) {
+    const caught = this.combat.snareNearest(seconds);
+    if (!caught) { this.toast('Nothing in range.', { ms: 2200, level: 'g-low' }); return false; }
+    this.toast(`${caught.name} — held.`, { ms: 2600 });
+    return true;
+  }
+
+  // Left click, when the off hand is holding something. It beats the swing rather than following
+  // it: a player who has deliberately put a stone in their hand did not also mean to attack with
+  // the other one, and a click that did both would spend the stone every time they fought.
+  drainHand() {
+    const id = this.doc.gear?.hand;
+    if (!id || !this.player.castEdge) return false;
+    if (!hasItem(this.doc.items, id)) { this.doc.gear.hand = ''; return false; }
+    this.player.castEdge = false;
+    this.useFromBag(id);
+    return true;
   }
 
   // The sheet needs the essence table to name what the player took, and that table is fetched on
@@ -539,6 +877,9 @@ export class Session {
   }
 
   showScreen(id) {
+    // Screen ids are one flat space (DEV_CONTRACT §10) and each screen claims its own corner of
+    // it. The boards own everything unclaimed, which is why this reads as a list of exceptions.
+    if (isShop(id)) return this.shopUI.show(id);
     if (id !== 'essences') return this.board.show(id);
     if (this.essences) return this.essences.show();
     this.loadEssenceTable().then(ok => { if (ok) this.essences.show(); });
@@ -664,18 +1005,29 @@ export class Session {
     this.dialogue.tick?.(dt);
     // The fight runs whether or not a bubble is up: a conversation that starts mid-swing must not
     // freeze the elemental with its arm back.
+    // Before the fight sees the click: what is in the off hand takes the left button.
+    this.drainHand();
     this.combat.update(dt);
     this.runMission(dt);
     this.drainCast();
     this.casting.update(dt);
     const busy = this.dialogue.active || this.board.open || !!this.essences?.open
-      || this.menuAt.open || this.spells.open || !!this.sheet?.open;
+      || this.menuAt.open || this.spells.open || !!this.sheet?.open
+      || !!this.inventory?.open || !!this.shopUI?.open || !!this.bar?.open;
+    // Cheap: the labels are keyed and only redrawn when the arrangement changes. What runs every
+    // frame is ten cooldown washes. `busy` also pushes it out of the way of whatever is on screen
+    // — the conversation band lives at the bottom too, and the two were sharing the space.
+    this.bar?.setBusy(busy);
+    this.bar?.draw();
     if (!busy) this.hotspots.update(dt, this.player.pos);
     this.stairRefusal();
     this.hud.setPrompt(busy ? null : this.reachable());
     this.heads.track(this.headBars());
     const live = this.combat.foes.filter(f => f.state !== 'dead' && f.hp > 0).length;
-    this.mission.progress(live, this.combat.foes.length, this.missionLeft());
+    // The tour borrows the contract panel, because a player has one thing in hand at a time and
+    // the tour is a thing in hand. It only ever runs before the first contract is taken.
+    if (this.tourTick()) this.mission.progress(tourLeft(this.doc.flags), TOUR_STOPS.length, null);
+    else this.mission.progress(live, this.combat.foes.length, this.missionLeft());
     this.autoDetect(dt);
     this.doc.played += dt;
     this.autosave.tick(dt);

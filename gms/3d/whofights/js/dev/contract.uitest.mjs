@@ -145,13 +145,23 @@ await p.eval('window.__wf.game.mission.toggle(); true');
 
 // ── casting ─────────────────────────────────────────────────────────────────────────────────
 const before = (await state()).mana;
-const cast = await p.eval(`(() => {
+// A DAMAGING one, not simply the first. Registration draws one ability at random from each of the
+// four essences now, so `awakened()[0]` is as likely to be a ward or a mending as it is to be
+// something that arrives and hurts — and this block is about the bolt arriving.
+const cast = await p.eval(`(async () => {
   const g = window.__wf.game, P = window.__wf.player;
+  const { KINDS } = await import('./js/game/spells.js');
+  // A THROWN one. Registration draws at random now, and 'movement' does damage but blooms where
+  // you land rather than where you were looking — so picking the first damaging ability caught a
+  // dash about one run in three and hurt nothing but the floor.
+  const a = g.awakened().find(x => (KINDS[x.kind]?.damage || 0) > 0 && KINDS[x.kind]?.aim === 'bolt')
+    || g.awakened().find(x => (KINDS[x.kind]?.damage || 0) > 0)
+    || g.awakened()[0];
   const f = g.combat.foes[0];
   P.camYaw = Math.atan2(f.x - P.pos.x, f.z - P.pos.z);
-  return g.castSpell(g.awakened()[0]);
+  return g.castSpell(a);
 })()`);
-check(cast === true, 'the first ability casts');
+check(cast === true, 'an ability that does damage casts');
 await sleep(150);
 check((await state()).mana < before, `and it cost mana (${before} → ${(await state()).mana})`);
 check(await p.eval('window.__wf.game.casting.fx.report().casts > 0 || window.__wf.game.casting.fx.report().glow > 0'),
@@ -237,6 +247,10 @@ check(await p.eval('window.__wf.game.run === null'), 'the clock does not survive
 // ── the ladder ──────────────────────────────────────────────────────────────────────────────
 // Four stars at iron does not raise you: somebody at a desk does. Nothing called promote() before
 // this, so a player who earned four stars at iron simply stopped.
+//
+// And four stars is no longer enough on its own. Aaron's son asked that Bronze wait until every
+// essence ability is awake, so the gate has two halves and the first thing checked here is that
+// the second half is really shut.
 await p.eval(`(() => {
   const g = window.__wf.game;
   g.doc.flags['society.xp'] = 380;
@@ -244,7 +258,34 @@ await p.eval(`(() => {
   return true;
 })()`);
 check(await p.eval('window.__wf.game.progress().stars === 4'), 'four stars at iron');
-check(await p.eval('window.__wf.game.doc.flags["society.promotable"] === true'), 'and the Society knows it');
+check(await p.eval('window.__wf.game.doc.flags["society.starred"] === true'), 'and the Society counts them');
+check(await p.eval('window.__wf.game.doc.flags["society.promotable"] === false'),
+  'but four abilities out of twenty is not a bronze adventurer');
+const halfway = await p.eval(`(() => {
+  const g = window.__wf.game;
+  const at = g.characters.at('greeter');
+  return (g.hotspots.candidates(at, ['interact']).filter(h => h.attach === 'greeter')[0] || {}).id || null;
+})()`);
+check(halfway === 'hs.greeter.notyet', `and Vail says why rather than going quiet (${halfway})`);
+check(await p.eval('window.__wf.game.promote() === false'), 'and the desk refuses');
+
+// Wake the rest. In play these are sixteen awakening stones; here it is the same call the stone
+// makes, sixteen times.
+await p.eval(`(async () => {
+  const m = await import('./js/game/essences.js');
+  const g = window.__wf.game;
+  for (let i = 0; i < 40; i++) {
+    const a = m.awakenOne(g.essences.doc, g.doc.essences);
+    if (!a) break;
+    g.doc.essences.abilities.push(a.id);
+  }
+  g.awokeKey = null;
+  g.awakened();
+  g.syncStanding();
+  return true;
+})()`);
+check(await p.eval('window.__wf.game.doc.essences.abilities.length === 20'), 'twenty abilities awake');
+check(await p.eval('window.__wf.game.doc.flags["society.promotable"] === true'), 'and now the Society knows it');
 const greeter = await p.eval(`(() => {
   const g = window.__wf.game;
   const at = g.characters.at('greeter');

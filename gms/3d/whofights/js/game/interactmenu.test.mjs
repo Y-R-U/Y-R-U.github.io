@@ -6,7 +6,7 @@ const on = o => o.filter(x => x.enabled).map(x => x.id);
 
 test('the menu always offers the same three, in the same order', () => {
   eq(ids(optionsFor({})), ['spell', 'talk', 'trade']);
-  eq(ids(optionsFor({ target: { name: 'Vail' }, abilities: [1, 2], canTrade: true })), ['spell', 'talk', 'trade']);
+  eq(ids(optionsFor({ target: { name: 'Vail' }, abilities: [1, 2], canTrade: true, tradeWith: 'shop.weaponry' })), ['spell', 'talk', 'trade']);
 });
 
 // A menu that changes shape every time you open it is a menu you have to read every time. What
@@ -37,5 +37,8 @@ test('casting needs an awakened ability, and counts them', () => {
 // There is no economy yet, and the menu must not pretend otherwise by opening an empty ledger.
 test('trading stays shut until something can trade', () => {
   eq(on(optionsFor({ canTrade: false })), []);
-  eq(on(optionsFor({ canTrade: true })), ['trade']);
+  // A trader has to be a specific counter now, not a boolean: the three keepers on the square are
+  // the only people who keep one, and `canTrade` without a shop behind it would open nothing.
+  eq(on(optionsFor({ canTrade: true })), []);
+  eq(on(optionsFor({ canTrade: true, tradeWith: 'shop.general' })), ['trade']);
 });

@@ -74,6 +74,9 @@ export class Interior {
     // outside has been promising all along. The ground floor gives up some height to pay for it.
     // A great hall is one room by definition: no loft, and the ceiling takes the whole wall.
     this.hall = !!opts.hall;
+    // 0 is a home. See SHOP_KIND — the number comes off the level document, because every param
+    // in js/editor/scene.js's house schema is a number with a range.
+    this.shop = this.hall ? 0 : Math.max(0, Math.min(SHOP_KIND.length - 1, Math.round(+opts.shop || 0)));
     this.fillK = 1;
     this.flames = [];
     this.sconces = [];
@@ -156,7 +159,11 @@ export class Interior {
     } else {
       shell(b, this, z, R);
       hearth(b, this);
-      furniture(b, this, z, R);
+      // A shop is the same room with a different life in it. A counter and three cupboards
+      // instead of a bed and a supper table — Aaron asked that the shops look like they have
+      // cupboards full of the relevant things, and a cupboard is one merged mass, not forty props.
+      if (this.shop) shopFurniture(b, this, z, R, SHOP_KIND[this.shop]);
+      else furniture(b, this, z, R);
       if (this.loft) buildStairs(b, this, R);
       this.glass = stainedGlass(this, z, opts);
     }
@@ -480,6 +487,8 @@ function bakeVertexLight(geo, I) {
 const smooth = (a, b, x) => THREE.MathUtils.smootherstep(x, a, b);
 
 const box = (w, h, d) => new THREE.BoxGeometry(w, h, d);
+// A rough stone. Six of these on a shelf is what an awakening stone looks like at two metres.
+const lump = r => new THREE.IcosahedronGeometry(r, 0);
 
 function shell(b, I, z, R) {
   const { rx, rz, fy, ceil, roomH, wallH } = I;
@@ -616,6 +625,123 @@ function furniture(b, I, z, R) {
   b.add('wood', box(0.78, 0.16, bl), T(rx - 0.5, fy + 0.24, -rz + bl / 2 + 0.25));
   b.add('cloth', box(0.74, 0.14, bl - 0.1), T(rx - 0.5, fy + 0.39, -rz + bl / 2 + 0.25));
   b.add('wood', box(0.82, 0.5, 0.09), T(rx - 0.5, fy + 0.25, -rz + 0.28));
+}
+
+// ── a shop ─────────────────────────────────────────────────────────────────────────────────
+// What `p.shop` on a house means. The index is what the level document carries; this is the only
+// place the names live, and js/editor/scene.js's label points at it.
+export const SHOP_KIND = ['', 'weapons', 'potions', 'general'];
+
+// One cupboard: a carcass, three shelves, and a mass of whatever this shop sells standing on
+// them. Everything is one merged batch — the whole cupboard costs the room three surfaces, not
+// forty objects — which is exactly the trade Aaron asked for.
+//
+// Drawn against a wall in the room's own frame. `face` is which way it opens: +1 for a cupboard
+// on the -x wall opening toward +x, -1 for the other side, and `along` runs it in z.
+function cupboard(b, I, { x, z, face, w = 1.9, kind, R }) {
+  const fy = I.fy;
+  const D = 0.52;             // how far it stands off the wall
+  const H = 2.05;
+  const dx = face * D / 2;
+
+  // carcass: two sides, a back, a top and a plinth
+  for (const s of [-1, 1]) b.add('wood', box(D, H, 0.09), T(x + dx, fy + H / 2, z + s * (w / 2)));
+  b.add('wood', box(0.07, H, w), T(x - face * 0.02, fy + H / 2, z));
+  b.add('wood', box(D + 0.14, 0.09, w + 0.2), T(x + dx, fy + H, z));
+  b.add('wood', box(D, 0.16, w), T(x + dx, fy + 0.08, z));
+
+  const shelves = [0.52, 1.06, 1.58];
+  for (const sy of shelves) b.add('wood', box(D - 0.05, 0.05, w - 0.06), T(x + dx, fy + sy, z));
+
+  // and what is on them
+  for (const [i, sy] of shelves.entries()) {
+    const top = fy + sy + 0.025;
+    if (kind === 'weapons') {
+      // Blades stood on end in a rack, and two hafts leaning. Grey against the timber, which is
+      // what says steel in a room with three surfaces in it.
+      const n = 5 + (i % 2);
+      for (let k = 0; k < n; k++) {
+        const zz = z - w / 2 + 0.22 + k * ((w - 0.4) / Math.max(1, n - 1));
+        const bl = span(R, 0.30, 0.46);
+        b.add('stone', box(0.05, bl, 0.10), T(x + dx, top + bl / 2, zz));
+        b.add('stone', new THREE.ConeGeometry(0.06, 0.10, 4).rotateY(Math.PI / 4), T(x + dx, top + bl + 0.05, zz));
+        b.add('cloth', box(0.055, 0.10, 0.06), T(x + dx, top + 0.05, zz));
+      }
+    } else if (kind === 'potions') {
+      // Bottles. The accent surface is the only colour in a cottage room, which is what makes a
+      // shelf of these read as glass rather than as more joinery.
+      const n = 7 + (i % 3);
+      for (let k = 0; k < n; k++) {
+        const zz = z - w / 2 + 0.16 + k * ((w - 0.3) / Math.max(1, n - 1));
+        const hh = span(R, 0.14, 0.26);
+        const rr = span(R, 0.045, 0.07);
+        b.add('cloth', new THREE.CylinderGeometry(rr, rr * 1.08, hh, 6), T(x + dx + span(R, -0.06, 0.06), top + hh / 2, zz));
+        b.add('cloth', new THREE.CylinderGeometry(rr * 0.42, rr * 0.5, 0.07, 5), T(x + dx + span(R, -0.06, 0.06), top + hh + 0.035, zz));
+      }
+    } else {
+      // Everything else: boxes, sacks and — on the middle shelf, because they are what anybody
+      // comes in here for — a short row of grey lumps under a bar.
+      const n = 3 + (i % 2);
+      for (let k = 0; k < n; k++) {
+        const zz = z - w / 2 + 0.28 + k * ((w - 0.56) / Math.max(1, n - 1));
+        if (i === 1) {
+          const rr = span(R, 0.075, 0.105);
+          const g = lump(rr);
+          g.scale(1, 0.82, 1.1);
+          b.add('stone', g, T(x + dx, top + rr * 0.8, zz, span(R, 0, 6.28)));
+          continue;
+        }
+        const bw = span(R, 0.20, 0.30);
+        const bh = span(R, 0.14, 0.24);
+        b.add('wood', box(0.3, bh, bw), T(x + dx, top + bh / 2, zz));
+        b.add('cloth', box(0.24, 0.03, bw * 0.8), T(x + dx, top + bh + 0.015, zz));
+      }
+    }
+  }
+  solid(I, x + dx, z, D / 2 + 0.07, w / 2 + 0.1, fy + H);
+}
+
+function shopFurniture(b, I, z, R, kind) {
+  const { rx, rz, fy } = I;
+
+  // The counter runs ACROSS the room, parallel to the back wall, so a player coming in through
+  // the door walks up to it. Along the other axis it is a plank down the middle of the floor that
+  // reads as a partition, which is what the first version looked like.
+  // Short enough that there is floor visible past both ends of it. At eight metres it stopped
+  // reading as a counter and started reading as a stage.
+  const len = Math.min(rx * 1.05, 5.6);
+  const cx = rx * 0.12;
+  const cz = -rz * 0.12;
+  const ch = 0.94;
+  b.add('wood', box(len, 0.09, 0.86), T(cx, fy + ch, cz));
+  b.add('wood', box(len - 0.06, ch - 0.09, 0.72), T(cx, fy + (ch - 0.09) / 2, cz + 0.05));
+  b.add('wood', box(len + 0.12, 0.07, 0.94), T(cx, fy + ch - 0.30, cz));
+  for (const s of [-1, 1]) b.add('wood', box(0.1, 0.1, 0.9), T(cx + s * (len / 2), fy + ch + 0.05, cz));
+  solid(I, cx, cz, len / 2, 0.48, fy + ch);
+
+  // Two cupboards on the +x wall behind the counter and one on the -x wall past the hearth, where
+  // the player walks straight by it on the way in.
+  cupboard(b, I, { x: rx - 0.30, z: -rz * 0.42, face: -1, w: 2.0, kind, R });
+  cupboard(b, I, { x: rx - 0.30, z: rz * 0.36, face: -1, w: 1.8, kind, R });
+  cupboard(b, I, { x: -rx + 0.30, z: -rz * 0.55, face: 1, w: 1.7, kind, R });
+
+  // A barrel and two crates in the corner by the door, so the bit of floor the player arrives on
+  // is not bare boards.
+  const bz = rz - 1.25;
+  b.add('wood', new THREE.CylinderGeometry(0.36, 0.30, 0.86, 8), T(-rx + 0.95, fy + 0.43, bz));
+  for (const [i, sy] of [0.0, 0.52].entries()) {
+    b.add('wood', box(0.62, 0.5, 0.58), T(-rx + 0.88 + i * 0.09, fy + 0.25 + sy, bz - 1.05, span(R, -0.2, 0.2)));
+  }
+  solid(I, -rx + 0.9, bz - 0.5, 0.5, 1.2, fy + 0.9);
+
+  // A stool behind the counter. The keeper never sits on it; it is there because a room somebody
+  // works in all day has one.
+  const sx = cx - len * 0.3, sz = cz - 1.0;
+  b.add('wood', new THREE.CylinderGeometry(0.17, 0.16, 0.06, 8), T(sx, fy + 0.44, sz));
+  for (let i = 0; i < 3; i++) {
+    const a = (i / 3) * Math.PI * 2;
+    b.add('wood', box(0.05, 0.42, 0.05), T(sx + Math.cos(a) * 0.11, fy + 0.21, sz + Math.sin(a) * 0.11));
+  }
 }
 
 // ── the leaded light, and the sun through it ────────────────────────────────────────────────

@@ -39,7 +39,7 @@ export function spawn(at, tuning = EARTH) {
     x: at.x, z: at.z, yaw: at.yaw ?? 0,
     hp: tuning.hp, max: tuning.hp,
     state: 'idle', t: 0, since: 0, hitId: 0, struck: false,
-    onDirt: false, mended: 0,
+    onDirt: false, mended: 0, held: 0,
   };
 }
 
@@ -57,6 +57,9 @@ export function step(f, dt, w, tuning = EARTH) {
   t += dt;
   since += dt;
   let struck = false;
+  // A snare (js/game/items.js's rope) holds it exactly where it is. Longer than a stagger and,
+  // unlike one, not something a hit can chain: `held` only ever comes from snare().
+  const held = Math.max(0, (f.held || 0) - dt);
 
   // Standing on soil is the whole of the fight. It mends whatever state it is in — including mid
   // windup — but not for `regenDelay` after being cut, or a knife can never get ahead of it.
@@ -74,7 +77,8 @@ export function step(f, dt, w, tuning = EARTH) {
     yaw += clamp(wrapPi(want - yaw), -T.turn * dt, T.turn * dt);
   }
 
-  switch (state) {
+  if (held > 0) { state = 'stagger'; t = 0; }
+  else switch (state) {
     case 'idle':
       if (alive && d < T.notice) { state = 'chase'; t = 0; }
       break;
@@ -114,7 +118,7 @@ export function step(f, dt, w, tuning = EARTH) {
   // state means a long frame cannot throw two and a stalled one cannot throw none.
   struck = state === 'strike' && f.state !== 'strike';
 
-  return { ...f, x, z, yaw, hp, state, t, since, struck, onDirt, mended };
+  return { ...f, x, z, yaw, hp, state, t, since, struck, onDirt, mended, held };
 }
 
 // A hit from the player. `id` is the swing's own number so one swing cannot land twice, which is
@@ -127,6 +131,13 @@ export function wound(f, amount, id = 0) {
   // delay, and it is the only thing that lets a knife get ahead of eight and a half a second.
   const state = hp <= 0 ? 'dead' : (f.state === 'windup' ? 'stagger' : f.state);
   return { ...f, hp, hitId: id || f.hitId, since: 0, state, t: state === f.state ? f.t : 0, struck: false };
+}
+
+// Roped. Not a hit — it does no damage and does not restart the regeneration delay, so a snared
+// thing standing on soil goes on mending. What it buys is the windup it is not throwing.
+export function snare(f, seconds) {
+  if (f.state === 'dead') return f;
+  return { ...f, held: Math.max(f.held || 0, Math.max(0, +seconds || 0)), state: 'stagger', t: 0, struck: false };
 }
 
 export const fraction = f => (f.max > 0 ? f.hp / f.max : 0);

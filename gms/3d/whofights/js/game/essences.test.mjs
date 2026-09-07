@@ -92,12 +92,24 @@ test('choosing gives you four abilities, one from each', () => {
   for (const a of got) ok(a.name && a.text, a.id);
 });
 
-test('the first ability of each essence is the one you get', () => {
+// Registration used to hand out each essence's FIRST ability, which made two players who took the
+// same three essences the same adventurer. It is a draw now — from that essence's own list, still
+// exactly one per row — because there are more abilities in an essence than anyone can claim and
+// that is the whole point of there being more.
+test('one ability from each essence, drawn from that essence', () => {
   for (const id of ids(doc)) {
     const got = awaken(doc, [id, 'fire', 'water']).find(a => a.from === id);
     if (!got) continue;
-    eq(got.id, doc.essences[id].abilities[0].id, `${id} awakened the wrong one`);
+    ok(doc.essences[id].abilities.some(a => a.id === got.id), `${id} awakened something it does not have`);
   }
+});
+
+test('the draw is a draw — a different roll gives a different sheet', () => {
+  const first = awaken(doc, ['fire', 'water', 'wind'], () => 0).map(a => a.id);
+  const last = awaken(doc, ['fire', 'water', 'wind'], () => 0.999).map(a => a.id);
+  eq(first.length, 4);
+  eq(last.length, 4);
+  ok(first.join() !== last.join(), 'both ends of the roll gave the same four');
 });
 
 test('resolve is the whole answer, in the shape the save keeps', () => {
@@ -133,7 +145,11 @@ test('a save naming an essence that no longer exists still opens', () => {
   const h = held(doc, { picked: ['fire', 'mithril', 'water'], confluence: 'nope', abilities: ['fire.brand'] });
   ok(h, 'the sheet refused to open');
   eq(h.rows.filter(r => !r.confluence).length, 2, 'the two real ones survived');
-  ok(h.confluence, 'it fell back to the tag rule for the confluence');
+  // The tag rules are gone — every triple has a confluence of its own now — so this is the
+  // generator composing one from the two essences that are left rather than the sheet losing a
+  // quarter of the player because a table moved on.
+  ok(h.confluence, 'the fourth row went missing when one essence was dropped');
+  eq(h.confluence.abilities.length >= 5, true, 'and it has enough in it to claim five from');
 });
 
 test('a table with no catch-all says so rather than resolving to nothing', () => {

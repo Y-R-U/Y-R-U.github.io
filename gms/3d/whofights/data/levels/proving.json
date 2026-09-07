@@ -322,6 +322,7 @@
       "keep": 6
     }
   ],
+  "loaner": "knife",
   "foes": [
     {
       "kind": "earth",

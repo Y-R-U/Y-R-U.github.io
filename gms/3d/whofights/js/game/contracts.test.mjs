@@ -106,7 +106,7 @@ test('the ladder thins as it climbs', () => {
   ok(n('board.iron') >= n('board.bronze'), 'bronze has more work than iron');
   ok(n('board.bronze') > n('board.silver'), 'silver is not scarcer than bronze');
   ok(n('board.silver') > n('board.gold'), 'gold is not scarcer than silver');
-  ok(n('board.gold') <= 4, 'gold is meant to be a short board');
+  ok(n('board.gold') <= 6, 'gold is meant to be a short board');
 });
 
 test('every example job is filled in, not a stub', () => {

@@ -18,8 +18,8 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../.
 const COPY = path.resolve(ROOT, '../.wf-convotest');
 const OUT = process.argv[2] || '/tmp/wf-convoshots';
 const PORT = 8797;
-const NODE = 'academy.uitest.hello';
-const CLIP = 'academy_uitest_hello_01';
+const NODE = 'society.uitest.hello';
+const CLIP = 'society_uitest_hello_01';
 
 let fails = 0;
 const check = (cond, what) => { console.log(`${cond ? ' ok ' : 'FAIL'}  ${what}`); if (!cond) fails++; };
@@ -101,14 +101,14 @@ await sleep(500);
 await p.eval(`(()=>{const i=[...document.querySelectorAll('#wf-dev input[type=text]')].find(x=>x.placeholder==='what the player says');
   i.value='Who pins the contracts up?'; i.dispatchEvent(new Event('input',{bubbles:true}));})()`);
 await sleep(300);
-await pick('#wf-dev .convo-choice select', 0, 'academy.greeter.who');
-check((await pack())[NODE].choices[0].goto === 'academy.greeter.who', 'the choice branches to a real node');
+await pick('#wf-dev .convo-choice select', 0, 'society.greeter.floors');
+check((await pack())[NODE].choices[0].goto === 'society.greeter.floors', 'the choice branches to a real node');
 
 await pick('#wf-dev .convo-choice .convo-pred select', 0, 'flag');
 await p.eval(`(()=>{const i=document.querySelector('#wf-dev .convo-pred input[type=text]');
-  i.value='academy.met.vail'; i.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+  i.value='society.met.registrar'; i.dispatchEvent(new Event('input',{bubbles:true}));})()`);
 await sleep(400);
-check(JSON.stringify((await pack())[NODE].choices[0].if) === '["flag","academy.met.vail",true]',
+check(JSON.stringify((await pack())[NODE].choices[0].if) === '["flag","society.met.registrar",true]',
   'the if predicate is one predicate.js knows');
 await p.shot(`${OUT}/3-node.png`);
 
@@ -119,7 +119,7 @@ await p.clickText('#wf-dev .convo-new button', 'Turn into a full character');
 await sleep(700);
 const promoted = (await cast()).stable_hand;
 check(promoted?.body === 'robed', 'promotion sets body: robed');
-check(promoted?.place?.level === 'academy' && Number.isFinite(promoted?.place?.z), 'and gives it a place');
+check(promoted?.place?.level === 'society' && Number.isFinite(promoted?.place?.z), 'and gives it a place');
 check(promoted?.voice === madeVoice && promoted?.name === 'Stable hand', 'and changes nothing else');
 
 await p.eval(`document.querySelector('#wf-dev .convo-editor').scrollTop = 99999`);
@@ -132,7 +132,7 @@ await p.clickText('#wf-dev button', 'Next ▸');
 await sleep(500);
 check(/— end —/.test(await transcript()) && !(await p.eval(`!!document.querySelector('#wf-dev .convo-choicebtn')`)),
   'with the flag off the gated choice never appears and the node just ends');
-await p.eval(`(()=>{const c=[...document.querySelectorAll('#wf-dev .convo-flags label')].find(l=>l.textContent.includes('academy.met.vail')).querySelector('input');
+await p.eval(`(()=>{const c=[...document.querySelectorAll('#wf-dev .convo-flags label')].find(l=>l.textContent.includes('society.met.registrar')).querySelector('input');
   c.checked=true; c.dispatchEvent(new Event('change',{bubbles:true}));})()`);
 await p.clickText('#wf-dev button', '▶ Play it');
 await sleep(400);
@@ -143,7 +143,7 @@ await sleep(500);
 check(await p.eval(`!!document.querySelector('#wf-dev .convo-choicebtn')`), 'with the flag set the choice appears');
 await p.clickText('#wf-dev .convo-choicebtn', '▸');
 await sleep(500);
-check(/academy.greeter.who/.test(await transcript()), 'taking it walks on into the node it goes to');
+check(/society.greeter.floors/.test(await transcript()), 'taking it walks on into the node it goes to');
 await p.shot(`${OUT}/5-play.png`);
 await p.clickText('#wf-dev button', 'Transcript');
 await sleep(500);
@@ -184,16 +184,33 @@ if (status.kokoro) {
 
 await p.clickText('#wf-dev nav button', 'Status');
 await sleep(600);
-await p.eval(`window.__wfConvo.open('academy.greeter.contracts')`);
+await p.eval(`window.__wfConvo.open('society.greeter.contracts')`);
 await p.clickText('#wf-dev nav button', 'Conversations');
 await sleep(1200);
-check(await p.eval(`window.__wfConvo.nodeId === 'academy.greeter.contracts'`),
+check(await p.eval(`window.__wfConvo.nodeId === 'society.greeter.contracts'`),
   'a node id handed over before the tab opens lands on that node');
-await p.eval(`window.__wfConvo.open('academy.nosuch.node')`);
+await p.eval(`window.__wfConvo.open('society.nosuch.node')`);
 await sleep(600);
 check(/does not exist yet/.test(await p.eval(`document.querySelector('#wf-dev .banner')?.textContent || ''`)),
   'an unknown node id offers to create it');
 await p.shot(`${OUT}/7-handoff.png`);
+
+// Put the scratch node away again before holding the file to the game's own standard. An orphan
+// node is precisely what conversations.test.mjs 'every node is reachable' exists to catch, and a
+// node this tab has only just created is an orphan by definition — so the last thing the tab is
+// asked to do is delete it, which is also the only test Delete gets.
+await p.eval(`window.__wfConvo.open(${JSON.stringify(NODE)})`);
+await sleep(500);
+await p.clickText('#wf-dev button', 'Delete');
+await sleep(500);
+// The confirm is a `.convo-new` card with a `.danger` button on it — js/dev/convo/dom.js
+// promptCard(), the same card Rename and New use.
+check(await p.eval(`!!document.querySelector('#wf-dev .convo-new button.danger')`), 'and asks first');
+await p.eval(`document.querySelector('#wf-dev .convo-new button.danger').click(), true`);
+await sleep(900);
+check(!(await pack())[NODE], 'the tab can delete a node again');
+await p.clickText('#wf-dev button', 'Save');
+await sleep(1400);
 
 const t = spawnSync(process.execPath, [path.join(COPY, 'tools/test.mjs'), 'conversations'], { cwd: COPY, encoding: 'utf8' });
 check(t.status === 0, `the game still reads the file the tool wrote — ${(t.stdout || '').trim().split('\n').pop()}`);

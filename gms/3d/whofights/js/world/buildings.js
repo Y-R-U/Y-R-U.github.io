@@ -409,7 +409,7 @@ export function tower(zoneId, { radius = 4, height = 18, sides = 16, seed: sv = 
   return finish(b, g, zoneId);
 }
 
-export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, floors = 1, seed: sv = 0 } = {}) {
+export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, floors = 1, shop = 0, seed: sv = 0 } = {}) {
   const z = zone(zoneId);
   const R = seed(sv, w, d, h);
   const dressed = R() < 0.55;
@@ -636,7 +636,7 @@ export function house(zoneId, { w = 8, d = 7, h = 6, hall = 0, floors = 1, seed:
     addChimney(b, R, { m: T(cx, wallTop + rise - 0.6, cz), w: 1.35, h: span(R, 2.55, 4.65), surface: S.wall, cap: S.trim });
   }
 
-  g.userData = { kind: 'house', zoneId, w, d, h, t, plinth, wallTop, hall: !!hall, floors: ST ? ST.n : 1, door };
+  g.userData = { kind: 'house', zoneId, w, d, h, t, plinth, wallTop, hall: !!hall, floors: ST ? ST.n : 1, shop: shop | 0, door };
   return finish(b, g, zoneId);
 }
 

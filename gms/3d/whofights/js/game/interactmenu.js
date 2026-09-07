@@ -13,7 +13,7 @@ const LABEL = { spell: 'Cast a spell', talk: 'Talk', trade: 'Trade offer' };
 
 // What a press at a point can answer. Pure over the little the menu needs to know, so the rule
 // about which entries appear is testable without a DOM or a raycaster.
-export function optionsFor({ target, abilities = [], canTrade = false }) {
+export function optionsFor({ target, abilities = [], canTrade = false, tradeWith = null }) {
   const out = [];
   out.push({
     id: 'spell',
@@ -27,13 +27,15 @@ export function optionsFor({ target, abilities = [], canTrade = false }) {
     note: target?.name || 'Nobody in reach',
     enabled: !!target,
   });
+  // `tradeWith` is a shop id if whoever is under the pointer keeps one. The three keepers on the
+  // square are the only people in the game who do, so everywhere else this stays honestly shut
+  // rather than opening an empty ledger and letting the player conclude the game is broken.
+  const shop = canTrade ? tradeWith : null;
   out.push({
     id: 'trade',
     label: LABEL.trade,
-    // There is no economy yet. Saying so is better than opening an empty ledger and letting the
-    // player conclude the game is broken.
-    note: canTrade ? 'Offer marks or goods' : 'Nobody here trades yet',
-    enabled: canTrade,
+    note: shop ? `Look over the counter` : 'Nobody here trades',
+    enabled: !!shop,
   });
   return out;
 }

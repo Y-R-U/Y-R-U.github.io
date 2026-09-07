@@ -114,6 +114,33 @@ export function award(flags = {}, amount) {
   };
 }
 
+// Going down costs you a star. Aaron's son asked for exactly that, and the honest reading of it
+// is "back to where the star you just earned began" rather than a flat subtraction — a fixed
+// number of experience means the same death costs a bronze adventurer a tenth of what it costs an
+// iron one, and past a rank's fourth star it would cost nothing at all.
+//
+// You are never demoted and you never fall below the rank's own floor. Losing a rank to one bad
+// contract would mean losing the FLOOR of the building you are allowed to walk on, and a player
+// standing on a stair they can no longer climb is a punishment nobody asked for.
+export function loseStar(flags = {}) {
+  const rank = rankOf(flags);
+  if (rank === 'none') return null;
+  const steps = stepsOf(rank);
+  const before = sheet(flags);
+  // The bottom of the star below the one you are on. At no stars there is nothing left to take.
+  const to = Math.max(steps[0], steps[Math.max(0, before.stars - 1)]);
+  const xp = Math.min(xpOf(flags), to);
+  const after = sheet({ ...flags, [XP_FLAG]: xp });
+  return {
+    xp,
+    lost: xpOf(flags) - xp,
+    starLost: after.stars < before.stars,
+    rank,
+    before,
+    after,
+  };
+}
+
 // The Society promoting you, which is a separate act from earning the stars: you are eligible at
 // four stars and ranked when somebody at a desk says so. Experience carries across — the next
 // rung's ladder simply starts a long way up.

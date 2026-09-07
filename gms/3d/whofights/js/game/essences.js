@@ -9,7 +9,18 @@
 //
 // One ability from each of the four to begin with — DEV_CONTRACT §12. The rest are awakened later.
 
+import { SLOTS } from './save.js';
+import { confluenceFor as composeConfluence, registry as confluenceRegistry } from './confluence.js';
+import { KINDS as SPELL_KINDS } from './spells.js';
+
 export const PICK = 3;
+
+// The most anyone can claim from one essence, and therefore — four essences, the three picked and
+// the confluence they come to — the most anyone can hold. SLOTS is the same number seen from the
+// keyboard's end (js/game/save.js), and they are the same number on purpose: every ability you
+// have has a key, and every key has an ability on it once you are done.
+export const MAX_PER_ESSENCE = 5;
+export const MAX_ABILITIES = SLOTS;
 
 const asId = v => (typeof v === 'string' ? v : '');
 
@@ -29,6 +40,9 @@ export function normalise(raw) {
       name: String(e.name || id),
       colour: typeof e.colour === 'string' ? e.colour : '#888888',
       tags: Array.isArray(e.tags) ? e.tags.filter(t => typeof t === 'string') : [],
+      // The words this essence lends to a confluence's name — see js/game/confluence.js. An
+      // essence with none falls back to its own name there, so this is allowed to be absent.
+      words: Array.isArray(e.words) ? e.words.filter(w => typeof w === 'string' && w) : [],
       blurb: String(e.blurb || ''),
       // What it looks like coming out of a hand — js/game/spells.js reads this and nothing else
       // does. Kept verbatim rather than field-by-field: the shape names and the palette are that
@@ -65,8 +79,9 @@ export function normalise(raw) {
 
 export const ids = doc => Object.keys(doc?.essences || {});
 
-// Every tag the three carry, counted. A triple of two elementals and a destructive scores against
-// a rule that wants exactly that, and the best score wins.
+// Every tag the three carry, counted. The tag rules it used to feed are gone — every triple has a
+// confluence of its own now (js/game/confluence.js) — but the count itself is what the picker uses
+// to tell a player what they are building, so it stays.
 export function tally(doc, triple) {
   const out = {};
   for (const id of triple) {
@@ -75,33 +90,23 @@ export function tally(doc, triple) {
   return out;
 }
 
-// The one rule. An exact entry always wins; otherwise the entry whose `needs` are all met, by the
-// widest margin, in document order. A `needs` of `{}` matches everything at score zero, which is
-// what makes the catch-all a catch-all rather than a special case in the loop.
+// The one rule, and it changed: EVERY triple has a confluence of its own now.
+//
+// It used to be "an exact entry wins, otherwise the tag rule that matches by the widest margin",
+// which meant the five tag rules were shared between roughly two hundred triples — take any two
+// entropic essences and you were an Attrition, whichever two. Aaron's son asked for a unique
+// confluence for each combination, and js/game/confluence.js is the answer: the seventeen the
+// registry has on file keep their authored writing and win on their own triple, and every other
+// triple is composed, deterministically, from the three that made it.
+//
+// This function is kept as the way in because six other modules call it and every one of them
+// wants the same thing: what did these three come to?
 export function confluenceFor(doc, picked) {
-  const triple = key(picked);
-  if (!triple.length) return null;
-  const named = doc.confluences.find(c => c.exact && sameSet(c.exact, triple));
-  if (named) return named;
-  const have = tally(doc, triple);
-  let best = null, bestScore = -1;
-  for (const c of doc.confluences) {
-    // An entry with no `exact` and no `needs` is the catch-all, and it has to stay in this loop
-    // rather than be skipped by it: it matches everything at score zero, which is exactly what
-    // makes it the last resort instead of a special case after the loop. Skipping it was a real
-    // bug — fire + void + blood satisfies no tag rule and resolved to nothing at all.
-    if (c.exact) continue;
-    let score = 0, ok = true;
-    for (const [tag, n] of Object.entries(c.needs || {})) {
-      if ((have[tag] || 0) < n) { ok = false; break; }
-      score += n;
-    }
-    if (ok && score > bestScore) { best = c; bestScore = score; }
-  }
-  return best;
+  return composeConfluence(doc, picked);
 }
 
-const sameSet = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
+// Every triple this table can make, with the name each one resolves to. The test walks it.
+export const confluences = doc => confluenceRegistry(doc);
 
 // Is this a legal choice? Said as a reason rather than a boolean, because the picker has to put
 // something on screen when it is not.
@@ -113,23 +118,54 @@ export function checkPick(doc, picked) {
   return null;
 }
 
-// What the four of them give you at registration: the first ability of each, which is each
-// essence's signature one. The rest are awakened later, with stones the Society does not hand out.
-export function awaken(doc, picked) {
+// What the four of them give you at registration: one from each, chosen at random rather than
+// always the first. Two players who take the same three essences should not be the same
+// adventurer — that is the whole reason there are more abilities in an essence than anyone can
+// claim from it.
+//
+// `rnd` is injectable so the test can walk it and so a save can be replayed; nothing in the game
+// passes one.
+export function awaken(doc, picked, rnd = Math.random) {
   const triple = key(picked);
   const conf = confluenceFor(doc, triple);
+  const rows = [...triple.map(id => doc.essences[id]), conf];
   const out = [];
-  for (const id of triple) {
-    const a = doc.essences[id]?.abilities?.[0];
-    if (a) out.push({ ...a, from: id, fromName: doc.essences[id].name });
+  const draw = (row, confluence) => {
+    const list = row?.abilities || [];
+    if (!list.length) return;
+    const a = list[Math.min(list.length - 1, Math.floor(rnd() * list.length))];
+    out.push({ ...a, from: row.id, fromName: row.name, confluence });
+  };
+  for (const [i, row] of rows.entries()) draw(row, i === rows.length - 1);
+
+  // One of the four has to be something you can THROW.
+  //
+  // The draw is random and ten of the twelve essences have three or four defensive and utility
+  // abilities in them, so about one opening hand in eight came out as four wards and a step —
+  // nothing that could hurt anything at range. That is survivable, because you have a weapon, and
+  // it is still a rotten first hour: every one of the four keys does something you cannot see.
+  // A driven test drew exactly that hand and it is why this is here.
+  if (!out.some(canThrow)) {
+    for (const [i, row] of rows.entries()) {
+      const pool = (row?.abilities || []).filter(canThrow);
+      if (!pool.length) continue;
+      const a = pool[Math.min(pool.length - 1, Math.floor(rnd() * pool.length))];
+      out[i] = { ...a, from: row.id, fromName: row.name, confluence: i === rows.length - 1 };
+      break;
+    }
   }
-  const c = conf?.abilities?.[0];
-  if (c) out.push({ ...c, from: conf.id, fromName: conf.name, confluence: true });
   return out;
 }
 
+// Does this ability arrive somewhere you were pointing and do damage when it gets there?
+// js/game/spells.js owns the ten kinds; this is the one question anything outside it asks.
+const canThrow = a => {
+  const k = SPELL_KINDS[a?.kind];
+  return !!k && k.aim === 'bolt' && k.damage > 0;
+};
+
 // The whole result of choosing, in the shape the save keeps it in.
-export function resolve(doc, picked) {
+export function resolve(doc, picked, rnd = Math.random) {
   const why = checkPick(doc, picked);
   if (why) return { ok: false, why, picked: key(picked), confluence: null, abilities: [] };
   const triple = key(picked);
@@ -138,15 +174,65 @@ export function resolve(doc, picked) {
     ok: true, why: null, picked: triple,
     confluence: conf ? conf.id : null,
     confluenceName: conf ? conf.name : null,
-    abilities: awaken(doc, triple).map(a => a.id),
+    abilities: awaken(doc, triple, rnd).map(a => a.id),
   };
+}
+
+// ── awakening ───────────────────────────────────────────────────────────────
+// An awakening stone wakes one ability. Which one is not a choice — that is the whole of what the
+// stones are for, and it is why the sheet is different every time somebody starts again.
+
+// The four rows a player's essences come to: the three picked and the confluence they resolve to.
+// One helper because three places need exactly this list and each of them getting it slightly
+// wrong is how a confluence ability ends up unreachable.
+export function rowsOf(doc, saved) {
+  const picked = key(saved?.picked || []);
+  const out = [];
+  for (const id of picked) if (doc.essences[id]) out.push(doc.essences[id]);
+  const conf = picked.length ? confluenceFor(doc, picked) : null;
+  if (conf) out.push(conf);
+  return out;
+}
+
+// Every ability still to wake, per row, with the per-essence cap already applied. A row that is
+// full contributes nothing, which is what makes a stone useless only when ALL of them are full.
+export function unawakened(doc, saved) {
+  const owned = new Set(saved?.abilities || []);
+  const out = [];
+  for (const r of rowsOf(doc, saved)) {
+    const held = r.abilities.filter(a => owned.has(a.id)).length;
+    if (held >= MAX_PER_ESSENCE) continue;
+    for (const a of r.abilities) if (!owned.has(a.id)) out.push({ ...a, from: r.id, fromName: r.name, confluence: !doc.essences[r.id] });
+  }
+  return out;
+}
+
+// Is there anything left to wake? The stone refuses when there is not — see js/game/items.js.
+export const allAwakened = (doc, saved) => unawakened(doc, saved).length === 0;
+
+// The most this player will ever hold, which is 20 for a full table and less for a thin one. Said
+// out loud so the sheet and the Bronze gate can both ask rather than assume.
+export function capacity(doc, saved) {
+  return rowsOf(doc, saved).reduce((n, r) => n + Math.min(MAX_PER_ESSENCE, r.abilities.length), 0);
+}
+
+// Wake one, at random, from a random essence that has room. Random across the whole pool rather
+// than "pick an essence then pick an ability in it": the second is subtly biased toward whichever
+// essence has fewest left, and the point is that you cannot steer it.
+export function awakenOne(doc, saved, rnd = Math.random) {
+  const pool = unawakened(doc, saved);
+  if (!pool.length) return null;
+  return pool[Math.min(pool.length - 1, Math.floor(rnd() * pool.length))];
 }
 
 // Everything the player has, for the sheet. Reads the save, not the picker.
 export function held(doc, saved) {
   const picked = key(saved?.picked || []);
   if (!picked.length) return null;
-  const conf = doc.confluences.find(c => c.id === saved?.confluence) || confluenceFor(doc, picked);
+  // Always composed, never the raw authored row: an authored confluence carries three abilities
+  // in the file and ten once js/game/confluence.js has filled out the ladder, and the sheet must
+  // show the ten it can actually awaken.
+  const conf = confluenceFor(doc, picked);
   const owned = new Set(saved?.abilities || []);
   const rows = [];
   for (const id of picked) {
