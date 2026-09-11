@@ -125,5 +125,6 @@ Some projects have their own `CLAUDE.md` with architecture details:
 - `/games/CLAUDE.md` — **the games.br8t.com hub + the shared account layer** (see above)
 - `/gms/3d/crowd/CLAUDE.md` — Crowd Rush 3D (Three.js, multi-file)
 - `/gms/2d/paperant/claude.md` — Paper Ant puzzle game
+- `/gms/3d/tidekeeper/CLAUDE.md` — Tidekeeper aquarium sim (single HTML file; read before touching the chemistry)
 
 When working on a specific project, read its `CLAUDE.md` first if present.
