@@ -77,13 +77,16 @@ export class Orbit {
     const [W, H, D] = dims;
     this.goal.set(0, H * 0.48, 0);
     this.distG = this.fitDistance();
-    this.maxD = Math.max(W, D) * 4;
+    this.maxD = Math.max(W, D) * 4 + 26;
     if (instant) { this.tgt.copy(this.goal); this.dist = this.distG; }
   }
+  /** Only correct a view that has become useless, never fight a deliberate one.
+      The player is allowed to pull back far enough to see the room. */
   refit() {
     if (this.follow) return;
     const want = this.fitDistance();
-    if (this.distG > want * 0.5) this.distG = clamp(this.distG, want * 0.85, want * 1.25);
+    if (this.distG < want * 0.30) this.distG = want;
+    this.maxD = Math.max(this.dims[0], this.dims[2]) * 4 + 26;
   }
   setFollow(f) { this.follow = f; this.followT = 0; }
   update(dt) {

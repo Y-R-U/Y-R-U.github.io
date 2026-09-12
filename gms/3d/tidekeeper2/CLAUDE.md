@@ -87,6 +87,22 @@ deliberately dark for the same reason: a pale floor bounces light everywhere
 and flattens the fish. `assets/tex/ref_*.jpg` are art-direction references,
 gitignored, not shipped.
 
+## The room
+
+The tank is the only light source in a dark room, and that contrast is most of
+why photographs of aquariums look the way they do. Two things to know:
+
+- **The pools of light on the wall and floor are painted, not lit.** three has
+  no per-object light masking — `light.layers` is tested against the *camera*,
+  not per object — so any point light bright enough to wash the wall also
+  washes out the inside of the tank. `glowBack` and `glowFloor` are additive
+  quads instead; only one weak point light picks out the cabinet face.
+- `Orbit.refit()` deliberately does **not** clamp a deliberate view any more.
+  It only rescues a camera that has ended up too close to see anything, so the
+  player can pull right back and look at the room.
+
+Plant scale is clamped to `dims[1] * 0.86` so nothing grows out through the lid.
+
 Balance facts worth re-proving after any change to the sim:
 - A betta plus six neons in the 10 gallon starter is over capacity, and the
   warning fires before anything dies.

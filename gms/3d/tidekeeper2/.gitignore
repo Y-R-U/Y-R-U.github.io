@@ -1,3 +1,6 @@
 node_modules/
 tools/out/
 assets/tex/ref_*.jpg
+# generated but unused: caustics are procedural, and the generated tile
+# has an implied centre and does not repeat
+assets/tex/caustics.jpg

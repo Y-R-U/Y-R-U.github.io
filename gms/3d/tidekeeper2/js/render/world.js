@@ -53,12 +53,14 @@ export class World {
     this.amb = new THREE.AmbientLight(0x4a6d8c, 1.15);
     this.scene.add(this.amb);
     /* the room */
-    this.room = new THREE.PointLight(0xffc287, 60, 120, 0.7);
-    this.room.position.set(-11, 10, 16);
-    this.room2 = new THREE.PointLight(0x7fb8e0, 26, 90, 0.8);
-    this.room2.position.set(10, 4, 16);
-    this.scene.add(this.room2);
+    this.room = new THREE.PointLight(0xffc287, 22, 120, 0.9);
+    this.room.position.set(-13, 11, 18);
     this.scene.add(this.room);
+    /* A light in the room would also light the inside of the tank, so the
+       pool the tank throws on the wall and the floor is painted rather than
+       lit. One weak point light picks out the cabinet face. */
+    this.spill = new THREE.PointLight(0xbfe8ff, 30, 26, 1.4);
+    this.scene.add(this.spill);
     this.moon = new THREE.DirectionalLight(0x8ac6ff, 0);
     this.moon.position.set(-2, 8, 3);
     this.scene.add(this.moon);
@@ -67,26 +69,52 @@ export class World {
   buildRoom() {
     const wallTex = photo('wall', { repeat: 4, fallback: wallFallback });
     const wallMat = new THREE.MeshStandardMaterial({
-      map: wallTex, normalMap: derivedNormal(wallTex, 0.5, 4), color: 0x2f3a45, roughness: 0.96 });
-    const back = new THREE.Mesh(new THREE.PlaneGeometry(90, 58), wallMat);
-    back.position.set(0, 14, -18);
+      map: wallTex, normalMap: derivedNormal(wallTex, 0.5, 4), color: 0x5d6b76, roughness: 0.97 });
+    const back = new THREE.Mesh(new THREE.PlaneGeometry(70, 46), wallMat);
+    back.position.set(0, 11, -13);
     this.root.add(back);
     for (const s of [1, -1]) {
-      const w = new THREE.Mesh(new THREE.PlaneGeometry(50, 58), wallMat);
-      w.position.set(s * 22, 14, 4); w.rotation.y = -s * Math.PI / 2;
+      const w = new THREE.Mesh(new THREE.PlaneGeometry(40, 46), wallMat);
+      w.position.set(s * 18, 11, 6); w.rotation.y = -s * Math.PI / 2;
       this.root.add(w);
     }
     const floorTex = photo('wall', { repeat: 9, fallback: wallFallback });
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(160, 160),
-      new THREE.MeshStandardMaterial({ map: floorTex, color: 0x272d33, roughness: 0.88, metalness: 0.06 }));
+      new THREE.MeshStandardMaterial({ map: floorTex, color: 0x4c443b, roughness: 0.80, metalness: 0.04 }));
     floor.rotation.x = -Math.PI / 2; floor.position.y = -7;
     this.root.add(floor); this.floor = floor;
 
     const oakTex = photo('oak', { repeat: 2, fallback: oakFallback });
-    this.cabinet = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshStandardMaterial({ map: oakTex, normalMap: derivedNormal(oakTex, 0.8, 2),
-        color: 0x55463a, roughness: 0.58, metalness: 0.06 }));
+    const oakMat = new THREE.MeshStandardMaterial({ map: oakTex, normalMap: derivedNormal(oakTex, 0.8, 2),
+      color: 0x8a7154, roughness: 0.58, metalness: 0.06 });
+    const doorMat = new THREE.MeshStandardMaterial({ map: oakTex, color: 0x6f5c46, roughness: 0.62 });
+    this.cabinet = new THREE.Group();
+    this.cabBody = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), oakMat);
+    this.cabTop = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), oakMat);
+    this.cabinet.add(this.cabBody, this.cabTop);
+    this.cabLegs = []; this.cabDoors = [];
+    for (let i = 0; i < 4; i++) { const l = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), oakMat);
+      this.cabLegs.push(l); this.cabinet.add(l); }
+    for (let i = 0; i < 2; i++) { const d = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), doorMat);
+      this.cabDoors.push(d); this.cabinet.add(d); }
     this.root.add(this.cabinet);
+
+    /* the painted pools of light */
+    const glowMat = () => new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+      uniforms: { uA: { value: 0.4 }, uCol: { value: new THREE.Color(0xa8dcff) } },
+      vertexShader: `varying vec2 vU; void main(){ vU = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+      fragmentShader: `varying vec2 vU; uniform float uA; uniform vec3 uCol;
+        void main(){ float d = length((vU - 0.5) * vec2(1.0, 1.25)) * 2.0;
+          float a = pow(max(0.0, 1.0 - d), 2.6) * uA;
+          gl_FragColor = vec4(uCol, a); }`,
+    });
+    this.glowBack = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), glowMat());
+    this.glowFloor = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), glowMat());
+    this.glowFloor.rotation.x = -Math.PI / 2;
+    this.glowBack.renderOrder = -1; this.glowFloor.renderOrder = -1;
+    this.root.add(this.glowBack, this.glowFloor);
     /* a plinth line under the tank, so it does not float */
     this.plinth = new THREE.Mesh(new THREE.BoxGeometry(1, 0.12, 1),
       new THREE.MeshStandardMaterial({ color: 0x11161b, roughness: 0.5, metalness: 0.3 }));
@@ -105,8 +133,22 @@ export class World {
     this.dims = T.dims.slice();
     this.tank.build(T.dims, T.water, T.substrate);
     const [W, H, D] = T.dims;
-    this.cabinet.scale.set(W + 0.30, 7, D + 0.26);
-    this.cabinet.position.set(0, -3.55, 0);
+    /* a top slab that overhangs, a body, four legs and two door panels */
+    const CW = W + 0.30, CD = D + 0.26, legH = 1.5, bodyH = 5.0;
+    this.cabTop.scale.set(CW + 0.22, 0.24, CD + 0.20);
+    this.cabTop.position.set(0, -0.22, 0);
+    this.cabBody.scale.set(CW, bodyH, CD);
+    this.cabBody.position.set(0, -0.34 - bodyH / 2, 0);
+    this.cabLegs.forEach((l, i) => {
+      l.scale.set(0.34, legH, 0.34);
+      l.position.set((i % 2 ? 1 : -1) * (CW / 2 - 0.25), -0.34 - bodyH - legH / 2, (i < 2 ? 1 : -1) * (CD / 2 - 0.25));
+    });
+    this.cabDoors.forEach((d, i) => {
+      d.scale.set(CW * 0.44, bodyH * 0.78, 0.07);
+      d.position.set((i ? 1 : -1) * CW * 0.235, -0.34 - bodyH / 2, CD / 2 + 0.02);
+    });
+    this.cabinet.position.set(0, 0, 0);
+    this.floor.position.y = -0.34 - bodyH - legH;
     this.plinth.scale.set(W + 0.45, 1, D + 0.4);
     this.plinth.position.set(0, -0.09, 0);
     this.hood.scale.set(W + 0.16, 1, D + 0.14);
@@ -115,6 +157,13 @@ export class World {
     this.tube.position.set(0, H + 0.18, 0);
     this.lamp.position.set(0, H + 0.9, 0);
     this.lamp.distance = Math.max(W, D) * 4;
+    /* in front and low, so it reaches the cabinet face and the floor; and
+       well behind, so the wall gets a wide wash rather than a hot spot */
+    this.spill.position.set(0, H * 0.10, D * 0.5 + 1.5);
+    this.glowBack.position.set(0, H * 0.75, -12.6);
+    this.glowBack.scale.set(W * 2.6, H * 5.0, 1);
+    this.glowFloor.position.set(0, this.floor.position.y + 0.02, D * 0.5 + 3.4);
+    this.glowFloor.scale.set(W * 2.2, D * 4.5, 1);
     this.key.target.position.set(0, H * 0.4, 0);
     this.key.target.updateMatrixWorld();
     return this;
@@ -183,7 +232,11 @@ export class World {
       list.forEach((p) => {
         let seed = (p.x * 971 + p.z * 613 + 7) | 0;
         const rq = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
-        const base = PL[p.id].height * 2.5 * p.scale * (0.45 + 0.55 * p.health) * (this.dims[1] / 2.6);
+        /* the plant meshes are about one unit tall at scale 1, so this also
+           clamps them below the water line — a vallisneria that grows out
+           through the lid is the kind of thing you only notice in a render */
+        const base = Math.min(this.dims[1] * 0.86,
+          PL[p.id].height * 2.5 * p.scale * (0.45 + 0.55 * p.health) * (this.dims[1] / 2.6));
         const r = PL[p.id].kind === 'carpet' ? 0.62 : 0.26;
         for (let c = 0; c < clump && n < mesh.instanceMatrix.count; c++) {
           const a = rq() * TAU, d = c === 0 ? 0 : Math.sqrt(rq()) * r;
@@ -343,8 +396,16 @@ export class World {
     this.lamp.intensity = (2.5 + 16 * day) * lamp + night * 2.4;
     this.lamp.color.setHex(0xd8f2ff).lerp(new THREE.Color(0x86b8ff), night);
     this.moon.intensity = night * 1.2;
-    this.room.intensity = 52 + night * 26;
-    this.room2.intensity = 20 + night * 10;
+    this.room.intensity = 26 + night * 12;
+    const spill = (0.35 + 0.65 * day) * lamp;
+    this.spill.intensity = 34 * spill;
+    this.spill.color.setHex(0xbfe8ff).lerp(new THREE.Color(0x7fb4ff), night);
+    if (this.glowBack) {
+      this.glowBack.material.uniforms.uA.value = 0.85 * spill;
+      this.glowFloor.material.uniforms.uA.value = 0.55 * spill;
+      this.glowBack.material.uniforms.uCol.value.setHex(0xa8dcff).lerp(new THREE.Color(0x6fa8ff), night);
+      this.glowFloor.material.uniforms.uCol.value.copy(this.glowBack.material.uniforms.uCol.value);
+    }
     this.amb.intensity = 1.0 + night * 0.35;
     this.tube.material.color.setHex(0xf2fbff).multiplyScalar(0.15 + day * lamp);
 
