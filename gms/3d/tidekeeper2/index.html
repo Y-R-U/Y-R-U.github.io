@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#04101a">
+<title>Tidekeeper II</title>
+<meta name="description" content="Start with one fish in one tank. Everything else you have to earn.">
+<link rel="stylesheet" href="css/style.css?v=2">
+</head>
+<body data-stage="0">
+
+<div id="load">
+  <div class="l-mark"><span></span><span></span><span></span></div>
+  <h1>TIDEKEEPER<i>II</i></h1>
+  <div class="l-tag">the fishroom</div>
+  <div class="l-err" id="load-err"></div>
+</div>
+
+<!-- ── the HUD grows as the game does; every group is hidden until earned ── -->
+<div id="hud">
+  <div id="top-left" class="hud-grp">
+    <div id="tank-name"></div>
+    <div id="vitals"></div>
+  </div>
+
+  <div id="top-right" class="hud-grp">
+    <div id="purse"><b id="money">$0</b></div>
+    <div id="renown-wrap"><span id="renown-icon">◆</span><b id="renown">0</b></div>
+    <div id="visitors"></div>
+  </div>
+
+  <div id="rail"></div>
+
+  <div id="shelf"></div>
+
+  <div id="dock" class="hud-grp">
+    <div id="dock-inner"></div>
+  </div>
+
+  <div id="prompt"></div>
+  <div id="toast"></div>
+  <div id="alerts"></div>
+</div>
+
+<div id="sheet"><div class="sh-box">
+  <div class="sh-head"><span class="sh-title" id="sh-title"></span><button class="sh-x" id="sh-x">&times;</button></div>
+  <div class="sh-tabs" id="sh-tabs"></div>
+  <div class="sh-body" id="sh-body"></div>
+  <div class="sh-foot" id="sh-foot"></div>
+</div></div>
+
+<div id="modal"><div class="m-box">
+  <div class="m-art" id="m-art"></div>
+  <div class="m-head"><div class="m-kick" id="m-kick"></div><h2 id="m-title"></h2><p id="m-sub"></p></div>
+  <div class="m-body" id="m-body"></div>
+  <div class="m-foot" id="m-foot"></div>
+</div></div>
+
+<div id="fishcard"></div>
+
+<!-- ── boot gate ─────────────────────────────────────────────────────────
+     Must be an inline classic script. A module that fails to resolve an
+     import cannot report itself: nothing in it runs and the loading screen
+     sits there forever, which is indistinguishable from a hang. This is a
+     real bug this repo has shipped before. The reload busts the cache
+     because a plain reload re-serves the same broken pair of files.
+     ─────────────────────────────────────────────────────────────────── -->
+<script>
+(function () {
+  var box = document.getElementById('load-err'), done = false;
+  function report(what, detail) {
+    if (done || !box) return; done = true;
+    box.className = 'l-err show';
+    box.innerHTML = '<b>Tidekeeper could not start.</b><br>' + what +
+      '<code>' + String(detail || '').replace(/[<>&]/g, function (c) {
+        return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]; }) + '</code>' +
+      '<button id="boot-reload">Reload and clear cache</button>';
+    document.getElementById('boot-reload').onclick = function () {
+      location.replace(location.pathname + '?v=' + Date.now());
+    };
+  }
+  window.addEventListener('error', function (e) {
+    if (e.target && e.target !== window && (e.target.src || e.target.href))
+      report('A file failed to load. Usually a stale cache after a deploy.', e.target.src || e.target.href);
+    else report('A script error stopped the boot.', (e.message || e.error) + ' @ ' + (e.filename || '') + ':' + (e.lineno || ''));
+  }, true);
+  window.addEventListener('unhandledrejection', function (e) {
+    report('A promise rejected during boot.', (e.reason && (e.reason.stack || e.reason.message)) || e.reason);
+  });
+  setTimeout(function () {
+    if (!window.__TK2_BOOTED__) report(
+      'The game did not finish starting within 15 seconds. If this device has no WebGL2 the renderer cannot come up.',
+      'boot timeout');
+  }, 15000);
+})();
+</script>
+
+<!-- three is VENDORED in this repo, never fetched from a CDN. A bare CDN
+     import takes the whole module graph hostage to one network fetch. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "../../lib/three/0.180.0/three.module.js",
+    "three/addons/": "../../lib/three/0.180.0/addons/"
+  }
+}
+</script>
+<script type="module" src="js/main.js?v=2"></script>
+</body>
+</html>

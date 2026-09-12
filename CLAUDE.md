@@ -126,5 +126,6 @@ Some projects have their own `CLAUDE.md` with architecture details:
 - `/gms/3d/crowd/CLAUDE.md` — Crowd Rush 3D (Three.js, multi-file)
 - `/gms/2d/paperant/claude.md` — Paper Ant puzzle game
 - `/gms/3d/tidekeeper/CLAUDE.md` — Tidekeeper aquarium sim (single HTML file; read before touching the chemistry)
+- `/gms/3d/tidekeeper2/CLAUDE.md` — Tidekeeper II (multi-file rebuild; read before touching the sim or the renderer)
 
 When working on a specific project, read its `CLAUDE.md` first if present.
