@@ -79,7 +79,7 @@ export class TankView {
       { repeat: Math.max(2, Math.round(W / 2.4)), fallback: isSand ? sandFallback : gravelFallback });
     const sandMat = new THREE.MeshStandardMaterial({
       map: cmap, normalMap: derivedNormal(cmap, isSand ? 1.1 : 2.2, Math.max(2, Math.round(W / 2.4))),
-      color: isSand ? 0xbdb49f : 0xa39c90, roughness: 0.94, metalness: 0.0,
+      color: isSand ? 0x6e6759 : 0x494540, roughness: 0.96, metalness: 0.0,
     });
     sandMat.onBeforeCompile = sh => {
       sh.uniforms.uTime = TANK_U.uTime; sh.uniforms.uNight = TANK_U.uNight;
@@ -104,7 +104,7 @@ export class TankView {
 
     /* scattered pebbles so the floor is not one smooth sheet */
     const peb = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1, 0),
-      new THREE.MeshStandardMaterial({ color: isSand ? 0x9d9481 : 0x8e8a80, roughness: 0.95 }), 70);
+      new THREE.MeshStandardMaterial({ color: isSand ? 0x776f61 : 0x4e4a44, roughness: 0.95 }), 70);
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), s = new THREE.Vector3();
     for (let i = 0; i < 70; i++) {
       const sc = rr(0.012, 0.034);
@@ -175,7 +175,7 @@ export class TankView {
         ${CAUSTIC_SAMPLE}
         void main(){
           float c = tkCaustic(vWP.xz * 1.6);
-          vec3 col = uWater * (0.5 + 0.5 * c);
+          vec3 col = uWater * (0.55 + 0.45 * c);
           col += vec3(0.72,0.90,1.0) * clamp(c,0.0,2.0) * 0.26 * uCaustic * (1.0 - uNight*0.7);
           /* looked at from below, a water surface turns into a mirror at a
              shallow angle — the single most recognisable thing about it */

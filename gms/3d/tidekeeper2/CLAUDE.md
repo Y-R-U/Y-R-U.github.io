@@ -76,6 +76,17 @@ the player to stop playing:
 - The first animal that would ever die **doesn't**, once, ever
   (`Game.useMercy`). It drops to 10% condition and the coach explains.
 
+## Aquascaping
+
+`World.layout()` puts planting in two or three **masses** with gaps between
+them rather than an even row, and `World.syncContents()` renders each plant you
+bought as a **clump** (`CLUMP` — nine for carpet, six for stems, four for
+ribbons). Both are there because a real planted tank is dense and grouped, and
+an evenly spaced row of single stems reads as a diagram. The substrate is
+deliberately dark for the same reason: a pale floor bounces light everywhere
+and flattens the fish. `assets/tex/ref_*.jpg` are art-direction references,
+gitignored, not shipped.
+
 Balance facts worth re-proving after any change to the sim:
 - A betta plus six neons in the 10 gallon starter is over capacity, and the
   warning fires before anything dies.

@@ -21,6 +21,9 @@ const _m4 = new THREE.Matrix4(), _q = new THREE.Quaternion(), _qb = new THREE.Qu
       _e = new THREE.Euler(), _col = new THREE.Color();
 const UP = new THREE.Vector3(0, 1, 0), FWD = new THREE.Vector3(1, 0, 0);
 
+/** How many of a thing one purchase actually plants. */
+const CLUMP = { carpet: 9, stem: 6, ribbon: 4, grape: 3, fern: 4, broad: 2 };
+
 export class World {
   constructor(scene, renderer) {
     this.scene = scene; this.renderer = renderer;
@@ -129,12 +132,22 @@ export class World {
       d.rot = rq() * TAU;
       d.scale = 0.8 + rq() * 0.35;
     });
+    /* plants go in two or three masses with a gap between them, which is how
+       anyone actually aquascapes and reads far better than an even row */
+    const groups = T.plants.length <= 2 ? 1 : T.plants.length <= 6 ? 2 : 3;
+    const anchors = [];
+    for (let g = 0; g < groups; g++)
+      anchors.push(groups === 1 ? -W * 0.22 : -W * 0.36 + (g / (groups - 1)) * W * 0.72);
+    const byKind = new Map();
+    T.plants.forEach(p => { const k = PL[p.id].kind;
+      if (!byKind.has(k)) byKind.set(k, byKind.size % groups); });
     T.plants.forEach((p, i) => {
-      const n = T.plants.length, band = i % 3;
-      p.x = (n === 1 ? -W * 0.2 : -W * 0.42 + (i / Math.max(1, n - 1)) * W * 0.84) + (rq() - 0.5) * 0.5;
-      p.z = -D * 0.30 + band * D * 0.19 + (rq() - 0.5) * 0.22;
+      const g = byKind.get(PL[p.id].kind) ?? (i % groups);
+      const spread = PL[p.id].kind === 'carpet' ? W * 0.30 : W * 0.11;
+      p.x = clamp(anchors[g] + (rq() - 0.5) * spread * 2, -W * 0.45, W * 0.45);
+      p.z = -D * 0.30 + (rq() * 0.62) * D * 0.5;
       p.rot = rq() * TAU;
-      p.scale = 0.78 + rq() * 0.46;
+      p.scale = 0.72 + rq() * 0.56;
     });
   }
 
@@ -151,10 +164,11 @@ export class World {
     }
     for (const [k, list] of byKind) {
       let mesh = this.plantMeshes.get(k);
-      if (!mesh || mesh.instanceMatrix.count < list.length) {
+      const want = list.length * (CLUMP[k] ?? 3) + 4;
+      if (!mesh || mesh.instanceMatrix.count < want) {
         if (mesh) { this.tank.group.remove(mesh); mesh.geometry.dispose(); }
         const geo = buildPlantGeo(k);
-        const cap = Math.max(10, list.length + 8);
+        const cap = Math.max(16, want);
         const ph = new THREE.InstancedBufferAttribute(new Float32Array(cap * 3), 3);
         for (let i = 0; i < cap; i++) ph.setXYZ(i, rnd() * TAU, rnd(), rnd());
         geo.setAttribute('aPhase', ph);
@@ -164,12 +178,22 @@ export class World {
         this.plantMeshes.set(k, mesh);
         this.tank.group.add(mesh);
       }
-      mesh.count = list.length;
-      list.forEach((p, i) => {
-        const s = PL[p.id].height * 2.5 * p.scale * (0.45 + 0.55 * p.health) * (this.dims[1] / 2.6);
-        _m4.compose(_v.set(p.x, 0.04, p.z), _q.setFromEuler(_e.set(0, p.rot, 0)), _v2.set(s, s, s));
-        mesh.setMatrixAt(i, _m4);
+      let n = 0;
+      const clump = CLUMP[k] ?? 3;
+      list.forEach((p) => {
+        let seed = (p.x * 971 + p.z * 613 + 7) | 0;
+        const rq = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+        const base = PL[p.id].height * 2.5 * p.scale * (0.45 + 0.55 * p.health) * (this.dims[1] / 2.6);
+        const r = PL[p.id].kind === 'carpet' ? 0.62 : 0.26;
+        for (let c = 0; c < clump && n < mesh.instanceMatrix.count; c++) {
+          const a = rq() * TAU, d = c === 0 ? 0 : Math.sqrt(rq()) * r;
+          const s = base * (c === 0 ? 1 : 0.62 + rq() * 0.5);
+          _m4.compose(_v.set(p.x + Math.cos(a) * d, 0.04, p.z + Math.sin(a) * d),
+            _q.setFromEuler(_e.set(0, p.rot + rq() * TAU, 0)), _v2.set(s, s, s));
+          mesh.setMatrixAt(n++, _m4);
+        }
       });
+      mesh.count = n;
       mesh.instanceMatrix.needsUpdate = true;
     }
 
@@ -325,7 +349,7 @@ export class World {
     this.tube.material.color.setHex(0xf2fbff).multiplyScalar(0.15 + day * lamp);
 
     /* water colour and per-channel absorption */
-    const clear = new THREE.Color(T.water === 'sw' ? 0x2f92c4 : 0x2f8ea0);
+    const clear = new THREE.Color(T.water === 'sw' ? 0x2a86bb : 0x35848c);
     const murky = new THREE.Color(0x3d6a2c);
     const wc = clear.clone().lerp(murky, clamp(T.algae * 0.85 + T.detritus * 0.18, 0, 0.9));
     wc.lerp(new THREE.Color(0x0b2749), night * 0.7);
@@ -342,7 +366,7 @@ export class World {
        blue. One unit is ten centimetres, so these are per-decimetre numbers
        exaggerated about four times for the look. Murk scatters all three. */
     const murk = T.algae * 0.9 + T.detritus * 0.16;
-    FISH_U.uAbsorb.value.set(0.072 + murk * 0.10, 0.017 + murk * 0.085, 0.008 + murk * 0.08);
+    FISH_U.uAbsorb.value.set(0.055 + murk * 0.11, 0.013 + murk * 0.09, 0.006 + murk * 0.085);
     FISH_U.uFogLo.value = 0.5;
 
     this.scene.background = wc.clone().multiplyScalar(0.10);
