@@ -1,0 +1,18 @@
+{
+  "name": "HELLWAKE — The dead are not alone",
+  "short_name": "HELLWAKE",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#080e15",
+  "theme_color": "#080e15",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
