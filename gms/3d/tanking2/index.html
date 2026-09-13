@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#182924" />
+    <meta
+      name="description"
+      content="One fish. A little care. A whole world to grow. A beautifully planted aquarium collection that unfolds through play."
+    />
+    <title>Tanking 2 — A little life, a whole world</title>
+    <link rel="icon" href="./assets/icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <canvas
+      id="aquarium"
+      aria-label="Living 3D aquarium. Drag to orbit, scroll or pinch to zoom, tap a fish to follow it."
+    ></canvas>
+    <div id="loading">
+      <span class="loading-orbit"></span>
+      <p>A little world is waking up.</p>
+    </div>
+    <div class="atmosphere" aria-hidden="true"></div>
+    <div id="interface">
+      <header class="topbar">
+        <a class="wordmark" href="./" aria-label="Tanking 2 home"
+          >TANKING <span>II</span><small>A LIVING COLLECTION</small></a
+        >
+        <div class="top-actions">
+          <div class="balance" title="Coins earned by your living tanks">
+            <span class="coin-mark">◈</span><strong id="coins">40</strong
+            ><small id="income"></small>
+          </div>
+          <div class="pearl-balance" id="pearlBalance" hidden>
+            <span>◌</span> <strong id="pearls">0</strong>
+          </div>
+          <button
+            class="icon-button"
+            id="soundButton"
+            title="Turn ambient sound on"
+            aria-label="Turn ambient sound on"
+          >
+            <svg viewBox="0 0 24 24">
+              <path d="M10 5 5 9H2v6h3l5 4V5Zm5 4 6 6m0-6-6 6" />
+            </svg></button
+          ><button
+            class="icon-button"
+            id="settingsButton"
+            title="Settings"
+            aria-label="Settings"
+            hidden
+          >
+            <svg viewBox="0 0 24 24">
+              <path d="M5 4v16M12 4v16M19 4v16M2 8h6m1 8h6m1-8h6" />
+            </svg>
+          </button>
+        </div>
+      </header>
+      <nav id="tankRail" class="tank-rail" aria-label="Your tanks" hidden></nav>
+      <section class="chapter-intro">
+        <p class="eyebrow" id="chapterLabel">01 / A FIRST RIPPLE</p>
+        <h1 id="sceneTitle">A little life.<br /><em>A whole world.</em></h1>
+        <p class="scene-copy" id="sceneCopy">
+          Every beautiful aquarium begins with one small inhabitant. This one
+          begins with you.
+        </p>
+        <div id="tankVitals" class="tank-vitals" hidden>
+          <span class="health-dot"></span><span id="healthLabel">Thriving</span
+          ><span class="vital-divider"></span><span id="tankIncome"></span>
+        </div>
+        <div class="chapter-progress" id="chapterProgress" hidden>
+          <span id="chapterProgressBar"></span>
+        </div>
+      </section>
+      <div class="world-caption">
+        <span class="live-dot"></span
+        ><span id="worldCaption">STILLWATER / PLANTED FRESHWATER</span>
+      </div>
+      <div class="orbit-hint" id="orbitHint">
+        DRAG TO EXPLORE <span>·</span> TAP A FISH TO FOLLOW
+      </div>
+      <section id="followCard" class="follow-card" hidden>
+        <span class="eyebrow">A CLOSER LOOK</span>
+        <h3 id="followName"></h3>
+        <p id="followDetail"></p>
+        <button id="unfollow" class="text-button">
+          Return to the whole world ↗</button
+        ><button id="rehomeFish" class="text-button rehome-button" hidden>
+          Rehome with a trusted keeper
+        </button>
+      </section>
+      <section id="mission" class="mission" aria-label="Current chapter">
+        <div class="mission-seal" id="missionSeal">01</div>
+        <div class="mission-content">
+          <span class="eyebrow" id="missionKicker">YOUR FIRST SMALL STEP</span>
+          <h2 id="missionTitle">Meet your first fish</h2>
+          <p id="missionText">
+            A copper betta, a quiet tank, and room to begin.
+          </p>
+          <div class="mission-track" id="missionTrack" hidden>
+            <span id="missionTrackBar"></span>
+          </div>
+        </div>
+        <button class="primary" id="missionAction">
+          Bring them home <span>40 ◈</span>
+        </button>
+      </section>
+      <nav id="dock" class="dock" aria-label="Aquarium tools" hidden></nav>
+      <div id="modeBanner" class="mode-banner" hidden></div>
+      <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+    </div>
+    <div id="drawerBackdrop" class="drawer-backdrop" hidden></div>
+    <aside id="drawer" class="drawer" aria-label="Aquarium panel" hidden>
+      <header class="drawer-header">
+        <div>
+          <span class="eyebrow" id="drawerKicker">YOUR LITTLE WORLD</span>
+          <h2 id="drawerTitle"></h2>
+        </div>
+        <button id="closeDrawer" class="close-button" aria-label="Close panel">
+          ×
+        </button>
+      </header>
+      <div id="drawerBody" class="drawer-body"></div>
+    </aside>
+    <dialog id="choiceDialog" class="choice-dialog">
+      <span class="eyebrow">SOMETHING TO CARRY WITH YOU</span>
+      <h2>A little luck.<br /><em>A lasting difference.</em></h2>
+      <p>Choose one keepsake. Its gift stays with every tank you grow.</p>
+      <div id="choiceCards" class="choice-cards"></div>
+    </dialog>
+    <dialog id="reportDialog" class="report-dialog">
+      <span class="eyebrow" id="reportEyebrow">A MOMENT TO CELEBRATE</span>
+      <h2 id="reportTitle"></h2>
+      <div id="reportBody"></div>
+      <button class="primary" id="reportClose">
+        Lovely. Let’s keep growing <span>↗</span>
+      </button>
+    </dialog>
+    <div id="photoBar" class="photo-bar" hidden>
+      <span>TANKING <i>II</i> / FIELD NOTES</span
+      ><button id="photoNight">Moonlight</button
+      ><button id="takePhoto">Save photograph ↗</button
+      ><button id="exitPhoto" aria-label="Exit photo mode">×</button>
+    </div>
+    <div id="fatal" hidden>
+      <h1>This little world needs WebGL.</h1>
+      <p>Try a current browser with hardware acceleration enabled.</p>
+      <button onclick="location.reload()">Try again</button>
+      <p id="fatalDetail"></p>
+    </div>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
