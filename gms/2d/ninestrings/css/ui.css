@@ -1,0 +1,192 @@
+/* NINE STRINGS - the DOM menu layer.
+   Canvas owns the HUD; DOM owns the menus (D5), because crisp text at any DPR
+   and real safe-area handling are worth more than bitmap-font layout misery.
+
+   Lane D builds screens out of the components below. Every colour is a custom
+   property from style.css - no hex literals in UI JS. */
+
+/* ---------- screen scaffolding ---------- */
+
+.screen {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  padding:
+    calc(var(--safe-t) + 12px)
+    calc(var(--safe-r) + 16px)
+    calc(var(--safe-b) + 12px)
+    calc(var(--safe-l) + 16px);
+  overflow: hidden;
+  animation: screen-in 220ms cubic-bezier(.2,.8,.3,1) both;
+}
+.screen--sheet { justify-content: flex-end; }      /* rises from the bottom */
+.screen--center { justify-content: center; align-items: center; }
+.screen--scrim { background: radial-gradient(120% 80% at 50% 0%, rgba(10,12,20,.72), rgba(3,4,8,.94)); }
+
+@keyframes screen-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes rise      { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+
+.screen__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  /* fade the content out at the edges instead of hard-cutting it */
+  mask-image: linear-gradient(180deg, transparent 0, #000 14px, #000 calc(100% - 20px), transparent 100%);
+}
+
+/* ---------- type ---------- */
+
+.title {
+  font-size: clamp(30px, 11vw, 52px);
+  font-weight: 800;
+  letter-spacing: .16em;
+  line-height: .98;
+  margin: 0;
+  text-transform: uppercase;
+  color: var(--bone);
+  text-shadow: 0 0 28px color-mix(in srgb, var(--choir) 55%, transparent);
+}
+.subtitle { font-size: 12px; letter-spacing: .30em; text-transform: uppercase; color: var(--text-faint); margin: 6px 0 0; }
+.h2 { font-size: 17px; font-weight: 700; letter-spacing: .05em; margin: 0 0 2px; color: var(--text); }
+.body { font-size: 13px; line-height: 1.5; color: var(--text-dim); margin: 0; }
+.tiny { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-faint); }
+.num  { font-variant-numeric: tabular-nums; }
+
+/* ---------- buttons: every one is >= 44px tall (CONTRACTS Section 10) ---------- */
+
+.btn {
+  -webkit-appearance: none;
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  min-width: 44px;
+  width: 100%;
+  padding: 12px 18px;
+  border: 1px solid var(--edge);
+  border-radius: var(--r-md);
+  background: linear-gradient(180deg, var(--ink-3), var(--ink-2));
+  color: var(--text);
+  font: 600 15px/1 var(--font);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 90ms ease, filter 120ms ease, border-color 120ms ease;
+}
+.btn:active { transform: scale(.975); filter: brightness(1.25); }
+.btn[disabled] { opacity: .4; pointer-events: none; }
+
+.btn--primary {
+  border-color: color-mix(in srgb, var(--choir) 60%, var(--edge));
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--choir) 26%, var(--ink-3)),
+    color-mix(in srgb, var(--choir) 8%, var(--ink-2)));
+  box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 10px 30px -12px var(--choir);
+}
+.btn--ghost { background: transparent; border-color: transparent; color: var(--text-dim); }
+.btn--small { min-height: 44px; padding: 8px 14px; font-size: 13px; }
+.btn--icon  { width: 52px; min-width: 52px; padding: 0; }
+
+.btn-row { display: flex; gap: 10px; }
+.btn-row > .btn { flex: 1; }
+
+/* ---------- cards: the level-up choice, the sanctum node, the stage tile ---------- */
+
+.card {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  min-height: 76px;
+  padding: 14px 16px;
+  border: 1px solid var(--edge);
+  border-radius: var(--r-md);
+  background: linear-gradient(140deg, var(--ink-3), var(--ink-2) 60%);
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 90ms ease, border-color 140ms ease;
+}
+.card:active { transform: scale(.985); }
+/* the accent bleed that gives a card its owner's colour */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--accent, var(--choir));
+  box-shadow: 0 0 18px 1px var(--accent, var(--choir));
+}
+.card--on { border-color: color-mix(in srgb, var(--accent, var(--choir)) 70%, var(--edge)); }
+.card--locked { opacity: .45; }
+.card__icon {
+  flex: 0 0 46px; height: 46px;
+  display: grid; place-items: center;
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--accent, var(--choir)) 16%, var(--ink));
+  color: var(--accent, var(--choir));
+  font: 800 15px/1 var(--font); letter-spacing: .04em;
+}
+.card__text { flex: 1; min-width: 0; }
+.card__lvl {
+  flex: 0 0 auto;
+  font: 700 11px/1 var(--font); letter-spacing: .14em;
+  color: var(--text-faint);
+}
+
+.stack { display: flex; flex-direction: column; gap: 10px; }
+.stack > * { animation: rise 260ms cubic-bezier(.2,.8,.3,1) both; }
+.stack > :nth-child(2) { animation-delay: 45ms; }
+.stack > :nth-child(3) { animation-delay: 90ms; }
+.stack > :nth-child(4) { animation-delay: 135ms; }
+.stack > :nth-child(5) { animation-delay: 180ms; }
+
+/* ---------- bars ---------- */
+
+.bar { height: 6px; border-radius: 3px; background: var(--ink); overflow: hidden; }
+.bar__fill { height: 100%; background: var(--accent, var(--choir)); transition: width 200ms ease; }
+
+/* ---------- the visual-novel dialogue strip ---------- */
+
+.vn { display: flex; flex-direction: column; height: 100%; }
+.vn__art { flex: 1; min-height: 0; position: relative; }
+.vn__portrait {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center top;
+  mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+}
+.vn__box {
+  border: 1px solid var(--edge);
+  border-radius: var(--r-md);
+  background: rgba(8,10,16,.92);
+  padding: 16px 18px;
+  min-height: 132px;
+}
+.vn__who { font: 700 12px/1 var(--font); letter-spacing: .22em; text-transform: uppercase; color: var(--choir); margin-bottom: 8px; }
+.vn__text { font-size: 15px; line-height: 1.55; color: var(--text); margin: 0; }
+
+/* ---------- misc ---------- */
+
+.souls { display: inline-flex; align-items: center; gap: 6px; color: var(--gold); font: 700 14px/1 var(--font); }
+.spacer { flex: 1; }
+.hidden { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .screen, .stack > * { animation: none !important; }
+  .btn, .card { transition: none !important; }
+}
+
+/* NOTE: the ui-* classes used by js/ui/** are styled by a stylesheet INJECTED
+   from js/ui/components.js (see `CSS` there, id `ns-ui-lane-d`). That file was
+   written while this one was owned by another lane, so the screen-specific
+   rules live beside the markup that uses them. Do not duplicate them here -
+   two stylesheets defining the same class silently fight over the cascade,
+   which cost a debugging pass on the title screen's height. */

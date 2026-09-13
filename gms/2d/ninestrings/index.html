@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>NINE STRINGS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#05060a" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="description" content="NINE STRINGS - a survivors-like where the dead do not choose. Every corpse is puppeted from above, and you are the only one who can cut the threads." />
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/ui.css" />
+</head>
+<body>
+<div id="stage">
+  <canvas id="game"></canvas>
+</div>
+<div id="ui"></div>
+<div id="safe-probe"></div>
+<div id="callout" hidden></div>
+<script>
+// No CDN, no importmap, no dependencies. A bare CDN import makes the entire
+// module graph hostage to one network fetch, and when it fails there is no
+// error and no retry - the page simply never boots. That bug has cost this
+// repo real debugging time twice. The fix is to have nothing to fetch.
+//
+// This handler is INLINE and classic-script on purpose: a module that fails to
+// parse never runs, so only something already on the page can report it.
+(function () {
+  var show = function (m) {
+    var el = document.getElementById('callout');
+    if (el) { el.textContent = m; el.hidden = false; }
+    window.__nsBootError = m;
+  };
+  window.addEventListener('error', function (e) {
+    show('Error: ' + (e.message || e.error) +
+         (e.filename ? ' @ ' + e.filename.split('/').pop() + ':' + e.lineno : ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    show('Unhandled: ' + (e.reason && e.reason.message ? e.reason.message : e.reason));
+  });
+  // If the module graph never reaches main.js at all, say so rather than
+  // sitting on a black screen forever.
+  setTimeout(function () {
+    if (!window.__ns) show('NINE STRINGS did not boot. Try a hard reload.');
+  }, 8000);
+})();
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

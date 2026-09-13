@@ -28,6 +28,15 @@
  */
 const PROJECTS = [
 
+  { name: "Nine Strings", path: "/gms/2d/ninestrings/", screenshot: "ninestrings", type: "game",
+    desc: "A survivors-like where the dead do not choose. Nine demon Choirmasters worked out that a corpse takes a string without complaining, so every shambler on the street is being walked from somewhere above \u2014 and you are the one person who can see the threads. You move with one thumb and your weapons fire themselves, but the bodies are the easy target and the threads are the correct one: any attack that crosses a glowing thread severs it, the puppet collapses limp and worth double, and sometimes it gets back up on your side. Kill the Conductor holding a Choir and every thread it owns snaps at once. Twelve stages across four acts, from a flooded town lane to a cathedral of woven thread, with a real story either side of every one and an ending that asks you to choose. Sixteen weapons that evolve, twelve passives, six characters, relics that cost you something, rule-bending sigils drafted mid-run, and a Sanctum of permanent upgrades bought with souls \u2014 none of which exists on screen until you have earned it, because the first stage is deliberately almost nothing: move, one weapon, two choices. Built portrait-first for a phone held in one hand. Vanilla JS and WebGL2 with a procedurally-baked sprite atlas, generative WebAudio, and no build step, no CDN and no dependencies at all.",
+    date: "2026-09-14", creator: "Opus 5" },
+
+
+  { name: "HELLWAKE", path: "/gms/3d/hellwake/", screenshot: "hellwake", type: "game",
+    desc: "The dead are not alone. Follow a lost sister's radio signal through six demon-held districts in a complete portrait-first survivor campaign. One-thumb movement, automatic combat, eight weapons and their evolutions, six charms, three survivors, permanent relics, rescue objectives, archdemons and an endless afterlight. A neon-lit procedural 3D city, original story, synthesized audio and local saves. Vanilla JavaScript and Three.js, no build step.",
+    date: "2026-09-14", creator: "OpenAI Codex / GPT-6" },
+
   { name: "Tanking II", path: "/gms/3d/tanking2/", screenshot: "tanking2", type: "game",
     desc: "One fish. A little care. A whole world to grow. Begin with a single betta and earn a second living tank, then discover sixteen species, planted gardens, coral reefs, automation, conservation, and five adventures through thirteen guided chapters. Earlier tanks keep earning, a caretaker looks after your collection while away, and choices of permanent keepsakes shape your growing gallery. Procedural fish, rimless glass, fine swaying plants, caustics, moonlight, and a photographic lens. Vanilla Three.js with no build step.",
     date: "2026-09-13", creator: "OpenAI Codex / GPT-6" },
