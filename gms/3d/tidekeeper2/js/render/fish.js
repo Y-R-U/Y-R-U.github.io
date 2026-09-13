@@ -164,7 +164,7 @@ export function fishMaterial(geo, sp) {
         float along = (vFin > 3.5 && vFin < 4.5) ? vFinUV.x : vFinUV.y;
         float ray = pow(abs(sin(along * 3.14159 * 13.0)), 0.55);
         gl_FragColor.rgb *= 0.72 + 0.36 * ray;
-        gl_FragColor.a *= (0.55 + 0.45 * ray) * (1.0 - pow(vFinUV.x, 1.15) * 0.78);
+        gl_FragColor.a *= (0.55 + 0.45 * ray) * (1.0 - pow(max(vFinUV.x, 0.0), 1.15) * 0.78);
         gl_FragColor.rgb += vec3(0.90, 0.95, 1.0) * fres * 0.13;
       }
       /* iridescence: a hue that walks across the flank as the fish turns */

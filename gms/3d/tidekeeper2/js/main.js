@@ -27,12 +27,18 @@ const LITE = QS.has('lite');
 const SHOT = QS.has('shot');
 const AUTO = QS.has('auto');
 const FRESH = QS.has('fresh');
+const DIAG = QS.has('diag');
+/* A phone is not a small desktop: less memory, a stricter driver, and a
+   framebuffer it will quietly refuse rather than complain about. */
+const MOBILE = matchMedia('(pointer:coarse)').matches || /Android|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 function boot() {
+  /* preserveDrawingBuffer is not needed: savePhoto() renders and reads the
+     canvas in the same task. On mobile it costs a full-screen copy a frame. */
   const renderer = new THREE.WebGLRenderer({
-    antialias: false, powerPreference: 'high-performance', preserveDrawingBuffer: true, alpha: false,
+    antialias: false, powerPreference: 'high-performance', alpha: false,
   });
-  const DPR = Math.min(window.devicePixelRatio || 1, LITE ? 1.1 : 2);
+  const DPR = Math.min(window.devicePixelRatio || 1, LITE ? 1.1 : MOBILE ? 1.5 : 2);
   renderer.setPixelRatio(DPR);
   renderer.setSize(innerWidth, innerHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -61,7 +67,18 @@ function boot() {
   window.__TK2 = G;
   G.api = { SPECIES, SP, PLANTS, DECOR, ui, coach, post, world, orbit, Save, Modal, makeFish, placeFish };
 
-  G.renderOnce = () => { renderer.info.reset(); post.composer.render(); };
+  G.renderOnce = () => { renderer.info.reset(); post.render(); };
+
+  /* Losing the context does not throw. The loop keeps ticking, the HUD keeps
+     updating, and the canvas just stays black — the exact shape of a bug that
+     looks like the game rather than the device. Say so out loud. */
+  renderer.domElement.addEventListener('webglcontextlost', e => {
+    e.preventDefault();
+    ui.toast('The graphics context was lost — reload to bring the tank back.', 12000);
+  });
+  renderer.domElement.addEventListener('webglcontextrestored', () => location.reload());
+
+  if (DIAG) showDiag(renderer, post, DPR);
 
   /* ── picking ──────────────────────────────────────────────────────────── */
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
@@ -134,7 +151,7 @@ function boot() {
     if (coachT <= 0) { coachT = 0.25; step('coach', () => coach.update()); }
     if (!G.photo) post.grade.uniforms.uFocus.value += (orbit.dist * 0.98 - post.grade.uniforms.uFocus.value) * 0.08;
     if (AUTO) autoPlay(G, rdt);
-    G.renderOnce();
+    step('render', G.renderOnce);
     window.__TK2_FRAMES++;
     frames++; fpsT += rdt;
     if (fpsT > 4) {
@@ -155,6 +172,33 @@ function boot() {
     else if (AUTO) { Save.wipe(); }
     else if (G.offlineReport) showOffline(G);
   }));
+}
+
+/* ?diag=1 — what this particular device actually gave us. The point of it is
+   a phone that renders black: the answer is nearly always one of these lines. */
+function showDiag(renderer, post, dpr) {
+  const gl = renderer.getContext();
+  const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+  const rows = [
+    ['screen', innerWidth + '\u00d7' + innerHeight + ' @' + (window.devicePixelRatio || 1) + ' \u2192 dpr ' + dpr],
+    ['gpu', dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)],
+    ['webgl2', String(gl instanceof WebGL2RenderingContext)],
+    ['buffer', post.mode.type + ' \u00d7' + post.mode.samples + ' msaa' + (post.mode.forced ? ' (FORCED \u2014 all refused)' : '')],
+    ['maxSamples', String(renderer.capabilities.maxSamples)],
+    ['float rt', String(renderer.extensions.has('EXT_color_buffer_float'))],
+    ['half rt', String(renderer.extensions.has('EXT_color_buffer_half_float'))],
+    ['maxTex', String(gl.getParameter(gl.MAX_TEXTURE_SIZE))],
+    ['precision', gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT).precision + ' bits'],
+  ];
+  const box = document.createElement('div');
+  box.id = 'diag';
+  box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;max-width:92vw;' +
+    'background:#000c;color:#9fe;font:11px/1.5 ui-monospace,monospace;padding:8px 10px;' +
+    'border:1px solid #2a6;border-radius:8px;white-space:pre-wrap';
+  box.textContent = rows.map(r => r[0].padEnd(11) + r[1]).join('\n');
+  box.onclick = () => box.remove();
+  document.body.appendChild(box);
+  console.log('[tidekeeper diag]\n' + box.textContent);
 }
 
 function showOffline(G) {

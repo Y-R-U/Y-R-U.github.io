@@ -143,7 +143,7 @@ export function plantMaterial() {
     sh.fragmentShader = sh.fragmentShader.replace('#include <dithering_fragment>', `
       #include <dithering_fragment>
       vec3 N = normalize(vNormal); vec3 V = normalize(vViewPosition);
-      float f = pow(1.0 - abs(dot(N, V)), 2.0);
+      float f = pow(max(1.0 - abs(dot(N, V)), 0.0), 2.0);
       gl_FragColor.rgb += vColor.rgb * f * 0.34;
     `);
   };

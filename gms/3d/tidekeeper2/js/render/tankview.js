@@ -190,7 +190,14 @@ export class TankView {
     surf.rotation.x = -Math.PI / 2; surf.position.y = H;
     surf.renderOrder = 3;
 
-    /* ── shafts of light through the surface ────────────────────────────── */
+    /* ── shafts of light through the surface ────────────────────────────────
+       Every pow() in this file guards its base with max(x, 0.0). A varying
+       interpolated to a fragment centre just outside its triangle comes back
+       a hair past its range, so `1.0 - vU.y` goes very slightly negative along
+       an edge — and pow() of a negative base is NaN. One NaN pixel is
+       invisible until the bloom pass blurs it across the whole frame, at which
+       point the game renders BLACK with a working HUD. That is the bug that
+       shipped; see CLAUDE.md. ──────────────────────────────────────────────── */
     this.rays = new THREE.Group(); add(this.rays);
     const rayMat = new THREE.ShaderMaterial({
       transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
@@ -202,7 +209,7 @@ export class TankView {
         void main(){
           float across = smoothstep(0.0,0.46,vU.x) * smoothstep(1.0,0.54,vU.x);
           across = pow(across, 1.6);
-          float down = pow(1.0 - vU.y, 1.35);
+          float down = pow(max(1.0 - vU.y, 0.0), 1.35);
           float flick = 0.55 + 0.45 * sin(uTime*0.5 + vS*21.0) * sin(uTime*0.21 + vS*9.0);
           float a = across * down * flick * 0.085 * uCaustic * (1.0 - uNight*0.88);
           gl_FragColor = vec4(vec3(0.66,0.88,1.0), a);
@@ -232,7 +239,7 @@ export class TankView {
       fragmentShader: `varying vec3 vN, vV, vWP; uniform sampler2D uCaus;
         uniform float uTime, uNight, uCaustic; ${CAUSTIC_SAMPLE}
         void main(){
-          float f = pow(1.0 - abs(dot(normalize(vN), normalize(vV))), 3.2);
+          float f = pow(max(1.0 - abs(dot(normalize(vN), normalize(vV))), 0.0), 3.2);
           float c = tkCaustic(vec2(vWP.x + vWP.z, vWP.y * 1.6)) * uCaustic * (1.0 - uNight*0.85);
           /* a dim room reflected in the front pane, brighter near the top */
           float room = smoothstep(0.0, ${(H).toFixed(2)}, vWP.y) * 0.5 + 0.25;

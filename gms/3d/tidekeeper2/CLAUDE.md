@@ -39,6 +39,21 @@ transfer function at the end of that shader is load-bearing; remove it and the
 whole game renders about two stops dark and you will be tempted to "fix" it by
 turning every light up, which is wrong.
 
+**Never pow() an unguarded base.** A varying interpolated to a fragment centre
+just outside its own triangle comes back a hair past its range, so a term like
+`1.0 - vU.y` goes very slightly negative along one edge — and `pow()` of a
+negative base is NaN. `pow(0.0, k)` is fine; negatives are the killer. One NaN
+pixel is invisible until the bloom pass blurs it over the whole frame, at which
+point every pixel is NaN and the game renders **black with a working HUD** —
+looking for all the world like a device that cannot do WebGL. That shipped in
+the god-ray shader in `tankview.js`. Every `pow()` in `render/` now writes
+`pow(max(x, 0.0), k)`, and a new shader must too.
+
+To check: render the scene pass into `post.rt` and scan it with
+`readRenderTargetPixels` for half-float exponent 31 with a non-zero mantissa.
+Toggling `mesh.visible` one object at a time bisects it to the material in
+about fifty draws. `?lite=1` hides the symptom, because it has no bloom.
+
 Two smaller ones, both of which cost an hour each:
 - A **colour map multiplies the material colour**, so a dark fallback texture
   makes a black material however bright the colour is. Fallbacks in
@@ -58,6 +73,12 @@ Two smaller ones, both of which cost an hour each:
   `?shot=fish&sp=a,b,c&d=5` lines species up at a fixed distance for judging
   the models, `?auto=1` plays badly on purpose, `?lite=1` drops bloom and DPR.
 - `window.__TK2` is the Game; `__TK2.api` exposes the modules for tests.
+- `?diag=1` prints what the device actually gave us — GPU, WebGL2, the colour
+  buffer and sample count the driver accepted, float-target extensions. It is
+  the first thing to ask for when someone reports a black screen on a phone.
+- `buildPost` steps down through half-float+MSAA, half-float, byte+MSAA, byte,
+  checking `checkFramebufferStatus` each time, because a render target a mobile
+  driver refuses does not throw — it just draws nothing, for ever.
 - The render loop wraps each stage in `step()` so one throwing subsystem
   cannot silently stop the others — a dead loop with no error is the worst
   failure a no-build-step game can have.

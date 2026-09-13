@@ -82,46 +82,81 @@ export const GradeShader = {
     }`,
 };
 
+/* Mobile GPUs refuse combinations desktop drivers wave through — a 16-bit
+   float colour buffer, and especially a multisampled one. A refused
+   attachment does not throw: the framebuffer is simply incomplete and every
+   frame draws nothing, which looks exactly like the game being broken. So ask
+   the driver whether the target really got made, and step down until one
+   does. Anything the phone accepts beats a black screen. */
+function tryTarget(renderer, w, h, type, samples, depth) {
+  const gl = renderer.getContext();
+  while (gl.getError() !== gl.NO_ERROR) { /* drain anything earlier left behind */ }
+  let rt = null;
+  try {
+    rt = new THREE.WebGLRenderTarget(w, h, { type, samples, depthBuffer: depth });
+    if (depth) rt.depthTexture = new THREE.DepthTexture(w, h, THREE.UnsignedIntType);
+    const prev = renderer.getRenderTarget();
+    renderer.setRenderTarget(rt);            /* forces the real GL allocation */
+    const ok = gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE &&
+               gl.getError() === gl.NO_ERROR;
+    renderer.setRenderTarget(prev);
+    if (ok) return rt;
+  } catch (e) { /* fall through to the next rung */ }
+  if (rt) rt.dispose();
+  return null;
+}
+
 export function buildPost(renderer, scene, camera, { lite = false, dpr = 1 } = {}) {
   const size = new THREE.Vector2();
   renderer.getSize(size);
-  const rt = new THREE.WebGLRenderTarget(size.x * dpr, size.y * dpr, {
-    type: THREE.HalfFloatType, samples: lite ? 0 : 4,
-  });
-  rt.depthTexture = new THREE.DepthTexture(size.x * dpr, size.y * dpr);
-  rt.depthTexture.type = THREE.UnsignedIntType;
+  const w = Math.max(2, Math.round(size.x * dpr)), h = Math.max(2, Math.round(size.y * dpr));
 
-  const composer = new EffectComposer(renderer, rt);
-  composer.setPixelRatio(dpr);
-  composer.setSize(size.x, size.y);
+  const floatOk = renderer.extensions.has('EXT_color_buffer_float') ||
+                  renderer.extensions.has('EXT_color_buffer_half_float');
+  const maxS = lite ? 0 : Math.min(4, renderer.capabilities.maxSamples || 0);
+  const rungs = [];
+  if (floatOk && maxS) rungs.push([THREE.HalfFloatType, maxS]);
+  if (floatOk)         rungs.push([THREE.HalfFloatType, 0]);
+  if (maxS)            rungs.push([THREE.UnsignedByteType, maxS]);
+  rungs.push([THREE.UnsignedByteType, 0]);
+
+  let rtScene = null, mode = null;
+  for (const [type, samples] of rungs) {
+    rtScene = tryTarget(renderer, w, h, type, samples, true);
+    if (rtScene) { mode = { type: type === THREE.HalfFloatType ? 'half' : 'byte', samples }; break; }
+  }
+  if (!rtScene) {                        /* every rung refused; take what three gives */
+    rtScene = new THREE.WebGLRenderTarget(w, h, { type: THREE.UnsignedByteType, samples: 0 });
+    rtScene.depthTexture = new THREE.DepthTexture(w, h, THREE.UnsignedIntType);
+    mode = { type: 'byte', samples: 0, forced: true };
+  }
+  const composer = new EffectComposer(renderer, rtScene);
   /* both ping-pong buffers share one depth attachment so the grade pass can
      read the depth the render pass just wrote, whichever way round it went */
-  composer.renderTarget2.depthTexture = rt.depthTexture;
+  composer.renderTarget2.depthTexture = rtScene.depthTexture;
+  composer.setPixelRatio(dpr);
+  composer.setSize(size.x, size.y);
 
   composer.addPass(new RenderPass(scene, camera));
   let bloom = null;
   if (!lite) {
-    bloom = new UnrealBloomPass(new THREE.Vector2(size.x, size.y), 0.42, 0.72, 0.86);
+    bloom = new UnrealBloomPass(new THREE.Vector2(w, h), 0.42, 0.72, 0.86);
     composer.addPass(bloom);
   }
   const grade = new ShaderPass(GradeShader);
-  grade.uniforms.uRes.value.set(size.x * dpr, size.y * dpr);
-  grade.uniforms.tDepth.value = rt.depthTexture;
+  grade.uniforms.uRes.value.set(w, h);
+  grade.uniforms.tDepth.value = rtScene.depthTexture;
   grade.uniforms.uNear.value = camera.near;
   grade.uniforms.uFar.value = camera.far;
   grade.renderToScreen = true;
   composer.addPass(grade);
 
   return {
-    composer, bloom, grade, rt,
-    setSize(w, h) {
-      composer.setSize(w, h);
-      /* setSize already resizes the attached depth texture; doing it again by
-         hand makes the driver attempt a partial upload and complain */
-      rt.setSize(w * dpr, h * dpr);
-      composer.renderTarget2.depthTexture = rt.depthTexture;
-      grade.uniforms.uRes.value.set(w * dpr, h * dpr);
-      if (bloom) bloom.setSize(w, h);
+    composer, bloom, grade, rt: rtScene, mode,
+    render() { composer.render(); },
+    setSize(w2, h2) {
+      composer.setSize(w2, h2);        /* resizes both targets and every pass */
+      grade.uniforms.uRes.value.set(w2 * dpr, h2 * dpr);
     },
   };
 }
