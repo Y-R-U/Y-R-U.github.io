@@ -4,7 +4,7 @@
 // The things only the running game can answer: that the doors are enterable at all, that the rooms
 // are dressed as shops rather than as somebody's cottage, that a keeper standing inside a house
 // that only exists while you are in it is actually there when you get there, and that a purchase
-// moves marks out of the same counted bag the sheet reads.
+// moves coins out of the same counted bag the sheet reads.
 //
 //   node js/dev/shop.uitest.mjs [outdir]      KEEP_COPY=1 leaves the working copy behind
 //
@@ -41,7 +41,7 @@ check(await p.waitFor('!!(window.__wf && window.__wf.game && window.__wf.player)
 
 // From an empty save, always. Chrome's profile is deleted before it is launched, but a renderer
 // left alive by a previous run holds the old localStorage in memory and the attach lands on THAT
-// browser — which handed this test 27 marks and a rope it had bought the run before. The purse is
+// browser — which handed this test 27 coins and a rope it had bought the run before. The purse is
 // the thing being measured here, so it starts at nothing whatever the profile did.
 await p.eval('try { localStorage.clear(); } catch (e) {} location.reload(); true');
 await sleep(1200);
@@ -109,11 +109,11 @@ await p.eval('window.__wf.doors.abort(); true');
 await sleep(600);
 
 // ── the registration purse ──────────────────────────────────────────────────────────────────
-check(await p.eval('window.__wf.game.doc.items.marks === undefined || window.__wf.game.doc.items.marks === 0'),
+check(await p.eval('window.__wf.game.doc.items.coin === undefined || window.__wf.game.doc.items.coin === 0'),
   'a new adventurer has nothing');
 check(await p.eval('window.__wf.game.payPurse()'), 'the Society pays the registration fee');
-const purse = await p.eval('window.__wf.game.doc.items.marks');
-check(purse > 0, `and it lands in the purse (${purse} marks)`);
+const purse = await p.eval('window.__wf.game.doc.items.coin');
+check(purse > 0, `and it lands in the purse (${purse} coins)`);
 check(await p.eval('window.__wf.game.payPurse() === false'), 'and it is only ever paid once');
 
 // ── the counter ─────────────────────────────────────────────────────────────────────────────
@@ -139,16 +139,16 @@ check(await p.eval('!!document.querySelector("#game .g-shopnote")'), 'and it say
 check(await p.eval('document.querySelector("#game .g-till button").disabled === false'), 'and it can be bought');
 await p.shot(`${OUT}/counter-picked.png`);
 
-const before = await p.eval('window.__wf.game.doc.items.marks');
+const before = await p.eval('window.__wf.game.doc.items.coin');
 check(await p.eval('document.querySelector("#game .g-till button").click(), true'), 'bought it');
 await sleep(400);
 const after = await p.eval(`JSON.stringify({
-  marks: window.__wf.game.doc.items.marks,
+  coins: window.__wf.game.doc.items.coin,
   gear: window.__wf.game.doc.gear,
   bag: window.__wf.game.doc.items,
   held: window.__wf.player.heft,
 })`).then(JSON.parse);
-check(after.marks < before, `and it cost something (${before} -> ${after.marks})`);
+check(after.coins < before, `and it cost something (${before} -> ${after.coins})`);
 check(!!after.gear.weapon, `and went straight into the hand (${after.gear.weapon})`);
 check(after.held === 'dagger', `and is actually drawn (${after.held})`);
 check(await p.eval('window.__wf.game.combat.weapon.id === "dagger"'), 'and the fight is swinging it');
@@ -180,6 +180,54 @@ const drops = await p.eval(`(async () => {
 })()`);
 check(drops === 12, `every kill dropped something with the odds pinned to 1 (${drops}/12)`);
 check(await p.eval('Object.keys(window.__wf.game.doc.items).length > 2'), 'and it is all in the bag');
+
+// Aaron's rule: EVERY monster drops loot, and that loot always includes coins. The item roll is
+// the part that is a chance; the coins are not, so this pins the item chance to zero and checks
+// that twelve kills still fill a purse.
+const coins = await p.eval(`(async () => {
+  const g = window.__wf.game;
+  const e = await import('./js/game/economy.js');
+  e.retune({ lootChance: 0 });
+  const before = g.doc.items.coin || 0;
+  const kinds = Object.keys(g.doc.items).length;
+  for (let i = 0; i < 12; i++) g.dropLoot({ xp: 14 });
+  const out = { gained: (g.doc.items.coin || 0) - before, newKinds: Object.keys(g.doc.items).length - kinds };
+  e.reset();
+  return JSON.stringify(out);
+})()`).then(JSON.parse);
+check(coins.gained >= 12, `twelve kills with no item chance at all still paid coins (${coins.gained})`);
+check(coins.newKinds === 0, 'and nothing else came with them');
+
+// A bigger monster is carrying more. Same twelve kills, a gold-rank worth.
+const rich = await p.eval(`(() => {
+  const g = window.__wf.game;
+  const before = g.doc.items.coin || 0;
+  for (let i = 0; i < 12; i++) g.dropLoot({ xp: 239 });
+  return (g.doc.items.coin || 0) - before;
+})()`);
+check(rich > coins.gained * 8, `a Verge is worth more than an elemental (${coins.gained} against ${rich})`);
+
+// ── coins are a thing in the bag, and a thing can be dropped ────────────────────────────────
+check(await p.eval('window.__wf.game.openBag()'), 'the bag opens');
+await sleep(400);
+const hasCoinRow = await p.eval(`[...document.querySelectorAll('#game .g-invcell')].some(c => /Coins/.test(c.textContent))`);
+check(hasCoinRow, 'and the coins are a row in it, not only a number on the header');
+const dropped = await p.eval(`(() => {
+  const g = window.__wf.game;
+  const before = g.doc.items.coin || 0;
+  const cell = [...document.querySelectorAll('#game .g-invcell')].find(c => /Coins/.test(c.textContent));
+  cell.click();
+  const btn = () => [...document.querySelectorAll('#game .g-invact')].find(b => /^Drop one/.test(b.textContent));
+  const armedLabel = (btn().click(), [...document.querySelectorAll('#game .g-invact')].find(b => /sure\?/.test(b.textContent))?.textContent || '');
+  // Still there — the first press only arms it.
+  const midway = g.doc.items.coin || 0;
+  [...document.querySelectorAll('#game .g-invact')].find(b => /sure\?/.test(b.textContent)).click();
+  return JSON.stringify({ before, midway, after: g.doc.items.coin || 0, armedLabel });
+})()`).then(JSON.parse);
+check(dropped.midway === dropped.before, `one press only arms it ("${dropped.armedLabel}")`);
+check(dropped.after === dropped.before - 1, `and the second one throws a coin away (${dropped.before} → ${dropped.after})`);
+await p.shot(`${OUT}/bag-coins.png`);
+await p.eval('window.__wf.game.inventory.close(); true');
 
 // Nothing may have thrown along the way. A screen that renders and quietly logs a TypeError every
 // frame passes every check above and is still broken.

@@ -6,9 +6,14 @@
 // board with forty jobs on it cannot afford forty rigs, and a player does not want forty either —
 // they want the same fight to keep asking a different question.
 //
-// A spawn is `kind + variant`. The kind decides what it is made of, the variant what has been done
-// to it, and the two multiply. Fourteen kinds and six variants is eighty-four monsters, all of
-// them tuned relative to a fight that has already been balanced against the proving knife.
+// A spawn is `kind + variant + rank`. The kind decides what it is made of, the variant what has
+// been done to it, the rank what weight of the world it belongs to, and the three multiply.
+// Fourteen kinds and six variants is eighty-four monsters at each of four ranks, all of them tuned
+// relative to a fight that has already been balanced against the proving knife.
+//
+// The rank is the one of the three that decides whether the fight is survivable at all —
+// js/game/ranks.js — and it is stamped on a spawn by the contract it is standing in rather than by
+// the kind's own nature. A Mire Thing on a silver board is a silver thing.
 //
 // A kind may also name a BUILD — one of the four silhouettes in js/world/elemental.js — and a
 // `scale`. Up to the silver board it could not: every monster in the game was the same stack of
@@ -19,6 +24,7 @@
 // Pure. js/game/foe.js takes the tuning this hands it and has no idea any of this exists.
 
 import { EARTH } from './foe.js';
+import { WORK_RANKS, RANK_LABEL, monsterAt, floorDamage } from './ranks.js';
 
 // `rock` is the body, `seam` the light in its cracks. Both are read straight by
 // js/world/elemental.js. The tuning is a patch over EARTH, never a replacement: the base fight is
@@ -27,24 +33,28 @@ import { EARTH } from './foe.js';
 export const KINDS = {
   earth: {
     id: 'earth', name: 'Earth Elemental', rock: '#4a4238', seam: '#ff7a2a',
+    rank: 'iron',
     heals: 'dirt',
     note: 'Slow, patient, and it mends off bare soil. Fight it on stone.',
     tuning: {},
   },
   ember: {
     id: 'ember', name: 'Ember Elemental', rock: '#3a1c14', seam: '#ff5a1e',
+    rank: 'iron',
     heals: 'ash',
     note: 'Faster and it hits harder, and it mends standing in its own ash.',
     tuning: { hp: 62, speed: 3.1, damage: 14, windup: 0.5, regen: 26, regenDelay: 0.35, notice: 30 },
   },
   brine: {
     id: 'brine', name: 'Brine Elemental', rock: '#16303a', seam: '#3fd4ff',
+    rank: 'iron',
     heals: 'water',
     note: 'It knits faster than anything else on the board and hits like a wet sack. Outlast it.',
     tuning: { hp: 96, speed: 2.0, damage: 8, regen: 34, regenDelay: 0.25, recover: 0.85 },
   },
   gale: {
     id: 'gale', name: 'Gale Elemental', rock: '#2b3438', seam: '#cfe9f2',
+    rank: 'iron',
     build: 'spindly',
     heals: null,
     note: 'Quick, light, and it turns on the spot. Circling it does not work.',
@@ -52,12 +62,14 @@ export const KINDS = {
   },
   shade: {
     id: 'shade', name: 'Shade', rock: '#14161f', seam: '#8f6cff',
+    rank: 'iron',
     heals: null,
     note: 'It notices you from across a field, it does not stop, and nothing here mends it.',
     tuning: { hp: 70, speed: 3.4, damage: 12, notice: 60, windup: 0.46, regen: 0 },
   },
   mire: {
     id: 'mire', name: 'Mire Thing', rock: '#2c3320', seam: '#9ad14a',
+    rank: 'iron',
     build: 'squat',
     heals: 'dirt',
     note: 'Heavy, mends off anything soft, and takes a very long time to decide to swing.',
@@ -65,6 +77,7 @@ export const KINDS = {
   },
   rust: {
     id: 'rust', name: 'Rust Hound', rock: '#3a2418', seam: '#e0902a',
+    rank: 'iron',
     build: 'spindly',
     heals: null,
     note: 'It does not mend and it does not stop. Everything it has is in the first ten seconds.',
@@ -78,6 +91,7 @@ export const KINDS = {
   // ahead of on ground it likes.
   barrow: {
     id: 'barrow', name: 'Barrow-Wight', rock: '#26232c', seam: '#cfd6ff',
+    rank: 'bronze',
     build: 'tall',
     heals: 'dirt',
     note: 'Slow, very heavy, and the turned earth it came out of puts it back together.',
@@ -86,6 +100,7 @@ export const KINDS = {
   },
   warden: {
     id: 'warden', name: 'Quarry Warden', rock: '#585048', seam: '#ffb038',
+    rank: 'bronze',
     build: 'squat',
     heals: 'stone',
     note: 'Enormous, and it mends off the floor of its own quarry. Fight it anywhere else.',
@@ -94,6 +109,7 @@ export const KINDS = {
   },
   hollow: {
     id: 'hollow', name: 'Hollow Thing', rock: '#1b1426', seam: '#b46cff',
+    rank: 'bronze',
     build: 'spindly',
     heals: null,
     note: 'It knows where you are from anywhere on the floor and it is faster than you think.',
@@ -108,6 +124,7 @@ export const KINDS = {
   // is SPINDLY and reads as fast before it has moved.
   chant: {
     id: 'chant', name: 'Processional', rock: '#3b3550', seam: '#e8d7a0',
+    rank: 'silver',
     build: 'tall',
     heals: 'stone',
     note: 'It walks in a line, it does not hurry, and it reaches further than anything you have '
@@ -117,6 +134,7 @@ export const KINDS = {
   },
   tally: {
     id: 'tally', name: 'Tallyman', rock: '#2a2620', seam: '#7fe0b0',
+    rank: 'silver',
     build: 'squat',
     heals: 'ash',
     note: 'It hits for almost nothing and it never stops, and every scrap of ash on the floor is '
@@ -126,6 +144,7 @@ export const KINDS = {
   },
   glass: {
     id: 'glass', name: 'Glasswright', rock: '#20323a', seam: '#8ff0ff',
+    rank: 'silver',
     build: 'spindly',
     heals: null,
     note: 'Very little of it, moving very fast, hitting harder than anything its size has any '
@@ -138,6 +157,7 @@ export const KINDS = {
   // Four contracts in the province, and this is what is on three of them.
   verge: {
     id: 'verge', name: 'The Verge', rock: '#141a14', seam: '#c8ff5a',
+    rank: 'gold',
     build: 'tall',
     heals: 'grass',
     note: 'It is the size of a gatehouse and everything green in the field is its ground. There '
@@ -171,18 +191,64 @@ const SCALED = { hp: 'hp', speed: 'speed', damage: 'damage', regen: 'regen' };
 export const kindOf = id => KINDS[id] || KINDS[DEFAULT_KIND];
 export const variantOf = id => VARIANTS[id] || VARIANTS.none;
 
+export const rankOfKind = id => kindOf(id).rank || 'iron';
+
+// What the kinds of one rank are, on average, before anything has been done to them. Measured off
+// the table rather than written down beside it, so adding a monster cannot leave a constant
+// lying about the place saying what the band used to be.
+//
+// This is what makes a rank mean the same thing whichever body it is wearing. The table was
+// authored before ranks existed and a silver kind's numbers already had silver baked into them
+// — a Glasswright hit for 33 where an Earth Elemental hit for 11 — so applying a rank multiplier
+// on top would have counted the climb twice. Dividing by the band first leaves only what makes a
+// Glasswright a Glasswright: it hits 1.4× what a silver thing hits, and there is very little of
+// it. js/game/ranks.js then decides what a silver thing hits.
+const BANDS = (() => {
+  const acc = {};
+  for (const k of Object.values(KINDS)) {
+    const t = { ...EARTH, ...k.tuning };
+    (acc[k.rank || 'iron'] ||= []).push(t);
+  }
+  const mean = (list, f) => list.reduce((a, t) => a + t[f], 0) / list.length;
+  return Object.fromEntries(Object.entries(acc).map(([r, l]) => [r, { hp: mean(l, 'hp'), damage: mean(l, 'damage') }]));
+})();
+
+// Iron is the yardstick, because the proving knife was measured against it and js/game/foe.js's
+// regeneration is tuned in its units. An iron kind fought at iron rank comes out of `describe`
+// with exactly the numbers written above — the band it is divided by is the band it is
+// multiplied back up by, and the rank multiplier is 1.
+const BASE = BANDS.iron;
+
 // One monster, fully resolved: what it is called, what it is made of, and the tuning js/game/foe.js
 // will run it with. `spec` is a level document's `foes` entry.
 export function describe(spec = {}) {
   const k = kindOf(spec.kind);
   const v = variantOf(spec.variant);
+  // The rank the work is at, which is the contract's board and not the monster's own nature —
+  // js/game/missions.js stamps it on every spawn. A kind fought above its band is the same
+  // creature grown into harder country; one fought below it has been starved down to fit.
+  const rank = WORK_RANKS.includes(spec.rank) ? spec.rank : (k.rank || 'iron');
+  const m = monsterAt(rank);
+  const band = BANDS[k.rank || 'iron'] || BASE;
   const base = { ...EARTH, ...k.tuning };
   const tuning = { ...base };
   for (const f of Object.keys(SCALED)) tuning[f] = round(base[f] * v[f]);
+  const hp = BASE.hp * (tuning.hp / band.hp) * m.hp;
+  // Mending keeps its pace relative to the body it is mending: a Brine Elemental that knits a
+  // third of itself back in a second still does, whatever rank it is standing at.
+  tuning.regen = round(tuning.regen * (hp / tuning.hp));
+  tuning.hp = round(hp);
+  tuning.damage = round(Math.max(floorDamage(rank), BASE.damage * (tuning.damage / band.damage) * m.damage));
+  const plain = spec.name || (v.name ? `${v.name} ${k.name}` : k.name);
   return {
     kind: k.id,
     variant: v.id,
-    name: spec.name || (v.name ? `${v.name} ${k.name}` : k.name),
+    rank,
+    rankLabel: RANK_LABEL[rank],
+    // The rank goes in the name because the name is the only thing a player reads before the
+    // thing reaches them, and at silver a wrong guess is the whole fight.
+    name: `${RANK_LABEL[rank]}-rank ${plain}`,
+    plainName: plain,
     note: k.note,
     heals: k.heals,
     rock: k.rock,

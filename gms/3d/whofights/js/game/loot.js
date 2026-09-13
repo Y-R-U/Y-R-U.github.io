@@ -1,21 +1,29 @@
 // What falls off a monster.
 //
 // Pure — a roll takes an injected `rnd` — because the whole of the game's pace between Iron and
-// Bronze is these two numbers and a test has to be able to hold them still. The numbers themselves
+// Bronze is these numbers and a test has to be able to hold them still. The numbers themselves
 // are in js/game/economy.js behind the debug tab's Economy panel; nothing here holds a probability
 // that is not read out of there at the moment of the roll.
 //
-// The shape of it: something drops off roughly two kills in five (`lootChance`), and what it is
-// depends on the rank of the work. Awakening stones are the exception and are rolled SEPARATELY,
-// per contract rather than per kill (`stoneDrop`), because sixteen of them is the distance to
-// Bronze and that distance should be measured in contracts finished, not in how many things
-// happened to be standing in the last room.
+// The shape of it, and Aaron's rule: **every monster drops something, and that something always
+// includes coins.** How many is what it was worth to kill, which is the one number that already
+// knows its rank, its kind and what has been done to it. On top of the coins, roughly two kills in
+// five (`lootChance`) also drop an item, and what that item is depends on the rank of the work —
+// higher-rank monsters carry better things.
+//
+// Awakening stones are the exception and are rolled SEPARATELY, per contract rather than per kill
+// (`stoneDrop`), because sixteen of them is the distance to Bronze and that distance should be
+// measured in contracts finished, not in how many things happened to be standing in the last room.
 
 import { tuning } from './economy.js';
-import { STONE, POTION, ROPE } from './items.js';
+import { STONE, POTION, DRAUGHT, ROPE, COIN } from './items.js';
+import { coinsFor } from './ranks.js';
 
-// Per-kill drops, by the rank of the contract. Weights, not chances: one roll picks one row.
-// A rank the table has never heard of falls back to iron rather than dropping nothing.
+export { COIN };
+
+// The item that sometimes comes with the coins, by the rank of the work. Weights, not chances:
+// one roll picks one row. A rank the table has never heard of falls back to iron rather than
+// dropping nothing.
 export const TABLES = {
   iron: [
     { id: POTION, weight: 5 },
@@ -30,16 +38,20 @@ export const TABLES = {
     { id: 'spear', weight: 1 },
   ],
   silver: [
-    { id: POTION, weight: 4 },
+    { id: POTION, weight: 3 },
+    { id: DRAUGHT, weight: 2 },
     { id: ROPE, weight: 1 },
     { id: 'shortsword', weight: 2 },
     { id: 'spear', weight: 2 },
-    { id: 'axe', weight: 1 },
+    { id: 'axe', weight: 2 },
+    { id: 'warsword', weight: 1 },
   ],
   gold: [
-    { id: POTION, weight: 3 },
-    { id: 'spear', weight: 2 },
-    { id: 'axe', weight: 3 },
+    { id: DRAUGHT, weight: 4 },
+    { id: 'axe', weight: 2 },
+    { id: 'warsword', weight: 3 },
+    { id: 'pike', weight: 2 },
+    { id: 'maul', weight: 1 },
   ],
 };
 
@@ -57,12 +69,16 @@ export function pick(rows, rnd = Math.random) {
   return rows[rows.length - 1].id;
 }
 
-// One kill. Null most of the time, which is what makes a drop worth noticing.
-export function onKill({ rank = 'iron' } = {}, rnd = Math.random) {
-  const chance = Math.max(0, Math.min(1, tuning().lootChance));
-  if (rnd() >= chance) return null;
-  const id = pick(tableFor(rank), rnd);
-  return id ? { id, count: 1 } : null;
+// One kill. Always coins, sometimes an item as well. `worth` is the monster's own `xp` off
+// js/game/bestiary.js — it is what the fight was, so it is what the purse is.
+//
+// Never null. A monster that dropped nothing at all is the thing this pass exists to remove.
+export function onKill({ rank = 'iron', worth = 14 } = {}, rnd = Math.random) {
+  const t = tuning();
+  const coins = coinsFor(worth, t.coinRate, rnd);
+  const chance = Math.max(0, Math.min(1, t.lootChance));
+  const item = rnd() < chance ? pick(tableFor(rank), rnd) : null;
+  return { coins, item: item ? { id: item, count: 1 } : null, rank };
 }
 
 // One contract, finished. The stone roll, and only the stone roll — it is deliberately not in the

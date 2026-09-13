@@ -72,7 +72,7 @@ export const WEAPONS = {
   },
 
   // ── the back of the shop ──────────────────────────────────────────────────
-  // A silver contract pays six hundred marks and an awakening stone costs two hundred and forty,
+  // A silver contract pays six hundred coins and an awakening stone costs two hundred and forty,
   // so without these there is nothing above iron rank to want. They are roughly twice the axe and
   // they are priced so that a bronze adventurer can see them and not have them.
   //

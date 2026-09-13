@@ -34,7 +34,14 @@
         {
           "say": "How do I join?",
           "goto": "society.greeter.test",
-          "sets": []
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.test.passed"
+            ]
+          ]
         },
         {
           "say": "I'll read them myself.",
@@ -88,7 +95,14 @@
         {
           "say": "About joining.",
           "goto": "society.greeter.test",
-          "sets": []
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.test.passed"
+            ]
+          ]
         },
         {
           "say": "The contracts, then.",
@@ -128,7 +142,14 @@
         {
           "say": "How do I join?",
           "goto": "society.greeter.test",
-          "sets": []
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.test.passed"
+            ]
+          ]
         },
         {
           "say": "Thank you.",
@@ -213,7 +234,33 @@
         {
           "say": "How do I get to iron?",
           "goto": "society.greeter.test",
-          "sets": []
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.test.passed"
+            ]
+          ]
+        },
+        {
+          "say": "I came up that way.",
+          "goto": "society.greeter.stars",
+          "sets": [],
+          "if": [
+            "all",
+            [
+              "flag",
+              "society.test.passed"
+            ],
+            [
+              "not",
+              [
+                "flag",
+                "society.knows.stars"
+              ]
+            ]
+          ]
         },
         {
           "say": "Understood.",
@@ -251,12 +298,26 @@
         {
           "say": "I'm ready.",
           "goto": "society.greeter.proving.go",
-          "sets": []
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.test.passed"
+            ]
+          ]
         },
         {
           "say": "What happens if I lose?",
           "goto": "society.greeter.proving.lose",
-          "sets": []
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.test.passed"
+            ]
+          ]
         },
         {
           "say": "Not yet.",
@@ -290,7 +351,14 @@
         {
           "say": "Then let's go.",
           "goto": "society.greeter.proving.go",
-          "sets": []
+          "sets": [],
+          "if": [
+            "not",
+            [
+              "flag",
+              "society.test.passed"
+            ]
+          ]
         },
         {
           "say": "Later.",
@@ -1802,7 +1870,7 @@
       "lines": [
         {
           "who": "smith",
-          "text": "A dagger, first, because it is quick and it is cheap and you will not be sorry you spent the marks."
+          "text": "A dagger, first, because it is quick and it is cheap and you will not be sorry you spent the coins."
         },
         {
           "who": "smith",
@@ -1840,7 +1908,7 @@
       "lines": [
         {
           "who": "smith",
-          "text": "Come back with marks and I will be delighted to see you."
+          "text": "Come back with coins and I will be delighted to see you."
         }
       ],
       "choices": [],
@@ -2177,7 +2245,7 @@
         },
         {
           "who": "smith",
-          "text": "Everything on the racks is yours if you pay for it. Buy the dagger today and the spear when you have the marks — it reaches a thing before the thing reaches you."
+          "text": "Everything on the racks is yours if you pay for it. Buy the dagger today and the spear when you have the coins — it reaches a thing before the thing reaches you."
         }
       ],
       "choices": [],

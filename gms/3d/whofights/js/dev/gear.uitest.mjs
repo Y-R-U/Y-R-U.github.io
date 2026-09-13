@@ -65,12 +65,20 @@ let a = await armed();
 check(a.vis === false && a.w === 'fists', `unarmed in the Society, bare-handed (${a.w})`);
 
 // ── the proving lends a knife ───────────────────────────────────────────────────────────────
+// `society.test.passed` has to come off first: the proving is a room you may only walk into once,
+// and js/game/session.js gotoLevel() shuts the door on anybody who has already been through it.
+// That is the fix for Aaron's "I could go back to the registration battle", and it applies to a
+// test driving the game exactly as it applies to a conversation.
+await p.eval('window.__wf.game.doc.flags["society.test.passed"] = false; true');
 await p.eval('window.__wf.game.gotoLevel("proving", { x: 0, z: 15, yaw: 3.14159 }); true');
 check(await p.waitFor('window.__wf.level.id === "proving"', 20000), 'moved to the proving floor');
 await sleep(2000);
 a = await armed();
 check(a.vis === true && a.w === 'knife', `the proving lends the knife (${a.w})`);
 check(await p.eval('window.__wf.level.loaner === "knife"'), 'and the level document is what says so');
+check(await p.eval('window.__wf.game.doc.flags["society.test.passed"] = true'), 'proving passed again');
+check(await p.eval('window.__wf.game.gotoLevel("proving") === false'),
+  'and a second walk into the proving is refused outright');
 
 // ── the bug: a contract arena must NOT ───────────────────────────────────────────────────────
 await p.eval(`(() => {
@@ -91,7 +99,7 @@ await p.shot(`${OUT}/arena-unarmed.png`);
 await p.eval(`(async () => {
   const it = await import('./js/game/items.js');
   const g = window.__wf.game;
-  it.give(g.doc.items, 'marks', 400);
+  it.give(g.doc.items, 'coin', 400);
   it.give(g.doc.items, 'spear', 1);
   it.give(g.doc.items, 'stone.awakening', 2);
   it.give(g.doc.items, 'potion.healing', 3);
@@ -111,7 +119,7 @@ check(await p.eval('window.__wf.game.openBag()'), 'the bag opens');
 await sleep(500);
 check(await p.eval('!!document.querySelector("#game .g-inv")'), 'and it is on screen');
 const cells = await p.eval('document.querySelectorAll("#game .g-invcell").length');
-check(cells === 4, `five things carried, four rows (marks are the purse, not a row) — got ${cells}`);
+check(cells === 5, `five things carried, five rows — coins are a row now, not just the purse — got ${cells}`);
 check(await p.eval('!!document.querySelector("#game .g-invequip")'), 'with the equip box set aside');
 check(await p.eval('/400/.test(document.querySelector("#game .g-parch-title p").textContent)'), 'and the purse on the header');
 await p.shot(`${OUT}/bag.png`);

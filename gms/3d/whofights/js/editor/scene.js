@@ -399,6 +399,10 @@ export function normalise(raw) {
           // falls back there rather than here: one place decides what a monster is.
           kind: typeof f.kind === 'string' ? f.kind : 'earth',
           variant: typeof f.variant === 'string' ? f.variant : 'none',
+          // The rank the monster is fought at — js/game/ranks.js. Dropped here once, which meant
+          // every monster in a patched arena came back at its kind's own rank and a bronze
+          // contract was fought at iron weight. Validated in js/game/bestiary.js, like `kind`.
+          rank: typeof f.rank === 'string' ? f.rank : null,
           name: typeof f.name === 'string' && f.name ? f.name : null,
           x: +f.x, z: +f.z, yaw: num(f.yaw, 0),
           scale: Math.min(2.5, Math.max(0.5, num(f.scale, 1))),

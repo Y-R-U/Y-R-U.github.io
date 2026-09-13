@@ -27,7 +27,7 @@
 //
 // Pure. The document patching is a JSON transform and it is tested as one.
 
-import { BOARDS } from './contracts.js';
+import { BOARDS, rankIndex, RANK_LABEL } from './contracts.js';
 import { describe } from './bestiary.js';
 import { SURFACES } from './ground.js';
 
@@ -65,10 +65,16 @@ export const playable = jobId => !!missionOf(jobId);
 //
 // `turn` fans each wave from a different quarter of the ring, so the second group does not walk
 // out of the footprints of the first.
-export function spawnsOf(mission, group = null, turn = 0) {
+export function spawnsOf(mission, group = null, turn = 0, rank = 'iron') {
+  const board = rankIndex(rank) > 0 ? rank : 'iron';
   const list = [];
   for (const s of group || mission?.spawns || []) {
-    for (let i = 0; i < Math.max(1, s.count || 1); i++) list.push({ kind: s.kind, variant: s.variant || 'none', name: s.name || null });
+    // The rank of the work, stamped on every monster in it. A spawn may not ask for more than the
+    // board it hangs on: the boards are what gate a player to their own rank, and a contract that
+    // could smuggle a silver monster onto the iron floor would kill an iron adventurer in one
+    // blow — which is exactly what js/game/ranks.js makes a silver monster do.
+    const at = rankIndex(s.rank) > 0 && rankIndex(s.rank) < rankIndex(board) ? s.rank : board;
+    for (let i = 0; i < Math.max(1, s.count || 1); i++) list.push({ kind: s.kind, variant: s.variant || 'none', name: s.name || null, rank: at });
   }
   const n = list.length;
   return list.map((s, i) => {
@@ -87,37 +93,44 @@ export function spawnsOf(mission, group = null, turn = 0) {
 
 // The groups that arrive after the gate, each already placed. Wave 0 is `spawns` and is in the
 // level document; these are handed to js/game/combat.js `reinforce()` on the mission's own clock.
-export function wavesOf(mission) {
+export function wavesOf(mission, rank = 'iron') {
   return (mission?.waves || [])
     .filter(w => w && Array.isArray(w.spawns) && w.spawns.length)
-    .map((w, i) => ({ at: Math.max(0.5, +w.at || 10), spawns: spawnsOf(mission, w.spawns, i + 1) }))
+    .map((w, i) => ({ at: Math.max(0.5, +w.at || 10), spawns: spawnsOf(mission, w.spawns, i + 1, rank) }))
     .sort((a, b) => a.at - b.at);
 }
 
 // Everything that will ever stand in the room, whenever it arrives.
-export const allSpawns = mission => [...spawnsOf(mission), ...wavesOf(mission).flatMap(w => w.spawns)];
+export const allSpawns = (mission, rank = 'iron') =>
+  [...spawnsOf(mission, null, 0, rank), ...wavesOf(mission, rank).flatMap(w => w.spawns)];
 
 // What the whole room is worth, off the bestiary rather than authored beside it — swap a lesser
 // elemental for a greater one and the contract pays more without anybody remembering to say so.
-export const worthOf = mission =>
-  allSpawns(mission).reduce((a, s) => a + describe(s).xp, 0);
+export const worthOf = (mission, rank = 'iron') =>
+  allSpawns(mission, rank).reduce((a, s) => a + describe(s).xp, 0);
 
 // What the player is walking into, in one line, for the toast on arrival and the mission panel.
 export function briefOf(jobId) {
   const job = jobFor(jobId);
   const m = job?.mission;
   if (!m) return null;
+  // Every monster in one contract carries that contract's rank, and the rank is in each of their
+  // names — so the list would read "Iron-rank Lesser Shade, 2 × Iron-rank Gale Elemental". Said
+  // once, at the top of the panel, instead.
+  const all = allSpawns(m, job.rank).map(describe);
+  const oneRank = all.every(d => d.rank === all[0]?.rank);
   const seen = new Map();
-  for (const s of allSpawns(m)) {
-    const d = describe(s);
-    seen.set(d.name, (seen.get(d.name) || 0) + 1);
+  for (const d of all) {
+    const label = oneRank ? d.plainName : d.name;
+    seen.set(label, (seen.get(label) || 0) + 1);
   }
   const parts = [...seen].map(([name, n]) => (n === 1 ? name : `${n} × ${name}`));
   const objective = objectiveOf(m);
   const seconds = secondsOf(m);
   return {
-    job, mission: m, foes: parts.join(', '), worth: worthOf(m), note: m.note || job.blurb,
-    objective, seconds, waves: wavesOf(m).length,
+    job, mission: m, rank: job.rank, rankLabel: RANK_LABEL[job.rank], foes: parts.join(', '),
+    worth: worthOf(m, job.rank), note: m.note || job.blurb,
+    objective, seconds, waves: wavesOf(m, job.rank).length,
     // The one line the mission panel and the arrival toast both use, so they cannot disagree
     // about what the player is being asked to do.
     asks: objective === 'survive' ? `Stay standing for ${seconds} seconds` : 'Clear the floor',
@@ -142,6 +155,6 @@ export function patchArena(base, mission, job = null) {
     // indexed, so re-laying the arena in the editor cannot silently swap them over.
     if (o.type === 'plot') o.p.surface = (o.p.w >= 30 ? floor : patch);
   }
-  doc.foes = spawnsOf(mission);
+  doc.foes = spawnsOf(mission, null, 0, job?.rank || 'iron');
   return doc;
 }

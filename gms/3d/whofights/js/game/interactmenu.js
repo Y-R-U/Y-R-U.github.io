@@ -147,11 +147,17 @@ export class SpellList {
       b.append(h);
       b.append(el('span', 'g-abil-cost', a.cost));
       b.append(el('p', null, a.text));
+      // What it does, as opposed to what it is like. Off the live tuning, so it says what this
+      // adventurer's rank makes of it rather than what the table says at iron.
+      if (st.does) b.append(el('em', 'g-abil-does', st.does));
       // The mana cost and the reason, on one line. `why` is whatever js/game/spells.js refused
       // with, so the sheet and the toast the number keys raise say the same thing.
+      // Two kinds cost nothing and wait a long time instead (js/game/spells.js), so the line has
+      // to be able to say "free" — "0 mana" reads as a bug.
+      const price = st.cost > 0 ? `${st.cost} mana` : 'free';
       b.append(el('span', 'g-abil-state', st.ready
-        ? `${st.cost} mana · ready · key ${i + 1}`
-        : (st.cooling > 0 ? `${st.cost} mana · ready in ${st.cooling.toFixed(1)}s` : st.why)));
+        ? `${price} · ready · key ${i + 1}`
+        : (st.cooling > 0 ? `${price} · ready in ${st.cooling.toFixed(1)}s` : st.why)));
       b.onclick = () => { this.close(); this.onCast(a); };
       body.append(b);
     });

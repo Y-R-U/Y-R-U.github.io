@@ -8,10 +8,11 @@
 
 import { Elemental } from '../world/elemental.js';
 import { spawn, step, wound, snare, isDead } from './foe.js';
-import { make, hurt, mend, inSwing, fraction } from './vitals.js';
+import { make, hurt, mend, lift, drop, inSwing, fraction } from './vitals.js';
 import { WARD } from './spells.js';
 import { isHealing, plotsOf } from './ground.js';
 import { describe } from './bestiary.js';
+import { maxHp, soak } from './ranks.js';
 // Re-exported, not redefined: js/game/bestiary.test.mjs has to reach the knife without reaching
 // three, and two copies of a balance number is one copy too many.
 import { KNIFE, PLAYER_HP, weaponOf } from './weapons.js';
@@ -28,7 +29,10 @@ export class Combat {
     this.swingId = 0;
     this.cool = 0;
     this.pending = null;
-    this.vitals = make(PLAYER_HP);
+    this.vitals = make(this.hpCeiling());
+    // Lifts from a `buff` ability, each with its own clock. A list rather than one number because
+    // two of them at once is two of them, and the first to run out must take back only its own.
+    this.lifts = [];
     // How long a ward is still standing. One number rather than a list: two wards at once is a
     // longer ward, which is what a player casting two defensive abilities expects anyway.
     this.warded = 0;
@@ -82,11 +86,23 @@ export class Combat {
     this.expecting = false;
   }
 
+  // What the player is made of at their rank — js/game/ranks.js. A session that has not been
+  // handed one (the tests, the tools) is the iron figure the proving was tuned against.
+  hpCeiling() { return maxHp(this.session?.rank?.() || 'iron'); }
+
+  // A full bar at whatever the ceiling is now. What a promotion does, and the one moment in the
+  // game where the Society puts the player back together.
+  restore() {
+    this.lifts = [];
+    this.vitals = make(this.hpCeiling());
+    return this.vitals;
+  }
+
   // Called when the level says the fight starts — a hotspot's `proving.begin` event, not level
   // load, so a player who walks in and stands at the gate is not jumped the instant it streams in.
   begin() {
     if (this.foes.length || !this.spec.length) return false;
-    this.vitals = make(PLAYER_HP);
+    this.restore();
     this.warded = 0;
     this.stand(this.spec, this.book);
     this.session?.bus?.dispatchEvent(new CustomEvent('combat.begin', { detail: { foes: this.foes.length } }));
@@ -119,8 +135,9 @@ export class Combat {
 
   groundY(x, z) { return this.player.groundY(x, z); }
 
-  // What the bar over its head says it is. The name is the kind and what has been done to it —
-  // "Greater Ember Elemental" — unless the level document wrote one out itself.
+  // What the bar over its head says it is. The rank, the kind and what has been done to it —
+  // "Bronze-rank Greater Ember Elemental" — unless the level document wrote a name of its own,
+  // which still gets the rank in front of it. js/game/bestiary.js decides.
   nameOf(i) { return this.book[i]?.name || 'Something'; }
 
   // What killing everything in the room is worth. Summed off the bestiary rather than authored on
@@ -137,6 +154,12 @@ export class Combat {
     // what stops a held button being a hit every frame.
     this.cool = Math.max(0, this.cool - dt);
     this.warded = Math.max(0, this.warded - dt);
+    for (let i = this.lifts.length - 1; i >= 0; i--) {
+      this.lifts[i].t -= dt;
+      if (this.lifts[i].t > 0) continue;
+      this.vitals = drop(this.vitals, this.lifts[i].amount);
+      this.lifts.splice(i, 1);
+    }
     if (P.castEdge) {
       P.castEdge = false;
       if (this.cool <= 0 && !this.vitals.dead) {
@@ -227,6 +250,15 @@ export class Combat {
 
   guard(seconds) { this.warded = Math.max(this.warded, seconds); return true; }
 
+  // More of you, for a while. Refused when there is nothing to add to — a corpse with a bigger
+  // ceiling is still a corpse — so the caller can say why the mana did nothing.
+  bolster(amount, seconds) {
+    if (this.vitals.dead || amount <= 0) return false;
+    this.vitals = lift(this.vitals, amount);
+    this.lifts.push({ amount: Math.max(0, Math.round(amount)), t: Math.max(1, seconds || 30) });
+    return true;
+  }
+
   // A rope on the nearest thing still standing. Returns what it caught, or null — the caller only
   // spends the rope if something was actually roped.
   snareNearest(seconds) {
@@ -243,9 +275,12 @@ export class Combat {
   }
 
   takeHit(amount) {
-    // A ward does not stop a blade. It takes the weight out of it, which is what every defensive
-    // ability in data/essences.json says it does in one way or another.
-    const taken = this.warded > 0 ? amount * (1 - WARD) : amount;
+    // Two things stand between a blow and the player, and they compound. Rank is what the Society
+    // has made of you and applies always (js/game/ranks.js); a ward is something you cast and
+    // applies while it holds, which is what every defensive ability in data/essences.json says it
+    // does in one way or another.
+    const rank = soak(this.session?.rank?.() || 'iron', amount);
+    const taken = this.warded > 0 ? rank * (1 - WARD) : rank;
     this.vitals = hurt(this.vitals, taken);
     this.session?.bus?.dispatchEvent(new CustomEvent('combat.hurt', {
       detail: { hp: this.vitals.hp, fraction: fraction(this.vitals) },

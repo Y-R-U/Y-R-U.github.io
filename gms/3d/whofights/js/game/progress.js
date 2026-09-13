@@ -20,11 +20,16 @@ export const STARS = 4;
 // That means each rank's ladder begins exactly where the one below it ended: bronze's first star
 // costs more than the whole of iron, which is right — it is a bronze star. The first version had
 // bronze starting at 260 against an iron top of 380, so being promoted handed you a free star.
+//
+// The widths are measured against what a board of that rank actually pays now that a monster's
+// rank scales it (js/game/ranks.js): iron work averages 25 experience a contract, bronze 182,
+// silver 581 and gold 2,722. Every rung is about a dozen contracts of its own work — and, with
+// the ceiling below, only its own work.
 export const LADDER = {
   iron:   [0, 40, 110, 220, 380],
   bronze: [380, 640, 1080, 1720, 2600],
-  silver: [2600, 4200, 6600, 10200, 15400],
-  gold:   [15400, 24000, 38000, 60000, 95000],
+  silver: [2600, 3800, 5600, 8000, 11000],
+  gold:   [11000, 16000, 23000, 32000, 44000],
 };
 
 export const XP_FLAG = 'society.xp';
@@ -95,16 +100,34 @@ export function sheet(flags = {}) {
 const ORDINALS = ['zeroth', 'first', 'second', 'third', 'fourth'];
 export const ordinal = n => ORDINALS[n] || `${n}th`;
 
+// The most a rank may hold. Experience stops at its own fourth star and the rest is not counted:
+// Aaron finished the iron board at four stars, was raised, and arrived at bronze already two
+// stars up, because the ladder is one lifetime total and iron work had gone on adding to it.
+//
+// A ceiling rather than a reset. The number in the save never goes down, you are never told you
+// have lost anything, and the moment the Society raises you the rung above is open all the way —
+// you simply start at the bottom of it, which is where being new to a rank ought to put you.
+export const ceilingOf = rank => (rank === 'none' ? stepsOf('iron')[STARS] : stepsOf(rank)[STARS]);
+
 // Earning it. Returns the flags to write and what changed, so the caller can say "a star" out loud
 // without working out for itself whether one was crossed.
 export function award(flags = {}, amount) {
-  const gain = Math.max(0, Math.round(amount || 0));
+  const want = Math.max(0, Math.round(amount || 0));
   const rank = rankOf(flags);
   const before = sheet(flags);
-  const after = sheet({ ...flags, [XP_FLAG]: xpOf(flags) + gain });
+  const had = xpOf(flags);
+  // Never below what is already there: a save carried over from a build without the ceiling can
+  // be above it, and an award must not take experience away.
+  const xp = Math.max(had, Math.min(had + want, ceilingOf(rank)));
+  const gain = xp - had;
+  const after = sheet({ ...flags, [XP_FLAG]: xp });
   return {
-    xp: xpOf(flags) + gain,
+    xp,
     gain,
+    // What the rank would not count. The toast says so, because experience that quietly vanishes
+    // looks exactly like experience that was never awarded.
+    wasted: want - gain,
+    capped: gain < want,
     rank,
     stars: after.stars,
     starGained: after.stars > before.stars,

@@ -19,6 +19,20 @@ export const hurt = (v, amount) => apply(v, -Math.max(0, amount));
 export const mend = (v, amount) => (v.dead ? v : apply(v, Math.max(0, amount)));
 export const fraction = v => (v.max > 0 ? v.hp / v.max : 0);
 
+// More of you than there was. A `buff` ability (js/game/spells.js) raises the ceiling and fills
+// what it opened, which is what makes it worth casting at full health.
+export const lift = (v, amount) => {
+  const n = Math.max(0, Math.round(amount));
+  return v.dead ? v : { hp: v.hp + n, max: v.max + n, dead: false };
+};
+
+// And the ceiling coming back down when it wears off. What is over the new top is lost — you were
+// carrying more than you have room for — but it can never put you below one.
+export const drop = (v, amount) => {
+  const max = Math.max(1, v.max - Math.max(0, Math.round(amount)));
+  return { hp: Math.max(v.dead ? 0 : 1, Math.min(v.hp, max)), max, dead: v.dead };
+};
+
 // The angle between where you are facing and where a thing is, folded to ±π. Yaw here is the
 // game's own convention — atan2(x, z), +z at yaw 0 — not the maths one, and mixing the two is
 // how a swing comes out ninety degrees off the thing you are looking at.

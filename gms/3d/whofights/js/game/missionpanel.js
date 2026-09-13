@@ -76,12 +76,15 @@ export class MissionPanel {
     box.append(el('b', 'g-mission-asks', b.asks));
     box.append(el('p', null, b.note));
     const row = el('div', 'g-mission-row');
-    row.append(el('span', null, this.total && this.seconds == null ? `${b.foes} · ${this.left} standing` : b.foes));
+    // The rank of the work, said once. Every monster in the room is that rank and carries it in
+    // its own name over its head; repeating it four times in one list reads as a stutter.
+    const foes = b.rankLabel ? `${b.rankLabel} rank — ${b.foes}` : b.foes;
+    row.append(el('span', null, this.total && this.seconds == null ? `${foes} · ${this.left} standing` : foes));
     row.append(el('em', null, `${b.worth} xp`));
     box.append(row);
     const pay = el('div', 'g-mission-row');
     pay.append(el('span', null, `${b.job.client} · ${b.job.where}`));
-    pay.append(el('em', null, `${b.job.reward} marks`));
+    pay.append(el('em', null, `${b.job.reward} coins`));
     box.append(pay);
     this.root.append(box);
   }

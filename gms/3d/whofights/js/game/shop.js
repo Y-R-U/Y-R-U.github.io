@@ -9,7 +9,7 @@
 // mis-tap that spends it would be the worst moment in the game.
 
 import { el, clear } from './ui.js';
-import { ITEMS, itemOf, stockPrice, countOf, purse, MARKS, STONE, POTION, DRAUGHT, ROPE } from './items.js';
+import { ITEMS, itemOf, stockPrice, countOf, purse, COIN, STONE, POTION, DRAUGHT, ROPE } from './items.js';
 import { buyableIds, weaponOf } from './weapons.js';
 
 export const SHOPS = {
@@ -69,11 +69,11 @@ export function wares(id) {
 export function refuse(bag, id, shopId) {
   const row = wares(shopId).find(w => w.id === id);
   if (!row) return 'Not stocked here.';
-  if (purse(bag) < row.price) return `${row.price - purse(bag)} marks short.`;
+  if (purse(bag) < row.price) return `${row.price - purse(bag)} coins short.`;
   return null;
 }
 
-const money = n => `${(n || 0).toLocaleString('en-GB')} marks`;
+const money = n => `${(n || 0).toLocaleString('en-GB')} coins`;
 
 export class Shop {
   constructor({ host, bag = () => ({}), onBuy = () => false, onOpen = () => {}, onClose = () => {} }) {
@@ -185,4 +185,4 @@ export class Shop {
   }
 }
 
-export { MARKS };
+export { COIN };

@@ -44,6 +44,10 @@ test('the well never overfills and never goes negative', () => {
   const drained = { mana: 1, max: MANA, cool: {} };
   ok(spend(drained, A('special')).mana >= 0);
   near(well({ mana: 0, max: MANA, cool: {} }, 2).mana, REGEN * 2, 1e-9);
+  // A share of the well, not a flat number: a gold adventurer's four hundred mana would otherwise
+  // take a minute to come back where an iron one's hundred takes fifteen seconds.
+  near(well({ mana: 0, max: 400, cool: {} }, 2).mana, REGEN * 4 * 2, 1e-9);
+  near(well({ mana: 0, max: 400, cool: {} }, 15.4).mana, 400, 1e-9, 'empty to full takes the same time at every rank');
 });
 
 test('an empty well refuses by name', () => {
@@ -113,6 +117,58 @@ test('the confluence look is the three that made it', () => {
   eq(withVoid.void, doc.essences.void.spell.void, 'one void among the three is enough');
 });
 
+// Aaron: "Make sure not all essence abilities are attack/teleport. They could boost health,
+// increase max health, or that for mana." Ten kinds used to come out as eight bolts, a dash and a
+// heal — `utility` was a bolt that did five and `buff` was a small ward — so half the book was the
+// same key with a different colour on it.
+test('the ten kinds are not eight ways of throwing something', () => {
+  const bolts = Object.values(KINDS).filter(k => k.aim === 'bolt');
+  const selves = Object.values(KINDS).filter(k => k.aim === 'self');
+  ok(selves.length >= 4, `only ${selves.length} of the ten kinds do anything but travel`);
+  ok(bolts.length <= 6);
+  // One of each thing Aaron asked for.
+  ok(Object.values(KINDS).some(k => k.mend > 0), 'nothing heals');
+  ok(Object.values(KINDS).some(k => k.vigour > 0), 'nothing raises maximum health');
+  ok(Object.values(KINDS).some(k => k.draw > 0), 'nothing gives mana back');
+  ok(Object.values(KINDS).some(k => k.focus > 0), 'nothing raises maximum mana');
+  ok(Object.values(KINDS).some(k => k.ward > 0), 'nothing wards');
+});
+
+test('every kind does something when it is pressed, and a free one waits instead', () => {
+  for (const [id, k] of Object.entries(KINDS)) {
+    const gives = k.damage || k.mend || k.ward || k.vigour || k.draw || k.focus || k.dash;
+    ok(gives > 0, `${id} costs ${k.cost} and does nothing`);
+    if (k.cost === 0) ok(k.cooldown >= 10, `${id} is free and comes back in ${k.cooldown}s`);
+    if (k.vigour || k.focus) ok(k.seconds > 0, `${id} lifts a ceiling and never puts it back`);
+  }
+});
+
+// A rank makes everything better — Aaron: "on higher ranks, the effectiveness of all essence
+// abilities should increase".
+test('a rank multiplies what an ability gives and takes something off what it costs', () => {
+  const rich = { power: 8, thrift: 0.3 };
+  for (const [id, k] of Object.entries(KINDS)) {
+    const a = { id, name: id, kind: id };
+    const base = tuning(a);
+    const up = tuning(a, rich);
+    for (const f of ['damage', 'mend', 'vigour', 'draw', 'focus']) {
+      if (!base[f]) continue;
+      eq(up[f], base[f] * 8, `${id}: ${f} did not scale with rank`);
+    }
+    if (base.ward) ok(up.ward > base.ward && up.ward < base.ward * 8, `${id}: a ward scaled like an amount`);
+    if (base.cost > 0) ok(up.cost < base.cost && up.cost >= 1, `${id}: cost ${base.cost} → ${up.cost}`);
+    else eq(up.cost, 0, `${id}: a free ability stopped being free`);
+    eq(up.cooldown, base.cooldown, `${id}: rank moved a cooldown`);
+  }
+});
+
+test('an iron adventurer gets exactly the numbers the table writes down', () => {
+  for (const id of Object.keys(KINDS)) {
+    const a = { id, name: id, kind: id };
+    eq(tuning(a, { power: 1, thrift: 0 }), tuning(a), `${id} drifted at iron`);
+  }
+});
+
 // The rule that has to hold for every player, not for the three triples somebody tried: every
 // ability the essence table can hand out resolves to a shape that exists and a colour that parses.
 test('every triple there is casts four spells that can be drawn', () => {
@@ -130,7 +186,12 @@ test('every triple there is casts four spells that can be drawn', () => {
           ok(p.ok, `${a.id}: ${p.why}`);
           ok(SHAPES[p.cast.look.shape], `${a.id}: unknown shape`);
           ok(/^#[0-9a-f]{6}$/i.test(p.cast.look.core), `${a.id}: bad core`);
-          ok(p.cast.damage >= 0 && p.cast.cost > 0, `${a.id}: nonsense tuning`);
+          ok(p.cast.damage >= 0 && p.cast.cost >= 0, `${a.id}: nonsense tuning`);
+          // An ability has to DO something. Two kinds cost nothing on purpose — see KINDS — so
+          // "it costs mana" is no longer proof that a key does anything when it is pressed.
+          const gives = p.cast.damage || p.cast.mend || p.cast.ward || p.cast.vigour
+            || p.cast.draw || p.cast.focus || p.cast.dash;
+          ok(gives > 0, `${a.id}: costs ${p.cast.cost} and does nothing at all`);
         }
         checked++;
       }

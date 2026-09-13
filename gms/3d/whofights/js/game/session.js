@@ -32,9 +32,10 @@ import { Shop, isShop, shopOf, refuse as shopRefuse, wares } from './shop.js';
 import { ActionBar } from './actionbar.js';
 import { active as tourOn, complete as tourDone, left as tourLeft, brief as tourBrief, DONE as TOUR_DONE, STOPS as TOUR_STOPS } from './tour.js';
 import { resolve as resolveSlots, normalise as normaliseSlots, assign as assignSlot, filled as slotsFilled } from './slots.js';
-import { use as useItem, take as takeItem, give as giveItem, has as hasItem, nameOf as itemName, usable as itemUsable, isWeapon, purse, MARKS, STONE } from './items.js';
+import { use as useItem, take as takeItem, give as giveItem, has as hasItem, nameOf as itemName, usable as itemUsable, isWeapon, purse, COIN, STONE } from './items.js';
 import { tuning as economy, payFor } from './economy.js';
 import { onKill as lootOnKill, onContract as lootOnContract } from './loot.js';
+import { xpScale, playerAt } from './ranks.js';
 import { awakenOne, allAwakened, rowsOf, MAX_ABILITIES } from './essences.js';
 
 // Where the proving puts you back: in front of the Registrar's desk on the ground floor, facing
@@ -161,6 +162,7 @@ export class Session {
       onEquip: id => this.equip(id),
       onHold: id => this.hold(id),
       onUse: id => this.useFromBag(id),
+      onDrop: (id, n) => this.discard(id, n),
     });
     // `I` for the bag, the way every game with a bag in it has done since Ultima. Its own listener
     // rather than a route through js/input.js, because the screens already own their keys —
@@ -206,7 +208,7 @@ export class Session {
       progress: () => this.progress(),
       essences: () => (this.essences?.doc ? heldEssences(this.essences.doc, this.doc.essences) : null),
       abilities: () => this.awakened(),
-      marks: () => this.doc.items.marks || 0,
+      coins: () => purse(this.doc.items),
       contract: () => this.activeContract(),
       played: () => this.doc.played,
     });
@@ -238,7 +240,7 @@ export class Session {
     // Something went down, whatever put it down. Loot goes straight into the bag — Aaron's son
     // asked for that explicitly, and a corpse you have to walk over and press a button on is a
     // corpse you forget while the next wave is arriving.
-    this.bus.addEventListener('combat.kill', () => this.dropLoot());
+    this.bus.addEventListener('combat.kill', e => this.dropLoot(e.detail || {}));
     this.bus.addEventListener('combat.end', e => {
       const won = e.detail?.outcome === 'won';
       if (this.level.id === ARENA) return this.finishContract(won);
@@ -353,14 +355,19 @@ export class Session {
       return void setTimeout(() => this.gotoLevel('society', BACK_TO_DESK), 2600);
     }
     this.run = null;
-    const gain = worthOf(job.mission);
+    // What the room was worth, and then what it is worth TO YOU. Work below your own rank counts
+    // for almost nothing (js/game/ranks.js) — a bronze adventurer clearing the iron board is
+    // doing somebody a favour, not advancing.
+    const worth = worthOf(job.mission, job.rank);
+    const scale = xpScale(this.rank(), job.rank);
+    const gain = Math.max(scale >= 1 ? 1 : 0, Math.round(worth * scale));
     const r = award(this.doc.flags, gain);
     this.doc.flags[XP_FLAG] = r.xp;
     this.doc.flags[`contract.done.${id}`] = true;
     this.doc.flags['contract.active'] = null;
     this.syncStanding();
     const paid = payFor(job.reward);
-    giveItem(this.doc.items, MARKS, paid);
+    giveItem(this.doc.items, COIN, paid);
     // The stone roll is per CONTRACT, not per kill — see js/game/loot.js. Sixteen of these is the
     // whole distance to Bronze, and that distance is meant to be measured in work finished.
     const stone = lootOnContract();
@@ -372,7 +379,14 @@ export class Session {
     const star = r.starGained
       ? ` ${r.after.stars} ${r.after.stars === 1 ? 'star' : 'stars'} at ${r.after.rankLabel}.`
       : '';
-    this.toast(`${job.name} — closed. ${gain} experience, ${paid} marks.${star}`
+    // Said out loud in both directions: experience a lower board would not pay, and experience
+    // this rank will not count until the Society raises you. Either one silently missing reads
+    // as the game having lost something.
+    const thin = scale < 1
+      ? ` ${RANK_LABEL[job.rank]} work at ${RANK_LABEL[this.rank()]} rank — ${worth} of it became ${gain}.`
+      : '';
+    const full = r.capped ? ` ${r.after.rankLabel} counts no further until you are raised.` : '';
+    this.toast(`${job.name} — closed. ${r.gain} experience, ${paid} coins.${star}${thin}${full}`
       + (stone ? ' An awakening stone came out of it.' : ''), { ms: 5600 });
     // The promotion is its own beat and worth waiting for: it is the only thing on the ladder the
     // player has to go and ask a person for.
@@ -422,6 +436,14 @@ export class Session {
     if (!up) return false;
     Object.assign(this.doc.flags, { 'society.rank': up.to });
     this.syncStanding();
+    // A rank is what you are made of — js/game/ranks.js — so both wells have to be widened the
+    // moment it changes rather than at the next level load. The health one is filled: being
+    // raised is the one moment in the game where the Society puts you back together.
+    this.combat.restore();
+    this.casting?.resize();
+    const p = playerAt(up.to);
+    this.toast(`${RANK_LABEL[up.to]} rank. ${p.hp} health, ${p.mana} mana, and everything you can `
+      + `do lands ${p.power}× as hard.`, { ms: 6000 });
     this.autosave.mark();
     this.bus.dispatchEvent(new CustomEvent('society.promoted', { detail: up }));
     return up;
@@ -650,6 +672,10 @@ export class Session {
     this.castSpell(a);
   }
 
+  // What the player is, which decides how much of them there is, how hard a blow lands and how
+  // much every ability gives — js/game/ranks.js. The fight and the well both ask this.
+  rank() { return rankOf(this.doc.flags); }
+
   // The rank the work was, which is what the drop table is keyed on. A contract in hand names its
   // own board; the proving and anything else are iron.
   workRank() {
@@ -657,13 +683,18 @@ export class Session {
     return (id ? jobFor(id)?.rank : null) || 'iron';
   }
 
-  dropLoot() {
-    const got = lootOnKill({ rank: this.workRank() });
-    if (!got) return false;
-    giveItem(this.doc.items, got.id, got.count);
+  // Something went down. Every monster is carrying coins and about two in five are carrying
+  // something else as well — js/game/loot.js. `worth` comes off the kill event, which is the
+  // bestiary's own number for what that particular monster was.
+  dropLoot(detail = {}) {
+    const got = lootOnKill({ rank: this.workRank(), worth: detail.xp });
+    giveItem(this.doc.items, COIN, got.coins);
+    if (got.item) giveItem(this.doc.items, got.item.id, got.item.count);
     this.autosave.mark();
     this.inventory?.refresh();
-    this.toast(`Picked up: ${itemName(got.id)}.`, { ms: 2800 });
+    this.toast(got.item
+      ? `${got.coins} coins and ${itemName(got.item.id)}.`
+      : `${got.coins} coins.`, { ms: 2600 });
     return true;
   }
 
@@ -707,13 +738,13 @@ export class Session {
 
   // ── the shops ───────────────────────────────────────────────────────────
   // One purchase. The refusal comes from js/game/shop.js so the button's label and what actually
-  // happens can never disagree, and the marks come out of the same counted bag everything else
+  // happens can never disagree, and the coins come out of the same counted bag everything else
   // lives in — there is no separate wallet to get out of step with the purse on the sheet.
   buy(id, shopId) {
     const why = shopRefuse(this.doc.items, id, shopId);
     if (why) { this.toast(why, { ms: 2800, level: 'g-low' }); return false; }
     const row = wares(shopId).find(w => w.id === id);
-    if (!takeItem(this.doc.items, MARKS, row.price)) return false;
+    if (!takeItem(this.doc.items, COIN, row.price)) return false;
     giveItem(this.doc.items, id, 1);
     // Bought a weapon with empty hands? Hold it. Nobody buys their first sword in order to carry
     // it about in a sack, and making them find the bag to use the thing they just bought is the
@@ -721,7 +752,7 @@ export class Session {
     if (isWeapon(id) && !this.doc.gear.weapon) { this.doc.gear.weapon = id; this.combat.regear(); }
     this.autosave.mark();
     this.inventory?.refresh();
-    this.toast(`${itemName(id)} — ${row.price} marks. ${purse(this.doc.items)} left.`, { ms: 3400 });
+    this.toast(`${itemName(id)} — ${row.price} coins. ${purse(this.doc.items)} left.`, { ms: 3400 });
     this.bus.dispatchEvent(new CustomEvent('shop.bought', { detail: { id, shop: shopId, price: row.price } }));
     return true;
   }
@@ -732,9 +763,9 @@ export class Session {
     if (this.doc.flags['society.purse.paid']) return false;
     const n = Math.max(0, Math.round(economy().startingPurse));
     this.doc.flags['society.purse.paid'] = true;
-    if (n > 0) giveItem(this.doc.items, MARKS, n);
+    if (n > 0) giveItem(this.doc.items, COIN, n);
     this.autosave.mark();
-    if (n > 0) this.toast(`${n} marks, from the Society. Spend them on the square.`, { ms: 5200 });
+    if (n > 0) this.toast(`${n} coins, from the Society. Spend them on the square.`, { ms: 5200 });
     return true;
   }
 
@@ -767,6 +798,27 @@ export class Session {
     return true;
   }
 
+  // Throwing something away. Aaron asked for coins to be a thing you can drop, and the honest
+  // version of that is that anything can be dropped — a bag with one row you are not allowed to
+  // empty is a bag with a rule in it nobody can see. Refused for what is not there, and the
+  // hand and weapon slots are emptied if what was in them has just gone on the floor.
+  discard(id, n = 1) {
+    const want = Math.max(1, Math.floor(+n || 1));
+    if (!id || !hasItem(this.doc.items, id, want)) {
+      this.toast('You are not carrying that.', { ms: 2400, level: 'g-low' });
+      return false;
+    }
+    takeItem(this.doc.items, id, want);
+    if (!hasItem(this.doc.items, id)) {
+      if (this.doc.gear.hand === id) this.doc.gear.hand = '';
+      if (this.doc.gear.weapon === id) { this.doc.gear.weapon = ''; this.combat.regear(); }
+    }
+    this.autosave.mark();
+    this.inventory?.refresh();
+    this.toast(`${want > 1 ? `${want} × ` : ''}${itemName(id)} — dropped.`, { ms: 2800, level: 'g-low' });
+    return true;
+  }
+
   // The other hand: one usable thing, held ready. What "used" means is js/game/items.js's answer,
   // not this method's.
   hold(id) {
@@ -790,6 +842,8 @@ export class Session {
     const doc = this.essences?.doc;
     return {
       fighting,
+      // What the player's rank does to a bottle — the same multiplier an ability gets.
+      power: playerAt(this.rank()).power,
       hurt: !!v && v.hp < v.max,
       registered: !!this.doc.essences?.picked?.length,
       // Unknown until the table is loaded, and `undefined` is not `true`: a stone must never be
@@ -926,6 +980,14 @@ export class Session {
   // straight from the Society's hall to a walled yard reads as a glitch rather than as a door.
   gotoLevel(id, at, patch = null) {
     if (!this.swap || this.swap.busy) return false;
+    // The proving is a thing you pass once. A conversation could still reach it afterwards —
+    // Vail's floors branch walks to "how do I get to iron" and on to "I'm ready" — and a
+    // registered adventurer dropped back into the yard with a borrowed knife is a dead end.
+    // The choices are gated in data/conversations.json too; this is the door itself being shut.
+    if (id === 'proving' && this.doc.flags['society.test.passed']) {
+      this.toast('You have passed the proving. The work is upstairs.', { ms: 3200, level: 'g-low' });
+      return false;
+    }
     this.dialogue.close?.();
     this.board.close();
     this.fade(1);

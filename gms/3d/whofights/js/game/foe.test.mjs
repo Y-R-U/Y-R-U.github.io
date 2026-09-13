@@ -1,7 +1,7 @@
 import { test, eq, ok, near } from '../../tools/harness.mjs';
 import { EARTH, STATES, spawn, step, wound, snare, isDead, fraction } from './foe.js';
 import { surfaceAt, isDirt, plotLocal, dirtRun, plotsOf } from './ground.js';
-import { make, hurt, mend, apply, inSwing, bearing } from './vitals.js';
+import { make, hurt, mend, lift, drop, apply, inSwing, bearing } from './vitals.js';
 
 const DT = 1 / 60;
 const at = (x, z) => ({ x, z, alive: true });
@@ -263,4 +263,32 @@ test('the rope does not stop it mending — that is what the floor is for', () =
   f = snare(f, 3);
   for (let i = 0; i < 120; i++) f = step(f, DT, { player: at(0, 0), ...dirt });
   ok(f.hp > low, 'a roped thing on soil stopped mending — the rope is not a hit');
+});
+
+
+// A `buff` ability makes there be more of you for a while — js/game/spells.js. The ceiling goes up
+// and what it opened is filled, which is what makes it worth casting at full health.
+test('a lift raises the ceiling and fills what it opened, and putting it back never kills you', () => {
+  const full = make(100);
+  const up = lift(full, 28);
+  eq(up.max, 128);
+  eq(up.hp, 128, 'a lift on a full bar gave nothing');
+  const hurtNow = hurt(up, 100);
+  eq(hurtNow.hp, 28);
+  // The ceiling comes back down under a player who has spent what it gave them.
+  const back = drop(hurtNow, 28);
+  eq(back.max, 100);
+  eq(back.hp, 28, 'dropping a ceiling above the player took health with it');
+  // And under one who has not.
+  eq(drop(up, 28).hp, 100);
+  eq(drop(make(100, 4), 28).hp, 4);
+  eq(drop(make(100, 1), 500).max, 1, 'a ceiling can never go below one');
+  ok(drop(make(100, 1), 500).hp >= 1, 'dropping a ceiling must not be a way to die');
+});
+
+test('a lift does nothing to a corpse', () => {
+  const dead = hurt(make(100), 200);
+  eq(dead.dead, true);
+  eq(lift(dead, 50), dead);
+  eq(drop(dead, 50).dead, true, 'a corpse came back to life when its ceiling fell');
 });

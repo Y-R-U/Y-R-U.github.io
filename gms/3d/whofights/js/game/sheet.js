@@ -10,16 +10,16 @@
 import { el, clear } from './ui.js';
 import { STARS } from './progress.js';
 
-const money = n => `${(n || 0).toLocaleString('en-GB')} marks`;
+const money = n => `${(n || 0).toLocaleString('en-GB')} coins`;
 
 export class PlayerSheet {
   constructor({ host, progress = () => null, essences = () => null, abilities = () => [],
-    marks = () => 0, contract = () => null, played = () => 0 }) {
+    coins = () => 0, contract = () => null, played = () => 0 }) {
     this.host = host;
     this.progress = progress;
     this.essences = essences;
     this.abilities = abilities;
-    this.marks = marks;
+    this.coins = coins;
     this.contract = contract;
     this.played = played;
     this.root = null;
@@ -57,7 +57,7 @@ export class PlayerSheet {
     if (c) body.append(this.contractRow(c));
     body.append(this.essenceBlock());
     body.append(el('p', 'g-parch-foot',
-      `${money(this.marks())} · ${hhmm(this.played())} in the field. The Society keeps the other copy.`));
+      `${money(this.coins())} · ${hhmm(this.played())} in the field. The Society keeps the other copy.`));
     sheet.append(body);
     this.root.append(sheet);
     this.host.append(this.root);

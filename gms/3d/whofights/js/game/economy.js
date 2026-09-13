@@ -6,7 +6,7 @@
 // constants: `tuning()` reads and `retune()` writes, which is what lets the Economy panel in the
 // debug tab move them while the game is running and what lets a test move them back afterwards.
 //
-// Nothing else in the game may hold a price. If you find yourself typing a number of marks
+// Nothing else in the game may hold a price. If you find yourself typing a number of coins
 // anywhere else, it belongs in DEFAULTS.
 //
 // Pure — no DOM, no three, no storage. The dev panel owns persisting an override if it wants one.
@@ -23,15 +23,24 @@ export const DEFAULTS = {
   // Awakening stones. Sixteen of these is the whole distance from registration to Bronze, so these
   // two numbers are the single biggest lever on how long the game is.
   //
-  // At the shipped values: an Iron contract pays about 25 marks, roughly a third of them drop a
+  // At the shipped values: an Iron contract pays about 25 coins, roughly a third of them drop a
   // stone, and a stone costs about ten contracts' pay. That is ~40 contracts to twenty abilities,
   // which is about an hour. Move `stoneDrop` first — buying stones should stay the slow way.
   stonePrice: 240,
   stoneDrop: 0.32,
 
-  // Anything at all dropping off a kill. Rolled per monster; what it turns out to be is
-  // js/game/loot.js's table.
+  // An ITEM dropping off a kill, on top of the coins. Rolled per monster; what it turns out to be
+  // is js/game/loot.js's table. Coins are not rolled for — every monster carries some.
   lootChance: 0.42,
+
+  // Coins per point of what a monster was worth to kill. Its worth already knows its rank, so one
+  // number here covers the whole ladder: an iron elemental carries four or five and a gold Verge
+  // carries the better part of a hundred.
+  //
+  // This is new money in a game that used to pay only on the contract sheet, and it is deliberately
+  // small against one: four iron monsters come to about a third of what the contract pays. Coins
+  // off the floor are meant to be the reason to clear a room rather than the reason to take the job.
+  coinRate: 0.35,
 
   // Consumables.
   potionPrice: 30,
@@ -100,7 +109,7 @@ export function priceOf(id) {
   return Math.max(0, Math.round(t.weaponPrice[id] || 0));
 }
 
-// What the Society actually pays for a contract whose board says `reward`.
+// What the Society actually pays for a contract whose board says `reward`. Coins, into the bag.
 export const payFor = reward => Math.max(0, Math.round((+reward || 0) * live.payMultiplier));
 
 // The rows the debug panel draws, so the panel does not have to know what any of these are. `step`
@@ -111,7 +120,8 @@ export const ROWS = [
   { key: 'payMultiplier', label: 'Contract pay ×', min: 0.25, max: 4, step: 0.05 },
   { key: 'stonePrice', label: 'Awakening stone price', min: 20, max: 1200, step: 10 },
   { key: 'stoneDrop', label: 'Stone drop chance', min: 0, max: 1, step: 0.01 },
-  { key: 'lootChance', label: 'Anything drops', min: 0, max: 1, step: 0.01 },
+  { key: 'lootChance', label: 'An item drops too', min: 0, max: 1, step: 0.01 },
+  { key: 'coinRate', label: 'Coins per point of worth', min: 0, max: 2, step: 0.05 },
   { key: 'potionPrice', label: 'Healing potion price', min: 0, max: 300, step: 5 },
   { key: 'potionHeal', label: 'Healing potion heals', min: 5, max: 100, step: 5 },
   { key: 'greaterPotionPrice', label: 'Draught price', min: 0, max: 900, step: 5 },

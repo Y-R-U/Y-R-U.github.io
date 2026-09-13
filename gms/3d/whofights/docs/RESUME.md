@@ -17,17 +17,32 @@ Society, pass a proving, take three essences and are given the fourth, and then 
 board up four ranks while buying gear, waking abilities and unpicking a side story.
 
 **The loop.** Read a board → take a contract → get walked out to an arena dressed for it → clear it
-or last it out → get paid in marks and experience → spend the marks on the square → wake abilities
-with the stones you find → earn four stars → be promoted.
+or last it out → take the coins off what you killed and be paid in coins and experience → spend
+the coins on the square → wake abilities with the stones you find → earn four stars → be promoted.
 
 | | |
 |---|---|
 | Contracts | **47**, all walkable — iron 18, bronze 16, silver 8, gold 5 |
-| Monsters | **14 kinds × 6 variants = 84**, drawn as 4 silhouettes |
+| Monsters | **14 kinds × 6 variants × 4 ranks**, drawn as 4 silhouettes |
+| Ranks | iron → bronze → silver → gold, on **both** sides of the fight — `js/game/ranks.js` |
 | Essences | 12 × 10 abilities, **claim 5 each**, 20 in all |
 | Confluences | **220** — one for every triple, 17 authored and the rest composed |
 | Conversations | 92 nodes, 13 characters |
-| Weapons | 7 buyable, 35 to 1,600 marks; the Weaponry stocks 8 rows from 18 |
+| Weapons | 7 buyable, 35 to 1,600 coins; the Weaponry stocks 8 rows from 18 |
+
+### What a rank is worth
+
+A rung is **×3** on what a monster hits for and **×2.2** on how much of it there is, and on the
+player's side **×2.4** health, more mana, a slice off every blow, a slice off every cost and **×2**
+on everything an ability gives. Damage climbing faster than health is what makes Aaron's rule true
+— *a silver-rank monster kills an iron-rank adventurer in one shot* — and the boards' rank gate is
+therefore the whole of the difficulty curve: **the work you are allowed to take is the work that
+will not delete you.** A monster's rank is the rank of the contract it is standing in, and it is in
+its name: `Iron-rank Lesser Shade`.
+
+Work below your own rank pays a trickle — 12 % one rung down, 3 % two — and a rank's experience
+stops at its own fourth star. Between them, finishing the iron board and being raised puts you at
+the *bottom* of bronze, which is where being new to a rank ought to put you.
 
 ---
 
@@ -35,7 +50,7 @@ with the stones you find → earn four stars → be promoted.
 
 ```bash
 node tools/devserver.mjs            # then open http://127.0.0.1:8796/
-node tools/test.mjs                 # 609 across 52 files
+node tools/test.mjs                 # 638 across 53 files
 node tools/shot.mjs --shot=hall     # and OPEN the png — see DECISIONS §10
 ```
 
@@ -78,6 +93,7 @@ js/game/          the game layer — nothing here is built under ?shot= or in th
   essences.js confluence.js spells.js casting.js                   what you are
   contracts.js missions.js progress.js                             the ladder
   items.js economy.js loot.js shop.js inventory.js                 the economy
+  ranks.js                                                         what a rung is worth
   slots.js actionbar.js                                            twenty keys
   tour.js                                                          the tour of the square
   noticeboard.js sheet.js essencesheet.js missionpanel.js          the parchment screens
@@ -116,9 +132,21 @@ board wants to group one.
 
 ## 5. What is open
 
-- **Gold pay has nothing to buy.** A gold contract pays up to 9,000 marks and the dearest thing in
-  the game is a 1,600-mark maul. Either gold should pay in something else or there should be a rack
-  above the maul.
+- **Gold pay has nothing to buy.** A gold contract pays up to 9,000 coins and the dearest thing in
+  the game is a 1,600-coin maul. Either gold should pay in something else or there should be a rack
+  above the maul. The gold drop table now hands out the maul and the pike, which makes the purse
+  *less* useful there rather than more.
+- **Coins off kills are new money and have never been watched in play.** Four iron monsters come to
+  about a third of what an iron contract pays, which is deliberate — the room should be worth
+  clearing, not worth farming — but the whole balance of it is one slider (`coinRate`) in the
+  Economy panel and an afternoon nobody has spent yet.
+- **Nothing scales a weapon with rank, so by gold the weapon is the small half of your damage.**
+  Measured against a plain Earth Elemental at each rank, with the dearest weapon that rank can
+  afford: 6.5 s to kill at iron, 8.6 at bronze, 8.8 at silver — and 17.9 at gold **on the weapon
+  alone**, because the maul is the top of the shop and a gold monster has ten times the stone in
+  it. A gold attack ability does 176 a cast against the maul's 46 a second, so in play the spells
+  are carrying it, which is the intended shape and has never been watched. If it reads as wrong,
+  the lever is a rack above the maul rather than a multiplier on the swing.
 - **Nothing gates an individual contract.** Any row on a board you can reach is takeable, which is
   why the Long Count is driven by what you have *finished* rather than by what you may *take*.
 - **The four new monsters have been fought by a test and not by a person**, and the whole economy
@@ -149,3 +177,5 @@ Recorded in that file too (§10, §10.1); listed here so one page has all of the
   that has moved on.
 - **Controls**: Space is jump, left button attacks, right button and long-press open the interact
   menu, and the number row is twenty ability keys.
+- **Ranks**: `js/game/ranks.js`, a `rank` on a level document's `foes` entries, `plainName` on a
+  bestiary row, and the save at **v3** with `marks` migrated to `coin`. See DEV_CONTRACT §10.2.

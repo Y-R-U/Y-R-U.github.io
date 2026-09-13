@@ -15,7 +15,7 @@ import { BOARDS, boardView, adventurerView, RANK_LABEL, RANK_FLOOR } from './con
 import { playable } from './missions.js';
 
 const NEW = 'board.new';
-const money = n => `${n.toLocaleString('en-GB')} marks`;
+const money = n => `${n.toLocaleString('en-GB')} coins`;
 const pips = n => '◆'.repeat(n) + '◇'.repeat(Math.max(0, 5 - n));
 
 export function boardTitle(id) {

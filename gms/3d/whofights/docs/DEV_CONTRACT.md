@@ -250,6 +250,40 @@ their own docs row).
   language compares a flag to a value and cannot count, so anything a hotspot has to be gated on
   has to be a flag first.
 
+## 10.2 Ranks — `js/game/ranks.js`, added this pass
+
+**Everything a rank decides lives in one module and nothing else may hold a rank multiplier.**
+`js/game/contracts.js` still owns the four rung names and which floor each hangs on; `ranks.js`
+owns what they are worth.
+
+| | |
+|---|---|
+| A rung, on a monster | **×3** damage, **×2.2** health. Damage climbs faster on purpose. |
+| A rung, on the player | health ×2.4, mana, a `resist` off every blow, a `thrift` off every cost, and `power` ×2 over every ability |
+| Damage floor | nothing at rank *n* hits for less than an adventurer two rungs below is worth. This is Aaron's rule — *a silver-rank monster kills an iron-rank adventurer in one shot* — stated as a number |
+| Work below you | `xpScale` — 0.12 one rung down, 0.03 two, 0.01 three |
+| Coins | every monster carries `worth × coinRate`, spread ±25 %. Never none |
+
+- **A level document's `foes` entry gained `rank`.** Absent means the kind's own natural rank
+  (every kind in `js/game/bestiary.js` now names one). `js/game/missions.js` stamps the contract's
+  board rank onto every spawn and will not let an entry ask for more than the board it hangs on.
+  `js/editor/scene.js` carries it through normalisation — it was dropped there once, and a bronze
+  contract was quietly fought at iron weight.
+- **A monster's name says its rank** — `Iron-rank Lesser Shade`. `describe()` also returns
+  `plainName` for the one place that says the rank separately (the mission panel).
+- **The bestiary's authored tunings are band-relative.** A kind's numbers are divided by the mean
+  of its own rank band before the rank multiplier is applied, so the climb is not counted twice.
+  An iron kind fought at iron comes out at exactly the numbers written in the table.
+- **A rank's experience has a ceiling**: its own fourth star. `progress.award()` reports `wasted`
+  and `capped`. Without it, finishing the iron board handed the player two bronze stars on
+  promotion, which is what Aaron hit.
+- **The currency is `coin`, an item in the bag**, not a number on a sheet. It is a row like any
+  other and can be discarded. **The save is v3**: `items.marks` migrates to `items.coin`.
+- **Two ability kinds no longer throw anything.** `buff` lifts maximum health for the length of a
+  fight and fills what it opened; `utility` gives mana back and lifts the mana ceiling, and costs
+  nothing but waits eighteen seconds. `js/game/vitals.js` gained `lift`/`drop` for the first and
+  `js/game/casting.js` owns the second.
+
 ## 11. House rules
 
 - `window.__wf` is the debug handle (forge uses `__forge`). Expose your systems on it.

@@ -7,7 +7,7 @@
 
 import { test, eq, ok } from '../../tools/harness.mjs';
 import {
-  ITEMS, MARKS, STONE, POTION, ROPE, SNARE_SECONDS,
+  ITEMS, COIN, STONE, POTION, DRAUGHT, ROPE, SNARE_SECONDS,
   itemOf, nameOf, usable, isWeapon, stockPrice,
   countOf, give, take, has, rows, purse, use,
 } from './items.js';
@@ -44,10 +44,14 @@ test('give and take ignore nonsense rather than corrupting the bag', () => {
   eq(Object.keys(bag), []);
 });
 
-test('marks are the purse, not a row in the bag', () => {
-  const bag = { [MARKS]: 120, [POTION]: 2 };
+test('coins are the purse AND a row in the bag, and they come last', () => {
+  const bag = { [COIN]: 120, [POTION]: 2 };
   eq(purse(bag), 120);
-  eq(rows(bag).map(r => r.id), [POTION]);
+  // Aaron's call: the currency is a thing you carry, so it has to be a thing you can look at and
+  // a thing you can throw away. It used to be skipped here and shown only as a number.
+  eq(rows(bag).map(r => r.id), [POTION, COIN]);
+  eq(rows(bag).find(r => r.id === COIN).count, 120);
+  eq(purse({}), 0);
 });
 
 test('rows come back gear first, then what you use', () => {
@@ -133,7 +137,7 @@ test('the knife and the fists are not for sale', () => {
   eq(buyable('knife'), false);
   eq(buyable('fists'), false);
   eq(stockPrice('knife'), 0);
-  eq(stockPrice(MARKS), 0);
+  eq(stockPrice(COIN), 0);
 });
 
 // ── pacing ──────────────────────────────────────────────────────────────────
@@ -244,4 +248,17 @@ test('every hand item has a use, and every use names a real item', () => {
     const r = use(id, { registered: true, allAwakened: false, hurt: true, fighting: true });
     ok(r.ok, `${id} sits in the hand slot and then does nothing when used`);
   }
+});
+
+
+// A bottle is worth what the rank drinking it is worth — js/game/ranks.js `power`, the same
+// multiplier every essence ability gets. Without it a gold adventurer with 1,390 health drinks a
+// 110-point draught and notices nothing.
+test('a potion scales with the rank holding it, and iron is still the number on the label', () => {
+  const iron = use(POTION, { hurt: true });
+  eq(use(POTION, { hurt: true, power: 1 }).amount, iron.amount);
+  eq(use(POTION, { hurt: true, power: 8 }).amount, iron.amount * 8);
+  eq(use(DRAUGHT, { hurt: true, power: 4 }).amount, use(DRAUGHT, { hurt: true }).amount * 4);
+  eq(use(POTION, { hurt: true, power: 0 }).amount, iron.amount, 'nonsense must not shrink a bottle');
+  eq(use(POTION, { hurt: false, power: 8 }).ok, false, 'and it still refuses when nothing is open');
 });

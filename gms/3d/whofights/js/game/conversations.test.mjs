@@ -102,6 +102,57 @@ test('Vail always has something to say, whatever the save knows', () => {
   }
 });
 
+// Aaron, playing it: "when I went back to talk the registrar, I could go back to the registration
+// battle via path: what is on the higher floors -> how do I get to iron -> I'm ready."
+//
+// The hotspots were already right — once the proving is passed a different one answers — but the
+// conversation graph is not a tree, and three nodes deep the old branch was still there. This
+// walks every node reachable from every greeter hotspot with the proving behind you and asserts
+// that nothing in the whole of it can put you back in that room.
+test('nothing the Registrar says can send a registered adventurer back to the proving', () => {
+  const level = JSON.parse(readFileSync(new URL('../../data/levels/society.json', import.meta.url)));
+  const flags = {
+    'society.met.registrar': true, 'society.test.passed': true, 'society.essences.chosen': true,
+    'society.registered': true, 'society.rank': 'iron', 'society.greeted': true,
+  };
+  const at = { x: cast.greeter.place.x, z: cast.greeter.place.z };
+  const hs = new Hotspots(level.hotspots, { flags, characterAt: () => at });
+  const starts = hs.candidates(at, ['interact'])
+    .flatMap(h => h.actions.filter(a => a.k === 'say').map(a => a.node));
+  ok(starts.length, 'no greeter hotspot answers at all');
+
+  const seen = new Set();
+  const walk = id => {
+    if (!id || seen.has(id) || !pack[id]) return;
+    seen.add(id);
+    for (const e of pack[id].sets || []) {
+      ok(!(e.k === 'goto' && e.level === 'proving'), `${id} walks back into the proving room`);
+    }
+    for (const c of visibleChoices(pack[id], { flags })) walk(c.goto);
+    walk(pack[id].next);
+  };
+  for (const s of starts) walk(s);
+  ok(seen.size > 5, `only walked ${seen.size} nodes`);
+  eq(seen.has('society.greeter.proving.go'), false, 'the door into the proving is still reachable');
+});
+
+// And the other half of it, because gating a choice is one line away from gating it for the person
+// who has not done it yet either.
+test('an unregistered adventurer can still find the proving in three questions', () => {
+  const flags = {};
+  const seen = new Set();
+  let found = false;
+  const walk = id => {
+    if (!id || seen.has(id) || !pack[id]) return;
+    seen.add(id);
+    if ((pack[id].sets || []).some(e => e.k === 'goto' && e.level === 'proving')) found = true;
+    for (const c of visibleChoices(pack[id], { flags })) walk(c.goto);
+    walk(pack[id].next);
+  };
+  walk('society.greeter.hello');
+  ok(found, 'there is no way into the proving room at all');
+});
+
 // Same shape as the greeter rule, and the same bug waiting: two hotspots on one body whose
 // predicates both answer means the player presses a person and gets whichever the array happens
 // to list first. Brann and Bel each got a second one when the proving landed.

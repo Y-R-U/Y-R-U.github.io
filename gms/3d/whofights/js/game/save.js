@@ -1,7 +1,9 @@
 // The save document, and the one function that makes an untrusted one safe to run. Pure: no DOM,
 // no storage — js/game/savestore.js owns the bytes.
 
-export const SAVE_VERSION = 2;
+import { COIN } from './items.js';
+
+export const SAVE_VERSION = 3;
 
 // How many number-key slots there are, and therefore the most abilities anybody can hold: four
 // essences at five each. One number, here, because js/game/essences.js caps what can be awakened
@@ -107,7 +109,12 @@ export function normalise(raw) {
     if (typeof k === 'string') doc.flags[k] = val;
   }
   for (const [k, val] of Object.entries(raw.items || {})) {
-    if (Number.isFinite(+val)) doc.items[k] = +val;
+    if (!Number.isFinite(+val)) continue;
+    // v2 and earlier paid in marks, which were the same word as the thing that raised your rank
+    // and confused exactly the person the game is for. They are coins now, and an old purse is
+    // the same money under the name it should always have had.
+    const id = k === 'marks' ? COIN : k;
+    doc.items[id] = (doc.items[id] || 0) + +val;
   }
   for (const [k, q] of Object.entries(raw.quests || {})) {
     if (q && typeof q.s === 'string') doc.quests[k] = { s: q.s, n: num(q.n, 0) };

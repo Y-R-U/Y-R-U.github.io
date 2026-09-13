@@ -12,21 +12,24 @@ import { el, clear } from './ui.js';
 import { rows as bagRows, itemOf, nameOf, purse, isWeapon, usable, countOf } from './items.js';
 import { weaponOf } from './weapons.js';
 
-const money = n => `${(n || 0).toLocaleString('en-GB')} marks`;
+const money = n => `${(n || 0).toLocaleString('en-GB')} coins`;
 
 export class Inventory {
   constructor({ host, bag = () => ({}), gear = () => ({}), onEquip = () => {}, onHold = () => {},
-    onUse = () => {}, onOpen = () => {}, onClose = () => {} }) {
+    onUse = () => {}, onDrop = () => {}, onOpen = () => {}, onClose = () => {} }) {
     this.host = host;
     this.bag = bag;
     this.gear = gear;
     this.onEquip = onEquip;
     this.onHold = onHold;
     this.onUse = onUse;
+    this.onDrop = onDrop;
     this.onOpen = onOpen;
     this.onClose = onClose;
     this.root = null;
     this.picked = null;
+    // Which row's Drop button has been pressed once. Cleared by every other thing a player can do.
+    this.armed = null;
     this.onKey = e => { if (e.key === 'Escape') this.close(); };
   }
 
@@ -78,7 +81,7 @@ export class Inventory {
     const pane = el('div', 'g-invpane');
     if (!rows.length) {
       pane.append(el('p', 'g-invempty',
-        'Nothing but the marks in your purse. The shops on the square will take some of those off you.'));
+        'Empty. Not even a coin — and everything on the square costs one.'));
       return pane;
     }
     const grid = el('div', 'g-invgrid');
@@ -87,7 +90,11 @@ export class Inventory {
       cell.append(el('u', null, glyph(r.kind)));
       cell.append(el('span', null, r.name));
       if (r.count > 1) cell.append(el('b', null, `×${r.count}`));
-      cell.onclick = () => { this.picked = this.picked === r.id ? null : r.id; this.draw(); };
+      cell.onclick = () => {
+        this.picked = this.picked === r.id ? null : r.id;
+        this.armed = null;
+        this.draw();
+      };
       grid.append(cell);
     }
     pane.append(grid);
@@ -122,12 +129,30 @@ export class Inventory {
         : this.act('To hand', () => this.onHold(id)));
       acts.append(this.act('Use one', () => this.onUse(id)));
     }
+    // Throwing a thing away is a two-tap gesture rather than a confirmation box: the first tap
+    // arms it and says so, the second one does it, and opening anything else disarms it. A modal
+    // over a modal is the one thing this game does not have anywhere.
+    const count = countOf(this.bag(), id);
+    const armed = this.armed === id;
+    acts.append(this.act(armed ? 'Drop it — sure?' : 'Drop one', () => {
+      if (!armed) { this.armed = id; return; }
+      this.armed = null;
+      this.onDrop(id, 1);
+    }, armed ? 'g-invact g-invdrop' : 'g-invact'));
+    if (count > 1) {
+      const allArmed = this.armed === `${id}:all`;
+      acts.append(this.act(allArmed ? `Drop all ${count} — sure?` : 'Drop all', () => {
+        if (!allArmed) { this.armed = `${id}:all`; return; }
+        this.armed = null;
+        this.onDrop(id, count);
+      }, allArmed ? 'g-invact g-invdrop' : 'g-invact'));
+    }
     box.append(acts);
     return box;
   }
 
-  act(label, fn) {
-    const b = el('button', 'g-invact', label);
+  act(label, fn, cls = 'g-invact') {
+    const b = el('button', cls, label);
     b.onclick = () => { fn(); this.refresh(); };
     return b;
   }
@@ -168,6 +193,7 @@ export class Inventory {
     const r = this.root;
     this.root = null;
     this.picked = null;
+    this.armed = null;
     r.classList.remove('in');
     setTimeout(() => r.remove(), 220);
     this.onClose();

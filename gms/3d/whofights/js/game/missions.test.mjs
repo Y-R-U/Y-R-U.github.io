@@ -261,3 +261,42 @@ test('the brief says what is being asked in one line', () => {
   ok(briefOf('iron.lamps').asks.includes('55'), briefOf('iron.lamps').asks);
   eq(briefOf('iron.well').asks, 'Clear the floor');
 });
+
+// A monster's rank is the board's rank, and the boards are what keep a player away from something
+// that would kill them where they stand — see js/game/ranks.js. This is the other half of
+// Aaron's rule: "monsters the user encounters must be same rank or lower as the user."
+test('every monster in a contract is stamped with that contract’s own rank', () => {
+  for (const id of BOARD_IDS) {
+    const board = BOARDS[id];
+    for (const job of board.jobs) {
+      if (!job.mission) continue;
+      for (const s of allSpawns(job.mission, board.rank)) {
+        eq(s.rank, board.rank, `${job.id} put a ${s.rank} monster on the ${board.rank} board`);
+        eq(describe(s).rank, board.rank);
+        ok(describe(s).name.startsWith(`${board.seal}-rank `), describe(s).name);
+      }
+    }
+  }
+});
+
+test('a contract cannot smuggle a monster above its own board, only below it', () => {
+  const m = { spawns: [{ kind: 'earth', rank: 'gold' }, { kind: 'shade', rank: 'iron' }, { kind: 'gale' }] };
+  const got = spawnsOf(m, null, 0, 'bronze').map(s => s.rank);
+  eq(got, ['bronze', 'iron', 'bronze']);
+  eq(spawnsOf(m, null, 0, 'nonsense').map(s => s.rank), ['iron', 'iron', 'iron']);
+});
+
+test('the same room is worth far more on a higher board', () => {
+  const m = missionOf('iron.lamps');
+  ok(worthOf(m, 'silver') > worthOf(m, 'iron') * 4,
+    `${worthOf(m, 'iron')} at iron against ${worthOf(m, 'silver')} at silver`);
+  ok(worthOf(m, 'bronze') > worthOf(m, 'iron'));
+});
+
+test('the arena document carries the rank into the level the fight is built from', () => {
+  // jobFor, not the raw board row: `rank` is what jobFor adds, and patchArena reads it.
+  const job = jobFor('bronze.barrow');
+  const doc = normalise(patchArena(base, job.mission, job)).doc;
+  ok(doc.foes.length);
+  for (const f of doc.foes) eq(f.rank, job.rank, 'the level document dropped the rank');
+});

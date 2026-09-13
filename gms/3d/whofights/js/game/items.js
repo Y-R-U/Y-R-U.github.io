@@ -1,7 +1,7 @@
 // Everything the player can own, in one table.
 //
 // The save has always had a counted bag (`doc.items` in js/game/save.js) and until now nothing
-// ever put anything in it but marks. This is the table that says what a key in that bag means:
+// ever put anything in it but the purse. This is the table that says what a key in that bag means:
 // what it is called, what kind of thing it is, and — for the three that do something — what
 // happens when it is in the hand slot and used.
 //
@@ -20,16 +20,18 @@ export const KINDS = ['currency', 'weapon', 'tool', 'potion', 'stone'];
 
 // What a thing in the hand does. `kind` on the returned description is what session.js switches
 // on; anything it does not recognise is a refusal rather than a silent nothing.
-export const MARKS = 'marks';
+export const COIN = 'coin';
 export const STONE = 'stone.awakening';
 export const POTION = 'potion.healing';
 export const DRAUGHT = 'potion.greater';
 export const ROPE = 'rope';
 
 const EXTRA = {
-  [MARKS]: {
-    id: MARKS, name: 'Marks', kind: 'currency', stack: Infinity,
-    blurb: 'What the Society pays in and what everyone else takes. Nobody calls them anything else.',
+  [COIN]: {
+    id: COIN, name: 'Coins', kind: 'currency', stack: Infinity,
+    blurb: 'Stamped brass, mostly, and a few of them older than the province. They are a thing in '
+      + 'your bag and not a number on a ledger: every shop on the square takes them, every monster '
+      + 'is carrying some, and you can throw them away — which is your business, and a poor idea.',
   },
   [STONE]: {
     id: STONE, name: 'Awakening stone', kind: 'stone', stack: 99, hand: true,
@@ -91,7 +93,7 @@ export const isWeapon = id => ITEMS[id]?.kind === 'weapon';
 // What a shop may stock, and for how much. Zero means not for sale — js/game/shop.js drops those
 // rows rather than offering something free.
 export function stockPrice(id) {
-  if (id === MARKS) return 0;
+  if (id === COIN) return 0;
   if (isWeapon(id) && !buyable(id)) return 0;
   return priceOf(id);
 }
@@ -124,13 +126,15 @@ export function take(bag, id, n = 1) {
 export const has = (bag, id, n = 1) => countOf(bag, id) >= Math.max(1, Math.floor(+n || 0));
 
 // Every row worth drawing, in a stable order: gear, then things you use, then everything else.
-// Marks are left out — they are the purse line at the bottom of the sheet, not a row in the bag.
+// Coins are a row like any other and always the last one. They used to be left out, because they
+// used to be marks — a number in the corner of a sheet rather than a thing. Aaron's call: the
+// currency is a physical item sitting in the bag, which means it can be looked at, counted, and
+// thrown away by somebody who has decided to.
 const ORDER = { weapon: 0, potion: 1, stone: 2, tool: 3, currency: 9 };
 
 export function rows(bag = {}) {
   const out = [];
   for (const [id, n] of Object.entries(bag)) {
-    if (id === MARKS) continue;
     const count = countOf(bag, id);
     if (!count) continue;
     const it = itemOf(id);
@@ -142,7 +146,7 @@ export function rows(bag = {}) {
   return out;
 }
 
-export const purse = bag => countOf(bag, MARKS);
+export const purse = bag => countOf(bag, COIN);
 
 // ── using what is in the hand ───────────────────────────────────────────────
 
@@ -164,7 +168,13 @@ export function use(id, ctx = {}) {
     if (ctx.hurt === false) return { ok: false, why: 'Nothing to mend.' };
     // A bottle with its own `heal` keeps it; the plain one reads the live tuning, because that is
     // the slider in the Economy panel and the two are meant to be a choice between sizes.
-    return { ok: true, kind: 'heal', amount: Math.max(1, Math.round(it.heal ?? tuning().potionHeal)), spend: 1 };
+    //
+    // Then the player's rank multiplies it, the same way it multiplies an ability (js/game/ranks.js
+    // `power`). Without that a bronze adventurer with 240 health is drinking a fifth of a bottle's
+    // worth and a gold one with 1,390 is drinking scenery — the apothecary sells to the rank
+    // standing at the counter.
+    const power = Math.max(1, +ctx.power || 1);
+    return { ok: true, kind: 'heal', amount: Math.max(1, Math.round((it.heal ?? tuning().potionHeal) * power)), spend: 1 };
   }
 
   if (it.kind === 'tool' && id === ROPE) {

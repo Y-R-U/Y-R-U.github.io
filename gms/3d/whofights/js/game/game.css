@@ -1279,11 +1279,15 @@ body.flip #game .g-open {
   position: absolute;
   top: 0;
   left: 0;
-  width: calc(132px * var(--ui));
+  width: calc(148px * var(--ui));
   transform-origin: 50% 100%;
   text-align: center;
   will-change: transform;
 }
+/* Wraps rather than ellipses. A name carries its rank now — "Bronze-rank Quarry Warden" — and the
+   one thing a player reads before the thing reaches them must not come out as "Bronze-rank Quar…".
+   The box is anchored bottom-centre (translate -50%, -100% in js/game/healthbars.js), so a second
+   line grows upward and the bar itself stays exactly where it was. */
 #game .g-headbar b {
   display: block;
   margin-bottom: calc(3px * var(--ui));
@@ -1291,9 +1295,7 @@ body.flip #game .g-open {
   letter-spacing: .05em;
   color: #efe9dc;
   text-shadow: 0 1px 3px #000, 0 0 8px rgba(0, 0, 0, .8);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: break-word;
 }
 #game .g-headbar b:empty { display: none; }
 #game .g-headbar-hp,
@@ -1730,6 +1732,14 @@ body.flip #game .g-open {
   color: var(--iron);
 }
 #game .g-invdesc p { margin: calc(5px * var(--ui)) 0 0; font-size: calc(13.5px * var(--ui)); color: var(--faint); }
+#game .g-abil-does {
+  display: block;
+  margin-top: calc(4px * var(--ui));
+  font: 600 calc(11px * var(--ui))/1.4 system-ui, sans-serif;
+  letter-spacing: .04em;
+  color: #8d6f3a;
+}
+
 #game .g-invacts { display: flex; flex-wrap: wrap; gap: calc(8px * var(--ui)); margin-top: calc(10px * var(--ui)); }
 #game .g-invact {
   min-height: var(--tap);
@@ -1744,6 +1754,8 @@ body.flip #game .g-open {
   cursor: pointer;
 }
 #game .g-invact:active { opacity: .8; }
+/* A Drop button that has been pressed once and is waiting to be pressed again. */
+#game .g-invdrop { background: #7a2318; }
 
 #game .g-invequip {
   align-self: start;

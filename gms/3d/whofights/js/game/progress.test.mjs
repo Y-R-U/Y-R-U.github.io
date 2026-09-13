@@ -2,7 +2,7 @@
 // player can always see how far the next rung is.
 
 import { test, eq, ok, near } from '../../tools/harness.mjs';
-import { LADDER, STARS, XP_FLAG, RANK_FLAG, sheet, starsFor, award, promote, nextRank, stepsOf } from './progress.js';
+import { LADDER, STARS, XP_FLAG, RANK_FLAG, sheet, starsFor, award, promote, nextRank, stepsOf, ceilingOf } from './progress.js';
 import { RANKS, RANK_LABEL } from './contracts.js';
 
 const at = (rank, xp) => ({ [RANK_FLAG]: rank, [XP_FLAG]: xp });
@@ -54,11 +54,35 @@ test('the bar between two stars runs from empty to full', () => {
   eq(top.fraction, 1, 'a full rank reads as full, not as empty');
 });
 
-test('experience past the top of a rank is not lost, only uncounted', () => {
+// The bug Aaron hit: he cleared the iron board well past four stars, was raised, and arrived at
+// bronze already two stars up — because the ladder is one lifetime total and iron work had gone
+// on adding to it. A rank now stops counting at its own fourth star.
+test('a rank stops counting at its fourth star, so promotion lands at the bottom of the next', () => {
+  const top = stepsOf('iron')[STARS];
+  eq(ceilingOf('iron'), top);
+  const r = award(at('iron', top - 10), 100000);
+  eq(r.xp, top, 'iron kept counting past its own ceiling');
+  eq(r.gain, 10);
+  eq(r.wasted, 99990);
+  eq(r.capped, true);
+  // And that is exactly the bottom of bronze.
+  eq(sheet({ [RANK_FLAG]: 'bronze', [XP_FLAG]: r.xp }).stars, 0);
+  eq(award(at('iron', 0), 10).capped, false, 'an ordinary award must not read as capped');
+});
+
+test('a save from before the ceiling is not robbed by it', () => {
   const s = sheet(at('iron', 100000));
   eq(s.stars, STARS);
-  eq(s.xp, 100000);
+  eq(s.xp, 100000, 'the sheet shows what the save holds');
   ok(s.promotion.includes('Bronze'));
+  const r = award(at('iron', 100000), 50);
+  eq(r.xp, 100000, 'an award above the ceiling took experience away');
+  eq(r.gain, 0);
+});
+
+test('every rank has a ceiling and it is that rank\u2019s own fourth star', () => {
+  for (const r of RANKS.filter(x => x !== 'none')) eq(ceilingOf(r), stepsOf(r)[STARS]);
+  eq(ceilingOf('none'), stepsOf('iron')[STARS], 'the unranked are shown against iron');
 });
 
 test('unranked is shown against the first iron star rather than as a blank', () => {

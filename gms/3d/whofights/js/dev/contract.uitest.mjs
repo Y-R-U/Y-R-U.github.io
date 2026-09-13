@@ -33,7 +33,7 @@ for (let i = 0; i < 60; i++) {
 }
 
 // A fresh profile every run. The browser profile carries localStorage, which carries the save —
-// the first version of this test read 64 marks for a 32-mark contract because the previous run's
+// the first version of this test read 64 coins for a 32-coin contract because the previous run's
 // were still in it, and a test that remembers the last run is a test that can pass for the wrong
 // reason.
 fs.rmSync('/tmp/wf-cdp-contract', { recursive: true, force: true });
@@ -69,7 +69,7 @@ const state = () => p.eval(`(() => {
     mana: +g.casting.well.mana.toFixed(1),
     xp: g.doc.flags['society.xp'] || 0,
     stars: g.progress().stars,
-    marks: g.doc.items.marks || 0,
+    coins: g.doc.items.coin || 0,
     active: g.doc.flags['contract.active'] || null,
     panel: !g.mission.root.hidden,
     heads: [...g.heads.pool.values()].filter(r => !r.root.hidden).length,
@@ -192,7 +192,7 @@ s = await state();
 const firstXp = s.xp;
 check(firstXp > 0, `experience landed (${firstXp})`);
 check(s.stars === 0, `one iron contract is not a star on its own (${s.stars})`);
-check(s.marks > 0, `the contract paid (${s.marks} marks)`);
+check(s.coins > 0, `the contract paid (${s.coins} coins)`);
 check(s.active === null, 'and nothing is in hand any more');
 check(!s.panel, 'so the mission panel is gone');
 // A bar belonging to a fight in a level that no longer exists is the pooled-element bug this
@@ -322,6 +322,18 @@ check(await p.waitFor('window.__wf.level.id === "arena"', 25000), 'and a bronze 
 await sleep(2600);
 s = await state();
 check(s.names.some(n => n.includes('Quarry Warden')), `to something iron never sent (${s.names.join(', ')})`);
+// Aaron asked for the rank to be in the name of every monster, because the name is the only thing
+// you read before it reaches you.
+check(s.names.every(n => /^Bronze-rank /.test(n)), `and every one of them says what rank it is (${s.names.join(', ')})`);
+check(await p.eval('window.__wf.game.combat.book.every(b => b.rank === "bronze")'), 'right through to the tuning');
+// Bronze is a bigger adventurer as well as a bigger monster — js/game/ranks.js.
+const grown = await p.eval(`JSON.stringify({
+  hp: window.__wf.game.combat.vitals.max,
+  mana: window.__wf.game.casting.well.max,
+  power: window.__wf.game.useContext().power,
+})`).then(JSON.parse);
+check(grown.hp > 100 && grown.mana > 100 && grown.power > 1,
+  `and there is more of you to meet it (${grown.hp} hp, ${grown.mana} mana, ×${grown.power})`);
 await p.shot(`${OUT}/bronze-arena.png`);
 // Every bronze contract arrives in waves, and on a `clear` one an empty floor brings the next
 // group forward rather than leaving the player waiting out a clock they cannot see.
@@ -331,6 +343,31 @@ check(await p.waitFor('window.__wf.game.combat.foes.length > 1', 8000),
 await p.eval('window.__wf.game.combat.foes = window.__wf.game.combat.foes.map(f => ({ ...f, hp: 0, state: "dead" })); true');
 check(await p.waitFor('window.__wf.level.id === "society"', 30000), 'and back again');
 await sleep(1800);
+
+// ── iron work, at bronze rank ───────────────────────────────────────────────────────────────
+// Aaron: "Ensure you get very small experience against bronze level if doing iron tasks… you
+// should still be close to start of bronze." The board below yours is still takeable and still
+// pays coins; what it stops paying is the ladder.
+const beforeIron = await state();
+await p.eval('window.__wf.game.takeContract("iron.rats"); true');
+check(await p.waitFor('window.__wf.level.id === "arena"', 25000), 'an iron contract is still takeable at bronze');
+await sleep(2400);
+const ironRoom = await state();
+check(ironRoom.names.every(n => /^Iron-rank /.test(n)),
+  `and it sends iron-rank monsters, not bronze ones (${ironRoom.names.join(', ')})`);
+const worth = await p.eval(`(async () => {
+  const m = await import('./js/game/missions.js');
+  return m.briefOf('iron.rats').worth;
+})()`);
+await p.eval('window.__wf.game.combat.foes = window.__wf.game.combat.foes.map(f => ({ ...f, hp: 0, state: "dead" })); true');
+check(await p.waitFor('window.__wf.level.id === "society"', 30000), 'and it can be finished');
+await sleep(1800);
+const afterIron = await state();
+const gained = afterIron.xp - beforeIron.xp;
+check(gained < worth, `the room was worth ${worth} and it paid ${gained}`);
+check(gained <= Math.ceil(worth * 0.12), `which is a trickle, not a rung (${gained})`);
+check(afterIron.coins > beforeIron.coins, 'but it still paid coins — it is work, it is just not advancement');
+check(afterIron.stars === 0, 'and it left him at the bottom of bronze, where being new to a rank belongs');
 
 // ── the sheet again ─────────────────────────────────────────────────────────────────────────
 await p.eval('window.__wf.game.openSheet(); true');

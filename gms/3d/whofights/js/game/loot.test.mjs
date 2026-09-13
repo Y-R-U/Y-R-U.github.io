@@ -6,7 +6,7 @@
 import { test, eq, ok } from '../../tools/harness.mjs';
 import { TABLES, tableFor, pick, onKill, onContract, contractsToTwenty } from './loot.js';
 import { SHOPS, KEEPERS, shopOf, wares, refuse, isShop } from './shop.js';
-import { ITEMS, STONE, POTION, DRAUGHT, ROPE, MARKS, isWeapon, use, stockPrice } from './items.js';
+import { ITEMS, STONE, POTION, DRAUGHT, ROPE, COIN, isWeapon, use, stockPrice } from './items.js';
 import { buyableIds, WEAPONS } from './weapons.js';
 import { DEFAULTS, ROWS, tuning, retune, reset } from './economy.js';
 import { RANKS } from './contracts.js';
@@ -40,9 +40,20 @@ test('no rank ever drops an awakening stone off a kill', () => {
   }
 });
 
-test('nothing drops marks — a purse is paid, not found', () => {
+test('coins are not in any table — they are not rolled for, they are always there', () => {
   for (const rank of Object.keys(TABLES)) {
-    eq(tableFor(rank).some(r => r.id === MARKS), false);
+    eq(tableFor(rank).some(r => r.id === COIN), false, `${rank} has coins in its item table`);
+  }
+});
+
+test('the tables climb: what a rank drops is worth more than what the rank below drops', () => {
+  reset();
+  const worth = rank => tableFor(rank).reduce((a, r) => a + stockPrice(r.id) * r.weight, 0)
+    / tableFor(rank).reduce((a, r) => a + r.weight, 0);
+  const ranks = ['iron', 'bronze', 'silver', 'gold'];
+  for (let i = 1; i < ranks.length; i++) {
+    ok(worth(ranks[i]) > worth(ranks[i - 1]),
+      `${ranks[i]} drops (${Math.round(worth(ranks[i]))}) are not better than ${ranks[i - 1]} (${Math.round(worth(ranks[i - 1]))})`);
   }
 });
 
@@ -61,23 +72,53 @@ test('the weighted pick lands in every row and never off the end', () => {
 
 // ── the rolls ───────────────────────────────────────────────────────────────
 
-test('a kill drops nothing above the chance and something below it', () => {
+// Aaron's rule, and the one thing in this file that must never come back false: EVERY monster
+// drops loot, and that loot always includes coins.
+test('every kill drops coins, whatever the item roll says', () => {
+  reset();
+  retune({ lootChance: 0 });
+  for (const rank of ['iron', 'bronze', 'silver', 'gold']) {
+    for (const roll of [0, 0.5, 0.999]) {
+      const got = onKill({ rank, worth: 14 }, () => roll);
+      ok(got, `a ${rank} kill at roll ${roll} dropped nothing at all`);
+      ok(got.coins >= 1, `a ${rank} kill dropped ${got.coins} coins`);
+      eq(got.item, null, 'nothing should come with it at a zero item chance');
+    }
+  }
+  reset();
+});
+
+test('an item comes with the coins below the chance and not above it', () => {
   reset();
   retune({ lootChance: 0.4 });
-  eq(onKill({ rank: 'iron' }, () => 0.99), null);
-  eq(onKill({ rank: 'iron' }, () => 0.41), null, 'a roll on the wrong side of the line dropped');
-  const got = onKill({ rank: 'iron' }, feed(0.1, 0));
-  ok(got && got.count === 1, 'a roll under the chance dropped nothing');
-  ok(ITEMS[got.id]);
+  // The coin spread takes the first roll; the item chance takes the second.
+  eq(onKill({ rank: 'iron' }, feed(0.5, 0.99)).item, null);
+  eq(onKill({ rank: 'iron' }, feed(0.5, 0.41)).item, null, 'a roll on the wrong side of the line dropped');
+  const got = onKill({ rank: 'iron' }, feed(0.5, 0.1, 0));
+  ok(got.item && got.item.count === 1, 'a roll under the chance dropped no item');
+  ok(ITEMS[got.item.id]);
+  reset();
+});
+
+test('a bigger monster is carrying more, and the rate is a live slider', () => {
+  reset();
+  const mid = () => 0.5;
+  const small = onKill({ rank: 'iron', worth: 14 }, mid).coins;
+  const big = onKill({ rank: 'gold', worth: 239 }, mid).coins;
+  ok(big > small * 8, `${small} off an iron elemental against ${big} off a Verge`);
+  retune({ coinRate: 2 });
+  ok(onKill({ rank: 'iron', worth: 14 }, mid).coins > small * 4, 'the rate slider moved nothing');
+  retune({ coinRate: 0 });
+  eq(onKill({ rank: 'iron', worth: 14 }, mid).coins, 1, 'a monster must never be empty-handed');
   reset();
 });
 
 test('the odds come out of economy.js at the moment of the roll, not at import', () => {
   reset();
   retune({ lootChance: 0 });
-  eq(onKill({ rank: 'iron' }, () => 0), null, 'a zeroed drop chance still dropped');
+  eq(onKill({ rank: 'iron' }, () => 0).item, null, 'a zeroed drop chance still dropped');
   retune({ lootChance: 1 });
-  ok(onKill({ rank: 'iron' }, () => 0.999), 'a certainty still refused to drop');
+  ok(onKill({ rank: 'iron' }, () => 0.999).item, 'a certainty still refused to drop');
   reset();
 });
 
@@ -163,23 +204,23 @@ test('nothing is stocked twice on one counter', () => {
   }
 });
 
-test('a shop never sells marks back to you', () => {
-  for (const id of Object.keys(SHOPS)) eq(wares(id).some(w => w.id === MARKS), false);
+test('a shop never sells coins back to you', () => {
+  for (const id of Object.keys(SHOPS)) eq(wares(id).some(w => w.id === COIN), false);
 });
 
 test('a refusal names what is missing, and an empty purse buys nothing', () => {
   reset();
-  eq(refuse({}, 'dagger', 'shop.weaponry'), '35 marks short.');
-  eq(refuse({ [MARKS]: 34 }, 'dagger', 'shop.weaponry'), '1 marks short.');
-  eq(refuse({ [MARKS]: 35 }, 'dagger', 'shop.weaponry'), null);
-  eq(refuse({ [MARKS]: 9999 }, 'dagger', 'shop.apothecary'), 'Not stocked here.');
-  eq(refuse({ [MARKS]: 9999 }, 'knife', 'shop.weaponry'), 'Not stocked here.');
-  eq(refuse({ [MARKS]: 9999 }, 'dagger', 'shop.nowhere'), 'Not stocked here.');
+  eq(refuse({}, 'dagger', 'shop.weaponry'), '35 coins short.');
+  eq(refuse({ [COIN]: 34 }, 'dagger', 'shop.weaponry'), '1 coins short.');
+  eq(refuse({ [COIN]: 35 }, 'dagger', 'shop.weaponry'), null);
+  eq(refuse({ [COIN]: 9999 }, 'dagger', 'shop.apothecary'), 'Not stocked here.');
+  eq(refuse({ [COIN]: 9999 }, 'knife', 'shop.weaponry'), 'Not stocked here.');
+  eq(refuse({ [COIN]: 9999 }, 'dagger', 'shop.nowhere'), 'Not stocked here.');
 });
 
 test('the registration purse buys a weapon and cannot come near a stone', () => {
   reset();
-  const p = { [MARKS]: DEFAULTS.startingPurse };
+  const p = { [COIN]: DEFAULTS.startingPurse };
   const armed = wares('shop.weaponry').filter(w => isWeapon(w.id));
   ok(armed.some(w => !refuse(p, w.id, 'shop.weaponry')),
     'a new member cannot afford a single weapon in the shop');
@@ -190,7 +231,7 @@ test('moving a price moves the counter, not just the panel', () => {
   reset();
   retune({ weaponPrice: { dagger: 5 } });
   eq(wares('shop.weaponry').find(w => w.id === 'dagger').price, 5);
-  eq(refuse({ [MARKS]: 5 }, 'dagger', 'shop.weaponry'), null);
+  eq(refuse({ [COIN]: 5 }, 'dagger', 'shop.weaponry'), null);
   reset();
   eq(wares('shop.weaponry').find(w => w.id === 'dagger').price, DEFAULTS.weaponPrice.dagger);
 });
@@ -200,19 +241,19 @@ test('a price of zero takes the row off the shelf rather than giving it away', (
   const stocked = wares('shop.apothecary').length;
   retune({ potionPrice: 0 });
   eq(wares('shop.apothecary').length, stocked - 1, 'zeroing one bottle should take one row off');
-  eq(refuse({ [MARKS]: 100 }, POTION, 'shop.apothecary'), 'Not stocked here.');
+  eq(refuse({ [COIN]: 100 }, POTION, 'shop.apothecary'), 'Not stocked here.');
   retune({ greaterPotionPrice: 0 });
   eq(wares('shop.apothecary').length, 0, 'zeroing both should empty the shelf');
   reset();
   eq(wares('shop.apothecary').length, stocked);
 });
 
-// A silver contract pays 620 marks and an awakening stone costs 240. Without something at the back
+// A silver contract pays 620 coins and an awakening stone costs 240. Without something at the back
 // of the shop there is nothing above iron rank to want, and the purse just goes up.
 test('there is something in the shop a silver adventurer cannot immediately afford', () => {
   reset();
   const dear = Math.max(...buyableIds().map(stockPrice));
-  ok(dear > 600, `the best thing on the rack costs ${dear} marks against a 620-mark silver contract`);
+  ok(dear > 600, `the best thing on the rack costs ${dear} coins against a 620-coin silver contract`);
   const cheap = Math.min(...buyableIds().map(stockPrice));
   ok(dear > cheap * 10, 'the racks should span an order of magnitude, top to bottom');
 });

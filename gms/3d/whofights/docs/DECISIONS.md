@@ -41,11 +41,15 @@ gold monsters were built to fit it. A player may arrive at gold with a dagger.
 
 **One body, many monsters.** A board with forty jobs on it cannot afford forty rigs and a player
 does not want forty either — they want the same fight to keep asking a different question. A spawn
-is `kind + variant`; the kind decides what it is made of and the variant what has been done to it.
-Fourteen kinds by six variants is eighty-four monsters.
+is `kind + variant + rank`; the kind decides what it is made of, the variant what has been done to
+it, and the rank what weight of the world it belongs to. Fourteen kinds by six variants by four
+ranks — and the rank is the one of the three that decides whether the fight is survivable at all
+(§6.1).
 
-**A variant scales `hp`, `speed`, `damage` and `regen` and nothing else.** Scaling `windup` would
-take away the tell, and scaling `arc` or `reach` would move the fight's geometry without saying so.
+**A variant scales `hp`, `speed`, `damage` and `regen` and nothing else, and a rank scales `hp`,
+`damage` and `regen`.** Scaling `windup` would take away the tell, and scaling `arc` or `reach`
+would move the fight's geometry without saying so. Neither touches `speed` on a rank either: a
+silver monster is a heavier thing, not a faster one, and the tells stay readable all the way up.
 
 **The seam is the whole readability of the fight.** `js/world/elemental.js` draws an additive seam
 that opens as the thing is cut and pulses as it mends, so you can see across the room whether it is
@@ -235,8 +239,19 @@ a caller cannot half-spend.
 
 **Nothing outside `js/game/economy.js` may hold a price.** Pacing is a thing you find out by
 watching somebody play, so it lives behind `tuning()`/`retune()` where the debug tab's Economy
-panel can move it while the game is running. If you type a number of marks anywhere else, it
+panel can move it while the game is running. If you type a number of coins anywhere else, it
 belongs in `DEFAULTS`.
+
+**The currency is coins, and a coin is an item.** It used to be *marks*, which was the same word as
+the thing that raised your rank, and Aaron said so: "the currency system of marks is the same
+system as the one that makes rank higher, making it confusing." Coins sit in the bag, have a row
+of their own, and can be thrown away by somebody who has decided to — a bag with one row you are
+not allowed to empty is a bag with a rule in it nobody can see. The save is v3 and migrates.
+
+**Every monster drops loot, and that loot always includes coins.** The item is the part that is a
+chance (`lootChance`); the coins are not. How many is what the monster was worth to kill, which is
+the one number that already knows its rank, its kind and what has been done to it — so a table of
+coin values per rank would be a second copy of the bestiary.
 
 **Awakening stones roll per CONTRACT, not per kill.** Sixteen of them is the whole distance to
 Bronze and that distance should be measured in work finished — per kill, a `survive` contract with
@@ -255,6 +270,58 @@ an arrangement the player made is never rearranged behind their back.
 **Buying a weapon with empty hands equips it.** Nobody buys their first sword in order to carry it
 about in a sack, and making them find the bag to use the thing they just bought reads as the game
 being broken.
+
+**A rank's experience stops at that rank's fourth star.** The ladder is one lifetime total, so
+without a ceiling the iron board went on adding to it and a player who cleared iron properly
+arrived at bronze already two stars up. Aaron hit exactly that. A ceiling and not a reset: the
+number in the save never goes down, nothing is taken away on screen, and the rung above simply
+starts at its own bottom.
+
+**Work below your rank pays almost nothing** — 12 % one rung down, 3 % two. It still pays coins,
+because it is still work; what it stops paying is advancement.
+
+---
+
+## 6.1 Ranks — `js/game/ranks.js`
+
+**A rung is ×3 on what a monster hits for and ×2.2 on how much of it there is.** Different on
+purpose. Damage climbing faster is what makes Aaron's rule true — *a silver-rank monster kills an
+iron-rank adventurer in one shot* — and health climbing slower is what keeps a fight the same
+length at every rung, because the player's damage climbs on abilities and a shop rather than on a
+multiplier of its own.
+
+**That rule is why the boards gate by rank, and the gate is the whole difficulty curve.** The work
+you are allowed to take is the work that will not delete you. A monster's rank is the rank of the
+contract it is standing in — not its own nature — so a Mire Thing on a silver board is a silver
+thing, and a contract may name a *lower* rank for a spawn but never a higher one.
+
+**Nothing at rank *n* hits for less than an adventurer two rungs below is worth.** `floorDamage()`.
+It is Aaron's sentence as a number, and it only bites on the feeble end of a band: a Tallyman hits
+for almost nothing by the standards of silver, and at silver "almost nothing" is still the end of
+an iron adventurer.
+
+**The bestiary's authored tunings are band-relative.** Every kind names its own rank and its numbers
+are divided by the mean of that band before the rank multiplier goes on, because the table was
+written before ranks existed and had the climb baked into it already — a Glasswright hit for 33
+where an Earth Elemental hit for 11. Dividing by the band leaves only what makes a Glasswright a
+Glasswright. An iron kind fought at iron comes out at exactly the numbers in the table, and
+`bestiary.test.mjs` pins that.
+
+**One number, `power`, scales everything an ability gives.** Damage, mending, wards, the mana a
+utility draws back, the ceiling a buff lifts — and potions, because a 45-point bottle is scenery to
+an adventurer with 1,390 health. An ability that got stronger in one of those and not the others
+would be a different ability at bronze than it was at iron.
+
+**Not every ability throws something.** Aaron: *"Make sure not all essence abilities are
+attack/teleport."* Ten kinds used to resolve to eight bolts, a dash and a heal, so half the book was
+the same key with a different colour on it. `buff` now lifts maximum health for the length of a
+fight and fills what it opened — which is what makes it worth casting at full health, and the whole
+difference between a buff and a potion — and `utility` gives mana back and lifts the mana ceiling,
+costs nothing, and waits eighteen seconds instead.
+
+**A monster's name says its rank.** `Iron-rank Lesser Shade`. The name is the only thing a player
+reads before the thing reaches them. The head bar wraps rather than ellipsing for the same reason,
+and the mission panel says the rank once instead of four times.
 
 ---
 

@@ -81,7 +81,7 @@ function estimate() {
   const perContract = Math.min(1, Math.max(0, t.stoneDrop))
     + (pay * t.payMultiplier) / Math.max(1, t.stonePrice);
   return table(['', ''], [
-    ['Iron contract pays', `${Math.round(pay * t.payMultiplier)} marks (board average ${Math.round(pay)})`],
+    ['Iron contract pays', `${Math.round(pay * t.payMultiplier)} coins (board average ${Math.round(pay)})`],
     ['Stones per contract', `${perContract.toFixed(2)} — ${(t.stoneDrop * 100).toFixed(0)}% dropped, the rest bought`],
     ['Contracts to twenty abilities', Number.isFinite(n) ? String(n) : 'never at these numbers'],
     ['Roughly', Number.isFinite(mins)
@@ -91,7 +91,7 @@ function estimate() {
 }
 
 function priceTable() {
-  return table(['What', 'Marks'], [
+  return table(['What', 'Coins'], [
     ...buyableIds().map(id => [id, String(stockPrice(id))]),
     ['healing potion', String(stockPrice('potion.healing'))],
     ['awakening stone', String(stockPrice('stone.awakening'))],
@@ -105,17 +105,17 @@ function purseRow(ctx, paint) {
   const row = h('div', 'row');
   if (!doc) { row.append(h('span', 'dim', 'no game running')); return row; }
   const give = n => {
-    doc.items.marks = Math.max(0, (doc.items.marks || 0) + n);
+    doc.items.coin = Math.max(0, (doc.items.coin || 0) + n);
     g.session.autosave?.mark?.();
     g.session.inventory?.refresh?.();
     g.session.shopUI?.refresh?.();
     paint();
   };
   row.append(
-    h('span', null, `Purse: ${doc.items.marks || 0} marks`),
+    h('span', null, `Purse: ${doc.items.coin || 0} coins`),
     button('+100', '', () => give(100)),
     button('+1000', '', () => give(1000)),
-    button('Empty', '', () => give(-(doc.items.marks || 0))),
+    button('Empty', '', () => give(-(doc.items.coin || 0))),
   );
   return row;
 }

@@ -11,8 +11,9 @@
 
 import * as THREE from 'three';
 import { SpellFX } from '../world/spellfx.js';
-import { makeWell, well, refuse, plan, fraction, cooling, tuning, MANA } from './spells.js';
+import { makeWell, well, refuse, plan, fraction, cooling, tuning, summary } from './spells.js';
 import { isDead } from './foe.js';
+import { maxMana, playerAt } from './ranks.js';
 
 // How wide of straight ahead a thrown spell will find a target on its own. Generous: the player is
 // aiming with a third-person camera on a phone, and a bolt that misses because the stick was two
@@ -28,10 +29,13 @@ export class Casting {
     this.player = player;
     this.session = session;
     this.combat = combat;
-    this.well = makeWell(MANA);
+    this.well = makeWell(this.manaCeiling());
     this.fx = new SpellFX(player);
     this.pending = [];
     this.slots = [];
+    // Lifts from a `utility` ability, each with its own clock — the mana well's half of what
+    // js/game/combat.js does for health.
+    this.lifts = [];
     app.scene.add(this.fx.object3D);
   }
 
@@ -43,15 +47,41 @@ export class Casting {
 
   get mana() { return fraction(this.well); }
 
+  rank() { return this.session?.rank?.() || 'iron'; }
+
+  manaCeiling() { return maxMana(this.session?.rank?.() || 'iron'); }
+
+  // What the player's rank does to an ability — js/game/ranks.js. Read at the moment of the cast,
+  // not stored, because a promotion happens between two casts and the second one is the new rank.
+  scale() {
+    const p = playerAt(this.rank());
+    return { power: p.power, thrift: p.thrift };
+  }
+
+  // The well is the rank's, so a promotion has to widen it. Called by the session when the ladder
+  // moves; what is already in it is kept and the new room is empty, which is the honest reading
+  // of being given a bigger vessel.
+  resize() {
+    const max = this.manaCeiling() + this.lifts.reduce((a, l) => a + l.amount, 0);
+    if (max === this.well.max) return false;
+    this.well = { ...this.well, max, mana: Math.min(this.well.mana, max) };
+    return true;
+  }
+
   // What the ability sheet shows against each row: ready, cooling, or too dear.
   state(a) {
-    const why = refuse(this.well, a);
-    const t = tuning(a);
+    const sc = this.scale();
+    const why = refuse(this.well, a, sc);
+    const t = tuning(a, sc);
     const left = cooling(this.well, a);
     // `cooling` is seconds left; `fraction` is those seconds as a share of the whole cooldown,
     // which is what the action bar's wash is scaled by. Both, because the sheet wants the number
     // and the bar wants the bar.
-    return { ready: !why, why, cooling: left, fraction: t.cooldown > 0 ? Math.min(1, left / t.cooldown) : 0, cost: t.cost };
+    return {
+      ready: !why, why, cooling: left,
+      fraction: t.cooldown > 0 ? Math.min(1, left / t.cooldown) : 0,
+      cost: t.cost, does: summary(a, sc),
+    };
   }
 
   // The live elemental nearest to where the player is looking, or null. Distance breaks ties
@@ -87,7 +117,7 @@ export class Casting {
   cast(ability) {
     const doc = this.session?.essences?.doc;
     const picked = this.session?.doc?.essences?.picked || [];
-    const p = plan(doc, this.well, ability, picked);
+    const p = plan(doc, this.well, ability, picked, this.scale());
     if (!p.ok) return p;
 
     const c = p.cast;
@@ -152,12 +182,32 @@ export class Casting {
   apply(c) {
     if (c.mend) this.combat?.mend?.(c.mend);
     if (c.ward) this.combat?.guard?.(c.ward);
+    if (c.vigour) this.combat?.bolster?.(c.vigour, c.seconds);
+    if (c.focus) this.focus(c.focus, c.seconds);
+    // The draw is applied AFTER the lift, so what it gives back can use the room the lift opened
+    // rather than spilling over a ceiling that is about to rise anyway.
+    if (c.draw) this.well = { ...this.well, mana: Math.min(this.well.max, this.well.mana + c.draw) };
+  }
+
+  focus(amount, seconds) {
+    const n = Math.max(0, Math.round(amount));
+    if (!n) return false;
+    this.lifts.push({ amount: n, t: Math.max(1, seconds || 30) });
+    this.well = { ...this.well, max: this.well.max + n };
+    return true;
   }
 
   groundY(x, z) { return this.player.groundY ? this.player.groundY(x, z) : 0; }
 
   update(dt) {
     this.well = well(this.well, dt);
+    for (let i = this.lifts.length - 1; i >= 0; i--) {
+      this.lifts[i].t -= dt;
+      if (this.lifts[i].t > 0) continue;
+      const max = Math.max(1, this.well.max - this.lifts[i].amount);
+      this.well = { ...this.well, max, mana: Math.min(this.well.mana, max) };
+      this.lifts.splice(i, 1);
+    }
     for (let i = this.pending.length - 1; i >= 0; i--) {
       const h = this.pending[i];
       h.t -= dt;
@@ -171,7 +221,9 @@ export class Casting {
   // A level swap disposes the world the particles were drawn against, so nothing survives it.
   reset() {
     this.pending.length = 0;
+    this.lifts.length = 0;
     this.fx.clear();
+    this.resize();
   }
 
   dispose() {
@@ -181,7 +233,7 @@ export class Casting {
 
   report() {
     return {
-      mana: +this.well.mana.toFixed(1), cool: this.well.cool,
+      mana: +this.well.mana.toFixed(1), max: this.well.max, cool: this.well.cool,
       slots: this.slots.map(a => a?.id || null), pending: this.pending.length, ...this.fx.report(),
     };
   }
