@@ -32,16 +32,35 @@ function segSphere(p0, p1, c, r) {
   const t = (-b - Math.sqrt(disc)) / (2 * a);
   return (t >= 0 && t <= 1) ? t : -1;
 }
-// segment vs vertical capsule (axis a→b, radius r): sampled — the capsule is
-// short relative to the step length, so 8 point-tests are plenty.
+// segment p0p1 vs capsule (axis a→b, radius r) → earliest hit t in [0,1] or -1.
+// Analytic, not sampled: 9 fixed samples per step space out by v/1920 metres, so
+// past ~920 m/s they straddle a 0.48 m torso and the Meridian drops dead-centre
+// body shots. Side hits come from the infinite-cylinder quadratic (clipped to the
+// axis span), end hits from the two cap spheres; the earliest is the entry.
 function segCapsule(p0, p1, a, b, r) {
+  const d = sub(p1, p0), ba = sub(b, a), oa = sub(p0, a);
+  const dd = dot(d, d);
+  if (dd < 1e-18) return -1;
+  const baba = dot(ba, ba);
+  if (baba < 1e-12) return segSphere(p0, p1, a, r);
+  {                                                   // already inside?
+    const s = segT(p0, a, b), q = add(a, scale(ba, s)), w = sub(p0, q);
+    if (dot(w, w) <= r * r) return 0;
+  }
   let best = -1;
-  for (let i = 0; i <= 8; i++) {
-    const t = i / 8;
-    const p = add(p0, scale(sub(p1, p0), t));
-    const s = segT(p, a, b);
-    const q = add(a, scale(sub(b, a), s));
-    if (len(sub(p, q)) <= r) { best = t; break; }
+  const bard = dot(ba, d), baoa = dot(ba, oa);
+  const A = baba * dd - bard * bard;
+  const B = baba * dot(d, oa) - baoa * bard;
+  const C = baba * dot(oa, oa) - baoa * baoa - r * r * baba;
+  const h = B * B - A * C;
+  if (h >= 0 && Math.abs(A) > 1e-12) {
+    const t = (-B - Math.sqrt(h)) / A;
+    const y = baoa + t * bard;                        // position along the axis
+    if (t >= 0 && t <= 1 && y > 0 && y < baba) best = t;
+  }
+  for (const c of [a, b]) {
+    const ts = segSphere(p0, p1, c, r);
+    if (ts >= 0 && (best < 0 || ts < best)) best = ts;
   }
   return best;
 }
@@ -244,17 +263,25 @@ export function raycast(origin, dir, opts = {}, _depth = 0) {
     const b = hit.building;
     const from = add(point, scale(d, 0.12));
     const gone = hit.t * max + 0.12;                 // travelled to get in here
+    // Nothing past `max` is the caller's business. Without this the room's own
+    // back wall is reported as a blocker beyond the range asked for, and every
+    // LOS test on a man at a lit window calls him blind.
+    const none = { type: 'none', dist: max, point: p1 };
+    if (gone >= max) return none;
     const tRoom = exitDist(from, d, { x: h.minX, y: h.minY, z: h.minZ }, { x: h.maxX, y: h.maxY, z: h.maxZ });
     const tBld = exitDist(from, d, { x: b.minX, y: 0, z: b.minZ }, { x: b.maxX, y: b.h, z: b.maxZ });
     // whatever is INSIDE the room (the man at the window) still gets hit first
     const inner = raycast(from, d, { ...opts, max: Math.min(max - gone, tRoom) }, _depth + 1);
     if (inner.type !== 'none') return { ...inner, dist: gone + inner.dist };
     if (tRoom < tBld - 0.05) {                       // the room's back wall
+      if (gone + tRoom >= max) return none;
       return { type: 'building', building: b, dist: gone + tRoom, point: add(from, scale(d, tRoom)) };
     }
+    const past = gone + tRoom + 0.02;
+    if (past >= max) return none;
     const out = add(from, scale(d, tRoom + 0.02));   // the room opens out the far side
-    const rest = raycast(out, d, { ...opts, max: max - gone - tRoom - 0.02 }, _depth + 1);
-    return { ...rest, dist: gone + tRoom + 0.02 + rest.dist };
+    const rest = raycast(out, d, { ...opts, max: max - past }, _depth + 1);
+    return { ...rest, dist: past + rest.dist };
   }
   return { ...hit, dist: hit.t * max, point };
 }

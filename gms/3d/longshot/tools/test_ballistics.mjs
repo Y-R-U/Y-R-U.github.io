@@ -161,5 +161,63 @@ const origin = { x: 0, y: 60, z: 0 };
   ok('room raycast reports the opening, not the facade', hitRoom.dist > 195, `dist=${hitRoom.dist.toFixed(1)}`);
 }
 
+// 12. raycast never reports a hit past the caller's `max`. losFrom() asks for
+//     `dist - 1.5` and treats anything but 'none' as a blocker, so a room's own
+//     back wall returned beyond `max` called every man-at-a-window blind.
+{
+  const tower = { minX: -15, maxX: 15, minZ: 190, maxZ: 220, h: 60 };
+  const room = { minX: -6, maxX: 6, minY: 14, maxY: 20, minZ: 188, maxZ: 197 };
+  const eye = { x: 0, y: 17, z: 0 };
+  const fwd = { x: 0, y: 0, z: 1 };
+  const near = raycast(eye, fwd, { buildings: [tower], holes: [room], groundY: -5, max: 191.5 });
+  ok('raycast respects max at a carved room',
+    near.type === 'none' && near.dist <= 191.5 + 1e-6,
+    `type=${near.type} dist=${near.dist.toFixed(2)} max=191.5`);
+  // and the back wall is still found when the caller asks far enough
+  const far = raycast(eye, fwd, { buildings: [tower], holes: [room], groundY: -5, max: 400 });
+  ok('the room back wall still blocks a longer look',
+    far.type === 'building' && far.dist > 195 && far.dist < 200,
+    `type=${far.type} dist=${far.dist.toFixed(2)}`);
+  // never past max, for any max, in either direction
+  let over = 0;
+  for (let m = 150; m <= 400; m += 0.5) {
+    const rc = raycast(eye, fwd, { buildings: [tower], holes: [room], groundY: -5, max: m });
+    if (rc.dist > m + 1e-6) over++;
+  }
+  ok('raycast never overruns max', over === 0, `overruns=${over}/501`);
+}
+
+// 13. the capsule test does not depend on step length. 9 fixed samples per step
+//     space out by v/1920 m, so above ~920 m/s they straddle a 0.48 m torso and
+//     the Meridian (v0 980) dropped dead-centre body shots.
+{
+  const V0 = [700, 730, 760, 800, 850, 900, 980];
+  let miss = 0, tot = 0, worst = null;
+  for (const v0 of V0) {
+    let s = 12345;
+    const rnd = () => (s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+    let m0 = 0;
+    for (let i = 0; i < 900; i++) {
+      // the gap only opens while the round is still above ~920 m/s — the first
+      // ~120 m of a Meridian's flight — so sample that band hard
+      const R = i < 600 ? 40 + rnd() * 100 : 140 + rnd() * 460;
+      const org = { x: 0, y: 1.12, z: 0 };
+      const aim = { x: 0, y: 1.12, z: R };
+      const man = [{
+        person: { id: 2 },
+        head: { c: { x: 0, y: 1.62, z: R }, r: 0.15 },
+        torso: { a: { x: 0, y: 0.82, z: R }, b: { x: 0, y: 1.42, z: R }, r: 0.24 },
+      }];
+      const sol = solve(org, aim, { v0 });
+      const res = simulate(org, sol.dir, { v0, people: man, groundY: -1000 });
+      tot++;
+      if (res.hit.type !== 'torso' && res.hit.type !== 'head') { miss++; m0++; }
+    }
+    if (m0 && !worst) worst = v0;
+  }
+  ok('no centre-mass hits lost at any muzzle velocity', miss === 0,
+    `missed=${miss}/${tot}${worst ? ' first at v0=' + worst : ''}`);
+}
+
 console.log(fails ? `\n${fails} FAILURES` : '\nall ballistics tests pass');
 process.exit(fails ? 1 : 0);

@@ -199,8 +199,8 @@ export function musicStart(mode) {
     }
     bar++;
   };
-  playBar();
   music = { iv: setInterval(playBar, 4200), mode };
+  playBar();                       // assign FIRST: playBar bails on !music
 }
 export function musicStop() { if (music) { clearInterval(music.iv); music = null; } }
 export function tensionTick() { tone(1240, 0.06, { gain: 0.05, bus: musBus }); tone(90, 0.1, { gain: 0.1, bus: musBus }); }

@@ -43,6 +43,7 @@ export class MissionRun {
     this.longest = 0;
     this.missed = false;
     this.killTimes = [];
+    this.movingKills = 0;
     this.streakBest = 0;
     this.time = 0;
     this.timeLimit = def.timeLimit || 0;
@@ -194,15 +195,24 @@ export class MissionRun {
     return losFrom(this.origin, pt,
       ignore ? this.simB.filter(b => b !== ignore) : this.simB, this.ctx.city.holes);
   }
-  // building near `want` metres out with a sightline to ptOf(b)
-  _pickBuilding(want, hWant, hW, ptOf, filter) {
-    const cands = this.simB
-      .filter(b => (!filter || filter(b)))
-      .sort((a, b) =>
-        (Math.abs(Math.hypot(a.cx - this.origin.x, a.cz - this.origin.z) - want) + Math.abs(a.h - hWant) * hW) -
-        (Math.abs(Math.hypot(b.cx - this.origin.x, b.cz - this.origin.z) - want) + Math.abs(b.h - hWant) * hW));
-    for (const b of cands.slice(0, 60)) if (this._losClear(ptOf(b), b)) return b;
+  // building near `want` metres out with a sightline to ptOf(b).
+  // `self` keeps the building itself in the LOS test — right for anything that
+  // sits ON the roof (a steel plate, a rooftop mark), wrong for a carved room
+  // whose own facade is the thing you shoot through.
+  _pickBuilding(want, hWant, hW, ptOf, filter, self) {
+    const cost = (b) =>
+      Math.abs(Math.hypot(b.cx - this.origin.x, b.cz - this.origin.z) - want) + Math.abs(b.h - hWant) * hW;
+    const cands = this.simB.filter(b => (!filter || filter(b))).sort((a, b) => cost(a) - cost(b));
+    // Scan EVERY candidate, not the first 60. The old cut-off silently handed
+    // back a blind building whenever the near ones were all occluded — which is
+    // how the tutorial's third plate ended up visible from nowhere on the roof.
+    for (const b of cands) if (this._losClear(ptOf(b), self ? null : b)) return b;
+    this._noLos(`_pickBuilding(${Math.round(want)}m)`);
     return cands[0];
+  }
+  _noLos(what) {
+    (this.losFallbacks ||= []).push(what);
+    console.warn('[longshot] no LOS-clear candidate for', what, '— falling back blind');
   }
 
   async _spawnTarget(td, i) {
@@ -217,17 +227,23 @@ export class MissionRun {
     if (td.kind === 'room') {
       // carve a lit office bay facing the vantage, in the given range band
       const want = td.dist || this.def.vantage?.dist || 250;
+      // Probe the sightline at the height the room will actually be CARVED at.
+      // Testing one height and carving another hands back a building whose
+      // window is blind (s17 seed 4: clear at y 47.6, a 46.9 m tower across the
+      // line at the y 42.5 the room landed on). Roll the jitter once, up front.
+      const jit = r.range(-8, 4);
+      const floorY = (b) => Math.min(b.h - 6, Math.max(10, this.origin.y - 4 + jit));
       const bestB = this._pickBuilding(want, Math.max(26, this.origin.y), 0.25, (b) => {
         const dx = this.origin.x - b.cx, dz = this.origin.z - b.cz;
         const nx = Math.abs(dx) * b.d > Math.abs(dz) * b.w ? Math.sign(dx) : 0;
         const nz = nx ? 0 : Math.sign(dz);
         return {
           x: b.cx + nx * (b.w / 2 + 1.2),
-          y: Math.min(b.h - 4.5, Math.max(12, this.origin.y - 4)),
+          y: floorY(b) + 1.5,
           z: b.cz + nz * (b.d / 2 + 1.2),
         };
       }, (b) => b.h >= 22);
-      const room = city.addRoom(bestB, this.origin, Math.min(bestB.h - 6, Math.max(10, this.origin.y - 4 + r.range(-8, 4))));
+      const room = city.addRoom(bestB, this.origin, floorY(bestB));
       person = await pop.spawn({
         ...base, pos: room.pos, yaw: room.yaw,
         routine: { type: 'room', anim: r.pick(['watch', 'phone', 'talk']) },
@@ -235,9 +251,11 @@ export class MissionRun {
       });
       person.room = room;
     } else if (td.kind === 'rooftop') {
-      const want = td.dist || 300;
+      // The brief's range is the contract's range: hardcoding 300 put "520 m"
+      // at 302 and "650 m" at 307.
+      const want = td.dist || this.def.vantage?.dist || 300;
       const bestB = this._pickBuilding(want, Math.max(12, this.origin.y - 10), 0.8,
-        (b) => ({ x: b.cx, y: b.h + 1.5, z: b.cz }));
+        (b) => ({ x: b.cx, y: b.h + 1.5, z: b.cz }), null, true);
       person = await pop.spawn({
         ...base, pos: new T.Vector3(bestB.cx, bestB.h + 1.4, bestB.cz),
         yaw: r.range(0, 6.28), routine: { type: 'stand', anim: td.anim || 'phone' },
@@ -281,17 +299,44 @@ export class MissionRun {
   }
 
   // ── LOS-checked spawn spots ────────────────────────────────────────────────
+  // The kill zone is not uniformly visible: the corridor guarantees its NEAR
+  // edge, and a tower on the plaza's near side can shadow the ten scripted crowd
+  // points that ring the fountain. Sweep the zone before falling back, or the
+  // mark lands somewhere no spot on the roof can see (measured: s05 and s14's
+  // CELL LEADER A, both 0 of 49).
+  _sweepZone(y, rMax) {
+    const R = rMax ?? Math.min(24, (this.ctx.city.zoneR || 50) * 0.44);
+    for (let ri = 1; ri <= 5; ri++) {
+      const rad = (ri / 5) * R, n = 6 * ri, a0 = this.r.range(0, Math.PI * 2);
+      for (let i = 0; i < n; i++) {
+        const a = a0 + (i / n) * Math.PI * 2;
+        const p = this.zone.clone().add(new T.Vector3(Math.cos(a) * rad, 0, Math.sin(a) * rad));
+        if (this._losClear({ x: p.x, y, z: p.z })) return p;
+      }
+    }
+    return null;
+  }
   _visibleGroundSpot() {
     const pts = [...this.ctx.city.plazaPts].sort(() => this.r() - 0.5);
     for (const c of pts) {
       const p = c.clone().add(new T.Vector3(this.r.range(-4, 4), 0, this.r.range(-4, 4)));
       if (this._losClear({ x: p.x, y: 1.5, z: p.z })) return p;
     }
+    const wide = this._sweepZone(1.5);
+    if (wide) return wide;
+    this._noLos('ground spot');
     return pts[0].clone();
   }
   _visibleBench() {
-    const bs = [...this.ctx.city.benches].sort(() => this.r() - 0.5);
+    const city = this.ctx.city;
+    const bs = [...city.benches].sort(() => this.r() - 0.5);
     for (const b of bs) if (this._losClear({ x: b.x, y: b.y + 0.9, z: b.z })) return b;
+    // widen to the park seating, nearest the kill zone first — he stays on an
+    // actual bench rather than sitting on thin air somewhere merely visible
+    const park = [...city.parkBenches]
+      .sort((a, b) => a.distanceToSquared(this.zone) - b.distanceToSquared(this.zone));
+    for (const b of park) if (this._losClear({ x: b.x, y: b.y + 0.9, z: b.z })) return b;
+    this._noLos('bench');
     return bs[0] || this.zone.clone();
   }
   // A walking MARK circuits the open kill zone, not a block's sidewalk — a
@@ -301,14 +346,21 @@ export class MissionRun {
   // (his bearing keeps changing, which is what makes the lead interesting).
   _visibleLoop(maxDist) {
     const city = this.ctx.city;
-    const R = Math.min(21, (city.zoneR || 50) * 0.4);
-    const ring = [];
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2 + 0.3;
-      const p = this.zone.clone().add(new T.Vector3(Math.cos(a) * R, 0, Math.sin(a) * R));
-      if (this._losClear({ x: p.x, y: 1.6, z: p.z })) ring.push(p);
+    const R0 = Math.min(21, (city.zoneR || 50) * 0.4);
+    // Several radii, then a smaller circuit recentred on a spot the roof can
+    // actually see: one fixed ring is easy to shadow entirely from one tower.
+    const tries = [[this.zone, R0], [this.zone, R0 * 0.68], [this.zone, R0 * 1.28]];
+    const off = this._sweepZone(1.6);
+    if (off) tries.push([off, R0 * 0.55]);
+    for (const [cen, R] of tries) {
+      const ring = [];
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2 + 0.3;
+        const p = cen.clone().add(new T.Vector3(Math.cos(a) * R, 0, Math.sin(a) * R));
+        if (this._losClear({ x: p.x, y: 1.6, z: p.z })) ring.push(p);
+      }
+      if (ring.length >= 4) return ring;
     }
-    if (ring.length >= 4) return ring;
     // fall back: whichever nearby sidewalk you can see most of
     let loops = city.walkLoops.filter(l => Math.hypot(l[0].x - this.zone.x, l[0].z - this.zone.z) < maxDist);
     if (city.plazaLoop) loops = [city.plazaLoop, ...loops.filter(l => l !== city.plazaLoop)];
@@ -365,7 +417,7 @@ export class MissionRun {
     else if (t0 && t0.def.kind === 'room') {
       // overwatch on nearby rooftops, watching the skyline for you
       const b = this._pickBuilding(this.def.vantage?.dist * 0.8 || 240, this.origin.y - 8, 0.6,
-        (bb) => ({ x: bb.cx, y: bb.h + 1.5, z: bb.cz }));
+        (bb) => ({ x: bb.cx, y: bb.h + 1.5, z: bb.cz }), null, true);
       if (b) g.group.position.set(b.cx + r.range(-4, 4), b.h + 1.4, b.cz + r.range(-4, 4));
     }
     return g;
@@ -392,9 +444,14 @@ export class MissionRun {
     const dists = [130, 230, 330];
     const mat = new T.MeshStandardMaterial({ color: 0xd8d2c4, roughness: 0.4, metalness: 0.7 });
     const ring = new T.MeshBasicMaterial({ color: 0xc23b2e });
+    // A plate you cannot see is a tutorial you cannot finish. `_pickBuilding`
+    // now LOS-checks every candidate (with the plate's own roof in the test,
+    // since the plate sits on it) and `used` keeps the three off one roof.
+    const used = new Set();
     for (const d of dists) {
       const bestB = this._pickBuilding(d, Math.max(10, this.origin.y - 6), 0.6,
-        (b) => ({ x: b.cx, y: b.h + 2.4, z: b.cz }));
+        (b) => ({ x: b.cx, y: b.h + 2.4, z: b.cz }), (b) => !used.has(b), true);
+      used.add(bestB);
       const g = new T.Group();
       const plate = new T.Mesh(new T.CircleGeometry(0.55, 20), mat);
       const bull = new T.Mesh(new T.CircleGeometry(0.2, 16), ring);
@@ -445,19 +502,50 @@ export class MissionRun {
     car.add(new T.Mesh(geoB, new T.MeshStandardMaterial({ color: 0x14161c, roughness: 0.35, metalness: 0.6 })));
     car.add(new T.Mesh(geoC, new T.MeshStandardMaterial({ color: 0x0e1014, roughness: 0.3, metalness: 0.6 })));
     const toEye = new T.Vector3().subVectors(this.origin, this.zone).setY(0).normalize();
-    // the road running most perpendicular to the sightline: x-road or z-road
-    const alongX = Math.abs(toEye.z) > Math.abs(toEye.x);
-    const lane = (city.zoneR || 50) * 0.62;
-    const axis = alongX ? new T.Vector3(1, 0, 0) : new T.Vector3(0, 0, 1);
+    // ROOT CAUSE of "the convoy never gets hit": this was the one spawn in the
+    // file that never LOS-checked itself. The corridor only guarantees the kill
+    // zone from its NEAR edge inward (capAt stops at L - zoneR), and the shipped
+    // lane sat a fixed 0.62·zoneR to the SHOOTER's side of the zone centre —
+    // behind the last uncapped row of buildings. Measured on seeds 1/4/9: the
+    // sedan was out of sight for the entire crossing, so 14 bot shots hit
+    // concrete. Score the candidate roads instead and drive the one the shooter
+    // can actually watch, anchored so the visible stretch starts early.
+    const R = city.zoneR || 50;
+    const AX = [new T.Vector3(1, 0, 0), new T.Vector3(0, 0, 1)];
+    const wantX = Math.abs(toEye.z) > Math.abs(toEye.x);   // true crossing shot
+    let pick = null;
+    for (const axis of AX) {
+      const perp = new T.Vector3(-axis.z, 0, axis.x);
+      for (const f of [-0.66, -0.54, 0.54, 0.66]) {
+        let run = 0, from = 0, bestRun = 0, bestFrom = 0;
+        for (let s = -130; s <= 130; s += 5) {
+          const p = this.zone.clone().addScaledVector(axis, s).addScaledVector(perp, f * R);
+          if (this._losClear({ x: p.x, y: 1.0, z: p.z })) {
+            if (!run) from = s;
+            run += 5;
+            if (run > bestRun) { bestRun = run; bestFrom = from; }
+          } else run = 0;
+        }
+        // A crossing shot is the point of this contract, so it wins outright —
+        // but only if it gives a workable window. Below ~6 s of visible road,
+        // take the going-away lane over an unshootable one.
+        const sc = bestRun + (((axis === AX[0]) === wantX && bestRun >= 70) ? 1000 : 0);
+        if (!pick || sc > pick.sc) pick = { sc, axis, perp, off: f * R, run: bestRun, from: bestFrom };
+      }
+    }
+    if (!pick.run) this._noLos('convoy lane');
+    const axis = pick.axis;
+    const lead = 90;                                   // approach before the window opens
     const start = this.zone.clone()
-      .addScaledVector(axis, -160)
-      .addScaledVector(alongX ? new T.Vector3(0, 0, 1) : new T.Vector3(1, 0, 0), toEye.z * 0 + (alongX ? Math.sign(toEye.z) : Math.sign(toEye.x)) * lane);
+      .addScaledVector(axis, pick.from - lead)
+      .addScaledVector(pick.perp, pick.off);
     car.position.copy(start);
-    car.rotation.y = alongX ? Math.PI / 2 : 0;
+    car.rotation.y = Math.atan2(axis.x, axis.z);
     scene.add(car);
     this.special.convoy = {
       car, speed: 12, state: 'driving', exitT: 0,
-      axis, travelled: 0, maxTravel: 320,
+      axis, travelled: 0, maxTravel: lead + Math.max(60, pick.run) + 70,
+      window: pick.run,
     };
   }
 
@@ -466,7 +554,7 @@ export class MissionRun {
     const r = this.r;
     // enemy marksman on a rooftop across the city — his glint gives him away
     const bestB = this._pickBuilding(420, this.origin.y, 0.7,
-      (b) => ({ x: b.cx, y: b.h + 1.1, z: b.cz }));
+      (b) => ({ x: b.cx, y: b.h + 1.1, z: b.cz }), null, true);
     const pos = new T.Vector3(bestB.cx, bestB.h + 1.1, bestB.cz);
     this.special.sniper = {
       pos, glint: fx.glint(pos.clone().add(new T.Vector3(0, 0.4, 0))),
@@ -689,7 +777,10 @@ export class MissionRun {
         this.ctx.hud.toast(`${this.def.setup.window}s — drop the rest`, '');
       }
       let sc = SCORE.kill + (head ? SCORE.head : 0) + Math.round(Math.max(0, (dist - SCORE.distFrom) * SCORE.distPerM));
-      if (p.state === 'route' && (p.routine.type === 'loop' || p.routine.type === 'patrol')) sc += SCORE.moving;
+      // Judge "moving" by the velocity the round actually had to lead. `p.state`
+      // cannot answer it: pop.kill() has already set it to 'dead' by now, and it
+      // was never the 'route' this used to test for.
+      if (p.vel && p.vel.lengthSq() > 0.25) { sc += SCORE.moving; this.movingKills++; }
       if (this.killTimes.length && now - this.killTimes[this.killTimes.length - 1] < SCORE.streakWindow) {
         sc += SCORE.streak;
         this.ctx.hud.toast('STREAK +' + SCORE.streak, 'good');
@@ -725,8 +816,10 @@ export class MissionRun {
 
   _panicAt(pos, always) {
     const r = this.suppressed ? PANIC.quietRadius : PANIC.loudRadius;
-    this.ctx.pop.panicFrom(pos, always ? Math.max(r, 26) : r, this);
-    if (!this.panicked) {
+    const n = this.ctx.pop.panicFrom(pos, always ? Math.max(r, 26) : r, this);
+    // Only a shot somebody REACTED to burns the ghost bonus. Setting this
+    // unconditionally made "nobody panicked" unreachable on 20 of 21 missions.
+    if (n > 0 && !this.panicked) {
       this.panicked = true;
       audio.panicCrowd();
     }
@@ -1069,6 +1162,9 @@ export class MissionRun {
   }
 
   _checkWin() {
+    // THE NEST has no win condition — it runs until three marks slip away. An
+    // empty board between waves is not a clear, it is the gap before the next one.
+    if (this.def.special === 'endless') return;
     if (this.identify) {
       if (this.targets.every(t => t.dead)) this._win();
       return;
@@ -1103,6 +1199,9 @@ export class MissionRun {
     if (won && !this.panicked && this.targets.length > 0 && this.def.special !== 'range') {
       bonus += 600; lines.push(['Ghost — nobody panicked', 600]);
     }
+    // dim (string) like the headshot line: these points are already in `base`
+    if (this.movingKills)
+      lines.push([`Moving target ×${this.movingKills}`, '+' + this.movingKills * SCORE.moving]);
     if (this.headshots) lines.push([`Headshots ×${this.headshots}`, '—']);
     if (this.longest > 0) lines.push(['Longest kill', Math.round(this.longest) + 'm']);
     const total = Math.max(0, Math.round(base + bonus));

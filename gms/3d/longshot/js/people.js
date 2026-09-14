@@ -178,12 +178,14 @@ export class Population {
     }
   }
 
-  // scare everyone in radius; returns whether anybody targeted flees
+  // scare everyone in radius; returns how many people it actually scared
   panicFrom(pos, radius, missions) {
+    let n = 0;
     for (const p of this.list) {
       if (!p.alive || p.state === 'panic' || p.state === 'escape') continue;
       const d = p.group.position.distanceTo(pos);
       if (d > radius) continue;
+      n++;
       if (p.role === 'target' || p.role === 'vip') {
         if (p.routine.type !== 'room') {                 // room targets duck & hide instead
           p.state = 'escape';
@@ -205,6 +207,7 @@ export class Population {
         p.panicked = true;
       }
     }
+    return n;
   }
 
   // Where a panicked mark runs. A target that vanishes behind a tower the

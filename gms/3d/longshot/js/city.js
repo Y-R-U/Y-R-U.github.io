@@ -8,7 +8,7 @@
 import * as THREE from 'three';
 import * as BGU from 'three/addons/utils/BufferGeometryUtils.js';
 import { CITY, TIMES, LITE, MOVE } from './config.js';
-import { rng } from './utils.js';
+import { rng, hash32 } from './utils.js';
 
 const T = THREE;
 
@@ -426,7 +426,7 @@ export function buildCity(scene, spec) {
   }
 
   const facadeMats = FACADE_STYLES.map((st, i) => {
-    const { map, emissive } = facadeTex(spec.seed ? (i * 999 + (typeof spec.seed === 'string' ? spec.seed.length : spec.seed)) : i, st, time.litP);
+    const { map, emissive } = facadeTex(i * 999 + (spec.seed ? hash32(String(spec.seed)) : 0), st, time.litP);
     return new T.MeshStandardMaterial({
       map, emissiveMap: emissive, emissive: 0xffcf9a, emissiveIntensity: time.em,
       vertexColors: true, roughness: 0.85, metalness: 0.08,
@@ -573,8 +573,9 @@ export function buildCity(scene, spec) {
   for (let i = 0; i < carN; i++) {
     const horiz = r.chance(0.5);
     const lane = r.int(0, grid);
-    const lanePos = lane * cell - half - road / 2 + (r.chance(0.5) ? 2.8 : -2.8);
-    const dir = (lanePos - Math.floor(lanePos)) >= 0 && r.chance(0.5) ? 1 : -1;
+    const side = r.chance(0.5) ? 2.8 : -2.8;     // which half of the road
+    const lanePos = lane * cell - half - road / 2 + side;
+    const dir = side > 0 ? 1 : -1;                // one way per lane, so no head-ons
     carState.push({ horiz, lanePos, dir, t: r.range(-half, half), speed: r.range(9, 16) });
     cars.setColorAt(i, new T.Color(carCols[i % carCols.length]));
   }
