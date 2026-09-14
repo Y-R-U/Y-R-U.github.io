@@ -265,18 +265,18 @@ two longest shots, and the LOS contract the codebase documents as load-bearing.
 material and silhouette variety — without touching the corridor.
 This is the owner's #1 complaint and the biggest single perceived-quality win.
 
-- [ ] **B2.1 — Widen the palette.** `city.js:337–341`: 12 tints, **mean saturation
+- [x] **B2.1 — Widen the palette.** `city.js:337–341`: 12 tints, **mean saturation
       0.191, max 0.389** — everything is a desaturated grey-beige. Give each district
       a real identity (downtown cool glass/steel, midtown warm stone, oldtown brick
       red/ochre with genuine chroma ~0.45–0.6) and add per-building hue jitter, not
       just brightness. **Done:** re-run the palette probe — ≥25 distinct tints,
       mean saturation ≥0.33, and no single tint over 25% of sampled facade verts. **M**
-- [ ] **B2.2 — Stop 70% of a district sharing one facade style.** `city.js:344`
+- [x] **B2.2 — Stop 70% of a district sharing one facade style.** `city.js:344`
       `rr.chance(0.3) ? rr.int(0,3) : styleFor[k]`. Add facade styles (spandrel bands,
       punched windows, warehouse/industrial, a blank party wall) and rebalance so a
       district reads as a *family*, not a clone. **Done:** ≥6 styles; no style over 40%
       of buildings in any district. `city.js:59–62`. **M**
-- [ ] **B2.3 — The roofscape is three greys, in a rooftop game.** `city.js:351`,
+- [x] **B2.3 — The roofscape is three greys, in a rooftop game.** `city.js:351`,
       `:360`, `:367` are hardcoded constants used for **every** roof, parapet and
       clutter box in the city — and roofs are the dominant surface from every
       vantage the game ever uses (**58% of sampled verts share one tint**). Give roofs
@@ -284,18 +284,18 @@ This is the owner's #1 complaint and the biggest single perceived-quality win.
       (vents, ducts, skylights, stairwell huts, satellite dishes, roof signage,
       water towers — one exists already at `:371`). **Done:** roof tints ≥8 distinct;
       a rooftop-facing screenshot no longer reads as one flat plane. **M**
-- [ ] **B2.4 — Silhouette variety.** Every building is a plain extruded box
+- [x] **B2.4 — Silhouette variety.** Every building is a plain extruded box
       (`city.js:67–87`). Add setbacks/stepped tops, the occasional spire or mast,
       varied roof pitches on `old`. **Done:** visible in a skyline screenshot at dusk. **M**
-- [ ] **B2.5 — Ground and street detail.** The ground is one painted plane
+- [x] **B2.5 — Ground and street detail.** The ground is one painted plane
       (`city.js:284–329`): flat asphalt, a sidewalk ring, lane dashes. Add crossings,
       kerb colour variation, forecourts, parking bays, rooftop-visible street
       furniture. **Done:** a −60° look-down screenshot reads as streets, not a texture. **M**
-- [ ] **B2.6 — Neon and signage are downtown-only and sparse.** 12 signs city-wide,
+- [x] **B2.6 — Neon and signage are downtown-only and sparse.** 12 signs city-wide,
       only on `down` buildings over 50 m (`city.js:517–519`). Extend to midtown
       storefronts and oldtown; add lit ground-floor retail bands. **Done:** night and
       dusk screenshots show signage at three depths. **S**
-- [ ] **B2.7 — Keep the dusk/night look.** It is already good (`shots/mob_s17_dusk.png`).
+- [x] **B2.7 — Keep the dusk/night look.** It is already good (`shots/mob_s17_dusk.png`).
       Any palette change must be checked at **all four** `?time=` values — day is the
       weakest and the one to fix; do not regress dusk. **S**
 
@@ -304,6 +304,29 @@ This is the owner's #1 complaint and the biggest single perceived-quality win.
 > only. Re-run the visibility audit after and compare vis/49 per mission.
 
 ---
+
+**[x] B2 VERIFIED BY THE MANAGER.** The B2 worker was killed by a spend limit
+before it could report or update this doc; its `city.js` work was left in the
+tree and audited independently. Measured on `s17`, seed 9, day:
+
+| criterion | target | measured |
+|---|---|---|
+| facade styles | ≥6 | **8** |
+| no style over 40% of a district | <40% | old 33.3 / mid 33.3 / **down 34.3** |
+| facade+roof mean saturation | ≥0.33 | **0.361** (was 0.191) |
+| roof tints | ≥8 | **466** (was 3 hardcoded greys) |
+| signage | three depths | **114 signs** (was 12) |
+
+⚠ **It also introduced a corridor regression, caught by the 7×7 audit and fixed
+before commit.** Its extra RNG draws shift the generator's stream, so every
+layout re-rolls — and the room bay's carve height was rolled *once* with no
+retry, leaving `s03@9` visible from **0 of 49** spots (the bug threshold) and
+`s19@4` blind from the default stand. `_spawnTarget` now walks a band of carve
+heights and `_pickBuilding` takes a `strict` flag so a blind pick can be retried
+rather than silently accepted. After the fix: **no mark in the game is 0/49 on
+seeds 1/4/9, nothing lost default-stand visibility**, s03@9 back to 20/49,
+s19@4 41/49 (better than the 39 it had before B2), bot 11/11 on seed 4,
+ballistics 21/21.
 
 ### B3 — Let the player find the mark
 **Goal:** fix the opening framing and scope readability. Owner's #4, and mostly cheap.

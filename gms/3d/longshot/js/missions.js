@@ -199,7 +199,7 @@ export class MissionRun {
   // `self` keeps the building itself in the LOS test — right for anything that
   // sits ON the roof (a steel plate, a rooftop mark), wrong for a carved room
   // whose own facade is the thing you shoot through.
-  _pickBuilding(want, hWant, hW, ptOf, filter, self) {
+  _pickBuilding(want, hWant, hW, ptOf, filter, self, strict) {
     const cost = (b) =>
       Math.abs(Math.hypot(b.cx - this.origin.x, b.cz - this.origin.z) - want) + Math.abs(b.h - hWant) * hW;
     const cands = this.simB.filter(b => (!filter || filter(b))).sort((a, b) => cost(a) - cost(b));
@@ -207,6 +207,7 @@ export class MissionRun {
     // back a blind building whenever the near ones were all occluded — which is
     // how the tutorial's third plate ended up visible from nowhere on the roof.
     for (const b of cands) if (this._losClear(ptOf(b), self ? null : b)) return b;
+    if (strict) return null;          // caller wants to retry at another height
     this._noLos(`_pickBuilding(${Math.round(want)}m)`);
     return cands[0];
   }
@@ -231,18 +232,30 @@ export class MissionRun {
       // Testing one height and carving another hands back a building whose
       // window is blind (s17 seed 4: clear at y 47.6, a 46.9 m tower across the
       // line at the y 42.5 the room landed on). Roll the jitter once, up front.
+      // ...and if that height is blind, try another. A bay 12 m lower clears
+      // towers the one above it does not, so accepting a single roll left s03
+      // visible from 0 of 49 spots whenever the layout re-rolled underneath it.
       const jit = r.range(-8, 4);
-      const floorY = (b) => Math.min(b.h - 6, Math.max(10, this.origin.y - 4 + jit));
-      const bestB = this._pickBuilding(want, Math.max(26, this.origin.y), 0.25, (b) => {
+      const carveAt = (j) => (b) => Math.min(b.h - 6, Math.max(10, this.origin.y - 4 + j));
+      const bayOf = (fy) => (b) => {
         const dx = this.origin.x - b.cx, dz = this.origin.z - b.cz;
         const nx = Math.abs(dx) * b.d > Math.abs(dz) * b.w ? Math.sign(dx) : 0;
         const nz = nx ? 0 : Math.sign(dz);
         return {
           x: b.cx + nx * (b.w / 2 + 1.2),
-          y: floorY(b) + 1.5,
+          y: fy(b) + 1.5,
           z: b.cz + nz * (b.d / 2 + 1.2),
         };
-      }, (b) => b.h >= 22);
+      };
+      let floorY = carveAt(jit), bestB = null;
+      for (const j of [jit, 0, -4, -8, 4, -12, 8]) {
+        const fy = carveAt(j);
+        const b = this._pickBuilding(want, Math.max(26, this.origin.y), 0.25,
+          bayOf(fy), (b) => b.h >= 22, false, true);
+        if (b) { bestB = b; floorY = fy; break; }
+      }
+      if (!bestB) bestB = this._pickBuilding(want, Math.max(26, this.origin.y), 0.25,
+        bayOf(floorY), (b) => b.h >= 22);
       const room = city.addRoom(bestB, this.origin, floorY(bestB));
       person = await pop.spawn({
         ...base, pos: room.pos, yaw: room.yaw,

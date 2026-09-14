@@ -20,4 +20,5 @@ lib/auth). **Only ever stage `gms/3d/longshot` paths.** Never `git add -A`.
 | # | agent | scope | status |
 |---|-------|-------|--------|
 | R0 | Reviewer | full audit → ranked backlog | DONE — docs/IMPROVEMENTS.md, 9 batches |
-| B1 | Worker | correctness: 10 systems switched off | running |
+| B1 | Worker | correctness: 10 systems switched off | DONE 10/10, committed bbc7af81, tests 17→21 |
+| B2 | Worker | city visual identity | KILLED by spend limit at ~95%; work salvaged, corridor regression found + fixed + verified by manager |
