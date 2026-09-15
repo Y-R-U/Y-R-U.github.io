@@ -54,13 +54,22 @@ async function decode(name) {
   sliceCache.set(name, p);
   return p;
 }
-export async function initChars() {
-  index = await fetch(INDEX).then(r => r.json());
-  const rangeOK = await fetch(PACK, { headers: { Range: 'bytes=0-0' } })
-    .then(r => r.status === 206).catch(() => false);
-  if (!rangeOK) fullBlob = await fetch(PACK).then(r => r.arrayBuffer());
-  return Object.keys(index.entries);
+let initP = null;
+export function initChars() {
+  return (initP ||= (async () => {
+    index = await fetch(INDEX).then(r => r.json());
+    // A host that ignores Range answers this probe with the WHOLE 4.5 MB pack.
+    // Keep that body instead of throwing it away and fetching the pack again.
+    const res = await fetch(PACK, { headers: { Range: 'bytes=0-0' } }).catch(() => null);
+    if (!res || res.status !== 206) {
+      fullBlob = res ? await res.arrayBuffer() : await fetch(PACK).then(r => r.arrayBuffer());
+    }
+    return Object.keys(index.entries);
+  })());
 }
+// Kicked off at import rather than from the Population constructor, so the pack
+// downloads while buildCity runs instead of after it.
+initChars().catch(() => {});
 
 // ── body-space bone control (x=right, y=up, z=forward) ──────────────────────
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -191,6 +200,58 @@ const ANIMS = {
     C.head && C.head.apply(qy(s * 0.55).multiply(qx(0.02)));
     S.bob = 0;
   },
+  smoke(C, t, S) {
+    // doorway smoker: hand comes up to the mouth on a slow cycle, then drops
+    const u = Math.pow(Math.max(0, Math.sin(t * 0.42)), 2);
+    const b = Math.sin(t * 1.1);
+    C.rArm && C.rArm.apply(qz(1.5 - 0.42 * u).multiply(qx(0.06 + 0.22 * u)));
+    C.rElb && C.rElb.apply(qx(0.25 + 1.85 * u));
+    C.lArm && C.lArm.apply(qx(0.18).multiply(DOWN_L));
+    C.lElb && C.lElb.apply(qx(1.35));
+    C.rLeg && C.rLeg.apply(qx(0.12)); C.lLeg && C.lLeg.apply(qx(-0.04));
+    C.rKnee && C.rKnee.apply(qx(0.18)); C.lKnee && C.lKnee.apply(qx(0));
+    C.spine && C.spine.apply(qx(-0.02).multiply(qy(0.06 * b)));
+    C.head && C.head.apply(qy(b * 0.18).multiply(qx(0.06 + 0.1 * u)));
+    S.bob = 0;
+  },
+  lean(C, t, S) {
+    // propped against a wall: weight back, one knee out, arms folded
+    const b = Math.sin(t * 0.8);
+    C.rArm && C.rArm.apply(qx(0.3).multiply(DOWN_R));
+    C.lArm && C.lArm.apply(qx(0.3).multiply(DOWN_L));
+    C.rElb && C.rElb.apply(qx(1.45).multiply(qy(0.65)));
+    C.lElb && C.lElb.apply(qx(1.45).multiply(qy(-0.65)));
+    C.rLeg && C.rLeg.apply(qx(0.2)); C.lLeg && C.lLeg.apply(qx(-0.06));
+    C.rKnee && C.rKnee.apply(qx(0.32)); C.lKnee && C.lKnee.apply(qx(0.02));
+    C.spine && C.spine.apply(qx(0.1));
+    C.head && C.head.apply(qy(b * 0.26).multiply(qx(-0.04)));
+    S.bob = 0;
+  },
+  browse(C, t, S) {
+    // both hands on the phone, head down at the screen
+    const s = Math.sin(t * 2.2), b = Math.sin(t * 1.2);
+    C.rArm && C.rArm.apply(qz(1.15).multiply(qx(0.45)));
+    C.lArm && C.lArm.apply(qz(-1.15).multiply(qx(0.45)));
+    C.rElb && C.rElb.apply(qx(1.75 + 0.04 * s)); C.lElb && C.lElb.apply(qx(1.75));
+    C.rLeg && C.rLeg.apply(qx(0)); C.lLeg && C.lLeg.apply(qx(0));
+    C.rKnee && C.rKnee.apply(qx(0)); C.lKnee && C.lKnee.apply(qx(0));
+    C.spine && C.spine.apply(qx(-0.1).multiply(qy(0.04 * b)));
+    C.head && C.head.apply(qx(0.42 + 0.03 * s));
+    S.bob = 0;
+  },
+  carry(C, t, S) {
+    // walking with a bag: the loaded arm barely swings, body leans off it
+    const sw = Math.sin(t * 7.2) * 0.46;
+    C.rLeg && C.rLeg.apply(qx(sw)); C.lLeg && C.lLeg.apply(qx(-sw));
+    C.rKnee && C.rKnee.apply(qx(Math.max(0, -sw) * 1.0));
+    C.lKnee && C.lKnee.apply(qx(Math.max(0, sw) * 1.0));
+    C.rArm && C.rArm.apply(qx(0.06).multiply(qz(1.62)));
+    C.lArm && C.lArm.apply(qx(sw * 0.75).multiply(DOWN_L));
+    C.rElb && C.rElb.apply(qx(0.1)); C.lElb && C.lElb.apply(qx(0.3));
+    C.spine && C.spine.apply(qx(-0.05).multiply(qz(-0.05)));
+    C.head && C.head.apply(qy(0));
+    S.bob = Math.abs(Math.sin(t * 7.2)) * 0.035;
+  },
   sit(C, t, S) {
     // park bench — thighs forward, shins down (group is raised by people.js)
     const b = Math.sin(t * 1.4);
@@ -233,6 +294,13 @@ export async function loadTemplate(file) {
   return p;
 }
 
+// Warm every template a mission needs at once. Decode + GLTF parse is the whole
+// cost of spawning a crowd (a second copy of a file is just a SkeletonUtils
+// clone), so this is what keeps a 60-strong crowd loading in the time 10 used to.
+export function preloadTemplates(files) {
+  return Promise.all([...new Set(files)].map(f => loadTemplate(f).catch(() => null)));
+}
+
 export async function loadCharacter(file, opts = {}) {
   const tpl = await loadTemplate(file);
   return driveModel(skClone(tpl), file, opts);
@@ -242,7 +310,20 @@ export function driveModel(model, file, opts = {}) {
   model.traverse(o => {
     if (o.isMesh || o.isSkinnedMesh) {
       o.castShadow = true; o.receiveShadow = false;
-      o.frustumCulled = false;            // skinned bounds drift; never cull
+      // Auto-computed skinned bounds drift with the pose, which is why this used
+      // to be frustumCulled = false — but with a city crowd that means every
+      // character behind the shooter still costs a draw call and a skeleton
+      // update. The rest pose is a T-pose (the widest the arms ever get), so an
+      // explicitly inflated rest sphere contains every pose in ANIMS and can be
+      // culled safely. Geometry is shared by SkeletonUtils.clone, so one pass
+      // per template covers every spawn of it.
+      o.frustumCulled = true;
+      const g = o.geometry;
+      if (g && !g.userData.lsBounds) {
+        g.computeBoundingSphere();
+        if (g.boundingSphere) g.boundingSphere.radius *= 1.9;
+        g.userData.lsBounds = true;
+      }
     }
   });
 

@@ -373,18 +373,30 @@ ballistics 21/21.
       parse (`charrig.js:43–56`). Civilians and guards have no ordering dependency —
       `Promise.all` them. **Required before B4.1 is affordable.** **Done:** load time
       for a 60-civilian mission no worse than today's 10. **M**
-- [ ] **B4.3 — Use more of the cast.** 28 characters ship in `assets/chars.dat`;
+- [x] **B4.3 — Use more of the cast.** 28 characters ship in `assets/chars.dat`;
       **9 distinct files loaded** in a measured s03 run. `CIV_FILES` is 16
       (`people.js:15–20`). The `3d-animated-characters` skill documents 117 available
       in the wider repo. **Done:** ≥20 distinct files in a single mission. **S**
+      **[x] VERIFIED** — **9 → 27–32 distinct files loaded per mission** (measured
+      s02/s03/s05/s13/s17/s20, seed 4). `CIV_FILES` 16 → 28 and the pack 28 → 40
+      characters (3.17 → 4.50 MB): twelve more street civilians pulled from the
+      local rigged cache via `tools/build_chars.py` (construction, carpenter,
+      paramedic, skater, plus the missing female counterparts of post / doctor /
+      homeless / mechanic). A crowd of sixty drawn from sixteen models read as the
+      same four people over and over.
 - [ ] **B4.4 — Ambient life beyond standing and walking.** Routines are
       `stand|loop|patrol|sit` (`people.js:104–117`). Add queueing, street vendors,
       dog-walkers, phone-checkers, smokers in doorways, people entering/leaving
       buildings. Park benches already exist and are barely used (`city.js:461–468`).
       **Done:** a 30 s dusk capture shows ≥6 distinct behaviours. **M**
-- [ ] **B4.5 — Sitting people are offset on one axis only.** `people.js:114` applies
+- [x] **B4.5 — Sitting people are offset on one axis only.** `people.js:114` applies
       `sin(yaw)` to `x` with no matching `cos(yaw)` on `z` — so a bench mark's collider
       can sit 15 cm from where the model appears. **S**
+      **[x] VERIFIED** — the offset is meant to shuffle a sitter BACK onto the seat
+      along his own facing; with only the `x` term a sitter facing ±z slid 15 cm
+      sideways off the bench instead. Now `x -= sin(yaw)*0.15` **and**
+      `z -= cos(yaw)*0.15`. (The collider is not separately wrong — collider and
+      model both read `p.group.position` — the model was in the wrong place.)
 
 ---
 

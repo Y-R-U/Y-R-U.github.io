@@ -28,6 +28,14 @@ CHARS = [
     "man_coat_winter", "woman_coat_winter", "man_punk", "woman_punk",
     "man_post", "man_chef", "woman_maid", "man_doctor",
     "man_homeless", "man_reporter", "woman_scientist", "man_mechanic",
+    # a crowd of 60 drawn from 16 models reads as the same four people over and
+    # over, so the street cast is twice the size it was
+    "man_construction_worker", "woman_construction_worker",
+    "man_carpenter", "woman_carpenter",
+    "man_paramedic", "woman_paramedic",
+    "woman_homeless", "woman_doctor",
+    "woman_post", "woman_mechanic",
+    "man_skate", "woman_skate",
 ]
 
 

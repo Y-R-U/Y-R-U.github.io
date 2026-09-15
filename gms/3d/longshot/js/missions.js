@@ -13,6 +13,10 @@ import * as audio from './audio.js';
 
 const T = THREE;
 
+// Crowd density, by tier. `near` is rigged characters inside the kill zone,
+// `mid` rigged walkers on the approach streets, `far` instanced impostors.
+const CROWD = { near: 74, mid: 34 };
+
 // the sedan's front wheel, in the car's own frame (it may drive either axis)
 export function convoyTyre(cv) {
   return cv.car.position.clone().addScaledVector(cv.axis, 2.0).setY(0.5);
@@ -159,8 +163,7 @@ export class MissionRun {
     if (setup.identify) await this._setupIdentify(setup.identify);
 
     // crowd + guards
-    const nCiv = setup.civs ?? 10;
-    for (let i = 0; i < nCiv; i++) await this._spawnCiv();
+    await this._spawnCrowd(setup);
     for (let i = 0; i < (setup.guards || 0); i++) await this._spawnGuard(i);
 
     // specials
@@ -387,28 +390,188 @@ export class MissionRun {
     return best;
   }
 
-  async _spawnCiv() {
+  // ── the crowd ──────────────────────────────────────────────────────────────
+  // A sniper contract is about picking ONE man out of a crowd, and the city used
+  // to hold nine people. The crowd is tiered by what the glass can resolve:
+  //   near — packed around the kill zone, so the collateral rule finally means
+  //          something and the mark has to be picked out of a crowd;
+  //   mid  — the approach streets you look across on the way in.
+  // Both tiers are rigged and shootable; what keeps them affordable is the
+  // angular-size impostor swap in people.js, not a cheaper kind of person.
+  // There is no far tier because there is nothing to see: measured from the
+  // perch, not one trial spot on the distant blocks had a clear line to the
+  // eye. A rooftop only ever sees the ground down the corridor it was cut for.
+  // Specs are built synchronously off the seeded RNG and only then spawned in
+  // one Promise.all, so the layout stays deterministic while the template
+  // parses overlap instead of queueing.
+
+  // Is (x,z) sitting on a shot the player has to take? A crowd is only good
+  // news if it surrounds the mark rather than standing in front of him — this
+  // rejects the strip where the eye-to-target line is still below head height.
+  _onShotLine(x, z, pad = 2.8) {
+    const o = this.origin;
+    for (const t of this.targets) {
+      const p = t.person;
+      if (!p || !p.alive) continue;
+      const tp = p.group.position;
+      const dx = tp.x - o.x, dz = tp.z - o.z;
+      const L2 = dx * dx + dz * dz;
+      if (L2 < 1) continue;
+      const s = ((x - o.x) * dx + (z - o.z) * dz) / L2;
+      if (s < 0 || s > 1.3) continue;
+      if (Math.hypot(x - (o.x + dx * s), z - (o.z + dz * s)) > pad) continue;
+      if (o.y + (tp.y + 1.5 - o.y) * s < 2.4) return true;
+    }
+    return false;
+  }
+  _inBuilding(x, z, pad = 0.7) {
+    for (const b of this.ctx.city.colliders)
+      if (x > b.minX - pad && x < b.maxX + pad && z > b.minZ - pad && z < b.maxZ + pad) return true;
+    return false;
+  }
+
+  async _spawnCrowd(setup) {
     const { city, pop } = this.ctx;
     const r = this.r;
-    const near = r.chance(0.6);
-    const seats = [...city.benches, ...city.parkBenches];
-    if (r.chance(0.25) && seats.length) {
-      const b = r.pick(seats);
-      return pop.spawn({
-        role: 'civ', file: r.pick(CIV_FILES), pos: b.clone().setY(0),
-        yaw: r.range(0, 6.28), routine: { type: 'sit' }, anim: 'sit',
+    // story.js's `civs` numbers were authored as *tone* — a quiet lab street vs
+    // a busy plaza — so they are read as a density weight, not a head count.
+    // `civs: 0` (the Range) still means nobody.
+    const w = setup.civs ?? 9;
+    const N = w === 0 ? 0 : Math.round(CROWD.near * clamp(0.62 + 0.05 * w, 0.6, 1.15));
+    const mids = w === 0 ? 0 : (setup.mids ?? CROWD.mid);
+    const specs = [], taken = [];
+    const zoneR = Math.min(43, (city.zoneR || 50) * 0.9);
+
+    const free = (x, z, gap = 1.5) => {
+      if (Math.hypot(x - this.zone.x, z - this.zone.z) < 8.5) return false;   // the fountain
+      if (this._inBuilding(x, z) || this._onShotLine(x, z)) return false;
+      for (const t of taken) if (Math.hypot(x - t.x, z - t.z) < gap) return false;
+      return true;
+    };
+    // pick a free point near `c` within `rad`; null if the ring is full
+    const near = (c, rad, gap) => {
+      for (let i = 0; i < 26; i++) {
+        const a = r.range(0, Math.PI * 2), d = rad * Math.sqrt(r());
+        const x = c.x + Math.cos(a) * d, z = c.z + Math.sin(a) * d;
+        if (free(x, z, gap)) { taken.push({ x, z }); return new T.Vector3(x, 0, z); }
+      }
+      return null;
+    };
+    const civ = (pos, routine, anim) => {
+      specs.push({ role: 'civ', file: r.pick(CIV_FILES), pos, yaw: r.range(0, 6.28), routine, anim });
+    };
+
+    // 1 — the benches, plaza first then the parks nearest the zone
+    const seats = [...city.benches,
+      ...[...city.parkBenches].sort((a, b) => a.distanceToSquared(this.zone) - b.distanceToSquared(this.zone)).slice(0, 10)];
+    for (const b of seats) {
+      if (specs.length >= N * 0.16) break;
+      if (!free(b.x, b.z, 1.0)) continue;
+      taken.push({ x: b.x, z: b.z });
+      civ(b.clone().setY(0), { type: 'sit' }, 'sit');
+    }
+
+    // 2 — knots of two or three standing and talking
+    for (let k = 0; k < Math.ceil(N / 12) + 1; k++) {
+      const c = near(this.zone, zoneR * 0.8, 4.5);
+      if (!c) continue;
+      const n = r.int(2, 3), ring = [];
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2 + r.range(0, 1);
+        const x = c.x + Math.cos(a) * 0.95, z = c.z + Math.sin(a) * 0.95;
+        if (!free(x, z, 0.8)) continue;
+        taken.push({ x, z });
+        ring.push({ x, z });
+      }
+      for (const m of ring)
+        civ(new T.Vector3(m.x, 0, m.z), { type: 'chat', face: Math.atan2(c.x - m.x, c.z - m.z) }, r.chance(0.5) ? 'talk' : 'idle');
+    }
+
+    // 3 — a street vendor with a queue in front of him
+    const stall = near(this.zone, zoneR * 0.7, 6);
+    let queueSpecs = null;
+    if (stall) {
+      const face = Math.atan2(this.zone.x - stall.x, this.zone.z - stall.z);
+      const fx = Math.sin(face), fz = Math.cos(face);
+      pop.addStall(stall.clone(), face);
+      civ(new T.Vector3(stall.x - fx * 1.1, 0, stall.z - fz * 1.1), { type: 'stand', anim: 'talk' }, 'talk');
+      const line = [];
+      for (let i = 0; i < 6; i++) line.push(new T.Vector3(stall.x + fx * (1.6 + i * 1.15), 0, stall.z + fz * (1.6 + i * 1.15)));
+      queueSpecs = { line };
+      for (let i = 0; i < 6; i++) {
+        taken.push({ x: line[i].x, z: line[i].z });
+        civ(line[i].clone(), { type: 'queue', line, slot: i, face: face + Math.PI }, 'idle');
+      }
+    }
+
+    // 4 — smokers and leaners against the facades that front the kill zone
+    const walls = this.simB
+      .filter(b => Math.hypot(b.cx - this.zone.x, b.cz - this.zone.z) < zoneR + 34)
+      .sort((a, b) => Math.hypot(a.cx - this.zone.x, a.cz - this.zone.z) - Math.hypot(b.cx - this.zone.x, b.cz - this.zone.z))
+      .slice(0, 8);
+    for (const b of walls) {
+      const dx = this.zone.x - b.cx, dz = this.zone.z - b.cz;
+      const nx = Math.abs(dx) * b.d > Math.abs(dz) * b.w ? Math.sign(dx) : 0, nz = nx ? 0 : Math.sign(dz);
+      const x = b.cx + nx * (b.w / 2 + 0.95) + (nx ? 0 : r.range(-b.w / 3, b.w / 3));
+      const z = b.cz + nz * (b.d / 2 + 0.95) + (nz ? 0 : r.range(-b.d / 3, b.d / 3));
+      if (!free(x, z, 1.4)) continue;
+      taken.push({ x, z });
+      specs.push({
+        role: 'civ', file: r.pick(CIV_FILES), pos: new T.Vector3(x, 0, z),
+        yaw: Math.atan2(nx, nz), routine: { type: 'stand', anim: r.pick(['smoke', 'lean', 'browse']) },
       });
     }
-    const loops = near
-      ? city.walkLoops.filter(l => Math.hypot(l[0].x - this.zone.x, l[0].z - this.zone.z) < 160)
-      : city.walkLoops;
-    const loop = r.pick(loops.length ? loops : city.walkLoops);
-    return pop.spawn({
-      role: 'civ', file: r.pick(CIV_FILES),
-      pos: loop[r.int(0, 3)].clone().add(new T.Vector3(r.range(-1, 1), 0, r.range(-1, 1))),
-      yaw: 0, routine: { type: 'loop', points: loop, start: r.int(0, 3), pause: true, speed: r.range(1.1, 1.6) },
-      anim: 'walk',
+
+    // 5 — fill the rest of the zone with standers, then walkers on the plaza
+    const idles = ['idle', 'phone', 'browse', 'watch', 'talk'];
+    let guardRail = 0;
+    while (specs.length < N * 0.78 && guardRail++ < 200) {
+      const p = near(this.zone, zoneR, 1.7);
+      if (!p) break;
+      civ(p, { type: 'stand', anim: r.pick(idles), vary: idles }, 'idle');
+    }
+    const plazaRing = [];
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2 + 0.2, rad = zoneR * 0.78;
+      plazaRing.push(new T.Vector3(this.zone.x + Math.cos(a) * rad, 0, this.zone.z + Math.sin(a) * rad));
+    }
+    guardRail = 0;
+    while (specs.length < N && guardRail++ < 200) {
+      const s = r.int(0, 9);
+      const p = plazaRing[s].clone().add(new T.Vector3(r.range(-2, 2), 0, r.range(-2, 2)));
+      if (!free(p.x, p.z, 1.6)) continue;
+      taken.push({ x: p.x, z: p.z });
+      specs.push({
+        role: 'civ', file: r.pick(CIV_FILES), pos: p,
+        yaw: 0, anim: 'walk',
+        routine: { type: 'loop', points: plazaRing, start: s, pause: true, speed: r.range(1.05, 1.5), walkAnim: r.chance(0.3) ? 'carry' : 'walk' },
+      });
+    }
+
+    // 6 — the mid band: the approach streets, walked
+    const midLoops = city.walkLoops.filter(l => {
+      const d = Math.hypot(l[0].x - this.zone.x, l[0].z - this.zone.z);
+      return d > 40 && d < 265;
     });
+    for (let i = 0; i < mids && midLoops.length; i++) {
+      const loop = r.pick(midLoops), s = r.int(0, 3);
+      const p = loop[s].clone().add(new T.Vector3(r.range(-1.5, 1.5), 0, r.range(-1.5, 1.5)));
+      if (this._inBuilding(p.x, p.z)) continue;
+      specs.push({
+        role: 'civ', file: r.pick(CIV_FILES), pos: p, yaw: 0, anim: 'walk',
+        routine: { type: 'loop', points: loop, start: s, pause: true, speed: r.range(1.1, 1.6), walkAnim: r.chance(0.28) ? 'carry' : 'walk' },
+      });
+    }
+
+    const made = await pop.spawnMany(specs);
+    if (queueSpecs) {
+      const q = made.filter(p => p.routine.type === 'queue');
+      if (q.length > 1) pop.addQueue(queueSpecs.line, q, 9);
+    }
+
+    pop.cullCam = this.ctx.rig.camera;
+    pop.initImpostors(specs.length + 28);
+    return made;
   }
 
   async _spawnGuard(i) {
