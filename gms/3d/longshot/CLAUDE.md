@@ -203,6 +203,16 @@ birds, the rifle viewmodel, the scope reticle — is procedural.
   Poll `window.__state` (fps/mode/mission{…}/scoped/**eye**/**walk**/errors);
   drive `window.__game` (`startMission`, `setAuto`, `mission`, `city`, `pop`,
   `rig`, **`walker`**, `controls.move` — write `{x,y}` to walk the bot's feet).
+- **`tools/gate.sh`** is the regression gate: `tools/gate.sh` for the node tests,
+  `tools/gate.sh --full` to add the visibility audit and the bot sweep. Current
+  numbers: ballistics **21**, utils **54**, bot **11/11** on seed 4, and **no mark
+  at 0/49** on seeds 1/4/9. `tools/cdp.mjs` is a puppeteer-free CDP driver
+  (`~/.claude/bin/cdp start --port 9223`, never launch Chrome by hand);
+  `tools/audit_visibility.mjs` and `tools/bot_sweep.mjs` run standalone too.
+- ⚠️ **Anything that consumes randomness during city generation re-rolls every
+  layout on every seed** — adding one `rr.chance()` in `city.js` deals a different
+  deck city-wide. An art-only change did exactly that and left one mission visible
+  from 0 of 49 standable spots. Run the audit after any such change, always.
 - **The visibility audit** is the tool for "I can't find/see the target": for
   every mark, LOS-test it from a 7×7 grid of standable spots on the perch roof
   (`walker.surfaceAt(x,z) + 1.62`, `mission._losClear`). It says both *is it
