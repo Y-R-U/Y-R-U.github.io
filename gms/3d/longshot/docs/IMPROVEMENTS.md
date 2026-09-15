@@ -383,30 +383,66 @@ section; its work was audited independently.
 ### B4 — A city with people in it
 **Goal:** make Meridian feel inhabited. Owner's #2.
 
-- [ ] **B4.1 — There are nine people.** `missions.js:161` `nCiv = setup.civs ?? 10`,
+- [x] **B4.1 — There are nine people.** `missions.js:161` `nCiv = setup.civs ?? 10`,
       **measured 9–11 total including the target**, in 780 m of city. Raise density
       hard, and *tier* it: a dense kill-zone crowd (which also makes the
       civilian-casualty rule mean something), a mid band, and cheap distant filler.
       **Done:** ≥60 visible humans near the kill zone with no frame-time regression —
       measure draw calls before/after with the GL-wrap probe (baseline **56.5/frame,
       59k tris**). `missions.js`, `people.js`. **L**
-- [ ] **B4.2 — Spawning 16 characters is fully serialised.** `missions.js:145–163`
+- [x] **B4.2 — Spawning 16 characters is fully serialised.** `missions.js:145–163`
       awaits each `_spawnCiv` in turn; each is a Range fetch + gunzip + XOR + GLTF
       parse (`charrig.js:43–56`). Civilians and guards have no ordering dependency —
       `Promise.all` them. **Required before B4.1 is affordable.** **Done:** load time
       for a 60-civilian mission no worse than today's 10. **M**
-- [ ] **B4.3 — Use more of the cast.** 28 characters ship in `assets/chars.dat`;
+- [x] **B4.3 — Use more of the cast.** 28 characters ship in `assets/chars.dat`;
       **9 distinct files loaded** in a measured s03 run. `CIV_FILES` is 16
       (`people.js:15–20`). The `3d-animated-characters` skill documents 117 available
       in the wider repo. **Done:** ≥20 distinct files in a single mission. **S**
-- [ ] **B4.4 — Ambient life beyond standing and walking.** Routines are
+      **[x] VERIFIED** — **9 → 27–32 distinct files loaded per mission** (measured
+      s02/s03/s05/s13/s17/s20, seed 4). `CIV_FILES` 16 → 28 and the pack 28 → 40
+      characters (3.17 → 4.50 MB): twelve more street civilians pulled from the
+      local rigged cache via `tools/build_chars.py` (construction, carpenter,
+      paramedic, skater, plus the missing female counterparts of post / doctor /
+      homeless / mechanic). A crowd of sixty drawn from sixteen models read as the
+      same four people over and over.
+- [x] **B4.4 — Ambient life beyond standing and walking.** Routines are
       `stand|loop|patrol|sit` (`people.js:104–117`). Add queueing, street vendors,
       dog-walkers, phone-checkers, smokers in doorways, people entering/leaving
       buildings. Park benches already exist and are barely used (`city.js:461–468`).
       **Done:** a 30 s dusk capture shows ≥6 distinct behaviours. **M**
-- [ ] **B4.5 — Sitting people are offset on one axis only.** `people.js:114` applies
+- [x] **B4.5 — Sitting people are offset on one axis only.** `people.js:114` applies
       `sin(yaw)` to `x` with no matching `cos(yaw)` on `z` — so a bench mark's collider
       can sit 15 cm from where the model appears. **S**
+      **[x] VERIFIED** — the offset is meant to shuffle a sitter BACK onto the seat
+      along his own facing; with only the `x` term a sitter facing ±z slid 15 cm
+      sideways off the bench instead. Now `x -= sin(yaw)*0.15` **and**
+      `z -= cos(yaw)*0.15`. (The collider is not separately wrong — collider and
+      model both read `p.group.position` — the model was in the wrong place.)
+
+---
+
+**[x] B4 — VERIFIED BY THE MANAGER** (its worker was killed by a spend limit
+before reporting). A/B against the build without it, seed 4:
+
+| | without B4 | with B4 |
+|---|---|---|
+| people in the world | 9-11 | **110-114** |
+| **within 60 m of the kill zone** | **1** | **66-74** |
+| distinct characters loaded | 9 | **29-31** |
+| load time | 9.4-10.3 s | 9.4-13.3 s |
+
+B4.2's parallel spawn is what makes that affordable — 12x the population for
+roughly the same load. B4.4 added `queue` and `chat` (now stand/loop/sit/queue/
+chat/room/patrol). B4.5 applies `sin` to x **and** `cos` to z. `_spawnCrowd` also
+guards `_onShotLine` so the new crowd cannot spawn into the firing line.
+Gate: audit seeds 1/4/9 no mark at 0/49, bot **11/11**, ballistics 21, utils 54.
+
+⚠️ **Not measured: draw calls and real-browser frame time.** Headless is capped
+at ~20 fps so it cannot see a regression. `window.__game` still exposes no
+`renderer` (**B9.5**) — do that first, then re-check this against the 56.5
+draw-calls/frame baseline before trusting the density on a phone.
+
 
 ---
 
@@ -414,7 +450,12 @@ section; its work was audited independently.
 **Goal:** a reward layer that tracks skill. Depends on **B1.1/B1.2/B1.4** landing first —
 the pars were authored for a scoring model that doesn't currently run.
 
-- [ ] **B5.1 — Re-derive every `par`.** Against max attainable score today,
+- [ ] **B5.1 — Re-derive every `par`.** ⚠️ **Re-measure AFTER B4**: a 70-strong
+      kill-zone crowd means an unsuppressed shot almost always panics somebody, so
+      the `ghost` +600 is now genuinely hard rather than automatic. Measured on the
+      same seed-4 bot runs, scores fell exactly 600 on s02/s05/s17/s19 the moment
+      the crowd landed. That is correct behaviour, but any par authored assuming
+      ghost is now out of reach. Against max attainable score today,
       **15 of 21 missions cannot reach gold and 9 cannot reach silver** — including
       every mission s15–s21 except s14. s21 tops out at ~47% of its own gold par.
       A flawless late campaign scores seven bronze dots. Recompute after B1.
