@@ -65,6 +65,7 @@ export function createMainland(){
  house(-8,20,'#566f70');house(8,21,'#947b63');house(-16,6,'#646f75',.15);house(16,5,'#6b7f72',-.2);house(15,-17,'#667984',.05);
  // Market awnings, a shared hearth and supply crates.
  for(const x of[-7,7]){const z=9;for(let side of[-1,1])cyl(root,'#736247',x+side*1.4,ground(x,z)+1.2,z,.065,.08,2.4);box(root,'#8b7853',x,ground(x,z)+.9,z,3,.18,1.3);for(let j=0;j<6;j++){const awn=box(root,j%2?'#d5c38c':'#638d8a',x-1.25+j*.5,ground(x,z)+2.5,z,.51,.07,2.4);awn.rotation.x=.15;}}
+ prop('shop','Lantern market','shop',7,10.3);
  prop('mara','Mara · Wardkeeper','mara',-3,16);const mara=npc('maraModel','',-3,16,'#a38a62');w.objects.pop();mara.rotation.y=.7;
  prop('neri','Neri · Archivist','neri',12,-8);const neri=npc('neriModel','',12,-8,'#787dab');w.objects.pop();neri.userData.appearance('female');w.neri=neri;
  prop('fire','Town hearth','fire',4,15,g=>{cyl(g,'#737d6c',0,.15,0,.8,1,.3,10);for(let i=0;i<4;i++)mesh(g,new T.ConeGeometry(.2,.8,5),'#ffd291',(i%2)*.3-.15,.6,Math.floor(i/2)*.3-.15,2);});

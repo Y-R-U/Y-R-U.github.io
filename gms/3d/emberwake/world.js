@@ -83,6 +83,7 @@ export function createWorld(renderer){
  const beam=mesh(scene,new T.CylinderGeometry(.35,1,55,24,1,true),'#ffdfa3',0,28,-27,2);beam.material=new T.MeshBasicMaterial({color:'#ffe3a4',transparent:true,opacity:.19,depthWrite:false,side:T.DoubleSide});beam.visible=false;
  // Distant silhouettes give the playable island a place in a larger archipelago.
  for(let i=0;i<14;i++){let x=(rand()-.5)*190,z=-70-rand()*70;let m=rock(staticRoot,'#41616a',x,-6,z,10+rand()*15);m.scale.y=.45;}
+ prop('shop','Shore supplies','shop',1,13,g=>{for(const x of[-1,1])cyl(g,'#856c4c',x,1.2,0,.07,.09,2.4,6);box(g,'#98764f',0,.7,0,2.4,.18,1.1);for(let i=0;i<6;i++){const awn=box(g,i%2?'#c9b67e':'#527b71',-1+i*.4,2.25,0,.42,.1,1.8);awn.rotation.x=.15;}for(let i=0;i<3;i++)box(g,'#b69b64',-.7+i*.65,.95,0,.45,.3,.5);});
  scene.remove(staticRoot);scene.add(mergeStatic(staticRoot));
  const edda=makeHuman('#839f85','#aa9270');edda.position.set(-4,ground(-4,11),11);edda.rotation.y=.7;scene.add(edda);objects.push({id:'edda',name:'Edda',kind:'edda',x:-4,z:11,y:ground(-4,11),group:edda,radius:1});
  const player=makeHuman('#436f78','#d8c299');scene.add(player);

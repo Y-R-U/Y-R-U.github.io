@@ -20,9 +20,24 @@ Create a named male or female lab assistant, meet Dr Vale, hide during the attac
 
 J (or the journal button) opens discovered story notes and mission status. `Show the way` works throughout all three regions. The northern road marks the end of this chapter. Both shores remain explorable, with fishing, cooking, gathering and island training available after completion.
 
-Cooked fish heal 45 vitality. Hearths and friendly wardkeepers restore health. Focus regenerates; the island well also restores it. Defeat returns the player to the current region's hearth without losing quest progress. Surviving enemies recover. Six skills track XP: Melee, Magic, Woodcutting, Mining, Fishing and Smithing. Mainland ward repairs provide further Smithing XP. Mara's reinforced weapon fittings add four damage.
+Cooked fish heal 45 vitality plus 5 per Fishing mastery rank (up to 100). Hearths and friendly wardkeepers restore health. Focus regenerates; the island well also restores it. Defeat returns the player to the current region's hearth without losing quest progress. Surviving enemies recover. Six skills track XP: Melee, Magic, Woodcutting, Mining, Fishing and Smithing. Mainland ward repairs provide further Smithing XP. Mara's reinforced weapon fittings add four damage.
 
-Progress is saved locally under the existing `emberwake-v1` key using schema version 2. Version 1 island saves migrate in place; completed beacons become mainland crossings. Saves include character identity, region, both regions' independent progress, equipment, inventory, XP, position, UI modes and the current dialogue. A new journey requires confirmation if a save exists. Enemies remain defeated. There is no multiplayer or cloud save.
+Progress is saved locally under the existing `emberwake-v1` key using schema version 3. Version 1 and 2 saves migrate in place with 20 starter coins and unearned mastery ranks; completed beacons become mainland crossings. Saves include character identity, region, both regions' independent progress, equipment, inventory, XP, position, UI modes and the current dialogue. A new journey requires confirmation if a save exists. Enemies remain defeated. There is no multiplayer or cloud save.
+
+## Skilling and trading
+
+Fishing, Woodcutting and Mining begin **manual**: tap a resource, wait for the action to finish, then tap it or the activity panel’s **Cast/Cut/Mine again** button. At **level 5**, a glowing **Unlock auto skill** button appears at that resource. Win its mastery challenge to permanently unlock automatic work for that skill. Further challenges open at levels **10, 15, 20…100**; a missed challenge remains available and is easier when overlevelled (fishing/woodcutting). Attempts cost no items or coins.
+
+- **Fishing:** hold the reel button (or Space) to bring the fish closer; release to lower line tension. Land it before time runs out without snapping the line.
+- **Woodcutting:** tap Cut (or Space) as the marker crosses the gold band. Six good cuts win; three misses end the attempt.
+- **Mining:** tap glowing weak points (or use number keys 1–9). Six hits win; three misses end the attempt.
+- Fishing mastery upgrades **all stored and future fish**: +2 sale coins and +5 meal healing per rank. Woodcutting/Mining add +2 sale coins per rank and one extra resource per cycle every two ranks.
+- Automatic work continues while nearby. Ground movement, movement keys, dodge, damage, another interaction, travel or **Stop** cancel it. Menus and hidden tabs pause it. Reloads do not resume work, and there are no offline rewards.
+- **Shore supplies** near the island hearth and **Lantern market** under the mainland market awning buy and sell wood, ore and fish. Each shop shows owned quantities and prices, with Sell 10 for surplus stacks. Coins appear on the belt. Quest items cannot be sold. Buy prices scale alongside sale prices to prevent profitable buy/sell loops.
+
+Cooking currently remains the existing instant batch action at a fire; Smithing remains the quest forge/ward-repair system. Their earned automation, mastery games, recipes and equipment upgrades are the next checklist milestone. Combat still uses its existing repeated attacks.
+
+See [ENHANCEMENTS.md](ENHANCEMENTS.md) for the full checklist, current verification and exact continuation instructions.
 
 ## Narration
 
@@ -42,13 +57,15 @@ Regenerate with the local environment containing cached Kokoro weights and ffmpe
 - `regions.js`: original lab and mainland scenes, scenery, NPCs and ward visuals.
 - `main.js`: region transitions, story journal, character creation, controls, A* routing, tutorial, combat, UI, particles, sound, narration and saves.
 - `state.mjs`: XP thresholds, crafting, healing, progression gates and save validation.
+- `professions.mjs`: gathering, mastery challenges and atomic shop transactions.
+- `professions-ui.js`: activity panel, mouse/touch/keyboard challenge controls and shop dialogs.
 - `icons.js`: original inline SVG interface icons.
 - Uses the adjacent Second Hand project's bundled Manrope font and its existing license.
 
 Run state tests:
 
 ```sh
-node --test tests/state.test.mjs
+node --test tests/*.test.mjs
 ```
 
 Run the real browser playthrough with Playwright installed and the site served on port 8891 (override `EMBERWAKE_URL` and `PLAYWRIGHT_MODULE` as needed):
@@ -58,6 +75,7 @@ node tests/browser.mjs
 node tests/interactions.mjs
 node tests/expansion.mjs
 node tests/speech.mjs
+node tests/professions.mjs
 ```
 
 The browser test plays through character creation, the lab escape, gathering, crafting, all three weapon styles, shades, the Warden, three mainland missions and return travel; then checks panel states, skill XP, saved progress, and four viewport sizes. It fails on JavaScript, shader-console or HTTP errors. The interaction checks exercise touch input, dodge timing, defeat recovery, fishing, cooking and narrow-screen skill contents. `window.emberwake` exposes state, objects, movement and rendering metrics for inspection; the normal game flow does not require it.
