@@ -190,9 +190,9 @@ function shade(tint, mul, desat = 0.5) {
 // from the perch, and a square roof reaches 1.41× further across its diagonal —
 // get this wrong and the shooter stares across nine metres of his own gravel,
 // which grazes the sightline and hides the target behind his own parapet.
-export function perchReach(w, yaw) {
+export function perchReach(w, yaw, back = 3) {
   const edge = (w / 2) / Math.max(Math.abs(Math.sin(yaw)), Math.abs(Math.cos(yaw)));
-  return Math.max(3, edge - 3);
+  return Math.max(3, edge - back);
 }
 
 // ── the city ─────────────────────────────────────────────────────────────────
@@ -1149,10 +1149,92 @@ export function buildCity(scene, spec) {
     return room;
   };
 
+  // The perch deck is up to half the opening frame, so it gets a surface of its
+  // own: tiled tar-and-gravel for grain underfoot, plus one unstretched pass of
+  // repairs, stains and edge flashing so it reads as a roof somebody maintains.
+  let deckMaps = null;
+  const perchDeck = () => {
+    if (deckMaps) return deckMaps;
+    const px = LITE ? 256 : 512;
+    const gravel = canvasTex(px, px, (g, W) => {
+      const gr = rng(spec.seed + ':deck');
+      g.fillStyle = '#3f4248'; g.fillRect(0, 0, W, W);
+      for (let i = 0; i < 40; i++) {                        // rolled-on bitumen patchiness
+        const v = gr.int(52, 74);
+        g.fillStyle = `rgba(${v},${v + 2},${v + 6},0.5)`;
+        g.beginPath();
+        g.ellipse(gr.range(0, W), gr.range(0, W), gr.range(W / 14, W / 5), gr.range(W / 16, W / 6), gr.range(0, 3), 0, 7);
+        g.fill();
+      }
+      const chips = Math.round(W * W / 9);
+      for (let i = 0; i < chips; i++) {                     // the gravel itself
+        const v = gr.int(58, 148), s = gr.range(0.9, 2.6);
+        g.fillStyle = `rgba(${v},${v - gr.int(0, 6)},${v - gr.int(2, 12)},${gr.range(0.3, 0.9).toFixed(2)})`;
+        g.fillRect(gr.range(0, W), gr.range(0, W), s, s * gr.range(0.7, 1.3));
+      }
+      for (let i = 0; i < chips / 6; i++) {                 // shadow under the chips
+        g.fillStyle = `rgba(12,13,16,${gr.range(0.2, 0.5).toFixed(2)})`;
+        g.fillRect(gr.range(0, W), gr.range(0, W), gr.range(1, 2.2), gr.range(1, 2));
+      }
+    });
+    gravel.wrapS = gravel.wrapT = T.RepeatWrapping;
+    gravel.anisotropy = 4;
+    const grime = canvasTex(px, px, (g, W) => {
+      const gr = rng(spec.seed + ':deckgrime');
+      g.clearRect(0, 0, W, W);
+      for (let i = 0; i < 7; i++) {                         // pooled water / weathering
+        const x = gr.range(W * 0.12, W * 0.88), z = gr.range(W * 0.12, W * 0.88);
+        const rr2 = gr.range(W * 0.06, W * 0.2);
+        const rad = g.createRadialGradient(x, z, rr2 * 0.1, x, z, rr2);
+        rad.addColorStop(0, `rgba(20,22,26,${gr.range(0.3, 0.55).toFixed(2)})`);
+        rad.addColorStop(1, 'rgba(20,22,26,0)');
+        g.fillStyle = rad;
+        g.beginPath(); g.ellipse(x, z, rr2, rr2 * gr.range(0.5, 1), gr.range(0, 3), 0, 7); g.fill();
+      }
+      for (let i = 0; i < 5; i++) {                         // tar repairs over the seams
+        g.strokeStyle = `rgba(26,26,29,${gr.range(0.45, 0.8).toFixed(2)})`;
+        g.lineWidth = gr.range(W / 180, W / 70);
+        g.beginPath();
+        let x = gr.range(0, W), z = gr.range(0, W);
+        g.moveTo(x, z);
+        for (let j = 0; j < 4; j++) { x += gr.range(-W / 5, W / 5); z += gr.range(-W / 5, W / 5); g.lineTo(x, z); }
+        g.stroke();
+      }
+      for (let i = 0; i < 3; i++) {                         // rust bloom round a fixing
+        const x = gr.range(W * 0.15, W * 0.85), z = gr.range(W * 0.15, W * 0.85), rr2 = gr.range(W / 40, W / 18);
+        const rad = g.createRadialGradient(x, z, 1, x, z, rr2);
+        rad.addColorStop(0, 'rgba(112,64,30,0.5)'); rad.addColorStop(1, 'rgba(112,64,30,0)');
+        g.fillStyle = rad; g.beginPath(); g.arc(x, z, rr2, 0, 7); g.fill();
+      }
+      const t = Math.max(3, W * 0.035);                     // edge flashing + its seam
+      g.strokeStyle = 'rgba(150,154,162,0.42)'; g.lineWidth = t;
+      g.strokeRect(t / 2, t / 2, W - t, W - t);
+      g.strokeStyle = 'rgba(14,16,19,0.55)'; g.lineWidth = Math.max(1, W / 340);
+      g.strokeRect(t, t, W - t * 2, W - t * 2);
+      g.fillStyle = 'rgba(206,210,216,0.5)';                // fixings along the flashing
+      for (let s = t * 1.6; s < W - t; s += W / 26) {
+        for (const [x, z] of [[s, t * 0.55], [s, W - t * 0.55], [t * 0.55, s], [W - t * 0.55, s]]) {
+          g.fillRect(x, z, Math.max(1, W / 300), Math.max(1, W / 300));
+        }
+      }
+    });
+    deckMaps = { gravel, grime };
+    return deckMaps;
+  };
+
   // ── vantage rooftop ── (`pos` = where the shooter STANDS, at roof-top height)
   // `b` = the perch collider, so the roof can be furnished to its real footprint:
   // the shooter WALKS this roof (js/walk.js), so it needs an edge to walk to.
   city.setVantage = (pos, faceYaw, b) => {
+    // Re-callable: missions.js re-seats the shooter on the side of the roof his
+    // mark is actually on once the marks exist, and the furniture goes with him.
+    if (city.vantage) {
+      for (const g of [city.vantage.group, city.vantage.coping]) {
+        if (!g) continue;
+        g.parent?.remove(g);
+        g.traverse(o => { if (o.isMesh) { o.geometry.dispose(); o.material.dispose(); } });
+      }
+    }
     const vg = new T.Group();
     vg.position.set(pos.x, 0, pos.z);
     const y = pos.y;
@@ -1176,10 +1258,22 @@ export function buildCity(scene, spec) {
     };
     // gravel roof deck — the whole roof, so it can never overhang
     if (b) {
+      const { gravel, grime } = perchDeck();
+      const g2 = gravel.clone();                     // per-roof tiling, one canvas
+      g2.wrapS = g2.wrapT = T.RepeatWrapping;
+      g2.repeat.set(b.w / 3.5, b.d / 3.5);
+      g2.needsUpdate = true;
       const deck = new T.Mesh(new T.BoxGeometry(b.w - 0.1, 0.1, b.d - 0.1),
-        new T.MeshStandardMaterial({ color: 0x53565d, roughness: 0.98 }));
+        new T.MeshStandardMaterial({ map: g2, color: 0xa8aab0, roughness: 0.98 }));
       deck.position.set(b.cx - pos.x, y + 0.05, b.cz - pos.z);
       vg.add(deck);
+      // stains, tar repairs and the edge flashing, unstretched across the whole
+      // roof: the tiled gravel gives it grain, this gives it a history.
+      const stain = new T.Mesh(new T.PlaneGeometry(b.w - 0.12, b.d - 0.12),
+        new T.MeshStandardMaterial({ map: grime, transparent: true, depthWrite: false, roughness: 1 }));
+      stain.rotation.x = -Math.PI / 2;
+      stain.position.set(b.cx - pos.x, y + 0.102, b.cz - pos.z);
+      vg.add(stain);
     }
     // shooting mat + sandbag rest, ankle height: put bags anywhere near the eye
     // (roof + 1.6 m) and they become a wall filling the entire scope
@@ -1217,9 +1311,10 @@ export function buildCity(scene, spec) {
     // Its size comes from MOVE, because walk.js stands the shooter ON it: two
     // copies of these numbers is how the drawn roof and the walked roof drift
     // apart, which is the whole family of bugs this module keeps producing.
+    let cop = null;
     if (b) {
       const cw = MOVE.copingW, ch = MOVE.coping, cy = y + ch / 2;
-      const cop = new T.Group();
+      cop = new T.Group();
       const cmat = new T.MeshStandardMaterial({ color: 0x4c5057, roughness: 0.92 });
       for (const [ox, oz, sw, sd] of [
         [0, b.d / 2 - cw / 2, b.w, cw], [0, -b.d / 2 + cw / 2, b.w, cw],
@@ -1232,7 +1327,7 @@ export function buildCity(scene, spec) {
       group.add(cop);
     }
     group.add(vg);
-    city.vantage = { pos: pos.clone(), yaw: faceYaw, group: vg, blockers, b: b || null };
+    city.vantage = { pos: pos.clone(), yaw: faceYaw, group: vg, coping: cop, blockers, b: b || null };
   };
 
   // ── per-frame update ──

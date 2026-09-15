@@ -259,16 +259,48 @@ export class ScopeRig {
     const fovRad = this.fov * Math.PI / 180;
     const pxPerMil = (H / fovRad) * 0.001;
 
+    // A black reticle on a night city is a reticle you cannot see: at 4× on a
+    // dark facade the whole field is one flat navy and the crosshair vanishes
+    // into it. The ink follows the ambient — near-black over daylight, lit
+    // amber once the city is (fog colour is the cheapest read on it).
+    const hex = this.scene.fog ? this.scene.fog.color.getHexString() : '808080';
+    if (hex !== this._fogHex) {
+      this._fogHex = hex;
+      const l = (parseInt(hex.slice(0, 2), 16) * 0.2126 + parseInt(hex.slice(2, 4), 16) * 0.7152
+        + parseInt(hex.slice(4, 6), 16) * 0.0722) / 255;
+      this._dark = clamp((0.34 - l) / 0.2, 0, 1);
+    }
+    const dark = this._dark || 0;
+    const ink = (a) => `rgba(${Math.round(10 + 245 * dark)},${Math.round(12 + 178 * dark)},${Math.round(10 + 95 * dark)},${a})`;
+
     // faint illumination halo so the reticle reads against night glass
-    g.strokeStyle = 'rgba(255,175,70,0.25)';
-    g.lineWidth = Math.max(3.5, H / 380);
+    g.strokeStyle = `rgba(255,175,70,${(0.25 + 0.3 * dark).toFixed(2)})`;
+    g.lineWidth = Math.max(3.5, H / 380) * (1 + 0.5 * dark);
     g.beginPath();
     g.moveTo(cx - R, cy); g.lineTo(cx + R, cy);
     g.moveTo(cx, cy - R); g.lineTo(cx, cy + R);
     g.stroke();
 
-    g.strokeStyle = 'rgba(10,12,10,0.92)';
-    g.fillStyle = 'rgba(10,12,10,0.92)';
+    // The horizon, when it is in the glass. Scoped at 12× on a blank wall there
+    // is nothing in frame to say which way is level or how far down you are
+    // holding; this is the one cue that always reads.
+    const camPitch = Math.asin(clamp(-this.camera.matrixWorld.elements[9], -1, 1));
+    const hy = cy + camPitch * (H / fovRad);
+    if (Math.abs(hy - cy) < R * 0.98) {
+      const halfW = Math.sqrt(Math.max(0, R * R - (hy - cy) * (hy - cy))) * 0.94;
+      g.save();
+      g.strokeStyle = ink(0.3 + 0.25 * dark);
+      g.lineWidth = Math.max(1, H / 1100);
+      g.setLineDash([Math.max(4, H / 150), Math.max(6, H / 90)]);
+      g.beginPath();
+      g.moveTo(cx - halfW, hy); g.lineTo(cx - pxPerMil * 4, hy);
+      g.moveTo(cx + pxPerMil * 4, hy); g.lineTo(cx + halfW, hy);
+      g.stroke();
+      g.restore();
+    }
+
+    g.strokeStyle = ink(0.92);
+    g.fillStyle = ink(0.92);
     g.lineWidth = Math.max(1.5, H / 900);
 
     // crosshair

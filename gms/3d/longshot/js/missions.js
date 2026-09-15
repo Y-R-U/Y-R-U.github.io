@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { simulate, raycast, buildTable, solve } from './ballistics.js';
 import { perchReach } from './city.js';
-import { BALLISTICS, PANIC, EXPOSURE, SCORE, RIFLES, SCOPES, AMMOS } from './config.js';
+import { BALLISTICS, PANIC, EXPOSURE, SCORE, RIFLES, SCOPES, AMMOS, MOVE } from './config.js';
 import { SUIT_FILES, CIV_FILES, GUARD_FILES } from './people.js';
 import { rng, clamp, fmtM } from './utils.js';
 import { save } from './save.js';
@@ -16,6 +16,16 @@ const T = THREE;
 // the sedan's front wheel, in the car's own frame (it may drive either axis)
 export function convoyTyre(cv) {
   return cv.car.position.clone().addScaledVector(cv.axis, 2.0).setY(0.5);
+}
+
+// What the crosshair should sit on: mid-torso, where people.js runs its capsule
+// (0.82–1.42 m standing, 0.55–1.0 sitting), scaled per character. A person's
+// group origin is at his FEET, and those feet are 19 m up when he is standing
+// in a carved office — so an aim point is never an absolute height.
+export function aimPoint(p) {
+  if (!p) return null;
+  const s = p.scale || 1;
+  return p.group.position.clone().add(new T.Vector3(0, (p.char?.anim === 'sit' ? 0.78 : 1.12) * s, 0));
 }
 
 // straight line from `eye` to `pt` unblocked by `buildings`?
@@ -130,6 +140,7 @@ export class MissionRun {
     // to fail (main.js catches it and keeps the contract playable), and a perch
     // that is half-described would take the walker down with it.
     const yaw = Math.atan2(this.zone.x - best.cx, this.zone.z - best.cz);
+    this.standYaw = yaw;
     const reach = perchReach(Math.min(best.w, best.d), yaw);   // 3 m short of the edge he faces
     const eye = new T.Vector3(
       best.cx + Math.sin(yaw) * reach, roofY + 1.62, best.cz + Math.cos(yaw) * reach);
@@ -178,8 +189,14 @@ export class MissionRun {
 
     // Point the shooter at the job: the opening view looks straight down the
     // sightline at whatever this contract is about, not off into the skyline.
-    const look = this.plates.length ? this.plates[0].c
-      : (this.targets.find(t => t.person)?.person.group.position.clone().setY(1.4) || this.zone);
+    // At the MARK, not at the pavement under him — flattening the aim to y 1.4
+    // put every man at a window 4.8°–9.3° below the crosshair.
+    // On the range, open on whichever plate is most nearly ahead of him rather
+    // than on plate 1: three plates cannot all be in one frame, and the markers
+    // point at the other two.
+    const look = this.plates.length ? this._frontPlate()
+      : (aimPoint(this.targets.find(t => t.person)?.person) || this.zone);
+    this._faceStand(look);
     const dv = new T.Vector3().subVectors(look, this.origin);
     rig.yaw = Math.atan2(dv.x, dv.z);
     rig.pitch = Math.atan2(dv.y, Math.hypot(dv.x, dv.z));
@@ -195,13 +212,71 @@ export class MissionRun {
     return losFrom(this.origin, pt,
       ignore ? this.simB.filter(b => b !== ignore) : this.simB, this.ctx.city.holes);
   }
+
+  _frontPlate() {
+    const off = (c) => {
+      const a = Math.atan2(c.x - this.origin.x, c.z - this.origin.z) - this.standYaw;
+      return Math.abs(Math.atan2(Math.sin(a), Math.cos(a)));
+    };
+    return this.plates.slice().sort((a, b) => off(a.c) - off(b.c))[0].c;
+  }
+
+  // everything this contract needs a line to
+  _sightPoints() {
+    const out = [];
+    for (const t of this.targets) if (t.person) out.push(aimPoint(t.person));
+    for (const pl of this.plates) out.push(pl.c);
+    if (this.special.protect?.vip) out.push(aimPoint(this.special.protect.vip));
+    for (const p of this.ctx.pop.list) if (p.decoy) out.push(aimPoint(p));    // identify suits
+    return out;
+  }
+
+  // The perch faces the KILL ZONE, because that is what the sightline corridor
+  // was cut for — but a room or rooftop mark can be at any bearing from it, and
+  // a shooter stood 3 m from the far rim then looks across 15 m of his own deck
+  // (measured: 57% of the opening frame inside 60 m on s03). So once the marks
+  // exist, stand him at the rim on the side the job is actually on, and closer
+  // to it: 1.2 m rather than the corridor's nominal 3 m.
+  //
+  // city.js cuts the cone for the 3 m spot and this one is ~1.8 m in FRONT of
+  // it, which is the safe direction — same eye height, nearer the zone, so the
+  // sightline to it is steeper and every capped building stays under it. What
+  // is not automatically safe is stepping SIDEWAYS out of the cone for a mark
+  // at another bearing, so the move is taken only if it loses no sightline the
+  // briefed spot had. The corridor wins over the framing, every time.
+  _faceStand(look) {
+    const { city, rig } = this.ctx;
+    const b = this.vantageB;
+    if (!b || !look) return;
+    const yaw = Math.atan2(look.x - b.cx, look.z - b.cz);
+    const reach = perchReach(Math.min(b.w, b.d), yaw, 1.2);
+    const pos = new T.Vector3(b.cx + Math.sin(yaw) * reach, this.roofY, b.cz + Math.cos(yaw) * reach);
+    const eye = new T.Vector3(pos.x, this.roofY + MOVE.eyeH, pos.z);
+    const wasEye = rig.eye.clone();
+    if (eye.distanceTo(wasEye) < 0.3) return;
+    const pts = this._sightPoints();
+    const seen = pts.filter(p => this._losClear(p)).length;
+    rig.setVantage(eye, yaw);
+    this.origin = rig.eye;
+    if (pts.filter(p => this._losClear(p)).length < seen) {
+      rig.setVantage(wasEye, this.standYaw);        // corridor wins over framing
+      this.origin = rig.eye;
+      return;
+    }
+    this.standYaw = yaw;
+    city.setVantage(pos, yaw, b);
+  }
   // building near `want` metres out with a sightline to ptOf(b).
   // `self` keeps the building itself in the LOS test — right for anything that
   // sits ON the roof (a steel plate, a rooftop mark), wrong for a carved room
   // whose own facade is the thing you shoot through.
-  _pickBuilding(want, hWant, hW, ptOf, filter, self, strict) {
+  // `bias(b)` adds metres of cost for anything else that matters — the range
+  // uses it to keep its plates in front of the shooter without letting bearing
+  // overrule the briefed distances.
+  _pickBuilding(want, hWant, hW, ptOf, filter, self, strict, bias) {
     const cost = (b) =>
-      Math.abs(Math.hypot(b.cx - this.origin.x, b.cz - this.origin.z) - want) + Math.abs(b.h - hWant) * hW;
+      Math.abs(Math.hypot(b.cx - this.origin.x, b.cz - this.origin.z) - want)
+      + Math.abs(b.h - hWant) * hW + (bias ? bias(b) : 0);
     const cands = this.simB.filter(b => (!filter || filter(b))).sort((a, b) => cost(a) - cost(b));
     // Scan EVERY candidate, not the first 60. The old cut-off silently handed
     // back a blind building whenever the near ones were all occluded — which is
@@ -267,10 +342,23 @@ export class MissionRun {
       // The brief's range is the contract's range: hardcoding 300 put "520 m"
       // at 302 and "650 m" at 307.
       const want = td.dist || this.def.vantage?.dist || 300;
+      // Not the roof CENTRE: every roof but the shooter's own is ringed by a
+      // parapet, and a man stood 15 m behind one is a man behind a wall. Put him
+      // near the rim the shot comes from, inside the parapet by a stride, and
+      // LOS-check the spot he will actually stand on.
+      const spotOf = (b) => {
+        const dx = this.origin.x - b.cx, dz = this.origin.z - b.cz;
+        const L = Math.hypot(dx, dz) || 1;
+        const m = 1.9;                                  // clear of the 0.5 m parapet
+        const k = Math.min(Math.max(0, b.w / 2 - m) / (Math.abs(dx / L) || 1e-6),
+                           Math.max(0, b.d / 2 - m) / (Math.abs(dz / L) || 1e-6));
+        return { x: b.cx + dx / L * k, z: b.cz + dz / L * k };
+      };
       const bestB = this._pickBuilding(want, Math.max(12, this.origin.y - 10), 0.8,
-        (b) => ({ x: b.cx, y: b.h + 1.5, z: b.cz }), null, true);
+        (b) => ({ ...spotOf(b), y: b.h + 1.5 }), null, true);
+      const spot = spotOf(bestB);
       person = await pop.spawn({
-        ...base, pos: new T.Vector3(bestB.cx, bestB.h + 1.4, bestB.cz),
+        ...base, pos: new T.Vector3(spot.x, bestB.h + 1.4, spot.z),
         yaw: r.range(0, 6.28), routine: { type: 'stand', anim: td.anim || 'phone' },
       });
       person.roofB = bestB;
@@ -460,10 +548,23 @@ export class MissionRun {
     // A plate you cannot see is a tutorial you cannot finish. `_pickBuilding`
     // now LOS-checks every candidate (with the plate's own roof in the test,
     // since the plate sits on it) and `used` keeps the three off one roof.
+    // ...and a range reads as a range when the three plates are in FRONT of the
+    // shooter. Unconstrained, seed 4 put plate 1 round the back of his own
+    // tower: he opened the tutorial looking across 25 m of his own deck at a
+    // plate the roof was hiding, which the building-only LOS test cannot see.
+    // A bias, not a filter — the briefed 130/230/330 m grading is the point of
+    // the range, and a hard sector traded it for plates at 46 m and 243 m.
+    const ahead = (b) => {
+      const a = Math.atan2(b.cx - this.origin.x, b.cz - this.origin.z) - this.standYaw;
+      return Math.abs(Math.atan2(Math.sin(a), Math.cos(a))) * 55;        // metres per radian off
+    };
     const used = new Set();
+    const hWant = Math.max(10, this.origin.y - 6);
+    const ptOf = (b) => ({ x: b.cx, y: b.h + 2.4, z: b.cz });
     for (const d of dists) {
-      const bestB = this._pickBuilding(d, Math.max(10, this.origin.y - 6), 0.6,
-        (b) => ({ x: b.cx, y: b.h + 2.4, z: b.cz }), (b) => !used.has(b), true);
+      const free = (b) => !used.has(b);
+      const bestB = this._pickBuilding(d, hWant, 0.6, ptOf, free, true, true, ahead)
+        || this._pickBuilding(d, hWant, 0.6, ptOf, free);
       used.add(bestB);
       const g = new T.Group();
       const plate = new T.Mesh(new T.CircleGeometry(0.55, 20), mat);
