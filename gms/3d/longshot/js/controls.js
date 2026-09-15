@@ -6,7 +6,7 @@ import { $ } from './utils.js';
 
 export class Controls {
   constructor(hooks) {
-    this.h = hooks;         // { look, fire, scopeToggle, breath(on), mark, pause, zoomNudge, zoomFrac }
+    this.h = hooks;         // { look, fire, reload, scopeToggle, breath(on), mark, pause, zoomNudge, zoomFrac }
     this.enabled = false;
     this.pointers = new Map();
     this.pinchD = 0;
@@ -103,6 +103,12 @@ export class Controls {
       b.addEventListener('pointercancel', done);
       b.addEventListener('pointerleave', done);
     };
+    // the magazine strip is a button too: there was no manual reload at all, so
+    // a 20-second three-target window could open on one chambered round
+    $('ammo-wrap').addEventListener('pointerdown', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      if (this.enabled) this.h.reload();
+    });
     press('btn-fire', () => this.h.fire());
     press('btn-scope', () => this.h.scopeToggle());
     press('btn-mark', () => this.h.mark());
@@ -131,6 +137,7 @@ export class Controls {
         case 'KeyC': this.h.scopeToggle(); break;
         case 'KeyQ': this.h.zoomNudge(-0.12); break;
         case 'KeyE': this.h.zoomNudge(0.12); break;
+        case 'KeyR': this.h.reload(); break;
         case 'KeyM': case 'Tab': e.preventDefault(); this.h.mark(); break;
         case 'Escape': this.h.pause(); break;
       }

@@ -491,33 +491,68 @@ the pars were authored for a scoring model that doesn't currently run.
 ### B7 — Teach the game
 **Goal:** stop the systems that fail the player being the ones nobody mentions.
 
-- [ ] **B7.1 — The four unbriefed killers.** (a) *Hip-fire is randomly wrong by
-      ±0.03 rad* = **±9 m at 300 m** (`missions.js:513–518`) and the FIRE button is
-      live unscoped — a new player misses by nine metres and never learns why.
-      (b) *A miss within 70 m voids the contract* — the most punishing rule in the
-      game, first communicated as a toast **after** it has happened.
-      (c) *Two civilian kills fail the mission* — first mentioned in **mission 16**.
-      (d) *A miss near a room mark arms a silent 13 s sudden-death timer*
-      (`missions.js:757–759`) — in **mission 3**, the glass tutorial, i.e. exactly
-      where a first miss is most likely. Worse, the mark shows no sign of it: he
-      keeps idling in the lit window (`people.js:194–196` changes no state).
-      **Done:** each is taught before it can fail you. `story.js`, `ui.js`. **M**
-- [ ] **B7.2 — There is no manual reload.** `_reload` fires only at `ammoLeft <= 0`
-      (`missions.js:499`); no key, no button (`controls.js:113–141`). Entering s14's
-      20 s three-target window on one round is unrecoverable and unexplained. **S**
-- [ ] **B7.3 — Controls are pause-menu only.** The card at `ui.js:316–323` is the sole
-      place any binding is documented. Add a title-screen controls entry / first-boot
-      overlay (`save.seenIntro` already exists, unread). **S**
-- [ ] **B7.4 — Two briefings advertise bonuses that don't exist.** `story.js:61`
-      (moving) and `story.js:77` (ghost); `ui.js:160` prints "ghost (no panic)" on
-      **every** briefing. Fix with B1.1/B1.2 or stop promising them. **S**
-- [ ] **B7.5 — The tutorial teaches inputs, not systems.** s01 has `civs: 0`,
-      `wind: [0,0]`, no MARK, no panic, no fail state; s02 then drops 9 civilians and
-      the full ruleset at once. (The free Range is *harder* than the tutorial —
-      `wind: [0,3]` vs `[0,0]`.) **Done:** a soft-failure first encounter with panic
-      and collateral. **M**
-- [ ] **B7.6 — Show par before the first attempt.** `ui.js:161–162` gates "Gold at N"
-      behind `rec?.score`, so a first-timer never knows the target. **S**
+- [x] **B7.1 — The four unbriefed killers.** *(B7, verified)* All four are now named
+      before they can bite, three ways: a **RULES OF ENGAGEMENT** block on the
+      contract sheet listing only the rules *that* contract can punish you with; a
+      one-time **first-encounter callout** in the field (`ui.js _teach`, fired from
+      `hudShow(true, def)`, keyed off `save.taught`); and the full set in the field
+      manual. (a) the FIRE button now reads **✛ HIP FIRE** in amber whenever the
+      rifle is unscoped and toasts *"HIP FIRE scatters ±9 m at 300 m — tap ◎ SCOPE"*
+      the first time it is pressed that way; (b) + (c) taught on **s01/s02**, i.e.
+      before the first contract that can void; (d) taught on the first `room`
+      contract. Measured progression on a real save: s01 → SCOPE + BYSTANDERS,
+      s02 → A MISS IS HEARD, s03 → GLASS WARNS HIM. Both failure paths were then
+      driven for real (scoped miss 10 m from the mark): s02 → `TARGET FLEEING`,
+      s03 → `TARGET DIVING FOR COVER — 13s` with `special.bunker` counting down —
+      in both cases *after* the callout had already been on screen.
+      `shots/b7/callout_s0{1,2,3}_{desk,mob}.png`, `shots/b7/miss_s0{2,3}.png`.
+      **Residual (people.js owner):** the bunkered mark still shows no outward sign
+      and there is still no on-screen 13 s countdown — `people.js:194–196`.
+- [x] **B7.2 — There is no manual reload.** *(B7, verified)* `MissionRun.reload()`
+      (refuses mid-reload/mid-bullet-cam, toasts `MAGAZINE FULL` when it would be a
+      no-op) wired to **R** and to a tap on the **ammo strip**, which now carries a
+      `⟳ RELOAD` label so it reads as a control and not a readout. Documented in the
+      pause card, the manual and s14's intel. Measured: full mag → `MAGAZINE FULL`;
+      at 2/5 → `reloadT` runs and the magazine refills; `R` refills 1 → 5.
+- [x] **B7.3 — Controls are pause-menu only.** *(B7, verified)* `save.seenIntro` is
+      now read: a first-boot **field manual** popup (controls + the five voiding
+      rules + how par and medals work), skipped when `?m` / `?auto` / `?shot` is
+      driving. Reachable any time from **❓ HOW TO SHOOT** on the title and
+      **❓ CONTROLS & FULL RULES** on every briefing. `#pop-btns` is sticky so a long
+      card can always be dismissed at 390 px. `shots/b7/intro_mob.png`.
+- [x] **B7.4 — Two briefings advertise bonuses that don't exist.** *(B7, verified)*
+      Re-checked this campaign: both bonuses now really pay — `missions.js` awards
+      `SCORE.moving` on any kill whose collider had velocity, and `_finish` adds the
+      600 ghost bonus — so the s07/s09 promises stand and were kept. The briefing
+      line itself was the remaining lie: it now lists only the bonuses *that*
+      contract can pay, so the Range no longer advertises "ghost (no panic)" with
+      nobody in it to panic. `shots/b7/brief_s01_mob.png` vs `brief_s17_mob.png`.
+- [x] **B7.5 — The tutorial teaches inputs, not systems.** *(B7, verified)* s01 now
+      spawns **6 civilians** on the street under the plates, so the first contract
+      contains real collateral and real panic, and the briefing says so ("steel
+      doesn't bleed, but everything below it does"). Its intel adds the hip-fire
+      rule and the 2 500 civilian cost, and the ROE block teaches SCOPE +
+      BYSTANDERS before insert. The failure stays soft: no pay to lose, instant
+      retry. Confirmed the amusing detail — the free Range really is windier than
+      the tutorial (`[0,3]` vs `[0,0]`); left as is, because wind is s05's lesson
+      and s02–s04 are deliberately calm, but the Range briefing now *says* it has
+      wind instead of ambushing a first-timer with it.
+- [x] **B7.6 — Show par before the first attempt.** *(B7, verified)* Par, silver and
+      gold are printed on every briefing whether or not the mission has been played;
+      the personal best is appended only when there is one.
+
+**B7 regression gate.** `node tools/test_ballistics.mjs` **21/21**. Bot sweep
+`s01,s02,s03,s05,s08,s09,s12,s13,s17,s19,s21` @ seed 4: **11/11 WON** (2000 · 2437 ·
+2514 · 2953 · 3477 · 2570 · 2950 · 2703 · 3291 · 3275 · 3066) — s01 wins with its
+six new civilians in place. No `alert()`; the callout is `pointer-events: none`
+except its ✕ GOT IT, so it cannot swallow a drag-look, and the only popup in the
+mission flow is the pause menu (`hudShow(true)` force-closes any other).
+*Harness note: the box was at load ~23 from the other workers' Chromes, so the
+last six ran at 480×300 with `&lite` and headless mission time crawls to ~0.25×.
+Two traps worth knowing — node **block-buffers stdout to a file** (a sweep that
+looks stalled has usually finished; append with `fs.appendFileSync` instead), and
+`drv.mjs`'s `send()` has **no timeout**, so one lost CDP response hangs the whole
+poll loop forever.*
 
 ---
 
@@ -525,15 +560,25 @@ the pars were authored for a scoring model that doesn't currently run.
 **Goal:** make the next ten sessions cheaper. No player-visible change — schedule it
 when the visible work is landing, not instead of it.
 
-- [ ] **B8.1 — Unlock node testing: 2 lines.** `config.js:140` and `save.js:4`
+- [x] **B8.1 — Unlock node testing: 2 lines.** `config.js:140` and `save.js:4`
       evaluate `location.search` at module scope, so `config.js`, `save.js` and
       `events.js` cannot be imported in node at all. Guard them. **Everything below
       depends on this.** **S**
-- [ ] **B8.2 — `tools/test_utils.mjs`.** `utils.js` is 56 lines of pure functions with
+      ✅ Guarded both with `typeof location === 'undefined'`. Verified: `config.js`,
+      `save.js` and `events.js` all import cleanly in node now, and both guarded
+      lines throw `ReferenceError: location is not defined` when the guard is
+      removed. (`save.js`'s `localStorage` reads were already inside try/catch.)
+- [x] **B8.2 — `tools/test_utils.mjs`.** `utils.js` is 56 lines of pure functions with
       zero coverage. Pin `rng` determinism (every seeded mission and city rests on it);
       `r.int` inclusivity — `missions.js:343` indexes `loop[r.int(0,3)]` into a
       4-element array; `weekKey`'s ISO-week arithmetic across the 2027-01-01 boundary
       and W53; `dayKey` zero-padding; `fmtTime` edge cases. **M**
+      ✅ 54 assertions, PASS/FAIL per line in the `test_ballistics.mjs` style. Pins
+      `hash32`/`rng` golden sequences, `r.int` inclusivity (the `loop[r.int(0,3)]`
+      trap), `r.range`/`pick`/`chance` bounds, `dayKey` padding + local time,
+      `weekKey` across 2027-01-01 / W53 plus Mon→Sun stability and 400 unique
+      consecutive weeks, and `fmtTime` ceiling/clamping. Every group falsified by
+      deliberately breaking the function and confirming FAIL.
 - [ ] **B8.3 — Extract `js/scoring.js` and test it.** `missions.js:691–698` +
       `:1092–1108` are pure arithmetic on plain numbers — no THREE, no DOM. Extracting
       ~70 lines makes the whole medal/economy layer testable, and would have caught
@@ -557,11 +602,15 @@ when the visible work is landing, not instead of it.
       branches: `def.ordered`/`noCiv`/`forceRifle` (→ B6.1 uses them instead), an empty
       `if` at `missions.js:591`, a no-op handler at `ui.js:42`. Dead state:
       `person.frozen`, `decoy.decoy`, `real.traits`. **M**
-- [ ] **B8.7 — `perchReach` can put the shooter off the roof.** `city.js:104`
+- [x] **B8.7 — `perchReach` can put the shooter off the roof.** `city.js:104`
       `Math.max(3, edge - 3)`: for any roof under 12 m the floor wins and the stand
       point is outside the footprint. Unreachable today only because the perch is
       always 30 m — but `missions.js:132` and `main.js:389` both call it with an
       arbitrary collider. Add the assertion as a test. **S**
+      ✅ Assertion added (sweeps w=2..60 × 64 yaws; the stand point must stay inside
+      ±w/2). Fix was a genuine one-liner — `Math.max(3, edge - 3)` →
+      `Math.max(0, edge - 3)`, identical output for every roof ≥ 12 m (asserted),
+      and the old line makes the new assertion FAIL with 460 off-roof cases.
 
 ---
 

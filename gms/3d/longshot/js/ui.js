@@ -2,7 +2,7 @@
 // House rule: styled popups, never alert()/confirm().
 
 import { STORY, ACT_NAMES, RANGE_DEF } from './story.js';
-import { SCORE } from './config.js';
+import { SCORE, FLAGS } from './config.js';
 import { save, persist, wipe } from './save.js';
 import { dailyDef, weeklyDef, endlessDef, dailyState } from './events.js';
 import { renderArmory, renderLoadout } from './shop.js';
@@ -10,6 +10,53 @@ import { $, el, fmt$, fmtM, fmtTime, weekKey } from './utils.js';
 import * as audio from './audio.js';
 
 const SCREENS = ['title', 'campaign', 'contracts', 'armory', 'briefing', 'results'];
+
+// ── the rules nobody used to mention ────────────────────────────────────────
+// Each of these voids a contract, and each was previously first explained by a
+// toast AFTER it had already happened. They are taught three ways now: `s` on
+// the contract sheet before you insert, `l` as a one-time callout the first
+// time a contract can bite you with it, and the whole set in the field manual.
+const RULES = {
+  scope: { t: '◎ SCOPE EVERY SHOT',
+    s: 'from the hip the rifle scatters ±9 m at 300 m',
+    l: 'FIRE works unscoped. The rifle does not: a hip shot lands anywhere inside about ±9 m at 300 m. Scope with ◎ before every round that matters.' },
+  miss: { t: 'A MISS IS HEARD',
+    s: 'a loud round landing within 70 m panics the mark — and he runs',
+    l: 'An unsuppressed round landing within 70 m of the mark panics the street. Marks run for the edge of the city and the contract voids. Suppressed, that radius is 16 m.' },
+  civ: { t: 'BYSTANDERS COUNT',
+    s: 'a civilian costs 2 500 — the second one voids the contract',
+    l: 'Every civilian you kill costs 2 500 points. The second one ends the contract on the spot.' },
+  window: { t: 'GLASS WARNS HIM',
+    s: 'miss near his window and he takes cover — 13 s to finish it',
+    l: 'A mark at a lit window who hears a round go past drops out of sight. He stays in the room, but you have 13 seconds to put one in him before he is gone for good.' },
+  expo: { t: 'GUARDS TRIANGULATE',
+    s: 'every loud shot fills EXPOSURE — a full bar is a fail',
+    l: 'With guards posted, every unsuppressed shot fills the EXPOSURE bar. Full means they have your rooftop, and the job is over.' },
+};
+
+// which of them this contract can actually punish you with
+function rulesFor(def) {
+  const s = def.setup || {};
+  const kinds = (s.targets || []).map(t => t.kind || 'plaza');
+  const out = [];
+  if (def.special !== 'range' && kinds.length) out.push('miss');
+  if ((s.civs ?? 10) > 0) out.push('civ');
+  if (kinds.includes('room')) out.push('window');
+  if ((s.guards || 0) > 0) out.push('expo');
+  return out;
+}
+
+function controlsHTML() {
+  return `<div class="helpbox">
+    <div><b>👣 WALK</b> the stick paces your rooftop — go to the edge to see the street below, or sidestep whatever is in your way</div>
+    <div><b>DRAG</b> look around, full 360°<span class="kb">WASD / arrows</span></div>
+    <div><b>◎ SCOPE</b> in · pinch or the slider to zoom<span class="kb">C · Q/E</span></div>
+    <div><b>🫁 BREATH</b> hold to steady the crosshair<span class="kb">Shift</span></div>
+    <div><b>✛ FIRE</b><span class="kb">Space</span></div>
+    <div><b>◈ MARK</b> tag the person under your crosshair<span class="kb">M</span></div>
+    <div><b>⟳ RELOAD</b> tap the ammo pips — don't meet a 20-second window on one round<span class="kb">R</span></div>
+  </div>`;
+}
 
 export class UI {
   constructor(hooks) {
@@ -29,6 +76,7 @@ export class UI {
     $('bt-contracts').onclick = () => this.renderContracts();
     $('bt-armory').onclick = () => this.renderArmoryScreen();
     $('bt-range').onclick = () => this.renderBriefing(RANGE_DEF);
+    $('bt-howto').onclick = () => this.manualPopup(false);
     $('bt-settings').onclick = () => this.settingsPopup(false);
     document.querySelectorAll('[data-back]').forEach(b => b.onclick = () => this.renderTitle());
     $('arm-tabs').querySelectorAll('.tab').forEach(t => t.onclick = () => {
@@ -40,6 +88,15 @@ export class UI {
       if (this.briefDef) this.h.startMission(this.briefDef);
     };
     $('btn-pause').onclick = () => {};   // wired via controls
+    // Hip fire is the quietest trap in the game: FIRE is live unscoped and the
+    // round lands nowhere near the crosshair. Name it the moment it is pressed.
+    const hipWarn = () => {
+      if (this._scoped || this._hipWarned || $('hud').classList.contains('hidden')) return;
+      this._hipWarned = true;
+      this.hud && this.hud.toast('HIP FIRE scatters ±9 m at 300 m — tap ◎ SCOPE', 'bad');
+    };
+    $('btn-fire').addEventListener('pointerdown', hipWarn);
+    addEventListener('keydown', (e) => { if (e.code === 'Space') hipWarn(); });
   }
 
   refreshCash() {
@@ -51,6 +108,12 @@ export class UI {
   // ── title ──────────────────────────────────────────────────────────────────
   renderTitle() {
     this.show('title');
+    // First boot ever: the manual, once, before the first contract. Skipped when
+    // a flag is sending us straight into a mission (harness / thumbnail runs).
+    if (!save.seenIntro && !FLAGS.get('m') && !FLAGS.has('auto') && !FLAGS.has('shot')) {
+      save.seenIntro = true; persist();
+      setTimeout(() => this.manualPopup(true), 300);
+    }
     const done = Object.values(save.missions).filter(m => m.done).length;
     $('t-stats').innerHTML = `
       <div><b>${fmt$(save.cash)}</b>CASH</div>
@@ -157,9 +220,33 @@ export class UI {
       : (def.setup?.targets?.length || 1) > 1 ? `Eliminate all ${def.setup.targets.length} targets`
       : 'Eliminate the target';
     objs.append(el('div', 'obj-line', `<span class="od">◆</span> ${prim}`));
-    objs.append(el('div', 'obj-line bonus', `<span class="od">◇</span> Bonus: headshots, distance, no misses, ghost (no panic)`));
+    // Only bonuses this contract can actually pay. It used to promise "ghost"
+    // on the range, where there is nobody to panic.
+    const st = def.setup || {};
+    const kinds = (st.targets || []).map(t => t.kind || 'plaza');
+    const bon = [];
+    // convoy/protect/endless spawn their marks at runtime, so they pay too
+    if (kinds.length || ['convoy', 'protect', 'endless'].includes(def.special)) bon.push('headshots +500');
+    if ((def.vantage?.dist || 0) > SCORE.distFrom) bon.push('distance past 150 m');
+    if (kinds.some(k => ['walk', 'pair'].includes(k)) || ['convoy', 'protect', 'endless'].includes(def.special))
+      bon.push('moving target +400');
+    bon.push('no shot wasted +800');
+    if (def.timeLimit) bon.push('time left +25/s');
+    if (kinds.length && def.special !== 'range') bon.push('ghost +600 — nobody panics');
+    objs.append(el('div', 'obj-line bonus', `<span class="od">◇</span> Bonus: ${bon.join(', ')}`));
+    // Par BEFORE the first attempt — you cannot aim at a number you are not shown.
     const rec = save.missions[def.id];
-    if (rec?.score) objs.append(el('div', 'obj-line bonus', `<span class="od">★</span> Best score: ${rec.score} · Gold at ${Math.round((def.par || 3000) * SCORE.medals.gold)}`));
+    const par = def.par || 3000;
+    objs.append(el('div', 'obj-line bonus', `<span class="od">★</span> Par ${par} — silver at ${Math.round(par * SCORE.medals.silver)}, gold at ${Math.round(par * SCORE.medals.gold)}${rec?.score ? ` · your best ${rec.score}` : ''}`));
+    const roe = rulesFor(def);
+    if (!save.taught.scope) roe.unshift('scope');
+    if (roe.length) {
+      objs.append(el('div', 'roe-h', 'RULES OF ENGAGEMENT'));
+      for (const k of roe) objs.append(el('div', 'roe-line', `<span class="rw">!</span><span><b>${RULES[k].t}</b> — ${RULES[k].s}</span>`));
+    }
+    const man = el('button', 'roe-more', '❓ CONTROLS & FULL RULES');
+    man.onclick = () => this.manualPopup(false);
+    objs.append(man);
     renderLoadout($('br-loadout'), () => this.renderBriefing(def));
   }
 
@@ -198,12 +285,59 @@ export class UI {
     if (result.won) audio.medalSting();
   }
 
+  // ── the field manual ───────────────────────────────────────────────────────
+  manualPopup(first) {
+    this.popup(first ? 'BEFORE YOUR FIRST CONTRACT' : 'FIELD MANUAL', `
+      ${first ? '<div class="man-lead">You are WREN. One rooftop, one rifle, one contract at a time. Find the mark, read the air, and make the first round count — because the second one is always harder.</div>' : ''}
+      <div class="man-h">CONTROLS</div>
+      ${controlsHTML()}
+      <div class="man-h">RULES THAT VOID A CONTRACT</div>
+      <div class="helpbox">
+        ${Object.values(RULES).map(r => `<div><b>${r.t}</b><br>${r.l}</div>`).join('')}
+      </div>
+      <div class="man-h">SCORING</div>
+      <div class="helpbox">
+        <div>Every contract has a <b>par</b> score, printed on its briefing. <b>${Math.round(SCORE.medals.silver * 100)}%</b> of par is silver, <b>${Math.round(SCORE.medals.gold * 100)}%</b> is gold.</div>
+        <div>Kill ${SCORE.kill} · headshot +${SCORE.head} · moving target +${SCORE.moving} · past 150 m +${SCORE.distPerM}/m · no shot wasted +${SCORE.noMiss} · ghost (nobody panicked) +600 · civilian ${SCORE.civilian}</div>
+      </div>
+    `, [{ label: first ? 'TAKE THE FIRST CONTRACT' : 'GOT IT', prime: true }]);
+  }
+
+  // One-time callouts, shown on the first contract that can punish you with each
+  // rule — before the shot that would have taught it the expensive way.
+  _teach(def) {
+    clearTimeout(this._teachT);
+    const todo = rulesFor(def).filter(k => !save.taught[k]);
+    if (!save.taught.scope) todo.unshift('scope');
+    if (!todo.length) return;
+    const show = todo.slice(0, 2);
+    this._teachT = setTimeout(() => {
+      if ($('hud').classList.contains('hidden')) return;   // mission over: teach it next time instead
+      for (const k of show) save.taught[k] = true;
+      persist();
+      const c = $('callout') || el('div', '', '');
+      if (!c.id) { c.id = 'callout'; $('hud').append(c); }
+      c.innerHTML = `<div class="co-h">RULES OF ENGAGEMENT</div>` +
+        show.map(k => `<div class="co-r"><b>${RULES[k].t}</b><div>${RULES[k].l}</div></div>`).join('') +
+        `<button class="co-x">✕ GOT IT</button>`;
+      c.classList.remove('hidden');
+      c.querySelector('.co-x').onpointerdown = () => c.classList.add('hidden');
+      clearTimeout(this._teachHide);
+      this._teachHide = setTimeout(() => c.classList.add('hidden'), 3000 + show.length * 6000);
+    }, 4900);   // after HALCYON's opening line has had its moment
+  }
+
   // ── HUD ────────────────────────────────────────────────────────────────────
-  hudShow(on) {
+  hudShow(on, def) {
     $('hud').classList.toggle('hidden', !on);
     if (on) {
+      $('popup').classList.add('hidden');
+      this._hipWarned = false;
       for (const id of ['btn-fire', 'btn-breath', 'stick', 'btn-scope', 'btn-mark', 'breath-wrap']) $(id).classList.remove('hidden');
+      if (def) this._teach(def);
     } else {
+      clearTimeout(this._teachT);
+      $('callout')?.classList.add('hidden');
       $('fixer').classList.add('hidden');
       $('scope').classList.add('hidden');
       if (this.hud) { this.hud.setTimer(null); this.hud.setDist(null); }
@@ -242,7 +376,10 @@ export class UI {
       setAmmo: (n, mag) => {
         const w = $('ammo-wrap');
         w.innerHTML = '';
+        // the magazine is also the reload control — so it says so
+        w.append(el('div', 'ammo-lab', '⟳ RELOAD'));
         for (let i = 0; i < mag; i++) w.append(el('div', 'ammo-pip' + (i < n ? '' : ' spent')));
+        w.classList.toggle('low', n <= 1);
       },
       setBreath: (f, winded) => {
         $('breath-fill').style.height = Math.round(f * 100) + '%';
@@ -288,6 +425,10 @@ export class UI {
         this._scoped = on;
         $('zoom-wrap').classList.toggle('hidden', !on);
         $('btn-fire').classList.remove('hidden');
+        // The button is live unscoped and the round goes metres wide: say which
+        // of the two it is, on the button itself, before it is pressed.
+        $('btn-fire').classList.toggle('hip', !on);
+        $('btn-fire').querySelector('.al').textContent = on ? 'FIRE' : 'HIP FIRE';
       },
       setZoomLabel: (z) => { $('zoom-val').textContent = Math.round(z) + '×'; },
     };
@@ -313,14 +454,7 @@ export class UI {
   settingsPopup(inMission) {
     const s = save.settings;
     const body = this.popup('SETTINGS', `
-      ${inMission ? `<div class="helpbox">
-        <div><b>👣 WALK</b> the stick paces your rooftop — go to the edge to see the street below, or sidestep whatever is in your way</div>
-        <div><b>DRAG</b> look around, full 360°<span class="kb">WASD / arrows</span></div>
-        <div><b>◎ SCOPE</b> in · pinch or the slider to zoom<span class="kb">C · Q/E</span></div>
-        <div><b>🫁 BREATH</b> hold to steady the crosshair<span class="kb">Shift</span></div>
-        <div><b>✛ FIRE</b><span class="kb">Space</span></div>
-        <div><b>◈ MARK</b> tag the person under your crosshair<span class="kb">M</span></div>
-      </div>` : ''}
+      ${inMission ? controlsHTML() : ''}
       <label>Look sensitivity <input id="set-sens" type="range" min="30" max="200" value="${Math.round(s.sens * 100)}"></label>
       <label>Invert Y <input id="set-inv" type="checkbox" ${s.invertY ? 'checked' : ''}></label>
       <label>Target markers <input id="set-mk" type="checkbox" ${s.markers !== false ? 'checked' : ''}></label>

@@ -951,6 +951,14 @@ export class MissionRun {
     }
   }
 
+  // manual reload (R / the ammo strip): topping up before a window opens is a
+  // decision the player is allowed to make, not one the empty magazine makes.
+  reload() {
+    if (this.state !== 'active' || this.reloadT > 0 || this.ctx.bcam?.active) return;
+    if (this.ammoLeft >= this.rifle.mag) { this.ctx.hud.toast('MAGAZINE FULL', ''); return; }
+    this._reload();
+  }
+
   _reload() {
     if (this.reloadT > 0) return;
     this.reloadT = 2.6;

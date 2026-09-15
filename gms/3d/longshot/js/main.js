@@ -87,6 +87,7 @@ const markers = new Markers();
 const controls = new Controls({
   look: (dx, dy) => rig.look(dx, dy),
   fire: () => G.mission && !G.paused && !bcam.active && G.mission.fire(),
+  reload: () => G.mission && !G.paused && !bcam.active && G.mission.reload(),
   scopeToggle: () => {
     if (!G.mission || bcam.active) return;
     rig.toggleScope();
@@ -189,7 +190,7 @@ async function startMission(def) {
   rig.enabled = true;
   rig.setScoped(false);
   hud.setScopedUI(false);
-  ui.hudShow(true);
+  ui.hudShow(true, def);
   controls.setEnabled(true);
   $('loading').classList.add('hidden');
   audio.ambStart(clamp((def.wind?.[1] || 0) / 3, 0, 2));

@@ -1,7 +1,7 @@
 // LONGSHOT — profile persistence (localStorage), debounced.
 
 const KEY = 'longshot.save.v1';
-const NOSAVE = new URLSearchParams(location.search).has('nosave');
+const NOSAVE = new URLSearchParams(typeof location === 'undefined' ? '' : location.search).has('nosave');
 
 function defaults() {
   return {
@@ -16,6 +16,7 @@ function defaults() {
     stats: { shots: 0, hits: 0, heads: 0, kills: 0, longest: 0, cleared: 0 },
     settings: { sens: 1, invertY: false, quality: 'high', sfx: true, music: true, markers: true },
     seenIntro: false,
+    taught: {},                   // rule key -> true, once the game has explained it
   };
 }
 

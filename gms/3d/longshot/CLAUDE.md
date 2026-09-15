@@ -219,6 +219,12 @@ birds, the rifle viewmodel, the scope reticle — is procedural.
   visible from the default stand* and *is there anywhere on the roof that sees
   it* — the second question is why walking exists. Some marks are visible from
   only ~9 of 49 spots, so "blocked" is normal; "0 of 49" is a bug.
+- **`s08` is FLAKY, not broken.** The convoy is a timing window: the bot wins it
+  most runs and loses it some, on the same seed, and a loaded machine times it
+  out outright (its own run can take 45-105 s). Measured A/B on 2026-09-15,
+  seeds 1/4/9/13: merged build **4/4**, the build before it **3/4** — i.e. the
+  losses do not track the code. Re-run it before believing an s08 regression,
+  and never chase one from a single sweep.
 - **Bot losses that are not bugs**: the 4-wave `s10` protect and a clustered
   `weekly` beat the `?auto` bot (it cannot lead panicked runners, whose direction
   changes mid-flight). Both fail *identically on the shipped build* — always

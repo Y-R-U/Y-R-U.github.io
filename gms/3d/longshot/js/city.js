@@ -192,7 +192,7 @@ function shade(tint, mul, desat = 0.5) {
 // which grazes the sightline and hides the target behind his own parapet.
 export function perchReach(w, yaw, back = 3) {
   const edge = (w / 2) / Math.max(Math.abs(Math.sin(yaw)), Math.abs(Math.cos(yaw)));
-  return Math.max(3, edge - back);
+  return Math.max(0, edge - back);
 }
 
 // ── the city ─────────────────────────────────────────────────────────────────

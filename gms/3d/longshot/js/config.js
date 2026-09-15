@@ -137,5 +137,5 @@ export const MOVE = {
   bobHz: 1.75, bobAmp: 0.022,
 };
 
-export const FLAGS = new URLSearchParams(location.search);
+export const FLAGS = new URLSearchParams(typeof location === 'undefined' ? '' : location.search);
 export const LITE = FLAGS.has('lite');

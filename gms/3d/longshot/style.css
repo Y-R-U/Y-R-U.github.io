@@ -270,3 +270,47 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .p-body { max-width: 640px; width: 100%; margin: 0 auto; }
   #arm-tabs, .tabs { max-width: 640px; margin: 0 auto; width: 100%; }
 }
+
+/* ── teaching the game (B7) ────────────────────────────────────────────────── */
+.mbtn.small { padding: 10px 16px; font-size: 12px; letter-spacing: 2px; color: var(--dim); }
+
+/* rules of engagement, on the contract sheet */
+.roe-h { color: var(--red); letter-spacing: 3px; font-size: 10px; font-weight: 800; margin: 14px 2px 6px; }
+.roe-line { display: flex; gap: 9px; align-items: flex-start; padding: 5px 4px; font-size: 12px;
+  color: var(--dim); line-height: 1.45; }
+.roe-line b { color: #ffc4bd; font-weight: 800; letter-spacing: .5px; }
+.roe-line .rw { flex: none; width: 16px; height: 16px; margin-top: 1px; border-radius: 50%; text-align: center;
+  line-height: 15px; font-size: 11px; font-weight: 900; color: var(--red); border: 1px solid var(--red); }
+.roe-more { display: block; width: 100%; margin: 12px 0 2px; padding: 10px; border: 1px dashed var(--line);
+  border-radius: 10px; background: rgba(18,24,31,.5); color: var(--dim); font-size: 12px; letter-spacing: 2px; font-weight: 700; }
+.roe-more:active { color: var(--amber2); border-color: var(--amber); }
+
+/* the field manual */
+.man-lead { font-size: 13px; line-height: 1.6; color: var(--txt); margin-bottom: 4px; }
+.man-h { color: var(--amber); letter-spacing: 3px; font-size: 10px; font-weight: 800; margin: 14px 2px 7px; }
+
+/* first-encounter callout — non-blocking, and clear of #fixer, which can
+   speak again ("they're rabbiting") while the callout is still up */
+#callout { position: absolute; left: 50%; transform: translateX(-50%); top: calc(214px + var(--sat));
+  width: min(86vw, 430px); background: rgba(11,14,18,.92); border: 1px solid var(--line);
+  border-left: 3px solid var(--red); border-radius: 11px; padding: 11px 15px; z-index: 33;
+  pointer-events: none; animation: tin .3s; }
+.co-h { color: var(--red); font-size: 9.5px; font-weight: 800; letter-spacing: 3px; margin-bottom: 6px; }
+.co-r { font-size: 12px; line-height: 1.5; color: var(--dim); margin-top: 7px; }
+.co-r b { color: #ffc4bd; font-size: 12.5px; letter-spacing: 1px; }
+/* the card itself must not eat a drag-look — only its dismiss does */
+.co-x { display: block; margin: 9px 0 0 auto; padding: 4px 8px; pointer-events: auto;
+  font-size: 9px; font-weight: 800; letter-spacing: 1px; color: var(--dim);
+  border: 1px solid var(--line); border-radius: 7px; }
+
+/* unscoped, FIRE throws the round metres wide — the button says which it is */
+#btn-fire.hip { background: rgba(232,163,61,.16); border-color: rgba(232,163,61,.6); color: var(--amber2); }
+#btn-fire.hip .al { color: var(--amber); }
+
+/* the magazine strip is the reload button */
+#ammo-wrap { pointer-events: auto; align-items: flex-end; padding: 6px 8px; border-radius: 9px; }
+#ammo-wrap:active { background: rgba(232,163,61,.18); }
+.ammo-lab { font-size: 8px; font-weight: 800; letter-spacing: 1px; color: var(--dim); padding-bottom: 5px; margin-right: 3px; }
+#ammo-wrap.low .ammo-lab { color: var(--amber2); }
+/* a long card (the field manual) must never hide its own dismiss button */
+#pop-btns { position: sticky; bottom: -20px; background: var(--panel); padding: 10px 0; margin-top: 10px; }
