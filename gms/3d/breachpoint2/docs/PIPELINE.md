@@ -999,3 +999,34 @@ about in `PLAYTEST.md`.
 - `tests/boot.mjs` — new suite, copied out of the scratchpad per the standing rule.
 - `/assets/screenshots/breachpoint2.jpg` — the one file written outside `gms/3d/breachpoint2/`.
 - **No change to any `js/`, `css/` or `index.html` file. No change to `projects.js`. Nothing pushed.**
+
+
+---
+
+# BUILD COMPLETE 2026-09-18 13:20 — committed locally as `d775bdc4`, NOT pushed
+
+All phases done. Coordinator loop stopped. 91 files, 16,007 insertions, staged exactly
+`gms/3d/breachpoint2` + `assets/screenshots/breachpoint2.jpg`; the 53 dirty paths belonging to other
+sessions were left untouched. `projects.js` deliberately **not** edited — Aaron has not played it yet.
+`main` is 3 ahead of origin, two of those another session's (one labelled *work in progress, unverified*),
+so **a push is Aaron's call, not ours**.
+
+Final suite: 523 assertions green across 11 suites, plus the one documented STEADY timing flake.
+Draw calls L1 **46**, L8 **134**.
+
+## THE ONE KNOWN DEFECT LEFT — L5's insertion pocket
+On roughly **2% of prop rolls** `LEVELS[5].insert` (24, 18) lands in a 41-cell pocket that is 1.02% of the
+free grid — walled by two crane legs 1.20 m apart to the south and, to the north, a barrel from
+`barrelStack(24.0, 24.5, 4)` beside a bollard. **The same barrel stack P5c caught plugging the other end of
+the same corridor.** Consequence: `spawnPoints()`'s A* rejects nearly every candidate and the roster spawns
+somewhere it cannot path to you — L5 is quietly broken when it fires. It is bimodal (1.0% or 98.8% of the
+grid, never marginal), so it either happens or it does not.
+
+P5d chose not to fix it on the day everything else was verified, which was right — it is world geometry
+predating every phase that found it, and the fix means editing `engine.js` and re-running five suites.
+**Fix it together with whatever the playtest turns up**, not on its own. Diagnosis in HANDOFF §9.6;
+PLAYTEST.md warns about it so it does not waste Aaron's time.
+
+**That barrel stack has now caused two separate connectivity defects.** Whoever fixes the pocket should
+look at `barrelStack(24.0, 24.5, 4)` itself rather than at the symptom — the quay corridor is too narrow
+for a scattering prop.
