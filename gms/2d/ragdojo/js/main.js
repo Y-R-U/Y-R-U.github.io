@@ -16,7 +16,13 @@ import * as haptic from './haptic.js';
 import { buildShop } from './shop.js';
 import { MUSIC, TRACK_NAME, poolFor, roleTrack, unlockedFightTracks, pickFightTrack, RECENT_KEEP } from './music.js';
 
+import { DEV, DEMO, ACCOUNTS, HOME } from './edition.js';
+import { Purchases } from './purchases.js';
+import { track, visitor, source, analyticsChoice, analyticsEnabled } from './analytics.js';
 const qs = new URLSearchParams(location.search);
+let purchases = null, account = null, pendingCloud = null;
+const hasPremium = () => DEV || (!DEMO && purchases?.owned === true);
+
 const cvs = document.getElementById('game');
 const ctx = cvs.getContext('2d', { alpha: false });
 const $ = (id) => document.getElementById(id);
@@ -28,7 +34,7 @@ let S = load();
 const LEVELS = () => levelsFor(S.theme);
 const RANKS = () => ranksFor(S.theme);
 const MOVES = () => activeMoves(S);
-if (qs.get('unlock')) { for (const m of [...activeMoves({ theme: 'light' }), ...activeMoves({ theme: 'dark' })]) S.moves[m.id] = { owned: true, power: 2, cd: 2 }; }
+if (DEV && qs.get('unlock')) { for (const m of [...activeMoves({ theme: 'light' }), ...activeMoves({ theme: 'dark' })]) S.moves[m.id] = { owned: true, power: 2, cd: 2 }; }
 let match = null;
 let sheet = null;
 let sheetLevel = -1;
@@ -82,13 +88,13 @@ const input = new Input(cvs, {
 });
 
 // ── screens ──────────────────────────────────────────────────────────────
-const SCREENS = ['boot', 'hub', 'shop', 'results', 'victory', 'settings', 'help', 'thug'];
+const SCREENS = ['boot', 'hub', 'shop', 'results', 'victory', 'settings', 'help', 'thug', 'premium'];
 function show(name) {
   for (const s of SCREENS) $(s).classList.toggle('show', s === name);
   $('pauseBtn').classList.toggle('hidden', name !== null || !match || match.demo);
 }
 function overlay(name) {   // a panel on top of the hub
-  for (const s of ['shop', 'settings', 'help', 'results', 'victory', 'thug']) $(s).classList.toggle('show', s === name);
+  for (const s of ['shop', 'settings', 'help', 'results', 'victory', 'thug', 'premium']) $(s).classList.toggle('show', s === name);
   $('pauseBtn').classList.toggle('hidden', !!name || mode !== 'fight');
 }
 
@@ -119,7 +125,7 @@ function applyTheme() {
 }
 
 /** True once you have won a bully run in the light — that is what opens the door. */
-const darkOpen = () => !!S.darkUnlocked;
+const darkOpen = () => !!S.darkUnlocked && hasPremium();
 /**
  * In the dark, the bully run is called being a THUG — and it stays called that in the
  * daylight if you walked back out still carrying the knives. The word follows the moves you
@@ -130,6 +136,8 @@ const bullyWord = () => (S.theme === 'dark' || S.carryDark ? 'THUG' : 'BULLY');
 const thugInPlay = () => !!(S.stash.dark ? S.stash.dark.bully : false) || (S.theme === 'dark' && S.bully);
 
 function setTheme(to, { keepMoves = null } = {}) {
+  if (to === 'dark' && !darkOpen()) { openUpgrade(); return; }
+  if (keepMoves && !hasPremium()) keepMoves = false;
   if (to === S.theme) return;
   S.stash[S.theme] = Object.fromEntries(RUN_KEYS.map((k) => [k, S[k]]));
   const next = S.stash[to] || RUN();
@@ -164,18 +172,21 @@ function startDemo() {
 }
 
 function startFight(levelIdx, bully = false) {
+  if ((S.theme === 'dark' || S.carryDark) && !hasPremium()) { parkDark(); refreshHub(); openUpgrade(); return; }
+  if (pendingCloud) { applyCloud(); toMenu(); return; }
   // Never trust the index: an out-of-range one throws inside the click handler, which looks
   // exactly like a button that does nothing.
   const level = LEVELS()[Math.max(0, Math.min(TOTAL_LEVELS - 1, levelIdx | 0))];
   ensureSheet(level);
   match = new Match({
-    level, save: S, bully, autoplay: !!qs.get('autoplay'),
+    level, save: S, bully, autoplay: DEV && !!qs.get('autoplay'),
     onSeen: () => persist(S),
     onEnd: (result, m) => finishFight(result, m),
   });
   match.say(bully ? `${bullyWord()} TIME` : level.kind === 'final' ? 'FINAL PAGE' :
     level.kind === 'champion' ? 'CHAMPION' : 'FIGHT!', 1.8);
   setMode('fight');
+  track('fight_start', S);
   audio.play(fightTrack(level));
 }
 
@@ -199,6 +210,8 @@ function fightTrack(level) {
 }
 
 function finishFight(result, m) {
+  track('fight_end', S, result);
+  account?.matchCompleted();
   const L = m.level;
   const won = result === 'win';
   const rankGap = L.tier - playerRankAt(L.idx);
@@ -344,6 +357,7 @@ function hubLevel() {
 }
 
 function refreshHub() {
+  if (pendingCloud && mode !== 'fight') applyCloud();
   const bullyMode = S.bully;
   const idx = hubLevel();
   const L = LEVELS()[idx];
@@ -379,7 +393,7 @@ function refreshHub() {
   dk.textContent = darkOpen() ? (S.theme === 'dark' ? '☀ LIGHT' : '☾ DARK') : '🔒 DARK';
   dk.title = darkOpen()
     ? (S.theme === 'dark' ? 'Back to the dojo' : 'The streets after dark')
-    : 'Win a BULLY run to unlock';
+    : (!hasPremium() ? 'Permanent DARK upgrade required; win BULLY to enter' : 'Win a BULLY run to unlock');
 }
 
 // ── render ───────────────────────────────────────────────────────────────
@@ -449,7 +463,7 @@ function frame(t) {
     }
   }
   render();
-  window.__state = match ? {
+  if (DEV) window.__state = match ? {
     mode, hp: match.player.hp, enemies: match.aliveEnemies.length,
     over: match.over, result: match.result, time: match.time, score: match.score,
   } : { mode };
@@ -463,6 +477,7 @@ $('btnFight').onclick = () => {
 $('btnTrophy').onclick = () => { click(); showVictory(S.bully, false); };
 $('btnDark').onclick = () => {
   click();
+  if (!hasPremium()) { openUpgrade(); return; }
   if (!darkOpen()) {
     // Locked, and it says why rather than doing nothing.
     match && match.fx && match.fx.text(SHEET_W / 2, GROUND_Y - 260,
@@ -603,7 +618,12 @@ function openSettings() {
     // A dead toggle is worse than no toggle: desktop and iOS Safari cannot vibrate at all.
     (haptic.supported ? T('Vibration', S.settings.haptics, 'haptics') : '') +
     `<div class="toggle"><span>Stick side</span><button class="buy" data-fn="hand">${S.settings.hand === 'right' ? 'LEFT STICK' : 'RIGHT STICK'}</button></div>` +
+    `<div class="toggle"><span>Share anonymous play statistics</span><button class="buy" id="analyticsToggle">${analyticsEnabled() ? 'ON' : 'OFF'}</button></div>` +
+    `<p class="fine">Optional: starts, fight progress and upgrade conversion. No email or save contents. <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></p>` +
     musicList();
+  $('analyticsToggle').closest('.toggle').classList.toggle('hidden', DEMO || !ACCOUNTS);
+  $('btnCloudRetry').classList.toggle('hidden', DEMO || !ACCOUNTS);
+  $('analyticsToggle').onclick = () => { analyticsChoice(!analyticsEnabled()); openSettings(); };
   // Pausing is the only place you can bail out of a fight, so the way out lives here.
   $('btnQuit').classList.toggle('hidden', mode !== 'fight');
   rows.querySelectorAll('button[data-fn]').forEach((b) => {
@@ -729,6 +749,7 @@ function applySettings() {
 // ── boot ─────────────────────────────────────────────────────────────────
 const BOOT_MSGS = ['sharpening pencils…', 'ruling lines…', 'tying bandanas…', 'warming up the ragdolls…', 'ready'];
 async function boot() {
+  if (!DEV) parkDark();
   resize();
   show('boot');
   let step = 0;
@@ -754,14 +775,114 @@ async function boot() {
     audio.sfx.ping();
     setMode('hub');
     refreshHub();
-    if (qs.get('level')) startFight(Math.min(TOTAL_LEVELS - 1, +qs.get('level')));
+    track('start', S);
+    if (DEV && qs.get('level')) startFight(Math.min(TOTAL_LEVELS - 1, +qs.get('level')));
   };
-  if (qs.get('auto') || qs.get('shot')) setTimeout(() => $('startBtn').click(), 120);
+  if (DEV && (qs.get('auto') || qs.get('shot'))) setTimeout(() => $('startBtn').click(), 120);
 }
 boot().catch((err) => {
   // Surfaced by the inline handler in index.html; rethrow so it is reported, not swallowed.
   setTimeout(() => { throw err; });
 });
 
-window.__ragdojo = { get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };
-window.__input = input;
+if (DEV) window.__ragdojo = { get save() { return S; }, get match() { return match; }, startFight, fightTrack, fightPool, setTheme, get LEVELS() { return LEVELS(); }, S };
+if (DEV) window.__input = input;
+
+// Paid access never deletes earned progress. Park the dark run intact while signed out,
+// refunded or offline; restoring ownership lets the player resume it from the DARK button.
+function parkDark() {
+  if (S.theme === 'dark') {
+    S.stash.dark = Object.fromEntries(RUN_KEYS.map(k => [k, S[k]]));
+    const light = S.stash.light || RUN();
+    for (const k of RUN_KEYS) S[k] = light[k];
+    S.theme = 'light';
+  }
+  S.carryDark = false;
+  sheetLevel = -1;
+  applyTheme();
+}
+function applyCloud() {
+  if (!pendingCloud) return;
+  // Heal using the game's established loader; remote saves contain progress only.
+  S = load(); pendingCloud = null;
+  if (!hasPremium()) parkDark();
+  match = null; sheetLevel = -1;
+  applySettings();
+  if (mode === 'hub') setMode('hub');
+}
+function purchaseStatus(text) { $('purchaseStatus').textContent = text; }
+async function restorePurchase() {
+  if (!purchases) { purchaseStatus('Use the account button to sign in on games.br8t.com.'); return; }
+  try {
+    const owned = await purchases.refresh();
+    purchaseStatus(owned ? 'DARK upgrade restored. Win a BULLY run to enter; earned DARK progress is kept.' : 'No purchase found on this account. Sign in with the same Google or email account used at checkout.');
+    $('btnCheckout').disabled = !!owned || !account?.auth.signedIn;
+    refreshHub();
+  } catch (e) { purchaseStatus(e.message); }
+}
+function openUpgrade() {
+  track('upgrade_view', S);
+  overlay('premium');
+  $('premiumHome').classList.toggle('hidden', !DEMO && ACCOUNTS);
+  $('btnRestore').classList.toggle('hidden', DEMO || !ACCOUNTS);
+  $('btnCheckout').classList.toggle('hidden', DEMO || !ACCOUNTS);
+  purchaseStatus(DEMO ? 'Play LIGHT here. Accounts and the DARK upgrade live on games.br8t.com.' : 'Test checkout only. Sign in using the account button before buying or restoring.');
+  $('btnCheckout').disabled = true;
+  if (DEMO || !ACCOUNTS) return;
+  void fetch('/api/ragdojo/offer', { cache: 'no-store' }).then(async res => {
+    if (!res.ok) throw new Error('Upgrade checkout is not configured yet.');
+    const offer = await res.json();
+    if (!offer.testMode || offer.product !== 'ragdojo_dark') throw new Error('Upgrade unavailable.');
+    const digits = new Intl.NumberFormat('en', { style: 'currency', currency: offer.currency }).resolvedOptions().maximumFractionDigits;
+    $('btnCheckout').textContent = 'TEST UPGRADE · ' + new Intl.NumberFormat('en', { style: 'currency', currency: offer.currency }).format(offer.amount / 10 ** digits);
+    $('btnCheckout').disabled = !account?.auth.signedIn || !!purchases?.owned;
+    if (account?.auth.signedIn) await restorePurchase();
+  }).catch(e => purchaseStatus(e.message));
+}
+$('btnUpgrade').onclick = () => { click(); openUpgrade(); };
+$('btnPremiumClose').onclick = () => { click(); overlay(null); };
+$('premiumHome').href = HOME + '?from=itch';
+$('btnRestore').onclick = restorePurchase;
+$('btnCheckout').onclick = async () => {
+  $('btnCheckout').disabled = true;
+  try { location.assign(await purchases.checkout({ visitor: visitor(), source })); }
+  catch (e) { purchaseStatus(e.message); $('btnCheckout').disabled = !account?.auth.signedIn; }
+};
+$('btnCloudLocal').onclick = () => void account?.sync.choose('local');
+$('btnCloudRemote').onclick = () => void account?.sync.choose('remote');
+$('btnCloudRetry').onclick = () => { if (!account) return; if (account.sync.conflict) { openSettings(); return; } void account.sync.connect(account.auth.signedIn ? account.auth.user.uid : null); };
+
+if (ACCOUNTS && !DEV) {
+  import('./cloud.js').then(({ connectCloud }) => {
+    account = connectCloud({
+      canPester: () => mode === 'hub' || !!document.querySelector('#results.show, #victory.show'),
+      adopt: save => { pendingCloud = save; if (mode !== 'fight') { applyCloud(); refreshHub(); } },
+      status: text => { $('cloudStatus').textContent = text; },
+      conflict: value => {
+        $('cloudChoice').classList.toggle('hidden', !value);
+        if (value) {
+          const describe = data => `${data?.save?.theme === 'dark' ? 'DARK' : 'LIGHT'}, fight ${(data?.save?.level || 0) + 1}, ${data?.save?.wins || 0} wins`;
+          $('cloudSummary').textContent = `This device: ${describe(value.local)}. Cloud: ${describe(value.remote)}.`;
+          $('btnCloudRetry').textContent = 'CHOOSE CLOUD SAVE';
+          if (mode !== 'fight') openSettings();
+        } else $('btnCloudRetry').textContent = 'RETRY CLOUD SYNC';
+      },
+    });
+    purchases = new Purchases(account.auth, fetch, owned => {
+      if (!owned && (S.theme === 'dark' || S.carryDark)) { parkDark(); toMenu(); }
+      refreshHub();
+    });
+    account.auth.onChange(() => { void restorePurchase(); });
+    // Returning from Checkout is only a prompt to check the server, never proof of payment.
+    if (qs.get('checkout') === 'success') {
+      openUpgrade();
+      let attempts = 0;
+      const poll = setInterval(() => {
+        if (purchases.owned || ++attempts > 12) { clearInterval(poll); return; }
+        void restorePurchase();
+      }, 2500);
+    } else if (qs.get('checkout') === 'cancel') { openUpgrade(); purchaseStatus('Checkout cancelled. Your progress is unchanged.'); }
+    addEventListener('focus', () => { void restorePurchase(); });
+    setInterval(() => { if (purchases.owned) void restorePurchase(); }, 120000);
+  }).catch(() => { $('cloudStatus').textContent = 'Accounts unavailable. Play is saved on this device.'; });
+}

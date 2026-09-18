@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="canonical" href="https://games.br8t.com/gms/2d/ragdojo/">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#3b3428">
 <meta name="description" content="RAGDOJO — a stick-fighting game on a sheet of paper. Draw gestures to fight.">
@@ -33,6 +34,7 @@
     <div id="hub" class="screen">
       <div class="corner tl">
         <button class="icon" id="btnSettings" title="Settings">⚙</button>
+        <button class="icon" id="btnUpgrade" title="DARK upgrade">☾</button>
         <button class="icon" id="btnHelp" title="How to play">?</button>
       </div>
       <div class="corner tr">
@@ -52,6 +54,22 @@
       </div>
       <div class="corner br">
         <div class="stat" id="hubStats"></div>
+      </div>
+    </div>
+
+    <div id="premium" class="screen panel-screen">
+      <div class="sheet narrow">
+        <button class="icon close" id="btnPremiumClose" aria-label="Close upgrade">✕</button>
+        <h2>AFTER DARK</h2>
+        <div class="rows">
+          <p>One permanent upgrade: 45 DARK fights, eight dark moves, deeper skill training, ten after-dark tracks and THUG replay.</p>
+          <p>Complete LIGHT and win a BULLY run to enter. LIGHT’s 45 fights and BULLY replay stay free.</p>
+          <p>Already played DARK? Your earned progress is kept. Purchase is now required to access it.</p>
+          <p id="purchaseStatus" role="status"></p>
+          <a id="premiumHome" class="btn hidden" href="https://games.br8t.com/gms/2d/ragdojo/?from=itch" target="_blank" rel="noopener">PLAY ON GAMES.BR8T.COM</a>
+          <p class="fine">Full refunds remove upgrade access; progress is kept. No subscription. No ads.</p>
+        </div>
+        <div class="vicbtns"><button id="btnCheckout" class="btn" disabled>TEST UPGRADE · PRICE PENDING</button><button id="btnRestore" class="btn">RESTORE PURCHASE</button></div>
       </div>
     </div>
 
@@ -104,6 +122,14 @@
       <div class="sheet narrow">
         <div class="sheethead"><h2>SETTINGS</h2><button class="icon close" id="btnSetClose">✕</button></div>
         <div class="rows" id="setRows"></div>
+        <p class="fine" id="cloudStatus" role="status">Play is saved on this device.</p>
+        <div id="cloudChoice" class="hidden">
+          <p id="cloudSummary"></p>
+          <p>Choose which progress to keep. The other save is replaced; purchases are unaffected.</p>
+          <button id="btnCloudLocal" class="btn">KEEP THIS DEVICE</button>
+          <button id="btnCloudRemote" class="btn">USE CLOUD SAVE</button>
+        </div>
+        <button id="btnCloudRetry" class="btn">RETRY CLOUD SYNC</button>
         <button id="btnQuit" class="btn hidden">QUIT TO MENU</button>
         <button id="btnWipe" class="btn danger">ERASE ALL PROGRESS</button>
       </div>

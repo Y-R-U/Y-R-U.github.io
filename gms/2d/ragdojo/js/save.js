@@ -1,6 +1,8 @@
 import { TOTAL_LEVELS } from './config.js';
 
-const KEY = 'ragdojo.save.v2';
+export const KEY = 'ragdojo.save.v2';
+const listeners = new Set();
+export function onSave(fn) { listeners.add(fn); return () => listeners.delete(fn); }
 
 /**
  * Per-run, per-theme state. The ACTIVE theme's run sits at the TOP LEVEL of the save, so
@@ -72,6 +74,7 @@ export function load() {
 
 export function save(s) {
   try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* private mode */ }
+  for (const fn of listeners) fn(s);
 }
 
 export function wipe() {

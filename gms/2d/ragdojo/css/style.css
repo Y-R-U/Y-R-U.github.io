@@ -249,3 +249,18 @@ html, body {
   .tabs { margin: 4px 0 7px; }
   .tab { font-size: 17px; padding: 3px 12px; }
 }
+
+/* Leave room for the shared account button. */
+.corner.tr, #pauseBtn { right: calc(max(10px, env(safe-area-inset-right)) + var(--br8t-account-space, 0px)); }
+#premium p { margin: 8px 0; }
+#premium .rows { font-size: 19px; }
+#cloudChoice { max-height: 160px; overflow: auto; }
+
+/* The app rotates in portrait, so panel bounds must follow its actual dimensions. */
+@media (orientation: portrait) and (max-width: 860px) {
+  #premium .sheet, #settings .sheet { width: min(470px, 94vh); max-height: calc(100vw - 24px); padding: 8px 13px 11px; }
+  #premium h2, #settings h2 { font-size: 27px; }
+  #premium .rows { font-size: 17px; }
+  #premium .btn, #settings .btn { font-size: 17px; padding: 6px 12px; }
+}
+#premiumHome { display: inline-block; text-decoration: none; }

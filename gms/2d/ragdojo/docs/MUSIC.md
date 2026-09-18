@@ -156,3 +156,9 @@ short crossfade in `audio.js` is the obvious next pass; it was deliberately left
 - **boss** — `tense martial arts champion duel, fully instrumental, no vocals, key of F sharp minor, tempo exactly 132 BPM, low ominous strings and slow taiko build, sparse woodblock ticking like a clock, wailing erhu over the top, gong hits, coiled and dangerous, boss fight, martial arts film score`
 - **final** — `epic final duel of a martial arts film, fully instrumental, no vocals, key of D minor, tempo exactly 150 BPM, full orchestra over an army of taiko drums, choir stabs, screaming erhu lead, distorted guitar underneath, huge brass, enormous and climactic, the last fight, cinematic`
 - **victory** — `triumphant martial arts victory theme, fully instrumental, no vocals, key of B flat major, tempo exactly 108 BPM, bright brass and erhu rising fanfare, big gong hit, celebratory taiko flourish, warm strings, proud and joyful, champion of the dojo, loops under a victory screen`
+
+## Commercial release confirmation (2026-09-08)
+
+Aaron explicitly confirmed that the Suno tracks have 100% commercial-use licensing.
+No tracks were replaced for the monetisation preparation. Keep supporting license
+records privately; the itch listing discloses Suno-generated music.

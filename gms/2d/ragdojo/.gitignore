@@ -1,3 +1,6 @@
 assets/audio/raw/
 shots/
 node_modules/
+dist/
+*.log
+.env*

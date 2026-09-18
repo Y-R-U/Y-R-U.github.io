@@ -350,3 +350,21 @@ the two sets use different ids (`power` vs `d_shank`) in the same `save.moves`.
 Fourteen Suno v5.5 instrumental tracks in `assets/audio/`, wired through `js/music.js`.
 See `docs/MUSIC.md` for the prompts and the regeneration recipe. Missing files are tolerated —
 `audio.js` stays silent for any id whose mp3 is absent, so the game runs fine without them.
+
+## Monetisation preparation (2026-09-08; local review only)
+
+Read `docs/MONETISATION.md` and `docs/VERIFICATION.md` before payment/release work.
+Aaron approved LIGHT + BULLY free and requiring a permanent purchase for DARK,
+including existing players. Preserve their DARK careers. In commercial releases,
+`darkUnlocked` is only the earned progression prerequisite, not proof of purchase.
+The separate Go/SQLite backend verifies Firebase UID and Stripe test payments.
+
+Source served on localhost retains the existing developer/gate workflow. Release
+builds (`npm ci && npm run build`) minify code, disable query cheats/debug hooks,
+and gate DARK from server ownership. Shared accounts load dynamically; basic play
+must work offline. `js/save-sync.js` coordinates explicit-UID cloud reads/writes and
+conflict choices. Never store trusted entitlement flags in a save. `dist/itch` has
+no account/analytics requests; `dist/home` is for games.br8t.com paths.
+
+Do not deploy/publish or enable live payments without Aaron's approval. No price
+has been selected. Aaron confirmed commercial-use rights for the Suno soundtrack.
