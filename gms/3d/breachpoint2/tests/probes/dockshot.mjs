@@ -1,0 +1,28 @@
+import {writeFileSync} from 'fs';
+import {connect,URL,sleep} from './lib.mjs';
+const {ws,send,ev,errors}=await connect();
+await send('Page.enable');await send('Runtime.enable');await send('Log.enable');
+await send('Network.setCacheDisabled',{cacheDisabled:true});
+const win=(await send('Browser.getWindowForTarget')).result;
+await send('Emulation.setDeviceMetricsOverride',{width:1000,height:600,deviceScaleFactor:1,mobile:false});
+await send('Page.navigate',{url:URL}); await sleep(4000);
+const shot=async(n)=>{const r=await send('Page.captureScreenshot',{format:'png'});
+  writeFileSync(n, Buffer.from(r.result.data,'base64'));};
+const view=async(lvl,x,z,y,yaw,pitch)=>{
+  await ev(`__game.S.quality='low';__game.S.bloom=0;__game.applySettings();__game.loadLevel(${lvl});__game.god(true)`);
+  await sleep(900);
+  await ev(`__game.teleport(${x},${z},${y});__game.look(${yaw},${pitch});__game.player.vel.set(0,0,0)`);
+  await sleep(700);
+  await ev(`__game.teleport(${x},${z},${y});__game.look(${yaw},${pitch})`);
+  await sleep(250);
+};
+await view(1, -4, 2, 22, -Math.PI/2, -0.34); await shot('p4_dock_east.png');
+await view(1, 23.5, -2, 0.02, -Math.PI/2, -0.10); await shot("p4_quay.png");
+await view(1, 4, 14, 14, -Math.PI/2+0.55, -0.55); await shot('p4_zone.png');
+await view(4, -4, 2, 22, -Math.PI/2, -0.34); await shot('p4_night.png');
+await view(6, -4, 2, 22, -Math.PI/2, -0.34); await shot('p4_fog.png');
+await view(8, -4, 2, 22, -Math.PI/2, -0.34); await shot('p4_storm.png');
+console.log('errors', errors);
+await send('Emulation.clearDeviceMetricsOverride');
+await send('Browser.setWindowBounds',{windowId:win.windowId,bounds:win.bounds});
+ws.close();process.exit(0);

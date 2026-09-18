@@ -1,0 +1,21 @@
+import {connect,URL,sleep} from './lib.mjs';
+const {ws,send,ev}=await connect();
+await send('Runtime.enable');await send('Log.enable');await send('Page.enable');
+await send('Network.setCacheDisabled',{cacheDisabled:true});
+await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
+await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});
+await send('Page.navigate',{url:'about:blank'});await sleep(300);
+await ev(`localStorage.clear()`).catch(()=>{});
+await send('Page.navigate',{url:URL});await sleep(4000);
+console.log(await ev(`(()=>{localStorage.removeItem('bp2_profile');localStorage.removeItem('bp2_settings');return 1})()`));
+await send('Page.navigate',{url:URL});await sleep(3500);
+console.log('intro/state', await ev(`({i:BP2.Tutorial.introVisible(),s:__game.GAME.state,touch:__game.S.touchMode,assist:__game.S.aimAssist,W:innerWidth,H:innerHeight})`));
+await ev(`BP2.Tutorial.introVisible() && document.getElementById('btnIntroGo').click()`);
+await sleep(1200);
+console.log('after tap', await ev(`({s:__game.GAME.state,lvl:__game.levelInfo().id,bar:BP2.Tutorial.barVisible(),tut:BP2.Tutorial.state(),ammo:__game.ammo()})`));
+console.log('enemies', await ev(`({p:[+__game.player.pos.x.toFixed(1),+__game.player.pos.y.toFixed(1),+__game.player.pos.z.toFixed(1)],e:__game.enemyInfo()})`));
+console.log('probe-aim', await ev(`(()=>{const es=__game.enemyInfo().filter(e=>e.alive);const p=__game.player.pos;
+ const out=[];for(const e of es){const dx=e.x-p.x,dz=e.z-p.z,d=Math.hypot(dx,dz);
+  out.push({n:e.name,d:+d.toFixed(1),los:__game.losClear(p.x,p.y+1.6,p.z,e.x,e.y+1.2,e.z)});}
+ return out;})()`));
+ws.close();

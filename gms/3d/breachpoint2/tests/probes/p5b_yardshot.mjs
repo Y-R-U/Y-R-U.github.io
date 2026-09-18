@@ -1,0 +1,14 @@
+import {connect, sleep} from './lib.mjs';
+import {writeFileSync} from 'fs';
+const base=process.argv[2], out=process.argv[3];
+const {send, ev} = await connect();
+await send('Runtime.enable'); await send('Page.enable');
+await send('Page.navigate',{url:base+'/index.html'});
+await sleep(2800);
+await ev(`__game.S.quality='low';__game.S.bloom=0;__game.applySettings()`); await sleep(300);
+await ev(`__game.loadLevel(1);__game.teleport(1.5,24.5);__game.look(0,0)`); await sleep(1100);
+const hide=`__game.Enemies.list().forEach(e=>{e.rig.root.visible=false;e.tag.sprite.visible=false;});document.getElementById('hud').style.display='none';__game.teleport(1.5,24.5);__game.look(0,0)`;
+await ev(hide); await sleep(500); await ev(hide); await sleep(400); await ev(hide); await sleep(250);
+const r=await send('Page.captureScreenshot',{format:'png'});
+writeFileSync(out, Buffer.from(r.result.data,'base64'));
+process.exit(0);

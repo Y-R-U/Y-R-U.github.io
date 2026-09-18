@@ -1,0 +1,15 @@
+import {connect,URL,sleep} from './lib.mjs';
+const {ws,send,ev,errors}=await connect();
+await send('Runtime.enable');await send('Log.enable');await send('Page.enable');
+await send('Network.setCacheDisabled',{cacheDisabled:true});
+await send('Page.navigate',{url:'about:blank'});await sleep(300);errors.length=0;
+await send('Page.navigate',{url:URL});await sleep(3300);
+await ev(`__game.Profile.reset()`);
+await send('Page.navigate',{url:URL});await sleep(3300);
+await ev(`document.getElementById('btnIntroGo').click()`);await sleep(900);
+await ev(`__game.GAME.pause()`);await sleep(300);
+console.log('paused', await ev(`({bar:BP2.Tutorial.barVisible(),state:__game.GAME.state})`));
+await ev(`document.getElementById('btnAbort').click()`);await sleep(1400);
+console.log('aborted', await ev(`({bar:BP2.Tutorial.barVisible(),state:__game.GAME.state,run:BP2.Tutorial.state().running,end:!document.getElementById('endScreen').classList.contains('hidden')})`));
+console.log('errors', errors);
+ws.close();

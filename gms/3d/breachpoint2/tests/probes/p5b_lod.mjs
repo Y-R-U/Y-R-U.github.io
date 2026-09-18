@@ -1,0 +1,14 @@
+import {connect, sleep, URL} from './lib.mjs';
+const {send, ev, errors} = await connect();
+await send('Runtime.enable'); await send('Page.enable');
+await send('Page.navigate',{url:URL});
+await sleep(2600);
+const PIN = `__game.S.quality='low';__game.S.bloom=0;__game.applySettings()`;
+const POSE = `__game.teleport(1.5,24.5);__game.look(0,0)`;
+await ev(PIN); await sleep(200);
+await ev(`__game.loadLevel(8)`); await ev(POSE); await sleep(1200); await ev(POSE); await sleep(300);
+const info = await ev(`__game.Enemies.lodInfo()`);
+console.log('near', info.near, 'far', info.far, 'instCount', info.count, 'swaps', info.swaps);
+console.log(info.state.map(s=>`${s.name} d=${s.d} lod=${s.lod} boss=${s.boss} tag=${s.tag}`).join('\n'));
+console.log('drawCalls', await ev('__game.drawCalls()'));
+process.exit(0);

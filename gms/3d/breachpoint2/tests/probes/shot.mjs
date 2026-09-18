@@ -1,0 +1,18 @@
+import {writeFileSync} from 'fs';
+const PORT=9223; const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const list=await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json();
+const page=list.find(t=>t.type==='page');
+const ws=new WebSocket(page.webSocketDebuggerUrl); await new Promise(r=>ws.onopen=r);
+let id=0; const pend=new Map();
+ws.onmessage=e=>{const m=JSON.parse(e.data); if(m.id&&pend.has(m.id)){pend.get(m.id)(m);pend.delete(m.id);}};
+const send=(m,p={})=>new Promise(r=>{const i=++id;pend.set(i,r);ws.send(JSON.stringify({id:i,method:m,params:p}));});
+await send('Page.enable'); await send('Runtime.enable');
+await send('Emulation.setDeviceMetricsOverride',{width:900,height:520,deviceScaleFactor:1,mobile:false});
+await send('Page.navigate',{url:'file:///Users/aaronair/cc/yru/site/gms/3d/breachpoint2/index.html'});
+await sleep(4000);
+let r=await send('Page.captureScreenshot',{format:'png'});
+writeFileSync(process.argv[2]||'shot_start.png', Buffer.from(r.result.data,'base64'));
+await send('Runtime.evaluate',{expression:'__game.loadLevel(1)'}); await sleep(1500);
+r=await send('Page.captureScreenshot',{format:'png'});
+writeFileSync('shot_l1.png', Buffer.from(r.result.data,'base64'));
+ws.close();process.exit(0);

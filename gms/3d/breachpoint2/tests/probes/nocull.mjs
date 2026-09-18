@@ -1,0 +1,20 @@
+const PORT=9223; const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const list=await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json();
+const page=list.find(t=>t.type==='page');
+const ws=new WebSocket(page.webSocketDebuggerUrl); await new Promise(r=>ws.onopen=r);
+let id=0; const pend=new Map();
+ws.onmessage=e=>{const m=JSON.parse(e.data); if(m.id&&pend.has(m.id)){pend.get(m.id)(m);pend.delete(m.id);}};
+const send=(m,p={})=>new Promise(r=>{const i=++id;pend.set(i,r);ws.send(JSON.stringify({id:i,method:m,params:p}));});
+const ev=async e=>{const r=await send('Runtime.evaluate',{expression:e,returnByValue:true,awaitPromise:true});
+  if(r.result?.exceptionDetails) throw new Error(JSON.stringify(r.result.exceptionDetails));return r.result.result.value;};
+await send('Runtime.enable');await send('Page.enable');
+await send('Page.navigate',{url:process.argv[2]||'file:///Users/aaronair/cc/yru/site/gms/3d/breachpoint2/index.html'});
+await sleep(4000);
+const measure = async n => {
+  await ev(`(()=>{let s=12345; Math.random=()=>{s=(s*1664525+1013904223)>>>0; return s/4294967296;};})()`);
+  await ev(`__game.loadLevel(${n}); __game.teleport(1.5,24.5); __game.look(0,0);`);
+  await sleep(1200);
+  return await ev('({calls:__game.drawCalls(), tris:__game.tris()})');
+};
+for(const n of [1,8,1,8]) console.log('L'+n, JSON.stringify(await measure(n)));
+ws.close();process.exit(0);

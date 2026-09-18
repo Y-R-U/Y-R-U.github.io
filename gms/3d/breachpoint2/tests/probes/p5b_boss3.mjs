@@ -1,0 +1,22 @@
+import {connect, sleep} from './lib.mjs';
+import {writeFileSync} from 'fs';
+const base=process.argv[2], tag=process.argv[3];
+const {send, ev} = await connect();
+await send('Runtime.enable'); await send('Page.enable');
+await send('Page.navigate',{url:base+'/index.html'}); await sleep(2800);
+await ev(`__game.S.quality='low';__game.S.bloom=0;__game.applySettings()`); await sleep(300);
+const shot=async n=>{const r=await send('Page.captureScreenshot',{format:'png'});writeFileSync(n,Buffer.from(r.result.data,'base64'));};
+await ev(`__game.loadLevel(4)`); await sleep(1500);
+const clear=`(()=>{const G=__game;document.getElementById('hud').style.display='none';
+  for(const m of G.scene.children) if(m.name&&m.name.indexOf('layout')===0) m.visible=false;
+  G.setLight(0);return 1;})()`;
+const setup=`(()=>{const G=__game,L=G.Enemies.list();const b=L.filter(e=>e.active&&e.boss)[0];
+  const g=L.filter(e=>e.active&&!e.boss)[0];
+  L.forEach(e=>{if(e!==b&&e!==g&&e.active){e.active=false;e.rig.root.visible=false;e.tag.sprite.visible=false;}});
+  for(const [e,x] of [[b,1.6],[g,-1.6]]){ e.active=true;e.alive=true;e.hp=e.maxHp;e.rig.root.visible=true;
+    e.pos.set(x,G.groundAt(x,14,4,0.3),14);e.yaw=0;e.aimYaw=0;e.aimPitch=0;e.state='patrol';e._aim=0;e.vel.set(0,0,0);e.walkPhase=0;}
+  G.teleport(0,20);G.look(0,0);return b.name;})()`;
+await ev(clear); await ev(setup); await sleep(700); await ev(clear); await ev(setup); await sleep(500);
+await shot(`p5b_boss3_${tag}.png`);
+console.log(tag,'ok');
+process.exit(0);

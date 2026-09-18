@@ -1,0 +1,41 @@
+import {connect,URL,sleep} from './lib.mjs';
+import {writeFileSync} from 'node:fs';
+const {ws,send,ev,errors}=await connect();
+await send('Runtime.enable');await send('Page.enable');
+await send('Network.setCacheDisabled',{cacheDisabled:true});
+await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
+const winId=(await send('Browser.getWindowForTarget')).result;
+const shot=async(name,w,h)=>{
+  await send('Emulation.setDeviceMetricsOverride',{width:w,height:h,deviceScaleFactor:2,mobile:true});
+  await sleep(500); await ev('__game.onResize()'); await sleep(400);
+  const r=await send('Page.captureScreenshot',{format:'png'});
+  writeFileSync(name, Buffer.from(r.result.data,'base64'));
+  console.log('wrote',name);
+};
+await send('Page.navigate',{url:URL}); await sleep(3600);
+await ev(`localStorage.removeItem('bp2_profile');localStorage.removeItem('bp2_settings')`);
+await send('Page.navigate',{url:URL}); await sleep(3600);
+await ev(`(()=>{__game.grantSP(4200);const P=BP2.Profile;P.buyRank('plating');P.buyRank('plating');P.buyRank('plating');
+  P.buyRank('plating');P.buyRank('marksman');P.buyRank('logistics');P.clearLevel(1,55);P.get().level=7;P.save();
+  __game.applyRanks();BP2.Armoury.open('start');return 1})()`);
+await sleep(400);
+await shot('arm_portrait.png',390,844);
+await shot('arm_landscape.png',844,390);
+// debrief with a breakdown
+await ev(`(()=>{document.getElementById('armScreen').classList.add('hidden');BP2.Profile.get().level=2;BP2.Profile.save();
+  __game.loadLevel(2);__game.god(true);return 1})()`);
+await sleep(900);
+await ev(`(()=>{__game.GAME.stats.shots=40;__game.GAME.stats.hits=31;
+  __game.Enemies.list().filter(e=>e.active&&e.alive).forEach(e=>__game.Enemies.damage(e,e.maxHp*4,true,null));return 1})()`);
+await sleep(1600);
+await shot('debrief_portrait.png',390,844);
+// in-round HUD with the reload button
+await ev(`(()=>{__game.loadLevel(1);__game.Weapons.runtime()[0].mag=4;__game.HUD.updateAmmo();return 1})()`);
+await sleep(1200);
+await shot('hud_portrait.png',390,844);
+await shot('hud_landscape.png',844,390);
+console.log('errors:',errors);
+await send('Emulation.clearDeviceMetricsOverride');
+await send('Emulation.setTouchEmulationEnabled',{enabled:false});
+if(winId&&winId.windowId) await send('Browser.setWindowBounds',{windowId:winId.windowId,bounds:winId.bounds});
+ws.close();
