@@ -54,8 +54,8 @@ const PROJECTS = [
     date: "2026-09-12", creator: "Opus 5" },
 
   { name: "Emberwake", path: "/gms/3d/emberwake/", screenshot: "emberwake", type: "game",
-    desc: "An isometric RPG: create a lab assistant, escape through an experimental device, train on an island, then uncover a mystery across three mainland missions. Sword, dagger, magic, six skills, translucent interfaces, local saves and Kokoro Lewis, Bella and Echo voices.",
-    date: "2026-09-07", creator: "OpenAI Codex / GPT-6" },
+    desc: "An isometric RPG from a laboratory escape to an island and three mainland missions. Seven skills, earned automatic gathering and crafting, five mastery minigames, shops, upgraded tools and tempered blades. Sword, dagger, magic, local saves and narrated story.",
+    date: "2026-09-15", creator: "OpenAI Codex / GPT-6" },
 
 
   { name: "SECOND HAND", path: "/gms/3d/secondhand/", screenshot: "secondhand", type: "game",

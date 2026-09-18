@@ -10,7 +10,7 @@ Last updated: 2026-09-15. This file is the continuation handoff; update it as wo
 - Shops use coins, show buy/sell prices and quantities, and never trade story items. Existing journeys must migrate without losing progress.
 - Keep touch controls usable on small phones and preserve the narrated chapter.
 
-## 1. Automatic work and economy (current milestone)
+## 1. Automatic work and economy (released)
 
 - [x] Add save migration for mastery and coins; validate new fields.
 - [x] Manual fishing, woodcutting and mining; level 5 mastery unlocks automatic work per skill, with progress display and Stop control.
@@ -24,12 +24,12 @@ Last updated: 2026-09-15. This file is the continuation handoff; update it as wo
 - [x] Automated state/challenge tests, desktop/touch browser checks and screenshots.
 - [x] Record exact verification results and continuation instructions below.
 
-## 2. Complete the artisan loop
+## 2. Complete the artisan loop (current milestone)
 
-- [ ] Introduce Cooking XP with manual early levels and earned automatic batch cooking and a temperature-control mastery challenge.
-- [ ] Repeatable Smithing recipes, earned automatic crafting, an anvil timing challenge, and permanent equipment upgrades.
-- [ ] Buyable tool upgrades that change gathering speed and appearance.
-- [ ] Add recipe previews, ingredient shortages and craft quantities.
+- [x] Introduce Cooking XP with manual early levels and earned automatic batch cooking and a temperature-control mastery challenge.
+- [x] Repeatable Smithing recipes, earned automatic crafting, an anvil timing challenge, and permanent equipment upgrades.
+- [x] Buyable tool upgrades that change gathering speed and appearance.
+- [x] Add recipe previews, ingredient shortages and craft quantities.
 - [ ] Balance time to level 5/10/15 and prices through a normal early-game playthrough.
 
 - [ ] Extend earned automation to Melee/Magic training; review how the unlock should interact with existing repeated combat attacks.
@@ -55,9 +55,9 @@ Last updated: 2026-09-15. This file is the continuation handoff; update it as wo
 
 Read this file, README.md, and the nearest AGENTS.md before continuing. Work is limited to this game directory; the repository has many unrelated modified/staged files.
 
-Current implementation: **Milestone 1 complete locally**. State/challenge tests pass 19/19; professions, touch/combat and full chapter browser suites pass. See `VERIFICATION.md` for exact coverage and limits. No commit/push/public release performed.
+Current implementation: **Milestone 1 committed/pushed as bed969b2 and verified on https://yru.br8t.com/gms/3d/emberwake/** (public shop purchase, manual fishing, clean WebGL/assets). **Milestone 2 artisan changes implemented and verified locally; commit/push/public verification next.** State tests pass 29/29. User expects tested work to be committed/pushed as progress continues.
 
-Next implementation milestone: **Cooking and repeatable Smithing**. Add Cooking to skill icons/grid/state migration carefully (the current six-skill layout assumes three columns); introduce one-at-a-time cooking before earned automation. Preserve existing tutorial forging and ward-repair gates while adding repeatable smithing recipes. Avoid making shops a source of profitable buy/craft/sell loops without intentional balancing.
+Next work: commit/push the artisan batch and verify the public version 4 game. Then review level/price pacing, add merchant requests and resource unlocks, and continue the remaining checklist. Cooking/Smithing now use earned auto at level 5; combat still uses its original repeated attacks until its separate checklist item is addressed.
 
 New modules: `professions.mjs` contains pure rules and challenge simulations; `professions-ui.js` contains activity/modal/input handling. `main.js` stops work on movement/damage/dodge/travel, pauses it through `paused()`, and awards quest progression after gathering or buying materials. Saved activity/challenge timers are intentionally absent. Ranks 1–20 unlock at levels 5–100.
 
@@ -70,6 +70,7 @@ node --test tests/*.test.mjs
 export PLAYWRIGHT_MODULE=/private/tmp/tanking-tools/node_modules/playwright
 export EMBERWAKE_URL=http://127.0.0.1:8888/gms/3d/emberwake/
 node tests/professions.mjs
+node tests/artisans.mjs
 node tests/interactions.mjs
 node tests/browser.mjs
 ```

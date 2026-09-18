@@ -5,7 +5,7 @@ import {gather,canMaster,nextMastery,createChallenge,stepChallenge,strikeChallen
 
 test('version 2 journeys migrate with supplies, story and XP intact',()=>{
  const s=fresh();Object.assign(s,{version:2,region:'mainland',mainStage:4,coins:undefined,mastery:undefined});s.xp.Fishing=2400;s.bag.raw=18;
- const v=validate(JSON.parse(JSON.stringify(s)));assert.equal(v.version,3);assert.equal(v.coins,20);assert.equal(v.mastery.Fishing,0);assert.equal(v.bag.raw,18);assert.equal(v.xp.Fishing,2400);assert.equal(v.mainStage,4);
+ const v=validate(JSON.parse(JSON.stringify(s)));assert.equal(v.version,4);assert.equal(v.coins,20);assert.equal(v.mastery.Fishing,0);assert.equal(v.bag.raw,18);assert.equal(v.xp.Fishing,2400);assert.equal(v.mainStage,4);
 });
 test('new saves reject invalid currency and unearned ranks',()=>{
  const s=fresh();for(const coins of [-1,1.5,Infinity,1e9+1])assert.equal(validate({...s,coins}),null);
