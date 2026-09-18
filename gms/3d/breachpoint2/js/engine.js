@@ -77,6 +77,8 @@ const IS_TOUCH = ('ontouchstart' in window) || navigator.maxTouchPoints>0;
 const IS_MOBILE = IS_TOUCH && Math.min(screen.width,screen.height)<900;
 
 /* -------------------------- §SETTINGS — defaults + storage --------- */
+// bumped when a control default changes in a way stored settings must follow
+const CTRL_MIG = 1;
 const DEF = {
   sens: 1.0,            // look sensitivity (desktop)
   tsens: 1.0,           // look sensitivity (touch)
@@ -89,10 +91,13 @@ const DEF = {
   sfx: 1.0,
   leftHanded: 0,        // 0 = move stick left / look right. 1 = swapped
   wbtnRight: 0,         // weapon buttons on right instead of left
-  touchMode: 'doubletap', // 'doubletap' = drag/hold the look side to look,
-                        //   double-tap it to fire; hold the 2nd tap to keep firing
-                        // 'twofinger' = hold to look, 2nd finger on the same
-                        //   side fires (hold it down to keep firing)
+  touchMode: 'twofinger', // 'twofinger' = hold a finger on the look side to look,
+                        //   put a 2nd finger down to fire and hold it to keep
+                        //   firing. Both fingers work at once, so you turn
+                        //   while you shoot. This is the scheme that works.
+                        // 'doubletap' = double-tap the look side to fire; hold
+                        //   the 2nd tap to keep firing (the firing finger IS
+                        //   the looking finger — kept as an option, not default)
                         // 'tapfire'   = quick tap shoots, drag looks
   lookStyle: 'hold',    // 'hold'  = right thumb is a stick: keep it held off
                         //   centre and the view keeps turning
@@ -107,11 +112,29 @@ const DEF = {
   god: 0,               // testing: take no damage
   autoJump: IS_MOBILE?1:0,
   autoMantle: 1,
-  fpsCap: 0
+  fpsCap: 0,
+  ctrlMig: CTRL_MIG      // which control migrations this save has already had
 };
 const S = Object.assign({}, DEF);
-try{ const raw = localStorage.getItem('bp2_settings'); if(raw) Object.assign(S, JSON.parse(raw)); }catch(e){}
+let storedSettings = null;
+try{
+  const raw = localStorage.getItem('bp2_settings');
+  if(raw){ storedSettings = JSON.parse(raw); Object.assign(S, storedSettings); }
+}catch(e){}
 const saveSettings = ()=>{ try{ localStorage.setItem('bp2_settings', JSON.stringify(S)); }catch(e){} };
+
+/* One-time control migration. 'doubletap' shipped as the default and it costs
+   you the one thing that makes touch aiming work: the firing finger IS the
+   looking finger, so the view stops while you shoot. Anyone still carrying that
+   default is moved across to 'twofinger' once.
+   A stored value cannot tell a deliberate DOUBLE-TAP from the old default —
+   both are the same string — so this moves both, exactly once. After it runs,
+   ctrlMig is stamped, and choosing DOUBLE-TAP from then on sticks for good. */
+if(storedSettings && (+storedSettings.ctrlMig||0) < CTRL_MIG){
+  if(S.touchMode==='doubletap') S.touchMode='twofinger';
+  S.ctrlMig = CTRL_MIG;
+  saveSettings();
+}
 
 /* ---------------------------- §AUDIO — procedural Web Audio -------- */
 const Audio_ = (function(){
@@ -4600,6 +4623,10 @@ const Input = (function(){
   return {
     update, requestLock,
     isLocked:()=>locked,
+    // the real zone geometry. The instruction overlay draws from these two and
+    // nothing else, so a diagram can never disagree with the input.
+    zoneSplit:()=> window.innerWidth/2,
+    zoneAt(x){ return inMoveZone(x)? 'move' : 'look'; },
     setTouchUI(on){ touchUI.classList.toggle('on', !!on && IS_TOUCH); },
     clear(){
       firing=false; touchFireHeld=false; pendingFire=0;
@@ -4626,8 +4653,8 @@ const SETTINGS_UI = [
   {key:'leftHanded', label:'Stick layout', desc:'Which thumb moves and which thumb looks.',
     opts:[[0,'MOVE LEFT'],[1,'MOVE RIGHT']], touchOnly:true},
   {key:'touchMode', label:'How you shoot',
-    desc:'DOUBLE-TAP: drag the look side to look, double-tap it to fire — hold the second tap down for continuous fire. 2-FINGER: drop a second finger to fire. TAP-FIRE: a quick tap on the look side shoots.',
-    opts:[['doubletap','DOUBLE-TAP'],['twofinger','2-FINGER'],['tapfire','TAP-FIRE']], touchOnly:true},
+    desc:'2-FINGER: keep the look finger down and press a second finger on the same side to fire — hold it for continuous fire. You look and shoot at the same time. DOUBLE-TAP: double-tap the look side to fire, hold the second tap down. TAP-FIRE: a quick tap on the look side shoots.',
+    opts:[['twofinger','2-FINGER'],['doubletap','DOUBLE-TAP'],['tapfire','TAP-FIRE']], touchOnly:true},
   {key:'lookStyle', label:'How you look',
     desc:'HOLD: the look thumb works like a stick — keep it held off centre and the view keeps turning. SWIPE: the view only turns while your thumb is moving.',
     opts:[['hold','HOLD'],['swipe','SWIPE']], touchOnly:true},
@@ -5193,9 +5220,9 @@ function boot(){
   applyCamera(0.016, 0);
 
   $('keyHints').innerHTML = IS_TOUCH ? [
-    ['LEFT THUMB','MOVE · PUSH FAR TO SPRINT'],
-    ['RIGHT THUMB','HOLD OFF-CENTRE TO KEEP TURNING'],
-    ['3RD FINGER','HOLD ANYWHERE TO FIRE'],
+    ['MOVE THUMB','DRAG · PUSH FAR TO SPRINT'],
+    ['LOOK THUMB','HOLD OFF-CENTRE TO KEEP TURNING'],
+    ['SECOND FINGER','PRESS AND HOLD TO FIRE — LOOK THUMB STAYS DOWN'],
     ['1–4','WEAPONS · JUMP &amp; RELOAD ARE AUTO']
   ].map(([k,v])=>'<div><k>'+k+'</k><br>'+v+'</div>').join('')
   : [

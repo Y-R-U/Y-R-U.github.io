@@ -15,14 +15,9 @@ const TRAIN_SP = 300;
 const TRAIN_MAG = 10;       // short drill magazine so the reload step arrives fast
 
 /* ---------------------------- §CARDS ------------------------------------- */
-const CARDS_TOUCH = [
-  ['◄►','LEFT THUMB','Drag anywhere on the left to move. Push it far out to sprint.'],
-  ['◉','RIGHT THUMB','Drag or hold on the right to look. Keep it held off centre and you keep turning.'],
-  ['••','DOUBLE-TAP RIGHT','Tap twice on the right to fire. Hold the second tap down to keep firing.'],
-  ['⌁','HANDS FREE','Jumping, mantling, reloading and aiming happen on their own.'],
-  ['1','WEAPON','The numbered buttons down the side swap weapons you have unlocked.'],
-  ['❚❚','PAUSE','Top right. Settings and these cards live behind it.']
-];
+/* Touch does NOT get a list of cards. It gets §ZONES below: the real touch
+   zones drawn where they really are, over the paused play view. Desktop keeps
+   its card grid — a keyboard has no zones to point at. */
 const CARDS_KEYS = [
   ['W','MOVE','WASD to move, SHIFT to sprint, SPACE to jump.'],
   ['◉','LOOK','Move the mouse. Click the view once to capture the pointer.'],
@@ -31,21 +26,125 @@ const CARDS_KEYS = [
   ['1','WEAPONS','Keys 1–4, or the mouse wheel, for weapons you have unlocked.'],
   ['⎋','PAUSE','ESC pauses. Settings and these cards live behind it.']
 ];
+const NOTES_TOUCH = [
+  'Jumping, mantling, reloading and aiming down the sights all happen on their own.',
+  'The numbered buttons down the side swap weapons · ❚❚ top right pauses.'
+];
 function buildCards(){
-  const list = IS_TOUCH? CARDS_TOUCH : CARDS_KEYS;
-  $('ctrlCards').innerHTML = list.map(([ic,t,d])=>
+  if(IS_TOUCH){
+    $('ctrlCards').innerHTML = '';
+    $('introNotes').innerHTML = NOTES_TOUCH.map(t=>'<div>'+t+'</div>').join('');
+    return;
+  }
+  $('ctrlCards').innerHTML = CARDS_KEYS.map(([ic,t,d])=>
     '<div class="ccard"><div class="ic">'+ic+'</div><div class="tx"><b>'+t+'</b><span>'+d+'</span></div></div>').join('');
+}
+
+/* ---------------------------- §ZONES ------------------------------------- */
+/* The instruction overlay. Left/right are never assumed: which half moves and
+   where the split falls both come out of the input code itself. */
+const lookSide = ()=> G.S.leftHanded? 'LEFT' : 'RIGHT';
+const moveSide = ()=> G.S.leftHanded? 'RIGHT' : 'LEFT';
+
+function zoneCopy(){
+  const m = G.S.touchMode;
+  const move = ['<b>ONE FINGER</b> anywhere in this half — press and drag to move.',
+                'Push it far out and you <b>SPRINT</b>.'];
+  if(m==='doubletap') return {move,
+    lookTitle:'LOOK · DOUBLE-TAP TO FIRE', dots:1,
+    look:['<b>ONE FINGER</b> — hold it off centre and the view keeps turning.',
+          '<b>DOUBLE-TAP</b> in here to fire. Hold the second tap down to keep firing.'],
+    key:'THE TAP THAT FIRES IS THE FINGER THAT LOOKS. SWITCH TO 2-FINGER IN SETTINGS TO LOOK AND SHOOT AT ONCE.'};
+  if(m==='tapfire') return {move,
+    lookTitle:'LOOK · TAP TO FIRE', dots:1,
+    look:['<b>ONE FINGER</b> — hold it off centre and the view keeps turning.',
+          '<b>A QUICK TAP</b> in here fires one round.'],
+    key:'A TAP FIRES, A HOLD LOOKS — THE SAME FINGER DOES BOTH. SWITCH TO 2-FINGER IN SETTINGS TO LOOK AND SHOOT AT ONCE.'};
+  return {move,
+    lookTitle:'LOOK &amp; SHOOT', dots:2,
+    look:['<b>❶ ONE FINGER</b> — hold it off centre and the view keeps turning. <b>It never lifts.</b>',
+          '<b>❷ A SECOND FINGER</b> in here fires. Hold it down and it keeps firing.'],
+    key:'KEEP THE LOOK FINGER DOWN AND PUT A SECOND FINGER BESIDE IT — YOU LOOK AND SHOOT AT THE SAME TIME.'};
+}
+
+function buildZones(){
+  const c = zoneCopy();
+  const dots = c.dots===2
+    ? '<i class="idot">❶</i><i class="idot two">❷</i>'
+    : '<i class="idot">❶</i>';
+  $('introZones').innerHTML =
+    '<div class="izone move"><div class="izlab">' +
+      '<b class="zt">MOVE · '+moveSide()+'</b>' +
+      '<div class="idots"><i class="idot">❶</i></div>' +
+      '<div class="izl">'+c.move.map(t=>'<p>'+t+'</p>').join('')+'</div>' +
+    '</div></div>' +
+    '<div class="izone look"><div class="izlab">' +
+      '<b class="zt">'+c.lookTitle+' · '+lookSide()+'</b>' +
+      '<div class="idots">'+dots+'</div>' +
+      '<div class="izl">'+c.look.map(t=>'<p>'+t+'</p>').join('')+'</div>' +
+    '</div></div>';
+  $('introKey').innerHTML = c.key;
+}
+
+/* Position the two rects from the live input geometry, then drop the label
+   blocks into the gap between the heading above and the button row below. */
+function layoutZones(){
+  if(!IS_TOUCH) return;
+  const z = $('introZones');
+  const mv = z.querySelector('.izone.move'), lk = z.querySelector('.izone.look');
+  if(!mv || !lk) return;
+  const W = window.innerWidth, H = window.innerHeight;
+  const split = G.Input.zoneSplit();
+  const moveLeft = G.Input.zoneAt(1)==='move';
+  const put=(el,x0,x1)=>{ el.style.left=x0+'px'; el.style.width=(x1-x0)+'px';
+                          el.style.top='0px'; el.style.height=H+'px'; };
+  if(moveLeft){ put(mv,0,split); put(lk,split,W); }
+  else        { put(lk,0,split); put(mv,split,W); }
+  const keyB = $('introKey').getBoundingClientRect();
+  const footB= $('introNotes').getBoundingClientRect();
+  const top = Math.max(keyB.bottom+9, H*0.14);
+  const bot = Math.max(top+60, Math.min(footB.top-9, H-8));
+  const labs = [...z.querySelectorAll('.izlab')];
+  for(const el of labs){
+    el.style.top = top.toFixed(1)+'px';
+    el.style.height = (bot-top).toFixed(1)+'px';
+    el.style.paddingTop = '0px';
+    for(const k of el.children) k.style.minHeight = '';
+  }
+  // The two halves have to read as one diagram, so row i is the same height on
+  // both sides. Without this the longer heading wraps to two lines and drags
+  // that side's dots and copy a line lower than the other's.
+  const rows = Math.max(...labs.map(el=>el.children.length));
+  for(let i=0;i<rows;i++){
+    let h=0;
+    for(const el of labs){ const k=el.children[i]; if(k) h=Math.max(h, k.getBoundingClientRect().height); }
+    for(const el of labs){ const k=el.children[i]; if(k) k.style.minHeight = h.toFixed(1)+'px'; }
+  }
+  // Then drop the pair to the bottom of the band, over where the thumbs they
+  // describe actually rest. They only ride up if the copy outgrows the gap.
+  const contentH = el => { const k=el.children;
+    return k.length? k[k.length-1].getBoundingClientRect().bottom - k[0].getBoundingClientRect().top : 0; };
+  let maxH=0; for(const el of labs) maxH=Math.max(maxH, contentH(el));
+  const pad = Math.max(0, (bot-top)-maxH);
+  for(const el of labs) el.style.paddingTop = pad.toFixed(1)+'px';
 }
 
 /* ---------------------------- §STEPS ------------------------------------- */
 // Every test reads a counter that the poll loop keeps from live game state.
 const C = {moved:0, turned:0, shots:0, hits:0, reloads:0, ads:0, downs:0};
+// Touch hints are read live: they have to follow leftHanded and the fire mode.
+const fireHint = ()=>{
+  const m = G.S.touchMode;
+  if(m==='doubletap') return 'Double-tap the '+lookSide().toLowerCase()+' side';
+  if(m==='tapfire')   return 'Quick tap on the '+lookSide().toLowerCase()+' side';
+  return 'Keep the look finger down, press a second finger beside it';
+};
 const STEPS = [
-  {id:'move',   text:'MOVE',                hint: IS_TOUCH? 'Drag the left side of the screen' : 'W A S D',
+  {id:'move',   text:'MOVE',                hint: IS_TOUCH? ()=>'Drag the '+moveSide().toLowerCase()+' side of the screen' : 'W A S D',
    test:()=>C.moved>3},
-  {id:'look',   text:'LOOK AROUND',         hint: IS_TOUCH? 'Drag or hold the right side' : 'Move the mouse',
+  {id:'look',   text:'LOOK AROUND',         hint: IS_TOUCH? ()=>'Hold the '+lookSide().toLowerCase()+' side off centre' : 'Move the mouse',
    test:()=>C.turned>1.2},
-  {id:'fire',   text:'FIRE',                hint: IS_TOUCH? 'Double-tap the right side' : 'Mouse 1',
+  {id:'fire',   text:'FIRE',                hint: IS_TOUCH? fireHint : 'Mouse 1',
    test:()=>C.shots>=1},
   {id:'hit',    text:'HIT A TARGET',        hint:'Put paint on one of them',
    test:()=>C.hits>=1},
@@ -76,6 +175,7 @@ function showIntro(mode, back){
   introMode = mode||'boot';
   introBack = back||'pause';
   buildCards();
+  if(IS_TOUCH){ $('introScreen').classList.add('zones'); buildZones(); }
   $('startScreen').classList.add('hidden');
   $('endScreen').classList.add('hidden');
   $('pauseScreen').classList.add('hidden');
@@ -87,8 +187,15 @@ function showIntro(mode, back){
   $('introPrompt').textContent = boot? (IS_TOUCH?'TAP ANYWHERE TO BEGIN':'CLICK ANYWHERE TO BEGIN') : '';
   $('introPrompt').style.display = boot? '' : 'none';
   $('introScreen').classList.remove('hidden');
+  if(IS_TOUCH){ layoutZones(); requestAnimationFrame(layoutZones); }
 }
 function hideIntro(){ $('introScreen').classList.add('hidden'); }
+window.addEventListener('resize', ()=>{
+  if(IS_TOUCH && !$('introScreen').classList.contains('hidden')) requestAnimationFrame(layoutZones);
+});
+window.addEventListener('orientationchange', ()=>{
+  if(IS_TOUCH && !$('introScreen').classList.contains('hidden')) setTimeout(layoutZones, 260);
+});
 
 function introAction(){
   if(introMode==='boot'){
@@ -105,6 +212,7 @@ function introAction(){
 
 /* ---------------------------- §RUN --------------------------------------- */
 function setBar(on){ $('tutHud').classList.toggle('hidden', !on); }
+const stepHint = s => !s? '' : (typeof s.hint==='function'? s.hint() : s.hint);
 
 function paintStep(){
   const s = STEPS[stepI];
@@ -116,7 +224,7 @@ function paintStep(){
   } else {
     bar.classList.remove('done');
     $('tutStep').textContent = (stepI+1)+'. '+s.text;
-    $('tutHint').textContent = s.hint;
+    $('tutHint').textContent = stepHint(s);
   }
   $('tutDots').innerHTML = STEPS.map((_,i)=>
     '<i class="'+(i<stepI?'on':(i===stepI&&!finished?'cur':''))+'"></i>').join('');
@@ -299,7 +407,18 @@ if(!Profile.get().trainingDone){
 requestAnimationFrame(tick);
 
 const Tutorial = {
-  STEPS, showIntro, hideIntro, skip, beginRun,
+  STEPS, showIntro, hideIntro, skip, beginRun, layoutZones,
+  hints:()=>STEPS.map(stepHint),
+  // what the overlay actually drew, for comparison against Input's own zones
+  zoneRects(){
+    const out={};
+    for(const el of $('introZones').querySelectorAll('.izone')){
+      const b=el.getBoundingClientRect();
+      out[el.classList.contains('move')?'move':'look'] =
+        {left:+b.left.toFixed(1), right:+b.right.toFixed(1), top:+b.top.toFixed(1), bottom:+b.bottom.toFixed(1)};
+    }
+    return out;
+  },
   introVisible:()=>!$('introScreen').classList.contains('hidden'),
   // the war beat is the radio over the live round now, not a screen
   warVisible:()=>warRunning || !$('warScreen').classList.contains('hidden'),

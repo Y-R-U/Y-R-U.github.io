@@ -42,17 +42,23 @@ ok('CANARY(errors): collector catches a deliberate throw', sawCanary, sawCanary?
 for(let i=errors.length-1;i>=0;i--) if(/CANARY/.test(errors[i])) errors.splice(i,1);
 
 console.log('\n=== 2. INSTRUCTION SCREEN ===');
-let s = await ev(`({intro:BP2.Tutorial.introVisible(), state:__game.GAME.state, start:!document.getElementById('startScreen').classList.contains('hidden'), cards:document.querySelectorAll('.ccard').length, mode:__game.S.touchMode})`);
+let s = await ev(`({intro:BP2.Tutorial.introVisible(), state:__game.GAME.state, start:!document.getElementById('startScreen').classList.contains('hidden'),
+  cards:document.querySelectorAll('.ccard').length, zones:Object.keys(BP2.Tutorial.zoneRects()).length,
+  pulse:document.querySelectorAll('#introZones .idot.two').length,
+  scrim:getComputedStyle(document.getElementById('introScreen')).backgroundColor,
+  mode:__game.S.touchMode})`);
 ok('fresh profile boots into the instruction screen, paused', s.intro && s.state==='menu' && !s.start, JSON.stringify(s));
-ok('control cards rendered (6)', s.cards===6, 'cards='+s.cards);
-ok("default touch mode is 'doubletap'", s.mode==='doubletap', s.mode);
+ok('touch gets the zone overlay, not a card list', s.zones===2 && s.cards===0, `zones=${s.zones} cards=${s.cards}`);
+ok('the second finger is shown as a pulsing dot', s.pulse===1, 'pulsing dots='+s.pulse);
+ok('the overlay is a scrim, so the live scene shows through', /rgba\(/.test(s.scrim) && !/, *1\)$/.test(s.scrim), s.scrim);
+ok("default touch mode is 'twofinger' on a fresh profile", s.mode==='twofinger', s.mode);
 // a tap in the middle of the screen (not on the buttons) must start it
 await tstart(W/2, H*0.42); await sleep(40); await tend(); await sleep(900);
 s = await ev(`({intro:BP2.Tutorial.introVisible(), state:__game.GAME.state, lvl:__game.levelInfo().id, bar:BP2.Tutorial.barVisible(), step:BP2.Tutorial.state().step})`);
 ok('one tap dismisses it and deploys into L0', !s.intro && s.state==='play' && s.lvl===0, JSON.stringify(s));
 ok('tutorial bar visible, first step is MOVE', s.bar && s.step==='move', s.step);
 
-console.log('\n=== 3. DOUBLE-TAP FIRE SCHEME ===');
+console.log('\n=== 3. TOUCH FIRE SCHEMES ===');
 await ev(`__game.S.aimAssist=0; __game.S.mobileADS='off'; __game.applySettings()`);
 const shots=()=>ev('__game.GAME.stats.shots');
 const ammo =()=>ev('__game.ammo().mag');
@@ -64,6 +70,31 @@ const readyGun=async(n=8)=>{ for(let i=0;i<30;i++){ if(await ev(`__game.Weapons.
 const s0 = await shots(); await sleep(600); const s0b = await shots();
 ok('CANARY(fire): no taps => shot counter does NOT move', s0b===s0, `shots ${s0} -> ${s0b}`);
 
+// the default scheme first: hold to look, second finger fires
+let tid=200;
+const twoFinger = async (ms, drag)=>{
+  const a=++tid, b=++tid;
+  await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:RX(),y:RY(),id:a}]});
+  await sleep(90);
+  await send('Input.dispatchTouchEvent',{type:'touchStart',
+    touchPoints:[{x:RX(),y:RY(),id:a},{x:RX()-58,y:RY()+78,id:b}]});
+  if(drag){ for(let i=1;i<=6;i++){
+    await send('Input.dispatchTouchEvent',{type:'touchMove',
+      touchPoints:[{x:RX()-i*16,y:RY(),id:a},{x:RX()-58,y:RY()+78,id:b}]});
+    await sleep(ms/6); } }
+  else await sleep(ms);
+  await tend(); await sleep(250);
+};
+await readyGun(20);
+const tf1=await ev('({mag:__game.ammo().mag, yaw:+__game.player.yaw.toFixed(4)})');
+await twoFinger(600, true);
+const tf2=await ev('({mag:__game.ammo().mag, yaw:+__game.player.yaw.toFixed(4)})');
+ok('DEFAULT: a second finger fires WHILE the look finger keeps turning the view',
+   tf2.mag<tf1.mag && Math.abs(tf2.yaw-tf1.yaw)>0.05,
+   `mag ${tf1.mag} -> ${tf2.mag}, yaw ${tf1.yaw} -> ${tf2.yaw}`);
+ok('DEFAULT: holding the second finger empties more than one round', (tf1.mag-tf2.mag)>1, `${tf1.mag-tf2.mag} rounds`);
+
+await ev(`__game.S.touchMode='doubletap'`);
 // single tap: look only, must not fire
 const a1=await shots();
 await tstart(RX(),RY()); await sleep(60); await tend(); await sleep(500);
@@ -117,23 +148,14 @@ const e2=await ev('({mag:__game.ammo().mag, yaw:+__game.player.yaw.toFixed(4)})'
 ok('the held firing tap still looks while it fires', e2.mag<e1.mag && Math.abs(e2.yaw-e1.yaw)>0.05,
    `mag ${e1.mag} -> ${e2.mag}, yaw ${e1.yaw} -> ${e2.yaw}`);
 
-// the other two modes still work
-await ev(`__game.S.touchMode='twofinger'`);
-await readyGun();
-const f1=await ammo();
-await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:RX(),y:RY(),id:1}]});
-await sleep(60);
-await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:RX(),y:RY(),id:1},{x:RX()-60,y:RY()+80,id:2}]});
-await sleep(400); await tend(); await sleep(250);
-const f2=await ammo();
-ok("'twofinger' mode still fires on a second finger", f2<f1, `mag ${f1} -> ${f2}`);
+// the third mode still works
 await ev(`__game.S.touchMode='tapfire'`);
 await readyGun();
 const g1=await ammo();
-await tstart(RX(),RY()); await sleep(60); await tend(); await sleep(350);
+await tstart(RX(),RY(),++tid); await sleep(60); await tend(); await sleep(350);
 const g2=await ammo();
 ok("'tapfire' mode still fires on a single tap", g2<g1, `mag ${g1} -> ${g2}`);
-await ev(`__game.S.touchMode='doubletap'`);
+await ev(`__game.S.touchMode='twofinger'`);
 
 console.log('\n=== 4. PAINTBALL ===');
 const pb = await ev(`({paint:__game.paintball(), fx:__game.FX.isPaint(), allowed:__game.weaponAllowed()})`);
@@ -173,11 +195,13 @@ await sleep(400); await tend(); await sleep(250);
 st = await ev('BP2.Tutorial.state()');
 ok('LOOK advances only after the view really turns', st.stepI>=2 && st.counters.turned>1.2, `step=${st.step} turned=${st.counters.turned.toFixed(2)}`);
 
-// FIRE — by real double-tap
-await tstart(RX(),RY()); await sleep(45); await tend(); await sleep(90);
-await tstart(RX(),RY()); await sleep(120); await tend(); await sleep(350);
+// FIRE — with the default scheme: look finger down, second finger fires
+await twoFinger(450, false);
 st = await ev('BP2.Tutorial.state()');
-ok('FIRE advances on a real double-tap shot', st.stepI>=3 && st.counters.shots>=1, `step=${st.step} shots=${st.counters.shots}`);
+ok('FIRE advances on a real second-finger shot', st.stepI>=3 && st.counters.shots>=1, `step=${st.step} shots=${st.counters.shots}`);
+const hints = await ev('BP2.Tutorial.hints()');
+ok('no drill step teaches double-tap firing on the default scheme',
+   !hints.some(h=>/double.?tap/i.test(h)), JSON.stringify(hints[2]));
 
 // HIT — reposition to a spot with line of sight, aim, shoot. The targets
 // patrol, so every shot repeats the whole setup rather than trusting the last one.
@@ -279,7 +303,7 @@ const back = await ev(`(()=>{document.getElementById('btnIntroGo').click();
 ok('closing it returns to the pause screen, still paused', !back.intro && back.pause && back.state==='pause', JSON.stringify(back));
 const setRow = await ev(`(()=>{const o=[...document.querySelectorAll('#setBody .seg')].map(s=>[...s.children].map(b=>b.textContent));
   return o.filter(r=>r.indexOf('DOUBLE-TAP')>=0)[0]||null;})()`);
-ok('settings still offer all three touch modes', setRow && setRow.join()==='DOUBLE-TAP,2-FINGER,TAP-FIRE', JSON.stringify(setRow));
+ok('settings still offer all three touch modes, default first', setRow && setRow.join()==='2-FINGER,DOUBLE-TAP,TAP-FIRE', JSON.stringify(setRow));
 
 console.log('\n=== 8. PAINTBALL IS LEVEL-DRIVEN (falsify) ===');
 const live = await ev(`(()=>{__game.loadLevel(1);__game.S.god=0;const hp0=__game.player.hp;const r=__game.hurt(500);
@@ -292,21 +316,30 @@ ok('weapon buttons follow the unlock ladder on live levels', JSON.stringify(l1w.
 console.log('\n=== 9. LAYOUT: PORTRAIT + LANDSCAPE ===');
 const layoutCheck = async (label,w,h)=>{
   W=w;H=h; await viewport(w,h);
-  await ev(`BP2.Tutorial.showIntro('view','start')`); await sleep(350);
-  const r = await ev(`(()=>{const c=[...document.querySelectorAll('.ccard')];
-    const vw=innerWidth, vh=innerHeight;
-    let off=0, tiny=0, minFont=99;
-    for(const el of c){const b=el.getBoundingClientRect();
-      if(b.left< -1 || b.right>vw+1) off++;
-      if(b.width<90||b.height<24) tiny++;
-      const f=parseFloat(getComputedStyle(el.querySelector('span')).fontSize); if(f<minFont)minFont=f;}
+  await ev(`BP2.Tutorial.showIntro('view','start')`); await sleep(400);
+  const r = await ev(`(()=>{const vw=innerWidth, vh=innerHeight;
+    const z=BP2.Tutorial.zoneRects(), half=__game.Input.zoneSplit();
+    const txt=[...document.querySelectorAll('#introZones .izl p, #introZones .zt, #introKey, #introNotes div')];
+    let off=0, minFont=99;
+    for(const el of txt){const b=el.getBoundingClientRect();
+      if(b.width>2 && (b.left<-1 || b.right>vw+1)) off++;
+      const f=parseFloat(getComputedStyle(el).fontSize); if(f<minFont)minFont=f;}
+    const labs=[...document.querySelectorAll('.izlab')].map(e=>e.getBoundingClientRect());
+    const key=document.getElementById('introKey').getBoundingClientRect();
+    const notes=document.getElementById('introNotes').getBoundingClientRect();
     const btn=document.getElementById('btnIntroGo').getBoundingClientRect();
-    const card=document.querySelector('#introScreen .card');
-    return {n:c.length, off, tiny, minFont, vw, vh,
+    return {z, half:+half.toFixed(1), off, minFont, vw, vh,
+      dots:document.querySelectorAll('#introZones .idot').length,
+      labsClear: labs.every(b=>b.top>=key.bottom-1 && b.bottom<=notes.top+1 && b.height>=60),
+      covers: Math.abs(Math.min(z.move.left,z.look.left))<1.5 &&
+              Math.abs(Math.max(z.move.right,z.look.right)-vw)<1.5 &&
+              Math.abs(z.move.bottom-vh)<1.5 && Math.abs(z.look.bottom-vh)<1.5,
       btnOn: btn.top>=0 && btn.bottom<=vh+1 && btn.width>=90 && btn.height>=36,
-      hscroll: document.documentElement.scrollWidth>vw || document.body.scrollWidth>vw,
-      cardScrollable: card.scrollHeight<=card.clientHeight+1};})()`);
-  ok(label+': all 6 cards on screen, readable', r.n===6 && r.off===0 && r.tiny===0 && r.minFont>=10, JSON.stringify(r));
+      hscroll: document.documentElement.scrollWidth>vw || document.body.scrollWidth>vw};})()`);
+  ok(label+': both zones fill the screen, split on the real boundary, text readable',
+     r.covers && r.off===0 && r.minFont>=10 && r.dots===3, JSON.stringify({covers:r.covers,off:r.off,f:r.minFont,dots:r.dots,z:r.z}));
+  ok(label+': the zone labels sit clear of the heading above and the button row below',
+     r.labsClear, JSON.stringify(r.z));
   ok(label+': primary action reachable, no horizontal page scroll', r.btnOn && !r.hscroll, `btnOn=${r.btnOn} hscroll=${r.hscroll}`);
   await ev(`BP2.Tutorial.hideIntro()`);
 };

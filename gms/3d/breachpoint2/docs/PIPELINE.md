@@ -1030,3 +1030,57 @@ PLAYTEST.md warns about it so it does not waste Aaron's time.
 **That barrel stack has now caused two separate connectivity defects.** Whoever fixes the pocket should
 look at `barrelStack(24.0, 24.5, 4)` itself rather than at the symptom — the quay corridor is too narrow
 for a scattering prop.
+
+## P6 CLOSED 2026-09-18 — the touch scheme restored, and the instruction screen Aaron asked for
+
+Aaron's "single tap on right move camera, double tap on right shoots" was **instruction copy he was
+drafting**, not a spec. It was read as a spec, a `doubletap` mode was built, and it was made the default —
+which replaced the scheme he had already validated in Breachpoint I. His correction:
+
+> "Version 1 had it correct as it allows you to look around and shoot at the same time. Holding 1 finger to
+> look and a 2nd to shoot works well — it just needed instructions, not a change to how it works."
+
+**`S.touchMode` default is `'twofinger'` again.** `doubletap` and `tapfire` stay as settings options,
+`doubletap` second in the list. A one-shot migration (`ctrlMig`, `CTRL_MIG=1`) moves a stored `'doubletap'`
+across exactly once and stamps the save, so a deliberate DOUBLE-TAP chosen afterwards is never stomped.
+
+### The property, proven directly (`tests/controls_test.mjs` §3)
+One finger held off centre on the look side, a **second finger put down beside it and held 840 ms**, both
+down for the whole gesture:
+
+| | yaw | magazine |
+|---|---|---|
+| two fingers | **Δ2.382 rad** | **24 → 14** (10 rounds) |
+| CANARY: identical gesture, one finger | Δ2.425 rad | 24 → 24 (**0 rounds**) |
+| left-handed, sides swapped | Δ2.467 rad | 24 → 13 |
+
+The canary is the whole point: the check is **proven capable of failing**. Turning alone does not fire.
+
+### The instruction screen is the paused play view, not a card list
+Touch gets `§ZONES` in `tutorial.js`: the real touch rectangles drawn over the live yard, positioned from
+`Input.zoneSplit()` / `Input.zoneAt()` and nothing else, so the diagram **cannot drift from the input**.
+41 sample points per configuration are compared against `Input.zoneAt()` itself, in portrait and landscape,
+`leftHanded` 0 and 1 — and a deliberately mis-drawn rect is caught (13 mismatches) before it is put back.
+Desktop keeps its card grid; a keyboard has no zones to point at.
+
+`layoutZones()` equalises **row heights across the two halves** before positioning them. Without that the
+longer heading ("LOOK & SHOOT · RIGHT") wraps to two lines in portrait and drags that side's dots and copy
+a line below the other's. The pair is then bottom-aligned into the band between the key line and the
+footer — **over where the thumbs actually rest**, not floating mid-screen. Measured: portrait 390×844 both
+blocks 482.1 → 677 of 844 (80% down); landscape 844×390 both 186.3 → 290 of 390. Identical top **and**
+bottom on both sides in all four configurations.
+
+### Suite results at the close of P6
+`boot` 44/44 · `controls_test` **43/43** · `desktop` 7/7 · `split` 40/40 · `p2` 62/62 ·
+`p3` **69/70** (the documented STEADY assist-cone timing flake, pre-existing) · `p4` 97/97 · `p4b` 63/63 ·
+`p4c` 33/33 · `p5` 26/26 · `p5b` 41/41 · `p5c` 60/60. Zero console errors anywhere.
+
+### Verified, not assumed
+- Blocked `localStorage` (a private window with site data off): the game **boots in memory** on the
+  default scheme, level 0, 0 SP, instruction screen up, canvas alive, zero errors escaping the guards.
+  `controls_test` §7 proves the block is real before it asserts anything about it.
+- Every console hook at the top of `PLAYTEST.md` was executed against the live `window.__game`, not copied
+  from memory: `grantSP`, `loadLevel` (0–9, 9 = ENDLESS), `god`, `Profile.unlock/setRank/clearLevel/
+  noteFail`, `Campaign.openHub`, `Armoury.open`. All present, all doing what the line claims.
+  `__game.god(1)` sets the harness `GOD` flag, **not** `S.god`, so the GOD button does not light — the doc
+  now says so.

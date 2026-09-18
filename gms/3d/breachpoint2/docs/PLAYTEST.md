@@ -1,5 +1,33 @@
 # BREACHPOINT II — what to look for
 
+## If you test in an incognito window — read this first
+
+Incognito means **no saved profile, every time**: level 0, 0 SP, rifle only, the instruction screen every
+run. That is the right way to test the opening, but it means you never see the campaign, the armoury, the
+threat readout or levels 2–8 unless you ask for them. Open the console and paste any of these:
+
+```js
+__game.grantSP(30000)                       // enough SP for most of the shop
+__game.loadLevel(4)                         // jump straight into any level 0-9 (9 = endless)
+BP2.Profile.unlock('pistol')                // also 'shotgun', 'sniper' — skips the cost AND the level gate
+['pistol','shotgun','sniper'].forEach(id=>BP2.Profile.unlock(id))
+BP2.Profile.setRank('plating',5)            // tracks: vitality plating marksman steady logistics mobility
+BP2.Profile.clearLevel(3)                   // mark 0-8 cleared, which opens the next one in the hub
+[0,1,2,3,4,5].forEach(n=>BP2.Profile.clearLevel(n))   // open the campaign hub right up
+BP2.Campaign.openHub()                      // the hub screen · BP2.Armoury.open() for the armoury
+__game.S.touchMode='doubletap'              // 'twofinger' (default) · 'doubletap' · 'tapfire'
+__game.god(1)                               // stop dying while you look around (so does the GOD button, top right)
+```
+
+The **stuck-player debrief** only escalates on *consecutive* losses on one level, so to see all three tiers:
+
+```js
+BP2.Profile.noteFail(4); BP2.Profile.noteFail(4)   // now lose level 4 once for the tier-3 debrief
+```
+
+Settings → CAREER → RESET PROGRESS wipes it all again. Everything above is the game's own code, not a
+cheat layer — `__game` is the same handle the test suites drive.
+
 Everything in this project is headless evidence about *correctness*. None of it is evidence about whether
 the game is any good. This is the short list of things only you can answer, roughly in the order you will
 hit them. **Play it once without reading past the first section, then come back.**
@@ -31,14 +59,14 @@ It is the first thing you see and the game is paused behind it. You have not tou
 being asked to explain a control scheme in the abstract. Does it? Or does it only make sense *afterwards*,
 which is the same as not making sense.
 
-**2. Does double-tap-to-fire feel right under a thumb, or does it fight you?**
-A single tap on the right-hand side of the screen looks; a **double-tap within about a quarter of a second**
-fires, and **holding the second tap down** empties the magazine. It was chosen so that aiming never fires by
-accident. The question is whether it costs you shots you meant to take — whether you find yourself
-double-tapping and getting nothing, or swinging the camera when you meant to shoot. Try it while moving,
-which is when it matters. Settings has two alternatives under CONTROLS — **2-FINGER** (drop a
-second finger anywhere to fire) and **TAP-FIRE** (a single quick tap shoots) — plus a HOLD/SWIPE choice for
-how the look thumb behaves and a left/right stick swap. Say which combination you ended up on and why.
+**2. Does the two-finger scheme read clearly from the instruction screen alone?**
+The default is the one from the first Breachpoint: **hold a finger on the look side to look, put a second
+finger down beside it to fire, and hold it to keep firing.** Both fingers work at the same time, so the view
+keeps turning while you shoot — that is the whole point of it. The question is not whether it works (it
+does); it is whether the instruction screen *tells you* that, before you have played. It now draws the real
+touch zones over the paused yard with the second finger pulsing in the look zone. Settings still has
+**DOUBLE-TAP** and **TAP-FIRE** under CONTROLS, plus a HOLD/SWIPE choice for the look thumb and a left/right
+stick swap. Say which combination you ended up on and why.
 
 **3. Does the war beat land?**
 Near the end of the paintball drill the PA cuts out mid-sentence and you get conscripted. It plays as six
