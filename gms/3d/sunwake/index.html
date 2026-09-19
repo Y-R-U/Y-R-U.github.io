@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#082f3d">
+  <meta name="description" content="SUNWAKE — an ocean in the last light. Sail a little launch through a sunset sea.">
+  <title>SUNWAKE · Apricot Passage</title>
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <div id="boot" role="status" style="position:fixed;inset:0;z-index:100;background:#082f3d;color:#fff0d0;padding:10vh 8vw;font:16px/1.6 system-ui">
+    <h1 id="boot-title">SUNWAKE</h1><p id="boot-detail" style="white-space:pre-wrap;overflow-wrap:anywhere">Finding the last light…</p>
+    <button id="reload" hidden style="font:inherit;padding:12px 24px">Reload SUNWAKE</button>
+  </div>
+  <script>
+  (() => {
+    let failed = false;
+    window.__SUNWAKE_BOOTED__ = false;
+    window.sunwakeFail = (message) => {
+      failed = true;
+      window.__SUNWAKE_FAILED__ = String(message);
+      window.__SUNWAKE_BOOTED__ = false;
+      document.getElementById('boot').style.display = 'block';
+      document.getElementById('boot-title').textContent = 'SUNWAKE could not continue';
+      document.getElementById('boot-detail').textContent = String(message);
+      document.getElementById('reload').hidden = false;
+    };
+    window.onerror = (message, file, line) => window.sunwakeFail(`${message}\n${file || ''}:${line || ''}`);
+    window.addEventListener('error', (e) => {
+      if (e.target !== window && (e.target.src || e.target.href)) window.sunwakeFail('A file failed to load:\n' + (e.target.src || e.target.href));
+    }, true);
+    window.addEventListener('unhandledrejection', (e) => window.sunwakeFail(e.reason?.stack || e.reason));
+    const watchdog = setTimeout(() => {
+      if (!window.__SUNWAKE_BOOTED__) window.sunwakeFail('Loading timed out after 15 seconds. Check the connection and reload.');
+    }, 15000);
+    window.sunwakeBoot = () => {
+      if (failed) return;
+      clearTimeout(watchdog);
+      window.__SUNWAKE_BOOTED__ = true;
+      document.getElementById('boot').style.display = 'none';
+    };
+    document.getElementById('reload').onclick = () => location.reload();
+  })();
+  </script>
+  <link rel="stylesheet" href="style.css">
+  <canvas id="sea" aria-label="Sunset ocean" tabindex="0"></canvas>
+  <header id="hud"><a class="wordmark" href="./">SUNWAKE<span>APRICOT PASSAGE</span></a><div id="bearing">W <span>270°</span></div><button id="pause" aria-label="Pause sailing" hidden>Ⅱ</button></header>
+  <section id="title" class="sheet">
+    <div class="eyebrow">AN OCEAN IN THE LAST LIGHT</div><h1>Follow<br>the sun.</h1>
+    <p>Deep water. A little launch.<br>A horizon that keeps going.</p>
+    <button id="start" class="primary">Cast off <span>↗</span></button>
+    <small>WASD / ARROWS TO SAIL · P TO PAUSE</small>
+  </section>
+  <section id="paused" class="sheet" hidden><div class="eyebrow">A MOMENT BETWEEN WAVES</div><h2>Stay awhile.</h2><p>The ocean will wait.</p><button id="resume" class="primary">Return to the water <span>↗</span></button></section>
+  <div id="helm" hidden>
+    <div class="helm-status"><span>OPEN WATER</span><strong id="speed">0.0 kn</strong><small>W / S ahead &amp; astern · A / D steer</small></div>
+    <div class="rudder-wrap"><button id="rudder" aria-label="Rudder: drag left or right"><span>PORT <i>·</i> STARBOARD</span><b>↔</b></button><small>HOLD &amp; SLIDE</small></div>
+    <div class="throttle-wrap"><button id="ahead" aria-label="Hold to go ahead">AHEAD <span>↑</span></button><button id="astern" aria-label="Hold to go astern">ASTERN <span>↓</span></button></div>
+  </div>
+  <footer id="study" hidden><span>APRICOT PASSAGE <i> / </i> WATER STUDY</span><div><button id="turn">Look east ↗</button><button id="height">At the waterline</button></div></footer>
+  <script type="importmap">
+  { "imports": {
+      "three": "../../lib/three/0.180.0/three.module.js",
+      "three/addons/": "../../lib/three/0.180.0/addons/"
+  } }
+  </script>
+  <script type="module" src="js/main.mjs"></script>
+</body>
+</html>

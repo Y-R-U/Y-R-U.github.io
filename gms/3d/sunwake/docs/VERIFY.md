@@ -1,0 +1,194 @@
+# SUNWAKE verification — M1 / M2 / M3 / M4
+
+Verification date: 2026-09-19 Australia/Brisbane (2026-09-18 UTC).
+Scope: M1 sunset shell and harness; M2 water; M3 playable launch; M4 solid shores.
+M5–M8 are not implemented or accepted. The M1/M2 sections below are the original
+record and were not rewritten; the M3/M4 sections at the end are this session's.
+
+## Reproduce
+
+Run from `gms/3d/sunwake/`:
+
+```sh
+curl -I http://127.0.0.1:8888/gms/3d/sunwake/
+node tools/sim.mjs
+node tools/sim.mjs --suite waves
+~/.claude/bin/cdp start --port 9223
+node tools/browser.mjs
+```
+
+The server already serves the repo root. Never restart it or serve this folder alone. In this command runner, keep the launcher and browser test in **one shell execution**, separated by a newline: child-process cleanup otherwise stops Chrome between calls. Local socket access needs network-capable execution. Node v24.15.0 is installed; harness requires Node 22+ with built-in fetch/WebSocket. No dependency install/build step.
+
+Focused browser suites: `--suite shell`, `--suite preview`, `--suite water`. No flag runs both shell and water. `CDP_PORT` defaults to 9223; `BASE` defaults to the local SUNWAKE URL. The harness never launches Chrome itself, creates a new tab per scenario, closes it in `finally`, and disables cache before navigating. Successful scenarios reject every collected console error, runtime exception, network failure, HTTP error, and shader diagnostic. Fault-injection scenarios require a readable failure panel and whitelist only the intended diagnostics.
+
+## M1
+
+Passed: same-origin boot, exact vendored import map, successful first frame before boot flag, real mouse start/resume, real Escape pause, frozen time on pause. Failed module request, deliberately malformed module source, failed CSS request, unavailable WebGL2, and deliberately invalid GLSL all produce readable errors with reload actions. These injected errors are expected tests, not clean-run errors.
+
+Original flat-shell evidence is `m1-title.png` and `m1-shell.png`. The final shell regression uses `m2-title.png` and `m2-shell-regression.png` so it does not overwrite those historical images. Fault images are `m1-failure-*.png` (latest regression of the M1 error gates).
+
+## M2 numeric and render gates
+
+- Pure Node production imports pass 20,000 deterministic height/slope/velocity/normal/derivative/continuity cases, signed chunk/lattice boundaries, large-coordinate rebase phase equivalence, ripple wrapping, and manifold topology/winding/index checks for every tier.
+- A1 runtime bounds: height ±1.2700000000000002 m; slope ≤0.4101523742186674; vertical speed ≤2.135801663257494 m/s. Crest foam starts at 70% of the current height bound, 0.889 m at SEA_STATE=1.
+- Maximum derivative difference observed: 1.8153e-8 (required <1e-6). Double-precision phase/rebase difference: 4.864e-10 m.
+- Exact water geometry: high 49,153 vertices / 98,048 triangles; standard 30,721 / 61,248; low 16,385 / 32,640. Uint16 indices, one water draw. Empty scene including reference boat: 18 draws, water count +194 triangles.
+- Browser height probe: 64 GPU samples at each t=0,2,5,10, both origin and `(1e7,-1e7)`, using the production `waveSurface` GLSL, RGBA8 two-channel packing. Largest observed error approximately 0.000204 m, below 0.002 m. Readback occurs only through the opt-in diagnostic.
+- Frozen-time reference hull height is checked against the production CPU sampler. This is a quasi-static reference pose, **not** M3 buoyancy.
+- Forced origin change from `(0,0)` to `(256,0)` at unchanged world position `(255.9,0)` is compared at screenshot pixel level. Final exact numbers and the repeated-frozen-frame stability assertion are in `browser-all.json`.
+- Complete matrix: `m2-{standard,low}-{west,east}-t{0,2,5,10}.png`; both tiers also have `-near.png` and `-north.png`. Additional captures show high tier, a 10-million-metre origin, and 360×800 / 390×844 / 844×390 mobile layouts.
+- Mobile layout checks use DPR 3, CPU ×4, and real CDP touch dispatch on the view control. These verify layout and the M2 view buttons, not the future M3 split helm.
+
+## Visual assessment
+
+The first sine-only captures looked too rounded. A2 was therefore applied, after review: horizontal displacements of 0.24 m and 0.11 m on octaves 0/1 only. Their Q values are shift/amplitude. Total possible shift ≤0.35 m, with smooth LOD fades and a Jacobian-corrected normal. CPU height sampling is unchanged. The accepted renderer/physics horizontal mismatch is ≤0.35 m; do not feed displaced GPU positions back into physics. The baseline remains in `m2-sine-baseline-{west,east}.png`.
+
+The final water has visible changing crests/troughs, fine wind ripples, saturated teal troughs, peach/copper grazing reflections, and an alignment-driven broken sun road that leaves view when facing east or north. The near-water angle makes swell silhouettes clear. The horizon hides the disc rim in both aspect ratios. Standard and low screenshots were inspected directly, including the less flattering cross-wave/north view. Low has softer detail and visible pixel steps on some distant crest silhouettes: it is the intended cheaper tier, not a claim of identical image quality. No holes, exposed disc rim, origin jump, or shader errors were observed. The remaining angularity in the far cross-wave view is a tessellation limit rather than a seam; the full-detail near water stays continuous.
+
+The launch is deliberately a simple M1/M2 reference mesh. It has no wake, spring buoyancy, steering, collision or exploration yet. Those limitations are not evidence of completed later milestones.
+
+## Evidence and limitations
+
+Open [the screenshot gallery](evidence/index.html). Numeric evidence: `evidence/node-sim.txt`. Final authoritative browser evidence: `evidence/browser-all.json`; focused reports are retained as development history.
+
+Chrome is launched only by `~/.claude/bin/cdp start --port 9223`. Its wrapper selects ANGLE SwiftShader; the final report records actual browser and graphics identification. This is software-rendered desktop Chrome, **not** representative phone GPU performance.
+
+**Physical-device gate: NOT MET — no hardware available.** No sustained phone FPS, thermals, iPhone Safari, or M7 dense-scene qualification is claimed. Emulation here covers only M2 layouts/touch at 390×844 and 844×390 (also 360×800), DPR 3, CPU ×4. M7 remains pending.
+
+**Final combined run: PASS.** `node tools/browser.mjs` completed all seven scenarios; clean render cases have zero collected errors. Report timestamp 2026-09-18T15:22:01.087Z, Chrome 153.0.8010.48 / ANGLE SwiftShader. Rebase mean channel difference 0.0012708657424353343; fraction of channels differing by >8 is 0.000001191511102977062. Repeated frozen frames are pixel-identical (mean/max difference zero). M2 is accepted; M3 has not started.
+
+
+---
+
+# M3 — Playable launch (verified 2026-09-19)
+
+Reproduce: `node tools/sim.mjs --suite handling`, then in one shell execution
+`~/.claude/bin/cdp start --port 9223 && node tools/browser.mjs --suite handling`.
+
+## Numeric gates (PLAN §10.3, all derived, no literals reinstated)
+
+| Gate | Required | Measured |
+| --- | --- | --- |
+| Flat-water immersion after 15 s | 0.22 ±0.02 m, pitch/roll → 0 | 0.2200 m, \|pitch\|,\|roll\| < 0.001 rad |
+| Full ahead after 30 s | 7.5–8.5 m/s | 7.983 m/s |
+| Full astern after 30 s | −2.4 to −1.8 m/s | −2.125 m/s |
+| Full rudder at speed | 0.38–0.48 rad/s | 0.4300 rad/s |
+| Neutral coast 8 → 1 m/s | 8–15 s | 9.967 s |
+| 10 min in live waves | finite, ≤9° pitch / ≤12° roll | max 8.389° / 10.948° |
+| 30 / 60 / 120 Hz render schedules | identical trajectories | byte-identical after 3,600 steps |
+
+Also asserted: no spin at rest, yaw decays to zero, reverse steering flips with travel
+direction, and the four hull-point velocities match a finite difference of the exact render
+transform to 1e-5.
+
+## Browser gates
+
+Real `Input.dispatchKeyEvent` and `Input.dispatchTouchEvent`. `sunwakeTest.setInput` is left
+null so `advance()` reads the live `platform/input.mjs` state — the production input path is
+under test, not a stand-in.
+
+- Landscape keyboard: W/S/A/D and the arrow keys, opposites cancelling, reverse steering,
+  release to neutral, camera roll inside A3's 0.12 × roll-stop band and non-zero in a turn,
+  camera never below local water +2 m, reduced motion zeroing camera roll.
+- Split helm at 844×390 and 390×844, `deviceScaleFactor:3`, `setCPUThrottlingRate(4)`:
+  simultaneous rudder + AHEAD, port/starboard travel, the 8% dead zone, vertical travel
+  ignored, release outside the button, AHEAD+ASTERN cancelling, `touchCancel` clearing both
+  the axis and the button state. All three targets ≥48 px and inside the viewport in both
+  orientations; no horizontal overflow.
+
+Screenshots: `evidence/m3-handling-keyboard.png`, `m3-handling-touch-landscape.png`,
+`m3-handling-touch-portrait.png`. Report: `evidence/browser-handling.json`.
+
+## Visual assessment
+
+TASKS **C2** is answered. The launch is 1,689 triangles in four material draws (budget
+4,000 / 4). The black outboard drum that made it read as "a rowing dinghy with a black box on
+the transom" is replaced by a pale cowling with a rust band, a grey leg, a brass gearcase and
+prop, and a tiller; the transom is a cream panel with a varnished name board; a boot band just
+above the waterline makes the hull read cream-over-dark from the chase camera. A cool
+sky-bounce fill light was added because the chase camera always looks west into the sun and
+every solid object was otherwise seen from its shaded side.
+
+The wake was rebuilt: it previously read as two hard, dashed, laser-straight beams because the
+ribbon's V coordinate alternated 0/1 per station. It now scrolls continuously and is broken up
+by two octaves of analytic value noise. It is much better; it is still a flat two-arm V with no
+turbulence offset, and right at the stern it is slightly too geometric. Bow spray quads are a
+little large and round at close range.
+
+---
+
+# M4 — One unquestionably solid island (verified 2026-09-19)
+
+Reproduce: `node tools/sim.mjs --suite collision`, then
+`~/.claude/bin/cdp start --port 9223 && node tools/browser.mjs --suite islands`.
+
+TASKS **A1** numbers are used, not PLAN's older ones: shore wall top **+1.60 m**, bottom
+−2.0 m, decorative apron only below **−1.45 m**. Asserted in the suite so they cannot drift.
+
+## The invariant
+
+`distance(boat, island) ≥ island.radius + 2.6 − 1e-6`, asserted after **every** fixed step
+against **every** island — not just the last contact — and on the interpolated render centre
+at alpha 0, 0.25, 0.5, 0.75 and 1 as well as the simulated one.
+
+| Case | Steps | Contacts | Worst clearance |
+| --- | ---: | ---: | ---: |
+| Head-on, full ahead, 60 s | 3,600 | 2,667 | +0.001000 m |
+| Tangent pass at exactly radius+2.6 | 3,600 | 1 | +0.001012 m |
+| Oblique 26° approach, 70 s | 4,200 | 4,680 | +0.001000 m |
+| Stern-first astern into the wall, 120 s | 7,200 | 4,132 | +0.001000 m |
+| Held against the shore at full throttle, 600 s | 36,000 | 35,986 | +0.001000 m |
+| Grinding along the wall, full rudder, 300 s | 18,000 | 28,768 | +0.001000 m |
+| 3,000 m/s teleport-sized steps | 400 | — | clear |
+
+Plus: coincident spawn (dead centre, a nanometre off centre, on the wall, just inside) all
+resolve to the shore rather than teleporting, with +X used for an exactly coincident centre;
+single-call displacements of 0, 1e-9, 0.001 … 10,000 m on 24 bearings straight through the
+island, 432 sweeps, worst penetration **0.000000 m** and every blocked sweep ending on the
+near side; the same sweeps against all six islands staying clear; and 20,000 seeded random
+sweeps including starts already deep inside a shore.
+
+## Falsifying the render-centre correction
+
+The straight lerp between two simulated positions never actually crossed the hard radius in
+any sailing case: at ≤12 m/s a 1/60 s chord on a 36.6 m circle sags about 1.4e-4 m, which the
+1 mm `CONTACT_SKIN` already absorbs. It did enter that skin 14,719 times, so the grazing cases
+are genuinely grazing. Because sailing therefore cannot exercise the corrector, it is falsified
+directly instead: a constructed 40° chord across the clearance circle cuts **2.218 m** inside
+the shore, and `world.clearCentre` is asserted to both move it and return it clear. Reported as
+`rawRenderLerpViolations: 0`, `constructedChordCut: 2.218`.
+
+## Browser gates
+
+`--suite islands`, zero collected errors. Real keyboard drive into Lantern Key: worst clearance
+over the approach and the grind **+0.001 m**, the boat held at 2.601 m from the shore
+(= 2.6 m boat radius + 1 mm skin), and the water shader receives ≥1 shore circle. Camera
+obstruction: parked against the shore facing away, the chase seat would be 10.5 m inside the
+stone; the swept 0.4 m camera sphere pulls it in to **reach 0.389** and the camera finishes
+**0.401 m outside** the wall, then eases back to reach > 0.99 once clear.
+
+Screenshots: `m4-approach.png`, `m4-shore-contact.png`, `m4-shore-grind.png`,
+`m4-camera-obstruction.png`, `m4-wide.png`, `m4-split-crown.png`, `m4-last-orchard.png`.
+Report: `evidence/browser-islands.json`.
+
+## Visual assessment and honest limitations
+
+The islands read as low limestone keys: a continuous cream shore wall with a wet stain at the
+waterline, irregular terraces, sparse cypresses and olive scrub, and one readable crown feature
+per profile (tower / spire / cairn). Two rendering bugs were found by looking rather than by
+the suites, and both had passed every numeric gate:
+
+1. Every island triangle except the apron was wound inside-out, so the near wall was
+   back-face culled and you looked straight through the island at the sea inside it.
+2. Shore foam used `max(shore,0)`, so every water pixel *inside* a shore circle got full foam.
+   With the wall invisible that produced a huge white saucer. Foam is now gated to the outside
+   of the circle.
+
+Remaining: at 240–760 m the islands are still a little crisp against the horizon haze compared
+with the water's own fade; the terraces are regular enough to read as concentric at close
+range; only the six authored landmark islands exist — there is **no procedural geography yet**,
+that is M5.
+
+**Physical-device gate still NOT MET — no hardware available.** Nothing in M3 or M4 changes
+that. Chrome remains ANGLE/SwiftShader and no phone FPS, Safari result or M7 performance
+qualification is claimed.
