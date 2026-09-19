@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {SHORE_TOP,SHORE_BOTTOM,APRON_TOP} from '../core/world.mjs';
 import {islandField,TERRACE_EDGES,saturate,smoothstep} from '../core/island-shape.mjs';
-import {HORIZON_FADE} from '../core/config.mjs';
+import {HORIZON_FADE,QUALITY} from '../core/config.mjs';
 import {skyGLSL} from './shaders.mjs';
 // One merged, flat-shaded, vertex-coloured mesh per island: one draw each.
 // Nothing above water may sit outside the collision circle, so every radial
@@ -23,12 +23,12 @@ const COLOURS={
   moss:new THREE.Color('#6d7f52'),
 };
 export const ISLAND_LOD=Object.freeze([
-  Object.freeze({segments:96,rings:14,bands:4,plants:1}),
-  Object.freeze({segments:48,rings:9,bands:3,plants:.55}),
+  Object.freeze({segments:96,rings:9,bands:4,plants:1}),
+  Object.freeze({segments:48,rings:5,bands:3,plants:.55}),
   Object.freeze({segments:24,rings:5,bands:2,plants:0}),
 ]);
 
-export function createIslandGeometry(island,lod=0){
+export function createIslandGeometry(island,lod=0,plantLimit=240){
   const detail=ISLAND_LOD[Math.max(0,Math.min(ISLAND_LOD.length-1,lod|0))];
   const AS=detail.segments;
   const field=islandField(island),{R,peak,wallRadius,wallTop,notch,stain,heightAt}=field;
@@ -58,7 +58,7 @@ export function createIslandGeometry(island,lod=0){
     const wr=wallRadius(a),n=notch(a),top=wallTop(a),st=stain(a);
     const levels=[[SHORE_BOTTOM,wr,COLOURS.wet],[-.55,wr-.35*n,COLOURS.wet],[st,wr-n,COLOURS.wet],
       [st+(top-st)*.62,wr-.35*n,COLOURS.wall],[top-.22-.34*(.5+.5*Math.sin(7*a+1.9)),wr-.10*n,COLOURS.wall],[top,wr,COLOURS.lip]];
-    return detail.bands>=4?levels:detail.bands===3?[levels[0],levels[2],levels[3],levels[5]]:[levels[0],levels[2],levels[5]];
+    return detail.bands>=4?levels:detail.bands===3?[levels[0],levels[2],levels[3],levels[5]]:[levels[0],levels[5]];
   };
   for(let i=0;i<AS;i++){
     const a=angleAt(i),b=angleAt(i+1),pa=wallProfile(a),pb=wallProfile(b);
@@ -76,16 +76,17 @@ export function createIslandGeometry(island,lod=0){
   // near-vertical face whose plan shape wanders with the noise instead of a
   // lathe-turned circle. Ring 0 is exactly the wall top: rim and wall share it.
   const SMAX=.985,DU=.008,LEDGE=.030;
-  const treads=detail.rings>=14?2:detail.rings>=9?1:0,summits=detail.rings>=14?3:detail.rings>=9?2:1;
-  const RINGS=2+TERRACE_EDGES.length*(treads+2)+summits;
+  const edgesUsed=lod===1?TERRACE_EDGES.slice(0,2):TERRACE_EDGES;
+  const treads=lod===0?1:0,summits=lod===0?2:1;
+  const RINGS=2+edgesUsed.length*(treads+2)+summits;
   const riserBand=new Array(RINGS-1).fill(false);
-  for(let e=0;e<TERRACE_EDGES.length;e++)riserBand[2+e*(treads+2)+treads]=true;
+  for(let e=0;e<edgesUsed.length;e++)riserBand[2+e*(treads+2)+treads]=true;
   const edgeScratch=[],stations=[];
   function buildStations(a){
     const w=field.terraceWeight(a),edges=field.edgeStations(a,edgeScratch);
     stations.length=0;stations.push(0,LEDGE);
     let prev=LEDGE;
-    for(let e=0;e<TERRACE_EDGES.length;e++){
+    for(let e=0;e<edgesUsed.length;e++){
       const c=Math.min(SMAX,Math.max(prev+2*DU+1e-3,edges[e]));
       for(let t=1;t<=treads;t++)stations.push(prev+(c-DU-prev)*t/(treads+1));
       stations.push(c-DU,c+DU);prev=c+DU;
@@ -100,6 +101,9 @@ export function createIslandGeometry(island,lod=0){
     for(let k=1;k<RINGS;k++)stations[k]=Math.max(stations[k],stations[k-1]+1e-4);
     return stations;
   }
+  if(lod===2){
+    for(let i=0;i<AS;i++){const a=angleAt(i),b=angleAt(i+1);push(at(a,wallRadius(a),wallTop(a)),at(b,wallRadius(b),wallTop(b)),[0,heightAt(0,0),0],COLOURS.stone,.1);}
+  }else{
   const rings=[];for(let k=0;k<RINGS;k++)rings.push([]);
   for(let i=0;i<AS;i++){
     const a=angleAt(i),wr=wallRadius(a),cos=Math.cos(a),sin=Math.sin(a);
@@ -125,22 +129,58 @@ export function createIslandGeometry(island,lod=0){
   const last=rings[RINGS-1];
   for(let i=0;i<AS;i++)push(last[i],last[(i+1)%AS],[0,summit,0],COLOURS.lip,.10+.14*shade(last[i][1]));
 
+  }
+
   // One readable crown feature per profile, seated on the actual terrain.
   const crownAngle=field.rnd()*Math.PI*2,crownReach=R*.10*field.rnd();
   const cx=Math.cos(crownAngle)*crownReach,cz=Math.sin(crownAngle)*crownReach;
   const base=heightAt(cx,cz)-.5;
   const ring=(n,r,y)=>{const out=[];for(let s=0;s<n;s++){const a=s/n*Math.PI*2;out.push([cx+Math.cos(a)*r,y,cz+Math.sin(a)*r]);}return out;};
-  if(island.profile==='mesa'){                                   // a squat stone tower
-    const h=island.height*.55+3,lower=ring(8,2.2,base),upper=ring(8,1.7,base+h);
-    for(let s=0;s<8;s++){const t=(s+1)%8;quad(lower[s],lower[t],upper[t],upper[s],COLOURS.lip,.10+.30*(s%2));
+  // Authored crowns survive every terrain LOD and stay well inside the shore.
+  const brass=new THREE.Color('#c49b51'),dark=new THREE.Color('#445b48'),ember=new THREE.Color('#ffd185');
+  function column(x,z,y,r0,r1,h,colour,n=8){
+    const lower=[],upper=[];
+    for(let k=0;k<n;k++){const a=k/n*Math.PI*2;lower.push([x+Math.cos(a)*r0,y,z+Math.sin(a)*r0]);upper.push([x+Math.cos(a)*r1,y+h,z+Math.sin(a)*r1]);}
+    for(let k=0;k<n;k++){const j=(k+1)%n;quad(lower[k],lower[j],upper[j],upper[k],colour,.12*(k%3));push(upper[k],upper[j],[x,y+h,z],colour);}
+  }
+  function block(x,z,y,w,d,h,colour){
+    const a=[x-w/2,y,z-d/2],b=[x+w/2,y,z-d/2],c=[x+w/2,y,z+d/2],e=[x-w/2,y,z+d/2];
+    const top=p=>[p[0],p[1]+h,p[2]],ring=[a,b,c,e];
+    for(let k=0;k<4;k++)quad(ring[k],ring[(k+1)%4],top(ring[(k+1)%4]),top(ring[k]),colour);
+    quad(top(a),top(b),top(c),top(e),colour);
+  }
+  if(island.landmark==='Lantern Key'){
+    column(cx,cz,base,2.7,2.1,9,COLOURS.lip);column(cx,cz,base+9,3.1,3.1,.7,COLOURS.wall);
+    column(cx,cz,base+9.7,1.6,1.6,2,ember);column(cx,cz,base+11.7,3,0,1.6,brass);
+  }else if(island.landmark==='Bell Garden'){
+    for(const x of [-6,6])column(cx+x,cz,base,1,1,9,COLOURS.lip,6);
+    block(cx,cz,base+8.5,15,2,1.2,COLOURS.lip);
+    for(let k=0;k<3;k++){const x=cx+(k-1)*4,y=base+4.5+(k%2)*.8;column(x,cz,y+1.5,.14,.14,2.5-(k%2)*.8,brass,5);column(x,cz,y,1.4,.55,2,brass);column(x,cz,y-.5,.25,.25,1,brass,5);}
+  }else if(island.landmark==='Split Crown'){
+    for(const [x,h]of [[-4,17],[4.5,20]])column(cx+x,cz,base,3.2,.9,h,COLOURS.lip,5);
+  }else if(island.landmark==='Cinder Steps'){
+    const rust=new THREE.Color('#b5683f');
+    for(let k=0;k<3;k++)column(cx,cz,base+k*1.1,5-k,5-k,1.1,rust,7);
+    column(cx,cz,base+3.3,1.5,2.8,1.2,brass,7);column(cx,cz,base+4.5,1.8,0,3.8,ember,5);
+  }else if(island.landmark==='White Needle'){
+    column(cx,cz,base,2.6,.12,24,COLOURS.lip,7);
+  }else if(island.landmark==='Last Orchard'){
+    column(cx,cz,base,2.6,1.3,3,COLOURS.stone,6);
+    for(let k=0;k<6;k++){const a=k/6*Math.PI*2,x=cx+Math.cos(a)*8,z=cz+Math.sin(a)*8,y=heightAt(x,z)-.2;
+      column(x,z,y,.45,.35,3,COLOURS.riser,5);
+      const n=6;for(let j=0;j<n;j++){const a=j/n*Math.PI*2,b=(j+1)/n*Math.PI*2;push([x+Math.cos(a)*1.65,y+1,z+Math.sin(a)*1.65],[x+Math.cos(b)*1.65,y+1,z+Math.sin(b)*1.65],[x-2.4,y+10,z],dark,.1*(j%3));}
+    }
+  }else if(island.profile==='mesa'){                                   // a squat stone tower
+    const n=lod===2?6:8,h=island.height*.55+3,lower=ring(n,2.2,base),upper=ring(n,1.7,base+h);
+    for(let s=0;s<n;s++){const t=(s+1)%n;quad(lower[s],lower[t],upper[t],upper[s],COLOURS.lip,.10+.30*(s%2));
       push(upper[s],upper[t],[cx,base+h+1.1,cz],COLOURS.wall,.2);}
   }else if(island.profile==='split'){                            // a leaning spire
     const h=island.height*.9+4,lower=ring(7,2.6,base),tip=[cx+Math.cos(crownAngle)*1.4,base+h,cz+Math.sin(crownAngle)*1.4];
     for(let s=0;s<7;s++)push(lower[s],lower[(s+1)%7],tip,COLOURS.lip,.08+.34*(s%3)/2);
   }else{                                                         // a cairn
-    for(let s=0;s<4;s++){
-      const r0=2.4-s*.5,y=base+s*1.05,lower=ring(6,r0,y),upper=ring(6,r0*.8,y+.95);
-      for(let k=0;k<6;k++){const t=(k+1)%6;quad(lower[k],lower[t],upper[t],upper[k],COLOURS.stone,.12+.26*(k%2));}
+    for(let s=0;s<(lod===2?2:4);s++){
+      const n=lod===2?4:6,r0=2.4-s*.5,y=base+s*1.05,lower=ring(n,r0,y),upper=ring(n,r0*.8,y+.95);
+      for(let k=0;k<n;k++){const t=(k+1)%n;quad(lower[k],lower[t],upper[t],upper[k],COLOURS.stone,.12+.26*(k%2));}
     }
   }
 
@@ -161,7 +201,7 @@ export function createIslandGeometry(island,lod=0){
   }
 
   // Sparse olive scrub and leaning cypresses, all well inside the wall.
-  const plants=Math.round((9+R/3.2)*detail.plants);
+  const plants=island.landmark==='Last Orchard'?0:Math.min(plantLimit,Math.round((9+R/3.2)*detail.plants));
   for(let i=0;i<plants;i++){
     const angle=field.rnd()*Math.PI*2,reach=R*(.12+field.rnd()*.58);
     const x=Math.cos(angle)*reach,z=Math.sin(angle)*reach,ground=heightAt(x,z)-.4;
@@ -179,7 +219,7 @@ export function createIslandGeometry(island,lod=0){
   geometry.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
-  geometry.userData={triangles:positions.length/9,lod};
+  geometry.userData={triangles:positions.length/9,lod,ornaments:plants+(island.landmark==='Last Orchard'?6:0)};
   return geometry;
 }
 
@@ -191,7 +231,7 @@ export function createIslandMaterial(skyUniforms){
   const material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.92,flatShading:true});
   material.fog=false;
   material.onBeforeCompile=shader=>{
-    for(const key of ['uSun','uHorizon','uZenith','uHaze','uSunColor','uCloud','uCloudTime'])shader.uniforms[key]=skyUniforms[key];
+    for(const key of ['uSun','uHorizon','uZenith','uHaze','uSunColor','uCloud','uCloudTime','uCloudEnabled'])shader.uniforms[key]=skyUniforms[key];
     shader.vertexShader='varying vec3 vShoreWorld;\n'+shader.vertexShader
       .replace('#include <project_vertex>','#include <project_vertex>\n  vShoreWorld=(modelMatrix*vec4(transformed,1.0)).xyz;');
     shader.fragmentShader='varying vec3 vShoreWorld;\n'+skyGLSL+shader.fragmentShader
@@ -207,7 +247,7 @@ export function createIslandMaterial(skyUniforms){
 // hysteresis, and a bounded geometry pool so sailing a circuit does not rebuild.
 // Pending meshes never mean pending colliders: collision reads world.queryIslands
 // directly and does not know this module exists.
-export const BUILD_RANGE=1000,EVICT_RANGE=1150,LOD_EDGES=[230,560],LOD_HYSTERESIS=70,GEOMETRY_POOL=40;
+export const BUILD_RANGE=1000,EVICT_RANGE=1150,LOD_EDGES=[160,420],LOD_HYSTERESIS=24,GEOMETRY_POOL=40;
 const now=()=>(typeof performance!=='undefined'?performance.now():Date.now());
 
 export function createIslandsView(world,skyUniforms,options={}){
@@ -217,19 +257,19 @@ export function createIslandsView(world,skyUniforms,options={}){
   const live=new Map();                 // island id -> {island,mesh,lod,triangles}
   const pool=new Map();                 // "id@lod" -> geometry, insertion-ordered
   const queue=[],list=[];
-  let triangles=0,built=0,evictions=0,lastBuild=0,pending=0;
+  let triangles=0,built=0,evictions=0,lastBuild=0,pending=0,tier='standard';
 
-  const poolKey=(island,lod)=>island.id+'@'+lod;
-  function takeGeometry(island,lod){
-    const key=poolKey(island,lod),cached=pool.get(key);
+  const poolKey=(island,lod,plants)=>island.id+'@'+lod+'@'+plants;
+  function takeGeometry(island,lod,plants){
+    const key=poolKey(island,lod,plants),cached=pool.get(key);
     if(cached){pool.delete(key);return cached;}
     const start=now();
-    const geometry=createIslandGeometry(island,lod);
+    const geometry=createIslandGeometry(island,lod,plants);geometry.userData.plantLimit=plants;
     lastBuild=now()-start;built++;
     return geometry;
   }
   function recycle(island,lod,geometry){
-    pool.set(poolKey(island,lod),geometry);
+    pool.set(poolKey(island,lod,geometry.userData.plantLimit),geometry);
     while(pool.size>GEOMETRY_POOL){
       const oldest=pool.keys().next().value;
       pool.get(oldest).dispose();pool.delete(oldest);
@@ -248,23 +288,23 @@ export function createIslandsView(world,skyUniforms,options={}){
     group.remove(entry.mesh);triangles-=entry.triangles;
     recycle(entry.island,entry.lod,entry.mesh.geometry);
   }
-  function install(island,lod){
+  function install(island,lod,plants){
     const existing=live.get(island.id);
     if(existing)drop(existing);
-    const geometry=takeGeometry(island,lod);
+    const geometry=takeGeometry(island,lod,plants);
     const mesh=existing?existing.mesh:new THREE.Mesh(geometry,material);
     mesh.geometry=geometry;mesh.frustumCulled=true;
     mesh.userData={island,lod};
-    const entry={island,mesh,lod,triangles:geometry.userData.triangles};
+    const entry={island,mesh,lod,plants,triangles:geometry.userData.triangles};
     live.set(island.id,entry);group.add(mesh);triangles+=entry.triangles;
     return entry;
   }
   function place(entry,origin){entry.mesh.position.set(entry.island.x-origin.x,0,entry.island.z-origin.z);}
 
-  return {group,material,
+  return {group,material,setQuality(value){tier=value;},
     get triangles(){return triangles;},get meshes(){return [...live.values()].map(e=>e.mesh);},
     get count(){return live.size;},get pending(){return pending;},
-    stats(){return {islands:live.size,triangles,pending,built,evictions,pooled:pool.size,lastBuildMs:lastBuild,
+    stats(){const all=[...pool.values(),...[...live.values()].map(e=>e.mesh.geometry)];return {geometryBytes:all.reduce((n,g)=>n+Object.values(g.attributes).reduce((s,a)=>s+a.array.byteLength,0),0),ornaments:[...live.values()].filter(e=>e.mesh.visible).reduce((n,e)=>n+e.mesh.geometry.userData.ornaments,0),islands:live.size,triangles,pending,built,evictions,pooled:pool.size,lastBuildMs:lastBuild,
       lods:[...live.values()].reduce((n,e)=>{n[e.lod]=(n[e.lod]||0)+1;return n;},[0,0,0])};},
     update(origin,x=origin.x,z=origin.z){
       const near=world.nearby(x,z,build,list);
@@ -273,18 +313,27 @@ export function createIslandsView(world,skyUniforms,options={}){
         drop(entry);live.delete(id);evictions++;
       }
       queue.length=0;
+      let ornaments=QUALITY[tier].ornaments;
       for(const island of near){
         const entry=live.get(island.id);
         const lod=lodFor(Math.hypot(island.x-x,island.z-z)-island.radius,entry?.lod);
-        if(!entry||entry.lod!==lod)queue.push({island,lod});
+        const reserved=island.landmark==='Last Orchard'?6:0;
+        const plants=tier==='emergency'?0:Math.min(Math.max(0,ornaments-reserved),lod===2?0:Math.round((9+island.radius/3.2)*ISLAND_LOD[lod].plants));ornaments-=plants+reserved;
+        if(!entry||entry.lod!==lod||entry.plants!==plants)queue.push({island,lod,plants});
       }
       pending=queue.length;
       const start=now();
       for(let done=0;done<queue.length&&done<maxItems;done++){
         if(done>0&&now()-start>=budget)break;              // always land one item
-        install(queue[done].island,queue[done].lod);pending--;
+        install(queue[done].island,queue[done].lod,queue[done].plants);pending--;
       }
-      for(const entry of live.values())place(entry,origin);
+      // Fully hazed islands need no draw. Bounds also protect pathological dense fixtures.
+      let draws=0,visiblePlants=0,visibleTriangles=0;
+      const ordered=[...live.values()].sort((a,b)=>Math.hypot(a.island.x-x,a.island.z-z)-Math.hypot(b.island.x-x,b.island.z-z));
+      for(const entry of ordered){place(entry,origin);const gap=Math.hypot(entry.island.x-x,entry.island.z-z)-entry.island.radius;
+        entry.mesh.visible=gap<650&&draws<QUALITY[tier].drawCap-8&&visiblePlants+entry.mesh.geometry.userData.ornaments<=QUALITY[tier].ornaments&&visibleTriangles+entry.triangles<QUALITY[tier].triangleCap-QUALITY[tier].segments*(2*QUALITY[tier].bands.reduce((n,b)=>n+b[0],0)-1)-6500;
+        if(entry.mesh.visible){draws++;visiblePlants+=entry.mesh.geometry.userData.ornaments;visibleTriangles+=entry.triangles;}
+      }
       return pending;
     },
     dispose(){

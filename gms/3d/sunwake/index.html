@@ -45,19 +45,24 @@
   </script>
   <link rel="stylesheet" href="style.css">
   <canvas id="sea" aria-label="Sunset ocean" tabindex="0"></canvas>
-  <header id="hud"><a class="wordmark" href="./">SUNWAKE<span>APRICOT PASSAGE</span></a><div id="bearing">W <span>270°</span></div><button id="pause" aria-label="Pause sailing" hidden>Ⅱ</button></header>
+  <header id="hud"><a class="wordmark" href="./">SUNWAKE<span>APRICOT PASSAGE</span></a><div id="bearing">W <span>270°</span></div><nav id="nav"><button id="chart-open" hidden>Atlas 0/6</button><button id="pause" aria-label="Pause sailing" hidden>Ⅱ</button></nav></header>
   <section id="title" class="sheet">
     <div class="eyebrow">AN OCEAN IN THE LAST LIGHT</div><h1>Follow<br>the sun.</h1>
-    <p>Deep water. A little launch.<br>A horizon that keeps going.</p>
+    <p>Deep water. A little launch.<br>Six places worth remembering.</p>
     <button id="start" class="primary">Cast off <span>↗</span></button>
-    <small>WASD / ARROWS TO SAIL · P TO PAUSE</small>
+    <small>WASD / ARROWS OR TOUCH HELM · M FOR ATLAS</small>
   </section>
-  <section id="paused" class="sheet" hidden><div class="eyebrow">A MOMENT BETWEEN WAVES</div><h2>Stay awhile.</h2><p>The ocean will wait.</p><button id="resume" class="primary">Return to the water <span>↗</span></button></section>
+  <section id="paused" class="sheet" hidden><div class="eyebrow">A MOMENT BETWEEN WAVES</div><h2>Stay awhile.</h2><p>The ocean will wait.</p><button id="resume" class="primary">Return to the water <span>↗</span></button><button id="settings-open">Voyage settings</button></section>
   <div id="helm" hidden>
     <div class="helm-status"><span>OPEN WATER</span><strong id="speed">0.0 kn</strong><small>W / S ahead &amp; astern · A / D steer</small></div>
     <div class="rudder-wrap"><button id="rudder" aria-label="Rudder: drag left or right"><span>PORT <i>·</i> STARBOARD</span><b>↔</b></button><small>HOLD &amp; SLIDE</small></div>
     <div class="throttle-wrap"><button id="ahead" aria-label="Hold to go ahead">AHEAD <span>↑</span></button><button id="astern" aria-label="Hold to go astern">ASTERN <span>↓</span></button></div>
   </div>
+  <div id="course" hidden><b id="course-arrow">↑</b><div><strong id="course-name">Lantern Key</strong><small id="course-distance"></small></div><p id="approach"></p></div>
+  <aside id="discovery" role="status" hidden><small>A PAGE FOR YOUR ATLAS</small><h2 id="discovery-title"></h2><p id="discovery-copy"></p><button id="discovery-close">Keep sailing ↗</button><button id="discovery-atlas">Open atlas</button></aside>
+  <section id="chart" class="panel" role="dialog" aria-modal="true" aria-labelledby="chart-title" hidden><header><div><small>THE SUNSET ATLAS · <span id="atlas-count">0 / 6</span></small><h2 id="chart-title">An atlas of the last light.</h2></div><button id="chart-close" aria-label="Close atlas">Return to sea ↗</button></header><canvas id="chart-map" aria-label="Chart showing landmarks, nearby islands and the boat"></canvas><div class="chart-tools"><p id="voyage-stats"></p><button id="map-toggle">Follow the boat</button></div><div id="cards"></div></section>
+  <section id="settings" class="panel settings" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden><header><h2 id="settings-title">Your voyage.</h2><button id="settings-close">Back</button></header><label>Sound <input id="sound" type="checkbox"></label><label>Reduced motion <input id="reduced" type="checkbox"></label><label>Quality <select id="quality"><option value="auto">Auto</option><option value="high">High</option><option value="standard">Standard</option><option value="low">Low</option></select></label><p id="performance"></p><button id="restart">Restart voyage</button><div id="restart-confirm" hidden><p>Clear this atlas and start at the launch? Your discoveries will be lost.</p><button id="restart-no">Keep voyage</button><button id="restart-yes">Start again</button></div></section>
+  <p id="notice" role="status" hidden></p>
   <footer id="study" hidden><span>APRICOT PASSAGE <i> / </i> WATER STUDY</span><div><button id="turn">Look east ↗</button><button id="height">At the waterline</button></div></footer>
   <script type="importmap">
   { "imports": {

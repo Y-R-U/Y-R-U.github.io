@@ -21,6 +21,7 @@ export const skyGLSL = /* glsl */`
 uniform vec3 uSun, uHorizon, uZenith, uHaze, uSunColor;
 uniform sampler2D uCloud;
 uniform float uCloudTime;
+uniform float uCloudEnabled;
 vec3 skyColor(vec3 ray, bool disc) {
   float altitude=max(ray.y,0.0);
   float west=pow(max(dot(normalize(vec3(ray.x,0.001,ray.z)),normalize(vec3(uSun.x,0.,uSun.z))),0.0),4.0);
@@ -29,7 +30,8 @@ vec3 skyColor(vec3 ray, bool disc) {
   float alignment=dot(ray,uSun);
   color+=uSunColor*(0.26*exp((alignment-1.0)*55.0)+0.15*exp((alignment-1.0)*450.0));
   vec2 cloudUV=vec2(atan(ray.z,ray.x)/6.2831853+uCloudTime,ray.y*1.8);
-  float noise=texture2D(uCloud,cloudUV*vec2(2.,2.)).r*.65+texture2D(uCloud,cloudUV*vec2(5.,4.)).r*.35;
+  float noise=0.;
+  if(uCloudEnabled>.5)noise=texture2D(uCloud,cloudUV*vec2(2.,2.)).r*.65+texture2D(uCloud,cloudUV*vec2(5.,4.)).r*.35;
   float bands=exp(-pow((altitude-.20)/.037,2.))+0.65*exp(-pow((altitude-.32)/.048,2.))+0.35*exp(-pow((altitude-.52)/.065,2.));
   float clouds=smoothstep(.44,.65,noise)*bands*smoothstep(.04,.13,altitude);
   color=mix(color,mix(uHaze*.75,uHorizon*1.1,west),clouds*.5);

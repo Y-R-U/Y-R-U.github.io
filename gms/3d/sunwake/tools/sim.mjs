@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import {quality} from './quality.mjs';
+import {exploration} from './exploration.mjs';
 import {handling} from './handling.mjs';
 import {collision} from './collision.mjs';
 import {world} from './world.mjs';
@@ -7,10 +9,10 @@ import {WAVES,MAX_HEIGHT,MAX_SLOPE,MAX_VERTICAL_SPEED,FOAM_HEIGHT,sampleWave,pha
 import {rebaseOrigin,rippleOffsets} from '../js/core/math.mjs';
 import {radialMesh} from '../js/core/water-mesh.mjs';
 const suite=process.argv.includes('--suite')?process.argv[process.argv.indexOf('--suite')+1]:'all';
-if(!['all','shell','waves','handling','collision','world'].includes(suite))throw new Error(`Suite ${suite} is not implemented through M5`);
+if(!['all','shell','waves','handling','collision','world','exploration','quality'].includes(suite))throw new Error(`Suite ${suite} is not implemented through M5`);
 if(['all','shell'].includes(suite)){
-  assert.equal(Object.keys(QUALITY).length,3);assert.ok(SEA_STATE>0);assert.ok(Math.abs(Math.hypot(...SUN_DIRECTION)-1)<1e-12);
-  console.log('PASS shell: pure config, three quality tiers, normalized sun direction');
+  assert.equal(Object.keys(QUALITY).length,4);assert.ok(SEA_STATE>0);assert.ok(Math.abs(Math.hypot(...SUN_DIRECTION)-1)<1e-12);
+  console.log('PASS shell: pure config, four quality tiers, normalized sun direction');
 }
 if(['all','waves'].includes(suite)){
   const a={},b={},c={},eps=1e-4,tolerance=1e-6,phases=new Float64Array(4);let seed=0x53554e57,maxDerivativeError=0;
@@ -62,3 +64,7 @@ if(['all','waves'].includes(suite)){
 if(['all','handling'].includes(suite)){console.log('PASS handling',JSON.stringify(handling(),null,2));}
 if(['all','world'].includes(suite)){console.log('PASS world',JSON.stringify(world(),null,2));}
 if(['all','collision'].includes(suite)){console.log('PASS collision',JSON.stringify(collision(),null,2));}
+
+if(['all','exploration'].includes(suite))console.log('PASS exploration',JSON.stringify(exploration(),null,2));
+
+if(['all','quality'].includes(suite))console.log('PASS quality',JSON.stringify(quality(),null,2));

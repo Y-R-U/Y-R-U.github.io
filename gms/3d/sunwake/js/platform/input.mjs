@@ -5,6 +5,7 @@ export function createInput({rudder,ahead,astern,onPause}){
   const down=code=>Number(keys.has(code));
   function clear(){keys.clear();pointers.clear();rudder.style.setProperty('--helm','0px');for(const element of [rudder,ahead,astern]){element.classList.remove('held');}}
   addEventListener('keydown',e=>{
+    if(['INPUT','SELECT','TEXTAREA'].includes(e.target?.tagName))return;
     if(axes.has(e.code)){e.preventDefault();keys.add(e.code);device='keyboard';}
     if(!e.repeat&&['Escape','KeyP','KeyM','KeyQ'].includes(e.code)){
       e.preventDefault();if(e.code==='KeyM')pulses.chartPressed=true;else if(e.code==='KeyQ')pulses.mutePressed=true;else {pulses.pausePressed=true;onPause();}

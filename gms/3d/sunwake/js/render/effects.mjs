@@ -38,7 +38,7 @@ gl_FragColor=vec4(vec3(1.,.93,.80)*a,a);\n#include <tonemapping_fragment>\n#incl
     if(clock>=E.interval){clock%=E.interval;
       if(u>.8){const s=stations[head];s.x=b.x-Math.sin(b.yaw)*2.15;s.z=b.z-Math.cos(b.yaw)*2.15;s.yaw=b.yaw;s.speed=u;s.born=time;head=(head+1)%E.stations;count=Math.min(count+1,E.stations);emissions++;}
     }
-    if(u>2&&scratch.bowImpact>.8){const limit=tier==='low'?E.sprayLow:E.spray;
+    if(u>2&&scratch.bowImpact>.8){const limit=tier==='emergency'?0:tier==='low'?E.sprayLow:E.spray;
       for(const side of [-1,1]){hullPoint(b,[side*.60,-.12,1.55],point);const p=particles[particleHead%limit];particleHead++;p.born=time;p.x=point.x;p.y=point.y+.08;p.z=point.z;p.vx=b.vx*.4+Math.cos(b.yaw)*side*(.8+random());p.vz=b.vz*.4-Math.sin(b.yaw)*side*(.8+random());p.vy=1.2+random()*1.4;p.life=.35+random()*.35;p.size=.055+random()*.09;}
     }
   },render(b,origin,camera){
@@ -59,7 +59,7 @@ gl_FragColor=vec4(vec3(1.,.93,.80)*a,a);\n#include <tonemapping_fragment>\n#incl
     // Reverse is a 1.5 m churn at the current stern, never a backwards V trail.
     if(reverse){const fx=Math.sin(b.yaw),fz=Math.cos(b.yaw),rx=fz,rz=-fx;for(let i=0;i<2;i++)for(let strip=0;strip<3;strip++)for(let e=0;e<2;e++){const j=i*6+strip*2+e,d=2.15+i*1.5,w=(e?1:-1)*(.24+i*.2);position[j*3]=b.x-fx*d+rx*w-origin.x;position[j*3+2]=b.z-fz*d+rz*w-origin.z;alpha[j]=strip===2?.30*Math.min(1,-u):0;}geometry.setDrawRange(0,18);}
     geometry.attributes.position.needsUpdate=true;geometry.attributes.opacity.needsUpdate=true;
-    sprayAlpha.fill(0);const right=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0),up=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,1),limit=tier==='low'?E.sprayLow:E.spray;let live=0;
+    sprayAlpha.fill(0);const right=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,0),up=new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld,1),limit=tier==='emergency'?0:tier==='low'?E.sprayLow:E.spray;let live=0;
     for(let i=0;i<limit;i++){const p=particles[i],age=t-p.born;if(age<0||age>p.life)continue;live++;
       const x=p.x+p.vx*age-origin.x,y=p.y+p.vy*age-4.905*age*age,z=p.z+p.vz*age-origin.z;
       for(let corner=0;corner<4;corner++){const index=i*4+corner,a=(corner%2?1:-1)*p.size,c=(corner<2?-1:1)*p.size;sprayPosition[index*3]=x+right.x*a+up.x*c;sprayPosition[index*3+1]=y+right.y*a+up.y*c;sprayPosition[index*3+2]=z+right.z*a+up.z*c;sprayAlpha[index]=Math.sin(Math.PI*age/p.life)*.65;}}

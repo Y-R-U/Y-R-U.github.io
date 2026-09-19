@@ -1,11 +1,10 @@
 # SUNWAKE — continuation handoff
 
-Updated 2026-09-19 Australia/Brisbane. This session: M3 finished, M4 built and verified.
+Updated 2026-09-19 Australia/Brisbane. M5 and M6 verified and signed off; M7 in progress.
 
 ## Status
 
-**M1 COMPLETE. M2 COMPLETE. TASKS C1 FIXED. TASKS C2 FIXED. M3 COMPLETE. M4 COMPLETE.
-M5 NOT STARTED — and was explicitly out of scope for this run.**
+**M1–M5 COMPLETE. TASKS C1/C2 and D1/D2 FIXED. M6 COMPLETE. M7 IN PROGRESS.**
 
 Read BRIEF → TASKS → STATE. TASKS section A overrides PLAN wherever they conflict.
 Everything lives inside `gms/3d/sunwake/`. **No git writes of any kind** (no add, commit, push,
@@ -14,11 +13,12 @@ server on <http://127.0.0.1:8888/gms/3d/sunwake/> serves the repo root — **do 
 
 ## What runs today
 
-Title → Cast off → a sailable wooden launch on an endless sunset sea with six authored
-limestone islands whose shores are provably solid. WASD/arrows on desktop, a fixed split helm
-on touch, chase camera with A3 roll and island obstruction, wake ribbon, bow spray, shore foam,
-pause via the button / Escape / P. No discovery loop, no chart, no save, no audio, no
-procedural geography.
+A complete six-page sunset-atlas voyage in an endless deterministic archipelago. Keyboard and
+split-helm touch sailing, solid shores, smooth follow camera, six distinct authored crowns,
+two-second slow discovery, postcards, compass pinning, chart, named ordinary visits, distance,
+atlas completion and continued sailing. `sunwake-v1` saves position/progress/settings, validates
+imports and resumes at rest. Sound is synthesized and opt-in. Pause settings include reduced
+motion, quality and explicitly confirmed restart. M7 adaptive performance is being added.
 
 ## Verification
 
@@ -111,27 +111,18 @@ harness imports the real production code.
   `performance.now()`; screenshot capture waits two RAFs; the error UI must keep its inline
   styling and use `textContent`; wave-test bounds are derived from the table, never literals.
 
-## Exact next action: M5 — endless archipelago
+## Exact next action: M7 — mobile qualification and polish
 
-Nothing procedural exists yet. `core/world.mjs` was written so M5 slots in at one function:
+Add adaptive quality, emergency tier, scene/ornament budgets and diagnostics. Run dense-scene
+budgets and sustained CDP mobile emulation at both orientations, DPR 3 and CPU ×4. Inspect
+final screenshots and regress collision. Physical hardware remains unavailable.
 
-1. Replace `chunkIsland(cx,cz)` with: authored `LANDMARKS` override first, otherwise
-   `hash32(SEED,cx,cz,salt)` → 55% occupancy, at most one island, centre = chunk centre ± 64 m
-   independent jitter, radius 26–64 m, adjacent centres ≥256 m apart on their separating axis,
-   origin chunk and the 90 m spawn clearance reserved as water. Query order must not affect
-   generation. Keep the descriptor shape `{id,cx,cz,x,z,radius,height,profile,landmark,seed}`.
-2. Bound the descriptor cache to 256 chunks; collision may regenerate an uncached chunk
-   immediately. **Pending meshes must never mean pending colliders.**
-3. Streaming in `render/islands.mjs`: build within 1,000 m nearest-first, evict past 1,150 m,
-   ≤2 ms and ≤2 work items per frame, LOD, prebuilt geometry pools. Right now all six islands
-   are built at boot and never evicted — that is fine for six and wrong for infinity.
-4. Gates (TASKS §B M5): `--suite world` — 10,000 chunks queried in different orders must be
-   byte-identical; `--suite collision` — 100,000 randomised cases; a 20 km sailed route with
-   stable memory and no water seam at rebases.
-
-Then M6 (exploration loop), M7 (mobile performance, `docs/VERIFY.md` completion), M8 (hand-off).
-Never cut, per TASKS A8: the water, the handling, the shore collision, the camera, both control
-schemes, the six landmarks.
+M5: `browser-stream.json`, `browser-shape.json`, `m5-extra.json`, `m5-collision.txt`.
+M6: `m6-browser.json`, `m6-*.png`, `m6-collision.txt`; Node `--suite exploration`.
+Real CDP keyboard sailing from default spawn discovers Lantern Key in 38.25 simulation seconds.
+The other five used controlled positions followed by real RAF dwell. Completion, continued
+sailing, reload, corrupt save and denied storage all passed. Original canvas postcard art is
+in `platform/ui.mjs`; discovery logic and validation stay in pure core modules.
 
 ## Debug surface
 
@@ -151,9 +142,8 @@ teleporting. `advance()` ends with `interpolateSimulation`, so the snapshot's `x
 - The wake still reads slightly too geometric right at the stern; it is a flat two-arm V with no
   turbulence offset. Much better than the dashed beams it replaced, not beautiful.
 - Bow spray quads are a little large and round at close range.
-- Islands are a touch crisp against the horizon haze between 240 and 760 m; the scene fog range
-  does not quite match the water shader's own 180–650 m fade.
-- Terraces are regular enough to still read as concentric rings from close up.
+- D2 closed: shared HORIZON_FADE and linear-space sky colour; fresh approach/far screenshots inspected.
+- D1 closed: irregular terrain accepted and visually reconfirmed.
 - In portrait the compass strip sits close to the pause button and its degree readout is hidden
   by design at ≤600 px. Revisit with the real HUD in M6/M7.
 - `world.nearby()` sorts a fresh array every frame. Fine for six islands, not for M5.

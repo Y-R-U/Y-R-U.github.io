@@ -15,9 +15,10 @@ export const HORIZON_FADE = Object.freeze([180,650]);
 export const SUN_ANGLE = 6 * Math.PI / 180;
 export const SUN_DIRECTION = Object.freeze([-Math.cos(SUN_ANGLE), Math.sin(SUN_ANGLE), 0]);
 export const QUALITY = Object.freeze({
-  high: {segments:256, bands:[[96,48],[48,144],[32,400],[16,1536]], pixelCap:2e6,dpr:1.5,ripples:2},
-  standard: {segments:192,bands:[[64,32],[48,128],[32,384],[16,1536]],pixelCap:1.1e6,dpr:1.25,ripples:2},
-  low: {segments:128,bands:[[64,32],[32,128],[24,384],[8,1536]],pixelCap:.65e6,dpr:1,ripples:1},
+  high: {segments:256, bands:[[96,48],[48,144],[32,400],[16,1536]], pixelCap:2e6,dpr:1.5,ripples:2,drawCap:70,triangleCap:185000,ornaments:240},
+  standard: {segments:192,bands:[[64,32],[48,128],[32,384],[16,1536]],pixelCap:1.1e6,dpr:1.25,ripples:2,drawCap:55,triangleCap:125000,ornaments:160},
+  emergency: {segments:128,bands:[[64,32],[32,128],[24,384],[8,1536]],pixelCap:.40e6,dpr:.75,ripples:1,drawCap:28,triangleCap:58000,ornaments:24},
+  low: {segments:128,bands:[[64,32],[32,128],[24,384],[8,1536]],pixelCap:.65e6,dpr:1,ripples:1,drawCap:36,triangleCap:70000,ornaments:64},
 });
 export const SEED = 0x53554E57;
 

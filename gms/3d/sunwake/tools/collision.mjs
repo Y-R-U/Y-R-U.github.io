@@ -76,6 +76,24 @@ function bruteForceBand(x0,z0,x1,z1,generate=landmarksOnly){
 
 export function collision(){
   const key=LANDMARKS[0],report={};
+  // Seeded case 1399: two tangent contacts send the remainder OUTSIDE the
+  // initial DDA band. A frozen-band mutation penetrates an unqueried shore.
+  // Keep that negative control: an endpoint check against the original list
+  // would silently pass, whereas this independent spatial scan cannot.
+  {
+    const p={x:-50575.805249656434,z:34385.48855049048};
+    const d={x:-2502.38153792162,z:-920.5876421980047},v={x:d.x*17,z:d.z*17};
+    const initial=live.queryIslands(p.x,p.z,p.x+d.x,p.z+d.z,[]);
+    const frozen=(x0,z0,x1,z1,out)=>{out.length=0;out.push(...initial);return out;};
+    const broken=moveCircleSwept(p,d,v,BOAT_RADIUS,frozen);
+    const badGap=clearanceIn(live,broken.x,broken.z).gap;
+    assert.ok(badGap < -2,'negative control must expose the original missed shore');
+    const fixed=moveCircleSwept(p,d,v,BOAT_RADIUS,live.queryIslands);
+    const goodGap=assertClearLive(fixed.x,fixed.z,'deflected chunk-band regression').gap;
+    assert.equal(fixed.contacts,3);assert.equal(fixed.recovered,false);
+    assert.equal(fixed.failed,false);
+    report.deflectedBand={frozenBandClearance:badGap,fixedClearance:goodGap,contacts:fixed.contacts};
+  }
   assert.equal(key.id,'-1:0');
 
   // The DDA band must be a superset of a brute-force scan in BOTH directions,

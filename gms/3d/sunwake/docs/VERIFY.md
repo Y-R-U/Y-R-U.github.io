@@ -1,8 +1,8 @@
-# SUNWAKE verification — M1 / M2 / M3 / M4
+# SUNWAKE verification — living milestone record
 
 Verification date: 2026-09-19 Australia/Brisbane (2026-09-18 UTC).
 Scope: M1 sunset shell and harness; M2 water; M3 playable launch; M4 solid shores.
-M5–M8 are not implemented or accepted. The M1/M2 sections below are the original
+M5 is now independently accepted (see appended section); M6–M8 are in progress. The M1/M2 sections below are the original
 record and were not rewritten; the M3/M4 sections at the end are this session's.
 
 ## Reproduce
@@ -192,3 +192,65 @@ that is M5.
 **Physical-device gate still NOT MET — no hardware available.** Nothing in M3 or M4 changes
 that. Chrome remains ANGLE/SwiftShader and no phone FPS, Safari result or M7 performance
 qualification is claimed.
+
+
+## M5 — signed off 2026-09-19
+
+Commands: `node tools/sim.mjs`, `node tools/sim.mjs --suite collision`, and the prescribed
+CDP launcher followed by `node tools/browser.mjs --suite stream`, `--suite shape`, and
+`node tools/m5-extra.mjs`. Existing :8888 server returned HTTP 200; no restart performed.
+Sandbox socket isolation required execution with local network access.
+
+- World: 10,000 chunks, seven query orders byte-identical; 5,543 occupied; three profiles.
+- Collision: 100,000 live randomized sweeps, 35,392 overlapping starts, 38,319 shore hits;
+  minimum clearance 0.001 m. Actual 20,000.05 m route: 160,804 steps, 14,573 contacts,
+  67 entered chunks, simulated and interpolated centres clear throughout. Cache ≤256.
+- Added regression uses seeded case 1399 and an independent spatial overlap scan. Freezing
+  the initial query band reproduces **−2.787036 m clearance**. Production re-queries after
+  tangent projection, accumulates candidates, makes three contacts and remains clear without
+  endpoint recovery. This tests the original failure, not a narrowed fixture.
+- Browser streaming: 21 sampled locations up to 20 km radius and return, pool ≤40,
+  peak 20 islands / 28 uploaded geometries / 15 draws / 20,685 island triangles. Home has
+  24 uploaded geometries; descriptor cache 256. Worst sampled mesh build 0.40 ms.
+  These browser positions are controlled teleports, not a claim of a 20 km browser sail.
+- Real simulated sailing in Chrome crosses both signs of 256 m rebases and 384 m chunk
+  boundaries. `(1e7,-1e7)` renders and sails with intact collision and GPU wave probe.
+- Rebase image mean channel difference 0.002562; fraction differing by >8: 0.000000715.
+- **D2 confirmed fixed**, including direct inspection of fresh `d1-approach.png` and
+  `d1-far.png`: shared 180–650 m fade and identical linear-space sky colour. No straight
+  fog discontinuity, white interior foam, inside-out faces or far-water shelves observed.
+- Reports: `evidence/browser-stream.json`, `browser-shape.json`, `m5-extra.json`,
+  `m5-collision.txt`. All browser runs have zero collected errors.
+
+M5 accepted. M6 is next. **Physical-device gate: NOT MET — no hardware available.**
+
+
+## M6 — exploration signed off 2026-09-19
+
+Commands: `node tools/sim.mjs --suite exploration`, `--suite collision`, and the prescribed
+launcher followed by `node tools/exploration-browser.mjs`.
+
+- Pure discovery: all six valid outside their collision circles; strict speed <3 m/s,
+  two continuous seconds; speed or range interruption resets dwell. One reward per landmark,
+  one completion event; nearest undiscovered pin; 300 ordinary arrivals retain latest 256.
+- Save validation: version, seed, finite bounded coordinates, known and deduplicated atlas IDs,
+  bounded ordinary records; corrupt data recovers. Restored position is collision-validated
+  with velocity reset. `core/` remains DOM/Three/storage-free.
+- Browser first voyage: **38.25 simulated seconds** to Lantern Key from the default launch,
+  using real CDP W/A/S/D events and production fixed ticks. No pose/teleport after restart.
+  This is deterministic accelerated sailing, not a claim of 38.25 wall-clock seconds.
+- Remaining five: controlled positions outside shores followed by **real RAF discovery dwell**.
+  Completion opens all six illustrated cards; closing the atlas permits continued key sailing.
+- Reload preserves all six pages and position with zero velocity. Malformed saved JSON and
+  throwing storage operations both leave a bootable/playable game with an explanatory notice.
+- Local canvas-drawn postcards and distinct authored lighthouse, bells, twin crown, brazier,
+  needle and six-tree orchard. All six silhouettes persist through LOD; no external assets.
+- Directly inspected first-sail discovery, bell approach, completion chart and postcard captures.
+  No shore foam fill or inside-out surfaces observed. UI is legible and completion is playable.
+- Evidence: `evidence/m6-browser.json`, `m6-first-sail.png`, `m6-lantern-discovered.png`,
+  `m6-{bells,crown,cinder,needle,orchard}.png`, `m6-atlas-complete.png`, `m6-postcards.png`.
+  Browser errors: zero. Full collision regression still passes.
+
+M6 accepted. M7 qualification remains next. Sound synthesis is implemented but audible output
+has not been assessed. Distant sail silhouettes and the optional bird flock are deferred per
+TASKS A8; all ordinary names, audio and settings are retained.
