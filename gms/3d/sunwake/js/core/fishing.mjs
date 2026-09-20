@@ -10,6 +10,9 @@ export const BITE_MIN=1.4,BITE_MAX=6.5;
 export const TENSION_MAX=1;
 export const BAND_BASE=.30;           // half-width of the safe band at level 1
 export const BAND_PER_LEVEL=.012;     // widens as the skill grows
+// What a bought rod adds to that band. Lives here rather than in jobs.mjs so
+// fishing does not have to know the economy exists; jobs.mjs reads it back.
+export const ROD_BAND=Object.freeze([0,.05,.10]);
 export const REEL_RATE=.55;           // tension gained per second while reeling
 export const SLACK_RATE=.75;          // tension lost per second while not
 export const LANDED_PROGRESS=1;
@@ -47,7 +50,7 @@ export function levelForXp(xp){
   return level;
 }
 export function xpToNext(xp){const level=levelForXp(xp);return level>=MAX_LEVEL?0:LEVEL_XP[level]-xp;}
-export function tensionBand(level){return Math.min(.62,BAND_BASE+BAND_PER_LEVEL*(level-1));}
+export function tensionBand(level,rod=1){return Math.min(.62,BAND_BASE+BAND_PER_LEVEL*(level-1)+(ROD_BAND[Math.min(ROD_BAND.length,Math.max(1,rod|0))-1]||0));}
 
 export function availableSpecies(level,kind){
   return SPECIES.filter(s=>s.level<=level&&(s.weight[kind]||0)>0);
@@ -84,6 +87,7 @@ export function createFishing(save=null){
     casts:Math.max(0,Number.isSafeInteger(save?.casts)?save.casts:0),
     caught:{...(save?.caught||{})},
     best:{...(save?.best||{})},
+    rod:Math.min(ROD_BAND.length,Math.max(1,save?.rod|0||1)),
     phase:'idle',           // idle | casting | waiting | fighting | landed | lost
     timer:0,tension:0,progress:0,outside:0,
     species:null,kg:0,kind:OPEN_WATER,lastXp:0,lastLevel:0,spot:null};
@@ -130,7 +134,7 @@ export function stepFishing(fishing,boat,dt,reeling,events){
     }
     return;
   }
-  const level=levelForXp(fishing.xp),band=tensionBand(level),fight=fishing.species.fight;
+  const level=levelForXp(fishing.xp),band=tensionBand(level,fishing.rod),fight=fishing.species.fight;
   fishing.tension+=(reeling?REEL_RATE*fight:-SLACK_RATE)*dt;
   fishing.tension=Math.min(TENSION_MAX,Math.max(0,fishing.tension));
   const centre=.5,inside=Math.abs(fishing.tension-centre)<=band/2;

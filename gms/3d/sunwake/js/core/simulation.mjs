@@ -1,12 +1,27 @@
-import {FIXED_DT} from './config.mjs';
+import {FIXED_DT,BOAT} from './config.mjs';
 import {createBoat,stepBoat} from './boat.mjs';
 export function createSimulation(spawn={},world={},time=0){
   const boat=createBoat(spawn,world,time);
   return {boat,previous:{...boat},world,time,previousTime:time,accumulator:0,steps:0,scratch:{}};
 }
+/**
+ * A bought hull is more engine, and the engine lives in `core/boat.mjs`, which
+ * belongs to the other builder. So the extra thrust is applied here instead, as
+ * exactly what it is: newtons along the heading, proportional to the smoothed
+ * throttle. `s.bonusThrust` is 0 unless something sets it, so with a stock hull
+ * every trajectory in every suite is bit-identical to before.
+ */
+export function applyBonusThrust(s,dt){
+  const newtons=s.bonusThrust||0,b=s.boat,drive=Math.max(0,b.throttle);
+  if(!(newtons>0)||drive<=0)return;
+  const a=newtons*drive/BOAT.mass*dt;
+  b.vx+=Math.sin(b.yaw)*a;b.vz+=Math.cos(b.yaw)*a;
+  const speed=Math.hypot(b.vx,b.vz);
+  if(speed>BOAT.speedCap){b.vx*=BOAT.speedCap/speed;b.vz*=BOAT.speedCap/speed;}
+}
 export function tickSimulation(s,input,onStep){
   Object.assign(s.previous,s.boat);s.previousTime=s.time;
-  stepBoat(s.boat,input,s.world,s.time,FIXED_DT,s.scratch);s.steps++;s.time+=FIXED_DT;
+  stepBoat(s.boat,input,s.world,s.time,FIXED_DT,s.scratch);applyBonusThrust(s,FIXED_DT);s.steps++;s.time+=FIXED_DT;
   onStep?.(s.boat,s.time,FIXED_DT,s.scratch);
 }
 export function stepSimulation(s,input,frameDt,onStep){

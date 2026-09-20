@@ -535,3 +535,48 @@ Honest reading of them, since this project has five green suites over invisible 
   healthy CDP socket. It now retries twice after two RAFs, which has always landed it. That flake
   is what silently truncated the previous builder's evidence run.
 - Physical device and real-phone performance remain **NOT MET**; nothing here changes that.
+
+## Graphics builder — the 900 m read and horizon weather, 2026-09-21 — IN PROGRESS
+
+Taking the previous builder's honest closing note as the task: *"at 900 m the island alone is
+still a small pale smudge — the beacon is what makes you turn the boat, not the rock."*
+
+Measured the claim before acting on it, on `docs/evidence/beacon-900.png` (Bell Garden at 900 m):
+island-region mean luminance **170.6** against a sky-band mean of **173.0** — the rock body is
+within 1.4% of the haze it sits in. Only the dark roofs and the cypresses carry any signal at all
+(240 pixels above a 32/255 threshold in a 200x60 crop).
+
+So the cause is **not** `HORIZON_FADE` (which is the gameplay builder's file and is being left
+alone). At 900 m the elevated-silhouette fade is only 30% — the rock is already pale sand under a
+bright hemisphere light, so it *starts* the same value as the haze and no amount of un-fading will
+separate it. Real backlit land at golden hour reads **darker and cooler** than the sky behind it.
+Fixing it render-side, three ways: aerial perspective that darkens before it bleaches, a true
+silhouette at far LOD instead of a cone, and horizon weather so the sky band is not a flat wash.
+
+Owned files only: `js/render/*`, `js/core/visual-config.mjs`. Evidence to follow.
+
+---
+
+## PAUSED 2026-09-21 — mid-task stop, read this before resuming
+
+Aaron stopped both builders to resume in 4 hours. **Neither lane finished; both were stopped
+early, not at a gate.** The tree is green (9 Node suites, hull test, browser shell suite all
+pass and the game boots) but two features are part-built:
+
+- **Gameplay lane (jobs/coins):** `js/core/jobs.mjs` was just created and is barely started.
+  `fishing.mjs`, `save.mjs`, `simulation.mjs` have related edits. The agent had finished reading
+  and was about to write the jobs core module. **Treat jobs.mjs as a stub, not as a design to
+  inherit.** The brief is ROADMAP P2: job board at discovered islands, three job kinds, jobs you
+  are ineligible for shown DISABLED WITH THE REASON (Aaron was explicit), deterministic per
+  island per in-game day, delivery at the destination jetty's `approach` point (the table of six
+  jetty coordinates is above; `deck` is inside solid collision).
+- **Graphics lane (900 m island readability):** `js/render/islands.mjs`, `shaders.mjs`,
+  `sky.mjs`, `js/core/visual-config.mjs` have partial edits — the agent was mid-way through the
+  island material when stopped. Verify what is actually in those files before building on them.
+  The goal: at 900 m an island is currently "a pale smudge — the beacon is what makes you turn
+  the boat, not the rock". Fix render-side; `HORIZON_FADE` lives in `js/core/config.mjs` which
+  is the gameplay lane's file. **Read TASKS §C1 first** — the distance fades partly exist to
+  keep the far-water shelf bug fixed.
+
+Still open after those: a reason to stop at ordinary islands, M7 adaptive quality finish,
+distant sails and birds, and the physical-device gate that only Aaron can close.

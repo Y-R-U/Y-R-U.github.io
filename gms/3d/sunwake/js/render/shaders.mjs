@@ -22,6 +22,10 @@ uniform vec3 uSun, uHorizon, uZenith, uHaze, uSunColor;
 uniform sampler2D uCloud;
 uniform float uCloudTime;
 uniform float uCloudEnabled;
+// One scalar for every horizon weather term, so a suite can render the exact
+// same frame with it at 0 and prove the measurement is the weather and not
+// frame-to-frame noise. The sun never moves: this is cloud, not a clock.
+uniform float uWeather;
 vec3 skyColor(vec3 ray, bool disc) {
   float altitude=max(ray.y,0.0);
   float west=pow(max(dot(normalize(vec3(ray.x,0.001,ray.z)),normalize(vec3(uSun.x,0.,uSun.z))),0.0),4.0);
@@ -35,6 +39,35 @@ vec3 skyColor(vec3 ray, bool disc) {
   float bands=exp(-pow((altitude-.20)/.037,2.))+0.65*exp(-pow((altitude-.32)/.048,2.))+0.35*exp(-pow((altitude-.52)/.065,2.));
   float clouds=smoothstep(.44,.65,noise)*bands*smoothstep(.04,.13,altitude);
   color=mix(color,mix(uHaze*.75,uHorizon*1.1,west),clouds*.5);
+  if(uCloudEnabled>.5&&uWeather>.001){
+    // Horizon weather. Every term is analytic on integer harmonics of the
+    // azimuth, so it is exactly periodic in 2pi: no texture, no extra draw and
+    // no seam at +/-pi (which a texture lookup on atan() would give, because the
+    // wrap makes the derivative enormous and drops it to the coarsest mip).
+    float azimuth=atan(ray.z,ray.x),lap=uCloudTime*6.2831853;
+    float toSun=max(dot(normalize(vec3(ray.x,0.0001,ray.z)),normalize(vec3(uSun.x,0.,uSun.z))),0.);
+    // 1. A bank of cloud actually sitting ON the horizon. The existing band set
+    //    starts at 0.04 altitude, so the strip the islands live in was a flat
+    //    wash with nothing in it to give the distance any scale.
+    float bankNoise=.5+.5*(.55*sin(azimuth*5.+lap*1.4)+.30*sin(azimuth*11.-1.7)+.15*sin(azimuth*23.+2.3));
+    float bank=exp(-pow((altitude-.032)/.030,2.))*smoothstep(.36,.68,bankNoise);
+    color=mix(color,mix(uHaze*.84,uHorizon*1.2,west),bank*.42*uWeather);
+    // 2. Crepuscular shafts raked off the sun, gated to the sun's quarter.
+    float rake=.5+.5*sin(azimuth*17.+1.1)*sin(azimuth*6.+lap*2.2);
+    float shaft=pow(toSun,6.)*smoothstep(.03,.30,altitude)*(1.-smoothstep(.30,.64,altitude))*rake;
+    color+=uSunColor*shaft*.14*uWeather;
+    // 3. One squall, a full lap of the compass per cloud wrap (~35 min), so a
+    //    long voyage watches it arrive, cross and leave. The veil is at full
+    //    strength at altitude 0 on purpose: the sea's own haze is
+    //    skyColor(horizontal), so sky and water darken together under it with
+    //    no line between them.
+    float off=abs(atan(sin(azimuth-lap),cos(azimuth-lap)));
+    float ragged=.26+.09*sin(azimuth*21.+3.7)+.04*sin(azimuth*47.-1.2);
+    float across=1.-smoothstep(ragged*.42,ragged,off);
+    float veil=across*(1.-smoothstep(.12,.34,altitude));
+    float head=across*exp(-pow((altitude-.17)/.090,2.));
+    color=mix(color,mix(uHaze,uZenith,.42)*.58,(veil*.44+head*.36)*uWeather);
+  }
   if(disc) {float edge=fwidth(alignment)*1.2;float sun=smoothstep(cos(radians(.8))-edge,cos(radians(.8))+edge,alignment);color=mix(color,uSunColor*5.,sun);}
   // The sea haze uses precisely skyColor(horizontal,false).
   return color;

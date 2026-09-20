@@ -2,6 +2,7 @@ import {SEED} from './config.mjs';
 import {ATLAS} from './content.mjs';
 import {MAX_VISITS} from './exploration.mjs';
 import {SPECIES,MAX_LEVEL,LEVEL_XP} from './fishing.mjs';
+import {createJobs,encodeJobs} from './jobs.mjs';
 export const SAVE_KEY='sunwake-v1';
 export const DEFAULT_SETTINGS=Object.freeze({sound:false,reduced:false,quality:'auto',helm:'invisible',helmHintsDone:false});
 const coordinate=n=>Number.isFinite(n)&&Math.abs(n)<=1e9;
@@ -34,9 +35,15 @@ export function validateSave(v){
  }
  const fishing={xp:Number.isFinite(raw.xp)&&raw.xp>0?Math.min(Math.floor(raw.xp),cap):0,
   casts:Number.isSafeInteger(raw.casts)&&raw.casts>0?Math.min(raw.casts,1e9):0,caught,best};
- return {version:1,seed:SEED,fishing,position:{x:v.position.x,z:v.position.z,yaw:Math.atan2(Math.sin(v.position.yaw),Math.cos(v.position.yaw))},atlasIds,ordinaryVisits,
+ // Jobs and coins arrived after fishing did, and the same rule applies: a save
+ // without them is a save from before there was a job board, not a bad save.
+ // `createJobs` regenerates every accepted job from the board it came from, so
+ // this both defaults a missing block and scrubs a tampered one.
+ const jobs=encodeJobs(createJobs(v.jobs&&typeof v.jobs==='object'?v.jobs:null));
+ return {version:1,seed:SEED,fishing,jobs,position:{x:v.position.x,z:v.position.z,yaw:Math.atan2(Math.sin(v.position.yaw),Math.cos(v.position.yaw))},atlasIds,ordinaryVisits,
   visitCount:Math.max(ordinaryVisits.length,Number.isSafeInteger(v.visitCount)&&v.visitCount>=0?v.visitCount:0),distanceM:Number.isFinite(v.distanceM)&&v.distanceM>=0?v.distanceM:0,settings};
 }
 export function decodeSave(text){try{return validateSave(JSON.parse(text));}catch{return null;}}
-export function encodeSave(boat,exploration,settings,fishing=null){return JSON.stringify(validateSave({version:1,seed:SEED,position:{x:boat.x,z:boat.z,yaw:boat.yaw},atlasIds:exploration.atlasIds,ordinaryVisits:exploration.ordinaryVisits,visitCount:exploration.visitCount,distanceM:exploration.distanceM,settings,
-  fishing:fishing?{xp:fishing.xp,casts:fishing.casts,caught:fishing.caught,best:fishing.best}:null}));}
+export function encodeSave(boat,exploration,settings,fishing=null,jobs=null){return JSON.stringify(validateSave({version:1,seed:SEED,position:{x:boat.x,z:boat.z,yaw:boat.yaw},atlasIds:exploration.atlasIds,ordinaryVisits:exploration.ordinaryVisits,visitCount:exploration.visitCount,distanceM:exploration.distanceM,settings,
+  fishing:fishing?{xp:fishing.xp,casts:fishing.casts,caught:fishing.caught,best:fishing.best}:null,
+  jobs:jobs?encodeJobs(jobs):null}));}

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import {SHORE_TOP,SHORE_BOTTOM,APRON_TOP} from '../core/world.mjs';
 import {islandField,TERRACE_EDGES,saturate,smoothstep} from '../core/island-shape.mjs';
-import {MARINE_LIMITS,SETTLEMENT_LIMITS,ISLAND_VISIBILITY} from '../core/visual-config.mjs';
+import {MARINE_LIMITS,SETTLEMENT_LIMITS,ISLAND_VISIBILITY,AERIAL} from '../core/visual-config.mjs';
 import {HORIZON_FADE,QUALITY} from '../core/config.mjs';
 import {createSettlementGeometry} from './settlements.mjs';
 import {skyGLSL,waveGLSL} from './shaders.mjs';
@@ -86,7 +86,12 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
   // near-vertical face whose plan shape wanders with the noise instead of a
   // lathe-turned circle. Ring 0 is exactly the wall top: rim and wall share it.
   const SMAX=.985,DU=.008,LEDGE=.030;
-  const edgesUsed=lod===1?TERRACE_EDGES.slice(0,2):TERRACE_EDGES;
+  // Far LOD used to collapse the terrain to a single cone from the wall top to
+  // the summit, which is why two islands 900 m off looked like the same smudge:
+  // they literally were the same triangle fan. It now runs the coarse ring
+  // scheme, so the far skyline is the island's own heightfield — its ridges,
+  // its cliff sector, its lopsided summit. 24 segments x 7 rings.
+  const edgesUsed=lod>=1?TERRACE_EDGES.slice(0,2):TERRACE_EDGES;
   const treads=lod===0?1:0,summits=lod===0?2:1;
   const RINGS=2+edgesUsed.length*(treads+2)+summits;
   const riserBand=new Array(RINGS-1).fill(false);
@@ -111,9 +116,7 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
     for(let k=1;k<RINGS;k++)stations[k]=Math.max(stations[k],stations[k-1]+1e-4);
     return stations;
   }
-  if(lod===2){
-    for(let i=0;i<AS;i++){const a=angleAt(i),b=angleAt(i+1);push(at(a,wallRadius(a),wallTop(a)),at(b,wallRadius(b),wallTop(b)),[0,heightAt(0,0),0],COLOURS.stone,.1);}
-  }else{
+  {
   const rings=[];for(let k=0;k<RINGS;k++)rings.push([]);
   for(let i=0;i<AS;i++){
     const a=angleAt(i),wr=wallRadius(a),cos=Math.cos(a),sin=Math.sin(a);
@@ -247,11 +250,16 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
   const settlement=createSettlementGeometry(island,lod),rockVertices=positions.length/3;
   const glow=new Float32Array(rockVertices+settlement.attributes.position.count);
   glow.set(settlement.attributes.glow.array,rockVertices);
+  // 1 on every settlement vertex, 0 on rock. The aerial-perspective pass in
+  // createIslandMaterial uses it to hold roofs, walls and the harbour mast back
+  // from the silhouette treatment, so a far island keeps readable structure.
+  const built=new Float32Array(glow.length).fill(1,rockVertices);
   for(const v of settlement.attributes.position.array)positions.push(v);
   for(const v of settlement.attributes.color.array)colours.push(v);
   const settlementTriangles=settlement.userData.triangles;settlement.dispose();
   const geometry=new THREE.BufferGeometry();
   geometry.setAttribute('glow',new THREE.BufferAttribute(glow,1));
+  geometry.setAttribute('built',new THREE.BufferAttribute(built,1));
   geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
   geometry.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));
   geometry.computeVertexNormals();
@@ -268,16 +276,16 @@ export function createIslandMaterial(skyUniforms,waterUniforms){
   const material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.92,flatShading:true});
   material.fog=false;
   material.onBeforeCompile=shader=>{
-    for(const key of ['uSun','uHorizon','uZenith','uHaze','uSunColor','uCloud','uCloudTime','uCloudEnabled'])shader.uniforms[key]=skyUniforms[key];
+    for(const key of ['uSun','uHorizon','uZenith','uHaze','uSunColor','uCloud','uCloudTime','uCloudEnabled','uWeather'])shader.uniforms[key]=skyUniforms[key];
     if(waterUniforms){shader.uniforms.uPhases=waterUniforms.uPhases;shader.uniforms.uCenter=waterUniforms.uCenter;}
-    shader.vertexShader='attribute float glow;varying float vGlow;varying vec3 vShoreWorld;varying vec3 vRockLocal;\n'+shader.vertexShader
+    shader.vertexShader='attribute float glow;attribute float built;varying float vGlow;varying float vBuilt;varying vec3 vShoreWorld;varying vec3 vRockLocal;\n'+shader.vertexShader
       .replace('#include <project_vertex>',`#include <project_vertex>
         vec4 rockPosition=vec4(transformed,1.0);
         #ifdef USE_INSTANCING
         rockPosition=instanceMatrix*rockPosition;
         #endif
-        vShoreWorld=(modelMatrix*rockPosition).xyz;vRockLocal=position;vGlow=glow;`);
-    shader.fragmentShader='varying float vGlow;varying vec3 vShoreWorld;varying vec3 vRockLocal;\n'+skyGLSL+(waterUniforms?'uniform vec2 uCenter;\n'+waveGLSL:'')+shader.fragmentShader
+        vShoreWorld=(modelMatrix*rockPosition).xyz;vRockLocal=position;vGlow=glow;vBuilt=built;`);
+    shader.fragmentShader='varying float vGlow;varying float vBuilt;varying vec3 vShoreWorld;varying vec3 vRockLocal;\n'+skyGLSL+(waterUniforms?'uniform vec2 uCenter;\n'+waveGLSL:'')+shader.fragmentShader
       .replace('#include <color_fragment>',`#include <color_fragment>
         float grain=sin(vRockLocal.y*5.8+sin(vRockLocal.x*.47)*2.+sin(vRockLocal.z*.41)*2.);
         diffuseColor.rgb*=.97+.03*grain;
@@ -288,11 +296,38 @@ export function createIslandMaterial(skyUniforms,waterUniforms){
       .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>\n totalEmissiveRadiance+=vColor*vGlow;`)
       .replace('#include <opaque_fragment>',`#include <opaque_fragment>
   vec3 shoreRay=vec3(vShoreWorld.x-cameraPosition.x,0.,vShoreWorld.z-cameraPosition.z);
-  float coastFade=smoothstep(${HORIZON_FADE[0].toFixed(1)},${HORIZON_FADE[1].toFixed(1)},length(shoreRay));
-  float skylineFade=.30*smoothstep(${ISLAND_VISIBILITY.fadeStart.toFixed(1)},900.0,length(shoreRay))
-    +.70*smoothstep(940.0,${ISLAND_VISIBILITY.fadeEnd.toFixed(1)},length(shoreRay));
+  float range=length(shoreRay);
+  float elevated=smoothstep(1.6,5.0,vRockLocal.y);
+  // AERIAL PERSPECTIVE, in the order it happens in air. Land this far away is
+  // BACKLIT: its own surface loses its diffuse lift and cools toward a dark
+  // silhouette a long way before the airlight bleaches it out. The first build
+  // went straight to the airlight, which is why a 900 m island measured 170.6
+  // mean luminance against a 173.0 sky and simply was not there. Withheld from
+  // the waterline (elevated), so the sea haze still meets the rock exactly
+  // where D2 put it and no seam comes back.
+  float aerial=elevated*smoothstep(${AERIAL.range[0].toFixed(1)},${AERIAL.range[1].toFixed(1)},range);
+  vec3 lit=gl_FragColor.rgb;
+  float grey=dot(lit,vec3(.299,.587,.114));
+  // Roofs, walls and the harbour mast keep most of their own colour and most of
+  // their brightness: the island goes to silhouette, the settlement stays a set
+  // of marks ON it. That is what reads as structure rather than as a smudge.
+  vec3 keep=mix(lit,vec3(grey),1.-mix(${AERIAL.chroma.toFixed(3)},${AERIAL.builtChroma.toFixed(3)},vBuilt));
+  // Rock whose bearing is near the sun keeps an ember cast; rock away from it
+  // goes blue-violet. Two far islands on different bearings are then different
+  // colours, not the same grey lozenge.
+  float sunward=pow(max(dot(normalize(shoreRay),normalize(vec3(uSun.x,0.,uSun.z))),0.),3.);
+  vec3 cool=vec3(${AERIAL.cool.map(v=>v.toFixed(3)).join(',')}),warm=vec3(${AERIAL.warm.map(v=>v.toFixed(3)).join(',')});
+  gl_FragColor.rgb=mix(lit,keep*mix(cool,warm,sunward),aerial*${AERIAL.strength.toFixed(3)}*(1.-${AERIAL.built.toFixed(3)}*vBuilt));
+  // Warm top-light on upward faces. Flat-shaded, so the world normal straight
+  // off the screen derivatives is the exact face normal, no extra varying.
+  vec3 faceNormal=normalize(cross(dFdx(vShoreWorld),dFdy(vShoreWorld)));
+  faceNormal*=sign(dot(faceNormal,cameraPosition-vShoreWorld)+1e-6);
+  gl_FragColor.rgb+=uSunColor*(aerial*${AERIAL.crest.toFixed(3)}*smoothstep(.25,.90,faceNormal.y));
+  float coastFade=smoothstep(${HORIZON_FADE[0].toFixed(1)},${HORIZON_FADE[1].toFixed(1)},range);
+  float skylineFade=.30*smoothstep(${ISLAND_VISIBILITY.fadeStart.toFixed(1)},900.0,range)
+    +.70*smoothstep(940.0,${ISLAND_VISIBILITY.fadeEnd.toFixed(1)},range);
   // Waterline still reaches the exact sea haze; elevated roofs/crowns stay legible.
-  float islandFade=mix(coastFade,skylineFade,smoothstep(1.6,5.0,vRockLocal.y));
+  float islandFade=mix(coastFade,skylineFade,elevated);
   gl_FragColor.rgb=mix(gl_FragColor.rgb,skyColor(normalize(shoreRay),false),islandFade);`);
   };
   return material;
