@@ -104,6 +104,11 @@ if(['all','handling'].includes(suite)){
     await reset();await press('KeyW');await advance(900);await p.shot(evidence+'m3-handling-keyboard.png');await release();
 
     // --- split helm touch, landscape then portrait ---
+    // The VISIBLE helm is no longer the default, so select it: this scenario is
+    // the visible split helm's regression and must keep testing that scheme.
+    // The invisible dual-zone helm has its own suite in tools/helm.mjs.
+    await p.eval(`document.getElementById('helm-mode').value='visible';document.getElementById('helm-mode').dispatchEvent(new Event('change'))`);
+    assert.equal(await p.eval('sunwake.helm.scheme'),'visible');
     for(const [width,height,label] of [[844,390,'landscape'],[390,844,'portrait']]){
       await p.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:3,mobile:true});
       await p.send('Emulation.setCPUThrottlingRate',{rate:4});

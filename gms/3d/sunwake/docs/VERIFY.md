@@ -254,3 +254,70 @@ launcher followed by `node tools/exploration-browser.mjs`.
 M6 accepted. M7 qualification remains next. Sound synthesis is implemented but audible output
 has not been assessed. Distant sail silhouettes and the optional bird flock are deferred per
 TASKS A8; all ordinary names, audio and settings are retained.
+
+---
+
+# 2026-09-21 — gameplay pass on Aaron's first play session
+
+## P0 — the waypoint bug
+
+**Reproduced before it was diagnosed**, in Node and in the browser, by sailing the route rather
+than reading the source.
+
+| | before | after |
+|---|---|---|
+| Leg 2 (Lantern Key → Bell Garden, 488 m), Node autopilot on the HUD bearing | **300.1 s** | **71.8 s** |
+| Same leg, browser, steering only by the on-screen arrow read back from `getComputedStyle` | **46 m covered in 300 s**, full throttle | **~65 s, closing the whole way** |
+| Seconds of the whole six-landmark route spent pinned to a shore making no way | 109.6 s | **0** |
+| Whole route, Node | never completed | **607.8 s, 4.5 km, all six** |
+
+Root causes, in order of weight:
+1. The advertised bearing ran through the island the player was moored against. From (−178, 141)
+   the straight line to Bell Garden passes **36.9 m** from Lantern Key's centre; its collision
+   radius is **36.6 m**.
+2. `TANGENT_DAMPING = .92` was applied per *tick* of contact, not per second: **0.68 %** of
+   tangential speed survived one second at 60 Hz. Now `TANGENT_RETENTION = .45` **per second**,
+   measured at dt = 1/120, 1/60 and 1/30 → **0.45, 0.45, 0.45**.
+3. The HUD reported "483 m to shore" and "Six places. Take your time." throughout.
+
+**Both fixes were isolated before either was tuned.** With only the friction fixed, leg 2 is
+148 s with 109 s aground; with only the bearing fixed, it is 71.8 s with 0 s aground and the
+friction is never exercised. The bearing is the primary fix; the friction is what stops a player
+who wanders into a shore — which an autopilot never does — from being welded to it.
+
+**The new suite was falsified against the pre-fix build**: `node tools/sim.mjs --suite route`
+goes red with *leg to -2:1 took 300.1 s*, and its friction probe goes red with *one second of
+grinding left 0.000 of the tangential speed, not 0.45*.
+
+Collision regression after the friction change: worst clearance **+0.001000 m**, worst single-call
+penetration **0.000000 m**, 100,000 live random sweeps clear, 20 km route clear — unchanged. The
+seeded negative control had to be **re-derived** (seed 1399 → 12773, frozen-band penetration
+**−21.95 m**) because the deflected path depends on the friction constant.
+
+Is the 488 m leg followable? **Yes.** Bell Garden is faintly visible from the start of it
+(`docs/evidence/p0-leg2-openwater.png`) and the HUD now reads *closing / holding / opening*. It
+is still very faint; a distant beacon is requested from the graphics builder in ROADMAP.md.
+
+## P1 — invisible helm
+
+`node tools/helm.mjs` at 390×844 and 844×390, DPR 3, touch emulation on, real
+`Input.dispatchTouchEvent`. Both orientations pass. Held throttle from rest: **14.1 m in 4.0 s,
+reaching 6.38 m/s**. Rudder reaches **PORT 100 / STARBOARD 100** from a thumb landing anywhere in
+the left half. Asserted: no permanent chrome, hints shown → faded → persisted across reload, a
+second thumb does not disturb the first, `touchEnd` releases only the named point, `touchCancel`
+with an empty array clears everything, and the visible helm still works when selected.
+
+**Physical-device gate remains NOT MET — no hardware available to any agent.** Everything above
+is CDP emulation on SwiftShader. Only Aaron can close it.
+
+## P2 — fishing
+
+`node tools/sim.mjs --suite fishing` and `node tools/fishing-browser.mjs`. Reef water yields
+**41.2 %** good fish against **26.7 %** in open water. Tension band **0.30** at level 1 → **0.528**
+at level 20. A level-1 angler hooked a gated species **0 times in 2,000 rolls**. Ten casts to
+level 3. Holding the reel flat out always loses the fish; a slack-and-ease policy always lands it.
+
+**Save compatibility verified rather than assumed:** the version stays at **1**, and a save with
+the `fishing` block stripped out (injected before any page script runs, because the game writes
+the save on `pagehide`) still boots, still reads *Continue voyage*, keeps its 900 m odometer and
+its atlas, and comes back as a level-1 angler.

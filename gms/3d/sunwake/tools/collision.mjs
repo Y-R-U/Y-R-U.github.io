@@ -76,13 +76,18 @@ function bruteForceBand(x0,z0,x1,z1,generate=landmarksOnly){
 
 export function collision(){
   const key=LANDMARKS[0],report={};
-  // Seeded case 1399: two tangent contacts send the remainder OUTSIDE the
-  // initial DDA band. A frozen-band mutation penetrates an unqueried shore.
-  // Keep that negative control: an endpoint check against the original list
-  // would silently pass, whereas this independent spatial scan cannot.
+  // Seeded case 12773: three tangent contacts send the remainder OUTSIDE the
+  // initial DDA band. A frozen-band mutation penetrates an unqueried shore by
+  // ~22 m. Keep that negative control: an endpoint check against the original
+  // list would silently pass, whereas this independent spatial scan cannot.
+  // NOTE: the deflected path depends on TANGENT_RETENTION, so this case has to
+  // be re-derived whenever shore friction changes — scan the seeded sweeps for
+  // a start/displacement whose frozen-band result is deep inside a shore that
+  // the live band keeps clear. The previous case (seed 1399) stopped biting
+  // when the per-step .92 damping became a per-second rate.
   {
-    const p={x:-50575.805249656434,z:34385.48855049048};
-    const d={x:-2502.38153792162,z:-920.5876421980047},v={x:d.x*17,z:d.z*17};
+    const p={x:-579.6440026560862,z:-563.8606989393151};
+    const d={x:1164.5409456811835,z:1182.946746710677},v={x:d.x*60,z:d.z*60};
     const initial=live.queryIslands(p.x,p.z,p.x+d.x,p.z+d.z,[]);
     const frozen=(x0,z0,x1,z1,out)=>{out.length=0;out.push(...initial);return out;};
     const broken=moveCircleSwept(p,d,v,BOAT_RADIUS,frozen);

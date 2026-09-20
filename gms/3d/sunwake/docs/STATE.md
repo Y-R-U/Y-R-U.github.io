@@ -77,7 +77,76 @@ harness imports the real production code.
   `camera`, `effects`, and **new** `islands.mjs`.
 - `tools/` — `cdp`, `browser`, `sim`, `handling`, and **new** `collision.mjs`.
 
+## 2026-09-21 — gameplay pass on Aaron's first play session
+
+P0 waypoint bug and P1 invisible helm. Full detail and evidence in `docs/ROADMAP.md`; the
+short version, and the new commands:
+
+```sh
+node tools/sim.mjs                                            # now 9 suites, route and fishing included
+node tools/sim.mjs --suite route                              # sails the six-landmark route by the HUD bearing
+node tools/sim.mjs --suite fishing                            # species, curve, fight, save migration
+~/.claude/bin/cdp start --port 9223 && node tools/helm.mjs    # invisible helm, real CDP touch, both orientations
+~/.claude/bin/cdp start --port 9223 && node tools/fishing-browser.mjs   # the fishing loop through the real DOM
+```
+
+`tools/browser.mjs`'s handling scenario now selects the **visible** helm before it drives
+`#rudder`, because the invisible scheme is the default and those buttons are `display:none`.
+That scenario is the visible helm's regression; `tools/helm.mjs` is the invisible one's.
+
+- `core/exploration.mjs` gains **`courseTo()`**: the bearing the compass advertises is routed
+  around any island whose avoidance ring (`COURSE_CLEARANCE = 14 m`) the direct line enters.
+  Without it the arrow pointed straight through Lantern Key from the spot where you discover it.
+- `core/collision.mjs`: `TANGENT_DAMPING = .92` **per step** became
+  `TANGENT_RETENTION = .45` **per second**, scaled by the real `dt` now threaded through
+  `world.resolveBoat(b,px,pz,dt)`. The old constant left 0.68% of tangential speed after one
+  second of contact at 60 Hz and welded the hull to any shore it brushed.
+- `stepExploration` no longer lets an ordinary island take a landmark's dwell, and no longer
+  steals a pin the player set by hand from the chart.
+- `platform/input.mjs` gains the dual-zone invisible helm; `DEFAULT_SETTINGS` gains
+  `helm` and `helmHintsDone`, both **defaulted by `validateSave` rather than rejected**, so
+  existing `sunwake-v1` saves load unchanged.
+- `window.sunwake` snapshot gains `aground`, `contactSeconds`, a `helm` block
+  (`scheme / hintsDone / used / zones / hintsVisible / zonesVisible / buttonsVisible`) and a
+  `fishing` block (state plus `level`, `band`, `canCast`).
+- **`core/fishing.mjs` is new and pure.** Cast → bite → one-held-touch tension fight → land.
+  Six species gated by skill, rarity weighted by water (`waterKind`: reef ≤34 m, shore ≤120 m,
+  open beyond), 20 levels on `42·L^1.65`. `input.reeling` is the single held touch — the
+  throttle half of the screen, the AHEAD button, or the space bar.
+- **`SAVE_KEY` stays `sunwake-v1` and the version stays 1.** `validateSave` treats a missing
+  `fishing` block as a pre-fishing save and returns a fresh angler rather than rejecting it, and
+  clamps xp, cast count, per-species counts and best weights. `encodeSave` takes fishing as an
+  optional fourth argument, so a call without it still produces a valid save.
+
 ## Gotchas — every one of these cost real time
+
+- **A numeric suite that stops at the first landmark proves nothing about the second.** Every
+  suite was green while the second leg of the atlas route was unsailable, because the only
+  sailing test aimed the autopilot at the landmark's true coordinates. `tools/route.mjs` now
+  steers by the bearing the HUD actually publishes; if the HUD lies, the test fails.
+- **`TANGENT_DAMPING` was applied per contact, and contact is every tick.** Any constant that
+  looks like "a small penalty for scraping" is a per-second rate in disguise. `tools/route.mjs`
+  measures the surviving tangential speed after one second at dt = 1/120, 1/60 and 1/30.
+- **The seeded negative control in `tools/collision.mjs` depends on shore friction.** Changing
+  `TANGENT_RETENTION` moves the deflected path, so the frozen-band case stops penetrating and
+  the control silently loses its power. Re-derive it (scan the seeded sweeps for a start whose
+  frozen-band result is deep inside a shore the live band keeps clear) and say so in the comment.
+- **The game saves on `pagehide`.** Clearing `localStorage` and then navigating writes the old
+  settings straight back, so a CDP test cannot reset state that way. Clear with
+  `Page.addScriptToEvaluateOnNewDocument` before any page script runs, then remove the script.
+- **Repeated navigations in one tab eventually lose the WebGL2 context** on SwiftShader. Use a
+  fresh `connect()` per device profile; it looks exactly like a boot bug and is not one.
+- **`ui.course().goal` is an island ID STRING, not the island.** `main.mjs` feeds the render
+  beacon `{...ui.course(), goal: page}` and the order matters: spread the course first. Reversed,
+  the beacon gets a string, every distance is `NaN`, and the goal light simply never appears —
+  no exception, no console error, nothing to grep for.
+- **Run one CDP suite per Chrome.** Four browser suites back to back against a single
+  `cdp start` produce `CDP timeout: Runtime.evaluate` / `Page.captureScreenshot` failures that
+  look exactly like real hangs. Each suite passes on its own with a fresh browser; put
+  `pkill -f "Chrome.*9223"` and a fresh `cdp start` between them.
+- **`navigator.maxTouchPoints` is 0 under `setDeviceMetricsOverride{mobile:true}` alone.**
+  Without `Emulation.setTouchEmulationEnabled` the page cannot tell it is on a phone, so anything
+  gated on touch capability (the thumb hints) never appears and the test reads as a feature bug.
 
 - **CDP `touchEnd` names the points being *lifted*, not the ones left behind.** Passing the
   remaining points leaves the released pointer stuck down and the helm reads a stale axis.
@@ -111,7 +180,17 @@ harness imports the real production code.
   `performance.now()`; screenshot capture waits two RAFs; the error UI must keep its inline
   styling and use `textContent`; wave-test bounds are derived from the table, never literals.
 
-## Exact next action: M7 — mobile qualification and polish
+## Exact next action: ROADMAP P2 — jobs, coins, and a reason to stop
+
+Fishing and the fishing skill are in. Still open, in `docs/ROADMAP.md` order: a job board at any
+discovered island (transport / catch N / visit, with ineligible jobs shown **disabled with the
+reason**, not hidden), coins paid by jobs and fish, and something worth stopping for at an
+ordinary island. Two items are waiting on the graphics builder and are listed at the top of
+ROADMAP.md: a distant beacon for the pinned landmark, and low-speed steering authority in
+`core/boat.mjs` (a boat pinned at ~0 m/s still cannot turn, because `yawTarget` scales with
+`|u|/(|u|+2)`; shore friction no longer welds it on, so this is survivable but still a trap).
+
+## Superseded: M7 — mobile qualification and polish
 
 Add adaptive quality, emergency tier, scene/ornament budgets and diagnostics. Run dense-scene
 budgets and sustained CDP mobile emulation at both orientations, DPR 3 and CPU ×4. Inspect

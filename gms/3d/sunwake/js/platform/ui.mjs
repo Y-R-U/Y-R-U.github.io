@@ -1,4 +1,5 @@
 import {ATLAS,islandName} from '../core/content.mjs';
+import {courseTo} from '../core/exploration.mjs';
 const $=id=>document.getElementById(id);
 // Original code-drawn postcard illustrations: no downloads or runtime image generation.
 export function drawPostcard(canvas,page){
@@ -19,6 +20,9 @@ export function drawPostcard(canvas,page){
 }
 export function createUI({getState,getExploration,world,onChart,onPin,onSettings,onRestart}){
  let last=-Infinity,lastChart=-Infinity,localChart=false,signature='';
+ // Reused every HUD tick: no per-frame allocation on the 10 Hz path.
+ const courseIslands=[],course={};
+ let closingFrom=null,closingAt=-Infinity,closing=0;
  const cards=$('cards');
  for(const page of ATLAS){const card=document.createElement('article');card.className='atlas-card';card.dataset.id=page.id;
   const canvas=document.createElement('canvas');canvas.setAttribute('aria-label',page.landmark+' illustration');drawPostcard(canvas,page);card.append(canvas);
@@ -30,6 +34,7 @@ export function createUI({getState,getExploration,world,onChart,onPin,onSettings
  function refreshCards(){const e=getExploration();for(const card of cards.children){const known=e.atlasIds.includes(card.dataset.id);card.classList.toggle('undiscovered',!known);card.querySelector('p').hidden=!known;card.querySelector('button').textContent=e.pin===card.dataset.id?'Pinned on compass ◆':known?'Revisit · pin ◇':'Set course ◇';}
   $('atlas-count').textContent=e.atlasIds.length+' / 6';$('chart-title').textContent=e.complete?"The chart ends. The sea doesn't.":'An atlas of the last light.';
  }
+ const name=(list,id)=>{const i=(list||[]).find(v=>v.id===id);return i?(i.landmark||islandName(i)):'an island';};
  function chart(){const s=getState(),e=getExploration(),canvas=$('chart-map'),c=canvas.getContext('2d');const w=canvas.width=800,h=canvas.height=440;
   c.fillStyle='#123e49';c.fillRect(0,0,w,h);const scale=localChart?.28:.23,cx=localChart?s.x:150,cz=localChart?s.z:150;
   const xy=(x,z)=>[w/2+(x-cx)*scale,h/2-(z-cz)*scale];
@@ -50,12 +55,39 @@ export function createUI({getState,getExploration,world,onChart,onPin,onSettings
  $('restart').onclick=()=>{$('restart-confirm').hidden=false;};$('restart-no').onclick=()=>{$('restart-confirm').hidden=true;};$('restart-yes').onclick=()=>{$('restart-confirm').hidden=true;onRestart();};
  return {refreshCards,chart,notice(text){$('notice').textContent=text;$('notice').hidden=false;},
   postcard(id){const page=ATLAS.find(i=>i.id===id);$('discovery-title').textContent=page.landmark;$('discovery-copy').textContent=page.postcard;$('discovery').hidden=false;refreshCards();},
+  course:()=>course,
   update(now,force=false){if(!force&&now-last<.1)return;last=now;const s=getState(),e=getExploration(),page=ATLAS.find(i=>i.id===e.pin);
    $('chart-open').textContent='Atlas '+e.atlasIds.length+'/6';$('course').hidden=s.mode!=='water'||s.fixture;
-   if(page){const distance=Math.max(0,Math.hypot(page.x-s.x,page.z-s.z)-page.radius),angle=Math.atan2(page.x-s.x,page.z-s.z)-s.yaw;
-    $('course-name').textContent=page.landmark;$('course-distance').textContent=Math.round(distance)+' m to shore';$('course-arrow').style.transform=`rotate(${angle}rad)`;
-   }else{$('course-name').textContent='Beyond the chart';$('course-distance').textContent=(e.distanceM/1000).toFixed(2)+' km sailed';$('course-arrow').style.transform='none';}
-   $('approach').textContent=e.dwellId?'Hold this slow pace · '+Math.min(100,Math.round(e.dwell/2*100))+'%':page&&Math.hypot(page.x-s.x,page.z-s.z)<page.radius+80?'Ease below 5.8 kn. Stay close for 2 seconds.':e.atlasIds.length===0?'Follow the pin. Slow beside Lantern Key.':'Six places. Take your time.';
+   if(page){
+    // The arrow must point somewhere a boat can actually go. A straight bearing
+    // through the island you are moored against is what made the second leg feel
+    // like a broken waypoint, so the course is routed around any blocking shore.
+    world.nearby(s.x,s.z,Math.min(1200,Math.hypot(page.x-s.x,page.z-s.z)+120),courseIslands);
+    courseTo(s,page,courseIslands,undefined,course);
+    const distance=course.distance,angle=course.bearing-s.yaw;
+    // Closing rate over a two-second window: on a long empty leg this is the
+    // only way to tell a correct course from a plausible one. Measured in
+    // SIMULATION time — wall time disagrees with it whenever the game is
+    // stepped by the test harness, or stalls, and the readout then lies.
+    const clock=Number.isFinite(s.time)?s.time:now;
+    if(e.pin!==course.pinWas){closing=0;closingFrom=distance;closingAt=clock;course.pinWas=e.pin;}
+    else if(closingFrom===null){closing=0;closingFrom=distance;closingAt=clock;}
+    else if(clock-closingAt>2||clock<closingAt){closing=(closingFrom-distance)/Math.max(.001,clock-closingAt);closingFrom=distance;closingAt=clock;}
+    const trend=Math.abs(closing)<.3?'holding':closing>0?'closing':'opening';
+    $('course-name').textContent=page.landmark;
+    $('course-distance').textContent=Math.round(distance)+' m to shore · '+trend;
+    $('course-arrow').style.transform=`rotate(${angle}rad)`;
+    $('course-arrow').style.color=course.blocked?'#ffb3a0':'';
+   }else{closingFrom=null;course.goal=null;course.blocked=null;$('course-name').textContent='Beyond the chart';$('course-distance').textContent=(e.distanceM/1000).toFixed(2)+' km sailed';$('course-arrow').style.transform='none';$('course-arrow').style.color='';}
+   const blocker=course.blocked&&courseIslands.find(i=>i.id===course.blocked);
+   $('approach').textContent=
+    s.aground?'Aground'+(blocker||s.agroundOn?' on '+name(courseIslands,s.agroundOn||course.blocked):'')+' — astern to back off, then steer round it.'
+    :e.dwellId?'Hold this slow pace · '+Math.min(100,Math.round(e.dwell/2*100))+'%'
+    :course.blocked?name(courseIslands,course.blocked)+' is across the course — the arrow leads round it.'
+    :page&&Math.hypot(page.x-s.x,page.z-s.z)<page.radius+80?'Ease below 5.8 kn. Stay close for 2 seconds.'
+    :e.atlasIds.length===0?'Follow the pin. Slow beside Lantern Key.'
+    :page?'Hold the arrow. '+page.landmark+' is '+Math.round(course.distance)+' m off.'
+    :'Six places. Take your time.';
    const sig=e.atlasIds.join('|')+e.pin;if(sig!==signature){signature=sig;refreshCards();}
    if(s.mode==='chart'&&(force||now-lastChart>=.5)){lastChart=now;chart();}
   }};

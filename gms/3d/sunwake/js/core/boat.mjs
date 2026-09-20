@@ -2,6 +2,24 @@ import {BOAT as B} from './config.mjs';
 import {clamp} from './math.mjs';
 import {sampleWave} from './waves.mjs';
 export const targetImmersion=B.mass*B.gravity/(4*B.spring);
+// Reserve displacement rises rapidly above the design draft. The old 2x cap
+// clipped crest impulses while retaining trough/downward motion, allowing
+// sustained head seas to drive the entire boat several metres underwater.
+const POINT_WEIGHT=B.mass*B.gravity/4;
+export const MIN_FREEBOARD=.10;
+// Actual sheer stations from boat-view; physics owns the correction, no mesh lift.
+const SHEER=[[-2.3,.64,.46],[-1.65,.82,.46],[-.8,.85,.47],[.2,.82,.49],
+  [1.15,.64,.54],[1.9,.32,.63],[2.3,.012,.70]].flatMap(([z,x,y])=>[[-x,y,z],[x,y,z]]);
+function protectFreeboard(b,sample,time,scratch){
+  const p=scratch.point,w=scratch.wave;let lift=0,velocity=-Infinity;
+  for(const point of SHEER){
+    hullPoint(b,point,p);sample(p.x,p.z,time,w);
+    const deficit=w.height+MIN_FREEBOARD-p.y;
+    if(deficit>0){lift=Math.max(lift,deficit);velocity=Math.max(velocity,w.dt+w.dx*p.vx+w.dz*p.vz-(p.vy-b.vy));}
+  }
+  scratch.freeboardLift=lift;
+  if(lift>0){b.y+=lift;b.vy=Math.max(b.vy,velocity);}
+}
 export const forwardSpeed=b=>b.vx*Math.sin(b.yaw)+b.vz*Math.cos(b.yaw);
 // R_y(yaw) R_x(-pitch) R_z(roll), including exact angle derivatives.
 export function hullPoint(b,point,out={}){
@@ -17,6 +35,8 @@ export function hullPoint(b,point,out={}){
 }
 export function createBoat(spawn={},world={},time=0){
   const b={x:0,z:0,y:0,vx:0,vz:0,vy:0,yaw:-Math.PI/2,yawRate:0,pitch:0,pitchRate:0,roll:0,rollRate:0,throttle:0,rudder:0,...spawn};
+  // Clear shore overlap before solving the water plane at the final spawn.
+  world.clearSpawn?.(b);
   const sample=world.sampleWave||sampleWave,w={},p={};
   // Solve the local support plane at the four actual transformed hull points.
   // At spawn there is no damping impulse or artificial velocity.
@@ -25,7 +45,6 @@ export function createBoat(spawn={},world={},time=0){
     for(const point of B.points){hullPoint(b,point,p);sample(p.x,p.z,time,w);const error=w.height-targetImmersion-p.y;height+=error;fore+=error*p.dp;side+=error*p.dr;}
     b.y+=height/4;b.pitch=clamp(b.pitch+fore/(4*1.55**2),-B.pitchStop,B.pitchStop);b.roll=clamp(b.roll+side/(4*.60**2),-B.rollStop,B.rollStop);
   }
-  world.clearSpawn?.(b);
   return b;
 }
 export function stepBoat(b,input,world,time,dt,scratch={}){
@@ -42,15 +61,17 @@ export function stepBoat(b,input,world,time,dt,scratch={}){
   let force=-B.mass*B.gravity,pitchTorque=-B.pitchDamping*b.pitchRate+B.enginePitch*b.throttle,rollTorque=-B.rollDamping*b.rollRate-B.mass*B.bankArm*u*b.yawRate,bowImpact=0;
   for(const point of B.points){
     hullPoint(b,point,p);sample(p.x,p.z,time,w);const immersion=w.height-p.y,impact=w.dt+w.dx*p.vx+w.dz*p.vz-p.vy;
-    const support=immersion>0?clamp(B.spring*immersion+B.damper*impact,0,B.mass*B.gravity/2):0;
+    const support=immersion>0?clamp(B.spring*immersion+2*B.spring*Math.max(0,immersion-targetImmersion)+B.damper*1.8*impact,0,POINT_WEIGHT*6):0;
     force+=support;pitchTorque+=support*p.dp;rollTorque+=support*p.dr;
     if(point[2]>0&&immersion>0)bowImpact=Math.max(bowImpact,impact);
   }
   // Progressive righting outside the comfortable operating band. Required by
   // A1 sea state: the literal support-only model hits both emergency stops.
+  // Reserve buoyancy also increases angular restoring impulses; match the
+  // progressive righting stiffness/damping to retain the comfortable angle band.
   for(const [angle,rate,start,k,damping]of [['pitch','pitchRate',B.pitchRightingStart,B.pitchRighting,B.pitchRightingDamping],['roll','rollRate',B.rollRightingStart,B.rollRighting,B.rollRightingDamping]]){
     const excess=Math.max(0,Math.abs(b[angle])-start),ramp=clamp(excess/(2*Math.PI/180),0,1);
-    const torque=-Math.sign(b[angle])*k*excess-damping*b[rate]*ramp;
+    const torque=-Math.sign(b[angle])*k*3.2*excess-damping*1.6*b[rate]*ramp;
     if(angle==='pitch')pitchTorque+=torque;else rollTorque+=torque;
   }
   b.vy+=force/B.mass*dt;b.pitchRate+=pitchTorque/B.pitchInertia*dt;b.rollRate+=rollTorque/B.rollInertia*dt;
@@ -60,5 +81,8 @@ export function stepBoat(b,input,world,time,dt,scratch={}){
   scratch.bowImpact=bowImpact;
   // Shore collision is injected, never sampled: sweep the step we just took.
   scratch.contact=world?.resolveBoat?.(b,previousX,previousZ,dt)||null;
+  // Enforce at the integrated time and collision-corrected position. This only
+  // catches extreme local crests; ordinary heave remains force-driven.
+  protectFreeboard(b,sample,time+dt,scratch);
   return b;
 }

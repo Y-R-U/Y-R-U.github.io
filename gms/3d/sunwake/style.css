@@ -6,3 +6,52 @@
 @media(max-width:600px){#nav{gap:6px}#nav button{padding:0 10px}#bearing{display:none}#course{top:86px;left:20px;max-width:calc(100vw - 40px)}#course p{font-size:10px}#discovery{top:185px;left:20px;right:20px;width:auto;padding:18px}#discovery h2{font-size:28px;margin:10px 0}.panel{inset:8px;padding:16px}.panel h2{font-size:27px;margin-bottom:8px}.panel header{align-items:flex-start}.panel header button{padding:0 10px;max-width:120px}#cards{grid-template-columns:1fr}.chart-tools{align-items:flex-start}#chart-map{max-height:none}#chart-title{max-width:200px}.settings{inset:20px;max-height:90vh}#notice{top:140px;width:max-content}}
 @media(max-height:480px){#course{top:80px;left:24px}#course p{max-width:220px}#discovery{top:82px;right:100px;width:290px;padding:14px}#discovery h2{font-size:25px;margin:8px 0}#discovery p{margin:8px 0;font-size:12px}#cards{grid-template-columns:repeat(3,1fr)}.panel h2{font-size:28px}#chart-map{max-height:none;height:260px}#notice{top:74px}}
 .panel>header{position:sticky;top:-24px;z-index:2;background:#102f38;padding:10px 0}.panel>header h2{margin-bottom:10px}@media(max-width:600px){.panel>header{top:-16px}}
+
+/* Invisible dual-zone helm. Nothing is drawn until a thumb lands: the left half
+   of the screen becomes a floating rudder wherever it is touched, the right half
+   a floating throttle lever. Below the HUD only, so the pause and atlas buttons
+   stay reachable. */
+#zones{position:absolute;left:0;right:0;top:calc(76px + env(safe-area-inset-top));bottom:0;z-index:5;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#zones .zone{position:absolute;top:0;bottom:0;width:50%;touch-action:none}
+#zone-steer{left:0}#zone-throttle{right:0}
+#zones .ring,#zones .knob,#zones .lever{position:absolute;opacity:0;pointer-events:none;transition:opacity .18s ease}
+#zones .zone.live .ring,#zones .zone.live .knob,#zones .zone.live .lever{opacity:1}
+#zones .ring{width:124px;height:124px;margin:-62px 0 0 -62px;border:1px solid #fff0d052;border-radius:50%;background:radial-gradient(circle,#fff0d012,#fff0d000 70%);left:var(--ox,50%);top:var(--oy,50%)}
+#zones .knob{width:52px;height:52px;margin:-26px 0 0 -26px;border:1px solid #ffd7a3aa;border-radius:50%;background:#ffd7a333;backdrop-filter:blur(6px);left:calc(var(--ox,50%) + var(--kx,0px));top:calc(var(--oy,50%) + var(--ky,0px))}
+#zone-throttle .lever{left:var(--ox,50%);top:var(--oy,50%);width:2px;height:124px;margin:-62px 0 0 -1px;background:linear-gradient(#fff0d000,#fff0d055,#fff0d000)}
+#zones .zone::after{content:attr(data-readout);position:absolute;left:var(--ox,50%);top:calc(var(--oy,50%) + 78px);transform:translateX(-50%);font-size:10px;letter-spacing:.16em;color:#ffe3bb;opacity:0;transition:opacity .18s ease;text-shadow:0 1px 8px #082f3d;white-space:nowrap}
+#zones .zone.live::after{opacity:.85}
+@media(prefers-reduced-motion:reduce){#zones .ring,#zones .knob,#zones .lever,#zones .zone::after{transition:none}}
+
+/* First-play thumb hints. Shown once, on touch devices, until the player has
+   actually steered AND used the throttle — then never again. */
+#thumbs{position:absolute;inset:0;z-index:6;pointer-events:none;display:flex;transition:opacity .7s ease}
+#thumbs.fading{opacity:0}
+#thumbs .thumb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:16vh;gap:14px;text-align:center}
+#thumbs .pad{width:96px;height:96px;border-radius:50%;border:1px dashed #ffd7a3;background:#ffd7a31f;animation:thumbpulse 2.4s ease-in-out infinite}
+#thumbs .right .pad{animation-delay:1.2s}
+#thumbs small{font-size:9px;letter-spacing:.2em;color:#ffe3bb;text-shadow:0 1px 10px #082f3d;line-height:2}
+#thumbs b{font-weight:400;letter-spacing:.08em;opacity:.75;font-size:10px}
+@keyframes thumbpulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.12);opacity:1}}
+@media(prefers-reduced-motion:reduce){#thumbs .pad{animation:none}#thumbs{transition:none}}
+@media(max-height:480px){#thumbs .thumb{padding-bottom:8vh}#thumbs .pad{width:76px;height:76px}}
+
+#hud{z-index:12}#discovery{z-index:12}#course{z-index:4;pointer-events:none}
+/* Invisible scheme: keep the speed readout, drop every permanent control. */
+#helm.status-only .rudder-wrap,#helm.status-only .throttle-wrap{display:none}
+#helm.status-only .helm-status{bottom:calc(26px + env(safe-area-inset-bottom))}
+#helm.status-only .helm-status small{display:none}
+
+/* Fishing. Sits under the course card, out of the way of both thumb zones. */
+#fishing{position:absolute;left:32px;top:174px;z-index:8;max-width:290px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;text-shadow:0 2px 10px #082f3d}
+#fishing>button{font-size:11px;letter-spacing:.1em;min-height:44px;display:flex;align-items:center;gap:14px}
+#fishing>button[disabled]{opacity:.4;pointer-events:none}
+#fishing small{font-size:10px;letter-spacing:.09em;opacity:.8;line-height:1.6}
+#fish-state{font-size:12px;letter-spacing:.06em;opacity:1;color:#ffd7a3}
+#fishing-live{display:flex;flex-direction:column;gap:7px;width:250px}
+#tension{position:relative;height:12px;border:1px solid #fff0d044;border-radius:6px;background:linear-gradient(90deg,#2c5a63,#4b7a6e 50%,#b0654f);overflow:hidden}
+#tension-band{position:absolute;top:0;bottom:0;left:var(--band-left,35%);width:var(--band-width,30%);background:#ffe3bb4d;border-left:1px solid #ffe3bbcc;border-right:1px solid #ffe3bbcc}
+#tension-mark{position:absolute;top:-3px;bottom:-3px;left:var(--mark,50%);width:3px;margin-left:-1.5px;background:#fff4d5;border-radius:2px;box-shadow:0 0 8px #fff4d5aa}
+#fishing.taut #tension-mark{background:#ffb3a0;box-shadow:0 0 10px #ffb3a0}
+@media(max-width:600px){#fishing{left:20px;top:166px;max-width:calc(100vw - 40px)}#fishing-live{width:min(250px,calc(100vw - 48px))}}
+@media(max-height:480px){#fishing{top:150px;left:24px}}

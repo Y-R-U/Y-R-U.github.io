@@ -38,8 +38,8 @@ gl_FragColor=vec4(vec3(1.,.93,.80)*a,a);\n#include <tonemapping_fragment>\n#incl
     if(clock>=E.interval){clock%=E.interval;
       if(u>.8){const s=stations[head];s.x=b.x-Math.sin(b.yaw)*2.15;s.z=b.z-Math.cos(b.yaw)*2.15;s.yaw=b.yaw;s.speed=u;s.born=time;head=(head+1)%E.stations;count=Math.min(count+1,E.stations);emissions++;}
     }
-    if(u>2&&scratch.bowImpact>.8){const limit=tier==='emergency'?0:tier==='low'?E.sprayLow:E.spray;
-      for(const side of [-1,1]){hullPoint(b,[side*.60,-.12,1.55],point);const p=particles[particleHead%limit];particleHead++;p.born=time;p.x=point.x;p.y=point.y+.08;p.z=point.z;p.vx=b.vx*.4+Math.cos(b.yaw)*side*(.8+random());p.vz=b.vz*.4-Math.sin(b.yaw)*side*(.8+random());p.vy=1.2+random()*1.4;p.life=.35+random()*.35;p.size=.055+random()*.09;}
+    if(tier!=='emergency'&&u>2&&scratch.bowImpact>.8){const limit=tier==='emergency'?0:tier==='low'?E.sprayLow:E.spray;
+      for(const side of [-1,1]){hullPoint(b,[side*.60,-.12,1.55],point);const p=particles[particleHead%limit];particleHead++;p.born=time;p.x=point.x;p.y=point.y+.08;p.z=point.z;p.vx=b.vx*.4+Math.cos(b.yaw)*side*(.8+random());p.vz=b.vz*.4-Math.sin(b.yaw)*side*(.8+random());p.vy=1.2+random()*1.4;p.life=.35+random()*.35;p.size=.025+random()*.042;}
     }
   },render(b,origin,camera){
     const t=b.time,u=forwardSpeed(b),reverse=u<-.05;alpha.fill(0);
@@ -50,8 +50,8 @@ gl_FragColor=vec4(vec3(1.,.93,.80)*a,a);\n#include <tonemapping_fragment>\n#incl
       const opacity=Math.min(1,age/.22)*(1-age/E.lifetime)**2.4*Math.min(1,(s.speed-.8)/4)*.42;
       const rx=Math.cos(s.yaw),rz=-Math.sin(s.yaw);
       for(let strip=0;strip<3;strip++)for(let edge=0;edge<2;edge++){
-        const sign=strip===0?-1:1,center=strip===2?0:sign*(.42+age*E.expansion),width=strip===2?.5+age*.5:.09+age*.16,offset=center+(edge?1:-1)*width;
-        const index=i*6+strip*2+edge;position[index*3]=s.x+rx*offset-origin.x;position[index*3+2]=s.z+rz*offset-origin.z;
+        const sign=strip===0?-1:1,turbulence=Math.sin(s.born*7.3+age*2.4+strip*1.7)*(.055+Math.min(age,2)*.10)+Math.sin(s.born*17.1+strip)*.035,center=strip===2?turbulence*.4:sign*(.32+age*E.expansion)+turbulence,width=(strip===2?.38+age*.40:.13+age*.16)*(1+.24*Math.sin(s.born*11+age*3+strip)),offset=center+(edge?1:-1)*width;
+        const index=i*6+strip*2+edge;const drift=Math.sin(s.born*5.7+age)*Math.min(age,.8)*.12;position[index*3]=s.x+rx*offset+Math.sin(s.yaw)*drift-origin.x;position[index*3+2]=s.z+rz*offset+Math.cos(s.yaw)*drift-origin.z;
         alpha[index]=next&&next.born-s.born>.2?0:opacity*(strip===2?Math.max(0,1-age/1.6)*.8:1);
       }visible++;
     }

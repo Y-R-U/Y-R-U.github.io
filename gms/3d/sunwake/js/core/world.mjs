@@ -141,8 +141,9 @@ export function createWorld({generate=generateIsland,cacheLimit=DESCRIPTOR_CACHE
     sampleShoreDistance(x,z,range=600){let best=Infinity;for(const island of nearby(x,z,range,shoreList))best=Math.min(best,Math.hypot(x-island.x,z-island.z)-island.radius);return best;},
     // Injected into stepBoat. The boat has already been integrated to (b.x,b.z);
     // sweep that displacement from where it actually started.
-    resolveBoat(b,px,pz){
-      const result=moveCircleSwept({x:px,z:pz},{x:b.x-px,z:b.z-pz},{x:b.vx,z:b.vz},BOAT_RADIUS,queryIslands,scratch.move||(scratch.move={}),scratch);
+    // `dt` is passed on so shore friction is a rate, not a per-step constant.
+    resolveBoat(b,px,pz,dt){
+      const result=moveCircleSwept({x:px,z:pz},{x:b.x-px,z:b.z-pz},{x:b.vx,z:b.vz},BOAT_RADIUS,queryIslands,scratch.move||(scratch.move={}),scratch,dt);
       b.x=result.x;b.z=result.z;b.vx=result.vx;b.vz=result.vz;
       return result;
     },

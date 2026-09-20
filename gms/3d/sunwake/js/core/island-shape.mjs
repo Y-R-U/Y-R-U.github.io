@@ -1,7 +1,7 @@
 // Pure island shape maths: no THREE, no DOM, no Math.random. The renderer and
 // the Node harness both import this exact file, so the silhouette the suites
 // measure is the silhouette that is drawn.
-import {SHORE_TOP} from './world.mjs';
+import {SHORE_TOP,BOAT_RADIUS} from './world.mjs';
 // [input span, output rise], alternating tread and riser. Risers are only 2% of
 // field span, so a terrace edge is a near-vertical face rather than a ramp.
 // Three treads (D1 caps the visible steps at three) with unequal riser heights
@@ -38,7 +38,7 @@ function makeNoise(seed){
 
 // Everything shape-related for one island, shared by the mesh builder and the
 // scatter. Deterministic from island.seed alone.
-export function islandField(island){
+export function islandField(island,{harbour=false}={}){
   let seed=(island.seed>>>0)||1;
   const rnd=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
   const R=island.radius,peak=Math.max(island.height,4.5);
@@ -61,10 +61,13 @@ export function islandField(island){
   // touches the collision circle.
   const flute=a=>.60*Math.max(0,.62*Math.sin(fa*a+fp)+.38*Math.sin(fb*a+fq));
   const notch=a=>.09+.15*(.5+.5*Math.sin(3*a+np));           // wave-cut undercut
-  const wallRadius=a=>R-flute(a);
+  const landing=harbour?mooringLayout(island):null;
+  // A visual inlet only: collider stays the original circle. The timber head
+  // reaches that circle, making the physical stopping boundary understandable.
+  const wallRadius=a=>R-flute(a)-(landing?landing.inset*(1-smoothstep(.08,.30,Math.abs(Math.atan2(Math.sin(a-landing.angle),Math.cos(a-landing.angle))))):0);
   const wallTop=a=>topLo+(topHi-topLo)*saturate(.5+.5*(.6*Math.sin(ta*a+tp)+.4*Math.sin(tb*a+tq)));
   // The tide band reaches above still water: crests wash it to +1.27 m.
-  const stain=a=>.72+.34*Math.sin(2.5*a+sp);
+  const stain=a=>.72+.34*Math.sin(3*a+sp);
   let meanTop=0;for(let i=0;i<48;i++)meanTop+=wallTop(i/48*Math.PI*2);meanTop/=48;
   const split=island.profile==='split';
   const lobeField=(x,z)=>{
@@ -89,11 +92,17 @@ export function islandField(island){
   function heightAt(x,z){
     const r=Math.hypot(x,z),a=Math.atan2(z,x),wr=wallRadius(a);
     const u=saturate(1-r/Math.max(wr,1e-6));
+    if(u<1e-12)return wallTop(a); // exact seam despite fractional slope powers
     const rim=wallTop(a)+(meanTop-wallTop(a))*u*u;
     const f=fieldAt(x,z),w=terraceWeight(a);
     // The un-terraced sector is a single steep face that tops out on a plateau,
     // not a dome: it must read as one tall wall of rock from the water.
-    const shaped=saturate(f/.45)*(1-w)+terraceCurve(f)*w;
+    const terraced=saturate(f/.45)*(1-w)+terraceCurve(f)*w;
+    // Garden islands have broad weathered slopes; split islands keep sharp,
+    // asymmetric ridges. Mesas retain the exposed terrace strata.
+    const ridge=saturate(f*1.9)*( .72+.28*Math.sin(a*2+lobeDir)**2 );
+    const shaped=island.profile==='garden'?terraced*.48+Math.pow(f,.65)*.52:
+      island.profile==='split'?terraced*.65+ridge*.35:terraced;
     const tilt=1+.22*(x*tiltX+z*tiltZ);               // a few degrees of dip
     // Rubble, so a tread is weathered rock rather than a machined disc.
     const rough=.05*Math.min(1,u*8)*noiseB(x*.30+naz,z*.30+nax);
@@ -124,3 +133,17 @@ export function islandField(island){
     mottle:(x,z)=>noiseB(x*.21+nbz,z*.21+nbx)};
 }
 
+
+// Stable, pure world-space interface for job handovers. No render dependency.
+// deck is the centre of the outer timber head. approach is a SAFE BOAT CENTRE,
+// not geometry; it intentionally sits outside the immutable collision circle.
+export function mooringLayout(island){
+  const angle=island.landmark?Math.atan2(-island.z,-island.x):((island.seed>>>0)%6283)/1000;
+  const nx=Math.cos(angle),nz=Math.sin(angle),width=Math.min(10,island.radius*.26);
+  const reach=Math.sqrt((island.radius-.35)**2-(width/2+.3)**2)-.2;
+  const y=3.8;
+  return {angle,nx,nz,width,reach,y,inset:Math.min(9,island.radius*.24),
+    deck:{x:island.x+nx*(reach-.9),y:y+.2,z:island.z+nz*(reach-.9)},
+    approach:{x:island.x+nx*(island.radius+BOAT_RADIUS+2),z:island.z+nz*(island.radius+BOAT_RADIUS+2)},
+    yaw:Math.atan2(-nx,-nz)};
+}

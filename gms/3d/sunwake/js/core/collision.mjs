@@ -3,7 +3,14 @@
 // Pure — no THREE, no DOM. The Node harness imports this exact file.
 export const CONTACT_SKIN=.001;
 export const MAX_CONTACTS=4;
-export const TANGENT_DAMPING=.92;
+// Shore friction is a RATE, not a per-step constant. The old flat .92 was applied
+// on every tick of sustained contact — 0.68% of tangential speed left after one
+// second at 60 Hz — which glued the hull to any shore it brushed and made the
+// second leg of the atlas route unsailable. Keep this as "fraction of tangential
+// speed surviving one second of grinding" and scale it by the real step.
+export const TANGENT_RETENTION=.45;
+export const REFERENCE_DT=1/60;
+export const TANGENT_DAMPING=Math.pow(TANGENT_RETENTION,REFERENCE_DT);
 export const clearanceRadius=(island,radius)=>island.radius+radius+CONTACT_SKIN;
 
 // How far a centre is inside the *hard* radius. The gate is radius+2.6, so the
@@ -51,11 +58,11 @@ export function sweepIsland(px,pz,dx,dz,island,radius){
  * Sweep a circle of `radius` from `position` along `displacement`.
  * `queryIslands(x0,z0,x1,z1,out)` must return every descriptor that could
  * possibly be touched by the whole segment, in stable ID order.
- * Writes {x,z,vx,vz,contacts,exhausted,recovered,failed} into `out`.
+ * Writes {x,z,vx,vz,contacts,island,exhausted,recovered,failed} into `out`.
  */
-export function moveCircleSwept(position,displacement,velocity,radius,queryIslands,out={},scratch={}){
+export function moveCircleSwept(position,displacement,velocity,radius,queryIslands,out={},scratch={},dt=REFERENCE_DT){
   let px=position.x,pz=position.z,dx=displacement.x,dz=displacement.z,vx=velocity.x,vz=velocity.z;
-  out.contacts=0;out.exhausted=false;out.recovered=false;out.failed=false;
+  out.contacts=0;out.exhausted=false;out.recovered=false;out.failed=false;out.island=null;
   if(![px,pz,dx,dz,vx,vz].every(Number.isFinite)){out.x=position.x;out.z=position.z;out.vx=0;out.vz=0;out.failed=true;return out;}
   // PLAN §4.3: a contact projects the remaining displacement along the shore, so
   // the rest of the step can leave the band that was queried for the original
@@ -78,6 +85,7 @@ export function moveCircleSwept(position,displacement,velocity,radius,queryIslan
   resolveOverlap(px,pz,radius,candidates,push);px=push.x;pz=push.z;
   let safeX=px,safeZ=pz;
   const damped=scratch.damped||(scratch.damped=new Set());damped.clear();
+  const retain=Number.isFinite(dt)&&dt>0?Math.pow(TANGENT_RETENTION,Math.min(dt,.25)):TANGENT_DAMPING;
   for(let contact=0;contact<=MAX_CONTACTS;contact++){
     if(dx===0&&dz===0)break;
     let best=null,bestT=Infinity;
@@ -97,12 +105,12 @@ export function moveCircleSwept(position,displacement,velocity,radius,queryIslan
     const R=clearanceRadius(best,radius);px=best.x+nx*R;pz=best.z+nz*R;safeX=px;safeZ=pz;
     const inwardV=vx*nx+vz*nz;if(inwardV<0){vx-=inwardV*nx;vz-=inwardV*nz;}
     let rx=dx*(1-bestT),rz=dz*(1-bestT);const inwardD=rx*nx+rz*nz;if(inwardD<0){rx-=inwardD*nx;rz-=inwardD*nz;}
-    if(!damped.has(best.id)){ // 8% of tangent speed, once per island per step
+    if(!damped.has(best.id)){ // one step's worth of tangential friction, once per island
       damped.add(best.id);
-      const vn=vx*nx+vz*nz;vx=(vx-vn*nx)*TANGENT_DAMPING+vn*nx;vz=(vz-vn*nz)*TANGENT_DAMPING+vn*nz;
-      const rn=rx*nx+rz*nz;rx=(rx-rn*nx)*TANGENT_DAMPING+rn*nx;rz=(rz-rn*nz)*TANGENT_DAMPING+rn*nz;
+      const vn=vx*nx+vz*nz;vx=(vx-vn*nx)*retain+vn*nx;vz=(vz-vn*nz)*retain+vn*nz;
+      const rn=rx*nx+rz*nz;rx=(rx-rn*nx)*retain+rn*nx;rz=(rz-rn*nz)*retain+rn*nz;
     }
-    dx=rx;dz=rz;out.contacts++;
+    dx=rx;dz=rz;out.contacts++;out.island=best.id;
     gather(px,pz,px+dx,pz+dz);        // the deflected remainder crosses new chunks
   }
   // Validate against every candidate, not only the island that was last hit.

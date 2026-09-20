@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 import {SHORE_TOP,SHORE_BOTTOM,APRON_TOP} from '../core/world.mjs';
 import {islandField,TERRACE_EDGES,saturate,smoothstep} from '../core/island-shape.mjs';
+import {MARINE_LIMITS,SETTLEMENT_LIMITS,ISLAND_VISIBILITY} from '../core/visual-config.mjs';
 import {HORIZON_FADE,QUALITY} from '../core/config.mjs';
-import {skyGLSL} from './shaders.mjs';
+import {createSettlementGeometry} from './settlements.mjs';
+import {skyGLSL,waveGLSL} from './shaders.mjs';
 // One merged, flat-shaded, vertex-coloured mesh per island: one draw each.
 // Nothing above water may sit outside the collision circle, so every radial
 // variation only ever cuts inward. The wall touches `radius` wherever its
@@ -12,7 +14,7 @@ import {skyGLSL} from './shaders.mjs';
 // This one is a heightfield over the disc instead. Terraces are contours of a
 // 2-D noise field put through a piecewise-linear step curve, so no two rims
 // share a centre; treads tilt; one seeded sector has no terrace at all.
-const COLOURS={
+const BASE_COLOURS={
   wet:new THREE.Color('#7e8b83'),
   wall:new THREE.Color('#f3e4c3'),
   lip:new THREE.Color('#fcf2da'),
@@ -30,8 +32,16 @@ export const ISLAND_LOD=Object.freeze([
 
 export function createIslandGeometry(island,lod=0,plantLimit=240){
   const detail=ISLAND_LOD[Math.max(0,Math.min(ISLAND_LOD.length-1,lod|0))];
+  // Seeded geology, shared by every LOD; authored Cinder keeps its iron colour.
+  const geology=island.landmark==='Cinder Steps'?1:(island.seed>>>5)%4;
+  const rock=[['#e2ccaa','#f7e9cd','#9e795b','#596c5b'],
+    ['#ae6d4e','#dfad78','#744639','#465c50'],
+    ['#697879','#a5ad9f','#414f55','#405b52'],
+    ['#c2b8a1','#eee4cb','#817c71','#657555']][geology];
+  const COLOURS={...BASE_COLOURS,stone:new THREE.Color(rock[0]),wall:new THREE.Color(rock[0]),
+    lip:new THREE.Color(rock[1]),riser:new THREE.Color(rock[2]),wet:new THREE.Color(rock[3])};
   const AS=detail.segments;
-  const field=islandField(island),{R,peak,wallRadius,wallTop,notch,stain,heightAt}=field;
+  const field=islandField(island,{harbour:true}),{R,peak,wallRadius,wallTop,notch,stain,heightAt}=field;
   const positions=[],colours=[],temp=new THREE.Color();
   // Rings run counter-clockwise in (x,z); with Y up that makes (a,c,b) the
   // outward/upward face. Getting this backwards renders the near wall invisible
@@ -184,6 +194,19 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
     }
   }
 
+  // Offset sea stacks and tilted fins break ordinary skylines, even at far LOD.
+  // Their footprints stay deep inside the solid shore circle.
+  if(!island.landmark){
+    const count=island.profile==='split'?3:island.profile==='mesa'?2:1;
+    for(let i=0;i<count;i++){
+      const a=crownAngle+i*2.1,reach=R*(.28+i*.07),x=Math.cos(a)*reach,z=Math.sin(a)*reach;
+      const y=heightAt(x,z)-1,h=peak*(island.profile==='split'?.65:.32)*(1-i*.16);
+      const lower=[],upper=[];
+      for(let k=0;k<5;k++){const t=k/5*Math.PI*2;lower.push([x+Math.cos(t)*3,y,z+Math.sin(t)*2]);upper.push([x+Math.cos(t)*1.1+1.8,y+h,z+Math.sin(t)*.85]);}
+      for(let k=0;k<5;k++){const j=(k+1)%5;quad(lower[k],lower[j],upper[j],upper[k],COLOURS.stone,.08+k*.035);push(upper[k],upper[j],[x+1.8,y+h+.5,z],COLOURS.lip);}
+    }
+  }
+
   // A few weathered outcrops, so the plateau is broken rock rather than a lawn.
   const outcrops=detail.plants>0?Math.round(3+R/22):0;
   for(let i=0;i<outcrops;i++){
@@ -200,6 +223,13 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
       push(upper[k],upper[t],[ox,ground+h+.35,oz],COLOURS.stone,.10);}
   }
 
+  // Wave-worn talus teeth interrupt the rim without extending the collider.
+  if(lod<2)for(let i=0;i<12;i++){
+    const a=i/12*Math.PI*2+(island.seed%23)*.11,r=R-2.4;
+    const x=Math.cos(a)*r,z=Math.sin(a)*r,y=wallTop(a)-.8,h=1.2+1.9*(.5+.5*Math.sin(i*7.3+crownAngle));
+    column(x,z,y,1.6,.65,h,COLOURS.stone,5);
+  }
+
   // Sparse olive scrub and leaning cypresses, all well inside the wall.
   const plants=island.landmark==='Last Orchard'?0:Math.min(plantLimit,Math.round((9+R/3.2)*detail.plants));
   for(let i=0;i<plants;i++){
@@ -214,12 +244,19 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
     }
   }
 
+  const settlement=createSettlementGeometry(island,lod),rockVertices=positions.length/3;
+  const glow=new Float32Array(rockVertices+settlement.attributes.position.count);
+  glow.set(settlement.attributes.glow.array,rockVertices);
+  for(const v of settlement.attributes.position.array)positions.push(v);
+  for(const v of settlement.attributes.color.array)colours.push(v);
+  const settlementTriangles=settlement.userData.triangles;settlement.dispose();
   const geometry=new THREE.BufferGeometry();
+  geometry.setAttribute('glow',new THREE.BufferAttribute(glow,1));
   geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
   geometry.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
-  geometry.userData={triangles:positions.length/9,lod,ornaments:plants+(island.landmark==='Last Orchard'?6:0)};
+  geometry.userData={triangles:positions.length/9,settlementTriangles,lod,ornaments:plants+(island.landmark==='Last Orchard'?6:0)};
   return geometry;
 }
 
@@ -227,17 +264,36 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
 // space before tone mapping. THREE.Fog is a flat colour applied after tone
 // mapping, so an island fading with it left a visible straight seam against
 // the sea. Islands now run the identical fade, from the identical constants.
-export function createIslandMaterial(skyUniforms){
+export function createIslandMaterial(skyUniforms,waterUniforms){
   const material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.92,flatShading:true});
   material.fog=false;
   material.onBeforeCompile=shader=>{
     for(const key of ['uSun','uHorizon','uZenith','uHaze','uSunColor','uCloud','uCloudTime','uCloudEnabled'])shader.uniforms[key]=skyUniforms[key];
-    shader.vertexShader='varying vec3 vShoreWorld;\n'+shader.vertexShader
-      .replace('#include <project_vertex>','#include <project_vertex>\n  vShoreWorld=(modelMatrix*vec4(transformed,1.0)).xyz;');
-    shader.fragmentShader='varying vec3 vShoreWorld;\n'+skyGLSL+shader.fragmentShader
+    if(waterUniforms){shader.uniforms.uPhases=waterUniforms.uPhases;shader.uniforms.uCenter=waterUniforms.uCenter;}
+    shader.vertexShader='attribute float glow;varying float vGlow;varying vec3 vShoreWorld;varying vec3 vRockLocal;\n'+shader.vertexShader
+      .replace('#include <project_vertex>',`#include <project_vertex>
+        vec4 rockPosition=vec4(transformed,1.0);
+        #ifdef USE_INSTANCING
+        rockPosition=instanceMatrix*rockPosition;
+        #endif
+        vShoreWorld=(modelMatrix*rockPosition).xyz;vRockLocal=position;vGlow=glow;`);
+    shader.fragmentShader='varying float vGlow;varying vec3 vShoreWorld;varying vec3 vRockLocal;\n'+skyGLSL+(waterUniforms?'uniform vec2 uCenter;\n'+waveGLSL:'')+shader.fragmentShader
+      .replace('#include <color_fragment>',`#include <color_fragment>
+        float grain=sin(vRockLocal.y*5.8+sin(vRockLocal.x*.47)*2.+sin(vRockLocal.z*.41)*2.);
+        diffuseColor.rgb*=.97+.03*grain;
+        ${waterUniforms?`if(vShoreWorld.y<2.){float wetHeight=waveSurface(vShoreWorld.xz,vShoreWorld.xz-uCenter,true).x;
+        float wash=1.-smoothstep(wetHeight+.05,wetHeight+.55,vShoreWorld.y);
+        diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(.48,.65,.66),wash*.65);}`:''}
+      `)
+      .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>\n totalEmissiveRadiance+=vColor*vGlow;`)
       .replace('#include <opaque_fragment>',`#include <opaque_fragment>
   vec3 shoreRay=vec3(vShoreWorld.x-cameraPosition.x,0.,vShoreWorld.z-cameraPosition.z);
-  gl_FragColor.rgb=mix(gl_FragColor.rgb,skyColor(normalize(shoreRay),false),smoothstep(${HORIZON_FADE[0].toFixed(1)},${HORIZON_FADE[1].toFixed(1)},length(shoreRay)));`);
+  float coastFade=smoothstep(${HORIZON_FADE[0].toFixed(1)},${HORIZON_FADE[1].toFixed(1)},length(shoreRay));
+  float skylineFade=.30*smoothstep(${ISLAND_VISIBILITY.fadeStart.toFixed(1)},900.0,length(shoreRay))
+    +.70*smoothstep(940.0,${ISLAND_VISIBILITY.fadeEnd.toFixed(1)},length(shoreRay));
+  // Waterline still reaches the exact sea haze; elevated roofs/crowns stay legible.
+  float islandFade=mix(coastFade,skylineFade,smoothstep(1.6,5.0,vRockLocal.y));
+  gl_FragColor.rgb=mix(gl_FragColor.rgb,skyColor(normalize(shoreRay),false),islandFade);`);
   };
   return material;
 }
@@ -253,7 +309,7 @@ const now=()=>(typeof performance!=='undefined'?performance.now():Date.now());
 export function createIslandsView(world,skyUniforms,options={}){
   const budget=options.budget??2,maxItems=options.items??2;
   const build=options.build??BUILD_RANGE,evict=options.evict??EVICT_RANGE;
-  const group=new THREE.Group(),material=createIslandMaterial(skyUniforms);
+  const group=new THREE.Group(),material=createIslandMaterial(skyUniforms,options.waterUniforms);
   const live=new Map();                 // island id -> {island,mesh,lod,triangles}
   const pool=new Map();                 // "id@lod" -> geometry, insertion-ordered
   const queue=[],list=[];
@@ -331,7 +387,7 @@ export function createIslandsView(world,skyUniforms,options={}){
       let draws=0,visiblePlants=0,visibleTriangles=0;
       const ordered=[...live.values()].sort((a,b)=>Math.hypot(a.island.x-x,a.island.z-z)-Math.hypot(b.island.x-x,b.island.z-z));
       for(const entry of ordered){place(entry,origin);const gap=Math.hypot(entry.island.x-x,entry.island.z-z)-entry.island.radius;
-        entry.mesh.visible=gap<650&&draws<QUALITY[tier].drawCap-8&&visiblePlants+entry.mesh.geometry.userData.ornaments<=QUALITY[tier].ornaments&&visibleTriangles+entry.triangles<QUALITY[tier].triangleCap-QUALITY[tier].segments*(2*QUALITY[tier].bands.reduce((n,b)=>n+b[0],0)-1)-6500;
+        entry.mesh.visible=gap<ISLAND_VISIBILITY.range&&draws<QUALITY[tier].drawCap-12&&visiblePlants+entry.mesh.geometry.userData.ornaments<=QUALITY[tier].ornaments&&visibleTriangles+entry.triangles<QUALITY[tier].triangleCap-QUALITY[tier].segments*(2*QUALITY[tier].bands.reduce((n,b)=>n+b[0],0)-1)-MARINE_LIMITS[tier].reserve-SETTLEMENT_LIMITS[tier].reserve;
         if(entry.mesh.visible){draws++;visiblePlants+=entry.mesh.geometry.userData.ornaments;visibleTriangles+=entry.triangles;}
       }
       return pending;

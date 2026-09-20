@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {VISUAL_WIND} from '../core/visual-config.mjs';
 // Four material batches, vertex colors keep every fitting inside four draws.
 export function createBoatView(){
   const boat=new THREE.Group(),batches=Array.from({length:4},()=>({p:[],n:[],c:[]}));
@@ -85,6 +86,7 @@ export function createBoatView(){
   const materials=[new THREE.MeshStandardMaterial({vertexColors:true,roughness:.62,side:THREE.DoubleSide}),new THREE.MeshStandardMaterial({vertexColors:true,roughness:.78,side:THREE.DoubleSide}),new THREE.MeshStandardMaterial({vertexColors:true,roughness:.42,metalness:.45}),new THREE.MeshStandardMaterial({vertexColors:true,emissive:'#ffc078',emissiveIntensity:1.1,roughness:.3})];
   let triangles=0;for(let i=0;i<4;i++){const b=batches[i],g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(b.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(b.n,3));g.setAttribute('color',new THREE.Float32BufferAttribute(b.c,3));triangles+=b.p.length/9;boat.add(new THREE.Mesh(g,materials[i]));}
   let discoveryTime=-100;
-  boat.userData={triangles,draws:4,sections:7,discover(time){discoveryTime=time;},update(time,speed){materials[3].emissiveIntensity=1.1+3*Math.max(0,1-(time-discoveryTime)/4);const p=boat.children[0].geometry.attributes.position;p.array[flagStart+5]=2.08+Math.sin(time*5)*.025-Math.min(Math.abs(speed),8)*.013;p.needsUpdate=true;}};
+  boat.userData={triangles,draws:4,sections:7,discover(time){discoveryTime=time;},update(time,speed,yaw=0){materials[3].emissiveIntensity=1.1+3*Math.max(0,1-(time-discoveryTime)/4);const p=boat.children[0].geometry.attributes.position;const wx=VISUAL_WIND.x*Math.cos(yaw)-VISUAL_WIND.z*Math.sin(yaw),wz=VISUAL_WIND.x*Math.sin(yaw)+VISUAL_WIND.z*Math.cos(yaw)-speed/VISUAL_WIND.speed;
+    const length=Math.hypot(wx,wz)||1;p.array[flagStart+3]=.42*wx/length;p.array[flagStart+5]=2.16+.42*wz/length+Math.sin(time*5)*.025;p.needsUpdate=true;}};
   return boat;
 }

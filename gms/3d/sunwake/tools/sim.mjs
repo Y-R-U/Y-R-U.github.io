@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {quality} from './quality.mjs';
 import {exploration} from './exploration.mjs';
+import {route} from './route.mjs';
+import {fishing} from './fishing.mjs';
 import {handling} from './handling.mjs';
 import {collision} from './collision.mjs';
 import {world} from './world.mjs';
@@ -9,7 +11,7 @@ import {WAVES,MAX_HEIGHT,MAX_SLOPE,MAX_VERTICAL_SPEED,FOAM_HEIGHT,sampleWave,pha
 import {rebaseOrigin,rippleOffsets} from '../js/core/math.mjs';
 import {radialMesh} from '../js/core/water-mesh.mjs';
 const suite=process.argv.includes('--suite')?process.argv[process.argv.indexOf('--suite')+1]:'all';
-if(!['all','shell','waves','handling','collision','world','exploration','quality'].includes(suite))throw new Error(`Suite ${suite} is not implemented through M5`);
+if(!['all','shell','waves','handling','collision','world','exploration','route','fishing','quality'].includes(suite))throw new Error(`Suite ${suite} is not implemented through M5`);
 if(['all','shell'].includes(suite)){
   assert.equal(Object.keys(QUALITY).length,4);assert.ok(SEA_STATE>0);assert.ok(Math.abs(Math.hypot(...SUN_DIRECTION)-1)<1e-12);
   console.log('PASS shell: pure config, four quality tiers, normalized sun direction');
@@ -66,5 +68,9 @@ if(['all','world'].includes(suite)){console.log('PASS world',JSON.stringify(worl
 if(['all','collision'].includes(suite)){console.log('PASS collision',JSON.stringify(collision(),null,2));}
 
 if(['all','exploration'].includes(suite))console.log('PASS exploration',JSON.stringify(exploration(),null,2));
+
+if(['all','route'].includes(suite))console.log('PASS route',JSON.stringify(route(),null,2));
+
+if(['all','fishing'].includes(suite))console.log('PASS fishing',JSON.stringify(fishing(),null,2));
 
 if(['all','quality'].includes(suite))console.log('PASS quality',JSON.stringify(quality(),null,2));
