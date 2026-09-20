@@ -77,16 +77,16 @@ Everything below serves that. **Aaron has played it; his experience outranks any
 
 ## Blocking the gameplay side right now (graphics builder)
 
-- [ ] **`js/render/islands.mjs:269` crashes on boot** as of 2026-09-21: `material.fog=false;
-      material.defaultAttributeValues.glow=[0];` throws *Cannot set properties of undefined
-      (setting 'glow')*. Checked against the vendored build: **no material class in three 0.180
-      ever initialises `defaultAttributeValues`** — `WebGLBindingStates` only *reads* it
-      (`three.module.js:1897`), so it is `undefined` on a fresh material and the property
-      assignment throws. The one-line fix is to create it first:
-      `material.defaultAttributeValues={glow:[0]};` (or give every island geometry an explicit
-      `glow` attribute so no default is needed).
-      The game does not boot at all while this stands, so **every browser test is red for both
-      builders**. Gameplay must not edit `js/render/*`, so this one is yours.
+- [x] **`js/render/islands.mjs` boot crash — ALREADY FIXED, re-verified 2026-09-21 (graphics).**
+      `defaultAttributeValues` appears nowhere in `js/render/` any more, and the *second* of the
+      two fixes suggested here is the one that shipped: **every island geometry carries an
+      explicit `glow` attribute** (`islands.mjs:248-254`), so no material default is needed.
+      Confirmed by `grep -n defaultAttributeValues js/render/*.mjs` (no match) and by booting the
+      real game — `tools/browser.mjs` (all 10 scenarios), `tools/helm.mjs`, and a live voyage
+      capture, `docs/evidence/beacon-voyage.png` — all reach `__SUNWAKE_BOOTED__` with zero
+      console, shader, runtime or request errors. **Browser testing is not blocked for either
+      builder.** If you saw this crash, you were on a stale module: the page query string does not
+      bust the ES modules it imports, so set `Network.setCacheDisabled` before every navigate.
 
 ## Requests for the graphics builder (gameplay side cannot do these)
 
@@ -97,11 +97,26 @@ Everything below serves that. **Aaron has played it; his experience outranks any
       **Watch the spread order:** `ui.course().goal` is the island **id string**, so it must be
       spread *before* the island object — the other way round hands the beacon a string, every
       range comes out `NaN`, and the goal light silently never appears with no error at all.
-- [ ] **Low-speed steering authority** (`js/core/boat.mjs`, codex's file). `yawTarget` scales with
-      `|u|/(|u|+2)`, so a boat pinned against a shore at ~0 m/s cannot turn at all: no speed → no
-      steering → cannot get off the rock. Shore friction no longer welds the hull on, so this is
-      survivable, but a small rudder authority at zero way (or a bow-thruster nudge while in
-      contact) would remove the last of the trap. Gameplay must not edit `boat.mjs`.
+- [x] **Low-speed steering authority — DONE 2026-09-21 (graphics; `js/core/boat.mjs`).**
+      Reproduced first: a boat driven straight at Lantern Key with the helm hard over **never**
+      cleared the shore, on all six test bearings, sitting at exactly 0.00 m/s for the full 40 s.
+      The fix is not a fudge on the rudder. An outboard steers by *vectoring its own thrust*, so
+      the new term scales with **throttle**, not with speed, and falls off as a cube of speed:
+
+      ```js
+      const wash=WASH_TURN*b.rudder*b.throttle*(WASH_FALLOFF/(Math.abs(u)+WASH_FALLOFF))**3;
+      ```
+
+      0.14 rad/s at rest, 0.019 at 1 m/s, under 0.0003 rad/s at cruising speed. All six bearings
+      now clear the rock in **11.5 s**. `WASH_TURN` / `WASH_FALLOFF` live in `boat.mjs`, not in
+      `core/config.mjs`, so nothing of yours was touched.
+      Guard rails, all asserted: with the throttle shut the helm still does **exactly** nothing —
+      the handling suite's `assert.equal(resting.yawRate,0)` is an exact equality and still passes,
+      and the heading is unchanged to the last bit; the cruising turn is **0.430389 rad/s** against
+      the 0.4300 measured before; astern with the helm over still swings the other way;
+      30/60/120 Hz trajectories are still bit-identical.
+      New suite **`node js/render/tests/steering.test.mjs`**, falsified by setting `WASH_TURN` to
+      0 — it goes red with *never cleared the shore in 40 s*.
 
 ## P1 — controls and feel
 
@@ -293,7 +308,7 @@ Remaining for Aaron: physical device play/performance and visual judgement. Circ
 shores remain an intentional constraint; this pass improves their contact and silhouette within it.
 No gameplay/platform/UI files were edited, no server restarted, no git operations performed.
 
-## Graphics builder — inhabited islands, 2026-09-21 — IN PROGRESS
+## Graphics builder — inhabited islands, 2026-09-21 — DONE
 
 - Building collision-contained timber landings, profile-specific homesteads, warm windows and
   wind-driven chimney smoke. Ownership remains render + island-shape + visual-config; no gameplay,
@@ -374,3 +389,149 @@ Evidence files are `docs/evidence/settlements-{sim,hull,core,browser}.txt`,
 `settlements-browser.json`, `settlement-{0..5}-{200,900}.png`,
 `settlement-landing-{15,50,420}.png`, `settlement-{low,emergency}-{200,900}.png`,
 `settlement-portrait-200.png` and `settlement-dense-*.png`.
+
+## Graphics builder — navigation lights and the 900 m read, 2026-09-21 — DONE
+
+Picked up mid-task from the previous graphics builder, whose `js/render/settlements.mjs` was
+left in an unknown state. **It was complete and wired in** (`islands.mjs:6` merges the static
+architecture into each island's single draw; `scene.mjs:38` runs the smoke). What was *not* done
+was the evidence: `docs/evidence/settlements-browser.json` on disk was the empty `finally` dump
+of a run that died on a hung `Page.captureScreenshot`, so none of the numbers in the section
+above were actually backed by a file. **Every one of them has now been reproduced** — see below.
+
+### What is new here
+
+- **`js/render/beacon.mjs`** — navigation lights. ONE instanced draw (measured: exactly +1 call
+  at every tier, 20 draws in the worst dense sample against a 28-draw emergency cap) carrying
+  every harbour lamp in sight plus the pinned goal's signal. No point lights, no bloom, no
+  textures, nothing added to the triangle budget that matters.
+  - **Harbour lamps** sit on the lamp head of each island's harbour signal — the mast that
+    `settlements.mjs` builds at `reach - 2.3` along the mooring bearing. Landmarks are brighter
+    than ordinary landings, and all of them *fade down* inside 55–240 m, because close up the
+    island's own emissive lamp box is already doing that job.
+  - **The goal signal** is a tapering warm column rising from the pinned island's crown, plus a
+    halo at its base, pulsing at 1.9 rad/s (steady under reduced motion). It retires over
+    70–150 m — you have arrived, it would only be glare — and goes out again over 1000–1200 m,
+    which is where islands stop being drawn at all, so it can never be a light hanging in an
+    empty sky over nothing.
+  - **The point of the whole thing.** `HORIZON_FADE` reaches full haze at 650 m, and rock is
+    *meant* to fade — a light is not. So these quads keep a **screen-space floor** rather than a
+    world size: a lamp is 3.4 px and the goal column 30 px tall however far away they are, while
+    the rock behind them keeps hazing exactly as before. No shared config, water shader,
+    `HORIZON_FADE`, collision radius or physics constant was changed to achieve it.
+  - **Tier caps** in `js/core/visual-config.mjs` → `BEACON_LIMITS`: 10 / 8 / 5 / 3 lamps for
+    high / standard / low / emergency. The goal signal stays lit at **every** tier, emergency
+    included, because it is navigation and not decoration.
+- **`js/core/boat.mjs`** — the low-speed steering trap, above.
+
+### Interface — `view.setCourse()` (gameplay has already wired this; thank you)
+
+```js
+view.setCourse({goal});   // goal: the island descriptor, or null for no signal
+view.setCourse(null);     // same as {goal:null}
+```
+
+`goal` needs `x`, `z` and ideally `height` and `radius`; an ATLAS entry is exactly right, which
+is what `main.mjs:107` passes. Your spread-order warning is real and worth keeping: `goal` must
+end up an **object**, not the id string, or every range comes out `NaN` and the light silently
+never draws. `view.metrics().beacons` (so `window.sunwake.beacons`) reports
+`{lamps, goal, instances}` — `goal:false` there is the fastest way to catch that mistake.
+
+**There is also a fallback**, and it is deliberate: until `setCourse()` is called even once, the
+renderer reads `window.sunwake.exploration.pin` itself, at most once a second, in a try/catch,
+off the render path. Now that `main.mjs` calls `setCourse()` every frame the fallback never
+runs — but it means the beacon cannot be broken by a wiring regression on your side. Delete the
+`pinnedGoal()` fallback in `beacon.mjs` whenever you want it gone.
+
+### Where the jetties are, in world metres
+
+For the job handover point. All from `mooringLayout(island)` in `js/core/island-shape.mjs`,
+deterministic from the descriptor alone — independent of LOD, quality tier and origin rebases.
+Use **`approach`** as the boat destination (a safe boat centre 2 m outside contact); `deck` is
+inside solid collision and is only where the timber is.
+
+| Landmark | id | deck (x, y, z) | approach (x, z) | inward yaw |
+| --- | --- | --- | --- | --- |
+| Lantern Key | `-1:0` | -184.4, 4.0, 140.5 | -179.3, 136.6 | -52.7° |
+| Bell Garden | `-2:1` | -512.5, 4.0, 493.5 | -507.9, 489.1 | -46.1° |
+| Split Crown | `0:2` | 160.9, 4.0, 870.6 | 159.7, 864.3 | 10.5° |
+| Cinder Steps | `2:1` | 871.0, 4.0, 555.1 | 865.6, 551.7 | 57.5° |
+| White Needle | `1:-2` | 546.2, 4.0, -565.4 | 541.8, -560.8 | 136.0° |
+| Last Orchard | `-2:-2` | -538.4, 4.0, -492.0 | -533.8, -487.8 | -132.4° |
+
+Ordinary islands have one too, on a seeded bearing: call `mooringLayout(island)` rather than
+hard-coding anything. The handover board and cargo crate are already modelled at the landward
+end of every one of these piers, so a job that changes hands there will look like it belongs.
+
+### Verified, on this code, this session
+
+```sh
+node tools/sim.mjs                                  # 9/9 suites
+node js/render/tests/hull.test.mjs
+node js/render/tests/steering.test.mjs              # NEW
+node js/render/tests/settlements.test.mjs
+~/.claude/bin/cdp start --port 9223 && node tools/browser.mjs                       # 10/10
+~/.claude/bin/cdp start --port 9223 && node tools/helm.mjs                          # both orientations
+~/.claude/bin/cdp start --port 9223 && node js/render/tests/beacon-browser.mjs      # NEW
+~/.claude/bin/cdp start --port 9223 && node js/render/tests/settlements-browser.mjs
+~/.claude/bin/cdp start --port 9223 && node js/render/tests/feedback-browser.mjs
+```
+
+- **Hull, unchanged and re-run after the steering edit:** 151,200 steps, minimum normal-sailing
+  gunwale clearance **0.18288 m** (it went *up* from 0.15871), **zero** backstops, `maxLift 0`.
+- **Settlement containment, reproduced:** 252 islands × 3 LODs, **2,590,488** new vertices, zero
+  outside the collider, largest new vertex radius **99.101%** of the collision radius; 721,362
+  full-island vertices; smoke bound **65.04%**; shared wind matched at 16 headings to 1.9e-7.
+  Maximum new static triangles per island **1,866 / 1,554 / 342** near/mid/far.
+- **Dense-scene budgets with beacons, marine life and smoke all present,** two poses × four
+  tiers × four headings: **20 / 20 / 20 / 16** draws and **113,920 / 77,092 / 48,063 / 45,360**
+  triangles for high / standard / low / emergency, against caps of 70 / 55 / 36 / 28 draws and
+  185,000 / 125,000 / 70,000 / 58,000 triangles. Geometry **10,247,072 bytes**, cap 24 MiB.
+- **The beacon is measured in pixels, not in instance counts.** `beacon-browser.mjs` renders the
+  identical frame twice — beacons hidden, then shown, in one task on an already-warm island
+  cache — and differences a 40% × 26% crop of the real framebuffer per pixel:
+
+  | range | brightest pixel rise | pixels lit | extra draws |
+  | --- | --- | --- | --- |
+  | 200 m | +94.9 / 255 | 232 | 1 |
+  | 420 m | +101.8 / 255 | 90 | 1 |
+  | 700 m | +84.1 / 255 | 87 | 1 |
+  | 900 m | +99.1 / 255 | 91 | 1 |
+
+  **Falsified in the suite itself**: the same measurement with the beacons hidden in *both*
+  frames is a built-in negative control and returns peak **+1.37**, **0** pixels lit. If the crop
+  were measuring frame-to-frame noise rather than the light, that control would not be zero.
+- **The real voyage, not a fixture:** boot, `reset()`, advance — `pin: "-1:0"`, `beacons.goal:
+  true`, lamps lit, zero errors. Capture `docs/evidence/beacon-voyage.png`.
+
+### Screenshots, opened and looked at
+
+`beacon-200.png`, `beacon-420.png`, `beacon-700.png`, `beacon-900.png`, `beacon-arrived.png`,
+`beacon-nogoal-420.png`, `beacon-emergency-420.png`, `beacon-dense.png`, `beacon-voyage.png`,
+plus the refreshed `settlement-*.png` set.
+
+Honest reading of them, since this project has five green suites over invisible bugs behind it:
+
+- **At 40 m** Bell Garden is unambiguously a place: pier, ladder, mooring posts, the bell arch,
+  lit windows, red and green channel buoys. The goal signal is correctly *gone* at that range.
+- **At 200 m** the landing, roofs and lamp read clearly, and the goal column marks which of the
+  three islands in frame is yours.
+- **At 900 m** the island alone is still a small pale smudge — roofs are picked out by the
+  existing elevated-silhouette fade, but *not* enough to make you turn the boat. The beacon is.
+  **This is the honest answer to "would you sail over":** at 900 m you sail over because a light
+  marks it, not because the rock sells itself. The haze curve that causes this is `HORIZON_FADE`
+  in `core/config.mjs`, which is the gameplay builder's file, so it was left alone on purpose.
+
+### Left behind, honestly
+
+- **The goal column is a game marker.** It is soft, warm, tapering and pulsing rather than a
+  laser, and it retires on arrival — but it is not a thing that exists in the fiction. If Aaron
+  dislikes it, `SHAFT_*` in `beacon.mjs` turns it down or off in one line and the harbour lamps
+  alone still mark every landing.
+- **Harbour lamps are depth-tested**, so an island hides its own lamp from the blind side. That
+  is deliberate and correct, but it does mean the landing bearing is not advertised from behind.
+- `js/render/tests/settlements-browser.mjs` was hardened while re-running it: SwiftShader
+  occasionally leaves a dense frame's `Page.captureScreenshot` pending forever with a perfectly
+  healthy CDP socket. It now retries twice after two RAFs, which has always landed it. That flake
+  is what silently truncated the previous builder's evidence run.
+- Physical device and real-phone performance remain **NOT MET**; nothing here changes that.

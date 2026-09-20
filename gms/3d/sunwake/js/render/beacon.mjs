@@ -17,10 +17,10 @@ import {BEACON_LIMITS} from '../core/visual-config.mjs';
 
 const LAMP_COLOUR=new THREE.Color('#ffae55');
 const GOAL_COLOUR=new THREE.Color('#ffdfae');
-const SHAFT_COLOUR=new THREE.Color('#ffcb8c');
+const SHAFT_COLOUR=new THREE.Color('#ffae5e');
 // Pixels of the viewport's short-axis height that each element must keep.
-const LAMP_PIXELS=3.4,GOAL_PIXELS=8,SHAFT_WIDTH_PIXELS=2.8,SHAFT_HEIGHT_PIXELS=46;
-const LAMP_MIN=1.5,LAMP_MAX=11,GOAL_MIN=4,SHAFT_MIN_WIDTH=1.7,SHAFT_MIN_HEIGHT=24;
+const LAMP_PIXELS=3.4,GOAL_PIXELS=7,SHAFT_WIDTH_PIXELS=4.4,SHAFT_HEIGHT_PIXELS=30;
+const LAMP_MIN=1.5,LAMP_MAX=11,GOAL_MIN=3.6,SHAFT_MIN_WIDTH=2.6,SHAFT_MIN_HEIGHT=18;
 // A lamp you are moored against does not need a halo; the emissive lamp box in
 // the island's own geometry is doing that job from close range.
 const NEAR_FADE=[55,240];
@@ -33,13 +33,17 @@ const GOAL_RANGE=[1000,1200];
 export function createBeacons(islands,world=null){
   const group=new THREE.Group(),geometry=new THREE.PlaneGeometry(1,1);
   const material=new THREE.MeshBasicMaterial({color:'#ffffff',transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false});
-  // Soft analytic falloff rather than a sprite texture: the plane's UV circle
-  // becomes a vertical lens once the shaft instance scales it non-uniformly,
-  // which is the shape a light column wants anyway.
+  // Soft analytic falloff rather than a sprite texture: a radial lamp halo, or
+  // a tapering column when the instance is flagged as the goal's light shaft.
   material.onBeforeCompile=shader=>{
-    shader.vertexShader='varying vec2 vLampUv;\n'+shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvLampUv=uv;');
-    shader.fragmentShader='varying vec2 vLampUv;\n'+shader.fragmentShader.replace('#include <opaque_fragment>',
-      'float lampFall=1.0-smoothstep(0.0,0.5,length(vLampUv-0.5));\ndiffuseColor.a*=lampFall*lampFall;\n#include <opaque_fragment>');
+    shader.vertexShader='attribute float aShaft;varying vec2 vLampUv;varying float vShaft;\n'+shader.vertexShader.replace('#include <begin_vertex>','#include <begin_vertex>\nvLampUv=uv;vShaft=aShaft;');
+    // A light column is brightest where it leaves the island and dissolves
+    // upward; without that it reads as a laser rather than a loom.
+    shader.fragmentShader='varying vec2 vLampUv;varying float vShaft;\n'+shader.fragmentShader.replace('#include <opaque_fragment>',
+      `float lampFall=1.0-smoothstep(0.0,0.5,length(vLampUv-0.5));lampFall*=lampFall;
+       float column=(1.0-smoothstep(0.30,0.96,abs(vLampUv.x-0.5)*2.0))*(1.0-smoothstep(0.0,0.92,vLampUv.y));
+       diffuseColor.a*=mix(lampFall,column,vShaft);
+       #include <opaque_fragment>`);
   };
   const max=BEACON_LIMITS.high.lamps+2;
   const mesh=new THREE.InstancedMesh(geometry,material,max);
@@ -48,6 +52,8 @@ export function createBeacons(islands,world=null){
   // setColorAt allocates instanceColor, which is what makes three compile the
   // USE_INSTANCING_COLOR path. Assigning the attribute by hand does not.
   mesh.setColorAt(0,new THREE.Color(0,0,0));mesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
+  const shaftFlag=new THREE.InstancedBufferAttribute(new Float32Array(max),1);
+  shaftFlag.setUsage(THREE.DynamicDrawUsage);geometry.setAttribute('aShaft',shaftFlag);
   group.add(mesh);
 
   const dummy=new THREE.Object3D(),tint=new THREE.Color(),lamps=new Map();
@@ -102,6 +108,7 @@ export function createBeacons(islands,world=null){
       let count=0;lit=0;goalLit=false;
       const put=(x,y,z,w,h,colour,intensity,upright)=>{
         if(count>=max||!(intensity>.01))return;
+        shaftFlag.setX(count,upright?1:0);
         dummy.position.set(x-origin.x,y,z-origin.z);
         if(upright){
           // Yaw-only billboard: a light column must stay vertical.
@@ -137,13 +144,13 @@ export function createBeacons(islands,world=null){
         const shaftW=Math.max(SHAFT_MIN_WIDTH,perPixel(range)*SHAFT_WIDTH_PIXELS);
         const shaftH=Math.max(SHAFT_MIN_HEIGHT,perPixel(range)*SHAFT_HEIGHT_PIXELS);
         const halo=Math.max(GOAL_MIN,perPixel(range)*GOAL_PIXELS);
-        put(gx,crown+2+shaftH/2,gz,shaftW,shaftH,SHAFT_COLOUR,.30*arrive*pulse,true);
-        put(gx,crown+2,gz,halo,halo,GOAL_COLOUR,.95*arrive*pulse,false);
+        put(gx,crown+2+shaftH/2,gz,shaftW,shaftH,SHAFT_COLOUR,.52*arrive*pulse,true);
+        put(gx,crown+2,gz,halo,halo,GOAL_COLOUR,.85*arrive*pulse,false);
         goalLit=arrive>.01;
       }
 
       mesh.count=count;mesh.visible=count>0;
-      mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;
+      mesh.instanceMatrix.needsUpdate=true;mesh.instanceColor.needsUpdate=true;shaftFlag.needsUpdate=true;
     },
     dispose(){geometry.dispose();material.dispose();lamps.clear();}};
 }

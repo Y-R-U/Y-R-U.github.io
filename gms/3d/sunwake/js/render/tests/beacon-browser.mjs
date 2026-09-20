@@ -94,6 +94,13 @@ try{
    await p.shot(new URL(`beacon-${distance}.png`,evidence).pathname);
    step('range',distance,'peak +'+on.peak.toFixed(1),'pixels',on.changed,'mean +'+on.mean.toFixed(1));
  }
+ // Negative control: the identical measurement with the beacon group hidden in
+ // BOTH frames. If this does not collapse, the crop is measuring frame-to-frame
+ // noise and every number above is worthless.
+ report.control=await p.eval('lights.compare(1,420,{blank:true})');
+ assert.ok(report.control.peak<2,`control peak ${report.control.peak}`);
+ assert.equal(report.control.changed,0,`control lit ${report.control.changed} pixels`);
+ step('control peak',report.control.peak,'pixels',report.control.changed);
  for(const f of report.frames){
    assert.ok(f.peak>PEAK_RISE,`${f.distance} m: brightest beacon pixel only rose ${f.peak.toFixed(1)}`);
    assert.ok(f.changed>=CHANGED,`${f.distance} m: only ${f.changed} pixels lit`);
@@ -127,6 +134,17 @@ try{
    report.dense.push({pose,tier,yaw,calls:m.calls,triangles:m.triangles,beacons:m.beacons});
  }
  await p.shot(new URL('beacon-dense.png',evidence).pathname);
+ // The real voyage, with nothing wired on the gameplay side: the renderer picks
+ // up the published pin by itself, so the goal signal is lit from the default
+ // spawn without anyone calling setCourse. Remove this once gameplay calls it.
+ await p.goto();await p.wait('window.__SUNWAKE_BOOTED__',60000);
+ await p.eval("sunwakeTest.reset()");
+ let live;for(let i=0;i<180;i++){live=await p.eval('sunwakeTest.advance(1)');if(live.beacons?.goal)break;}
+ report.live={pin:live.exploration.pin,beacons:live.beacons,calls:live.calls};
+ assert.ok(live.beacons.goal,'published pin did not light the goal signal in the real voyage');
+ assert.ok(live.beacons.lamps>0,'no harbour lamp in the real voyage');
+ step('live',JSON.stringify(report.live));
+ await p.shot(new URL('beacon-voyage.png',evidence).pathname);
  report.errors=p.errors;assert.deepEqual(p.errors,[]);
- console.log('PASS beacons',JSON.stringify({frames:report.frames.map(f=>({d:f.distance,goal:f.beacons.goal,lamps:f.beacons.lamps,calls:f.calls,meanRise:f.meanRise,peakRise:f.peakRise})),tiers:report.tiers,denseMax:report.dense.reduce((n,d)=>Math.max(n,d.calls),0)},null,2));
+ console.log('PASS beacons',JSON.stringify({frames:report.frames.map(f=>({d:f.distance,goal:f.beacons.goal,lamps:f.beacons.lamps,calls:f.calls,meanRise:f.meanRise,peakRise:f.peakRise})),tiers:report.tiers,denseMax:report.dense.reduce((n,d)=>Math.max(n,d.calls),0),live:report.live},null,2));
 }finally{await writeFile(new URL('beacon-browser.json',evidence),JSON.stringify({...report,errors:p.errors},null,2));await p.close();}

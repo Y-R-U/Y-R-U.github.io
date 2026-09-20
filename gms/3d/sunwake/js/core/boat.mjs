@@ -47,6 +47,7 @@ export function createBoat(spawn={},world={},time=0){
   }
   return b;
 }
+const WASH_TURN=.14,WASH_FALLOFF=1.2;
 export function stepBoat(b,input,world,time,dt,scratch={}){
   const sample=world?.sampleWave||sampleWave,w=scratch.wave||(scratch.wave={}),p=scratch.point||(scratch.point={});
   b.throttle+=(clamp(input.throttle||0,-1,1)-b.throttle)*(1-Math.exp(-dt/B.throttleTau));
@@ -56,7 +57,18 @@ export function stepBoat(b,input,world,time,dt,scratch={}){
   const drag=-B.dragLinear*u-(u>=0?B.dragAhead:B.dragAstern)*u*Math.abs(u),lateral=-B.mass*B.lateralDrag*side;
   b.vx+=((thrust+drag)*sy+lateral*cy)/B.mass*dt;b.vz+=((thrust+drag)*cy-lateral*sy)/B.mass*dt;
   const speed=Math.hypot(b.vx,b.vz);if(speed>B.speedCap){b.vx*=B.speedCap/speed;b.vz*=B.speedCap/speed;}
-  const yawTarget=b.rudder*Math.sign(u)*B.turnRate*Math.abs(u)/(Math.abs(u)+2);
+  // ROADMAP: a boat pinned against a shore at ~0 m/s had no steering at all —
+  // no way on, no rudder, no way off the rock. An outboard does not work like
+  // that: it steers by vectoring its own thrust, and propwash over the deflected
+  // leg walks the stern sideways with the boat stopped. So the term is
+  // proportional to THROTTLE, not to speed, and it falls off as a cube: 0.14
+  // rad/s at rest, 0.019 at 1 m/s, under 0.0003 at cruising speed, which leaves
+  // the measured 0.43 rad/s turn and the reverse-turn sign untouched. With the
+  // throttle shut it is exactly zero, so "rudder alone never turns a drifting
+  // boat" still holds to the last bit. Constants live here rather than in
+  // core/config.mjs because that file belongs to the other builder.
+  const wash=WASH_TURN*b.rudder*b.throttle*(WASH_FALLOFF/(Math.abs(u)+WASH_FALLOFF))**3;
+  const yawTarget=b.rudder*Math.sign(u)*B.turnRate*Math.abs(u)/(Math.abs(u)+2)+wash;
   b.yawRate+=(yawTarget-b.yawRate)*(1-Math.exp(-dt/B.yawTau));
   let force=-B.mass*B.gravity,pitchTorque=-B.pitchDamping*b.pitchRate+B.enginePitch*b.throttle,rollTorque=-B.rollDamping*b.rollRate-B.mass*B.bankArm*u*b.yawRate,bowImpact=0;
   for(const point of B.points){
