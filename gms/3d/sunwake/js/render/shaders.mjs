@@ -35,7 +35,16 @@ vec3 skyColor(vec3 ray, bool disc) {
   color+=uSunColor*(0.26*exp((alignment-1.0)*55.0)+0.15*exp((alignment-1.0)*450.0));
   vec2 cloudUV=vec2(atan(ray.z,ray.x)/6.2831853+uCloudTime,ray.y*1.8);
   float noise=0.;
-  if(uCloudEnabled>.5)noise=texture2D(uCloud,cloudUV*vec2(2.,2.)).r*.65+texture2D(uCloud,cloudUV*vec2(5.,4.)).r*.35;
+  if(uCloudEnabled>.5){
+    // Explicit angular gradients stay continuous across atan's +/-pi seam.
+    // An implicit mip derivative across that seam erases a vertical cloud stripe.
+    vec2 radial=ray.xz;float radius2=max(dot(radial,radial),.0001);
+    vec2 dx=dFdx(radial),dy=dFdy(radial);
+    vec2 uvDx=vec2((radial.x*dx.y-radial.y*dx.x)/(6.2831853*radius2),dFdx(ray.y)*1.8);
+    vec2 uvDy=vec2((radial.x*dy.y-radial.y*dy.x)/(6.2831853*radius2),dFdy(ray.y)*1.8);
+    noise=textureGrad(uCloud,cloudUV*vec2(2.,2.),uvDx*vec2(2.,2.),uvDy*vec2(2.,2.)).r*.65
+      +textureGrad(uCloud,cloudUV*vec2(5.,4.),uvDx*vec2(5.,4.),uvDy*vec2(5.,4.)).r*.35;
+  }
   float bands=exp(-pow((altitude-.20)/.037,2.))+0.65*exp(-pow((altitude-.32)/.048,2.))+0.35*exp(-pow((altitude-.52)/.065,2.));
   float clouds=smoothstep(.44,.65,noise)*bands*smoothstep(.04,.13,altitude);
   color=mix(color,mix(uHaze*.75,uHorizon*1.1,west),clouds*.5);
@@ -49,24 +58,30 @@ vec3 skyColor(vec3 ray, bool disc) {
     // 1. A bank of cloud actually sitting ON the horizon. The existing band set
     //    starts at 0.04 altitude, so the strip the islands live in was a flat
     //    wash with nothing in it to give the distance any scale.
-    float bankNoise=.5+.5*(.55*sin(azimuth*5.+lap*1.4)+.30*sin(azimuth*11.-1.7)+.15*sin(azimuth*23.+2.3));
-    float bank=exp(-pow((altitude-.032)/.030,2.))*smoothstep(.36,.68,bankNoise);
-    color=mix(color,mix(uHaze*.84,uHorizon*1.2,west),bank*.42*uWeather);
+    float bankNoise=.5+.5*(.55*sin(azimuth*5.+lap)+.30*sin(azimuth*11.-1.7)+.15*sin(azimuth*23.+2.3));
+    float bankTop=.038+.075*bankNoise;
+    float bank=exp(-pow((altitude-bankTop)/.037,2.))*smoothstep(.28,.65,bankNoise);
+    color=mix(color,mix(uZenith*.58,uHorizon*.54,west),bank*.65*uWeather);
+    // Thin warm upper rim gives the bank volume without cloud geometry.
+    float rim=exp(-pow((altitude-bankTop-.029)/.009,2.))*smoothstep(.36,.70,bankNoise);
+    color+=uSunColor*rim*.045*west*uWeather;
     // 2. Crepuscular shafts raked off the sun, gated to the sun's quarter.
-    float rake=.5+.5*sin(azimuth*17.+1.1)*sin(azimuth*6.+lap*2.2);
+    float rake=.5+.5*sin(azimuth*17.+1.1)*sin(azimuth*6.+lap*2.);
     float shaft=pow(toSun,6.)*smoothstep(.03,.30,altitude)*(1.-smoothstep(.30,.64,altitude))*rake;
-    color+=uSunColor*shaft*.14*uWeather;
+    color+=uSunColor*shaft*.22*uWeather;
     // 3. One squall, a full lap of the compass per cloud wrap (~35 min), so a
     //    long voyage watches it arrive, cross and leave. The veil is at full
     //    strength at altitude 0 on purpose: the sea's own haze is
     //    skyColor(horizontal), so sky and water darken together under it with
     //    no line between them.
     float off=abs(atan(sin(azimuth-lap),cos(azimuth-lap)));
-    float ragged=.26+.09*sin(azimuth*21.+3.7)+.04*sin(azimuth*47.-1.2);
+    float ragged=.29+.035*sin(azimuth*21.+3.7)+.015*sin(azimuth*47.-1.2);
     float across=1.-smoothstep(ragged*.42,ragged,off);
-    float veil=across*(1.-smoothstep(.12,.34,altitude));
-    float head=across*exp(-pow((altitude-.17)/.090,2.));
-    color=mix(color,mix(uHaze,uZenith,.42)*.58,(veil*.44+head*.36)*uWeather);
+    float rain=.94+.04*sin(azimuth*173.+lap*2.+altitude*12.)+.02*sin(azimuth*311.-altitude*19.);
+    float veil=across*(1.-smoothstep(.10,.22,altitude))*rain;
+    float headY=.205+.014*sin(azimuth*37.+1.2);
+    float head=across*exp(-pow((altitude-headY)/.055,2.));
+    color=mix(color,mix(uHaze,uZenith,.42)*.58,(veil*.36+head*.56)*uWeather);
   }
   if(disc) {float edge=fwidth(alignment)*1.2;float sun=smoothstep(cos(radians(.8))-edge,cos(radians(.8))+edge,alignment);color=mix(color,uSunColor*5.,sun);}
   // The sea haze uses precisely skyColor(horizontal,false).

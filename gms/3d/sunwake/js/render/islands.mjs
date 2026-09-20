@@ -275,7 +275,9 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
 export function createIslandMaterial(skyUniforms,waterUniforms){
   const material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.92,flatShading:true});
   material.fog=false;
+  const aerialStrength={value:1};material.userData.aerialStrength=aerialStrength;
   material.onBeforeCompile=shader=>{
+    shader.uniforms.uAerialStrength=aerialStrength;
     for(const key of ['uSun','uHorizon','uZenith','uHaze','uSunColor','uCloud','uCloudTime','uCloudEnabled','uWeather'])shader.uniforms[key]=skyUniforms[key];
     if(waterUniforms){shader.uniforms.uPhases=waterUniforms.uPhases;shader.uniforms.uCenter=waterUniforms.uCenter;}
     shader.vertexShader='attribute float glow;attribute float built;varying float vGlow;varying float vBuilt;varying vec3 vShoreWorld;varying vec3 vRockLocal;\n'+shader.vertexShader
@@ -285,7 +287,7 @@ export function createIslandMaterial(skyUniforms,waterUniforms){
         rockPosition=instanceMatrix*rockPosition;
         #endif
         vShoreWorld=(modelMatrix*rockPosition).xyz;vRockLocal=position;vGlow=glow;vBuilt=built;`);
-    shader.fragmentShader='varying float vGlow;varying float vBuilt;varying vec3 vShoreWorld;varying vec3 vRockLocal;\n'+skyGLSL+(waterUniforms?'uniform vec2 uCenter;\n'+waveGLSL:'')+shader.fragmentShader
+    shader.fragmentShader='uniform float uAerialStrength;varying float vGlow;varying float vBuilt;varying vec3 vShoreWorld;varying vec3 vRockLocal;\n'+skyGLSL+(waterUniforms?'uniform vec2 uCenter;\n'+waveGLSL:'')+shader.fragmentShader
       .replace('#include <color_fragment>',`#include <color_fragment>
         float grain=sin(vRockLocal.y*5.8+sin(vRockLocal.x*.47)*2.+sin(vRockLocal.z*.41)*2.);
         diffuseColor.rgb*=.97+.03*grain;
@@ -298,14 +300,14 @@ export function createIslandMaterial(skyUniforms,waterUniforms){
   vec3 shoreRay=vec3(vShoreWorld.x-cameraPosition.x,0.,vShoreWorld.z-cameraPosition.z);
   float range=length(shoreRay);
   float elevated=smoothstep(1.6,5.0,vRockLocal.y);
-  // AERIAL PERSPECTIVE, in the order it happens in air. Land this far away is
-  // BACKLIT: its own surface loses its diffuse lift and cools toward a dark
-  // silhouette a long way before the airlight bleaches it out. The first build
+  // Art-directed aerial perspective: lower the bright ambient fill on distant
+  // elevated rock before adding airlight. This preserves warm shadow planes
+  // and readable roofs instead of bleaching already-pale limestone. The first build
   // went straight to the airlight, which is why a 900 m island measured 170.6
   // mean luminance against a 173.0 sky and simply was not there. Withheld from
   // the waterline (elevated), so the sea haze still meets the rock exactly
   // where D2 put it and no seam comes back.
-  float aerial=elevated*smoothstep(${AERIAL.range[0].toFixed(1)},${AERIAL.range[1].toFixed(1)},range);
+  float aerial=uAerialStrength*elevated*smoothstep(${AERIAL.range[0].toFixed(1)},${AERIAL.range[1].toFixed(1)},range);
   vec3 lit=gl_FragColor.rgb;
   float grey=dot(lit,vec3(.299,.587,.114));
   // Roofs, walls and the harbour mast keep most of their own colour and most of

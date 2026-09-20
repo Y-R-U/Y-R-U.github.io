@@ -15,7 +15,7 @@ export const SETTLEMENT_LIMITS=Object.freeze({
   low:Object.freeze({chimneys:3,puffs:4,reserve:180}),
   emergency:Object.freeze({chimneys:0,puffs:0,reserve:0}),
 });
-export const ISLAND_VISIBILITY=Object.freeze({range:1000,fadeStart:420,fadeEnd:1050});
+export const ISLAND_VISIBILITY=Object.freeze({range:1000,fadeStart:420,fadeEnd:1000});
 
 // Navigation lights (js/render/beacon.mjs). `lamps` is the number of harbour
 // signals lit at once, nearest first; the pinned goal's own signal is extra and
@@ -40,9 +40,9 @@ export const AERIAL=Object.freeze({
   built:.58,                       // how much is WITHHELD from roofs/walls/masts
   chroma:.34,                      // rock chroma kept, so geologies stay distinct
   builtChroma:.82,
-  cool:Object.freeze([.38,.41,.56]),
-  warm:Object.freeze([.64,.48,.40]),
-  crest:.075,                      // warm top-light, so the skyline separates
+  cool:Object.freeze([.20,.25,.36]),
+  warm:Object.freeze([.38,.27,.21]),
+  crest:.035,                      // warm top-light, so the skyline separates
 });
 
 // Horizon weather in the shared sky shader (js/render/shaders.mjs). One scalar,
@@ -51,5 +51,5 @@ export const AERIAL=Object.freeze({
 // squall, not a day/night cycle.
 export const WEATHER=Object.freeze({
   intensity:1,
-  squallPeriod:2094,   // seconds for one lap of the compass (= the cloud wrap)
+  squallPeriod:2*Math.PI/.003,   // seconds for one lap of the compass (= the cloud wrap)
 });

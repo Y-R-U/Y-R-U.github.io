@@ -53,7 +53,9 @@ try{
       view.render(state,1/60);const origin=view.metrics().origin;for(let i=0;i<35;i++)view.islands.update(origin,state.x,state.z);view.render(state,1/60);
       const o=view.metrics().origin;
       view.camera.position.set(state.x-o.x,5.5,state.z-o.z);view.camera.lookAt(island.x-o.x,distance<80?4:10,island.z-o.z);
-      view.sky.update(view.camera,time);view.beacons.update(state,o,view.camera,view.renderer.domElement.clientHeight);
+      // lookAt changes the quaternion after its internal matrix update.
+      // Refresh before sky reconstruction and beacon projection, so both read this frame.
+      view.camera.updateMatrixWorld();view.sky.update(view.camera,time);view.beacons.update(state,o,view.camera,view.renderer.domElement.clientHeight);
       view.renderer.render(view.scene,view.camera);
       const m=view.metrics();
       return {landmark:island.landmark,distance,tier,goal,calls:m.calls,triangles:m.triangles,beacons:m.beacons};

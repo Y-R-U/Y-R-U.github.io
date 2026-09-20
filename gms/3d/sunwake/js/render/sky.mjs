@@ -14,5 +14,5 @@ export function createSky() {
     #include <colorspace_fragment>
     }`});
   const mesh=new THREE.Mesh(geometry,material);mesh.frustumCulled=false;mesh.renderOrder=-1000;
-  return {mesh,uniforms,update(camera,time){uniforms.uInverseProjection.value.copy(camera.projectionMatrixInverse);uniforms.uCameraWorld.value.copy(camera.matrixWorld);uniforms.uCloudTime.value=(time*.003/(2*Math.PI))%1;}};
+  return {mesh,uniforms,update(camera,time,reduced=false){uniforms.uInverseProjection.value.copy(camera.projectionMatrixInverse);uniforms.uCameraWorld.value.copy(camera.matrixWorld);if(!reduced)uniforms.uCloudTime.value=((time/WEATHER.squallPeriod)%1+1)%1;}};
 }
