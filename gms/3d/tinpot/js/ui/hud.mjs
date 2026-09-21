@@ -6,8 +6,11 @@ const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 // a touchstart landed on a button, the DOM was replaced before the touchend, and Chrome then had
 // no element to fire `click` on. The m5 rail-button gate caught it. So the structure is rebuilt
 // only when the structure changes, and the moving numbers are written straight into cached nodes.
+// Losing a named man gets a beat of its own: a small telegram under the mission banner. It sits
+// in the top edge strip, never in the middle of the battlefield, and never takes a tap.
+const QUIPS=['He had plans.','Posthumously adequate.','The paperwork will miss him.','A good lad, apparently.','He owed the mess three shillings.','Survived by his helmet.','Remembered, briefly.','His mother will be told something.'];
 export function createHUD(root,send){
- let signature='',refs=null;
+ let signature='',refs=null,plaque=null;
  root.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   send({type:b.dataset.action,id:b.dataset.id===undefined?null:Number(b.dataset.id),weapon:b.dataset.weapon});});
 
@@ -16,6 +19,12 @@ export function createHUD(root,send){
  return {update(model){
   const hidden=model.hidden||false;
   root.classList.toggle('hidden',hidden);
+  if(!plaque){plaque=document.createElement('div');plaque.className='eulogy';plaque.setAttribute('aria-live','polite');(root.parentNode||document.body).appendChild(plaque);}
+  const e=hidden?null:model.eulogy;
+  plaque.classList.toggle('showing',!!e);
+  if(e&&plaque.dataset.key!==String(e.key)){plaque.dataset.key=String(e.key);
+   plaque.innerHTML=`<span class="eyebrow">A TELEGRAM</span><strong>${escape(e.name)}</strong><small>${e.kills} kill${e.kills===1?'':'s'} · ${escape(QUIPS[e.key%QUIPS.length])}</small>`;}
+  root.classList.toggle('kit3',(model.equipped||[]).length>=3);
   if(hidden){signature='';refs=null;return;}
   const shape=JSON.stringify([model.location,model.objective,model.hint,model.equipped,model.paused,
    model.units.map(u=>[u.id,u.name,u.active,u.weapon,u.hp<=0])]);

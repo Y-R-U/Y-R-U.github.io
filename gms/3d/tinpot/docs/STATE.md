@@ -5,13 +5,177 @@
 
 ## Now
 
-**Milestone:** M1.5 done, M9 done bar the one box that is explicitly Aaron's.
-Everything in `PLAN.md` is ticked except the `projects.js` entry.
+**Milestone:** V1 slice shipped; the **V2 playtest pass (V1–V7) is complete**. Every box in
+`PLAN.md` is ticked except the `projects.js` entry, which is deliberately Aaron's.
 
-**Nobody has played this with their thumbs yet.** Every gate here is a harness gate. The next
-useful thing is a human holding a phone.
+**Nobody has played this with their thumbs yet.** Every gate here is still a harness gate. The
+next useful thing remains a human holding a phone — and there is now a lot more to feel.
+
+Green as of this session, on ANGLE Metal:
+`node tools/sim.mjs` · `node tools/campaign.mjs` · `node tools/browser.mjs`
+(`shell m2 m3 m4 m5 m6 m7 m8 art v1 v3 v4 v6`) · `node tools/release.mjs` ·
+`python3 tools/artgate.py docs/evidence/m1b-portrait.png` (exit 0, unedited).
+
+## V2 playtest pass — in progress (2026-09-22, fourth relay session)
+
+Working `PLAN.md`'s **V2 — the playtest pass**, V1→V7 in order. Nothing above that section is
+being touched.
+
+### V1 — fire damage: core done, sim green, browser not yet reshot
+
+`js/core/forestSim.mjs` is now the fire *field*, not just the spread automaton:
+
+* `fireIntensityAt(w,x,z)` → 0..1.35, read off a cached `w.burning` list plus `w.fires`
+  (ground fires). Falls off linearly with distance and with `min(1, burn/3)`, so a fresh blaze
+  is full strength and the last three seconds taper. A burnt-out tree scores 0 — charred ground
+  is safe, which is the whole point of burning a route open.
+* `FIRE = {dps:27, selfDps:10, linger:2.8, panic:.14}`. Standing in a fierce cell is ~35 dps;
+  crossing a 2 m band at a run costs ~20 HP. A man who catches light keeps burning for ~2.8 s
+  after he leaves, runs 1.6x faster while alight, and **sets fire to trees he runs past**.
+* `damage()` gained a `cause`. Armour (V4) does not apply to `cause==='fire'` — the heavy is
+  meant to be answered with a grenade or a flame, not a rifle.
+* `escapeRoute()` + panic: a unit in fire re-paths to the nearest cool walkable cell. Panic is
+  suppressed when his current path already leads somewhere cool, or he oscillates on the spot.
+* `rebuildFireMask(w)` builds a per-cell danger mask one cell fatter than the damage field.
+  `grid.route(from,x,z,danger)` treats it as wall. **The AI routes with it and has no fallback**
+  (`ai.mjs` `safeRoute`, `u.ai='waits'`); **the player's orders fall back to the plain route**,
+  so marching your own men into a firestorm stays possible and stays your fault.
+* Trees gained `charred`. Without it a trunk that outlives its own burn is relit by the ground
+  fire it just made and the wood never stops burning. Found by a sim test that hung on it.
+
+Sim evidence (`node tools/sim.mjs`, all green):
+
+```
+fire kills the man standing in it and spares the man beside him   parked 0 HP at 4.53 s, beside 100 HP
+intensity ramps with distance; burnt-out scar is safe             close .644  far .204  outside 0
+a man in fire panics out rather than standing in it politely      72.7 HP, ran 8.25 m
+burning treeline is a wall the AI waits behind                    held off 8.0 s, then advanced
+the player can march men into a firestorm                         crossed a 9-tree blaze for 23 HP
+```
+
+Every one of those has a negative control beside it in `tools/sim.mjs`.
+
+### V2 — instant retry: done
+
+A losing debrief now leads with **"Again. Nobody saw →"** and keeps "Send in the replacements"
+as the secondary. `markDeployment(c)` snapshots roster, slots, credits, upgrades, maps and the
+mission index at every deploy; `rewind(c)` restores all of them together and pops the failed
+attempt off `history`. Rolling them back *together* matters — restoring only the roster would
+let you farm brass off your own casualties.
+
+`tools/release.mjs` now loses a mission on purpose at 320/390/430 (`tinpotTest.smite()`),
+asserts the retry button exists and is a ≥44 px on-screen target, taps it, and checks the dead
+man is alive again and `history` is empty. Negative controls: he is alive before, and the loss
+really does bury him. Evidence: `docs/evidence/v2-defeat-retry.png`.
+
+**One real bug fell out of this.** `platform/audio.mjs` created a fresh `Audio` per cue and set
+`src=''` on fade-out. Tapping Retry a second after losing cancels the in-flight `defeat.mp3`
+fetch → `net::ERR_ABORTED`, which the release gate counts as a console/network error. Audio
+elements are now pooled one per track and never have their src cleared.
+
+### V3 — flamethrower: done
+
+`WEAPONS.flamer` — range 6.4 m, `cone` 0.46 rad half-angle, 0.4 s cadence, 8.5 damage a lick.
+No projectile and no accuracy roll: `spray()` in `combat.mjs` hits *everything* in the wedge
+including your own men, sets them alight, drops a `groundFire` at 72% of range and ignites the
+trees around it. `tank:{radius:5.4,damage:150}` cooks off when its owner dies — pushed through
+the existing grenade path, which now reads `g.radius`/`g.damage`.
+
+Unlocks with `mission>=3 && upgrades.slots>=2`, so it is live from *A Slight Detour*. Sim:
+clears a three-man wedge in 0.83 s, leaves the man standing behind him on 100 HP, takes his own
+mate to 0, and burns its owner when the player marches him into his own pool.
+
+**The layout cost of the third weapon, which is the part that nearly broke the release gate:**
+three 44 px pips do not fit across a 73 px card. `.weapon-pips` now wraps globally with
+`.pip{flex:1 0 44px}` — 3 rows at 320, 2 rows at 390/430 — the card body is compressed under
+`max-width:370px`, and `hud.mjs` sets a `kit3` class that lifts the weapon rail and the order
+hint clear of the taller cards. Without that the lowest rail button sat on top of the leftmost
+card's pips and ate the tap. Measured clear at all three widths; release re-run green with a
+flamer carried through missions 4–6.
+
+### V4 — three kinds of enemy: done
+
+`data/soldiers.mjs` is now a stat block per type and `units.applyKind(u,kind)` applies it;
+`data/missions.mjs` carries a `mix` per mission and per wave, cycled by `pickKind(mix,i)`.
+
+| | hp | speed | armour | weapon |
+|---|---|---|---|---|
+| grunt  |  65 | 2.5  | 0    | rifle (12 m) |
+| heavy  | 170 | 1.5  | 0.46 | rifle, +34% damage |
+| rusher |  34 | 5.4  | 0    | bayonet (2.4 m) |
+
+Armour is skipped for `cause==='fire'` and `'flame'`, so a heavy is roughly 315 effective HP
+against rifles and 170 against a grenade or the flamer — that is the whole point of him.
+`ai.mjs` gives each kind its own sight and hold distance, and **the rusher does not brake**: at
+under 7 m he commits to a point 1.9 m *past* you (`ai:'lunge'`) and sorts it out afterwards.
+
+Visually: `KIND` in `actors.mjs` — the heavy is 1.32x wide with a riveted iron chest slab and a
+dark red helmet, the rusher 0.83x with a bright amber helmet and a 24° forward lean, and their
+leg cadences differ (3.4 / 5.0 / 6.4 per metre) so one plods and one scurries. Measured off the
+real meshes by `tinpotTest.actorSizes()` in `tools/browser.mjs v4`, not asserted off the stats.
+
+**Balance, and the mistake worth recording.** My first mix roughly doubled the effective enemy
+HP of every mission and `tools/release.mjs` lost *A Slight Detour* outright. Two separate
+causes, found by building a 2-second headless loop instead of re-running the 5-minute browser
+gate:
+1. The mix itself. Mission 4 went from 520 effective HP to 1860.
+2. **The flamer.** Handing one of four men a 6.4 m weapon costs a quarter of the squad's
+   firepower at rifle range, and in the browser the ravine caught: 146 trees burnt and 51
+   ground fires in 37 s. `spray()` was igniting a 3 m circle at 55% every 0.4 s and ground
+   fires were re-igniting at 16% a tick. Both are now much lower (`pool*.8` at 28%, and 9%),
+   the flamer reaches 7.4 m, and the heavy came down to 170/0.46.
+
+Final: all six missions win on both loadouts with the naive harness pilot, mission 4 being the
+pinch (1 man lost with rifles only). `tools/campaign.mjs` and `tools/release.mjs` both green.
+
+### V5 — the emplacement: done
+
+`fortify(w)` in `core/world.mjs` builds nine sandbag works plus a mortar pit, laid out relative
+to `centre(-1, map)` so they sit in the corridor however it bends (D18). They are **low cover**:
+never in the pathing grid, so boots walk over them, but `lineClear` stops a bullet that crosses
+one — *unless* either end of the shot is within `HUG` (1.6 m) of that bag. So the side holding
+the bags fires out and cannot be fired at, which is the entire reason to hold ground.
+
+`blastTrees` flattens them, `props.mjs` now draws them from `w.works` rather than hard-coded
+coordinates (so what you can see is exactly what stops a bullet, and a flattened bag vanishes),
+and `snapshotWorld` carries them through a save. `ai.mjs` gained one behaviour to go with them:
+a red with no line of sight and bags within 7 m goes and hugs the bags instead of standing in
+the open. Territory was already persisted by `finishMission`; the sim now asserts it, with a
+negative control that nothing is dug in on the first visit and that trees you did not burn are
+still trees.
+
+### V6 — juice: done
+
+* `platform/haptics.mjs` — 11 ms on a kill, 46 ms on a grenade, 26/40/70 on a flamer cooking
+  off, and a triple stutter when one of your own catches light. Feature-checked, try/catch'd,
+  rate-limited to one buzz per 60 ms so a firefight is not a doorbell, and muted with the SFX
+  slider.
+* **Flinch.** `damage()` stamps `u.hurt`; `actors.mjs` gives him 0.2 s of being knocked off his
+  axis, arms up. A new `hit` event (non-fire, ≥3 damage) throws jam in the air proportional to
+  the damage and stains the grass on a big one.
+* **The telegram.** A named man dying puts a small gold-edged card under the mission banner for
+  2.8 s: his name, his kills, and one of eight lines ("He owed the mess three shillings."). It
+  lives in the top edge strip, is `pointer-events:none`, and is asserted by `browser.mjs v6` to
+  sit above 42% of screen height so it never covers the battlefield.
+
+### V7 — landscape: done (the friendly card)
+
+`@media(orientation:landscape)` puts up a full-screen "Turn me round." card with a tipping
+helmet. Pure CSS, so it works even if the module never boots. A `Carry on sideways anyway`
+button sets `html.rotate-ok` for anyone on a laptop who cannot rotate anything. Evidence:
+`docs/evidence/v7-rotate.png`. The corridor is 26 m across by 55 m along by design; making the
+camera fill a landscape window would show the map edge, so this is the honest answer rather
+than the lazy one.
 
 ## Last done
+
+- 2026-09-22 (managing Opus 5 session, verifying V2 before push): the `v6` juice gate was
+  **flaky — 1 failure in 3 runs** on "somebody must actually get hit". Its hit-wait loop gave the
+  squad only 12x60 ticks to close the distance and land a shot. Raised to 60 iterations; 5 of 5
+  green after. Still bounded and still a real assertion, so the gate is not weakened.
+  Also note for future sessions: `tools/browser.mjs` takes the suite as a **positional** argument
+  (`node tools/browser.mjs v1`). Passing `--suite v1` silently runs only the generic boot
+  scenario and prints PASS — a false green that fooled this session once.
 
 ### 2026-09-22 — Opus 5 relay session (third agent): M1.5 art pass finished, M9 closed
 
@@ -161,6 +325,19 @@ node tools/release.mjs
 
 ## Next
 
+0. **What the V2 pass left undone, honestly:**
+   * Difficulty. The harness pilot now wins all six missions losing **one** man in total (on
+     *A Slight Detour*, rifles only). That pilot plays better than a thumb does, but if Aaron
+     finds it soft the levers are `heavy.damageBonus`, the `mix`/`count` in `data/missions.mjs`,
+     and the red damage multiplier `.65` in `combat.mjs`. `tools/campaign.mjs` re-tests in two
+     seconds.
+   * Nobody actively seeks cover except a blocked red near sandbags. Blue never takes cover on
+     its own; the player has to put them there.
+   * The flamer is only exercised by the harness on missions 4–6 with one carrier. A squad of
+     four flamers has never been played.
+   * Grenade and flamer ids diverge by *id only* across a save/reload (`eventId` is not in the
+     snapshot). Positions, lives and propagation are identical; asserted above.
+
 1. **Put it in front of a human with a phone.** Every gate in this repo is mechanical.
 2. Aaron's `projects.js` entry, and copy `docs/evidence/tinpot.jpg` to
    `/assets/screenshots/tinpot.jpg`. Both are deliberately not an agent's job.
@@ -223,5 +400,29 @@ Append one line per decision that a later agent would otherwise re-litigate.
   (`snapTo` in `world.mjs`) and enemy lines are laid out relative to `centre(z, map)`. A unit in
   a blocked cell can never path out of one, and `route` is deliberately left strict about that so
   the bug stays visible instead of being papered over with a teleport.
+- **D20** **Fire is a field, not a flag.** `fireIntensityAt(w,x,z)` is the single source of
+  truth for "how much is this point burning", read by damage, by panic and by the route mask.
+  Anything new that burns adds to `w.burning` or `w.fires`; nothing gets its own damage rule.
+- **D21** **The AI has no fallback through fire; the player does.** `ai.mjs safeRoute` returns
+  an empty path and the unit waits (`u.ai='waits'`). `orderMove` falls back to the plain route.
+  Marching your own men into a firestorm must stay possible and must stay the player's idea.
+- **D22** **A tree burns once (`t.charred`).** Otherwise the ground fire a tree leaves behind
+  relights the tree, and the wood never stops burning. A sim test hung on exactly this.
+- **D23** **Armour is skipped for `cause==='fire'` and `'flame'`.** That is the heavy's whole
+  design: rifles are the wrong answer, a grenade or a flame is the right one.
+- **D24** **A man who is alight ignores new orders until he stops burning** (`u.panicking`).
+  Without it, a player (or a harness) tapping once a second drives burning men back into the
+  fire they are running out of.
+- **D25** **Sandbags are LOW cover: never in the pathing grid, always in `lineClear`, and
+  transparent to anyone within `HUG` = 1.6 m.** Blocking the cells would wall the corridor off;
+  blocking shots without the hug rule would make the bags useless to their owner.
+- **D26** **Retry rolls the whole deployment back together** — roster, slots, credits,
+  upgrades, maps and the mission index. Restoring only the roster would let you farm brass off
+  your own casualties.
+- **D27** **Audio elements are pooled one per track and never have `src` cleared.** Clearing it
+  aborts an in-flight media fetch, which the release gate counts as an error and instant retry
+  triggers every time.
+- **D28** **Landscape gets a card, not a camera.** The corridor is 26 m x 55 m by design; a
+  landscape camera shows the map edge and the empty world past it.
 - **D19** **Perf must be measured with `-- --use-angle=metal`.** The default `cdp` launcher is
   SwiftShader; see the performance section above.

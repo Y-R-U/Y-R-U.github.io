@@ -34,7 +34,13 @@ function merge(parts){
 }
 
 const HUE={cloth:0x6d6c48,clothDark:0x565537,webbing:0x3f4030,boot:0x272b26,
-           skin:0xd8ab78,steel:0x3b4038,wood:0x6b4a2c,pack:0x7b7550};
+           skin:0xd8ab78,steel:0x3b4038,wood:0x6b4a2c,pack:0x7b7550,iron:0x413c36,rivet:0x6a6055};
+// Three enemies you can tell apart from 78 m up, using the only three things that read at this
+// size: overall mass, helmet colour, and one extra lump on the silhouette.
+export const KIND={
+ heavy :{scale:[1.32,1.16,1.32],helmet:'heavy', plate:true },
+ rusher:{scale:[.83,.9,.83],    helmet:'rusher',lean:-.34  },
+};
 const c=k=>new THREE.Color(HUE[k]);
 
 function buildGeometry(){
@@ -73,7 +79,13 @@ function buildGeometry(){
   {geo:new THREE.SphereGeometry(.255,10,5,0,Math.PI*2,0,Math.PI*.55),color:new THREE.Color(0xffffff),m:at(0,0,0)},
   {geo:new THREE.CylinderGeometry(.30,.315,.05,12),color:new THREE.Color(0xe6e6e6),m:at(0,-.015,0)},
  ]);
- return {body,leg,arms,helmet};
+ // the heavy's chest slab: a wide low box that breaks his outline from directly above
+ const plate=merge([
+  {geo:box,color:c('iron'), m:at(0,1.04,.30,0,0,0,.86,.62,.15)},
+  {geo:box,color:c('rivet'),m:at(0,1.33,.31,0,0,0,.92,.11,.17)},
+  {geo:box,color:c('rivet'),m:at(0,.76,.31,0,0,0,.92,.09,.17)},
+ ]);
+ return {body,leg,arms,helmet,plate};
 }
 
 export function createActors(scene){
@@ -83,6 +95,8 @@ export function createActors(scene){
   blue:new THREE.MeshStandardMaterial({color:0x6fbfae,vertexColors:true,metalness:.3,roughness:.42}),
   red:new THREE.MeshStandardMaterial({color:0xd96a44,vertexColors:true,metalness:.28,roughness:.42}),
   gold:new THREE.MeshStandardMaterial({color:0xe6bf4c,vertexColors:true,metalness:.45,roughness:.35}),
+  heavy:new THREE.MeshStandardMaterial({color:0xa4472e,vertexColors:true,metalness:.5,roughness:.3}),
+  rusher:new THREE.MeshStandardMaterial({color:0xf2ad3e,vertexColors:true,metalness:.2,roughness:.5}),
  };
  const actors=new Map();
 
@@ -99,14 +113,17 @@ export function createActors(scene){
   // 16 degrees the brief asks for; this is a character trick, not a camera one, and it is the
   // difference between seeing a helmet and seeing a man: it nearly doubles how far up-screen
   // the helmet sits from the boots, so shoulders, torso and boots all clear the hat.
-  const lean=new THREE.Group();lean.rotation.x=-.19;g.add(lean);
+  const kind=KIND[u.kind]||null;
+  if(kind)g.scale.set(...kind.scale);
+  const lean=new THREE.Group();lean.rotation.x=-.19+(kind?.lean||0)*.5;g.add(lean);
   const yaw=new THREE.Group();lean.add(yaw);
   const legs=[-1,1].map(s=>{const m=new THREE.Mesh(G.leg,bodyMat);m.position.set(s*.20,.74,0);m.castShadow=true;yaw.add(m);return m;});
   const body=new THREE.Group();yaw.add(body);
   const torso=new THREE.Mesh(G.body,bodyMat);torso.castShadow=true;body.add(torso);
   const arms=new THREE.Group();arms.position.y=1.18;body.add(arms);
   const armMesh=new THREE.Mesh(G.arms,bodyMat);armMesh.castShadow=true;arms.add(armMesh);
-  const hat=new THREE.Mesh(G.helmet,teamMat[u.escort?'gold':u.team]);
+  if(kind?.plate){const slab=new THREE.Mesh(G.plate,bodyMat);slab.castShadow=true;body.add(slab);}
+  const hat=new THREE.Mesh(G.helmet,teamMat[u.escort?'gold':kind?.helmet||u.team]);
   hat.position.y=1.655;hat.castShadow=true;body.add(hat);
   const ring=new THREE.Mesh(new THREE.RingGeometry(.58,.63,20),new THREE.MeshBasicMaterial({color:0xa9d98a,transparent:true,opacity:.30,side:THREE.DoubleSide}));
   ring.rotation.x=-Math.PI/2;ring.position.y=.04;g.add(ring);
@@ -137,13 +154,15 @@ export function createActors(scene){
    const firing=u.state==='engage',walking=u.state==='walk';
    // recoil: cooldown jumping back up means he has just let one off
    if(u.cooldown>a.cool+.01)a.recoil=1;
+   // flinch: 0.2 s of being knocked back off the axis of whoever just hit him
+   const flinch=Math.max(0,1-(w.time-(u.hurt??-9))/.2);
    a.cool=u.cooldown;a.recoil=Math.max(0,a.recoil-dt*7);
 
    if(walking){
-    const ph=u.steps*5.0;
+    const ph=u.steps*(u.kind==='heavy'?3.4:u.kind==='rusher'?6.4:5.0);
     a.body.position.set(0,Math.abs(Math.sin(ph))*.065,0);
-    a.body.rotation.set(.16,0,Math.sin(ph)*.06);
-    a.legs.forEach((l,i)=>l.rotation.set(Math.sin(ph+i*Math.PI)*.62,0,0));
+    a.body.rotation.set(u.kind==='rusher'?.42:u.kind==='heavy'?.08:.16,0,Math.sin(ph)*(u.kind==='heavy'?.11:.06));
+    a.legs.forEach((l,i)=>l.rotation.set(Math.sin(ph+i*Math.PI)*(u.kind==='rusher'?.95:.62),0,0));
     a.arms.rotation.x=.42-Math.sin(ph)*.12;
     a.mark+=u.speed*dt;
     if(a.mark>.85){a.mark=0;const p=puffs[puffAt=(puffAt+1)%64];p.x=u.x;p.z=u.z;p.t=0;}
@@ -160,6 +179,7 @@ export function createActors(scene){
     a.legs.forEach(l=>l.rotation.set(0,0,0));
     a.arms.rotation.x=.34;
    }
+   if(flinch>0){const j=flinch*flinch;a.body.rotation.x-=j*.34;a.body.rotation.z+=Math.sin(u.id*3+u.hurt*7)*j*.22;a.body.position.y+=j*.05;a.arms.rotation.x+=j*.5;}
    a.hat.position.set(0,1.655,0);a.hat.rotation.set(0,0,0);
    a.ring.visible=u.team==='blue'&&u.active&&!u.escort;
   }
@@ -171,5 +191,8 @@ export function createActors(scene){
    dummy.updateMatrix();dust.setMatrixAt(i,dummy.matrix);
   }
   dust.instanceMatrix.needsUpdate=true;
- }};
+ },
+ // test-only: the real rendered extent of each actor, so "you can tell them apart from up here"
+ // is measured off the meshes rather than asserted off the stat block.
+ sizes(){const out={},box=new THREE.Box3();for(const [id,a] of actors){box.setFromObject(a.g);out[id]={h:+(box.max.y-box.min.y).toFixed(3),w:+(box.max.x-box.min.x).toFixed(3),scale:+a.g.scale.x.toFixed(3)};}return out;}};
 }

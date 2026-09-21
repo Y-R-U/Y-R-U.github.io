@@ -19,9 +19,35 @@ try{
    s=await p.eval('tinpotTest.advance(90)');
   }
   assert.equal(s.mode,'debrief');assert.equal(s.mission.status,'victory',JSON.stringify(s));report.missions.push(s.campaign.history.at(-1));await shot('m9-mission-'+(mission+1)+'-victory');console.log('PASS campaign mission',mission+1,s.mission.title);
-  if(mission<5){await click('[data-action="next"]');if(mission===0)await click('[data-action="buy"][data-id="armour"]');if(mission===1)await click('[data-action="buy"][data-id="slots"]');if(mission===2)await click('[data-action="buy"][data-id="rifle"]');await shot('m9-barracks-'+(mission+1));await click('[data-action="briefing"]');await click('[data-action="deploy"]');}
+  if(mission<5){await click('[data-action="next"]');if(mission===0)await click('[data-action="buy"][data-id="armour"]');if(mission===1)await click('[data-action="buy"][data-id="slots"]');if(mission===2)await click('[data-action="buy"][data-id="rifle"]');await shot('m9-barracks-'+(mission+1));await click('[data-action="briefing"]');await click('[data-action="deploy"]');
+   // V3: from A Slight Detour one man carries the flamer for the rest of the campaign. If that
+   // makes a mission unwinnable it is a balance bug, not a harness problem.
+   if(mission===2){const kit=await p.eval('tinpotTest.advance(0)');assert.ok(kit.equipped.includes('flamer'),'flamer must unlock at mission 4: '+JSON.stringify(kit.equipped));await click('.pip[data-id="0"][data-weapon="flamer"]');assert.equal((await p.eval('tinpotTest.advance(0)')).units[0].weapon,'flamer','the third pip must actually equip it');await shot('v3-flamer-equipped');}}
  }
  assert.equal((await p.eval('tinpotTest.advance(0)')).campaign.mission,6);
+ // V2 instant retry: lose on purpose, and get back on the field in one tap at every width.
+ for(const [width,height] of [[320,740],[390,844],[430,932]]){
+  await p.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:2,mobile:true});
+  await p.eval("tinpotTest.fixture('campaign')");await sleep(150);
+  const deployed=await p.eval('tinpotTest.advance(0)');assert.equal(deployed.mode,'battle');
+  const man=deployed.campaign.roster[0];assert.ok(man.alive,'negative control: he starts the mission alive');
+  await p.eval('tinpotTest.smite()');const lost=await p.eval('tinpotTest.advance(4)');
+  assert.equal(lost.mode,'debrief');assert.equal(lost.mission.status,'defeat');
+  assert.equal(lost.campaign.roster[0].alive,false,'negative control: losing really does bury him');
+  const buttons=await p.eval(`[...document.querySelectorAll('#screens .screen-bottom button')].map(b=>{const r=b.getBoundingClientRect();return {action:b.dataset.action,w:r.width,h:r.height,x:r.x,y:r.y,right:r.right,bottom:r.bottom}})`);
+  assert.ok(buttons.some(b=>b.action==='retry-mission'),'defeat debrief must offer a retry: '+JSON.stringify(buttons));
+  for(const b of buttons){assert.ok(b.w>=44&&b.h>=44,JSON.stringify(b));assert.ok(b.x>=0&&b.y>=0&&b.right<=width+.1&&b.bottom<=height+.1,JSON.stringify(b));}
+  if(width===390)await shot('v2-defeat-retry');
+  await click('[data-action="retry-mission"]');
+  const again=await p.eval('tinpotTest.advance(0)');
+  assert.equal(again.mode,'battle','retry must put you straight back on the field');
+  assert.equal(again.mission.id,0);
+  assert.equal(again.campaign.roster[0].alive,true,'and the pre-mission roster must be intact');
+  assert.equal(again.campaign.history.length,0,'the failed attempt is not kept on the record');
+  assert.ok(again.units.filter(u=>u.team==='blue'&&u.hp>0).length>0);
+  report.screens.push('retry@'+width);
+ }
+ await p.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});
  // A fresh title and a four-man, two-weapon battlefield at each phone width.
  for(const [width,height] of [[320,740],[390,844],[430,932]]){await p.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:2,mobile:true});await p.eval("tinpotTest.fixture('m5')");await sleep(200);const rects=await p.eval(`[...document.querySelectorAll('#hud button')].map(b=>{const r=b.getBoundingClientRect();return {label:b.ariaLabel,w:r.width,h:r.height,x:r.x,y:r.y,right:r.right,bottom:r.bottom}})`);for(const r of rects){assert.ok(r.w>=44&&r.h>=44,JSON.stringify(r));assert.ok(r.x>=0&&r.y>=0&&r.right<=width+.1&&r.bottom<=height+.1,JSON.stringify(r));}assert.equal(await p.eval('document.documentElement.scrollWidth'),width);const visibility=await p.eval(`(()=>{const top=document.querySelector('.unit-cards').getBoundingClientRect().top;return tinpot.units.filter(u=>u.team==='blue').map(u=>({point:tinpotTest.project(u.x,u.z),top}));})()`);for(const v of visibility)assert.ok(v.point.y<v.top-10,'deployed soldier hidden behind cards: '+JSON.stringify(v));await shot('m9-phone-'+width);}
  await p.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});await p.eval("tinpotTest.fixture('title')");await p.send('Emulation.setCPUThrottlingRate',{rate:4});await sleep(1000);

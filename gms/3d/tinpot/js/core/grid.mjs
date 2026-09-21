@@ -18,8 +18,14 @@ export function createGrid(map,trees,cover=map.cover||[]){
  const point=i=>({x:i%width-width/2+.5,z:Math.floor(i/width)-depth/2+.5});
  const neighbours=i=>{const x=i%width,z=Math.floor(i/width);return [x>0?i-1:-1,x<width-1?i+1:-1,z>0?i-width:-1,z<depth-1?i+width:-1].filter(n=>n>=0);};
  function rebuild(){blocked.fill(0);for(const t of [...trees,...cover]){if(t.dead)continue;for(let z=Math.floor(t.z-1);z<=Math.ceil(t.z+1);z++)for(let x=Math.floor(t.x-1);x<=Math.ceil(t.x+1);x++){const i=index(x,z);if(i>=0){const p=point(i);if(Math.hypot(p.x-t.x,p.z-t.z)<(t.radius||1)*.7+.45)blocked[i]=1;}}}}
- function nearest(x,z){let i=index(Math.max(-width/2,Math.min(width/2-.01,x)),Math.max(-depth/2,Math.min(depth/2-.01,z)));if(!blocked[i])return i;const seen=new Set([i]),q=[i];for(let j=0;j<q.length;j++)for(const n of neighbours(q[j])){if(seen.has(n))continue;if(!blocked[n])return n;seen.add(n);q.push(n);}return -1;}
- function flow(x,z){const target=nearest(x,z),dist=new Int32Array(width*depth).fill(-1);if(target<0)return {target,dist};dist[target]=0;const q=[target];for(let j=0;j<q.length;j++)for(const n of neighbours(q[j]))if(!blocked[n]&&dist[n]<0){dist[n]=dist[q[j]]+1;q.push(n);}return {target,dist};}
- function route(from,x,z){const f=flow(x,z);let i=index(from.x,from.z);if(i<0||f.dist[i]<0)return [];const path=[];while(i!==f.target){const n=neighbours(i).find(n=>f.dist[n]===f.dist[i]-1);if(n===undefined)break;i=n;path.push(point(i));}return path;}
+ function nearest(x,z,danger=null){const bad=n=>blocked[n]||(danger&&danger[n]);let i=index(Math.max(-width/2,Math.min(width/2-.01,x)),Math.max(-depth/2,Math.min(depth/2-.01,z)));if(i<0)return -1;if(!bad(i))return i;const seen=new Set([i]),q=[i];for(let j=0;j<q.length;j++)for(const n of neighbours(q[j])){if(seen.has(n))continue;if(!bad(n))return n;seen.add(n);q.push(n);}return -1;}
+ // `danger` is an optional per-cell mask (fire). Cells in it are impassable for this query, so
+ // a burning treeline is a real wall to whoever respects it. Callers decide what to do with the
+ // empty array that comes back when the only way through is through the flames.
+ function flow(x,z,danger=null){const target=nearest(x,z,danger),dist=new Int32Array(width*depth).fill(-1);if(target<0)return {target,dist};dist[target]=0;const q=[target];for(let j=0;j<q.length;j++)for(const n of neighbours(q[j]))if(!blocked[n]&&!(danger&&danger[n])&&dist[n]<0){dist[n]=dist[q[j]]+1;q.push(n);}return {target,dist};}
+ function route(from,x,z,danger=null){const f=flow(x,z,danger);let i=index(from.x,from.z);if(i<0||f.target<0)return [];if(f.dist[i]<0){if(!danger)return [];
+   // Standing in the fire already: step to the best neighbour that is out of it, then re-plan.
+   const out=neighbours(i).filter(n=>!blocked[n]&&f.dist[n]>=0).sort((a,b)=>f.dist[a]-f.dist[b])[0];if(out===undefined)return [];i=out;}
+  const path=[];if(i!==index(from.x,from.z))path.push(point(i));while(i!==f.target){const n=neighbours(i).find(n=>f.dist[n]===f.dist[i]-1);if(n===undefined)break;i=n;path.push(point(i));}return path;}
  rebuild();return {width,depth,blocked,index,point,nearest,neighbours,flow,route,rebuild};
 }

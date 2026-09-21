@@ -129,3 +129,57 @@ The first M1 frame was competent and boring; these are the specific fixes.
 Flamethrower · mortar · rockets · minelayer · jeep, half-track, tank · magic units ·
 water and bridges · night missions · the 200-mission story campaign · boss missions ·
 a Boot Hill graveyard that grows · daily challenge · games.br8t.com account layer
+
+---
+
+# V2 — the playtest pass (added 2026-09-22, after shipping the slice)
+
+Aaron is play-testing on `yru.br8t.com`. These are the gaps found by reading the shipped build.
+Ordered by how much each one changes whether the game is fun. Same rules as everything above:
+run it, look at it, tick honestly.
+
+## V1 — Fire has to matter (the signature mechanic is currently decorative)
+Nothing in `core/` damages a unit for standing in fire. You can burn the forest down and then
+walk through the flames unharmed. Fire is the thing that makes this game not-Cannon-Fodder, and
+right now it is set dressing.
+- [x] Burning trees and burning ground damage ANY unit in them — yours, theirs, the tea inspector
+- [x] Damage ramps with how fiercely that cell is burning; charred-but-out ground is safe
+- [x] Units panic-path out of fire rather than standing in it politely
+- [x] The AI will not route through fire, so a burning treeline is a real wall while it burns
+- [x] Headless: `sim.mjs` asserts a soldier parked in fire dies, and one beside it does not
+
+## V2 — Instant retry
+A mission is ninety seconds and permadeath is the hook, so losing must cost a tap, not a reload.
+- [x] Defeat debrief has a Retry that restarts the mission with the pre-mission roster intact
+- [x] Retry is reachable by touch on all three phone widths; covered by the release harness
+
+## V3 — The third weapon: flamethrower
+The weapon rail and the card pips were both built for three and only ever hold two.
+- [x] `flamer`: short range, a cone rather than a line, ignites everything it touches
+- [x] Unlocks at mission 3; appears as the third rail button and a third pip automatically
+- [x] It is genuinely dangerous to its owner — this should be funny, not balanced
+- [x] Balance it in `tools/sim.mjs`, not the browser
+
+## V4 — Enemies that are not all the same man
+`SOLDIERS.red` is one stat block and `updateAI` is one behaviour, so every firefight is identical.
+- [x] Three types minimum: the current grunt, a slow armoured heavy, a fast low-HP rusher
+- [x] Each visually distinguishable from above at this camera height — silhouette and colour
+- [x] Mission data picks the mix; later missions get nastier
+- [x] The heavy should make you reach for grenades; the rusher should punish a split squad
+
+## V5 — The fortifications the game keeps promising
+Mission 2's briefing says "we have installed sandbags and a mortar pit". Neither exists. This is
+the map-as-territory promise and it is the reason to reuse a map at all.
+- [x] Sandbags are real cover: they block shots and soldiers use them
+- [x] A won mission leaves its emplacement behind on that map for later missions
+- [x] Burn scars from a previous mission persist into the next mission on the same map
+
+## V6 — Juice
+- [x] Haptics on a phone: a short buzz on a kill, a longer one on a grenade
+- [x] Hit feedback readable at this camera height — flinch, a spray, a number, something
+- [x] Losing a named man is dwelt on for a beat. He has a name; make it land.
+
+## V7 — Landscape
+At 1280x800 the play corridor stays portrait-shaped and you can see the map's edge and the empty
+background past it. On a phone turned sideways this looks broken.
+- [x] Either handle landscape properly, or put up a friendly "turn me round" card

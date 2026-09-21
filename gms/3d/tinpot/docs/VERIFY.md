@@ -180,3 +180,38 @@ run on a phone, or played by a human.** That is the single biggest gap in this d
 * No human has played it. Everything above is a machine agreeing with a machine.
 * `docs/evidence/tinpot.jpg` is the store screenshot, staged but not copied to
   `/assets/screenshots/`. That copy and the `projects.js` entry are Aaron's, at ship time.
+
+---
+
+## V2 — the playtest pass (2026-09-22, fourth relay session)
+
+All seven items ticked. Commands, all green on ANGLE Metal
+(`~/.claude/bin/cdp start --port 9223 -- --use-angle=metal`):
+
+```
+node tools/sim.mjs
+node tools/campaign.mjs
+node tools/browser.mjs <shell|m2|m3|m4|m5|m6|m7|m8|art|v1|v3|v4|v6>
+node tools/release.mjs
+python3 tools/artgate.py docs/evidence/m1b-portrait.png      # exit 0, thresholds unedited
+```
+
+New gates and the evidence they produced:
+
+| gate | what it proves | evidence |
+|---|---|---|
+| `sim.mjs` fire block | parked man dies at 4.5 s, man 7 m away untouched; intensity .644 → .204 → 0 with distance; burnt-out scar costs nothing; panic runs 8.25 m out and lives; AI holds off a burning treeline for 8.0 s then walks the gap | `docs/evidence/sim.json` |
+| `sim.mjs` flamer block | clears a three-man wedge in 0.83 s, man behind on 100 HP, own mate to 0, owner burned by his own pool, tank cooks off | `sim.json` |
+| `sim.mjs` enemy block | heavy takes 125 of 250 rifle damage and all of the fire; rusher closes 22 m while the heavy makes 6 | `sim.json` |
+| `sim.mjs` emplacement block | sandbags stop a bullet, never a boot, never the man hugging them; a grenade opens a lane; a won mission leaves works + scars | `sim.json` |
+| `browser.mjs v1` | men marched through fire catch light and lose >20 HP; the ground fire burns out and the cold scar is free | `v1-men-on-fire.png`, `v1-burning-meadow.png`, `v1-cold-scar.png` |
+| `browser.mjs v3` | three rail buttons in the right order, one tap arms the squad, the cone leaves fire and kills | `v3-flame-cone.png`, `v3-aftermath.png` |
+| `browser.mjs v4` | the three kinds differ in stats **and** in rendered extent (`tinpotTest.actorSizes()`) | `v4-lineup.png` |
+| `browser.mjs v6` | a hit puts claret in the air; the telegram appears, is `pointer-events:none`, and stays above 42% of screen height | `v6-hit.png`, `v6-telegram.png` |
+| `release.mjs` retry stage | a deliberate defeat at 320/390/430 offers a ≥44 px Retry, and one tap restores the buried man and clears the failed attempt from history | `v2-defeat-retry.png` |
+| landscape | the rotate card shows in landscape, dismisses, and stays gone in portrait | `v7-rotate.png` |
+
+Release campaign result (harness pilot, flamer carried from mission 4):
+all six won, 0 men lost. Headless `tools/campaign.mjs` with rifles only loses 1 man on
+*A Slight Detour*. Perf unchanged: 60.00 fps, p95 16.7 ms, 362 calls, 276 k triangles at
+390x844 DPR 2 with a 4x CPU throttle.
