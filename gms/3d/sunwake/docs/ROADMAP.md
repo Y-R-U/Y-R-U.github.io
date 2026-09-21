@@ -190,12 +190,10 @@ Early game stays as it is: a few island hops as practice. These systems unlock a
       Found by playing it, not by the suite: landing a fish left the panel painted with
       "Landed." and the button still reading *Reel in and stow*, because the phase was reset at
       the end of the HUD update instead of when the fight ended.
-- [ ] **Jobs.** A board at any discovered island. Three kinds: transport cargo from here to a
-      named island, catch N of a species, visit a named island. **Jobs you are ineligible for are
-      shown disabled with the reason** ("needs fishing 6"), not hidden.
-- [ ] **Coins and progression.** Jobs and fish pay. Spend on a better rod, hull speed, a longer
-      chart range. Keep it small and legible — no shop trees.
-- [ ] Ordinary islands need a reason to stop: a fishing spot, a job board, a buoy marking a reef.
+- [x] **Jobs — BUILT 2026-09-21 (gameplay builder). IN PROGRESS → DONE; evidence below.**
+- [x] **Coins and progression — BUILT 2026-09-21, same pass.**
+- [x] **Ordinary islands now have a reason to stop — same pass.** See
+      *Gameplay builder — jobs, coins and a reason to stop* below.
 
 ## P3 — graphics (Aaron asked for astra on these)
 
@@ -536,7 +534,7 @@ Honest reading of them, since this project has five green suites over invisible 
   is what silently truncated the previous builder's evidence run.
 - Physical device and real-phone performance remain **NOT MET**; nothing here changes that.
 
-## Graphics builder — the 900 m read and horizon weather, 2026-09-21 — IN PROGRESS
+## Graphics builder — the 900 m read and horizon weather, 2026-09-21 — DONE (resume evidence below)
 
 Taking the previous builder's honest closing note as the task: *"at 900 m the island alone is
 still a small pale smudge — the beacon is what makes you turn the boat, not the rock."*
@@ -580,3 +578,232 @@ pass and the game boots) but two features are part-built:
 
 Still open after those: a reason to stop at ordinary islands, M7 adaptive quality finish,
 distant sails and birds, and the physical-device gate that only Aaron can close.
+
+## Graphics resume — 2026-09-21 — DONE
+
+Read the pause, TASKS C1/D2 and STATE before changing code. Audited the partial island
+geometry/material and shared weather shader: the earlier attempt is present, including
+explicit `built` attributes and shared `uWeather`; it needs framebuffer validation, not a
+blind restart. Completing the 900 m silhouette and weather, correcting weather wrap timing,
+and adding hidden-feature negative controls. Water displacement and HORIZON_FADE stay as
+reviewed; shared sky colour changes will still receive fresh C1 east/west captures.
+
+### Request to tools owner — screenshot retry (graphics resume)
+
+`tools/browser.mjs --suite stream` twice timed out in `Page.captureScreenshot` on managed
+SwiftShader Chrome; the other nine browser scenarios passed. Please give `tools/cdp.mjs`'s
+`shot()` the same two-RAF retry used by `js/render/tests/settlements-browser.mjs`. A graphics-owned in-memory retry adapter also hit a Runtime.evaluate timeout, and was
+removed after investigation. Managed Chrome with `-- --use-angle=metal` passes the **original,
+unmodified full ten-scenario suite**, including 20 km streaming and rebase comparison. The
+SwiftShader failures are preserved in `docs/evidence/graphics-resume-initial-browser-all.json`
+and `graphics-resume-swiftshader-stream.json`. Prefer Metal for local render validation;
+physical-device qualification remains separate. No tools file was modified.
+
+### Completed graphics work and evidence — 2026-09-21
+
+**DONE: the 900 m island read; DONE: changing weather within the fixed sunset.**
+The paused section above is historical. The four partially edited files were inspected before
+resuming; their geometry/material work was retained, completed, tuned and tested.
+
+- **Islands:** retained the seeded rock palettes, coarse heightfield at far LOD and offset
+  ordinary-island fins/stacks from the paused work. Tuned the elevated rock toward darker warm
+  shadow planes, with a restrained warm crest; settlement vertices preserve their own colour
+  and lightness, so roofs and masts separate from the rock. Near views are unaffected by the
+  distance treatment. Six authored crowns and three ordinary profiles were captured at 900 m.
+  The final elevated fade finishes by 1000 m, matching the visible-range cutoff. This is an
+  art-directed material treatment, not a change to physical lighting or island colliders.
+- **Weather:** cloud banks with warm rims, soft sunward shafts, and a drifting squall/rain veil
+  share the sky/water horizon colour function. No new draw, mesh, texture or render target.
+  The sun direction never changes. The ~34.9 minute loop now uses integer time harmonics,
+  eliminating the partial implementation's wrap discontinuity. Reduced motion freezes the
+  cloud/weather clock; emergency tier disables it with the existing cloud switch. Explicit
+  texture gradients remove the cloud mip stripe at the azimuth seam.
+- **C1/D2 preserved:** no change to water displacement, wave fade distances, water haze range,
+  HORIZON_FADE, config.mjs or collision. The shoreline still uses the original horizon fade.
+  Because the shared sky function changed, all four explicit C1 images were recaptured and
+  opened: `c1-{standard,low}-{east,west}-t5.png`. The far band is graded water/haze; the hard
+  rectangular shelves have not returned.
+- **Test fixture defect fixed:** beacon/settlement fixtures called `lookAt()` then reconstructed
+  the sky from a stale camera matrix. Weather exposed it: the hidden-beacon control measured
+  +13.51 luminance and the 420 m frame incorrectly counted thousands of weather pixels as
+  beacon light. Explicit `updateMatrixWorld()` before sky/light projection fixes the fixture;
+  the production camera already does this. The corrected hidden-beacon control is exactly 0.
+
+Code touched in this resume: `js/core/visual-config.mjs`, `js/render/islands.mjs`,
+`shaders.mjs`, `sky.mjs`, `scene.mjs`, and render tests `horizon-browser.mjs` (new),
+`beacon-browser.mjs`, `settlements-browser.mjs`. No gameplay-owned source, tools, site registry
+or git operations. Documentation/evidence stays in SUNWAKE.
+
+#### Framebuffer proof, with the features actually hidden
+
+`horizon-browser.mjs` reads the real WebGL default framebuffer synchronously after rendering,
+not a proxy/instance count. The isolated target uses real geometry, materials, scale, FOV and
+lighting; other islands and all beacons are hidden. Identical fixed-time frames are compared
+with the target hidden, aerial treatment disabled, or its settlement draw range removed.
+The threshold is a >12/255 maximum RGB-channel difference. "Mean" below is that channel
+contrast over qualifying pixels, not mean scene luminance.
+
+| Bell Garden at 900 m | Island contrast pixels | Mean contrast | Settlement pixels |
+| --- | ---: | ---: | ---: |
+| Desktop, final | 363 | 53.62/255 | 88 |
+| Desktop, aerial treatment disabled | 360 | 39.32/255 | — |
+| Portrait 390×844 CSS, actual 487×1055 buffer | 515 | 51.66/255 | 109 |
+| Island hidden in both frames | 0 | 0 | 0 |
+
+All six landmarks: **307–537** contrast pixels at 900 m. Three ordinary profile samples:
+**174 / 388 / 441**. Low/emergency also retain the island. The aerial treatment changes
+**306** Bell Garden pixels; hiding the island collapses that measurement to **0**, too.
+This disabled-aerial comparison retains the new geometry/palette; it is **not** a claim to
+reproduce every detail of the pre-pause renderer.
+
+Weather affects **29,584–84,382** sky pixels across four headings at t=5 and t=500, with
+**0 extra draws**. Hidden-weather control: **0 changed pixels, peak 0**. Same view after
+495 seconds: **82,036** pixels change. Loop boundary: peak **1/255**, **0** above threshold.
+Reduced-motion repeat: pixel-identical. Sun framebuffer centroid shifts only **0.046 px**
+between the two weather phases; its direction uniform is identical.
+
+Main evidence: `horizon-browser.json`, `horizon-island-1-900.png`,
+`horizon-island-1-900-portrait.png`, `horizon-island-1-900-without-aerial.png`,
+`horizon-island-hidden-control.png`, all `horizon-island-{0..8}-900.png`, and
+`horizon-weather-*.png`. These, the close 40/200 m views, and the four C1 captures were opened
+and inspected. **Would I turn the boat at 900 m? Yes:** the warm rock, small roofs and bell
+arch now read as an inhabited destination without a beacon. It remains a small island at its
+real angular size; it has not been enlarged into a navigation icon. The smallest ordinary
+split sample is subtler than the authored landmarks.
+
+#### Gates passed on the final render code
+
+All commands run from `gms/3d/sunwake/`. Each browser suite had its own managed launch in the
+same shell invocation, with `-- --use-angle=metal` for the successful final runs. Actual
+renderer: **ANGLE Metal, Apple M5**, Chrome 153. Node output: `graphics-resume-node.txt`.
+
+```sh
+node tools/sim.mjs                                      # 9 suites
+node js/render/tests/hull.test.mjs
+node js/render/tests/steering.test.mjs
+node js/render/tests/settlements.test.mjs
+~/.claude/bin/cdp start --port 9223 -- --use-angle=metal && node tools/browser.mjs
+~/.claude/bin/cdp start --port 9223 -- --use-angle=metal && node tools/browser.mjs --suite c1
+~/.claude/bin/cdp start --port 9223 -- --use-angle=metal && node tools/helm.mjs
+~/.claude/bin/cdp start --port 9223 -- --use-angle=metal && node js/render/tests/horizon-browser.mjs
+~/.claude/bin/cdp start --port 9223 -- --use-angle=metal && node js/render/tests/beacon-browser.mjs
+~/.claude/bin/cdp start --port 9223 -- --use-angle=metal && node js/render/tests/settlements-browser.mjs
+~/.claude/bin/cdp start --port 9223 -- --use-angle=metal && node js/render/tests/feedback-browser.mjs
+```
+
+Original full browser suite **10/10**, including 20 km streaming, geometry containment,
+CPU/GPU water agreement, origin rebases and deliberate boot-failure cases. Clean-render
+scenarios collect zero console/shader/runtime/request errors. Mobile helm passes both
+orientations. Hull: **151,200 steps**, normal-sailing minimum gunwale clearance **0.18288 m**,
+**0 backstops**, **0 lift**. Settlement browser: **252 islands**, **2,590,488 settlement
+vertices + 744,690 full-island vertices**, no collider escapes.
+
+Dense fixture, two poses × four headings × four tiers, with marine life, smoke and beacons:
+
+| Tier | Max draws / cap | Max triangles / cap |
+| --- | ---: | ---: |
+| High | 20 / 70 | 115,648 / 185,000 |
+| Standard | 20 / 55 | 78,820 / 125,000 |
+| Low | 19 / 36 | 48,229 / 70,000 |
+| Emergency | 15 / 28 | 45,648 / 58,000 |
+
+Peak recorded geometry memory **11,813,692 bytes**, below 24 MiB. Far terrain uses more
+triangles than the old cone; this is the explicit tradeoff for a real silhouette, within the
+full-scene caps. Weather adds fragment arithmetic, so zero extra draws is not zero GPU cost.
+
+#### Limits and defects left behind
+
+- **Physical phones, Safari and sustained mobile thermal/GPU performance remain NOT MET.**
+  Desktop Metal and CDP portrait/touch verification do not qualify those devices.
+- **SwiftShader capture/evaluation flakiness remains a harness issue**, with the failed runs
+  preserved and the tools-owner request above. The final original suites pass on Metal.
+- Weather is distant scenery: it does not bring local rain, change sea state or move the sun.
+  Emergency quality intentionally loses the weather to preserve its existing simplified sky.
+- Existing wake geometry/spray polish is outside this pass and unchanged. No new known game
+  rendering defect is being waived; the small distant ordinary islands remain less emphatic
+  than the six landmarks, as shown in their uncropped 900 m captures.
+
+## Gameplay builder — jobs, coins and a reason to stop, 2026-09-21 — IN PROGRESS
+
+Picked up the paused gameplay lane. **`js/core/jobs.mjs` turned out not to be a bare stub** — the
+stopped agent had written the whole model (board generation, eligibility, accept/abandon, the
+chandlery, save encoding) minutes before the stop, and `save.mjs` and `simulation.mjs` were
+already wired to it. It was, however, entirely **unverified and unreachable**: nothing in
+`main.mjs`, `ui.mjs`, `index.html` or `style.css` knew it existed and there was no suite. This
+pass verified it, fixed what the verification found, and built the game around it.
+
+### The bug the new suite found before Aaron could
+
+**The delivery goal re-created the P0 waypoint bug.** `jobGoal()` handed `courseTo` the drop
+point carrying the *destination island's own id*, which makes `courseTo` stop treating that
+island as an obstacle — necessary, because the drop sits 2 m off its shore and is always inside
+its own avoidance ring. On the jetty's side that is right. On the other side the arrow points
+**straight through the rock**. Measured, sailing it: the autopilot reached the far shore of
+Quiet Garden in 120 s and then ground along it at 0.1–0.5 m/s for the next 280 s, 76 m from the
+drop, while the HUD read *"76 m · holding"* and named **no** blocking island at all.
+
+The fix is a two-leg approach, the way a real one works. While the drop is not in line of sight —
+the straight line to it cuts the destination's collision circle — the goal is the **standoff**:
+the same bearing as the jetty, `STANDOFF = 56 m` further out, carrying **no** island id, so
+`courseTo` routes around the destination like any other rock. Once the run-in is clear the goal
+becomes the drop and the island is exempted, which by then is true. Both legs lie on the same
+radial, so the switch never sends the boat back the way it came.
+**Result: 400 s and stuck → 112 s and paid.**
+
+Two more defects found by running things rather than reading them:
+
+- **`world.clearance()` is clamped at zero.** It returns `-deepestOverlap()`, so it reads
+  `0.000` for a point in mid-ocean *and* for a point resting on a shore. The first draft of the
+  suite asserted `clearance > 0` on every drop point and `worstPenetration <= 1e-3` along every
+  sailed route: the first can never pass, the second can never fail. `tools/jobs.mjs` measures a
+  true signed gap itself now, and the drop-point check is anchored by a negative control — the
+  `deck` point, which genuinely *is* inside the collider.
+- **A berth cache served a stale `null` across a teleport.** `currentBerth()` cached on
+  simulation time; `setPose` resets that clock to zero, so for the first quarter second after any
+  jump the board simply did not open. Removed — a `world.nearby` over 46 m is one chunk.
+- **An hour lost to a CDP timeout that was not a bug at all.** `CDP timeout: Runtime.evaluate`
+  after a long autopilot run was blamed first on `returnByValue` choking on a bare function value
+  and then on a hung `Page.captureScreenshot`. Both wrong; the function theory was falsified
+  directly (`p.eval('window.__probe=(n)=>n+1')` returns `{}` in **353 ms**). The real cause was
+  one `advance` call crossing unstreamed chunks and taking longer than the 20 s default. The
+  lesson is in STATE.md: trace each step before theorising.
+
+### What is in the game now
+
+- **A job board at any island you have been recorded at**, landmark or ordinary. Three jobs, one
+  of each kind, a pure function of `(SEED, island, in-game day)` — `DAY_SECONDS = 600` of sailing
+  — so the same board twice is the same board and it turns over as you play.
+  - **Cargo**: load here, lay it alongside a named island's landing. Delivered at the jetty's
+    `approach` point from the table above, inside `DELIVERY_RANGE = 24 m`, **at rest**.
+  - **Catch**: N of a named species, landed anywhere.
+  - **Passage**: call at a named island and be seen, inside `VISIT_RANGE = 40 m` of its shore.
+- **Ineligible jobs are shown, greyed, and the disabled button *is* the reason** — "Needs
+  fishing 6", "Too heavy for this hull — needs hull 2", "Off your chart — needs chart 2",
+  "Hold full — one cargo at a time", "Logbook full — 3 jobs at a time". Nothing is ever hidden.
+- **Coins.** Jobs pay on delivery, never on acceptance. Every landed fish pays too, scaled by
+  species and size, so fishing does not stop mattering the moment you have a job.
+- **A chandlery at every board**, three upgrades, three levels each, no trees:
+  **rod** widens the tension band (0.30 → 0.40 at level 1), **hull** adds real newtons along the
+  heading (measured: **7.983 → 9.327 m/s** top speed) and lets you carry heavy cargo,
+  **chart** draws more sea (1000 / 1500 / 2200 m) and opens the long passages.
+  An upgrade you cannot afford says *how many coins short you are*.
+- **The compass follows a job.** Taking a delivery or a passage points the arrow at it, the
+  render beacon lights the destination island, and the logbook strip on the water shows every
+  active job with its range or its count. The atlas pin takes over again when nothing is followed.
+- **A reason to stop at an ordinary island.** Come alongside one and the HUD says *"Ease
+  alongside to record this island"*; two seconds later the visit is recorded and that island has
+  its own board, its own three jobs and the same chandlery. The board header also names the water
+  you are sitting in — reef water off a pier is the best fishing in the game, and now it says so.
+
+### Files
+
+`js/core/jobs.mjs` (verified, fixed, extended), `js/core/save.mjs` and `js/core/simulation.mjs`
+(already wired by the stopped agent, verified), `js/platform/storage.mjs`, `js/platform/ui.mjs`,
+`index.html`, `style.css`, `js/main.mjs`, **new** `tools/jobs.mjs` and `tools/jobs-browser.mjs`,
+`tools/sim.mjs` (registration), `tools/cdp.mjs` (`eval`/`shot` take an optional timeout; the
+default is unchanged, so no other suite is affected).
+
+**`js/main.mjs` is not in the ownership table.** The gameplay lane has been editing it (the
+`setCourse` wiring above), and it is the only place jobs can be wired in, so this pass edited it
+too. Nothing in `js/render/*`, `js/core/boat.mjs`, `js/core/island-shape.mjs` or
+`js/core/visual-config.mjs` was touched.

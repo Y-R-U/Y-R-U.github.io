@@ -118,7 +118,62 @@ That scenario is the visible helm's regression; `tools/helm.mjs` is the invisibl
   clamps xp, cast count, per-species counts and best weights. `encodeSave` takes fishing as an
   optional fourth argument, so a call without it still produces a valid save.
 
+## 2026-09-21 — jobs, coins and a reason to stop at an ordinary island
+
+```sh
+node tools/sim.mjs                                                       # now 10 suites
+node tools/sim.mjs --suite jobs                                          # boards, gates, the sailed delivery, hostile saves
+~/.claude/bin/cdp start --port 9223 && node tools/jobs-browser.mjs       # the loop through the real DOM
+```
+
+- **`core/jobs.mjs` is the model.** Pure. A board is `boardFor(island, day)` — three jobs, one
+  cargo, one catch, one passage, a pure function of `(SEED, island, day)`; `DAY_SECONDS = 600` of
+  sailing is a day. `eligibility(job, context)` is what greys a card, and it always returns words:
+  the board itself never filters, because Aaron asked for ineligible jobs to be shown with the
+  reason. An accepted job is stored as nothing but `(island, day, slot, progress)` and regenerated
+  from its board on load, so a tampered save cannot invent a job or a payout.
+- **`jobGoal(job, boat)` is a two-leg approach and must stay one.** See ROADMAP: handing
+  `courseTo` a drop point that carries the destination island's id exempts that island from
+  routing, which is right on the jetty's side and points the arrow straight through the rock on
+  the other. The standoff leg is the fix.
+- **`SAVE_KEY` is still `sunwake-v1` and the version is still 1.** `validateSave` treats a
+  missing `jobs` block exactly as it treats a missing `fishing` block: a save from before there
+  were jobs, migrated to an empty purse, atlas and odometer intact.
+- **Upgrades live in one place, `jobs.upgrades`, and are read back out.** `applyUpgrades()` in
+  `main.mjs` copies the rod level onto `fishing.rod` and the hull's newtons onto
+  `simulation.bonusThrust`. With a stock hull `bonusThrust` is 0 and every trajectory is
+  bit-identical to before — asserted.
+- `window.sunwake` gains a `jobs` block: coins, earned, completed, seconds, day, upgrades, the
+  active list, the followed job id, and the berth (`{id, name, gap, known, open, reason}`).
+- New HUD: `#purse`, `#berth-open`, `#berth-hint`, `#logbook`, and the `#board` panel
+  (`mode('board')`, **J** to open and close).
+
 ## Gotchas — every one of these cost real time
+
+- **`world.clearance()` is clamped at zero.** It is `-deepestOverlap()`, so it reads `0.000` in
+  mid-ocean and `0.000` on a shore. `clearance > 0` is an assertion that can never pass and
+  `-clearance <= tolerance` is one that can never fail. Both were in the first draft of
+  `tools/jobs.mjs`. Measure a signed gap yourself
+  (`hypot(x-island.x, z-island.z) - island.radius - BOAT_RADIUS`) and anchor it with a negative
+  control — the jetty `deck` point is genuinely inside the collider, so use that.
+- **Never cache anything on `simulation.time`.** `setPose` and `fixtureView` rebuild the
+  simulation with the clock back at zero, so a "recomputed every 0.25 s" cache hands back the
+  value from before the teleport. That is how the job board silently failed to open for the first
+  quarter second at every island a test dropped the boat beside.
+- **`sunwakeTest.advance(1)` renders a full frame per tick.** A loop of 6,000 of them is minutes
+  of SwiftShader and looks exactly like a deadlock. Steer once per `advance(6)` — 0.1 s, which is
+  also the rate the HUD actually redraws at, and the fastest a human could react.
+- **A CDP timeout in a sailing test is almost always the renderer being slow, not a deadlock.**
+  This cost an hour: `CDP timeout: Runtime.evaluate` after a long `advance` run got blamed first
+  on `returnByValue` choking on a bare function value, then on `Page.captureScreenshot`. Both
+  were wrong, and the function one was **falsified directly** —
+  `p.eval('window.__probe=(n)=>n+1')` returns `{}` in 353 ms. The real cause was a single
+  `__sail(120)` call crossing unstreamed chunks and taking longer than the 20 s default. Raise
+  the timeout and trace each step before theorising.
+- **Sailing into unstreamed chunks builds island and settlement geometry synchronously**, and on
+  this machine a single `Runtime.evaluate` spanning a chunk boundary can take 25 s. `tools/cdp.mjs`
+  `eval`/`shot` now take an optional timeout (default unchanged at 20 s); `tools/jobs-browser.mjs`
+  passes 240 s.
 
 - **A numeric suite that stops at the first landmark proves nothing about the second.** Every
   suite was green while the second leg of the atlas route was unsailable, because the only
@@ -180,15 +235,12 @@ That scenario is the visible helm's regression; `tools/helm.mjs` is the invisibl
   `performance.now()`; screenshot capture waits two RAFs; the error UI must keep its inline
   styling and use `textContent`; wave-test bounds are derived from the table, never literals.
 
-## Exact next action: ROADMAP P2 — jobs, coins, and a reason to stop
+## Exact next action
 
-Fishing and the fishing skill are in. Still open, in `docs/ROADMAP.md` order: a job board at any
-discovered island (transport / catch N / visit, with ineligible jobs shown **disabled with the
-reason**, not hidden), coins paid by jobs and fish, and something worth stopping for at an
-ordinary island. Two items are waiting on the graphics builder and are listed at the top of
-ROADMAP.md: a distant beacon for the pinned landmark, and low-speed steering authority in
-`core/boat.mjs` (a boat pinned at ~0 m/s still cannot turn, because `yawTarget` scales with
-`|u|/(|u|+2)`; shore friction no longer welds it on, so this is survivable but still a trap).
+ROADMAP P2 is closed: fishing, the fishing skill, jobs, coins, progression and a reason to stop
+at an ordinary island are all in and verified. What is left is in `docs/ROADMAP.md` P4 —
+M7 adaptive quality, distant sails and birds — plus the physical-device gate only Aaron can
+close, and whatever his next play session turns up. **Play it before building more.**
 
 ## Superseded: M7 — mobile qualification and polish
 

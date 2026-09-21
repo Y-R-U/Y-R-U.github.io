@@ -321,3 +321,42 @@ level 3. Holding the reel flat out always loses the fish; a slack-and-ease polic
 the `fishing` block stripped out (injected before any page script runs, because the game writes
 the save on `pagehide`) still boots, still reads *Continue voyage*, keeps its 900 m odometer and
 its atlas, and comes back as a level-1 angler.
+
+## P2 — jobs, coins and progression
+
+`node tools/sim.mjs --suite jobs` (inside the ten-suite `node tools/sim.mjs`) and
+`node tools/jobs-browser.mjs`.
+
+**The suite found a real bug before it shipped.** The delivery goal re-created the P0 waypoint
+bug: `jobGoal()` handed `courseTo` a drop point carrying the destination island's own id, which
+exempts that island from routing. Correct on the jetty's side; on the other side the arrow points
+through the rock. Sailed, pre-fix: the autopilot reached the far shore in **120 s** and then
+ground along it at **0.1–0.5 m/s for 280 s**, 76 m from the drop, while the HUD read
+*"76 m · holding"* and named no blocking island. Post-fix, same start, same dumb bearing-only
+pilot: **112 s, paid**. The suite is falsified against the pre-fix `jobGoal` and goes red with
+*the delivery was never handed over — 400.02 s holding the arrow, still 74 m off*.
+
+Every drop point on **72** generated cargo jobs across all six landmarks and twelve in-game days
+is clear water at exactly the promised **2.000 m** margin, measured with a signed gap rather than
+`world.clearance()` — which is clamped at zero and cannot fail that assertion. The check is
+anchored by a negative control: the jetty `deck` point is asserted to be **inside** the collider.
+
+Six deliberate breakages, each confirmed to turn the suite red:
+
+| Breakage | Assertion that fired |
+| --- | --- |
+| skill gate removed from `eligibility` | a gated job became takeable |
+| cargo dropped at `deck` instead of `approach` | *the drop must be the jetty approach point* |
+| `validateSave` rejects a save with no `jobs` block | *a pre-jobs save is not an invalid save* |
+| tampered progress clamp removed | *a save must never hand back a completed job* |
+| handover speed gate removed | *handover happened at speed* |
+| `HULL_THRUST` zeroed | the bought-hull speed assertion |
+
+Also asserted: a board is a pure function of `(SEED, island, day)` and changes with both; every
+board offers one cargo, one catch and one passage; **14** hostile save blocks (negative, infinite
+and string coins, upgrades above and below their range, an unknown upgrade key, an invented
+island id, a path-traversal id, a slot past the end of the board, forty jobs in a three-job
+logbook, a job already finished, duplicates, a negative clock, and total garbage) each clamp and
+round-trip without manufacturing money, a job or an upgrade; a stock hull is **bit-identical**
+(`bonusThrust === 0` produces exactly the same `x` and `z` after 600 ticks as the untouched
+simulation); and a bought hull is measurably faster on the water — **7.983 → 9.327 m/s**.

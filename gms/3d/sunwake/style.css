@@ -55,3 +55,42 @@
 #fishing.taut #tension-mark{background:#ffb3a0;box-shadow:0 0 10px #ffb3a0}
 @media(max-width:600px){#fishing{left:20px;top:166px;max-width:calc(100vw - 40px)}#fishing-live{width:min(250px,calc(100vw - 48px))}}
 @media(max-height:480px){#fishing{top:150px;left:24px}}
+
+/* --- Jobs, coins and the harbour board -------------------------------- */
+#purse{align-self:center;font-size:12px;letter-spacing:.14em;color:#ffd7a3;padding:0 6px;white-space:nowrap}
+#berth-open{border-color:#ffd7a3aa;color:#ffe3bb}
+#logbook{position:absolute;left:32px;top:auto;bottom:calc(150px + env(safe-area-inset-bottom));z-index:4;pointer-events:none;max-width:300px;display:flex;flex-direction:column;gap:6px;text-shadow:0 2px 10px #082f3d}
+#logbook .entry{font-size:11px;line-height:1.5;opacity:.85;border-left:2px solid #ffd7a366;padding-left:9px}
+#logbook .entry.followed{opacity:1;border-left-color:#ffc078}
+#logbook .entry b{font-weight:500;display:block;letter-spacing:.03em}
+#logbook .entry i{font-style:normal;opacity:.7;font-size:10px}
+#berth-hint{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(112px + env(safe-area-inset-bottom));z-index:8;margin:0;font-size:11px;letter-spacing:.1em;color:#ffe3bb;background:#123e49cc;padding:8px 14px;border-radius:4px;text-align:center;pointer-events:none}
+.board-head{font:16px Georgia,serif;font-weight:400;letter-spacing:.02em;margin:26px 0 12px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-top:1px solid #fff0d022;padding-top:18px}
+.board-head small{font-size:13px;letter-spacing:.1em;color:#ffd7a3}
+#board-water{font-size:12px;line-height:1.6;opacity:.8;margin:0 0 18px}
+#board-jobs,#board-active,#board-shop{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.job{background:#214650;border:1px solid #e5c99d33;border-radius:4px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.job.blocked{opacity:.52}
+.job .kind{font-size:9px;letter-spacing:.2em;color:#e6c59a}
+.job h4{font:19px Georgia,serif;font-weight:400;margin:0;letter-spacing:-.01em}
+.job p{font-size:12px;line-height:1.6;margin:0;opacity:.82;flex:1}
+.job .pay{font-size:13px;letter-spacing:.1em;color:#ffd7a3}
+.job button{font-size:11px;letter-spacing:.08em;width:100%}
+.job button[disabled]{opacity:.55;cursor:not-allowed;border-style:dashed}
+.job .why{font-size:11px;color:#ffb3a0;letter-spacing:.04em;margin:0}
+.job .bar{height:4px;border-radius:2px;background:#fff0d022;overflow:hidden}
+.job .bar i{display:block;height:100%;background:#ffc078;width:var(--fill,0%)}
+.job .row{display:flex;gap:8px}
+.job .row button{flex:1;padding:0 8px}
+#board-active .empty,#board-jobs .empty{grid-column:1/-1;font-size:12px;opacity:.7;margin:0}
+@media(max-width:600px){
+ #purse{font-size:11px;padding:0 4px}
+ #board-jobs,#board-active,#board-shop{grid-template-columns:1fr}
+ #logbook{left:20px;right:20px;max-width:none;bottom:calc(196px + env(safe-area-inset-bottom))}
+ #berth-hint{bottom:calc(150px + env(safe-area-inset-bottom));max-width:calc(100vw - 40px)}
+}
+@media(max-height:480px){
+ #logbook{bottom:calc(92px + env(safe-area-inset-bottom));max-width:240px}
+ #berth-hint{bottom:calc(74px + env(safe-area-inset-bottom))}
+ #board-jobs,#board-active,#board-shop{grid-template-columns:repeat(3,1fr)}
+}

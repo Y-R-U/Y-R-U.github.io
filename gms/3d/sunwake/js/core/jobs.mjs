@@ -1,4 +1,4 @@
-import {generateIsland,hash32} from './world.mjs';
+import {generateIsland,hash32,BOAT_RADIUS} from './world.mjs';
 import {SEED} from './config.mjs';
 import {islandName} from './content.mjs';
 import {SPECIES,ROD_BAND} from './fishing.mjs';
@@ -17,6 +17,7 @@ export const MAX_ACTIVE=3;
 export const BERTH_RANGE=46;           // metres off the shore the board is in reach
 export const BERTH_SPEED=2.2;          // and you have to have stopped
 export const DELIVERY_RANGE=24;        // around the destination jetty's approach point
+export const STANDOFF=56;              // metres off the destination shore where the run-in begins
 export const VISIT_RANGE=40;           // off the shore of the island you were sent to
 export const ARRIVE_SPEED=3;
 export const POOL_CHUNKS=4;            // halo of chunks scanned for destinations
@@ -121,9 +122,15 @@ export function jobAt(island,day,slot,pool=null){
   const heavy=r(22)<.30;
   const goods=heavy?HEAVY_CARGO[Math.floor(r(23)*HEAVY_CARGO.length)]:CARGO[Math.floor(r(23)*CARGO.length)];
   const drop=mooringLayout(target);
+  // Where the run-in starts: the same bearing as the jetty, STANDOFF metres
+  // further out, in open water well outside the island's avoidance ring. See
+  // `jobGoal` — without it the arrow points straight through the island the
+  // landing is on.
+  const standX=target.x+drop.nx*(target.radius+BOAT_RADIUS+STANDOFF);
+  const standZ=target.z+drop.nz*(target.radius+BOAT_RADIUS+STANDOFF);
   return Object.freeze({...base,targetId:target.id,targetName:name,
     targetX:target.x,targetZ:target.z,targetRadius:target.radius,
-    dropX:drop.approach.x,dropZ:drop.approach.z,cargo:goods,heavy,
+    dropX:drop.approach.x,dropZ:drop.approach.z,standX,standZ,cargo:goods,heavy,
     title:`${goods} to ${name}`,
     detail:`Load ${goods.toLowerCase()} here and lay it alongside the landing at ${name} — ${Math.round(distance)} m.`,
     distance,coins:payFor(kind,distance,null,0,heavy),
@@ -218,16 +225,44 @@ export function jobRange(job,boat){
 }
 
 /**
- * The goal a routed course can be aimed at. For a delivery this is the jetty's
- * approach point carrying the TARGET ISLAND'S id, so `courseTo` routes around
- * every other island but does not treat the island you are delivering to as a
- * thing in the way — which would leave the arrow circling it forever.
+ * The goal a routed course can be aimed at.
+ *
+ * This is where the P0 waypoint bug grows back if you are not careful, and it
+ * did: a delivery's drop point sits 2 m off the destination's shore, so it is
+ * always inside that island's own avoidance ring. Hand `courseTo` the drop with
+ * the target island's id and the island stops counting as an obstacle — which
+ * is correct on the jetty's side and catastrophic on the other one, where the
+ * arrow then points straight through the rock. Measured, before the fix: the
+ * autopilot reached the far shore in 120 s and spent the next 280 s grinding
+ * along it at 0.1 m/s, with the HUD reporting "76 m · holding" and no blocking
+ * island at all.
+ *
+ * So a delivery is two legs, the way a real approach is. While the drop is not
+ * in line of sight — the straight line to it cuts the destination's collision
+ * circle — the goal is the STANDOFF point: the same bearing as the jetty,
+ * `STANDOFF` metres further out, carrying NO island id, so `courseTo` routes
+ * around the destination like any other rock. Once the run-in is clear, the
+ * goal becomes the drop itself and the island is exempted, because by then the
+ * line to it genuinely does not touch the island. Both legs lie on the same
+ * radial, so the switch never sends the boat back the way it came.
+ *
+ * `boat` is optional: without it the drop is returned directly, which is what a
+ * pure "where is this job" query wants.
  */
-export function jobGoal(job){
+export function lineOfSightToDrop(job,boat){
+  if(!job||job.kind!=='cargo'||!boat)return true;
+  const R=job.targetRadius+BOAT_RADIUS+.5;
+  const dx=job.dropX-boat.x,dz=job.dropZ-boat.z,span2=dx*dx+dz*dz;
+  if(!(span2>1e-12))return true;
+  const t=Math.max(0,Math.min(1,((job.targetX-boat.x)*dx+(job.targetZ-boat.z)*dz)/span2));
+  return Math.hypot(boat.x+dx*t-job.targetX,boat.z+dz*t-job.targetZ)>=R;
+}
+export function jobGoal(job,boat=null){
   if(!job)return null;
-  if(job.kind==='cargo')return {id:job.targetId,x:job.dropX,z:job.dropZ,radius:0};
   if(job.kind==='visit')return {id:job.targetId,x:job.targetX,z:job.targetZ,radius:job.targetRadius};
-  return null;
+  if(job.kind!=='cargo')return null;
+  if(lineOfSightToDrop(job,boat))return {id:job.targetId,x:job.dropX,z:job.dropZ,radius:0,leg:'drop'};
+  return {id:null,x:job.standX,z:job.standZ,radius:0,leg:'standoff'};
 }
 
 export function stepJobs(state,boat,dt,events){
@@ -305,3 +340,28 @@ export function berthAt(boat,nearby,isKnown){
   }
   return best;
 }
+
+/**
+ * The nearest island in berthing range whether or not it has been recorded, and
+ * why its board is not open yet. This is what makes an *ordinary* island worth
+ * turning for: you come alongside, the prompt tells you what is still missing,
+ * and two seconds later the board is there.
+ */
+export function berthNear(boat,nearby,isKnown){
+  let best=null,bestGap=Infinity;
+  for(const island of nearby||[]){
+    if(!island)continue;
+    const gap=Math.hypot(boat.x-island.x,boat.z-island.z)-island.radius;
+    if(gap>BERTH_RANGE||gap>=bestGap)continue;
+    best=island;bestGap=gap;
+  }
+  if(!best)return null;
+  const known=!isKnown||isKnown(best);
+  const moving=Math.hypot(boat.vx||0,boat.vz||0)>BERTH_SPEED;
+  return {island:best,gap:bestGap,known,moving,
+    open:known&&!moving,
+    reason:!known?'Ease alongside to record this island':moving?'Come off the throttle to go alongside':''};
+}
+
+/** Where in the in-game day we are, 0..1 — the board rerolls when this wraps. */
+export const dayProgress=seconds=>{const s=Number.isFinite(seconds)&&seconds>0?seconds:0;return (s%DAY_SECONDS)/DAY_SECONDS;};
