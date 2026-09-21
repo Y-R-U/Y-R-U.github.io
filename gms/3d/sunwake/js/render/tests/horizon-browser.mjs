@@ -5,7 +5,7 @@ import {writeFile} from 'node:fs/promises';
 import {connect} from '../../../tools/cdp.mjs';
 import {QUALITY} from '../../core/config.mjs';
 const evidence=new URL('../../../docs/evidence/',import.meta.url);
-const p=await connect(),report={date:new Date().toISOString(),passed:false,islands:[],weather:[],dense:[]};
+const p=await connect(),report={date:new Date().toISOString(),passed:false,islands:[],weather:[],hiddenIslands:[],wraps:[],dense:[]};
 p.eval=async expression=>{const r=await p.send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true},120000);if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result.value;};
 async function fixture(){
  const [{createScene},{createWorld,LANDMARKS,generateIsland},{createBoat},{mooringLayout},{WEATHER}]=await Promise.all([
@@ -66,7 +66,10 @@ try{
   const pose=await p.eval(`horizon.island(${index},${distance})`),pixels=await p.eval('horizon.measureIsland()');report.islands.push({...pose,...pixels});
   await save(`horizon-island-${index}-${distance}`);console.log('island',JSON.stringify(report.islands.at(-1)));
   assert.ok(pixels.visible.changed>50,'Island needs real framebuffer coverage');
-  if(distance===900){assert.ok(pixels.visible.dark>40,'Elevated rock needs contrast');assert.ok(pixels.aerial.changed>20,'Aerial treatment absent');assert.ok(pixels.buildings.changed>3,'Distant structure vanished');}
+  if(distance===900){
+   const hidden=await p.eval('horizon.measureIsland(true)');report.hiddenIslands.push({index,...hidden});
+   for(const feature of Object.values(hidden)){assert.equal(feature.changed,0);assert.equal(feature.peak,0,'Hidden island feature contaminated by another draw');}
+   assert.ok(pixels.visible.dark>40,'Elevated rock needs contrast');assert.ok(pixels.aerial.changed>20,'Aerial treatment absent');assert.ok(pixels.buildings.changed>3,'Distant structure vanished');}
  }
  for(const tier of ['low','emergency']){
   const pose=await p.eval(`horizon.island(1,900,'${tier}')`),pixels=await p.eval('horizon.measureIsland()');report.islands.push({...pose,...pixels});assert.ok(pixels.visible.changed>50);await save(`horizon-island-1-900-${tier}`);
@@ -83,7 +86,16 @@ try{
  }
  report.weatherControl=await p.eval('horizon.measureWeather(0,5,true)');assert.equal(report.weatherControl.changed,0);assert.equal(report.weatherControl.peak,0);
  report.weatherMotion=await p.eval(`(()=>{horizon.weather(0,5);const a=horizon.pixels();horizon.weather(0,500);return horizon.diff(a,horizon.pixels(),[0,.42,1,1])})()`);assert.ok(report.weatherMotion.changed>100);
- report.wrap=await p.eval(`(()=>{horizon.weather(0,horizon.WEATHER.squallPeriod-.001);const a=horizon.pixels();horizon.weather(0,horizon.WEATHER.squallPeriod+.001);return horizon.diff(a,horizon.pixels())})()`);assert.equal(report.wrap.changed,0,'Weather jumps at clock wrap');
+ // Freeze water phases: only the shared sky/weather clock changes. Include the
+ // squall centre, the atan seam, and multiple complete laps in both directions.
+ report.wrap=[];
+ for(const yaw of [0,Math.PI/2,Math.PI,-Math.PI/2])for(const lap of [-1,1,3]){
+  const pixels=await p.eval(`(()=>{const t=horizon.WEATHER.squallPeriod*${lap};horizon.weather(${yaw},t-.001);const a=horizon.pixels();horizon.weather(${yaw},t+.001);return horizon.diff(a,horizon.pixels())})()`);
+  report.wrap.push({yaw,lap,...pixels});assert.equal(pixels.changed,0,'Weather jumps at clock wrap');assert.ok(pixels.peak<=2,'Wrap exceeds framebuffer quantisation tolerance');
+ }
+ report.periodic=await p.eval(`(()=>{horizon.weather(Math.PI/2,500);const a=horizon.pixels();horizon.weather(Math.PI/2,500+3*horizon.WEATHER.squallPeriod);return horizon.diff(a,horizon.pixels())})()`);assert.equal(report.periodic.peak,0,'Weather fails to repeat after complete laps');
+ report.hiddenWeatherMotion=await p.eval(`(()=>{horizon.view.sky.uniforms.uCloudEnabled.value=0;horizon.weather(0,5);const a=horizon.pixels();horizon.weather(0,500);const diff=horizon.diff(a,horizon.pixels());horizon.view.sky.uniforms.uCloudEnabled.value=1;return diff})()`);assert.equal(report.hiddenWeatherMotion.peak,0,'Hidden clouds still animate the frame');
+ for(const name of ['visible','aerial','buildings'])assert.equal(report.islandControl[name].peak,0,'Hidden island contributes pixels: '+name);
  report.reduced=await p.eval(`(()=>{const {view}=horizon;horizon.weather(0,5);const a=horizon.pixels();view.sky.update(view.camera,500,true);horizon.draw();return horizon.diff(a,horizon.pixels())})()`);assert.equal(report.reduced.peak,0);
  report.sunPixels=await p.eval(`(()=>{const centres=[];for(const t of [5,500]){horizon.weather(-Math.PI/2,t);const {buf,w,h}=horizon.pixels();let xsum=0,ysum=0,n=0;for(let y=Math.floor(h*.48);y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;if(buf[i]>245&&buf[i+1]>240&&buf[i+2]>220){xsum+=x;ysum+=y;n++;}}centres.push({x:xsum/n,y:ysum/n,n});}return centres;})()`);
  assert.ok(report.sunPixels[0].n>20);assert.ok(Math.hypot(report.sunPixels[0].x-report.sunPixels[1].x,report.sunPixels[0].y-report.sunPixels[1].y)<.2,'Sun moved on screen');

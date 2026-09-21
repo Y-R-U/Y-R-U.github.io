@@ -43,12 +43,18 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
   const AS=detail.segments;
   const field=islandField(island,{harbour:true}),{R,peak,wallRadius,wallTop,notch,stain,heightAt}=field;
   const positions=[],colours=[],temp=new THREE.Color();
+  // The crown — the one feature that says *which* island this is — is written
+  // into its own buffer and appended just before the settlement, so a test can
+  // hide it with a single contiguous draw range and prove the silhouette that
+  // identifies the island really is the thing doing the identifying.
+  const crownPositions=[],crownColours=[],crownGlow=[];
+  let sinkP=positions,sinkC=colours,sinkG=null,sinkGlow=0;
   // Rings run counter-clockwise in (x,z); with Y up that makes (a,c,b) the
   // outward/upward face. Getting this backwards renders the near wall invisible
   // and you look straight through the island at the sea inside it.
   const push=(a,b,c,colour,tint=0)=>{
     temp.copy(colour);if(tint)temp.lerp(COLOURS.shade,tint);
-    for(const p of [a,c,b]){positions.push(p[0],p[1],p[2]);colours.push(temp.r,temp.g,temp.b);}
+    for(const p of [a,c,b]){sinkP.push(p[0],p[1],p[2]);sinkC.push(temp.r,temp.g,temp.b);if(sinkG)sinkG.push(sinkGlow);}
   };
   const quad=(a,b,c,d,colour,tint=0)=>{push(a,b,c,colour,tint);push(a,c,d,colour,tint);};
   const angleAt=i=>i/AS*Math.PI*2;
@@ -150,38 +156,84 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
   const base=heightAt(cx,cz)-.5;
   const ring=(n,r,y)=>{const out=[];for(let s=0;s<n;s++){const a=s/n*Math.PI*2;out.push([cx+Math.cos(a)*r,y,cz+Math.sin(a)*r]);}return out;};
   // Authored crowns survive every terrain LOD and stay well inside the shore.
-  const brass=new THREE.Color('#c49b51'),dark=new THREE.Color('#445b48'),ember=new THREE.Color('#ffd185');
+  const brass=new THREE.Color('#c49b51'),dark=new THREE.Color('#31452f'),ember=new THREE.Color('#ffd185');
   function column(x,z,y,r0,r1,h,colour,n=8){
     const lower=[],upper=[];
     for(let k=0;k<n;k++){const a=k/n*Math.PI*2;lower.push([x+Math.cos(a)*r0,y,z+Math.sin(a)*r0]);upper.push([x+Math.cos(a)*r1,y+h,z+Math.sin(a)*r1]);}
     for(let k=0;k<n;k++){const j=(k+1)%n;quad(lower[k],lower[j],upper[j],upper[k],colour,.12*(k%3));push(upper[k],upper[j],[x,y+h,z],colour);}
   }
-  function block(x,z,y,w,d,h,colour){
-    const a=[x-w/2,y,z-d/2],b=[x+w/2,y,z-d/2],c=[x+w/2,y,z+d/2],e=[x-w/2,y,z+d/2];
-    const top=p=>[p[0],p[1]+h,p[2]],ring=[a,b,c,e];
-    for(let k=0;k<4;k++)quad(ring[k],ring[(k+1)%4],top(ring[(k+1)%4]),top(ring[k]),colour);
-    quad(top(a),top(b),top(c),top(e),colour);
+  // A landmark is only legible if its shape is broadside to the boat that is
+  // looking for it, so lateral features are laid out across the approach
+  // bearing rather than along world X. `mooringLayout` faces the world origin
+  // for every authored island, and this is the same bearing.
+  const facing=island.landmark?Math.atan2(-island.z,-island.x):crownAngle;
+  const ax=Math.cos(facing+Math.PI/2),az=Math.sin(facing+Math.PI/2);
+  // A box whose length runs along that lateral axis. Same corner order as the
+  // columns above, so the outward winding is the same.
+  function bar(px,pz,y,len,thick,h,colour){
+    const ux=ax*len/2,uz=az*len/2,vx=-az*thick/2,vz=ax*thick/2;
+    const foot=[[px-ux-vx,pz-uz-vz],[px+ux-vx,pz+uz-vz],[px+ux+vx,pz+uz+vz],[px-ux+vx,pz-uz+vz]];
+    const lo=foot.map(q=>[q[0],y,q[1]]),hi=foot.map(q=>[q[0],y+h,q[1]]);
+    for(let k=0;k<4;k++)quad(lo[k],lo[(k+1)%4],hi[(k+1)%4],hi[k],colour);
+    quad(hi[0],hi[1],hi[2],hi[3],colour);
   }
+  sinkP=crownPositions;sinkC=crownColours;sinkG=crownGlow;
   if(island.landmark==='Lantern Key'){
-    column(cx,cz,base,2.7,2.1,9,COLOURS.lip);column(cx,cz,base+9,3.1,3.1,.7,COLOURS.wall);
-    column(cx,cz,base+9.7,1.6,1.6,2,ember);column(cx,cz,base+11.7,3,0,1.6,brass);
+    // One slender white tower with a lit lamp, and nothing else tall on the
+    // island. At 900 m that is a single bright vertical with a spark on top.
+    column(cx,cz,base,4.2,3.4,3,COLOURS.lip,8);
+    column(cx,cz,base+3,3.1,2.2,14,COLOURS.lip,9);
+    column(cx,cz,base+17,3.5,3.5,1,COLOURS.wall,9);
+    sinkGlow=3.4;column(cx,cz,base+18,2.1,2.1,3,ember,8);sinkGlow=0;
+    column(cx,cz,base+21,3,0,2.6,brass,8);
   }else if(island.landmark==='Bell Garden'){
-    for(const x of [-6,6])column(cx+x,cz,base,1,1,9,COLOURS.lip,6);
-    block(cx,cz,base+8.5,15,2,1.2,COLOURS.lip);
-    for(let k=0;k<3;k++){const x=cx+(k-1)*4,y=base+4.5+(k%2)*.8;column(x,cz,y+1.5,.14,.14,2.5-(k%2)*.8,brass,5);column(x,cz,y,1.4,.55,2,brass);column(x,cz,y-.5,.25,.25,1,brass,5);}
+    // The only horizontal in the set, and the only one you can see sky through.
+    // The old lintel spanned 15 m with 1.2 m of bar: under a pixel of beam and
+    // 2 m of gap at 900 m. This one is a 22 m arch with a real hole under it.
+    for(const d of [-8.5,8.5])column(cx+ax*d,cz+az*d,base,1.9,1.5,12.5,COLOURS.lip,6);
+    bar(cx,cz,base+12.5,22,2.6,2.4,COLOURS.lip);
+    bar(cx,cz,base+14.9,19,1.6,.9,COLOURS.wall);
+    for(let k=0;k<3;k++){
+      const d=(k-1)*5.2,x=cx+ax*d,z=cz+az*d,y=base+7.4+(k%2)*1.1;
+      column(x,z,y+3.1,.22,.22,5.1-(k%2)*1.1,brass,5);
+      column(x,z,y,2,.8,3,brass,7);
+      column(x,z,y-.7,.4,.4,1.2,brass,5);
+    }
   }else if(island.landmark==='Split Crown'){
-    for(const [x,h]of [[-4,17],[4.5,20]])column(cx+x,cz,base,3.2,.9,h,COLOURS.lip,5);
+    // Two towers with a band of sky between them. The pair used to be 2 m
+    // apart — under two pixels at 900 m — so it read as one fat chimney.
+    for(const [d,h,r]of [[-9.5,20,4.4],[9.5,25,4]])column(cx+ax*d,cz+az*d,base,r,1.1,h,COLOURS.lip,6);
   }else if(island.landmark==='Cinder Steps'){
-    const rust=new THREE.Color('#b5683f');
-    for(let k=0;k<3;k++)column(cx,cz,base+k*1.1,5-k,5-k,1.1,rust,7);
-    column(cx,cz,base+3.3,1.5,2.8,1.2,brass,7);column(cx,cz,base+4.5,1.8,0,3.8,ember,5);
+    // A stair of rust terraces with a brazier burning on the top step: the
+    // only stepped profile and the only warm point above a dark mass.
+    // Each riser is 3.4 m — about three pixels at 900 m. Anything finer and
+    // the stair silhouette smooths into a plain cone and the name is a lie.
+    const rust=new THREE.Color('#b5683f'),ash=new THREE.Color('#8d4b31');
+    for(let k=0;k<3;k++)column(cx,cz,base+k*3.4,11-k*3.6,10.2-k*3.6,3.4,k%2?ash:rust,7);
+    column(cx,cz,base+10.2,2.9,3.4,1.5,brass,7);
+    // Warm rather than the lamp's near-white, but it cannot go much deeper: a
+    // saturated orange tone-maps BELOW the luminance of a bright sunset sky,
+    // and a flame that is darker than the sky behind it is not a flame. #ff5a18
+    // at 2.8 looked right in isolation and measured `lit` 0 at two bearings.
+    sinkGlow=3.2;column(cx,cz,base+11.7,3,0,5.6,new THREE.Color('#ff8a3c'),6);sinkGlow=0;
   }else if(island.landmark==='White Needle'){
-    column(cx,cz,base,2.6,.12,24,COLOURS.lip,7);
+    // Thinner and far taller than anything else in the world, on the smallest
+    // of the six. Against Lantern Key: no lamp, no gallery, and it tapers all
+    // the way to a point.
+    column(cx,cz,base,4,3,2.4,COLOURS.lip,7);
+    column(cx,cz,base+2.4,2.6,.1,29,COLOURS.lip,7);
   }else if(island.landmark==='Last Orchard'){
-    column(cx,cz,base,2.6,1.3,3,COLOURS.stone,6);
-    for(let k=0;k<6;k++){const a=k/6*Math.PI*2,x=cx+Math.cos(a)*8,z=cz+Math.sin(a)*8,y=heightAt(x,z)-.2;
-      column(x,z,y,.45,.35,3,COLOURS.riser,5);
-      const n=6;for(let j=0;j<n;j++){const a=j/n*Math.PI*2,b=(j+1)/n*Math.PI*2;push([x+Math.cos(a)*1.65,y+1,z+Math.sin(a)*1.65],[x+Math.cos(b)*1.65,y+1,z+Math.sin(b)*1.65],[x-2.4,y+10,z],dark,.1*(j%3));}
+    // The widest, lowest island, crowned by a dark ring of bent cypresses
+    // round a pale cairn. Read as a dark tuft rather than as a vertical, which
+    // is what separates it from the other five at range.
+    for(let k=0;k<3;k++)column(cx,cz,base+k*1.9,3.4-k*.8,3-k*.8,1.9,COLOURS.stone,6);
+    for(let k=0;k<6;k++){
+      const a=k/6*Math.PI*2+facing,x=cx+Math.cos(a)*9.5,z=cz+Math.sin(a)*9.5,y=heightAt(x,z)-.2;
+      column(x,z,y,.7,.5,3.4,COLOURS.riser,5);
+      const w=3+.6*Math.sin(k*2.3),h=9.5+2.2*Math.sin(k*1.7),lean=2.2,n=6;
+      const tip=[x+Math.cos(a)*lean,y+2.4+h,z+Math.sin(a)*lean];
+      for(let j=0;j<n;j++){const p=j/n*Math.PI*2,q=(j+1)/n*Math.PI*2;
+        push([x+Math.cos(p)*w,y+2.4,z+Math.sin(p)*w],[x+Math.cos(q)*w,y+2.4,z+Math.sin(q)*w],tip,dark,.04*(j%3));}
     }
   }else if(island.profile==='mesa'){                                   // a squat stone tower
     const n=lod===2?6:8,h=island.height*.55+3,lower=ring(n,2.2,base),upper=ring(n,1.7,base+h);
@@ -209,6 +261,7 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
       for(let k=0;k<5;k++){const j=(k+1)%5;quad(lower[k],lower[j],upper[j],upper[k],COLOURS.stone,.08+k*.035);push(upper[k],upper[j],[x+1.8,y+h+.5,z],COLOURS.lip);}
     }
   }
+  sinkP=positions;sinkC=colours;sinkG=null;
 
   // A few weathered outcrops, so the plateau is broken rock rather than a lawn.
   const outcrops=detail.plants>0?Math.round(3+R/22):0;
@@ -247,12 +300,22 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
     }
   }
 
+  // Buffer layout is terrain, then crown, then settlement, each contiguous, so
+  // `count - (settlement+crown)*3` hides exactly the identifying structure and
+  // nothing else. The three blocks are one opaque draw; order within it is
+  // irrelevant to the depth-tested result.
+  const terrainVertices=positions.length/3,crownVertices=crownPositions.length/3;
+  for(const v of crownPositions)positions.push(v);
+  for(const v of crownColours)colours.push(v);
   const settlement=createSettlementGeometry(island,lod),rockVertices=positions.length/3;
   const glow=new Float32Array(rockVertices+settlement.attributes.position.count);
+  glow.set(crownGlow,terrainVertices);
   glow.set(settlement.attributes.glow.array,rockVertices);
-  // 1 on every settlement vertex, 0 on rock. The aerial-perspective pass in
-  // createIslandMaterial uses it to hold roofs, walls and the harbour mast back
-  // from the silhouette treatment, so a far island keeps readable structure.
+  // 1 on every settlement vertex, 0 on rock and crown. The aerial-perspective
+  // pass in createIslandMaterial uses it to hold roofs, walls and the harbour
+  // mast back from the silhouette treatment, so a far island keeps readable
+  // structure. Crowns deliberately stay rock-classed: a distant vertical reads
+  // because it goes DARK against a bright sky, not because it stays pale.
   const built=new Float32Array(glow.length).fill(1,rockVertices);
   for(const v of settlement.attributes.position.array)positions.push(v);
   for(const v of settlement.attributes.color.array)colours.push(v);
@@ -264,7 +327,8 @@ export function createIslandGeometry(island,lod=0,plantLimit=240){
   geometry.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
-  geometry.userData={triangles:positions.length/9,settlementTriangles,lod,ornaments:plants+(island.landmark==='Last Orchard'?6:0)};
+  geometry.userData={triangles:positions.length/9,settlementTriangles,crownTriangles:crownVertices/3,lod,
+    ornaments:plants+(island.landmark==='Last Orchard'?6:0)};
   return geometry;
 }
 

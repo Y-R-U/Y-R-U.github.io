@@ -53,3 +53,14 @@ export const WEATHER=Object.freeze({
   intensity:1,
   squallPeriod:2*Math.PI/.003,   // seconds for one lap of the compass (= the cloud wrap)
 });
+
+// Per-pixel filtering of the analytic wave slopes in the water shader
+// (js/render/shaders.mjs). `footprint` there is one octave's phase span across
+// a pixel; this is the coefficient of footprint^2 in the Gaussian that damps
+// the octave as it approaches the sampling limit. The exact box-filter match is
+// 1/24 ~= .0417; the shipped value is stricter, because a sinusoid sampled at
+// under about four pixels per wavelength is correct and still shimmers when it
+// moves. Chosen by supersampled measurement, not by eye: see
+// js/render/tests/water-detail-browser.mjs. Geometry is untouched — the wave
+// FADE distances that keep TASKS C1 fixed live in core/config.mjs.
+export const MID_WAVE_FILTER=.125;

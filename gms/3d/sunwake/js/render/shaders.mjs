@@ -1,5 +1,6 @@
 import {WAVES,MAX_HEIGHT,MAX_VERTICAL_SPEED,FOAM_HEIGHT} from '../core/waves.mjs';
 import {CHOP_SHIFTS,HORIZON_FADE} from '../core/config.mjs';
+import {MID_WAVE_FILTER} from '../core/visual-config.mjs';
 const f=value=>Number(value).toFixed(12);
 // Both production water and the GPU probe call this exact generated function.
 export const waveGLSL=/* glsl */`
@@ -113,6 +114,8 @@ ${skyGLSL}
 ${waveGLSL}
 uniform vec3 uDeep,uLit,uFoam,uShallow;
 uniform sampler2D uRipple;uniform vec4 uRippleOffset;uniform float uRippleLayers;
+uniform float uMidDetail;
+#define WAVE_FILTER ${f(MID_WAVE_FILTER)}
 uniform vec2 uCenter;
 uniform int uShoreCount;uniform vec3 uShores[8];
 varying vec3 vPosition;varying vec4 vWave;
@@ -126,9 +129,30 @@ void main(){
   vec2 macro=vec2(0.);
   // Filter macro slopes per pixel as well as by range; flat geometry must not
   // reintroduce an aliased horizon through high-frequency grazing reflections.
-  ${WAVES.map((w,i)=>`{vec2 d=vec2(${f(w.x)},${f(w.z)});float q=${f(w.k)}*dot(d,vPosition.xz)+uPhases[${i}];float footprint=fwidth(q);macro+=${f(w.amplitude*w.k)}*d*cos(q)*exp(-.5*footprint*footprint);}`).join('\n')}
-  macro*=mix(1.,.16,smoothstep(70.,240.,distanceXZ));
-  vec2 baseSlope=mix(vWave.yz,macro,smoothstep(20.,70.,distanceXZ))*(1.-smoothstep(100.,450.,distanceXZ));
+  //
+  // footprint is the phase span of this octave across one pixel. The exact
+  // box-filtered average of sin over that span is sin(q)*sinc(footprint/2), and
+  // the Gaussian that matches it has sigma = footprint/sqrt(12) — an exponent
+  // of footprint^2/24, not footprint^2/2. The original filter was twelve times
+  // too strong in the exponent, which is why the sea between 120 and 300 m went
+  // to a soft sheet with only ripple noise on it: at 240 m the main swell was
+  // held at 5% of its slope when correct filtering keeps about 80%.
+  // WAVE_FILTER below is deliberately stricter than the exact value (a
+  // correctly filtered sinusoid at 2.6 samples per wavelength is still near
+  // full amplitude, and *that* shimmers when it moves); it is the largest
+  // coefficient whose supersampled aliasing error stayed at the old level in
+  // js/render/tests/water-detail-browser.mjs. This is shading only — no wave is
+  // geometrically displaced anywhere near here, so TASKS C1 cannot come back
+  // through it, and C1 asked for exactly this compensation.
+  ${WAVES.map((w,i)=>`{vec2 d=vec2(${f(w.x)},${f(w.z)});float q=${f(w.k)}*dot(d,vPosition.xz)+uPhases[${i}];float footprint=fwidth(q);macro+=${f(w.amplitude*w.k)}*d*cos(q)*exp(-WAVE_FILTER*footprint*footprint);}`).join('\n')}
+  // Held back with range as well, but gently: the per-pixel filter above is now
+  // doing the work, and it is the one that is correct at every camera height.
+  macro*=mix(1.,.55,smoothstep(70.,300.,distanceXZ));
+  // uMidDetail is the negative control. At 1 nothing changes; at 0 the macro
+  // slopes die past 150 m exactly as if they had never been carried out, and
+  // the mid-field structure the suite measures must collapse with it.
+  macro*=mix(1.,uMidDetail,smoothstep(90.,150.,distanceXZ));
+  vec2 baseSlope=mix(vWave.yz,macro,smoothstep(20.,70.,distanceXZ))*(1.-smoothstep(260.,560.,distanceXZ));
   vec2 slope=baseSlope+rippleFade*(r1*.065+transpose(rotation)*r2*.035);
   vec3 N=normalize(vec3(-slope.x,1.,-slope.y));
   float NoV=max(dot(N,V),.0001),NoL=max(dot(N,uSun),.0001);
