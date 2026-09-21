@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"><meta name="theme-color" content="#152c28"><title>TINPOT — A Very Small War</title><link rel="icon" href="data:,"><link rel="stylesheet" href="style.css">
+<style>#boot{position:fixed;inset:0;z-index:100;background:#142820;color:#f6edcb;display:grid;place-content:center;text-align:center;font-family:system-ui;padding:28px}#boot.hidden{display:none}#boot button{padding:16px;font:inherit}#boot.stalled{background:#412c2b}</style>
+<script>
+(function(){var BOOT_MS=20000,seen=[];window.__ready=false;
+function fail(message){if(window.__ready)return;window.__TINPOT_FAILED__=message;document.getElementById('boot').classList.add('stalled');document.getElementById('boot-status').textContent=message;document.getElementById('boot-retry').hidden=false;}
+addEventListener('error',function(e){var t=e.target;var message=t&&(t.tagName==='SCRIPT'||t.tagName==='LINK')?'Could not load '+(t.src||t.href):e.message;if(message)seen.push(message);},true);
+addEventListener('unhandledrejection',function(e){seen.push(String(e.reason));});
+setTimeout(function(){if(!window.__ready)fail(seen.length?seen[seen.length-1].slice(0,160):'The game did not finish loading. The quartermaster is investigating.');},BOOT_MS);
+document.addEventListener('click',function(e){if(e.target.id==='boot-retry')location.reload();});window.tinpotBootFail=fail;
+})();
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "../../lib/three/0.180.0/three.module.js",
+  "three/addons/": "../../lib/three/0.180.0/addons/"
+} }
+</script></head><body>
+<canvas id="battlefield" aria-label="TINPOT battlefield"></canvas>
+<div id="boot"><p class="eyebrow">DEPARTMENT OF SMALL WARS</p><h1>TINPOT</h1><p id="boot-status">Polishing the helmets…</p><button id="boot-retry" hidden>Reload the lads</button></div>
+<div id="hud"></div><div id="screens"></div>
+<script type="module" src="js/main.mjs"></script></body></html>

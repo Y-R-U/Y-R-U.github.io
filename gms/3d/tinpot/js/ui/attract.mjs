@@ -1,0 +1,2 @@
+// Demo controller consumes a view model and sends the same intents as a player.
+export function createAttract(send){let next=0;return {reset(){next=0;},update(model){const blue=model.units.filter(u=>u.team==='blue'&&u.hp>0),red=model.units.filter(u=>u.team==='red'&&u.hp>0);if(model.time>28||!blue.length||(!red.length&&model.time>10)){send({type:'reset-demo'});return;}if(model.time<next)return;next=model.time+2;const target=red[0];if(target)send({type:'demo-move',x:target.x,z:target.z+5});if(model.time>1&&model.time<4)send({type:'demo-lob',x:8,z:0});}};}

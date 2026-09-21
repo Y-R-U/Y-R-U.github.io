@@ -1,0 +1,6 @@
+# Dev captures. The gates rewrite these every run and they are 45 MB of PNG.
+# docs/VERIFY.md cites them by name; regenerate with `node tools/release.mjs`.
+docs/evidence/
+
+# Another game's harness, kept locally as a reference while building. Not ours.
+docs/reference/

@@ -1,0 +1,1 @@
+export const WEAPONS={rifle:{id:'rifle',name:'Rifle',icon:'⌁',range:12,cadence:.72,accuracy:.72,damage:25,speed:70},grenade:{id:'grenade',name:'Grenade',icon:'●',range:16,cadence:3.8,accuracy:1,damage:115,speed:12,radius:4.2,fuse:1.7}};

@@ -1,0 +1,14 @@
+import {blastTrees} from './forestSim.mjs';
+import {WEAPONS} from '../data/weapons.mjs';
+export function emit(w,event){w.events.push({id:++w.eventId,time:w.time,...event});if(w.events.length>600)w.events.splice(0,100);}
+export function damage(w,u,amount,source){if(u.hp<=0)return;u.hp=Math.max(0,u.hp-amount);if(!u.hp){u.state='dead';u.path=[];if(u.team==='blue'&&u.active&&!w.units.some(v=>v.team==='blue'&&!v.escort&&v.hp>0&&v.active)){const next=w.units.find(v=>v.team==='blue'&&!v.escort&&v.hp>0);if(next)next.active=true;}u.deathTime=w.time;if(source)source.kills++;emit(w,{type:'death',x:u.x,z:u.z,unit:u.id});}}
+export function combat(w,dt){
+ for(const u of w.units){if(u.hp<=0)continue;u.cooldown=Math.max(0,u.cooldown-dt);const weapon=WEAPONS[u.weapon];if(!weapon)continue;const range=weapon.range*(u.team==='red'?.8:1);let target=null,nearest=range;
+ for(const v of w.units){if(v.team===u.team||v.hp<=0)continue;const d=Math.hypot(u.x-v.x,u.z-v.z);if(d<nearest&&lineClear(w,u,v)){nearest=d;target=v;}}
+ if(!target)continue;u.yaw=Math.atan2(target.x-u.x,target.z-u.z);if(!u.path.length)u.state='engage';if(u.cooldown>0)continue;u.cooldown=weapon.cadence*(u.team==='red'?1.5:1);if(u.weapon==='grenade'){throwGrenade(w,u,target.x,target.z);continue;}const hit=w.random()<Math.min(.95,weapon.accuracy+(u.veterancy||0)*.04)*(u.team==='red'?.55:1);w.projectiles.push({source:u.id,target:target.id,hit,x:u.x,z:u.z,tx:target.x,tz:target.z,life:nearest/weapon.speed,damage:weapon.damage*(1+(u.damageBonus||0))*(u.team==='red'?.65:1)});emit(w,{type:'shot',x:u.x,z:u.z,tx:target.x,tz:target.z,team:u.team});
+ }
+ for(const p of w.projectiles){p.life-=dt;if(p.life>0)continue;const victim=w.units.find(u=>u.id===p.target),source=w.units.find(u=>u.id===p.source);if(p.hit&&victim)damage(w,victim,p.damage,source);emit(w,{type:'impact',x:p.tx,z:p.tz});}w.projectiles=w.projectiles.filter(p=>p.life>0);
+}
+export function throwGrenade(w,u,x,z){const weapon=WEAPONS.grenade,d=Math.hypot(x-u.x,z-u.z),ratio=Math.min(1,weapon.range/Math.max(.1,d));const tx=u.x+(x-u.x)*ratio,tz=u.z+(z-u.z)*ratio;w.grenades.push({id:++w.eventId,source:u.id,x:u.x,z:u.z,tx,tz,born:w.time,life:weapon.fuse});u.cooldown=weapon.cadence;emit(w,{type:'lob',x:u.x,z:u.z,tx,tz});}
+export function stepGrenades(w,dt){for(const g of w.grenades){g.life-=dt;if(g.life>0)continue;emit(w,{type:'explosion',x:g.tx,z:g.tz});const source=w.units.find(u=>u.id===g.source);for(const u of w.units){const d=Math.hypot(u.x-g.tx,u.z-g.tz);if(d<WEAPONS.grenade.radius)damage(w,u,WEAPONS.grenade.damage*(1-d/WEAPONS.grenade.radius*.65),source);}blastTrees(w,g.tx,g.tz,WEAPONS.grenade.radius);}w.grenades=w.grenades.filter(g=>g.life>0);}
+export function lineClear(w,a,b){const d=Math.hypot(a.x-b.x,a.z-b.z);for(let s=.8;s<d;s+=.6){const t=s/d,i=w.grid.index(a.x+(b.x-a.x)*t,a.z+(b.z-a.z)*t);if(i<0||w.grid.blocked[i])return false;}return true;}

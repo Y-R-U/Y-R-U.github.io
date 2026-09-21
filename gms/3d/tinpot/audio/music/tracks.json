@@ -1,0 +1,80 @@
+{
+ "title": {
+  "file": "title.mp3",
+  "name": "Before the Scramble",
+  "context": "title",
+  "bpm": 100,
+  "key": "Dm",
+  "startAt": 2.0,
+  "loopFadeS": 3.5,
+  "_why": "0.5s of true silence then a 5s intro swell; starting at 0 opens the title on nothing."
+ },
+ "briefing": {
+  "file": "briefing.mp3",
+  "name": "Orders Received",
+  "context": "briefing",
+  "bpm": 96
+ },
+ "barracks": {
+  "file": "barracks.mp3",
+  "name": "Radio Swing",
+  "context": "barracks",
+  "bpm": 104,
+  "_why": "Jaunty wireless swing. This is the between-missions tone: cheerful about the casualties."
+ },
+ "battle_tense": {
+  "file": "battle_tense.mp3",
+  "name": "Nothing on the Horizon",
+  "context": "battle",
+  "intensity": "low",
+  "bpm": 110,
+  "key": "Gm"
+ },
+ "battle_march": {
+  "file": "battle_march.mp3",
+  "name": "Dawn Patrol",
+  "context": "battle",
+  "intensity": "march",
+  "bpm": 128,
+  "key": "Dm",
+  "pairId": "ww2"
+ },
+ "battle_heavy": {
+  "file": "battle_heavy.mp3",
+  "name": "Dawn Patrol Redline",
+  "context": "battle",
+  "intensity": "heavy",
+  "bpm": 128,
+  "key": "Dm",
+  "pairId": "ww2",
+  "_why": "Same key and bpm as battle_march: cross-fade between them on threat level without a beat glitch."
+ },
+ "battle_grim": {
+  "file": "battle_grim.mp3",
+  "name": "Mud and Magnesium",
+  "context": "battle",
+  "intensity": "march",
+  "bpm": 120,
+  "key": "Cm"
+ },
+ "boss": {
+  "file": "boss.mp3",
+  "name": "The Big One",
+  "context": "boss",
+  "bpm": 140,
+  "key": "Fm"
+ },
+ "victory": {
+  "file": "victory.mp3",
+  "name": "Victory",
+  "context": "sting",
+  "loop": false
+ },
+ "defeat": {
+  "file": "defeat.mp3",
+  "name": "Defeat",
+  "context": "sting",
+  "loop": false
+ },
+ "_source": "Copied from gms/2d/skyhammer/assets/audio/music/ (same house soundtrack, WW2 flavour). Do not re-encode."
+}

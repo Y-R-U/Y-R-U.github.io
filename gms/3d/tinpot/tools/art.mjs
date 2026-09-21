@@ -1,0 +1,4 @@
+import assert from 'node:assert/strict';
+import {writeFile} from 'node:fs/promises';
+import {connect,BASE,sleep} from './cdp.mjs';
+const p=await connect();try{await p.goto(BASE+'?test=1',{width:390,height:844,deviceScaleFactor:2,mobile:true});await p.wait('window.__TINPOT_BOOTED__');await p.eval("tinpotTest.fixture('art');tinpotTest.advance(180);tinpotTest.freeze()");await sleep(200);const tilt=await p.eval('tinpotTest.tilt()');await p.shot(new URL('../docs/evidence/m1b-portrait.png',import.meta.url).pathname);assert.deepEqual(p.errors,[]);await writeFile(new URL('../docs/evidence/art-browser.json',import.meta.url),JSON.stringify({snapshot:await p.eval('tinpot'),tilt,errors:p.errors},null,2));console.log(`PASS art capture — pitch ${tilt.pitchDegrees} deg, tan ${tilt.worldOffsetPerMetre}, ${tilt.count} trees, canopy offset min ${tilt.minPx}px median ${tilt.medianPx}px, ${(tilt.fractionUpScreen*100).toFixed(0)}% up-screen`);}finally{await p.close();}

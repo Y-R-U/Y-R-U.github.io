@@ -1,0 +1,5 @@
+const NAMES=['Crumb','Spud','Peas','Titch','Gravy','Wobble','Bunting','Noodle','Pudding','Mops','Pickle','Drizzle','Socks','Turnip','Crumpet','Boggle'];
+export function recruit(c){const id=c.nextRecruit++;const man={id,name:NAMES[id%NAMES.length]+(id>=NAMES.length?' '+Math.floor(id/NAMES.length+1):''),xp:0,kills:0,alive:true};c.roster.push(man);return man;}
+export function fillSquad(c,count){while(c.roster.filter(m=>m.alive).length<count)recruit(c);c.slots=c.slots.filter(id=>c.roster.some(m=>m.id===id&&m.alive));for(const m of c.roster)if(m.alive&&!c.slots.includes(m.id)&&c.slots.length<count)c.slots.push(m.id);c.slots=c.slots.slice(0,count);return c.slots.map(id=>c.roster.find(m=>m.id===id));}
+export const rank=man=>man.xp>=3?'Sgt.':man.xp>=1?'Cpl.':'Pvt.';
+export function settleRoster(c,w){for(const u of w.units.filter(u=>u.team==='blue'&&!u.escort)){const man=c.roster.find(m=>m.id===u.rosterId);if(!man)continue;man.kills+=u.kills;if(u.hp<=0){man.alive=false;man.lostAt=w.mission.title;}else if(w.mission.status==='victory')man.xp++;}}
