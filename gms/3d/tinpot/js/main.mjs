@@ -26,7 +26,11 @@ import {createHUD} from './ui/hud.mjs';
 import {createScreens} from './ui/screens.mjs';
 import {MISSIONS} from './data/missions.mjs';
 try {
- const canvas=document.getElementById('battlefield'),view=createScene(canvas),testing=new URLSearchParams(location.search).has('test');let campaign=loadCampaign(),w,terrain,forest,actors,vfx,fire,props,root,marker,armedMark,armedRing,armedFill,reachRing,mode='title',paused=false,result=null,lastSave=0,assignSlot=null;
+ // 0.04.2 — how long the mission banner stays open before it folds down to the pause button
+ // alone, and how long it comes back for after an unpause. Both are in sim seconds, so a paused
+ // game never counts down and the banner is always up while he is reading it.
+ const BANNER_OPEN=7,BANNER_AFTER_PAUSE=6;
+ const canvas=document.getElementById('battlefield'),view=createScene(canvas),testing=new URLSearchParams(location.search).has('test');let campaign=loadCampaign(),w,terrain,forest,actors,vfx,fire,props,root,marker,armedMark,armedRing,armedFill,reachRing,mode='title',paused=false,result=null,lastSave=0,assignSlot=null,primer=false,bannerUntil=0,collapsed=false;
  // The coaching ledger. A teaching card is shown until the player has DONE the thing, then
  // never again in this campaign. Nothing he has already learned should still be nagging him.
  function teach(k){if(!campaign.taught)campaign.taught={};if(campaign.taught[k])return;campaign.taught[k]=true;save();}
@@ -36,7 +40,12 @@ try {
  function drainEvents(){const fresh=[];for(const e of w.events)if(e.id>eventCursor)fresh.push(e);if(fresh.length)eventCursor=fresh[fresh.length-1].id;return fresh;}
  const attract=createAttract(intent=>{if(intent.type==='reset-demo')demo();if(intent.type==='demo-move')orderMove(w,intent.x,intent.z);if(intent.type==='demo-lob'){const u=w.units.find(u=>u.team==='blue'&&u.hp>0);if(u)throwGrenade(w,u,intent.x,intent.z);}});
  function demo(){load(createWorld({count:4,enemies:10}));for(const u of w.units)if(u.team==='blue')u.z=7+Math.floor(u.id/2)*1.6;attract.reset();}
- const hud=createHUD(document.getElementById('hud'),intent=>{if(mode!=='battle')return;if(intent.type==='toggle')toggleUnit(w,intent.id);if(intent.type==='weapon')setWeapon(w,intent.weapon,intent.id);if(intent.type==='pause')paused=!paused;});
+ const hud=createHUD(document.getElementById('hud'),intent=>{if(mode!=='battle')return;
+  // 0.04.3: while the grenade briefing is up the only thing a tap can do is dismiss it.
+  if(primer){primer=false;paused=false;teach('grenade');bannerUntil=w.time+BANNER_AFTER_PAUSE;return;}
+  if(intent.type==='toggle')toggleUnit(w,intent.id);if(intent.type==='weapon')setWeapon(w,intent.weapon,intent.id);
+  // 0.04.2: unpausing leaves the banner up for a few seconds before it folds away again.
+  if(intent.type==='pause'){paused=!paused;if(!paused)bannerUntil=w.time+BANNER_AFTER_PAUSE;}});
  const screens=createScreens(document.getElementById('screens'),intent=>{
  if(intent.type==='start'){if(campaign.mission>=MISSIONS.length){result=campaign.history.at(-1);mode='debrief';}else if(campaign.inProgress){load(campaignWorld(campaign));mode='battle';paused=false;}else mode='briefing';}
  if(intent.type==='settings')mode='settings';
@@ -69,13 +78,13 @@ try {
  armedMark=new THREE.Group();armedRing.rotation.x=armedFill.rotation.x=-Math.PI/2;armedRing.position.y=.09;armedFill.position.y=.08;armedFill.renderOrder=6;armedRing.renderOrder=7;armedMark.add(armedRing,armedFill);armedMark.visible=false;root.add(armedMark);
  reachRing=new THREE.Mesh(new THREE.RingGeometry(.9795,1,120),new THREE.MeshBasicMaterial({color:0xffd27a,side:THREE.DoubleSide,transparent:true,opacity:0,depthWrite:false,depthTest:false}));
  reachRing.rotation.x=-Math.PI/2;reachRing.position.y=.06;reachRing.renderOrder=6;reachRing.visible=false;root.add(reachRing);
- lastSave=w.time;eventCursor=0;eulogy=null;}
+ lastSave=w.time;eventCursor=0;eulogy=null;primer=false;bannerUntil=w.time+BANNER_OPEN;collapsed=false;}
  function save(){if(mode==='battle'&&w.mission?.status==='active')campaign.inProgress=snapshotWorld(w);storeCampaign(campaign);}
  demo();showScreen();
  const ray=new THREE.Raycaster(),plane=new THREE.Plane(new THREE.Vector3(0,1,0),0),hit=new THREE.Vector3();bindInput(canvas,intent=>{if(paused||mode!=='battle')return;ray.setFromCamera(new THREE.Vector2(intent.x/innerWidth*2-1,1-intent.y/innerHeight*2),view.camera);if(ray.ray.intersectPlane(plane,hit)){const did=groundOrder(w,hit.x,hit.z);if(did==='move')teach('move');else if(did==='arm')teach('grenade');}});
  document.getElementById('rotate-dismiss')?.addEventListener('click',()=>document.documentElement.classList.add('rotate-ok'));
  addEventListener('pagehide',save);document.addEventListener('visibilitychange',()=>{if(document.hidden){save();paused=true;}});
- let frames=0,last=0,acc=0;const snapshot=()=>({frames,time:w.time,mode,paused,graphics:{pitchDegrees:Math.atan2(view.camera.position.z,view.camera.position.y)*180/Math.PI,calls:view.renderer.info.render.calls,triangles:view.renderer.info.render.triangles,geometries:view.renderer.info.memory.geometries},audio:sound.snapshot(),haptics:{supported:haptics.supported,buzzes:haptics.count()},eulogy:eulogy&&{name:eulogy.name,kills:eulogy.kills},dpr:view.renderer.getPixelRatio(),equipped:w.equipped,trees:forest.count,burned:w.trees.filter(t=>t.dead).length,burning:w.trees.filter(t=>t.burn>0).length,fires:(w.fires||[]).length,alight:w.units.filter(u=>u.onFire>0&&u.hp>0).length,grenades:w.grenades.length,grenadeTargets:w.grenades.map(g=>({tx:+g.tx.toFixed(2),tz:+g.tz.toFixed(2)})),explosions:testing?w.events.filter(e=>e.type==='explosion').map(e=>({x:+e.x.toFixed(2),z:+e.z.toFixed(2)})):undefined,vfx:vfx.counts(),units:w.units.map(u=>({...u,path:u.path.length})),target:w.target,mission:w.mission,campaign:{mission:campaign.mission,credits:campaign.credits,roster:campaign.roster,history:campaign.history,taught:campaign.taught||{}},armed:w.armed?{...w.armed,left:+Math.max(0,w.armed.ready-w.time).toFixed(2)}:null,split:w.split||0,coach:coachModel(),markers:{target:!!marker?.visible,armed:!!armedMark?.visible,reach:!!reachRing?.visible},version:VERSION,fortified:w.fortified});
+ let frames=0,last=0,acc=0;const snapshot=()=>({frames,time:w.time,mode,paused,graphics:{pitchDegrees:Math.atan2(view.camera.position.z,view.camera.position.y)*180/Math.PI,calls:view.renderer.info.render.calls,triangles:view.renderer.info.render.triangles,geometries:view.renderer.info.memory.geometries},audio:sound.snapshot(),haptics:{supported:haptics.supported,buzzes:haptics.count()},eulogy:eulogy&&{name:eulogy.name,kills:eulogy.kills},dpr:view.renderer.getPixelRatio(),equipped:w.equipped,trees:forest.count,burned:w.trees.filter(t=>t.dead).length,burning:w.trees.filter(t=>t.burn>0).length,fires:(w.fires||[]).length,alight:w.units.filter(u=>u.onFire>0&&u.hp>0).length,grenades:w.grenades.length,grenadeTargets:w.grenades.map(g=>({tx:+g.tx.toFixed(2),tz:+g.tz.toFixed(2)})),explosions:testing?w.events.filter(e=>e.type==='explosion').map(e=>({x:+e.x.toFixed(2),z:+e.z.toFixed(2)})):undefined,vfx:vfx.counts(),units:w.units.map(u=>({...u,path:u.path.length})),target:w.target,mission:w.mission,campaign:{mission:campaign.mission,credits:campaign.credits,roster:campaign.roster,history:campaign.history,taught:campaign.taught||{}},armed:w.armed?{...w.armed,left:+Math.max(0,w.armed.ready-w.time).toFixed(2)}:null,primer,banner:{collapsed,openUntil:+bannerUntil.toFixed(2)},split:w.split||0,coach:coachModel(),markers:{target:!!marker?.visible,armed:!!armedMark?.visible,reach:!!reachRing?.visible},version:VERSION,fortified:w.fortified});
 
  // ---------------------------------------------------------------- the teaching moments (V3)
  // One card at a time, in priority order, and every one of them retires itself. `campaign.taught`
@@ -89,20 +98,20 @@ try {
   const crew=w.units.filter(u=>u.team==='blue'&&!u.escort&&u.hp>0&&u.active&&u.weapon==='grenade');
   if(!crew.length)return false;
   return Math.min(...crew.map(u=>Math.hypot(u.x-a.x,u.z-a.z)))>WEAPONS.grenade.range;};
+ // 0.04.1: the armed-grenade readout is NOT a coach card any more. It takes over the mission
+ // banner at the top of the screen (see `armedModel`), because Aaron's complaint about it was
+ // that it was legible and in the way. Nothing about the armed state floats over the grass.
+ const armedModel=()=>w.armed&&mode==='battle'&&!w.art?{left:Math.max(0,Math.ceil(w.armed.ready-w.time)),short:outOfReach()}:null;
  function coachModel(){
-  if(mode!=='battle'||w.art)return null;
-  if(w.armed){const left=Math.max(0,Math.ceil(w.armed.ready-w.time));
-   return {tone:'red',eyebrow:'GRENADE ARMED',title:left>0?left+'…':'AWAY!',
-    lines:outOfReach()?['You have walked out of range. It will fall short.','Tap the marker to call it off.']
-      :['Tap the red marker to call it off.','Tap anywhere else and the lads march — it is still thrown, from wherever they end up.']};}
+  if(mode!=='battle'||w.art||w.armed||primer)return null;
   const t=campaign.taught||{};
   if(!t.move)return {tone:'gold',eyebrow:'FIELD MANUAL, RULE ONE',title:'Tap to move to location',
    lines:['Anywhere on the grass. They walk there and shoot on their own.']};
-  if(!t.grenade&&(w.equipped||[]).includes('grenade')){
-   if(!bomber())return {tone:'gold',eyebrow:'NEW: GRENADES',title:'Hand out the grenades',
+  // The arm/cancel/move lesson is now the paused briefing in `primer` (0.04.3), so all that is
+  // left here is the nudge that gets a grenade into somebody's hand in the first place.
+  if(!t.grenade&&(w.equipped||[]).includes('grenade')&&!bomber())
+   return {tone:'gold',eyebrow:'NEW: GRENADES',title:'Hand out the grenades',
     lines:['Tap ● on the left rail for the whole squad, or the ● on one man\u2019s card for just him.']};
-   return {tone:'gold',eyebrow:'NEW: GRENADES',title:'Tap to ARM, not to throw',
-    lines:['A red marker lands and counts down.','Tap the marker to call it off.','Tap elsewhere and they march — and it is thrown from wherever they end up.']};}
   const alive=w.units.filter(u=>u.team==='blue'&&!u.escort&&u.hp>0);
   if(!t.split&&w.mission?.id===1&&alive.length>1){
    const held=alive.find(u=>!u.active);
@@ -110,7 +119,7 @@ try {
     arrow:(held||alive[alive.length-1]).id,
     lines:held?['Tap his card again and he rejoins the march.']:['Tap a helmet card below. He stays put and keeps shooting while the others swing wide.']};}
   return null;}
- function step(){tick(w);if(w.mission&&w.mission.status!=='active'&&mode==='battle'){result=finishMission(campaign,w);mode='debrief';showScreen();save();}}
+ function step(){tick(w);if(w.mission&&w.mission.status!=='active'&&mode==='battle'){result=finishMission(campaign,w);mode='debrief';primer=false;paused=false;showScreen();save();}}
  const project3=(x,y,z)=>{const p=new THREE.Vector3(x,y,z).project(view.camera);return {x:(p.x+1)*innerWidth/2,y:(1-p.y)*innerHeight/2};};
  // Measures the camera tilt the way it is actually seen: how far up-screen a tree's canopy sits
  // from its own trunk base. Zero means the camera is vertical whatever the config claims.
@@ -121,6 +130,15 @@ try {
  function frame(t=0){const dt=Math.min((t-last)/1000,.1);acc+=dt;last=t;while(acc>=STEP){if(!paused&&mode==='battle')step();else if(mode==='title'||mode==='settings'){tick(w);attract.update(snapshot());}acc-=STEP;}const fresh=drainEvents();haptics.update(w,fresh,sound.settings().sfx>0);
   if(mode==='battle')for(const e of fresh)if(e.type==='death'&&e.team==='blue'&&!e.escort)eulogy={name:e.name,kills:e.kills||0,key:++eulogyKey,at:performance.now()};
   if(eulogy&&performance.now()-eulogy.at>2800)eulogy=null;
+  // 0.04.3 — the first time a grenade is actually in somebody's hand, stop the war and explain
+  // it properly, once, ever. `taught.grenade` is the same ledger the rest of the coaching uses,
+  // so it cannot come back a second time even across a reload.
+  if(mode==='battle'&&!w.art&&!primer&&!(campaign.taught||{}).grenade&&w.units.some(u=>u.team==='blue'&&!u.escort&&u.hp>0&&u.weapon==='grenade')){primer=true;paused=true;}
+  // 0.04.2 — the banner folds down to the pause button alone once he has had time to read it.
+  // Sim seconds, so a paused game never counts down; it stays open while armed (it is carrying
+  // the countdown) and while the briefing is up.
+  const armedLive=armedModel();
+  collapsed=mode==='battle'&&!w.art&&!paused&&!primer&&!armedLive&&w.time>bannerUntil;
   const coach=coachModel();if(w.split===2)teach('split');
   terrain.update(w.time,w);forest.update(w);props.update();fire.update(w);actors.update(w,paused?0:dt);vfx.update(w,paused?0:dt);if(w.target){marker.visible=true;marker.position.set(w.target.x,.04,w.target.z);}
   {const a=w.armed,live=a&&mode==='battle',lead=bomber();
@@ -132,5 +150,5 @@ try {
     const cold=outOfReach();armedRing.material.color.setHex(cold?0x93a2a6:0xff5530);armedFill.material.color.setHex(cold?0x7f8f8c:0xff9a4a);}
    const show=mode==='battle'&&lead&&(a||w.time<w.reachUntil);
    reachRing.visible=!!show;
-   if(show){reachRing.position.set(lead.x,.06,lead.z);reachRing.scale.set(WEAPONS.grenade.range,1,WEAPONS.grenade.range);reachRing.material.opacity=a?.5:.4;}}hud.update({hidden:mode!=='battle'||w.art,location:w.map.name,objective:w.mission?.objective,time:Math.floor(w.mission?.type==='hold'?Math.max(0,w.mission.duration-w.mission.elapsed):w.time),units:w.units.filter(u=>u.team==='blue'&&!u.escort).map(u=>({id:u.id,name:u.name,hp:u.hp,maxHp:u.maxHp,active:u.active,weapon:u.weapon})),equipped:w.equipped,kills:w.units.filter(u=>u.team==='red'&&u.hp<=0).length,losses:w.units.filter(u=>u.team==='blue'&&!u.escort&&u.hp<=0).length,paused,eulogy,hint:w.units.some(u=>u.team==='blue'&&u.active&&u.weapon==='grenade')?'TAP TO ARM · TAP THE MARKER TO CANCEL':undefined,coach,arrow:coach?.arrow??null});sound.update(w,dt,paused||!['battle','title'].includes(mode));view.draw();frames++;if(!window.__ready){window.__ready=window.__TINPOT_BOOTED__=true;document.getElementById('boot').classList.add('hidden');}window.tinpot=snapshot();if(mode==='battle'&&w.mission&&w.time-lastSave>5){save();lastSave=w.time;}requestAnimationFrame(frame);}frame();
+   if(show){reachRing.position.set(lead.x,.06,lead.z);reachRing.scale.set(WEAPONS.grenade.range,1,WEAPONS.grenade.range);reachRing.material.opacity=a?.5:.4;}}hud.update({hidden:mode!=='battle'||w.art,location:w.map.name,objective:w.mission?.objective,time:Math.floor(w.mission?.type==='hold'?Math.max(0,w.mission.duration-w.mission.elapsed):w.time),units:w.units.filter(u=>u.team==='blue'&&!u.escort).map(u=>({id:u.id,name:u.name,hp:u.hp,maxHp:u.maxHp,active:u.active,weapon:u.weapon})),equipped:w.equipped,kills:w.units.filter(u=>u.team==='red'&&u.hp<=0).length,losses:w.units.filter(u=>u.team==='blue'&&!u.escort&&u.hp<=0).length,paused:paused&&!primer,eulogy,armed:armedLive,collapsed,primer,hint:w.units.some(u=>u.team==='blue'&&u.active&&u.weapon==='grenade')?'TAP TO ARM · TAP THE MARKER TO CANCEL':undefined,coach,arrow:coach?.arrow??null});sound.update(w,dt,paused||!['battle','title'].includes(mode));view.draw();frames++;if(!window.__ready){window.__ready=window.__TINPOT_BOOTED__=true;document.getElementById('boot').classList.add('hidden');}window.tinpot=snapshot();if(mode==='battle'&&w.mission&&w.time-lastSave>5){save();lastSave=w.time;}requestAnimationFrame(frame);}frame();
 } catch(e){window.tinpotBootFail(e.message);throw e;}

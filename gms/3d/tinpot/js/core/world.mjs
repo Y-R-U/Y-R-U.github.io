@@ -2,7 +2,7 @@ import {stepMission} from './mission.mjs';
 import {rng} from './rng.mjs';
 import {updateAI} from './ai.mjs';
 import {stepForest} from './forestSim.mjs';
-import {combat,throwGrenade,stepGrenades,emit} from './combat.mjs';
+import {combat,throwGrenade,stepGrenades,emit,revertToRifle} from './combat.mjs';
 import {treeLayout,createGrid} from './grid.mjs';
 import {createUnit,moveUnit,applyKind} from './units.mjs';
 import {pickKind} from '../data/soldiers.mjs';
@@ -52,7 +52,7 @@ export function stepArmed(w){const a=w.armed;if(!a)return;const crew=bombers(w);
  if(w.time<a.ready)return;
  // If every thrower is mid-cadence the order waits rather than silently evaporating.
  const ready=crew.filter(u=>u.cooldown<=0&&!(u.panicking>w.time));if(!ready.length)return;
- for(const u of ready)throwGrenade(w,u,a.x,a.z);w.armed=null;}
+ for(const u of ready){throwGrenade(w,u,a.x,a.z);revertToRifle(w,u);}w.armed=null;}
 export function groundOrder(w,x,z){
  if(w.armed){if(Math.hypot(x-w.armed.x,z-w.armed.z)<=CANCEL_RADIUS){emit(w,{type:'disarm',x:w.armed.x,z:w.armed.z});w.armed=null;return 'disarm';}orderMove(w,x,z);return 'move';}
  if(bombers(w).length){w.armed={x,z,at:w.time,ready:w.time+ARM_SECONDS};w.reachUntil=w.time+ARM_SECONDS+.4;emit(w,{type:'arm',x,z});return 'arm';}

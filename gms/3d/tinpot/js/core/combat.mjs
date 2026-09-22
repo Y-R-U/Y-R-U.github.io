@@ -11,6 +11,15 @@ export function combat(w,dt){
  }
  for(const p of w.projectiles){p.life-=dt;if(p.life>0)continue;const victim=w.units.find(u=>u.id===p.target),source=w.units.find(u=>u.id===p.source);if(p.hit&&victim)damage(w,victim,p.damage,source);emit(w,{type:'impact',x:p.tx,z:p.tz});}w.projectiles=w.projectiles.filter(p=>p.life>0);
 }
+// 0.04.4 — one tap, one grenade. The moment a man has actually thrown, his weapon goes back to
+// the rifle, so every subsequent tap on the ground is unambiguously a march order. Aaron's own
+// words: "there is confusion on if you will end up running away or throw more grenades".
+// CANCELLING does not revert him — he never spent it, so he stays ready to re-aim.
+// It does NOT apply to an auto-lob. That was tried and it is worse: a grenadier lobs at the
+// first thing that wanders into range, so selecting the grenade would hand it back to the rifle
+// a second later with no tap from the player at all, which is a weapon changing by itself. The
+// rule is "an order you gave has been carried out", not "a grenade left the map". See D36.
+export function revertToRifle(w,u){if(u.team!=='blue'||u.escort||u.weapon!=='grenade')return false;if(!(w.equipped||[]).includes('rifle'))return false;u.weapon='rifle';emit(w,{type:'rearm',unit:u.id,weapon:'rifle'});return true;}
 export function throwGrenade(w,u,x,z){const weapon=WEAPONS.grenade,d=Math.hypot(x-u.x,z-u.z),ratio=Math.min(1,weapon.range/Math.max(.1,d));const tx=u.x+(x-u.x)*ratio,tz=u.z+(z-u.z)*ratio;w.grenades.push({id:++w.eventId,source:u.id,x:u.x,z:u.z,tx,tz,born:w.time,life:weapon.fuse});u.cooldown=weapon.cadence;emit(w,{type:'lob',x:u.x,z:u.z,tx,tz});}
 // A cone of flame: no projectile, no accuracy roll, and it does not care whose side you are on.
 // The pool it leaves is what makes it dangerous to its owner — he is four metres from a fire he

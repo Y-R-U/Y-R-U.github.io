@@ -249,3 +249,50 @@ He liked that it is dangerous — do not defuse it — but he could not *see* it
 - [x] An arrow and a short instruction prompting him to practise **splitting the squad and
       rejoining it** — the card toggle is the entire tactical game and nothing teaches it
 - [x] Fires during mission 2, retires once he has toggled a card off and back on
+
+---
+
+# 0.04 — second human playtest (Aaron, on a phone, 2026-09-22)
+
+His feedback on 0.03. The theme this time is **screen real estate and modal clarity**: the new
+teaching furniture works but it covers the battlefield, and the armed-grenade state leaves him
+unsure whether his next tap moves the squad or throws another grenade.
+
+## 0.04.1 — The grenade warning must not cover the battlefield
+The "GRENADE ARMED / you have walked out of range" card currently sits in the play field. See
+`docs/evidence/v3-falls-short-warning.png` — it is legible and it is in the way.
+- [x] The armed-grenade state and its warning render **over the mission banner at the top**,
+      taking that space rather than adding new space
+- [x] The countdown, the out-of-range warning and the "tap the marker to cancel" hint all live
+      there; nothing about the armed state floats over the middle of the screen
+- [x] Still readable at 320, 390 and 430 px wide
+
+## 0.04.2 — The mission banner collapses to just the pause button
+- [x] After 5-10 s of a mission, the banner shrinks down to the **pause button alone**
+- [x] Tapping pause expands the banner again (and pauses, as now)
+- [x] On unpause the banner stays up a few seconds, then re-collapses on its own
+- [x] The collapse/expand must not rebuild the HUD's innerHTML mid-gesture. That bug has already
+      eaten a tap once in this project — animate or toggle a class, do not re-render.
+- [x] Gate: the pause button stays >=44 px and inside the top edge at all three widths, in both
+      the collapsed and expanded state
+
+## 0.04.3 — Pause the game to explain the grenade, once, ever
+- [x] The **first ever** time the player selects or throws a grenade, pause and explain the flow:
+      tap to arm, tap the marker to cancel, you can walk away and it will fall short
+- [x] One tap dismisses it and resumes. It never appears again — same `campaign.taught` ledger
+      as the rest of the coaching.
+- [x] It replaces the current non-blocking grenade coach card rather than adding to it
+
+## 0.04.4 — Throwing a grenade puts the rifle back in his hands
+His exact complaint: "there is confusion on if you will end up running away or throw more
+grenades when the timer runs out." This is the fix he proposed and it is a good one — after the
+throw, every tap is unambiguously movement again.
+- [x] Once a grenade is actually thrown, the squad's weapon **reverts to rifle automatically**
+- [x] **Cancelling** an armed grenade leaves the weapon **on grenade**, so he can re-aim. He
+      raised this as a question ("cancel grenade toggles back to grenade?"); this is the reading
+      being implemented, and it is the consistent one — cancelling means he did not spend it.
+- [x] The rail and the pips must visibly follow the change, so the UI never lies about what is
+      in his hands
+- [x] Per-man throws revert only that man; a rail-wide grenade order reverts everyone who threw
+- [x] Note in STATE.md that this interacts with grenadiers still auto-lobbing without arming
+      (a known 0.03 inconsistency) and say what you did about it

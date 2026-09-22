@@ -265,3 +265,26 @@ standing rule requires:
   its reach"*.
 
 `teach` was run four times end to end for flake: 9/9 scenarios every time.
+
+---
+
+## 0.04 — second human playtest (screen real estate and modal clarity)
+
+Build `0.04`. Everything in this table was run on ANGLE Metal and the frame was looked at.
+
+| gate | what it measures | evidence |
+|---|---|---|
+| `sim.mjs` revert block | a rail-wide grenade order reverts **all four** throwers to the rifle; a per-man pip reverts **only that man**; a cancelled grenade stays a grenade and emits no `rearm`; an unprompted auto-lob does **not** change the weapon under him | `docs/evidence/sim.json` |
+| `browser.mjs teach` #3 | the first grenade in anybody's hand **pauses** the war for a briefing that covers arm / cancel / falls-short; one tap dismisses it and the war resumes; the old floating card is gone | `v4-grenade-primer.png` |
+| `browser.mjs teach` #3 | the armed countdown lives **inside** `.mission-header` (`.armed-panel` box within the header box), the header bottom is under 18% of screen height, `.banner-text` is `display:none`, and `.coach` is not showing | `v3-armed.png` |
+| `browser.mjs teach` #4 | walking away turns the **banner** cold (`.short`) and its copy reads "It will fall short from here." before it lands; the warning is in the top strip, not over the grass | `v3-falls-short-warning.png` |
+| `browser.mjs teach` #9 | the banner is open at 0 s and at 4 s, collapsed by 9 s (no background, no border, no shadow, `.banner-text` at opacity 0); pause re-expands and pauses; unpause keeps it up then re-collapses; the pause button's rect is `deepEqual` across all of it and **the DOM node itself is never replaced** | `v4-banner-open.png`, `v4-banner-collapsed.png`, `v4-banner-paused.png` |
+| `browser.mjs teach` #10 | at 320/390/430 and in all three banner states (open, collapsed, armed) the pause button is ≥44 px, fully on screen, visible, and inside the top 15% | `v4-collapsed-320/390/430.png` |
+| `browser.mjs teach` #11 | at 320/390/430 the armed banner is on screen, inside the header, ≥11 px copy; and once the throw goes, every thrower is on the rifle and the **rail, the pips and the order hint** all say so | `v4-armed-320/390/430.png`, `v4-reverted-to-rifle.png` |
+| `browser.mjs teach` #12 | cancelling leaves the whole squad on grenade and the rail still selected on grenade; the briefing does not return after a cancel, after re-selecting the weapon, or after a full page reload | `v4-cancel-keeps-grenade.png` |
+| production path (no `?test=1`) | zero console/network errors, `window.tinpotTest === undefined`, `window.tinpot.version === '0.04'`, title footer reads `PATTERN 0.04` | `v4-title-version.png` |
+| `release.mjs` | all six missions won by touch on build `0.04`, retry at three widths, **60.00 fps / p95 16.7 ms**, zero errors, no external requests | `release.json` |
+| `campaign.mjs`, `artgate.py` | unchanged and green; the art frame still passes all seven checks | `campaign-sim.json` |
+
+**Every new gate was falsified against a build with the bug still in it** — the table of what
+reddened, and what was broken to redden it, is in `docs/STATE.md` under *0.04 → Gates*.

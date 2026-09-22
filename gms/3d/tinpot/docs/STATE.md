@@ -5,24 +5,136 @@
 
 ## Now
 
-**Milestone: 0.03.** 0.01 (the shipped slice) and 0.02 (the playtest pass) are done; **0.03 —
-Aaron's first human playtest — is this session's work and every box of it is now ticked.**
+**Milestone: 0.04.** 0.01 (the shipped slice), 0.02 (the playtest pass) and 0.03 (the first human
+playtest) are done. **0.04 — Aaron's SECOND human playtest — is this session's work.**
 The live build number is `VERSION` in `js/version.mjs`; it prints on the title screen as
-`PATTERN 0.03` and is on `window.tinpot.version`.
+`PATTERN 0.04` and is on `window.tinpot.version`.
 
-**Versioning note:** headings are numbered 0.01 / 0.02 / 0.03 because we are at very early
+**Versioning note:** headings are numbered 0.01 / 0.02 / 0.03 / 0.04 because we are at very early
 concept stage. **No code identifier was renamed** — the browser suites are still
 `node tools/browser.mjs v1 v3 v4 v6 m2…m8 art teach` and the evidence filenames are unchanged.
+The new 0.04 evidence shots are named `v4-*.png`, which collides in spirit with the `v4` SUITE
+(three kinds of enemy) but not in fact: no file was renamed and no suite was added. 0.04's gates
+all live in the `teach` suite.
 
-**A human has now played it once, on a phone.** His verdict: "It looks good, and very brief test
-was fun", with one structural complaint — *the opening minute teaches nothing*. That complaint is
-what 0.03 is. It has not been in front of him again since; **the next useful thing is still a
-thumb**, specifically on the first two minutes.
+**Aaron has now played it twice.** His 0.04 note, in one line: *the teaching furniture works and
+it is in the way, and the armed-grenade state leaves him unsure whether his next tap moves the
+squad or throws another grenade.* The theme is **screen real estate and modal clarity**.
 
-Green as of this session, on ANGLE Metal:
-`node tools/sim.mjs` · `node tools/campaign.mjs` · `node tools/browser.mjs`
-(`shell m2 m3 m4 m5 m6 m7 m8 art v1 v3 v4 v6 teach`) · `node tools/release.mjs` ·
-`python3 tools/artgate.py docs/evidence/m1b-portrait.png` (exit 0, unedited).
+## 0.04 — second human playtest pass (2026-09-22, sixth relay session)
+
+Working `PLAN.md`'s **0.04** section only. Nothing above it is being touched.
+
+### What 0.04 changed
+
+**0.04.4 — throwing a grenade puts the rifle back in his hands.** `revertToRifle(w,u)` in
+`core/combat.mjs`; `stepArmed` calls it on every man it just threw for. Cancelling does not.
+See **D36** for the one real decision inside this (auto-lobs).
+
+**0.04.1 — the armed grenade takes over the mission banner.** `coachModel()` no longer returns
+an armed card at all; `armedModel()` feeds `hud.update({armed})`, and `hud.mjs` toggles an
+`armed` class on `.mission-header`, hides `.banner-text` and shows `.armed-panel` — a red eyebrow
+(`GRENADE ARMED`, or `GRENADE ARMED · OUT OF REACH`), a big countdown digit and one line of copy.
+Out of reach the whole banner goes cold grey to match the marker on the ground. **Nothing about
+the armed state floats over the battlefield any more.** Same box, same top strip, no new space.
+
+**0.04.2 — the banner collapses to the pause button.** `BANNER_OPEN=7` sim seconds from the start
+of a mission, then `.mission-header` gets a `collapsed` class: the card's background, border and
+shadow fade out and `.banner-text` fades to zero. Tapping pause expands it and pauses; unpausing
+gives it `BANNER_AFTER_PAUSE=6` more seconds and then it folds again. Both are **sim** seconds,
+so a paused game never counts down while he is reading it. It is a class toggle and two CSS
+transitions — **the HUD markup is never rebuilt for it** (see D32; that bug has eaten a tap here).
+
+**The pause button no longer moves, at all, ever.** It is `position:absolute` against the
+header's own top-right corner, so it is identical to the pixel in the open, collapsed and armed
+states at 320/390/430. The gate asserts `deepEqual` on its rect across all three.
+
+**0.04.3 — the grenade briefing pauses the war, once, ever.** The first time any living blue
+soldier is actually holding a grenade, `main.mjs` sets `primer=true; paused=true` and `hud.mjs`
+shows `.primer`, a centred card: tap to arm / tap the marker to cancel / walk away and it falls
+short. Any tap dismisses it, the war resumes, and `teach('grenade')` writes the same
+`campaign.taught` ledger the rest of the coaching uses — so it survives a reload and never
+returns. It **replaces** the old non-blocking "Tap to ARM, not to throw" card, which is gone. The
+"Hand out the grenades" card stays: that one teaches the pips, which is what gets him here.
+
+### Gates (all falsified against a build with the bug still in it)
+
+* `tools/sim.mjs` — new block *"throwing a grenade puts the rifle back in his hands; cancelling
+  does not"*: rail-wide revert, per-man revert, cancel keeps it, and an unprompted auto-lob does
+  NOT change the weapon under him. Falsified: neutering `revertToRifle` reddens it on
+  `["grenade","grenade","grenade","grenade"]`.
+* `tools/browser.mjs teach` — **13 scenarios** (was 9). Four new ones:
+  *the mission banner folds down to the pause button, and the pause button never moves*;
+  *the pause button is a 44 px target inside the top edge at every width, collapsed or not*
+  (three widths x three states);
+  *the armed banner reads at every width, and the grenade goes back to a rifle after it is
+  thrown* (three widths, plus the rail, the pips and the order hint following it);
+  *cancelling leaves the grenade in his hand, and the briefing never comes back* (including
+  across a reload).
+
+**Each one was run against a build with the bug still in it and watched go red:**
+
+| falsification | what reddened |
+|---|---|
+| `revertToRifle` neutered | *throwing it puts the rifle back in every thrower's hands at 320* — `["grenade","grenade","grenade","grenade"]` |
+| the briefing never fires | *the first grenade must pause the war to explain itself* |
+| the briefing ignores the ledger | *one tap dismisses it* (it comes straight back) |
+| `parseSave` wipes `taught` | *nor after a reload* |
+| `collapsed` forced false | *and within ten seconds it has folded away* |
+| pause button put back in the flow | *armed at 320: not in the top edge strip* |
+| armed panel floated 190 px down again | *and it lives INSIDE the mission banner* |
+| `paused`/`collapsed` put back in the rebuild signature | *collapsing must not replace the pause button in the DOM* |
+  The two existing grenade scenarios were rewritten to assert the NEW correct behaviour: the
+  countdown and the fall-short warning are read off `.armed-panel` inside `.mission-header`, and
+  the arm/cancel lesson is asserted as the paused briefing.
+
+### Two things that came out of doing it, worth keeping
+
+**The pause button is no longer part of the rebuilt markup at all.** `model.paused` has been
+taken OUT of the HUD's rebuild signature, alongside `armed` and `collapsed`. The glyph and the
+`aria-label` are written into the cached node and `.pause-label` is a permanent element toggled
+by a class. So the three states the banner can be in now produce **zero** `innerHTML` rebuilds,
+and a gate marks the live DOM node (`dataset.mark`) and requires *that* node — not an identical
+replacement — to still be there after collapsing, pausing, unpausing and re-collapsing.
+Falsified by putting `paused`/`collapsed` back in the signature: reddens immediately.
+
+**The coach card climbs into the space the banner gave back.** When the banner is collapsed and
+no telegram is up, `.coach` gets a `high` class and slides from `top:150px` to `top:88px`, and
+`#hud` gets `coach-high` which fades the kill tally out from under it. Without this the folded
+banner just left an empty strip with the lesson still hanging over the grass below it.
+
+### Everything green, this session, on ANGLE Metal
+
+```
+node tools/sim.mjs                                    OK (new 0.04.4 block)
+node tools/campaign.mjs                               OK (all six missions, unchanged)
+node tools/browser.mjs shell m2 m3 m4 m5 m6 m7 m8     OK 2 scenarios each
+node tools/browser.mjs art v1 v3 v4 v6                OK 2 scenarios each
+node tools/browser.mjs teach                          OK 13 scenarios
+node tools/release.mjs                                OK, build 0.04, 60.0 fps, p95 16.7 ms
+python3 tools/artgate.py docs/evidence/m1b-portrait.png   PASS all 7, exit 0, unedited
+```
+
+`teach` was run **five times end to end** for flake after the last code change: 13/13 every time.
+
+Production path checked by hand with no `?test=1`: zero console/network errors,
+`window.tinpotTest` is `undefined`, `window.tinpot.version` is `0.04`, and the title footer
+reads `EST. THIS MORNING · PATTERN 0.04` (`docs/evidence/v4-title-version.png`).
+
+**Two harnesses had to be corrected, both to the NEW truth rather than loosened:**
+* `m5`'s *"nothing is in the air during the arming window"* was a sky-is-empty assertion. The
+  0.04.3 briefing pauses the war for a moment, which gives the lads time to spot somebody and
+  auto-lob before he taps. It now asserts nothing has been thrown **at the point he tapped**,
+  which is the same reading the `teach` suite already used.
+* `m5` also read the reverted weapon off `window.tinpot`, which is written on the next **rAF**
+  while `advance()` returns immediately — the previous-frame trap in this file's gotcha list,
+  and it applies to `window.tinpot`, not only to DOM text. Read the snapshot `advance()` returns.
+
+### Evidence looked at (not just run)
+
+`v4-banner-open.png` · `v4-banner-collapsed.png` · `v4-banner-paused.png` ·
+`v4-collapsed-320/390/430.png` · `v4-armed-320/390/430.png` · `v4-grenade-primer.png` ·
+`v4-reverted-to-rifle.png` · `v4-cancel-keeps-grenade.png` · `v4-title-version.png`.
 
 ## 0.03 — first human playtest pass (2026-09-22, fifth relay session)
 
@@ -279,6 +391,14 @@ than the lazy one.
 
 ## Last done
 
+- 2026-09-22 (managing session, verifying 0.04): all gates re-run independently and green —
+  sim, campaign, 14 browser suites, release on build 0.04, artgate unedited. Evidence nit for
+  the next agent: `v4-collapsed-{320,390,430}.png` actually capture the **armed** banner, not the
+  collapsed one, because the sequence arms a grenade before the width sweep. The collapsed state
+  is genuinely correct — see `v4-banner-collapsed.png` — and its geometry is asserted rather than
+  eyeballed, so this is a filename problem, not a behaviour one. Worth fixing if that sweep is
+  ever touched.
+
 - 2026-09-22 (managing Opus 5 session, verifying V2 before push): the `v6` juice gate was
   **flaky — 1 failure in 3 runs** on "somebody must actually get hit". Its hit-wait loop gave the
   squad only 12x60 ticks to close the distance and land a shot. Raised to 60 iterations; 5 of 5
@@ -463,8 +583,26 @@ node tools/release.mjs
    * Grenadiers still **auto-lob** at anything in range without arming. That predates 0.03 and
      it is arguably now inconsistent with the deliberate-tap flow.
 
-1. **Put it in front of a human with a phone again.** Ask specifically whether the first two
-   minutes now teach the game, and whether the arming delay feels like thought or like lag.
+0c. **What 0.04 left undone, honestly:**
+   * The collapse is **time-based only** (7 s). It does not re-open for anything except pause
+     and the armed grenade — not for an objective change, not for the last thirty seconds of a
+     hold. If he ever wants to re-read the objective he has to pause.
+   * The **kill tally is untouched** and still sits at `top:100px` over the grass whenever no
+     high coach card is fading it out. It is 9 px text at the right edge; nobody has complained.
+   * The **briefing has only ever been dismissed by a machine.** It is a full-screen modal on a
+     game whose owner dislikes modals — it is here because he asked for a pause, and it is
+     once-ever, but it is the single most likely thing in 0.04 for him to bounce off.
+   * Grenadiers still auto-lob without arming, and **deliberately still keep the grenade when
+     they do** (D36). So a man can throw one without the player's order and the pips will still
+     say grenade. That is consistent with "the order you gave has been carried out", but it is a
+     second rule the player is never told.
+   * The armed banner shows **one** line of copy. Out of reach, it drops the "tap anywhere else
+     and they march" half to make room for the warning. Both facts are never on screen at once.
+
+1. **Put it in front of a human with a phone again.** Ask specifically: is the battlefield clear
+   now; does the folded banner ever leave him unsure what the mission is; did the one-time
+   grenade briefing help or annoy; and after a grenade goes off, is it obvious the next tap is a
+   march?
 2. Aaron's `projects.js` entry, and copy `docs/evidence/tinpot.jpg` to
    `/assets/screenshots/tinpot.jpg`. Both are deliberately not an agent's job.
 3. Optional polish that was considered and not done: true screen-space heat shimmer over burning
@@ -578,5 +716,23 @@ Append one line per decision that a later agent would otherwise re-litigate.
   title screen (`PATTERN 0.03`) and on `window.tinpot.version`, and `release.mjs` asserts both,
   so a deploy can be verified without a screenshot. Doc headings are versioned 0.01/0.02/0.03;
   **no suite, fixture, function or evidence filename was renamed to match.**
+- **D36** **A grenade reverts its thrower to the rifle, but only when the player ORDERED the
+  throw.** `stepArmed` reverts everyone it threw for; a cancel does not (he never spent it); and
+  an **auto-lob does not revert either**. Reverting on auto-lobs was built first and thrown away:
+  a grenadier lobs at the first thing inside 16 m, so selecting the grenade handed the rifle back
+  a second later with no tap from the player, which reads as the weapon changing by itself. It
+  also made a browser gate non-deterministic — a man who has just auto-lobbed is mid-cadence, so
+  he is not in the set `stepArmed` throws for. The rule is *"the order you gave has been carried
+  out"*, not *"a grenade left the map"*. The known 0.03 inconsistency (grenadiers auto-lob without
+  arming) therefore stands, deliberately.
+- **D37** **The pause button is positioned absolutely against the mission banner's own top-right
+  corner.** The banner now changes shape three ways (open / collapsed / armed) and it carries the
+  game's most-tapped control; a control that moves is a control that gets missed. Its rect is
+  asserted identical across all three states at all three widths.
+- **D38** **The armed-grenade readout takes the mission banner's space rather than new space.**
+  `.banner-text` is hidden and `.armed-panel` shown, by class. Aaron's complaint about the 0.03
+  warning card was not that it was illegible — it was that it was legible and in the way.
+- **D39** **The banner collapse timer runs on SIM seconds, not wall clock.** A paused game must
+  never count down while he is reading the objective.
 - **D19** **Perf must be measured with `-- --use-angle=metal`.** The default `cdp` launcher is
   SwiftShader; see the performance section above.

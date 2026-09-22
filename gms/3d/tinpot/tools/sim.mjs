@@ -6,7 +6,7 @@ import {WEAPONS} from '../js/data/weapons.mjs';
 import {throwGrenade} from '../js/core/combat.mjs';
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
-import {createWorld,orderMove,groundOrder,toggleUnit,tick,fortify,ARM_SECONDS,CANCEL_RADIUS} from '../js/core/world.mjs';
+import {createWorld,orderMove,groundOrder,toggleUnit,setWeapon,tick,fortify,ARM_SECONDS,CANCEL_RADIUS} from '../js/core/world.mjs';
 import {lineClear} from '../js/core/combat.mjs';
 import {centre} from '../js/core/landscape.mjs';
 import {blastTrees} from '../js/core/forestSim.mjs';
@@ -252,6 +252,49 @@ assert.equal(groundOrder(called,pin.x+1,pin.z),'disarm','a tap ON the marker cal
 assert.equal(called.armed,null);
 for(let i=0;i<60*4;i++)tick(called);
 assert.ok(!called.events.some(e=>e.type==='explosion'),'a cancelled grenade never goes off');
+// ---------------------------------------------------------------- 0.04.4 one tap, one grenade
+// Aaron: "there is confusion on if you will end up running away or throw more grenades when the
+// timer runs out". So a man who has THROWN goes back to his rifle; a man whose grenade was
+// CALLED OFF does not, because he never spent it and may want to re-aim.
+const kit=createWorld({count:4});kit.equipped=['rifle','grenade'];
+assert.ok(kit.units.every(u=>u.weapon==='rifle'),'negative control: they start with rifles');
+setWeapon(kit,'grenade');
+assert.ok(kit.units.every(u=>u.weapon==='grenade'),'a rail-wide order hands everybody a grenade');
+groundOrder(kit,kit.units[0].x,kit.units[0].z-10);
+for(let i=0;i<60*3&&kit.armed;i++)tick(kit);
+assert.equal(kit.armed,null,'the order resolved into a throw');
+assert.ok(kit.events.some(e=>e.type==='lob'),'somebody actually threw');
+assert.ok(kit.units.every(u=>u.weapon==='rifle'),'a rail-wide grenade order reverts EVERYONE who threw: '+JSON.stringify(kit.units.map(u=>u.weapon)));
+
+// Per man: only the man who threw it changes hands.
+const oneMan=createWorld({count:4});oneMan.equipped=['rifle','grenade'];
+setWeapon(oneMan,'grenade',oneMan.units[1].id);
+assert.deepEqual(oneMan.units.map(u=>u.weapon),['rifle','grenade','rifle','rifle'],'one pip, one grenadier');
+groundOrder(oneMan,oneMan.units[1].x,oneMan.units[1].z-9);
+for(let i=0;i<60*3&&oneMan.armed;i++)tick(oneMan);
+assert.equal(oneMan.armed,null);
+assert.deepEqual(oneMan.units.map(u=>u.weapon),['rifle','rifle','rifle','rifle'],'a per-man throw reverts only that man');
+
+// Cancelling leaves the grenade in his hand — this is the asymmetry Aaron asked about.
+const kept=createWorld({count:1});kept.equipped=['rifle','grenade'];setWeapon(kept,'grenade');
+const keptPin={x:kept.units[0].x,z:kept.units[0].z-10};
+assert.equal(groundOrder(kept,keptPin.x,keptPin.z),'arm');
+assert.equal(groundOrder(kept,keptPin.x+1,keptPin.z),'disarm');
+for(let i=0;i<60*4;i++)tick(kept);
+assert.equal(kept.units[0].weapon,'grenade','cancelling must NOT take the grenade off him — he never spent it');
+assert.ok(!kept.events.some(e=>e.type==='rearm'),'and nothing claimed he re-armed');
+
+// An auto-lob is NOT an order he gave, so it does NOT hand the rifle back. Reverting on an
+// auto-lob was built first and thrown away: a grenadier lobs at the first thing in range, so the
+// weapon changed by itself a second after he selected it and before he could aim anything. The
+// rule is "the order you gave has been carried out", not "a grenade left the map".
+const auto=createWorld({count:1,enemies:1,enemyZ:-6});auto.equipped=['rifle','grenade'];setWeapon(auto,'grenade');
+assert.equal(auto.units[0].weapon,'grenade','negative control: he is holding it before the enemy is in range');
+for(let i=0;i<60*8&&!auto.events.some(e=>e.type==='lob');i++)tick(auto);
+assert.ok(auto.events.some(e=>e.type==='lob'),'he spotted somebody and lobbed one unprompted');
+assert.equal(auto.units[0].weapon,'grenade','an unprompted lob must NOT change the weapon under him');
+report.tests.push({name:'throwing a grenade puts the rifle back in his hands; cancelling does not',railWide:kit.units.map(u=>u.weapon),perMan:oneMan.units.map(u=>u.weapon),cancelled:kept.units[0].weapon,autoLob:auto.units[0].weapon,autoLobRule:'unprompted lobs do not revert'});
+
 report.tests.push({name:'arming: on-target when he stays, short when he walks, cancelled only by tapping the marker',armSeconds:ARM_SECONDS,reach:+reach.toFixed(2),fellShortBy:+Math.hypot(short.tx-spot.x,short.tz-spot.z).toFixed(2)});
 
 // The split, so the mission-two coaching can retire itself the moment he has done it.
