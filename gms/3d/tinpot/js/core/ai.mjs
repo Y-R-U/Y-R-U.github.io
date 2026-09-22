@@ -9,6 +9,9 @@ import {lineClear} from './combat.mjs';
 export function safeRoute(w,u,x,z,allowFire=false){const safe=w.grid.route(u,x,z,w.fireMask);if(safe.length)return safe;if(!w.fireMaskHot)return w.grid.route(u,x,z);return allowFire?w.grid.route(u,x,z):[];}
 export function updateAI(w,dt){for(const u of w.units){if(u.team!=='red'||u.hp<=0)continue;
  if(u.panicking>w.time){u.ai='panic';continue;}
+ // Parked by the mission's holdLine (see mission.mjs). He still shoots anything that walks into
+ // his range — he simply will not come and find you until you have crossed the line.
+ if(u.holds){u.ai='holds';u.path=[];u.think=.6;continue;}
  u.think=(u.think||0)-dt;if(u.think>0)continue;u.think=.6;
  const targets=w.units.filter(v=>v.team==='blue'&&v.hp>0).sort((a,b)=>Math.hypot(a.x-u.x,a.z-u.z)-Math.hypot(b.x-u.x,b.z-u.z));const target=targets[0];if(!target)continue;
  const distance=Math.hypot(target.x-u.x,target.z-u.z),sight=u.kind==='rusher'?26:u.kind==='heavy'?21:19,hold=u.kind==='rusher'?1.4:u.kind==='heavy'?10:8,stop=hold+1;

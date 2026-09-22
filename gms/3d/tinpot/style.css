@@ -33,3 +33,34 @@
 .rotate-card p{font-size:13px;line-height:1.55;color:#d9e0c7;max-width:330px}
 .rotate-card button{margin-top:10px;min-height:46px;padding:0 18px;background:#203e33e8;color:#e9e3c4;border:1px solid #e6d9a559;border-radius:10px;pointer-events:auto;font-size:12px}
 @media(prefers-reduced-motion:reduce){.rotate-helmet{animation:none}}
+
+/* ---------------------------------------------------------------- coaching (V3)
+   Aaron's one structural complaint after the first human playtest was that the opening minute
+   teaches nothing. These are the teaching moments. Rules they all obey:
+     - top edge strip or the card strip, NEVER the middle of the battlefield;
+     - `pointer-events:none`, so nothing here can ever eat a tap;
+     - high contrast, because it has to read on a bright phone outdoors;
+     - every one of them retires itself the moment the skill has been demonstrated.
+   The coach sits where the telegram sits, and slides down out of its way when one arrives. */
+.coach{position:absolute;left:50%;transform:translate(-50%,-14px);top:max(150px,calc(env(safe-area-inset-top) + 118px));width:min(320px,84vw);padding:9px 14px 11px;text-align:center;pointer-events:none;opacity:0;background:#0c221dfa;border:1px solid var(--gold);border-radius:12px;box-shadow:0 10px 30px #04120fbb,inset 0 0 0 1px #0000004d;transition:opacity .22s ease,transform .22s ease;z-index:5}
+.coach.showing{opacity:1;transform:translate(-50%,0)}
+.eulogy.showing ~ .coach.showing{transform:translate(-50%,88px)}
+.coach .eyebrow{display:block;font-size:8px;letter-spacing:2.2px;color:var(--gold)}
+.coach strong{display:block;font-size:17px;line-height:1.15;letter-spacing:-.3px;color:#fff6d8;margin:4px 0 4px;text-shadow:0 2px 6px #04120f}
+.coach small{display:block;font-size:10.5px;line-height:1.45;letter-spacing:.3px;color:#dcead0}
+.coach.urgent{border-color:#ff6a44;background:#2a100cfa;box-shadow:0 10px 30px #1a05039e,0 0 26px #ff53281f;animation:coachpulse .8s ease-in-out infinite}
+.coach.urgent .eyebrow{color:#ff9d6e}
+.coach.urgent strong{color:#ffe0b8}
+@keyframes coachpulse{0%,100%{border-color:#ff6a44}50%{border-color:#ffc27a}}
+#hud.hidden ~ .coach{display:none}
+
+/* The pointing arrows. The unit card clips its own children, so the coached one stops. */
+.unit-card{position:relative}
+.unit-card.coached{overflow:visible;z-index:3}
+.card-arrow{position:absolute;left:50%;top:-31px;margin-left:-11px;width:22px;text-align:center;font-size:22px;line-height:22px;color:var(--gold);text-shadow:0 2px 7px #04120f,0 0 12px #f0c06e77;pointer-events:none;animation:nudge 1.05s ease-in-out infinite}
+.shop-item{position:relative}
+.shop-item.coached{border-color:var(--gold);box-shadow:0 0 0 1px #e9bf6366,0 0 18px #e9bf6333}
+.coach-arrow{position:absolute;left:50%;bottom:calc(100% + 3px);margin-left:-11px;width:22px;text-align:center;font-size:22px;line-height:22px;color:var(--gold);text-shadow:0 2px 7px #04120f;pointer-events:none;animation:nudge 1.05s ease-in-out infinite}
+.shop-coach{color:var(--gold)!important;font-weight:bold;font-size:13px!important;letter-spacing:.2px}
+@keyframes nudge{0%,100%{transform:translateY(-5px)}50%{transform:translateY(2px)}}
+@media(prefers-reduced-motion:reduce){.card-arrow,.coach-arrow{animation:none}.coach.urgent{animation:none}}

@@ -1,6 +1,14 @@
 import * as THREE from 'three';
 export function createVFX(scene){
- const active=[],stains=[],dummy=new THREE.Object3D();let last=0;
+ const active=[],stains=[],ripples=[],dummy=new THREE.Object3D();let last=0;
+ // A tap has to be visible. The first human to play this did not know that tapping moved you,
+ // so every ground order now drops a pond ripple where his thumb landed: two rings that expand
+ // and fade over ~0.7 s. Cream for a march, red for an armed grenade, grey for calling one off.
+ const ringGeo=new THREE.RingGeometry(.9,1,44);
+ function ripple(x,z,colour,r0,r1,life,delay=0){if(ripples.length>26)return;
+  const mat=new THREE.MeshBasicMaterial({color:colour,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false});
+  const mesh=new THREE.Mesh(ringGeo,mat);mesh.rotation.x=-Math.PI/2;mesh.position.set(x,.06,z);mesh.scale.setScalar(r0);mesh.renderOrder=3;
+  scene.add(mesh);ripples.push({mesh,mat,t:-delay,life,r0,r1});}
  const ball=new THREE.IcosahedronGeometry(1,0),blood=new THREE.MeshBasicMaterial({color:0x9f1744}),ash=new THREE.MeshBasicMaterial({color:0x1d1a17}),soot=new THREE.MeshBasicMaterial({color:0x2b2723,transparent:true,opacity:.55}),spark=new THREE.MeshBasicMaterial({color:new THREE.Color(6,2.4,.2)}),flash=new THREE.MeshBasicMaterial({color:new THREE.Color(5,2.6,.5)}),smoke=new THREE.MeshBasicMaterial({color:0xc6ba8d,transparent:true,opacity:.45}),brass=new THREE.MeshStandardMaterial({color:0xe2bb55,metalness:.5});
  function particle(x,y,z,vx,vy,vz,scale,life,mat,gravity=9){if(active.length>160)return;const mesh=new THREE.Mesh(ball,mat);mesh.position.set(x,y,z);mesh.scale.setScalar(scale);scene.add(mesh);active.push({mesh,vx,vy,vz,life,max:life,gravity});}
  function stain(x,z,r,burnt=false){const mesh=new THREE.Mesh(new THREE.CircleGeometry(r,11),burnt?ash:blood);mesh.rotation.x=-Math.PI/2;mesh.position.set(x,.025+stains.length*.00002,z);mesh.scale.y=.65;scene.add(mesh);stains.push(mesh);if(stains.length>256)scene.remove(stains.shift());}
@@ -13,7 +21,13 @@ export function createVFX(scene){
   particle(e.x+sx*(.5+lead),1+t*.25,e.z+sz*(.5+lead),sx*e.range*1.45,.5+t,sz*e.range*1.45,.17+t*.3,.22+t*.16,i%4?spark:soot,1.1);}}
  if(e.type==='hit'){const n=Math.min(7,2+Math.round(e.amount/14));for(let i=0;i<n;i++){const a=i*2.1+e.unit;particle(e.x,1.15,e.z,Math.cos(a)*1.9,1.7+i%3*.7,Math.sin(a)*1.9,.075+i%2*.03,.42,e.cause==='flame'?spark:blood);}if(e.amount>=18)stain(e.x,e.z,.2+Math.min(.3,e.amount/300));}
  if(e.type==='impact')particle(e.x,.2,e.z,0,.8,0,.18,.3,smoke,0);
+ if(e.type==='order'){ripple(e.x,e.z,0xf4edce,.5,3.4,.62);ripple(e.x,e.z,0xbfe2a6,.4,2.2,.5,.11);}
+ if(e.type==='arm'){ripple(e.x,e.z,0xff5a3c,.6,4.2,.55);ripple(e.x,e.z,0xffb648,.5,2.6,.45,.1);}
+ if(e.type==='disarm'){ripple(e.x,e.z,0x9fb5a6,2.6,.4,.42);for(let i=0;i<5;i++)particle(e.x,.5,e.z,Math.cos(i*1.3)*1.1,1.2,Math.sin(i*1.3)*1.1,.11,.4,smoke,3);}
  }
  for(let i=active.length-1;i>=0;i--){const p=active[i];p.life-=dt;if(p.life<=0){scene.remove(p.mesh);if(p.mesh.geometry!==ball)p.mesh.geometry.dispose();active.splice(i,1);continue;}p.vy-=p.gravity*dt;p.mesh.position.x+=p.vx*dt;p.mesh.position.y=Math.max(.04,p.mesh.position.y+p.vy*dt);p.mesh.position.z+=p.vz*dt;}
- },counts(){return {particles:active.length,stains:stains.length};}};
+ for(let i=ripples.length-1;i>=0;i--){const r=ripples[i];r.t+=dt;if(r.t<0)continue;const k=r.t/r.life;
+  if(k>=1){scene.remove(r.mesh);r.mat.dispose();ripples.splice(i,1);continue;}
+  const ease=1-(1-k)*(1-k);r.mesh.scale.setScalar(r.r0+(r.r1-r.r0)*ease);r.mat.opacity=.85*(1-k)*Math.min(1,k*6);}
+ },counts(){return {particles:active.length,stains:stains.length,ripples:ripples.length};}};
 }

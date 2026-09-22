@@ -8,7 +8,14 @@ async function click(selector){const r=await p.eval(`(()=>{const r=document.quer
 async function march(x,z){const r=await p.eval(`tinpotTest.project(${x},${z})`);assert.ok(r.x>0&&r.x<390&&r.y>0&&r.y<844,'march target is on screen');await touch(r.x,r.y);}
 async function shot(name){await p.shot(evidence+name+'.png');report.screens.push(name);}
 try{
- await p.goto(BASE+'?test=1',{width:390,height:844,deviceScaleFactor:2,mobile:true});await p.wait('window.__TINPOT_BOOTED__');await p.eval("tinpotTest.fixture('title')");await sleep(150);await click('[data-action="start"]');await shot('m9-first-orders');await click('[data-action="deploy"]');
+ await p.goto(BASE+'?test=1',{width:390,height:844,deviceScaleFactor:2,mobile:true});await p.wait('window.__TINPOT_BOOTED__');await p.eval("tinpotTest.fixture('title')");await sleep(150);
+ // Which build is actually live. Aaron reloads a deployed URL, so the version has to be
+ // checkable without a screenshot: it is one string in js/version.mjs, shown on the title
+ // screen and exposed on window.tinpot.
+ report.version=await p.eval('tinpot.version');
+ assert.match(report.version,/^\d+\.\d+$/,'a build number must be exposed: '+report.version);
+ assert.ok((await p.eval(`document.querySelector('.title-footer').textContent`)).includes(report.version),'and printed on the title screen');
+ console.log('PASS build',report.version);await click('[data-action="start"]');await shot('m9-first-orders');await click('[data-action="deploy"]');
  for(let mission=0;mission<6;mission++){
   let s=await p.eval('tinpotTest.advance(0)');assert.equal(s.mission.id,mission);await shot('m9-mission-'+(mission+1)+'-start');
   for(let i=0;i<100&&s.mode==='battle';i++){

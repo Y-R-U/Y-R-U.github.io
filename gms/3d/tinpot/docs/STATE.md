@@ -5,23 +5,133 @@
 
 ## Now
 
-**Milestone:** V1 slice shipped; the **V2 playtest pass (V1–V7) is complete**. Every box in
-`PLAN.md` is ticked except the `projects.js` entry, which is deliberately Aaron's.
+**Milestone: 0.03.** 0.01 (the shipped slice) and 0.02 (the playtest pass) are done; **0.03 —
+Aaron's first human playtest — is this session's work and every box of it is now ticked.**
+The live build number is `VERSION` in `js/version.mjs`; it prints on the title screen as
+`PATTERN 0.03` and is on `window.tinpot.version`.
 
-**Nobody has played this with their thumbs yet.** Every gate here is still a harness gate. The
-next useful thing remains a human holding a phone — and there is now a lot more to feel.
+**Versioning note:** headings are numbered 0.01 / 0.02 / 0.03 because we are at very early
+concept stage. **No code identifier was renamed** — the browser suites are still
+`node tools/browser.mjs v1 v3 v4 v6 m2…m8 art teach` and the evidence filenames are unchanged.
+
+**A human has now played it once, on a phone.** His verdict: "It looks good, and very brief test
+was fun", with one structural complaint — *the opening minute teaches nothing*. That complaint is
+what 0.03 is. It has not been in front of him again since; **the next useful thing is still a
+thumb**, specifically on the first two minutes.
 
 Green as of this session, on ANGLE Metal:
 `node tools/sim.mjs` · `node tools/campaign.mjs` · `node tools/browser.mjs`
-(`shell m2 m3 m4 m5 m6 m7 m8 art v1 v3 v4 v6`) · `node tools/release.mjs` ·
+(`shell m2 m3 m4 m5 m6 m7 m8 art v1 v3 v4 v6 teach`) · `node tools/release.mjs` ·
 `python3 tools/artgate.py docs/evidence/m1b-portrait.png` (exit 0, unedited).
 
-## V2 playtest pass — in progress (2026-09-22, fourth relay session)
+## 0.03 — first human playtest pass (2026-09-22, fifth relay session)
 
-Working `PLAN.md`'s **V2 — the playtest pass**, V1→V7 in order. Nothing above that section is
+Working `PLAN.md`'s **0.03 — first human playtest**. Nothing above that section is being touched.
+Aaron's through-line: *the opening minute teaches nothing.* Everything here is a teaching
+device; none of it makes the game safer.
+
+### What 0.03 changed
+
+**0.03.1 — room to learn.**
+`data/missions.mjs` gained two fields, on missions 1 and 2 only:
+* `enemyZ` — where the enemy line starts. Mission 1 went from `-8` (18 m from the player) to
+  `-21` (31 m); mission 2 from `-8` (11 m) to `-18` (21 m).
+* `holdLine` — a **z the player must reach** before the enemies already on the map will move at
+  all. `beginMission` stamps `u.holds=true` on every red already present; `stepMission` clears
+  it the moment any living blue soldier crosses the line; `ai.mjs` answers `u.ai='holds'` and
+  keeps `u.path` empty until then. It is a trigger on his progress, never a timer.
+  Both are `0` — roughly the sandbag line on Bramble Common (the bags sit at z ≈ -1).
+* **Wave reinforcements are deliberately NOT gated.** A hold mission still has to be held; the
+  gate only stops the men who were standing there when he arrived.
+* Measured: `campaignWorld(newCampaign())` then 20 s of `tick` with no orders leaves the squad
+  on 100 HP and both reds still at z = -20.5 with `ai:'holds'`.
+
+**0.03.2 — the tap is visible.** `orderMove` emits an `order` event and `render/vfx.mjs` drops a
+pond ripple at the point: two rings (cream + green) that expand and fade over ~0.7 s, with a red
+pair for an armed grenade and a grey contracting one for calling it off. Materials are per-ripple
+and disposed; the pool is capped at 26. `tinpot.vfx.ripples` is asserted non-zero right after a
+real CDP touch. The instruction card is described under V3.6 below — it is one shared component.
+
+**0.03.3 — the upgrade arrow.** `main.mjs firstAffordable()` picks the first unlocked, unmaxed,
+affordable offer and `screens.mjs` hangs a bouncing `▼` over that shop button plus the line
+*"Tap to upgrade units?"* in gold. It appears only from mission 2 onward, only while he has bought
+nothing at all, and retires the instant `purchase()` succeeds.
+
+**0.03.4 — the armed grenade.** `world.mjs` now owns `w.armed` and `stepArmed(w)`:
+* `groundOrder` returns `'arm' | 'move' | 'disarm'` so the UI can tell what a tap actually did.
+* Tap with a grenade selected → `w.armed={x,z,ready:time+2.4}`; a red ring pulses on the ground
+  with a disc inside it that drains away as the clock runs down.
+* **Tapping elsewhere does NOT cancel.** It is a march order and the grenade still goes, thrown
+  by `throwGrenade` from wherever the man is standing — which already clamps to the weapon's
+  16 m reach, so walking away makes it fall short. Measured: 16.00 m thrown, 7.22 m short.
+* Cancelling is a deliberate tap inside `CANCEL_RADIUS` (2.2 m ≈ a 66 px target at this camera).
+  Outside that radius the same tap is a march, and there is a negative control for it.
+* If every thrower is mid-cadence the order **waits** rather than evaporating; if they are all
+  dead or stood down it clears with a `disarm` event.
+* Selecting the grenade shows a reach ring for 2.6 s, and again for the whole arming window.
+* **The out-of-reach state is visible before it lands**: the marker goes cold grey and the card
+  reads *"You have walked out of range. It will fall short."* Evidence
+  `docs/evidence/v3-falls-short-warning.png`.
+* Friendly fire is untouched. Nothing here defuses it; it only makes it legible.
+* Gotcha worth keeping: grenadiers still **auto-lob** at anything in range, so a harness cannot
+  assert "nothing is in the air" during the arming window. Assert on `grenadeTargets` near the
+  tapped point instead — `tools/browser.mjs teach` does.
+* Render gotcha: `terrain.mjs` only ever RAISES the forest floor, so a 16 m ring drawn at y=0.06
+  is buried outside the corridor and reads as a dashed bug. The armed marker and the reach ring
+  are UI affordances and are drawn with `depthTest:false` at renderOrder 6/7.
+
+**0.03.5 — `'Onward, unfortunately →'` is now `'Next mission →'`.** Every other joke is untouched,
+and the `teach` suite asserts the exact new string.
+
+**0.03.6 — the split.** `toggleUnit` records `w.split` (0 → 1 when a man is stood down → 2 when he
+is brought back). Mission 2 gets a card plus a gold `▼` hanging over the card it wants tapped;
+the card's own text changes to *"Now bring him back"* after the first toggle, and the whole thing
+retires at `w.split===2`.
+
+**The coaching component itself.** `hud.mjs` appends one `.coach` element beside the existing
+`.eulogy` — deliberately NOT part of the HUD markup, because rebuilding that innerHTML mid-gesture
+eats taps (the bug that cost the m5 rail gate). Priority: the live armed countdown outranks
+everything, then move → grenades → split. `campaign.taught` is the ledger, persisted in the save,
+so nothing he has already demonstrated is ever explained to him again. It is `pointer-events:none`
+and asserted inside the top edge strip at 320/390/430.
+
+**Versioning and the build stamp (Aaron's second note).** `js/version.mjs` exports `VERSION`
+and is the only place to bump it. It prints on the title screen as `EST. THIS MORNING · PATTERN
+0.03` and is exposed as `window.tinpot.version`, asserted by both `browser.mjs teach` and
+`release.mjs` so a deploy can be checked without a screenshot.
+
+**New test hooks** (test build only): `tinpotTest.mission(n,credits)` deploys straight into a
+mission, `tinpotTest.taught()` reads the coaching ledger, and the snapshot gained `armed`,
+`split`, `coach`, `markers`, `grenadeTargets`, `explosions`, `version` and `vfx.ripples`.
+
+**New gates, each falsified against a build with the bug still in it:**
+* `tools/sim.mjs` — the hold gate, the 20 s idle survival with its negative control, the
+  arming semantics (on target when he stays, short when he walks, only the marker cancels), and
+  the split ledger. Reverting `holdLine` reddens *"mission one parks the enemy line"*; reverting
+  the arming reddens *"nothing is in the air during the arming window"*. Both checked.
+* `tools/browser.mjs teach` — nine scenarios (the suite name is `teach`, not a version).
+  Run four times end to end for flake: 9/9 every time.
+
+**Also checked by hand, on the production path (no `?test=1`):** the page boots with zero console
+or network errors, `window.tinpotTest` is `undefined` (test hooks are gated on the query string),
+and the title footer reads `EST. THIS MORNING · PATTERN 0.03`. Evidence
+`docs/evidence/v3-title-version.png`.
+
+**Honest verdict on whether the first two minutes now teach the game.** Yes for the three things
+Aaron actually tripped over — tapping to move, the card toggle, and that a grenade is a
+committed order you can walk away from — and each of those is now stated in words, shown with a
+mark on the ground, and retired the moment he has done it. What is still untaught: fire, the
+flamer, and the fact that a man left holding keeps firing (the card says HOLDING, the coach says
+"keeps shooting", but nothing demonstrates it). And all of this remains a machine's opinion
+about legibility; it has not been in front of a thumb. Forcing `coachModel()` to null reddens the first;
+  forcing `reachRing.visible=false` reddens the grenade one. Both checked.
+
+## 0.02 — the playtest pass (2026-09-22, fourth relay session)
+
+Working `PLAN.md`'s **0.02 — the playtest pass**, 0.02.1 → 0.02.7 in order. Nothing above that section is
 being touched.
 
-### V1 — fire damage: core done, sim green, browser not yet reshot
+### 0.02.1 — fire damage (suite: `node tools/browser.mjs v1`)
 
 `js/core/forestSim.mjs` is now the fire *field*, not just the spread automaton:
 
@@ -55,7 +165,7 @@ the player can march men into a firestorm                         crossed a 9-tr
 
 Every one of those has a negative control beside it in `tools/sim.mjs`.
 
-### V2 — instant retry: done
+### 0.02.2 — instant retry: done
 
 A losing debrief now leads with **"Again. Nobody saw →"** and keeps "Send in the replacements"
 as the secondary. `markDeployment(c)` snapshots roster, slots, credits, upgrades, maps and the
@@ -73,7 +183,7 @@ really does bury him. Evidence: `docs/evidence/v2-defeat-retry.png`.
 fetch → `net::ERR_ABORTED`, which the release gate counts as a console/network error. Audio
 elements are now pooled one per track and never have their src cleared.
 
-### V3 — flamethrower: done
+### 0.02.3 — flamethrower: done (suite: `node tools/browser.mjs v3`)
 
 `WEAPONS.flamer` — range 6.4 m, `cone` 0.46 rad half-angle, 0.4 s cadence, 8.5 damage a lick.
 No projectile and no accuracy roll: `spray()` in `combat.mjs` hits *everything* in the wedge
@@ -93,7 +203,7 @@ hint clear of the taller cards. Without that the lowest rail button sat on top o
 card's pips and ate the tap. Measured clear at all three widths; release re-run green with a
 flamer carried through missions 4–6.
 
-### V4 — three kinds of enemy: done
+### 0.02.4 — three kinds of enemy: done (suite: `node tools/browser.mjs v4`)
 
 `data/soldiers.mjs` is now a stat block per type and `units.applyKind(u,kind)` applies it;
 `data/missions.mjs` carries a `mix` per mission and per wave, cycled by `pickKind(mix,i)`.
@@ -128,7 +238,7 @@ gate:
 Final: all six missions win on both loadouts with the naive harness pilot, mission 4 being the
 pinch (1 man lost with rifles only). `tools/campaign.mjs` and `tools/release.mjs` both green.
 
-### V5 — the emplacement: done
+### 0.02.5 — the emplacement: done
 
 `fortify(w)` in `core/world.mjs` builds nine sandbag works plus a mortar pit, laid out relative
 to `centre(-1, map)` so they sit in the corridor however it bends (D18). They are **low cover**:
@@ -144,7 +254,7 @@ the open. Territory was already persisted by `finishMission`; the sim now assert
 negative control that nothing is dug in on the first visit and that trees you did not burn are
 still trees.
 
-### V6 — juice: done
+### 0.02.6 — juice: done (suite: `node tools/browser.mjs v6`)
 
 * `platform/haptics.mjs` — 11 ms on a kill, 46 ms on a grenade, 26/40/70 on a flamer cooking
   off, and a triple stutter when one of your own catches light. Feature-checked, try/catch'd,
@@ -158,7 +268,7 @@ still trees.
   lives in the top edge strip, is `pointer-events:none`, and is asserted by `browser.mjs v6` to
   sit above 42% of screen height so it never covers the battlefield.
 
-### V7 — landscape: done (the friendly card)
+### 0.02.7 — landscape: done (the friendly card)
 
 `@media(orientation:landscape)` puts up a full-screen "Turn me round." card with a tipping
 helmet. Pure CSS, so it works even if the module never boots. A `Carry on sideways anyway`
@@ -325,7 +435,7 @@ node tools/release.mjs
 
 ## Next
 
-0. **What the V2 pass left undone, honestly:**
+0. **What 0.02 left undone, honestly:**
    * Difficulty. The harness pilot now wins all six missions losing **one** man in total (on
      *A Slight Detour*, rifles only). That pilot plays better than a thumb does, but if Aaron
      finds it soft the levers are `heavy.damageBonus`, the `mix`/`count` in `data/missions.mjs`,
@@ -338,7 +448,23 @@ node tools/release.mjs
    * Grenade and flamer ids diverge by *id only* across a save/reload (`eventId` is not in the
      snapshot). Positions, lives and propagation are identical; asserted above.
 
-1. **Put it in front of a human with a phone.** Every gate in this repo is mechanical.
+0b. **What 0.03 left undone, honestly:**
+   * The **reach ring is weak**. A 16 m grenade reach is nearly the whole 26 m viewport, so the
+     ring reads as a faint line across the screen rather than a circle. It is correct and it is
+     gated, but if Aaron does not notice it, the cheap fix is a shorter grenade reach (which is
+     also a balance change) rather than a louder ring.
+   * Coaching is **per campaign, not per player**: `campaign.taught` lives in the save, so
+     starting a new campaign teaches everything again. That is probably right, but it has not
+     been asked about.
+   * There is **no coaching for fire or the flamer**, which are the two things most likely to
+     kill his own men after grenades.
+   * The arming delay is **2.4 s + the 1.7 s grenade fuse**, so tap-to-bang is ~4 s. It has only
+     been felt by a harness. If it drags, `ARM_SECONDS` in `js/core/world.mjs` is the one knob.
+   * Grenadiers still **auto-lob** at anything in range without arming. That predates 0.03 and
+     it is arguably now inconsistent with the deliberate-tap flow.
+
+1. **Put it in front of a human with a phone again.** Ask specifically whether the first two
+   minutes now teach the game, and whether the arming delay feels like thought or like lag.
 2. Aaron's `projects.js` entry, and copy `docs/evidence/tinpot.jpg` to
    `/assets/screenshots/tinpot.jpg`. Both are deliberately not an agent's job.
 3. Optional polish that was considered and not done: true screen-space heat shimmer over burning
@@ -348,8 +474,14 @@ node tools/release.mjs
 
 ## Known broken / open questions
 
-- **Nothing is known broken.** `node tools/sim.mjs`, `node tools/browser.mjs <shell|m2..m8|art>`
-  and `node tools/release.mjs` are all green as of this session, on ANGLE Metal.
+- **Nothing is known broken.** `node tools/sim.mjs`, `node tools/campaign.mjs`,
+  `node tools/browser.mjs <shell|m2..m8|art|v1|v3|v4|v6|teach>`, `node tools/release.mjs` and
+  `python3 tools/artgate.py docs/evidence/m1b-portrait.png` are all green on ANGLE Metal as of
+  the 0.03 session. `teach` was run 4x for flake and was 9/9 every time.
+- **The HUD is written on the next rAF, not inside `advance()`.** A gate that advances the sim
+  and then immediately reads DOM text gets the *previous* frame's text. This bit the
+  falls-short scenario once; the fix is `await sleep(150)` after the advance, and it is the
+  first thing to suspect in a new UI gate that reads a countdown.
 - The `art` suite's `minPx` assertion filters to trees ≥3 m tall. Bushes are 1–3 m and legitimately
   project only 4–5 px, which is not evidence about the camera.
 - `tinpotTest.advance(n)` runs sim steps synchronously while the rAF loop is *also* stepping, so
@@ -424,5 +556,27 @@ Append one line per decision that a later agent would otherwise re-litigate.
   triggers every time.
 - **D28** **Landscape gets a card, not a camera.** The corridor is 26 m x 55 m by design; a
   landscape camera shows the map edge and the empty world past it.
+- **D29** **A grenade tap ARMS; only a tap on the marker cancels.** Tapping elsewhere is a march
+  order and the grenade still goes, thrown from wherever the man ends up — so walking away makes
+  it fall short. That asymmetry is the design: it makes abandoning your own grenade a decision
+  rather than an accident. `ARM_SECONDS=2.4`, `CANCEL_RADIUS=2.2` m (~66 px at this camera).
+- **D30** **Nothing in 0.03 makes the game safer.** Friendly fire, fire damage and the enemy mix
+  are untouched. Every item is legibility: the danger stays, the surprise goes.
+- **D31** **`campaign.taught` is the coaching ledger and lives in the save.** A lesson is shown
+  until the player has DONE the thing and then never again. Anything new that teaches must
+  retire itself the same way, or it becomes nagging.
+- **D32** **The coach card is a sibling of `#hud`, not part of its markup.** `hud.mjs` rebuilds
+  its innerHTML only when the *structure* changes, because rebuilding mid-gesture eats taps;
+  the coach changes every frame while a grenade is armed, so it must stay outside that markup.
+- **D33** **The armed marker and the reach ring draw with `depthTest:false`.** `terrain.mjs`
+  only ever RAISES the forest floor, so a wide ring at ground level is buried outside the
+  corridor and reads as a dashed bug. They are UI affordances, so they go on top.
+- **D34** **`holdLine` and `enemyZ` are on missions 1 and 2 only.** They are a teaching device,
+  not a difficulty change, and `tools/sim.mjs` asserts missions 3-6 have no `holdLine`. Wave
+  reinforcements are never gated — a hold mission still has to be held.
+- **D35** **The build number is one string, `VERSION` in `js/version.mjs`.** It prints on the
+  title screen (`PATTERN 0.03`) and on `window.tinpot.version`, and `release.mjs` asserts both,
+  so a deploy can be verified without a screenshot. Doc headings are versioned 0.01/0.02/0.03;
+  **no suite, fixture, function or evidence filename was renamed to match.**
 - **D19** **Perf must be measured with `-- --use-angle=metal`.** The default `cdp` launcher is
   SwiftShader; see the performance section above.

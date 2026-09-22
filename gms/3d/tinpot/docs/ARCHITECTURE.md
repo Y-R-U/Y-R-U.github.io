@@ -41,6 +41,8 @@ gms/3d/tinpot/
 
   js/
     main.mjs          boot, the frame loop, wiring between sim / render / ui
+    version.mjs       THE build number. One string. Shown on the title screen and on
+                      `window.tinpot.version`; bump it here and nowhere else.
 
     core/             PURE. No three, no DOM, no window. Node imports these directly.
       rng.mjs         seeded deterministic RNG (missions are reproducible)
@@ -87,8 +89,12 @@ gms/3d/tinpot/
 
   tools/
     cdp.mjs           raw Chrome DevTools Protocol client (copy sunwake's)
-    browser.mjs       headless screenshot + real-touch interaction suite
+    browser.mjs       headless screenshot + real-touch interaction suite. The suite name is a
+                      POSITIONAL argument: shell m2..m8 art v1 v3 v4 v6 teach
     sim.mjs           headless balance harness — runs core/world.mjs with no browser
+    campaign.mjs      plays the whole campaign headlessly; the two-second balance loop
+    release.mjs       the ship gate: every mission by touch at 320/390/430, zero errors
+    artgate.py        mechanical art gate, pure stdlib. Do not edit its thresholds.
 
   docs/
     BRIEF.md          what the game is
@@ -126,9 +132,19 @@ do not serve this folder alone.** The game is at
 
 ```sh
 node tools/sim.mjs                       # headless balance + determinism
-~/.claude/bin/cdp start --port 9223
-node tools/browser.mjs                   # screenshots + real CDP touch
+node tools/campaign.mjs                  # plays all six missions with no browser at all
+~/.claude/bin/cdp start --port 9223 -- --use-angle=metal
+node tools/browser.mjs teach             # screenshots + real CDP touch; SUITE IS POSITIONAL
+node tools/release.mjs                   # the whole campaign by touch at three phone widths
+python3 tools/artgate.py docs/evidence/m1b-portrait.png
 ```
+
+Two traps that have each cost a session:
+
+* **`--use-angle=metal` is not optional.** The `cdp` launcher hardcodes swiftshader, which
+  software-renders this game at ~9 fps and makes every timing-based gate flaky.
+* **The suite is a positional argument.** `node tools/browser.mjs v1`. Passing `--suite v1`
+  silently runs only the generic boot scenario and prints PASS.
 
 Keep the cdp launcher and the browser run in **one shell execution** separated by a newline —
 child-process cleanup otherwise kills Chrome between calls. Disable cache in the driver before

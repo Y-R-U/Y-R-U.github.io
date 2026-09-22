@@ -6,7 +6,7 @@ import {WEAPONS} from '../js/data/weapons.mjs';
 import {throwGrenade} from '../js/core/combat.mjs';
 import assert from 'node:assert/strict';
 import {writeFile} from 'node:fs/promises';
-import {createWorld,orderMove,tick,fortify} from '../js/core/world.mjs';
+import {createWorld,orderMove,groundOrder,toggleUnit,tick,fortify,ARM_SECONDS,CANCEL_RADIUS} from '../js/core/world.mjs';
 import {lineClear} from '../js/core/combat.mjs';
 import {centre} from '../js/core/landscape.mjs';
 import {blastTrees} from '../js/core/forestSim.mjs';
@@ -191,6 +191,74 @@ assert.ok(second.works&&second.works.length>=9,'the emplacement you won is stand
 assert.ok(second.trees[3].dead&&second.trees[7].dead,'and so are the burn scars');
 assert.equal(second.trees[4].dead,false,'negative control: trees you did not burn are still trees');
 report.tests.push({name:'a won mission leaves its emplacement and its burn scars on the map',works:second.works.length,scars:second.trees.filter(t=>t.dead).length});
+
+
+// ---------------------------------------------------------------- V3.1 room to learn
+// The first human to play this was under fire before he had worked out that tapping moves you.
+// Missions one and two now start the enemy a long way off and park him there until the player
+// has walked as far as the sandbag line. Missions three to six get neither.
+const quiet=campaignWorld(newCampaign());
+assert.ok(quiet.units.filter(u=>u.team==='red').every(u=>u.holds),'mission one parks the enemy line');
+const gap=Math.min(...quiet.units.filter(u=>u.team==='red').map(r=>Math.hypot(r.x-quiet.units[0].x,r.z-quiet.units[0].z)));
+assert.ok(gap>26,'and starts it a long way off: '+gap.toFixed(1)+' m');
+for(let i=0;i<60*20;i++)tick(quiet);
+assert.ok(quiet.units.filter(u=>u.team==='blue').every(u=>u.hp===u.maxHp),'a player who does nothing for 20 s in mission one is untouched');
+assert.ok(quiet.units.filter(u=>u.team==='red').every(u=>u.ai==='holds'),'because nobody came looking for him');
+// Negative control: unpark exactly the same fight and the same twenty seconds costs him blood.
+const noisy=campaignWorld(newCampaign());for(const u of noisy.units)if(u.team==='red'){u.holds=false;u.alerted=true;}
+for(let i=0;i<60*20;i++)tick(noisy);
+assert.ok(noisy.units.filter(u=>u.team==='blue').some(u=>u.hp<u.maxHp),'negative control: without the gate he is being shot at inside 20 s');
+// And it is a trigger on his progress, not a timer: walking up to the line releases them.
+const woken=campaignWorld(newCampaign());orderMove(woken,woken.units[0].x,-1);
+for(let i=0;i<60*12;i++)tick(woken);
+assert.ok(woken.units.filter(u=>u.team==='red').every(u=>!u.holds),'crossing the hold line releases them');
+assert.ok(woken.units.filter(u=>u.team==='red').some(u=>u.z>quiet.units.filter(v=>v.team==='red')[0].z+1),'and then they actually advance');
+// Missions three to six are untouched. This is a teaching device, not a difficulty change.
+for(const m of MISSIONS.slice(2))assert.equal(m.holdLine,undefined,m.title+' must not be gated');
+report.tests.push({name:'missions one and two give a beginner room to learn',startGap:+gap.toFixed(1),idleHP:quiet.units.filter(u=>u.team==='blue').map(u=>u.hp),controlHP:noisy.units.filter(u=>u.team==='blue').map(u=>+u.hp.toFixed(1))});
+
+// ---------------------------------------------------------------- V3.4 the armed grenade
+// His first grenade killed one of his own men. The danger stays; the surprise does not.
+const straight=createWorld({count:1});straight.units[0].weapon='grenade';
+const mark={x:straight.units[0].x,z:straight.units[0].z-8};
+assert.equal(groundOrder(straight,mark.x,mark.z),'arm','a grenade tap arms rather than throws');
+assert.ok(straight.armed&&!straight.grenades.length,'negative control: nothing is in the air during the arming window');
+assert.ok(straight.armed.ready-straight.time>2&&straight.armed.ready-straight.time<3.01,'2-3 s of countdown, got '+ARM_SECONDS);
+for(let i=0;i<60*3;i++)tick(straight);
+const onTarget=straight.events.filter(e=>e.type==='lob').at(-1);
+assert.ok(Math.hypot(onTarget.tx-mark.x,onTarget.tz-mark.z)<.35,'standing still, it lands where he tapped');
+
+// Tapping elsewhere is a MARCH, not a cancel, and the grenade still goes — from wherever he is.
+const away=createWorld({count:1});const thrower=away.units[0];thrower.weapon='grenade';
+const spot={x:thrower.x,z:thrower.z-15};
+assert.equal(groundOrder(away,spot.x,spot.z),'arm');
+assert.equal(groundOrder(away,thrower.x,thrower.z+9),'move','tapping elsewhere while armed is a march order');
+assert.ok(away.armed,'and it does NOT call the grenade off — that asymmetry is the whole design');
+for(let i=0;i<60*3;i++)tick(away);
+assert.equal(away.armed,null,'the clock ran out and it went anyway');
+const short=away.events.filter(e=>e.type==='lob').at(-1);
+const reach=Math.hypot(short.tx-short.x,short.tz-short.z);
+assert.ok(Math.abs(reach-WEAPONS.grenade.range)<.25,'he threw as far as he could: '+reach.toFixed(2)+' m');
+assert.ok(Math.hypot(short.tx-spot.x,short.tz-spot.z)>3,'and it fell short of the marker rather than teleporting to it');
+assert.ok(short.z>spot.z+6,'because he had walked away from it');
+
+// Cancelling is a deliberate tap on the marker itself.
+const called=createWorld({count:1});called.units[0].weapon='grenade';
+const pin={x:called.units[0].x,z:called.units[0].z-10};
+groundOrder(called,pin.x,pin.z);
+assert.equal(groundOrder(called,pin.x+CANCEL_RADIUS+1.2,pin.z),'move','negative control: a tap outside the marker is still a march');
+assert.ok(called.armed,'and it did not cancel');
+assert.equal(groundOrder(called,pin.x+1,pin.z),'disarm','a tap ON the marker calls it off');
+assert.equal(called.armed,null);
+for(let i=0;i<60*4;i++)tick(called);
+assert.ok(!called.events.some(e=>e.type==='explosion'),'a cancelled grenade never goes off');
+report.tests.push({name:'arming: on-target when he stays, short when he walks, cancelled only by tapping the marker',armSeconds:ARM_SECONDS,reach:+reach.toFixed(2),fellShortBy:+Math.hypot(short.tx-spot.x,short.tz-spot.z).toFixed(2)});
+
+// The split, so the mission-two coaching can retire itself the moment he has done it.
+const pair=createWorld({count:2});
+assert.equal(pair.split,0);toggleUnit(pair,1);assert.equal(pair.split,1,'one man peeled off');
+toggleUnit(pair,1);assert.equal(pair.split,2,'and brought back');
+report.tests.push({name:'toggling a man out and back in is observable, so the lesson can retire'});
 
 const money=newCampaign();money.credits=500;assert.equal(purchase(money,'armour'),false);assert.equal(money.credits,500);money.mission=1;assert.equal(purchase(money,'armour'),true);assert.equal(money.credits,430);assert.equal(purchase(money,'slots'),false);money.mission=2;assert.equal(purchase(money,'slots'),true);assert.equal(purchase(money,'slots'),false);money.credits=0;assert.equal(purchase(money,'rifle'),false);report.tests.push({name:'economy rejects locked, maxed and unaffordable purchases'});
 await writeFile(new URL('../docs/evidence/sim.json',import.meta.url),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));

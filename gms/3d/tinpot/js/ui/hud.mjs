@@ -9,12 +9,16 @@ const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 // Losing a named man gets a beat of its own: a small telegram under the mission banner. It sits
 // in the top edge strip, never in the middle of the battlefield, and never takes a tap.
 const QUIPS=['He had plans.','Posthumously adequate.','The paperwork will miss him.','A good lad, apparently.','He owed the mess three shillings.','Survived by his helmet.','Remembered, briefly.','His mother will be told something.'];
+// The coaching card. One at a time, top edge strip only, `pointer-events:none`, and every one
+// of them retires the moment the player has demonstrated the skill (see `taught` in save.mjs).
+// It is a separate element rather than part of the HUD markup on purpose: rebuilding the HUD's
+// innerHTML mid-gesture eats taps, and this thing changes far more often than the HUD structure.
 export function createHUD(root,send){
- let signature='',refs=null,plaque=null;
+ let signature='',refs=null,plaque=null,coach=null;
  root.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   send({type:b.dataset.action,id:b.dataset.id===undefined?null:Number(b.dataset.id),weapon:b.dataset.weapon});});
 
- function markup(model){return `<header class="mission-header"><div><div class="eyebrow">${escape(model.location||'BRAMBLE COMMON')} <span>• ${model.time}s</span></div><strong>${escape(model.objective||'Take a very small stroll')}</strong></div><button class="pause" data-action="pause" aria-label="${model.paused?'Resume':'Pause'}">${model.paused?'▶':'Ⅱ'}</button></header><div class="tally">${model.kills} ENEMY DOWN <span> / ${model.losses} OURS</span></div><div class="order-hint">${escape(model.hint||'TAP GROUND TO MARCH · THE LADS AIM')}</div><nav class="weapon-rail" aria-label="Squad weapons">${[...model.equipped].reverse().map(id=>`<button data-action="weapon" data-weapon="${id}" class="rail-button ${model.units.every(u=>u.weapon===id)?'selected':''}" aria-label="All soldiers: ${WEAPONS[id]?.name||id}"><b>${WEAPONS[id]?.icon||'●'}</b><small>${WEAPONS[id]?.name||id}</small></button>`).join('')}</nav><section class="unit-cards" aria-label="Squad">${model.units.map(u=>`<article class="unit-card ${u.active?'active':'holding'} ${u.hp<=0?'dead':''}"><div class="weapon-pips">${model.equipped.map(id=>`<button data-action="weapon" data-id="${u.id}" data-weapon="${id}" class="pip ${u.weapon===id?'selected':''}" aria-label="${escape(u.name)}: ${WEAPONS[id]?.name||id}">${WEAPONS[id]?.icon||'●'}</button>`).join('')}</div><button class="unit-toggle" data-action="toggle" data-id="${u.id}" ${u.hp<=0?'disabled':''} aria-pressed="${u.active}" aria-label="${escape(u.name)} ${u.active?'hold position':'join orders'}"><span class="helmet-icon">${u.hp<=0?'✝':'⏜'}</span><strong>${escape(u.name.replace(/^(Pvt\.|Cpl\.|Sgt\.) /,''))}</strong><span class="health"><i style="width:${u.hp/u.maxHp*100}%"></i></span><small>${u.hp<=0?'POSTHUMOUS':u.active?'WITH YOU':'HOLDING'}</small></button></article>`).join('')}</section>${model.paused?'<div class="pause-label">WAR ON TEA BREAK</div>':''}`;}
+ function markup(model){return `<header class="mission-header"><div><div class="eyebrow">${escape(model.location||'BRAMBLE COMMON')} <span>• ${model.time}s</span></div><strong>${escape(model.objective||'Take a very small stroll')}</strong></div><button class="pause" data-action="pause" aria-label="${model.paused?'Resume':'Pause'}">${model.paused?'▶':'Ⅱ'}</button></header><div class="tally">${model.kills} ENEMY DOWN <span> / ${model.losses} OURS</span></div><div class="order-hint">${escape(model.hint||'TAP GROUND TO MARCH · THE LADS AIM')}</div><nav class="weapon-rail" aria-label="Squad weapons">${[...model.equipped].reverse().map(id=>`<button data-action="weapon" data-weapon="${id}" class="rail-button ${model.units.every(u=>u.weapon===id)?'selected':''}" aria-label="All soldiers: ${WEAPONS[id]?.name||id}"><b>${WEAPONS[id]?.icon||'●'}</b><small>${WEAPONS[id]?.name||id}</small></button>`).join('')}</nav><section class="unit-cards" aria-label="Squad">${model.units.map(u=>`<article class="unit-card ${u.active?'active':'holding'} ${u.hp<=0?'dead':''} ${model.arrow===u.id?'coached':''}">${model.arrow===u.id?'<span class="card-arrow" aria-hidden="true">▼</span>':''}<div class="weapon-pips">${model.equipped.map(id=>`<button data-action="weapon" data-id="${u.id}" data-weapon="${id}" class="pip ${u.weapon===id?'selected':''}" aria-label="${escape(u.name)}: ${WEAPONS[id]?.name||id}">${WEAPONS[id]?.icon||'●'}</button>`).join('')}</div><button class="unit-toggle" data-action="toggle" data-id="${u.id}" ${u.hp<=0?'disabled':''} aria-pressed="${u.active}" aria-label="${escape(u.name)} ${u.active?'hold position':'join orders'}"><span class="helmet-icon">${u.hp<=0?'✝':'⏜'}</span><strong>${escape(u.name.replace(/^(Pvt\.|Cpl\.|Sgt\.) /,''))}</strong><span class="health"><i style="width:${u.hp/u.maxHp*100}%"></i></span><small>${u.hp<=0?'POSTHUMOUS':u.active?'WITH YOU':'HOLDING'}</small></button></article>`).join('')}</section>${model.paused?'<div class="pause-label">WAR ON TEA BREAK</div>':''}`;}
 
  return {update(model){
   const hidden=model.hidden||false;
@@ -24,9 +28,15 @@ export function createHUD(root,send){
   plaque.classList.toggle('showing',!!e);
   if(e&&plaque.dataset.key!==String(e.key)){plaque.dataset.key=String(e.key);
    plaque.innerHTML=`<span class="eyebrow">A TELEGRAM</span><strong>${escape(e.name)}</strong><small>${e.kills} kill${e.kills===1?'':'s'} · ${escape(QUIPS[e.key%QUIPS.length])}</small>`;}
+  if(!coach){coach=document.createElement('div');coach.className='coach';coach.setAttribute('aria-live','polite');(root.parentNode||document.body).appendChild(coach);}
+  const c=hidden?null:model.coach;
+  coach.classList.toggle('showing',!!c);
+  coach.classList.toggle('urgent',!!c&&c.tone==='red');
+  if(c){const html=`<span class="eyebrow">${escape(c.eyebrow)}</span><strong>${escape(c.title)}</strong>${c.lines.map(l=>`<small>${escape(l)}</small>`).join('')}`;
+   if(coach.dataset.sig!==html){coach.dataset.sig=html;coach.innerHTML=html;}}
   root.classList.toggle('kit3',(model.equipped||[]).length>=3);
   if(hidden){signature='';refs=null;return;}
-  const shape=JSON.stringify([model.location,model.objective,model.hint,model.equipped,model.paused,
+  const shape=JSON.stringify([model.location,model.objective,model.hint,model.equipped,model.paused,model.arrow,
    model.units.map(u=>[u.id,u.name,u.active,u.weapon,u.hp<=0])]);
   if(shape!==signature){
    signature=shape;root.innerHTML=markup(model);

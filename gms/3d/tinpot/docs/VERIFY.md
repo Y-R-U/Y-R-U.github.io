@@ -215,3 +215,53 @@ Release campaign result (harness pilot, flamer carried from mission 4):
 all six won, 0 men lost. Headless `tools/campaign.mjs` with rifles only loses 1 man on
 *A Slight Detour*. Perf unchanged: 60.00 fps, p95 16.7 ms, 362 calls, 276 k triangles at
 390x844 DPR 2 with a 4x CPU throttle.
+
+---
+
+## 0.03 — first human playtest (Aaron, on a phone) — all six items
+
+**Version numbering note:** the doc headings are now `0.01` (the shipped slice, M0–M9), `0.02`
+(the playtest pass) and `0.03` (this). **No code identifier changed** — the browser suites are
+still invoked as `node tools/browser.mjs v1`, `v3`, `v4`, `v6`, `m2`…`m8`, `art` and the new
+`teach`, and every evidence filename is unchanged. The live build number is `VERSION` in
+`js/version.mjs`, printed on the title screen as `PATTERN 0.03` and exposed as
+`window.tinpot.version`; `release.mjs` asserts both.
+
+Commands, all green on ANGLE Metal
+(`~/.claude/bin/cdp start --port 9223 -- --use-angle=metal`):
+
+```
+node tools/sim.mjs
+node tools/campaign.mjs
+node tools/browser.mjs <shell|m2|m3|m4|m5|m6|m7|m8|art|v1|v3|v4|v6|teach>
+node tools/release.mjs
+python3 tools/artgate.py docs/evidence/m1b-portrait.png      # exit 0, thresholds unedited
+```
+
+| gate | what it proves | evidence |
+|---|---|---|
+| `sim.mjs` room-to-learn block | mission one's enemy line starts **31.1 m** away and is parked; 20 s of doing nothing leaves the squad on **100 HP**; the same fight unparked costs him blood (**83.8 HP**); crossing the line releases them and they advance; missions 3–6 have no `holdLine` | `docs/evidence/sim.json` |
+| `sim.mjs` arming block | standing still it lands where he tapped (<0.35 m); walking away it is thrown **16.00 m** and falls **7.22 m short**; a tap outside `CANCEL_RADIUS` is a march and does not cancel; a tap on the marker cancels and nothing ever explodes there | `sim.json` |
+| `browser.mjs teach` #1 | "Tap to move to location" is on screen at boot, `pointer-events:none`, bottom at 28% of screen height; a real CDP touch leaves a ripple and the card retires | `v3-coach-move.png`, `v3-ripple.png` |
+| `browser.mjs teach` #2 | 20 s of mission one with no input at all: every man still on full HP, mission still active | `v3-idle-20s.png` |
+| `browser.mjs teach` #3 | selecting the grenade shows the reach ring and the arm/cancel/move card; a tap arms (marker on the ground, nothing thrown at it); a tap elsewhere marches and does **not** cancel; a tap on the marker does | `v3-coach-grenade-kit.png`, `v3-reach-ring.png`, `v3-armed.png`, `v3-cancelled.png` |
+| `browser.mjs teach` #4 | walk away from an armed grenade and the marker goes **cold grey** and the card reads "You have walked out of range. It will fall short." *before* it lands; it then lands short and within one man's throw | `v3-falls-short-warning.png`, `v3-falls-short.png` |
+| `browser.mjs teach` #5 | mission two's split card plus a gold arrow over a helmet card; the text changes to "Now bring him back" after the first toggle; both retire at toggle-back | `v3-coach-split.png`, `v3-coach-rejoin.png` |
+| `browser.mjs teach` #6 | the barracks arrow points at the first affordable upgrade with "Tap to upgrade units?"; the debrief button now reads exactly "Next mission →"; buying retires the arrow | `v3-upgrade-arrow.png`, `v3-upgrade-bought.png` |
+| `browser.mjs teach` #7 | at 320/390/430 the coach card is on screen, below the header, clear of the rail and the cards, bottom under 42% of height; the card arrow stays on screen and above the cards; every HUD button still ≥44 px and inside the viewport | `v3-coach-320.png`, `v3-coach-390.png`, `v3-coach-430.png` |
+| `browser.mjs teach` #8 | the build number is on `window.tinpot.version` and printed on the title screen | `v3-version.png` |
+| `release.mjs` | unchanged: all six missions won by touch, retry at three widths, 60.00 fps / p95 16.7 ms, zero console, network or shader errors, no external requests — plus the new build-number assertion | `release.json` |
+
+**Both new gate families were falsified against a build with the bug still in it**, as the
+standing rule requires:
+
+* reverting `enemyZ`/`holdLine` in `data/missions.mjs` → `sim.mjs` fails on *"mission one parks
+  the enemy line"*;
+* reverting `groundOrder` to the old throw-immediately behaviour → `sim.mjs` fails on
+  *"nothing is in the air during the arming window"*;
+* forcing `coachModel()` to return `null` → `teach` fails on *"the first thing on screen must be
+  the instruction"*;
+* forcing `reachRing.visible=false` → `teach` fails on *"selecting the grenade must briefly show
+  its reach"*.
+
+`teach` was run four times end to end for flake: 9/9 scenarios every time.

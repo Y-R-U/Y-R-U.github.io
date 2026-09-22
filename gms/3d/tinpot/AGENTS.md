@@ -33,9 +33,18 @@ The game is `http://127.0.0.1:8888/gms/3d/tinpot/`.
 
 ```sh
 node tools/sim.mjs
-~/.claude/bin/cdp start --port 9223
-node tools/browser.mjs
+node tools/campaign.mjs
+~/.claude/bin/cdp start --port 9223 -- --use-angle=metal
+node tools/browser.mjs teach
+node tools/release.mjs
 ```
+
+**`--use-angle=metal` is not optional.** The `cdp` launcher hardcodes swiftshader; without the
+override this game software-renders at ~9 fps and timing-based gates go flaky.
+
+**The suite is a POSITIONAL argument** — `node tools/browser.mjs v1`. Passing `--suite v1`
+silently runs only the generic boot scenario and prints PASS. That false green has already
+fooled one session. The suites are `shell m2 m3 m4 m5 m6 m7 m8 art v1 v3 v4 v6 teach`.
 
 Keep the `cdp start` and the harness run in **one shell execution**, separated by a newline.
 Disable cache in the CDP driver before navigating — a `?v=` query string does **not** bust a
@@ -54,6 +63,17 @@ stale ES module, and stale modules have hidden agents' own edits in this repo mo
   force-teleported past a gate hid a third of a map being unreachable.
 - **Isolate before tuning.** Force a suspect term to a constant; if the output is identical the
   experiment failed, not the hypothesis.
+
+## Versioning
+
+Milestone headings in `PLAN.md` and `STATE.md` are numbered **0.01** (the shipped slice, M0–M9),
+**0.02** (the playtest pass) and **0.03** (the first human playtest). We are at very early
+concept stage on purpose. **The numbering is documentation only** — suite names, fixture names,
+function names and evidence filenames keep their old letters and must not be renamed to match.
+
+The live build number is one string: `VERSION` in `js/version.mjs`. It prints on the title screen
+as `PATTERN 0.03` and is exposed as `window.tinpot.version`, which `tools/release.mjs` asserts —
+so a deployed build can be identified without a screenshot. Bump it there and nowhere else.
 
 ## Tone
 

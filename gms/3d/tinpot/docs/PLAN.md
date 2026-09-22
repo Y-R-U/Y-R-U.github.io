@@ -11,6 +11,16 @@ Deliberately not the full campaign. We are finding out whether the core is fun.
 
 ---
 
+# 0.01 — the shipped slice
+
+> **Version note.** We are at very early concept stage, so the milestones are numbered from
+> 0.01. This block (M0–M9) is **0.01**, the playtest pass below is **0.02**, and the first human
+> playtest is **0.03**. The `M0`…`M9` headings inside this block keep their letters on purpose:
+> `m2`…`m8` are live suite names (`node tools/browser.mjs m5`) and `m1b-portrait.png` and friends
+> are live evidence filenames. Only the top-level version labels changed.
+> The live build number is one string, `VERSION` in `js/version.mjs`, printed on the title screen
+> as `PATTERN 0.03` and exposed as `window.tinpot.version`.
+
 ## M0 — Shell that cannot silently fail
 - [x] `index.html` with the exact vendored importmap and the inline boot watchdog
 - [x] Portrait-first `style.css`: safe-area insets, no page scroll, no rubber-band, fixed canvas
@@ -132,13 +142,13 @@ a Boot Hill graveyard that grows · daily challenge · games.br8t.com account la
 
 ---
 
-# V2 — the playtest pass (added 2026-09-22, after shipping the slice)
+# 0.02 — the playtest pass (added 2026-09-22, after shipping the slice)
 
 Aaron is play-testing on `yru.br8t.com`. These are the gaps found by reading the shipped build.
 Ordered by how much each one changes whether the game is fun. Same rules as everything above:
 run it, look at it, tick honestly.
 
-## V1 — Fire has to matter (the signature mechanic is currently decorative)
+## 0.02.1 — Fire has to matter (gate: `node tools/browser.mjs v1`)
 Nothing in `core/` damages a unit for standing in fire. You can burn the forest down and then
 walk through the flames unharmed. Fire is the thing that makes this game not-Cannon-Fodder, and
 right now it is set dressing.
@@ -148,38 +158,94 @@ right now it is set dressing.
 - [x] The AI will not route through fire, so a burning treeline is a real wall while it burns
 - [x] Headless: `sim.mjs` asserts a soldier parked in fire dies, and one beside it does not
 
-## V2 — Instant retry
+## 0.02.2 — Instant retry (gate: `node tools/release.mjs`)
 A mission is ninety seconds and permadeath is the hook, so losing must cost a tap, not a reload.
 - [x] Defeat debrief has a Retry that restarts the mission with the pre-mission roster intact
 - [x] Retry is reachable by touch on all three phone widths; covered by the release harness
 
-## V3 — The third weapon: flamethrower
+## 0.02.3 — The third weapon: flamethrower (gate: `node tools/browser.mjs v3`)
 The weapon rail and the card pips were both built for three and only ever hold two.
 - [x] `flamer`: short range, a cone rather than a line, ignites everything it touches
 - [x] Unlocks at mission 3; appears as the third rail button and a third pip automatically
 - [x] It is genuinely dangerous to its owner — this should be funny, not balanced
 - [x] Balance it in `tools/sim.mjs`, not the browser
 
-## V4 — Enemies that are not all the same man
+## 0.02.4 — Enemies that are not all the same man (gate: `node tools/browser.mjs v4`)
 `SOLDIERS.red` is one stat block and `updateAI` is one behaviour, so every firefight is identical.
 - [x] Three types minimum: the current grunt, a slow armoured heavy, a fast low-HP rusher
 - [x] Each visually distinguishable from above at this camera height — silhouette and colour
 - [x] Mission data picks the mix; later missions get nastier
 - [x] The heavy should make you reach for grenades; the rusher should punish a split squad
 
-## V5 — The fortifications the game keeps promising
+## 0.02.5 — The fortifications the game keeps promising (gate: `node tools/sim.mjs`)
 Mission 2's briefing says "we have installed sandbags and a mortar pit". Neither exists. This is
 the map-as-territory promise and it is the reason to reuse a map at all.
 - [x] Sandbags are real cover: they block shots and soldiers use them
 - [x] A won mission leaves its emplacement behind on that map for later missions
 - [x] Burn scars from a previous mission persist into the next mission on the same map
 
-## V6 — Juice
+## 0.02.6 — Juice (gate: `node tools/browser.mjs v6`)
 - [x] Haptics on a phone: a short buzz on a kill, a longer one on a grenade
 - [x] Hit feedback readable at this camera height — flinch, a spray, a number, something
 - [x] Losing a named man is dwelt on for a beat. He has a name; make it land.
 
-## V7 — Landscape
+## 0.02.7 — Landscape
 At 1280x800 the play corridor stays portrait-shaped and you can see the map's edge and the empty
 background past it. On a phone turned sideways this looks broken.
 - [x] Either handle landscape properly, or put up a friendly "turn me round" card
+
+---
+
+# 0.03 — first human playtest (Aaron, on a phone, 2026-09-22)
+
+> **Gate for this whole section:** `node tools/browser.mjs teach` (nine scenarios) plus the new
+> blocks in `node tools/sim.mjs`. Both were falsified against a build with the bug still in it.
+
+**The first time a person has played this.** His verdict: "It looks good, and very brief test was
+fun." Everything below is his, in his priority order. Treat it as the most valuable input the
+project has had — every gate before this was a machine agreeing with a machine.
+
+The through-line: **the opening minute teaches nothing.** He was under fire before he had worked
+out that tapping moves you, and he killed one of his own men with his first grenade because
+nothing told him he could not move while throwing.
+
+## 0.03.1 — Give the player room to learn (missions 1 and 2)
+- [x] Enemies start **considerably further away** in missions 1 and 2
+- [x] They **hold position** and do not advance until the player's squad reaches roughly the
+      sandbag line — a trigger on player progress, not a timer
+- [x] Verify in `sim.mjs` that a player who does nothing for 20 s is still unharmed in mission 1
+- [x] Do NOT apply this to missions 3-6; it is a teaching device, not a difficulty change
+
+## 0.03.2 — Make the tap visible
+- [x] A pond-ripple animation at the tap point: expanding ring, fades out
+- [x] Plain instruction on screen early on — "Tap to move to location" — that retires once used
+- [x] It must read at this camera height on a bright phone outdoors
+
+## 0.03.3 — Point at the first upgrade
+- [x] After mission 1, an **animated arrow** points at the first affordable upgrade
+- [x] With the words "Tap to upgrade units?"
+- [x] Retires once he has bought anything. Deliberately crude — upgrades get reworked later.
+
+## 0.03.4 — The grenade needs a moment of thought (the big one)
+Right now a grenade tap is instant and irreversible, so his first one killed one of his own men.
+He liked that it is dangerous — do not defuse it — but he could not *see* it coming.
+- [x] Tapping with grenade selected **arms** it: a red pulsing marker at the target point, with a
+      visible 2-3 s countdown before the throw
+- [x] The marker carries its own **cancel** affordance — tap the marker to call it off
+- [x] Tapping **elsewhere** while armed does NOT cancel: the squad moves there and the grenade is
+      still thrown when the timer ends
+- [x] The throw goes **as far as the thrower can toward the target** — so if he has walked out of
+      range, it falls short, and that is his fault and visible
+- [x] Selecting the grenade **briefly shows a range ring** so the reach is knowable before he taps
+- [x] A one-off instruction the first time grenades unlock, explaining arm / cancel / move
+- [x] Friendly fire stays on. The comedy is the point; only the surprise was the problem.
+
+## 0.03.5 — Drop one joke
+- [x] `'Onward, unfortunately →'` becomes a plain next-mission message. His words: "I get the
+      idea/humor concept but I don't think that particular one lands."
+- [x] Leave every other joke alone. He liked the tone.
+
+## 0.03.6 — Teach the squad split in mission 2
+- [x] An arrow and a short instruction prompting him to practise **splitting the squad and
+      rejoining it** — the card toggle is the entire tactical game and nothing teaches it
+- [x] Fires during mission 2, retires once he has toggled a card off and back on
