@@ -19,7 +19,7 @@ import { seaCamera } from '../ocean.js';
 import { VFX } from '../../config.js';
 import { rng, clamp, smoothstep } from '../textures/noise.js';
 import {
-  WaterPatch, pumpCards, pumpSea, seaSource, dropSeaSource, sunDir, seaHeight, hotTexture, softAdd,
+  WaterPatch, pumpSea, seaSource, dropSeaSource, sunDir, seaHeight, hotTexture, softAdd,
   smokeField, hotField, flameField, rainField, sprayField, apronTexture, vfxScene, dbg, useCtx, vfxCtx,
   setImpactPhase, setFirePhase, firePin, warmSource, dropWarmSource, warmSources,
 } from './field.js';
@@ -181,7 +181,8 @@ registerEmitter('fire', (ctx, host, localPos, seconds = VFX.fireSeconds) => {
     }
   }
 
-  const light = o.light === false ? null : ctx.lights.acquire();
+  // Persistent fires leave two light slots for the next gun flash or hit.
+  const light = o.light === false ? null : ctx.lights.acquire(2);
   // The cutoff is what gives a hull a shadow face. At H*8 one fire reached stem to stern and
   // every plate on the ship came back the same value; three.js windows the 1/d² by
   // (1-(d/cutoff)^4)^2, so the pool ends inside the ship's own length.
@@ -322,7 +323,6 @@ registerEmitter('fire', (ctx, host, localPos, seconds = VFX.fireSeconds) => {
       const p = firePin();
       t = o.at != null ? o.at : (p != null ? p : t + dt);
       shape();
-      pumpCards(ctx.app.camera);
       pumpSea();
       return o.at != null || firePin() != null || t < LIFE;
     },
@@ -503,7 +503,7 @@ export function rain(opts = {}) {
   shape();
 
   return ctx.add({
-    update() { shape(); pumpCards(ctx.app.camera); return true; },
+    update() { shape(); return true; },
     kill() {
       for (const c of drops) field.give(c.s);
       for (const c of hits) hotField(ctx.root).give(c.s);

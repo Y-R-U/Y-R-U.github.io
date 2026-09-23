@@ -490,9 +490,9 @@ export function hullMaterial(kitId) {
   const s = clampWrap(surface(`hull:${kitId}`, 512, hullSkin(skin)));
   const m = shipSurface(new THREE.MeshStandardMaterial({
     map: s.map, normalMap: s.normalMap, normalScale: new THREE.Vector2(0.75, 0.75),
-    color: 0xffffff, roughness: 0.62, metalness: 0.14, envMapIntensity: 1.20,
+    color: 0xffffff, roughness: 0.82, metalness: 0.08, envMapIntensity: 0.80,
     vertexColors: true,
-  }), { lo: 0.60, hi: 1.30, clipQ: WATERLINE_V - 0.012 });
+  }), { lo: 0.82, hi: 1.16, clipQ: WATERLINE_V - 0.012 });
   m.name = `hull:${kitId}`;
   perKit.set(kitId, m);
   return m;
@@ -555,7 +555,7 @@ export function make(name, quality) {
     const s = surface('hull:steel', 512, steelSkin({ colour: '#79838e', dirt: 0.42 }));
     return shipSurface(new THREE.MeshStandardMaterial({
       map: s.map, normalMap: s.normalMap, normalScale: new THREE.Vector2(0.8, 0.8),
-      color: 0xffffff, roughness: 0.60, metalness: 0.16, envMapIntensity: 1.20,
+      color: 0xffffff, roughness: 0.76, metalness: 0.10, envMapIntensity: 0.90,
       vertexColors: true,
     }), { lo: 0.62, hi: 1.26 });
   }

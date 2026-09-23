@@ -35,6 +35,7 @@ export function createVFX(app) {
     make: () => { const l = new THREE.PointLight(0xffb060, 0, 60, 2); root.add(l); return l; },
     reset: l => { l.intensity = 0; l.distance = 60; },
   });
+  lights.warm();
 
   const live = [];   // { update(dt) → boolean keepAlive, kill() }
 
@@ -48,7 +49,7 @@ export function createVFX(app) {
   function handleFor(updater) {
     return {
       get alive() { return live.includes(updater); },
-      kill() { updater.kill?.(); const i = live.indexOf(updater); if (i >= 0) live.splice(i, 1); },
+      kill() { const i = live.indexOf(updater); if (i < 0) return; live.splice(i, 1); updater.kill?.(); },
     };
   }
 

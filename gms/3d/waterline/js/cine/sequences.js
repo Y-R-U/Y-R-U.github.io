@@ -187,12 +187,13 @@ export function registerSequences(director, world) {
     const R = (VFX[ctx.size] || VFX[1]).scale;
     const head = new THREE.Vector3(), aim = new THREE.Vector3();
     const start = ctx.u0 ?? 0, end = ctx.u1 ?? 1;
-    // The round keeps its OWN clock (Round.update: elapsed / ms) and starts at u = 0. A beat that
-    // remaps its time onto a different stretch of the arc therefore frames a point the shell has
-    // not reached — at u0 = 0.06 that is 54 m of a 900 m flight, and the shell spends the first
-    // half of the beat behind the lens. Read the round's phase; only a still with no live round
-    // falls back to the ramp.
-    const phase = u => (round ? round.round.u : start + (end - start) * u);
+    // Live shots share the director clock, including hold-to-fast-forward and skip.
+    // A separate real-time shell clock left the camera/impact ahead of the projectile.
+    const phase = u => {
+      const f = start + (end - start) * u;
+      if (round?.round.driven) round.pose(f);
+      return round ? round.round.u : f;
+    };
 
     // Trail the round down its COURSE rather than down its tangent. The tangent at launch points
     // 33° up, so a camera set back along it sits UNDER the shell looking at the zenith — that is
@@ -509,10 +510,11 @@ function buildPresenter(director, world) {
       fleet.settle?.(shot.at);
 
       const ms = CINE.shellMs[mode] ?? CINE.shellMs.full;
-      const round = vfx.tracer(gun.clone(), target.clone(), ms, { size, seed: (turn * 7919) & 0xffff, sea: true });
+      const round = vfx.tracer(gun.clone(), target.clone(), ms, { size, seed: (turn * 7919) & 0xffff, sea: true, driven: true });
       caption?.forShot(turn, shot.kind);
       caption?.follow(() => round.head());
-      await director.play('shell_chase', { round, size, from: gun, to: target, aspect });
+      try { await director.play('shell_chase', { round, size, from: gun, to: target, aspect }); }
+      finally { round.kill(); }
       caption?.unfollow();
 
       api.resolve(events, { mySide, size, from: gun });

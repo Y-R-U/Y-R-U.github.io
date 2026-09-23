@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 import { registerEmitter } from './index.js';
-import { smokeField, pumpCards, useCtx, warmSources, seaHeight } from './field.js';
+import { smokeField, useCtx, warmSources, seaHeight } from './field.js';
 import { Round } from '../shell.js';
 import { rng } from '../textures/noise.js';
 
@@ -81,7 +81,6 @@ registerEmitter('smoke', (ctx, pos, drift, size) => {
     update(dt) {
       t += dt;
       pose();
-      pumpCards(ctx.app.camera);
       return t < life;
     },
     kill() { for (const s of slots) field.give(s); },

@@ -128,10 +128,12 @@ function hullShell(S) {
   for (let i = 0; i < NS - 1; i++) {
     for (let j = 0; j < M - 1; j++) {
       // port winds one way, starboard the other, so both faces point outboard
-      idx.push(at(i, 0, j), at(i, 0, j + 1), at(i + 1, 0, j));
-      idx.push(at(i, 0, j + 1), at(i + 1, 0, j + 1), at(i + 1, 0, j));
-      idx.push(at(i, 1, j), at(i + 1, 1, j), at(i, 1, j + 1));
-      idx.push(at(i, 1, j + 1), at(i + 1, 1, j), at(i + 1, 1, j + 1));
+      // Stations run from +X toward -X. The old winding pointed INTO the ship,
+      // culling the near wall and showing the opposite side through the hull.
+      idx.push(at(i, 0, j), at(i + 1, 0, j), at(i, 0, j + 1));
+      idx.push(at(i, 0, j + 1), at(i + 1, 0, j), at(i + 1, 0, j + 1));
+      idx.push(at(i, 1, j), at(i, 1, j + 1), at(i + 1, 1, j));
+      idx.push(at(i, 1, j + 1), at(i + 1, 1, j + 1), at(i + 1, 1, j));
     }
     // close the keel seam between the two halves
     idx.push(at(i, 0, 0), at(i + 1, 0, 0), at(i, 1, 0));

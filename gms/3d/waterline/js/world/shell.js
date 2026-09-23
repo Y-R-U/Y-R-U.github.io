@@ -9,7 +9,7 @@
 // calls beyond its own 200-triangle body.
 
 import * as THREE from 'three';
-import { hotField, smokeField, pumpCards, seaSource, dropSeaSource, warmSource, dropWarmSource, seaHeight, sunDir }
+import { hotField, smokeField, seaSource, dropSeaSource, warmSource, dropWarmSource, seaHeight, sunDir }
   from './vfx/field.js';
 import { rng } from './textures/noise.js';
 
@@ -94,7 +94,7 @@ let bodyMat = null;
 
 export class Round {
   // ctx is the frozen vfx emitter context (root, lights, app, size()).
-  constructor(ctx, { from, to, ms = 2400, size = 1, seed = 4001, trail = 1, light = false, sea = true, arc = null }) {
+  constructor(ctx, { from, to, ms = 2400, size = 1, seed = 4001, trail = 1, light = false, sea = true, arc = null, driven = false }) {
     const cfg = ctx.size(size);
     this.ctx = ctx;
     this.cfg = cfg;
@@ -105,6 +105,7 @@ export class Round {
     this.stretch = 1;
     this.elapsed = 0;
     this.dead = false;
+    this.driven = driven;
 
     // length / diameter = 4.5, which is what a naval shell actually is. Pass 1 ran 9:1 and the
     // round read as a sausage as long as the ship it was aimed at.
@@ -193,7 +194,7 @@ export class Round {
       // a camera seven metres away.
       s.sy = R * sy;
       s.rot = ang;
-      HOT.setRGB(1.0, 0.46, 0.17);
+      HOT.setRGB(1.0, i === 0 ? 0.78 : 0.42, i === 0 ? 0.38 : 0.10);
       s.colour.copy(HOT).multiplyScalar(b);
       s.alpha = 1;
     }
@@ -243,7 +244,7 @@ export class Round {
       s.colour.copy(COOL).lerp(HOT, lit * 0.6);
       // exponent well under 1: at 1.15 the tail faded before it had finished broadening, so the
       // visible trail NARROWED with age — smoke does the opposite
-      s.alpha = 0.40 * (1 - age) ** 0.55 * Math.min(1, this.u * 14) * (0.55 + 0.45 * j[3]) / stretch;
+      s.alpha = 0.28 * (1 - age) ** 0.55 * Math.min(1, this.u * 14) * (0.55 + 0.45 * j[3]) / stretch;
     }
   }
 
@@ -256,10 +257,10 @@ export class Round {
 
   // Real-time flight. Returns false when the round has landed.
   update(dt) {
-    if (pinned !== null) { this.poseAt(pinned); pumpCards(this.ctx.app.camera); return true; }
+    if (pinned !== null) { this.poseAt(pinned); return true; }
+    if (this.driven) return true;
     this.elapsed += dt * 1000;
     this.poseAt(Math.min(1, this.elapsed / this.ms));
-    pumpCards(this.ctx.app.camera);
     return this.elapsed < this.ms;
   }
 

@@ -1,8 +1,8 @@
 // Billboard / sprite / light pooling. FROZEN after W0.
 //
 // The rule the whole VFX budget rests on: a cinematic beat must not allocate. Everything is
-// acquired from a fixed-size pool and released back; when the pool is empty the oldest live
-// entry is recycled rather than a new one made, so `alive()` can never exceed the preset cap.
+// acquired from a fixed-size pool and released back. When full, optional lights are
+// omitted; a live resource must never be stolen from an effect that still owns it.
 
 import * as THREE from 'three';
 
@@ -23,13 +23,17 @@ export class Pool {
     while (this.live.length > this.cap) this.release(this.live[0]);
   }
 
-  acquire() {
+  acquire(reserve = 0) {
+    if (this.live.length >= this.cap - reserve) return null;
     if (this.free.length) return this.track(this.free.pop());
     if (this.built < this.cap) { this.built++; return this.track(this.make()); }
-    // Cap reached: steal the oldest. Recycling is visible; allocating mid-beat is a hitch.
-    const oldest = this.live.shift();
-    this.reset(oldest);
-    return this.track(oldest);
+    return null;
+  }
+
+  // Keep the renderer's light count constant before combat starts. Stealing a live
+  // light lets its previous owner move or release another explosion's light.
+  warm() {
+    while (this.built < this.cap) { this.free.push(this.make()); this.built++; }
   }
 
   track(item) { this.live.push(item); return item; }
@@ -59,6 +63,7 @@ export class CardField {
     this.mesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(cap * 3), 3);
     this.mesh.instanceColor.setUsage(THREE.DynamicDrawUsage);
     this.slots = [];
+    this.active = 0;
     this.m = new THREE.Matrix4();
     this.q = new THREE.Quaternion();
     this.s = new THREE.Vector3();
@@ -66,15 +71,16 @@ export class CardField {
   }
 
   take() {
-    for (const s of this.slots) if (!s.live) { s.live = true; return s; }
+    for (const s of this.slots) if (!s.live) { s.live = true; this.active++; return s; }
     return null;
   }
 
-  give(s) { if (s) { s.live = false; s.alpha = 0; } }
+  give(s) { if (s?.live) { s.live = false; s.alpha = 0; this.active--; } }
 
   // Billboards to the camera every frame. Writing count = cap and hiding dead slots with a zero
   // scale is cheaper than compacting, and keeps a slot's index stable for its owner.
   update(camera) {
+    if (!this.active) { this.mesh.count = 0; return 0; }
     camera.getWorldQuaternion(this.q);
     let n = 0;
     for (const s of this.slots) {
@@ -85,7 +91,7 @@ export class CardField {
       this.mesh.setColorAt(s.i, s.colour);
       if (live) n++;
     }
-    this.mesh.count = this.cap;
+    this.mesh.count = n ? this.cap : 0;
     this.mesh.instanceMatrix.needsUpdate = true;
     if (this.mesh.instanceColor) this.mesh.instanceColor.needsUpdate = true;
     return n;

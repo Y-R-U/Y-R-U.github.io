@@ -51,9 +51,7 @@ function softAdd(mat) {
 
 let smoke = null;
 let smokeAlpha = null;
-let smokeFrame = -1;
 let fireCards = null;
-let fireFrame = -1;
 
 // The shared card field is a hard additive on a soft DISC, and at 4x that disc's rim is countable
 // — ten crisp white bokeh circles round the flash in the last round. This field is the same idea
@@ -70,9 +68,7 @@ function fireField(ctx) {
 }
 
 function pumpFire(ctx) {
-  const f = window.__waterline?.frames?.() ?? -1;
-  if (!fireCards || f === fireFrame) return;
-  fireFrame = f;
+  if (!fireCards) return;
   fireCards.update(ctx.app.camera);
 }
 
@@ -133,11 +129,9 @@ function smokeField(ctx) {
   return smoke;
 }
 
-// index.js only pumps its own field, so this one ticks off the first live muzzle each frame.
+// Uploaded once after all muzzle effects and the cinematic camera have updated.
 function pumpSmoke(ctx) {
-  const f = window.__waterline?.frames?.() ?? -1;
-  if (!smoke || f === smokeFrame) return;
-  smokeFrame = f;
+  if (!smoke) return;
   for (const s of smoke.slots) smokeAlpha.array[s.i] = s.live ? s.alpha : 0;
   smokeAlpha.needsUpdate = true;
   smoke.update(ctx.app.camera);
@@ -503,13 +497,13 @@ registerEmitter('muzzle', (ctx, anchor, size) => {
     });
   }
 
-  const light = ctx.lights.acquire();
-  light.color.set(0xffab5c);
+  let light = ctx.lights.acquire();
+  if (light) light.color.set(0xffab5c);
   // OFF the bore axis, and this is the whole fix. Pass 1 put the light on the axis extended, where
   // N·L on a barrel running along that same axis is cos 89° — the barrels a metre from a 2400 cd
   // flash came back stone cold, and the answer was never a brighter light.
-  light.distance = R * 6;
-  light.position.copy(v).addScaledVector(fwd, R * 0.20).addScaledVector(up, R * 0.28)
+  if (light) light.distance = R * 6;
+  if (light) light.position.copy(v).addScaledVector(fwd, R * 0.20).addScaledVector(up, R * 0.28)
     .addScaledVector(side, R * 0.10);
 
   const wash = takeWash(ctx);
@@ -538,6 +532,7 @@ registerEmitter('muzzle', (ctx, anchor, size) => {
 
   const shape = () => {
     const glow = Math.max(0, 1 - t / 0.30);          // what the flash lights the world with
+    if (!glow && light) { ctx.lights.release(light); light = null; }
     ball.copy(v).addScaledVector(fwd, R * 0.55);     // the fireball's centre, for the smoke's lit side
     // the flame body: it grows along the bore for the first 40 ms, then burns back and dims
     const gk = Math.min(1, t / 0.030);
@@ -590,7 +585,7 @@ registerEmitter('muzzle', (ctx, anchor, size) => {
     }
     // candela at 1 m with decay 2, so the near thirty metres take it and the far hull does not.
     // Off-axis placement is what makes this readable at all — see where light.position is set.
-    light.intensity = 2100 * cfg.light * Math.pow(glow, 1.6);
+    if (light) light.intensity = 2100 * cfg.light * Math.pow(glow, 1.6);
     wash.scale.setScalar(R * (1.3 + t * 4.5));
     wash.material.opacity = 0.28 * Math.pow(glow, 2.0);
     if (seaOwner === wash) {
@@ -605,8 +600,6 @@ registerEmitter('muzzle', (ctx, anchor, size) => {
     update(dt) {
       t = pinned !== null ? Math.max(0.004, pinned - ord * pinSpread) : t + dt;
       shape();
-      pumpSmoke(ctx);
-      pumpFire(ctx);
       return pinned !== null || t < LIFE;
     },
     kill() {
@@ -622,3 +615,8 @@ registerEmitter('muzzle', (ctx, anchor, size) => {
   });
 });
 
+
+export function flushGunCards(app) {
+  pumpSmoke({ app });
+  pumpFire({ app });
+}

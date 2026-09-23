@@ -19,7 +19,7 @@ import { VFX } from '../../config.js';
 import { rng, clamp, smoothstep, fields } from '../textures/noise.js';
 import { track } from '../../engine/budget.js';
 import {
-  WaterPatch, pumpCards, pumpSea, seaSource, dropSeaSource, sunDir, seaHeight, apronTexture,
+  WaterPatch, pumpSea, seaSource, dropSeaSource, sunDir, seaHeight, apronTexture,
   sprayField, smokeField, hotField, ringTexture, vfxScene, dbg, useCtx, setImpactPhase, setFirePhase, impactPin, impactSpread,
   warmSource, dropWarmSource,
 } from './field.js';
@@ -162,8 +162,8 @@ function takeColumn(ctx) {
   }
   let m = columns.find(c => !c.userData.busy);
   if (!m) {
-    if (columns.length >= 3) m = columns[0];
-    else { m = new THREE.Mesh(columnGeo, columnMat.clone()); m.frustumCulled = false; m.renderOrder = 2; ctx.root.add(m); columns.push(m); }
+    if (columns.length >= 3) return null;
+    else { m = new THREE.Mesh(columnGeo, columnShade(columnMat.clone())); m.frustumCulled = false; m.renderOrder = 2; ctx.root.add(m); columns.push(m); }
   }
   m.userData.busy = true;
   m.visible = true;
@@ -183,7 +183,7 @@ function takeApron(ctx) {
   }
   let p = aprons.find(a => !a.busy);
   if (!p) {
-    if (aprons.length >= 3) p = aprons[0];
+    if (aprons.length >= 3) return null;
     else { p = new WaterPatch(apronMat.clone(), { rings: 13, seg: 46, root: ctx.root }); aprons.push(p); }
   }
   p.busy = true;
@@ -206,7 +206,7 @@ function takeRing(ctx) {
   }
   let p = rings.find(a => !a.busy);
   if (!p) {
-    if (rings.length >= 3) p = rings[0];
+    if (rings.length >= 3) return null;
     else { p = new WaterPatch(ringMat.clone(), { rings: 10, seg: 40, root: ctx.root }); rings.push(p); }
   }
   p.busy = true;
@@ -369,28 +369,34 @@ registerEmitter('splash', (ctx, pos, size = 9) => {
     const climb = clamp(t / 0.30, 0, 1);
     const rootH = H * 0.34 * (climb - 0.7 * Math.pow(smoothstep(0.30, 1.0, k), 2));
 
-    column.position.set(pos.x, y0 + 0.8, pos.z);
-    // narrow: the root of a shell splash is a stem. At 1.25·R it was the widest part of the column
-    // and the whole thing read as a traffic cone.
-    const cw = R * (0.72 + 0.34 * k);
-    column.scale.set(cw, Math.max(0.5, rootH), cw);
-    column.rotation.y = 0.9 + ord;
-    const cf = smoothstep(0, 0.08, t) * (1 - smoothstep(0.34, 0.9, k));
-    column.material.opacity = 0.44 * cf * dbg.col;
-    // must match the spray cards' 1.52–1.62. At 1.32 the mesh was DARKER than the cards it covers,
-    // so its low-poly silhouette stamped a dark polygon across the base of every column.
-    column.material.color.setScalar(1.58);
-    column.visible = cf > 0.01 && rootH > 0.5;
+    if (column) {
+      column.position.set(pos.x, y0 + 0.8, pos.z);
+      // narrow: the root of a shell splash is a stem. At 1.25·R it was the widest part of the column
+      // and the whole thing read as a traffic cone.
+      const cw = R * (0.72 + 0.34 * k);
+      column.scale.set(cw, Math.max(0.5, rootH), cw);
+      column.rotation.y = 0.9 + ord;
+      const cf = smoothstep(0, 0.08, t) * (1 - smoothstep(0.34, 0.9, k));
+      column.material.opacity = 0.44 * cf * dbg.col;
+      // must match the spray cards' 1.52–1.62. At 1.32 the mesh was DARKER than the cards it covers,
+      // so its low-poly silhouette stamped a dark polygon across the base of every column.
+      column.material.color.setScalar(1.58);
+      column.visible = cf > 0.01 && rootH > 0.5;
+    }
 
-    apron.set(pos.x, pos.z, R * (1.6 + 2.4 * Math.pow(k, 0.45)), 0.75);
-    apron.mesh.material.opacity = 0.34 * dbg.apron * smoothstep(0, 0.05, t) * (1 - smoothstep(0.6, 1.0, k));
+    if (apron) {
+      apron.set(pos.x, pos.z, R * (1.6 + 2.4 * Math.pow(k, 0.45)), 0.75);
+      apron.mesh.material.opacity = 0.34 * dbg.apron * smoothstep(0, 0.05, t) * (1 - smoothstep(0.6, 1.0, k));
+    }
 
     // a real celerity: shallow-water waves run at sqrt(g·h), so the ring travels at a constant
     // speed and thins as its circumference grows, rather than easing out on a curve
     const rr = R * 1.1 + Math.sqrt(9.81 * H * 0.06) * t;
-    ring.set(pos.x, pos.z, rr, 0.8);
-    ring.mesh.material.opacity = 0.26 * dbg.apron * smoothstep(0, 0.07, t)
-      * (1 - smoothstep(0.35, 1.05, k)) * Math.min(1, (R * 2.2) / rr);
+    if (ring) {
+      ring.set(pos.x, pos.z, rr, 0.8);
+      ring.mesh.material.opacity = 0.26 * dbg.apron * smoothstep(0, 0.07, t)
+        * (1 - smoothstep(0.35, 1.05, k)) * Math.min(1, (R * 2.2) / rr);
+    }
 
     // 20 m of aerated white water lights the sea it stands in. Without this the wave under the
     // column is the same value as the wave 40 m away and the column reads as pasted on.
@@ -440,7 +446,6 @@ registerEmitter('splash', (ctx, pos, size = 9) => {
     update(dt) {
       t = phaseOf(o, ord, t, dt);
       shape();
-      pumpCards(ctx.app.camera);
       pumpSea();
       return posed(o) || t < LIFE;
     },
@@ -559,13 +564,13 @@ registerEmitter('hit', (ctx, pos, size = 9) => {
     });
   }
 
-  const light = ctx.lights.acquire();
-  light.color.set(0xffa552);
+  let light = ctx.lights.acquire();
+  if (light) light.color.set(0xffa552);
   // the cutoff is the shadow face: at R*11 one hit lit a whole 140 m hull to one value
-  light.distance = o.lightRange ?? R * 4.5;
+  if (light) light.distance = o.lightRange ?? R * 4.5;
   // off the impact normal: on it, a hull plate running along that same plane takes the light at
   // grazing incidence and comes back stone cold next to a white core
-  light.position.copy(pos).addScaledVector(out, R * 0.35).addScaledVector(up, R * 0.55);
+  if (light) light.position.copy(pos).addScaledVector(out, R * 0.35).addScaledVector(up, R * 0.55);
 
   const source = o.sea === false ? null : seaSource();
   if (source) {
@@ -583,10 +588,13 @@ registerEmitter('hit', (ctx, pos, size = 9) => {
   const sun = sunDir();
   const col = new THREE.Color();
   const seaY = seaHeight(pos.x, pos.z);
-  let t = 0;
+  let t = 1 / 120;
+  const projected = new THREE.Vector3();
+  const projectedTip = new THREE.Vector3();
 
   const shape = () => {
     const glow = Math.max(0, 1 - t / 0.45);
+    if (!glow && light) { ctx.lights.release(light); light = null; }
     ball.copy(pos).addScaledVector(up, R * 0.4);
 
     for (const c of balls) {
@@ -605,7 +613,12 @@ registerEmitter('hit', (ctx, pos, size = 9) => {
       const k = Math.max(0, 1 - age / c.fade);
       c.s.pos.copy(pos).add(c.off).addScaledVector(c.vel, age);
       c.s.pos.y += 0.5 * c.grav * age * age;
-      c.s.sx = c.s.sy = c.s0;
+      c.s.sx = c.s0;
+      c.s.sy = c.s0 * (3.5 + 5 * k);
+      projected.copy(c.s.pos).project(ctx.app.camera);
+      projectedTip.copy(c.s.pos).addScaledVector(c.vel, 0.025).project(ctx.app.camera);
+      c.s.rot = Math.atan2(projectedTip.y - projected.y,
+        (projectedTip.x - projected.x) * ctx.app.camera.aspect) - Math.PI / 2;
       c.s.colour.copy(c.col).multiplyScalar(k * k * dbg.hot * (age > 0 ? 1 : 0));
       c.s.alpha = k > 0 ? 1 : 0;
     }
@@ -644,7 +657,7 @@ registerEmitter('hit', (ctx, pos, size = 9) => {
       c.s.alpha = k > 0 && c.s.pos.y > seaY + c.s0 * 0.6 ? 0.6 * k : 0;
     }
 
-    light.intensity = 320 * cfg.light * Math.pow(glow, 1.5) * dbg.light;
+    if (light) light.intensity = 320 * cfg.light * Math.pow(glow, 1.5) * dbg.light;
     if (source) source.intensity = 0.62 * Math.pow(glow, 1.2);
     warm.pos.copy(ball);
     warm.intensity = 2.2 * Math.pow(glow, 1.2);
@@ -656,7 +669,6 @@ registerEmitter('hit', (ctx, pos, size = 9) => {
     update(dt) {
       t = phaseOf(o, ord, t, dt);
       shape();
-      pumpCards(ctx.app.camera);
       pumpSea();
       return posed(o) || t < LIFE;
     },

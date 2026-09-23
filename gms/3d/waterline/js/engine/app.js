@@ -241,6 +241,7 @@ export class App {
       this.stats.beginFrame();
       this.renderer.info.reset();
       for (const s of this.systems) if (s.update) s.update(dt, this);
+      for (const s of this.systems) s.beforeRender?.(this);
       this.parkEmpty();
       // after the updates, so a PMREM refresh's internal renders don't claim the mark
       this.marked = false;

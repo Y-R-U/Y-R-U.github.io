@@ -38,14 +38,9 @@ export const dbg = (window.__c4 = window.__c4 ?? { col: 1, spray: 1, apron: 1, f
 const AXIS = new THREE.Vector3(0, 0, 1);
 const TINT = new THREE.Color();
 const all = new Set();
-let pumped = -1;
-
-// index.js pumps only its own field, so every live effect calls this and the frame guard makes the
-// extra calls free.
-export function pumpCards(camera) {
-  const f = window.__waterline?.frames?.() ?? -1;
-  if (f === pumped) return;
-  pumped = f;
+// Flush after all simulation and camera updates, including the frame the last
+// effect is killed. Flushing inside the first emitter left later emitters stale.
+export function flushCards(camera) {
   for (const c of all) c.flush(camera);
 }
 
@@ -68,6 +63,7 @@ export class Cards {
       this.mesh.geometry.setAttribute('aAlpha', this.aAlpha);
     }
     this.slots = [];
+    this.active = 0;
     for (let i = 0; i < cap; i++) {
       this.slots.push({ i, live: false, pos: new THREE.Vector3(), sx: 1, sy: 1, rot: 0, alpha: 0, colour: new THREE.Color() });
     }
@@ -81,13 +77,14 @@ export class Cards {
   }
 
   take() {
-    for (const s of this.slots) if (!s.live) { s.live = true; s.alpha = 0; s.rot = 0; return s; }
+    for (const s of this.slots) if (!s.live) { s.live = true; this.active++; s.alpha = 0; s.rot = 0; return s; }
     return null;
   }
 
-  give(s) { if (s) { s.live = false; s.alpha = 0; } }
+  give(s) { if (s?.live) { s.live = false; s.alpha = 0; this.active--; } }
 
   flush(camera) {
+    if (!this.active) { this.mesh.count = 0; return; }
     camera.getWorldQuaternion(this.q);
     // world metres per screen pixel at unit distance. A card thinner than a couple of pixels is
     // not a small particle, it is an aliased square — the far embers were 1–2 px hard-edged blocks.

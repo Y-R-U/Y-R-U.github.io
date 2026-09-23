@@ -10,7 +10,7 @@
 //   node tools/shot.mjs --shot=hit_explode --seed=7 --turn=30  ← a specific board state
 
 import { spawn, execSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, existsSync, rmSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, rmSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import http from 'node:http';
@@ -18,6 +18,8 @@ import { createReadStream, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const SITE = resolve(ROOT, '../..');
+const PAGE = '/3d/waterline/index.html';
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
 const args = Object.fromEntries(process.argv.slice(2).map(a => {
@@ -30,6 +32,8 @@ const args = Object.fromEntries(process.argv.slice(2).map(a => {
 // machine at once must not fight over a port.
 const PORT = 9131 + (process.pid % 200);
 const CDP_PORT = 9831 + (process.pid % 200);
+// --url=https://…/waterline/index.html verifies the deployed build with the same probes.
+const PAGE_URL = args.url || `http://127.0.0.1:${PORT}${PAGE}`;
 const W = +(args.w || 1280), H = +(args.h || 720);
 const PRESET = args.preset || 'high';
 const DPR = args.dpr || 2;
@@ -43,7 +47,7 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/jav
 function serve() {
   return new Promise(res => {
     const s = http.createServer((req, rp) => {
-      let p = join(ROOT, decodeURIComponent(req.url.split('?')[0]));
+      let p = join(SITE, decodeURIComponent(req.url.split('?')[0]));
       if (!existsSync(p) || statSync(p).isDirectory()) p = join(p, 'index.html');
       if (!existsSync(p)) { rp.writeHead(404); return rp.end('404'); }
       rp.writeHead(200, { 'content-type': MIME[extname(p)] || 'application/octet-stream' });
@@ -150,7 +154,7 @@ async function main() {
   const results = [];
 
   for (const shot of shots) {
-    const url = `http://127.0.0.1:${PORT}/index.html?shot=${shot}&preset=${PRESET}&dpr=${DPR}`
+    const url = `${PAGE_URL}?shot=${shot}&preset=${PRESET}&dpr=${DPR}`
       + (args.seed ? `&seed=${args.seed}` : '') + (args.turn ? `&turn=${args.turn}` : '')
       + (args.hud ? '&hud=1' : '') + (args.set ? '&' + args.set : '');
     await S('Page.navigate', { url });
@@ -190,7 +194,8 @@ async function main() {
         seed: args.seed ?? null, turn: args.turn ?? null, mobile: !!args.mobile, headed: HEADED, stats,
       }, null, 2));
       results.push({ shot, at: t, png, stats });
-      if (args.eval) console.log('  eval:', JSON.stringify(await evalJSON(S, args.eval)));
+      if (args.eval || args.evalfile) console.log('  eval:', JSON.stringify(await evalJSON(S,
+        args.evalfile ? readFileSync(resolve(args.evalfile), 'utf8') : args.eval)));
       for (const l of logs.splice(0)) console.log('  ' + l);
       // calls/tris are the total the GPU drew; the bracket is the main pass alone (total − shadow)
       console.log(`${shot}${t !== null ? '@' + t : ''}  ${stats.fps.toFixed(0)}fps  gpu ${fmt(stats.gpuP95)}ms  cpu ${fmt(stats.cpuP95)}ms  ${stats.calls} calls (${stats.mainCalls} main)  ${(stats.tris / 1000).toFixed(0)}k tris (${(stats.mainTris / 1000).toFixed(0)}k main)  → ${png}`);
@@ -229,12 +234,13 @@ async function settle(S, frames) {
 }
 
 async function evalJSON(S, expr) {
-  const r = await S('Runtime.evaluate', { expression: `JSON.stringify(${expr})`, returnByValue: true, awaitPromise: true });
+  const r = await S('Runtime.evaluate', { expression: `Promise.resolve(${expr}).then(v => JSON.stringify(v))`, returnByValue: true, awaitPromise: true });
+  if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text);
   return JSON.parse(r.result.value);
 }
 
 async function listScenarios(S) {
-  await S('Page.navigate', { url: `http://127.0.0.1:${PORT}/index.html` });
+  await S('Page.navigate', { url: PAGE_URL });
   await waitFor(S, `window.__waterline && window.__waterline.ready`, 15000);
   return await evalJSON(S, `window.__waterline.scenarios.map(s=>s.id)`);
 }

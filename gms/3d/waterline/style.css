@@ -163,12 +163,12 @@ body.wl-cine .hud-top, body.wl-cine .hud-bar, body.wl-cine .hud-note { opacity: 
   margin: -2px 0 5px; font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
   color: rgba(219,227,232,.5);
 }
-.hud-own-eye {
+.hud .hud-own-eye {
   position: relative; flex: none; width: 26px; height: 26px; padding: 0; min-height: 0;
   display: grid; place-items: center; border-radius: 6px; cursor: pointer;
 }
 .hud-own-eye::after { content: ''; position: absolute; left: -9px; right: -9px; top: -9px; bottom: -9px; }
-.hud-own-eye svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+.hud-own-eye svg { display: block; width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; }
 .hud-own-eye svg circle { fill: none; }
 .hud-own-eye .eye-bar { display: none; stroke-width: 2.4; }
 .private .hud-own-eye { color: var(--amber); border-color: rgba(255,166,60,.6); }

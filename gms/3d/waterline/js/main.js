@@ -18,7 +18,9 @@ import { buildShip } from './world/ship.js';
 import { buildFleet } from './world/fleet.js';
 import { fireShell, arcHeight } from './world/shell.js';
 import { createVFX } from './world/vfx/index.js';
-import './world/vfx/gun.js';
+import { flushGunCards } from './world/vfx/gun.js';
+import { flushCards, pumpSea } from './world/vfx/field.js';
+import { warmCombat } from './world/vfx/warm.js';
 import './world/vfx/impact.js';
 import './world/vfx/fire.js';
 import './world/vfx/round.js';
@@ -68,7 +70,11 @@ app.scene.fog = lighting.fog;
 const rig = new Rig(app);
 const director = new Director(rig);
 registerSequences(director, { bridge, ocean, ship, fleet });
-app.add({ update: dt => director.update(dt) });
+app.add({ update: dt => director.update(dt), beforeRender() {
+  flushCards(app.camera);
+  flushGunCards(app);
+  pumpSea();
+} });
 
 const uiMount = document.getElementById('ui');
 const hud = buildHUD(uiMount);
@@ -152,6 +158,8 @@ if (seed !== undefined || turn) {
   catch (e) { console.warn(`?seed/?turn ignored: ${e.message}`); }
 }
 
+document.getElementById('boot-status').textContent = 'preparing guns and impact effects…';
+await warmCombat(app, vfx, ship);
 const shot = shotId ? getScenario(shotId) : null;
 // A scenario may load something. Returning the promise routes it through the ready gate, so the
 // harness cannot screenshot a half-built shot.
