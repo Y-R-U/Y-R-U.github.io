@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b1026">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Lanternlight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<div id="boot" class="screen show">
+  <div class="boot-title">Lanternlight</div>
+  <div class="boot-bar"><i id="bootFill"></i></div>
+  <div id="bootMsg" class="boot-msg">Lighting the lanterns…</div>
+  <button id="bootReload" class="btn ghost hidden" onclick="location.reload()">Reload</button>
+</div>
+
+<div id="title" class="screen">
+  <div class="logo"><span>Lantern</span><span>light</span></div>
+  <div class="tagline">Three lights. One way home.</div>
+  <div class="menu">
+    <button class="btn big" id="btnBegin">Begin</button>
+    <button class="btn ghost" id="btnChapters">Chapters</button>
+    <button class="btn ghost" id="btnSettings">Settings</button>
+  </div>
+</div>
+
+<div id="pick" class="screen">
+  <div class="pick-head">Who goes after them?</div>
+  <div class="pick-sub">The little ones are gone. Someone has to bring them home.</div>
+  <div class="pick-row">
+    <button class="pick-card" data-hero="ivy"><b>Ivy</b><span>big sister</span></button>
+    <button class="pick-card" data-hero="rowan"><b>Rowan</b><span>big brother</span></button>
+  </div>
+  <button class="btn big hidden" id="btnGo">Go</button>
+  <button class="btn ghost small" id="btnPickBack">Back</button>
+</div>
+
+<div id="chapters" class="screen">
+  <div class="pick-head">Chapters</div>
+  <div id="chapterList" class="chapter-list"></div>
+  <button class="btn ghost small" id="btnChapBack">Back</button>
+</div>
+
+<div id="settings" class="screen">
+  <div class="pick-head">Settings</div>
+  <label class="set">Music <input type="range" id="setMusic" min="0" max="1" step="0.05"></label>
+  <label class="set">Voices <input type="range" id="setVoice" min="0" max="1" step="0.05"></label>
+  <label class="set">Effects <input type="range" id="setSfx" min="0" max="1" step="0.05"></label>
+  <label class="set check">Subtitles <input type="checkbox" id="setSubs"></label>
+  <label class="set check">High quality <input type="checkbox" id="setHQ"></label>
+  <button class="btn ghost small" id="btnSetBack">Back</button>
+</div>
+
+<div id="hud" class="hidden">
+  <div class="hud-top">
+    <div id="chapName" class="chap-name"></div>
+    <div class="progress"><i id="progFill"></i><b id="progSib1" class="sib"></b><b id="progSib2" class="sib"></b></div>
+    <button id="btnPause" class="icon-btn" aria-label="Pause">❚❚</button>
+  </div>
+  <div id="hint" class="hint"></div>
+  <div id="subs" class="subs"><b id="subWho"></b><span id="subText"></span></div>
+  <button id="lampBtn" class="lamp" aria-label="Shine">
+    <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="44"/><circle id="lampRing" class="ring" cx="50" cy="50" r="44"/></svg>
+    <span class="lamp-core"></span>
+    <span class="lamp-label">SHINE</span>
+  </button>
+</div>
+
+<div id="chapCard" class="chap-card"><small id="chapNum"></small><div id="chapTitle"></div></div>
+
+<div id="pause" class="screen dim">
+  <div class="pick-head">Paused</div>
+  <div class="menu">
+    <button class="btn big" id="btnResume">Resume</button>
+    <button class="btn ghost" id="btnRestartChap">Restart chapter</button>
+    <button class="btn ghost" id="btnQuit">Title screen</button>
+  </div>
+</div>
+
+<div id="fail" class="screen dim">
+  <div class="pick-head">The light went out</div>
+  <div class="pick-sub" id="failSub">But it isn't over. Not yet.</div>
+  <div class="menu">
+    <button class="btn big" id="btnRetry">Try again</button>
+    <button class="btn ghost small" id="btnFailQuit">Title screen</button>
+  </div>
+</div>
+
+<div id="ending" class="screen">
+  <div class="end-text" id="endText"></div>
+  <button class="btn ghost hidden" id="btnEndDone">The End</button>
+</div>
+
+<div id="fade" class="fade"></div>
+
+<script>
+  window.__boot = { ready: false, t0: Date.now() };
+  window.addEventListener('error', function (e) {
+    var m = document.getElementById('bootMsg');
+    if (m && !window.__boot.ready) m.textContent = 'Something went wrong: ' + (e.message || 'load error');
+  });
+  setTimeout(function () {
+    if (window.__boot.ready) return;
+    document.getElementById('bootMsg').textContent = 'This is taking longer than it should.';
+    document.getElementById('bootReload').classList.remove('hidden');
+  }, 20000);
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "../../lib/three/0.160.0/three.module.js",
+  "three/addons/": "../../lib/three/0.160.0/addons/"
+} }
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{
+"narrator":{
+ "n_title":"Lanternlight.",
+ "n_intro":"At the edge of the world stood a lighthouse, and in it lived three children. The eldest had grown very tired of being followed. Just leave me alone, they said, that night. And for once... the little ones listened.",
+ "n_ch1":"The little ones had gone after a lantern that floated all by itself. Lanterns do not do that. Not in this world, anyway.",
+ "n_ch2":"The river in the Gloaming runs toward whoever needs it most. Tonight, it ran toward Pip.",
+ "n_ch3":"Above the Gloaming, the islands drift like thoughts you haven't finished having.",
+ "n_ch4":"Every light that has ever been lost ends up somewhere. The Hush keeps them. The Hush keeps everything.",
+ "n_fail":"The light flickered. But it was not out. Not yet.",
+ "n_end":"They flew home on the back of the morning, three lights in a row. And the eldest never said leave me alone again. Well. Not often. And never meaning it."
+},
+"eldest":{
+ "e_pick":"Right. My fault. My job.",
+ "e_ch1":"Pip? Bean? This isn't funny! Okay, it's a little bit funny. Come home!",
+ "e_firefly":"Come on, little lights. Help me find them.",
+ "e_jump":"Jump. Don't look down. Definitely don't look down.",
+ "e_shine":"Back off! This lantern's been in the family longer than you have.",
+ "e_low":"Stay lit. Please, please stay lit.",
+ "e_ch1end":"Footprints. Tiny ones. Wellies on the wrong feet. That's Bean.",
+ "e_ch2":"A paper boat. Of course it's a paper boat. Why wouldn't it be.",
+ "e_seepip":"Pip! Hold on, I'm coming!",
+ "e_rescuepip":"I've got you. I've got you. You're freezing, you idiot. Come here.",
+ "e_whereb":"Where's Bean, Pip?",
+ "e_ch3":"Hold on tight. If you let go, I'm telling Mum it was your idea.",
+ "e_ch3reply":"No. It's not what I wanted. I just didn't know how to say it better.",
+ "e_ch4":"It's so dark. Okay. Okay. I'm the big one. I'm the big one.",
+ "e_ch4mid":"I'm not scared of you. I'm scared of losing them. That's different.",
+ "e_seebean":"Bean!",
+ "e_final":"Then let's give it ours.",
+ "e_final2":"Lanterns up. All of us. Together. Now!",
+ "e_end":"You were. You both were. Let's go home.",
+ "e_nope":"Absolutely not.",
+ "e_fail1":"Not yet. I'm not done.",
+ "e_fail2":"Get up. They're waiting for you.",
+ "e_fail3":"One more go. For them."
+},
+"pip":{
+ "p_rescued":"You came! I told Bean you would. I told her like a hundred times!",
+ "p_moth":"The big moth took her. She waved at it. She waves at everything.",
+ "p_ch3":"Faster! No, slower! No! Faster!",
+ "p_ch3q":"You said leave you alone. So we did. That's what you wanted, right?",
+ "p_ch4":"I'm not scared. You're holding my hand really hard, though.",
+ "p_again":"Can we do this again tomorrow?"
+},
+"bean":{
+ "b_found":"Hello. The moth is sad. It has all the lights, but it's still dark inside.",
+ "b_end":"Is it morning yet? I kept my light on. I was very brave."
+}
+}
