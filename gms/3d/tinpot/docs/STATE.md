@@ -5,6 +5,58 @@
 
 ## Now
 
+**Milestone: 0.05 — the lads find the radio (2026-09-25). COMPLETE locally.**
+Aaron requested voiced command replies, sarcastic banter and game commentary. The live build
+number is now `0.05`. All runtime changes and asset files stay inside this game. Aaron explicitly authorised
+committing and pushing this voice release on 2026-09-25, overriding the standing no-git rule
+for this change. The soundtrack and simulation balance were not changed.
+
+- **Six locally designed Qwen3-TTS 1.7B characters / 115 lines / 328.08 seconds.** Four squad
+  personalities, Headquarters, Inspector Biscuit. Mono 24 kHz / 40 kbps MP3, **1,699,815 bytes**
+  for the entire voice pack, plus a 43 KB transcript/provenance manifest. Only played clips
+  download; the browser keeps at most 16 decoded buffers. No live AI is required by the game.
+- Movement, hold/rejoin, equipment, arming/cancel, combat, friendly fire, burning, idle banter,
+  briefings, reinforcement commentary, inspector complaints, results and upgrades are wired.
+  Speakers use stable roster identity; dead soldiers cannot speak. One voice at a time,
+  three-item expiring queue, category cooldowns and recent-line avoidance. Orders interrupt
+  background jokes; urgent warnings can interrupt ordinary replies. Pause, primer, hidden
+  page, mute and scene/reset changes stop speech and invalidate late network callbacks.
+- Music ducks while speech plays. Separate persistent **Radio chatter** volume in settings.
+  Existing cards identify the speaker; no new panel covers the battlefield. Small-phone
+  sound controls were fitted at 320x568 with 44px sliders and no heading/footer overlap.
+- Reproduction, cast, API workflow and limitations: **`docs/VOICES.md`**. Auditions:
+  **`tools/voices-audition.html`**. Source script and resumable generator under `tools/`.
+  Raw local WAV takes / service reference IDs are ignored for release, not deleted.
+
+**Validation actually run:**
+
+- `node tools/voices-test.mjs`: **13 checks**, plus three deliberately broken variants
+  rejected (dead-speaker guard, priority sort, expiry). The first priority test itself failed
+  its falsification check; it was corrected to test an idle queue, then proved to reject
+  reversed priorities. Production thresholds were not relaxed.
+- `tools/audit-voices.py`: all **115** MP3s decode, are mono 24 kHz, non-silent/finite, and
+  match expected durations and byte counts. This is not a subjective accent/quality verdict.
+- `node tools/voices-browser.mjs`: **10 browser checks** pass. Real touch -> briefing and
+  command MP3s, music ducking, hold speaker identity, death interruption, natural timed idle,
+  pause, persisted mute/reload, and 320/390/430px settings. Zero console/network/shader errors;
+  no external runtime requests. It caught and then verified a fix for the first movement
+  reply being starved by the general's welcome. Failure evidence retained in
+  `voices-before-command-fix.json`.
+- Existing `node tools/sim.mjs`: **24 checks** pass. `node tools/campaign.mjs`: all six wins.
+  `node tools/browser.mjs teach`: **13 scenarios** pass. `node tools/release.mjs`: all six
+  missions and phone-width/retry gates pass on the finished pack. Hardware ANGLE Metal,
+  390x844 DPR2 / CPU 4x: **60.0 FPS**, **16.8 ms p95**. This is desktop Chrome emulation,
+  not a physical-phone or Safari claim.
+- Screenshots **looked at**: `voices-speaking-390.png` (speaker highlighted, play field clear)
+  and `voices-settings-320.png` (all three sound sliders and footer fit).
+
+**Next:** play the local build at `http://192.168.0.236:8888/gms/3d/tinpot/` and audition the
+cast. Aaron tests at https://yru.br8t.com/gms/3d/tinpot/; release this authorised change to main
+and verify that public URL reports PATTERN 0.05 and plays the shipped MP3s. Future agents can
+extend the lines using the manifest/generator without touching the music.
+
+### Previous handoff (0.04)
+
 **Milestone: 0.04.** 0.01 (the shipped slice), 0.02 (the playtest pass) and 0.03 (the first human
 playtest) are done. **0.04 — Aaron's SECOND human playtest — is this session's work.**
 The live build number is `VERSION` in `js/version.mjs`; it prints on the title screen as
@@ -736,3 +788,12 @@ Append one line per decision that a later agent would otherwise re-litigate.
   never count down while he is reading the objective.
 - **D19** **Perf must be measured with `-- --use-angle=metal`.** The default `cdp` launcher is
   SwiftShader; see the performance section above.
+
+- **D40** Speech is shipped Qwen MP3 assets, never a runtime call to the local AI server. The
+  six designed references and transcripts preserve the cast for future generation.
+- **D41** Voice identity follows `rosterId % 4`, not squad slot or current rank. Living-speaker
+  checks apply both to queue selection and playback completion; no ghost acknowledgements.
+- **D42** Commands supersede background welcome/idle remarks; urgent warnings can preempt them.
+  This was driven by a real browser failure where the general delayed the first move reply.
+- **D43** The radio gets its own volume and ducks music. Speaker feedback reuses existing cards;
+  no new caption panel competes with the play field after the 0.04 screen-space feedback.

@@ -119,3 +119,9 @@
 #hud.coach-high .tally{opacity:0}
 
 .pause-label.showing{display:block}
+
+/* Voice lives on existing cards: no caption panel over the battlefield. */
+.unit-card.on-radio{border-color:#ffe6a0;box-shadow:0 0 0 1px #ffe6a0,0 0 16px #f4c76366}.unit-card.on-radio .helmet-icon{color:#fff0ad;animation:radio-talk .4s ease-in-out infinite alternate}@keyframes radio-talk{to{filter:brightness(1.4);transform:translateY(-1px)}}
+.radio-settings-note{font-size:10px;line-height:1.5;color:#c4d3bb}.volume-controls{top:39%;gap:12px}.volume-controls input{margin:0}@media(max-height:650px){.volume-controls{top:34%;gap:3px}.volume-controls label{font-size:11px;gap:1px}.volume-controls input{height:44px}.radio-settings-note{font-size:9px}}@media(prefers-reduced-motion:reduce){.unit-card.on-radio .helmet-icon{animation:none}}
+
+@media(max-height:650px){.sound-heading{top:20px}.sound-heading h1{font-size:44px;letter-spacing:-2px}.sound-heading p{font-size:11px}.volume-controls{top:40%}}

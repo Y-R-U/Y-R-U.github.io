@@ -296,3 +296,13 @@ throw, every tap is unambiguously movement again.
 - [x] Per-man throws revert only that man; a rail-wide grenade order reverts everyone who threw
 - [x] Note in STATE.md that this interacts with grenadiers still auto-lobbing without arming
       (a known 0.03 inconsistency) and say what you did about it
+
+
+# 0.05 — the lads find the radio (Aaron, 2026-09-25)
+- [x] Distinct local Qwen voices: four squad personalities, general, Inspector Biscuit
+- [x] Compressed MP3 command responses, idle banter, situational and campaign commentary
+- [x] One speaker at a time, priorities, cooldowns, recent-line avoidance, living speakers only
+- [x] Music ducking, separate persistent voice volume, pause/background/reset cancellation
+- [x] Voice manifest and resumable asset-generation instructions
+- [x] Falsified voice tests, real browser MP3 playback, phone-width controls and screenshots
+- [x] Existing sim/campaign/teaching/release gates pass; evidence reviewed

@@ -4,3 +4,8 @@ docs/evidence/
 
 # Another game's harness, kept locally as a reference while building. Not ours.
 docs/reference/
+
+# Local Qwen production takes / API job bookkeeping; runtime uses audio/voices/*.mp3.
+tools/voice-source/*.wav
+tools/voice-source/references.json
+tools/voice-source/generation.log

@@ -1,0 +1,726 @@
+{
+  "cast": {
+    "crumb": {
+      "name": "Crumb",
+      "description": "A tired adult British male infantryman with a low, slightly gravelly London voice. Dry sarcasm, understated comic timing, conversational and clearly spoken. Not shouting.",
+      "reference": "Right then. Another glorious morning in a field nobody wanted. I suppose we had better look busy before the general gets ideas."
+    },
+    "spud": {
+      "name": "Spud",
+      "description": "A cheerful adult male soldier from Yorkshire in northern England. Broad warm middle-low voice, friendly regional accent, enthusiastically dim and slightly mischievous. Clear, conversational comic delivery.",
+      "reference": "Oh, lovely! A walk in the countryside, fresh air, and somebody else doing the paperwork. Do you reckon there will be sandwiches?"
+    },
+    "peas": {
+      "name": "Peas",
+      "description": "An adult British male clerk turned soldier, with a crisp precise middle-pitched voice and educated southern English accent. Fastidious, deadpan, mildly irritated, dry intelligent comedy. Clear natural speech.",
+      "reference": "I have checked the orders twice. They are still ridiculous. For the record, this was not covered during the induction."
+    },
+    "titch": {
+      "name": "Titch",
+      "description": "A young adult male Scottish soldier with a light, higher-pitched voice and a gentle Edinburgh accent. Quick nervous wit, brave but apprehensive, expressive conversational delivery. Clearly spoken, not whispering.",
+      "reference": "Aye, I am coming. Just checking whether that bush is armed. You can never be too careful with the local scenery."
+    },
+    "general": {
+      "name": "Headquarters",
+      "description": "A pompous older British male army general with a rich rounded baritone and exaggerated upper-class received pronunciation. Cheerful confidence completely unearned. Dry absurd comedy, clipped authoritative radio announcements.",
+      "reference": "Splendid work, gentlemen. Headquarters has reviewed the situation and decided that the situation is somebody else's problem. Carry on."
+    },
+    "biscuit": {
+      "name": "Inspector Biscuit",
+      "description": "A fussy middle-aged British male tea inspector, with a nasal higher-mid voice, precise upper-class pronunciation and indignant theatrical delivery. Pompous, officious, comically concerned about tea.",
+      "reference": "I am here to inspect the tea, not the artillery. Kindly point those unpleasant things away from my biscuits. Standards must be maintained."
+    }
+  },
+  "clips": [
+    {
+      "id": "crumb-move-01",
+      "voice": "crumb",
+      "event": "move",
+      "text": "Yes, sir. Lovely place to get shot."
+    },
+    {
+      "id": "crumb-move-02",
+      "voice": "crumb",
+      "event": "move",
+      "text": "Marching. Under protest."
+    },
+    {
+      "id": "crumb-move-03",
+      "voice": "crumb",
+      "event": "move",
+      "text": "Another inspirational bit of grass."
+    },
+    {
+      "id": "crumb-hold-01",
+      "voice": "crumb",
+      "event": "hold",
+      "text": "Holding. My favourite speed."
+    },
+    {
+      "id": "crumb-hold-02",
+      "voice": "crumb",
+      "event": "hold",
+      "text": "Fine. I will guard this particular mud."
+    },
+    {
+      "id": "crumb-join-01",
+      "voice": "crumb",
+      "event": "join",
+      "text": "Back with the idiots. Missed you."
+    },
+    {
+      "id": "crumb-rifle-01",
+      "voice": "crumb",
+      "event": "rifle",
+      "text": "Rifle it is. The boring end faces me."
+    },
+    {
+      "id": "crumb-grenade-01",
+      "voice": "crumb",
+      "event": "grenade",
+      "text": "Grenades. Management has stopped pretending."
+    },
+    {
+      "id": "crumb-flamer-01",
+      "voice": "crumb",
+      "event": "flamer",
+      "text": "Subtlety has left the building."
+    },
+    {
+      "id": "crumb-arm-01",
+      "voice": "crumb",
+      "event": "arm",
+      "text": "Pin out. Try not to supervise too closely."
+    },
+    {
+      "id": "crumb-arm-02",
+      "voice": "crumb",
+      "event": "arm",
+      "text": "Explosive suggestion incoming."
+    },
+    {
+      "id": "crumb-cancel-01",
+      "voice": "crumb",
+      "event": "cancel",
+      "text": "Good. A rare outbreak of common sense."
+    },
+    {
+      "id": "crumb-kill-01",
+      "voice": "crumb",
+      "event": "kill",
+      "text": "He has clocked off."
+    },
+    {
+      "id": "crumb-kill-02",
+      "voice": "crumb",
+      "event": "kill",
+      "text": "That is one complaint resolved."
+    },
+    {
+      "id": "crumb-hurt-01",
+      "voice": "crumb",
+      "event": "hurt",
+      "text": "Oi! That is government property."
+    },
+    {
+      "id": "crumb-fire-01",
+      "voice": "crumb",
+      "event": "fire",
+      "text": "I am not a bloody campfire!"
+    },
+    {
+      "id": "crumb-friendly-01",
+      "voice": "crumb",
+      "event": "friendly",
+      "text": "Same side, you absolute teapot!"
+    },
+    {
+      "id": "crumb-blocked-01",
+      "voice": "crumb",
+      "event": "blocked",
+      "text": "Lovely destination. Shame about the forest."
+    },
+    {
+      "id": "crumb-idle-01",
+      "voice": "crumb",
+      "event": "idle",
+      "text": "I could be at home disappointing my wife."
+    },
+    {
+      "id": "crumb-idle-02",
+      "voice": "crumb",
+      "event": "idle",
+      "text": "Do we get overtime for standing here?"
+    },
+    {
+      "id": "crumb-idle-03",
+      "voice": "crumb",
+      "event": "idle",
+      "text": "This war could have been a strongly worded letter."
+    },
+    {
+      "id": "crumb-idle-04",
+      "voice": "crumb",
+      "event": "idle",
+      "text": "I joined for the boots. They squeak."
+    },
+    {
+      "id": "spud-move-01",
+      "voice": "spud",
+      "event": "move",
+      "text": "Coming! Is this the way to lunch?"
+    },
+    {
+      "id": "spud-move-02",
+      "voice": "spud",
+      "event": "move",
+      "text": "Right you are. Tactical ambling."
+    },
+    {
+      "id": "spud-move-03",
+      "voice": "spud",
+      "event": "move",
+      "text": "Ooh, new mud!"
+    },
+    {
+      "id": "spud-hold-01",
+      "voice": "spud",
+      "event": "hold",
+      "text": "Staying put. Born for this."
+    },
+    {
+      "id": "spud-hold-02",
+      "voice": "spud",
+      "event": "hold",
+      "text": "I will keep an eye on the scenery."
+    },
+    {
+      "id": "spud-join-01",
+      "voice": "spud",
+      "event": "join",
+      "text": "The gang is back! Terrible news for everyone."
+    },
+    {
+      "id": "spud-rifle-01",
+      "voice": "spud",
+      "event": "rifle",
+      "text": "Pointy end forwards. Got it."
+    },
+    {
+      "id": "spud-grenade-01",
+      "voice": "spud",
+      "event": "grenade",
+      "text": "Pocket fireworks! Lovely."
+    },
+    {
+      "id": "spud-flamer-01",
+      "voice": "spud",
+      "event": "flamer",
+      "text": "Who ordered the extra crispy forest?"
+    },
+    {
+      "id": "spud-arm-01",
+      "voice": "spud",
+      "event": "arm",
+      "text": "Special delivery! No returns!"
+    },
+    {
+      "id": "spud-arm-02",
+      "voice": "spud",
+      "event": "arm",
+      "text": "Catch! Actually, please do not."
+    },
+    {
+      "id": "spud-cancel-01",
+      "voice": "spud",
+      "event": "cancel",
+      "text": "Aw. I had my throwing face on."
+    },
+    {
+      "id": "spud-kill-01",
+      "voice": "spud",
+      "event": "kill",
+      "text": "That worked! Nobody look surprised."
+    },
+    {
+      "id": "spud-kill-02",
+      "voice": "spud",
+      "event": "kill",
+      "text": "Oh dear. He has dropped everything."
+    },
+    {
+      "id": "spud-hurt-01",
+      "voice": "spud",
+      "event": "hurt",
+      "text": "Ow! That was my favourite bit!"
+    },
+    {
+      "id": "spud-fire-01",
+      "voice": "spud",
+      "event": "fire",
+      "text": "Too crispy! Too crispy!"
+    },
+    {
+      "id": "spud-friendly-01",
+      "voice": "spud",
+      "event": "friendly",
+      "text": "Oi! I am the friendly idiot!"
+    },
+    {
+      "id": "spud-blocked-01",
+      "voice": "spud",
+      "event": "blocked",
+      "text": "Cannot get through. Tree says no."
+    },
+    {
+      "id": "spud-idle-01",
+      "voice": "spud",
+      "event": "idle",
+      "text": "Anyone else thinking about potatoes?"
+    },
+    {
+      "id": "spud-idle-02",
+      "voice": "spud",
+      "event": "idle",
+      "text": "I have named that tree Gerald."
+    },
+    {
+      "id": "spud-idle-03",
+      "voice": "spud",
+      "event": "idle",
+      "text": "If we win, can I keep the helmet?"
+    },
+    {
+      "id": "spud-idle-04",
+      "voice": "spud",
+      "event": "idle",
+      "text": "Lovely day. Apart from the war bit."
+    },
+    {
+      "id": "peas-move-01",
+      "voice": "peas",
+      "event": "move",
+      "text": "Relocating the administrative error."
+    },
+    {
+      "id": "peas-move-02",
+      "voice": "peas",
+      "event": "move",
+      "text": "A bold strategy. Is there a second page?"
+    },
+    {
+      "id": "peas-move-03",
+      "voice": "peas",
+      "event": "move",
+      "text": "Very well. I have noted my objections."
+    },
+    {
+      "id": "peas-hold-01",
+      "voice": "peas",
+      "event": "hold",
+      "text": "Holding. Finally, an efficient order."
+    },
+    {
+      "id": "peas-hold-02",
+      "voice": "peas",
+      "event": "hold",
+      "text": "I shall inventory the bullets as they arrive."
+    },
+    {
+      "id": "peas-join-01",
+      "voice": "peas",
+      "event": "join",
+      "text": "Rejoining this organisational failure."
+    },
+    {
+      "id": "peas-rifle-01",
+      "voice": "peas",
+      "event": "rifle",
+      "text": "Standard issue. Standard disappointment."
+    },
+    {
+      "id": "peas-grenade-01",
+      "voice": "peas",
+      "event": "grenade",
+      "text": "An argument with a three-second conclusion."
+    },
+    {
+      "id": "peas-flamer-01",
+      "voice": "peas",
+      "event": "flamer",
+      "text": "That will invalidate the warranty."
+    },
+    {
+      "id": "peas-arm-01",
+      "voice": "peas",
+      "event": "arm",
+      "text": "Please stand outside the complaint radius."
+    },
+    {
+      "id": "peas-arm-02",
+      "voice": "peas",
+      "event": "arm",
+      "text": "Preparing a strongly explosive memo."
+    },
+    {
+      "id": "peas-cancel-01",
+      "voice": "peas",
+      "event": "cancel",
+      "text": "Amendment accepted. Limbs retained."
+    },
+    {
+      "id": "peas-kill-01",
+      "voice": "peas",
+      "event": "kill",
+      "text": "File closed. Permanently."
+    },
+    {
+      "id": "peas-kill-02",
+      "voice": "peas",
+      "event": "kill",
+      "text": "A small reduction in paperwork."
+    },
+    {
+      "id": "peas-hurt-01",
+      "voice": "peas",
+      "event": "hurt",
+      "text": "That goes in the incident report."
+    },
+    {
+      "id": "peas-fire-01",
+      "voice": "peas",
+      "event": "fire",
+      "text": "This is not regulation heating!"
+    },
+    {
+      "id": "peas-friendly-01",
+      "voice": "peas",
+      "event": "friendly",
+      "text": "Check the helmet colour, you muppet!"
+    },
+    {
+      "id": "peas-blocked-01",
+      "voice": "peas",
+      "event": "blocked",
+      "text": "The route exists only in your imagination."
+    },
+    {
+      "id": "peas-idle-01",
+      "voice": "peas",
+      "event": "idle",
+      "text": "I have calculated our odds. Would you prefer a biscuit?"
+    },
+    {
+      "id": "peas-idle-02",
+      "voice": "peas",
+      "event": "idle",
+      "text": "Our strategy appears to be enthusiastic trespassing."
+    },
+    {
+      "id": "peas-idle-03",
+      "voice": "peas",
+      "event": "idle",
+      "text": "The map says scenic. The map is a liar."
+    },
+    {
+      "id": "peas-idle-04",
+      "voice": "peas",
+      "event": "idle",
+      "text": "I am billing this as a team-building exercise."
+    },
+    {
+      "id": "titch-move-01",
+      "voice": "titch",
+      "event": "move",
+      "text": "Aye. Terrible idea. On my way."
+    },
+    {
+      "id": "titch-move-02",
+      "voice": "titch",
+      "event": "move",
+      "text": "Legs first, courage later."
+    },
+    {
+      "id": "titch-move-03",
+      "voice": "titch",
+      "event": "move",
+      "text": "Right behind you. Metaphorically."
+    },
+    {
+      "id": "titch-hold-01",
+      "voice": "titch",
+      "event": "hold",
+      "text": "Not moving? Best order all day."
+    },
+    {
+      "id": "titch-hold-02",
+      "voice": "titch",
+      "event": "hold",
+      "text": "I will stay here and look difficult to hit."
+    },
+    {
+      "id": "titch-join-01",
+      "voice": "titch",
+      "event": "join",
+      "text": "Wait for me, you oversized targets!"
+    },
+    {
+      "id": "titch-rifle-01",
+      "voice": "titch",
+      "event": "rifle",
+      "text": "Right. The sensible bad idea."
+    },
+    {
+      "id": "titch-grenade-01",
+      "voice": "titch",
+      "event": "grenade",
+      "text": "This wee thing seems awfully confident."
+    },
+    {
+      "id": "titch-flamer-01",
+      "voice": "titch",
+      "event": "flamer",
+      "text": "We have brought a barbecue to a war."
+    },
+    {
+      "id": "titch-arm-01",
+      "voice": "titch",
+      "event": "arm",
+      "text": "Little present! Big feelings!"
+    },
+    {
+      "id": "titch-arm-02",
+      "voice": "titch",
+      "event": "arm",
+      "text": "Throwing! Everybody be somewhere else!"
+    },
+    {
+      "id": "titch-cancel-01",
+      "voice": "titch",
+      "event": "cancel",
+      "text": "Aye. Let us keep all the fingers."
+    },
+    {
+      "id": "titch-kill-01",
+      "voice": "titch",
+      "event": "kill",
+      "text": "I meant to do that. Mostly."
+    },
+    {
+      "id": "titch-kill-02",
+      "voice": "titch",
+      "event": "kill",
+      "text": "Down he goes. Up goes my pulse."
+    },
+    {
+      "id": "titch-hurt-01",
+      "voice": "titch",
+      "event": "hurt",
+      "text": "Oi! There is hardly any of me!"
+    },
+    {
+      "id": "titch-fire-01",
+      "voice": "titch",
+      "event": "fire",
+      "text": "My trousers have declared independence!"
+    },
+    {
+      "id": "titch-friendly-01",
+      "voice": "titch",
+      "event": "friendly",
+      "text": "Friendly fire is a rubbish name for this!"
+    },
+    {
+      "id": "titch-blocked-01",
+      "voice": "titch",
+      "event": "blocked",
+      "text": "That tree has seniority, apparently."
+    },
+    {
+      "id": "titch-idle-01",
+      "voice": "titch",
+      "event": "idle",
+      "text": "If I stand very still, can I be scenery?"
+    },
+    {
+      "id": "titch-idle-02",
+      "voice": "titch",
+      "event": "idle",
+      "text": "I have a cunning plan. It involves going home."
+    },
+    {
+      "id": "titch-idle-03",
+      "voice": "titch",
+      "event": "idle",
+      "text": "Do you think the enemy gets better tea?"
+    },
+    {
+      "id": "titch-idle-04",
+      "voice": "titch",
+      "event": "idle",
+      "text": "I am not nervous. I am vibrating tactically."
+    },
+    {
+      "id": "general-brief0-01",
+      "voice": "general",
+      "event": "brief0",
+      "text": "Take the clearing. We have already printed the flag."
+    },
+    {
+      "id": "general-brief1-01",
+      "voice": "general",
+      "event": "brief1",
+      "text": "Hold the tea position. The mortar is still on back order."
+    },
+    {
+      "id": "general-brief2-01",
+      "voice": "general",
+      "event": "brief2",
+      "text": "Push north. Negotiate with the forest using grenades."
+    },
+    {
+      "id": "general-brief3-01",
+      "voice": "general",
+      "event": "brief3",
+      "text": "Intelligence promises a shortcut. Do try to act surprised."
+    },
+    {
+      "id": "general-brief4-01",
+      "voice": "general",
+      "event": "brief4",
+      "text": "Protect the tea inspector. Losing him means two inspectors."
+    },
+    {
+      "id": "general-brief5-01",
+      "voice": "general",
+      "event": "brief5",
+      "text": "Hold until the kettle boils. This is not a metaphor."
+    },
+    {
+      "id": "general-deploy-01",
+      "voice": "general",
+      "event": "deploy",
+      "text": "Off you pop. I shall command from somewhere upholstered."
+    },
+    {
+      "id": "general-deploy-02",
+      "voice": "general",
+      "event": "deploy",
+      "text": "Good luck, gentlemen. Do keep the receipts."
+    },
+    {
+      "id": "general-wave-01",
+      "voice": "general",
+      "event": "wave",
+      "text": "More volunteers for the opposing argument."
+    },
+    {
+      "id": "general-wave-02",
+      "voice": "general",
+      "event": "wave",
+      "text": "Enemy reinforcements. How terribly clingy."
+    },
+    {
+      "id": "general-last-01",
+      "voice": "general",
+      "event": "last",
+      "text": "One helmet left. Make it look like several."
+    },
+    {
+      "id": "general-loss-01",
+      "voice": "general",
+      "event": "loss",
+      "text": "A vacancy has opened in the optimism department."
+    },
+    {
+      "id": "general-loss-02",
+      "voice": "general",
+      "event": "loss",
+      "text": "Headquarters regrets the inconvenience to his hat."
+    },
+    {
+      "id": "general-win-01",
+      "voice": "general",
+      "event": "win",
+      "text": "Splendid. I shall accept full responsibility for your success."
+    },
+    {
+      "id": "general-win-02",
+      "voice": "general",
+      "event": "win",
+      "text": "Victory! Put the expensive bits back in the box."
+    },
+    {
+      "id": "general-defeat-01",
+      "voice": "general",
+      "event": "defeat",
+      "text": "A valuable lesson. Unfortunately, none of you are available to learn it."
+    },
+    {
+      "id": "general-defeat-02",
+      "voice": "general",
+      "event": "defeat",
+      "text": "We shall describe this as an aggressive personnel reduction."
+    },
+    {
+      "id": "general-complete-01",
+      "voice": "general",
+      "event": "complete",
+      "text": "The war is won. The tea is cold. History will omit the second part."
+    },
+    {
+      "id": "general-upgrade-01",
+      "voice": "general",
+      "event": "upgrade",
+      "text": "Excellent purchase. Practically a survival policy."
+    },
+    {
+      "id": "general-barracks-01",
+      "voice": "general",
+      "event": "barracks",
+      "text": "Fresh kit, same questionable leadership."
+    },
+    {
+      "id": "general-forest-01",
+      "voice": "general",
+      "event": "forest",
+      "text": "The forest has been promoted to kindling."
+    },
+    {
+      "id": "general-time-01",
+      "voice": "general",
+      "event": "time",
+      "text": "Time is running short. Unlike the expense report."
+    },
+    {
+      "id": "biscuit-arrival-01",
+      "voice": "biscuit",
+      "event": "arrival",
+      "text": "Inspector Biscuit. I trust this is the queue for tea."
+    },
+    {
+      "id": "biscuit-idle-01",
+      "voice": "biscuit",
+      "event": "idle",
+      "text": "These explosions are bruising the biscuits."
+    },
+    {
+      "id": "biscuit-idle-02",
+      "voice": "biscuit",
+      "event": "idle",
+      "text": "I shall be mentioning all of this in my review."
+    },
+    {
+      "id": "biscuit-lost-01",
+      "voice": "biscuit",
+      "event": "lost",
+      "text": "You cannot leave me here! I am a department!"
+    },
+    {
+      "id": "biscuit-hurt-01",
+      "voice": "biscuit",
+      "event": "hurt",
+      "text": "I am deducting a star for this!"
+    }
+  ]
+}
