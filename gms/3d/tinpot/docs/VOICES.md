@@ -51,8 +51,8 @@ It uses its own random source and never consumes `world.random`.
 `js/platform/speech.mjs` observes the world and plays decoded MP3s through Web Audio. Only one
 voice source plays at once. Commands supersede idle/welcome commentary; fire/friendly-fire/
 grenade warnings can interrupt ordinary replies. Dead speakers and stale queued orders are
-cancelled. Pause, the grenade primer, changing scenes/worlds, backgrounding, and voice mute
-stop speech and discard its queue. Reset preserves recent-line memory to avoid instant repeats.
+cancelled. Battle pause, the grenade primer, changing scenes/worlds, backgrounding, and voice mute
+stop speech and discard its queue. Depot narration can play while depot combat stays paused. Reset preserves recent-line memory to avoid instant repeats.
 
 Clips download **on demand**, with at most 16 decoded buffers retained. Fetches are not aborted
 when a line is cancelled; an epoch check discards late results so they cannot play in the wrong

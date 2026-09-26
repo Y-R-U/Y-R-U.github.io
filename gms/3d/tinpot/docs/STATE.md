@@ -46,7 +46,11 @@ Final local verification complete: story-polish.mjs proves the overlap gate reje
 labels, real touch swipe scrolls depot 167 px, sticky close stays reachable, and the final
 320x568 route/ending screenshots are inspected. Ministry battle profile is 60.0035 fps,
 p95 16.8ms, 359 calls, 265,126 triangles, 127 geometries (M5 Metal, CPU4x, 390x844 DPR2).
-Remaining: scoped commit/push and public validation.
+Release checkpoint: gameplay commit 46ce9977 pushed to main; GitHub Pages workflow
+36209988568 running. Final depot narration fix follows: speech can play in depot mode while
+combat remains paused; verified with a real gesture, story-depot MP3 and zero browser errors.
+Next: push that small fix, verify public 0.06 plus all assets and browser field flow, then
+record publication and tick the last 0.06 checklist item.
 
 --- Previous handoff follows ---
 
