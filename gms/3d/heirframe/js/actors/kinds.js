@@ -4,6 +4,7 @@ import {
   buildRental, rentalMats, RENTAL_DIMS, buildHeavy, heavyMats, BRAWLER_DIMS, ENFORCER_DIMS,
   buildGunner, buildGhost, buildSecurity, eleganceMats, GUNNER_DIMS, GHOST_DIMS, SECURITY_DIMS,
 } from './kinds_frames.js';
+import { buildKettle, kettleMats, KETTLE_DIMS } from './kinds_boss.js';
 
 const CIV_SLOTS = ['body', 'trim', 'mech', 'glow', 'eye'];
 
@@ -64,6 +65,15 @@ export const KINDS = {
     style: { heavy: 1.3, arm: 0.6, dodge: 'dash', stance: 1.1, cadence: 0.9 },
     dims: () => ENFORCER_DIMS, build: (b, o) => buildHeavy(b, { ...o, enforcer: true }), mats: (o) => heavyMats(o.tier, true),
     sockets: { head: [0, 0.09, 0.02], back: [0, 0.18, -0.36], muzzle: ['handR', [0, -0.18, 0]] },
+  },
+  // Act 1 boss: enforcer frame + boiler. Extra sockets ventL/ventR/stack feed robot.steam().
+  boss_kettle: {
+    slots: ['body', 'trim', 'mech', 'boiler', 'gauge', 'glow', 'eye'], height: 2.75, radius: 0.62, runSpeed: 3.0,
+    style: { heavy: 1.5, arm: 0.55, dodge: 'dash', stance: 1.2, cadence: 0.8 },
+    dims: () => KETTLE_DIMS, build: buildKettle, mats: kettleMats,
+    sockets: { head: [0, 0.1, 0.02], back: [0, 0.2, -0.5], muzzle: ['handR', [0, -0.2, 0]] },
+    extraSockets: { ventL: ['aux0', [0.26, 0.58, 0.15]], ventR: ['aux0', [-0.26, 0.58, 0.15]], stack: ['aux0', [0.1, 0.74, -0.06]] },
+    steam: true,
   },
   drone_scout: {
     rig: 'hover', slots: ['body', 'trim', 'mech', 'glow', 'eye'], height: 1.75, radius: 0.4, runSpeed: 5,

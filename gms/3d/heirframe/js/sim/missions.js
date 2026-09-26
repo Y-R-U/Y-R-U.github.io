@@ -498,7 +498,10 @@ export function generateContract(rng, ctx, opts) {
   if (!opts.noTwist && onboarding >= 3) {
     if (onboarding === 3 && arch.twists.includes('T10')) twistId = 'T10';
     else if (opts.forceTwist) twistId = opts.forceTwist;
-    else if (rng.chance(twistChance(ctx, grade, arch))) twistId = rng.pick(arch.twists);
+    else if (rng.chance(twistChance(ctx, grade, arch))) {
+      const pool = ctx.twists ? arch.twists.filter(t => ctx.twists.includes(t)) : arch.twists;
+      if (pool.length) twistId = rng.pick(pool);
+    }
   }
   if (twistId) m.twist = buildTwist(rng, twistId, m, S, ctx, built);
 
@@ -550,7 +553,7 @@ export function generateBoard(ctx) {
     const S = sitesFor(district, ctx.sites);
     const tagSet = new Set(S.map(s => s.tag));
     const avail = Object.values(ARCHETYPES).filter(a =>
-      lvl >= a.unlock && a.grades.includes(grade) && (counts[a.id] || 0) < 2 && (a.sites.includes('*') || a.sites.some(t => tagSet.has(t))));
+      lvl >= a.unlock && a.grades.includes(grade) && (!ctx.archetypes || ctx.archetypes.includes(a.id)) && (counts[a.id] || 0) < 2 && (a.sites.includes('*') || a.sites.some(t => tagSet.has(t))));
     let card = null;
     for (let tries = 0; tries < 6 && !card; tries++) {
       const pool = avail.filter(a => (counts[a.id] || 0) < 2);

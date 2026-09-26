@@ -37,5 +37,15 @@
   "b_enforcer_aggro_02": "Is that all your little rental can do?",
   "b_enforcer_hurt_01": "Hah. Barely a scratch.",
   "b_enforcer_death_01": "Impossible... beaten by a rental..."
+ },
+ "warden_m": {
+  "b_warden_heat3_01": "All patrols, the suspect frame is armed. Hunt and detain.",
+  "b_warden_heat5_01": "Every unit in the district. Priority target. Do not let them reach a relay.",
+  "b_warden_eye_01": "Eye in the sky. Rider tagged. Stand by."
+ },
+ "warden_f": {
+  "b_warden_heat4_01": "Enforcer squad deployed. Lethal response authorised.",
+  "b_warden_lost_01": "Contact lost. Holding the perimeter.",
+  "b_warden_clear_01": "Stand down. Sector returning to harmony."
  }
 }

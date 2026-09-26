@@ -6,7 +6,8 @@ export const SUN_DIR = new THREE.Vector3(0.74, 0.50, -0.45).normalize();
 export const PLANET_DIR = new THREE.Vector3(0.30, 0.62, -0.72).normalize();
 export const SUN_COLOR = new THREE.Color(1.0, 0.80, 0.58);
 export const HAZE_COLOR = new THREE.Color(0.70, 0.76, 0.85);
-export const AERIAL = 2.2;
+const HAZE_OLD = typeof location !== 'undefined' && /[?&]haze=old/.test(location.search);
+export const AERIAL = HAZE_OLD ? 2.2 : 3.0;
 export const SUN_HAZE_COLOR = new THREE.Color(1.0, 0.80, 0.56);
 
 const v3 = (v) => `vec3(${v.x.toFixed(4)},${v.y.toFixed(4)},${v.z.toFixed(4)})`;
@@ -15,6 +16,7 @@ const c3 = (c) => `vec3(${c.r.toFixed(4)},${c.g.toFixed(4)},${c.b.toFixed(4)})`;
 // Height + distance fog with sun in-scattering, patched into every built-in material.
 export function installFog() {
   const C = THREE.ShaderChunk;
+  const old = /[?&]haze=old/.test(location.search) ? '#define HF_HAZE_OLD\n' : '';
   C.fog_pars_vertex = `#ifdef USE_FOG
   varying float vFogDepth;
   varying vec3 vFogWorldPos;
@@ -35,7 +37,7 @@ export function installFog() {
     uniform float fogFar;
   #endif
 #endif`;
-  C.fog_fragment = `#ifdef USE_FOG
+  C.fog_fragment = old + `#ifdef USE_FOG
   {
     vec3 fr = vFogWorldPos - cameraPosition;
     float fd = max( length( fr ), 1e-3 );
@@ -56,8 +58,16 @@ export function installFog() {
     // aerial perspective: per-channel extinction (blue goes first) + sky in-scatter, so far mass turns blue-grey and
     // loses contrast while near stays crisp; thins with height like the fog. Kicks in past ~25 m.
     vec3 aT = exp( -max( optical - 25.0, 0.0 ) * vec3( 0.0011, 0.0014, 0.0019 ) * uAerial );
+#ifdef HF_HAZE_OLD
     gl_FragColor.rgb = gl_FragColor.rgb * aT + mix( fogColor * vec3( 0.6, 0.71, 0.9 ), fcol * 0.85, sunAmt ) * ( 1.0 - aT );
     gl_FragColor.rgb = mix( gl_FragColor.rgb, fcol, fogAmt );
+#else
+    // distance recedes into a clear mid blue-grey (darker than the sky behind it) instead of whitening; the sun side
+    // only warms it a little, so far towers keep their silhouettes against the bright horizon
+    vec3 inS = mix( fogColor * vec3( 0.52, 0.64, 0.86 ), fcol * 0.62, sunAmt * 0.55 );
+    gl_FragColor.rgb = gl_FragColor.rgb * aT + inS * ( 1.0 - aT );
+    gl_FragColor.rgb = mix( gl_FragColor.rgb, mix( fogColor * vec3( 0.74, 0.84, 1.0 ), fcol * 0.8, sunAmt * 0.5 ), fogAmt );
+#endif
   }
 #endif`;
 }
@@ -78,7 +88,7 @@ vec3 skyColor(vec3 d){
   float sd = max(dot(d, SUN), 0.0);
   vec3 zen = vec3(0.13, 0.30, 0.72);
   vec3 mid = vec3(0.40, 0.58, 0.88);
-  vec3 hor = vec3(1.0, 0.88, 0.74);
+  vec3 hor = ${HAZE_OLD ? 'vec3(1.0, 0.88, 0.74)' : 'vec3(0.92, 0.9, 0.88)'};
   float e = max(el, 0.0);
   vec3 col = mix(hor, mid, smoothstep(0.0, 0.28, e));
   col = mix(col, zen, smoothstep(0.25, 0.95, e));

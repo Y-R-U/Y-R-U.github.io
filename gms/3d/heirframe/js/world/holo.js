@@ -73,16 +73,29 @@ export const HOLO_ART = {
     glowText(x, 'HARMONY', w / 2, 110, 64, 400, 8, '#eaf8ff', 'center');
     glowText(x, 'THROUGH UNITY', w / 2, 170, 34, 300, 8, '#bfe8ff', 'center');
     emblem(x, w / 2, 380, 130);
-    // landscape vignette: mountains + lake
-    const sky = x.createLinearGradient(0, 560, 0, 1000); sky.addColorStop(0, '#a9d8ff'); sky.addColorStop(1, '#2d7cc4');
-    x.fillStyle = sky; x.fillRect(30, 560, w - 60, 430);
-    x.fillStyle = '#e8f4ff';
-    x.beginPath(); x.moveTo(30, 820);
-    for (let i = 0; i <= 12; i++) x.lineTo(30 + i * (w - 60) / 12, 820 - (i % 2 ? 180 + R() * 60 : 60 + R() * 60));
-    x.lineTo(w - 30, 820); x.fill();
-    x.fillStyle = '#3f8f6a'; x.fillRect(30, 800, w - 60, 40);
-    x.fillStyle = '#4aa6e6'; x.fillRect(30, 840, w - 60, 150);
-    x.strokeStyle = 'rgba(255,255,255,0.35)'; for (let i = 0; i < 14; i++) { x.beginPath(); const y = 860 + i * 9; x.moveTo(60 + R() * 200, y); x.lineTo(200 + R() * 250, y); x.stroke(); }
+    // landscape vignette: layered ranges with snow, a treeline, and a still lake mirroring them
+    const X0 = 30, X1 = w - 30, Y0 = 560, HZ = 820, Y1 = 990;
+    x.save(); x.beginPath(); x.rect(X0, Y0, X1 - X0, Y1 - Y0); x.clip();
+    const sky = x.createLinearGradient(0, Y0, 0, HZ); sky.addColorStop(0, '#5aa6ee'); sky.addColorStop(1, '#d8eeff');
+    x.fillStyle = sky; x.fillRect(X0, Y0, X1 - X0, HZ - Y0);
+    const ridge = (base, amp, seed, cols, snow) => {
+      const r = rngLite(seed), pts = [];
+      for (let i = 0; i <= 9; i++) pts.push([X0 + i * (X1 - X0) / 9 + (i % 9 ? (r() - 0.5) * 30 : 0), base - amp * (0.35 + 0.65 * Math.abs(Math.sin(i * 0.9 + seed)) * (0.6 + 0.4 * r()))]);
+      const g = x.createLinearGradient(0, base - amp, 0, base); g.addColorStop(0, cols[0]); g.addColorStop(1, cols[1]);
+      const path = () => { x.beginPath(); x.moveTo(X0, base); for (const [px, py] of pts) x.lineTo(px, py); x.lineTo(X1, base); x.closePath(); };
+      path(); x.fillStyle = g; x.fill();
+      if (snow) { x.save(); path(); x.clip(); x.fillStyle = 'rgba(245,250,255,0.92)'; for (const [px, py] of pts) { x.beginPath(); x.moveTo(px - 40, py + 48); x.lineTo(px, py); x.lineTo(px + 34, py + 40); x.closePath(); x.fill(); } x.restore(); }
+    };
+    ridge(HZ, 230, 3, ['#8fb4d8', '#6f93b8'], true);
+    ridge(HZ, 150, 7, ['#5f86a8', '#3f6a78'], true);
+    ridge(HZ, 60, 11, ['#2f6a4a', '#23503a'], false);
+    // lake: the scene above, flipped and darkened, with ripple lines
+    x.save(); x.translate(0, HZ * 2); x.scale(1, -1); x.globalAlpha = 0.55; x.drawImage(c, X0, Y0, X1 - X0, HZ - Y0, X0, Y0, X1 - X0, HZ - Y0); x.restore();
+    const lake = x.createLinearGradient(0, HZ, 0, Y1); lake.addColorStop(0, 'rgba(40,110,170,0.35)'); lake.addColorStop(1, 'rgba(10,50,100,0.8)');
+    x.fillStyle = lake; x.fillRect(X0, HZ, X1 - X0, Y1 - HZ);
+    x.strokeStyle = 'rgba(255,255,255,0.28)'; x.lineWidth = 2;
+    for (let i = 0; i < 16; i++) { const y = HZ + 12 + i * 10; x.beginPath(); x.moveTo(X0 + 20 + R() * 180, y); x.lineTo(X0 + 140 + R() * 260, y); x.stroke(); }
+    x.restore();
     ui(x, w, h, R);
     return c;
   },
@@ -160,6 +173,31 @@ export const HOLO_ART = {
       x.restore();
     });
     return { canvas: c, count: list.length, keys: list };
+  },
+  // Landscape ad: emblem (or Harmony's profile) on the left, title + subline on the right.
+  wide(title, sub, seed = 1, hue = '#0b2a52', faceArt = false) {
+    const w = 1024, h = 512, c = makeCanvas(w, h), x = c.getContext('2d'); const R = rngLite(seed);
+    bg(x, w, h, hue, '#030d1c'); ui(x, w, h, R);
+    if (faceArt) face(x, 250, 250, 190); else emblem(x, 250, 250, 150);
+    let size = 84;
+    x.font = `400 ${size}px ${FONT}`;
+    while (x.measureText(title).width + title.length * 10 > 560 && size > 40) { size -= 4; x.font = `400 ${size}px ${FONT}`; }
+    glowText(x, title, 480, 250, size, 400, 10, '#eaf8ff');
+    x.fillStyle = 'rgba(160,225,255,0.7)'; x.fillRect(482, 285, 360, 3);
+    glowText(x, sub, 482, 335, 28, 300, 6, '#9fd8ff');
+    return c;
+  },
+  // Shop fascia names stacked in rows (one texture, one mesh for a whole street of signs).
+  signAtlas(names, w = 1024, rowH = 128) {
+    const c = makeCanvas(w, rowH * names.length), x = c.getContext('2d');
+    names.forEach(([text, col], i) => {
+      x.save(); x.translate(0, i * rowH);
+      x.fillStyle = '#03101f'; x.fillRect(0, 0, w, rowH);
+      x.fillStyle = col || '#9fe4ff'; x.fillRect(0, rowH - 6, w, 3);
+      glowText(x, text, w / 2, rowH * 0.7, rowH * 0.5, 400, 14, '#eaf8ff', 'center');
+      x.restore();
+    });
+    return { canvas: c, rows: names.length };
   },
   sign(text, w = 1024, h = 160) {
     const c = makeCanvas(w, h), x = c.getContext('2d');

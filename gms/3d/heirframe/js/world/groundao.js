@@ -7,7 +7,7 @@ import * as THREE from 'three';
 const BAKE_LAYER = 7;
 export const MAX_CONTACTS = 12;
 
-export function bakeGroundAO(renderer, scene, { x0, x1, z0, z1 }, { texel = 0.2 } = {}) {
+export function bakeGroundAO(renderer, scene, { x0, x1, z0, z1 }, { texel = 0.2, root = scene } = {}) {
   const W = Math.min(1024, Math.ceil((x1 - x0) / texel)), H = Math.min(1024, Math.ceil((z1 - z0) / texel));
   const cam = new THREE.OrthographicCamera(-(x1 - x0) / 2, (x1 - x0) / 2, (z1 - z0) / 2, -(z1 - z0) / 2, 0.01, 60);
   cam.position.set((x0 + x1) / 2, -0.25, (z0 + z1) / 2);
@@ -19,7 +19,7 @@ export function bakeGroundAO(renderer, scene, { x0, x1, z0, z1 }, { texel = 0.2 
   const tagged = [];
   const box = new THREE.Box3();
   scene.updateMatrixWorld(true);
-  scene.traverse((o) => {
+  root.traverse((o) => {
     if (!o.isMesh || o.isInstancedMesh || o.isSkinnedMesh || o.name === 'ground' || !o.visible) return;
     const m = Array.isArray(o.material) ? o.material[0] : o.material;
     if (!m || m.transparent || m.isShaderMaterial) return;

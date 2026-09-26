@@ -39,7 +39,7 @@ export function arcRailing(ctx, cx, cz, r, th0, th1, y = 0, h = 1.1) {
   }
 }
 
-function planter(ctx, x, z, len, wid, rot, seed, trees = 1, y = 0) {
+export function planter(ctx, x, z, len, wid, rot, seed, trees = 1, y = 0) {
   const { batch, M, col } = ctx;
   const h = 0.75;
   batch.put(roundedBar(len, wid, h, 0.2), y ? M.stoneUpper : M.stone, V(x, y, z), rot);
@@ -54,7 +54,7 @@ function planter(ctx, x, z, len, wid, rot, seed, trees = 1, y = 0) {
   col.box(x, z, len / 2, wid / 2, rot, 'planter');
 }
 
-function lamp(ctx, x, z, y = 0) {
+export function lamp(ctx, x, z, y = 0) {
   const { batch, M, col } = ctx;
   batch.add(cyl(0.07, 0.1, 5.2, x, y, z, 10), M.chrome);
   batch.add(cyl(0.22, 0.26, 0.3, x, y, z, 12), M.darkMetal);
@@ -119,7 +119,7 @@ function fountain(ctx) {
   col.circle(x, z, 6.7, 'fountain');
 }
 
-function kiosk(ctx) {
+export function kiosk(ctx) {
   const { batch, M, scene, col, layout, interactables } = ctx;
   const { x, z, rot } = layout.kiosk;
   const base = lathe([[0, 0], [1.1, 0], [1.1, 0.12], [0.7, 0.3], [0.45, 1.0], [0.6, 1.15], [0, 1.15]], 32);
@@ -141,7 +141,7 @@ function kiosk(ctx) {
   interactables.push({ id: 'contracts', label: 'Contract Terminal', x, z, r: 3.0 });
 }
 
-function warehousePad(ctx) {
+export function warehousePad(ctx) {
   const { batch, M, scene, col, layout, interactables } = ctx;
   const { x, z } = layout.pad;
   batch.put(lathe([[0, 0], [2.6, 0], [2.6, 0.08], [2.4, 0.14], [0, 0.14]], 48), M.darkMetal, V(x, 0, z));
@@ -160,7 +160,7 @@ function warehousePad(ctx) {
   interactables.push({ id: 'warehouse', label: 'Warehouse Link', x, z, r: 2.6 });
 }
 
-function holoPillar(ctx, x, z, art, rot = 0, h = 2.6) {
+export function holoPillar(ctx, x, z, art, rot = 0, h = 2.6) {
   const { batch, M, scene, col } = ctx;
   batch.add(cyl(0.18, 0.28, 0.5, x, 0, z, 12), M.darkMetal);
   batch.add(cyl(0.06, 0.06, h + 0.6, x, 0, z, 8), M.chrome);

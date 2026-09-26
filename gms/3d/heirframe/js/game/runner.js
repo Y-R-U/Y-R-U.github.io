@@ -137,6 +137,14 @@ export function createRunner(ctx) {
   function spawnBoss() {
     const b = R.mission.boss;
     if (!b || R.boss) return;
+    // breather before the boss: story bosses start with the frame patched up and a spare kit
+    if (R.mission.story) {
+      const pc = sim.playerCombatant();
+      pc.hp = pc.stats.hp; pc.shield = pc.stats.shield;
+      if ((sim.state.consumables.repairKit || 0) < 1) sim.state.consumables.repairKit = 1;
+      fx.ring(player.pos, 2.2, 0x7dffb0, 0.5);
+      ui.toast('Mara patched you up', 'good', { sub: 'Full repair + a spare kit' });
+    }
     const s = site(b.site) || site(R.step?.site) || { x: player.pos.x + 10, z: player.pos.z };
     const a = Math.atan2(player.pos.x - s.x, player.pos.z - s.z);
     let x = s.x - Math.sin(a) * 6, z = s.z - Math.cos(a) * 6;
@@ -181,6 +189,7 @@ export function createRunner(ctx) {
     }
     if (s.type === 'choose') runChoice(s);
     if (s.type === 'photo') R.ss.need = s.shots || 1;
+    log(`step ${i} ${s.type}${s.target ? ':' + s.target : ''} ${s.site || s.sites?.join(',') || ''}`);
     storyEvent(`enter:${i}`);
     ctx.onStep && ctx.onStep(R, s);
   }

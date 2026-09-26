@@ -22,7 +22,7 @@
 <script type="importmap">{"imports":{"three":"../../../lib/three/0.180.0/three.module.js","three/addons/":"../../../lib/three/0.180.0/addons/"}}</script>
 <script type="module">
 import * as THREE from '../../../lib/three/0.180.0/three.module.js';
-import { createRobot, ROBOT_KINDS, ANIMS } from '../js/actors/robots.js';
+import { createRobot, createDropPod, ROBOT_KINDS, ANIMS } from '../js/actors/robots.js';
 
 const Q = new URLSearchParams(location.search);
 const view = Q.get('view') || 'lineup';
@@ -123,6 +123,7 @@ let fixedRot = Q.get('rot') !== null ? parseFloat(Q.get('rot')) : 0;
 const quality = Q.get('q') || 'high';
 const lod = Q.get('lod') || 'near';
 
+let pod = null, podLoop = null, podWait = null;
 function clear() { for (const r of robots) r.dispose(); robots.length = 0; }
 function add(opts, x, z = 0) {
   const r = createRobot({ quality, lod, ...opts });
@@ -147,6 +148,21 @@ function build() {
     const k = Q.get('kind') || 'brawler';
     for (let i = 0; i < 5; i++) add({ kind: k, tier: i, seed: 1 }, (i - 2) * 1.25);
     dist = 12; target.set(0, 1.0, 0);
+  } else if (view === 'pod') {
+    // drop-pod cycle: land → open → (a frame steps out) → close → leave, looping. ?pt= freezes at that many seconds.
+    pod?.dispose(); pod = createDropPod(); scene.add(pod.root);
+    const fr = add({ kind: Q.get('kind') || 'brawler', tier: +(Q.get('tier') || 1), seed: 1 }, 0); fr.root.visible = false;
+    podLoop = async () => {
+      for (;;) {
+        fr.root.visible = false; pod.root.position.set(0, 0, 0);
+        await pod.play('land'); await pod.play('open');
+        fr.root.visible = true; fr.root.position.set(0, 0.3, 0); fr.setMove(0.3, 1.2);
+        for (let t = 0; t < 1.8; t += 1 / 60) { fr.root.position.z = Math.min(2.3, t * 1.3); fr.root.position.y = fr.root.position.z > 0.9 ? 0 : 0.3; await new Promise((r) => (podWait = r)); }
+        fr.setMove(0); await pod.play('close'); await pod.play('leave');
+      }
+    };
+    podLoop();
+    dist = 11; target.set(0, 2.2, 0); pitch = 0.25;
   } else if (view === 'hero') {
     add({ kind: Q.get('kind') || 'civ_gold', tier: +(Q.get('tier') || 0), seed: +(Q.get('seed') || 1) }, 0);
     dist = 4.2; target.set(0, 1.0, 0);
@@ -192,7 +208,7 @@ sb.onclick = () => { spin = spin ? 0 : 0.3; sb.classList.toggle('on', !!spin); }
 bar.appendChild(sb);
 const fb = document.createElement('button'); fb.textContent = 'flash'; fb.onclick = () => robots.forEach((r) => r.hitFlash()); bar.appendChild(fb);
 const vs = document.createElement('select');
-for (const v of ['lineup', 'iso', 'hero', 'tiers', 'seeds', 'crowd']) { const o = document.createElement('option'); o.value = o.textContent = v; if (v === view) o.selected = true; vs.appendChild(o); }
+for (const v of ['lineup', 'iso', 'hero', 'tiers', 'seeds', 'crowd', 'pod']) { const o = document.createElement('option'); o.value = o.textContent = v; if (v === view) o.selected = true; vs.appendChild(o); }
 vs.onchange = () => { Q.set('view', vs.value); location.search = Q.toString(); };
 bar.appendChild(vs);
 
@@ -217,13 +233,14 @@ let rot = fixedRot, clockT = 0;
 const camRight = () => new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
 function step(dt) {
   clockT += dt;
+  if (pod) { pod.update(dt); const w = podWait; podWait = null; w?.(); }
   rot += spin * dt;
   for (const r of robots) {
     if (r.orbit) {
       const o = r.orbit; o.a += (o.w / o.R) * dt;
       r.root.position.set(Math.cos(o.a) * o.R, 0, Math.sin(o.a) * o.R);
       r.root.rotation.y = Math.atan2(-Math.sin(o.a), Math.cos(o.a));
-    } else r.root.rotation.y = yaw + rot;
+    } else if (!pod) r.root.rotation.y = yaw + rot;
     r.update(dt);
   }
 }

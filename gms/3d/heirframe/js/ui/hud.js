@@ -174,8 +174,10 @@ export function createHud(bus) {
       const v = clamp(s.heat || 0, 0, 5);
       r.pips.forEach((pip, i) => pip.style.setProperty('--f', clamp(v - i, 0, 1)));
       if (r.heat.classList.contains('on') !== v > 0.01) { r.heat.classList.toggle('on', v > 0.01); bus.emit('_restack'); }
-      r.heat.classList.toggle('hot', v >= 3);
-      r.heatLbl.textContent = v < 1 ? 'Noticed' : v < 2 ? 'Heat' : v < 3 ? 'Wanted' : v < 4 ? 'Hunted' : 'Lockdown';
+      // a star holds until its pip drains completely (the last pip shows the decay)
+      const stars = Math.ceil(v - 1e-6);
+      r.heat.classList.toggle('hot', stars >= 3);
+      r.heatLbl.textContent = ['', 'Noticed', 'Wanted', 'Hunted', 'Crackdown', 'Lockdown'][stars] || '';
     }
     if ('district' in p) r.district.textContent = s.district || '';
     if ('mission' in p) {

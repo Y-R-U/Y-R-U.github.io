@@ -20,6 +20,8 @@ import { createFrames } from './frames.js';
 import { createBoss } from './boss.js';
 import { createHeat } from './heat.js';
 
+// Harmony PA pool: everything except the Renewal countdown lines, which play as milestones after contracts
+const PA_KEYS = () => (audio.voKeys?.() || []).filter((k) => k.startsWith('pa_') && !k.startsWith('pa_renewal_'));
 const UI_SFX = { click: 'ui_click', open: 'ui_open', close: 'ui_close', deny: 'ui_deny', confirm: 'ui_confirm', levelup: null, loot: null, loot_rare: null, toast: 'ui_hover', type: null };
 const EMITTERS = [['fountain', 0, 0, 1], ['waterfall', -47, -62, 1], ['waterfall', 66, -96, 1.2], ['fountain', -47, -57, 0.6]];
 
@@ -146,7 +148,12 @@ export async function createGame(api) {
     const act = ui ? await ui.screen('death', { cause: `Wrecked by ${cause}`, cost: r.cost || 0, tip }) : 'redeploy';
     if (G.runner.active && !G.sim.state.contract) G.runner.failed('wrecked');
     else if (G.runner.active) setTimeout(() => ui?.toast('Back on the job', 'info', { sub: `${G.runner.mission?.title || 'The contract'} is still open` }), 400);
-    const sp = world.spawnPoints.kiosk, rx = sp.x + 2, rz = sp.z + 3;
+    // redeploy at whichever safe point is furthest from the fight (a boss parked on the kiosk shouldn't spawn-camp)
+    const alive = G.enemies.alive().filter((e) => !e.ally);
+    const cands = [world.spawnPoints.kiosk, world.spawnPoints.pad, world.spawnPoints.player].filter(Boolean).map((p) => ({ x: p.x + 2, z: p.z + 3 }));
+    const clear = (p) => alive.reduce((m, e) => Math.min(m, Math.hypot(e.pos.x - p.x, e.pos.z - p.z)), 99);
+    const best = cands.reduce((a, b) => (clear(b) > clear(a) + 8 ? b : a), cands[0]);
+    const rx = best.x, rz = best.z;
     // no redeploy into the same fight: strays near the kiosk leave, everyone else calms down and walks home
     G.enemies.clear((e) => !e.mission && e.state !== 'dead' && Math.hypot(e.pos.x - rx, e.pos.z - rz) < 30);
     for (const e of G.enemies.list) {
@@ -154,11 +161,14 @@ export async function createGame(api) {
       e.state = 'idle'; e.c.alerted = false; e.bot.setAlert(0); e.detect = 0; e.route = null;
       if (Math.hypot(e.home.x - rx, e.home.z - rz) < 20) e.home.set(e.pos.x, 0, e.pos.z);
     }
-    G.spawnShield = 3;
+    for (const e of G.enemies.list) if (e.mission && e.state !== 'dead' && Math.hypot(e.pos.x - rx, e.pos.z - rz) < 16) { e.state = 'idle'; e.c.alerted = false; e.hunter = false; e.bot.setAlert(0); }
+    G.spawnShield = 4;
     player.teleport(rx, rz, Math.PI);
     rig.target.copy(player.pos); rig.snap();
     player.actor.play('idle');
     G.sim.playerCombatant();
+    // story checkpoints come back fully repaired: no spawn-death loops mid-boss
+    if (G.sim.state.contract?.mission.story) { const pc = G.sim.playerCombatant(); pc.hp = pc.stats.hp; pc.shield = pc.stats.shield; }
     G.state = 'free';
     if (act === 'warehouse') openWarehouse();
   }
@@ -372,6 +382,8 @@ export async function createGame(api) {
     if (out.clue) ui?.toast('Codex updated', 'story', { sub: out.clue === 'C01' ? 'The Heir-Key' : out.clue });
     if (out.mission.story?.id === 'a1_m1') ui?.sting('The board is yours', 'Random contracts unlocked', 'unlock', 3000);
     if (out.mission.story?.id === 'a1_m5') setTimeout(() => ui?.sting('Act 1 complete', 'A BRIGHTER FUTURE · Act 2 arrives in the next update', 'story', 4600), 600);
+    const days = G.sim.state.story.renewalDays;
+    if (!out.mission.story && days % 10 === 0 && audio.hasVo(`pa_renewal_${days}`)) setTimeout(() => audio.bark([`pa_renewal_${days}`], { force: true }), 5000);
     if (out.stiffed) ui?.toast('Stiffed!', 'bad', { sub: 'The client won\'t pay. A Collect bounty is on the board' });
     G.sim.save();
   }
@@ -412,7 +424,7 @@ export async function createGame(api) {
       get fighting() { return G.fighting; },
       log, carrying: () => G.carrying,
       onCollateral: (v) => { if (!sim.state.contract) return; sim.reportCollateral(v); ui?.toast(`Collateral −${sim.state.contract.mission.modifiers.includes('collateral') ? v * 2 : v} cr`, 'warn', { ms: 1400, sub: 'Clean bonus lost' }); },
-      onSpotted: (e) => { if (e.watcher || e.heat === 1) { sim.reportSpotted(); if (e.heat === 1 && sim.state.factions.heat < 2) sim.forceHeat(Math.floor(sim.state.factions.heat) + 1); } },
+      onSpotted: (e) => { if (e.watcher || e.heat === 1) { sim.reportSpotted(); if (e.heat === 1 && sim.state.factions.heat <= 1) sim.forceHeat(2); } },
       onBoss: (on) => { G.bossOn = on; setMusic(on ? 'boss' : 'combat'); },
     };
     G.props = ctx.props = createProps(ctx);
@@ -435,6 +447,10 @@ export async function createGame(api) {
     ctx.goalOverride = () => nextGoal(sim);
     G.coach = ui ? createCoach(G, { ui, rig, player }) : null;
     sim.storyActCap = 1;   // P2a: Act 1 only; Act 2 story cards come with P3
+    // archetypes/twists the runner implements (P2a); tail, repo, race, rescue, heist, wetwork and the choice twists come later
+    sim.setScope({ archetypes: ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'infiltrate', 'transport', 'defend', 'assassinate'],
+      twists: ['T1', 'T2', 'T3', 'T4', 'T6', 'T7', 'T8', 'T9', 'T10'] });
+    if (sim.state.board && !sim.state.contract && sim.state.board.cards.some((c) => !['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'infiltrate', 'transport', 'defend', 'assassinate'].includes(c.archetype))) sim.refreshBoard();
     ctx.bossLine = (key, speaker) => story.bark({ speaker, vo: key });
     sim.on('levelUp', (p) => { ui?.sting(`Level ${p.level}`, (p.features || []).map((f) => f.name || f.id).join(' · ') || 'Frame systems upgraded', 'level', 3000); audio.sfx('levelup'); audio.bark('b_hira_levelup_', { cooldown: 10 }); log('level ' + p.level); });
     sim.on('toast', (p) => ui?.toast(p.text, p.kind || 'info'));
@@ -524,7 +540,7 @@ export async function createGame(api) {
     G.enemies.update(dt * hs, { playerDead: G.state === 'down', sneaking: !!ui?.controls.sneak });
     if (!paused && G.state === 'free' && !ui?.dialogue.open && !overlay.cardOpen) G.runner.update(dt);
     G.boss.update(dt);
-    G.heat.update(dt, { paused: paused || G.state !== 'free', calm: story.busy || !!ui?.dialogue.open });
+    G.heat.update(dt, { paused: paused || G.state !== 'free', calm: !!ui?.dialogue.open || overlay.cardOpen });
     G.props.update(dt, player.pos, onLootCollect);
 
     // interactables near the player
@@ -544,7 +560,7 @@ export async function createGame(api) {
     if (!panelOpen() && G.state === 'free') setMusic(G.bossOn ? 'boss' : fighting ? 'combat' : 'explore');
     if (fighting && crowd?.scare) crowd.scare(player.pos.x, player.pos.z, 16);
     // Harmony PA every ~90 s of free roaming
-    if (G.state === 'free' && !fighting && !story.busy && (G.paT -= dt) <= 0) { G.paT = 80 + Math.random() * 30; audio.bark('pa_', { cooldown: 60 }); }
+    if (G.state === 'free' && !fighting && !story.busy && (G.paT -= dt) <= 0) { G.paT = 80 + Math.random() * 30; { const k = PA_KEYS(); if (k.length) audio.bark(k, { cooldown: 60 }); } }
     if ((G.autosaveT -= dt) <= 0 && G.state === 'free') { G.autosaveT = 30; sim.save(); }
 
     overlay.suppress(!!(ui?.root?.classList.contains('hf-in-dialogue') || panelOpen() || ui?.root?.classList.contains('hf-in-screen')));

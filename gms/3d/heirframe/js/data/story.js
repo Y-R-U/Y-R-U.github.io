@@ -48,8 +48,8 @@ export const STORY_MISSIONS = [
     steps: [
       { type: 'goto', tags: ['fountain', 'plaza'], radius: 7, label: 'The civic-records node, under the statue' },
       { type: 'hack', at: 0, time: 5, ghostTime: 2.5, verb: 'Query the records node', label: 'Match your genome at the node' },
-      { type: 'survive', seconds: 50, orExfilTags: ['relay'], label: 'Wardens incoming: reach the Transit Relay' },
-      { type: 'exfil', tags: ['relay'], radius: 4, label: 'Transit Relay: get out' },
+      { type: 'survive', seconds: 45, label: 'Wardens incoming: stay alive' },
+      { type: 'exfil', tags: ['relay'], radius: 4, far: true, label: 'Transit Relay: get out' },
     ] },
   { id: 'a2_m1', act: 2, title: 'The Garden of Blank Names', gate: 8, archetype: 'escort', district: 'terraces', clues: ['C06'], unlocks: ['terraces'], faction: 'concord',
     blurb: 'Find Dr. Fenn at the memorial garden and get him away from the sweepers.' },

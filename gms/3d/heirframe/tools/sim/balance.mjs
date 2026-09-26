@@ -25,9 +25,14 @@ const HUMAN = 1.25;          // humans are slower than the bot at walking/readin
 const OVERHEAD = 40;         // board, results card, travel to the first marker (s)
 const FRAME_ORDER = ['brawler', 'gunner', 'ghost'];
 
-export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate = ROTATE, log = console.log } = {}) {
+export const P2A_ARCH = ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'infiltrate', 'transport', 'defend', 'assassinate'];
+export const P2A_TWISTS = ['T1', 'T2', 'T3', 'T4', 'T6', 'T7', 'T8', 'T9', 'T10'];
+
+export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate = ROTATE, log = console.log, act1 = !args.all } = {}) {
   const game = createGame({ seed, store: createSaveStore(memoryStorage()) });
   game.noAutosave = true;
+  // same runtime scope as js/game/game.js (P2a): Act 1 story, the archetypes/twists the runner implements
+  if (act1) { game.storyActCap = 1; game.setScope({ archetypes: P2A_ARCH, twists: P2A_TWISTS }); game.refreshBoard(); }
   const S = game.state;
   const brng = createRng('balance|' + seed);
   const out = { spent: {}, deathLog: [], milestones: {}, hourly: [], ttk: [], deaths: 0, fails: 0, contracts: 0, idleRich: 0, notes: [] };
@@ -36,6 +41,7 @@ export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate =
   game.on('loot', p => { for (const it of p.items || []) if (it.rarity === 'relic') ms('firstRelic'); });
   game.on('frame:buy', () => { const n = game.ownedFrames().length; ms(['', 'frame1', 'frame2', 'frame3'][n]); });
   game.on('levelUp', p => { ms('level' + p.level); });
+  game.on('story', p => { ms('story_' + p.id); });
   out.xpBy = {}; out.grades = {};
   game.on('xp', p => { out.xpBy[p.source] = (out.xpBy[p.source] || 0) + p.gained; hourXp += p.gained / L(S.player.level); });
   let hourXp = 0, hourContracts = 0;
@@ -266,6 +272,8 @@ export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate =
     const acc = game.acceptContract(m.id);
     if (!acc.ok) { game.refreshBoard(); continue; }
     const mission = acc.mission;
+    // A1-M4: Mara's dealer discount lands on accept and the mission opens at Sal's lot (the runtime does the same)
+    if (mission.story?.id === 'a1_m4' && game.grantFrameDiscount().ok) spend();
     // planner par times are the design intent; players land around 1.0-1.4x par, plus fights
     let t = OVERHEAD + Math.max(mission.parTime || 180, missionTime(mission)) * brng.range(1.0, 1.4);
     let failed = false;
@@ -376,8 +384,9 @@ if (isMain) {
   const M = r.milestones;
   console.log('\nMilestones (target):');
   const rows = [
-    ['first contract / level 2', M.level2, '5 min'], ['first upgrade equipped', M.firstUpgrade, '<= 8 min'], ['first frame', M.frame1, '30-45 min (brief: 45-75)'],
-    ['level 8 (Act 1)', M.level8, '1.3 h'], ['second frame', M.frame2, '3-4 h'], ['third frame', M.frame3, '7-9 h'], ['first Relic', M.firstRelic, '3-5 h'],
+    ['first contract / level 2', M.level2, '5 min'], ['first upgrade equipped', M.firstUpgrade, '<= 8 min'], ['first frame', M.frame1, '45-75 min (D19)'],
+    ['A1-M4 Kettle', M.story_a1_m4, '—'], ['Act 1 done (A1-M5)', M.story_a1_m5, '60-100 min (P2)'],
+    ['level 5', M.level5, '40-55 min (D19)'], ['level 8 (Act 1)', M.level8, '1.3 h'], ['second frame', M.frame2, '3-4 h'], ['third frame', M.frame3, '7-9 h'], ['first Relic', M.firstRelic, '3-5 h'],
     ['level 15', M.level15, '3.4 h'], ['level 20', M.level20, '5.5 h'], ['level 30', M.level30, '11.3 h'], ['level 40', M.level40, '19.1 h'], ['level 50', M.level50, '28-32 h'], ['level 60', M.level60, '~40 h'],
   ];
   for (const [k, v, tgt] of rows) console.log(`  ${k.padEnd(26)} ${hm(v).padStart(8)}   target ${tgt}`);

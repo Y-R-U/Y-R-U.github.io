@@ -9,7 +9,7 @@ import { xpNext, addXp, addSyncXp, framePrice, mkUpgrade, repairCost, wreckCost,
 import { createEnemy } from './enemies.js';
 import { L } from '../data/balance.js';
 import { newFactionState, adjustRep, killRep, resetMissionRep, stance, addHeat, setHeat, tickHeat, heatStars, heatEffects, repPayMul, canHarm } from './factions.js';
-import { generateBoard, completionRewards, threatDef, validateMission } from './missions.js';
+import { generateBoard, generateContract, completionRewards, threatDef, validateMission, missionPayout } from './missions.js';
 import { newStoryState, storyReady, completeStory, tickRenewal, rollEcho, echoAvailable, buildStoryMission, storyFlags, storyCacheItem, codexView } from './story.js';
 import { createSaveStore, SAVE_VERSION } from './save.js';
 import { OWNABLE_FRAMES, MK_TIERS } from '../data/frames.js';
@@ -515,7 +515,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
       frameArchetype: activeFrame().archetype, districts: S.districts.unlocked.map(id => ({ id })), currentDistrict: S.districts.current,
       danger: Object.fromEntries(S.districts.unlocked.map(id => [id, S.districts.danger[id] ?? DISTRICTS[id].danger])),
       contractsDone: S.stats.contractsDone, flags: storyFlags(S.story), sites: live.sitesRegistry,
-      repMul: f => repPayMul(S.factions, f), creditsPct: frameStats().creditsPct, ...extra,
+      repMul: f => repPayMul(S.factions, f), creditsPct: frameStats().creditsPct, archetypes: live.archetypes || null, twists: live.twists || null, ...extra,
     };
   }
   function storyCard() {
@@ -555,6 +555,17 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     playerCombatant();
     emit('contract:accept', { mission: m });
     return { ok: true, mission: m };
+  }
+
+  // tests: put a specific contract on the board ({archetype, grade, twist, modifiers, seed}) → mission or null
+  function makeContract({ archetype, grade = 'street', twist = null, modifiers = null, seed = 1 } = {}) {
+    const ctx = boardCtx({ contractsDone: 99 });
+    const m = generateContract(createRng(`${S.seed}|debug|${seed}`), ctx, { grade, archetype, district: S.districts.current, forceTwist: twist, noTwist: !twist, slot: 9 });
+    if (!m) return null;
+    if (twist && (!m.twist || m.twist.id !== twist)) return null;
+    if (modifiers) { m.modifiers = modifiers.slice(); m.timeLimit = modifiers.includes('timed') ? Math.round(m.parTime * 1.3) : null; m.payout = missionPayout(m, ctx); }
+    board().cards.unshift(m);
+    return m;
   }
 
   const currentStep = () => S.contract ? S.contract.steps[S.contract.stepIndex] || null : null;
@@ -658,7 +669,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
         if (fx.grants.firstFrameDiscount) S.flags.firstFrameDiscount = true;
         if (fx.grants.heirCore) addItem(makeHeirCore(actRng('heircore'), m.level));
         if (fx.grants.home) S.home = fx.grants.home;
-        if (fx.setHeat != null) emit('heat', (setHeat(S.factions, fx.setHeat), { stars: heatStars(S.factions) }));
+        if (fx.setHeat != null) emit('heat', (setHeat(S.factions, fx.setHeat ? Math.max(S.factions.heat, fx.setHeat) : 0), { stars: heatStars(S.factions) }));
         if (m.story.id === 'a1_m1') S.flags.boardUnlocked = true;
         emit('story', fx);
       }
@@ -869,6 +880,9 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     features: () => featuresAt(S.player.level), threatsUnlocked, enemyStance, freeStash, validateMission,
     framePrice: () => framePrice(ownedFrames().length, { discount: S.flags.firstFrameDiscount }),
     // actions
+    // runtime scope: which archetypes/twists the engine can run (null = all)
+    setScope({ archetypes = null, twists = null } = {}) { live.archetypes = archetypes; live.twists = twists; },
+    makeContract,
     get storyActCap() { return live.storyActCap ?? Infinity; }, set storyActCap(v) { live.storyActCap = v; }, forceHeat, grantFrameDiscount,
     tick, refreshBoard, rerollBoard, acceptContract, completeStep, fireTwist, reportAlarm, reportCollateral, reportSpotted, finishContract, failContract, abandonContract, playerWrecked,
     spawnEnemy, hit, useSkill: useSkillFor, kill, addItem, lootPickup: items => items.map(i => addItem(i)).filter(Boolean),

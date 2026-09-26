@@ -4,14 +4,19 @@ export function createCollision(bounds) {
   const circles = [], boxes = [], arcs = [], heights = [], customs = [];
   const C = {
     bounds, circles, boxes, arcs, heights,
-    circle(x, z, r, tag) { circles.push({ x, z, r, tag }); },
-    box(x, z, hw, hd, rot = 0, tag) { boxes.push({ x, z, hw, hd, c: Math.cos(rot), s: Math.sin(rot), tag }); },
+    circle(x, z, r, tag) { const e = { x, z, r, tag }; circles.push(e); return e; },
+    box(x, z, hw, hd, rot = 0, tag) { const e = { x, z, hw, hd, c: Math.cos(rot), s: Math.sin(rot), tag }; boxes.push(e); return e; },
+    // drop one shape returned by circle()/box() (breakable props)
+    remove(e) { for (const L of [circles, boxes, arcs]) { const i = L.indexOf(e); if (i >= 0) { L.splice(i, 1); return true; } } return false; },
+    // district swap: same object (callers may hold it), new contents
+    reset(nb) { for (const L of [circles, boxes, arcs, heights, customs]) L.length = 0; C.bounds = nb; },
     // blocked ring sector: centre, radii, angle range in theta convention (x = sin θ, z = cos θ)
     arc(x, z, r0, r1, a0, a1, tag) { arcs.push({ x, z, r0, r1, a0, a1, tag }); },
     custom(fn) { customs.push(fn); },
     // walk-around area height; kind 'flat' {y} or 'rampZ' {z0,z1,y0,y1}
     height(region) { heights.push(region); },
     blocked(x, z, r = 0.4) {
+      const bounds = C.bounds;
       if (x - r < bounds.x0 || x + r > bounds.x1 || z - r < bounds.z0 || z + r > bounds.z1) return true;
       for (const c of circles) { const dx = x - c.x, dz = z - c.z, rr = c.r + r; if (dx * dx + dz * dz < rr * rr) return true; }
       for (const b of boxes) {

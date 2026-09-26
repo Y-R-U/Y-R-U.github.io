@@ -24,6 +24,12 @@ export function createGround(ctx) {
   g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
 
   const mat = M.marble;
+  // rebuilt on every visit to the district: patch the shared material once, reuse its uniforms after that
+  if (mat.userData.groundU) {
+    ctx.groundAO = mat.userData.groundU;
+    ctx.groundAO.uAOOn.value = 0;
+    return addMesh(ctx, g, mat);
+  }
   const slate = M.stoneTex.slate;
   const prev = mat.onBeforeCompile;
   const u = { tSlate: { value: slate.map }, tSlateR: { value: slate.roughnessMap }, uTime: ctx.time,
@@ -31,6 +37,7 @@ export function createGround(ctx) {
     uContacts: { value: Array.from({ length: MAX_CONTACTS }, () => new THREE.Vector3(0, 0, 0)) } };
   u.tAO.value.needsUpdate = true;
   ctx.groundAO = u;
+  mat.userData.groundU = u;
   mat.defines = { ...(mat.defines || {}), REFL_ZONE: '' };
   mat.onBeforeCompile = (sh, r) => {
     prev?.(sh, r);
@@ -183,7 +190,10 @@ totalEmissiveRadiance += vec3(0.16, 0.09, 0.02) * zI;
   };
   const baseKey = mat.customProgramCacheKey?.() || '';
   mat.customProgramCacheKey = () => baseKey + 'ground';
+  return addMesh(ctx, g, mat);
+}
 
+function addMesh({ scene }, g, mat) {
   const mesh = new THREE.Mesh(g, mat);
   mesh.receiveShadow = true;
   mesh.name = 'ground';

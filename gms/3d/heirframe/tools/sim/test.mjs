@@ -12,7 +12,8 @@ import { RARITIES, RARITY_INDEX, SLOTS, RARITY_BANDS, POWERS } from '../../js/da
 import { STORY_MISSIONS } from '../../js/data/story.js';
 import { DISTRICTS, DISTRICT_ORDER } from '../../js/data/districts.js';
 import { THREATS } from '../../js/data/missions.js';
-import { runBalance } from './balance.mjs';
+import { runBalance, P2A_ARCH, P2A_TWISTS } from './balance.mjs';
+import { FRAMES, SKILLS, SYNC_MODS } from '../../js/data/frames.js';
 
 const QUICK = process.argv.includes('--quick');
 let pass = 0, fail = 0;
@@ -285,6 +286,81 @@ test('ui_adapt shapes', () => {
   assert(toUiContract(g.board().cards[0]).title, 'contract shape');
   g.acceptContract(g.board().story.id); const out = playThrough(g);
   assert(toUiComplete(out, g), 'complete shape');
+});
+
+console.log('P2a');
+test('frame kits: every frame skill has a kind the runtime casts; sync-5 mods patch a real skill', () => {
+  const KINDS = ['melee', 'ranged', 'self', 'distract', 'aoe', 'dash', 'cone', 'line', 'summon', 'blink', 'hack'];
+  for (const f of Object.values(FRAMES)) for (const [slot, id] of Object.entries(f.skills)) {
+    if (slot === 'heir') continue;
+    assert(SKILLS[id], `${f.id} ${slot} ${id} missing`);
+    assert(KINDS.includes(SKILLS[id].kind), `${id} kind ${SKILLS[id].kind}`);
+  }
+  for (const [fid, ranks] of Object.entries(SYNC_MODS)) for (const r of ranks) for (const o of r.options) assert(Object.values(FRAMES[fid].skills).includes(o.skill), `${fid} mod ${o.id} → ${o.skill}`);
+});
+test('buy, swap, Mk gate and sync mod: prices 1,500 / 12,000 / 50,000, A1-M4 discount 30%', () => {
+  const g = newGame(11);
+  while (g.state.player.level < 5) g.giveXp(200);
+  assert(g.grantFrameDiscount().ok && g.framePrice() === 1050, 'discount price ' + g.framePrice());
+  g.addCredits(200000);
+  const prices = ['brawler', 'gunner', 'ghost'].map(k => { const r = g.buyFrame(k); assert(r.ok, 'buy ' + k + ' ' + r.reason); return r.price; });
+  eq(prices, [1050, 12000, 50000], 'licence prices');
+  const b = g.state.frames.find(f => f.frameId === 'brawler');
+  assert(g.swapFrame(b.uid).ok && g.activeFrame().archetype === 'brawler', 'swap to brawler');
+  assert(!g.swapFrame(g.state.frames.find(f => f.frameId === 'gunner').uid, { inCombat: true }).ok, 'no swap in combat');
+  assert(g.upgradeMk(b.uid).reason === 'gate', 'Mk II gated by level 10 + sync 4');
+  b.sync = 5;
+  assert(g.chooseSyncMod(b.uid, 5, 'aftershock').ok && g.frameSkills(b).s1.echo, 'sync 5 mod patches Ground Slam');
+});
+test('P2a board scope: only runnable archetypes/twists; Act 1 story cap', () => {
+  const g = newGame(12);
+  g.setScope({ archetypes: P2A_ARCH, twists: P2A_TWISTS });
+  g.storyActCap = 1;
+  const seen = new Set();
+  for (let i = 0; i < 40; i++) {
+    while (g.state.player.level < 2 + (i % 12)) g.giveXp(300);
+    g.state.shiftIndex++;
+    for (const c of g.refreshBoard().cards) { seen.add(c.archetype); assert(P2A_ARCH.includes(c.archetype), 'archetype ' + c.archetype); if (c.twist) assert(P2A_TWISTS.includes(c.twist.id), 'twist ' + c.twist.id); }
+  }
+  for (const a of ['bounty', 'escort', 'sabotage', 'hack']) assert(seen.has(a), 'never rolled ' + a);
+  g.state.story.done = ['a1_m1', 'a1_m2', 'a1_m3', 'a1_m4', 'a1_m5']; g.state.story.mission = 'a2_m1';
+  assert(!g.storyCard(), 'Act 2 card hidden under the cap');
+});
+test('forced contracts: bounty/escort/sabotage/hack with T2/T3/T9 and every P2a modifier validate and complete', () => {
+  const g = newGame(13);
+  while (g.state.player.level < 12) g.giveXp(500);
+  const combos = [['bounty', 'T2', ['fragile']], ['bounty', 'T9', ['watched']], ['escort', 'T9', ['vip']], ['sabotage', 'T3', ['collateral', 'reinforced']], ['hack', null, ['watched']], ['retrieve', 'T3', ['fragile']], ['courier', 'T9', ['reinforced']]];
+  for (const [a, tw, mods] of combos) {
+    const m = g.makeContract({ archetype: a, grade: a === 'sabotage' ? 'pro' : 'street', twist: tw, modifiers: mods, seed: a.length });
+    assert(m, `no ${a} ${tw}`);
+    const v = g.validateMission(m); assert(v.ok, `${a} ${tw}: ${v.errors.join('; ')}`);
+    assert(g.acceptContract(m.id).ok, 'accept ' + a);
+    // payout twists (T9) fire at finish, like js/game/runner.js finish()
+    if (tw === 'T9') { while (!g.completeStep({}).done); g.fireTwist(); }
+    const out = tw === 'T9' ? g.finishContract({ time: m.parTime }) : playThrough(g);
+    assert(out?.ok !== false && !g.state.contract, `${a} ${tw} did not complete`);
+    if (tw === 'T9') assert(out.stiffed && g.board().cards[0].id.endsWith('_collect'), 'T9 adds a Collect card');
+  }
+});
+test('Heat: forceHeat holds the star, decays one star per 3 min, reaches 5', () => {
+  const g = newGame(14);
+  const stars = () => g.hud().heatStars ?? Math.ceil(g.state.factions.heat - 1e-6);
+  g.forceHeat(3);
+  g.tick(1);
+  assert(stars() === 3, 'still 3 stars after 1 s: ' + g.state.factions.heat);
+  g.tick(181);
+  assert(stars() === 2, '2 stars after 3 min');
+  g.forceHeat(5); g.tick(1); assert(stars() === 5, '5 stars');
+  g.tick(5 * 181); assert(stars() === 0, 'cold after 15 min');
+});
+test('P2 pacing (bot, Tense): Act 1 in 60-100 min, first frame 45-75 min (median of 6 seeds)', () => {
+  const act = [], frame = [];
+  for (const seed of [1, 2, 3, 4, 5, 6]) { const r = runBalance({ hours: 2.2, seed, quiet: true, act1: true }); act.push(r.milestones.story_a1_m5 / 60); frame.push(r.milestones.frame1 / 60); }
+  const med = a => a.slice().sort((x, y) => x - y)[Math.floor(a.length / 2)];
+  console.log(`       Act 1 min: ${act.map(Math.round).join(' ')} · first frame min: ${frame.map(Math.round).join(' ')}`);
+  assert(med(act) >= 60 && med(act) <= 100, 'Act 1 median ' + med(act));
+  assert(med(frame) >= 45 && med(frame) <= 75, 'first frame median ' + med(frame));
+  assert(act.every(x => x >= 55 && x <= 110), 'Act 1 outlier');
 });
 
 console.log(`\n${pass} passed, ${fail} failed${fail ? ': ' + failures.join(', ') : ''}`);

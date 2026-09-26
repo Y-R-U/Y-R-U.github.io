@@ -409,11 +409,14 @@ export function createEnemies(ctx) {
     convert(e, t) { e.ally = t; e.state = 'chase'; e.pending = null; e.tele = null; e.aggro = null; e.bot.setAlert(0); fx.ring(e.pos, 1.6, 0x7ff6ff, 0.5); fx.sparks(tmp.set(e.pos.x, e.pos.y + 1.2, e.pos.z), 0x7ff6ff, 12, 5); },
     // Veil: engaged enemies lose the player and search the last known spot
     loseTrack(p, r) {
+      let lost = null;
       for (const e of list) {
         if (e.state === 'dead' || e.nonCombat || e.ally || e.brain || e.state === 'idle') continue;
         if (e.pos.distanceTo(p) > r) continue;
         e.state = 'search'; e.searchT = 5; e.lastSeen = p.clone(); e.c.alerted = false; e.detect = 0.4; e.pending = null; e.bot.setAlert(1);
+        lost ||= e;
       }
+      if (lost) audio.bark(lost.c.faction === 'concord' ? 'b_warden_lost_' : lost.c.faction === 'syndicate' ? 'b_thug_lost_' : [], { x: lost.pos.x, z: lost.pos.z, cooldown: 10 });
     },
     taunt(x, z, r, t) { for (const e of list) if (e.state !== 'dead' && !e.nonCombat && !e.ally && Math.hypot(e.pos.x - x, e.pos.z - z) < r) { alert(e, 'taunt'); e.tauntT = t; e.aggro = null; } },
     clear(filter = () => true) {

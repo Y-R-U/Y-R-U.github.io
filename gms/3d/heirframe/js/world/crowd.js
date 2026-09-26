@@ -17,21 +17,25 @@ const LOOPS = [
 const D2R = Math.PI / 180;
 // Talk spots are group centres. Seats (benches, café stools) come from the world's furniture via ctx.gather.
 function gatherSpots(world) {
+  const extra = (world.ctx?.gather || []).map((g) => ({ ...g }));
+  const dc = world.district?.crowd;
+  if (dc) return [...dc.talk.map(([x, z]) => ({ x, z, kind: 'talk' })), ...extra].map((g) => ({ ...g, taken: false }));
   const S = [];
   for (const a of [30, 150, 250, 320]) S.push([Math.sin(a * D2R) * 8.2, Math.cos(a * D2R) * 8.2]);
   for (const a of [0, 90, 180, 270]) { const t = (a + 45.3) * D2R; S.push([Math.sin(t) * 15.2, Math.cos(t) * 15.2]); }
   S.push([-11.8, 15.8], [18.8, 11.5], [5, 27.5], [-6, 29], [24.5, 26.5], [-24, 2], [24, -6], [0, -24.5], [-19.5, -35], [-24.5, -42],
     [-8.5, -40], [8.5, -52], [-11, -47], [11, -59.5], [27.5, 19.5], [-30, 50], [4, 50], [24, 58]);
-  return [...S.map(([x, z]) => ({ x, z, kind: 'talk' })), ...(world.ctx?.gather || []).map((g) => ({ ...g }))].map((g) => ({ ...g, taken: false }));
+  return [...S.map(([x, z]) => ({ x, z, kind: 'talk' })), ...extra].map((g) => ({ ...g, taken: false }));
 }
 
 export function createCrowd(world, createRobot, count, quality) {
   const kinds = ['civ_gold', 'civ_chrome', 'civ_black', 'civ_gold', 'civ_chrome', 'civ_black', 'civ_worker'];
   const members = [];
-  const spots = gatherSpots(world);
+  let spots = gatherSpots(world);
+  let loops = world.district?.crowd?.loops || LOOPS;
   const walkers = Math.max(1, Math.ceil(count * 0.45));
   for (let i = 0; i < count; i++) {
-    const loop = LOOPS[i % LOOPS.length];
+    const loop = loops[i % loops.length];
     let bot;
     try { bot = createRobot({ kind: kinds[i % kinds.length], seed: 100 + i * 17, quality: quality === 'high' ? 'high' : quality === 'low' ? 'low' : 'med', lod: 'far', merged: true }); }
     catch (e) { console.warn('crowd robot failed', e); break; }
@@ -177,6 +181,23 @@ export function createCrowd(world, createRobot, count, quality) {
     }
     return { moved, gaveUp: (m.strikes || 0) >= 3 };
   }
+  // district swap: new walk grid, loops and gathering spots; everyone reappears on the new loops
+  world.onDistrict?.(() => {
+    nav = null; clock = 0; reseat = 0;
+    spots = gatherSpots(world);
+    loops = world.district?.crowd?.loops || LOOPS;
+    for (const g of groups) g.spot = null;
+    members.forEach((m, i) => {
+      m.loop = loops[i % loops.length];
+      const idx = (i * 3) % m.loop.length, [x, z] = m.loop[idx];
+      m.idx = (idx + 1) % m.loop.length;
+      m.pos.set(x + (i % 3) - 1, 0, z + ((i * 7) % 3) - 1);
+      m.home = null; m.goal = null; m.path = null; m.flee = null; m.escape = null; m.mode = 'walk'; m.pause = 0; m.needRoute = true;
+      m.pos.y = world.groundAt(m.pos.x, m.pos.z);
+      m.bot.root.position.copy(m.pos);
+      m.bot.play('idle', { loop: true, fade: 0 });
+    });
+  });
   const crowd = {
     members,
     scare(x, z, r) {

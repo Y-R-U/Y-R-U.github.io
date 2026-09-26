@@ -74,8 +74,9 @@ export const ENEMIES = {
 
 // Bosses: champion or boss rank; phases split HP.
 export const BOSSES = {
-  big_kettle: { id: 'big_kettle', name: 'Big Kettle', title: 'Silverhand Captain', rank: 'champion', robotKind: 'enforcer', paint: 'kettle', faction: 'syndicate', ai: ['boss', 'bruiser'], act: 1,
-    base: { hp: 150, dmg: 16, armor: 30, shield: 40 }, move: 3.4, skills: ['e_melee', 'e_stomp', 'e_blast'], phases: [0.5], adds: { defId: 'knuckle', count: 3, atPhase: 1 }, tags: ['robot', 'frame', 'heavy'] },
+  big_kettle: { id: 'big_kettle', // sim: hp 150→55, dmg 16→9 (P2a: ~75 s fight for a Mk I frame at L5; a rental can win with kits + dodges)
+     name: 'Big Kettle', title: 'Silverhand Captain', rank: 'champion', robotKind: 'enforcer', paint: 'kettle', faction: 'syndicate', ai: ['boss', 'bruiser'], act: 1,
+    base: { hp: 55, dmg: 9, armor: 30, shield: 40 }, move: 3.4, skills: ['e_melee', 'e_stomp', 'e_blast'], phases: [0.5], adds: { defId: 'knuckle', count: 3, atPhase: 1 }, tags: ['robot', 'frame', 'heavy'] },
   halloran: { id: 'halloran', name: 'Warden-Captain Halloran', rank: 'boss', robotKind: 'security', robotTier: 3, paint: 'concord_gold', faction: 'concord', ai: ['boss', 'lancer'], act: 2,
     base: { hp: 90, dmg: 18, armor: 30, shield: 60 }, move: 4.6, skills: ['e_baton', 'e_lunge', 'e_emp'], frontalDR: 0.6, phases: [0.6, 0.3], tags: ['robot', 'frame'] },
   choir_warden: { id: 'choir_warden', name: 'Choir Warden', rank: 'boss', robotKind: 'seraph', robotTier: 1, fallbackKind: 'civ_gold', faction: 'choir', ai: ['boss', 'flyer'], act: 3, flying: true,

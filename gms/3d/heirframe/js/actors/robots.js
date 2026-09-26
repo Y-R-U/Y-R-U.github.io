@@ -4,6 +4,8 @@ import { PartBuilder } from './parts.js';
 import { KINDS, kindOf } from './kinds.js';
 import { NCH, PX, evalBase, evalAction, ACTIONS, LOWER, eyeCurve, smooth } from './anims.js';
 import { setMaterialQuality, flashMat, applyPaint, PAINTS, HORIZON_BAND } from './materials.js';
+import { createSteam } from './steam.js';
+export { createDropPod } from './droppod.js';
 
 export const ROBOT_KINDS = Object.keys(KINDS);
 export { PAINTS };
@@ -151,6 +153,8 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
   const mz = S.muzzle || ['handR', [0, -0.16, 0.02]];
   sock('muzzle', mz[0], mz[1]);
   sock('back', 'chest', S.back || [0, 0.14, -0.14]);
+  for (const [n, [bone, p]] of Object.entries(K.extraSockets || {})) sock(n, bone, p);
+  const steamFx = K.steam && !merged ? createSteam(root, ['ventL', 'ventR', 'stack'].filter((n) => sockets[n]).map((n) => sockets[n])) : null;
 
   // ---- animation state ----
   const style = K.style || {};
@@ -199,6 +203,7 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
       const def = ACTIONS[name];
       if (!def) return 0;
       freeze(f);
+      if (steamFx && (name === 'attack_heavy' || name === 'die' || name === 'hit')) steamFx.emit(name === 'die' ? 2.5 : name === 'hit' ? 0.6 : 1.3);
       if (name === 'hit') ctx.st.hitDir = r01() < 0.5 ? -1 : 1;
       act = { name, t: 0, dur: def.dur, speed, loop: !!loop && !def.hold, def, fired: {} };
       eyeTarget = 1;
@@ -214,6 +219,8 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
     get alert() { return alert; },
     setAim(yaw) { aimYaw = yaw === null || yaw === undefined ? null : yaw; },
     hitFlash(dur = 0.09) { flashT = dur; mesh.material = flash; },
+    // boiler kinds only (boss_kettle): a burst of steam from the shoulder vents + chimney; k scales it. No-op otherwise.
+    steam(k = 1) { steamFx?.emit(k); },
     update(dt) {
       dt = Math.min(dt, 0.1);
       ctx.t += dt; baseT += dt;
@@ -307,12 +314,14 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
         mm.emissiveIntensity = u.baseEI * eye * lerp(1, pulse, alertW);
       }
       if (flashT > 0) { flashT -= dt; if (flashT <= 0) mesh.material = meshMats; }
+      steamFx?.update(dt, !(act && act.name === 'die' && act.t >= act.dur));
     },
     dispose() {
       LIVE_ROBOTS.delete(api);
       root.removeFromParent();
       mesh.skeleton.dispose();
       for (const mm of own) mm.dispose();
+      steamFx?.dispose();
     },
   };
   api.hover = ctx.hover;

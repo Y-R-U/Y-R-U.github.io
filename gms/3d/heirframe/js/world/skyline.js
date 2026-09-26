@@ -11,7 +11,7 @@ const B = (w, h, d, x, y, z) => { const g = new THREE.BoxGeometry(w, h, d); g.tr
 const Tor = (r, t, y) => { const g = new THREE.TorusGeometry(r, t, 4, 28); g.rotateX(Math.PI / 2); g.translate(0, y, 0); return g; };
 
 // Each archetype: { glass, stone, gold } unit geometries (instanced separately).
-function archetypes() {
+export function archetypes() {
   const A = [];
   { // needle spire
     const glass = [], stone = [], gold = [];
@@ -71,7 +71,6 @@ export function buildSkyline(ctx) {
   const { scene, M, tier } = ctx;
   const R = rng(77);
   const arch = archetypes();
-  const placements = arch.map(() => []);
   const tooClose = (x, z) => {
     if (Math.hypot(x, z + 45) < 215) return true;                       // district, monorail ring
     if (Math.abs(x) < 26 && z < -120 && z > -300) return true;         // statue vista down the boulevard
@@ -96,27 +95,8 @@ export function buildSkyline(ctx) {
     if (tooClose(x, z) || spots.some(([sx, sz]) => Math.hypot(sx - x, sz - z) < 60)) continue;
     spots.push([x, z, (R() * 4) | 0, 0.5 + R() * 0.5]);
   }
-  for (const s of spots) { s.push(R() * Math.PI, 0.85 + R() * 0.4); placements[s[2]].push(s); }
-  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
-  const skyMats = { glass: M.facadeSky, stone: M.skyStone, gold: M.goldSolid };
-  let tris = 0;
-  const far = [];
-  arch.forEach((a, i) => {
-    const list = placements[i];
-    if (!list.length) return;
-    for (const part of ['glass', 'stone', 'gold']) {
-      const im = new THREE.InstancedMesh(a[part], skyMats[part], list.length);
-      list.forEach(([x, z, , s, rot, ys], k) => {
-        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), rot);
-        m4.compose(new THREE.Vector3(x, -8, z), q, sc.set(s, s * ys, s));
-        im.setMatrixAt(k, m4);
-      });
-      im.computeBoundingSphere();
-      im.layers.enable(REFLECT_LAYER);
-      scene.add(im); far.push(im);
-      tris += a[part].attributes.position.count / 3 * list.length;
-    }
-  });
+  for (const s of spots) s.push(R() * Math.PI, 0.85 + R() * 0.4);
+  const { far, tris } = addTowerField(ctx, spots, { arch });
   const st = statue();
   const fig = new THREE.Mesh(st.figure, M.statue);
   const ped = new THREE.Mesh(st.ped, M.skyStone);
@@ -127,4 +107,32 @@ export function buildSkyline(ctx) {
   ctx.stats.towers = spots.length;
   (ctx.farSky ||= []).push(...far);
   return { spots };
+}
+
+// Instanced far towers: spots = [x, z, archetype 0..3, scale, rotY, yScale]; 3 draws per archetype used.
+export function addTowerField(ctx, spots, { arch = archetypes(), y = -8, mats = null } = {}) {
+  const { scene, M } = ctx;
+  const placements = arch.map(() => []);
+  for (const s of spots) placements[s[2]].push(s);
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
+  const skyMats = mats || { glass: M.facadeSky, stone: M.skyStone, gold: M.goldSolid };
+  let tris = 0;
+  const far = [];
+  arch.forEach((a, i) => {
+    const list = placements[i];
+    if (!list.length) return;
+    for (const part of ['glass', 'stone', 'gold']) {
+      const im = new THREE.InstancedMesh(a[part], skyMats[part], list.length);
+      list.forEach(([x, z, , s, rot, ys], k) => {
+        q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), rot);
+        m4.compose(new THREE.Vector3(x, y, z), q, sc.set(s, s * ys, s));
+        im.setMatrixAt(k, m4);
+      });
+      im.computeBoundingSphere();
+      im.layers.enable(REFLECT_LAYER);
+      scene.add(im); far.push(im);
+      tris += a[part].attributes.position.count / 3 * list.length;
+    }
+  });
+  return { far, tris };
 }

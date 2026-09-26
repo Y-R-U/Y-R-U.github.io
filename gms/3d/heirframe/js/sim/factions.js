@@ -64,7 +64,8 @@ export function stance(fs, faction, ctx = {}) {
 export const canHarm = faction => !FACTIONS[faction]?.invulnerable;
 
 // ---- heat (0..5 stars, stored as a float so UI can show partial fills) ----------------------
-export const heatStars = fs => Math.floor(fs.heat + 1e-9);
+// a star lasts until its whole bar has decayed (ceil): +1 Heat = 1★ for the full 3 minutes
+export const heatStars = fs => Math.min(5, Math.ceil(fs.heat - 1e-6));
 
 // reason: alarm | wardenKill | blackContract | collateral | spotted | {amount}
 export function addHeat(fs, reason, amount) {

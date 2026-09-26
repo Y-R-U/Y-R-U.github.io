@@ -69,20 +69,26 @@ const GradeShader = {
     tDiffuse: { value: null }, tBloom: { value: null }, uBloomOn: { value: 0 }, toneMappingExposure: { value: 1 },
     uVignette: { value: 0.34 }, uSat: { value: 1.16 }, uContrast: { value: 1.14 },
     uLift: { value: new THREE.Vector3(0.01, 0.006, 0.0) }, uGain: { value: new THREE.Vector3(1.05, 1.0, 0.93) },
-    uAspect: { value: 1.7 }, uTime: { value: 0 },
+    uAspect: { value: 1.7 }, uTime: { value: 0 }, uRelay: { value: 0 }, uRelayT: { value: 0 },
   },
   vertexShader: /* glsl */`
     varying vec2 vUv;
     void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 ); }`,
   fragmentShader: /* glsl */`
     uniform sampler2D tDiffuse, tBloom;
-    uniform float uBloomOn, uVignette, uSat, uContrast, uAspect, uTime;
+    uniform float uBloomOn, uVignette, uSat, uContrast, uAspect, uTime, uRelay, uRelayT;
     uniform vec3 uLift, uGain;
     #include <tonemapping_pars_fragment>
     varying vec2 vUv;
     void main() {
       vec4 c = texture2D( tDiffuse, vUv );
       if ( uBloomOn > 0.5 ) c.rgb += texture2D( tBloom, vUv ).rgb;
+      if ( uRelay > 0.001 ) {
+        // Transit Relay: zoom blur into the centre (the light tunnel's pull)
+        vec2 zd = vUv - 0.5;
+        for ( int i = 1; i < 8; i++ ) c.rgb += texture2D( tDiffuse, 0.5 + zd * ( 1.0 - uRelay * 0.06 * float( i ) ) ).rgb;
+        c.rgb /= 8.0;
+      }
       c.rgb = min( max( c.rgb, vec3( 0.0 ) ), vec3( 64.0 ) );
       #ifdef ACES_FILMIC_TONE_MAPPING
         c.rgb = ACESFilmicToneMapping( c.rgb );
@@ -95,6 +101,20 @@ const GradeShader = {
       c.rgb = c.rgb * uGain + uLift * ( 1.0 - c.rgb );
       vec2 v = ( vUv - 0.5 ) * vec2( uAspect, 1.0 ) * 0.62;
       c.rgb *= 1.0 - uVignette * smoothstep( 0.18, 0.75, dot( v, v ) * 1.6 );
+      if ( uRelay > 0.001 ) {
+        vec2 p = ( vUv - 0.5 ) * vec2( uAspect, 1.0 );
+        float r = length( p ), a = atan( p.y, p.x ) / 6.28318 + 0.5;
+        float lane = floor( a * 150.0 ), la = fract( a * 150.0 );
+        float h = fract( sin( lane * 12.9898 ) * 43758.5453 ), h2 = fract( h * 91.7 );
+        float z = 0.3 / max( r, 0.015 );
+        float seg = fract( z * ( 0.25 + 0.3 * h2 ) - uRelayT * ( 1.6 + 2.2 * h ) + h * 7.0 );
+        float streak = smoothstep( 0.0, 0.05, seg ) * smoothstep( 0.45, 0.08, seg ) * smoothstep( 0.5, 0.15, abs( la - 0.5 ) ) * step( 0.35, h2 );
+        streak *= smoothstep( 0.03, 0.4, r ) * smoothstep( 0.0, 0.55, uRelay );
+        vec3 sc = mix( vec3( 0.35, 0.8, 1.0 ), vec3( 1.0 ), h );
+        c.rgb = c.rgb * ( 1.0 - 0.45 * smoothstep( 0.2, 0.9, r ) * uRelay ) + sc * streak * 1.6;
+        c.rgb += vec3( 0.55, 0.85, 1.0 ) * smoothstep( 0.45, 0.0, r ) * uRelay * uRelay * 0.9;
+        c.rgb = mix( c.rgb, vec3( 0.93, 0.97, 1.0 ), smoothstep( 0.62, 1.0, uRelay ) );
+      }
       c = sRGBTransferOETF( clamp( c, 0.0, 1.0 ) );
       float n = fract( sin( dot( gl_FragCoord.xy + uTime, vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
       c.rgb += ( n - 0.5 ) / 255.0;

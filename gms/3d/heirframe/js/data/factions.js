@@ -43,7 +43,7 @@ export const HEAT = {
   maxStars: 5,
   decaySeconds: 180,           // -1 star per 3 min with no incident
   wardenKillCooldown: 10,
-  gains: { alarm: 1, wardenKill: 1, blackContract: 1, collateral: 1, spotted: 1 },
+  gains: { alarm: 1, wardenKill: 0.5, blackContract: 1, collateral: 1, spotted: 1 }, // sim: wardenKill 1→0.5 (P2a: a responder squad fight no longer runs 3★→5★ in a minute)
   collateralThreshold: 500,
   effects: {
     1: 'Warden Eyes watch you.',

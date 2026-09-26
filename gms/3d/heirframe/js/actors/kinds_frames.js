@@ -112,7 +112,7 @@ export const ENFORCER_DIMS = {
 
 export function buildHeavy(b, o) {
   const t = o.tier, E = !!o.enforcer, k = E ? 1.15 : 1, far = b.far, D = b.rig.D;
-  const G = t >= 2 ? 'glow' : 'mech';
+  const G = t >= 1 ? 'glow' : 'mech';
   // head
   b.scope([0, 0, 0], [0, 0, 0], k * (E ? 0.9 : 1), () => {
     b.add(b.sph(18, 14), 'head', 'body', [0, 0.085, 0.0], [0, 0, 0], [0.1, 0.11, 0.115]);
@@ -121,6 +121,7 @@ export function buildHeavy(b, o) {
     b.add(b.rbox(0.18, 0.035, 0.1, 0.012), 'head', 'body', [0, 0.13, 0.055], [0.15, 0, 0]);
     b.sym(discX(b, 0.035, 0.03, 14), 'head', 'trim', [0.095, 0.08, 0]);
     if (t >= 4 && !E) b.add(b.sph(10, 10), 'head', 'trim', [0, 0.19, -0.01], [0.3, 0, 0], [0.016, 0.05, 0.12]);
+    else if (t >= 1 && !E) b.add(b.rbox(0.035, 0.05, 0.19, 0.012), 'head', 'trim', [0, 0.185, 0.0]);
     if (E) for (const sx of [1, -1]) b.add(b.cyl(0.006, 0.012, 0.12, 5), 'head', 'trim', [0.07 * sx, 0.2, -0.05], [-0.3, 0, -0.35 * sx]);
   });
   b.add(b.cyl(0.05, 0.06, 0.12, 10), 'neck', 'mech', [0, 0.04, 0]);
@@ -130,6 +131,7 @@ export function buildHeavy(b, o) {
     b.add(b.sph(18, 14), 'chest', 'mech', [0, 0.13, 0], [0, 0, 0], [0.2, 0.16, 0.14]);
     b.add(b.sph(22, 16), 'chest', 'body', [0, 0.16, 0.0], [0, 0, 0], [0.25, 0.18, 0.175]);
     b.sym(b.rbox(0.17, 0.13, 0.05, 0.022), 'chest', 'body', [0.095, 0.19, 0.145], [-0.25, 0.3, 0.05]);
+    if (t >= 1 && !E) b.sym(b.rbox(0.175, 0.022, 0.054, 0.008), 'chest', 'trim', [0.095, 0.25, 0.16], [-0.25, 0.3, 0.05]);
     b.add(arcH(b, 0.2, 0.012, PI * 0.9, 20, 5), 'chest', 'trim', [0, 0.075, 0.02], [0, 0, 0], [1, 1, 0.9]);
     const ring = b.tor(0.05, 0.011, 20, 6); b.add(ring, 'chest', 'trim', [0, 0.14, 0.178]);
     b.add(b.cyl(0.042, 0.042, 0.02, 16), 'chest', G, [0, 0.14, 0.172], [PI / 2, 0, 0]);
@@ -253,7 +255,8 @@ export function buildGunner(b, o) {
   b.add(b.rbox(0.036, 0.06, 0.1, 0.012), 'handR', 'trim', [-0.012, -0.11, 0.1], [0.35, 0, 0]);
   b.add(b.rbox(0.04, 0.12, 0.06, 0.012), 'handR', 'body', [-0.012, 0.02, -0.02]);
   b.add(b.rbox(0.03, 0.1, 0.03, 0.008), 'handR', 'body', [-0.012, -0.2, -0.02]);
-  if (t >= 2) b.add(b.box(0.006, 0.18, 0.014), 'handR', 'glow', [0.015, -0.18, 0.04]);
+  if (t >= 1) b.add(b.box(0.006, 0.18, 0.014), 'handR', 'glow', [0.015, -0.18, 0.04]);
+  if (t >= 1) b.add(b.rbox(0.13, 0.05, 0.15, 0.02), 'upArmL', 'trim', [0.03, 0.04, 0], [0, 0, -0.35]);
   // shoulder sensor mast (aux0 over the left shoulder)
   const mh = 0.36 + t * 0.04;
   b.add(b.rbox(0.09, 0.06, 0.12, 0.015), 'aux0', 'body', [0, -0.02, 0]);
@@ -278,7 +281,8 @@ export function buildGhost(b, o) {
   blade.translate(0, 0, -0.003); blade.rotateY(PI / 2);
   b.add(blade, 'foreArmR', 'trim', [-0.042, -0.06, 0.01]);
   b.add(b.box(0.004, 0.52, 0.006), 'foreArmR', 'glow', [-0.042, -0.34, 0.034], [0.035, 0, 0]);
-  if (t >= 1 && !far) for (const bone of ['upArm', 'thigh']) b.sym(b.cap(0.003, 0.14, 4), bone, 'glow', [0, -0.16, bone === 'thigh' ? 0.075 : 0.05]);
+  if (t >= 1) for (const bone of ['upArm', 'thigh']) b.sym(b.cap(0.0055, 0.14, 4), bone, 'glow', [0, -0.16, bone === 'thigh' ? 0.075 : 0.05]);
+  if (t >= 1) { b.sym(b.box(0.008, 0.2, 0.008), 'chest', 'glow', [0.045, 0.13, 0.125], [0, 0, 0.45]); b.add(b.rbox(0.014, 0.08, 0.17, 0.006), 'head', 'trim', [0, 0.2, -0.03]); }
   if (t >= 2) b.sym(b.rbox(0.012, 0.16, 0.08, 0.005), 'upArm', 'trim', [0.075, 0.03, -0.01], [0, 0, -0.45]);
   if (t >= 3) for (const sx of [1, -1]) b.add(b.rbox(0.012, 0.5, 0.07, 0.006), 'aux0', 'trim', [0.08 * sx, -0.18, -0.02], [0.18, 0, 0.12 * sx]);
   if (t >= 4) b.add(b.tor(0.11, 0.004, 32, 4), 'head', 'glow', [0, 0.26, -0.03], [PI / 2 - 0.3, 0, 0]);
@@ -310,7 +314,7 @@ export function eleganceMats(kind, tier) {
   const t = tier;
   if (kind === 'gunner') return {
     body: mat('gun_chrome' + t, { color: 0xeef2f6, metal: 1, rough: [0.26, 0.2, 0.14, 0.09, 0.06][t] }),
-    trim: mat('gun_trim' + t, { color: t >= 4 ? 0x2a5cff : 0x39414d, metal: 0.9, rough: 0.3, coat: t >= 3 ? 0.6 : 0 }),
+    trim: mat('gun_trim' + t, { color: t >= 4 ? 0x2a5cff : t >= 1 ? 0x1e3f8c : 0x39414d, metal: 0.9, rough: 0.3, coat: t >= 1 ? 0.6 : 0 }),
     mech: mat('gun_mech', { color: 0x1d2026, metal: 1, rough: 0.25 }),
     glow: glow('gun_glow' + t, 0x58c8ff, 2 + t * 0.5),
     eye: glow('gun_eye', 0x9fe6ff, 3),

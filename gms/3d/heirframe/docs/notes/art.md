@@ -308,3 +308,105 @@ Expected on the S22: the fill-bound part of the frame ~40–55% cheaper; the cro
 3. Falls: critics want a lip curl over the edge and a spreading foam ring at impact; sheets are still cards (no thickness).
 4. On-device perf: ask Aaron to open `?perf` (overlay) on the S22 before/after this push; try `?msaa=2` there.
 5. REQUEST (UI owner, low): measure `.hf-glass` backdrop blur on the S22 (not measurable on M5).
+
+## P2b (world/art agent, 2026-09-27) — DONE
+Brief: Brightline Boulevard district (ref_boulevard_blue), district API + relay transition, boss_kettle, drop-pod + courier,
+Mk I/II tier reads, milky-haze carry-over, perf on high/med/low, 2+ blind critic rounds.
+
+### P2b → API for gameplay
+- `createWorld(canvas, {quality, district})` — `district` = `'aurum_plaza'` (default) | `'brightline'`; `?district=brightline`
+  also works with no code change (read in createWorld). main.js needs nothing.
+- `world.loadDistrict(id) → buildMs` (sync, ~100–150 ms on M5): disposes the old district (geometry, non-shared materials,
+  textures, AO bake), builds the new one, then re-points `world.district` (`{id, name, city, bounds, layout, crowd}`),
+  `world.sites`, `world.interactables`, `world.spawnPoints` (`player, kiosk, pad, relay` Vector3s), `world.billboards`,
+  `world.breakables`, and applies the district's light (sun, hemi, fog, env, grade). `world.collision` is the SAME object
+  (reset in place), so cached references stay valid. `world.ctx` is a getter (current district's ctx).
+- `world.onDistrict(fn)` → unsubscribe; `fn(world, id)` runs after every swap. The crowd re-homes itself here.
+  **Gameplay must, on swap:** teleport the player (`world.spawnPoints.player` or `.relay`), clear its enemies/mission props
+  (they live in `world.scene`, not in the district group), rebuild its own nav grid (`createNav(world)` reads the new
+  `world.district.bounds`), and re-read `world.sites` (game.js caches `{aurum_plaza: world.sites}` at start).
+- `world.relayTransition(toId, {onSwap}) → Promise<{buildMs}>`: light tunnel (zoom blur + streaks) eases in 0.85 s, white-out,
+  swap at the peak (`onSwap(world, toId)` → put the player at `world.spawnPoints.relay`), 0.15 s hold, eases out 0.9 s.
+  Same id = tunnel only (use it for relay-to-relay hops). While it runs, keep calling world.update/render as normal.
+- `world.districts` = ids. Both districts have a Transit Relay interactable `{id:'relay'}`, a `contracts` terminal and a
+  `warehouse` link pad.
+- `world.breakables` (every district; Aurum's is empty): `list` [{id, kind:'crate'|'vending'|'holo', x,y,z, r, hp, maxHp,
+  value, broken}], `alive`, `near(x,z,r)`, `hit(prop|id, dmg) → broke?`, `splash(x,z,r,dmg) → broken[]`,
+  `onBreak(fn(prop))`, `reset()`. Breaking hides the instance, removes its collision circle and throws debris.
+  Values: crate 30, vending 90, holo 60 (use for collateral/loot as you like).
+- Brightline sites (tags): plaza ×4, market ×2, locker ×3, alley ×2, rooftop ×2 (terrace y 2.4, deck y 2.0), lobby ×2, relay,
+  spawn_edge ×4, vantage ×3, hide ×4, npc ×5, terminal, link_pad. ids prefixed `bl_`.
+
+### Files (new): `js/world/brightline.js` (layout, furniture, sites, crowd loops, ambience), `bl_city.js` (canyon: arcade,
+podium, towers, east drop, billboards, far towers, monorail, car lanes), `bl_ground.js` (wet slate floor shader),
+`breakables.js`, `js/fx/relay.js` (tunnel timing; the effect itself is in the grade pass, renderer.js `uRelay`).
+Refactors (Aurum pixel-identical, checked 2.6% = crowd motion): world.js district system; traffic.js → `addFlyingCars`,
+`addMonorail`; skyline.js → `addTowerField`; plaza/sites/furnish helpers exported; collision `reset/remove`; ground.js
+patches the shared marble once; crowd.js per-district loops/talk spots + `onDistrict` re-home.
+
+### Robots (P2b)
+- `boss_kettle` (kinds_boss.js): enforcer build ×1.08 + copper boiler on aux0 (brass bands, rivets, glowing firebox grille),
+  chimney + whistle, steam vents over both shoulders, 2 boiler gauges + 1 chest gauge (canvas dial), brass knuckles,
+  bowler hat. 7 slots = 7 draws. Height 2.75, radius 0.62. All biped anims (hit/attack_melee/attack_heavy/die…).
+  `robot.steam(k=1)` = burst from sockets ventL/ventR/stack (any kind; no-op without vents). Auto bursts on
+  attack_heavy (1.3), hit (0.6), die (2.5); a thin chimney wisp runs on its own. js/actors/steam.js (1 Points draw,
+  parented to the robot's parent).
+- `createDropPod()` (js/actors/droppod.js, re-exported from robots.js): `{root, pod, drone, slot, state, durations,
+  play('land'|'open'|'close'|'leave') → Promise, update(dt), dispose()}`. land 2.6 s (courier drone lowers it from 45 m,
+  retro flare, dust ring, drone lets go and hovers at 7 m), open 1.1 s (4 petals fold down, floor lights), close 0.9 s,
+  leave 2.4 s (re-hook, haul up and away, root hides). Stand a robot on `pod.slot` (or next to root) for the swap.
+  Gallery: `tools/robot_gallery.html?view=pod&kind=gunner&tier=1` loops the whole cycle.
+- Mk II (tier 1) reads now: Bulwark gold helmet crest + lit core + gold pec edges; Longarm navy trim + navy left pauldron
+  + carbine glow strip; Wisp cyan chest V seam + cowl fin + thicker limb seams (`art/p2b/tiers1.png`).
+
+### Perf (M5 metal, 915x412 mobile UA DPR2 → dpr 1.5; shot.mjs calls / tris; after the cell fix below)
+- high: gameplay (0,40) 141 / 397k · vista N (0,70 p12) 262 / 608k · look-up (0,40 p-20) 194 / 450k · vista S (0,-60 yaw180 p12)
+  259 / 583k. Before the fix: 180 / 407k, 340 / 632k, 253 / 480k, 331 / 594k (vistas over the ~300 budget).
+- med (pre-fix, so upper bounds): 171–320 calls / 356–527k. low (pre-fix): 43–153 calls / 64–212k.
+- Fix: Brightline batches with 96 m cells (`def.batchCell`), far-canyon cells (|z| > 130) are out of the mirror,
+  lower-avenue trees only near the play area. Vista N passes: main 173, mirror 76, shadow 32+13 (was 210/117/36).
+- GPU sync render ms (cost.mjs, dpr 1.5 / 3): gameplay 1.93 / 5.41, vista N 2.33 / 5.69, vista S 2.19 / 5.58.
+  Aurum on the same run: 2.02 / 5.85 (default), 2.26 / 5.84 (vista). Same range, as required.
+
+### Haze carry-over (atmosphere.js; `?haze=old` restores the round-3 look for A/B)
+- Distance now recedes into a mid blue-grey that is darker than the sky (in-scatter fogColor×(0.52,0.64,0.86), sun side
+  weight 0.55→ was 1), the exp2 fog target is bluer, AERIAL 2.2→3.0, sky horizon (1.0,0.88,0.74)→(0.92,0.90,0.88).
+  Gameplay-pitch frames unchanged (sunlit look kept; `art/p2b/hz2.png` bottom row). Brightline far band sat .316→.351.
+  HONEST: Aurum's far band barely moves (mean .566→.564): its "milk" is sunlit cream stone at 60–100 m + exposure,
+  not haze. A real fix there means darker/cooler distant materials or a darker grade (the round-3 hypothesis).
+- HARMONY panel was invisible (holo coplanar with its backing box → failed depth test); moved 0.7 m forward.
+  Mountain-lake art redrawn (layered ranges, snow, lake mirror); shared with Aurum's HARMONY panel.
+- Brightline light: warmer, stronger sun (1,.9,.78 ×3.6), lower fill (hemi .26) after critic R1 "flat cold haze".
+
+### Critic rounds (answer keys; sheets in `art/critic/`)
+- P2b R1 `critic/p2b_r1.png` 2x2: TL = ref (crop 0,200 1536x690), TR = game eye-level north (0,20 yaw0 pitch -5),
+  BL = game vista (-4,48 pitch 14), BR = ref (crop 250,420 1150x518). Verdict: both game panels ID'd (80/85%).
+  Game 4/10 and 3.5/10, refs 7 and 8. Floor 6 (best game sub-score), architecture 5–6, billboards 4–5, figures 2,
+  light 5. #1 figures are tiny unreadable blobs at vista distance (crowd far LOD, camera far from the crowd);
+  #2 billboards read blank (HARMONY was invisible, see above); #3 flat cold haze, no sun contrast.
+
+- P2b R2 `critic/p2b_r2.png` 2x2: TL = game eye-level among the crowd (cam.sh -6,1.9,34 → 4,6,-40), TR = ref (crop
+  236,380 1300x585), BL = ref (crop 0,120 1536x690), BR = game north (0,20 pitch -5). After: HARMONY fix, new
+  mountain art, warmer sun, haze. Verdict: both game panels ID'd (88/90%). Game 5/10 and 4.5/10 (R1: 4, 3.5), refs 8.5 / 8.
+  Architecture 6, floor 6, light 5, billboards 2–3 ("blank white rectangles"), figures 3. #1 "blank white panels" =
+  the shared facade shader's bright cool lit-window cells (1.6×4.2 m, emissive ×1.5) → dimmed to 0.25–0.45 with a
+  split, 0.99 threshold (also changes Aurum's towers a little: 11% px vs the P2b start, incl. crowd motion). Not re-judged.
+  #2 underpopulated: 32 civilians is the D20 cap; the ref's density needs cheap impostor crowds (not done).
+- **P2 target ≥ 7/10 NOT met: best 5/10.** The gap the critics name every round: readable dense robot crowds at
+  mid distance (ours go to the far LOD at 18 m and are sparse), billboard/sign content richness, and the refs'
+  close-up hero robots (a composition the game camera rarely makes).
+
+### Final checks
+- `node --check` clean; full-UI boot of both districts → title, 0 exceptions; brightline: 34 sites, 18 breakables.
+- Swap ×20 (10 round trips): programs flat at 84, geometries 89→92 and textures 58→63 then flat (first-use uploads).
+- Relay transition verified end to end (`art/p2b/rl_grid.png`).
+
+### NEXT / gaps
+1. Crowd density for vistas: impostor/instanced background walkers on the boulevard (cheap, no AI) to reach the ref's
+   density without breaking D20; hold the near LOD further out on eye-level views.
+2. Billboard content: animated holo content (scrolling ads, face that blinks) on the big boards; more shop signage.
+3. Aurum's "milky" distance is materials + exposure, not haze (see above); try cooler/darker far façades behind a flag.
+4. Brightline's east lower avenue is thin (trees + lamps only near the play area); the drop reads fine at gameplay pitch.
+5. `?haze=old` A/B flag for Aaron on the S22 (the haze change affects both districts).
+6. Gameplay agent wiring (see API above): relay interactable → `relayTransition`, nav/sites/enemy cleanup on
+   `onDistrict`, Kettle `steam()` on phase changes, drop-pod in the frame swap, breakables → collateral/loot.

@@ -444,6 +444,7 @@ export function createAudio() {
     sfx,
     vo: (key, opts) => playVo(key, opts),
     hasVo: (key) => !!(manifest && manifest[key]),
+    voKeys: () => Object.keys(manifest || {}),
     voInfo: (key) => (manifest && manifest[key] ? { text: manifest[key].text, duration: manifest[key].duration, voice: manifest[key].voice } : null),
     manifestReady: () => loadManifest(),
     bark,

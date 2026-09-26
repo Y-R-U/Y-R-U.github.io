@@ -5,7 +5,7 @@ import { REFLECT_LAYER } from '../fx/reflection.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
-function locker(ctx, x, z, rot) {
+export function locker(ctx, x, z, rot) {
   const { batch, M, col } = ctx;
   batch.put(box(3.2, 2.6, 0.9), M.stoneUpper, V(x, 1.3, z), rot);
   const c = Math.cos(rot), s = Math.sin(rot);
@@ -20,7 +20,7 @@ function locker(ctx, x, z, rot) {
   col.box(x, z, 1.65, 0.5, rot, 'locker');
 }
 
-function stall(ctx, x, z, rot, hue) {
+export function stall(ctx, x, z, rot, hue) {
   const { batch, M, col } = ctx;
   batch.put(box(2.6, 1.0, 1.1), M.stoneUpper, V(x, 0.5, z), rot);
   batch.put(box(2.7, 0.06, 1.2), M.gold, V(x, 1.02, z), rot);
@@ -34,7 +34,7 @@ function stall(ctx, x, z, rot, hue) {
   col.box(x, z, 1.35, 0.6, rot, 'stall');
 }
 
-function relay(ctx, x, z) {
+export function relay(ctx, x, z) {
   const { batch, M, col, scene } = ctx;
   batch.put(lathe([[0, 0], [1.3, 0], [1.3, 0.15], [0.5, 0.35], [0.35, 4.2], [0.6, 4.4], [0, 4.4]], 24), M.stoneUpper, V(x, 0, z));
   batch.put(new THREE.TorusGeometry(0.9, 0.08, 8, 40), M.gold, V(x, 3.2, z));
@@ -46,14 +46,14 @@ function relay(ctx, x, z) {
   ctx.interactables.push({ id: 'relay', label: 'Transit Relay', x, z, r: 2.4 });
 }
 
-function dumpster(ctx, x, z, rot) {
+export function dumpster(ctx, x, z, rot) {
   const { batch, M, col } = ctx;
   batch.put(box(2.2, 1.3, 1.2), M.dumpster, V(x, 0.65, z), rot);
   batch.put(box(2.3, 0.1, 1.3), M.darkMetal, V(x, 1.35, z), rot);
   col.box(x, z, 1.15, 0.65, rot, 'dumpster');
 }
 
-function crate(ctx, x, z, s = 1, y = 0, rot = 0) {
+export function crate(ctx, x, z, s = 1, y = 0, rot = 0) {
   const { batch, M, col } = ctx;
   batch.put(box(1.2 * s, 1.0 * s, 1.2 * s), M.crate, V(x, y + 0.5 * s, z), rot);
   batch.put(box(1.24 * s, 0.08, 1.24 * s), M.darkMetal, V(x, y + 0.9 * s, z), rot, null, { cast: false });

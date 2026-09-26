@@ -58,11 +58,11 @@ export const SCRIPTS = {
   a1_m5: [
     { n: 1, trigger: 'accept', mode: 'bark', speaker: 'mara', vo: 'a1_s13_mara_01', text: 'Civic records node, under the statue…' },
     { n: 2, trigger: 'after:1', mode: 'bark', speaker: 'hira', vo: 'a1_s13_hira_01', text: "Hacking is a violation of your rental agreement! I'll… look away." },
-    { n: 3, trigger: 'done:1', mode: 'card', lines: ['CIVIC RECORDS · GENOME QUERY', 'MATCH: VAEL, WREN · STATUS: UNPERSONED'], ms: 3400, sfx: ['alarm'] },
+    { n: 3, trigger: 'done:1', mode: 'card', lines: ['CIVIC RECORDS · GENOME QUERY', 'MATCH: VAEL, WREN · STATUS: UNPERSONED'], ms: 3400, sfx: ['alarm'], action: { forceHeat: 3 } },
     { n: 4, trigger: 'after:3', mode: 'bark', speaker: 'hira', vo: 'a1_s14_hira_01', text: 'Match found. Vael, Wren. Status: unpersoned…' },
     { n: 5, trigger: 'after:4', mode: 'dlg', speaker: 'mara', vo: 'a1_s14_mara_01', text: "It means they don't exist. The Vaels. The Meridian traitors. Wren, get out of there, now." },
     { n: 6, trigger: 'after:5', mode: 'dlg', speaker: 'iris', label: 'HEIR-KEY RECORDING', portrait: 'heir_key', vo: 'a1_s14_iris_01', text: 'If you are hearing this, you are a Vael, and they lied to you about us. Find Abel Fenn in the Terraces. He kept our names.' },
-    { n: 7, trigger: 'after:6', mode: 'bark', speaker: 'warden', vo: 'a1_s15_warden_m_01', text: 'Unregistered genome query at the civic node. All units, detain the rider.', action: { forceHeat: 3 } },
+    { n: 7, trigger: 'after:6', mode: 'bark', speaker: 'warden', vo: 'a1_s15_warden_m_01', text: 'Unregistered genome query at the civic node. All units, detain the rider.' },
     { n: 8, trigger: 'after:7', mode: 'bark', speaker: 'hira', vo: 'a1_s15_hira_01', text: "Oh, we're famous! That's bad, right? That feels bad. Run!" },
     { n: 9, trigger: 'deliver', mode: 'action', action: { toast: 'Codex updated: House Vael', actEnd: 1 } },
   ],

@@ -9,7 +9,7 @@ const WAVES = {
   4: { every: 34, max: 7, units: [['enforcer', 'grunt'], ['lancer', 'grunt'], ['warden', 'grunt'], ['warden', 'grunt']] },
   5: { every: 26, max: 9, units: [['enforcer', 'veteran'], ['lancer', 'grunt'], ['lancer', 'grunt'], ['warden', 'grunt'], ['warden_eye', 'grunt']] },
 };
-const BARK = { 2: 'b_warden_spot_', 3: 'b_warden_backup_', 4: 'b_enforcer_aggro_', 5: 'b_secbot_backup_' };
+const BARK = { 2: 'b_warden_spot_', 3: 'b_warden_heat3_', 4: 'b_warden_heat4_', 5: 'b_warden_heat5_' };
 
 export function createHeat(ctx) {
   const { sim, enemies, world, player, ui, audio } = ctx;
@@ -41,7 +41,10 @@ export function createHeat(ctx) {
     const lvl = sim.state.player.level + Math.max(0, stars - 2);
     const at = edgeSpot();
     const n = W.units.length;
-    const ents = W.units.map(([defId, rank], k) => {
+    // Act 1 riders get one grunt Enforcer per squad; Lancers (gold-trim spears) arrive from level 12
+    const low = sim.state.player.level < 12;
+    const units = W.units.map(([defId, rank]) => (low && defId === 'lancer' ? ['warden', 'veteran'] : low && defId === 'enforcer' ? ['enforcer', 'grunt'] : [defId, rank]));
+    const ents = units.map(([defId, rank], k) => {
       let x = at.x + Math.sin(k * 2.1) * 2, z = at.z + Math.cos(k * 2.1) * 2;
       if (world.blocked(x, z, 0.5)) { const q = ctx.nav?.nearest(x, z); if (q) { x = q.x; z = q.z; } }
       const e = enemies.spawn({ defId, rank, level: lvl }, x, z, { hostile: stars >= 3, guard: stars < 3, yaw: Math.atan2(player.pos.x - x, player.pos.z - z) });
@@ -62,13 +65,13 @@ export function createHeat(ctx) {
       if (e.state !== 'dead' && Math.hypot(e.pos.x - player.pos.x, e.pos.z - player.pos.z) > 30) enemies.clear((x) => x === e);
       else { e.state = 'search'; e.searchT = 3; e.c.alerted = false; e.bot.setAlert(1); e.lastSeen = player.pos.clone(); }
     }
-    audio.bark('b_warden_search_', { cooldown: 20 });
+    audio.bark(['b_warden_clear_01', 'b_warden_search_01'].filter((k) => audio.hasVo(k)), { cooldown: 20 });
   }
 
   function update(dt, { paused = false, calm = false } = {}) {
-    const stars = Math.floor(sim.state.factions.heat + 1e-9);
+    const stars = Math.min(5, Math.ceil(sim.state.factions.heat - 1e-6));
     if (stars !== H.lastStars) {
-      if (stars > H.lastStars && stars >= 2) { H.t = Math.min(H.t, 4); ui.sting(`${stars}-star Heat`, ['', '', 'Wardens engage on sight', 'Patrols are hunting you', 'Lancers and Enforcers deployed', 'The whole district is after you'][stars], 'alert', 2200); }
+      if (stars > H.lastStars && stars >= 2) { H.t = Math.min(H.t, 4); if (stars >= 3) audio.bark('b_mara_heat_', { cooldown: 40 }); ui.sting(`${stars}-star Heat`, ['', '', 'Wardens engage on sight', 'Patrols are hunting you', 'Lancers and Enforcers deployed', 'The whole district is after you'][stars], 'alert', 2200); }
       if (stars === 0 && H.lastStars > 0) { standDown(); ui.toast('Heat cleared', 'good', { sub: 'The Wardens lost interest' }); }
       H.lastStars = stars;
     }
@@ -76,7 +79,7 @@ export function createHeat(ctx) {
     if (paused || calm || !stars) return;
     // 1★+: a Warden Eye shadows you from a distance
     if (!H.eye || H.eye.state === 'dead' || !enemies.list.includes(H.eye)) {
-      if ((H.eyeT = (H.eyeT ?? 3) - dt) <= 0) { H.eyeT = 20; const [e] = spawnSquadEye(); H.eye = e; }
+      if ((H.eyeT = (H.eyeT ?? 3) - dt) <= 0) { H.eyeT = 20; const [e] = spawnSquadEye(); H.eye = e; audio.bark('b_warden_eye_', { x: e.pos.x, z: e.pos.z, cooldown: 30 }); }
     } else if (H.eye.state === 'idle') {
       H.eye.home.set(player.pos.x + 6, 0, player.pos.z - 5);
       if (stars >= 2) enemies.alert(H.eye, 'heat');

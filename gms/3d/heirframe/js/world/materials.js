@@ -111,7 +111,7 @@ float fh(vec2 p){ return fract(sin(dot(p, vec2(41.3, 289.1))) * 43758.5453); }`)
   metalnessFactor = mix(metalnessFactor, 0.1, spandrel);
   roughnessFactor = mix(roughnessFactor, 0.45, spandrel);
   diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.8, 0.8, 0.85), mull * 0.35);
-  totalEmissiveRadiance += vec3(1.0, 0.75, 0.45) * lit * 0.35 + vec3(0.3, 0.6, 1.0) * ${cool.toFixed(2)} * step(0.985, fh(cell + 7.0)) * 1.5;
+  totalEmissiveRadiance += vec3(1.0, 0.75, 0.45) * lit * 0.35 + vec3(0.3, 0.6, 1.0) * ${cool.toFixed(2)} * step(0.99, fh(cell + 7.0)) * (0.25 + 0.2 * step(0.5, fract(u / 0.4))) * aa;
 }
 #endif`);
   };

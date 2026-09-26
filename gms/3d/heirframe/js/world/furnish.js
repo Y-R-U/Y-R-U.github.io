@@ -35,7 +35,7 @@ export function bench(ctx, x, z, rot, y = 0, back = true) {
 const xyz = ([x, z], y) => [x, y, z];
 
 // Café: round counter under a white canopy, plus two tables with two stools each.
-function cafe(ctx, x, z, rot) {
+export function cafe(ctx, x, z, rot) {
   const { batch, M, col, scene } = ctx;
   const c = Math.cos(rot), s = Math.sin(rot);
   const at = (lx, lz) => [x + lx * c + lz * s, z - lx * s + lz * c];
@@ -77,7 +77,7 @@ function cafe(ctx, x, z, rot) {
   ctx.gather.push({ x: fx, z: fz, kind: 'talk' });
 }
 
-function bollard(ctx, x, z) {
+export function bollard(ctx, x, z) {
   const { batch, M, col } = ctx;
   batch.add(lathe([[0, 0], [0.16, 0], [0.16, 0.05], [0.11, 0.1], [0.1, 0.78], [0.12, 0.82], [0, 0.84]], 12), M.chrome, { matrix: new THREE.Matrix4().makeTranslation(x, 0, z), cast: false });
   batch.put(new THREE.CylinderGeometry(0.105, 0.105, 0.05, 12, 1, true), M.blueGlow, V(x, 0.7, z), 0, null, { cast: false });
@@ -85,7 +85,7 @@ function bollard(ctx, x, z) {
 }
 
 // Double-sided street totems; all panels share one poster atlas → one draw call.
-function totems(ctx, list) {
+export function totems(ctx, list) {
   const { batch, M, col, scene } = ctx;
   const P = HOLO_ART.posters();
   const W = 1.15, H = 2.3, Y0 = 0.42;
