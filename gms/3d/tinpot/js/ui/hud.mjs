@@ -22,7 +22,7 @@ export function createHUD(root,send){
 
  return {update(model){
   const hidden=model.hidden||false;
-  root.classList.toggle('hidden',hidden);
+  root.classList.toggle('hidden',hidden);root.classList.toggle('field-mode',!!model.field);
   if(!plaque){plaque=document.createElement('div');plaque.className='eulogy';plaque.setAttribute('aria-live','polite');(root.parentNode||document.body).appendChild(plaque);}
   const e=hidden?null:model.eulogy;
   plaque.classList.toggle('showing',!!e);

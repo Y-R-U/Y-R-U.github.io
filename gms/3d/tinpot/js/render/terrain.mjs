@@ -28,6 +28,7 @@ function groundColour(out,x,z,map){
  out.lerp(PAL.moss,smooth(width-2.4,width+.3,d));
  out.lerp(PAL.floor,smooth(width-.2,width+2.2,d));
  out.lerp(PAL.deep,smooth(width+2,width+7,d));
+ if(map.tint)out.lerp(new THREE.Color(map.tint),.23);
  return out;
 }
 

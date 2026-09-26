@@ -1,7 +1,7 @@
-# TINPOT 0.05 — the lads find the radio
+# TINPOT 0.06 — the lads find the radio
 
-115 original lines, six locally designed Qwen3-TTS 1.7B voices, 328 seconds of dialogue.
-The **runtime MP3 payload is 1,699,815 bytes (1.70 MB / 1.62 MiB)** plus a 43 KB manifest.
+148 original lines, six locally designed Qwen3-TTS 1.7B voices, 418 seconds of dialogue.
+The **runtime MP3 payload is 2,165,076 bytes (2.17 MB / 2.06 MiB)** plus the manifest.
 No live AI, server connection, cloud API, speech synthesis dependency or external request is
 required to play the game. `audio/music/` is unchanged.
 
@@ -31,6 +31,16 @@ soldiers answer; inspector lines require a living inspector. Nobody speaks in at
 The death and hit observations do not alter game simulation. Friendly fire is inferred from the
 existing hit/source-position data; no combat data or balance was changed. Commentary is flavour,
 not a substitute for the objective display or grenade warnings.
+
+## Plain replies and story lines (0.06)
+
+Move, hold/rejoin, equipment and cancellation confirmations choose a plain pool 80% of the
+time, with the existing personality pool used for the remainder. Each soldier has Yes sir,
+Affirmative, Going now and Sure thing; Going now is movement-only. Every voice also has five
+snarky movement takes. Fresh-line selection happens within the chosen pool, so adding more
+jokes does not change the ratio. Plain replies can repeat after four seconds; jokes retain
+the 45-second per-line cooldown. The seeded distribution gate also rejects a reversed 20/80
+mutant. Nine new headquarters clips cover the story zones, depot and ending.
 
 ## Playback rules
 
@@ -110,4 +120,4 @@ phone/Safari playback remains unverified.
 The initial voice pass was prepared locally under the folder's standing no-git rule. Aaron
 explicitly authorised committing and pushing this release on 2026-09-25; that instruction
 overrides the standing rule for these Tinpot changes. Public test URL:
-https://yru.br8t.com/gms/3d/tinpot/ (PATTERN 0.05).
+https://yru.br8t.com/gms/3d/tinpot/ (PATTERN 0.06).

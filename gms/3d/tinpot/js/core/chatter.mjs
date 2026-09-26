@@ -15,7 +15,13 @@ export function createChatter(clips,random=Math.random){
    if(unit!=null&&!alive(w,unit))return false;
    if(!voice&&!who){const live=w.units.filter(u=>u.team==='blue'&&!u.escort&&u.hp>0&&u.active);if(!live.length)return false;who=live[Math.floor(random()*live.length)];unit=who.id;}
    voice=voice||voiceFor(who);
-   const choices=(byKey.get(voice+':'+event)||[]).filter(c=>now-(played.get(c.id)??-Infinity)>45);
+   const ordinary=['move','hold','join','rifle','grenade','flamer','cancel'].includes(event);
+   const standard=(byKey.get(voice+':ack')||[]).filter(c=>event==='move'||!c.moveOnly);
+   const useStandard=ordinary&&standard.length&&random()<.8;
+   const candidates=useStandard?standard:(byKey.get(voice+':'+event)||[]);
+   // Four plain replies can repeat after a short gap; jokes retain their longer cooldown.
+   let choices=candidates.filter(c=>now-(played.get(c.id)??-Infinity)>(useStandard?4:45));
+   if(!choices.length&&ordinary)choices=standard.filter(c=>now-(played.get(c.id)??-Infinity)>4);
    if(!choices.length)return false;
    const fresh=choices.filter(c=>!recent.includes(c.id)),pool=fresh.length?fresh:choices;
    const clip=pool[Math.floor(random()*pool.length)];

@@ -2,7 +2,7 @@ import {rng} from './rng.mjs';
 import {centre,corridorWidth} from './landscape.mjs';
 export function treeLayout(map){const r=rng(map.seed+1),trees=[];
  // species 0 broadleaf · 1 conifer · 2 low scrub · 3 bare dead trunk
- function add(x,z,edge=false){const shade=r(),species=edge?(shade<.42?2:shade<.78?0:1):(shade<.36?1:shade<.72?0:shade<.9?2:3),size=edge?.62+r()*.4:1;
+ function add(x,z,edge=false){if(map.theme&&(map.cover||[]).some(c=>c.type==='landmark'&&Math.hypot(c.x-x,c.z-z)<4))return;const shade=r(),species=edge?(shade<.42?2:shade<.78?0:1):(shade<.36?1:shade<.72?0:shade<.9?2:3),size=edge?.62+r()*.4:1;
   const emergent=species!==2&&r()<.14?1.55+r()*.35:1;
   const height=(species===1?5.8+r()*3.2:species===2?1.7+r()*1.5:species===3?5+r()*2.6:4.4+r()*2.9)*size*emergent;
   const radius=(species===1?1.15+r()*.55:species===2?1.25+r()*.75:species===3?.55+r()*.3:1.15+r()*.75)*size*(emergent>1?1.35:1);

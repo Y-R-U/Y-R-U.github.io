@@ -721,6 +721,220 @@
       "voice": "biscuit",
       "event": "hurt",
       "text": "I am deducting a star for this!"
+    },
+    {
+      "id": "crumb-ack-01",
+      "voice": "crumb",
+      "event": "ack",
+      "text": "Yes, sir.",
+      "moveOnly": false
+    },
+    {
+      "id": "crumb-ack-02",
+      "voice": "crumb",
+      "event": "ack",
+      "text": "Affirmative.",
+      "moveOnly": false
+    },
+    {
+      "id": "crumb-ack-03",
+      "voice": "crumb",
+      "event": "ack",
+      "text": "Going now.",
+      "moveOnly": true
+    },
+    {
+      "id": "crumb-ack-04",
+      "voice": "crumb",
+      "event": "ack",
+      "text": "Sure thing.",
+      "moveOnly": false
+    },
+    {
+      "id": "spud-ack-01",
+      "voice": "spud",
+      "event": "ack",
+      "text": "Yes, sir.",
+      "moveOnly": false
+    },
+    {
+      "id": "spud-ack-02",
+      "voice": "spud",
+      "event": "ack",
+      "text": "Affirmative.",
+      "moveOnly": false
+    },
+    {
+      "id": "spud-ack-03",
+      "voice": "spud",
+      "event": "ack",
+      "text": "Going now.",
+      "moveOnly": true
+    },
+    {
+      "id": "spud-ack-04",
+      "voice": "spud",
+      "event": "ack",
+      "text": "Sure thing.",
+      "moveOnly": false
+    },
+    {
+      "id": "peas-ack-01",
+      "voice": "peas",
+      "event": "ack",
+      "text": "Yes, sir.",
+      "moveOnly": false
+    },
+    {
+      "id": "peas-ack-02",
+      "voice": "peas",
+      "event": "ack",
+      "text": "Affirmative.",
+      "moveOnly": false
+    },
+    {
+      "id": "peas-ack-03",
+      "voice": "peas",
+      "event": "ack",
+      "text": "Going now.",
+      "moveOnly": true
+    },
+    {
+      "id": "peas-ack-04",
+      "voice": "peas",
+      "event": "ack",
+      "text": "Sure thing.",
+      "moveOnly": false
+    },
+    {
+      "id": "titch-ack-01",
+      "voice": "titch",
+      "event": "ack",
+      "text": "Yes, sir.",
+      "moveOnly": false
+    },
+    {
+      "id": "titch-ack-02",
+      "voice": "titch",
+      "event": "ack",
+      "text": "Affirmative.",
+      "moveOnly": false
+    },
+    {
+      "id": "titch-ack-03",
+      "voice": "titch",
+      "event": "ack",
+      "text": "Going now.",
+      "moveOnly": true
+    },
+    {
+      "id": "titch-ack-04",
+      "voice": "titch",
+      "event": "ack",
+      "text": "Sure thing.",
+      "moveOnly": false
+    },
+    {
+      "id": "crumb-move-04",
+      "voice": "crumb",
+      "event": "move",
+      "text": "Yes, sir. The mud was getting attached."
+    },
+    {
+      "id": "crumb-move-05",
+      "voice": "crumb",
+      "event": "move",
+      "text": "Moving. My pension had better be spectacular."
+    },
+    {
+      "id": "spud-move-04",
+      "voice": "spud",
+      "event": "move",
+      "text": "On my way! Save me the least haunted bit."
+    },
+    {
+      "id": "spud-move-05",
+      "voice": "spud",
+      "event": "move",
+      "text": "Aye! Walking is just slow charging."
+    },
+    {
+      "id": "peas-move-04",
+      "voice": "peas",
+      "event": "move",
+      "text": "Certainly. Another triumph for pointing."
+    },
+    {
+      "id": "peas-move-05",
+      "voice": "peas",
+      "event": "move",
+      "text": "Proceeding without a sensible explanation."
+    },
+    {
+      "id": "titch-move-04",
+      "voice": "titch",
+      "event": "move",
+      "text": "Aye. If I survive, I am choosing the next hill."
+    },
+    {
+      "id": "titch-move-05",
+      "voice": "titch",
+      "event": "move",
+      "text": "Coming! Tell the bullets I am busy."
+    },
+    {
+      "id": "general-story-orchard",
+      "voice": "general",
+      "event": "story-orchard",
+      "text": "The tea convoy has vanished. Follow the invoices. Apparently they are better armed than we are."
+    },
+    {
+      "id": "general-story-village",
+      "voice": "general",
+      "event": "story-village",
+      "text": "The village needs its food back. Headquarters would prefer its silverware. Use your judgement."
+    },
+    {
+      "id": "general-story-quarry",
+      "voice": "general",
+      "event": "story-quarry",
+      "text": "Recover the Ministry ledger. Try not to explode the evidence. Again."
+    },
+    {
+      "id": "general-story-junction",
+      "voice": "general",
+      "event": "story-junction",
+      "text": "Both trails lead to the railway. Somebody has been shipping the war to themselves."
+    },
+    {
+      "id": "general-story-marsh",
+      "voice": "general",
+      "event": "story-marsh",
+      "text": "Biscuit knows a back way. It is mostly water and professional resentment."
+    },
+    {
+      "id": "general-story-ridge",
+      "voice": "general",
+      "event": "story-ridge",
+      "text": "Take the signal ridge. Headquarters insists the enormous aerial is purely decorative."
+    },
+    {
+      "id": "general-story-ministry",
+      "voice": "general",
+      "event": "story-ministry",
+      "text": "The Ministry has requisitioned victory. Kindly inform them it is out of stock."
+    },
+    {
+      "id": "general-story-ending",
+      "voice": "general",
+      "event": "story-ending",
+      "text": "The war is over. The tea belongs to the people who actually made it. A worrying precedent."
+    },
+    {
+      "id": "general-story-depot",
+      "voice": "general",
+      "event": "story-depot",
+      "text": "Field depot open. Bandages, upgrades, and tea of uncertain military value."
     }
   ]
 }

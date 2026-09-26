@@ -8,7 +8,7 @@ async function ground(x,z){const point=await p.eval(`tinpotTest.project(${x},${z
 function pass(name){report.checks.push(name);console.log('PASS',name);}
 try{
  await p.goto(BASE+'?test=1',{width:390,height:844,deviceScaleFactor:2,mobile:true});await p.wait('window.__TINPOT_BOOTED__');
- assert.equal(await p.eval('tinpot.speech.available'),115,'All voice clips must be installed');
+ assert.equal(await p.eval('tinpot.speech.available'),148,'All voice clips must be installed');
  await p.eval("localStorage.removeItem('tinpot.test.campaign');localStorage.removeItem('tinpot.audio')");await p.send('Page.reload',{ignoreCache:true});await p.wait('window.__TINPOT_BOOTED__');
  assert.equal(await p.eval('tinpot.speech.spoken'),0,'No attract-screen voice before a gesture');
  pass('full cast installed; title stays quiet before interaction');

@@ -28,7 +28,7 @@ export function createWorld({map=clearing,count=1,enemies=0,mix=null,enemyZ=-8}=
 // not get that second option (see ai.mjs) — walking into a firestorm has to be the player's
 // idea, or it reads as broken instead of funny.
 export function orderMove(w,x,z){w.target={x,z};emit(w,{type:'order',x,z});const active=w.units.filter(u=>u.team==='blue'&&!u.escort&&u.active&&u.hp>0);active.forEach((u,i)=>{if(u.panicking>w.time)return;const offset=active.length>1?(i%2-.5)*1.6:0,tx=x+offset,tz=z+Math.floor(i/2)*1.6;const safe=w.grid.route(u,tx,tz,w.fireMask);u.path=safe.length?safe:w.grid.route(u,tx,tz);});}
-export function tick(w,dt=STEP){if(w.mission&&w.mission.status!=='active')return;w.time+=dt;updateAI(w,dt);for(const u of w.units)moveUnit(u,w.grid,dt);combat(w,dt);stepArmed(w);stepGrenades(w,dt);stepForest(w,dt);stepMission(w,dt);}
+export function tick(w,dt=STEP){if(w.mission?.status==='intermission'){w.time+=dt;for(const u of w.units)if(u.team==='blue'&&u.hp>0)moveUnit(u,w.grid,dt);return;}if(w.mission&&w.mission.status!=='active')return;w.time+=dt;updateAI(w,dt);for(const u of w.units)moveUnit(u,w.grid,dt);combat(w,dt);stepArmed(w);stepGrenades(w,dt);stepForest(w,dt);stepMission(w,dt);}
 export function toggleUnit(w,id){const u=w.units.find(u=>u.id===id&&u.team==='blue'&&u.hp>0);if(!u)return;if(u.active&&w.units.filter(v=>v.team==='blue'&&v.hp>0&&v.active).length===1)return;u.active=!u.active;if(!u.active){u.path=[];w.split=1;}else if(w.split===1)w.split=2;}
 export function setWeapon(w,weapon,id=null){if(!w.equipped.includes(weapon))return;for(const u of w.units)if(u.team==='blue'&&!u.escort&&(id===null||id===u.id))u.weapon=weapon;if(weapon==='grenade')w.reachUntil=w.time+REACH_SECONDS;}
 

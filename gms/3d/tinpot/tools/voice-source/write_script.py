@@ -98,5 +98,27 @@ clips=[]
 for voice,events in scripts.items():
  for event,lines in events.items():
   for n,text in enumerate(lines):clips.append({'id':f'{voice}-{event}-{n+1:02d}','voice':voice,'event':event,'text':text})
+# Short shared confirmations: the director chooses this pool 80% of the time.
+for voice in ['crumb','spud','peas','titch']:
+ for n,line in enumerate(['Yes, sir.','Affirmative.','Going now.','Sure thing.']):
+  clips.append({'id':f'{voice}-ack-{n+1:02d}','voice':voice,'event':'ack','text':line,'moveOnly':n==2})
+extra={
+ 'crumb':['Yes, sir. The mud was getting attached.','Moving. My pension had better be spectacular.'],
+ 'spud':['On my way! Save me the least haunted bit.','Aye! Walking is just slow charging.'],
+ 'peas':['Certainly. Another triumph for pointing.','Proceeding without a sensible explanation.'],
+ 'titch':['Aye. If I survive, I am choosing the next hill.','Coming! Tell the bullets I am busy.']}
+for voice,lines in extra.items():
+ for n,line in enumerate(lines):clips.append({'id':f'{voice}-move-{n+4:02d}','voice':voice,'event':'move','text':line})
+story={
+ 'orchard':'The tea convoy has vanished. Follow the invoices. Apparently they are better armed than we are.',
+ 'village':'The village needs its food back. Headquarters would prefer its silverware. Use your judgement.',
+ 'quarry':'Recover the Ministry ledger. Try not to explode the evidence. Again.',
+ 'junction':'Both trails lead to the railway. Somebody has been shipping the war to themselves.',
+ 'marsh':'Biscuit knows a back way. It is mostly water and professional resentment.',
+ 'ridge':'Take the signal ridge. Headquarters insists the enormous aerial is purely decorative.',
+ 'ministry':'The Ministry has requisitioned victory. Kindly inform them it is out of stock.',
+ 'ending':'The war is over. The tea belongs to the people who actually made it. A worrying precedent.',
+ 'depot':'Field depot open. Bandages, upgrades, and tea of uncertain military value.'}
+for event,line in story.items():clips.append({'id':'general-story-'+event,'voice':'general','event':'story-'+event,'text':line})
 (ROOT/'tools/voice-source/script.json').write_text(json.dumps({'cast':cast,'clips':clips},indent=2)+'\n')
 print(f'{len(cast)} voices, {len(clips)} clips')

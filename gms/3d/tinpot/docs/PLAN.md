@@ -306,3 +306,18 @@ throw, every tap is unambiguously movement again.
 - [x] Voice manifest and resumable asset-generation instructions
 - [x] Falsified voice tests, real browser MP3 playback, phone-width controls and screenshots
 - [x] Existing sim/campaign/teaching/release gates pass; evidence reviewed
+
+# 0.06 — Operation Last Orders (Aaron, 2026-09-26)
+
+Scope supersedes the old six-mission slice limit. Keep the intro; deliver a complete
+branching story arc with an ending, field depots, and continuous objectives.
+- [x] 80/20 plain/snarky command replies, four plain acknowledgements per voice, extra quips
+- [x] Campaign graph: new territories, two meaningful route forks, consequences and endings
+- [x] Same-territory objectives continue with survivors, positions and destruction intact
+- [x] Compact field dispatches, exit hotspots, optional depot upgrades/resupply/save/exit
+- [x] Old-save migration, route persistence, checkpoint/retry and safe reload at every boundary
+- [x] Distinct territory art/landmarks, compact mobile depot and story journal
+- [x] Generate/audit new compressed local Qwen voice assets
+- [x] Headless full-route balance, persistence/transition regressions and falsified gates
+- [x] Hardware browser touch walkthrough, 320/390/430 layout, screenshots inspected
+- [ ] Commit only Tinpot, push and verify public deployment (existing user authorization)

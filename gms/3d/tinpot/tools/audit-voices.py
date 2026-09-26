@@ -7,7 +7,7 @@ root=Path(__file__).resolve().parents[1]
 m=json.loads((root/'audio/voices/manifest.json').read_text())
 source=json.loads((root/'tools/voice-source/script.json').read_text())
 assert {c['id'] for c in m['clips']}=={c['id'] for c in source['clips']}
-assert len(m['clips'])==115
+assert len(m['clips'])==len(source['clips'])==148
 stats=[]
 for c in m['clips']:
  p=root/'audio/voices'/c['file'];audio,rate=sf.read(p)

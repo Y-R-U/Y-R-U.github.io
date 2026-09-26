@@ -2,6 +2,38 @@ import * as THREE from 'three';
 export function createProps(scene,w){const root=new THREE.Group(),coverGroups=new Map(),sand=new THREE.MeshStandardMaterial({color:0xaa9c70,roughness:1}),wood=new THREE.MeshStandardMaterial({color:0x755036,roughness:1}),cut=new THREE.MeshStandardMaterial({color:0xbe955d,roughness:1}),stone=new THREE.MeshStandardMaterial({color:0x8a8194,roughness:.85}),dark=new THREE.MeshStandardMaterial({color:0x333e49,roughness:1});
  function mesh(group,geo,mat,x,y,z,sx=1,sy=1,sz=1){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=m.receiveShadow=true;group.add(m);return m;}
  for(const c of w.cover||[]){const g=new THREE.Group();g.position.set(c.x,0,c.z);g.rotation.y=c.id*1.73;root.add(g);coverGroups.set(c.id,g);
+ if(c.type==='landmark'){
+ g.rotation.y=0;
+ const plaster=new THREE.MeshStandardMaterial({color:w.map.theme==='capital'?0xddd2aa:0xb1aa87,roughness:1}),roof=new THREE.MeshStandardMaterial({color:w.map.theme==='village'?0x8f4031:0x526c63,roughness:.9}),gold=new THREE.MeshStandardMaterial({color:0xd5b45c,roughness:.7});
+ const theme=w.map.theme;
+ if(['village','ministry','capital'].includes(theme)){
+  mesh(g,new THREE.BoxGeometry(3.3,2.8,3),plaster,0,1.4,0);
+  const top=mesh(g,new THREE.ConeGeometry(2.7,1.3,4),roof,0,3.4,0);top.rotation.y=Math.PI/4;
+  mesh(g,new THREE.BoxGeometry(.7,1.6,.12),wood,0,.8,1.55);
+  for(const x of [-1,1])mesh(g,new THREE.BoxGeometry(.55,.7,.13),dark,x,1.8,1.55);
+  if(theme!=='village')for(const x of [-1.5,1.5])mesh(g,new THREE.CylinderGeometry(.17,.22,3.6,6),plaster,x,1.8,1.9);
+  if(theme==='capital')mesh(g,new THREE.SphereGeometry(.6,10,6),gold,0,4.3,0);
+ }else if(theme==='radio'){
+  for(const x of [-1,1]){const leg=mesh(g,new THREE.CylinderGeometry(.08,.18,7,5),dark,x,3.5,0);leg.rotation.z=x*.12;}
+  for(let i=0;i<5;i++)mesh(g,new THREE.BoxGeometry(2.8-i*.35,.11,.13),dark,0,1.5+i,0);
+  mesh(g,new THREE.SphereGeometry(.55,10,6),gold,0,6.8,0);
+ }else if(theme==='quarry'){
+  for(let i=0;i<5;i++)mesh(g,new THREE.IcosahedronGeometry(1.3,0),plaster,(i%2-.5)*1.4,.7+(i>2?1:0),(i%3-1)*.8,1,.8,1);
+  mesh(g,new THREE.BoxGeometry(.18,4,.18),wood,1,2,0);mesh(g,new THREE.BoxGeometry(3.6,.22,.2),wood,0,3.9,0);
+ }else if(theme==='rail'){
+  for(const x of [-.9,.9])mesh(g,new THREE.BoxGeometry(.12,.13,8),dark,x,.12,0);
+  for(let i=0;i<10;i++)mesh(g,new THREE.BoxGeometry(2.5,.12,.25),wood,0,.06,i*.8-4);
+  mesh(g,new THREE.BoxGeometry(2.2,1.5,3.6),roof,0,1,0);
+  for(const x of [-1.2,1.2])for(const z of [-1.1,1.1]){const wheel=mesh(g,new THREE.CylinderGeometry(.35,.35,.15,8),dark,x,.45,z);wheel.rotation.z=Math.PI/2;}
+ }else if(theme==='marsh'){
+  const water=mesh(g,new THREE.CircleGeometry(2.6,16),new THREE.MeshStandardMaterial({color:0x52787a,roughness:.15}),0,.035,0);water.rotation.x=-Math.PI/2;
+  for(let i=0;i<7;i++)mesh(g,new THREE.BoxGeometry(2,.12,.35),wood,0,.15,i*.48-1.5);
+  for(const x of [-1.4,1.4])mesh(g,new THREE.CylinderGeometry(.035,.06,2,5),gold,x,1,0);
+ }else{
+  for(let i=0;i<5;i++){const box=mesh(g,new THREE.BoxGeometry(1.1,.8,.9),cut,(i%2-.5)*1.3,.4+(i>2?.85:0),(i%3-1)*.8);box.rotation.y=i*.3;}
+  mesh(g,new THREE.BoxGeometry(.12,3,.12),wood,0,1.5,0);mesh(g,new THREE.BoxGeometry(2,.55,.1),gold,0,2.7,0);
+ }
+ }
  if(c.type==='rock'){mesh(g,new THREE.IcosahedronGeometry(1,0),stone,0,.62,0,1.2,.95,.86);mesh(g,new THREE.IcosahedronGeometry(.5,0),dark,.7,.23,.5);}
  if(c.type==='log'){const log=mesh(g,new THREE.CylinderGeometry(.28,.34,2.4,7),wood,0,.3,0);log.rotation.z=Math.PI/2;const end=mesh(g,new THREE.CircleGeometry(.27,7),cut,1.21,.3,0);end.rotation.y=Math.PI/2;mesh(g,new THREE.BoxGeometry(.5,.14,.18),wood,-.3,.6,0);}
  if(c.type==='stump'){mesh(g,new THREE.CylinderGeometry(.37,.52,.6,7),wood,0,.3,0);const top=mesh(g,new THREE.CircleGeometry(.35,7),cut,0,.61,0);top.rotation.x=-Math.PI/2;}
@@ -35,5 +67,9 @@ export function createProps(scene,w){const root=new THREE.Group(),coverGroups=ne
   mesh(g,new THREE.BoxGeometry(.07,.62,.07),wood,-.72,.31,.12);
  }
  if(w.mission?.type==='reach'||w.mission?.type==='escort'){const goal=w.map.goal,ring=mesh(root,new THREE.RingGeometry(1.5,1.65,40),new THREE.MeshBasicMaterial({color:0xf5d281,side:THREE.DoubleSide}),goal.x,.045,goal.z);ring.rotation.x=-Math.PI/2;mesh(root,new THREE.CylinderGeometry(.035,.035,3,5),sand,goal.x,1.5,goal.z);mesh(root,new THREE.BoxGeometry(.95,.55,.03),new THREE.MeshStandardMaterial({color:0xe9c364}),goal.x+.47,2.7,goal.z);}
+ if(w.map.depot){const d=w.map.depot,white=new THREE.MeshBasicMaterial({color:0xa8ead1,depthTest:false,transparent:true,opacity:.8});
+ const ring=mesh(root,new THREE.RingGeometry(1.8,1.95,32),white,d.x,.09,d.z);ring.rotation.x=-Math.PI/2;ring.renderOrder=5;
+ mesh(root,new THREE.BoxGeometry(.45,.08,2.1),white,d.x,.12,d.z);mesh(root,new THREE.BoxGeometry(2.1,.08,.45),white,d.x,.12,d.z);
+ }
  scene.add(root);return {update(){for(const c of w.cover||[])coverGroups.get(c.id).visible=!c.dead;for(const k of w.works||[])workGroups.get(k.id).visible=!k.dead;}};
 }

@@ -1,3 +1,4 @@
+import {MISSIONS} from '../data/missions.mjs';
 import {createChatter} from '../core/chatter.mjs';
 
 // All lines are shipped files. The running game never contacts the TTS service.
@@ -48,13 +49,15 @@ export async function createSpeech(sound){
  function enter(mode,w,campaign,result){
   stop();scene=mode;world=w;wave=w.mission?.wave||0;burned=w.trees.filter(t=>t.dead).length;lastCount=live(w).length;
   lastCombat=lastOrder=now();nextIdle=now()+16+Math.random()*8;
-  if(mode==='briefing')offer('brief'+Math.min(campaign.mission,5),w,{voice:'general',priority:80,ttl:20,delay:.25});
+  if(mode==='briefing')offer(campaign.mission>=6?'story-'+(MISSIONS[campaign.mission]?.story||'depot'):'brief'+campaign.mission,w,{voice:'general',priority:80,ttl:20,delay:.25});
   if(mode==='battle'){
+   if(w.mission?.story)offer('story-'+w.mission.story,w,{voice:'general',priority:38,ttl:15,delay:.6});
    if(w.mission?.type==='escort'){const inspector=w.units.find(u=>u.escort&&u.hp>0);if(inspector)offer('arrival',w,{unit:inspector.id,priority:35,ttl:8,delay:.4});}
-   else offer('deploy',w,{voice:'general',priority:35,ttl:6,delay:.4});
+   else if(!w.mission?.story)offer('deploy',w,{voice:'general',priority:35,ttl:6,delay:.4});
   }
+  if(mode==='depot')offer('story-depot',w,{voice:'general',priority:40,ttl:6});
   if(mode==='barracks')offer('barracks',w,{voice:'general',priority:40,ttl:6,delay:.3});
-  if(mode==='debrief')offer(campaign.mission>=6&&result?.win?'complete':result?.win?'win':'defeat',w,{voice:'general',priority:100,ttl:20,delay:.45});
+  if(mode==='debrief')offer(campaign.mission>=MISSIONS.length&&result?.win?'story-ending':result?.win?'win':'defeat',w,{voice:'general',priority:100,ttl:20,delay:.45});
  }
  function command(event,w,unit=null){if(suspended)return;lastOrder=now();return offer(event,w,{unit,priority:70,ttl:2.8,active:event==='hold'?false:event==='join'?true:null});}
  return {
@@ -65,7 +68,7 @@ export async function createSpeech(sound){
    if(suspended){stop();duck=0;return;}
    if(current?.unit!=null&&!w.units.some(u=>u.id===current.unit&&u.hp>0))stop(false);
    const t=now(),soldiers=live(w);
-   if(mode==='battle'){
+   if(mode==='battle'&&w.mission?.status!=='intermission'){
     for(const e of events){
      if(w.time-e.time>.7)continue;
      if(['shot','hit','death','explosion','flame'].includes(e.type))lastCombat=t;

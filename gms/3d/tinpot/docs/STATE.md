@@ -1,3 +1,55 @@
+# ACTIVE HANDOFF — 0.06 Operation Last Orders
+
+User request 2026-09-26: more move/confirm variation; roughly 80% short plain replies,
+20% jokes. Expand beyond training into connected territories, branching story, optional
+depots and unobstructed transitions. Keep intro. Maintain checklist during work.
+Earlier explicit commit/push authorization persists; only stage Tinpot paths. Other games
+and root files have unrelated edits. No delegation authorized.
+
+Current: implementation complete; all local gates complete; publication remains. 0.05 commit bfc381ca pushed; Pages deployment
+36018810293 succeeded and public version 0.05 verified. New work not released yet.
+Plan: six intro missions unchanged; Operation Last Orders adds an actual mission graph
+about missing tea supplies and Ministry fraud. Same-map objectives roll on; cleared-zone
+exit markers select routes. Safe depots are optional between objectives; opening pauses,
+closing resumes; autosave includes exact field checkpoint. Two routes affect later
+reinforcements, rewards and ending. See new 0.06 checklist at END of PLAN.md.
+
+Next: commit/push only Tinpot and verify public version/audio/field flow. Update this handoff
+with release evidence.
+
+Implementation checkpoint (2026-09-26):
+- Campaign graph and eight procedural territories implemented (24 definitions, 20 played
+  per route including intro). Four possible paths, village/ledger and marsh/radio decisions.
+- Pure save schema 2 migrates v1, including old completed slice at mission=6.
+- Same-map continuation carries actual positions, wounds, map damage. Retry restores field
+  deployment snapshot; crossroads have explicit persisted choices.
+- Optional world depot opens a scrolling shop/journal, heals 35 HP once per objective,
+  saves/exits; brief edge dispatches and seven-second objective changeover.
+- 33 new locally generated clips COMPLETE; 148 total, 2,165,076 bytes. 80/20 director
+  chooses four plain clips per character, five snarky move variants; excludes Going now
+  for hold/equipment. All four full routes pass pure sim with modest upgrades.
+- Original sim 24 checks and voice 13+3 mutants pass. New persistence/depot/branch gates
+  and voice weighting (including reversed-weight mutant) pass.
+- First hardware browser boot and orchard screenshot inspected; zero errors.
+Validation checkpoint:
+- Reach transitions now use a different destination; all four full paths remain green.
+- Real-touch browser played all 14 new objectives on village/radio route to ending, with
+  no force wins. Targeted fixtures verified depot purchases affect live HP, settings freeze
+  combat, save/exit/reload retains crossroads, and walking+confirming selects the branch.
+- 320x568, 390x844, 430x932 depot and route controls exercised. Screenshot review caught
+  route overlap and a stale dispatch on scene reset, both fixed. Added overlap gates.
+- All new territory screenshots inspected; depot/ending scroll on short phones.
+- Original teach 13, voices browser 10, release all six intro missions/retries/mobile checks
+  passed; title profile 60.00 fps, p95 16.8ms on M5 ANGLE Metal, CPU4x, 390x844 DPR2.
+- Audio audit: all 148 MP3s decode, mono24kHz40kbps, 417.84 seconds, 2,165,076 bytes.
+Final local verification complete: story-polish.mjs proves the overlap gate rejects colliding
+labels, real touch swipe scrolls depot 167 px, sticky close stays reachable, and the final
+320x568 route/ending screenshots are inspected. Ministry battle profile is 60.0035 fps,
+p95 16.8ms, 359 calls, 265,126 triangles, 127 geometries (M5 Metal, CPU4x, 390x844 DPR2).
+Remaining: scoped commit/push and public validation.
+
+--- Previous handoff follows ---
+
 # TINPOT — living state
 
 > Update this **as you work**, not at the end. You may be cut off mid-sentence by a usage limit.
@@ -797,3 +849,15 @@ Append one line per decision that a later agent would otherwise re-litigate.
   This was driven by a real browser failure where the general delayed the first move reply.
 - **D43** The radio gets its own volume and ducks music. Speaker feedback reuses existing cards;
   no new caption panel competes with the play field after the 0.04 screen-space feedback.
+
+- **D44** Six training operations retain their modals. Field operations auto-continue on a shared
+  map after seven seconds; territory exits and route forks require walking and confirming.
+- **D45** Schema 2 keeps a cleared-field snapshot at crossroads; the saved world ID can differ
+  from the provisional next mission. Route selection is validated and never inferred on reload.
+- **D46** Same-territory transitions preserve live positions, HP and damage; new territories
+  redeploy/heal. Retry uses the field deployment snapshot, including branches and prior history.
+- **D47** Four plain acknowledgements receive 80% probability independently of joke count.
+  Going now is movement-only. Existing radio priorities and living-speaker checks still apply.
+- **D48** Depots are optional safe stops. A +35 HP dressing is once per objective, upgrades affect
+  the live squad, and shop/journal/ending scroll on short phones. Exit labels must not overlap
+  one another or weapon controls; numeric bounds alone missed this in screenshot review.
