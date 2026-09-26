@@ -3,6 +3,7 @@ import { box, cyl, lathe } from './geo.js';
 import { addTree } from './foliage.js';
 import { createWaterfall, createWaterMaterial, createMist } from './water.js';
 import { REFLECT_LAYER } from '../fx/reflection.js';
+import { tiered } from './backdrop.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
@@ -45,7 +46,14 @@ export function buildVista(ctx) {
   // Far-bank buildings (low, cheap)
   for (let k = 0; k < 6; k++) {
     const z = -100 + k * 30, h = 18 + (k * 37) % 22;
-    batch.put(box(22, h, 20), k % 2 ? M.facade : M.stoneUpper, V(bankX + 52, WY + 12 + h / 2, z), 0.1 * (k % 3), null, { cast: false });
+    tiered(ctx, bankX + 52, WY + 12, z, 22, 20, -Math.PI / 2 + 0.1 * (k % 3 - 1),
+      [{ h: 8 }, { h: h * 0.6, glass: true, warm: k % 2 === 0, setback: 1.5, garden: k % 2 === 1 }, { h: h * 0.5, glass: true, setback: 2.5, garden: true }], 40 + k);
+  }
+  // east-bank towers so the basin view has height
+  for (const [x, z, h] of [[205, -70, 120], [230, 10, 90], [196, 60, 70]]) {
+    batch.add(cyl(8, 10, h, x, WY, z, 16), M.facade, { cast: false });
+    for (let y = WY + 20; y < h; y += 20) batch.add(cyl(10.6, 10.6, 1.4, x, y, z, 16), M.stoneUpper, { cast: false });
+    batch.add(cyl(0.4, 7, 26, x, WY + h, z, 12), M.goldSolid, { cast: false });
   }
   // Islands with trees in the basin
   for (const [x, z, r] of [[70, -30, 7], [92, 20, 5]]) {

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { box, cyl, lathe } from './geo.js';
-import { HOLO_ART, createHoloMaterial } from './holo.js';
+import { HOLO_ART, createHoloMaterial, faceCamera } from './holo.js';
 import { REFLECT_LAYER } from '../fx/reflection.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -16,7 +16,7 @@ function locker(ctx, x, z, rot) {
   batch.put(box(3.3, 0.1, 1.0), M.gold, V(x, 2.62, z), rot);
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.38), createHoloMaterial(HOLO_ART.sign('NEXUS PARCEL'), { bright: 2.6, alpha: 0.9, time: ctx.time }));
   sign.position.set(x + 0.5 * s, 3.1, z + 0.5 * c); sign.rotation.y = rot; sign.layers.enable(REFLECT_LAYER);
-  ctx.scene.add(sign);
+  ctx.scene.add(sign); faceCamera(ctx, sign);
   col.box(x, z, 1.65, 0.5, rot, 'locker');
 }
 
@@ -40,7 +40,7 @@ function relay(ctx, x, z) {
   batch.put(new THREE.TorusGeometry(0.9, 0.08, 8, 40), M.gold, V(x, 3.2, z));
   batch.put(new THREE.TorusGeometry(0.9, 0.05, 8, 40).rotateY(Math.PI / 2), M.blueGlow, V(x, 3.2, z), 0, null, { cast: false });
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.4), createHoloMaterial(HOLO_ART.sign('TRANSIT RELAY'), { bright: 2.8, alpha: 0.9, time: ctx.time }));
-  sign.position.set(x, 4.9, z); sign.layers.enable(REFLECT_LAYER); scene.add(sign);
+  sign.position.set(x, 4.9, z); sign.layers.enable(REFLECT_LAYER); scene.add(sign); faceCamera(ctx, sign);
   const ring = ctx.makePadRing(1.6, [0.5, 0.9, 1.0], true); ring.position.set(x, 0.02, z); scene.add(ring);
   col.circle(x, z, 0.6, 'relay');
   ctx.interactables.push({ id: 'relay', label: 'Transit Relay', x, z, r: 2.4 });

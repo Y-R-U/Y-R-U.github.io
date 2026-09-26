@@ -135,6 +135,7 @@ export const ui = {
       hud ? hud.set(p) : Object.assign(pending.hud, p);
     },
     heading(rad) { hud?.heading(rad); },
+    recenter(on) { hud?.recenter(on); },
     flash(kind) { hud?.flash(kind); },
     badge(evt, n) { hud?.badge(evt, n); },
   },

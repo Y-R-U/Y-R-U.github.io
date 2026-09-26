@@ -27,10 +27,13 @@ async function start() {
   const world = createWorld(canvas, { quality: tier, toneMapping: flags.tm, onProgress: progress });
   await frame();
   const rig = createCameraRig(world.camera, { zoom: 0.35 });
-  // gameplay framing: closer Diablo angle so the rental reads on a 915x412 phone; <0.35 still dips into the vista view
-  rig.keys = [[0, 7.5, 26, 50], [0.35, 9.2, 52, 36], [0.7, 15, 54, 40], [1, 27, 58, 38]];
+  // gameplay framing: closer Diablo angle so the rental reads on a 915x412 phone. Zoom 0..1 spans 0.7x..1.5x the
+  // default distance (Aaron); ?shot= keeps the old keys so art's reference framings don't move.
+  rig.keys = flags.shot ? [[0, 7.5, 26, 50], [0.35, 9.2, 52, 36], [0.7, 15, 54, 40], [1, 27, 58, 38]]
+    : [[0, 6.45, 48, 37], [0.35, 9.2, 52, 36], [1, 13.8, 56, 36]];
   rig.setZoom(0.35);
   const input = createInput(canvas, world.camera, world, rig);
+  input.eBusy = () => !!document.querySelector('.hf-interact.show');   // E is also the interact key
 
   // UI (optional until the ui agent ships ui.js)
   let ui = null, pad = null;
@@ -98,7 +101,8 @@ async function start() {
   const perfEl = document.getElementById('perf');
   if (flags.perf) perfEl.style.display = 'block';
   const stats = { fps: 0, ms: 0, calls: 0, tris: 0, frames: 0 };
-  let last = performance.now(), acc = 0, accN = 0, perfT = 0, runtimeErr = false;
+  let last = performance.now(), acc = 0, accN = 0, perfT = 0, runtimeErr = false, recenterOn = false;
+  ui?.on?.('recenter', () => rig.reset(0.4));
 
   const game = window.__game = {
     THREE, world, rig, input, player, crowd, flags, tier, governor, stats, ui, get runtime() { return runtime; },
@@ -116,6 +120,9 @@ async function start() {
     if (ui?.controls?.move) stick = { x: ui.controls.move.x, y: -ui.controls.move.y };
     else if (pad?.active) stick = pad.move;
     if (!ui) { const k = input.keyVector(); if (k.x || k.y) stick = k; }
+    // camera-relative: stick up = screen up whatever the orbit yaw
+    if (rig.yaw && (stick.x || stick.y)) { const w = rig.screenToWorld(stick.x, stick.y); stick = { x: w.x, y: -w.z }; }
+    input.update(dt);
     if (flags.auto && !runtime && !player.moveTarget) {
       const [x, z] = AUTO[autoIdx++ % AUTO.length];
       player.setTarget({ x, z });
@@ -134,6 +141,11 @@ async function start() {
 
     rig.target.copy(player.pos);
     rig.update(dt);
+    if (ui?.hud && !rig.fixed) {
+      ui.hud.heading(-rig.yaw);
+      const off = !rig.isDefault() && !rig.resetT;
+      if (off !== recenterOn) { recenterOn = off; ui.hud.recenter?.(off); }
+    }
     world.focus.copy(player.pos);
     if (!rig.fixed) world.setFadeTarget(player.pos);
     world.update(dt);

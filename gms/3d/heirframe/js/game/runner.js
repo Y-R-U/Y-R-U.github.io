@@ -175,6 +175,8 @@ export function createRunner(ctx) {
   }
 
   function abandon() { if (!R) return; sim.abandonContract(); endFailed('abandon'); }
+  // the sim already failed the contract (e.g. the frame was wrecked): tear down + tell the player
+  function failed(reason) { if (R && !sim.state.contract) endFailed(reason); }
 
   function missionHostiles() { return enemies.list.filter((e) => R && e.mission === R.mission.id && e.state !== 'dead' && !e.nonCombat); }
 
@@ -337,7 +339,7 @@ export function createRunner(ctx) {
   }
 
   return {
-    accept, update, objective, interact, interactLabel, abandon,
+    accept, update, objective, interact, interactLabel, abandon, failed,
     capture() { if (R) R.ss.capture = true; },
     get active() { return R; },
     get mission() { return R?.mission || null; },

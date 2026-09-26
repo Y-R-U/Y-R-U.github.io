@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { box, cyl, arcWall, arcTube, lathe } from './geo.js';
 import { addTree } from './foliage.js';
-import { HOLO_ART, createHoloMaterial } from './holo.js';
+import { HOLO_ART, createHoloMaterial, registerBillboard } from './holo.js';
 import { createWaterfall, createWaterMaterial, createMist } from './water.js';
 import { REFLECT_LAYER } from '../fx/reflection.js';
 
@@ -61,6 +61,7 @@ export function buildBlocks(ctx) {
   { const uv = bbGeo.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setX(i, 1 - uv.getX(i)); }
   const bbMesh = new THREE.Mesh(bbGeo, createHoloMaterial(HOLO_ART.brighter(), { bright: 2.1, alpha: 0.95, time }));
   bbMesh.layers.enable(REFLECT_LAYER);
+  registerBillboard(ctx, bbMesh.material, 1024, 576);
   bb.add(bbMesh);
   const bbZ = -63.8 + bbR;
   bb.position.set(-22.5, 13.5, bbZ);
@@ -75,6 +76,7 @@ export function buildBlocks(ctx) {
   block(ctx, 14, 26, -66, 44, [{ h: 6 }, { h: 16, glass: true, setback: 1.5 }, { h: 14, glass: true, setback: 2, garden: true }]);
   block(ctx, 33, 46, -66, 14, [{ h: 6 }, { h: 7, glass: true, warm: true, setback: 1, garden: true }]);
   const hp = new THREE.Mesh(new THREE.PlaneGeometry(8, 16), createHoloMaterial(HOLO_ART.harmony(), { bright: 2.0, alpha: 0.96, time }));
+  registerBillboard(ctx, hp.material, 512, 1024);
   hp.position.set(20, 15, -65.4); hp.rotation.y = -0.12; hp.layers.enable(REFLECT_LAYER);
   scene.add(hp);
   batch.put(box(8.6, 16.6, 0.5), M.darkMetal, V(20.05, 15, -65.95), -0.12);

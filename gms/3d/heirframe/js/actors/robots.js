@@ -34,6 +34,51 @@ function getTemplate(kind, tier, variant, quality, lod) {
   return t;
 }
 
+// Crowd path: every material slot baked into vertex attributes so the whole robot is ONE draw call per pass.
+const mergedGeo = new Map();
+function mergedGeometry(T, key, mats) {
+  let g = mergedGeo.get(key);
+  if (g) return g;
+  g = T.geometry.clone();
+  const n = g.attributes.position.count, col = new Float32Array(n * 3), pbr = new Float32Array(n * 4), idx = g.index.array;
+  for (const gr of g.groups) {
+    const m = mats[gr.materialIndex];
+    const glowing = m.emissive && m.emissiveIntensity > 0 && m.color.r + m.color.g + m.color.b < 0.01;
+    const c = glowing ? m.emissive.clone().multiplyScalar(m.emissiveIntensity) : m.color;
+    const coat = m.clearcoat || 0;
+    for (let i = gr.start; i < gr.start + gr.count; i++) {
+      const v = idx[i];
+      col[v * 3] = c.r; col[v * 3 + 1] = c.g; col[v * 3 + 2] = c.b;
+      pbr[v * 4] = m.metalness; pbr[v * 4 + 1] = m.roughness; pbr[v * 4 + 2] = glowing ? 1 : 0; pbr[v * 4 + 3] = coat;
+    }
+  }
+  g.clearGroups();
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  g.setAttribute('pbr', new THREE.BufferAttribute(pbr, 4));
+  mergedGeo.set(key, g);
+  return g;
+}
+const mergedMats = {};
+function mergedMaterial(low) {
+  const k = low ? 'lo' : 'hi';
+  if (mergedMats[k]) return mergedMats[k];
+  const m = low ? new THREE.MeshStandardMaterial({ vertexColors: true, metalness: 1, roughness: 1 })
+    : new THREE.MeshPhysicalMaterial({ vertexColors: true, metalness: 1, roughness: 1, clearcoat: 1, clearcoatRoughness: 0.06, envMapIntensity: 1.25 });
+  m.onBeforeCompile = (sh) => {
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec4 pbr;\nvarying vec4 vPbr;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvPbr = pbr;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec4 vPbr;')
+      .replace('#include <color_fragment>', '#include <color_fragment>\nvec3 glowC = diffuseColor.rgb * vPbr.z; diffuseColor.rgb *= 1.0 - vPbr.z;')
+      .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor = vPbr.x;')
+      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = vPbr.y;')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += glowC;\n{ float rimF = pow( 1.0 - saturate( dot( normal, normalize( vViewPosition ) ) ), 3.0 ); totalEmissiveRadiance += ( diffuseColor.rgb * 0.35 + vec3( 0.05, 0.055, 0.06 ) ) * rimF; }')
+      .replace('#include <lights_physical_fragment>', '#include <lights_physical_fragment>\n#ifdef USE_CLEARCOAT\nmaterial.clearcoat *= vPbr.w;\n#endif');
+  };
+  m.customProgramCacheKey = () => 'robotMerged' + k;
+  m.name = 'robot:merged';
+  return (mergedMats[k] = m);
+}
+
 export function robotStats(kind, opts = {}) {
   const r = createRobot({ kind, ...opts });
   const s = { drawCalls: r.drawCalls, tris: r.tris, height: r.height };
@@ -41,7 +86,7 @@ export function robotStats(kind, opts = {}) {
   return s;
 }
 
-export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality = 'high', lod = 'near', paint = null } = {}) {
+export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality = 'high', lod = 'near', paint = null, merged = false } = {}) {
   kind = kindOf(kind);
   const K = KINDS[kind];
   tier = Math.max(0, Math.min(4, tier | 0));
@@ -64,10 +109,17 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
     }
     return m;
   });
-  const flash = T.slots.map(() => flashMat());
+  const flash = merged ? flashMat() : T.slots.map(() => flashMat());
+  let geometry = T.geometry, meshMats = mats;
+  if (merged) {
+    const key = [kind, tier, variant, quality, lod, tone, JSON.stringify(paint)].join('|');
+    geometry = mergedGeometry(T, key, T.slots.map((s) => M[s]));
+    meshMats = mergedMaterial(quality === 'low');
+    own.length = 0;
+  }
 
   const bones = makeBones(T.rig);
-  const mesh = new THREE.SkinnedMesh(T.geometry, mats);
+  const mesh = new THREE.SkinnedMesh(geometry, meshMats);
   mesh.add(bones[0]);
   mesh.bind(new THREE.Skeleton(bones, T.inverses), new THREE.Matrix4());
   mesh.castShadow = true;
@@ -112,7 +164,7 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
   const api = {
     root, mesh, sockets, kind, tier, seed,
     height: K.height * sc, radius: K.radius * sw, seatHeight: ctx.hover || ctx.quad ? 0 : (D.shin + D.ankle) * sc,
-    runSpeed, drawCalls: T.slots.length, tris: T.tris,
+    runSpeed, drawCalls: merged ? 1 : T.slots.length, tris: T.tris,
     onEvent: null,
     get state() { return { base, action: act && act.name, dead: !!(act && act.name === 'die'), speed: ctx.move.v }; },
 
@@ -237,7 +289,7 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
         if (ac && w > 1e-3) mm.emissive.lerp(ac, w);
         mm.emissiveIntensity = u.baseEI * eye * lerp(1, pulse, alertW);
       }
-      if (flashT > 0) { flashT -= dt; if (flashT <= 0) mesh.material = mats; }
+      if (flashT > 0) { flashT -= dt; if (flashT <= 0) mesh.material = meshMats; }
     },
     dispose() {
       root.removeFromParent();

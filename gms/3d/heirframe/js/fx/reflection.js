@@ -76,10 +76,10 @@ export function createPlanarReflection(renderer, { scale = 0.5, planeY = 0, samp
 // The mirror target's alpha marks reflected objects: there the planar image replaces the env specular;
 // elsewhere `sky` scales the env (sky) specular up toward the same artistic fresnel.
 // A material may define REFL_ZONE and a float `reflZone` in main() to modulate strength per pixel.
-export function addPlanarReflection(material, R, { strength = 1, base = 0.28, blur = 3.0, distort = 0.04, tint = null, sky = 0 } = {}) {
+export function addPlanarReflection(material, R, { strength = 1, base = 0.28, blur = 3.0, distort = 0.04, tint = null, sky = 0, skySat = 0.55 } = {}) {
   const u = { ...R.uniforms, uReflStrength: { value: strength }, uReflBase: { value: base },
     uReflBlur: { value: blur }, uReflDistort: { value: distort }, uReflTint: { value: tint || new THREE.Color(1, 1, 1) },
-    uReflSky: { value: sky } };
+    uReflSky: { value: sky }, uReflSkySat: { value: skySat } };
   material.userData.reflUniforms = u;
   const prev = material.onBeforeCompile;
   const prevKey = material.customProgramCacheKey?.call(material) || '';
@@ -91,7 +91,7 @@ export function addPlanarReflection(material, R, { strength = 1, base = 0.28, bl
       .replace('#include <fog_vertex>', '#include <fog_vertex>\nvReflPos = uReflectMatrix * vec4( ( modelMatrix * vec4( transformed, 1.0 ) ).xyz, 1.0 );');
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
-uniform sampler2D tReflect; uniform vec2 uReflectTexel; uniform float uReflectOn, uReflStrength, uReflBase, uReflBlur, uReflDistort, uReflSky;
+uniform sampler2D tReflect; uniform vec2 uReflectTexel; uniform float uReflectOn, uReflStrength, uReflBase, uReflBlur, uReflDistort, uReflSky, uReflSkySat;
 uniform vec3 uReflTint;
 varying vec4 vReflPos;`)
       .replace('#include <opaque_fragment>', `
@@ -103,7 +103,7 @@ varying vec4 vReflPos;`)
   F *= reflZone;
 #endif
   vec3 envS = reflectedLight.indirectSpecular;
-  vec3 envD = mix( vec3( dot( envS, vec3( 0.2126, 0.7152, 0.0722 ) ) ), envS, 0.55 );
+  vec3 envD = mix( vec3( dot( envS, vec3( 0.2126, 0.7152, 0.0722 ) ) ), envS, uReflSkySat );
   if ( uReflectOn > 0.5 ) {
     vec3 nd = normal - normalize( vNormal );
     vec2 ruv = vReflPos.xy / vReflPos.w + nd.xy * uReflDistort;

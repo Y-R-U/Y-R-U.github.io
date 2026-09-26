@@ -55,6 +55,7 @@ export function createHud(bus) {
         <div class="me"></div>
       </div>
       <div class="hf-district"></div>
+      <button class="hf-ibtn hf-live hf-recenter" data-evt="recenter" aria-label="Reset view">${icon('recenter')}</button>
     </div>
   </div>`;
 
@@ -68,7 +69,7 @@ export function createHud(bus) {
     heat: $('.hf-heat'), pips: [...el.querySelectorAll('.hf-heat .pips i')], heatLbl: $('.hf-heat .hl'),
     credits: $('.hf-credits'), cv: $('.hf-credits .cv'), map: $('.hf-map'), canvas: $('.hf-map canvas'),
     compass: $('.hf-map .compass'), district: $('.hf-district'), vig: $('.hf-vignette'),
-    goal: $('.hf-goal'), goalT: $('.hf-goal span'), surch: $('.hf-surch'), surchV: $('.hf-surch b'),
+    recenter: $('.hf-recenter'), goal: $('.hf-goal'), goalT: $('.hf-goal span'), surch: $('.hf-surch'), surchV: $('.hf-surch b'),
   };
 
   el.querySelectorAll('[data-evt]').forEach(b => onTap(b, () => { haptic(); bus.emit('sfx', 'click'); bus.emit(b.dataset.evt); }));
@@ -218,6 +219,8 @@ export function createHud(bus) {
     el, set, badge,
     minimap: r.canvas,
     heading(rad) { r.compass.style.transform = `rotate(${-rad}rad)`; },
+    // camera is off its default framing: show the reset-view button
+    recenter(on) { r.recenter.classList.toggle('on', !!on); },
     flash(kind = 'hit') {
       r.vig.className = 'hf-vignette'; void r.vig.offsetWidth; r.vig.className = `hf-vignette ${kind}`;
     },

@@ -30,7 +30,7 @@ export function createEnemies(ctx) {
       c, bot, def, pos: p, home: p.clone(), yaw: opts.yaw ?? Math.random() * TAU, radius: (bot.radius || 0.45) * sc,
       ai: (c.ai || ['rusher'])[0], guard: !!opts.guard, stealthy: !!opts.stealthy, pack: opts.pack ?? null, tag: opts.tag || null,
       state: opts.hostile ? 'chase' : 'idle', detect: 0, wanderT: Math.random() * 3, wander: null, strafe: Math.random() < 0.5 ? 1 : -1,
-      fleeT: 0, deadT: 0, pending: null, pendingT: 0, lastSeen: null, searchT: 0, barkT: 0, id: c.id, nonCombat: c.nonCombat, keepRange: def.keepRange || 0,
+      fleeT: 0, deadT: 0, kbx: 0, kbz: 0, pending: null, pendingT: 0, lastSeen: null, searchT: 0, barkT: 0, id: c.id, nonCombat: c.nonCombat, keepRange: def.keepRange || 0,
     };
     if (e.state === 'chase') { c.alerted = true; bot.setAlert(2); }
     bot.onEvent = (ev) => { if ((ev === 'impact' || ev === 'fire') && e.pending) release(e); };
@@ -45,7 +45,7 @@ export function createEnemies(ctx) {
       e.state = 'chase'; e.c.alerted = true; e.bot.setAlert(2); e.detect = 1;
       if (e.c.faction === 'syndicate' && Math.random() < 0.5) audio.bark('b_thug_aggro_', { x: e.pos.x, z: e.pos.z, cooldown: 5 });
       if (e.c.faction === 'concord') audio.bark('b_warden_spot_', { x: e.pos.x, z: e.pos.z, cooldown: 5 });
-      if (e.c.faction === 'scrap') audio.sfx('stealth_alert', { x: e.pos.x, z: e.pos.z, vol: 0.35, minGap: 0.5 });
+      if (e.c.faction === 'scrap') audio.sfx('stealth_alert', { x: e.pos.x, z: e.pos.z, vol: 0.35, minGap: 500 });
       ctx.onAlert && ctx.onAlert(e, why);
       // call the group within 15 m
       for (const o of list) if (o !== e && o.state === 'idle' && !o.nonCombat && o.pos.distanceTo(e.pos) < 15) { o.state = 'chase'; o.c.alerted = true; o.bot.setAlert(2); o.detect = 1; }
@@ -58,7 +58,7 @@ export function createEnemies(ctx) {
     e.pending = { skill, target: targetPos.clone() };
     e.pendingT = skill.kind === 'ranged' ? 0.45 : 0.4;
     e.bot.play(skill.anim || (skill.kind === 'ranged' ? 'shoot' : 'attack_melee'), { loop: false });
-    if (skill.kind !== 'ranged') audio.sfx('swing', { x: e.pos.x, z: e.pos.z, vol: 0.5, minGap: 0.08 });
+    if (skill.kind !== 'ranged') audio.sfx('swing', { x: e.pos.x, z: e.pos.z, vol: 0.5, minGap: 80 });
     return true;
   }
 
@@ -69,7 +69,7 @@ export function createEnemies(ctx) {
     if (p.skill.kind === 'ranged') {
       const from = muzzle(e);
       const to = tmp2.set(p.target.x + (Math.random() - 0.5) * 0.4, p.target.y + 1.0, p.target.z + (Math.random() - 0.5) * 0.4).clone();
-      audio.sfx('shoot', { x: e.pos.x, z: e.pos.z, vol: 0.55, minGap: 0.05 });
+      audio.sfx('shoot', { x: e.pos.x, z: e.pos.z, vol: 0.55, minGap: 50 });
       fx.bolt(from, to, { color: BOLT[p.skill.id] || 0xff8a3a, speed: 20, size: 0.9, onArrive: (pt) => {
         fx.sparks(pt, BOLT[p.skill.id] || 0xffa060, 5, 3);
         if (Math.hypot(pt.x - ctx.player.pos.x, pt.z - ctx.player.pos.z) < 1.1) ctx.hitPlayer(e, p.skill);
@@ -101,6 +101,20 @@ export function createEnemies(ctx) {
     e.bot.setMove(Math.min(1, speed / (e.bot.runSpeed || 4)), moved / Math.max(dt, 1e-4));
   }
 
+  // straight at the target when the walk grid has a clear line, else along an A* route (refreshed ~2x/s)
+  function chase(e, tx, tz, speed, dt) {
+    const nav = ctx.nav;
+    if (nav && (e.navT = (e.navT || 0) - dt) <= 0) {
+      e.navT = 0.5 + Math.random() * 0.2;
+      e.route = nav.los(e.pos.x, e.pos.z, tx, tz) ? null : nav.route(e.pos, { x: tx, z: tz }, 8000);
+    }
+    const r = e.route;
+    if (r?.length) {
+      if (r.length > 1 && Math.hypot(r[0].x - e.pos.x, r[0].z - e.pos.z) < 0.7) r.shift();
+      moveTo(e, r[0].x - e.pos.x, r[0].z - e.pos.z, speed, dt);
+    } else moveTo(e, tx - e.pos.x, tz - e.pos.z, speed, dt);
+  }
+
   function face(e, x, z, dt, k = 12) {
     const want = Math.atan2(x - e.pos.x, z - e.pos.z);
     e.yaw += angDiff(want, e.yaw) * (1 - Math.exp(-dt * k));
@@ -120,6 +134,12 @@ export function createEnemies(ctx) {
     for (let i = list.length - 1; i >= 0; i--) {
       const e = list[i];
       const c = e.c;
+      if (e.kbx || e.kbz) {
+        world.collision.move(e.pos, e.kbx * dt, e.kbz * dt, e.radius);
+        const k = Math.exp(-dt * 8);
+        e.kbx *= k; e.kbz *= k;
+        if (Math.abs(e.kbx) + Math.abs(e.kbz) < 0.05) e.kbx = e.kbz = 0;
+      }
       if (e.state === 'dead') {
         e.deadT += dt;
         e.bot.setMove(0, 0);
@@ -167,7 +187,7 @@ export function createEnemies(ctx) {
         if (e.def.fleeBelow && c.hp < c.stats.hp * e.def.fleeBelow && !e.fled) { e.fled = true; e.state = 'flee'; e.fleeT = 2.5; continue; }
         const wantRange = e.ai === 'striker' ? e.keepRange || 9 : e.ai === 'spotter' ? 7 : 0;
         if (wantRange) {
-          if (d > reach) moveTo(e, dx, dz, speed, dt);
+          if (d > reach) chase(e, pl.x, pl.z, speed, dt);
           else if (d < wantRange - 2.5) moveTo(e, -dx, -dz, speed * 0.8, dt);
           else {
             // strafe while in band
@@ -179,7 +199,7 @@ export function createEnemies(ctx) {
           }
           if (d <= reach && skill && !e.pending && ctx.losClear(e.pos, pl)) beginAttack(e, skill, pl);
         } else {
-          if (d > reach * 0.85) moveTo(e, dx, dz, speed, dt);
+          if (d > reach * 0.85) chase(e, pl.x, pl.z, speed, dt);
           else { e.bot.setMove(0, 0); face(e, pl.x, pl.z, dt); if (skill && !e.pending) beginAttack(e, skill, pl); }
         }
         // leash: give up if the player got very far away
@@ -224,6 +244,7 @@ export function createEnemies(ctx) {
     audio.sfx(e.c.defId === 'scrap_rat' ? 'explosion_small' : 'power_down', { x: e.pos.x, z: e.pos.z, vol: 0.7 });
     if (e.c.faction === 'syndicate') audio.bark('b_thug_death_', { x: e.pos.x, z: e.pos.z, cooldown: 6 });
     fx.sparks(tmp.set(e.pos.x, e.pos.y + 0.6, e.pos.z), 0xffc070, 16, 6);
+    fx.ring(e.pos, 1.8, 0xffc070, 0.35);
     ctx.onDeath && ctx.onDeath(e);
   }
 
@@ -235,8 +256,15 @@ export function createEnemies(ctx) {
     if (res.killed || !e.c.alive) die(e);
   }
 
+  // shove away from (x,z); heavier ranks resist
+  function knock(e, x, z, power) {
+    const dx = e.pos.x - x, dz = e.pos.z - z, d = Math.hypot(dx, dz) || 1;
+    const k = power / (e.c.rank === 'grunt' ? 1 : e.c.rank === 'veteran' ? 1.6 : 3);
+    e.kbx += dx / d * k; e.kbz += dz / d * k;
+  }
+
   return {
-    list, spawn, update, alert, damage, die,
+    list, spawn, update, alert, damage, die, knock,
     alive: () => list.filter((e) => e.state !== 'dead' && !e.nonCombat),
     hostileNear(x, z, r) { return list.some((e) => e.state !== 'dead' && !e.nonCombat && e.state !== 'idle' && Math.hypot(e.pos.x - x, e.pos.z - z) < r); },
     clear(filter = () => true) {

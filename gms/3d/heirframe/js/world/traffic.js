@@ -101,6 +101,7 @@ export function buildTraffic(ctx) {
   const train = new THREE.InstancedMesh(carG, paint, NC);
   const wins = new THREE.InstancedMesh(winG, glow, NC);
   for (const m of [train, wins]) { m.frustumCulled = false; m.layers.enable(REFLECT_LAYER); scene.add(m); }
+  (ctx.farSky ||= []).push(...meshes, beam, glowTube, pylons, train, wins);
   let tt = 0;
   const up = new THREE.Vector3(0, 1, 0), tan = new THREE.Vector3(), look = new THREE.Matrix4();
   updaters.push((dt) => {

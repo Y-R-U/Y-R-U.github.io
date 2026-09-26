@@ -82,8 +82,16 @@ export function buildElegant(b, o) {
   for (let i = 0; i < 4; i++) {
     const y = 0.03 + i * 0.054;
     b.add(b.cyl(rr[i] - 0.014, rr[i] - 0.014, 0.03, 16), 'spine', 'mech', [0, y, -0.004], [0, 0, 0], [1.1, 1, 0.9]);
-    b.add(band(b, rr[i] - 0.012, rr[i] + 0.006, 0.046, PI * (i === 3 ? 1.15 : 0.9), 18), 'spine', 'body', [0, y, 0.002], [0, 0, 0], [1.08, 1, 0.95]);
     if (!far && i < 3) b.add(band(b, rr[i] - 0.016, rr[i] - 0.004, 0.034, PI * 0.5, 10), 'spine', 'trim', [0, y, 0], [0, PI, 0], [1.1, 1, 0.9]);
+  }
+  // sculpted abdominal plate: one continuous front shell pinched at the waist, with three shallow segment grooves
+  {
+    const prof = [[0.08, 0.0], [0.072, 0.05], [0.064, 0.1], [0.07, 0.15], [0.082, 0.2], [0.09, 0.235]];
+    const pts = prof.map(([r, y]) => [r, y]).concat(prof.slice().reverse().map(([r, y]) => [r - 0.009, y]));
+    pts.push([prof[0][0], prof[0][1]]);
+    b.add(b.lathe(pts, 22, -PI * 0.58, PI * 1.16), 'spine', 'body', [0, 0, 0.004], [0, 0, 0], [1.08 * s, 1, 0.95]);
+    if (!o.worker) for (const y of [0.062, 0.112, 0.162]) b.add(band(b, 0.066, 0.071 + (y - 0.1) * 0.04, 0.006, PI * 0.62, 12), 'spine', 'trim', [0, y, 0.008], [0, 0, 0], [1.08 * s, 1, 0.95]);
+    if (!o.worker && !far) b.add(b.box(0.005, 0.15, 0.006), 'spine', 'trim', [0, 0.115, 0.072]);
   }
   b.add(b.sph(16, 12, -PI * 0.28, PI * 0.56, PI * 0.2, PI * 0.6), 'spine', 'body', [0, 0.1, -0.02], [0, 0, 0], [0.07, 0.15, 0.1]);
   if (!far) b.sym(b.tube([[0.07, -0.02, -0.01], [0.085, 0.1, -0.015], [0.07, 0.22, -0.01]], 0.007, 10, 5), 'spine', 'mech');
@@ -113,11 +121,11 @@ export function buildElegant(b, o) {
     b.sym(band(b, 0.06, 0.072, 0.02, PI * 2, 20), 'upArm', 'trim', [0.004, -0.03, 0], [0, 0, -0.3]);
   }
   b.sym(b.cyl(0.022, 0.02, 0.26, 10), 'upArm', 'mech', [0, -0.14, 0]);
-  b.sym(pod(b, -0.055, -0.268, [0.046, 0.053, 0.05, 0.042, 0.034], 18), 'upArm', 'body', [0, 0, 0], [0, 0, 0], [0.95 * s, 1, 1.02]);
+  b.sym(pod(b, -0.055, -0.268, [0.05, 0.058, 0.054, 0.044, 0.035], 18), 'upArm', 'body', [0, 0, 0], [0, 0, 0], [0.95 * s, 1, 1.02]);
   if (!far) b.sym(rod(b, [0, -0.08, -0.043], [0, -0.25, -0.036], 0.006, 6), 'upArm', 'trim');
   b.sym(b.sph(12, 10), 'foreArm', 'mech', [0, 0, 0], [0, 0, 0], 0.03);
   b.sym(b.sph(10, 8), 'foreArm', 'body', [0, -0.008, -0.022], [0, 0, 0], [0.026, 0.032, 0.022]);
-  b.sym(pod(b, -0.02, -0.235, [0.034, 0.044, 0.041, 0.033, 0.027], 18), 'foreArm', 'body', [0, 0, 0], [0, 0, 0], [0.88 * s, 1, 1.05]);
+  b.sym(pod(b, -0.02, -0.235, [0.036, 0.047, 0.043, 0.034, 0.027], 18), 'foreArm', 'body', [0, 0, 0], [0, 0, 0], [0.88 * s, 1, 1.05]);
   b.sym(ringH(b, 0.026, 0.005, 14), 'foreArm', 'trim', [0, -0.232, 0]);
   b.sym(b.sph(10, 8), 'foreArm', 'mech', [0, -D.foreArm, 0], [0, 0, 0], 0.02);
   if (o.lines && !far) b.sym(b.cap(0.003, 0.11, 4), 'foreArm', 'glow', [0.034, -0.12, 0]);

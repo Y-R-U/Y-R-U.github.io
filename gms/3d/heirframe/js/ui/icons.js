@@ -104,6 +104,7 @@ const P = {
   joystick: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/>',
   vibrate: '<rect x="8" y="3" width="8" height="18" rx="2"/><path d="M4 8v8M20 8v8"/>',
   map: '<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15M15 6v15"/>',
+  recenter: '<circle cx="12" cy="12" r="8.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/><path d="M12 7.5l2.6 6.5L12 12.6 9.4 14z" fill="currentColor"/>',
   exit: '<path d="M10 4H5v16h5"/><path d="M14 8l4 4-4 4M18 12H9"/>',
   more: '<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>',
   sparkle: '<path d="M12 2l2 7 7 3-7 3-2 7-2-7-7-3 7-3z"/>',

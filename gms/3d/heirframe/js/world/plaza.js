@@ -2,8 +2,10 @@ import * as THREE from 'three';
 import { box, cyl, lathe, roundedBar, arcWall, arcTube, D2R } from './geo.js';
 import { addTree, addShrubs } from './foliage.js';
 import { createWaterMaterial } from './water.js';
-import { HOLO_ART, createHoloMaterial } from './holo.js';
+import { HOLO_ART, createHoloMaterial, registerBillboard, twoSided, faceCamera } from './holo.js';
 import { REFLECT_LAYER } from '../fx/reflection.js';
+import { bench } from './furnish.js';
+import { createFlowJetMaterial, createDroplets, createSplashRings, createSheetMaterial } from '../fx/effects.js';
 
 const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
@@ -63,22 +65,13 @@ function lamp(ctx, x, z, y = 0) {
   col.circle(x, z, 0.25, 'lamp');
 }
 
-function bench(ctx, x, z, rot, y = 0) {
-  const { batch, M, col } = ctx;
-  batch.put(box(2.4, 0.12, 0.7), M.stoneUpper, V(x, y + 0.46, z), rot);
-  batch.put(box(2.2, 0.06, 0.08), M.gold, V(x, y + 0.5, z), rot);
-  const c = Math.cos(rot), s = Math.sin(rot);
-  for (const k of [-0.9, 0.9]) batch.put(box(0.12, 0.42, 0.55), M.darkMetal, V(x + k * c, y + 0.21, z - k * s), rot);
-  col.box(x, z, 1.2, 0.35, rot, 'bench');
-}
-
 function fountain(ctx) {
   const { batch, M, col, scene, updaters, layout } = ctx;
   const { x, z } = layout.fountain;
   const rim = lathe([[0, 0], [6.4, 0], [6.6, 0.1], [6.6, 0.55], [6.45, 0.65], [6.0, 0.65], [5.9, 0.4], [0, 0.4]], 64);
   batch.put(rim, M.stoneUpper, V(x, 0, z));
   batch.put(new THREE.TorusGeometry(6.52, 0.05, 6, 96).rotateX(Math.PI / 2), M.gold, V(x, 0.62, z));
-  const water = new THREE.Mesh(new THREE.CircleGeometry(5.95, 64).rotateX(-Math.PI / 2), createWaterMaterial(ctx, { color: 0x1d4f60, reflect: true }));
+  const water = new THREE.Mesh(new THREE.CircleGeometry(5.95, 64).rotateX(-Math.PI / 2), createWaterMaterial(ctx, { color: 0x2a8496, reflect: true }));
   water.position.set(x, 0.5, z); water.receiveShadow = true; water.layers.enable(REFLECT_LAYER);
   scene.add(water);
   const ped = lathe([[0, 0], [1.6, 0], [1.4, 0.5], [0.7, 0.9], [0.55, 2.4], [0.9, 2.7], [0.9, 2.9], [0, 2.9]], 32);
@@ -99,20 +92,30 @@ function fountain(ctx) {
   arm.position.set(x, 5.2, z);
   scene.add(arm);
   updaters.push((dt, t) => { arm.rotation.y = t * 0.18; arm.children[0].rotation.x = t * 0.3; arm.children[1].rotation.z = t * 0.22; core.position.y = Math.sin(t * 1.4) * 0.12; });
-  // jets
-  // arcing jets from the rim toward the pedestal (local +Z = inward)
+  // arcing jets from the rim toward the pedestal (local +Z = inward), with droplets and splash rings
   const arc = [];
-  for (let k = 0; k <= 12; k++) { const t = k / 12; arc.push(V(0, t * (1 - t) * 4 * 1.8, t * 3.2)); }
-  const jetGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(arc), 24, 0.035, 5, false);
-  const jets = new THREE.InstancedMesh(jetGeo, ctx.jetMaterial, 16);
-  const m4 = new THREE.Matrix4();
+  for (let k = 0; k <= 16; k++) { const t = k / 16; arc.push(V(0, t * (1 - t) * 4 * 1.8, t * 3.2)); }
+  const jetGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(arc), 32, 0.05, 6, false);
+  const jets = new THREE.InstancedMesh(jetGeo, createFlowJetMaterial(ctx.time), 16);
+  const m4 = new THREE.Matrix4(), list = [], lands = [];
   for (let i = 0; i < 16; i++) {
-    const a = i / 16 * Math.PI * 2;
-    m4.compose(V(x + Math.sin(a) * 5.6, 0.5, z + Math.cos(a) * 5.6), new THREE.Quaternion().setFromAxisAngle(V(0, 1, 0), a + Math.PI), V(1, 0.8 + (i % 2) * 0.35, 1));
+    const a = i / 16 * Math.PI * 2, sy = 0.8 + (i % 2) * 0.35;
+    const sx = x + Math.sin(a) * 5.6, sz = z + Math.cos(a) * 5.6;
+    m4.compose(V(sx, 0.5, sz), new THREE.Quaternion().setFromAxisAngle(V(0, 1, 0), a + Math.PI), V(1, sy, 1));
     jets.setMatrixAt(i, m4);
+    list.push({ x: sx, z: sz, dx: -Math.sin(a), dz: -Math.cos(a), len: 3.2, h: 1.8 * sy });
+    lands.push([x + Math.sin(a) * 2.4, z + Math.cos(a) * 2.4]);
+    batch.add(cyl(0.09, 0.12, 0.14, sx, 0.42, sz, 10), M.gold, { cast: false });
   }
   jets.layers.enable(REFLECT_LAYER);
-  scene.add(jets);
+  scene.add(jets, createDroplets(ctx.time, ctx.pxScale, list, 0.5), createSplashRings(ctx.time, lands, 0.53));
+  // overflow bell: a thin sheet spilling from the pedestal bowl into the basin
+  const bell = [];
+  for (let k = 0; k <= 12; k++) { const t = k / 12; bell.push([0.93 + 0.85 * Math.sqrt(t), 3.28 - 2.76 * Math.pow(t, 1.5)]); }
+  const bellMesh = new THREE.Mesh(lathe(bell, 48), createSheetMaterial(ctx.time, 1.1));
+  bellMesh.position.set(x, 0, z); bellMesh.layers.enable(REFLECT_LAYER); bellMesh.renderOrder = 1;
+  scene.add(bellMesh, createSplashRings(ctx.time, [[x, z]], 0.54, 4.2));
+  batch.add(new THREE.TorusGeometry(5.93, 0.035, 6, 96).rotateX(Math.PI / 2), M.blueGlow, { matrix: new THREE.Matrix4().makeTranslation(x, 0.52, z), cast: false });
   col.circle(x, z, 6.7, 'fountain');
 }
 
@@ -127,10 +130,10 @@ function kiosk(ctx) {
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(1.36, 0.86), createHoloMaterial(HOLO_ART.ad('CONTRACTS', 'OPEN WORK • VERIFIED PAY', 11, '#123b6e'), { bright: 2.2, alpha: 0.98, time: ctx.time }));
   screen.position.set(x + s * 0.06, 1.65, z + c * 0.06); screen.rotation.y = rot;
   screen.layers.enable(REFLECT_LAYER);
-  scene.add(screen);
+  scene.add(screen); twoSided(screen);
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.5), createHoloMaterial(HOLO_ART.sign('CONTRACT TERMINAL'), { bright: 2.8, alpha: 0.85, time: ctx.time }));
   sign.position.set(x, 3.0, z); sign.rotation.y = rot; sign.layers.enable(REFLECT_LAYER);
-  scene.add(sign);
+  scene.add(sign); faceCamera(ctx, sign);
   ctx.updaters.push((dt, t) => { sign.position.y = 3.0 + Math.sin(t * 1.6) * 0.06; });
   const ring = ctx.makePadRing(1.8, [0.4, 0.8, 1.0]);
   ring.position.set(x, 0.02, z); scene.add(ring);
@@ -153,7 +156,7 @@ function warehousePad(ctx) {
   ring.position.set(x, 0.16, z); scene.add(ring);
   const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.5), createHoloMaterial(HOLO_ART.sign('WAREHOUSE LINK'), { bright: 2.8, alpha: 0.85, time: ctx.time }));
   sign.position.set(x, 3.7, z); sign.layers.enable(REFLECT_LAYER);
-  scene.add(sign);
+  scene.add(sign); faceCamera(ctx, sign);
   interactables.push({ id: 'warehouse', label: 'Warehouse Link', x, z, r: 2.6 });
 }
 
@@ -163,7 +166,8 @@ function holoPillar(ctx, x, z, art, rot = 0, h = 2.6) {
   batch.add(cyl(0.06, 0.06, h + 0.6, x, 0, z, 8), M.chrome);
   const m = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.8), createHoloMaterial(art, { bright: 2.2, alpha: 0.85, time: ctx.time }));
   m.position.set(x, h + 0.9, z); m.rotation.y = rot; m.layers.enable(REFLECT_LAYER);
-  scene.add(m);
+  registerBillboard(ctx, m.material, 512, 512);
+  scene.add(m); faceCamera(ctx, m);
   col.circle(x, z, 0.35, 'holo');
 }
 
@@ -185,8 +189,9 @@ export function buildPlaza(ctx) {
   for (let zz = -38; zz >= -74; zz -= 18) planter(ctx, 0, zz, 1.6, 7.5, 0, 50 + zz, 2);
   for (let zz = -32; zz >= -78; zz -= 11.5) { lamp(ctx, -10.4, zz); lamp(ctx, 10.4, zz); }
   for (let a = 0; a < 360; a += 45) { const r = 30.5; lamp(ctx, Math.sin((a + 22.5) * D2R) * r, Math.cos((a + 22.5) * D2R) * r); }
-  for (let a = 0; a < 360; a += 90) { const r = 12.5, t = (a + 45) * D2R; bench(ctx, Math.sin(t) * r, Math.cos(t) * r, t + Math.PI / 2); }
-  bench(ctx, -6, -44, Math.PI / 2); bench(ctx, 6, -56, Math.PI / 2);
+  const seat = (x, z, rot, y = 0) => { const seats = bench(ctx, x, z, rot, y); (ctx.gather ||= []).push({ x, z, kind: 'sit', seats, y }); };
+  for (let a = 0; a < 360; a += 90) { const r = 12.5, t = (a + 45) * D2R; seat(Math.sin(t) * r, Math.cos(t) * r, t + Math.PI / 2); }
+  seat(-6, -44, Math.PI / 2); seat(6, -56, -Math.PI / 2);
 
   holoPillar(ctx, -13.2, -44, HOLO_ART.ad('NEXUS', 'ONE CITY • ONE MIND', 4), 0.35);
   holoPillar(ctx, 13.2, -62, HOLO_ART.ad('HIREFRAME', 'RENT A BODY TODAY', 9, '#3a2a10'), -0.35);
@@ -255,6 +260,6 @@ function buildTerrace(ctx) {
   col.custom((x, z, r) => z > T.z - 0.2 && x + r > T.x1 - 0.3);
   // terrace dressing
   for (let i = 0; i < 5; i++) planter(ctx, -40 + i * 17, 62, 7, 1.8, 0, 90 + i, 2, T.y);
-  for (let i = 0; i < 4; i++) bench(ctx, -32 + i * 17, 55, 0, T.y);
+  for (let i = 0; i < 4; i++) { const seats = bench(ctx, -32 + i * 17, 55, 0, T.y); ctx.gather.push({ x: -32 + i * 17, z: 55, kind: 'sit', seats, y: T.y }); }
   for (const x of [-44, -20, 20, 32]) lamp(ctx, x, 45, T.y);
 }

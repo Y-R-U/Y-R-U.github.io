@@ -9,17 +9,19 @@ export function createBatcher({ cell = 48 } = {}) {
   const tmpM = new THREE.Matrix4();
   const white = new THREE.Color(1, 1, 1);
   const b = {
-    add(geom, material, { matrix = null, color = null, cast = 'auto', receive = true, reflect = 'auto', cellKey = null } = {}) {
+    add(geom, material, { matrix = null, color = null, cast = 'auto', receive = true, reflect = 'auto', cellKey = null, vcolor = false } = {}) {
       let g = geom.index ? geom.clone() : geom.clone();
       if (!g.index) { const n = g.attributes.position.count; const idx = new (n > 65535 ? Uint32Array : Uint16Array)(n); for (let i = 0; i < n; i++) idx[i] = i; g.setIndex(new THREE.BufferAttribute(idx, 1)); }
-      for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(k)) g.deleteAttribute(k);
+      for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv', ...(vcolor ? ['color'] : [])].includes(k)) g.deleteAttribute(k);
       if (!g.attributes.uv) g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(g.attributes.position.count * 2), 2));
       if (!g.attributes.normal) g.computeVertexNormals();
       if (matrix) g.applyMatrix4(matrix);
-      const n = g.attributes.position.count, c = color || white;
-      const ca = new Float32Array(n * 3);
-      for (let i = 0; i < n; i++) { ca[i * 3] = c.r; ca[i * 3 + 1] = c.g; ca[i * 3 + 2] = c.b; }
-      g.setAttribute('color', new THREE.BufferAttribute(ca, 3));
+      if (!(vcolor && g.attributes.color)) {
+        const n = g.attributes.position.count, c = color || white;
+        const ca = new Float32Array(n * 3);
+        for (let i = 0; i < n; i++) { ca[i * 3] = c.r; ca[i * 3 + 1] = c.g; ca[i * 3 + 2] = c.b; }
+        g.setAttribute('color', new THREE.BufferAttribute(ca, 3));
+      }
       g.computeBoundingSphere();
       const cen = g.boundingSphere.center, rad = g.boundingSphere.radius;
       // small props skip the mirror pass and the shadow pass; they cost draw calls, not looks

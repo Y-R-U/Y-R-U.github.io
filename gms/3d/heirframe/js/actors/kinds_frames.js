@@ -36,6 +36,11 @@ export function buildRental(b) {
   b.add(b.rbox(0.26, 0.2, 0.1, 0.02), 'chest', 'paint', [0, 0.12, -0.165]);
   b.add(b.decal(0.22, 0.11, DECAL.back), 'chest', 'decal', [0, 0.13, -0.2155], [0, PI, 0]);
   b.add(b.sph(8, 6), 'chest', 'glow', [-0.12, 0.2, 0.12], [0, 0, 0], 0.012);
+  // battery gauge on the backpack: three amber bars lit, the last one dead
+  for (let i = 0; i < 4; i++) b.add(b.box(0.04, 0.022, 0.01), 'chest', i < 3 ? 'glow' : 'mech', [-0.075 + i * 0.05, 0.215, -0.218]);
+  // clip-on rental beacon: reads as the player's warm dot from the overhead camera
+  b.add(b.cyl(0.028, 0.034, 0.02, 10), 'head', 'mech', [0.03, 0.195, -0.04]);
+  b.add(b.sph(10, 6, 0, PI * 2, 0, PI / 2), 'head', 'glow', [0.03, 0.203, -0.04], [0, 0, 0], [0.027, 0.03, 0.027]);
   b.sym(b.sph(10, 8), 'chest', 'mech', [0.18, 0.2, 0], [0, 0, 0], 0.045);
   // spine bellows
   b.add(b.cyl(0.04, 0.045, 0.14, 8), 'spine', 'mech', [0, 0.07, 0]);

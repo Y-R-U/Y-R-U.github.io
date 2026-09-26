@@ -24,13 +24,13 @@ export function createMaterials(reflection, tier) {
   const warm = makeStoneSet({ tiles: 8, base: [214, 204, 188], vary: 12, vein: [150, 135, 110], veinAlpha: 0.1, grout: [128, 114, 94], rough: [0.14, 0.3], seed: 23 });
   const noise = makeNoiseTexture(256, 4);
 
-  const floor = (set, color, rough, strength, base, tint, sky = 0) => {
+  const floor = (set, color, rough, strength, base, tint, sky = 0, skySat = 0.55) => {
     const m = new THREE.MeshStandardMaterial({ map: set.map, roughnessMap: set.roughnessMap, normalMap: set.normalMap,
       normalScale: new THREE.Vector2(0.6, 0.6), color, roughness: rough, metalness: 0.0, envMapIntensity: 0.55 });
-    if (reflection?.enabled) addPlanarReflection(m, reflection, { strength, base, blur: 2.2, distort: 0.05, tint, sky });
+    if (reflection?.enabled) addPlanarReflection(m, reflection, { strength, base, blur: 2.2, distort: 0.05, tint, sky, skySat });
     return m;
   };
-  M.marble = floor(cream, 0xffffff, 1.0, 1.0, 0.3, null, 1);
+  M.marble = floor(cream, 0xffffff, 1.0, 1.0, 0.3, null, 1, 0.22);
   M.slate = floor(slate, 0xffffff, 1.0, 1.0, 0.42, new THREE.Color(0.95, 0.98, 1.05));
   M.terrace = new THREE.MeshStandardMaterial({ map: warm.map, roughnessMap: warm.roughnessMap, normalMap: warm.normalMap, roughness: 1, envMapIntensity: 0.8 });
   M.stoneTex = { cream, slate, warm };

@@ -1,11 +1,11 @@
 // Quality tiers. `?q=` overrides; otherwise guessed from the GPU string and device class.
 export const TIERS = {
   high: { name: 'high', dprMax: 1.5, dprDesktop: 1.75, shadowMap: 2048, shadowSoft: true, msaa: 4, bloom: true,
-          reflect: 0.5, reflectLayers: 'full', crowd: 16, traffic: 70, trees: 1, envSize: 256, mist: true },
+          reflect: 0.5, reflectLayers: 'full', crowd: 32, traffic: 70, trees: 1, envSize: 256, mist: true },
   med:  { name: 'med', dprMax: 1.25, dprDesktop: 1.25, shadowMap: 1024, shadowSoft: true, msaa: 0, bloom: true,
-          reflect: 0.33, reflectLayers: 'full', crowd: 9, traffic: 40, trees: 0.7, envSize: 128, mist: true },
+          reflect: 0.33, reflectLayers: 'full', crowd: 14, traffic: 40, trees: 0.7, envSize: 128, mist: true },
   low:  { name: 'low', dprMax: 1.0, dprDesktop: 1.0, shadowMap: 0, shadowSoft: false, msaa: 0, bloom: false,
-          reflect: 0, reflectLayers: 'none', crowd: 5, traffic: 18, trees: 0.5, envSize: 64, mist: false },
+          reflect: 0, reflectLayers: 'none', crowd: 7, traffic: 18, trees: 0.5, envSize: 64, mist: false },
 };
 
 export function detectQuality(flag) {

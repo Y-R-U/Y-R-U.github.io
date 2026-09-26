@@ -209,6 +209,8 @@
   clip-path: polygon(50% 0, 100% 100%, 50% 75%, 0 100%);
   background: #fff; filter: drop-shadow(0 0 4px var(--cyan));
 }
+.hf-ibtn.hf-recenter { margin-top: 2px; font-size: 22px; transition: opacity .25s, transform .25s var(--ease-out); }
+.hf-ibtn.hf-recenter:not(.on) { opacity: 0; pointer-events: none; transform: scale(.6); }
 .hf-district { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--ice); text-shadow: 0 1px 3px #000, 0 0 8px rgba(var(--cyan-rgb), .6); white-space: nowrap; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
 
 /* vignette */

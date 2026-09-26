@@ -14,7 +14,10 @@ import { buildVista } from './vista.js';
 import { buildSkyline } from './skyline.js';
 import { buildTraffic } from './traffic.js';
 import { buildSites } from './sites.js';
-import { swayFoliage, fadeMaterial } from './foliage.js';
+import { buildFurnish } from './furnish.js';
+import { buildBackdrop } from './backdrop.js';
+import { createBillboards } from './holo.js';
+import { swayFoliage, fadeMaterial, makeLeafAtlas, createLeafMaterial } from './foliage.js';
 import { D2R } from './geo.js';
 
 export const LAYOUT = {
@@ -61,29 +64,33 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     sun.shadow.radius = 3;
   }
   scene.add(sun, sun.target);
-  const hemi = new THREE.HemisphereLight(0xbcd4ff, 0x8a7358, 0.15);
+  const hemi = new THREE.HemisphereLight(0xbcd4ff, 0x8a7358, 0.3);
   hemi.layers.enable(REFLECT_LAYER);
   scene.add(hemi);
 
   const M = createMaterials(reflection, tier);
   const fade = { uFadeC: { value: new THREE.Vector2(-9999, -9999) }, uFadeR: { value: 0 }, uFadeZ: { value: 0 } };
   swayFoliage(M.foliage, time, fade);
-  fadeMaterial(M.bark, fade);
+  M.leaves = createLeafMaterial(makeLeafAtlas(), time, fade);
+  // anything tall enough to stand between the camera and the player dithers away around them
+  for (const k of ['bark', 'chrome', 'darkMetal', 'gold', 'stone', 'stoneUpper', 'glassRail', 'canopyA', 'warmGlow', 'blueGlow', 'facade', 'facadeWarm', 'shopGlow']) fadeMaterial(M[k], fade);
   const col = createCollision(LAYOUT.bounds);
   const batch = createBatcher({ cell: 56 });
   const ctx = {
     scene, renderer, M, batch, col, tier, time, pxScale, reflection, layout: LAYOUT,
-    updaters: [], interactables: [], cache: {}, stats: {},
+    updaters: [], interactables: [], cache: {}, stats: {}, gather: [], billboards: [],
     jetMaterial: createJetMaterial(time),
     makePadRing: (r, c, busy) => createPadRing(time, r, c, busy),
   };
   onProgress(0.35, 'Laying the marble…');
   createGround(ctx);
   buildPlaza(ctx);
+  buildFurnish(ctx);
   onProgress(0.5, 'Raising the Atrium…');
   buildAtrium(ctx);
   buildBlocks(ctx);
   buildVista(ctx);
+  buildBackdrop(ctx);
   buildSites(ctx);
   onProgress(0.65, 'Building the skyline…');
   buildSkyline(ctx);
@@ -102,6 +109,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     renderer, scene, camera, sun, post, reflection, tier, ctx, time, collision: col,
     district: { id: 'aurum_plaza', name: 'Aurum Plaza', city: 'Halcyon', bounds: LAYOUT.bounds, layout: LAYOUT },
     sites: ctx.sites,
+    billboards: createBillboards(ctx),
     spawnPoints: { player: new THREE.Vector3(LAYOUT.spawn.x, 0, LAYOUT.spawn.z), kiosk: new THREE.Vector3(LAYOUT.kiosk.x, 0, LAYOUT.kiosk.z + 2.5), pad: new THREE.Vector3(LAYOUT.pad.x, 0, LAYOUT.pad.z) },
     interactables: ctx.interactables,
     groundAt: (x, z) => col.groundAt(x, z),
@@ -129,10 +137,13 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     update(dt) {
       time.value += dt;
       for (const u of ctx.updaters) u(dt, time.value);
-      // shadow frustum follows the focus, snapped to texels to stop shimmering
+      camera.getWorldDirection(_v); _v.y = 0;
+      const lead = _v.lengthSq() > 1e-6 ? _v.normalize() : _v.set(0, 0, 0);
+      for (const m of ctx.faceCam || []) m.rotation.y = Math.atan2(camera.position.x - m.position.x, camera.position.z - m.position.z);
+      // shadow frustum follows the focus (led a little toward where the camera looks), snapped to texels to stop shimmering
       if (sun.castShadow) {
         const f = world.focus, texel = (2 * 22) / tier.shadowMap;
-        const fx = Math.round(f.x / texel) * texel, fz = Math.round(f.z / texel) * texel;
+        const fx = Math.round((f.x + lead.x * 6) / texel) * texel, fz = Math.round((f.z + lead.z * 6) / texel) * texel;
         sun.target.position.set(fx, f.y, fz);
         sun.position.set(fx + SUN_DIR.x * 90, f.y + SUN_DIR.y * 90, fz + SUN_DIR.z * 90);
         sun.target.updateMatrixWorld();
@@ -144,7 +155,12 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     render(dt) {
       renderer.info.reset();
       reflection.update(scene, camera);
+      // the skyline only shows in the mirror while the view's top edge is below the horizon
+      camera.getWorldDirection(_v);
+      const hideSky = Math.asin(Math.max(-1, Math.min(1, _v.y))) + camera.fov * D2R * 0.5 < -0.04;
+      if (hideSky) for (const m of ctx.farSky || []) m.visible = false;
       post.render(dt);
+      if (hideSky) for (const m of ctx.farSky || []) m.visible = true;
     },
   };
   world.resize(innerWidth, innerHeight, tier.dpr);

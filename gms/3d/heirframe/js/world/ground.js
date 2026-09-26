@@ -19,7 +19,7 @@ export function createGround(ctx) {
   }
   const g = mergeGeometries(parts.map((p) => { const q = p.index ? p.toNonIndexed() : p; q.deleteAttribute('uv'); return q; }), false);
   const pos = g.attributes.position, uv = new Float32Array(pos.count * 2);
-  for (let i = 0; i < pos.count; i++) { uv[i * 2] = pos.getX(i) / 12; uv[i * 2 + 1] = -pos.getZ(i) / 12; }
+  for (let i = 0; i < pos.count; i++) { uv[i * 2] = pos.getX(i) / 6; uv[i * 2 + 1] = -pos.getZ(i) / 6; }
   g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
 
   const mat = M.marble;
@@ -42,22 +42,24 @@ float gLine(float d, float w) { float aa = fwidth(d) * 1.2 + 1e-4; return 1.0 - 
 float gBand(float d, float w) { float aa = fwidth(d) + 1e-4; return 1.0 - smoothstep(w * 0.5 - aa, w * 0.5 + aa, abs(d)); }
 // x = nero (black marble) weight, y = steel slate weight; edges anti-aliased with fwidth
 float aaStep(float d) { float w = fwidth(d) * 0.75 + 1e-4; return smoothstep(-w, w, d); }
-vec2 zoneOf(vec2 p) {
+// x = nero (black marble) weight, y = steel slate weight, z = honey-travertine wedge weight
+vec3 zoneOf(vec2 p) {
   float r = length(p);
   float inRing = 1.0 - aaStep(r - 28.6);
   float slate = aaStep(r - 25.8) * inRing;
   float a = atan(p.y, p.x);
   float seg = 3.14159265 / 12.0;
   float sa = (abs(fract(a / (2.0 * seg)) - 0.5) - 0.25) * 2.0 * seg * r;
-  float burst = aaStep(sa) * aaStep(r - 8.6) * (1.0 - aaStep(r - 17.0));
+  float inBurst = aaStep(r - 8.6) * (1.0 - aaStep(r - 17.0));
+  float burst = aaStep(sa) * inBurst;
   float band = 1.0 - aaStep(abs(r - 21.4) - 0.9);
   float hub = 1.0 - aaStep(r - 3.0);
-  float nero = max(max(burst, band), hub) * (1.0 - slate) * inRing;
+  float nero = max(band, hub) * (1.0 - slate) * inRing;
   float outer = 1.0 - inRing;
   float blvd = max(aaStep(12.0 - abs(p.x)) * aaStep(-27.0 - p.y), aaStep(p.x - 35.5));
   vec2 q = abs(fract(p / 6.0) - 0.5) * 6.0;
   float rib = aaStep(max(q.x, q.y) - 2.72) * (1.0 - blvd);
-  return vec2(max(nero, rib * outer), max(slate, blvd * outer));
+  return vec3(max(nero, rib * outer), max(slate, blvd * outer), burst * (1.0 - nero));
 }
 float inlay(vec2 p) {
   float r = length(p);
@@ -68,6 +70,8 @@ float inlay(vec2 p) {
   float am = mod(a + seg * 0.5, seg) - seg * 0.5;
   float am2 = mod(a, seg) - seg * 0.5;
   m += gLine(r * sin(am2 + seg * 0.5), 0.07) * step(8.6, r) * step(r, 17.0);
+  float sb = (abs(fract(a / (2.0 * seg)) - 0.5) - 0.25) * 2.0 * seg * r;
+  m += (gLine(sb - 0.09, 0.05) + gLine(sb + 0.09, 0.05)) * step(8.6, r) * step(r, 17.0);
   float bz = step(p.y, -28.6);
   m += (gLine(abs(p.x) - 12.0, 0.2) + gLine(abs(p.x) - 12.6, 0.06)) * bz;
   m += gLine(p.x - 35.5, 0.2) * step(-80.0, p.y);
@@ -78,12 +82,13 @@ float inlay(vec2 p) {
   return clamp(m, 0.0, 1.0);
 }`)
       .replace('#include <map_fragment>', `#include <map_fragment>
-vec2 zW = zoneOf(vGW);
+vec3 zW3 = zoneOf(vGW);
+vec2 zW = zW3.xy;
 float zI = inlay(vGW);
-vec2 cell3 = floor(vGW / 3.0);
+vec2 cell3 = floor(vGW / 1.5);
 float tone = gH(cell3 + 17.0);
 float gn = gN(vGW * 0.07) * 0.6 + gN(vGW * 0.23) * 0.4;
-vec3 trav = diffuseColor.rgb * vec3(0.66, 0.58, 0.47) * (0.78 + 0.3 * tone);
+vec3 trav = diffuseColor.rgb * vec3(0.62, 0.545, 0.44) * (0.84 + 0.2 * tone);
 vec3 sl = texture2D(tSlate, vMapUv * 0.73 + 0.31).rgb;
 vec3 nero = sl * sl * vec3(0.16, 0.15, 0.15);
 {
@@ -96,9 +101,20 @@ vec3 nero = sl * sl * vec3(0.16, 0.15, 0.15);
   vein += (1.0 - smoothstep(0.0, fwidth(vn2) + 0.002, abs(vn2 - 0.5))) * 0.35 * smoothstep(0.5, 0.7, gN(rp * 0.08 + 11.0));
   nero += vec3(0.16, 0.155, 0.15) * clamp(vein, 0.0, 1.0);
 }
+{
+  // travertine: soft cloudy veins + a few crisp hairline veins so the stone reads from the gameplay camera
+  vec2 rp = mat2(0.6, -0.8, 0.8, 0.6) * vGW;
+  vec2 vp = rp * vec2(0.12, 0.5) + vec2(gN(vGW * 0.21) * 0.9, 3.0);
+  float vn = gN(vp) * 0.65 + gN(vp * 2.3 + 9.0) * 0.35;
+  float hair = (1.0 - smoothstep(0.0, fwidth(vn) * 1.5 + 0.003, abs(vn - 0.5))) * smoothstep(0.3, 0.65, gN(rp * 0.07 + 5.0));
+  float cloud = smoothstep(0.35, 0.8, gN(vGW * 0.45 + 2.0) * 0.6 + gN(vGW * 1.3) * 0.4);
+  trav *= (1.0 - 0.14 * cloud) * (1.0 - 0.5 * hair);
+  trav = mix(trav, trav * vec3(1.06, 1.0, 0.9), gN(cell3 * 0.7 + 3.0));
+}
+trav = mix(trav, trav * vec3(0.66, 0.54, 0.4), zW3.z);
 vec3 steel = texture2D(tSlate, vMapUv).rgb * vec3(0.5, 0.56, 0.66);
 diffuseColor.rgb = mix(mix(trav, nero, zW.x), steel, zW.y);
-float reflZone = mix(mix(0.75, 1.0, zW.x), 1.25, zW.y);
+float reflZone = mix(mix(1.15, 1.0, zW.x), 1.25, zW.y);
 diffuseColor.rgb *= 0.9 + 0.16 * gn;
 diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.95, 0.66, 0.26), zI);
 reflZone = mix(reflZone, 0.6, zI);`)
@@ -116,6 +132,10 @@ totalEmissiveRadiance += vec3(0.16, 0.09, 0.02) * zI;
   float guide = gLine(rr - 29.15, 0.07) + gLine(rr - 8.25, 0.05);
   guide += gLine(abs(vGW.x) - 11.55, 0.06) * step(vGW.y, -28.6) * step(-80.0, vGW.y);
   totalEmissiveRadiance += vec3(0.25, 0.75, 1.6) * clamp(guide, 0.0, 1.0);
+  // inset studs at the travertine tile corners
+  vec2 sq = (fract(vGW / 3.0 + 0.5) - 0.5) * 3.0;
+  float stud = 1.0 - smoothstep(0.035, 0.035 + fwidth(vGW.x) * 1.5, length(sq));
+  totalEmissiveRadiance += vec3(1.6, 1.25, 0.8) * stud * (1.0 - zW.x) * (1.0 - zW.y) * step(8.0, rr);
 }`);
   };
   const baseKey = mat.customProgramCacheKey?.() || '';

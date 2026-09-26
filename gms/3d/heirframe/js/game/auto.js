@@ -110,8 +110,8 @@ export function createAutopilot(G, { ui, player }) {
     if (foe) {
       A.phase = 'fight';
       const d = Math.hypot(foe.pos.x - player.pos.x, foe.pos.z - player.pos.z);
-      if (d < 2.4 + foe.radius) { player.setTarget(null); A.attackHeld = true; G.combat.lock = foe; }
-      else { goTo(foe.pos.x, foe.pos.z, 1.8); if (d < 12 && pc.energy > 20 && Math.random() < 0.08) G.combat.skill('s1'); }
+      if (G.combat.inReach(foe)) { player.setTarget(null); A.attackHeld = true; G.combat.lock = foe; }
+      else { A.goal = null; goTo(foe.pos.x, foe.pos.z, 1.0); if (d < 12 && pc.energy > 20 && Math.random() < 0.08) G.combat.skill('s1'); }
       if (pc.hp < pc.stats.hp * 0.35 && Math.random() < 0.15) G.combat.dodge({ x: player.pos.x - foe.pos.x, z: player.pos.z - foe.pos.z });
       return;
     }

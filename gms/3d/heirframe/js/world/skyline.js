@@ -80,6 +80,8 @@ export function buildSkyline(ctx) {
   const spots = [];
   // hand-placed hero towers north (they dominate the floor reflections)
   spots.push([-140, -250, 0, 1.15], [115, -270, 1, 1.1], [-60, -380, 2, 1.0], [205, -190, 3, 1.0], [-235, -140, 1, 0.95], [70, -450, 0, 1.3]);
+  // free look (D16): heroes on the other three sides too
+  spots.push([-60, 290, 1, 1.15], [150, 330, 0, 1.2], [330, 60, 2, 1.05], [300, -60, 1, 1.1], [-330, 90, 0, 1.2], [-290, -30, 3, 1.0], [-210, 260, 2, 1.0]);
   for (let i = 0; i < 70; i++) {
     const a = (R() * 1.5 - 0.75) * Math.PI + Math.PI; // bias north
     const d = 170 + R() * 520;
@@ -87,8 +89,8 @@ export function buildSkyline(ctx) {
     if (tooClose(x, z) || spots.some(([sx, sz]) => Math.hypot(sx - x, sz - z) < 60)) continue;
     spots.push([x, z, (R() * 4) | 0, 0.55 + R() * 0.65]);
   }
-  for (let i = 0; i < 18; i++) { // south and east ring (seen in reflections/chrome)
-    const a = (R() - 0.5) * Math.PI * 1.1;
+  for (let i = 0; i < 60; i++) { // south, east and west ring
+    const a = (R() - 0.5) * Math.PI * 1.5;
     const d = 220 + R() * 400;
     const x = Math.sin(a) * d, z = Math.cos(a) * d;
     if (tooClose(x, z) || spots.some(([sx, sz]) => Math.hypot(sx - x, sz - z) < 60)) continue;
@@ -98,6 +100,7 @@ export function buildSkyline(ctx) {
   const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
   const skyMats = { glass: M.facadeSky, stone: M.skyStone, gold: M.goldSolid };
   let tris = 0;
+  const far = [];
   arch.forEach((a, i) => {
     const list = placements[i];
     if (!list.length) return;
@@ -110,17 +113,18 @@ export function buildSkyline(ctx) {
       });
       im.computeBoundingSphere();
       im.layers.enable(REFLECT_LAYER);
-      scene.add(im);
+      scene.add(im); far.push(im);
       tris += a[part].attributes.position.count / 3 * list.length;
     }
   });
   const st = statue();
   const fig = new THREE.Mesh(st.figure, M.statue);
   const ped = new THREE.Mesh(st.ped, M.skyStone);
-  for (const m of [fig, ped]) { m.position.set(0, 60, -360); m.layers.enable(REFLECT_LAYER); scene.add(m); }
+  for (const m of [fig, ped]) { m.position.set(0, 60, -360); m.layers.enable(REFLECT_LAYER); scene.add(m); far.push(m); }
   fig.position.y = 70;
   ped.position.y = 0;
   ctx.stats.skylineTris = tris;
   ctx.stats.towers = spots.length;
+  (ctx.farSky ||= []).push(...far);
   return { spots };
 }

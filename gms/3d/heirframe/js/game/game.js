@@ -3,9 +3,9 @@ import { audio } from '../audio/audio.js';
 import { createGame as createSim, loadGame } from '../sim/game_state.js';
 import { createSaveStore } from '../sim/save.js';
 import { statusMult } from '../sim/stats.js';
-import { SHIFT_SECONDS } from '../sim/economy.js';
+import { SHIFT_SECONDS, framePrice } from '../sim/economy.js';
 import { toUiBoard, toUiWarehouse, toUiComplete, toUiItem, toUiCodex, uiConfig } from '../sim/ui_adapt.js';
-import { createFx } from './fx.js';
+import { createFx, RARITY_COLOR } from './fx.js';
 import { createOverlay } from './overlay.js';
 import { createStoryPlayer } from './story.js';
 import { createEnemies } from './enemies.js';
@@ -60,7 +60,8 @@ export async function createGame(api) {
   function titleCam(dt) {
     titleT += dt;
     const a = -0.35 + Math.sin(titleT * 0.05) * 0.25;
-    rig.fixed = { pos: new THREE.Vector3(Math.sin(a) * 34, 11 + Math.sin(titleT * 0.08) * 1.5, 30 + Math.cos(a) * 12), look: new THREE.Vector3(-4, 6, -30), fov: 52 };
+    const f = rig.fixed || (rig.fixed = { pos: new THREE.Vector3(), look: new THREE.Vector3(-4, 6, -30), fov: 52 });
+    f.pos.set(Math.sin(a) * 34, 11 + Math.sin(titleT * 0.08) * 1.5, 30 + Math.cos(a) * 12);
   }
 
   function setMusic(state) { if (G.music !== state) { G.music = state; audio.music(state); } }
@@ -97,7 +98,8 @@ export async function createGame(api) {
     if (s.on) ui?.damage(s.x + (Math.random() - 0.5) * 20, s.y, res.amount, 'player');
     ui?.hud.flash(res.shieldDmg > res.hullDmg ? 'shield' : 'hit');
     actor.hitFlash?.();
-    audio.sfx(res.shieldDmg > res.hullDmg ? 'shield_hit' : 'hurt', { vol: 0.8, minGap: 0.05 });
+    fx.impact(tmp.set(player.pos.x, player.pos.y + 1.1, player.pos.z), res.shieldDmg > res.hullDmg ? 0x8fe8ff : 0xff6040, 0.9);
+    audio.sfx(res.shieldDmg > res.hullDmg ? 'shield_hit' : 'hurt', { vol: 0.8, minGap: 50 });
     rig.shake = Math.max(rig.shake, 0.12);
     if (pc.hp < pc.stats.hp * 0.3 && !G.lowHpBark) { G.lowHpBark = true; audio.bark('b_hira_lowhp_', { cooldown: 30 }); }
     if (pc.hp > pc.stats.hp * 0.5) G.lowHpBark = false;
@@ -120,10 +122,21 @@ export async function createGame(api) {
     const r = G.sim.playerWrecked();
     ui?.lens.hide(); ui?.detect.clear();
     await wait(1600);
-    const act = ui ? await ui.screen('death', { cause: `Wrecked by ${cause}`, cost: r.cost ? `${r.cost} cr` : 'Free (rental warranty)', tip: 'Dodge through attacks: the roll has invulnerability frames.' }) : 'redeploy';
-    for (const e of G.enemies.list) if (!e.mission && e.state !== 'dead') { e.state = 'idle'; e.c.alerted = false; e.bot.setAlert(0); }
-    const sp = world.spawnPoints.kiosk;
-    player.teleport(sp.x + 2, sp.z + 3, Math.PI);
+    const rental = G.sim.activeFrame().rental;
+    const tip = `${rental ? 'Rental warranty: redeploy is free. ' : ''}Dodge through attacks: the roll has invulnerability frames.`;
+    const act = ui ? await ui.screen('death', { cause: `Wrecked by ${cause}`, cost: r.cost || 0, tip }) : 'redeploy';
+    if (G.runner.active && !G.sim.state.contract) G.runner.failed('wrecked');
+    else if (G.runner.active) setTimeout(() => ui?.toast('Back on the job', 'info', { sub: `${G.runner.mission?.title || 'The contract'} is still open` }), 400);
+    const sp = world.spawnPoints.kiosk, rx = sp.x + 2, rz = sp.z + 3;
+    // no redeploy into the same fight: strays near the kiosk leave, everyone else calms down and walks home
+    G.enemies.clear((e) => !e.mission && e.state !== 'dead' && Math.hypot(e.pos.x - rx, e.pos.z - rz) < 30);
+    for (const e of G.enemies.list) {
+      if (e.state === 'dead' || e.nonCombat) continue;
+      e.state = 'idle'; e.c.alerted = false; e.bot.setAlert(0); e.detect = 0; e.route = null;
+      if (Math.hypot(e.home.x - rx, e.home.z - rz) < 20) e.home.set(e.pos.x, 0, e.pos.z);
+    }
+    G.spawnShield = 3;
+    player.teleport(rx, rz, Math.PI);
     rig.target.copy(player.pos); rig.snap();
     actor.play('idle');
     G.sim.playerCombatant();
@@ -143,6 +156,8 @@ export async function createGame(api) {
     }
   }
   function onLootCollect(o) {
+    tmp.set(player.pos.x, player.pos.y + 0.1, player.pos.z);
+    fx.pop(tmp, o.credits ? 0xffc850 : RARITY_COLOR[o.item?.rarity] || 0xffffff);
     if (o.credits) { ui?.loot([{ credits: o.credits }]); audio.sfx('credits', { vol: 0.6 }); return; }
     const it = o.item;
     if (!it) return;
@@ -177,7 +192,7 @@ export async function createGame(api) {
     ui.on('dodge', () => {
       if (blocked()) return;
       const m = ui.controls.move;
-      G.combat.dodge(Math.hypot(m.x, m.y) > 0.2 ? { x: m.x, z: m.y } : null);
+      G.combat.dodge(Math.hypot(m.x, m.y) > 0.2 ? rig.screenToWorld(m.x, -m.y) : null);
     });
     ui.on('interact', () => interact());
     ui.on('contracts', () => { if (G.state === 'free') openContracts(); });
@@ -311,13 +326,28 @@ export async function createGame(api) {
     audio.bark('b_mara_fail_', { cooldown: 5 });
   }
 
+  // Goal chip: the next story step first; the sim's "big want" (ECONOMY §7) once the story waits on a level.
+  // Hidden during a contract, where the tracker already says what to do.
+  function nextGoal(sim) {
+    const S = sim.state;
+    if (S.contract) return null;
+    if (!S.flags.kioskDone) return 'Meet Mara at her kiosk';
+    const sc = sim.board()?.story;
+    if (sc) return `Story: ${sc.title} · at the board`;
+    if (!S.frames.some((f) => !f.rental)) {
+      const cost = framePrice(0, { discount: S.flags.firstFrameDiscount }) || 1500;
+      return { label: S.player.level < 5 ? 'Own a frame (Lv 5)' : 'Frame licence', cost, progress: Math.min(1, S.credits / cost) };
+    }
+    return sim.nextGoal();
+  }
+
   // --- session start (after the title) -----------------------------------------------------------
   function startSession(sim) {
     G.sim = sim;
     sim.noAutosave = false;
     const ctx = {
       world, robots: api.robots, sim, fx, audio, ui, tier: api.tier, player, actor, rig, crowd, overlay, story,
-      project, losClear, hitPlayer, damagePlayerPct, setCarrying, onLootCollect, onComplete, onFail,
+      project, losClear, hitPlayer, damagePlayerPct, setCarrying, onLootCollect, onComplete, onFail, nav, walkTo,
       blocked: () => blocked(),
       hitstop: (s) => { G.hitstopT = Math.max(G.hitstopT, s); },
       onDeath: onKill,
@@ -330,6 +360,7 @@ export async function createGame(api) {
     G.runner = ctx.runner = createRunner(ctx);
     G.hud = createHudSync(ctx);
     ctx.hud = G.hud;
+    ctx.goalOverride = () => nextGoal(sim);
     sim.on('levelUp', (p) => { ui?.sting(`Level ${p.level}`, (p.features || []).map((f) => f.name || f.id).join(' · ') || 'Frame systems upgraded', 'level', 3000); audio.sfx('levelup'); audio.bark('b_hira_levelup_', { cooldown: 10 }); log('level ' + p.level); });
     sim.on('toast', (p) => ui?.toast(p.text, p.kind || 'info'));
     sim.on('rental:fee', (p) => { ui?.toast(`HireFrame shift fee −${p.fee} cr`, 'warn', { sub: p.debt ? `Balance owed: ${p.debt} cr` : 'Rent by the hour!' }); audio.bark('b_hira_fee_', { cooldown: 30 }); log('shift fee ' + p.fee); });
@@ -401,6 +432,7 @@ export async function createGame(api) {
       if (shiftLen) sim.state.shiftClock += dt * (SHIFT_SECONDS / shiftLen - 1);
       sim.tick(dt, { moving: player.moving });
     }
+    if (G.spawnShield > 0 && G.state === 'free') { pc.invulnerable = true; if ((G.spawnShield -= dt) <= 0) pc.invulnerable = false; }
     player.speedMult = (pc.stats.moveSpeed / 4.2) * statusMult(pc, 'moveMult') * (G.carrying === 'case' ? 0.9 : 1);
     const canMove = G.state === 'free' && !panelOpen() && !ui?.dialogue.open && !overlay.cardOpen;
     let hs = 1;

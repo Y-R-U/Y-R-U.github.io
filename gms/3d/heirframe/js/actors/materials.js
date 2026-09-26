@@ -10,6 +10,19 @@ function once(key, make) {
   return cache.get(k);
 }
 
+// Sunlit rim so gold / chrome read against the bright floor at gameplay distance (tinted by the paint).
+export function addRim(m, k = 0.35) {
+  m.onBeforeCompile = (sh) => {
+    sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+{
+  float rimF = pow( 1.0 - saturate( dot( normal, normalize( vViewPosition ) ) ), 3.0 );
+  totalEmissiveRadiance += ( diffuseColor.rgb * ${k.toFixed(3)} + vec3( 0.05, 0.055, 0.06 ) ) * rimF;
+}`);
+  };
+  m.customProgramCacheKey = () => 'robotRim' + k;
+  return m;
+}
+
 // metal/paint/gloss factory. o: {color, metal, rough, coat, coatRough, emissive, ei, map, emap, sheen}
 export function mat(key, o) {
   return once(key, () => {
@@ -28,7 +41,7 @@ export function mat(key, o) {
     if (o.emap) m.emissiveMap = o.emap;
     if (o.rmap) m.roughnessMap = o.rmap;
     m.name = key;
-    return m;
+    return addRim(m);
   });
 }
 
