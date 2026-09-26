@@ -73,9 +73,9 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
   swayFoliage(M.foliage, time, fade);
   M.leaves = createLeafMaterial(makeLeafAtlas(), time, fade);
   // anything tall enough to stand between the camera and the player dithers away around them
-  for (const k of ['bark', 'chrome', 'darkMetal', 'gold', 'stone', 'stoneUpper', 'glassRail', 'canopyA', 'warmGlow', 'blueGlow', 'facade', 'facadeWarm', 'shopGlow']) fadeMaterial(M[k], fade);
+  for (const k of ['bark', 'chrome', 'darkMetal', 'gold', 'stone', 'stoneUpper', 'glassRail', 'canopyA', 'warmGlow', 'blueGlow', 'facade', 'facadeWarm', 'shopGlow', 'uber']) fadeMaterial(M[k], fade);
   const col = createCollision(LAYOUT.bounds);
-  const batch = createBatcher({ cell: 56 });
+  const batch = createBatcher({ cell: 56, uber: /[?&]nouber/.test(location.search) ? null : M.uber });
   const ctx = {
     scene, renderer, M, batch, col, tier, time, pxScale, reflection, layout: LAYOUT,
     updaters: [], interactables: [], cache: {}, stats: {}, gather: [], billboards: [],

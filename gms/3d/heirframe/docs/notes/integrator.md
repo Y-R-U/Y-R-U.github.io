@@ -23,7 +23,8 @@ Owns: `js/game/*`, `js/main.js`, `js/engine/{player,camera,input,devpad}.js`, th
 
 ## Camera controls (Aaron, 2026-09-26) — finished
 - **Look:** one-finger drag on the canvas (anything outside the joystick zone and buttons) orbits: horizontal = yaw, full 360°
-  (0.0075 rad/px, ~840 px per turn); vertical = pitch offset, effective pitch clamped 35°–70°. Smoothed (k=18) with fling inertia
+  (0.0075 rad/px, ~840 px per turn); vertical = pitch offset, effective pitch clamped **12°–70° (D16)**. Below 30° the rig
+  smoothsteps into a vista: look point +1.8 m, distance ×1.2, fov +6° → at 12° the horizon sits ~20% from the top. Smoothed (k=18) with fling inertia
   (decay 5/s; no fling if the finger rests >80 ms before lifting). Tap = <10 px and <250 ms (mouse clicks: any duration); longer
   or further = look-drag, never a tap. Mouse: right- or middle-drag orbits; Q/E rotate (E ignored while an interact prompt shows,
   since E = interact). Wheel and two-finger pinch zoom.
@@ -37,6 +38,17 @@ Owns: `js/game/*`, `js/main.js`, `js/engine/{player,camera,input,devpad}.js`, th
 - Verified headless (cam.mjs): drag 200 px = 86°, joystick-up·camera-forward = 0.997, fling, pitch clamp 70°, tap still moves,
   pinch → 0.7×, reset → exactly default, button 44×44, 0 console errors.
 
+## Also fixed this session (#2)
+- Standoff bug: attack() picked targets out to reach+0.5 but release() only lands within reach → endless whiffs. One reach test
+  (`combat.inReach`) now gates the swing; out of reach = auto-approach along a nav route (ctx.walkTo, re-routed every 0.35 s).
+- Enemies chased in straight lines and pinned themselves behind planters: `chase()` uses nav.los / nav.route (refresh ~0.6 s).
+- Sites inside geometry (fountain_plaza 7.8 m, fountain_falls 16.3 m, 6 others <2 m) are snapped to the nearest walkable cell in
+  the runner (`nav.nearest`) — a surveil at fountain_falls soft-locked the autopilot. All 38 sites now route from spawn.
+- Death: the Redeploy button showed "NaN cr" (string cost into fmt). Wrecked random contracts now fail with a toast (the sim
+  failed them silently); checkpoint (story) contracts toast "Back on the job". Redeploy clears stray hostiles within 30 m of the
+  kiosk, calms the rest, and gives 3 s spawn protection (a Rustkin pack parked at the kiosk killed the bot 14× in a row).
+- audio.sfx minGap is ms; js/game passed seconds (0.05) so it never throttled. Fixed.
+
 ## Edits outside my files (owners gone at the time)
 - `js/world/crowd.js`: added `crowd.scare(x,z,r)` + flee movement (civilians get out of fights, D15).
 - `index.html`: `<link rel="icon" href="data:,">` (favicon 404 was the only console error).
@@ -49,8 +61,10 @@ Owns: `js/game/*`, `js/main.js`, `js/engine/{player,camera,input,devpad}.js`, th
 - **art (camera yaw):** (1) tree canopies/planters sit between camera and player at yaw 90–180° (player hidden under leaves):
   please fade or cut out foliage on the camera→player segment like the building fade. (2) at yaw 270° near (-30, 40) a building's
   west side is a flat untextured grey slab filling a third of the screen and it is not faded; the fade target test should use the
-  camera→player segment for any yaw. Horizon never shows (pitch ≥35°, zoom ≤13.8 m), so the skyline is safe.
-- art/world: `world.billboards.show(key)` hook for T10 "Harmony Watching" / intro `billboards_face` (currently a sting banner).
+  camera→player segment for any yaw. With D16 (pitch 12°) the tree canopy problem is worse: at yaw 90 from (0,20) the player
+  is fully under leaves. (3) perf at the 12° vista, high tier, M5 metal, 915x412 DPR2: 35–46 fps (vs 60 top-down), e.g. from
+  (10,-40) looking south 38 fps, (-30,40) looking west 35 fps.
+- (done) `world.billboards.show('harmony_face', {line, duration})` now drives the intro `billboards_face` beat and T10 (sting fallback).
 - sim: `sim.hud().goal` is an object — fine now (finisher HUD renders it).
 
 ## Gotchas

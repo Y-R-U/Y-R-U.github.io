@@ -260,10 +260,16 @@ export async function createGame(api) {
     else if (n.id === 'relay') ui?.toast('Transit Relay', 'info', { sub: 'Other districts open as the story unfolds' });
   }
 
+  // every holo billboard wipes to Harmony's face (art's world.billboards); the sting is the fallback
+  function harmonyFace(line, duration) {
+    if (world.billboards?.show) world.billboards.show('harmony_face', { line, duration, fade: 1.2 });
+    else ui?.sting('Harmony is watching', 'The billboards turn to face you', 'story', 2400);
+  }
+
   // --- story: intro + kiosk -----------------------------------------------------------------------
   const story = createStoryPlayer({
     ui, audio, overlay,
-    onFx: (f) => { if (f === 'billboards_face') ui?.sting('Harmony', 'The billboards turn to face you', 'story', 2400); },
+    onFx: (f) => { if (f === 'billboards_face') harmonyFace('GOOD MORNING, HALCYON', 9); },
     onAction: async (a) => {
       if (a.tutorial === 'move') ui?.toast('Drag the left side to walk', 'info', { sub: 'or tap the ground to move there', ms: 4500 });
       if (a.tutorial === 'attack') ui?.toast('Tap ATTACK', 'info', { sub: 'the baton auto-targets the nearest rat', ms: 3500 });
@@ -352,7 +358,7 @@ export async function createGame(api) {
       hitstop: (s) => { G.hitstopT = Math.max(G.hitstopT, s); },
       onDeath: onKill,
       onAlert: () => {},
-      onFx: (f) => story && f === 'billboards_face' && ui?.sting('Harmony is watching', 'A billboard turns to face you', 'story', 2400),
+      onFx: (f) => f === 'billboards_face' && harmonyFace('HARMONY IS WATCHING', 12),
     };
     G.props = ctx.props = createProps(ctx);
     G.enemies = ctx.enemies = createEnemies(ctx);

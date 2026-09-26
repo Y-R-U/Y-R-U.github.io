@@ -4,7 +4,7 @@ import * as THREE from 'three';
 // twists, stealth (surveil) and the story beats that hang off step events.
 export function createRunner(ctx) {
   const { sim, world, enemies, props, ui, audio, fx, player } = ctx;
-  const siteById = new Map(world.sites.map((s) => [s.id, s]));
+  const siteById = new Map();
   let R = null;   // runtime mission
   const tmp = new THREE.Vector3();
 
@@ -12,13 +12,20 @@ export function createRunner(ctx) {
   // real Aurum Plaza sites with the same tag so the contract stays playable.
   const byTag = {};
   for (const s of world.sites) (byTag[s.tag] ||= []).push(s);
+  // Sites whose centre sits inside geometry (e.g. a waterfall basin) are snapped to the nearest walkable cell so
+  // goto/deliver steps and markers stay reachable.
+  const walkable = (s) => {
+    if (!s || !ctx.nav?.blocked(s.x, s.z)) return s;
+    const p = ctx.nav.nearest(s.x, s.z);
+    return p ? { ...s, x: p.x, z: p.z } : s;
+  };
   const site = (id) => {
     if (!id) return null;
     let s = siteById.get(id);
     if (s) return s;
     const m = /^(.*)_(\d+)$/.exec(id);
     const pool = (m && byTag[m[1]]) || byTag.plaza;
-    s = pool[((m ? +m[2] : 1) - 1) % pool.length];
+    s = walkable(world.sites.find((x) => x.id === id) || pool[((m ? +m[2] : 1) - 1) % pool.length]);
     siteById.set(id, s);
     return s;
   };

@@ -63,7 +63,29 @@ export function createMaterials(reflection, tier) {
   M.goldSolid = new THREE.MeshStandardMaterial({ color: 0xf6cd78, roughness: 0.16, metalness: 1.0, envMapIntensity: 1.3 });
   M.chromeSolid = new THREE.MeshStandardMaterial({ color: 0xf2f4f8, roughness: 0.06, metalness: 1.0, envMapIntensity: 1.2 });
   M.coreGlow = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: new THREE.Color(0.55, 0.85, 1.0), emissiveIntensity: 6 });
+  M.uber = contactAO(uberMaterial());
+  for (const k of ['stone', 'stoneUpper', 'gold', 'chrome', 'darkMetal', 'glassDark', 'warmGlow', 'blueGlow', 'bark', 'soil', 'dumpster', 'crate']) M[k].userData.uber = true;
+  for (const k in M) if (M[k]?.isMaterial && !M[k].name) M[k].name = k;
   return M;
+}
+
+// Per-vertex metal/rough/glow/env (see batch.js `uber`); colour comes from the vertex colour.
+function uberMaterial() {
+  const m = new THREE.MeshStandardMaterial({ vertexColors: true, metalness: 1, roughness: 1, envMapIntensity: 1 });
+  const prev = m.onBeforeCompile;
+  m.onBeforeCompile = (sh, r) => {
+    prev?.call(m, sh, r);
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec4 pbr;\nvarying vec4 vPbr;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvPbr = pbr;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec4 vPbr;')
+      .replace('#include <color_fragment>', '#include <color_fragment>\nvec3 glowC = diffuseColor.rgb * vPbr.z; diffuseColor.rgb *= 1.0 - vPbr.z;')
+      .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor = vPbr.x;')
+      .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = vPbr.y;')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += glowC;')
+      .replace('#include <lights_fragment_maps>', '#include <lights_fragment_maps>\nradiance *= vPbr.w; iblIrradiance *= vPbr.w;');
+  };
+  m.customProgramCacheKey = () => 'uber';
+  return m;
 }
 
 // Curtain-wall glass: floor spandrels + mullions + a scatter of warm lit windows, from world position.

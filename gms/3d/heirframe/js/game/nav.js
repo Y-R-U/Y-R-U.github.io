@@ -9,9 +9,9 @@ export function createNav(world, { cell = 1, radius = 0.45 } = {}) {
   const ok = (i, j) => i >= 0 && j >= 0 && i < W && j < H && !grid[j * W + i];
   const cx = (i) => x0 + (i + 0.5) * cell, cz = (j) => z0 + (j + 0.5) * cell;
 
-  function nearestOpen(i, j) {
+  function nearestOpen(i, j, maxR = 24) {
     if (ok(i, j)) return [i, j];
-    for (let r = 1; r < 8; r++) for (let dj = -r; dj <= r; dj++) for (let di = -r; di <= r; di++) if (Math.max(Math.abs(di), Math.abs(dj)) === r && ok(i + di, j + dj)) return [i + di, j + dj];
+    for (let r = 1; r < maxR; r++) for (let dj = -r; dj <= r; dj++) for (let di = -r; di <= r; di++) if (Math.max(Math.abs(di), Math.abs(dj)) === r && ok(i + di, j + dj)) return [i + di, j + dj];
     return null;
   }
 
@@ -66,5 +66,8 @@ export function createNav(world, { cell = 1, radius = 0.45 } = {}) {
     return out;
   }
 
-  return { route, los, blocked: (x, z) => !ok(ci(x), cj(z)), W, H, grid };
+  // nearest walkable point (cell centre) to x,z, or null
+  function nearest(x, z, maxR = 24) { const c = nearestOpen(ci(x), cj(z), maxR); return c ? { x: cx(c[0]), z: cz(c[1]) } : null; }
+
+  return { route, los, nearest, blocked: (x, z) => !ok(ci(x), cj(z)), W, H, grid };
 }

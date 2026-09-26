@@ -47,3 +47,5 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 - 2026-09-26: both agents died at the limit again; resumed as integrator(2) + art(2). Pushed 3a98127c (A1-M1 + contracts + combat + loot + marble floor). Live check below.
   live verified: fresh profile, ready, zero failed requests
 - Aaron: right-side look/zoom/reset view → sent to integrator as priority (D16).
+- 2026-09-26: art round 1 DONE (4 blind critic rounds, 3–4/10, crowd/cafés/totems/trees/fountain/skyline ring/billboard hook; see notes/art.md). Pushed 57adccfa. Live check: 1st run "ready false 96 s" was host GPU contention (3 headless Chromes); the retry was ready in 9 s with 0 failed requests. The title screen draw load (495 calls / 860k tris) is on art round 2's list.
+- Running: integrator (P1 polish + D16 camera look; pitch amended to ~12–70° per art finding), art round 2 (phone perf, floor clutter, chrome contrast, low-pitch vistas).
