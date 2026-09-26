@@ -320,4 +320,4 @@ branching story arc with an ending, field depots, and continuous objectives.
 - [x] Generate/audit new compressed local Qwen voice assets
 - [x] Headless full-route balance, persistence/transition regressions and falsified gates
 - [x] Hardware browser touch walkthrough, 320/390/430 layout, screenshots inspected
-- [ ] Commit only Tinpot, push and verify public deployment (existing user authorization)
+- [x] Commit only Tinpot, push and verify public deployment (46ce9977 + 9789ffc2, public verified)

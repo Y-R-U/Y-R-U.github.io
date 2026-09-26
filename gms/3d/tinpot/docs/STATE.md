@@ -6,51 +6,48 @@ depots and unobstructed transitions. Keep intro. Maintain checklist during work.
 Earlier explicit commit/push authorization persists; only stage Tinpot paths. Other games
 and root files have unrelated edits. No delegation authorized.
 
-Current: implementation complete; all local gates complete; publication remains. 0.05 commit bfc381ca pushed; Pages deployment
-36018810293 succeeded and public version 0.05 verified. New work not released yet.
-Plan: six intro missions unchanged; Operation Last Orders adds an actual mission graph
-about missing tea supplies and Ministry fraud. Same-map objectives roll on; cleared-zone
-exit markers select routes. Safe depots are optional between objectives; opening pauses,
-closing resumes; autosave includes exact field checkpoint. Two routes affect later
-reinforcements, rewards and ending. See new 0.06 checklist at END of PLAN.md.
+Current: **0.06 complete, committed, pushed and verified publicly.**
 
-Next: commit/push only Tinpot and verify public version/audio/field flow. Update this handoff
-with release evidence.
+Release:
+- 46ce9977 — Operation Last Orders campaign, field depots and varied voices.
+- 9789ffc2 — depot narration plays while combat stays paused.
+- GitHub Pages workflows 36209988568 and 36210126026 completed successfully.
+- Public URL: https://yru.br8t.com/gms/3d/tinpot/ — PATTERN 0.06.
+- Production boot exposes version 0.06 / 148 clips and no tinpotTest API without ?test=1.
+- Public real-touch walkthrough completed all fourteen post-training operations on the
+  village/radio route, both route choices, depot purchase, save/exit/reload and all map renders.
+- All 148 public MP3s match local SHA-256; 2,165,076 bytes, 417.84 seconds.
+- Final public depot MP3 played from a real touch while combat stayed paused; zero browser,
+  network or shader errors. Evidence: story-public-{assets,browser,final}.json and public PNG.
 
-Implementation checkpoint (2026-09-26):
-- Campaign graph and eight procedural territories implemented (24 definitions, 20 played
-  per route including intro). Four possible paths, village/ledger and marsh/radio decisions.
-- Pure save schema 2 migrates v1, including old completed slice at mission=6.
-- Same-map continuation carries actual positions, wounds, map damage. Retry restores field
-  deployment snapshot; crossroads have explicit persisted choices.
-- Optional world depot opens a scrolling shop/journal, heals 35 HP once per objective,
-  saves/exits; brief edge dispatches and seven-second objective changeover.
-- 33 new locally generated clips COMPLETE; 148 total, 2,165,076 bytes. 80/20 director
-  chooses four plain clips per character, five snarky move variants; excludes Going now
-  for hold/equipment. All four full routes pass pure sim with modest upgrades.
-- Original sim 24 checks and voice 13+3 mutants pass. New persistence/depot/branch gates
-  and voice weighting (including reversed-weight mutant) pass.
-- First hardware browser boot and orchard screenshot inspected; zero errors.
-Validation checkpoint:
-- Reach transitions now use a different destination; all four full paths remain green.
-- Real-touch browser played all 14 new objectives on village/radio route to ending, with
-  no force wins. Targeted fixtures verified depot purchases affect live HP, settings freeze
-  combat, save/exit/reload retains crossroads, and walking+confirming selects the branch.
-- 320x568, 390x844, 430x932 depot and route controls exercised. Screenshot review caught
-  route overlap and a stale dispatch on scene reset, both fixed. Added overlap gates.
-- All new territory screenshots inspected; depot/ending scroll on short phones.
-- Original teach 13, voices browser 10, release all six intro missions/retries/mobile checks
-  passed; title profile 60.00 fps, p95 16.8ms on M5 ANGLE Metal, CPU4x, 390x844 DPR2.
-- Audio audit: all 148 MP3s decode, mono24kHz40kbps, 417.84 seconds, 2,165,076 bytes.
-Final local verification complete: story-polish.mjs proves the overlap gate rejects colliding
-labels, real touch swipe scrolls depot 167 px, sticky close stays reachable, and the final
-320x568 route/ending screenshots are inspected. Ministry battle profile is 60.0035 fps,
-p95 16.8ms, 359 calls, 265,126 triangles, 127 geometries (M5 Metal, CPU4x, 390x844 DPR2).
-Release checkpoint: gameplay commit 46ce9977 pushed to main; GitHub Pages workflow
-36209988568 running. Final depot narration fix follows: speech can play in depot mode while
-combat remains paused; verified with a real gesture, story-depot MP3 and zero browser errors.
-Next: push that small fix, verify public 0.06 plus all assets and browser field flow, then
-record publication and tick the last 0.06 checklist item.
+Implemented: 24 operation definitions / 20 per full run across ten territories; two branching
+choices with real garrison/wave/reward consequences; route-dependent ending and platoon record;
+continuous shared-territory objectives preserving positions, wounds and destruction; optional
+safe depots with upgrades, once-per-objective dressing, journal, sound and save/exit; v1 save
+migration and exact field retries; 80/20 plain/snarky radio confirmations, 33 new Qwen clips.
+Read CAMPAIGN.md and VOICES.md for the graph, persistence contracts and reproduction commands.
+
+Validation:
+- Core sim 24, original campaign all six, voice unit 13 + 3 rejected mutants.
+- Story core: all four complete paths + migration/crossroads/idempotent reward/exact retry/
+  depot anti-farming/branch-effect gates; 808 plain replies per 1,000 seeded moves; reversed
+  80/20 mutant rejected; hold never says Going now.
+- Browser teach 13, voice 10, original release all six missions/retry/layout/performance.
+- Story real-touch full route plus depot/branch/reload; 320x568, 390x844, 430x932 checked.
+- Screenshots caught overlapping route controls and stale dispatch text, both fixed. Gate now
+  checks route-vs-route AND route-vs-weapon collisions; deliberately colliding labels rejected.
+- Real touch scroll moves the depot 167 px; sticky close stays reachable. Short-phone route,
+  depot, ending and every new territory screenshot inspected.
+- Ministry battle: 60.0035 fps, p95 16.8 ms, 359 calls / 265,126 triangles / 127 geometries.
+  Profile: M5 ANGLE Metal, CPU4x, 390x844 DPR2. Physical phone/Safari remains a human check.
+- Intro/title profile: 60.00 fps, p95 16.8 ms on the same hardware profile.
+
+Next: human playtest on the public URL. No unfinished implementation items in the 0.06 list.
+Ask whether the seven-second objective changeovers and depot/route labels feel natural, and
+whether veterans need harder opposition. The rifle pilot is competent and the arc is generous.
+Future expansion ideas (NOT promises or completed work): objective variety, larger terrain
+changes, vehicles/weapons, more bespoke voiced dispatches, and a strategic campaign map.
+The old projects.js item remains reserved for Aaron's session; it was outside this request.
 
 --- Previous handoff follows ---
 
