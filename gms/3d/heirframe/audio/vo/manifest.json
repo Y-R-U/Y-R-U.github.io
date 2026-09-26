@@ -334,10 +334,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s00_hira_01.mp3",
-  "duration": 6.48,
+  "duration": 6.13,
   "seed": 42,
-  "job_id": "beea2244d7f34827b9c483abddbde465",
-  "sig": "820edaf0074e",
+  "job_id": "4f68ec5bf68a48a895e5f12d2244e1ae",
+  "sig": "648a9c0b4b76",
   "qc": []
  },
  "a1_s00_hira_02": {
@@ -345,10 +345,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s00_hira_02.mp3",
-  "duration": 7.93,
+  "duration": 7.16,
   "seed": 42,
-  "job_id": "240394beacbf42d39d6db191fd6f0817",
-  "sig": "45fd686881cc",
+  "job_id": "8ae39a9d94fb4aaea8ba8624c1c3e721",
+  "sig": "7704bbf20c7d",
   "qc": []
  },
  "a1_s00_harmony_01": {
@@ -389,10 +389,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s00_hira_03.mp3",
-  "duration": 7.4,
+  "duration": 7.23,
   "seed": 42,
-  "job_id": "aabfc15564fc45cfa18aa431391841cb",
-  "sig": "7b822a8303c1",
+  "job_id": "d0b1080bceef436d9a0017957444612d",
+  "sig": "6c383989a7ab",
   "qc": []
  },
  "a1_s01_mara_01": {
@@ -411,10 +411,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s01_hira_01.mp3",
-  "duration": 5.29,
+  "duration": 4.82,
   "seed": 42,
-  "job_id": "7bb18da0012a439ba9d47dabababa624",
-  "sig": "d85dc2548cbc",
+  "job_id": "b3f590d085d54165a793ea346daf6833",
+  "sig": "9a5a87f5ac6a",
   "qc": []
  },
  "a1_s02_hira_01": {
@@ -422,10 +422,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s02_hira_01.mp3",
-  "duration": 5.96,
+  "duration": 6.54,
   "seed": 42,
-  "job_id": "401e21760efe4a18a15b47b9640f24b1",
-  "sig": "a6a4678ade63",
+  "job_id": "64d2f5ced9684ed58006f84966102823",
+  "sig": "53c9bb776990",
   "qc": []
  },
  "a1_s02_mara_01": {
@@ -444,10 +444,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s03_hira_01.mp3",
-  "duration": 7.81,
+  "duration": 8.07,
   "seed": 42,
-  "job_id": "9ca282181f3c4cbcbff312de08389333",
-  "sig": "689f793e9f4d",
+  "job_id": "75301462d8b147ea87f06b144a2e7390",
+  "sig": "4f2422dacc1e",
   "qc": []
  },
  "a1_s03_iris_01": {
@@ -466,10 +466,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s03_hira_02.mp3",
-  "duration": 5.17,
+  "duration": 4.78,
   "seed": 42,
-  "job_id": "bf97789df4f542dc98e0f450bd16ca42",
-  "sig": "e5dd934c2273",
+  "job_id": "d682c1d9d1b24077a63e5ff7e73abfea",
+  "sig": "a92f445d5b96",
   "qc": []
  },
  "a1_s04_mara_01": {
@@ -510,10 +510,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s05_hira_01.mp3",
-  "duration": 3.71,
+  "duration": 3.7,
   "seed": 42,
-  "job_id": "88022bdf6ed0439e850f8cafd751ea42",
-  "sig": "0ea16c0f6a81",
+  "job_id": "c55ec5ee39b0406c919b4da2b47fde3e",
+  "sig": "a7e06d687c58",
   "qc": []
  },
  "a1_s06_thug_m_01": {
@@ -565,10 +565,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s08_hira_01.mp3",
-  "duration": 3.72,
+  "duration": 4.13,
   "seed": 42,
-  "job_id": "36ac89f4f9a1465e975dffc0a11ebfd7",
-  "sig": "d575c289f3ae",
+  "job_id": "50efab62e56c4dc3b4d727faccf9028c",
+  "sig": "0aa387046b15",
   "qc": []
  },
  "a1_s09_mara_01": {
@@ -598,10 +598,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s09_hira_01.mp3",
-  "duration": 8.03,
+  "duration": 8.59,
   "seed": 42,
-  "job_id": "9fdd46bf44ca4fb2bbce1ffa0f4989ad",
-  "sig": "e0aca2849de9",
+  "job_id": "ba3c3eacde0b412cb37b21512daaca1e",
+  "sig": "786378d3c25f",
   "qc": []
  },
  "a1_s10_kettle_01": {
@@ -708,10 +708,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s13_hira_01.mp3",
-  "duration": 5.7,
+  "duration": 5.05,
   "seed": 42,
-  "job_id": "ef79347536c540c7a7abe96bca178dd3",
-  "sig": "c9918bd7f004",
+  "job_id": "e6a75c8d393a4ce9a1796caa7b38e1bb",
+  "sig": "dd5835554992",
   "qc": []
  },
  "a1_s14_hira_01": {
@@ -719,10 +719,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s14_hira_01.mp3",
-  "duration": 5.85,
+  "duration": 5.91,
   "seed": 42,
-  "job_id": "6ac074226bc7407fb902d9b5d8d2d10a",
-  "sig": "f5cefa0cba1c",
+  "job_id": "2019fededf294c7ca646b1e92da61c67",
+  "sig": "868b00a728de",
   "qc": []
  },
  "a1_s14_mara_01": {
@@ -763,10 +763,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s15_hira_01.mp3",
-  "duration": 5.29,
+  "duration": 4.45,
   "seed": 42,
-  "job_id": "c1c1ddb6af90403686ec95e8294c723f",
-  "sig": "2ffee7361497",
+  "job_id": "68298ee7ee8140599485444f45f1ca45",
+  "sig": "3d579adf38b9",
   "qc": []
  },
  "pa_unity_01": {
@@ -1060,10 +1060,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_loot_01.mp3",
-  "duration": 3.49,
+  "duration": 3.19,
   "seed": 42,
-  "job_id": "6582ed1d17eb450690f82ed719ff52f3",
-  "sig": "5b26d205baef",
+  "job_id": "6adbb352ce774c0bb7eb40989e3f37a9",
+  "sig": "74820d727004",
   "qc": []
  },
  "b_hira_loot_up_01": {
@@ -1071,10 +1071,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_loot_up_01.mp3",
-  "duration": 4.33,
+  "duration": 4.87,
   "seed": 42,
-  "job_id": "7777500de5054ffe931608ddb8bb8711",
-  "sig": "3cdfb0ba99f6",
+  "job_id": "6e7070b09ee1402294ef579be3aee6eb",
+  "sig": "23420e5011e3",
   "qc": []
  },
  "b_hira_loot_rare_01": {
@@ -1082,10 +1082,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_loot_rare_01.mp3",
-  "duration": 5.23,
+  "duration": 4.77,
   "seed": 42,
-  "job_id": "da12bfcb5826432b8c2635d64ed48bff",
-  "sig": "14c892035bff",
+  "job_id": "89ad355e05b7450294589ae7e97c46c5",
+  "sig": "a87e5a2c606a",
   "qc": []
  },
  "b_hira_levelup_01": {
@@ -1093,10 +1093,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_levelup_01.mp3",
-  "duration": 5.56,
+  "duration": 5.54,
   "seed": 42,
-  "job_id": "c917bd46c1c24e528ddfa555736dc909",
-  "sig": "577a094c7ea9",
+  "job_id": "a539a366eff34dfd9b0aad5a7639c3a2",
+  "sig": "6e4e5377869f",
   "qc": []
  },
  "b_hira_fee_01": {
@@ -1104,10 +1104,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_fee_01.mp3",
-  "duration": 5.95,
+  "duration": 5.53,
   "seed": 42,
-  "job_id": "c1e9b2de92e146959c55776e63d4dc53",
-  "sig": "f7404533fd4d",
+  "job_id": "f4006cd4df024f61aa36b0c540cc501f",
+  "sig": "c882882b1b7d",
   "qc": []
  },
  "b_hira_fee_02": {
@@ -1115,10 +1115,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_fee_02.mp3",
-  "duration": 5.15,
+  "duration": 5.38,
   "seed": 42,
-  "job_id": "6d439b2cedd34b97a600dd27857b06fe",
-  "sig": "97bb18c11404",
+  "job_id": "3691e20c3c74460fa22eda3ea6fb0333",
+  "sig": "93837e9e271d",
   "qc": []
  },
  "b_hira_lowhp_01": {
@@ -1126,10 +1126,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_lowhp_01.mp3",
-  "duration": 4.91,
+  "duration": 4.83,
   "seed": 42,
-  "job_id": "68e60addab4642f48ff046b850116730",
-  "sig": "10217516d952",
+  "job_id": "b3c9051472c340d8a0a80359584a2473",
+  "sig": "95808e2c4478",
   "qc": []
  },
  "b_hira_wreck_01": {
@@ -1137,10 +1137,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_wreck_01.mp3",
-  "duration": 6.78,
+  "duration": 6.35,
   "seed": 42,
-  "job_id": "f1be8c65b3f549718b3ac1046025c813",
-  "sig": "7efe9719df09",
+  "job_id": "3c4008d39fe3472abd8ba3080b6ed2a6",
+  "sig": "d3d1e328695e",
   "qc": []
  },
  "b_hira_idle_01": {
@@ -1148,10 +1148,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_idle_01.mp3",
-  "duration": 4.16,
+  "duration": 4.01,
   "seed": 42,
-  "job_id": "171c826ddfb1446991fade200389c5eb",
-  "sig": "67125bf2fec4",
+  "job_id": "480a21ffa6fc4fb4a50aae45809460f8",
+  "sig": "7cfd5d372278",
   "qc": []
  },
  "b_hira_idle_02": {
@@ -1159,10 +1159,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_idle_02.mp3",
-  "duration": 4.3,
+  "duration": 4.48,
   "seed": 42,
-  "job_id": "0d6055cf793f417e89ed1effbf07d5c3",
-  "sig": "e7c887bc73f7",
+  "job_id": "2b53d075639f4e26af0d958af2f731ae",
+  "sig": "fd6d01145f9b",
   "qc": []
  },
  "b_hira_skill_01": {
@@ -1170,10 +1170,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_skill_01.mp3",
-  "duration": 1.98,
+  "duration": 2.03,
   "seed": 42,
-  "job_id": "c98f99827b384c7bb21a485e51ae73cb",
-  "sig": "16b804a5f560",
+  "job_id": "3c40cfc33ba547bb8d7459f1cfa4521b",
+  "sig": "9f8071c43842",
   "qc": []
  },
  "b_hira_warehouse_01": {
@@ -1181,10 +1181,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_warehouse_01.mp3",
-  "duration": 1.56,
+  "duration": 1.44,
   "seed": 42,
-  "job_id": "e9009062ff6c4f7c9130b3c453b123bb",
-  "sig": "be89f707224c",
+  "job_id": "154e1918cfb14e9ea6d5d7e4ce805031",
+  "sig": "c4bea0182b60",
   "qc": []
  },
  "b_hira_stealth_01": {
@@ -1192,10 +1192,10 @@
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "b_hira_stealth_01.mp3",
-  "duration": 2.8,
+  "duration": 2.74,
   "seed": 42,
-  "job_id": "38412dbaf3ac4011bbef2ab0b96304ee",
-  "sig": "a42a3a19b89a",
+  "job_id": "4fa4f43b922347d38b4739075cd898c2",
+  "sig": "c4710fcf872d",
   "qc": []
  },
  "b_civ_greet_01": {

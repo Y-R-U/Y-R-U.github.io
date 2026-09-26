@@ -187,30 +187,30 @@
   "f0": 205
  },
  "hira": {
-  "id": "2cb0997b6f4c4a029082edf46246e6c2",
+  "id": "c70608db97544c42bb6a64bf46850d1f",
   "name": "Heirframe · HIRA",
-  "notes": "Designed for HEIRFRAME (yru gms/3d/heirframe). A young woman, mid-twenties, bright and bubbly American accent, crisp and slightly over-enunciated like a customer-service chatbot, fast and upbeat, with a sing-song lift at the end of sentences.",
+  "notes": "Designed for HEIRFRAME (yru gms/3d/heirframe). A professional young woman in her late twenties, clear confident adult voice with a warm mid-low register, friendly and polished like a premium airline or luxury-brand virtual assistant, smooth American accent, relaxed natural pace, cheerful but composed, not childlike, not squeaky.",
   "settings": {
    "mode": "clone",
    "speaker": "Ryan",
    "language": "English",
    "instruct": "",
-   "reference_id": "5b1a2bebd9554786852793aa750ebf7e",
+   "reference_id": "757373f9ae1e4e909ad8b56997cc10d8",
    "ref_text": "Good morning, valued rider! Your HireFrame R-1 is fully charged and ready for another brighter day. Have you considered our premium plan?",
    "temperature": 0.9,
    "top_p": 1.0,
    "top_k": 50,
    "repetition_penalty": 1.05,
    "speed": 1,
-   "seed": 11
+   "seed": 2024
   },
-  "preview": "3cdc0032bac2493ba9570cf066b18914",
-  "created": 1790347569.281059,
+  "preview": "2c3783d3a01d41339d71ff67ace8ed77",
+  "created": 1790427846.910557,
   "source_recipe": {
    "mode": "design",
    "speaker": "Ryan",
    "language": "English",
-   "instruct": "A young woman, mid-twenties, bright and bubbly American accent, crisp and slightly over-enunciated like a customer-service chatbot, fast and upbeat, with a sing-song lift at the end of sentences.",
+   "instruct": "A professional young woman in her late twenties, clear confident adult voice with a warm mid-low register, friendly and polished like a premium airline or luxury-brand virtual assistant, smooth American accent, relaxed natural pace, cheerful but composed, not childlike, not squeaky.",
    "reference_id": null,
    "ref_text": "",
    "temperature": 0.9,
@@ -218,11 +218,11 @@
    "top_k": 50,
    "repetition_penalty": 1.05,
    "speed": 1.0,
-   "seed": 11,
+   "seed": 2024,
    "text": "Good morning, valued rider! Your HireFrame R-1 is fully charged and ready for another brighter day. Have you considered our premium plan?"
   },
-  "design_seed": 11,
-  "f0": 308
+  "design_seed": 2024,
+  "f0": 229
  },
  "iris": {
   "id": "78679a8f12e34878bf7c82dd21651537",

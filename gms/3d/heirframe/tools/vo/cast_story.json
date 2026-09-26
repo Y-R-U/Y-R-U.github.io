@@ -6,18 +6,18 @@
    150,
    350
   ],
-  "name": "Heirframe · Mara Quill",
+  "name": "Heirframe \u00b7 Mara Quill",
   "fx": ""
  },
  "hira": {
-  "instruct": "A young woman, mid-twenties, bright and bubbly American accent, crisp and slightly over-enunciated like a customer-service chatbot, fast and upbeat, with a sing-song lift at the end of sentences.",
+  "instruct": "A professional young woman in her late twenties, clear confident adult voice with a warm mid-low register, friendly and polished like a premium airline or luxury-brand virtual assistant, smooth American accent, relaxed natural pace, cheerful but composed, not childlike, not squeaky.",
   "ref": "Good morning, valued rider! Your HireFrame R-1 is fully charged and ready for another brighter day. Have you considered our premium plan?",
   "f0": [
-   170,
-   400
+   150,
+   245
   ],
-  "fx": "highpass=f=350,lowpass=f=5200,acrusher=bits=10:mix=0.2",
-  "name": "Heirframe · HIRA"
+  "fx": "highpass=f=180,lowpass=f=7500,acrusher=bits=12:mix=0.08",
+  "name": "Heirframe \u00b7 HIRA"
  },
  "iris": {
   "instruct": "A woman in her late sixties with a warm, clear British received-pronunciation accent. Sharp and intelligent, slightly frail but quick, kind with a dry wit, speaks like a professor who loves her students.",
@@ -26,7 +26,7 @@
    150,
    350
   ],
-  "name": "Heirframe · Iris Vael",
+  "name": "Heirframe \u00b7 Iris Vael",
   "fx": ""
  },
  "dray": {
@@ -36,7 +36,7 @@
    60,
    150
   ],
-  "name": "Heirframe · Archon Dray",
+  "name": "Heirframe \u00b7 Archon Dray",
   "fx": ""
  },
  "lyra": {
@@ -46,7 +46,7 @@
    150,
    350
   ],
-  "name": "Heirframe · Lyra Vael",
+  "name": "Heirframe \u00b7 Lyra Vael",
   "fx": ""
  },
  "tomas": {
@@ -56,7 +56,7 @@
    80,
    190
   ],
-  "name": "Heirframe · Tomas Quill",
+  "name": "Heirframe \u00b7 Tomas Quill",
   "fx": ""
  },
  "fenn": {
@@ -66,7 +66,7 @@
    70,
    200
   ],
-  "name": "Heirframe · Dr Abel Fenn",
+  "name": "Heirframe \u00b7 Dr Abel Fenn",
   "fx": ""
  },
  "kettle": {
@@ -76,7 +76,7 @@
    60,
    140
   ],
-  "name": "Heirframe · Big Kettle",
+  "name": "Heirframe \u00b7 Big Kettle",
   "fx": ""
  },
  "jun": {
@@ -86,7 +86,7 @@
    170,
    400
   ],
-  "name": "Heirframe · Jun Okafor",
+  "name": "Heirframe \u00b7 Jun Okafor",
   "fx": ""
  },
  "halloran": {
@@ -96,7 +96,7 @@
    135,
    300
   ],
-  "name": "Heirframe · Halloran",
+  "name": "Heirframe \u00b7 Halloran",
   "fx": ""
  },
  "rook": {
@@ -106,7 +106,7 @@
    65,
    175
   ],
-  "name": "Heirframe · Rook",
+  "name": "Heirframe \u00b7 Rook",
   "fx": ""
  },
  "elena": {
@@ -117,7 +117,7 @@
    350
   ],
   "fx": "highpass=f=300,lowpass=f=3400[v];anoisesrc=c=pink:a=0.006:r=24000[n];[v][n]amix=inputs=2:duration=first:normalize=0",
-  "name": "Heirframe · Captain Elena Vael"
+  "name": "Heirframe \u00b7 Captain Elena Vael"
  },
  "helm": {
   "instruct": "An androgynous synthetic voice in the mid range, perfectly even and calm, no accent, slow and precise with no emotion.",
@@ -127,7 +127,7 @@
    280
   ],
   "fx": "aecho=0.8:0.5:23|37|53:0.3|0.2|0.12",
-  "name": "Heirframe · The Helm"
+  "name": "Heirframe \u00b7 The Helm"
  },
  "sal": {
   "instruct": "A man in his forties with a smooth, fast, cheerful tenor and a New York accent, a friendly used-car salesman.",
@@ -136,7 +136,7 @@
    85,
    200
   ],
-  "name": "Heirframe · Sal Venn",
+  "name": "Heirframe \u00b7 Sal Venn",
   "fx": ""
  },
  "ottoline": {
@@ -146,7 +146,7 @@
    150,
    350
   ],
-  "name": "Heirframe · Ottoline Gearwright",
+  "name": "Heirframe \u00b7 Ottoline Gearwright",
   "fx": ""
  },
  "civ_f1": {
@@ -156,7 +156,7 @@
    150,
    350
   ],
-  "name": "Heirframe · Civilian F1 (affluent)",
+  "name": "Heirframe \u00b7 Civilian F1 (affluent)",
   "fx": ""
  },
  "civ_m1": {
@@ -166,7 +166,7 @@
    65,
    175
   ],
-  "name": "Heirframe · Civilian M1 (affluent)",
+  "name": "Heirframe \u00b7 Civilian M1 (affluent)",
   "fx": ""
  },
  "civ_f2": {
@@ -176,7 +176,7 @@
    150,
    350
   ],
-  "name": "Heirframe · Civilian F2 (Stacks)",
+  "name": "Heirframe \u00b7 Civilian F2 (Stacks)",
   "fx": ""
  },
  "civ_m2": {
@@ -186,7 +186,7 @@
    65,
    175
   ],
-  "name": "Heirframe · Civilian M2 (Stacks)",
+  "name": "Heirframe \u00b7 Civilian M2 (Stacks)",
   "fx": ""
  },
  "warden_m": {
@@ -197,7 +197,7 @@
    175
   ],
   "fx": "highpass=f=400,lowpass=f=3200,acrusher=bits=11:mix=0.15",
-  "name": "Heirframe · Warden M"
+  "name": "Heirframe \u00b7 Warden M"
  },
  "warden_f": {
   "instruct": "A woman in her thirties, firm, clipped, neutral American accent, dispatch cadence.",
@@ -207,7 +207,7 @@
    350
   ],
   "fx": "highpass=f=400,lowpass=f=3200,acrusher=bits=11:mix=0.15",
-  "name": "Heirframe · Warden F"
+  "name": "Heirframe \u00b7 Warden F"
  },
  "thug_m": {
   "instruct": "A man in his twenties, cocky and aggressive, rough South London accent, shouty.",
@@ -216,7 +216,7 @@
    75,
    220
   ],
-  "name": "Heirframe · Syndicate Thug M",
+  "name": "Heirframe \u00b7 Syndicate Thug M",
   "fx": ""
  },
  "thug_f": {
@@ -226,7 +226,7 @@
    150,
    350
   ],
-  "name": "Heirframe · Syndicate Thug F",
+  "name": "Heirframe \u00b7 Syndicate Thug F",
   "fx": ""
  },
  "unlinked": {
@@ -236,7 +236,7 @@
    70,
    220
   ],
-  "name": "Heirframe · Unlinked Rebel",
+  "name": "Heirframe \u00b7 Unlinked Rebel",
   "fx": ""
  },
  "harmony": {
