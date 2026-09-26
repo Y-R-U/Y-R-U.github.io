@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Voice Lab · YRU</title><link rel="stylesheet" href="../util.css"><link rel="icon" href="data:,"></head><body><main>
+<a href="/#utils">← Utils</a><header><div class="eyebrow">Local tools / Audio</div><h1>Find the right voice.</h1><p class="muted">Audition your favourites, shape a new character, or bring a reference voice to life.</p></header>
+<div class="grid">
+  <a class="card lab-card" data-port="7874" href="http://localhost:7874/"><div class="lab-icon">🎙</div><span class="eyebrow">Kokoro</span><h2>The original Voice Lab</h2><p>Audition 57 voices, rate your favourites, and blend voices with saved notes for your agents.</p><span class="open">Open Kokoro Voice Lab ↗</span></a>
+  <a class="card lab-card" data-port="7876" href="http://localhost:7876/"><div class="lab-icon">✦</div><span class="eyebrow">Qwen3-TTS · 1.7B</span><h2>Qwen Voice Studio</h2><p>Preset voices, voice design and voice cloning. Save profiles, tune delivery, and download your takes.</p><span class="hint">CustomVoice · VoiceDesign · Base</span><span class="open">Open Qwen Voice Studio ↗</span></a>
+</div><p class="hint" style="margin-top:24px">Both studios run on your Mac and work from your phone on the home network.</p><p id="local-note" class="notice" hidden>Open Voice Lab from your local YRU server to use these studios.</p>
+<script>
+const host = location.hostname || 'localhost';
+const local = /^(localhost|127\.0\.0\.1)$/.test(host) || /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(host) || host.endsWith('.local');
+document.querySelectorAll('[data-port]').forEach(link => { link.href = `http://${local ? host : 'localhost'}:${link.dataset.port}/`; });
+document.getElementById('local-note').hidden = local;
+</script></main></body></html>

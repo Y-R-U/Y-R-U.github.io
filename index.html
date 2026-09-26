@@ -553,6 +553,69 @@
 
     .about-section p:last-child { margin-bottom: 0; }
 
+    /* ─── UTILS PAGE (local network only — see IS_LOCAL below) ─── */
+    .utils-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--card-gap);
+      margin-top: 20px;
+    }
+
+    .util-card {
+      display: block;
+      text-decoration: none;
+      background: rgba(10, 10, 20, 0.85);
+      border: 1px solid rgba(0,255,252,0.3);
+      border-radius: 8px;
+      padding: 20px;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+
+    .util-card:hover {
+      border-color: var(--cyber-primary);
+      box-shadow: 0 0 20px rgba(0,255,252,0.2);
+      transform: translateY(-2px);
+    }
+
+    .util-card h3 {
+      font-size: 15px;
+      color: var(--cyber-primary);
+      margin: 0 0 8px;
+      letter-spacing: 0.08em;
+    }
+
+    .util-card .util-icon { margin-right: 8px; }
+
+    .util-card p {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      color: #b8b8b8;
+      line-height: 1.6;
+      margin: 0 0 10px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      min-height: 3.2em;
+    }
+
+    .util-card .util-url {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: var(--cyber-accent);
+      word-break: break-all;
+    }
+
+    .utils-note {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 11px;
+      color: #6a6a6a;
+      line-height: 1.7;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(0,255,252,0.1);
+    }
+
     .highlight {
       color: var(--cyber-primary);
       text-shadow: 0 0 4px var(--cyber-primary);
@@ -619,6 +682,7 @@
   <div class="navbar">
     <a href="#home" class="home-icon active" data-page="home"><i class="fas fa-home"></i></a>
     <a href="#projects" data-page="projects">Projects</a>
+    <a href="#utils" data-page="utils" id="utils-nav" hidden>Utils</a>
     <a href="#about" data-page="about">About</a>
   </div>
 
@@ -656,6 +720,20 @@
           <h2><span class="about-icon"><i class="fas fa-tv"></i></span> Best Viewed</h2>
           <p>Home page video is best viewed in portrait on mobile, or resize your browser to approximately 16:9. Projects work on both desktop and mobile.</p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UTILS PAGE — local network only, see IS_LOCAL in the script below -->
+  <div id="utils-page" class="page">
+    <div class="about-container">
+      <div class="about-panel">
+        <h1 class="glitch-text">Utils</h1>
+        <p style="font-family:'Share Tech Mono',monospace;font-size:12px;color:#b8b8b8;margin:0">
+          Local tools on the home network. This page is hidden off-network.
+        </p>
+        <div class="utils-grid" id="utils-grid"></div>
+        <div class="utils-note" id="utils-note"></div>
       </div>
     </div>
   </div>
@@ -938,6 +1016,50 @@
       });
     }
 
+    // ─── UTILS: LOCAL-NETWORK-ONLY PAGE ───
+    // The Utils page links to services that only exist on the home LAN, so it
+    // would be dead weight (and a bit of an information leak) on the public
+    // GitHub Pages build. Rather than keep an un-committable local edit, the
+    // whole thing ships and hides itself: the nav link starts `hidden` in the
+    // markup and is only unhidden when the page is being served from a private
+    // address. Everything here is safe to commit.
+    const IS_LOCAL = (() => {
+      const h = location.hostname;
+      if (location.protocol === 'file:') return true;
+      if (h === 'localhost' || h === '127.0.0.1' || h === '::1' || h === '') return true;
+      if (h.endsWith('.local')) return true;
+      // RFC1918: 10.x, 192.168.x, 172.16–172.31.x
+      if (/^10\./.test(h) || /^192\.168\./.test(h)) return true;
+      if (/^172\.(1[6-9]|2\d|3[01])\./.test(h)) return true;
+      return false;
+    })();
+
+    const UTILS = [
+      { icon: '\u{1F50A}', name: 'SFX Bench',
+        url: '/gms/3d/forge/audio/',
+        desc: 'Audition synth effects. Save your picks.' },
+      { icon: '\u{1F399}', name: 'Voice Lab',
+        url: '/utils/voice-lab/',
+        desc: 'Kokoro + Qwen voices. Audition, blend and clone.' },
+      { icon: '\u{23F1}', name: 'iTerm Reminders',
+        url: '/utils/iterm/',
+        desc: 'Schedule agent prompts. Repeat per session.' },
+    ];
+
+    let utilsInited = false;
+
+    function buildUtils() {
+      document.getElementById('utils-grid').innerHTML = UTILS.map(u => `
+        <a class="util-card" href="${u.url}">
+          <h3><span class="util-icon">${u.icon}</span>${u.name}</h3>
+          <p>${u.desc}</p>
+          <div class="util-url">${u.url}</div>
+        </a>`).join('');
+      document.getElementById('utils-note').textContent =
+        'Served from ' + location.host + '. Curated voice picks live in ' +
+        '~/cc/airon/voicelab/data/voices.json.';
+    }
+
     // ─── PAGE NAVIGATION ───
     function showPage(pageName) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -956,6 +1078,8 @@
         const video = document.querySelector('#home-page video');
         if (video) video.style.display = 'none';
       }
+
+      if (pageName === 'utils' && !utilsInited) { utilsInited = true; buildUtils(); }
 
       if (pageName === 'projects') {
         if (!projectsInited) { projectsInited = true; buildMonthBar(); }
@@ -1017,8 +1141,12 @@
         }
       });
 
+      // Utils nav — only exists on the home network
+      if (IS_LOCAL) document.getElementById('utils-nav').hidden = false;
+
       // Handle hash navigation
       if (window.location.hash === '#projects') showPage('projects');
+      if (window.location.hash === '#utils' && IS_LOCAL) showPage('utils');
     });
   </script>
 </body>

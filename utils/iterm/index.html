@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>iTerm Reminders · YRU</title><link rel="stylesheet" href="../util.css"><link rel="icon" href="data:,"></head>
+<body><main>
+  <a href="/#utils">← Utils</a>
+  <header><div class="eyebrow">Local tools / iTerm2</div><h1>A nudge to keep going.</h1><p class="muted">Schedule a prompt for any session. Set it once, then let your Mac take care of the reminders.</p></header>
+  <div class="toolbar"><span id="connection" class="badge" role="status">Connecting…</span><button id="refresh" type="button">↻ Refresh sessions</button></div>
+  <div id="message" class="notice" role="status" aria-live="polite"></div>
+  <div id="offline" class="notice" hidden>The local helper is unavailable. On the Mac, run <code>python3 utils/iterm/install.py</code> from the YRU site folder. Use this page on your home network with the Mac awake. If macOS asks, allow automation of iTerm2.</div>
+  <div class="layout"><div>
+    <section class="panel"><h2>1. Choose a session</h2><div id="sessions" class="session-list"><p class="hint">Looking for iTerm2 windows, tabs and split panes…</p></div>
+      <details id="preview-details"><summary>Preview selected terminal</summary><button id="preview" type="button">Load current screen</button><pre id="screen">Choose a session, then load its screen.</pre></details>
+    </section>
+    <section class="panel"><h2 id="form-title">2. Schedule a reminder</h2><div id="selected" class="selected-name">No session selected</div>
+      <form id="schedule-form">
+        <label>First reminder in</label><div class="time-fields"><div><label for="delay-hours">Hours</label><input id="delay-hours" type="number" min="0" max="8760" value="5" required></div><div><label for="delay-minutes">Minutes</label><input id="delay-minutes" type="number" min="0" max="59" value="2" required></div></div>
+        <label for="first-prompt">First prompt</label><input id="first-prompt" maxlength="4000" value="continue" required>
+        <label class="check"><input id="repeat" type="checkbox"> Repeat after the first reminder</label>
+        <div id="repeat-fields" hidden><div class="time-fields"><div><label for="repeat-hours">Every · hours</label><input id="repeat-hours" type="number" min="0" max="8760" value="5" required></div><div><label for="repeat-minutes">Minutes</label><input id="repeat-minutes" type="number" min="0" max="59" value="2" required></div></div>
+          <label for="repeat-count">Additional reminders</label><input id="repeat-count" type="number" min="1" max="1000" value="3" required>
+          <label for="repeat-prompt">Repeat prompt</label><input id="repeat-prompt" maxlength="4000" value="continue" required>
+        </div>
+        <div id="summary" class="notice summary"></div>
+        <p class="hint">Sends your text and presses Enter in the selected pane. Keep the agent open and its input clear. A detected shell prompt pauses delivery; detection needs iTerm2 shell integration.</p>
+        <button class="primary full" id="save" type="submit" disabled>Create reminder</button><button id="cancel-edit" class="full" style="margin-top:10px" type="button" hidden>Cancel edit</button>
+      </form>
+    </section>
+  </div><div>
+    <section class="panel"><h2>Your reminders</h2><p class="hint">They run with the browser closed. After sleep, one overdue reminder is sent; repeats start a fresh interval.</p><div id="schedules"><p class="muted">Connecting to your scheduler…</p></div></section>
+    <section class="panel"><h2>Recent deliveries</h2><div id="history"><p class="hint">No deliveries yet.</p></div></section>
+    <p class="hint">Times use this device’s timezone. Your Mac must be awake and logged in. Closed sessions pause their reminders; choose a new session with Edit.</p>
+  </div></div>
+</main><script src="app.js"></script></body></html>
