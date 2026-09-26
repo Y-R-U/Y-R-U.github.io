@@ -4,10 +4,10 @@ export const REFLECT_LAYER = 1;
 
 // Planar mirror for the y=planeY floor. Renders only objects on REFLECT_LAYER, at reduced resolution,
 // into a texture that glossy floor/water materials sample in screen-projected space.
-export function createPlanarReflection(renderer, { scale = 0.5, planeY = 0 } = {}) {
+export function createPlanarReflection(renderer, { scale = 0.5, planeY = 0, samples = 0 } = {}) {
   const size = renderer.getDrawingBufferSize(new THREE.Vector2());
   const rt = new THREE.WebGLRenderTarget(Math.max(2, size.x * scale | 0), Math.max(2, size.y * scale | 0),
-    { type: THREE.HalfFloatType, samples: 0 });
+    { type: THREE.HalfFloatType, samples });
   const cam = new THREE.PerspectiveCamera();
   cam.layers.set(REFLECT_LAYER);
   const texMatrix = new THREE.Matrix4();
@@ -56,9 +56,14 @@ export function createPlanarReflection(renderer, { scale = 0.5, planeY = 0 } = {
       const prevRT = renderer.getRenderTarget();
       const prevAuto = renderer.shadowMap.autoUpdate;
       renderer.shadowMap.autoUpdate = false;
+      const prevA = renderer.getClearAlpha();
       renderer.setRenderTarget(rt);
+      renderer.setClearAlpha(0);
       renderer.clear();
+      const bg = scene.background; scene.background = null;
       renderer.render(scene, cam);
+      scene.background = bg;
+      renderer.setClearAlpha(prevA);
       renderer.setRenderTarget(prevRT);
       renderer.shadowMap.autoUpdate = prevAuto;
     },
@@ -68,9 +73,13 @@ export function createPlanarReflection(renderer, { scale = 0.5, planeY = 0 } = {
 
 // Patches a MeshStandardMaterial so it adds the planar reflection, blurred by its roughness,
 // with an artistically strong fresnel (the refs' floors read as near-mirror at any angle).
-export function addPlanarReflection(material, R, { strength = 1, base = 0.28, blur = 3.0, distort = 0.04, tint = null } = {}) {
+// The mirror target's alpha marks reflected objects: there the planar image replaces the env specular;
+// elsewhere `sky` scales the env (sky) specular up toward the same artistic fresnel.
+// A material may define REFL_ZONE and a float `reflZone` in main() to modulate strength per pixel.
+export function addPlanarReflection(material, R, { strength = 1, base = 0.28, blur = 3.0, distort = 0.04, tint = null, sky = 0 } = {}) {
   const u = { ...R.uniforms, uReflStrength: { value: strength }, uReflBase: { value: base },
-    uReflBlur: { value: blur }, uReflDistort: { value: distort }, uReflTint: { value: tint || new THREE.Color(1, 1, 1) } };
+    uReflBlur: { value: blur }, uReflDistort: { value: distort }, uReflTint: { value: tint || new THREE.Color(1, 1, 1) },
+    uReflSky: { value: sky } };
   material.userData.reflUniforms = u;
   const prev = material.onBeforeCompile;
   const prevKey = material.customProgramCacheKey?.call(material) || '';
@@ -82,7 +91,7 @@ export function addPlanarReflection(material, R, { strength = 1, base = 0.28, bl
       .replace('#include <fog_vertex>', '#include <fog_vertex>\nvReflPos = uReflectMatrix * vec4( ( modelMatrix * vec4( transformed, 1.0 ) ).xyz, 1.0 );');
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
-uniform sampler2D tReflect; uniform vec2 uReflectTexel; uniform float uReflectOn, uReflStrength, uReflBase, uReflBlur, uReflDistort;
+uniform sampler2D tReflect; uniform vec2 uReflectTexel; uniform float uReflectOn, uReflStrength, uReflBase, uReflBlur, uReflDistort, uReflSky;
 uniform vec3 uReflTint;
 varying vec4 vReflPos;`)
       .replace('#include <opaque_fragment>', `
@@ -90,18 +99,27 @@ varying vec4 vReflPos;`)
   float NdV = clamp( dot( normal, geometryViewDir ), 0.0, 1.0 );
   float gloss = pow( clamp( 1.0 - roughnessFactor, 0.0, 1.0 ), 2.0 );
   float F = mix( uReflBase, 1.0, pow( 1.0 - NdV, 3.0 ) ) * gloss * uReflStrength;
+#ifdef REFL_ZONE
+  F *= reflZone;
+#endif
+  vec3 envS = reflectedLight.indirectSpecular;
+  vec3 envD = mix( vec3( dot( envS, vec3( 0.2126, 0.7152, 0.0722 ) ) ), envS, 0.55 );
   if ( uReflectOn > 0.5 ) {
     vec3 nd = normal - normalize( vNormal );
     vec2 ruv = vReflPos.xy / vReflPos.w + nd.xy * uReflDistort;
-    float br = uReflBlur * ( 0.25 + roughnessFactor * 4.0 );
+    float br = uReflBlur * ( 0.6 + roughnessFactor * 4.0 );
     vec2 o = uReflectTexel * br;
-    vec3 rc = texture2D( tReflect, ruv ).rgb * 0.28;
-    rc += texture2D( tReflect, ruv + vec2( o.x, o.y * 2.0 ) ).rgb * 0.18;
-    rc += texture2D( tReflect, ruv + vec2( -o.x, -o.y * 2.0 ) ).rgb * 0.18;
-    rc += texture2D( tReflect, ruv + vec2( -o.x * 1.5, o.y * 3.5 ) ).rgb * 0.18;
-    rc += texture2D( tReflect, ruv + vec2( o.x * 1.5, -o.y * 3.5 ) ).rgb * 0.18;
-    rc = min( rc, vec3( 6.0 ) );
-    outgoingLight = outgoingLight * ( 1.0 - F * 0.55 ) + rc * uReflTint * F;
+    vec4 rc = texture2D( tReflect, ruv ) * 0.28;
+    rc += texture2D( tReflect, ruv + vec2( o.x, o.y * 2.0 ) ) * 0.18;
+    rc += texture2D( tReflect, ruv + vec2( -o.x, -o.y * 2.0 ) ) * 0.18;
+    rc += texture2D( tReflect, ruv + vec2( -o.x * 1.5, o.y * 3.5 ) ) * 0.18;
+    rc += texture2D( tReflect, ruv + vec2( o.x * 1.5, -o.y * 3.5 ) ) * 0.18;
+    float a = clamp( rc.a, 0.0, 1.0 );
+    vec3 rcol = min( rc.rgb, vec3( 6.0 ) );
+    outgoingLight = ( outgoingLight - envS ) * ( 1.0 - F * 0.55 ) + ( uReflSky > 0.0 ? envD * uReflSky * F * 20.0 : envS ) * ( 1.0 - a )
+      + rcol * uReflTint * F;
+  } else if ( uReflSky > 0.0 ) {
+    outgoingLight += envD * uReflSky * F * 20.0 - envS;
   }
 }
 #include <opaque_fragment>`);

@@ -208,13 +208,13 @@ export function buildHeavy(b, o) {
   }
 }
 
-const GOLD_T = [0xa07830, 0xc0903a, 0xd9a441, 0xe8b04a, 0xf5c35a];
+const GOLD_T = [0xb89048, 0xd4a852, 0xe8bd62, 0xf5cb70, 0xffd67e];
 export function heavyMats(tier, enforcer) {
   const t = tier;
   if (enforcer) {
     const gold = t >= 3;
     return {
-      body: gold ? mat('enf_gold', { color: 0xe8b04a, metal: 1, rough: 0.2, coat: 0.5 }) : mat('enf_black' + t, { color: 0x1a1b1e, metal: 0.7, rough: 0.35 - t * 0.04, coat: 0.3 }),
+      body: gold ? mat('enf_gold', { color: 0xf5cb70, metal: 1, rough: 0.2, coat: 0.5 }) : mat('enf_black' + t, { color: 0x1a1b1e, metal: 0.7, rough: 0.35 - t * 0.04, coat: 0.3 }),
       trim: gold ? mat('enf_goldtrim', { color: 0x1a1a1d, metal: 1, rough: 0.2 }) : mat('enf_red', { color: 0x9b111e, metal: 0.4, rough: 0.35, coat: 0.6 }),
       mech: mat('enf_mech', { color: 0x0e0f11, metal: 0.9, rough: 0.35 }),
       glow: glow('enf_glow' + (gold ? 'g' : ''), gold ? 0xffd070 : 0xff2a2a, 3),
@@ -320,7 +320,7 @@ export function eleganceMats(kind, tier) {
   const gold = t >= 2;
   return {
     body: mat('sec_white', { color: 0xf0f2f5, metal: 0.1, rough: 0.25, coat: 1 }),
-    trim: gold ? mat('sec_gold', { color: 0xd9a441, metal: 1, rough: 0.22 }) : mat('sec_navy', { color: 0x1b2a4a, metal: 0.5, rough: 0.35, coat: 0.6 }),
+    trim: gold ? mat('sec_gold', { color: 0xecc36a, metal: 1, rough: 0.22 }) : mat('sec_navy', { color: 0x1b2a4a, metal: 0.5, rough: 0.35, coat: 0.6 }),
     mech: mat('sec_mech', { color: 0x14161b, metal: 1, rough: 0.15 }),
     glow: glow('sec_glow', 0x3aa0ff, 3),
     eye: glow('sec_eye', 0x7cc4ff, 3),

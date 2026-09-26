@@ -19,8 +19,9 @@ export function createAutopilot(G, { ui, player }) {
     const b = toUiBoard(G.sim);
     const list = b.contracts;
     let i = G.contractsDone === 0 ? list.findIndex((c) => c.story) : -1;
-    if (i < 0) i = list.findIndex((c) => P1_ARCH.includes(c.archetype) && !A.archetypes.includes(c.archetype) && !(c.modifiers || []).some((m) => /Ghost/.test(m.label)));
-    if (i < 0) i = list.findIndex((c) => P1_ARCH.includes(c.archetype));
+    if (i < 0) i = list.findIndex((c) => !c.story && P1_ARCH.includes(c.archetype) && !A.archetypes.includes(c.archetype) && !(c.modifiers || []).some((m) => /Ghost/.test(m.label)));
+    if (i < 0) i = list.findIndex((c) => !c.story && P1_ARCH.includes(c.archetype));
+    if (i < 0) i = list.findIndex((c) => !c.story);
     if (i < 0) i = 0;
     return i;
   }

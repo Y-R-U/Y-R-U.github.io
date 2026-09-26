@@ -4,7 +4,7 @@ import { createGame as createSim, loadGame } from '../sim/game_state.js';
 import { createSaveStore } from '../sim/save.js';
 import { statusMult } from '../sim/stats.js';
 import { SHIFT_SECONDS } from '../sim/economy.js';
-import { toUiBoard, toUiWarehouse, toUiComplete, toUiItem, uiConfig } from '../sim/ui_adapt.js';
+import { toUiBoard, toUiWarehouse, toUiComplete, toUiItem, toUiCodex, uiConfig } from '../sim/ui_adapt.js';
 import { createFx } from './fx.js';
 import { createOverlay } from './overlay.js';
 import { createStoryPlayer } from './story.js';
@@ -43,9 +43,13 @@ export async function createGame(api) {
   const log = (msg) => { G.log.push(`${(performance.now() / 1000).toFixed(1)} ${msg}`); if (G.log.length > 200) G.log.shift(); };
 
   ui?.config(uiConfig());
-  const settings = ui?.settings.get();
-  if (settings) audio.setVolumes({ music: settings.music, sfx: settings.sfx, vo: settings.voice });
-  ui?.on('settings', (s) => audio.setVolumes({ music: s.music, sfx: s.sfx, vo: s.voice }));
+  if (ui) {
+    audio.setVolumes(ui.settings.volumes());
+    ui.on('volumes', (v) => audio.setVolumes(v));
+    // dialogue VO goes through the audio engine (ducking + volume buses); typing syncs to the returned duration
+    ui.dialogue.setVoice((k) => { audio.vo(k); return audio.voInfo(k)?.duration; });
+    ui.on('dialogue:end', () => audio.stopVo());
+  }
   ui?.on('sfx', (n) => { const k = UI_SFX[n]; if (k) audio.sfx(k, { vol: n === 'toast' ? 0.3 : 0.7 }); });
   audio.ambient('plaza');
   for (const [k, x, z, level] of EMITTERS) audio.emitter(k, { x, z, level });
@@ -178,7 +182,7 @@ export async function createGame(api) {
     ui.on('interact', () => interact());
     ui.on('contracts', () => { if (G.state === 'free') openContracts(); });
     ui.on('warehouse', () => { if (G.state === 'free') openWarehouse(); });
-    ui.on('codex', () => { if (G.state === 'free') ui.panel.open('codex', G.sim.codex()); });
+    ui.on('codex', () => { if (G.state === 'free') ui.panel.open('codex', toUiCodex(G.sim)); });
     ui.on('pause', () => { if (G.state === 'free') ui.panel.open('pause', { mission: G.runner.mission ? { title: G.runner.mission.title } : null }); });
     ui.on('pause:quit', () => { G.sim.save(); window.__reload?.(); });
     ui.on('tap', (s) => tapAt(s.x, s.y));
@@ -425,6 +429,7 @@ export async function createGame(api) {
     if (G.state === 'free' && !fighting && !story.busy && (G.paT -= dt) <= 0) { G.paT = 80 + Math.random() * 30; audio.bark('pa_', { cooldown: 60 }); }
     if ((G.autosaveT -= dt) <= 0 && G.state === 'free') { G.autosaveT = 30; sim.save(); }
 
+    overlay.suppress(!!(ui?.root?.classList.contains('hf-in-dialogue') || panelOpen() || ui?.root?.classList.contains('hf-in-screen')));
     audio.setListenerCamera(world.camera, player.pos.x, player.pos.z);
     audio.update();
     G.auto?.update(dt);

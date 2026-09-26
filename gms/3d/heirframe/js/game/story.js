@@ -22,12 +22,10 @@ export function createStoryPlayer(ctx) {
 
   async function dlg(b) {
     const s = who(b.speaker), text = fullText(b);
-    const info = b.vo ? audio.voInfo(b.vo) : null;
+    overlay.hideSubtitle();
     const p = { speaker: b.label || s.name, role: b.label ? '' : s.role, portrait: typeof b.portrait === 'string' ? { kind: 'unknown', seed: 7 } : (b.portrait || s.portrait), text, choices: b.choices };
-    if (info?.duration) p.voiceDuration = info.duration;
-    if (b.vo) audio.vo(b.vo);
+    if (b.vo) p.voiceKey = b.vo;
     const choice = await ui.dialogue.show(p);
-    audio.stopVo();
     const reply = b.replies?.[choice];
     if (reply) await ui.dialogue.show({ speaker: who(reply.speaker).name, role: who(reply.speaker).role, portrait: who(reply.speaker).portrait, text: reply.text });
     return choice;

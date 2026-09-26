@@ -143,7 +143,7 @@ export function buildElegant(b, o) {
 }
 
 // Material palettes. Tones vary with seed.
-const GOLDS = [0xf2b64c, 0xe9a86c, 0xd89a38];
+const GOLDS = [0xffd27a, 0xf8cf9e, 0xf2c060];
 const CHROMES = [0xf3f5f8, 0xe8eef6, 0xf6f1ea];
 const CIV_GLOW = { civ_gold: 0xffd9a0, civ_chrome: 0x9fe8ff, civ_black: 0x2fe0ff, civ_worker: 0xffb030 };
 

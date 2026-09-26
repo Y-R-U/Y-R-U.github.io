@@ -8,7 +8,20 @@ export function createRunner(ctx) {
   let R = null;   // runtime mission
   const tmp = new THREE.Vector3();
 
-  const site = (id) => siteById.get(id) || null;
+  // Story missions set in districts that aren't built yet use virtual ids like `plaza_1`: map them onto
+  // real Aurum Plaza sites with the same tag so the contract stays playable.
+  const byTag = {};
+  for (const s of world.sites) (byTag[s.tag] ||= []).push(s);
+  const site = (id) => {
+    if (!id) return null;
+    let s = siteById.get(id);
+    if (s) return s;
+    const m = /^(.*)_(\d+)$/.exec(id);
+    const pool = (m && byTag[m[1]]) || byTag.plaza;
+    s = pool[((m ? +m[2] : 1) - 1) % pool.length];
+    siteById.set(id, s);
+    return s;
+  };
   const d2 = (s) => Math.hypot(s.x - player.pos.x, s.z - player.pos.z);
   const storyId = () => R?.mission.story?.id || null;
 

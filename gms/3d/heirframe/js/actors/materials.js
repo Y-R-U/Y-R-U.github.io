@@ -179,9 +179,9 @@ export const lensTex = () => once('tex:lens', () => canvas(128, 128, (g, w, h) =
 
 // Livery presets for the `paint` param. Slots not named keep the kind's own material.
 export const PAINTS = {
-  gold: { body: { color: 0xf2b64c, metal: 1, rough: 0.2, coat: 0.5 }, trim: { color: 0x1a1a1d, metal: 1, rough: 0.22 } },
+  gold: { body: { color: 0xffd27a, metal: 1, rough: 0.2, coat: 0.5 }, trim: { color: 0x1a1a1d, metal: 1, rough: 0.22 } },
   chrome: { body: { color: 0xf3f5f8, metal: 1, rough: 0.07 }, trim: { color: 0xb8bcc2, metal: 1, rough: 0.28 } },
-  black: { body: { color: 0x08090b, metal: 0.55, rough: 0.28, coat: 1 }, trim: { color: 0xd9a441, metal: 1, rough: 0.22 } },
+  black: { body: { color: 0x08090b, metal: 0.55, rough: 0.28, coat: 1 }, trim: { color: 0xf0c068, metal: 1, rough: 0.22 } },
   rental: { body: { color: 0x8a8d90, metal: 0.35, rough: 0.6 }, trim: { color: 0xff6a13, metal: 0.1, rough: 0.5 } },
   syndicate: { body: { color: 0x3a1420, metal: 0.6, rough: 0.35, coat: 0.6 }, trim: { color: 0xd4a017, metal: 0.9, rough: 0.3 }, glow: 0xff3aa8, eye: 0xff4fb4 },
   concord: { body: { color: 0xeef1f5, metal: 0.1, rough: 0.25, coat: 1 }, trim: { color: 0x1b2a4a, metal: 0.6, rough: 0.35 }, glow: 0x3aa0ff, eye: 0x7cc4ff },

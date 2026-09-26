@@ -29,6 +29,8 @@ export function createOverlay() {
       if (ms) subT = setTimeout(() => { sub.style.opacity = '0'; }, ms);
     },
     hideSubtitle() { clearTimeout(subT); sub.style.opacity = '0'; },
+    // keep barks from showing through the dialogue letterbox / panels
+    suppress(on) { const v = on ? 'hidden' : ''; if (sub.style.visibility !== v) sub.style.visibility = v; },
     get cardOpen() { return card.style.opacity === '1'; },
   };
 }

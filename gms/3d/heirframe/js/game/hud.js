@@ -59,8 +59,6 @@ export function createHudSync(ctx) {
     if (t <= 0) {
       t = 0.1;
       const h = sim.hud();
-      const g = h.goal;
-      if (g && typeof g === 'object') h.goal = h.level < 5 ? 'Reach level 5 to license your own frame' : `Next: ${g.label} · ${g.cost.toLocaleString()} cr`;
       if (ctx.goalOverride) h.goal = ctx.goalOverride();
       ui.hud.set(h);
       ui.skills.set(sim.skillsHud());

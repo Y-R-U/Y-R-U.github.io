@@ -24,20 +24,20 @@ export function createMaterials(reflection, tier) {
   const warm = makeStoneSet({ tiles: 8, base: [214, 204, 188], vary: 12, vein: [150, 135, 110], veinAlpha: 0.1, grout: [128, 114, 94], rough: [0.14, 0.3], seed: 23 });
   const noise = makeNoiseTexture(256, 4);
 
-  const floor = (set, color, rough, strength, base, tint) => {
+  const floor = (set, color, rough, strength, base, tint, sky = 0) => {
     const m = new THREE.MeshStandardMaterial({ map: set.map, roughnessMap: set.roughnessMap, normalMap: set.normalMap,
       normalScale: new THREE.Vector2(0.6, 0.6), color, roughness: rough, metalness: 0.0, envMapIntensity: 0.55 });
-    if (reflection?.enabled) addPlanarReflection(m, reflection, { strength, base, blur: 2.2, distort: 0.05, tint });
+    if (reflection?.enabled) addPlanarReflection(m, reflection, { strength, base, blur: 2.2, distort: 0.05, tint, sky });
     return m;
   };
-  M.marble = floor(cream, 0xeadcc6, 1.0, 1.0, 0.36);
+  M.marble = floor(cream, 0xffffff, 1.0, 1.0, 0.3, null, 1);
   M.slate = floor(slate, 0xffffff, 1.0, 1.0, 0.42, new THREE.Color(0.95, 0.98, 1.05));
   M.terrace = new THREE.MeshStandardMaterial({ map: warm.map, roughnessMap: warm.roughnessMap, normalMap: warm.normalMap, roughness: 1, envMapIntensity: 0.8 });
   M.stoneTex = { cream, slate, warm };
 
   M.stone = contactAO(new THREE.MeshStandardMaterial({ color: 0xefe6d6, roughness: 0.42, metalness: 0.0, vertexColors: true, roughnessMap: noise, envMapIntensity: 0.9 }));
   M.stoneUpper = new THREE.MeshStandardMaterial({ color: 0xf2eadb, roughness: 0.38, metalness: 0.0, vertexColors: true, envMapIntensity: 0.9 });
-  M.gold = new THREE.MeshStandardMaterial({ color: 0xe8b75e, roughness: 0.18, metalness: 1.0, vertexColors: true, envMapIntensity: 1.25 });
+  M.gold = new THREE.MeshStandardMaterial({ color: 0xf6cd78, roughness: 0.18, metalness: 1.0, vertexColors: true, envMapIntensity: 1.25 });
   M.chrome = new THREE.MeshStandardMaterial({ color: 0xf2f4f8, roughness: 0.08, metalness: 1.0, vertexColors: true, envMapIntensity: 1.2 });
   M.darkMetal = new THREE.MeshStandardMaterial({ color: 0x23262c, roughness: 0.28, metalness: 0.85, vertexColors: true, envMapIntensity: 1.0 });
   M.glassDark = new THREE.MeshStandardMaterial({ color: 0x1d2a38, roughness: 0.06, metalness: 0.9, vertexColors: true, envMapIntensity: 1.3 });
@@ -60,7 +60,7 @@ export function createMaterials(reflection, tier) {
   M.crate = new THREE.MeshStandardMaterial({ color: 0xb98a4a, roughness: 0.5, metalness: 0.3, vertexColors: true });
   M.foliage.userData.reflect = true; M.bark.userData.reflect = false; M.soil.userData.reflect = false;
   M.gold.userData.reflectMin = 7; M.chrome.userData.reflectMin = 7; M.darkMetal.userData.reflectMin = 7; M.glassRail.userData.reflect = false;
-  M.goldSolid = new THREE.MeshStandardMaterial({ color: 0xe8b75e, roughness: 0.16, metalness: 1.0, envMapIntensity: 1.3 });
+  M.goldSolid = new THREE.MeshStandardMaterial({ color: 0xf6cd78, roughness: 0.16, metalness: 1.0, envMapIntensity: 1.3 });
   M.chromeSolid = new THREE.MeshStandardMaterial({ color: 0xf2f4f8, roughness: 0.06, metalness: 1.0, envMapIntensity: 1.2 });
   M.coreGlow = new THREE.MeshStandardMaterial({ color: 0x000000, emissive: new THREE.Color(0.55, 0.85, 1.0), emissiveIntensity: 6 });
   return M;

@@ -41,7 +41,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
 
   const time = { value: 0 };
   const pxScale = { value: 1 };
-  const reflection = createPlanarReflection(renderer, { scale: tier.reflect, planeY: 0 });
+  const reflection = createPlanarReflection(renderer, { scale: tier.reflect, planeY: 0, samples: tier.name === 'high' ? 4 : 0 });
   scene.add(createSky());
   scene.environment = buildEnvironment(renderer, tier.envSize);
   scene.environmentIntensity = 0.75;
