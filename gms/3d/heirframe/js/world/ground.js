@@ -35,7 +35,8 @@ export function createGround(ctx) {
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
 uniform sampler2D tSlate, tSlateR;
 varying vec2 vGW;
-float gH(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+// sine-free hash (full-rate ALU; the sin() hash was ~80 transcendental ops per floor pixel)
+float gH(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 float gN(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
   return mix(mix(gH(i), gH(i + vec2(1, 0)), f.x), mix(gH(i + vec2(0, 1)), gH(i + vec2(1, 1)), f.x), f.y); }
 float gLine(float d, float w) { float aa = fwidth(d) * 1.2 + 1e-4; return 1.0 - smoothstep(w * 0.5, w * 0.5 + aa, abs(d)); }
@@ -87,9 +88,12 @@ vec2 cell3 = floor(vGW / 1.5);
 float tone = gH(cell3 + 17.0);
 float gn = gN(vGW * 0.07) * 0.6 + gN(vGW * 0.23) * 0.4;
 vec3 trav = diffuseColor.rgb * vec3(0.62, 0.545, 0.44) * (0.84 + 0.2 * tone);
-vec3 sl = texture2D(tSlate, vMapUv * 0.73 + 0.31).rgb;
-vec3 nero = sl * sl * vec3(0.16, 0.15, 0.15);
-{
+// the slow per-zone detail only runs where that zone has weight (coherent branches; derivatives taken outside)
+vec2 gdx = dFdx(vMapUv), gdy = dFdy(vMapUv);
+vec3 nero = vec3(0.0);
+if (zW.x > 0.002) {
+  vec3 sl = textureGrad(tSlate, vMapUv * 0.73 + 0.31, gdx * 0.73, gdy * 0.73).rgb;
+  nero = sl * sl * vec3(0.16, 0.15, 0.15);
   vec2 rp = mat2(0.82, 0.57, -0.57, 0.82) * vGW;
   vec2 vp = rp * vec2(0.09, 0.42) + vec2(gN(vGW * 0.3) * 0.6, 0.0);
   float vn = gN(vp) * 0.7 + gN(vp * 2.7 + 4.0) * 0.3;
@@ -99,7 +103,7 @@ vec3 nero = sl * sl * vec3(0.16, 0.15, 0.15);
   vein += (1.0 - smoothstep(0.0, fwidth(vn2) + 0.002, abs(vn2 - 0.5))) * 0.35 * smoothstep(0.5, 0.7, gN(rp * 0.08 + 11.0));
   nero += vec3(0.16, 0.155, 0.15) * clamp(vein, 0.0, 1.0);
 }
-{
+if ((1.0 - zW.x) * (1.0 - zW.y) > 0.002) {
   // travertine: soft cloudy veins + a few crisp hairline veins so the stone reads from the gameplay camera
   vec2 rp = mat2(0.6, -0.8, 0.8, 0.6) * vGW;
   vec2 vp = rp * vec2(0.12, 0.5) + vec2(gN(vGW * 0.21) * 0.9, 3.0);
@@ -110,7 +114,7 @@ vec3 nero = sl * sl * vec3(0.16, 0.15, 0.15);
   trav = mix(trav, trav * vec3(1.06, 1.0, 0.9), gN(cell3 * 0.7 + 3.0));
 }
 trav = mix(trav, trav * vec3(0.66, 0.54, 0.4), zW3.z);
-vec3 steel = texture2D(tSlate, vMapUv).rgb * vec3(0.5, 0.56, 0.66);
+vec3 steel = zW.y > 0.002 ? textureGrad(tSlate, vMapUv, gdx, gdy).rgb * vec3(0.5, 0.56, 0.66) : vec3(0.0);
 diffuseColor.rgb = mix(mix(trav, nero, zW.x), steel, zW.y);
 float reflZone = mix(mix(1.15, 1.0, zW.x), 1.25, zW.y);
 diffuseColor.rgb *= 0.9 + 0.16 * gn;
@@ -130,7 +134,7 @@ float sheenK = (1.0 - zI) * mix(1.0, 0.6, zW.y);`)
 			reflectedLight.directSpecular += directLight.color * vec3( 1.0, 0.8, 0.55 ) * lobe * sheenK * saturate( dot( geometryNormal, directLight.direction ) );
 		}`))
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
-roughnessFactor = mix(roughnessFactor, max(texture2D(tSlateR, vMapUv).g, 0.14), zW.y);
+if (zW.y > 0.002) roughnessFactor = mix(roughnessFactor, max(textureGrad(tSlateR, vMapUv, gdx, gdy).g, 0.14), zW.y);
 roughnessFactor *= 0.7 + 0.8 * gN(vGW * 0.11 + 7.0);
 roughnessFactor = mix(roughnessFactor, 0.035 + 0.03 * gN(vGW * 0.3), zW.x);
 roughnessFactor = mix(roughnessFactor, 0.3, zI);`)

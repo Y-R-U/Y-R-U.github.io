@@ -785,6 +785,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
       fee = RENTAL_FEE;
       if (S.credits >= fee) addCredits(-fee, 'rental');
       else { S.rentalDebt += fee - S.credits; addCredits(-S.credits, 'rental'); toast('HireFrame: rental fee added to your account balance!', 'warn'); }
+      if (S.rentalDebt && S.credits > 0) payRental();
       emit('rental:fee', { fee, debt: S.rentalDebt });
     }
     for (const id of S.districts.unlocked) {

@@ -1,10 +1,10 @@
 // Quality tiers. `?q=` overrides; otherwise guessed from the GPU string and device class.
 export const TIERS = {
-  high: { name: 'high', dprMax: 1.5, dprDesktop: 1.75, shadowMap: 2048, shadowSoft: true, msaa: 4, bloom: true,
+  high: { name: 'high', dprMax: 1.5, dprDesktop: 1.75, shadowMap: 2048, shadowSoft: true, msaa: 4, mirrorMsaa: 0, bloom: true, bloomDiv: 4,
           reflect: 0.5, reflectLayers: 'full', crowd: 32, traffic: 70, trees: 1, envSize: 256, mist: true },
-  med:  { name: 'med', dprMax: 1.25, dprDesktop: 1.25, shadowMap: 1024, shadowSoft: true, msaa: 0, bloom: true,
+  med:  { name: 'med', dprMax: 1.25, dprDesktop: 1.25, shadowMap: 1024, shadowSoft: true, msaa: 0, mirrorMsaa: 0, bloom: true, bloomDiv: 4,
           reflect: 0.33, reflectLayers: 'full', crowd: 14, traffic: 40, trees: 0.7, envSize: 128, mist: true },
-  low:  { name: 'low', dprMax: 1.0, dprDesktop: 1.0, shadowMap: 0, shadowSoft: false, msaa: 0, bloom: false,
+  low:  { name: 'low', dprMax: 1.0, dprDesktop: 1.0, shadowMap: 0, shadowSoft: false, msaa: 0, mirrorMsaa: 0, bloom: false, bloomDiv: 2,
           reflect: 0, reflectLayers: 'none', crowd: 7, traffic: 18, trees: 0.5, envSize: 64, mist: false },
 };
 
@@ -33,8 +33,15 @@ export function detectQuality(flag) {
     else name = 'med';
   } else if (/SwiftShader|llvmpipe|Software/i.test(gpu)) name = 'low';
   const tier = { ...TIERS[name], isMobile, gpu };
+  // on-device A/B overrides: ?msaa=2 &mirrormsaa=0 &bloomdiv=4 &shadow=1024 &dpr=1.25
+  const qs = new URLSearchParams(location.search), num = (k) => (qs.has(k) && isFinite(+qs.get(k)) ? +qs.get(k) : null);
+  if (num('msaa') !== null) tier.msaa = num('msaa');
+  if (num('mirrormsaa') !== null) tier.mirrorMsaa = num('mirrormsaa');
+  if (num('bloomdiv') !== null) tier.bloomDiv = Math.max(2, num('bloomdiv'));
+  if (num('shadow') !== null) tier.shadowMap = num('shadow');
   const dpr = window.devicePixelRatio || 1;
   tier.dpr = Math.min(dpr, isMobile ? tier.dprMax : tier.dprDesktop);
+  if (num('dpr') !== null) tier.dpr = Math.min(dpr, num('dpr'));
   return tier;
 }
 

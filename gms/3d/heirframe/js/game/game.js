@@ -20,6 +20,17 @@ import { createCoach } from './coach.js';
 const UI_SFX = { click: 'ui_click', open: 'ui_open', close: 'ui_close', deny: 'ui_deny', confirm: 'ui_confirm', levelup: null, loot: null, loot_rare: null, toast: 'ui_hover', type: null };
 const EMITTERS = [['fountain', 0, 0, 1], ['waterfall', -47, -62, 1], ['waterfall', 66, -96, 1.2], ['fountain', -47, -57, 0.6]];
 
+// ?noui: the runtime modules still call ui.* freely; hand them an inert stand-in (falsy state, no-op calls)
+const FALSY = new Set(['open', 'current', 'attackHeld', 'sneak', 'minimap', 'root', 'then']);
+function inertUi() {
+  const move = { x: 0, y: 0 };
+  const p = new Proxy(function () {}, {
+    get: (_, k) => (k === 'move' ? move : FALSY.has(k) || typeof k === 'symbol' ? undefined : p),
+    apply: () => undefined,
+  });
+  return p;
+}
+
 // Gameplay runtime (D13). main.js calls createGame(api) once and then update(dt, stick) every frame.
 export async function createGame(api) {
   const { world, rig, input, player, crowd, ui, flags } = api;
@@ -275,7 +286,7 @@ export async function createGame(api) {
 
   // --- story: intro + kiosk -----------------------------------------------------------------------
   const story = createStoryPlayer({
-    ui, audio, overlay,
+    ui: ui || inertUi(), audio, overlay,
     onFx: (f) => { if (f === 'billboards_face') harmonyFace('GOOD MORNING, HALCYON', 9); },
     onAction: async (a) => {
       if (a.tutorial === 'accept') ui?.toast('Pick a contract', 'info', { sub: 'the gold card is your story', ms: 3500 });
@@ -325,10 +336,10 @@ export async function createGame(api) {
     const better = out.items.filter((i) => i.upgrade);
     G.coach?.contractDone();
     if (out.items.length) { G.coach?.lootItem(); ui?.loot(out.items.map((i) => ({ ...toUiItem(i), better: !!i.upgrade }))); for (const it of out.items) audio.sfx('loot', { rarity: it.rarity }); }
-    if (better.length) ui?.toast('Upgrade available', 'gold', { sub: 'Tap ▲ EQUIP or open the Warehouse' });
+    // the results card already showed the surcharge; the coach's Warehouse hint covers a first upgrade
+    if (better.length && G.coach?.current !== 'warehouse' && G.sim.state.flags.coach?.warehouse) ui?.toast('Upgrade available', 'gold', { sub: 'Tap ▲ EQUIP or open the Warehouse' });
     if (out.clue) ui?.toast('Codex updated', 'story', { sub: out.clue === 'C01' ? 'The Heir-Key' : out.clue });
-    if (out.mission.story?.id === 'a1_m1') { ui?.sting('The board is yours', 'Random contracts unlocked', 'unlock', 3000); ui?.toast('Codex updated: The Heir-Key', 'story'); }
-    if (out.surcharge) ui?.toast(`HireFrame surcharge −${out.surcharge} cr`, 'warn', { ms: 3000 });
+    if (out.mission.story?.id === 'a1_m1') ui?.sting('The board is yours', 'Random contracts unlocked', 'unlock', 3000);
     G.sim.save();
   }
   function onFail(m, reason) {
@@ -358,7 +369,7 @@ export async function createGame(api) {
     G.sim = sim;
     sim.noAutosave = false;
     const ctx = {
-      world, robots: api.robots, sim, fx, audio, ui, tier: api.tier, player, actor, rig, crowd, overlay, story,
+      world, robots: api.robots, sim, fx, audio, ui: ui || inertUi(), tier: api.tier, player, actor, rig, crowd, overlay, story,
       project, losClear, hitPlayer, damagePlayerPct, setCarrying, onLootCollect, onComplete, onFail, nav, walkTo,
       blocked: () => blocked(),
       hitstop: (s) => { G.hitstopT = Math.max(G.hitstopT, s); },
@@ -373,7 +384,7 @@ export async function createGame(api) {
     G.hud = createHudSync(ctx);
     ctx.hud = G.hud;
     ctx.goalOverride = () => nextGoal(sim);
-    G.coach = createCoach(G, { ui, rig, player });
+    G.coach = ui ? createCoach(G, { ui, rig, player }) : null;
     sim.on('levelUp', (p) => { ui?.sting(`Level ${p.level}`, (p.features || []).map((f) => f.name || f.id).join(' · ') || 'Frame systems upgraded', 'level', 3000); audio.sfx('levelup'); audio.bark('b_hira_levelup_', { cooldown: 10 }); log('level ' + p.level); });
     sim.on('toast', (p) => ui?.toast(p.text, p.kind || 'info'));
     sim.on('rental:fee', (p) => { ui?.toast(`HireFrame shift fee −${p.fee} cr`, 'warn', { sub: p.debt ? `Balance owed: ${p.debt} cr` : 'Rent by the hour!' }); audio.bark('b_hira_fee_', { cooldown: 30 }); log('shift fee ' + p.fee); });

@@ -219,3 +219,17 @@ med: 60 fps, 1.8–2.2 ms, 189–235 calls / 460–560k. Title (UI on): 268 call
    + UnrealBloom's 5 mips at dpr 1.5), then `.hf-glass` backdrop-filter blur (UI). Try bloom at quarter res, and MSAA 2 on high.
 5. Near-lens fade dithers balconies/rails close to the camera into a visible Bayer pattern at the frame edge (lake views).
 6. REQUEST integrator: `?noui` is broken (hud.js:64 null `ui.hud` in startSession → stuck in title).
+
+## Round 3 (art agent #4, 2026-09-26) — IN PROGRESS
+Brief: phone fill-rate (per-pass cost table, dpr 2.5–3 forced on M5), atmospheric depth, falls mist/spray, floor grounding
+(reflected mass + contact shadows), soften near-lens dither; 2 blind critic rounds.
+- Harness `art/r3/cost.mjs "<query>"` (env DPRS, VIEWS="x,z,yaw,pitch;…", TOG=base,legacy,nobloom,bloom4,msaa2,msaa0,nomirror,
+  mirror2,mirror0,noshadow,shbasic,shpcf,nofloor,notrans,nopost, REPS): interleaved toggles, median sync render+readPixels ms,
+  dpr forced (3 = phone-fill stand-in: 915x412@3 = 3.4 Mpx, 4x the S22's 0.85 Mpx at dpr 1.5). Delta = cost of that pass.
+- DONE post: `BloomLite` (renderer.js) folds UnrealBloom's final full-res additive blend into the grade pass (identical
+  maths) — that blend reloaded + re-stored the 4x MSAA half-float target and forced a 2nd resolve. Composer rt1 (never
+  drawn: RenderPass draws into rt2=readBuffer) now has no MSAA; resolveDepthBuffer=false on the scene + mirror targets.
+  A/B vs an emulated legacy path: legacy +0.74 ms @dpr1.5 (+18%), +1.28 ms @dpr3.
+- DONE floor (ground.js): the nero-vein / travertine-vein / steel-texture blocks only run where their zone has weight
+  (coherent branches, textureGrad with derivatives taken outside). Floor cost (nofloor delta) 1.66→0.89 ms @1.5,
+  6.44→3.90 ms @3; frame 3.4→2.3 ms @1.5. Pixel-identical floor (only moving robots differ).

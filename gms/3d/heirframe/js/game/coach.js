@@ -88,6 +88,8 @@ export function createCoach(G, { ui, rig, player }) {
     if (C.yaw0 !== null && (Math.abs(rig.yaw - C.yaw0) > 0.35 || Math.abs(rig.zoom - C.zoom0) > 0.08 || Math.abs(rig.pitchOff || 0) > 4)) finish('look');
 
     const quiet = G.state === 'free' && !ui?.panel.current && !ui?.dialogue.open && !G.overlay.cardOpen;
+    // after a results card / death / intro, let the banners and toasts clear before coaching
+    if (G.state !== 'free') C.gap = Math.max(C.gap, G.state === 'results' ? 3.5 : 1.5);
     if (quiet !== !C.suppressed) { C.suppressed = !quiet; el.style.visibility = quiet ? '' : 'hidden'; if (!quiet) setPulse(null); else if (C.cur) setPulse(LESSONS[C.cur].pulse); }
     if (!quiet) return;
     if (C.cur) {

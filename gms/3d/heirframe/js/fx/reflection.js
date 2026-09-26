@@ -8,6 +8,7 @@ export function createPlanarReflection(renderer, { scale = 0.5, planeY = 0, samp
   const size = renderer.getDrawingBufferSize(new THREE.Vector2());
   const rt = new THREE.WebGLRenderTarget(Math.max(2, size.x * scale | 0), Math.max(2, size.y * scale | 0),
     { type: THREE.HalfFloatType, samples });
+  rt.resolveDepthBuffer = false;
   const cam = new THREE.PerspectiveCamera();
   cam.layers.set(REFLECT_LAYER);
   const texMatrix = new THREE.Matrix4();
