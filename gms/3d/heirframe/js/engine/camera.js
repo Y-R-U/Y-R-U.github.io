@@ -5,9 +5,9 @@ const TAU = Math.PI * 2;
 const LOOK = new THREE.Vector3();
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 const Q = new URLSearchParams(location.search);
-// TEMP (Aaron look-up test): negative pitch = view tilts above the horizon. Revert: PITCH_MIN = 12, CAM_DEBUG = false.
+// Negative pitch = view tilts above the horizon (D17, Aaron approved -45). ?camdbg=1 shows the tilt/fps readout.
 const PITCH_MIN = Q.has('pitchmin') ? +Q.get('pitchmin') : -45;
-const CAM_DEBUG = Q.get('camdbg') !== '0';
+const CAM_DEBUG = Q.get('camdbg') === '1';
 const ORBIT_FLOOR = 4; // below this the camera stops orbiting down and tilts its view up instead
 const DIR = new THREE.Vector3();
 

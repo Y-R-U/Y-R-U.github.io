@@ -35,3 +35,4 @@ Numbered, append-only. A later decision may supersede an earlier one by number.
 - **D14 Interface additions accepted:** `world.sites`, robots `paint` param + `setAlert`, `ui.detect` / `ui.lens` / `ui.boss`, `audio.vo(key)` resolves immediately if the file is missing.
 - **D15 Civilians can't be harmed** (a story clue, and it keeps things simple). `scrap_rat` enemy is needed for P1.
 - **D16 Camera look (Aaron, 2026-09-26)** supersedes D4's fixed yaw: a one-finger drag on the right side of the screen orbits (yaw 360°, pitch ~35–70°), pinch or wheel zooms a little (~0.7–1.5× default distance), and after release a **Reset view** button appears that eases back to the default Diablo framing. Taps still tap-to-move. Movement is camera-relative.
+- **D17 Look up (Aaron approved 2026-09-26)**: pitch range -45°..70° (negative = view above the horizon; below 4° the camera stops orbiting and tilts up). The debug readout is off by default (`?camdbg=1` shows it).
