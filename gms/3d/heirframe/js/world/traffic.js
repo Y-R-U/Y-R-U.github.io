@@ -6,11 +6,11 @@ import { REFLECT_LAYER } from '../fx/reflection.js';
 const clean = (g) => { g = g.index ? g.toNonIndexed() : g; for (const k of Object.keys(g.attributes)) if (k !== 'position' && k !== 'normal') g.deleteAttribute(k); return g; };
 
 function carGeometry() {
-  const body = new THREE.SphereGeometry(1, 20, 10); body.scale(2.6, 0.5, 1.15);
-  const canopy = new THREE.SphereGeometry(1, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2); canopy.scale(1.2, 0.55, 0.8); canopy.translate(0.3, 0.2, 0);
-  const podL = new THREE.CylinderGeometry(0.42, 0.42, 1.6, 12); podL.rotateZ(Math.PI / 2); podL.translate(-1.4, -0.15, 1.25);
+  const body = new THREE.SphereGeometry(1, 14, 7); body.scale(2.6, 0.5, 1.15);
+  const canopy = new THREE.SphereGeometry(1, 10, 4, 0, Math.PI * 2, 0, Math.PI / 2); canopy.scale(1.2, 0.55, 0.8); canopy.translate(0.3, 0.2, 0);
+  const podL = new THREE.CylinderGeometry(0.42, 0.42, 1.6, 8); podL.rotateZ(Math.PI / 2); podL.translate(-1.4, -0.15, 1.25);
   const podR = podL.clone(); podR.translate(0, 0, -2.5);
-  const glow = new THREE.CylinderGeometry(0.34, 0.34, 0.1, 12); glow.rotateZ(Math.PI / 2);
+  const glow = new THREE.CylinderGeometry(0.34, 0.34, 0.1, 8); glow.rotateZ(Math.PI / 2);
   const g1 = glow.clone(); g1.translate(-2.22, -0.15, 1.25); const g2 = glow.clone(); g2.translate(-2.22, -0.15, -1.25);
   const strip = new THREE.BoxGeometry(3.6, 0.06, 1.9); strip.translate(0, -0.42, 0);
   return {
@@ -40,7 +40,7 @@ export function buildTraffic(ctx) {
   const glass = new THREE.MeshStandardMaterial({ color: 0x0c1520, roughness: 0.05, metalness: 0.9, envMapIntensity: 1.5 });
   const glow = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.45, 0.85, 1.0).multiplyScalar(5) });
   const meshes = [new THREE.InstancedMesh(geo.body, paint, n), new THREE.InstancedMesh(geo.glass, glass, n), new THREE.InstancedMesh(geo.glow, glow, n)];
-  for (const m of meshes) { m.frustumCulled = false; m.layers.enable(REFLECT_LAYER); m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); }
+  for (const m of meshes) { m.frustumCulled = false; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); }
   // car paint variety: a few gold, a few dark
   const cols = [new THREE.Color(0xf4f5f7), new THREE.Color(0xf4f5f7), new THREE.Color(0xe0b060), new THREE.Color(0x2a2e36)];
   for (let i = 0; i < n; i++) meshes[0].setColorAt(i, cols[(R() * cols.length) | 0]);

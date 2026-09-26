@@ -63,6 +63,7 @@ export function createAutopilot(G, { ui, player }) {
   }
 
   function step(dt) {
+    if (A.finished) return;   // hands off: tests drive the game after the run
     // screens
     const titleNew = $('.hf-title [data-a="new"]');
     if (titleNew && A.phase === 'title') { if (A.t > 1.2) click(titleNew); return; }

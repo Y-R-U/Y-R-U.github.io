@@ -15,6 +15,7 @@ import { createRunner } from './runner.js';
 import { createHudSync } from './hud.js';
 import { createAutopilot } from './auto.js';
 import { createNav } from './nav.js';
+import { createCoach } from './coach.js';
 
 const UI_SFX = { click: 'ui_click', open: 'ui_open', close: 'ui_close', deny: 'ui_deny', confirm: 'ui_confirm', levelup: null, loot: null, loot_rare: null, toast: 'ui_hover', type: null };
 const EMITTERS = [['fountain', 0, 0, 1], ['waterfall', -47, -62, 1], ['waterfall', 66, -96, 1.2], ['fountain', -47, -57, 0.6]];
@@ -103,6 +104,7 @@ export async function createGame(api) {
     rig.shake = Math.max(rig.shake, 0.12);
     if (pc.hp < pc.stats.hp * 0.3 && !G.lowHpBark) { G.lowHpBark = true; audio.bark('b_hira_lowhp_', { cooldown: 30 }); }
     if (pc.hp > pc.stats.hp * 0.5) G.lowHpBark = false;
+    G.coach?.playerHit();
     if (res.wrecked || !pc.alive) playerDown(e.c.name);
   }
   function damagePlayerPct(pct, cause) {
@@ -164,6 +166,7 @@ export async function createGame(api) {
     const u = toUiItem(it);
     u.better = !!it.upgrade && !it.equippedOn;
     ui?.loot([u]);
+    G.coach?.lootItem();
     audio.sfx('loot', { rarity: it.rarity, x: player.pos.x, z: player.pos.z });
     if (u.better) audio.bark('b_hira_loot_up_', { cooldown: 20 });
     else if (['prototype', 'relic', 'heirloom'].includes(it.rarity)) audio.bark('b_hira_loot_rare_', { cooldown: 20 });
@@ -188,14 +191,15 @@ export async function createGame(api) {
   function wireUi() {
     if (!ui) return;
     ui.on('attack', () => { if (!blocked()) G.combat.attack(); });
-    ui.on('skill', (id) => { if (!blocked()) G.combat.skill(id); });
+    ui.on('skill', (id) => { if (!blocked()) { G.combat.skill(id); G.coach?.finish('skill'); } });
     ui.on('dodge', () => {
       if (blocked()) return;
+      G.coach?.finish('dodge');
       const m = ui.controls.move;
       G.combat.dodge(Math.hypot(m.x, m.y) > 0.2 ? rig.screenToWorld(m.x, -m.y) : null);
     });
-    ui.on('interact', () => interact());
-    ui.on('contracts', () => { if (G.state === 'free') openContracts(); });
+    ui.on('interact', () => { if (!blocked() && G.lastInteract) G.coach?.finish('interact'); interact(); });
+    ui.on('contracts', () => { if (G.state === 'free') { G.coach?.finish('board'); openContracts(); } });
     ui.on('warehouse', () => { if (G.state === 'free') openWarehouse(); });
     ui.on('codex', () => { if (G.state === 'free') ui.panel.open('codex', toUiCodex(G.sim)); });
     ui.on('pause', () => { if (G.state === 'free') ui.panel.open('pause', { mission: G.runner.mission ? { title: G.runner.mission.title } : null }); });
@@ -224,7 +228,7 @@ export async function createGame(api) {
     ui.on('warehouse:activate', wh((p) => G.sim.swapFrame(p.frameId, { inCombat: inCombat() })));
     ui.on('warehouse:mk', wh((p) => G.sim.upgradeMk(p.frameId)));
     ui.on('warehouse:buy', wh((p) => G.sim.buyFrame(p.kind)));
-    ui.on('panel:open', (n) => { if (n === 'warehouse') setMusic('warehouse'); });
+    ui.on('panel:open', (n) => { if (n === 'warehouse') { setMusic('warehouse'); G.coach?.finish('warehouse'); } });
     ui.on('panel:close', () => setMusic(G.state === 'title' ? 'menu' : 'explore'));
     ui.on('lens:capture', () => G.runner.capture());
   }
@@ -239,6 +243,9 @@ export async function createGame(api) {
     let best = null, bd = 1.8;
     for (const e of G.enemies.alive()) { const d = Math.hypot(e.pos.x - g.x, e.pos.z - g.z); if (d < bd) { bd = d; best = e; } }
     if (best) { G.combat.engage(best); return; }
+    // a tap near the horizon (camera tilted up) hits the ground far away: walk toward it, at most 30 m
+    const dx = g.x - player.pos.x, dz = g.z - player.pos.z, d = Math.hypot(dx, dz);
+    if (d > 30) { g.x = player.pos.x + dx / d * 30; g.z = player.pos.z + dz / d * 30; g.y = world.groundAt(g.x, g.z); }
     walkTo(g.x, g.z);
     api.marker.position.set(g.x, g.y + 0.03, g.z); api.marker.visible = true;
   }
@@ -271,8 +278,6 @@ export async function createGame(api) {
     ui, audio, overlay,
     onFx: (f) => { if (f === 'billboards_face') harmonyFace('GOOD MORNING, HALCYON', 9); },
     onAction: async (a) => {
-      if (a.tutorial === 'move') ui?.toast('Drag the left side to walk', 'info', { sub: 'or tap the ground to move there', ms: 4500 });
-      if (a.tutorial === 'attack') ui?.toast('Tap ATTACK', 'info', { sub: 'the baton auto-targets the nearest rat', ms: 3500 });
       if (a.tutorial === 'accept') ui?.toast('Pick a contract', 'info', { sub: 'the gold card is your story', ms: 3500 });
       if (a.marker) G.introMarker = true;
       if (a.openBoard) openContracts();
@@ -318,7 +323,8 @@ export async function createGame(api) {
     if (ui) await ui.screen('complete', data);
     G.state = 'free';
     const better = out.items.filter((i) => i.upgrade);
-    if (out.items.length) { ui?.loot(out.items.map((i) => ({ ...toUiItem(i), better: !!i.upgrade }))); for (const it of out.items) audio.sfx('loot', { rarity: it.rarity }); }
+    G.coach?.contractDone();
+    if (out.items.length) { G.coach?.lootItem(); ui?.loot(out.items.map((i) => ({ ...toUiItem(i), better: !!i.upgrade }))); for (const it of out.items) audio.sfx('loot', { rarity: it.rarity }); }
     if (better.length) ui?.toast('Upgrade available', 'gold', { sub: 'Tap ▲ EQUIP or open the Warehouse' });
     if (out.clue) ui?.toast('Codex updated', 'story', { sub: out.clue === 'C01' ? 'The Heir-Key' : out.clue });
     if (out.mission.story?.id === 'a1_m1') { ui?.sting('The board is yours', 'Random contracts unlocked', 'unlock', 3000); ui?.toast('Codex updated: The Heir-Key', 'story'); }
@@ -367,6 +373,7 @@ export async function createGame(api) {
     G.hud = createHudSync(ctx);
     ctx.hud = G.hud;
     ctx.goalOverride = () => nextGoal(sim);
+    G.coach = createCoach(G, { ui, rig, player });
     sim.on('levelUp', (p) => { ui?.sting(`Level ${p.level}`, (p.features || []).map((f) => f.name || f.id).join(' · ') || 'Frame systems upgraded', 'level', 3000); audio.sfx('levelup'); audio.bark('b_hira_levelup_', { cooldown: 10 }); log('level ' + p.level); });
     sim.on('toast', (p) => ui?.toast(p.text, p.kind || 'info'));
     sim.on('rental:fee', (p) => { ui?.toast(`HireFrame shift fee −${p.fee} cr`, 'warn', { sub: p.debt ? `Balance owed: ${p.debt} cr` : 'Rent by the hour!' }); audio.bark('b_hira_fee_', { cooldown: 30 }); log('shift fee ' + p.fee); });
@@ -415,7 +422,10 @@ export async function createGame(api) {
   function objective() {
     const o = G.runner?.objective();
     if (o) return o;
-    if (G.introMarker && !G.runner?.active) { const k = world.spawnPoints.kiosk; return { x: k.x, z: k.z, label: 'Mara\'s kiosk' }; }
+    const k = world.spawnPoints.kiosk;
+    if (G.introMarker && !G.runner?.active) return { x: k.x, z: k.z, label: 'Mara\'s kiosk' };
+    // between contracts the board is always the next place to go
+    if (G.sim?.state.flags.kioskDone && !G.sim.state.contract && Math.hypot(k.x - player.pos.x, k.z - player.pos.z) > 6) return { x: k.x, z: k.z, label: 'Contract board' };
     return null;
   }
 
@@ -460,7 +470,9 @@ export async function createGame(api) {
     G.hud.update(dt, { objective: G.state === 'free' ? objective() : null, show: G.state !== 'intro' });
 
     // music + civilians react to fights
-    const fighting = G.enemies.hostileNear(player.pos.x, player.pos.z, 26);
+    const fighting = G.fighting = G.enemies.hostileNear(player.pos.x, player.pos.z, 26);
+    if (G.kills) G.coach?.finish('attack');
+    G.coach?.update(dt);
     if (!panelOpen() && G.state === 'free') setMusic(fighting ? 'combat' : 'explore');
     if (fighting && crowd?.scare) crowd.scare(player.pos.x, player.pos.z, 16);
     // Harmony PA every ~90 s of free roaming

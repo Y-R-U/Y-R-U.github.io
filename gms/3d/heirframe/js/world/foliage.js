@@ -178,19 +178,30 @@ export function addShrubs(batch, M, x, y, z, len, wid, rot, seed = 1, count = 8)
 }
 
 // Dithered see-through for occluders standing between the camera and the player.
+// See-through for anything between the camera and the player: a world-space capsule along camera→player (wide near the
+// player, so props next to them clear; a fixed width near the lens, so a canopy grazing the camera opens a big hole) plus a
+// near-lens fade. Ordered dither, so the cut reads as a clean screen-door rather than noise.
+export const FADE_GLSL = `
+uniform vec3 uFadeA, uFadeB; uniform float uFadeOn;
+float hfFade( vec3 p, float depth ) {
+  if ( uFadeOn < 0.5 ) return 0.0;
+  vec3 ab = uFadeB - uFadeA; float L = max( length( ab ), 1e-3 ); vec3 dir = ab / L;
+  float s = dot( p - uFadeA, dir );
+  float d = length( p - uFadeA - dir * clamp( s, 0.0, L ) );
+  float R = mix( 1.6, 2.7, clamp( s / L, 0.0, 1.0 ) );
+  float a = ( 1.0 - smoothstep( R * 0.55, R, d ) ) * ( 1.0 - smoothstep( L - 0.9, L - 0.3, s ) ) * step( 0.0, s );
+  return max( a, 1.0 - smoothstep( 1.5, 3.5, depth ) );
+}
+float hfBayer( vec2 f ) {
+  vec2 p = mod( floor( f ), 4.0 ), a = mod( p, 2.0 ), b = floor( p / 2.0 );
+  return ( 4.0 * mod( 2.0 * a.x + 3.0 * a.y, 4.0 ) + mod( 2.0 * b.x + 3.0 * b.y, 4.0 ) + 0.5 ) / 16.0;
+}`;
 export function addFade(sh, fade) {
   Object.assign(sh.uniforms, fade);
   sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
-uniform vec2 uFadeC; uniform float uFadeR, uFadeZ;`).replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
+${FADE_GLSL}`).replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
 #ifdef USE_FOG
-{
-  float fd = length(gl_FragCoord.xy - uFadeC);
-  if (vFogDepth < uFadeZ - 1.5 && fd < uFadeR) {
-    float amt = 1.0 - smoothstep(uFadeR * 0.55, uFadeR, fd);
-    float h = fract(sin(dot(floor(gl_FragCoord.xy), vec2(12.9898, 78.233))) * 43758.5453);
-    if (h < amt * 0.8) discard;
-  }
-}
+  if ( hfBayer( gl_FragCoord.xy ) < hfFade( vFogWorldPos, vFogDepth ) * 0.9 ) discard;
 #endif`);
 }
 export function fadeMaterial(material, fade) {

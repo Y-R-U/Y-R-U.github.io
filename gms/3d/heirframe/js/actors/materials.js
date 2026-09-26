@@ -11,13 +11,23 @@ function once(key, make) {
 }
 
 // Sunlit rim so gold / chrome read against the bright floor at gameplay distance (tinted by the paint).
+// Chrome reads pale when everything it mirrors is bright sky/floor: darken the env where the reflection vector grazes the
+// horizon (the city's dark tower bases), so metals get the classic dark horizon line at any distance.
+export const HORIZON_BAND = `
+#if defined( USE_ENVMAP ) && defined( RE_IndirectSpecular )
+{
+  vec3 hrv = inverseTransformDirection( reflect( -geometryViewDir, geometryNormal ), viewMatrix );
+  float hb = smoothstep( -0.35, -0.08, hrv.y ) * ( 1.0 - smoothstep( 0.02, 0.24, hrv.y ) );
+  radiance *= 1.0 - 0.62 * hb * metalnessFactor;
+}
+#endif`;
 export function addRim(m, k = 0.35) {
   m.onBeforeCompile = (sh) => {
     sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
 {
   float rimF = pow( 1.0 - saturate( dot( normal, normalize( vViewPosition ) ) ), 3.0 );
   totalEmissiveRadiance += ( diffuseColor.rgb * ${k.toFixed(3)} + vec3( 0.05, 0.055, 0.06 ) ) * rimF;
-}`);
+}`).replace('#include <lights_fragment_maps>', '#include <lights_fragment_maps>' + HORIZON_BAND);
   };
   m.customProgramCacheKey = () => 'robotRim' + k;
   return m;

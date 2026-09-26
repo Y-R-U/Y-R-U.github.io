@@ -17,7 +17,7 @@ import { buildSites } from './sites.js';
 import { buildFurnish } from './furnish.js';
 import { buildBackdrop } from './backdrop.js';
 import { createBillboards } from './holo.js';
-import { swayFoliage, fadeMaterial, makeLeafAtlas, createLeafMaterial } from './foliage.js';
+import { swayFoliage, fadeMaterial, makeLeafAtlas, createLeafMaterial, FADE_GLSL } from './foliage.js';
 import { D2R } from './geo.js';
 
 export const LAYOUT = {
@@ -69,7 +69,8 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
   scene.add(hemi);
 
   const M = createMaterials(reflection, tier);
-  const fade = { uFadeC: { value: new THREE.Vector2(-9999, -9999) }, uFadeR: { value: 0 }, uFadeZ: { value: 0 } };
+  const fade = { uFadeA: { value: new THREE.Vector3() }, uFadeB: { value: new THREE.Vector3() }, uFadeOn: { value: 0 } };
+  let fadeSet = false;
   swayFoliage(M.foliage, time, fade);
   M.leaves = createLeafMaterial(makeLeafAtlas(), time, fade);
   // anything tall enough to stand between the camera and the player dithers away around them
@@ -96,6 +97,15 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
   buildSkyline(ctx);
   buildTraffic(ctx);
   const built = batch.build(scene);
+  // holo signs/posters fade out (alpha) instead of dithering
+  scene.traverse((o) => {
+    const m = o.material;
+    if (!m?.isShaderMaterial || !m.uniforms?.uBright || m.userData.faded) return;
+    m.userData.faded = true;
+    Object.assign(m.uniforms, fade);
+    m.fragmentShader = m.fragmentShader.replace('#include <fog_pars_fragment>', '#include <fog_pars_fragment>\n' + FADE_GLSL)
+      .replace('#include <fog_fragment>', 'gl_FragColor.a *= 1.0 - 0.85 * hfFade( vFogWorldPos, vFogDepth );\n#include <fog_fragment>');
+  });
   ctx.stats.staticMeshes = built.meshes; ctx.stats.staticTris = built.tris;
   const motes = createMotes(time, pxScale, tier.name === 'low' ? 80 : 220);
   scene.add(motes);
@@ -116,14 +126,10 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     blocked: (x, z, r) => col.blocked(x, z, r),
     focus: new THREE.Vector3(),
     fade,
-    // screen-space see-through circle around a world point (the player)
+    // see-through capsule from the camera to a world point (the player); call every frame, or the fade switches off
     setFadeTarget(p) {
-      const v = _v.copy(p); v.y += 1.0;
-      const depth = -v.clone().applyMatrix4(camera.matrixWorldInverse).z;
-      v.project(camera);
-      const b = renderer.getDrawingBufferSize(_b);
-      fade.uFadeC.value.set((v.x * 0.5 + 0.5) * b.x, (v.y * 0.5 + 0.5) * b.y);
-      fade.uFadeR.value = b.y * 0.2; fade.uFadeZ.value = depth;
+      fade.uFadeB.value.set(p.x, p.y + 1.0, p.z);
+      fadeSet = true;
     },
     resize(w, h, dpr) {
       renderer.setPixelRatio(dpr);
@@ -154,7 +160,10 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     },
     render(dt) {
       renderer.info.reset();
+      fade.uFadeOn.value = 0;
       reflection.update(scene, camera);
+      camera.getWorldPosition(fade.uFadeA.value);
+      fade.uFadeOn.value = fadeSet ? 1 : 0; fadeSet = false;
       // the skyline only shows in the mirror while the view's top edge is below the horizon
       camera.getWorldDirection(_v);
       const hideSky = Math.asin(Math.max(-1, Math.min(1, _v.y))) + camera.fov * D2R * 0.5 < -0.04;

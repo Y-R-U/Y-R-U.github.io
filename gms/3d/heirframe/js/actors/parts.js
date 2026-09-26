@@ -16,9 +16,9 @@ export function mat4(p = [0, 0, 0], r = [0, 0, 0], s = 1) {
 export class PartBuilder {
   constructor(rig, quality = 'high', lod = 'near') {
     this.rig = rig;
-    this.q = lod === 'far' ? 'low' : quality;
-    this.far = lod === 'far';
-    this.k = this.q === 'high' ? 0.8 : this.q === 'med' ? 0.6 : 0.42;
+    this.q = lod === 'far' || lod === 'tiny' ? 'low' : quality;
+    this.far = lod === 'far' || lod === 'tiny';
+    this.k = lod === 'tiny' ? 0.26 : this.q === 'high' ? 0.8 : this.q === 'med' ? 0.6 : 0.42;
     this.slots = new Map();
     this.pre = null;
   }

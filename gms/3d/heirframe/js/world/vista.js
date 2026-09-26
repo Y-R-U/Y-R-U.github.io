@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { box, cyl, lathe } from './geo.js';
 import { addTree } from './foliage.js';
-import { createWaterfall, createWaterMaterial, createMist } from './water.js';
+import { createWaterfall, createWaterMaterial, createLakeMaterial, createMist } from './water.js';
 import { REFLECT_LAYER } from '../fx/reflection.js';
 import { tiered } from './backdrop.js';
 
@@ -11,7 +11,13 @@ const V = (x, y, z) => new THREE.Vector3(x, y, z);
 export function buildVista(ctx) {
   const { scene, batch, M, tier } = ctx;
   const WY = -7;
-  const water = new THREE.Mesh(new THREE.PlaneGeometry(420, 460).rotateX(-Math.PI / 2), createWaterMaterial(ctx, { color: 0x1b4a5c }));
+  const shore = {
+    walls: [[-60, -300, 41.0, 200], [123.5, -300, 600, 200], [44, -135, 100, -105.2]],
+    discs: [[70, -30, 7.4], [92, 20, 5.4]],
+    churn: [[48, -106, 68, -96, 1], [76, -106, 92, -96, 1], [118, -74, 123.5, -30, 0.7]],
+  };
+  const water = new THREE.Mesh(new THREE.PlaneGeometry(420, 460).rotateX(-Math.PI / 2), createLakeMaterial(ctx, { shore }));
+  const poolMat = createWaterMaterial(ctx, { color: 0x1b4a5c });
   water.position.set(250, WY, -60);
   water.geometry.attributes.uv.array.forEach((v, i, a) => { a[i] = v * 40; });
   water.receiveShadow = true;
@@ -39,7 +45,7 @@ export function buildVista(ctx) {
     const f = createWaterfall(ctx, { width: 40, height: 3.2, lip: 0.6, segsY: 4, bright: 1.5 });
     f.rotation.y = -Math.PI / 2; f.position.set(x - 4.5, y + 0.45, -52 + i * 18);
     scene.add(f);
-    const pw = new THREE.Mesh(new THREE.PlaneGeometry(8.6, 150).rotateX(-Math.PI / 2), water.material);
+    const pw = new THREE.Mesh(new THREE.PlaneGeometry(8.6, 150).rotateX(-Math.PI / 2), poolMat);
     pw.position.set(x, y + 0.4, -30); scene.add(pw);
     for (let z = -100; z < 40; z += 11) if ((z + i * 7) % 3 !== 0) addTree(batch, M, x + 2.5, y + 0.5, z + i * 3, (z * 13 + i) | 0, 1.1);
   }

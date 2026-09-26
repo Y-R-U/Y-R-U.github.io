@@ -3,7 +3,7 @@ import { makeRig, makeBones, BONES, BI, NB } from './rig.js';
 import { PartBuilder } from './parts.js';
 import { KINDS, kindOf } from './kinds.js';
 import { NCH, PX, evalBase, evalAction, ACTIONS, LOWER, eyeCurve, smooth } from './anims.js';
-import { setMaterialQuality, flashMat, applyPaint, PAINTS } from './materials.js';
+import { setMaterialQuality, flashMat, applyPaint, PAINTS, HORIZON_BAND } from './materials.js';
 
 export const ROBOT_KINDS = Object.keys(KINDS);
 export { PAINTS };
@@ -23,7 +23,7 @@ function getTemplate(kind, tier, variant, quality, lod) {
   const K = KINDS[kind];
   const rig = makeRig(K.dims(variant, tier));
   const b = new PartBuilder(rig, quality, lod);
-  K.build(b, { tier, variant, far: lod === 'far' });
+  K.build(b, { tier, variant, far: lod === 'far' || lod === 'tiny' });
   const { geometry, slots, tris } = b.build(K.slots);
   const h = K.height;
   geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, h * 0.5, 0), h * 0.95);
@@ -62,7 +62,7 @@ const mergedMats = {};
 function mergedMaterial(low) {
   const k = low ? 'lo' : 'hi';
   if (mergedMats[k]) return mergedMats[k];
-  const m = low ? new THREE.MeshStandardMaterial({ vertexColors: true, metalness: 1, roughness: 1 })
+  const m = low ? new THREE.MeshStandardMaterial({ vertexColors: true, metalness: 1, roughness: 1, envMapIntensity: 1.25 })
     : new THREE.MeshPhysicalMaterial({ vertexColors: true, metalness: 1, roughness: 1, clearcoat: 1, clearcoatRoughness: 0.06, envMapIntensity: 1.25 });
   m.onBeforeCompile = (sh) => {
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nattribute vec4 pbr;\nvarying vec4 vPbr;')
@@ -72,6 +72,7 @@ function mergedMaterial(low) {
       .replace('#include <metalnessmap_fragment>', '#include <metalnessmap_fragment>\nmetalnessFactor = vPbr.x;')
       .replace('#include <roughnessmap_fragment>', '#include <roughnessmap_fragment>\nroughnessFactor = vPbr.y;')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += glowC;\n{ float rimF = pow( 1.0 - saturate( dot( normal, normalize( vViewPosition ) ) ), 3.0 ); totalEmissiveRadiance += ( diffuseColor.rgb * 0.35 + vec3( 0.05, 0.055, 0.06 ) ) * rimF; }')
+      .replace('#include <lights_fragment_maps>', '#include <lights_fragment_maps>' + HORIZON_BAND)
       .replace('#include <lights_physical_fragment>', '#include <lights_physical_fragment>\n#ifdef USE_CLEARCOAT\nmaterial.clearcoat *= vPbr.w;\n#endif');
   };
   m.customProgramCacheKey = () => 'robotMerged' + k;
@@ -110,10 +111,15 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
     return m;
   });
   const flash = merged ? flashMat() : T.slots.map(() => flashMat());
-  let geometry = T.geometry, meshMats = mats;
+  let geometry = T.geometry, meshMats = mats, lodGeo = null;
   if (merged) {
     const key = [kind, tier, variant, quality, lod, tone, JSON.stringify(paint)].join('|');
     geometry = mergedGeometry(T, key, T.slots.map((s) => M[s]));
+    if (lod === 'far') {
+      // distant crowd members swap to a coarser mesh on the same skeleton (see api.setLod)
+      const Tt = getTemplate(kind, tier, variant, quality, 'tiny');
+      lodGeo = [geometry, mergedGeometry(Tt, key + '|tiny', Tt.slots.map((s) => M[s]))];
+    }
     meshMats = mergedMaterial(quality === 'low');
     own.length = 0;
   }
@@ -166,6 +172,14 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
     height: K.height * sc, radius: K.radius * sw, seatHeight: ctx.hover || ctx.quad ? 0 : (D.shin + D.ankle) * sc,
     runSpeed, drawCalls: merged ? 1 : T.slots.length, tris: T.tris,
     onEvent: null,
+    lod: 0,
+    // far LOD also drops the clearcoat lobe (the physical material is the costliest crowd shader)
+    setLod(i) {
+      if (!lodGeo || i === api.lod) return;
+      api.lod = i; mesh.geometry = lodGeo[i];
+      meshMats = mergedMaterial(i === 1 || quality === 'low');
+      if (flashT <= 0) mesh.material = meshMats;
+    },
     get state() { return { base, action: act && act.name, dead: !!(act && act.name === 'die'), speed: ctx.move.v }; },
 
     play(name, { loop, speed = 1, fade: f = 0.15 } = {}) {

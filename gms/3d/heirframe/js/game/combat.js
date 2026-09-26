@@ -157,7 +157,7 @@ export function createCombat(ctx) {
     } else if (sk.kind === 'distract') {
       fx.advert(player.pos, 2.6);
       fx.ring(player.pos, sk.radius || 6, 0x8fe8ff, 0.6);
-      audio.sfx('holo', { vol: 0.8 }) || audio.sfx('scan', { vol: 0.8 });
+      audio.sfx('scan', { vol: 0.8 });
       let n = 0;
       for (const e of ctx.enemies.alive()) {
         if (e.pos.distanceTo(player.pos) > (sk.radius || 6)) continue;

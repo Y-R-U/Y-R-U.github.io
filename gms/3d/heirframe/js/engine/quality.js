@@ -42,10 +42,16 @@ export function detectQuality(flag) {
 export function createGovernor(tier, apply) {
   const g = { dpr: tier.dpr, floor: Math.max(0.6, tier.dpr * 0.55), ceil: tier.dpr, acc: 0, frames: 0,
     slow: 0, fast: 0, ups: 0, fps: 60, enabled: true, history: [] };
+  // Judged on a trimmed mean frame time (the slowest 10% of frames dropped), so one-off hitches (shader compiles, GC,
+  // a panel opening) never cost resolution. Thresholds sit well below 60, so a 60 Hz vsync cap (~59.9) is never "slow".
+  const dts = [];
   g.tick = (dt) => {
-    g.acc += dt; g.frames++;
+    g.acc += dt; g.frames++; dts.push(dt);
     if (g.acc < 1.5) return;
-    g.fps = g.frames / g.acc; g.acc = 0; g.frames = 0;
+    dts.sort((a, b) => a - b);
+    const keep = Math.max(1, Math.floor(dts.length * 0.9));
+    let sum = 0; for (let i = 0; i < keep; i++) sum += dts[i];
+    g.fps = keep / sum; g.acc = 0; g.frames = 0; dts.length = 0;
     if (!g.enabled || document.hidden) return;
     if (g.fps < 45) { g.slow++; g.fast = 0; } else if (g.fps > 57) { g.fast++; g.slow = 0; } else { g.slow = 0; g.fast = 0; }
     if (g.slow >= 2 && g.dpr > g.floor + 0.01) {

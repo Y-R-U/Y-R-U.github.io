@@ -4,6 +4,7 @@ Game folder: `/Users/aaronair/cc/yru/site/gms/3d/heirframe/` (inside the yru Git
 Read `docs/DECISIONS.md` (Aaron's brief + manager decisions) and look at BOTH images in `refs/` before starting.
 
 ## Hard rules
+- **Quality and efficiency together (D18):** Aaron finds the visuals very impressive and the S22 fps fine. Keep improving the look, measure any added cost, and make perf work "same look, cheaper", never "cheaper look".
 - **Never `git commit`, `git push`, `git add`, stash, rebase or checkout.** Other sessions share this repo. The manager commits.
 - **Only edit files you own** (your brief lists them). If you need a change in someone else's file, write the request in your notes file and message the manager; do not edit it.
 - Three.js **0.180.0 vendored**: `../../lib/three/0.180.0/three.module.js`, addons under `../../lib/three/0.180.0/addons/` (check what exists there; if an addon you need is missing, copy it from the matching three release into that vendored folder and note it). **No CDN imports of anything.** Fonts: Google Fonts link is OK but UI must degrade gracefully without it.

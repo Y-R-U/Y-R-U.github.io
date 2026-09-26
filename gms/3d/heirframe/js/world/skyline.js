@@ -8,7 +8,7 @@ const clean = (g) => { g = g.index ? g.toNonIndexed() : g; for (const k of Objec
 const merge = (list) => mergeGeometries(list.map(clean), false);
 const C = (rt, rb, h, y, seg = 12) => { const g = new THREE.CylinderGeometry(rt, rb, h, seg, 1); g.translate(0, y + h / 2, 0); return g; };
 const B = (w, h, d, x, y, z) => { const g = new THREE.BoxGeometry(w, h, d); g.translate(x, y + h / 2, z); return g; };
-const Tor = (r, t, y) => { const g = new THREE.TorusGeometry(r, t, 6, 40); g.rotateX(Math.PI / 2); g.translate(0, y, 0); return g; };
+const Tor = (r, t, y) => { const g = new THREE.TorusGeometry(r, t, 4, 28); g.rotateX(Math.PI / 2); g.translate(0, y, 0); return g; };
 
 // Each archetype: { glass, stone, gold } unit geometries (instanced separately).
 function archetypes() {
@@ -26,7 +26,7 @@ function archetypes() {
     glass.push(C(20, 22, 130, 0, 16), C(16, 18, 110, 130, 16), C(11, 13, 70, 240, 16));
     for (const [y, rr] of [[118, 36], [205, 30]]) {
       stone.push(Tor(rr, 1.6, y));
-      stone.push(C(rr + 0.5, rr + 0.5, 1.2, y - 1.6, 32));
+      stone.push(C(rr + 0.5, rr + 0.5, 1.2, y - 1.6, 20));
       for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2; const g = B(1.6, 1.2, rr - 12, 0, y - 1.2, (rr + 12) / 2); g.rotateY(a); stone.push(g); }
     }
     stone.push(C(24, 24, 3, 128, 16), C(19, 19, 3, 238, 16));
@@ -42,7 +42,7 @@ function archetypes() {
   }
   { // saucer tower
     const glass = [C(7, 9, 150, 0, 12), C(14, 22, 10, 158, 24)];
-    const stone = [lathe([[0, 150], [34, 154], [36, 156], [34, 158], [0, 160]], 32), C(3, 7, 30, 168, 12)];
+    const stone = [lathe([[0, 150], [34, 154], [36, 156], [34, 158], [0, 160]], 20), C(3, 7, 30, 168, 12)];
     const gold = [Tor(35.5, 0.8, 156), C(0.2, 1, 30, 198, 6)];
     A.push({ glass, stone, gold, height: 228 });
   }

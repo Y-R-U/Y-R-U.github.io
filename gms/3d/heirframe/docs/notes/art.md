@@ -120,3 +120,102 @@ scratchpad `art/` (driver `art/shot.mjs`, PORT 9314, MOBILE=1 now also sets an A
 Env: `TP="x,z,yaw" YAW=deg PITCH=offset ZOOM=0..1 PRE=file.js`. `art/gshot.mjs` = same for tools/robot_gallery.html (BASE=).
 Key shots: a0 (start), g4a/final_s1 (end default cam), g6b (rotated end), v4 (4 yaws at min pitch), h4/h2 (horizon vistas),
 f2 (fountain), sit2 (bench sitters), bb1 (billboard takeover), gal3/gal4 (robots), critic/r1..r4.png.
+
+## Round 2 (art agent #3, 2026-09-26) — DONE
+Brief: vista perf at pitch 12° (≥55 fps M5 every yaw), title ≤300 calls/650k, occlusion fade at any yaw, calmer floor + sun sheen,
+chrome contrast at distance, water sparkle. Previous round-2 agent died without notes; its only work was the uber batching below.
+
+1. **Uber-material batching (kept)** — `js/world/{batch,materials,world}.js`. Materials flagged `userData.uber` (stone, stoneUpper,
+   gold, chrome, darkMetal, glassDark, warmGlow, blueGlow, bark, soil, dumpster, crate) are baked at batch time into vertex colour
+   (× material colour, or × emissive·intensity for pure glows) plus a `pbr` vec4 attribute (metal, rough, glow flag, envMapIntensity),
+   and every such bucket in a cell shares `M.uber` (contactAO + fade). `?nouber` disables it for A/B.
+   Manager measure shot=1 915x412 DPR2: 171 calls / 717k tris (uber) vs 236 / 666k (nouber), 5% pixels changed.
+   Verified: vista (-30,40) pitch 12 high: uber 257 calls / 589k vs nouber 368 / 536k, 6.3% px changed (crowd motion), looks
+   identical side by side (`art/r2/u_stack.png`); low tier 121 vs 182 calls, 4.2% changed. Fade/dither works on uber (it's in the
+   fade list); mirror shows uber cells normally.
+
+2. **Measurement traps found:** `?noui` is broken right now (integrator's hud.js throws in startSession → runtime stuck in
+   'title' → rig.fixed title cam), so any `?noui` "vista" is really the title view. Use `?shot=1` (rig follows the player,
+   same 0.35 zoom key) or the real UI + `?auto=1&fresh` then `runtime.auto=null`. Driver `art/vp.mjs "<query>" base,nomirror,...`
+   (env VIEWS="x,z,yaw;..." PITCH=12 SHOT=prefix FREE=1 TITLE=1) prints rAF fps, a synchronous 8-frame render+readPixels ms,
+   and calls/tris per pass (renderer.render / shadowMap.render wrapped). `art/r2/top.js|named*.js` = per-object draw breakdown.
+3. **Perf finding:** on M5 metal (915x412 DPR2 mobile → dpr 1.5) every vista yaw at pitch 12 runs at the 60 fps rAF cap, render
+   cost ~4–10 ms (noisy: other agents' Chromes share the GPU). I could NOT reproduce 35–46 fps; with the real UI in free state
+   also 60. Suspects for the integrator's number: GPU contention (2–3 headless Chromes) and/or the HUD's `backdrop-filter`
+   blur on `.hf-glass` (css/ui.css:90, high tier) which re-blurs the canvas every frame — request to UI owner: test without it.
+4. **Perf changes:** crowd far LOD — `createRobot({lod:'far', merged:true})` now also builds a `tiny` template (PartBuilder
+   k 0.26, ~3.2k tris vs 5.6k) and `bot.setLod(0|1)` swaps geometry on the same skeleton; crowd.js swaps at camera distance
+   >18 m (back <16). Crowd shadow/mirror now also require camera distance <25 m. Flying cars out of the mirror and ~45% fewer
+   tris (sphere 14x7). Skyline tori 6x40 → 4x28, stone rings 32 → 20 segs.
+   Title: 303 calls / 992k → 281 / 654k. Vistas (shot=1, pitch 12, 8 views): 177–281 calls / 568–803k (were 250–304 / 690–950k).
+5. **Atrium end walls** (the integrator's "flat grey slab" at yaw 270 near (-30,40) — it's the 31 m atrium end wall at th1):
+   both faces now have per-tier lit shopfront bands (shopGlow) with chrome mullions, stoneUpper slab bands + gold strips +
+   warm reveal, gold corner pilasters. All batched (uber/shopGlow), ~0 extra calls.
+
+6. **Occlusion fade rewritten (any yaw/pitch):** foliage.js `FADE_GLSL` — world-space capsule camera→player chest (radius 1.6 m
+   at the lens → 2.7 m at the player, stops 0.3–0.9 m before the player) + everything within 1.5–3.5 m of the lens, ordered
+   4x4 Bayer dither (was hash noise) up to 90%. Uniforms `uFadeA` (camera, set in world.render) / `uFadeB` (player, via the
+   unchanged `world.setFadeTarget(p)`) / `uFadeOn` (off during the mirror pass and on frames nobody called setFadeTarget, e.g.
+   title cam). Holo signs/posters (ShaderMaterial with uBright) get the same test as an alpha fade (patched in world.js after
+   batch.build). Shots `art/r2/f_grid.png`: canopy at (0,20) yaw 90 now opens around the player.
+
+### Aaron's S22 report (2026-09-26): crowd stuck on planters; 44–52 fps looking at the crowd (idle elsewhere ~56 = 60 Hz vsync
+cap); governor must not read a 60 Hz cap as slow. D17: look-up to -45° is final (cheap views).
+7. **Crowd navigation (crowd.js `walkTo`)**: A* on a lazily built 1 m walk grid (`createNav` imported read-only from
+   js/game/nav.js, radius 0.42, own instance), string-pulled paths, ≤3 routes per frame; blocked steps try ±0.6/1.2/1.7 rad
+   slides; a 1 s progress watchdog re-routes (and flips slide side), 3 strikes → new stroll goal / next loop point / snap home if
+   off-screen; civilians spawned inside a prop footprint walk straight out to `nav.nearest`. Seats: last metre straight in.
+   Flee also slides. **Harness `art/r2/stuck.js`** (eval in a `?shot=1` page: 120 s virtual clock at 30 Hz, focus hops
+   across 12 plaza points every 10 s; stuck = wants to move but <0.25 m in 2 s): before 8 civs / 304 of 2641 samples stuck
+   (spawned inside planters at (7,21), (-9,21); loops pinned at (1,-55)); after **0 / 2706**; 300 s soak (`stuck2.js`) 0 / 6385;
+   med tier 0 / 1253.
+8. **Crowd render cost:** shadows + mirror only for the nearest 8 (high) / 5 (med) civs within 13 m of the player and 22 m
+   of the camera; far LOD (>18 m from camera) also swaps to the plain MeshStandard merged material (no clearcoat lobe, env 1.25).
+   Crowd CPU on M5: 0.06 ms/frame for 32 civs (anim is not the problem). On M5 the whole crowd costs ~0.3 ms GPU — the S22
+   crowd-view dip is most likely fill (dpr 1.5 → 1.0 cut M5 frame 28%), i.e. reflective floor + bloom + MSAA over a busy view.
+9. **Governor:** judges a trimmed mean (slowest 10% frames dropped) per 1.5 s window; slow < 45, fast > 57, so a 60 Hz vsync
+   cap (~59.9) never drops dpr and one-off hitches don't either.
+   NOTE: GPU timer queries (EXT_disjoint_timer_query_webgl2) on ANGLE-Metal return garbage (bloom "60 ms"); and M5 timings
+   were swamped for a while by qwen-tts (MLX) + replayd sharing the GPU — treat ms numbers from this session as ±50%.
+10. **Floor (ground.js):** inlays cut from ~7 rings + 72 radial hairlines + 6 m grid to 5 bold rings, 12 gold spokes (every other
+    wedge edge), a 12 m outer grid and one boulevard edge line; warm studs every 6 m (was 3). New **sun sheen**: a second,
+    rough specular lobe (pow 40 ×0.28 + pow 8 ×0.06, warm tint) injected into the directional-light loop of
+    lights_fragment_begin, so it respects shadows; zero on inlays, 0.6 on steel. Shots `art/r2/fl_cmp.png`, `sh_cmp.png`.
+11. **Chrome contrast (actors):** `HORIZON_BAND` in actors/materials.js — env radiance ×(1 − 0.62·band·metalness) where the
+    world-space reflection vector grazes the horizon (−0.35..0.24): the dark tower-base line chrome shows in the refs. Applied to
+    every mat() robot material (via addRim) and the merged crowd material. `art/r2/ch_cmp2.png`.
+12. **Water:** fountain/pool material got specular AA (ripples flatten with distance, roughness from fwidth of the ripple
+    normal, capped 0.2). **The east lake is a new material** (`createLakeMaterial` in water.js, shore SDF from
+    walls/discs passed by vista.js): turquoise shallows → teal → deep via shore distance + noise, broken foam line at stone and
+    islands, caustic web in the shallows (fades with distance), world-space normals (2 scrolling ripple scales + 2-wave analytic
+    swell → no tiling), churn + white water under the great falls and the lowest cascade, spec AA (roughness ≥ fwidth(ripple),
+    foam rough 0.75). Cascade pools keep the old material. Cost A/B on M5 (same frame, material swapped, 3 reps):
+    +0.05 ms (3.10 vs 3.05 ms) at (40,8) yaw 270 pitch 12; +0.08 at (44,-40) pitch 40. Shots `art/r2/lk_grid.png`, `lk2.png`.
+13. Outer-plaza dark nero ribs 6 m → 12 m grid (matches the 12 m gold grid). Steel slate/boulevard roughness floor 0.14 (critic
+    read the razor-sharp black mirror as an SSR glitch). Lake ripples modulated by a slow noise "wind" field (critic saw tiling).
+
+### Final numbers (M5 metal, 915x412 DPR2 mobile → dpr 1.5, `art/vp.mjs "shot=1"`, pitch 12, rAF fps / sync render ms / calls / tris)
+high: (10,-40)y180 60/4.0ms/252/665k · (-30,40)y270 60/2.5/253/604k · (0,20)y90 60/3.5/179/568k · (3,12)y0 60/4.0/230/615k ·
+(-20,0)y45 60/3.8/173/578k · (30,0)y90 60/4.1/216/543k · (0,-60)y0 60/3.3/158/461k · (0,30)y180 60/3.0/167/536k.
+Before this round (same views, pre-LOD): 177–304 calls / 568–950k tris. Integrator's 35–46 fps not reproducible (see 3).
+med: 60 fps, 1.8–2.2 ms, 189–235 calls / 460–560k. Title (UI on): 268 calls / 619k (was 303 / 992k; 495 / 860k pre-uber).
+
+### Critic rounds (answer keys) — both correctly ID'd the game (camera angle + low-poly figures give it away)
+- R5 `critic/r5.png` = LEFT game `art/r2/g7a.png` (shot=1 default cam), RIGHT ref gold floor crop (420,380 1252x561).
+  Game 3/10, ref 8.5. #1 floor still "flat tan vinyl with painted grid lines", wants veining/mirror falloff; #2 empty, props
+  placeholder; #3 lighting a single gradient wash. (Taken before item 13.) Same verdict as R1–R4: the 52° frame is ~80% floor.
+- R6 `critic/r6.png` 2x2: TOP-LEFT game vista `g7v` (10,-40 yaw180 pitch12), TOP-RIGHT ref gold (0,100 1672x753);
+  BOTTOM-LEFT ref water crop (1000,540 672x302), BOTTOM-RIGHT game lake `g7l` (40,-20 yaw300 pitch14). Game 4/10 both, refs 8.5/7.5.
+  Lake water 5.5 vs ref 7.5: "nice colour, reads as a pool; visible ripple tiling; foam only at the top; single glitter
+  hotspot". Vista: "near-mirror floor reflects flat black silhouettes → SSR glitch" (→ item 13), mixed robot designs,
+  greybox architecture, no atmospheric perspective.
+
+## NEXT / gaps (round 3)
+1. The gameplay frame's floor is still the weakest read (3/10 five rounds running). Needs mass, not more paint: long soft
+   reflections of the tall architecture at gameplay pitch, contact shadows/AO under props, maybe a larger-scale veined slab.
+2. Atmospheric perspective between near and far (critic, both vistas): stronger distance haze/aerial blue on the skyline.
+3. Lake: falls-base foam/mist volume (the mist points exist but barely read), scattered glints; waterfall sheet shader is flat.
+4. Phone perf is unmeasured: M5 can't stand in for the S22. Suspects in order: fill (reflective floor + MSAA×4 on half-float
+   + UnrealBloom's 5 mips at dpr 1.5), then `.hf-glass` backdrop-filter blur (UI). Try bloom at quarter res, and MSAA 2 on high.
+5. Near-lens fade dithers balconies/rails close to the camera into a visible Bayer pattern at the frame edge (lake views).
+6. REQUEST integrator: `?noui` is broken (hud.js:64 null `ui.hud` in startSession → stuck in title).

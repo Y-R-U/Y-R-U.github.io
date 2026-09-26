@@ -58,10 +58,23 @@ export function buildAtrium(ctx) {
     batch.put(box(0.45, 30.5, len), M.stoneUpper, new THREE.Vector3(cx + rm * Math.sin(a), 15.25, cz + rm * Math.cos(a)), a);
     batch.put(box(0.5, 30.5, 0.35), M.gold, new THREE.Vector3(cx + rIn * Math.sin(a), 15.25, cz + rIn * Math.cos(a)), a);
   }
-  // end walls
+  // end walls, dressed as a facade on both faces (with free look they fill the frame from the terrace)
   for (const a of [th0, th1]) {
-    const rm = 55, len = 20;
-    batch.put(box(1.2, 31, len), M.stone, new THREE.Vector3(cx + rm * Math.sin(a), 15.5, cz + rm * Math.cos(a)), a);
+    const rm = 55, len = 20, ex = cx + rm * Math.sin(a), ez = cz + rm * Math.cos(a);
+    const c = Math.cos(a), sn = Math.sin(a);
+    const at = (lx, y, lz) => new THREE.Vector3(ex + lx * c + lz * sn, y, ez - lx * sn + lz * c);
+    batch.put(box(1.2, 31, len), M.stone, at(0, 15.5, 0), a);
+    for (const sd of [-1, 1]) {
+      tiers.forEach((t, i) => {
+        const h = t.y1 - t.y0 - 1.0;
+        batch.put(box(0.1, h, len - 3), M.shopGlow, at(sd * 0.62, t.y0 + 0.3 + h / 2, 0), a, null, { cast: false });
+        for (let z = -(len - 3) / 2; z <= (len - 3) / 2 + 0.01; z += (len - 3) / 7) batch.put(box(0.16, h, 0.14), M.chrome, at(sd * 0.68, t.y0 + 0.3 + h / 2, z), a, null, { cast: false });
+        batch.put(box(0.6, 0.8, len + 0.4), M.stoneUpper, at(sd * 0.72, t.y1 + 0.4, 0), a);
+        batch.put(box(0.62, 0.12, len + 0.42), M.gold, at(sd * 0.72, t.y1 + 0.06, 0), a, null, { cast: false });
+        batch.put(box(0.06, 0.06, len - 3), M.warmGlow, at(sd * 1.0, t.y1 - 0.04, 0), a, null, { cast: false });
+      });
+      for (const z of [-len / 2, len / 2]) batch.put(box(0.5, 31.2, 0.5), M.gold, at(sd * 0.5, 15.6, z), a, null, { cast: false });
+    }
   }
   col.arc(cx, cz, 47.9, 90, th0 - 0.01, th1 + 0.01, 'atrium');
 }

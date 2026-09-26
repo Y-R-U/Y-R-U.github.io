@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { enableReflect } from '../engine/player.js';
+import { createNav } from '../game/nav.js';
 
 // Civilian robots. About half stroll between plaza waypoints; the rest loiter in small groups (talking, sitting on
 // benches) and are quietly moved, while off-screen, to gathering spots near the player so the gameplay view stays lively.
@@ -54,6 +55,7 @@ export function createCrowd(world, createRobot, count, quality) {
   }
 
   const tmp = new THREE.Vector3(), ndc = new THREE.Vector3();
+  const ranked = [], closeMax = quality === 'high' ? 8 : quality === 'low' ? 0 : 5;
   let clock = 0, reseat = 0;
   const onScreen = (x, z) => {
     ndc.set(x, 1, z).project(world.camera);
@@ -130,6 +132,51 @@ export function createCrowd(world, createRobot, count, quality) {
   }
 
   const face = (m, want, dt, k) => { m.yaw += Math.atan2(Math.sin(want - m.yaw), Math.cos(want - m.yaw)) * (1 - Math.exp(-dt * k)); };
+  // Walking: A* route on a 1 m walk grid (built lazily, shared across civilians), string-pulled; a few routes per frame.
+  // Blocked steps slide along the obstacle; no progress for ~1 s re-routes, and a third strike gives up on the goal.
+  let nav = null, routeBudget = 0;
+  const getNav = () => nav || (nav = createNav(world, { radius: 0.42 }));
+  function walkTo(m, tx, tz, speed, dt, focus) {
+    if (m.gx !== tx || m.gz !== tz) { m.gx = tx; m.gz = tz; m.path = null; m.needRoute = true; m.strikes = 0; }
+    if (m.needRoute && routeBudget > 0) {
+      routeBudget--; m.needRoute = false;
+      const n = getNav(), r = n.los(m.pos.x, m.pos.z, tx, tz) ? null : n.route(m.pos, { x: tx, z: tz }, 12000);
+      m.path = r && r.length ? r : null;
+    }
+    let wx = tx, wz = tz;
+    if (m.path) {
+      while (m.path.length > 1 && Math.hypot(m.path[0].x - m.pos.x, m.path[0].z - m.pos.z) < 0.7) m.path.shift();
+      wx = m.path[0].x; wz = m.path[0].z;
+    }
+    let dx = wx - m.pos.x, dz = wz - m.pos.z;
+    const dl = Math.hypot(dx, dz) || 1;
+    dx /= dl; dz /= dl;
+    // step around the player instead of through them
+    const px = m.pos.x - focus.x, pz = m.pos.z - focus.z, pd = Math.hypot(px, pz);
+    if (pd < 2.2 && pd > 1e-3) { const k = (2.2 - pd) / 2.2 * 2.5; dx += px / pd * k; dz += pz / pd * k; }
+    face(m, Math.atan2(dx, dz), dt, 5);
+    const step = speed * dt;
+    let moved = false;
+    if (world.blocked(m.pos.x, m.pos.z, 0.4)) {
+      // spawned or pushed inside a prop's footprint: walk straight out to the nearest open cell
+      const o = m.escape || (m.escape = getNav().nearest(m.pos.x, m.pos.z));
+      if (o) { const ex = o.x - m.pos.x, ez = o.z - m.pos.z, el = Math.hypot(ex, ez) || 1; m.pos.x += ex / el * Math.min(el, step); m.pos.z += ez / el * Math.min(el, step); face(m, Math.atan2(ex, ez), dt, 8); return { moved: true, gaveUp: false }; }
+    }
+    m.escape = null;
+    for (const off of [0, 0.6, -0.6, 1.2, -1.2, 1.7, -1.7]) {
+      const a = m.yaw + off * (m.dir || 1), sx = Math.sin(a) * step, sz = Math.cos(a) * step;
+      if (!world.blocked(m.pos.x + sx, m.pos.z + sz, 0.4)) { m.pos.x += sx; m.pos.z += sz; moved = true; if (off) m.yaw += off * (m.dir || 1) * 0.25; break; }
+    }
+    // progress watchdog
+    m.watchT = (m.watchT || 0) + dt;
+    if (m.watchT > 1) {
+      const prog = m.watch ? Math.hypot(m.pos.x - m.watch.x, m.pos.z - m.watch.z) : 1;
+      m.watch = { x: m.pos.x, z: m.pos.z }; m.watchT = 0;
+      if (prog < speed * 0.3) { m.needRoute = true; m.strikes = (m.strikes || 0) + 1; m.dir = -(m.dir || 1); }
+      else m.strikes = 0;
+    }
+    return { moved, gaveUp: (m.strikes || 0) >= 3 };
+  }
   const crowd = {
     members,
     scare(x, z, r) {
@@ -142,21 +189,33 @@ export function createCrowd(world, createRobot, count, quality) {
     },
     update(dt, focus) {
       clock += dt;
+      routeBudget = 3;
       if ((reseat -= dt) <= 0) { assign(focus, clock < 1.5); reseat = 1.2; }
+      // shadows and mirror images only for the few nearest the camera
+      const cam = world.camera.position;
+      for (const m of members) { m.cd = m.pos.distanceTo(cam); m.fd = m.pos.distanceTo(focus); }
+      ranked.length = 0;
+      for (const m of members) if (m.fd < 13 && m.cd < 22) ranked.push(m);
+      ranked.sort((a, b) => a.cd - b.cd);
+      for (let i = 0; i < ranked.length; i++) ranked[i].rank = i;
       for (const m of members) {
-        const dist = m.pos.distanceTo(focus);
+        const dist = m.fd;
         const far = dist > 40;
         m.bot.root.visible = !far;
-        // shadows and mirror images only up close: each robot costs ~5 draws per pass
-        const close = dist < 13;
+        const close = m.fd < 13 && m.cd < 22 && m.rank < closeMax;
+        m.rank = 99;
         if (close !== m.close) { m.close = close; m.bot.root.traverse((o) => { if (o.isMesh) { o.castShadow = close; close ? o.layers.enable(1) : o.layers.disable(1); } }); }
         if (m.flee) {
           // D15: civilians can't be hurt, but they do get out of the way of a fight
           m.flee.t -= dt;
           const fx = m.pos.x - m.flee.x, fz = m.pos.z - m.flee.z, fl = Math.hypot(fx, fz) || 1;
           face(m, Math.atan2(fx / fl, fz / fl), dt, 8);
-          const sx = Math.sin(m.yaw) * 3.6 * dt, sz = Math.cos(m.yaw) * 3.6 * dt;
-          if (!world.blocked(m.pos.x + sx, m.pos.z + sz, 0.4)) { m.pos.x += sx; m.pos.z += sz; } else m.yaw += 0.9 * m.dir;
+          let fled = false;
+          for (const off of [0, 0.7, -0.7, 1.4, -1.4]) {
+            const a = m.yaw + off, sx = Math.sin(a) * 3.6 * dt, sz = Math.cos(a) * 3.6 * dt;
+            if (!world.blocked(m.pos.x + sx, m.pos.z + sz, 0.4)) { m.pos.x += sx; m.pos.z += sz; fled = true; break; }
+          }
+          if (!fled) m.yaw += 0.9 * m.dir;
           m.bot.setMove(3.6 / (m.bot.runSpeed || 4.5), 3.6);
           if (m.flee.t <= 0) { m.flee = null; if (m.home) m.mode = 'return'; }
         } else if (m.home && m.mode === 'return') {
@@ -165,10 +224,15 @@ export function createCrowd(world, createRobot, count, quality) {
           if (d < 0.25) {
             m.mode = m.home.mode; m.bot.setMove(0, 0);
             m.bot.play(m.mode === 'sit' ? 'sit' : 'talk', { loop: true, fade: 0.3 });
-          } else {
+          } else if (d < 1.0) {
+            // last metre to a seat/talk spot: straight in (seats sit inside the bench's collision box)
             face(m, Math.atan2(tmp.x, tmp.z), dt, 6);
             const step = Math.min(d, 1.3 * dt);
-            m.pos.x += Math.sin(m.yaw) * step; m.pos.z += Math.cos(m.yaw) * step;
+            m.pos.x += tmp.x / d * step; m.pos.z += tmp.z / d * step;
+            m.bot.setMove(1.3 / (m.bot.runSpeed || 4.5), 1.3);
+          } else {
+            const w = walkTo(m, m.home.x, m.home.z, 1.3, dt, focus);
+            if (w.gaveUp && !onScreen(m.pos.x, m.pos.z)) m.pos.set(m.home.x, m.pos.y, m.home.z);
             m.bot.setMove(1.3 / (m.bot.runSpeed || 4.5), 1.3);
           }
         } else if (m.home) {
@@ -191,22 +255,22 @@ export function createCrowd(world, createRobot, count, quality) {
           else if (d < 1.2 && m.stroll) { m.goal = strollGoal(m, focus); if (rnd() < 0.25) m.pause = 1 + rnd() * 3; }
           else if (d < 1.2) { m.idx = (m.idx + m.dir + m.loop.length) % m.loop.length; if (Math.random() < 0.3) m.pause = 1 + Math.random() * 3; }
           else {
-            tmp.multiplyScalar(1 / d);
-            // step around the player instead of through them
-            const px = m.pos.x - focus.x, pz = m.pos.z - focus.z, pd = Math.hypot(px, pz);
-            if (pd < 2.2 && pd > 1e-3) { const k = (2.2 - pd) / 2.2 * 2.5; tmp.x += px / pd * k; tmp.z += pz / pd * k; }
-            face(m, Math.atan2(tmp.x, tmp.z), dt, 5);
-            const fx = Math.sin(m.yaw), fz = Math.cos(m.yaw);
-            const step = m.speed * dt;
-            if (!world.blocked(m.pos.x + fx * step, m.pos.z + fz * step, 0.4)) { m.pos.x += fx * step; m.pos.z += fz * step; }
-            else { m.yaw += 0.8 * m.dir; }
+            const w = walkTo(m, tx, tz, m.speed, dt, focus);
+            if (w.gaveUp) {
+              m.strikes = 0;
+              if (m.stroll) m.goal = strollGoal(m, focus);
+              else m.idx = (m.idx + m.dir + m.loop.length) % m.loop.length;
+            }
             m.bot.setMove(m.speed / (m.bot.runSpeed || 4.5), m.speed);
           }
         }
         m.pos.y = world.groundAt(m.pos.x, m.pos.z) + (m.mode === 'sit' ? m.dy || 0 : 0);
         m.bot.root.position.copy(m.pos);
         m.bot.root.rotation.y = m.yaw;
-        if (!far) m.bot.update(dt);
+        if (!far) {
+          m.bot.setLod?.(m.cd > (m.bot.lod ? 16 : 18) ? 1 : 0);
+          m.bot.update(dt);
+        }
       }
     },
   };

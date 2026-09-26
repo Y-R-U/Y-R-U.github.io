@@ -21,6 +21,28 @@ Owns: `js/game/*`, `js/main.js`, `js/engine/{player,camera,input,devpad}.js`, th
 - DONE: Aaron's camera look controls (see "Camera controls" below).
 - Next: goal chip (showed "Stash 90 · 5,000 cr" at start), fx pooling / per-frame allocs, combat juice, death/save flows, perf, acceptance table.
 
+## Integrator #3 (2026-09-26) — IN PROGRESS
+- Plan: (1) speed-1 `?auto=1&contracts=3` regression + fps/hitch, (2) P1 acceptance table below, (3) real-touch CDP re-verify
+  of look/zoom/tap/joystick/skills at 915x412 DPR2, (4) first-3-minutes context prompts + Warehouse first-visit pulse,
+  (5) save/continue, death→redeploy, rental fee, results final pass. Then "P1 PLAYABLE" line on top.
+- NEW `js/game/coach.js`: first-session lessons (move, look, interact, attack, dodge, skill, warehouse, board), one gold hint
+  pill at a time (top centre) + pulse on the named control; each shows once (`sim.state.flags.coach`) and clears when done or
+  times out; hidden under dialogue/panels/cards/story beats. First item drop → Warehouse button badge + pulse + hint.
+  Story 'move'/'attack' toasts removed (coach replaces them). Free roam with no contract: marker/minimap → "Contract board".
+- Regression driver: scratchpad `integrator/reg.mjs` (rAF frame-delta probe; hitches >100 ms after 10 s; NOSHOT=1).
+- REGRESSION (speed 1, `?auto=1&contracts=3`, 915x412 MOBILE DPR2 high, M5 metal): ok, story + 3 random (courier/retrieve/pest,
+  one bot death to a Popper → failed+retaken), L3, 690 cr, surcharge shown −22→−78, FR 18→42, 0 console errors.
+  58.3 fps avg, p50 16.7 / p95 16.8 / p99 33.4 ms, max 67 ms, 0 hitches >100 ms, max 265 calls, dpr held 1.75.
+  (1st run's 4 "hitches" at 60/121/182 s were the driver's own Page.captureScreenshot every 60 s.)
+  A box-shadow pulse animation on the coach target cost ~3 fps and made the governor drop dpr to 1.39 → replaced by a
+  separate transform/opacity ring element.
+- Coach bug caught by the run: `ui.badge` is `ui.hud.badge` (threw every frame → runtime fell back). Fixed.
+- REAL TOUCH (`integrator/touch.mjs`, Input.dispatchTouchEvent, 915x412 DPR2): 11/11 — orbit 86°/200 px, pitch drag,
+  pinch 9.2→6.45 m, reset button, tap-to-move 3.7 m, joystick (dir·camFwd 1.000), dodge, attack, skills s1–s3,
+  interact (kiosk → board), Warehouse HUD button. **Harness gotcha:** only the FIRST touch session on a headless Chrome
+  gets touches; later sessions degrade to mouse-only (2/11, only click-driven buttons). Restart `cdp` before each touch run.
+- auto.js: `step()` returns once `finished` (it used to keep closing panels opened by tests). combat.js: unknown sfx `holo`.
+
 ## Camera controls (Aaron, 2026-09-26) — finished
 - **Look:** one-finger drag on the canvas (anything outside the joystick zone and buttons) orbits: horizontal = yaw, full 360°
   (0.0075 rad/px, ~840 px per turn); vertical = pitch offset, effective pitch clamped **12°–70° (D16)**. Below 30° the rig
