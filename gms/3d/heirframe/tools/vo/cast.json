@@ -1,0 +1,42 @@
+{
+ "civ_a": {
+  "name": "Heirframe · Civilian Robot A",
+  "instruct": "A polite woman with a soft, sweet, overly pleasant voice. Gentle and airy, smiling while she speaks, with an eerie calm and a perfectly even tone, like a contented android who has never had a bad day.",
+  "ref": "Oh, good afternoon! Isn't the light lovely today? I do hope you're having a wonderful, wonderful time. Everyone is.",
+  "fx": "highpass=f=120,aecho=0.8:0.55:4:0.28",
+  "f0": [
+   170,
+   400
+  ]
+ },
+ "civ_b": {
+  "name": "Heirframe · Civilian Robot B",
+  "instruct": "A polite middle-aged man with a mild, precise, neutral voice. Courteous and a little stiff, speaking with unsettling serenity, every sentence delivered at the same gentle pace, like a well-mannered service robot.",
+  "ref": "Greetings, citizen. I have completed my tasks for the morning, and I am very content. The Founders provide, and we are grateful.",
+  "fx": "highpass=f=120,aecho=0.8:0.55:5:0.28",
+  "f0": [
+   85,
+   170
+  ]
+ },
+ "security": {
+  "name": "Heirframe · Security Robot",
+  "instruct": "A deep, flat, authoritative male voice. Cold, clipped and emotionless, commanding and precise, like an armoured security robot issuing orders.",
+  "ref": "Citizen, halt. You are in a restricted zone. Remain where you are and prepare to be scanned. Resistance will be noted.",
+  "fx": "highpass=f=240,lowpass=f=4200,aecho=0.8:0.7:7:0.38,acrusher=bits=12:mix=0.25",
+  "f0": [
+   70,
+   140
+  ]
+ },
+ "enforcer": {
+  "name": "Heirframe · Enforcer",
+  "instruct": "A huge man with a very deep bass voice, gravelly and booming, extremely low pitched and menacing. Slow, confident and mocking, a heavy brute who enjoys the fight.",
+  "ref": "Well, well. A little rental robot, all alone in my district. You picked the wrong street, friend. Let's see what you're made of.",
+  "fx": "lowpass=f=6500,aecho=0.8:0.6:9:0.32",
+  "f0": [
+   60,
+   115
+  ]
+ }
+}

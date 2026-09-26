@@ -1,0 +1,276 @@
+{
+ "mara": {
+  "instruct": "A woman in her early fifties with a warm, husky alto and a light Scottish accent. Dry humour, quick and plain-spoken like a veteran radio dispatcher, a little smoky, affectionate under the gruffness.",
+  "ref": "Wren? It's Mara. Put the kettle on, kid, it's going to be a long shift. I've got three jobs, two of them legal, and one that actually pays.",
+  "f0": [
+   150,
+   350
+  ],
+  "name": "Heirframe · Mara Quill",
+  "fx": ""
+ },
+ "hira": {
+  "instruct": "A young woman, mid-twenties, bright and bubbly American accent, crisp and slightly over-enunciated like a customer-service chatbot, fast and upbeat, with a sing-song lift at the end of sentences.",
+  "ref": "Good morning, valued rider! Your HireFrame R-1 is fully charged and ready for another brighter day. Have you considered our premium plan?",
+  "f0": [
+   170,
+   400
+  ],
+  "fx": "highpass=f=350,lowpass=f=5200,acrusher=bits=10:mix=0.2",
+  "name": "Heirframe · HIRA"
+ },
+ "iris": {
+  "instruct": "A woman in her late sixties with a warm, clear British received-pronunciation accent. Sharp and intelligent, slightly frail but quick, kind with a dry wit, speaks like a professor who loves her students.",
+  "ref": "If you are hearing this, then you found it, and I am so very proud of you. Listen carefully, little star. There isn't much time, and there is so much I should have told you.",
+  "f0": [
+   150,
+   350
+  ],
+  "name": "Heirframe · Iris Vael",
+  "fx": ""
+ },
+ "dray": {
+  "instruct": "A man sounding in his sixties with a deep, smooth, resonant baritone and a polished mid-Atlantic accent. Slow, measured and paternal, like a beloved statesman giving a eulogy, never raising his voice.",
+  "ref": "Nobody here has ever gone hungry. Nobody here has ever been afraid. That is what we built, together. Surely a little quiet is a fair price for paradise.",
+  "f0": [
+   60,
+   150
+  ],
+  "name": "Heirframe · Archon Dray",
+  "fx": ""
+ },
+ "lyra": {
+  "instruct": "A woman in her mid-forties with a clear mezzo-soprano voice, slightly hoarse, neutral southern-English accent, determined and tender, speaks softly but with steel underneath.",
+  "ref": "Listen to me. Whatever they tell you about us, it isn't true. We tried to do the right thing. Be brave, and be kind, and whatever happens, keep going.",
+  "f0": [
+   150,
+   350
+  ],
+  "name": "Heirframe · Lyra Vael",
+  "fx": ""
+ },
+ "tomas": {
+  "instruct": "A man in his early thirties with a gentle, warm tenor and a light Scottish accent. Laughs easily, soft-spoken and kind, a little breathless and urgent when scared.",
+  "ref": "Ha! Did you see that? Tiny hand, iron grip. Oh, this one's going to be trouble, I can tell already. Come here, little star. Come here.",
+  "f0": [
+   80,
+   190
+  ],
+  "name": "Heirframe · Tomas Quill",
+  "fx": ""
+ },
+ "fenn": {
+  "instruct": "An elderly man around eighty with a soft, papery voice and a gentle Welsh lilt. Slow, careful and kind, with a slight tremor, like a retired librarian.",
+  "ref": "Ah. You have her eyes, you know. Please, sit down. Mind the roses. I have kept this garden for twenty-two years, and nobody has ever asked me why.",
+  "f0": [
+   70,
+   200
+  ],
+  "name": "Heirframe · Dr Abel Fenn",
+  "fx": ""
+ },
+ "kettle": {
+  "instruct": "A man in his late forties with a big gravelly bass voice and a broad East London Cockney accent. Boisterous, theatrical and jolly-menacing, like a gangster who thinks he's a comedian.",
+  "ref": "Oi oi! What have we got here, then? A little rental, all on its lonesome. That key's worth a family fortune, that is. Hand it over, there's a good sport.",
+  "f0": [
+   60,
+   140
+  ],
+  "name": "Heirframe · Big Kettle",
+  "fx": ""
+ },
+ "jun": {
+  "instruct": "A young woman of nineteen with a bright, quick soprano and a light Australian accent. Talks fast with nervous energy, clever and funny, drops into a whisper when excited.",
+  "ref": "Okay, okay, don't panic, I'm totally in. Well, mostly in. Three firewalls down, one to go. Can you maybe punch that guard slightly more quietly?",
+  "f0": [
+   170,
+   400
+  ],
+  "name": "Heirframe · Jun Okafor",
+  "fx": ""
+ },
+ "halloran": {
+  "instruct": "A woman in her mid-forties with a crisp, cool contralto and a neutral American accent. Clipped military cadence, precise and controlled, almost no emotion.",
+  "ref": "This is Warden-Captain Halloran. You are in violation of civic order. Lower your weapons, disconnect your Link, and kneel. I will not ask twice.",
+  "f0": [
+   135,
+   300
+  ],
+  "name": "Heirframe · Halloran",
+  "fx": ""
+ },
+ "rook": {
+  "instruct": "A man in his mid-thirties with a relaxed, smoky baritone and a gentle Jamaican English lilt. Unhurried and amused, philosophical, speaks like he has all the time in the world.",
+  "ref": "Relax, friend. Everybody comes to Rook eventually. Parts, rumours, a little truth if you can afford it. And truth, you know, is the expensive stuff.",
+  "f0": [
+   65,
+   175
+  ],
+  "name": "Heirframe · Rook",
+  "fx": ""
+ },
+ "elena": {
+  "instruct": "A woman in her fifties with a commanding but warm voice and a neutral American accent. Steady and authoritative, like a starship captain recording a log entry, tired but hopeful.",
+  "ref": "Captain's log, day one of the journey. Forty thousand souls asleep, and the rest of us awake and terrified. We will make it. We have to make it.",
+  "f0": [
+   150,
+   350
+  ],
+  "fx": "highpass=f=300,lowpass=f=3400[v];anoisesrc=c=pink:a=0.006:r=24000[n];[v][n]amix=inputs=2:duration=first:normalize=0",
+  "name": "Heirframe · Captain Elena Vael"
+ },
+ "helm": {
+  "instruct": "An androgynous synthetic voice in the mid range, perfectly even and calm, no accent, slow and precise with no emotion.",
+  "ref": "Renewal protocol active. State your lineage. The ship has waited. The ship will continue to wait. The ship does not forget.",
+  "f0": [
+   85,
+   280
+  ],
+  "fx": "aecho=0.8:0.5:23|37|53:0.3|0.2|0.12",
+  "name": "Heirframe · The Helm"
+ },
+ "sal": {
+  "instruct": "A man in his forties with a smooth, fast, cheerful tenor and a New York accent, a friendly used-car salesman.",
+  "ref": "Hey, hey, hey! Look at you, a rider with taste! Come on in. Every frame on this lot is certified, pre-owned, and practically brand new.",
+  "f0": [
+   85,
+   200
+  ],
+  "name": "Heirframe · Sal Venn",
+  "fx": ""
+ },
+ "ottoline": {
+  "instruct": "A woman in her sixties with a brisk, raspy voice and a Northern English Yorkshire accent. Blunt, practical and impatient, secretly fond.",
+  "ref": "Right. Put it on the bench. No, not like that. Honestly, what have you done to this poor thing? It's a precision machine, not a tin of beans.",
+  "f0": [
+   150,
+   350
+  ],
+  "name": "Heirframe · Ottoline Gearwright",
+  "fx": ""
+ },
+ "civ_f1": {
+  "instruct": "A woman in her thirties, light and pleasant, polished upper-class British accent, airy and carefree.",
+  "ref": "Oh, isn't it simply glorious today? We're taking the sky lane up to the Terraces for lunch. Darling, you really must come along.",
+  "f0": [
+   150,
+   350
+  ],
+  "name": "Heirframe · Civilian F1 (affluent)",
+  "fx": ""
+ },
+ "civ_m1": {
+  "instruct": "A man in his forties, relaxed and friendly, clean neutral American accent, pleasant mid-range.",
+  "ref": "Hey there, nice morning, isn't it? I just love this time of year. Well, every time of year, really. It's always perfect here.",
+  "f0": [
+   65,
+   175
+  ],
+  "name": "Heirframe · Civilian M1 (affluent)",
+  "fx": ""
+ },
+ "civ_f2": {
+  "instruct": "A tired woman in her twenties, flat and weary, working-class London accent, low energy.",
+  "ref": "Another double shift. Link in, link out, sleep in a pod, do it all again. Don't look at me like that. It's just how it is down here.",
+  "f0": [
+   150,
+   350
+  ],
+  "name": "Heirframe · Civilian F2 (Stacks)",
+  "fx": ""
+ },
+ "civ_m2": {
+  "instruct": "A man in his fifties, gravelly and resigned, Irish accent, mutters.",
+  "ref": "Forty years I've worked these docks. Forty years, and they still don't know my name. Doesn't matter. Nothing does, down here.",
+  "f0": [
+   65,
+   175
+  ],
+  "name": "Heirframe · Civilian M2 (Stacks)",
+  "fx": ""
+ },
+ "warden_m": {
+  "instruct": "A man in his thirties, firm and authoritative, neutral accent, police-radio cadence.",
+  "ref": "Unit seven to dispatch. Suspect is a rental frame, orange markings, heading north on Brightline. Requesting a cordon. Over.",
+  "f0": [
+   65,
+   175
+  ],
+  "fx": "highpass=f=400,lowpass=f=3200,acrusher=bits=11:mix=0.15",
+  "name": "Heirframe · Warden M"
+ },
+ "warden_f": {
+  "instruct": "A woman in her thirties, firm, clipped, neutral American accent, dispatch cadence.",
+  "ref": "Dispatch to all units. Civic alert in Aurum Plaza. Suspect is armed and unregistered. Use of force is authorised. Out.",
+  "f0": [
+   150,
+   350
+  ],
+  "fx": "highpass=f=400,lowpass=f=3200,acrusher=bits=11:mix=0.15",
+  "name": "Heirframe · Warden F"
+ },
+ "thug_m": {
+  "instruct": "A man in his twenties, cocky and aggressive, rough South London accent, shouty.",
+  "ref": "Oi! You! Yeah, you, in the tin can! This is Silverhand turf, mate. You want to walk through here, you pay the toll. Understand?",
+  "f0": [
+   75,
+   220
+  ],
+  "name": "Heirframe · Syndicate Thug M",
+  "fx": ""
+ },
+ "thug_f": {
+  "instruct": "A woman in her thirties, sharp and sneering, New Jersey accent, loud.",
+  "ref": "Well, look what crawled out of the rental lot. You lost, sweetie? 'Cause you're about to be real lost. Get 'em, boys!",
+  "f0": [
+   150,
+   350
+  ],
+  "name": "Heirframe · Syndicate Thug F",
+  "fx": ""
+ },
+ "unlinked": {
+  "instruct": "A young man in his twenties, intense whisper-shout, Scottish Glaswegian accent, urgent.",
+  "ref": "Keep your head down and keep moving! They're scanning the whole block. If they catch you with that key, we're all finished. Go!",
+  "f0": [
+   70,
+   220
+  ],
+  "name": "Heirframe · Unlinked Rebel",
+  "fx": ""
+ },
+ "harmony": {
+  "clone_of": "iris",
+  "speed": 0.92,
+  "fx": "chorus=0.6:0.9:50|60:0.3|0.25:0.25|0.4:2|2.3,aecho=0.8:0.7:140|290|460:0.32|0.22|0.12"
+ },
+ "seraph": {
+  "clone_of": "lyra",
+  "fx": "asplit[a][b];[b]asetrate=12000,aresample=24000,atempo=2.0,volume=0.25[lo];[a][lo]amix=inputs=2:normalize=0,aeval=val(0)*(0.75+0.25*sin(2*PI*55*t))"
+ },
+ "choir": {
+  "clone_of": "lyra",
+  "fx": "asplit=3[a][b][c];[b]asetrate=20182,aresample=24000,atempo=1.1892,volume=0.7[l];[c]asetrate=30238,aresample=24000,atempo=0.7937,volume=0.6[h];[a][l][h]amix=inputs=3:normalize=0:duration=first,aecho=0.8:0.6:90|180:0.3|0.2"
+ },
+ "hira_clean": {
+  "clone_of": "hira",
+  "fx": ""
+ },
+ "dray_gold": {
+  "clone_of": "dray",
+  "fx": "aecho=0.8:0.4:3:0.15"
+ },
+ "halloran_radio": {
+  "clone_of": "halloran",
+  "fx": "highpass=f=400,lowpass=f=3200,acrusher=bits=11:mix=0.15"
+ },
+ "iris_rec": {
+  "clone_of": "iris",
+  "fx": "highpass=f=180,lowpass=f=6500,aecho=0.8:0.3:12:0.15[v];anoisesrc=c=pink:a=0.003:r=24000[n];[v][n]amix=inputs=2:duration=first:normalize=0"
+ },
+ "harmony_glitch": {
+  "clone_of": "iris",
+  "speed": 0.9,
+  "fx": "tremolo=f=11:d=0.45,acrusher=bits=9:mix=0.3,chorus=0.6:0.9:50|60:0.3|0.25:0.25|0.4:2|2.3,aecho=0.8:0.7:140|290|460:0.32|0.22|0.12"
+ }
+}

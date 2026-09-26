@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HEIRFRAME Audio Test</title>
+<style>
+  :root { --bg: #0d1117; --panel: #161c26; --line: #2a3342; --text: #dfe6f0; --dim: #8a96a8; --gold: #ffd36b; --cyan: #5fe1ff; --bad: #ff6b6b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif; }
+  h1 { margin: 0 0 4px; font-size: 18px; letter-spacing: .08em; color: var(--gold); }
+  h2 { margin: 18px 0 6px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; }
+  button { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font: inherit; cursor: pointer; }
+  button:hover { border-color: var(--cyan); }
+  button.on { border-color: var(--gold); color: var(--gold); }
+  label { display: inline-flex; align-items: center; gap: 6px; margin-right: 12px; color: var(--dim); }
+  #info, #log { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px; white-space: pre-wrap; font: 12px/1.35 ui-monospace, monospace; max-height: 260px; overflow: auto; }
+  #meter { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+  #meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), var(--gold)); }
+  .bad { color: var(--bad); }
+</style>
+</head>
+<body>
+<h1>HEIRFRAME · AUDIO</h1>
+<div class="row"><button id="unlock">Unlock audio</button><button id="auto">Run auto test</button><button id="stopall">Stop music</button></div>
+<div id="meter"><i></i></div>
+<h2>Music states</h2><div class="row" id="states"></div>
+<h2>Stings</h2><div class="row" id="stings"></div>
+<h2>Ambient beds</h2><div class="row" id="beds"></div>
+<h2>Emitter (fountain orbiting the listener)</h2><div class="row"><button id="orbit">Toggle orbit</button></div>
+<h2>SFX (shift-click = 30 m to the right)</h2><div class="row" id="sfx"></div>
+<h2>Barks</h2><div class="row" id="barks"></div>
+<h2>Voice lines</h2><div class="row" id="vo"></div>
+<h2>Volumes</h2><div id="vols"></div>
+<h2>State</h2><div id="info"></div>
+<h2>Log</h2><div id="log"></div>
+<script type="module">
+import { audio } from '../js/audio/audio.js';
+
+const $ = (s) => document.querySelector(s);
+const logEl = $('#log');
+const errors = [];
+const log = (m, bad) => { const d = document.createElement('div'); d.textContent = m; if (bad) d.className = 'bad'; logEl.prepend(d); };
+addEventListener('error', (e) => { errors.push(String(e.message)); log('ERROR ' + e.message, true); });
+addEventListener('unhandledrejection', (e) => { errors.push(String(e.reason)); log('REJECT ' + e.reason, true); });
+
+const btn = (parent, label, fn) => { const b = document.createElement('button'); b.textContent = label; b.onclick = fn; $(parent).append(b); return b; };
+const D = audio.debug;
+
+$('#unlock').onclick = () => audio.unlock().then((ok) => log('unlock -> ' + ok));
+$('#stopall').onclick = () => audio.music(null);
+Object.keys(D.states).forEach((s) => btn('#states', s, () => audio.music(s)));
+['win', 'lose'].forEach((s) => btn('#stings', s, () => audio.sting(s)));
+btn('#beds', 'none', () => audio.ambient(null));
+D.beds.forEach((b) => btn('#beds', b, () => audio.ambient(b)));
+D.sfxNames.forEach((n) => btn('#sfx', n, (e) => audio.sfx(n, e.shiftKey ? { x: 30, z: 0 } : {})));
+
+let fountain = null, orbitT = 0;
+$('#orbit').onclick = () => {
+  if (fountain) { fountain.stop(); fountain = null; return; }
+  fountain = audio.emitter('fountain', { x: 8, z: 0 });
+};
+setInterval(() => { if (fountain) { orbitT += 0.05; fountain.setPos(Math.cos(orbitT) * 10, Math.sin(orbitT) * 10); } }, 50);
+
+fetch('../audio/vo/manifest.json').then((r) => r.json()).then((m) => {
+  const keys = Object.keys(m);
+  const prefixes = [...new Set(keys.map((k) => k.split('_')[0]))];
+  prefixes.forEach((p) => btn('#barks', p + '_*', () => audio.bark(p + '_', { force: true }).then((r) => log('bark ' + JSON.stringify(r)))));
+  keys.forEach((k) => btn('#vo', k, () => audio.vo(k).then((r) => log('vo ' + JSON.stringify(r)))).title = m[k].text);
+}).catch(() => log('no vo manifest yet'));
+
+const vols = audio.getVolumes();
+Object.keys(vols).forEach((k) => {
+  const l = document.createElement('label');
+  l.innerHTML = `${k} <input type="range" min="0" max="1" step="0.05" value="${vols[k]}">`;
+  l.querySelector('input').oninput = (e) => audio.setVolumes({ [k]: +e.target.value });
+  $('#vols').append(l);
+});
+
+setInterval(() => {
+  $('#info').textContent = JSON.stringify(D.info(), null, 1);
+  const db = D.level();
+  $('#meter i').style.width = Math.max(0, Math.min(100, (db + 60) * 1.8)) + '%';
+}, 200);
+
+// ---- automated pass --------------------------------------------------------------------------
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function peak(ms) {
+  let m = -Infinity;
+  for (let t = 0; t < ms; t += 25) { m = Math.max(m, D.level()); await sleep(25); }
+  return +m.toFixed(1);
+}
+
+async function autoTest() {
+  const R = { music: {}, stings: {}, sfx: {}, beds: {}, vo: {}, barks: {}, positional: {}, errors };
+  window.__audioTest = { done: false, results: R };
+  const ok = await audio.unlock();
+  R.unlocked = ok;
+  log('auto: unlocked ' + ok);
+  for (const s of Object.keys(D.states)) {
+    audio.music(s, { fade: 0.4 });
+    await sleep(900);
+    R.music[s] = { level: await peak(500), track: D.info().deck && D.info().deck.track, t: D.info().deck && D.info().deck.t };
+    log(`music ${s}: ${JSON.stringify(R.music[s])}`);
+  }
+  // loop point: jump near the end of the explore track; the playlist should roll to the next track
+  audio.music('explore', { fade: 0.3 });
+  await sleep(1000);
+  const first = D.info().deck.track;
+  D.loopNow(); // seeking needs HTTP Range, which the python dev server lacks
+  await sleep(2500);
+  R.loop = { from: first, to: D.info().deck.track, t: D.info().deck.t };
+  log('loop ' + JSON.stringify(R.loop));
+  audio.music(null, { fade: 0.3 });
+  await sleep(600);
+  for (const s of ['win', 'lose']) { audio.sting(s); R.stings[s] = await peak(900); }
+  await sleep(300);
+  for (const n of D.sfxNames) {
+    const len = audio.sfx(n);
+    R.sfx[n] = { len: +(len || 0).toFixed(2), peak: await peak(Math.min(700, (len || 0.2) * 1000 + 150)) };
+  }
+  audio.setListener(0, 0, 0);
+  audio.sfx('explosion', { x: 100, z: 0 });
+  R.positional.beyondMax = await peak(300);
+  R.positional.farRightLen = audio.sfx('melee_hit', { x: 30, z: 0, minGap: 0 });
+  R.positional.near = await peak(250);
+  for (const b of D.beds) { audio.ambient(b, { fade: 0.2 }); await sleep(700); R.beds[b] = await peak(300); }
+  audio.ambient(null, { fade: 0.2 });
+  const em = audio.emitter('waterfall', { x: 3, z: 0 });
+  await sleep(500); R.positional.emitterNear = await peak(300);
+  em.setPos(200, 0); await sleep(1200); R.positional.emitterFar = await peak(300);
+  em.stop();
+  audio.music('explore', { fade: 0.3 });
+  await sleep(1200);
+  const before = await peak(300);
+  const m = await (await fetch('../audio/vo/manifest.json')).json().catch(() => ({}));
+  const keys = Object.keys(m);
+  const pick = [keys[0], keys[Math.floor(keys.length / 2)], keys[keys.length - 1]].filter(Boolean);
+  for (const k of pick) {
+    const t0 = performance.now();
+    const p = audio.vo(k);
+    await sleep(400);
+    const during = D.info().ducks.slice();
+    const r = await p;
+    R.vo[k] = { ...r, wall: +((performance.now() - t0) / 1000).toFixed(2), manifestDur: m[k].duration, ducks: during };
+  }
+  R.vo._musicBefore = before;
+  R.vo.missing = await audio.vo('does_not_exist');
+  const barkP = ['sec_', 'civ_', 'hira'].filter((p) => keys.some((k) => k.startsWith(p)));
+  for (const p of barkP) { R.barks[p] = await audio.bark(p, { x: 4, z: 2 }); }
+  const [b1, b2] = await Promise.all([audio.bark('sec_'), audio.bark('sec_')]);
+  R.barks.pair = [b1, b2];
+  R.barks.cooldownOk = !(b1.ok && b2.ok);
+  audio.music('combat', { fade: 0.3 });
+  await sleep(800);
+  R.music.combatAfter = D.info().deck;
+  audio.setVolumes({ music: 0.55 });
+  audio.music(null);
+  R.engineErrors = D.errors.slice();
+  window.__audioTest.done = true;
+  log('auto: done ' + (errors.length + D.errors.length) + ' errors');
+}
+$('#auto').onclick = autoTest;
+if (new URLSearchParams(location.search).has('auto')) autoTest();
+</script>
+</body>
+</html>

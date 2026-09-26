@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>HEIRFRAME UI Kit</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #02060e; }
+  #bg { position: fixed; inset: 0; background: url(../refs/ref_boulevard_blue.png) center 40% / cover no-repeat; }
+  #bg.gold { background-image: url(../refs/ref_plaza_gold.png); }
+  #kit { position: fixed; left: 50%; bottom: 0; translate: -50% 0; z-index: 200; font: 600 12px system-ui, sans-serif; color: #dff; }
+  #kit > button { display: block; margin: 0 auto; padding: 4px 14px; border: 1px solid #5fd4ff88; border-bottom: 0; border-radius: 8px 8px 0 0; background: #04142ae0; color: #bff; font: inherit; letter-spacing: .15em; cursor: pointer; }
+  #kit .dock { display: none; flex-wrap: wrap; gap: 4px; width: min(880px, 96vw); max-height: 46vh; overflow: auto; padding: 8px; background: #04142af0; border: 1px solid #5fd4ff66; border-radius: 10px 10px 0 0; }
+  #kit.open .dock { display: flex; }
+  #kit .dock b { flex-basis: 100%; font-size: 10px; letter-spacing: .2em; color: #5fd4ff; margin-top: 4px; }
+  #kit .dock button { padding: 7px 10px; border-radius: 6px; border: 1px solid #5fd4ff55; background: #0b2a4a; color: #e8f8ff; font: inherit; cursor: pointer; }
+  #kit .dock button:active { background: #1d5a8a; }
+  body.nodock #kit { display: none; }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<div id="app"></div>
+<div id="kit"><button id="kitToggle">UI KIT</button><div class="dock"></div></div>
+<script type="module">
+import { ui } from '../js/ui/ui.js';
+import { ICONS } from '../js/ui/icons.js';
+
+const q = new URLSearchParams(location.search);
+if (q.get('dock') === '0') document.body.classList.add('nodock');
+if (q.get('bg') === 'gold') document.getElementById('bg').classList.add('gold');
+const mode = q.get('controls') || 'auto';
+ui.mount(document.getElementById('app'), { controls: mode });
+if (q.get('theme') === 'undercity') ui.theme('undercity');
+
+let seed = 7;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const pick = a => a[Math.floor(rnd() * a.length)];
+
+const hudState = {
+  hp: 86, hpMax: 120, shield: 0, shieldMax: 0, energy: 42, energyMax: 60,
+  level: 4, xp: 610, xpMax: 900, credits: 12450,
+  frame: { name: 'HireFrame R-1', kind: 'rental', tier: 0 },
+  heat: 1.6, district: 'Aurum Plaza', surcharge: 240, goal: 'Reach level 5 to unlock Pro contracts',
+  mission: { title: 'Signed, Sealed, Delivered', objective: 'Deliver the parcel to drop-locker twelve', progress: .4, count: '2/5', timer: 94 },
+  buffs: [{ id: 'ovc', icon: 'overclock', t: 6, tMax: 10, kind: 'buff' }, { id: 'shd', icon: 'shield', t: 14, tMax: 20, kind: 'buff', stacks: 2 }, { id: 'jam', icon: 'emp', t: 2.5, tMax: 5, kind: 'debuff' }],
+};
+ui.hud.set(hudState);
+ui.hud.badge('contracts', 3);
+ui.hud.badge('codex', 1);
+ui.controls.setAttack({ icon: 'baton', label: 'Shock Baton' });
+
+const skills = [
+  { id: 'r_zap', icon: 'pistol', label: 'Zap Pistol', cd: 0, cdMax: 3, cost: 10 },
+  { id: 'r_overclock', icon: 'overclock', label: 'Overclock', cd: 4.2, cdMax: 14 },
+  { id: 'r_sponsored', icon: 'advert', label: 'Sponsored Content', cd: 0, cdMax: 20, cost: 25, ready: false },
+];
+ui.skills.set(skills);
+let dodgeCd = 0;
+
+// minimap placeholder
+const mm = ui.hud.minimap;
+function drawMap(t) {
+  const d = devicePixelRatio || 1, w = mm.clientWidth * d, h = mm.clientHeight * d;
+  if (!w) return;
+  if (mm.width !== w) { mm.width = w; mm.height = h; }
+  const c = mm.getContext('2d');
+  c.clearRect(0, 0, w, h);
+  c.save(); c.translate(w / 2, h / 2); c.rotate(-t * .05);
+  c.strokeStyle = 'rgba(140,210,255,.35)'; c.lineWidth = 3 * d;
+  for (let i = -3; i <= 3; i++) { c.beginPath(); c.moveTo(i * 22 * d, -h); c.lineTo(i * 22 * d, h); c.stroke(); c.beginPath(); c.moveTo(-w, i * 26 * d); c.lineTo(w, i * 26 * d); c.stroke(); }
+  c.fillStyle = 'rgba(80,160,230,.25)';
+  for (let i = 0; i < 9; i++) c.fillRect(((i * 37) % 120 - 60) * d, ((i * 53) % 120 - 60) * d, 14 * d, 18 * d);
+  c.fillStyle = 'rgba(60,180,255,.35)'; c.beginPath(); c.ellipse(24 * d, -30 * d, 16 * d, 9 * d, .4, 0, 7); c.fill();
+  const blip = (x, y, col, r = 3) => { c.fillStyle = col; c.shadowColor = col; c.shadowBlur = 6 * d; c.beginPath(); c.arc(x * d, y * d, r * d, 0, 7); c.fill(); c.shadowBlur = 0; };
+  blip(-20, 14, '#ff5a6e'); blip(-26, 20, '#ff5a6e'); blip(18, 22, '#e8f4ff', 2); blip(-8, -24, '#e8f4ff', 2);
+  c.restore();
+  c.fillStyle = '#ffd27a'; c.save(); c.translate(w * .78, h * .3); c.rotate(Math.PI / 4); c.fillRect(-4 * d, -4 * d, 8 * d, 8 * d); c.restore();
+}
+
+let last = performance.now(), T = 0, ang = 0;
+function loop(now) {
+  const dt = Math.min(.1, (now - last) / 1000); last = now; T += dt;
+  for (const s of skills) s.cd = Math.max(0, s.cd - dt);
+  ui.skills.set(skills);
+  dodgeCd = Math.max(0, dodgeCd - dt); ui.skills.dodge(dodgeCd, 1.2);
+  hudState.buffs.forEach(b => { b.t -= dt; if (b.t <= 0) b.t = b.tMax; });
+  if (hudState.mission) hudState.mission.timer = Math.max(0, hudState.mission.timer - dt);
+  hudState.energy = Math.min(hudState.energyMax, hudState.energy + dt * 4);
+  ui.hud.set({ buffs: hudState.buffs, mission: { ...hudState.mission }, energy: hudState.energy });
+  ui.hud.heading(T * .05);
+  drawMap(T);
+  const m = ui.controls.move;
+  if (m.x || m.y) ang += dt * 1.5 * m.x;
+  if (!q.get('nomarker')) {
+    const a = T * .35 + ang, W = innerWidth, H = innerHeight;
+    const sx = W / 2 + Math.cos(a) * W * .75, sy = H / 2 + Math.sin(a) * H * .6;
+    const on = sx > 40 && sx < W - 40 && sy > 40 && sy < H - 40;
+    ui.marker.set(sx, sy, on, 'Pier 9', 140 + Math.sin(T) * 20);
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+ui.on('skill', id => { const s = skills.find(x => x.id === id); s.cd = s.cdMax; burst(1); });
+ui.on('attack', () => burst(1));
+ui.on('dodge', () => { dodgeCd = 1.2; });
+ui.on('tap', p => ui.damage(p.x, p.y - 30, 'MOVE', 'miss'));
+
+const ITEMS = [
+  { id: 'i1', name: 'Shock Baton', rarity: 0, slot: 'weapon', icon: 'baton', level: 1, fr: 12, stats: { weaponDamage: 5 }, element: 'shock', value: 12, tune: 0 },
+  { id: 'i2', name: 'Civic Carbine', rarity: 1, slot: 'weapon', icon: 'carbine', level: 3, fr: 24, stats: { weaponDamage: 9, critChance: .02 }, element: 'kinetic', value: 180, tune: 1 },
+  { id: 'i3', name: 'Targeting Array', rarity: 2, slot: 'optics', level: 4, fr: 31, stats: { critChance: .06, critDmg: .15 }, affixes: ['+12% damage vs. drones'], value: 520, tune: 2, tuneCost: { credits: 340, scrap: 12, circuitry: 2 }, tuneChance: .85, salvage: { scrap: 6, circuitry: 1 } },
+  { id: 'i4', name: 'Gilded Carapace', rarity: 3, slot: 'chassis', level: 6, fr: 58, stats: { armor: 22, hp: 64 }, affixes: ['Reflect 12% melee damage', '+15% shield regen'], value: 1400, tune: 3, tuneCost: { credits: 900, scrap: 20, circuitry: 6 }, tuneChance: .72, salvage: { scrap: 10, circuitry: 3 } },
+  { id: 'i5', name: 'Aegis Reactor', rarity: 6, slot: 'core', level: 7, fr: 96, stats: { energy: 24, shield: 60, enRegen: .18 }, affixes: ['Skills cost 20% less energy', 'Set: Aurel’s Oath (1/3)', 'Starburst on shield break', '+10% skill damage'], flavor: 'Serial plate reads VN-0001. Someone filed off the maker’s mark, carefully.', value: 9800, tune: 4, tuneCost: { credits: 4200, scrap: 40, flux: 6, shards: 2 }, tuneChance: .55, salvage: { scrap: 30, flux: 4, shards: 3 } },
+  { id: 'i6', name: 'Skipjack Spring Actuators', rarity: 5, slot: 'mobility', level: 6, fr: 74, stats: { movePct: .12, armor: 6 }, affixes: ['Dodge leaves a decoy hologram', 'Relic: Kinetic Battery'], value: 3600 },
+  { id: 'i7', name: 'Quiet Daemon Chip', rarity: 4, slot: 'chip', level: 5, fr: 49, stats: { cdr: .08, energy: 10 }, affixes: ['Sponsored Content lasts +1s', 'Hack speed +25%', '+6% loot luck'], value: 1640, isNew: true, better: true },
+  { id: 'i8', name: 'Ion Rail Coil', rarity: 4, slot: 'weapon', icon: 'rail', level: 6, fr: 64, stats: { weaponDamage: 16, critChance: .04 }, element: 'ion', affixes: ['Ion: ×1.5 vs shields', 'Pierces one target', '+8% crit damage'], value: 2100, isNew: true },
+  { id: 'i9', name: 'Scrap Plating', rarity: 0, slot: 'chassis', level: 1, fr: 6, stats: { armor: 5, hp: 12 }, value: 12, qty: 3 },
+  { id: 'i10', name: 'Optic Lens', rarity: 1, slot: 'optics', level: 3, fr: 18, stats: { critChance: .03 }, value: 90 },
+  { id: 'i11', name: 'Brighter Future', rarity: 5, slot: 'chip', level: 7, fr: 81, stats: { energy: 14, cdr: .1 }, affixes: ['Relic: kills restore 3% HP', 'Etched: HARMONY THROUGH UNITY'], value: 4100 },
+  { id: 'i12', name: 'Servo Legs', rarity: 2, slot: 'mobility', level: 2, fr: 20, stats: { movePct: .05 }, affixes: ['+4 armor'], value: 60 },
+  { id: 'i13', name: 'Logic Chip', rarity: 1, slot: 'chip', level: 1, fr: 8, stats: {}, affixes: [], value: 5 },
+];
+const byId = id => ITEMS.find(i => i.id === id);
+const warehouse = {
+  credits: 12450, active: 'rental', invMax: 60,
+  materials: { scrap: 146, circuitry: 18, flux: 4, shards: 1 },
+  frames: [
+    { id: 'rental', kind: 'rental', rental: true, name: 'HireFrame R-1', model: 'HireFrame R-1', level: 4, fr: 44, stats: { hp: 120, shield: 0, energy: 60, armor: 5, moveSpeed: 4.2, critChance: .05, critDmg: 1.5, dodgeCd: 4 }, slots: { weapon: byId('i1'), chip: byId('i13') } },
+    { id: 'bulwark', kind: 'brawler', name: 'Bulwark', model: 'Bulwark G-7', mk: 2, mkMax: 6, mkCost: 4000, sync: 3, level: 4, fr: 212, stats: { hp: 286, shield: 66, energy: 80, armor: 34, moveSpeed: 3.8, critChance: .05, critDmg: 1.5, dodgeCd: 3.5 }, slots: { chassis: byId('i4'), core: byId('i5'), weapon: null, optics: null, mobility: null, chip: null } },
+  ],
+  shop: [
+    { kind: 'gunner', name: 'Longarm', model: 'Longarm V-3', price: 12000 },
+    { kind: 'ghost', name: 'Wisp', model: 'Wisp S-9', price: 12000 },
+  ],
+  inventory: ITEMS.filter(i => !['i1', 'i13', 'i4', 'i5'].includes(i.id)),
+};
+
+const CLIENTS = [['Mara Quill', 'Fixer, Aurum Plaza', 'human', 7], ['Dr. Imre Castellan', 'Nexus Biotech', 'human', 12], ['"Magpie"', 'Unlinked', 'black', 3], ['Warden Rhee', 'Concord', 'gold', 9], ['Dock Boss Oyelaran', 'Freehaul Union', 'chrome', 5], ['HireFrame Recovery', 'Nexus', 'rental', 1]];
+const LOCS = [['Drop-locker 12', 'Aurum Plaza'], ['Fountain Terraces', 'Aurum Plaza'], ['Meridian Spire, fl. 88', 'Crown Heights'], ['Monorail Loop C', 'Promenade'], ['Pipe Canyon 4', 'The Stacks'], ['Pier 9', 'Portside']];
+const MODS = [['Stealth bonus', 'good'], ['Civilians nearby', 'neutral'], ['Armoured target', 'bad'], ['Night shift ×1.3', 'good'], ['Drone patrols', 'bad'], ['No frame swaps', 'bad'], ['Fragile cargo', 'bad'], ['Ally support', 'good']];
+const ARCH = ['courier', 'pest', 'surveil', 'bounty', 'escort', 'sabotage', 'tail'];
+const TITLES = ['Signed, Sealed, Delivered', 'Rats in the Fountain', 'Eyes on the Spire', 'Wanted: "Rustjaw"', 'Fragile Company', 'Lights Out, Loop C', 'Shadow the Courier'];
+const GRADES = ['street', 'street', 'pro', 'pro', 'elite', 'street', 'black'];
+const contracts = [
+  { id: 'c0', title: 'The Heir-Key', archetype: 'courier', story: true, level: 5, payout: 6000, xp: 800, client: { name: 'Mara Quill', org: 'Fixer, Aurum Plaza', kind: 'human', seed: 7, hue: 30 }, location: 'Drop-locker 12', district: 'Aurum Plaza', modifiers: [{ label: 'Story', kind: 'neutral' }, { label: 'Handle with care', kind: 'bad' }], timeLimit: null },
+  ...ARCH.map((type, i) => {
+    const [cn, org, kind, seed] = CLIENTS[i % CLIENTS.length], [loc, dist] = LOCS[i % LOCS.length];
+    const d = 1 + (i * 2) % 5;
+    return {
+      id: `c${i + 1}`, archetype: type, grade: GRADES[i], difficulty: d, level: 3 + d, payout: 800 + d * 900 + i * 55, bonus: i % 3 === 0 ? 400 : 0, xp: 120 + d * 90,
+      title: TITLES[i], suits: i === 1 ? 'Rental' : null,
+      client: { name: cn, org, kind, seed },
+      location: loc, district: dist, timeLimit: i % 2 ? 240 + i * 30 : null,
+      modifiers: [MODS[i % MODS.length], MODS[(i + 3) % MODS.length]].map(([label, kind]) => ({ label, kind })),
+    };
+  }),
+];
+const board = { contracts, rerollCost: 150, refreshIn: 761, threat: 'tense', threats: [{ id: 'calm', name: 'Calm' }, { id: 'tense', name: 'Tense' }, { id: 'hostile', name: 'Hostile', locked: true }, { id: 'lethal', name: 'Lethal', locked: true }] };
+
+// Early Act 2 codex state: unknown nodes carry no names so nothing is spoiled.
+const codex = {
+  chapter: 'Act II · The Unpersoned',
+  people: [
+    { id: 'n_founder', gen: 0, state: 'unknown' },
+    { id: 'n_gap', gen: 1, collapsed: true, label: 'Generations', parents: ['n_founder'], state: 'unknown' },
+    { id: 'n_gp1', gen: 2, state: 'unknown', parents: ['n_gap'], partner: 'n_gp2', need: 3, hint: 'A name scratched off every plaque in the Terraces.' },
+    { id: 'n_gp2', gen: 2, state: 'unknown', partner: 'n_gp1', need: 3, hint: 'An old photograph of a young engineer. The face is familiar.' },
+    { id: 'n_mother', gen: 3, state: 'rumoured', name: '? Vael', parents: ['n_gp1', 'n_gp2'], partner: 'n_father', need: 4, hint: 'The genome match said VAEL. Someone carried you out of Meridian.' },
+    { id: 'n_father', gen: 3, state: 'revealed', name: 'Tomas Quill', role: 'Father', years: 'died in the Sundering', partner: 'n_mother', portrait: { kind: 'human', seed: 23, hue: 205 }, bio: 'A memory shard from the Meridian attack. He held the door, and hummed the lullaby while he did it.' },
+    { id: 'wren', gen: 4, state: 'revealed', name: 'Wren Vael', role: 'Heir', years: 'Ward of Harmony #4471', you: true, parents: ['n_father', 'n_mother'], portrait: { kind: 'rental' }, bio: 'Aged out of the Wards with a debt and no surname. Now has a surname, and considerably more trouble.' },
+  ],
+  clues: [
+    { id: 'C01', title: 'The Heir-Key', source: 'A1 · Drop-locker 12', text: 'A star-shaped data key, warm to the touch. "Happy birthday, little star."', personId: 'wren', icon: 'heir' },
+    { id: 'C02', title: 'Tinsel’s Scan', source: 'A1 · Scrap market', text: 'Fragment: …AEL — HEIR PROTOCOL — ACCESS DENIED.', personId: 'n_mother', icon: 'scan' },
+    { id: 'C03', title: 'Stuttering Billboard', source: 'A1 · Boulevard', text: 'A Harmony billboard glitched and said "little star". Probably nothing.', icon: 'advert' },
+    { id: 'C05', title: 'The Vael Star', source: 'A1 · Civic records', text: 'Eight-pointed star, erased from every plaque in the city.', icon: 'star' },
+    { id: 'C07', title: 'Tomas’s Shard', source: 'A2 · Arcology archive', text: '"I’ll hold the door." My father. He hummed my lullaby.', personId: 'n_father', icon: 'talk', new: true },
+    { found: false }, { found: false }, { found: false },
+  ],
+  places: [
+    { id: 'p1', name: 'Aurum Plaza', district: 'Surface · Tier 1', text: 'Gold terraces, cascading waterfalls, and a statue nobody can name.', icon: 'pin' },
+    { id: 'p2', name: 'Lullaby Rest, Pod 4471', district: 'The Stacks', text: 'Coffin-pod hostel. Home, technically.', icon: 'defend' },
+    { id: 'p3', name: 'Memorial Garden', district: 'The Terraces', text: 'The plaques are blank. The flowers are very well kept.', icon: 'heal', new: true },
+    { found: false, district: 'Hullside' },
+  ],
+};
+
+const lines = [
+  { speaker: 'Mara Quill', role: 'Fixer · Aurum Plaza', portrait: { kind: 'human', seed: 7, hue: 30 }, text: 'You’re flying a HireFrame R-1. Brave, or broke. I’m guessing broke.' },
+  { speaker: 'Mara Quill', role: 'Fixer · Aurum Plaza', portrait: { kind: 'human', seed: 7, hue: 30 }, text: 'One parcel, one locker, no questions. Pays enough to cover the rental. Mostly.', choices: ['What’s in the parcel?', 'What’s the payout?', { text: 'Not today.', tag: 'Leave' }] },
+];
+const lines2 = [
+  { speaker: 'HIRA', role: 'HireFrame Interactive Rental Assistant', portrait: { kind: 'rental' }, text: 'Hi! I’m HIRA! Your rental includes premium roadside assistance and zero dignity! Let’s get to work!' },
+  { speaker: 'Warden Eye', role: 'Concord', portrait: { kind: 'gold', seed: 9 }, text: 'Citizen. Your rental licence expired four minutes ago. Please remain calm.' },
+  { speaker: 'Unknown Recording', role: 'Heir-Key', portrait: { kind: 'unknown', hue: 45 }, text: 'Happy birthday, little star. Don’t let them see this.', choices: ['…little star?', 'Who is this?'] },
+];
+
+function burst(n = 6) {
+  const W = innerWidth, H = innerHeight;
+  const kinds = ['normal', 'normal', 'normal', 'crit', 'shield', 'heal', 'player', 'miss', 'energy'];
+  for (let i = 0; i < n; i++) setTimeout(() => {
+    const k = n === 1 ? pick(['normal', 'normal', 'crit']) : kinds[i % kinds.length];
+    const amt = k === 'crit' ? 180 + Math.floor(rnd() * 200) : k === 'heal' ? 24 : 20 + Math.floor(rnd() * 70);
+    ui.damage(W * (.35 + rnd() * .3), H * (.35 + rnd() * .25), amt, k);
+  }, i * 90);
+}
+
+let toastI = 0;
+const TOASTS = [
+  ['Contract accepted', 'good', { sub: 'Signed, Sealed, Delivered' }], ['Heat rising', 'warn', { sub: 'Warden Eyes are converging' }],
+  ['+2,400 credits', 'gold'], ['Frame integrity critical', 'bad'], ['Codex updated: The Heir-Key', 'story', { sub: 'Clue C01 recovered' }], ['Checkpoint reached', 'info'],
+];
+const complete = { title: 'Signed, Sealed, Delivered', grade: 'S', credits: 3250, bonus: 400, xp: 420, xpFrom: 610, xpMax: 900, level: 4, levelUp: true, items: [ITEMS[7], ITEMS[6], ITEMS[4], ITEMS[1]], stats: [{ label: 'Time', value: '3:12' }, { label: 'Hostiles disabled', value: 11 }, { label: 'Civilians harmed', value: 0 }, { label: 'Max heat', value: '2 / 5' }] };
+
+const A = {
+  hud: () => { ui.panel.close(); ui.screen(null); ui.dialogue.close(); },
+  toast: () => { const t = TOASTS[toastI++ % TOASTS.length]; ui.toast(...t); },
+  loot: () => ui.loot([{ credits: 240 }, pick(ITEMS.slice(0, 3)), ITEMS[6], ITEMS[7]]),
+  heirloom: () => ui.loot([ITEMS[4], { credits: 1200 }]),
+  relic: () => ui.loot([ITEMS[10]]),
+  damage: () => burst(9),
+  dialogue: async () => { const c = await ui.dialogue.play(lines); ui.toast(`Choice ${c + 1}`, 'info'); },
+  dialogue2: () => ui.dialogue.play(lines2),
+  contracts: () => ui.panel.open('contracts', board),
+  warehouse: () => ui.panel.open('warehouse', warehouse),
+  frames: () => ui.panel.open('warehouse', { ...warehouse, tab: 'frames' }),
+  fabricator: () => ui.panel.open('warehouse', { ...warehouse, tab: 'fabricator' }),
+  codex: () => ui.panel.open('codex', codex),
+  clues: () => { ui.panel.open('codex', codex); document.querySelector('.cx-tab[data-t="clues"]')?.click(); },
+  people: () => { ui.panel.open('codex', codex); document.querySelector('.cx-tab[data-t="people"]')?.click(); },
+  boss: () => { let hp = 2400; ui.boss.set({ name: 'Big Kettle', title: 'Syndicate Captain', hp, max: 2400, shield: 300, shieldMax: 400, phases: 3, phase: 1 }); clearInterval(A._bt); A._bt = setInterval(() => { hp -= 90; if (hp <= 0) { clearInterval(A._bt); ui.boss.hide(); return; } ui.boss.set({ hp, shield: Math.max(0, 300 - (2400 - hp) / 2), phase: hp > 1600 ? 1 : hp > 800 ? 2 : 3, enraged: hp < 500 }); }, 500); },
+  bossStatic: () => ui.boss.set({ name: 'Big Kettle', title: 'Syndicate Captain', hp: 1450, max: 2400, shield: 120, shieldMax: 400, phases: 3, phase: 2 }),
+  detect: () => { let v = 0; clearInterval(A._dt); A._dt = setInterval(() => { v += .04; const W = innerWidth, H = innerHeight; ui.detect.set('w1', W * .62, H * .42, Math.min(1, v)); ui.detect.set('w2', W + 200, H * .3, Math.min(1, v * .6)); if (v > 1.6) { clearInterval(A._dt); ui.detect.clear(); } }, 100); },
+  detectStatic: () => { const W = innerWidth, H = innerHeight; ui.detect.set('w1', W * .6, H * .45, .55); ui.detect.set('w2', W + 200, H * .25, .3); ui.detect.set('w3', W * .42, H * .5, 1); },
+  lens: () => { ui.lens.show({ label: 'Photograph the courier', count: '1 / 3' }); let p = 0; clearInterval(A._lt); A._lt = setInterval(() => { p += .05; ui.lens.target(innerWidth * .56, innerHeight * .52, 96, { label: 'Syndicate courier', dist: 23 }); ui.lens.progress(Math.min(1, p)); if (p > 1.3) { clearInterval(A._lt); ui.lens.flash(); ui.lens.count('2 / 3'); } }, 80); },
+  lensStatic: () => { ui.lens.show({ label: 'Photograph the courier', count: '1 / 3' }); ui.lens.target(innerWidth * .56, innerHeight * .52, 96, { label: 'Syndicate courier', dist: 23 }); ui.lens.progress(.62); },
+  band: () => { let t = 0; clearInterval(A._bd); A._bd = setInterval(() => { t += .05; const v = 13 + Math.sin(t) * 12; ui.band.set({ value: v, min: 0, max: 30, lo: 5, hi: 22, label: 'Target distance' }); if (t > 12) { clearInterval(A._bd); ui.band.hide(); } }, 50); },
+  twist: () => ui.sting('The client lied', 'The "courier" is the target. Mara is on comms.', 'twist'),
+  levelSting: () => ui.sting('Level 5', 'Pro contracts unlocked · fully repaired', 'level'),
+  heir: () => { skills[3] = skills[3] ? undefined : { id: 'heir', icon: 'heir', label: 'Heir Protocol', cd: 0, cdMax: 60 }; if (!skills[3]) skills.length = 3; },
+  settings: () => ui.panel.open('settings'),
+  pause: () => ui.panel.open('pause', { mission: hudState.mission, playtime: '2h 14m' }),
+  title: () => ui.screen('title', { hasSave: true, version: 'v0.1 · kit' }),
+  loading: () => { ui.screen('loading', { progress: .15 }); let p = .15; const t = setInterval(() => { p += .07; ui.loading(p); if (p >= 1) { clearInterval(t); ui.screen(null); } }, 300); },
+  loadingStatic: () => ui.screen('loading', { progress: .62, label: 'Streaming district · Aurelia' }),
+  rotate: () => ui.screen('rotate'),
+  complete: () => ui.screen('complete', complete),
+  death: () => ui.screen('death', { cause: 'Hull breach · Civic Enforcer "Warden-9"', cost: 850, tip: 'Enforcers telegraph their charge. Dodge sideways, not back.' }),
+  card: () => ui.itemCard(ITEMS[7], ITEMS[0]),
+  interact: () => { if (A._i = !A._i) ui.interact.show('Talk to Mara', { icon: 'talk' }); else ui.interact.hide(); },
+  hit: () => { hudState.hp = Math.max(0, hudState.hp - 22); hudState.shield = Math.max(0, hudState.shield - 15); ui.hud.set({ hp: hudState.hp, shield: hudState.shield }); ui.hud.flash('hit'); ui.damage(innerWidth / 2, innerHeight / 2, 22, 'player'); },
+  heal: () => { hudState.hp = hudState.hpMax; hudState.shield = hudState.shieldMax; ui.hud.set({ hp: hudState.hp, shield: hudState.shield }); ui.hud.flash('heal'); },
+  levelup: () => { hudState.level++; ui.hud.set({ level: hudState.level, xp: 40 }); ui.sting(`Level ${hudState.level}`, 'Fully repaired · new contracts on the board', 'level'); },
+  credits: () => { hudState.credits += 2400; ui.hud.set({ credits: hudState.credits }); },
+  heatUp: () => { hudState.heat = Math.min(5, hudState.heat + 1); ui.hud.set({ heat: hudState.heat }); },
+  heatDown: () => { hudState.heat = Math.max(0, hudState.heat - 1); ui.hud.set({ heat: hudState.heat }); },
+  noMission: () => ui.hud.set({ mission: (hudState.mission = hudState.mission ? null : { title: 'Eyes on the Spire', objective: 'Photograph the courier', progress: .1, count: '0/3', timer: 25 }) }),
+  frame: () => {
+    const F = [
+      [{ name: 'Bulwark G-7', kind: 'brawler' }, 'fist', [['b_slam', 'slam', 30], ['b_charge', 'charge', 25], ['b_bulwark', 'wall', 35]], { hp: 260, hpMax: 260, shield: 60, shieldMax: 60, energyMax: 80, surcharge: 0 }],
+      [{ name: 'Longarm V-3', kind: 'gunner' }, 'carbine', [['g_scatter', 'scatter', 20], ['g_rail', 'rail', 35], ['g_turret', 'turret', 40]], { hp: 180, hpMax: 180, shield: 100, shieldMax: 100, energyMax: 100, surcharge: 0 }],
+      [{ name: 'Wisp S-9', kind: 'ghost' }, 'blade', [['h_veil', 'veil', 30], ['h_blink', 'blink', 20], ['h_pulse', 'hack', 45]], { hp: 150, hpMax: 150, shield: 50, shieldMax: 50, energyMax: 120, surcharge: 0 }],
+      [{ name: 'HireFrame R-1', kind: 'rental' }, 'baton', [['r_zap', 'pistol', 10], ['r_overclock', 'overclock', 0], ['r_sponsored', 'advert', 25]], { hp: 86, hpMax: 120, shield: 0, shieldMax: 0, energyMax: 60, surcharge: 240 }],
+    ];
+    A._f = ((A._f ?? 3) + 1) % 4;
+    const [frame, atk, sk, st] = F[A._f];
+    ui.hud.set({ frame, ...st }); ui.controls.setAttack({ icon: atk });
+    sk.forEach(([id, ic, cost], i) => Object.assign(skills[i], { id, icon: ic, cost, cd: 0, ready: true }));
+  },
+  theme: () => { A._u = !A._u; ui.theme(A._u ? 'undercity' : 'surface'); },
+  bg: () => document.getElementById('bg').classList.toggle('gold'),
+};
+
+ui.on('contracts', A.contracts);
+ui.on('warehouse', A.warehouse);
+ui.on('codex', A.codex);
+ui.on('pause', A.pause);
+ui.on('interact', () => A.dialogue());
+ui.on('contract:accept', c => { ui.toast('Contract accepted', 'good', { sub: c.title }); ui.hud.set({ mission: (hudState.mission = { title: c.title, objective: `Travel to ${c.location}`, progress: 0, count: '0/1', timer: c.timeLimit }) }); });
+ui.on('warehouse:equip', ({ frameId, itemId }) => {
+  const f = warehouse.frames.find(x => x.id === frameId), it = byId(itemId);
+  const old = f.slots[it.slot];
+  f.slots[it.slot] = it;
+  warehouse.inventory = warehouse.inventory.filter(x => x.id !== itemId).concat(old ? [old] : []);
+  ui.panel.update(warehouse); ui.toast(`Equipped ${it.name}`, 'good');
+});
+ui.on('warehouse:salvage', ({ itemId }) => { const it = byId(itemId); warehouse.inventory = warehouse.inventory.filter(x => x.id !== itemId); warehouse.materials.scrap += 6; ui.panel.update(warehouse); ui.toast(`Salvaged ${it.name}`, 'gold', { sub: '+6 Scrap Alloy' }); });
+ui.on('warehouse:activate', ({ frameId }) => { warehouse.active = frameId; const f = warehouse.frames.find(x => x.id === frameId); ui.hud.set({ frame: f }); ui.panel.update(warehouse); ui.toast(`${f.name} deployed`, 'good'); });
+ui.on('warehouse:buy', () => ui.toast('Not enough credits', 'bad', { sub: '25,000 cr required' }));
+ui.on('warehouse:autoEquip', () => ui.toast('Best FR equipped', 'good'));
+ui.on('loot:inspect', it => ui.itemCard(it, warehouse.frames[0].slots[it.slot]));
+if (q.get('static')) setTimeout(() => (q.get('static').split(',')).forEach(k => A[k] && A[k]()), 80);
+ui.on('pause:quit', A.title);
+ui.on('lens:capture', () => { ui.lens.flash(); });
+ui.on('lens:close', () => { clearInterval(A._lt); ui.lens.hide(); });
+ui.on('loot:equip', it => ui.toast(`Equipped ${it.name}`, 'good', { sub: 'Frame Rating ▲' }));
+ui.on('contract:threat', t => { board.threat = t; ui.panel.update(board); });
+ui.on('warehouse:tune', ({ itemId }) => { const it = byId(itemId); it.tune = (it.tune || 0) + 1; ui.panel.update(warehouse); ui.toast(`Tuned to +${it.tune}`, 'good', { sub: it.name }); });
+ui.on('warehouse:mk', () => ui.toast('Not enough credits', 'bad', { sub: '4,000 cr required' }));
+ui.on('death:warehouse', A.warehouse);
+
+const dock = document.querySelector('#kit .dock');
+const groups = {
+  Screens: ['hud', 'title', 'loading', 'rotate', 'complete', 'death'],
+  Panels: ['contracts', 'warehouse', 'codex', 'clues', 'settings', 'pause'],
+  Panels2: ['frames', 'fabricator', 'people'],
+  Feedback: ['toast', 'loot', 'relic', 'heirloom', 'damage', 'card', 'interact', 'dialogue', 'dialogue2', 'twist', 'levelSting'],
+  Combat: ['boss', 'detect', 'lens', 'band', 'heir'],
+  HUD: ['hit', 'heal', 'levelup', 'credits', 'heatUp', 'heatDown', 'noMission', 'frame', 'theme', 'bg'],
+};
+for (const [g, list] of Object.entries(groups)) {
+  dock.insertAdjacentHTML('beforeend', `<b>${g}</b>`);
+  for (const k of list) { const b = document.createElement('button'); b.textContent = k; b.onclick = () => A[k](); dock.append(b); }
+}
+document.getElementById('kitToggle').onclick = () => document.getElementById('kit').classList.toggle('open');
+
+window.__kit = { A, ui, ITEMS, ICONS, hudState };
+window.__game = { ui: () => ui.debug() };
+const st = q.get('state');
+if (st && A[st]) setTimeout(() => A[st](), 50);
+</script>
+</body>
+</html>

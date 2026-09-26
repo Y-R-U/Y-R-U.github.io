@@ -1,0 +1,267 @@
+{
+ "a1_s00_harmony_01": {
+  "score": 0.93,
+  "heard": "Good morning, Halcyon. Renewable day is 100 days away. 225 years of unity. The journey continues.",
+  "text": "Good morning, Halcyon. Renewal Day is one hundred days away. Two hundred and twenty-five years of unity. The journey continues."
+ },
+ "a1_s00_hira_01": {
+  "score": 0.81,
+  "heard": "Good morning, valued rider. Welcome to higher frame. Your R1 is ready for another brighter day.",
+  "text": "Good morning, valued rider! Welcome to HireFrame. Your R-1 is ready for another brighter day!"
+ },
+ "a1_s00_hira_02": {
+  "score": 1.0,
+  "heard": "Link stable! Latency! Zero milliseconds! Wow! That's unusually good! Anyway!",
+  "text": "Link stable. Latency: zero milliseconds! Wow, that's... unusually good. Anyway!"
+ },
+ "a1_s00_hira_03": {
+  "score": 1.0,
+  "heard": "Tip! Drag the left side of the screen to walk. Tap anywhere to go there. Walking is included in your plan.",
+  "text": "Tip! Drag the left side of the screen to walk. Tap anywhere to go there. Walking is included in your plan!"
+ },
+ "a1_s00_mara_01": {
+  "score": 0.87,
+  "heard": "Ren, its Mara, Quill contracts, the kiosk by the fountain. You said you wanted work.",
+  "text": "Wren? It's Mara. Quill Contracts, the kiosk by the fountain. You said you wanted work."
+ },
+ "a1_s00_mara_02": {
+  "score": 1.0,
+  "heard": "I've got a parcel that needs legs. Yours are rented but they'll do.",
+  "text": "I've got a parcel that needs legs. Yours are rented, but they'll do."
+ },
+ "a1_s01_hira_01": {
+  "score": 0.89,
+  "heard": "Parcel acquired. Did you know higher frame premium riders get a complimentary shoulder bag?",
+  "text": "Parcel acquired! Did you know HireFrame Premium riders get a complimentary shoulder bag?"
+ },
+ "a1_s01_mara_01": {
+  "score": 0.88,
+  "heard": "Locker 7 Northside. Grab the parcel, walk it to drop Locker 12. Don't open it, don't drop it, don't sell it.",
+  "text": "Locker seven, north side. Grab the parcel, walk it to drop-locker twelve. Don't open it, don't drop it, don't sell it."
+ },
+ "a1_s02_hira_01": {
+  "score": 1.0,
+  "heard": "Uh oh! Scrap rats! Tap attack to swing your baton! Please do not get them on the upholstery!",
+  "text": "Uh-oh! Scrap rats! Tap attack to swing your baton. Please do not get them on the upholstery."
+ },
+ "a1_s02_mara_01": {
+  "score": 1.0,
+  "heard": "Rats out of the drains in broad daylight, brighter future, my foot. Keep moving.",
+  "text": "Rats out of the drains in broad daylight. Brighter future, my foot. Keep moving."
+ },
+ "a1_s03_hira_01": {
+  "score": 1.0,
+  "heard": "Drop locker 12, scanning recipient. Recipient is you, recipient. Ward 4471.",
+  "text": "Drop-locker twelve! Scanning recipient... recipient is... you? Recipient: Ward four-four-seven-one."
+ },
+ "a1_s03_hira_02": {
+  "score": 1.0,
+  "heard": "Oh, sorry, firmware hiccup. I don't know that song.",
+  "text": "Mm-mm, mm-mm... Oh! Sorry! Firmware hiccup! I don't know that song."
+ },
+ "a1_s03_iris_01": {
+  "score": 1.0,
+  "heard": "Happy Birthday Little Star. Don't let them see this.",
+  "text": "Happy birthday, little star. Don't let them see this."
+ },
+ "a1_s04_mara_01": {
+  "score": 0.83,
+  "heard": "That's not on my manifest. Who sends a war to birthday present?",
+  "text": "That's not on my manifest. Who sends a Ward a birthday present?"
+ },
+ "a1_s04_mara_02": {
+  "score": 1.0,
+  "heard": "Keep it in your pocket, kid. Go take some jobs. You've got rent. The board's yours.",
+  "text": "Keep it in your pocket, kid. Go take some jobs; you've got rent. The board's yours."
+ },
+ "a1_s05_hira_01": {
+  "score": 0.8,
+  "heard": "Tinsels pre-loved electronics, 2.3 stars.",
+  "text": "Tinsel's Pre-Loved Electronics! Two point three stars!"
+ },
+ "a1_s05_mara_01": {
+  "score": 0.89,
+  "heard": "If you must know what's on that key, there's a pond droid called Tinsel in the East Arcade. 200 cred and he'll look.",
+  "text": "If you must know what's on that key, there's a pawn-droid called Tinsel in the east arcade. Two hundred cred and he'll look."
+ },
+ "a1_s06_mara_01": {
+  "score": 1.0,
+  "heard": "word travels fast in the plaza. Too fast. Get out of there.",
+  "text": "Word travels fast in the plaza. Too fast. Get out of there."
+ },
+ "a1_s06_thug_m_01": {
+  "score": 0.94,
+  "heard": "Boy, rental, heard you've got a fancy key, hand it over and you keep your arms.",
+  "text": "Oi, rental! Heard you've got a fancy key. Hand it over and you keep your arms."
+ },
+ "a1_s07_mara_01": {
+  "score": 0.92,
+  "heard": "Silverhand Courier on Brightline Boulevard. Get me three clean pictures of who he meets. Stay out of his eye line.",
+  "text": "Silverhand courier on Brightline Boulevard. Get me three clean pictures of who he meets. Stay out of his eyeline."
+ },
+ "a1_s08_harmony_01": {
+  "score": 1.0,
+  "heard": "a brighter future, little, little star together.",
+  "text": "A brighter future... little... little star... together."
+ },
+ "a1_s08_hira_01": {
+  "score": 0.71,
+  "heard": "Did that billboard just know Bransafe Thoughts only?",
+  "text": "Did that billboard just... no. Brand-safe thoughts only!"
+ },
+ "a1_s09_mara_01": {
+  "score": 0.92,
+  "heard": "You can't keep taking jobs in a rented tin can. I know a dealer. 30% off. Don't ask why. // //",
+  "text": "You can't keep taking jobs in a rented tin can. I know a dealer. Thirty percent off; don't ask why."
+ },
+ "b_civbot_bump_01": {
+  "score": 1.0,
+  "heard": "Pardon me, pardon me, pardon me.",
+  "text": "Pardon me. Pardon me. Pardon me."
+ },
+ "b_civbot_flee_01": {
+  "score": 1.0,
+  "heard": "Please don't hurt me. I was only being pleasant.",
+  "text": "Please don't hurt me! I was only being pleasant!"
+ },
+ "b_civbot_flee_02": {
+  "score": 1.0,
+  "heard": "Security security, someone is being unpleasant.",
+  "text": "Security! Security! Someone is being unpleasant!"
+ },
+ "b_civbot_greet_01": {
+  "score": 1.0,
+  "heard": "Good day, Citizen. Isn't everything wonderful?",
+  "text": "Good day, citizen. Isn't everything wonderful?"
+ },
+ "b_civbot_greet_02": {
+  "score": 1.0,
+  "heard": "What a lovely day. Every day is a lovely day.",
+  "text": "What a lovely day. Every day is a lovely day."
+ },
+ "b_civbot_greet_03": {
+  "score": 1.0,
+  "heard": "greetings. Have you been assigned a purpose today?",
+  "text": "Greetings. Have you been assigned a purpose today?"
+ },
+ "b_civbot_idle_01": {
+  "score": 1.0,
+  "heard": "Please remember to smile, someone is always watching, for your safety.",
+  "text": "Please remember to smile. Someone is always watching. For your safety."
+ },
+ "b_civbot_idle_02": {
+  "score": 1.0,
+  "heard": "Excuse me, I'm on my way to be happy somewhere else.",
+  "text": "Excuse me. I'm on my way to be happy somewhere else."
+ },
+ "b_civbot_idle_03": {
+  "score": 1.0,
+  "heard": "The founders provide. We are grateful. We are grateful.",
+  "text": "The Founders provide. We are grateful. We are grateful."
+ },
+ "b_civbot_idle_04": {
+  "score": 1.0,
+  "heard": "I don't go to the lower levels, nobody does. Nobody ever did.",
+  "text": "I don't go to the lower levels. Nobody does. Nobody ever did."
+ },
+ "b_civbot_rental_01": {
+  "score": 0.86,
+  "heard": "Wow! A rental! How brave of you!",
+  "text": "Oh. A rental. How... brave of you."
+ },
+ "b_civbot_rumour_01": {
+  "score": 1.0,
+  "heard": "They say someone has been asking questions about the old families, terribly rude.",
+  "text": "They say someone has been asking questions about the old families. Terribly rude."
+ },
+ "b_enforcer_aggro_01": {
+  "score": 0.83,
+  "heard": "You pick the wrong district rental.",
+  "text": "You picked the wrong district, rental."
+ },
+ "b_enforcer_aggro_02": {
+  "score": 1.0,
+  "heard": "Is that all your little rental can do?",
+  "text": "Is that all your little rental can do?"
+ },
+ "b_enforcer_death_01": {
+  "score": 1.0,
+  "heard": "Impossible beaten by a rental.",
+  "text": "Impossible... beaten by a rental..."
+ },
+ "b_enforcer_hurt_01": {
+  "score": 0.75,
+  "heard": "Ha! Barely a scratch!",
+  "text": "Hah. Barely a scratch."
+ },
+ "b_secbot_aggro_01": {
+  "score": 1.0,
+  "heard": "comply or be decommissioned.",
+  "text": "Comply, or be decommissioned."
+ },
+ "b_secbot_aggro_02": {
+  "score": 1.0,
+  "heard": "flank the target.",
+  "text": "Flank the target."
+ },
+ "b_secbot_aggro_03": {
+  "score": 1.0,
+  "heard": "a brighter future by force if necessary.",
+  "text": "A brighter future. By force, if necessary."
+ },
+ "b_secbot_backup_01": {
+  "score": 1.0,
+  "heard": "requesting backup to my location.",
+  "text": "Requesting backup to my location."
+ },
+ "b_secbot_clear_01": {
+  "score": 1.0,
+  "heard": "Area secure resuming patrol. //",
+  "text": "Area secure. Resuming patrol."
+ },
+ "b_secbot_death_01": {
+  "score": 1.0,
+  "heard": "System. Failure.",
+  "text": "System... failure."
+ },
+ "b_secbot_death_02": {
+  "score": 1.0,
+  "heard": "shutting down",
+  "text": "Shutting... down."
+ },
+ "b_secbot_found_01": {
+  "score": 0.86,
+  "heard": "And there you are.",
+  "text": "There you are."
+ },
+ "b_secbot_hurt_01": {
+  "score": 1.0,
+  "heard": "damage sustained.",
+  "text": "Damage sustained."
+ },
+ "b_secbot_hurt_02": {
+  "score": 1.0,
+  "heard": "Warning, Integrity compromised.",
+  "text": "Warning. Integrity compromised."
+ },
+ "b_secbot_search_01": {
+  "score": 1.0,
+  "heard": "target lost, sweeping the area.",
+  "text": "Target lost. Sweeping the area."
+ },
+ "b_secbot_spot_01": {
+  "score": 1.0,
+  "heard": "Citizen halt.",
+  "text": "Citizen, halt."
+ },
+ "b_secbot_spot_02": {
+  "score": 1.0,
+  "heard": "Unregistered frame detected, engaging.",
+  "text": "Unregistered frame detected. Engaging."
+ },
+ "b_secbot_suspect_01": {
+  "score": 0.8,
+  "heard": "Suspicious behavior noted. Stand still.",
+  "text": "Suspicious behaviour noted. Stand still."
+ }
+}

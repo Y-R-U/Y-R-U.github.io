@@ -1,0 +1,41 @@
+{
+ "_note": "Supplementary robot barks (not in VO_LINES). civ_a/civ_b = civilian robots, security = security robots, enforcer = elite enemy.",
+ "civ_a": {
+  "b_civbot_greet_01": "Good day, citizen. Isn't everything wonderful?",
+  "b_civbot_greet_02": "What a lovely day. Every day is a lovely day.",
+  "b_civbot_rental_01": "Oh. A rental. How... brave of you.",
+  "b_civbot_idle_01": "Please remember to smile. Someone is always watching. For your safety.",
+  "b_civbot_idle_02": "Excuse me. I'm on my way to be happy somewhere else.",
+  "b_civbot_flee_01": "Please don't hurt me! I was only being pleasant!"
+ },
+ "civ_b": {
+  "b_civbot_greet_03": "Greetings. Have you been assigned a purpose today?",
+  "b_civbot_idle_03": "Harmony provides. We are grateful. We are grateful.",
+  "b_civbot_idle_04": "I don't go down to the Stacks. Nobody does. Nobody ever did.",
+  "b_civbot_bump_01": "Pardon me. Pardon me. Pardon me.",
+  "b_civbot_rumour_01": "They say someone has been asking questions about the old families. Terribly rude.",
+  "b_civbot_flee_02": "Security! Security! Someone is being unpleasant!"
+ },
+ "security": {
+  "b_secbot_spot_01": "Citizen, halt.",
+  "b_secbot_spot_02": "Unregistered frame detected. Engaging.",
+  "b_secbot_suspect_01": "Suspicious behaviour noted. Stand still.",
+  "b_secbot_search_01": "Target lost. Sweeping the area.",
+  "b_secbot_found_01": "There you are.",
+  "b_secbot_backup_01": "Requesting backup to my location.",
+  "b_secbot_aggro_01": "Comply, or be decommissioned.",
+  "b_secbot_aggro_02": "Flank the target.",
+  "b_secbot_aggro_03": "A brighter future. By force, if necessary.",
+  "b_secbot_hurt_01": "Damage sustained.",
+  "b_secbot_hurt_02": "Warning. Integrity compromised.",
+  "b_secbot_death_01": "System... failure.",
+  "b_secbot_death_02": "Shutting... down.",
+  "b_secbot_clear_01": "Area secure. Resuming patrol."
+ },
+ "enforcer": {
+  "b_enforcer_aggro_01": "You picked the wrong district, rental.",
+  "b_enforcer_aggro_02": "Is that all your little rental can do?",
+  "b_enforcer_hurt_01": "Hah. Barely a scratch.",
+  "b_enforcer_death_01": "Impossible... beaten by a rental..."
+ }
+}

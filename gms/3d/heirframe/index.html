@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a1510">
+<title>HEIRFRAME</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #14110d; color: #f3e9d6;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: none; }
+  #game { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; outline: none; }
+  #ui-root { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+  #ui-root > * { pointer-events: auto; }
+  #boot { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 18px; transition: opacity .6s ease;
+    background: radial-gradient(ellipse at 50% 38%, #3a2c1a 0%, #17120c 55%, #0b0907 100%); }
+  #boot.gone { opacity: 0; pointer-events: none; }
+  #boot h1 { margin: 0; font-weight: 300; letter-spacing: .5em; font-size: clamp(22px, 5vw, 44px);
+    background: linear-gradient(180deg, #fff6df, #d6a64f 60%, #8a6428); -webkit-background-clip: text;
+    background-clip: text; color: transparent; padding-left: .5em; }
+  #boot .sub { font-size: 11px; letter-spacing: .4em; color: #b99a6a; text-transform: uppercase; }
+  #boot .bar { width: min(320px, 60vw); height: 2px; background: #3a2e20; overflow: hidden; border-radius: 2px; }
+  #boot .fill { height: 100%; width: 0%; background: linear-gradient(90deg, #8fd8ff, #fff1c8); transition: width .3s; }
+  #boot .msg { font-size: 12px; color: #9f8a6a; min-height: 1.2em; text-align: center; max-width: 80vw; }
+  #boot button { display: none; font: inherit; font-size: 13px; letter-spacing: .2em; text-transform: uppercase;
+    color: #1a140c; background: linear-gradient(180deg, #ffe7b0, #c8963e); border: 0; border-radius: 3px;
+    padding: 10px 26px; cursor: pointer; box-shadow: 0 0 24px #d6a64f55; }
+  #boot.failed button { display: block; }
+  #boot.failed .msg { color: #ffcf9a; }
+  #perf { position: fixed; left: 6px; top: 6px; z-index: 40; font: 11px/1.35 ui-monospace, Menlo, monospace;
+    color: #cfe8ff; background: #0009; padding: 5px 8px; border-radius: 4px; white-space: pre; pointer-events: none; display: none; }
+  .shot #ui-root, .shot #perf, .shot .devpad { display: none !important; }
+</style>
+<script>
+  // Classic (non-module) watchdog: a module-graph failure never reaches a module's own error handler.
+  (function () {
+    var t0 = Date.now();
+    window.__bootErrors = [];
+    window.addEventListener('error', function (e) { window.__bootErrors.push(String(e.message || e)); });
+    window.addEventListener('unhandledrejection', function (e) { window.__bootErrors.push(String(e.reason && e.reason.message || e.reason)); });
+    function check() {
+      if (window.__heirframeReady) return;
+      if (Date.now() - t0 > 20000) {
+        var b = document.getElementById('boot');
+        if (!b) return;
+        b.classList.add('failed');
+        var m = b.querySelector('.msg');
+        var err = window.__bootErrors[0];
+        m.textContent = 'The city is taking too long to load.' + (err ? ' (' + err + ')' : ' Check your connection and try again.');
+        return;
+      }
+      setTimeout(check, 1000);
+    }
+    setTimeout(check, 1000);
+    window.__reload = function () {
+      var u = location.href.replace(/([?&])_r=\d+&?/, '$1').replace(/[?&]$/, '');
+      location.replace(u + (u.indexOf('?') < 0 ? '?' : '&') + '_r=' + Date.now());
+    };
+  })();
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "../../lib/three/0.180.0/three.module.js",
+  "three/addons/": "../../lib/three/0.180.0/addons/"
+} }
+</script>
+</head>
+<body>
+<canvas id="game" tabindex="0"></canvas>
+<div id="ui-root"></div>
+<div id="perf"></div>
+<div id="boot">
+  <h1>HEIRFRAME</h1>
+  <div class="sub">Halcyon · Aurum Plaza</div>
+  <div class="bar"><div class="fill"></div></div>
+  <div class="msg">Warming the city…</div>
+  <button type="button" onclick="window.__reload()">Reload</button>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
