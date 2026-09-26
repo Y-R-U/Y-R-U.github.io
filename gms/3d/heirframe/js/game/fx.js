@@ -17,6 +17,7 @@ export function createFx(scene) {
     plane: new THREE.PlaneGeometry(1, 1),
     star: starGeometry(),
     slash: new THREE.RingGeometry(0.75, 1, 24, 1, -1.1, 2.2).rotateX(-Math.PI / 2),
+    holo: new THREE.CapsuleGeometry(0.33, 1.15, 4, 10).translate(0, 0.95, 0),
   };
   const pools = {};
   const recs = [];
@@ -107,6 +108,19 @@ export function createFx(scene) {
         o.p1 = 1;
       }
     },
+    // vertical light column (frame beam-in, cloak, turret deploy)
+    beam(pos, color = 0x9fe8ff, life = 0.5, height = 3, width = 1) {
+      const o = spawn('beam', life, color);
+      o.mesh.position.copy(pos); o.p0 = height; o.p1 = width;
+      o.mesh.scale.set(width, height, width);
+      return o;
+    },
+    // flickering see-through body (Blink decoy)
+    hologram(pos, color = 0x7ff6ff, life = 2) {
+      const o = spawn('holo', life, color);
+      o.mesh.position.copy(pos);
+      return o;
+    },
     // floating holo "ad" for Sponsored Content
     advert(pos, life = 2.5) {
       if (!adTex) {
@@ -146,6 +160,8 @@ export function createFx(scene) {
             m.rotateZ(o.p1);
             m.scale.setScalar(o.p0 * (0.6 + u * 0.9)); m.material.opacity = 1 - u * u; break;
           case 'slash': m.scale.setScalar(o.p0 * (0.75 + u * 0.35)); m.material.opacity = (1 - u) * 0.85; break;
+          case 'beam': m.scale.set(o.p1 * (1 - u * 0.7), o.p0 * (0.6 + u * 0.4), o.p1 * (1 - u * 0.7)); m.material.opacity = (1 - u) * 0.9; break;
+          case 'holo': m.material.opacity = (u > 0.85 ? (1 - u) / 0.15 : 1) * (0.28 + 0.12 * Math.sin(o.t * 40) + (Math.random() < 0.05 ? -0.2 : 0)); break;
           case 'advert': if (camera) m.quaternion.copy(camera.quaternion); m.material.opacity = Math.min(1, (1 - u) * 4) * (0.8 + 0.2 * Math.sin(o.t * 30)); break;
         }
         if (o.t >= o.life) {

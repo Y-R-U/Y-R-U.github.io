@@ -16,7 +16,8 @@ export function createControls(bus) {
   const dodge = h('button.hf-skill.hf-dodge.hf-live', { 'aria-label': 'Dodge', html: `<span class="ic">${icon('dodge')}</span><i class="cd"></i><b class="t hf-num"></b><kbd>␣</kbd>` });
   const skillEls = [0, 1, 2, 3].map(i => h(`button.hf-skill.hf-live.s${i}`, { html: `<span class="ic"></span><i class="cd"></i><b class="t hf-num"></b><kbd>${i < 3 ? i + 1 : 'Q'}</kbd><span class="cost hf-num"></span>` }));
   skillEls[3].classList.add('hf-heir');
-  cluster.append(...skillEls, dodge, attack);
+  const kit = h('button.hf-kit.hf-live.empty', { 'aria-label': 'Repair kit', html: `<span class="ic">${icon('heal')}</span><b class="n hf-num"></b><kbd>R</kbd>` });
+  cluster.append(...skillEls, dodge, attack, kit);
   el.append(zone, cluster);
 
   const move = { x: 0, y: 0 };
@@ -118,6 +119,7 @@ export function createControls(bus) {
   }
 
   press(attack, () => { api.attackHeld = true; bus.emit('attack'); }, () => { api.attackHeld = false; bus.emit('attackUp'); });
+  press(kit, () => { if (kit.classList.contains('empty') || kit.classList.contains('cooling')) return deny(kit); bus.emit('kit'); });
   press(dodge, () => { if (dodge.classList.contains('cooling')) return deny(dodge); bus.emit('dodge'); });
   skillEls.forEach((b, i) => press(b, () => {
     const s = skills[i];
@@ -156,6 +158,11 @@ export function createControls(bus) {
       paintCd(b, st, s.cd || 0, s.cdMax || 0);
     });
   };
+  let kitN = -1;
+  api.setKit = (n, { cooling = false } = {}) => {
+    if (n !== kitN) { kitN = n; kit.querySelector('.n').textContent = n > 0 ? String(n) : ''; kit.classList.toggle('empty', !(n > 0)); }
+    kit.classList.toggle('cooling', !!cooling);
+  };
   const dodgeState = {};
   api.setDodge = (cd, cdMax) => paintCd(dodge, dodgeState, cd || 0, cdMax || 0);
 
@@ -165,7 +172,7 @@ export function createControls(bus) {
     if (e.repeat) return false;
     const map = {
       KeyF: attack, KeyJ: attack, Space: dodge, Digit1: skillEls[0], Digit2: skillEls[1], Digit3: skillEls[2],
-      KeyK: skillEls[0], KeyL: skillEls[1], Semicolon: skillEls[2], KeyQ: skillEls[3], Digit4: skillEls[3],
+      KeyK: skillEls[0], KeyL: skillEls[1], Semicolon: skillEls[2], KeyQ: skillEls[3], Digit4: skillEls[3], KeyR: kit,
     };
     const b = map[k];
     if (!b) return false;

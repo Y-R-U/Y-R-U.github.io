@@ -1,10 +1,11 @@
 // Converters from sim objects to the shapes js/ui/README.md expects.
 import { RARITIES, RARITY_INDEX, SLOTS, SLOT_NAMES, POWERS, HEIRLOOM_SETS } from '../data/loot.js';
 import { MODIFIERS, THREATS, SITE_NAMES } from '../data/missions.js';
-import { FRAMES, OWNABLE_FRAMES, MK_TIERS } from '../data/frames.js';
+import { FRAMES, OWNABLE_FRAMES, MK_TIERS, SYNC_MODS, SYNC_NEXT, SKILLS } from '../data/frames.js';
+import { CONSUMABLES } from '../data/economy.js';
 import { itemFR, affixLabel, tuneCost, salvageYield } from './loot.js';
 import { itemStats } from './stats.js';
-import { xpNext, rerollCost, mkUpgrade } from './economy.js';
+import { xpNext, rerollCost, mkUpgrade, repairCost, consumableCost } from './economy.js';
 import { createRng } from './rng.js';
 import { sitesFor } from './missions.js';
 import { frameDef, tierName } from './frames.js';
@@ -90,7 +91,8 @@ export function toUiWarehouse(game) {
       rental: !!f.rental, fr: game.frameFR(f), hpFrac: f.hpFrac, paint: f.paint,
       mk: (f.tier || 0) + 1, mkMax: MK_TIERS.length, mkCost: f.rental ? null : mkUpgrade(f, S.player.level)?.cost ?? null, slotsAllowed: d.slots.slice(),
       stats: { hp: st.hp, shield: st.shield, armor: st.armor, energy: st.energy, weaponDamage: st.weaponDamage, critChance: st.critChance, critDmg: st.critDmg, moveSpeed: st.moveSpeed, dodgeCd: st.dodgeCd },
-      slots,
+      slots, skills: skillsView(game, f), syncXp: f.syncXp || 0, syncNext: SYNC_NEXT(f.sync), maxSync: d.maxSync,
+      repair: f.rental || (f.hpFrac ?? 1) >= 0.999 ? null : repairCost(1 - (f.hpFrac ?? 1), S.player.level, st.repairCostPct),
     };
   });
   return {
@@ -98,6 +100,42 @@ export function toUiWarehouse(game) {
     inventory: S.stash.filter(i => !i.equippedOn).map(i => toUiItem(i)), materials: uiMats(S.materials), stashSize: S.stashSize, invMax: S.stashSize,
     shop: OWNABLE_FRAMES.filter(id => !S.frames.some(f => f.frameId === id)).map(id => ({ kind: FRAMES[id].archetype, frameId: id, name: FRAMES[id].name, model: FRAMES[id].model, price: game.framePrice() })),
     owned: frames.filter(f => !f.rental).map(f => f.kind),
+    market: marketView(game),
+  };
+}
+
+const SKILL_DESC = {
+  r_baton: 'Melee shock baton. Shock chains to a second target.', r_zap: '16 m hitscan pistol shot.', r_overclock: '+35% move and attack speed for 4 s. Costs 5% HP.',
+  r_sponsored: 'A holo advert: enemies within 6 m stand and stare for 2.5 s.',
+  b_fists: '3-hit combo; the third punch knocks back hard.', b_slam: '4 m shockwave, 45 damage, staggers.', b_charge: 'Dash 8 m through enemies, knocking them aside.',
+  b_bulwark: 'Frontal energy wall for 5 s: -60% damage from the front, taunts within 10 m.',
+  g_carbines: 'Auto-fire, 4 shots a second out to 16 m.', g_scatter: '60° shotgun volley that knocks back.', g_rail: 'Charge, then a piercing ion beam out to 30 m.',
+  g_turret: 'A turret that fires 3 shots a second for 10 s and draws aggro.',
+  h_blade: 'Fast 2-hit combo. Backstabs (behind, or unaware targets) deal x3.', h_veil: 'Cloak for 6 s; enemies lose you. First strike always crits.',
+  h_blink: 'Teleport behind your target (or 7 m ahead), leaving a decoy that draws fire.', h_pulse: 'Disables drones and turrets; hacks one robot to fight for you for 8 s.',
+};
+
+function skillsView(game, f) {
+  const d = frameDef(f);
+  const sk = game.frameSkills(f);
+  const list = ['attack', 's1', 's2', 's3'].filter(k => sk[k]).map(k => ({ slot: k, id: sk[k].id, name: sk[k].name, icon: sk[k].icon, desc: SKILL_DESC[sk[k].id] || '', mod: sk[k].modId || null,
+    cd: sk[k].cooldown || null, energy: sk[k].energy || null }));
+  const mods = (SYNC_MODS[f.frameId] || []).map(r => ({ rank: r.rank, unlocked: f.sync >= r.rank, chosen: f.mods?.[r.rank] || null,
+    options: r.options.map(o => ({ id: o.id, name: o.name, desc: o.desc, skill: SKILLS[o.skill]?.name || o.skill })) }));
+  return { list, mods, passive: d.passive ? { name: d.passive.name, desc: d.passive.desc } : null };
+}
+
+function marketView(game) {
+  const S = game.state;
+  if (!S.market || S.market.shift !== S.shiftIndex) game.refreshMarket();
+  const lvl = S.player.level;
+  const f = game.activeFrame();
+  return {
+    stock: S.market.stock.map((e, i) => ({ index: i, price: e.price, sold: !!e.sold, special: !!e.special, item: toUiItem(e.item, { compareTo: f.equipped[e.item.slot] ? game.itemByUid(f.equipped[e.item.slot]) : null }) })),
+    consumables: Object.values(CONSUMABLES).map(c => ({ id: c.id, name: c.name, price: consumableCost(c.id, lvl), count: S.consumables[c.id] || 0,
+      cap: c.id === 'repairKit' ? (lvl >= 20 ? c.carryAt20 : c.carry) : 5,
+      desc: c.id === 'repairKit' ? `Field repair: heal ${Math.round(c.healPct * 100)}% HP (R / the green button).` : c.id === 'signalJammer' ? 'Drops Heat by one star, right now.' : 'A holo double that draws fire for 6 s.' })),
+    refreshIn: null,
   };
 }
 

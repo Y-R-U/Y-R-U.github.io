@@ -19,6 +19,8 @@ import { buildBackdrop } from './backdrop.js';
 import { createBillboards } from './holo.js';
 import { swayFoliage, fadeMaterial, makeLeafAtlas, createLeafMaterial, FADE_GLSL } from './foliage.js';
 import { D2R } from './geo.js';
+import { bakeGroundAO, MAX_CONTACTS } from './groundao.js';
+import { LIVE_ROBOTS } from '../actors/robots.js';
 
 export const LAYOUT = {
   bounds: { x0: -58, x1: 47.5, z0: -97, z1: 79 },
@@ -38,7 +40,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
   installFog();
   const renderer = createRenderer(canvas, tier, toneMapping);
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(HAZE_COLOR.clone(), 0.0007);
+  scene.fog = new THREE.FogExp2(HAZE_COLOR.clone(), 0.00055);
   const camera = new THREE.PerspectiveCamera(40, innerWidth / innerHeight, 0.5, 3000);
   camera.layers.enable(REFLECT_LAYER);
 
@@ -74,7 +76,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
   swayFoliage(M.foliage, time, fade);
   M.leaves = createLeafMaterial(makeLeafAtlas(), time, fade);
   // anything tall enough to stand between the camera and the player dithers away around them
-  for (const k of ['bark', 'chrome', 'darkMetal', 'gold', 'stone', 'stoneUpper', 'glassRail', 'canopyA', 'warmGlow', 'blueGlow', 'facade', 'facadeWarm', 'shopGlow', 'uber']) fadeMaterial(M[k], fade);
+  for (const k of ['bark', 'chrome', 'darkMetal', 'gold', 'stone', 'stoneUpper', 'glassRail', 'canopyA', 'warmGlow', 'blueGlow', 'facade', 'facadeWarm', 'shopGlow', 'uber']) fadeMaterial(M[k], fade, { a2c: tier.msaa > 0 });
   const col = createCollision(LAYOUT.bounds);
   const batch = createBatcher({ cell: 56, uber: /[?&]nouber/.test(location.search) ? null : M.uber });
   const ctx = {
@@ -107,6 +109,12 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
       .replace('#include <fog_fragment>', 'gl_FragColor.a *= 1.0 - 0.85 * hfFade( vFogWorldPos, vFogDepth );\n#include <fog_fragment>');
   });
   ctx.stats.staticMeshes = built.meshes; ctx.stats.staticTris = built.tris;
+  if (ctx.groundAO && !/[?&]noao/.test(location.search)) {
+    const ao = bakeGroundAO(renderer, scene, LAYOUT.bounds);
+    ctx.groundAO.tAO.value = ao.texture; ctx.groundAO.uAOMat.value.copy(ao.uvMat); ctx.groundAO.uAOOn.value = 1;
+    ctx.stats.groundAO = { meshes: ao.meshes, size: ao.size }; ctx.groundAOBake = ao;
+  }
+  const near = [];
   const motes = createMotes(time, pxScale, tier.name === 'low' ? 80 : 220);
   scene.add(motes);
   const skyShadows = createSkyShadows(time, tier.name === 'low' ? 2 : 5);
@@ -155,6 +163,20 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
         sun.target.updateMatrixWorld();
       }
       motes.material.uniforms.uCenter.value.copy(world.focus);
+      // soft contact disks under the robots nearest the focus
+      if (ctx.groundAO) {
+        near.length = 0;
+        for (const b of LIVE_ROBOTS) {
+          if (b.hover || !b.root.parent || !b.root.visible) continue;
+          const p = b.root.getWorldPosition(_v);
+          if (p.y > 0.3 || p.y < -0.3) continue;
+          const d = (p.x - world.focus.x) ** 2 + (p.z - world.focus.z) ** 2;
+          if (d < 900) near.push([d, p.x, p.z, b.radius]);
+        }
+        near.sort((a, b) => a[0] - b[0]);
+        const C = ctx.groundAO.uContacts.value;
+        for (let i = 0; i < MAX_CONTACTS; i++) { const n = near[i]; if (n) C[i].set(n[1], n[2], n[3] * 2.2); else C[i].z = 0; }
+      }
       shadowAnchor.set(Math.round(world.focus.x / 60) * 60, 0, Math.round(world.focus.z / 60) * 60);
       skyShadows.update(dt, shadowAnchor);
     },

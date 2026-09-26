@@ -149,6 +149,22 @@ export function createCombat(bus, root) {
     band.querySelector('.bd-w').textContent = o.warn || (zone === 'close' ? 'Too close' : zone === 'far' ? 'Losing target' : '');
   }
 
+  // objective meter (hack / defend / escort / capture progress)
+  const meter = h('div.hf-meter', { html: '<div class="mt-l"><span></span><b class="hf-num"></b></div><div class="mt-t"><i></i></div><div class="mt-s"></div>' });
+  let mKey = '';
+  function meterSet(o = {}) {
+    if (!meter.classList.contains('on')) { meter.classList.add('on'); bus.emit('_restack'); }
+    const v = clamp(o.value ?? 0, 0, 1);
+    meter.style.setProperty('--v', `${(v * 100).toFixed(1)}%`);
+    const k = `${o.label}|${o.kind}|${o.sub || ''}|${o.text ?? Math.round(v * 100)}`;
+    if (k === mKey) return;
+    mKey = k;
+    meter.dataset.kind = o.kind || 'hack';
+    meter.querySelector('.mt-l span').textContent = o.label || '';
+    meter.querySelector('.mt-l b').textContent = o.text ?? `${Math.round(v * 100)}%`;
+    meter.querySelector('.mt-s').textContent = o.sub || '';
+  }
+
   // sting (twist / level / alert banners)
   const sting = h('div.hf-sting');
   function stingShow(title, sub = '', kind = 'twist', ms = 3200) { centerBanner(() => stingNow(title, sub, kind, ms), ms + 100); }
@@ -160,7 +176,7 @@ export function createCombat(bus, root) {
     bus.emit('sfx', kind === 'level' ? 'levelup' : 'toast');
   }
 
-  el.append(detWrap, boss, detStatus, band, sting, lens);
+  el.append(detWrap, boss, detStatus, band, meter, sting, lens);
 
   return {
     el,
@@ -168,6 +184,7 @@ export function createCombat(bus, root) {
     detect: { set: detSet, clear: detClear, status(s) { statusOverride = s || null; refreshStatus(); } },
     lens: lensApi,
     band: { set: bandSet, hide() { band.classList.remove('on'); bus.emit('_restack'); } },
+    meter: { set: meterSet, hide() { if (!meter.classList.contains('on')) return; meter.classList.remove('on'); mKey = ''; bus.emit('_restack'); } },
     sting: stingShow,
   };
 }

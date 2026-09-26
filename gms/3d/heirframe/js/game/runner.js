@@ -1,7 +1,8 @@
 import * as THREE from 'three';
+import { createSteps } from './steps.js';
 
 // Mission step runner: maps sim contract steps onto world.sites, spawns packs/props, drives objectives,
-// twists, stealth (surveil) and the story beats that hang off step events.
+// twists, modifiers, stealth (surveil) and the story beats that hang off step events.
 export function createRunner(ctx) {
   const { sim, world, enemies, props, ui, audio, fx, player } = ctx;
   const siteById = new Map();
@@ -45,31 +46,66 @@ export function createRunner(ctx) {
     if (!r.ok) { ui.toast(r.reason === 'active' ? 'Finish your current contract first' : 'Contract unavailable', 'warn'); return r; }
     const m = r.mission;
     R = { mission: m, idx: -1, step: null, ss: {}, packs: m.enemies.map((p, i) => ({ ...p, i, spawned: false, units: p.units })), beacons: [], carries: new Map(), carrying: null,
-      target: null, scriptedCleared: false, elapsed: 0, done: false, stealth: !!m.stealthy, twistSpawned: false, extra: [] };
+      target: null, realTarget: null, boss: null, scriptedCleared: false, elapsed: 0, done: false, stealth: !!m.stealthy, extra: [], npcs: {}, hitsCarrying: 0, watchers: [] };
     for (const [i, s] of m.steps.entries()) if (s.type === 'pickup' && site(s.site)) { const st = site(s.site); R.carries.set(i, props.carry(st.x + 0.8, st.z + 0.8, s.item?.kind || 'parcel')); }
+    // escortees wait at their meeting point from the start
+    for (const n of m.npcs || []) steps.spawnNpc(R, n);
+    placeCollateral(m);
+    if (m.modifiers.includes('watched')) placeWatchers(m);
     ui.sting(m.title, m.story ? 'Story contract' : `${m.client?.name || ''} · ${m.districtName || ''}`, m.story ? 'story' : 'alert', 2400);
     audio.sfx('contract_accept');
     if (m.story) storyEvent('accept');
     else audio.bark('b_mara_accept_', { cooldown: 20 });
+    ctx.onAccept?.(m);
     enter(0);
     return { ok: true, mission: m };
   }
 
-  function spawnPack(p, hostile) {
+  // Glass House / Crowded: breakable stalls around the objectives; area hits there cost collateral
+  function placeCollateral(m) {
+    const ids = [...new Set(m.steps.map((s) => s.site || s.sites?.[0]).filter(Boolean))].slice(0, 3);
+    const per = m.modifiers.includes('vip') ? 4 : m.modifiers.includes('collateral') ? 3 : 1;
+    for (const id of ids) {
+      const s = site(id);
+      if (!s) continue;
+      for (let k = 0; k < per; k++) {
+        const a = Math.random() * Math.PI * 2, r = 3 + Math.random() * 3;
+        const x = s.x + Math.sin(a) * r, z = s.z + Math.cos(a) * r;
+        if (!world.blocked(x, z, 0.8)) props.breakable(x, z, Math.round(40 * Math.pow(1.09, m.level - 1)));
+      }
+    }
+  }
+
+  // Watched: extra Warden Eyes over the objectives; being spotted = +1 Heat
+  function placeWatchers(m) {
+    const ids = [...new Set(m.steps.map((s) => s.site).filter(Boolean))].slice(0, 2);
+    for (const id of ids) {
+      const s = site(id);
+      if (!s) continue;
+      const e = enemies.spawn({ defId: 'warden_eye', level: m.level }, s.x + 4, s.z - 3, { guard: true, stealthy: true });
+      e.mission = m.id; e.watcher = true;
+      R.watchers.push(e);
+    }
+  }
+
+  // hostile: ambush (spawn out of sight, come in). opts.near/dist: spawn around a point instead of the pack's site
+  function spawnPack(p, hostile, opts = {}) {
     if (p.spawned) return;
     p.spawned = true;
     let s = site(p.site) || site(R.step?.site) || { x: player.pos.x + 12, z: player.pos.z - 12, r: 3 };
     let cx = s.x, cz = s.z;
+    const ref = opts.near || player.pos, lim = opts.dist || 20;
     if (hostile) {
       // ambushers come from their spawn site but no further than ~20 m away, so they actually arrive
-      const dx = cx - player.pos.x, dz = cz - player.pos.z, d = Math.hypot(dx, dz);
-      if (d > 20) { cx = player.pos.x + dx / d * 18; cz = player.pos.z + dz / d * 18; }
+      const dx = cx - ref.x, dz = cz - ref.z, d = Math.hypot(dx, dz);
+      if (d > lim) { cx = ref.x + dx / d * (lim - 2); cz = ref.z + dz / d * (lim - 2); }
     }
     const n = p.units.length;
     p.ents = p.units.map((u, k) => {
       const a = (k / Math.max(1, n)) * Math.PI * 2 + Math.random() * 0.4, r = Math.min(3.5, (s.r || 3) * 0.6) + Math.random() * 1.2;
       let x = cx + Math.sin(a) * r, z = cz + Math.cos(a) * r;
-      for (let t = 0; t < 6 && world.blocked(x, z, 0.5); t++) { x = cx + (Math.random() - 0.5) * 4; z = cz + (Math.random() - 0.5) * 4; }
+      for (let t = 0; t < 8 && world.blocked(x, z, 0.5); t++) { x = cx + (Math.random() - 0.5) * 5; z = cz + (Math.random() - 0.5) * 5; }
+      if (world.blocked(x, z, 0.5) && ctx.nav) { const q = ctx.nav.nearest(x, z); if (q) { x = q.x; z = q.z; } }
       const e = enemies.spawn(u, x, z, { guard: !hostile, stealthy: R.stealth && !hostile, hostile, pack: p.i, yaw: Math.atan2(player.pos.x - x, player.pos.z - z) });
       e.mission = R.mission.id;
       return e;
@@ -77,14 +113,35 @@ export function createRunner(ctx) {
     if (p.scripted && p.trigger?.event) { R.scriptedPack = p; storyEvent(p.trigger.event); if (!storyId()) audio.bark('b_mara_ambush_', { cooldown: 10 }); }
   }
 
-  function spawnTarget() {
-    const t = R.mission.target;
-    if (!t || R.target) return;
-    const s = site(t.site) || site(R.step?.site);
+  // generated defends: a small pack of the mission faction per wave
+  function synthPack(Rm, k, src) {
+    const fac = Rm.mission.faction || 'syndicate';
+    const pool = { syndicate: ['knuckle', 'knuckle', 'popper'], scrap: ['scrap_rat', 'scrap_rat', 'scrap_rat', 'scrap_rat'], concord: ['warden', 'warden_eye'] }[fac] || ['knuckle', 'popper'];
+    const n = pool.length + Math.min(2, k);
+    const p = { i: Rm.packs.length, site: src?.id || Rm.step?.site, units: Array.from({ length: n }, (_, j) => ({ defId: pool[j % pool.length], rank: j === 0 && k > 1 ? 'veteran' : 'grunt', level: Rm.mission.level })), atStep: Rm.idx, spawned: false };
+    Rm.packs.push(p);
+    return p;
+  }
+
+  function spawnTarget(which = 'target') {
+    const t = which === 'realTarget' ? R.mission.twist?.realTarget : R.mission.target;
+    if (!t || (which === 'target' ? R.target : R.realTarget)) return;
+    const siteId = which === 'realTarget' ? R.step?.site : t.site;
+    const s = site(siteId) || site(R.step?.site);
     if (!s) return;
     const e = enemies.spawn({ defId: t.defId, rank: t.rank || 'grunt', level: R.mission.level, name: t.name }, s.x + 1.5, s.z + 1.5, { guard: true, stealthy: R.stealth });
     e.mission = R.mission.id; e.isTarget = true; e.home.set(s.x, 0, s.z);
-    R.target = e;
+    if (which === 'realTarget') R.realTarget = e; else R.target = e;
+  }
+
+  function spawnBoss() {
+    const b = R.mission.boss;
+    if (!b || R.boss) return;
+    const s = site(b.site) || site(R.step?.site) || { x: player.pos.x + 10, z: player.pos.z };
+    const a = Math.atan2(player.pos.x - s.x, player.pos.z - s.z);
+    let x = s.x - Math.sin(a) * 6, z = s.z - Math.cos(a) * 6;
+    if (world.blocked(x, z, 1) && ctx.nav) { const q = ctx.nav.nearest(x, z); if (q) { x = q.x; z = q.z; } }
+    R.boss = ctx.boss.spawn(b, x, z, R);
   }
 
   function enter(i) {
@@ -95,25 +152,36 @@ export function createRunner(ctx) {
     R.ss = { t: 0, hold: 0, shots: 0, prog: 0 };
     for (const b of R.beacons) b.remove();
     R.beacons = [];
-    ui.lens.hide(); ui.band.hide();
+    ui.lens.hide(); ui.band.hide(); ui.meter.hide();
     if (!R.step) return finish();
     const s = R.step;
-    // twist
+    // twist (T2 fires when its step is done, T9 at payout, the rest on entering their step)
     const tw = m.twist;
-    if (tw && !c.twistFired && tw.atStep === i) fireTwist(tw);
+    if (tw && !c.twistFired && tw.atStep === i && tw.id !== 'T2') fireTwist(tw);
+    steps.enter(R, s);
     // spawn packs: guards one step early (so they stand at the objective), ambushes on their step
     for (const p of R.packs) {
-      if (p.spawned || p.scripted) continue;
-      const guardHere = p.site && (p.site === s.site || p.site === c.steps[i + 1]?.site);
-      if (p.atStep <= i || (guardHere && p.atStep <= i + 1)) spawnPack(p, !guardHere);
+      if (p.spawned || p.scripted || p.deferred || p.nearNpc) continue;
+      const guardHere = p.guard || (p.site && (p.site === s.site || p.site === c.steps[i + 1]?.site || s.sites?.includes(p.site)));
+      if (p.atStep <= i || (guardHere && p.atStep <= i + 1)) spawnPack(p, !guardHere && p.atStep <= i);
     }
-    if (m.target && (['photo', 'kill', 'capture', 'tail'].includes(c.steps[i + 1]?.type) || ['photo', 'kill', 'capture', 'tail'].includes(s.type)) && s.target !== 'all') spawnTarget();
-    if (s.type === 'deliver' || s.type === 'exfil' || s.type === 'goto' && !c.steps[i + 1]?.type?.match(/pickup/)) {
+    const next = c.steps[i + 1];
+    const TT = ['photo', 'kill', 'capture', 'tail'];
+    if (m.target && ((TT.includes(next?.type) && next.target === 'target') || (TT.includes(s.type) && s.target === 'target'))) spawnTarget('target');
+    if ((s.type === 'kill' || s.type === 'photo') && s.target === 'realTarget') spawnTarget('realTarget');
+    if (s.type === 'kill' && s.target === 'boss') spawnBoss();
+    if (s.type === 'deliver' || s.type === 'exfil' || s.type === 'goto' && !next?.type?.match(/pickup/)) {
       const st = site(s.site); if (st) R.beacons.push(props.beacon(st.x, st.z, s.type === 'exfil' ? [0.5, 0.9, 1.0] : [1.0, 0.8, 0.4]));
     }
-    if (s.type === 'destroy') for (const o of s.objs || []) { const st = site(o.site); if (st) { const a = Math.random() * 6; o._prop = props.nest(st.x + Math.sin(a) * 1.5, st.z + Math.cos(a) * 1.5, Math.round(40 * Math.pow(1.09, m.level - 1))); } }
+    if (s.type === 'destroy') for (const o of s.objs || []) {
+      const st = site(o.site); if (!st) continue;
+      const a = Math.random() * 6;
+      const hp = Math.round(40 * Math.pow(1.09, m.level - 1) * (o.hpMult || 1));
+      o._prop = o.kind === 'nest' || !o.kind ? props.nest(st.x + Math.sin(a) * 1.5, st.z + Math.cos(a) * 1.5, hp) : props.machine(st.x + Math.sin(a) * 1.5, st.z + Math.cos(a) * 1.5, hp, o.kind);
+    }
     if (s.type === 'choose') runChoice(s);
     if (s.type === 'photo') R.ss.need = s.shots || 1;
+    storyEvent(`enter:${i}`);
     ctx.onStep && ctx.onStep(R, s);
   }
 
@@ -127,9 +195,16 @@ export function createRunner(ctx) {
       const p = { i: R.packs.length, site: g.site, units: g.units, atStep: R.idx, spawned: false };
       R.packs.push(p);
       spawnPack(p, true);
+      if (g.rivals) for (const e of p.ents) { e.hunter = true; e.bot.setAlert(2); }
     }
     if (t.id === 'T10') ctx.onFx && ctx.onFx('billboards_face');
+    if (t.id === 'T2' && R.target && R.target.state !== 'dead') {
+      // the decoy bolts; the real one is somewhere else
+      const e = R.target; e.state = 'flee'; e.fleeT = 6; e.nonCombat = true; setTimeout(() => enemies.clear((x) => x === e), 6000);
+    }
+    log('twist ' + t.id);
   }
+  const log = (m) => ctx.log?.(m);
 
   async function runChoice(s) {
     R.busy = true;
@@ -141,11 +216,33 @@ export function createRunner(ctx) {
 
   function complete(info = {}) {
     if (!R || R.done) return;
+    const c = sim.state.contract;
+    const tw = R.mission.twist;
+    if (tw?.id === 'T2' && c && !c.twistFired && tw.atStep === R.idx) fireTwist(tw);
+    const idx = R.idx;
     const r = sim.completeStep(info);
     if (r.failed || !sim.state.contract) { endFailed(r.reason || 'fail'); return; }
     audio.sfx('ui_confirm', { vol: 0.6 });
+    storyEvent(`done:${idx}`);
     if (r.done) return finish();
     enter(r.index);
+  }
+
+  function fail(reason, text) {
+    if (!R) return;
+    if (R.mission.story) {
+      // story contracts restart the step instead of failing (checkpoints)
+      ui.toast(text || 'Checkpoint', 'bad', { sub: 'Back to the last checkpoint' });
+      for (const e of enemies.list) if (e.mission === R.mission.id && !e.escort && e.state !== 'dead') e.state === 'idle' || (e.hunter = false);
+      for (const n of Object.values(R.npcs)) if (n.state === 'dead' || !n.c.alive) { enemies.clear((x) => x === n); enemies.removeDecoy(n.decoy); }
+      R.npcs = {};
+      for (const n of R.mission.npcs || []) steps.spawnNpc(R, n);
+      enter(R.idx);
+      return;
+    }
+    ui.toast(text || 'Contract failed', 'bad');
+    sim.failContract(reason);
+    endFailed(reason);
   }
 
   async function finish() {
@@ -154,7 +251,7 @@ export function createRunner(ctx) {
     const m = R.mission;
     if (m.twist && !sim.state.contract.twistFired && m.twist.atStep >= sim.state.contract.steps.length) fireTwist(m.twist);
     props.collectAll(ctx.onLootCollect);
-    ui.lens.hide(); ui.detect.clear();
+    ui.lens.hide(); ui.detect.clear(); ui.meter.hide();
     if (m.story) await storyEvent('deliver', true);
     const out = sim.finishContract({ time: sim.state.contract?.elapsed });
     cleanup();
@@ -173,10 +270,13 @@ export function createRunner(ctx) {
     for (const c of R.carries.values()) props.removeCarry(c);
     props.clearMission();
     ctx.setCarrying(null);
-    ui.lens.hide(); ui.detect.clear(); ui.band.hide();
+    ui.lens.hide(); ui.detect.clear(); ui.band.hide(); ui.meter.hide();
+    ctx.boss?.end();
     const id = R.mission.id;
+    for (const n of Object.values(R.npcs)) enemies.removeDecoy(n.decoy);
+    for (const d of [...enemies.decoys]) if (d.kind === 'npc') enemies.removeDecoy(d);
     // survivors walk off; dead bodies are cleared by enemies.update
-    enemies.clear((e) => e.mission === id && e.state !== 'dead' && (e.nonCombat || e.state === 'idle'));
+    enemies.clear((e) => e.mission === id && e.state !== 'dead' && (e.nonCombat || e.state === 'idle' || e.watcher));
     for (const e of enemies.list) if (e.mission === id && e.state !== 'dead') { e.mission = null; }
     R = null;
   }
@@ -185,34 +285,42 @@ export function createRunner(ctx) {
   // the sim already failed the contract (e.g. the frame was wrecked): tear down + tell the player
   function failed(reason) { if (R && !sim.state.contract) endFailed(reason); }
 
-  function missionHostiles() { return enemies.list.filter((e) => R && e.mission === R.mission.id && e.state !== 'dead' && !e.nonCombat); }
+  function missionHostiles() { return enemies.list.filter((e) => R && e.mission === R.mission.id && e.state !== 'dead' && !e.nonCombat && !e.watcher); }
+
+  function nearestOf(list) { let b = list[0], bd = 1e9; for (const e of list) { const d = e.pos.distanceTo(player.pos); if (d < bd) { bd = d; b = e; } } return b; }
 
   function objective() {
     if (!R || !R.step) return null;
     const s = R.step;
     const amb = R.scriptedPack && !R.scriptedCleared ? R.scriptedPack.ents?.filter((e) => e.state !== 'dead') : null;
-    if (amb?.length) { const e = amb.reduce((a, b) => (a.pos.distanceTo(player.pos) < b.pos.distanceTo(player.pos) ? a : b)); return { x: e.pos.x, z: e.pos.z, label: `${amb.length} rats`, enemy: true }; }
-    if (['kill'].includes(s.type)) {
-      if (s.target === 'target' && R.target && R.target.state !== 'dead') return { x: R.target.pos.x, z: R.target.pos.z, label: R.target.c.name, enemy: true };
+    if (amb?.length) { const e = nearestOf(amb); return { x: e.pos.x, z: e.pos.z, label: `${amb.length} left`, enemy: true }; }
+    if (s.type === 'kill') {
+      if (s.target === 'boss' && R.boss && R.boss.state !== 'dead') return { x: R.boss.pos.x, z: R.boss.pos.z, label: R.boss.c.name, enemy: true };
+      const tgt = s.target === 'realTarget' ? R.realTarget : s.target === 'target' ? R.target : null;
+      if (tgt && tgt.state !== 'dead') return { x: tgt.pos.x, z: tgt.pos.z, label: tgt.c.name, enemy: true };
       const h = missionHostiles();
-      if (h.length) { let b = h[0], bd = 1e9; for (const e of h) { const d = e.pos.distanceTo(player.pos); if (d < bd) { bd = d; b = e; } } return { x: b.pos.x, z: b.pos.z, label: `${h.length} left`, enemy: true }; }
+      if (h.length) { const b = nearestOf(h); return { x: b.pos.x, z: b.pos.z, label: `${h.length} left`, enemy: true }; }
     }
     if (s.type === 'destroy') { const o = (s.objs || []).find((o) => o._prop && !o._prop.destroyed); if (o) return { x: o._prop.pos.x, z: o._prop.pos.z, label: 'Destroy' }; }
-    if (s.type === 'photo' && R.target && R.target.state !== 'dead') return { x: R.target.pos.x, z: R.target.pos.z, label: R.target.c.name };
+    if (s.type === 'photo') { const t = s.target === 'realTarget' ? R.realTarget : R.target; if (t && t.state !== 'dead') return { x: t.pos.x, z: t.pos.z, label: t.c.name }; }
+    if (s.type === 'escort' && R.ss.npc) { const e = R.ss.npc; const wp = R.ss.path?.[R.ss.wp]; return d2(e.pos) > 10 ? { x: e.pos.x, z: e.pos.z, label: e.c.name } : wp ? { x: wp.x, z: wp.z, label: 'Escort' } : null; }
+    if (s.type === 'hack') { const st = site((s.sites || [s.site])[R.ss.hackI || 0]); if (st) return { x: st.x, z: st.z, label: s.verb ? 'Terminal' : 'Hack' }; }
     const st = site(s.site || s.sites?.[0] || s.path?.[s.path.length - 1] || s.orExfil);
     if (!st) return null;
-    return { x: st.x, z: st.z, label: s.type === 'pickup' ? 'Pick up' : s.type === 'deliver' ? 'Deliver' : s.type === 'exfil' ? 'Exfil' : null };
+    return { x: st.x, z: st.z, label: s.type === 'pickup' ? 'Pick up' : s.type === 'deliver' ? 'Deliver' : s.type === 'exfil' || s.type === 'survive' ? 'Exfil' : s.ping ? `Search ${s.radius} m` : null };
   }
 
   function interactLabel() {
     if (!R || !R.step || R.busy) return null;
     const s = R.step;
+    const x = steps.label(R, s);
+    if (x) return x;
     const next = sim.state.contract?.steps[R.idx + 1];
     const near = (id, r = 2.8) => { const st = site(id); return st && d2(st) < r + (st.r || 0) * 0.3; };
     if (s.type === 'pickup' && near(s.site)) return `Pick up ${s.item?.name ? 'the ' + s.item.kind : ''}`.trim();
     if (s.type === 'deliver' && near(s.site, 3.2) && !(R.scriptedPack && !R.scriptedCleared)) return s.dispose ? 'Dump it' : 'Deliver';
     if (s.type === 'kill' && s.optional && next?.type === 'pickup' && near(next.site)) return `Grab the ${next.item?.kind || 'item'}`;
-    if (['hack', 'escort', 'tail', 'race', 'defend', 'capture', 'confront', 'walk'].includes(s.type) && near(s.site || s.sites?.[R.ss.hackI || 0] || s.path?.[s.path.length - 1], 3.5)) return s.type === 'hack' ? (s.plant ? 'Plant the bug' : 'Hack') : 'Continue';
+    if (['tail', 'race', 'capture', 'confront', 'walk'].includes(s.type) && near(s.site || s.path?.[s.path.length - 1], 3.5)) return 'Continue';
     return null;
   }
 
@@ -221,6 +329,7 @@ export function createRunner(ctx) {
     const s = R.step;
     const lbl = interactLabel();
     if (!lbl) return false;
+    if (steps.interact(R, s)) return true;
     if (s.type === 'pickup') { pickUp(R.idx); complete(); storyEvent('pickup'); return true; }
     if (s.type === 'kill' && s.optional) { complete(); pickUp(R.idx); complete(); return true; }
     if (s.type === 'deliver') {
@@ -229,7 +338,6 @@ export function createRunner(ctx) {
       complete();
       return true;
     }
-    if (s.type === 'hack') { R.ss.hacking = true; return true; }
     complete();
     return true;
   }
@@ -239,8 +347,17 @@ export function createRunner(ctx) {
     const s = sim.state.contract?.steps[idx];
     props.removeCarry(c); R.carries.delete(idx);
     ctx.setCarrying(s?.item?.kind || 'parcel');
+    R.hitsCarrying = 0;
     audio.sfx('pickup');
-    ui.toast(`Picked up ${s?.item?.name || 'the item'}`, 'good', { ms: 2000 });
+    ui.toast(`Picked up ${s?.item?.name || 'the item'}`, 'good', { ms: 2000, sub: R.mission.modifiers.includes('fragile') ? 'Fragile: 3 hits and it breaks' : undefined });
+  }
+
+  // Fragile: the carried cargo breaks after 3 hits taken
+  function playerHit(res) {
+    if (!R || !ctx.carrying?.() || !R.mission.modifiers.includes('fragile') || !(res?.amount > 0)) return;
+    R.hitsCarrying++;
+    if (R.hitsCarrying >= 3) { fx.sparks(tmp.set(player.pos.x, player.pos.y + 1.2, player.pos.z), 0xd8c0a0, 16, 5); audio.sfx('explosion_small'); fail('fragile', 'The cargo broke'); }
+    else ui.toast(`Fragile cargo: ${3 - R.hitsCarrying} hit${3 - R.hitsCarrying > 1 ? 's' : ''} left`, 'warn', { ms: 1400 });
   }
 
   function update(dt) {
@@ -250,13 +367,13 @@ export function createRunner(ctx) {
     const s = R.step;
     R.ss.t += dt;
     const m = R.mission;
-    if (m.timeLimit && c.elapsed > m.timeLimit) { ui.toast('Out of time', 'bad'); sim.failContract('timeout'); endFailed('timeout'); return; }
+    if (m.timeLimit && c.elapsed > m.timeLimit) { fail('timeout', 'Out of time'); return; }
     if (s.timer && R.ss.t > s.timer) {
       fx.flash(tmp.set(player.pos.x, player.pos.y + 1, player.pos.z), 2, 0xff5020, 0.4); audio.sfx('explosion');
       ctx.damagePlayerPct(0.35, 'The parcel exploded');
       complete(); return;
     }
-    // scripted packs (A1-M1 ambush) trigger on route progress
+    // scripted packs (story ambushes) trigger on route progress
     for (const p of R.packs) {
       if (!p.scripted || p.spawned || p.atStep !== R.idx) continue;
       const st = site(s.site), from = site(c.steps[R.idx - 1]?.site) || st;
@@ -267,40 +384,47 @@ export function createRunner(ctx) {
     }
     if (R.scriptedPack && !R.scriptedCleared && R.scriptedPack.ents?.every((e) => e.state === 'dead')) { R.scriptedCleared = true; storyEvent(R.scriptedPack.trigger.event + 'Cleared'); }
 
-    const st = site(s.site);
-    switch (s.type) {
-      case 'goto': case 'exfil':
-        if (st && d2(st) < Math.max(3, Math.min(s.radius || 4, 10))) complete();
-        break;
-      case 'kill': {
-        if (s.target === 'target') { if (R.target ? R.target.state === 'dead' : !missionHostiles().length) complete(); break; }
-        const pending = R.packs.some((p) => !p.spawned && !p.scripted && p.atStep <= R.idx);
-        if (!pending && !missionHostiles().length && R.ss.t > 0.5) complete();
-        else for (const e of missionHostiles()) if (e.state === 'idle' && e.pos.distanceTo(player.pos) < 14 && !R.stealth) enemies.alert(e, 'fight');
-        break;
-      }
-      case 'destroy':
-        if ((s.objs || []).every((o) => !o._prop || o._prop.destroyed) && R.ss.t > 0.3) complete();
-        break;
-      case 'photo': photo(dt, s); break;
-      case 'hack': case 'confront': case 'walk': case 'escort': case 'tail': case 'race': case 'defend': case 'capture':
-        if (R.ss.hacking) {
-          R.ss.hold += dt;
-          if (R.ss.hold >= (s.time || 2)) complete();
-          else if (!interactLabel()) R.ss.hacking = false;
+    if (!steps.update(R, s, dt)) {
+      const st = site(s.site);
+      switch (s.type) {
+        case 'goto': case 'exfil': {
+          const rad = s.ping ? Math.max(4, s.radius * 0.45) : Math.max(3, Math.min(s.radius || 4, 10));
+          if (st && d2(st) < rad && !(R.scriptedPack && !R.scriptedCleared && s.type === 'goto' && R.scriptedPack.atStep === R.idx && R.scriptedPack.ents?.some((e) => e.state !== 'dead') && false)) complete();
+          break;
         }
-        if (s.type !== 'hack' && st && d2(st) < 3) complete();
-        break;
-      case 'survive':
-        if (R.ss.t >= (s.seconds || 30) || (s.orExfil && site(s.orExfil) && d2(site(s.orExfil)) < 4)) complete();
-        break;
-      default: break;
+        case 'kill': {
+          if (s.target === 'boss') { if (R.boss && R.boss.state === 'dead') complete(); break; }
+          if (s.target === 'target' || s.target === 'realTarget') {
+            const t = s.target === 'target' ? R.target : R.realTarget;
+            if (t ? t.state === 'dead' : !missionHostiles().length) complete();
+            break;
+          }
+          const pending = R.packs.some((p) => !p.spawned && !p.scripted && p.atStep <= R.idx);
+          if (!pending && !missionHostiles().length && R.ss.t > 0.5) complete();
+          else for (const e of missionHostiles()) if (e.state === 'idle' && e.pos.distanceTo(player.pos) < 14 && !R.stealth) enemies.alert(e, 'fight');
+          break;
+        }
+        case 'destroy':
+          if ((s.objs || []).every((o) => !o._prop || o._prop.destroyed) && R.ss.t > 0.3) complete();
+          break;
+        case 'photo': photo(dt, s); break;
+        case 'confront': case 'walk': case 'tail': case 'race': case 'capture':
+          if (st && d2(st) < 3) complete();
+          break;
+        case 'survive': {
+          const ex = s.orExfil && site(s.orExfil);
+          ui.meter.set({ label: s.label || 'Survive', value: Math.min(1, R.ss.t / (s.seconds || 30)), kind: 'danger', text: `${Math.max(0, Math.ceil((s.seconds || 30) - R.ss.t))}s`, sub: ex ? 'or reach the exit' : '' });
+          if (R.ss.t >= (s.seconds || 30) || (ex && d2(ex) < 4)) { ui.meter.hide(); complete(); }
+          break;
+        }
+        default: break;
+      }
     }
     if (R?.stealth) stealth(dt);
   }
 
   function photo(dt, s) {
-    const t = R.target;
+    const t = s.target === 'realTarget' ? R.realTarget : R.target;
     if (!t || t.state === 'dead') { if (R.ss.t > 2) complete(); return; }
     const d = t.pos.distanceTo(player.pos);
     const maxD = s.maxDist || 14;
@@ -319,6 +443,7 @@ export function createRunner(ctx) {
         ui.lens.flash('Captured'); ui.lens.count(`${R.ss.shots} / ${R.ss.need}`);
         audio.sfx('scan');
         fx.flash(tmp, 0.6, 0xffffff, 0.15);
+        storyEvent(`shot:${R.ss.shots}`);
         if (R.ss.shots >= R.ss.need) { setTimeout(() => ui.lens.hide(), 700); complete(); }
       }
     } else if (ui.lens.open) ui.lens.hide();
@@ -328,7 +453,7 @@ export function createRunner(ctx) {
     let alarm = false;
     for (const e of enemies.list) {
       if (e.mission !== R.mission.id || e.nonCombat || e.state === 'dead') continue;
-      if (e.state !== 'idle') { alarm = true; ui.detect.clear(e.id); continue; }
+      if (e.state !== 'idle' && e.state !== 'search') { alarm = true; ui.detect.clear(e.id); continue; }
       if (e.detect > 0.02) {
         tmp.set(e.pos.x, e.pos.y + 2.3, e.pos.z);
         const sp = ctx.project(tmp);
@@ -345,10 +470,12 @@ export function createRunner(ctx) {
     }
   }
 
-  return {
-    accept, update, objective, interact, interactLabel, abandon, failed,
+  const api = {
+    accept, update, objective, interact, interactLabel, abandon, failed, playerHit, site, spawnPack, synthPack, complete, fail, missionHostiles, storyEvent,
     capture() { if (R) R.ss.capture = true; },
     get active() { return R; },
     get mission() { return R?.mission || null; },
   };
+  const steps = createSteps(ctx, api);
+  return api;
 }

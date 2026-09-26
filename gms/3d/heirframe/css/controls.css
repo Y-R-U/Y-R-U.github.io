@@ -127,3 +127,14 @@
 .hf-desktop kbd { display: block; }
 .hf-desktop .hf-joyzone { display: none; }
 .hf-desktop .hf-attack kbd { top: 4px; right: 4px; }
+
+/* repair kit quick-use (DESIGN §13 market consumable) */
+.hf-kit { position: absolute; left: 30px; top: 86px; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 21px; color: #eafff2; touch-action: none;
+  background: radial-gradient(circle at 50% 28%, rgba(160, 255, 200, .4), transparent 60%), radial-gradient(circle, #0e4a33, #062618 80%);
+  box-shadow: 0 0 0 1.5px rgba(230, 255, 240, .75), 0 0 0 3px rgba(8, 50, 32, .9), 0 0 0 4px rgba(90, 230, 150, .6), 0 0 14px rgba(90, 230, 150, .35), inset 0 -5px 12px rgba(0, 0, 0, .5);
+  transition: scale .1s var(--ease-out), opacity .2s; }
+.hf-kit .ic { filter: drop-shadow(0 0 6px rgba(120, 255, 170, .9)); }
+.hf-kit .n { position: absolute; right: -3px; bottom: -3px; min-width: 18px; height: 18px; border-radius: 9px; padding: 0 4px; font: 700 11px/18px var(--font-u); text-align: center; color: #04231a; background: linear-gradient(180deg, #eafff2, #8ff0b8); }
+.hf-kit.empty { opacity: .28; filter: grayscale(.8); }
+.hf-kit.cooling { opacity: .5; }
+.hf-kit.pressed { scale: .9; }

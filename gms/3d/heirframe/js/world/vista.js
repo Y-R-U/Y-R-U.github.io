@@ -34,7 +34,7 @@ export function buildVista(ctx) {
     f.position.set(x, top, fallZ + 1.2);
     scene.add(f);
   }
-  if (tier.mist) scene.add(createMist(ctx, { x: fallX, y: WY + 0.2, z: fallZ + 4, w: 46, d: 6, count: 200, size: 9 }));
+  if (tier.mist) scene.add(createMist(ctx, { x: fallX, y: WY + 0.2, z: fallZ + 4, w: 46, d: 9, count: 220, size: 10 }));
 
   // Cascade terraces on the far bank: stepped pools with short falls.
   const bankX = 128;

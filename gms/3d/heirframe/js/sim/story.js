@@ -128,7 +128,8 @@ export function buildStoryMission(id, ctx) {
   const level = Math.max(def.gate, (ctx.riderLevel || 1) - 2) + Math.max(0, threat.lvlOff);
   const S = sitesFor(def.district, ctx.sites);
   let m;
-  if (['walk', 'confront'].includes(def.archetype)) {
+  if (def.steps) m = templateMission(def, id, S, rng, level, threat);
+  else if (['walk', 'confront'].includes(def.archetype)) {
     sseq = 0;
     const tagPool = S.filter(s => s.tag !== 'spawn_edge');
     const a = def.archetype === 'confront' ? (S.find(s => s.tag === 'market') || S.find(s => s.tag === 'plaza') || tagPool[0]) : tagPool[0];
@@ -173,6 +174,50 @@ export function buildStoryMission(id, ctx) {
   m.payout = def.payout ? { credits: def.payout.credits, xp: def.payout.xp, rep: {}, cache: 'story' } : missionPayout(m, ctx);
   if (def.cacheItem) m.cacheItem = def.cacheItem;
   m.difficulty = 3;
+  return m;
+}
+
+// Hand-built story steps (Act 1 M2–M5): tags → sites (deterministic), '@N'/at:N reuse step N's site.
+function templateMission(def, id, S, rng, level, threat) {
+  sseq = 0;
+  const pool = S;
+  const used = new Set();
+  const pick = (tags, from, far) => {
+    for (const t of tags) {
+      let c = pool.filter(s => s.tag === t && !used.has(s.id));
+      if (!c.length) c = pool.filter(s => s.tag === t);
+      if (!c.length) continue;
+      if (from && c.length > 1) c = c.slice().sort((a, b) => (far ? -1 : 1) * (Math.hypot(a.x - from.x, a.z - from.z) - Math.hypot(b.x - from.x, b.z - from.z)));
+      const s = from ? c[0] : c[rng.int(0, c.length - 1)];
+      used.add(s.id);
+      return s;
+    }
+    return pool[0];
+  };
+  const siteOf = [];
+  const steps = def.steps.map((t, i) => {
+    const prev = siteOf[i - 1] || null;
+    const site = t.at != null ? siteOf[t.at] : t.tags ? pick(t.tags, prev, t.far) : prev;
+    siteOf[i] = site;
+    const { tags, at, far, spawnTags, orExfilTags, ...rest } = t;
+    const st = sstep(t.type, { ...rest, label: t.label });
+    if (['goto', 'exfil', 'photo', 'defend'].includes(t.type)) st.site = site.id;
+    if (t.type === 'hack') st.sites = [site.id];
+    if (t.type === 'defend') st.spawns = (spawnTags || ['spawn_edge']).map(tag => pick([tag, 'spawn_edge'], site, false).id).filter((v, k, a) => a.indexOf(v) === k);
+    if (t.type === 'survive' && orExfilTags) st.orExfil = pick(orExfilTags, site, false).id;
+    return st;
+  });
+  const enemies = (def.packs || []).map((p, k) => ({
+    pack: p.scripted ? 'scripted' : 'story_' + k, faction: def.faction || 'syndicate', atStep: p.atStep, site: (siteOf[p.at] || siteOf[p.atStep]).id,
+    ...(p.scripted ? { scripted: true, trigger: { event: p.scripted.event, progress: p.scripted.progress } } : {}), guard: !!p.guard,
+    units: p.units.flatMap(([defId, rank, n]) => Array.from({ length: n }, () => ({ defId, rank, level }))),
+  }));
+  const m = {
+    id: `story_${id}`, seed: rng.int(1, 2 ** 31 - 1), archetype: def.archetype, type: 'story', name: 'Story', grade: 'story', threat: threat.id, district: def.district,
+    level, client: null, faction: def.faction || 'syndicate', target: null, npcs: [], steps, modifiers: [], timeLimit: null, parTime: 300, twist: null, enemies,
+    heat: 0, checkpoints: true, stealthy: !!def.stealthy, bonuses: ['stealth', 'flawless', 'speed', 'clean'],
+  };
+  if (def.target) m.target = { defId: def.target.defId, rank: def.target.rank || 'grunt', name: def.target.name, level, faction: def.faction, site: siteOf[def.target.at || 0].id };
   return m;
 }
 

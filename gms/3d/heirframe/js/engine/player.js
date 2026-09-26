@@ -37,6 +37,8 @@ export function createPlayerController(world, actor, { speed = 4.6 } = {}) {
       p.yaw = Math.atan2(dx, dz);
       p.moveTarget = null; p.path = null;
     },
+    // swap the body (frame change); the caller adds/removes roots from the scene
+    setActor(a) { actor = a; p.actor = a; p.radius = a.radius || 0.45; p.sync(); },
     sync() { actor.root.position.copy(p.pos); actor.root.rotation.y = p.yaw; },
     // stick: {x, y} with y = forward (up the screen)
     update(dt, stick) {

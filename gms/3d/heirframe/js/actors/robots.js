@@ -87,6 +87,9 @@ export function robotStats(kind, opts = {}) {
   return s;
 }
 
+// every live robot, for world effects (ground contact shadows)
+export const LIVE_ROBOTS = new Set();
+
 export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality = 'high', lod = 'near', paint = null, merged = false } = {}) {
   kind = kindOf(kind);
   const K = KINDS[kind];
@@ -306,11 +309,14 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
       if (flashT > 0) { flashT -= dt; if (flashT <= 0) mesh.material = meshMats; }
     },
     dispose() {
+      LIVE_ROBOTS.delete(api);
       root.removeFromParent();
       mesh.skeleton.dispose();
       for (const mm of own) mm.dispose();
     },
   };
+  api.hover = ctx.hover;
+  LIVE_ROBOTS.add(api);
   api.update(0);
   return api;
 }

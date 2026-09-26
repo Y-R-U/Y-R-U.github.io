@@ -10,7 +10,8 @@ export function createRenderer(canvas, tier, toneMapping = 'aces') {
   renderer.setSize(innerWidth, innerHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = toneMapping === 'agx' ? THREE.AgXToneMapping : THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.85;
+  const expQ = new URLSearchParams(location.search).get('exp');
+  renderer.toneMappingExposure = expQ ? +expQ : 0.85; // ?exp= lets Aaron compare grades on the phone
   renderer.shadowMap.enabled = tier.shadowMap > 0;
   renderer.shadowMap.type = tier.shadowSoft ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
   renderer.info.autoReset = false;
@@ -23,6 +24,10 @@ class BloomLite extends UnrealBloomPass {
   constructor(res, strength, radius, threshold, div = 2) {
     super(res.clone().multiplyScalar(2 / div), strength, radius, threshold);
     this.div = div; this.needsSwap = false;
+    // a mirror-smooth sun glint can overflow the half-float target to Inf; Inf through the blur/ACES = a black frame
+    const hp = this.materialHighPassFilter;
+    hp.fragmentShader = hp.fragmentShader.replace('vec4 texel = texture2D( tDiffuse, vUv );',
+      'vec4 texel = texture2D( tDiffuse, vUv ); texel.rgb = min( max( texel.rgb, vec3( 0.0 ) ), vec3( 64.0 ) );');
   }
   setSize(w, h) { super.setSize(Math.max(2, w * 2 / this.div), Math.max(2, h * 2 / this.div)); }
   get output() { return this.renderTargetsHorizontal[0].texture; }
@@ -78,7 +83,7 @@ const GradeShader = {
     void main() {
       vec4 c = texture2D( tDiffuse, vUv );
       if ( uBloomOn > 0.5 ) c.rgb += texture2D( tBloom, vUv ).rgb;
-      c.rgb = max( c.rgb, vec3( 0.0 ) );
+      c.rgb = min( max( c.rgb, vec3( 0.0 ) ), vec3( 64.0 ) );
       #ifdef ACES_FILMIC_TONE_MAPPING
         c.rgb = ACESFilmicToneMapping( c.rgb );
       #elif defined( AGX_TONE_MAPPING )

@@ -6,6 +6,7 @@ export const SUN_DIR = new THREE.Vector3(0.74, 0.50, -0.45).normalize();
 export const PLANET_DIR = new THREE.Vector3(0.30, 0.62, -0.72).normalize();
 export const SUN_COLOR = new THREE.Color(1.0, 0.80, 0.58);
 export const HAZE_COLOR = new THREE.Color(0.70, 0.76, 0.85);
+export const AERIAL = 2.2;
 export const SUN_HAZE_COLOR = new THREE.Color(1.0, 0.80, 0.56);
 
 const v3 = (v) => `vec3(${v.x.toFixed(4)},${v.y.toFixed(4)},${v.z.toFixed(4)})`;
@@ -24,6 +25,7 @@ export function installFog() {
 #endif`;
   C.fog_pars_fragment = `#ifdef USE_FOG
   uniform vec3 fogColor;
+  const float uAerial = ${AERIAL.toFixed(3)};
   varying float vFogDepth;
   varying vec3 vFogWorldPos;
   #ifdef FOG_EXP2
@@ -51,6 +53,10 @@ export function installFog() {
     fogAmt = clamp( fogAmt, 0.0, 0.93 );
     float sunAmt = pow( max( dot( fdir, ${v3(SUN_DIR)} ), 0.0 ), 5.0 );
     vec3 fcol = mix( fogColor, ${c3(SUN_HAZE_COLOR)} * 1.25, sunAmt * 0.8 );
+    // aerial perspective: per-channel extinction (blue goes first) + sky in-scatter, so far mass turns blue-grey and
+    // loses contrast while near stays crisp; thins with height like the fog. Kicks in past ~25 m.
+    vec3 aT = exp( -max( optical - 25.0, 0.0 ) * vec3( 0.0011, 0.0014, 0.0019 ) * uAerial );
+    gl_FragColor.rgb = gl_FragColor.rgb * aT + mix( fogColor * vec3( 0.6, 0.71, 0.9 ), fcol * 0.85, sunAmt ) * ( 1.0 - aT );
     gl_FragColor.rgb = mix( gl_FragColor.rgb, fcol, fogAmt );
   }
 #endif`;

@@ -13,7 +13,7 @@ const BLURB = {
 };
 const ROMAN = ['0', 'I', 'II', 'III', 'IV', 'V', 'VI'];
 const MATS = [['scrap', 'Scrap Alloy'], ['circuitry', 'Circuitry'], ['flux', 'Flux Cells'], ['shards', 'Heir Shards']];
-const TABS = [['loadout', 'Loadout', 'chassis'], ['frames', 'Frames', 'warehouse'], ['fabricator', 'Fabricator', 'upgrade']];
+const TABS = [['loadout', 'Loadout', 'chassis'], ['frames', 'Frames', 'warehouse'], ['skills', 'Skills', 'sparkle'], ['fabricator', 'Fabricator', 'upgrade'], ['market', 'Market', 'credits']];
 
 const slotsOf = (f, all) => f.slotsAllowed || (f.rental ? ['weapon', 'chip'] : all);
 const better = (it, eq) => it.fr != null && (!eq || (eq.fr != null && it.fr > eq.fr));
@@ -34,6 +34,8 @@ export function warehousePanel(body, data, ctx) {
 
   if (st.tab === 'frames') return framesTab(body, data, ctx, emit);
   if (st.tab === 'fabricator') return fabTab(body, data, ctx, emit);
+  if (st.tab === 'skills') return skillsTab(body, data, ctx, emit);
+  if (st.tab === 'market') return marketTab(body, data, ctx, emit);
 
   const f = frames.find(x => x.id === st.frame) || {};
   const allowed = slotsOf(f, allSlots);
@@ -125,6 +127,7 @@ function framesTab(body, data, ctx, emit) {
         <div class="wf-meta">${f.fr != null ? `<span>FR <b class="hf-num">${f.fr}</b></span>` : ''}${f.sync != null ? `<span>Sync <b class="hf-num">${f.sync}</b></span>` : ''}${f.level != null ? `<span>LV <b class="hf-num">${f.level}</b></span>` : ''}</div>
         <div class="wf-btns">
           ${f.id === data.active ? `<span class="hf-chip good">${icon('check')}Deployed</span>` : `<button class="hf-btn primary hf-live" data-deploy="${esc(f.id)}">Deploy</button>`}
+          ${f.repair ? `<button class="hf-btn hf-live" data-repair="${esc(f.id)}">${icon('heal')}Repair <b class="hf-num">${fmt(f.repair)}</b></button>` : ''}
           ${!f.rental && mk < mkMax && f.mkCost ? `<button class="hf-btn gold hf-live" data-mk="${esc(f.id)}">${icon('upgrade')}Mk ${ROMAN[mk + 1]} <b class="hf-num">${fmt(f.mkCost)}</b></button>` : ''}
         </div>
       </div>
@@ -142,6 +145,44 @@ function framesTab(body, data, ctx, emit) {
   body.querySelectorAll('[data-deploy]').forEach(b => onTap(b, () => emit('warehouse:activate', { frameId: b.dataset.deploy })));
   body.querySelectorAll('[data-mk]').forEach(b => onTap(b, () => emit('warehouse:mk', { frameId: b.dataset.mk })));
   body.querySelectorAll('[data-buy]').forEach(b => onTap(b, () => emit('warehouse:buy', { kind: b.dataset.buy })));
+  body.querySelectorAll('[data-repair]').forEach(b => onTap(b, () => emit('warehouse:repair', { frameId: b.dataset.repair })));
+}
+
+function skillsTab(body, data, ctx, emit) {
+  const st = ctx.state;
+  const frames = data.frames || [];
+  const f = frames.find(x => x.id === st.frame) || frames.find(x => x.id === data.active) || frames[0] || {};
+  const sv = f.skills || { list: [], mods: [] };
+  const pick = frames.map(fr => `<button class="sk-fr hf-live ${fr.id === f.id ? 'on' : ''}" data-f="${esc(fr.id)}">${esc(fr.name)}</button>`).join('');
+  const sync = f.maxSync ? `<div class="sk-sync"><span class="hf-label">Frame Sync</span><b class="hf-num">${f.sync || 1}</b><div class="sk-bar"><i style="width:${Math.min(100, Math.round((f.syncXp || 0) / (f.syncNext || 1) * 100))}%"></i></div><small class="hf-num">${fmt(f.syncXp || 0)} / ${fmt(f.syncNext || 0)}</small></div>` : '';
+  const skills = sv.list.map(k => `<div class="sk-row"><span class="sk-ic">${icon(k.icon || 'sparkle')}</span><div class="sk-t"><b>${esc(k.name)}${k.mod ? ' <em>modded</em>' : ''}</b><small>${esc(k.desc)}</small></div><span class="sk-m hf-num">${k.slot === 'attack' ? 'BASIC' : `${k.cd ? k.cd + ' s' : ''}${k.energy ? ` · ${k.energy} en` : ''}`}</span></div>`).join('');
+  const passive = sv.passive ? `<div class="sk-row passive"><span class="sk-ic">${icon('star')}</span><div class="sk-t"><b>${esc(sv.passive.name)}</b><small>${esc(sv.passive.desc)}</small></div><span class="sk-m">PASSIVE</span></div>` : '';
+  const mods = sv.mods.map(r => `<div class="sk-rank ${r.unlocked ? '' : 'locked'}"><span class="hf-label">Sync ${r.rank}</span>${r.options.map(o => `<button class="sk-mod hf-live ${r.chosen === o.id ? 'on' : ''}" ${r.unlocked ? '' : 'disabled'} data-rank="${r.rank}" data-opt="${esc(o.id)}"><b>${esc(o.name)}</b><small>${esc(o.skill)} · ${esc(o.desc)}</small>${r.chosen === o.id ? `<i>${icon('check')}</i>` : ''}</button>`).join('')}${r.unlocked ? '' : `<span class="sk-lock">${icon('lock')} reach sync ${r.rank}</span>`}</div>`).join('');
+  body.innerHTML = `<div class="hf-sk">
+    <div class="sk-l hf-scroll"><div class="sk-frs">${pick}</div>${sync}${skills}${passive}</div>
+    <div class="sk-r hf-scroll"><span class="hf-label">Skill mods · free to change here</span>${mods || '<div class="hf-empty">The rental has one mod, at sync 5.</div>'}</div>
+  </div>`;
+  body.querySelectorAll('.sk-fr').forEach(b => onTap(b, () => { st.frame = b.dataset.f; ctx.bus.emit('sfx', 'click'); ctx.rerender(); }));
+  body.querySelectorAll('.sk-mod:not([disabled])').forEach(b => onTap(b, () => emit('warehouse:mod', { frameId: f.id, rank: +b.dataset.rank, optionId: b.dataset.opt })));
+}
+
+function marketTab(body, data, ctx, emit) {
+  const m = data.market || { stock: [], consumables: [] };
+  const stock = m.stock.map(e => `<div class="mk-item ${e.sold ? 'sold' : ''}" data-i="${e.index}">
+      ${itemTile(e.item, e.item.delta > 0 ? 'better' : '')}
+      <div class="mk-t"><b style="color:${RARITY.get(e.item.rarity).color}">${esc(e.item.name)}</b><small>${esc(e.item.slotName || e.item.slot)} · FR ${e.item.fr}${e.item.delta != null ? ` <em class="${e.item.delta > 0 ? 'up' : 'dn'}">${e.item.delta > 0 ? '▲' : '▼'}${Math.abs(e.item.delta)}</em>` : ''}</small></div>
+      <button class="hf-btn ${e.sold ? 'ghost' : 'gold'} hf-live" ${e.sold ? 'disabled' : ''} data-buy="${e.index}">${e.sold ? 'Sold' : `${icon('credits')}<b class="hf-num">${fmt(e.price)}</b>`}</button>
+    </div>`).join('');
+  const cons = m.consumables.map(c => `<div class="mk-con"><span class="mk-ci">${icon(c.id === 'repairKit' ? 'heal' : c.id === 'signalJammer' ? 'heat' : 'drone')}</span>
+      <div class="mk-t"><b>${esc(c.name)} <span class="hf-num">${c.count}/${c.cap}</span></b><small>${esc(c.desc)}</small></div>
+      <button class="hf-btn gold hf-live" ${c.count >= c.cap ? 'disabled' : ''} data-con="${esc(c.id)}">${c.count >= c.cap ? 'Full' : `${icon('credits')}<b class="hf-num">${fmt(c.price)}</b>`}</button></div>`).join('');
+  body.innerHTML = `<div class="hf-mk">
+    <div class="mk-l hf-scroll"><span class="hf-label">Sal's stock · new every shift</span>${stock || '<div class="hf-empty">Sold out.</div>'}</div>
+    <div class="mk-r hf-scroll"><span class="hf-label">Supplies</span>${cons}</div>
+  </div>`;
+  body.querySelectorAll('[data-buy]').forEach(b => onTap(b, () => emit('warehouse:market', { index: +b.dataset.buy })));
+  body.querySelectorAll('[data-con]').forEach(b => onTap(b, () => emit('warehouse:consumable', { id: b.dataset.con })));
+  body.querySelectorAll('.mk-item .hf-tile').forEach(t => onTap(t, () => { const e = m.stock.find(x => String(x.item.id) === t.dataset.id); if (e) ctx.itemCard(e.item, null, {}); }));
 }
 
 function fabTab(body, data, ctx, emit) {

@@ -6,13 +6,67 @@ import { enableReflect } from '../engine/player.js';
 export function createProps(ctx) {
   const { world, fx, audio } = ctx;
   const scene = world.scene;
-  const destructibles = [], carries = [], loot = [];
+  const destructibles = [], carries = [], loot = [], breakables = [];
   const std = (color, o = {}) => new THREE.MeshStandardMaterial({ color, metalness: 0.6, roughness: 0.45, ...o });
   const M = {
     junk: std(0x5a4a3a, { roughness: 0.8 }), rust: std(0x8a4a22, { roughness: 0.7 }), eye: new THREE.MeshBasicMaterial({ color: 0xff5a2a, toneMapped: false }),
     parcel: std(0xd9c9a8, { metalness: 0.1, roughness: 0.7 }), tape: std(0x2f7fd8, { metalness: 0.2 }), glow: new THREE.MeshBasicMaterial({ color: 0x9fe8ff, toneMapped: false }),
     case: std(0x2a2d33, { metalness: 0.9, roughness: 0.25 }), gold: std(0xe8b95a, { metalness: 1, roughness: 0.2 }), bomb: new THREE.MeshBasicMaterial({ color: 0xff3020, toneMapped: false }),
+    steel: std(0x6b7280, { metalness: 0.9, roughness: 0.35 }), panel: std(0x1c2230, { metalness: 0.7, roughness: 0.3 }), amber: new THREE.MeshBasicMaterial({ color: 0xffb040, toneMapped: false }),
+    crate: std(0xb08a5a, { metalness: 0.05, roughness: 0.75 }), glass: std(0x9fd8ff, { metalness: 0.2, roughness: 0.05, transparent: true, opacity: 0.55 }),
   };
+  const G = {
+    mBase: new THREE.BoxGeometry(1.3, 0.25, 1.1), mBody: new THREE.BoxGeometry(1.0, 1.25, 0.85), mCore: new THREE.CylinderGeometry(0.18, 0.18, 0.9, 10),
+    mFin: new THREE.BoxGeometry(0.08, 0.9, 0.7), crate: new THREE.BoxGeometry(0.8, 0.7, 0.8), pane: new THREE.BoxGeometry(1.4, 1.1, 0.08),
+  };
+
+  // sabotage / defend objects: a humming machine with a glowing core (generator, relay, pump, ...)
+  function machine(x, z, hp = 120, kind = 'generator', { hostile = true } = {}) {
+    const g = new THREE.Group();
+    const base = new THREE.Mesh(G.mBase, M.panel); base.position.y = 0.12; g.add(base);
+    const body = new THREE.Mesh(G.mBody, M.steel); body.position.y = 0.87; g.add(body);
+    const core = new THREE.Mesh(G.mCore, hostile ? M.amber : M.glow); core.position.set(0, 0.9, 0.44); core.rotation.x = Math.PI / 2; core.scale.set(1, 0.12, 1); g.add(core);
+    for (const k of [-1, 1]) { const f = new THREE.Mesh(G.mFin, M.panel); f.position.set(k * 0.56, 0.9, 0); g.add(f); }
+    const top = new THREE.Mesh(G.mCore, hostile ? M.amber : M.glow); top.position.y = 1.55; top.scale.set(0.6, 0.25, 0.6); g.add(top);
+    enableReflect(g);
+    g.position.set(x, world.groundAt(x, z), z);
+    g.rotation.y = Math.random() * Math.PI * 2;
+    scene.add(g);
+    const d = { prop: true, kind, pos: g.position, radius: 0.9, hp, max: hp, mesh: g, destroyed: false, core, t: Math.random() * 6 };
+    if (hostile) destructibles.push(d);
+    return d;
+  }
+
+  // collateral: market crates and glass stands near objectives; only area hits break them
+  function breakable(x, z, value = 60) {
+    const g = new THREE.Group();
+    const glass = Math.random() < 0.4;
+    if (glass) { const p = new THREE.Mesh(G.pane, M.glass); p.position.y = 0.75; g.add(p); const b = new THREE.Mesh(G.mBase, M.gold); b.scale.set(1.1, 0.4, 0.2); b.position.y = 0.05; g.add(b); }
+    else for (let i = 0; i < 3; i++) { const c = new THREE.Mesh(G.crate, M.crate); c.position.set((i - 1) * 0.3, 0.35 + (i === 1 ? 0.7 : 0), (i % 2) * 0.2); c.rotation.y = i * 0.4; c.scale.setScalar(i === 1 ? 0.8 : 1); g.add(c); }
+    g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+    g.position.set(x, world.groundAt(x, z), z);
+    g.rotation.y = Math.random() * Math.PI;
+    scene.add(g);
+    const b = { pos: g.position, mesh: g, value: glass ? value * 2 : value, hp: glass ? 8 : 20, glass };
+    breakables.push(b);
+    return b;
+  }
+  // area damage from the player: breaks collateral within r of (x,z)
+  function splash(x, z, r, dmg) {
+    for (let i = breakables.length - 1; i >= 0; i--) {
+      const b = breakables[i];
+      if (Math.hypot(b.pos.x - x, b.pos.z - z) > r + 0.5) continue;
+      b.hp -= dmg;
+      if (b.hp > 0) continue;
+      breakables.splice(i, 1);
+      scene.remove(b.mesh);
+      const p = new THREE.Vector3(b.pos.x, b.pos.y + 0.6, b.pos.z);
+      fx.sparks(p, b.glass ? 0xbfe6ff : 0xd8b080, 14, 6);
+      fx.flash(p, 0.6, 0xfff0d0, 0.1);
+      audio.sfx(b.glass ? 'shield_break' : 'explosion_small', { x: b.pos.x, z: b.pos.z, vol: 0.6 });
+      ctx.onCollateral && ctx.onCollateral(b.value, b);
+    }
+  }
 
   function nest(x, z, hp = 60) {
     const g = new THREE.Group();
@@ -96,6 +150,7 @@ export function createProps(ctx) {
   }
 
   function update(dt, playerPos, onCollect) {
+    for (const d of destructibles) if (d.core) { d.t += dt; d.core.scale.y = 0.12 + 0.03 * Math.sin(d.t * 9); }
     for (const c of carries) { c.t += dt; c.body.position.y = 0.9 + Math.sin(c.t * 2.5) * 0.08; c.body.rotation.y += dt * 0.8; }
     for (let i = loot.length - 1; i >= 0; i--) {
       const o = loot[i];
@@ -113,7 +168,8 @@ export function createProps(ctx) {
   function clearMission() {
     for (const d of destructibles.splice(0)) scene.remove(d.mesh);
     for (const c of carries.splice(0)) scene.remove(c.mesh);
+    for (const b of breakables.splice(0)) scene.remove(b.mesh);
   }
 
-  return { nest, damage, carry, removeCarry, beacon, dropLoot, update, collectAll, clearMission, targets: () => destructibles.filter((d) => !d.destroyed), loot, destructibles };
+  return { nest, machine, breakable, splash, breakables, damage, carry, removeCarry, beacon, dropLoot, update, collectAll, clearMission, targets: () => destructibles.filter((d) => !d.destroyed), loot, destructibles };
 }

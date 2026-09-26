@@ -220,7 +220,7 @@ med: 60 fps, 1.8–2.2 ms, 189–235 calls / 460–560k. Title (UI on): 268 call
 5. Near-lens fade dithers balconies/rails close to the camera into a visible Bayer pattern at the frame edge (lake views).
 6. REQUEST integrator: `?noui` is broken (hud.js:64 null `ui.hud` in startSession → stuck in title).
 
-## Round 3 (art agent #4, 2026-09-26) — IN PROGRESS
+## Round 3 (art agent #4, 2026-09-26) — DONE
 Brief: phone fill-rate (per-pass cost table, dpr 2.5–3 forced on M5), atmospheric depth, falls mist/spray, floor grounding
 (reflected mass + contact shadows), soften near-lens dither; 2 blind critic rounds.
 - Harness `art/r3/cost.mjs "<query>"` (env DPRS, VIEWS="x,z,yaw,pitch;…", TOG=base,legacy,nobloom,bloom4,msaa2,msaa0,nomirror,
@@ -233,3 +233,78 @@ Brief: phone fill-rate (per-pass cost table, dpr 2.5–3 forced on M5), atmosphe
 - DONE floor (ground.js): the nero-vein / travertine-vein / steel-texture blocks only run where their zone has weight
   (coherent branches, textureGrad with derivatives taken outside). Floor cost (nofloor delta) 1.66→0.89 ms @1.5,
   6.44→3.90 ms @3; frame 3.4→2.3 ms @1.5. Pixel-identical floor (only moving robots differ).
+  Then the floor's sin() hash → sine-free Hoskins hash (same value-noise character, veins land elsewhere): trav veins 1.16→0.76 ms @3.
+- DONE bloom at quarter res (`tier.bloomDiv` 4 on high/med): side-by-side indistinguishable (`art/r3/bdcmp.png`), saves most of bloom.
+- DONE mirror RT MSAA 4→0 on high (`tier.mirrorMsaa`): the floor blurs it with 5 taps anyway, crops identical (`mmcmp.png`).
+- KEPT main MSAA 4: MSAA 2 shows stair-steps on rail tops / lamp poles at 4x zoom (`mscmp.png`) = a look loss (D18).
+- On-device A/B URL overrides (quality.js): `?msaa=2 &mirrormsaa=4 &bloomdiv=2 &shadow=1024 &dpr=1.25` — Aaron can try msaa=2 on the S22.
+- HUD backdrop-filter: at 915x412@4 (GPU-bound, ~42 fps) glass on vs off is within noise (1 visible .hf-glass element in
+  the free/dialogue state). Headless M5 can't model the Android compositor, so: REQUEST (UI owner, low priority) — try
+  `?`-gated or high-only removal of `.hf-glass` blur and compare on the S22 perf overlay; no evidence it matters on M5.
+- DONE aerial perspective (atmosphere.js fog chunk, `AERIAL` 2.2): per-channel extinction exp(-(optical-25)·(1.1,1.4,1.9)e-3·k)
+  + blue-grey in-scatter (sun-tinted toward the sun) before the existing exp2 fog. Far bank/towers go cooler and flatter,
+  near stays crisp; no milk. `art/r3/aev.png` (before) vs `aev2.png`.
+- DONE near-lens / capsule fade (foliage.js): opaque fade materials with MSAA on use alpha-to-coverage (`HF_A2C`) + a
+  low-amplitude 2x2 alpha offset (16 levels) instead of the 4x4 Bayer discard → soft translucent fade, no grid
+  (`dz.png` before, `dz2.png` after). Low/med (no MSAA), glass and alpha-tested leaves keep the Bayer path.
+- DONE falls (water.js): sheet shader — sqrt(t) flow coordinate (water accelerates, streaks stretch), wobble growing with
+  drop, uneven "rope" columns, glassy dark lip with a sun glint line, ragged side edges, white-water foot. Mist = billows
+  (normal blend, lobed, sun-lit top) that boil up + roll out d m over the water, plus additive droplet spray; great falls
+  d 16. Lake: foam plume downstream of each churn box (30 m falloff, advected scum lines, extra ripple).
+  Free-camera shot helper `art/r3/cam.sh "px,py,pz,tx,ty,tz" out.png` (disables the fade). Views: fc*.png near, fw*.png wide.
+  GOTCHA hit again: `pow(negative, 2.0)` in the lip glint = NaN → whole frame black via bloom. Use x*x.
+- DONE floor grounding: `js/world/groundao.js` bakes contact AO once at load (ortho camera UNDER the floor looking up
+  renders the lowest surface height of static, opaque, non-instanced meshes with bbox below 2.5 m on BAKE_LAYER 7, then a
+  40-tap disk pass → 528x880 RGBA8 over LAYOUT.bounds, 0.2 m/texel). Floor samples it once (`groundOcc()` in ground.js,
+  after aomap_fragment: indirect diffuse ×(1−.75o), indirect spec ×(1−.6o), direct ×(1−.3/.5o)). Plus live soft contact
+  disks under the 12 grounded robots nearest the focus (`LIVE_ROBOTS` Set exported from actors/robots.js; hover kinds
+  skipped; `uContacts[12]` = x, z, 2.2×radius). `?noao` disables. Cost ≈ 0 (within noise at dpr 3). `aocmp2.png`.
+  Bake texture dump: `art/r3/aomap.png` (driver `/tmp/claude-501/aodump.js`, uses `ctx.groundAOBake`).
+- Mist cost: ≈0.3 ms @dpr3 / 0.08 @1.5 in the lake view (new billows + spray), 0 elsewhere.
+- FIXED black-frame bug (latent, pre-existing): a mirror-smooth sun glint on the lake overflowed the half-float scene
+  target to Inf at dpr 2 (GGX D at roughness 0.0525 × sun 3.3 > 65504); Inf → bloom mips → ACES = NaN → a blocky black
+  frame (`art/r3/l_r3.png` before the fix). Now clamped to 64 in BloomLite's high-pass input and in the grade input.
+  Could explain any "black screen with HUD working" report on phones.
+
+### Critic rounds R7/R8 (answer keys; sheets in `art/critic/`)
+- R7 `critic/r7.png`: LEFT = ref gold crop (420,380 1252x561), RIGHT = game gameplay `art/r3/g_r3.png` (shot=1 default).
+- R8 `critic/r8.png` 2x2: TOP-LEFT = game vista `v_r3.png` (10,-40 yaw180 pitch12), TOP-RIGHT = ref gold (0,100 1672x753);
+  BOTTOM-LEFT = ref water crop (1000,540 672x302), BOTTOM-RIGHT = game falls/lake `l_r3.png` (cam.sh 25,12,-20 → 72,0,-100).
+- R7 verdict: ID'd (95%). Game 3/10, ref 9. Floor 3/10 "vinyl": 80% of frame is bare floor, no mass reflected in it, no
+  wear/roughness breakup; claims "no contact AO under feet" (the disks are there but subtle at this zoom); light wedges
+  read as painted decals. Fix wanted: reflections of figures/props + roughness smudges + contact AO; less floor in frame
+  (camera = integrator's).
+- R8 verdict: both game panels ID'd. Vista 3/10 (overexposed/washed, mannequins, mirror floor sterile, atmos depth 3
+  "distance only gets whiter, milky"). Falls/lake 3.5/10: falls 3 ("flat scrolling planes, hard edges"), mist "big white
+  blob bleaching half the frame", water 4, atmos 2 "milky". Refs 8–8.5, atmos 8–9.
+  → acted: aerial in-scatter darker/bluer (fogColor×(0.6,0.71,0.9), sun side ×0.85) = value falloff not whitening; exp2
+  fog 0.0007→0.00055; great-falls mist d 16→9, rise 0.6→0.45×size, billow alpha 0.3→0.22 (`art/r3/lcmp.png`).
+- R9 `critic/r9.png` (post-fix): TOP-LEFT = ref gold wide, TOP-RIGHT = game vista `v_r4.png`; BOTTOM-LEFT = ref water,
+  BOTTOM-RIGHT = game falls `l_r4.png`.
+
+### Per-pass cost table (M5 metal, 915x412 mobile UA, sync render+readPixels median ms; delta = cost of that pass)
+BEFORE = round-2 code served from `art/r3/before/` on :8842; AFTER = current. REPS 5, interleaved. ±0.3 ms noise.
+| view | dpr | frame B→A | bloom B→A | MSAA4 B→A | mirror B→A | floor B→A | post total B→A |
+|---|---|---|---|---|---|---|---|
+| (0,24) default | 1.5 | 3.65→(2.25–4.3, noisy run) | 0.36→~0 | 0.29→0.3 | 0.37→0.4 | 1.55→0.75–1.0 | 0.82→~0.2 |
+| (0,24) default | 3 | 12.38→7.33 | 2.29→~0 | 1.50→0.48 | 0.70→0.28 | 6.07→4.30 | 3.85→0.77 |
+| (4,10) crowd | 3 | 14.10→7.87 | 2.32→0.10 | 1.60→0.72 | 0.94→0.50 | 7.43→4.85 | 3.59→0.78 |
+| (10,-40) vista | 3 | 18.72→7.29 | 3.19→0.10 | 2.18→0.81 | 1.34→0.53 | 6.93→3.08 | 5.34→0.75 |
+| (40,-20) lake | 3 | 15.84→6.02 | 2.97→0.10 | 2.50→0.81 | 1.15→0.55 | 1.43→0.78 | 5.99→0.73 |
+dpr 1.5 AFTER frames: 2.2–2.8 ms (one noisy 4.3). Shadow-map render ≈0–0.3; PCFSoft filtering ≈0.3–0.6 @3 (kept);
+transparent layers ≈0 except the lake view (~1 ms @3: mist + falls + water). dpr 3 ≈ the S22's pixel load ×4.
+Expected on the S22: the fill-bound part of the frame ~40–55% cheaper; the crowd view should clear 60 at dpr 1.5.
+- R9 verdict: both game panels ID'd again. Vista 3/10 (atmos 3, "fades to the same pale white-blue, milky"), falls 3.5
+  (falls 4 up from 3, mist now "soft blob at the base" not "bleaching half the frame"; water 4; atmos 2). Refs 8.
+  The three critics AGREE the "milky" read is global: the whole frame is overexposed/washed with no dark far values,
+  not the fog itself (my haze changes moved atmos scores 3→3, 2→2). Hypothesis, NOT acted on (Aaron likes the current
+  look; D18 → ask first): exposure −0.5..−1 stop (renderer.toneMappingExposure 0.85, grade uContrast 1.14) + darker
+  sky/env so far towers can go blue-grey DARK rather than pale.
+
+## NEXT / gaps (round 4)
+1. Ask Aaron/manager about a darker grade (above). Try it behind `?grade=dark` for an on-device A/B first.
+2. Gameplay floor still 3/10: the critic wants mass reflected in the floor at the gameplay pitch and roughness wear
+   breakup. The contact AO + robot disks exist now but read subtle at 0.35 zoom; could strengthen 0.8→1.0 and radius.
+3. Falls: critics want a lip curl over the edge and a spreading foam ring at impact; sheets are still cards (no thickness).
+4. On-device perf: ask Aaron to open `?perf` (overlay) on the S22 before/after this push; try `?msaa=2` there.
+5. REQUEST (UI owner, low): measure `.hf-glass` backdrop blur on the S22 (not measurable on M5).

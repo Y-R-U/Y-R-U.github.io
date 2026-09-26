@@ -196,15 +196,30 @@ float hfBayer( vec2 f ) {
   vec2 p = mod( floor( f ), 4.0 ), a = mod( p, 2.0 ), b = floor( p / 2.0 );
   return ( 4.0 * mod( 2.0 * a.x + 3.0 * a.y, 4.0 ) + mod( 2.0 * b.x + 3.0 * b.y, 4.0 ) + 0.5 ) / 16.0;
 }`;
+// HF_A2C (opaque materials, MSAA on): the fade drives alpha-to-coverage, so the MSAA resolve blends it smoothly
+// instead of the 4x4 Bayer discard pattern that showed on rails near the lens.
 export function addFade(sh, fade) {
   Object.assign(sh.uniforms, fade);
   sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
 ${FADE_GLSL}`).replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
 #ifdef USE_FOG
-  if ( hfBayer( gl_FragCoord.xy ) < hfFade( vFogWorldPos, vFogDepth ) * 0.9 ) discard;
+  float hfF = hfFade( vFogWorldPos, vFogDepth );
+  #ifdef HF_A2C
+    if ( hfF > 0.97 ) discard;
+  #else
+    if ( hfBayer( gl_FragCoord.xy ) < hfF * 0.9 ) discard;
+  #endif
+#endif`).replace('#include <dithering_fragment>', `#include <dithering_fragment>
+#if defined( HF_A2C ) && defined( USE_FOG )
+  { vec2 q = mod( floor( gl_FragCoord.xy ), 2.0 ); // 2x2 offset between the 4 coverage steps: 16 levels, no visible grid
+    gl_FragColor.a = clamp( 1.0 - hfF + ( ( 2.0 * q.x + 3.0 * q.y - 4.0 * q.x * q.y ) / 4.0 - 0.375 ) * 0.25 * step( 0.01, hfF ), 0.0, 1.0 ); }
 #endif`);
 }
-export function fadeMaterial(material, fade) {
+export function fadeMaterial(material, fade, { a2c = false } = {}) {
+  if (a2c && !material.transparent && !material.alphaTest) {
+    material.alphaToCoverage = true;
+    material.defines = { ...(material.defines || {}), HF_A2C: '' };
+  }
   const prev = material.onBeforeCompile;
   material.onBeforeCompile = (sh, r) => { prev?.call(material, sh, r); addFade(sh, fade); };
   const k = material.customProgramCacheKey?.call(material) || '';

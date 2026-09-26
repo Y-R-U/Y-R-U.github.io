@@ -45,6 +45,8 @@ function restack() {
   if (on('.hf-detstat')) y += 32;
   root.style.setProperty('--y-band', `${y}px`);
   if (on('.hf-band')) y += 56;
+  root.style.setProperty('--y-meter', `${y}px`);
+  if (on('.hf-meter')) y += 50;
   root.style.setProperty('--y-toast', `${y + 6}px`);
 }
 
@@ -150,6 +152,7 @@ export const ui = {
   skills: {
     set(list) { controls ? controls.setSkills(list) : (pending.skills = list); },
     dodge(cd, cdMax) { controls?.setDodge(cd, cdMax); },
+    kit(n, o) { controls?.setKit(n, o); },
   },
 
   toast: (...a) => fx?.toast(...a),
@@ -191,6 +194,10 @@ export const ui = {
     count: t => combat?.lens.count(t),
     flash: label => combat?.lens.flash(label),
     get open() { return !!combat?.lens.open; },
+  },
+  meter: {
+    set: o => combat?.meter.set(o),
+    hide: () => combat?.meter.hide(),
   },
   band: {
     set: o => combat?.band.set(o),

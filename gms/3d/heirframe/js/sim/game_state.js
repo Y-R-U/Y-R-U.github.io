@@ -520,7 +520,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
   }
   function storyCard() {
     const def = storyReady(S.story, S.player.level);
-    if (!def) return null;
+    if (!def || def.act > (live.storyActCap ?? Infinity)) return null;
     return buildStoryMission(def.id, boardCtx());
   }
   function refreshBoard({ reroll = 0 } = {}) {
@@ -610,6 +610,10 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     S.contract.collateral += cr * mult;
     if (S.contract.collateral >= HEAT.collateralThreshold && !S.contract.collateralHeat) { S.contract.collateralHeat = true; emit('heat', addHeat(S.factions, 'collateral')); }
   }
+  // story beats that set Heat mid-mission (A1-M5's Warden swarm)
+  function forceHeat(stars) { setHeat(S.factions, Math.max(S.factions.heat, stars)); emit('heat', { stars: heatStars(S.factions), changed: true }); return { ok: true }; }
+  // A1-M4: Mara's dealer discount lands when the mission is taken, so the frame can be bought before the fight
+  function grantFrameDiscount() { if (ownedFrames().length) return { ok: false }; S.flags.firstFrameDiscount = true; return { ok: true, price: framePrice(0, { discount: true }) }; }
   function reportSpotted() {
     if (S.contract?.mission.modifiers.includes('watched')) emit('heat', addHeat(S.factions, 'spotted'));
   }
@@ -865,6 +869,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     features: () => featuresAt(S.player.level), threatsUnlocked, enemyStance, freeStash, validateMission,
     framePrice: () => framePrice(ownedFrames().length, { discount: S.flags.firstFrameDiscount }),
     // actions
+    get storyActCap() { return live.storyActCap ?? Infinity; }, set storyActCap(v) { live.storyActCap = v; }, forceHeat, grantFrameDiscount,
     tick, refreshBoard, rerollBoard, acceptContract, completeStep, fireTwist, reportAlarm, reportCollateral, reportSpotted, finishContract, failContract, abandonContract, playerWrecked,
     spawnEnemy, hit, useSkill: useSkillFor, kill, addItem, lootPickup: items => items.map(i => addItem(i)).filter(Boolean),
     equip, unequip, equipBest, salvage, salvageAll, tune, recalibrate,

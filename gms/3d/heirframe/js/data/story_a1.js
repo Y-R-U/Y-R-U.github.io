@@ -26,6 +26,46 @@ export const SCRIPTS = {
     { n: 9, trigger: 'after:8', mode: 'dlg', speaker: 'mara', vo: 'a1_s04_mara_02', text: "Keep it in your pocket, kid… The board's yours." },
     { n: 10, trigger: 'after:9', mode: 'action', action: { results: true, toast: 'Codex updated: The Heir-Key', clue: 'C01', storyNext: 'a1_m2', unlockBoard: true } },
   ],
+  // Act 1 M2–M5 (P2a). Extra triggers from the runner: enter:N / done:N (step N), shot:N (photo N), wave1.
+  a1_m2: [
+    { n: 1, trigger: 'accept', mode: 'bark', speaker: 'mara', vo: 'a1_s05_mara_01', text: "If you must know what's on that key, there's a pawn-droid called Tinsel…" },
+    { n: 2, trigger: 'after:1', mode: 'bark', speaker: 'hira', vo: 'a1_s05_hira_01', text: "Tinsel's Pre-Loved Electronics! Two point three stars!" },
+    { n: 3, trigger: 'done:1', mode: 'dlg', speaker: 'tinsel', text: 'Ooh, star-shaped. Pretty. Hold still, rental, this tickles.' },
+    { n: 4, trigger: 'after:3', mode: 'dlg', speaker: 'tinsel', text: 'Genome-locked, sweetheart. Whose blood did you steal?' },
+    { n: 5, trigger: 'after:4', mode: 'dlg', speaker: 'tinsel', text: 'All it coughs up is a scrap: …AEL. HEIR PROTOCOL. ACCESS DENIED. Take it and go. Out the back, and quietly.' },
+    { n: 6, trigger: 'after:5', mode: 'action', action: { toast: "Codex updated: Tinsel's Scan" } },
+    { n: 7, trigger: 'ambush', mode: 'bark', speaker: 'thug', vo: 'a1_s06_thug_m_01', text: 'Oi, rental! Heard you\'ve got a fancy key…' },
+    { n: 8, trigger: 'ambushCleared', mode: 'bark', speaker: 'mara', vo: 'a1_s06_mara_01', text: 'Word travels fast in the plaza. Too fast. Get out of there.' },
+  ],
+  a1_m3: [
+    { n: 1, trigger: 'accept', mode: 'bark', speaker: 'mara', vo: 'a1_s07_mara_01', text: 'Silverhand courier on Brightline Boulevard…' },
+    { n: 2, trigger: 'shot:2', mode: 'bark', speaker: 'harmony', vo: 'a1_s08_harmony_01', text: 'A brighter future… little… little star… together.', fx: 'billboards_glitch' },
+    { n: 3, trigger: 'after:2', mode: 'bark', speaker: 'hira', vo: 'a1_s08_hira_01', text: 'Did that billboard just… no. Brand-safe thoughts only!' },
+    { n: 4, trigger: 'done:1', mode: 'action', action: { toast: 'Codex updated: Stuttering Billboard' } },
+  ],
+  a1_m4: [
+    { n: 1, trigger: 'accept', mode: 'dlg', speaker: 'mara', vo: 'a1_s09_mara_01', text: "You can't keep taking jobs in a rented tin can. I know a dealer. Thirty percent off; don't ask why.", action: { discount: true } },
+    { n: 2, trigger: 'after:1', mode: 'bark', speaker: 'sal', vo: 'a1_s09_sal_01', text: 'Sal Venn, Nexus Frames! Brand new chassis, zero previous owners…' },
+    { n: 3, trigger: 'done:0', mode: 'action', action: { openFrames: true } },
+    { n: 4, trigger: 'after:3', mode: 'bark', speaker: 'hira', vo: 'a1_s09_hira_01', text: "You're… buying your own frame? That's great! I'm happy for you!" },
+    { n: 5, trigger: 'enter:2', mode: 'bark', speaker: 'mara', vo: 'a1_s10_mara_01', text: "Wren, they're at the kiosk. Hold them off…" },
+    { n: 6, trigger: 'wave1', mode: 'bark', speaker: 'kettle', vo: 'a1_s10_kettle_01', text: "Mara, love! Put the kettle on, I'm coming in!" },
+    { n: 7, trigger: 'deliver', mode: 'dlg', speaker: 'kettle', vo: 'a1_s12_kettle_01', text: "Wasn't my idea, rental. Someone in gold paid double. Never saw a face. They don't have faces." },
+    { n: 8, trigger: 'after:7', mode: 'dlg', speaker: 'mara', vo: 'a1_s12_mara_01', text: "Hold still. You've got his stubbornness, you know that?", choices: ['Whose?', 'Ow.'] },
+    { n: 9, trigger: 'after:8', mode: 'dlg', speaker: 'mara', vo: 'a1_s12_mara_02', text: "Nobody's. Figure of speech. Go on, off you go." },
+    { n: 10, trigger: 'after:9', mode: 'action', action: { toast: 'Codex updated: "His Stubbornness"' } },
+  ],
+  a1_m5: [
+    { n: 1, trigger: 'accept', mode: 'bark', speaker: 'mara', vo: 'a1_s13_mara_01', text: 'Civic records node, under the statue…' },
+    { n: 2, trigger: 'after:1', mode: 'bark', speaker: 'hira', vo: 'a1_s13_hira_01', text: "Hacking is a violation of your rental agreement! I'll… look away." },
+    { n: 3, trigger: 'done:1', mode: 'card', lines: ['CIVIC RECORDS · GENOME QUERY', 'MATCH: VAEL, WREN · STATUS: UNPERSONED'], ms: 3400, sfx: ['alarm'] },
+    { n: 4, trigger: 'after:3', mode: 'bark', speaker: 'hira', vo: 'a1_s14_hira_01', text: 'Match found. Vael, Wren. Status: unpersoned…' },
+    { n: 5, trigger: 'after:4', mode: 'dlg', speaker: 'mara', vo: 'a1_s14_mara_01', text: "It means they don't exist. The Vaels. The Meridian traitors. Wren, get out of there, now." },
+    { n: 6, trigger: 'after:5', mode: 'dlg', speaker: 'iris', label: 'HEIR-KEY RECORDING', portrait: 'heir_key', vo: 'a1_s14_iris_01', text: 'If you are hearing this, you are a Vael, and they lied to you about us. Find Abel Fenn in the Terraces. He kept our names.' },
+    { n: 7, trigger: 'after:6', mode: 'bark', speaker: 'warden', vo: 'a1_s15_warden_m_01', text: 'Unregistered genome query at the civic node. All units, detain the rider.', action: { forceHeat: 3 } },
+    { n: 8, trigger: 'after:7', mode: 'bark', speaker: 'hira', vo: 'a1_s15_hira_01', text: "Oh, we're famous! That's bad, right? That feels bad. Run!" },
+    { n: 9, trigger: 'deliver', mode: 'action', action: { toast: 'Codex updated: House Vael', actEnd: 1 } },
+  ],
 };
 
 export const SPEAKERS = {
@@ -41,4 +81,8 @@ export const SPEAKERS = {
   jun: { name: 'Jun Okafor', role: 'The Unlinked', portrait: { kind: 'human', seed: 12 } },
   halloran: { name: 'Warden-Captain Halloran', role: 'Concord security', portrait: { kind: 'robot', seed: 6 } },
   rook: { name: 'Rook', role: 'Info broker', portrait: { kind: 'robot', seed: 13 } },
+  tinsel: { name: 'Tinsel', role: "Tinsel's Pre-Loved Electronics", portrait: { kind: 'robot', seed: 21 } },
+  sal: { name: 'Sal Venn', role: 'Nexus Frames', portrait: { kind: 'chrome', seed: 17 } },
+  thug: { name: 'Silverhand thug', role: 'Syndicate', portrait: { kind: 'black', seed: 19 } },
+  warden: { name: 'Warden dispatch', role: 'Concord security', portrait: { kind: 'robot', seed: 6 } },
 };

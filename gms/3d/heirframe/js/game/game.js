@@ -16,6 +16,9 @@ import { createHudSync } from './hud.js';
 import { createAutopilot } from './auto.js';
 import { createNav } from './nav.js';
 import { createCoach } from './coach.js';
+import { createFrames } from './frames.js';
+import { createBoss } from './boss.js';
+import { createHeat } from './heat.js';
 
 const UI_SFX = { click: 'ui_click', open: 'ui_open', close: 'ui_close', deny: 'ui_deny', confirm: 'ui_confirm', levelup: null, loot: null, loot_rare: null, toast: 'ui_hover', type: null };
 const EMITTERS = [['fountain', 0, 0, 1], ['waterfall', -47, -62, 1], ['waterfall', 66, -96, 1.2], ['fountain', -47, -57, 0.6]];
@@ -34,7 +37,6 @@ function inertUi() {
 // Gameplay runtime (D13). main.js calls createGame(api) once and then update(dt, stick) every frame.
 export async function createGame(api) {
   const { world, rig, input, player, crowd, ui, flags } = api;
-  const actor = player.actor;
   const Q = new URLSearchParams(location.search);
   const store = createSaveStore();
   const overlay = createOverlay();
@@ -48,7 +50,7 @@ export async function createGame(api) {
   const shiftLen = +(Q.get('shift') || 0);
 
   const G = {
-    state: 'boot', sim: null, player, actor, enemies: null, runner: null, combat: null, props: null, fx, overlay, audio, errors: [],
+    state: 'boot', sim: null, player, get actor() { return player.actor; }, enemies: null, runner: null, combat: null, props: null, fx, overlay, audio, errors: [],
     music: null, hitstopT: 0, autosaveT: 30, paT: 70, lowHpBark: false, carrying: null, carryMesh: null, near: null, lastInteract: null, contractsDone: 0,
     log: [],
   };
@@ -78,7 +80,7 @@ export async function createGame(api) {
 
   function setMusic(state) { if (G.music !== state) { G.music = state; audio.music(state); } }
   const panelOpen = () => !!ui?.panel.current;
-  const blocked = () => G.state !== 'free' || panelOpen() || ui?.dialogue.open || overlay.cardOpen;
+  const blocked = () => G.state !== 'free' || panelOpen() || ui?.dialogue.open || overlay.cardOpen || !!G.frames?.busy;
 
   function project(p) { return G.hud.project(p); }
   function losClear(a, b) {
@@ -94,7 +96,7 @@ export async function createGame(api) {
     const m = new THREE.Mesh(kind === 'case' ? new THREE.BoxGeometry(0.55, 0.22, 0.36) : new THREE.BoxGeometry(0.4, 0.34, 0.4),
       new THREE.MeshStandardMaterial({ color: kind === 'case' ? 0x2a2d33 : kind === 'bomb' ? 0x5a4a3a : 0xd9c9a8, metalness: kind === 'case' ? 0.9 : 0.1, roughness: 0.5, emissive: kind === 'bomb' ? 0x401008 : 0 }));
     m.castShadow = true;
-    actor.root.add(m); m.position.set(0, 1.18, -0.36); m.scale.setScalar(0.75);
+    player.actor.root.add(m); m.position.set(0, (player.actor.height || 1.8) * 0.65, -0.36); m.scale.setScalar(0.75);
     G.carryMesh = m;
   }
 
@@ -105,11 +107,15 @@ export async function createGame(api) {
     const head = tmp.set(player.pos.x, player.pos.y + 2.0, player.pos.z);
     const s = project(head);
     if (pc.invulnerable) { if (s.on) ui?.damage(s.x, s.y, 0, 'miss'); return; }
-    const res = G.sim.hit(e.c, pc, skill, {});
+    // Bulwark's wall and shields only stop what comes from in front
+    const ra = Math.abs(Math.atan2(Math.sin(Math.atan2(e.pos.x - player.pos.x, e.pos.z - player.pos.z) - player.yaw), Math.cos(Math.atan2(e.pos.x - player.pos.x, e.pos.z - player.pos.z) - player.yaw)));
+    const res = G.sim.hit(e.c, pc, skill, { frontal: ra < 1.2 });
     if (!res.hit) { if (s.on) ui?.damage(s.x, s.y, 0, 'miss'); return; }
     if (s.on) ui?.damage(s.x + (Math.random() - 0.5) * 20, s.y, res.amount, 'player');
     ui?.hud.flash(res.shieldDmg > res.hullDmg ? 'shield' : 'hit');
-    actor.hitFlash?.();
+    player.actor.hitFlash?.();
+    if (res.blocked) fx.ring(player.pos, 1.3, 0xffc860, 0.2);
+    G.onPlayerHit?.(res);
     fx.impact(tmp.set(player.pos.x, player.pos.y + 1.1, player.pos.z), res.shieldDmg > res.hullDmg ? 0x8fe8ff : 0xff6040, 0.9);
     audio.sfx(res.shieldDmg > res.hullDmg ? 'shield_hit' : 'hurt', { vol: 0.8, minGap: 50 });
     rig.shake = Math.max(rig.shake, 0.12);
@@ -129,7 +135,7 @@ export async function createGame(api) {
     if (G.state === 'down') return;
     G.state = 'down';
     log('player down: ' + cause);
-    actor.play('die', { loop: false });
+    player.actor.play('die', { loop: false });
     audio.sfx('power_down');
     audio.bark('b_hira_wreck_', { force: true });
     const r = G.sim.playerWrecked();
@@ -151,7 +157,7 @@ export async function createGame(api) {
     G.spawnShield = 3;
     player.teleport(rx, rz, Math.PI);
     rig.target.copy(player.pos); rig.snap();
-    actor.play('idle');
+    player.actor.play('idle');
     G.sim.playerCombatant();
     G.state = 'free';
     if (act === 'warehouse') openWarehouse();
@@ -199,6 +205,21 @@ export async function createGame(api) {
   }
   function refreshWarehouse() { if (ui?.panel.current === 'warehouse') ui.panel.update(toUiWarehouse(G.sim)); }
 
+  let kitCd = 0;
+  function useKit() {
+    if (blocked() || kitCd > 0) return;
+    const pc = G.sim.playerCombatant();
+    if (pc.hp >= pc.stats.hp - 0.5) { ui?.toast('Frame already at full HP', 'info', { ms: 1200 }); return; }
+    const r = G.sim.useConsumable('repairKit');
+    if (!r.ok) { ui?.toast('No repair kits', 'warn', { sub: 'Buy them at the Warehouse market' }); audio.sfx('ui_deny'); return; }
+    kitCd = 1.5;
+    fx.ring(player.pos, 1.8, 0x7dffb0, 0.5);
+    fx.sparks(tmp.set(player.pos.x, player.pos.y + 1, player.pos.z), 0x7dffb0, 14, 4);
+    audio.sfx('pickup', { vol: 0.9 });
+    log('repair kit');
+  }
+  G.useKit = useKit;
+
   function wireUi() {
     if (!ui) return;
     ui.on('attack', () => { if (!blocked()) G.combat.attack(); });
@@ -236,9 +257,15 @@ export async function createGame(api) {
     ui.on('warehouse:tune', wh((p) => { const r = G.sim.tune(p.itemId); if (r.ok !== false && r.success !== undefined) { ui.toast(r.success ? 'Tune succeeded' : 'Tune failed: materials lost', r.success ? 'good' : 'bad'); audio.bark(r.success ? 'b_ottoline_tune_ok_' : 'b_ottoline_tune_fail_', { cooldown: 8 }); } return r; }));
     ui.on('warehouse:salvage', wh((p) => { const r = G.sim.salvage(p.itemId); if (r.ok) { ui.toast('Salvaged', 'info', { sub: matsText(r.mats) }); audio.sfx('explosion_small', { vol: 0.4 }); } return r; }));
     ui.on('warehouse:salvageAll', wh((p) => { const R = ['scrap', 'standard', 'tuned', 'custom', 'prototype', 'relic', 'heirloom']; const r = G.sim.salvageAll(R[p.tier] || 'standard'); ui.toast(`Salvaged ${r.count} items`, 'info', { sub: matsText(r.mats) }); return { ok: true }; }));
-    ui.on('warehouse:activate', wh((p) => G.sim.swapFrame(p.frameId, { inCombat: inCombat() })));
-    ui.on('warehouse:mk', wh((p) => G.sim.upgradeMk(p.frameId)));
-    ui.on('warehouse:buy', wh((p) => G.sim.buyFrame(p.kind)));
+    const deployed = (r) => { if (r?.ok) { ui.panel.close(); } return r; };
+    ui.on('warehouse:activate', wh((p) => deployed(G.sim.swapFrame(p.frameId, { inCombat: inCombat(), bossFight: !!G.boss?.active }))));
+    ui.on('warehouse:mk', wh((p) => { const r = G.sim.upgradeMk(p.frameId); if (r.ok) { ui.toast(`Upgraded to Mk ${['I', 'II', 'III', 'IV', 'V', 'VI'][r.tier]}`, 'gold'); audio.sfx('levelup'); } return r; }));
+    ui.on('warehouse:buy', wh((p) => { const r = G.sim.buyFrame(p.kind); if (r.ok) { audio.bark('b_sal_frame_', { force: true }); ui.panel.close(); log('bought ' + p.kind + ' ' + r.price); } else if (r.reason === 'credits') audio.bark('b_sal_poor_', { cooldown: 10 }); return r; }));
+    ui.on('warehouse:repair', wh((p) => { const r = G.sim.repair(p.frameId); if (r.ok) { ui.toast(r.cost ? `Repaired for ${r.cost} cr` : 'Repaired', 'good'); audio.sfx('pickup'); } return r; }));
+    ui.on('warehouse:mod', wh((p) => { const r = G.sim.chooseSyncMod(p.frameId, p.rank, p.optionId); if (r.ok) { ui.toast('Skill mod set', 'good'); audio.sfx('ui_confirm'); } return r; }));
+    ui.on('warehouse:market', wh((p) => { const r = G.sim.buyMarket(p.index); if (r.ok) { audio.bark('b_sal_buy_', { cooldown: 8 }); ui.toast(`Bought ${r.item.name}`, 'good', { sub: 'Sent to your stash' }); } return r; }));
+    ui.on('warehouse:consumable', wh((p) => { const r = G.sim.buyConsumable(p.id); if (r.ok) audio.sfx('credits', { vol: 0.6 }); else if (r.reason === 'full') ui.toast('Carrying the maximum', 'info'); return r; }));
+    ui.on('kit', () => useKit());
     ui.on('panel:open', (n) => { if (n === 'warehouse') { setMusic('warehouse'); G.coach?.finish('warehouse'); } });
     ui.on('panel:close', () => setMusic(G.state === 'title' ? 'menu' : 'explore'));
     ui.on('lens:capture', () => G.runner.capture());
@@ -287,8 +314,12 @@ export async function createGame(api) {
   // --- story: intro + kiosk -----------------------------------------------------------------------
   const story = createStoryPlayer({
     ui: ui || inertUi(), audio, overlay,
-    onFx: (f) => { if (f === 'billboards_face') harmonyFace('GOOD MORNING, HALCYON', 9); },
+    onFx: (f) => { if (f === 'billboards_face') harmonyFace('GOOD MORNING, HALCYON', 9); else if (f === 'billboards_glitch') harmonyFace('LITTLE STAR', 6); },
     onAction: async (a) => {
+      if (a.discount && G.sim.grantFrameDiscount().ok) ui?.toast('Frame licence: 30% off', 'gold', { sub: `Your first frame for ${G.sim.framePrice()} cr at Sal's lot`, ms: 4000 });
+      if (a.openFrames) { if (G.sim.ownedFrames().length) ui?.toast('Sal Venn, Nexus Frames', 'info', { sub: 'Open the Warehouse any time to upgrade' }); else if (!inCombat()) openWarehouse('frames'); }
+      if (a.forceHeat) G.sim.forceHeat(a.forceHeat);
+      if (a.actEnd) G.actEnd = a.actEnd;
       if (a.tutorial === 'accept') ui?.toast('Pick a contract', 'info', { sub: 'the gold card is your story', ms: 3500 });
       if (a.marker) G.introMarker = true;
       if (a.openBoard) openContracts();
@@ -340,6 +371,8 @@ export async function createGame(api) {
     if (better.length && G.coach?.current !== 'warehouse' && G.sim.state.flags.coach?.warehouse) ui?.toast('Upgrade available', 'gold', { sub: 'Tap ▲ EQUIP or open the Warehouse' });
     if (out.clue) ui?.toast('Codex updated', 'story', { sub: out.clue === 'C01' ? 'The Heir-Key' : out.clue });
     if (out.mission.story?.id === 'a1_m1') ui?.sting('The board is yours', 'Random contracts unlocked', 'unlock', 3000);
+    if (out.mission.story?.id === 'a1_m5') setTimeout(() => ui?.sting('Act 1 complete', 'A BRIGHTER FUTURE · Act 2 arrives in the next update', 'story', 4600), 600);
+    if (out.stiffed) ui?.toast('Stiffed!', 'bad', { sub: 'The client won\'t pay. A Collect bounty is on the board' });
     G.sim.save();
   }
   function onFail(m, reason) {
@@ -369,22 +402,40 @@ export async function createGame(api) {
     G.sim = sim;
     sim.noAutosave = false;
     const ctx = {
-      world, robots: api.robots, sim, fx, audio, ui: ui || inertUi(), tier: api.tier, player, actor, rig, crowd, overlay, story,
+      world, robots: api.robots, sim, fx, audio, ui: ui || inertUi(), tier: api.tier, player, rig, crowd, overlay, story,
       project, losClear, hitPlayer, damagePlayerPct, setCarrying, onLootCollect, onComplete, onFail, nav, walkTo,
       blocked: () => blocked(),
       hitstop: (s) => { G.hitstopT = Math.max(G.hitstopT, s); },
       onDeath: onKill,
       onAlert: () => {},
       onFx: (f) => f === 'billboards_face' && harmonyFace('HARMONY IS WATCHING', 12),
+      get fighting() { return G.fighting; },
+      log, carrying: () => G.carrying,
+      onCollateral: (v) => { if (!sim.state.contract) return; sim.reportCollateral(v); ui?.toast(`Collateral −${sim.state.contract.mission.modifiers.includes('collateral') ? v * 2 : v} cr`, 'warn', { ms: 1400, sub: 'Clean bonus lost' }); },
+      onSpotted: (e) => { if (e.watcher || e.heat === 1) { sim.reportSpotted(); if (e.heat === 1 && sim.state.factions.heat < 2) sim.forceHeat(Math.floor(sim.state.factions.heat) + 1); } },
+      onBoss: (on) => { G.bossOn = on; setMusic(on ? 'boss' : 'combat'); },
     };
     G.props = ctx.props = createProps(ctx);
     G.enemies = ctx.enemies = createEnemies(ctx);
     G.combat = ctx.combat = createCombat(ctx);
+    G.boss = ctx.boss = createBoss(ctx);
     G.runner = ctx.runner = createRunner(ctx);
+    G.heat = ctx.heat = createHeat(ctx);
+    G.onPlayerHit = (res) => G.runner.playerHit(res);
     G.hud = createHudSync(ctx);
+    G.setCarrying = setCarrying;
+    G.frames = createFrames(G, { world, robots: api.robots, tier: api.tier, player, fx, audio, ui: ui || null, rig });
+    G.frames.sync();
+    sim.on('frame:swap', (p) => { G.frames.deploy(p.frame); log('deploy ' + p.frame.archetype); });
+    sim.on('frame:mk', (p) => { if (p.frame.uid === sim.state.activeFrame) G.frames.deploy(p.frame, { reason: 'mk' }); });
+    sim.on('frame:buy', (p) => { log('frame:buy ' + p.frame.archetype); setTimeout(() => audio.bark('b_hira_ownframe_', { cooldown: 60 }), 4000); });
+    sim.on('sync', (p) => { if (p.modUnlocked) ui?.sting(`Sync ${p.sync}`, 'Skill mod unlocked · choose it in the Warehouse', 'unlock', 3200); });
+    G.onFrameDeployed = (f, why) => { if (why !== 'mk') ui?.toast(`${f.name} deployed`, 'good', { sub: f.rental ? 'HireFrame R-1 · rented' : `${f.model || ''} · Mk ${['I', 'II', 'III', 'IV', 'V', 'VI'][f.tier || 0]}` }); };
     ctx.hud = G.hud;
     ctx.goalOverride = () => nextGoal(sim);
     G.coach = ui ? createCoach(G, { ui, rig, player }) : null;
+    sim.storyActCap = 1;   // P2a: Act 1 only; Act 2 story cards come with P3
+    ctx.bossLine = (key, speaker) => story.bark({ speaker, vo: key });
     sim.on('levelUp', (p) => { ui?.sting(`Level ${p.level}`, (p.features || []).map((f) => f.name || f.id).join(' · ') || 'Frame systems upgraded', 'level', 3000); audio.sfx('levelup'); audio.bark('b_hira_levelup_', { cooldown: 10 }); log('level ' + p.level); });
     sim.on('toast', (p) => ui?.toast(p.text, p.kind || 'info'));
     sim.on('rental:fee', (p) => { ui?.toast(`HireFrame shift fee −${p.fee} cr`, 'warn', { sub: p.debt ? `Balance owed: ${p.debt} cr` : 'Rent by the hour!' }); audio.bark('b_hira_fee_', { cooldown: 30 }); log('shift fee ' + p.fee); });
@@ -421,14 +472,15 @@ export async function createGame(api) {
     const fresh = !sim;
     if (fresh) { store.clear(); sim = createSim({ seed: Q.get('seed') || String(Date.now() % 100000), store, sites }); }
     startSession(sim);
-    if (fresh || !sim.state.flags.introDone) await runIntro();
+    if (Q.has('skipintro') && fresh) { Object.assign(sim.state.flags, { introDone: true, kioskDone: true }); G.state = 'free'; setMusic('explore'); }
+    else if (fresh || !sim.state.flags.introDone) await runIntro();
     else { G.state = 'free'; setMusic('explore'); ui.toast(`Welcome back, ${sim.state.player.name}`, 'info', { sub: `Level ${sim.state.player.level} · ${sim.state.credits} cr` }); }
     if (!sim.state.flags.kioskDone) G.introMarker = true;
   }
 
   // --- per-frame ----------------------------------------------------------------------------------------
   let stepGap = 0;
-  player.onStep = (v) => { if (stepGap <= 0) { audio.sfx('step', { kind: 'rental', x: player.pos.x, z: player.pos.z, vol: v > 3 ? 0.55 : 0.4 }); stepGap = 0.18; } };
+  player.onStep = (v) => { if (stepGap <= 0) { audio.sfx('step', { kind: G.sim ? G.frames.stepKind(G.sim.activeFrame()) : 'rental', x: player.pos.x, z: player.pos.z, vol: v > 3 ? 0.55 : 0.4 }); stepGap = 0.18; } };
 
   function objective() {
     const o = G.runner?.objective();
@@ -461,13 +513,18 @@ export async function createGame(api) {
     }
     if (G.spawnShield > 0 && G.state === 'free') { pc.invulnerable = true; if ((G.spawnShield -= dt) <= 0) pc.invulnerable = false; }
     player.speedMult = (pc.stats.moveSpeed / 4.2) * statusMult(pc, 'moveMult') * (G.carrying === 'case' ? 0.9 : 1);
-    const canMove = G.state === 'free' && !panelOpen() && !ui?.dialogue.open && !overlay.cardOpen;
+    const canMove = G.state === 'free' && !panelOpen() && !ui?.dialogue.open && !overlay.cardOpen && !G.frames.busy;
+    G.frames.update(dt);
+    if (kitCd > 0) kitCd -= dt;
+    ui?.skills.kit(sim.state.consumables.repairKit || 0, { cooling: kitCd > 0 });
     let hs = 1;
     if (G.hitstopT > 0) { G.hitstopT -= rawDt; hs = 0.15; }
     player.update(dt * (hs < 1 ? 0.5 : 1), canMove ? stick : null);
     if (canMove) G.combat.update(dt, { attackHeld: !!ui?.controls.attackHeld || G.auto?.attackHeld });
     G.enemies.update(dt * hs, { playerDead: G.state === 'down', sneaking: !!ui?.controls.sneak });
-    if (!paused && G.state === 'free') G.runner.update(dt);
+    if (!paused && G.state === 'free' && !ui?.dialogue.open && !overlay.cardOpen) G.runner.update(dt);
+    G.boss.update(dt);
+    G.heat.update(dt, { paused: paused || G.state !== 'free', calm: story.busy || !!ui?.dialogue.open });
     G.props.update(dt, player.pos, onLootCollect);
 
     // interactables near the player
@@ -484,7 +541,7 @@ export async function createGame(api) {
     const fighting = G.fighting = G.enemies.hostileNear(player.pos.x, player.pos.z, 26);
     if (G.kills) G.coach?.finish('attack');
     G.coach?.update(dt);
-    if (!panelOpen() && G.state === 'free') setMusic(fighting ? 'combat' : 'explore');
+    if (!panelOpen() && G.state === 'free') setMusic(G.bossOn ? 'boss' : fighting ? 'combat' : 'explore');
     if (fighting && crowd?.scare) crowd.scare(player.pos.x, player.pos.z, 16);
     // Harmony PA every ~90 s of free roaming
     if (G.state === 'free' && !fighting && !story.busy && (G.paT -= dt) <= 0) { G.paT = 80 + Math.random() * 30; audio.bark('pa_', { cooldown: 60 }); }

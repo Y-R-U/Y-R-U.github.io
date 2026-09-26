@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { REFLECT_LAYER } from '../fx/reflection.js';
+import { MAX_CONTACTS } from './groundao.js';
 
 // The y=0 promenade: one mesh, one material. Zones (cream marble / dark slate) and gold inlays are
 // chosen per-pixel from world position so the whole floor costs a single draw call.
@@ -25,7 +26,11 @@ export function createGround(ctx) {
   const mat = M.marble;
   const slate = M.stoneTex.slate;
   const prev = mat.onBeforeCompile;
-  const u = { tSlate: { value: slate.map }, tSlateR: { value: slate.roughnessMap }, uTime: ctx.time };
+  const u = { tSlate: { value: slate.map }, tSlateR: { value: slate.roughnessMap }, uTime: ctx.time,
+    tAO: { value: new THREE.DataTexture(new Uint8Array(4), 1, 1) }, uAOMat: { value: new THREE.Matrix4() }, uAOOn: { value: 0 },
+    uContacts: { value: Array.from({ length: MAX_CONTACTS }, () => new THREE.Vector3(0, 0, 0)) } };
+  u.tAO.value.needsUpdate = true;
+  ctx.groundAO = u;
   mat.defines = { ...(mat.defines || {}), REFL_ZONE: '' };
   mat.onBeforeCompile = (sh, r) => {
     prev?.(sh, r);
@@ -33,8 +38,23 @@ export function createGround(ctx) {
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vGW;')
       .replace('#include <fog_vertex>', '#include <fog_vertex>\nvGW = ( modelMatrix * vec4( transformed, 1.0 ) ).xz;');
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
-uniform sampler2D tSlate, tSlateR;
+uniform sampler2D tSlate, tSlateR, tAO;
+uniform mat4 uAOMat; uniform float uAOOn; uniform vec3 uContacts[${MAX_CONTACTS}];
 varying vec2 vGW;
+float groundOcc() {
+  float o = 0.0;
+  if (uAOOn > 0.5) {
+    vec2 q = (uAOMat * vec4(vGW.x, 0.0, vGW.y, 1.0)).xy;
+    if (q.x > 0.0 && q.x < 1.0 && q.y > 0.0 && q.y < 1.0) o = texture2D(tAO, q).r;
+  }
+  for (int i = 0; i < ${MAX_CONTACTS}; i++) {
+    vec3 c = uContacts[i];
+    if (c.z <= 0.0) continue;
+    float d = length(vGW - c.xy) / c.z;
+    o = max(o, 0.8 * (1.0 - smoothstep(0.35, 1.0, d)));
+  }
+  return o;
+}
 // sine-free hash (full-rate ALU; the sin() hash was ~80 transcendental ops per floor pixel)
 float gH(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * 0.1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 float gN(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
@@ -133,6 +153,14 @@ float sheenK = (1.0 - zI) * mix(1.0, 0.6, zW.y);`)
 			float lobe = pow( nh, 40.0 ) * 0.28 + pow( nh, 8.0 ) * 0.06;
 			reflectedLight.directSpecular += directLight.color * vec3( 1.0, 0.8, 0.55 ) * lobe * sheenK * saturate( dot( geometryNormal, directLight.direction ) );
 		}`))
+      .replace('#include <aomap_fragment>', `#include <aomap_fragment>
+{
+  float gOcc = groundOcc();
+  reflectedLight.indirectDiffuse *= 1.0 - 0.75 * gOcc;
+  reflectedLight.indirectSpecular *= 1.0 - 0.6 * gOcc;
+  reflectedLight.directDiffuse *= 1.0 - 0.3 * gOcc;
+  reflectedLight.directSpecular *= 1.0 - 0.5 * gOcc;
+}`)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
 if (zW.y > 0.002) roughnessFactor = mix(roughnessFactor, max(textureGrad(tSlateR, vMapUv, gdx, gdy).g, 0.14), zW.y);
 roughnessFactor *= 0.7 + 0.8 * gN(vGW * 0.11 + 7.0);

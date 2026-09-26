@@ -398,3 +398,41 @@
 .hf-ccard .cc-desc + .cc-meta { margin-top: auto; }
 @media (max-height: 480px) { .hf-ccard .cc-desc { -webkit-line-clamp: 1; flex: none; } }
 @media (max-height: 480px) { .hf-ccard:has(.cc-suits) .cc-desc, .hf-ccard:has(.cc-tgt) .cc-desc, .hf-ccard:has(.cc-mods > :nth-child(3)) .cc-desc { display: none; } }
+
+/* warehouse: skills + market tabs (P2a) */
+.hf-sk, .hf-mk { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 12px; height: 100%; }
+.sk-l, .sk-r, .mk-l, .mk-r { display: flex; flex-direction: column; gap: 6px; min-height: 0; overflow-y: auto; padding-right: 2px; }
+.sk-frs { display: flex; gap: 4px; flex-wrap: wrap; }
+.sk-fr { height: 30px; padding: 0 10px; border-radius: 6px; font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); background: rgba(2, 8, 18, .5); border: 1px solid var(--line-soft); }
+.sk-fr.on { color: #04233d; background: linear-gradient(180deg, #fff, #8fe0ff); }
+.sk-sync { display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: rgba(2, 8, 18, .45); }
+.sk-sync b { font-size: 18px; color: var(--gold); }
+.sk-bar { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.sk-bar i { display: block; height: 100%; background: linear-gradient(90deg, #8fe0ff, #fff); box-shadow: 0 0 6px rgba(var(--cyan-rgb), .8); }
+.sk-sync small { font-size: 11px; color: var(--ink-dim); }
+.sk-row { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: rgba(2, 8, 18, .4); border: 1px solid var(--line-soft); }
+.sk-row.passive { border-color: rgba(255, 210, 122, .35); }
+.sk-ic { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; color: var(--ice); background: radial-gradient(circle, #0f365e, #061a34 80%); box-shadow: 0 0 0 1px rgba(var(--cyan-rgb), .6); }
+.sk-t { min-width: 0; display: flex; flex-direction: column; }
+.sk-t b { font-size: 13.5px; letter-spacing: .04em; }
+.sk-t b em { font-style: normal; font-size: 10px; letter-spacing: .12em; color: var(--gold); text-transform: uppercase; margin-left: 4px; }
+.sk-t small { font-size: 12px; line-height: 1.2; color: var(--ink-dim); }
+.sk-m { font-size: 11px; letter-spacing: .1em; color: var(--ink-dim); white-space: nowrap; }
+.sk-rank { display: flex; flex-direction: column; gap: 4px; padding: 6px; border-radius: 8px; background: rgba(2, 8, 18, .4); }
+.sk-rank.locked { opacity: .55; }
+.sk-mod { position: relative; text-align: left; display: flex; flex-direction: column; padding: 6px 30px 6px 8px; border-radius: 7px; border: 1px solid var(--line-soft); background: rgba(10, 30, 50, .5); color: var(--ink); }
+.sk-mod b { font-size: 13px; } .sk-mod small { font-size: 11.5px; color: var(--ink-dim); line-height: 1.2; }
+.sk-mod.on { border-color: rgba(255, 210, 122, .8); box-shadow: 0 0 12px -4px rgba(255, 210, 122, .8); background: rgba(60, 40, 8, .5); }
+.sk-mod i { position: absolute; right: 8px; top: 50%; translate: 0 -50%; color: var(--gold); }
+.sk-lock { font-size: 11.5px; color: var(--ink-dim); display: flex; gap: 4px; align-items: center; }
+.mk-item, .mk-con { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 8px; background: rgba(2, 8, 18, .4); border: 1px solid var(--line-soft); }
+.mk-item .hf-tile { width: 44px; height: 44px; }
+.mk-item.sold { opacity: .45; }
+.mk-t { min-width: 0; display: flex; flex-direction: column; }
+.mk-t b { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mk-t small { font-size: 11.5px; color: var(--ink-dim); line-height: 1.2; }
+.mk-t em { font-style: normal; font-weight: 700; } .mk-t em.up { color: #5dffb3; } .mk-t em.dn { color: #ff7a6a; }
+.mk-ci { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-size: 20px; color: #eafff2; background: radial-gradient(circle, #0e4a33, #062618 80%); box-shadow: 0 0 0 1px rgba(90, 230, 150, .6); }
+.mk-item .hf-btn, .mk-con .hf-btn { height: 34px; padding: 0 10px; font-size: 12.5px; }
+.wh-tab span { white-space: nowrap; }
+@media (max-width: 960px) { .wh-tab { padding: 0 8px; } .wh-tab span { display: none; } .wh-tab.on span { display: inline; } }
