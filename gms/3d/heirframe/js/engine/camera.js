@@ -4,13 +4,19 @@ const D2R = Math.PI / 180;
 const TAU = Math.PI * 2;
 const LOOK = new THREE.Vector3();
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a));
+const Q = new URLSearchParams(location.search);
+// TEMP (Aaron look-up test): negative pitch = view tilts above the horizon. Revert: PITCH_MIN = 12, CAM_DEBUG = false.
+const PITCH_MIN = Q.has('pitchmin') ? +Q.get('pitchmin') : -45;
+const CAM_DEBUG = Q.get('camdbg') !== '0';
+const ORBIT_FLOOR = 4; // below this the camera stops orbiting down and tilts its view up instead
+const DIR = new THREE.Vector3();
 
 // Diablo-style follow camera. One zoom value drives distance/pitch/fov (keys); the player can orbit
 // (yaw, 360°), tilt (pitch offset, clamped to pitchMin..pitchMax: 12°–70°, D16) and zoom; reset() eases back to default.
 export function createCameraRig(camera, { zoom = 0.5 } = {}) {
   const rig = {
     camera, zoom, zoomTarget: zoom, yaw: 0, yawTarget: 0, yawVel: 0, pitchOff: 0, pitchTarget: 0, pitchVel: 0,
-    defaultZoom: zoom, dragging: false, resetT: 0, reset0: null, pitchMin: 12, pitchMax: 70,
+    defaultZoom: zoom, dragging: false, resetT: 0, reset0: null, pitchMin: PITCH_MIN, pitchMax: 70,
     // zoom keys: [zoom, dist, pitch°, fov°]
     keys: [[0, 7.5, 26, 50], [0.35, 12.5, 46, 44], [1, 27, 58, 38]],
     target: new THREE.Vector3(), smooth: new THREE.Vector3(), lead: new THREE.Vector3(),
@@ -88,12 +94,34 @@ export function createCameraRig(camera, { zoom = 0.5 } = {}) {
       rig.smooth.lerp(rig.target, dt ? k : 1);
       const { dist, pitch, fov, lift } = rig.params();
       if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
-      const p = pitch * D2R;
+      const up = Math.max(0, ORBIT_FLOOR - pitch), span = Math.max(1, ORBIT_FLOOR - rig.pitchMin);
+      const p = Math.max(pitch, ORBIT_FLOOR) * D2R, d = dist * (1 - 0.45 * Math.min(1, up / span));
       const look = LOOK.copy(rig.smooth); look.y += 1.1 + Math.max(0, rig.keys[1][0] - rig.zoom) * 1.2 + lift;
-      camera.position.set(look.x + Math.sin(rig.yaw) * Math.cos(p) * dist, look.y + Math.sin(p) * dist, look.z + Math.cos(rig.yaw) * Math.cos(p) * dist);
+      camera.position.set(look.x + Math.sin(rig.yaw) * Math.cos(p) * d, look.y + Math.sin(p) * d, look.z + Math.cos(rig.yaw) * Math.cos(p) * d);
       if (rig.shake > 0) { camera.position.x += (Math.random() - 0.5) * rig.shake; camera.position.y += (Math.random() - 0.5) * rig.shake; rig.shake = Math.max(0, rig.shake - dt * 2); }
-      camera.lookAt(look);
+      if (up > 0) {
+        const e = -pitch * D2R;
+        DIR.set(-Math.sin(rig.yaw) * Math.cos(e), Math.sin(e), -Math.cos(rig.yaw) * Math.cos(e));
+        camera.lookAt(DIR.add(camera.position));
+      } else camera.lookAt(look);
+      if (CAM_DEBUG) camDebug(dt, pitch, rig);
     },
   };
   return rig;
+}
+
+let dbgEl = null, dbgT = 0, fpsAcc = 0, fpsN = 0;
+function camDebug(dt, pitch, rig) {
+  if (!dt) return;
+  fpsAcc += dt; fpsN++; dbgT += dt;
+  if (dbgT < 0.25) return;
+  if (!dbgEl) {
+    dbgEl = document.createElement('div');
+    dbgEl.style.cssText = 'position:fixed;left:50%;top:calc(max(6px,env(safe-area-inset-top)) + 56px);transform:translateX(-50%);z-index:99;pointer-events:none;'
+      + 'font:600 13px/1.2 ui-monospace,Menlo,monospace;color:#fff;background:rgba(0,0,0,.55);padding:4px 10px;border-radius:8px;letter-spacing:.03em';
+    document.body.append(dbgEl);
+  }
+  const tilt = Math.round(-pitch), deg = ((Math.round(-rig.yaw / D2R) % 360) + 360) % 360;
+  dbgEl.textContent = `TILT ${tilt > 0 ? '+' + tilt + '° up' : -tilt + '° down'} · YAW ${deg}° · ZOOM ${rig.zoom.toFixed(2)} · ${Math.round(fpsN / fpsAcc)} fps`;
+  dbgT = fpsAcc = fpsN = 0;
 }
