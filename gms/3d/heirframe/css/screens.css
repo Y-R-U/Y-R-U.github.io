@@ -130,3 +130,5 @@
   .cp-grade { width: 88px; height: 100px; }
   .cp-grade b { font-size: 44px; }
 }
+
+.hf-title .ti-fs { position: absolute; top: max(12px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); z-index: 3; }

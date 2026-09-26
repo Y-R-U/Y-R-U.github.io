@@ -22,9 +22,11 @@ export function settingsPanel(body, data, ctx) {
       ${row('vibrate', 'Haptics', tog('haptics', s.haptics))}
     </section>
     <section><span class="hf-label">Audio</span>
+      ${row('volume', 'Master', slider('master', s.master ?? 1))}
       ${row('volume', 'Music', slider('music', s.music))}
       ${row('volume', 'Effects', slider('sfx', s.sfx))}
       ${row('talk', 'Voice', slider('voice', s.voice))}
+      ${row('volume', 'Ambience', slider('ambient', s.ambient ?? 0.7))}
     </section>
   </div>`;
 

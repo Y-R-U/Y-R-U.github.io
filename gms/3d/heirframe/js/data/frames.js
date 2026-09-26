@@ -66,7 +66,8 @@ export const DODGE = { distance: 5, iframeStart: 0.05, iframeEnd: 0.35 };
 
 export const SKILLS = {
   // rental
-  r_baton: { id: 'r_baton', name: 'Shock Baton', icon: 'baton', basic: true, kind: 'melee', range: 2.2, arc: 70, base: 9, interval: 0.75, element: 'shock', anim: 'attack_melee' },
+  r_baton: { id: 'r_baton', name: 'Shock Baton', icon: 'baton', basic: true, kind: 'melee', range: 2.2, arc: 70, base: 11, // sim: 9 -> 11 (enemy HP x1.15-1.5)
+    interval: 0.75, element: 'shock', anim: 'attack_melee' },
   r_zap: { id: 'r_zap', name: 'Zap Pistol', icon: 'pistol', kind: 'ranged', hitscan: true, range: 16, base: 14, element: 'shock', energy: 10, cooldown: 3, anim: 'shoot' },
   r_overclock: { id: 'r_overclock', name: 'Overclock', icon: 'overclock', kind: 'self', hpCostPct: 0.05, cooldown: 14, selfStatus: [{ id: 'overclock', t: 4, moveMult: 1.35, atkSpeedMult: 1.35 }], anim: 'cast' },
   r_sponsored: { id: 'r_sponsored', name: 'Sponsored Content', icon: 'advert', kind: 'distract', radius: 6, energy: 25, cooldown: 20, applies: [{ id: 'distracted', t: 2.5, bossImmune: true }], anim: 'cast' },

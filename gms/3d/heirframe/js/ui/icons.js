@@ -72,6 +72,8 @@ const P = {
   warehouse: '<path d="M3 21V9l9-6 9 6v12"/><path d="M7 21v-9h10v9M7 15h10M7 18h10"/>',
   contracts: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v2h6V3"/><path d="M8.5 10h7M8.5 14h7M8.5 18h4"/>',
   pause: '<path d="M8 5v14M16 5v14" stroke-width="2.6"/>',
+  fs_enter: '<path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" stroke-width="2.2"/>',
+  fs_exit: '<path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5" stroke-width="2.2"/>',
   play: '<path d="M7 4v16l13-8z"/>',
   close: '<path d="M6 6l12 12M18 6 6 18"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',

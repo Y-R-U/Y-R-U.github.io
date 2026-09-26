@@ -18,7 +18,7 @@ export function createDialogue(bus, root) {
   const $ = s => el.querySelector(s);
   const pf = $('.pf'), nm = $('.dl-name b'), role = $('.dl-name span'), txt = $('.dl-text'), choicesEl = $('.dl-choices');
 
-  let cur = null, raf = 0, closeT = 0, audio = null;
+  let cur = null, raf = 0, closeT = 0, audio = null, voiceFn = null;
 
   function stopAudio() { if (audio) { audio.pause(); audio = null; } }
 
@@ -63,6 +63,7 @@ export function createDialogue(bus, root) {
 
   function close() {
     clearTimeout(closeT);
+    if (el.classList.contains('show')) bus.emit('dialogue:end');
     cancelAnimationFrame(raf);
     stopAudio();
     if (cur) { const c = cur; cur = null; c.resolve(-1); }
@@ -89,13 +90,24 @@ export function createDialogue(bus, root) {
       }
       el.classList.add('show');
       root.classList.add('hf-in-dialogue');
-      const hasVoice = !!(o.voiceUrl || o.voiceDuration);
+      const hasVoice = !!(o.voiceUrl || o.voiceDuration || ((o.voiceKey || o.vo) && voiceFn));
       if (hasVoice && !store.settings.subtitles) el.classList.add('nosubs');
       let cps = 42;
-      if (o.voiceDuration) cps = cur.text.length / Math.max(.5, o.voiceDuration * .9);
+      const syncTo = d => { if (cur && d > 0 && isFinite(d)) cps = cur.text.length / Math.max(.5, d * .9); };
+      syncTo(o.voiceDuration);
+      bus.emit('dialogue:line', o);
+      const key = o.voiceKey || o.vo;
+      if (key && voiceFn && !o.voiceUrl) {
+        const line = cur;
+        let r = null;
+        try { r = voiceFn(key, o); } catch (e) { console.error('[ui] voice', e); }
+        if (typeof r === 'number') syncTo(r);
+        else if (r && typeof r.then === 'function') r.then(v => { if (cur === line && !o.voiceDuration) syncTo(typeof v === 'number' ? v : v?.duration); }).catch(() => {});
+        else if (r?.duration) syncTo(r.duration);
+      }
       if (o.voiceUrl) {
         audio = new Audio(o.voiceUrl);
-        audio.volume = store.settings.voice;
+        audio.volume = (store.settings.master ?? 1) * store.settings.voice;
         audio.addEventListener('loadedmetadata', () => { if (isFinite(audio?.duration)) cps = cur ? cur.text.length / Math.max(.5, audio.duration * .9) : cps; });
         audio.play().catch(() => {});
       }
@@ -131,5 +143,8 @@ export function createDialogue(bus, root) {
     return false;
   }
 
-  return { el, show, play, close, onKey, get open() { return !!cur; }, _advance: advance };
+  // fn(key, line) plays the line's VO (e.g. audio.vo) and returns its duration in s, {duration}, or a Promise of either
+  const setVoice = fn => { voiceFn = typeof fn === 'function' ? fn : null; };
+
+  return { el, show, play, close, onKey, setVoice, get open() { return !!cur; }, _advance: advance };
 }

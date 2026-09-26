@@ -1,5 +1,5 @@
 // Stat assembly (ECONOMY §1) and combat resolution.
-import { BALANCE, L } from '../data/balance.js';
+import { BALANCE, L, enemyHpMult } from '../data/balance.js';
 import { SYNC_BONUS_PER_RANK, MK_TIERS, MK_DAMAGE_SHARE } from '../data/frames.js';
 import { SLOT_PRIMARY, SCALING_STATS, ELEMENTS, HEIRLOOM_SETS, POWERS } from '../data/loot.js';
 import { TUNE_BONUS } from '../data/economy.js';
@@ -122,7 +122,7 @@ export function enemyStats(def, level, rankDef, threat = { hp: 1, dmg: 1 }, extr
   const b = def.base;
   const s = {
     level,
-    hp: Math.round(b.hp * Lv * rankDef.hp * threat.hp),
+    hp: Math.round(b.hp * Lv * rankDef.hp * threat.hp * enemyHpMult(level)),
     shield: Math.round((b.shield || 0) * Lv * Math.sqrt(rankDef.hp) * threat.hp),
     armor: Math.round((b.armor || 0) * Lv),
     energy: 100, energyRegen: 10, moveSpeed: def.move ?? 4, critChance: 0.05, critDmg: 1.5, atkSpeed: 1,

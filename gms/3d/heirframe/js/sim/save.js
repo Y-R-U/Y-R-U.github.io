@@ -1,11 +1,16 @@
 import { hash32 } from './rng.js';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 export const SAVE_PREFIX = 'heirframe.save.';
 
 // migrations[n] upgrades a v(n) save object to v(n+1). Keep them forever.
 export const migrations = {
-  // 1: s => { s.newField = default; return s; },
+  1: s => {
+    s.homesOwned = s.homesOwned || [s.home || 'pod'];
+    s.overclock = s.overclock || { unlocked: 0, active: null };
+    if (s.player?.level >= 60 && !s.overclock.unlocked) s.overclock.unlocked = 1;
+    return s;
+  },
 };
 
 // Transient runtime keys never written to disk.

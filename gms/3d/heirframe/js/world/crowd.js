@@ -32,6 +32,13 @@ export function createCrowd(world, createRobot, count, quality) {
   const tmp = new THREE.Vector3();
   return {
     members,
+    scare(x, z, r) {
+      for (const m of members) {
+        if (m.flee || Math.hypot(m.pos.x - x, m.pos.z - z) > r) continue;
+        m.flee = { x, z, t: 3 + Math.random() * 2 };
+        m.pause = 0;
+      }
+    },
     update(dt, focus) {
       for (const m of members) {
         const dist = m.pos.distanceTo(focus);
@@ -43,7 +50,17 @@ export function createCrowd(world, createRobot, count, quality) {
         const [tx, tz] = m.loop[m.idx];
         tmp.set(tx - m.pos.x, 0, tz - m.pos.z);
         const d = tmp.length();
-        if (m.pause > 0) { m.pause -= dt; m.bot.setMove(0, 0); }
+        if (m.flee) {
+          // D15: civilians can't be hurt, but they do get out of the way of a fight
+          m.flee.t -= dt;
+          const fx = m.pos.x - m.flee.x, fz = m.pos.z - m.flee.z, fl = Math.hypot(fx, fz) || 1;
+          const want = Math.atan2(fx / fl, fz / fl);
+          m.yaw += Math.atan2(Math.sin(want - m.yaw), Math.cos(want - m.yaw)) * (1 - Math.exp(-dt * 8));
+          const sx = Math.sin(m.yaw) * 3.6 * dt, sz = Math.cos(m.yaw) * 3.6 * dt;
+          if (!world.blocked(m.pos.x + sx, m.pos.z + sz, 0.4)) { m.pos.x += sx; m.pos.z += sz; } else m.yaw += 0.9 * m.dir;
+          m.bot.setMove(3.6 / (m.bot.runSpeed || 4.5), 3.6);
+          if (m.flee.t <= 0) m.flee = null;
+        } else if (m.pause > 0) { m.pause -= dt; m.bot.setMove(0, 0); }
         else if (d < 1.2) { m.idx = (m.idx + m.dir + m.loop.length) % m.loop.length; if (Math.random() < 0.3) m.pause = 1 + Math.random() * 3; }
         else {
           tmp.multiplyScalar(1 / d);

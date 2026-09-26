@@ -175,6 +175,7 @@ export function createControls(bus) {
   api.releaseAll = () => { keys.clear(); joy.id = null; joy.x = joy.y = 0; homeJoy(); updateMove(); };
 
   api.setSide(store.settings.joystick);
+  api.setSkills([]);
   homeJoy();
   return api;
 }

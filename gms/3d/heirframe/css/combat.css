@@ -160,3 +160,15 @@
 .ln-shoot span { width: 62px; height: 62px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; color: #043028; background: radial-gradient(circle at 50% 30%, #fff, #b4fff0 60%, #4fd6c0); transition: scale .1s; }
 .ln-shoot:active span { scale: .88; }
 .hf-lens.locked .ln-shoot { animation: hf-ipulse 1s infinite; }
+
+/* finisher: legibility plates for the top-centre overlays on bright skies */
+.hf-boss::before, .hf-band::before {
+  content: ''; position: absolute; z-index: -1; pointer-events: none;
+  inset: -14px -40px -12px; border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(4, 8, 18, .72) 0%, rgba(4, 8, 18, .45) 45%, transparent 72%);
+}
+.bb-t { font-size: 10px; }
+.bb-n { font-size: 15px; text-shadow: 0 0 12px rgba(255, 80, 100, .8), 0 1px 2px #000, 0 0 4px #000; }
+.bb-name { margin-bottom: 2px; }
+.hf-band { width: min(300px, 40vw, calc(100vw - 660px * var(--hs, 1))); min-width: 220px; }
+.bd-l, .bd-w { text-shadow: 0 1px 2px #000, 0 0 6px #000; }

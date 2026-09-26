@@ -1,6 +1,8 @@
 // DESIGN §10. base = level-1 stats before rank/threat multipliers (hp, dmg, armor, shield scale by L).
 // robotKind = createRobot kind; fallbackKind is used until the robots agent adds the new kind.
 // paint = faction paint param for shared meshes. pts = pack-budget cost multiplier on the rank cost.
+// sim: pts raised for tier 3-5 units (choir_angel was 1, so budget filler built packs of 10 angels).
+// sim: gilded_guard dmg 30 -> 24, sovereign_construct 40 -> 34 (Helm, L45-50, was a 25% contract-fail wall).
 // ai: rusher | striker (strafe/pistol) | spotter | shield (frontal block) | bruiser | turret | swarm |
 //     shambler | ambusher | lancer | crawler | flyer | duelist | escortee | boss
 
@@ -33,7 +35,7 @@ export const ENEMIES = {
     base: { hp: 40, dmg: 6, armor: 3 }, move: 4.2, skills: ['e_pistol'], tags: ['robot', 'frame'] },
   warden_eye: { id: 'warden_eye', name: 'Warden Eye', tier: 1, robotKind: 'drone_scout', paint: 'concord', faction: 'concord', ai: ['spotter'], flying: true,
     base: { hp: 30, dmg: 3, armor: 2, shield: 10 }, move: 5, skills: ['e_zap'], spotHeat: 1, tags: ['robot', 'drone'] },
-  warden: { id: 'warden', name: 'Warden', tier: 2, robotKind: 'security', paint: 'concord', faction: 'concord', ai: ['shield'], frontalDR: 0.7,
+  warden: { id: 'warden', name: 'Warden', tier: 2, robotKind: 'security', paint: 'concord', faction: 'concord', pts: 1.5, ai: ['shield'], frontalDR: 0.7,
     base: { hp: 90, dmg: 10, armor: 20, shield: 20 }, move: 4, skills: ['e_baton'], tags: ['robot', 'frame'] },
   enforcer: { id: 'enforcer', name: 'Enforcer', tier: 2, robotKind: 'enforcer', paint: 'concord', faction: 'concord', ai: ['bruiser'], pts: 2.5, minLevel: 14,
     base: { hp: 220, dmg: 18, armor: 35, shield: 40 }, move: 3.2, skills: ['e_melee', 'e_stomp'], stunResist: 0.5, tags: ['robot', 'frame', 'heavy'] },
@@ -41,24 +43,24 @@ export const ENEMIES = {
     base: { hp: 110, dmg: 12, armor: 15 }, move: 4.8, skills: ['e_melee', 'e_dash'], tags: ['robot', 'frame'] },
   sentry_turret: { id: 'sentry_turret', name: 'Sentry Turret', tier: 2, robotKind: 'turret', fallbackKind: 'security', faction: 'concord', ai: ['turret'], static: true, hackable: true,
     base: { hp: 80, dmg: 8, armor: 25 }, move: 0, skills: ['e_burst'], tags: ['robot', 'turret'] },
-  rustkin: { id: 'rustkin', name: 'Rustkin', tier: 3, robotKind: 'rustkin', fallbackKind: 'civ_worker', paint: 'rust', faction: 'scrap', ai: ['shambler'], merge: { count: 3, into: 'rust_hulk' },
+  rustkin: { id: 'rustkin', name: 'Rustkin', tier: 3, robotKind: 'rustkin', fallbackKind: 'civ_worker', paint: 'rust', faction: 'scrap', pts: 1.8, ai: ['shambler'], merge: { count: 3, into: 'rust_hulk' },
     base: { hp: 120, dmg: 14, armor: 15 }, move: 3, skills: ['e_melee'], tags: ['robot', 'scrap'] },
   rust_hulk: { id: 'rust_hulk', name: 'Rust Hulk', tier: 3, robotKind: 'rustkin', fallbackKind: 'enforcer', paint: 'rust', faction: 'scrap', ai: ['bruiser'], pts: 4, size: 1.6,
     base: { hp: 420, dmg: 26, armor: 30 }, move: 2.6, skills: ['e_melee', 'e_stomp'], stunResist: 0.6, tags: ['robot', 'scrap', 'heavy'] },
-  saboteur: { id: 'saboteur', name: 'Unlinked Saboteur', tier: 3, robotKind: 'ghost', paint: 'rebel', faction: 'unlinked', ai: ['ambusher'], cloaks: true,
+  saboteur: { id: 'saboteur', name: 'Unlinked Saboteur', tier: 3, robotKind: 'ghost', paint: 'rebel', faction: 'unlinked', pts: 2, ai: ['ambusher'], cloaks: true,
     base: { hp: 90, dmg: 16, armor: 8, shield: 30 }, move: 5, skills: ['e_melee', 'e_emp'], tags: ['robot', 'frame'] },
-  lancer: { id: 'lancer', name: 'Concord Lancer', tier: 3, robotKind: 'security', robotTier: 2, paint: 'concord_gold', faction: 'concord', ai: ['lancer'], minHeat: 3,
+  lancer: { id: 'lancer', name: 'Concord Lancer', tier: 3, robotKind: 'security', robotTier: 2, paint: 'concord_gold', faction: 'concord', pts: 2.5, ai: ['lancer'], minHeat: 3,
     base: { hp: 160, dmg: 20, armor: 25, shield: 40 }, move: 4.6, skills: ['e_melee', 'e_lunge'], tags: ['robot', 'frame'] },
-  hull_wight: { id: 'hull_wight', name: 'Hull Wight', tier: 4, robotKind: 'spider', fallbackKind: 'drone_scout', faction: 'scrap', ai: ['crawler'],
+  hull_wight: { id: 'hull_wight', name: 'Hull Wight', tier: 4, robotKind: 'spider', fallbackKind: 'drone_scout', faction: 'scrap', pts: 2.2, ai: ['crawler'],
     base: { hp: 140, dmg: 18, armor: 20 }, move: 5.5, skills: ['e_bite', 'e_beam'], tags: ['robot', 'scrap'] },
   spine_keeper: { id: 'spine_keeper', name: 'Spine Keeper', tier: 4, robotKind: 'spider', robotTier: 2, fallbackKind: 'enforcer', faction: 'scrap', ai: ['bruiser'], pts: 6, size: 2.2,
     base: { hp: 600, dmg: 30, armor: 40 }, move: 2.4, skills: ['e_sweep', 'e_stomp'], summons: { defId: 'hull_wight', count: 2, every: 15 }, stunResist: 0.8, tags: ['robot', 'scrap', 'heavy'] },
-  choir_angel: { id: 'choir_angel', name: 'Choir Angel', tier: 4, robotKind: 'seraph', robotTier: 0, fallbackKind: 'civ_gold', faction: 'choir', ai: ['flyer'], flying: true, formation: 3,
+  choir_angel: { id: 'choir_angel', name: 'Choir Angel', tier: 4, robotKind: 'seraph', robotTier: 0, fallbackKind: 'civ_gold', faction: 'choir', pts: 3.5, ai: ['flyer'], flying: true, formation: 3,
     base: { hp: 200, dmg: 26, armor: 15, shield: 60 }, move: 6.5, skills: ['e_melee', 'e_dive'], tags: ['robot', 'frame'] },
-  gilded_guard: { id: 'gilded_guard', name: 'Gilded Guard', tier: 5, robotKind: 'civ_gold', robotTier: 2, faction: 'voices', ai: ['duelist'], pts: 2,
-    base: { hp: 300, dmg: 30, armor: 30, shield: 80 }, move: 4.8, skills: ['e_melee', 'e_parry', 'e_lunge'], tags: ['robot', 'frame'] },
+  gilded_guard: { id: 'gilded_guard', name: 'Gilded Guard', tier: 5, robotKind: 'civ_gold', robotTier: 2, faction: 'voices', ai: ['duelist'], pts: 4,
+    base: { hp: 300, dmg: 24, armor: 30, shield: 80 }, move: 4.8, skills: ['e_melee', 'e_parry', 'e_lunge'], tags: ['robot', 'frame'] },
   sovereign_construct: { id: 'sovereign_construct', name: 'Sovereign Construct', tier: 5, robotKind: 'enforcer', robotTier: 3, paint: 'gold', faction: 'voices', ai: ['bruiser'], pts: 8, size: 1.8,
-    base: { hp: 900, dmg: 40, armor: 50, shield: 150 }, move: 3, skills: ['e_melee', 'e_stomp', 'e_blast'], stunResist: 0.8, tags: ['robot', 'frame', 'heavy'] },
+    base: { hp: 900, dmg: 34, armor: 50, shield: 150 }, move: 3, skills: ['e_melee', 'e_stomp', 'e_blast'], stunResist: 0.8, tags: ['robot', 'frame', 'heavy'] },
   // non-combat / mission actors
   vip: { id: 'vip', name: 'Target', tier: 1, robotKind: 'civ_gold', faction: 'syndicate', ai: ['escortee'], nonCombat: true,
     base: { hp: 70, dmg: 0, armor: 10, shield: 30 }, move: 4.2, skills: [], tags: ['robot', 'frame'] },

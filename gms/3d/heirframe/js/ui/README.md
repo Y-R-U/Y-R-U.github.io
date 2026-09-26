@@ -31,7 +31,9 @@ Warehouse: `warehouse:activate` ({frameId}), `warehouse:equip` ({frameId, itemId
 `warehouse:unequip` ({frameId, slot}), `warehouse:autoEquip` ({frameId}), `warehouse:tune` ({itemId}),
 `warehouse:salvage` ({itemId}), `warehouse:salvageAll` ({tier}), `warehouse:mk` ({frameId}), `warehouse:buy` ({kind}).
 Loot: `loot:equip` (item) — the one-tap ▲ EQUIP on a loot row. Lens: `lens:capture`, `lens:close`.
-Settings: `settings` (full settings object, on every change).
+Settings: `settings` (full settings object, on every change), `volumes` (`{master, music, sfx, vo, ambient}` — pass straight to
+`audio.setVolumes`; fires on mount-time changes too, and `ui.settings.volumes()` returns the current values for boot).
+Dialogue: `dialogue:line` (the line object, when it starts), `dialogue:end` (letterbox closed — call `audio.stopVo()`).
 Pause menu: `pause:resume`, `pause:quit` (its Contracts/Warehouse/Codex buttons emit the plain events).
 Screens: `title:continue`, `title:new`, `complete:continue`, `death:redeploy`, `death:warehouse`. Loot: `loot:inspect` (item).
 Audio hooks: `sfx` (name) — `click`, `open`, `close`, `toast`, `loot`, `loot_rare`, `type`, `deny`, `confirm`, `levelup`.
@@ -66,9 +68,9 @@ ui.hud.set({
   heat: 1.5,                    // 0..5 Heat stars (fractional fills the next pip)
   district: 'Aurum Plaza',
   surcharge: 240,               // rental "usage surcharge" red line under credits (0/null hides)
-  goal: 'Reach level 5 to unlock Pro contracts',   // next-goal chip under the tracker (null hides)
+  goal: 'Reach level 5 to unlock Pro contracts',   // next-goal chip (null hides); or the sim's {label, cost, progress} → "label · cost cr" + gold progress line
   mission: { title: 'Quiet Delivery', objective: 'Deliver the case to Pier 9', progress: 0.4,
-             count: '2/5', timer: 94 } ,   // or null; timer seconds or null
+             count: '2/5', timer: 94 } ,   // or null (a mission with no title/objective also hides the tracker)
   buffs: [{ id: 'ovr', icon: 'overload', t: 6, tMax: 10, kind: 'buff' | 'debuff', stacks: 2 }],
 });
 ui.hud.minimap            // <canvas> — draw into it; size with canvas.clientWidth * dpr
@@ -124,17 +126,27 @@ const choice = await ui.dialogue.show({
   side: 'left',
 });
 // resolves choice index (0 when there were no choices). Consecutive show() calls keep the letterbox.
+
+// VO through the audio engine (music ducking + volume buses): register once, then pass voiceKey per line.
+ui.dialogue.setVoice(key => { audio.vo(key); return audio.voInfo(key)?.duration; });   // return s, {duration} or a Promise
+await ui.dialogue.show({ speaker: 'Mara Quill', text: '…', voiceKey: 'a1_m1_mara_01' });
+ui.on('dialogue:end', () => audio.stopVo());
 ui.dialogue.close();
 await ui.dialogue.play([line1, line2, ...]);   // runs a sequence, resolves the last choice
 ```
-Portrait kinds: `human | robot | gold | chrome | black | bulwark | rental | ghost | unknown` (+ `seed`, `hue`).
+Portrait kinds: `human | robot | gold | chrome | black | bulwark | rental | ghost | unknown` (+ `seed`, `hue`). A bare kind
+string (`'rental'`) works too; strings containing `/` or `.` are image URLs.
+
+Sim adapters (`js/sim/ui_adapt.js`): `toUiBoard`, `toUiWarehouse`, `toUiCodex`, `toUiComplete`, `toUiItem`, `uiConfig` produce the
+shapes on this page; `game.hud()` / `game.skillsHud()` feed `ui.hud.set` / `ui.skills.set` directly.
+Panels and the results/death screens scale up on big viewports (`--ps`, never below 1); the HUD scales with `--hs`.
 
 ## Panels — `ui.panel.open(name, data)`, `ui.panel.update(data)`, `ui.panel.close()`, `ui.panel.current`
 
 - `contracts` — `{contracts:[{id, title, archetype, grade:'street'|'pro'|'elite'|'black', story?, client:{name, org,
-  kind?, seed?}, location, district, difficulty?:1-5, level, payout, bonus?, xp, timeLimit?, suits?:'Brawler',
-  modifiers:[{label, kind:'good'|'bad'|'neutral'}]}], rerollCost?, refreshIn? (s), threat?, threats?:[{id, name,
-  locked?}]}`. STORY cards pin first. Archetypes = MISSIONS §4 ids (courier pest retrieve surveil bounty escort
+  kind?, seed?, portrait?}, location, district, difficulty?:1-5, level, payout, bonus?, xp, timeLimit?, suits?:'Brawler',
+  desc?, target?, modifiers:[{label, kind:'good'|'bad'|'neutral'}]}], rerollCost?, refreshIn? (s), threat?, threats?:[{id, name,
+  locked?}] | ['calm', …]}`. `toUiBoard(game)` in `js/sim/ui_adapt.js` builds exactly this. STORY cards pin first. Archetypes = MISSIONS §4 ids (courier pest retrieve surveil bounty escort
   sabotage hack tail infiltrate transport defend repo race assassinate rescue heist wetwork).
 - `warehouse` — tabs Loadout / Frames / Fabricator (`tab` picks the first one). `{credits, active, invMax?,
   materials:{scrap, circuitry, flux, shards}, frames:[{id, kind, name, model, rental?, mk, mkMax, mkCost, sync, fr,
@@ -148,7 +160,7 @@ Portrait kinds: `human | robot | gold | chrome | black | bulwark | rental | ghos
   Unknown nodes show only "?" and a silhouette — don't send names for them. `near` places a parentless node
   beside another (e.g. a sibling); `collapsed` renders a small "… generations" pill.
 - `settings` — no data needed. `ui.settings.get()` / `ui.settings.set(partial)`; persisted to
-  localStorage `heirframe:settings`: `{quality, music, sfx, voice, subtitles, joystick:'left'|'right', haptics}`.
+  localStorage `heirframe:settings`: `{quality, master, music, sfx, voice, ambient, subtitles, joystick:'left'|'right', haptics}`.
 - `pause` — `{mission?}`; buttons resume / settings / codex / warehouse / quit.
 
 `ui.panel.open('results', data)` is an alias for `ui.screen('complete', data)`.
@@ -161,3 +173,6 @@ Portrait kinds: `human | robot | gold | chrome | black | bulwark | rental | ghos
 - `complete` `{title, grade:'S'|'A'|'B'|'C', credits, bonus, xp, xpMax, xpFrom, level, levelUp,
   items:[item], stats:[{label, value}]}` → `'continue'`.
 - `death` `{cause, cost, tip}` → `'redeploy' | 'warehouse'`.
+
+## Fullscreen
+`js/ui/fullscreen.js` exports `toggleFullscreen()`, `fullscreenSupported`, `bindFullscreen(btn, bus)`. There is a toggle button in the HUD menu row (`.hf-fs`) and in the title screen corner (`.ti-fs`). Entering fullscreen also locks the screen to landscape where supported. The button is removed where the Fullscreen API is missing (iPhone Safari).

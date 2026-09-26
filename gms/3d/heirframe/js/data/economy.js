@@ -93,6 +93,14 @@ export const LEGACY_NODES = [
   { id: 'heir', name: 'Heir Protocol', per: 0.02, stat: 'heirPct' },
 ];
 
+// sim: endless credit sink (not in ECONOMY). Kettle's broker sells materials at price × L(level) per unit;
+// each unit bought in the same shift raises that material's price by `step` (resets every shift).
+export const MATERIAL_BROKER = {
+  unlock: 15,
+  price: { scrapAlloy: 8, circuitry: 40, flux: 250, heirShard: 1500 },
+  step: 0.08,
+};
+
 export const SUCCESSION = { minLegacy: 20, creditCap: 50000, xpPerGen: 0.15, lootPerGen: 0.1, maxGen: 10 };
 
 export const DEBT_FREE_PERK = { creditsPct: 0.05 };

@@ -43,7 +43,7 @@ export function createEnemy(spawn, { threat, riderLevel } = {}) {
     fleeBelow: def.fleeBelow || 0, hackable: !!def.hackable || (def.tags || []).includes('robot'),
     eliteMods: spawn.eliteMods || [], eliteModNames: modNames,
     eliteHooks: (spawn.eliteMods || []).map(id => ELITE_MODS.find(m => m.id === id)?.hook).filter(Boolean),
-    xp: killXp(spawn.level, rank, riderLevel ?? spawn.level),
+    xp: Math.round(killXp(spawn.level, rank, riderLevel ?? spawn.level) * Math.sqrt(def.pts || 1)), // sim: tougher unit types pay XP by sqrt(pack cost)
     alerted: false,
   });
   return c;

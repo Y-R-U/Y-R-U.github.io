@@ -1,4 +1,4 @@
-import { h, createBus, cssUrl, store, RARITY, STAT_LABELS, SLOTS } from './core.js';
+import { h, createBus, cssUrl, store, RARITY, STAT_LABELS, SLOTS, volumesOf } from './core.js';
 import { createHud } from './hud.js';
 import { createControls } from './controls.js';
 import { createFeedback } from './feedback.js';
@@ -13,7 +13,10 @@ const FONTS = 'https://fonts.googleapis.com/css2?family=Michroma&family=Rajdhani
 const bus = createBus();
 let root = null, hud, controls, fx, dlg, panels, screens, combat;
 let slots = SLOTS;
-const pending = { hud: {}, skills: null };
+const pending = { hud: {}, skills: null, voice: null };
+// attack glyph per frame kind until the engine calls ui.controls.setAttack itself
+const DEFAULT_ATTACK = { rental: 'baton', brawler: 'fist', gunner: 'carbine', ghost: 'blade' };
+let attackSet = false;
 
 function addLink(href) {
   if (document.querySelector(`link[href="${href}"]`)) return;
@@ -25,6 +28,9 @@ function fitScale() {
   const r = Math.min(innerWidth / 915, innerHeight / 412);
   const s = Math.max(.82, Math.min(1.7, r >= 1 ? 1 + (r - 1) * .55 : r));
   root.style.setProperty('--hs', s.toFixed(3));
+  // panels / results / death render on a virtual ~960x460 page scaled up on big screens (never down)
+  const ps = Math.max(1, Math.min(1.6, innerWidth / 960, innerHeight / 460));
+  root.style.setProperty('--ps', ps.toFixed(3));
   restack();
 }
 
@@ -42,8 +48,11 @@ function restack() {
   root.style.setProperty('--y-toast', `${y + 6}px`);
 }
 
+let lastVol = '';
 function applySettings(s) {
   Object.assign(store.settings, s);
+  const vol = volumesOf(store.settings), vk = JSON.stringify(vol);
+  if (vk !== lastVol) { lastVol = vk; bus.emit('volumes', vol); }
   store.saveSettings();
   ui.quality(store.settings.quality);
   controls?.setSide(store.settings.joystick);
@@ -79,6 +88,7 @@ export const ui = {
     hud = createHud(bus);
     controls = createControls(bus);
     dlg = createDialogue(bus, root);
+    if (pending.voice) dlg.setVoice(pending.voice);
     fx = createFeedback(bus);
     panels = createPanels(bus, { root, itemCard: (...a) => fx.itemCard(...a), toast: (...a) => fx.toast(...a), applySettings, get slots() { return slots; } });
     screens = createScreens(bus, root);
@@ -97,6 +107,7 @@ export const ui = {
       addEventListener('keyup', e => onKey(e, false));
       addEventListener('blur', () => controls.releaseAll());
     }
+    if (pending.hud.frame?.kind) controls.setAttack({ icon: DEFAULT_ATTACK[pending.hud.frame.kind] || 'fist' });
     hud.set(pending.hud);
     if (pending.skills) controls.setSkills(pending.skills);
     return ui;
@@ -119,7 +130,10 @@ export const ui = {
 
   hud: {
     minimap: null,
-    set(p) { hud ? hud.set(p) : Object.assign(pending.hud, p); },
+    set(p) {
+      if (p?.frame?.kind && !attackSet && controls) controls.setAttack({ icon: DEFAULT_ATTACK[p.frame.kind] || 'fist' });
+      hud ? hud.set(p) : Object.assign(pending.hud, p);
+    },
     heading(rad) { hud?.heading(rad); },
     flash(kind) { hud?.flash(kind); },
     badge(evt, n) { hud?.badge(evt, n); },
@@ -129,7 +143,7 @@ export const ui = {
     move: { x: 0, y: 0 },
     get attackHeld() { return !!controls?.attackHeld; },
     get sneak() { return !!controls?.sneak; },
-    setAttack(o) { controls?.setAttack(o); },
+    setAttack(o) { attackSet = true; controls?.setAttack(o); },
   },
 
   skills: {
@@ -152,6 +166,7 @@ export const ui = {
 
   dialogue: {
     show: o => dlg.show(o),
+    setVoice: fn => { pending.voice = fn; dlg?.setVoice(fn); },
     play: lines => dlg.play(lines),
     close: () => dlg.close(),
     get open() { return !!dlg?.open; },
@@ -194,6 +209,7 @@ export const ui = {
 
   settings: {
     get: () => ({ ...store.settings }),
+    volumes: () => volumesOf(store.settings),
     set: s => applySettings(s),
   },
 

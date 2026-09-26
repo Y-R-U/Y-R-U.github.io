@@ -1,5 +1,6 @@
 import { h, fmt, fmtTime, clamp, onTap, haptic } from './core.js';
 import { icon } from './icons.js';
+import { bindFullscreen } from './fullscreen.js';
 import { framePortrait } from './portrait.js';
 
 const KIND_LABEL = { rental: 'Rental', brawler: 'Brawler', gunner: 'Gunner', ghost: 'Ghost' };
@@ -15,21 +16,21 @@ export function createHud(bus) {
         <div class="hf-lvl hf-num"><span>1</span></div>
       </button>
       <div class="hf-vbars">
-        <div class="hf-vname"><span class="n"></span><span class="k hf-chip"></span></div>
-        <div class="hf-bar sh"><i class="lag"></i><i class="fill"></i></div>
+        <div class="hf-vname"><span class="n">&nbsp;</span><span class="k hf-chip off"></span></div>
+        <div class="hf-bar sh none"><i class="lag"></i><i class="fill"></i></div>
         <div class="hf-bar hp"><i class="lag"></i><i class="fill"></i><b class="v hf-num"></b></div>
         <div class="hf-bar en"><i class="fill"></i><b class="v hf-num"></b></div>
         <div class="hf-xp"><i class="fill"></i><span class="hf-num"></span></div>
       </div>
     </div>
     <div class="hf-buffs"></div>
-    <div class="hf-tracker hf-glass hf-live">
+    <div class="hf-tracker hf-glass hf-live off">
       <div class="hd"><span class="hf-label">${icon('contracts')}Contract</span><span class="tm hf-num"></span></div>
       <div class="tt"></div>
       <div class="ob"><i></i><span class="ot"></span><em class="hf-num"></em></div>
       <div class="pg"><i></i></div>
     </div>
-    <div class="hf-goal off">${icon('star')}<span></span></div>
+    <div class="hf-goal off">${icon('star')}<span></span><i class="gp"></i></div>
   </div>
   <div class="hf-tc">
     <div class="hf-heat"><div class="pips">${'<i><b></b></i>'.repeat(5)}</div><span class="hf-label">${icon('heat')}<span class="hl">Heat</span></span></div>
@@ -40,6 +41,7 @@ export function createHud(bus) {
         <button class="hf-ibtn hf-live" data-evt="codex" aria-label="Codex">${icon('codex')}<span class="hf-badge"></span></button>
         <button class="hf-ibtn hf-live" data-evt="warehouse" aria-label="Warehouse">${icon('warehouse')}<span class="hf-badge"></span></button>
         <button class="hf-ibtn hf-live" data-evt="contracts" aria-label="Contracts">${icon('contracts')}<span class="hf-badge"></span></button>
+        <button class="hf-ibtn hf-live hf-fs" aria-label="Fullscreen">${icon('fs_enter')}</button>
         <button class="hf-ibtn hf-live" data-evt="pause" aria-label="Pause">${icon('pause')}</button>
       </div>
       <div class="hf-credits"><span class="ci">${icon('credits')}</span><span class="cv hf-num hf-gold-text">0</span></div>
@@ -71,6 +73,7 @@ export function createHud(bus) {
 
   el.querySelectorAll('[data-evt]').forEach(b => onTap(b, () => { haptic(); bus.emit('sfx', 'click'); bus.emit(b.dataset.evt); }));
   onTap($('.hf-pchip'), () => { haptic(); bus.emit('sfx', 'click'); bus.emit('warehouse'); });
+  bindFullscreen($('.hf-fs'), bus);
   onTap(r.tracker, () => { r.tracker.classList.toggle('min'); bus.emit('sfx', 'click'); });
 
   const s = {};
@@ -133,17 +136,17 @@ export function createHud(bus) {
       const f = bar(r.hp, s.hp, s.hpMax, fr.hp);
       if (fr.hp != null && f < fr.hp - .001) { r.hp.classList.remove('hit'); void r.hp.offsetWidth; r.hp.classList.add('hit'); }
       fr.hp = f;
-      r.hpV.textContent = `${fmt(s.hp)} / ${fmt(s.hpMax)}`;
+      r.hpV.textContent = s.hpMax ? `${fmt(s.hp)} / ${fmt(s.hpMax)}` : '';
       el.classList.toggle('low', f < .25 && f > 0);
     }
     if (ch('shield') || ch('shieldMax')) {
       fr.sh = bar(r.sh, s.shield || 0, s.shieldMax || 0, fr.sh);
       r.sh.classList.toggle('none', !s.shieldMax);
     }
-    if (ch('energy') || ch('energyMax')) { bar(r.en, s.energy, s.energyMax); r.enV.textContent = fmt(s.energy); }
+    if (ch('energy') || ch('energyMax')) { bar(r.en, s.energy, s.energyMax); r.enV.textContent = fmt(s.energy || 0); r.en.classList.toggle('none', !s.energyMax); }
     if (ch('xp') || ch('xpMax')) {
       bar(r.xp, s.xp, s.xpMax);
-      r.xpV.textContent = `${fmt(s.xp)} / ${fmt(s.xpMax)} XP`;
+      r.xpV.textContent = s.xpMax ? `${fmt(s.xp)} / ${fmt(s.xpMax)} XP` : '';
     }
     if (ch('level')) {
       if (prevLevel != null && s.level > prevLevel) {
@@ -158,9 +161,10 @@ export function createHud(bus) {
       const f = p.frame, key = `${f.kind}|${f.name}|${f.tier}`;
       if (key !== s._fkey) {
         s._fkey = key;
-        r.name.textContent = f.name || '';
-        r.kind.textContent = KIND_LABEL[f.kind] || f.kind || '';
-        r.kind.className = `k hf-chip ${f.kind === 'rental' ? 'bad' : 'gold'}`;
+        r.name.textContent = f.name || '\u00a0';
+        const kl = [KIND_LABEL[f.kind] || f.kind || '', f.kind !== 'rental' && f.tierName ? f.tierName : ''].filter(Boolean).join(' · ');
+        r.kind.textContent = kl;
+        r.kind.className = `k hf-chip ${f.kind === 'rental' ? 'bad' : 'gold'}${kl ? '' : ' off'}`;
         r.hexIn.innerHTML = framePortrait(f.kind, f.seed || 3);
         el.dataset.frame = f.kind;
       }
@@ -174,11 +178,11 @@ export function createHud(bus) {
     }
     if ('district' in p) r.district.textContent = s.district || '';
     if ('mission' in p) {
-      const m = s.mission;
+      const m = s.mission && (s.mission.title || s.mission.objective) ? s.mission : null;
       r.tracker.classList.toggle('off', !m);
       if (m) {
-        if (r.tTitle.textContent !== m.title) {
-          r.tTitle.textContent = m.title;
+        if (r.tTitle.textContent !== (m.title || '')) {
+          r.tTitle.textContent = m.title || '';
           r.tracker.classList.remove('new'); void r.tracker.offsetWidth; r.tracker.classList.add('new');
         }
         if (r.tObj.textContent !== (m.objective || '')) {
@@ -192,7 +196,16 @@ export function createHud(bus) {
       }
     }
     if ('buffs' in p) setBuffs(s.buffs);
-    if (ch('goal')) { r.goal.classList.toggle('off', !s.goal); if (s.goal) r.goalT.textContent = s.goal; }
+    if ('goal' in p) {
+      // string, or the sim's {label, cost, progress}
+      const g = s.goal, txt = !g ? '' : typeof g === 'string' ? g : g.cost ? `${g.label} · ${fmt(g.cost)} cr` : g.label || '';
+      const pg = g && typeof g === 'object' && g.progress != null ? clamp(g.progress, 0, 1) : null;
+      r.goal.classList.toggle('off', !txt);
+      r.goal.classList.toggle('has-p', pg != null);
+      r.goal.classList.toggle('ready', pg === 1);
+      if (txt && r.goalT.textContent !== txt) r.goalT.textContent = txt;
+      if (pg != null) r.goal.style.setProperty('--gp', pg);
+    }
     if (ch('surcharge')) { r.surch.classList.toggle('off', !s.surcharge); r.surchV.textContent = `−${fmt(s.surcharge || 0)} cr`; }
   }
 

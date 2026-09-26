@@ -107,7 +107,10 @@ function unknown(id, hue) {
 }
 
 export function portrait(p = {}) {
-  if (typeof p === 'string') return `<img class="hf-portrait-img" src="${p}" alt="">`;
+  if (typeof p === 'string') {
+    if (/[/.]/.test(p)) return `<img class="hf-portrait-img" src="${p}" alt="">`;
+    p = { kind: p };
+  }
   const id = ++uid;
   const kind = p.kind || 'human';
   const hue = p.hue ?? (kind === 'human' ? 196 : 190);

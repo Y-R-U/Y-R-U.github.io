@@ -1,5 +1,6 @@
 import { h, esc, fmt, clamp, onTap, haptic } from './core.js';
 import { icon } from './icons.js';
+import { bindFullscreen } from './fullscreen.js';
 import { itemTile } from './itemcard.js';
 
 const emblem = (cls = '') => `<div class="hf-emblem ${cls}"><svg viewBox="0 0 120 120" aria-hidden="true">
@@ -54,8 +55,10 @@ export function createScreens(bus, root) {
             <button class="hf-btn ghost hf-live" data-a="settings">${icon('settings')}Settings</button>
           </div>
         </div>
-        <div class="ti-ver">${esc(d.version || 'v0.1')}</div>`,
+        <div class="ti-ver">${esc(d.version || 'v0.1')}</div>
+        <button class="hf-ibtn hf-live ti-fs" aria-label="Fullscreen"></button>`,
       });
+      bindFullscreen(s.querySelector('.ti-fs'), bus);
       s.querySelectorAll('[data-a]').forEach(b => onTap(b, () => {
         haptic(); bus.emit('sfx', 'confirm');
         if (b.dataset.a === 'settings') { api.openSettings && api.openSettings(); return; }

@@ -202,3 +202,10 @@
 @keyframes hf-cpin { from { opacity: 0; scale: .9; } }
 .hf-icard .iv .uc { text-transform: uppercase; letter-spacing: .14em; font-size: 10.5px; font-weight: 700; }
 .hf-icard .el-thermal { color: #ff9a5a; } .hf-icard .el-shock { color: #9fe7ff; } .hf-icard .el-ion { color: #c6a4ff; } .hf-icard .el-kinetic { color: var(--ink-dim); }
+
+/* finisher: bigger one-tap EQUIP on loot rows */
+.hf-loot .leq { position: relative; height: 30px; padding: 0 11px 0 8px; font-size: 12px; }
+.hf-loot .leq::after { content: ''; position: absolute; inset: -9px -6px; }
+.hf-loot:has(.leq) { height: 40px; }
+/* keep toasts inside the gap between the vitals block and the menu buttons */
+.hf-toasts { width: max(220px, min(380px, 44vw, calc(100vw - 660px * var(--hs, 1)))); }

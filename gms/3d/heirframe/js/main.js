@@ -27,6 +27,9 @@ async function start() {
   const world = createWorld(canvas, { quality: tier, toneMapping: flags.tm, onProgress: progress });
   await frame();
   const rig = createCameraRig(world.camera, { zoom: 0.35 });
+  // gameplay framing: closer Diablo angle so the rental reads on a 915x412 phone; <0.35 still dips into the vista view
+  rig.keys = [[0, 7.5, 26, 50], [0.35, 9.2, 52, 36], [0.7, 15, 54, 40], [1, 27, 58, 38]];
+  rig.setZoom(0.35);
   const input = createInput(canvas, world.camera, world, rig);
 
   // UI (optional until the ui agent ships ui.js)
@@ -54,11 +57,7 @@ async function start() {
   const marker = world.ctx.makePadRing(0.7, [1.0, 0.85, 0.5], true);
   marker.visible = false; world.scene.add(marker);
   input.onTap = (g) => { player.setTarget(g); marker.position.set(g.x, g.y + 0.03, g.z); marker.visible = true; };
-  ui?.on?.('tap', (s) => { const g = input.groundFromScreen(s.x, s.y); if (g) input.onTap(g); });
-
-  // Interactables
   let near = null;
-  ui?.on?.('interact', () => { if (near) ui.panel?.open?.(near.id, {}); });
 
   // Screenshot / demo presets
   const SHOTS = {
@@ -79,7 +78,14 @@ async function start() {
   const gameMod = await tryImport('./game/game.js');
   let runtime = null;
   const api = { THREE, world, rig, input, player, crowd, ui, robots, flags, tier, marker };
-  if (gameMod?.createGame) { try { runtime = await gameMod.createGame(api); } catch (e) { console.error('game runtime failed to start', e); } }
+  if (gameMod?.createGame && !flags.shot) { try { runtime = await gameMod.createGame(api); } catch (e) { console.error('game runtime failed to start', e); } }
+  if (runtime) {
+    // the runtime owns taps (it also engages enemies) and interactables
+    input.onTap = (g, e) => runtime.tapWorld?.(e.clientX, e.clientY);
+  } else {
+    ui?.on?.('tap', (s) => { const g = input.groundFromScreen(s.x, s.y); if (g) input.onTap(g); });
+    ui?.on?.('interact', () => { if (near) ui.panel?.open?.(near.id, {}); });
+  }
 
   const AUTO = [[0, 22], [-14, 14], [-18, -8], [-4, -30], [-2, -60], [8, -70], [10, -40], [28, -20], [44, -42], [32, 6], [44, 8], [22, 22], [0, 30], [0, 50], [-30, 52], [-12, 36]];
   let autoIdx = 0;
@@ -92,11 +98,13 @@ async function start() {
   const perfEl = document.getElementById('perf');
   if (flags.perf) perfEl.style.display = 'block';
   const stats = { fps: 0, ms: 0, calls: 0, tris: 0, frames: 0 };
-  let last = performance.now(), acc = 0, accN = 0, perfT = 0;
+  let last = performance.now(), acc = 0, accN = 0, perfT = 0, runtimeErr = false;
 
   const game = window.__game = {
     THREE, world, rig, input, player, crowd, flags, tier, governor, stats, ui, get runtime() { return runtime; },
     get moveTarget() { return player.moveTarget; },
+    get state() { return runtime?.state ?? 'free'; },
+    snapshot: () => runtime?.snapshot?.() ?? null,
     get near() { return near; },
     teleport: (x, z, yaw) => { player.teleport(x, z, yaw); rig.target.copy(player.pos); rig.snap(); },
     info: () => ({ ...stats, dpr: governor.dpr, tier: tier.name, gpu: tier.gpu, static: world.ctx.stats, programs: world.renderer.info.programs?.length }),
@@ -108,17 +116,21 @@ async function start() {
     if (ui?.controls?.move) stick = { x: ui.controls.move.x, y: -ui.controls.move.y };
     else if (pad?.active) stick = pad.move;
     if (!ui) { const k = input.keyVector(); if (k.x || k.y) stick = k; }
-    if (flags.auto && !player.moveTarget) {
+    if (flags.auto && !runtime && !player.moveTarget) {
       const [x, z] = AUTO[autoIdx++ % AUTO.length];
       player.setTarget({ x, z });
     }
-    if (runtime?.update) runtime.update(dt, stick); else player.update(dt, stick);
+    if (runtime?.update) {
+      try { runtime.update(dt, stick); } catch (e) { if (!runtimeErr) { runtimeErr = true; console.error('runtime update failed', e); } player.update(dt, stick); }
+    } else player.update(dt, stick);
     if (!player.moveTarget) marker.visible = false;
     crowd?.update(dt, player.pos);
 
-    near = null;
-    for (const it of world.interactables) if (Math.hypot(it.x - player.pos.x, it.z - player.pos.z) < it.r) near = it;
-    if (ui?.interact) near ? ui.interact.show(near.label) : ui.interact.hide();
+    if (!runtime) {
+      near = null;
+      for (const it of world.interactables) if (Math.hypot(it.x - player.pos.x, it.z - player.pos.z) < it.r) near = it;
+      if (ui?.interact) near ? ui.interact.show(near.label) : ui.interact.hide();
+    }
 
     rig.target.copy(player.pos);
     rig.update(dt);

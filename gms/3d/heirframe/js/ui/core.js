@@ -87,7 +87,7 @@ export function haptic(ms = 8) {
 }
 
 const SETTINGS_KEY = 'heirframe:settings';
-const DEFAULT_SETTINGS = { quality: 'high', music: 0.7, sfx: 0.8, voice: 0.9, subtitles: true, joystick: 'left', haptics: true };
+const DEFAULT_SETTINGS = { quality: 'high', master: 1, music: 0.7, sfx: 0.8, voice: 0.9, ambient: 0.7, subtitles: true, joystick: 'left', haptics: true };
 
 function loadSettings() {
   try { return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; }
@@ -111,3 +111,6 @@ export function centerBanner(fn, ms) {
   const run = () => { banner.busy = performance.now() + ms; fn(); setTimeout(() => { const n = banner.q.shift(); n && n(); }, ms); };
   if (performance.now() < banner.busy) banner.q.push(run); else run();
 }
+
+// settings → audio.setVolumes() shape
+export const volumesOf = s => ({ master: s.master ?? 1, music: s.music, sfx: s.sfx, vo: s.voice, ambient: s.ambient ?? 0.7 });

@@ -68,6 +68,9 @@ export function createCombat(bus, root) {
       const cx = W / 2, cy = H / 2, dx = x - cx, dy = y - cy;
       const s = Math.min((W / 2 - 50) / Math.max(1e-3, Math.abs(dx)), (H / 2 - 50) / Math.max(1e-3, Math.abs(dy)));
       px = cx + dx * s; py = cy + dy * s;
+      // keep edge pips out of the HUD corners (vitals, minimap, joystick, action buttons)
+      if (Math.abs(px - cx) >= W / 2 - 51) py = clamp(py, H * .44, H * .62);
+      else px = clamp(px, W * .3, W * .7);
       n.el.querySelector('.arr').style.transform = `rotate(${Math.atan2(dy, dx) + Math.PI / 2}rad)`;
     }
     n.el.style.transform = `translate(${px}px, ${py}px)`;

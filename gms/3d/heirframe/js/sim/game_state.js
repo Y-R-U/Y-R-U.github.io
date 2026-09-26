@@ -7,6 +7,7 @@ import { newFrame, frameDef, frameSkills, chooseMod, maxSync, tierName, canEquip
 import { rollItem, rollKillLoot, rollCache, itemFR, salvageYield, tuneCost, applyTune, recalibrateCost, applyRecalibrate, marketStock, makeHeirCore, newLootState, RARITY_INDEX } from './loot.js';
 import { xpNext, addXp, addSyncXp, framePrice, mkUpgrade, repairCost, wreckCost, rerollCost, consumableCost, cleanSlateCost, nextStash, legacyStats, nextGoal, featuresAt, newFeatures, SHIFT_SECONDS, RENTAL_FEE, LEGACY_XP } from './economy.js';
 import { createEnemy } from './enemies.js';
+import { L } from '../data/balance.js';
 import { newFactionState, adjustRep, killRep, resetMissionRep, stance, addHeat, setHeat, tickHeat, heatStars, heatEffects, repPayMul, canHarm } from './factions.js';
 import { generateBoard, completionRewards, threatDef, validateMission } from './missions.js';
 import { newStoryState, storyReady, completeStory, tickRenewal, rollEcho, echoAvailable, buildStoryMission, storyFlags, storyCacheItem, codexView } from './story.js';
@@ -15,7 +16,7 @@ import { OWNABLE_FRAMES, MK_TIERS } from '../data/frames.js';
 import { POWERS } from '../data/loot.js';
 import { DISTRICTS, DISTRICT_ORDER } from '../data/districts.js';
 import { THREATS } from '../data/missions.js';
-import { STASH_SIZES, CONSUMABLES, COSTS, DEBT_FREE_PERK, SUCCESSION, LEGACY_NODES, WARRANTY_SURCHARGE } from '../data/economy.js';
+import { STASH_SIZES, CONSUMABLES, COSTS, DEBT_FREE_PERK, SUCCESSION, LEGACY_NODES, WARRANTY_SURCHARGE, HOMES, PAINTS, MATERIAL_BROKER } from '../data/economy.js';
 import { HEAT } from '../data/factions.js';
 import { MATERIALS } from '../data/loot.js';
 
@@ -34,7 +35,7 @@ export function newState(seed = 1, { name = 'Wren' } = {}) {
     districts: { unlocked: ['aurum_plaza'], current: 'aurum_plaza', danger: {} },
     threat: 'tense', overclock: { unlocked: 0, active: null },
     board: null, contract: null, market: null,
-    perks: [], home: 'pod', paints: ['rental_orange'],
+    perks: [], home: 'pod', homesOwned: ['pod'], paints: ['rental_orange'],
     flags: { firstFrameDiscount: false, boardUnlocked: false },
     stats: { contractsDone: 0, contractsFailed: 0, kills: 0, wrecks: 0, itemsFound: 0, creditsEarned: 0 },
   };
@@ -147,6 +148,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
       restatPlayer({ heal: true });
       for (const lvl of res.levels) emit('levelUp', { level: lvl, features: newFeatures(lvl - 1, lvl) });
       if (newFeatures(before, S.player.level).some(x => x.id === 'brightline')) unlockDistrict('brightline');
+      if (S.player.level >= 60 && !S.overclock.unlocked) { S.overclock.unlocked = 1; emit('overclock:unlock', { n: 1 }); }
     } else if (syncUps.length) restatPlayer();
     if (res.legacy) emit('legacy', { points: S.player.legacyPoints, gained: res.legacy });
     return xp;
@@ -396,6 +398,24 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     addItem(deepClone(e.item));
     return { ok: true, item: e.item };
   }
+  function brokerPrice(id, count = 1) {
+    const base = MATERIAL_BROKER.price[id];
+    if (!base) return null;
+    const bought = S.broker?.shift === S.shiftIndex ? S.broker.bought[id] || 0 : 0;
+    let total = 0;
+    for (let i = 0; i < count; i++) total += Math.round(base * L(S.player.level) * (1 + MATERIAL_BROKER.step * (bought + i)));
+    return total;
+  }
+  function buyMaterial(id, count = 1) {
+    if (S.player.level < MATERIAL_BROKER.unlock) return { ok: false, reason: 'locked', need: MATERIAL_BROKER.unlock };
+    const cost = brokerPrice(id, count);
+    if (cost == null || count < 1) return { ok: false, reason: 'bad' };
+    if (!spend(cost, 'broker')) return { ok: false, reason: 'credits', need: cost };
+    if (S.broker?.shift !== S.shiftIndex) S.broker = { shift: S.shiftIndex, bought: {} };
+    S.broker.bought[id] = (S.broker.bought[id] || 0) + count;
+    addMats({ [id]: count });
+    return { ok: true, cost };
+  }
   function payWardDebt() {
     if (!S.wardDebt) return { ok: false };
     if (!spend(S.wardDebt, 'wardDebt')) return { ok: false, reason: 'credits', need: S.wardDebt };
@@ -411,6 +431,51 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     addCredits(-pay, 'rentalDebt');
     S.rentalDebt -= pay;
     return { ok: S.rentalDebt === 0, paid: pay, left: S.rentalDebt };
+  }
+
+  function storyDone(id) { return id === 'finale' ? S.story.flags.includes('finale') : S.story.done.includes(id); }
+  function homeState(id) {
+    const h = HOMES[id];
+    if (!h) return null;
+    return { ...h, owned: S.homesOwned.includes(id), current: S.home === id, locked: !!h.needs && !storyDone(h.needs) };
+  }
+  function buyHome(id) {
+    const h = homeState(id);
+    if (!h) return { ok: false, reason: 'bad' };
+    if (h.owned) return { ok: false, reason: 'owned' };
+    if (h.locked) return { ok: false, reason: 'locked', needs: h.needs };
+    if (h.cost && !spend(h.cost, 'home')) return { ok: false, reason: 'credits', need: h.cost };
+    S.homesOwned.push(id);
+    S.home = id;
+    emit('home', { id, name: h.name });
+    return { ok: true };
+  }
+  function setHome(id) {
+    if (!S.homesOwned.includes(id)) return { ok: false };
+    S.home = id; emit('home', { id, name: HOMES[id].name });
+    return { ok: true };
+  }
+  function paintState(id) {
+    const p = PAINTS.find(x => x.id === id);
+    if (!p) return null;
+    const locked = p.needs === 'trusted' ? !Object.values(S.factions.rep).some(v => v >= 50) : p.needs === 'story' ? !storyDone('finale') : false;
+    return { ...p, owned: S.paints.includes(id), locked };
+  }
+  function buyPaint(id) {
+    const p = paintState(id);
+    if (!p) return { ok: false, reason: 'bad' };
+    if (p.owned) return { ok: false, reason: 'owned' };
+    if (p.locked) return { ok: false, reason: 'locked' };
+    if (p.cost && !spend(p.cost, 'paint')) return { ok: false, reason: 'credits', need: p.cost };
+    S.paints.push(id);
+    emit('paint:buy', { id });
+    return { ok: true };
+  }
+  function setPaint(frameUid, id) {
+    const f = frameByUid(frameUid);
+    if (!f || !S.paints.includes(id)) return { ok: false };
+    f.paint = id; emit('paint', { frame: f.uid, paint: id });
+    return { ok: true };
   }
 
   // ---- districts / threat ----------------------------------------------------------------
@@ -599,6 +664,8 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
       if (echo) { out.clue = echo; emit('clue', { id: echo }); }
       if (m.faction && m.archetype !== 'pest') S.districts.danger[m.district] = Math.min(10, (S.districts.danger[m.district] ?? DISTRICTS[m.district].danger) + 0.3);
     }
+    const oc = S.overclock.active;
+    if (oc && m.grade === 'elite' && oc >= S.overclock.unlocked && oc < 30) { S.overclock.unlocked = oc + 1; out.overclockUnlocked = oc + 1; emit('overclock:unlock', { n: oc + 1 }); }
     S.stats.contractsDone++;
     out.levelTo = S.player.level;
     out.grade = gradeFor(c, rw);
@@ -803,6 +870,8 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     buyFrame, swapFrame, returnRental, upgradeMk, chooseSyncMod, repair, payRental, payWardDebt,
     buyConsumable, useConsumable, cleanSlate, buyStash, refreshMarket, buyMarket, travel, setThreat, unlockDistrict,
     spendLegacy, succession, addCredits, giveXp, save,
+    buyHome, setHome, buyPaint, setPaint, buyMaterial, brokerPrice,
+    homes: () => Object.keys(HOMES).map(homeState), paintsList: () => PAINTS.map(p => paintState(p.id)),
     setSites(districtId, sites) { live.sitesRegistry[districtId] = sites; },
   };
   return game;

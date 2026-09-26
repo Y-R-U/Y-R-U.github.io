@@ -30,6 +30,8 @@ function card(c, i) {
     </div>
     <div class="cc-loc">${icon('pin')}<span>${esc(c.location || '')}${c.district ? ` · <em>${esc(c.district)}</em>` : ''}</span></div>
     <div class="cc-mods">${mods}</div>
+    ${c.target ? `<div class="cc-tgt">${icon('mark')}<span>${esc(c.target)}</span></div>` : ''}
+    ${c.desc ? `<p class="cc-desc">${esc(c.desc)}</p>` : '<div class="cc-sp"></div>'}
     <div class="cc-meta">
       <span>${icon('clock')}${c.timeLimit ? fmtTime(c.timeLimit) : 'No limit'}</span>
       <span class="cc-lv">LV <b class="hf-num">${c.level ?? '—'}</b></span>
@@ -48,7 +50,7 @@ export function contractsPanel(body, data, ctx) {
   body.innerHTML = `<div class="hf-cboard hf-scroll">${list.map(card).join('') || '<div class="hf-empty">No open contracts. Check back soon.</div>'}</div>`;
   if (data.threats) {
     const seg = h('div.cb-threat', {
-      html: `<span class="hf-label">Threat</span><div class="st-seg">${data.threats.map(t => `<button class="hf-live ${t.id === data.threat ? 'on' : ''} ${t.locked ? 'locked' : ''}" data-t="${esc(t.id)}" ${t.locked ? 'aria-disabled="true"' : ''}>${t.locked ? icon('lock') : ''}${esc(t.name)}</button>`).join('')}</div>`,
+      html: `<span class="hf-label">Threat</span><div class="st-seg">${data.threats.map(t => (typeof t === 'string' ? { id: t, name: t[0].toUpperCase() + t.slice(1) } : t)).map(t => `<button class="hf-live ${t.id === data.threat ? 'on' : ''} ${t.locked ? 'locked' : ''}" data-t="${esc(t.id)}" ${t.locked ? 'aria-disabled="true"' : ''}>${t.locked ? icon('lock') : ''}${esc(t.name)}</button>`).join('')}</div>`,
     });
     seg.querySelectorAll('button').forEach(b => onTap(b, () => {
       if (b.classList.contains('locked')) { ctx.bus.emit('sfx', 'deny'); return; }

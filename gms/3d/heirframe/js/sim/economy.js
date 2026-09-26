@@ -1,6 +1,6 @@
 // XP curve, level-ups, credits and cost formulas (ECONOMY.md).
 import { L, BALANCE } from '../data/balance.js';
-import { XP, COSTS, FRAME_PRICES, FIRST_FRAME_DISCOUNT, STASH_SIZES, LEGACY_NODES, FEATURE_UNLOCKS, CONSUMABLES, SHIFT_SECONDS, RENTAL_FEE } from '../data/economy.js';
+import { XP, COSTS, FRAME_PRICES, FIRST_FRAME_DISCOUNT, STASH_SIZES, LEGACY_NODES, FEATURE_UNLOCKS, CONSUMABLES, SHIFT_SECONDS, RENTAL_FEE, HOMES, PAINTS } from '../data/economy.js';
 import { MK_TIERS, SYNC_NEXT } from '../data/frames.js';
 import { clamp } from './util.js';
 
@@ -120,6 +120,19 @@ export function nextGoal(state) {
   }
   const ns = nextStash(state.stashSize);
   if (ns && state.stash.length > state.stashSize * 0.8) wants.push({ id: 'stash', label: `Stash ${ns.size}`, cost: ns.cost });
+  // nothing functional to buy right now: fall back to the next stash size, homes and prestige paints
+  if (!wants.length) {
+    if (ns) wants.push({ id: 'stash', label: `Stash ${ns.size}`, cost: ns.cost });
+    const done = new Set([...(state.story?.done || []), ...(state.story?.flags || [])]);
+    for (const h of Object.values(HOMES)) {
+      if (!h.cost || (state.homesOwned || [state.home]).includes(h.id) || (h.needs && !done.has(h.needs))) continue;
+      wants.push({ id: 'home:' + h.id, label: h.name, cost: h.cost, cosmetic: true });
+    }
+    for (const p of PAINTS) {
+      if (p.cost < 10000 || p.needs || (state.paints || []).includes(p.id)) continue;
+      wants.push({ id: 'paint:' + p.id, label: `${p.name} paint`, cost: p.cost, cosmetic: true });
+    }
+  }
   if (!wants.length) return null;
   wants.sort((a, b) => a.cost - b.cost);
   const w = wants[0];

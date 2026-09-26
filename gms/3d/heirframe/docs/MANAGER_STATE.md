@@ -40,3 +40,6 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 ## Phase 1 (2 agents)
 - **integrator**: js/game/* + js/main.js + js/engine/player.js (world agent is gone) → BUILD_PLAN P1 first playable. Notes: docs/notes/integrator.md
 - **finisher**: systems leftovers (balance.mjs, test.mjs, js/sim/README.md) then UI verification (ui_kit, screenshots, rarity 7-tier, dialogue→audio.vo). Owns js/sim, js/data, tools/sim, js/ui, css, tools/ui_kit.html. Notes: docs/notes/finisher.md
+- 2026-09-26: checkpoint commit 42eff3c3 pushed (heirframe folder only; walk-around, not in projects.js). integrator + finisher running.
+- 2026-09-26: **live checkpoint hung on the boot watchdog** (Aaron reported it). Cause: the world agent vendored 4 three addons into shared `gms/lib/three/0.180.0/addons/` (outside the game folder), and my folder-only commit left them untracked, so they 404'd live. Local testing hid it because http.server serves the working tree. Fixed in 40d18a4e; the live load verified in a fresh profile (ready 4.5 s, only the optional js/game/game.js 404s).
+  **PRE-PUSH CHECK from now on:** `git status --short gms/lib` for new vendored files, then after deploy run `scratchpad/mgr/live.mjs` (fresh profile, port 9313) against the LIVE url and read its list of failed requests.

@@ -143,14 +143,15 @@ const MODS = [['Stealth bonus', 'good'], ['Civilians nearby', 'neutral'], ['Armo
 const ARCH = ['courier', 'pest', 'surveil', 'bounty', 'escort', 'sabotage', 'tail'];
 const TITLES = ['Signed, Sealed, Delivered', 'Rats in the Fountain', 'Eyes on the Spire', 'Wanted: "Rustjaw"', 'Fragile Company', 'Lights Out, Loop C', 'Shadow the Courier'];
 const GRADES = ['street', 'street', 'pro', 'pro', 'elite', 'street', 'black'];
+const DESCS = ['Mara needs a parcel taken to drop-locker twelve. No questions, no scanning, no detours.', 'Nexus Biotech wants the fountain cleared of scrap rats before the lunch crowd. For a brighter future!', 'Get three clean photos of the courier on the Spire. Nobody can know you were there.', 'The Concord has a price on Rustjaw. Bring him in breathing for a bonus.', 'Walk the client through the Promenade to the relay. She is nervous, and she is not wrong to be.', 'Loop C runs on three relays. Make them stop running.', 'Stay on the courier from a distance until he reaches the drop. Do not get close.'];
 const contracts = [
-  { id: 'c0', title: 'The Heir-Key', archetype: 'courier', story: true, level: 5, payout: 6000, xp: 800, client: { name: 'Mara Quill', org: 'Fixer, Aurum Plaza', kind: 'human', seed: 7, hue: 30 }, location: 'Drop-locker 12', district: 'Aurum Plaza', modifiers: [{ label: 'Story', kind: 'neutral' }, { label: 'Handle with care', kind: 'bad' }], timeLimit: null },
+  { id: 'c0', title: 'The Heir-Key', archetype: 'courier', story: true, desc: 'A locker registered to a name that should not exist. Mara wants you to open it, carefully.', level: 5, payout: 6000, xp: 800, client: { name: 'Mara Quill', org: 'Fixer, Aurum Plaza', kind: 'human', seed: 7, hue: 30 }, location: 'Drop-locker 12', district: 'Aurum Plaza', modifiers: [{ label: 'Story', kind: 'neutral' }, { label: 'Handle with care', kind: 'bad' }], timeLimit: null },
   ...ARCH.map((type, i) => {
     const [cn, org, kind, seed] = CLIENTS[i % CLIENTS.length], [loc, dist] = LOCS[i % LOCS.length];
     const d = 1 + (i * 2) % 5;
     return {
       id: `c${i + 1}`, archetype: type, grade: GRADES[i], difficulty: d, level: 3 + d, payout: 800 + d * 900 + i * 55, bonus: i % 3 === 0 ? 400 : 0, xp: 120 + d * 90,
-      title: TITLES[i], suits: i === 1 ? 'Rental' : null,
+      title: TITLES[i], suits: i === 1 ? 'Rental' : null, desc: DESCS[i], target: type === 'bounty' ? '"Rustjaw" Okafor, the Scrapper' : null,
       client: { name: cn, org, kind, seed },
       location: loc, district: dist, timeLimit: i % 2 ? 240 + i * 30 : null,
       modifiers: [MODS[i % MODS.length], MODS[(i + 3) % MODS.length]].map(([label, kind]) => ({ label, kind })),
