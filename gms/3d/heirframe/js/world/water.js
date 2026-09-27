@@ -159,14 +159,17 @@ export function createMist(ctx, { x, y, z, w = 20, d = 4, count = 160, size = 6 
 // The east basin. Depth colour from a shore distance field (turquoise shallows → deep teal), a foam line at the stone,
 // world-space normals (two scrolling ripple scales + a slow analytic swell, so nothing tiles), churn + white water where the
 // falls land, cheap caustics in the shallows, and specular anti-aliasing so the sun reads as a glitter streak, not squares.
-// `shore`: { walls: [[x0,z0,x1,z1], ...] axis-aligned solid boxes, discs: [[x,z,r], ...], churn: [[x0,z0,x1,z1,k], ...] }
+// `shore`: { walls: [[x0,z0,x1,z1], ...] axis-aligned solid boxes, discs: [[x,z,r], ...], water: [[x0,z0,x1,z1], ...] open-water
+// rects (shore = their outline), churn: [[x0,z0,x1,z1,k], ...] }
 export function createLakeMaterial(ctx, { shore }) {
   const n = ctx.cache.waterNormal ||= makeWaterNormal(256);
   const m = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.035, metalness: 0.0, envMapIntensity: 1.5 });
   const u = { uTime: ctx.time, tRip: { value: n } };
   const box = (b) => `sdBox(p, vec2(${((b[0] + b[2]) / 2).toFixed(2)}, ${((b[1] + b[3]) / 2).toFixed(2)}), vec2(${((b[2] - b[0]) / 2).toFixed(2)}, ${((b[3] - b[1]) / 2).toFixed(2)}))`;
-  const sdf = [...shore.walls.map(box), ...shore.discs.map(([x, z, r]) => `(length(p - vec2(${x.toFixed(2)}, ${z.toFixed(2)})) - ${r.toFixed(2)})`)]
-    .reduce((a, b) => `min(${a}, ${b})`);
+  // solids (walls, discs) and/or water rects (distance to the shore from inside = minus the union's SDF)
+  const solid = [...(shore.walls || []).map(box), ...(shore.discs || []).map(([x, z, r]) => `(length(p - vec2(${x.toFixed(2)}, ${z.toFixed(2)})) - ${r.toFixed(2)})`)];
+  if (shore.water?.length) solid.push(`(-(${shore.water.map(box).reduce((a, b) => `min(${a}, ${b})`)}))`);
+  const sdf = solid.reduce((a, b) => `min(${a}, ${b})`);
   const churn = shore.churn.map((c) => `${c[4].toFixed(2)} * (1.0 - smoothstep(0.0, 6.0, ${box(c)}))`).join(' + ') || '0.0';
   // foam plume: the white water rolls out downstream (+z) and breaks into drifting scum lines
   const plume = shore.churn.map((c) => `${c[4].toFixed(2)} * (1.0 - smoothstep(0.0, 30.0, ${box([c[0], c[1], c[2], c[3] + 4])})) * smoothstep(-8.0, 2.0, p.y - ${c[1].toFixed(2)})`).join(' + ') || '0.0';
@@ -232,6 +235,8 @@ vec2 lkP = vec2(0.0); float lkD = 30.0, lkFoam = 0.0, lkC = 0.0, lkFar = 0.0;
   roughnessFactor = mix(roughnessFactor, 0.75, lkFoam);
 }`);
   };
-  m.customProgramCacheKey = () => 'lake';
+  let hsh = 0; for (const ch of sdf + churn + plume) hsh = (Math.imul(hsh, 31) + ch.charCodeAt(0)) | 0;
+  const key = 'lake' + hsh;
+  m.customProgramCacheKey = () => key;
   return m;
 }

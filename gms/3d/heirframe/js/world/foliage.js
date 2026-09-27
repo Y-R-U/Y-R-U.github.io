@@ -90,7 +90,7 @@ normal = faceDirection < 0.0 ? -normal : normal;`);
 }
 
 // Quad cards at `centers`; normals point away from `hub` so a canopy lights like one soft volume.
-function cards(list, hub, region, size, colorFn, R, { upBias = 0.35, sq = [1, 1] } = {}) {
+export function cards(list, hub, region, size, colorFn, R, { upBias = 0.35, sq = [1, 1] } = {}) {
   const n = list.length, pos = new Float32Array(n * 12), nor = new Float32Array(n * 12), uv = new Float32Array(n * 8), col = new Float32Array(n * 12);
   const idx = new Uint16Array(n * 6);
   const a = new THREE.Vector3(), b = new THREE.Vector3(), d = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0), v = new THREE.Vector3();
@@ -175,6 +175,29 @@ export function addShrubs(batch, M, x, y, z, len, wid, rot, seed = 1, count = 8)
   const hedge = pts.filter((_, i) => !bloom || i % 4);
   batch.add(cards(hedge, hub, HEDGE, 0.9, tone, R, { upBias: 0.7 }), M.leaves, { vcolor: true, cast: false });
   if (bloom) batch.add(cards(pts.filter((_, i) => i % 4 === 0).map((p) => p.setY(p.y + 0.08)), hub, BLOOM, 0.8, tone, R, { upBias: 0.8 }), M.leaves, { vcolor: true, cast: false });
+}
+
+// Hanging garden: leaf-card curtains spilling `drop` m down from a wall top along (x0,z0)→(x1,z1); `side` (±1) picks which
+// face of the line they hang on (+1 = left of the direction of travel). Denser and brighter at the top, ragged ends.
+export function addVines(batch, M, x0, z0, x1, z1, y, drop, { seed = 1, side = 1, density = 1, bloom = 0.25 } = {}) {
+  const R = rng(seed * 7717 + 3);
+  const len = Math.hypot(x1 - x0, z1 - z0), dx = (x1 - x0) / len, dz = (z1 - z0) / len;
+  const nx = -dz * side, nz = dx * side;
+  const pts = [], bl = [], col = new THREE.Color();
+  for (let s = 0; s < len; s += 0.55 / density) {
+    const L = drop * (0.35 + 0.65 * Math.pow(R(), 0.7)) * (0.7 + 0.3 * Math.sin(s * 0.7 + seed));
+    const bx = x0 + dx * (s + R() * 0.4), bz = z0 + dz * (s + R() * 0.4);
+    for (let d = 0; d < L; d += 0.32) {
+      const out = 0.12 + 0.25 * R() + 0.15 * Math.sin(d * 1.3 + s);
+      const p = new THREE.Vector3(bx + nx * out + dx * (R() - 0.5) * 0.3, y + 0.25 - d, bz + nz * out + dz * (R() - 0.5) * 0.3);
+      (R() < bloom * (1 - d / L) ? bl : pts).push(p);
+    }
+  }
+  const mx = (x0 + x1) / 2, mz = (z0 + z1) / 2;
+  const hub = new THREE.Vector3(mx - nx * 3, y - drop * 0.5, mz - nz * 3);
+  const tone = (p) => { const k = 0.5 + 0.5 * Math.min(1, (p.y - (y - drop)) / drop); return col.setRGB(0.5 + 0.45 * k, (0.52 + 0.45 * k) * 1.03, (0.5 + 0.4 * k) * 0.85); };
+  if (pts.length) batch.add(cards(pts, hub, HEDGE, 0.75, tone, R, { upBias: 0.1, sq: [0.8, 1.2] }), M.leaves, { vcolor: true, cast: false });
+  if (bl.length) batch.add(cards(bl, hub, BLOOM, 0.62, tone, R, { upBias: 0.1 }), M.leaves, { vcolor: true, cast: false });
 }
 
 // Dithered see-through for occluders standing between the camera and the player.

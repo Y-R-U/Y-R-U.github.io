@@ -25,6 +25,8 @@ import { BRIGHTLINE } from './brightline.js';
 import { createRelayFx } from '../fx/relay.js';
 import { createBreakables } from './breakables.js';
 import { bakeCrowdAtlas, createFarCrowdMaterial, addFarCrowd } from './farcrowd.js';
+import { TERRACES } from './verdant.js';
+import { ARCOLOGY, ARCOLOGY_SERVERS } from './nexus.js';
 
 export const LAYOUT = {
   bounds: { x0: -58, x1: 47.5, z0: -97, z1: 79 },
@@ -67,14 +69,20 @@ export const DISTRICT_DEFS = {
     spawnPoints: (L) => ({ player: [L.spawn.x, L.spawn.z], kiosk: [L.kiosk.x, L.kiosk.z + 2.5], pad: [L.pad.x, L.pad.z], relay: [27, 31.5] }),
   },
   brightline: BRIGHTLINE,
+  terraces: TERRACES,
+  arcology: ARCOLOGY,
+  arcology_servers: ARCOLOGY_SERVERS,
 };
 export const DISTRICT_IDS = Object.keys(DISTRICT_DEFS);
+// ids the P3 brief used; the sim (js/data/districts.js) uses the canonical ones
+export const DISTRICT_ALIASES = { verdant: 'terraces', verdant_terraces: 'terraces', nexus: 'arcology', nexus_arcology: 'arcology', nexus_servers: 'arcology_servers' };
+const canon = (id) => DISTRICT_ALIASES[id] || id;
 
 
 export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress = () => {}, district = null } = {}) {
   const tier = quality;
   const Q = new URLSearchParams(location.search);
-  district = district || Q.get('district') || 'aurum_plaza';
+  district = canon(district || Q.get('district') || 'aurum_plaza');
   if (!DISTRICT_DEFS[district]) district = 'aurum_plaza';
   installFog();
   const renderer = createRenderer(canvas, tier, toneMapping);
@@ -86,8 +94,11 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
   const time = { value: 0 };
   const pxScale = { value: 1 };
   const reflection = createPlanarReflection(renderer, { scale: tier.reflect, planeY: 0, samples: tier.mirrorMsaa || 0 });
-  scene.add(createSky());
-  scene.environment = buildEnvironment(renderer, tier.envSize);
+  const sky = createSky();
+  scene.add(sky);
+  const skyEnv = buildEnvironment(renderer, tier.envSize);
+  scene.environment = skyEnv;
+  const sunDir = SUN_DIR.clone();
   scene.environmentIntensity = 0.75;
   onProgress(0.2, 'Lighting the sky…');
 
@@ -153,6 +164,12 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     g.uGain.value.set(...a.gain); g.uLift.value.set(...a.lift); g.uSat.value = a.sat; g.uContrast.value = a.contrast;
     if (!expQ && a.exposure) renderer.toneMappingExposure = a.exposure;
     else if (!expQ) renderer.toneMappingExposure = 0.85;
+    sunDir.copy(a.sunDir ? new THREE.Vector3(...a.sunDir).normalize() : SUN_DIR);
+    // interiors: no sky dome, cloud shadows or sun motes; their own env map (built by the district, disposed with it)
+    const inside = !!a.interior;
+    sky.visible = !inside; skyShadows.mesh.visible = !inside; motes.visible = !inside;
+    scene.background = inside ? new THREE.Color(a.background ?? 0x05070a) : null;
+    scene.environment = D?.ctx.env || skyEnv;
   }
   function disposeDistrict(d) {
     scene.remove(d.group);
@@ -170,6 +187,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     for (const t of Object.values(d.ctx.cache)) t?.isTexture && t.dispose();
     d.ctx.groundAOBake?.rt.dispose();
     for (const f of d.ctx.disposers || []) f();
+    d.ctx.env?.dispose();
   }
   function buildDistrict(id, progress = () => {}) {
     const t0 = performance.now();
@@ -184,6 +202,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
       updaters: [], interactables: [], cache: {}, stats: {}, gather: [], billboards: [], faceCam: [], farSky: [], disposers: [],
       jetMaterial, makePadRing,
     };
+    if (def.env) ctx.env = def.env(renderer, tier);
     def.build(ctx, progress);
     if (M.farCrowd) addFarCrowd(ctx, M.farCrowd, farN, { extra: def.farLanes || [] });
     const built = ctx.batch.build(group);
@@ -213,7 +232,6 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     };
     ctx.breakables ||= createBreakables(ctx, []);
     ctx.stats.buildMs = Math.round(performance.now() - t0);
-    applyAmbience(def.ambience);
     return d;
   }
 
@@ -231,10 +249,12 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     // Swap districts in place: disposes the old geometry/materials/textures, builds the new one, re-points
     // sites/interactables/collision/spawnPoints/billboards/breakables and applies its light. Synchronous; returns build ms.
     loadDistrict(id, { compile = true } = {}) {
-      if (!DISTRICT_DEFS[id]) throw new Error('unknown district ' + id);
       const t0 = performance.now();
+      id = canon(id);
+      if (!DISTRICT_DEFS[id]) throw new Error('unknown district ' + id);
       if (D) disposeDistrict(D);
       D = buildDistrict(id);
+      applyAmbience(D.def.ambience);
       world.district = D.info; world.sites = D.ctx.sites || []; world.interactables = D.ctx.interactables;
       world.spawnPoints = D.spawnPoints; world.billboards = D.billboards; world.breakables = D.ctx.breakables || null;
       if (compile && world.ready) renderer.compile(scene, camera);
@@ -245,10 +265,15 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     // then back out. Resolves when the view is clear. toId === current district just plays the tunnel.
     relayTransition(toId, { onSwap = null, inS = 0.85, holdS = 0.15, outS = 0.9 } = {}) {
       return relayFx.run({ inS, holdS, outS, swap: () => {
-        const ms = toId && toId !== D.id ? world.loadDistrict(toId) : 0;
+        const ms = toId && canon(toId) !== D.id ? world.loadDistrict(toId) : 0;
         onSwap?.(world, toId);
         return ms;
       } });
+    },
+    // Lift between arcology floors (each floor is its own district id): the same tunnel, shorter. onSwap(world, toId)
+    // should put the player on world.spawnPoints.lift.
+    liftTransition(toId, { onSwap = null } = {}) {
+      return world.relayTransition(toId, { onSwap, inS: 0.45, holdS: 0.1, outS: 0.55 });
     },
     // see-through capsule from the camera to a world point (the player); call every frame, or the fade switches off
     setFadeTarget(p) {
@@ -277,7 +302,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
         const f = world.focus, texel = (2 * 22) / tier.shadowMap;
         const fx = Math.round((f.x + lead.x * 6) / texel) * texel, fz = Math.round((f.z + lead.z * 6) / texel) * texel;
         sun.target.position.set(fx, f.y, fz);
-        sun.position.set(fx + SUN_DIR.x * 90, f.y + SUN_DIR.y * 90, fz + SUN_DIR.z * 90);
+        sun.position.set(fx + sunDir.x * 90, f.y + sunDir.y * 90, fz + sunDir.z * 90);
         sun.target.updateMatrixWorld();
       }
       motes.material.uniforms.uCenter.value.copy(world.focus);
@@ -287,7 +312,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
         for (const b of LIVE_ROBOTS) {
           if (b.hover || !b.root.parent || !b.root.visible) continue;
           const p = b.root.getWorldPosition(_v);
-          if (p.y > 0.3 || p.y < -0.3) continue;
+          if (Math.abs(p.y - col.groundAt(p.x, p.z)) > 0.3) continue;
           const d = (p.x - world.focus.x) ** 2 + (p.z - world.focus.z) ** 2;
           if (d < 900) near.push([d, p.x, p.z, b.radius]);
         }

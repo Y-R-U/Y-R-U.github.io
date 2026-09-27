@@ -1,3 +1,6 @@
+P2a PLAYABLE
+(gameplay agent, 2026-09-27: acceptance table below; bot + headless checks, M5 metal, drivers in scratchpad `gameplay/`.)
+
 # gameplay notes (P2a "Own Your Frame")
 
 Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*, js/data/*, tools/sim/*, js/ui/*, css/*, js/audio/*, tools/vo/*, audio/vo/*, this file.
@@ -51,8 +54,39 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
   Warehouse; the 1★ tail Eye no longer escalates Heat (DESIGN: it only watches); riot shields block half as much of a carbine
   burst (`frontalScale` opt in resolveHit) so Longarm isn't walled by Wardens; heat changes logged (`heat N★`).
 
-## IN PROGRESS
-- Screenshots of new UI (skills/market tabs, codex tree, boss), perf with 8 enemies, P2b hookups (boss_kettle, breakables) if room.
+- P2b hookups (NEW `js/game/districts.js`): Transit Relay interactable → destination picker → `world.relayTransition`; contracts
+  in another district ride the relay before they start; swap cleanup (strays + loot cleared, nav rebuilt, runner site index
+  reset, `sim.setSites`, player to the relay, ambience/emitters per district); save resumes in its district. A1-M3 now plays in
+  the real Brightline (verified). Big Kettle uses `boss_kettle` (+ `steam()` in phase 2); A1-M4 stays at Mara's kiosk in Aurum
+  (STORY canon). `world.breakables.splash` is hit by the same AoE splash as mission stalls → collateral.
+- `setSupportedRobotKinds(robots.ROBOT_KINDS)` at session start: scrap rats were rendering as Warden drones (sim's default kind
+  list lacked `scrap_rat`); now real rats and boss_kettle.
+- Warehouse `openWarehouse(tab)` now really opens that tab (panel state kept the old tab). Title version "P2a · Own Your Frame".
+- Rustkin packs gated to level 18 (they rolled into level-2 pest jobs). Warden Eyes no longer add wardenKill Heat.
+
+## Acceptance (P2a, BUILD_PLAN §P2 minus Brightline look)
+| item | result | evidence |
+|---|---|---|
+| Buy all 3 frames 1,500 / 12,000 / 50,000, swap in the field < 3 s | PASS | tour.mjs: bought + one contract each; swap 0.7–1.4 s game time; test.mjs prices + 30% A1-M4 discount |
+| Full kits, distinct feel | PASS | feel.mjs: Brawler avg engagement 2.22 m (<3), Gunner 9.3 m (>8), Ghost backstab 78% of melee hits / 93% of damage (>40%) |
+| Sync mods (sync 5), 6 slots + loot, Mk II | PASS | Skills tab mod picker; sim patches (test); 6-slot loadout existed; Mk II gate L10+sync4 (test), Mk II visuals from art |
+| Act 1 M2–M5 + story beats/VO/codex | PASS | storyat runs for each; `?auto=1&story=1` path; codex Wren/parents/Mara/Vael silhouettes (ui_codex shot) |
+| Big Kettle boss, bar, music | PASS | boss.mjs: boss_kettle, 2-phase bar, adds, yields; bot beats it (dies 3–4× first: it doesn't dodge well) |
+| bounty/escort/sabotage/hack; fragile/watched/reinforced/collateral/vip; T2/T3/T9 | PASS | arch.mjs forced runs + test.mjs forced contracts; T3 rival riders can wreck a Mk I Brawler bot (design) |
+| Heat to 5 with Wardens and Enforcers | PASS | A1-M5 run: 2★→3★→4★ squads logged; test: 5★ holds; Lancers from L12 |
+| Market + repair kits; Family Tree v1 | PASS | Market tab (6 parts + supplies), kit button (R) used by the bot; codex tree shot |
+| VO | PASS | all P0 Act-1 clips existed; +21 clips (warden radio, Act-1 P1 lines), 0 QC flags |
+| Balance: Act 1 in 60–100 min, first frame 45–75 | PASS (median) | 10 seeds: Act 1 66–96 min; first frame 39–66 (median ~51; seeds 1 and 8 at 39/42) |
+| P1 green | PASS | reg2: speed 1 `?auto=1&contracts=3` ok, 60.0 fps, p99 16.8, max 33 ms, 0 hitches, 293 calls, 0 console errors; perf 8 enemies high 1280x720 60 fps / 237 calls, med 915x412 60 fps; test.mjs 21/21 |
+
+## Known issues / NEXT (P2c)
+- Drop-pod swap not used: pod land+open is 3.7 s, over the < 3 s swap target. Option: pod lands behind the beam-in as a
+  cosmetic follow-up, or art shortens `land` to ~1.5 s.
+- Bot pilots are weaker than people at bosses (no kiting/dodging timing); Kettle TTK for a human Mk I ~60–75 s (estimate).
+- Twists T5/T11/T12 (choice twists) and archetypes tail/repo/race/rescue/heist/wetwork are scoped off (`sim.setScope`) until P3.
+- Act 2 story cards hidden (`sim.storyActCap = 1`); "Act 1 complete" sting points at the next update.
+- First-frame lower tail (2/10 seeds < 45 min) comes from fast L5 seeds; levers: bounty/assassinate XP multipliers.
+- The market prices look cheap next to credits at L7 (101–403 cr for Tuned/Custom); ECONOMY review.
 
 ## Requests (art / P2b world agent)
 - `boss_kettle` (enforcer with a boiler-tank back, copper/brass; steam vent socket on the back would be lovely). Until then boss.js

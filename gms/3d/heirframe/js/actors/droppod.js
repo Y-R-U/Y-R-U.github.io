@@ -12,7 +12,7 @@ const PI = Math.PI;
 const ease = (x) => x * x * (3 - 2 * x);
 const easeOut = (x) => 1 - (1 - x) * (1 - x) * (1 - x);
 const easeIn = (x) => x * x * x;
-export const POD_DURATIONS = { land: 2.6, open: 1.1, close: 0.9, leave: 2.4 };
+export const POD_DURATIONS = { land: 1.5, open: 0.6, close: 0.7, leave: 2.0 };
 
 let MATS = null;
 function mats() {
@@ -114,7 +114,7 @@ export function createDropPod() {
       S.name = name; S.t = 0; S.dur = POD_DURATIONS[name];
       S.state = { land: 'landing', open: 'opening', close: 'closing', leave: 'leaving' }[name];
       root.visible = true;
-      if (name === 'land') { S.podY = 45; S.droneY = 45 + HANG; setOpen(0); }
+      if (name === 'land') { S.podY = 32; S.droneY = 32 + HANG; setOpen(0); }
       return new Promise((r) => { S.resolve = r; });
     },
     update(dt) {
@@ -124,7 +124,7 @@ export function createDropPod() {
       S.t += dt;
       const u = Math.min(1, S.t / S.dur);
       if (S.name === 'land') {
-        const d = u < 0.8 ? 45 * (1 - easeOut(u / 0.8)) + 0.0 : 0;
+        const d = u < 0.8 ? 32 * (1 - easeOut(u / 0.8)) : 0;
         S.podY = d;
         S.droneY = u < 0.8 ? d + HANG : HANG + (HOVER - HANG) * ease((u - 0.8) / 0.2);
         S.flare = u > 0.55 && u < 0.85 ? Math.sin((u - 0.55) / 0.3 * PI) : 0;

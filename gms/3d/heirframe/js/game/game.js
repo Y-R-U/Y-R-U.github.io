@@ -491,7 +491,7 @@ export async function createGame(api) {
     setMusic('menu');
     if (!ui) { startSession(createSim({ seed: Q.get('seed') || 1, store, sites })); G.state = 'free'; return; }
     const hasSave = store.has() && !Q.has('fresh');
-    const act = await ui.screen('title', { hasSave, version: 'P1 · One Good Shift' });
+    const act = await ui.screen('title', { hasSave, version: 'P2a · Own Your Frame' });
     audio.unlock();
     log('title: ' + act);
     let sim = null;

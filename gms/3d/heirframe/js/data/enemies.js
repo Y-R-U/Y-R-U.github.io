@@ -103,7 +103,7 @@ export const PACKS = {
   security_floor: { faction: 'concord', units: [['warden', 2, 2], ['sentry_turret', 2, 2], ['enforcer', 1, 1, 14]] },
   dockers: { faction: 'syndicate', units: [['chromehead', 1, 1], ['popper', 3, 3]] },
   unlinked_cell: { faction: 'unlinked', units: [['saboteur', 2, 3]] },
-  rust_pack: { faction: 'scrap', units: [['rustkin', 3, 3]] },
+  rust_pack: { faction: 'scrap', minLevel: 18, units: [['rustkin', 3, 3]] }, // sim: Rustkin are T3 (DESIGN §10.2); they rolled into level-2 pest jobs
   lancer_patrol: { faction: 'concord', units: [['lancer', 1, 2], ['warden', 1, 2]] },
   wight_crawl: { faction: 'scrap', units: [['hull_wight', 4, 4], ['spine_keeper', 1, 1, 30]] },
   choir_trine: { faction: 'choir', units: [['choir_angel', 3, 3]] },

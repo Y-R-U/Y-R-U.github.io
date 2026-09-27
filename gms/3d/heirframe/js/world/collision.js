@@ -13,7 +13,7 @@ export function createCollision(bounds) {
     // blocked ring sector: centre, radii, angle range in theta convention (x = sin θ, z = cos θ)
     arc(x, z, r0, r1, a0, a1, tag) { arcs.push({ x, z, r0, r1, a0, a1, tag }); },
     custom(fn) { customs.push(fn); },
-    // walk-around area height; kind 'flat' {y} or 'rampZ' {z0,z1,y0,y1}
+    // walk-around area height; kind 'flat' {y}, 'rampZ' {z0,z1,y0,y1} (y0 at z0) or 'rampX' {x0,x1,y0,y1} (y0 at x0)
     height(region) { heights.push(region); },
     blocked(x, z, r = 0.4) {
       const bounds = C.bounds;
@@ -41,6 +41,7 @@ export function createCollision(bounds) {
         if (x < h.x0 || x > h.x1 || z < h.z0 || z > h.z1) continue;
         if (h.kind === 'flat') y = h.y;
         else if (h.kind === 'rampZ') { const t = Math.min(1, Math.max(0, (z - h.z0) / (h.z1 - h.z0))); y = h.y0 + (h.y1 - h.y0) * t; }
+        else if (h.kind === 'rampX') { const t = Math.min(1, Math.max(0, (x - h.x0) / (h.x1 - h.x0))); y = h.y0 + (h.y1 - h.y0) * t; }
       }
       return y;
     },
