@@ -41,24 +41,26 @@ export const VT_LAYOUT = {
 };
 const L = VT_LAYOUT;
 
+const LAWNS = [];
 // ---- zone mask: R lawn, G gravel, B granite (black = limestone) ----
 function paintMask() {
   const B = L.bounds, px = 4, W = Math.ceil((B.x1 - B.x0) * px), H = Math.ceil((B.z1 - B.z0) * px);
   const c = makeCanvas(W, H), g = c.getContext('2d');
   g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
-  const rr = (x0, z0, x1, z1, r, col) => {
+  let rr = (x0, z0, x1, z1, r, col) => {
     const X = (x0 - B.x0) * px, Y = (z0 - B.z0) * px, w = (x1 - x0) * px, h = (z1 - z0) * px;
     g.fillStyle = col; g.beginPath(); g.roundRect(X, Y, w, h, r * px); g.fill();
   };
   const circ = (x, z, r, col) => { g.fillStyle = col; g.beginPath(); g.arc((x - B.x0) * px, (z - B.z0) * px, r * px, 0, 7); g.fill(); };
   const lawn = '#f00', grav = '#0f0', gran = '#00f';
+  const rr0 = rr;
+  rr = (x0, z0, x1, z1, r, col) => { if (col === lawn) LAWNS.push([x0, z0, x1, z1]); rr0(x0, z0, x1, z1, r, col); };
   // L0
   rr(-46, 22, -18, 34, 4, lawn); rr(-40, 44, -22, 58, 5, lawn); rr(-2, 46, 6, 58, 3, lawn); rr(18, 46, 38, 60, 5, lawn);
   rr(-40, 62, -22, 82, 4, lawn); rr(20, 64, 38, 84, 5, lawn); rr(-2, 22, 4, 38, 2, lawn);
   rr(-34, 36, -24, 44, 1, grav);
   circ(0, 70, 7.5, gran); circ(0, 70, 6.2, '#000'); circ(0, 70, 3.2, gran);
-  rr(-12, 40, -6, 46, 0.5, gran);
-  // L1
+    // L1
   rr(-47, -34, -33, 18, 5, lawn); rr(-3, -22, 12, -2, 4, lawn); rr(-3, 2, 18, 11, 4, lawn); rr(27, -22, 34, 18, 2, lawn);
   rr(L.garden.x0, L.garden.z0, L.garden.x1, L.garden.z1, 1, grav);
   rr(-19.6, L.garden.z0, -16.4, L.garden.z1, 0, gran); rr(L.garden.x0, -9.6, L.garden.x1, -6.4, 0, gran); circ(-18, -8, 5.2, gran);
@@ -66,6 +68,24 @@ function paintMask() {
   rr(-46, -88, -6, -40, 6, lawn); rr(-2, -72, 16, -40, 4, lawn); rr(28, -88, 34, -40, 2, lawn);
   circ(-22, -66, 11, grav); circ(-2, -78, 7, gran); rr(-4, -74, 0, -38, 0, grav);
   return c;
+}
+
+// [x0, x1, z0, z1] minus holes [x0, z0, x1, z1] (water) → list of [x0, x1, z0, z1]
+function carve(rect, holes) {
+  let out = [rect];
+  for (const [hx0, hz0, hx1, hz1] of holes) {
+    const next = [];
+    for (const [x0, x1, z0, z1] of out) {
+      if (hx1 <= x0 || hx0 >= x1 || hz1 <= z0 || hz0 >= z1) { next.push([x0, x1, z0, z1]); continue; }
+      if (hz0 > z0) next.push([x0, x1, z0, hz0]);
+      if (hz1 < z1) next.push([x0, x1, hz1, z1]);
+      const a = Math.max(z0, hz0), b = Math.min(z1, hz1);
+      if (hx0 > x0) next.push([x0, hx0, a, b]);
+      if (hx1 < x1) next.push([hx1, x1, a, b]);
+    }
+    out = next;
+  }
+  return out;
 }
 
 function water(ctx) {
@@ -77,7 +97,7 @@ function water(ctx) {
   const rects = P.map(([r]) => r);
   const mat = createLakeMaterial(ctx, { shore: {
     water: [...rects, valley], discs: [[120, -40, 9], [150, 50, 6]],
-    churn: [[10, 21, 16, 25, 1], [22, 21, 30, 25, 1], [17, -35, 29, -31, 1], [EDGE + 0.5, 21, EDGE + 7, 40, 0.9], [8, -90, 34, -87, 0.6]],
+    churn: [[10, 21, 16, 23, 0.45], [22, 21, 30, 23, 0.5], [17, -35, 29, -33, 0.5], [EDGE + 0.5, 21, EDGE + 7, 40, 0.9], [12, -90, 30, -88.5, 0.35]],
   } });
   const geos = [];
   for (const [[x0, z0, x1, z1], y] of P) { const g = new THREE.PlaneGeometry(x1 - x0, z1 - z0).rotateX(-Math.PI / 2); g.translate((x0 + x1) / 2, y, (z0 + z1) / 2); geos.push(g); }
@@ -144,6 +164,15 @@ function levelWall(ctx, z, x0, x1, yLo, yHi, gaps, seed) {
     batch.put(box(w, h, 1.2), M.stoneUpper, V(cx, yLo + h / 2, z + 0.2));
     batch.put(box(w + 0.1, 0.12, 1.34), M.gold, V(cx, yHi + 0.02, z + 0.2), 0, null, { cast: false });
     batch.put(box(w, 0.35, 0.3), M.stone, V(cx, yLo + 0.17, z + 0.92), 0, null, { cast: false });
+    for (let cy = yLo + 0.8; cy < yHi - 0.3; cy += 0.8) batch.put(box(w, 0.07, 0.04), M.stone, V(cx, cy, z + 0.81), 0, null, { cast: false, color: new THREE.Color(0.55, 0.5, 0.44) });
+    for (let x = s0 + 6.5; x < s1 - 4; x += 7) {
+      // bronze trellis panel with a vine climbing it
+      batch.put(box(4.6, h - 1.6, 0.08), M.darkMetal, V(x, yLo + h / 2 + 0.1, z + 0.78), 0, null, { cast: false });
+      for (let k = -2; k <= 2; k++) batch.put(box(0.05, h - 1.6, 0.1), M.gold, V(x + k * 1.1, yLo + h / 2 + 0.1, z + 0.82), 0, null, { cast: false });
+      batch.put(box(4.7, 0.06, 0.16), M.gold, V(x, yLo + h - 0.65, z + 0.8), 0, null, { cast: false });
+      addVines(ctx.batch, M, x - 2.1, z + 0.95, x + 2.1, z + 0.95, yLo + h - 0.7, h - 1.4, { seed: (x * 5 + yLo) | 0, side: -1, density: 1.3, bloom: 0.4 });
+      batch.put(box(4.4, 0.05, 0.05), M.warmGlow, V(x, yLo + 0.9, z + 0.86), 0, null, { cast: false });
+    }
     for (let x = s0 + 3; x < s1 - 2; x += 7) {
       batch.put(box(1.1, h - 0.4, 0.7), M.stone, V(x, yLo + (h - 0.4) / 2, z + 0.95));
       batch.put(box(0.9, 0.07, 0.05), M.warmGlow, V(x, yLo + h * 0.55, z + 1.31), 0, null, { cast: false });
@@ -152,7 +181,7 @@ function levelWall(ctx, z, x0, x1, yLo, yHi, gaps, seed) {
     batch.put(box(w, 0.7, 1.1), M.stoneUpper, V(cx, yHi + 0.35, z - 0.35));
     batch.put(box(w - 0.2, 0.08, 0.9), M.soil, V(cx, yHi + 0.66, z - 0.35), 0, null, { cast: false });
     addShrubs(ctx.batch, M, cx, yHi + 0.7, z - 0.35, w - 0.4, 0.9, 0, seed + (cx | 0), Math.round(w * 1.2));
-    addVines(ctx.batch, M, s0 + 0.3, z + 0.85, s1 - 0.3, z + 0.85, yHi + 0.6, h * 0.55, { seed: seed * 3 + (s0 | 0), side: -1, density: 0.9, bloom: 0.3 });
+    addVines(ctx.batch, M, s0 + 0.3, z + 0.85, s1 - 0.3, z + 0.85, yHi + 0.6, h * 0.8, { seed: seed * 3 + (s0 | 0), side: -1, density: 1.5, bloom: 0.35 });
     col.box(cx, z - 0.1, w / 2, 1.05, 0, 'levelWall');
   }
 }
@@ -204,8 +233,8 @@ function ramp(ctx, x0, x1, zLo, zHi, yLo, yHi, wallX) {
 function terraces(ctx) {
   const { batch, M, col } = ctx;
   // level blocks (visible faces only matter on the south / east sides)
-  batch.put(box(EDGE - CLIFF + 2, Y1 + 30, L.wallA - L.wallB), M.stone, V((EDGE + CLIFF) / 2, Y1 - (Y1 + 30) / 2 - 0.02, (L.wallA + L.wallB) / 2), 0, null, { cast: false, reflect: false, color: new THREE.Color(0.75, 0.7, 0.62) });
-  batch.put(box(EDGE - CLIFF + 2, Y2 + 30, L.wallB + 94), M.stone, V((EDGE + CLIFF) / 2, Y2 - (Y2 + 30) / 2 - 0.02, (L.wallB - 94) / 2), 0, null, { cast: false, reflect: false, color: new THREE.Color(0.75, 0.7, 0.62) });
+  batch.put(box(EDGE - CLIFF + 0.5, Y1 + 30, L.wallA - L.wallB), M.stone, V((EDGE + CLIFF) / 2 - 0.75, Y1 - (Y1 + 30) / 2 - 1.3, (L.wallA + L.wallB) / 2), 0, null, { cast: false, reflect: false, color: new THREE.Color(0.75, 0.7, 0.62) });
+  batch.put(box(EDGE - CLIFF + 0.5, Y2 + 30, L.wallB + 94), M.stone, V((EDGE + CLIFF) / 2 - 0.75, Y2 - (Y2 + 30) / 2 - 1.3, (L.wallB - 94) / 2), 0, null, { cast: false, reflect: false, color: new THREE.Color(0.75, 0.7, 0.62) });
   levelWall(ctx, L.wallA, -40.5, EDGE, 0, Y1, [[L.stairA[0], L.stairA[1]], [9.5, 16.5], [21.5, 30.5]], 11);
   levelWall(ctx, L.wallB, CLIFF, EDGE, Y1, Y2, [[L.stairB[0], L.stairB[1]], [16.5, 29.5], [L.rampE[0] - 0.4, EDGE]], 23);
   // lips where falls pour (the wall top between the parapets)
@@ -230,6 +259,24 @@ function terraces(ctx) {
   railing(ctx, [[CLIFF, 85.9], [EDGE, 85.9]], 0);
 }
 
+// low flowering borders along the lawn edges, broken where paths would cut through
+function lawnBorders(ctx) {
+  const { batch, M, col } = ctx, R = rng(313);
+  for (const [x0, z0, x1, z1] of LAWNS) {
+    const y = col.groundAt((x0 + x1) / 2, (z0 + z1) / 2);
+    const edges = [[x0 + 2, z0 + 0.6, x1 - 2, z0 + 0.6], [x0 + 2, z1 - 0.6, x1 - 2, z1 - 0.6], [x0 + 0.6, z0 + 2, x0 + 0.6, z1 - 2], [x1 - 0.6, z0 + 2, x1 - 0.6, z1 - 2]];
+    for (const [ax, az, bx, bz] of edges) {
+      const len = Math.hypot(bx - ax, bz - az);
+      if (len < 3) continue;
+      for (let s = 0; s < len; s += 5) {
+        if (R() < 0.3) continue;
+        const e = Math.min(len, s + 2.5 + R() * 2), m = (s + e) / 2 / len;
+        addShrubs(batch, M, ax + (bx - ax) * m, y, az + (bz - az) * m, e - s, 0.8, Math.atan2(bx - ax, bz - az) + Math.PI / 2, (x0 * 7 + s * 13 + az) | 0, Math.round((e - s) * 1.6));
+      }
+    }
+  }
+}
+
 function lowerGardens(ctx, plaqueM) {
   const { batch, M, col } = ctx;
   kiosk(ctx); warehousePad(ctx); relay(ctx, L.relay.x, L.relay.z);
@@ -239,6 +286,7 @@ function lowerGardens(ctx, plaqueM) {
   planter(ctx, -18, 66, 5, 1.6, 0.3, 501, 1); planter(ctx, 18, 66, 5, 1.6, -0.3, 502, 1);
   // promenade facing the falls pool
   for (const x of [10, 18, 26, 34]) seat(x, 42.6, Math.PI);
+  for (const x of [14, 22, 30]) planter(ctx, x, 45.6, 3.2, 1.4, 0, 520 + x, 1);
   for (const x of [8, 20, 32]) lamp(ctx, x, 41.4);
   lamp(ctx, -3, 41); lamp(ctx, 5, 58); lamp(ctx, -16, 58); lamp(ctx, 16, 58); lamp(ctx, -24, 76); lamp(ctx, 24, 76);
   holoPillar(ctx, -5.5, 50, HOLO_ART.ad('VERDANT', 'BREATHE • BELONG • BLOOM', 5, '#1e4a2a'), 0.3);
@@ -262,7 +310,7 @@ function memorialTerrace(ctx, plaqueM) {
   const { batch, M, col } = ctx;
   const G = L.garden, y = Y1;
   // hedge enclosure with gaps on each axis
-  const hedge = (x0, z0, x1, z1) => { const len = Math.hypot(x1 - x0, z1 - z0), rot = Math.atan2(x1 - x0, z1 - z0) + Math.PI / 2; addShrubs(ctx.batch, M, (x0 + x1) / 2, y, (z0 + z1) / 2, len, 0.9, rot, (x0 * 13 + z0) | 0, Math.round(len * 1.4)); batch.put(box(len, 0.35, 1), M.soil, V((x0 + x1) / 2, y + 0.1, (z0 + z1) / 2), rot, null, { cast: false }); col.box((x0 + x1) / 2, (z0 + z1) / 2, len / 2, 0.5, rot, 'hedge'); };
+  const hedge = (x0, z0, x1, z1) => { const len = Math.hypot(x1 - x0, z1 - z0), rot = Math.atan2(x1 - x0, z1 - z0) + Math.PI / 2; for (const [dy, k] of [[0.3, 0], [0.62, 1]]) addShrubs(ctx.batch, M, (x0 + x1) / 2, y + dy, (z0 + z1) / 2, len, 0.95, rot, ((x0 * 13 + z0) | 0) + k, Math.round(len * 2.2)); batch.put(box(len, 0.4, 1.1), M.stoneUpper, V((x0 + x1) / 2, y + 0.2, (z0 + z1) / 2), rot, null, { cast: false }); batch.put(box(len - 0.1, 0.05, 0.95), M.soil, V((x0 + x1) / 2, y + 0.41, (z0 + z1) / 2), rot, null, { cast: false }); col.box((x0 + x1) / 2, (z0 + z1) / 2, len / 2, 0.5, rot, 'hedge'); };
   hedge(G.x0, G.z0, G.cx - 2.2, G.z0); hedge(G.cx + 2.2, G.z0, G.x1, G.z0);
   hedge(G.x0, G.z1, G.cx - 2.2, G.z1); hedge(G.cx + 2.2, G.z1, G.x1, G.z1);
   hedge(G.x0, G.z0 + 0.5, G.x0, G.cz - 2.2); hedge(G.x0, G.cz + 2.2, G.x0, G.z1 - 0.5);
@@ -273,8 +321,8 @@ function memorialTerrace(ctx, plaqueM) {
   const warm = [];
   for (const zr of [-17.5, -13.5, -2.5, 1.5]) for (const side of [-1, 1]) for (let k = 0; k < 5; k++) {
     const x = G.cx + side * (3.2 + k * 1.95), z = zr;
-    stele(ctx, plaqueM, x, y, z, Math.PI, 1);
-    if (R() < 0.35) warm.push([x + (R() - 0.5) * 0.6, z - 0.45]);
+    stele(ctx, plaqueM, x, y, z, 0, 1);
+    if (R() < 0.35) warm.push([x + (R() - 0.5) * 0.6, z + 0.45]);
   }
   for (const [x, z] of warm) {
     batch.put(new THREE.CylinderGeometry(0.035, 0.035, 0.16, 8), M.stoneUpper, V(x, y + 0.08, z), 0, null, { cast: false, reflect: false });
@@ -339,8 +387,10 @@ function scenery(ctx) {
   cliffGardens(ctx, -60, -92.2, 4, -92.2, [24, 34], { seed: 13, side: 1, trees: 0.3 });
   cliffGardens(ctx, 36, -92.2, 60, -92.2, [24, 34], { seed: 17, side: 1, trees: 0.3 });
   // east face below the terraces, down to the valley
-  cliffFace(ctx, EDGE + 0.6, -100, EDGE + 0.6, 21, WY - 1, Y2, { seed: 21, side: -1, rough: 1.0, cast: false });
-  cliffFace(ctx, EDGE + 0.6, 40, EDGE + 0.6, 100, WY - 1, 0, { seed: 22, side: -1, rough: 1.0, cast: false });
+  cliffFace(ctx, EDGE + 0.6, -100, EDGE + 0.6, L.wallB, WY - 1, Y2 - 0.3, { seed: 21, side: -1, rough: 2.2, cast: false });
+  cliffFace(ctx, EDGE + 0.6, L.wallB, EDGE + 0.6, L.wallA + 0.5, WY - 1, Y1 - 0.3, { seed: 23, side: -1, rough: 2.2, cast: false });
+  cliffFace(ctx, EDGE + 0.6, L.poolL0[3] + 0.4, EDGE + 0.6, 100, WY - 1, -0.3, { seed: 22, side: -1, rough: 2.2, cast: false });
+  cliffFace(ctx, EDGE + 0.6, L.wallA + 0.5, EDGE + 0.6, L.poolL0[1], WY - 1, -0.3, { seed: 24, side: -1, rough: 1.2, cast: false });
   cliffGardens(ctx, EDGE + 0.6, -95, EDGE + 0.6, 95, [-6, -13], { seed: 29, side: -1, trees: 0.2 });
   // west cliff top: terraced residences; north cliff top: more of them, and a Harmony screen on the west face
   const R = rng(41);
@@ -399,9 +449,9 @@ function buildTerraces(ctx, onProgress = () => {}) {
   const plaqueM = plaqueMaterial(ctx);
   const B = L.bounds;
   createGardenGround(ctx, [
-    { rects: [[CLIFF - 1, EDGE + 0.5, L.wallA, 86.5]], y: 0, reflect: true, ao: true },
-    { rects: [[CLIFF - 1, EDGE + 0.5, L.wallB, L.wallA]], y: Y1 },
-    { rects: [[CLIFF - 1, EDGE + 0.5, -92.5, L.wallB]], y: Y2 },
+    { rects: carve([CLIFF - 1, EDGE + 0.5, L.wallA, 86.5], [L.poolL0]), y: 0, reflect: true, ao: true },
+    { rects: carve([CLIFF - 1, EDGE + 0.5, L.wallB, L.wallA], [L.poolL1, L.canalL1, L.spill]), y: Y1 },
+    { rects: carve([CLIFF - 1, EDGE + 0.5, -92.5, L.wallB], [L.headwater, L.canalL2]), y: Y2 },
   ], { canvas: paintMask(), x0: B.x0, z0: B.z0, w: B.x1 - B.x0, d: B.z1 - B.z0 });
   onProgress(0.45, 'Watering the terraces…');
   terraces(ctx);
@@ -416,6 +466,7 @@ function buildTerraces(ctx, onProgress = () => {}) {
     return false;
   });
   lowerGardens(ctx, plaqueM);
+  lawnBorders(ctx);
   onProgress(0.55, 'Tending the memorial garden…');
   memorialTerrace(ctx, plaqueM);
   skyLawn(ctx);
@@ -473,7 +524,7 @@ export const TERRACES = {
   adOrigins: [[0, 0], [-20, -60], [0, 60]], adCount: 6,
   farLanes: [[-40, 30, 100, 130, -6]],
   ambience: {
-    sun: [1.0, 0.86, 0.66], sunI: 3.4, hemiSky: 0xbcd8ff, hemiGround: 0x5a6a3a, hemiI: 0.32,
+    sun: [1.0, 0.8, 0.56], sunI: 3.6, hemiSky: 0xb8d0f4, hemiGround: 0x7a6440, hemiI: 0.34,
     fog: [0.66, 0.74, 0.8], fogDensity: 0.0006, env: 0.8,
     gain: [1.03, 1.02, 0.94], lift: [0.004, 0.008, 0.0], sat: 1.14, contrast: 1.14,
   },

@@ -22,6 +22,8 @@ import { setSupportedRobotKinds } from '../sim/enemies.js';
 import { createBoss } from './boss.js';
 import { createHeat } from './heat.js';
 
+export const RUN_ARCH = ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'tail', 'infiltrate', 'transport', 'defend', 'repo', 'race', 'assassinate', 'rescue'];
+export const RUN_TWISTS = ['T1', 'T2', 'T3', 'T4', 'T6', 'T7', 'T8', 'T9', 'T10'];
 // Harmony PA pool: everything except the Renewal countdown lines, which play as milestones after contracts
 const PA_KEYS = () => (audio.voKeys?.() || []).filter((k) => k.startsWith('pa_') && !k.startsWith('pa_renewal_'));
 const UI_SFX = { click: 'ui_click', open: 'ui_open', close: 'ui_close', deny: 'ui_deny', confirm: 'ui_confirm', levelup: null, loot: null, loot_rare: null, toast: 'ui_hover', type: null };
@@ -297,6 +299,9 @@ export async function createGame(api) {
     let best = null, bd = 1.8;
     for (const e of G.enemies.alive()) { const d = Math.hypot(e.pos.x - g.x, e.pos.z - g.z); if (d < bd) { bd = d; best = e; } }
     if (best) { G.combat.engage(best); return; }
+    // tap a crate / vending machine / holo stand to smash it
+    const brk = G.props.brkNear(g.x, g.z, 0.5)[0];
+    if (brk) { G.combat.engage(brk); return; }
     // a tap near the horizon (camera tilted up) hits the ground far away: walk toward it, at most 30 m
     const dx = g.x - player.pos.x, dz = g.z - player.pos.z, d = Math.hypot(dx, dz);
     if (d > 30) { g.x = player.pos.x + dx / d * 30; g.z = player.pos.z + dz / d * 30; g.y = world.groundAt(g.x, g.z); }
@@ -431,7 +436,14 @@ export async function createGame(api) {
       get fighting() { return G.fighting; },
       log, carrying: () => G.carrying,
       onCollateral: (v) => { if (!sim.state.contract) return; sim.reportCollateral(v); ui?.toast(`Collateral −${sim.state.contract.mission.modifiers.includes('collateral') ? v * 2 : v} cr`, 'warn', { ms: 1400, sub: 'Clean bonus lost' }); },
-      onSpotted: (e) => { if (e.watcher) sim.reportSpotted(); },   // the 1★ tail Eye only watches (DESIGN §11.2)
+      onSpotted: (e) => { if (e.watcher) sim.reportSpotted(); },
+      onBreakLoot: (b, byPlayer) => {
+        if (!byPlayer) return;
+        const lv = sim.state.player.level, cr = Math.max(1, Math.round((b.value || 30) / 12 * Math.pow(1.09, lv - 1) * (0.6 + Math.random() * 0.8)));
+        sim.addCredits(cr, 'breakable');
+        G.props.dropLoot({ credits: cr }, b.x, b.z);
+        if (b.kind === 'vending' && Math.random() < 0.15 && sim.grantConsumable('repairKit').ok) ui?.toast('The machine coughs up a repair kit', 'good', { ms: 1800 });
+      },   // the 1★ tail Eye only watches (DESIGN §11.2)
       onBoss: (on) => { G.bossOn = on; setMusic(on ? 'boss' : 'combat'); },
     };
     G.props = ctx.props = createProps(ctx);
@@ -448,19 +460,18 @@ export async function createGame(api) {
     G.frames.sync();
     sim.on('frame:swap', (p) => { G.frames.deploy(p.frame); log('deploy ' + p.frame.archetype); });
     sim.on('frame:mk', (p) => { if (p.frame.uid === sim.state.activeFrame) G.frames.deploy(p.frame, { reason: 'mk' }); });
-    sim.on('frame:buy', (p) => { log('frame:buy ' + p.frame.archetype); setTimeout(() => audio.bark('b_hira_ownframe_', { cooldown: 60 }), 4000); });
+    sim.on('frame:buy', (p) => { if (sim.ownedFrames().length === 1) G.frames.podNext(); log('frame:buy ' + p.frame.archetype); setTimeout(() => audio.bark('b_hira_ownframe_', { cooldown: 60 }), 4000); });
     sim.on('sync', (p) => { if (p.modUnlocked) ui?.sting(`Sync ${p.sync}`, 'Skill mod unlocked · choose it in the Warehouse', 'unlock', 3200); });
     G.onFrameDeployed = (f, why) => { if (why !== 'mk') ui?.toast(`${f.name} deployed`, 'good', { sub: f.rental ? 'HireFrame R-1 · rented' : `${f.model || ''} · Mk ${['I', 'II', 'III', 'IV', 'V', 'VI'][f.tier || 0]}` }); };
     ctx.hud = G.hud;
     ctx.goalOverride = () => nextGoal(sim);
     G.coach = ui ? createCoach(G, { ui, rig, player }) : null;
-    sim.storyActCap = 1;   // P2a: Act 1 only; Act 2 story cards come with P3
-    // archetypes/twists the runner implements (P2a); tail, repo, race, rescue, heist, wetwork and the choice twists come later
-    sim.setScope({ archetypes: ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'infiltrate', 'transport', 'defend', 'assassinate'],
-      twists: ['T1', 'T2', 'T3', 'T4', 'T6', 'T7', 'T8', 'T9', 'T10'] });
-    if (sim.state.board && !sim.state.contract && sim.state.board.cards.some((c) => !['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'infiltrate', 'transport', 'defend', 'assassinate'].includes(c.archetype))) sim.refreshBoard();
+    sim.storyActCap = 1;   // Act 2 story cards open once its staging lands (P3g)
+    // archetypes/twists the runner implements (P3: all 16 non-heist ones); heist, wetwork and the choice twists are P4
+    sim.setScope({ archetypes: RUN_ARCH, twists: RUN_TWISTS });
+    if (sim.state.board && !sim.state.contract && sim.state.board.cards.some((c) => !RUN_ARCH.includes(c.archetype))) sim.refreshBoard();
     ctx.bossLine = (key, speaker) => story.bark({ speaker, vo: key });
-    sim.on('levelUp', (p) => { ui?.sting(`Level ${p.level}`, (p.features || []).map((f) => f.name || f.id).join(' · ') || 'Frame systems upgraded', 'level', 3000); audio.sfx('levelup'); audio.bark('b_hira_levelup_', { cooldown: 10 }); log('level ' + p.level); });
+    sim.on('levelUp', (p) => { ui?.sting(`Level ${p.level}`, (p.features || []).map((f) => f.desc || f.name || f.id).join(' · ') || 'Frame systems upgraded', 'level', 3000); audio.sfx('levelup'); audio.bark('b_hira_levelup_', { cooldown: 10 }); log('level ' + p.level); });
     sim.on('toast', (p) => ui?.toast(p.text, p.kind || 'info'));
     sim.on('rental:fee', (p) => { ui?.toast(`HireFrame shift fee −${p.fee} cr`, 'warn', { sub: p.debt ? `Balance owed: ${p.debt} cr` : 'Rent by the hour!' }); audio.bark('b_hira_fee_', { cooldown: 30 }); log('shift fee ' + p.fee); });
     sim.on('playerDown', () => playerDown('damage over time'));

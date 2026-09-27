@@ -20,7 +20,8 @@ export function createCombat(ctx) {
 
   const pcNow = () => sim.playerCombatant();
   const archetype = () => sim.activeFrame().archetype;
-  const targets = () => ctx.enemies.alive().filter((e) => e.state !== 'dead' && !e.ally).concat(ctx.props.targets());
+  // district breakables are only ever a target when the player picked one (tap); swings still clip them
+  const targets = () => { const t = ctx.enemies.alive().filter((e) => e.state !== 'dead' && !e.ally).concat(ctx.props.targets()); if (st.lock?.brk && !st.lock.destroyed) t.push(st.lock); return t; };
   const dist = (e) => Math.hypot(e.pos.x - player.pos.x, e.pos.z - player.pos.z);
   const yawTo = (e) => Math.atan2(e.pos.x - player.pos.x, e.pos.z - player.pos.z);
 
@@ -119,6 +120,7 @@ export function createCombat(ctx) {
     const fin = p.combo === p.n - 1;
     let hitAny = false, crit = false, kill = false, back = false;
     for (const e of targets()) {
+      if (e.brk) continue;
       const d = dist(e) - (e.radius || 0.4) * 0.6;
       if (d > reach) continue;
       const a = Math.abs(angDiff(yawTo(e), player.yaw));
@@ -131,6 +133,7 @@ export function createCombat(ctx) {
       if (res?.killed) kill = true;
       if (res?.backstab) back = true;
     }
+    if (ctx.props.smashArc(player.pos, player.yaw, reach, arc, (skill.combo?.[p.combo] || skill.base || 10) * pc.stats.dmgScale * (fin ? 1.5 : 1))) hitAny = true;
     if (hitAny) {
       const big = fin || crit || kill || back;
       const heavy = skill.id === 'b_fists' && fin;

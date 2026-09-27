@@ -38,7 +38,7 @@ export function createAutopilot(G, { ui, player }) {
   function nearestHostile(r) {
     let best = null, bd = r;
     for (const e of G.enemies.alive()) {
-      if (e.state === 'dead' || e.ally || e.escort) continue;
+      if (e.state === 'dead' || e.ally || e.escort || e.slumped) continue;
       const d = Math.hypot(e.pos.x - player.pos.x, e.pos.z - player.pos.z);
       const engaged = e.state === 'chase' || e.state === 'flee' || (G.runner.active && e.mission === G.runner.mission?.id && !G.runner.active.stealth && !e.watcher);
       if (d < bd && engaged) { bd = d; best = e; }
@@ -213,6 +213,8 @@ export function createAutopilot(G, { ui, player }) {
 
     const pc = G.sim.playerCombatant();
     A.attackHeld = false;
+    const cap = G.runner.active && G.runner.interactLabel();
+    if (cap && /^Capture/.test(cap)) { player.setTarget(null); ui.emit('interact'); return; }
     const foe = nearestHostile(G.sim.activeFrame().archetype === 'gunner' ? 16 : 11);
     if (foe) { A.phase = 'fight'; fight(foe); return; }
     if (G.runner.active) {
@@ -241,6 +243,13 @@ export function createAutopilot(G, { ui, player }) {
         const n = G.runner.active.ss.npc, wp = G.runner.active.ss.path?.[G.runner.active.ss.wp] || n.pos;
         const ax = wp.x - n.pos.x, az = wp.z - n.pos.z, l = Math.hypot(ax, az) || 1;
         goTo(n.pos.x + ax / l * 4, n.pos.z + az / l * 4, 1.5);
+        return;
+      }
+      if (st?.type === 'tail' && G.runner.active.target) {
+        const t = G.runner.active.target, d = Math.hypot(t.pos.x - player.pos.x, t.pos.z - player.pos.z);
+        if (d < 10) { player.setTarget(null); return; }
+        const ax = player.pos.x - t.pos.x, az = player.pos.z - t.pos.z, l = Math.hypot(ax, az) || 1;
+        A.goal = null; goTo(t.pos.x + ax / l * 9, t.pos.z + az / l * 9, 1.5);
         return;
       }
       if (st?.type === 'defend' && o) { const d = Math.hypot(o.x - player.pos.x, o.z - player.pos.z); if (d < 6) { player.setTarget(null); return; } }

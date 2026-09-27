@@ -18,7 +18,7 @@ function noise2(seed) {
 
 // A limestone cliff face along (x0,z0)→(x1,z1), facing `side` (+1 = left of travel), y0..y1. Strata ledges, weathered
 // recesses darker, moss on anything facing up. Vertex-coloured, batched as stone (uber).
-export function cliffFace(ctx, x0, z0, x1, z1, y0, y1, { seed = 1, side = 1, step = 2, rough = 1.4, tint = [0.84, 0.77, 0.66], cast = true } = {}) {
+export function cliffFace(ctx, x0, z0, x1, z1, y0, y1, { seed = 1, side = 1, step = 1.6, rough = 1.4, tint = [0.78, 0.66, 0.5], cast = true } = {}) {
   const len = Math.hypot(x1 - x0, z1 - z0), dx = (x1 - x0) / len, dz = (z1 - z0) / len, nx = -dz * side, nz = dx * side;
   const W = Math.max(2, Math.round(len / step)), H = Math.max(2, Math.round((y1 - y0) / step));
   const N = noise2(seed), g = new THREE.PlaneGeometry(1, 1, W, H);
@@ -27,27 +27,30 @@ export function cliffFace(ctx, x0, z0, x1, z1, y0, y1, { seed = 1, side = 1, ste
   for (let i = 0; i < p.count; i++) {
     const u = uv.getX(i) * len, v = uv.getY(i) * (y1 - y0), y = y0 + v;
     const band = Math.floor(v / 3.1 + N(u * 0.02, 3) * 1.5);
-    const shelf = ((band * 0.37) % 1) * 0.9;
+    const shelf = ((band * 0.37) % 1) * 0.9 * Math.min(1, rough);
     const edge = uv.getX(i) < 0.001 || uv.getX(i) > 0.999 || uv.getY(i) < 0.001 ? 0 : 1;
-    const d = edge * (rough * (N(u * 0.07, v * 0.11) * 2 - 0.7) + shelf + 0.8 * N(u * 0.3, v * 0.3));
+    const d = edge * (rough * (N(u * 0.04, v * 0.06) * 4 - 1.6) + shelf + rough * 0.9 * N(u * 0.18, v * 0.22));
     disp[i] = d;
     p.setXYZ(i, x0 + dx * u + nx * d, y, z0 + dz * u + nz * d);
   }
-  g.computeVertexNormals();
-  const nrm = g.attributes.normal, col = new Float32Array(p.count * 3);
-  for (let i = 0; i < p.count; i++) {
-    const v = uv.getY(i) * (y1 - y0), u = uv.getX(i) * len;
+  g.setAttribute('disp', new THREE.BufferAttribute(disp, 1));
+  const fg = g.toNonIndexed(); g.dispose();
+  fg.computeVertexNormals();
+  const nrm = fg.attributes.normal, fuv = fg.attributes.uv, fd = fg.attributes.disp.array, col = new Float32Array(fg.attributes.position.count * 3);
+  for (let i = 0; i < fuv.count; i++) {
+    const v = fuv.getY(i) * (y1 - y0), u = fuv.getX(i) * len;
     const band = Math.floor(v / 3.1 + N(u * 0.02, 3) * 1.5);
-    const bt = 0.86 + 0.14 * (((band * 0.61) % 1)), rec = 0.72 + 0.28 * Math.min(1, Math.max(0, disp[i] / (rough * 1.2) + 0.4));
-    const up = Math.max(0, nrm.getY(i)), moss = Math.min(1, Math.max(0, (up - 0.25) * 2.2)) * (0.5 + 0.5 * N(u * 0.2, v * 0.2));
+    const bt = 0.93 + 0.07 * (((band * 0.61) % 1)), rec = 0.62 + 0.38 * Math.min(1, Math.max(0, fd[i] / (rough * 1.2) + 0.4));
+    const up = Math.max(0, nrm.getY(i)), moss = Math.min(1, Math.max(0, (up - 0.2) * 2.2) * (0.5 + 0.5 * N(u * 0.2, v * 0.2)) + Math.max(0, N(u * 0.08 + 5, v * 0.12) - 0.58) * 3.5);
     const k = bt * rec * (0.9 + 0.2 * N(u * 0.5 + 9, v * 0.5));
-    col[i * 3] = tint[0] * k * (1 - moss) + 0.2 * moss;
-    col[i * 3 + 1] = tint[1] * k * (1 - moss) + 0.33 * moss;
-    col[i * 3 + 2] = tint[2] * k * (1 - moss) + 0.09 * moss;
+    col[i * 3] = tint[0] * k * (1 - moss) + 0.14 * moss;
+    col[i * 3 + 1] = tint[1] * k * (1 - moss) + 0.26 * moss;
+    col[i * 3 + 2] = tint[2] * k * (1 - moss) + 0.06 * moss;
   }
-  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  ctx.batch.add(g, ctx.M.stone, { vcolor: true, cast });
-  g.dispose();
+  fg.deleteAttribute('disp');
+  fg.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  ctx.batch.add(fg, ctx.M.stone, { vcolor: true, cast });
+  fg.dispose();
 }
 
 // Ledge gardens up a cliff: trees and vine curtains on shelves at the given heights.
@@ -59,7 +62,8 @@ export function cliffGardens(ctx, x0, z0, x1, z1, ys, { seed = 1, side = 1, tree
     while (s < len - 6) {
       const run = 8 + R() * 16, e = Math.min(len - 2, s + run);
       const ax = x0 + dx * s + nx * 1.2, az = z0 + dz * s + nz * 1.2, bx = x0 + dx * e + nx * 1.2, bz = z0 + dz * e + nz * 1.2;
-      batch.put(box(e - s, 0.6, 2.4), M.stoneUpper, V((ax + bx) / 2 + nx * 0.4, y - 0.3, (az + bz) / 2 + nz * 0.4), Math.atan2(dx, dz) + Math.PI / 2, null, { cast: false });
+      batch.put(box(e - s, 1.2, 3.2), M.stone, V((ax + bx) / 2 + nx * 0.2, y - 0.6, (az + bz) / 2 + nz * 0.2), Math.atan2(dx, dz) + Math.PI / 2, null, { cast: false, color: new THREE.Color(0.6, 0.54, 0.46) });
+      addShrubs(batch, M, (ax + bx) / 2 + nx * 0.4, y, (az + bz) / 2 + nz * 0.4, e - s - 1, 2, Math.atan2(dx, dz) + Math.PI / 2, seed * 7 + k * 3 + (s | 0), Math.round((e - s) * 0.8));
       addVines(batch, M, ax + nx * 1.4, az + nz * 1.4, bx + nx * 1.4, bz + nz * 1.4, y, 3 + R() * 4, { seed: seed * 17 + k * 5 + (s | 0), side: -side, density: 0.8, bloom: 0.3 });
       for (let t = s + 2; t < e - 1; t += 5 + R() * 5) if (R() < trees) addTree(batch, M, x0 + dx * t + nx * 2, y, z0 + dz * t + nz * 2, (seed * 97 + t * 13) | 0, 0.9 + R() * 0.4);
       s = e + 4 + R() * 12;

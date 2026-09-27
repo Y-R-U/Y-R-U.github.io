@@ -70,3 +70,6 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 - 2026-09-27 09:50+: both agents (gameplay P2a, art r4 a5204b2a…) died at the limit; resumed via SendMessage after the reset.
 - 2026-09-27: **art r4 DONE** (interior-lit windows, far-crowd sprites 1 call, sky swarm, billboard reels + tower ads; critic flat at 4.2–4.3, +0.1 ms). Pushed 1e952941. Open ideas: ?grade=gold (ask Aaron), a lower default camera/zoom for the gameplay frame (Aaron likes the current one, so ask first), far-tower spires. Launched **P3w world** (a576a0f9…: verdant + nexus districts, Halloran boss). Running: gameplay P2a + P3w.
 - 2026-09-27: **P2a PLAYABLE** (gameplay notes). Push held: P3w's world.js imported missing verdant/nexus (boot broken); asked it to stub them. Launched **P3g gameplay** (a27cc35e…: P2c then P3 systems then Act 2 staging). Running: P3w + P3g. D22.
+- 2026-09-27: pushed e6d210b8 (P2a PLAYABLE + P3w verdant WIP) after P3w reported boot green; live check below.
+  live verified e6d210b8: 0 bad; ready 21 s and 31 s under agent GPU contention, then 7.2 s (143 reqs, 0.95 MB before ready; scratchpad/mgr/live_net.mjs lists the slowest requests).
+- 2026-09-27 14:50+: P3w (a576a0f9…) and P3g (a27cc35e…) died at the limit; resumed via SendMessage.

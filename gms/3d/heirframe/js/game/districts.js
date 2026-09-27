@@ -1,8 +1,10 @@
 import { createNav } from './nav.js';
 
-const NAMES = { aurum_plaza: 'Aurum Plaza', brightline: 'Brightline Boulevard' };
-const AMBIENT = { aurum_plaza: 'plaza', brightline: 'boulevard' };
-const EMITTERS = { aurum_plaza: [['fountain', 0, 0, 1], ['waterfall', -47, -62, 1], ['waterfall', 66, -96, 1.2], ['fountain', -47, -57, 0.6]], brightline: [['traffic', 0, -60, 0.8], ['crowd', 0, 20, 0.7]] };
+export const DISTRICT_NAMES = { aurum_plaza: 'Aurum Plaza', brightline: 'Brightline Boulevard', terraces: 'Verdant Terraces', arcology: 'Nexus Arcology', arcology_servers: 'Arcology Server Floor' };
+const NAMES = DISTRICT_NAMES;
+const AMBIENT = { aurum_plaza: 'plaza', brightline: 'boulevard', terraces: 'park', arcology: 'interior', arcology_servers: 'interior' };
+const EMITTERS = { aurum_plaza: [['fountain', 0, 0, 1], ['waterfall', -47, -62, 1], ['waterfall', 66, -96, 1.2], ['fountain', -47, -57, 0.6]], brightline: [['traffic', 0, -60, 0.8], ['crowd', 0, 20, 0.7]],
+  terraces: [['wind', 0, 0, 0.6], ['fountain', 0, -30, 0.7]], arcology: [['holo', 0, 0, 0.6], ['machine', 0, -30, 0.5]], arcology_servers: [['machine', 0, 0, 0.9]] };
 
 // District travel (P2b world API): the Transit Relay interactable, contract-driven hops, and the swap cleanup
 // (player to the relay, strays and mission props cleared, nav rebuilt, sites re-registered with the sim).
@@ -17,17 +19,31 @@ export function createDistricts(G, ctx) {
     emitters = (EMITTERS[id] || []).map(([k, x, z, level]) => audio.emitter(k, { x, z, level }));
   }
 
-  function onSwap(w, id) {
-    G.enemies.clear((e) => !e.mission || e.mission !== G.runner.mission?.id);
+  // every district swap (relay, save resume, story jumps): nothing from the old district may survive it
+  function cleanup(w, id) {
+    G.enemies.clear(() => true);
+    for (const d of [...G.enemies.decoys]) G.enemies.removeDecoy(d);
     G.props.collectAll(ctx.onLootCollect);
+    if (!G.runner.active) G.props.clearMission();
+    G.props.bindWorld();
+    G.boss?.end();
+    G.heat?.reset?.();
+    G.combat?.reset();
     G.nav = ctx.nav = createNav(world);
     G.runner.reset?.();
     sim.setSites(id, world.sites);
+    player.setTarget?.(null);
+    G.near = null;
+    ambience(id);
+  }
+  const unsub = world.onDistrict ? world.onDistrict(cleanup) : null;
+
+  function onSwap(w, id) {
+    if (!unsub) cleanup(w, id);
     const sp = world.spawnPoints.relay || world.spawnPoints.player;
     const p = ctx.nav.nearest(sp.x, sp.z + 2.5) || sp;
     player.teleport(p.x, p.z, Math.PI);
     rig.target.copy(player.pos); rig.snap();
-    ambience(id);
     G.log?.push?.(`district ${id}`);
   }
 

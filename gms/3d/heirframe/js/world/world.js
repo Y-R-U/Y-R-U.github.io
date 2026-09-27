@@ -187,7 +187,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     for (const t of Object.values(d.ctx.cache)) t?.isTexture && t.dispose();
     d.ctx.groundAOBake?.rt.dispose();
     for (const f of d.ctx.disposers || []) f();
-    d.ctx.env?.dispose();
+    if (d.ctx.env) (d.ctx.env.userData.rt || d.ctx.env).dispose();
   }
   function buildDistrict(id, progress = () => {}) {
     const t0 = performance.now();

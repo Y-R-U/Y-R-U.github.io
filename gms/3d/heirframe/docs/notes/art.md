@@ -487,3 +487,130 @@ richer animated billboards, Aurum's milky distance, blind critic before/after. H
 4. Far crowd: impostors are baked at 10° elevation; at gameplay pitch (52°) beyond 21 m they are foreshortened
    slightly wrong but read fine. A second elevation row (45°) would fix it for +50% atlas (still ~1 MB).
 5. Flying cars read too small in 915x412 shots: a few "hero" lanes nearer the canyon (y 20–30, scale 2) would help.
+
+## P3w (world agent, 2026-09-27) — DONE (this round)
+Brief: Act 2 districts (Verdant Terraces, Nexus Arcology floors), Halloran + Act 2 enemy kinds, perf, blind critics.
+Harness: scratchpad `art/p3w/` (`cam.sh "px,py,pz,tx,ty,tz" out.png "query"`, `calls.sh "x,z,yaw|yaw|apitch|query" ...`,
+`leak.js` (10 round trips, eval via ../shot.mjs), `../shot.mjs`, `../gshot.mjs` with BASE=robot_gallery), Chrome port 9302.
+Boot check (after the limit): Aurum, ?district=verdant|nexus|nexus_servers and `?auto=1&speed=3&fresh` → 'free', 0 errors.
+
+### API for gameplay (P3g)
+**District ids** (canonical = the sim ids in js/data/districts.js, so the relay menu picks them up with no change):
+`terraces` (Verdant Terraces), `arcology` (Nexus Arcology floor 0: lobby atrium + office wing + lab wing + evidence vault),
+`arcology_servers` (B4 server hall + archive core + evidence locker; NOT in the sim's unlock list, reached by lift only).
+Aliases for `?district=` / `world.loadDistrict()`: `verdant`, `verdant_terraces` → terraces; `nexus`, `nexus_arcology`
+→ arcology; `nexus_servers` → arcology_servers. `world.districts` lists canonical ids only; `world.district.id` is canonical.
+**Floors / lifts** (simplest API: one district id per floor): each arcology floor has an interactable
+`{id: 'lift', to: '<districtId>', label, x, z, r}` on a gold pad in front of the lift bank.
+REQUEST (P3g): on interact with `id === 'lift'` call `world.liftTransition(it.to, { onSwap })` (a 1.1 s version of the relay
+tunnel) and in onSwap do the same cleanup as the relay swap, but place the player at `world.spawnPoints.lift`.
+Every floor also has `world.spawnPoints.{player, relay, lift, kiosk, pad}`. Both floors have a Transit Relay; the lobby has
+the contract terminal and warehouse link (B4 has neither).
+Each district def has `floor` (0 lobby, -4 servers) if you want to show "B4" in the HUD.
+**Sites** (all `{id, tag, x, z, r, y, district, indoor}`; y from groundAt):
+- terraces (43, prefix `vt_`, indoor false; y 0 / 6 / 13 by level): plaza ×3, fountain ×3, park ×4, **garden ×2
+  (`vt_memorial_garden` centre (-18,-8) r 10 = the memorial garden with the blank plaques; `vt_memorial_plaques`)**, market,
+  locker ×3, alley ×2, rooftop ×4, warehouse, relay, spawn_edge ×4, vantage ×4, hide ×4, npc ×5 (**`vt_npc_fenn`** at Fenn's
+  glasshouse), terminal, link_pad. spawnPoints also has `garden` (the memorial garden's south gate).
+- arcology (33, prefix `ax_`, indoor true): lobby ×2, fountain, plaza ×2, interior ×4 (offices, meeting room, lab, tubes),
+  **vault `ax_vault_evidence`** (Concord evidence vault, A2-M4), locker ×2, relay, **lift `ax_lift`**, spawn_edge ×4,
+  vantage, hide ×4, npc ×4, terminal ×3 (`ax_terminal_offices`, `ax_terminal_lab`, `ax_contract_terminal`), link_pad.
+- arcology_servers (20, prefix `as_`, indoor true): **vault `as_archive_core`** (the archive floor for A2-M2's memory shard),
+  vault `as_evidence_locker`, interior ×4, lift, relay, lobby, spawn_edge ×4, hide ×3, vantage, terminal ×2, npc.
+  New tag `lift` (only the lift pads). Everything else uses MISSIONS §3 tags plus the P1 extras (vantage/hide/npc/terminal/link_pad).
+**Breakables**: terraces 14, arcology 10, servers 6 (crate/vending/holo; same world.breakables API).
+**Enemy kinds** (js/actors/kinds_act2.js, registered in kinds.js, gallery: `tools/robot_gallery.html?kinds=...`):
+- `boss_halloran`: security frame ×1.1, gold crest, epaulettes, navy half-cape, tower shield with the Concord sun, shock lance
+  with glowing arc coils (muzzle socket = lance tip). 6 draws, 21.7k tris, h 2.15. **`security` at tier 3–4 now builds
+  boss_halloran automatically** (`TIER_KINDS` in kinds.js), so js/data/enemies.js `halloran` (security, robotTier 3) gets the
+  boss look with no data change. All biped anims.
+- `turret` (Sentry Turret; data robotKind 'turret' now resolves): hover rig held still (`style.fixed`): pedestal, gun head
+  (head bone, aims with setAim), twin barrels (muzzle socket), radar dish spinning. 5 draws, 2.4k tris. 'die' slumps it.
+- `seraph` (Choir Angel tier 0, Choir Warden 1, **Seraph tier 3** for A2-M4's first appearance): gold elegant frame, halo,
+  blade wings (fan of lit gold feathers), forearm blades. Biped; to fly, raise root.position.y yourself. 5 draws, 19.6k tris.
+- Lancer (security tier 2) was already gold-trimmed with a lance.
+**Drop pod** (manager request): land 1.5 s, open 0.6, close 0.7, leave 2.0 (was 2.6/1.1/0.9/2.4); drops from 32 m.
+
+### world.js changes
+Per-district `def.env(renderer, tier)` → own PMREM (the RT is disposed on swap), `ambience.interior` (hides sky dome, cloud
+shadows, motes; `ambience.background`), `ambience.sunDir`. `world.liftTransition`. Contact disks now work on raised floors
+(robot within 0.3 m of groundAt, was |y| < 0.3). collision: `rampX` height regions. water.js lake: `shore.water` rects
+(shore = outline of open-water rects) and the lake program cache key is now a hash of its generated SDF (two different lakes
+used to share the key 'lake'). foliage.js: `cards` exported, new `addVines()` hanging-garden curtains.
+Leak fixes: ground zone-mask + dummy AO textures (vt_ground and bl_ground) now disposed with the district.
+
+### Verdant Terraces (`verdant.js`, `vt_ground.js`, `vt_scenery.js`)
+Three levels stepping UP to the north: L0 y 0 (z 20..86, arrival/lower gardens), L1 y 6 (z -36..20, memorial terrace),
+L2 y 13 (z -92..-36, sky lawn). Grand stairs x -14..-4 (L0→L1, z 32→20) and x -6..6 (L1→L2, z -24→-36); ramps west
+x -46.5..-41 (z 50→20) and east x 34.5..39.5 (z 0→-36). One water system (clue C15 "every waterfall is the same water"):
+north cliff falls → headwater → canal (footbridge) → great falls → L1 pool → canal (2 footbridges) → spill → twin falls →
+L0 pool → cascade over the east edge into the valley lake. Memorial garden: hedged, 40 blank plaques (names ground away,
+ghost of the Vael star), obelisk with blank tablets, gold halo, eternal flame, candles. Fenn's glasshouse (-39,-8). L2:
+conservatory dome, gold pavilion. West: cliff of ledge gardens + HARMONY screen; north: falls cliff + BRIGHTER reel board;
+east: valley lake, far-bank cascades, towers, flying traffic. Ground: one zone-mask shader (lawn / gravel / granite /
+limestone), mirror only on L0.
+
+### Nexus Arcology (`nexus.js`)
+Walls are one-sided planes facing into the room, so near walls and all ceilings vanish from the Diablo camera (back-face
+culled): no cut-away code. Interior PMREM = a room of ceiling light strips, gold panels, blue holo cards, a bright horizon band
+(chrome/gold read). Lobby: 40 m atrium with stacked lit balconies, fountain + gold armillary, NEXUS holo, reels, light shafts,
+security gate line, reception desk, indoor planters, lift bank N. Office wing W (carpet, 24 desks), lab wing E (grate floor,
+benches, specimen tubes, holo table), vault NE (round gold door rolled aside, shelves, gold plinth). B4: instanced rack rows
+(LED shader, blinking), cable trays, archive core (glowing column + gold rings), evidence cage, lift bank S.
+
+### Perf (M5 metal, 915x412 mobile DPR2 → dpr 1.5, high; calls / tris)
+terraces gameplay 124–151 / 438–495k; vistas (pitch 12) 169–263 / 613–707k; look-up 183–189. arcology gameplay 84–99 /
+165–183k, vistas 147–162. servers 84–85 gameplay, 114–118 vista. All views 60 fps. Build ms: terraces ~155–215, arcology ~70–90,
+servers ~30. 10 round trips over all 5 districts: programs 89 flat, geometries 99→101, textures 68→69 (first-use), flat.
+Tris over the 600k line at terraces vistas (~700k, like Aurum's 665k); calls are inside ~300.
+
+### GPU cost (r4/cost.mjs, sync render+readPixels median ms, dpr 1.5 / 3; same run)
+terraces gameplay 2.22 / 6.62, vista N 2.74 / 7.15, memorial 2.61 / 6.59, vista S 2.78 / 6.55 · arcology gameplay 1.91 / 5.98,
+vista 2.08 / 5.95 · servers 1.84 / 5.96, vista 1.68 / 5.05 · Aurum (same run) 2.49 / 9.1, vista 4.53 / 10.21. New districts
+cost the same as Aurum or less. Mirror pass 0.1–0.5 ms, transparent layers ≤ 0.3.
+
+### Critic rounds (sheets + answer keys in scratchpad `art/p3w/critic/`; views = `art/p3w/vset.sh`)
+Views: vt_game (6,46 default cam), vt_eye (memorial garden eye level), vt_vista (2,52 pitch 12 north), ax_game (4,22),
+ax_eye (lobby eye level to the fountain), ax_vista (0,34 pitch 12), as_eye (server aisle eye level).
+- **C0** (key_c0.txt): all 3 refs ID'd as concept (8/9/9). Game: vt_eye 3, vt_game 2, ax_eye 5, vt_vista 5, ax_vista 4,
+  as_eye 6, ax_game 2 (avg 3.9). Named: flat neutral lighting (no golden-hour warmth, no shafts), crowd tiny/repeated,
+  flat undressed walls, bare top-down floors (gameplay frames read as "debug arena"), atrium balconies copy-pasted, a near-black
+  floor band read as a lighting bug.
+  → acted: plaques face south (dark blank faces now read), lawn flower borders + daisies, promenade planters, recessed lit wall
+  panels on the level walls, terraces sun warmer/lower (sunDir 0.72,0.36,-0.5) + warmer bounce; lobby: diagonal granite
+  checkerboard atrium floor, entrance hall planters/benches/lamps, hanging gardens and closed bays varying the balconies,
+  entrance granite slab → medallion ring, warmer stronger interior key, light shafts 0.07 → 0.12.
+
+- **C1** (key_c1.txt): refs 9/9/9. Game: vt_vista 4, vt_eye 3, ax_eye 4, vt_game 3, ax_vista 4, ax_game 3, as_eye 4 (avg 3.6,
+  flat vs C0 = critic variance). New concrete reads: the dark granite front-walk bands on L0 read as a "hard clipped shadow-map
+  seam" (same trap as Aurum's nero ribbons); the lobby's floating TRANSIT RELAY sign read as a z-fighting floor decal; black
+  civs go to pure black silhouettes in the dark B4; recessed wall panels read as "blank grey signage"; crowd = cloned poses.
+  → acted: bands removed, terraces sun back to the default direction (the low sun doubled shadow lengths), wall panels became
+  bronze/gold trellises with climbing vines, lobby relay moved to (24,41), B4 env strips + env 1.5 + hemi 0.55, lobby medallion
+  ring removed (read as a dark arc bug top-down). Turret: fixed-mount overrides for dodge/die/attacks (base never moves).
+
+- **C2** (key_c2.txt): refs 9/9/9, all game panels ID'd. vt_vista 5, vt_game 3, vt_eye 5, ax_eye 6, ax_game 4, ax_vista 6,
+  as_eye 6 → **avg 5.0 (C0 3.9, C1 3.6)**. Still named: cloned crowd (one rig recoloured, same poses), flat light on monuments
+  and atrium walls, top-down gameplay frames = bare floor, repeating rack/balcony modules.
+  → acted after C2 (not re-judged): B4 rack LED states vary per rack (busy / idle / amber maintenance); memorial hedges are
+  two-layer beds on stone curbs.
+Final (M5, 915x412 DPR2 high): terraces gameplay 151 calls / 510k, vistas 238–263 / 722–741k; arcology ≤ 162; servers ≤ 118.
+Boot of all four districts + `?auto=1&speed=3&fresh` green; lift and relay transitions verified end to end; every site of the
+three new districts is reachable on the nav grid from spawn; no walk-through gaps in the level walls (probe `gaps.js`).
+
+### Requests for P3g (gameplay)
+1. Wire `id: 'lift'` interactables → `world.liftTransition(it.to, {onSwap})`, player to `world.spawnPoints.lift`
+   (districts.js onSwap does the rest). Add `terraces`/`arcology`/`arcology_servers` to NAMES/AMBIENT/EMITTERS in
+   js/game/districts.js (falls emitters for terraces: (13,21) (26,21) (23,-36) (41,30); servers: hum).
+2. Crowd in the B4 server hall: 32 civilians in a server hall reads odd — consider fewer there (crowd size is tier.crowd).
+3. Optional data tidy: `halloran.robotKind` can become `boss_halloran` (security tier 3 already maps to it).
+4. Seraph flies: raise `root.position.y` for `flying` enemies (the kind is a biped with wings).
+
+### NEXT / gaps
+1. Crowd variety is now the #1 critic complaint in every district (one rig, recoloured): more civ silhouettes/poses
+   (robots owner) — the biggest remaining look lever.
+2. Top-down gameplay frames still read as bare floor (3–4/10): more props within 10 m, floor inlays that are not dark bands
+   (dark bands read as shadow seams: Aurum R1–R4 and P3w C1 all said so).
+3. Terraces vista tris 720–740k (over the 600k line; calls fine). Cheapest cut: cliffGardens trees and the far-bank trees.
+4. Verdant cliffs are faceted low-poly (reads "stylised"); the north falls cliff is plain. Atrium balconies still repeat.
+5. Terraces build ~160–230 ms (relay white-out hides it).

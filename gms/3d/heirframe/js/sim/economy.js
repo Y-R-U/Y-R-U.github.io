@@ -12,7 +12,7 @@ export function niceRound(v) {
   return Math.round(v / 100) * 100;
 }
 
-export const xpNext = n => niceRound((4 + 1.2 * n) * 20 * L(n));
+export const xpNext = n => niceRound((4 + 1.2 * n) * 20 * L(n) * (BALANCE.xpLevelMult?.[n] || 1));
 export const LEGACY_XP = xpNext(BALANCE.maxLevel);
 
 export function overLevelPenalty(riderLevel, enemyLevel) {

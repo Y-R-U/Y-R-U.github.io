@@ -105,3 +105,33 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
   (`cdp start --port 9311 --idle 1800 -- --use-angle=metal`; the default idle-kill is 300 s).
 - sim `setHeat(n)` is a float: n.0 decays to (n-1)★ within a frame. Use `forceHeat(n)` (n + 0.95).
 - Enemy `e.brain(e, dt, info)` runs before the generic AI; return true only to take over movement.
+
+
+# P2c + P3g (gameplay agent P3g, 2026-09-27)
+
+## DONE (P2c)
+- First-frame lower tail: `BALANCE.xpLevelMult {4: 1.5}` (the licence level 4→5 takes 1.5× XP; ECONOMY §2 formula otherwise).
+  12 seeds: first frame 42–68 min (median ~58), 1/12 under 45 (seed 8, 42: its L5 lands on a story XP chunk); Act 1 73–96.
+  test.mjs 21/21. **Planner/manager:** ECONOMY §2 table's xpNext(4) is now ~345, not 230.
+- Market prices reviewed: they already equal ECONOMY §4 (`60 × L × {1,2,4,10}`, Sal's relic `600 × L`). Kept (D11); the
+  "cheap at L7" worry is by design (~6 min of income for a Custom). Nexus rep tiers will discount them (P3 vendor pricing).
+- Big Kettle: hp 55→40, dmg 9→6.5; new tell + punish window: the boiler hisses (`steam()`) when he winds up a stomp/charge,
+  and after a stomp/blast he vents 1.8 s (stands still, takes +30%). Steam also on a timer, below 20% HP, phase 2 (real
+  `boss_kettle.steam()`; the enforcer stand-in fakes it). Bot runs (speed 2, storyat=a1_m4): Gunner 77 game-s 0 deaths,
+  Brawler ~75 s of fighting + 1 death (the bot face-tanks). Driver: scratchpad `gameplay/boss2.mjs <frame>`.
+- District swap cleanup via `world.onDistrict` (js/game/districts.js `cleanup`): all enemies + decoys, loot collected,
+  mission props, breakables rebound, boss ended, heat responders reset, combat reset, nav rebuilt, runner sites re-indexed,
+  `sim.setSites`, ambience/emitters (names + beds for terraces/arcology/arcology_servers).
+- Breakables in combat + loot (js/game/props.js): tap a crate/vending/holo to target and smash it; melee swings clip any in
+  their arc; area skills as before; enemy stomps/blasts break them too (no collateral). Breaking one by the player = collateral
+  on a contract + a small credit drop (value/12 × L); vending machines 15% drop a repair kit (`sim.grantConsumable`).
+- First frame delivery uses the drop-pod (js/game/frames.js `podDelivery`): pod lands 3.2 m in front (1.5 s), opens (0.6 s),
+  the rental beams out and the new frame beams in at the pod door; the pod leaves 0.9 s later. Later swaps: plain beam.
+
+## IN PROGRESS
+- verify pod + breakables in the browser (tour.mjs), then P3 systems.
+
+## NEXT (P3)
+- rep tiers/vendor pricing/rival UI; archetypes tail/repo/race/rescue runtime (+ assassinate flee); Fabricator (recalibrate UI,
+  salvage-all, tune pity); relic hooks still missing at runtime (afterimage, phantom_step, reactive_plating, stillwater check,
+  kinetic_battery consume); Hostile threat; danger/Crackdown; Echo clues; Act 2 staging in terraces/arcology + VO.

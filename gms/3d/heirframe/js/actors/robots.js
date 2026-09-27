@@ -1,7 +1,7 @@
 import * as THREE from '../../../../lib/three/0.180.0/three.module.js';
 import { makeRig, makeBones, BONES, BI, NB } from './rig.js';
 import { PartBuilder } from './parts.js';
-import { KINDS, kindOf } from './kinds.js';
+import { KINDS, kindOf, TIER_KINDS } from './kinds.js';
 import { NCH, PX, evalBase, evalAction, ACTIONS, LOWER, eyeCurve, smooth } from './anims.js';
 import { setMaterialQuality, flashMat, applyPaint, PAINTS, HORIZON_BAND } from './materials.js';
 import { createSteam } from './steam.js';
@@ -94,8 +94,9 @@ export const LIVE_ROBOTS = new Set();
 
 export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality = 'high', lod = 'near', paint = null, merged = false } = {}) {
   kind = kindOf(kind);
-  const K = KINDS[kind];
   tier = Math.max(0, Math.min(4, tier | 0));
+  if (TIER_KINDS[kind]?.[tier]) kind = TIER_KINDS[kind][tier];
+  const K = KINDS[kind];
   setMaterialQuality(quality);
   const r01 = rng(seed * 7919 + 13);
   const variant = K.variants ? (seed >>> 0) % K.variants : 0;

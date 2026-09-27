@@ -365,9 +365,9 @@ function die(P, u, ctx) {
 
 // ---------- hover rig (drones) ----------
 function hoverBase(P, ctx, t) {
-  const v = ctx.move.v01;
-  pel(P, 0, Math.sin(t * 2.1) * 0.05, 0);
-  R(P, 'pelvis', 0.32 * v + Math.sin(t * 1.3) * 0.03, 0, Math.sin(t * 0.9) * 0.04);
+  const v = ctx.move.v01, k = ctx.style.fixed ? 0 : 1;
+  pel(P, 0, Math.sin(t * 2.1) * 0.05 * k, 0);
+  R(P, 'pelvis', (0.32 * v + Math.sin(t * 1.3) * 0.03) * k, 0, Math.sin(t * 0.9) * 0.04 * k);
   R(P, 'head', ctx.st.gp * 0.5 - 0.2 * v, ctx.st.gy * 1.4, 0);
   for (const s of ['L', 'R']) RS(P, 'upArm', s, -0.3 * v, 0, 0);
 }
@@ -533,8 +533,17 @@ function evalBase0(name, P, ctx, t) {
   }
 }
 
+// static mounts (turrets): the base never leaves the floor; the head does the acting
+const FIXED = {
+  dodge: (P, u, ctx) => { hoverBase(P, ctx, ctx.t); R(P, 'head', 0, kf(u, [[0, 0], [0.4, 0.9], [1, 0]]), 0); },
+  die: (P, u, ctx) => { hoverBase(P, ctx, ctx.t); R(P, 'head', kf(u, [[0, 0], [0.2, -0.3], [0.6, 0.75], [0.75, 0.62], [1, 0.7]]), kf(u, [[0, 0], [1, 0.5]]), kf(u, [[0, 0], [0.6, 0.35], [1, 0.3]])); },
+  attack_melee: (P, u, ctx) => { hoverBase(P, ctx, ctx.t); R(P, 'head', kf(u, [[0, 0], [0.3, -0.25], [0.45, 0.3], [1, 0]]), 0, 0); },
+  attack_heavy: (P, u, ctx) => { hoverBase(P, ctx, ctx.t); const k = kf(u, [[0, 0], [0.4, 1], [0.7, 1], [1, 0]]); R(P, 'head', -0.25 * k, Math.sin(u * 18) * 0.25 * k, 0); },
+};
+
 export function evalAction(name, P, u, ctx) {
   P.fill(0);
+  if (ctx.hover && ctx.style.fixed && FIXED[name]) return FIXED[name](P, u, ctx);
   if (ctx.hover) return H[name](P, u, ctx);
   if (ctx.quad) return QA[name](P, u, ctx);
   const st = ctx.style;

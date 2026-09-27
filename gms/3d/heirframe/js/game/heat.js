@@ -99,5 +99,5 @@ export function createHeat(ctx) {
     return [e];
   }
 
-  return { update, get stars() { return H.stars; }, responders, standDown };
+  return { update, get stars() { return H.stars; }, responders, standDown, reset() { H.eye = null; H.squads = []; H.t = 8; } };
 }

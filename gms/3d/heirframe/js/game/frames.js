@@ -47,6 +47,40 @@ export function createFrames(G, { world, robots, tier, player, fx, audio, ui, ri
     ui?.controls.setAttack({ icon: ATTACK[frame.archetype] || 'fist' });
   }
 
+  // the first frame you ever own is delivered: a Nexus courier drone drops the pod in front of you (~1.5 s),
+  // the petals open and the new body beams in at its door. Later swaps are the plain beam.
+  let pod = null, podNext = false;
+  function podSpot() {
+    // screen-right, screen-left, then toward the camera, so the whole drop stays in frame
+    for (const [sx, sy] of [[1, 0], [-1, 0], [0.7, -0.7], [-0.7, -0.7], [0, -1]]) {
+      const d = rig.screenToWorld(sx, sy), l = Math.hypot(d.x, d.z) || 1;
+      const x = player.pos.x + d.x / l * 3.4, z = player.pos.z + d.z / l * 3.4;
+      if (!world.blocked(x, z, 1.3)) return { x, z };
+    }
+    return null;
+  }
+  async function podDelivery(A) {
+    const at = podSpot();
+    if (!robots.createDropPod || !at) { A.phase = 'out'; return; }
+    try {
+      pod?.dispose();
+      pod = robots.createDropPod();
+      world.scene.add(pod.root);
+      pod.root.position.set(at.x, world.groundAt(at.x, at.z), at.z);
+      pod.root.rotation.y = Math.atan2(player.pos.x - at.x, player.pos.z - at.z);
+      enableReflect(pod.root);
+      player.faceYaw?.(Math.atan2(at.x - player.pos.x, at.z - player.pos.z), 0.3);
+      audio.sfx('flyby', { x: at.x, z: at.z, vol: 0.9 });
+      await pod.play('land');
+      rig.shake = Math.max(rig.shake, 0.22);
+      audio.sfx('explosion_small', { x: at.x, z: at.z, vol: 0.7 });
+      await pod.play('open');
+      audio.sfx('scan', { vol: 0.7 });
+      A.podAt = { x: at.x + Math.sin(pod.root.rotation.y) * 1.3, z: at.z + Math.cos(pod.root.rotation.y) * 1.3, yaw: pod.root.rotation.y };
+    } catch (e) { console.warn('drop pod failed', e); }
+    A.t = 0; A.phase = 'out';
+  }
+
   function deploy(frame, { reason = 'swap' } = {}) {
     const k = keyOf(frame);
     if (k === bodyKey && !anim) return false;
@@ -54,6 +88,7 @@ export function createFrames(G, { world, robots, tier, player, fx, audio, ui, ri
     const col = COLOR[frame.archetype] || 0xffffff;
     anim = { t: 0, phase: 'out', frame, key: k, col, reason, next: null };
     player.frozen = true;
+    if (podNext) { podNext = false; anim.phase = 'pod'; podDelivery(anim); return true; }
     fx.beam(player.pos, col, 0.9, 7, 1.4);
     fx.ring(player.pos, 2.4, col, 0.5);
     audio.sfx('power_down', { vol: 0.7 });
@@ -62,10 +97,13 @@ export function createFrames(G, { world, robots, tier, player, fx, audio, ui, ri
   }
 
   function update(dt) {
+    // the drone climbs straight through the camera: drop it from view once it is above head height
+    if (pod) { pod.update(dt); if (pod.state === 'gone' || (pod.state === 'leaving' && pod.drone.position.y > 8)) { pod.dispose(); pod = null; } }
     if (!anim) return;
     const A = anim;
     A.t += dt;
     const root = player.actor.root;
+    if (A.phase === 'pod') return;
     if (A.phase === 'out') {
       const u = Math.min(1, A.t / 0.38);
       root.scale.set(1 - u * 0.7, 1 - u * 0.95, 1 - u * 0.7);
@@ -73,6 +111,7 @@ export function createFrames(G, { world, robots, tier, player, fx, audio, ui, ri
       if (u >= 1) {
         const a = build(A.frame);
         if (a) { attach(a); a.root.scale.set(0.3, 0.02, 0.3); }
+        if (A.podAt) { player.teleport(A.podAt.x, A.podAt.z, A.podAt.yaw); rig.target.copy(player.pos); }
         bodyKey = A.key;
         A.phase = 'in'; A.t = 0;
         fx.flash(v.set(player.pos.x, player.pos.y + 1, player.pos.z), 1.4, A.col, 0.18);
@@ -91,10 +130,11 @@ export function createFrames(G, { world, robots, tier, player, fx, audio, ui, ri
         fx.sparks(v.set(player.pos.x, player.pos.y + 0.2, player.pos.z), A.col, 18, 6);
         player.frozen = false;
         anim = null;
+        if (A.podAt && pod) setTimeout(() => pod?.play('leave'), 900);
         G.onFrameDeployed?.(A.frame, A.reason);
       }
     }
   }
 
-  return { sync, deploy, update, stepKind: (f) => STEP[f.archetype] || 'rental', get busy() { return !!anim; } };
+  return { sync, deploy, update, stepKind: (f) => STEP[f.archetype] || 'rental', get busy() { return !!anim; }, podNext() { podNext = true; }, get pod() { return pod; } };
 }

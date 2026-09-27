@@ -3,6 +3,8 @@
 export const BALANCE = {
   levelBase: 1.09,
   maxLevel: 60,
+  // D19: the licence level (4→5) runs longer so a fast first hour doesn't buy the first frame before ~45 min
+  xpLevelMult: { 4: 1.5 },
   combat: {
     armorK: 50,               // DR = armor / (armor + armorK * L(attackerLvl))
     maxDR: 0.85,

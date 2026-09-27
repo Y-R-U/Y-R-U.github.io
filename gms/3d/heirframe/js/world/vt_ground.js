@@ -7,7 +7,7 @@ import { canvasTexture } from './textures.js';
 // Verdant Terraces floors: one mesh per level (only y = 0 gets the planar mirror), one shader. A painted zone mask over
 // the district (R lawn, G gravel, B dark granite; black = pale limestone) picks the surface per pixel.
 // levels: [{ rects: [[x0, x1, z0, z1], ...], y, reflect }]; mask: { canvas, x0, z0, w, d } (world rect it covers).
-export function createGardenGround(ctx, levels, mask) {
+export function createGardenGround(ctx, levels, mask, { interior = false, stone = [0.96, 0.9, 0.8] } = {}) {
   const { M, reflection } = ctx;
   const maskTex = canvasTexture(mask.canvas, false);
   maskTex.anisotropy = 1; maskTex.generateMipmaps = true; maskTex.flipY = false; maskTex.needsUpdate = true;
@@ -19,6 +19,8 @@ export function createGardenGround(ctx, levels, mask) {
   };
   u.tAO.value.needsUpdate = true;
   ctx.groundAO = u;
+  const dummy = u.tAO.value;
+  (ctx.disposers ||= []).push(() => { maskTex.dispose(); dummy.dispose(); });
   const cream = M.stoneTex.cream;
   const meshes = levels.map((L, li) => {
     const parts = L.rects.map(([x0, x1, z0, z1]) => {
@@ -37,6 +39,8 @@ export function createGardenGround(ctx, levels, mask) {
       addPlanarReflection(mat, reflection, { strength: 0.9, base: 0.28, blur: 2.6, distort: 0.06, tint: new THREE.Color(1.0, 0.98, 0.95), sky: 1, skySat: 0.35 });
       mat.defines = { REFL_ZONE: '' };
     }
+    if (interior) mat.defines = { ...(mat.defines || {}), HF_INTERIOR: '' };
+    mat.defines = { ...(mat.defines || {}), HF_STONE: `vec3(${stone.map((v) => v.toFixed(3)).join(',')})` };
     patch(mat, u, !!L.ao);
     const mesh = new THREE.Mesh(g, mat);
     mesh.receiveShadow = true;
@@ -91,7 +95,7 @@ sq.x += mod(floor(sq.y), 2.0) * 0.5;
 vec2 cell = floor(sq), fq = fract(sq);
 float tone = gH(cell + 3.0);
 float joint = max(gLine((fq.x - 0.5) * 2.4 - sign(fq.x - 0.5) * 1.2, 0.02), gLine((fq.y - 0.5) * 1.2 - sign(fq.y - 0.5) * 0.6, 0.02)) * (1.0 - far);
-vec3 stoneC = grain * vec3(0.96, 0.9, 0.8) * (0.86 + 0.16 * tone) * (1.0 - 0.35 * joint);
+vec3 stoneC = grain * HF_STONE * (0.86 + 0.16 * tone) * (1.0 - 0.35 * joint);
 stoneC *= 0.93 + 0.1 * gN(vGW * 0.15);
 // lawn: mown stripes, patchy tone, blade speckle that fades out with distance, darker at its borders
 float stripe = step(0.5, fract(vGW.x / 3.0 + 0.13 * sin(vGW.y * 0.05)));
@@ -100,21 +104,46 @@ float blade = mix(gN(vGW * 11.0) * 0.6 + gN(vGW * 27.0) * 0.4, 0.5, fine);
 vec3 lawnC = vec3(0.085, 0.15, 0.04) * (0.78 + 0.4 * gN(vGW * 0.23)) * (0.94 + 0.09 * stripe) * (0.8 + 0.4 * blade);
 lawnC = mix(lawnC, vec3(0.16, 0.19, 0.07), 0.3 * smoothstep(0.55, 0.8, gN(vGW * 0.09 + 11.0)));
 lawnC *= 0.7 + 0.3 * smoothstep(0.5, 0.9, zm.r);
+lawnC *= 0.82 + 0.3 * gN(vGW * 0.6 + 3.0) * gN(vGW * 0.13);
+{
+  // scattered daisies and clover flowers, only up close
+  vec2 dq = vGW / 0.35, dc = floor(dq);
+  float dh = gH(dc + 41.0);
+  float daisy = step(0.965, dh) * smoothstep(0.16, 0.08, length(fract(dq) - 0.5 - (vec2(gH(dc + 7.0), gH(dc + 9.0)) - 0.5) * 0.5)) * (1.0 - fine);
+  lawnC = mix(lawnC, mix(vec3(0.9, 0.88, 0.8), vec3(0.95, 0.75, 0.25), step(0.99, dh)), daisy * 0.8);
+}
 vec3 gravC = vec3(0.6, 0.54, 0.45) * (0.82 + 0.28 * mix(gN(vGW * 9.0) * 0.5 + gN(vGW * 23.0) * 0.5, 0.5, fine)) * (0.9 + 0.15 * gN(vGW * 0.4));
 vec2 gq = vGW / 0.9; float gt = gH(floor(gq) + 17.0);
 float gj = max(gLine(fract(gq.x) - 0.5, 0.03), gLine(fract(gq.y) - 0.5, 0.03)) * (1.0 - far);
-vec3 granC = vec3(0.045, 0.047, 0.05) * (0.8 + 0.4 * gt) * (1.0 - 0.5 * gj) + vec3(0.9, 0.7, 0.35) * gj * 0.12;
+vec3 granC = vec3(0.045, 0.047, 0.05) * (0.85 + 0.3 * gt) * (1.0 - 0.25 * gj) + vec3(0.9, 0.7, 0.35) * gj * 0.05;
+#ifdef HF_INTERIOR
+  // interiors: R = carpet tiles, G = steel floor grate
+  vec2 cq = vGW / 0.6; float ct = gH(floor(cq) + 5.0);
+  lawnC = vec3(0.05, 0.058, 0.07) * (0.94 + 0.1 * ct) * (0.9 + 0.2 * mix(gN(vGW * 14.0), 0.5, fine));
+  vec2 rq = fract(vGW / vec2(0.6, 0.15));
+  float slot = smoothstep(0.35, 0.3, abs(rq.y - 0.5)) * smoothstep(0.48, 0.44, abs(rq.x - 0.5)) * (1.0 - far);
+  gravC = vec3(0.16, 0.17, 0.19) * (1.0 - 0.75 * slot) * (0.85 + 0.2 * gN(vGW * 0.5));
+#endif
 diffuseColor.rgb = stoneC;
 diffuseColor.rgb = mix(diffuseColor.rgb, granC, gran);
 diffuseColor.rgb = mix(diffuseColor.rgb, gravC, grav);
 diffuseColor.rgb = mix(diffuseColor.rgb, lawnC, lawn);
+#ifdef HF_INTERIOR
+float reflZone = mix(mix(0.7 * (1.0 - 0.7 * joint), 1.15, gran), 0.0, lawn) * (1.0 - 0.6 * grav);
+#else
 float reflZone = mix(mix(0.55 * (1.0 - 0.7 * joint), 1.1, gran), 0.0, max(lawn, grav));
+#endif
 float sheenK = (1.0 - lawn) * (1.0 - grav) * (1.0 - 0.5 * gran);`)
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
 roughnessFactor = 0.24 + 0.1 * tone + 0.2 * joint;
 roughnessFactor = mix(roughnessFactor, 0.1 + 0.06 * gt, gran);
+#ifdef HF_INTERIOR
+roughnessFactor = mix(roughnessFactor, 0.35, grav);
+roughnessFactor = mix(roughnessFactor, 0.95, lawn);
+#else
 roughnessFactor = mix(roughnessFactor, 0.9, grav);
 roughnessFactor = mix(roughnessFactor, 0.78, lawn);
+#endif
 roughnessFactor *= 0.85 + 0.3 * gN(vGW * 0.27 + 5.0);`)
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
 normal = normalize(mix(normal, normalize(vNormal), max(lawn, grav)));`)
@@ -138,5 +167,5 @@ normal = normalize(mix(normal, normalize(vNormal), max(lawn, grav)));`)
   reflectedLight.directSpecular *= 1.0 - 0.5 * gOcc;
 }`);
   };
-  mat.customProgramCacheKey = () => 'vtGround' + (mat.defines?.REFL_ZONE !== undefined ? 'r' : '') + (ao ? 'a' : '');
+  mat.customProgramCacheKey = () => 'vtGround' + (mat.defines?.REFL_ZONE !== undefined ? 'r' : '') + (ao ? 'a' : '') + (mat.defines?.HF_INTERIOR !== undefined ? 'i' : '') + mat.defines.HF_STONE;
 }

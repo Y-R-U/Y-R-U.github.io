@@ -26,6 +26,8 @@ export function createBoulevardGround(ctx, rects, L) {
     uContacts: { value: Array.from({ length: MAX_CONTACTS }, () => new THREE.Vector3(0, 0, 0)) } };
   u.tAO.value.needsUpdate = true;
   ctx.groundAO = u;
+  const dummy = u.tAO.value;
+  (ctx.disposers ||= []).push(() => dummy.dispose());
   const f = (v) => v.toFixed(2);
   mat.defines = { REFL_ZONE: '' };
   const prev = mat.onBeforeCompile;

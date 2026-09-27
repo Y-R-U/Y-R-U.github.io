@@ -51,10 +51,54 @@ export function createProps(ctx) {
     breakables.push(b);
     return b;
   }
-  // area damage from the player: breaks collateral within r of (x,z)
-  function splash(x, z, r, dmg) {
-    // the district's own breakables (P2b world.breakables: crates, vending, holo stands)
-    for (const b of world.breakables?.splash?.(x, z, r, dmg) || []) ctx.onCollateral && ctx.onCollateral(b.value || 30, b);
+  // --- the district's own breakables (world.breakables: crates, vending, holo stands) ---------------------
+  // They join combat as prop targets (tap one to smash it; melee arcs and area skills clip them) and spill a
+  // little loot when they break. Breaking them on a contract is collateral; enemies' stomps break them for free.
+  const brkWrap = new Map();
+  let unBreak = null, byPlayer = false;
+  function brkTarget(b) {
+    let w = brkWrap.get(b);
+    if (!w) { w = { prop: true, brk: b, kind: b.kind, pos: new THREE.Vector3(b.x, b.y, b.z), radius: b.r, get destroyed() { return b.broken; }, get hp() { return b.hp; } }; brkWrap.set(b, w); }
+    return w;
+  }
+  const brkNear = (x, z, r) => (world.breakables?.near?.(x, z, r) || []).map(brkTarget);
+  function bindWorld() {
+    unBreak?.();
+    brkWrap.clear();
+    unBreak = world.breakables?.onBreak?.((b) => onBroken(b)) || null;
+  }
+  function onBroken(b) {
+    const who = byPlayer;
+    audio.sfx(b.kind === 'holo' ? 'shield_break' : 'explosion_small', { x: b.x, z: b.z, vol: 0.55, minGap: 60 });
+    if (who) ctx.onCollateral && ctx.onCollateral(b.value || 30, b);
+    ctx.onBreakLoot?.(b, who);
+  }
+  function hitBreakable(b, dmg, player = true) {
+    byPlayer = player;
+    const broke = world.breakables.hit(b, dmg);
+    byPlayer = false;
+    if (!broke && player) {
+      const s = ctx.project(new THREE.Vector3(b.x, b.y + 0.9, b.z));
+      if (s.on) ctx.ui.damage(s.x, s.y, Math.round(dmg), 'normal');
+      fx.sparks(new THREE.Vector3(b.x, b.y + 0.7, b.z), b.kind === 'holo' ? 0x9fe8ff : 0xd8dde6, 5, 3);
+      audio.sfx('melee_hit', { x: b.x, z: b.z, vol: 0.5, minGap: 60 });
+    }
+    return broke;
+  }
+  // a melee swing clips whatever stands in its arc
+  function smashArc(p, yaw, reach, arc, dmg) {
+    let n = 0;
+    for (const w of brkNear(p.x, p.z, reach + 0.6)) {
+      const a = Math.abs(Math.atan2(Math.sin(Math.atan2(w.pos.x - p.x, w.pos.z - p.z) - yaw), Math.cos(Math.atan2(w.pos.x - p.x, w.pos.z - p.z) - yaw)));
+      if (a <= arc || Math.hypot(w.pos.x - p.x, w.pos.z - p.z) < w.radius + 0.9) { hitBreakable(w.brk, dmg); n++; }
+    }
+    return n;
+  }
+
+  // area damage: breaks collateral within r of (x,z); opts.byPlayer=false for enemy stomps (no collateral)
+  function splash(x, z, r, dmg, { byPlayer: pl = true } = {}) {
+    for (const b of world.breakables?.near?.(x, z, r) || []) hitBreakable(b, dmg, pl);
+    if (!pl) return;
     for (let i = breakables.length - 1; i >= 0; i--) {
       const b = breakables[i];
       if (Math.hypot(b.pos.x - x, b.pos.z - z) > r + 0.5) continue;
@@ -89,6 +133,7 @@ export function createProps(ctx) {
 
   function damage(d, amount) {
     if (d.destroyed) return;
+    if (d.brk) { hitBreakable(d.brk, amount); return; }
     d.hp -= amount;
     const s = ctx.project(new THREE.Vector3(d.pos.x, d.pos.y + 0.8, d.pos.z));
     if (s.on) ctx.ui.damage(s.x, s.y, amount, 'normal');
@@ -173,5 +218,6 @@ export function createProps(ctx) {
     for (const b of breakables.splice(0)) scene.remove(b.mesh);
   }
 
-  return { nest, machine, breakable, splash, breakables, damage, carry, removeCarry, beacon, dropLoot, update, collectAll, clearMission, targets: () => destructibles.filter((d) => !d.destroyed), loot, destructibles };
+  bindWorld();
+  return { nest, machine, breakable, splash, smashArc, brkNear, brkTarget, bindWorld, breakables, damage, carry, removeCarry, beacon, dropLoot, update, collectAll, clearMission, targets: () => destructibles.filter((d) => !d.destroyed), loot, destructibles };
 }

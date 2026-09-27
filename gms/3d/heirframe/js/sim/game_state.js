@@ -365,6 +365,13 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     S.consumables[id] = (S.consumables[id] || 0) + 1;
     return { ok: true, count: S.consumables[id] };
   }
+  // found in the world (a vending machine jackpot): free, up to the carry cap
+  function grantConsumable(id, n = 1) {
+    if (!(id in S.consumables) || S.consumables[id] >= carryCap(id)) return { ok: false, reason: 'full' };
+    S.consumables[id] = Math.min(carryCap(id), S.consumables[id] + n);
+    emit('consumable', { id, left: S.consumables[id] });
+    return { ok: true };
+  }
   function useConsumable(id) {
     if (!(S.consumables[id] > 0)) return { ok: false, reason: 'none' };
     S.consumables[id]--;
@@ -888,7 +895,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     spawnEnemy, hit, useSkill: useSkillFor, kill, addItem, lootPickup: items => items.map(i => addItem(i)).filter(Boolean),
     equip, unequip, equipBest, salvage, salvageAll, tune, recalibrate,
     buyFrame, swapFrame, returnRental, upgradeMk, chooseSyncMod, repair, payRental, payWardDebt,
-    buyConsumable, useConsumable, cleanSlate, buyStash, refreshMarket, buyMarket, travel, setThreat, unlockDistrict,
+    buyConsumable, useConsumable, grantConsumable, cleanSlate, buyStash, refreshMarket, buyMarket, travel, setThreat, unlockDistrict,
     spendLegacy, succession, addCredits, giveXp, save,
     buyHome, setHome, buyPaint, setPaint, buyMaterial, brokerPrice,
     homes: () => Object.keys(HOMES).map(homeState), paintsList: () => PAINTS.map(p => paintState(p.id)),

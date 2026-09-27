@@ -183,6 +183,7 @@ export function createEnemies(ctx) {
     fx.sparks(tmp.set(e.pos.x, e.pos.y + 0.4, e.pos.z), 0xffa060, 14, 7);
     audio.sfx('explosion', { x: e.pos.x, z: e.pos.z, vol: 0.8 });
     if (Math.hypot(pl.x - e.pos.x, pl.z - e.pos.z) < r + 0.4) { ctx.hitPlayer(e, skill); ctx.rig.shake = Math.max(ctx.rig.shake, 0.18); }
+    ctx.props?.splash(e.pos.x, e.pos.z, r, 40, { byPlayer: false });
     for (const d of decoys) if (!d.dead && d.pos.distanceTo(e.pos) < r) land(e, skill, d);
   }
 
@@ -373,6 +374,7 @@ export function createEnemies(ctx) {
 
   function die(e) {
     if (e.state === 'dead') return;
+    if (e.noKill) { e.c.hp = Math.max(1, e.c.hp); e.c.alive = true; return; }
     e.state = 'dead'; e.pending = null; e.tele = null; e.dash = null; e.ally = 0;
     e.bot.play('die', { loop: false });
     e.bot.setAlert(0);

@@ -25,7 +25,7 @@ const HUMAN = 1.25;          // humans are slower than the bot at walking/readin
 const OVERHEAD = 40;         // board, results card, travel to the first marker (s)
 const FRAME_ORDER = ['brawler', 'gunner', 'ghost'];
 
-export const P2A_ARCH = ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'infiltrate', 'transport', 'defend', 'assassinate'];
+export const P2A_ARCH = ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'tail', 'infiltrate', 'transport', 'defend', 'repo', 'race', 'assassinate', 'rescue'];   // = js/game RUN_ARCH (P3)
 export const P2A_TWISTS = ['T1', 'T2', 'T3', 'T4', 'T6', 'T7', 'T8', 'T9', 'T10'];
 
 export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate = ROTATE, log = console.log, act1 = !args.all } = {}) {

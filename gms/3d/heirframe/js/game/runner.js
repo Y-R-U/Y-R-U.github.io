@@ -133,6 +133,7 @@ export function createRunner(ctx) {
     const e = enemies.spawn({ defId: t.defId, rank: t.rank || 'grunt', level: R.mission.level, name: t.name }, s.x + 1.5, s.z + 1.5, { guard: true, stealthy: R.stealth });
     e.mission = R.mission.id; e.isTarget = true; e.home.set(s.x, 0, s.z);
     if (which === 'realTarget') R.realTarget = e; else R.target = e;
+    steps.onTarget(R, e);
   }
 
   function spawnBoss() {
@@ -263,7 +264,7 @@ export function createRunner(ctx) {
     props.collectAll(ctx.onLootCollect);
     ui.lens.hide(); ui.detect.clear(); ui.meter.hide();
     if (m.story) await storyEvent('deliver', true);
-    const out = sim.finishContract({ time: sim.state.contract?.elapsed });
+    const out = sim.finishContract({ time: sim.state.contract?.elapsed, raceFirst: !!R.raceFirst });
     cleanup();
     await ctx.onComplete(out);
   }
@@ -315,6 +316,8 @@ export function createRunner(ctx) {
     if (s.type === 'photo') { const t = s.target === 'realTarget' ? R.realTarget : R.target; if (t && t.state !== 'dead') return { x: t.pos.x, z: t.pos.z, label: t.c.name }; }
     if (s.type === 'escort' && R.ss.npc) { const e = R.ss.npc; const wp = R.ss.path?.[R.ss.wp]; return d2(e.pos) > 10 ? { x: e.pos.x, z: e.pos.z, label: e.c.name } : wp ? { x: wp.x, z: wp.z, label: 'Escort' } : null; }
     if (s.type === 'hack') { const st = site((s.sites || [s.site])[R.ss.hackI || 0]); if (st) return { x: st.x, z: st.z, label: s.verb ? 'Terminal' : 'Hack' }; }
+    if (s.type === 'race' && R.ss.race) { const c = R.ss.race.cps[R.ss.race.i]; if (c) return { x: c.x, z: c.z, label: `Checkpoint ${R.ss.race.i}` }; }
+    if ((s.type === 'tail' || s.type === 'capture') && R.target && R.target.state !== 'dead') return { x: R.target.pos.x, z: R.target.pos.z, label: R.target.c.name, enemy: s.type === 'capture' };
     const st = site(s.site || s.sites?.[0] || s.path?.[s.path.length - 1] || s.orExfil);
     if (!st) return null;
     return { x: st.x, z: st.z, label: s.type === 'pickup' ? 'Pick up' : s.type === 'deliver' ? 'Deliver' : s.type === 'exfil' || s.type === 'survive' ? 'Exfil' : s.ping ? `Search ${s.radius} m` : null };
@@ -330,7 +333,7 @@ export function createRunner(ctx) {
     if (s.type === 'pickup' && near(s.site)) return `Pick up ${s.item?.name ? 'the ' + s.item.kind : ''}`.trim();
     if (s.type === 'deliver' && near(s.site, 3.2) && !(R.scriptedPack && !R.scriptedCleared)) return s.dispose ? 'Dump it' : 'Deliver';
     if (s.type === 'kill' && s.optional && next?.type === 'pickup' && near(next.site)) return `Grab the ${next.item?.kind || 'item'}`;
-    if (['tail', 'race', 'capture', 'confront', 'walk'].includes(s.type) && near(s.site || s.path?.[s.path.length - 1], 3.5)) return 'Continue';
+    if (['confront', 'walk'].includes(s.type) && near(s.site || s.path?.[s.path.length - 1], 3.5)) return 'Continue';
     return null;
   }
 

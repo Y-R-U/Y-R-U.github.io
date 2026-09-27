@@ -5,6 +5,7 @@ import {
   buildGunner, buildGhost, buildSecurity, eleganceMats, GUNNER_DIMS, GHOST_DIMS, SECURITY_DIMS,
 } from './kinds_frames.js';
 import { buildKettle, kettleMats, KETTLE_DIMS } from './kinds_boss.js';
+import { buildHalloran, halloranMats, HALLORAN_DIMS, buildTurret, turretMats, TURRET_DIMS, buildSeraph, seraphMats, SERAPH_DIMS } from './kinds_act2.js';
 
 const CIV_SLOTS = ['body', 'trim', 'mech', 'glow', 'eye'];
 
@@ -75,6 +76,26 @@ export const KINDS = {
     extraSockets: { ventL: ['aux0', [0.26, 0.58, 0.15]], ventR: ['aux0', [-0.26, 0.58, 0.15]], stack: ['aux0', [0.1, 0.74, -0.06]] },
     steam: true,
   },
+  // Act 2 boss (also what `security` tier 3 builds, see TIER_KINDS)
+  boss_halloran: {
+    slots: ['body', 'trim', 'mech', 'cape', 'glow', 'eye'], height: 2.15, radius: 0.4, runSpeed: 4.4,
+    style: { heavy: 0.35, stance: 1.05 },
+    dims: () => HALLORAN_DIMS, build: buildHalloran, mats: halloranMats,
+    sockets: { muzzle: ['handR', [0, -1.12, 0]] },
+  },
+  // Sentry Turret: static, hackable. head = gun (aims via setAim), thighL = radar dish (spins)
+  turret: {
+    rig: 'hover', slots: ['body', 'trim', 'mech', 'glow', 'eye'], variants: 1, height: 1.6, radius: 0.5, runSpeed: 0,
+    style: { fixed: true }, dims: () => TURRET_DIMS, build: buildTurret, mats: turretMats,
+    sockets: { head: [0, 0.2, 0], muzzle: ['head', [0.15, -0.05, 0.56]], back: [0, 0.1, -0.2], handL: [0, 0, 0], handR: [0, 0, 0] },
+  },
+  // Choir Angel (tier 0), Choir Warden (1), Seraph (3)
+  seraph: {
+    slots: ['body', 'trim', 'mech', 'glow', 'eye'], height: 2.05, radius: 0.32, runSpeed: 5.2,
+    style: { elegance: 0.8, melee: 'slash', arm: 0.9 },
+    dims: () => SERAPH_DIMS, build: buildSeraph, mats: (o) => seraphMats(o),
+    sockets: { muzzle: ['foreArmR', [-0.05, -0.36, 0]] },
+  },
   drone_scout: {
     rig: 'hover', slots: ['body', 'trim', 'mech', 'glow', 'eye'], height: 1.75, radius: 0.4, runSpeed: 5,
     style: {}, dims: () => DRONE_DIMS, build: buildDrone, mats: droneMats,
@@ -87,6 +108,9 @@ export const KINDS = {
     sockets: { head: [0, 0.02, 0.04], muzzle: ['aux1', [0, -0.02, 0.07]], back: [0, 0.06, 0], handL: [0, -0.09, 0], handR: [0, -0.09, 0] },
   },
 };
+
+// kind + tier combinations that build a different kind (the data asks for Halloran as security tier 3)
+export const TIER_KINDS = { security: { 3: 'boss_halloran', 4: 'boss_halloran' } };
 
 const FALLBACK = { rental: 'civ_worker', brawler: 'civ_chrome', gunner: 'civ_chrome', ghost: 'civ_black', drone_scout: 'civ_chrome', security: 'civ_chrome', enforcer: 'civ_black' };
 

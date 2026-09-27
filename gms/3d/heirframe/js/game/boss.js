@@ -53,10 +53,20 @@ export function createBoss(ctx) {
     if (!B || B.e !== e) return false;
     const c = e.c;
     B.t += dt;
-    // steam: constant venting from the boiler, heavier in phase 2
-    if ((B.steamT -= dt) <= 0) { B.steamT = B.phase ? 0.08 : 0.2; fx.sparks(v.set(e.pos.x - Math.sin(e.yaw) * 0.6, e.pos.y + 2.4 * e.bot.root.scale.y, e.pos.z - Math.cos(e.yaw) * 0.6), 0xf0e6dc, 1, 2.5); }
-    if (B.phase === 1 && (B.puffT = (B.puffT || 3) - dt) <= 0) { B.puffT = 2 + Math.random() * 2; e.bot.steam?.(0.8); }
+    // steam: boss_kettle vents from its own sockets (steam()); the stand-in fakes it with pale sparks
+    const steam = e.bot.steam ? (k) => e.bot.steam(k) : (k) => fx.sparks(v.set(e.pos.x - Math.sin(e.yaw) * 0.6, e.pos.y + 2.4 * e.bot.root.scale.y, e.pos.z - Math.cos(e.yaw) * 0.6), 0xf0e6dc, Math.ceil(k * 6), 2.5);
+    if (!e.bot.steam && (B.steamT -= dt) <= 0) { B.steamT = B.phase ? 0.08 : 0.2; steam(0.2); }
+    if ((B.puffT = (B.puffT ?? 4) - dt) <= 0) { B.puffT = B.phase ? 2 + Math.random() * 2 : 5 + Math.random() * 3; steam(B.phase ? 0.8 : 0.45); }
+    // the boiler hisses as he winds up a stomp or a charge: a readable tell on top of the ground ring
+    if (e.tele && B.tele !== e.tele) { B.tele = e.tele; steam(e.tele.skill.kind === 'dash' ? 1.2 : 0.9); }
+    // ...and after a stomp or blast the boiler has to blow off: a short opening where he is slow and takes +30%
+    else if (!e.tele && B.tele) {
+      if (B.tele.skill.kind === 'aoe') { addStatus(c, { id: 'venting', t: 1.8, tMax: 1.8, dmgTakenMult: 1.3, moveMult: 0.35 }); steam(1.4); fx.ring(e.pos, 1.6, 0xf0e6dc, 0.5); }
+      B.tele = null;
+    }
+    if (!B.lowHp && c.hp < c.stats.hp * 0.2) { B.lowHp = true; steam(1.6); }
     if (B.phase === 0 && c.hp < c.stats.hp * B.phases[0]) phase2(e);
+    if (c.statuses.some((x) => x.id === 'venting' && x.t > 0)) { e.bot.setMove(0, 0); return true; }
     return false;
   }
 
