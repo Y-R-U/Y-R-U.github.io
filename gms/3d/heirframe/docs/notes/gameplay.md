@@ -42,8 +42,17 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
 - P1 regression (speed 1, `?auto=1&contracts=3`, 915x412 DPR2 high): ok, A1-M1 + pest/courier/retrieve, L3, 684 cr, FR 18→45,
   0 console errors, 60.0 fps avg, p99 16.8 ms, max 17 ms, 0 hitches, max 278 calls.
 
+- Feel metrics (real runtime, `?auto=1&frame=K&contracts=4&speed=2`, scratchpad feel.mjs): Brawler avg engagement 2.22 m
+  (<3 ✓), Gunner 9.3 m (>8 ✓), Ghost backstab share 78% of melee hits / 93% of damage (>40% ✓; small sample, 18 hits).
+  0 console errors in all three.
+- Frames tour (`?auto=1&frames=1&contracts=1`, tour.mjs): buys Bulwark 1,500 / Longarm 12,000 / Wisp 50,000, swaps and plays a
+  contract with each → ok. Swap transition measured 0.36–0.68 s wall at speed 2 (≈0.7–1.4 s game time; < 3 s ✓).
+- Fixes from the bot runs: bot only counts a frame bought if it really is; clears hunters before opening the (jammed)
+  Warehouse; the 1★ tail Eye no longer escalates Heat (DESIGN: it only watches); riot shields block half as much of a carbine
+  burst (`frontalScale` opt in resolveHit) so Longarm isn't walled by Wardens; heat changes logged (`heat N★`).
+
 ## IN PROGRESS
-- Feel metrics per frame (feel.mjs), frames tour, screenshots of new UI, perf with 8 enemies.
+- Screenshots of new UI (skills/market tabs, codex tree, boss), perf with 8 enemies, P2b hookups (boss_kettle, breakables) if room.
 
 ## Requests (art / P2b world agent)
 - `boss_kettle` (enforcer with a boiler-tank back, copper/brass; steam vent socket on the back would be lovely). Until then boss.js

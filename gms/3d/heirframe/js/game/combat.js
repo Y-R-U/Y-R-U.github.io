@@ -104,7 +104,7 @@ export function createCombat(ctx) {
     fx.tracer(from, to, 0xffe2a0, 0.07, 0.55);
     fx.flash(from, 0.18, 0xffd080, 0.05);
     audio.sfx('shoot', { x: player.pos.x, z: player.pos.z, vol: 0.45, minGap: 60 });
-    const r = strike(pc, t, skill, { knock: 0.6, frontal: relAngle(t) < Math.PI / 3 });
+    const r = strike(pc, t, skill, { knock: 0.6, frontal: relAngle(t) < Math.PI / 3, frontalScale: 0.5 });   // riot shields stop half of a carbine burst
     if (r && !r.miss && r.crit) ctx.rig.shake = Math.max(ctx.rig.shake, 0.04);
     return true;
   }

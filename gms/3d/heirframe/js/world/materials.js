@@ -88,6 +88,7 @@ function uberMaterial() {
   return m;
 }
 
+const WIN = typeof location !== 'undefined' ? /[?&]win=(\w+)/.exec(location.search)?.[1] : null;
 // Curtain-wall glass: floor spandrels + mullions + a scatter of warm lit windows, from world position.
 function facadeGlass(m, cool = 1) {
   m.onBeforeCompile = (sh) => {
@@ -111,11 +112,22 @@ float fh(vec2 p){ return fract(sin(dot(p, vec2(41.3, 289.1))) * 43758.5453); }`)
   metalnessFactor = mix(metalnessFactor, 0.1, spandrel);
   roughnessFactor = mix(roughnessFactor, 0.45, spandrel);
   diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.8, 0.8, 0.85), mull * 0.35);
-  totalEmissiveRadiance += vec3(1.0, 0.75, 0.45) * lit * 0.35 + vec3(0.3, 0.6, 1.0) * ${cool.toFixed(2)} * step(0.99, fh(cell + 7.0)) * (0.25 + 0.2 * step(0.5, fract(u / 0.4))) * aa;
+${WIN === 'old' ? `  totalEmissiveRadiance += vec3(1.0, 0.75, 0.45) * lit * 0.35 + vec3(0.3, 0.6, 1.0) * ${cool.toFixed(2)} * step(0.985, fh(cell + 7.0)) * 1.5;`
+  : WIN === 'p2b' ? `  totalEmissiveRadiance += vec3(1.0, 0.75, 0.45) * lit * 0.35 + vec3(0.3, 0.6, 1.0) * ${cool.toFixed(2)} * step(0.99, fh(cell + 7.0)) * (0.25 + 0.2 * step(0.5, fract(u / 0.4))) * aa;`
+  : `  // lit rooms read as interiors seen through glass: less mirror, a ceiling light line, a dim floor, two panes
+  float coolC = ${cool.toFixed(2)} * step(0.988, fh(cell + 7.0)) * (1.0 - spandrel) * step(an.y, 0.5) * (0.3 + 0.7 * aa);
+  float litN = step(0.965, fh(cell)) * (1.0 - spandrel) * step(an.y, 0.5) * (0.3 + 0.7 * aa);
+  float room = max(litN, coolC);
+  float pane = 1.0 - 0.7 * smoothstep(0.9, 0.96, fract(u / 0.8)) * aa;
+  float ceil = 0.22 + 0.5 * smoothstep(0.45, 0.83, fy) + 0.9 * smoothstep(0.79, 0.84, fy) * smoothstep(0.87, 0.85, fy);
+  vec3 rc = mix(vec3(1.0, 0.7, 0.4), vec3(0.45, 0.72, 1.0), step(litN, 0.0)) * (0.7 + 0.5 * fh(cell + 11.0));
+  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.04, 0.045, 0.05), room * 0.85);
+  metalnessFactor = mix(metalnessFactor, 0.25, room);
+  totalEmissiveRadiance += rc * room * ceil * pane * 0.8;`}
 }
 #endif`);
   };
-  m.customProgramCacheKey = () => 'facade' + cool;
+  m.customProgramCacheKey = () => 'facade' + cool + WIN;
   return m;
 }
 

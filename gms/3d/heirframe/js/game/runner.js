@@ -11,8 +11,9 @@ export function createRunner(ctx) {
 
   // Story missions set in districts that aren't built yet use virtual ids like `plaza_1`: map them onto
   // real Aurum Plaza sites with the same tag so the contract stays playable.
-  const byTag = {};
-  for (const s of world.sites) (byTag[s.tag] ||= []).push(s);
+  let byTag = {};
+  const indexSites = () => { byTag = {}; siteById.clear(); for (const s of world.sites) (byTag[s.tag] ||= []).push(s); };
+  indexSites();
   // Sites whose centre sits inside geometry (e.g. a waterfall basin) are snapped to the nearest walkable cell so
   // goto/deliver steps and markers stay reachable.
   const walkable = (s) => {
@@ -480,6 +481,7 @@ export function createRunner(ctx) {
   }
 
   const api = {
+    reset: indexSites,
     accept, update, objective, interact, interactLabel, abandon, failed, playerHit, site, spawnPack, synthPack, complete, fail, missionHostiles, storyEvent,
     capture() { if (R) R.ss.capture = true; },
     get active() { return R; },

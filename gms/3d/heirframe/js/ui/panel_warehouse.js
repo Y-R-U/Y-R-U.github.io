@@ -21,7 +21,9 @@ const better = (it, eq) => it.fr != null && (!eq || (eq.fr != null && it.fr > eq
 export function warehousePanel(body, data, ctx) {
   const st = ctx.state;
   const frames = data.frames || [];
-  st.tab ||= data.tab || 'loadout';
+  // a tab passed with fresh data (openWarehouse('frames')) wins once; re-renders of the same data keep the user's tab
+  if (data.tab && data !== st._tabData) { st.tab = data.tab; st._tabData = data; }
+  st.tab ||= 'loadout';
   st.frame ||= data.active || frames[0]?.id;
   if (!frames.find(f => f.id === st.frame)) st.frame = frames[0]?.id;
   st.filter ||= 'all';

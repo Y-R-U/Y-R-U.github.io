@@ -5,10 +5,10 @@ import { REFLECT_LAYER } from '../fx/reflection.js';
 
 const clean = (g) => { g = g.index ? g.toNonIndexed() : g; for (const k of Object.keys(g.attributes)) if (k !== 'position' && k !== 'normal') g.deleteAttribute(k); return g; };
 
-function carGeometry() {
-  const body = new THREE.SphereGeometry(1, 14, 7); body.scale(2.6, 0.5, 1.15);
-  const canopy = new THREE.SphereGeometry(1, 10, 4, 0, Math.PI * 2, 0, Math.PI / 2); canopy.scale(1.2, 0.55, 0.8); canopy.translate(0.3, 0.2, 0);
-  const podL = new THREE.CylinderGeometry(0.42, 0.42, 1.6, 8); podL.rotateZ(Math.PI / 2); podL.translate(-1.4, -0.15, 1.25);
+function carGeometry(low = false) {
+  const body = new THREE.SphereGeometry(1, low ? 8 : 14, low ? 4 : 7); body.scale(2.6, 0.5, 1.15);
+  const canopy = new THREE.SphereGeometry(1, low ? 6 : 10, low ? 2 : 4, 0, Math.PI * 2, 0, Math.PI / 2); canopy.scale(1.2, 0.55, 0.8); canopy.translate(0.3, 0.2, 0);
+  const podL = new THREE.CylinderGeometry(0.42, 0.42, 1.6, low ? 5 : 8); podL.rotateZ(Math.PI / 2); podL.translate(-1.4, -0.15, 1.25);
   const podR = podL.clone(); podR.translate(0, 0, -2.5);
   const glow = new THREE.CylinderGeometry(0.34, 0.34, 0.1, 8); glow.rotateZ(Math.PI / 2);
   const g1 = glow.clone(); g1.translate(-2.22, -0.15, 1.25); const g2 = glow.clone(); g2.translate(-2.22, -0.15, -1.25);
@@ -29,6 +29,12 @@ export function buildTraffic(ctx) {
   // straight corridors crossing the north vista
   for (const [x0, z0, x1, z1, y, sp] of [[-600, -150, 600, -170, 42, 28], [600, -230, -600, -200, 64, 30], [-600, -300, 600, -330, 90, 34], [-80, 400, 60, -700, 55, 30], [120, -700, -100, 400, 38, 26]]) lanes.push({ type: 'line', x0, z0, x1, z1, y, sp });
   const { paint, glow } = addFlyingCars(ctx, lanes, ctx.tier.traffic, R);
+  // distant swarm: many low-poly cars on wide loops and far corridors, so the skyline always has traffic
+  const swarm = [];
+  for (const [r, y, sp] of [[330, 70, 30], [420, 110, -34], [520, 150, 36], [610, 90, -32], [700, 190, 40]]) swarm.push({ type: 'loop', cx: 0, cz: -60, r, y, sp });
+  for (const [z, y, sp] of [[-420, 80, 34], [-520, 125, 38], [-640, 60, 32], [380, 95, 34], [480, 140, 36]]) swarm.push({ type: 'line', x0: -900, z0: z, x1: 900, z1: z - 40, y, sp });
+  for (const [x, y, sp] of [[-380, 100, 34], [360, 70, 30], [-520, 150, 38], [480, 120, 36]]) swarm.push({ type: 'line', x0: x, z0: 800, x1: x + 30, z1: -900, y, sp });
+  addFlyingCars(ctx, swarm, Math.round(ctx.tier.traffic * 1.4), rng(47), { spread: 30, scale: 1.7, low: true, paint, glow });
   const pts = [];
   for (let i = 0; i < 24; i++) {
     const a = i / 24 * Math.PI * 2;
@@ -38,19 +44,19 @@ export function buildTraffic(ctx) {
 }
 
 // lanes: {type:'loop', cx, cz, r, y, sp} | {type:'line', x0, z0, x1, z1, y, sp}; n instanced cars spread over them.
-export function addFlyingCars(ctx, lanes, n, R = rng(31), { spread = 8, scale = 1.4 } = {}) {
+export function addFlyingCars(ctx, lanes, n, R = rng(31), { spread = 8, scale = 1.4, low = false, paint: sharedPaint = null, glow: sharedGlow = null } = {}) {
   const { scene, updaters } = ctx;
   const cars = [];
   for (let i = 0; i < n; i++) {
     const lane = lanes[i % lanes.length];
-    cars.push({ lane, t: R(), off: (R() - 0.5) * spread, dy: (R() - 0.5) * 6, bob: R() * 6 });
+    cars.push({ lane, t: R(), off: (R() - 0.5) * spread, dy: (R() - 0.5) * Math.max(6, spread * 0.6), bob: R() * 6 });
   }
-  const geo = carGeometry();
-  const paint = new THREE.MeshStandardMaterial({ color: 0xf4f5f7, roughness: 0.18, metalness: 0.6, envMapIntensity: 1.2 });
+  const geo = carGeometry(low);
+  const paint = sharedPaint || new THREE.MeshStandardMaterial({ color: 0xf4f5f7, roughness: 0.18, metalness: 0.6, envMapIntensity: 1.2 });
   const glass = new THREE.MeshStandardMaterial({ color: 0x0c1520, roughness: 0.05, metalness: 0.9, envMapIntensity: 1.5 });
-  const glow = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.45, 0.85, 1.0).multiplyScalar(5) });
+  const glow = sharedGlow || new THREE.MeshBasicMaterial({ color: new THREE.Color(0.45, 0.85, 1.0).multiplyScalar(5) });
   const meshes = [new THREE.InstancedMesh(geo.body, paint, n), new THREE.InstancedMesh(geo.glass, glass, n), new THREE.InstancedMesh(geo.glow, glow, n)];
-  for (const m of meshes) { m.frustumCulled = false; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); }
+  for (const m of meshes) { m.name = low ? 'carSwarm' : 'cars'; m.frustumCulled = false; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(m); }
   // car paint variety: a few gold, a few dark
   const cols = [new THREE.Color(0xf4f5f7), new THREE.Color(0xf4f5f7), new THREE.Color(0xe0b060), new THREE.Color(0x2a2e36)];
   for (let i = 0; i < n; i++) meshes[0].setColorAt(i, cols[(R() * cols.length) | 0]);

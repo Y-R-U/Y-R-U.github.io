@@ -1,0 +1,79 @@
+import { createNav } from './nav.js';
+
+const NAMES = { aurum_plaza: 'Aurum Plaza', brightline: 'Brightline Boulevard' };
+const AMBIENT = { aurum_plaza: 'plaza', brightline: 'boulevard' };
+const EMITTERS = { aurum_plaza: [['fountain', 0, 0, 1], ['waterfall', -47, -62, 1], ['waterfall', 66, -96, 1.2], ['fountain', -47, -57, 0.6]], brightline: [['traffic', 0, -60, 0.8], ['crowd', 0, 20, 0.7]] };
+
+// District travel (P2b world API): the Transit Relay interactable, contract-driven hops, and the swap cleanup
+// (player to the relay, strays and mission props cleared, nav rebuilt, sites re-registered with the sim).
+export function createDistricts(G, ctx) {
+  const { world, sim, ui, audio, player, rig } = ctx;
+  let emitters = [];
+  const D = { busy: false };
+
+  function ambience(id) {
+    for (const e of emitters) e?.stop?.();
+    audio.ambient(AMBIENT[id] || 'city');
+    emitters = (EMITTERS[id] || []).map(([k, x, z, level]) => audio.emitter(k, { x, z, level }));
+  }
+
+  function onSwap(w, id) {
+    G.enemies.clear((e) => !e.mission || e.mission !== G.runner.mission?.id);
+    G.props.collectAll(ctx.onLootCollect);
+    G.nav = ctx.nav = createNav(world);
+    G.runner.reset?.();
+    sim.setSites(id, world.sites);
+    const sp = world.spawnPoints.relay || world.spawnPoints.player;
+    const p = ctx.nav.nearest(sp.x, sp.z + 2.5) || sp;
+    player.teleport(p.x, p.z, Math.PI);
+    rig.target.copy(player.pos); rig.snap();
+    ambience(id);
+    G.log?.push?.(`district ${id}`);
+  }
+
+  // hop to another district through the relay tunnel; resolves true when there
+  async function travel(id, { reason = 'relay' } = {}) {
+    if (D.busy || !world.loadDistrict) return false;
+    if (world.district?.id === id) return true;
+    const r = sim.travel(id);
+    if (!r.ok) {
+      ui?.toast(r.reason === 'heat' ? 'Transit Relays locked' : 'District locked', 'bad', { sub: r.reason === 'heat' ? 'Lose some Heat first (4★ locks the relays)' : 'The story opens it' });
+      audio.sfx('ui_deny');
+      return false;
+    }
+    D.busy = true;
+    player.frozen = true;
+    audio.sfx('contract_accept', { vol: 0.6 });
+    try { await world.relayTransition(id, { onSwap }); }
+    catch (e) { console.error('relay failed', e); }
+    player.frozen = false;
+    D.busy = false;
+    ui?.toast(NAMES[id] || id, 'info', { sub: reason === 'contract' ? 'Contract site' : 'Transit Relay' });
+    return true;
+  }
+
+  // the relay kiosk: pick a destination among unlocked districts
+  async function relayMenu() {
+    if (G.runner.active) { ui?.toast('Finish your contract first', 'warn', { sub: 'The relay takes you off the job' }); return; }
+    const here = world.district?.id || 'aurum_plaza';
+    const opts = sim.state.districts.unlocked.filter((d) => d !== here && (world.districts || []).includes(d));
+    if (!opts.length) { ui?.toast('Transit Relay', 'info', { sub: 'Other districts open as the story unfolds' }); return; }
+    const labels = opts.map((d) => NAMES[d] || d).concat('Stay here');
+    const i = await ui.dialogue.show({ speaker: 'Transit Relay', role: 'Nexus Transit', portrait: { kind: 'chrome', seed: 31 }, text: 'Destination?', choices: labels });
+    if (i >= 0 && i < opts.length) travel(opts[i]);
+  }
+
+  // start: build the district the save was in
+  function boot() {
+    const want = sim.state.districts.current;
+    if (want && world.district && want !== world.district.id && world.loadDistrict && (world.districts || []).includes(want)) {
+      world.loadDistrict(want);
+      onSwap(world, want);
+    } else {
+      sim.setSites(world.district?.id || 'aurum_plaza', world.sites);
+      ambience(world.district?.id || 'aurum_plaza');
+    }
+  }
+
+  return { travel, relayMenu, boot, get busy() { return D.busy; }, get id() { return world.district?.id || 'aurum_plaza'; } };
+}

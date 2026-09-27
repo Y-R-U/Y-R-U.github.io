@@ -15,8 +15,10 @@ import { createRunner } from './runner.js';
 import { createHudSync } from './hud.js';
 import { createAutopilot } from './auto.js';
 import { createNav } from './nav.js';
+import { createDistricts } from './districts.js';
 import { createCoach } from './coach.js';
 import { createFrames } from './frames.js';
+import { setSupportedRobotKinds } from '../sim/enemies.js';
 import { createBoss } from './boss.js';
 import { createHeat } from './heat.js';
 
@@ -68,7 +70,7 @@ export async function createGame(api) {
   }
   ui?.on('sfx', (n) => { const k = UI_SFX[n]; if (k) audio.sfx(k, { vol: n === 'toast' ? 0.3 : 0.7 }); });
   audio.ambient('plaza');
-  for (const [k, x, z, level] of EMITTERS) audio.emitter(k, { x, z, level });
+  const titleEmitters = EMITTERS.map(([k, x, z, level]) => audio.emitter(k, { x, z, level }));
   input.onTap = null;
 
   // --- title backdrop: slow drift over the plaza -------------------------------------------------
@@ -82,7 +84,7 @@ export async function createGame(api) {
 
   function setMusic(state) { if (G.music !== state) { G.music = state; audio.music(state); } }
   const panelOpen = () => !!ui?.panel.current;
-  const blocked = () => G.state !== 'free' || panelOpen() || ui?.dialogue.open || overlay.cardOpen || !!G.frames?.busy;
+  const blocked = () => G.state !== 'free' || panelOpen() || ui?.dialogue.open || overlay.cardOpen || !!G.frames?.busy || !!G.districts?.busy;
 
   function project(p) { return G.hud.project(p); }
   function losClear(a, b) {
@@ -249,8 +251,12 @@ export async function createGame(api) {
     ui.on('tap', (s) => tapAt(s.x, s.y));
     ui.on('contract:accept', (c) => {
       if (G.runner.active) { ui.toast('Finish your current contract first', 'warn'); return; }
-      const r = G.runner.accept(c.id);
-      if (r.ok) { log('accepted ' + r.mission.id + ' ' + r.mission.archetype); G.sim.save(); }
+      const b = G.sim.board();
+      const m = b.story?.id === c.id ? b.story : b.cards.find((x) => x.id === c.id);
+      const go = () => { const r = G.runner.accept(c.id); if (r.ok) { log('accepted ' + r.mission.id + ' ' + r.mission.archetype); G.sim.save(); } };
+      // contracts in another district: ride the relay there first
+      if (m && world.districts?.includes(m.district) && m.district !== G.districts.id) { ui.panel.close(); G.districts.travel(m.district, { reason: 'contract' }).then((ok) => ok && go()); }
+      else go();
     });
     ui.on('contract:reroll', () => { const r = G.sim.rerollBoard(); if (r.ok) ui.panel.update(toUiBoard(G.sim)); });
     ui.on('contract:threat', (id) => { if (G.sim.setThreat(id).ok) ui.panel.update(toUiBoard(G.sim)); });
@@ -299,7 +305,7 @@ export async function createGame(api) {
   }
 
   function walkTo(x, z, stopAt = 0.25) {
-    const pts = nav.route(player.pos, { x, z });
+    const pts = (G.nav || nav).route(player.pos, { x, z });
     if (pts) player.setPath(pts, { stopAt }); else player.setTarget({ x, z }, { stopAt });
   }
 
@@ -312,7 +318,7 @@ export async function createGame(api) {
       if (!G.sim.state.flags.kioskDone) { kioskIntro(); return; }
       openContracts();
     } else if (n.id === 'warehouse') openWarehouse();
-    else if (n.id === 'relay') ui?.toast('Transit Relay', 'info', { sub: 'Other districts open as the story unfolds' });
+    else if (n.id === 'relay') G.districts.relayMenu();
   }
 
   // every holo billboard wipes to Harmony's face (art's world.billboards); the sting is the fallback
@@ -412,6 +418,7 @@ export async function createGame(api) {
   // --- session start (after the title) -----------------------------------------------------------
   function startSession(sim) {
     G.sim = sim;
+    if (api.robots?.ROBOT_KINDS) setSupportedRobotKinds(api.robots.ROBOT_KINDS);   // scrap_rat, boss_kettle… are real kinds now
     sim.noAutosave = false;
     const ctx = {
       world, robots: api.robots, sim, fx, audio, ui: ui || inertUi(), tier: api.tier, player, rig, crowd, overlay, story,
@@ -424,7 +431,7 @@ export async function createGame(api) {
       get fighting() { return G.fighting; },
       log, carrying: () => G.carrying,
       onCollateral: (v) => { if (!sim.state.contract) return; sim.reportCollateral(v); ui?.toast(`Collateral −${sim.state.contract.mission.modifiers.includes('collateral') ? v * 2 : v} cr`, 'warn', { ms: 1400, sub: 'Clean bonus lost' }); },
-      onSpotted: (e) => { if (e.watcher || e.heat === 1) { sim.reportSpotted(); if (e.heat === 1 && sim.state.factions.heat <= 1) sim.forceHeat(2); } },
+      onSpotted: (e) => { if (e.watcher) sim.reportSpotted(); },   // the 1★ tail Eye only watches (DESIGN §11.2)
       onBoss: (on) => { G.bossOn = on; setMusic(on ? 'boss' : 'combat'); },
     };
     G.props = ctx.props = createProps(ctx);
@@ -434,6 +441,7 @@ export async function createGame(api) {
     G.runner = ctx.runner = createRunner(ctx);
     G.heat = ctx.heat = createHeat(ctx);
     G.onPlayerHit = (res) => G.runner.playerHit(res);
+    G.districts = ctx.districts = createDistricts(G, ctx);
     G.hud = createHudSync(ctx);
     G.setCarrying = setCarrying;
     G.frames = createFrames(G, { world, robots: api.robots, tier: api.tier, player, fx, audio, ui: ui || null, rig });
@@ -457,6 +465,7 @@ export async function createGame(api) {
     sim.on('rental:fee', (p) => { ui?.toast(`HireFrame shift fee −${p.fee} cr`, 'warn', { sub: p.debt ? `Balance owed: ${p.debt} cr` : 'Rent by the hour!' }); audio.bark('b_hira_fee_', { cooldown: 30 }); log('shift fee ' + p.fee); });
     sim.on('playerDown', () => playerDown('damage over time'));
     sim.on('clue', (p) => log('clue ' + p.id));
+    sim.on('heat', (p) => { if (p.changed || p.added) log(`heat ${p.stars}★${p.added ? ' +' + p.added : ''}`); });
     // restore a mid-contract save by restarting that contract from its first step
     const c = sim.state.contract;
     if (c) {
@@ -471,6 +480,8 @@ export async function createGame(api) {
     player.teleport(sp.x, sp.z, Math.PI);
     rig.fixed = null;
     rig.target.copy(player.pos); rig.snap();
+    for (const e of titleEmitters) e?.stop?.();
+    G.districts.boot();
     G.hud.update(0, { objective: null, interactLabel: null });
     if (window.__game) window.__game.sim = sim;
   }

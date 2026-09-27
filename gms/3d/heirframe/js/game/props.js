@@ -53,6 +53,8 @@ export function createProps(ctx) {
   }
   // area damage from the player: breaks collateral within r of (x,z)
   function splash(x, z, r, dmg) {
+    // the district's own breakables (P2b world.breakables: crates, vending, holo stands)
+    for (const b of world.breakables?.splash?.(x, z, r, dmg) || []) ctx.onCollateral && ctx.onCollateral(b.value || 30, b);
     for (let i = breakables.length - 1; i >= 0; i--) {
       const b = breakables[i];
       if (Math.hypot(b.pos.x - x, b.pos.z - z) > r + 0.5) continue;

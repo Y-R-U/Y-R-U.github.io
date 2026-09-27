@@ -196,7 +196,8 @@ export function buildCanyon(ctx, L) {
   // west: the huge curved "A BRIGHTER FUTURE TOGETHER" over the canopy (bulges into the street, faces north-east)
   const bb = L.billboard;
   const bbGeo = new THREE.CylinderGeometry(bb.r, bb.r, bb.h, 40, 1, true, bb.th0, bb.th1 - bb.th0);
-  const bbMesh = new THREE.Mesh(bbGeo, createHoloMaterial(HOLO_ART.brighter(), { bright: 2.2, alpha: 0.96, time }));
+  const brReel = HOLO_ART.reel('brighter');
+  const bbMesh = new THREE.Mesh(bbGeo, createHoloMaterial(brReel.canvas, { bright: 2.2, alpha: 0.96, time, reel: { ...brReel, hold: 8 } }));
   bbMesh.position.set(bb.cx, bb.y + bb.h / 2, bb.cz); bbMesh.layers.enable(REFLECT_LAYER); bbMesh.renderOrder = 2;
   scene.add(bbMesh); registerBillboard(ctx, bbMesh.material, 1024, 512);
   const fm = new THREE.Matrix4().makeTranslation(bb.cx, 0, bb.cz);
@@ -216,8 +217,10 @@ export function buildCanyon(ctx, L) {
   P(ctx, box(1.2, 0.4, 23.8), M.gold, V(39.8, 45.2, -93), 0.05, { cast: false });
   P(ctx, box(1.2, 0.4, 23.8), M.gold, V(39.8, -1.2, -93), 0.05, { cast: false });
   // south-facing boards for the reverse view
+  let ph = 0;
   const wide = (art, x, y, zz, w, h, ry) => {
-    const m2 = new THREE.Mesh(new THREE.PlaneGeometry(w, h), createHoloMaterial(art, { bright: 2.0, alpha: 0.96, time }));
+    const r = HOLO_ART.reel(art, 0.5);
+    const m2 = new THREE.Mesh(new THREE.PlaneGeometry(w, h), createHoloMaterial(r.canvas, { bright: 2.0, alpha: 0.96, time, reel: { ...r, hold: 9, phase: (ph += 1.37) } }));
     m2.position.set(x, y, zz); m2.rotation.y = ry; m2.layers.enable(REFLECT_LAYER); scene.add(m2);
     registerBillboard(ctx, m2.material, 1024, 512);
     P(ctx, box(w + 1, h + 1, 0.8), M.darkMetal, V(x - Math.sin(ry) * 0.5, y, zz - Math.cos(ry) * 0.5), ry, { cast: false });
@@ -274,6 +277,10 @@ export function buildCanyon(ctx, L) {
   }
   for (const [zz, y, sp] of [[-210, 70, 30], [-330, 52, 28], [200, 60, 26]]) lanes.push({ type: 'line', x0: -700, z0: zz, x1: 700, z1: zz + 20, y, sp });
   const cars = addFlyingCars(ctx, lanes, Math.round(ctx.tier.traffic * 0.8), rng(31), { spread: 5, scale: 1.3 });
+  const swarm = [];
+  for (const [zz, y, sp] of [[-420, 90, 34], [-520, 130, 36], [-640, 70, 32], [-760, 160, 38], [420, 100, 34], [560, 140, 36]]) swarm.push({ type: 'line', x0: -900, z0: zz, x1: 900, z1: zz - 30, y, sp });
+  for (const [x, y, sp] of [[-160, 80, 32], [-240, 130, 36], [200, 90, -34], [300, 150, -38], [-40, 140, 40], [50, 170, -36]]) swarm.push(sp > 0 ? { type: 'line', x0: x, z0: 700, x1: x, z1: -1000, y, sp } : { type: 'line', x0: x, z0: -1000, x1: x, z1: 700, y, sp: -sp });
+  addFlyingCars(ctx, swarm, Math.round(ctx.tier.traffic * 1.3), rng(47), { spread: 24, scale: 1.6, low: true, paint: cars.paint, glow: cars.glow });
   const mono = new THREE.CatmullRomCurve3([[34, 19, 520], [30, 19, 260], [27, 19, 90], [26, 20, -20], [22, 21, -85], [2, 22, -140], [-40, 24, -200], [-110, 26, -300], [-190, 28, -420]]
     .map((p) => new THREE.Vector3(...p)), false);
   addMonorail(ctx, mono, { paint: cars.paint, glow: cars.glow, pylons: 20, pylonY0: Y0, cars: 4, trains: 2, speed: 24, far: true, steps: 260 });

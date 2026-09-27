@@ -54,6 +54,52 @@ function ui(x, w, h, R) {
   x.strokeRect(12, 12, w - 24, h - 24);
 }
 const rngLite = (s) => () => (s = (s * 16807) % 2147483647) / 2147483647;
+function aureliaAd(x, w, h) {
+  const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#2a1a04'); g.addColorStop(0.55, '#120a02'); g.addColorStop(1, '#040302');
+  x.fillStyle = g; x.fillRect(0, 0, w, h);
+  const sh = x.createRadialGradient(300, 230, 20, 300, 230, 330); sh.addColorStop(0, 'rgba(255,200,110,0.35)'); sh.addColorStop(1, 'rgba(255,200,110,0)');
+  x.fillStyle = sh; x.fillRect(0, 0, w, h);
+  // gold robot bust: head, neck, shoulders, chest plates, lit optics
+  const gold = (y0, y1) => { const q = x.createLinearGradient(180, y0, 420, y1); q.addColorStop(0, '#fff0b8'); q.addColorStop(0.35, '#f2c25a'); q.addColorStop(0.7, '#8a5a12'); q.addColorStop(1, '#f7d27a'); return q; };
+  x.fillStyle = gold(60, 460);
+  x.beginPath(); x.ellipse(300, 170, 78, 96, 0, 0, 7); x.fill();
+  x.fillRect(272, 250, 56, 50);
+  x.beginPath(); x.moveTo(120, 470); x.quadraticCurveTo(140, 320, 230, 300); x.lineTo(370, 300); x.quadraticCurveTo(460, 320, 480, 470); x.closePath(); x.fill();
+  x.strokeStyle = 'rgba(40,22,2,0.8)'; x.lineWidth = 3;
+  x.beginPath(); x.moveTo(300, 305); x.lineTo(300, 470); x.moveTo(230, 330); x.quadraticCurveTo(300, 380, 370, 330); x.stroke();
+  x.beginPath(); x.moveTo(236, 150); x.quadraticCurveTo(300, 128, 364, 150); x.stroke();
+  x.fillStyle = '#0a0602'; x.fillRect(244, 150, 112, 26);
+  x.shadowColor = '#7fe0ff'; x.shadowBlur = 18; x.fillStyle = '#bff0ff';
+  x.fillRect(258, 158, 34, 9); x.fillRect(308, 158, 34, 9); x.shadowBlur = 0;
+  x.fillStyle = 'rgba(255,250,230,0.85)'; x.beginPath(); x.ellipse(262, 110, 12, 30, -0.5, 0, 7); x.fill();
+  glowText(x, 'AURELIA', 560, 200, 88, 300, 14, '#fff1cf');
+  glowText(x, 'THE GOLD STANDARD', 564, 262, 30, 400, 8, '#ffd889');
+  x.fillStyle = 'rgba(255,210,120,0.8)'; x.fillRect(566, 292, 340, 3);
+  glowText(x, 'SERIES VI FRAMES • NOW IN HALCYON', 564, 336, 20, 400, 5, '#ffe6b8');
+}
+function skylineAd(x, w, h) {
+  const sky = x.createLinearGradient(0, 0, 0, h); sky.addColorStop(0, '#0b3a78'); sky.addColorStop(0.55, '#6fb4ee'); sky.addColorStop(0.8, '#ffd8a0'); sky.addColorStop(1, '#ff9a50');
+  x.fillStyle = sky; x.fillRect(0, 0, w, h);
+  x.fillStyle = 'rgba(255,245,225,0.9)'; x.beginPath(); x.arc(760, 120, 46, 0, 7); x.fill();
+  const R = rngLite(23);
+  for (let layer = 0; layer < 3; layer++) {
+    const base = h * (0.62 + layer * 0.12), col = ['#5a86b8', '#2e5480', '#10243e'][layer];
+    x.fillStyle = col;
+    for (let bx = -10; bx < w; bx += 18 + R() * 40) {
+      const bw = 14 + R() * 34, bh = (60 + R() * 220) * (1.2 - layer * 0.3);
+      x.fillRect(bx, base - bh, bw, bh + 200);
+      if (R() < 0.35) { x.beginPath(); x.moveTo(bx, base - bh); x.lineTo(bx + bw / 2, base - bh - 30 - R() * 50); x.lineTo(bx + bw, base - bh); x.fill(); }
+      if (layer === 2) { x.fillStyle = 'rgba(255,215,150,0.8)'; for (let k = 0; k < 6; k++) x.fillRect(bx + 3 + R() * (bw - 6), base - bh + 8 + R() * bh, 3, 3); x.fillStyle = col; }
+    }
+  }
+  x.fillStyle = 'rgba(255,255,255,0.9)';
+  for (let i = 0; i < 9; i++) { const cx = 60 + R() * 900, cy = 60 + R() * 170; x.beginPath(); x.ellipse(cx, cy, 9, 2.5, 0, 0, 7); x.fill(); }
+  const shade = x.createLinearGradient(0, 0, w, 0); shade.addColorStop(0, 'rgba(3,12,30,0.75)'); shade.addColorStop(0.55, 'rgba(3,12,30,0)');
+  x.fillStyle = shade; x.fillRect(0, 0, w, h);
+  glowText(x, 'LIVE ABOVE', 60, 150, 64, 300, 10, '#f2fbff');
+  glowText(x, 'THE CLOUDS', 60, 222, 64, 300, 10, '#f2fbff');
+  glowText(x, 'SKYLINE RESIDENCES • HALCYON', 62, 272, 22, 400, 5, '#bfe8ff');
+}
 
 export const HOLO_ART = {
   brighter() {
@@ -187,6 +233,35 @@ export const HOLO_ART = {
     glowText(x, sub, 482, 335, 28, 300, 6, '#9fd8ff');
     return c;
   },
+  // Big-board ad reel: `frames` 1024x512 ads stacked top to bottom + a 1024x64 news ticker strip at the bottom.
+  // createHoloMaterial(canvas, { reel: { frames } }) cycles them with a wipe and scrolls the ticker (no redraws).
+  reel(first = 'brighter', scale = 1, ticker = 'HALCYON CIVIC NEWS  •  TRANSIT RELAYS ON SCHEDULE  •  AIR QUALITY 99.2%  •  HARMONY INDEX ▲ 0.4  •  NEW AURELIA FRAMES IN STORE  •  ') {
+    const W = 1024, H = 512, TH = 64, list = [first, 'aurelia', 'skyline', first === 'brighter' ? 'harmony' : 'brighter'];
+    const c = makeCanvas(W, H * list.length + TH), x = c.getContext('2d');
+    list.forEach((k, i) => {
+      x.save(); x.translate(0, i * H); x.beginPath(); x.rect(0, 0, W, H); x.clip();
+      if (typeof k !== 'string') x.drawImage(k, 0, 0, W, H);
+      else if (k === 'brighter') x.drawImage(HOLO_ART.brighter(), 0, 0);
+      else if (k === 'harmony') x.drawImage(HOLO_ART.wide('HARMONY', 'ONE CITY • ONE MIND', 12, '#0c3a70', true), 0, 0);
+      else if (k === 'aurelia') aureliaAd(x, W, H);
+      else skylineAd(x, W, H);
+      // ticker band backing (the shader scrolls the strip into it)
+      x.fillStyle = 'rgba(2,10,24,0.85)'; x.fillRect(0, H * 0.9, W, H * 0.1);
+      x.fillStyle = 'rgba(140,215,255,0.8)'; x.fillRect(0, H * 0.9, W, 2);
+      x.restore();
+    });
+    x.save(); x.translate(0, H * list.length);
+    x.fillStyle = '#030d1c'; x.fillRect(0, 0, W, TH);
+    let size = 34; x.font = `500 ${size}px ${FONT}`;
+    let t = ticker; while (x.measureText(t + ticker).width < W) t += ticker;
+    const tw = x.measureText(t).width;
+    x.setTransform(W / tw, 0, 0, 1, 0, H * list.length);
+    glowText(x, t, 0, TH * 0.7, size, 500, 0, '#dff4ff');
+    x.restore();
+    let out = c;
+    if (scale < 1) { out = makeCanvas(W * scale, c.height * scale); out.getContext('2d').drawImage(c, 0, 0, out.width, out.height); }
+    return { canvas: out, frames: list.length, tick: TH / c.height };
+  },
   // Shop fascia names stacked in rows (one texture, one mesh for a whole street of signs).
   signAtlas(names, w = 1024, rowH = 128) {
     const c = makeCanvas(w, rowH * names.length), x = c.getContext('2d');
@@ -207,32 +282,50 @@ export const HOLO_ART = {
   },
 };
 
-export function createHoloMaterial(canvas, { bright = 2.4, alpha = 0.92, tint = [0.8, 0.95, 1.1], time, cols = 1, side = THREE.DoubleSide } = {}) {
+export function createHoloMaterial(canvas, { bright = 2.4, alpha = 0.92, tint = [0.8, 0.95, 1.1], time, cols = 1, side = THREE.DoubleSide, reel = null } = {}) {
   const tex = canvasTexture(canvas);
   tex.anisotropy = 4;
   const m = new THREE.ShaderMaterial({
     uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {
       map: { value: null }, map2: { value: null }, uMix: { value: 0 }, uCols: { value: cols },
       uBright: { value: bright }, uAlpha: { value: alpha }, uTint: { value: new THREE.Vector3(...tint) }, uTime: { value: 0 },
+      uReel: { value: new THREE.Vector4(reel?.frames || 1, reel?.hold || 7, reel?.phase || 0, reel?.tick || 0) },
     }]),
     vertexShader: /* glsl */`
       varying vec2 vUv;
+      attribute float aPhase;
+      varying float vPhase;
       #include <fog_pars_vertex>
       void main() {
-        vUv = uv;
+        vUv = uv; vPhase = aPhase;
         vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
         gl_Position = projectionMatrix * mvPosition;
         #include <fog_vertex>
       }`,
     fragmentShader: /* glsl */`
       uniform sampler2D map, map2; uniform float uBright, uAlpha, uTime, uMix, uCols; uniform vec3 uTint;
+      uniform vec4 uReel;
       varying vec2 vUv;
+      varying float vPhase;
       #include <fog_pars_fragment>
       void main() {
         vec2 uv = vUv;
         float glitch = step(0.985, fract(sin(floor(uTime * 3.0) * 91.7) * 43758.5)) * step(abs(uv.y - fract(uTime * 0.37)), 0.03);
         uv.x += glitch * 0.01;
-        vec3 c = texture2D( map, uv ).rgb;
+        vec3 c;
+        #ifdef REEL
+        {
+          // frame f holds, then the next one wipes in from the top; the bottom 10% scrolls the news strip
+          float fh = ( 1.0 - uReel.w ) / uReel.x, tt = uTime / uReel.y + uReel.z + vPhase;
+          float f = mod( floor( tt ), uReel.x ), k = fract( tt ), wp = smoothstep( 0.9, 1.0, k ) * 1.1;
+          float nx = step( 1.0 - vUv.y, wp );
+          vec2 ra = vec2( uv.x, 1.0 - ( f + 1.0 - uv.y ) * fh ), rb = vec2( uv.x, 1.0 - ( mod( f + 1.0, uReel.x ) + 1.0 - uv.y ) * fh );
+          c = mix( texture2D( map, ra ).rgb, texture2D( map, rb ).rgb, nx ) + vec3( 0.4, 0.75, 1.0 ) * smoothstep( 0.025, 0.0, abs( 1.0 - vUv.y - wp ) ) * step( wp, 1.0 ) * step( 0.001, wp );
+          if ( vUv.y < 0.085 && vUv.y > 0.012 ) c = texture2D( map, vec2( fract( uv.x + uTime * 0.035 ), uReel.w * ( vUv.y - 0.012 ) / 0.073 ) ).rgb;
+        }
+        #else
+        c = texture2D( map, uv ).rgb;
+        #endif
         if ( uMix > 0.001 ) {
           // the takeover rolls in as a bright wipe from the top
           float w = smoothstep( uMix * 1.2 - 0.2, uMix * 1.2, 1.0 - vUv.y );
@@ -249,6 +342,7 @@ export function createHoloMaterial(canvas, { bright = 2.4, alpha = 0.92, tint = 
       }`,
     transparent: true, depthWrite: false, side, fog: true,
   });
+  if (reel) m.defines = { REEL: '' };
   m.uniforms.map.value = tex;
   m.uniforms.map2.value = tex;
   if (time) m.uniforms.uTime = time;
@@ -302,3 +396,55 @@ export function twoSided(mesh) {
 
 // Floating signs that turn (about Y) to face the camera, so the free camera never reads them mirrored.
 export function faceCamera(ctx, mesh) { (ctx.faceCam ||= []).push(mesh); }
+
+// Holo ad screens stuck to tower faces around the play area: rays from `origins` find flat, facing glass 25–120 m away.
+// Every screen is one quad of a single merged mesh on a shared half-res ad reel (one draw call, per-screen phase).
+export function addTowerAds(ctx, origins, { count = 8, seed = 3, first = 'aurelia', mats = ['facade', 'facadeWarm'] } = {}) {
+  const targets = [];
+  ctx.scene.traverse((o) => { if (o.isMesh && !o.isInstancedMesh && mats.includes(o.material?.name)) targets.push(o); });
+  if (!targets.length) return null;
+  ctx.scene.updateMatrixWorld(true);
+  const ray = new THREE.Raycaster(), R = rngLite(seed * 7919 + 1), dir = new THREE.Vector3(), o = new THREE.Vector3();
+  const hitAt = (p, d) => { ray.set(p, d); ray.far = 140; return ray.intersectObjects(targets, false)[0]; };
+  const placed = [], pos = [], uv = [], ph = [], idx = [];
+  for (let t = 0; t < count * 30 && placed.length < count; t++) {
+    const [ox, oz] = origins[t % origins.length];
+    const a = R() * Math.PI * 2, y = 14 + R() * 30;
+    o.set(ox, y, oz); dir.set(Math.sin(a), (R() - 0.5) * 0.15, Math.cos(a)).normalize();
+    const h = hitAt(o, dir);
+    if (!h || h.distance < 25 || !h.face) continue;
+    const n = h.face.normal.clone().transformDirection(h.object.matrixWorld);
+    if (Math.abs(n.y) > 0.05 || n.dot(dir) > -0.75) continue;
+    const w = 9 + R() * 7, hh = w / 2;
+    const right = new THREE.Vector3(n.z, 0, -n.x).normalize(), c = h.point.clone().addScaledVector(n, 0.35);
+    if (placed.some((q) => q.distanceTo(c) < w * 1.4)) continue;
+    // all four corners must sit on the same wall
+    let ok = true;
+    for (const [sx, sy] of [[-0.55, -0.55], [0.55, -0.55], [0.55, 0.55], [-0.55, 0.55]]) {
+      const p0 = c.clone().addScaledVector(right, sx * w).add(new THREE.Vector3(0, sy * hh, 0)).addScaledVector(n, 3);
+      const q = hitAt(p0, n.clone().negate());
+      if (!q || Math.abs(q.distance - 3.35) > 0.25) { ok = false; break; }
+    }
+    if (!ok) continue;
+    placed.push(c);
+    const k = pos.length / 3, phase = R() * 4;
+    for (const [sx, sy, u, v] of [[-0.5, -0.5, 0, 0], [0.5, -0.5, 1, 0], [0.5, 0.5, 1, 1], [-0.5, 0.5, 0, 1]]) {
+      const p = c.clone().addScaledVector(right, sx * w).add(new THREE.Vector3(0, sy * hh, 0));
+      pos.push(p.x, p.y, p.z); uv.push(u, v); ph.push(phase);
+    }
+    idx.push(k, k + 1, k + 2, k, k + 2, k + 3);
+  }
+  if (!placed.length) return null;
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setAttribute('aPhase', new THREE.Float32BufferAttribute(ph, 1));
+  g.setIndex(idx); g.computeBoundingSphere();
+  const r = HOLO_ART.reel(first, 0.5);
+  const mesh = new THREE.Mesh(g, createHoloMaterial(r.canvas, { bright: 2.1, alpha: 0.94, time: ctx.time, side: THREE.FrontSide, reel: { ...r, hold: 8 } }));
+  mesh.name = 'towerAds';
+  ctx.scene.add(mesh);
+  registerBillboard(ctx, mesh.material, 1024, 512);
+  ctx.stats.towerAds = placed.length;
+  return mesh;
+}

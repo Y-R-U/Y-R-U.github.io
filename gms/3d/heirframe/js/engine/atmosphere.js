@@ -16,7 +16,9 @@ const c3 = (c) => `vec3(${c.r.toFixed(4)},${c.g.toFixed(4)},${c.b.toFixed(4)})`;
 // Height + distance fog with sun in-scattering, patched into every built-in material.
 export function installFog() {
   const C = THREE.ShaderChunk;
-  const old = /[?&]haze=old/.test(location.search) ? '#define HF_HAZE_OLD\n' : '';
+  const farQ = /[?&]far=([\d.]+)/.exec(location.search);
+  const far = farQ ? +farQ[1] : 0.35;
+  const old = (/[?&]haze=old/.test(location.search) ? '#define HF_HAZE_OLD\n' : '') + (far > 0 ? `#define HF_FAR_RICH ${far.toFixed(3)}\n#define HF_FAR_IN ${(+(/[?&]farin=([\d.]+)/.exec(location.search)?.[1] ?? 0.65)).toFixed(3)}\n` : '');
   C.fog_pars_vertex = `#ifdef USE_FOG
   varying float vFogDepth;
   varying vec3 vFogWorldPos;
@@ -58,6 +60,10 @@ export function installFog() {
     // aerial perspective: per-channel extinction (blue goes first) + sky in-scatter, so far mass turns blue-grey and
     // loses contrast while near stays crisp; thins with height like the fog. Kicks in past ~25 m.
     vec3 aT = exp( -max( optical - 25.0, 0.0 ) * vec3( 0.0011, 0.0014, 0.0019 ) * uAerial );
+#ifdef HF_FAR_RICH
+    // sunlit cream/glass at 40-150 m otherwise lands at the sky's value (milky); push it cooler and darker first
+    gl_FragColor.rgb *= mix( vec3( 1.0 ), fogColor / max( fogColor.b, 0.01 ) * HF_FAR_RICH, smoothstep( 30.0, 110.0, fd ) );
+#endif
 #ifdef HF_HAZE_OLD
     gl_FragColor.rgb = gl_FragColor.rgb * aT + mix( fogColor * vec3( 0.6, 0.71, 0.9 ), fcol * 0.85, sunAmt ) * ( 1.0 - aT );
     gl_FragColor.rgb = mix( gl_FragColor.rgb, fcol, fogAmt );
@@ -65,6 +71,9 @@ export function installFog() {
     // distance recedes into a clear mid blue-grey (darker than the sky behind it) instead of whitening; the sun side
     // only warms it a little, so far towers keep their silhouettes against the bright horizon
     vec3 inS = mix( fogColor * vec3( 0.52, 0.64, 0.86 ), fcol * 0.62, sunAmt * 0.55 );
+#ifdef HF_FAR_RICH
+    inS *= HF_FAR_IN;
+#endif
     gl_FragColor.rgb = gl_FragColor.rgb * aT + inS * ( 1.0 - aT );
     gl_FragColor.rgb = mix( gl_FragColor.rgb, mix( fogColor * vec3( 0.74, 0.84, 1.0 ), fcol * 0.8, sunAmt * 0.5 ), fogAmt );
 #endif

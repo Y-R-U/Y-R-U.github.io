@@ -241,6 +241,8 @@ const CROWD = {
 
 export const BRIGHTLINE = {
   id: 'brightline', name: 'Brightline Boulevard', layout: BL_LAYOUT, bounds: BL_LAYOUT.bounds, build: buildBrightline, crowd: CROWD, batchCell: 96,
+  adOrigins: [[0, -80], [0, -20], [0, 40], [0, 90]], adCount: 10,
+  farLanes: [[-20, 12, -330, -110, 0], [-20, 12, 105, 330, 0]],
   ambience: {
     sun: [1.0, 0.9, 0.78], sunI: 3.6, hemiSky: 0xa8c8ff, hemiGround: 0x3c4450, hemiI: 0.26,
     fog: [0.50, 0.60, 0.74], fogDensity: 0.0006, env: 0.8,

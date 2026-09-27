@@ -187,6 +187,7 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
       meshMats = mergedMaterial(i === 1 || quality === 'low');
       if (flashT <= 0) mesh.material = meshMats;
     },
+    get phase() { return ctx.move.phase; },
     get state() { return { base, action: act && act.name, dead: !!(act && act.name === 'die'), speed: ctx.move.v }; },
 
     play(name, { loop, speed = 1, fade: f = 0.15 } = {}) {

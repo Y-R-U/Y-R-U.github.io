@@ -16,7 +16,7 @@ import { buildTraffic } from './traffic.js';
 import { buildSites } from './sites.js';
 import { buildFurnish } from './furnish.js';
 import { buildBackdrop } from './backdrop.js';
-import { createBillboards } from './holo.js';
+import { createBillboards, addTowerAds } from './holo.js';
 import { swayFoliage, fadeMaterial, makeLeafAtlas, createLeafMaterial, FADE_GLSL } from './foliage.js';
 import { D2R } from './geo.js';
 import { bakeGroundAO, MAX_CONTACTS } from './groundao.js';
@@ -24,6 +24,7 @@ import { LIVE_ROBOTS } from '../actors/robots.js';
 import { BRIGHTLINE } from './brightline.js';
 import { createRelayFx } from '../fx/relay.js';
 import { createBreakables } from './breakables.js';
+import { bakeCrowdAtlas, createFarCrowdMaterial, addFarCrowd } from './farcrowd.js';
 
 export const LAYOUT = {
   bounds: { x0: -58, x1: 47.5, z0: -97, z1: 79 },
@@ -116,6 +117,9 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
   M.leaves.name = 'leaves';
   // anything tall enough to stand between the camera and the player dithers away around them
   for (const k of ['bark', 'chrome', 'darkMetal', 'gold', 'stone', 'stoneUpper', 'glassRail', 'canopyA', 'warmGlow', 'blueGlow', 'facade', 'facadeWarm', 'shopGlow', 'uber']) fadeMaterial(M[k], fade, { a2c: tier.msaa > 0 });
+  const farN = /[?&]nofar/.test(location.search) ? 0 : tier.farCrowd || 0;
+  const farAtlas = farN ? bakeCrowdAtlas(renderer, scene.environment) : null;
+  if (farAtlas) { M.farCrowd = createFarCrowdMaterial(farAtlas.texture, time, { a2c: tier.msaa > 0 }); M.farCrowd.userData.atlas = farAtlas; }
   const col = createCollision(LAYOUT.bounds);
   const jetMaterial = createJetMaterial(time);
   const makePadRing = (r, c, busy) => createPadRing(time, r, c, busy);
@@ -181,7 +185,9 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
       jetMaterial, makePadRing,
     };
     def.build(ctx, progress);
+    if (M.farCrowd) addFarCrowd(ctx, M.farCrowd, farN, { extra: def.farLanes || [] });
     const built = ctx.batch.build(group);
+    if (!/[?&]noads/.test(location.search)) addTowerAds(ctx, def.adOrigins || [[0, 0], [0, 30], [-20, -30], [20, -40]], { count: def.adCount || 8 });
     // holo signs/posters fade out (alpha) instead of dithering
     group.traverse((o) => {
       const m = o.material;

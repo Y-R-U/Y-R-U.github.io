@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { box, cyl, arcWall, arcTube, lathe } from './geo.js';
 import { addTree } from './foliage.js';
 import { HOLO_ART, createHoloMaterial, registerBillboard } from './holo.js';
+
+let R0;
 import { createWaterfall, createWaterMaterial, createMist } from './water.js';
 import { REFLECT_LAYER } from '../fx/reflection.js';
 
@@ -59,7 +61,7 @@ export function buildBlocks(ctx) {
   const bbR = 26, bbA = 0.62;
   const bbGeo = new THREE.CylinderGeometry(bbR, bbR, 9, 32, 1, true, Math.PI - bbA / 2, bbA);
   { const uv = bbGeo.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setX(i, 1 - uv.getX(i)); }
-  const bbMesh = new THREE.Mesh(bbGeo, createHoloMaterial(HOLO_ART.brighter(), { bright: 2.1, alpha: 0.95, time }));
+  const bbMesh = new THREE.Mesh(bbGeo, createHoloMaterial((R0 = HOLO_ART.reel('brighter')).canvas, { bright: 2.1, alpha: 0.95, time, reel: { ...R0, hold: 8 } }));
   bbMesh.layers.enable(REFLECT_LAYER);
   registerBillboard(ctx, bbMesh.material, 1024, 576);
   bb.add(bbMesh);

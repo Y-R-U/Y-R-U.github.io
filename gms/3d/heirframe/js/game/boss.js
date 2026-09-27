@@ -10,7 +10,7 @@ const KETTLE_PAINT = {
   mech: { color: 0x2a2320, metal: 0.8, rough: 0.4 }, glow: 0xff7a20, eye: 0xffb040,
 };
 const SCRIPT = {
-  big_kettle: { paint: KETTLE_PAINT, scale: 1.18, title: 'Silverhand Captain', lines: { spawn: 'a1_s10_kettle_02', phase: 'a1_s11_kettle_01', down: 'a1_s11_kettle_02' } },
+  big_kettle: { paint: KETTLE_PAINT, scale: 1.08, title: 'Silverhand Captain', lines: { spawn: 'a1_s10_kettle_02', phase: 'a1_s11_kettle_01', down: 'a1_s11_kettle_02' } },
 };
 
 export function createBoss(ctx) {
@@ -19,9 +19,20 @@ export function createBoss(ctx) {
   let B = null;
   const line = (key) => (ctx.bossLine ? ctx.bossLine(key, 'kettle') : audio.vo(key));
 
+  function spawnStandIn(def, x, z, R, sc) {
+    const e = enemies.spawn({ defId: def.defId, level: def.level || R.mission.level, name: def.name }, x, z, { hostile: true, paint: sc.paint, scale: sc.scale || 1.25 });
+    return setup(e, def, sc, R, x, z);
+  }
+
   function spawn(def, x, z, R) {
     const sc = SCRIPT[def.defId] || {};
-    const e = enemies.spawn({ defId: def.defId, rank: undefined, level: def.level || R.mission.level, name: def.name }, x, z, { hostile: true, paint: sc.paint, scale: sc.scale || 1.25 });
+    const e = enemies.spawn({ defId: def.defId, rank: undefined, level: def.level || R.mission.level, name: def.name }, x, z, { hostile: true, scale: sc.scale || 1.25 });
+    // the stand-in enforcer gets the copper livery; the real boss_kettle brings its own boiler
+    if (e.c.robotKind !== 'boss_kettle' && sc.paint) { enemies.clear((o) => o === e); return spawnStandIn(def, x, z, R, sc); }
+    return setup(e, def, sc, R, x, z);
+  }
+
+  function setup(e, def, sc, R, x, z) {
     e.mission = R.mission.id; e.hunter = true; e.isBoss = true;
     const c = e.c;
     B = { e, c, def, sc, phase: 0, phases: c.phases || [0.5], ventT: 5, addsDone: false, steamT: 0, downT: 0, t: 0 };
@@ -44,6 +55,7 @@ export function createBoss(ctx) {
     B.t += dt;
     // steam: constant venting from the boiler, heavier in phase 2
     if ((B.steamT -= dt) <= 0) { B.steamT = B.phase ? 0.08 : 0.2; fx.sparks(v.set(e.pos.x - Math.sin(e.yaw) * 0.6, e.pos.y + 2.4 * e.bot.root.scale.y, e.pos.z - Math.cos(e.yaw) * 0.6), 0xf0e6dc, 1, 2.5); }
+    if (B.phase === 1 && (B.puffT = (B.puffT || 3) - dt) <= 0) { B.puffT = 2 + Math.random() * 2; e.bot.steam?.(0.8); }
     if (B.phase === 0 && c.hp < c.stats.hp * B.phases[0]) phase2(e);
     return false;
   }
@@ -55,6 +67,7 @@ export function createBoss(ctx) {
     if (B.sc.lines?.phase) line(B.sc.lines.phase);
     audio.sfx('alarm', { vol: 0.5 });
     fx.ring(e.pos, 6, 0xff5020, 0.7);
+    e.bot.steam?.(2);
     fx.flash(v.set(e.pos.x, e.pos.y + 2, e.pos.z), 2, 0xff7a20, 0.25);
     ctx.rig.shake = Math.max(ctx.rig.shake, 0.3);
     addStatus(c, { id: 'boil', t: 999, moveMult: 1.2, dmgMult: 1.15, atkSpeedMult: 1.2 });

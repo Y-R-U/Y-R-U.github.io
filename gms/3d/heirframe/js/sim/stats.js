@@ -302,7 +302,7 @@ export function resolveHit(attacker, defender, skill, rng, opts = {}) {
   for (const s of defender.statuses) if (s.dmgTakenMult) dmg *= s.dmgTakenMult;
   if (opts.frontal) {
     const fr = Math.max(D.frontalDR || 0, ...defender.statuses.map(s => s.frontalDR || 0));
-    if (fr) { dmg *= 1 - fr; res.blocked = true; }
+    if (fr) { dmg *= 1 - fr * (opts.frontalScale ?? 1); res.blocked = true; }
   }
   dmg *= 1 - (D.resist?.[element] || 0);
 

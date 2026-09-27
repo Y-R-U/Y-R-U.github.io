@@ -410,3 +410,80 @@ patches the shared marble once; crowd.js per-district loops/talk spots + `onDist
 5. `?haze=old` A/B flag for Aaron on the S22 (the haze change affects both districts).
 6. Gameplay agent wiring (see API above): relay interactable → `relayTransition`, nav/sites/enemy cleanup on
    `onDistrict`, Kettle `steam()` on phase changes, drop-pod in the frame swap, breakables → collateral/loot.
+
+## Round 4 (art agent #6, 2026-09-27) — IN PROGRESS
+Brief: re-judge P2b's lit-window dimming (both districts), mid-distance life (impostor far crowds, more sky traffic),
+richer animated billboards, Aurum's milky distance, blind critic before/after. Harness: scratchpad `art/r4/`
+(`vset.sh prefix [query]` = 7 critic views both districts, `cam.sh`, `camexp.sh`, `sheet.py` blind 3x2 sheet builder,
+`cost.mjs` = r3 cost harness + `nofar` toggle). Chrome on port 9302 (`../shot.mjs` default port changed to 9302).
+- **Critic C0 (before, answer key `art/r4/critic/key_c0.txt`)**: Brightline eye 5, vista 5, gameplay 2; Aurum vista 5,
+  gameplay 3, eye-level 6 (avg 4.3; refs 10). Named: milky/washed distance in BOTH districts (towers fade to white-blue,
+  no silhouettes/lights), gameplay frame = empty floor, tiny sparse uniform crowd, few signs/flyers.
+- **Lit windows (materials.js facadeGlass)**: judged P2b's dimming: old (`?win=old`) = bright white slabs, P2b
+  (`?win=p2b`) = better but the warm cells still read as flat tan "blank" panels. NEW default: lit cells are interiors
+  (dark glass, metalness 0.25, ceiling light line + warm/cool falloff, 2 panes per cell), 3.5% warm + 1.2% cool. Both
+  districts checked (`art/r4/w_crop.png`). Cost: same shader, a few ALU.
+- **Far richness (atmosphere.js fog chunk, `HF_FAR_RICH`)**: past 30→110 m surfaces are multiplied toward a darker,
+  cooler tint derived from the district fog colour (×0.35 at full distance) and the aerial in-scatter ×0.65, before
+  the haze. Foreground untouched. `?far=0` disables, `?far=K&farin=K2` tunes (defaults 0.35 / 0.65). `art/r4/g_grid.png`.
+- **Far crowd (NEW `js/world/farcrowd.js`)**: impostor atlas baked at load (~40 ms) from the real civ robots
+  (gold/chrome/black/worker × front/side/back × 8 walk frames + idle, 64x128 cells, half-float 576x1536 with mips,
+  each cell via a small MSAA target + copy quad). One instanced quad mesh per district, lanes sampled against collision
+  (every 1 m, flat ground), 30% standing; walking/pingpong/frame/view selection all in the vertex shader (0 CPU per
+  frame); fades in at 21–26 m from the camera so up close you only see real robots; in the mirror too; A2C on MSAA
+  tiers. Counts (tier.farCrowd) high 200 / med 130 / low 60. Brightline also gets `farLanes` rects down the boulevard
+  past the play bounds (z -330..-110, 105..330). `?nofar` disables. Cost: +1 draw (+1 mirror), GPU delta within noise
+  (−0.05..+0.07 ms @1.5 and @3, 4 views).
+- **More sky traffic (traffic.js / bl_city.js)**: a distant low-poly swarm (`addFlyingCars(..., {low:true, paint, glow})`
+  shares the near cars' materials): Aurum 1.4×tier.traffic on 5 wide loops + 9 far corridors, Brightline 1.3× on 12
+  far corridors. +3 draws each district (instanced, farSky: hidden at gameplay pitch).
+- **Billboards (holo.js)**: `HOLO_ART.reel(first, scale)` = 4 stacked 1024x512 ads (BRIGHTER / new AURELIA gold-frame ad
+  / new SKYLINE RESIDENCES skyline ad / HARMONY) + a news-ticker strip; `createHoloMaterial(canvas, {reel:{frames,
+  tick, hold, phase}})` (define REEL) holds each ad `hold` s then wipes the next in from the top, and scrolls the ticker
+  in the bottom band. No canvas redraws. The big BRIGHTER boards (both districts) and Brightline's 3 wide boards use it
+  (wide ones at half res, staggered phases). Takeover (`world.billboards.show`) still works over reels.
+- **Tower ad screens (holo.js `addTowerAds`)**: at district build, rays from `def.adOrigins` find flat glass facades
+  25–120 m out, check all 4 corners sit on the wall, and stick 9–16 m holo screens on them; all screens = ONE merged
+  mesh on a shared half-res reel with a per-vertex phase (`aPhase`). Aurum 6, Brightline 10 (`adCount`). +1 draw.
+  `?noads` disables. Raycast cost is inside buildMs (~110 ms total, unchanged range).
+- Checked after the usage-limit cutoff: `node --check` clean on all owned files; both districts boot (shot=1 and full
+  UI), swap BL→Aurum→BL fine, 0 exceptions.
+- robots.js: added `get phase()` on the robot api (walk-cycle phase, used by the atlas bake). No behaviour change.
+- **Perf before→after** (M5 metal, 915x412 mobile DPR2→dpr 1.5, high). BEFORE = `git archive HEAD` (P2b) served on :8842
+  from `art/r4/before/`; `art/r4/calls.sh HOST`, `cost.mjs` with `HOST=`.
+  calls / tris: Aurum vista (10,-40 y180 p12) 250/646k→256/665k · Aurum gameplay 139/492k→142/493k · BL vista N
+  (0,70 p12) 262/610k→268/627k · BL look-up (0,20 p-5) 244/603k→250/621k · BL gameplay (2,26) 152/424k→155/424k ·
+  BL vista S (0,-60 y180 p12) 260/589k→266/606k. All inside the ~300 vista budget.
+  Sync render ms (2 alternating runs, ±0.3 noise): Aurum vista 2.17/2.49→2.57/3.11 @1.5, 5.7/6.6→6.6/7.9 @3;
+  Aurum gameplay 2.88/2.76→2.85/2.76; BL views equal within noise. Same-page toggles in the Aurum vista: far crowd
+  0.0/+0.06, car swarm 0.0/0.0, tower ads +0.08/+0.13 (@1.5/@3). So the real added cost is ~0.1 ms @1.5 (0.2 @3);
+  the rest of the run-to-run gap is noise.
+- Critic C1 launched (sheets `art/r4/critic/c1_*.png`, key `critic/key_c1.txt`).
+- **Critic C1 (after; key `art/r4/critic/key_c1.txt`)**: all 6 game panels ID'd again. Brightline: gameplay 3 (C0 2),
+  vista 4 (5), eye 5 (5). Aurum: vista 5 (5), gameplay 3 (3), eye 5 (6). Avg 4.2 vs 4.3 = flat, i.e. within critic
+  variance: the changes read on side-by-sides (`art/r4/r1_grid.png` vs `base0_grid.png`) but not on a 1–10 scale
+  against 10/10 concept art. C1 named the "AURELIA/HARMONY/BRIGHTER" boards as a plus; still wants: distance with
+  silhouette detail (spires, sky-bridges, lit windows) instead of flat pale boxes, a warm golden-hour grade in Aurum
+  (low backlit sun, rim light, shafts), vertical complexity (ring platforms, terraces, planters on ledges), and a
+  gameplay frame that isn't bare floor. It did not notice the flying cars (too small at 915x412).
+- Aurum sky/skyline material test (skyStone/facadeSky darker+cooler, `art/r4/sk.png`): no visible change in the vista;
+  what reads pale there is the sky and the 40–70 m plaza-edge buildings, not the skyline. `?far=0.15` (stronger) makes
+  it greyer, not richer (`fa.png`); kept 0.35.
+- Low/med tiers checked (`art/r4/q.png`): far crowd works without MSAA (alpha-test path), 110 / 242 calls.
+
+### Round 4 — final state / A-B flags for Aaron
+`?win=old|p2b` (lit windows: pre-P2b / P2b / default new), `?far=0` (distance richness off) or `?far=K&farin=K2`,
+`?nofar` (impostor crowd off), `?noads` (tower ad screens off), `?haze=old` (round-3 haze, still works).
+
+### NEXT / gaps (round 5)
+1. Distance silhouettes: far towers are flat-lit extruded boxes. Needed: spires/ring platforms/sky-bridges on the
+   skyline archetypes (skyline.js `archetypes()`), per-face shading contrast (dark shaded side), lit window speckle on
+   facadeSky at distance (the facade shader's `aa` fades windows out past ~60 m — try keeping a coarse lit-cell term).
+2. Aurum grade: critics want warm golden hour (ref_plaza_gold is backlit, low sun). Aaron likes the current look, so
+   put a `?grade=gold` A/B behind a flag (lower sun, warmer sky horizon, rim) and ask before changing the default.
+3. Gameplay frame (3/10 every round): it's ~80% floor at the integrator's 0.35 zoom / 52° pitch. Art can add floor
+   life (holo floor arrows/decals, more props within 10 m), but the big lever is the camera (REQUEST integrator:
+   consider zoom ~0.45 default or a pitch a few degrees lower so tower bases + boards enter the top of the frame).
+4. Far crowd: impostors are baked at 10° elevation; at gameplay pitch (52°) beyond 21 m they are foreshortened
+   slightly wrong but read fine. A second elevation row (45°) would fix it for +50% atlas (still ~1 MB).
+5. Flying cars read too small in 915x412 shots: a few "hero" lanes nearer the canyon (y 20–30, scale 2) would help.

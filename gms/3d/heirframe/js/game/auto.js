@@ -180,9 +180,13 @@ export function createAutopilot(G, { ui, player }) {
       if ((A.wT = (A.wT || 0) + 0.25) < 1.2) return;
       if (buy) {
         A.wT = 0;
-        if ((frameK || framesTour) && S.credits < G.sim.framePrice()) G.sim.addCredits(G.sim.framePrice() - S.credits + 50, 'autopilot');
+        if (frameK || framesTour) {
+          while (S.player.level < 5) G.sim.giveXp(200, 'autopilot');
+          if (S.credits < G.sim.framePrice()) G.sim.addCredits(G.sim.framePrice() - S.credits + 50, 'autopilot');
+        }
         const r = ui.emit('warehouse:buy', { kind: buy });
-        A.bought.push(buy);
+        if (G.sim.state.frames.some((f) => f.frameId === buy)) A.bought.push(buy);
+        else if ((A.buyFails = (A.buyFails || 0) + 1) > 3) { A.bought.push(buy); G.log.push('AUTO could not buy ' + buy); }
         G.log.push(`AUTO bought ${buy} ${JSON.stringify(r || {})}`);
         if (!G.sim.state.frames.some((f) => f.frameId === buy)) { ui.panel.close(); }
         return;
@@ -225,7 +229,11 @@ export function createAutopilot(G, { ui, player }) {
       }
       if (st?.type === 'photo' && o) {
         const d = Math.hypot(o.x - player.pos.x, o.z - player.pos.z);
-        if (d < 10 && d > 4) { player.setTarget(null); return; }
+        const hold = G.runner.active.ss.hold + G.runner.active.ss.shots * 10;
+        if (hold > (A.photoBest ?? -1)) { A.photoBest = hold; A.photoT = 0; } else A.photoT = (A.photoT || 0) + 0.25;
+        // no lock for a while (off-screen, blocked line of sight): find another angle
+        if (A.photoT > 2.5) { A.photoT = 0; A.photoBest = -1; const a = Math.random() * Math.PI * 2; A.goal = null; goTo(o.x + Math.sin(a) * 7, o.z + Math.cos(a) * 7, 0.8); return; }
+        if (d < 10 && d > 4) { if (!player.moveTarget) player.setTarget(null); return; }
         goTo(o.x, o.z, 6);
         return;
       }
@@ -257,13 +265,15 @@ export function createAutopilot(G, { ui, player }) {
       if (S.player.level < 5) G.sim.giveXp(1600, 'autopilot');
       S.flags.kioskDone = true;
     }
+    // the Warehouse link is jammed while anything hunts you: go deal with it first
+    const lurker = G.enemies.hostileNear(player.pos.x, player.pos.z, 24) ? nearestHostile(26) : null;
+    if (lurker) { A.phase = 'fight'; fight(lurker); return; }
     if (buy) { A.phase = 'buy:' + buy; ui.emit('warehouse'); return; }
     if (framesTour && G.contractsDone >= 1 + want) {
       // one contract per bought frame, then done
       const k = G.sim.activeFrame().archetype;
-      const played = A.tour.filter((x) => x === k).length;
-      if (!played && A.bought.includes(k) && A.tourStart !== G.contractsDone) { A.tourStart = G.contractsDone; A.tourFrame = k; }
       if (A.tourFrame && G.contractsDone > A.tourStart) { A.tour.push(A.tourFrame); A.tourFrame = null; }
+      if (!A.tourFrame && k === ORDER.find((x) => A.bought.includes(x) && !A.tour.includes(x))) { A.tourStart = G.contractsDone; A.tourFrame = k; }
       const next = ORDER.find((x) => A.bought.includes(x) && !A.tour.includes(x));
       if (!next) { finish(true, 'frames tour complete'); return; }
       if (k !== next) { const f = S.frames.find((x) => x.frameId === next); ui.emit('warehouse:activate', { frameId: f.uid }); return; }
