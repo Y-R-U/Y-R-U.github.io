@@ -84,6 +84,8 @@ export function installFog() {
 const skyGLSL = /* glsl */`
 uniform float uTime;
 uniform float uEnv;
+uniform vec3 uSun;
+uniform float uDusk;
 varying vec3 vDir;
 float hash(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }
 float hash1(float x){ return fract(sin(x*127.1)*43758.5453); }
@@ -91,7 +93,7 @@ float noise(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
   return mix(mix(hash(i),hash(i+vec2(1,0)),f.x), mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x), f.y); }
 float fbm(vec2 p){ float a=0.5, s=0.0; for(int i=0;i<5;i++){ s+=a*noise(p); p=p*2.03+vec2(1.7,9.2); a*=0.5; } return s; }
 vec3 skyColor(vec3 d){
-  const vec3 SUN = ${v3(SUN_DIR)};
+  vec3 SUN = uSun;
   const vec3 PL = ${v3(PLANET_DIR)};
   float el = d.y;
   float sd = max(dot(d, SUN), 0.0);
@@ -99,9 +101,12 @@ vec3 skyColor(vec3 d){
   vec3 mid = vec3(0.40, 0.58, 0.88);
   vec3 hor = ${HAZE_OLD ? 'vec3(1.0, 0.88, 0.74)' : 'vec3(0.92, 0.9, 0.88)'};
   float e = max(el, 0.0);
-  vec3 col = mix(hor, mid, smoothstep(0.0, 0.28, e));
+  // dusk (Portside): violet zenith, rose middle, a burning horizon and a wide sun glow
+  zen = mix(zen, vec3(0.09, 0.11, 0.3), uDusk); mid = mix(mid, vec3(0.52, 0.42, 0.6), uDusk); hor = mix(hor, vec3(1.0, 0.6, 0.36), uDusk);
+  vec3 col = mix(hor, mid, smoothstep(0.0, 0.28 + 0.1 * uDusk, e));
   col = mix(col, zen, smoothstep(0.25, 0.95, e));
   col += vec3(1.0, 0.62, 0.32) * pow(sd, 6.0) * 0.9 * (1.0 - smoothstep(0.0, 0.6, e));
+  col += vec3(1.0, 0.42, 0.16) * pow(sd, 2.5) * 0.9 * uDusk * (1.0 - smoothstep(0.0, 0.45, e));
   col += vec3(1.0, 0.80, 0.55) * pow(sd, 48.0) * 2.5;
   col += vec3(1.0, 0.92, 0.80) * smoothstep(0.9993, 0.9997, sd) * 40.0;
 
@@ -139,6 +144,7 @@ vec3 skyColor(vec3 d){
     float cl = fbm(cp * 0.9 + SUN.xz * 0.15);
     vec3 ccol = mix(vec3(1.05, 1.0, 0.96), vec3(0.78, 0.8, 0.86), smoothstep(0.35, 0.8, cl));
     ccol += vec3(1.0, 0.7, 0.4) * pow(sd, 4.0) * 0.8;
+    ccol = mix(ccol, mix(vec3(0.55, 0.42, 0.55), vec3(1.25, 0.66, 0.4), smoothstep(0.2, 0.9, pow(sd, 1.5)) * (1.0 - smoothstep(0.35, 0.8, cl) * 0.5)), uDusk * 0.85);
     col = mix(col, ccol, c * 0.85);
   }
 
@@ -146,6 +152,7 @@ vec3 skyColor(vec3 d){
   float az = atan(d.x, -d.z);
   float mtn = 0.035 + 0.05 * fbm(vec2(az * 2.2, 1.3)) + 0.02 * noise(vec2(az * 14.0, 0.5));
   vec3 hz = mix(vec3(0.74, 0.73, 0.74), vec3(1.0, 0.82, 0.62), pow(sd, 3.0));
+  hz = mix(hz, mix(vec3(0.3, 0.26, 0.36), vec3(0.95, 0.55, 0.35), pow(sd, 3.0)), uDusk);
   if (el < mtn) col = mix(col, hz * 0.92, 0.75 * smoothstep(-0.01, 0.02, el));
   float cell = floor(az * 55.0);
   float bh = 0.012 + pow(hash1(cell), 3.0) * 0.08 * (0.5 + 0.5 * sin(az * 3.0 + 1.0));
@@ -183,7 +190,7 @@ vec3 skyColor(vec3 d){
 export function createSkyMaterial(forEnv = false) {
   return new THREE.ShaderMaterial({
     name: 'Sky',
-    uniforms: { uTime: { value: 0 }, uEnv: { value: forEnv ? 1 : 0 } },
+    uniforms: { uTime: { value: 0 }, uEnv: { value: forEnv ? 1 : 0 }, uSun: { value: SUN_DIR.clone() }, uDusk: { value: 0 } },
     vertexShader: /* glsl */`
       varying vec3 vDir;
       void main() {
@@ -229,14 +236,15 @@ function envFacadeTexture(seed) {
   return t;
 }
 
-export function buildEnvironment(renderer, size = 256) {
+export function buildEnvironment(renderer, size = 256, { sun = SUN_DIR, dusk = 0 } = {}) {
   const envScene = new THREE.Scene();
   const m = new THREE.Mesh(new THREE.SphereGeometry(80, 64, 32), createSkyMaterial(true));
+  m.material.uniforms.uSun.value.copy(sun); m.material.uniforms.uDusk.value = dusk;
   m.material.depthTest = false; m.material.depthWrite = false; m.renderOrder = -10;
   envScene.add(m);
   const dispose = [];
   // A ring of towers: dark glass with window strips, a few sunlit stone faces. Leaves the sun's azimuth open.
-  const sunAz = Math.atan2(SUN_DIR.x, -SUN_DIR.z);
+  const sunAz = Math.atan2(sun.x, -sun.z);
   const texes = [0, 1, 2].map((i) => { const t = envFacadeTexture(i + 1); dispose.push(t); return t; });
   let seed = 7;
   const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
@@ -268,5 +276,6 @@ export function buildEnvironment(renderer, size = 256) {
   pmrem.dispose();
   envScene.traverse((o) => { o.geometry?.dispose(); o.material?.dispose(); });
   dispose.forEach((t) => t.dispose());
+  rt.texture.userData.rt = rt;
   return rt.texture;
 }

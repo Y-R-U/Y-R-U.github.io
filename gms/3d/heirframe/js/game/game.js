@@ -255,9 +255,17 @@ export async function createGame(api) {
       if (G.runner.active) { ui.toast('Finish your current contract first', 'warn'); return; }
       const b = G.sim.board();
       const m = b.story?.id === c.id ? b.story : b.cards.find((x) => x.id === c.id);
-      const go = () => { const r = G.runner.accept(c.id); if (r.ok) { log('accepted ' + r.mission.id + ' ' + r.mission.archetype); G.sim.save(); } };
+      // a story card built before its district's real sites were known is rebuilt on the spot (a no-op otherwise)
+      const go = () => { if (m?.story && m.district === G.districts.id) { const b2 = G.sim.board(); b2.story = G.sim.storyCard() || b2.story; } const r = G.runner.accept(c.id); if (r.ok) { log('accepted ' + r.mission.id + ' ' + r.mission.archetype); G.sim.save(); } };
       // contracts in another district: ride the relay there first
-      if (m && world.districts?.includes(m.district) && m.district !== G.districts.id) { ui.panel.close(); G.districts.travel(m.district, { reason: 'contract' }).then((ok) => ok && go()); }
+      if (m && world.districts?.includes(m.district) && m.district !== G.districts.id) {
+        ui.panel.close();
+        if (m.story) G.sim.unlockDistrict(m.district);   // a story card may open its own district
+        G.districts.travel(m.district, { reason: 'contract' }).then((ok) => {
+          if (!ok) return;
+          go();
+        });
+      }
       else go();
     });
     ui.on('contract:reroll', () => { const r = G.sim.rerollBoard(); if (r.ok) ui.panel.update(toUiBoard(G.sim)); });
@@ -324,6 +332,7 @@ export async function createGame(api) {
       openContracts();
     } else if (n.id === 'warehouse') openWarehouse();
     else if (n.id === 'relay') G.districts.relayMenu();
+    else if (n.id === 'lift') G.districts.lift(n);
   }
 
   // every holo billboard wipes to Harmony's face (art's world.billboards); the sting is the fallback
@@ -341,6 +350,8 @@ export async function createGame(api) {
       if (a.openFrames) { if (G.sim.ownedFrames().length) ui?.toast('Sal Venn, Nexus Frames', 'info', { sub: 'Open the Warehouse any time to upgrade' }); else if (!inCombat()) openWarehouse('frames'); }
       if (a.forceHeat) G.sim.forceHeat(a.forceHeat);
       if (a.actEnd) G.actEnd = a.actEnd;
+      if (a.seraph) await seraphScene();
+      if (a.fennDown) { const f = G.runner.active?.npcs?.fenn; if (f) { f.bot.play('sit', { loop: true }); f.bot.setAlert(0); fx.ring(f.pos, 2.4, 0xfff0c0, 0.8); audio.sfx('power_down'); } }
       if (a.tutorial === 'accept') ui?.toast('Pick a contract', 'info', { sub: 'the gold card is your story', ms: 3500 });
       if (a.marker) G.introMarker = true;
       if (a.openBoard) openContracts();
@@ -348,6 +359,41 @@ export async function createGame(api) {
     },
   });
   G.story = story;
+
+  // A2-M4: Seraph drops out of the sky, puts you down in two hits, hums three notes and leaves (STORY Act 2, clue C09)
+  async function seraphScene() {
+    const bot = (() => { try { return api.robots.createRobot({ kind: 'seraph', tier: 3, seed: 9, quality: api.tier.name }); } catch (e) { return null; } })();
+    if (!bot) return;
+    player.frozen = true;
+    const a = player.yaw, sx = player.pos.x + Math.sin(a) * 3, sz = player.pos.z + Math.cos(a) * 3, gy = world.groundAt(sx, sz);
+    world.scene.add(bot.root);
+    bot.root.position.set(sx, gy + 16, sz);
+    bot.root.rotation.y = Math.atan2(player.pos.x - sx, player.pos.z - sz);
+    const step = (ms, fn) => new Promise((r) => { const t0 = performance.now(); const tick = () => { const u = Math.min(1, (performance.now() - t0) / (ms / speedK)); fn(u); bot.update(1 / 60); if (u < 1) requestAnimationFrame(tick); else r(); }; tick(); });
+    fx.beam(tmp.set(sx, gy, sz), 0xffe6a0, 1.4, 18, 2.2);
+    audio.sfx('flyby', { vol: 1 });
+    await step(1100, (u) => { bot.root.position.y = gy + 16 * Math.pow(1 - u, 2); });
+    fx.ring(tmp.set(sx, gy, sz), 4, 0xffd36b, 0.6); rig.shake = Math.max(rig.shake, 0.3); audio.sfx('explosion', { vol: 0.7 });
+    await story.bark({ speaker: 'seraph', vo: 'a2_s04_seraph_01', text: 'Target located. Do not resist.' });
+    const pc = G.sim.playerCombatant();
+    for (const k of [0.45, 0.99]) {
+      bot.play('attack_melee', { loop: false, speed: 1.4 });
+      await wait(260);
+      fx.slash(tmp.set(player.pos.x, player.pos.y + 1.1, player.pos.z), a, 0xffe6a0, 2.4, 0.2);
+      fx.impact(tmp, 0xfff0c0, 1.6); audio.sfx('melee_hit', { vol: 1 }); ui?.hud.flash('hit'); rig.shake = Math.max(rig.shake, 0.35); player.actor.hitFlash?.();
+      pc.shield = 0; pc.hp = Math.max(1, pc.stats.hp * (1 - k));
+      await wait(500);
+    }
+    player.actor.play('die', { loop: false });
+    await wait(900);
+    await story.bark({ speaker: 'seraph', vo: 'a2_s04_seraph_02', text: 'Mm... mm-mm.' });
+    await wait(600);
+    fx.beam(tmp.set(sx, gy, sz), 0xffe6a0, 1.0, 18, 1.6);
+    await step(1000, (u) => { bot.root.position.y = gy + 20 * u * u; });
+    world.scene.remove(bot.root); bot.dispose?.();
+    player.actor.play('idle');
+    player.frozen = false;
+  }
 
   async function kioskIntro() {
     G.sim.state.flags.kioskDone = true;
@@ -392,7 +438,8 @@ export async function createGame(api) {
     if (better.length && G.coach?.current !== 'warehouse' && G.sim.state.flags.coach?.warehouse) ui?.toast('Upgrade available', 'gold', { sub: 'Tap ▲ EQUIP or open the Warehouse' });
     if (out.clue) ui?.toast('Codex updated', 'story', { sub: out.clue === 'C01' ? 'The Heir-Key' : out.clue });
     if (out.mission.story?.id === 'a1_m1') ui?.sting('The board is yours', 'Random contracts unlocked', 'unlock', 3000);
-    if (out.mission.story?.id === 'a1_m5') setTimeout(() => ui?.sting('Act 1 complete', 'A BRIGHTER FUTURE · Act 2 arrives in the next update', 'story', 4600), 600);
+    if (out.mission.story?.id === 'a1_m5') setTimeout(() => ui?.sting('Act 1 complete', 'Act 2 · HARMONY THROUGH UNITY · find Abel Fenn in the Terraces', 'story', 4600), 600);
+    if (out.mission.story?.id === 'a2_m5') setTimeout(() => ui?.sting('Act 2 complete', 'HARMONY THROUGH UNITY · Act 3 arrives in the next update', 'story', 4600), 600);
     const days = G.sim.state.story.renewalDays;
     if (!out.mission.story && days % 10 === 0 && audio.hasVo(`pa_renewal_${days}`)) setTimeout(() => audio.bark([`pa_renewal_${days}`], { force: true }), 5000);
     if (out.stiffed) ui?.toast('Stiffed!', 'bad', { sub: 'The client won\'t pay. A Collect bounty is on the board' });
@@ -466,7 +513,7 @@ export async function createGame(api) {
     ctx.hud = G.hud;
     ctx.goalOverride = () => nextGoal(sim);
     G.coach = ui ? createCoach(G, { ui, rig, player }) : null;
-    sim.storyActCap = 1;   // Act 2 story cards open once its staging lands (P3g)
+    sim.storyActCap = 2;   // Acts 1–2 are staged (P3g); Act 3 cards stay hidden
     // archetypes/twists the runner implements (P3: all 16 non-heist ones); heist, wetwork and the choice twists are P4
     sim.setScope({ archetypes: RUN_ARCH, twists: RUN_TWISTS });
     if (sim.state.board && !sim.state.contract && sim.state.board.cards.some((c) => !RUN_ARCH.includes(c.archetype))) sim.refreshBoard();

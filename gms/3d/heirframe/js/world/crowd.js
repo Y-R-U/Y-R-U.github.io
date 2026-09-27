@@ -182,6 +182,9 @@ export function createCrowd(world, createRobot, count, quality) {
     return { moved, gaveUp: (m.strikes || 0) >= 3 };
   }
   // district swap: new walk grid, loops and gathering spots; everyone reappears on the new loops
+  // a district can cap its crowd (crowd.count: the pod room holds none, the Stacks fewer); the rest hide
+  const applyCap = () => { const cap = world.district?.crowd?.count ?? Infinity; members.forEach((m, i) => { m.off = i >= cap; if (m.off) m.bot.root.visible = false; }); };
+  applyCap();
   world.onDistrict?.(() => {
     nav = null; clock = 0; reseat = 0;
     spots = gatherSpots(world);
@@ -197,6 +200,7 @@ export function createCrowd(world, createRobot, count, quality) {
       m.bot.root.position.copy(m.pos);
       m.bot.play('idle', { loop: true, fade: 0 });
     });
+    applyCap();
   });
   const crowd = {
     members,
@@ -216,10 +220,11 @@ export function createCrowd(world, createRobot, count, quality) {
       const cam = world.camera.position;
       for (const m of members) { m.cd = m.pos.distanceTo(cam); m.fd = m.pos.distanceTo(focus); }
       ranked.length = 0;
-      for (const m of members) if (m.fd < 13 && m.cd < 22) ranked.push(m);
+      for (const m of members) if (!m.off && m.fd < 13 && m.cd < 22) ranked.push(m);
       ranked.sort((a, b) => a.cd - b.cd);
       for (let i = 0; i < ranked.length; i++) ranked[i].rank = i;
       for (const m of members) {
+        if (m.off) continue;
         const dist = m.fd;
         const far = dist > 40;
         m.bot.root.visible = !far;

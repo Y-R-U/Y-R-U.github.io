@@ -247,9 +247,9 @@ export function createAutopilot(G, { ui, player }) {
       }
       if (st?.type === 'tail' && G.runner.active.target) {
         const t = G.runner.active.target, d = Math.hypot(t.pos.x - player.pos.x, t.pos.z - player.pos.z);
-        if (d < 10) { player.setTarget(null); return; }
+        if (d < 13) { player.setTarget(null); return; }
         const ax = player.pos.x - t.pos.x, az = player.pos.z - t.pos.z, l = Math.hypot(ax, az) || 1;
-        A.goal = null; goTo(t.pos.x + ax / l * 9, t.pos.z + az / l * 9, 1.5);
+        A.goal = null; goTo(t.pos.x + ax / l * 12, t.pos.z + az / l * 12, 1.5);
         return;
       }
       if (st?.type === 'defend' && o) { const d = Math.hypot(o.x - player.pos.x, o.z - player.pos.z); if (d < 6) { player.setTarget(null); return; } }
@@ -262,7 +262,7 @@ export function createAutopilot(G, { ui, player }) {
     const at = Q.get('storyat');
     if (at && !A.jumped) {
       A.jumped = true;
-      const ids = ['a1_m1', 'a1_m2', 'a1_m3', 'a1_m4', 'a1_m5'], gates = { a1_m1: 1, a1_m2: 2, a1_m3: 3, a1_m4: 5, a1_m5: 7 };
+      const ids = ['a1_m1', 'a1_m2', 'a1_m3', 'a1_m4', 'a1_m5', 'a2_m1', 'a2_m2', 'a2_m3', 'a2_m4', 'a2_m5'], gates = { a1_m1: 1, a1_m2: 2, a1_m3: 3, a1_m4: 5, a1_m5: 7, a2_m1: 8, a2_m2: 10, a2_m3: 12, a2_m4: 15, a2_m5: 17 };
       const S2 = G.sim.state;
       S2.story.done = ids.slice(0, ids.indexOf(at)); S2.story.mission = at; S2.flags.boardUnlocked = true;
       while (S2.player.level < gates[at]) G.sim.giveXp(200, 'autopilot');
@@ -289,7 +289,8 @@ export function createAutopilot(G, { ui, player }) {
       A.phase = 'board'; ui.emit('contracts'); return;
     }
     const goal = storyMode ? 99 : want;
-    if (storyMode && S.story.done.includes('a1_m5')) { finish(true, 'act 1 complete'); return; }
+    const storyEnd = Q.get('storyend') || 'a2_m5';
+    if (storyMode && S.story.done.includes(storyEnd)) { finish(true, `story complete to ${storyEnd}`); return; }
     if (G.contractsDone < 1 + goal) { A.phase = 'board'; if (G.contractsDone > A.done.length) syncDone(); ui.emit('contracts'); return; }
     syncDone();
     if (A.phase !== 'warehouse' && A.phase !== 'warehouse2') { A.phase = 'warehouse'; A.wT = 0; ui.emit('warehouse'); }

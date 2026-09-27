@@ -614,3 +614,133 @@ three new districts is reachable on the nav grid from spawn; no walk-through gap
 3. Terraces vista tris 720–740k (over the 600k line; calls fine). Cheapest cut: cliffGardens trees and the far-bank trees.
 4. Verdant cliffs are faceted low-poly (reads "stylised"); the north falls cliff is plain. Atrium balconies still repeat.
 5. Terraces build ~160–230 ms (relay white-out hides it).
+
+## Round 5 (art agent #7, 2026-09-27) — REDIRECTED (see Round 5b)
+Brief: crowd variety (silhouettes, humans, pairs/groups, poses, palette; D20 32 real civs; far-crowd bake), gameplay-pitch
+frame richness (floor decals, small props, contact AO, light pools, life from above), then P3w gaps (Terraces cliffs,
+atrium balconies, Terraces vista tris). Harness: scratchpad `art/r5/` (`vset.sh prefix [query]` = 8 critic views: au/bl/vt/ax
+× game/eye; `cam.sh`, `sheet.py`). Chrome port 9302.
+- **Baseline b0** (M5 metal, 915x412 DPR2 high, calls / tris): au_game 141/487k · au_eye 255/662k · bl_game 155/424k ·
+  bl_eye 260/631k · vt_game 155/522k · vt_eye 166/606k · ax_game 118/296k · ax_eye 159/350k. All 60 fps.
+- **Critic C0** (before; sheets `art/r5/critic/c0_*.png`, key `critic/key_c0.txt`): refs 8–9. Game: au_game 4, au_eye 6,
+  bl_game 3, bl_eye 5, vt_game 3, vt_eye 4, ax_game 4, ax_eye 5 → **avg 4.25**. Sub-scores avg: crowd 3.1, ground 3.75.
+  "~4 figure types, one slim rig at one height and one build = one model recoloured"; eye-level crowds stand in a far line,
+  foreground empty; overhead 60–80% bare tile, 3–6 figures; wants body types ±15%, service bot, drone, child unit, clothed
+  humans, activities (carry, point, queue, pairs facing), decals/props every 3–5 m, contact AO.
+- **REDIRECT (manager, per Aaron):** general graphics pass + critic rounds stopped (Aaron: it already looks great). Done before
+  the stop, booting and harmless: `js/actors/anims.js` gained civilian ambient loops `lean` (back to a wall, arms folded,
+  ankle crossed), `photo` (camera to face), `phone` (head down over a tablet), `browse` (hands behind back, slow head
+  scan), `point` (points up now and then), exported `BASE_LOOPS`, and style overlays `style.cart` (push a cart, pelvis
+  square) / `style.bagL|bagR` (arm hangs out with a bag). NOT wired yet: robots.js `play()` still only treats talk/sit as
+  base loops, so nothing uses them. Picking the crowd-variety plan back up later: new civ kinds (slim/heavy/kid scaled
+  elegant, pearl palette, bellhop porter with luggage cart on the pelvis bone, hover courier drone, stylised humans in
+  coats/suits/dresses), per-instance accessories (bags/case/tablet/camera), 12-tone palettes, crowd roles (pairs, kid
+  companions, singles leaning/photographing), far-crowd atlas in RGBA8 with a 45° row. Boot check: shot=1 + auto → OK.
+
+## Round 5b (art agent #7, 2026-09-27) — DONE
+Scope (manager, per Aaron): 1. Aurum lake motion (lake reads like a still photo); also the terraces pools. 2. P4 districts
+`portside`, `stacks`, plus `home` (Pod 4471) / Brightline apartment if STORY needs them. One self-check shot per district.
+### 1. Lake motion (water.js `createLakeMaterial`, Aurum east basin + Terraces pools/valley share it) — DONE
+- Before: beyond ~15 m the ripples faded (×0.4) and scrolled at 0.1 m/s, so the mid/far lake was a still mirror; the only
+  motion was fine shimmer near the rail. Frame-diff strips `art/r5/l0_*_strip.png` (f0 | f+0.75 s | diff ×6).
+- Now: (a) **impact rings** from every churn box: 3 wave trains travelling out at ~1.6 m/s, noise-warped so they aren't
+  perfect circles, decaying over 22·k+6 m, with a faint crest tint so they read at distance; (b) **flow**: near a landing the
+  fine ripple layer is carried outward with a two-phase flow map (2nd fetch only where rings exist); (c) **gusts**: cat's-paw
+  patches (one low-frequency texture fetch) sweep across at ~2.5 m/s, boosting ripple amplitude + a fine chop layer inside
+  them; (d) ripples 2.5× faster, a third large-scale layer (27 m) and less distance fade (0.6→0.35), a 3rd short swell;
+  (e) **sun glints**: per-cell facets re-rolled ~5×/s catch the sun for a moment (only computed where the normal is near
+  the sun half-vector; ~3.5% of cells). `?lake=old` = previous shader for A/B on the S22.
+- Frames: `l5_wide_strip.png`, `l5_top_strip.png` (rings visible top-right), `vt_look_strip.png` (Terraces valley),
+  `l5_up_cmp.png` (look-up, unchanged character), `l4_cmp.png` old vs new.
+- Cost: lake-only render (full-screen water, dpr 3 = 3.4 Mpx, 10 renders/sample, interleaved same page, GPU contended by
+  other agents): old 8.3 ms, new 9.9 ms (first cut was 11.4; trimmed: gust hash-noise → texture, 2nd flow fetch branch,
+  glint early-out). ≈ +0.15 ms estimated on the S22 at dpr 1.5 with the lake at ~40% of the frame; whole-frame A/B is within
+  noise right now (base frame 7 ms vs 2.5 ms in round 4 = heavy GPU contention on the M5).
+- **Lake motion: DONE** (above). Boot re-checked after a usage-limit cutoff: all 5 districts + `?auto=1&speed=3&fresh` green,
+  0 exceptions, `node --check` clean on every owned file.
+### 2. P4 districts — DONE (Portside, Stacks, Home)
+- atmosphere.js: sky shader now takes `uSun` (vec3) + `uDusk` (0..1: violet zenith, rose middle, burning horizon, sunset
+  clouds) instead of the baked SUN_DIR; `buildEnvironment(renderer, size, {sun, dusk})`. Defaults = old look (Aurum
+  unchanged). Needed for Portside's sunset.
+- NEW `js/world/ind_ground.js` (not imported yet): `createIndustrialGround(ctx, levels, mask, {slab, tint, wet, rust, rain})`
+  — concrete slabs / steel tread plate (R) / worn yellow paint + hazard stripes (G) / grating (B), rust bleed, puddles in low
+  spots (mirror-smooth, planar reflection), optional rain rings in puddles; `zoneMask(bounds, paint)` painter.
+- **Portside DONE (first pass)** — `js/world/portside.js` (+ `p4_props.js`, `ind_ground.js`), id `portside` (aliases `docks`,
+  `spaceport`). Sunset (`ambience.dusk: 1`, sun low in the NW over the harbour, own dusk PMREM). North = quay (z −62) with
+  2 ship-to-shore cranes (animated trolley/spreader lifting containers ship ↔ apron, 38 s cycle), a moored freighter with
+  deck cargo, lake-shader harbour water (sunset glitter from item 1), breakwater + lighthouse, buoys, anchored freighters.
+  Middle: container yard (1 instanced draw, fade-on-occlusion via new `ctx.fadeMat`), aisles z −24/−12/0 = alleys; 3 AGVs
+  run the apron lane and stop for the player (collision box follows them). East: pad A (parked shuttle, boarding gantry,
+  fuel tanks), pad B (a shuttle lands, sits 18 s, lifts off and climbs out over the sea, 60 s loop; collision only while
+  landed). West: Freehaul Bay 7 shed (racking, forklift, crates) + customs hold cage (vault). SW: harbour-office deck
+  (rooftop/vantage, stairs). South: Freehaul terminal + boards. Flood masts + additive light pools (`lightPools`, 1 draw).
+  Crowd capped at 26 (`crowd.count`). Build ~110 ms.
+  Sites (35, prefix `ps_`): dock ×3, pad ×2, warehouse ×2, vault `ps_vault_customs`, locker ×3, alley ×2, rooftop, plaza ×2,
+  relay, spawn_edge ×4, vantage ×3, hide ×4, npc ×4 (`ps_npc_foreman` at the shed), terminal, link_pad. Breakables 15.
+  Perf (M5, 915x412 DPR2 high, calls/tris): gameplay 113–139 / 191–264k · vista N (p12) 239 / 355k · vista S 188 / 316k ·
+  look-up 124 / 179k. All 60 fps.
+- ind_ground fixes found by the self-check: puddle threshold was inverted (less `wet` → more puddles → the floor mirrored
+  the whole port); the rust term leaked the 1.5 m steel seam grid onto concrete; hazard stripes now = G+B in the mask (thin
+  solid lines' antialiased edges used to read as hazard); no tiled texture maps (procedural concrete grain).
+- world.js: `ctx.focus` (getter → world.focus), `ctx.fadeMat(material)`, `def.farCrowd` (scale, 0 = none), sky `uSun`/`uDusk`
+  from `ambience.sunDir`/`skySun`/`dusk`; crowd.js: `district.crowd.count` caps visible civilians (rest hidden, `m.off`).
+- REQUEST P3g: hud.js minimap should skip crowd members with `m.off` (hidden). Add `portside`/`stacks`/`home` to
+  NAMES/AMBIENT/EMITTERS in js/game/districts.js (portside emitters: cranes (-28,-46) (6,-46), sea (0,-62), pad B (32,68)).
+- **Stacks DONE (first pass)** — `js/world/stacks.js`, id `stacks` (aliases `the_stacks`, `undercity`). Interior ambience
+  (no sky; own neon PMREM), dense blue fog. A pipe canyon (x ±14, spawn at the south end z 86, looking north) between two
+  walls of pod hostels 20 high (44 m): ONE merged mesh + one pod shader (`podMaterial`: 2.4×2.2 m modules, round hatches lit
+  amber / Harmony-blue / rare magenta or dark, flicker, status LEDs, grilles, plates, rust runs; lit by the scene, faded
+  on occlusion). City underside closes it at 60 m (girders; 3 faint daylight shafts). Pipes (rusty up high), 5 tiers of
+  catwalks + ladders; the lowest east catwalk (y 4.4, z −60..56) is walkable via stairs at z 56–66 (rooftop/vantage).
+  46 sagging cables across the canyon. Harmony-blue wall ads (billboard takeover-registered) + 6 neon blade signs
+  (LULLABY REST, PODS 9 CR/NIGHT, NOODLES, HIREFRAME REPAIR, STACK 9, ROOK PARTS & RUMOURS). Floor: `ind_ground` wet 0.75,
+  rust 0.6, **rain rings in the puddles**, centre drain grate + cross grates, planar reflection (neon smears in the wet).
+  Leak streaks from the pipes (`leaks`, 1 draw), steam from grates/pipes (`steamVents`, 1 draw), cyan/amber lamp pools.
+  West alley (z −34..−16) = Stack 9's freestanding pod rows (instanced, same shader); east alley (z 68..84) = Rook's corner
+  (3 stalls); west-base market (5 grimy stalls). North end = flooded sub-stack (Rustmother arena): black water over
+  z −99..−72, pump house, tipped fallen pods. **Lullaby Rest door** at (−12.6, 40): interactable `{id:'home', to:'home'}`.
+  **Power cull hook (A4-M2):** `world.ctx.stacks.setCull(k 0..1, z0, z1)` darkens every pod between z0..z1 (red LEDs).
+  Crowd capped at 20; far crowd ×0.4. Build ~55 ms.
+  Sites (34, prefix `st_`): pods ×4, market ×2, alley ×2, locker ×3, rooftop, **arena `st_flooded_substack`** (new tag),
+  plaza ×2, relay, spawn_edge ×4, vantage ×2, hide ×4, npc ×4 (**`st_npc_rook`** at his stall), **home `st_home_door`**
+  (new tag), terminal, link_pad. spawnPoints also has `home` (outside the hostel door). Breakables 12.
+  Perf: gameplay 121–126 calls / 145–181k · vistas (p10) 191–193 / 171–193k · look-up 110 / 84k. 60 fps.
+- **Home DONE** — `js/world/home.js`, id `home` (aliases `pod_4471`, `pod`). A 12×9 m pod room (one-sided walls, interior
+  ambience, own small PMREM): coffin pod with the glass lid open and Wren asleep inside, vitals screen ("HR 52 • DEBT
+  3,140 CR"); the rig (link chair, headset arm, cables); a cracked window onto the pipe canyon (a lit pod-wall plane 28 m
+  out); the family tree pinned to the north wall with red string (WREN, TOMAS QUILL †, LYRA VAEL — ALIVE?, MARA QUILL
+  (she knew), IRIS VAEL = HARMONY, "?" who sent the key, the Vael star, a "212 YEARS TO LANDFALL" clipping: only what the
+  player knows by A4-M1); codex screen; trophy shelf; frame display rack; a door out. Crowd 0, far crowd 0. 47 calls / 31k.
+  **Interactables:** `warehouse` (frame rack), `codex`, `trophies`, `family_tree`, `bed` (shift refresh), `door` `{to:'stacks'}`.
+  Sites (8, prefix `hm_`); spawnPoints player/door/relay/pad/kiosk all inside the room.
+- NOT built: the Brightline Apartment. DESIGN §13 sells it *after* Act 4, so STORY's Acts 3–4 don't need it (next round).
+- Final checks: `node --check` clean; all 8 districts boot on high and low (0 exceptions; low 14–44 calls); `?auto=1&speed=3
+  &fresh` reaches 'free'; every site of portside/stacks/home is reachable from spawn on the nav grid (found and fixed a
+  locker placed on the Stacks catwalk stairs); crowd stuck test (r2 harness, 120 s, focus hops over 12 sites) portside
+  0 / 2189, stacks 0 / 2251; 10 swap round trips over the 3 new districts: programs flat (83), geometries 43→51 and
+  textures 64→70 over the first 4 rounds (first-use caches), then flat; all 8 districts: programs flat at 102.
+- NOTE for shots: `?shot=1` always teleports the player to (3,12) (main.js SHOTS) — in `home` that is outside the room;
+  use `TP=`.
+
+### Requests for P3g (gameplay) — P4 districts
+1. Relay menu: `portside` and `stacks` are canonical sim ids already (js/data/districts.js); `home` is not a sim district.
+   Add them to NAMES/AMBIENT/EMITTERS in js/game/districts.js (portside: cranes (-28,-46) (6,-46), sea (0,-62), shuttle pad
+   (32,68); stacks: drips (0,-84), steam vents along x ±5, hum; home: pod hum).
+2. Stacks `{id:'home', to:'home'}` at the Lullaby Rest door → `world.relayTransition('home', {onSwap})` (or the shorter
+   `liftTransition`), player at `world.spawnPoints.player`; home `{id:'door', to:'stacks'}` → back, player at
+   `world.spawnPoints.home` (outside the hostel door). Home `bed` → shift refresh; `codex`/`family_tree` → codex panel;
+   `trophies` → trophy view; `warehouse` = the normal warehouse panel.
+3. A4-M2 "Culling Hour": `world.ctx.stacks.setCull(1, z0, z1)` blacks out the pods in a z range (red LEDs); `setCull(0)` back.
+4. Rook: spawn his NPC at `st_npc_rook`; Rustmother's arena = site `st_flooded_substack` (new tag `arena`); `st_home_door`
+   (new tag `home`). Freehaul foreman/Jun at `ps_npc_foreman`; A3-M1's crate run fits `ps_warehouse_*` → `ps_dock_*`.
+5. hud.js minimap: skip crowd members with `m.off` (hidden by a district's `crowd.count`).
+6. `?shot=1` teleport: consider using `world.spawnPoints.player` when the district isn't Aurum.
+
+### NEXT / gaps (round 5b)
+1. Crowd variety (the critics' #1 complaint) is still open: anims are in (`lean/photo/phone/browse/point`, cart/bag
+   overlays) but not wired to robots.js `play()` or crowd.js, and no new civ kinds yet (plan in the Round 5 note above).
+2. Portside/Stacks crowds are the plaza civ mix; dock workers / Stacks riders slumped in frames would sell both districts
+   (needs crowd kinds per district — rebuild the robots on swap, cached templates make it cheap).
+3. Brightline Apartment. P3w gaps (Terraces cliffs, atrium balconies, Terraces vista tris) untouched.
+4. Stacks: fog doesn't use the district's sun direction (the fog chunk's sun glow is baked to the Aurum sun) — harmless
+   indoors, and Portside's sunset glow in the fog points the wrong way (subtle). Fix: make SUN_DIR in the fog a uniform.

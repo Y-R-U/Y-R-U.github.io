@@ -766,7 +766,8 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     for (const it of drop.items) { const added = addItem(it, { silent: true }); if (added) out.items.push(added); }
     if (out.items.length) emit('loot', { items: out.items, credits: out.credits, from: enemy.id });
     out.rep = killRep(S.factions, enemy.faction);
-    if (enemy.faction === 'concord' && enemy.tags.includes('frame')) emit('heat', addHeat(S.factions, 'wardenKill'));   // Warden Eyes are drones, not Wardens
+    // story fights set their own Heat (A1-M5); killing a story mission's Wardens doesn't stack more on top
+    if (enemy.faction === 'concord' && enemy.tags.includes('frame') && !S.contract?.mission.story) emit('heat', addHeat(S.factions, 'wardenKill'));   // Warden Eyes are drones, not Wardens
     S.stats.kills++;
     if (S.contract) S.contract.kills++;
     const p = live.player;

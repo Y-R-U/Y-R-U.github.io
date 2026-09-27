@@ -73,3 +73,6 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 - 2026-09-27: pushed e6d210b8 (P2a PLAYABLE + P3w verdant WIP) after P3w reported boot green; live check below.
   live verified e6d210b8: 0 bad; ready 21 s and 31 s under agent GPU contention, then 7.2 s (143 reqs, 0.95 MB before ready; scratchpad/mgr/live_net.mjs lists the slowest requests).
 - 2026-09-27 14:50+: P3w (a576a0f9…) and P3g (a27cc35e…) died at the limit; resumed via SendMessage.
+- 2026-09-27: **P3w DONE** (terraces/arcology/arcology_servers, lifts, halloran/seraph/turret; critic 3.9→5.0; no leaks). Pushed 2ff86b9c. Forwarded its requests to P3g. Launched **art r5** (a6ac34c7…: crowd variety, gameplay-frame richness). Running: P3g + art r5.
+- 2026-09-27: Aaron → D23. Art r5 redirected from crowd variety to lake motion and then the P4 districts (portside, stacks, home pod). Parked: the dialogue speaker-portrait UI, to revisit after the main game is built.
+- 2026-09-27 23:40+: P3g + art r5 died at the limit; resumed via SendMessage.

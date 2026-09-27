@@ -244,6 +244,7 @@ export function createRunner(ctx) {
     if (R.mission.story) {
       // story contracts restart the step instead of failing (checkpoints)
       ui.toast(text || 'Checkpoint', 'bad', { sub: 'Back to the last checkpoint' });
+      log(`checkpoint ${reason}: ${text || ''}`);
       for (const e of enemies.list) if (e.mission === R.mission.id && !e.escort && e.state !== 'dead') e.state === 'idle' || (e.hunter = false);
       for (const n of Object.values(R.npcs)) if (n.state === 'dead' || !n.c.alive) { enemies.clear((x) => x === n); enemies.removeDecoy(n.decoy); }
       R.npcs = {};
@@ -397,7 +398,7 @@ export function createRunner(ctx) {
     }
     if (R.scriptedPack && !R.scriptedCleared && R.scriptedPack.ents?.every((e) => e.state === 'dead')) { R.scriptedCleared = true; storyEvent(R.scriptedPack.trigger.event + 'Cleared'); }
 
-    if (!steps.update(R, s, dt)) {
+    if (!steps.update(R, s, dt) && R) {
       const st = site(s.site);
       switch (s.type) {
         case 'goto': case 'exfil': {

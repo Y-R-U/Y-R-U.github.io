@@ -1,3 +1,5 @@
+import { SCRIPTS_A2, SPEAKERS_A2 } from './story_a2.js';
+
 // STORY §8 script tables. trigger: event name from the mission runner, or 'after:N' to chain after beat N.
 // mode: bark (subtitle + VO, play continues) | dlg (dialogue panel) | card (full-screen text) | action (no line).
 
@@ -86,3 +88,6 @@ export const SPEAKERS = {
   thug: { name: 'Silverhand thug', role: 'Syndicate', portrait: { kind: 'black', seed: 19 } },
   warden: { name: 'Warden dispatch', role: 'Concord security', portrait: { kind: 'robot', seed: 6 } },
 };
+
+Object.assign(SCRIPTS, SCRIPTS_A2);
+Object.assign(SPEAKERS, SPEAKERS_A2);

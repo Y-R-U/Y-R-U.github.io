@@ -128,10 +128,41 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
 - First frame delivery uses the drop-pod (js/game/frames.js `podDelivery`): pod lands 3.2 m in front (1.5 s), opens (0.6 s),
   the rental beams out and the new frame beams in at the pod door; the pod leaves 0.9 s later. Later swaps: plain beam.
 
+- Pod + breakables verified headless (pod.mjs: land→open→beam-in at the pod door, pod picked to screen-right so it's in
+  frame, drone hidden once it climbs past 8 m so it never fills the camera; brk.mjs: vending smashed in Brightline, +5 cr).
+  Level-up sting shows feature descriptions ("Brightline Boulevard"), not ids.
+
+## DONE (P3 archetypes) — all 16 non-heist archetypes are in the runtime scope (`RUN_ARCH` in game.js, = balance P2A_ARCH)
+- tail (steps.js): target strolls via 2 stops to the meeting site, glances back at stops; suspicion meter over its head
+  (too close <5 m, or in its view while it looks back); distance band (`ui.band`), lost after 8 s beyond 22 m; made = fail.
+- race: 3-2-1-GO, beacons on the next two checkpoints, 2 rival riders run the course at ~par×0.8–1.05, place shown in the
+  meter; 1st = `raceFirst` (+50%) through finishContract.
+- repo (capture): the deadbeat can't be wrecked (`e.noKill`), runs and blinks away when you close in, slumps below 20% →
+  "Capture the frame". rescue: the hostage sits cuffed (not a target) until the hack frees it, then escort + evac defend.
+- assassinate: at `fleeAt` the target runs for its car (red beacon); reaching it = "The target got away".
+- Autopilot: tail (hang back ~9 m), capture interact. arch.mjs runs (Brightline, L7): tail ok, race ok (1st), repo ok,
+  rescue ok, assassinate ok (FLEE=1 forces the flee). test.mjs 21/21. Runner guard: a step that fails the mission mid-update.
+
+## DONE (Act 2 staging, first pass — being bot-verified)
+- Sim: `arcology_servers` (B4) is a sim district (unlocked by A2-M2 with arcology). story.js templates now take `site:` (the
+  world's named place, tags as fallback), escort `path: [{site|tags}]`, tail `end:`, `npcs:`, packs `atPath`.
+- js/data/story.js A2-M1…M5 hand-built: M1 escort Fenn garden→glasshouse (vt_memorial_garden, vt_npc_fenn; 2 sweeper
+  ambushes), M2 B4 infiltrate (as_archive_core, stealthy, memory-shard card + Tomas VO), M3 tail the gold frame to ax_lift
+  + photo the meeting, M4 heist ax_vault_evidence → Halloran boss after the pickup → Seraph scene → exfil, M5 defend the
+  glasshouse (protect Fenn, 3 waves) → R2 reveal, Dray PA, Fenn shut down. Scripts: NEW js/data/story_a2.js (merged into
+  SCRIPTS/SPEAKERS by story_a1.js; speakers tomas, voice).
+- game.js: storyActCap 2; story cards unlock their own district and are rebuilt with the real sites on accept; lift pads
+  (`id:'lift'`) → districts.lift → world.liftTransition, player at spawnPoints.lift (not during contracts); seraphScene()
+  (seraph tier 3 drops 16 m, two hits to 1 HP, hums a2_s04_seraph_02, flies off); fennDown; Act 1/Act 2 end stings.
+- boss.js: SCRIPT.halloran (lines a2_s04_halloran_01/02, adds 3 Wardens at 60%, speaker halloran); only Kettle vents.
+  enemies.js `halloran.robotKind = 'boss_halloran'`; winged kinds (seraph/flying) hover 1.8 m.
+- sim: killing a story mission's Wardens adds no Heat (A2-M1 went to 5★ and squads killed Fenn in a loop).
+- Autopilot: storyat/gates for a2_m1..a2_m5, `storyend=` (default a2_m5). Driver scratchpad `gameplay/story2.mjs <id>`.
+- Not done (world-owned, noted for the manager): fewer civilians in B4 (crowd.js/tier.crowd are world files).
+
 ## IN PROGRESS
-- verify pod + breakables in the browser (tour.mjs), then P3 systems.
+- Bot runs of A2-M1…M5 (A2-M1: Fenn died once in the escort fight → checkpoint; re-verifying), then VO for Act 2.
 
 ## NEXT (P3)
-- rep tiers/vendor pricing/rival UI; archetypes tail/repo/race/rescue runtime (+ assassinate flee); Fabricator (recalibrate UI,
-  salvage-all, tune pity); relic hooks still missing at runtime (afterimage, phantom_step, reactive_plating, stillwater check,
-  kinetic_battery consume); Hostile threat; danger/Crackdown; Echo clues; Act 2 staging in terraces/arcology + VO.
+- rep tiers/vendor pricing/rival UI; Fabricator (recalibrate UI, tune pity); relic hooks (afterimage, phantom_step,
+  reactive_plating, stillwater, kinetic_battery); Hostile threat check; danger/Crackdown; Echo.

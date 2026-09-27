@@ -25,6 +25,13 @@ export const DISTRICTS = {
     pools: [['concord', 6], ['syndicate', 2]],
     packs: ['security_floor', 'warden_patrol', 'chromehead_duo'],
   },
+  // B4 under the Arcology (the archive floor): reached by the lift, or the relay once A2-M2 opens it
+  arcology_servers: {
+    id: 'arcology_servers', name: 'Arcology B4 · Servers', minLvl: 10, maxLvl: 24, act: 2, unlock: { level: 10, story: 'a2_m2' }, danger: 4, gang: 'Floor Thirteen', floor: -4,
+    tags: ['vault', 'interior', 'lobby', 'relay', 'spawn_edge'],
+    pools: [['concord', 7], ['syndicate', 1]],
+    packs: ['security_floor', 'warden_patrol'],
+  },
   portside: {
     id: 'portside', name: 'Portside', minLvl: 15, maxLvl: 30, act: 3, unlock: { level: 18, story: 'a3_m1' }, danger: 5, gang: 'Silverhand Dockers',
     tags: ['dock', 'pad', 'warehouse', 'market', 'vault', 'alley', 'locker', 'relay', 'spawn_edge'],
@@ -69,7 +76,7 @@ export const DISTRICTS = {
   },
 };
 
-export const DISTRICT_ORDER = ['aurum_plaza', 'brightline', 'terraces', 'arcology', 'portside', 'stacks', 'spine', 'hullside', 'meridian', 'helm', 'landfall'];
+export const DISTRICT_ORDER = ['aurum_plaza', 'brightline', 'terraces', 'arcology', 'arcology_servers', 'portside', 'stacks', 'spine', 'hullside', 'meridian', 'helm', 'landfall'];
 
 // Virtual site layout used when world.sites isn't available (node sim, early boot).
 // 2-4 sites per tag, laid out on a ring so goto distances are 40-120 m.

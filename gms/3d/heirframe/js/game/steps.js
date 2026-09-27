@@ -12,7 +12,7 @@ export function createSteps(ctx, run) {
   function spawnNpc(R, npc) {
     if (R.npcs[npc.id]) return R.npcs[npc.id];
     const s = run.site(npc.site) || { x: player.pos.x + 3, z: player.pos.z };
-    const e = enemies.spawn({ defId: npc.defId || 'escortee', level: R.mission.level, name: npc.name }, s.x + 1.2, s.z + 1.2, { yaw: 0 });
+    const e = enemies.spawn({ defId: npc.defId || 'escortee', rank: npc.rank, level: R.mission.level, name: npc.name }, s.x + 1.2, s.z + 1.2, { yaw: 0 });
     e.mission = R.mission.id; e.escort = true; e.npc = npc;
     // a cuffed hostage isn't a target until you free them (the escort step adds the decoy)
     if (npc.id === 'hostage') { e.cuffed = true; e.bot.play('sit', { loop: true }); }
@@ -192,7 +192,9 @@ export function createSteps(ctx, run) {
   function enterTail(R, s) {
     const e = R.target;
     if (!e) { run.complete(); return; }
-    e.escort = true; e.tailing = true;
+    e.escort = true; e.tailing = true; e.state = 'idle'; e.fleeT = 0;
+    // a story checkpoint restarts the tail: the target walks back into view first
+    if (R.tailReset) { e.pos.set(R.tailReset.x, ctx.world.groundAt(R.tailReset.x, R.tailReset.z), R.tailReset.z); R.tailReset = null; }
     const end = run.site(s.endSite) || e.home;
     // a stroll: two stops on the way, then the meeting spot
     const all = ctx.world.sites.filter((q) => q.tag !== 'spawn_edge' && Math.hypot(q.x - e.pos.x, q.z - e.pos.z) > 15);
@@ -202,7 +204,7 @@ export function createSteps(ctx, run) {
     for (const p of path) { len += Math.hypot(p.x - prev.x, p.z - prev.z); prev = p; }
     const stops = path.length - 1;
     const walkT = Math.max(30, (s.duration || 120) - stops * 6);
-    R.ss.tail = { path, wp: 0, speed: Math.min(3.2, Math.max(1.8, len * 1.25 / walkT)), pause: 0, look: 0, sus: 0, far: 0, near: 0 };
+    R.ss.tail = { path, wp: 0, speed: Math.min(3.2, Math.max(1.8, len * 1.25 / walkT)), pause: 0, look: 0, sus: 0, far: 0, near: 0, grace: 4 };
     ui.toast(`Tail ${e.c.name}`, 'info', { sub: `Stay ${s.minD || 5}–${s.maxD || 22} m back. Don't let them see you.` });
   }
   function updateTail(R, s, dt) {
@@ -220,8 +222,8 @@ export function createSteps(ctx, run) {
       T.pause = 3 + Math.random() * 3; T.look = Math.random() < 0.7 ? 2 : 0;
     } else if (Math.random() < dt * 0.04) { T.pause = 1.6; T.look = 1.6; }
     // suspicion: close behind, or anywhere in view while it looks back
-    const inView = Math.abs(angDiff(Math.atan2(player.pos.x - e.pos.x, player.pos.z - e.pos.z), e.yaw)) < 0.9 && d < 13 && !pc.hidden && ctx.losClear(e.pos, player.pos);
-    const rate = (d < minD ? 0.6 : 0) + (inView && T.look > 0 ? 0.9 * (1 - d / 13) + 0.2 : 0);
+    const inView = Math.abs(angDiff(Math.atan2(player.pos.x - e.pos.x, player.pos.z - e.pos.z), e.yaw)) < 0.9 && d < 11 && !pc.hidden && ctx.losClear(e.pos, player.pos);
+    const rate = (T.grace -= dt) > 0 ? 0 : (d < minD ? 0.6 : 0) + (inView && T.look > 0 ? 0.7 * (1 - d / 11) + 0.1 : 0);
     T.sus = rate > 0 ? Math.min(1, T.sus + rate * dt) : Math.max(0, T.sus - dt * 0.15);
     e.bot.setAlert(T.sus > 0.1 ? 1 : 0);
     tmp.set(e.pos.x, e.pos.y + 2.3, e.pos.z);
@@ -230,7 +232,7 @@ export function createSteps(ctx, run) {
     T.far = d > maxD ? T.far + dt : 0;
     const lose = s.loseTime || 8;
     ui.band.set({ value: d, min: 0, max: maxD + 10, lo: minD, hi: maxD, label: `Tailing ${e.c.name}`, warn: T.far > 0 ? `Losing them: ${Math.ceil(lose - T.far)}s` : T.sus > 0.5 ? 'They sense something' : '' });
-    if (T.sus >= 1) { ui.band.hide(); ui.detect.clear(e.id); audio.sfx('alarm', { vol: 0.5 }); e.state = 'flee'; e.fleeT = 5; e.escort = false; run.fail('spotted', 'You were made'); return; }
+    if (T.sus >= 1) { if (R.mission.story) R.tailReset = T.path[Math.min(T.wp, T.path.length - 1)]; ui.band.hide(); ui.detect.clear(e.id); audio.sfx('alarm', { vol: 0.5 }); e.state = 'flee'; e.fleeT = 5; e.escort = false; run.fail('spotted', 'You were made'); return; }
     if (T.far >= lose) { ui.band.hide(); ui.detect.clear(e.id); run.fail('lost', 'You lost the target'); }
   }
 
@@ -348,7 +350,7 @@ export function createSteps(ctx, run) {
     }
     if (R.ss.fleeing) {
       e.brain = () => true;
-      if (!walkNpc(e, car, (e.c.stats.moveSpeed || 4) * 1.1, dt, 'carRoute')) { enemies.clear((x) => x === e); fx.beam(car, 0xff6040, 0.6, 6, 1.4); run.fail('escaped', 'The target got away'); }
+      if (!walkNpc(e, car, (e.c.stats.moveSpeed || 4) * 0.85, dt, 'carRoute')) { enemies.clear((x) => x === e); fx.beam(car, 0xff6040, 0.6, 6, 1.4); run.fail('escaped', 'The target got away'); }
     }
   }
 

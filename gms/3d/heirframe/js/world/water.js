@@ -173,6 +173,9 @@ export function createLakeMaterial(ctx, { shore }) {
   const churn = shore.churn.map((c) => `${c[4].toFixed(2)} * (1.0 - smoothstep(0.0, 6.0, ${box(c)}))`).join(' + ') || '0.0';
   // foam plume: the white water rolls out downstream (+z) and breaks into drifting scum lines
   const plume = shore.churn.map((c) => `${c[4].toFixed(2)} * (1.0 - smoothstep(0.0, 30.0, ${box([c[0], c[1], c[2], c[3] + 4])})) * smoothstep(-8.0, 2.0, p.y - ${c[1].toFixed(2)})`).join(' + ') || '0.0';
+  const old = typeof location !== 'undefined' && /[?&]lake=old/.test(location.search);
+  // impact rings: waves travelling out from every place a fall lands (gradient contribution + outward flow direction)
+  const rings = shore.churn.map((c) => `lkRing(p, vec2(${((c[0] + c[2]) / 2).toFixed(2)}, ${((c[1] + c[3]) / 2).toFixed(2)}), vec2(${((c[2] - c[0]) / 2).toFixed(2)}, ${((c[3] - c[1]) / 2).toFixed(2)}), ${c[4].toFixed(2)}, gr, fl);`).join('\n  ');
   m.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, u);
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
@@ -183,9 +186,24 @@ float lkN(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
 float sdBox(vec2 p, vec2 c, vec2 h){ vec2 d = abs(p - c) - h; return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0); }
 float lkShore(vec2 p){ return ${sdf}; }
 float lkChurn(vec2 p){ return clamp(${churn}, 0.0, 1.0); }
-float lkPlume(vec2 p){ return clamp(${plume}, 0.0, 1.0); }`)
+float lkPlume(vec2 p){ return clamp(${plume}, 0.0, 1.0); }
+float lkCrest = 0.0;
+void lkRing(vec2 p, vec2 c, vec2 h, float k, inout vec2 g, inout vec3 fl){
+  vec2 q = p - c, a = abs(q) - h, dir; float d;
+  if (max(a.x, a.y) > 0.0) { vec2 m = max(a, 0.0); d = length(m); dir = sign(q) * m / max(d, 1e-3); }
+  else { d = max(a.x, a.y); dir = a.x > a.y ? vec2(sign(q.x), 0.0) : vec2(0.0, sign(q.y)); }
+  float R = 22.0 * k + 6.0;
+  if (d > R) return;
+  float env = k * exp(-d / (9.0 * k + 3.0)) * smoothstep(-1.0, 2.5, d) * (1.0 - smoothstep(R * 0.6, R, d));
+  float w = lkN(p * 0.13) * 4.0;
+  float s = 0.26 * sin(d * 2.1 - uTime * 3.4 + w) + 0.16 * sin(d * 1.15 - uTime * 2.1 + w * 0.7) + 0.08 * sin(d * 3.7 - uTime * 5.2 + w * 1.3);
+  g += dir * s * env;
+  fl += vec3(dir * env, env);
+  float cr = max(0.0, sin(d * 1.15 - uTime * 2.1 + w * 0.7 + 1.2)); cr *= cr; cr *= cr;
+  lkCrest += env * cr * smoothstep(1.0, 5.0, d);
+}`)
       .replace('#include <color_fragment>', `#include <color_fragment>
-vec2 lkP = vec2(0.0); float lkD = 30.0, lkFoam = 0.0, lkC = 0.0, lkFar = 0.0;
+vec2 lkP = vec2(0.0); float lkD = 30.0, lkFoam = 0.0, lkC = 0.0, lkFar = 0.0, lkGlint = 0.0;
 #ifdef USE_FOG
   lkP = vFogWorldPos.xz;
   lkFar = smoothstep(15.0, 90.0, vFogDepth);
@@ -215,7 +233,7 @@ vec2 lkP = vec2(0.0); float lkD = 30.0, lkFoam = 0.0, lkC = 0.0, lkFar = 0.0;
   lkFoam = clamp(edge * smoothstep(0.25, 0.6, fn + edge * 0.3) + fall, 0.0, 1.0);
   diffuseColor.rgb = mix(wc, vec3(0.92, 0.95, 0.96), lkFoam);
 }`)
-      .replace('#include <normal_fragment_maps>', `
+      .replace('#include <normal_fragment_maps>', old ? `
 {
   // world-space height gradient: slow swell (analytic) + two scrolling ripple layers (texture)
   vec2 p = lkP;
@@ -233,9 +251,59 @@ vec2 lkP = vec2(0.0); float lkD = 30.0, lkFoam = 0.0, lkC = 0.0, lkFar = 0.0;
   // specular AA: sub-pixel ripples widen the highlight instead of aliasing into single-pixel sparkles
   roughnessFactor = clamp(max(roughnessFactor, nv * 1.1 + lkFar * 0.04), 0.0, 0.22);
   roughnessFactor = mix(roughnessFactor, 0.75, lkFoam);
-}`);
+}` : `
+{
+  // world-space height gradient: slow swell (analytic) + scrolling ripple layers (texture) + impact rings + travelling gusts
+  vec2 p = lkP;
+  vec2 g = vec2(0.0);
+  g += vec2(0.8, 0.6) * cos(dot(p, vec2(0.8, 0.6)) * 0.09 + uTime * 0.35) * 0.09 * 0.12;
+  g += vec2(-0.5, 0.86) * cos(dot(p, vec2(-0.5, 0.86)) * 0.13 - uTime * 0.28) * 0.13 * 0.08;
+  g += vec2(0.2, 0.98) * cos(dot(p, vec2(0.2, 0.98)) * 0.42 - uTime * 0.9) * 0.42 * 0.05;
+  vec2 gr = vec2(0.0); vec3 fl = vec3(0.0);
+  ${rings}
+  // flow: near a landing the fine ripples are carried outward (two-phase flow map, no stretching)
+  vec2 fdir = fl.z > 1e-3 ? fl.xy / max(length(fl.xy), 1e-3) * min(fl.z * 2.5, 1.2) : vec2(0.0);
+  float ph0 = fract(uTime * 0.35), ph1 = fract(uTime * 0.35 + 0.5), fw = abs(ph0 - 0.5) * 2.0;
+  vec2 r2 = texture2D(tRip, p / 4.3 - fdir * ph0 * 1.4 + vec2(-uTime * 0.05, uTime * 0.065)).xy;
+  if (fl.z > 0.01) r2 = mix(r2, texture2D(tRip, p / 4.3 - fdir * ph1 * 1.4 + vec2(-uTime * 0.05, uTime * 0.065) + 0.37).xy, fw);
+  r2 = r2 * 2.0 - 1.0;
+  vec2 r1 = texture2D(tRip, p / 11.0 + vec2(uTime * 0.03, uTime * 0.018)).xy * 2.0 - 1.0;
+  vec2 r3 = texture2D(tRip, p / 27.0 + vec2(-uTime * 0.012, -uTime * 0.02)).xy * 2.0 - 1.0;
+  // gusts (cat's paws): rough patches that sweep across the lake with the wind at ~2.5 m/s
+  vec2 wd = vec2(0.8, 0.6), wp = vec2(-0.6, 0.8);
+  float al = dot(p, wd), ac = dot(p, wp);
+  vec2 gt = texture2D(tRip, vec2(al * 0.0045 - uTime * 0.011, ac * 0.008)).xy;
+  float gu = smoothstep(0.5, 0.78, gt.x * 0.6 + gt.y * 0.4);
+  vec2 rip = (r1 * 0.22 + r2 * 0.15) * (0.4 + 0.5 * lkN(p * 0.045 + uTime * 0.02) + 1.1 * gu) + r3 * 0.07;
+  if (gu > 0.01) rip += (texture2D(tRip, p / 1.7 + wd * uTime * 0.55).xy * 2.0 - 1.0) * 0.12 * gu;
+  float nv = length(fwidth(rip + gr));
+  rip *= (1.0 - 0.35 * lkFar) * (1.0 + lkC * 2.2 + lkPlume(lkP) * 0.8) * (1.0 - 0.7 * lkFoam);
+  g += rip + gr * (1.0 - 0.6 * lkFoam);
+  diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.62, 0.78, 0.8), clamp(lkCrest * 0.45, 0.0, 0.3) * (1.0 - lkFoam));
+  vec3 nW = normalize(vec3(-g.x, 1.0, -g.y));
+  normal = normalize((viewMatrix * vec4(nW, 0.0)).xyz);
+  roughnessFactor = clamp(max(roughnessFactor, nv * 1.1 + lkFar * 0.04 + gu * 0.02), 0.0, 0.22);
+  roughnessFactor = mix(roughnessFactor, 0.75, lkFoam);
+  // sun glints: tiny facets that catch the sun for a moment (cells re-roll ~5x a second)
+#if NUM_DIR_LIGHTS > 0
+  {
+    vec3 H = normalize(directionalLights[0].direction + normalize(vViewPosition));
+    if (dot(normal, H) > 0.94) {
+    vec2 cell = floor(p * 2.6); float ph = floor(uTime * 5.0 + lkH(cell) * 5.0);
+    vec2 tilt = (vec2(lkH(cell + ph * 0.137), lkH(cell.yx + ph * 0.291)) - 0.5) * 0.5;
+    vec3 fn = normalize((viewMatrix * vec4(normalize(vec3(-g.x - tilt.x, 1.0, -g.y - tilt.y)), 0.0)).xyz);
+    float sp = pow(max(dot(fn, H), 0.0), 900.0) * step(0.965, lkH(cell * 1.7 + ph));
+    lkGlint = min(sp * 6.0, 5.0) * (1.0 - lkFoam) * (1.0 - smoothstep(0.05, 0.12, nv));
+    }
+  }
+#endif
+}`)
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+#if NUM_DIR_LIGHTS > 0
+totalEmissiveRadiance += directionalLights[0].color * lkGlint * 0.35;
+#endif`);
   };
-  let hsh = 0; for (const ch of sdf + churn + plume) hsh = (Math.imul(hsh, 31) + ch.charCodeAt(0)) | 0;
+  let hsh = 0; for (const ch of sdf + churn + plume + (old ? 'old' : '')) hsh = (Math.imul(hsh, 31) + ch.charCodeAt(0)) | 0;
   const key = 'lake' + hsh;
   m.customProgramCacheKey = () => key;
   return m;

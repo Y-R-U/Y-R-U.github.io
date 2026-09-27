@@ -38,9 +38,10 @@ export function createDistricts(G, ctx) {
   }
   const unsub = world.onDistrict ? world.onDistrict(cleanup) : null;
 
+  let arrive = 'relay';
   function onSwap(w, id) {
     if (!unsub) cleanup(w, id);
-    const sp = world.spawnPoints.relay || world.spawnPoints.player;
+    const sp = world.spawnPoints[arrive] || world.spawnPoints.relay || world.spawnPoints.player;
     const p = ctx.nav.nearest(sp.x, sp.z + 2.5) || sp;
     player.teleport(p.x, p.z, Math.PI);
     rig.target.copy(player.pos); rig.snap();
@@ -48,10 +49,11 @@ export function createDistricts(G, ctx) {
   }
 
   // hop to another district through the relay tunnel; resolves true when there
-  async function travel(id, { reason = 'relay' } = {}) {
+  async function travel(id, { reason = 'relay', via = 'relay' } = {}) {
     if (D.busy || !world.loadDistrict) return false;
     if (world.district?.id === id) return true;
-    const r = sim.travel(id);
+    if (via === 'lift') sim.unlockDistrict(id);   // the lift bank is always open between Arcology floors
+    const r = via === 'lift' ? (sim.travel(id).ok ? { ok: true } : { ok: true, soft: true }) : sim.travel(id);
     if (!r.ok) {
       ui?.toast(r.reason === 'heat' ? 'Transit Relays locked' : 'District locked', 'bad', { sub: r.reason === 'heat' ? 'Lose some Heat first (4★ locks the relays)' : 'The story opens it' });
       audio.sfx('ui_deny');
@@ -60,12 +62,21 @@ export function createDistricts(G, ctx) {
     D.busy = true;
     player.frozen = true;
     audio.sfx('contract_accept', { vol: 0.6 });
-    try { await world.relayTransition(id, { onSwap }); }
+    arrive = via;
+    try { await (via === 'lift' && world.liftTransition ? world.liftTransition(id, { onSwap }) : world.relayTransition(id, { onSwap })); }
     catch (e) { console.error('relay failed', e); }
     player.frozen = false;
     D.busy = false;
-    ui?.toast(NAMES[id] || id, 'info', { sub: reason === 'contract' ? 'Contract site' : 'Transit Relay' });
+    ui?.toast(NAMES[id] || id, 'info', { sub: reason === 'contract' ? 'Contract site' : via === 'lift' ? 'Lift' : 'Transit Relay' });
     return true;
+  }
+
+  // Arcology lift pads: {id:'lift', to}
+  function lift(it) {
+    const to = it?.to;
+    if (!to) return;
+    if (G.runner.active) { ui?.toast('Finish your contract first', 'warn', { sub: 'The job is on this floor' }); return; }
+    travel(to, { via: 'lift' });
   }
 
   // the relay kiosk: pick a destination among unlocked districts
@@ -91,5 +102,5 @@ export function createDistricts(G, ctx) {
     }
   }
 
-  return { travel, relayMenu, boot, get busy() { return D.busy; }, get id() { return world.district?.id || 'aurum_plaza'; } };
+  return { travel, lift, relayMenu, boot, get busy() { return D.busy; }, get id() { return world.district?.id || 'aurum_plaza'; } };
 }

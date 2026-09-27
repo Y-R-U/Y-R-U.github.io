@@ -10,14 +10,18 @@ const KETTLE_PAINT = {
   mech: { color: 0x2a2320, metal: 0.8, rough: 0.4 }, glow: 0xff7a20, eye: 0xffb040,
 };
 const SCRIPT = {
-  big_kettle: { paint: KETTLE_PAINT, scale: 1.08, title: 'Silverhand Captain', lines: { spawn: 'a1_s10_kettle_02', phase: 'a1_s11_kettle_01', down: 'a1_s11_kettle_02' } },
+  big_kettle: { paint: KETTLE_PAINT, scale: 1.08, title: 'Silverhand Captain', speaker: 'kettle', steam: true, lines: { spawn: 'a1_s10_kettle_02', phase: 'a1_s11_kettle_01', down: 'a1_s11_kettle_02' },
+    phaseSting: ['is boiling over', 'Faster, angrier, and he brought friends'] },
+  // A2-M4: shield + shock lance; at 60% she calls a Warden squad and starts lunging harder
+  halloran: { scale: 1.05, title: 'Warden-Captain', speaker: 'halloran', lines: { spawn: 'a2_s04_halloran_01', phase: 'a2_s04_halloran_02' },
+    phaseSting: ['calls it in', 'Warden squad inbound. She stops holding back'], adds: { defId: 'warden', count: 3 } },
 };
 
 export function createBoss(ctx) {
   const { enemies, ui, audio, fx } = ctx;
   const v = new THREE.Vector3();
   let B = null;
-  const line = (key) => (ctx.bossLine ? ctx.bossLine(key, 'kettle') : audio.vo(key));
+  const line = (key) => (ctx.bossLine ? ctx.bossLine(key, B?.sc.speaker || 'kettle') : audio.vo(key));
 
   function spawnStandIn(def, x, z, R, sc) {
     const e = enemies.spawn({ defId: def.defId, level: def.level || R.mission.level, name: def.name }, x, z, { hostile: true, paint: sc.paint, scale: sc.scale || 1.25 });
@@ -53,6 +57,7 @@ export function createBoss(ctx) {
     if (!B || B.e !== e) return false;
     const c = e.c;
     B.t += dt;
+    if (!B.sc.steam) { if (B.phase === 0 && c.hp < c.stats.hp * B.phases[0]) phase2(e); return false; }
     // steam: boss_kettle vents from its own sockets (steam()); the stand-in fakes it with pale sparks
     const steam = e.bot.steam ? (k) => e.bot.steam(k) : (k) => fx.sparks(v.set(e.pos.x - Math.sin(e.yaw) * 0.6, e.pos.y + 2.4 * e.bot.root.scale.y, e.pos.z - Math.cos(e.yaw) * 0.6), 0xf0e6dc, Math.ceil(k * 6), 2.5);
     if (!e.bot.steam && (B.steamT -= dt) <= 0) { B.steamT = B.phase ? 0.08 : 0.2; steam(0.2); }
@@ -73,7 +78,8 @@ export function createBoss(ctx) {
   function phase2(e) {
     B.phase = 1;
     const c = e.c;
-    ui.sting(`${c.name} is boiling over`, 'Faster, angrier, and he brought friends', 'alert', 2600);
+    const ps = B.sc.phaseSting || ['enrages', 'Watch out'];
+    ui.sting(`${c.name} ${ps[0]}`, ps[1], 'alert', 2600);
     if (B.sc.lines?.phase) line(B.sc.lines.phase);
     audio.sfx('alarm', { vol: 0.5 });
     fx.ring(e.pos, 6, 0xff5020, 0.7);
@@ -83,7 +89,7 @@ export function createBoss(ctx) {
     addStatus(c, { id: 'boil', t: 999, moveMult: 1.2, dmgMult: 1.15, atkSpeedMult: 1.2 });
     c.stats.moveSpeed *= 1.2;
     c.skills.e_dash = SKILLS.e_dash;
-    const adds = B.def.adds || { defId: 'knuckle', count: 3 };
+    const adds = B.def.adds || B.sc.adds || { defId: 'knuckle', count: 3 };
     const R = ctx.runner.active;
     if (R && !B.addsDone) {
       B.addsDone = true;

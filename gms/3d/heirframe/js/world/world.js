@@ -27,6 +27,9 @@ import { createBreakables } from './breakables.js';
 import { bakeCrowdAtlas, createFarCrowdMaterial, addFarCrowd } from './farcrowd.js';
 import { TERRACES } from './verdant.js';
 import { ARCOLOGY, ARCOLOGY_SERVERS } from './nexus.js';
+import { PORTSIDE } from './portside.js';
+import { STACKS } from './stacks.js';
+import { HOME } from './home.js';
 
 export const LAYOUT = {
   bounds: { x0: -58, x1: 47.5, z0: -97, z1: 79 },
@@ -72,10 +75,13 @@ export const DISTRICT_DEFS = {
   terraces: TERRACES,
   arcology: ARCOLOGY,
   arcology_servers: ARCOLOGY_SERVERS,
+  portside: PORTSIDE,
+  stacks: STACKS,
+  home: HOME,
 };
 export const DISTRICT_IDS = Object.keys(DISTRICT_DEFS);
 // ids the P3 brief used; the sim (js/data/districts.js) uses the canonical ones
-export const DISTRICT_ALIASES = { verdant: 'terraces', verdant_terraces: 'terraces', nexus: 'arcology', nexus_arcology: 'arcology', nexus_servers: 'arcology_servers' };
+export const DISTRICT_ALIASES = { verdant: 'terraces', verdant_terraces: 'terraces', nexus: 'arcology', nexus_arcology: 'arcology', nexus_servers: 'arcology_servers', docks: 'portside', spaceport: 'portside', the_stacks: 'stacks', undercity: 'stacks', pod_4471: 'home', pod: 'home' };
 const canon = (id) => DISTRICT_ALIASES[id] || id;
 
 
@@ -165,6 +171,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     if (!expQ && a.exposure) renderer.toneMappingExposure = a.exposure;
     else if (!expQ) renderer.toneMappingExposure = 0.85;
     sunDir.copy(a.sunDir ? new THREE.Vector3(...a.sunDir).normalize() : SUN_DIR);
+    sky.material.uniforms.uSun.value.copy(a.skySun ? new THREE.Vector3(...a.skySun).normalize() : sunDir); sky.material.uniforms.uDusk.value = a.dusk || 0;
     // interiors: no sky dome, cloud shadows or sun motes; their own env map (built by the district, disposed with it)
     const inside = !!a.interior;
     sky.visible = !inside; skyShadows.mesh.visible = !inside; motes.visible = !inside;
@@ -200,11 +207,11 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
       scene: group, root: scene, renderer, camera, M, col, tier, time, pxScale, reflection, layout: def.layout, district: id,
       batch: createBatcher({ cell: def.batchCell || 56, uber: /[?&]nouber/.test(location.search) ? null : M.uber }),
       updaters: [], interactables: [], cache: {}, stats: {}, gather: [], billboards: [], faceCam: [], farSky: [], disposers: [],
-      jetMaterial, makePadRing,
+      jetMaterial, makePadRing, get focus() { return world.focus; }, fadeMat: (m) => fadeMaterial(m, fade, { a2c: tier.msaa > 0 }),
     };
     if (def.env) ctx.env = def.env(renderer, tier);
     def.build(ctx, progress);
-    if (M.farCrowd) addFarCrowd(ctx, M.farCrowd, farN, { extra: def.farLanes || [] });
+    if (M.farCrowd && def.farCrowd !== 0) addFarCrowd(ctx, M.farCrowd, Math.round(farN * (def.farCrowd ?? 1)), { extra: def.farLanes || [] });
     const built = ctx.batch.build(group);
     if (!/[?&]noads/.test(location.search)) addTowerAds(ctx, def.adOrigins || [[0, 0], [0, 30], [-20, -30], [20, -40]], { count: def.adCount || 8 });
     // holo signs/posters fade out (alpha) instead of dithering

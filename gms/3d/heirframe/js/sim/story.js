@@ -194,21 +194,26 @@ function templateMission(def, id, S, rng, level, threat) {
     }
     return pool[0];
   };
-  const siteOf = [];
+  // an exact site id (the world's named places, e.g. vt_memorial_garden) wins when that district's real sites are known
+  const byId = (id) => { const s = id && pool.find(x => x.id === id); if (s) used.add(s.id); return s; };
+  const where = (t, prev) => byId(t.site) || (t.tags ? pick(t.tags, prev, t.far) : prev);
+  const siteOf = [], pathOf = [];
   const steps = def.steps.map((t, i) => {
     const prev = siteOf[i - 1] || null;
-    const site = t.at != null ? siteOf[t.at] : t.tags ? pick(t.tags, prev, t.far) : prev;
+    const site = t.at != null ? siteOf[t.at] : (t.site || t.tags) ? where(t, prev) : prev;
     siteOf[i] = site;
-    const { tags, at, far, spawnTags, orExfilTags, ...rest } = t;
+    const { tags, at, far, spawnTags, orExfilTags, path, end, ...rest } = t;
     const st = sstep(t.type, { ...rest, label: t.label });
-    if (['goto', 'exfil', 'photo', 'defend'].includes(t.type)) st.site = site.id;
+    if (['goto', 'exfil', 'photo', 'defend', 'kill', 'pickup', 'deliver'].includes(t.type) && site) st.site = site.id;
     if (t.type === 'hack') st.sites = [site.id];
+    if (t.type === 'escort') { let p = site; pathOf[i] = (path || []).map(q => (p = where(q, p))); st.path = pathOf[i].map(q => q.id); siteOf[i] = pathOf[i][pathOf[i].length - 1] || site; }
+    if (t.type === 'tail') { const e = where(end || {}, site) || site; st.endSite = e.id; siteOf[i] = e; }
     if (t.type === 'defend') st.spawns = (spawnTags || ['spawn_edge']).map(tag => pick([tag, 'spawn_edge'], site, false).id).filter((v, k, a) => a.indexOf(v) === k);
     if (t.type === 'survive' && orExfilTags) st.orExfil = pick(orExfilTags, site, false).id;
     return st;
   });
   const enemies = (def.packs || []).map((p, k) => ({
-    pack: p.scripted ? 'scripted' : 'story_' + k, faction: def.faction || 'syndicate', atStep: p.atStep, site: (siteOf[p.at] || siteOf[p.atStep]).id,
+    pack: p.scripted ? 'scripted' : 'story_' + k, faction: def.faction || 'syndicate', atStep: p.atStep, site: (p.atPath != null ? pathOf[p.atStep][p.atPath] : siteOf[p.at] || siteOf[p.atStep]).id,
     ...(p.scripted ? { scripted: true, trigger: { event: p.scripted.event, progress: p.scripted.progress } } : {}), guard: !!p.guard,
     units: p.units.flatMap(([defId, rank, n]) => Array.from({ length: n }, () => ({ defId, rank, level }))),
   }));
@@ -218,6 +223,7 @@ function templateMission(def, id, S, rng, level, threat) {
     heat: 0, checkpoints: true, stealthy: !!def.stealthy, bonuses: ['stealth', 'flawless', 'speed', 'clean'],
   };
   if (def.target) m.target = { defId: def.target.defId, rank: def.target.rank || 'grunt', name: def.target.name, level, faction: def.faction, site: siteOf[def.target.at || 0].id };
+  for (const n of def.npcs || []) m.npcs.push({ speed: 3, stopRadius: 8, defId: 'escortee', ...n, site: (byId(n.site) || siteOf[n.at || 0]).id, at: undefined });
   return m;
 }
 

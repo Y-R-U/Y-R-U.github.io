@@ -38,6 +38,7 @@ export function createEnemies(ctx) {
       state: opts.hostile ? 'chase' : 'idle', detect: 0, wanderT: Math.random() * 3, wander: null, strafe: Math.random() < 0.5 ? 1 : -1,
       fleeT: 0, deadT: 0, kbx: 0, kbz: 0, pending: null, pendingT: 0, lastSeen: null, searchT: 0, barkT: 0, id: c.id, nonCombat: c.nonCombat, keepRange: def.keepRange || 0,
       ally: 0, aggro: null, tauntT: 0, tele: null, dash: null, specialT: 1 + Math.random() * 2, brain: null,
+      fly: def.flying || c.robotKind === 'seraph' ? 1.8 : 0,   // winged kinds hover; the rig is a biped
     };
     if (e.state === 'chase') { c.alerted = true; bot.setAlert(2); }
     bot.onEvent = (ev) => { if ((ev === 'impact' || ev === 'fire') && e.pending) release(e); };
@@ -342,7 +343,7 @@ export function createEnemies(ctx) {
         if (T === PLAYER && d > 45 && !e.hunter) { e.state = 'idle'; c.alerted = false; e.bot.setAlert(0); e.detect = 0; }
       }
       separate(e, dt);
-      e.pos.y = world.groundAt(e.pos.x, e.pos.z);
+      e.pos.y = world.groundAt(e.pos.x, e.pos.z) + (e.fly ? e.fly + Math.sin(performance.now() * 0.002 + e.radius * 9) * 0.25 : 0);
       e.bot.root.position.copy(e.pos);
       e.bot.root.rotation.y = e.yaw;
       e.bot.update(dt);

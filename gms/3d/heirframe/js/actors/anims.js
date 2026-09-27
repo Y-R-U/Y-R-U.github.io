@@ -186,6 +186,108 @@ export function sit(P, ctx, t) {
   }
 }
 
+
+// ---------- ambient loops for civilians (crowd life) ----------
+// leaning back against a wall / planter / rail, arms folded, one ankle crossed
+export function lean(P, ctx, t) {
+  const br = Math.sin(t * 1.5), sw = Math.sin(t * 0.37);
+  pel(P, 0, -0.035 * ctx.D.leg / 0.86, -0.07);
+  R(P, 'pelvis', -0.07, 0, 0.02 * sw);
+  R(P, 'spine', -0.04 + br * 0.006, 0, 0);
+  R(P, 'chest', -0.05 + br * 0.015, 0, 0);
+  R(P, 'neck', 0.06 + ctx.st.gp * 0.3, ctx.st.gy * 0.45, 0);
+  R(P, 'head', ctx.st.gp * 0.6, ctx.st.gy * 0.7, ctx.st.tilt + 0.05);
+  for (const s of ['L', 'R']) {
+    const k = s === 'L' ? 1 : 0.92;
+    RS(P, 'clav', s, 0, -0.08, br * 0.015);
+    RS(P, 'upArm', s, -0.3, 0.55 * k, -0.02);
+    RS(P, 'foreArm', s, -1.85 * k, 0, 0);
+    RS(P, 'hand', s, 0.1, 0, 0.35);
+  }
+  const x = stanceX(ctx);
+  legIK(P, ctx, 'L', x * 0.9, ctx.D.ankle, 0.2, 0);
+  legIK(P, ctx, 'R', -x * 0.1 + 0.02, ctx.D.ankle + 0.015, 0.27, 0.35);
+}
+
+// holding a camera up to the face, small reframing moves
+export function photo(P, ctx, t) {
+  idle(P, ctx, t);
+  const a = Math.sin(t * 0.8), b = Math.sin(t * 2.3) * 0.3;
+  A(P, 'chest', -0.04, 0.08 * a, 0);
+  R(P, 'neck', 0.02, 0.05 * a, 0);
+  R(P, 'head', 0.08 + b * 0.05, 0.04 * a, 0.08);
+  for (const s of ['L', 'R']) {
+    RS(P, 'clav', s, 0, -0.12, 0.06);
+    RS(P, 'upArm', s, -0.95, 0.5, 0.42);
+    RS(P, 'foreArm', s, -1.95, 0, 0);
+    RS(P, 'hand', s, 0.15, 0, -0.5);
+  }
+}
+
+// head down over a tablet held in the left hand, right hand tapping it
+export function phone(P, ctx, t) {
+  idle(P, ctx, t);
+  const tap = Math.max(0, Math.sin(t * 3.3)) * Math.max(0, Math.sin(t * 0.6));
+  R(P, 'neck', 0.3, ctx.st.gy * 0.1, 0);
+  R(P, 'head', 0.3, ctx.st.gy * 0.15, 0.04);
+  RS(P, 'upArm', 'L', -0.22, 0.25, 0.1);
+  RS(P, 'foreArm', 'L', -1.55, 0, 0);
+  RS(P, 'hand', 'L', 0.2, 0, -0.9);
+  RS(P, 'upArm', 'R', -0.28, 0.35, 0.12);
+  RS(P, 'foreArm', 'R', -1.3 - 0.12 * tap, 0, 0);
+  RS(P, 'hand', 'R', 0.3 + 0.15 * tap, 0, 0);
+}
+
+// window-shopping / looking around: hands clasped behind the back, slow head scan
+export function browse(P, ctx, t) {
+  idle(P, ctx, t);
+  const scan = Math.sin(t * 0.33), sw = Math.sin(t * 0.21);
+  pel(P, sw * 0.03, P[PX + 1], 0);
+  A(P, 'pelvis', 0, 0, sw * 0.03);
+  A(P, 'chest', 0, 0.18 * scan, 0);
+  R(P, 'neck', 0.05, 0.25 * scan, 0);
+  R(P, 'head', -0.05 + 0.05 * Math.sin(t * 0.9), 0.35 * scan, ctx.st.tilt);
+  for (const s of ['L', 'R']) {
+    RS(P, 'upArm', s, 0.38, -0.25, 0.1);
+    RS(P, 'foreArm', s, -1.25, 0, 0);
+    RS(P, 'hand', s, 0.2, 0, -0.3);
+  }
+}
+
+// pointing up at something (a billboard, a flying car) now and then, otherwise idling
+export function point(P, ctx, t) {
+  idle(P, ctx, t);
+  const k = smooth((Math.sin(t * 0.5) - 0.1) * 2.5);
+  R(P, 'neck', -0.15 * k + 0.03, 0.1 * k, 0);
+  R(P, 'head', -0.3 * k, 0.1 * k, 0);
+  A(P, 'chest', -0.05 * k, 0.15 * k, 0);
+  RS(P, 'upArm', 'R', lerp(0.04, -2.1, k), lerp(0.05, -0.2, k), lerp(0.07, 0.25, k));
+  RS(P, 'foreArm', 'R', lerp(-0.16, -0.12, k), 0, 0);
+  RS(P, 'hand', 'R', lerp(-0.06, 0.2, k), 0, 0);
+}
+
+// pushing a luggage cart (walk or stand): pelvis kept square to the cart, both hands on the handle
+function pushCart(P, ctx) {
+  P[1] = 0; P[2] = 0; P[PX] *= 0.3;
+  P[bi3('spine') + 1] *= 0.3; P[bi3('chest') + 1] *= 0.3;
+  A(P, 'spine', 0.06, 0, 0);
+  for (const s of ['L', 'R']) {
+    RS(P, 'clav', s, 0, 0, 0);
+    RS(P, 'upArm', s, -0.72, 0.12, 0.05);
+    RS(P, 'foreArm', s, -0.28, 0, 0);
+    RS(P, 'hand', s, -0.35, 0, 0.1);
+  }
+}
+
+// shopping bag / case in one hand: that arm hangs a little out and barely swings
+function carryBag(P, ctx, s) {
+  const i = bi3('upArm' + s);
+  P[i] *= 0.25;
+  RS(P, 'upArm', s, P[i], 0.05, 0.16);
+  RS(P, 'foreArm', s, -0.08, 0, 0);
+  RS(P, 'hand', s, 0, 0, -0.08);
+}
+
 // ---------- one-shot actions: fn(P, u 0..1, ctx) ----------
 function lookFwd(P, k = 0.85) {
   const y = P[bi3('pelvis') + 1] + P[bi3('spine') + 1] + P[bi3('chest') + 1];
@@ -502,7 +604,10 @@ export const ACTIONS = {
   hit: { dur: 0.38, events: {} },
   die: { dur: 1.8, events: { down: 0.8 }, hold: true },
 };
-export const LOOPS = ['idle', 'walk', 'run', 'talk', 'sit'];
+export const LOOPS = ['idle', 'walk', 'run', 'talk', 'sit', 'lean', 'photo', 'phone', 'browse', 'point'];
+// named base loops (everything that isn't locomotion or a one-shot action)
+export const BASE_LOOPS = new Set(['talk', 'sit', 'lean', 'photo', 'phone', 'browse', 'point']);
+const AMBIENT = { lean, photo, phone, browse, point };
 
 // Weapon held at low-ready in the right hand (gunner).
 function carry(P, ctx) {
@@ -515,7 +620,13 @@ function carry(P, ctx) {
 
 export function evalBase(name, P, ctx, t) {
   evalBase0(name, P, ctx, t);
-  if (ctx.style.carry && !ctx.hover && !ctx.quad && name !== 'sit' && name !== 'talk') carry(P, ctx);
+  if (ctx.hover || ctx.quad) return;
+  const st = ctx.style;
+  if (st.carry && name !== 'sit' && name !== 'talk') carry(P, ctx);
+  if (st.cart) return pushCart(P, ctx);
+  if (name === 'sit' || name === 'photo' || name === 'lean') return;
+  if (st.bagL && name !== 'phone') carryBag(P, ctx, 'L');
+  if (st.bagR && name !== 'point' && name !== 'talk') carryBag(P, ctx, 'R');
 }
 function evalBase0(name, P, ctx, t) {
   P.fill(0);
@@ -523,6 +634,7 @@ function evalBase0(name, P, ctx, t) {
   if (ctx.quad) return quadBase(name, P, ctx, t);
   if (name === 'talk') return talk(P, ctx, t);
   if (name === 'sit') return sit(P, ctx, t);
+  if (AMBIENT[name]) return AMBIENT[name](P, ctx, t);
   // locomotion: idle <-> walk/run by current speed
   const w = smooth((ctx.move.v - 0.05) / 0.45);
   if (w <= 0.001) return idle(P, ctx, t);
