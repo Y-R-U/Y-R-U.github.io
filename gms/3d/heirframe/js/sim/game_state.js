@@ -8,7 +8,7 @@ import { rollItem, rollKillLoot, rollCache, itemFR, salvageYield, tuneCost, appl
 import { xpNext, addXp, addSyncXp, framePrice, mkUpgrade, repairCost, wreckCost, rerollCost, consumableCost, cleanSlateCost, nextStash, legacyStats, nextGoal, featuresAt, newFeatures, SHIFT_SECONDS, RENTAL_FEE, LEGACY_XP } from './economy.js';
 import { createEnemy } from './enemies.js';
 import { L } from '../data/balance.js';
-import { newFactionState, adjustRep, killRep, resetMissionRep, stance, addHeat, setHeat, tickHeat, heatStars, heatEffects, repPayMul, canHarm } from './factions.js';
+import { newFactionState, adjustRep, killRep, resetMissionRep, stance, addHeat, setHeat, tickHeat, heatStars, heatEffects, repPayMul, canHarm, repTier } from './factions.js';
 import { generateBoard, generateContract, completionRewards, threatDef, validateMission, missionPayout } from './missions.js';
 import { newStoryState, storyReady, completeStory, tickRenewal, rollEcho, echoAvailable, buildStoryMission, storyFlags, storyCacheItem, codexView } from './story.js';
 import { createSaveStore, SAVE_VERSION } from './save.js';
@@ -87,6 +87,12 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     return (threat.loot || 0) + danger * 0.03 + (frameStats().lootLuck || 0) + generationBonus() * 0.1;
   }
   function currentThreat() { return S.overclock.active ? `overclock:${S.overclock.active}` : S.threat; }
+
+  // ---- vendor pricing by reputation (DESIGN §9: Nexus −2% per tier above Neutral; Concord Friendly = cheap repairs) --
+  const VENDOR_MUL = { hated: 1.1, hostile: 1.05, wary: 1, neutral: 1, friendly: 0.98, trusted: 0.96, honored: 0.94 };
+  const vendorMul = (faction = 'nexus') => VENDOR_MUL[repTier(S.factions.rep[faction] ?? 0).id] ?? 1;
+  const nexusPrice = (p) => (p == null ? p : Math.round(p * vendorMul('nexus')));
+  const repairMul = () => (repTier(S.factions.rep.concord ?? 0).min >= 25 ? 0.75 : 1);
 
   // ---- player combatant ------------------------------------------------------------------
   function playerCombatant(rebuild = false) {
@@ -282,7 +288,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     if (S.frames.some(f => f.frameId === frameId)) return { ok: false, reason: 'owned' };
     if (!featuresAt(S.player.level).includes('pro') && !S.flags.firstFrameDiscount) return { ok: false, reason: 'level', need: 5 };
     const owned = ownedFrames().length;
-    const price = framePrice(owned, { discount: S.flags.firstFrameDiscount });
+    const price = nexusPrice(framePrice(owned, { discount: S.flags.firstFrameDiscount }));
     if (price == null) return { ok: false, reason: 'max' };
     if (!spend(price, 'frame')) return { ok: false, reason: 'credits', need: price };
     if (owned === 0) S.flags.firstFrameDiscount = false;
@@ -348,7 +354,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     if (!f) return { ok: false };
     if (f.uid === S.activeFrame) storeHp();
     const missing = 1 - (f.hpFrac ?? 1);
-    const cost = f.rental ? 0 : repairCost(missing, S.player.level, frameStats(f).repairCostPct);
+    const cost = f.rental ? 0 : Math.round(repairCost(missing, S.player.level, frameStats(f).repairCostPct) * repairMul());
     if (cost && !spend(cost, 'repair')) return { ok: false, reason: 'credits', need: cost };
     f.hpFrac = 1; f.wrecked = false;
     if (f.uid === S.activeFrame) restatPlayer({ heal: true });
@@ -361,7 +367,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
   function buyConsumable(id) {
     if (!CONSUMABLES[id]) return { ok: false };
     if ((S.consumables[id] || 0) >= carryCap(id)) return { ok: false, reason: 'full' };
-    if (!spend(consumableCost(id, S.player.level), id)) return { ok: false, reason: 'credits' };
+    if (!spend(nexusPrice(consumableCost(id, S.player.level)), id)) return { ok: false, reason: 'credits' };
     S.consumables[id] = (S.consumables[id] || 0) + 1;
     return { ok: true, count: S.consumables[id] };
   }
@@ -400,7 +406,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     if (!S.market || S.market.shift !== S.shiftIndex) refreshMarket();
     const e = S.market.stock[index];
     if (!e || e.sold) return { ok: false, reason: 'sold' };
-    if (!spend(e.price, 'market')) return { ok: false, reason: 'credits', need: e.price };
+    if (!spend(nexusPrice(e.price), 'market')) return { ok: false, reason: 'credits', need: nexusPrice(e.price) };
     e.sold = true;
     addItem(deepClone(e.item));
     return { ok: true, item: e.item };
@@ -886,7 +892,9 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     activeFrame, frameByUid, itemByUid, ownedFrames, frameStats, frameSkills: skillsOf, frameFR, playerCombatant, lootQuality, currentThreat,
     board, storyCard, currentStep, hud, skillsHud, nextGoal: () => nextGoal(S), codex: () => codexView(S.story, { heirs: S.player.heirs }),
     features: () => featuresAt(S.player.level), threatsUnlocked, enemyStance, freeStash, validateMission,
-    framePrice: () => framePrice(ownedFrames().length, { discount: S.flags.firstFrameDiscount }),
+    framePrice: () => nexusPrice(framePrice(ownedFrames().length, { discount: S.flags.firstFrameDiscount })),
+    vendorMul, nexusPrice, repairMul,
+    standing: () => Object.entries(S.factions.rep).map(([id, v]) => ({ id, value: v, tier: repTier(v) })),
     // actions
     // runtime scope: which archetypes/twists the engine can run (null = all)
     setScope({ archetypes = null, twists = null } = {}) { live.archetypes = archetypes; live.twists = twists; },

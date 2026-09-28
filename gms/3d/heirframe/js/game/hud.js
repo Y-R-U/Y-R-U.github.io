@@ -37,7 +37,7 @@ export function createHudSync(ctx) {
     g.strokeStyle = 'rgba(160,228,255,.25)'; g.lineWidth = 1.5 * dpr; g.strokeRect((b.x0 - P.x) * s, (b.z0 - P.z) * s, (b.x1 - b.x0) * s, (b.z1 - b.z0) * s);
     const dot = (x, z, r, col) => { g.fillStyle = col; g.beginPath(); g.arc((x - P.x) * s, (z - P.z) * s, r * dpr, 0, Math.PI * 2); g.fill(); };
     for (const it of world.interactables) dot(it.x, it.z, 3.2, it.id === 'contracts' ? '#ffd27a' : it.id === 'warehouse' ? '#8fe8ff' : '#b8c8ff');
-    if (ctx.crowd) for (const m of ctx.crowd.members) if (Math.abs(m.pos.x - P.x) < range && Math.abs(m.pos.z - P.z) < range) dot(m.pos.x, m.pos.z, 1.3, 'rgba(255,255,255,.45)');
+    if (ctx.crowd) for (const m of ctx.crowd.members) if (!m.off && Math.abs(m.pos.x - P.x) < range && Math.abs(m.pos.z - P.z) < range) dot(m.pos.x, m.pos.z, 1.3, 'rgba(255,255,255,.45)');
     for (const e of ctx.enemies.list) if (e.state !== 'dead') dot(e.pos.x, e.pos.z, e.nonCombat ? 2.4 : 2.2, e.nonCombat ? '#ffd27a' : e.state === 'idle' ? '#ff9a6a' : '#ff4a4a');
     for (const o of ctx.props.loot) dot(o.pos.x, o.pos.z, 1.8, '#' + (o.credits ? 0xffc850 : RARITY_COLOR[o.item?.rarity] || 0xffffff).toString(16).padStart(6, '0'));
     if (obj) {

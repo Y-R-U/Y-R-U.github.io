@@ -68,11 +68,11 @@ vec3 spaceColor(vec3 d){
       pcol += halo * rim * (0.08 + 0.9 * smoothstep(-0.3, 0.4, lit));
       col = mix(col, pcol, smoothstep(1.0, 0.985, r2));
     }
-    float out = (ang - uPR) / (uPR * 0.12);
-    if (out > 0.0) {
+    float ex = (ang - uPR) / (uPR * 0.12);
+    if (ex > 0.0) {
       vec3 sdir = normalize(d - uPlanet * pc);
       float litE = smoothstep(-0.4, 0.5, dot(sdir, uSun));
-      col += halo * pow(1.0 - clamp(out, 0.0, 1.0), 3.0) * 0.5 * litE;
+      col += halo * pow(1.0 - clamp(ex, 0.0, 1.0), 3.0) * 0.5 * litE;
     }
   }
   // in the env map: the hull as a dark plated floor below the horizon, so chrome and gold reflect structure

@@ -3,7 +3,8 @@ import { RARITIES, RARITY_INDEX, SLOTS, SLOT_NAMES, POWERS, HEIRLOOM_SETS } from
 import { MODIFIERS, THREATS, SITE_NAMES } from '../data/missions.js';
 import { FRAMES, OWNABLE_FRAMES, MK_TIERS, SYNC_MODS, SYNC_NEXT, SKILLS } from '../data/frames.js';
 import { CONSUMABLES } from '../data/economy.js';
-import { itemFR, affixLabel, tuneCost, salvageYield } from './loot.js';
+import { itemFR, affixLabel, tuneCost, salvageYield, recalibrateCost } from './loot.js';
+import { FACTIONS } from '../data/factions.js';
 import { itemStats } from './stats.js';
 import { xpNext, rerollCost, mkUpgrade, repairCost, consumableCost } from './economy.js';
 import { createRng } from './rng.js';
@@ -40,6 +41,7 @@ export function toUiItem(item, { compareTo } = {}) {
     fr: stats.power, tune: item.tune || 0, tuneMax: 10 + (item.maxTuneBonus || 0), tuneChance: tc?.chance ?? null,
     tuneCost: tc ? uiMats({ credits: tc.credits, ...tc.mats }) : null, salvage: uiMats(salvageYield(item, createRng(item.uid))),
     isNew: !!item.new, better: !!item.upgrade,
+    recal: item.affixes?.length ? { locked: item.recal ?? null, cost: uiMats({ credits: recalibrateCost(item).credits, ...recalibrateCost(item).mats }) } : null,
   };
 }
 
@@ -92,11 +94,11 @@ export function toUiWarehouse(game) {
       mk: (f.tier || 0) + 1, mkMax: MK_TIERS.length, mkCost: f.rental ? null : mkUpgrade(f, S.player.level)?.cost ?? null, slotsAllowed: d.slots.slice(),
       stats: { hp: st.hp, shield: st.shield, armor: st.armor, energy: st.energy, weaponDamage: st.weaponDamage, critChance: st.critChance, critDmg: st.critDmg, moveSpeed: st.moveSpeed, dodgeCd: st.dodgeCd },
       slots, skills: skillsView(game, f), syncXp: f.syncXp || 0, syncNext: SYNC_NEXT(f.sync), maxSync: d.maxSync,
-      repair: f.rental || (f.hpFrac ?? 1) >= 0.999 ? null : repairCost(1 - (f.hpFrac ?? 1), S.player.level, st.repairCostPct),
+      repair: f.rental || (f.hpFrac ?? 1) >= 0.999 ? null : Math.round(repairCost(1 - (f.hpFrac ?? 1), S.player.level, st.repairCostPct) * (game.repairMul?.() ?? 1)),
     };
   });
   return {
-    credits: S.credits, active: S.activeFrame, bays: 3, framePrice: game.framePrice(), frames,
+    credits: S.credits, active: S.activeFrame, bays: 3, framePrice: game.framePrice(), frames, level: S.player.level, recalLevel: 8,
     inventory: S.stash.filter(i => !i.equippedOn).map(i => toUiItem(i)), materials: uiMats(S.materials), stashSize: S.stashSize, invMax: S.stashSize,
     shop: OWNABLE_FRAMES.filter(id => !S.frames.some(f => f.frameId === id)).map(id => ({ kind: FRAMES[id].archetype, frameId: id, name: FRAMES[id].name, model: FRAMES[id].model, price: game.framePrice() })),
     owned: frames.filter(f => !f.rental).map(f => f.kind),
@@ -131,11 +133,15 @@ function marketView(game) {
   const lvl = S.player.level;
   const f = game.activeFrame();
   return {
-    stock: S.market.stock.map((e, i) => ({ index: i, price: e.price, sold: !!e.sold, special: !!e.special, item: toUiItem(e.item, { compareTo: f.equipped[e.item.slot] ? game.itemByUid(f.equipped[e.item.slot]) : null }) })),
-    consumables: Object.values(CONSUMABLES).map(c => ({ id: c.id, name: c.name, price: consumableCost(c.id, lvl), count: S.consumables[c.id] || 0,
+    stock: S.market.stock.map((e, i) => ({ index: i, price: game.nexusPrice ? game.nexusPrice(e.price) : e.price, sold: !!e.sold, special: !!e.special, item: toUiItem(e.item, { compareTo: f.equipped[e.item.slot] ? game.itemByUid(f.equipped[e.item.slot]) : null }) })),
+    consumables: Object.values(CONSUMABLES).map(c => ({ id: c.id, name: c.name, price: game.nexusPrice ? game.nexusPrice(consumableCost(c.id, lvl)) : consumableCost(c.id, lvl), count: S.consumables[c.id] || 0,
       cap: c.id === 'repairKit' ? (lvl >= 20 ? c.carryAt20 : c.carry) : 5,
       desc: c.id === 'repairKit' ? `Field repair: heal ${Math.round(c.healPct * 100)}% HP (R / the green button).` : c.id === 'signalJammer' ? 'Drops Heat by one star, right now.' : 'A holo double that draws fire for 6 s.' })),
     refreshIn: null,
+    // faction standing (DESIGN §9) and what it does to Sal's prices / repairs
+    standing: (game.standing?.() || []).map(r => ({ id: r.id, name: FACTIONS[r.id]?.short || FACTIONS[r.id]?.name || r.id, color: FACTIONS[r.id]?.color, value: Math.round(r.value), tier: r.tier.name })),
+    priceNote: game.vendorMul ? `${Math.round((1 - game.vendorMul('nexus')) * 100)}` : '0',
+    repairNote: game.repairMul && game.repairMul() < 1 ? 'Concord Friendly: repairs −25%' : '',
   };
 }
 
@@ -146,7 +152,8 @@ export function toUiComplete(out, game) {
     title: out.mission.title, grade: out.grade, credits: out.credits, bonus: Math.round(bonusPct * 100), xp: out.xp,
     xpMax: xpNext(S.player.level), xpFrom: S.player.xp, level: out.levelTo, levelUp: out.levelTo > out.levelFrom,
     items: out.items.map(i => toUiItem(i)), surcharge: out.surcharge || 0,
-    stats: [...out.bonuses.map(b => ({ label: b.id[0].toUpperCase() + b.id.slice(1), value: `+${Math.round(b.pct * 100)}%` })), ...(out.surcharge ? [{ label: 'HireFrame surcharge', value: `-${out.surcharge} cr` }] : [])],
+    stats: [...out.bonuses.map(b => ({ label: b.id[0].toUpperCase() + b.id.slice(1), value: `+${Math.round(b.pct * 100)}%` })), ...(out.surcharge ? [{ label: 'HireFrame surcharge', value: `-${out.surcharge} cr` }] : []),
+      ...(out.rep || []).filter(r => r.delta).map(r => ({ label: `${FACTIONS[r.faction]?.short || FACTIONS[r.faction]?.name || r.faction} rep`, value: `${r.delta > 0 ? '+' : ''}${r.delta}${r.tierChanged ? ` · now ${r.tier}` : ''}` }))],
   };
 }
 

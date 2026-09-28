@@ -4,6 +4,7 @@ import { createGame as createSim, loadGame } from '../sim/game_state.js';
 import { createSaveStore } from '../sim/save.js';
 import { statusMult } from '../sim/stats.js';
 import { SHIFT_SECONDS, framePrice } from '../sim/economy.js';
+import { affixLabel as affixText } from '../sim/loot.js';
 import { toUiBoard, toUiWarehouse, toUiComplete, toUiItem, toUiCodex, uiConfig } from '../sim/ui_adapt.js';
 import { createFx, RARITY_COLOR } from './fx.js';
 import { createOverlay } from './overlay.js';
@@ -268,6 +269,7 @@ export async function createGame(api) {
     ui.on('warehouse:unequip', wh((p) => G.sim.unequip(p.frameId, p.slot)));
     ui.on('warehouse:autoEquip', wh((p) => { const ch = G.sim.equipBest(p.frameId); ui.toast(ch.length ? `Equipped ${ch.length} part${ch.length > 1 ? 's' : ''}` : 'Already optimal', ch.length ? 'good' : 'info'); return { ok: true }; }));
     ui.on('warehouse:tune', wh((p) => { const r = G.sim.tune(p.itemId); if (r.ok !== false && r.success !== undefined) { ui.toast(r.success ? 'Tune succeeded' : 'Tune failed: materials lost', r.success ? 'good' : 'bad'); audio.bark(r.success ? 'b_ottoline_tune_ok_' : 'b_ottoline_tune_fail_', { cooldown: 8 }); } return r; }));
+    ui.on('warehouse:recal', wh((p) => { const r = G.sim.recalibrate(p.itemId, p.index); if (r.ok !== false) { ui.toast('Recalibrated', 'good', { sub: r.affix ? affixText(r.affix) : '' }); audio.bark('b_ottoline_tune_ok_', { cooldown: 8 }); } return r; }));
     ui.on('warehouse:salvage', wh((p) => { const r = G.sim.salvage(p.itemId); if (r.ok) { ui.toast('Salvaged', 'info', { sub: matsText(r.mats) }); audio.sfx('explosion_small', { vol: 0.4 }); } return r; }));
     ui.on('warehouse:salvageAll', wh((p) => { const R = ['scrap', 'standard', 'tuned', 'custom', 'prototype', 'relic', 'heirloom']; const r = G.sim.salvageAll(R[p.tier] || 'standard'); ui.toast(`Salvaged ${r.count} items`, 'info', { sub: matsText(r.mats) }); return { ok: true }; }));
     const deployed = (r) => { if (r?.ok) { ui.panel.close(); } return r; };
@@ -341,6 +343,20 @@ export async function createGame(api) {
     } else if (n.id === 'warehouse') openWarehouse();
     else if (n.id === 'relay') G.districts.relayMenu();
     else if (n.id === 'lift') G.districts.lift(n);
+    else if ((n.id === 'home' || n.id === 'door') && n.to) G.districts.door(n);
+    else if (n.id === 'codex' || n.id === 'family_tree') ui?.panel.open('codex', toUiCodex(G.sim));
+    else if (n.id === 'bed') sleepShift();
+    else if (n.id === 'trophies') { const t = G.sim.state.stats; ui?.toast('Trophy shelf', 'gold', { sub: `${t.contractsDone} contracts · ${t.kills} kills · ${G.sim.state.story.clues.length} clues`, ms: 3200 }); }
+  }
+
+  // Pod 4471's bed: sleep through to the next shift (new board, new market)
+  function sleepShift() {
+    if (G.runner.active) { ui?.toast('Not with a contract open', 'warn'); return; }
+    G.sim.state.shiftClock = SHIFT_SECONDS;
+    G.sim.tick(0);
+    const pc = G.sim.playerCombatant(); pc.hp = pc.stats.hp; pc.shield = pc.stats.shield;
+    overlay.card(['LULLABY REST — POD 4471', 'You sleep. The sun rises at exactly 06:00:00. It always does.'], 2600);
+    ui?.toast('New shift', 'info', { sub: 'The board and the market have turned over' });
   }
 
   // every holo billboard wipes to Harmony's face (art's world.billboards); the sting is the fallback

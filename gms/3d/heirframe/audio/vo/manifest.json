@@ -1692,5 +1692,82 @@
   "job_id": "f0d0940d4ff646e79fb4a176d7f7b600",
   "sig": "bdb033c1c3d2",
   "qc": []
+ },
+ "a2_s01_fenn_01": {
+  "text": "You have her eyes. Well, your frame doesn't. But you would.",
+  "voice": "fenn",
+  "voice_name": "Heirframe · Dr Abel Fenn",
+  "file": "a2_s01_fenn_01.mp3",
+  "duration": 4.64,
+  "seed": 42,
+  "job_id": "b5cf111a0f9445a98654c5782f9306dd",
+  "sig": "e14066babbb1",
+  "qc": []
+ },
+ "a2_s01_fenn_02": {
+  "text": "Every plaque here had a name once. The Concord calls it tidying.",
+  "voice": "fenn",
+  "voice_name": "Heirframe · Dr Abel Fenn",
+  "file": "a2_s01_fenn_02.mp3",
+  "duration": 4.85,
+  "seed": 42,
+  "job_id": "905857d1f295459e8328d05f4621217d",
+  "sig": "bc6087788baa",
+  "qc": []
+ },
+ "a2_s01_hira_01": {
+  "text": "Huh! That photo lady looks just like Harmony. Lookalike! Must be a lookalike.",
+  "voice": "hira",
+  "voice_name": "Heirframe · HIRA",
+  "file": "a2_s01_hira_01.mp3",
+  "duration": 5.61,
+  "seed": 42,
+  "job_id": "d2752742df434aa6b85775af767ec352",
+  "sig": "d9dd677fc6f1",
+  "qc": []
+ },
+ "a2_s02_tomas_01": {
+  "text": "Lyra, take the baby, go. I'll hold the door.",
+  "voice": "tomas",
+  "voice_name": "Heirframe · Tomas Quill",
+  "file": "a2_s02_tomas_01.mp3",
+  "duration": 2.58,
+  "seed": 42,
+  "job_id": "abc84793ad994a87a21cbd47ffc9a945",
+  "sig": "a77129080fb0",
+  "qc": []
+ },
+ "a2_s02_tomas_02": {
+  "text": "Little star, the sky is wide... little star, go see outside.",
+  "voice": "tomas",
+  "voice_name": "Heirframe · Tomas Quill",
+  "file": "a2_s02_tomas_02.mp3",
+  "duration": 3.93,
+  "seed": 42,
+  "job_id": "cecf9e1404164b69807c49944a867cd7",
+  "sig": "21ed87d40b79",
+  "qc": []
+ },
+ "a2_s02_hira_01": {
+  "text": "That's the song. That's my hiccup song. Why do I know that song?",
+  "voice": "hira",
+  "voice_name": "Heirframe · HIRA",
+  "file": "a2_s02_hira_01.mp3",
+  "duration": 3.93,
+  "seed": 42,
+  "job_id": "cce8bf3d1a6a41a3b4b1057591d5139c",
+  "sig": "61f0acf6dc66",
+  "qc": []
+ },
+ "a2_s03_fenn_01": {
+  "text": "No pod. There's no body at the other end of that frame, Wren.",
+  "voice": "fenn",
+  "voice_name": "Heirframe · Dr Abel Fenn",
+  "file": "a2_s03_fenn_01.mp3",
+  "duration": 4.25,
+  "seed": 42,
+  "job_id": "de5de0aeba6c4cbea663722f5ceeaa5a",
+  "sig": "38b334cb0b59",
+  "qc": []
  }
 }

@@ -142,7 +142,7 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
       ['One-hit kills', () => { D.oneHit = !D.oneHit; }, D.oneHit ? 'on' : ''],
       ['Speed ×1', () => G.setSpeed(1), G.speed === 1 ? 'on' : ''], ['Speed ×3', () => G.setSpeed(3), G.speed === 3 ? 'on' : ''],
     ]);
-    section('Start point (relay there)', (world.districts || []).map((id) => [DISTRICT_NAMES[id] || DISTRICTS[id]?.name || id, () => { D.open = false; goDistrict(id); }, G.districts?.id === id ? 'here' : '']));
+    section('Start point (relay there)', (world.districtList?.() || (world.districts || []).map((id) => ({ id }))).map(({ id, label }) => [DISTRICT_NAMES[id] || label || DISTRICTS[id]?.name || id, () => { D.open = false; goDistrict(id); }, G.districts?.id === id ? 'here' : '']));
     section('Story checkpoint', staged().map((m) => [`${m.id.toUpperCase().replace('_', '-')} ${m.title}`, () => { D.open = false; jumpStory(m.id); }, S?.story.mission === m.id ? 'here' : '']));
     section('Economy', [
       ['+1,000 cr', () => G.sim.addCredits(1000, 'dev')], ['+10,000 cr', () => G.sim.addCredits(10000, 'dev')], ['+100,000 cr', () => G.sim.addCredits(100000, 'dev')],

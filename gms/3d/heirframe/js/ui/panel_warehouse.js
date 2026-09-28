@@ -168,6 +168,14 @@ function skillsTab(body, data, ctx, emit) {
   body.querySelectorAll('.sk-mod:not([disabled])').forEach(b => onTap(b, () => emit('warehouse:mod', { frameId: f.id, rank: +b.dataset.rank, optionId: b.dataset.opt })));
 }
 
+// faction standing: rep tiers drive Sal's prices (Nexus) and repair costs (Concord)
+function standing(m) {
+  if (!m.standing?.length) return '';
+  const rows = m.standing.map(r => `<div class="mk-rep"><i style="background:${esc(r.color || '#9fd')}"></i><b>${esc(r.name)}</b><span>${esc(r.tier)}</span><em class="hf-num">${r.value > 0 ? '+' : ''}${r.value}</em></div>`).join('');
+  const notes = [+m.priceNote > 0 ? `Nexus standing: prices −${m.priceNote}%` : +m.priceNote < 0 ? `Nexus distrusts you: prices +${-m.priceNote}%` : '', m.repairNote].filter(Boolean);
+  return `<span class="hf-label mk-rep-h">Standing</span>${rows}${notes.map(n => `<div class="mk-rep-n">${esc(n)}</div>`).join('')}`;
+}
+
 function marketTab(body, data, ctx, emit) {
   const m = data.market || { stock: [], consumables: [] };
   const stock = m.stock.map(e => `<div class="mk-item ${e.sold ? 'sold' : ''}" data-i="${e.index}">
@@ -180,11 +188,24 @@ function marketTab(body, data, ctx, emit) {
       <button class="hf-btn gold hf-live" ${c.count >= c.cap ? 'disabled' : ''} data-con="${esc(c.id)}">${c.count >= c.cap ? 'Full' : `${icon('credits')}<b class="hf-num">${fmt(c.price)}</b>`}</button></div>`).join('');
   body.innerHTML = `<div class="hf-mk">
     <div class="mk-l hf-scroll"><span class="hf-label">Sal's stock · new every shift</span>${stock || '<div class="hf-empty">Sold out.</div>'}</div>
-    <div class="mk-r hf-scroll"><span class="hf-label">Supplies</span>${cons}</div>
+    <div class="mk-r hf-scroll"><span class="hf-label">Supplies</span>${cons}${standing(m)}</div>
   </div>`;
   body.querySelectorAll('[data-buy]').forEach(b => onTap(b, () => emit('warehouse:market', { index: +b.dataset.buy })));
   body.querySelectorAll('[data-con]').forEach(b => onTap(b, () => emit('warehouse:consumable', { id: b.dataset.con })));
   body.querySelectorAll('.mk-item .hf-tile').forEach(t => onTap(t, () => { const e = m.stock.find(x => String(x.item.id) === t.dataset.id); if (e) ctx.itemCard(e.item, null, {}); }));
+}
+
+// Recalibrate (DESIGN §6.6): reroll one affix; the first one you pick is the only one that item can ever reroll
+function recalBox(sel, data) {
+  const lvl = data.recalLevel || 8;
+  if ((data.level || 1) < lvl) return `<div class="fb-recal hf-glass"><span class="hf-label">Recalibrate</span><div class="ft-y">${icon('lock')} Unlocks at level ${lvl}</div></div>`;
+  const c = sel.recal.cost || {};
+  const cost = Object.entries(c).map(([k, v]) => `${fmt(v)} ${k === 'credits' ? 'cr' : esc((MATS.find(x => x[0] === k) || [k, k])[1])}`).join(' · ');
+  const rows = sel.affixes.map((a, i) => {
+    const off = sel.recal.locked != null && sel.recal.locked !== i;
+    return `<div class="rc-row ${off ? 'off' : ''}"><span>${esc(typeof a === 'string' ? a : a.text || a.label || '')}</span><button class="hf-btn hf-live" data-recal="${i}" ${off ? 'disabled' : ''}>${icon('refresh')}Reroll</button></div>`;
+  }).join('');
+  return `<div class="fb-recal hf-glass"><span class="hf-label">Recalibrate · ${esc(cost)}</span>${rows}${sel.recal.locked == null ? '<div class="ft-y">The first affix you reroll is the only one this part can ever reroll.</div>' : ''}</div>`;
 }
 
 function fabTab(body, data, ctx, emit) {
@@ -221,6 +242,7 @@ function fabTab(body, data, ctx, emit) {
         </div>
         ${yields ? `<div class="ft-y">Salvage yields ${yields}</div>` : ''}
       </div>` : ''}
+      ${sel?.recal ? recalBox(sel, data) : ''}
     </div>
   </div>`;
   body.querySelectorAll('.fb-grid .hf-tile').forEach(t => onTap(t, () => { st.fab = items.find(i => String(i.id) === t.dataset.id)?.id; ctx.bus.emit('sfx', 'click'); ctx.rerender(); }));
@@ -229,4 +251,5 @@ function fabTab(body, data, ctx, emit) {
   const tb = body.querySelector('[data-tune]'), sb = body.querySelector('[data-salv]');
   if (tb) onTap(tb, () => emit('warehouse:tune', { itemId: sel.id }));
   if (sb) onTap(sb, () => emit('warehouse:salvage', { itemId: sel.id }));
+  body.querySelectorAll('[data-recal]:not([disabled])').forEach(b => onTap(b, () => emit('warehouse:recal', { itemId: sel.id, index: +b.dataset.recal })));
 }

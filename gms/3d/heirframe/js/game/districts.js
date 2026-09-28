@@ -2,9 +2,10 @@ import { createNav } from './nav.js';
 
 export const DISTRICT_NAMES = { aurum_plaza: 'Aurum Plaza', brightline: 'Brightline Boulevard', terraces: 'Verdant Terraces', arcology: 'Nexus Arcology', arcology_servers: 'Arcology Server Floor', portside: 'Portside', stacks: 'The Stacks', home: 'Home · Pod 4471', spine: 'The Spine' };
 const NAMES = DISTRICT_NAMES;
-const AMBIENT = { aurum_plaza: 'plaza', brightline: 'boulevard', terraces: 'park', arcology: 'interior', arcology_servers: 'interior' };
+const AMBIENT = { aurum_plaza: 'plaza', brightline: 'boulevard', terraces: 'park', arcology: 'interior', arcology_servers: 'interior', portside: 'city', stacks: 'undercity', home: 'interior' };
 const EMITTERS = { aurum_plaza: [['fountain', 0, 0, 1], ['waterfall', -47, -62, 1], ['waterfall', 66, -96, 1.2], ['fountain', -47, -57, 0.6]], brightline: [['traffic', 0, -60, 0.8], ['crowd', 0, 20, 0.7]],
-  terraces: [['wind', 0, 0, 0.6], ['fountain', 0, -30, 0.7]], arcology: [['holo', 0, 0, 0.6], ['machine', 0, -30, 0.5]], arcology_servers: [['machine', 0, 0, 0.9]] };
+  terraces: [['wind', 0, 0, 0.6], ['fountain', 0, -30, 0.7]], arcology: [['holo', 0, 0, 0.6], ['machine', 0, -30, 0.5]], arcology_servers: [['machine', 0, 0, 0.9]],
+  portside: [['wind', 0, 60, 0.7], ['machine', 32, 68, 0.6]], stacks: [['machine', 0, -84, 0.7], ['machine', 5, 20, 0.4], ['wind', -5, 40, 0.4]], home: [['room', 0, 0, 0.6]] };
 
 // District travel (P2b world API): the Transit Relay interactable, contract-driven hops, and the swap cleanup
 // (player to the relay, strays and mission props cleared, nav rebuilt, sites re-registered with the sim).
@@ -63,15 +64,21 @@ export function createDistricts(G, ctx) {
     D.busy = true;
     player.frozen = true;
     audio.sfx('contract_accept', { vol: 0.6 });
-    arrive = via === 'dev' ? 'player' : via;
-    try { await (via === 'lift' && world.liftTransition ? world.liftTransition(id, { onSwap }) : world.relayTransition(id, { onSwap })); }
+    arrive = via === 'dev' ? 'player' : via === 'door' ? (id === 'home' ? 'player' : 'home') : via;
+    try { await ((via === 'lift' || via === 'door') && world.liftTransition ? world.liftTransition(id, { onSwap }) : world.relayTransition(id, { onSwap })); }
     catch (e) { console.error('relay failed', e); }
     player.frozen = false;
     D.busy = false;
-    ui?.toast(NAMES[id] || id, 'info', { sub: reason === 'contract' ? 'Contract site' : via === 'lift' ? 'Lift' : via === 'dev' ? 'Dev start point' : 'Transit Relay' });
+    ui?.toast(NAMES[id] || id, 'info', { sub: reason === 'contract' ? 'Contract site' : via === 'lift' ? 'Lift' : via === 'door' ? (id === 'home' ? 'Lullaby Rest · Pod 4471' : 'The Stacks') : via === 'dev' ? 'Dev start point' : 'Transit Relay' });
     return true;
   }
 
+  // the Stacks hostel door ↔ Home (Pod 4471): {id:'home', to:'home'} / {id:'door', to:'stacks'}
+  function door(it) {
+    if (!it?.to) return;
+    if (G.runner.active) { ui?.toast('Finish your contract first', 'warn'); return; }
+    travel(it.to, { via: 'door' });
+  }
   // Arcology lift pads: {id:'lift', to}
   function lift(it) {
     const to = it?.to;
@@ -104,5 +111,5 @@ export function createDistricts(G, ctx) {
     }
   }
 
-  return { travel, lift, relayMenu, boot, get busy() { return D.busy; }, get id() { return world.district?.id || 'aurum_plaza'; } };
+  return { travel, lift, door, relayMenu, boot, get busy() { return D.busy; }, get id() { return world.district?.id || 'aurum_plaza'; } };
 }
