@@ -44,7 +44,6 @@ function inertUi() {
 export async function createGame(api) {
   const { world, rig, input, player, crowd, ui, flags } = api;
   const Q = new URLSearchParams(location.search);
-  const store = createSaveStore();
   const overlay = createOverlay();
   const fx = createFx(world.scene);
   const t0 = performance.now();
@@ -52,7 +51,11 @@ export async function createGame(api) {
   console.info(`nav grid ${nav.W}x${nav.H} in ${(performance.now() - t0).toFixed(0)} ms`);
   const sites = { aurum_plaza: world.sites };
   const tmp = new THREE.Vector3();
-  const speedK = Math.min(4, Math.max(0.25, +(Q.get('speed') || 1)));
+  let speedK = Math.min(4, Math.max(0.25, +(Q.get('speed') || 1)));
+  // D24 dev mode: only with ?dev in the URL does js/dev/ get fetched at all (dynamic import below)
+  const DEV = Q.has('dev') && Q.get('dev') !== '0';
+  const devMod = DEV ? await import('../dev/dev.js').catch((e) => { console.warn('dev module failed', e); return null; }) : null;
+  const store = devMod ? createSaveStore(devMod.devStorage()) : createSaveStore();
   const shiftLen = +(Q.get('shift') || 0);
 
   const G = {
@@ -251,23 +254,7 @@ export async function createGame(api) {
     ui.on('pause', () => { if (G.state === 'free') ui.panel.open('pause', { mission: G.runner.mission ? { title: G.runner.mission.title } : null }); });
     ui.on('pause:quit', () => { G.sim.save(); window.__reload?.(); });
     ui.on('tap', (s) => tapAt(s.x, s.y));
-    ui.on('contract:accept', (c) => {
-      if (G.runner.active) { ui.toast('Finish your current contract first', 'warn'); return; }
-      const b = G.sim.board();
-      const m = b.story?.id === c.id ? b.story : b.cards.find((x) => x.id === c.id);
-      // a story card built before its district's real sites were known is rebuilt on the spot (a no-op otherwise)
-      const go = () => { if (m?.story && m.district === G.districts.id) { const b2 = G.sim.board(); b2.story = G.sim.storyCard() || b2.story; } const r = G.runner.accept(c.id); if (r.ok) { log('accepted ' + r.mission.id + ' ' + r.mission.archetype); G.sim.save(); } };
-      // contracts in another district: ride the relay there first
-      if (m && world.districts?.includes(m.district) && m.district !== G.districts.id) {
-        ui.panel.close();
-        if (m.story) G.sim.unlockDistrict(m.district);   // a story card may open its own district
-        G.districts.travel(m.district, { reason: 'contract' }).then((ok) => {
-          if (!ok) return;
-          go();
-        });
-      }
-      else go();
-    });
+    ui.on('contract:accept', (c) => acceptCard(c.id));
     ui.on('contract:reroll', () => { const r = G.sim.rerollBoard(); if (r.ok) ui.panel.update(toUiBoard(G.sim)); });
     ui.on('contract:threat', (id) => { if (G.sim.setThreat(id).ok) ui.panel.update(toUiBoard(G.sim)); });
     ui.on('loot:equip', (it) => {
@@ -298,6 +285,27 @@ export async function createGame(api) {
   }
   const matsText = (m) => Object.entries(m || {}).filter(([, v]) => v).map(([k, v]) => `+${v} ${k}`).join(' · ');
   const whyText = (r) => ({ credits: `Not enough credits${r.need ? ` (${r.need})` : ''}`, materials: 'Not enough materials', level: `Needs level ${r.need || r.needLevel || ''}`, combat: 'Not during combat', max: 'Already maxed', owned: 'Already owned', slot: 'Wrong slot for this frame', gate: `Needs level ${r.needLevel} and sync ${r.needSync}`, locked: 'Locked' }[r.reason] || 'Not possible right now');
+
+  // accept a board card (the story card too): contracts in another district ride the relay first
+  function acceptCard(id) {
+    const c = { id };
+    if (G.runner.active) { ui?.toast('Finish your current contract first', 'warn'); return; }
+    const b = G.sim.board();
+    const m = b.story?.id === c.id ? b.story : b.cards.find((x) => x.id === c.id);
+    // a story card built before its district's real sites were known is rebuilt on the spot (a no-op otherwise)
+    const go = () => { if (m?.story && m.district === G.districts.id) { const b2 = G.sim.board(); b2.story = G.sim.storyCard() || b2.story; } const r = G.runner.accept(c.id); if (r.ok) { log('accepted ' + r.mission.id + ' ' + r.mission.archetype); G.sim.save(); } };
+    // contracts in another district: ride the relay there first
+    if (m && world.districts?.includes(m.district) && m.district !== G.districts.id) {
+      ui?.panel.close();
+      if (m.story) G.sim.unlockDistrict(m.district);   // a story card may open its own district
+      G.districts.travel(m.district, { reason: 'contract' }).then((ok) => {
+        if (!ok) return;
+        go();
+      });
+    }
+    else go();
+  }
+  G.acceptCard = acceptCard;
 
   function tapAt(x, y) {
     if (blocked()) return;
@@ -365,7 +373,14 @@ export async function createGame(api) {
     const bot = (() => { try { return api.robots.createRobot({ kind: 'seraph', tier: 3, seed: 9, quality: api.tier.name }); } catch (e) { return null; } })();
     if (!bot) return;
     player.frozen = true;
-    const a = player.yaw, sx = player.pos.x + Math.sin(a) * 3, sz = player.pos.z + Math.cos(a) * 3, gy = world.groundAt(sx, sz);
+    // the Wardens scatter when she lands
+    for (const e of G.enemies.alive()) if (!e.ally && !e.escort) { fx.beam(e.pos, 0x9fb8ff, 0.4, 4, 1); }
+    G.enemies.clear((e) => e.state !== 'dead' && !e.escort && !e.isBoss);
+    const d = rig.screenToWorld(1, 0), dl = Math.hypot(d.x, d.z) || 1;
+    const q = G.nav.nearest(player.pos.x + d.x / dl * 3, player.pos.z + d.z / dl * 3) || { x: player.pos.x + 2, z: player.pos.z };
+    const sx = q.x, sz = q.z, gy = world.groundAt(sx, sz);
+    const a = Math.atan2(sx - player.pos.x, sz - player.pos.z);
+    player.faceYaw?.(a, 0.3);
     world.scene.add(bot.root);
     bot.root.position.set(sx, gy + 16, sz);
     bot.root.rotation.y = Math.atan2(player.pos.x - sx, player.pos.z - sz);
@@ -547,6 +562,7 @@ export async function createGame(api) {
   async function titleFlow() {
     G.state = 'title';
     setMusic('menu');
+    if (devMod) { G.dev = devMod.createDev(G, { world, ui, player, rig, audio, api, createSim, loadGame, store, sites, startSession, Q }); if (await G.dev.autostart()) { setMusic('explore'); return; } }
     if (!ui) { startSession(createSim({ seed: Q.get('seed') || 1, store, sites })); G.state = 'free'; return; }
     const hasSave = store.has() && !Q.has('fresh');
     const act = await ui.screen('title', { hasSave, version: 'P2a · Own Your Frame' });
@@ -579,6 +595,7 @@ export async function createGame(api) {
 
   function update(rawDt, stick) {
     const dt = rawDt * speedK;
+    G.devTick?.(dt);
     stepGap -= dt;
     fx.update(dt, world.camera);
     if (G.state === 'title' || G.state === 'boot') {
@@ -639,6 +656,8 @@ export async function createGame(api) {
   }
 
   G.update = update;
+  G.setSpeed = (k) => { speedK = k; };
+  Object.defineProperty(G, 'speed', { get: () => speedK });
   G.tapWorld = (x, y) => tapAt(x, y);
   G.walkTo = walkTo;
   G.nav = nav;

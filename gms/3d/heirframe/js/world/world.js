@@ -30,6 +30,7 @@ import { ARCOLOGY, ARCOLOGY_SERVERS } from './nexus.js';
 import { PORTSIDE } from './portside.js';
 import { STACKS } from './stacks.js';
 import { HOME } from './home.js';
+import { SPINE } from './spine.js';
 
 export const LAYOUT = {
   bounds: { x0: -58, x1: 47.5, z0: -97, z1: 79 },
@@ -78,10 +79,13 @@ export const DISTRICT_DEFS = {
   portside: PORTSIDE,
   stacks: STACKS,
   home: HOME,
+  spine: SPINE,
 };
 export const DISTRICT_IDS = Object.keys(DISTRICT_DEFS);
+// [{id, label}] for pickers (the ?dev panel); world.districtList() returns the same
+export const DISTRICT_LIST = DISTRICT_IDS.map((id) => ({ id, label: DISTRICT_DEFS[id].name }));
 // ids the P3 brief used; the sim (js/data/districts.js) uses the canonical ones
-export const DISTRICT_ALIASES = { verdant: 'terraces', verdant_terraces: 'terraces', nexus: 'arcology', nexus_arcology: 'arcology', nexus_servers: 'arcology_servers', docks: 'portside', spaceport: 'portside', the_stacks: 'stacks', undercity: 'stacks', pod_4471: 'home', pod: 'home' };
+export const DISTRICT_ALIASES = { verdant: 'terraces', verdant_terraces: 'terraces', nexus: 'arcology', nexus_arcology: 'arcology', nexus_servers: 'arcology_servers', docks: 'portside', spaceport: 'portside', the_stacks: 'stacks', undercity: 'stacks', pod_4471: 'home', pod: 'home', the_spine: 'spine' };
 const canon = (id) => DISTRICT_ALIASES[id] || id;
 
 
@@ -209,6 +213,8 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
       updaters: [], interactables: [], cache: {}, stats: {}, gather: [], billboards: [], faceCam: [], farSky: [], disposers: [],
       jetMaterial, makePadRing, get focus() { return world.focus; }, fadeMat: (m) => fadeMaterial(m, fade, { a2c: tier.msaa > 0 }),
     };
+    // districts with no mirror floor skip the planar-reflection pass (set before build: materials check it)
+    reflection.enabled = tier.reflect > 0 && def.mirror !== false;
     if (def.env) ctx.env = def.env(renderer, tier);
     def.build(ctx, progress);
     if (M.farCrowd && def.farCrowd !== 0) addFarCrowd(ctx, M.farCrowd, Math.round(farN * (def.farCrowd ?? 1)), { extra: def.farLanes || [] });
@@ -233,7 +239,9 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     const v = (p) => new THREE.Vector3(p[0], col.groundAt(p[0], p[1]), p[1]);
     const d = {
       id, def, group, ctx,
-      info: { id, name: def.name, city: 'Halcyon', bounds: def.bounds, layout: L, crowd: def.crowd || null },
+      info: { id, name: def.name, city: 'Halcyon', bounds: def.bounds, layout: L, crowd: def.crowd || null,
+        // movement flags gameplay can read: gravity scale (1 = normal), mag boots, vacuum (no air: no sound carry / breath fx)
+        gravity: def.gravity ?? 1, magBoots: !!def.magBoots, vacuum: !!def.vacuum, zeroG: !!def.zeroG },
       spawnPoints: Object.fromEntries(Object.entries(sp).map(([k, p]) => [k, v(p)])),
       billboards: createBillboards(ctx),
     };
@@ -246,6 +254,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     renderer, scene, camera, sun, hemi, post, reflection, tier, time, collision: col,
     get ctx() { return D.ctx; },
     districts: DISTRICT_IDS,
+    districtList: () => DISTRICT_LIST.map((d) => ({ ...d })),
     district: null, sites: null, billboards: null, spawnPoints: null, interactables: null, breakables: null,
     groundAt: (x, z) => col.groundAt(x, z),
     blocked: (x, z, r) => col.blocked(x, z, r),
@@ -311,7 +320,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
         sun.target.position.set(fx, f.y, fz);
         sun.position.set(fx + sunDir.x * 90, f.y + sunDir.y * 90, fz + sunDir.z * 90);
         sun.target.updateMatrixWorld();
-      }
+      } else sun.position.copy(sunDir).multiplyScalar(90);
       motes.material.uniforms.uCenter.value.copy(world.focus);
       // soft contact disks under the robots nearest the focus
       if (ctx.groundAO) {

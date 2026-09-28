@@ -76,3 +76,5 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 - 2026-09-27: **P3w DONE** (terraces/arcology/arcology_servers, lifts, halloran/seraph/turret; critic 3.9→5.0; no leaks). Pushed 2ff86b9c. Forwarded its requests to P3g. Launched **art r5** (a6ac34c7…: crowd variety, gameplay-frame richness). Running: P3g + art r5.
 - 2026-09-27: Aaron → D23. Art r5 redirected from crowd variety to lake motion and then the P4 districts (portside, stacks, home pod). Parked: the dialogue speaker-portrait UI, to revisit after the main game is built.
 - 2026-09-27 23:40+: P3g + art r5 died at the limit; resumed via SendMessage.
+- 2026-09-28: **art r5/5b DONE** (lake motion ?lake=old A/B; portside/stacks/home; unwired civ anims in anims.js). Pushed 6629232b. Launched **P5w world** (a1d2a52e…: spine/hullside/meridian/helm, spider/sovereign/human body). Running: P3g + P5w.
+- 2026-09-28 04:40+: P3g + P5w died at the limit; resumed. Aaron: ?district links only change the title backdrop (Continue/New go to Aurum), so he asked for a debug path with god mode + start point → D24, given to P3g as top priority.

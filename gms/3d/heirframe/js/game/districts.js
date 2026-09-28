@@ -1,6 +1,6 @@
 import { createNav } from './nav.js';
 
-export const DISTRICT_NAMES = { aurum_plaza: 'Aurum Plaza', brightline: 'Brightline Boulevard', terraces: 'Verdant Terraces', arcology: 'Nexus Arcology', arcology_servers: 'Arcology Server Floor' };
+export const DISTRICT_NAMES = { aurum_plaza: 'Aurum Plaza', brightline: 'Brightline Boulevard', terraces: 'Verdant Terraces', arcology: 'Nexus Arcology', arcology_servers: 'Arcology Server Floor', portside: 'Portside', stacks: 'The Stacks', home: 'Home · Pod 4471', spine: 'The Spine' };
 const NAMES = DISTRICT_NAMES;
 const AMBIENT = { aurum_plaza: 'plaza', brightline: 'boulevard', terraces: 'park', arcology: 'interior', arcology_servers: 'interior' };
 const EMITTERS = { aurum_plaza: [['fountain', 0, 0, 1], ['waterfall', -47, -62, 1], ['waterfall', 66, -96, 1.2], ['fountain', -47, -57, 0.6]], brightline: [['traffic', 0, -60, 0.8], ['crowd', 0, 20, 0.7]],
@@ -53,7 +53,8 @@ export function createDistricts(G, ctx) {
     if (D.busy || !world.loadDistrict) return false;
     if (world.district?.id === id) return true;
     if (via === 'lift') sim.unlockDistrict(id);   // the lift bank is always open between Arcology floors
-    const r = via === 'lift' ? (sim.travel(id).ok ? { ok: true } : { ok: true, soft: true }) : sim.travel(id);
+    // lifts (and the dev start-point list) go even where the sim has no district entry (B4, Home)
+    const r = via !== 'relay' ? (sim.travel(id).ok ? { ok: true } : { ok: true, soft: true }) : sim.travel(id);
     if (!r.ok) {
       ui?.toast(r.reason === 'heat' ? 'Transit Relays locked' : 'District locked', 'bad', { sub: r.reason === 'heat' ? 'Lose some Heat first (4★ locks the relays)' : 'The story opens it' });
       audio.sfx('ui_deny');
@@ -62,12 +63,12 @@ export function createDistricts(G, ctx) {
     D.busy = true;
     player.frozen = true;
     audio.sfx('contract_accept', { vol: 0.6 });
-    arrive = via;
+    arrive = via === 'dev' ? 'player' : via;
     try { await (via === 'lift' && world.liftTransition ? world.liftTransition(id, { onSwap }) : world.relayTransition(id, { onSwap })); }
     catch (e) { console.error('relay failed', e); }
     player.frozen = false;
     D.busy = false;
-    ui?.toast(NAMES[id] || id, 'info', { sub: reason === 'contract' ? 'Contract site' : via === 'lift' ? 'Lift' : 'Transit Relay' });
+    ui?.toast(NAMES[id] || id, 'info', { sub: reason === 'contract' ? 'Contract site' : via === 'lift' ? 'Lift' : via === 'dev' ? 'Dev start point' : 'Transit Relay' });
     return true;
   }
 
@@ -93,6 +94,7 @@ export function createDistricts(G, ctx) {
   // start: build the district the save was in
   function boot() {
     const want = sim.state.districts.current;
+    if (G.keepDistrict && world.district) { cleanup(world, world.district.id); return; }   // dev start point: stay where the world booted
     if (want && world.district && want !== world.district.id && world.loadDistrict && (world.districts || []).includes(want)) {
       world.loadDistrict(want);
       onSwap(world, want);

@@ -1,6 +1,17 @@
 P2a PLAYABLE
 (gameplay agent, 2026-09-27: acceptance table below; bot + headless checks, M5 metal, drivers in scratchpad `gameplay/`.)
 
+## DEV MODE (D24) — for Aaron / testers only
+- Add `?dev=1` to the game URL. Without it no file under `js/dev/` is fetched (verified: normal boot loads 138 js files, 0
+  from js/dev) and there is no hint of it in the game. Dev play uses its own save (`heirframe.save.main_dev`).
+- A gold **DEV** pill (top, next to the portrait) opens the panel: God mode (no damage, full energy, no cooldowns),
+  One-hit kills, Speed ×1/×3, **Start point** (every district the world has: relays you there, player spawn), **Story
+  checkpoint** (A1-M1 … A2-M5: completes everything before it through the sim, sets the level gate, a frame from L5,
+  then takes the card), credits, Own all frames, Fill parts (prototype, auto-equipped), Level, Heat 0–5★.
+- Straight into play, no clicks: `?dev=1&district=portside`, `?dev=1&mission=A2-M1`, both together, `&fresh` = new dev save.
+  e.g. `http://192.168.0.236:8841/gms/3d/heirframe/?dev=1&mission=A2-M4`
+- Code: js/dev/dev.js (UI, cheats, autostart); game.js only `import()`s it when `?dev` is present.
+
 # gameplay notes (P2a "Own Your Frame")
 
 Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*, js/data/*, tools/sim/*, js/ui/*, css/*, js/audio/*, tools/vo/*, audio/vo/*, this file.
@@ -160,8 +171,15 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
 - Autopilot: storyat/gates for a2_m1..a2_m5, `storyend=` (default a2_m5). Driver scratchpad `gameplay/story2.mjs <id>`.
 - Not done (world-owned, noted for the manager): fewer civilians in B4 (crowd.js/tier.crowd are world files).
 
+- Bot runs: A2-M1 ok (Fenn now elite-rank HP; he went down twice before), A2-M2 ok (ghost), A2-M3 ok (tail: 4 s grace,
+  sight 11 m, a checkpoint puts the target at its next stop), A2-M4 ok (Halloran hp 90→22, dmg 18→3.5, shield 60→25,
+  frontalDR 0.6→0.35: was a 450 s fight that two-shot a L15 Mk I; gunner bot now 1 death, brawler bot 2–3 face-tanking),
+  Seraph scene screenshot-checked (lands on walkable ground to screen-right; Wardens scatter).
+
 ## IN PROGRESS
-- Bot runs of A2-M1…M5 (A2-M1: Fenn died once in the escort fight → checkpoint; re-verifying), then VO for Act 2.
+- D24 dev mode DONE (see top; phone 915x412 touch taps on the pill + God mode verified; start points portside/home/stacks/
+  aurum; story jump a2_m4 with clues C01–C08). Title Settings panel checked on top (manager's z-index 20 kept).
+- NEXT: A2-M5 run, Act 2 VO, P4 cheap wiring (Home door loop), P3 systems.
 
 ## NEXT (P3)
 - rep tiers/vendor pricing/rival UI; Fabricator (recalibrate UI, tune pity); relic hooks (afterimage, phantom_step,

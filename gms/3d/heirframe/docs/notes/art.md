@@ -744,3 +744,18 @@ Scope (manager, per Aaron): 1. Aurum lake motion (lake reads like a still photo)
 3. Brightline Apartment. P3w gaps (Terraces cliffs, atrium balconies, Terraces vista tris) untouched.
 4. Stacks: fog doesn't use the district's sun direction (the fog chunk's sun glow is baked to the Aurum sun) — harmless
    indoors, and Portside's sunset glow in the fog points the wrong way (subtle). Fix: make SUN_DIR in the fog a uniform.
+
+## P5w (world agent, 2026-09-28) — IN PROGRESS
+Brief: Act 5–6 districts `spine`, `hullside`, `meridian`, `helm` (same district API), actor kinds `spider`, `boss_sovereign`
+(+ halo drones), Seraph phase hooks, `human` body for *Walk as Yourself*; fog sun glow per district. D23: no art passes, no
+critics; one self-check shot per area. Harness: scratchpad `art/p5w/`, Chrome port 9302.
+- DONE fog sun per district (atmosphere.js): the fog chunk's sun glow now reads the scene's first directional light on lit
+  materials (`HF_LIT` define injected into lights_pars_begin; unlit ShaderMaterials keep the default SUN_DIR). Fog density
+  below 0.00055 (vacuum) also thins aerial perspective + far darkening (all existing districts are ≥ 0.00055 → unchanged).
+  world.js: sun light direction now follows the district on low tier too (was only updated with shadows on).
+- DONE world.js: `DISTRICT_LIST` export + `world.districtList()` → `[{id, label}]` (for the ?dev picker);
+  `world.district.{gravity, magBoots, vacuum, zeroG}` (defaults 1/false/false/false); `def.mirror: false` skips the planar
+  reflection pass for that district.
+- Boot check after the limit: all 8 existing districts load in one page, 0 errors (`art/p5w/boot.js`).
+- NEW (not imported yet): `js/world/space.js` (space sky dome + PMREM: stars, milky band, sun, Verdance), `js/world/p5_props.js`.
+- NEXT: spine.js → hullside.js → meridian.js → helm.js, then actor kinds.

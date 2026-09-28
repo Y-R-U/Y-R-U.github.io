@@ -78,8 +78,8 @@ export const BOSSES = {
      name: 'Big Kettle', title: 'Silverhand Captain', rank: 'champion', robotKind: 'boss_kettle', fallbackKind: 'enforcer', faction: 'syndicate', ai: ['boss', 'bruiser'], act: 1,
     base: { hp: 40, dmg: 6.5, armor: 30, shield: 40 }, move: 3.4, skills: ['e_melee', 'e_stomp', 'e_blast'], phases: [0.5], adds: { defId: 'knuckle', count: 3, atPhase: 1 }, tags: ['robot', 'frame', 'heavy'] },
   halloran: { id: 'halloran', name: 'Warden-Captain Halloran', rank: 'boss', robotKind: 'boss_halloran', fallbackKind: 'security', robotTier: 3, paint: 'concord_gold', faction: 'concord', ai: ['boss', 'lancer'], act: 2,
-    // P3g: hp 90→22, dmg 18→5.5 (boss rank ×60 made her a 450 s fight that two-shot a L15 Mk I; now ~90 s, same share per hit as Kettle)
-    base: { hp: 22, dmg: 5.5, armor: 30, shield: 25 }, move: 4.6, skills: ['e_baton', 'e_lunge', 'e_emp'], frontalDR: 0.35, phases: [0.6, 0.3], tags: ['robot', 'frame'] },
+    // P3g: hp 90→22, dmg 18→3.5, shield 60→25, frontalDR 0.6→0.35 (boss rank ×60 made her a 450 s fight that two-shot a L15 Mk I; now ~90 s, same share per hit as Kettle)
+    base: { hp: 22, dmg: 3.5, armor: 30, shield: 25 }, move: 4.6, skills: ['e_baton', 'e_lunge', 'e_emp'], frontalDR: 0.35, phases: [0.6, 0.3], tags: ['robot', 'frame'] },
   choir_warden: { id: 'choir_warden', name: 'Choir Warden', rank: 'boss', robotKind: 'seraph', robotTier: 1, fallbackKind: 'civ_gold', faction: 'choir', ai: ['boss', 'flyer'], act: 3, flying: true,
     base: { hp: 110, dmg: 22, armor: 20, shield: 90 }, move: 6, skills: ['e_melee', 'e_dive', 'e_blast'], phases: [0.5], tags: ['robot', 'frame'] },
   rustmother: { id: 'rustmother', name: 'Rustmother', rank: 'boss', robotKind: 'rustkin', robotTier: 3, fallbackKind: 'enforcer', faction: 'scrap', ai: ['boss', 'turret'], act: 4, size: 3,

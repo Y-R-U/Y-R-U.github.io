@@ -1,4 +1,4 @@
-.hf-panel { position: absolute; inset: 0; display: none; pointer-events: none; }
+.hf-panel { position: absolute; inset: 0; z-index: 20; display: none; pointer-events: none; }
 .hf-panel.show { display: block; }
 .hf-in-panel .hf-hud, .hf-in-panel .hf-controls, .hf-in-panel .hf-marker, .hf-in-panel .hf-interact, .hf-in-panel .hf-lootfeed { opacity: 0 !important; pointer-events: none !important; }
 .hf-in-panel .hf-controls * { pointer-events: none !important; }

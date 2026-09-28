@@ -19,6 +19,7 @@ export function installFog() {
   const farQ = /[?&]far=([\d.]+)/.exec(location.search);
   const far = farQ ? +farQ[1] : 0.35;
   const old = (/[?&]haze=old/.test(location.search) ? '#define HF_HAZE_OLD\n' : '') + (far > 0 ? `#define HF_FAR_RICH ${far.toFixed(3)}\n#define HF_FAR_IN ${(+(/[?&]farin=([\d.]+)/.exec(location.search)?.[1] ?? 0.65)).toFixed(3)}\n` : '');
+  if (!C.lights_pars_begin.startsWith('#define HF_LIT')) C.lights_pars_begin = '#define HF_LIT\n' + C.lights_pars_begin;
   C.fog_pars_vertex = `#ifdef USE_FOG
   varying float vFogDepth;
   varying vec3 vFogWorldPos;
@@ -55,14 +56,26 @@ export function installFog() {
       float fogAmt = smoothstep( fogNear, fogFar, vFogDepth );
     #endif
     fogAmt = clamp( fogAmt, 0.0, 0.93 );
-    float sunAmt = pow( max( dot( fdir, ${v3(SUN_DIR)} ), 0.0 ), 5.0 );
+    // the district's own sun (the scene's first directional light) on lit materials; unlit ones keep the default
+#if defined( HF_LIT ) && NUM_DIR_LIGHTS > 0
+    vec3 hfSun = normalize( ( vec4( directionalLights[ 0 ].direction, 0.0 ) * viewMatrix ).xyz );
+#else
+    vec3 hfSun = ${v3(SUN_DIR)};
+#endif
+    float sunAmt = pow( max( dot( fdir, hfSun ), 0.0 ), 5.0 );
+    // thin fog (vacuum: density below the Aurum 0.00055) also thins the aerial perspective and the far darkening
+    #ifdef FOG_EXP2
+      float hfAir = clamp( fogDensity * 1818.0, 0.0, 1.0 );
+    #else
+      float hfAir = 1.0;
+    #endif
     vec3 fcol = mix( fogColor, ${c3(SUN_HAZE_COLOR)} * 1.25, sunAmt * 0.8 );
     // aerial perspective: per-channel extinction (blue goes first) + sky in-scatter, so far mass turns blue-grey and
     // loses contrast while near stays crisp; thins with height like the fog. Kicks in past ~25 m.
-    vec3 aT = exp( -max( optical - 25.0, 0.0 ) * vec3( 0.0011, 0.0014, 0.0019 ) * uAerial );
+    vec3 aT = exp( -max( optical - 25.0, 0.0 ) * vec3( 0.0011, 0.0014, 0.0019 ) * uAerial * hfAir );
 #ifdef HF_FAR_RICH
     // sunlit cream/glass at 40-150 m otherwise lands at the sky's value (milky); push it cooler and darker first
-    gl_FragColor.rgb *= mix( vec3( 1.0 ), fogColor / max( fogColor.b, 0.01 ) * HF_FAR_RICH, smoothstep( 30.0, 110.0, fd ) );
+    gl_FragColor.rgb *= mix( vec3( 1.0 ), fogColor / max( fogColor.b, 0.01 ) * HF_FAR_RICH, smoothstep( 30.0, 110.0, fd ) * hfAir );
 #endif
 #ifdef HF_HAZE_OLD
     gl_FragColor.rgb = gl_FragColor.rgb * aT + mix( fogColor * vec3( 0.6, 0.71, 0.9 ), fcol * 0.85, sunAmt ) * ( 1.0 - aT );
