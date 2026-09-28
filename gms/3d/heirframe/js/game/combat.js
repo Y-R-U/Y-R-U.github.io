@@ -127,7 +127,8 @@ export function createCombat(ctx) {
       if (a > arc && d > 0.9) continue;
       const ra = relAngle(e);
       const knock = skill.id === 'b_fists' ? (fin ? 9 : 2.5) : skill.id === 'h_blade' ? 1.2 : fin ? 7 : 3.2;
-      const res = strike(pc, e, skill, { comboIndex: p.combo, backstab: e.c && (!e.c.alerted || ra > Math.PI * 2 / 3), frontal: ra < Math.PI / 3, knock });
+      const marked = e.phantomMark > 0 && (e.phantomMark = 0, true);
+      const res = strike(pc, e, skill, { comboIndex: p.combo, backstab: e.c && (marked || !e.c.alerted || ra > Math.PI * 2 / 3), frontal: ra < Math.PI / 3, knock });
       hitAny = true;
       if (res?.crit) crit = true;
       if (res?.killed) kill = true;
@@ -224,6 +225,17 @@ export function createCombat(ctx) {
     actor().play('dodge', { loop: false, speed: 1.3 });
     pc.invulnerable = true;
     st.dodgeT = 0.42;
+    const powers = pc.stats.powers || [];
+    // Afterimage (relic): the roll leaves a decoy where you stood
+    if (powers.includes('afterimage')) { ctx.enemies.addDecoy({ x: player.pos.x, z: player.pos.z, t: 2, radius: 10 }); fx.ring(player.pos, 1.2, 0x9fe8ff, 0.4); fx.flash(tmp.set(player.pos.x, player.pos.y + 1, player.pos.z), 0.8, 0x9fe8ff, 0.2); }
+    // Phantom Step (relic): whoever you roll through is marked, and your next hit on them counts as a backstab
+    if (powers.includes('phantom_step')) {
+      const x0 = player.pos.x, z0 = player.pos.z, ex = x0 + dx * 4, ez = z0 + dz * 4;
+      for (const e of ctx.enemies.alive()) {
+        const t = Math.max(0, Math.min(1, ((e.pos.x - x0) * (ex - x0) + (e.pos.z - z0) * (ez - z0)) / 16));
+        if (Math.hypot(e.pos.x - (x0 + (ex - x0) * t), e.pos.z - (z0 + (ez - z0) * t)) < 1.4) { e.phantomMark = 4; fx.ring(e.pos, 1, 0x7ff6ff, 0.5); }
+      }
+    }
     audio.sfx('dodge', { vol: 0.9 });
     if (k === 'ghost') fx.ring(player.pos, 1.4, 0x7ff6ff, 0.25);
     return true;

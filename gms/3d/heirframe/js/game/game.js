@@ -7,6 +7,7 @@ import { SHIFT_SECONDS, framePrice } from '../sim/economy.js';
 import { affixLabel as affixText } from '../sim/loot.js';
 import { toUiBoard, toUiWarehouse, toUiComplete, toUiItem, toUiCodex, uiConfig } from '../sim/ui_adapt.js';
 import { createFx, RARITY_COLOR } from './fx.js';
+import { CLUES } from '../data/codex.js';
 import { createOverlay } from './overlay.js';
 import { createStoryPlayer } from './story.js';
 import { createEnemies } from './enemies.js';
@@ -125,6 +126,12 @@ export async function createGame(api) {
     ui?.hud.flash(res.shieldDmg > res.hullDmg ? 'shield' : 'hit');
     player.actor.hitFlash?.();
     if (res.blocked) fx.ring(player.pos, 1.3, 0xffc860, 0.2);
+    // Reactive Plating (relic): a broken shield throws everything within 4 m back (10 s cooldown)
+    if (res.shieldBroke && pc.stats.powers?.includes('reactive_plating') && (G.plateCd || 0) <= performance.now()) {
+      G.plateCd = performance.now() + 10000 / speedK;
+      for (const o of G.enemies.alive()) if (!o.ally && o.pos.distanceTo(player.pos) < 4) G.enemies.knock(o, player.pos.x, player.pos.z, 10);
+      fx.ring(player.pos, 4, 0x8fe8ff, 0.5); rig.shake = Math.max(rig.shake, 0.2); audio.sfx('shield_break', { vol: 0.8 });
+    }
     G.onPlayerHit?.(res);
     fx.impact(tmp.set(player.pos.x, player.pos.y + 1.1, player.pos.z), res.shieldDmg > res.hullDmg ? 0x8fe8ff : 0xff6040, 0.9);
     audio.sfx(res.shieldDmg > res.hullDmg ? 'shield_hit' : 'hurt', { vol: 0.8, minGap: 50 });
@@ -467,7 +474,7 @@ export async function createGame(api) {
     if (out.items.length) { G.coach?.lootItem(); ui?.loot(out.items.map((i) => ({ ...toUiItem(i), better: !!i.upgrade }))); for (const it of out.items) audio.sfx('loot', { rarity: it.rarity }); }
     // the results card already showed the surcharge; the coach's Warehouse hint covers a first upgrade
     if (better.length && G.coach?.current !== 'warehouse' && G.sim.state.flags.coach?.warehouse) ui?.toast('Upgrade available', 'gold', { sub: 'Tap ▲ EQUIP or open the Warehouse' });
-    if (out.clue) ui?.toast('Codex updated', 'story', { sub: out.clue === 'C01' ? 'The Heir-Key' : out.clue });
+    if (out.clue) { const cl = CLUES.find((c) => c.id === out.clue); if (cl?.source === 'echo') ui?.sting('Echo found', cl.name, 'story', 3200); else ui?.toast('Codex updated', 'story', { sub: cl?.name || out.clue }); }
     if (out.mission.story?.id === 'a1_m1') ui?.sting('The board is yours', 'Random contracts unlocked', 'unlock', 3000);
     if (out.mission.story?.id === 'a1_m5') setTimeout(() => ui?.sting('Act 1 complete', 'Act 2 · HARMONY THROUGH UNITY · find Abel Fenn in the Terraces', 'story', 4600), 600);
     if (out.mission.story?.id === 'a2_m5') setTimeout(() => ui?.sting('Act 2 complete', 'HARMONY THROUGH UNITY · Act 3 arrives in the next update', 'story', 4600), 600);
@@ -554,6 +561,7 @@ export async function createGame(api) {
     sim.on('rental:fee', (p) => { ui?.toast(`HireFrame shift fee −${p.fee} cr`, 'warn', { sub: p.debt ? `Balance owed: ${p.debt} cr` : 'Rent by the hour!' }); audio.bark('b_hira_fee_', { cooldown: 30 }); log('shift fee ' + p.fee); });
     sim.on('playerDown', () => playerDown('damage over time'));
     sim.on('clue', (p) => log('clue ' + p.id));
+    sim.on('crackdown', (p) => { log(`crackdown ${p.id} ${p.on}`); if (p.on) { ui?.sting(`Crackdown: ${p.name}`, 'Patrol sweeps · 3 champion bounties on the board', 'alert', 3600); audio.sfx('alarm', { vol: 0.5 }); } else ui?.toast(`${p.name}: the crackdown is over`, 'good'); });
     sim.on('heat', (p) => { if (p.changed || p.added) log(`heat ${p.stars}★${p.added ? ' +' + p.added : ''}`); });
     // restore a mid-contract save by restarting that contract from its first step
     const c = sim.state.contract;
@@ -664,6 +672,8 @@ export async function createGame(api) {
     // Harmony PA every ~90 s of free roaming
     if (G.state === 'free' && !fighting && !story.busy && (G.paT -= dt) <= 0) { G.paT = 80 + Math.random() * 30; { const k = PA_KEYS(); if (k.length) audio.bark(k, { cooldown: 60 }); } }
     if ((G.autosaveT -= dt) <= 0 && G.state === 'free') { G.autosaveT = 30; sim.save(); }
+    // Crackdown sweeps: Warden Eyes keep finding you in that district between contracts
+    if (sim.state.districts.crackdown?.id === G.districts.id && !sim.state.contract && G.state === 'free' && (G.sweepT = (G.sweepT ?? 20) - dt) <= 0) { G.sweepT = 75; if (sim.state.factions.heat < 1) sim.forceHeat(1); }
 
     overlay.suppress(!!(ui?.root?.classList.contains('hf-in-dialogue') || panelOpen() || ui?.root?.classList.contains('hf-in-screen')));
     audio.setListenerCamera(world.camera, player.pos.x, player.pos.z);

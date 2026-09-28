@@ -10,7 +10,7 @@ import { canvasTexture, makeCanvas } from './textures.js';
 // levels: [{ rects: [[x0, x1, z0, z1], ...], y, reflect, ao }].
 export function createIndustrialGround(ctx, levels, mask, o = {}) {
   const { M, reflection, time } = ctx;
-  const { slab = 6, tint = [0.62, 0.6, 0.57], wet = 0.3, rust = 0, rain = false, interior = false, key = 'ind' } = o;
+  const { slab = 6, tint = [0.62, 0.6, 0.57], wet = 0.3, rust = 0, rain = false, interior = false, key = 'ind', holes = [] } = o;
   const maskTex = canvasTexture(mask.canvas, false);
   maskTex.anisotropy = 1; maskTex.generateMipmaps = true; maskTex.flipY = false; maskTex.needsUpdate = true;
   maskTex.minFilter = THREE.LinearMipmapLinearFilter;
@@ -18,6 +18,7 @@ export function createIndustrialGround(ctx, levels, mask, o = {}) {
     tAO: { value: new THREE.DataTexture(new Uint8Array(4), 1, 1) }, uAOMat: { value: new THREE.Matrix4() }, uAOOn: { value: 0 },
     uContacts: { value: Array.from({ length: MAX_CONTACTS }, () => new THREE.Vector3(0, 0, 0)) },
     tZone: { value: maskTex }, uZone: { value: new THREE.Vector4(mask.x0, mask.z0, 1 / mask.w, 1 / mask.d) }, uTime: time,
+    uHoles: { value: holes.length ? holes.map(([x, z, r]) => new THREE.Vector3(x, z, r)) : [new THREE.Vector3(0, 0, 0)] },
   };
   u.tAO.value.needsUpdate = true;
   ctx.groundAO = u;
@@ -47,6 +48,7 @@ export function createIndustrialGround(ctx, levels, mask, o = {}) {
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec2 vGW;')
         .replace('#include <fog_vertex>', '#include <fog_vertex>\nvGW = ( modelMatrix * vec4( transformed, 1.0 ) ).xz;');
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
+uniform vec3 uHoles[${Math.max(1, holes.length)}];
 uniform sampler2D tAO, tZone; uniform mat4 uAOMat; uniform float uAOOn, uTime; uniform vec4 uZone; uniform vec3 uContacts[${MAX_CONTACTS}];
 varying vec2 vGW;
 float groundOcc() {
@@ -69,6 +71,7 @@ float gN(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
 float gLine(float d, float w) { float aa = fwidth(d) * 1.2 + 1e-4; return 1.0 - smoothstep(w * 0.5, w * 0.5 + aa, abs(d)); }
 float igWet = 0.0, igSteel = 0.0, igGrate = 0.0, igPaint = 0.0;`)
         .replace('#include <map_fragment>', `#include <map_fragment>
+${holes.length ? `for (int i = 0; i < ${holes.length}; i++) if (length(vGW - uHoles[i].xy) < uHoles[i].z) discard;` : ''}
 vec3 zm = texture2D(tZone, (vGW - uZone.xy) * uZone.zw).rgb;
 float far = smoothstep(0.02, 0.12, fwidth(vGW.x));
 igSteel = smoothstep(0.35, 0.65, zm.r);
@@ -157,7 +160,7 @@ if (igWet > 0.05) {
   reflectedLight.directSpecular *= 1.0 - 0.5 * gOcc;
 }`);
     };
-    const ck = key + li + (refl ? 'r' : '') + (ao ? 'a' : '') + (rain ? 'w' : '') + [slab, ...tint, wet, rust].map(f).join(',');
+    const ck = key + holes.length + li + (refl ? 'r' : '') + (ao ? 'a' : '') + (rain ? 'w' : '') + [slab, ...tint, wet, rust].map(f).join(',');
     mat.customProgramCacheKey = () => 'indGround' + ck;
     const mesh = new THREE.Mesh(g, mat);
     mesh.receiveShadow = true;

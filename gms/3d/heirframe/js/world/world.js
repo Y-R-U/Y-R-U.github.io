@@ -32,6 +32,8 @@ import { STACKS } from './stacks.js';
 import { HOME } from './home.js';
 import { SPINE } from './spine.js';
 import { HULLSIDE } from './hullside.js';
+import { MERIDIAN } from './meridian.js';
+import { HELM } from './helm.js';
 
 export const LAYOUT = {
   bounds: { x0: -58, x1: 47.5, z0: -97, z1: 79 },
@@ -82,12 +84,14 @@ export const DISTRICT_DEFS = {
   home: HOME,
   spine: SPINE,
   hullside: HULLSIDE,
+  meridian: MERIDIAN,
+  helm: HELM,
 };
 export const DISTRICT_IDS = Object.keys(DISTRICT_DEFS);
 // [{id, label}] for pickers (the ?dev panel); world.districtList() returns the same
 export const DISTRICT_LIST = DISTRICT_IDS.map((id) => ({ id, label: DISTRICT_DEFS[id].name }));
 // ids the P3 brief used; the sim (js/data/districts.js) uses the canonical ones
-export const DISTRICT_ALIASES = { verdant: 'terraces', verdant_terraces: 'terraces', nexus: 'arcology', nexus_arcology: 'arcology', nexus_servers: 'arcology_servers', docks: 'portside', spaceport: 'portside', the_stacks: 'stacks', undercity: 'stacks', pod_4471: 'home', pod: 'home', the_spine: 'spine', hull: 'hullside' };
+export const DISTRICT_ALIASES = { verdant: 'terraces', verdant_terraces: 'terraces', nexus: 'arcology', nexus_arcology: 'arcology', nexus_servers: 'arcology_servers', docks: 'portside', spaceport: 'portside', the_stacks: 'stacks', undercity: 'stacks', pod_4471: 'home', pod: 'home', the_spine: 'spine', hull: 'hullside', meridian_wreck: 'meridian', wreck: 'meridian', the_helm: 'helm', bridge: 'helm' };
 const canon = (id) => DISTRICT_ALIASES[id] || id;
 
 

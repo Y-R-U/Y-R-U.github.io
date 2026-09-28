@@ -269,7 +269,7 @@ function buildSpine(ctx, onProgress = () => {}) {
   ]);
   const S = [
     ['sp_catwalk_spine', 'catwalk', 0, -20, 3], ['sp_bridge_s', 'catwalk', -8, 40, 2.5], ['sp_bridge_mid', 'catwalk', 8, 0, 2.5], ['sp_bridge_n', 'catwalk', -8, -40, 2.5],
-    ['sp_turbine_hall', 'interior', -31, 2, 6], ['sp_control_room', 'interior', 35, 0, 4],
+    ['sp_turbine_hall', 'interior', -31, 2, 6], ['sp_control_room', 'interior', 37, -3, 3],
     ['sp_bay_n', 'warehouse', 30, -40, 5], ['sp_bay_s', 'warehouse', 30, 40, 5],
     ['sp_arrival', 'plaza', 0, 72, 6], ['sp_locker', 'locker', 30, 93, 2.5],
     ['sp_firmament_door', 'vault', L.door.x, L.door.z + 3.5, 3], ['sp_keeper_arena', 'arena', 0, -86, 10],

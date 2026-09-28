@@ -436,3 +436,15 @@
 .mk-item .hf-btn, .mk-con .hf-btn { height: 34px; padding: 0 10px; font-size: 12.5px; }
 .wh-tab span { white-space: nowrap; }
 @media (max-width: 960px) { .wh-tab { padding: 0 8px; } .wh-tab span { display: none; } .wh-tab.on span { display: inline; } }
+
+/* P3g: faction standing (Market tab) and Recalibrate (Fabricator) */
+.mk-rep-h { display: block; margin-top: 10px; }
+.mk-rep { display: grid; grid-template-columns: 8px 1fr auto auto; align-items: center; gap: 8px; padding: 3px 8px; font-size: 13px; }
+.mk-rep i { width: 8px; height: 8px; border-radius: 50%; }
+.mk-rep span { color: var(--ink-dim); }
+.mk-rep em { font-style: normal; color: var(--gold); min-width: 32px; text-align: right; }
+.mk-rep-n { padding: 2px 8px; font-size: 12px; color: var(--good); }
+.fb-recal { margin-top: 8px; padding: 8px 12px; border-radius: 12px; flex: none; }
+.rc-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 3px 0; font-size: 13px; }
+.rc-row.off { opacity: .45; }
+.rc-row .hf-btn { height: 30px; padding: 0 10px; font-size: 12px; }

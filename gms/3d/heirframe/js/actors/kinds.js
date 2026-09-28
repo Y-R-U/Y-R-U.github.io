@@ -5,6 +5,10 @@ import {
   buildGunner, buildGhost, buildSecurity, eleganceMats, GUNNER_DIMS, GHOST_DIMS, SECURITY_DIMS,
 } from './kinds_frames.js';
 import { buildKettle, kettleMats, KETTLE_DIMS } from './kinds_boss.js';
+import {
+  buildSpider, spiderMats, spiderPost, SPIDER_DIMS, KEEPER_DIMS, KEEPER_SCALE, buildSovereign, sovereignMats, sovereignPhase, SOVEREIGN_DIMS,
+  SOVEREIGN_SOCKETS, SOVEREIGN_K, buildHaloDrone, haloDroneMats, HALO_DRONE_DIMS, seraphPhase, buildHuman, humanMats, HUMAN_DIMS,
+} from './kinds_act5.js';
 import { buildHalloran, halloranMats, HALLORAN_DIMS, buildTurret, turretMats, TURRET_DIMS, buildSeraph, seraphMats, SERAPH_DIMS } from './kinds_act2.js';
 
 const CIV_SLOTS = ['body', 'trim', 'mech', 'glow', 'eye'];
@@ -93,8 +97,40 @@ export const KINDS = {
   seraph: {
     slots: ['body', 'trim', 'mech', 'glow', 'eye'], height: 2.05, radius: 0.32, runSpeed: 5.2,
     style: { elegance: 0.8, melee: 'slash', arm: 0.9 },
-    dims: () => SERAPH_DIMS, build: buildSeraph, mats: (o) => seraphMats(o),
+    dims: () => SERAPH_DIMS, build: buildSeraph, mats: (o) => seraphMats(o), phase: seraphPhase,
     sockets: { muzzle: ['foreArmR', [-0.05, -0.36, 0]] },
+  },
+  // Act 4–6 ship swarm: Hull Wight (tier 0–1) and Spine Keeper (tier 2+ → spider_keeper). Six legs: the middle pair rides aux0.
+  spider: {
+    rig: 'quad', slots: ['body', 'trim', 'mech', 'glow', 'eye'], variants: 1, height: 1.0, radius: 0.55, runSpeed: 4.4, scaleVar: 0.06,
+    style: { cadence: 1.5, duty: 0.5, splay: 1.9, bend: -2.1, legL: 0.45 },
+    dims: () => SPIDER_DIMS, build: buildSpider, mats: (o) => spiderMats(o, false), post: spiderPost,
+    sockets: { head: [0, 0.02, 0.1], muzzle: ['aux1', [0, -0.075, 0.24]], back: [0, 0.22, -0.2], handL: [0, -0.56, 0], handR: [0, -0.56, 0] },
+  },
+  spider_keeper: {
+    rig: 'quad', slots: ['body', 'trim', 'mech', 'glow', 'eye'], variants: 1, height: 2.2, radius: 1.3, runSpeed: 3.0,
+    style: { cadence: 0.95, duty: 0.5, splay: 1.9, bend: -2.1, legL: 0.45 * KEEPER_SCALE },
+    dims: () => KEEPER_DIMS, build: (b, o) => buildSpider(b, { ...o, keeper: true }), mats: (o) => spiderMats(o, true), post: spiderPost,
+    sockets: { head: [0, 0.05 * KEEPER_SCALE, 0.1 * KEEPER_SCALE], muzzle: ['head', [0, 0.05 * KEEPER_SCALE, 0.14 * KEEPER_SCALE]], back: [0, 0.5, -0.45], handL: [0, -1.2, 0], handR: [0, -1.2, 0] },
+  },
+  // Act 6 boss: Archon Dray. setPhase(1|2|3); halo drones dock at sockets halo0..halo6.
+  boss_sovereign: {
+    slots: ['body', 'trim', 'mech', 'cape', 'pods', 'glow', 'eye'], height: 3.1, radius: 0.75, runSpeed: 3.2, ownSlots: ['pods'],
+    style: { heavy: 1.4, arm: 0.6, dodge: 'dash', stance: 1.2, cadence: 0.8 },
+    dims: () => SOVEREIGN_DIMS, build: buildSovereign, mats: sovereignMats, phase: sovereignPhase,
+    sockets: { head: [0, 0.12, 0.03], back: [0, 0.24, -0.46], muzzle: ['handR', [0, -0.24, 0]] },
+    extraSockets: SOVEREIGN_SOCKETS,
+  },
+  halo_drone: {
+    rig: 'hover', slots: ['body', 'trim', 'mech', 'glow', 'eye'], variants: 1, height: 2.1, radius: 0.35, runSpeed: 5.5,
+    style: {}, dims: () => HALO_DRONE_DIMS, build: buildHaloDrone, mats: haloDroneMats,
+    sockets: { head: [0, 0, 0.16], muzzle: ['head', [0, 0, 0.18]], back: [0, 0.1, -0.1], handL: [0, 0, 0.1], handR: [0, 0, 0.1] },
+  },
+  // Wren's own body for A6-M4 "Walk as Yourself" (not a frame: slow, no combat anims needed)
+  human: {
+    slots: ['skin', 'hair', 'suit', 'trim', 'eye'], variants: 1, height: 1.72, radius: 0.26, runSpeed: 2.2,
+    style: { elegance: 0.25, arm: 0.95, cadence: 0.92 },
+    dims: () => HUMAN_DIMS, build: buildHuman, mats: humanMats,
   },
   drone_scout: {
     rig: 'hover', slots: ['body', 'trim', 'mech', 'glow', 'eye'], height: 1.75, radius: 0.4, runSpeed: 5,
@@ -110,7 +146,8 @@ export const KINDS = {
 };
 
 // kind + tier combinations that build a different kind (the data asks for Halloran as security tier 3)
-export const TIER_KINDS = { security: { 3: 'boss_halloran', 4: 'boss_halloran' } };
+export const TIER_KINDS = { security: { 3: 'boss_halloran', 4: 'boss_halloran' }, spider: { 2: 'spider_keeper', 3: 'spider_keeper', 4: 'spider_keeper' } };
+KINDS.boss_dray = KINDS.boss_sovereign;
 
 const FALLBACK = { rental: 'civ_worker', brawler: 'civ_chrome', gunner: 'civ_chrome', ghost: 'civ_black', drone_scout: 'civ_chrome', security: 'civ_chrome', enforcer: 'civ_black' };
 

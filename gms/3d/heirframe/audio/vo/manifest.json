@@ -1769,5 +1769,104 @@
   "job_id": "de5de0aeba6c4cbea663722f5ceeaa5a",
   "sig": "38b334cb0b59",
   "qc": []
+ },
+ "a2_s03_fenn_02": {
+  "text": "I should tell you. I'm one of them too. I was dying. They offered. I'm not proud.",
+  "voice": "fenn",
+  "voice_name": "Heirframe · Dr Abel Fenn",
+  "file": "a2_s03_fenn_02.mp3",
+  "duration": 5.25,
+  "seed": 42,
+  "job_id": "816c5baeb17a440bb989193f49d04d78",
+  "sig": "1254c78ede5e",
+  "qc": []
+ },
+ "a2_s04_halloran_01": {
+  "text": "Rider Vael. You are an unperson. You have no rights to read.",
+  "voice": "halloran",
+  "voice_name": "Heirframe · Halloran",
+  "file": "a2_s04_halloran_01.mp3",
+  "duration": 3.82,
+  "seed": 42,
+  "job_id": "4ab84823e6aa48129a568b45ded44c5f",
+  "sig": "b16939fbb98d",
+  "qc": []
+ },
+ "a2_s04_halloran_02": {
+  "text": "Stand down, or be decommissioned. Those are the only options.",
+  "voice": "halloran",
+  "voice_name": "Heirframe · Halloran",
+  "file": "a2_s04_halloran_02.mp3",
+  "duration": 4.09,
+  "seed": 42,
+  "job_id": "f78109d4bfdf4e1c83fe57e27fbfadec",
+  "sig": "e993a83a8d6b",
+  "qc": []
+ },
+ "a2_s04_seraph_01": {
+  "text": "Target located. Do not resist.",
+  "voice": "seraph",
+  "voice_name": "Heirframe · Lyra Vael",
+  "file": "a2_s04_seraph_01.mp3",
+  "duration": 2.26,
+  "seed": 42,
+  "job_id": "2c22544e324f420aba19f1b11f78b84f",
+  "sig": "e07bbbc45072",
+  "qc": []
+ },
+ "a2_s04_seraph_02": {
+  "text": "Mm... mm-mm.",
+  "voice": "seraph",
+  "voice_name": "Heirframe · Lyra Vael",
+  "file": "a2_s04_seraph_02.mp3",
+  "duration": 1.19,
+  "seed": 777,
+  "job_id": "f3bfdb18bda847ad85aac0300fc5ed63",
+  "sig": "784b97217dfc",
+  "qc": []
+ },
+ "a2_s05_fenn_01": {
+  "text": "Iris made Ascension to save the dying. Severin made it to never die.",
+  "voice": "fenn",
+  "voice_name": "Heirframe · Dr Abel Fenn",
+  "file": "a2_s05_fenn_01.mp3",
+  "duration": 4.88,
+  "seed": 42,
+  "job_id": "67e43381da5041f4be89c74180a7331e",
+  "sig": "9be6ac5aec5f",
+  "qc": []
+ },
+ "a2_s05_fenn_02": {
+  "text": "The Voices are the Concord, Wren. Seven minds that forgot how to end.",
+  "voice": "fenn",
+  "voice_name": "Heirframe · Dr Abel Fenn",
+  "file": "a2_s05_fenn_02.mp3",
+  "duration": 5.1,
+  "seed": 42,
+  "job_id": "be32c9f87e974860b08cade6e4baaac7",
+  "sig": "c4de78dc5af7",
+  "qc": []
+ },
+ "a2_s05_dray_01": {
+  "text": "Abel. You always did talk too much.",
+  "voice": "dray_gold",
+  "voice_name": "Heirframe · Archon Dray",
+  "file": "a2_s05_dray_01.mp3",
+  "duration": 2.47,
+  "seed": 42,
+  "job_id": "cc6bb62620a64f60b93ff4127094d39a",
+  "sig": "b240748af3c4",
+  "qc": []
+ },
+ "a2_s05_fenn_03": {
+  "text": "Find the ones who were erased. Some of them... aren't dead.",
+  "voice": "fenn",
+  "voice_name": "Heirframe · Dr Abel Fenn",
+  "file": "a2_s05_fenn_03.mp3",
+  "duration": 4.57,
+  "seed": 42,
+  "job_id": "6c638e3ff4844256b634caedae6519a6",
+  "sig": "8571ec09f47d",
+  "qc": []
  }
 }

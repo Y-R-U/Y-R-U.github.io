@@ -536,8 +536,33 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     if (!def || def.act > (live.storyActCap ?? Infinity)) return null;
     return buildStoryMission(def.id, boardCtx());
   }
+  // ---- Crackdown (DESIGN §11.3): danger ≥ 8 → the district's controlling faction sweeps it for 2 shifts and posts a
+  // bounty board of 3 champion targets
+  function crackdownCards() {
+    const cd = S.districts.crackdown;
+    if (!cd) return [];
+    const ctx = boardCtx({ contractsDone: 99 });
+    const out = [];
+    for (let i = 0; i < 3; i++) {
+      const m = generateContract(rngFor(S.seed, 'crackdown', cd.id, cd.start, i), ctx, { grade: 'elite', archetype: 'bounty', district: cd.id, noTwist: true, slot: 20 + i });
+      if (!m || !m.target) continue;
+      m.id = `cd_${cd.start}_${i}`; m.target.rank = 'champion'; m.badge = 'Crackdown';
+      m.title = `Crackdown: ${m.target.name}`;
+      m.payout = { ...m.payout, credits: Math.round(m.payout.credits * 1.5) };
+      out.push(m);
+    }
+    return out;
+  }
+  function checkCrackdown(id) {
+    if (S.districts.crackdown || (S.districts.danger[id] ?? 0) < 8) return;
+    S.districts.crackdown = { id, shifts: 2, start: S.shiftIndex };
+    emit('crackdown', { id, name: DISTRICTS[id].name, on: true });
+    if (S.board) S.board.cards.unshift(...crackdownCards());
+  }
+
   function refreshBoard({ reroll = 0 } = {}) {
     S.board = generateBoard({ ...boardCtx(), reroll, storyCard: storyCard() });
+    if (S.districts.crackdown) S.board.cards.unshift(...crackdownCards().filter((c) => !S.districts.crackdown.done?.includes(c.id)));
     emit('board', S.board);
     return S.board;
   }
@@ -690,7 +715,8 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
       tickRenewal(S.story);
       const echo = rollEcho(actRng('echo'), S.story, m.district);
       if (echo) { out.clue = echo; emit('clue', { id: echo }); }
-      if (m.faction && m.archetype !== 'pest') S.districts.danger[m.district] = Math.min(10, (S.districts.danger[m.district] ?? DISTRICTS[m.district].danger) + 0.3);
+      if (m.faction && m.archetype !== 'pest' && DISTRICTS[m.district]) { S.districts.danger[m.district] = Math.min(10, (S.districts.danger[m.district] ?? DISTRICTS[m.district].danger) + 0.3); checkCrackdown(m.district); }
+      if (m.badge === 'Crackdown' && S.districts.crackdown) (S.districts.crackdown.done ||= []).push(m.id);
     }
     const oc = S.overclock.active;
     if (oc && m.grade === 'elite' && oc >= S.overclock.unlocked && oc < 30) { S.overclock.unlocked = oc + 1; out.overclockUnlocked = oc + 1; emit('overclock:unlock', { n: oc + 1 }); }
@@ -817,7 +843,10 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
       if (S.rentalDebt && S.credits > 0) payRental();
       emit('rental:fee', { fee, debt: S.rentalDebt });
     }
+    const cd = S.districts.crackdown;
+    if (cd && --cd.shifts <= 0) { S.districts.crackdown = null; emit('crackdown', { id: cd.id, name: DISTRICTS[cd.id].name, on: false }); }
     for (const id of S.districts.unlocked) {
+      if (!DISTRICTS[id]) continue;
       const floor = DISTRICTS[id].danger;
       const cur = S.districts.danger[id] ?? floor;
       S.districts.danger[id] = Math.max(floor, cur - 0.5);
@@ -909,6 +938,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     buyHome, setHome, buyPaint, setPaint, buyMaterial, brokerPrice,
     homes: () => Object.keys(HOMES).map(homeState), paintsList: () => PAINTS.map(p => paintState(p.id)),
     setSites(districtId, sites) { live.sitesRegistry[districtId] = sites; },
+    checkCrackdown,
   };
   return game;
 }

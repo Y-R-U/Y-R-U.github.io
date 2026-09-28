@@ -24,6 +24,7 @@ const CSS = `
 .hfdev-btn { position: fixed; z-index: 60; top: max(8px, env(safe-area-inset-top)); left: 300px; height: 34px; padding: 0 12px; border-radius: 17px;
   font: 700 13px/34px 'Rajdhani', system-ui, sans-serif; letter-spacing: .14em; color: #1a0f00; background: linear-gradient(180deg, #fff6d6, #ffd986 40%, #dc9a34);
   border: 1px solid rgba(255, 240, 200, .8); box-shadow: 0 2px 10px rgba(0, 0, 0, .35); touch-action: manipulation; user-select: none; }
+body:has(.hf-panel.show) .hfdev-btn:not(.open) { opacity: .35; }
 .hfdev-btn.god { box-shadow: 0 0 0 2px #5dffb3, 0 2px 10px rgba(0, 0, 0, .35); }
 .hfdev { position: fixed; z-index: 61; top: max(8px, env(safe-area-inset-top)); bottom: max(8px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
   width: min(620px, calc(100vw - 24px)); overflow-y: auto; padding: 12px 14px 14px; border-radius: 14px; display: none; color: #eef8ff;
@@ -129,6 +130,7 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
   }
   function render() {
     btn.classList.toggle('god', D.god);
+    btn.classList.toggle('open', D.open);
     panel.classList.toggle('show', D.open);
     if (!D.open) return;
     panel.innerHTML = '';

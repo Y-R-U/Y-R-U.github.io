@@ -179,7 +179,18 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
 ## IN PROGRESS
 - D24 dev mode DONE (see top; phone 915x412 touch taps on the pill + God mode verified; start points portside/home/stacks/
   aurum; story jump a2_m4 with clues C01–C08). Title Settings panel checked on top (manager's z-index 20 kept).
-- NEXT: A2-M5 run, Act 2 VO, P4 cheap wiring (Home door loop), P3 systems.
+- A2-M5 bot run ok (glasshouse defend, R2 beats, Fenn shut down, Act 2 sting). Act 2 VO generating (gen_vo.py --max-p P1
+  with the 16 a2_* keys; log scratchpad vo_a2.log).
+- P4 cheap wiring DONE: district names/ambience/emitters for portside/stacks/home; Stacks `home` door ↔ Home `door`
+  (liftTransition; arrive at Home's player spawn / the Stacks' `home` spawn outside the hostel); Home bed = sleep to the next
+  shift (card + full repair), codex/family_tree → codex panel, trophies → stats toast, warehouse → Warehouse; minimap skips
+  `m.off` crowd. Not yet: Rook NPC, setCull (A4-M2 staging, P4).
+- P3 rep + vendors DONE: `sim.vendorMul(faction)` (Hated +10%, Hostile +5%, Friendly −2%, Trusted −4%, Honored −6%) on Sal's
+  market, supplies and frame licences (Nexus); repairs −25% at Concord Friendly+. Market tab shows a Standing list (tier +
+  value per faction) and the discount; results card lists rep changes and tier changes. Rival pairs already in the sim.
+- P3 Fabricator DONE: Recalibrate box in the Fabricator (per-affix Reroll, locks to the first affix rerolled, cost, locked
+  under L8) → `warehouse:recal` → sim.recalibrate; salvage-all and tune pity (+10%/fail) already existed. Fixed duplicate
+  "scrapAlloy · Scrap Alloy" cost labels. DEV pill dims while a panel is open.
 
 ## NEXT (P3)
 - rep tiers/vendor pricing/rival UI; Fabricator (recalibrate UI, tune pity); relic hooks (afterimage, phantom_step,

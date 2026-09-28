@@ -180,7 +180,11 @@ export function createSteps(ctx, run) {
     const dx = t.x - e.pos.x, dz = t.z - e.pos.z, l = Math.hypot(dx, dz);
     if (Math.hypot(to.x - e.pos.x, to.z - e.pos.z) < 0.9) { e.bot.setMove(0, 0); return false; }
     if (l > 0.05) {
+      const bx = e.pos.x, bz = e.pos.z;
       ctx.world.collision.move(e.pos, dx / l * speed * dt, dz / l * speed * dt, e.radius);
+      // wedged on geometry for 3 s: hop to the next route point (a stuck escortee/racer/target must never soft-lock a job)
+      e.wedgeT = Math.hypot(e.pos.x - bx, e.pos.z - bz) < speed * dt * 0.2 ? (e.wedgeT || 0) + dt : 0;
+      if (e.wedgeT > 3) { e.wedgeT = 0; const q = r.length > 1 ? r[1] : to; const n = ctx.nav.nearest(q.x, q.z) || q; e.pos.set(n.x, ctx.world.groundAt(n.x, n.z), n.z); r.shift(); }
       e.yaw = Math.atan2(dx, dz);
       e.bot.setMove(Math.min(1, speed / (e.bot.runSpeed || 4)), speed);
     }
@@ -229,7 +233,7 @@ export function createSteps(ctx, run) {
     tmp.set(e.pos.x, e.pos.y + 2.3, e.pos.z);
     const sp = ctx.project(tmp);
     if (T.sus > 0.02) ui.detect.set(e.id, sp.x, sp.y, T.sus, { onScreen: sp.on }); else ui.detect.clear(e.id);
-    T.far = d > maxD ? T.far + dt : 0;
+    T.far = d > maxD && T.grace <= 0 ? T.far + dt : 0;
     const lose = s.loseTime || 8;
     ui.band.set({ value: d, min: 0, max: maxD + 10, lo: minD, hi: maxD, label: `Tailing ${e.c.name}`, warn: T.far > 0 ? `Losing them: ${Math.ceil(lose - T.far)}s` : T.sus > 0.5 ? 'They sense something' : '' });
     if (T.sus >= 1) { if (R.mission.story) R.tailReset = T.path[Math.min(T.wp, T.path.length - 1)]; ui.band.hide(); ui.detect.clear(e.id); audio.sfx('alarm', { vol: 0.5 }); e.state = 'flee'; e.fleeT = 5; e.escort = false; run.fail('spotted', 'You were made'); return; }

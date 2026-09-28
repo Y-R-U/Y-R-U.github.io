@@ -244,9 +244,9 @@ function buildHullside(ctx, onProgress = () => {}) {
   const T = L.trench;
   const S = [
     ['hs_hull_south', 'hull', 0, 52, 8], ['hs_hull_west', 'hull', -30, 20, 8], ['hs_hull_east', 'hull', 20, -40, 8], ['hs_hull_north', 'hull', 0, -74, 8], ['hs_hull_radiators', 'hull', -30, -50, 6],
-    ['hs_landing_pad', 'pad', L.pad.x, L.pad.z, 10],
+    ['hs_landing_pad', 'pad', L.pad.x - 9, L.pad.z, 5],
     ['hs_bridge_w', 'catwalk', T.bridges[0], 34, 2], ['hs_bridge_e', 'catwalk', T.bridges[1], 34, 2],
-    ['hs_cargo', 'warehouse', 24, -20, 5], ['hs_comms', 'hull', -32, -2, 5],
+    ['hs_cargo', 'warehouse', 20, -20, 4], ['hs_comms', 'hull', -32, -2, 5],
     ['hs_arena', 'arena', A.x, A.z, A.r], ['hs_spur', 'dock', 0, -92, 3], ['hs_airlock', 'lobby', 0, 78, 3],
     ['hs_relay', 'relay', L.relay.x, L.relay.z - 2.8, 2.5],
     ['hs_spawn_sw', 'spawn_edge', -43, 60, 3], ['hs_spawn_se', 'spawn_edge', 43, 70, 3], ['hs_spawn_nw', 'spawn_edge', -43, -90, 3], ['hs_spawn_ne', 'spawn_edge', 43, -80, 3],

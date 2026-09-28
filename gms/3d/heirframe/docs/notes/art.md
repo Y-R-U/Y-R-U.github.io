@@ -745,7 +745,7 @@ Scope (manager, per Aaron): 1. Aurum lake motion (lake reads like a still photo)
 4. Stacks: fog doesn't use the district's sun direction (the fog chunk's sun glow is baked to the Aurum sun) — harmless
    indoors, and Portside's sunset glow in the fog points the wrong way (subtle). Fix: make SUN_DIR in the fog a uniform.
 
-## P5w (world agent, 2026-09-28) — IN PROGRESS
+## P5w (world agent, 2026-09-28) — DONE
 Brief: Act 5–6 districts `spine`, `hullside`, `meridian`, `helm` (same district API), actor kinds `spider`, `boss_sovereign`
 (+ halo drones), Seraph phase hooks, `human` body for *Walk as Yourself*; fog sun glow per district. D23: no art passes, no
 critics; one self-check shot per area. Harness: scratchpad `art/p5w/`, Chrome port 9302.
@@ -758,4 +758,84 @@ critics; one self-check shot per area. Harness: scratchpad `art/p5w/`, Chrome po
   reflection pass for that district.
 - Boot check after the limit: all 8 existing districts load in one page, 0 errors (`art/p5w/boot.js`).
 - NEW (not imported yet): `js/world/space.js` (space sky dome + PMREM: stars, milky band, sun, Verdance), `js/world/p5_props.js`.
-- NEXT: spine.js → hullside.js → meridian.js → helm.js, then actor kinds.
+- BUILT + registered (boot green, first self-check shots in `art/p5w/`): `spine.js` (sp_), `hullside.js` (hs_),
+  `meridian.js` (mr_). ind_ground gained `holes: [[x,z,r]]` (discards floor inside discs: the Meridian breach).
+  GOTCHA: headless Chrome keeps stale ES modules across navigations even with cache disabled → `art/p5w/rs.sh` restarts it.
+- BUILT `helm.js` (hl_): mirror floor of black glass with gold inlays, pointed rib vault open to the stars, rose window
+  on Verdance, seven thrones, the chair + ship-intelligence rings; `world.ctx.helm.setMode(...)` lighting hook.
+- DONE actor kinds (js/actors/kinds_act5.js, registered in kinds.js): `spider` (+ `spider_keeper` via tier ≥ 2), `boss_sovereign`
+  (alias `boss_dray`), `halo_drone`, `human`; `robot.setPhase(n)` (seraph 1–4, sovereign 1–3), per-kind `post()` anim hook
+  (spider middle legs), quad anims read `style.splay/bend/legL`. Gallery: `tools/robot_gallery.html?kinds=spider,...`.
+- Checks: all 12 districts boot on high and low in one page, 0 errors; `?auto=1&speed=3&fresh` → 'free'. Every site and
+  interactable of the 4 new districts routes from spawn on the nav grid (`art/p5w/nav.js`); no site stands in a blocked cell
+  except terminals/relays (prop centres, as in every district). 10 swap round trips (4 new + stacks + aurum): programs 88 flat,
+  geometries 96→103 / textures 64→68 over the first rounds (first-use caches) then flat; skinned meshes flat (the frozen
+  frame in Meridian is disposed via ctx.disposers). Build ms: spine ~58, hullside ~60, meridian ~63, helm ~47.
+- Perf (M5 metal, 915x412 DPR2 → dpr 1.5, calls / tris; gameplay · vista p12 · vista y180 p12 · look-up p-20; low tier):
+  spine 76/89k · 96/112k · 91/92k · 71/66k (low 33–54) · hullside 47/45k · 78/52k · 63/47k · 45/39k (low 24–52) ·
+  meridian 53/39k · 91/59k · 70/43k · 52/29k (low 24–60) · helm 82/147k · 100/161k · 98/122k · 64/103k (low 28–42). All 60 fps.
+
+### P5w → API for gameplay
+**District ids** (canonical = js/data/districts.js): `spine`, `hullside`, `meridian`, `helm`. Aliases: `the_spine`, `hull`,
+`meridian_wreck`, `wreck`, `the_helm`, `bridge`. Picker list: `import { DISTRICT_LIST } from './world/world.js'` or
+`world.districtList()` → `[{id, label}]` (all 12 districts).
+**Movement flags** on `world.district`: `gravity` (1 normal; hullside 0.35; meridian 0), `magBoots` (hullside, meridian),
+`vacuum` (hullside, meridian: no air), `zeroG` (meridian: debris floats; the player still walks on mag boots).
+**New interactable ids**
+- `{id:'passage', to, story?, label}` — story-gated connectors (gameplay decides the gate from `story`, a sim story id):
+  spine Firmament door `to:'hullside', story:'a4_m4'` → place player at hullside `spawnPoints.airlock`;
+  hullside airlock `to:'spine'` → spine `spawnPoints.firmament`; hullside spur `to:'meridian', story:'a5_m1'` → meridian
+  `spawnPoints.dock`; meridian collar `to:'hullside'` → hullside `spawnPoints.spur`. Use `world.liftTransition` (short) or
+  `relayTransition`.
+- meridian: `heir_core` (A5-M2 pickup; `world.ctx.meridian.core` is the glowing mesh — hide it once taken), `log` (Captain's
+  log, clue C16), `tomas` (the frozen frame in the doorway). helm: `helm_chair` (A6-M4 walk target, A6-M5 choice).
+- Every new district also has `relay`, `contracts`, `warehouse` (standard).
+**Sites** (all `{id, tag, x, z, r, y, district, indoor}`):
+- spine (28, `sp_`, indoor): catwalk ×4 (`sp_catwalk_spine`, 3 bridges), interior ×2 (turbine hall, control room),
+  warehouse ×2, plaza, locker, vault `sp_firmament_door`, **arena `sp_keeper_arena`** (A4-M5 Spine Keeper), relay,
+  spawn_edge ×4, vantage ×2, hide ×4, npc ×3, terminal, link_pad. spawnPoints + `firmament`.
+- hullside (29, `hs_`, outdoor): hull ×6, pad `hs_landing_pad`, catwalk ×2 (trench bridges), warehouse `hs_cargo`,
+  **arena `hs_arena`** (A5-M5 Seraph, open plating ring), dock `hs_spur` (A5-M1 escort goal), lobby `hs_airlock`, relay,
+  spawn_edge ×4, vantage ×2, hide ×4, npc ×3 (`hs_npc_jun`, `hs_npc_team`, `hs_npc_pad`), terminal, link_pad.
+  spawnPoints + `airlock`, `spur`, `arena`. The trench (z 30..38) is a drop except on the two bridges.
+- meridian (26, `mr_`, outdoor): hull ×3 (`mr_comms_platform` = A5-M3 defend point, mast at `world.ctx.meridian.mast`),
+  interior ×4 (concourse, memorial hall, command room, `mr_tomas_door`), **vault `mr_lyra_lab`** (Heir Core), catwalk ×2
+  (`mr_breach_catwalk` over the breach, `mr_mast_catwalk`), memorial `mr_memorial` (new tag), relay, spawn_edge ×4,
+  vantage ×2, hide ×4, npc ×2 (`mr_npc_jun`), terminal, link_pad. spawnPoints + `dock`, `core`, `mast`. The breach
+  (22,4) r 13 is a hole (blocked) except the catwalk.
+- helm (29, `hl_`, indoor): lobby ×2 (nave), interior ×3 (outer ring W/E, `hl_pod_dock`), vault `hl_helm_chair`,
+  **arena `hl_dais`** (A6-M5), throne ×7 `hl_throne_1..7` (new tag: the Seven Voices' seats, A6-M2 targets), relay,
+  spawn_edge ×4, vantage ×2, hide ×4, npc ×2 (`hl_npc_lyra`, `hl_npc_mara`), terminal, link_pad. spawnPoints + `dock`
+  (Walk as Yourself start), `chair`, `dais`. The dais is raised 1.2 m (stairs on its south side).
+**Crowds**: spine 6, hullside 0, meridian 0, helm 8 (district.crowd.count). Breakables: 10 / 8 / 7 / 4.
+**Helm boss hook**: `world.ctx.helm.setMode('calm'|'harmony'|'dray'|'iris'|'open')` recolours the pillar lines, the ship
+intelligence's rings and the floor pools (phase 1 harmony, phase 2 dray, phase 3 iris, ending open). `.chair` (Vector3 on
+the dais), `.voices` (7 throne stand points), `.dock`.
+**Actor kinds** (js/actors/kinds_act5.js):
+- `spider` — Hull Wight (tier 0–1: 1.0 m, welding-torch muzzle on the head arm). **Tier ≥ 2 builds `spider_keeper`**
+  (Spine Keeper ×2.2, 2.2 m, red laser eye muzzle, glowing spawn sacs). Quad anims; 5 draws, 4.8k / 5.9k tris.
+- `boss_sovereign` (= `boss_dray`): Archon Dray, 3.1 m gold colossus, halo with seven voice pods, sockets `halo0..halo6`
+  (spawn the drones there). `robot.setPhase(1|2|3)`: 1 pods lit, 2 pods dark (drones out), 3 halo gutters red / eyes white
+  (Iris cuts his link). 7 draws, 17k tris.
+- `halo_drone` — one of Dray's seven voices (hover rig, gold orb + spinning halo). 5 draws, 1.4k tris.
+- `seraph` tier 3 (existing) now has phases: `setPhase(1..4)` — 2 wings flare, 3 damaged (red chip light), 4 freed (Lyra:
+  warm eyes, dim amber halo). No separate kind needed.
+- `human` — Wren's own body for A6-M4: pod-suit, 1.72 m, slow (runSpeed 2.2), biped anims (walk/idle/talk/sit).
+- `robot.setPhase(n)` is a no-op on other kinds; merged crowd robots ignore it.
+**Engine**: fog sun glow follows each district's sun (portside's sunset glow now points at its sun); low tier's sun light
+direction now follows the district too.
+
+### Requests (gameplay / P5 runtime)
+1. Wire `passage` interactables (above) with the story gates; add spine/hullside/meridian/helm to NAMES/AMBIENT/EMITTERS
+   (spine: turbines (-31,22) (-31,-18) (-31,-56), coolant falls (±14, 50/20/-30/-66); hullside: silence/suit breath, vacuum;
+   meridian: creak, vacuum; helm: choir hum at (0,-76)).
+2. Read `world.district.gravity/magBoots/vacuum/zeroG` in the player controller (jump height, fall speed, footstep sfx).
+3. enemies.js: add a `halo_drone` enemy (robotKind 'halo_drone', faction voices, flying) for Dray's phase 2.
+4. On A5-M2 pickup hide `world.ctx.meridian.core`; call `robot.setPhase` at Seraph/Dray phase breaks; `helm.setMode` too.
+5. `?shot=1` still teleports to (3,12): in spine that is over the chasm (a drop) — use `world.spawnPoints.player` off-Aurum.
+
+### NEXT / gaps (P5w)
+1. `rustkin` (Act 4 Rustmother) and an armed `civ_gold` tier 2 (Gilded Guard) are still fallbacks — not in this brief.
+2. Brightline Apartment (DESIGN §13) still unbuilt. Epilogue billboard art ("A BRIGHTER FUTURE — TOGETHER. For real this
+   time.") and an "open sky" mode for the city sky shader (ending OPEN THE SKY) are not done; both are small holo/atmosphere adds.
+3. Gameplay-pitch frames of hullside/meridian are plain plating by design (EVA); dress more only if Aaron asks.

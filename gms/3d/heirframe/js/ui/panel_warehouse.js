@@ -200,10 +200,10 @@ function recalBox(sel, data) {
   const lvl = data.recalLevel || 8;
   if ((data.level || 1) < lvl) return `<div class="fb-recal hf-glass"><span class="hf-label">Recalibrate</span><div class="ft-y">${icon('lock')} Unlocks at level ${lvl}</div></div>`;
   const c = sel.recal.cost || {};
-  const cost = Object.entries(c).map(([k, v]) => `${fmt(v)} ${k === 'credits' ? 'cr' : esc((MATS.find(x => x[0] === k) || [k, k])[1])}`).join(' · ');
+  const cost = Object.entries(c).filter(([k]) => k === 'credits' || MATS.some(x => x[0] === k)).map(([k, v]) => `${fmt(v)} ${k === 'credits' ? 'cr' : esc((MATS.find(x => x[0] === k) || [k, k])[1])}`).join(' · ');
   const rows = sel.affixes.map((a, i) => {
     const off = sel.recal.locked != null && sel.recal.locked !== i;
-    return `<div class="rc-row ${off ? 'off' : ''}"><span>${esc(typeof a === 'string' ? a : a.text || a.label || '')}</span><button class="hf-btn hf-live" data-recal="${i}" ${off ? 'disabled' : ''}>${icon('refresh')}Reroll</button></div>`;
+    return `<div class="rc-row ${off ? 'off' : ''}"><span>${esc(typeof a === 'string' ? a : a.text || a.label || '')}</span><button class="hf-btn hf-live" data-recal="${i}" ${off ? 'disabled' : ''}>${icon('reroll')}Reroll</button></div>`;
   }).join('');
   return `<div class="fb-recal hf-glass"><span class="hf-label">Recalibrate · ${esc(cost)}</span>${rows}${sel.recal.locked == null ? '<div class="ft-y">The first affix you reroll is the only one this part can ever reroll.</div>' : ''}</div>`;
 }
@@ -218,7 +218,7 @@ function fabTab(body, data, ctx, emit) {
   const m = data.materials || {};
   const tune = sel?.tune || 0, tuneMax = sel?.tuneMax || 10;
   const cost = sel?.tuneCost || {};
-  const costHtml = Object.entries(cost).map(([k, v]) => {
+  const costHtml = Object.entries(cost).filter(([k]) => k === 'credits' || MATS.some(x => x[0] === k)).map(([k, v]) => {
     const have = k === 'credits' ? data.credits || 0 : m[k] || 0;
     return `<span class="${have < v ? 'short' : ''}">${k === 'credits' ? icon('credits') : icon('materials')}<b class="hf-num">${fmt(v)}</b><small>${k === 'credits' ? 'cr' : esc((MATS.find(x => x[0] === k) || [k, k])[1])}</small></span>`;
   }).join('');

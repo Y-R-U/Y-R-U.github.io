@@ -510,9 +510,10 @@ function qStance(P, splay = 0.75, bend = -1.1) {
   for (const [u, l, s] of QLEGS) { RS(P, u, s, 0, 0, splay); RS(P, l, s, 0, 0, bend); }
 }
 function qTail(P, t, k = 1) { R(P, 'aux0', 0.25 + 0.08 * Math.sin(t * 3.1) * k, 0.35 * Math.sin(t * 2.3) * k, 0); }
+const qSplay = (ctx) => ctx.style.splay ?? 0.75, qBend = (ctx) => ctx.style.bend ?? -1.1;
 function qIdle(P, ctx, t) {
   const st = ctx.st;
-  qStance(P);
+  qStance(P, qSplay(ctx), qBend(ctx));
   pel(P, 0, 0.004 * Math.sin(t * 5), 0);
   R(P, 'pelvis', 0, 0.04 * Math.sin(t * 0.8), 0);
   R(P, 'spine', 0, 0.06 * Math.sin(t * 0.8 + 1), 0);
@@ -522,17 +523,17 @@ function qIdle(P, ctx, t) {
   qTail(P, t);
 }
 function qTrot(P, ctx, t) {
-  const m = ctx.move, L = 0.17;
+  const m = ctx.move, L = ctx.style.legL || 0.17;
   const A = Math.min(0.85, Math.atan2(m.stride / 2, L));
-  const duty = 0.5;
-  qStance(P);
+  const duty = 0.5, sp = qSplay(ctx), bd = qBend(ctx);
+  qStance(P, sp, bd);
   for (const [u, l, s, off] of QLEGS) {
     const p = (m.phase + off) % 1;
     let rx, lift = 0;
     if (p < duty) rx = -A + 2 * A * (p / duty);
     else { const w = (p - duty) / (1 - duty); rx = A - 2 * A * smooth(w); lift = Math.sin(Math.PI * w); }
-    RS(P, u, s, rx, 0, 0.75 + 0.35 * lift);
-    RS(P, l, s, 0, 0, -1.1 - 0.5 * lift);
+    RS(P, u, s, rx, 0, sp + 0.35 * lift);
+    RS(P, l, s, 0, 0, bd - 0.5 * lift);
   }
   const b = Math.sin(TAU * 2 * m.phase);
   pel(P, 0, 0.008 * b, 0);

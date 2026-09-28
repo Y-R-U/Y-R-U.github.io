@@ -442,6 +442,8 @@ export function createKits(K) {
     }
     const bs = S.blinkSkill;
     if (bs?.charges > 1 && S.blinkBank < bs.charges - 1 && !pc.cooldowns[bs.id]) S.blinkBank = bs.charges - 1;
+    // Stillwater (relic): Veil drains at half speed while you stand still
+    if (pc.hidden && !player.moving && pc.stats.powers?.includes('stillwater')) { const c = pc.statuses.find((x) => x.id === 'cloak'); if (c) c.t += dt * 0.5; }
     if (pc.hidden && !S.cloak) cloakOn();
     else if (!pc.hidden && S.cloak) cloakOff();
     // Steady Hands: a quick cue when the crit bonus comes online

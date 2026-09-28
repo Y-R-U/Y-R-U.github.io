@@ -262,6 +262,7 @@ export function createEnemies(ctx) {
       if (e.pending && (e.pendingT -= dt) <= 0) release(e);
       if (e.ally && (e.ally = Math.max(0, e.ally - dt)) === 0) { e.state = 'chase'; e.bot.setAlert(2); fx.ring(e.pos, 1.4, 0xff4020, 0.3); }
       if (e.tauntT > 0) e.tauntT -= dt;
+      if (e.phantomMark > 0) e.phantomMark -= dt;
       if (e.aggro && (e.aggro.t -= dt) <= 0) e.aggro = null;
       e.barkT -= dt;
       const stunned = isStunned(c);

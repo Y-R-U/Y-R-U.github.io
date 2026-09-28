@@ -109,7 +109,7 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
   const own = [];
   const mats = T.slots.map((s) => {
     let m = M[s];
-    if (s === 'eye' || s === 'glow') {
+    if (s === 'eye' || s === 'glow' || K.ownSlots?.includes(s)) {
       m = m.clone();
       m.userData.baseEI = m.emissiveIntensity; m.userData.baseC = m.emissive.clone(); m.userData.slot = s;
       own.push(m);
@@ -223,6 +223,9 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
     hitFlash(dur = 0.09) { flashT = dur; mesh.material = flash; },
     // boiler kinds only (boss_kettle): a burst of steam from the shoulder vents + chimney; k scales it. No-op otherwise.
     steam(k = 1) { steamFx?.emit(k); },
+    // boss phases (seraph 1–4, boss_sovereign 1–3): recolours the per-instance glow/eye/pod materials; no-op for other kinds
+    phaseN: 1,
+    setPhase(n) { api.phaseN = n; if (K.phase && !merged) K.phase(api, n, Object.fromEntries(own.map((m) => [m.userData.slot, m]))); },
     update(dt) {
       dt = Math.min(dt, 0.1);
       ctx.t += dt; baseT += dt;
@@ -293,6 +296,7 @@ export function createRobot({ kind = 'civ_chrome', tier = 0, seed = 1, quality =
         }
       }
 
+      K.post?.(Out, ctx);
       for (let i = 0; i < NB; i++) bones[i].rotation.set(Out[i * 3], Out[i * 3 + 1], Out[i * 3 + 2]);
       const pr = T.rig.off.pelvis;
       bones[0].position.set(pr[0] + Out[PX], pr[1] + Out[PX + 1], pr[2] + Out[PX + 2]);

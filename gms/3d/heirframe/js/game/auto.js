@@ -247,8 +247,9 @@ export function createAutopilot(G, { ui, player }) {
       }
       if (st?.type === 'tail' && G.runner.active.target) {
         const t = G.runner.active.target, d = Math.hypot(t.pos.x - player.pos.x, t.pos.z - player.pos.z);
-        if (d < 13) { player.setTarget(null); return; }
         const ax = player.pos.x - t.pos.x, az = player.pos.z - t.pos.z, l = Math.hypot(ax, az) || 1;
+        if (d < 8) { A.goal = null; goTo(t.pos.x + ax / l * 13, t.pos.z + az / l * 13, 1); return; }
+        if (d < 13) { player.setTarget(null); return; }
         A.goal = null; goTo(t.pos.x + ax / l * 12, t.pos.z + az / l * 12, 1.5);
         return;
       }
