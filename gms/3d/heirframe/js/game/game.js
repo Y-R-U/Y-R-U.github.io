@@ -351,9 +351,27 @@ export async function createGame(api) {
     else if (n.id === 'relay') G.districts.relayMenu();
     else if (n.id === 'lift') G.districts.lift(n);
     else if ((n.id === 'home' || n.id === 'door') && n.to) G.districts.door(n);
+    else if (n.id === 'passage') G.districts.passage(n);
+    else if (n.id === 'rook') rookTalk();
     else if (n.id === 'codex' || n.id === 'family_tree') ui?.panel.open('codex', toUiCodex(G.sim));
     else if (n.id === 'bed') sleepShift();
     else if (n.id === 'trophies') { const t = G.sim.state.stats; ui?.toast('Trophy shelf', 'gold', { sub: `${t.contractsDone} contracts · ${t.kills} kills · ${G.sim.state.story.clues.length} clues`, ms: 3200 }); }
+  }
+
+  const ROOK_RUMOURS = [
+    "The sun comes up at six. Exactly six. Every day. You ever see a sunrise late, kid?",
+    "Freehaul crates from the Outer Farms smell like rain. Real rain. Ask yourself where rain comes from.",
+    "Gold frames don't sleep, don't eat, don't Link out. Walk like they own the place. They do.",
+    "I knew a Quill once. Laughed too loud, ran too slow. Good man.",
+    "Mara's board has a way of finding you the jobs you needed. Funny, that.",
+  ];
+  async function rookTalk() {
+    const cost = G.sim.state.player ? Math.round(150 * Math.pow(1.09, G.sim.state.player.level - 1)) : 150;
+    const heat = G.sim.state.factions.heat > 0;
+    const who = { speaker: 'Rook', role: 'Parts & Rumours · the Stacks', portrait: { kind: 'robot', seed: 13 } };
+    const i = await ui?.dialogue.show({ ...who, text: 'Easy, rider. Buying, selling, or listening?', choices: ['Heard anything?', heat ? `Clean Slate: wipe my Heat (${cost} cr)` : 'Clean Slate (no Heat on you)', 'Just passing.'] });
+    if (i === 0) await ui.dialogue.show({ ...who, text: ROOK_RUMOURS[Math.floor(Math.random() * ROOK_RUMOURS.length)] });
+    else if (i === 1 && heat) { const r = G.sim.cleanSlate(); if (r.ok) { ui.toast('Heat wiped', 'good', { sub: 'Rook knows a man in the records office' }); audio.sfx('credits'); } else ui.toast('Not enough credits', 'warn'); }
   }
 
   // Pod 4471's bed: sleep through to the next shift (new board, new market)
@@ -589,7 +607,7 @@ export async function createGame(api) {
     if (devMod) { G.dev = devMod.createDev(G, { world, ui, player, rig, audio, api, createSim, loadGame, store, sites, startSession, Q }); if (await G.dev.autostart()) { setMusic('explore'); return; } }
     if (!ui) { startSession(createSim({ seed: Q.get('seed') || 1, store, sites })); G.state = 'free'; return; }
     const hasSave = store.has() && !Q.has('fresh');
-    const act = await ui.screen('title', { hasSave, version: 'P2a · Own Your Frame' });
+    const act = await ui.screen('title', { hasSave, version: 'P3 · Harmony Through Unity' });
     audio.unlock();
     log('title: ' + act);
     let sim = null;
@@ -605,7 +623,7 @@ export async function createGame(api) {
 
   // --- per-frame ----------------------------------------------------------------------------------------
   let stepGap = 0;
-  player.onStep = (v) => { if (stepGap <= 0) { audio.sfx('step', { kind: G.sim ? G.frames.stepKind(G.sim.activeFrame()) : 'rental', x: player.pos.x, z: player.pos.z, vol: v > 3 ? 0.55 : 0.4 }); stepGap = 0.18; } };
+  player.onStep = (v) => { if (stepGap <= 0) { const W = world.district || {}; audio.sfx('step', { kind: W.magBoots ? 'heavy' : G.sim ? G.frames.stepKind(G.sim.activeFrame()) : 'rental', x: player.pos.x, z: player.pos.z, vol: (v > 3 ? 0.55 : 0.4) * (W.vacuum ? 0.3 : 1) }); stepGap = W.magBoots ? 0.3 : 0.18; } };   // vacuum: steps only carry through the frame
 
   function objective() {
     const o = G.runner?.objective();
@@ -638,7 +656,8 @@ export async function createGame(api) {
       sim.tick(dt, { moving: player.moving });
     }
     if (G.spawnShield > 0 && G.state === 'free') { pc.invulnerable = true; if ((G.spawnShield -= dt) <= 0) pc.invulnerable = false; }
-    player.speedMult = (pc.stats.moveSpeed / 4.2) * statusMult(pc, 'moveMult') * (G.carrying === 'case' ? 0.9 : 1);
+    const W = world.district || {};
+    player.speedMult = (pc.stats.moveSpeed / 4.2) * statusMult(pc, 'moveMult') * (G.carrying === 'case' ? 0.9 : 1) * (W.magBoots ? 0.88 : 1);
     const canMove = G.state === 'free' && !panelOpen() && !ui?.dialogue.open && !overlay.cardOpen && !G.frames.busy;
     G.frames.update(dt);
     if (kitCd > 0) kitCd -= dt;
@@ -656,6 +675,8 @@ export async function createGame(api) {
     // interactables near the player
     G.near = null;
     for (const it of world.interactables) if (Math.hypot(it.x - player.pos.x, it.z - player.pos.z) < it.r) G.near = it;
+    for (const it of G.districts.residents) if (Math.hypot(it.x - player.pos.x, it.z - player.pos.z) < it.r) G.near = it;
+    G.districts.update(dt);
     const lbl = canMove ? (G.runner.interactLabel() || (G.near ? (G.near.id === 'contracts' ? 'Contracts' : G.near.label) : null)) : null;
     if (lbl !== G.lastInteract) { G.lastInteract = lbl; lbl ? ui?.interact.show(lbl) : ui?.interact.hide(); }
     // walk up to the kiosk the first time: Mara opens the board

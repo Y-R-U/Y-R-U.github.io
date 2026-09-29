@@ -363,5 +363,52 @@ test('P2 pacing (bot, Tense): Act 1 in 60-100 min, first frame 45-75 min (median
   assert(act.every(x => x >= 55 && x <= 110), 'Act 1 outlier');
 });
 
+console.log('P3');
+test('P3: 16 non-heist archetypes build and validate in Aurum, Terraces and the Arcology', () => {
+  const g = newGame(20);
+  for (const d of ['aurum_plaza', 'terraces', 'arcology']) {
+    g.state.districts.unlocked.push(d); g.state.districts.current = d;
+    for (const a of P2A_ARCH) for (let k = 0; k < 4; k++) {
+      const m = g.makeContract({ archetype: a, grade: 'street', seed: k + 1 });
+      assert(m, `${a} in ${d} failed to build`);
+      const v = validateMission(m, sitesFor(d));
+      assert(v.ok, `${a} ${d}: ${v.errors.join('; ')}`);
+    }
+  }
+  assert(P2A_ARCH.length === 16 && !P2A_ARCH.includes('heist'), 'scope is the 16 non-heist archetypes');
+});
+test('P3: rep tiers price the vendors (Nexus) and repairs (Concord); rivals move opposite', () => {
+  const g = newGame(12);
+  const base = g.framePrice();
+  g.state.factions.rep.nexus = 55;
+  assert(g.framePrice() === Math.round(base * 0.96), 'trusted Nexus −4% on the licence');
+  g.state.factions.rep.nexus = -70;
+  assert(g.framePrice() === Math.round(base * 1.1), 'hated Nexus +10%');
+  assert(g.repairMul() === 1, 'no repair discount at Neutral Concord');
+  g.state.factions.rep.concord = 30;
+  assert(g.repairMul() === 0.75, 'Concord Friendly: repairs −25%');
+  const w = toUiWarehouse(g);
+  assert(w.market.standing.length >= 4 && w.market.standing.every(r => r.tier), 'standing list in the market view');
+});
+test('P3: Crackdown at danger 8 posts 3 champion bounties for 2 shifts', () => {
+  const g = newGame(12);
+  g.state.districts.danger.aurum_plaza = 8;
+  g.checkCrackdown('aurum_plaza');
+  const cards = g.board().cards.filter(c => c.badge === 'Crackdown');
+  assert(cards.length === 3 && cards.every(c => c.target.rank === 'champion'), 'three champion targets');
+  for (let i = 0; i < 2; i++) { g.state.shiftClock = 1e6; g.tick(0); }
+  assert(!g.state.districts.crackdown, 'ends after 2 shifts');
+});
+test('P3: Act 2 story missions build and validate (fallback and real site ids)', () => {
+  for (const id of ['a2_m1', 'a2_m2', 'a2_m3', 'a2_m4', 'a2_m5']) {
+    const m = buildStoryMission(id, { seed: '1', shiftIndex: 0, riderLevel: 12, threat: 'tense', districts: [], currentDistrict: 'aurum_plaza', flags: [], sites: {}, contractsDone: 9 });
+    const v = validateMission(m, sitesFor(m.district));
+    assert(v.ok, `${id}: ${v.errors.join('; ')}`);
+  }
+  const real = [{ id: 'vt_memorial_garden', tag: 'garden', x: -18, z: -8, r: 10 }, { id: 'vt_npc_fenn', tag: 'npc', x: -39, z: -8, r: 3 }, { id: 'vt_park_a', tag: 'park', x: 0, z: 10, r: 4 }, { id: 'vt_edge', tag: 'spawn_edge', x: 40, z: 40, r: 4 }];
+  const m = buildStoryMission('a2_m1', { seed: '1', shiftIndex: 0, riderLevel: 9, threat: 'tense', districts: [], currentDistrict: 'terraces', flags: [], sites: { terraces: real }, contractsDone: 9 });
+  assert(m.steps[0].site === 'vt_memorial_garden' && m.steps[1].path.at(-1) === 'vt_npc_fenn', 'named places win: ' + JSON.stringify(m.steps.map(s => s.site || s.path)));
+});
+
 console.log(`\n${pass} passed, ${fail} failed${fail ? ': ' + failures.join(', ') : ''}`);
 process.exit(fail ? 1 : 0);

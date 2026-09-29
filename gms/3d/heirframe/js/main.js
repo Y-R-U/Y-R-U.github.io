@@ -72,7 +72,8 @@ async function start() {
   };
   const shot = flags.shot ? SHOTS[flags.shot] || SHOTS[1] : null;
   if (shot) {
-    player.teleport(shot.player[0], shot.player[1], shot.player[2]);
+    // the shot presets are Aurum framings; other districts start at their own spawn (Spine's (3,12) is over the chasm)
+    if (!world.district || world.district.id === 'aurum_plaza') player.teleport(shot.player[0], shot.player[1], shot.player[2]);
     if (shot.cam) rig.fixed = { pos: new THREE.Vector3(...shot.cam.pos), look: new THREE.Vector3(...shot.cam.look), fov: shot.cam.fov };
     if (shot.zoom !== undefined) rig.setZoom(shot.zoom);
   }

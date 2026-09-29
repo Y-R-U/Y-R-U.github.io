@@ -61,6 +61,9 @@ export const ENEMIES = {
     base: { hp: 300, dmg: 24, armor: 30, shield: 80 }, move: 4.8, skills: ['e_melee', 'e_parry', 'e_lunge'], tags: ['robot', 'frame'] },
   sovereign_construct: { id: 'sovereign_construct', name: 'Sovereign Construct', tier: 5, robotKind: 'enforcer', robotTier: 3, paint: 'gold', faction: 'voices', ai: ['bruiser'], pts: 8, size: 1.8,
     base: { hp: 900, dmg: 34, armor: 50, shield: 150 }, move: 3, skills: ['e_melee', 'e_stomp', 'e_blast'], stunResist: 0.8, tags: ['robot', 'frame', 'heavy'] },
+  // one of Dray's seven voices (A6-M5 phase 2): a hovering gold orb that zaps from range
+  halo_drone: { id: 'halo_drone', name: 'Voice Drone', tier: 5, robotKind: 'halo_drone', fallbackKind: 'drone_scout', faction: 'voices', ai: ['striker'], flying: true, pts: 2, keepRange: 9,
+    base: { hp: 120, dmg: 18, armor: 10, shield: 60 }, move: 5, skills: ['e_zap'], tags: ['robot', 'drone'] },
   // non-combat / mission actors
   vip: { id: 'vip', name: 'Target', tier: 1, robotKind: 'civ_gold', faction: 'syndicate', ai: ['escortee'], nonCombat: true,
     base: { hp: 70, dmg: 0, armor: 10, shield: 30 }, move: 4.2, skills: [], tags: ['robot', 'frame'] },

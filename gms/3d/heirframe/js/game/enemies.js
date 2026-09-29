@@ -109,7 +109,7 @@ export function createEnemies(ctx) {
         if (res.amount) { T.ref.bot.hitFlash(); ctx.onNpcHit?.(T.ref, res); }
         if (!T.ref.c.alive) { T.dead = true; ctx.onNpcDown?.(T.ref); }
       } else {
-        T.hp -= e.c.stats.dmgScale * (skill.base || 1);
+        T.hp -= e.c.stats.dmgScale * (skill.base || 1) * (T.kind === 'npc' ? 1 : 0.5);   // objectives are armoured: half damage
         if (T.hp <= 0) T.dead = true;
       }
       fx.sparks(tmp.set(T.pos.x, T.pos.y + 0.9, T.pos.z), 0xffa060, 5, 3);

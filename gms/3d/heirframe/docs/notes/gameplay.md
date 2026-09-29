@@ -1,3 +1,7 @@
+P3 PLAYABLE
+(gameplay agent P3g, 2026-09-29: Act 2 staged and bot-played in Verdant Terraces + the Arcology; P3 systems in; table in "P3
+acceptance" below. P2a PLAYABLE line kept underneath for history.)
+
 P2a PLAYABLE
 (gameplay agent, 2026-09-27: acceptance table below; bot + headless checks, M5 metal, drivers in scratchpad `gameplay/`.)
 
@@ -191,6 +195,52 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
 - P3 Fabricator DONE: Recalibrate box in the Fabricator (per-affix Reroll, locks to the first affix rerolled, cost, locked
   under L8) → `warehouse:recal` → sim.recalibrate; salvage-all and tune pity (+10%/fail) already existed. Fixed duplicate
   "scrapAlloy · Scrap Alloy" cost labels. DEV pill dims while a panel is open.
+- P3 relics: runtime hooks for the ones the sim couldn't do alone: Afterimage (dodge leaves a 2 s decoy), Phantom Step
+  (enemies you roll through are marked 4 s; next melee hit on them is a backstab), Reactive Plating (shield break → 4 m
+  knockback, 10 s cd), Stillwater (Veil drains at half speed while standing still). The other 8 were already in sim/stats.
+- P3 Crackdown (sim): danger ≥ 8 after a contract → 2-shift crackdown, 3 champion bounty cards (badge Crackdown, ×1.5 pay,
+  re-posted on board refresh until taken), sting; runtime keeps Heat ≥ 1★ (Eye sweeps) in that district between contracts.
+- P3 Echo: clue sting "Echo found · name" (was the raw id); E04/E06 also drop in B4. Hostile threat verified (L10, +2
+  levels). Custom+ caches and relic uniques 1–12 were already in the sim.
+- Act 2 VO: 16 clips (a2_s01…a2_s05, Fenn/Tomas/HIRA/Halloran/Seraph/Dray) via gen_vo.py --max-p P1, 0 QC flags.
+- test.mjs 25/25 (+4 P3 tests: 16 archetypes × 3 districts validate, rep vendor pricing, Crackdown, Act 2 missions).
+- Balance (balance.mjs 7 h, seeds 1–3): first frame 48–58 min, L5 48–51, Act 1 1.2–1.5 h, second frame 3.3–4.2 h,
+  L15 3.7–3.8 h (target 3.4), L20 5.3–5.5 h (5.5), first Relic 4.5–6.4 h (3–5; seed 3 is +28%).
+- Tail robustness: grace also pauses "losing" the target; NPC walkers wedged 3 s hop to their next route point.
+- Sweep 1 (bot, L12, speed 2; sweep.txt): terraces 13/16 complete (tail lost once, defend failed once, rescue timeout);
+  arcology courier/pest/…/hack ok, escort failed once; the rest timed out because headless Chrome hit the cdp helper's
+  1 h hard cap (not a game fault). Re-running the failures + the rest next.
+- P5w/5b world requests DONE: `passage` interactables (story-gated via `it.story`: open once that story mission is done or
+  current) → liftTransition to the paired spawn (spine>hullside airlock, hullside>spine firmament, hullside>meridian dock,
+  meridian>hullside spur); names/ambience/emitters for spine (warehouse bed, turbines, coolant falls), hullside/meridian
+  (vacuum: no bed; meridian creak), helm (choir hum at (0,-76)); movement flags: magBoots = ×0.88 speed + heavy, slower
+  steps; vacuum = steps at 30% volume (no jump exists, so gravity/zeroG have nothing to drive yet); `halo_drone` enemy
+  (voices, flying striker, e_zap); `?shot=` presets only teleport in Aurum. Rook stands at st_npc_rook in the Stacks
+  (districts.js RESIDENTS): rumours + Clean Slate (150×L cr, wipes Heat).
+  Not yet (need the Act 4–6 story staging): hide meridian core on pickup, seraph/dray setPhase, helm.setMode, setCull.
+- Sweep 2 + reruns: terraces 16/16 complete (tail, defend and rescue on re-run); arcology 16/16 complete at least once
+  (escort/rescue after escortees got veteran HP; repo ok; defend completes with the Brawler bot, the Gunner bot fails it
+  in the arcology because it kites out of line of sight). Fixes from the sweep: escortees/hostages spawn at veteran rank,
+  defend objectives have 2× HP and take half damage (two Wardens broke one in ~10 s), sentry turrets in a defend wave
+  become Wardens (static turrets can't walk in from the edge).
+- P1 regression (reg.mjs, speed 1, `?auto=1&contracts=3`, 915x412 DPR2 high): ok, 60 fps, p99 16.8 ms, 0 hitches, max 300
+  calls, 0 console errors. test.mjs 25/25.
+
+## P3 acceptance (BUILD_PLAN §P3)
+| item | result | evidence |
+|---|---|---|
+| Verdant Terraces + Nexus Arcology (world P3w) wired | PASS | relay/lift travel, names/ambience, B4 as a sim district, residents |
+| Act 2 A2-M1…M5, Halloran, Seraph's first appearance | PASS | story2.mjs bot runs each mission (gunner/ghost/brawler); Seraph scene screenshot; 16 VO clips |
+| rep tiers, vendor pricing, rival pairs | PASS | sim vendorMul/repairMul + test; Market Standing list; results rep lines; rivals in sim |
+| archetypes tail/infiltrate/transport/defend/repo/race/assassinate/rescue | PASS | runtime steps + 16×3 districts sweep (caveat: arcology defend with the Gunner bot) |
+| all 16 non-heist archetypes generated + completable across 3 districts | PASS* | test.mjs (valid ×3 districts) + sweeps; *see caveat above |
+| full Fabricator (recalibrate, salvage-all, pity) | PASS | Recalibrate UI + wh.mjs tap test; salvage-all/pity existed |
+| Relic uniques 1–12, Custom+ quality | PASS | 8 in sim + 4 runtime hooks (afterimage, phantom_step, reactive_plating, stillwater); cache rules |
+| Hostile threat, district danger + Crackdown, Echo clues | PASS | L10 unlock, +2 lvl; Crackdown test; Echo sting |
+| codex fills R1–R2 | PASS | after A2-M5: Dray + Tomas complete, Iris rumoured (R4 later), C01–C10 |
+| sim 1–20 within ECONOMY §9 (±20%) | PASS* | L15 3.7 h (+9%), L20 5.4 h, 2nd frame 3.3–4.2 h; first Relic 4.5–6.4 h (seed 3 +28%) |
+| choice twists T5/T11/T12 | not in P3 | BUILD_PLAN puts them in P4 (wetwork) |
+| P1 VO (non-Act-2 barks) | partial | Act 2 story VO done; the other VO_LINES P1 barks not generated yet |
 
 ## NEXT (P3)
 - rep tiers/vendor pricing/rival UI; Fabricator (recalibrate UI, tune pity); relic hooks (afterimage, phantom_step,

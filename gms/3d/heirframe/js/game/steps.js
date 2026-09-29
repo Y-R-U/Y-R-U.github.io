@@ -12,7 +12,7 @@ export function createSteps(ctx, run) {
   function spawnNpc(R, npc) {
     if (R.npcs[npc.id]) return R.npcs[npc.id];
     const s = run.site(npc.site) || { x: player.pos.x + 3, z: player.pos.z };
-    const e = enemies.spawn({ defId: npc.defId || 'escortee', rank: npc.rank, level: R.mission.level, name: npc.name }, s.x + 1.2, s.z + 1.2, { yaw: 0 });
+    const e = enemies.spawn({ defId: npc.defId || 'escortee', rank: npc.rank || 'veteran', level: R.mission.level, name: npc.name }, s.x + 1.2, s.z + 1.2, { yaw: 0 });
     e.mission = R.mission.id; e.escort = true; e.npc = npc;
     // a cuffed hostage isn't a target until you free them (the escort step adds the decoy)
     if (npc.id === 'hostage') { e.cuffed = true; e.bot.play('sit', { loop: true }); }
@@ -75,7 +75,7 @@ export function createSteps(ctx, run) {
   // --- defend -----------------------------------------------------------------------------------------------
   function enterDefend(R, s) {
     const st = run.site(s.site) || { x: player.pos.x, z: player.pos.z };
-    const hp = Math.round(60 * Math.pow(1.09, R.mission.level - 1) * (s.objHpMult || 10) / 4);
+    const hp = Math.round(60 * Math.pow(1.09, R.mission.level - 1) * (s.objHpMult || 10) / 2);   // P3g: /4 → /2, two Wardens broke it in ~10 s
     const obj = s.object === 'kiosk' ? null : props.machine(st.x + 1.5, st.z + 1.5, hp, s.object || 'pylon', { hostile: false });
     const at = obj ? obj.pos : new THREE.Vector3(st.x, 0, st.z);
     const decoy = s.objHpMult === 0 ? null : enemies.addDecoy({ x: at.x, z: at.z, kind: 'npc', radius: 16, hp });
@@ -97,7 +97,8 @@ export function createSteps(ctx, run) {
       const sp = (s.spawns || []).map((id) => run.site(id)).filter(Boolean);
       const src = sp.length ? sp[D.spawned % sp.length] : null;
       const w = D.waves[D.spawned];
-      if (w) { if (src) w.site = src.id; run.spawnPack(w, true, { near: D.at, dist: 22 }); }
+      // waves walk in from the edges: static emplacements (sentry turrets) in a rolled pack become Wardens
+      if (w) { if (src) w.site = src.id; w.units = w.units.map((u) => (u.defId === 'sentry_turret' ? { ...u, defId: 'warden' } : u)); run.spawnPack(w, true, { near: D.at, dist: 22 }); }
       else if (D.synth) run.spawnPack(run.synthPack(R, D.spawned, src), true, { near: D.at, dist: 22 });
       D.spawned++;
       D.next = t + D.dur / D.n;
