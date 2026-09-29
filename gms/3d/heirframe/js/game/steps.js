@@ -104,7 +104,7 @@ export function createSteps(ctx, run) {
       D.next = t + D.dur / D.n;
       audio.sfx('alarm', { vol: 0.35 });
       ui.toast(`Wave ${D.spawned} / ${D.n}`, 'warn', { ms: 1400 });
-      if (s.object === 'kiosk' && D.spawned === 1) run.storyEvent('wave1');
+      if (D.spawned === 1) run.storyEvent('wave1');
     }
     const objHp = D.decoy ? Math.max(0, D.decoy.hp) / D.hp : 1;
     if (D.decoy?.dead || objHp <= 0) {
@@ -258,7 +258,7 @@ export function createSteps(ctx, run) {
       rivals.push(e);
     }
     R.ss.race = { cps, i: 1, rivals, go: 3, finished: [], t: 0 };
-    ui.sting('Street Run', `${cps.length} checkpoints · ${rivals.length} rivals`, 'alert', 2000);
+    ui.sting(rivals.length ? 'Street Run' : s.label || 'Run', `${cps.length} checkpoints${rivals.length ? ` · ${rivals.length} rivals` : ''}`, 'alert', 2000);
     raceBeacons(R);
   }
   function raceBeacons(R) {
@@ -295,7 +295,8 @@ export function createSteps(ctx, run) {
         const place = Q.finished.length + 1;
         R.raceFirst = place === 1;
         ui.meter.hide();
-        ui.sting(place === 1 ? '1st place!' : `${place}${place === 2 ? 'nd' : 'rd'} place`, place === 1 ? '+50% prize money' : 'Finished', place === 1 ? 'unlock' : 'info', 2200);
+        if (!Q.rivals.length) ui.sting('Course clear', `${Math.round(Q.t)}s`, 'unlock', 2000);
+        else ui.sting(place === 1 ? '1st place!' : `${place}${place === 2 ? 'nd' : 'rd'} place`, place === 1 ? '+50% prize money' : 'Finished', place === 1 ? 'unlock' : 'info', 2200);
         for (const e of Q.rivals) e.nonCombat = true;
         run.complete();
         return;
@@ -303,7 +304,7 @@ export function createSteps(ctx, run) {
       raceBeacons(R);
     }
     const ahead = Q.rivals.filter((e) => e.done || e.cp > Q.i || (e.cp === Q.i && c && Math.hypot(c.x - e.pos.x, c.z - e.pos.z) < d2(c))).length;
-    ui.meter.set({ label: `Checkpoint ${Q.i} / ${Q.cps.length - 1}`, value: (Q.i - 1) / (Q.cps.length - 1), kind: ahead ? 'danger' : 'escort', text: `${ahead + 1}${['st', 'nd', 'rd'][ahead] || 'th'}`, sub: `${Math.round(Q.t)}s · par ${s.par || '?'}s` });
+    ui.meter.set({ label: `Checkpoint ${Q.i} / ${Q.cps.length - 1}`, value: (Q.i - 1) / (Q.cps.length - 1), kind: ahead ? 'danger' : 'escort', text: Q.rivals.length ? `${ahead + 1}${['st', 'nd', 'rd'][ahead] || 'th'}` : `${Math.round(Q.t)}s`, sub: `${Math.round(Q.t)}s · par ${s.par || '?'}s` });
   }
 
   // --- repo: the deadbeat frame runs and blinks; knock it under 20% and haul it in ------------------------------------
@@ -375,6 +376,73 @@ export function createSteps(ctx, run) {
     run.complete({ captured: true });
   }
 
+  // --- snap: photograph holo boards at several sites in order (A4-M3's Landfall countdown) -----------------------
+  function boardMesh(text) {
+    const c = document.createElement('canvas'); c.width = 512; c.height = 160;
+    const g = c.getContext('2d');
+    const gr = g.createLinearGradient(0, 0, 0, 160); gr.addColorStop(0, 'rgba(20,60,110,0.85)'); gr.addColorStop(1, 'rgba(6,18,40,0.85)');
+    g.fillStyle = gr; g.fillRect(0, 0, 512, 160);
+    g.strokeStyle = '#9fe8ff'; g.lineWidth = 6; g.strokeRect(6, 6, 500, 148);
+    g.fillStyle = '#e8fbff'; g.font = '700 58px Rajdhani, system-ui, sans-serif'; g.textAlign = 'center';
+    const [a, ...rest] = text.split(' TO ');
+    g.fillText(a, 256, 78); g.font = '600 34px Rajdhani, system-ui, sans-serif'; g.fillStyle = '#ffd986'; g.fillText(rest.length ? 'TO ' + rest.join(' TO ') : '', 256, 124);
+    const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 1.3), new THREE.MeshBasicMaterial({ map: tex, transparent: true, color: new THREE.Color(1.6, 1.6, 1.6), side: THREE.DoubleSide, depthWrite: false, fog: false }));
+    return m;
+  }
+  function enterSnap(R, s) {
+    R.ss.snapI = 0; R.ss.hold = 0;
+    R.snapBoards = (s.sites || []).map((id) => {
+      const st = run.site(id);
+      if (!st) return null;
+      const m = boardMesh(s.text || 'HARMONY');
+      m.position.set(st.x, ctx.world.groundAt(st.x, st.z) + 2.6, st.z);
+      ctx.world.scene.add(m);
+      return { m, st, done: false };
+    }).filter(Boolean);
+    snapBeacon(R);
+  }
+  function snapBeacon(R) {
+    for (const b of R.beacons) b.remove();
+    R.beacons = [];
+    const b = R.snapBoards[R.ss.snapI];
+    if (b) R.beacons.push(props.beacon(b.st.x, b.st.z, [0.5, 0.9, 1.0]));
+  }
+  function clearSnap(R) { for (const b of R.snapBoards || []) { ctx.world.scene.remove(b.m); b.m.geometry.dispose(); b.m.material.map.dispose(); b.m.material.dispose(); } R.snapBoards = null; }
+  function updateSnap(R, s, dt) {
+    const B = R.snapBoards || [];
+    for (const b of B) b.m.rotation.y = Math.atan2(ctx.world.camera.position.x - b.m.position.x, ctx.world.camera.position.z - b.m.position.z);
+    const b = B[R.ss.snapI];
+    if (!b) { ui.lens.hide(); clearSnap(R); run.complete(); return; }
+    const d = Math.hypot(b.st.x - player.pos.x, b.st.z - player.pos.z);
+    if (d > 22) { if (ui.lens.open) ui.lens.hide(); return; }
+    if (!ui.lens.open) ui.lens.show({ label: 'Photograph the countdown', count: `${R.ss.snapI} / ${B.length}` });
+    // photo framing: the camera turns to the board and tilts up so it sits in frame (a drag still overrides)
+    const rig = ctx.rig;
+    if (rig && !rig.dragging && d < 16) {
+      const want = Math.atan2(-(b.st.x - player.pos.x), -(b.st.z - player.pos.z));
+      rig.yawTarget = rig.yaw + Math.atan2(Math.sin(want - rig.yaw), Math.cos(want - rig.yaw));
+      rig.pitchTarget = Math.max(rig.pitchMin - rig.basePitch(), 22 - rig.basePitch());
+      R.ss.framed = true;
+    }
+    const sp = ctx.project(b.m.position);
+    // the board may sit above the frame at the default pitch: range and a clear line are what count
+    const ok = d > 3 && d < 14 && ctx.losClear(player.pos, b.st);
+    ui.lens.target(sp.on ? sp.x : null, sp.y, 140, { label: d >= 14 ? 'Get closer' : d <= 3 ? 'Too close!' : 'Countdown board', dist: Math.round(d), locked: ok });
+    if (ok) R.ss.hold += dt; else R.ss.hold = Math.max(0, R.ss.hold - dt * 0.5);
+    if (R.ss.capture) { R.ss.capture = false; if (ok) R.ss.hold += 1; }
+    ui.lens.progress(Math.min(1, R.ss.hold / 1.8));
+    if (R.ss.hold >= 1.8) {
+      R.ss.hold = 0; R.ss.snapI++;
+      ui.lens.flash('Captured'); ui.lens.count(`${R.ss.snapI} / ${B.length}`);
+      audio.sfx('scan'); fx.flash(b.m.position, 0.6, 0xffffff, 0.15);
+      b.m.material.color.setRGB(0.7, 1.4, 0.8);
+      run.storyEvent(`shot:${R.ss.snapI}`);
+      if (R.ss.snapI >= B.length) { setTimeout(() => ui.lens.hide(), 700); clearSnap(R); ctx.rig?.reset(0.6); run.complete(); }
+      else snapBeacon(R);
+    }
+  }
+
   return {
     enter(R, s) {
       if (s.type === 'escort') enterEscort(R, s);
@@ -383,6 +451,7 @@ export function createSteps(ctx, run) {
       else if (s.type === 'tail') enterTail(R, s);
       else if (s.type === 'race') enterRace(R, s);
       else if (s.type === 'capture') enterCapture(R, s);
+      else if (s.type === 'snap') enterSnap(R, s);
     },
     update(R, s, dt) {
       if (s.type === 'escort') { updateEscort(R, s, dt); return true; }
@@ -390,6 +459,7 @@ export function createSteps(ctx, run) {
       if (s.type === 'hack') { updateHack(R, s, dt); return true; }
       if (s.type === 'tail') { updateTail(R, s, dt); return true; }
       if (s.type === 'race') { updateRace(R, s, dt); return true; }
+      if (s.type === 'snap') { updateSnap(R, s, dt); return true; }
       if (s.type === 'capture') { if (R.target?.state === 'dead') { R.target.state = 'idle'; } return true; }
       if (s.type === 'kill' && s.fleeAt) updateKillFlee(R, s, dt);
       return false;
@@ -406,6 +476,7 @@ export function createSteps(ctx, run) {
       if (s.type === 'capture' && capturableRepo(R, s)) { const t = R.target; t.brain = null; t.nonCombat = true; fx.ring(t.pos, 2, 0x7dffb0, 0.5); ui.toast(`${t.c.name} repossessed`, 'good'); audio.sfx('ui_confirm'); run.complete({ captured: true }); return true; }
       return false;
     },
-    spawnNpc, onTarget,
+    spawnNpc, onTarget, cleanup: clearSnap,
+    snapTarget(R) { const b = R.snapBoards?.[R.ss.snapI]; return b ? { x: b.st.x, z: b.st.z, label: 'Countdown board' } : null; },
   };
 }

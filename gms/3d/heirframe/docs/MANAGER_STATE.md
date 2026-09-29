@@ -82,3 +82,6 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 - 2026-09-28: Aaron: cap **1 agent**; both 5-hour and weekly usage are nearly out (resets tomorrow). Let P3g + P5w finish; launch nothing new while both run, and afterwards at most 1. Verify and push what finishes. On Aaron's next message after the reset: resume or relaunch 1 agent (P3g first; gameplay leads, world is ahead).
 - 2026-09-28: **P5w DONE** (12 districts, Act 5–6 kinds; requests for gameplay in the art.md P5w section). Pushed; live check done. Aaron confirmed cap = 1 ('only a single sub'). Running: P3g only.
 - 2026-09-29: P3g died at the weekly limit (UI for rep standing and Fabricator recalibrate); resumed after the reset. Cap 1.
+- 2026-09-30: **P3 PLAYABLE** (P3g). Pushed 4189c931; live verified (4.5 s, 0 bad). D25. Next: one P4 gameplay agent (Acts 3–4).
+- 2026-09-30: launched **P4 agent** (a4930957…, sole agent: Acts 3–4, day/night, rain, heist/wetwork, VO, dev leftovers). Notes: gameplay.md 'P4'.
+- 2026-10-01 00:30+: P4 died at the limit; resumed via SendMessage.

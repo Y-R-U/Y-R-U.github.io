@@ -946,7 +946,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
 function stepLabel(s) {
   if (!s) return '';
   const map = { goto: 'Go to the marker', pickup: 'Pick it up', deliver: 'Deliver it', kill: 'Take out the target', destroy: 'Destroy the objectives', hack: 'Hack the terminals', photo: 'Get the photo',
-    tail: 'Tail the target', escort: 'Escort them', defend: 'Hold the position', race: 'Hit the checkpoints', capture: 'Capture the target', exfil: 'Get out', choose: 'Decide', survive: 'Survive' };
+    tail: 'Tail the target', escort: 'Escort them', defend: 'Hold the position', race: 'Hit the checkpoints', capture: 'Capture the target', exfil: 'Get out', choose: 'Decide', survive: 'Survive', snap: 'Photograph the boards' };
   return map[s.type] || s.type;
 }
 

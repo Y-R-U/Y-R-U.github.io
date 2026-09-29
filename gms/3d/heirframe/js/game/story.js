@@ -32,6 +32,7 @@ export function createStoryPlayer(ctx) {
   }
 
   async function beat(b) {
+    ctx.onBeat?.(b);
     if (b.sfx) for (const n of b.sfx) audio.sfx(n, { vol: 0.6 });
     if (b.fx) ctx.onFx && ctx.onFx(b.fx);
     let choice = 0;
@@ -42,12 +43,22 @@ export function createStoryPlayer(ctx) {
     return choice;
   }
 
+  // `when: {key: value}` beats only play for that story choice (the open contract's pick first, then the save's)
+  const ok = (b) => !b.when || Object.entries(b.when).every(([k, v]) => (ctx.choice?.(k)) === v);
+
   // Play every beat whose trigger matches, then its after:N chain. Resolves when the chain ends.
-  async function run(script, trigger) {
+  // Runs queue behind each other so a step's beats never talk over the mission's closing scene.
+  let chain = Promise.resolve();
+  function run(script, trigger) {
     const beats = SCRIPTS[script] || [];
-    const starts = beats.filter((b) => b.trigger === trigger);
-    if (!starts.length) return false;
+    if (!beats.some((b) => b.trigger === trigger)) return Promise.resolve(false);
     busy++;
+    const p = chain.then(() => runNow(beats, trigger));
+    chain = p.catch(() => {});
+    return p;
+  }
+  async function runNow(beats, trigger) {
+    const starts = beats.filter((b) => b.trigger === trigger && ok(b));
     try {
       for (let b of starts) {
         while (b) {

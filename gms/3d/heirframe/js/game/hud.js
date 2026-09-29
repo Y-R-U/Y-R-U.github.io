@@ -56,7 +56,7 @@ export function createHudSync(ctx) {
 
   function update(dt, { objective, show = true }) {
     t -= dt; mmT -= dt;
-    if (!show) return;
+    if (!show) { ui.marker.hide(); return; }
     if (t <= 0) {
       t = 0.1;
       const h = sim.hud();

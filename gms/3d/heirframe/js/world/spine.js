@@ -10,6 +10,7 @@ import { createBreakables } from './breakables.js';
 import { createWaterfall, createMist } from './water.js';
 import { HOLO_ART, createHoloMaterial, registerBillboard } from './holo.js';
 import { rng } from './textures.js';
+import { firmamentLattice } from './lattice.js';
 import { REFLECT_LAYER } from '../fx/reflection.js';
 
 // The Spine: the ark's inner machinery. A long chasm runs north–south through the middle, 28 m down to a glowing coolant
@@ -178,6 +179,7 @@ function hall(ctx, L) {
   for (let x = -40; x <= 40; x += 5) if (Math.abs(x) > 8) batch.put(box(0.3, T - 12, 0.3), M.stoneUpper, V(x, 12 + (T - 12) / 2, b.z0 + 0.4), 0, null, { cast: false, color: STEEL, cellKey: 'lattice' });
   for (let y = 12; y < T; y += 4) batch.put(box(80, 0.25, 0.3), M.stoneUpper, V(0, y, b.z0 + 0.5), 0, null, { cast: false, color: STEEL, cellKey: 'lattice' });
   for (const x of [-12, 12]) batch.put(box(1.2, T - 12, 0.5), M.stoneUpper, V(x, 12 + (T - 12) / 2, b.z0 + 0.6), 0, null, { color: YELLOW, cast: false, cellKey: 'lattice' });
+  firmamentLattice(ctx, { x0: -b.x1, x1: b.x1, y0: 12, y1: T, z: b.z0 + 0.05 });
 }
 
 function bays(ctx, L) {

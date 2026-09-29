@@ -14,7 +14,7 @@ import { buildEnemies, enemyBudget, championUnit } from './enemies.js';
 import { overLevelPenalty } from './economy.js';
 import { clamp } from './util.js';
 
-export const STEP_TYPES = ['goto', 'pickup', 'deliver', 'kill', 'killCount', 'destroy', 'hack', 'photo', 'tail', 'escort', 'defend', 'race', 'capture', 'exfil', 'choose', 'survive'];
+export const STEP_TYPES = ['goto', 'snap', 'pickup', 'deliver', 'kill', 'killCount', 'destroy', 'hack', 'photo', 'tail', 'escort', 'defend', 'race', 'capture', 'exfil', 'choose', 'survive'];
 const round5 = v => Math.max(5, Math.round(v / 5) * 5);
 const dist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 
@@ -415,11 +415,11 @@ function chooseFaction(rng, district, arch, clientFaction) {
   return rng.weighted(pool);
 }
 
-function rollModifiers(rng, arch, grade, level, combat) {
+function rollModifiers(rng, arch, grade, level, combat, district) {
   const [lo, hi, p] = GRADES[grade].mods;
   let n = grade === 'street' ? (rng.chance(p) ? 1 : 0) : rng.int(lo, hi);
   const pool = Object.values(MODIFIERS).filter(md =>
-    level >= md.unlock && (!md.only || md.only.includes(arch.id)) && (!md.except || !md.except.includes(arch.id)) && (!md.minCombat || combat >= md.minCombat));
+    level >= md.unlock && (!md.only || md.only.includes(arch.id)) && (!md.except || !md.except.includes(arch.id)) && (!md.minCombat || combat >= md.minCombat) && (md.needs !== 'sky' || !!DISTRICTS[district]?.sky));
   const out = [];
   for (let i = 0; i < n; i++) {
     const cands = pool.filter(md => !out.includes(md.id) && !MODIFIER_CONFLICTS.some(([a, b]) => (a === md.id && (out.includes(b) || b === arch.id)) || (b === md.id && (out.includes(a) || a === arch.id))));
@@ -467,7 +467,7 @@ export function generateContract(rng, ctx, opts) {
     m.target = makeTarget(rng, faction, rank, arch.id);
   }
   if (built.npc) m.npcs.push(built.npc);
-  m.modifiers = rollModifiers(rng, arch, grade, level, arch.combat);
+  m.modifiers = rollModifiers(rng, arch, grade, level, arch.combat, district);
   if (m.modifiers.includes('timed')) m.timeLimit = Math.round(m.parTime * 1.3);
   if (m.modifiers.includes('broadcast')) m.heat += 1;
 
@@ -600,6 +600,7 @@ export function validateMission(m, sites) {
         if (s.target === 'boss') need(m.boss?.defId, `${where}: kill needs mission.boss`); break;
       case 'killCount': need(s.n > 0, `${where}: n`); break;
       case 'destroy': need(s.objs?.length > 0, `${where}: objs`); s.objs?.forEach(o => siteOk(o.site)); break;
+      case 'snap': need(s.sites?.length > 0, `${where}: snap sites`); s.sites?.forEach(siteOk); break;
       case 'hack': need(s.sites?.length > 0 && s.time > 0, `${where}: hack sites/time`); s.sites?.forEach(siteOk); break;
       case 'photo': siteOk(s.site); need(s.shots >= 1 && s.holdTime > 0, `${where}: photo params`); if (s.target === 'target') need(m.target, `${where}: photo needs target`); break;
       case 'tail': need(m.target && s.duration > 0 && s.maxD > s.minD, `${where}: tail params`); if (s.endSite) siteOk(s.endSite); break;

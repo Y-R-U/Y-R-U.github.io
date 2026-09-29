@@ -132,6 +132,8 @@ export function createRunner(ctx) {
     if (!s) return;
     const e = enemies.spawn({ defId: t.defId, rank: t.rank || 'grunt', level: R.mission.level, name: t.name }, s.x + 1.5, s.z + 1.5, { guard: true, stealthy: R.stealth });
     e.mission = R.mission.id; e.isTarget = true; e.home.set(s.x, 0, s.z);
+    // T5 / T12 targets can't die before their twist asks the question
+    if (['T5', 'T12'].includes(R.mission.twist?.id) && !sim.state.contract?.twistFired) e.noKill = true;
     if (which === 'realTarget') R.realTarget = e; else R.target = e;
     steps.onTarget(R, e);
   }
@@ -167,7 +169,7 @@ export function createRunner(ctx) {
     const s = R.step;
     // twist (T2 fires when its step is done, T9 at payout, the rest on entering their step)
     const tw = m.twist;
-    if (tw && !c.twistFired && tw.atStep === i && tw.id !== 'T2') fireTwist(tw);
+    if (tw && !c.twistFired && tw.atStep === i && !['T2', 'T5', 'T12'].includes(tw.id)) fireTwist(tw);
     steps.enter(R, s);
     // spawn packs: guards one step early (so they stand at the objective), ambushes on their step
     for (const p of R.packs) {
@@ -217,12 +219,45 @@ export function createRunner(ctx) {
   }
   const log = (m) => ctx.log?.(m);
 
+  // T5 / T12 (P4): the target breaks before it dies; the choice comes as the next step (sim splices it in)
+  const TWIST_ASK = {
+    T5: "That's no gangster. It's a pod-rider in a borrowed frame, and somebody framed them. Your call, kid.",
+    T12: '"Wait! Wait. Whatever they pay you, I pay more. Now. Walk away." Your call.',
+    T11: "Second client on the line. They want the other side of this job, and they pay better. Your call.",
+  };
+  function lowHpTwist(tw) {
+    const e = R.target;
+    // the target can break before its kill step comes up (you fought it at the goto): catch the runner up first
+    for (let k = 0; k < 6 && R && R.step?.type !== 'kill'; k++) complete();
+    if (!R) return;
+    fireTwist(tw);
+    R.twistTarget = e;
+    e.nonCombat = true; e.escort = true; e.brain = () => true; e.pending = null; e.tele = null;
+    e.bot.setMove(0, 0); e.bot.play('sit', { loop: true }); e.bot.setAlert(0);
+    complete();
+  }
+  function twistOutcome(outcome) {
+    const e = R?.twistTarget;
+    if (!e || e.state === 'dead') return;
+    R.twistTarget = null;
+    if (outcome === 'kill' || outcome === 'finish') { e.nonCombat = false; e.noKill = false; e.c.hp = 0; e.c.alive = false; enemies.die(e); }
+    else { fx.beam(e.pos, 0x7dffb0, 0.5, 5, 1.2); ui.toast(outcome === 'spare' ? 'You faked the kill' : 'They walk away', 'info', { sub: outcome === 'spare' ? 'Proof planted. The Unlinked will hear about this' : '' }); setTimeout(() => enemies.clear((x) => x === e), 900); }
+  }
+
   async function runChoice(s) {
     R.busy = true;
+    // story beats for the step before (e.g. A3-M3's confession) finish first
+    while (ctx.story.busy) await new Promise((r) => setTimeout(r, 100));
+    if (!R) return;
     const opts = s.options || [];
-    const choice = await ui.dialogue.show({ speaker: 'Mara Quill', role: 'Quill Contracts', portrait: { kind: 'human', seed: 11, hue: 30 }, text: s.label || 'Your call.', choices: opts.map((o) => o.label) });
-    R && (R.busy = false);
-    complete({ choice: Math.max(0, choice) });
+    const tw = R.mission.twist;
+    const choice = await ui.dialogue.show({ speaker: 'Mara Quill', role: 'Quill Contracts', portrait: { kind: 'human', seed: 11, hue: 30 }, text: s.label || (tw && TWIST_ASK[tw.id]) || 'Your call.', choices: opts.map((o) => o.label) });
+    if (!R) return;
+    R.busy = false;
+    const k = Math.max(0, choice);
+    log(`choice ${opts[k]?.outcome}`);
+    twistOutcome(opts[k]?.outcome);
+    complete({ choice: k });
   }
 
   function complete(info = {}) {
@@ -278,6 +313,7 @@ export function createRunner(ctx) {
 
   function cleanup() {
     if (!R) return;
+    steps.cleanup(R);
     for (const b of R.beacons) b.remove();
     for (const c of R.carries.values()) props.removeCarry(c);
     props.clearMission();
@@ -314,9 +350,10 @@ export function createRunner(ctx) {
       if (h.length) { const b = nearestOf(h); return { x: b.pos.x, z: b.pos.z, label: `${h.length} left`, enemy: true }; }
     }
     if (s.type === 'destroy') { const o = (s.objs || []).find((o) => o._prop && !o._prop.destroyed); if (o) return { x: o._prop.pos.x, z: o._prop.pos.z, label: 'Destroy' }; }
-    if (s.type === 'photo') { const t = s.target === 'realTarget' ? R.realTarget : R.target; if (t && t.state !== 'dead') return { x: t.pos.x, z: t.pos.z, label: t.c.name }; }
+    if (s.type === 'photo') { const t = s.target === 'vault' ? vaultMark(s) : s.target === 'realTarget' ? R.realTarget : R.target; if (t && t.state !== 'dead') return { x: t.pos.x, z: t.pos.z, label: t.c.name }; }
     if (s.type === 'escort' && R.ss.npc) { const e = R.ss.npc; const wp = R.ss.path?.[R.ss.wp]; return d2(e.pos) > 10 ? { x: e.pos.x, z: e.pos.z, label: e.c.name } : wp ? { x: wp.x, z: wp.z, label: 'Escort' } : null; }
     if (s.type === 'hack') { const st = site((s.sites || [s.site])[R.ss.hackI || 0]); if (st) return { x: st.x, z: st.z, label: s.verb ? 'Terminal' : 'Hack' }; }
+    if (s.type === 'snap') { const b = steps.snapTarget(R); if (b) return b; }
     if (s.type === 'race' && R.ss.race) { const c = R.ss.race.cps[R.ss.race.i]; if (c) return { x: c.x, z: c.z, label: `Checkpoint ${R.ss.race.i}` }; }
     if ((s.type === 'tail' || s.type === 'capture') && R.target && R.target.state !== 'dead') return { x: R.target.pos.x, z: R.target.pos.z, label: R.target.c.name, enemy: s.type === 'capture' };
     const st = site(s.site || s.sites?.[0] || s.path?.[s.path.length - 1] || s.orExfil);
@@ -398,11 +435,14 @@ export function createRunner(ctx) {
     }
     if (R.scriptedPack && !R.scriptedCleared && R.scriptedPack.ents?.every((e) => e.state === 'dead')) { R.scriptedCleared = true; storyEvent(R.scriptedPack.trigger.event + 'Cleared'); }
 
+    const tw = m.twist;
+    if (tw && (tw.id === 'T5' || tw.id === 'T12') && !c.twistFired && R.target && R.target.state !== 'dead'
+      && R.target.c.hp < R.target.c.stats.hp * (tw.id === 'T12' ? tw.threshold || 0.3 : 0.5)) { lowHpTwist(tw); return; }
     if (!steps.update(R, s, dt) && R) {
       const st = site(s.site);
       switch (s.type) {
         case 'goto': case 'exfil': {
-          const rad = s.ping ? Math.max(4, s.radius * 0.45) : Math.max(3, Math.min(s.radius || 4, 10));
+          const rad = s.ping ? Math.max(4, s.radius * 0.45) : Math.max(3, Math.min(s.radius || 4, 12));
           if (st && d2(st) < rad && !(R.scriptedPack && !R.scriptedCleared && s.type === 'goto' && R.scriptedPack.atStep === R.idx && R.scriptedPack.ents?.some((e) => e.state !== 'dead') && false)) complete();
           break;
         }
@@ -437,8 +477,15 @@ export function createRunner(ctx) {
     if (R?.stealth) stealth(dt);
   }
 
+  // heist: "case the vault" photographs a place, not a person
+  function vaultMark(s) {
+    if (R.vaultT) return R.vaultT;
+    const st = site(s.site);
+    if (!st) return null;
+    return (R.vaultT = { pos: new THREE.Vector3(st.x, world.groundAt(st.x, st.z) + 0.3, st.z), state: 'idle', c: { name: 'The vault' } });
+  }
   function photo(dt, s) {
-    const t = s.target === 'realTarget' ? R.realTarget : R.target;
+    const t = s.target === 'vault' ? vaultMark(s) : s.target === 'realTarget' ? R.realTarget : R.target;
     if (!t || t.state === 'dead') { if (R.ss.t > 2) complete(); return; }
     const d = t.pos.distanceTo(player.pos);
     const maxD = s.maxDist || 14;

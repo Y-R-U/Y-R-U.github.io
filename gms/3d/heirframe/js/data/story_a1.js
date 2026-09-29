@@ -1,4 +1,6 @@
 import { SCRIPTS_A2, SPEAKERS_A2 } from './story_a2.js';
+import { SCRIPTS_A3, SPEAKERS_A3 } from './story_a3.js';
+import { SCRIPTS_A4, SPEAKERS_A4 } from './story_a4.js';
 
 // STORY §8 script tables. trigger: event name from the mission runner, or 'after:N' to chain after beat N.
 // mode: bark (subtitle + VO, play continues) | dlg (dialogue panel) | card (full-screen text) | action (no line).
@@ -89,5 +91,5 @@ export const SPEAKERS = {
   warden: { name: 'Warden dispatch', role: 'Concord security', portrait: { kind: 'robot', seed: 6 } },
 };
 
-Object.assign(SCRIPTS, SCRIPTS_A2);
-Object.assign(SPEAKERS, SPEAKERS_A2);
+Object.assign(SCRIPTS, SCRIPTS_A2, SCRIPTS_A3, SCRIPTS_A4);
+Object.assign(SPEAKERS, SPEAKERS_A2, SPEAKERS_A3, SPEAKERS_A4);

@@ -62,8 +62,8 @@ export const MODIFIERS = {
   collateral: { id: 'collateral', label: 'Glass House', desc: 'Prop damage penalty x2', pay: 0.1, unlock: 4, kind: 'neutral' },
   noSwap: { id: 'noSwap', label: 'Locked Link', desc: 'No frame swap', pay: 0.05, unlock: 10, kind: 'neutral' },
   broadcast: { id: 'broadcast', label: 'Live on Harmony', desc: 'Heat +1 on completion', pay: 0.25, unlock: 12, kind: 'bad', only: ['assassinate', 'sabotage', 'heist', 'bounty'] },
-  night: { id: 'night', label: 'After Dark', desc: 'Detection range -35%', pay: 0.1, unlock: 999, kind: 'good', needs: 'daynight' },
-  rain: { id: 'rain', label: 'Rain', desc: 'Detection -20%', pay: 0.1, unlock: 999, kind: 'good', needs: 'weather' },
+  night: { id: 'night', label: 'After Dark', desc: 'Night shift: detection range -35%', pay: 0.1, unlock: 12, kind: 'good', needs: 'sky' },   // P4: open-sky districts only
+  rain: { id: 'rain', label: 'Rain', desc: 'Scheduled rain: detection -20%', pay: 0.1, unlock: 12, kind: 'good', needs: 'sky' },
   vip: { id: 'vip', label: 'Crowded', desc: 'More civilians; props everywhere', pay: 0.1, unlock: 3, kind: 'neutral' },
 };
 export const MODIFIER_CONFLICTS = [['noAlarm', 'defend'], ['noAlarm', 'broadcast'], ['noAlarm', 'reinforced'], ['timed', 'defend']];

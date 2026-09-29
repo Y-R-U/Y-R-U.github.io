@@ -43,12 +43,18 @@ export function createDistricts(G, ctx) {
   const unsub = world.onDistrict ? world.onDistrict(cleanup) : null;
 
   // district residents gameplay owns (Round 5b): Rook at his Stacks stall — rumours and the Clean Slate
-  const RESIDENTS = { stacks: [{ id: 'rook', site: 'st_npc_rook', kind: 'civ_worker', seed: 13, label: 'Rook · Parts & Rumours' }] };
+  // + the informants (P4): Big Kettle after A1-M4 (Aurum, by the boulevard), Halloran after A4-M2 (Arcology offices)
+  const RESIDENTS = {
+    stacks: [{ id: 'rook', site: 'st_npc_rook', kind: 'civ_worker', seed: 13, label: 'Rook · Parts & Rumours' }],
+    aurum_plaza: [{ id: 'kettle', site: 'npc_boulevard', kind: 'boss_kettle', seed: 4, label: 'Big Kettle · informant', after: 'a1_m4', sit: true }],
+    arcology: [{ id: 'halloran', site: 'ax_npc_offices', kind: 'boss_halloran', seed: 6, label: 'Halloran · informant', after: 'a4_m2' }],
+  };
   D.residents = [];
   function spawnResidents(id) {
     for (const r of D.residents) { world.scene.remove(r.bot.root); r.bot.dispose?.(); }
     D.residents = [];
     for (const def of RESIDENTS[id] || []) {
+      if (def.after && !sim.state.story.done.includes(def.after)) continue;
       const st = world.sites.find((x) => x.id === def.site);
       if (!st || !ctx.robots?.createRobot) continue;
       let bot;
@@ -56,7 +62,7 @@ export function createDistricts(G, ctx) {
       const p = ctx.nav?.nearest(st.x, st.z) || st;
       bot.root.position.set(p.x, world.groundAt(p.x, p.z), p.z);
       bot.root.rotation.y = Math.atan2(player.pos.x - p.x, player.pos.z - p.z);
-      bot.play('idle', { loop: true });
+      bot.play(def.sit ? 'sit' : 'idle', { loop: true });
       world.scene.add(bot.root);
       D.residents.push({ ...def, bot, x: p.x, z: p.z, r: 2.4 });
     }
@@ -73,7 +79,7 @@ export function createDistricts(G, ctx) {
   }
 
   // hop to another district through the relay tunnel; resolves true when there
-  async function travel(id, { reason = 'relay', via = 'relay', spawn = null } = {}) {
+  async function travel(id, { reason = 'relay', via = 'relay', spawn = null, quiet = false } = {}) {
     if (D.busy || !world.loadDistrict) return false;
     if (world.district?.id === id) return true;
     if (via === 'lift') sim.unlockDistrict(id);   // the lift bank is always open between Arcology floors
@@ -92,7 +98,7 @@ export function createDistricts(G, ctx) {
     catch (e) { console.error('relay failed', e); }
     player.frozen = false;
     D.busy = false;
-    ui?.toast(NAMES[id] || id, 'info', { sub: reason === 'contract' ? 'Contract site' : via === 'lift' ? 'Lift' : via === 'door' ? (id === 'home' ? 'Lullaby Rest · Pod 4471' : 'The Stacks') : via === 'dev' ? 'Dev start point' : 'Transit Relay' });
+    if (!quiet) ui?.toast(NAMES[id] || id, 'info', { sub: reason === 'contract' ? 'Contract site' : via === 'lift' ? 'Lift' : via === 'door' ? (id === 'home' ? 'Lullaby Rest · Pod 4471' : 'The Stacks') : via === 'dev' ? 'Dev start point' : 'Transit Relay' });
     return true;
   }
 
@@ -146,5 +152,5 @@ export function createDistricts(G, ctx) {
     }
   }
 
-  return { travel, lift, door, passage, relayMenu, boot, update, get residents() { return D.residents; }, get busy() { return D.busy; }, get id() { return world.district?.id || 'aurum_plaza'; } };
+  return { respawnResidents: () => spawnResidents(world.district?.id), travel, lift, door, passage, relayMenu, boot, update, get residents() { return D.residents; }, get busy() { return D.busy; }, get id() { return world.district?.id || 'aurum_plaza'; } };
 }

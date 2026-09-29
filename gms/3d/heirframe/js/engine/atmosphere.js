@@ -99,6 +99,8 @@ uniform float uTime;
 uniform float uEnv;
 uniform vec3 uSun;
 uniform float uDusk;
+uniform float uNight;
+uniform float uRain;
 varying vec3 vDir;
 float hash(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }
 float hash1(float x){ return fract(sin(x*127.1)*43758.5453); }
@@ -114,6 +116,7 @@ vec3 skyColor(vec3 d){
   vec3 mid = vec3(0.40, 0.58, 0.88);
   vec3 hor = ${HAZE_OLD ? 'vec3(1.0, 0.88, 0.74)' : 'vec3(0.92, 0.9, 0.88)'};
   float e = max(el, 0.0);
+  float pm = 0.0; vec3 pKeep = vec3(0.0);
   // dusk (Portside): violet zenith, rose middle, a burning horizon and a wide sun glow
   zen = mix(zen, vec3(0.09, 0.11, 0.3), uDusk); mid = mix(mid, vec3(0.52, 0.42, 0.6), uDusk); hor = mix(hor, vec3(1.0, 0.6, 0.36), uDusk);
   vec3 col = mix(hor, mid, smoothstep(0.0, 0.28 + 0.1 * uDusk, e));
@@ -144,6 +147,7 @@ vec3 skyColor(vec3 d){
       pcol += vec3(0.6, 0.75, 1.0) * rim * 0.35;
       float edge = smoothstep(1.0, 0.97, r2);
       col = mix(col, pcol + col * 0.18, edge * 0.93);
+      pm = edge * 0.93; pKeep = pcol;
     }
     float halo = smoothstep(R * 1.35, R, ang);
     col += vec3(0.9, 0.9, 1.0) * halo * halo * 0.12;
@@ -196,6 +200,16 @@ vec3 skyColor(vec3 d){
       col = hz * 0.95;
     }
   }
+  // P4 day/night + scheduled rain (the env map is not rebuilt: world.js dims its intensity instead)
+  if (uRain > 0.0) col = mix(col, vec3(0.5, 0.53, 0.58) * (0.35 + 0.65 * smoothstep(-0.05, 0.4, el)), uRain * 0.75 * (1.0 - pm));
+  if (uNight > 0.0) {
+    vec3 nc = col * vec3(0.07, 0.09, 0.2);
+    nc += vec3(0.55, 0.32, 0.18) * pow(1.0 - clamp(abs(el) * 5.0, 0.0, 1.0), 3.0) * 0.28;                // city glow on the horizon
+    vec2 sp = floor(d.xz / (abs(d.y) + 0.35) * 260.0);
+    nc += vec3(0.9, 0.92, 1.0) * step(0.9975, hash(sp)) * smoothstep(0.05, 0.3, el) * (1.0 - uRain) * (1.0 - pm) * 1.4;   // stars
+    nc = mix(nc, pKeep * 0.85, pm);                                                                    // the moon never changes phase
+    col = mix(col, nc, uNight);
+  }
   return col;
 }
 `;
@@ -203,7 +217,7 @@ vec3 skyColor(vec3 d){
 export function createSkyMaterial(forEnv = false) {
   return new THREE.ShaderMaterial({
     name: 'Sky',
-    uniforms: { uTime: { value: 0 }, uEnv: { value: forEnv ? 1 : 0 }, uSun: { value: SUN_DIR.clone() }, uDusk: { value: 0 } },
+    uniforms: { uTime: { value: 0 }, uEnv: { value: forEnv ? 1 : 0 }, uSun: { value: SUN_DIR.clone() }, uDusk: { value: 0 }, uNight: { value: 0 }, uRain: { value: 0 } },
     vertexShader: /* glsl */`
       varying vec3 vDir;
       void main() {

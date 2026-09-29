@@ -2,19 +2,19 @@
 // `p1Sites` is the fallback site list the generator uses when the engine hasn't registered real sites.
 export const DISTRICTS = {
   aurum_plaza: {
-    id: 'aurum_plaza', name: 'Aurum Plaza', minLvl: 1, maxLvl: 12, act: 1, unlock: { level: 1 }, danger: 1, gang: 'The Gilt Grins',
+    sky: true, id: 'aurum_plaza', name: 'Aurum Plaza', minLvl: 1, maxLvl: 12, act: 1, unlock: { level: 1 }, danger: 1, gang: 'The Gilt Grins',
     tags: ['plaza', 'fountain', 'park', 'market', 'locker', 'alley', 'rooftop', 'warehouse', 'relay', 'spawn_edge'],
     pools: [['syndicate', 5], ['scrap', 4], ['concord', 1]],
     packs: ['syndicate_street', 'scrap_swarm', 'warden_patrol'],
   },
   brightline: {
-    id: 'brightline', name: 'Brightline Boulevard', minLvl: 3, maxLvl: 15, act: 1, unlock: { level: 3 }, danger: 2, gang: 'Neon Saints',
+    sky: true, id: 'brightline', name: 'Brightline Boulevard', minLvl: 3, maxLvl: 15, act: 1, unlock: { level: 3 }, danger: 2, gang: 'Neon Saints',
     tags: ['plaza', 'market', 'locker', 'alley', 'rooftop', 'lobby', 'relay', 'spawn_edge'],
     pools: [['syndicate', 5], ['concord', 3], ['scrap', 2]],
     packs: ['syndicate_street', 'chromehead_duo', 'scrap_swarm', 'warden_patrol'],
   },
   terraces: {
-    id: 'terraces', name: 'Verdant Terraces', minLvl: 7, maxLvl: 20, act: 2, unlock: { level: 8, story: 'a2_m1' }, danger: 3, gang: 'Greenhouse Boys',
+    sky: true, id: 'terraces', name: 'Verdant Terraces', minLvl: 7, maxLvl: 20, act: 2, unlock: { level: 8, story: 'a2_m1' }, danger: 3, gang: 'Greenhouse Boys',
     tags: ['park', 'fountain', 'garden', 'rooftop', 'locker', 'plaza', 'relay', 'spawn_edge'],
     pools: [['scrap', 3], ['syndicate', 3], ['concord', 4]],
     packs: ['scrap_swarm', 'syndicate_street', 'sweeper_squad'],
@@ -33,7 +33,7 @@ export const DISTRICTS = {
     packs: ['security_floor', 'warden_patrol'],
   },
   portside: {
-    id: 'portside', name: 'Portside', minLvl: 15, maxLvl: 30, act: 3, unlock: { level: 18, story: 'a3_m1' }, danger: 5, gang: 'Silverhand Dockers',
+    sky: true, id: 'portside', name: 'Portside', minLvl: 15, maxLvl: 30, act: 3, unlock: { level: 18, story: 'a3_m1' }, danger: 5, gang: 'Silverhand Dockers',
     tags: ['dock', 'pad', 'warehouse', 'market', 'vault', 'alley', 'locker', 'relay', 'spawn_edge'],
     pools: [['syndicate', 6], ['concord', 2], ['unlinked', 2]],
     packs: ['dockers', 'syndicate_street', 'warden_patrol', 'unlinked_cell'],

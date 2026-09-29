@@ -152,13 +152,14 @@ export function buildStoryMission(id, ctx) {
     if (def.faction) { m.faction = def.faction; for (const e of m.enemies) e.faction = def.faction; }
     for (const e of m.enemies) for (const u of e.units) u.level = level;
   }
-  m.story = { id, act: def.act, clues: def.clues, reveal: def.reveal || null, choice: def.choice || null, grants: def.grants || null, setHeat: def.setHeat ?? null, noCombat: !!def.noCombat };
+  m.story = { id, act: def.act, clues: def.clues, reveal: def.reveal || null, choice: def.choice || null, grants: def.grants || null, setHeat: def.setHeat ?? null, noCombat: !!def.noCombat, after: def.after || null };
+  if (def.night) m.night = true;
   m.title = def.title;
   m.blurb = def.blurb;
   m.client = { name: 'Mara Quill', org: 'Quill Contracts', faction: 'unlinked', portrait: { kind: 'human', seed: 11 } };
   if (def.noCombat) m.enemies = [];
   if (def.boss) {
-    const bi = Math.max(0, m.steps.findIndex(s => s.type === def.bossAt));
+    const bi = typeof def.bossAt === 'number' ? def.bossAt : Math.max(0, m.steps.findIndex(s => s.type === def.bossAt));
     const bossStep = m.steps[bi];
     const site = bossStep.site || bossStep.sites?.[bossStep.sites.length - 1] || m.steps.find(s => s.site)?.site;
     m.boss = { defId: def.boss, name: BOSSES[def.boss].name, level: level + 1, site, atStep: bi };
@@ -197,15 +198,20 @@ function templateMission(def, id, S, rng, level, threat) {
   // an exact site id (the world's named places, e.g. vt_memorial_garden) wins when that district's real sites are known
   const byId = (id) => { const s = id && pool.find(x => x.id === id); if (s) used.add(s.id); return s; };
   const where = (t, prev) => byId(t.site) || (t.tags ? pick(t.tags, prev, t.far) : prev);
+  // list entries (hack/snap/race/destroy sites): a named site, else its tags, else any open site
+  const whereAll = (t, prev) => byId(t.site) || pick(t.tags || ['plaza', 'market', 'lobby', 'interior', 'catwalk'], prev, false);
   const siteOf = [], pathOf = [];
   const steps = def.steps.map((t, i) => {
     const prev = siteOf[i - 1] || null;
     const site = t.at != null ? siteOf[t.at] : (t.site || t.tags) ? where(t, prev) : prev;
     siteOf[i] = site;
-    const { tags, at, far, spawnTags, orExfilTags, path, end, ...rest } = t;
+    const { tags, at, far, spawnTags, orExfilTags, path, end, hackSites, snapSites, objs, checkpoints, ...rest } = t;
     const st = sstep(t.type, { ...rest, label: t.label });
     if (['goto', 'exfil', 'photo', 'defend', 'kill', 'pickup', 'deliver'].includes(t.type) && site) st.site = site.id;
-    if (t.type === 'hack') st.sites = [site.id];
+    if (t.type === 'hack') { const hs = hackSites ? (() => { let p = prev; return hackSites.map(q => (p = whereAll(q, p))); })() : [site]; st.sites = hs.map(q => q.id); siteOf[i] = hs[hs.length - 1]; }
+    if (t.type === 'snap') { let p = prev; const ss = snapSites.map(q => (p = whereAll(q, p))); st.sites = ss.map(q => q.id); siteOf[i] = ss[ss.length - 1]; }
+    if (t.type === 'race') { let p = prev; const cp = checkpoints.map(q => (p = whereAll(q, p))); st.checkpoints = cp.map(q => q.id); siteOf[i] = cp[cp.length - 1]; }
+    if (t.type === 'destroy') { let p = site || prev; st.objs = objs.map(o => { const q = (p = whereAll(o, p)); return { kind: o.kind, hpMult: o.hpMult || 1, site: q.id }; }); siteOf[i] = pool.find(q => q.id === st.objs[0].site); }
     if (t.type === 'escort') { let p = site; pathOf[i] = (path || []).map(q => (p = where(q, p))); st.path = pathOf[i].map(q => q.id); siteOf[i] = pathOf[i][pathOf[i].length - 1] || site; }
     if (t.type === 'tail') { const e = where(end || {}, site) || site; st.endSite = e.id; siteOf[i] = e; }
     if (t.type === 'defend') st.spawns = (spawnTags || ['spawn_edge']).map(tag => pick([tag, 'spawn_edge'], site, false).id).filter((v, k, a) => a.indexOf(v) === k);
@@ -213,7 +219,7 @@ function templateMission(def, id, S, rng, level, threat) {
     return st;
   });
   const enemies = (def.packs || []).map((p, k) => ({
-    pack: p.scripted ? 'scripted' : 'story_' + k, faction: def.faction || 'syndicate', atStep: p.atStep, site: (p.atPath != null ? pathOf[p.atStep][p.atPath] : siteOf[p.at] || siteOf[p.atStep]).id,
+    pack: p.scripted ? 'scripted' : 'story_' + k, faction: def.faction || 'syndicate', atStep: p.atStep, site: ((p.site && pool.find(q => q.id === p.site)) || (p.atPath != null ? pathOf[p.atStep][p.atPath] : siteOf[p.at] || siteOf[p.atStep])).id,
     ...(p.scripted ? { scripted: true, trigger: { event: p.scripted.event, progress: p.scripted.progress } } : {}), guard: !!p.guard,
     units: p.units.flatMap(([defId, rank, n]) => Array.from({ length: n }, () => ({ defId, rank, level }))),
   }));

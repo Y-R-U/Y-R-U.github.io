@@ -47,5 +47,31 @@
   "b_warden_heat4_01": "Enforcer squad deployed. Lethal response authorised.",
   "b_warden_lost_01": "Contact lost. Holding the perimeter.",
   "b_warden_clear_01": "Stand down. Sector returning to harmony."
+ },
+ "kettle": {
+  "b_kettle_tip_01": "Word from the docks, rental. The Unlinked are hiring. Ask for the girl who talks to cranes.",
+  "b_kettle_tip_02": "Heard the Wardens are sweeping Brightline tonight. Wouldn't be there. Just saying.",
+  "b_kettle_tip_03": "No hard feelings about the kiosk, eh? Business is business. This one's on the house."
+ },
+ "halloran": {
+  "b_halloran_informant_01": "Don't make this a habit. Patrol routes for the next shift. Burn them after.",
+  "b_halloran_informant_02": "They rotate the sweepers on the hour. Walk slow and you'll never meet one.",
+  "b_halloran_stand_01": "Wardens, stand down. That's an order. We are not doing this."
+ },
+ "jun": {
+  "b_jun_comms_01": "I'm in your comms now. Don't be weird about it.",
+  "b_jun_chorus_01": "Traced your key. It wasn't a courier. It came from the top of the spire. The Chorus Tower.",
+  "b_jun_archive_01": "Sixty-one years of billboards. Same number. Every single one.",
+  "b_jun_pumps_01": "The waterfalls drain down here. And then they get pumped back up. It's a loop, Wren."
+ },
+ "harmony": {
+  "pa_night_01": "Evening lighting is now active. Rest well, Halcyon.",
+  "pa_dawn_01": "Good morning, Halcyon. Sunrise, six o'clock. Exactly on time."
+ },
+ "mara": {
+  "b_mara_night_01": "It's late, kid. The Wardens see less at night. So do you."
+ },
+ "hira": {
+  "b_hira_home_01": "Is that... you? You look peaceful. Your vitals are fine! Mostly fine."
  }
 }

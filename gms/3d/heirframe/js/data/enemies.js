@@ -83,12 +83,15 @@ export const BOSSES = {
   halloran: { id: 'halloran', name: 'Warden-Captain Halloran', rank: 'boss', robotKind: 'boss_halloran', fallbackKind: 'security', robotTier: 3, paint: 'concord_gold', faction: 'concord', ai: ['boss', 'lancer'], act: 2,
     // P3g: hp 90→22, dmg 18→3.5, shield 60→25, frontalDR 0.6→0.35 (boss rank ×60 made her a 450 s fight that two-shot a L15 Mk I; now ~90 s, same share per hit as Kettle)
     base: { hp: 22, dmg: 3.5, armor: 30, shield: 25 }, move: 4.6, skills: ['e_baton', 'e_lunge', 'e_emp'], frontalDR: 0.35, phases: [0.6, 0.3], tags: ['robot', 'frame'] },
+  // P4: Act 3–4 bosses scaled to Halloran's share per hit (boss rank ×60 HP made the listed bases 10-minute fights that
+  // two-shot a L27 frame): choir_warden hp 110→28 dmg 22→3.8 shield 90→30, rustmother hp 160→30 dmg 24→4,
+  // spine_keeper_boss (champion ×20) hp 120→75 dmg 26→4.5
   choir_warden: { id: 'choir_warden', name: 'Choir Warden', rank: 'boss', robotKind: 'seraph', robotTier: 1, fallbackKind: 'civ_gold', faction: 'choir', ai: ['boss', 'flyer'], act: 3, flying: true,
-    base: { hp: 110, dmg: 22, armor: 20, shield: 90 }, move: 6, skills: ['e_melee', 'e_dive', 'e_blast'], phases: [0.5], tags: ['robot', 'frame'] },
+    base: { hp: 28, dmg: 3.8, armor: 20, shield: 30 }, move: 6, skills: ['e_melee', 'e_dive', 'e_blast'], phases: [0.5], tags: ['robot', 'frame'] },
   rustmother: { id: 'rustmother', name: 'Rustmother', rank: 'boss', robotKind: 'rustkin', robotTier: 3, fallbackKind: 'enforcer', faction: 'scrap', ai: ['boss', 'turret'], act: 4, size: 3,
-    base: { hp: 160, dmg: 24, armor: 40 }, move: 1, skills: ['e_sweep', 'e_stomp'], summons: { defId: 'scrap_rat', count: 5, every: 12 }, phases: [0.66, 0.33], tags: ['robot', 'scrap', 'heavy'] },
+    base: { hp: 30, dmg: 4, armor: 40 }, move: 1, skills: ['e_sweep', 'e_stomp'], summons: { defId: 'scrap_rat', count: 5, every: 12 }, phases: [0.66, 0.33], tags: ['robot', 'scrap', 'heavy'] },
   spine_keeper_boss: { id: 'spine_keeper_boss', name: 'Spine Keeper', rank: 'champion', robotKind: 'spider', robotTier: 2, fallbackKind: 'enforcer', faction: 'scrap', ai: ['boss', 'bruiser'], act: 4, size: 2.4,
-    base: { hp: 120, dmg: 26, armor: 40 }, move: 2.4, skills: ['e_sweep', 'e_stomp', 'e_beam'], summons: { defId: 'hull_wight', count: 2, every: 15 }, phases: [0.5], tags: ['robot', 'scrap', 'heavy'] },
+    base: { hp: 75, dmg: 4.5, armor: 40 }, move: 2.4, skills: ['e_sweep', 'e_stomp', 'e_beam'], summons: { defId: 'hull_wight', count: 2, every: 15 }, phases: [0.5], tags: ['robot', 'scrap', 'heavy'] },
   seraph: { id: 'seraph', name: 'Seraph', rank: 'boss', robotKind: 'seraph', robotTier: 3, fallbackKind: 'civ_gold', faction: 'choir', ai: ['boss', 'flyer'], act: 5, flying: true, spares: true,
     base: { hp: 130, dmg: 28, armor: 25, shield: 120 }, move: 7, skills: ['e_melee', 'e_dive', 'e_lunge', 'e_blast'], phases: [0.66, 0.33], tags: ['robot', 'frame'] },
   dray: { id: 'dray', name: 'Archon Dray', title: 'the Sovereign Frame', rank: 'boss', robotKind: 'boss_sovereign', fallbackKind: 'enforcer', faction: 'voices', ai: ['boss', 'bruiser'], act: 6, size: 2.6,

@@ -1,3 +1,7 @@
+P4 PLAYABLE
+(gameplay agent P4, 2026-09-30: Acts 3–4 staged and bot-played mission by mission; day/night + rain; heist/wetwork/T5/T11/T12;
+informants; Breach set piece at 60 fps. Table in "P4 acceptance" at the bottom. P3/P2a lines kept underneath for history.)
+
 P3 PLAYABLE
 (gameplay agent P3g, 2026-09-29: Act 2 staged and bot-played in Verdant Terraces + the Arcology; P3 systems in; table in "P3
 acceptance" below. P2a PLAYABLE line kept underneath for history.)
@@ -245,3 +249,88 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
 ## NEXT (P3)
 - rep tiers/vendor pricing/rival UI; Fabricator (recalibrate UI, tune pity); relic hooks (afterimage, phantom_step,
   reactive_plating, stillwater, kinetic_battery); Hostile threat check; danger/Crackdown; Echo.
+
+
+# P4 "The Sky Is a Screen" (gameplay agent P4, 2026-09-30)
+
+## Checkpoint 1
+- DONE: read-in; VO for Acts 3–4 generating in the background (gen_vo.py --max-p P2 + 21 new keys in tools/vo/script.json:
+  Kettle/Halloran informant lines, Jun comms, PA night/dawn, Mara night, HIRA home). Log: scratchpad vo_p4.log.
+- IN PROGRESS: Act 3–4 story staging (js/data/story.js steps + NEW js/data/story_a3.js / story_a4.js scripts).
+- NEXT: day/night + rain, heist/wetwork/T5/T11/T12 runtime, dev jump banner fix, B4 crowd count.
+
+## Checkpoint 2 (after the usage-limit reset)
+- GREEN: boot + smoke (`auto=1&contracts=1&speed=2`: A1-M1 + pest, 0 console errors), `node tools/sim/test.mjs` 25/25.
+- DONE: VO 39 clips (18 Act 3–4 lines, pa_curfew_01, pa_renewal_40..1, b_rook_open_01, 16 new barks), log vo_p4.log.
+- DONE: Act 3–4 step templates (js/data/story.js), scripts js/data/story_a3.js + story_a4.js (merged in story_a1.js);
+  sim/story.js template gained hackSites / snap / race checkpoints / destroy objs / pack `site:` / numeric `bossAt`,
+  `m.night`, `m.story.after`; new step type `snap` (sim STEP_TYPES + validator); story runs now queue (game/story.js)
+  and beats can carry `when: {maraTone}`.
+- IN PROGRESS: runtime for the new beats (snap step, cull, Halloran, harmonyIris, joinJun, post-mission scenes
+  home/breach), storyActCap 4, choice from the open contract.
+- NEXT: day/night + rain, heist/wetwork/T5/T11/T12, dev jump quiet + ToD control, B4 crowd, informants, lattice.
+
+## Checkpoint 3
+- Bot runs (story2.mjs, gunner, speed 2): A3-M1 ok · A3-M2 ok · A3-M3 ok (choice.mjs: confession → choice → the `cold`
+  line only; `maraTone` persists through save + Continue) · A3-M4 ok · A3-M5 ok (Choir Warden ~70 s, 1 death) · A4-M1 ok
+  (→ Pod 4471 scene) · A4-M2 ok (Halloran stands her squad down, cull on/off, Rustmother ~90 s, 0 deaths) · A4-M3 ok
+  (snap step: 4 countdown boards; the camera turns and tilts to frame each board) · A4-M4 ok. A4-M5 next.
+- Boss retune (js/data/enemies.js, same share per hit as Halloran): choir_warden hp 110→28 dmg 22→3.8 shield 90→30;
+  rustmother hp 160→30 dmg 24→4; spine_keeper_boss hp 120→75 dmg 26→4.5. With the listed bases the bot died 20× in 4 min.
+- runner goto radius cap 10→12 (A4-M4 control room: the bot wedged on the doorway corner; its goto radius is 11).
+- Dev jump + autopilot storyat: `G.quiet` mutes level-up stings/sim toasts while fast-forwarding (the stale LEVEL N queue).
+- B4 crowd `count: 10` (nexus.js). night/rain modifiers: unlock 12, only in `sky: true` districts (aurum, brightline,
+  terraces, portside) via rollModifiers(…, district). Runtime for them is next (day/night).
+
+## Checkpoint 4
+- A4-M5 Breach ok by bot: Spine Keeper ~75 s, then the set piece: out through the airlock onto the hull, a 9 s camera
+  move from the player's face to a wide over the plating with Verdance filling the frame, HIRA/Jun lines, REVELATION card.
+  **60 fps, 43–55 calls** through it (M5 metal, 915x412 DPR2 high; breach.mjs). HUD, marker and interact prompt hidden.
+- NEW js/world/lattice.js: the Firmament from behind (hex sky panels back-lit, flickering/dead cells, the sun-lamp in a
+  gantry ring, the moon as a scanline feed), in the Spine's north lattice. 4 draws; spine look-up 67 calls, 60 fps.
+- Day/night + rain DONE: NEW js/game/daynight.js (a shift = one day, starting 06:00:00 exactly; dusk 19–20:30, night to
+  05:00, dawn done at 06:00; ~1 shift in 3 has Harmony's scheduled rain 14:00–16:00; After Dark / Rain modifiers and
+  A3-M3 force their sky for the job; detection ×(1−0.35 night)×(1−0.2 rain) under open sky; PA pa_night_01 / pa_dawn_01 /
+  pa_weather_01 on the hour). World side: `world.setSky({night, rain})` + `world.sky` in world.js (light/fog/env
+  intensity/exposure/shadow intensity + sky shader uNight/uRain: stars, city glow, the moon keeps its phase), NEW
+  js/world/rain.js (1 draw, camera-following streaks). Cost: Aurum noon 143 calls → night 145 → rain 145, 60 fps; Portside
+  147–148. Interiors and space ignore it. Dev panel: Time of day (Live / 06 / 12 / 18 / 19:30 / 21 / 00, Rain auto/on/off).
+- NEXT: heist/wetwork + T5/T11/T12 runtime, Lethal check, informants (Kettle/Halloran residents), regressions.
+
+## Checkpoint 5
+- Heist + wetwork in the runtime scope (RUN_ARCH 18), twists T5/T11/T12 (RUN_TWISTS all 12). Heist "case the vault" =
+  a photo of the vault site (runner vaultMark). T5/T12: the target can't die before its twist (noKill until fired); at
+  50% (T5) / 30% (T12) HP it sits down, the runner catches up to the kill step, and the choice step follows; outcomes
+  kill/finish (dies), spare (beams away, 60% pay +Unlinked), bribe (fails at 80% pay). T11 = the sim's pay/rep choice
+  (switch ×1.2, −5 client rep): no objective flip. arch4.mjs (L18, gunner): heist ok, wetwork T5 kill/spare ok, T12
+  finish/bribe ok, sabotage T11 switch ok, defend T11 stay ok, sabotage T6 (+2★, survive/exfil) ok. `&choice=N` makes
+  the autopilot pick option N.
+- Lethal threat (sim, L25): setThreat ok, board at Lethal ok; Black cards appear at 3★ (checked in node).
+- Informants: Big Kettle (Aurum, npc_boulevard, after A1-M4): once per shift a free board turnover + a tip line;
+  Halloran (Arcology offices, after A4-M2): once per shift −2★ Heat. inf.mjs: both ok. Residents gate on `after`.
+
+## P4 acceptance (BUILD_PLAN §P4)
+| item | result | evidence |
+|---|---|---|
+| Act 3 A3-M1…M5 (Freehaul, Ward Records, Quill, Signal to Noise, Harmony/Iris) | PASS | story2.mjs each ok (gunner bot, speed 2); VO for every VO_LINES line |
+| Mara's choice persists `maraTone` | PASS | choice.mjs: confession → choice → only the matching line; `cold` survives save + Continue; `&choice=1` = warm |
+| Act 4 A4-M1…M5 (Pod 4471, Culling Hour + Rustmother + setCull + Halloran, Stuck Clock, Waterfall's End, Breach) | PASS | story2.mjs / breach.mjs each ok |
+| Breach set piece ≥ 45 fps | PASS | 60 fps, 43–55 calls through the whole scene (M5 metal, 915x412 DPR2 high) |
+| Day/night (24-min shift, sun at exactly 06:00), rain, night/rain modifiers | PASS | tod.mjs Aurum/Portside 12/19:30/00/rain: 60 fps, +2 calls; modifiers roll in open-sky districts from L12 |
+| Black contracts, heist, wetwork T5/T6/T11/T12, Lethal | PASS | arch4.mjs runs (both branches of T5/T12/T11); node: Lethal board + Black at 3★ |
+| Kettle + Halloran as informants | PASS | inf.mjs |
+| Dev checkpoints for the new missions; no stale banners | PASS | devjump.mjs: A3-M1 L18, A4-M4 L32 exact, no queued LEVEL stings |
+| Normal boot fetches 0 js/dev | PASS | 147 js, 0 from js/dev |
+| P1/P2/P3 regressions | PASS | test.mjs 25/25; smoke ok; reg (speed 1, contracts=3, NOSHOT): 60 fps, p99 16.8, max 17 ms, 0 hitches, 262 calls; perf 1280x720 high 8 enemies 60 fps / 204 calls; story2 A1-M4 + A2-M5 ok |
+| Acts 3–4 end to end in one bot run | not done | each mission bot-played from its checkpoint; a single run needs ~16 levels of contracts between gates |
+
+## Known / decisions to review
+- A4-M3 "four districts" became four countdown boards on Brightline (Jun's archive covers the rest). The snap step turns
+  and tilts the camera to frame each board (the default pitch hides anything 2 m up at 8 m).
+- Act 3–4 boss bases cut hard (see Checkpoint 3) so they match Halloran's share per hit.
+- A3-M2 plays in B4 (arcology_servers), not the lobby: the Wards registry is on the archive floor.
+- T11 is a pay/rep choice only; the objective does not flip sides.
+- Night covers ~40% of a shift (19:00–06:00 with ramps). If the S22 night look disappoints, `nightAt` in daynight.js is the knob.
+- reg.mjs's screenshot every 30 polls causes 170 ms hitches every 60 s: harness, not game (NOSHOT=1 run is clean).
+- Brightline Apartment not built (DESIGN sells it after Act 4). Act 5 cards stay hidden (storyActCap 4).
+- Hullside has no lattice view from outside; the lattice lives in the Spine's north bulkhead (js/world/lattice.js).

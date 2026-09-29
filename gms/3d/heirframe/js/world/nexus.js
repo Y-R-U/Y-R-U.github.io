@@ -490,6 +490,7 @@ export const ARCOLOGY_SERVERS = {
   crowd: {
     loops: [[[0, 30], [0, 6], [-6, -5], [-26, -5], [-34, -20], [-34, 24], [-6, 26]], [[6, 26], [34, 24], [34, -20], [26, -5], [6, -5], [0, -26], [10, -32]]],
     talk: [[-8, 26], [10, -2], [-18, -30], [20, -30]],
+    count: 10,   // a staff floor, not a concourse (Aaron: fewer civilians in B4)
   },
   env: (r, tier) => interiorEnv(r, tier, { strip: [2.0, 2.4, 3.0], wallC: 0.06, floorC: 0.03, holo: [0.3, 0.9, 2.4], dark: true }),
   ambience: {

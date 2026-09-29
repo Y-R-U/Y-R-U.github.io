@@ -1,4 +1,6 @@
 import { toUiBoard } from '../sim/ui_adapt.js';
+import { STORY_MISSIONS } from '../data/story.js';
+import { completeStory } from '../sim/story.js';
 
 // ?auto=1 test pilot. Drives the real UI (DOM clicks) for screens/panels and the same player/combat calls the
 // touch controls use. Progress in __game.runtime.auto.
@@ -158,7 +160,8 @@ export function createAutopilot(G, { ui, player }) {
     const redeploy = $('.hf-scr [data-a="redeploy"]');
     if (redeploy) { A.fails++; click(redeploy); return; }
     if (ui.dialogue.open) {
-      const ch = document.querySelector('.hf-dlg .hf-choice');
+      const all = document.querySelectorAll('.hf-dlg .hf-choice');
+      const ch = all[+(Q.get('choice') || 0)] || all[0];   // &choice=N: pick the Nth option (tests the other branches)
       if (ch) click(ch); else click($('.hf-dlg'));
       return;
     }
@@ -253,6 +256,15 @@ export function createAutopilot(G, { ui, player }) {
         A.goal = null; goTo(t.pos.x + ax / l * 12, t.pos.z + az / l * 12, 1.5);
         return;
       }
+      if (st?.type === 'snap' && o) {
+        const d = Math.hypot(o.x - player.pos.x, o.z - player.pos.z);
+        const h = G.runner.active.ss.hold + (G.runner.active.ss.snapI || 0) * 10;
+        if (h > (A.snapBest ?? -1)) { A.snapBest = h; A.snapT = 0; } else A.snapT = (A.snapT || 0) + 0.25;
+        if (A.snapT > 4) { A.snapT = 0; A.snapBest = -1; const a = Math.random() * Math.PI * 2; A.goal = null; goTo(o.x + Math.sin(a) * 8, o.z + Math.cos(a) * 8, 0.8); return; }
+        if (d < 11 && d > 5) { player.setTarget(null); return; }
+        if (d <= 5) { A.goal = null; goTo(o.x + (player.pos.x - o.x) / (d || 1) * 8, o.z + (player.pos.z - o.z) / (d || 1) * 8, 1); return; }
+        goTo(o.x, o.z, 8); return;
+      }
       if (st?.type === 'defend' && o) { const d = Math.hypot(o.x - player.pos.x, o.z - player.pos.z); if (d < 6) { player.setTarget(null); return; } }
       if (o) goTo(o.x, o.z, 0.8);
       return;
@@ -263,10 +275,13 @@ export function createAutopilot(G, { ui, player }) {
     const at = Q.get('storyat');
     if (at && !A.jumped) {
       A.jumped = true;
-      const ids = ['a1_m1', 'a1_m2', 'a1_m3', 'a1_m4', 'a1_m5', 'a2_m1', 'a2_m2', 'a2_m3', 'a2_m4', 'a2_m5'], gates = { a1_m1: 1, a1_m2: 2, a1_m3: 3, a1_m4: 5, a1_m5: 7, a2_m1: 8, a2_m2: 10, a2_m3: 12, a2_m4: 15, a2_m5: 17 };
-      const S2 = G.sim.state;
-      S2.story.done = ids.slice(0, ids.indexOf(at)); S2.story.mission = at; S2.flags.boardUnlocked = true;
-      while (S2.player.level < gates[at]) G.sim.giveXp(200, 'autopilot');
+      const S2 = G.sim.state, idx = STORY_MISSIONS.findIndex((m) => m.id === at);
+      S2.story.done = []; S2.story.mission = STORY_MISSIONS[0].id;
+      for (const m of STORY_MISSIONS.slice(0, idx)) { const fx = completeStory(S2.story, m.id, {}); for (const d of fx?.unlocks || []) G.sim.unlockDistrict(d); }
+      S2.story.mission = at; S2.flags.boardUnlocked = true;
+      G.quiet = true;
+      while (S2.player.level < STORY_MISSIONS[idx].gate) G.sim.giveXp(200 * S2.player.level, 'autopilot');
+      G.quiet = false;
       G.contractsDone = Math.max(G.contractsDone, 1);
       G.sim.refreshBoard();
     }

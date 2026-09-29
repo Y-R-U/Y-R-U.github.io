@@ -4,6 +4,7 @@ import { STORY_MISSIONS } from '../data/story.js';
 import { DISTRICTS } from '../data/districts.js';
 import { completeStory } from '../sim/story.js';
 import { rollItem } from '../sim/loot.js';
+import { xpNext } from '../sim/economy.js';
 import { createRng } from '../sim/rng.js';
 import { OWNABLE_FRAMES } from '../data/frames.js';
 import { DISTRICT_NAMES } from '../game/districts.js';
@@ -50,7 +51,8 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
 
   // ---- actions ----------------------------------------------------------------------------------------------
   function toast(t, sub) { ui?.toast(t, 'info', { sub, ms: 1600 }); }
-  function setLevel(n) { const S = G.sim.state; while (S.player.level < n) G.sim.giveXp(Math.max(200, 50 * S.player.level * S.player.level), 'dev'); }
+  // exactly to level n (big chunks overshot: A3-M1 at gate 18 landed on 22)
+  function setLevel(n) { const S = G.sim.state; for (let k = 0; k < 500 && S.player.level < n; k++) G.sim.giveXp(Math.max(1, xpNext(S.player.level) - S.player.xp), 'dev'); }
   function goDistrict(id) {
     if (G.runner.active) G.runner.abandon();
     if (DISTRICTS[id]) G.sim.unlockDistrict(id);
@@ -69,6 +71,8 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
     const idx = STORY_MISSIONS.findIndex((m) => m.id === id);
     if (idx < 0) { toast('Unknown mission', id); return false; }
     if (G.runner.active) G.runner.abandon();
+    // fast-forwarding fires dozens of level-ups and unlock toasts: mute them, or stale LEVEL N banners queue for minutes
+    G.quiet = true;
     const S = G.sim.state, st = S.story;
     st.done = []; st.clues = []; st.reveals = []; st.flags = []; st.mission = STORY_MISSIONS[0].id;
     for (const m of STORY_MISSIONS.slice(0, idx)) { const fx = completeStory(st, m.id, {}); for (const d of fx?.unlocks || []) G.sim.unlockDistrict(d); }
@@ -77,6 +81,7 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
     setLevel(STORY_MISSIONS[idx].gate);
     if (STORY_MISSIONS[idx].gate >= 5 && !G.sim.ownedFrames().length) { G.sim.addCredits(G.sim.framePrice() || 1500, 'dev'); G.sim.buyFrame('brawler'); }
     setHeat(0);
+    G.quiet = false;
     G.sim.refreshBoard();
     G.acceptCard(`story_${id}`);
     toast(`Story: ${STORY_MISSIONS[idx].title}`, id.toUpperCase().replace('_', '-'));
@@ -150,8 +155,12 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
       ['+1,000 cr', () => G.sim.addCredits(1000, 'dev')], ['+10,000 cr', () => G.sim.addCredits(10000, 'dev')], ['+100,000 cr', () => G.sim.addCredits(100000, 'dev')],
       ['Own all frames', ownFrames], ['Fill parts', fillParts],
     ]);
-    section('Level', [5, 8, 10, 15, 20, 30].map((n) => [`L${n}`, () => setLevel(n), S?.player.level >= n ? 'on' : '']).concat([['+1', () => setLevel((G.sim.state.player.level || 1) + 1)]]));
+    section('Level', [5, 8, 10, 15, 20, 30].map((n) => [`L${n}`, () => { G.quiet = true; setLevel(n); G.quiet = false; }, S?.player.level >= n ? 'on' : '']).concat([['+1', () => setLevel((G.sim.state.player.level || 1) + 1)]]));
     section('Heat', [0, 1, 2, 3, 4, 5].map((n) => [`${n}★`, () => setHeat(n)]));
+    const dn = G.dayNight;
+    section(`Time of day · ${dn ? dn.clock() : '--:--'}`, [['Live', () => dn.setHour(null), dn?.override == null ? 'on' : '']]
+      .concat([6, 12, 18, 19.5, 21, 0].map((h) => [`${String(Math.floor(h)).padStart(2, '0')}:${h % 1 ? '30' : '00'}`, () => dn.setHour(h), dn?.override === h ? 'on' : '']))
+      .concat([['Rain auto', () => dn.setRain(null), dn?.rainOverride == null ? 'on' : ''], ['Rain on', () => dn.setRain(1), dn?.rainOverride === 1 ? 'on' : ''], ['Rain off', () => dn.setRain(0), dn?.rainOverride === 0 ? 'on' : '']]));
   }
 
   // ---- URL shortcut: ?dev=1&district=portside&mission=A2-M1 → straight into play -------------------------------------

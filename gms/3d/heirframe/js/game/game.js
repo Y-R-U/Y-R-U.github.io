@@ -23,9 +23,10 @@ import { createFrames } from './frames.js';
 import { setSupportedRobotKinds } from '../sim/enemies.js';
 import { createBoss } from './boss.js';
 import { createHeat } from './heat.js';
+import { createDayNight } from './daynight.js';
 
-export const RUN_ARCH = ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'tail', 'infiltrate', 'transport', 'defend', 'repo', 'race', 'assassinate', 'rescue'];
-export const RUN_TWISTS = ['T1', 'T2', 'T3', 'T4', 'T6', 'T7', 'T8', 'T9', 'T10'];
+export const RUN_ARCH = ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'tail', 'infiltrate', 'transport', 'defend', 'repo', 'race', 'assassinate', 'rescue', 'heist', 'wetwork'];
+export const RUN_TWISTS = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
 // Harmony PA pool: everything except the Renewal countdown lines, which play as milestones after contracts
 const PA_KEYS = () => (audio.voKeys?.() || []).filter((k) => k.startsWith('pa_') && !k.startsWith('pa_renewal_'));
 const UI_SFX = { click: 'ui_click', open: 'ui_open', close: 'ui_close', deny: 'ui_deny', confirm: 'ui_confirm', levelup: null, loot: null, loot_rare: null, toast: 'ui_hover', type: null };
@@ -353,6 +354,7 @@ export async function createGame(api) {
     else if ((n.id === 'home' || n.id === 'door') && n.to) G.districts.door(n);
     else if (n.id === 'passage') G.districts.passage(n);
     else if (n.id === 'rook') rookTalk();
+    else if (n.id === 'kettle' || n.id === 'halloran') informantTalk(n.id);
     else if (n.id === 'codex' || n.id === 'family_tree') ui?.panel.open('codex', toUiCodex(G.sim));
     else if (n.id === 'bed') sleepShift();
     else if (n.id === 'trophies') { const t = G.sim.state.stats; ui?.toast('Trophy shelf', 'gold', { sub: `${t.contractsDone} contracts · ${t.kills} kills · ${G.sim.state.story.clues.length} clues`, ms: 3200 }); }
@@ -374,6 +376,22 @@ export async function createGame(api) {
     else if (i === 1 && heat) { const r = G.sim.cleanSlate(); if (r.ok) { ui.toast('Heat wiped', 'good', { sub: 'Rook knows a man in the records office' }); audio.sfx('credits'); } else ui.toast('Not enough credits', 'warn'); }
   }
 
+  // Informants (P4): Kettle's tip turns the board over for free; Halloran's patrol routes drop your Heat by two stars.
+  // Each once per shift.
+  async function informantTalk(id) {
+    const S = G.sim.state, used = (S.flags.informant ||= {}), fresh = used[id] !== S.shiftIndex;
+    const K = id === 'kettle';
+    const who = K ? { speaker: 'Big Kettle', role: 'Silverhand Syndicate · informant', portrait: { kind: 'black', seed: 4 } } : { speaker: 'Warden-Captain Halloran', role: 'Concord security · informant', portrait: { kind: 'robot', seed: 6 } };
+    if (!fresh) { await ui?.dialogue.show({ ...who, text: K ? "Tap's dry, rental. Come back next shift." : 'You had your routes. Next shift.' }); return; }
+    const vo = K ? `b_kettle_tip_0${1 + (S.shiftIndex % 3)}` : `b_halloran_informant_0${1 + (S.shiftIndex % 2)}`;
+    const i = await ui?.dialogue.show({ ...who, voiceKey: vo, text: audio.voInfo(vo)?.text || '', choices: [K ? 'Take the tip (fresh board)' : 'Take the routes (−2★ Heat)', 'Not now.'] });
+    if (i !== 0) return;
+    used[id] = S.shiftIndex;
+    if (K) { G.sim.refreshBoard({ reroll: (S.board?.reroll || 0) + 1 }); ui?.toast("Kettle's tip", 'good', { sub: 'The board has turned over' }); }
+    else { S.factions.heat = Math.max(0, S.factions.heat - 2); G.sim.events.emit('heat', { stars: Math.ceil(S.factions.heat), changed: true }); if (S.factions.heat < 1) G.heat?.standDown?.(); ui?.toast('Patrol routes', 'good', { sub: 'Heat down two stars' }); }
+    audio.sfx('ui_confirm'); G.sim.save();
+  }
+
   // Pod 4471's bed: sleep through to the next shift (new board, new market)
   function sleepShift() {
     if (G.runner.active) { ui?.toast('Not with a contract open', 'warn'); return; }
@@ -393,6 +411,8 @@ export async function createGame(api) {
   // --- story: intro + kiosk -----------------------------------------------------------------------
   const story = createStoryPlayer({
     ui: ui || inertUi(), audio, overlay,
+    choice: (k) => G.sim?.state.contract?.choices?.[k] ?? G.sim?.state.story.choices[k],
+    onBeat: (b) => log(`beat ${b.vo || b.mode}${b.when ? ' ' + JSON.stringify(b.when) : ''}`),
     onFx: (f) => { if (f === 'billboards_face') harmonyFace('GOOD MORNING, HALCYON', 9); else if (f === 'billboards_glitch') harmonyFace('LITTLE STAR', 6); },
     onAction: async (a) => {
       if (a.discount && G.sim.grantFrameDiscount().ok) ui?.toast('Frame licence: 30% off', 'gold', { sub: `Your first frame for ${G.sim.framePrice()} cr at Sal's lot`, ms: 4000 });
@@ -404,7 +424,11 @@ export async function createGame(api) {
       if (a.tutorial === 'accept') ui?.toast('Pick a contract', 'info', { sub: 'the gold card is your story', ms: 3500 });
       if (a.marker) G.introMarker = true;
       if (a.openBoard) openContracts();
-      if (a.toast) ui?.toast(a.toast, 'story');
+      if (a.cull) world.ctx.stacks?.setCull?.(...a.cull);
+      if (a.halloran) await halloranScene(a.halloran);
+      if (a.harmonyIris) harmonyFace('HELLO, LITTLE STAR', 14);
+      if (a.joinJun) ui?.toast('Jun Okafor joins you', 'gold', { sub: 'Unlinked hacker · on comms from now on' });
+      if (a.toast) ui?.toast(a.toast, 'story', a.sub ? { sub: a.sub, ms: 4200 } : undefined);
     },
   });
   G.story = story;
@@ -448,6 +472,79 @@ export async function createGame(api) {
     await step(1000, (u) => { bot.root.position.y = gy + 20 * u * u; });
     world.scene.remove(bot.root); bot.dispose?.();
     player.actor.play('idle');
+    player.frozen = false;
+  }
+
+  // A4-M2: Warden-Captain Halloran and her squad at the Stack 9 cordon; she refuses the culling order and walks them out
+  async function halloranScene(what) {
+    const R = G.runner.active;
+    if (what === 'arrive') {
+      const s = R && G.runner.site(R.mission.steps[1]?.site) || { x: player.pos.x + 4, z: player.pos.z - 3 };
+      G.halloranSquad = [];
+      const make = (defId, name, dx, dz) => {
+        const q = G.nav.nearest(s.x + dx, s.z + dz) || { x: s.x + dx, z: s.z + dz };
+        const e = G.enemies.spawn({ defId, level: R?.mission.level || 28, name }, q.x, q.z, { yaw: Math.atan2(player.pos.x - q.x, player.pos.z - q.z) });
+        e.nonCombat = true; e.escort = true; e.state = 'idle'; e.bot.setAlert(0);
+        G.halloranSquad.push(e);
+        fx.beam(e.pos, 0x9fb8ff, 0.5, 5, 1);
+        return e;
+      };
+      make('halloran', 'Warden-Captain Halloran', 2, -2);
+      make('warden', 'Warden', -1, -3.5); make('warden', 'Warden', 4.5, -3); make('warden', 'Warden', 1, -5);
+      audio.sfx('contract_accept', { vol: 0.5 });
+      await wait(700);
+    } else if (what === 'leave') {
+      for (const e of G.halloranSquad || []) { fx.beam(e.pos, 0x9fb8ff, 0.5, 5, 1); }
+      G.enemies.clear((e) => (G.halloranSquad || []).includes(e));
+      G.halloranSquad = null;
+      ui?.toast('Halloran stood her squad down', 'story', { sub: 'She will remember this. So will Dray' });
+    }
+  }
+
+  // After-mission scenes: A4-M1 walks you home to Pod 4471; A4-M5 is the Breach (out through the airlock onto the hull)
+  async function afterScene(kind, id) {
+    if (kind === 'home') {
+      if (!await G.districts.travel('home', { via: 'door' })) return;
+      await story.run(id, 'home');
+    } else if (kind === 'breach') await breachScene(id);
+    G.sim.save();
+  }
+
+  // R5, the set piece: the airlock cycles, the camera climbs off the player's shoulder, turns past the hull's curve and
+  // settles on Verdance hanging enormous over the horizon. Reuses hullside's own sky, sun and fog (no extra cost).
+  async function breachScene(id) {
+    player.frozen = true;
+    if (!await G.districts.travel('hullside', { via: 'passage', spawn: 'airlock', reason: 'story', quiet: true })) { player.frozen = false; return; }
+    G.state = 'intro';
+    const p0 = player.pos.clone();
+    player.faceYaw?.(Math.PI, 0.1);
+    audio.sfx('power_down', { vol: 0.6 });
+    const cam = rig.fixed = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 42 };
+    ui?.hideHud(true);
+    const planet = new THREE.Vector3(0.8, 0.02, -0.4).normalize();
+    const T = 9000 / speedK, t0 = performance.now();
+    const ease = (u) => u * u * (3 - 2 * u);
+    let hulled = false;
+    await new Promise((res) => {
+      const tick = () => {
+        const u = Math.min(1, (performance.now() - t0) / T), e = ease(u);
+        // shoulder → up over the airlock roof on the far side from the planet, looking out at it
+        const o0x = 1.5, o0y = 2.0, o0z = -4.5, o1x = -11, o1y = 7.5, o1z = -7;
+        cam.pos.set(p0.x + o0x + (o1x - o0x) * e, p0.y + o0y + (o1y - o0y) * e, p0.z + o0z + (o1z - o0z) * e);
+        const lookFar = tmp.copy(planet).multiplyScalar(400).add(p0);
+        cam.look.set(p0.x, p0.y + 1.6, p0.z).lerp(lookFar, ease(Math.min(1, u * 1.4)));
+        cam.fov = 42 + e * 14;
+        if (!hulled && u > 0.45) { hulled = true; story.run(id, 'hull'); }
+        if (u < 1) requestAnimationFrame(tick); else res();
+      };
+      tick();
+    });
+    while (story.busy) await wait(200);
+    await wait(600);
+    rig.fixed = null;
+    G.state = 'free';
+    ui?.hideHud(false);
+    rig.target.copy(player.pos); rig.snap();
     player.frozen = false;
   }
 
@@ -495,7 +592,10 @@ export async function createGame(api) {
     if (out.clue) { const cl = CLUES.find((c) => c.id === out.clue); if (cl?.source === 'echo') ui?.sting('Echo found', cl.name, 'story', 3200); else ui?.toast('Codex updated', 'story', { sub: cl?.name || out.clue }); }
     if (out.mission.story?.id === 'a1_m1') ui?.sting('The board is yours', 'Random contracts unlocked', 'unlock', 3000);
     if (out.mission.story?.id === 'a1_m5') setTimeout(() => ui?.sting('Act 1 complete', 'Act 2 · HARMONY THROUGH UNITY · find Abel Fenn in the Terraces', 'story', 4600), 600);
-    if (out.mission.story?.id === 'a2_m5') setTimeout(() => ui?.sting('Act 2 complete', 'HARMONY THROUGH UNITY · Act 3 arrives in the next update', 'story', 4600), 600);
+    if (out.mission.story?.id === 'a2_m5') setTimeout(() => ui?.sting('Act 2 complete', 'Act 3 · LITTLE STAR · Kettle has a tip about the docks', 'story', 4600), 600);
+    if (out.mission.story?.id === 'a3_m5') setTimeout(() => ui?.sting('Act 3 complete', 'Act 4 · THE SKY IS A SCREEN · go home, to the Stacks', 'story', 4600), 600);
+    if (out.mission.story?.after) await afterScene(out.mission.story.after, out.mission.story.id);
+    if (out.mission.story?.id === 'a4_m5') setTimeout(() => ui?.sting('Act 4 complete', 'THE SKY IS A SCREEN · Act 5 arrives in the next update', 'story', 4600), 600);
     const days = G.sim.state.story.renewalDays;
     if (!out.mission.story && days % 10 === 0 && audio.hasVo(`pa_renewal_${days}`)) setTimeout(() => audio.bark([`pa_renewal_${days}`], { force: true }), 5000);
     if (out.stiffed) ui?.toast('Stiffed!', 'bad', { sub: 'The client won\'t pay. A Collect bounty is on the board' });
@@ -503,7 +603,7 @@ export async function createGame(api) {
   }
   function onFail(m, reason) {
     log(`failed ${m?.id} ${reason}`);
-    ui?.toast(`Contract failed: ${m?.title || ''}`, 'bad', { sub: reason === 'timeout' ? 'Out of time' : reason === 'alarm' ? 'Alarm raised' : reason === 'wrecked' ? 'Frame wrecked' : '' });
+    ui?.toast(`Contract failed: ${m?.title || ''}`, 'bad', { sub: reason === 'timeout' ? 'Out of time' : reason === 'alarm' ? 'Alarm raised' : reason === 'wrecked' ? 'Frame wrecked' : reason === 'bribe' ? 'You took the bribe: 80% paid, the client won\'t forget' : '' });
     audio.sting('lose');
     audio.bark('b_mara_fail_', { cooldown: 5 });
   }
@@ -548,7 +648,9 @@ export async function createGame(api) {
         if (b.kind === 'vending' && Math.random() < 0.15 && sim.grantConsumable('repairKit').ok) ui?.toast('The machine coughs up a repair kit', 'good', { ms: 1800 });
       },   // the 1★ tail Eye only watches (DESIGN §11.2)
       onBoss: (on) => { G.bossOn = on; setMusic(on ? 'boss' : 'combat'); },
+      detectMult: () => G.dayNight?.detectMult() ?? 1,
     };
+    G.dayNight = createDayNight(G, { world, audio, SHIFT_SECONDS });
     G.props = ctx.props = createProps(ctx);
     G.enemies = ctx.enemies = createEnemies(ctx);
     G.combat = ctx.combat = createCombat(ctx);
@@ -569,13 +671,13 @@ export async function createGame(api) {
     ctx.hud = G.hud;
     ctx.goalOverride = () => nextGoal(sim);
     G.coach = ui ? createCoach(G, { ui, rig, player }) : null;
-    sim.storyActCap = 2;   // Acts 1–2 are staged (P3g); Act 3 cards stay hidden
-    // archetypes/twists the runner implements (P3: all 16 non-heist ones); heist, wetwork and the choice twists are P4
+    sim.storyActCap = 4;   // Acts 1–4 are staged (P4); Act 5 cards stay hidden
+    // archetypes/twists the runner implements: all 18 and every twist (P4 added heist, wetwork, T5/T11/T12)
     sim.setScope({ archetypes: RUN_ARCH, twists: RUN_TWISTS });
     if (sim.state.board && !sim.state.contract && sim.state.board.cards.some((c) => !RUN_ARCH.includes(c.archetype))) sim.refreshBoard();
     ctx.bossLine = (key, speaker) => story.bark({ speaker, vo: key });
-    sim.on('levelUp', (p) => { ui?.sting(`Level ${p.level}`, (p.features || []).map((f) => f.desc || f.name || f.id).join(' · ') || 'Frame systems upgraded', 'level', 3000); audio.sfx('levelup'); audio.bark('b_hira_levelup_', { cooldown: 10 }); log('level ' + p.level); });
-    sim.on('toast', (p) => ui?.toast(p.text, p.kind || 'info'));
+    sim.on('levelUp', (p) => { if (G.quiet) { log('level ' + p.level); return; } ui?.sting(`Level ${p.level}`, (p.features || []).map((f) => f.desc || f.name || f.id).join(' · ') || 'Frame systems upgraded', 'level', 3000); audio.sfx('levelup'); audio.bark('b_hira_levelup_', { cooldown: 10 }); log('level ' + p.level); });
+    sim.on('toast', (p) => { if (!G.quiet) ui?.toast(p.text, p.kind || 'info'); });
     sim.on('rental:fee', (p) => { ui?.toast(`HireFrame shift fee −${p.fee} cr`, 'warn', { sub: p.debt ? `Balance owed: ${p.debt} cr` : 'Rent by the hour!' }); audio.bark('b_hira_fee_', { cooldown: 30 }); log('shift fee ' + p.fee); });
     sim.on('playerDown', () => playerDown('damage over time'));
     sim.on('clue', (p) => log('clue ' + p.id));
@@ -607,7 +709,7 @@ export async function createGame(api) {
     if (devMod) { G.dev = devMod.createDev(G, { world, ui, player, rig, audio, api, createSim, loadGame, store, sites, startSession, Q }); if (await G.dev.autostart()) { setMusic('explore'); return; } }
     if (!ui) { startSession(createSim({ seed: Q.get('seed') || 1, store, sites })); G.state = 'free'; return; }
     const hasSave = store.has() && !Q.has('fresh');
-    const act = await ui.screen('title', { hasSave, version: 'P3 · Harmony Through Unity' });
+    const act = await ui.screen('title', { hasSave, version: 'P4 · The Sky Is a Screen' });
     audio.unlock();
     log('title: ' + act);
     let sim = null;
@@ -660,6 +762,7 @@ export async function createGame(api) {
     player.speedMult = (pc.stats.moveSpeed / 4.2) * statusMult(pc, 'moveMult') * (G.carrying === 'case' ? 0.9 : 1) * (W.magBoots ? 0.88 : 1);
     const canMove = G.state === 'free' && !panelOpen() && !ui?.dialogue.open && !overlay.cardOpen && !G.frames.busy;
     G.frames.update(dt);
+    G.dayNight.update(dt);
     if (kitCd > 0) kitCd -= dt;
     ui?.skills.kit(sim.state.consumables.repairKit || 0, { cooling: kitCd > 0 });
     let hs = 1;

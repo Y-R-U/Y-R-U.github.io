@@ -24,6 +24,7 @@ import { LIVE_ROBOTS } from '../actors/robots.js';
 import { BRIGHTLINE } from './brightline.js';
 import { createRelayFx } from '../fx/relay.js';
 import { createBreakables } from './breakables.js';
+import { createRain } from './rain.js';
 import { bakeCrowdAtlas, createFarCrowdMaterial, addFarCrowd } from './farcrowd.js';
 import { TERRACES } from './verdant.js';
 import { ARCOLOGY, ARCOLOGY_SERVERS } from './nexus.js';
@@ -187,6 +188,28 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
     sky.visible = !inside; skyShadows.mesh.visible = !inside; motes.visible = !inside;
     scene.background = inside ? new THREE.Color(a.background ?? 0x05070a) : null;
     scene.environment = D?.ctx.env || skyEnv;
+    baseExp = renderer.toneMappingExposure;
+    applySky();
+  }
+  // P4 time of day + scheduled rain over the district's own light (open-sky districts only; interiors and space ignore it)
+  const tod = { night: 0, rain: 0 };
+  let baseExp = 0.85;
+  const rain = createRain(time, { count: tier.name === 'low' ? 700 : 1800 });
+  scene.add(rain.mesh);
+  const MOON = new THREE.Color(0.5, 0.62, 1.0), NIGHT_FOG = new THREE.Color(0.035, 0.05, 0.1), RAIN_FOG = new THREE.Color(0.42, 0.45, 0.5), NIGHT_HEMI = new THREE.Color(0.22, 0.3, 0.55);
+  function applySky() {
+    const a = D?.def.ambience;
+    if (!a) return;
+    const open = !a.interior, n = open ? tod.night : 0, r = open ? tod.rain : 0;
+    sun.color.setRGB(...a.sun).lerp(MOON, n); sun.intensity = a.sunI * (1 - 0.8 * n) * (1 - 0.5 * r);
+    if ('intensity' in sun.shadow) sun.shadow.intensity = 1 - 0.45 * n - 0.35 * r * (1 - n);
+    hemi.color.set(a.hemiSky).lerp(NIGHT_HEMI, n); hemi.intensity = a.hemiI * (1 - 0.2 * n);
+    scene.fog.color.setRGB(...a.fog).lerp(RAIN_FOG, r * 0.6).lerp(NIGHT_FOG, n); scene.fog.density = a.fogDensity * (1 + 2.5 * r) * (1 + 0.6 * n);
+    scene.environmentIntensity = a.env * (1 - 0.65 * n) * (1 - 0.25 * r);
+    post.grade.uniforms.uSat.value = a.sat * (1 - 0.12 * r);
+    sky.material.uniforms.uNight.value = n; sky.material.uniforms.uRain.value = r;
+    if (!expQ) renderer.toneMappingExposure = baseExp * (1 + 0.2 * n);
+    rain.set(r);
   }
   function disposeDistrict(d) {
     scene.remove(d.group);
@@ -259,6 +282,12 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
   const world = {
     renderer, scene, camera, sun, hemi, post, reflection, tier, time, collision: col,
     get ctx() { return D.ctx; },
+    // night 0..1, rain 0..1 (cheap: light/fog/sky uniforms only; the env map is dimmed, not rebuilt)
+    setSky({ night = tod.night, rain: rn = tod.rain } = {}) {
+      if (Math.abs(night - tod.night) < 0.002 && Math.abs(rn - tod.rain) < 0.002) return;
+      tod.night = night; tod.rain = rn; applySky();
+    },
+    get sky() { return { ...tod, open: !D.def.ambience.interior }; },
     districts: DISTRICT_IDS,
     districtList: () => DISTRICT_LIST.map((d) => ({ ...d })),
     district: null, sites: null, billboards: null, spawnPoints: null, interactables: null, breakables: null,
@@ -328,6 +357,7 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
         sun.target.updateMatrixWorld();
       } else sun.position.copy(sunDir).multiplyScalar(90);
       motes.material.uniforms.uCenter.value.copy(world.focus);
+      if (rain.mesh.visible) rain.set(tod.rain * (D.def.ambience.interior ? 0 : 1), camera.position);
       // soft contact disks under the robots nearest the focus
       if (ctx.groundAO) {
         near.length = 0;
