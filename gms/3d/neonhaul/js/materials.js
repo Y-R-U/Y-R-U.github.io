@@ -48,6 +48,10 @@ export const U = {
   // uP11 is a MASTER SWITCH, 1 or 0, and it exists so a gate can measure the pass against itself
   // rather than against a screenshot from yesterday. Every term below is multiplied by it.
   uP11: { value: 1 },
+  uFacade: { value: new THREE.Vector2(1, 1) }, // dielectric/depth, actual-source spill
+  uFacadeVisible: { value: new THREE.Vector2(1, 1) }, // signs, strips isolation
+  uFacadeSources: { value: null },
+  uFacadeRows: { value: 2048 },
   // §2 — "emissives light nothing" (six of six round-6 critics). The wall between the panes
   // catches the light of the panes; the lower floors catch the street.
   uSpill: { value: 0.030 },
@@ -117,6 +121,17 @@ attribute vec3 iEmissive2;
 attribute vec4 iZone;
 attribute float iSeed;
 attribute float aFace;
+attribute float iReceiver;
+uniform vec2 uFacadeCam;
+uniform float uFacadeR0;
+uniform float uFacadeHard;
+#ifndef NEONHAUL_CHUNK_ATTRIBUTE
+#define NEONHAUL_CHUNK_ATTRIBUTE
+attribute vec2 iChunk;
+#endif
+varying highp float vReceiver;
+varying float vSourceRamp;
+varying vec3 vFacadeNormal;
 varying highp vec2 vTileUv;   // = uv * iUvScale, unbounded; mediump visibly quantises at ~6
 varying vec2 vCellUv;
 varying vec3 vEmissive;
@@ -128,6 +143,14 @@ varying float vKey;
 `;
 
 const WINDOW_FRAG_DECL = /* glsl */`
+varying highp float vReceiver;
+varying float vSourceRamp;
+varying vec3 vFacadeNormal;
+uniform vec2 uFacade;
+uniform vec2 uFacadeVisible;
+uniform sampler2D uFacadeSources;
+uniform float uFacadeRows;
+
 varying highp vec2 vTileUv;
 varying vec2 vCellUv;
 varying vec3 vEmissive;
@@ -247,16 +270,71 @@ const WINDOW_FRAG_BODY = /* glsl */`
   float bay     = floor( vTileUv.x * uGrid.x / uBay.x );
   float bhash   = fract( sin( bay * 37.719 + vSeed * 5.31 ) * 4517.19 );
   float glassy  = step( uBay.y, bhash ) * notRoof * uP11;
-  roughnessFactor = mix( roughnessFactor, mix( 0.55, 0.13, glassy ), notRoof * uP11 );
-  metalnessFactor = mix( metalnessFactor, mix( 0.58, 0.94, glassy ), notRoof * uP11 );
+  // Near-black metal gives glass a near-zero F0. Dielectric glazing reflects
+  // the environment without raising its base colour; cladding stays rough.
+  float paneGlass = mix( glassy, max( glassy, smoothstep( 0.025, 0.20, pane ) ), uFacade.x );
+  roughnessFactor = mix( roughnessFactor, mix( mix(0.55, 0.68, uFacade.x), mix(0.13, 0.11, uFacade.x), paneGlass ), notRoof * uP11 );
+  metalnessFactor = mix( metalnessFactor, mix( mix(0.58, 0.24, uFacade.x), mix(0.94, 0.03, uFacade.x), paneGlass ), notRoof * uP11 );
   float rule  = min( smoothstep( 0.0, 0.11, pf.y ), smoothstep( 0.0, 0.10, pf.x ) );
   float grime = 1.0 - 0.30 * exp( -max( wy, 0.0 ) * 0.011 );
   diffuseColor.rgb *= mix( 1.0, mix( 0.40, 1.0, rule ) * grime * mix( 1.10, 0.90, glassy ), notRoof * uP11 ) * faceK;
 
+  // Pane-local ceiling shadow, recessed side jamb and a warm lower sill.
+  // fwidth fades detail once an entire pane is below a couple of pixels.
+  vec2 pAA = max( fwidth( vTileUv * uGrid ), vec2( 0.0001 ) );
+  float paneDetail = uFacade.x * uP11 * ( 1.0 - smoothstep( 0.12, 0.65, max( pAA.x, pAA.y ) ) );
+  float ceiling = smoothstep( 0.57 - pAA.y, 0.85 + pAA.y, pf.y );
+  float recess = 1.0 - smoothstep( 0.20 - pAA.x, 0.34 + pAA.x, pf.x );
+  win *= mix( 1.0, ( 1.0 - 0.43 * ceiling ) * ( 1.0 - 0.22 * recess )
+    * ( 0.90 + 0.18 * ( 1.0 - pf.y ) ), paneDetail );
+  float sill = ( 1.0 - smoothstep( 0.0, 0.07 + pAA.y, abs( pf.y - 0.21 ) ) )
+    * smoothstep( 0.20 - pAA.x, 0.29 + pAA.x, pf.x )
+    * ( 1.0 - smoothstep( 0.71 - pAA.x, 0.80 + pAA.x, pf.x ) );
+  spandrel += tnt * pane * sill * paneDetail * 0.035 * faceK;
+
+  vec3 sourceSpill = vec3( 0.0 );
+  if ( uFacade.y * uP11 > 0.0 && vReceiver > 0.5 && notRoof > 0.5 ) {
+    // Four source records on THIS building, never a city-wide source loop.
+    for ( int source = 0; source < 4; source++ ) {
+      float row = ( vReceiver + 0.5 ) / uFacadeRows;
+      float col = float(source) * 4.0;
+      vec4 c = texture2D( uFacadeSources, vec2((col + 0.5) / 16.0, row) );
+      if ( c.w > 0.0 ) {
+        vec4 n = texture2D( uFacadeSources, vec2((col + 1.5) / 16.0, row) );
+        vec3 wallN = vec3( n.x, 0.0, n.y );
+        vec3 delta = vWorldPosition - c.xyz;
+        // The same host descriptor is not enough: stepped masses and opposite
+        // faces must reject both wrong plane and wrong outward normal.
+        if ( dot( vFacadeNormal, wallN ) > 0.98 && abs( dot( delta, wallN ) ) < 0.15 ) {
+          vec4 bounds = texture2D( uFacadeSources, vec2((col + 3.5) / 16.0, row) );
+          float tangent = n.x != 0.0 ? vWorldPosition.z : vWorldPosition.x;
+          if ( tangent >= bounds.x && tangent <= bounds.y && wy >= bounds.z && wy <= bounds.w ) {
+            vec4 rgb = texture2D( uFacadeSources, vec2((col + 2.5) / 16.0, row) );
+            float type = floor( rgb.w );
+            float visible = type < 1.5 ? uFacadeVisible.x : uFacadeVisible.y;
+            float seed = fract( rgb.w ) * 1024.0;
+            float k = type < 1.5 ? 1.0 : 1.0 - 0.06 * sin(uTime * (0.4 + fract(seed * 0.77)) + seed);
+            if ( type < 1.5 ) {
+              float h1 = fract( seed * 0.7351 );
+              float h2 = fract( seed * 3.1719 );
+              float rate = 0.2 + 1.8 * fract( seed * 1.3137 );
+              k *= mix(1.0, 1.0 - step(fract(uTime * rate + h2), 0.04 * rate), step(h1, 0.15));
+              k *= mix(1.0, 1.0 + 0.25 * sin(uTime * (0.6 + h2 * 0.9) + h2 * 6.2832), step(0.15, h1) * (1.0 - step(0.25, h1)));
+            }
+            vec2 outside = max( abs( vec2( dot(delta, vec3(n.y,0.0,-n.x)), delta.y ) ) - n.zw, 0.0 );
+            float falloff = pow( 1.0 - smoothstep( 0.0, c.w, length( outside ) ), 2.0 );
+            sourceSpill += rgb.rgb * falloff * visible * k;
+          }
+        }
+      }
+    }
+    sourceSpill *= uFacade.y * uP11 * vSourceRamp * uNeon;
+  }
+
   // A roof is a plant deck, not a wall of windows. Flying over a city whose rooftops are lit
   // window grids is the single loudest tell that the buildings are texture-mapped boxes.
   totalEmissiveRadiance = mix( tnt * win * uNeon * flick + ( spill + spandrel ) * uNeon, tnt * 0.014 * uNeon, vRoof )
-                        + street * uNeon;
+                        + street * uNeon + sourceSpill;
 #endif
 `;
 
@@ -274,6 +352,13 @@ export function patchWindows(mat, atlas) {
     shader.uniforms.uStreetCol = U.uStreetCol;
     shader.uniforms.uStreetK = U.uStreetK;
     shader.uniforms.uBay = U.uBay;
+    shader.uniforms.uFacade = U.uFacade;
+    shader.uniforms.uFacadeVisible = U.uFacadeVisible;
+    shader.uniforms.uFacadeSources = U.uFacadeSources;
+    shader.uniforms.uFacadeRows = U.uFacadeRows;
+    shader.uniforms.uFacadeCam = U.uCamXZ;
+    shader.uniforms.uFacadeR0 = U.uR0;
+    shader.uniforms.uFacadeHard = U.uSignHard;
     shader.vertexShader = patch(shader.vertexShader, '#include <common>',
       '#include <common>' + WINDOW_VERT_DECL, 'windows/vert-decl');
     shader.vertexShader = patch(shader.vertexShader, '#include <begin_vertex>',
@@ -296,7 +381,11 @@ export function patchWindows(mat, atlas) {
       + '  vTileUv = vec2( uv.x * mix( iUvScale.x, iUvScale.z, fZ ), uv.y * iUvScale.y );\n'
       + '  vCellUv = iUvOffset;\n'
       + '  vEmissive = iEmissive;\n  vEmissive2 = iEmissive2;\n  vZone = iZone;\n'
-      + '  vSeed = iSeed;', 'windows/vert-body');
+      + '  vSeed = iSeed;\n'
+      + '  vReceiver = iReceiver;\n'
+      + '  vFacadeNormal = normalize( objectNormal / max( iUvScale, vec3(0.001) ) );\n'
+      + '  float sourceD = distance( uFacadeCam, iChunk );\n'
+      + '  vSourceRamp = mix( 1.0 - smoothstep(0.85 * uFacadeR0, uFacadeR0, sourceD), 1.0 - step(uFacadeR0, sourceD), uFacadeHard );', 'windows/vert-body');
     shader.fragmentShader = patch(shader.fragmentShader, '#include <common>',
       '#include <common>' + WINDOW_FRAG_DECL, 'windows/frag-decl');
     shader.fragmentShader = patch(shader.fragmentShader, '#include <emissivemap_fragment>',
@@ -421,7 +510,11 @@ export function patchGlass(mat, tint = 0x2a3a4c, amount = 1.0) {
 // pixels in both fields and doubles the city instead of cross-fading it.
 
 const FADE_VERT_DECL = /* glsl */`
+#ifndef NEONHAUL_CHUNK_ATTRIBUTE
+#define NEONHAUL_CHUNK_ATTRIBUTE
 attribute vec2 iChunk;
+#endif
+
 uniform vec2 uCamXZ;
 uniform float uR0;
 uniform float uFadeHard;

@@ -20,6 +20,7 @@ import * as THREE from 'three';
 import { CHUNK, FAR_CHUNK, PROTO_IDS } from './city.js';
 import { buildPrototypes, buildLodBox, PROTO_TRAITS } from './blocks.js';
 import { shellMaterial, farMaterial, uvScale3, U } from './materials.js';
+import { FacadeSources, FACADE_SOURCE_CAP } from './facade_sources.js';
 import { COLS_PER_CELL, ROWS_PER_CELL, GRID, cellOffset } from './atlas.js';
 
 // Sized from the HIGH preset unconditionally, so `__game.setQuality('high')` after a downgrade
@@ -40,7 +41,8 @@ const SHELL_ATTRS = [
   // four reads. Seven floats on ~4,000 live instances is 112 KB of typed array and zero draws;
   // this is instance data, not geometry, which is the constraint ART_PASS sets on the whole pass.
   { name: 'iEmissive2', size: 3 },
-  { name: 'iZone', size: 4 },        // (split, band0, band1, crown) in metres above y = 0
+  { name: 'iZone', size: 4 }, // (split, band0, band1, crown), world metres
+  { name: 'iReceiver', size: 1 }, // final (16th) vertex attribute slot on WebGL2
 ];
 
 // ── one instanced field ────────────────────────────────────────────────────
@@ -142,6 +144,9 @@ export class CityRenderer {
     this.group.matrixAutoUpdate = false;
     scene.add(this.group);
 
+    this.facadeSources = new FacadeSources();
+    U.uFacadeSources.value = this.facadeSources.texture;
+    U.uFacadeRows.value = FACADE_SOURCE_CAP;
     this.matL0 = shellMaterial(atlas, sky.env, 'lod0');
     this.matL1 = shellMaterial(atlas, sky.env, 'lod1');
     this.matL2 = farMaterial();
@@ -217,6 +222,7 @@ export class CityRenderer {
   attachSignage(sig) {
     while (this.sgDying.length) this.drainDying();
     this.signage = sig;
+    sig.facadeSources = this.facadeSources;
     for (const rec of this.live.values()) { this.signage.release(rec); rec.stage = Math.min(rec.stage, 2); }
     this.ccx = NaN;
     return sig;
@@ -275,6 +281,7 @@ export class CityRenderer {
     this.lod1.flush();
     this.lod2.flush();
     this.signage?.flush();
+    this.facadeSources.flush();
     return this.msGen;
   }
 
@@ -356,6 +363,7 @@ export class CityRenderer {
     rec.l0f.length = 0; rec.l0s.length = 0;
     rec.aabbs = null;
     this.signage?.release(rec);
+    for (const b of rec.desc?.buildings || []) this.facadeSources.release(b);
     // An evicted chunk is gone from `live` and its LOD1 slots go with it.
     if (this.live.get(rec.key) !== rec) {
       for (let i = rec.l1s.length - 1; i >= 0; i--) this.lod1.free(rec.l1s[i]);
@@ -509,6 +517,7 @@ export class CityRenderer {
     this.lod1.flush();
     this.lod2.flush();
     this.signage?.flush();
+    this.facadeSources.flush();
     return +(performance.now() - t0).toFixed(2);
   }
 
@@ -584,6 +593,7 @@ export class CityRenderer {
       b.band1 === undefined ? 0 : b.band1,
       b.crown === undefined ? 1e6 : b.crown);
 
+    f.set('iReceiver', slot, f === this.lod1 ? 0 : this.facadeSources.alloc(b));
     f.set('iSeed', slot, b.seed);
     f.set('iChunk', slot, ccx, ccz);
     f.touch(slot);
@@ -719,6 +729,7 @@ export class CityRenderer {
 
   dispose() {
     this.signage?.dispose();
+    this.facadeSources.dispose();
     for (const f of this.lod0) f.dispose();
     this.lod1.dispose(); this.lod2.dispose();
     this.matL0.dispose(); this.matL1.dispose(); this.matL2.dispose();

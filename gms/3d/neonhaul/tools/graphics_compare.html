@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neonhaul graphics comparison</title>
+<style>
+  :root { color-scheme: dark; font: 16px system-ui,sans-serif; background:#071019; color:#e1edf3; }
+  body { margin:0 auto; max-width:1400px; padding:20px; }
+  h1 { font-size:22px; margin:0 0 10px; }
+  p { color:#9fb4c1; line-height:1.5; }
+  .controls { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin:18px 0; }
+  select,button { font:inherit; min-height:44px; padding:8px 12px; background:#122430; color:#e1edf3; border:1px solid #345361; border-radius:8px; }
+  label { display:flex; align-items:center; gap:8px; }
+  .stage { position:relative; border:1px solid #345361; background:#03080c; overflow:hidden; min-height:180px; }
+  .stage img { display:block; width:100%; height:auto; }
+  #upgrade { position:absolute; inset:0; height:100%; object-fit:contain; clip-path:inset(0 0 0 50%); }
+  #divider { position:absolute; inset:0 auto 0 50%; width:2px; background:#79e6ff; pointer-events:none; }
+  .badge { position:absolute; top:10px; padding:6px 9px; border-radius:6px; background:#031018da; font-size:13px; }
+  #beforeLabel { left:10px; } #afterLabel { right:10px; }
+  input[type=range] { width:100%; min-height:44px; accent-color:#79e6ff; }
+  .links { display:flex; gap:20px; flex-wrap:wrap; } a { color:#79e6ff; }
+  #status { min-height:24px; font-size:14px; }
+  @media(max-width:450px) { body { padding:12px; } .controls label { flex:1 1 100%; } select { flex:1; } }
+</style>
+<h1>Neonhaul — before / after</h1>
+<p>Slide to compare the same camera, clock, quality and screen size. The left side is the original; the right side is the upgrade.</p>
+<div class="controls">
+  <label>Scene <select id="scene">
+    <option value="fog_city">Rainy skyline</option><option value="canyon_dive">Tower canyon</option>
+    <option value="hero_craft">Craft reflections</option><option value="wet_street">Wet street</option>
+    <option value="cockpit">Cockpit</option><option value="day_smog">Daytime smog</option>
+  </select></label>
+  <label>Upgrade <select id="phase"><option value="after">Final</option><option value="g1">Facade pass</option></select></label>
+  <label>View <select id="view"><option value="">High / authored camera</option><option value="-low">Low quality</option><option value="-portrait">390px portrait</option></select></label>
+  <button id="reset" type="button">50 / 50</button>
+</div>
+<div class="stage">
+  <img id="original" alt="Original Neonhaul scene">
+  <img id="upgrade" alt="Upgraded Neonhaul scene">
+  <div id="divider"></div><span class="badge" id="beforeLabel">Original</span><span class="badge" id="afterLabel">Upgrade</span>
+</div>
+<label for="split">Comparison position</label><input id="split" aria-label="Before after comparison position" type="range" min="0" max="100" value="50">
+<p id="status" aria-live="polite"></p>
+<div class="links"><a id="originalLink" target="_blank" rel="noopener">Open original</a><a id="upgradeLink" target="_blank" rel="noopener">Open upgrade</a><a href="../index.html" target="_blank" rel="noopener">Play local game</a></div>
+<script>
+  const scene=document.querySelector('#scene'),phase=document.querySelector('#phase'),view=document.querySelector('#view');
+  const original=document.querySelector('#original'),upgrade=document.querySelector('#upgrade'),split=document.querySelector('#split'),status=document.querySelector('#status');
+  let generation=0;
+  function update(){
+    const current=++generation;status.textContent='Loading captures…';
+    const name=scene.value+view.value+'.png';
+    original.src='../shots/graphics-upgrade/baseline/'+name;
+    upgrade.src='../shots/graphics-upgrade/'+phase.value+'/'+name;
+    document.querySelector('#originalLink').href=original.src;
+    document.querySelector('#upgradeLink').href=upgrade.src;
+    Promise.all([original.decode(),upgrade.decode()]).then(()=>{
+      if(current!==generation)return;
+      status.textContent=original.naturalWidth===upgrade.naturalWidth&&original.naturalHeight===upgrade.naturalHeight?'Matched '+original.naturalWidth+' × '+original.naturalHeight+' captures.':'Capture dimensions differ; this pair needs to be recaptured.';
+    }).catch(()=>{if(current===generation)status.textContent='This capture is not available yet. Choose another upgrade or view.';});
+  }
+  function move(){upgrade.style.clipPath='inset(0 0 0 '+split.value+'%)';document.querySelector('#divider').style.left=split.value+'%';}
+  for(const el of [scene,phase,view])el.addEventListener('change',update);
+  split.addEventListener('input',move);document.querySelector('#reset').onclick=()=>{split.value=50;move();};
+  update();
+</script>
+</html>

@@ -5,6 +5,16 @@ first, then `DECISIONS.md` (all of it, including Tracked obligations), then `MAN
 then `ART_PASS.md`.** `BUILD_PLAN.md` is 218 KB — never read it whole; each phase brief names its
 own sections.
 
+## Graphics upgrade — 2026-10-01 (complete locally)
+
+Completed manager-led visual reviews against the original prompt and current Heirframe,
+followed by selected upgrades implemented by sub-agents. **Current assignments, progress, evidence,
+and the usage-limit resume checklist are in `GRAPHICS_UPGRADE_STATE.md` — read that next.**
+The exact original prompt was recovered into `GRAPHICS_ORIGINAL_GOALS.md`; the fresh visual review
+is `GRAPHICS_REVIEW.md`. Run one sub-agent at a time to conserve the five-hour usage window.
+Both selected facade/reflection phases are accepted; targeted checks and final review passed.
+Commit/push was authorized on 2026-10-01; publication evidence is in local shots/graphics-upgrade/release.json. Preserve unrelated working-tree edits.
+
 Last updated: 2026-08-25, after **§S2-R**. Read the S2-R section immediately below first. Read the P11 section first, then P7b, then the integration section.
 
 ## §S2-R (2026-08-25) — the obsidian deck, and traffic that knows the city is there

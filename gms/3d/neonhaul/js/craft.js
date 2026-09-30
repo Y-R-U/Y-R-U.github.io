@@ -740,7 +740,7 @@ const BODY_VERT_BODY = /* glsl */`
 //
 // A real probe is a second scene render and is not happening on a phone. So the city is
 // RECONSTRUCTED from the reflection direction: vertical slabs of window light around the horizon,
-// a rarer saturated sign among them, warm sodium below. Cost is about thirty ALU on the few
+// a rarer saturated sign among them, warm sodium below. Bounded arithmetic on the few
 // hundred pixels a craft covers — no texture fetch, no render target, no draw call, and it is a
 // uniform away from zero on a weak phone.
 //
@@ -765,14 +765,27 @@ vec3 cityRefl( vec3 d, vec2 wp ) {
   float band = exp( -el * el * 44.0 ) * step( -0.30, el );
   // Window rows inside the slab. Deliberately low contrast: the reflection direction sweeps fast
   // across a curved hull, and a high-contrast row pattern turns into a moire the moment it does.
-  float rows = 0.72 + 0.28 * sin( el * 46.0 + h * 30.0 );
+  float phase = el * 27.0 + h * 13.0;
+  float aa = max( fwidth( phase ), 0.035 );
+  float rows = 0.12 + 0.88 * ( 1.0 - smoothstep( 0.16, 0.16 + aa, abs( fract( phase ) - 0.5 ) ) );
+  // Each reflected tower has an unequal top/bottom, rather than an unbroken
+  // glow band across the whole canopy. Derivatives soften minified rows.
+  band *= 1.0 - smoothstep( 0.09 + h2 * 0.12, 0.13 + h2 * 0.12, abs( el + 0.04 - h * 0.06 ) );
   vec3 col = mix( vec3( 1.00, 0.62, 0.26 ), vec3( 0.36, 0.72, 1.00 ), h2 );
   // The rarer, brighter, saturated one — a sign rather than a window grid. This is the term that
   // actually reads as a reflection when it slides across the crown.
-  float sgn = step( 0.86, h ) * smoothstep( 0.30, 0.10, abs( f - 0.5 ) ) * exp( -el * el * 90.0 );
+  float sgn = step( 0.86, h ) * ( 1.0 - smoothstep( 0.055, 0.095, abs( f - 0.42 ) ) )
+    * ( 1.0 - smoothstep( 0.07, 0.10, abs( el + 0.025 - h2 * 0.11 ) ) );
   vec3 sgnCol = mix( vec3( 1.0, 0.14, 0.52 ), vec3( 0.20, 0.95, 1.0 ), fract( h * 53.7 ) );
   float street = smoothstep( -0.10, -0.55, el );
+  // Tall towers also occupy the upward reflection of the crown/canopy. The
+  // old horizon-only band left those panels reflecting a smooth empty sky.
+  // Sparse angular windows, with unequal tower tops, keep these broken and
+  // view-dependent; they are not a broad neon wash over the glass.
+  float tall = slab * smoothstep( 0.03, 0.09, el )
+    * ( 1.0 - smoothstep( 0.30 + h2 * 0.46, 0.35 + h2 * 0.46, el ) );
   return col * ( slab * band * rows ) + sgnCol * ( sgn * uCity.z )
+    + mix( vec3( 0.66, 0.58, 0.42 ), vec3( 0.42, 0.62, 0.72 ), h2 ) * ( tall * rows * 0.65 )
     + vec3( 1.0, 0.55, 0.22 ) * ( street * 0.09 );
 }
 `;
@@ -819,10 +832,8 @@ const BODY_ROUGH_BODY = /* glsl */`
 const BODY_FRAG_BODY = /* glsl */`
   // A HARD specular break, which is the single thing every round-6 critic named as the reason the
   // hull read as "a matte vinyl decal" rather than lacquered metal: "it needs a narrow, near-clipped
-  // highlight running the length of the dorsal crown". The envMap cannot supply one — our env is a
-  // smooth sky bake, so any roughness gives a smooth WASH and turning it up just makes the whole
-  // hull the colour of the sky (which is how the first three passes ended up with red craft). So the
-  // break comes from a fixed virtual key at a high exponent: bright, narrow, and — because it is
+  // highlight running the length of the dorsal crown". A fixed virtual key complements the
+  // low-resolution city environment at a high exponent: bright, narrow, and — because it is
   // additive on top of a near-black albedo — it lights the crown and nothing else.
   vec3 vRefl = reflect( -geometryViewDir, geometryNormal );
   vec3 kL = normalize( vec3( -0.35, 0.86, 0.37 ) );
@@ -920,10 +931,10 @@ export const CRAFT_U = {
   uCity: { value: new THREE.Vector4(0.46, 0.07, 2.2, 1.0) },
   // A road transport's interior, warm and dim: it is seen through glass from 60 m up.
   uWindow: { value: new THREE.Color(0xffd7a0).convertSRGBToLinear().multiplyScalar(0.42) },
-  // The canopy takes the same city at 3.4x the hull's gain — it is glass over a cabin, not clear
+  // The canopy takes the same city at 2.2x the hull's gain — it is glass over a cabin, not clear
   // coat over black paint — and its alpha runs from nearly clear head-on to nearly opaque at the
   // grazing angle where a real windscreen becomes a mirror.
-  uGlassRefl: { value: 3.4 },
+  uGlassRefl: { value: 2.2 },
   uGlassA: { value: new THREE.Vector2(0.24, 0.92) },
 };
 
@@ -1019,7 +1030,7 @@ const GLASS_FRAG = /* glsl */`
   float gnv = saturate( dot( geometryNormal, geometryViewDir ) );
   float gf = pow( 1.0 - gnv, 3.0 );
   vec3 gR = inverseTransformDirection( reflect( -geometryViewDir, geometryNormal ), viewMatrix );
-  outgoingLight += cityRefl( gR, vWorldPosition.xz * uCity.w ) * ( uCity.x * uGlassRefl * ( 0.30 + 0.90 * gf ) );
+  outgoingLight += cityRefl( gR, vWorldPosition.xz * uCity.w ) * ( uCity.x * uGlassRefl * ( 0.12 + 0.90 * gf ) );
   // A tint of the frame's own colour at the very edge, so the canopy has a rim and not just a
   // gradient — the thing that says "there is a pane fitted here" rather than "the paint changed".
   outgoingLight += vec3( 0.42, 0.62, 0.86 ) * pow( 1.0 - gnv, 7.0 ) * 0.55;
@@ -1029,10 +1040,11 @@ const GLASS_FRAG = /* glsl */`
 
 export function glassMaterial(env) {
   const m = new THREE.MeshStandardMaterial({
-    color: 0x05070a, metalness: 1.0, roughness: 0.05,
-    envMap: env || null, envMapIntensity: 1.35,
+    color: 0x05070a, metalness: 0.12, roughness: 0.07,
+    envMap: env || null, envMapIntensity: 0.85,
     transparent: true, opacity: 1.0, depthWrite: false, fog: true,
   });
+  m.extensions = Object.assign({ derivatives: true }, m.extensions);
   addPatch(m, 'craft:glass', sh => {
     sh.uniforms.uCity = CRAFT_U.uCity;
     sh.uniforms.uGlassRefl = CRAFT_U.uGlassRefl;

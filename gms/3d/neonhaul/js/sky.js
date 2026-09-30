@@ -171,6 +171,8 @@ export class Sky {
     this.envTarget = null;
     this.envKey = -1;
     this.msEnv = 0;
+    this.envStructure = 1;
+    this.envBakes = 0;
 
     // §4.5's shafts, against FIXED DEBUG ANCHORS. Real anchoring is P3b's job: the cards hang in
     // the widest gaps between near-ring towers and there are no chunks yet.
@@ -381,9 +383,60 @@ export class Sky {
   // A 4:2 equirect painted from the blended sky, then PMREM'd. Rebaked only when the sky has
   // actually moved: a per-frame PMREM is a 2-4 ms hitch for a reflection nobody can see change.
   envSignature(p) {
-    return Math.round(p.zenith.r * 60) * 1e6 + Math.round(p.horizon.g * 60) * 1e4
-      + Math.round(p.fogColor.b * 60) * 1e2 + Math.round(p.dirI * 40)
-      + (this.glowKey || 0) * 1e8;
+    // Quantized sky cadence stays unchanged, but include every channel of the
+    // district glow: the former two-channel modulo key could leave a stale bake.
+    return [Math.round(p.zenith.r * 60), Math.round(p.horizon.g * 60),
+      Math.round(p.fogColor.b * 60), Math.round(p.dirI * 40),
+      ...[this.glowTop, this.glowBot].flatMap(c => c ?
+        [c.r, c.g, c.b].map(v => Math.round(v * 15)) : [0, 0, 0]),
+      this.glowStr ?? 0, this.envStructure].join(':');
+  }
+
+  setEnvStructure(amount) {
+    const was = this.envStructure;
+    if (amount !== null && amount !== undefined) this.envStructure = clamp(+amount, 0, 1);
+    if (was !== this.envStructure) this.bakeEnv(false);
+    return { was, now: this.envStructure, bakes: this.envBakes };
+  }
+
+  paintCityEnv(g, w, h, p) {
+    if (!this.envStructure || !this.glowTop) return;
+    // Reflected city cues, not a local scene capture. A separate fixed hash
+    // never touches city RNG. Broad dark towers leave black between emissive
+    // patches; details span several LOW texels before PMREM filters them.
+    const hash = n => { const x = Math.sin(n * 127.1 + 19.3) * 43758.5453; return x - Math.floor(x); };
+    const s = this.envStructure * (0.30 + 0.70 * p.neon);
+    const col = new THREE.Color();
+    const light = (hex, gain) => col.setHex(hex).multiplyScalar(gain).getStyle(THREE.SRGBColorSpace);
+    g.save();
+    for (let i = 0; i < 24; i++) {
+      const a = hash(i), b = hash(i + 57);
+      const x = (i + 0.16 + a * 0.16) * w / 24;
+      const width = (0.30 + b * 0.40) * w / 24;
+      const top = h * (0.14 + a * 0.23), bottom = h * (0.66 + b * 0.13);
+      g.globalAlpha = 0.66 * this.envStructure;
+      g.fillStyle = '#05070b'; g.fillRect(x, top, width, bottom - top);
+      g.globalAlpha = 1;
+      // Unequal row lengths, missing floors and a single coloured cluster per
+      // tower avoid an all-around luminous horizon or a fine window-grid moire.
+      for (let row = 0; row < 7; row++) {
+        if (hash(i * 11 + row + 151) < 0.48) continue;
+        const yy = top + (bottom - top) * (0.14 + row * 0.105);
+        g.fillStyle = light(b < 0.45 ? 0xc9b58c : 0x7396ae, s * (0.24 + a * 0.20));
+        g.fillRect(x + width * 0.16, yy, width * (0.45 + hash(row + i * 5) * 0.30), Math.max(1, h * 0.007));
+      }
+      if (a > 0.62) {
+        const tint = col.copy(this.glowTop).lerp(new THREE.Color(b > 0.5 ? 0x49c7d8 : 0xea6d9d), 0.65);
+        tint.multiplyScalar(s * 0.48);
+        g.fillStyle = tint.getStyle(THREE.SRGBColorSpace);
+        const sx = x + width * (b > 0.5 ? 0.14 : 0.63);
+        const sy = top + (bottom - top) * 0.30;
+        g.fillRect(sx, sy, Math.max(1.5, width * 0.15), h * (0.05 + b * 0.06));
+        g.fillStyle = '#05070b';
+        g.fillRect(sx, sy + h * 0.028, Math.max(1.5, width * 0.15), Math.max(1, h * 0.006));
+      }
+    }
+    g.restore();
   }
 
   // §3.7(a)'s missing half. The section asks for "a saturated horizon band of CITY GLOW whose hue
@@ -398,7 +451,6 @@ export class Sky {
     const a = new THREE.Color(hexTop), b = new THREE.Color(hexBottom);
     if (this.glowTop && this.glowTop.equals(a) && this.glowBot.equals(b) && this.glowStr === strength) return false;
     this.glowTop = a; this.glowBot = b; this.glowStr = strength;
-    this.glowKey = (Math.round(a.r * 15) * 16 + Math.round(b.g * 15)) % 97;
     return true;
   }
 
@@ -410,6 +462,9 @@ export class Sky {
     const t0 = performance.now();
 
     const c = this.envCanvas, g = c.getContext('2d'), w = c.width, h = c.height;
+    // Lower sky stops carry alpha. Clear before repaint so forced/restored
+    // bakes do not accumulate yesterday's glow under the same signature.
+    g.clearRect(0, 0, w, h);
     const zen = p.zenith, hor = p.horizon, fg = p.fogColor;
     const grad = g.createLinearGradient(0, 0, 0, h);
     grad.addColorStop(0.00, css(zen, 1.0));
@@ -450,9 +505,11 @@ export class Sky {
       g.fillRect(0, h * 0.40, w, h * 0.60);
     }
 
+    this.paintCityEnv(g, w, h, p);
     this.envTex.needsUpdate = true;
     this.envTarget = this.pmrem.fromEquirectangular(this.envTex, this.envTarget);
     this.msEnv = +(performance.now() - t0).toFixed(2);
+    this.envBakes++;
     return true;
   }
 

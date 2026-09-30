@@ -504,7 +504,7 @@ renderer.domElement.addEventListener('webglcontextrestored', () => {
   // CanvasTexture or an image atlas, and those re-upload from their CPU-side copy on next use.
   // So this one line IS the complete restore path, which is worth stating because it does not
   // look like it should be.
-  Game.sky?.bakeEnv?.();
+  Game.sky?.bakeEnv?.(true);
   unpark('contextrestored');
 }, false);
 
@@ -3681,6 +3681,14 @@ window.__game = {
   // a P11 gate needs. `setP11(0)` disables the SHADER half of the pass (colour zones, spill,
   // street glow, facade bays, road markings and road light) and leaves the instance data alone,
   // so an A/B against it measures the shader and says so.
+  // G1 visual controls: source spill is independent of the old pane halo/wash.
+  setFacade(material, spill) {
+    const prev = { material: U.uFacade.value.x, spill: U.uFacade.value.y };
+    if (material !== null && material !== undefined) U.uFacade.value.x = +material;
+    if (spill !== null && spill !== undefined) U.uFacade.value.y = +spill;
+    return prev;
+  },
+  facadeSources: () => cityR.facadeSources.list(),
   setP11(on) { U.uP11.value = on ? 1 : 0; return U.uP11.value; },
   setRoadGlow(v) { const p = U.uRoad.value.w; U.uRoad.value.w = +v; return p; },
   setSpill(spill, street) {
@@ -4099,6 +4107,10 @@ window.__game = {
     return out;
   },
   bakeEnv: () => sky.bakeEnv(true),
+  envBake: (force = false) => sky.bakeEnv(force),
+  setEnvStructure: amount => sky.setEnvStructure(amount),
+  envState: () => ({ structure: sky.envStructure, bakes: sky.envBakes,
+    key: sky.envKey, texture: sky.env?.uuid, size: [sky.envCanvas.width, sky.envCanvas.height] }),
 };
 
 window.__ready = false;

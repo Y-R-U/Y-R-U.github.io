@@ -35,7 +35,7 @@
 import * as THREE from 'three';
 import { Field } from './render_city.js';
 import { protoBoxes, PROTO_TRAITS } from './blocks.js';
-import { signMaterial, stripMaterial, strobeMaterial, structureMaterial } from './materials.js';
+import { U, signMaterial, stripMaterial, strobeMaterial, structureMaterial } from './materials.js';
 import { heroCanvases } from './signs.js';
 import { PosterBoard } from './posters.js';
 import { Shops } from './shops.js';
@@ -281,6 +281,7 @@ export class Signage {
       this.pvSites.length = w;
       rec.pvN = 0;
     }
+    for (const b of rec.desc?.buildings || []) this.facadeSources?.clear(b);
     rec.sgMeta.length = 0; rec.stMeta.length = 0;
     rec.sgAt = 0; rec.signed = false; rec.extra = false;
   }
@@ -439,7 +440,7 @@ export class Signage {
     q.inten = reg.mode === 'box' ? 0.55 + rng() * 0.45 : 1.15 + rng() * 0.95;
     q.seed = rng() * 100; q.ccx = ccx; q.ccz = ccz;
     q.layer = layer; q.cls = reg.cls; q.kind = reg.kind; q.mode = reg.mode;
-    q.b = b; q.face = hit.face; q.nx = hit.nx; q.nz = hit.nz; q.perp = !!L.perp;
+    q.hostBox = hit.box; q.b = b; q.face = hit.face; q.nx = hit.nx; q.nz = hit.nz; q.perp = !!L.perp;
     q.live = false;
     if (living) {
       // The channel is a hash of the building, so neighbours differ and the assignment survives a
@@ -541,7 +542,7 @@ export class Signage {
     q.inten = this.heroFps > 0 ? 1.0 : 0.9;
     q.seed = rng() * 100; q.ccx = ccx; q.ccz = ccz;
     q.layer = 5; q.cls = mega ? 'megahero' : 'graphic'; q.kind = 'hero'; q.mode = 'hero';
-    q.b = b; q.face = hit.face; q.nx = hit.nx; q.nz = hit.nz; q.perp = false;
+    q.hostBox = hit.box; q.b = b; q.face = hit.face; q.nx = hit.nx; q.nz = hit.nz; q.perp = false;
     return this.writeQuad(rec, this.heroF, rec.sgH, q);
   }
 
@@ -688,6 +689,14 @@ export class Signage {
     field.set('iAnim', slot, m.anim);
     field.touch(slot);
 
+    // Register only an emitted quad, using the actual placement normal/host face.
+    if (!m.live && m.mode !== 'hero') this.facadeSources?.add(m.b, m.hostBox, {
+      kind: 'sign', box: m.hostBox, rgb: [this._c.r, this._c.g, this._c.b], x: m.x - m.nx * m.off, y: m.y, z: m.z - m.nz * m.off,
+      nx: m.nx, nz: m.nz, w: m.perp ? 0.35 : m.w, h: m.h, tint: m.tint,
+      intensity: m.inten * (m.mode === 'box' ? 0.065 : 0.11),
+      range: Math.min(12, Math.max(4, Math.min(m.w, m.h) * 0.3 + 3)),
+      score: m.w * m.h * m.inten, seed: m.seed,
+    });
     this.stats[LAYERS[m.layer].key]++;
     if (m.cls === 'poster') this.stats.poster++;
     if (!this.keepMeta) return true;
@@ -702,7 +711,7 @@ export class Signage {
     return true;
   }
 
-  writeEmis(rec, field, arr, x, y, z, sx, sy, sz, tint, inten, seed, ccx, ccz) {
+  writeEmis(rec, field, arr, x, y, z, sx, sy, sz, tint, inten, seed, ccx, ccz, host = null) {
     const idx = arr.length;
     const slot = field.alloc(arr, idx);
     if (slot < 0) return false;
@@ -717,6 +726,15 @@ export class Signage {
     field.set('iChunk', slot, ccx, ccz);
     field.set('iIntensity', slot, inten);
     field.touch(slot);
+    if (host) for (const [nx, nz] of host.normals) {
+      const b = host.b, bx = host.box;
+      this.facadeSources?.add(b, bx, { kind: 'strip', box: bx, rgb: [this._c.r, this._c.g, this._c.b],
+        x: nx ? b.x + (nx > 0 ? bx.x1 : bx.x0) * b.w : x, y,
+        z: nz ? b.z + (nz > 0 ? bx.z1 : bx.z0) * b.d : z,
+        nx, nz, w: nx ? sz : sx, h: sy, tint, intensity: inten * 0.20, range: 5.5,
+        score: sy > 20 ? sy * 3 : Math.max(sx, sz), seed,
+      });
+    }
     return true;
   }
 
@@ -755,10 +773,10 @@ export class Signage {
       const z0 = b.z + top.z0 * b.d, z1 = b.z + top.z1 * b.d;
       const L = (x1 - x0) * 0.98;
       this.writeEmis(rec, this.strip, rec.stS, (x0 + x1) / 2, y, z1 + T * 0.4, L, T, T,
-        tint, 0.9 + rng() * 0.5, rng() * 100, ccx, ccz);
+        tint, 0.9 + rng() * 0.5, rng() * 100, ccx, ccz, { b, box: top, normals: [[0, 1]] });
       if (rng() < 0.55 * this.density) {
         this.writeEmis(rec, this.strip, rec.stS, (x0 + x1) / 2, y, z0 - T * 0.4, L, T, T,
-          tint, 0.9 + rng() * 0.5, rng() * 100, ccx, ccz);
+          tint, 0.9 + rng() * 0.5, rng() * 100, ccx, ccz, { b, box: top, normals: [[0, -1]] });
       }
     }
 
@@ -784,7 +802,8 @@ export class Signage {
       const TV = Math.min(1.8, Math.max(0.50, (y1 - y0) * 0.0045));
       this.writeEmis(rec, this.strip, rec.stS,
         b.x + sx * b.w + Math.sign(sx) * TV * 0.5, (y0 + y1) / 2, b.z + sz * b.d + Math.sign(sz) * TV * 0.5,
-        TV, y1 - y0, TV, this.mixWhite(tint, 0.25), 0.30 + rng() * 0.22, rng() * 100, ccx, ccz);
+        TV, y1 - y0, TV, this.mixWhite(tint, 0.25), 0.30 + rng() * 0.22, rng() * 100, ccx, ccz,
+        { b, box: base, normals: [[Math.sign(sx), 0], [0, Math.sign(sz)]] });
     }
 
     // one setback lip — the `stack` / `terrace` ledge rhythm, lit
@@ -794,7 +813,8 @@ export class Signage {
       const x0 = b.x + bx.x0 * b.w, x1 = b.x + bx.x1 * b.w;
       const z1 = b.z + bx.z1 * b.d;
       this.writeEmis(rec, this.strip, rec.stS, (x0 + x1) / 2, bx.y1 * b.h - T * 0.6, z1 + T * 0.4,
-        (x1 - x0) * 0.96, T, T, tint, 0.8 + rng() * 0.4, rng() * 100, ccx, ccz);
+        (x1 - x0) * 0.96, T, T, tint, 0.8 + rng() * 0.4, rng() * 100, ccx, ccz,
+        { b, box: bx, normals: [[0, 1]] });
     }
   }
 
@@ -967,6 +987,8 @@ export class Signage {
   // measurement sweeps R0, and R0 drives P3a's intensity ramp as well, so leaving the emissive
   // layers on makes part 2 show up as part 3's residue.
   setVisible(on, all) {
+    U.uFacadeVisible.value.x = on ? 1 : 0;
+    if (all) U.uFacadeVisible.value.y = on ? 1 : 0;
     const set = all ? this.fields : [this.neon, this.box, this.heroF, this.postF];
     for (const f of set) f.mesh.visible = !!on;
     // Obligation T7. Shopfronts carry the LOD0 dither itself, which is the very thing gates_p2's
