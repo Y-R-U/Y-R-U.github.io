@@ -80,6 +80,7 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
     Object.assign(S.flags, { introDone: true, kioskDone: true, boardUnlocked: true });
     setLevel(STORY_MISSIONS[idx].gate);
     if (STORY_MISSIONS[idx].gate >= 5 && !G.sim.ownedFrames().length) { G.sim.addCredits(G.sim.framePrice() || 1500, 'dev'); G.sim.buyFrame('brawler'); }
+    if (st.done.includes('a5_m2')) G.sim.installHeirCore();
     setHeat(0);
     G.quiet = false;
     G.sim.refreshBoard();
@@ -97,6 +98,7 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
     Object.assign(S.flags, { introDone: true, kioskDone: true, boardUnlocked: true });
     setLevel(50);
     if (!G.sim.ownedFrames().length) { G.sim.addCredits(G.sim.framePrice() || 1500, 'dev'); G.sim.buyFrame('brawler'); }
+    G.sim.installHeirCore();
     setHeat(0);
     G.quiet = false;
     G.sim.refreshBoard();

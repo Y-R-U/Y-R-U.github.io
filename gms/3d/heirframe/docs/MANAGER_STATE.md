@@ -88,3 +88,4 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 - 2026-10-01: **P4 PLAYABLE**, pushed 7ac30106, live verified (4.6 s, 0 bad). D26. Launched **P5 agent** (a242d597…, sole agent: Acts 5–6, bosses, endings, Heirlooms, Nightmare, VO).
 - 2026-10-01: Aaron: 98% of the 5-hour window is used, so P5 will be cut off soon. On his next message: resume the P5 agent (a242d597…) by SendMessage, or relaunch 'continue from the gameplay.md P5 section'.
 - 2026-10-01 05:30+: P5 died at the limit (early, still reading); resumed via SendMessage.
+- 2026-10-01: P5 agent handed back PARTIAL (the auto-mode classifier returned 'no verdict' ×9). Tree verified green; pushed checkpoint b9d25424. Resumed P5 for its unverified items (closing/theEnd/epilogue travel, Dray re-measure, reload check, regressions).

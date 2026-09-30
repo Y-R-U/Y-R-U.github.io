@@ -101,8 +101,8 @@ export const BOSSES = {
     // P5: hp 130→24 dmg 28→4 shield 120→24 (the Act 3–4 share per hit; three phases, she spares you once per phase)
     base: { hp: 24, dmg: 4, armor: 25, shield: 24 }, move: 7, skills: ['e_melee', 'e_dive', 'e_lunge', 'e_blast'], phases: [0.66, 0.33], tags: ['robot', 'frame'] },
   dray: { id: 'dray', name: 'Archon Dray', title: 'the Sovereign Frame', rank: 'boss', robotKind: 'boss_sovereign', fallbackKind: 'enforcer', faction: 'voices', ai: ['boss', 'bruiser'], act: 6, size: 2.6,
-    // P5: hp 180→22 dmg 34→4 shield 200→28; phase 2's seven halo drones (not gilded guards) shield him
-    base: { hp: 22, dmg: 4, armor: 45, shield: 28 }, move: 3, skills: ['e_melee', 'e_stomp', 'e_sweep', 'e_blast'], phases: [0.66, 0.33], tags: ['robot', 'frame', 'heavy'] },
+    // P5: hp 180→22 dmg 34→3.5 armor 50→30 shield 200→28; phase 2's seven halo drones (not gilded guards) shield him
+    base: { hp: 22, dmg: 3.5, armor: 30, shield: 28 }, move: 3, skills: ['e_melee', 'e_stomp', 'e_sweep', 'e_blast'], phases: [0.66, 0.33], tags: ['robot', 'frame', 'heavy'] },
   voice: { id: 'voice', name: 'Escaped Voice', rank: 'boss', robotKind: 'civ_gold', robotTier: 3, faction: 'voices', ai: ['boss', 'duelist'], act: 7,
     base: { hp: 140, dmg: 32, armor: 40, shield: 150 }, move: 5, skills: ['e_melee', 'e_parry', 'e_lunge', 'e_blast'], phases: [0.5], tags: ['robot', 'frame'] },
 };

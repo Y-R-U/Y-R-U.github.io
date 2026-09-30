@@ -457,7 +457,7 @@ export async function createGame(api) {
       if (a.voicesFlee) await G.finale.voicesFlee();
       if (a.helm) world.ctx?.helm?.setMode(a.helm);
       if (a.human === 'on') G.finale.humanOn(); else if (a.human === 'off') G.finale.humanOff();
-      if (a.closing) setTimeout(() => story.run('a6_m5', 'closing'), 0);
+      if (a.closing) story.run('a6_m5', 'closing');   // not awaited: it queues behind this chain (busy stays up)
       if (a.theEnd) G.finale.theEnd();
       if (a.toast) ui?.toast(a.toast, 'story', a.sub ? { sub: a.sub, ms: 4200 } : undefined);
     },
@@ -629,7 +629,6 @@ export async function createGame(api) {
     if (out.mission.story?.after) await afterScene(out.mission.story.after, out.mission.story.id);
     if (out.mission.story?.id === 'a4_m5') setTimeout(() => ui?.sting('Act 4 complete', 'Act 5 · HULLSIDE · Jun is waiting at the airlock', 'story', 4600), 600);
     if (out.mission.story?.id === 'a5_m5') setTimeout(() => ui?.sting('Act 5 complete', 'Act 6 · HEIRFRAME · Renewal Day is coming', 'story', 4600), 600);
-    if (out.mission.story?.id === 'a6_m5') setTimeout(() => G.finale.theEnd(), 800);
     const days = G.sim.state.story.renewalDays;
     if (!out.mission.story && days % 10 === 0 && audio.hasVo(`pa_renewal_${days}`)) setTimeout(() => audio.bark([`pa_renewal_${days}`], { force: true }), 5000);
     if (out.stiffed) ui?.toast('Stiffed!', 'bad', { sub: 'The client won\'t pay. A Collect bounty is on the board' });

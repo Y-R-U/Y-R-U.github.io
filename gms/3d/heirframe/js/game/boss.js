@@ -120,7 +120,7 @@ export function createBoss(ctx) {
   function multiBrain(e, dt) {
     const c = e.c, sc = B.sc;
     if (B.phase < sc.phases.length && c.hp < c.stats.hp * B.phases[B.phase]) phaseUp(e, B.phase + 1);
-    if (sc.strikes && B.phase < 2) harmonyStrike(dt);
+    if (sc.strikes && B.phase === 0) harmonyStrike(dt);   // one threat at a time: the Helm's strikes stop when the drones come out
     if (B.drones.length) {
       B.drones = B.drones.filter((d) => d.state !== 'dead');
       const shielded = B.drones.length >= 4;
@@ -174,6 +174,8 @@ export function createBoss(ctx) {
       const d = enemies.spawn({ defId: 'halo_drone', rank: 'grunt', level: R?.mission.level || e.c.level }, x, z, { hostile: true });
       d.c.stats.hp *= 0.12; d.c.hp = d.c.stats.hp; d.c.stats.shield *= 0.15; d.c.shield = d.c.stats.shield;
       d.mission = R?.mission.id; d.hunter = true;
+      addStatus(d.c, { id: 'voice', t: 999, dmgMult: 0.5 });
+      d.keepRange = 3.5;   // they guard him close instead of kiting: a Bulwark has to be able to reach them
       fx.beam(d.pos, 0xffd36b, 0.4, 5, 0.8);
       B.drones.push(d);
     }
@@ -192,7 +194,7 @@ export function createBoss(ctx) {
       return;
     }
     if ((B.strikeT -= dt) > 0) return;
-    B.strikeT = B.phase ? 9 : 7;
+    B.strikeT = 7;
     const p = new THREE.Vector3(ctx.player.pos.x, ctx.world.groundAt(ctx.player.pos.x, ctx.player.pos.z) + 0.05, ctx.player.pos.z);
     B.pending = { p, t: 1.4, ring: 0 };
     audio.sfx('scan', { x: p.x, z: p.z, vol: 0.6 });

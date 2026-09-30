@@ -667,6 +667,16 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     if (S.contract?.mission.modifiers.includes('watched')) emit('heat', addHeat(S.factions, 'spotted'));
   }
 
+  // A5-M2's Heir Core installs itself: the active frame's core slot (or the first owned frame with one). Also used by
+  // story jumps (dev checkpoints, autopilot storyat) that skip finishContract.
+  function installHeirCore(level = S.player.level) {
+    if (S.stash.some(i => i.heirCore)) return null;
+    const hc = addItem(makeHeirCore(actRng('heircore'), level), { silent: true });
+    const f = [activeFrame(), ...ownedFrames()].find(x => x && frameDef(x).slots.includes('core'));
+    if (hc && f) equip(hc.uid, f.uid);
+    return hc;
+  }
+
   function finishContract(result = {}) {
     const c = S.contract;
     if (!c) return { ok: false };
@@ -705,13 +715,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
       if (fx) {
         for (const d of fx.unlocks) unlockDistrict(d);
         if (fx.grants.firstFrameDiscount) S.flags.firstFrameDiscount = true;
-        if (fx.grants.heirCore && !S.stash.some(i => i.heirCore)) {
-          // it installs itself: the active frame's core slot (or the first owned frame that has one)
-          const hc = addItem(makeHeirCore(actRng('heircore'), m.level), { silent: true });
-          const f = [activeFrame(), ...ownedFrames()].find(x => x && frameDef(x).slots.includes('core'));
-          if (hc && f) equip(hc.uid, f.uid);
-          if (hc) out.items.push(hc);
-        }
+        if (fx.grants.heirCore) { const hc = installHeirCore(m.level); if (hc) out.items.push(hc); }
         if (fx.grants.heirloom) {
           const af = activeFrame().rental ? ownedFrames()[0] : activeFrame();
           const set = fx.grants.heirloom === 'frame' ? Object.values(HEIRLOOM_SETS).find(x => x.frame === af?.archetype)?.id : fx.grants.heirloom;
@@ -950,7 +954,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     buyHome, setHome, buyPaint, setPaint, buyMaterial, brokerPrice,
     homes: () => Object.keys(HOMES).map(homeState), paintsList: () => PAINTS.map(p => paintState(p.id)),
     setSites(districtId, sites) { live.sitesRegistry[districtId] = sites; },
-    checkCrackdown,
+    checkCrackdown, installHeirCore,
   };
   return game;
 }

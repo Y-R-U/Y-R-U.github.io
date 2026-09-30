@@ -1,3 +1,8 @@
+P5 PLAYABLE
+(gameplay agent P5, 2026-10-01: Acts 5–6 staged and bot-played mission by mission; Seraph + Dray multi-phase bosses;
+Heir Core 4th skills; Walk as Yourself; both endings persist; epilogue; heirloom sets; Nightmare. Table in "P5
+acceptance" at the bottom. P4/P3/P2a lines kept underneath for history.)
+
 P4 PLAYABLE
 (gameplay agent P4, 2026-09-30: Acts 3–4 staged and bot-played mission by mission; day/night + rain; heist/wetwork/T5/T11/T12;
 informants; Breach set piece at 60 fps. Table in "P4 acceptance" at the bottom. P3/P2a lines kept underneath for history.)
@@ -375,3 +380,62 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
 - Dev: "Post-game" section (ending open/keep → all missions done through the sim), Level 40/50 buttons. Act 5–6
   checkpoints appear automatically (storyActCap 6).
 - NEXT: boss re-measure (p5b3.log), reload/softlock driver (reload.mjs), epilogue screenshots, regressions, perf.
+
+## Checkpoint 4 (after the classifier stall; coordinator pushed checkpoint 3)
+- DONE: closing beat queued directly (no setTimeout, so busy stays up through Mara's line); theEnd fires once (the
+  closing action); epilogue travel is soft (`via: 'dev'`), so Heat can't lock the ending out. test.mjs 27/27.
+- DONE: reload.mjs (dev jump → play 6 s → save → reload into the dev save) at all 10 Act 5–6 checkpoints: 10/10 resume
+  the story contract with a live objective, 0 console errors.
+- IN PROGRESS: Dray re-measure + story2 regressions A1-M4 / A2-M5 / A4-M2 + Brawler boss runs (p5b5.log).
+- NEXT: p5perf.mjs (Dray phase 2 + 7 drones, high), epi.mjs (both endings: shots + reload), normal boot 0 js/dev.
+
+## Checkpoint 5
+- Dray re-tune: armor 50→30, dmg 3.5, drones halve their damage and guard close (keepRange 3.5, so a Bulwark can
+  reach them), the Helm strikes stop once the drones are out. Bot (gearless, speed 2): Gunner 176 s / 1 wreck,
+  Brawler 181 s / 2, Ghost 386 s / 6 (the backstab bot vs a boss that turns: known weakness, like P3's Gunner defend).
+  With the Heir Core the Gunner bot kills Seraph in 81 s with 0 wrecks (Brawler 220 s / 2 without it).
+- Boss bar label bug fixed (js/ui/combat.js): "Phase 1 / N" showed for the first two phases (`bs.phase || 1`);
+  now phase + 1. Affects every multi-phase boss.
+- Story jumps (dev checkpoints, autopilot storyat, dev post-game) skipped finishContract, so no Heir Core: new
+  `sim.installHeirCore()` (A5-M2's grant uses it too).
+- Endings (epi.mjs, both branches): Dray down → Helm "OPEN/KEEP" → Iris fade/frame → results → Aurum Plaza epilogue
+  card, warm billboards ("A BRIGHTER FUTURE — TOGETHER. FOR REAL THIS TIME."), Harmony line, Mara's closing line by
+  maraTone, "HEIRFRAME" sting; save + reload + Continue keeps {ending, irisFate} and the epilogue billboards.
+  Shots: scratchpad gameplay/p5_end0_*.png, p5_end1_*.png.
+- Perf: Dray phase 2 + 7 drones (8 enemies), high: 1280x720 60 fps p95 16.8 ms, 153 calls, 228k tris; 915x412 DPR2
+  the same (p5perf.mjs).
+- smoke.mjs had vanished from the scratchpad (not by me); recreated from the same source.
+
+## P5 acceptance (BUILD_PLAN §P5)
+| item | result | evidence |
+|---|---|---|
+| Acts 5–6 story missions in spine / hullside (low g) / meridian (zero-g) / helm | PASS | story2.mjs: A5-M1…A6-M5 each ok from its checkpoint (gunner); test.mjs builds + validates all 10 |
+| Full story playthrough by bot through dev checkpoints + each boss | PASS | per-mission bot runs above; sim test runs A1-M1 → A6-M5 end to end; Seraph and Dray with Gunner/Brawler/Ghost |
+| Heir Core + 4th skill per frame | PASS | A5-M2 installs it; Titanfall / Starfall / Eclipse in kits.js; sim test: Gunner gets Starfall |
+| Seraph multi-phase → freed Lyra (phase 4) | PASS | setPhase 1→2→3, spares once per phase, yields as Lyra, lullaby choice, R6 |
+| Dray / Sovereign multi-phase + halo drones + Helm modes | PASS | harmony → dray (7 drones from halo sockets) → iris; helm.setMode per phase, open/calm after |
+| Walk as Yourself | PASS | A6-M4: human body at 0.35× speed, no combat, comms beats, frame beams back in |
+| Both endings, choice persists | PASS | epi.mjs 0/1: ending + irisFate survive reload; test.mjs reload check; falsified |
+| Epilogue billboards rewritten | PASS | warm 'epilogue' billboard key, re-applied on every surface district load after the finale |
+| Codex family tree complete | PASS | test.mjs: every node 'complete', every place revealed after A6-M5 |
+| No softlock on reload at each checkpoint | PASS | reload.mjs: 10/10 resume the contract with a live objective, 0 console errors |
+| Heirloom sets + Nightmare | PASS | story grants (A5-M4/A6-M2/A6-M5 frame set, A5-M5 Lyra's Wake) + 5 set hooks; Nightmare board at L40 (test) |
+| Story hooks (Meridian core, Seraph/Dray phases, helm modes) | PASS | finale.js apply() + boss.js |
+| VO Acts 5–6 | PASS | 17 VO_LINES + 22 new clips, existing voices, 0 QC flags |
+| P1–P4 regressions | PASS | test.mjs 27/27; smoke ok; story2 A1-M4 (Kettle 52 s), A2-M5, A4-M2 (Rustmother) ok |
+| Normal boot fetches 0 js/dev | PASS | nodev.mjs: 150 js, 0 from js/dev |
+| 60 fps on high, ≤ 300 calls | PASS | Dray + 7 drones: 60 fps, 153 calls |
+
+## Known / decisions to review
+- Boss bases cut hard (P4 share per hit): Seraph 130→24 hp; Dray 180→22 hp, dmg 34→3.5, armor 50→30. Bot times are
+  game-seconds with gearless frames (P4's "~90 s" was wall time at speed 2, i.e. ~180 game-s).
+- Choir Angel dmg 26→20 everywhere (random choir contracts too).
+- Seraph can't wreck you once per phase (she hesitates, hums): STORY canon "she always spares you".
+- Heir Core is a per-frame core item (auto-equipped); Heir Protocol shows only on the frame wearing it.
+- Story missions still use the selected threat: at Nightmare the bosses have ×4.5 HP.
+- "Open the sky" = Helm open mode + warm billboards + the epilogue card; no city sky shader "open" mode (art gap).
+- A6-M5 `unlocks: ['landfall']` has no district yet (P6).
+- Ghost bot is weak vs bosses (backstab style vs a boss that faces you); a human Ghost should dodge and use Veil.
+- The Helm reads very dark at gameplay pitch (black mirror floor + space); art-owned, D23 says only on Aaron's flag.
+- Runner: packs of a defend step now wait for that step (they spawned early as guards when their site was the next
+  step's site). Also changes A4-M2's defend (regression run ok).

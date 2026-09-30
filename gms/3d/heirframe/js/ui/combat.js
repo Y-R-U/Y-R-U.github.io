@@ -36,7 +36,7 @@ export function createCombat(bus, root) {
       bs._nph = ph.length + 1;
     }
     const n = bs._nph || 1;
-    bq('.bb-phase').textContent = n > 1 ? `Phase ${bs.phase || 1} / ${n}` : (bs.rank || '');
+    bq('.bb-phase').textContent = n > 1 ? `Phase ${(bs.phase || 0) + 1} / ${n}` : (bs.rank || '');
     if ('phase' in o && o.phase !== bs._lastPhase && bs._lastPhase != null) { boss.classList.remove('phase'); void boss.offsetWidth; boss.classList.add('phase'); }
     bs._lastPhase = bs.phase;
     boss.classList.toggle('enraged', !!bs.enraged);

@@ -284,6 +284,7 @@ export function createAutopilot(G, { ui, player }) {
       while (S2.player.level < STORY_MISSIONS[idx].gate) G.sim.giveXp(200 * S2.player.level, 'autopilot');
       G.quiet = false;
       G.contractsDone = Math.max(G.contractsDone, 1);
+      if (S2.story.done.includes('a5_m2')) A.heirCore = true;
       G.sim.refreshBoard();
     }
     if (frameK && !A.bought.includes(frameK) && G.contractsDone === 0 && !A.granted) {
@@ -295,6 +296,7 @@ export function createAutopilot(G, { ui, player }) {
     const lurker = G.enemies.hostileNear(player.pos.x, player.pos.z, 24) ? nearestHostile(26) : null;
     if (lurker) { A.phase = 'fight'; fight(lurker); return; }
     if (buy) { A.phase = 'buy:' + buy; ui.emit('warehouse'); return; }
+    if (A.heirCore && G.sim.ownedFrames().length) { A.heirCore = false; G.sim.installHeirCore(); }
     if (framesTour && G.contractsDone >= 1 + want) {
       // one contract per bought frame, then done
       const k = G.sim.activeFrame().archetype;

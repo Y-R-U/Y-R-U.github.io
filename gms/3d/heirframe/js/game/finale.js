@@ -90,7 +90,7 @@ export function createFinale(G, { world, robots, tier, player, fx, audio, ui, ri
   async function epilogue(id) {
     player.frozen = true;
     ui?.hideHud(true);
-    await G.districts.travel('aurum_plaza', { reason: 'story', quiet: true });
+    await G.districts.travel('aurum_plaza', { reason: 'story', via: 'dev', quiet: true });   // soft travel: Heat can't lock the ending out
     apply('aurum_plaza');
     G.state = 'intro';
     const p0 = player.pos.clone();
