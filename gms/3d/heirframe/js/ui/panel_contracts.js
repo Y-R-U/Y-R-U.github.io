@@ -58,6 +58,17 @@ export function contractsPanel(body, data, ctx) {
     }));
     ctx.extra.append(seg);
   }
+  // P6 Overclock I–XXX (level 60): a stepper beside the threat row
+  if (data.overclock) {
+    const oc = data.overclock, n = oc.active || 0;
+    const R = (k) => { let r = ''; for (const [v, t] of [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']]) while (k >= v) { r += t; k -= v; } return r; };
+    const el = h('div.cb-oc', { html: `<span class="hf-label">Overclock</span><button class="hf-live" data-d="-1" ${n ? '' : 'disabled'}>−</button><b>${n ? R(n) : 'OFF'}</b><button class="hf-live ${n ? 'on' : ''}" data-d="1" ${n >= oc.unlocked ? 'disabled' : ''}>+</button><small class="hf-num">max ${R(oc.unlocked)}</small>` });
+    el.querySelectorAll('button').forEach(b => onTap(b, () => {
+      const k = n + +b.dataset.d;
+      haptic(); ctx.bus.emit('sfx', 'click'); ctx.bus.emit('contract:threat', k > 0 ? `overclock:${k}` : 'nightmare');
+    }));
+    ctx.extra.append(el);
+  }
   if (data.refreshIn != null) ctx.extra.append(h('div.cb-refresh', { html: `<small>New shift in</small><b class="hf-num">${fmtTime(data.refreshIn)}</b>` }));
   if (data.rerollCost != null) {
     const b = h('button.hf-btn.ghost.hf-live', { html: `${icon('reroll')}<span>Refresh</span><b class="hf-num" style="color:var(--gold)">${fmt(data.rerollCost)}</b>` });

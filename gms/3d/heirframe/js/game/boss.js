@@ -16,6 +16,8 @@ const SCRIPT = {
   halloran: { scale: 1.05, title: 'Warden-Captain', speaker: 'halloran', lines: { spawn: 'a2_s04_halloran_01', phase: 'a2_s04_halloran_02' },
     phaseSting: ['calls it in', 'Warden squad inbound. She stops holding back'], adds: { defId: 'warden', count: 3 } },
   // A5-M5: three phases on the open hull; she spares you once per phase (STORY R6) and yields at 0 as Lyra
+  // P6 Voice Hunts: one of the five escaped Voices, gilded livery from js/data/voices.js; calls its guard at half HP
+  voice: { scale: 1.12, title: 'Escaped Voice', adds: { defId: 'gilded_guard', count: 2 }, phaseSting: ['calls its Gilded Guard', 'Silence the Voice'] },
   seraph: { scale: 1, title: "The Concord's hunter", speaker: 'seraph', multi: true, spares: true, robotPhase: [1, 2, 3], lines: { spawn: 'a5_s05_seraph_01' },
     phases: [
       { sting: ['spreads her wings', 'A Choir angel answers her'], line: 'a2_s04_seraph_02', adds: { defId: 'choir_angel', count: 1 } },
@@ -39,6 +41,12 @@ export function createBoss(ctx) {
   function spawnStandIn(def, x, z, R, sc) {
     const e = enemies.spawn({ defId: def.defId, level: def.level || R.mission.level, name: def.name }, x, z, { hostile: true, paint: sc.paint, scale: sc.scale || 1.25 });
     return setup(e, def, sc, R, x, z);
+  }
+
+  // a Voice Hunt target: the boss machinery (bar, adds at 50%) on the mission's target, in its own livery
+  function spawnVoice(t, x, z, R) {
+    const sc = { ...SCRIPT.voice, paint: t.paint, title: t.epithet || SCRIPT.voice.title };
+    return spawnStandIn({ defId: 'voice', level: R.mission.level, name: t.name }, x, z, R, sc);
   }
 
   function spawn(def, x, z, R) {
@@ -245,5 +253,5 @@ export function createBoss(ctx) {
     B = null;
   }
 
-  return { spawn, update, end, spares, get active() { return !!B && B.e.state !== 'dead'; }, get entity() { return B?.e || null; } };
+  return { spawn, spawnVoice, update, end, spares, get active() { return !!B && B.e.state !== 'dead'; }, get entity() { return B?.e || null; } };
 }

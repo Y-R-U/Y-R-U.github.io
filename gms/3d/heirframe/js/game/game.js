@@ -25,6 +25,7 @@ import { createBoss } from './boss.js';
 import { createHeat } from './heat.js';
 import { createDayNight } from './daynight.js';
 import { createFinale, EPILOGUE_LINE } from './finale.js';
+import { createEndless } from './endless.js';
 
 export const RUN_ARCH = ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'tail', 'infiltrate', 'transport', 'defend', 'repo', 'race', 'assassinate', 'rescue', 'heist', 'wetwork'];
 export const RUN_TWISTS = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
@@ -76,6 +77,26 @@ export async function createGame(api) {
     // dialogue VO goes through the audio engine (ducking + volume buses); typing syncs to the returned duration
     ui.dialogue.setVoice((k) => { audio.vo(k); return audio.voInfo(k)?.duration; });
     ui.on('dialogue:end', () => audio.stopVo());
+    // Settings ▸ Save: export the current save as text, check a pasted one, then replace and reload (styled UI only)
+    const summary = (st) => ({ name: st.player?.name, gen: st.player?.generation || 1, level: st.player?.level, credits: st.credits, story: st.story?.mission, hours: +((st.playSeconds || 0) / 3600).toFixed(1) });
+    ui.on('save:export', (p) => {
+      if (G.sim && !G.sim.state.contract) G.sim.save();
+      const k = 'main', text = (() => { try { return store.storage.getItem('heirframe.save.' + k); } catch (e) { return null; } })();
+      if (!text) { p.cb?.({ ok: false, error: 'No save yet: start a game first.' }); return; }
+      try { p.cb?.({ ok: true, text, ...summary(store.importText(text)) }); } catch (e) { p.cb?.({ ok: false, error: String(e.message || e) }); }
+    });
+    ui.on('save:check', (p) => { try { p.cb?.({ ok: true, ...summary(store.importText(String(p.text || '').trim())) }); } catch (e) { p.cb?.({ ok: false, error: String(e.message || e).replace(/^save: /, '') }); } });
+    ui.on('save:import', (p) => {
+      const text = String(p.text || '').trim();
+      try { store.importText(text); } catch (e) { p.cb?.({ ok: false, error: String(e.message || e) }); return; }
+      if (G.sim) G.sim.noAutosave = true;
+      const key = 'heirframe.save.main', prev = store.storage.getItem(key);
+      if (prev) store.storage.setItem(key + '.bak', prev);
+      store.storage.setItem(key, text);
+      p.cb?.({ ok: true });
+      setTimeout(() => location.reload(), 600);
+    });
+    ui.on('game:restart', () => { if (G.sim && !G.sim.state.contract) G.sim.save(); setTimeout(() => location.reload(), 200); });
   }
   ui?.on('sfx', (n) => { const k = UI_SFX[n]; if (k) audio.sfx(k, { vol: n === 'toast' ? 0.3 : 0.7 }); });
   audio.ambient('plaza');
@@ -295,6 +316,8 @@ export async function createGame(api) {
     ui.on('warehouse:repair', wh((p) => { const r = G.sim.repair(p.frameId); if (r.ok) { ui.toast(r.cost ? `Repaired for ${r.cost} cr` : 'Repaired', 'good'); audio.sfx('pickup'); } return r; }));
     ui.on('warehouse:mod', wh((p) => { const r = G.sim.chooseSyncMod(p.frameId, p.rank, p.optionId); if (r.ok) { ui.toast('Skill mod set', 'good'); audio.sfx('ui_confirm'); } return r; }));
     ui.on('warehouse:market', wh((p) => { const r = G.sim.buyMarket(p.index); if (r.ok) { audio.bark('b_sal_buy_', { cooldown: 8 }); ui.toast(`Bought ${r.item.name}`, 'good', { sub: 'Sent to your stash' }); } return r; }));
+    ui.on('warehouse:legacy', wh((p) => { const r = G.sim.spendLegacy(p.node); if (r.ok) audio.sfx('ui_confirm'); return r; }));
+    ui.on('warehouse:succession', (p) => { if (inCombat() || G.sim.state.contract) { ui.toast('Finish your contract first', 'warn'); return; } G.succession?.pass(p.name, p.heirloom); });
     ui.on('warehouse:consumable', wh((p) => { const r = G.sim.buyConsumable(p.id); if (r.ok) audio.sfx('credits', { vol: 0.6 }); else if (r.reason === 'full') ui.toast('Carrying the maximum', 'info'); return r; }));
     ui.on('kit', () => useKit());
     ui.on('panel:open', (n) => { if (n === 'warehouse') { setMusic('warehouse'); G.coach?.finish('warehouse'); } });
@@ -436,6 +459,7 @@ export async function createGame(api) {
   const story = createStoryPlayer({
     ui: ui || inertUi(), audio, overlay,
     choice: (k) => G.sim?.state.contract?.choices?.[k] ?? G.sim?.state.story.choices[k],
+    echo: () => (G.sim?.state.story.echo ? G.sim.state.player.name : null),
     onBeat: (b) => log(`beat ${b.vo || b.mode}${b.when ? ' ' + JSON.stringify(b.when) : ''}`),
     onFx: (f) => { if (f === 'billboards_face') harmonyFace('GOOD MORNING, HALCYON', 9); else if (f === 'billboards_glitch') harmonyFace('LITTLE STAR', 6); else if (f === 'billboards_epilogue') world.billboards?.show?.('epilogue', { line: EPILOGUE_LINE, fade: 2.4 }); },
     onAction: async (a) => {
@@ -697,6 +721,7 @@ export async function createGame(api) {
     G.frames = createFrames(G, { world, robots: api.robots, tier: api.tier, player, fx, audio, ui: ui || null, rig });
     G.frames.sync();
     G.finale = createFinale(G, { world, robots: api.robots, tier: api.tier, player, fx, audio, ui: ui || null, rig });
+    G.succession = createEndless(G, { ui: ui || null, audio, fx, player, log });
     sim.on('frame:swap', (p) => { G.frames.deploy(p.frame); log('deploy ' + p.frame.archetype); });
     sim.on('frame:mk', (p) => { if (p.frame.uid === sim.state.activeFrame) G.frames.deploy(p.frame, { reason: 'mk' }); });
     sim.on('frame:buy', (p) => { if (sim.ownedFrames().length === 1) G.frames.podNext(); log('frame:buy ' + p.frame.archetype); setTimeout(() => audio.bark('b_hira_ownframe_', { cooldown: 60 }), 4000); });
@@ -744,7 +769,7 @@ export async function createGame(api) {
     if (devMod) { G.dev = devMod.createDev(G, { world, ui, player, rig, audio, api, createSim, loadGame, store, sites, startSession, Q }); if (await G.dev.autostart()) { setMusic('explore'); return; } }
     if (!ui) { startSession(createSim({ seed: Q.get('seed') || 1, store, sites })); G.state = 'free'; return; }
     const hasSave = store.has() && !Q.has('fresh');
-    const act = await ui.screen('title', { hasSave, version: 'P5 · Heirframe' });
+    const act = await ui.screen('title', { hasSave, version: 'P6 · Endless' });
     audio.unlock();
     log('title: ' + act);
     let sim = null;

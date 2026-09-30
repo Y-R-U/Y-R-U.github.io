@@ -128,6 +128,12 @@ export const POWERS = [
   { id: 'lullaby', slot: 'optics', name: 'Lullaby Loop', desc: 'Crits restore 2 energy.', hook: { onCrit: { energy: 2 } } },
   { id: 'renewal', slot: 'chassis', name: 'Renewal Plating', desc: 'Below 30% HP, gain +40% armor.', hook: { cond: 'lowHp', armorPct: 0.4 } },
   { id: 'tidewater', slot: 'weapon', name: 'Tidewater Edge', desc: 'Hits against stunned enemies deal +35%.', hook: { vsStunnedPct: 0.35 } },
+  // P6 Voice Hunt uniques: only the matching Voice drops them (never in the random relic pool)
+  { id: 'voice_mercy', voice: 'mercy', slot: 'chassis', name: "Mercy's Mantle", desc: '+25% HP and +15% armor. Signed in gold: FOR YOUR OWN GOOD.', stats: { hpPct: 0.25, armorPct: 0.15 } },
+  { id: 'voice_unity', voice: 'unity', slot: 'weapon', name: "Unity's Gavel", desc: '+22% damage and +10% crit chance.', stats: { dmgPct: 0.22, critChance: 0.1 } },
+  { id: 'voice_vigil', voice: 'vigil', slot: 'optics', name: "Vigil's Eye", desc: '+60% crit damage and +20% loot luck.', stats: { critDmg: 0.6, lootLuck: 0.2 } },
+  { id: 'voice_renewal', voice: 'renewal', slot: 'core', name: "Renewal's Heart", desc: '+35% shield, +40% shield regen and +12% cooldown recovery.', stats: { shieldPct: 0.35, shieldRegenPct: 0.4, cdr: 0.12 } },
+  { id: 'voice_tomorrow', voice: 'tomorrow', slot: 'mobility', name: "Tomorrow's Stride", desc: '+15% move speed, −25% dodge cooldown and +20% credits.', stats: { movePct: 0.15, dodgeCdPct: 0.25, creditsPct: 0.2 } },
 ];
 
 // DESIGN §6.5 heirloom sets. Pieces are fixed-name, 4 random affixes, set bonuses by count.

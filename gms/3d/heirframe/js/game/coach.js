@@ -45,6 +45,10 @@ export function createCoach(G, { ui, rig, player }) {
     if (C.cur === k) hide();
     if (k === 'warehouse') ui?.hud.badge('warehouse', 0);
   }
+  // a returning or dev-jumped player (past A1-M1, or already a veteran) never gets the first-session hints
+  function skipAll() { const d = done(); for (const k of Object.keys(LESSONS)) d[k] = 1; C.pending.clear(); if (C.cur) hide(); }
+  const veteran = () => G.sim.state.story.done.includes('a1_m1') || G.sim.state.player.level >= 8 || G.sim.state.player.generation > 1;
+  if (G.sim && veteran()) skipAll();
   function want(k) { if (G.sim && !isDone(k)) C.pending.add(k); }
   // a separate ring over the target (transform/opacity only, so it never repaints the target or the canvas)
   function setPulse(sel) { C.pulsed = sel ? document.querySelector(sel) : null; C.ringT = 0; placeRing(); }
@@ -80,6 +84,7 @@ export function createCoach(G, { ui, rig, player }) {
 
   function update(dt) {
     if (!G.sim || G.state === 'intro' || G.state === 'title') return;
+    if (!C.vetChecked && G.sim.state.player.level >= 8) { C.vetChecked = true; skipAll(); }
     const P = player.pos;
     if (C.last) C.travelled += Math.hypot(P.x - C.last.x, P.z - C.last.z);
     C.last = { x: P.x, z: P.z };
@@ -114,6 +119,7 @@ export function createCoach(G, { ui, rig, player }) {
     update,
     finish,
     want,
+    skipAll,
     playerHit() { C.hits++; },
     lootItem() { if (!isDone('warehouse')) { want('warehouse'); ui?.hud.badge('warehouse', 1); } },
     contractDone() { want('board'); },

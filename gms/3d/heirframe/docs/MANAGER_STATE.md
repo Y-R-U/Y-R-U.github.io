@@ -89,3 +89,7 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 - 2026-10-01: Aaron: 98% of the 5-hour window is used, so P5 will be cut off soon. On his next message: resume the P5 agent (a242d597…) by SendMessage, or relaunch 'continue from the gameplay.md P5 section'.
 - 2026-10-01 05:30+: P5 died at the limit (early, still reading); resumed via SendMessage.
 - 2026-10-01: P5 agent handed back PARTIAL (the auto-mode classifier returned 'no verdict' ×9). Tree verified green; pushed checkpoint b9d25424. Resumed P5 for its unverified items (closing/theEnd/epilogue travel, Dray re-measure, reload check, regressions).
+- 2026-10-01: **P5 PLAYABLE**, pushed; live check above. D27. Scratchpad world/ and mgr/live.mjs were wiped (shot.mjs recreated; live_net.mjs survives). Next: P6.
+- 2026-10-01: launched **P6 agent** (af05d504…, sole agent: Landfall, Overclock, Legacy, Succession, Voice Hunts, settings, 60 h soak, low/med perf, coach-after-dev-jump bug). After P6: the manager registers projects.js + a screenshot.
+- 2026-10-02 03:50+: P6 died at the limit (voice relics); resumed via SendMessage.
+- 2026-10-02 08:50+: P6 died at the limit during the 30-min memory soak (checkpoint 7: 60 h soak passed except level 8 pacing + Brawler grunt TTK); resumed.

@@ -20,7 +20,10 @@ if (flags.shot) document.body.classList.add('shot');
 async function tryImport(path) { try { return await import(path); } catch (e) { console.warn('optional module unavailable:', path, e.message); return null; } }
 
 async function start() {
-  const tier = detectQuality(flags.q);
+  // Settings ▸ Graphics (a stored choice; 'auto' = detect) applies at boot; ?q= still wins
+  const picked = (() => { try { const st = JSON.parse(localStorage.getItem('heirframe:settings') || '{}'); return st.qualityPicked && st.quality !== 'auto' ? st.quality : null; } catch (e) { return null; } })();
+  const tier = detectQuality(flags.q || picked);
+  window.__hfTier = tier.name;
   progress(0.05, 'Calibrating optics…');
   await frame();
   const canvas = document.getElementById('game');

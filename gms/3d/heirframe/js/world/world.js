@@ -35,6 +35,7 @@ import { SPINE } from './spine.js';
 import { HULLSIDE } from './hullside.js';
 import { MERIDIAN } from './meridian.js';
 import { HELM } from './helm.js';
+import { LANDFALL } from './landfall.js';
 
 export const LAYOUT = {
   bounds: { x0: -58, x1: 47.5, z0: -97, z1: 79 },
@@ -87,12 +88,13 @@ export const DISTRICT_DEFS = {
   hullside: HULLSIDE,
   meridian: MERIDIAN,
   helm: HELM,
+  landfall: LANDFALL,
 };
 export const DISTRICT_IDS = Object.keys(DISTRICT_DEFS);
 // [{id, label}] for pickers (the ?dev panel); world.districtList() returns the same
 export const DISTRICT_LIST = DISTRICT_IDS.map((id) => ({ id, label: DISTRICT_DEFS[id].name }));
 // ids the P3 brief used; the sim (js/data/districts.js) uses the canonical ones
-export const DISTRICT_ALIASES = { verdant: 'terraces', verdant_terraces: 'terraces', nexus: 'arcology', nexus_arcology: 'arcology', nexus_servers: 'arcology_servers', docks: 'portside', spaceport: 'portside', the_stacks: 'stacks', undercity: 'stacks', pod_4471: 'home', pod: 'home', the_spine: 'spine', hull: 'hullside', meridian_wreck: 'meridian', wreck: 'meridian', the_helm: 'helm', bridge: 'helm' };
+export const DISTRICT_ALIASES = { verdant: 'terraces', verdant_terraces: 'terraces', nexus: 'arcology', nexus_arcology: 'arcology', nexus_servers: 'arcology_servers', docks: 'portside', spaceport: 'portside', the_stacks: 'stacks', undercity: 'stacks', pod_4471: 'home', pod: 'home', the_spine: 'spine', hull: 'hullside', meridian_wreck: 'meridian', wreck: 'meridian', the_helm: 'helm', bridge: 'helm', verdance: 'landfall', verdance_landfall: 'landfall' };
 const canon = (id) => DISTRICT_ALIASES[id] || id;
 
 
@@ -111,6 +113,9 @@ export function createWorld(canvas, { quality, toneMapping = 'aces', onProgress 
   const time = { value: 0 };
   const pxScale = { value: 1 };
   const reflection = createPlanarReflection(renderer, { scale: tier.reflect, planeY: 0, samples: tier.mirrorMsaa || 0 });
+  // med: the mirror re-renders every other frame (the texture keeps its own world→texture matrix, so the floor still
+  // lines up while the camera moves; only moving reflections update at 30 Hz)
+  reflection.skip = tier.reflectSkip || 0;
   const sky = createSky();
   scene.add(sky);
   const skyEnv = buildEnvironment(renderer, tier.envSize);

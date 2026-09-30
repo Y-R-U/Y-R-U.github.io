@@ -4,7 +4,7 @@ import { STORY_MISSIONS } from '../data/story.js';
 import { DISTRICTS } from '../data/districts.js';
 import { completeStory } from '../sim/story.js';
 import { rollItem } from '../sim/loot.js';
-import { xpNext } from '../sim/economy.js';
+import { xpNext, LEGACY_XP } from '../sim/economy.js';
 import { createRng } from '../sim/rng.js';
 import { OWNABLE_FRAMES } from '../data/frames.js';
 import { DISTRICT_NAMES } from '../game/districts.js';
@@ -73,6 +73,7 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
     if (G.runner.active) G.runner.abandon();
     // fast-forwarding fires dozens of level-ups and unlock toasts: mute them, or stale LEVEL N banners queue for minutes
     G.quiet = true;
+    G.coach?.skipAll();
     const S = G.sim.state, st = S.story;
     st.done = []; st.clues = []; st.reveals = []; st.flags = []; st.mission = STORY_MISSIONS[0].id;
     for (const m of STORY_MISSIONS.slice(0, idx)) { const fx = completeStory(st, m.id, {}); for (const d of fx?.unlocks || []) G.sim.unlockDistrict(d); }
@@ -92,6 +93,7 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
   function postGame(ending) {
     if (G.runner.active) G.runner.abandon();
     G.quiet = true;
+    G.coach?.skipAll();
     const S = G.sim.state, st = S.story;
     st.done = []; st.clues = []; st.reveals = []; st.flags = []; st.mission = STORY_MISSIONS[0].id;
     for (const m of STORY_MISSIONS) { const fx = completeStory(st, m.id, m.id === 'a6_m5' ? { choice: ending, choices: { irisFate: 'frame' } } : {}); for (const d of fx?.unlocks || []) G.sim.unlockDistrict(d); }
@@ -103,6 +105,7 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
     G.quiet = false;
     G.sim.refreshBoard();
     G.finale?.apply();
+    G.sim.openVoiceHunts();
     toast(`Post-game · ${ending === 'open' ? 'OPEN THE SKY' : 'KEEP THE SKY'}`, 'every story mission done');
   }
   function ownFrames() {
@@ -173,6 +176,12 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
     section('Economy', [
       ['+1,000 cr', () => G.sim.addCredits(1000, 'dev')], ['+10,000 cr', () => G.sim.addCredits(10000, 'dev')], ['+100,000 cr', () => G.sim.addCredits(100000, 'dev')],
       ['Own all frames', ownFrames], ['Fill parts', fillParts],
+    ]);
+    section('Endless (P6)', [
+      ['L60', () => { G.quiet = true; setLevel(60); G.quiet = false; }],
+      ['+20 Legacy', () => { G.quiet = true; setLevel(60); G.sim.giveXp(20 * LEGACY_XP, 'dev'); G.quiet = false; }],
+      ['Overclock +1', () => { const oc = G.sim.state.overclock; setLevel(60); oc.unlocked = Math.min(30, (oc.unlocked || 0) + 1); G.sim.refreshBoard(); toast(`Overclock ${oc.unlocked} unlocked`); }],
+      ['Voice Hunt now', () => { G.sim.openVoiceHunts(); if (!G.sim.state.voices.hunt) G.sim.startHunt(); G.sim.refreshBoard(); }],
     ]);
     section('Level', [5, 8, 10, 15, 20, 30, 40, 50].map((n) => [`L${n}`, () => { G.quiet = true; setLevel(n); G.quiet = false; }, S?.player.level >= n ? 'on' : '']).concat([['+1', () => setLevel((G.sim.state.player.level || 1) + 1)]]));
     section('Heat', [0, 1, 2, 3, 4, 5].map((n) => [`${n}★`, () => setHeat(n)]));

@@ -69,10 +69,10 @@ export const DISTRICTS = {
     packs: ['gilded_court', 'choir_trine'],
   },
   landfall: {
-    id: 'landfall', name: 'Verdance Landfall', minLvl: 50, maxLvl: 999, act: 7, unlock: { level: 50, story: 'finale' }, danger: 9,
-    tags: ['park', 'plaza', 'pad', 'warehouse', 'garden', 'relay', 'spawn_edge'],
-    pools: [['voices', 6], ['choir', 4], ['scrap', 3]],
-    packs: ['gilded_court', 'choir_trine', 'wight_crawl'],
+    id: 'landfall', name: 'Verdance Landfall', minLvl: 50, maxLvl: 999, act: 7, unlock: { level: 50, story: 'finale' }, danger: 6,
+    tags: ['park', 'plaza', 'market', 'pad', 'warehouse', 'garden', 'locker', 'interior', 'vault', 'lobby', 'rooftop', 'relay', 'spawn_edge'], sky: false,
+    pools: [['scrap', 4], ['unlinked', 3], ['voices', 2], ['choir', 1]],   // P6: the frontier: wights, raiders, a few gilded holdouts
+    packs: ['wight_crawl', 'unlinked_cell', 'rust_pack', 'gilded_court'],
   },
 };
 

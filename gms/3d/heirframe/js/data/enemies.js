@@ -104,7 +104,8 @@ export const BOSSES = {
     // P5: hp 180→22 dmg 34→3.5 armor 50→30 shield 200→28; phase 2's seven halo drones (not gilded guards) shield him
     base: { hp: 22, dmg: 3.5, armor: 30, shield: 28 }, move: 3, skills: ['e_melee', 'e_stomp', 'e_sweep', 'e_blast'], phases: [0.66, 0.33], tags: ['robot', 'frame', 'heavy'] },
   voice: { id: 'voice', name: 'Escaped Voice', rank: 'boss', robotKind: 'civ_gold', robotTier: 3, faction: 'voices', ai: ['boss', 'duelist'], act: 7,
-    base: { hp: 140, dmg: 32, armor: 40, shield: 150 }, move: 5, skills: ['e_melee', 'e_parry', 'e_lunge', 'e_blast'], phases: [0.5], tags: ['robot', 'frame'] },
+    // P6: the Act 5–6 boss share per hit (was hp 140 dmg 32 armor 40 shield 150)
+    base: { hp: 24, dmg: 3.8, armor: 30, shield: 24 }, move: 5, skills: ['e_melee', 'e_parry', 'e_lunge', 'e_blast'], phases: [0.5], tags: ['robot', 'frame'] },
 };
 
 // MISSIONS §9 packs. units: [defId, min, max]. minLevel gates a unit.

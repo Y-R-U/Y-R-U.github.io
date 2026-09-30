@@ -3,7 +3,7 @@ export const TIERS = {
   high: { name: 'high', dprMax: 1.5, dprDesktop: 1.75, shadowMap: 2048, shadowSoft: true, msaa: 4, mirrorMsaa: 0, bloom: true, bloomDiv: 4,
           reflect: 0.5, reflectLayers: 'full', crowd: 32, farCrowd: 200, traffic: 70, trees: 1, envSize: 256, mist: true },
   med:  { name: 'med', dprMax: 1.25, dprDesktop: 1.25, shadowMap: 1024, shadowSoft: true, msaa: 0, mirrorMsaa: 0, bloom: true, bloomDiv: 4,
-          reflect: 0.33, reflectLayers: 'full', crowd: 14, farCrowd: 130, traffic: 40, trees: 0.7, envSize: 128, mist: true },
+          reflect: 0.33, reflectSkip: 1, reflectLayers: 'full', crowd: 14, farCrowd: 130, traffic: 40, trees: 0.7, envSize: 128, mist: true },
   low:  { name: 'low', dprMax: 1.0, dprDesktop: 1.0, shadowMap: 0, shadowSoft: false, msaa: 0, mirrorMsaa: 0, bloom: false, bloomDiv: 2,
           reflect: 0, reflectLayers: 'none', crowd: 7, farCrowd: 60, traffic: 18, trees: 0.5, envSize: 64, mist: false },
 };
@@ -39,6 +39,7 @@ export function detectQuality(flag) {
   if (num('mirrormsaa') !== null) tier.mirrorMsaa = num('mirrormsaa');
   if (num('bloomdiv') !== null) tier.bloomDiv = Math.max(2, num('bloomdiv'));
   if (num('shadow') !== null) tier.shadowMap = num('shadow');
+  if (num('rskip') !== null) tier.reflectSkip = num('rskip');
   const dpr = window.devicePixelRatio || 1;
   tier.dpr = Math.min(dpr, isMobile ? tier.dprMax : tier.dprDesktop);
   if (num('dpr') !== null) tier.dpr = Math.min(dpr, num('dpr'));

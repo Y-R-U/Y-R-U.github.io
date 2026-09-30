@@ -87,10 +87,14 @@ export function haptic(ms = 8) {
 }
 
 const SETTINGS_KEY = 'heirframe:settings';
-const DEFAULT_SETTINGS = { quality: 'high', master: 1, music: 0.7, sfx: 0.8, voice: 0.9, ambient: 0.7, subtitles: true, joystick: 'left', haptics: true };
+const DEFAULT_SETTINGS = { quality: 'auto', buttons: 'm', master: 1, music: 0.7, sfx: 0.8, voice: 0.9, ambient: 0.7, subtitles: true, joystick: 'left', haptics: true };
 
 function loadSettings() {
-  try { return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; }
+  try {
+    const s = { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') };
+    if (!s.qualityPicked) s.quality = 'auto';   // pre-P6 saves stored the old 'high' default without anyone choosing it
+    return s;
+  }
   catch { return { ...DEFAULT_SETTINGS }; }
 }
 

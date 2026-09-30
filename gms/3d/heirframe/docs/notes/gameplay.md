@@ -1,3 +1,9 @@
+P6 PLAYABLE
+(gameplay agent P6, 2026-10-01: Verdance Landfall, Overclock I–XXX, the Legacy board, Succession (Gen N, handed-down
+heirlooms, Echo runs), five Voice Hunts, Settings (graphics, layout with a left-handed mirror, button size, save export and
+import), a 60 h × 6-seed balance soak, the mirror at half rate on med, the coach fix. Table in "P6 acceptance" at the
+bottom.)
+
 P5 PLAYABLE
 (gameplay agent P5, 2026-10-01: Acts 5–6 staged and bot-played mission by mission; Seraph + Dray multi-phase bosses;
 Heir Core 4th skills; Walk as Yourself; both endings persist; epilogue; heirloom sets; Nightmare. Table in "P5
@@ -439,3 +445,152 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
 - The Helm reads very dark at gameplay pitch (black mirror floor + space); art-owned, D23 says only on Aaron's flag.
 - Runner: packs of a defend step now wait for that step (they spawned early as guards when their site was the next
   step's site). Also changes A4-M2's defend (regression run ok).
+
+
+# P6 "Endless" (gameplay agent P6, 2026-10-01)
+
+## Checkpoint 1
+- DONE: coach hints never show for a veteran (save past A1-M1, level ≥ 8, Gen 2+) or after a dev jump (`coach.skipAll()`
+  from dev.js jumpStory/postGame).
+- DONE sim: NEW js/data/voices.js (Mercy, Unity, Vigil, Renewal, Tomorrow) + 5 Voice relic POWERS (`voice:` key, never in
+  the random pool); NEW js/sim/endless.js (heirRank, growItem, hunt helpers). game_state: `player.legacyEver/legacyGen`,
+  Heir Core rank = legacyEver/10 (+5% heirPct each), Heir Core + handed-down heirlooms re-level with the rider,
+  `successionState()` / `succession(name, heirloomUid)` (needs L60 + Legacy 20 earned by THIS heir; estate duty over 50k;
+  districts re-open with the Echo story; gear the heir can't wear is unequipped), Voice Hunts (`S.voices`; the finale opens
+  them, one Voice at a time, a card on the board until caught, moves district every 7 shifts, the next surfaces 7 shifts
+  after a catch, a full cycle of 5 restarts +2 levels). Save v3 migration. equipBest never swaps out the Heir Core.
+- test.mjs 29/29 (+2 P6: whole post-game chain incl. a Gen 2 Succession with save/reload at each stage; v2 migration +
+  export/import round trip).
+- NEXT: balance bot (legacy spending, succession, voice hunts, overclock), runtime/UI (Legacy tab, Succession flow, Echo
+  dialogue, Voice boss, Overclock picker), Landfall district, settings, perf, Ghost boss check.
+
+## Checkpoint 2
+- GREEN (after the limit reset): boot + smoke (`auto=1&contracts=1&speed=2`, 0 console errors), test.mjs 29/29.
+- DONE balance: bot plays the full P5 scope (storyActCap ∞, 18 archetypes, 12 twists; `--act1` = old P2 scope), spends
+  Legacy, passes the frame at Legacy 20, hunts Voices, climbs the threat ladder at 60 (Hostile → … → Overclock n).
+  NEW tools/sim/soak60.mjs (6 seeds × 66 h, every §9 target ±20%, idle-rich, grunt TTK) → scratchpad p6/soak60.txt.
+- Balance changes: `BALANCE.legacyXpMult 0.5` (a Legacy point = half the L60 requirement; at full cost the soak ended at
+  Legacy 12 → Succession ~80 h; now 55.7–64.2 h); all heirlooms re-level with the rider (they lagged 8+ levels behind at 60
+  and the bot died at every threat above Tense); the first Pro/Elite clear from L15 carries a Relic (first Relic now
+  3.3–3.7 h, was 4.5–6.4); nextGoal adds a Mk tier gated ≤ 3 levels away and, when nothing else is left, the next tune
+  incl. the broker price of missing materials (idle-rich 0 in all 6 seeds, was 3); Voice boss base cut to the Act 5–6
+  share per hit (hp 140→24, dmg 32→3.8).
+- Soak misses (for the manager): level 8 at 1.4–1.7 h vs 1.3 h (+30% worst; it is D19's slower licence level, Act 1 itself
+  meets the P2-amended 60–100 min); Brawler grunt TTK 1.17 s vs 1.5 s floor (a 3-hit combo kills a Knuckle; a fix is a
+  −20% combo nerf, not done: it would slow every Brawler boss fight).
+- NEXT: runtime/UI for Legacy/Succession/Echo/Voices/Overclock, Landfall district, settings, perf, Ghost boss check.
+
+## Checkpoint 3
+- DONE runtime/UI: Warehouse ▸ **Legacy** tab (NEW js/ui/panel_legacy.js; shows from L50 / Gen 2 / after the finale):
+  12-node board (tap to spend), Legacy XP bar, Heir Core rank, Succession card (family chain, rules, heirloom picker,
+  heir name input, two-tap "Pass the Frame" → "Confirm", no browser dialogs), the five Voices (hiding / hunting in X /
+  silenced + relic). Contract board: **Overclock stepper** (− OFF/I…XXX +, max unlocked) beside the threat row.
+  NEW js/game/endless.js: stings/toasts for legacy, heir rank, Overclock, Voice surfaced/moved/silenced; `pass()` =
+  sim.succession → redeploy frame, relay to Aurum, "Generation N" sting, estate-duty toast, save. Echo runs: Mara/Lyra/
+  Iris/Tomas lines show as "<name> · Echo — Recorded for <heir>" (js/game/story.js). Voice Hunt targets spawn through
+  boss.js `spawnVoice` (boss bar, gilded livery per Voice, 2 Gilded Guard at 50%). Title "P6 · Endless".
+- Dev panel "Endless (P6)": L60, +20 Legacy, Overclock +1, Voice Hunt now; dev post-game opens the hunts.
+- Verified (scratchpad p6/p6ui.mjs, 915x412 touch): post-game → L60 + 21 Legacy → Voice card on the board → Legacy tab
+  (shot p6/legacy_915.png) → 3 taps = dmg rank 3 → name "Robin" → Pass → Confirm → Gen 2 Robin L1, Echo A1-M1, Aurum,
+  coach stays off; reload keeps Gen 2. 0 console errors.
+- NEXT: Verdance Landfall district, settings (graphics/auto, save export/import, left-handed), perf low/med, Ghost boss,
+  30-min soak, regressions.
+
+## Checkpoint 4 — Verdance Landfall
+- NEW js/world/landfall.js (registered in world.js `landfall`, aliases `verdance`, `verdance_landfall`): a colony clearing
+  on the real planet. Own sky dome + PMREM (teal-gold atmosphere, cloud banks, pale moon; `interior: true` so the city
+  sky/rain/night are off), a two-level terrain (1 m walkable patch with ochre trails + gravel aprons, 6 m outer rolling
+  downs and blue ridges), 5 prefab domes, market stalls, supply lockers, survey tower, crop plots with Earth trees, solar
+  array, fence beacons, lamps, landing pad + shuttle, containers, breakables, the colony holo sign; alien flora (bulb
+  stalks with glowing caps, frond fans, crystal spires) inside the meadow edges and ~260 out on the hills; **the ark**
+  hangs in the northern sky (unfogged, haze painted in). 34 sites (`lf_*`: park ×3, plaza ×2, market, pad, warehouse ×2,
+  garden ×2, locker ×2, interior ×2, vault, lobby, rooftop, relay, spawn_edge ×4, vantage ×2, hide ×4, npc ×3,
+  terminal, link_pad), crowd 12, build ~95 ms.
+- Perf (M5 metal, 915x412 DPR2): high 65–78 calls / 180–250k tris, med 64–82, low 27–46; vista 1280x720 high 62–132
+  calls. 60 fps everywhere. Shots: scratchpad p6/lfv_*.png, lf_*_915_*.png.
+- Sim: landfall tags widened (market, locker, interior, vault, lobby, rooftop), danger 9→6, pools scrap/unlinked/voices/
+  choir 4/3/2/1 (was voices/choir heavy: every generated defend there broke in < 10 s).
+- Voice Hunt cards: level = rider + 1 (+2 per full cycle), faction voices, a small gilded court (1 veteran + 1 Gilded
+  Guard + 2 Voice Drones) instead of the district packs, checkpoints on (a wreck redeploys). Bot (voice.mjs): geared
+  Brawler kills the Voice in 26 s, gearless Gunner in 126 game-s with 0 wrecks → relic granted, hunt cleared.
+- Landfall contracts (voice.mjs <frame> <sec> <arch>): bounty ok, escort ok (1 of 2), defend fails for the Prototype+5 L52
+  bot at mission level 55–56 — the same defend fails in the Helm at L55 and passes in Hullside at L50, so it is the
+  +3/+4 level gap vs the bot, not the district. Left as is (humans kite and use kits).
+
+## Checkpoint 5 — Settings
+- Settings panel (js/ui/panel_settings.js): **Graphics** Auto / Low / Med / High (stored with `qualityPicked`; main.js
+  applies it at boot, `?q=` still wins; pre-P6 settings that only stored the old 'high' default count as Auto) +
+  "running: X" and a **Restart to apply** button (saves, reloads). **Layout** Standard / Left-handed (mirrors the
+  stick zone and the action cluster; camera drag takes the other side). **Button size** S/M/L (scales the HUD `--hs`).
+  Subtitles, haptics, the five volume sliders as before. **Save**: Export (summary + the checksummed text, Copy, Download
+  .txt) and Import (paste or Load file → Check → summary or "Not a valid save: …" → two-tap Replace → reload to the
+  title). No alert/confirm/prompt; game.js handles `save:export|check|import`, `game:restart`.
+- settings.mjs (915x412 touch taps): mirror on, Low → restart → boots `low` + mirror kept; export 14.7 kB; garbage →
+  "not JSON"; the exported text → found → replace → reload → Continue restores level/credits. 0 console errors.
+
+## Checkpoint 6 — perf (low/med) + Ghost vs bosses
+- Perf, med: the planar mirror re-renders every other frame (`tier.reflectSkip = 1`, `reflection.skip`; `?rskip=0` to A/B).
+  The texture keeps its own world→texture matrix, so the floor stays registered while the camera moves; only moving
+  reflections update at 30 Hz. Uncapped M5 (`--disable-gpu-vsync --disable-frame-rate-limit`, 915x412 DPR2):
+  Aurum avg calls 133→110, 387→423 fps; Brightline 153→122, 420→444 fps; the peak frame is unchanged (134/155).
+  Per-pass breakdown on med (passes.mjs): the mirror is 47–63 calls and ~150–185k tris of a 134–154-call frame, shadows
+  ~30 calls. Low was already cheap (67 calls with 8 enemies, 593 fps uncapped): left as is.
+- Ghost vs bosses (story2m.mjs a6_m5 ghost, gearless, speed 2): 283 hits, **backstabs 26% of hits but 52% of the damage**
+  (Blink's 2 s decoy turns the boss away, so the frame's boss tool works), 6 wrecks: 4 to Dray's melee, 1 Helm strike,
+  1 drone. Verdict: it is the bot's style (it stays in melee after the decoy window) plus the Ghost's low HP, not a missing
+  tool. I tried a "back off until Blink is ready" bot style: backstab share rose to 92% of damage, but the bot then stood
+  still in Helm strikes and wrecked 8×, so it is reverted. No frame change; a human Ghost should Blink → stab → Veil/dodge.
+
+## Checkpoint 7
+- 60 h soak re-run after the Landfall / Voice changes (6 seeds × 66 h, scratchpad p6/soak60.txt): all §9 targets ±20%
+  except level 8 (1.4–1.7 h vs 1.3 h; D19) and the Brawler grunt TTK (1.17 s vs the 1.5 s floor). Level 60 36.5–39.2 h,
+  first Succession 49.4–54.7 h, first Relic 3.3–3.7 h, idle-rich windows 0, 3–4 Voices caught per seed, Gen 2 in all six.
+- Autopilot: an emptied board (all cards taken or failed) is rerolled instead of idling until the next shift (found by
+  the memory soak: the bot sat on an empty board for 8 real minutes).
+- IN PROGRESS: 30-min memory soak (soak.mjs, `auto=1&story=1&contracts=9999&speed=3`, heap after forced GC each minute).
+
+## Checkpoint 8 — memory soak + regressions (after the limit reset)
+- 30-min memory soak (soak.mjs, story autopilot, speed 3, forced GC before each sample; log p6/soak30.log survived):
+  heap 79.3 MB at min 5 → 83.2 MB at min 30 (**+4.9%**), geometries 244→280 and textures 77→80 (they grow over the first
+  district swaps, then stay flat from min 11), programs flat at 98–99, 0 console errors. Caveat: the bot stopped completing
+  contracts at min 7 (L8, Brightline); the page kept running fights and redeploys to the end. A1-M3 and A1-M4 replay fine
+  on their own, so the cause is not found. It is noted here, not fixed.
+- Regressions: test.mjs 29/29; smoke ok; story2 A1-M3, A1-M4 (Kettle), A2-M5, A4-M2 (Rustmother) complete; reload.mjs
+  A2-M1 / A4-M4 / A6-M5 resume with a live objective; normal boot fetches 155 js, **0 from js/dev**; after a dev jump
+  to A4-M4 (L32) no coach hint shows and every lesson is marked done. 0 console errors throughout.
+- Perf (perf.mjs, 8 enemies, M5 metal, vsync on): high 1280x720 60 fps p95 16.8 ms, **237 calls** max, 0 hitches; med
+  915x412 60 fps, 223 max (the peak frame; the average fell 20% with the half-rate mirror); low 60 fps, 62 calls.
+  Landfall: high 65–78 calls, vistas ≤ 136.
+
+## P6 acceptance (BUILD_PLAN §P6)
+| item | result | evidence |
+|---|---|---|
+| Verdance Landfall district | PASS | js/world/landfall.js; 34 sites; bot bounty/escort/Voice Hunt there; 60 fps on high/med/low (27–82 calls) |
+| Overclock I–XXX | PASS | sim: unlocks at 60, an Elite clear unlocks n+1, cards at level 66+n/3; contract-board stepper; test.mjs |
+| Legacy board + Heir Core ranks | PASS | Warehouse ▸ Legacy (tap to spend; p6ui.mjs); +5% Heir Protocol per 10 Legacy; test.mjs |
+| Gen 2 Succession end to end | PASS | test.mjs (save/reload at each stage); in-game p6ui.mjs: name → Pass → Confirm → Gen 2 Robin L1, Echo A1-M1, reload keeps it; soak: Gen 2 in 6/6 seeds |
+| Voice Hunts (5 roaming bosses, unique Relics) | PASS | sim + runtime boss bar and livery; voice.mjs: Voice killed, relic granted; relics never in the random pool (test) |
+| 60 h sim meets ECONOMY §9 ±20% | PASS* | soak60.mjs 6 seeds × 66 h: all milestones pass except level 8 (1.4–1.7 h vs 1.3 h, from D19) and Brawler grunt TTK (1.17 s vs 1.5 s); first Relic 3.3–3.7 h (was 4.5–6.4) |
+| credits never idle > 3× next want for 2 h | PASS | 0 windows in 6 seeds |
+| Settings: graphics, audio, controls layout + left-handed mirror, save export/import | PASS | settings.mjs (touch): mirror, Low applies after restart, export → bad/good check → replace → reload |
+| 30-min soak, memory growth ≤ 15% | PASS | +4.9% heap (min 5 → 30), geometries/textures flat after the first swaps (see the caveat in checkpoint 8) |
+| low/med perf pass | PASS | med mirror at half rate: −20% average calls, +6–9% uncapped fps, same look |
+| Coach after dev jumps / veteran saves | PASS | coach.mjs: 0 hints at L32 after a jump |
+| Ghost vs bosses | checked | the frame's tool works (backstabs = 52% of the damage vs Dray); the wrecks come from the bot staying in melee |
+| P1–P5 regressions, reload, 0 js/dev | PASS | checkpoint 8 |
+| 60 fps on high, ≤ 300 calls | PASS | 237 calls with 8 enemies at 1280x720 |
+
+## Known / decisions to review (P6)
+- `BALANCE.legacyXpMult 0.5`: a Legacy point costs half the L60 requirement (ECONOMY §8 says the whole one); otherwise the
+  first Succession lands near 80 h instead of ~55 h.
+- Every heirloom re-levels with the rider; handed-down pieces also grow (+2 levels) and gain +1 tune cap per hand-down (up
+  to 5). The Heir Core re-levels too and auto-equip never swaps it out.
+- Succession resets unlocked districts to Aurum (the Echo story re-opens them); the Voice Hunts stay open across generations.
+- The first Pro/Elite clear from L15 always carries a Relic.
+- nextGoal also lists a Mk tier gated ≤ 3 levels away and, in the endgame, the next tune (materials priced in).
+- Voice Hunt cards: rider level + 1 (+2 per cycle of five), 3× pay, 2× XP, checkpoints, a gilded court escort; Voice
+  base cut to the Act 5–6 share (hp 24, dmg 3.8).
+- Landfall danger 6 with frontier pools (scrap/unlinked first); `interior: true`, so no day/night or rain there.
+- Soak misses: level 8 (D19) and Brawler TTK (left for feel).
+- Generated defends 3–4 levels above the bot fail anywhere (Helm and Landfall alike).
+- Pre-P6 settings that stored 'high' without anyone choosing it now boot on Auto.

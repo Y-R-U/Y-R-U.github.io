@@ -130,7 +130,8 @@ export function createRunner(ctx) {
     const siteId = which === 'realTarget' ? R.step?.site : t.site;
     const s = site(siteId) || site(R.step?.site);
     if (!s) return;
-    const e = enemies.spawn({ defId: t.defId, rank: t.rank || 'grunt', level: R.mission.level, name: t.name }, s.x + 1.5, s.z + 1.5, { guard: true, stealthy: R.stealth });
+    const e = t.voice && ctx.boss?.spawnVoice ? ctx.boss.spawnVoice(t, s.x + 1.5, s.z + 1.5, R)
+      : enemies.spawn({ defId: t.defId, rank: t.rank || 'grunt', level: R.mission.level, name: t.name }, s.x + 1.5, s.z + 1.5, { guard: true, stealthy: R.stealth });
     e.mission = R.mission.id; e.isTarget = true; e.home.set(s.x, 0, s.z);
     // T5 / T12 targets can't die before their twist asks the question
     if (['T5', 'T12'].includes(R.mission.twist?.id) && !sim.state.contract?.twistFired) e.noKill = true;

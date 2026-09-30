@@ -73,7 +73,7 @@ export function rollItem(rng, opts = {}) {
   let power = null;
   if (rarity === 'relic') {
     const recent = opts.lootState?.recentRelics || [];
-    const bySlot = opts.slot ? POWERS.filter(p => p.slot === opts.slot) : POWERS;
+    const bySlot = opts.power ? POWERS.filter(p => p.id === opts.power) : POWERS.filter(p => !p.voice && (!opts.slot || p.slot === opts.slot));
     let pool = bySlot.filter(p => !recent.includes(p.id));
     if (!pool.length) pool = bySlot;
     power = rng.pick(pool);

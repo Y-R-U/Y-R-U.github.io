@@ -1,6 +1,6 @@
 import { hash32 } from './rng.js';
 
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 export const SAVE_PREFIX = 'heirframe.save.';
 
 // migrations[n] upgrades a v(n) save object to v(n+1). Keep them forever.
@@ -9,6 +9,15 @@ export const migrations = {
     s.homesOwned = s.homesOwned || [s.home || 'pod'];
     s.overclock = s.overclock || { unlocked: 0, active: null };
     if (s.player?.level >= 60 && !s.overclock.unlocked) s.overclock.unlocked = 1;
+    return s;
+  },
+  // P6: Legacy bookkeeping (points earned ever / this generation) and the Voice Hunt state
+  2: s => {
+    const p = s.player || {};
+    const spent = Object.values(p.legacyBoard || {}).reduce((a, b) => a + b, 0);
+    p.legacyEver ??= spent + (p.legacyPoints || 0);
+    p.legacyGen ??= p.legacyEver;
+    s.voices ||= { open: false, caught: [], hunt: null, cycle: 0, lastShift: 0, relics: [] };
     return s;
   },
 };

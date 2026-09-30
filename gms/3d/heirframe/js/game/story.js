@@ -5,7 +5,10 @@ export function createStoryPlayer(ctx) {
   const { ui, audio, overlay } = ctx;
   let busy = 0;
 
-  const who = (id) => SPEAKERS[id] || { name: id ? id[0].toUpperCase() + id.slice(1) : '', role: '', portrait: { kind: 'unknown' } };
+  const who0 = (id) => SPEAKERS[id] || { name: id ? id[0].toUpperCase() + id.slice(1) : '', role: '', portrait: { kind: 'unknown' } };
+  // Echo runs (after a Succession): Mara's, Lyra's and Iris's lines are recordings left for the new heir
+  const ECHO = ['mara', 'lyra', 'iris', 'tomas'];
+  const who = (id) => { const s = who0(id), heir = ctx.echo?.(); return heir && ECHO.includes(id) ? { ...s, name: `${s.name} · Echo`, role: `Recorded for ${heir}` } : s; };
   const fullText = (b) => audio.voInfo(b.vo)?.text || b.text || '';
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const readMs = (t) => Math.max(1800, Math.min(7000, t.length * 55));

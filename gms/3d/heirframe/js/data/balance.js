@@ -5,6 +5,9 @@ export const BALANCE = {
   maxLevel: 60,
   // D19: the licence level (4→5) runs longer so a fast first hour doesn't buy the first frame before ~45 min
   xpLevelMult: { 4: 1.5 },
+  // P6 sim: a Legacy point costs half the level-60 requirement (ECONOMY §8 says the whole one). With the full cost the
+  // 60 h soak reached Legacy 12, so the first Succession (§9: ~55 h) sat near 80 h.
+  legacyXpMult: 0.5,
   combat: {
     armorK: 50,               // DR = armor / (armor + armorK * L(attackerLvl))
     maxDR: 0.85,

@@ -160,7 +160,7 @@ Panels and the results/death screens scale up on big viewports (`--ps`, never be
   Unknown nodes show only "?" and a silhouette — don't send names for them. `near` places a parentless node
   beside another (e.g. a sibling); `collapsed` renders a small "… generations" pill.
 - `settings` — no data needed. `ui.settings.get()` / `ui.settings.set(partial)`; persisted to
-  localStorage `heirframe:settings`: `{quality, master, music, sfx, voice, ambient, subtitles, joystick:'left'|'right', haptics}`.
+  localStorage `heirframe:settings`: `{quality:'auto'|'low'|'med'|'high', qualityPicked, buttons:'s'|'m'|'l', master, music, sfx, voice, ambient, subtitles, joystick:'left'|'right' (right = left-handed mirror), haptics}`. main.js reads quality at boot (P6).
 - `pause` — `{mission?}`; buttons resume / settings / codex / warehouse / quit.
 
 `ui.panel.open('results', data)` is an alias for `ui.screen('complete', data)`.

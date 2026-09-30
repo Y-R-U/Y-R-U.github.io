@@ -19,11 +19,13 @@ import { THREATS } from '../data/missions.js';
 import { STASH_SIZES, CONSUMABLES, COSTS, DEBT_FREE_PERK, SUCCESSION, LEGACY_NODES, WARRANTY_SURCHARGE, HOMES, PAINTS, MATERIAL_BROKER } from '../data/economy.js';
 import { HEAT } from '../data/factions.js';
 import { MATERIALS } from '../data/loot.js';
+import { heirRank, HEIR_RANK_PCT, HANDED_DOWN_MAX, growItem, nextVoice, huntDistrict, voiceById } from './endless.js';
+import { VOICE_HUNT } from '../data/voices.js';
 
 export function newState(seed = 1, { name = 'Wren' } = {}) {
   const st = {
     v: SAVE_VERSION, seed: String(seed), created: 0, playSeconds: 0, shiftIndex: 0, shiftClock: 0, actCounter: 0,
-    player: { name, level: 1, xp: 0, legacyXp: 0, legacyPoints: 0, legacyBoard: {}, generation: 1, heirs: [] },
+    player: { name, level: 1, xp: 0, legacyXp: 0, legacyPoints: 0, legacyBoard: {}, legacyEver: 0, legacyGen: 0, generation: 1, heirs: [] },
     credits: 0, rentalDebt: 0, wardDebt: COSTS.wardDebt, surchargeTotal: 0,
     materials: Object.fromEntries(Object.keys(MATERIALS).map(k => [k, 0])),
     frames: [], activeFrame: null, rentalReturned: false,
@@ -34,6 +36,7 @@ export function newState(seed = 1, { name = 'Wren' } = {}) {
     story: newStoryState(),
     districts: { unlocked: ['aurum_plaza'], current: 'aurum_plaza', danger: {} },
     threat: 'tense', overclock: { unlocked: 0, active: null },
+    voices: { open: false, caught: [], hunt: null, cycle: 0, lastShift: 0, relics: [] },
     board: null, contract: null, market: null,
     perks: [], home: 'pod', homesOwned: ['pod'], paints: ['rental_orange'],
     flags: { firstFrameDiscount: false, boardUnlocked: false },
@@ -65,6 +68,8 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
 
   function extrasFor() {
     const ex = [legacyStats(S.player.legacyBoard)];
+    const hr = heirRank(S.player.legacyEver);
+    if (hr) ex.push({ heirPct: hr * HEIR_RANK_PCT });
     if (S.perks.includes('debtFree')) ex.push(DEBT_FREE_PERK);
     return ex;
   }
@@ -151,13 +156,27 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     const syncUps = addSyncXp(f, xp, maxSync(f));
     for (const s of syncUps) emit('sync', { frame: f.uid, sync: s, modUnlocked: [5, 10, 15, 20].includes(s) });
     if (res.levels.length) {
+      growItems();
       restatPlayer({ heal: true });
       for (const lvl of res.levels) emit('levelUp', { level: lvl, features: newFeatures(lvl - 1, lvl) });
       if (newFeatures(before, S.player.level).some(x => x.id === 'brightline')) unlockDistrict('brightline');
       if (S.player.level >= 60 && !S.overclock.unlocked) { S.overclock.unlocked = 1; emit('overclock:unlock', { n: 1 }); }
     } else if (syncUps.length) restatPlayer();
-    if (res.legacy) emit('legacy', { points: S.player.legacyPoints, gained: res.legacy });
+    if (res.legacy) {
+      S.player.legacyEver = (S.player.legacyEver || 0) + res.legacy;
+      S.player.legacyGen = (S.player.legacyGen || 0) + res.legacy;
+      const hr = heirRank(S.player.legacyEver);
+      if (hr > heirRank(S.player.legacyEver - res.legacy)) { restatPlayer(); emit('heir:rank', { rank: hr }); }
+      emit('legacy', { points: S.player.legacyPoints, gained: res.legacy, gen: S.player.legacyGen });
+    }
     return xp;
+  }
+  // the Heir Core and handed-down heirlooms level with their rider (never down, except at a Succession)
+  function growItems() {
+    for (const it of S.stash) {
+      if (it.grows) { if (it.ilvl < S.player.level + 2) growItem(it, S.player.level + 2); }
+      else if ((it.heirCore || it.rarity === 'heirloom') && it.ilvl < S.player.level) growItem(it, S.player.level);
+    }
   }
 
   // ---- stash / items ----------------------------------------------------------------------
@@ -223,6 +242,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     const changed = [];
     for (const slot of frameDef(f).slots) {
       const cur = f.equipped[slot] ? itemByUid(f.equipped[slot]) : null;
+      if (cur?.heirCore) continue;   // the Heir Core carries the 4th skill: auto-equip never swaps it out
       let best = cur;
       for (const it of S.stash) {
         if (it.slot !== slot || (it.equippedOn && it.equippedOn !== f.uid)) continue;
@@ -563,6 +583,8 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
   function refreshBoard({ reroll = 0 } = {}) {
     S.board = generateBoard({ ...boardCtx(), reroll, storyCard: storyCard() });
     if (S.districts.crackdown) S.board.cards.unshift(...crackdownCards().filter((c) => !S.districts.crackdown.done?.includes(c.id)));
+    const vc = voiceCard();
+    if (vc) S.board.cards.unshift(vc);
     emit('board', S.board);
     return S.board;
   }
@@ -701,7 +723,9 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     if (m.twist?.clientRep && c.twistFired) out.rep.push(...adjustRep(S.factions, m.client.faction, m.twist.clientRep));
     if (m.heat) emit('heat', addHeat(S.factions, 'mission', m.heat));
     const rng = actRng('cache:' + m.id);
-    const cacheItem = m.cacheItem ? storyCacheItem(m.cacheItem, rng, m.level) : rollCache(rng, m.grade, { level: m.level, riderLevel: S.player.level, q: lootQuality(), rental: onRental(), lootState: S.loot, overclock: S.overclock.active });
+    // the first Pro/Elite clear from level 15 always carries a Relic (ECONOMY §9: first Relic at 3–5 h)
+    const firstRelic = !m.cacheItem && m.grade !== 'street' && !S.loot.relicsFound && S.player.level >= 15;
+    const cacheItem = m.cacheItem ? storyCacheItem(m.cacheItem, rng, m.level) : firstRelic ? rollItem(rng, { ilvl: Math.min(m.level, S.player.level + 2), rarity: 'relic', q: lootQuality(), lootState: S.loot }) : rollCache(rng, m.grade, { level: m.level, riderLevel: S.player.level, q: lootQuality(), rental: onRental(), lootState: S.loot, overclock: S.overclock.active });
     if (cacheItem) { const it = addItem(cacheItem, { silent: true }); if (it) out.items.push(it); }
     if (rw.stiffed && S.board) {
       const collect = deepClone(m);
@@ -725,6 +749,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
         if (fx.grants.home) S.home = fx.grants.home;
         if (fx.setHeat != null) emit('heat', (setHeat(S.factions, fx.setHeat ? Math.max(S.factions.heat, fx.setHeat) : 0), { stars: heatStars(S.factions) }));
         if (m.story.id === 'a1_m1') S.flags.boardUnlocked = true;
+        if (S.story.flags.includes('finale')) openVoiceHunts();
         emit('story', fx);
       }
     } else {
@@ -734,6 +759,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
       if (m.faction && m.archetype !== 'pest' && DISTRICTS[m.district]) { S.districts.danger[m.district] = Math.min(10, (S.districts.danger[m.district] ?? DISTRICTS[m.district].danger) + 0.3); checkCrackdown(m.district); }
       if (m.badge === 'Crackdown' && S.districts.crackdown) (S.districts.crackdown.done ||= []).push(m.id);
     }
+    if (m.voiceHunt) voiceCaught(m, out);
     const oc = S.overclock.active;
     if (oc && m.grade === 'elite' && oc >= S.overclock.unlocked && oc < 30) { S.overclock.unlocked = oc + 1; out.overclockUnlocked = oc + 1; emit('overclock:unlock', { n: oc + 1 }); }
     S.stats.contractsDone++;
@@ -867,6 +893,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
       const cur = S.districts.danger[id] ?? floor;
       S.districts.danger[id] = Math.max(floor, cur - 0.5);
     }
+    voiceShift();
     if (!S.contract) refreshBoard();
     refreshMarket();
     emit('shift', { shift: S.shiftIndex, fee });
@@ -881,23 +908,122 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     return { ok: true, ranks: S.player.legacyBoard[nodeId] };
   }
   function legacyTotal() { return Object.values(S.player.legacyBoard).reduce((a, b) => a + b, 0) + S.player.legacyPoints; }
+  // ECONOMY §8: Pass the Frame once this heir has earned Legacy 20 (a new heir must earn their own 20)
+  function successionState() {
+    const gen = S.player.legacyGen || 0;
+    const heirlooms = S.stash.filter((i) => i.rarity === 'heirloom' && !i.heirCore && (i.handedDown || 0) < HANDED_DOWN_MAX);
+    return { ok: S.player.level >= 60 && gen >= SUCCESSION.minLegacy, legacyGen: gen, need: SUCCESSION.minLegacy, generation: S.player.generation,
+      nextGen: S.player.generation + 1, creditCap: SUCCESSION.creditCap, duty: Math.max(0, S.credits - SUCCESSION.creditCap),
+      xpBonus: SUCCESSION.xpPerGen * Math.min(S.player.generation, SUCCESSION.maxGen), lootBonus: SUCCESSION.lootPerGen * Math.min(S.player.generation, SUCCESSION.maxGen),
+      heirlooms: heirlooms.map((i) => ({ uid: i.uid, name: i.name, slot: i.slot, tune: i.tune || 0, handedDown: i.handedDown || 0 })) };
+  }
   function succession(heirName, heirloomUid) {
-    if (legacyTotal() < SUCCESSION.minLegacy) return { ok: false, reason: 'legacy' };
-    const hl = heirloomUid && itemByUid(heirloomUid);
-    if (hl && hl.rarity === 'heirloom') hl.maxTuneBonus = 1;
-    S.player.heirs.push({ name: heirName, gen: S.player.generation + 1 });
+    const st = successionState();
+    if (!st.ok) return { ok: false, reason: S.player.level < 60 ? 'level' : 'legacy', need: SUCCESSION.minLegacy, have: st.legacyGen };
+    if (S.contract) return { ok: false, reason: 'contract' };
+    const name = String(heirName || '').trim().slice(0, 18) || `Heir ${S.player.generation + 1}`;
+    const hl = heirloomUid ? itemByUid(heirloomUid) : null;
+    if (hl && hl.rarity === 'heirloom' && !hl.heirCore && (hl.handedDown || 0) < HANDED_DOWN_MAX) {
+      hl.handedDown = (hl.handedDown || 0) + 1;
+      hl.maxTuneBonus = hl.handedDown;
+      hl.grows = true;
+      hl.lore = `Handed down ×${hl.handedDown}. ${hl.lore || ''}`.trim();
+    }
+    const from = { name: S.player.name, gen: S.player.generation, level: S.player.level, legacy: S.player.legacyEver };
+    S.player.heirs.push({ name, gen: S.player.generation + 1, from: from.name, shift: S.shiftIndex, heirloom: hl?.name || null });
     S.player.generation++;
-    S.player.name = heirName; S.player.level = 1; S.player.xp = 0; S.player.legacyXp = 0;
-    for (const f of S.frames) { f.sync = 1; f.syncXp = 0; }
+    S.player.name = name; S.player.level = 1; S.player.xp = 0; S.player.legacyXp = 0; S.player.legacyGen = 0;
+    for (const f of S.frames) { f.sync = 1; f.syncXp = 0; f.hpFrac = 1; f.wrecked = false; }
+    // gear the heir can't wear waits in the stash; the Heir Core and the handed-down pieces re-level to the heir
+    for (const f of S.frames) for (const [slot, uid] of Object.entries(f.equipped)) {
+      const it = uid && itemByUid(uid);
+      if (!it) continue;
+      if (it.heirCore) growItem(it, 1);
+      else if (it.grows) growItem(it, 3);
+      else { it.equippedOn = null; f.equipped[slot] = null; }
+    }
+    for (const it of S.stash) { if (it.heirCore) growItem(it, 1); else if (it.grows) growItem(it, 3); }
+    const duty = Math.max(0, S.credits - SUCCESSION.creditCap);
     S.credits = Math.min(S.credits, SUCCESSION.creditCap);
-    S.factions.heat = 0; S.districts.danger = {};
-    const codexClues = S.story.clues.slice();
-    S.story = newStoryState(); S.story.clues = codexClues; S.story.echo = true;
+    S.factions.heat = 0; S.districts.danger = {}; S.districts.crackdown = null;
+    S.districts.unlocked = ['aurum_plaza']; S.districts.current = 'aurum_plaza';
+    const codexClues = S.story.clues.slice(), ending = S.story.choices?.ending;
+    S.story = newStoryState(); S.story.clues = codexClues; S.story.echo = true; S.story.echoOf = ending || null;
     S.contract = null; S.threat = 'tense'; S.overclock.active = null;
+    if (S.voices) S.voices.hunt = null;
+    S.flags.firstFrameDiscount = false;
+    for (const f of S.frames) { if (!f.rental) equipBest(f.uid); }
     playerCombatant(true);
     refreshBoard();
-    emit('succession', { gen: S.player.generation, name: heirName });
-    return { ok: true };
+    emit('succession', { gen: S.player.generation, name, from, duty, heirloom: hl?.name || null });
+    autosave();
+    return { ok: true, gen: S.player.generation, name, duty };
+  }
+
+  // ---- Voice Hunts (DESIGN §11.4) ---------------------------------------------------------
+  function openVoiceHunts() {
+    const V = S.voices ||= { open: false, caught: [], hunt: null, cycle: 0, lastShift: 0, relics: [] };
+    if (V.open) return;
+    V.open = true;
+    startHunt();
+  }
+  function startHunt() {
+    const V = S.voices;
+    if (!V?.open || V.hunt) return null;
+    if (V.caught.length >= 5) { V.caught = []; V.cycle++; }
+    const rng = rngFor(S.seed, 'voice', V.cycle, V.caught.length, S.shiftIndex);
+    const v = nextVoice(V, rng);
+    if (!v) return null;
+    V.hunt = { id: v.id, district: huntDistrict(rng, S.districts.unlocked, null), since: S.shiftIndex, n: 0 };
+    emit('voice:hunt', { id: v.id, name: v.name, district: V.hunt.district, districtName: DISTRICTS[V.hunt.district]?.name });
+    const vc = S.board && voiceCard();
+    if (vc) S.board.cards.unshift(vc);
+    return V.hunt;
+  }
+  function voiceCard() {
+    const h = S.voices?.hunt;
+    if (!h || !S.districts.unlocked.includes(h.district)) return null;
+    const v = voiceById(h.id);
+    const ctx = boardCtx({ contractsDone: 99 });
+    const m = generateContract(rngFor(S.seed, 'voicecard', h.id, h.since, h.n), ctx, { grade: 'elite', archetype: 'bounty', district: h.district, noTwist: true, slot: 30 });
+    if (!m || !m.target) return null;
+    m.id = `vh_${h.id}_${h.since}_${h.n}`;
+    // a Voice levels to its hunter (+1, +2 per full cycle) and keeps a small gilded court, not the district's packs
+    m.level = S.player.level + 1 + S.voices.cycle * VOICE_HUNT.cycleLevel;
+    m.faction = 'voices';
+    m.target = { ...m.target, defId: 'voice', rank: 'boss', faction: 'voices', name: v.name, epithet: v.epithet, voice: v.id, paint: v.paint };
+    const kill = m.steps.findIndex((st) => st.type === 'kill');
+    const u = (defId, rank) => ({ defId, rank, level: m.level });
+    m.enemies = [{ pack: 'gilded_court', faction: 'voices', atStep: Math.max(0, kill), site: m.target.site, units: [u('gilded_guard', 'veteran'), u('gilded_guard', 'grunt'), u('halo_drone', 'grunt'), u('halo_drone', 'grunt')] }];
+    m.voiceHunt = v.id; m.badge = 'Voice Hunt'; m.modifiers = []; m.timeLimit = null; m.checkpoints = true;
+    m.title = `Voice Hunt: ${v.name}`;
+    m.blurb = `${v.name}, ${v.epithet}, fled the Helm and hides in ${DISTRICTS[h.district].name}. Find it before it moves on.`;
+    m.payout = { ...m.payout, credits: Math.round(m.payout.credits * VOICE_HUNT.pay), xp: Math.round(m.payout.xp * 2) };
+    m.relic = POWERS.find((p) => p.voice === v.id)?.name;
+    return m;
+  }
+  function voiceCaught(m, out) {
+    const V = S.voices;
+    if (!V || !m.voiceHunt) return;
+    if (!V.caught.includes(m.voiceHunt)) V.caught.push(m.voiceHunt);
+    const pw = POWERS.find((p) => p.voice === m.voiceHunt);
+    const relic = rollItem(actRng('voice:' + m.voiceHunt), { ilvl: m.level, rarity: 'relic', power: pw.id, q: lootQuality(), lootState: S.loot });
+    const it = addItem(relic, { silent: true });
+    if (it) out.items.push(it);
+    V.relics = [...new Set([...(V.relics || []), pw.id])];
+    V.hunt = null; V.lastShift = S.shiftIndex;
+    out.voice = { id: m.voiceHunt, relic: it?.name, left: 5 - V.caught.length };
+    emit('voice:caught', { id: m.voiceHunt, name: voiceById(m.voiceHunt)?.name, relic: it?.name, left: 5 - V.caught.length });
+  }
+  function voiceShift() {
+    const V = S.voices;
+    if (!V?.open) return;
+    if (!V.hunt) { if (S.shiftIndex - (V.lastShift || 0) >= VOICE_HUNT.everyShifts) startHunt(); return; }
+    if (S.shiftIndex - V.hunt.since >= VOICE_HUNT.moveShifts * (V.hunt.n + 1)) {
+      V.hunt.n++;
+      V.hunt.district = huntDistrict(rngFor(S.seed, 'voicemove', V.hunt.id, V.hunt.n), S.districts.unlocked, V.hunt.district);
+      emit('voice:moved', { id: V.hunt.id, name: voiceById(V.hunt.id)?.name, district: V.hunt.district, districtName: DISTRICTS[V.hunt.district]?.name });
+    }
   }
 
   // ---- save ------------------------------------------------------------------------------------
@@ -929,6 +1055,7 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     });
   }
 
+  if (S.story.flags.includes('finale') && !S.voices?.open) openVoiceHunts();
   if (!S.board) refreshBoard();
 
   const game = {
@@ -950,7 +1077,8 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     equip, unequip, equipBest, salvage, salvageAll, tune, recalibrate,
     buyFrame, swapFrame, returnRental, upgradeMk, chooseSyncMod, repair, payRental, payWardDebt,
     buyConsumable, useConsumable, grantConsumable, cleanSlate, buyStash, refreshMarket, buyMarket, travel, setThreat, unlockDistrict,
-    spendLegacy, succession, addCredits, giveXp, save,
+    spendLegacy, succession, successionState, legacyTotal, openVoiceHunts, startHunt, addCredits, giveXp, save,
+    heirRank: () => heirRank(S.player.legacyEver),
     buyHome, setHome, buyPaint, setPaint, buyMaterial, brokerPrice,
     homes: () => Object.keys(HOMES).map(homeState), paintsList: () => PAINTS.map(p => paintState(p.id)),
     setSites(districtId, sites) { live.sitesRegistry[districtId] = sites; },

@@ -175,6 +175,8 @@ export function createAutopilot(G, { ui, player }) {
       if (S.contract) { ui.panel.close(); return; }
       if ((A.pT = (A.pT || 0) + 0.25) < 1) return;
       A.pT = 0;
+      // an emptied board (every card taken or failed) refills next shift; a player rerolls it instead of waiting
+      if (!document.querySelector('.cc-go') && !G.sim.board().story) { if (G.sim.rerollBoard().ok) ui.panel.update(toUiBoard(G.sim)); else ui.panel.close(); return; }
       const i = chooseContract();
       const btn = document.querySelectorAll('.cc-go')[i] || document.querySelector('.cc-go');
       if (!click(btn)) ui.panel.close();

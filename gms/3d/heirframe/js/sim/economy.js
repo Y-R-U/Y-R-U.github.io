@@ -1,8 +1,9 @@
 // XP curve, level-ups, credits and cost formulas (ECONOMY.md).
 import { L, BALANCE } from '../data/balance.js';
-import { XP, COSTS, FRAME_PRICES, FIRST_FRAME_DISCOUNT, STASH_SIZES, LEGACY_NODES, FEATURE_UNLOCKS, CONSUMABLES, SHIFT_SECONDS, RENTAL_FEE, HOMES, PAINTS } from '../data/economy.js';
+import { XP, COSTS, FRAME_PRICES, FIRST_FRAME_DISCOUNT, STASH_SIZES, LEGACY_NODES, FEATURE_UNLOCKS, CONSUMABLES, SHIFT_SECONDS, RENTAL_FEE, HOMES, PAINTS, MATERIAL_BROKER } from '../data/economy.js';
 import { MK_TIERS, SYNC_NEXT } from '../data/frames.js';
 import { clamp } from './util.js';
+import { tuneCost } from './loot.js';
 
 export { L, SHIFT_SECONDS, RENTAL_FEE };
 
@@ -13,7 +14,7 @@ export function niceRound(v) {
 }
 
 export const xpNext = n => niceRound((4 + 1.2 * n) * 20 * L(n) * (BALANCE.xpLevelMult?.[n] || 1));
-export const LEGACY_XP = xpNext(BALANCE.maxLevel);
+export const LEGACY_XP = Math.round(xpNext(BALANCE.maxLevel) * (BALANCE.legacyXpMult ?? 1));
 
 export function overLevelPenalty(riderLevel, enemyLevel) {
   return clamp(1 - 0.1 * (riderLevel - enemyLevel - 2), 0.1, 1);
@@ -117,12 +118,25 @@ export function nextGoal(state) {
   for (const f of state.frames.filter(x => !x.rental)) {
     const mk = mkUpgrade(f, state.player.level);
     if (mk?.ok) wants.push({ id: 'mk:' + f.uid, label: `${f.name} ${mk.name}`, cost: mk.cost });
+    // a tier whose level gate is 3 or fewer levels away is already the thing you save for
+    else if (mk && (f.sync || 1) >= mk.needSync && mk.needLevel <= state.player.level + 3) wants.push({ id: 'mk:' + f.uid, label: `${f.name} ${mk.name} (Lv ${mk.needLevel})`, cost: mk.cost, gated: true });
   }
   const ns = nextStash(state.stashSize);
   if (ns && state.stash.length > state.stashSize * 0.8) wants.push({ id: 'stash', label: `Stash ${ns.size}`, cost: ns.cost });
   // nothing functional to buy right now: fall back to the next stash size, homes and prestige paints
   if (!wants.length) {
     if (ns) wants.push({ id: 'stash', label: `Stash ${ns.size}`, cost: ns.cost });
+    // endgame: the next tune on the active frame's cheapest-to-tune part (ECONOMY §7: 60+ = gear tuning)
+    const act = state.frames.find(f => f.uid === state.activeFrame);
+    let tune = null;
+    for (const uid of Object.values(act?.equipped || {})) {
+      const it = uid && state.stash.find(i => i.uid === uid);
+      const c = it && tuneCost(it);
+      // materials you don't have are part of the price (Kettle's broker)
+      const mats = c && Object.entries(c.mats).reduce((a, [k, v]) => a + Math.max(0, v - (state.materials?.[k] || 0)) * (MATERIAL_BROKER.price[k] || 0) * L(state.player.level), 0);
+      if (c && (!tune || c.credits + mats < tune.cost)) tune = { id: 'tune:' + it.uid, label: `Tune ${it.name} +${(it.tune || 0) + 1}`, cost: Math.round(c.credits + mats) };
+    }
+    if (tune && state.player.level >= 15) wants.push(tune);
     const done = new Set([...(state.story?.done || []), ...(state.story?.flags || [])]);
     for (const h of Object.values(HOMES)) {
       if (!h.cost || (state.homesOwned || [state.home]).includes(h.id) || (h.needs && !done.has(h.needs))) continue;

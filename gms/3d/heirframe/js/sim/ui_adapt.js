@@ -2,11 +2,13 @@
 import { RARITIES, RARITY_INDEX, SLOTS, SLOT_NAMES, POWERS, HEIRLOOM_SETS } from '../data/loot.js';
 import { MODIFIERS, THREATS, SITE_NAMES } from '../data/missions.js';
 import { FRAMES, OWNABLE_FRAMES, MK_TIERS, SYNC_MODS, SYNC_NEXT, SKILLS } from '../data/frames.js';
-import { CONSUMABLES } from '../data/economy.js';
+import { CONSUMABLES, LEGACY_NODES } from '../data/economy.js';
+import { VOICES } from '../data/voices.js';
+import { DISTRICTS } from '../data/districts.js';
 import { itemFR, affixLabel, tuneCost, salvageYield, recalibrateCost } from './loot.js';
 import { FACTIONS } from '../data/factions.js';
 import { itemStats } from './stats.js';
-import { xpNext, rerollCost, mkUpgrade, repairCost, consumableCost } from './economy.js';
+import { xpNext, rerollCost, mkUpgrade, repairCost, consumableCost, legacyValue, LEGACY_XP } from './economy.js';
 import { createRng } from './rng.js';
 import { sitesFor } from './missions.js';
 import { frameDef, tierName } from './frames.js';
@@ -78,7 +80,9 @@ export function toUiBoard(game) {
   if (b.story && !game.state.contract) cards.unshift(toUiContract(b.story));
   const open = new Set(game.threatsUnlocked());
   const threats = Object.values(THREATS).map(t => ({ id: t.id, name: t.name, locked: !open.has(t.id), unlock: t.unlock }));
-  return { contracts: cards, rerollCost: rerollCost(game.state.player.level), threat: game.currentThreat(), threats, threatIds: [...open] };
+  const oc = game.state.overclock || {};
+  const overclock = game.state.player.level >= 60 ? { unlocked: Math.max(1, oc.unlocked || 0), active: oc.active || null } : null;
+  return { contracts: cards, rerollCost: rerollCost(game.state.player.level), threat: game.currentThreat(), threats, threatIds: [...open], overclock };
 }
 
 export function toUiWarehouse(game) {
@@ -103,6 +107,29 @@ export function toUiWarehouse(game) {
     shop: OWNABLE_FRAMES.filter(id => !S.frames.some(f => f.frameId === id)).map(id => ({ kind: FRAMES[id].archetype, frameId: id, name: FRAMES[id].name, model: FRAMES[id].model, price: game.framePrice() })),
     owned: frames.filter(f => !f.rental).map(f => f.kind),
     market: marketView(game),
+    legacy: legacyView(game),
+  };
+}
+
+// P6 Legacy tab: the board, the Heir Core rank, Succession and the five Voices
+const LEGACY_FMT = { dmgPct: 'pct', hpPct: 'pct', shieldPct: 'pct', critChance: 'pct', critDmg: 'pct', cdr: 'pct', creditsPct: 'pct', lootLuck: 'pct', xpPct: 'pct', movePct: 'pct', repairCostPct: 'pct', heirPct: 'pct' };
+function legacyView(game) {
+  const S = game.state, P = S.player;
+  const show = P.level >= 50 || P.generation > 1 || !!S.voices?.open || (P.legacyEver || 0) > 0;
+  if (!show) return null;
+  const pct = (v) => `${v > 0 ? '+' : ''}${Math.round(v * 1000) / 10}%`;
+  const nodes = LEGACY_NODES.map((n) => {
+    const r = P.legacyBoard[n.id] || 0;
+    return { id: n.id, name: n.name, ranks: r, value: r ? pct(legacyValue(n.id, r)) : '—', next: pct(legacyValue(n.id, r + 1) - (r ? legacyValue(n.id, r) : 0)), capped: n.cap != null && legacyValue(n.id, r + 1) === legacyValue(n.id, r) };
+  });
+  const rank = game.heirRank();
+  const V = S.voices || {};
+  const voices = VOICES.map((v) => ({ id: v.id, name: v.name, epithet: v.epithet, caught: (V.caught || []).includes(v.id), relicOwned: (V.relics || []).includes(v.relic),
+    relic: POWERS.find((p) => p.id === v.relic)?.name, hunting: V.hunt?.id === v.id, district: V.hunt?.id === v.id ? DISTRICTS[V.hunt.district]?.name : null }));
+  return {
+    level: P.level, points: P.legacyPoints || 0, ever: P.legacyEver || 0, gen: P.legacyGen || 0, xp: P.level >= 60 ? P.legacyXp || 0 : 0, xpNext: LEGACY_XP,
+    heirRank: rank, heirNext: (rank + 1) * 10, nodes, succession: { ...game.successionState(), credits: S.credits, name: P.name },
+    generation: P.generation, heirs: P.heirs.slice(), voices: { open: !!V.open, cycle: V.cycle || 0, list: voices }, overclock: S.overclock.unlocked || 0,
   };
 }
 

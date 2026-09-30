@@ -6,7 +6,7 @@ import { rollItem, rollKillLoot, rarityWeights, newLootState, itemFR, salvageYie
 import { generateBoard, validateMission, sitesFor, missionLevel } from '../../js/sim/missions.js';
 import { buildStoryMission, newStoryState } from '../../js/sim/story.js';
 import { enemyDef } from '../../js/sim/enemies.js';
-import { xpNext } from '../../js/sim/economy.js';
+import { xpNext, LEGACY_XP } from '../../js/sim/economy.js';
 import { uiConfig, toUiItem, toUiBoard, toUiWarehouse, toUiContract, toUiComplete } from '../../js/sim/ui_adapt.js';
 import { RARITIES, RARITY_INDEX, SLOTS, RARITY_BANDS, POWERS } from '../../js/data/loot.js';
 import { STORY_MISSIONS } from '../../js/data/story.js';
@@ -459,6 +459,109 @@ test('P5: whole story through the sim: Heir Core, heirlooms, ending + irisFate p
   assert(g2.setThreat('nightmare').ok, 'set Nightmare');
   g2.refreshBoard();
   for (const c of g2.board().cards) { const v = validateMission(c, sitesFor(c.district)); assert(v.ok, c.id + ' ' + v.errors); assert(c.threat === 'nightmare', 'card threat ' + c.threat); }
+});
+
+// ---- P6 endless -----------------------------------------------------------------------------------------------------
+function playStory(g, until = 'endgame', choice = 1) {
+  let guard = 0;
+  while (g.state.story.mission !== until && guard++ < 40) {
+    const id = g.state.story.mission, def = STORY_MISSIONS.find(m => m.id === id);
+    while (g.state.player.level < def.gate) g.giveXp(xpNext(g.state.player.level), 'test');
+    g.refreshBoard();
+    const card = g.storyCard(); assert(card, 'story card for ' + id);
+    g.board().story = card;
+    assert(g.acceptContract(card.id).ok, 'accept ' + id);
+    for (let k = 0; k < 40 && g.state.contract; k++) { const s = g.currentStep(); if (!s) break; if (g.completeStep(s.type === 'choose' ? { choice } : {}).done) break; }
+    assert(g.finishContract({}).ok, 'finish ' + id);
+  }
+}
+function finishCard(g, card) {
+  assert(g.acceptContract(card.id).ok, 'accept ' + card.id);
+  for (let k = 0; k < 40 && g.state.contract; k++) { const s = g.currentStep(); if (!s) break; if (g.completeStep({}).done) break; }
+  return g.finishContract({});
+}
+test('P6: Voice Hunts, Overclock, Legacy and a Gen 2 Succession end to end (save/reload at each stage)', () => {
+  const store = createSaveStore(memoryStorage());
+  let g = createGame({ seed: 11, store }); g.noAutosave = true;
+  g.giveXp(5000, 'test'); g.addCredits(5000, 'test'); g.buyFrame('brawler');
+  playStory(g);
+  const S0 = g.state;
+  assert(S0.voices.open && S0.voices.hunt, 'the finale opens the Voice Hunts');
+  assert(S0.districts.unlocked.includes('landfall'), 'Verdance Landfall unlocked');
+  const vc = g.board().cards.find(c => c.voiceHunt);
+  assert(vc && vc.target.defId === 'voice' && vc.target.rank === 'boss' && validateMission(vc, sitesFor(vc.district)).ok, 'voice card on the board: ' + JSON.stringify(vc?.target));
+  const out = finishCard(g, vc);
+  assert(out.voice && out.items.some(i => i.powers.includes('voice_' + vc.voiceHunt)), 'the Voice drops its unique relic');
+  assert(!g.board().cards.some(c => c.voiceHunt), 'caught: no hunt until a week passes');
+  for (let i = 0; i < 7 * 24 * 60 / 5; i++) g.tick(5 * 60 / 60);
+  assert(g.state.voices.hunt && g.state.voices.hunt.id !== vc.voiceHunt, 'the next Voice surfaces after 7 shifts');
+  // the random relic pool never rolls a Voice relic
+  const r = createRng('vr'); for (let i = 0; i < 400; i++) assert(!rollItem(r, { ilvl: 50, rarity: 'relic' }).powers[0].startsWith('voice_'), 'no voice relics in the pool');
+  g.save(); g = loadGame({ store }); g.noAutosave = true;
+  // level 60 → Overclock I, an Elite clear unlocks II
+  while (g.state.player.level < 60) g.giveXp(xpNext(g.state.player.level), 'test');
+  eq(g.state.overclock.unlocked, 1, 'Overclock I at 60');
+  assert(g.setThreat('overclock:1').ok && !g.setThreat('overclock:3').ok, 'only unlocked tiers');
+  const oc = g.board().cards;
+  assert(oc.every(c => c.threat === 'overclock:1' && (c.voiceHunt || c.level === 66)), 'Overclock I cards at level 66: ' + oc.map(c => c.level));
+  const el = oc.find(c => c.grade === 'elite' && !c.voiceHunt) || g.makeContract({ archetype: 'bounty', grade: 'elite' });
+  assert(finishCard(g, el).overclockUnlocked === 2, 'an Elite clear unlocks Overclock II');
+  // Legacy: 20 points → board ranks, Heir Core rank 2
+  assert(!g.successionState().ok, 'no Succession before Legacy 20');
+  g.giveXp(20 * LEGACY_XP, 'test');
+  const P = g.state.player;
+  assert(P.legacyPoints >= 20 && P.legacyGen === P.legacyPoints && g.heirRank() === Math.floor(P.legacyEver / 10) && g.heirRank() >= 2, 'legacy points, gen, heir rank');
+  const heirBefore = g.frameStats().heirPct;
+  assert(Math.abs(heirBefore - 0.05 * g.heirRank()) < 1e-9, 'Heir rank = +5% Heir Protocol each: ' + heirBefore);
+  const dmg0 = g.frameStats().dmgPct;
+  for (let i = 0; i < 5; i++) assert(g.spendLegacy('dmg').ok, 'spend');
+  assert(Math.abs(g.frameStats().dmgPct - dmg0 - 0.05) < 1e-9, 'legacy damage +5%');
+  g.addCredits(400000, 'test');
+  g.save(); g = loadGame({ store }); g.noAutosave = true;
+  // Succession: Gen 2
+  const st = g.successionState();
+  assert(st.ok && st.heirlooms.length >= 1, 'Succession available with an heirloom to hand down');
+  const hlUid = st.heirlooms[0].uid, stash0 = g.state.stash.length, board0 = { ...g.state.player.legacyBoard };
+  const res = g.succession('Robin', hlUid);
+  assert(res.ok && res.duty > 0, 'succession ok with estate duty');
+  const S = g.state;
+  eq([S.player.generation, S.player.name, S.player.level, S.player.legacyGen, S.credits], [2, 'Robin', 1, 0, 50000], 'the heir starts over');
+  eq(S.player.legacyBoard, board0, 'Legacy board kept');
+  eq(S.stash.length, stash0, 'stash kept');
+  assert(S.story.echo && S.story.mission === STORY_MISSIONS[0].id && S.story.clues.length > 0, 'the story restarts as an Echo run, codex kept');
+  eq(S.districts.unlocked, ['aurum_plaza'], 'districts re-open with the Echo story');
+  const hl = g.itemByUid(hlUid);
+  eq([hl.maxTuneBonus, hl.grows, hl.ilvl, hl.reqLevel], [1, true, 3, 1], 'handed-down heirloom: +11 cap, grows with the heir');
+  const hc = S.stash.find(i => i.heirCore);
+  eq([hc.ilvl, !!hc.equippedOn], [1, true], 'Heir Core re-levels to the heir and stays on');
+  assert(S.frames.every(f => Object.values(f.equipped).every(u => !u || g.itemByUid(u).reqLevel <= 1)), 'nothing the heir cannot wear stays equipped');
+  assert(!g.successionState().ok, 'Gen 2 must earn its own Legacy 20');
+  const cx = g.codex();
+  assert(cx.people.some(p => p.name === 'Robin' && p.role === 'Generation 2'), 'family tree grows');
+  eq(g.giveXp(100, 'test'), 115, 'Gen 2: +15% XP');
+  assert(Math.abs(g.lootQuality() - 0.1 - (g.frameStats().lootLuck || 0)) < 1e-9, 'Gen 2: +10% loot quality ' + g.lootQuality());
+  for (const c of g.board().cards) { assert(validateMission(c, sitesFor(c.district)).ok, 'gen 2 card'); assert(c.level <= 6, 'gen 2 cards level to the heir: ' + c.level); }
+  // the Echo run plays: A1-M1 → level 2; the heirloom grows
+  const card = g.storyCard(); g.board().story = card;
+  assert(finishCard(g, card).ok && S.player.level >= 2, 'Echo A1-M1 completes');
+  assert(hl.ilvl === S.player.level + 2, 'heirloom grew to ' + hl.ilvl);
+  g.save();
+  const g2 = loadGame({ store });
+  eq([g2.state.player.generation, g2.state.player.heirs.length, g2.state.story.echo, g2.state.voices.caught.length], [2, 1, true, 1], 'Gen 2 survives a reload');
+});
+test('P6: v2 saves migrate (Legacy ever/gen, Voice Hunts open after the finale), export/import round trip', () => {
+  const g = newGame(3);
+  g.state.player.legacyBoard = { dmg: 4 }; g.state.player.legacyPoints = 3;
+  delete g.state.player.legacyEver; delete g.state.player.legacyGen; delete g.state.voices;
+  const data = JSON.parse(JSON.stringify(g.state)); data.v = 2;
+  const m = migrate(data);
+  eq([m.v, m.player.legacyEver, m.player.legacyGen, m.voices.open], [SAVE_VERSION, 7, 7, false], 'migrated');
+  const store = createSaveStore(memoryStorage());
+  const text = store.exportText(g.state);
+  const back = store.importText(text);
+  eq(back.player.name, g.state.player.name, 'round trip');
+  let threw = false; try { store.importText(text.replace('"sum":', '"sum":1')); } catch { threw = true; }
+  assert(threw, 'a tampered export is refused');
 });
 
 console.log(`\n${pass} passed, ${fail} failed${fail ? ': ' + failures.join(', ') : ''}`);

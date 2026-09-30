@@ -27,21 +27,33 @@ const FRAME_ORDER = ['brawler', 'gunner', 'ghost'];
 
 export const P2A_ARCH = ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'tail', 'infiltrate', 'transport', 'defend', 'repo', 'race', 'assassinate', 'rescue'];   // = js/game RUN_ARCH (P3)
 export const P2A_TWISTS = ['T1', 'T2', 'T3', 'T4', 'T6', 'T7', 'T8', 'T9', 'T10'];
+// = js/game/game.js RUN_ARCH / RUN_TWISTS (P4+): the whole story is staged
+export const RUN_ARCH = [...P2A_ARCH, 'heist', 'wetwork'];
+export const RUN_TWISTS = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
+const LEGACY_ORDER = ['dmg', 'hp', 'credits', 'luck', 'xp', 'crit', 'critDmg', 'shield', 'cdr', 'heir', 'move', 'repair'];
 
-export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate = ROTATE, log = console.log, act1 = !args.all } = {}) {
+export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate = ROTATE, log = console.log, act1 = !!args.act1, succeed = !args.nosuccession } = {}) {
   const game = createGame({ seed, store: createSaveStore(memoryStorage()) });
   game.noAutosave = true;
   // same runtime scope as js/game/game.js (P2a): Act 1 story, the archetypes/twists the runner implements
   if (act1) { game.storyActCap = 1; game.setScope({ archetypes: P2A_ARCH, twists: P2A_TWISTS }); game.refreshBoard(); }
+  else { game.setScope({ archetypes: RUN_ARCH, twists: RUN_TWISTS }); game.refreshBoard(); }
   const S = game.state;
   const brng = createRng('balance|' + seed);
   const out = { spent: {}, deathLog: [], milestones: {}, hourly: [], ttk: [], deaths: 0, fails: 0, contracts: 0, idleRich: 0, notes: [] };
   const ms = (k, v = S.playSeconds) => { if (out.milestones[k] == null) out.milestones[k] = Math.round(v); };
   game.on('equip', p => { if (p.prev == null || S.playSeconds > 0) if (S.playSeconds > 0 && p.item) ms('firstUpgrade'); });
   game.on('loot', p => { for (const it of p.items || []) if (it.rarity === 'relic') ms('firstRelic'); });
+  game.on('contract:complete', p => { for (const it of p.items || []) if (it.rarity === 'relic') ms('firstRelic'); });
   game.on('frame:buy', () => { const n = game.ownedFrames().length; ms(['', 'frame1', 'frame2', 'frame3'][n]); });
   game.on('levelUp', p => { ms('level' + p.level); });
-  game.on('story', p => { ms('story_' + p.id); });
+  game.on('story', p => { ms((S.player.generation > 1 ? 'g' + S.player.generation + '_' : '') + 'story_' + p.id); });
+  game.on('voice:caught', p => { out.voices = (out.voices || 0) + 1; ms('voice' + out.voices); });
+  game.on('voice:hunt', () => ms('voiceHunt1'));
+  game.on('overclock:unlock', p => ms('overclock' + p.n));
+  game.on('legacy', p => { if (p.gen >= 20) ms('legacy20'); });
+  game.on('succession', p => { ms('succession' + (p.gen - 1)); out.successions = (out.successions || 0) + 1; });
+  out.idleLog = [];
   out.xpBy = {}; out.grades = {};
   game.on('xp', p => { out.xpBy[p.source] = (out.xpBy[p.source] || 0) + p.gained; hourXp += p.gained / L(S.player.level); });
   let hourXp = 0, hourContracts = 0;
@@ -108,7 +120,7 @@ export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate =
         if (!p.alive) break;
       }
     }
-    if (!p.alive) out.deathLog.push({ frame: game.activeFrame().frameId, lvl: S.player.level, units: enemies.map(e => `${e.defId}:${e.rank}:${e.level}`).join(' ') , left: enemies.filter(e => e.alive).length, district: S.districts.current });
+    if (!p.alive) out.deathLog.push({ threat: game.currentThreat(), frame: game.activeFrame().frameId, lvl: S.player.level, units: enemies.map(e => `${e.defId}:${e.rank}:${e.level}`).join(' ') , left: enemies.filter(e => e.alive).length, district: S.districts.current });
     return { time: t, died: !p.alive };
   }
 
@@ -151,6 +163,8 @@ export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate =
     if (best !== S.districts.current && game.travel(best).ok) { game.refreshBoard(); advance(15); }
     const b = game.board();
     if (b.story) return b.story;
+    const vh = b.cards.find(c => c.voiceHunt && c.level <= S.player.level + 6);
+    if (vh) return vh;
     const oc = S.overclock.active;
     const cards = b.cards.filter(c => oc || c.level <= S.player.level + 3);
     // in Overclock, Elite clears unlock the next tier
@@ -209,14 +223,14 @@ export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate =
       if (!c || it.tune >= 10) continue;
       const miss = Object.entries(c.mats).filter(([k, v]) => (S.materials[k] || 0) < v);
       const cost = miss.reduce((a, [k, v]) => a + game.brokerPrice(k, v - (S.materials[k] || 0)), 0);
-      if (miss.length && S.credits > (cost + c.credits) * 3) {
+      if (miss.length && S.credits > (cost + c.credits) * 1.5) {
         for (const [k, v] of miss) game.buyMaterial(k, v - (S.materials[k] || 0));
         out.spent.broker = (out.spent.broker || 0) + cost;
         game.tune(it.uid);
       }
     }
-    // rich: Sal's Special relic, then homes / paints / stash from the next-goal chip
-    if (S.player.level >= 15 && !saving) {
+    // rich: Sal's Special relic, then homes / paints / stash from the next-goal chip (while saving, only from the surplus)
+    if (S.player.level >= 15 && (!saving || S.credits > saving * 1.5)) {
       const mk = game.refreshMarket && S.market?.shift === S.shiftIndex ? S.market : game.refreshMarket();
       const sp = mk.stock.findIndex(e => e.special && !e.sold);
       if (sp >= 0 && S.credits > mk.stock[sp].price * 5) { const r = game.buyMarket(sp); if (r.ok) out.spent.special = (out.spent.special || 0) + 1; }
@@ -241,14 +255,16 @@ export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate =
 
   // endgame: push the highest Overclock that is not failing too often
   const recent = [];
+  // at 60 a player climbs the threat ladder (Hostile → Lethal → Nightmare → Overclock n) while it keeps going well
   function pickThreat() {
-    if (S.player.level < 60) return;
-    const n = S.overclock.active || 0;
-    const last = recent.slice(-4);
-    let want = n;
-    if (last.filter(x => !x).length >= 2) want = Math.max(0, n - 1);
-    else if (last.length === 4 && last.every(Boolean)) want = Math.min(n + 1, Math.max(1, S.overclock.unlocked));
-    if (want !== n) { recent.length = 0; game.setThreat(want ? 'overclock:' + want : 'tense'); }
+    if (S.player.level < 60) { if (game.currentThreat() !== 'tense') game.setThreat('tense'); return; }
+    const ladder = ['tense', 'hostile', 'lethal', 'nightmare', ...Array.from({ length: Math.max(1, S.overclock.unlocked) }, (_, i) => 'overclock:' + (i + 1))];
+    const cur = ladder.indexOf(game.currentThreat());
+    const last = recent.slice(-5);
+    let want = cur < 0 ? 0 : cur;
+    if (last.filter(x => !x).length >= 2) want = Math.max(0, want - 1);
+    else if (last.length === 5 && last.every(Boolean)) want = Math.min(ladder.length - 1, want + 1);
+    if (want !== cur) { recent.length = 0; game.setThreat(ladder[want]); }
   }
 
   function tidyStash() {
@@ -309,16 +325,23 @@ export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate =
     tidyStash();
     spend();
     game.equipBest();
+    while (S.player.legacyPoints > 0) game.spendLegacy(LEGACY_ORDER[(S.player.legacyEver - S.player.legacyPoints) % LEGACY_ORDER.length]);
+    if (succeed && game.successionState().ok && !S.contract) {
+      const st = game.successionState();
+      const eqd = st.heirlooms.map(h => game.itemByUid(h.uid)).sort((a, b) => (b.equippedOn ? 1 : 0) - (a.equippedOn ? 1 : 0) || b.tune - a.tune);
+      game.succession('Heir ' + (S.player.generation + 1), eqd[0]?.uid);
+      recent.length = 0;
+    }
     // idle-rich check (credits > 3x the next big want)
     const goal = game.nextGoal();
     if (goal && S.credits > goal.cost * 3) { if (richSince == null) richSince = S.playSeconds; }
     else richSince = null;
-    if (richSince != null && S.playSeconds - richSince > 7200) { out.idleRich++; richSince = S.playSeconds; }
+    if (richSince != null && S.playSeconds - richSince > 7200) { out.idleRich++; out.idleLog.push({ h: +(S.playSeconds / 3600).toFixed(1), lvl: S.player.level, cr: S.credits, goal: goal?.label, cost: goal?.cost }); richSince = S.playSeconds; }
     if (S.playSeconds >= nextHour) {
       const f = game.activeFrame();
       const row = { h: Math.round(S.playSeconds / 360) / 10, level: S.player.level, credits: S.credits, earned: S.stats.creditsEarned, income: S.stats.creditsEarned - lastCredits,
         fr: game.frameFR(f), frame: f.frameId + (f.rental ? '' : ' ' + ['I', 'II', 'III', 'IV', 'V', 'VI'][f.tier]), sync: f.sync, avgIlvl: avgIlvl(f), maxTune: maxTune(f),
-        contracts: out.contracts, deaths: out.deaths, fails: out.fails, story: S.story.mission, ttk: ttkGrunt(), incomePerL: Math.round((S.stats.creditsEarned - lastCredits) / L(S.player.level)), xpPerMinL: Math.round(hourXp / 60 * 10) / 10 };
+        threat: game.currentThreat(), contracts: out.contracts, deaths: out.deaths, fails: out.fails, story: S.story.mission, ttk: ttkGrunt(), incomePerL: Math.round((S.stats.creditsEarned - lastCredits) / L(S.player.level)), xpPerMinL: Math.round(hourXp / 60 * 10) / 10 };
       hourXp = 0;
       lastCredits = S.stats.creditsEarned;
       out.hourly.push(row);
@@ -326,7 +349,7 @@ export function runBalance({ hours = HOURS, seed = SEED, quiet = QUIET, rotate =
       nextHour += 3600;
     }
   }
-  out.final = { overclock: S.overclock, spent: out.spent, homes: S.homesOwned, paints: S.paints, stash: S.stashSize, level: S.player.level, credits: S.credits, story: S.story.mission, frames: S.frames.map(f => `${f.frameId}:${f.tier}`), relics: S.loot.relicsFound };
+  out.final = { gen: S.player.generation, legacyEver: S.player.legacyEver, voices: S.voices?.caught, overclock: S.overclock, spent: out.spent, homes: S.homesOwned, paints: S.paints, stash: S.stashSize, level: S.player.level, credits: S.credits, story: S.story.mission, frames: S.frames.map(f => `${f.frameId}:${f.tier}`), relics: S.loot.relicsFound };
   return out;
 
   function avgIlvl(f) { const its = Object.values(f.equipped).filter(Boolean).map(game.itemByUid); return its.length ? Math.round(its.reduce((a, i) => a + i.ilvl, 0) / its.length) : 0; }
@@ -373,7 +396,7 @@ export function ttkTable(levels = [1, 5, 10, 20, 30, 40, 50, 60], trials = 40) {
 }
 
 function fmtRow(r) {
-  return `${String(r.h).padStart(5)}h L${String(r.level).padStart(2)} cr ${String(r.credits).padStart(9)} +${String(r.income).padStart(8)}/h (${r.incomePerL}xL) FR ${String(r.fr).padStart(5)} ${r.frame.padEnd(10)} sync ${String(r.sync).padStart(2)} ilvl ${String(r.avgIlvl).padStart(2)} +${r.maxTune} ttk ${r.ttk}s xp/min ${r.xpPerMinL}xL c${r.contracts} d${r.deaths} f${r.fails} ${r.story}`;
+  return `${String(r.h).padStart(5)}h L${String(r.level).padStart(2)} cr ${String(r.credits).padStart(9)} +${String(r.income).padStart(8)}/h (${r.incomePerL}xL) FR ${String(r.fr).padStart(5)} ${r.frame.padEnd(10)} sync ${String(r.sync).padStart(2)} ilvl ${String(r.avgIlvl).padStart(2)} +${r.maxTune} ttk ${r.ttk}s xp/min ${r.xpPerMinL}xL c${r.contracts} d${r.deaths} f${r.fails} ${r.story} ${r.threat}`;
 }
 
 const isMain = process.argv[1] && import.meta.url.endsWith(process.argv[1].split('/').pop());
@@ -388,9 +411,12 @@ if (isMain) {
     ['A1-M4 Kettle', M.story_a1_m4, '—'], ['Act 1 done (A1-M5)', M.story_a1_m5, '60-100 min (P2)'],
     ['level 5', M.level5, '40-55 min (D19)'], ['level 8 (Act 1)', M.level8, '1.3 h'], ['second frame', M.frame2, '3-4 h'], ['third frame', M.frame3, '7-9 h'], ['first Relic', M.firstRelic, '3-5 h'],
     ['level 15', M.level15, '3.4 h'], ['level 20', M.level20, '5.5 h'], ['level 30', M.level30, '11.3 h'], ['level 40', M.level40, '19.1 h'], ['level 50', M.level50, '28-32 h'], ['level 60', M.level60, '~40 h'],
+    ['story finale (A6-M5)', M.story_a6_m5, '28-32 h'], ['first Voice caught', M.voice1, '—'], ['Overclock II', M.overclock2, '—'], ['Legacy 20', M.legacy20, '—'], ['first Succession', M.succession1, '~55 h'],
   ];
   for (const [k, v, tgt] of rows) console.log(`  ${k.padEnd(26)} ${hm(v).padStart(8)}   target ${tgt}`);
   console.log('xp by source', r.xpBy, 'grades', r.grades);
+  console.log('idle-rich windows', r.idleLog.map(x => `${x.h}h L${x.lvl} ${x.cr} cr vs ${x.goal} ${x.cost}`).join(' | '));
+  const dt = {}; for (const d of r.deathLog) dt[d.threat + ' L' + d.lvl] = (dt[d.threat + ' L' + d.lvl] || 0) + 1; console.log('deaths by threat', dt);
   console.log(`contracts ${r.contracts}, deaths ${r.deaths}, fails ${r.fails}, idle-rich 2h windows ${r.idleRich}, final`, r.final, `(${((Date.now() - t0) / 1000).toFixed(1)} s)`);
   const tt = ttkTable();
   console.log('\nGrunt TTK, average gear (Tuned +3, Mk I), target 1.5-4 s:');

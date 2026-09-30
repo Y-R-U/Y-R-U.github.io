@@ -26,7 +26,7 @@ function addLink(href) {
 function fitScale() {
   if (!root) return;
   const r = Math.min(innerWidth / 915, innerHeight / 412);
-  const s = Math.max(.82, Math.min(1.7, r >= 1 ? 1 + (r - 1) * .55 : r));
+  const s = Math.max(.82, Math.min(1.7, r >= 1 ? 1 + (r - 1) * .55 : r)) * ({ s: 0.88, m: 1, l: 1.12 }[store.settings.buttons] || 1);
   root.style.setProperty('--hs', s.toFixed(3));
   // panels / results / death render on a virtual ~960x460 page scaled up on big screens (never down)
   const ps = Math.max(1, Math.min(1.6, innerWidth / 960, innerHeight / 460));
@@ -58,6 +58,7 @@ function applySettings(s) {
   store.saveSettings();
   ui.quality(store.settings.quality);
   controls?.setSide(store.settings.joystick);
+  fitScale();
   bus.emit('settings', { ...store.settings });
 }
 
@@ -121,7 +122,7 @@ export const ui = {
   quality(q) {
     if (!root) return;
     root.classList.remove('hf-q-low', 'hf-q-med', 'hf-q-high');
-    root.classList.add(`hf-q-${q || 'high'}`);
+    root.classList.add(`hf-q-${!q || q === 'auto' ? (window.__hfTier || 'high') : q}`);
   },
   config({ rarities, statLabels, slots: sl } = {}) {
     if (rarities) RARITY.list = rarities.map((r, i) => ({ ...RARITY.list[i], ...(typeof r === 'string' ? { name: r } : r) }));

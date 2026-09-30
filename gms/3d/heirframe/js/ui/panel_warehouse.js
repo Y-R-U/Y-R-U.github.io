@@ -3,6 +3,7 @@ import { icon } from './icons.js';
 import { framePortrait } from './portrait.js';
 import { frameFigure } from './figure.js';
 import { itemTile, itemCardHTML } from './itemcard.js';
+import { legacyTab } from './panel_legacy.js';
 
 const KIND = { rental: 'Rental', brawler: 'Brawler', gunner: 'Gunner', ghost: 'Ghost' };
 const BLURB = {
@@ -30,7 +31,9 @@ export function warehousePanel(body, data, ctx) {
   const allSlots = ctx.slots || SLOTS;
   const emit = (e, p) => { haptic(); ctx.bus.emit('sfx', 'click'); ctx.bus.emit(e, p); };
 
-  ctx.extra.innerHTML = `<div class="wh-tabs">${TABS.map(([id, l, ic]) => `<button class="wh-tab hf-live ${st.tab === id ? 'on' : ''}" data-tab="${id}">${icon(ic)}<span>${l}</span></button>`).join('')}</div>
+  const tabs = data.legacy ? [...TABS, ['legacy', 'Legacy', 'heir']] : TABS;
+  if (st.tab === 'legacy' && !data.legacy) st.tab = 'loadout';
+  ctx.extra.innerHTML = `<div class="wh-tabs">${tabs.map(([id, l, ic]) => `<button class="wh-tab hf-live ${st.tab === id ? 'on' : ''}" data-tab="${id}">${icon(ic)}<span>${l}</span></button>`).join('')}</div>
     <div class="hf-credits pn-cred"><span class="ci">${icon('credits')}</span><span class="cv hf-num hf-gold-text">${fmt(data.credits || 0)}</span></div>`;
   ctx.extra.querySelectorAll('.wh-tab').forEach(b => onTap(b, () => { st.tab = b.dataset.tab; ctx.bus.emit('sfx', 'click'); ctx.rerender(); }));
 
@@ -38,6 +41,7 @@ export function warehousePanel(body, data, ctx) {
   if (st.tab === 'fabricator') return fabTab(body, data, ctx, emit);
   if (st.tab === 'skills') return skillsTab(body, data, ctx, emit);
   if (st.tab === 'market') return marketTab(body, data, ctx, emit);
+  if (st.tab === 'legacy') return legacyTab(body, data, ctx, emit);
 
   const f = frames.find(x => x.id === st.frame) || {};
   const allowed = slotsOf(f, allSlots);
