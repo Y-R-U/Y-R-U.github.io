@@ -48,6 +48,10 @@ export function createDistricts(G, ctx) {
     stacks: [{ id: 'rook', site: 'st_npc_rook', kind: 'civ_worker', seed: 13, label: 'Rook · Parts & Rumours' }],
     aurum_plaza: [{ id: 'kettle', site: 'npc_boulevard', kind: 'boss_kettle', seed: 4, label: 'Big Kettle · informant', after: 'a1_m4', sit: true }],
     arcology: [{ id: 'halloran', site: 'ax_npc_offices', kind: 'boss_halloran', seed: 6, label: 'Halloran · informant', after: 'a4_m2' }],
+    // P5: Lyra, freed (phase 4 = warm eyes), after A5-M5: on Meridian by the dock, and in the Helm once it is open
+    meridian: [{ id: 'lyra', site: 'mr_npc_dock', kind: 'seraph', tier: 3, phase: 4, seed: 5, label: 'Lyra Vael · your mother', after: 'a5_m5' }],
+    helm: [{ id: 'lyra', site: 'hl_npc_lyra', kind: 'seraph', tier: 3, phase: 4, seed: 5, label: 'Lyra Vael · your mother', after: 'a6_m5' },
+      { id: 'mara_helm', site: 'hl_npc_mara', kind: 'civ_worker', seed: 11, label: 'Mara Quill', after: 'a6_m5' }],
   };
   D.residents = [];
   function spawnResidents(id) {
@@ -58,7 +62,8 @@ export function createDistricts(G, ctx) {
       const st = world.sites.find((x) => x.id === def.site);
       if (!st || !ctx.robots?.createRobot) continue;
       let bot;
-      try { bot = ctx.robots.createRobot({ kind: def.kind, seed: def.seed, quality: ctx.tier?.name || 'high' }); } catch (e) { continue; }
+      try { bot = ctx.robots.createRobot({ kind: def.kind, tier: def.tier || 0, seed: def.seed, quality: ctx.tier?.name || 'high' }); } catch (e) { continue; }
+      if (def.phase) bot.setPhase?.(def.phase);
       const p = ctx.nav?.nearest(st.x, st.z) || st;
       bot.root.position.set(p.x, world.groundAt(p.x, p.z), p.z);
       bot.root.rotation.y = Math.atan2(player.pos.x - p.x, player.pos.z - p.z);

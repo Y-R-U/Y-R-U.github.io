@@ -410,5 +410,56 @@ test('P3: Act 2 story missions build and validate (fallback and real site ids)',
   assert(m.steps[0].site === 'vt_memorial_garden' && m.steps[1].path.at(-1) === 'vt_npc_fenn', 'named places win: ' + JSON.stringify(m.steps.map(s => s.site || s.path)));
 });
 
+test('P5: Act 5–6 story missions build and validate', () => {
+  for (const m0 of STORY_MISSIONS.filter(m => m.act >= 5)) {
+    const m = buildStoryMission(m0.id, { seed: '1', shiftIndex: 0, riderLevel: m0.gate, threat: 'tense', districts: [], currentDistrict: m0.district, flags: [], sites: {}, contractsDone: 9 });
+    const v = validateMission(m, sitesFor(m.district));
+    assert(v.ok, `${m0.id}: ${v.errors.join('; ')}`);
+    assert(m0.steps, `${m0.id} is hand-staged`);
+  }
+});
+test('P5: whole story through the sim: Heir Core, heirlooms, ending + irisFate persist, family tree complete, Nightmare', () => {
+  const store = createSaveStore(memoryStorage());
+  const g = createGame({ seed: 5, store }); g.noAutosave = true;
+  g.giveXp(5000, 'test'); g.addCredits(5000, 'test'); g.buyFrame('gunner');
+  let guard = 0;
+  while (g.state.story.mission !== 'endgame' && guard++ < 40) {
+    const id = g.state.story.mission, def = STORY_MISSIONS.find(m => m.id === id);
+    while (g.state.player.level < def.gate) g.giveXp(xpNext(g.state.player.level), 'test');
+    g.refreshBoard();
+    const card = g.storyCard(); assert(card, 'story card for ' + id);
+    g.board().story = card;
+    assert(g.acceptContract(card.id).ok, 'accept ' + id);
+    for (let k = 0; k < 40 && g.state.contract; k++) {
+      const s = g.currentStep();
+      if (!s) break;
+      const r = g.completeStep(s.type === 'choose' ? { choice: s.choiceKey === 'ending' || s.choiceKey === 'irisFate' ? 1 : 0 } : {});
+      if (r.done) break;
+    }
+    const out = g.finishContract({});
+    assert(out.ok, 'finish ' + id);
+  }
+  const S = g.state;
+  eq(S.story.mission, 'endgame', 'story ends');
+  const hc = S.stash.find(i => i.heirCore);
+  assert(hc && hc.equippedOn, 'heir core equipped');
+  assert(g.playerCombatant().skills.heir?.id === 'g_starfall', 'Gunner gets Starfall: ' + Object.keys(g.playerCombatant().skills));
+  const hl = S.stash.filter(i => i.rarity === 'heirloom' && i.set);
+  assert(hl.length >= 4 && hl.filter(i => i.set === 'iris_lens').length === 3 && hl.some(i => i.set === 'lyras_wake'), 'heirlooms: ' + hl.map(i => i.baseId));
+  eq([S.story.choices.ending, S.story.choices.irisFate], ['keep', 'frame'], 'choices');
+  g.save();
+  const g2 = loadGame({ store });
+  eq([g2.state.story.choices.ending, g2.state.story.choices.irisFate], ['keep', 'frame'], 'choices survive a reload');
+  const cx = g2.codex();
+  const open = cx.people.filter(p => p.state !== 'complete').map(p => p.id + ':' + p.state);
+  eq(open, [], 'every family-tree node complete');
+  assert(cx.places.every(p => p.revealed), 'places revealed');
+  while (g2.state.player.level < 40) g2.giveXp(xpNext(g2.state.player.level), 'test');
+  assert(g2.threatsUnlocked().includes('nightmare'), 'Nightmare unlocked at 40');
+  assert(g2.setThreat('nightmare').ok, 'set Nightmare');
+  g2.refreshBoard();
+  for (const c of g2.board().cards) { const v = validateMission(c, sitesFor(c.district)); assert(v.ok, c.id + ' ' + v.errors); assert(c.threat === 'nightmare', 'card threat ' + c.threat); }
+});
+
 console.log(`\n${pass} passed, ${fail} failed${fail ? ': ' + failures.join(', ') : ''}`);
 process.exit(fail ? 1 : 0);

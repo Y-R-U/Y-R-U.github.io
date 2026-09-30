@@ -56,7 +56,7 @@ export const ENEMIES = {
   spine_keeper: { id: 'spine_keeper', name: 'Spine Keeper', tier: 4, robotKind: 'spider', robotTier: 2, fallbackKind: 'enforcer', faction: 'scrap', ai: ['bruiser'], pts: 6, size: 2.2,
     base: { hp: 600, dmg: 30, armor: 40 }, move: 2.4, skills: ['e_sweep', 'e_stomp'], summons: { defId: 'hull_wight', count: 2, every: 15 }, stunResist: 0.8, tags: ['robot', 'scrap', 'heavy'] },
   choir_angel: { id: 'choir_angel', name: 'Choir Angel', tier: 4, robotKind: 'seraph', robotTier: 0, fallbackKind: 'civ_gold', faction: 'choir', pts: 3.5, ai: ['flyer'], flying: true, formation: 3,
-    base: { hp: 200, dmg: 26, armor: 15, shield: 60 }, move: 6.5, skills: ['e_melee', 'e_dive'], tags: ['robot', 'frame'] },
+    base: { hp: 200, dmg: 20, armor: 15, shield: 60 }, move: 6.5, skills: ['e_melee', 'e_dive'], tags: ['robot', 'frame'] },   // P5: dmg 26→20 (three dives two-shot a L38 frame)
   gilded_guard: { id: 'gilded_guard', name: 'Gilded Guard', tier: 5, robotKind: 'civ_gold', robotTier: 2, faction: 'voices', ai: ['duelist'], pts: 4,
     base: { hp: 300, dmg: 24, armor: 30, shield: 80 }, move: 4.8, skills: ['e_melee', 'e_parry', 'e_lunge'], tags: ['robot', 'frame'] },
   sovereign_construct: { id: 'sovereign_construct', name: 'Sovereign Construct', tier: 5, robotKind: 'enforcer', robotTier: 3, paint: 'gold', faction: 'voices', ai: ['bruiser'], pts: 8, size: 1.8,
@@ -69,6 +69,11 @@ export const ENEMIES = {
     base: { hp: 70, dmg: 0, armor: 10, shield: 30 }, move: 4.2, skills: [], tags: ['robot', 'frame'] },
   escortee: { id: 'escortee', name: 'Client', tier: 1, robotKind: 'civ_chrome', faction: 'civilians', ai: ['escortee'], nonCombat: true, vulnerable: true,
     base: { hp: 150, dmg: 0, armor: 10 }, move: 3, skills: [], tags: ['frame'] },
+  // P5 story actors: Jun in her Unlinked EVA frame (A5-M1 escort), Seraph watching from the hull (A5-M4 scan target)
+  jun_eva: { id: 'jun_eva', name: 'Jun Okafor', tier: 1, robotKind: 'ghost', paint: 'rebel', faction: 'unlinked', ai: ['escortee'], nonCombat: true, vulnerable: true,
+    base: { hp: 150, dmg: 0, armor: 10 }, move: 3, skills: [], tags: ['frame'] },
+  seraph_watch: { id: 'seraph_watch', name: 'Seraph', tier: 1, robotKind: 'seraph', robotTier: 3, faction: 'choir', ai: ['escortee'], nonCombat: true, flying: true,
+    base: { hp: 400, dmg: 0, armor: 30 }, move: 0, skills: [], tags: ['robot', 'frame'] },
   deadbeat: { id: 'deadbeat', name: 'Deadbeat Frame', tier: 1, robotKind: 'rental', faction: 'syndicate', ai: ['escortee'], blinks: true,
     base: { hp: 90, dmg: 5, armor: 5 }, move: 4.6, skills: ['e_melee'], tags: ['robot', 'frame'] },
   rival_rider: { id: 'rival_rider', name: 'Rival Rider', tier: 2, robotKind: 'gunner', paint: 'rival', faction: 'syndicate', ai: ['striker'], pts: 2,
@@ -93,9 +98,11 @@ export const BOSSES = {
   spine_keeper_boss: { id: 'spine_keeper_boss', name: 'Spine Keeper', rank: 'champion', robotKind: 'spider', robotTier: 2, fallbackKind: 'enforcer', faction: 'scrap', ai: ['boss', 'bruiser'], act: 4, size: 2.4,
     base: { hp: 75, dmg: 4.5, armor: 40 }, move: 2.4, skills: ['e_sweep', 'e_stomp', 'e_beam'], summons: { defId: 'hull_wight', count: 2, every: 15 }, phases: [0.5], tags: ['robot', 'scrap', 'heavy'] },
   seraph: { id: 'seraph', name: 'Seraph', rank: 'boss', robotKind: 'seraph', robotTier: 3, fallbackKind: 'civ_gold', faction: 'choir', ai: ['boss', 'flyer'], act: 5, flying: true, spares: true,
-    base: { hp: 130, dmg: 28, armor: 25, shield: 120 }, move: 7, skills: ['e_melee', 'e_dive', 'e_lunge', 'e_blast'], phases: [0.66, 0.33], tags: ['robot', 'frame'] },
+    // P5: hp 130→24 dmg 28→4 shield 120→24 (the Act 3–4 share per hit; three phases, she spares you once per phase)
+    base: { hp: 24, dmg: 4, armor: 25, shield: 24 }, move: 7, skills: ['e_melee', 'e_dive', 'e_lunge', 'e_blast'], phases: [0.66, 0.33], tags: ['robot', 'frame'] },
   dray: { id: 'dray', name: 'Archon Dray', title: 'the Sovereign Frame', rank: 'boss', robotKind: 'boss_sovereign', fallbackKind: 'enforcer', faction: 'voices', ai: ['boss', 'bruiser'], act: 6, size: 2.6,
-    base: { hp: 180, dmg: 34, armor: 50, shield: 200 }, move: 3, skills: ['e_melee', 'e_stomp', 'e_sweep', 'e_blast'], phases: [0.66, 0.33], summons: { defId: 'gilded_guard', count: 2, atPhase: 1 }, tags: ['robot', 'frame', 'heavy'] },
+    // P5: hp 180→22 dmg 34→4 shield 200→28; phase 2's seven halo drones (not gilded guards) shield him
+    base: { hp: 22, dmg: 4, armor: 45, shield: 28 }, move: 3, skills: ['e_melee', 'e_stomp', 'e_sweep', 'e_blast'], phases: [0.66, 0.33], tags: ['robot', 'frame', 'heavy'] },
   voice: { id: 'voice', name: 'Escaped Voice', rank: 'boss', robotKind: 'civ_gold', robotTier: 3, faction: 'voices', ai: ['boss', 'duelist'], act: 7,
     base: { hp: 140, dmg: 32, armor: 40, shield: 150 }, move: 5, skills: ['e_melee', 'e_parry', 'e_lunge', 'e_blast'], phases: [0.5], tags: ['robot', 'frame'] },
 };

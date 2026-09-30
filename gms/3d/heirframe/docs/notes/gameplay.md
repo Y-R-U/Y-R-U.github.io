@@ -334,3 +334,44 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
 - reg.mjs's screenshot every 30 polls causes 170 ms hitches every 60 s: harness, not game (NOSHOT=1 run is clean).
 - Brightline Apartment not built (DESIGN sells it after Act 4). Act 5 cards stay hidden (storyActCap 4).
 - Hullside has no lattice view from outside; the lattice lives in the Spine's north bulkhead (js/world/lattice.js).
+
+
+# P5 "Hullside" + "Heirframe" (gameplay agent P5, 2026-09-30)
+
+## Checkpoint 1
+- GREEN: smoke (`auto=1&contracts=1&speed=2`: A1-M1 + courier, 0 console errors), `node tools/sim/test.mjs` 25/25.
+- DONE: read-in; VO for the 17 VO_LINES Act 5–6 lines (gen_vo.py --max-p P2, 23 made incl. choir barks; log scratchpad
+  vo_p5a.log). Act 5–6 step templates in js/data/story.js (sites from the P5w districts; pack units take an optional 4th
+  name; grants.heirloom), enemy defs `jun_eva` (A5-M1 escortee) and `seraph_watch` (A5-M4 scan target).
+- IN PROGRESS: scripts story_a5.js / story_a6.js, sim (choices, heirloom grants, heir core auto-equip), runtime (Seraph /
+  Dray boss scripts, heir skills, set hooks, human walk, endings + epilogue), storyActCap 6.
+- NEXT: bot runs per mission, VO extras, Nightmare check, regressions, perf.
+
+## Checkpoint 2
+- DONE: scripts js/data/story_a5.js + story_a6.js (merged in story_a1.js; speakers elena/choir/helm); VO +22 clips
+  (tools/vo/script.json: Act 5–6 comms lines, Iris fade/frame, Mara epilogue cold/warm, Helm, Dray, `pa_renewal_today`;
+  log vo_p5b.log). storyActCap 6, title "P5 · Heirframe", act 5/6 stings.
+- DONE sim: completeStory stores every STORY_CHOICES key made in the contract (irisFate); family-tree node with no story
+  clues is complete once revealed; grants.heirCore auto-equips on the active frame's core slot; grants.heirloom (set id or
+  'frame') rolls that set's missing piece (loot.rollHeirloom `set`). test.mjs 27/27 (+2 P5: build/validate; whole story
+  through the sim → Heir Core + Starfall, 3 Iris's Lens + 1 Lyra's Wake, ending/irisFate survive reload, every node
+  complete, Nightmare board at L40). Falsified: removing the choices fix fails the test.
+- DONE runtime: NEW js/game/finale.js (Walk as Yourself human body swap + 0.55× speed + no combat; Seraph flies off after
+  the A5-M4 scan; five Voices beam out; world state re-applied on every district load: Meridian core hidden, Helm mode
+  by ending, warm epilogue billboards on surface districts; epilogue scene in Aurum). boss.js multi-phase Seraph (setPhase
+  1→2→3, 2 angel adds, cracked slow, spares once per phase, yields as Lyra phase 4) and Dray (Harmony strikes: gold ring
+  1.4 s telegraph then 12% if still inside; 7 halo drones shield him to 20% damage while ≥3 live; Iris unlink phase;
+  helm.setMode harmony/dray/iris). Heir skills in kits.js (Titanfall leap-quake, Starfall 12 lances, Eclipse slows all
+  enemies in 30 m to 25%). Set hooks: Aurel's reflect, Lyra's blink reset + free veil at 0 Heat, Iris's turret copies.
+  Lyra/Mara residents after A5-M5 / A6-M5. holo.js billboards gain a warm 'epilogue' key.
+- Bot: A5-M1 ok, A5-M2 ok (gunner). IN PROGRESS: A5-M3…A6-M5 batch (p5batch.sh).
+
+## Checkpoint 3
+- Bot runs (story2.mjs, gunner, speed 2, gearless frame at the gate level): A5-M1 ok · A5-M2 ok · A5-M4 ok · A5-M5 ok
+  (Seraph ~200 game-s incl. 2 wrecks to her angel → hp 32→24, 1 angel add) · A6-M1 ok · A6-M2 ok · A6-M3 ok · A6-M4 ok
+  (walk as human, 0.35× speed now) · A6-M5 ok end to end (Dray 354 game-s with 2 wrecks → hp 38→28, drones weaker,
+  voice shield 20%→30%). A5-M3 failed: defend waves spawned early as guards (pack site = next step's site); runner fix
+  (packs of a defend step wait for that step; also helps A4-M2) + Choir Angel dmg 26→20, lighter waves.
+- Dev: "Post-game" section (ending open/keep → all missions done through the sim), Level 40/50 buttons. Act 5–6
+  checkpoints appear automatically (storyActCap 6).
+- NEXT: boss re-measure (p5b3.log), reload/softlock driver (reload.mjs), epilogue screenshots, regressions, perf.

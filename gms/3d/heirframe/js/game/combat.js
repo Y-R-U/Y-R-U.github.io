@@ -178,6 +178,8 @@ export function createCombat(ctx) {
     if (!opts.quiet) audio.sfx(res.shieldDmg > res.hullDmg ? 'shield_hit' : skill.kind === 'melee' ? 'melee_hit' : 'hit', { x: e.pos.x, z: e.pos.z, vol: res.crit ? 1 : 0.8, minGap: 30 });
     if (res.shieldBroke) audio.sfx('shield_break', { x: e.pos.x, z: e.pos.z });
     ctx.enemies.damage(e, res, { byPlayer: !skill.fromSummon });
+    // Lyra's Wake (2): a backstab kill resets Shadow Step
+    if (res.killed && res.backstab && pc.skills.s2?.resetOnBackstabKill) pc.cooldowns[pc.skills.s2.id] = 0;
     if (res.chain && !opts.chained) {
       const other = targets().filter((o) => o !== e && !o.prop && o.state !== 'dead' && o.pos.distanceTo(e.pos) < 4.5).sort((a, b) => a.pos.distanceTo(e.pos) - b.pos.distanceTo(e.pos))[0];
       if (other) {

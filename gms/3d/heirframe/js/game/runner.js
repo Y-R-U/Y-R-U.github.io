@@ -174,6 +174,7 @@ export function createRunner(ctx) {
     // spawn packs: guards one step early (so they stand at the objective), ambushes on their step
     for (const p of R.packs) {
       if (p.spawned || p.scripted || p.deferred || p.nearNpc) continue;
+      if (c.steps[p.atStep]?.type === 'defend' && p.atStep !== i) continue;   // defend waves wait for their step
       const guardHere = p.guard || (p.site && (p.site === s.site || p.site === c.steps[i + 1]?.site || s.sites?.includes(p.site)));
       if (p.atStep <= i || (guardHere && p.atStep <= i + 1)) spawnPack(p, !guardHere && p.atStep <= i);
     }
@@ -251,7 +252,8 @@ export function createRunner(ctx) {
     if (!R) return;
     const opts = s.options || [];
     const tw = R.mission.twist;
-    const choice = await ui.dialogue.show({ speaker: 'Mara Quill', role: 'Quill Contracts', portrait: { kind: 'human', seed: 11, hue: 30 }, text: s.label || (tw && TWIST_ASK[tw.id]) || 'Your call.', choices: opts.map((o) => o.label) });
+    const sp = s.speaker && ctx.story.who ? ctx.story.who(s.speaker) : { name: 'Mara Quill', role: 'Quill Contracts', portrait: { kind: 'human', seed: 11, hue: 30 } };
+    const choice = await ui.dialogue.show({ speaker: sp.name, role: sp.role, portrait: sp.portrait, text: s.label || (tw && TWIST_ASK[tw.id]) || 'Your call.', choices: opts.map((o) => o.label) });
     if (!R) return;
     R.busy = false;
     const k = Math.max(0, choice);

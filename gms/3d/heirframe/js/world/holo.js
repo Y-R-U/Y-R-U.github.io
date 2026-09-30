@@ -154,13 +154,15 @@ export const HOLO_ART = {
     return c;
   },
   // Harmony's face, eyes open and looking straight out: the billboard takeover (world.billboards.show('harmony_face')).
-  watching(w = 1024, h = 512, line = 'HARMONY IS WATCHING') {
+  // warm: the epilogue rewrite (Iris's face, gold-dawn palette)
+  watching(w = 1024, h = 512, line = 'HARMONY IS WATCHING', warm = false) {
     const c = makeCanvas(w, h), x = c.getContext('2d'); const R = rngLite(19);
-    bg(x, w, h, '#0c3a70', '#020a18'); ui(x, w, h, R);
+    bg(x, w, h, warm ? '#7a4a18' : '#0c3a70', warm ? '#1a0c04' : '#020a18'); ui(x, w, h, R);
     const s = Math.min(w, h) * 0.36, cx = w / 2, cy = h * 0.47;
     x.save();
     const g = x.createRadialGradient(cx, cy, s * 0.1, cx, cy, s * 1.4);
-    g.addColorStop(0, 'rgba(235,250,255,0.95)'); g.addColorStop(0.55, 'rgba(140,205,250,0.75)'); g.addColorStop(1, 'rgba(30,90,170,0)');
+    if (warm) { g.addColorStop(0, 'rgba(255,248,230,0.95)'); g.addColorStop(0.55, 'rgba(250,200,130,0.75)'); g.addColorStop(1, 'rgba(170,90,30,0)'); }
+    else { g.addColorStop(0, 'rgba(235,250,255,0.95)'); g.addColorStop(0.55, 'rgba(140,205,250,0.75)'); g.addColorStop(1, 'rgba(30,90,170,0)'); }
     x.fillStyle = g;
     x.beginPath(); x.ellipse(cx, cy, s * 0.62, s * 0.86, 0, 0, 7); x.fill();
     x.fillRect(cx - s * 0.3, cy + s * 0.6, s * 0.6, s * 0.6);
@@ -359,9 +361,9 @@ export function registerBillboard(ctx, material, w, h) {
 export function createBillboards(ctx) {
   const cache = new Map();
   let target = 0, mix = 0, speed = 1, timer = 0, key = 'default';
-  const art = (b, line) => {
-    const k = `${b.w}x${b.h}|${line}`;
-    if (!cache.has(k)) cache.set(k, canvasTexture(HOLO_ART.watching(b.w, b.h, line)));
+  const art = (b, line, warm) => {
+    const k = `${b.w}x${b.h}|${line}|${warm ? 1 : 0}`;
+    if (!cache.has(k)) cache.set(k, canvasTexture(HOLO_ART.watching(b.w, b.h, line, warm)));
     return cache.get(k);
   };
   ctx.updaters.push((dt) => {
@@ -371,14 +373,14 @@ export function createBillboards(ctx) {
     for (const b of ctx.billboards) b.mat.uniforms.uMix.value = mix;
   });
   return {
-    keys: ['default', 'harmony_face'],
+    keys: ['default', 'harmony_face', 'epilogue'],
     get current() { return key; },
     get list() { return ctx.billboards; },
     show(k = 'default', { line = 'HARMONY IS WATCHING', duration = 0, fade = 1.2 } = {}) {
       speed = 1 / Math.max(0.05, fade);
       timer = duration;
       if (!k || k === 'default') { target = 0; key = 'default'; return ctx.billboards.length; }
-      for (const b of ctx.billboards) b.mat.uniforms.map2.value = art(b, line);
+      for (const b of ctx.billboards) b.mat.uniforms.map2.value = art(b, line, k === 'epilogue');
       target = 1; key = k;
       return ctx.billboards.length;
     },

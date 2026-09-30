@@ -93,6 +93,7 @@ export function createAutopilot(G, { ui, player }) {
     const tele = G.enemies.alive().find((e) => e.tele && Math.hypot(e.pos.x - player.pos.x, e.pos.z - player.pos.z) < (e.tele.skill.radius || e.tele.skill.range || 3) + 1.5);
     if (tele && Math.random() < 0.6 && G.combat.dodge({ x: player.pos.x - tele.pos.x, z: player.pos.z - tele.pos.z })) return;
     if (pc.hp < pc.stats.hp * 0.35 && (G.sim.state.consumables.repairKit || 0) > 0) G.useKit?.();
+    if (ready('heir') && (foe.isBoss || countNear(8) >= 3) && d < 10) G.combat.skill('heir');
     if (k === 'gunner') return gunner(foe, d, pc);
     if (k === 'ghost') return ghost(foe, d, pc);
     if (k === 'brawler') {
@@ -305,7 +306,7 @@ export function createAutopilot(G, { ui, player }) {
       A.phase = 'board'; ui.emit('contracts'); return;
     }
     const goal = storyMode ? 99 : want;
-    const storyEnd = Q.get('storyend') || 'a2_m5';
+    const storyEnd = Q.get('storyend') || 'a6_m5';
     if (storyMode && S.story.done.includes(storyEnd)) { finish(true, `story complete to ${storyEnd}`); return; }
     if (G.contractsDone < 1 + goal) { A.phase = 'board'; if (G.contractsDone > A.done.length) syncDone(); ui.emit('contracts'); return; }
     syncDone();

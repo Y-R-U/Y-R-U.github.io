@@ -123,8 +123,8 @@ export function allHeirloomPieces() {
 }
 
 // smart loot: the first missing piece of the set with the most pieces owned (then random)
-export function rollHeirloom(rng, { ilvl, q = 0, lootState, pieceId } = {}) {
-  const all = allHeirloomPieces();
+export function rollHeirloom(rng, { ilvl, q = 0, lootState, pieceId, set } = {}) {
+  const all = allHeirloomPieces().filter(p => !set || p.set === set);
   let piece = pieceId && all.find(p => p.id === pieceId);
   if (!piece) {
     const owned = new Set(lootState?.heirloomPieces || []);

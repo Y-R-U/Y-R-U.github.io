@@ -24,6 +24,7 @@ import { setSupportedRobotKinds } from '../sim/enemies.js';
 import { createBoss } from './boss.js';
 import { createHeat } from './heat.js';
 import { createDayNight } from './daynight.js';
+import { createFinale, EPILOGUE_LINE } from './finale.js';
 
 export const RUN_ARCH = ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'tail', 'infiltrate', 'transport', 'defend', 'repo', 'race', 'assassinate', 'rescue', 'heist', 'wetwork'];
 export const RUN_TWISTS = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
@@ -121,6 +122,12 @@ export async function createGame(api) {
     if (pc.invulnerable) { if (s.on) ui?.damage(s.x, s.y, 0, 'miss'); return; }
     // Bulwark's wall and shields only stop what comes from in front
     const ra = Math.abs(Math.atan2(Math.sin(Math.atan2(e.pos.x - player.pos.x, e.pos.z - player.pos.z) - player.yaw), Math.cos(Math.atan2(e.pos.x - player.pos.x, e.pos.z - player.pos.z) - player.yaw)));
+    // Aurel's Oath (3): the Bulwark wall throws frontal projectiles back at whoever fired them
+    if (ra < 1.2 && skill?.kind === 'ranged' && pc.skills.s3?.reflectProjectiles && G.combat.kits.wallUp) {
+      fx.tracer(tmp.set(player.pos.x, player.pos.y + 1.2, player.pos.z).clone(), new THREE.Vector3(e.pos.x, e.pos.y + 1, e.pos.z), 0xffc860, 0.12, 1);
+      G.combat.strike(pc, e, { id: 'reflect', name: 'Reflected', kind: 'ranged', base: 14, element: 'kinetic' }, { knock: 1 });
+      return;
+    }
     const res = G.sim.hit(e.c, pc, skill, { frontal: ra < 1.2 });
     if (!res.hit) { if (s.on) ui?.damage(s.x, s.y, 0, 'miss'); return; }
     if (s.on) ui?.damage(s.x + (Math.random() - 0.5) * 20, s.y, res.amount, 'player');
@@ -140,6 +147,7 @@ export async function createGame(api) {
     if (pc.hp < pc.stats.hp * 0.3 && !G.lowHpBark) { G.lowHpBark = true; audio.bark('b_hira_lowhp_', { cooldown: 30 }); }
     if (pc.hp > pc.stats.hp * 0.5) G.lowHpBark = false;
     G.coach?.playerHit();
+    if ((res.wrecked || !pc.alive) && G.boss?.spares(e)) { pc.alive = true; pc.hp = Math.max(1, pc.stats.hp * 0.15); G.spawnShield = 1.5; return; }
     if (res.wrecked || !pc.alive) playerDown(e.c.name);
   }
   function damagePlayerPct(pct, cause) {
@@ -354,6 +362,7 @@ export async function createGame(api) {
     else if ((n.id === 'home' || n.id === 'door') && n.to) G.districts.door(n);
     else if (n.id === 'passage') G.districts.passage(n);
     else if (n.id === 'rook') rookTalk();
+    else if (n.id === 'lyra' || n.id === 'mara_helm') familyTalk(n.id);
     else if (n.id === 'kettle' || n.id === 'halloran') informantTalk(n.id);
     else if (n.id === 'codex' || n.id === 'family_tree') ui?.panel.open('codex', toUiCodex(G.sim));
     else if (n.id === 'bed') sleepShift();
@@ -374,6 +383,21 @@ export async function createGame(api) {
     const i = await ui?.dialogue.show({ ...who, text: 'Easy, rider. Buying, selling, or listening?', choices: ['Heard anything?', heat ? `Clean Slate: wipe my Heat (${cost} cr)` : 'Clean Slate (no Heat on you)', 'Just passing.'] });
     if (i === 0) await ui.dialogue.show({ ...who, text: ROOK_RUMOURS[Math.floor(Math.random() * ROOK_RUMOURS.length)] });
     else if (i === 1 && heat) { const r = G.sim.cleanSlate(); if (r.ok) { ui.toast('Heat wiped', 'good', { sub: 'Rook knows a man in the records office' }); audio.sfx('credits'); } else ui.toast('Not enough credits', 'warn'); }
+  }
+
+  // P5 residents: Lyra (freed, after A5-M5) and Mara on the Helm after the finale
+  const LYRA_LINES = [
+    "Twenty-two years of humming. I'm still getting used to talking. Bear with me.",
+    "The Ghost frame was mine, you know. I built it for the quiet ones. You wear it well.",
+    "Your father would have liked Jun. He'd have made her eat something.",
+    "The Heir Core answers to our blood. Keep it on the frame you trust most.",
+    "When you're ready, love, go see outside. That was always the whole song.",
+  ];
+  async function familyTalk(id) {
+    const L = id === 'lyra';
+    const who = L ? { speaker: 'Lyra Vael', role: 'Your mother', portrait: { kind: 'ghost', seed: 5 } } : { speaker: 'Mara Quill', role: 'Your aunt', portrait: { kind: 'human', seed: 11, hue: 30 } };
+    const lines = L ? LYRA_LINES : ["Look at this place. All this gold, and not one kettle.", "Board's still open, kiddo. Whenever you want it."];
+    await ui?.dialogue.show({ ...who, text: lines[Math.floor(Math.random() * lines.length)] });
   }
 
   // Informants (P4): Kettle's tip turns the board over for free; Halloran's patrol routes drop your Heat by two stars.
@@ -413,7 +437,7 @@ export async function createGame(api) {
     ui: ui || inertUi(), audio, overlay,
     choice: (k) => G.sim?.state.contract?.choices?.[k] ?? G.sim?.state.story.choices[k],
     onBeat: (b) => log(`beat ${b.vo || b.mode}${b.when ? ' ' + JSON.stringify(b.when) : ''}`),
-    onFx: (f) => { if (f === 'billboards_face') harmonyFace('GOOD MORNING, HALCYON', 9); else if (f === 'billboards_glitch') harmonyFace('LITTLE STAR', 6); },
+    onFx: (f) => { if (f === 'billboards_face') harmonyFace('GOOD MORNING, HALCYON', 9); else if (f === 'billboards_glitch') harmonyFace('LITTLE STAR', 6); else if (f === 'billboards_epilogue') world.billboards?.show?.('epilogue', { line: EPILOGUE_LINE, fade: 2.4 }); },
     onAction: async (a) => {
       if (a.discount && G.sim.grantFrameDiscount().ok) ui?.toast('Frame licence: 30% off', 'gold', { sub: `Your first frame for ${G.sim.framePrice()} cr at Sal's lot`, ms: 4000 });
       if (a.openFrames) { if (G.sim.ownedFrames().length) ui?.toast('Sal Venn, Nexus Frames', 'info', { sub: 'Open the Warehouse any time to upgrade' }); else if (!inCombat()) openWarehouse('frames'); }
@@ -428,6 +452,13 @@ export async function createGame(api) {
       if (a.halloran) await halloranScene(a.halloran);
       if (a.harmonyIris) harmonyFace('HELLO, LITTLE STAR', 14);
       if (a.joinJun) ui?.toast('Jun Okafor joins you', 'gold', { sub: 'Unlinked hacker · on comms from now on' });
+      if (a.hideCore) G.finale.hideCore();
+      if (a.seraphLeaves) G.finale.seraphLeaves();
+      if (a.voicesFlee) await G.finale.voicesFlee();
+      if (a.helm) world.ctx?.helm?.setMode(a.helm);
+      if (a.human === 'on') G.finale.humanOn(); else if (a.human === 'off') G.finale.humanOff();
+      if (a.closing) setTimeout(() => story.run('a6_m5', 'closing'), 0);
+      if (a.theEnd) G.finale.theEnd();
       if (a.toast) ui?.toast(a.toast, 'story', a.sub ? { sub: a.sub, ms: 4200 } : undefined);
     },
   });
@@ -507,6 +538,7 @@ export async function createGame(api) {
       if (!await G.districts.travel('home', { via: 'door' })) return;
       await story.run(id, 'home');
     } else if (kind === 'breach') await breachScene(id);
+    else if (kind === 'epilogue') await G.finale.epilogue(id);
     G.sim.save();
   }
 
@@ -595,7 +627,9 @@ export async function createGame(api) {
     if (out.mission.story?.id === 'a2_m5') setTimeout(() => ui?.sting('Act 2 complete', 'Act 3 · LITTLE STAR · Kettle has a tip about the docks', 'story', 4600), 600);
     if (out.mission.story?.id === 'a3_m5') setTimeout(() => ui?.sting('Act 3 complete', 'Act 4 · THE SKY IS A SCREEN · go home, to the Stacks', 'story', 4600), 600);
     if (out.mission.story?.after) await afterScene(out.mission.story.after, out.mission.story.id);
-    if (out.mission.story?.id === 'a4_m5') setTimeout(() => ui?.sting('Act 4 complete', 'THE SKY IS A SCREEN · Act 5 arrives in the next update', 'story', 4600), 600);
+    if (out.mission.story?.id === 'a4_m5') setTimeout(() => ui?.sting('Act 4 complete', 'Act 5 · HULLSIDE · Jun is waiting at the airlock', 'story', 4600), 600);
+    if (out.mission.story?.id === 'a5_m5') setTimeout(() => ui?.sting('Act 5 complete', 'Act 6 · HEIRFRAME · Renewal Day is coming', 'story', 4600), 600);
+    if (out.mission.story?.id === 'a6_m5') setTimeout(() => G.finale.theEnd(), 800);
     const days = G.sim.state.story.renewalDays;
     if (!out.mission.story && days % 10 === 0 && audio.hasVo(`pa_renewal_${days}`)) setTimeout(() => audio.bark([`pa_renewal_${days}`], { force: true }), 5000);
     if (out.stiffed) ui?.toast('Stiffed!', 'bad', { sub: 'The client won\'t pay. A Collect bounty is on the board' });
@@ -631,7 +665,7 @@ export async function createGame(api) {
     const ctx = {
       world, robots: api.robots, sim, fx, audio, ui: ui || inertUi(), tier: api.tier, player, rig, crowd, overlay, story,
       project, losClear, hitPlayer, damagePlayerPct, setCarrying, onLootCollect, onComplete, onFail, nav, walkTo,
-      blocked: () => blocked(),
+      blocked: () => blocked() || !!G.finale?.human,
       hitstop: (s) => { G.hitstopT = Math.max(G.hitstopT, s); },
       onDeath: onKill,
       onAlert: () => {},
@@ -663,6 +697,7 @@ export async function createGame(api) {
     G.setCarrying = setCarrying;
     G.frames = createFrames(G, { world, robots: api.robots, tier: api.tier, player, fx, audio, ui: ui || null, rig });
     G.frames.sync();
+    G.finale = createFinale(G, { world, robots: api.robots, tier: api.tier, player, fx, audio, ui: ui || null, rig });
     sim.on('frame:swap', (p) => { G.frames.deploy(p.frame); log('deploy ' + p.frame.archetype); });
     sim.on('frame:mk', (p) => { if (p.frame.uid === sim.state.activeFrame) G.frames.deploy(p.frame, { reason: 'mk' }); });
     sim.on('frame:buy', (p) => { if (sim.ownedFrames().length === 1) G.frames.podNext(); log('frame:buy ' + p.frame.archetype); setTimeout(() => audio.bark('b_hira_ownframe_', { cooldown: 60 }), 4000); });
@@ -671,7 +706,7 @@ export async function createGame(api) {
     ctx.hud = G.hud;
     ctx.goalOverride = () => nextGoal(sim);
     G.coach = ui ? createCoach(G, { ui, rig, player }) : null;
-    sim.storyActCap = 4;   // Acts 1–4 are staged (P4); Act 5 cards stay hidden
+    sim.storyActCap = 6;   // the whole story is staged (P5)
     // archetypes/twists the runner implements: all 18 and every twist (P4 added heist, wetwork, T5/T11/T12)
     sim.setScope({ archetypes: RUN_ARCH, twists: RUN_TWISTS });
     if (sim.state.board && !sim.state.contract && sim.state.board.cards.some((c) => !RUN_ARCH.includes(c.archetype))) sim.refreshBoard();
@@ -699,6 +734,7 @@ export async function createGame(api) {
     rig.target.copy(player.pos); rig.snap();
     for (const e of titleEmitters) e?.stop?.();
     G.districts.boot();
+    G.finale.apply();
     G.hud.update(0, { objective: null, interactLabel: null });
     if (window.__game) window.__game.sim = sim;
   }
@@ -709,7 +745,7 @@ export async function createGame(api) {
     if (devMod) { G.dev = devMod.createDev(G, { world, ui, player, rig, audio, api, createSim, loadGame, store, sites, startSession, Q }); if (await G.dev.autostart()) { setMusic('explore'); return; } }
     if (!ui) { startSession(createSim({ seed: Q.get('seed') || 1, store, sites })); G.state = 'free'; return; }
     const hasSave = store.has() && !Q.has('fresh');
-    const act = await ui.screen('title', { hasSave, version: 'P4 · The Sky Is a Screen' });
+    const act = await ui.screen('title', { hasSave, version: 'P5 · Heirframe' });
     audio.unlock();
     log('title: ' + act);
     let sim = null;
@@ -759,16 +795,17 @@ export async function createGame(api) {
     }
     if (G.spawnShield > 0 && G.state === 'free') { pc.invulnerable = true; if ((G.spawnShield -= dt) <= 0) pc.invulnerable = false; }
     const W = world.district || {};
-    player.speedMult = (pc.stats.moveSpeed / 4.2) * statusMult(pc, 'moveMult') * (G.carrying === 'case' ? 0.9 : 1) * (W.magBoots ? 0.88 : 1);
+    player.speedMult = G.finale.human ? 0.35 : (pc.stats.moveSpeed / 4.2) * statusMult(pc, 'moveMult') * (G.carrying === 'case' ? 0.9 : 1) * (W.magBoots ? 0.88 : 1);
     const canMove = G.state === 'free' && !panelOpen() && !ui?.dialogue.open && !overlay.cardOpen && !G.frames.busy;
     G.frames.update(dt);
+    if (G.finale.human && !G.runner.active && G.state === 'free') G.finale.humanOff();
     G.dayNight.update(dt);
     if (kitCd > 0) kitCd -= dt;
     ui?.skills.kit(sim.state.consumables.repairKit || 0, { cooling: kitCd > 0 });
     let hs = 1;
     if (G.hitstopT > 0) { G.hitstopT -= rawDt; hs = 0.15; }
     player.update(dt * (hs < 1 ? 0.5 : 1), canMove ? stick : null);
-    if (canMove) G.combat.update(dt, { attackHeld: !!ui?.controls.attackHeld || G.auto?.attackHeld });
+    if (canMove && !G.finale.human) G.combat.update(dt, { attackHeld: !!ui?.controls.attackHeld || G.auto?.attackHeld });
     G.enemies.update(dt * hs, { playerDead: G.state === 'down', sneaking: !!ui?.controls.sneak });
     if (!paused && G.state === 'free' && !ui?.dialogue.open && !overlay.cardOpen) G.runner.update(dt);
     G.boss.update(dt);

@@ -4,7 +4,7 @@ import { createRng, rngFor } from './rng.js';
 import { createEmitter, deepClone, clamp } from './util.js';
 import { computeStats, makeCombatant, restat, resolveHit, tickCombatant, useSkill, skillReady, heal, addStatus } from './stats.js';
 import { newFrame, frameDef, frameSkills, chooseMod, maxSync, tierName, canEquipItem } from './frames.js';
-import { rollItem, rollKillLoot, rollCache, itemFR, salvageYield, tuneCost, applyTune, recalibrateCost, applyRecalibrate, marketStock, makeHeirCore, newLootState, RARITY_INDEX } from './loot.js';
+import { rollItem, rollKillLoot, rollCache, itemFR, salvageYield, tuneCost, applyTune, recalibrateCost, applyRecalibrate, marketStock, makeHeirCore, rollHeirloom, newLootState, RARITY_INDEX } from './loot.js';
 import { xpNext, addXp, addSyncXp, framePrice, mkUpgrade, repairCost, wreckCost, rerollCost, consumableCost, cleanSlateCost, nextStash, legacyStats, nextGoal, featuresAt, newFeatures, SHIFT_SECONDS, RENTAL_FEE, LEGACY_XP } from './economy.js';
 import { createEnemy } from './enemies.js';
 import { L } from '../data/balance.js';
@@ -13,7 +13,7 @@ import { generateBoard, generateContract, completionRewards, threatDef, validate
 import { newStoryState, storyReady, completeStory, tickRenewal, rollEcho, echoAvailable, buildStoryMission, storyFlags, storyCacheItem, codexView } from './story.js';
 import { createSaveStore, SAVE_VERSION } from './save.js';
 import { OWNABLE_FRAMES, MK_TIERS } from '../data/frames.js';
-import { POWERS } from '../data/loot.js';
+import { POWERS, HEIRLOOM_SETS } from '../data/loot.js';
 import { DISTRICTS, DISTRICT_ORDER } from '../data/districts.js';
 import { THREATS } from '../data/missions.js';
 import { STASH_SIZES, CONSUMABLES, COSTS, DEBT_FREE_PERK, SUCCESSION, LEGACY_NODES, WARRANTY_SURCHARGE, HOMES, PAINTS, MATERIAL_BROKER } from '../data/economy.js';
@@ -700,12 +700,24 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
       S.board.cards.unshift(collect);
     }
     if (m.story) {
-      const fx = completeStory(S.story, m.story.id, { choice: c.choices[m.story.choice] });
+      const fx = completeStory(S.story, m.story.id, { choice: c.choices[m.story.choice], choices: c.choices });
       out.story = fx;
       if (fx) {
         for (const d of fx.unlocks) unlockDistrict(d);
         if (fx.grants.firstFrameDiscount) S.flags.firstFrameDiscount = true;
-        if (fx.grants.heirCore) addItem(makeHeirCore(actRng('heircore'), m.level));
+        if (fx.grants.heirCore && !S.stash.some(i => i.heirCore)) {
+          // it installs itself: the active frame's core slot (or the first owned frame that has one)
+          const hc = addItem(makeHeirCore(actRng('heircore'), m.level), { silent: true });
+          const f = [activeFrame(), ...ownedFrames()].find(x => x && frameDef(x).slots.includes('core'));
+          if (hc && f) equip(hc.uid, f.uid);
+          if (hc) out.items.push(hc);
+        }
+        if (fx.grants.heirloom) {
+          const af = activeFrame().rental ? ownedFrames()[0] : activeFrame();
+          const set = fx.grants.heirloom === 'frame' ? Object.values(HEIRLOOM_SETS).find(x => x.frame === af?.archetype)?.id : fx.grants.heirloom;
+          const hl = addItem(rollHeirloom(actRng('heirloom:' + m.story.id), { ilvl: m.level, q: lootQuality(), lootState: S.loot, set }), { silent: true });
+          if (hl) out.items.push(hl);
+        }
         if (fx.grants.home) S.home = fx.grants.home;
         if (fx.setHeat != null) emit('heat', (setHeat(S.factions, fx.setHeat ? Math.max(S.factions.heat, fx.setHeat) : 0), { stars: heatStars(S.factions) }));
         if (m.story.id === 'a1_m1') S.flags.boardUnlocked = true;

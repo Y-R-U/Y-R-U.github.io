@@ -72,5 +72,5 @@ export function createStoryPlayer(ctx) {
     return true;
   }
 
-  return { run, beat, bark, get busy() { return busy > 0; }, has: (script, trigger) => (SCRIPTS[script] || []).some((b) => b.trigger === trigger) };
+  return { run, beat, bark, who, get busy() { return busy > 0; }, has: (script, trigger) => (SCRIPTS[script] || []).some((b) => b.trigger === trigger) };
 }

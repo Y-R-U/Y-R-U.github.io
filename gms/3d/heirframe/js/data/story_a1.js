@@ -1,6 +1,8 @@
 import { SCRIPTS_A2, SPEAKERS_A2 } from './story_a2.js';
 import { SCRIPTS_A3, SPEAKERS_A3 } from './story_a3.js';
 import { SCRIPTS_A4, SPEAKERS_A4 } from './story_a4.js';
+import { SCRIPTS_A5, SPEAKERS_A5 } from './story_a5.js';
+import { SCRIPTS_A6, SPEAKERS_A6 } from './story_a6.js';
 
 // STORY §8 script tables. trigger: event name from the mission runner, or 'after:N' to chain after beat N.
 // mode: bark (subtitle + VO, play continues) | dlg (dialogue panel) | card (full-screen text) | action (no line).
@@ -78,7 +80,7 @@ export const SPEAKERS = {
   harmony: { name: 'Harmony', role: 'Civic AI', portrait: { kind: 'gold', seed: 1 } },
   iris: { name: 'Dr. Iris Vael', role: '', portrait: { kind: 'unknown', seed: 7 } },
   dray: { name: 'Archon Dray', role: 'Chair of the Concord', portrait: { kind: 'gold', seed: 2 } },
-  lyra: { name: 'Lyra Vael', role: '', portrait: { kind: 'ghost', seed: 5 } },
+  lyra: { name: 'Lyra Vael', role: 'Your mother', portrait: { kind: 'ghost', seed: 5 } },
   seraph: { name: 'Seraph', role: '', portrait: { kind: 'gold', seed: 9 } },
   kettle: { name: 'Big Kettle', role: 'Silverhand Syndicate', portrait: { kind: 'black', seed: 4 } },
   fenn: { name: 'Dr. Abel Fenn', role: 'Retired archivist', portrait: { kind: 'human', seed: 8 } },
@@ -91,5 +93,5 @@ export const SPEAKERS = {
   warden: { name: 'Warden dispatch', role: 'Concord security', portrait: { kind: 'robot', seed: 6 } },
 };
 
-Object.assign(SCRIPTS, SCRIPTS_A2, SCRIPTS_A3, SCRIPTS_A4);
-Object.assign(SPEAKERS, SPEAKERS_A2, SPEAKERS_A3, SPEAKERS_A4);
+Object.assign(SCRIPTS, SCRIPTS_A2, SCRIPTS_A3, SCRIPTS_A4, SCRIPTS_A5, SCRIPTS_A6);
+Object.assign(SPEAKERS, SPEAKERS_A2, SPEAKERS_A3, SPEAKERS_A4, SPEAKERS_A5, SPEAKERS_A6);

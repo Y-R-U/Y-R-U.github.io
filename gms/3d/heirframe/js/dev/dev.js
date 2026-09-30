@@ -87,6 +87,22 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
     toast(`Story: ${STORY_MISSIONS[idx].title}`, id.toUpperCase().replace('_', '-'));
     return true;
   }
+  // after the finale: every mission done with the chosen ending (tests the post-game world: billboards, Helm, residents)
+  function postGame(ending) {
+    if (G.runner.active) G.runner.abandon();
+    G.quiet = true;
+    const S = G.sim.state, st = S.story;
+    st.done = []; st.clues = []; st.reveals = []; st.flags = []; st.mission = STORY_MISSIONS[0].id;
+    for (const m of STORY_MISSIONS) { const fx = completeStory(st, m.id, m.id === 'a6_m5' ? { choice: ending, choices: { irisFate: 'frame' } } : {}); for (const d of fx?.unlocks || []) G.sim.unlockDistrict(d); }
+    Object.assign(S.flags, { introDone: true, kioskDone: true, boardUnlocked: true });
+    setLevel(50);
+    if (!G.sim.ownedFrames().length) { G.sim.addCredits(G.sim.framePrice() || 1500, 'dev'); G.sim.buyFrame('brawler'); }
+    setHeat(0);
+    G.quiet = false;
+    G.sim.refreshBoard();
+    G.finale?.apply();
+    toast(`Post-game · ${ending === 'open' ? 'OPEN THE SKY' : 'KEEP THE SKY'}`, 'every story mission done');
+  }
   function ownFrames() {
     setLevel(5);
     for (const f of OWNABLE_FRAMES) if (!G.sim.state.frames.some((x) => x.frameId === f)) { G.sim.addCredits(G.sim.framePrice() || 0, 'dev'); G.sim.buyFrame(f); }
@@ -151,11 +167,12 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
     ]);
     section('Start point (relay there)', (world.districtList?.() || (world.districts || []).map((id) => ({ id }))).map(({ id, label }) => [DISTRICT_NAMES[id] || label || DISTRICTS[id]?.name || id, () => { D.open = false; goDistrict(id); }, G.districts?.id === id ? 'here' : '']));
     section('Story checkpoint', staged().map((m) => [`${m.id.toUpperCase().replace('_', '-')} ${m.title}`, () => { D.open = false; jumpStory(m.id); }, S?.story.mission === m.id ? 'here' : '']));
+    section('Post-game (after the finale)', [['Ending: open the sky', () => { D.open = false; postGame('open'); }, S?.story.choices?.ending === 'open' ? 'on' : ''], ['Ending: keep the sky', () => { D.open = false; postGame('keep'); }, S?.story.choices?.ending === 'keep' ? 'on' : '']]);
     section('Economy', [
       ['+1,000 cr', () => G.sim.addCredits(1000, 'dev')], ['+10,000 cr', () => G.sim.addCredits(10000, 'dev')], ['+100,000 cr', () => G.sim.addCredits(100000, 'dev')],
       ['Own all frames', ownFrames], ['Fill parts', fillParts],
     ]);
-    section('Level', [5, 8, 10, 15, 20, 30].map((n) => [`L${n}`, () => { G.quiet = true; setLevel(n); G.quiet = false; }, S?.player.level >= n ? 'on' : '']).concat([['+1', () => setLevel((G.sim.state.player.level || 1) + 1)]]));
+    section('Level', [5, 8, 10, 15, 20, 30, 40, 50].map((n) => [`L${n}`, () => { G.quiet = true; setLevel(n); G.quiet = false; }, S?.player.level >= n ? 'on' : '']).concat([['+1', () => setLevel((G.sim.state.player.level || 1) + 1)]]));
     section('Heat', [0, 1, 2, 3, 4, 5].map((n) => [`${n}★`, () => setHeat(n)]));
     const dn = G.dayNight;
     section(`Time of day · ${dn ? dn.clock() : '--:--'}`, [['Live', () => dn.setHour(null), dn?.override == null ? 'on' : '']]
@@ -183,5 +200,5 @@ export function createDev(G, { world, ui, player, rig, createSim, loadGame, stor
   }
 
   render();
-  return Object.assign(D, { autostart, goDistrict, jumpStory, setLevel, setHeat, ownFrames, fillParts, render });
+  return Object.assign(D, { autostart, goDistrict, jumpStory, postGame, setLevel, setHeat, ownFrames, fillParts, render });
 }

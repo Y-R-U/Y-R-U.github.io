@@ -62,16 +62,50 @@
   "b_jun_comms_01": "I'm in your comms now. Don't be weird about it.",
   "b_jun_chorus_01": "Traced your key. It wasn't a courier. It came from the top of the spire. The Chorus Tower.",
   "b_jun_archive_01": "Sixty-one years of billboards. Same number. Every single one.",
-  "b_jun_pumps_01": "The waterfalls drain down here. And then they get pumped back up. It's a loop, Wren."
+  "b_jun_pumps_01": "The waterfalls drain down here. And then they get pumped back up. It's a loop, Wren.",
+  "a5_s01_jun_01": "Mag boots on. Don't look up, it's very big and very green. Spur's at the far end. Wights nest in the plating.",
+  "a5_s02_jun_01": "Sixty-one years ago. She saw it sixty-one years ago. And then nobody told anyone. Ever.",
+  "a5_s03_jun_01": "Your grandfather's broadcast array is still up that mast. Give me eighty seconds and it'll talk again.",
+  "a5_s04_jun_01": "That's all three. And, Wren, she's here. She came to watch. Get your optics on her. Now.",
+  "a6_s04_jun_01": "I'm not crying. The helmet's fogging. Helmets fog."
  },
  "harmony": {
   "pa_night_01": "Evening lighting is now active. Rest well, Halcyon.",
-  "pa_dawn_01": "Good morning, Halcyon. Sunrise, six o'clock. Exactly on time."
+  "pa_dawn_01": "Good morning, Halcyon. Sunrise, six o'clock. Exactly on time.",
+  "pa_renewal_today": "Good morning, Halcyon. Renewal Day is today."
  },
  "mara": {
-  "b_mara_night_01": "It's late, kid. The Wardens see less at night. So do you."
+  "b_mara_night_01": "It's late, kid. The Wardens see less at night. So do you.",
+  "a5_s01_mara_01": "I'm back on your comms, kiddo. For good, if you'll have me. Jun's team is at the airlock.",
+  "a6_s01_mara_01": "So it's today. Right. Then we go to the Helm before he does. All of us.",
+  "a6_s06_mara_cold_01": "I said I'd earn it back one job at a time. Board's still open, kiddo. Contracts don't stop just because the sky did.",
+  "a6_s06_mara_warm_01": "We burned his world down, kiddo. Now let's build a better one. Board's open. Contracts don't stop just because the sky did."
  },
  "hira": {
   "b_hira_home_01": "Is that... you? You look peaceful. Your vitals are fine! Mostly fine."
+ },
+ "hira_clean": {
+  "a5_s02_hira_01": "Whoa. Something just plugged into the core slot and said hello. Nicely! A fourth button. For you."
+ },
+ "lyra": {
+  "a6_s01_lyra_02": "He doesn't want you to sit in it. He wants to put you in it. Forever. Read the protocol. See for yourself.",
+  "a6_s02_lyra_01": "Five of them are running. Let them. They'll have nowhere to hide once the sky is honest.",
+  "a6_s04_lyra_01": "You walk like your father. All elbows. I love it.",
+  "a5_s05_lyra_03": "Wren, run... no. No. Stay. Please stay."
+ },
+ "helm": {
+  "a6_s04_helm_01": "The Helm accepts a living body only. Frames will be refused.",
+  "a6_s04_helm_02": "Heir present. Living. Renewal may proceed."
+ },
+ "dray_gold": {
+  "a6_s04_dray_01": "There you are, child. Right where I needed you. Stay very still.",
+  "a6_s05_dray_04": "Voices of the Concord. Attend me."
+ },
+ "iris": {
+  "a6_s05_iris_fade_01": "Thank you, darling. One last broadcast, then. Tell your mother I was proud. Of both of you.",
+  "a6_s05_iris_frame_01": "A frame. At my age. Well. I shall have to learn to walk all over again. Lead the way, little star."
+ },
+ "seraph": {
+  "a5_s05_seraph_02": "Stand down. Stand... down. Why do you not stand down?"
  }
 }

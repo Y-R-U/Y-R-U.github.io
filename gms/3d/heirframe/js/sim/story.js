@@ -44,7 +44,7 @@ export function tickRenewal(st) {
 }
 
 // Complete a story mission. choice: {key, value} for missions with a choice. Returns effects for game_state/UI.
-export function completeStory(st, id, { choice } = {}) {
+export function completeStory(st, id, { choice, choices } = {}) {
   const def = storyDef(id);
   if (!def || st.done.includes(id)) return null;
   const fx = { id, title: def.title, clues: [], reveal: null, unlocks: def.unlocks || [], grants: def.grants || {}, flags: [], setHeat: def.setHeat ?? null, next: null };
@@ -55,6 +55,8 @@ export function completeStory(st, id, { choice } = {}) {
     const opts = STORY_CHOICES[def.choice].options.map(o => o.id);
     st.choices[def.choice] = choice && opts.includes(choice) ? choice : opts[0];
   }
+  // extra choices made on the way (A6-M5's irisFate) persist too
+  for (const [k, v] of Object.entries(choices || {})) if (STORY_CHOICES[k]?.options.some(o => o.id === v)) st.choices[k] = v;
   for (const f of [...(STORY_FLAGS[id] || []), ...(def.flags || [])]) if (!st.flags.includes(f)) { st.flags.push(f); fx.flags.push(f); }
   if (def.setRenewal != null) st.renewalDays = def.setRenewal;
   const idx = STORY_MISSIONS.findIndex(m => m.id === id);
@@ -87,7 +89,7 @@ function reached(st, key) {
 export function nodeState(st, node) {
   const clues = CLUES.filter(c => c.node === node.id && c.source !== 'echo');
   if (reached(st, node.revealedBy)) {
-    return clues.length && clues.every(c => st.clues.includes(c.id)) ? 'complete' : 'revealed';
+    return clues.every(c => st.clues.includes(c.id)) ? 'complete' : 'revealed';
   }
   return reached(st, node.rumouredBy) || clues.some(c => st.clues.includes(c.id)) ? 'rumoured' : 'unknown';
 }
@@ -221,7 +223,7 @@ function templateMission(def, id, S, rng, level, threat) {
   const enemies = (def.packs || []).map((p, k) => ({
     pack: p.scripted ? 'scripted' : 'story_' + k, faction: def.faction || 'syndicate', atStep: p.atStep, site: ((p.site && pool.find(q => q.id === p.site)) || (p.atPath != null ? pathOf[p.atStep][p.atPath] : siteOf[p.at] || siteOf[p.atStep])).id,
     ...(p.scripted ? { scripted: true, trigger: { event: p.scripted.event, progress: p.scripted.progress } } : {}), guard: !!p.guard,
-    units: p.units.flatMap(([defId, rank, n]) => Array.from({ length: n }, () => ({ defId, rank, level }))),
+    units: p.units.flatMap(([defId, rank, n, name]) => Array.from({ length: n }, () => ({ defId, rank, level, ...(name ? { name } : {}) }))),
   }));
   const m = {
     id: `story_${id}`, seed: rng.int(1, 2 ** 31 - 1), archetype: def.archetype, type: 'story', name: 'Story', grade: 'story', threat: threat.id, district: def.district,

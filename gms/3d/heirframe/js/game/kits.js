@@ -23,6 +23,22 @@ export function createKits(K) {
   }
 
   function cast(sk, pc) {
+    if (sk.heir) return heir(sk, pc);
+    const ok = castKind(sk, pc);
+    // Iris's Lens (3): every Drone Turret up copies your Scatter / Rail at 30%
+    const cp = pc.skills.s3?.copySkills;
+    if (ok && cp && S.turrets.length && (sk.kind === 'cone' || sk.kind === 'line')) {
+      const copy = { id: 'g_copy', name: 'Turret copy', kind: 'ranged', base: (sk.base || 10) * (sk.pellets || 1) * cp, element: sk.element || 'kinetic', fromSummon: true };
+      for (const T of S.turrets) {
+        let best = null, bd = T.range + 4;
+        for (const e of ctx.enemies.alive()) { if (e.ally) continue; const d = e.pos.distanceTo(T.g.position); if (d < bd) { bd = d; best = e; } }
+        if (!best) continue;
+        later(0.25, () => { if (best.state === 'dead') return; fx.tracer(at(T.g.position.x, T.g.position.y + 0.95, T.g.position.z).clone(), new THREE.Vector3(best.pos.x, best.pos.y + 1, best.pos.z), ION, 0.12, 1); strike(pc, best, copy, { knock: 0.5 }); });
+      }
+    }
+    return ok;
+  }
+  function castKind(sk, pc) {
     switch (sk.kind) {
       case 'ranged': return zap(sk, pc);
       case 'self': return self(sk, pc);
@@ -79,6 +95,8 @@ export function createKits(K) {
     if (!use(pc, sk)) return false;
     K.actor().play(sk.anim || 'cast', { loop: false });
     if (sk.id === 'h_veil') {
+      // Lyra's Wake (3): no cooldown while Heat is 0
+      if (sk.freeAtHeat0 && sim.state.factions.heat < 1) later(0.05, () => { pc.cooldowns[sk.id] = 0; });
       fx.ring(player.pos, 2.2, CYAN, 0.45);
       fx.beam(player.pos, CYAN, 0.5, 2.6, 0.7);
       audio.sfx('scan', { vol: 0.6 });
@@ -454,11 +472,50 @@ export function createKits(K) {
     if (pc.passive === 'momentum' && pc.momentum >= 3 && Math.random() < dt * pc.momentum) fx.sparks(at(player.pos.x, player.pos.y + 1.2, player.pos.z), 0xff9a40, 1, 2);
   }
 
+  // --- Heir Protocol (the Heir Core's 4th skill, DESIGN §5.8) ----------------------------------------------
+  function heir(sk, pc) {
+    if (!use(pc, sk)) return false;
+    K.actor().play(sk.anim || 'cast', { loop: false });
+    audio.sfx('levelup', { vol: 0.6 });
+    fx.beam(player.pos, GOLD, 1.0, 10, 1.2);
+    if (sk.id === 'b_titanfall') {
+      // leap onto the nearest crowd within range and land in a 5 m quake
+      const t = aimAt(sk.range + 2);
+      let dx = Math.sin(player.yaw), dz = Math.cos(player.yaw), dist = 3;
+      if (t) { const l = Math.hypot(t.pos.x - player.pos.x, t.pos.z - player.pos.z) || 1; dx = (t.pos.x - player.pos.x) / l; dz = (t.pos.z - player.pos.z) / l; dist = Math.min(sk.range, Math.max(0, l - 1)); }
+      player.dodge(dx, dz, dist, 0.45);
+      K.actor().play('attack_heavy', { loop: false, speed: 1.2 });
+      later(0.5, () => { const r = (sk.radius || 5) * (1 + (pc.stats.aoePct || 0)); aoeHit(pc, player.pos.x, player.pos.z, r, sk, { knock: 9 }); fx.ring(player.pos, r * 1.4, 0xffffff, 0.6); shake(0.5); });
+    } else if (sk.id === 'g_starfall') {
+      // 12 orbital lances over ~1.6 s, walked across whatever is in range
+      const foes = K.targets().filter((e) => e.pos.distanceTo(player.pos) < (sk.range || 18));
+      const n = sk.hits || 12;
+      for (let i = 0; i < n; i++) {
+        later(0.25 + i * 0.13, () => {
+          const live = foes.filter((e) => e.state !== 'dead' && !e.destroyed);
+          const e = live.length ? live[i % live.length] : null;
+          const a = Math.random() * Math.PI * 2, rr = e ? Math.random() * 1.2 : 3 + Math.random() * 6;
+          const cx = (e ? e.pos.x : player.pos.x) + Math.sin(a) * rr, cz = (e ? e.pos.z : player.pos.z) + Math.cos(a) * rr;
+          fx.beam(at(cx, ctx.world.groundAt(cx, cz), cz), 0xbfe6ff, 0.5, 30, 0.35);
+          aoeHit(pc, cx, cz, sk.radius || 3, sk, { knock: 2, color: 0xbfe6ff });
+        });
+      }
+    } else if (sk.id === 'h_eclipse') {
+      // time slows for everything else: enemies within 30 m move and attack at a quarter speed for 4 s
+      const t = sk.selfStatus?.[0]?.t || 4;
+      for (const e of ctx.enemies.alive()) if (!e.ally && e.pos.distanceTo(player.pos) < 30) { addStatus(e.c, { id: 'eclipse', t, moveMult: 0.25, atkSpeedMult: 0.25, src: 'player' }); if (e.tele) e.tele.t = (e.tele.t || 0) + 1.5; }
+      fx.ring(player.pos, 30, 0x2a1030, 0.9); fx.ring(player.pos, 6, CYAN, 0.6);
+      fx.flash(at(player.pos.x, player.pos.y + 1, player.pos.z), 3, 0x9070ff, 0.4);
+      ui.toast('Eclipse', 'good', { ms: 1400, sub: 'Time slows around you' });
+    }
+    return true;
+  }
+
   function reset() {
     S.timers.length = 0; S.dash = null; S.charge = null; wallOff(); cloakOff();
     for (const T of S.turrets) { ctx.world.scene.remove(T.g); ctx.enemies.removeDecoy(T.decoy); }
     S.turrets.length = 0; S.blinkBank = 1;
   }
 
-  return { cast, update, reset, get busy() { return !!(S.dash || S.charge); }, get turrets() { return S.turrets.length; } };
+  return { cast, update, reset, get wallUp() { return !!S.wall; }, get busy() { return !!(S.dash || S.charge); }, get turrets() { return S.turrets.length; } };
 }
