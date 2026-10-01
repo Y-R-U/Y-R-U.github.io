@@ -16,7 +16,7 @@ export const BLOCK = {};
 
 const DEF = {
   emissive: 0, light: 0, solid: true, cutout: false, transparent: false, liquid: false, plant: false,
-  waterlogged: false, hangs: false, climbable: false, shape: 'cube', glow: 'none', hardness: 1, tool: null, tier: 0, drops: null, buildOnly: false,
+  waterlogged: false, hangs: false, climbable: false, climb: false, shape: 'cube', glow: 'none', hardness: 1, tool: null, tier: 0, drops: null, buildOnly: false,
 };
 
 function hexToRgb(h) {
@@ -70,7 +70,7 @@ block(10, 'lattice_planks', 'Lattice Planks', tile('lattice_planks', 'lattice', 
 block(11, 'solar_leaves', 'Solar Film Leaves', tile('solar_leaves', 'film', '#2fa86a', '#e6d84a', { alpha: 'cutout', emissive: 0.25, glow: 'night' }),
   { cutout: true, emissive: 0.25, glow: 'night', hardness: 0.2, tool: 'saw', drops: 'none' });
 block(12, 'data_vine', 'Data Vine', tile('data_vine', 'plant', '#1f8a7a', '#5cf2ff', { alpha: 'cutout', emissive: 0.7, glow: 'pulse' }),
-  { solid: false, plant: true, cutout: true, emissive: 0.7, glow: 'pulse', light: 4, hardness: 0, tool: null, hangs: true, climbable: true });
+  { solid: false, plant: true, cutout: true, emissive: 0.7, glow: 'pulse', light: 4, hardness: 0, tool: null, hangs: true, climbable: true, climb: true });
 block(13, 'lumen_bloom', 'Lumen Bloom', tile('lumen_bloom', 'plant', '#3fae5a', '#ff7be0', { alpha: 'cutout', emissive: 0.9, glow: 'always' }),
   { solid: false, plant: true, cutout: true, emissive: 0.9, glow: 'always', light: 10, hardness: 0, tool: null });
 
@@ -172,7 +172,7 @@ block(48, 'mirror_sandstone', 'Mirror Sandstone', {
 
 // climb rail: the ladder. shape 'rail' = a thin panel drawn flat against its wall (see notes), no collision.
 block(49, 'climb_rail', 'Climb Rail', tile('climb_rail', 'rail', '#3a4458', '#5cf2ff', { fallback: 'lattice', alpha: 'cutout', emissive: 0.5, glow: 'always' }),
-  { solid: false, cutout: true, climbable: true, shape: 'rail', emissive: 0.5, glow: 'always', hardness: 0.4, tool: 'saw' });
+  { solid: false, cutout: true, climbable: true, climb: true, shape: 'rail', emissive: 0.5, glow: 'always', hardness: 0.4, tool: 'saw' });
 
 // --- farming (lane 4 grows crops; ids appended) ---
 block(50, 'grow_bed', 'Grow Bed', {
@@ -185,6 +185,14 @@ CROP.forEach(([base, acc, em], i) => block(51 + i, 'sun_crop_' + i, 'Sun Crop (s
   { solid: false, plant: true, cutout: true, emissive: em, glow: i === 3 ? 'always' : 'none', hardness: 0, drops: 'none', stage: i }));
 block(55, 'bio_sapling', 'Bio Sapling', tile('bio_sapling', 'plant', '#2e2a2a', '#4fe0a0', { alpha: 'cutout', emissive: 0.3, glow: 'night', scale: 0.6 }),
   { solid: false, plant: true, cutout: true, emissive: 0.3, glow: 'night', hardness: 0 });
+
+// representative colours matching lane 2's repainted tiles (js/render/atlas_styles.js STYLE): particles, map, icons
+const REPAINT = {
+  photomoss: '#1c9a86', loam_mesh: '#4a3f52', grow_bed: '#33293a', mirror_sand: '#aaa3c4', mirror_sandstone: '#a49cbe',
+  basalt_matrix: '#3d4a60', fractured_matrix: '#465068', fibre_stone: '#7f86ad', crystal_turf: '#4fb8a6',
+  polymer_clay: '#8f9cc4', shard_gravel: '#6f7890',
+};
+for (const k in REPAINT) BLOCKS[BLOCK[k.toUpperCase()]].color = hexToRgb(REPAINT[k]);
 
 export const MAX_ID = BLOCKS.length - 1;
 

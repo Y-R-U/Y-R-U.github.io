@@ -8,8 +8,9 @@ import { BIO } from './terrain.js';
 const B = BLOCK;
 const NEON = [B.NEON_CYAN, B.NEON_MAGENTA, B.NEON_LIME, B.NEON_AMBER, B.NEON_VIOLET, B.NEON_CORAL, B.NEON_WHITE, B.NEON_COBALT];
 const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+const MAST_TOP = 21; // antenna tip height above the starter floor
 
-export function makeStructures(S, column) {
+export function makeStructures(S, column, spawn) {
   const flatness = (cx, cz, rad) => {
     let lo = 1e9, hi = -1e9, wet = false;
     for (const [dx, dz] of [[0, 0], [rad, 0], [-rad, 0], [0, rad], [0, -rad], [rad, rad], [-rad, -rad], [rad, -rad], [-rad, rad]]) {
@@ -24,6 +25,8 @@ export function makeStructures(S, column) {
     { kind: 'outpost', grid: 160, salt: 0x0b05, pct: 45, edge: 14, make(cx, cz, r) {
       const c = column(cx, cz);
       if ((c.biome !== BIO.FOREST && c.biome !== BIO.PLAINS) || c.water || c.h > 90) return null;
+      const st = starter();
+      if (st && Math.abs(st.cx - cx) < 48 && Math.abs(st.cz - cz) < 48) return null;
       const f = flatness(cx, cz, 6);
       if (f.wet || f.spread > 3) return null;
       return { y: c.h, rad: 12 };
@@ -38,14 +41,72 @@ export function makeStructures(S, column) {
     { kind: 'observatory', grid: 256, salt: 0x0b5e, pct: 40, edge: 10, make(cx, cz) {
       const c = column(cx, cz);
       if (c.biome !== BIO.MOUNTAINS || c.h < 76 || c.h > 112) return null;
+      for (let dz = -4; dz <= 4; dz += 2) for (let dx = -4; dx <= 4; dx += 2) if (column(cx + dx, cz + dz).h > c.h + 4) return null; // near a summit
       return { y: c.h, rad: 6 };
     } },
     { kind: 'ruin', grid: 72, salt: 0x2a1e, pct: 30, edge: 12, make(cx, cz, r) {
       const c = column(cx, cz);
-      if (c.biome !== BIO.DESERT || c.water) return null;
+      if (c.biome !== BIO.DESERT || c.water || flatness(cx, cz, 5).spread > 5) return null;
       return { y: c.h, rad: 6, w: 5 + ((r >>> 4) % 5), d: 5 + ((r >>> 24) % 5) };
     } },
   ];
+
+  // guaranteed starter outpost 60-120 m from spawn, door facing spawn, with a tall glowing antenna
+  let starterInfo;
+  function starter() {
+    if (starterInfo !== undefined) return starterInfo;
+    starterInfo = null;
+    const [sx, sy, sz] = spawn();
+    const a0 = (hash2(Math.floor(sx), Math.floor(sz), S ^ 0x57a7) % 24);
+    // terrain must stay below the line from a kid's eye at spawn to the antenna tip
+    const sightline = (cx, cz, h) => {
+      const eye = sy + 1.6, tip = h + MAST_TOP;
+      for (let t = 0.08; t < 0.95; t += 0.06) {
+        const c = column(Math.round(sx + (cx - sx) * t), Math.round(sz + (cz - sz) * t));
+        if (c.h > eye + (tip - eye) * t - 2) return false;
+      }
+      return true;
+    };
+    for (const pass of [0, 1, 2]) for (const d of [80, 70, 92, 104, 62, 116]) for (let k = 0; k < 24 && !starterInfo; k++) {
+      const a = ((a0 + k) % 24) / 24 * Math.PI * 2;
+      const cx = Math.round(sx + Math.cos(a) * d), cz = Math.round(sz + Math.sin(a) * d), c = column(cx, cz);
+      if (c.water || c.h < 33 || c.h > 70 || !(c.biome === BIO.FOREST || c.biome === BIO.SHORE || c.biome === BIO.PLAINS)) continue;
+      if (pass === 0 && Math.abs(c.h - sy) > 6) continue;
+      if (pass < 2 && !sightline(cx, cz, c.h)) continue;
+      const f = flatness(cx, cz, 4);
+      if (f.wet || f.spread > 2) continue;
+      const dx = sx - cx, dz = sz - cz;
+      const face = Math.abs(dx) > Math.abs(dz) ? [Math.sign(dx), 0] : [0, Math.sign(dz) || 1];
+      starterInfo = { kind: 'starter', starter: true, cx, cz, y: c.h, r: hash2(cx, cz, S ^ 0x57), rad: 6, face, cache: [cx + 1, c.h, cz - 1] };
+    }
+    return starterInfo;
+  }
+
+  // spawn kit: a lumen-bloom cluster and a carbon-nodule outcrop within ~30 m of spawn (glowbulbs before night 1)
+  let kitList;
+  function kits() {
+    if (kitList) return kitList;
+    kitList = [];
+    const [sx, , sz] = spawn();
+    const a0 = hash2(Math.floor(sx), Math.floor(sz), S ^ 0x61f7) % 16;
+    const find = (dists, wantForest, avoid) => {
+      for (const pass of wantForest ? [true, false] : [false]) for (const d of dists) for (let k = 0; k < 16; k++) {
+        const a = ((a0 + k) % 16) / 16 * Math.PI * 2;
+        const cx = Math.round(sx + Math.cos(a) * d), cz = Math.round(sz + Math.sin(a) * d), c = column(cx, cz);
+        if (c.water || c.h < 33 || (pass && c.biome !== BIO.FOREST)) continue;
+        if (avoid && Math.abs(avoid.cx - cx) + Math.abs(avoid.cz - cz) < 8) continue;
+        const f = flatness(cx, cz, 2);
+        if (f.wet || f.spread > 2) continue;
+        return { cx, cz, y: c.h };
+      }
+      return null;
+    };
+    const bloom = find([14, 18, 22, 26, 10], true, null);
+    if (bloom) kitList.push({ kind: 'kit', sub: 'blooms', rad: 3, ...bloom });
+    const ore = find([12, 16, 20, 24, 28], false, bloom);
+    if (ore) kitList.push({ kind: 'kit', sub: 'outcrop', rad: 2, ...ore });
+    return kitList;
+  }
 
   const cache = new Map();
   function info(K, gx, gz) {
@@ -65,6 +126,9 @@ export function makeStructures(S, column) {
   }
 
   function each(xa, xb, za, zb, fn) {
+    for (const kt of kits()) if (kt.cx + kt.rad >= xa && kt.cx - kt.rad <= xb && kt.cz + kt.rad >= za && kt.cz - kt.rad <= zb) fn(kt);
+    const st = starter();
+    if (st && st.cx + st.rad >= xa && st.cx - st.rad <= xb && st.cz + st.rad >= za && st.cz - st.rad <= zb) fn(st);
     for (const K of KINDS) {
       for (let gz = Math.floor((za - K.grid) / K.grid); gz <= Math.floor((zb + K.grid) / K.grid); gz++)
         for (let gx = Math.floor((xa - K.grid) / K.grid); gx <= Math.floor((xb + K.grid) / K.grid); gx++) {
@@ -84,8 +148,13 @@ export function makeStructures(S, column) {
   function near(x, z, r) {
     const out = [];
     each(x - r, x + r, z - r, z + r, (I) => {
+      if (I.kind === 'kit') return;
       const dx = I.cx - x, dz = I.cz - z;
-      if (dx * dx + dz * dz <= r * r) out.push({ kind: I.kind, pos: [I.cx + 0.5, I.y, I.cz + 0.5], dist: Math.sqrt(dx * dx + dz * dz) });
+      if (dx * dx + dz * dz <= r * r) {
+        const e = { kind: I.kind, pos: [I.cx + 0.5, I.y, I.cz + 0.5], dist: Math.sqrt(dx * dx + dz * dz) };
+        if (I.starter) { e.starter = true; e.cache = I.cache.slice(); }
+        out.push(e);
+      }
     });
     return out.sort((a, b) => a.dist - b.dist);
   }
@@ -93,7 +162,9 @@ export function makeStructures(S, column) {
   // ---------- builders (put rule 0 = force, 2 = air only) ----------
   function build(put, x0, z0) {
     each(x0, x0 + 15, z0, z0 + 15, (I) => {
-      if (I.kind === 'outpost') outpost(put, I);
+      if (I.kind === 'kit') kit(put, I);
+      else if (I.kind === 'starter') starterHut(put, I);
+      else if (I.kind === 'outpost') outpost(put, I);
       else if (I.kind === 'vault') vault(put, I);
       else if (I.kind === 'observatory') observatory(put, I);
       else ruin(put, I);
@@ -122,6 +193,38 @@ export function makeStructures(S, column) {
       const bx = cx + Math.round(Math.cos(a) * d), bz = cz + Math.round(Math.sin(a) * d), c = column(bx, bz);
       if (!c.water) put(bx, c.h, bz, B.LUMEN_BLOOM, 2);
     }
+  }
+
+  function kit(put, I) {
+    const { cx, cz, y } = I;
+    if (I.sub === 'blooms') {
+      for (let dz = -3; dz <= 3; dz++) for (let dx = -3; dx <= 3; dx++) {
+        if (dx * dx + dz * dz > 9 || rand3(cx + dx, 7, cz + dz, S ^ 0xb10) > 0.45) continue;
+        const c = column(cx + dx, cz + dz);
+        if (!c.water && Math.abs(c.h - y) <= 2) put(cx + dx, c.h, cz + dz, B.LUMEN_BLOOM, 2);
+      }
+      put(cx, y, cz, B.LUMEN_BLOOM, 2);
+    } else {
+      // a knee-high basalt boulder studded with carbon nodules, sunk into the ground
+      for (let dz = -1; dz <= 1; dz++) for (let dx = -1; dx <= 1; dx++) {
+        const tall = dx === 0 && dz === 0 ? 3 : (dx && dz) ? 1 : 2;
+        for (let k = -1; k < tall; k++) {
+          const ore = k >= 0 && rand3(cx + dx, y + k, cz + dz, S ^ 0x0c) < 0.6;
+          put(cx + dx, y + k, cz + dz, ore || (dx === 0 && dz === 0 && k === 2) ? B.ORE_CARBON : B.BASALT_MATRIX, 0);
+        }
+      }
+    }
+  }
+
+  function starterHut(put, I) {
+    const { cx, cz, y, face } = I;
+    hut(put, cx, y, cz, 5, 5, face, B.NEON_CYAN, 0);
+    // hut() puts the fabricator at (cx-1,cz-1), the cache at (cx+1,cz-1) (reported as I.cache), a glowbulb at (cx-1,cz+1)
+    put(cx + 1, y, cz + 1, B.GLOWBULB, 0);
+    const mx = cx - 2, mz = cz - 2;
+    for (let k = 1; k < MAST_TOP - 4; k++) put(mx, y + 4 + k, mz, k % 3 === 0 ? B.NEON_WHITE : B.NEON_CYAN, 0);
+    put(mx, y + MAST_TOP, mz, B.LIGHT_PANEL, 0);
+    for (const [ax, az] of DIRS) { put(mx + ax, y + MAST_TOP - 2, mz + az, B.NEON_CYAN, 0); put(mx + ax * 2, y + MAST_TOP - 2, mz + az * 2, B.LIGHT_PANEL, 0); }
   }
 
   function hut(put, cx, y, cz, w, d, face, trim, r) {
@@ -214,14 +317,18 @@ export function makeStructures(S, column) {
       put(x, y - 1, z, B.POLYMER_BRICK, 0);
       const ring = fd >= R - 0.5;
       for (let k = 0; k < 3; k++) put(x, y + k, z, ring ? (k === 1 && ((dx * 3 + dz) & 3) === 0 ? B.CLEARGLASS : B.MIRROR_TILE) : 0, 0);
-      for (let dy = 0; dy <= R + 1; dy++) {
+      for (let dy = 0; dy <= R + 4; dy++) {
         const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
         put(x, y + 3 + dy, z, d >= R - 0.5 && d < R + 0.5 ? (dy === 0 ? B.NEON_COBALT : B.CLEARGLASS) : 0, 0);
       }
     }
     put(cx + fx * R, y, cz + fz * R, 0, 0); put(cx + fx * R, y + 1, cz + fz * R, 0, 0);
     // telescope: a glowing tube climbing towards the dome
-    for (let k = 0; k < 4; k++) put(cx - fx * (1 - k), y + 1 + k, cz - fz * (1 - k), k === 3 ? B.LIGHT_PANEL : B.NEON_COBALT, 0);
+    for (let k = 0; k < 4; k++) {
+      const tx = cx - fx * (1 - k), tz = cz - fz * (1 - k);
+      put(tx, y + 1 + k, tz, k === 3 ? B.LIGHT_PANEL : B.NEON_COBALT, 0);
+      if (k < 3) put(tx, y + 2 + k, tz, B.NEON_COBALT, 0); // stair-step so every piece touches the next by a face
+    }
     put(cx - fx, y, cz - fz, B.POLYMER_BRICK, 0);
     put(cx + fz * 2, y, cz + fx * 2, B.CACHE, 0);
     put(cx - fz * 2, y, cz - fx * 2, B.GLOWBULB, 0);
@@ -233,7 +340,7 @@ export function makeStructures(S, column) {
     for (let z = z0; z < z0 + d; z++) for (let x = x0; x < x0 + w; x++) {
       foundation(put, x, z, y, B.MIRROR_SANDSTONE);
       put(x, y - 1, z, rand3(x, y, z, S ^ 0x71) < 0.3 ? B.MIRROR_TILE_CRACKED : B.MIRROR_TILE, 0);
-      for (let k = y; k < y + 6; k++) put(x, k, z, 0, 0);
+      for (let k = y; k < y + 9; k++) put(x, k, z, 0, 0);
       const edge = x === x0 || x === x0 + w - 1 || z === z0 || z === z0 + d - 1;
       if (!edge) continue;
       const corner = (x === x0 || x === x0 + w - 1) && (z === z0 || z === z0 + d - 1);

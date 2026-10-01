@@ -1,6 +1,6 @@
 // node tools/world_test.mjs  — lane 1 world tests (storage, setBox, light, raycast, gen determinism, persistence, perf)
 import { World, UNLOADED } from '../js/world/world.js';
-import { BLOCKS, BLOCK, TILES, OPACITY, EMIT } from '../js/data/blocks.js';
+import { BLOCKS, BLOCK, TILES, OPACITY, EMIT, SOLID } from '../js/data/blocks.js';
 import { newSection, refineCell, tryCollapse, refinedCount, REFINED } from '../js/world/section.js';
 import { encodeSection, decodeSection } from '../js/world/persist.js';
 import { makeTerrain } from '../js/world/terrain.js';
@@ -221,6 +221,98 @@ section('structures');
   ok(ns.length > 0 && ns[0].dist < 400, 'something to explore within 400 m of spawn');
 }
 
+section('starter outpost');
+{
+  for (const seed of ['synthwild', 'kids', 'test-seed', 'm2-biomes', 'alpha', 'beta']) {
+    const t = makeTerrain(seed);
+    const sp = t.spawnPoint();
+    const st = t.structuresNear(sp[0], sp[2], 200).find((q) => q.starter);
+    ok(st && st.kind === 'starter' && st.dist >= 55 && st.dist <= 125, `${seed}: starter outpost ${st ? st.dist.toFixed(0) + ' m' : 'missing'} from spawn`);
+    if (!st) continue;
+    const Ws = new World({ seed, sync: true });
+    Ws.ensureArea(st.pos[0], st.pos[2], 1);
+    const [qx, qy, qz] = st.cache;
+    ok(Ws.getCell(qx, qy, qz) === B.CACHE, `${seed}: reported cache position holds a cache`);
+    let fab = 0, glow = 0, beacon = 0;
+    for (let y = qy - 1; y < qy + 24; y++) for (let z = qz - 6; z < qz + 6; z++) for (let x = qx - 6; x < qx + 6; x++) {
+      const v = Ws.getCell(x, y, z);
+      if (v === B.FABRICATOR) fab++; else if (v === B.GLOWBULB) glow++; else if (v === B.LIGHT_PANEL && y >= qy + 14) beacon++;
+    }
+    ok(fab === 1 && glow >= 2 && beacon >= 1, `${seed}: starter has fabricator, glowbulbs and a lit antenna (${fab},${glow},${beacon})`);
+    ok(!t.structuresNear(st.pos[0], st.pos[2], 40).some((q) => q !== st && !q.starter), `${seed}: nothing else crowds the starter`);
+    // spawn kit: blooms + exposed carbon within 30 m
+    let blooms = 0, carbon = 0;
+    Ws.ensureArea(sp[0], sp[2], 2);
+    for (let y = sp[1] - 4; y < sp[1] + 10; y++) for (let z = Math.floor(sp[2]) - 30; z <= sp[2] + 30; z++) for (let x = Math.floor(sp[0]) - 30; x <= sp[0] + 30; x++) {
+      if ((x - sp[0]) ** 2 + (z - sp[2]) ** 2 > 900) continue;
+      const v = Ws.getCell(x, y, z);
+      if (v === B.LUMEN_BLOOM) blooms++;
+      else if (v === B.ORE_CARBON && [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 0, -1]].some(([a, b, c]) => Ws.getCell(x + a, y + b, z + c) === 0)) carbon++;
+    }
+    ok(blooms >= 5 && carbon >= 2, `${seed}: spawn kit within 30 m (${blooms} blooms, ${carbon} exposed carbon)`);
+  }
+}
+
+section('no small floating terrain islands');
+{
+  const Wm = new World({ seed: 'synthwild', sync: true });
+  Wm.ensureArea(1568, -3808, 3);
+  const R = 2, X0 = ((1568 >> 4) - R) * 16, Z0 = ((-3808 >> 4) - R) * 16, N = (2 * R + 1) * 16, H = 128;
+  const id = (x, y, z) => (x - X0) + (z - Z0) * N + y * N * N;
+  const solid = new Uint8Array(N * N * H), seen = new Uint8Array(N * N * H);
+  for (let y = 0; y < H; y++) for (let z = Z0; z < Z0 + N; z++) for (let x = X0; x < X0 + N; x++) {
+    const v = Wm.getCell(x, y, z);
+    solid[id(x, y, z)] = (v === -1 || (v > 0 && SOLID[v])) ? 1 : 0;
+  }
+  const q = [];
+  for (let i = 0; i < N * N; i++) if (solid[i]) { seen[i] = 1; q.push(i); }
+  const each6 = (i, f) => {
+    const x = i % N, z = Math.floor(i / N) % N, y = Math.floor(i / (N * N));
+    if (x > 0) f(i - 1); if (x < N - 1) f(i + 1); if (z > 0) f(i - N); if (z < N - 1) f(i + N);
+    if (y > 0) f(i - N * N); if (y < H - 1) f(i + N * N);
+  };
+  for (let h = 0; h < q.length; h++) each6(q[h], (j) => { if (solid[j] && !seen[j]) { seen[j] = 1; q.push(j); } });
+  let small = 0;
+  for (let i = 0; i < solid.length; i++) {
+    if (!solid[i] || seen[i]) continue;
+    const c = [i]; seen[i] = 1; let edge = false;
+    for (let h = 0; h < c.length; h++) {
+      const x = c[h] % N, z = Math.floor(c[h] / N) % N;
+      if (!x || !z || x === N - 1 || z === N - 1) edge = true;
+      each6(c[h], (j) => { if (solid[j] && !seen[j]) { seen[j] = 1; c.push(j); } });
+    }
+    if (!edge && c.length < 20) small++;
+  }
+  ok(small <= 1, 'mountain area has (almost) no small floating islands: ' + small);
+}
+
+section('generated water never sits next to air');
+{
+  const t = makeTerrain('synthwild');
+  let lake = null;
+  for (let r = 50; r < 3000 && !lake; r += 37) for (let a = 0; a < 6.28 && !lake; a += 0.3) {
+    const x = Math.round(Math.cos(a) * r), z = Math.round(Math.sin(a) * r);
+    if (t.column(x, z).lake) lake = [x, z];
+  }
+  const vault = t.structuresNear(0, 0, 3000).find((q) => q.kind === 'vault');
+  const sites = [[...t.spawnPoint()].filter((_, i) => i !== 1), lake, [vault.pos[0], vault.pos[2]]];
+  let open = 0, cells = 0;
+  for (const [sx, sz] of sites) {
+    const Ww = new World({ seed: 'synthwild', sync: true });
+    Ww.ensureArea(sx, sz, 2);
+    for (const c of Ww.chunks.values()) {
+      if (!Ww.neighborsReady(c.cx, c.cz)) continue;
+      for (let y = 1; y < 127; y++) for (let z = c.cz * 16; z < c.cz * 16 + 16; z++) for (let x = c.cx * 16; x < c.cx * 16 + 16; x++) {
+        const v = Ww.getCell(x, y, z);
+        if (v !== B.WATER && v !== B.SERVER_KELP && v !== B.KELP_BULB) continue;
+        cells++;
+        if ([[1, 0, 0], [-1, 0, 0], [0, 0, 1], [0, 0, -1], [0, -1, 0]].some(([a, b, d]) => Ww.getCell(x + a, y + b, z + d) === 0)) open++;
+      }
+    }
+  }
+  ok(lake && cells > 10000 && open === 0, `no open water faces (${open} of ${cells} water cells; spawn, lake, vault)`);
+}
+
 section('setBox modes');
 {
   // build area: high in the air above spawn so it is clean
@@ -272,6 +364,19 @@ section('setBox modes');
   r = W.setBox([gx * 4, (gy - 1) * 4, gz * 4], [gx * 4 + 4, gy * 4, gz * 4 + 4], 0, 'fill');
   ok(W.getCell(gx, gy, gz) === 0 && r.removed.some((e) => e.mat === B.LUMEN_BLOOM), 'unsupported bloom removed');
   ok(W.getCell(gx, 0, gz) === B.COREPLATE, 'floor intact');
+  // sapling grows into a real tree; blocked trunk grows nothing
+  {
+    const sx2 = Math.floor(spx) - 14, sz2 = Math.floor(spz) + 9, sy2 = W.surfaceY(sx2, sz2);
+    W.setBox([sx2 * 4, sy2 * 4, sz2 * 4], [sx2 * 4 + 4, sy2 * 4 + 4, sz2 * 4 + 4], B.BIO_SAPLING, 'fill');
+    W.setBox([(sx2 + 2) * 4, (sy2 + 4) * 4, sz2 * 4], [(sx2 + 3) * 4, (sy2 + 5) * 4, sz2 * 4 + 4], B.POLYMER_BRICK, 'fill');
+    const n = W.growTree(sx2, sy2, sz2);
+    ok(n > 20 && W.getCell(sx2, sy2, sz2) === B.CARBON_LOG && W.getCell(sx2, sy2 + 3, sz2) === B.CARBON_LOG, 'sapling grew a tree: ' + n);
+    ok(W.getCell(sx2 + 2, sy2 + 4, sz2) === B.POLYMER_BRICK, 'tree spares player blocks');
+    W.setBox([sx2 * 4 + 40, (sy2 + 2) * 4, sz2 * 4], [sx2 * 4 + 44, (sy2 + 3) * 4, sz2 * 4 + 4], B.POLYMER_BRICK, 'fill');
+    const sy3 = W.surfaceY(sx2 + 10, sz2);
+    W.setBox([(sx2 + 10) * 4, (sy3 + 2) * 4, sz2 * 4], [(sx2 + 11) * 4, (sy3 + 3) * 4, sz2 * 4 + 4], B.POLYMER_BRICK, 'fill');
+    ok(W.growTree(sx2 + 10, sy3, sz2) === 0, 'no room → no tree');
+  }
   // climb rail on a wall pops when its wall is broken
   const rx = gx + 6, rz = gz, ry = W.surfaceY(rx, rz) + 3;
   W.setBox([rx * 4, ry * 4, rz * 4], [rx * 4 + 4, ry * 4 + 4, rz * 4 + 4], B.POLYMER_BRICK, 'fill');
@@ -304,6 +409,66 @@ section('water flows into a hole next to the sea');
     W.setBox([(x + dx) * 4, (y + 1) * 4, z * 4], [(x + dx + 1) * 4, (y + 2) * 4, z * 4 + 4], 0, 'fill');
     ok(W.getCell(x + dx, y + 1, z) === 0, 'no flooding above sea level');
   }
+}
+
+section('readBox / writeBox (undo + paste)');
+{
+  const Wb = new World({ seed: 'copy', sync: true });
+  const [qx, , qz] = Wb.spawn;
+  Wb.ensureArea(qx, qz, 2);
+  const x = Math.floor(qx) * 4, z = Math.floor(qz) * 4, y = Wb.surfaceY(qx, qz) * 4;
+  const min = [x - 9, y - 10, z - 7], max = [x + 23, y + 18, z + 13];
+  Wb.setBox([x + 1, y + 1, z + 1], [x + 3, y + 2, z + 2], B.NEON_LIME, 'fill'); // some refined cells
+  const snap = Wb.readBox(min, max);
+  ok(snap.data.length === 32 * 28 * 20 && !snap.unloaded, 'readBox size');
+  ok(snap.data[(x + 1 - min[0]) + (z + 1 - min[2]) * 32 + (y + 1 - min[1]) * 32 * 20] === B.NEON_LIME, 'readBox reads subs');
+  const light0 = Wb.serialize();
+  Wb.setBox([x, y - 8, z], [x + 16, y + 8, z + 8], B.POLYMER_BRICK, 'fill');
+  Wb.setBox([x + 2, y, z + 2], [x + 5, y + 3, z + 3], 0, 'fill');
+  Wb.setBox([x - 4, y + 4, z - 4], [x + 20, y + 5, z + 10], B.GLOWBULB, 'fill');
+  const r = Wb.writeBox(min, max, snap.data);
+  const back = Wb.readBox(min, max);
+  ok(back.data.every((v, i) => v === snap.data[i]), 'undo restores every sub');
+  ok(r.changed > 0 && r.removed.some((e) => e.mat === B.POLYMER_BRICK), 'undo reports what it removed');
+  const W2 = World.deserialize(JSON.parse(JSON.stringify(Wb.serialize())), { sync: true });
+  W2.ensureArea(qx, qz, 2);
+  let ld = 0;
+  for (let yy = (min[1] >> 2) - 4; yy < (max[1] >> 2) + 4; yy++) for (let zz = (min[2] >> 2) - 4; zz < (max[2] >> 2) + 4; zz++)
+    for (let xx = (min[0] >> 2) - 4; xx < (max[0] >> 2) + 4; xx++) if (Wb._lget(xx, yy, zz) !== W2._lget(xx, yy, zz)) ld++;
+  ok(ld === 0, 'light after undo equals recompute: ' + ld);
+  // aligned paste of a whole-cell copy stays uniform; skipAir keeps what is there
+  const src = Wb.readBox([x - 16, y - 16, z - 16], [x + 16, y + 16, z + 16]);
+  Wb.writeBox([x - 16, y + 48, z - 16], [x + 16, y + 80, z + 16], src.data);
+  let refined = 0;
+  for (const sct of Wb.sections.values()) if (sct && sct.sy === ((y + 64) >> 6)) refined += refinedCount(sct);
+  ok(refined <= 2, 'aligned paste stays uniform (only the copied refined cells): ' + refined);
+  Wb.setBox([x, y + 120, z], [x + 4, y + 124, z + 4], B.CACHE, 'fill');
+  const air = new Uint8Array(4 * 4 * 4);
+  Wb.writeBox([x, y + 120, z], [x + 4, y + 124, z + 4], air, { skipAir: true });
+  ok(Wb.getSub(x, y + 120, z) === B.CACHE, 'skipAir paste does not carve');
+}
+
+section('placed water falls and spreads (bounded)');
+{
+  const Wf = new World({ seed: 'pour', sync: true });
+  const [fx, , fz] = Wf.spawn;
+  Wf.ensureArea(fx, fz, 2);
+  const x = Math.floor(fx), z = Math.floor(fz);
+  // a flat brick floor with a 6-high pillar, water poured on top of the pillar
+  const y = Wf.surfaceY(x, z) + 1;
+  Wf.setBox([(x - 8) * 4, y * 4, (z - 8) * 4], [(x + 9) * 4, (y + 1) * 4, (z + 9) * 4], B.POLYMER_BRICK, 'fill');
+  Wf.setBox([(x - 8) * 4, (y + 1) * 4, (z - 8) * 4], [(x + 9) * 4, (y + 12) * 4, (z + 9) * 4], 0, 'fill');
+  Wf.setBox([x * 4, (y + 1) * 4, z * 4], [x * 4 + 4, (y + 6) * 4, z * 4 + 4], B.POLYMER_BRICK, 'fill');
+  const r = Wf.setBox([x * 4, (y + 6) * 4, z * 4], [x * 4 + 4, (y + 7) * 4, z * 4 + 4], B.WATER, 'fill');
+  let floorWater = 0, far = 0;
+  for (let dz = -8; dz <= 8; dz++) for (let dx = -8; dx <= 8; dx++) {
+    if (Wf.getCell(x + dx, y + 1, z + dz) === B.WATER) { floorWater++; if (Math.abs(dx) + Math.abs(dz) > 5) far++; }
+  }
+  ok(Wf.getCell(x + 1, y + 6, z) === B.WATER && Wf.getCell(x + 1, y + 1, z) === B.WATER, 'water spreads off the pillar and falls');
+  ok(floorWater > 10 && far === 0, `pool on the floor is bounded: ${floorWater} cells`);
+  ok(r.removed.length === 0, 'pouring reports nothing removed');
+  Wf.setBox([(x + 6) * 4, (y + 1) * 4, z * 4], [(x + 7) * 4, (y + 2) * 4, z * 4 + 4], B.WATER, 'fill', { flow: false });
+  ok(Wf.getCell(x + 6, y + 1, z) === B.WATER && Wf.getCell(x + 7, y + 1, z) === 0, 'flow:false places a still cell');
 }
 
 section('light: incremental == full recompute');

@@ -12,7 +12,7 @@ Status (2026-10-02): **M1 built.** Title → (first-run intro) → loading → p
 | `js/ui/settings_panel.js` | Settings panel: Sound / Video / Controls / Easier play, one-line kid-friendly explanations |
 | `js/ui/ui.js` | `ctx.ui`: `init(ctx, engine)`, `update(dt)`, `toggle('inventory'|'wheel')`, `closePanels()`, `blocking`, `toast`, `popup`, `handlesDeath` |
 | `js/ui/shell.js` | screen flow, loading screen, pause menu, autosave (60 s, on pause, on hide), save & quit, visitor "Save a copy" |
-| `js/ui/title.js` | title screen: wordmark over `assets/intro/title.webp`, My Worlds / Public / New World, rename/delete/public |
+| `js/ui/title.js` | title screen: wordmark over `assets/intro/forest.webp`, My Worlds / Public / New World, rename/delete/public |
 | `js/ui/store.js` | world storage façade over `js/net/api.js` (local IndexedDB + cloud), difficulty kept in localStorage per world id |
 | `js/ui/account.js` | sign-in panel (username + "Admin? Sign in with Google" link), admin player list (add/remove) |
 | `js/ui/hud.js` | hotbar (tap = select, tap selected = inventory), Integrity cells, Charge pips (+charging glow), air, eat ring, droop chip, damage/water vignettes, FPS, scale chip (opens wheel), bag and pause buttons |
@@ -45,7 +45,7 @@ Status (2026-10-02): **M1 built.** Title → (first-run intro) → loading → p
   None was listen-checked. **Gap:** nothing in the library is genuinely bright, wondrous synth. Worth a Suno session:
   "wondrous solarpunk ambient electronica, instrumental, glassy arpeggios, warm pads, gentle pulse, bright major key".
 - **Intro stills** (`assets/intro/*.webp`, Flux2 Klein 9B 4-bit, 1344×768 → 1280 wide webp q86): seed, forest, shore, ocean,
-  quiet, wake, night, vista; `title.webp` is the title backdrop. Regenerate with `tools/ui_flux.py` (raw PNGs to `$RAW`)
+  quiet, wake, night, vista; `forest.webp` doubles as the title backdrop and the fallback for a missing still. Regenerate with `tools/ui_flux.py` (raw PNGs to `$RAW`)
   and `tools/ui_webp.sh <png> <name>`.
 - **VO**: see `docs/INTRO_SCRIPT.md`; text in `tools/vo_script.json`; `tools/vo_design.py` designs the narrator,
   `tools/vo_gen.py` renders `audio/vo/i01..i10.mp3` + `manifest.json` (durations drive the intro timing).

@@ -20,7 +20,7 @@ export function createTitle({ store, account, onPlay, onSettings, onIntro }) {
   const form = { name: randomName(), seed: randomSeed(), mode: 'survival', difficulty: 'normal', where: 'local' };
 
   const motes = h('canvas.sw-motes');
-  const backdrop = h('div.sw-backdrop', {}, h('img', { src: ASSETS + 'intro/title.webp', alt: '', onerror: (e) => { e.target.style.display = 'none'; } }), motes);
+  const backdrop = h('div.sw-backdrop', {}, h('img', { src: ASSETS + 'intro/forest.webp', alt: '', onerror: (e) => { e.target.style.display = 'none'; } }), motes);
   const tabs = h('div.sw-tabs');
   const body = h('div.sw-panel-body');
   const panel = h('div.sw-panel.glass', {}, tabs, body);

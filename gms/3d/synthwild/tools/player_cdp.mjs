@@ -2,7 +2,9 @@
 // node tools/player_cdp.mjs <url> <outdir> [scenario]   scenarios: touch (default), desktop, auto
 import fs from 'node:fs';
 
-const [, , url, out = '/tmp', scenario = 'touch'] = process.argv;
+const [, , rawUrl, out = '/tmp', scenario = 'touch'] = process.argv;
+// ?play=1 on a fresh profile would stop at lane 5's first-run intro; tests always skip it.
+const url = /[?&]play=1/.test(rawUrl) && !/[?&]nointro/.test(rawUrl) ? rawUrl + '&nointro' : rawUrl;
 const PORT = +(process.env.CDP_PORT || 9313);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 

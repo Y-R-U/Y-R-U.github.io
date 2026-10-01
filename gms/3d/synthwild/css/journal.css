@@ -1,0 +1,21 @@
+/* Growth Journal goal chip (lane 4). Top-left, glassy, unobtrusive. */
+.sw-goal {
+  position: absolute; top: calc(42px * var(--ui)); left: calc(66px + var(--safe-l)); max-width: min(330px, 42vw);
+  padding: 5px 10px 5px 8px; border-radius: 12px; pointer-events: auto; cursor: pointer; z-index: 5;
+  font-size: calc(12.5px * var(--ui)); line-height: 1.25; transition: opacity .4s, transform .4s, border-color .3s, box-shadow .3s;
+}
+.sw-goal .row { display: flex; align-items: baseline; gap: 6px; }
+.sw-goal .ic { color: var(--teal); text-shadow: 0 0 8px var(--teal); }
+.sw-goal .lab { font-size: calc(9.5px * var(--ui)); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.sw-goal .t { font-weight: 700; color: var(--ink); flex: 1; min-width: 0; }
+.sw-goal .c { font-size: calc(10px * var(--ui)); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.sw-goal .hint { display: none; margin-top: 4px; color: var(--ink-2); font-size: calc(12px * var(--ui)); }
+.sw-goal.open .hint { display: block; }
+.sw-goal.hide { opacity: 0; transform: translateX(-12px); pointer-events: none; }
+.sw-goal.new { animation: sw-goal-new 1.2s ease-out; }
+.sw-goal.done { border-color: var(--gold); box-shadow: var(--shadow), 0 0 22px rgba(255, 210, 94, .55); }
+.sw-goal.done .ic { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+.sw-goal.done .t { color: var(--gold); text-decoration: line-through; text-decoration-color: rgba(255, 210, 94, .6); }
+@keyframes sw-goal-new { 0% { transform: translateX(-16px); opacity: 0; } 40% { box-shadow: var(--shadow), 0 0 18px rgba(70, 240, 212, .6); } }
+.sw-hud.lefty ~ .sw-goal, .lefty .sw-goal { left: auto; right: calc(66px + var(--safe-r)); }
+.sw-goal.build { top: calc(66px * var(--ui)); }

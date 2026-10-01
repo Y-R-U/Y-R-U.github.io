@@ -130,8 +130,8 @@ export function makeTerrain(seed) {
     return m;
   }
 
-  const caves = makeCaves(S);
-  const features = makeFeatures(S, { column, snowLine, nB, nC, wormNear: caves.wormNear });
+  const caves = makeCaves(S, column);
+  const features = makeFeatures(S, { column, snowLine, nB, nC, wormNear: caves.wormNear, solidAt: caves.solidOutside, spawn: () => spawnPoint() });
 
   function genColumn(cx, cz) {
     const x0 = cx * 16, z0 = cz * 16;
@@ -194,8 +194,13 @@ export function makeTerrain(seed) {
     return { cells, heights, waters, biomes };
   }
 
-  // land near the shore, as close to the origin as possible
+  // land near the shore, as close to the origin as possible (cached: structures ask for it too)
+  let spawnCache = null;
   function spawnPoint() {
+    if (!spawnCache) spawnCache = findSpawn();
+    return spawnCache.slice();
+  }
+  function findSpawn() {
     for (let ring = 0; ring < 200; ring++) {
       const R = ring * 12;
       const n = Math.max(1, Math.round(ring * 6));

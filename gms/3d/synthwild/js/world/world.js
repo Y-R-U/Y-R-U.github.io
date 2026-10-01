@@ -7,8 +7,9 @@ import {
 } from './section.js';
 import { relightGen, mergeBorders, refinedEmit } from './light.js';
 import { encodeSection } from './persist.js';
-import { setBox as setBoxImpl, railWall } from './edit.js';
+import { setBox as setBoxImpl, railWall, readBox as readBoxImpl, writeBox as writeBoxImpl } from './edit.js';
 import { raycast as raycastImpl } from './raycast.js';
+import { growTree as growTreeImpl } from './features.js';
 
 export const UNLOADED = 0x7fff;
 export { SEA };
@@ -210,6 +211,15 @@ export class World {
     this._flush();
     return r;
   }
+  // typed copy of a sub box: { min, max, size:[w,h,d], data: Uint8Array, unloaded } (index x + z*w + y*w*d)
+  readBox(minSub, maxSub) { return readBoxImpl(this, minSub, maxSub); }
+  // write a readBox-style copy back (undo / paste). 255 in data = leave; opts.skipAir = don't carve air.
+  writeBox(minSub, maxSub, data, opts = {}) {
+    this.finishLight();
+    const r = writeBoxImpl(this, minSub, maxSub, data, opts);
+    this._flush();
+    return r;
+  }
   lightPending() { return !!this._relight; }
   finishLight() {
     if (!this._relight) return;
@@ -239,6 +249,24 @@ export class World {
   // explorable structures within r metres of (x,z), nearest first: [{ kind, pos:[x,y,z], dist }]
   // kind: 'outpost' | 'vault' | 'observatory' | 'ruin'. Pure: works for unloaded areas too.
   structuresNear(x, z, r = 256) { return this.terrain.structuresNear(Math.floor(x), Math.floor(z), r); }
+  // grow a sapling into a forest tree at cell (x,y,z); returns cells placed (0 = no room)
+  growTree(x, y, z, seed = this.seed) { return growTreeImpl(this, x, y, z, seed); }
+  // batch-write whole cells [[x,y,z,mat], ...] (uniform, loaded only) with one relight; returns count written
+  _placeCells(list) {
+    this.finishLight();
+    const changed = [];
+    for (const [x, y, z, m] of list) {
+      const s = this._materialize(x >> 4, y >> 4, z >> 4);
+      if (!s) continue;
+      const i = (x & 15) + (z & 15) * 16 + (y & 15) * 256;
+      if (s.cells[i] & REFINED || s.cells[i] === m) continue;
+      s.cells[i] = m; s.modified = true;
+      changed.push(x, y, z);
+    }
+    if (changed.length) this._afterEdit(changed);
+    this._flush();
+    return changed.length / 3;
+  }
   railFace(x, y, z) { return railWall(this, x, y, z); }
   raycast(origin, dir, maxDist = 8, opts) { return raycastImpl(this, origin, dir, maxDist, opts); }
 

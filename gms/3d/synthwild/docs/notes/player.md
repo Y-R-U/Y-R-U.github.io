@@ -80,12 +80,24 @@ an edge, water and `waterlogged` (kelp) cells are swimmable with buoyancy and a 
 - **`brush.actions`** → `[{id, label, icon, key, enabled}]` for undo, redo, copy, paste, rotate, mirror, pick; **`brush.run(id)`** runs one.
   Bus: `brush:undo|redo {minSub,maxSub}`, `brush:copy {size}`, `brush:notUndoable {size}`, `brush:pick`.
 
+## Stations and the bow (lane 4, M2)
+- A fresh secondary press on a block calls `ctx.game.useBlock(hit)` first. If it returns true, nothing is placed for the rest of
+  that hold (no survival repeat, no build release-place).
+- Holding the Pulse Bow (`item.tool.type === 'bow'`) never places or uses; lane 4 reads the held secondary for charge/fire.
+- While `ctx.game.stations.isOpen`, `input.active` is false (no move/look/actions) and the brush outline/readout hide.
+- Verified live: place a fabricator → press place on it → panel opens, input goes inactive, and nothing is placed.
+- Test URLs now need `&nointro` with `?play=1` on a fresh profile (lane 5's first-run intro).
+
 ## Aim assist (touch, `aimAssist` setting, default on)
 - Stickiness: a mob within 4.5 m and ~12° of the crosshair slows look to 55% and drifts the view gently onto it (player.js).
 - Near misses: when the centre ray hits nothing, 8 rays in a small cone (1.4°, 2.6° on screens under 500 px) take the nearest hit,
   so a block edge is easy to grab on a phone. Mouse and gamepad are never assisted.
 
 ## Hand, climbing, kelp
+- Avatar + hand lighting mirrors the world's `shadeBlock`: lane 2's sky uniforms (`uAmbient/uGround/uLightDir/uLightColor/uBlockColor`)
+  plus local sky/block light from `world.lightAt` at the eye (eased). Rim `pow()` base is clamped (NaN-safe under bloom). Emissive
+  seams are toned down (hand seams 0.3), the hand sleeve is grey-blue and the hand is smaller (Bedrock-like). Item icons are tinted
+  by the same local light.
 - First-person hand: blocks use lane 2's atlas (`ctx.render.atlas`, sampler2DArray, per-face tile layers); tools, food and other
   items show lane 5's inventory icon (`ui/icons.js iconURL`) as a cut-out, a tool held diagonally like a pickaxe.
 - Climbing: data vines, `climb_rail`, or any block with `climb: true` are ladders. Walk forward or hold jump to climb (2.8 m/s),
@@ -125,6 +137,10 @@ actually written). `payUnits()` is a credit-ledger fallback for an integer-only 
 - Physics uses one sub-grid AABB; the third-person camera collision is a ray plus a small probe box (fine for M1).
 
 ## Requests to other lanes
+### Wave 2 follow-up
+- **Lane 5**: the new top-left "GOAL" chip overlaps the build-mode ↶ ↷ 📋 touch row (top 14 px, 42 px tall, from x 14 when the
+  HUD is present). Please start the chip below ~62 px, or tell me where to move the row.
+
 ### Wave 2
 - **Lane 1**: (1) please add a **`climb_rail`** block (climbable, non-solid or thin, `climb: true`); the player already treats
   `climb: true`, `data_vine` and `climb_rail` as ladders. (2) Optional speed-up for undo/paste: `world.readBox(minSub, maxSub)` →

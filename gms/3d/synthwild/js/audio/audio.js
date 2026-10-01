@@ -155,11 +155,14 @@ export const audio = {
     try { SFX[name](ac, g, ac.currentTime + 0.005, { ...opt, fam }); } catch (e) { console.warn('[sfx]', name, e); }
     setTimeout(() => { live--; out.disconnect(); }, Math.max(2.2, (opt.dur || 0) + 0.6) * 1000);
   },
-  // Plays audio/vo/<key>.mp3. Resolves when it ends (or fails). Muted voice still plays silently, so timing holds.
-  vo(key, { onStart } = {}) {
+  // audio/vo/<narrator>/ for the current `narrator` setting ('baritone' | 'female').
+  voBase(who = settings.get('narrator')) { return BASE + 'vo/' + (who === 'female' ? 'female' : 'baritone') + '/'; },
+  // Plays <voBase>/<key>.mp3. Resolves when it ends (or fails). Muted voice still plays silently, so timing holds.
+  vo(key, { onStart, who } = {}) {
     ensure();
+    audio._vo?.stop();
     return new Promise((resolve) => {
-      const el = new Audio(BASE + 'vo/' + key + '.mp3');
+      const el = new Audio(audio.voBase(who) + key + '.mp3');
       el.crossOrigin = 'anonymous';
       let src = null, done = false;
       const fin = () => {

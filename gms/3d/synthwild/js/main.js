@@ -149,8 +149,14 @@ async function boot() {
   }
 }
 
+const failCounts = new Map();
 function safe(label, fn) {
-  try { return fn(); } catch (e) { console.error(`[main] ${label} failed`, e); reportBootError(`${label}: ${e.message}`); }
+  try { return fn(); } catch (e) {
+    // per-frame calls fail every frame: log the first and then every 600th, so the console and memory stay sane
+    const n = failCounts.get(label) || 0;
+    failCounts.set(label, n + 1);
+    if (n % 600 === 0) { console.error(`[main] ${label} failed (x${n + 1})`, e); if (!n) reportBootError(`${label}: ${e.message}`); }
+  }
 }
 
 function applyQuality(rebuild) {

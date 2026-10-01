@@ -5,6 +5,7 @@ import { settings } from './settings.js';
 
 const ASSETS = new URL('../../assets/intro/', import.meta.url).href;
 const VO = new URL('../../audio/vo/', import.meta.url).href;
+const voDir = () => VO + (settings.get('narrator') === 'female' ? 'female' : 'baritone') + '/';
 
 export const LINES = [
   ['i01', 'seed', 'Not so very long from now, people stopped building things... and started growing them.'],
@@ -26,15 +27,18 @@ const MOVES = {
 };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-let manifest = null;
+const manifests = new Map();
 async function durations() {
-  if (manifest) return manifest;
-  try { manifest = await (await fetch(VO + 'manifest.json', { cache: 'no-cache' })).json(); } catch { manifest = {}; }
-  return manifest;
+  const dir = voDir();
+  if (manifests.has(dir)) return manifests.get(dir);
+  let m = {};
+  try { const r = await fetch(dir + 'manifest.json', { cache: 'no-cache' }); if (r.ok) m = await r.json(); } catch {}
+  manifests.set(dir, m);
+  return m;
 }
 
 export function preloadIntro() {
-  for (const s of new Set(LINES.map((l) => l[1]))) { const i = new Image(); i.src = ASSETS + s + '.webp'; }
+  for (const s of new Set(LINES.map((l) => l[1]))) { const i = new Image(); i.onerror = () => {}; i.src = ASSETS + s + '.webp'; }
   durations();
 }
 
@@ -63,12 +67,12 @@ export function playIntro(root, audio) {
 
     const mf = await durations();
     const dur = (k, text) => (mf[k + '.mp3']?.duration || text.split(' ').length / 2.4) * 1000;
-    const total = LINES.reduce((a, [k, , t]) => a + dur(k, t) + 650, 0) + 3200;
+    const total = LINES.reduce((a, [k, , t]) => a + dur(k, t) + 500, 0) + 3500;
     const t0 = performance.now();
 
     function shot(name) {
       if (!shots.has(name)) {
-        const img = h('img', { src: ASSETS + name + '.webp', alt: '' });
+        const img = h('img', { src: ASSETS + name + '.webp', alt: '', onerror: () => { if (!img.dataset.fb) { img.dataset.fb = 1; img.src = ASSETS + 'forest.webp'; } } });
         const s = h('div.shot', {}, img);
         stage.append(s);
         shots.set(name, { el: s, img, start: 0 });
@@ -107,13 +111,14 @@ export function playIntro(root, audio) {
       sub.textContent = text;
       sub.classList.toggle('on', settings.get('subtitles'));
       const minT = sleep(dur(key, text) * 0.9);
-      await Promise.all([audio?.vo ? audio.vo(key) : sleep(dur(key, text)), minT]);
+      const hasVo = !!mf[key + '.mp3'];
+      await Promise.all([audio?.vo && hasVo ? audio.vo(key) : sleep(dur(key, text)), minT]);
       sub.classList.remove('on');
-      await sleep(i === 1 || i === 4 || i === 6 || i === 8 ? 900 : 450);
+      await sleep(i === 1 || i === 4 || i === 6 || i === 8 ? 700 : 300);
     }
     if (!done) {
       end.classList.add('on');
-      await sleep(3200);
+      await sleep(2600);
       finish();
     }
   });

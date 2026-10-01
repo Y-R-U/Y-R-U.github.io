@@ -35,6 +35,8 @@
 .sw-eat svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .sw-eat circle { fill: none; stroke: rgba(0, 0, 0, .35); stroke-width: 4; }
 .sw-eat circle.p { stroke: var(--gold); stroke-dasharray: 100.5; stroke-dashoffset: 100.5; stroke-linecap: round; filter: drop-shadow(0 0 3px rgba(255, 210, 94, .8)); }
+.sw-eat.bow circle.p { stroke: var(--teal); filter: drop-shadow(0 0 4px rgba(70, 240, 212, .9)); }
+.sw-eat.bow.full circle.p { stroke: #fff; animation: chargeglow .4s infinite; }
 .sw-airrow { height: calc(14px * var(--ui)); }
 
 .sw-hotrow { display: flex; align-items: center; gap: 6px; }
@@ -67,6 +69,12 @@
 .sw-droop { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; align-items: center; padding: 5px 14px 5px 10px; border-radius: 99px; font-weight: 700; font-size: calc(13px * var(--ui)); color: #ffe7a3; background: rgba(20, 16, 50, .55); border: 1px solid rgba(255, 210, 94, .35); opacity: 0; transition: opacity .8s; }
 .sw-droop.on { opacity: 1; animation: droop 3s ease-in-out infinite; }
 @keyframes droop { 50% { border-color: rgba(255, 210, 94, .75); box-shadow: 0 0 14px rgba(255, 190, 60, .3); } }
+.sw-compass { position: absolute; top: max(12px, env(safe-area-inset-top, 0px)); right: calc(62px + var(--safe-r)); display: flex; gap: 6px; align-items: center; padding: 5px 11px 5px 8px; border-radius: 99px; font-weight: 700; font-size: calc(12px * var(--ui)); color: var(--ink-2); background: rgba(0, 14, 24, .42); border: 1px solid rgba(255, 255, 255, .12); opacity: 0; transition: opacity .6s; }
+.sw-compass.on { opacity: .9; }
+.sw-compass .arr { display: grid; color: var(--teal); transition: transform .25s; }
+.sw-hud.lefty .sw-compass { right: auto; left: calc(62px + var(--safe-l)); }
+.sw-say { position: absolute; left: 50%; bottom: calc(118px * var(--ui)); transform: translateX(-50%); max-width: min(640px, 80vw); padding: 8px 16px; border-radius: 12px; text-align: center; font-weight: 600; font-size: calc(15px * var(--ui)); line-height: 1.35; z-index: 6; pointer-events: none; animation: toastin .3s ease-out; }
+.sw-say.out { opacity: 0; transition: opacity .4s; }
 .sw-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 55%, rgba(255, 30, 60, .55) 100%); opacity: 0; transition: opacity .5s; }
 .sw-vignette.hit { opacity: 1; transition: opacity .05s; }
 .sw-vignette.water { background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 70, 120, .45) 100%); opacity: 1; }
@@ -104,7 +112,7 @@
 
 /* tool wheel */
 .sw-wheel-wrap { position: absolute; inset: 0; z-index: 26; pointer-events: auto; background: radial-gradient(ellipse at center, rgba(2, 12, 20, .15), rgba(2, 10, 18, .55)); animation: fadein .15s; display: flex; align-items: center; justify-content: center; gap: 22px; }
-.sw-wheel { position: relative; width: min(300px, 74vh); height: min(300px, 74vh); flex: none; animation: popin .2s cubic-bezier(.2, 1.3, .4, 1); }
+.sw-wheel { position: relative; width: min(300px, 66vh); height: min(300px, 66vh); flex: none; animation: popin .2s cubic-bezier(.2, 1.3, .4, 1); }
 .sw-wheel svg { width: 100%; height: 100%; overflow: visible; }
 .sw-wheel .seg path { fill: rgba(12, 34, 48, .66); stroke: rgba(170, 255, 240, .32); stroke-width: 1.2; cursor: pointer; transition: fill .12s; }
 .sw-wheel .seg:hover path { fill: rgba(40, 96, 104, .78); }
@@ -121,6 +129,10 @@
 .sw-modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
 .sw-modes button { appearance: none; border: 1px solid var(--edge-2); background: rgba(255, 255, 255, .05); border-radius: 10px; padding: 6px 2px 5px; cursor: pointer; display: grid; justify-items: center; gap: 2px; font-size: calc(11.5px * var(--ui)); font-weight: 700; color: var(--ink-2); }
 .sw-modes button.on { border-color: var(--teal); background: rgba(70, 240, 212, .16); color: var(--ink); }
+.sw-acts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.sw-acts button { appearance: none; border: 1px solid var(--edge-2); background: rgba(255, 255, 255, .05); border-radius: 10px; padding: 5px 2px 4px; cursor: pointer; display: grid; justify-items: center; gap: 1px; font-size: calc(10.5px * var(--ui)); font-weight: 700; color: var(--ink-2); }
+.sw-acts button:hover { border-color: var(--edge); background: rgba(255, 255, 255, .1); }
+.sw-acts button:disabled { opacity: .32; cursor: default; }
 .sw-dims { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .sw-step { display: grid; grid-template-columns: 26px 1fr 26px; align-items: center; background: rgba(0, 0, 0, .25); border-radius: 10px; border: 1px solid var(--edge-2); }
 .sw-step button { appearance: none; border: 0; background: transparent; height: 32px; font-size: 18px; cursor: pointer; color: var(--ink); }
@@ -134,7 +146,7 @@
 .sw-intro .shot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform; }
 .sw-intro .shot.on { opacity: 1; }
 .sw-intro .grade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0, 0, 0, .55), transparent 35%), radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, .45)); pointer-events: none; }
-.sw-intro .sub { position: absolute; left: 50%; bottom: max(26px, 8vh); transform: translateX(-50%); width: min(820px, 86vw); text-align: center; font-size: clamp(16px, 2.6vw, 24px); font-weight: 600; line-height: 1.35; text-shadow: 0 2px 6px rgba(0, 0, 0, .9), 0 0 2px #000; opacity: 0; transition: opacity .4s; color: #fff; }
+.sw-intro .sub { text-wrap: balance; position: absolute; left: 50%; bottom: max(26px, 8vh); transform: translateX(-50%); width: min(820px, 86vw); text-align: center; font-size: clamp(16px, 2.6vw, 24px); font-weight: 600; line-height: 1.35; text-shadow: 0 2px 6px rgba(0, 0, 0, .9), 0 0 2px #000; opacity: 0; transition: opacity .4s; color: #fff; }
 .sw-intro .sub.on { opacity: 1; }
 .sw-intro .skip { position: absolute; top: 12px; right: calc(14px + var(--safe-r)); z-index: 3; }
 .sw-intro .prog { position: absolute; left: 0; bottom: 0; height: 3px; background: linear-gradient(90deg, var(--teal), var(--gold)); width: 0; }

@@ -1,0 +1,32 @@
+{
+ "i01.mp3": {
+  "text": "Not so very long from now, people stopped building things... and started growing them.",
+  "voice": "Synthwild \u00b7 Narrator Baritone",
+  "speed": 0.9,
+  "voice_id": "8bc7a5fc4433482ba745cc6f586cd67e",
+  "job_id": "8325aaf46460486a974f48850537b647",
+  "duration": 5.89,
+  "words": 14,
+  "wps": 2.38
+ },
+ "i02.mp3": {
+  "text": "A tiny seed could hold a whole design. Plant it, and the land would grow into its shape, block by block by block.",
+  "voice": "Synthwild \u00b7 Narrator Baritone",
+  "speed": 0.9,
+  "voice_id": "8bc7a5fc4433482ba745cc6f586cd67e",
+  "job_id": "be45af699f814131b8dd6ffe1054bc24",
+  "duration": 8.92,
+  "words": 23,
+  "wps": 2.58
+ },
+ "i03.mp3": {
+  "text": "Nature and machines grew into each other. Trees grew bark of carbon lattice, and leaves of solar film that drank the sunlight.",
+  "voice": "Synthwild \u00b7 Narrator Baritone",
+  "speed": 0.9,
+  "voice_id": "8bc7a5fc4433482ba745cc6f586cd67e",
+  "job_id": "edb9b59fcf08483fb01e09441459393f",
+  "duration": 8.79,
+  "words": 22,
+  "wps": 2.5
+ }
+}

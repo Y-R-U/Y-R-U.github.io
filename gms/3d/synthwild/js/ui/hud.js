@@ -54,9 +54,45 @@ export function createHud(ctx, root, actions) {
   const eatP = eatRing.querySelector('.p');
   const water = h('div.sw-vignette.water', { style: { display: 'none' } });
   const cross = h('div.sw-cross');
-  const el = h('div.sw-hud.hidden', {}, water, vig, cross, eatRing, droop, topLeft, pauseBtn, itemName, bottom);
+  const compArrow = h('span.arr', { html: '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 3l6 15-6-4-6 4z" fill="currentColor"/></svg>' });
+  const compText = h('span');
+  const compass = h('div.sw-compass', {}, compArrow, compText);
+  const el = h('div.sw-hud.hidden', {}, water, vig, cross, eatRing, droop, compass, topLeft, pauseBtn, itemName, bottom);
   root.append(el);
 
+  const KIND = { outpost: 'Grower Outpost', starter: 'Grower Outpost', ruin: 'Ruin', vault: 'Seed Vault', observatory: 'Observatory' };
+  let compT = 0, compTarget = null;
+  function updateCompass(dt) {
+    const w = ctx.world, p = ctx.player?.pos || ctx.camera?.position;
+    compT -= dt;
+    if (compT <= 0 && w?.structuresNear && p) {
+      compT = 1;
+      try { compTarget = w.structuresNear(p.x, p.z, 400).find((s) => s.kind === 'outpost' || s.kind === 'starter') || null; } catch { compTarget = null; }
+    }
+    const t = ctx.game?.journal?.done?.outpost ? null : compTarget;
+    if (!t || !p) { compass.classList.remove('on'); return; }
+    const dx = t.pos[0] - p.x, dz = t.pos[2] - p.z, d = Math.hypot(dx, dz);
+    if (d < 20) { compass.classList.remove('on'); return; }
+    const e = ctx.camera?.matrixWorld?.elements;
+    const yawCam = e ? Math.atan2(-e[8], -e[10]) : 0;
+    const ang = Math.atan2(dx, dz) - yawCam;
+    compArrow.style.transform = `rotate(${(-ang * 180) / Math.PI}deg)`;
+    const txt = `${KIND[t.kind] || t.kind} · ${Math.round(d)} m`;
+    if (compText.textContent !== txt) compText.textContent = txt;
+    compass.classList.add('on');
+  }
+  // ~60 s before dusk (night starts at time01 0.75; a day is 1200 s), warn once per day in survival.
+  let duskWarned = false, lastT = null;
+  function duskWatch() {
+    const sky = ctx.sky, t = sky?.time01;
+    if (t == null || (ctx.session?.mode || 'survival') !== 'survival' || settings.get('alwaysDay')) { lastT = t; return; }
+    if (lastT != null && t < lastT) duskWarned = false;
+    if (!duskWarned && t >= 0.7 && t < 0.75 && lastT != null && lastT < 0.7) {
+      duskWarned = true;
+      actions.dusk?.();
+    }
+    lastT = t;
+  }
   let nameT = 0, lastSel = -1, fpsAcc = 0, fpsN = 0, fpsT = 0, lastInteg = null, flashT = 0;
   let dirty = true;
 
@@ -127,15 +163,20 @@ export function createHud(ctx, root, actions) {
       airEl.style.visibility = under || A < maxA ? 'visible' : 'hidden';
       if (under || A < maxA) setCells(airCells, (A / maxA) * 10, 'h');
       chargeEl.classList.toggle('charging', (sv.trickle || 0) > 0 && C < maxC);
-      const ep = sv.eatProgress || 0;
+      const bow = ctx.game?.bow?.charge || 0;
+      const ep = bow > 0 ? bow : sv.eatProgress || 0;
       eatRing.classList.toggle('on', ep > 0);
-      if (ep > 0) eatP.style.strokeDashoffset = String(100.5 * (1 - ep));
+      eatRing.classList.toggle('bow', bow > 0);
+      eatRing.classList.toggle('full', bow >= 1);
+      if (ep > 0) eatP.style.strokeDashoffset = String(100.5 * (1 - Math.min(1, ep)));
       const night = sv.droop ?? (ctx.sky?.isNight && !settings.get('alwaysDay'));
       droop.classList.toggle('on', !!night);
     } else {
       droop.classList.remove('on');
       airEl.style.visibility = 'hidden';
     }
+    updateCompass(dt);
+    duskWatch();
     if (flashT > 0 && (flashT -= dt) <= 0) integEl.classList.remove('flash');
     cross.classList.toggle('target', !!(ctx.brush?.target || ctx.brush?.placeTarget || ctx.player?.target));
     const uw = !!(ctx.player?.underwater ?? sv?.underwater);

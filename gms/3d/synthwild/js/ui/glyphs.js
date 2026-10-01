@@ -35,6 +35,13 @@ const P = {
   shell: '<path d="M4 20V4h16v16"/><path d="M4 20h16" stroke-dasharray="2 2"/>',
   replace: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 13a4 4 0 0 1 7-3l1 1M16 11a4 4 0 0 1-7 3l-1-1"/><path d="M16 8v3h-3M8 16v-3h3"/>',
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  redo: '<path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>',
+  paste: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 11h6M9 15h4"/>',
+  rotate: '<path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/>',
+  mirror: '<path d="M12 3v18" stroke-dasharray="2 2"/><path d="M9 7L4 17h5zM15 7l5 10h-5z"/>',
+  pick: '<path d="M14.5 4.5l5 5-2 2-5-5z"/><path d="M13.5 8.5L5 17l-1 3 3-1 8.5-8.5"/>',
+  arrow: '<path d="M12 3l6 15-6-4-6 4z" fill="currentColor"/>',
   moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
   bolt: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
 };

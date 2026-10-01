@@ -26,3 +26,4 @@
 - D6: M1 = the vertical slice + shell + server + intro (the brief's "no story / no crafting tree" applies to the slice
   only; full survival elements follow in M2).
 - D7: Landscape only (first-person, so the threat arrives on the horizontal axis).
+- D8 (Aaron, 2026-10-02): narrator defaults to a low, rich baritone; Settings → Audio "Narrator voice" toggle labelled Male / Female (default Male = the baritone). All VO is generated in both voices, in per-voice folders.

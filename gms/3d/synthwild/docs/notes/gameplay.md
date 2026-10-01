@@ -2,9 +2,9 @@
 
 Owner of `js/game/*`, `js/data/items.js`, `js/data/recipes.js`, `tools/game_*`.
 
-Status (2026-10-02): **M1 + M2 gameplay wave done.** `node tools/game_test.mjs` → 489 passed (runs `tools/game_test_m2.mjs` too).
+Status (2026-10-02): **M1, M2 and the journal/farming wave done.** `node tools/game_test.mjs` → 620 passed (also runs `tools/game_test_m2.mjs` and `game_test_m3.mjs`).
 Verified in the real game (`?noshell=1&q=low`, station panels with `?shot=1&q=low` so lane 5's CSS loads).
-Also owned since M2: `js/game/stations/*`, `css/stations.css`, `js/data/loot.js`.
+Also owned: `js/game/stations/*`, `css/stations.css`, `js/data/loot.js`, `js/game/journal/*`, `css/journal.css`, `js/game/farm.js`.
 
 ## Files
 | File | What |
@@ -137,6 +137,102 @@ day passives on grassy tops (photomoss/crystal turf): ibis (forest/plains/shore)
 - **Gel-core** (sizes 3/2/1: 16/8/2 HP, contact dmg 4/2/0): caves. Telegraph: squash + brightening nucleus before every
   hop. Splits into 2–3 smaller cores on death; the smallest drop gel beads.
 
+## Growth Journal (`js/game/journal/*`, `css/journal.css`)
+- `goals.js` holds the goal lists: `SURVIVAL_GOALS` (log → hand Fabricator → Lattice Cutter → Glowbulb at night → Sleep Pod →
+  till → Sun Grain → Sun Bread → ferrite → smelt → Grower Outpost → shelter → qubit crystal → qubit tool) and `BUILD_GOALS`
+  (place, fill, hollow, shell, replace, ¼ block, scale-8 stamp, copy, paste, undo, eyedropper). Each goal completes from a
+  bus event matcher or a 1 s poll; out-of-order completions count. Add goals by editing the list only.
+- Shelter = sky light ≤ 3 at the eye, block light ≥ 8, and within 8 of the surface (so a dark cave doesn't count).
+  Outpost = `world.structuresNear(x, z, 14)` has `kind: 'outpost'`.
+- The chip is top-left (below lane 5's FPS slot), shows the current goal and n/total, and tapping it shows the hint. It hides in
+  combat (a hostile within 14 that has seen you, or you were hit in the last 6 s), while panels are open, and when the
+  `guide` setting is false (undefined = on). On completion: `goal:done {id,title,done,total}`, `sfx('goal')`, a toast and
+  the chip glows gold for 1.6 s. Progress is in `game.save().journal`.
+
+## Farming (`js/game/farm.js`)
+- Seed Scoop (hoe tool, Fabricator: 2 planks + 2 rods) on photomoss/loam/crystal turf with air above → `grow_bed`
+  (`farm:till`). Sun Seeds (photomoss drops them 10%) on a grow bed → `sun_crop_0` above (`farm:plant`). Both go through
+  `game.useBlock(hit)` (farming is checked before stations).
+- Crops gain one stage per 60 lit seconds (block light ≥ 9, or sky light × daylight ≥ 9) up to `sun_crop_3`, which drops
+  Sun Grain 1–3 + seeds 1–2; unripe crops return their seed. 3 Sun Grain hand-fabricate Sun Bread (+9 Charge).
+- Bio Saplings (solar leaves, 5%) placed on soil grow a tree after 150 lit seconds via `world.growTree` (retries if
+  there is no room). Crops and saplings placed with the brush are tracked too.
+- Growth uses a play-time clock saved in `game.save().farm`. Entries in unloaded chunks don't tick. When the chunk loads,
+  or when a save loads, the gap is credited at once (capped at 30 min; sky-lit plants get 60% to allow for nights).
+- Block ids are looked up by key (`grow_bed`, `sun_crop_0..3`, `bio_sapling`); nothing is hardcoded.
+
+## Follow-ups (manager round)
+- Fall tracking also resets while `ctx.player.climbing` (climb rails / vines).
+- Bow: no Pulse Charges in survival → it does not draw and `game.bow.noAmmo` is true (this was the "charge 0 after 0.4 s"
+  report). With ammo, a 0.4 s hold reads `charge ≈ 0.4` while held; after release `charge` resets to 0 and
+  `game.bow.lastCharge` keeps the fired value. Covered in game_test_m3 through the real `game.update`.
+- Starter outpost: `LOOT_TABLES.starter` (guaranteed new lattice cutter, 8 glowbulbs, 3 Sun Bread + food/planks/seeds).
+  The cache picks it when the nearest structure from `structuresNear` has `starter: true` (or `kind: 'starter'`).
+  **Lane 1: please flag the starter outpost that way.** The journal goal "Find a Grower Outpost" is now third
+  (after the Fabricator) and matches both outposts and the starter.
+- Eyedropper `inv.setSlot(sel, blockId, 64)` is fine in build mode (infinite counts).
+
+## Difficulty and the first hour (this wave)
+`js/data/difficulty.js` is the one table: per difficulty `mobDmg`, `capHostile`, `spawnRate`, `cooldown` (mob attack
+cooldowns), `drain` (Charge), `starveFloor`, `regenEvery`, and a gentler `firstNight` block. Difficulty comes from
+`ctx.session.meta.difficulty` (lane 5's New World form, stored by `js/ui/store.js`); missing → normal. Peaceful = no
+hostiles, no drain. Mob damage = max(1, round(base × mobDmg)); fall/drown/starve are never scaled.
+| | mob dmg | hostile cap (night 1) | spawn rate | cooldowns | drain | starve stops at |
+|---|---|---|---|---|---|---|
+| easy | ×0.5 | 4 (2, reboots/spiders only) | 0.08 | ×1.8 | ×0.6 | 10 |
+| normal | ×1 | 7 (4) | 0.16 | ×1 | ×1 | 1 |
+| hard | ×1.5 | 10 | 0.26 | ×0.8 | ×1.3 | 0 (can starve) |
+Cave hostiles have their own cap (same number) and only spawn within −16..+8 of the player's height, so cave mobs no longer
+use up the surface night. Mobile (coarse pointer): total mob cap 10, passives 3; mobs beyond 56 m aren't drawn.
+
+**First-hour playthrough** (`tools/game_playthrough.mjs` + `tools/game_playthrough_bot.js`, real game, CDP port 9314,
+`q=low`). The bot plays like a careful kid at modelled walking/break/UI time while the game logic runs at full speed:
+starter outpost → logs → Fabricator → tools → glowbulbs → wait for dusk → 26-block dirt hut + lamp → night 1 → hunt
+for fibre → Sleep Pod → sleep. It runs each difficulty with a hut and again standing in the open.
+Final results on seed `synthwild` (starter outpost 80 m away):
+- Easy, hut: 0 deaths, 0 hits, Charge never below 16, slept at 35 min. Easy, in the open: 0–1 deaths (a reboot, only
+  when the bot stands still and never fights back).
+- Normal, hut: 0 hits all night (the hut blocks line of sight, spiders can't get in). Normal, open: 0–1 deaths, 5 hits.
+- Night 1 hostiles: easy spawned 2 (reboots/spiders), normal 4–7. At most 1 within 16 m of a hut.
+- fps: 60 with 15–27 mobs at night (desktop, metal); about 10 draw calls per mob.
+
+**Friction found → fixed in my lane**
+1. A crash: the first-night difficulty code read `night` before it was declared (only on a real night spawn). Fixed. The
+   playthrough is what found it; the unit tests didn't.
+2. Death loop: respawning next to the mobs that killed you (10 deaths in 4 min on easy in the open). Now hostiles within
+   24 m of the respawn point vanish and the rest forget you (`mobs.calm`), plus the 2 s spawn shield.
+3. Easy archers picked off a kid standing in the open every 3 s. No archers on easy night 1, and all mob cooldowns ×1.8 on easy.
+4. Cave mobs filled the hostile cap, so surface nights were empty, then suddenly not. Caps are now separate.
+5. The suit kit already has a Fabricator, so "Hand-fabricate a Fabricator" could never complete. Now "Set up your
+   Fabricator" (place it or make one).
+6. "Light your first night" only counted placing a lamp at full night; kids light up at dusk. It counts from dusk now.
+7. Day 1 had nothing to do between "Lattice Cutter" (about 2 min) and dusk (about 13 min). Farming goals (till, Sun Grain) now
+   come right after the cutter. Bread moved after the Sleep Pod and now needs actual fabrication (starter loot was completing it).
+8. No carbon near the surface = no glowbulbs = no lit shelter. Added a hand recipe: lumen bloom (the glowing pink forest
+   flower) + rod → 2 glowbulbs.
+9. A slightly leaky dirt hut didn't count as a shelter (sky ≤ 3 was too strict). Now sky ≤ 10 + own light ≥ 8.
+
+**For other lanes**
+- Lane 5: the death screen should say where you'll respawn and that nearby monsters were scared off. A night-is-coming
+  warning about 60 s before dusk ("Build a shelter and light it!") would help day-1 kids. Show the compass to the
+  starter outpost only until it's found (it already exists, nice).
+- Lane 3: auto-jump onto a 1-block step works, but kids won't know to pillar up to reach the top logs. A short hint, or
+  letting the saw break 2 logs above the target, would make trees quicker.
+- Lane 1: the starter outpost works (80 m on the default seed). Please guarantee a lumen bloom or an exposed carbon
+  outcrop within ~30 m of spawn on every seed.
+
+## Tree felling (`js/game/felling.js`)
+- Breaking one full carbon-bark log cell (scale 1) while holding any Saw, or by hand when the `treeFelling` setting is on
+  (default on), also breaks the connected logs above and beside it. The flood goes up or level (26-neighbour, never down)
+  and is capped at 64 logs.
+- If any of those logs touches a player-only block (planks, bricks, neon, glass, glowbulbs, devices, rails...), nothing
+  is felled, so log houses are safe.
+- Each log is re-emitted as `block:break {src:'fell'}`, so drops, Charge cost and saw wear (1 per log) go through the
+  normal path. Leaves within 3 of the trunk come down too (cap 160); the first 40 roll the usual Sun Fruit / Bio Sapling drops.
+- Effects: sparks along the trunk, a leaf puff, `sfx('treeFall')`, and a `tree:fell {pos, logs, leaves}` event.
+- **Lane 5:** please add the `treeFelling` toggle (default **true**, "Tree felling: chop the bottom log, the tree comes down")
+  and a `treeFall` SFX (a creaking whoosh).
+
 ## How to test
 - `node tools/game_test.mjs`
 - Viewer: `http://localhost:8861/gms/3d/synthwild/tools/game_mobview.html?mob=glitchfuse&fuse=0.8`
@@ -149,6 +245,14 @@ day passives on grassy tops (photomoss/crystal turf): ibis (forest/plains/shore)
 - Mobs path straight at the player with sidestep-on-stuck; no A*. Good enough for open terrain, poor in mazes.
 - Hostiles only spawn on the surface (no cave spawns until M2 caves).
 - Swimmers (fish-drones) are lane 2's `render/swimmers.js`, not mobs.
+
+## Requests to other lanes (journal/farming)
+- **Lane 5:** add the `guide` setting (default **true**) to settings and the panel ("Growth Journal hints"). Add a `goal` SFX
+  (a short bright chime), plus `till`, `plant` and `treeGrow`.
+- **Lane 3:** farming also needs the `game.useBlock(hit)` call on secondary (same request as for stations): seeds and the
+  scoop have `block: 0`, so the brush should do nothing else with them.
+- **Lane 1:** `world.growTree` and `structuresNear` are in use, thanks. Loot now also themes by the nearest structure kind
+  (ruin/outpost/vault/observatory tables in `js/data/loot.js`).
 
 ## Requests to other lanes (M2)
 - **Lane 3 (needed for stations to work in play):** on a fresh `secondary` press with a block target, call

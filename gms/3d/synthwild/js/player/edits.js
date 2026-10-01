@@ -9,7 +9,7 @@ export const MAX_BOX_SUBS = 8 << 20;     // larger edits are applied but not und
 export const sizeOf = (min, max) => [max[0] - min[0], max[1] - min[1], max[2] - min[2]];
 
 export function readBox(world, min, max) {
-  if (world.readBox) return world.readBox(min, max);
+  if (world.readBox) return world.readBox(min, max).data;   // lane 1: { size, data, unloaded }, same index order
   const [sx, sy, sz] = sizeOf(min, max);
   const out = new Uint8Array(sx * sy * sz);
   const sxz = sx * sz;
@@ -77,7 +77,7 @@ export function greedyBoxes(data, size, skip = -1) {
 
 // Write dense data back. keepAir: air in the data leaves the world untouched (stamps); otherwise exact restore.
 export function writeBox(world, min, max, data, { keepAir = false } = {}) {
-  if (world.writeBox) return world.writeBox(min, max, data, { keepAir });
+  if (world.writeBox) return world.writeBox(min, max, data, { skipAir: keepAir });
   const opts = { flow: false, support: false };
   let changed = 0;
   if (!keepAir) changed += world.setBox(min, max, 0, 'fill', opts)?.changed || 0;

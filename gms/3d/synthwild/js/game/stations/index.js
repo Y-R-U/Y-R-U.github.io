@@ -38,7 +38,10 @@ export class Stations {
     if (worldGen) {
       const seed = this.ctx.world?.seed ?? this.ctx.session?.meta?.seed ?? 'synthwild';
       const biome = this.ctx.world?.biomeAt?.(x + 0.5, z + 0.5) || 'forest';
-      for (const l of rollLoot(this.game.items, seed, x, y, z, biome)) {
+      const near = this.ctx.world?.structuresNear?.(x + 0.5, z + 0.5, 32) || [];
+      const ns = near.sort((a, b) => a.dist - b.dist)[0];
+      const st = ns ? (ns.starter ? 'starter' : ns.kind) : null;
+      for (const l of rollLoot(this.game.items, seed, x, y, z, biome, CACHE_SLOTS, st)) {
         inv.slots[l.slot] = { id: l.id, n: l.n, f: 0, ...(l.dur != null ? { dur: l.dur } : {}) };
       }
     }

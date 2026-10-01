@@ -160,7 +160,7 @@ export const reboot = {
       face(m, e.player.x - m.pos.x, e.player.z - m.pos.z, e.dt, 10);
       if (m.atk <= 0) {
         m.swing = 0.25;
-        m.cool = 1.1;
+        m.cool = 1.1 * e.coolMul;
         if (e.dist < 2.2 && Math.abs(e.dy) < 1.8) e.hurtPlayer(3, 'reboot', m);
         else e.ctx.audio?.sfx?.('whiff', { pos: m.pos });
       }

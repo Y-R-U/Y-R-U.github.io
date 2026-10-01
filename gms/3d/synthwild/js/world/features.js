@@ -1,6 +1,6 @@
 // Surface features: flora, kelp, seabed nodes, trees, glass spires; structures come from structures.js.
 // A structure's existence depends only on pure column data, so a structure cut by a chunk border is always whole.
-import { hash2, hash3, rand2, rand3 } from './noise.js';
+import { hash2, hash3, rand2, rand3, seedToInt } from './noise.js';
 import { BLOCK } from '../data/blocks.js';
 import { BIO, ss } from './terrain.js';
 import { makeStructures } from './structures.js';
@@ -9,8 +9,10 @@ const B = BLOCK;
 const COL_H = 128;
 
 export function makeFeatures(S, T) {
-  const { column, snowLine, nB, nC, wormNear } = T;
-  const S2 = makeStructures(S, column);
+  const { column, snowLine, nB, nC, wormNear, solidAt } = T;
+  // ground two cells deep (not an overhang lip that the fragment cleanup may remove); pure, so chunk-consistent
+  const firmGround = (x, z, h) => solidAt(x, h - 1, z) === 1 && solidAt(x, h - 2, z) === 1;
+  const S2 = makeStructures(S, column, T.spawn);
   const ruinCovers = (x, z) => S2.covers(x, z, 2);
 
   function groundFlora(cells, x0, z0, heights, waters, biomes) {
@@ -78,55 +80,10 @@ export function makeFeatures(S, T) {
     else return;
     if (((r >>> 8) % 1000) / 1000 >= chance) return;
     if (ruinCovers(tx, tz)) return;
-    if (wormNear(tx, tz, c.h - 6, 2)) return;
+    if (wormNear(tx, tz, c.h - 6, 2) || !firmGround(tx, tz, c.h)) return;
     const type = (r >>> 18) % 100;
     const kind = kindBias ? (type < 80 ? 1 : 0) : type < 64 ? 0 : type < 90 ? 1 : 2;
-    buildTree(put, tx, c.h, tz, kind, hash2(tx, tz, S ^ 0x77));
-  }
-
-  function buildTree(put, x, y, z, kind, r) {
-    const LOG = B.CARBON_LOG, LEAF = B.SOLAR_LEAVES, VINE = B.DATA_VINE;
-    const leafAt = (lx, ly, lz) => { if (rand3(lx, ly, lz, S ^ 0x1eaf) >= 0.06) put(lx, ly, lz, LEAF, 1); };
-    const vine = (vx, vy, vz, maxLen) => {
-      const len = 1 + (hash3(vx, vy, vz, S ^ 0x5) % maxLen);
-      for (let k = 1; k <= len; k++) put(vx, vy - k, vz, VINE, 2);
-    };
-    if (kind === 0) {
-      const th = 4 + (r % 3), rx = 2.4 + ((r >>> 4) % 3) * 0.3, ry = 2.1, cy = y + th;
-      for (let dy = -2; dy <= 2; dy++) for (let dz = -3; dz <= 3; dz++) for (let dx = -3; dx <= 3; dx++) {
-        const q = (dx * dx + dz * dz) / (rx * rx) + ((dy - 0.3) * (dy - 0.3)) / (ry * ry);
-        if (q > 1 || (q > 0.65 && rand3(x + dx, cy + dy, z + dz, S ^ 0xa1) < 0.25)) continue;
-        leafAt(x + dx, cy + dy, z + dz);
-        if (dy === -1 && dx * dx + dz * dz >= 4 && rand3(x + dx, cy, z + dz, S ^ 0x7) < 0.3) vine(x + dx, cy - 1, z + dz, 4);
-      }
-      for (let k = 0; k < th + 1; k++) put(x, y + k, z, LOG, 0);
-    } else if (kind === 1) {
-      const th = 7 + (r % 3), top = y + th + 1;
-      for (let ly = y + 3; ly <= top; ly++) {
-        const fromTop = top - ly;
-        let rad = 0.8 + fromTop * 0.42;
-        if (fromTop % 2 === 1) rad -= 0.9;
-        rad = Math.max(0.6, Math.min(3.2, rad));
-        const ir = Math.ceil(rad);
-        for (let dz = -ir; dz <= ir; dz++) for (let dx = -ir; dx <= ir; dx++) {
-          if (dx * dx + dz * dz > rad * rad + 0.3) continue;
-          leafAt(x + dx, ly, z + dz);
-          if (ly === y + 3 && dx * dx + dz * dz >= 4 && rand3(x + dx, ly, z + dz, S ^ 0x8) < 0.35) vine(x + dx, ly, z + dz, 3);
-        }
-      }
-      for (let k = 0; k < th; k++) put(x, y + k, z, LOG, 0);
-    } else {
-      const th = 9 + (r % 4), cy = y + th, rx = 4.3, ry = 2.8;
-      for (let dy = -3; dy <= 3; dy++) for (let dz = -5; dz <= 5; dz++) for (let dx = -5; dx <= 5; dx++) {
-        const ex = dx - 0.5, ez = dz - 0.5;
-        const q = (ex * ex + ez * ez) / (rx * rx) + ((dy - 0.4) * (dy - 0.4)) / (ry * ry);
-        if (q > 1 || (q > 0.6 && rand3(x + dx, cy + dy, z + dz, S ^ 0xa2) < 0.3)) continue;
-        leafAt(x + dx, cy + dy, z + dz);
-        if (dy === -2 && ex * ex + ez * ez >= 6 && rand3(x + dx, cy, z + dz, S ^ 0x9) < 0.45) vine(x + dx, cy - 2, z + dz, 6);
-      }
-      for (let k = 0; k < th; k++) for (let o = 0; o < 4; o++) put(x + (o & 1), y + k, z + (o >> 1), LOG, 0);
-      for (let o = 0; o < 4; o++) put(x + (o & 1) * 3 - 1, y, z + (o >> 1) * 3 - 1, LOG, 0);
-    }
+    buildTree(put, tx, c.h, tz, kind, hash2(tx, tz, S ^ 0x77), S);
   }
 
   // ---- desert: glass spires (saguaro-like) ----
@@ -134,7 +91,7 @@ export function makeFeatures(S, T) {
     const tx = gx * 6 + (r % 6), tz = gz * 6 + ((r >>> 3) % 6);
     if (((r >>> 8) % 100) >= 32) return;
     const c = column(tx, tz);
-    if (c.biome !== BIO.DESERT || c.water || ruinCovers(tx, tz)) return;
+    if (c.biome !== BIO.DESERT || c.water || ruinCovers(tx, tz) || !firmGround(tx, tz, c.h)) return;
     const y = c.h, ht = 2 + ((r >>> 16) % 4);
     for (let k = 0; k < ht; k++) put(tx, y + k, tz, B.GLASS_SPIRE, 2);
     if (ht >= 3 && ((r >>> 20) % 100) < 45) {
@@ -147,4 +104,72 @@ export function makeFeatures(S, T) {
   }
 
   return { groundFlora, structures, structuresNear: S2.near };
+}
+
+// put(x,y,z,mat,rule): rule 0 = trunk (force), 1 = leaf (air/soft plants), 2 = vine (air only)
+function buildTree(put, x, y, z, kind, r, S) {
+  const LOG = B.CARBON_LOG, LEAF = B.SOLAR_LEAVES, VINE = B.DATA_VINE;
+  const leafAt = (lx, ly, lz) => { if (rand3(lx, ly, lz, S ^ 0x1eaf) >= 0.06) put(lx, ly, lz, LEAF, 1); };
+  const vine = (vx, vy, vz, maxLen) => {
+    const len = 1 + (hash3(vx, vy, vz, S ^ 0x5) % maxLen);
+    for (let k = 1; k <= len; k++) put(vx, vy - k, vz, VINE, 2);
+  };
+  if (kind === 0) {
+    const th = 4 + (r % 3), rx = 2.4 + ((r >>> 4) % 3) * 0.3, ry = 2.1, cy = y + th;
+    for (let dy = -2; dy <= 2; dy++) for (let dz = -3; dz <= 3; dz++) for (let dx = -3; dx <= 3; dx++) {
+      const q = (dx * dx + dz * dz) / (rx * rx) + ((dy - 0.3) * (dy - 0.3)) / (ry * ry);
+      if (q > 1 || (q > 0.65 && rand3(x + dx, cy + dy, z + dz, S ^ 0xa1) < 0.25)) continue;
+      leafAt(x + dx, cy + dy, z + dz);
+      if (dy === -1 && dx * dx + dz * dz >= 4 && rand3(x + dx, cy, z + dz, S ^ 0x7) < 0.3) vine(x + dx, cy - 1, z + dz, 4);
+    }
+    for (let k = 0; k < th + 1; k++) put(x, y + k, z, LOG, 0);
+  } else if (kind === 1) {
+    const th = 7 + (r % 3), top = y + th + 1;
+    for (let ly = y + 3; ly <= top; ly++) {
+      const fromTop = top - ly;
+      let rad = 0.8 + fromTop * 0.42;
+      if (fromTop % 2 === 1) rad -= 0.9;
+      rad = Math.max(0.6, Math.min(3.2, rad));
+      const ir = Math.ceil(rad);
+      for (let dz = -ir; dz <= ir; dz++) for (let dx = -ir; dx <= ir; dx++) {
+        if (dx * dx + dz * dz > rad * rad + 0.3) continue;
+        leafAt(x + dx, ly, z + dz);
+        if (ly === y + 3 && dx * dx + dz * dz >= 4 && rand3(x + dx, ly, z + dz, S ^ 0x8) < 0.35) vine(x + dx, ly, z + dz, 3);
+      }
+    }
+    for (let k = 0; k < th; k++) put(x, y + k, z, LOG, 0);
+  } else {
+    const th = 9 + (r % 4), cy = y + th, rx = 4.3, ry = 2.8;
+    for (let dy = -3; dy <= 3; dy++) for (let dz = -5; dz <= 5; dz++) for (let dx = -5; dx <= 5; dx++) {
+      const ex = dx - 0.5, ez = dz - 0.5;
+      const q = (ex * ex + ez * ez) / (rx * rx) + ((dy - 0.4) * (dy - 0.4)) / (ry * ry);
+      if (q > 1 || (q > 0.6 && rand3(x + dx, cy + dy, z + dz, S ^ 0xa2) < 0.3)) continue;
+      leafAt(x + dx, cy + dy, z + dz);
+      if (dy === -2 && ex * ex + ez * ez >= 6 && rand3(x + dx, cy, z + dz, S ^ 0x9) < 0.45) vine(x + dx, cy - 2, z + dz, 6);
+    }
+    for (let k = 0; k < th; k++) for (let o = 0; o < 4; o++) put(x + (o & 1), y + k, z + (o >> 1), LOG, 0);
+    // root flare: face-adjacent to the 2x2 trunk, sunk one cell into the ground
+    for (const [rx, rz] of [[-1, 0], [2, 1], [1, -1], [0, 2]]) { put(x + rx, y, z + rz, LOG, 0); put(x + rx, y - 1, z + rz, LOG, 0); }
+  }
+}
+
+// Grow a forest tree at runtime (saplings). The trunk starts at (x,y,z), which may hold the sapling.
+// Never overwrites player blocks: logs and leaves only go into air or soft plants. Returns cells placed, or 0 if the
+// trunk has no room (then nothing changes).
+export function growTree(world, x, y, z, seed = 0) {
+  const S = (seedToInt(seed) ^ hash3(x, y, z, 0x5a9)) >>> 0;
+  const r = hash2(x, z, S ^ 0x77), type = (r >>> 18) % 100;
+  const kind = type < 70 ? 0 : 1;
+  const soft = (v) => v === 0 || v === B.LUMEN_BLOOM || v === B.PRISM_FLOWER || v === B.BIO_SAPLING || v === B.DATA_VINE;
+  const trunkH = kind === 0 ? 5 + (r % 3) : 7 + (r % 3);
+  for (let k = 0; k < trunkH; k++) if (!soft(world.getCell(x, y + k, z))) return 0;
+  const writes = new Map();
+  const put = (px, py, pz, m, rule) => {
+    if (py < 1 || py > 127) return;
+    const key = px + ',' + py + ',' + pz, cur = writes.has(key) ? writes.get(key)[3] : world.getCell(px, py, pz);
+    if (rule === 0 ? soft(cur) || cur === B.SOLAR_LEAVES : rule === 1 ? soft(cur) : cur === 0)
+      writes.set(key, [px, py, pz, m]);
+  };
+  buildTree(put, x, y, z, kind, r, S);
+  return world._placeCells([...writes.values()]);
 }

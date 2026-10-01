@@ -89,7 +89,7 @@ export function createShell(ctx, root, ui) {
   async function play(m, { fresh = false } = {}) {
     if (st.state === 'loading' || st.state === 'playing') return;
     title.hide();
-    if (!settings.get('introSeen') && !/[?&](auto|shot|nointro)/.test(location.search)) await runIntro();
+    if (!settings.get('introSeen') && !/[?&](auto|shot|nointro|play)/.test(location.search)) await runIntro();
     st.state = 'loading';
     ctx.audio?.music(null);
     const ld = loadingScreen(m.name);

@@ -1,0 +1,101 @@
+{
+ "i01.mp3": {
+  "text": "Not so very long from now, people stopped building things... and started growing them.",
+  "voice": "Synthwild \u00b7 Narrator",
+  "voice_id": "30597ad9c85f4b9eb8ad9ba1e01aa6bd",
+  "job_id": "b6b7e611329443e7947f161c5a7ca65b",
+  "duration": 5.72,
+  "words": 14,
+  "wps": 2.45
+ },
+ "i02.mp3": {
+  "text": "A tiny seed could hold a whole design. Plant it, and the land would grow into its shape, block by block by block.",
+  "voice": "Synthwild \u00b7 Narrator",
+  "voice_id": "30597ad9c85f4b9eb8ad9ba1e01aa6bd",
+  "job_id": "53d45a20fa35435ebb28059deed3c084",
+  "duration": 8.48,
+  "words": 23,
+  "wps": 2.71
+ },
+ "i03.mp3": {
+  "text": "Nature and machines grew into each other. Trees grew bark of carbon lattice, and leaves of solar film that drank the sunlight.",
+  "voice": "Synthwild \u00b7 Narrator",
+  "voice_id": "30597ad9c85f4b9eb8ad9ba1e01aa6bd",
+  "job_id": "ed7a3593a41f43ef8e52a658883e25af",
+  "duration": 8.89,
+  "words": 22,
+  "wps": 2.48
+ },
+ "i04.mp3": {
+  "text": "Vines carried data like little rivers of light. The beaches turned to mirror sand...",
+  "voice": "Synthwild \u00b7 Narrator",
+  "voice_id": "30597ad9c85f4b9eb8ad9ba1e01aa6bd",
+  "job_id": "5b8f7fe641194137af38aea2d09ad4f9",
+  "duration": 5.28,
+  "words": 14,
+  "wps": 2.65
+ },
+ "i05.mp3": {
+  "text": "...and deep in the ocean, the kelp grew into servers, humming softly in the blue.",
+  "voice": "Synthwild \u00b7 Narrator",
+  "voice_id": "30597ad9c85f4b9eb8ad9ba1e01aa6bd",
+  "job_id": "a663d90fdde94dff831774c95372fa5e",
+  "duration": 5.83,
+  "words": 15,
+  "wps": 2.57
+ },
+ "i06.mp3": {
+  "text": "Then, one day, the growers went quiet. Nobody is quite sure where they went.",
+  "voice": "Synthwild \u00b7 Narrator",
+  "voice_id": "30597ad9c85f4b9eb8ad9ba1e01aa6bd",
+  "job_id": "9d11710aa68f41c3805ed95fbd3df2bb",
+  "duration": 5.63,
+  "words": 14,
+  "wps": 2.49
+ },
+ "i07.mp3": {
+  "text": "But the wild kept on growing.",
+  "voice": "Synthwild \u00b7 Narrator",
+  "voice_id": "30597ad9c85f4b9eb8ad9ba1e01aa6bd",
+  "job_id": "72b7911a1b4f4271af3bd67f08777b38",
+  "duration": 1.94,
+  "words": 6,
+  "wps": 3.09
+ },
+ "i08.mp3": {
+  "text": "And now, you're awake. You have a fabricator kit, and a suit that runs on light.",
+  "voice": "Synthwild \u00b7 Narrator",
+  "voice_id": "30597ad9c85f4b9eb8ad9ba1e01aa6bd",
+  "job_id": "06eedab84ea94a88abb30abb07cbe154",
+  "duration": 6.52,
+  "words": 16,
+  "wps": 2.45
+ },
+ "i09.mp3": {
+  "text": "When the sun goes down, your power starts to droop, so build somewhere bright before the night comes.",
+  "voice": "Synthwild \u00b7 Narrator",
+  "voice_id": "30597ad9c85f4b9eb8ad9ba1e01aa6bd",
+  "job_id": "74d54945588141c68b28eba2f87b52f4",
+  "duration": 6.5,
+  "words": 18,
+  "wps": 2.77
+ },
+ "i10.mp3": {
+  "text": "This whole world is waiting for someone to look after it. Go on, grower. Plant your seed.",
+  "voice": "Synthwild \u00b7 Narrator",
+  "voice_id": "30597ad9c85f4b9eb8ad9ba1e01aa6bd",
+  "job_id": "e083fe5905d846a18ffbb3e138533bda",
+  "duration": 6.37,
+  "words": 17,
+  "wps": 2.67
+ },
+ "n01.mp3": {
+  "text": "The sun is going down soon. Build a little shelter, and light it up!",
+  "voice": "Synthwild \u00b7 Narrator",
+  "voice_id": "30597ad9c85f4b9eb8ad9ba1e01aa6bd",
+  "job_id": "97c8c14d905e4ceb9d4c532e319cd289",
+  "duration": 4.23,
+  "words": 14,
+  "wps": 3.31
+ }
+}

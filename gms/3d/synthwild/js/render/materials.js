@@ -44,16 +44,30 @@ varying float vFlags;
 varying float vExtra;
 
 float hash12(vec2 p);
+vec3 gEmi = vec3(0.0);
 float vnoise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
   return mix(mix(hash12(i), hash12(i + vec2(1, 0)), f.x), mix(hash12(i + vec2(0, 1)), hash12(i + vec2(1, 1)), f.x), f.y); }
 float hash12(vec2 p) { vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
 
+// sun shafts in water: noise projected along the light direction, sampled at a few points of a ray
+float shaftAt(vec3 p) {
+  vec2 q = (p.xz - p.y * uLightDir.xz / max(uLightDir.y, 0.2)) * 0.45 + vec2(uTime * 0.04, uTime * 0.03);
+  return smoothstep(0.58, 0.85, vnoise(q)) * smoothstep(0.0, 3.0, uSeaLevel - p.y);
+}
 vec3 applyFog(vec3 col, vec3 wp) {
   vec3 d = wp - cameraPosition;
   float dist = length(d);
   float f = smoothstep(uFogNear, uFogFar, dist);
   vec3 fc = mix(uFogColor, uFogSunColor, pow(max(dot(d / dist, uSunDir), 0.0), 6.0));
-  return mix(col, fc, f);
+  col = mix(col, fc, f);
+#ifndef LOW
+  if (uUnderwater > 0.5) {
+    float sh = 0.0, len = min(dist, 18.0);
+    for (int i = 1; i <= 4; i++) sh += shaftAt(cameraPosition + d / dist * len * (float(i) - 0.5) / 4.0);
+    col += uLightColor * sh * 0.07 * (1.0 - uNight);
+  }
+#endif
+  return col;
 }
 
 float caustic(vec2 p, float t) {
@@ -77,7 +91,7 @@ vec3 shadeBlock(vec4 alb, vec4 m, vec3 n, bool plant) {
   vec3 amb = mix(uGround, uAmbient, n.y * 0.5 + 0.5) * (0.22 + 0.78 * skyL) * 0.62;
   float ndl = plant ? 0.6 : max(dot(n, uLightDir), 0.0);
   vec3 direct = uLightColor * ndl * smoothstep(0.55, 0.95, sky) * 0.72;
-  vec3 bl = uBlockColor * pow(blk, 1.6) * 1.5;
+  vec3 bl = uBlockColor * pow(blk, 1.8) * 0.95;
   vec3 light = (amb + direct) * ao + bl * mix(ao, 1.0, 0.6);
   vec3 col = alb.rgb * light;
   vec3 V = normalize(cameraPosition - vWorld);
@@ -90,6 +104,11 @@ vec3 shadeBlock(vec4 alb, vec4 m, vec3 n, bool plant) {
     float h = hash12(cell);
     float tw = pow(max(sin(uTime * (1.5 + h * 3.0) + h * 40.0 + dot(V, vec3(13.0, 7.0, 11.0))), 0.0), 24.0);
     col += m.b * tw * (uLightColor + vec3(0.3)) * 2.2 * skyL;
+    // mirror grains: broad sheen + thin-film colour shift with the view angle
+    float ndv = clamp(dot(n, V), 0.0, 1.0);
+    vec3 irid = 0.5 + 0.5 * cos(6.2832 * (vec3(0.0, 0.33, 0.67) + ndv * 1.3 + vWorld.x * 0.03 + vWorld.z * 0.02));
+    col += irid * pow(1.0 - ndv, 2.0) * 0.12 * skyL * ao;
+    col += uLightColor * pow(max(dot(n, H), 0.0), 10.0) * 0.1 * skyL * ao;
   }
   float rim = pow(1.0 - clamp(dot(n, V), 0.0, 1.0), 3.0);
   col += rim * uRimColor * 0.12 * (0.4 + 0.6 * skyL) * ao;
@@ -111,7 +130,7 @@ vec3 shadeBlock(vec4 alb, vec4 m, vec3 n, bool plant) {
     col = mix(col, uDeep * (uAmbient * 0.3 + uLightColor * 0.12), uf);
     emi *= 1.0 - uf * 0.5;
   }
-  col += emi;
+  gEmi = emi;
   return col;
 }
 `;
@@ -157,7 +176,9 @@ void main() {
   bool plant = vFlags >= 8.0;
   vec3 n = vN;
   vec3 col = shadeBlock(alb, m, n, plant);
-  gl_FragColor = vec4(applyFog(col, vWorld), 1.0);
+  // glow cuts through the haze, so beacons and glowing flora still read at a distance
+  float fogK = smoothstep(uFogNear, uFogFar, length(vWorld - cameraPosition));
+  gl_FragColor = vec4(applyFog(col, vWorld) + gEmi * (1.0 - fogK * 0.45), 1.0);
   #include <colorspace_fragment>
 }
 `;
@@ -205,6 +226,13 @@ void main() {
   float sky = vLight.x;
   vec3 lightCol = uAmbient * (0.35 + 0.65 * sky * sky) + uBlockColor * pow(vLight.y, 1.6);
   vec3 body = mix(uShallow, uDeep, clamp(depth / 7.0, 0.0, 1.0)) * (lightCol * 0.6 + uLightColor * 0.3 * sky);
+#ifndef LOW
+  if (vTop > 0.5 && gl_FrontFacing) {
+    vec3 rd = refract(-V, n, 0.75);
+    float sh = shaftAt(vWorld + rd * 1.5) + shaftAt(vWorld + rd * 4.0);
+    body += uLightColor * sh * 0.12 * near * sky * (1.0 - uNight) * clamp(depth / 3.0, 0.0, 1.0);
+  }
+#endif
   float spec = pow(max(dot(r, uLightDir), 0.0), 220.0) * 4.0 + pow(max(dot(r, uLightDir), 0.0), 24.0) * 0.25;
   vec3 col = mix(body, refl * (0.4 + 0.6 * sky), fres * 0.85);
   col += uLightColor * spec * sky * near;

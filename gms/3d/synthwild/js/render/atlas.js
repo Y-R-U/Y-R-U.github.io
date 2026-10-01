@@ -3,6 +3,7 @@
 //   albedo: sRGB rgb + alpha (cutout)
 //   mat:    r = emissive mask, g = gloss, b = glint mask, a = glow mode (0 none, 1 night, 2 pulse, 3 always)/3
 import { hashString, mulberry32 } from '../core/rng.js';
+import { STYLE, stylePixel, paintLip } from './atlas_styles.js';
 
 export const TS = 32;
 const GLOW = { none: 0, night: 1, pulse: 2, always: 3 };
@@ -56,11 +57,17 @@ function paintTile(t) {
   };
   const shade = (rgb, k) => scale(rgb, k);
   const KNOWN = ['noise', 'grain', 'film', 'lattice', 'veins', 'circuit', 'mirror', 'rings', 'water', 'panel', 'ore', 'brick',
-    'device', 'plant', 'bulb', 'fibre', 'crystal', 'rail'];
+    'device', 'plant', 'bulb', 'fibre', 'crystal', 'rail', 'hexfilm', 'weave', 'sand', 'grooves', 'furrows'];
   const P = KNOWN.includes(t.pattern) ? t.pattern : (t.fallback || 'noise');
   const name = t.name;
 
+  const seed = hashString(t.name);
+  const sh = { base, acc, n1, n2, n3, rand, circuit: circuitMask(t, rand),
+    alt: t.alt ? hex(t.alt) : null, speck: t.speck ? hex(t.speck) : null,
+    cellHash: (k) => (Math.imul((k + 1) ^ seed, 2654435761) >>> 0) / 4294967296 };
   for (let y = 0; y < TS; y++) for (let x = 0; x < TS; x++) {
+    const st = stylePixel(P, t, x, y, sh);
+    if (st) { px(x, y, st.c, st.a, st.em * Math.min(1, (E || 0.5) * 1.6), st.gl, st.gt); continue; }
     const nv = fbm(x, y);
     let c = shade(base, 0.85 + nv * 0.3), a = 255, em = 0, emAbs = 0, gl = 0.12, gt = 0;
     if (P === 'noise') {
@@ -177,11 +184,14 @@ function paintTile(t) {
         gl = 0.55;
       }
     } else if (P === 'ore') {
+      // stone with glowing veins branching through it and a few bright nodes
       const w = makeWorleyCached(t, rand, 6)(x, y);
-      c = shade(base, 0.8 + nv * 0.3);
-      const crystal = makeWorleyCached({ name: t.name + 'o' }, rand, 5)(x, y);
-      if (crystal[0] < 2.6) { c = mix(acc, [255, 255, 255], clamp01(0.4 - crystal[0] * 0.15)); em = 1; gl = 0.8; gt = 0.5; }
-      else if (w[1] - w[0] < 0.8) c = shade(c, 0.7);
+      c = shade([61, 74, 96], 0.8 + nv * 0.3);
+      const crystal = makeWorleyCached({ name: t.name + 'o' }, rand, 4)(x, y);
+      const vein = w[1] - w[0];
+      if (crystal[0] < 2.2) { c = mix(acc, [255, 255, 255], 0.45); emAbs = 1; gl = 0.9; gt = 0.6; }
+      else if (vein < 1.1 && crystal[0] < 9) { c = mix(shade(acc, 0.8), acc, 1 - vein); emAbs = 0.8; gl = 0.7; }
+      else if (vein < 1.6) c = shade(c, 0.65);
     } else if (P === 'brick') {
       const row = Math.floor(y / 8), off = (row % 2) * 8;
       const mortar = y % 8 === 0 || (x + off) % 16 === 0;
@@ -227,7 +237,8 @@ function paintTile(t) {
   if (P === 'plant') paintPlant(t, alb, mat, rand, base, acc, glowMode, E);
   if (P === 'bulb') paintBulb(alb, mat, base, acc, glowMode, t.name.includes('kelp'));
 
-  if (t.lip) {
+  if (t.lip && t.lip.glow) paintLip(alb, mat, t.lip, hex, rand, glowMode);
+  else if (t.lip) {
     const lc = hex(t.lip.color);
     for (let x = 0; x < TS; x++) {
       const depth = t.lip.px * (TS / 16) + (t.lip.ragged ? Math.floor(rand() * 3) : 0);
@@ -279,6 +290,31 @@ function paintPlant(t, alb, mat, rand, base, acc, glowMode, E) {
     mat[i] = Math.min(255, em * 255); mat[i + 1] = 90; mat[i + 2] = 0; mat[i + 3] = (glowMode / 3) * 255;
   };
   const dot = (x, y, r, c, em) => { for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) if (dx * dx + dy * dy <= r * r + 0.5) put(x + dx, y + dy, c, em); };
+  if (t.name.includes('crop')) {
+    // sun crop: stage 0 sprouts → stage 3 tall stalks with glowing golden seed heads
+    const st = +(t.name.match(/(\d)$/) || [0, 0])[1];
+    const top = 7 + st * 7;
+    for (let s = 0; s < 4; s++) {
+      let x = 5 + s * 7 + rand() * 2;
+      const h = top - rand() * 3;
+      for (let y = 0; y < h; y++) {
+        x += Math.sin(y * 0.3 + s) * 0.15;
+        put(x, y, scale(base, 0.8 + (y / h) * 0.4));
+        if (y > 2 && y % 4 === s % 2) { put(x - 1, y + 1, scale(base, 1.15)); put(x + 1, y + 1, scale(base, 1.15)); }
+      }
+      if (st >= 2) {
+        const r = st === 3 ? 2 : 1;
+        for (let k = 0; k < 3 + st; k++) dot(x + (k % 2 ? 1 : -1) * 0.6, h - k * 1.6, r - (k > 2 ? 1 : 0), mix(acc, [255, 255, 255], st === 3 ? 0.35 : 0), st === 3 ? 1 : 0.4);
+      }
+    }
+    return;
+  }
+  if (t.name.includes('sapling')) {
+    for (let y = 0; y < 16; y++) { put(15, y, base); put(16, y, scale(base, 1.3)); }
+    for (const [cx, cy, r] of [[15.5, 18, 5], [11, 14, 3], [20, 15, 3]]) dot(cx, cy, r, mix(acc, [20, 90, 70], 0.5), 0.2);
+    for (const [cx, cy] of [[14, 20], [18, 17], [11, 15]]) dot(cx, cy, 1, acc, 1);
+    return;
+  }
   if (t.name.includes('vine')) {
     // hanging data cables with glowing packets
     for (let s = 0; s < 4; s++) {
@@ -347,7 +383,8 @@ export function buildAtlas(THREE, TILES) {
   const n = Math.max(1, TILES.length);
   const albData = new Uint8Array(TS * TS * 4 * n), matData = new Uint8Array(TS * TS * 4 * n);
   const painted = [];
-  TILES.forEach((t, i) => {
+  TILES.forEach((t0, i) => {
+    const t = { ...t0, ...(STYLE[t0.name] || {}) };
     const { alb, mat } = paintTile(t);
     albData.set(alb, i * TS * TS * 4); matData.set(mat, i * TS * TS * 4);
     painted.push(alb);

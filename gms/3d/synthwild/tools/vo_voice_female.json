@@ -1,0 +1,36 @@
+{
+ "id": "dfc03e33ae9f4f90afbab1f431508c59",
+ "name": "Synthwild \u00b7 Narrator Female",
+ "notes": "Designed for SYNTHWILD (yru gms/3d/synthwild) intro narration.",
+ "settings": {
+  "mode": "clone",
+  "speaker": "Ryan",
+  "language": "English",
+  "instruct": "",
+  "reference_id": "258d8dc9ee4949f5a0a9be17a950d066",
+  "ref_text": "A tiny seed could hold a whole design. Plant it, and the land would grow into its shape, block by block.",
+  "temperature": 0.9,
+  "top_p": 1.0,
+  "top_k": 50,
+  "repetition_penalty": 1.05,
+  "speed": 1,
+  "seed": 17
+ },
+ "preview": "ed941b6103c5464686b3cb3a3d8d366a",
+ "created": 1790871363.3836129,
+ "source_recipe": {
+  "mode": "design",
+  "speaker": "Ryan",
+  "language": "English",
+  "instruct": "A warm, gentle British woman in her thirties narrating a magical story for children. Soft, clear and wondrous, hopeful and kind, unhurried, with a quiet smile in her voice.",
+  "reference_id": null,
+  "ref_text": "",
+  "temperature": 0.9,
+  "top_p": 1.0,
+  "top_k": 50,
+  "repetition_penalty": 1.05,
+  "speed": 1.0,
+  "seed": 17,
+  "text": "A tiny seed could hold a whole design. Plant it, and the land would grow into its shape, block by block."
+ }
+}

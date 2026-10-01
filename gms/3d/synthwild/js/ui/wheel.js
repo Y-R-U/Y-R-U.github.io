@@ -1,6 +1,7 @@
 // Radial tool wheel: scale ring (0.25–8), brush mode, volume dims, view toggle.
 import { h, click } from './dom.js';
 import { svg } from './glyphs.js';
+import { toast } from './dom.js';
 import { settings } from './settings.js';
 
 const SCALES = [0.25, 0.5, 1, 2, 4, 8];
@@ -68,9 +69,19 @@ export function openWheel(ctx, root, { onClose } = {}) {
   });
   const viewSeg = h('div.sw-seg', { style: { width: '100%' } }, [['first', 'First person'], ['third', 'Third person']].map(([v, lb]) =>
     h('button', { 'data-v': v, style: { flex: 1 }, onclick: () => { settings.set('view', v); click(); paint(); } }, lb)));
+  const acts = (ctx.brush?.actions || []);
+  const actBtns = acts.map((a) => h('button', { 'data-id': a.id, title: a.key ? `${a.label} (${a.key})` : a.label, onclick: () => {
+    const cur = (ctx.brush?.actions || []).find((x) => x.id === a.id);
+    if (!cur?.enabled) { click('deny'); return; }
+    click('select');
+    let ok;
+    try { ok = ctx.brush.run(a.id); } catch (e) { console.warn('[wheel] action', a.id, e); }
+    if (ok !== false && (a.id === 'paste' || a.id === 'pick')) close(); else paint();
+  } }, h('span', { html: svg(a.icon || a.id, 18) }), a.label));
   const side = h('div.sw-wheel-side.glass', {},
+    actBtns.length ? h('div.lab', {}, 'Tools') : null, actBtns.length ? h('div.sw-acts', {}, actBtns) : null,
     h('div.lab', {}, 'Brush'), h('div.sw-modes', {}, modeBtns), modeHint,
-    ...(build ? [h('div.lab', {}, 'Size of the box (in blocks of this scale)'), h('div.sw-dims', {}, dims),
+    ...(build ? [h('div.lab', {}, 'Box size (W × H × D)'), h('div.sw-dims', {}, dims),
       h('button.sw-btn.small', { onclick: () => { setBrush(ctx, 'dims', [1, 1, 1]); click(); paint(); } }, 'Reset size to 1×1×1')]
       : [h('div.hint', { style: { fontSize: '12px', color: 'var(--ink-3)' } }, 'Big boxes (W×H×D) are a Build mode power. In Survival you place one block at a time.')]),
     h('div.lab', {}, 'Camera'), viewSeg);
@@ -87,6 +98,8 @@ export function openWheel(ctx, root, { onClose } = {}) {
     modeBtns.forEach((bt, i) => bt.classList.toggle('on', MODES[i][0] === md));
     modeHint.textContent = MODE_HINT[md] || '';
     dm.forEach((v, i) => { dimVals[i].textContent = v; });
+    const st = ctx.brush?.actions || [];
+    for (const b of actBtns) b.disabled = !st.find((x) => x.id === b.dataset.id)?.enabled;
     const view = settings.get('view');
     viewSeg.querySelectorAll('button').forEach((bt) => bt.classList.toggle('on', bt.dataset.v === view));
   }
@@ -104,9 +117,11 @@ export function openWheel(ctx, root, { onClose } = {}) {
   wrap.addEventListener('wheel', onWheel, { passive: true });
   document.addEventListener('keydown', onKey, true);
 
+  const tick = setInterval(paint, 300);
   let closed = false;
   function close() {
     if (closed) return; closed = true;
+    clearInterval(tick);
     document.removeEventListener('keydown', onKey, true);
     wrap.remove(); click('close'); onClose?.();
   }

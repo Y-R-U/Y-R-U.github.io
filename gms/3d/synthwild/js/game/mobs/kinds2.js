@@ -24,7 +24,7 @@ export const archer = {
         const l = Math.hypot(dx, dy, dz) || 1;
         e.fire(m, from, { x: (dx / l) * 22, y: (dy / l) * 22, z: (dz / l) * 22 }, { dmg: 3, gravity: 0, src: 'archer' });
         e.ctx.audio?.sfx?.('archerFire', { pos: m.pos });
-        m.cool = rand(1.5, 2.4);
+        m.cool = rand(1.5, 2.4) * e.coolMul;
       }
       return;
     }
@@ -110,7 +110,7 @@ export const spider = {
     if (sees) m.seen = 4; else m.seen -= e.dt;
     if (m.angry && m.seen > 0 && !e.player.dead) {
       if (e.dist < 3.2 && m.onGround && m.cool <= 0) {
-        m.crouch = POUNCE_WINDUP; m.cool = 1.5;
+        m.crouch = POUNCE_WINDUP; m.cool = 1.5 * e.coolMul;
         e.ctx.audio?.sfx?.('spiderHiss', { pos: m.pos });
         return;
       }
@@ -196,7 +196,7 @@ export const voidlinker = {
     }
     m.provoked -= e.dt;
     if (e.player.dead) { m.provoked = 0; return; }
-    if (e.dist < 2.3 && m.cool <= 0) { m.cool = 1.4; this.start(m, 'strike', e, 0.4); return; }
+    if (e.dist < 2.3 && m.cool <= 0) { m.cool = 1.4 * e.coolMul; this.start(m, 'strike', e, 0.4); return; }
     if (e.dist > 10 && Math.random() < e.dt * 0.7) { this.start(m, 'near', e); return; }
     m.moving = e.steer(m, this.speed);
   },
@@ -257,7 +257,7 @@ export const gelcore = {
     if (sees) m.seen = 4; else m.seen -= e.dt;
     const aggro = m.seen > 0 && !e.player.dead;
     if (aggro && m.size > 1 && m.cool <= 0 && e.dist < m.w * 0.5 + 0.7 && e.dy > -m.h && e.dy < 1) {
-      m.cool = 1;
+      m.cool = e.coolMul;
       e.hurtPlayer(GEL_DMG[m.size], 'gelcore', m);
     }
     if (m.hop && !m.onGround) { m.wantX = m.hop.x; m.wantZ = m.hop.z; m.moving = 1; return; }

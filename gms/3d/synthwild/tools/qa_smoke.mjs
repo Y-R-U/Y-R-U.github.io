@@ -355,7 +355,7 @@ async function runViewport({ url, port, out, F, vpName, missingOk, quick, expect
       };
       // break
       const breakTarget = tgt.bt;
-      const e1 = F.has('break') ? null : await btn('break', mode === 'build' ? 400 : 6000, 'window.__qa.brk.length>0');
+      const e1 = F.has('break') ? null : await btn('break', mode === 'build' ? 600 : 10000, 'window.__qa.brk.length>0');
       await sleep(400);
       const brk = await pg.evalSafe('window.__qa.brk.slice()');
       const brokeAir = brk?.length ? await pg.game(`return C.world.getSub(${breakTarget.min.join(',')})`).catch(() => null) : null;

@@ -1,5 +1,5 @@
 // ctx.game: inventory, survival stats, drops, Memory Caches and mobs. init(ctx) builds it; main.js calls update(dt).
-import { BLOCKS } from '../data/blocks.js';
+import { BLOCKS, BLOCK } from '../data/blocks.js';
 import { createItems } from '../data/items.js';
 import { Inventory, HOTBAR } from './inventory.js';
 import { Survival, TUNING } from './survival.js';
@@ -7,6 +7,10 @@ import { Mobs } from './mobs/index.js';
 import { Drops } from './drops.js';
 import { Stations } from './stations/index.js';
 import { Projectiles } from './projectiles.js';
+import { Farm } from './farm.js';
+import { Journal } from './journal/index.js';
+import { difficultyOf, MOB_SOURCES } from '../data/difficulty.js';
+import { fell } from './felling.js';
 import * as rules from './rules.js';
 import { lightAt, liquidAt } from './env.js';
 
@@ -27,8 +31,8 @@ export function init(ctx) {
 
   const game = {
     items, inv, survival, rules,
-    mobs: null, drops: null, stations: null, projectiles: null,
-    bow: { drawing: false, t: 0, charge: 0 },
+    mobs: null, drops: null, stations: null, projectiles: null, farm: null, journal: null,
+    bow: { drawing: false, t: 0, charge: 0, lastCharge: 0, noAmmo: false },
     spawnPoint: null,
     stash: null,
     peak: null,
@@ -36,6 +40,10 @@ export function init(ctx) {
     respawnT: 0,
 
     get creative() { return ctx.session?.mode === 'build'; },
+    get difficulty() { return ctx.session?.meta?.difficulty || 'normal'; },
+    get diff() { return difficultyOf(game.difficulty); },
+    nights: 0,
+    get firstNight() { return game.nights <= 1; },
 
     breakTime(mat, held = inv.held(), scale = 1) {
       return rules.breakTime(BLOCKS, mat, held, { creative: game.creative, scale });
@@ -57,6 +65,11 @@ export function init(ctx) {
 
     hurtPlayer(amount, src, knock = null) {
       if (game.creative || survival.dead) return 0;
+      if (MOB_SOURCES.has(src)) {
+        const m = game.diff.mobDmg;
+        if (!m) return 0;
+        amount = Math.max(1, Math.round(amount * m));
+      }
       const got = survival.damage(amount, src, { dir: knock });
       if (got && knock) playerKnock(knock);
       return got;
@@ -77,13 +90,14 @@ export function init(ctx) {
       const ws = ctx.world?.spawn;
       const sp = game.spawnPoint || (ws ? { x: ws[0], y: ws[1], z: ws[2] } : { x: 0.5, y: ctx.world?.surfaceY?.(0.5, 0.5) ?? 40, z: 0.5 });
       playerTeleport(sp);
+      game.mobs.calm(sp);
       game.peak = null;
       game.respawnT = 0;
       bus?.emit?.('player:respawn', { pos: sp });
     },
 
     // Secondary on a block (lane 3 calls this before placing). true = a station took the action.
-    useBlock(hit) { return game.stations.useBlock(hit); },
+    useBlock(hit) { return (!survival.dead && game.farm.use(hit, inv.held())) || game.stations.useBlock(hit); },
 
     // Test hook: spawn a mob `dist` units in front of the player.
     spawnMob(kind, dist = 4) {
@@ -101,9 +115,12 @@ export function init(ctx) {
       game.mobs.clear();
       game.stations.clear();
       game.projectiles.clear();
+      game.farm.clear();
+      game.journal.reset();
       survival.reset();
       inv.clear();
       game.spawnPoint = null;
+      game.nights = 0; game.wasNight = false;
       game.stash = null;
       game.peak = null;
       game.last = null;
@@ -121,7 +138,10 @@ export function init(ctx) {
         stash: game.stash,
         caches: game.drops.serializeCaches(),
         stations: game.stations.serialize(),
+        farm: game.farm.serialize(),
+        journal: game.journal.serialize(),
         spawn: game.spawnPoint,
+        nights: game.nights,
       };
     },
     load(d) {
@@ -130,8 +150,12 @@ export function init(ctx) {
       inv.load(d.inv);
       game.stash = d.stash || null;
       game.spawnPoint = d.spawn || null;
+      game.nights = d.nights || 0;
+      game.wasNight = !!ctx.sky?.isNight;
       game.drops.loadCaches(d.caches);
       game.stations.load(d.stations);
+      game.farm.load(d.farm);
+      game.journal.load(d.journal);
     },
 
     update(dt) {
@@ -142,6 +166,9 @@ export function init(ctx) {
       if (!p) return;
       const st = S();
       const sky = ctx.sky;
+      const isNight = !!sky?.isNight && !st.get('alwaysDay');
+      if (isNight && !game.wasNight) game.nights++;
+      game.wasNight = isNight;
       const alwaysDay = st.get('alwaysDay');
       const daylight = alwaysDay ? 1 : sky?.daylight01 ?? 1;
       const L = lightAt(ctx.world, p.x, p.y + EYE, p.z);
@@ -151,8 +178,8 @@ export function init(ctx) {
 
       if (!game.creative && !survival.dead) {
         // Fall damage: track the peak height while airborne.
-        if (p.onGround || p.inWater || p.flying) {
-          if (game.peak != null && p.onGround && !p.inWater && !p.flying) {
+        if (p.onGround || p.inWater || p.flying || p.climbing) {
+          if (game.peak != null && p.onGround && !p.inWater && !p.flying && !p.climbing) {
             const dmg = survival.fallDamage(game.peak - p.y);
             if (dmg > 0 && !st.get('noFallDamage')) game.hurtPlayer(dmg, 'fall');
           }
@@ -163,6 +190,7 @@ export function init(ctx) {
         survival.tick(dt, {
           creative: false, peaceful: st.get('peaceful'), daylight,
           skyLight: L.sky, blockLight: L.block, moving: moved > 0.6, sprinting: p.sprinting,
+          drain: game.diff.drain, starveFloor: game.diff.starveFloor, regenEvery: game.diff.regenEvery,
           swimming: p.inWater, eyeInWater: p.eyeInWater,
         });
         eatTick(dt);
@@ -177,6 +205,8 @@ export function init(ctx) {
       game.mobs.update(dt, p, st, alwaysDay ? { isNight: false, daylight01: 1 } : sky);
       game.projectiles.update(dt, p);
       game.stations.update(dt);
+      game.farm.update(dt);
+      game.journal.update(dt);
     },
   };
 
@@ -204,10 +234,11 @@ export function init(ctx) {
     if (holding) {
       if (!B.drawing) {
         if (!game.creative && inv.count(ammo) < 1) {
+          B.noAmmo = true;
           if (!B.warned) { B.warned = true; bus?.emit?.('player:noAmmo', { id: ammo }); game.stations.say('No Pulse Charges. Fabricate some from carbon + a rod.', 'warn'); }
           return;
         }
-        B.drawing = true; B.t = 0;
+        B.drawing = true; B.t = 0; B.noAmmo = false;
         ctx.audio?.sfx?.('bowDraw');
       }
       B.t += dt;
@@ -217,6 +248,7 @@ export function init(ctx) {
     B.warned = false;
     if (!B.drawing) return;
     const c = B.charge;
+    B.lastCharge = c;
     B.drawing = false; B.t = 0; B.charge = 0;
     if (c < 0.15 || !isBow) return;
     const dir = ctx.camera.getWorldDirection(new ctx.THREE.Vector3());
@@ -251,7 +283,7 @@ export function init(ctx) {
     const inWater = P.inWater ?? liquidAt(ctx.world, b.x, b.y + 0.4, b.z);
     const eyeInWater = P.eyeInWater ?? P.headInWater ?? liquidAt(ctx.world, b.x, b.y + EYE, b.z);
     const dir = ctx.camera?.getWorldDirection ? ctx.camera.getWorldDirection(lookV) : null;
-    return { x: b.x, y: b.y, z: b.z, onGround, inWater, eyeInWater, flying: !!P.flying, dir,
+    return { x: b.x, y: b.y, z: b.z, onGround, inWater, eyeInWater, flying: !!P.flying, climbing: !!P.climbing, dir,
       sprinting: P.sprinting ?? ctx.input?.held?.sprint ?? false, dead: survival.dead };
   }
   function playerKnock(k) {
@@ -274,18 +306,25 @@ export function init(ctx) {
   game.drops = new Drops(ctx, game);
   game.stations = new Stations(ctx, game);
   game.projectiles = new Projectiles(ctx, game);
+  game.farm = new Farm(ctx, game);
+  game.journal = new Journal(ctx, game);
 
   bus?.on?.('block:break', (ev) => {
     if (game.creative) return;
     game.drops.onBreak(ev);
     game.stations.onBreak(ev);
-    if (ev.src === 'emp') return;
+    if (ev.src === 'emp' || ev.leaf) return;
     survival.spend(TUNING.costBreak);
     const t = inv.held()?.item?.tool;
     if (t) inv.wear(inv.sel, 1, S().get('toolsNeverBreak'));
+    if (ev.src !== 'fell' && ev.minSub && ev.removed?.some((r) => r.mat === BLOCK.CARBON_LOG && r.count >= 64)) {
+      const size = ev.maxSub.map((v, i) => v - ev.minSub[i]);
+      const saw = t?.type === 'saw';
+      if (size.every((v) => v === 4) && (saw || (!t && S().get('treeFelling') !== false))) fell(ctx, ev.minSub[0] >> 2, ev.minSub[1] >> 2, ev.minSub[2] >> 2);
+    }
   });
   bus?.on?.('game:stop', () => { game.mobs.clear(); game.drops.clear(); game.stations.clear(); game.projectiles.clear(); survival.stopEat(); });
-  bus?.on?.('block:place', (ev) => game.stations.onPlace(ev));
+  bus?.on?.('block:place', (ev) => { game.stations.onPlace(ev); game.farm.onPlace(ev); });
   bus?.on?.('player:death', () => {
     const p = pstate();
     if (!p || S().get('keepInventory')) return;

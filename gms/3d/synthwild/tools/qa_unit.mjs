@@ -29,7 +29,7 @@ function counts(out) {
   const tail = out.split('\n').slice(-12).join('\n');
   let m = tail.match(/(\d+)\s*pass(?:ed)?\D{0,12}?(\d+)\s*fail/i) || tail.match(/pass(?:ed)?\D{0,3}(\d+)\D{1,12}fail(?:ed|s)?\D{0,3}(\d+)/i);
   if (m) return { pass: +m[1], fail: +m[2] };
-  m = tail.match(/(\d+)\s*\/\s*(\d+)\s*(?:passed|tests|checks|ok)/i);
+  m = tail.match(/(\d+)[ \t]*\/[ \t]*(\d+)[ \t]*(?:passed|tests|checks|ok)/i);
   if (m) return { pass: +m[1], fail: +m[2] - +m[1] };
   const fails = (out.match(/^\s*FAIL\b/gm) || []).length, oks = (out.match(/^\s*ok\b/gm) || []).length;
   return { pass: oks || null, fail: fails };

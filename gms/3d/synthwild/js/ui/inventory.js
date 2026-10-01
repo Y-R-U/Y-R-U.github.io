@@ -12,6 +12,7 @@ export function openInventory(ctx, root, { onClose } = {}) {
   let held = -1;           // tap-to-move source slot
   let tab = build ? 'blocks' : 'bag';
   let focus = inv.sel;
+  let fab = null;
 
   const tabsEl = h('div.sw-tabs');
   const bodyEl = h('div.body');
@@ -133,8 +134,15 @@ export function openInventory(ctx, root, { onClose } = {}) {
 
   function draw() {
     drawTabs();
+    fab?.destroy?.(); fab = null;
     if (tab === 'fab') {
       bodyEl.style.gridTemplateColumns = '1fr';
+      const st = ctx.game?.stations;
+      if (st?.mountFab) {
+        const box = h('div.sw-fab-host', { style: { overflowY: 'auto', minHeight: 0 } });
+        bodyEl.replaceChildren(box);
+        try { fab = st.mountFab(box); return; } catch (e) { console.warn('[inv] mountFab failed', e); }
+      }
       bodyEl.replaceChildren(h('div.sw-fab', {},
         h('div.card', {}, h('b', {}, 'The Fabricator is warming up. '),
           'Soon it will show everything you can make from what you are carrying. One tap builds it, so there are no recipes to remember.')));
@@ -164,7 +172,7 @@ export function openInventory(ctx, root, { onClose } = {}) {
     refresh();
   }
 
-  const offs = [ctx.bus?.on('inv:change', () => refresh()), ctx.bus?.on('inv:select', () => refresh())];
+  const offs = [ctx.bus?.on('inv:change', () => { refresh(); fab?.refresh?.(); }), ctx.bus?.on('inv:select', () => refresh())];
   const onKey = (e) => {
     if (e.key === 'Escape' || e.key === 'e' || e.key === 'E') { e.preventDefault(); e.stopPropagation(); close(); }
     else if (/^[1-9]$/.test(e.key)) {
@@ -182,6 +190,7 @@ export function openInventory(ctx, root, { onClose } = {}) {
     removeEventListener('pointermove', onMove); removeEventListener('pointerup', onUp); removeEventListener('pointercancel', onUp);
     document.removeEventListener('keydown', onKey, true);
     offs.forEach((f) => f && f());
+    fab?.destroy?.(); fab = null;
     wrap.classList.add('out');
     setTimeout(() => wrap.remove(), 200);
     onClose?.();

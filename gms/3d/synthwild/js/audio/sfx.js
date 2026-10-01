@@ -171,6 +171,43 @@ export const SFX = {
     [0, 4, 7, 11, 14].forEach((s, i) => tone(ac, o, t + i * 0.06, { type: 'triangle', f: 523 * 2 ** (s / 12), dur: 0.35, peak: 0.08 }));
     nz(ac, o, t, { dur: 0.5, a: 0.05, peak: 0.08, f: 6000, q: 1 });
   },
+  bowDraw(ac, o, t) {
+    tone(ac, o, t, { type: 'sine', f: 220, f2: 660, dur: 0.9, a: 0.05, peak: 0.07 });
+    nz(ac, o, t, { dur: 0.8, a: 0.1, peak: 0.05, f: 1500, f2: 4000, q: 4 });
+  },
+  bowFire(ac, o, t) {
+    tone(ac, o, t, { type: 'sawtooth', f: 1800, f2: 300, dur: 0.22, peak: 0.14, lp: 5000 });
+    nz(ac, o, t, { dur: 0.12, peak: 0.2, f: 3000, f2: 900, q: 1.5 });
+  },
+  pulseHit(ac, o, t) { tone(ac, o, t, { type: 'square', f: 1400, f2: 500, dur: 0.1, peak: 0.1, lp: 4000 }); nz(ac, o, t, { dur: 0.08, peak: 0.3, f: 2400, q: 2 }); },
+  archerCharge(ac, o, t) { tone(ac, o, t, { type: 'sawtooth', f: 300, f2: 1300, dur: 0.95, a: 0.05, peak: 0.08, lp: 3000 }); },
+  archerFire(ac, o, t) { tone(ac, o, t, { type: 'square', f: 1600, f2: 200, dur: 0.25, peak: 0.12, lp: 4500 }); },
+  spiderHiss(ac, o, t) { nz(ac, o, t, { dur: 0.5, a: 0.05, peak: 0.3, type: 'highpass', f: 4000, q: 0.7 }); for (let i = 0; i < 5; i++) nz(ac, o, t + i * 0.06, { dur: 0.02, peak: 0.12, f: 6000, q: 6 }); },
+  spiderLeap(ac, o, t) { nz(ac, o, t, { dur: 0.2, a: 0.02, peak: 0.3, f: 800, f2: 3000, q: 1.5 }); for (let i = 0; i < 4; i++) tone(ac, o, t + i * 0.03, { type: 'square', f: rnd(3000, 5000), dur: 0.015, peak: 0.04, lp: 8000 }); },
+  voidShimmer(ac, o, t) { [0, 1, 6, 7].forEach((s, i) => tone(ac, o, t + i * 0.05, { type: 'sine', f: 880 * 2 ** (s / 12), dur: 0.5, peak: 0.05, det: rnd(-30, 30) })); },
+  voidTeleport(ac, o, t) { tone(ac, o, t, { type: 'sine', f: 1600, f2: 120, dur: 0.3, peak: 0.16 }); tone(ac, o, t + 0.25, { type: 'sine', f: 120, f2: 1600, dur: 0.25, peak: 0.12 }); nz(ac, o, t, { dur: 0.5, peak: 0.1, f: 5000, q: 3 }); },
+  gelHop(ac, o, t) { tone(ac, o, t, { type: 'sine', f: 160, f2: 420, dur: 0.14, peak: 0.25 }); nz(ac, o, t + 0.1, { dur: 0.1, peak: 0.15, type: 'lowpass', f: 900, q: 1 }); },
+  fabricate(ac, o, t) {
+    [0, 7, 12].forEach((s, i) => tone(ac, o, t + i * 0.07, { type: 'triangle', f: 440 * 2 ** (s / 12), dur: 0.18, peak: 0.08 }));
+    nz(ac, o, t, { dur: 0.25, a: 0.02, peak: 0.1, f: 2500, f2: 6000, q: 2 });
+    tone(ac, o, t + 0.22, { type: 'sine', f: 1760, dur: 0.12, peak: 0.06 });
+  },
+  goal(ac, o, t) {
+    [0, 4, 7, 12].forEach((s, i) => tone(ac, o, t + i * 0.075, { type: 'sine', f: 784 * 2 ** (s / 12), dur: 0.4, peak: 0.09 }));
+    tone(ac, o, t + 0.3, { type: 'triangle', f: 2093, dur: 0.5, peak: 0.04 });
+  },
+  till(ac, o, t) { nz(ac, o, t, { dur: 0.14, peak: 0.4, f: 600, q: 0.8 }); nz(ac, o, t + 0.09, { dur: 0.12, peak: 0.25, f: 900, q: 0.8 }); },
+  plant(ac, o, t) { nz(ac, o, t, { dur: 0.08, peak: 0.25, f: 700, q: 1 }); tone(ac, o, t + 0.05, { type: 'sine', f: 660, f2: 990, dur: 0.15, peak: 0.08 }); },
+  treeGrow(ac, o, t) {
+    for (let i = 0; i < 8; i++) tone(ac, o, t + i * 0.07, { type: 'triangle', f: 330 * 2 ** ([0, 2, 4, 7, 9, 12, 14, 16][i] / 12), dur: 0.25, peak: 0.06 });
+    nz(ac, o, t, { dur: 0.7, a: 0.2, peak: 0.08, type: 'lowpass', f: 500, f2: 2500, q: 1 });
+  },
+  treeFall(ac, o, t) {
+    for (let i = 0; i < 6; i++) nz(ac, o, t + i * 0.09, { dur: 0.08, peak: 0.2 + i * 0.03, f: 500 - i * 40, q: 2 });
+    nz(ac, o, t + 0.55, { dur: 0.8, a: 0.01, peak: 0.6, type: 'lowpass', f: 900, f2: 120, q: 0.6 });
+    tone(ac, o, t + 0.55, { type: 'sine', f: 90, f2: 40, dur: 0.6, peak: 0.45 });
+    for (let i = 0; i < 5; i++) nz(ac, o, t + 0.6 + Math.random() * 0.6, { dur: 0.1, peak: 0.12, f: rnd(1500, 4000), q: 1.5 });
+  },
   swing(ac, o, t) { nz(ac, o, t, { dur: 0.14, a: 0.03, peak: 0.25, f: 900, f2: 2500, q: 1.2 }); },
   hit(ac, o, t) { nz(ac, o, t, { dur: 0.1, peak: 0.45, f: 1200, q: 1 }); tone(ac, o, t, { type: 'square', f: 240, f2: 120, dur: 0.08, peak: 0.1, lp: 1500 }); },
   death(ac, o, t) { [0, -3, -7, -12].forEach((s, i) => tone(ac, o, t + i * 0.16, { type: 'triangle', f: 440 * 2 ** (s / 12), dur: 0.25, peak: 0.14 })); },

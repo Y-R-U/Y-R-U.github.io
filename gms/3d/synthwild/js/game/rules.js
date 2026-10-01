@@ -1,6 +1,13 @@
 // Pure break/harvest/drop/damage rules. No THREE, no DOM: node-testable.
 
-const EXTRA_DROPS = { solar_leaves: [{ key: 'sun_fruit', chance: 0.12 }] };
+const EXTRA_DROPS = {
+  solar_leaves: [{ key: 'sun_fruit', chance: 0.12 }, { key: 'bio_sapling', chance: 0.05 }],
+  photomoss: [{ key: 'sun_seeds', chance: 0.1 }],
+  sun_crop_0: [{ key: 'sun_seeds', min: 1, max: 1 }],
+  sun_crop_1: [{ key: 'sun_seeds', min: 1, max: 1 }],
+  sun_crop_2: [{ key: 'sun_seeds', min: 1, max: 1 }],
+  sun_crop_3: [{ key: 'sun_grain', min: 1, max: 3 }, { key: 'sun_seeds', min: 1, max: 2 }],
+};
 
 export function blockOf(blocks, mat) {
   return Array.isArray(blocks) ? blocks[mat] : blocks?.[mat];

@@ -50,7 +50,9 @@ addEventListener('keydown', (e) => {
   else if (/^[1-9]$/.test(e.key)) inv.select(+e.key - 1);
 });
 const brush = { scale: 1, mode: 'fill', dims: [1, 1, 1], maxScale: 8,
-  setScale(s) { this.scale = s; }, setMode(m) { this.mode = m; }, setDims(w, h, d) { this.dims = [w, h, d]; } };
+  setScale(s) { this.scale = s; }, setMode(m) { this.mode = m; }, setDims(w, h, d) { this.dims = [w, h, d]; },
+  get actions() { return ['undo', 'redo', 'copy', 'paste', 'rotate', 'mirror', 'pick'].map((id, i) => ({ id, icon: id, label: id === 'pick' ? 'Pick block' : id[0].toUpperCase() + id.slice(1), enabled: i % 3 !== 1 })); },
+  run(id) { bus.emit(id === 'copy' ? 'brush:copy' : 'brush:pick', { size: [8, 4, 8], found: false }); return true; } };
 const survival = { integrity: q.get('hurt') ? 7 : 17, charge: 13.5, air: q.get('water') ? 6 : 10, maxAir: 10 };
 const ctx = { canvas, uiRoot: document.getElementById('ui-root'), bus, input, brush, settings, audio, ui,
   game: { inv, items, survival }, sky: { isNight: !!q.get('night') }, player: { underwater: !!q.get('water') },

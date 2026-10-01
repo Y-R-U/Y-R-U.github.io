@@ -234,6 +234,8 @@ export function meshSection(pl, T) {
           continue;
         }
         if (!vis(ka, m, nb)) continue;
+        // water beside open air (only player edits make this): no glassy side wall, the volume just ends
+        if (ka === K_LIQUID && nb === 0 && na !== 1) continue;
         const fl = sg > 0 ? (s + 1) * 4 : s * 4 - 1;
         faceCorners(d, fl, u * 4, v * 4, u * 4 + 4, v * 4 + 4);
         let aoK = 0;

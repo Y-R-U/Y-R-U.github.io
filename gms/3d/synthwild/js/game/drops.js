@@ -66,7 +66,7 @@ export class Drops {
   onBreak(ev) {
     if (this.game.creative) return;
     const { minSub, maxSub, removed } = ev;
-    if (!removed?.length) return;
+    if (!removed?.length || !minSub || !maxSub) return;
     const held = this.game.inv.held();
     const cx = (minSub[0] + maxSub[0]) / 8, cy = (minSub[1] + maxSub[1]) / 8, cz = (minSub[2] + maxSub[2]) / 8;
     for (const r of removed) {

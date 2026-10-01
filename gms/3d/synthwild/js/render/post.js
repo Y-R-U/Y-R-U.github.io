@@ -13,6 +13,11 @@ export function createPost(ctx) {
     composer = new EffectComposer(renderer, rt);
     composer.addPass(new RenderPass(scene, camera));
     bloom = new UnrealBloomPass(new THREE.Vector2(size.x / 2, size.y / 2), 0.55, 0.5, 0.82);
+    // one NaN pixel from any material would smear across the whole bloom chain → scrub at the high-pass input
+    const hp = bloom.materialHighPassFilter;
+    hp.fragmentShader = hp.fragmentShader.replace('vec4 texel = texture2D( tDiffuse, vUv );',
+      'vec4 texel = texture2D( tDiffuse, vUv ); if (any(isnan(texel)) || any(isinf(texel))) texel = vec4(0.0);');
+    hp.needsUpdate = true;
     composer.addPass(bloom);
     composer.addPass(new OutputPass());
   };

@@ -23,3 +23,10 @@ Started 2026-10-02. Manager session spawns lane agents (Aaron: 6 at once initial
 ## Next
 - Integration pass after M1 lanes land (boot whole game, fix seams), then commit + deploy.
 - M2 wave: fabrication tree, tools/tiers, oven, cache, sleep pod, caves/ores, more biomes.
+
+## Log
+- 2026-10-02: first checkpoint commit 08581b0a + deploy; live QA 22 PASS / 3 FAIL (404s for assets mid-generation, desktop harness CDP timeout under load). Unit: world 403, game 489→591, player 61+10, mesher ok (qa_unit miscounts it).
+- Waves running: lane 2 art-differentiation (daytime ground looked too Minecraft), lane 1 starter outpost + readBox/writeBox, lane 3 small fixes, lane 5 still on M1 shell/intro, lane 7 QA. Lane 4 done: M2 stations/tools/5 mobs/bow, journal + farming.
+- QA harness done (lane 7). Pre-commit gate: `node tools/qa_unit.mjs` + `node tools/qa_smoke.mjs` (4–5 min; `--only mobile --quick` fast).
+  Post-deploy: `node tools/qa_live.mjs` (`--no-browser` = API + deploy-parity in 10 s). Load avg was 12–71 from parallel Chromes: fps numbers unreliable.
+- QA found DESKTOP UNPLAYABLE (#ui-root > * pointer-events beats .sw-layer) + intermittent desktop black frame → sent to lane 2 as urgent.

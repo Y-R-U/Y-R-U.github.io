@@ -42,6 +42,14 @@ const EXTRA = [
   { key: 'pulse_bow', name: 'Pulse Bow', kind: 'tool', stack: 1, color: [0.45, 0.9, 1],
     tool: { type: 'bow', tier: 'lattice', level: 1, speed: 1, dmg: 1, durability: 384 },
     desc: 'Hold use to charge, let go to fire. Needs Pulse Charges.' },
+  // M3 farming
+  { key: 'seed_scoop', name: 'Seed Scoop', kind: 'tool', stack: 1, color: [0.55, 0.9, 0.45],
+    tool: { type: 'hoe', tier: 'lattice', level: 1, speed: 1, dmg: 1, durability: 131 },
+    desc: 'Use on loam or photomoss to till a grow bed.' },
+  { key: 'sun_seeds', name: 'Sun Seeds', kind: 'material', color: [0.75, 0.95, 0.35], plant: 'sun_crop_0',
+    desc: 'Use on a grow bed to plant. Crops need light to grow.' },
+  { key: 'sun_grain', name: 'Sun Grain', kind: 'material', color: [1, 0.85, 0.3], glow: 1 },
+  { key: 'sun_bread', name: 'Sun Bread', kind: 'food', color: [0.95, 0.7, 0.35], charge: 9, eat: 1.4 },
 ];
 
 export function createItems(blocks = []) {

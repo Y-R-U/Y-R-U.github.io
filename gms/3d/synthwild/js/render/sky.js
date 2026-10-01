@@ -15,7 +15,7 @@ const KEYS = [
   [0.715, 0x4060c8, 0xffa86a, 0xc09ab8, 0x6a5458, 0xffa060, 0xffb090],
   [0.750, 0x3a3aa0, 0xff6a9a, 0x9a78c0, 0x4a4060, 0xff7a6a, 0xe07aa8],
   [0.790, 0x1a2478, 0x6a3ab0, 0x6a6ac8, 0x302a58, 0x7a8ae8, 0x5a4aa8],
-  [0.875, 0x0a1658, 0x2048a0, 0x5070d8, 0x262c60, 0x8aa8ff, 0x203e90],
+  [0.875, 0x0a1658, 0x2048a0, 0x3c54b4, 0x262c60, 0x8aa8ff, 0x203e90],
   [0.960, 0x16246c, 0x5a4ab0, 0x6070c8, 0x302c60, 0x9a90e8, 0x4a48a8],
   [1.000, 0x4a62c8, 0xffa07a, 0x9a8cc8, 0x5a4a6a, 0xffa868, 0xf0a890],
 ].map(([t, ...c]) => [t, ...c.map(hexToLinear)]);
@@ -68,11 +68,11 @@ void main() {
   // orbital ring arc: a thin luminous band tilted across the sky
   vec3 ringN = normalize(vec3(0.12, 0.8, 0.58));
   float rd = dot(d, ringN);
-  float band = (smoothstep(0.018, 0.004, abs(rd - 0.03)) + 0.6 * smoothstep(0.008, 0.0, abs(rd - 0.058)))
-    * smoothstep(-0.04, 0.06, y);
-  float stripes = 0.65 + 0.35 * sin(rd * 1400.0) * sin(rd * 330.0);
+  float band = (smoothstep(0.014, 0.003, abs(rd - 0.03)) + 0.5 * smoothstep(0.006, 0.0, abs(rd - 0.052)))
+    * smoothstep(-0.01, 0.015, y) * (0.55 + 0.45 * smoothstep(0.0, 0.5, y));
+  float stripes = 0.8 + 0.2 * sin(rd * 900.0);
   float lit = mix(0.35, 1.0, uNight);
-  col += band * stripes * mix(vec3(0.9, 0.95, 1.0) * 0.25, vec3(0.55, 0.75, 1.3) * 0.55, uNight) * lit;
+  col += band * stripes * mix(vec3(0.9, 0.95, 1.0) * 0.16, vec3(0.6, 0.7, 1.2) * 0.32, uNight) * lit;
 #ifndef LOW
   // stars
   if (uNight > 0.01 && y > 0.0) {
@@ -114,7 +114,7 @@ export function createSky(ctx) {
     uFogColor: { value: new THREE.Color() }, uFogSunColor: { value: new THREE.Color() },
     uFogNear: { value: 60 }, uFogFar: { value: 120 },
     uZenith: { value: new THREE.Color() }, uHorizon: { value: new THREE.Color() }, uSunTint: { value: new THREE.Color() },
-    uBlockColor: { value: new THREE.Color().setRGB(...hexToLinear(0xffd9a0)) },
+    uBlockColor: { value: new THREE.Color().setRGB(...hexToLinear(0xa8e4ff)) },
     uRimColor: { value: new THREE.Color().setRGB(...hexToLinear(0x9ff0ff)) },
     uWaterTint: { value: new THREE.Color().setRGB(...hexToLinear(0xb0e8f0)) },
     uShallow: { value: new THREE.Color().setRGB(...hexToLinear(0x3fe6d8)) },

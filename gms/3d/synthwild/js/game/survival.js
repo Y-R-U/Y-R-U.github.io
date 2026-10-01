@@ -63,6 +63,7 @@ export class Survival {
     }
     const T = TUNING;
     let drain = T.drainIdle;
+    const dmul = env.drain ?? 1;
     if (env.moving) drain += env.sprinting ? T.drainSprint : T.drainWalk;
     if (env.swimming) drain += T.drainSwim;
 
@@ -73,13 +74,14 @@ export class Survival {
     this.trickle = trickle;
     this.droop = trickle === 0 && daylight <= 0.15;
     this.underwater = !!env.eyeInWater;
-    this.charge = Math.min(MAX, Math.max(0, this.charge + (trickle - drain) * dt));
+    this.charge = Math.min(MAX, Math.max(0, this.charge + (trickle - drain * dmul) * dt));
     if (env.peaceful) this.charge = MAX;
 
     if (this.charge > T.regenAbove && this.integrity < MAX) {
       this.regenT += dt;
-      while (this.regenT >= T.regenEvery && this.integrity < MAX) {
-        this.regenT -= T.regenEvery;
+      const every = env.regenEvery ?? T.regenEvery;
+      while (this.regenT >= every && this.integrity < MAX) {
+        this.regenT -= every;
         this.integrity = Math.min(MAX, this.integrity + 1);
         this.spend(T.regenCost);
         this.emit('player:heal', { amount: 1 });
@@ -90,7 +92,7 @@ export class Survival {
       this.starveT += dt;
       while (this.starveT >= T.starveEvery) {
         this.starveT -= T.starveEvery;
-        if (this.integrity > T.starveFloor) this.damage(1, 'starve', { ignoreInvuln: true });
+        if (this.integrity > (env.starveFloor ?? T.starveFloor)) this.damage(1, 'starve', { ignoreInvuln: true });
       }
     } else this.starveT = 0;
 

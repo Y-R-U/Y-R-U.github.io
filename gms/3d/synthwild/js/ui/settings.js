@@ -3,11 +3,11 @@ const KEY = 'synthwild.settings';
 const touch = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 
 export const DEFAULTS = {
-  music: 0.6, sfx: 0.8, voice: 0.9, muteAll: false, musicOn: true, sfxOn: true, voiceOn: true,
+  music: 0.6, sfx: 0.8, voice: 0.9, narrator: 'baritone', muteAll: false, musicOn: true, sfxOn: true, voiceOn: true,
   fullscreen: false, renderDistance: touch ? 6 : 8, quality: touch ? 'med' : 'high', fov: 75, showFps: false,
   sensitivity: 1, invertY: false, leftHanded: false, uiScale: 1, view: 'first',
   autoJump: true, aimAssist: true, noFallDamage: false, keepInventory: false, toolsNeverBreak: false,
-  peaceful: false, alwaysDay: false, mobGrief: false, buildMobs: false, highContrast: false, subtitles: true,
+  peaceful: false, alwaysDay: false, mobGrief: false, buildMobs: false, highContrast: false, subtitles: true, guide: true, treeFelling: true,
   introSeen: false,
 };
 

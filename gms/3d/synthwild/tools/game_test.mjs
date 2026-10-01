@@ -18,7 +18,7 @@ section('items');
 ok(items.get(BLOCK.CARBON_LOG).block === BLOCK.CARBON_LOG, 'block item id = block id');
 ok(!items.get(0), 'no air item');
 ok(items.get(I('lattice_cutter')).tool.level === 1 && items.get(I('qubit_blade')).tool.level === 4, 'tool tiers');
-ok(items.list.filter((x) => x?.kind === 'tool').length === 17, '16 tools + the Pulse Bow');
+ok(items.list.filter((x) => x?.kind === 'tool').length === 18, '16 tools + Pulse Bow + Seed Scoop');
 ok(items.get('sun_fruit').food.charge > 0, 'sun fruit is food');
 ok(items.palette().includes(BLOCK.GLOWBULB) && !items.palette().includes(BLOCK.WATER), 'palette: placeable blocks only');
 
@@ -172,6 +172,9 @@ section('recipes');
 }
 await mobTests();
 await (await import('./game_test_m2.mjs')).m2Tests({ ok, near, section });
+await (await import('./game_test_m3.mjs')).m3Tests({ ok, near, section });
+await (await import('./game_test_m3.mjs')).m4Tests({ ok, near, section });
+await (await import('./game_test_m3.mjs')).m5Tests({ ok, near, section });
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
 

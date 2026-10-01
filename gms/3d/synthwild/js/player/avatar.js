@@ -2,7 +2,16 @@
 // Self-lit ShaderMaterial so it doesn't depend on scene lights.
 
 let THREE;
-const U = { uSun: { value: null }, uDay: { value: 1 }, uTime: { value: 0 } };
+// Shared light uniforms. initAvatarLib links lane 2's sky uniform objects so the suit is lit like the world;
+// uLocal = (sky, block) light 0..1 sampled at the player each frame.
+const U = {};
+const LIGHT_GLSL = `uniform vec3 uLightDir, uLightColor, uAmbient, uGround, uBlockColor; uniform vec2 uLocal;
+  vec3 worldLight(vec3 n) {
+    float skyL = uLocal.x * uLocal.x;
+    vec3 amb = mix(uGround, uAmbient, n.y * 0.5 + 0.5) * (0.22 + 0.78 * skyL) * 0.75;
+    vec3 direct = uLightColor * max(dot(n, uLightDir), 0.0) * smoothstep(0.55, 0.95, uLocal.x) * 0.72;
+    return amb + direct + uBlockColor * pow(uLocal.y, 1.6) * 1.5;
+  }`;
 
 function mat(color, emissive = 0, pulse = 0) {
   return new THREE.ShaderMaterial({
@@ -10,20 +19,18 @@ function mat(color, emissive = 0, pulse = 0) {
     vertexShader: `varying vec3 vN; varying vec3 vW;
       void main(){ vN = normalize(mat3(modelMatrix) * normal); vec4 w = modelMatrix * vec4(position,1.0); vW = w.xyz;
       gl_Position = projectionMatrix * viewMatrix * w; }`,
-    fragmentShader: `uniform vec3 uColor; uniform vec3 uSun; uniform float uDay; uniform float uEmit; uniform float uPulse; uniform float uTime;
+    fragmentShader: `uniform vec3 uColor; uniform float uEmit; uniform float uPulse; uniform float uTime;
+      ${LIGHT_GLSL}
       varying vec3 vN; varying vec3 vW;
       void main(){
         vec3 n = normalize(vN);
-        float sun = max(dot(n, normalize(uSun)), 0.0) * uDay;
-        float sky = 0.5 + 0.5 * n.y;
-        vec3 amb = mix(vec3(0.16,0.2,0.36), vec3(0.55,0.62,0.7), uDay) * (0.55 + 0.45 * sky);
-        vec3 c = uColor * (amb + vec3(1.0,0.95,0.85) * sun * 0.85);
+        vec3 c = uColor * worldLight(n);
         vec3 V = normalize(cameraPosition - vW);
-        float rim = pow(1.0 - max(dot(n, V), 0.0), 3.0);
-        c += vec3(0.35,0.9,1.0) * rim * 0.22;
-        float p = uPulse > 0.0 ? 0.75 + 0.25 * sin(uTime * 3.0 + vW.y * 4.0) : 1.0;
-        c = mix(c, uColor * 1.6 * p, uEmit);
-        gl_FragColor = vec4(c, 1.0);
+        float rim = pow(clamp(1.0 - dot(n, V), 0.0, 1.0), 3.0);
+        c += vec3(0.35,0.9,1.0) * rim * 0.12 * (0.3 + 0.7 * uLocal.x);
+        float p = uPulse > 0.0 ? 0.8 + 0.2 * sin(uTime * 3.0 + vW.y * 4.0) : 1.0;
+        c = mix(c, uColor * 0.9 * p, uEmit);
+        gl_FragColor = vec4(max(c, vec3(0.0)), 1.0);
         #include <colorspace_fragment>
       }`,
   });
@@ -38,23 +45,31 @@ function box(w, h, d, m, x = 0, y = 0, z = 0) {
 
 function pivot(x, y, z) { const g = new THREE.Group(); g.position.set(x, y, z); return g; }
 
-export function initAvatarLib(three) {
+export function initAvatarLib(three, skyUniforms = null) {
   THREE = three;
-  U.uSun.value = new THREE.Vector3(0.4, 0.8, 0.3);
+  const fb = {
+    uLightDir: new THREE.Vector3(0.4, 0.8, 0.3).normalize(), uLightColor: new THREE.Color(1, 0.95, 0.85),
+    uAmbient: new THREE.Color(0.55, 0.62, 0.72), uGround: new THREE.Color(0.3, 0.28, 0.25), uBlockColor: new THREE.Color(1, 0.85, 0.63),
+  };
+  for (const k in fb) U[k] = skyUniforms?.[k] || { value: fb[k] };
+  U.uLocal = { value: new THREE.Vector2(1, 0) };
+  U.uTime = { value: 0 };
 }
 
-export function setAvatarLight(sky, t) {
-  if (!U.uSun.value) return;
-  if (sky?.sunDir) U.uSun.value.copy(sky.sunDir);
-  U.uDay.value = sky?.daylight01 ?? 1;
+// skyLight/blockLight 0..15 at the player (world.lightAt), eased so walking under a roof doesn't pop.
+export function setAvatarLight(skyL, blockL, t, dt = 0.016) {
+  const v = U.uLocal?.value;
+  if (!v) return;
+  const k = Math.min(1, dt * 6);
+  v.x += (skyL / 15 - v.x) * k; v.y += (blockL / 15 - v.y) * k;
   U.uTime.value = t;
 }
 
 // Shared mats: suit (pearl white), armour (graphite), seams (teal emissive), visor (magenta-gold emissive).
 function mats() {
   return {
-    suit: mat(0xdfe8f0), dark: mat(0x2b3240), seam: mat(0x3ff7ff, 1, 1),
-    visor: mat(0xffb84d, 0.9), accent: mat(0xff4fd8, 1, 1),
+    suit: mat(0xdfe8f0), dark: mat(0x2b3240), seam: mat(0x3ff7ff, 0.7, 1),
+    visor: mat(0xffb84d, 0.6), accent: mat(0xff4fd8, 0.7, 1),
   };
 }
 
@@ -129,16 +144,15 @@ function atlasCubeMat(atlas) {
       void main(){ vN = normalize(mat3(modelMatrix) * normal); vUv = uv; vLayer = aLayer;
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
     fragmentShader: `precision highp sampler2DArray; uniform sampler2DArray tAlb; uniform sampler2DArray tMat;
-      uniform vec3 uSun; uniform float uDay; varying vec3 vN; varying vec2 vUv; varying float vLayer;
+      ${LIGHT_GLSL}
+      varying vec3 vN; varying vec2 vUv; varying float vLayer;
       void main(){
         vec3 tc = vec3(vUv, vLayer + 0.5);
         vec4 a = texture(tAlb, tc); vec4 m = texture(tMat, tc);
         if (a.a < 0.4) discard;
         vec3 n = normalize(vN);
-        float sun = max(dot(n, normalize(uSun)), 0.0) * uDay;
-        vec3 amb = mix(vec3(0.32,0.36,0.5), vec3(0.86,0.88,0.92), uDay) * (0.8 + 0.2 * n.y);
-        vec3 c = a.rgb * (amb + vec3(1.0,0.95,0.85) * sun * 0.35);
-        c = mix(c, a.rgb * 1.4, m.r);
+        vec3 c = a.rgb * worldLight(n);
+        c = mix(c, a.rgb * 0.9, m.r * 0.6);
         gl_FragColor = vec4(c, 1.0);
         #include <colorspace_fragment>
       }`,
@@ -147,7 +161,8 @@ function atlasCubeMat(atlas) {
 
 // First-person arm holding the selected item, parented to the camera.
 export function createHand() {
-  const M = mats();
+  // Softer than the body: a grey-blue sleeve (not flat white) and dimmer seams so night bloom doesn't blow it out.
+  const M = { suit: mat(0x9eabba), dark: mat(0x2b3240), seam: mat(0x3ff7ff, 0.3, 0) };
   const root = new THREE.Group();
   root.name = 'player-hand';
   const arm = pivot(0.42, -0.42, -0.6);
@@ -165,6 +180,7 @@ export function createHand() {
   arm.add(cube);
   const planeGeo = new THREE.PlaneGeometry(1, 1);
   const iconMat = new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.35, side: THREE.DoubleSide, toneMapped: false });
+  const iconTint = () => { const v = U.uLocal.value, l = Math.max(0.25, Math.max(v.x * v.x * 0.9, Math.pow(v.y, 1.6))); iconMat.color.setScalar(Math.min(1, l)); };
   const icon = new THREE.Mesh(planeGeo, iconMat);
   arm.add(icon);
   let atlasMat = null;
@@ -172,7 +188,7 @@ export function createHand() {
   cube.visible = icon.visible = false;
 
   arm.rotation.set(0.1, 0.2, 0);
-  root.scale.setScalar(0.42);
+  root.scale.setScalar(0.34);
   root.traverse(o => { o.frustumCulled = false; o.renderOrder = 10; });
   let swing = 0, bob = 0;
   return {
@@ -224,6 +240,7 @@ export function createHand() {
       icon.rotation.set(tool ? 0.35 : 0.3, tool ? 0.45 : 0.35, tool ? 0.15 : 0);
     },
     update(dt, speed, onGround) {
+      if (icon.visible) iconTint();
       bob += dt * speed * 2.2 * (onGround ? 1 : 0);
       swing = Math.max(0, swing - dt * 5);
       const k = Math.sin(swing * Math.PI);

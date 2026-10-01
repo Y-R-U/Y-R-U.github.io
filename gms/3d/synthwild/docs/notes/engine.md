@@ -16,6 +16,7 @@ Status: M1 built and running with every lane's real modules (no stubs left in my
 | `js/render/mesher_core.js` | pure mesher (worker + node). Greedy at cell res, 4×4 greedy for sub faces, AO + smooth light per vertex, X plants, rail panels, water |
 | `js/render/mesher.worker.js`, `mesherpool.js` | module workers (hardwareConcurrency−2, max 3), 3 jobs in flight each |
 | `js/render/blocktable.js` | BLOCKS → typed tables (kind, flags, tiles) for the worker |
+| `js/render/atlas_styles.js` | art-direction layer: `STYLE` overrides by tile name (palette/pattern/glow/lip) + painters `hexfilm`, `weave`, `sand`, `grooves`, `furrows`, and the straight luminous lip band. Ids/tile indices untouched |
 | `js/render/atlas.js` | procedural 32×32 tiles from `TILES` hints → two `DataArrayTexture`s (albedo sRGB + mat). `atlas.iconURL(block, size)` = isometric icon data URL for the UI |
 | `js/render/materials.js` | the ONE opaque, ONE cutout, ONE water `ShaderMaterial` (define `LOW` = shader LOD) |
 | `js/render/sky.js` | `ctx.sky`: day/night, dome (gradient, sun, moon, orbital ring arc, stars, aurora, clouds), shared uniforms, hemi+dir lights + `scene.fog` for standard materials |
@@ -67,6 +68,23 @@ Status: M1 built and running with every lane's real modules (no stubs left in my
 - Colour pipeline: shaders work in linear and include `<colorspace_fragment>`; bloom goes HalfFloat RT → OutputPass.
   The composer RT must stay `samples: 0`: an MSAA HalfFloat target rendered pure black headless (metal).
 
+## Art-differentiation pass (wave 2)
+- Ground no longer reads as Minecraft: photomoss = teal hex solar film with sparse gold conductors and night specks; grass sides =
+  woven graphite-violet loam with a straight luminous moss band (no drip); mirror sand = silver-lavender gradient with dune ripples,
+  sparse hard glints and a view-dependent iridescent sheen (shader, glint-flagged faces); basalt = blue-grey with engraved circuit
+  grooves and a few glowing nodes; ores = glowing veins + nodes; crystal turf (plains) = teal/violet hex with magenta specks;
+  fibre stone pulled to blue-violet. Crops (`sun_crop_0..3`, stage 3 glows gold), `bio_sapling`, `furrows` (grow_bed) painted.
+- Block light is cyan-white (`uBlockColor` #a8e4ff, gain lowered); night ambient a touch darker.
+- Water light shafts: under water (4 samples along the view ray in the fog) and in the water body seen from above. Not on `low`.
+- Orbital ring: thinner, dimmer, fades in right at the horizon.
+- Mesher: water draws no horizontal side faces against open air (only player edits create that) → no glassy walls.
+- Emissive resists fog: the glow term is added after fog at ≥55% strength, so beacons and glowing flora read at distance.
+- Review views: `tools/engine_tour.sh <outdir> <prefix>` (forest, shore, plains, desert, mountains, cave, night, close at 915×412).
+- Desktop black frame (QA): bloom's high-pass now scrubs NaN/Inf texels, so one bad pixel from any material can't blank the screen.
+  The likely source was the avatar's old unclamped rim `pow` (lane 3 has since clamped it). QA desktop smoke passed 5/5 afterwards.
+  Also: `#ui-root > *:not(.sw-layer)` pointer events (the layer was eating desktop clicks), and an inline SVG favicon.
+- main.js `safe()` now logs a failing per-frame call once then every 600th (it was pushing to `__bootErrors` every frame).
+
 ## Testing
 - `node tools/engine_mesher_test.mjs`: mesher unit checks (greedy, culling, slabs, refined neighbours, water depth, plants, rails) + perf.
 - `~/.claude/bin/cdp start --port 9312 -- --use-angle=metal`, then
@@ -91,9 +109,9 @@ Use the CPU and GPU figures; they hold up better.
   (bloom turns it into a white blob): consider lighting it from `ctx.sky.uniforms` (`uAmbient`, `uLightColor`, `uLightDir`, `uNight`).
 - **Lane 5**: settings DEFAULTS have `renderDistance: touch ? 4 : 6`; the brief says 6 on mobile and 8 on desktop. Measured cost is fine
   at 6/8 (see below), so I suggest `touch ? 6 : 8`. The fps box is now only shown for `?fps=1` / `?shot=1`.
-- **Lane 1**: shore water cells sometimes sit next to air (water side faces show as glassy walls at the shoreline). Not a render bug.
+- **Lane 1**: the renderer now repaints some tiles (see `atlas_styles.js` STYLE). `BLOCKS[].color` (particles, map) still uses the old
+  palette: photomoss ≈ `#1c9a86`, loam ≈ `#4a3f52`, mirror sand ≈ `#aaa3c4`, basalt ≈ `#3d4a60`, crystal turf ≈ `#4fb8a6` if you want them to match.
 
 ## Open issues
-- No light shafts yet (bonus).
+- Plains crystal turf reads a little pale/low-contrast at a distance under the day haze.
 - Bloom costs real fps on high; it's off on med/low (phones default to med).
-- The block light colour is warm; night hillsides lit by many lumen blooms look maroon.

@@ -31,7 +31,7 @@ export const player = {
     this._eye = new THREE.Vector3();
     this.view = ctx.settings?.get?.('view') === 'third' ? 'third' : 'first';
     this.rig = createCameraRig(ctx);
-    initAvatarLib(THREE);
+    initAvatarLib(THREE, ctx.sky?.uniforms);
     this.avatar = createAvatar();
     ctx.scene.add(this.avatar.root);
     this.hand = createHand();
@@ -282,7 +282,8 @@ export const player = {
     const targetEye = this.crouching ? BODY.CROUCH_EYE : BODY.EYE;
     this.eyeH += (targetEye - this.eyeH) * Math.min(1, dt * 14);
     this.rig.update(dt, this);
-    setAvatarLight(ctx.sky, this._t);
+    const lw = ctx.world?.lightAt?.(this.rpos.x, this.rpos.y + this.eyeH, this.rpos.z);
+    setAvatarLight(lw == null ? 15 : lw >> 4, lw == null ? 0 : lw & 15, this._t, dt);
     const third = this.view === 'third';
     const a = this.avatar;
     a.root.visible = third && this.ready && !this.dead;

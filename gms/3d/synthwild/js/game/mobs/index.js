@@ -10,8 +10,10 @@ import { BLOCKS } from '../../data/blocks.js';
 const KINDS = { ...K1, ...KINDS2 };
 export const ALL_KINDS = KINDS;
 const CAP_HOSTILE = 8;
-const CAP_PASSIVE = 8;
-const CAP_TOTAL = 16;
+const MOBILE = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+const CAP_PASSIVE = MOBILE ? 3 : 6;
+const CAP_TOTAL = MOBILE ? 10 : 16;
+const DRAW_DIST = 56;
 const LAND = ['forest', 'shore', 'desert', 'mountains', 'plains'];
 // Weighted spawn tables. where: surface | cave. biomes: where on the surface it may appear.
 const NIGHT_TABLE = [
@@ -101,6 +103,15 @@ export class Mobs {
 
   clear() { for (const m of [...this.list]) this.remove(m); }
 
+  // After a respawn: hostiles near the respawn point vanish and the rest forget you (no death loops).
+  calm(pos, r = 24) {
+    for (const m of [...this.list]) {
+      if (!m.def.hostile) continue;
+      if (Math.hypot(m.pos.x - pos.x, m.pos.y - pos.y, m.pos.z - pos.z) < r) { this.ctx.fx?.puff?.(m.pos.clone().setY(m.pos.y + 1), 0x9ffcff); this.remove(m); }
+      else { m.seen = 0; m.provoked = 0; m.aim = 0; m.fusing = false; m.fuse = 0; }
+    }
+  }
+
   box(m, out = []) {
     const hw = m.w / 2;
     out[0] = m.pos.x - hw; out[1] = m.pos.y; out[2] = m.pos.z - hw;
@@ -170,7 +181,7 @@ export class Mobs {
   makeEnv() {
     const self = this;
     const e = {
-      dt: 0, player: { x: 0, y: 0, z: 0, eyeY: 0, dead: false }, dist: 99, dy: 0, game: this.game, ctx: this.ctx,
+      dt: 0, player: { x: 0, y: 0, z: 0, eyeY: 0, dead: false }, dist: 99, dy: 0, game: this.game, ctx: this.ctx, coolMul: 1,
       m: null, daylight: 1, night: false,
       safe: (m, dx, dz) => self.safe(m, dx, dz),
       los: () => {
@@ -385,12 +396,17 @@ export class Mobs {
     if (!w?.surfaceY) return;
     const build = ctx.session?.mode === 'build';
     if (build && !settings.get('buildMobs')) return;
-    const peaceful = settings.get('peaceful') || build;
+    const D = this.game.diff || { hostiles: true, capHostile: CAP_HOSTILE, spawnRate: 0.22 };
+    const peaceful = settings.get('peaceful') || build || !D.hostiles;
     const night = !settings.get('alwaysDay') && (sky?.isNight ?? false);
     const daylight = settings.get('alwaysDay') ? 1 : sky?.daylight01 ?? 1;
+    const N1 = night && this.game.firstNight && D.firstNight;
+    const capH = N1 ? N1.capHostile : D.capHostile;
+    const rate = N1 ? N1.spawnRate : D.spawnRate;
     if (this.list.length >= CAP_TOTAL) return;
-    const hostiles = this.count((m) => m.def.hostile);
-    const passive = this.list.length - hostiles;
+    const hostiles = this.count((m) => m.def.hostile && !m.cave);
+    const caveHostiles = this.count((m) => m.def.hostile && m.cave);
+    const passive = this.list.length - hostiles - caveHostiles;
     const a = Math.random() * Math.PI * 2;
     const cave = Math.random() < 0.4;
     const r = (cave ? 10 : 16) + Math.random() * 20;
@@ -401,11 +417,12 @@ export class Mobs {
     const can = (e) => !e.max || this.count((m) => m.kind === e.kind) < e.max;
 
     if (cave) {
-      if (peaceful || hostiles >= CAP_HOSTILE || Math.random() > 0.3) return;
+      if (peaceful || caveHostiles >= capH || Math.random() > rate * 2) return;
       const y = this.caveSpot(x, z, top, p);
       if (y == null) return;
       const e = pick(CAVE_TABLE, can);
       const m = e && this.spawn(e.kind, x, y, z);
+      if (m) m.cave = true;
       if (m && m.pos.y - y > 0.6) this.remove(m);   // didn't fit in the pocket
       return;
     }
@@ -414,10 +431,10 @@ export class Mobs {
     if (BLOCKS[ground]?.cutout || liquidAt(w, x, y + 0.1, z)) return;
     const biome = w.biomeAt?.(x, z) || 'forest';
     const L = lightAt(w, x, y + 0.5, z);
-    if (!peaceful && hostiles < CAP_HOSTILE) {
+    if (!peaceful && hostiles < capH) {
       const dark = L.block < 7 && (night || L.sky < 5);
-      if (dark && Math.random() < 0.22) {
-        const e = pick(NIGHT_TABLE, (t) => can(t) && t.biomes.includes(biome));
+      if (dark && Math.random() < rate) {
+        const e = pick(NIGHT_TABLE, (t) => can(t) && t.biomes.includes(biome) && (!N1?.kinds || N1.kinds.includes(t.kind)));
         if (e) this.spawn(e.kind, x, y, z);
         return;
       }
@@ -434,10 +451,12 @@ export class Mobs {
   // A dark air pocket with a floor, below the surface and away from the player. Returns feet y or null.
   caveSpot(x, z, top, p) {
     const w = this.world;
-    const start = Math.min(Math.floor(top) - 6, Math.floor(p.y) + 12);
+    const start = Math.min(Math.floor(top) - 6, Math.floor(p.y) + 8);
+    const floor = Math.max(4, Math.floor(p.y) - 16);
     const sx = Math.floor(x * 4), sz = Math.floor(z * 4);
     for (let tries = 0; tries < 3; tries++) {
-      let y = Math.max(3, Math.floor(4 + Math.random() * (start - 4)));
+      if (start <= floor) return null;
+      let y = Math.floor(floor + Math.random() * (start - floor));
       for (let k = 0; k < 14 && y > 2; k++, y--) {
         if (this.solid(sx, y * 4, sz) || this.solid(sx, y * 4 + 4, sz) || !this.solid(sx, y * 4 - 1, sz)) continue;
         if (liquidAt(w, x, y + 0.2, z)) continue;
@@ -453,11 +472,12 @@ export class Mobs {
   update(dt, p, settings, sky) {
     const e = this.env;
     e.dt = dt;
+    e.coolMul = this.game.diff?.cooldown ?? 1;
     e.player.x = p.x; e.player.y = p.y; e.player.z = p.z; e.player.eyeY = p.y + 1.62; e.player.dead = p.dead; e.player.dir = p.dir || null;
     e.night = !settings.get('alwaysDay') && (sky?.isNight ?? false);
     e.daylight = settings.get('alwaysDay') ? 1 : sky?.daylight01 ?? 1;
     const build = this.ctx.session?.mode === 'build';
-    const noHostile = settings.get('peaceful') || (build && !settings.get('buildMobs'));
+    const noHostile = settings.get('peaceful') || (build && !settings.get('buildMobs')) || this.game.diff?.hostiles === false;
     const noMobs = build && !settings.get('buildMobs');
 
     this.spawnT -= dt;
@@ -469,7 +489,7 @@ export class Mobs {
       const far = Math.hypot(dx, dz);
       if (far > DESPAWN || (noHostile && m.def.hostile) || (noMobs)) { this.remove(m); continue; }
       if (this.world?.isReady && !this.world.isReady(m.pos.x, m.pos.z)) { m.parts.root.visible = false; continue; }
-      m.parts.root.visible = true;
+      m.parts.root.visible = far < DRAW_DIST;
       m.t += dt;
       m.invuln = Math.max(0, m.invuln - dt);
       m.losT -= dt;

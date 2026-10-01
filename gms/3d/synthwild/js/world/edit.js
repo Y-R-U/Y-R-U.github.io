@@ -8,6 +8,7 @@ const WATER = BLOCK.WATER, KELP = BLOCK.SERVER_KELP, VINE = BLOCK.DATA_VINE, BLO
 const GROUNDED = new Uint8Array(256); // plants that need solid ground below
 for (const b of BLOCKS) if (b && b.plant && !b.hangs && !b.waterlogged && b.key !== 'glowbulb') GROUNDED[b.id] = 1;
 const FLOOD_CAP = 2048;
+const POUR_CAP = 512, POUR_SPREAD = 3;
 
 // opts: { wall: subs (default 4, hollow/shell wall thickness), flow: true (water fills new holes), support: true }
 export function setBox(world, min, max, mat, mode = 'fill', opts = {}) {
@@ -97,7 +98,11 @@ export function setBox(world, min, max, mat, mode = 'fill', opts = {}) {
 
   if (changedCells.length) {
     if (opts.support !== false) supportPass(world, changedCells, x0 >> 2, (x1 - 1) >> 2, (y0 >> 2), (y1 - 1) >> 2, z0 >> 2, (z1 - 1) >> 2, removed);
-    if (opts.flow !== false) floodPass(world, changedCells, wasWater);
+    if (opts.flow !== false) {
+      const n0 = changedCells.length;
+      floodPass(world, changedCells, wasWater);
+      if (mat === WATER) placedWaterFlow(world, changedCells, n0);
+    }
     world._afterEdit(changedCells);
   }
   res.changed = changed;
@@ -181,4 +186,129 @@ function floodPass(world, changedCells, wasWater) {
     if (isAir(x, y, z - 1)) q.push(x, y, z - 1);
     if (isAir(x, y - 1, z)) q.push(x, y - 1, z);
   }
+}
+
+// player-placed water: falls straight down, then spreads up to POUR_SPREAD cells over whatever it lands on.
+// Full-cell water only (no flow levels), capped, so one pour can never flood the map.
+function placedWaterFlow(world, changedCells, n) {
+  const q = [];
+  for (let k = 0; k < n; k += 3) {
+    const x = changedCells[k], y = changedCells[k + 1], z = changedCells[k + 2];
+    if (world.getCell(x, y, z) === WATER) q.push(x, y, z, 0);
+  }
+  const air = (x, y, z) => y > 0 && y < 128 && world.getCell(x, y, z) === 0;
+  let placed = 0;
+  const fill = (x, y, z, d) => {
+    const sec = world._materialize(x >> 4, y >> 4, z >> 4);
+    if (!sec) return;
+    sec.cells[(x & 15) + (z & 15) * 16 + (y & 15) * 256] = WATER;
+    sec.modified = true;
+    changedCells.push(x, y, z);
+    q.push(x, y, z, d);
+    placed++;
+  };
+  for (let h = 0; h < q.length && placed < POUR_CAP; h += 4) {
+    const x = q[h], y = q[h + 1], z = q[h + 2], d = q[h + 3];
+    if (air(x, y - 1, z)) { fill(x, y - 1, z, 0); continue; }
+    if (world.getCell(x, y - 1, z) === WATER || d >= POUR_SPREAD) continue;
+    if (air(x + 1, y, z)) fill(x + 1, y, z, d + 1);
+    if (air(x - 1, y, z)) fill(x - 1, y, z, d + 1);
+    if (air(x, y, z + 1)) fill(x, y, z + 1, d + 1);
+    if (air(x, y, z - 1)) fill(x, y, z - 1, d + 1);
+  }
+}
+
+// ---------- copy / paste (lane 3 undo + paste) ----------
+// data layout: Uint8Array(w*h*d), index (x-x0) + (z-z0)*w + (y-y0)*w*d over subs, x fastest. 255 = "leave as is".
+export const KEEP = 255;
+
+export function readBox(world, min, max) {
+  const x0 = Math.min(min[0], max[0]), x1 = Math.max(min[0], max[0]);
+  const y0 = Math.min(min[1], max[1]), y1 = Math.max(min[1], max[1]);
+  const z0 = Math.min(min[2], max[2]), z1 = Math.max(min[2], max[2]);
+  const w = x1 - x0, h = y1 - y0, d = z1 - z0;
+  const data = new Uint8Array(Math.max(0, w * h * d));
+  let unloaded = false;
+  for (let cy = y0 >> 2; cy <= (y1 - 1) >> 2; cy++) for (let cz = z0 >> 2; cz <= (z1 - 1) >> 2; cz++) for (let cx = x0 >> 2; cx <= (x1 - 1) >> 2; cx++) {
+    const v = world.getCell(cx, cy, cz);
+    if (v === 0 && !world.isChunkLoaded(cx >> 4, cz >> 4)) unloaded = true;
+    const sec = v === -1 ? world._secAt(cx >> 4, cy >> 4, cz >> 4) : null;
+    const sub = sec ? sec.subs[sec.cells[(cx & 15) + (cz & 15) * 16 + (cy & 15) * 256] & 0x7fff] : null;
+    for (let sy = Math.max(y0, cy * 4); sy < Math.min(y1, cy * 4 + 4); sy++)
+      for (let sz = Math.max(z0, cz * 4); sz < Math.min(z1, cz * 4 + 4); sz++) {
+        let o = (Math.max(x0, cx * 4) - x0) + (sz - z0) * w + (sy - y0) * w * d;
+        for (let sx = Math.max(x0, cx * 4); sx < Math.min(x1, cx * 4 + 4); sx++, o++)
+          data[o] = sub ? sub[(sx & 3) + (sz & 3) * 4 + (sy & 3) * 16] : v;
+      }
+  }
+  return { min: [x0, y0, z0], max: [x1, y1, z1], size: [w, h, d], data, unloaded };
+}
+
+// writes `data` (same layout as readBox) into the box. opts: { skipAir: false } treats 0 like KEEP (paste without
+// carving). Same bookkeeping as setBox: whole uniform cells stay uniform, removed counts, support pass, relight.
+export function writeBox(world, min, max, data, opts = {}) {
+  const x0 = Math.min(min[0], max[0]), x1 = Math.max(min[0], max[0]);
+  const y0 = Math.min(min[1], max[1]), y1 = Math.max(min[1], max[1]);
+  const z0 = Math.min(min[2], max[2]), z1 = Math.max(min[2], max[2]);
+  const w = x1 - x0, d = z1 - z0;
+  const res = { changed: 0, removed: [] };
+  if (data.length !== w * (y1 - y0) * d) throw new Error('writeBox: data size does not match the box');
+  const removed = new Uint32Array(256), changedCells = [];
+  const skipAir = !!opts.skipAir;
+  let changed = 0;
+  const at = (sx, sy, sz) => {
+    if (sy < 4) return KEEP;
+    const m = data[(sx - x0) + (sz - z0) * w + (sy - y0) * w * d];
+    return skipAir && m === 0 ? KEEP : m;
+  };
+  for (let cy = Math.max(1, y0 >> 2); cy <= Math.min(127, (y1 - 1) >> 2); cy++)
+    for (let cz = z0 >> 2; cz <= (z1 - 1) >> 2; cz++) for (let cx = x0 >> 2; cx <= (x1 - 1) >> 2; cx++) {
+      const sec = world._materialize(cx >> 4, cy >> 4, cz >> 4);
+      if (!sec) continue;
+      const i = (cx & 15) + (cz & 15) * 16 + (cy & 15) * 256;
+      const ax0 = Math.max(x0, cx * 4), ax1 = Math.min(x1, cx * 4 + 4), ay0 = Math.max(y0, cy * 4), ay1 = Math.min(y1, cy * 4 + 4);
+      const az0 = Math.max(z0, cz * 4), az1 = Math.min(z1, cz * 4 + 4);
+      const full = ax1 - ax0 === 4 && ay1 - ay0 === 4 && az1 - az0 === 4;
+      const before = changed;
+      let uni = -1;
+      if (full) {
+        uni = at(ax0, ay0, az0);
+        for (let sy = ay0; sy < ay1 && uni >= 0; sy++) for (let sz = az0; sz < az1 && uni >= 0; sz++)
+          for (let sx = ax0; sx < ax1; sx++) if (at(sx, sy, sz) !== uni) { uni = -1; break; }
+        if (uni === KEEP) continue;
+      }
+      const v = sec.cells[i];
+      if (uni >= 0) {
+        if (v & REFINED) {
+          const s = sec.subs[v & 0x7fff];
+          for (let k = 0; k < 64; k++) if (s[k] !== uni) { changed++; if (s[k] && !LIQ[s[k]]) removed[s[k]]++; }
+          setCellUniform(sec, i, uni);
+        } else if (v !== uni) {
+          changed += 64;
+          if (v && !LIQ[v]) removed[v] += 64;
+          sec.cells[i] = uni;
+        }
+      } else {
+        for (let sy = ay0; sy < ay1; sy++) for (let sz = az0; sz < az1; sz++) for (let sx = ax0; sx < ax1; sx++) {
+          const t = at(sx, sy, sz);
+          if (t === KEEP) continue;
+          const si = (sx & 3) + (sz & 3) * 4 + (sy & 3) * 16, cv = sec.cells[i];
+          const cur = (cv & REFINED) ? sec.subs[cv & 0x7fff][si] : cv;
+          if (cur === t) continue;
+          refineCell(sec, i)[si] = t;
+          changed++;
+          if (cur && !LIQ[cur]) removed[cur]++;
+        }
+        tryCollapse(sec, i);
+      }
+      if (changed !== before) { sec.modified = true; changedCells.push(cx, cy, cz); }
+    }
+  if (changedCells.length) {
+    if (opts.support !== false) supportPass(world, changedCells, x0 >> 2, (x1 - 1) >> 2, y0 >> 2, (y1 - 1) >> 2, z0 >> 2, (z1 - 1) >> 2, removed);
+    world._afterEdit(changedCells);
+  }
+  res.changed = changed;
+  for (let m = 1; m < 256; m++) if (removed[m]) res.removed.push({ mat: m, count: removed[m], blocks: removed[m] / 64 });
+  res.removed.sort((a, b) => b.count - a.count);
+  return res;
 }
