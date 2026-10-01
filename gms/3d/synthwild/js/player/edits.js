@@ -8,8 +8,28 @@ export const MAX_BOX_SUBS = 8 << 20;     // larger edits are applied but not und
 
 export const sizeOf = (min, max) => [max[0] - min[0], max[1] - min[1], max[2] - min[2]];
 
-export function readBox(world, min, max) {
-  if (world.readBox) return world.readBox(min, max).data;   // lane 1: { size, data, unloaded }, same index order
+export const KEEP = 255;
+
+// Marks every sub inside a chunk that isn't loaded as KEEP, so a restore never writes air over terrain it never saw.
+function keepUnloaded(world, min, max, data) {
+  const [sx, , sz] = sizeOf(min, max), sxz = sx * sz;
+  for (let cz = min[2] >> 6; cz <= (max[2] - 1) >> 6; cz++) for (let cx = min[0] >> 6; cx <= (max[0] - 1) >> 6; cx++) {
+    if (world.isChunkLoaded(cx, cz)) continue;
+    const x0 = Math.max(min[0], cx * 64), x1 = Math.min(max[0], cx * 64 + 64);
+    const z0 = Math.max(min[2], cz * 64), z1 = Math.min(max[2], cz * 64 + 64);
+    for (let y = min[1]; y < max[1]; y++) for (let z = z0; z < z1; z++) {
+      const i = (x0 - min[0]) + (z - min[2]) * sx + (y - min[1]) * sxz;
+      data.fill(KEEP, i, i + (x1 - x0));
+    }
+  }
+  return data;
+}
+
+export function readBox(world, min, max, { snapshot = false } = {}) {
+  if (world.readBox) {   // lane 1: { size, data, unloaded }, same index order
+    const r = world.readBox(min, max);
+    return snapshot && r.unloaded && world.isChunkLoaded ? keepUnloaded(world, min, max, r.data) : r.data;
+  }
   const [sx, sy, sz] = sizeOf(min, max);
   const out = new Uint8Array(sx * sy * sz);
   const sxz = sx * sz;
@@ -128,7 +148,7 @@ export function createHistory({ maxSteps = MAX_UNDO, maxBytes = UNDO_BYTES } = {
   const snap = (world, min, max) => {
     const [sx, sy, sz] = sizeOf(min, max);
     if (sx * sy * sz > MAX_BOX_SUBS || sx <= 0 || sy <= 0 || sz <= 0) return null;
-    const rle = rleEncode(readBox(world, min, max));
+    const rle = rleEncode(readBox(world, min, max, { snapshot: true }));
     return { min: min.slice(), max: max.slice(), rle };
   };
   const swap = (world, from, to) => {

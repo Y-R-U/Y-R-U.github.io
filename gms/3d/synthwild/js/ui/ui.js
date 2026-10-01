@@ -68,7 +68,10 @@ export const ui = {
     // Esc on desktop while the pointer is free: pause (input only emits when unlocked)
     const bus = ctx.bus;
     bus?.on('player:death', () => showDeath());
-    bus?.on('player:respawn', () => { deathEl?.remove(); deathEl = null; });
+    const hideDeath = () => { deathEl?.remove(); deathEl = null; };
+    bus?.on('player:respawn', hideDeath);
+    bus?.on('game:stop', hideDeath);
+    bus?.on('game:start', hideDeath);
     bus?.on('brush:notUndoable', () => toast('That one is too big to undo', { kind: 'warn', ms: 2200 }));
     bus?.on('brush:copy', (d) => toast(`Copied ${d?.size ? d.size.map((v) => +(v / 4).toFixed(2)).join('×') : ''} — paste it from the tool wheel`, { kind: 'good', ms: 2400 }));
     bus?.on('brush:pick', (d) => { if (d && d.found === false) toast('You don’t have that block. Find or make some first!', { kind: 'warn', ms: 2400 }); });
@@ -140,7 +143,7 @@ function duskWarning() {
 }
 
 function showDeath() {
-  if (deathEl || !root || ctxRef?.session?.mode === 'minigame') return;
+  if (deathEl || !root || ctxRef?.session?.mode === 'minigame' || ctxRef?.game?.survival?.dead === false) return;
   const ctx = ctxRef;
   const keep = settings.get('keepInventory');
   const where = ctx.game?.spawnPoint ? 'at your Sleep Pod' : 'at the landing site';

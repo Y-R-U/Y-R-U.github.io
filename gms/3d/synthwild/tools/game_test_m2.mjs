@@ -184,6 +184,52 @@ export async function m2Tests({ ok, near, section }) {
     ok(spawned.length > 0, 'breaking an unopened world cache spills its loot');
   }
 
+  section('R1 A3/A12: stations spill once per cell, placed caches never roll, pods clear the spawn');
+  {
+    const { World } = await import('../js/world/world.js');
+    const { Stations } = await import('../js/game/stations/index.js');
+    const W = new World({ seed: 'r1a3', sync: true });
+    const [sx, , sz] = W.spawn;
+    W.ensureArea(sx, sz, 1);
+    const spawned = [], remainder = [];
+    const game = {
+      items, mobs: { list: [] }, survival: { dead: false }, spawnPoint: null,
+      drops: { spawnItem: (id, n) => { spawned.push([id, n]); return {}; }, onBreak: (ev) => remainder.push(...(ev.removed || [])) },
+      setSpawn(p) { this.spawnPoint = p; },
+    };
+    const st = new Stations({ world: W, settings: { get: () => false } }, game);
+    st.say = () => {};
+    const cell = (x, y, z) => [x * 4, y * 4, z * 4];
+    const brk = (s) => { const max = s.map((v) => v + 1); const r = W.setBox(s, max, 0, 'fill'); st.onBreak({ minSub: s, maxSub: max, removed: r.removed }); };
+    const subsOf = (x, y, z, mat) => W.readBox(cell(x, y, z), cell(x + 1, y + 1, z + 1)).data.filter((m) => m === mat).length;
+    const cx = Math.floor(sx) + 3, cz = Math.floor(sz) + 3, cy = Math.ceil(W.surfaceY(cx + 0.5, cz + 0.5)) + 2;
+
+    W.setBox(cell(cx, cy, cz), cell(cx + 1, cy + 1, cz + 1), BLOCK.CACHE, 'fill');
+    st.onPlace({ minSub: cell(cx, cy, cz), maxSub: cell(cx + 1, cy + 1, cz + 1), mat: BLOCK.CACHE });
+    for (let i = 0; i < 6; i++) brk([cx * 4 + (i & 3), cy * 4 + 3, cz * 4 + (i >> 2)]);
+    ok(spawned.length === 0, `quarter-breaking an empty placed cache spills no loot (${spawned.length} stacks)`);
+    ok(subsOf(cx, cy, cz, BLOCK.CACHE) === 0 && !st.map.has(`${cx},${cy},${cz}`), 'the first partial break removes the whole station');
+    ok(remainder.filter((r) => r.mat === BLOCK.CACHE).reduce((a, r) => a + r.count, 0) === 63, 'the rest of the station drops as items');
+
+    const wx = cx + 5;
+    W.setBox(cell(wx, cy, cz), cell(wx + 1, cy + 1, cz + 1), BLOCK.CACHE, 'fill');
+    const want = st.newCache(wx, cy, cz, true).inv.slots.filter(Boolean).length;
+    spawned.length = 0;
+    for (let i = 0; i < 6; i++) brk([wx * 4 + (i & 3), cy * 4 + 3, cz * 4 + (i >> 2)]);
+    ok(want > 0 && spawned.length === want, `a world cache broken a sub at a time spills its loot exactly once (${spawned.length} vs ${want})`);
+
+    const qx = cx + 8, q = cell(qx, cy, cz);
+    W.setBox(q, q.map((v) => v + 1), BLOCK.CACHE, 'fill');
+    st.onPlace({ minSub: q, maxSub: q.map((v) => v + 1), mat: BLOCK.CACHE });
+    ok(st.map.has(`${qx},${cy},${cz}`) && !st.get('cache', qx, cy, cz).inv.slots.some(Boolean), 'a 1/4 placed cache registers as player-placed and is empty');
+
+    const px = cx + 11;
+    W.setBox(cell(px, cy, cz), cell(px + 1, cy + 1, cz + 1), BLOCK.SLEEP_POD, 'fill');
+    game.setSpawn({ x: px + 0.5, y: cy + 1, z: cz + 0.5 });
+    brk(cell(px, cy, cz));
+    ok(game.spawnPoint === null && subsOf(px, cy, cz, BLOCK.SLEEP_POD) === 0, 'breaking the sleep pod clears the respawn point');
+  }
+
   section('M2 mobs on a stub world');
   {
     globalThis.document ??= { createElement: () => ({ width: 0, height: 0, getContext: () => ({ createRadialGradient: () => ({ addColorStop() {} }), fillRect() {} }) }) };

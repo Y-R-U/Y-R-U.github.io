@@ -105,12 +105,12 @@ export class Farm {
         }
         if (want >= 3) this.map.delete(k);
       } else if (e.g >= SAPLING_TIME) {
-        if (w.growTree?.(x, y, z) > 0) {
+        if (w.growTree?.(x, y, z, undefined, this.ctx.player?.aabb?.() || null) > 0) {
           this.map.delete(k);
           this.ctx.fx?.hologram?.([x * 4 - 8, y * 4, z * 4 - 8], [x * 4 + 12, y * 4 + 32, z * 4 + 12], 0x4fe0a0);
           this.ctx.audio?.sfx?.('treeGrow');
           this.ctx.bus?.emit?.('farm:tree', { pos: [x, y, z] });
-        } else e.g = SAPLING_TIME * 0.8;   // no room yet: try again a bit later
+        } else e.g = SAPLING_TIME * 0.8;   // no room yet (or the player is in the way): try again a bit later
       }
     }
   }

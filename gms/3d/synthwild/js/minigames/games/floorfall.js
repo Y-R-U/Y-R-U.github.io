@@ -1,9 +1,12 @@
-// Floor Fall (spleef): three stacked glass floors. Every tile someone stands on cracks and vanishes 0.6 s later.
+// Floor Fall (spleef): three stacked glass floors. Every tile someone stands on cracks and vanishes a moment later.
 // Keep moving, drop through holes to the next floor, and be the last one standing.
 import { fill, put, top, mat } from '../arena.js';
 import { countdown } from '../index.js';
 
-const HALF = 8, GAP = 7, FLOORS = 3, CRACK = 0.6, MAX_TIME = 180;
+const HALF = 12, GAP = 7, FLOORS = 3, MAX_TIME = 180;
+const CRACK = { easy: 0.9, normal: 0.7, hard: 0.55 };
+const CALM = 40;   // bots play it safe for the first CALM seconds, then get bolder
+const CRUMBLE = 100; // after this the floors crumble on their own, so a round never stalls
 const FLOOR_KEY = ['clearglass', 'clearglass', 'clearglass'];
 const RIM = ['neon_cyan', 'neon_magenta', 'neon_amber'];
 const BOT_TEAMS = ['red', 'gold', 'green', 'red'];
@@ -30,7 +33,7 @@ class StubBot {
 }
 
 const floorfall = {
-  id: 'floorfall', name: 'Floor Fall', icon: 'layers', minutes: 2,
+  id: 'floorfall', name: 'Floor Fall', icon: 'layers', minutes: 1.5,
   blurb: 'Every tile you step on cracks and drops away. Keep moving and be the last one standing!',
   arenaY: 84, arenaRadius: 2,
 
@@ -55,7 +58,8 @@ const floorfall = {
     const { ctx, A } = { ctx: mg.ctx, A: this.A };
     this.mg = mg; this.ctx = ctx;
     this.cracks = new Map();   // "x,y,z" -> seconds left
-    this.out = []; this.t = 0; this.over = false;
+    this.crackTime = CRACK[mg.level] || CRACK.normal;
+    this.out = []; this.t = 0; this.over = false; this.playerOut = false; this.place = 0; this.crumbling = false; this.crumbleT = 0;
     this.count = countdown(mg, 3.5);
     ctx.sky?.setTime?.(0.3);
     const ps = top(A, 0, -1, 0);
@@ -66,7 +70,7 @@ const floorfall = {
     mg.hud.hint('Don’t stand still: the glass cracks under your feet!');
 
     const solid = (x, y, z) => !!ctx.world?.isSolidSub(x * 4 + 2, y * 4 + 2, z * 4 + 2);
-    const spots = [[-5, -5], [5, -5], [-5, 5], [5, 5]];
+    const spots = [[-7, -7], [7, -7], [-7, 7], [7, 7]];
     this.bots = [];
     let squad = null;
     try {
@@ -96,7 +100,7 @@ const floorfall = {
     const w = this.ctx.world;
     const m = w.getCell?.(x, y, z);
     if (!m || m < 0 || !w.isSolidSub(x * 4 + 2, y * 4 + 2, z * 4 + 2)) return;
-    this.cracks.set(k, CRACK);
+    this.cracks.set(k, this.crackTime);
     w.setBox([x * 4, y * 4, z * 4], [x * 4 + 4, y * 4 + 4, z * 4 + 4], mat('glass_crack'), 'fill', { flow: false, support: false });
   },
 
@@ -114,6 +118,18 @@ const floorfall = {
     if (counting) { this.squad?.update?.(0); return; }
     this.t += dt;
     mg.hud.timer(Math.max(0, MAX_TIME - this.t));
+
+    if (this.t > CRUMBLE) {
+      if (!this.crumbling) { this.crumbling = true; mg.hud.toast('Sudden death: the floors are crumbling!'); }
+      this.crumbleT = (this.crumbleT || 0) - dt;
+      if (this.crumbleT <= 0) {
+        this.crumbleT = 0.25;
+        const n = 2 + Math.floor((this.t - CRUMBLE) / 10);
+        for (let f = 0; f < FLOORS; f++) for (let i = 0; i < n; i++) {
+          this.crackAt(A.origin.x + Math.floor((Math.random() * 2 - 1) * (HALF + 0.99)), A.origin.y - 1 - f * GAP, A.origin.z + Math.floor((Math.random() * 2 - 1) * (HALF + 0.99)));
+        }
+      }
+    }
 
     // cracked tiles fall
     for (const [k, left] of this.cracks) {
@@ -135,8 +151,20 @@ const floorfall = {
     for (const b of this.alive()) {
       if (b.hidden) continue;
       if (b.y < bottom) { this.eliminate(b); continue; }
-      if (!b.falling && b.vy === 0) this.stepOn(b);
-      if ((b.mem.think -= dt) <= 0) { b.mem.think = 0.35 + Math.random() * 0.5; this.think(b); }
+      const grounded = !b.falling && b.vy === 0;
+      if (grounded) this.stepOn(b);
+      b.mem.think -= dt;
+      if (!grounded || b.seg) continue;
+      // Retarget the moment the goal tile cracks, is gone, or is on a floor we fell from, and step off a cracking tile after the bot's reaction time.
+      const fy = Math.floor(b.y - 0.05);
+      const left = this.cracks.get(Math.floor(b.x) + ',' + fy + ',' + Math.floor(b.z));
+      const goalBad = b.goal && (b.goal[1] !== fy + 1 || !this.safe(b.goal[0], fy, b.goal[2]));
+      const idle = !b.goal || b.arrived(0.6);
+      const react = left != null && this.crackTime - left >= (b.p?.reaction ?? 0.4) * 0.5;
+      if ((goalBad || (idle && react) || (idle && b.mem.think <= -1)) && b.mem.think <= 0) {
+        b.mem.think = 0.15;
+        this.think(b);
+      }
     }
     if (this.squad) this.squad.update(dt); else for (const b of this.bots) if (!b.out) b.update(dt);
 
@@ -145,19 +173,29 @@ const floorfall = {
     if (this.t >= MAX_TIME) return this.end2(!this.playerOut);
   },
 
-  // Bots hop to a nearby tile that's still solid on their floor, preferring ones away from cracks and the edge.
+  safe(x, y, z) { return !!this.ctx.world.isSolidSub(x * 4 + 2, y * 4 + 2, z * 4 + 2) && !this.cracks.has(x + ',' + y + ',' + z); },
+
+  // Bots step to a nearby whole tile, preferring ones with whole neighbours, away from holes and the edge.
+  // Early on they take short careful steps (few cracks); later they roam further and take more risks.
   think(b) {
     const fy = Math.floor(b.y - 0.05);
     const ox = this.A.origin.x, oz = this.A.origin.z;
+    const calm = Math.max(0, 1 - this.t / CALM);
+    const R = calm > 0.4 ? 2 : 2 + Math.round((1 - calm) * 2);
+    const bx = Math.floor(b.x), bz = Math.floor(b.z);
     let best = null, bestS = -1e9;
-    for (let i = 0; i < 10; i++) {
-      const x = Math.floor(b.x + (Math.random() - 0.5) * 7), z = Math.floor(b.z + (Math.random() - 0.5) * 7);
-      if (Math.abs(x - ox) > HALF || Math.abs(z - oz) > HALF) continue;
-      if (!this.ctx.world.isSolidSub(x * 4 + 2, fy * 4 + 2, z * 4 + 2) || this.cracks.has(x + ',' + fy + ',' + z)) continue;
-      let s = -Math.hypot(x - ox, z - oz) * 0.3 + Math.random() * 2;
-      for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (!this.ctx.world.isSolidSub((x + dx) * 4 + 2, fy * 4 + 2, (z + dz) * 4 + 2)) s -= 1.5;
+    for (let dx = -R; dx <= R; dx++) for (let dz = -R; dz <= R; dz++) {
+      if (!dx && !dz) continue;
+      const x = bx + dx, z = bz + dz;
+      if (Math.abs(x - ox) > HALF || Math.abs(z - oz) > HALF || !this.safe(x, fy, z)) continue;
+      let s = -Math.hypot(x - ox, z - oz) * 0.15 - Math.hypot(dx, dz) * 0.4 * calm + Math.random() * (0.6 + 2.4 * (1 - calm));
+      for (const [ex, ez] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        if (!this.ctx.world.isSolidSub((x + ex) * 4 + 2, fy * 4 + 2, (z + ez) * 4 + 2)) s -= 1.5;
+        else if (this.cracks.has((x + ex) + ',' + fy + ',' + (z + ez))) s -= 0.6;
+      }
       if (s > bestS) { bestS = s; best = [x, fy + 1, z]; }
     }
+    b.stop();
     if (best) b.goTo(best[0], best[1], best[2], 0.3);
   },
 

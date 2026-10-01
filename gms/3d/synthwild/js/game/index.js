@@ -90,6 +90,10 @@ export function init(ctx) {
     respawn() {
       if (!survival.dead) return;
       survival.revive();
+      if (game.spawnPoint && !game.stations.podAt(game.spawnPoint)) {
+        game.spawnPoint = null;
+        game.stations.say('Your Sleep Pod is gone, so your suit rebooted at the landing site.', 'warn');
+      }
       const ws = ctx.world?.spawn;
       const sp = game.spawnPoint || (ws ? { x: ws[0], y: ws[1], z: ws[2] } : { x: 0.5, y: ctx.world?.surfaceY?.(0.5, 0.5) ?? 40, z: 0.5 });
       playerTeleport(sp);
@@ -131,6 +135,8 @@ export function init(ctx) {
       if (saveData) game.load(saveData);
       else if (!game.creative) for (const [k, n] of START_KIT) inv.add(items.id(k), n);
       syncMode();
+      // a save taken on the death screen: reboot now rather than load a ghost
+      if (survival.dead) game.respawn();
     },
 
     save() {

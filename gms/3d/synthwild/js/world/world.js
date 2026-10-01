@@ -250,7 +250,7 @@ export class World {
   // kind: 'outpost' | 'vault' | 'observatory' | 'ruin'. Pure: works for unloaded areas too.
   structuresNear(x, z, r = 256) { return this.terrain.structuresNear(Math.floor(x), Math.floor(z), r); }
   // grow a sapling into a forest tree at cell (x,y,z); returns cells placed (0 = no room)
-  growTree(x, y, z, seed = this.seed) { return growTreeImpl(this, x, y, z, seed); }
+  growTree(x, y, z, seed = this.seed, avoid = null) { return growTreeImpl(this, x, y, z, seed, avoid); }
   // batch-write whole cells [[x,y,z,mat], ...] (uniform, loaded only) with one relight; returns count written
   _placeCells(list) {
     this.finishLight();

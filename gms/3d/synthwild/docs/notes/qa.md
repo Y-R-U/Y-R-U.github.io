@@ -141,3 +141,64 @@ No bugs from the harness so far. Gameplay unit tests are green, and saves round-
 - If a run hangs at "Page.captureScreenshot: CDP timeout", the page's main thread stalled. That is a finding, not a harness
   bug. The viewport is reported as a `harness` FAIL and the run continues.
 - Survival placing uses whatever the selected hotbar slot holds (currently a starter Fabricator).
+
+---
+
+## Mini-games: `tools/qa_minigames.mjs` (2026-10-02, run ~03:00–03:40)
+`node tools/qa_minigames.mjs [--only mobile|desktop] [--games parkour,ctf] [--no-cmd] [--falsify ends,stuck]`
+(CDP port 9319, about 12 min per viewport). Output goes to `tools/qa_out/minigames/` (screenshots, `results.json`, logs).
+
+For each game, at 915×412 touch and 1280×720:
+- **Launch:** the title → Games tab → that card's Play button, with real taps (the card is scrolled into view first).
+- **Real input:** stick or W for about 1.2 s must move the player more than 0.5 m. Measured during the hold, because Parkour respawns you if you walk off the pad.
+- **HUD moves:** the timer, score or objective text changes.
+- **Play to the end:**
+  - Steered with hooks: Parkour (teleport onto each platform), Treasure (onto each cache), CTF (grab the red flag, then home, three times), Seeker (onto each hider) and Siege (`mobs.kill` on every monster during waves; the build timers run for real).
+  - Played out naturally: Floor Fall (stand still and fall) and Hide (hide and wait for the drone).
+- **Game ends in time:** a results card within the game's own limit + 3.5 s countdown + 30 s.
+- **Results card:** it is visible and has a Play again button.
+- **Bots unstuck:** every bot is sampled at 1 Hz. A bot is "active" when it has a goal, hasn't arrived, and isn't frozen, hidden, falling or found. FAIL if one stays within 0.5 m for more than 10 s while active. The row also reports how often the bot `unstick()` watchdog fired.
+- **Play again:** a clean restart: one `.mg-hud`, no results card, the timer reset, no exceptions.
+- **Leave:** pause → Leave lands on the Games tab, the runner is stopped and the mini-game HUD is gone. For Parkour, the results card's "Mini-games" button is tested as well.
+- **Errors:** none, and no 4xx/5xx (favicon ignored here).
+- **fps:** measured in CTF with 5 bots.
+- **IDB untouched:** a "QA keep me" world is seeded first, and the whole `synthwild` IndexedDB is snapshotted before and after all games.
+
+**Command bar:**
+- Desktop: WASD moves while the bar is closed (no bar in the DOM, no focused field). While it's open, W types into the field and doesn't walk; Esc closes it and W walks again. Then `/help`, `/time night` refused in survival (and the time unchanged), `/play floorfall`, and `/quit`.
+- Mobile: pause → Commands chip → the `/help` chip → Go.
+
+### Falsified
+| check | how | result |
+|---|---|---|
+| game ends in time | `--falsify ends` (deadline set to 3 s) | parkour "after 15 s (limit 7 s)" FAIL, floorfall "no results 22 s in" FAIL |
+| bots unstuck | `--falsify stuck` (bot 0's `update()` replaced with a no-op and given a goal 12 m away) | floorfall FAIL "47.2 s (Zip#1)". CTF still passed, because its bots start `frozen=1` and a no-op update never thaws them, so the bot counts as inactive. This is a known limit of the falsifier, not of the check |
+
+### Results
+| | mobile 915×412 | desktop 1280×720 |
+|---|---|---|
+| launch via Games tab (×7) | 7 PASS | 7 WARN: every game opens **paused** (see bug M1), resumed by hook |
+| real input moves (×6) | 6 PASS (4.1–5.0 m) | 6 PASS (W key) |
+| HUD moves (×7) | 7 PASS | 7 PASS |
+| game ends in time | all 7 PASS: parkour 15 s, floorfall 21 s, treasure 11 s, ctf 23 s, hideseek 52 s (spotted), seek 19 s, siege 163 s | all 7 PASS (similar times) |
+| results card | 7 PASS | 7 PASS |
+| bots unstuck | floorfall, ctf and seek PASS (longest 0–1 s); 4 SKIP (no bots) | same |
+| play again | 7 PASS | 7 WARN (opens paused again) |
+| leave → Games tab, results → Mini-games | 8 PASS | 8 PASS |
+| no errors / 4xx | 7 PASS | 7 PASS |
+| fps, CTF with 5 bots | 60 fps | 60.1 fps |
+| IDB untouched | PASS | PASS |
+| command bar | Commands chip + /help PASS | WASD free while closed, keys captured only while open, /help, /time refused, /play floorfall, /quit: all PASS |
+
+### Bugs and notes (mini-games)
+- **M1 (lane 3 input + lane 5 shell): on desktop, every mini-game, and every "Play again", opens straight into the PAUSE menu.**
+  - Trace in headless Chrome: `pointerlockchange` with no lock → `input.js:168` emits `pause` (the unlock wasn't marked silent) → `shell.pause()`. A `pointerlockerror` follows.
+  - The Play click's user gesture is used by `enterPlaying()` → `requestPointer()`, and then the lock is dropped or refused while the game builds.
+  - Headless never grants pointer lock, so this needs one human check in real desktop Chrome. If it reproduces there, desktop kids hit a pause menu at the start of every round.
+  - Suggested fix: treat `pointerlockerror` and any unlock within about 1 s of a `requestPointer()` as silent, or don't auto-pause while `session.mode === 'minigame'` and a countdown runs.
+  - Repro: `node tools/qa_minigames.mjs --only desktop --games parkour --no-cmd` → "launch WARN opened PAUSED 1×".
+- **M2 (lane 4, Floor Fall bots):** the `unstick()` watchdog fires 9–27 times in a 20–30 s round. Bots don't stay stuck (longest 0 s), but every unstick is a visible teleport hop. Their goals likely sit on tiles that crack under them, so the path fails. Low priority, but it reads as glitchy.
+- **M3 (lane 5, Floor Fall pacing):** a player who stands still is out within about 13 s and the round ends at 17–27 s with "You came 5th". The bots also all drop out fast. That may be too short for a 2-minute card. It's a design call, not a defect.
+- **M4 (lane 5, command bar, touch):** the hint chips slide in, so a tap during the animation lands on a neighbouring chip. The harness tapped `/help` 0 s after the bar opened and got `/play`'s "Which one?". Consider no slide on the chips, or ignore taps for 250 ms.
+- **M5 (lane 5):** `?play=1` still plays the first-run intro (see earlier). `?mgtest=<id>` exists (it sets `noAutoPause`). The harness doesn't use it, because every game is launched from the real Games tab as asked.
+- Hide (hider) with the player standing in the open: spotted at 31–45 s. Seeker: all four hiders reachable by teleport. Siege: five waves complete in about 160 s with instant zaps. No stuck monsters needed a gate hop.

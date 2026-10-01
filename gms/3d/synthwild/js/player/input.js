@@ -93,6 +93,7 @@ export const input = {
   requestPointer() {
     const c = this._ctx?.canvas;
     if (c && !document.pointerLockElement && this.device === 'mouse') {
+      this._reqT = performance.now();
       try { const p = c.requestPointerLock?.(); p?.catch?.(() => {}); } catch {}
     }
   },
@@ -161,14 +162,20 @@ export const input = {
       this._lastWheel = t;
       this.emit('scale', e.deltaY < 0 ? +1 : -1);
     }, { passive: false });
+    // Only a lock the player actually had and then let go of (Esc) pauses. A refused lock, a change with no lock
+    // held, a lock lost within a second of asking for it, or a mini-game countdown never do.
     document.addEventListener('pointerlockchange', () => {
+      const was = this.locked;
       this.locked = !!document.pointerLockElement;
       if (!this.locked) {
         this.setHeld('primary', 'mouse', false); this.setHeld('secondary', 'mouse', false);
-        if (!this._silentUnlock && this.device === 'mouse' && !this._ctx?.session?.paused) this.emit('pause');
+        const s = this._ctx?.session;
+        const fresh = performance.now() - (this._reqT || 0) < 1000;
+        if (was && !fresh && !this._silentUnlock && this.device === 'mouse' && !s?.paused && !s?.mgCountdown) this.emit('pause');
         this._silentUnlock = false;
       }
     });
+    document.addEventListener('pointerlockerror', () => { this.locked = false; this._silentUnlock = false; });
   },
 
   _hotbar(slot) {

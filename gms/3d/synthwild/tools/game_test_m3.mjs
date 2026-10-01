@@ -228,4 +228,28 @@ export async function m5Tests({ ok, section }) {
   T.g.inv.setSlot(0, T.g.items.id('lattice_saw'), 1); T.g.inv.select(0);
   T.brk(0, 40, 0);
   ok([...T.cells.values()].filter((v) => v === BLOCK.CARBON_LOG).length === 8, 'logs built into a house are not felled');
+
+  section('R1 A12: a sapling never grows into the player');
+  {
+    const { World } = await import('../js/world/world.js');
+    const { Farm, SAPLING_TIME } = await import('../js/game/farm.js');
+    const { boxOf, BODY } = await import('../js/player/physics.js');
+    const W = new World({ seed: 'r1sap', sync: true });
+    const [sx, , sz] = W.spawn;
+    W.ensureArea(sx, sz, 1);
+    const x = Math.floor(sx) + 4, z = Math.floor(sz) + 4, y = Math.ceil(W.surfaceY(x + 0.5, z + 0.5));
+    W.setBox([x * 4, (y - 1) * 4, z * 4], [x * 4 + 4, y * 4, z * 4 + 4], BLOCK.PHOTOMOSS, 'fill');
+    for (let k = 0; k < 16; k++) W.setBox([(x - 6) * 4, (y + k) * 4, (z - 6) * 4], [(x + 7) * 4, (y + k + 1) * 4, (z + 7) * 4], 0, 'fill');
+    W.setBox([x * 4, y * 4, z * 4], [x * 4 + 4, y * 4 + 4, z * 4 + 4], BLOCK.BIO_SAPLING, 'fill');
+    const player = { pos: { x: x + 0.5, y, z: z + 0.5 } };
+    player.aabb = () => boxOf({ ...player.pos, h: BODY.H });
+    const farm = new Farm({ world: W, player, sky: { daylight01: 1 }, settings: { get: () => false } }, { inv: null, creative: false });
+    farm.track(x, y, z, 'sapling');
+    const e = farm.map.get(`${x},${y},${z}`);
+    e.g = SAPLING_TIME + 1; farm.tickT = 0; farm.update(0.01);
+    ok(W.getCell(x, y, z) === BLOCK.BIO_SAPLING && farm.map.has(`${x},${y},${z}`), 'growth is deferred while the player stands in the sapling');
+    player.pos.x += 10;
+    e.g = SAPLING_TIME + 1; farm.tickT = 0; farm.update(0.01);
+    ok(W.getCell(x, y, z) === BLOCK.CARBON_LOG, 'it grows once the player steps away');
+  }
 }

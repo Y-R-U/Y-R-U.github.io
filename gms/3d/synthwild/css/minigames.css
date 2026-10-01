@@ -64,7 +64,9 @@
 .mg-heat span { font-weight: 800; font-size: calc(13px * var(--ui)); color: var(--c); text-shadow: 0 1px 4px rgba(0, 0, 0, .8); }
 
 .mg-cmd { position: absolute; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(560px, 92vw); padding: 8px; z-index: 40;
-  pointer-events: auto; animation: toastin .2s ease-out; display: grid; gap: 6px; }
+  pointer-events: auto; animation: mgcmdin .15s ease-out; display: grid; gap: 6px; }
+/* opacity only: a transform keyframe here would fight translateX(-50%) and slide the chips under a tap */
+@keyframes mgcmdin { from { opacity: 0; } }
 .mg-cmd .row { display: flex; gap: 6px; }
 .mg-cmd .sw-input { font-family: ui-monospace, Menlo, monospace; min-height: 38px; }
 .mg-cmd-hints { display: flex; gap: 4px; flex-wrap: wrap; }

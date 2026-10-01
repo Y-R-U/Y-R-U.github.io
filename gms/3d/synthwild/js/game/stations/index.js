@@ -48,14 +48,31 @@ export class Stations {
     return { type: 'cache', inv };
   }
 
-  // Player-placed caches start empty so they never roll loot.
+  // Sub count of `type` station material in a cell (0..64). Refined cells are scanned.
+  subsOf(x, y, z, type) {
+    const w = this.ctx.world, v = w?.getCell?.(x, y, z);
+    if (v == null) return 0;
+    if (v !== -1) return this.typeOf(v) === type ? 64 : 0;
+    if (!w.readBox) return 0;
+    let n = 0;
+    for (const m of w.readBox([x * 4, y * 4, z * 4], [x * 4 + 4, y * 4 + 4, z * 4 + 4]).data) if (this.typeOf(m) === type) n++;
+    return n;
+  }
+  // Is there still a sleep pod under this spawn point? Unloaded cells can't be checked, so they pass.
+  podAt(sp) {
+    const x = Math.floor(sp.x), y = Math.floor(sp.y - 0.5), z = Math.floor(sp.z), w = this.ctx.world;
+    if (!w || (w.isChunkLoaded && !w.isChunkLoaded(x >> 4, z >> 4))) return true;
+    return this.subsOf(x, y, z, 'pod') > 0;
+  }
+
+  // Player-placed caches start empty so they never roll loot, at any scale.
   onPlace(ev) {
     if (this.typeOf(ev?.mat) !== 'cache' || !ev.minSub) return;
     const lo = ev.minSub.map((v) => v >> 2), hi = ev.maxSub.map((v) => (v - 1) >> 2);
     if ((hi[0] - lo[0] + 1) * (hi[1] - lo[1] + 1) * (hi[2] - lo[2] + 1) > 4096) return;
     for (let x = lo[0]; x <= hi[0]; x++) for (let y = lo[1]; y <= hi[1]; y++) for (let z = lo[2]; z <= hi[2]; z++) {
       const k = this.key(x, y, z);
-      if (!this.map.has(k) && this.ctx.world?.getCell?.(x, y, z) === ev.mat) this.map.set(k, this.newCache(x, y, z, false));
+      if (!this.map.has(k) && this.subsOf(x, y, z, 'cache')) this.map.set(k, this.newCache(x, y, z, false));
     }
   }
 
@@ -124,26 +141,51 @@ export class Stations {
       (P && Math.hypot(P.x - at.x - 0.5, P.y + 1 - at.y - 0.5, P.z - at.z - 0.5) > REACH))) this.close();
   }
 
-  // A station block was broken: spill its contents.
+  // A station is one whole cell: the first break that removes any of it removes all of it, and its
+  // contents (or a world cache's loot roll) spill exactly once.
   onBreak(ev) {
-    const w = this.ctx.world;
     if (!ev?.minSub) return;
     const lo = ev.minSub.map((v) => v >> 2), hi = ev.maxSub.map((v) => (v - 1) >> 2);
-    // An unopened world cache broken as a single block still spills its loot.
-    const cacheMat = ev.removed?.find((r) => this.typeOf(r.mat) === 'cache');
-    if (cacheMat && lo[0] === hi[0] && lo[1] === hi[1] && lo[2] === hi[2] && !this.map.has(this.key(...lo))) {
-      this.spill(this.newCache(...lo, true), lo[0] + 0.5, lo[1] + 0.5, lo[2] + 0.5);
-    }
-    if (!this.map.size) return;
+    const hitTypes = new Set((ev.removed || []).map((r) => this.typeOf(r.mat)).filter(Boolean));
+    const single = lo[0] === hi[0] && lo[1] === hi[1] && lo[2] === hi[2];
+    const done = new Set();
+    const resolve = (x, y, z, type, s) => {
+      const k = this.key(x, y, z);
+      if (done.has(k)) return;
+      done.add(k);
+      const left = this.subsOf(x, y, z, type);
+      if (left === 64 || (left && !hitTypes.has(type))) return;
+      if (s) this.spill(s, x + 0.5, y + 0.5, z + 0.5);
+      else if (type === 'cache') this.spill(this.newCache(x, y, z, true), x + 0.5, y + 0.5, z + 0.5);
+      this.map.delete(k);
+      if (left) this.clearRest(x, y, z, type);
+      if (type === 'pod' && this.game.spawnPoint && !this.podAt(this.game.spawnPoint)) this.game.spawnPoint = null;
+      if (this.panel?.at && this.key(this.panel.at.x, this.panel.at.y, this.panel.at.z) === k) this.close();
+    };
     for (const [k, s] of [...this.map]) {
       const [x, y, z] = k.split(',').map(Number);
       if (x < lo[0] || x > hi[0] || y < lo[1] || y > hi[1] || z < lo[2] || z > hi[2]) continue;
-      const mat = w?.getCell?.(x, y, z);
-      if (mat != null && this.typeOf(mat) === s.type) continue;
-      this.spill(s, x + 0.5, y + 0.5, z + 0.5);
-      this.map.delete(k);
-      if (this.panel?.at && this.key(this.panel.at.x, this.panel.at.y, this.panel.at.z) === k) this.close();
+      resolve(x, y, z, s.type, s);
     }
+    if (!hitTypes.size) return;
+    // Unmapped stations (fabricators, pods, unopened world caches): partial cuts anywhere, whole breaks of a single cell.
+    if ((hi[0] - lo[0] + 1) * (hi[1] - lo[1] + 1) * (hi[2] - lo[2] + 1) > 512) return;
+    for (let x = lo[0]; x <= hi[0]; x++) for (let y = lo[1]; y <= hi[1]; y++) for (let z = lo[2]; z <= hi[2]; z++) {
+      for (const type of hitTypes) {
+        if (this.subsOf(x, y, z, type) || single) resolve(x, y, z, type, null);
+      }
+    }
+    if (hitTypes.has('pod') && this.game.spawnPoint && !this.podAt(this.game.spawnPoint)) this.game.spawnPoint = null;
+  }
+
+  // Remove what is left of a partly broken station and drop it as items.
+  clearRest(x, y, z, type) {
+    const w = this.ctx.world;
+    if (!w?.readBox || !w.writeBox) return;
+    const min = [x * 4, y * 4, z * 4], max = [x * 4 + 4, y * 4 + 4, z * 4 + 4];
+    const data = w.readBox(min, max).data.map((m) => (this.typeOf(m) === type ? 0 : 255));
+    const r = w.writeBox(min, max, data);
+    if (r?.removed?.length) this.game.drops?.onBreak?.({ minSub: min, maxSub: max, removed: r.removed, src: 'station' });
   }
 
   spill(s, x, y, z) {

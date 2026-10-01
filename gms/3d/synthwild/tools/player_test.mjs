@@ -216,6 +216,19 @@ try {
   hist.undo(rw);
   const ms = performance.now() - t0;
   ok(eq([...readBox(rw, umin, umax)], [...orig]), `real world: undo restores exactly (${ms.toFixed(0)} ms)`);
+  // R1 A8: an undo snapshot that reaches into an unloaded chunk must not carve that chunk to air later
+  let ex = Math.floor(sx / 16);
+  while (rw.isChunkLoaded(ex, Math.floor(sz / 16))) ex++;
+  const zz = Math.floor(sz), fx = ex * 16 + 1, h = Math.floor(rw.surfaceY(fx + 0.5, zz + 0.5));
+  const amin = [(ex * 16 - 2) * 4, (h - 2) * 4, zz * 4], amax = [(ex * 16 + 3) * 4, (h + 1) * 4, zz * 4 + 4];
+  const ah = createHistory();
+  ah.record(rw, amin, amax);
+  rw.setBox(amin, amax, 10, 'fill');
+  rw.ensureArea(fx, zz, 0);
+  const before = rw.getCell(fx, h - 1, zz);
+  ah.undo(rw);
+  ok(before !== 0 && rw.getCell(fx, h - 1, zz) === before, `undo leaves terrain that was unloaded at record time (${before} → ${rw.getCell(fx, h - 1, zz)})`);
+  ok(rw.getCell(ex * 16 - 1, h + 0, zz) !== 10, 'undo still restores the loaded part');
 } catch (e) { ok(false, 'real world tests: ' + e.message); }
 
 console.log(`player_test: ${pass} passed, ${fail} failed`);

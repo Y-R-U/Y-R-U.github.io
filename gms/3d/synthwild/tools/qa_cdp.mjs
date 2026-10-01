@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import zlib from 'node:zlib';
 
+const VK = { Escape: 27, KeyE: 69, KeyQ: 81, Space: 32, KeyW: 87, KeyA: 65, KeyS: 83, KeyD: 68, KeyT: 84, Slash: 191, Enter: 13 };
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const CDP_BIN = path.join(os.homedir(), '.claude/bin/cdp');
 
@@ -210,12 +211,17 @@ export async function open(port, { allowForeign = ALLOWED_FOREIGN } = {}) {
       await pg.tap(r.x, r.y, opts);
       return r;
     },
-    async key(code, key = code, { hold = 40 } = {}) {
-      const vk = { Escape: 27, KeyE: 69, KeyQ: 81, Space: 32 }[code] || 0;
-      await send('Input.dispatchKeyEvent', { type: 'rawKeyDown', code, key, windowsVirtualKeyCode: vk });
+    async key(code, key = code, { hold = 40, text } = {}) {
+      await pg.keyDown(code, key, { text });
       await sleep(hold);
-      await send('Input.dispatchKeyEvent', { type: 'keyUp', code, key, windowsVirtualKeyCode: vk });
+      await pg.keyUp(code, key);
     },
+    // text: the character this key types (needed for '/' etc. to reach focused fields).
+    keyDown(code, key = code, { text } = {}) {
+      const vk = VK[code] || 0;
+      return send('Input.dispatchKeyEvent', text ? { type: 'keyDown', code, key, text, unmodifiedText: text, windowsVirtualKeyCode: vk } : { type: 'rawKeyDown', code, key, windowsVirtualKeyCode: vk });
+    },
+    keyUp(code, key = code) { return send('Input.dispatchKeyEvent', { type: 'keyUp', code, key, windowsVirtualKeyCode: VK[code] || 0 }); },
 
     async close() {
       try { await fetch(`http://127.0.0.1:${port}/json/close/${tab.id}`); } catch {}

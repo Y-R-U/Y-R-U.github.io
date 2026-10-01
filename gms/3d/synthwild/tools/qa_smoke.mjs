@@ -228,12 +228,12 @@ async function runViewport({ url, port, out, F, vpName, missingOk, quick, expect
 
     async function waitPlaying(step, mode, timeout = 60000) {
       const t0 = Date.now();
-      const ok = await pg.waitFor(`(()=>{const G=window.__game,C=G&&G.ctx;const st=C?.ui?.shell?.state;
+      const ok = await pg.waitFor(`(()=>{const G=window.__game,C=G&&G.ctx;const st=(window.__game?.shell||C?.ui?.shell)?.state;
         if(st&&st!=='playing')return false;if(!C||!C.world||!C.player)return false;
         const p=C.player.pos;return !!(p&&C.world.isReady?.(p.x,p.z)&&C.player.ready!==false)})()`, { timeout, every: 300 });
       if (step) mark(step);
       if (!ok) {
-        const st = await pg.evalSafe(`(()=>{const C=window.__game?.ctx;return {shell:C?.ui?.shell?.state,world:!!C?.world,player:!!C?.player,loading:!!document.querySelector('.sw-loading')}})()`);
+        const st = await pg.evalSafe(`(()=>{const C=window.__game?.ctx;return {shell:(window.__game?.shell||C?.ui?.shell)?.state,world:!!C?.world,player:!!C?.player,loading:!!document.querySelector('.sw-loading')}})()`);
         await shot(`04_${mode}_stuck`);
         if (step) add(step, FAIL, `not playing+ready after ${timeout / 1000} s: ${JSON.stringify(st)}`);
         return false;
@@ -406,7 +406,7 @@ async function runViewport({ url, port, out, F, vpName, missingOk, quick, expect
         if (paused) how = 'Escape key';
       }
       if (!paused) {
-        await pg.game('C.ui.shell.pause();return 1').catch(() => {});
+        await pg.game('(window.__game.shell||C.ui.shell).pause();return 1').catch(() => {});
         paused = await pg.waitFor(`!!document.querySelector('.sw-pause')`, { timeout: 2000 });
         if (paused) { how = 'HOOK ui.shell.pause() (no working pause button)'; }
       }

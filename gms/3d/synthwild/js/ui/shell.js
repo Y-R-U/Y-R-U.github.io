@@ -24,7 +24,7 @@ const TIPS = [
 export function createShell(ctx, root, ui) {
   let _state = 'boot';
   const st = { get state() { return _state; }, set state(v) { _state = v; document.body.dataset.swState = v; } };
-  let meta = null, saving = null, autoT = 0, saveCount = 0, gameMod = null;
+  let meta = null, saving = null, queued = null, autoT = 0, saveCount = 0, gameMod = null, starting = false;
   let api = null;
   const apiReady = import('../net/api.js').then((m) => { api = m.api || m.default; }).catch(() => { api = null; });
 
@@ -66,6 +66,7 @@ export function createShell(ctx, root, ui) {
     await account.refresh();
   }
   async function runIntro(replay = false) {
+    if (st.state === 'intro') return;
     const prev = st.state;
     st.state = 'intro';
     await playIntro(root, ctx.audio);
@@ -89,8 +90,12 @@ export function createShell(ctx, root, ui) {
     return { set, done() { clearInterval(fake); off?.(); set(1); el.classList.add('fade-out'); setTimeout(() => el.remove(), 450); } };
   }
 
-  async function play(m, { fresh = false } = {}) {
-    if (st.state === 'loading' || st.state === 'playing') return;
+  async function play(m, opts) {
+    if (starting || st.state === 'loading' || st.state === 'playing' || st.state === 'intro') return;
+    starting = true;
+    try { await startWorld(m, opts); } finally { starting = false; }
+  }
+  async function startWorld(m, { fresh = false } = {}) {
     title.hide();
     if (!settings.get('introSeen') && !/[?&](auto|shot|nointro|play)/.test(location.search)) await runIntro();
     st.state = 'loading';
@@ -127,9 +132,19 @@ export function createShell(ctx, root, ui) {
   }
 
   async function playMinigame(id, opts = {}) {
-    if (st.state === 'loading' || st.state === 'intro') return;
+    if (starting || st.state === 'loading' || st.state === 'intro') return;
+    starting = true;
+    try { await startMinigame(id, opts); } finally { starting = false; }
+  }
+  async function startMinigame(id, opts) {
     const from = st.state;
-    if (meta && !meta.temp && (from === 'playing' || from === 'paused')) await save('quit', true);
+    if (meta && meta.mode !== 'minigame' && (from === 'playing' || from === 'paused')) {
+      if (from === 'playing') { setPaused(true); inputOn(false); }
+      if (!(await canLeave('Start the mini-game anyway?', 'Play anyway'))) {
+        if (from === 'playing' && st.state === 'playing') { setPaused(false); inputOn(true); ctx.input?.requestPointer?.(); }
+        return;
+      }
+    }
     minigames.stop();
     pauseEl?.remove(); pauseEl = null;
     ui.closePanels?.(); ui.cmd?.close();
@@ -204,12 +219,7 @@ export function createShell(ctx, root, ui) {
       return;
     }
     if (pauseEl) pauseEl.querySelectorAll('button').forEach((b) => { b.disabled = true; });
-    if (visiting() && !(await confirmPop('Leave this world?', 'This is someone else’s world. Use “Save a copy” first if you want to keep what you built.', 'Leave'))) {
-      pauseEl?.querySelectorAll('button').forEach((b) => { b.disabled = false; });
-      return;
-    }
-    const ok = await save('quit', true);
-    if (!ok && !(await confirmPop('Saving failed', 'Your latest changes could not be saved. Quit anyway?', 'Quit anyway', true))) {
+    if (!(await canLeave('Quit anyway?', 'Quit anyway'))) {
       pauseEl?.querySelectorAll('button').forEach((b) => { b.disabled = false; });
       return;
     }
@@ -217,6 +227,13 @@ export function createShell(ctx, root, ui) {
     pauseEl?.remove(); pauseEl = null;
     meta = null;
     showTitle();
+  }
+
+  // Shared by Quit and starting a mini-game: a visitor confirms leaving, and a failed save is never silently thrown away.
+  async function canLeave(question, yes) {
+    if (visiting() && !(await confirmPop('Leave this world?', 'This is someone else’s world. Use “Save a copy” first if you want to keep what you built.', 'Leave'))) return false;
+    if (await save('quit', true)) return true;
+    return !!(await confirmPop('Saving failed', 'Your latest changes could not be saved. ' + question, yes, true));
   }
 
   function thumb() {
@@ -234,16 +251,41 @@ export function createShell(ctx, root, ui) {
   }
 
   const visiting = () => meta && meta.source === 'cloud' && !meta.mine;
-  async function save(why = 'auto', withThumb = false) {
-    if (!meta || meta.temp) return true;
-    if (visiting() && why !== 'copy') return true;
-    if (saving) { try { await saving; } catch {} }
-    saving = (async () => {
+  // One save in flight, plus at most one queued behind it that every later request joins. Never two writes at once.
+  function save(why = 'auto', withThumb = false) {
+    if (!meta || meta.temp) return Promise.resolve(true);
+    if (visiting() && why !== 'copy') return Promise.resolve(true);
+    if (queued) {
+      if (why !== 'auto') queued.why = why;
+      queued.withThumb ||= withThumb;
+      return queued.p;
+    }
+    if (!saving) return runSave(why, withThumb);
+    const q = queued = { why, withThumb };
+    q.p = saving.then(() => { queued = null; return runSave(q.why, q.withThumb); });
+    return q.p;
+  }
+  function runSave(why, withThumb) {
+    const p = doSave(why, withThumb);
+    saving = p;
+    p.then(() => { if (saving === p) saving = null; });
+    return p;
+  }
+  async function doSave(why, withThumb) {
+    try {
+      if (!meta || meta.temp) return true;
       const G = await game();
       const data = await G.save();
       if (!data) return true;
       const th = withThumb || why === 'pause' || saveCount++ % 5 === 0 ? thumb() : null;
-      const r = await store.save(meta, data, th, async () => {
+      const r = await store.save(meta, data, th, async (cur, kind) => {
+        if (kind === 'missing') {
+          return popup({
+            title: 'This world was deleted somewhere else',
+            text: 'It is gone from your world list, maybe from another tab or device. Save what you have here as a new copy?',
+            buttons: [{ label: 'Don’t save', value: null }, { label: 'Save as copy', value: 'copy', primary: true }],
+          });
+        }
         const v = await popup({
           title: 'This world changed somewhere else',
           text: 'Someone saved this world from another device since you opened it. Keep your version, or save yours as a separate copy?',
@@ -255,12 +297,11 @@ export function createShell(ctx, root, ui) {
       if (ctx.session) ctx.session.meta = meta;
       if (r.copied) toast(r.conflict ? 'Saved yours as a copy' : 'Saved your own copy of this world', { kind: 'good', ms: 3600 });
       return true;
-    })();
-    try { return await saving; } catch (e) {
+    } catch (e) {
       console.warn('[shell] save failed', e);
       if (why !== 'auto' || e?.code !== 'offline') toast('Could not save: ' + (e?.message || e), { kind: 'warn', ms: 3600 });
       return false;
-    } finally { saving = null; }
+    }
   }
 
   document.addEventListener('visibilitychange', () => {

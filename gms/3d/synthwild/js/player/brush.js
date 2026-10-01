@@ -44,6 +44,19 @@ export const brush = {
     inp?.on?.('cancel', () => { if (this.tools.paste) this.tools.endPaste(); else if (this.vol) this.cancel(); });
     for (const a of ACTIONS) inp?.on?.(a.id, () => this.run(a.id));
     this._dir = new THREE.Vector3();
+    ctx.bus?.on?.('game:stop', () => this.reset());
+    ctx.bus?.on?.('game:start', () => this.reset());
+  },
+
+  // Nothing about an edit in progress survives into another world. The clipboard does, on purpose.
+  reset() {
+    if (this.tools.paste) this.tools.endPaste();
+    this.tools.history.clear();
+    this.cancel();
+    this.target = this.mobTarget = this.placeTarget = this.breakTarget = null;
+    this.progress = 0; this._breakKey = ''; this._mineT = 0; this._repeat = 0; this._usedHold = false;
+    this.credit = {};
+    this.outline.hide();
   },
 
   get build() { return this._ctx?.session?.mode === 'build'; },
@@ -342,12 +355,17 @@ export const brush = {
   confirm() {
     const v = this.vol, ctx = this._ctx;
     if (!v?.box) return this.cancel();
+    // Volumes are a Build tool. Outside Build a clear is refused and a place is paid for like any placement.
+    if (!this.build && v.mode === 'clear') return this.cancel();
     if (v.mode === 'clear') this._doBreak(v.box);
     else {
-      const mat = this.heldBlock();
+      const mat = this.heldBlock(), inv = ctx.game?.inv;
       const fillsPlayer = (v.mode === 'fill' || v.mode === 'hollow') && this._overlapsPlayer(v.box);
-      if (mat && !fillsPlayer) {
+      const units = this.build ? 0 : costUnits(v.box, v.mode, this.scale * 4);
+      if (mat && !this.build && !this._canAfford(inv, units)) ctx.bus?.emit?.('player:cantPlace', { reason: 'items' });
+      else if (mat && !fillsPlayer) {
         const r = this.tools.edit(v.box.min, v.box.max, mat, v.mode, { wall: this.scale * 4 });
+        if (r?.changed && !this.build) this._pay(inv, Math.min(units, r.changed));
         if (r?.changed) {
           ctx.bus?.emit?.('block:place', { minSub: v.box.min.slice(), maxSub: v.box.max.slice(), mat, mode: v.mode, changed: r.changed, removed: r.removed });
           ctx.fx?.hologram?.(v.box.min, v.box.max, COLORS.volume);

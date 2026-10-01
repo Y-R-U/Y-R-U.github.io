@@ -56,20 +56,21 @@ export const minigames = {
     run = null;
     try { r.def.end(); } catch (e) { console.error('[minigame] end', e); }
     r.hud.dispose();
-    if (r.ctx.session) { r.ctx.session.mgSurvival = false; r.ctx.session.mgBreak = false; }
+    if (r.ctx.session) { r.ctx.session.mgSurvival = false; r.ctx.session.mgBreak = false; r.ctx.session.mgCountdown = false; }
   },
 };
 
 // 3-2-1-GO helper: call tick(dt) each frame; returns true while still counting.
 export function countdown(mg, sec = 3.5) {
-  const hud = mg.hud;
+  const hud = mg.hud, session = mg.ctx.session || {};
   let t = sec, shown = null;
+  session.mgCountdown = true;
   return (dt) => {
-    if (t <= -1) return false;
+    if (t <= -1) { session.mgCountdown = false; return false; }
     t -= dt;
     const n = Math.ceil(t - 0.5);
     if (n !== shown && t > -0.5) { shown = n; hud.big(n > 0 ? String(n) : 'GO!', 0.9); mg.ctx.audio?.sfx(n > 0 ? 'tick' : 'select'); }
-    if (t <= 0) { t = -1; return false; }
+    if (t <= 0) { t = -1; session.mgCountdown = false; return false; }
     return true;
   };
 }

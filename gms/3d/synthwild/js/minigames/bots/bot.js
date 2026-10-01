@@ -31,7 +31,7 @@ export class Bot {
 
   goTo(x, y, z, near = 0) {
     if (this.goal && Math.hypot(this.goal[0] - x, this.goal[1] - y, this.goal[2] - z) < 1.2 && this.goalNear === near) return;
-    this.goal = [x, y, z]; this.goalNear = near; this.repathT = 0; this.bestD = Infinity; this.stuckT = 0;
+    this.goal = [x, y, z]; this.goalNear = near; this.repathT = 0; this.bestD = Infinity; this.stuckT = 0; this.noPathT = 0;
   }
   stop() { this.goal = null; this.path = null; this.seg = null; this.speed = 0; }
   teleport(x, y, z) { this.x = x; this.y = y; this.z = z; this.path = null; this.seg = null; this.vy = 0; this.falling = false; this.bestD = Infinity; this.stuckT = 0; }
@@ -60,7 +60,8 @@ export class Bot {
       budget.n--;
       this.repathT = 1.2 + Math.random() * 0.4;
       const p = findPathClosest(G, [this.x, this.y + 0.1, this.z], this.goal, { maxNodes: 2500 });
-      if (p && p.length) { this.path = p; this.noPathT = 0; } else { this.path = null; this.noPathT += 1.2; }
+      // An empty path means we already stand on the closest reachable cell: not a failed search.
+      if (p) { this.path = p.length ? p : null; this.noPathT = 0; } else { this.path = null; this.noPathT += 1.2; }
     }
     if (!this.seg && this.path?.length) {
       const n = this.path[0];

@@ -155,8 +155,8 @@ function buildTree(put, x, y, z, kind, r, S) {
 
 // Grow a forest tree at runtime (saplings). The trunk starts at (x,y,z), which may hold the sapling.
 // Never overwrites player blocks: logs and leaves only go into air or soft plants. Returns cells placed, or 0 if the
-// trunk has no room (then nothing changes).
-export function growTree(world, x, y, z, seed = 0) {
+// trunk has no room (then nothing changes). avoid = [x0,y0,z0,x1,y1,z1] (e.g. the player): 0 if any cell would land in it.
+export function growTree(world, x, y, z, seed = 0, avoid = null) {
   const S = (seedToInt(seed) ^ hash3(x, y, z, 0x5a9)) >>> 0;
   const r = hash2(x, z, S ^ 0x77), type = (r >>> 18) % 100;
   const kind = type < 70 ? 0 : 1;
@@ -171,5 +171,7 @@ export function growTree(world, x, y, z, seed = 0) {
       writes.set(key, [px, py, pz, m]);
   };
   buildTree(put, x, y, z, kind, r, S);
-  return world._placeCells([...writes.values()]);
+  const list = [...writes.values()];
+  if (avoid && list.some(([px, py, pz]) => px < avoid[3] && px + 1 > avoid[0] && py < avoid[4] && py + 1 > avoid[1] && pz < avoid[5] && pz + 1 > avoid[2])) return 0;
+  return world._placeCells(list);
 }

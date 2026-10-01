@@ -34,28 +34,32 @@ export function createStore(getApi, account) {
       return { meta: withExtra({ ...meta, ...r.meta }), data: r.data };
     },
     // Returns the (possibly new) meta. A visitor's first save becomes their own copy.
-    // onConflict(serverMeta) -> 'overwrite' | 'copy'
+    // onConflict(serverMeta, kind) -> 'overwrite' | 'copy' | null. kind 'missing' = the world was deleted elsewhere.
     async save(meta, data, thumb, onConflict) {
       const a = api();
-      if (meta.source === 'cloud') {
-        if (!meta.mine) {
-          const copy = await a.worlds.create({ name: meta.name + ' (copy)', seed: meta.seed, mode: meta.mode, data, thumb });
-          setExtra(copy.id, { difficulty: meta.difficulty });
-          return { meta: withExtra(copy), copied: true };
+      const cloud = meta.source === 'cloud';
+      const copyOf = async (suffix) => {
+        const o = { name: meta.name + suffix, seed: meta.seed, mode: meta.mode, data, thumb };
+        const copy = cloud ? await a.worlds.create(o) : await a.local.put(o);
+        setExtra(copy.id, { difficulty: meta.difficulty, cheats: !!meta.cheats });
+        return withExtra(copy);
+      };
+      if (cloud && !meta.mine) return { meta: await copyOf(' (copy)'), copied: true };
+      try {
+        return { meta: withExtra(cloud ? await a.worlds.save(meta.id, data, meta.version, { thumb }) : await a.local.put({ id: meta.id, data, thumb, mustExist: true })) };
+      } catch (e) {
+        const missing = e?.code === 'not_found' || e?.status === 404;
+        if (!missing && e?.code !== 'conflict') throw e;
+        if (missing) {
+          if ((onConflict ? await onConflict(null, 'missing') : null) !== 'copy') throw e;
+          return { meta: await copyOf(' (saved copy)'), copied: true, conflict: true };
         }
-        try {
-          return { meta: withExtra(await a.worlds.save(meta.id, data, meta.version, { thumb })) };
-        } catch (e) {
-          if (e?.code !== 'conflict') throw e;
-          const choice = onConflict ? await onConflict(e.current) : 'copy';
-          if (choice === 'overwrite' && e.current) {
-            return { meta: withExtra(await a.worlds.save(meta.id, data, e.current.version, { thumb })) };
-          }
-          const copy = await a.worlds.create({ name: meta.name + ' (saved copy)', seed: meta.seed, mode: meta.mode, data, thumb });
-          return { meta: withExtra(copy), copied: true, conflict: true };
+        const choice = onConflict ? await onConflict(e.current, 'conflict') : 'copy';
+        if (choice === 'overwrite' && e.current) {
+          return { meta: withExtra(await a.worlds.save(meta.id, data, e.current.version, { thumb })) };
         }
+        return { meta: await copyOf(' (saved copy)'), copied: true, conflict: true };
       }
-      return { meta: withExtra(await a.local.put({ id: meta.id, data, thumb })) };
     },
     rename(meta, name) {
       const a = api();

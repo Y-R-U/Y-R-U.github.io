@@ -288,12 +288,14 @@ const local = {
     if (!rec) throw new ApiError(404, 'not_found', 'No such local world');
     return { meta: localMeta(rec), data: blob ? await decodeData(blob.bytes, rec.blobType) : null };
   },
-  async put({ id, name, seed = '', mode, data, thumb } = {}) {
+  // mustExist: refuse (404) instead of recreating a record that was deleted elsewhere.
+  async put({ id, name, seed = '', mode, data, thumb, mustExist = false } = {}) {
     const enc = data !== undefined && data !== null ? await encodeData(data) : null;
     const thumbUrl = thumb ? (typeof thumb === 'string' ? thumb : await blobToDataURL(thumb)) : undefined;
     const now = Date.now();
     return tx(['worlds', 'blobs'], 'readwrite', async (w, b) => {
       const old = id ? await reqP(w.get(id)) : null;
+      if (mustExist && !old) throw new ApiError(404, 'not_found', 'This world was deleted');
       const rec = old ? { ...old } : { id: id || newLocalId(), name: name || 'New world', seed: String(seed), mode: mode || 'survival',
         version: 0, size: 0, blobType: null, thumb: null, createdAt: now };
       if (name !== undefined && old) rec.name = name;

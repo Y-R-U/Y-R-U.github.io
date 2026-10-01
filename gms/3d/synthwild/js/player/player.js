@@ -18,8 +18,11 @@ const CLIMB_UP = 2.8, CLIMB_SLIDE = 2.2;
 export const player = {
   pos: null, vel: null, yaw: 0, pitch: 0, h: BODY.H, eyeH: BODY.EYE,
   onGround: false, inWater: false, headInWater: false, flying: false, crouching: false, sprinting: false,
-  speed: 0, view: 'first', dead: false, ready: false,
+  speed: 0, view: 'first', ready: false,
   _ctx: null, _frame: -1, _fallPeak: null, _lastJump: 0, _stepDist: 0, _blocked: false, _pendingSpawn: null, _t: 0,
+
+  // Survival owns death; this mirror can never drift from it across worlds or mini-games.
+  get dead() { return !!this._ctx?.game?.survival?.dead; },
 
   init(ctx) {
     this._ctx = ctx;
@@ -44,9 +47,8 @@ export const player = {
     inp?.on?.('toggleView', () => { if (!ctx.ui) this.setView(this.view === 'first' ? 'third' : 'first'); });
     ctx.settings?.on?.('view', v => { this.view = v === 'third' ? 'third' : 'first'; });
     const bus = ctx.bus;
-    bus?.on?.('player:death', () => { this.dead = true; this.vel.set(0, 0, 0); });
+    bus?.on?.('player:death', () => { this.vel.set(0, 0, 0); });
     bus?.on?.('player:respawn', d => {
-      this.dead = false;
       const p = d?.pos;
       if (p) this.teleport(p[0] ?? p.x, p[1] ?? p.y, p[2] ?? p.z); else this.spawn();
     });
