@@ -1,5 +1,5 @@
 // Worker pool for section meshing. One job per section key at a time.
-export function createMesherPool(table, onResult) {
+export function createMesherPool(table, onResult, onError = () => {}) {
   const hc = navigator.hardwareConcurrency || 4;
   const count = Math.max(1, Math.min(3, hc - 2));
   const PER = 3; // jobs in flight per worker
@@ -15,7 +15,7 @@ export function createMesherPool(table, onResult) {
       w.load = Math.max(0, w.load - 1);
       if (jobs.get(msg.key) === msg.id) jobs.delete(msg.key);
       if (msg.gen !== undefined && msg.gen !== gen) return;
-      if (msg.type === 'error') { console.error('[mesher]', msg.key, msg.error); return; }
+      if (msg.type === 'error') { console.error('[mesher]', msg.key, msg.error); onError(msg.key); return; }
       onResult(msg);
     };
     w.onerror = (e) => console.error('[mesher] worker error', e.message || e);

@@ -28,6 +28,12 @@ export function createPost(ctx) {
     setEnabled(on) {
       this.enabled = !!on;
       if (on && !composer) build();
+      if (!on && composer) {
+        // leaving High: free the half-float targets and the bloom mip chain
+        for (const p of composer.passes) p.dispose?.();
+        composer.renderTarget1.dispose(); composer.renderTarget2.dispose();
+        composer = null; bloom = null;
+      }
     },
     setSize(w, h) {
       if (!composer) return;

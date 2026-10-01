@@ -3,6 +3,7 @@
 //  cone hunts for 2 minutes. Stay out of the cone!
 //  Seek (seekGame): 4 Rivals hide while you count; find them in 3 minutes. A ping every 30 s points the way.
 import { BotSquad, NAMES } from '../bots/index.js';
+import { disposeObject } from '../../core/dispose.js';
 import { pad, fill, put, W } from '../bots/arena.js';
 
 const H = 17;
@@ -178,7 +179,7 @@ const hide = {
     this.mg.finish({ won, stars, score: Math.round(surv), title: won ? 'Never found!' : 'Spotted!', text: won ? (stars === 3 ? 'The Seeker never even got close.' : 'Phew, that was close!') : `You stayed hidden for ${Math.round(surv)} s.` });
   },
 
-  end() { this.ctx?.scene?.remove(this.d?.g); },
+  end() { disposeObject(this.d?.g); },
 };
 
 export const seekGame = {

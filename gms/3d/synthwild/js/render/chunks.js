@@ -15,7 +15,13 @@ export function createChunkRenderer(ctx, { BLOCKS, TILES }) {
   const materials = createMaterials(THREE, atlas, ctx.sky.uniforms, quality());
   const mats = [materials.opaque, materials.cutout, materials.water];
   const results = [];
-  const pool = createMesherPool(table, (msg) => results.push(msg));
+  const retries = new Map();
+  // a worker failure must not leave a permanent hole: retry the section a few times
+  const pool = createMesherPool(table, (msg) => { retries.delete(msg.key); results.push(msg); }, (key) => {
+    const n = (retries.get(key) || 0) + 1;
+    retries.set(key, n);
+    if (n <= 3) stale.add(key);
+  });
 
   const group = new THREE.Group();
   group.name = 'chunks';
@@ -32,7 +38,9 @@ export function createChunkRenderer(ctx, { BLOCKS, TILES }) {
 
   const parseKey = (key) => {
     let v = keyCache.get(key);
-    if (!v) { const p = key.split(','); v = [+p[0], +p[1], +p[2]]; keyCache.set(key, v); }
+    if (!v) {
+      if (keyCache.size > 20000) keyCache.clear(); // bounded: long walks visit endless keys
+      const p = key.split(','); v = [+p[0], +p[1], +p[2]]; keyCache.set(key, v); }
     return v;
   };
   const inRange = (cx, cz, pad = 0.5) => {
@@ -52,7 +60,7 @@ export function createChunkRenderer(ctx, { BLOCKS, TILES }) {
 
   function clear() {
     for (const c of cols.values()) disposeCol(c);
-    cols.clear(); secs.clear(); dirtyCols.clear(); stale.clear(); keyCache.clear();
+    cols.clear(); secs.clear(); dirtyCols.clear(); stale.clear(); keyCache.clear(); retries.clear();
     results.length = 0;
     pool.cancelAll();
   }

@@ -3,7 +3,12 @@
 // Ids and tile indices are untouched; only the pixels change.
 
 export const STYLE = {
-  solar_leaves: { base: '#178f80', accent: '#f2c84b' },
+  mirror_tile: { pattern: 'tiles', base: '#b4c0d4', accent: '#4ad7e8', emissive: 0.4 },
+  polymer_brick: { pattern: 'ceramic', base: '#a7b4c8', accent: '#4ad7e8', emissive: 0.4 },
+  lattice_planks: { pattern: 'composite', base: '#c6b088', accent: '#3fd6c4', emissive: 0.4 },
+  light_panel: { pattern: 'diffuser', base: '#a8e8f8' },
+  clearglass: { base: '#5fb8cc', accent: '#9ff0ff' },
+  solar_leaves: { base: '#22a892', accent: '#f2c84b' },
   photomoss_top: { pattern: 'hexfilm', base: '#1c9a86', accent: '#f2c84b', glow: 'night', emissive: 0.5 },
   photomoss_side: { pattern: 'weave', base: '#4a3f52', accent: '#8a7396', lip: { color: '#1c9a86', glow: '#7af7dc', px: 4 } },
   loam_mesh: { pattern: 'weave', base: '#4a3f52', accent: '#8a7396' },
@@ -82,8 +87,8 @@ export function stylePixel(P, t, x, y, h) {
     let c = mix(base, [214, 208, 236], clamp01(0.25 + (32 - y) / 120 + rip * 0.12 + (nv - 0.5) * 0.3));
     if (rip > 0.85) c = mix(c, [240, 236, 255], 0.35);
     else if (rip < -0.85) c = scale(c, 0.9);
-    let em = 0, gt = 0.35;
-    if (rand() < 0.012) { c = [255, 255, 255]; gt = 1; em = 0.4; }
+    let em = 0, gt = 0.04;
+    if (rand() < 0.01) { c = [255, 255, 255]; gt = 1; em = 0.4; }
     else if (rand() < 0.03) c = mix(c, [255, 200, 240], 0.3);
     return { c, a: 255, em, gl: 0.85, gt };
   }
@@ -95,6 +100,46 @@ export function stylePixel(P, t, x, y, h) {
     if (m) { c = scale(base, 0.45); if (m === 2) { c = mix(c, acc, 0.9); em = 1; } }
     else if (up) { c = scale(base, 1.25); gl = 0.5; }
     return { c, a: 255, em, gl, gt: 0 };
+  }
+  if (P === 'tiles') {
+    // bevelled 16 px tiles with a thin glowing inlay between them
+    const lx = x % 16, ly = y % 16;
+    let c = scale(base, 0.92 + nv * 0.12 + (32 - y) / 400);
+    let em = 0, gl = 0.75;
+    if (lx === 0 || ly === 0) { c = mix(scale(base, 0.5), acc, 0.7); em = 0.6; }
+    else if (lx === 1 || ly === 1) c = scale(base, 1.12);
+    else if (lx === 15 || ly === 15) c = scale(base, 0.72);
+    else if (lx > 5 && lx < 10 && ly > 5 && ly < 10 && ((x >> 4) + (y >> 4)) % 2 === 0) c = scale(base, 1.04);
+    return { c, a: 255, em, gl, gt: 0 };
+  }
+  if (P === 'ceramic') {
+    // offset ceramic panels with rounded dark joints; every other course carries a cyan pinstripe
+    const row = y >> 3, ly = y & 7, lx = (x + (row & 1) * 8) & 15;
+    let c = scale(base, 0.9 + nv * 0.14 + (ly === 1 ? 0.12 : 0) - (ly === 7 ? 0.14 : 0));
+    let em = 0;
+    if (ly === 0 || lx === 0) c = scale(base, 0.5);
+    else if (ly === 4 && row % 2 === 0 && lx > 2 && lx < 14) { c = mix(c, acc, 0.8); em = 0.5; }
+    return { c, a: 255, em, gl: 0.5, gt: 0 };
+  }
+  if (P === 'composite') {
+    // long pale composite boards: fine fibre grain, dark joints, a teal inlay down each board
+    const row = y >> 3, ly = y & 7, lx = (x + row * 11) & 31;
+    const grain = n2(x / 6, y * 1.5 + row * 7);
+    let c = scale(mix(base, [222, 206, 170], grain * 0.5), 0.86 + grain * 0.18 + (ly === 1 ? 0.1 : 0));
+    let em = 0;
+    if (ly === 0 || lx === 0) c = scale(base, 0.45);
+    else if (ly === 4 && lx > 3 && lx < 28) { c = mix(c, acc, 0.7); em = 0.45; }
+    return { c, a: 255, em, gl: 0.35, gt: 0 };
+  }
+  if (P === 'diffuser') {
+    // light panel: a hex diffuser grid instead of a flat white blob, so it reads at a glance
+    const hx = hexAt(x, y);
+    const edge = hx.f2 - hx.f1;
+    let c = mix(base, [255, 255, 255], 0.35 - hx.f1 * 0.06);
+    if (edge < 0.8) c = [70, 110, 140];
+    const e = Math.min(x, y, TS - 1 - x, TS - 1 - y);
+    if (e === 0) c = [90, 110, 135];
+    return { c, a: 255, em: e === 0 || edge < 0.8 ? 0 : 0.75, gl: 0.6, gt: 0 };
   }
   if (P === 'furrows') {
     // grow bed: raised rows of dark loam with a seeded glow line in each trough

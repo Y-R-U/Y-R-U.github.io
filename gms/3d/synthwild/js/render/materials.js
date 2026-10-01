@@ -59,7 +59,8 @@ vec3 applyFog(vec3 col, vec3 wp) {
   float dist = length(d);
   float f = smoothstep(uFogNear, uFogFar, dist);
   vec3 fc = mix(uFogColor, uFogSunColor, pow(max(dot(d / dist, uSunDir), 0.0), 6.0));
-  col = mix(col, fc, f);
+  // aerial perspective: keep a quarter of the colour's chroma into the haze so distant canopy stays jade, not grey
+  col = mix(col, fc, f) + (col - vec3(dot(col, vec3(0.3333)))) * f * (1.0 - f) * 0.9;
 #ifndef LOW
   if (uUnderwater > 0.5) {
     float sh = 0.0, len = min(dist, 18.0);

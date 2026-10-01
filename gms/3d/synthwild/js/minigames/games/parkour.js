@@ -1,5 +1,6 @@
 // Parkour Dash: a seeded spiral of floating platforms around a glowing spire. Checkpoints, a timer, and a ghost of your best run.
 import { fill, put, top, rng } from '../arena.js';
+import { disposeObject } from '../../core/dispose.js';
 import { countdown } from '../index.js';
 import { fmtTime } from '../hud.js';
 
@@ -164,7 +165,7 @@ const parkour = {
   },
 
   end() {
-    if (this.ghost?.mesh) this.ctx.scene?.remove(this.ghost.mesh);
+    if (this.ghost?.mesh) disposeObject(this.ghost.mesh);
     this.ghost = null;
     if (this.ctx.input) this.ctx.input.enabled = true;
   },

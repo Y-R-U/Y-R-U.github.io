@@ -13,7 +13,7 @@ function hex(c) { const k = new T.Color(c); return [k.r, k.g, k.b]; }
 
 // parts: [{ s:[w,h,d], p:[x,y,z], c:'#hex', r:[rx,ry,rz], shade:false }]
 function merge(parts) {
-  const pos = [], col = [];
+  const pos = [], col = [], nor = [];
   const m = new T.Matrix4(), q = new T.Quaternion(), e = new T.Euler(), v = new T.Vector3(), n = new T.Vector3();
   const nm = new T.Matrix3();
   for (const pt of parts) {
@@ -27,9 +27,10 @@ function merge(parts) {
     for (let i = 0; i < P.count; i++) {
       v.fromBufferAttribute(P, i).applyMatrix4(m);
       pos.push(v.x, v.y, v.z);
+      n.fromBufferAttribute(N, i).applyMatrix3(nm).normalize();
+      nor.push(n.x, n.y, n.z);
       let k = 1;
       if (pt.shade !== false) {
-        n.fromBufferAttribute(N, i).applyMatrix3(nm).normalize();
         k = n.y > 0.5 ? SHADE.py : n.y < -0.5 ? SHADE.ny : Math.abs(n.x) > Math.abs(n.z) ? (n.x > 0 ? SHADE.px : SHADE.nx) : (n.z > 0 ? SHADE.pz : SHADE.nz);
       }
       col.push(c[0] * k, c[1] * k, c[2] * k);
@@ -39,6 +40,7 @@ function merge(parts) {
   const g = new T.BufferGeometry();
   g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
   g.setAttribute('color', new T.Float32BufferAttribute(col, 3));
+  g.setAttribute('normal', new T.Float32BufferAttribute(nor, 3));
   g.computeBoundingSphere();
   return g;
 }
@@ -48,17 +50,34 @@ export function geo(key, parts) {
   return geoCache.get(key);
 }
 
+// Vertex-coloured body with a little art on top: fine panel seams in object space, a top-lit gradient and a
+// cyan rim (stronger at night) so silhouettes read against dark ground on a phone.
 export function bodyMaterial() {
   const mat = new T.MeshBasicMaterial({ vertexColors: true });
-  const u = { uTint: { value: new T.Color(1, 1, 1) }, uFlash: { value: new T.Vector4(1, 1, 1, 0) } };
+  const sky = globalThis.__game?.ctx?.sky?.uniforms;
+  const u = { uTint: { value: new T.Color(1, 1, 1) }, uFlash: { value: new T.Vector4(1, 1, 1, 0) },
+    uNight: sky?.uNight ?? { value: 0 }, uRim: sky?.uRimColor ?? { value: new T.Color(0x9ff0ff) } };
   mat.userData.u = u;
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, u);
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vObj;\nvarying vec3 vNw;\nvarying vec3 vWp;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvObj = position; vNw = normalize(mat3(modelMatrix) * normal); vWp = (modelMatrix * vec4(position, 1.0)).xyz;');
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform vec3 uTint;\nuniform vec4 uFlash;')
-      .replace('#include <opaque_fragment>', 'outgoingLight = mix(outgoingLight * uTint, uFlash.rgb, uFlash.a);\n#include <opaque_fragment>');
+      .replace('#include <common>', '#include <common>\nuniform vec3 uTint;\nuniform vec4 uFlash;\nuniform float uNight;\nuniform vec3 uRim;\nvarying vec3 vObj;\nvarying vec3 vNw;\nvarying vec3 vWp;')
+      .replace('#include <opaque_fragment>', `
+        vec3 an = abs(vNw);
+        vec2 fc = an.x > an.y && an.x > an.z ? vObj.zy : an.y > an.z ? vObj.xz : vObj.xy;
+        vec2 sg = abs(fract(fc * 6.0) - 0.5);
+        float seam = smoothstep(0.47, 0.5, max(sg.x, sg.y));
+        outgoingLight *= (1.0 - seam * 0.22) * (0.82 + 0.3 * clamp(vObj.y * 0.9 + 0.3, 0.0, 1.0));
+        vec3 V = normalize(cameraPosition - vWp);
+        float rim = pow(1.0 - clamp(abs(dot(normalize(vNw), V)), 0.0, 1.0), 3.0);
+        outgoingLight = outgoingLight * uTint + uRim * rim * (0.18 + 0.5 * uNight);
+        outgoingLight = mix(outgoingLight, uFlash.rgb, uFlash.a);
+        #include <opaque_fragment>`);
   };
-  mat.customProgramCacheKey = () => 'synthwild-mob';
+  mat.customProgramCacheKey = () => 'synthwild-mob2';
   return mat;
 }
 
@@ -153,17 +172,17 @@ function buildGlitchfuse(mat) {
   const root = new T.Group();
   const body = pivot(root, [0, 0.4, 0]);
   mesh(geo('gf.body', [
-    { s: [0.5, 0.9, 0.36], p: [0, 0.45, 0], c: '#2fae86' },
-    { s: [0.52, 0.04, 0.38], p: [0, 0.3, 0], c: '#17614c' },             // panel seams
-    { s: [0.52, 0.04, 0.38], p: [0, 0.62, 0], c: '#17614c' },
-    { s: [0.12, 0.5, 0.06], p: [0.13, 0.42, -0.19], c: '#1b7d61' },      // back vents
-    { s: [0.12, 0.5, 0.06], p: [-0.13, 0.42, -0.19], c: '#1b7d61' },
+    { s: [0.5, 0.9, 0.36], p: [0, 0.45, 0], c: '#c3d2e4' },
+    { s: [0.52, 0.04, 0.38], p: [0, 0.3, 0], c: '#d23a9e' },             // panel seams
+    { s: [0.52, 0.04, 0.38], p: [0, 0.62, 0], c: '#d23a9e' },
+    { s: [0.12, 0.5, 0.06], p: [0.13, 0.42, -0.19], c: '#7a4a96' },      // back vents
+    { s: [0.12, 0.5, 0.06], p: [-0.13, 0.42, -0.19], c: '#7a4a96' },
   ]), mat, body);
   const head = pivot(body, [0, 0.9, 0]);
   mesh(geo('gf.head', [
-    { s: [0.56, 0.52, 0.52], p: [0, 0.26, 0], c: '#36c494' },
+    { s: [0.56, 0.52, 0.52], p: [0, 0.26, 0], c: '#d6e2f0' },
     { s: [0.46, 0.42, 0.04], p: [0, 0.26, 0.26], c: '#0c2420', shade: false },   // face screen
-    { s: [0.58, 0.05, 0.54], p: [0, 0.53, 0], c: '#1d8064' },
+    { s: [0.58, 0.05, 0.54], p: [0, 0.53, 0], c: '#d23a9e' },
   ]), mat, head);
   const face = mesh(geo('gf.face', [
     { s: [0.12, 0.12, 0.02], p: [-0.11, 0.33, 0.285], c: '#ffffff', shade: false },
@@ -177,8 +196,8 @@ function buildGlitchfuse(mat) {
   for (const [x, z] of [[0.14, 0.13], [-0.14, 0.13], [0.14, -0.13], [-0.14, -0.13]]) {
     const leg = pivot(root, [x, 0.4, z]);
     mesh(geo('gf.leg', [
-      { s: [0.2, 0.4, 0.2], p: [0, -0.2, 0], c: '#238e6e' },
-      { s: [0.22, 0.06, 0.26], p: [0, -0.37, 0.03], c: '#15493b' },
+      { s: [0.2, 0.4, 0.2], p: [0, -0.2, 0], c: '#8796ad' },
+      { s: [0.22, 0.06, 0.26], p: [0, -0.37, 0.03], c: '#3a3550' },
     ]), mat, leg);
     legs.push(leg);
   }

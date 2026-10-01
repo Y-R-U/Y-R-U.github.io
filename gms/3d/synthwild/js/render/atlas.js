@@ -57,7 +57,7 @@ function paintTile(t) {
   };
   const shade = (rgb, k) => scale(rgb, k);
   const KNOWN = ['noise', 'grain', 'film', 'lattice', 'veins', 'circuit', 'mirror', 'rings', 'water', 'panel', 'ore', 'brick',
-    'device', 'plant', 'bulb', 'fibre', 'crystal', 'rail', 'hexfilm', 'weave', 'sand', 'grooves', 'furrows'];
+    'device', 'plant', 'bulb', 'fibre', 'crystal', 'rail', 'hexfilm', 'weave', 'sand', 'grooves', 'furrows', 'tiles', 'ceramic', 'composite', 'diffuser'];
   const P = KNOWN.includes(t.pattern) ? t.pattern : (t.fallback || 'noise');
   const name = t.name;
 

@@ -38,3 +38,8 @@ Started 2026-10-02. Manager session spawns lane agents (Aaron: 6 at once initial
 - Registries: 9d29e5a8 + 1807ed7e — SYNTHWILD hub card + projects entry, HEIRFRAME hub card; hub deployed from a clean HEAD worktree (other session's ragdojo hunks still uncommitted/unreleased — never deploy hub from the dirty tree).
 - Lane 2 leaves repaint done (uncommitted). Phone bug: .sw-motes canvas doubling per frame at DPR≥2 → lane 5 fixing first.
 - MINIGAMES phase: lane 4 (bots, ctf, hideseek, siege) + lane 5 (framework, command bar, parkour, floorfall, treasure). Max 2 agents (D9).
+- 105d2a77: all 7 mini-games live. Review R1 (client) → docs/reviews/R1_client.md, 12 findings (7 proven). Fix selection: A1–A8, A10–A12; SKIP A9 (drop cap is fine). Fixer agent afe6d53789f98a5c4 running; QA af76fb8fbfe291762 running qa_minigames.
+- Next: R2 review (server security, net/api, render perf, UI) once a slot frees → fix → art pass → R3 perf/bugs/duplication review → fix.
+- 08e7ba82: R1 fixes (A1–A8, A10–A12) + QA M1–M4 live; r1_regress 22/0, unit 8/8. Note: qa_smoke "break/place" can flake when the random seed spawns on a shoreline (water flows into the broken cell) — harness should avoid water-adjacent targets; also verify placing INTO water works (queue for next fixer).
+- Running: R2 reviewer (a4764d4d796082ec9: server/net/render) + ART PASS (lane 2 agent).
+- R2 review → docs/reviews/R2_server_net_render.md (16 findings). Fixing B1–B10, B12–B14, B16, B15 (message only); SKIP B11. Server fixer = lane 6 agent; B3/B14 GPU leaks folded into the art pass (lane 2).

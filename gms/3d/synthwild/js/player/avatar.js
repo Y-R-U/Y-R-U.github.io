@@ -16,15 +16,22 @@ const LIGHT_GLSL = `uniform vec3 uLightDir, uLightColor, uAmbient, uGround, uBlo
 function mat(color, emissive = 0, pulse = 0) {
   return new THREE.ShaderMaterial({
     uniforms: { ...U, uColor: { value: new THREE.Color(color) }, uEmit: { value: emissive }, uPulse: { value: pulse } },
-    vertexShader: `varying vec3 vN; varying vec3 vW;
+    vertexShader: `varying vec3 vN; varying vec3 vW; varying vec3 vO; varying vec3 vNo;
       void main(){ vN = normalize(mat3(modelMatrix) * normal); vec4 w = modelMatrix * vec4(position,1.0); vW = w.xyz;
+      vO = position; vNo = normal;
       gl_Position = projectionMatrix * viewMatrix * w; }`,
     fragmentShader: `uniform vec3 uColor; uniform float uEmit; uniform float uPulse; uniform float uTime;
       ${LIGHT_GLSL}
-      varying vec3 vN; varying vec3 vW;
+      varying vec3 vN; varying vec3 vW; varying vec3 vO; varying vec3 vNo;
       void main(){
         vec3 n = normalize(vN);
         vec3 c = uColor * worldLight(n);
+        // suit plating: fine engraved panel lines in box space and a soft top-lit gradient
+        vec3 an = abs(vNo);
+        vec2 fc = an.x > an.y && an.x > an.z ? vO.zy : an.y > an.z ? vO.xz : vO.xy;
+        vec2 sg = abs(fract(fc * 9.0) - 0.5);
+        float seam = smoothstep(0.46, 0.5, max(sg.x, sg.y)) * (1.0 - uEmit);
+        c *= (1.0 - seam * 0.28) * (0.9 + 0.2 * clamp(vO.y * 3.0 + 0.5, 0.0, 1.0));
         vec3 V = normalize(cameraPosition - vW);
         float rim = pow(clamp(1.0 - dot(n, V), 0.0, 1.0), 3.0);
         c += vec3(0.35,0.9,1.0) * rim * 0.12 * (0.3 + 0.7 * uLocal.x);
@@ -162,7 +169,7 @@ function atlasCubeMat(atlas) {
 // First-person arm holding the selected item, parented to the camera.
 export function createHand() {
   // Softer than the body: a grey-blue sleeve (not flat white) and dimmer seams so night bloom doesn't blow it out.
-  const M = { suit: mat(0x9eabba), dark: mat(0x2b3240), seam: mat(0x3ff7ff, 0.3, 0) };
+  const M = { suit: mat(0xb4c3d4), dark: mat(0x2b3240), seam: mat(0x3ff7ff, 0.35, 0), cuff: mat(0x3ff7ff, 0.55, 1), plate: mat(0x5b6b82) };
   const root = new THREE.Group();
   root.name = 'player-hand';
   const arm = pivot(0.42, -0.42, -0.6);
@@ -170,7 +177,10 @@ export function createHand() {
   const sleeve = box(0.13, 0.13, 0.5, M.suit, 0, 0, 0.12); arm.add(sleeve);
   arm.add(box(0.14, 0.14, 0.09, M.dark, 0, 0, 0.3));
   arm.add(box(0.02, 0.02, 0.4, M.seam, 0.068, 0.03, 0.1));
+  arm.add(box(0.1, 0.03, 0.26, M.plate, 0, 0.075, 0.08));   // forearm plate
+  arm.add(box(0.145, 0.03, 0.03, M.cuff, 0, 0.0, -0.075)); // glowing cuff
   arm.add(box(0.12, 0.1, 0.1, M.dark, 0, 0.0, -0.15));   // glove
+  arm.add(box(0.1, 0.03, 0.04, M.plate, 0, 0.055, -0.19)); // knuckle plate
 
   const colorMat = mat(0xffffff, 0);
   const cubeGeo = new THREE.BoxGeometry(0.15, 0.15, 0.15);

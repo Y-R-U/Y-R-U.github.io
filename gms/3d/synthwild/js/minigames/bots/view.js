@@ -1,5 +1,6 @@
 // Rival bot bodies: lane 3's avatar model, recoloured per team, with a glowing team ring and a name tag.
 import { createAvatar } from '../../player/avatar.js';
+import { disposeObject } from '../../core/dispose.js';
 
 const SUIT = 0xdfe8f0, SEAM = 0x3ff7ff;
 
@@ -56,7 +57,7 @@ export function createBotView(ctx, bot, team) {
       ring.material.opacity = bot.frozen > 0 ? 0.25 + 0.25 * Math.sin(performance.now() / 80) : 0.75;
       ring.scale.setScalar(1 + flash * 1.5);
     },
-    dispose() { ctx.scene?.remove(g); },
+    dispose() { disposeObject(g); },
   };
 }
 

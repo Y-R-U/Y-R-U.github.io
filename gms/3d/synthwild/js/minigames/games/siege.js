@@ -1,6 +1,7 @@
 // Glitch Siege: defend the Grower Core through 5 waves of reboots, glitchfuses and archers.
 // Between waves you get a few seconds and a stack of bricks to build walls. Monsters smash through bricks in time.
 import { pad, fill, put, W, mat } from '../bots/arena.js';
+import { disposeObject } from '../../core/dispose.js';
 
 const H = 13, WAVES = 5, CORE_HP = 60;
 const GATES = [[0, -1], [0, 1], [-1, 0], [1, 0]];
@@ -194,7 +195,7 @@ const siege = {
   end() {
     for (const m of this.alive || []) if (!m.removed) this.ctx.game.mobs.remove(m);
     this.ctx.game.mobs.list.filter((m) => m.target === this.coreTarget).forEach((m) => this.ctx.game.mobs.remove(m));
-    this.ctx.scene?.remove(this.coreFx);
+    disposeObject(this.coreFx);
     this.offExplode?.(); this.offDeath?.();
     this.ctx.session.mgSurvival = false;
     this.ctx.session.mgBreak = false;

@@ -92,6 +92,28 @@ Status: M1 built and running with every lane's real modules (no stubs left in my
 - FPS box: already only `?fps=1` / `?shot=1` (`showFps` is lane 5's HUD chip).
 - `engine_shot.mjs` takes `DPR=2` to emulate device pixel ratio.
 
+## Art pass (wave 4) + review fixes
+- `tools/engine_arttour.sh <outdir> <prefix> [W H]` (DPR via `DPR=2`): biomes × day/dusk/night, canopy, underwater, cave,
+  outpost day/night, vault, all mobs day/night (spawned and frozen), hand with block/tool/food, HUD. Mini-games via `?mgtest=<id>`.
+- Arena/building tiles (STYLE): `mirror_tile` → bevelled tiles with glowing teal inlays (was a blown-out white plate),
+  `polymer_brick` → offset ceramic panels with cyan pinstripes (was MC stone brick), `lattice_planks` → pale composite boards
+  with a teal inlay (was MC wood), `light_panel` → hex diffuser with dark ribs (was a flat white blob under bloom),
+  `clearglass` frame tinted teal (floorfall grid was pure white).
+- Mirror sand: base glint mask 0.35 → 0.04, so the shader twinkle only fires on the sparse real glints (was salt-and-pepper).
+- Haze keeps some chroma (aerial perspective term in `applyFog`), leaves a touch brighter: distant canopy reads jade.
+- Mobs (`js/game/mobs/models.js`): merged geometry now carries normals; the shared body material adds object-space panel
+  seams, a top-lit gradient and a cyan rim that strengthens at night (silhouettes read on a phone). Glitchfuse recoloured to
+  pale chrome with magenta seams (no longer a Minecraft creeper green); its glyph face and telegraph ring are untouched.
+- Avatar/bots/hand (`js/player/avatar.js`, visuals only): engraved plating lines + top-lit gradient on every suit box; the
+  first-person hand gets a forearm plate, knuckle plate and a pulsing teal cuff.
+- B3: `js/core/dispose.js` `disposeObject(root)` (geometries, materials, material maps; uniform textures such as the atlas are
+  deliberately left alone). Used by bot views, CTF flags, parkour ghost, siege core fx, hide-and-seek drone.
+  `review_b_gpu.mjs`: geometries now return to 14–16 and textures to 15–16 after every mini-game (were 11→264 / 15→24).
+  JS heap still creeps ~7 MB per mini-game after GC (100→167 MB over 9); not GPU-side, not yet traced.
+- B14: chunk key cache is cleared past 20k entries; a mesher worker error re-queues the section (up to 3 tries); leaving High
+  quality disposes the bloom composer, its passes and both half-float targets.
+- Perf: GPU med phone-res forest 1.0 ms min / 1.6–1.9 ms median (was 1.2 / 3.4 under heavier contention); 4× CPU throttle 60 fps.
+
 ## Testing
 - `node tools/engine_mesher_test.mjs`: mesher unit checks (greedy, culling, slabs, refined neighbours, water depth, plants, rails) + perf.
 - `~/.claude/bin/cdp start --port 9312 -- --use-angle=metal`, then

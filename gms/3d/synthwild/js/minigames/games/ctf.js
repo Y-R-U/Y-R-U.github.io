@@ -1,6 +1,7 @@
 // Capture the Flag: you + 2 Blue bots vs 3 Red bots. Grab the red flag, bring it home while your flag is safe.
 // Tap a rival to tag it (it's zapped back to base). First to 3 captures, or the most in 6 minutes.
 import { BotSquad } from '../bots/index.js';
+import { disposeObject } from '../../core/dispose.js';
 import { pad, fill, put, W } from '../bots/arena.js';
 
 const HX = 22, HZ = 12, BASE = 18, WIN = 3, TIME = 360;
@@ -262,7 +263,7 @@ const ctf = {
 
   end() {
     this.squad?.clear();
-    for (const f of Object.values(this.flags || {})) this.ctx.scene?.remove(f.mesh);
+    for (const f of Object.values(this.flags || {})) disposeObject(f.mesh);
   },
 };
 
