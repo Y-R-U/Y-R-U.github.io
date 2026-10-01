@@ -100,3 +100,11 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 - 2026-10-01: Aaron proposed anonymous avatars for humans → D30 Veils. Launched the P8 veils agent (sole).
 - 2026-10-01: **P8 Veils DONE** (D30, Mara Flux+LTX ping-pong; start=end loop rejected: near-still and snaps at frame 89). Pushed 64e97b23; live check done. No agent running; waiting for Aaron's playtest.
 - 2026-10-01: Aaron playtest → fixes by the manager: the pause/panel freeze (enemies/boss/props/dayNight were still ticking; proved by a control run, HP 120→32 unpaused vs 120 paused), the DEV pill moved mid-left and enlarged, ?god=1&onehit=1. Pushed 8a1d7e00.
+- 2026-10-01: Aaron: the opening HIRA→Harmony handover felt cut off → gaps between story lines (450 same speaker / 900 change / 1600 around the Harmony PA, per-beat 'gap'), and HIRA's line now ends 'Anyway, enjoy your shift!' (VO regenerated, ASR-clean). Pushed 129e9606 + 5ced3ef5.
+
+## CURRENT STATE SNAPSHOT (2026-10-01, before manager compaction #2)
+- Live = HEAD on main; all phases P1–P8 done (12 districts, a 6-act story, both endings, the endless post-game, Veils + Mara's unveil portrait). Registered in projects.js.
+- No agents running. Cap = 1 (Aaron). Waiting for Aaron's playtest feedback; under D23, visual work only on his flags.
+- Recent playtest fixes by the manager: pause freezes the world, the DEV pill mid-left plus ?god=1&onehit=1, dialogue gaps, and HIRA's opening line.
+- Pre-push: node --check, `node tools/sim/test.mjs --quick`, the auto smoke via scratchpad/world/shot.mjs (port 9310; recreate it from git history/notes if the scratchpad was wiped), a 0 js/dev fetch check, git status gms/lib; after push, scratchpad/mgr/live_net.mjs (port 9313).
+- NEONHAUL is NOT ours (D29).
