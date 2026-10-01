@@ -26,15 +26,20 @@ export function createAutopilot(G, { ui, player }) {
 
   function chooseContract() {
     const list = toUiBoard(G.sim).contracts;
-    const story = list.findIndex((c) => c.story);
+    // at 4★ the relays are locked: a story card in another district has to wait for the Heat to drop
+    const relayLocked = Math.ceil(G.sim.state.factions.heat - 1e-6) >= 4;
+    const sb = G.sim.board().story, storyBlocked = relayLocked && sb && sb.district !== G.districts?.id;
+    const story = storyBlocked ? -1 : list.findIndex((c) => c.story);
     if (story >= 0 && (G.contractsDone === 0 || storyMode)) return story;
-    const ok = (c) => !c.story && !(c.modifiers || []).some((m) => /Ghost/.test(m.label));
+    const simCards = G.sim.board().cards || [];
+    const here = (c) => !relayLocked || (simCards.find((x) => x.id === c.id)?.district ?? G.districts?.id) === G.districts?.id;
+    const ok = (c) => !c.story && here(c) && !(c.modifiers || []).some((m) => /Ghost/.test(m.label));
     let i = -1;
     if (!storyMode && !frameK && !framesTour) i = list.findIndex((c) => ok(c) && P1_ARCH.includes(c.archetype) && !A.archetypes.includes(c.archetype));
     if (i < 0) i = list.findIndex((c) => ok(c) && !A.archetypes.includes(c.archetype));
     if (i < 0) i = list.findIndex(ok);
-    if (i < 0) i = list.findIndex((c) => !c.story);
-    return Math.max(0, i);
+    if (i < 0) i = list.findIndex((c) => !c.story && here(c));
+    return relayLocked ? i : Math.max(0, i);
   }
 
   function nearestHostile(r) {
@@ -178,6 +183,8 @@ export function createAutopilot(G, { ui, player }) {
       // an emptied board (every card taken or failed) refills next shift; a player rerolls it instead of waiting
       if (!document.querySelector('.cc-go') && !G.sim.board().story) { if (G.sim.rerollBoard().ok) ui.panel.update(toUiBoard(G.sim)); else ui.panel.close(); return; }
       const i = chooseContract();
+      // relays locked and nothing local: reroll for local work, or wait out the Heat
+      if (i < 0) { if (A.t - (A.rerollAt ?? -99) > 30 && G.sim.rerollBoard().ok) { A.rerollAt = A.t; ui.panel.update(toUiBoard(G.sim)); } else ui.panel.close(); return; }
       const btn = document.querySelectorAll('.cc-go')[i] || document.querySelector('.cc-go');
       if (!click(btn)) ui.panel.close();
       return;

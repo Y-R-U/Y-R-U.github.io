@@ -594,3 +594,83 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
 - Soak misses: level 8 (D19) and Brawler TTK (left for feel).
 - Generated defends 3–4 levels above the bot fail anywhere (Helm and Landfall alike).
 - Pre-P6 settings that stored 'high' without anyone choosing it now boot on Auto.
+
+
+# P7 "Polish" (gameplay agent P7, 2026-10-01)
+
+## Checkpoint 1 — the dialogue speaker portrait (Aaron's flag, D23)
+- What read as strange (scratchpad p7/before_*.png): flat clip-art SVG heads with a line mouth, the same "ear-muff"
+  robot for every speaker (Kettle, Dray, Halloran, Harmony all one generic bust in different paint), none of them the
+  robot you actually meet; a tall narrow tab poking 58 px out of the letterbox with a flat cyan wash; at 1280x720 a thin
+  138 px strip. It looked like a web avatar next to a PBR game.
+- NEW js/game/bust.js: a **live 3D bust of the speaker's real model** (createRobot, the district's PMREM env, a key +
+  accent rim light). The main renderer draws it into a scissored corner of the canvas *before* the world frame (which
+  then overwrites it) and `drawImage` copies it into the portrait's 2D canvas, so there is no second GL context and no
+  readPixels stall. Only while a dialogue is open; framed once per speaker (head + shoulders) so the `talk` sway reads;
+  `talk` while the line types, `idle` after. Programs compile through `renderer.compile` + a poll of `isReady()`
+  (KHR_parallel_shader_compile), so no hitch: the SVG shows until the bust is linked (11–22 ms high, 125 ms low).
+  three's own `compileAsync` throws if a material is disposed while it polls (hit it on fast speaker swaps), hence the poll.
+- Humans call in over the Link, so they render as a **hologram** of the human body (one override material: fresnel
+  edges, scanlines, flicker, in the speaker's hue). Unknown voices (Iris's recordings, the Helm) get a 2D **waveform
+  emblem**. Voice reactive: NEW `audio.voLevel()` (a 256-sample analyser on the VO bus) drives the eye/glow emissive
+  and the portrait's outer glow (`--vl`).
+- Speakers now name their model: `portrait.model` (Kettle boss_kettle, Halloran boss_halloran, Dray boss_dray, Seraph
+  seraph tier 3, Choir seraph, Rook/Tinsel civ_worker, thug enforcer); others map by kind (rental, ghost, civ_gold…).
+- Frame (css/dialogue.css): a chamfered holo-glass window (gradient edge white→accent→gold, gold tick on the cut corner,
+  glass sheen, fades into the letterbox), sized 0.8 × height so it scales with the letterbox (118x148 at 915x412,
+  ~160x200 at 1280x720); it no longer pushes the choices down.
+- Cost: 6–9 draw calls, 0.2–0.8 ms CPU per frame, only during dialogue; 60 fps held at high 1280x720, high 915x412 and
+  low (bperf.mjs). 0 console errors.
+- Shots: p7/before_after.png (left before, right after), p7/grid_v3_915.png / grid_v3_1280.png (9 speakers), v4_*.png.
+- Framing tightened after review (head + shoulders, headroom for the bosses' hats/halos): p7/grid_v5.png.
+
+## Checkpoint 2 — the soak contract stall (root cause: a Heat death spiral, human-reachable)
+- Reproduced (p7/stall.mjs, same flags as the P6 soak): A1-M5 "Unperson" ends at 3★ (story `setHeat 3`) at L7. Hunting
+  squads arrive every 40 s; the Brawler fights back, each Warden kill adds +½★ (10 s cooldown), so it climbs to 4★:
+  Enforcer squads at L+2 wreck it, a wreck fails the contract, the redeploy only calms enemies within 30 m, the hunters
+  re-acquire after the 4 s shield, and at 4★ the relays are locked so the next story card (A2-M1, Terraces) can't be
+  taken. Heat only decays 1★ per 3 min, so the loop ran for the rest of the soak (77 redeploys, 1 contract in 5 min).
+  A human who fights back at L7–8 walks into exactly this, so it is fixed in the game, not just the bot.
+- Fix: a wreck drops Heat one star (game_state `playerWrecked` → `heatDrop`), the remaining
+  responders stand down and the next squad waits a full interval (heat.js `afterWreck`), toast "Heat down a star · The
+  Wardens logged you as dealt with". (First version skipped story contracts; the re-run soak then looped the same way
+  inside A2-M1 on Heat left over from free roam, so it applies on and off the story.) Bot: at 4★ it skips a story card in
+  another district (relays locked) and takes a local card. test.mjs 30/30 (+1 P7 test; it fails with the fix reverted).
+- Second stall found by the re-run (p7/soak30_run1.log, min 9–30): A2-M1's escortee (Fenn) wedged on a prop 4 m from
+  its first waypoint for 20 min. The nav grid is coarser than the colliders, so the route said "straight line" and
+  `collision.move` slid nowhere. Human-reachable (a contract that can't finish), so fixed in the step: escort now has the
+  same 3 s wedge rescue the tail/race walkers already had (hop to the next route point; log "escort unwedged").
+- Soak re-run 2 (p7/soak30.log, both fixes in): contracts kept completing to the end, 13 at min 11 → 26 at min 30,
+  story A1-M5 → A2-M4 start, L7 → L12, five districts; heap +3.4% (min 5 → 30), 0 console errors. The one dry spell
+  (min 11–16, Heat 3.9) was bot-only: at 4★ it kept clicking cards in other districts and the relay refused each one (a
+  human gets the "Transit Relays locked · Lose some Heat first" toast). The bot now takes only local cards while the
+  relays are locked, rerolls at most once per 30 s, and otherwise waits out the Heat.
+- Regressions: test.mjs 30/30; smoke `auto=1&contracts=1&speed=2` ok, 0 errors; normal boot 156 js, 0 from js/dev.
+- Final soak (p7/soak30.log, all fixes): contracts 1 → 34 over 30 min, never more than ~4 min without one (the gap is
+  the A2-M4 Halloran heist); story A1-M1 → A2-M4, L14, 6 districts; heap +8.6% (min 5 → 30, limit 15%); 0 console
+  errors. Geometries 260 → 418 because this run visited more districts (they settle per district, as in P6).
+- Story replays (story2m.mjs, Brawler): A1-M3, A1-M4 (Kettle), A4-M2 (Rustmother) complete; A2-M5 complete in 76 s on
+  the re-run (the first run of the batch printed no result before 420 s, cause not found).
+
+## Checkpoint 3 — Arcology defend with the Gunner (P3 known issue)
+- Not changed. Ranged enemies only fire at the objective with the same `losClear` the player's shots need
+  (enemies.js), so whoever is damaging the objective can be seen from beside it; a Gunner who holds near the objective
+  isn't blocked for a non-skill reason. The P3 failure is the bot kiting 7 m away behind cover. The quick re-check
+  (voice.mjs D=arcology defend) isn't valid evidence: it sets the bot to L52 against an L29 card, so it passes in 10 s.
+
+## P7 acceptance
+| item | result | evidence |
+|---|---|---|
+| Dialogue portrait redesign (Aaron's flag) | DONE | live 3D bust of each speaker's real model, holo humans, waveform for unknown voices, VO-reactive glow; p7/before_after.png, grid_v3_*.png, grid_v5.png |
+| Contract stall from the P6 soak | FIXED | root causes: Heat death spiral (game), escortee wedge (game), 4★ relay-lock board loop (bot); final soak 34 contracts / 30 min |
+| Arcology defend with the Gunner | checked | no non-skill failure found (LOS is symmetric) |
+| sim tests | PASS | test.mjs 30/30 (+1 P7) |
+| smoke + story replays | PASS | smoke ok; A1-M3, A1-M4, A2-M5, A4-M2 complete |
+| normal boot fetches 0 js/dev | PASS | 156 js, 0 dev |
+| 60 fps on high | PASS | perf.mjs 1280x720 high: avg 60, p95 16.7 ms, 205 calls max, 8 enemies; with a dialogue open: 60 fps, +6–9 calls |
+
+## Known / decisions to review (P7)
+- Every wreck drops Heat one star, story contracts included (A1-M5's scripted 3★ too, once you're wrecked).
+- Humans speak as a hologram of the generic human body (the Walk as Yourself mannequin), tinted by speaker hue; they
+  have no individual faces. Codex and contract-board portraits are still the SVG busts.
+- Speaker data now carries `portrait.model` (Kettle, Halloran, Dray, Seraph, Choir, Rook, Tinsel, thug).

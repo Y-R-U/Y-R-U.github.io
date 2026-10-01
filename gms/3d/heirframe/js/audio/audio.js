@@ -26,7 +26,7 @@ const now = () => (typeof performance !== 'undefined' ? performance.now() : Date
 
 export function createAudio() {
   const hasDOM = typeof window !== 'undefined';
-  let ctx = null, B = null, analyser = null, levelBuf = null;
+  let ctx = null, B = null, analyser = null, levelBuf = null, voAn = null, voBuf = null;
   let decks = [], active = null, primed = false, loopTimer = null;
   let curState = null, curAmbient = null, bed = null, vis = true;
   const rotation = {}, resume = {}, bufCache = new Map(), inflight = new Map();
@@ -54,6 +54,8 @@ export function createAudio() {
     B.sting.connect(B.master);
     B.sfx.connect(B.master);
     B.vo.connect(B.master);
+    voAn = ctx.createAnalyser(); voAn.fftSize = 256; voBuf = new Float32Array(256);
+    B.vo.connect(voAn);
     B.ambient.connect(B.ambientDuck).connect(B.master);
     analyser = ctx.createAnalyser(); analyser.fftSize = 2048;
     levelBuf = new Float32Array(analyser.fftSize);
@@ -443,6 +445,13 @@ export function createAudio() {
     sting,
     sfx,
     vo: (key, opts) => playVo(key, opts),
+    // 0..1 loudness of the playing main VO line (drives the dialogue portrait's glow)
+    voLevel() {
+      if (!voAn || !vo.main) return 0;
+      voAn.getFloatTimeDomainData(voBuf);
+      let s = 0; for (const v of voBuf) s += v * v;
+      return Math.min(1, Math.sqrt(s / voBuf.length) * 5);
+    },
     hasVo: (key) => !!(manifest && manifest[key]),
     voKeys: () => Object.keys(manifest || {}),
     voInfo: (key) => (manifest && manifest[key] ? { text: manifest[key].text, duration: manifest[key].duration, voice: manifest[key].voice } : null),

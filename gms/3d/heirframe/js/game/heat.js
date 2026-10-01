@@ -99,5 +99,8 @@ export function createHeat(ctx) {
     return [e];
   }
 
-  return { update, get stars() { return H.stars; }, responders, standDown, reset() { H.eye = null; H.squads = []; H.t = 8; } };
+  // after a wreck the remaining responders back off and the next squad takes a full wave interval
+  function afterWreck() { standDown(); H.t = Math.max(H.t, 20); H.lastStars = Math.min(5, Math.ceil(sim.state.factions.heat - 1e-6)); }
+
+  return { update, get stars() { return H.stars; }, responders, standDown, afterWreck, reset() { H.eye = null; H.squads = []; H.t = 8; } };
 }

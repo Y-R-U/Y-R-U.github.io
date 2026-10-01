@@ -6,7 +6,7 @@ export function createDialogue(bus, root) {
   const el = h('div.hf-dlg', {
     html: `<div class="lb top"></div><div class="lb bot"></div>
     <div class="dl-box">
-      <div class="dl-portrait"><div class="pf"></div><div class="pscan"></div></div>
+      <div class="dl-portrait"><i class="pglow"></i><div class="pwin"><div class="pf"></div><canvas class="pc"></canvas><div class="pscan"></div></div><i class="ptick"></i></div>
       <div class="dl-body">
         <div class="dl-name"><b></b><span></span></div>
         <div class="dl-text"></div>

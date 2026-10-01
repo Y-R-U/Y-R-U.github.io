@@ -53,5 +53,5 @@ export const SCRIPTS_A5 = {
 
 export const SPEAKERS_A5 = {
   elena: { name: 'Capt. Elena Vael', role: 'Ark Halcyon · log entry', portrait: { kind: 'human', seed: 31 } },
-  choir: { name: 'The Choir', role: '', portrait: { kind: 'gold', seed: 9 } },
+  choir: { name: 'The Choir', role: '', portrait: { kind: 'gold', seed: 9, model: 'seraph' } },
 };

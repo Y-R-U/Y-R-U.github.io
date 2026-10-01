@@ -564,5 +564,19 @@ test('P6: v2 saves migrate (Legacy ever/gen, Voice Hunts open after the finale),
   assert(threw, 'a tampered export is refused');
 });
 
+test('P7: a wreck drops Heat a star, on and off the story', () => {
+  const g = newGame(5);
+  g.state.factions.heat = 3.6;
+  const r = g.playerWrecked();
+  assert(r.heatDrop, 'heat dropped');
+  eq(Math.ceil(g.state.factions.heat - 1e-6), 3, '4★ → 3★');
+  g.state.factions.heat = 0;
+  eq(g.playerWrecked().heatDrop, false, 'no heat, no drop');
+  const b = g.board(); g.acceptContract(b.story.id);
+  g.state.factions.heat = 3;
+  g.playerWrecked();
+  eq(g.state.factions.heat, 2, 'story contract: 3★ → 2★');
+});
+
 console.log(`\n${pass} passed, ${fail} failed${fail ? ': ' + failures.join(', ') : ''}`);
 process.exit(fail ? 1 : 0);

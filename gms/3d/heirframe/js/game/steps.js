@@ -55,8 +55,11 @@ export function createSteps(ctx, run) {
       const t = r[0] || wp;
       const dx = t.x - e.pos.x, dz = t.z - e.pos.z, l = Math.hypot(dx, dz);
       if (l > 0.1) {
-        const sp = e.npc?.speed || 3;
+        const sp = e.npc?.speed || 3, bx = e.pos.x, bz = e.pos.z;
         ctx.world.collision.move(e.pos, dx / l * sp * dt, dz / l * sp * dt, e.radius);
+        // the nav grid is coarser than the colliders: an escortee wedged on a prop for 3 s hops to its next route point
+        e.wedgeT = Math.hypot(e.pos.x - bx, e.pos.z - bz) < sp * dt * 0.2 ? (e.wedgeT || 0) + dt : 0;
+        if (e.wedgeT > 3) { e.wedgeT = 0; const q = r.length > 1 ? r[1] : wp; const n = ctx.nav.nearest(q.x, q.z) || q; e.pos.set(n.x, ctx.world.groundAt(n.x, n.z), n.z); r.shift(); R.ss.route = null; ctx.log?.('escort unwedged'); }
         e.yaw = Math.atan2(dx, dz);
         e.bot.setMove(sp / (e.bot.runSpeed || 4), sp);
         moving = true;

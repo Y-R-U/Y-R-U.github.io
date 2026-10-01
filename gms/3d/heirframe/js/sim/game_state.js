@@ -803,9 +803,16 @@ export function createGame({ seed = 1, state = null, store = null, sites = null,
     S.stats.wrecks++;
     playerCombatant(true);
     const cp = S.contract && (S.contract.mission.checkpoints || S.contract.mission.archetype === 'defend');
-    emit('wreck', { cost, checkpoint: !!cp });
+    // a wreck drops Heat a star: otherwise a 3★ rider who fights back (+½★ per Warden) is hunted and wrecked on a
+    // loop, with the relays locked at 4★ and every contract failing (P7 soak stall)
+    let heatDrop = false;
+    if (S.factions.heat > 0) {
+      setHeat(S.factions, Math.max(0, heatStars(S.factions) - 1)); heatDrop = true;
+      emit('heat', { stars: heatStars(S.factions), changed: true, wreck: true });
+    }
+    emit('wreck', { cost, checkpoint: !!cp, heatDrop });
     if (S.contract && !cp) failContract('wrecked');
-    return { cost, checkpoint: !!cp };
+    return { cost, checkpoint: !!cp, heatDrop };
   }
 
   // ---- combat bridge ------------------------------------------------------------------------

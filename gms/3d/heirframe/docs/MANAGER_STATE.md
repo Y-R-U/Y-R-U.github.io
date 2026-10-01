@@ -93,3 +93,6 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 - 2026-10-01: launched **P6 agent** (af05d504…, sole agent: Landfall, Overclock, Legacy, Succession, Voice Hunts, settings, 60 h soak, low/med perf, coach-after-dev-jump bug). After P6: the manager registers projects.js + a screenshot.
 - 2026-10-02 03:50+: P6 died at the limit (voice relics); resumed via SendMessage.
 - 2026-10-02 08:50+: P6 died at the limit during the 30-min memory soak (checkpoint 7: 60 h soak passed except level 8 pacing + Brawler grunt TTK); resumed.
+- 2026-10-01: **P6 PLAYABLE**, pushed dcea3fde; registered in projects.js + assets/screenshots/heirframe.jpg (3e908283), live verified. Launched **P7 polish** (a3cc7f94…: speaker portrait, soak stall, Gunner defend). After P7: HEIRFRAME only (NEONHAUL removed from our queue per D29).
+- 2026-10-01: Aaron: don't start NEONHAUL (another agent owns it). D29.
+- 2026-10-01 13:50+: P7 died at the limit (before capturing portraits); resumed.

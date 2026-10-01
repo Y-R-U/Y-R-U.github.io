@@ -175,6 +175,7 @@ export const ui = {
     play: lines => dlg.play(lines),
     close: () => dlg.close(),
     get open() { return !!dlg?.open; },
+    get el() { return dlg?.el; },
   },
 
   boss: {

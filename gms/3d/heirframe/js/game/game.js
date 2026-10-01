@@ -26,6 +26,7 @@ import { createHeat } from './heat.js';
 import { createDayNight } from './daynight.js';
 import { createFinale, EPILOGUE_LINE } from './finale.js';
 import { createEndless } from './endless.js';
+import { createBust } from './bust.js';
 
 export const RUN_ARCH = ['courier', 'pest', 'retrieve', 'surveil', 'bounty', 'escort', 'sabotage', 'hack', 'tail', 'infiltrate', 'transport', 'defend', 'repo', 'race', 'assassinate', 'rescue', 'heist', 'wetwork'];
 export const RUN_TWISTS = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12'];
@@ -207,6 +208,7 @@ export async function createGame(api) {
       if (Math.hypot(e.home.x - rx, e.home.z - rz) < 20) e.home.set(e.pos.x, 0, e.pos.z);
     }
     for (const e of G.enemies.list) if (e.mission && e.state !== 'dead' && Math.hypot(e.pos.x - rx, e.pos.z - rz) < 16) { e.state = 'idle'; e.c.alerted = false; e.hunter = false; e.bot.setAlert(0); }
+    if (r.heatDrop) { G.heat?.afterWreck?.(); setTimeout(() => ui?.toast('Heat down a star', 'info', { sub: 'The Wardens logged you as dealt with' }), 900); }
     G.spawnShield = 4;
     player.teleport(rx, rz, Math.PI);
     rig.target.copy(player.pos); rig.snap();
@@ -402,7 +404,7 @@ export async function createGame(api) {
   async function rookTalk() {
     const cost = G.sim.state.player ? Math.round(150 * Math.pow(1.09, G.sim.state.player.level - 1)) : 150;
     const heat = G.sim.state.factions.heat > 0;
-    const who = { speaker: 'Rook', role: 'Parts & Rumours · the Stacks', portrait: { kind: 'robot', seed: 13 } };
+    const who = { speaker: 'Rook', role: 'Parts & Rumours · the Stacks', portrait: { kind: 'robot', seed: 13, model: 'civ_worker' } };
     const i = await ui?.dialogue.show({ ...who, text: 'Easy, rider. Buying, selling, or listening?', choices: ['Heard anything?', heat ? `Clean Slate: wipe my Heat (${cost} cr)` : 'Clean Slate (no Heat on you)', 'Just passing.'] });
     if (i === 0) await ui.dialogue.show({ ...who, text: ROOK_RUMOURS[Math.floor(Math.random() * ROOK_RUMOURS.length)] });
     else if (i === 1 && heat) { const r = G.sim.cleanSlate(); if (r.ok) { ui.toast('Heat wiped', 'good', { sub: 'Rook knows a man in the records office' }); audio.sfx('credits'); } else ui.toast('Not enough credits', 'warn'); }
@@ -428,7 +430,7 @@ export async function createGame(api) {
   async function informantTalk(id) {
     const S = G.sim.state, used = (S.flags.informant ||= {}), fresh = used[id] !== S.shiftIndex;
     const K = id === 'kettle';
-    const who = K ? { speaker: 'Big Kettle', role: 'Silverhand Syndicate · informant', portrait: { kind: 'black', seed: 4 } } : { speaker: 'Warden-Captain Halloran', role: 'Concord security · informant', portrait: { kind: 'robot', seed: 6 } };
+    const who = K ? { speaker: 'Big Kettle', role: 'Silverhand Syndicate · informant', portrait: { kind: 'black', seed: 4, model: 'boss_kettle' } } : { speaker: 'Warden-Captain Halloran', role: 'Concord security · informant', portrait: { kind: 'robot', seed: 6, model: 'boss_halloran' } };
     if (!fresh) { await ui?.dialogue.show({ ...who, text: K ? "Tap's dry, rental. Come back next shift." : 'You had your routes. Next shift.' }); return; }
     const vo = K ? `b_kettle_tip_0${1 + (S.shiftIndex % 3)}` : `b_halloran_informant_0${1 + (S.shiftIndex % 2)}`;
     const i = await ui?.dialogue.show({ ...who, voiceKey: vo, text: audio.voInfo(vo)?.text || '', choices: [K ? 'Take the tip (fresh board)' : 'Take the routes (−2★ Heat)', 'Not now.'] });
@@ -722,6 +724,7 @@ export async function createGame(api) {
     G.frames.sync();
     G.finale = createFinale(G, { world, robots: api.robots, tier: api.tier, player, fx, audio, ui: ui || null, rig });
     G.succession = createEndless(G, { ui: ui || null, audio, fx, player, log });
+    try { G.bust = ui ? createBust({ world, robots: api.robots, tier: api.tier, ui, audio }) : null; } catch (e) { console.warn('bust', e); }
     sim.on('frame:swap', (p) => { G.frames.deploy(p.frame); log('deploy ' + p.frame.archetype); });
     sim.on('frame:mk', (p) => { if (p.frame.uid === sim.state.activeFrame) G.frames.deploy(p.frame, { reason: 'mk' }); });
     sim.on('frame:buy', (p) => { if (sim.ownedFrames().length === 1) G.frames.podNext(); log('frame:buy ' + p.frame.archetype); setTimeout(() => audio.bark('b_hira_ownframe_', { cooldown: 60 }), 4000); });
@@ -802,6 +805,7 @@ export async function createGame(api) {
     G.devTick?.(dt);
     stepGap -= dt;
     fx.update(dt, world.camera);
+    G.bust?.update(rawDt);
     if (G.state === 'title' || G.state === 'boot') {
       titleCam(dt);
       player.update(dt, null);
