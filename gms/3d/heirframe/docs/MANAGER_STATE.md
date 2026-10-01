@@ -99,3 +99,4 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 - 2026-10-01: **P7 DONE** (3D speaker busts; heat spiral, escortee and autopilot fixes; soak 1→34 contracts in 30 min). Pushed; live check done. No agent running. Open: human speakers are a faceless hologram mannequin; codex/board portraits are still SVG.
 - 2026-10-01: Aaron proposed anonymous avatars for humans → D30 Veils. Launched the P8 veils agent (sole).
 - 2026-10-01: **P8 Veils DONE** (D30, Mara Flux+LTX ping-pong; start=end loop rejected: near-still and snaps at frame 89). Pushed 64e97b23; live check done. No agent running; waiting for Aaron's playtest.
+- 2026-10-01: Aaron playtest → fixes by the manager: the pause/panel freeze (enemies/boss/props/dayNight were still ticking; proved by a control run, HP 120→32 unpaused vs 120 paused), the DEV pill moved mid-left and enlarged, ?god=1&onehit=1. Pushed 8a1d7e00.

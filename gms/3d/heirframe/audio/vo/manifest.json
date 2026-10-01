@@ -341,14 +341,14 @@
   "qc": []
  },
  "a1_s00_hira_02": {
-  "text": "Link stable. Latency: zero milliseconds! Wow, that's... unusually good. Anyway!",
+  "text": "Link stable. Latency: zero milliseconds! Wow, that's... unusually good. Anyway, enjoy your shift!",
   "voice": "hira",
   "voice_name": "Heirframe · HIRA",
   "file": "a1_s00_hira_02.mp3",
-  "duration": 7.16,
+  "duration": 9.03,
   "seed": 42,
-  "job_id": "8ae39a9d94fb4aaea8ba8624c1c3e721",
-  "sig": "7704bbf20c7d",
+  "job_id": "827e51bc95ab4b7c8a9ac13a9b469fec",
+  "sig": "931a92cad211",
   "qc": []
  },
  "a1_s00_harmony_01": {

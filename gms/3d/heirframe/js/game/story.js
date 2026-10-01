@@ -69,8 +69,12 @@ export function createStoryPlayer(ctx) {
     const starts = beats.filter((b) => b.trigger === trigger && ok(b));
     try {
       for (let b of starts) {
+        let prev = null;
         while (b) {
+          // a breath between spoken lines; a longer one when someone else starts talking
+          if (prev?.speaker && b.speaker && (b.mode === 'bark' || b.mode === 'dlg')) await wait(prev.speaker === b.speaker ? 450 : 900);
           await beat(b);
+          prev = b;
           b = beats.find((x) => x.trigger === `after:${b.n}`);
           if (b && b.mode !== 'dlg' && ui.dialogue.open) ui.dialogue.close();
         }

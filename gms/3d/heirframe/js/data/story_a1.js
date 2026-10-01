@@ -12,7 +12,7 @@ export const SCRIPTS = {
     { n: 1, trigger: 'newGame', mode: 'card', lines: ['LULLABY REST — POD 4471', "Occupant: WARD-4471 'WREN' · Ward status: DISCHARGED (age 22) · Ward debt: 3,140 cr"], ms: 4000, sfx: ['pod_hum', 'heartbeat'] },
     { n: 2, trigger: 'after:1', mode: 'card', lines: ['LINKING… HireFrame R-1 · Aurum Plaza'], ms: 1500, fx: 'eyes_open' },
     { n: 3, trigger: 'spawn', mode: 'bark', speaker: 'hira', vo: 'a1_s00_hira_01', text: 'Good morning, valued rider! Welcome to HireFrame. Your R-1 is ready for another brighter day!' },
-    { n: 4, trigger: 'after:3', mode: 'bark', speaker: 'hira', vo: 'a1_s00_hira_02', text: "Link stable. Latency: zero milliseconds! Wow, that's... unusually good. Anyway!" },
+    { n: 4, trigger: 'after:3', mode: 'bark', speaker: 'hira', vo: 'a1_s00_hira_02', text: "Link stable. Latency: zero milliseconds! Wow, that's... unusually good. Anyway, enjoy your shift!" },
     { n: 5, trigger: 'after:4', mode: 'bark', speaker: 'harmony', vo: 'a1_s00_harmony_01', text: 'Good morning, Halcyon. Renewal Day is one hundred days away. Two hundred and twenty-five years of unity. The journey continues.', fx: 'billboards_face' },
     { n: 6, trigger: 'after:5', mode: 'dlg', speaker: 'mara', vo: 'a1_s00_mara_01', text: "Wren? It's Mara. Quill Contracts, the kiosk by the fountain. You said you wanted work." },
     { n: 7, trigger: 'after:6', mode: 'dlg', speaker: 'mara', vo: 'a1_s00_mara_02', text: "I've got a parcel that needs legs. Yours are rented, but they'll do.",

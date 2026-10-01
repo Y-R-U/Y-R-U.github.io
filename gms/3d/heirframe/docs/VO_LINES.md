@@ -15,7 +15,7 @@ Status: v1, 2026-09-26. **Audience:** the audio agent (Qwen TTS 1.7B, Voice Stud
 | key | voice | line | P | style |
 |---|---|---|---|---|
 | a1_s00_hira_01 | hira | Good morning, valued rider! Welcome to HireFrame. Your R-1 is ready for another brighter day! | P0 | chirpy, ad-read |
-| a1_s00_hira_02 | hira | Link stable. Latency: zero milliseconds! Wow, that's... unusually good. Anyway! | P0 | puzzled, then bright |
+| a1_s00_hira_02 | hira | Link stable. Latency: zero milliseconds! Wow, that's... unusually good. Anyway, enjoy your shift! | P0 | puzzled, then bright |
 | a1_s00_harmony_01 | harmony | Good morning, Halcyon. Renewal Day is one hundred days away. Two hundred and twenty-five years of unity. The journey continues. | P0 | serene PA |
 | a1_s00_mara_01 | mara | Wren? It's Mara. Quill Contracts, the kiosk by the fountain. You said you wanted work. | P0 | brisk, warm |
 | a1_s00_mara_02 | mara | I've got a parcel that needs legs. Yours are rented, but they'll do. | P0 | dry |
