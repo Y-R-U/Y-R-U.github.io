@@ -82,9 +82,9 @@ const ctf = {
       return true;
     };
     const ps = home('blue');
-    ctx.player.teleport(ps.x + 3, ps.y + 0.02, ps.z);
+    ctx.player.teleport(ps.x + 2, ps.y + 0.02, ps.z + 3);
     ctx.player.yaw = -Math.PI / 2; ctx.player.pitch = -0.08;
-    ctx.game.setSpawn({ x: ps.x + 3, y: ps.y, z: ps.z });
+    ctx.game.setSpawn({ x: ps.x + 2, y: ps.y, z: ps.z + 3 });
     this.invuln = 0;
     mg.hud.objective('Grab the red flag!');
     this.drawScore();

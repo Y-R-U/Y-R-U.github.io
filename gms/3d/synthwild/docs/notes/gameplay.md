@@ -233,6 +233,37 @@ Final results on seed `synthwild` (starter outpost 80 m away):
 - **Lane 5:** please add the `treeFelling` toggle (default **true**, "Tree felling: chop the bottom log, the tree comes down")
   and a `treeFall` SFX (a creaking whoosh).
 
+## Mini-games (lane 4 part: bots, CTF, Hide & Seek, Glitch Siege)
+| File | What |
+|---|---|
+| `js/minigames/bots/path.js` | pure A* on the cell grid: walk 8-dir (no corner cutting), step up 1, drop ≤ 3, straight gap-jump ≤ 2; `snap`, `findPathClosest`; optional `grid.avoid(x,y,z)` adds cost to a floor cell (Floor Fall cracks) |
+| `js/minigames/bots/bot.js` | `Bot`: kinematic path following (arcs for steps/jumps/drops), gravity when the floor vanishes, repath every ~1.3 s or when the next node breaks, stuck watchdog (no progress 5 s / no path 6 s → hop to a reachable cell nearer the goal). `BOT_LEVELS` easy/normal/hard (speed, reaction, aim, caution) from `minigamesBots` |
+| `js/minigames/bots/view.js` | bodies = lane 3's `createAvatar()` recoloured per team (suit + seams), team ring, name tag. `TEAMS` blue/red/green/gold |
+| `js/minigames/bots/index.js` | `BotSquad(ctx,{level})`: `add/remove/clear/update(dt)` (3 path searches per frame shared), `los(a,b)`, `onTag(bot)`. Bots are taggable through `game.mobs.extra`, so lane 3's normal primary-hit (`mobs.raycast` → `game.attack`) tags them |
+| `js/minigames/bots/arena.js` | `fill/put/pad/ring/W/mat/cellOf` (cell coords relative to `arena.origin`); lane 5's arena.js re-exports them |
+| `js/minigames/games/ctf.js` | 45×25 arena, bases at ±18 with flag pads, cover walls, a climbable centre tower, hop trenches. You + 2 Blue vs 3 Red. Tap a Red to tag it; bots tag only in their own half or whoever carries their flag (reaction delay). Carriers glow, leave a spark trail and are 18% slower; dropped flags go home after 12 s or when a teammate touches them. 3 captures or the most in 6 min. Red raids come in waves (a cautious second attacker) |
+| `js/minigames/games/hideseek.js` | village: 6 enterable huts (door + back window + lamp), hedges, crates, 2 trees. **Hide**: 30 s + 16 loam blocks, then the Seeker drone patrols (street sweep alternating with a door peek per hut, about 1 min per lap) with a visible cone that turns red as it locks on (0.75 s of sight = spotted; touching it = spotted). Survive 2 min. **Seek** (`seekGame`): 4 Rivals walk to hiding spots while you count 15 s; find (see within 2.2 m, or tap) all in 3 min; a ping every 30 s gives a direction toast + spark trail |
+| `js/minigames/games/siege.js` | 27×27 walled arena, 4 gates into closed spawn bays, a 2×2×2 Core (60 HP, spinning crystal + HP ring). 5 waves (3 → 12 mobs; reboots, glitchfuses, archers; ×0.65/1/1.35 by bot level). 30 s then 20 s build phases with 24 bricks; ferrite blade, Pulse Bow + 48 charges, bread. Mobs go for the Core unless you're within 6; blocked mobs smash bricks (glitchfuses fuse and EMP nearby bricks); 25 s without progress → back to their gate |
+Game-lane hooks for mini-games (`session.mode === 'minigame'`): no natural spawns, no sun burn, survival frozen unless
+`session.mgSurvival`, no breaking unless `session.mgBreak`, no journal, respawn after 2 s without the "calm" clean-up.
+Mobs support `m.target = { box, aggro, hurt(n) }` (siege), and bolts can hit `extraTarget`.
+Cracking glass: block 56 `glass_crack` (appended to blocks.js, `crystal` pattern with `veins` fallback); Floor Fall uses it
+and its bots' paths avoid cracking tiles (`squad.grid.avoid`).
+
+**Tests**: `node tools/mg_bots_test.mjs` (27): path moves (door, step 1 but not 2, gap 2 but not 3, drop 3), a bot crossing a
+door + step + gap, sealed goals (gets close, never freezes), falling when the floor goes, difficulty speeds, avoiding
+cracks, and arena reachability built into a stub world: CTF bases ↔ flags and tower, every Hide & Seek spot from the plaza,
+every Siege gate → Core. That test caught the hut floors being raised by `hollow` (fixed).
+In the real game (`q=low`, through lane 5's `shell.playMinigame`, which needs the shell kept un-paused when headless):
+CTF 90 s idle player → bots raid, tag, return flags, never stuck (score 0–0 to 0–2 depending on tuning); Hide in the open →
+spotted at 36 s, in a hut corner → spotted at 90 s (wall yourself in to win); Seek → all 4 bots reach their spots in time,
+no stuck; Siege with an auto-attacker → all 5 waves won, Core at 65% (2 stars). 60 fps headless.
+
+### Requests to the minigame framework
+- Headless/automation: the shell pauses when pointer lock is lost, so tests have to keep calling `shell.resume()`. A
+  `?mgtest=<id>` flag that starts a game un-pausable would make CI-style runs simpler.
+- Lane 5's death popup should stay hidden in mini-games (the game lane auto-respawns after 2 s there).
+
 ## How to test
 - `node tools/game_test.mjs`
 - Viewer: `http://localhost:8861/gms/3d/synthwild/tools/game_mobview.html?mob=glitchfuse&fuse=0.8`

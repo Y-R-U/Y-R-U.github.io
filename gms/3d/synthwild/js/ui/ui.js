@@ -56,12 +56,13 @@ export const ui = {
     });
     ui.shell = createShell(ctx, root, ui);
     ui.cmd = createCommandBar(ctx, root, ui);
+    if (window.__game) window.__game.shell = ui.shell;
 
     const inp = ctx.input;
     if (inp?.on) {
       inp.on('inventory', () => ui.toggle('inventory'));
       inp.on('wheel', () => ui.toggle('wheel'));
-      inp.on('pause', () => { if (ui.cmd?.isOpen) { ui.cmd.close(); return; } if (panel || ctx.game?.stations?.isOpen) ui.closePanels(); else if (ui.shell.state === 'playing') ui.shell.pause(); else if (ui.shell.state === 'paused') ui.shell.resume(); });
+      inp.on('pause', () => { if (ui.cmd?.isOpen) { ui.cmd.close(); return; } if (ui.shell.noAutoPause && ui.shell.state === 'playing' && !panel) return; if (panel || ctx.game?.stations?.isOpen) ui.closePanels(); else if (ui.shell.state === 'playing') ui.shell.pause(); else if (ui.shell.state === 'paused') ui.shell.resume(); });
       inp.on('toggleView', () => settings.set('view', settings.get('view') === 'first' ? 'third' : 'first'));
     }
     // Esc on desktop while the pointer is free: pause (input only emits when unlocked)
@@ -86,7 +87,11 @@ export const ui = {
       settings.set('introSeen', true);
       ui.shell.adopt();
     } else if (q.has('intro')) ui.shell.runIntro(true).then(() => ui.shell.start());
-    else if (q.has('play')) {
+    else if (q.has('mgtest')) {
+      settings.set('introSeen', true);
+      ui.shell.noAutoPause = true;
+      ui.shell.playMinigame(q.get('mgtest'), { variant: q.get('variant') || undefined });
+    } else if (q.has('play')) {
       ui.shell.play({ id: null, temp: true, name: 'Test world', seed: q.get('seed') || 'synthwild', mode: q.get('mode') || 'survival', difficulty: 'normal', source: 'local', mine: true }, { fresh: true });
     } else ui.shell.start();
   },
@@ -135,7 +140,7 @@ function duskWarning() {
 }
 
 function showDeath() {
-  if (deathEl || !root) return;
+  if (deathEl || !root || ctxRef?.session?.mode === 'minigame') return;
   const ctx = ctxRef;
   const keep = settings.get('keepInventory');
   const where = ctx.game?.spawnPoint ? 'at your Sleep Pod' : 'at the landing site';

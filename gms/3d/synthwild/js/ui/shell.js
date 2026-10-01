@@ -264,11 +264,12 @@ export function createShell(ctx, root, ui) {
   }
 
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden && (st.state === 'playing' || st.state === 'paused')) { save('hide'); if (st.state === 'playing') pause(); }
+    if (document.hidden && (st.state === 'playing' || st.state === 'paused')) { save('hide'); if (st.state === 'playing' && !shellApi.noAutoPause) pause(); }
   });
   addEventListener('pagehide', () => { if (st.state === 'playing' || st.state === 'paused') save('hide'); });
 
-  return {
+  const shellApi = {
+    noAutoPause: false,
     get state() { return st.state; },
     get meta() { return meta; },
     start: showTitle,
@@ -287,4 +288,5 @@ export function createShell(ctx, root, ui) {
     },
     preload: preloadIntro,
   };
+  return shellApi;
 }
