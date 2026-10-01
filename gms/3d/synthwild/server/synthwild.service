@@ -1,0 +1,27 @@
+[Unit]
+Description=synthwild — SYNTHWILD accounts + world saves (games.br8t.com/gms/3d/synthwild/)
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/srv/apps/synthwild
+ExecStart=/srv/apps/synthwild/synthwild
+Restart=on-failure
+RestartSec=3
+Environment=SYNTHWILD_ADDR=127.0.0.1:8011
+Environment=SYNTHWILD_DATA=/srv/data/synthwild
+Environment=SYNTHWILD_PREFIX=/gms/3d/synthwild
+Environment=SYNTHWILD_PUBLIC_URL=https://games.br8t.com/gms/3d/synthwild
+Environment=GOMEMLIMIT=96MiB
+MemoryMax=192M
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/srv/data/synthwild
+
+[Install]
+WantedBy=multi-user.target

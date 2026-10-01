@@ -1,0 +1,51 @@
+/* Station panels (lane 4). Builds on lane 5's .sw-inv glass panel, .sw-slot and .sw-grid. */
+.sw-st { width: min(860px, calc(100% - 16px)); }
+.sw-st header { padding: 6px 8px 6px 14px; }
+.sw-st-title { flex: 1; font-family: var(--display); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: calc(14px * var(--ui)); color: var(--teal); }
+.sw-st-x { min-height: calc(34px * var(--ui)); padding: 4px 10px; }
+.sw-st-body { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 10px 12px; min-height: 0; overflow: hidden; }
+.sw-st-left { min-width: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+.sw-st-inv { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+.sw-st .lab { font-size: calc(11px * var(--ui)); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin: 2px 0 0 2px; }
+.sw-st .hint, .sw-fab-list .hint { color: var(--ink-3); font-size: calc(12px * var(--ui)); line-height: 1.35; margin: 2px 2px; }
+.sw-st .sw-grid { grid-template-columns: repeat(9, calc(34px * var(--ui))); gap: 3px; }
+.sw-st .sw-grid .sw-slot { width: calc(34px * var(--ui)); height: calc(34px * var(--ui)); }
+
+/* fabrication list */
+.sw-fab-list { display: flex; flex-direction: column; gap: 5px; }
+.sw-fab-card {
+  appearance: none; display: grid; grid-template-columns: calc(36px * var(--ui)) 1fr; grid-template-rows: auto auto; column-gap: 10px;
+  align-items: center; text-align: left; padding: 6px 10px; border-radius: 11px; cursor: pointer;
+  background: rgba(70, 240, 212, .08); border: 1px solid rgba(70, 240, 212, .3); color: var(--ink);
+  transition: background .12s, transform .08s;
+}
+.sw-fab-card:hover { background: rgba(70, 240, 212, .16); }
+.sw-fab-card:active { transform: scale(.98); }
+.sw-fab-card .out { grid-row: span 2; width: calc(36px * var(--ui)); height: calc(36px * var(--ui)); }
+.sw-fab-card .nm { font-weight: 700; font-size: calc(14px * var(--ui)); }
+.sw-fab-card .nm em { font-style: normal; color: var(--teal); }
+.sw-fab-card .ings { display: flex; flex-wrap: wrap; gap: 8px; font-size: calc(12px * var(--ui)); color: var(--ink-2); }
+.sw-fab-card .ing { display: inline-flex; align-items: center; gap: 2px; }
+.sw-fab-card .ing img { width: calc(18px * var(--ui)); height: calc(18px * var(--ui)); }
+.sw-fab-card .ing.short { color: var(--red); font-weight: 700; }
+.sw-fab-card.dim { background: rgba(255, 255, 255, .03); border-color: rgba(255, 255, 255, .08); cursor: default; }
+.sw-fab-card.dim .out, .sw-fab-card.dim .nm { opacity: .5; }
+.sw-fab-card:disabled { pointer-events: none; }
+
+/* oven */
+.sw-oven { display: flex; align-items: center; gap: 18px; padding: 6px 4px; }
+.sw-oven .col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.sw-oven .cap { font-size: calc(11px * var(--ui)); color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; }
+.sw-oven .sw-slot { width: calc(48px * var(--ui)); height: calc(48px * var(--ui)); cursor: pointer; }
+.sw-oven-flame { width: 14px; height: 22px; border-radius: 7px 7px 4px 4px; background: rgba(255, 255, 255, .08); position: relative; overflow: hidden; }
+.sw-oven-flame b { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(0deg, #ff6a2a, #ffd25e); }
+.sw-oven-flame.on { box-shadow: 0 0 12px rgba(255, 140, 50, .7); }
+.sw-oven-arrow { width: 70px; height: 12px; border-radius: 6px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.sw-oven-arrow b { display: block; height: 100%; background: linear-gradient(90deg, var(--teal-d), var(--teal)); box-shadow: 0 0 10px var(--teal); }
+
+@media (max-height: 460px) {
+  .sw-st .sw-grid { grid-template-columns: repeat(9, calc(30px * var(--ui))); gap: 2px; }
+  .sw-st .sw-grid .sw-slot { width: calc(30px * var(--ui)); height: calc(30px * var(--ui)); border-radius: 7px; }
+  .sw-st-body { padding: 6px 8px; gap: 8px; }
+  .sw-fab-card { padding: 4px 8px; }
+}

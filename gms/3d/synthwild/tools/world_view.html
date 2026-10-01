@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Synthwild world view</title>
+<style>
+  body { margin: 0; background: #0b1020; color: #cfe; font: 13px system-ui, sans-serif; }
+  #info { position: fixed; left: 8px; top: 8px; background: #0b1020cc; padding: 6px 10px; border-radius: 6px; white-space: pre; }
+  canvas { display: block; margin: 0 auto; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<div id="info">loading…</div>
+<canvas id="c"></canvas>
+<script type="module">
+// top-down debug map: ?seed=&r=8&scale=3 ; shows surface colour, height shading, water depth, light
+import { World } from '../js/world/world.js';
+import { BLOCKS, BLOCK } from '../js/data/blocks.js';
+
+const q = new URLSearchParams(location.search);
+const seed = q.get('seed') || 'synthwild';
+const R = +(q.get('r') || 8), scale = +(q.get('scale') || 3);
+const world = new World({ seed });
+const sx = q.has('x') ? +q.get('x') : world.spawn[0], sz = q.has('z') ? +q.get('z') : world.spawn[2];
+const biomeMode = q.get('mode') === 'biome';
+const BCOL = { forest: [0.2, 0.6, 0.25], shore: [0.9, 0.85, 0.6], ocean: [0.2, 0.45, 0.85], desert: [0.95, 0.75, 0.35], mountains: [0.6, 0.6, 0.7], plains: [0.6, 0.9, 0.5], deep_ocean: [0.08, 0.18, 0.5] };
+const info = document.getElementById('info');
+const t0 = performance.now();
+let done = false;
+window.__wv = { world, done: false };
+
+function frame() {
+  world.update(sx, sz, R);
+  const total = [...world.chunks.keys()].length;
+  info.textContent = `seed ${seed}  chunks ${total}  pending ${world.pendingCount()}  ${(performance.now() - t0).toFixed(0)} ms`;
+  if (!world.pendingCount() && total > 0 && !done) { done = true; draw(); return; }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+function draw() {
+  const loadMs = performance.now() - t0;
+  const pcx = Math.floor(sx / 16), pcz = Math.floor(sz / 16);
+  const N = (2 * R + 1) * 16;
+  const cv = document.getElementById('c');
+  cv.width = N; cv.height = N;
+  cv.style.width = N * scale + 'px'; cv.style.height = N * scale + 'px';
+  const ctx = cv.getContext('2d');
+  const img = ctx.createImageData(N, N);
+  const x0 = (pcx - R) * 16, z0 = (pcz - R) * 16;
+  const biomes = {};
+  for (let z = 0; z < N; z++) for (let x = 0; x < N; x++) {
+    const wx = x0 + x, wz = z0 + z, p = (x + z * N) * 4;
+    if (!world.isChunkLoaded(wx >> 4, wz >> 4)) { img.data[p + 3] = 255; continue; }
+    const bn = world.biomeAt(wx, wz); biomes[bn] = (biomes[bn] || 0) + 1;
+    let y = 127, m = 0, wat = 0;
+    for (; y >= 0; y--) {
+      m = world.getCell(wx, y, wz);
+      if (m === BLOCK.WATER) { wat++; continue; }
+      if (m !== 0) break;
+    }
+    const col = biomeMode ? BCOL[bn] : m > 0 ? BLOCKS[m].color : [1, 0, 1];
+    const hl = world.getCell(wx - 1, y, wz) > 0 && world.getCell(wx - 1, y, wz) !== BLOCK.WATER ? 0.85 : 1;
+    const f = (0.55 + (y - 20) / 100) * hl;
+    let r = col[0] * f, g = col[1] * f, b = col[2] * f;
+    if (wat) { const k = Math.min(0.85, 0.35 + wat * 0.05); r = r * (1 - k) + 0.1 * k; g = g * (1 - k) + 0.45 * k; b = b * (1 - k) + 0.8 * k; }
+    img.data[p] = r * 255; img.data[p + 1] = g * 255; img.data[p + 2] = b * 255; img.data[p + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  ctx.fillStyle = '#f0f'; ctx.fillRect(sx - x0 - 2, sz - z0 - 2, 5, 5);
+  const st = world.stats;
+  const res = {
+    chunks: world.chunks.size, loadMs: Math.round(loadMs),
+    workerAvgMs: +(st.workerMs / st.generated).toFixed(2), genAvgMs: +(st.genMs / st.generated).toFixed(2),
+    applyAvgMs: +(st.applyMs / st.generated).toFixed(2), workers: world._workers.length, biomes,
+  };
+  info.textContent = JSON.stringify(res, null, 1);
+  if (q.has('bench')) bench(res); else Object.assign(window.__wv, res, { done: true });
+}
+
+// warm benchmark: workers are JIT-warm now; load a fresh disc nearby and time only that
+function bench(res) {
+  const st = world.stats, g0 = st.generated, w0 = st.workerMs, gm0 = st.genMs;
+  const bx = sx + (2 * R + 3) * 16;
+  const tb = performance.now();
+  const step = () => {
+    world.update(bx, sz, R);
+    if (world.pendingCount() || world.stats.generated - g0 < 50) return requestAnimationFrame(step);
+    const n = world.stats.generated - g0;
+    Object.assign(res, { warmChunks: n, warmWorkerMs: +((world.stats.workerMs - w0) / n).toFixed(2), warmGenMs: +((world.stats.genMs - gm0) / n).toFixed(2), warmLoadMs: Math.round(performance.now() - tb) });
+    info.textContent = JSON.stringify(res, null, 1);
+    Object.assign(window.__wv, res, { done: true });
+  };
+  requestAnimationFrame(step);
+}
+</script>
+</body>
+</html>

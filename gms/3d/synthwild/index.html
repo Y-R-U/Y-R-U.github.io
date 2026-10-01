@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b1650">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Synthwild</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0b1650; overscroll-behavior: none; touch-action: none;
+    -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+  #game { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  #ui-root { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+  #ui-root > * { pointer-events: auto; }
+  #boot { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at 50% 40%, #1d3a8a 0%, #0b1650 60%, #060b2a 100%); color: #bff6ff;
+    font: 600 16px/1.4 system-ui, sans-serif; letter-spacing: .04em; text-align: center; }
+  #boot b { font-size: 34px; letter-spacing: .3em; color: #fff; text-shadow: 0 0 18px #4ad7ff, 0 0 2px #fff; }
+  #boot .seed { width: 46px; height: 46px; margin: 22px; border-radius: 50%; border: 2px solid #5cf2ff;
+    box-shadow: 0 0 24px #5cf2ff inset, 0 0 18px #5cf2ff; animation: grow 1.6s ease-in-out infinite; }
+  @keyframes grow { 50% { transform: scale(1.25); box-shadow: 0 0 40px #ff7be0 inset, 0 0 30px #ff7be0; border-color: #ff7be0; } }
+  #boot button { margin-top: 16px; font: 700 15px system-ui; padding: 10px 22px; border-radius: 22px; border: 0; color: #062033;
+    background: linear-gradient(#9ffcff, #4ad7ff); display: none; }
+  #rotate { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; flex-direction: column;
+    background: #0b1650; color: #bff6ff; font: 600 18px/1.4 system-ui, sans-serif; text-align: center; padding: 24px; }
+  #rotate .ph { width: 44px; height: 76px; border: 3px solid #5cf2ff; border-radius: 9px; margin-bottom: 18px;
+    animation: rot 2s ease-in-out infinite; box-shadow: 0 0 18px #5cf2ff; }
+  @keyframes rot { 40%, 70% { transform: rotate(-90deg); } }
+  @media (orientation: portrait) and (pointer: coarse) { #rotate { display: flex; } }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "../../lib/three/0.180.0/three.module.js",
+  "three/addons/": "../../lib/three/0.180.0/addons/"
+} }
+</script>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="ui-root"></div>
+<div id="boot"><b>SYNTHWILD</b><div class="seed"></div><div id="boot-msg">Growing the wild…</div><button id="boot-reload">Reload</button></div>
+<div id="rotate"><div class="ph"></div>Turn your device sideways to play</div>
+<script>
+// Classic watchdog: the module graph can hang or fail silently, so this must not depend on it.
+(function () {
+  var errs = [];
+  window.addEventListener('error', function (e) { errs.push((e.message || 'error') + (e.filename ? ' @' + e.filename.split('/').pop() + ':' + e.lineno : '')); }, true);
+  window.addEventListener('unhandledrejection', function (e) { errs.push('promise: ' + (e.reason && e.reason.message || e.reason)); });
+  setTimeout(function () {
+    if (window.__bootReady) return;
+    var msg = document.getElementById('boot-msg'), btn = document.getElementById('boot-reload');
+    var all = errs.concat(window.__bootErrors || []);
+    if (msg) msg.textContent = 'Synthwild is taking too long to start.' + (all.length ? ' (' + all[0] + ')' : ' Try reloading.');
+    if (btn) {
+      btn.style.display = 'block';
+      btn.onclick = function () { var u = new URL(location.href); u.searchParams.set('r', Date.now()); location.replace(u.href); };
+    }
+  }, 20000);
+})();
+</script>
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>

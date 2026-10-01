@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Synthwild player harness</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#8fd3ff;touch-action:none}
+  canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+  #ui-root{position:fixed;inset:0;pointer-events:none}
+  #dbg{position:fixed;left:8px;top:58px;font:11px ui-monospace,monospace;color:#022;background:rgba(255,255,255,.55);padding:4px 6px;border-radius:6px;pointer-events:none;white-space:pre}
+</style>
+<script type="importmap">{ "imports": { "three": "../../../lib/three/0.180.0/three.module.js" } }</script>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="ui-root"></div>
+<div id="dbg"></div>
+<script type="module">
+import * as THREE from 'three';
+import { createBus } from '../js/core/bus.js';
+import { StubWorld, BLOCKS } from './player_stubworld.js';
+import { input } from '../js/player/input.js';
+import { player } from '../js/player/player.js';
+import { brush } from '../js/player/brush.js';
+
+const q = new URLSearchParams(location.search);
+const canvas = document.getElementById('game');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x8fd3ff);
+scene.fog = new THREE.Fog(0x8fd3ff, 30, 70);
+const camera = new THREE.PerspectiveCamera(75, 1, 0.05, 200);
+scene.add(new THREE.HemisphereLight(0xdff6ff, 0x4a5a3a, 1.4));
+const sun = new THREE.DirectionalLight(0xfff2d8, 1.6); sun.position.set(20, 40, 10); scene.add(sun);
+
+const world = new StubWorld();
+const settingsVals = { autoJump: true, view: q.get('view') || 'first', fov: 75, sensitivity: 1, leftHanded: q.has('lh') };
+const settingsL = {};
+const settings = {
+  get: k => settingsVals[k], set(k, v) { settingsVals[k] = v; (settingsL[k] || []).forEach(f => f(v)); },
+  on(k, f) { (settingsL[k] ||= []).push(f); return () => {}; },
+};
+const fxLog = [];
+const fx = {
+  spark: (p, c, n) => fxLog.push(['spark', n]), puff() {}, emp() {},
+  hologram: (a, b, c) => fxLog.push(['holo', a, b]), update() {},
+};
+const ctx = {
+  THREE, renderer, scene, camera, canvas, uiRoot: document.getElementById('ui-root'),
+  bus: createBus(), world, fx, settings,
+  sky: { sunDir: new THREE.Vector3(0.4, 0.8, 0.3).normalize(), daylight01: 1, isNight: false },
+  session: { mode: q.get('mode') === 'build' ? 'build' : 'survival', paused: false },
+  game: {},
+};
+window.__game = { ctx, fxLog };
+
+let gameMod = null;
+try {
+  gameMod = await import('../js/game/index.js');
+  gameMod.init(ctx);
+  ctx.game.start(null);
+  if (ctx.session.mode === 'survival') { ctx.game.inv.add(BLOCKS.length > 10 ? 10 : 1, 20); ctx.game.inv.select(ctx.game.inv.slots.findIndex(s => s?.id === 10)); }
+} catch (e) { console.warn('lane 4 game not usable in harness:', e); ctx.game = {}; }
+
+ctx.input = input; ctx.player = player; ctx.brush = brush;
+input.init(ctx); player.init(ctx); brush.init(ctx);
+player.spawn(-20.5, -20.5);
+
+// Naive stub renderer: instanced cubes for exposed cells and refined subs.
+const geo = new THREE.BoxGeometry(1, 1, 1);
+const mat = new THREE.MeshLambertMaterial();
+const wmat = new THREE.MeshLambertMaterial({ transparent: true, opacity: 0.55 });
+let meshes = [];
+function rebuild() {
+  for (const m of meshes) { scene.remove(m); m.dispose?.(); }
+  meshes = [];
+  const solidM = [], waterM = [];
+  const exposed = (x, y, z) => [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].some(([a,b,c]) => world.getCell(x+a,y+b,z+c) === -1 || !BLOCKS[world.getCell(x+a,y+b,z+c)]?.solid);
+  for (let y = 26; y < 44; y++) for (let z = -32; z < 32; z++) for (let x = -32; x < 32; x++) {
+    const c = world.getCell(x, y, z);
+    if (c > 0) { if (BLOCKS[c].liquid) { if (!world.getCell(x, y + 1, z)) waterM.push([x + .5, y + .5, z + .5, 1, c]); } else if (exposed(x, y, z)) solidM.push([x + .5, y + .5, z + .5, 1, c]); }
+    else if (c === -1) for (let i = 0; i < 64; i++) {
+      const sx = x * 4 + (i & 3), sz = z * 4 + ((i >> 2) & 3), sy = y * 4 + (i >> 4), m = world.getSub(sx, sy, sz);
+      if (m && !BLOCKS[m].liquid) solidM.push([(sx + .5) / 4, (sy + .5) / 4, (sz + .5) / 4, 0.25, m]);
+      else if (m) waterM.push([(sx + .5) / 4, (sy + .5) / 4, (sz + .5) / 4, 0.25, m]);
+    }
+  }
+  for (const [list, mt] of [[solidM, mat], [waterM, wmat]]) {
+    if (!list.length) continue;
+    const im = new THREE.InstancedMesh(geo, mt, list.length);
+    const m4 = new THREE.Matrix4(), col = new THREE.Color();
+    list.forEach(([x, y, z, s, id], i) => {
+      m4.makeScale(s, s, s).setPosition(x, y, z); im.setMatrixAt(i, m4);
+      const c = BLOCKS[id].color; col.setRGB(c[0], c[1], c[2]).multiplyScalar(0.85 + ((i * 7) % 5) * 0.04); im.setColorAt(i, col);
+    });
+    scene.add(im); meshes.push(im);
+  }
+}
+rebuild();
+let dirty = false;
+world.onSectionDirty(() => { dirty = true; });
+
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+const dbg = document.getElementById('dbg');
+let last = performance.now(), frames = 0, fpsT = 0, fps = 0;
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  input.update(dt);
+  player.update(dt);
+  brush.update(dt);
+  try { ctx.game.update?.(dt); } catch (e) { console.error(e); ctx.game.update = null; }
+  if (dirty) { dirty = false; rebuild(); }
+  renderer.render(scene, camera);
+  frames++; fpsT += dt; if (fpsT > 0.5) { fps = frames / fpsT; frames = 0; fpsT = 0; }
+  const p = player.pos;
+  dbg.textContent = `${ctx.session.mode} ${input.device} fps ${fps.toFixed(0)}\npos ${p.x.toFixed(2)} ${p.y.toFixed(2)} ${p.z.toFixed(2)} ${player.onGround ? 'G' : ''}${player.inWater ? 'W' : ''}${player.flying ? 'F' : ''}${player.crouching ? 'C' : ''}\nscale ${brush.scale} held ${ctx.game.inv?.held?.()?.id ?? '-'} n ${ctx.game.inv?.held?.()?.n?.toFixed?.(3) ?? '-'}`;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>synthwild api.js test</title>
+<pre id="out"></pre>
+<script type="module">
+// Exercises js/net/api.js against a running server. Needs an admin session first
+// (open an admin-link URL in the same browser). Results land in window.__results.
+import { api, ApiError } from '../js/net/api.js';
+
+const out = document.getElementById('out');
+const results = { pass: 0, fail: 0, lines: [] };
+window.__results = results;
+const ok = (name, cond, info = '') => {
+  results[cond ? 'pass' : 'fail']++;
+  const line = `${cond ? 'ok  ' : 'FAIL'} ${name}${cond ? '' : '  ' + info}`;
+  results.lines.push(line);
+  out.textContent += line + '\n';
+};
+const expectErr = async (name, p, code) => {
+  try { await p; ok(name, false, 'no error'); } catch (e) { ok(name, e instanceof ApiError && e.code === code, `${e.code} ${e.message}`); return e; }
+};
+
+const thumbBlob = () => new Promise((res) => {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 144;
+  const g = c.getContext('2d'); g.fillStyle = '#3fc'; g.fillRect(0, 0, 256, 144);
+  c.toBlob(res, 'image/jpeg', 0.7);
+});
+
+try {
+  ok('available()', await api.available() === true);
+  const me = await api.me();
+  ok('me() is an admin', me && me.admin === true, JSON.stringify(me));
+  try { await api.admin.removeUser('apitest'); } catch {}
+  const u = await api.admin.addUser('ApiTest', 'Api Tester');
+  ok('admin.addUser', u.username === 'apitest' && u.display === 'Api Tester', JSON.stringify(u));
+  ok('admin.listUsers', (await api.admin.listUsers()).some((x) => x.username === 'apitest'));
+  await expectErr('addUser duplicate → conflict', api.admin.addUser('apitest'), 'conflict');
+  await expectErr('addUser bad name → bad_request', api.admin.addUser('a!'), 'bad_request');
+
+  const p = await api.login('apitest');
+  ok('login(username)', p.username === 'apitest' && !p.admin);
+  await expectErr('player cannot list users', api.admin.listUsers(), 'forbidden');
+
+  const data = { seed: 'abc', sections: { '0,0,0': 'x'.repeat(5000) }, player: { pos: [1, 2, 3] } };
+  const thumb = await thumbBlob();
+  let meta = await api.worlds.create({ name: 'API test world', seed: 'abc', mode: 'build', data, thumb });
+  ok('worlds.create with data+thumb', meta.source === 'cloud' && meta.version === 1 && meta.mine && meta.thumbUrl, JSON.stringify(meta));
+  ok('gzip shrank the blob', meta.size < 1000, 'size ' + meta.size);
+  const img = await fetch(meta.thumbUrl);
+  ok('thumbUrl serves a jpeg', img.ok && img.headers.get('content-type') === 'image/jpeg');
+  const got = await api.worlds.get(meta.id);
+  ok('worlds.get round-trips data', JSON.stringify(got.data) === JSON.stringify(data) && got.meta.version === 1);
+  meta = await api.worlds.save(meta.id, { ...data, n: 2 }, 1);
+  ok('worlds.save bumps version', meta.version === 2);
+  const e = await expectErr('stale save → conflict', api.worlds.save(meta.id, data, 1), 'conflict');
+  ok('conflict carries current meta', e && e.current && e.current.version === 2);
+  meta = await api.worlds.patch(meta.id, { name: 'Renamed', public: true });
+  ok('worlds.patch', meta.name === 'Renamed' && meta.public === true);
+  ok('listMine has it', (await api.worlds.listMine()).some((w) => w.id === meta.id));
+  ok('listPublic has it', (await api.worlds.listPublic()).some((w) => w.id === meta.id && w.ownerDisplay === 'Api Tester'));
+  const raw = new Uint8Array([1, 2, 3, 250]);
+  meta = await api.worlds.save(meta.id, raw, meta.version);
+  const g2 = await api.worlds.get(meta.id);
+  ok('Uint8Array saves are opaque', g2.data instanceof Uint8Array && g2.data.join() === raw.join());
+  await api.worlds.remove(meta.id);
+  await expectErr('removed world → not_found', api.worlds.get(meta.id), 'not_found');
+
+  let lm = await api.local.put({ name: 'Local one', seed: 7, mode: 'survival', data, thumb });
+  ok('local.put new', lm.source === 'local' && lm.version === 1 && lm.thumbUrl.startsWith('data:image/jpeg'));
+  lm = await api.local.put({ id: lm.id, data: { ...data, n: 3 } });
+  ok('local.put update keeps name/mode', lm.version === 2 && lm.name === 'Local one' && lm.mode === 'survival');
+  const lg = await api.local.get(lm.id);
+  ok('local.get round-trips', lg.data.n === 3 && lg.data.player.pos[2] === 3);
+  ok('local.list has it', (await api.local.list()).some((w) => w.id === lm.id));
+  await api.local.remove(lm.id);
+  ok('local.remove', !(await api.local.list()).some((w) => w.id === lm.id));
+
+  await api.logout();
+  ok('logout → me() null', (await api.me()) === null);
+  await expectErr('signed-out listMine → unauthorized', api.worlds.listMine(), 'unauthorized');
+  await expectErr('unknown username → not_found', api.login('nobody_here'), 'not_found');
+} catch (err) {
+  ok('unexpected exception', false, String(err && err.stack || err));
+}
+results.done = true;
+out.textContent += `\n${results.pass} passed, ${results.fail} failed\n`;
+</script>

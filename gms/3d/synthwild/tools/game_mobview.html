@@ -1,0 +1,83 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Synthwild mob viewer</title>
+<style>html,body{margin:0;height:100%;background:#0b1640;overflow:hidden}canvas{display:block}
+#lbl{position:fixed;left:10px;top:8px;color:#cfe;font:13px system-ui;text-shadow:0 1px 2px #000}</style>
+<script type="importmap">{"imports":{"three":"../../../lib/three/0.180.0/three.module.js"}}</script>
+</head><body><div id="lbl"></div>
+<script type="module">
+// ?mob=<kind>|all|m2 &fuse=0..1 (frozen fuse) &atk=0..1 (frozen telegraph: reboot windup, archer aim, spider crouch, void shimmer, gel squash) &t=day|night &live=1 (run AI) &d=cam distance
+import * as THREE from 'three';
+import { Mobs } from '../js/game/mobs/index.js';
+import { EMP_RADIUS } from '../js/game/mobs/kinds.js';
+
+const q = new URLSearchParams(location.search);
+const kind = q.get('mob') || 'all';
+const night = (q.get('t') || 'night') === 'night';
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio));
+renderer.setSize(innerWidth, innerHeight);
+document.body.append(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(night ? 0x14215a : 0x9fd8ff);
+scene.fog = new THREE.Fog(scene.background, 18, 60);
+const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.05, 200);
+
+// Flat photomoss-ish ground at y=32 with a grid so depth reads.
+const g = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), new THREE.MeshBasicMaterial({ color: night ? 0x1d5a3c : 0x4fbf57 }));
+g.rotation.x = -Math.PI / 2; g.position.y = 32; scene.add(g);
+const grid = new THREE.GridHelper(120, 120, 0x000000, 0x000000);
+grid.material.opacity = 0.18; grid.material.transparent = true; grid.position.y = 32.01; scene.add(grid);
+for (const [x, z, h, c] of [[-3, 6, 3, 0x2e2a2a], [4, 7, 2, 0x5c6470], [6, -1, 1, 0x5c6470]]) {
+  const b = new THREE.Mesh(new THREE.BoxGeometry(1, h, 1), new THREE.MeshBasicMaterial({ color: c }));
+  b.position.set(x + 0.5, 32 + h / 2, z + 0.5); scene.add(b);
+}
+
+const world = {
+  isSolidSub: (sx, sy, sz) => sy < 128,
+  getSub: (sx, sy) => (sy < 128 ? 1 : 0),
+  surfaceY: () => 31, sections: new Map(), raycast: () => null,
+};
+const settings = { get: () => false };
+const fx = { spark() {}, puff() {}, emp(p, r) { console.log('emp', r); } };
+const ctx = { THREE, scene, world, fx, session: { mode: 'survival' }, settings };
+const game = { hurtPlayer: (a, s) => console.log('hurt', a, s), drops: { spawnItem() {} }, projectiles: { fire() {} } };
+const mobs = new Mobs(ctx, game);
+mobs.spawnTick = () => {};
+const live = q.get('live') === '1';
+const kinds = kind === 'all' ? ['ibis', 'glitchfuse', 'reboot'] : kind === 'm2' ? ['bull', 'archer', 'spider', 'voidlinker', 'gelcore'] : [kind];
+const list = kinds.map((k, i) => {
+  const m = mobs.spawn(k, (i - (kinds.length - 1) / 2) * (kind === 'm2' ? 2.6 : 2.2) + 0.5, 32, 0.5, k === 'gelcore' ? { size: +(q.get('size') || 3) } : {});
+  m.yaw = Math.PI * 0.85;
+  if (!live) m.def = { ...m.def, think() {} };
+  return m;
+});
+const fuse = q.get('fuse'), atk = q.get('atk');
+const d = +(q.get('d') || (kind === 'all' ? 6 : kind === 'm2' ? 8 : kind === 'ibis' ? 2.6 : 4));
+const player = { x: 0.5, y: 32, z: 0.5 - d, dead: false };
+camera.position.set(0.5, 32 + 1.62, 0.5 - d);
+camera.lookAt(0.5, 32 + (kind === 'ibis' ? 0.4 : 1.0), 0.5);
+document.getElementById('lbl').textContent = `${kinds.join(', ')}  ${night ? 'night' : 'day'}${fuse ? '  fuse ' + fuse : ''}${atk ? '  windup ' + atk : ''}`;
+
+let last = performance.now();
+const sky = { isNight: night, daylight01: night ? 0.05 : 1 };
+function frame(t) {
+  const dt = Math.min(0.05, (t - last) / 1000); last = t;
+  for (const m of list) {
+    if (fuse != null && m.kind === 'glitchfuse') { m.fuse = +fuse * 1.5; m.fusing = true; }
+    if (atk != null && m.kind === 'reboot') { m.atk = 0.4 * (1 - +atk) + 1e-3; }
+    if (atk != null && m.kind === 'archer') { m.aim = 0.95 * (1 - +atk) + 1e-3; m.aimAt = { x: camera.position.x, y: camera.position.y - 0.4, z: camera.position.z }; }
+    if (atk != null && m.kind === 'spider') { m.crouch = 0.35 * (1 - +atk) + 1e-3; m.angry = true; }
+    if (atk != null && m.kind === 'voidlinker') { m.shimmer = 0.6 * (1 - +atk) + 1e-3; m.shimmerMax = 0.6; m.provoked = 5; }
+    if (atk != null && m.kind === 'gelcore') { m.squash = 0.4 * (1 - +atk) + 1e-3; }
+    if (q.get('angry') && m.kind === 'spider') m.angry = true;
+    if (!live) { m.moving = q.get('walk') ? 1 : 0; m.wantX = m.wantZ = 0; }
+  }
+  mobs.update(dt, player, settings, sky);
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+window.__mv = { mobs, list, camera, EMP_RADIUS, ready: true };
+addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); });
+</script></body></html>
