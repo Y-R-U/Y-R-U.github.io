@@ -5,7 +5,7 @@ import { settings } from './settings.js';
 
 const ASSETS = new URL('../../assets/intro/', import.meta.url).href;
 const VO = new URL('../../audio/vo/', import.meta.url).href;
-const voDir = () => VO + (settings.get('narrator') === 'female' ? 'female' : 'baritone') + '/';
+const voDir = () => VO + (settings.get('narrator') === 'female' ? 'female' : 'male') + '/';
 
 export const LINES = [
   ['i01', 'seed', 'Not so very long from now, people stopped building things... and started growing them.'],

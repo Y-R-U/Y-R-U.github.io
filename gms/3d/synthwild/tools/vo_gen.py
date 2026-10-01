@@ -1,19 +1,20 @@
-# Generates the narration for one narrator: python3 vo_gen.py baritone|female [key...]  (skips unchanged lines)
+# Generates the narration for one narrator: python3 vo_gen.py male|female [key...]  (skips unchanged lines)
 import json, sys, os, subprocess; sys.path.insert(0, '.'); import vo_tts as tts
-NAMES = {'baritone': 'Synthwild · Narrator Baritone', 'female': 'Synthwild · Narrator Female'}
-WHO = sys.argv.pop(1) if len(sys.argv) > 1 and sys.argv[1] in NAMES else 'baritone'
+SCR = os.environ.get('VO_SCRATCH', '/tmp/synthwild_vo')   # raw wavs stay out of the repo
+NAMES = {'male': 'Synthwild · Narrator Baritone', 'female': 'Synthwild · Narrator Female'}
+WHO = sys.argv.pop(1) if len(sys.argv) > 1 and sys.argv[1] in NAMES else 'male'
 S = json.load(open('vo_script.json'))
 V = [v for v in tts.req('/api/voices') if v['name'] == NAMES[WHO]][-1]
-SPEED = {'baritone': 0.9, 'female': 1.0}[WHO]   # baritone renders brisk at 1.0 (~2.9 words/s); 0.9 is calmer
+SPEED = {'male': 0.9, 'female': 1.0}[WHO]   # the baritone renders brisk at 1.0 (~2.9 words/s); 0.9 is calmer
 V['settings'] = dict(V['settings'], speed=SPEED)
-out = f'../audio/vo/{WHO}'; mfp = f'{out}/manifest.json'; os.makedirs('scratch', exist_ok=True); os.makedirs(out, exist_ok=True)
+out = f'../audio/vo/{WHO}'; mfp = f'{out}/manifest.json'; os.makedirs(SCR, exist_ok=True); os.makedirs(out, exist_ok=True)
 mf = json.load(open(mfp)) if os.path.exists(mfp) else {}
 only = set(sys.argv[1:])
 for key, text in S.items():
     fn = f'{key}.mp3'
     if only and key not in only: continue
     if fn in mf and mf[fn]['text'] == text and not only: continue
-    wav = f'scratch/{WHO}_{key}.wav'
+    wav = f'{SCR}/{WHO}_{key}.wav'
     jid, s = tts.gen(V['settings'], text, wav)
     subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', wav, '-af',
                     'silenceremove=start_periods=1:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_threshold=-50dB,areverse,loudnorm=I=-16:TP=-1.5',

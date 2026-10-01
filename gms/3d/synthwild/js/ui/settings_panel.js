@@ -18,7 +18,7 @@ const TABS = [
     R('sfx', 'Effects volume', null, 0, 1, 0.05, pct, { sub: true, dep: 'sfxOn' }),
     T('voiceOn', 'Voice', 'The storyteller in the intro.'),
     R('voice', 'Voice volume', null, 0, 1, 0.05, pct, { sub: true, dep: 'voiceOn' }),
-    C('narrator', 'Narrator voice', 'Who tells the story. Tap ▶ to hear them.', [['baritone', 'Deep'], ['female', 'Warm']], { preview: true }),
+    C('narrator', 'Narrator voice', 'Who tells the story. Tap ▶ to hear them.', [['male', 'Male'], ['female', 'Female']], { preview: true }),
   ] },
   { id: 'video', icon: 'screen', label: 'Video', rows: [
     C('quality', 'Graphics quality', 'Lower it if the game feels slow.', [['low', 'Low'], ['med', 'Medium'], ['high', 'High']]),

@@ -3,7 +3,7 @@ const KEY = 'synthwild.settings';
 const touch = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 
 export const DEFAULTS = {
-  music: 0.6, sfx: 0.8, voice: 0.9, narrator: 'baritone', muteAll: false, musicOn: true, sfxOn: true, voiceOn: true,
+  music: 0.6, sfx: 0.8, voice: 0.9, narrator: 'male', muteAll: false, musicOn: true, sfxOn: true, voiceOn: true,
   fullscreen: false, renderDistance: touch ? 6 : 8, quality: touch ? 'med' : 'high', fov: 75, showFps: false,
   sensitivity: 1, invertY: false, leftHanded: false, uiScale: 1, view: 'first',
   autoJump: true, aimAssist: true, noFallDamage: false, keepInventory: false, toolsNeverBreak: false,
@@ -12,7 +12,10 @@ export const DEFAULTS = {
 };
 
 function load() {
-  try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch { return { ...DEFAULTS }; }
+  let v;
+  try { v = { ...DEFAULTS, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch { v = { ...DEFAULTS }; }
+  if (v.narrator !== 'male' && v.narrator !== 'female') v.narrator = 'male';
+  return v;
 }
 
 const values = load();

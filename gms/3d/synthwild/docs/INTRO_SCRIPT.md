@@ -1,8 +1,10 @@
 # SYNTHWILD — Intro script
 
-About 65–75 s, one warm narrator (`Synthwild · Narrator`, Qwen Voice Studio clone voice).
+About 70 s. Two narrators (Qwen Voice Studio clone voices), chosen in Settings → Sound → Narrator voice:
+**Male** (default, `Synthwild · Narrator Baritone`: low, rich baritone, rendered at speed 0.9) → `audio/vo/male/`, and
+**Female** (`Synthwild · Narrator Female`: warm British storyteller) → `audio/vo/female/`. Each folder has its own `manifest.json`.
 Seven key-art stills (Flux) with slow Ken Burns pans and crossfades. Subtitles = the line text.
-Source of truth for the text is `tools/vo_script.json`; regenerate with `python3 tools/vo_gen.py`.
+Source of truth for the text is `tools/vo_script.json`; regenerate with `cd tools && python3 vo_gen.py male|female [key…]`.
 
 | # | Key | Still | Line |
 |---|---|---|---|
@@ -18,3 +20,8 @@ Source of truth for the text is `tools/vo_script.json`; regenerate with `python3
 | 10 | `i10` | `vista` | This whole world is waiting for someone to look after it. Go on, grower. Plant your seed. |
 
 Tone: wondrous, hopeful, a little hushed, never scary. Kid-friendly words; each line is one breath.
+
+## In-game lines
+| Key | When | Line |
+|---|---|---|
+| `n01` | ~60 s before dusk, survival (with a toast + subtitle) | The sun is going down soon. Build a little shelter, and light it up! |

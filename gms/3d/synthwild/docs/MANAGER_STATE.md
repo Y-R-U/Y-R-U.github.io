@@ -30,3 +30,5 @@ Started 2026-10-02. Manager session spawns lane agents (Aaron: 6 at once initial
 - QA harness done (lane 7). Pre-commit gate: `node tools/qa_unit.mjs` + `node tools/qa_smoke.mjs` (4–5 min; `--only mobile --quick` fast).
   Post-deploy: `node tools/qa_live.mjs` (`--no-browser` = API + deploy-parity in 10 s). Load avg was 12–71 from parallel Chromes: fps numbers unreliable.
 - QA found DESKTOP UNPLAYABLE (#ui-root > * pointer-events beats .sw-layer) + intermittent desktop black frame → sent to lane 2 as urgent.
+- Checkpoint 2: commit 2c1684f5 + deploy; unit 6/6, smoke 38/0 (mobile+desktop), live parity 125+12 files PASS.
+  Pending: lane 5 M1 shell/intro + narrator Male/Female (D8). Lanes 1,2,3,4 idle; QA idle.
