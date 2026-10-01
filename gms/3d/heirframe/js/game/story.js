@@ -71,8 +71,11 @@ export function createStoryPlayer(ctx) {
       for (let b of starts) {
         let prev = null;
         while (b) {
-          // a breath between spoken lines; a longer one when someone else starts talking
-          if (prev?.speaker && b.speaker && (b.mode === 'bark' || b.mode === 'dlg')) await wait(prev.speaker === b.speaker ? 450 : 900);
+          // a breath between spoken lines, longer when someone else starts, longest when the city PA cuts in (not a conversation)
+          if (prev?.speaker && b.speaker && (b.mode === 'bark' || b.mode === 'dlg')) {
+            const pa = b.speaker === 'harmony' || prev.speaker === 'harmony';
+            await wait(b.gap ?? (prev.speaker === b.speaker ? 450 : pa ? 1600 : 900));
+          }
           await beat(b);
           prev = b;
           b = beats.find((x) => x.trigger === `after:${b.n}`);
