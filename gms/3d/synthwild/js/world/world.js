@@ -12,6 +12,16 @@ import { raycast as raycastImpl } from './raycast.js';
 import { growTree as growTreeImpl } from './features.js';
 
 export const UNLOADED = 0x7fff;
+function* chainGen(a, b) { yield* a; yield* b; }
+// World border (m): far inside the ±524,288 m where section keys would alias. Saves are clamped to it too (net/savecheck.js).
+export const WORLD_BORDER = 30000;
+export function clampToBorder(p, pad = 0.5) {
+  const L = WORLD_BORDER - pad;
+  let hit = false;
+  if (p.x > L) { p.x = L; hit = true; } else if (p.x < -L) { p.x = -L; hit = true; }
+  if (p.z > L) { p.z = L; hit = true; } else if (p.z < -L) { p.z = -L; hit = true; }
+  return hit;
+}
 export { SEA };
 const COREPLATE = BLOCK.COREPLATE;
 
@@ -59,6 +69,9 @@ export class World {
       lset: (x, y, z, v) => this._lset(x, y, z, v),
       opac: (x, y, z) => this._opac(x, y, z),
       emit: (x, y, z) => this._emit(x, y, z),
+      // fast path for light.js (cached section lookups); semantics match _lget/_lset
+      sec: (cx, sy, cz) => (sy < 0 || sy > 7 ? undefined : this._sec.get(secKeyNum(cx, sy, cz))),
+      markDirty: (cx, sy, cz) => this._markDirty(cx, sy, cz),
     };
   }
 
@@ -206,7 +219,6 @@ export class World {
 
   // ---------- edits ----------
   setBox(minSub, maxSub, mat, mode = 'fill', opts = {}) {
-    this.finishLight();
     const r = setBoxImpl(this, minSub, maxSub, mat, mode, opts);
     this._flush();
     return r;
@@ -215,7 +227,6 @@ export class World {
   readBox(minSub, maxSub) { return readBoxImpl(this, minSub, maxSub); }
   // write a readBox-style copy back (undo / paste). 255 in data = leave; opts.skipAir = don't carve air.
   writeBox(minSub, maxSub, data, opts = {}) {
-    this.finishLight();
     const r = writeBoxImpl(this, minSub, maxSub, data, opts);
     this._flush();
     return r;
@@ -231,9 +242,12 @@ export class World {
     const t0 = now();
     while (this._relight && now() - t0 < budgetMs) if (this._relight.next().done) this._relight = null;
   }
+  // A new edit never finishes a pending time-sliced relight synchronously (back-to-back stamps used to stack):
+  // its relight is chained after it. The light view's queues are shared, so relights must run one after another.
   _afterEdit(cells) {
     const g = relightGen(this._W, cells);
-    if (cells.length / 3 > this.deferLightOver) { this._relight = g; this._stepLight(4); }
+    if (this._relight) { this._relight = chainGen(this._relight, g); this._stepLight(4); }
+    else if (cells.length / 3 > this.deferLightOver) { this._relight = g; this._stepLight(4); }
     else while (!g.next().done);
     for (let k = 0; k < cells.length; k += 3) {
       const x = cells[k], y = cells[k + 1], z = cells[k + 2];

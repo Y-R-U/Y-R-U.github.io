@@ -1,5 +1,5 @@
 // Station panels (DOM). Reuses lane 5's glass look (.sw-inv*, .sw-slot, .sw-btn) plus css/stations.css.
-import { h, click } from '../../ui/dom.js';
+import { h, click, toast } from '../../ui/dom.js';
 import { iconURL, fmtCount } from '../../ui/icons.js';
 import { available, almost, make, smeltResult, fuelValue } from '../../data/recipes.js';
 import { HOTBAR, SIZE } from '../inventory.js';
@@ -184,7 +184,7 @@ export function openStation(ctx, game, { type, state, at, onClose }) {
       arrow.firstChild.style.width = (o.prog / 5) * 100 + '%';
     };
   }
-  async function toastMsg(t) { try { (await import('../../ui/dom.js')).toast(t, { kind: 'warn' }); } catch {} }
+  const toastMsg = (t) => toast(t, { kind: 'warn' });
 
   body.append(left, grid.el);
   function refresh() { grid.refresh(); fab?.refresh(); upd?.(); }

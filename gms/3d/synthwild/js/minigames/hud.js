@@ -1,6 +1,6 @@
 // Mini-game HUD: top bar (score · objective · timer), big countdown text, toasts, a hint line, results card.
 // Same calls as lane 4's stand-in minihud: objective score timer big toast results update dispose (+ hint, add).
-import { h } from '../ui/dom.js';
+import { h, setText, setHtml, setCls, setStyle, toast as domToast } from '../ui/dom.js';
 import { g } from '../ui/glyphs.js';
 
 const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.max(0, Math.floor(s % 60))).padStart(2, '0')}`;
@@ -11,28 +11,26 @@ export function createMgHud(ctx, root) {
   const top = h('div.mg-top.glass', {}, score, obj, time);
   const hint = h('div.mg-hint');
   const big = h('div.mg-big');
-  const toastEl = h('div.mg-toast.glass');
-  const wrap = h('div.mg-hud', {}, top, hint, big, toastEl);
+  const wrap = h('div.mg-hud', {}, top, hint, big);
   root.append(wrap);
-  let bigT = 0, toastT = 0, card = null;
-  const paint = () => { score.style.display = score.innerHTML ? '' : 'none'; time.style.display = time.textContent ? '' : 'none'; };
+  let bigT = 0, card = null;
+  const paint = () => { setStyle(score, 'display', score._html ? '' : 'none'); setStyle(time, 'display', time._txt ? '' : 'none'); };
 
   return {
     el: wrap,
-    objective(t) { obj.textContent = t || ''; },
-    score(t) { score.innerHTML = t || ''; paint(); },
+    objective(t) { setText(obj, t || ''); },
+    score(t) { setHtml(score, t || ''); paint(); },
     timer(s, up = false) {
-      time.textContent = s == null ? '' : up ? fmtTime(s) : fmt(Math.ceil(s));
-      time.classList.toggle('low', !up && s != null && s < 15);
+      setText(time, s == null ? '' : up ? fmtTime(s) : fmt(Math.ceil(s)));
+      setCls(time, 'low', !up && s != null && s < 15);
       paint();
     },
-    hint(t) { hint.textContent = t || ''; hint.classList.toggle('on', !!t); },
+    hint(t) { setText(hint, t || ''); setCls(hint, 'on', !!t); },
     big(t, sec = 1.5) { big.innerHTML = t; big.classList.remove('pop'); void big.offsetWidth; big.classList.add('on', 'pop'); bigT = sec; },
-    toast(t, sec = 2.2) { toastEl.innerHTML = t; toastEl.classList.add('on'); toastT = sec; },
+    toast(t, sec = 2.2) { domToast(t, { kind: 'info', ms: sec * 1000 }); },
     add(node) { wrap.append(node); return node; },
     update(dt) {
-      if (bigT > 0 && (bigT -= dt) <= 0) big.classList.remove('on');
-      if (toastT > 0 && (toastT -= dt) <= 0) toastEl.classList.remove('on');
+      if (bigT > 0 && (bigT -= dt) <= 0) setCls(big, 'on', false);
     },
     // r: { won, stars, title, text }, info: { best, newBest }, actions: { replay, menu, quit }
     results(r, actions = {}, info = {}) {

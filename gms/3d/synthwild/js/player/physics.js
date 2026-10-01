@@ -125,8 +125,3 @@ export function unstick(solid, body) {
   }
   return false;
 }
-
-// Fall damage in Integrity cells (10 = full). Minecraft-like: free for the first 3 m.
-export function fallDamage(dist) {
-  return dist > 3.2 ? Math.round((dist - 3) * 0.5 * 2) / 2 : 0;
-}

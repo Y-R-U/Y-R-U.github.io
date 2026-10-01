@@ -114,6 +114,13 @@ Status: M1 built and running with every lane's real modules (no stubs left in my
   quality disposes the bloom composer, its passes and both half-float targets.
 - Perf: GPU med phone-res forest 1.0 ms min / 1.6–1.9 ms median (was 1.2 / 3.4 under heavier contention); 4× CPU throttle 60 fps.
 
+## R3 fixes (C2, C5, C6, C7, C13, C21)
+See the fix log at the end of `docs/reviews/R3_perf_bugs_dup.md`. Short version: typed light queues + cached section view
+(`light.js`, `_W.sec/markDirty` in world.js), per-column box frustum culling, sky tiers by quality + late dome draw order,
+merged palette avatar (6 meshes; `avatar.setPalette({suit, seam})`), persistent audio slots, `js/core/quality.js`
+(`isMobile`, `defaultQuality`, `resolveQuality`) — **UI fixer: please switch `ui/settings.js` and mob caps to it.**
+Bench: `node tools/engine_light_bench.mjs`.
+
 ## Testing
 - `node tools/engine_mesher_test.mjs`: mesher unit checks (greedy, culling, slabs, refined neighbours, water depth, plants, rails) + perf.
 - `~/.claude/bin/cdp start --port 9312 -- --use-angle=metal`, then

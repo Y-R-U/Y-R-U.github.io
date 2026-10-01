@@ -1,5 +1,5 @@
 // The goal chip: a small glassy pill, top-left. Tap it for the hint. Gold flash + toast when a goal is done.
-import { h } from '../../ui/dom.js';
+import { h, toast } from '../../ui/dom.js';
 
 function ensureCss() {
   if (document.getElementById('sw-journal-css')) return;
@@ -31,16 +31,14 @@ export function createGoalChip(ctx, journal) {
     if (g?.id !== shownId) { shownId = g?.id; chip.classList.remove('new'); void chip.offsetWidth; chip.classList.add('new'); open = false; chip.classList.remove('open'); }
   }
 
-  async function toast(text) {
-    try { (await import('../../ui/dom.js')).toast(text, { kind: 'ok', icon: '✦', ms: 3200 }); } catch {}
-  }
+  const goalToast = (text) => toast(text, { kind: 'ok', icon: '✦', ms: 3200 });
 
   refresh();
   let modeSeen = journal.game.creative;
   return {
     refresh,
     celebrate(g, p) {
-      toast(`Goal complete: ${g.title}`);
+      goalToast(`Goal complete: ${g.title}`);
       // Hold the finished goal in gold for a moment before moving on.
       pending = g;
       celebT = 1.6;

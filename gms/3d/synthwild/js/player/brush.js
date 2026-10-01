@@ -18,7 +18,7 @@ export const brush = {
   buildMat: BLOCK.LATTICE_PLANKS || 10,
   target: null, mobTarget: null, placeTarget: null, breakTarget: null,
   progress: 0, vol: null, credit: {},
-  _ctx: null, _frame: -1, _repeat: 0, _breakKey: '', _pulse: 0,
+  _ctx: null, _repeat: 0, _breakKey: '', _pulse: 0,
 
   init(ctx) {
     this._ctx = ctx;
@@ -94,8 +94,7 @@ export const brush = {
 
   update(dt) {
     const ctx = this._ctx, inp = ctx.input;
-    if (!ctx || this._frame === inp?.frame) return;
-    this._frame = inp?.frame;
+    if (!ctx) return;
     const p = ctx.player, w = ctx.world;
     if (this.scale > this.maxScale) this.setScale(this.maxScale);
     const live = w?.raycast && p && !p.dead && !ctx.session?.paused && !ctx.ui?.blocking && !ctx.game?.stations?.isOpen;
@@ -269,7 +268,8 @@ export const brush = {
       units = costUnits(box, mode, this.scale * 4);
       if (!this._canAfford(inv, units)) { ctx.bus?.emit?.('player:cantPlace', { reason: 'items' }); return false; }
     }
-    const r = this.tools.edit(box.min, box.max, mat, mode, { wall: this.scale * 4 });
+    // Survival never overwrites solid blocks (a box on a ½ slab straddles into the cell above).
+    const r = this.tools.edit(box.min, box.max, mat, this.build ? mode : 'place', { wall: this.scale * 4 });
     if (!r?.changed) return false;
     if (!this.build) this._pay(inv, Math.min(units, r.changed));
     ctx.bus?.emit?.('block:place', { minSub: box.min.slice(), maxSub: box.max.slice(), mat, mode, changed: r.changed });
@@ -364,7 +364,7 @@ export const brush = {
       const units = this.build ? 0 : costUnits(v.box, v.mode, this.scale * 4);
       if (mat && !this.build && !this._canAfford(inv, units)) ctx.bus?.emit?.('player:cantPlace', { reason: 'items' });
       else if (mat && !fillsPlayer) {
-        const r = this.tools.edit(v.box.min, v.box.max, mat, v.mode, { wall: this.scale * 4 });
+        const r = this.tools.edit(v.box.min, v.box.max, mat, this.build ? v.mode : 'place', { wall: this.scale * 4 });
         if (r?.changed && !this.build) this._pay(inv, Math.min(units, r.changed));
         if (r?.changed) {
           ctx.bus?.emit?.('block:place', { minSub: v.box.min.slice(), maxSub: v.box.max.slice(), mat, mode: v.mode, changed: r.changed, removed: r.removed });

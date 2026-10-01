@@ -2,19 +2,6 @@
 import { createAvatar } from '../../player/avatar.js';
 import { disposeObject } from '../../core/dispose.js';
 
-const SUIT = 0xdfe8f0, SEAM = 0x3ff7ff;
-
-function tint(root, T, team) {
-  const suit = new T.Color(team.suit), seam = new T.Color(team.glow);
-  root.traverse((o) => {
-    const u = o.material?.uniforms?.uColor;
-    if (!u) return;
-    const hex = u.value.getHex();
-    if (hex === new T.Color(SUIT).getHex()) u.value.copy(suit);
-    else if (hex === new T.Color(SEAM).getHex()) u.value.copy(seam);
-  });
-}
-
 function nameTag(T, text, color) {
   const c = document.createElement('canvas');
   c.width = 256; c.height = 64;
@@ -34,7 +21,7 @@ function nameTag(T, text, color) {
 export function createBotView(ctx, bot, team) {
   const T = ctx.THREE;
   const av = createAvatar();
-  tint(av.root, T, team);
+  av.setPalette({ suit: team.suit, seam: team.glow });
   const g = new T.Group();
   g.add(av.root);
   const ring = new T.Mesh(new T.RingGeometry(0.42, 0.55, 24), new T.MeshBasicMaterial({ color: team.glow, transparent: true, opacity: 0.75, side: T.DoubleSide, depthWrite: false, toneMapped: false }));

@@ -38,9 +38,6 @@
 .mg-big.on { opacity: 1; }
 .mg-big.pop { animation: mgpop .35s cubic-bezier(.2, 1.6, .4, 1); }
 @keyframes mgpop { from { transform: translate(-50%, -50%) scale(1.6); } }
-.mg-toast { position: absolute; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); padding: 6px 16px; border-radius: 99px; font-weight: 700;
-  font-size: calc(14px * var(--ui)); opacity: 0; transition: opacity .3s; white-space: nowrap; }
-.mg-toast.on { opacity: 1; }
 
 .mg-results { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: auto !important; width: min(400px, 90vw); padding: 18px 20px 16px;
   text-align: center; animation: popin .3s cubic-bezier(.2, 1.3, .4, 1); max-height: 94vh; overflow: auto; }

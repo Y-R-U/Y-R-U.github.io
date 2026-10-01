@@ -13,6 +13,21 @@ const LIGHT_GLSL = `uniform vec3 uLightDir, uLightColor, uAmbient, uGround, uBlo
     return amb + direct + uBlockColor * pow(uLocal.y, 1.6) * 1.5;
   }`;
 
+// Suit plating, shared by both suit shaders: world light, fine engraved panel lines in box space, a soft top-lit
+// gradient and a cyan rim. Needs vO, vNo, vW and LIGHT_GLSL's worldLight/uLocal.
+const PLATING_GLSL = `
+  vec3 plating(vec3 col, float em, vec3 n) {
+    vec3 c = col * worldLight(n);
+    vec3 an = abs(vNo);
+    vec2 fc = an.x > an.y && an.x > an.z ? vO.zy : an.y > an.z ? vO.xz : vO.xy;
+    vec2 sg = abs(fract(fc * 9.0) - 0.5);
+    float seam = smoothstep(0.46, 0.5, max(sg.x, sg.y)) * (1.0 - em);
+    c *= (1.0 - seam * 0.28) * (0.9 + 0.2 * clamp(vO.y * 3.0 + 0.5, 0.0, 1.0));
+    vec3 V = normalize(cameraPosition - vW);
+    float rim = pow(clamp(1.0 - dot(n, V), 0.0, 1.0), 3.0);
+    return c + vec3(0.35,0.9,1.0) * rim * 0.12 * (0.3 + 0.7 * uLocal.x);
+  }`;
+
 function mat(color, emissive = 0, pulse = 0) {
   return new THREE.ShaderMaterial({
     uniforms: { ...U, uColor: { value: new THREE.Color(color) }, uEmit: { value: emissive }, uPulse: { value: pulse } },
@@ -23,24 +38,73 @@ function mat(color, emissive = 0, pulse = 0) {
     fragmentShader: `uniform vec3 uColor; uniform float uEmit; uniform float uPulse; uniform float uTime;
       ${LIGHT_GLSL}
       varying vec3 vN; varying vec3 vW; varying vec3 vO; varying vec3 vNo;
+      ${PLATING_GLSL}
       void main(){
         vec3 n = normalize(vN);
-        vec3 c = uColor * worldLight(n);
-        // suit plating: fine engraved panel lines in box space and a soft top-lit gradient
-        vec3 an = abs(vNo);
-        vec2 fc = an.x > an.y && an.x > an.z ? vO.zy : an.y > an.z ? vO.xz : vO.xy;
-        vec2 sg = abs(fract(fc * 9.0) - 0.5);
-        float seam = smoothstep(0.46, 0.5, max(sg.x, sg.y)) * (1.0 - uEmit);
-        c *= (1.0 - seam * 0.28) * (0.9 + 0.2 * clamp(vO.y * 3.0 + 0.5, 0.0, 1.0));
-        vec3 V = normalize(cameraPosition - vW);
-        float rim = pow(clamp(1.0 - dot(n, V), 0.0, 1.0), 3.0);
-        c += vec3(0.35,0.9,1.0) * rim * 0.12 * (0.3 + 0.7 * uLocal.x);
+        vec3 c = plating(uColor, uEmit, n);
         float p = uPulse > 0.0 ? 0.8 + 0.2 * sin(uTime * 3.0 + vW.y * 4.0) : 1.0;
         c = mix(c, uColor * 0.9 * p, uEmit);
         gl_FragColor = vec4(max(c, vec3(0.0)), 1.0);
         #include <colorspace_fragment>
       }`,
   });
+}
+
+// Palette material: one per avatar, shared by its few merged meshes. Each vertex carries a slot
+// (0 suit, 1 dark, 2 seam, 3 visor, 4 accent); colour/emissive/pulse per slot live in uniforms, so bots can be re-tinted.
+const SLOT = { suit: 0, dark: 1, seam: 2, visor: 3, accent: 4 };
+function palMat(colors, emit, pulse) {
+  return new THREE.ShaderMaterial({
+    uniforms: { ...U, uPal: { value: colors.map((c) => new THREE.Color(c)) }, uEm: { value: emit }, uPu: { value: pulse } },
+    vertexShader: `attribute float aSlot; varying vec3 vN; varying vec3 vW; varying vec3 vO; varying vec3 vNo; flat varying int vSlot;
+      void main(){ vN = normalize(mat3(modelMatrix) * normal); vec4 w = modelMatrix * vec4(position,1.0); vW = w.xyz;
+      vO = position; vNo = normal; vSlot = int(aSlot + 0.5);
+      gl_Position = projectionMatrix * viewMatrix * w; }`,
+    fragmentShader: `uniform vec3 uPal[5]; uniform float uEm[5]; uniform float uPu[5]; uniform float uTime;
+      ${LIGHT_GLSL}
+      varying vec3 vN; varying vec3 vW; varying vec3 vO; varying vec3 vNo; flat varying int vSlot;
+      ${PLATING_GLSL}
+      void main(){
+        vec3 col = uPal[vSlot]; float em = uEm[vSlot];
+        vec3 n = normalize(vN);
+        vec3 c = plating(col, em, n);
+        float p = uPu[vSlot] > 0.0 ? 0.8 + 0.2 * sin(uTime * 3.0 + vW.y * 4.0) : 1.0;
+        c = mix(c, col * 0.9 * p, em);
+        gl_FragColor = vec4(max(c, vec3(0.0)), 1.0);
+        #include <colorspace_fragment>
+      }`,
+  });
+}
+
+// Collects boxes per pivot and emits one mesh per pivot.
+function merger(material) {
+  const groups = new Map();
+  const tmp = new THREE.Vector3();
+  return {
+    box(parent, w, h, d, slot, x = 0, y = 0, z = 0) {
+      if (!groups.has(parent)) groups.set(parent, { pos: [], nor: [], slot: [] });
+      const G = groups.get(parent);
+      const g = new THREE.BoxGeometry(w, h, d).toNonIndexed();
+      const P = g.attributes.position, N = g.attributes.normal;
+      for (let i = 0; i < P.count; i++) {
+        tmp.fromBufferAttribute(P, i);
+        G.pos.push(tmp.x + x, tmp.y + y, tmp.z + z);
+        G.nor.push(N.getX(i), N.getY(i), N.getZ(i));
+        G.slot.push(slot);
+      }
+      g.dispose();
+    },
+    finish() {
+      for (const [parent, G] of groups) {
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.Float32BufferAttribute(G.pos, 3));
+        geo.setAttribute('normal', new THREE.Float32BufferAttribute(G.nor, 3));
+        geo.setAttribute('aSlot', new THREE.Float32BufferAttribute(G.slot, 1));
+        geo.computeBoundingSphere();
+        parent.add(new THREE.Mesh(geo, material));
+      }
+    },
+  };
 }
 
 function box(w, h, d, m, x = 0, y = 0, z = 0) {
@@ -72,55 +136,55 @@ export function setAvatarLight(skyL, blockL, t, dt = 0.016) {
   U.uTime.value = t;
 }
 
-// Shared mats: suit (pearl white), armour (graphite), seams (teal emissive), visor (magenta-gold emissive).
-function mats() {
-  return {
-    suit: mat(0xdfe8f0), dark: mat(0x2b3240), seam: mat(0x3ff7ff, 0.7, 1),
-    visor: mat(0xffb84d, 0.6), accent: mat(0xff4fd8, 0.7, 1),
-  };
-}
-
 export function createAvatar() {
-  const M = mats();
+  // suit (pearl white), armour (graphite), seams (teal emissive), visor (magenta-gold emissive), accent
+  const material = palMat([0xdfe8f0, 0x2b3240, 0x3ff7ff, 0xffb84d, 0xff4fd8], [0, 0, 0.7, 0.6, 0.7], [0, 0, 1, 0, 1]);
+  const B = merger(material), S = SLOT;
   const root = new THREE.Group();
   root.name = 'player-avatar';
   const body = pivot(0, 0, 0); root.add(body);
 
   const hips = pivot(0, 0.86, 0); body.add(hips);
   const torso = pivot(0, 0, 0); hips.add(torso);
-  torso.add(box(0.5, 0.62, 0.28, M.suit, 0, 0.31, 0));
-  torso.add(box(0.52, 0.2, 0.3, M.dark, 0, 0.5, 0));          // shoulder yoke
-  torso.add(box(0.04, 0.5, 0.02, M.seam, 0, 0.3, 0.145));    // chest seam
-  torso.add(box(0.5, 0.03, 0.29, M.seam, 0, 0.06, 0));       // belt line
-  torso.add(box(0.3, 0.36, 0.14, M.dark, 0, 0.32, -0.2));    // power pack
-  torso.add(box(0.2, 0.04, 0.02, M.accent, 0, 0.42, -0.275));
-  torso.add(box(0.04, 0.22, 0.02, M.seam, -0.09, 0.3, -0.275));
-  torso.add(box(0.04, 0.22, 0.02, M.seam, 0.09, 0.3, -0.275));
+  B.box(torso, 0.5, 0.62, 0.28, S.suit, 0, 0.31, 0);
+  B.box(torso, 0.52, 0.2, 0.3, S.dark, 0, 0.5, 0);          // shoulder yoke
+  B.box(torso, 0.04, 0.5, 0.02, S.seam, 0, 0.3, 0.145);    // chest seam
+  B.box(torso, 0.5, 0.03, 0.29, S.seam, 0, 0.06, 0);       // belt line
+  B.box(torso, 0.3, 0.36, 0.14, S.dark, 0, 0.32, -0.2);    // power pack
+  B.box(torso, 0.2, 0.04, 0.02, S.accent, 0, 0.42, -0.275);
+  B.box(torso, 0.04, 0.22, 0.02, S.seam, -0.09, 0.3, -0.275);
+  B.box(torso, 0.04, 0.22, 0.02, S.seam, 0.09, 0.3, -0.275);
 
   const neck = pivot(0, 0.62, 0); torso.add(neck);
   const head = pivot(0, 0.02, 0); neck.add(head);
-  head.add(box(0.42, 0.42, 0.42, M.suit, 0, 0.21, 0));
-  head.add(box(0.36, 0.13, 0.03, M.visor, 0, 0.25, 0.21));
-  head.add(box(0.44, 0.03, 0.44, M.seam, 0, 0.36, 0));
-  head.add(box(0.03, 0.12, 0.03, M.dark, 0.17, 0.48, -0.05));
-  head.add(box(0.05, 0.05, 0.05, M.accent, 0.17, 0.56, -0.05));
+  B.box(head, 0.42, 0.42, 0.42, S.suit, 0, 0.21, 0);
+  B.box(head, 0.36, 0.13, 0.03, S.visor, 0, 0.25, 0.21);
+  B.box(head, 0.44, 0.03, 0.44, S.seam, 0, 0.36, 0);
+  B.box(head, 0.03, 0.12, 0.03, S.dark, 0.17, 0.48, -0.05);
+  B.box(head, 0.05, 0.05, 0.05, S.accent, 0.17, 0.56, -0.05);
 
   const limb = (x, y, len, w, side) => {
     const p = pivot(x, y, 0);
-    p.add(box(w, len, w, M.suit, 0, -len / 2, 0));
-    p.add(box(w + 0.02, 0.12, w + 0.02, M.dark, 0, -len * 0.45, 0));
-    p.add(box(w + 0.02, 0.1, w + 0.02, M.dark, 0, -len + 0.05, 0));
-    p.add(box(0.02, len * 0.7, 0.02, M.seam, side * (w / 2 + 0.005), -len * 0.5, 0));
+    B.box(p, w, len, w, S.suit, 0, -len / 2, 0);
+    B.box(p, w + 0.02, 0.12, w + 0.02, S.dark, 0, -len * 0.45, 0);
+    B.box(p, w + 0.02, 0.1, w + 0.02, S.dark, 0, -len + 0.05, 0);
+    B.box(p, 0.02, len * 0.7, 0.02, S.seam, side * (w / 2 + 0.005), -len * 0.5, 0);
     return p;
   };
   const armL = limb(-0.33, 0.56, 0.62, 0.16, -1), armR = limb(0.33, 0.56, 0.62, 0.16, 1);
   torso.add(armL, armR);
   const legL = limb(-0.13, 0, 0.86, 0.2, -1), legR = limb(0.13, 0, 0.86, 0.2, 1);
   hips.add(legL, legR);
+  B.finish();
 
   let phase = 0, swing = 0;
   return {
-    root, head,
+    root, head, material,
+    // re-tint (bots): { suit, seam } hex colours
+    setPalette({ suit, seam } = {}) {
+      if (suit != null) material.uniforms.uPal.value[SLOT.suit].set(suit);
+      if (seam != null) material.uniforms.uPal.value[SLOT.seam].set(seam);
+    },
     swingArm() { swing = 1; },
     update(dt, { speed = 0, crouch = false, flying = false, swimming = false, pitch = 0, onGround = true }) {
       const moving = Math.min(1, speed / 4.3);
@@ -169,18 +233,21 @@ function atlasCubeMat(atlas) {
 // First-person arm holding the selected item, parented to the camera.
 export function createHand() {
   // Softer than the body: a grey-blue sleeve (not flat white) and dimmer seams so night bloom doesn't blow it out.
-  const M = { suit: mat(0xb4c3d4), dark: mat(0x2b3240), seam: mat(0x3ff7ff, 0.35, 0), cuff: mat(0x3ff7ff, 0.55, 1), plate: mat(0x5b6b82) };
+  // one merged arm mesh (palette slots: suit sleeve, dark plating, dim seam, plate, glowing cuff)
+  const armMat = palMat([0xb4c3d4, 0x2b3240, 0x3ff7ff, 0x5b6b82, 0x3ff7ff], [0, 0, 0.35, 0, 0.55], [0, 0, 0, 0, 1]);
+  const B = merger(armMat), S = SLOT;
   const root = new THREE.Group();
   root.name = 'player-hand';
   const arm = pivot(0.42, -0.42, -0.6);
   root.add(arm);
-  const sleeve = box(0.13, 0.13, 0.5, M.suit, 0, 0, 0.12); arm.add(sleeve);
-  arm.add(box(0.14, 0.14, 0.09, M.dark, 0, 0, 0.3));
-  arm.add(box(0.02, 0.02, 0.4, M.seam, 0.068, 0.03, 0.1));
-  arm.add(box(0.1, 0.03, 0.26, M.plate, 0, 0.075, 0.08));   // forearm plate
-  arm.add(box(0.145, 0.03, 0.03, M.cuff, 0, 0.0, -0.075)); // glowing cuff
-  arm.add(box(0.12, 0.1, 0.1, M.dark, 0, 0.0, -0.15));   // glove
-  arm.add(box(0.1, 0.03, 0.04, M.plate, 0, 0.055, -0.19)); // knuckle plate
+  B.box(arm, 0.13, 0.13, 0.5, S.suit, 0, 0, 0.12);
+  B.box(arm, 0.14, 0.14, 0.09, S.dark, 0, 0, 0.3);
+  B.box(arm, 0.02, 0.02, 0.4, S.seam, 0.068, 0.03, 0.1);
+  B.box(arm, 0.1, 0.03, 0.26, S.visor, 0, 0.075, 0.08);   // forearm plate
+  B.box(arm, 0.145, 0.03, 0.03, S.accent, 0, 0.0, -0.075); // glowing cuff
+  B.box(arm, 0.12, 0.1, 0.1, S.dark, 0, 0.0, -0.15);   // glove
+  B.box(arm, 0.1, 0.03, 0.04, S.visor, 0, 0.055, -0.19); // knuckle plate
+  B.finish();
 
   const colorMat = mat(0xffffff, 0);
   const cubeGeo = new THREE.BoxGeometry(0.15, 0.15, 0.15);

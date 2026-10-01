@@ -1,6 +1,6 @@
 // Glitch Siege: defend the Grower Core through 5 waves of reboots, glitchfuses and archers.
 // Between waves you get a few seconds and a stack of bricks to build walls. Monsters smash through bricks in time.
-import { pad, fill, put, W, mat } from '../bots/arena.js';
+import { pad, fill, put, W, mat } from '../arena.js';
 import { disposeObject } from '../../core/dispose.js';
 
 const H = 13, WAVES = 5, CORE_HP = 60;
@@ -68,7 +68,7 @@ const siege = {
     this.coreFx = new T.Group();
     this.coreFx.add(crystal, hpRing);
     this.coreFx.position.set(o.x, o.y + 3.1, o.z);
-    this.crystal = crystal; this.hpRing = hpRing;
+    this.crystal = crystal; this.hpRing = hpRing; this.ringF = null;
     ctx.scene?.add(this.coreFx);
     this.offExplode = ctx.bus?.on?.('mob:explode', (e) => this.empBricks(e.pos));
     this.offDeath = ctx.bus?.on?.('mob:death', () => { this.kills++; });
@@ -128,9 +128,13 @@ const siege = {
     this.hitFlash = Math.max(0, (this.hitFlash || 0) - dt);
     this.crystal.rotation.y += dt * 1.2;
     this.crystal.material.color.setRGB(this.hitFlash > 0 ? 1 : 0.37, this.hitFlash > 0 ? 0.3 : 0.97, 1);
-    this.hpRing.geometry.dispose();
-    this.hpRing.geometry = new ctx.THREE.RingGeometry(1.25, 1.45, 48, 1, 0, Math.PI * 2 * Math.max(0, this.hp / CORE_HP));
-    this.hpRing.material.color.setHex(this.hp / CORE_HP > 0.5 ? 0x46f0d4 : this.hp / CORE_HP > 0.25 ? 0xffd25e : 0xff5a6e);
+    const f = Math.max(0, this.hp / CORE_HP);
+    if (f !== this.ringF) {
+      this.ringF = f;
+      // the ring is built once; HP only changes how many of its 48 segments are drawn
+      this.hpRing.geometry.setDrawRange(0, Math.ceil(f * 48) * 6);
+      this.hpRing.material.color.setHex(f > 0.5 ? 0x46f0d4 : f > 0.25 ? 0xffd25e : 0xff5a6e);
+    }
 
     if (this.phase === 'build') {
       mg.hud.timer(this.t);

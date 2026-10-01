@@ -103,20 +103,24 @@ export function createTouch(input, ctx) {
       if (L.top) { b.style.top = -L.y + 'px'; b.style.bottom = ''; } else { b.style.bottom = L.y + 'px'; b.style.top = ''; }
     }
     el.classList.toggle('big', (input.setting('uiScale', 1) || 1) > 1.05);
+    box = null;
     idleStick();
   }
   function idleStick() {
-    const w = el.clientWidth || innerWidth, h = el.clientHeight || innerHeight;
+    const { w, h } = box || measure();
     stick.style.left = (st.left ? w - 96 : 96) + 'px';
     stick.style.top = (h - 96) + 'px';
     knob.style.transform = '';
     stick.classList.add('idle'); stick.classList.remove('sprint');
   }
+  // The zone's rect, measured on layout/resize only: a layout read per touchmove would force a reflow each time.
+  let box = null;
+  const measure = () => { const r = el.getBoundingClientRect(); box = { l: r.left, t: r.top, w: r.width || innerWidth, h: r.height || innerHeight }; return box; };
   const isStickSide = x => {
-    const w = el.clientWidth || innerWidth;
+    const w = (box || measure()).w;
     return st.left ? x > w * 0.6 : x < w * 0.4;
   };
-  const local = t => { const r = el.getBoundingClientRect(); return [t.clientX - r.left, t.clientY - r.top]; };
+  const local = t => { const b = box || measure(); return [t.clientX - b.l, t.clientY - b.t]; };
 
   zone.addEventListener('touchstart', e => {
     e.preventDefault();
@@ -125,7 +129,7 @@ export function createTouch(input, ctx) {
       const [x, y] = local(t);
       if (st.stickId === null && isStickSide(x)) {
         st.stickId = t.identifier; st.sx = x; st.sy = y;
-        const w = el.clientWidth, h = el.clientHeight;
+        const { w, h } = box || measure();
         st.sx = Math.min(Math.max(x, 64), w - 64); st.sy = Math.min(Math.max(y, 64), h - 64);
         stick.style.left = st.sx + 'px'; stick.style.top = st.sy + 'px';
         stick.classList.remove('idle');

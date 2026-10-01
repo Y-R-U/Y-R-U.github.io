@@ -1,14 +1,9 @@
 // Section storage: Uint16 cells (uniform id or 0x8000|subIndex), subs = Uint8Array(64) per refined cell.
 
-export const CS = 16;              // cells per section edge
 export const SECTION_CELLS = 4096;
-export const WORLD_H = 128;        // cells
-export const SECTIONS_Y = 8;
-export const SUB = 4;              // subs per cell edge
 export const REFINED = 0x8000;
 export const SKY_FULL = 0xf0;
 
-export const cellIndex = (x, y, z) => x + z * 16 + y * 256;
 export const subIndex = (sx, sy, sz) => sx + sz * 4 + sy * 16;
 export const secKeyStr = (cx, sy, cz) => cx + ',' + sy + ',' + cz;
 export const chunkKeyStr = (cx, cz) => cx + ',' + cz;
@@ -60,20 +55,9 @@ export function tryCollapse(sec, i) {
   return true;
 }
 
-export function getSubLocal(sec, i, si) {
-  const v = sec.cells[i];
-  return (v & REFINED) ? sec.subs[v & 0x7fff][si] : v;
-}
-
 export function isAllAir(sec) {
   const c = sec.cells;
   for (let i = 0; i < SECTION_CELLS; i++) if (c[i] !== 0) return false;
-  return true;
-}
-
-export function isAllSky(sec) {
-  const l = sec.light;
-  for (let i = 0; i < SECTION_CELLS; i++) if (l[i] !== SKY_FULL) return false;
   return true;
 }
 

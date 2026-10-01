@@ -80,6 +80,16 @@ export const ui = {
     bus?.on('player:sleep', () => toast('Sleep Pod set as your respawn point', { kind: 'good' }));
     bus?.on('inv:break', (d) => toast(`${ctx.game?.items?.get?.(d.id)?.name || 'Tool'} broke!`, { kind: 'warn' }));
 
+    // Portrait on a phone hides the game behind "Turn your device": pause under it, resume when turned back.
+    const portrait = matchMedia('(orientation: portrait) and (pointer: coarse)');
+    let rotPaused = false;
+    const onOrient = () => {
+      if (portrait.matches) { if (ui.shell.state === 'playing') { ui.closePanels(); ui.shell.pause(); rotPaused = true; } }
+      else if (rotPaused) { rotPaused = false; if (ui.shell.state === 'paused') ui.shell.resume(); }
+    };
+    portrait.addEventListener('change', onOrient);
+    addEventListener('orientationchange', onOrient);
+
     const once = () => { fullscreen.restore(); removeEventListener('pointerdown', once, true); };
     addEventListener('pointerdown', once, true);
 

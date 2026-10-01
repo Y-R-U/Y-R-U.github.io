@@ -52,39 +52,101 @@ export function geo(key, parts) {
 
 // Vertex-coloured body with a little art on top: fine panel seams in object space, a top-lit gradient and a
 // cyan rim (stronger at night) so silhouettes read against dark ground on a phone.
+export const MAX_BONES = 16;
+// One draw per mob: every body and glow part is merged into a single geometry whose vertices carry the index of
+// the part they came from (aBone) and a glow flag. The original part meshes stay in the scene graph as invisible
+// transforms (layers disabled), so the kinds' animation code keeps moving/scaling them; each frame their matrices
+// (relative to the mob root) feed uBones.
 export function bodyMaterial() {
   const mat = new T.MeshBasicMaterial({ vertexColors: true });
   const sky = globalThis.__game?.ctx?.sky?.uniforms;
+  const bones = [];
+  for (let i = 0; i < MAX_BONES; i++) bones.push(new T.Matrix4());
   const u = { uTint: { value: new T.Color(1, 1, 1) }, uFlash: { value: new T.Vector4(1, 1, 1, 0) },
-    uNight: sky?.uNight ?? { value: 0 }, uRim: sky?.uRimColor ?? { value: new T.Color(0x9ff0ff) } };
+    uNight: sky?.uNight ?? { value: 0 }, uRim: sky?.uRimColor ?? { value: new T.Color(0x9ff0ff) }, uBones: { value: bones } };
   mat.userData.u = u;
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, u);
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vObj;\nvarying vec3 vNw;\nvarying vec3 vWp;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvObj = position; vNw = normalize(mat3(modelMatrix) * normal); vWp = (modelMatrix * vec4(position, 1.0)).xyz;');
+      .replace('#include <common>', '#include <common>\nattribute float aBone;\nattribute float aGlow;\nuniform mat4 uBones[' + MAX_BONES + '];\nvarying vec3 vObj;\nvarying vec3 vNw;\nvarying vec3 vWp;\nvarying float vGlow;')
+      .replace('#include <begin_vertex>', 'mat4 B = uBones[int(aBone + 0.5)];\nvec3 transformed = (B * vec4(position, 1.0)).xyz;\nvObj = position; vGlow = aGlow;\nvNw = normalize(mat3(modelMatrix) * mat3(B) * normal); vWp = (modelMatrix * vec4(transformed, 1.0)).xyz;');
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform vec3 uTint;\nuniform vec4 uFlash;\nuniform float uNight;\nuniform vec3 uRim;\nvarying vec3 vObj;\nvarying vec3 vNw;\nvarying vec3 vWp;')
+      .replace('#include <common>', '#include <common>\nuniform vec3 uTint;\nuniform vec4 uFlash;\nuniform float uNight;\nuniform vec3 uRim;\nvarying vec3 vObj;\nvarying vec3 vNw;\nvarying vec3 vWp;\nvarying float vGlow;')
       .replace('#include <opaque_fragment>', `
-        vec3 an = abs(vNw);
-        vec2 fc = an.x > an.y && an.x > an.z ? vObj.zy : an.y > an.z ? vObj.xz : vObj.xy;
-        vec2 sg = abs(fract(fc * 6.0) - 0.5);
-        float seam = smoothstep(0.47, 0.5, max(sg.x, sg.y));
-        outgoingLight *= (1.0 - seam * 0.22) * (0.82 + 0.3 * clamp(vObj.y * 0.9 + 0.3, 0.0, 1.0));
-        vec3 V = normalize(cameraPosition - vWp);
-        float rim = pow(1.0 - clamp(abs(dot(normalize(vNw), V)), 0.0, 1.0), 3.0);
-        outgoingLight = outgoingLight * uTint + uRim * rim * (0.18 + 0.5 * uNight);
-        outgoingLight = mix(outgoingLight, uFlash.rgb, uFlash.a);
+        if (vGlow > 0.5) {
+          outgoingLight = vColor.rgb;
+        } else {
+          vec3 an = abs(vNw);
+          vec2 fc = an.x > an.y && an.x > an.z ? vObj.zy : an.y > an.z ? vObj.xz : vObj.xy;
+          vec2 sg = abs(fract(fc * 6.0) - 0.5);
+          float seam = smoothstep(0.47, 0.5, max(sg.x, sg.y));
+          outgoingLight *= (1.0 - seam * 0.22) * (0.82 + 0.3 * clamp(vObj.y * 0.9 + 0.3, 0.0, 1.0));
+          vec3 V = normalize(cameraPosition - vWp);
+          float rim = pow(1.0 - clamp(abs(dot(normalize(vNw), V)), 0.0, 1.0), 3.0);
+          outgoingLight = outgoingLight * uTint + uRim * rim * (0.18 + 0.5 * uNight);
+          outgoingLight = mix(outgoingLight, uFlash.rgb, uFlash.a);
+        }
         #include <opaque_fragment>`);
   };
-  mat.customProgramCacheKey = () => 'synthwild-mob2';
+  mat.customProgramCacheKey = () => 'synthwild-mob3';
   return mat;
+}
+
+// Merge every part drawn with the body material or a shared glow material into one bone-indexed mesh.
+const mergeCache = new Map();
+function compile(kind, root, mat) {
+  const parts = [];
+  root.updateMatrixWorld(true);
+  root.traverse((o) => {
+    if (!o.isMesh || !(o.material === mat || o.material?.userData?.glow)) return;
+    parts.push(o);
+  });
+  if (!parts.length || parts.length > MAX_BONES) return null;
+  let g = mergeCache.get(kind);
+  if (!g) {
+    const pos = [], nor = [], col = [], bone = [], glow = [];
+    parts.forEach((o, bi) => {
+      const G = o.geometry, P = G.attributes.position, N = G.attributes.normal, C = G.attributes.color;
+      const isGlow = o.material !== mat;
+      const gc = isGlow ? o.material.color : null;
+      for (let i = 0; i < P.count; i++) {
+        pos.push(P.getX(i), P.getY(i), P.getZ(i));
+        if (N) nor.push(N.getX(i), N.getY(i), N.getZ(i)); else nor.push(0, 1, 0);
+        if (isGlow) col.push(gc.r, gc.g, gc.b); else col.push(C.getX(i), C.getY(i), C.getZ(i));
+        bone.push(bi); glow.push(isGlow ? 1 : 0);
+      }
+    });
+    g = new T.BufferGeometry();
+    g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+    g.setAttribute('normal', new T.Float32BufferAttribute(nor, 3));
+    g.setAttribute('color', new T.Float32BufferAttribute(col, 3));
+    g.setAttribute('aBone', new T.Float32BufferAttribute(bone, 1));
+    g.setAttribute('aGlow', new T.Float32BufferAttribute(glow, 1));
+    mergeCache.set(kind, g);
+  }
+  for (const o of parts) o.layers.disableAll(); // keeps the transform (and .visible) for the kinds, never drawn
+  const merged = new T.Mesh(g, mat);
+  merged.frustumCulled = false;
+  const inv = new T.Matrix4(), zero = new T.Matrix4().makeScale(0, 0, 0);
+  const visibleChain = (o) => { for (let p = o; p && p !== root; p = p.parent) if (!p.visible) return false; return true; };
+  merged.onBeforeRender = () => {
+    inv.copy(root.matrixWorld).invert();
+    const B = mat.userData.u.uBones.value;
+    for (let i = 0; i < parts.length; i++) {
+      if (!visibleChain(parts[i])) B[i].copy(zero);
+      else B[i].multiplyMatrices(inv, parts[i].matrixWorld);
+    }
+  };
+  root.add(merged);
+  return merged;
 }
 
 export function glowMaterial(color, opts = {}) {
   const key = color + JSON.stringify(opts);
   if (!glowMats.has(key)) {
-    glowMats.set(key, new T.MeshBasicMaterial({ color: new T.Color(color), toneMapped: false, fog: false, ...opts }));
+    const gm = new T.MeshBasicMaterial({ color: new T.Color(color), toneMapped: false, fog: false, ...opts });
+    gm.userData.glow = true;
+    glowMats.set(key, gm);
   }
   return glowMats.get(key);
 }
@@ -336,5 +398,6 @@ export function buildModel(THREE, kind) {
   const mat = bodyMaterial();
   const parts = BUILDERS[kind](mat);
   parts.mat = mat;
+  parts.merged = compile(kind, parts.root, mat);
   return parts;
 }

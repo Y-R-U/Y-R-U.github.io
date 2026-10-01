@@ -1,17 +1,7 @@
 // Pulse bolts: the player's Pulse Bow and the wireframe archer share this. Pooled meshes, cap 48.
-const CAP = 48;
+import { segBox } from '../core/math.js';
 
-function segBox(o, d, len, b) {
-  let t0 = 0, t1 = len;
-  for (let a = 0; a < 3; a++) {
-    if (Math.abs(d[a]) < 1e-9) { if (o[a] < b[a] || o[a] > b[a + 3]) return -1; continue; }
-    let ta = (b[a] - o[a]) / d[a], tb = (b[a + 3] - o[a]) / d[a];
-    if (ta > tb) [ta, tb] = [tb, ta];
-    t0 = Math.max(t0, ta); t1 = Math.min(t1, tb);
-    if (t0 > t1) return -1;
-  }
-  return t0;
-}
+const CAP = 48;
 
 export class Projectiles {
   constructor(ctx, game) {

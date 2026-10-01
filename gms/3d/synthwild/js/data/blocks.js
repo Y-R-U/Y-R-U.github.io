@@ -198,18 +198,28 @@ const REPAINT = {
 };
 for (const k in REPAINT) BLOCKS[BLOCK[k.toUpperCase()]].color = hexToRgb(REPAINT[k]);
 
-export const MAX_ID = BLOCKS.length - 1;
-
 // Light helpers used by the world (and handy for the renderer).
 // opacity: 15 = blocks light completely; otherwise extra attenuation on top of the normal 1 per step.
 export const OPACITY = new Uint8Array(256);
 export const EMIT = new Uint8Array(256);
 export const SOLID = new Uint8Array(256);
+// LIQUID: real liquid (water). WET: anything you swim or are underwater in (liquid, or a waterlogged plant like kelp).
+// PLANT: X-mesh, no collision. CLIMB: ladders (vines, rails). REPLACEABLE: what a survival place may write over.
+export const LIQUID = new Uint8Array(256);
+export const WET = new Uint8Array(256);
+export const PLANT = new Uint8Array(256);
+export const CLIMB = new Uint8Array(256);
+export const REPLACEABLE = new Uint8Array(256);
 for (let i = 0; i < 256; i++) OPACITY[i] = 15;
 for (const b of BLOCKS) {
   if (!b) continue;
   EMIT[b.id] = b.light;
   SOLID[b.id] = b.solid ? 1 : 0;
+  LIQUID[b.id] = b.liquid ? 1 : 0;
+  WET[b.id] = b.liquid || b.waterlogged ? 1 : 0;
+  PLANT[b.id] = b.plant ? 1 : 0;
+  CLIMB[b.id] = b.climb || b.key === 'data_vine' || b.key === 'climb_rail' ? 1 : 0;
+  REPLACEABLE[b.id] = b.id === 0 || b.liquid || b.plant ? 1 : 0;
   if (b.id === 0 || b.plant || b.shape === 'rail' || (b.transparent && !b.liquid)) OPACITY[b.id] = 0;
   else if (b.liquid || b.cutout) OPACITY[b.id] = 1;
   else OPACITY[b.id] = 15;

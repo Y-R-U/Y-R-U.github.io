@@ -1,10 +1,11 @@
 // ctx.settings: get/set/on, persisted in localStorage 'synthwild.settings'.
+import { isMobile, defaultQuality } from '../core/quality.js';
+
 const KEY = 'synthwild.settings';
-const touch = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 
 export const DEFAULTS = {
   music: 0.6, sfx: 0.8, voice: 0.9, narrator: 'male', muteAll: false, musicOn: true, sfxOn: true, voiceOn: true,
-  fullscreen: false, renderDistance: touch ? 6 : 8, quality: touch ? 'med' : 'high', fov: 75, showFps: false,
+  fullscreen: false, renderDistance: isMobile ? 6 : 8, quality: defaultQuality(), fov: 75, showFps: false,
   sensitivity: 1, invertY: false, leftHanded: false, uiScale: 1, view: 'first',
   autoJump: true, aimAssist: true, noFallDamage: false, keepInventory: false, toolsNeverBreak: false,
   peaceful: false, alwaysDay: false, mobGrief: false, buildMobs: false, highContrast: false, subtitles: true, guide: true, treeFelling: true, minigamesBots: 'normal',

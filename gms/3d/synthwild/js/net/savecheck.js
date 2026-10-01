@@ -1,7 +1,8 @@
 // Validates a loaded save before it reaches the game. Saves can come from other
 // players (public worlds), so nothing in them is trusted: bad numbers are
 // clamped or dropped, and anything structurally wrong throws code 'corrupt'.
-const XZ_LIMIT = 1e6;
+const XZ_LIMIT = 30000;   // the world border (js/world/world.js WORLD_BORDER)
+const CHUNK_LIMIT = Math.ceil(XZ_LIMIT / 16) + 1;
 const Y_MIN = -16, Y_MAX = 256;
 const MAX_SECTIONS = 50000;
 const MAX_SECTION_CHARS = 200000;
@@ -64,6 +65,8 @@ export function sanitizeSave(save) {
     for (const k of keys) {
       const v = secs[k];
       if (!SECTION_KEY.test(k) || typeof v !== 'string' || v.length > MAX_SECTION_CHARS) throw new SaveError('bad section ' + k.slice(0, 20));
+      const [cx, , cz] = k.split(',').map(Number);
+      if (Math.abs(cx) > CHUNK_LIMIT || Math.abs(cz) > CHUNK_LIMIT) continue;   // past the border: dropped
       clean[k] = v;
     }
     out.world = { ...w, sections: clean };

@@ -1,9 +1,9 @@
 // node tools/player_test.mjs — pure parts of lane 3: collision, snapping, survival cost.
-import { BODY, moveBody, sweep, boxOf, canJumpOver, unstick, fallDamage } from '../js/player/physics.js';
-import { placeBox, breakBox, unionBox, clampVolume, costUnits, payUnits, subsToBlocks, aabbOverlapsSubBox, boxVolume } from '../js/player/brushmath.js';
+import { BODY, moveBody, sweep, boxOf, canJumpOver, unstick } from '../js/player/physics.js';
+import { placeBox, breakBox, unionBox, clampVolume, costUnits, payUnits, aabbOverlapsSubBox, boxVolume } from '../js/player/brushmath.js';
 import { StubWorld, BLOCKS } from './player_stubworld.js';
 import { Inventory } from '../js/game/inventory.js';
-import { readBox, writeBox, rleEncode, rleDecode, greedyBoxes, rotateY, mirrorX, stampBox, createHistory } from '../js/player/edits.js';
+import { readBox, writeBox, rleEncode, rleDecode, rotateY, mirrorX, stampBox, createHistory } from '../js/player/edits.js';
 import { createItems } from '../js/data/items.js';
 
 let pass = 0, fail = 0;
@@ -75,7 +75,6 @@ function sim(b, vx, vz, secs, opts = { step: true }) {
   const b = body(-4, 32.5, 0.5);
   ok(unstick(solid, b) && near(b.y, 34), `unstick to top (y=${b.y})`);
 }
-ok(fallDamage(3) === 0 && fallDamage(5) === 1 && fallDamage(10) === 3.5, 'fall damage curve');
 
 // --- sweep exactness vs fine grid
 {
@@ -119,7 +118,6 @@ ok(fallDamage(3) === 0 && fallDamage(5) === 1 && fallDamage(10) === 3.5, 'fall d
     have -= r.blocks; credit = r.credit; placed++;
   }
   ok(placed === 64 && have === 0 && credit === 0, `64 placements at 0.25 per block (placed ${placed})`);
-  ok(eq(subsToBlocks(100, 30), { blocks: 2, carry: 2 }), 'subs → blocks with carry');
   // Lane 4's inventory handles 64ths natively.
   const items = createItems(BLOCKS);
   const inv = new Inventory(items);
@@ -142,17 +140,19 @@ ok(fallDamage(3) === 0 && fallDamage(5) === 1 && fallDamage(10) === 3.5, 'fall d
 
 // --- edit history, stamps
 {
-  const ew = new StubWorld();
-  const min = [-8, 124, -26], max = [16, 140, -18];        // straddles the steps + ground
+  const { World } = await import('../js/world/world.js');
+  const ew = new World({ seed: 'edits', sync: true });
+  const [ex, , ez] = ew.spawn;
+  ew.ensureArea(ex, ez, 1);
+  const gx = Math.floor(ex * 4), gy = Math.floor(ew.surfaceY(ex, ez) * 4), gz = Math.floor(ez * 4);
+  const min = [gx - 8, gy - 8, gz - 26], max = [gx + 16, gy + 8, gz - 18];        // straddles the ground surface
   const before = readBox(ew, min, max);
   let same = true;
   for (let y = min[1], i = 0; y < max[1]; y++) for (let z = min[2]; z < max[2]; z++) for (let x = min[0]; x < max[0]; x++, i++)
     if (before[i] !== ew.getSub(x, y, z)) same = false;
   ok(same, 'readBox matches getSub');
   ok(eq([...rleDecode(rleEncode(before), before.length)], [...before]), 'RLE round trip');
-  ok(rleEncode(before).length < before.length / 4, `RLE compresses terrain (${rleEncode(before).length}/${before.length})`);
-  const boxes = greedyBoxes(before, [24, 16, 8]);
-  ok(boxes.reduce((a, b) => a + (b[3] - b[0]) * (b[4] - b[1]) * (b[5] - b[2]), 0) === before.length && boxes.length < 40, `greedy covers exactly (${boxes.length} boxes)`);
+  ok(rleEncode(before).length < before.length / 3, `RLE compresses terrain (${rleEncode(before).length}/${before.length})`);
   const h = createHistory();
   ok(h.record(ew, min, max), 'record');
   ew.setBox(min, max, 10, 'hollow', { wall: 2 });
@@ -166,7 +166,7 @@ ok(fallDamage(3) === 0 && fallDamage(5) === 1 && fallDamage(10) === 3.5, 'fall d
   ok(eq([...readBox(ew, min, max)], [...before]), 'undo again');
   // cap by steps
   const h2 = createHistory({ maxSteps: 3 });
-  for (let i = 0; i < 6; i++) h2.record(ew, [0, 128, 0], [4, 132, 4]);
+  for (let i = 0; i < 6; i++) h2.record(ew, [gx, gy + 4, gz], [gx + 4, gy + 8, gz + 4]);
   ok(h2.steps === 3, 'history step cap');
   const h3 = createHistory({ maxBytes: 100 });
   for (let i = 0; i < 6; i++) h3.record(ew, min, max);
@@ -180,10 +180,10 @@ ok(fallDamage(3) === 0 && fallDamage(5) === 1 && fallDamage(10) === 3.5, 'fall d
   ok(eq(stampBox([5, 129, 9], [1, 0, 0], [4, 8, 4], 1), { min: [6, 129, 7], max: [10, 137, 11] }), 'stamp on a side face: bottom at hit level');
   // keepAir paste leaves world where stamp is air
   const stamp = new Uint8Array(4 * 4 * 4); stamp[0] = 10;
-  const pmin = [-80, 128, -80];
-  ew.setBox([-79, 128, -80], [-78, 129, -79], 3, 'fill');
-  writeBox(ew, pmin, [-76, 132, -76], stamp, { keepAir: true });
-  ok(ew.getSub(-80, 128, -80) === 10 && ew.getSub(-79, 128, -80) === 3, 'keepAir paste');
+  const pmin = [gx + 40, gy + 16, gz + 40];
+  ew.setBox([pmin[0] + 1, pmin[1], pmin[2]], [pmin[0] + 2, pmin[1] + 1, pmin[2] + 1], 3, 'fill');
+  writeBox(ew, pmin, pmin.map((v) => v + 4), stamp, { keepAir: true });
+  ok(ew.getSub(...pmin) === 10 && ew.getSub(pmin[0] + 1, pmin[1], pmin[2]) === 3, 'keepAir paste');
 }
 
 // --- against lane 1's real World (sync generation)

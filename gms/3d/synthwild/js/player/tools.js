@@ -1,6 +1,6 @@
 // Build-mode power tools on top of the brush: undo/redo, copy → paste stamp (rotate/mirror, ghost preview), eyedropper.
 import { createHistory, readBox, writeBox, rotateY, mirrorX, stampBox, sizeOf, MAX_BOX_SUBS } from './edits.js';
-import { BLOCKS } from '../data/blocks.js';
+import { BLOCKS, LIQUID } from '../data/blocks.js';
 import { COLORS } from './brushview.js';
 
 // Entries lane 5's wheel can show. enabled(brush) tells it whether to grey the entry out.
@@ -41,7 +41,7 @@ export function createTools(brush, ctx) {
         const xx = Math.min(sx - 1, x + (k & 1) * 2), yy = Math.min(sy - 1, y + ((k >> 1) & 1) * 2), zz = Math.min(sz - 1, z + (k >> 2) * 2);
         m = d[xx + zz * sx + yy * sx * sz];
       }
-      if (m && !BLOCKS[m]?.liquid) pts.push(x, y, z, m);
+      if (m && !LIQUID[m]) pts.push(x, y, z, m);
     }
     const n = pts.length / 4;
     if (!n) return;
@@ -159,7 +159,7 @@ export function createTools(brush, ctx) {
     // Eyedropper: build mode puts the block in the held slot; survival selects a hotbar slot that has it.
     pick(hit) {
       const mat = hit?.mat;
-      if (!mat || !BLOCKS[mat] || BLOCKS[mat].liquid) return false;
+      if (!mat || !BLOCKS[mat] || LIQUID[mat]) return false;
       const inv = ctx.game?.inv;
       if (!inv) { brush.buildMat = mat; return true; }
       const slot = inv.slots.slice(0, 9).findIndex(s => s && s.id === mat);

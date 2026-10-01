@@ -55,19 +55,25 @@ async function round(level, mode) {
   floorfall.build(A);
   const mg = { ctx, arena: A, hud, level, variant: null, finish(r) { result = r; } };
   await floorfall.start(mg);
-  let t = 0;
+  let t = 0, sparks = 0, fallen = 0, setBoxes = 0, frames = 0;
+  ctx.fx = { spark: () => { sparks++; } };
+  const os = world.setBox;
+  world.setBox = function (...a) { setBoxes++; return os.apply(this, a); };
   while (!result && t < 240) {
     ctx.player.step(DT, floorfall.cracks);
     floorfall.update(DT);
-    t += DT;
+    t += DT; frames++;
+    for (const v of floorfall.cracks.values()) if (v <= 0) fallen++;
   }
+  world.setBox = os;
+  R3.push({ fallen, sparks, setBoxPerFrame: setBoxes / frames });
   const unsticks = floorfall.bots.reduce((a, b) => a + (b.stuckCount || 0), 0);
   const r = { level, mode, t: +floorfall.t.toFixed(1), unsticks, won: result?.won };
   floorfall.end();
   return r;
 }
 
-const rows = [];
+const rows = [], R3 = [];
 for (const level of ['easy', 'normal', 'hard']) for (let i = 0; i < ROUNDS; i++) rows.push(await round(level, i % 2 ? 'still' : 'wander'));
 for (const r of rows) console.log(`  ${r.level.padEnd(6)} ${r.mode.padEnd(6)} round ${String(r.t).padStart(5)} s  unstick ${r.unsticks}  ${r.won ? 'won' : 'lost'}`);
 const med = (a) => { const s = [...a].sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
@@ -77,6 +83,9 @@ const uMax = Math.max(...rows.map((r) => r.unsticks)), uMed = med(rows.map((r) =
 ok(tMed >= 50 && tMed <= 110, `median round length ${tMed} s (want ~60–90)`);
 ok(med(wander) >= 50, `a moving player's median round ${med(wander)} s`);
 ok(uMed <= 2 && uMax <= 5, `unstick hops per round: median ${uMed}, max ${uMax} (want rare)`);
+// R3 C1: a fallen tile leaves the crack map at once, so it is never re-broken or re-sparked frame after frame.
+ok(R3.every((r) => r.fallen === 0), `no fallen tiles linger in the crack map (${R3.map((r) => r.fallen).join(',')})`);
+ok(R3.every((r) => r.setBoxPerFrame < 3), `setBox calls per frame stay small (max ${Math.max(...R3.map((r) => r.setBoxPerFrame)).toFixed(1)})`);
 const card = floorfall.minutes;
 ok(Math.abs(card * 60 - tMed) <= 60, `the card says ${card} min, rounds run ${tMed} s`);
 console.log(`mg_floorfall_test: ${pass} passed, ${fail} failed`);

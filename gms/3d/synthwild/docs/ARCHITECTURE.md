@@ -10,7 +10,7 @@ gms/3d/synthwild/
   index.html            lane 2 (engine)  — canvas#game, #ui-root, importmap, classic inline boot watchdog
   css/                  lane 5 (ui)
   js/main.js            lane 2 — boot, ctx, frame loop, game.start/stop
-  js/core/              lane 2 — bus.js (event emitter), rng.js (seeded), math helpers
+  js/core/              lane 2 — bus.js (event emitter), rng.js (hashString + mulberry32), math helpers
   js/world/             lane 1 (world) — storage, terrain gen, light, edits, raycast, persistence, gen worker
   js/data/blocks.js     lane 1 — block registry
   js/render/            lane 2 — mesher worker, atlas, materials/shaders, chunk renderer, sky/day-night, water, fx
@@ -80,7 +80,7 @@ procedurally at boot (`js/render/atlas.js`, lane 2) from the per-tile style hint
 ## ctx (built in `js/main.js`, passed to every module's `init(ctx)`)
 ```js
 ctx = { THREE, renderer, scene, camera, canvas, uiRoot,
-  bus, rng, world, render, sky, fx,           // lanes 1-2
+  bus, world, render, sky, fx,                // lanes 1-2
   input, player, brush,                       // lane 3
   game: { mobs, survival, inv, items },       // lane 4
   ui, audio, settings,                        // lane 5

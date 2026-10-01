@@ -46,27 +46,41 @@ function applyVolumes() {
   busVoice.gain.setTargetAtTime(settings.gain('voice') ** 1.2, t, 0.05);
 }
 
-function makeTrack(name, idx) {
-  const list = PLAYLISTS[name];
-  const el = new Audio(BASE + list[idx % list.length]);
+// Two persistent music slots (for the crossfade) and one VO slot. A MediaElementAudioSourceNode pins its <audio> for
+// the page's lifetime, so elements are made once and only their src changes (one new pair per track used to leak).
+const slots = [];
+function slot(i) {
+  if (slots[i]) return slots[i];
+  const el = new Audio();
   el.crossOrigin = 'anonymous';
   el.preload = 'auto';
-  el.loop = list.length === 1;
   const src = ac.createMediaElementSource(el);
   const gain = ac.createGain();
   gain.gain.value = 0.0001;
   src.connect(gain).connect(busMusic);
-  const tr = { name, el, src, gain, idx };
-  if (!el.loop) el.addEventListener('ended', () => { if (cur === tr) startTrack(name, idx + 1); });
+  const sl = { el, src, gain, track: null, token: 0 };
+  el.addEventListener('ended', () => { const tr = sl.track; if (tr && cur === tr && !el.loop) startTrack(tr.name, tr.idx + 1); });
+  return (slots[i] = sl);
+}
+
+function makeTrack(name, idx) {
+  const list = PLAYLISTS[name];
+  const sl = slot(cur && cur.slot === slots[0] ? 1 : 0);
+  sl.token++;
+  sl.el.pause();
+  sl.el.loop = list.length === 1;
+  sl.el.src = BASE + list[idx % list.length];
+  const tr = { name, idx, el: sl.el, gain: sl.gain, slot: sl };
+  sl.track = tr;
   return tr;
 }
 
 function fadeOut(tr) {
-  const t = ac.currentTime;
+  const t = ac.currentTime, sl = tr.slot, token = sl.token;
   tr.gain.gain.cancelScheduledValues(t);
   tr.gain.gain.setValueAtTime(tr.gain.gain.value, t);
   tr.gain.gain.linearRampToValueAtTime(0.0001, t + FADE);
-  setTimeout(() => { tr.el.pause(); tr.src.disconnect(); tr.el.src = ''; }, FADE * 1000 + 100);
+  setTimeout(() => { if (sl.token === token) { sl.el.pause(); sl.track = null; } }, FADE * 1000 + 100);
 }
 
 function startTrack(name, idx = 0) {
@@ -162,19 +176,29 @@ export const audio = {
     ensure();
     audio._vo?.stop();
     return new Promise((resolve) => {
-      const el = new Audio(audio.voBase(who) + key + '.mp3');
-      el.crossOrigin = 'anonymous';
-      let src = null, done = false;
+      if (!audio._voSlot) {
+        const el = new Audio();
+        el.crossOrigin = 'anonymous';
+        let src = null;
+        try { src = ac.createMediaElementSource(el); src.connect(busVoice); } catch { /* no WebAudio: element volume */ }
+        audio._voSlot = { el, src, fin: null };
+        el.addEventListener('ended', () => audio._voSlot.fin?.());
+        el.addEventListener('error', () => audio._voSlot.fin?.());
+        el.addEventListener('playing', () => audio._voSlot.onStart?.(el.duration));
+      }
+      const S = audio._voSlot, el = S.el;
+      let done = false;
       const fin = () => {
         if (done) return; done = true;
+        if (S.fin === fin) { S.fin = null; S.onStart = null; }
         audio.duck(false); audio._vo = null;
-        try { src?.disconnect(); } catch {}
         resolve();
       };
-      try { src = ac.createMediaElementSource(el); src.connect(busVoice); } catch { el.volume = settings.gain('voice'); }
-      el.addEventListener('ended', fin);
-      el.addEventListener('error', fin);
-      el.addEventListener('playing', () => onStart?.(el.duration), { once: true });
+      S.fin = fin;
+      let started = false;
+      S.onStart = (d) => { if (!started) { started = true; onStart?.(d); } };
+      if (!S.src) el.volume = settings.gain('voice');
+      el.src = audio.voBase(who) + key + '.mp3';
       audio._vo = { el, stop: () => { el.pause(); fin(); } };
       audio.duck(true);
       el.play().catch(fin);

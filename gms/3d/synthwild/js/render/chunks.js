@@ -11,8 +11,7 @@ export function createChunkRenderer(ctx, { BLOCKS, TILES }) {
   const { THREE, scene } = ctx;
   const atlas = buildAtlas(THREE, TILES);
   const table = buildBlockTable(BLOCKS, TILES);
-  const quality = () => ctx.flags?.quality || (ctx.flags?.lite ? 'low' : ctx.settings?.get?.('quality') || (ctx.isMobile ? 'med' : 'high'));
-  const materials = createMaterials(THREE, atlas, ctx.sky.uniforms, quality());
+  const materials = createMaterials(THREE, atlas, ctx.sky.uniforms, ctx.quality());
   const mats = [materials.opaque, materials.cutout, materials.water];
   const results = [];
   const retries = new Map();
@@ -73,7 +72,7 @@ export function createChunkRenderer(ctx, { BLOCKS, TILES }) {
     const [cx, , cz] = parseKey(key);
     if (res) secs.set(key, res); else if (!secs.delete(key)) return;
     const ck = cx + ',' + cz;
-    if (!cols.has(ck)) cols.set(ck, { cx, cz, parts: [null, null, null], quads: 0 });
+    if (!cols.has(ck)) cols.set(ck, { cx, cz, parts: [null, null, null], quads: 0, near: false, box: new THREE.Box3(), y0: 99, y1: -1 });
     dirtyCols.add(ck);
   }
 
@@ -82,6 +81,7 @@ export function createChunkRenderer(ctx, { BLOCKS, TILES }) {
     if (!c) return;
     disposeCol(c);
     c.quads = 0;
+    c.y0 = 99; c.y1 = -1;
     let any = false;
     for (let p = 0; p < 3; p++) {
       const list = [];
@@ -115,6 +115,7 @@ export function createChunkRenderer(ctx, { BLOCKS, TILES }) {
       geo.setAttribute('aData', new THREE.BufferAttribute(data, 4));
       geo.setIndex(new THREE.BufferAttribute(index, 1));
       const y0 = minY * 1024, y1 = (maxY + 1) * 1024;
+      c.y0 = Math.min(c.y0, minY); c.y1 = Math.max(c.y1, maxY + 1);
       geo.boundingBox = new THREE.Box3(new THREE.Vector3(0, y0, 0), new THREE.Vector3(1024, y1, 1024));
       geo.boundingSphere = geo.boundingBox.getBoundingSphere(new THREE.Sphere());
       const m = new THREE.Mesh(geo, mats[p]);
@@ -123,12 +124,16 @@ export function createChunkRenderer(ctx, { BLOCKS, TILES }) {
       m.matrixAutoUpdate = false;
       m.updateMatrix();
       m.renderOrder = p;
-      m.visible = inRange(c.cx, c.cz);
+      m.frustumCulled = false; // culled per column with a box test in update() (tighter than three's sphere)
+      m.visible = false;
       group.add(m);
       c.parts[p] = m;
       any = true;
     }
-    if (!any) cols.delete(ck);
+    if (!any) { cols.delete(ck); return; }
+    c.box.min.set(c.cx * 16, c.y0 * 16, c.cz * 16);
+    c.box.max.set(c.cx * 16 + 16, c.y1 * 16, c.cz * 16 + 16);
+    c.near = inRange(c.cx, c.cz);
   }
 
   function dispatch() {
@@ -162,6 +167,7 @@ export function createChunkRenderer(ctx, { BLOCKS, TILES }) {
   }
 
   let cullTimer = 0, lastRD = -1;
+  const frustum = new THREE.Frustum(), projView = new THREE.Matrix4();
   const render = {
     atlas, materials, table, group, stats,
     setWorld,
@@ -208,11 +214,22 @@ export function createChunkRenderer(ctx, { BLOCKS, TILES }) {
             continue;
           }
           const vis = inRange(c.cx, c.cz);
-          for (const m of c.parts) if (m) m.visible = vis;
+          c.near = vis;
           if (vis) { quads += c.quads; n++; }
         }
         stats.columns = n; stats.sections = secs.size; stats.quads = quads;
       }
+      // per-frame frustum test against each column's box
+      cam.updateMatrixWorld();
+      projView.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse);
+      frustum.setFromProjectionMatrix(projView);
+      let drawn = 0;
+      for (const c of cols.values()) {
+        const v = c.near && frustum.intersectsBox(c.box);
+        if (v) drawn++;
+        for (const m of c.parts) if (m) m.visible = v;
+      }
+      stats.drawnColumns = drawn;
       stats.pending = stale.size; stats.inflight = pool.inflight();
       let under = 0;
       try {

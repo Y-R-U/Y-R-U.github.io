@@ -1,5 +1,4 @@
-// Build-mode edit history (undo/redo) and copy/paste stamps. Works on any world exposing
-// getCell/getSub/setBox; uses world.readBox/writeBox when lane 1 provides them.
+// Build-mode edit history (undo/redo) and copy/paste stamps, on top of world.readBox/writeBox.
 // Dense box data is x-fastest: i = x + z*sx + y*sx*sz.
 
 export const MAX_UNDO = 50;
@@ -26,39 +25,21 @@ function keepUnloaded(world, min, max, data) {
 }
 
 export function readBox(world, min, max, { snapshot = false } = {}) {
-  if (world.readBox) {   // lane 1: { size, data, unloaded }, same index order
-    const r = world.readBox(min, max);
-    return snapshot && r.unloaded && world.isChunkLoaded ? keepUnloaded(world, min, max, r.data) : r.data;
-  }
-  const [sx, sy, sz] = sizeOf(min, max);
-  const out = new Uint8Array(sx * sy * sz);
-  const sxz = sx * sz;
-  for (let cy = min[1] >> 2; cy <= (max[1] - 1) >> 2; cy++)
-    for (let cz = min[2] >> 2; cz <= (max[2] - 1) >> 2; cz++)
-      for (let cx = min[0] >> 2; cx <= (max[0] - 1) >> 2; cx++) {
-        const x0 = Math.max(min[0], cx * 4), x1 = Math.min(max[0], cx * 4 + 4);
-        const y0 = Math.max(min[1], cy * 4), y1 = Math.min(max[1], cy * 4 + 4);
-        const z0 = Math.max(min[2], cz * 4), z1 = Math.min(max[2], cz * 4 + 4);
-        const v = world.getCell(cx, cy, cz);
-        for (let y = y0; y < y1; y++) for (let z = z0; z < z1; z++) {
-          let i = (x0 - min[0]) + (z - min[2]) * sx + (y - min[1]) * sxz;
-          if (v >= 0) { out.fill(v, i, i + (x1 - x0)); continue; }
-          for (let x = x0; x < x1; x++) out[i++] = world.getSub(x, y, z);
-        }
-      }
-  return out;
+  const r = world.readBox(min, max);   // { size, data, unloaded }, same index order
+  return snapshot && r.unloaded ? keepUnloaded(world, min, max, r.data) : r.data;
 }
 
 export function rleEncode(data) {
-  const out = [];
+  let out = new Uint8Array(Math.min(2 * data.length, 1 << 16) || 2), o = 0;
   for (let i = 0; i < data.length;) {
     const v = data[i];
     let n = 1;
     while (n < 255 && i + n < data.length && data[i + n] === v) n++;
-    out.push(v, n);
+    if (o + 2 > out.length) { const g = new Uint8Array(out.length * 2); g.set(out); out = g; }
+    out[o++] = v; out[o++] = n;
     i += n;
   }
-  return Uint8Array.from(out);
+  return out.slice(0, o);
 }
 
 export function rleDecode(rle, len) {
@@ -68,44 +49,9 @@ export function rleDecode(rle, len) {
   return out;
 }
 
-// Greedy decomposition of dense data into same-material boxes: [x0,y0,z0,x1,y1,z1,mat] (local, max exclusive).
-export function greedyBoxes(data, size, skip = -1) {
-  const [sx, sy, sz] = size, sxz = sx * sz;
-  const done = new Uint8Array(data.length);
-  const boxes = [];
-  for (let y = 0; y < sy; y++) for (let z = 0; z < sz; z++) for (let x = 0; x < sx; x++) {
-    const i = x + z * sx + y * sxz;
-    if (done[i]) continue;
-    const m = data[i];
-    if (m === skip) { done[i] = 1; continue; }
-    let w = 1;
-    while (x + w < sx && !done[i + w] && data[i + w] === m) w++;
-    const rowOk = (zz, yy) => {
-      const b = x + zz * sx + yy * sxz;
-      for (let k = 0; k < w; k++) if (done[b + k] || data[b + k] !== m) return false;
-      return true;
-    };
-    let d = 1;
-    while (z + d < sz && rowOk(z + d, y)) d++;
-    let h = 1;
-    outer: while (y + h < sy) { for (let zz = z; zz < z + d; zz++) if (!rowOk(zz, y + h)) break outer; h++; }
-    for (let yy = y; yy < y + h; yy++) for (let zz = z; zz < z + d; zz++) done.fill(1, x + zz * sx + yy * sxz, x + zz * sx + yy * sxz + w);
-    boxes.push([x, y, z, x + w, y + h, z + d, m]);
-  }
-  return boxes;
-}
-
 // Write dense data back. keepAir: air in the data leaves the world untouched (stamps); otherwise exact restore.
 export function writeBox(world, min, max, data, { keepAir = false } = {}) {
-  if (world.writeBox) return world.writeBox(min, max, data, { skipAir: keepAir });
-  const opts = { flow: false, support: false };
-  let changed = 0;
-  if (!keepAir) changed += world.setBox(min, max, 0, 'fill', opts)?.changed || 0;
-  for (const b of greedyBoxes(data, sizeOf(min, max), 0)) {
-    const a = [min[0] + b[0], min[1] + b[1], min[2] + b[2]], z = [min[0] + b[3], min[1] + b[4], min[2] + b[5]];
-    changed += world.setBox(a, z, b[6], 'fill', opts)?.changed || 0;
-  }
-  return { changed };
+  return world.writeBox(min, max, data, { skipAir: keepAir });
 }
 
 export function rotateY(data, size) {
@@ -138,27 +84,41 @@ export function stampBox(hit, normal, size, n = 1) {
   return { min, max: min.map((v, i) => v + size[i]) };
 }
 
+// Snapshots are kept raw at first (a 64 m stamp's snapshot is one readBox, no encode on the stamp frame) and
+// RLE-compressed later, one entry per idle slot.
+const idle = (fn) => (typeof requestIdleCallback === 'function' ? requestIdleCallback(fn, { timeout: 2000 }) : setTimeout(fn, 0));
+
 export function createHistory({ maxSteps = MAX_UNDO, maxBytes = UNDO_BYTES } = {}) {
   const undo = [], redo = [];
-  let bytes = 0;
+  let bytes = 0, packing = false;
+  const size = (e) => (e.raw ? e.raw.length : e.rle.length);
   const trim = () => {
-    while (undo.length && (undo.length + redo.length > maxSteps || bytes > maxBytes)) bytes -= undo.shift().rle.length;
-    while (redo.length && bytes > maxBytes) bytes -= redo.shift().rle.length;
+    while (undo.length && (undo.length + redo.length > maxSteps || bytes > maxBytes)) bytes -= size(undo.shift());
+    while (redo.length && bytes > maxBytes) bytes -= size(redo.shift());
   };
+  const pack = () => {
+    packing = false;
+    const e = undo.find((x) => x.raw) || redo.find((x) => x.raw);
+    if (!e) return;
+    const rle = rleEncode(e.raw);
+    bytes += rle.length - e.raw.length;
+    e.rle = rle; e.raw = null;
+    later();
+  };
+  const later = () => { if (!packing && (undo.some((x) => x.raw) || redo.some((x) => x.raw))) { packing = true; idle(pack); } };
   const snap = (world, min, max) => {
     const [sx, sy, sz] = sizeOf(min, max);
     if (sx * sy * sz > MAX_BOX_SUBS || sx <= 0 || sy <= 0 || sz <= 0) return null;
-    const rle = rleEncode(readBox(world, min, max, { snapshot: true }));
-    return { min: min.slice(), max: max.slice(), rle };
+    return { min: min.slice(), max: max.slice(), raw: readBox(world, min, max, { snapshot: true }), rle: null };
   };
   const swap = (world, from, to) => {
     const e = from.pop();
     if (!e) return null;
-    bytes -= e.rle.length;
+    bytes -= size(e);
     const cur = snap(world, e.min, e.max);
     const [sx, sy, sz] = sizeOf(e.min, e.max);
-    writeBox(world, e.min, e.max, rleDecode(e.rle, sx * sy * sz));
-    if (cur) { to.push(cur); bytes += cur.rle.length; trim(); }
+    writeBox(world, e.min, e.max, e.raw || rleDecode(e.rle, sx * sy * sz));
+    if (cur) { to.push(cur); bytes += size(cur); trim(); later(); }
     return e;
   };
   return {
@@ -170,10 +130,11 @@ export function createHistory({ maxSteps = MAX_UNDO, maxBytes = UNDO_BYTES } = {
     record(world, min, max) {
       const e = snap(world, min, max);
       if (!e) return false;
-      for (const r of redo) bytes -= r.rle.length;
+      for (const r of redo) bytes -= size(r);
       redo.length = 0;
-      undo.push(e); bytes += e.rle.length;
+      undo.push(e); bytes += size(e);
       trim();
+      later();
       return true;
     },
     undo(world) { return swap(world, undo, redo); },

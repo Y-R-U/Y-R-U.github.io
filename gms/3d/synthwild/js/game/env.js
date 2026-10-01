@@ -1,17 +1,11 @@
 // World queries the gameplay lane needs, tolerant of a world that is still loading.
-import { BLOCKS } from '../data/blocks.js';
+import { WET } from '../data/blocks.js';
 
 const SKY_ONLY = { sky: 15, block: 0 };
 
 export function lightAt(world, x, y, z) {
-  if (!world) return SKY_ONLY;
-  if (world.lightAt) { const v = world.lightAt(x, y, z); return { sky: v >> 4, block: v & 15 }; }
-  const cx = Math.floor(x), cy = Math.floor(y), cz = Math.floor(z);
-  if (cy >= 128) return SKY_ONLY;
-  if (cy < 0) return { sky: 0, block: 0 };
-  const sec = world.sections?.get(`${cx >> 4},${cy >> 4},${cz >> 4}`);
-  if (!sec) return SKY_ONLY;
-  const v = sec.light[(cx & 15) + (cz & 15) * 16 + (cy & 15) * 256];
+  if (!world?.lightAt) return SKY_ONLY;
+  const v = world.lightAt(x, y, z);
   return { sky: v >> 4, block: v & 15 };
 }
 
@@ -26,5 +20,5 @@ export function solidFn(src) {
   return (sx, sy, sz) => { const w = get(); return w ? !!w.isSolidSub(sx, sy, sz) : false; };
 }
 
-export const isLiquid = (mat) => !!(BLOCKS[mat]?.liquid || BLOCKS[mat]?.waterlogged);
+export const isLiquid = (mat) => WET[mat] === 1;
 export const liquidAt = (world, x, y, z) => isLiquid(matAt(world, x, y, z));

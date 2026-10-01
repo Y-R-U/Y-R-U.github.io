@@ -1,9 +1,7 @@
 // setBox: fill / hollow / shell / replace on the fine grid. Whole aligned cells stay uniform (never refined).
-import { BLOCKS, BLOCK, SOLID } from '../data/blocks.js';
+import { BLOCKS, BLOCK, SOLID, REPLACEABLE, LIQUID as LIQ } from '../data/blocks.js';
 import { REFINED, refineCell, setCellUniform, tryCollapse } from './section.js';
 
-const LIQ = new Uint8Array(256);
-for (const b of BLOCKS) if (b) LIQ[b.id] = b.liquid ? 1 : 0;
 const WATER = BLOCK.WATER, KELP = BLOCK.SERVER_KELP, VINE = BLOCK.DATA_VINE, BLOOM = BLOCK.LUMEN_BLOOM, RAIL = BLOCK.CLIMB_RAIL;
 const GROUNDED = new Uint8Array(256); // plants that need solid ground below
 for (const b of BLOCKS) if (b && b.plant && !b.hangs && !b.waterlogged && b.key !== 'glowbulb') GROUNDED[b.id] = 1;
@@ -12,6 +10,7 @@ const POUR_CAP = 512, POUR_SPREAD = 3;
 
 // opts: { wall: subs (default 4, hollow/shell wall thickness), flow: true (water fills new holes), support: true }
 export function setBox(world, min, max, mat, mode = 'fill', opts = {}) {
+  if (mode === 'place') return placeBox(world, min, max, mat, opts);
   let x0 = Math.min(min[0], max[0]), x1 = Math.max(min[0], max[0]);
   let y0 = Math.min(min[1], max[1]), y1 = Math.max(min[1], max[1]);
   let z0 = Math.min(min[2], max[2]), z1 = Math.max(min[2], max[2]);
@@ -237,8 +236,9 @@ export function readBox(world, min, max) {
     for (let sy = Math.max(y0, cy * 4); sy < Math.min(y1, cy * 4 + 4); sy++)
       for (let sz = Math.max(z0, cz * 4); sz < Math.min(z1, cz * 4 + 4); sz++) {
         let o = (Math.max(x0, cx * 4) - x0) + (sz - z0) * w + (sy - y0) * w * d;
-        for (let sx = Math.max(x0, cx * 4); sx < Math.min(x1, cx * 4 + 4); sx++, o++)
-          data[o] = sub ? sub[(sx & 3) + (sz & 3) * 4 + (sy & 3) * 16] : v;
+        const xa = Math.max(x0, cx * 4), xb = Math.min(x1, cx * 4 + 4);
+        if (!sub) { if (v) data.fill(v, o, o + xb - xa); continue; }   // data starts zeroed: air needs no write
+        for (let sx = xa; sx < xb; sx++, o++) data[o] = sub[(sx & 3) + (sz & 3) * 4 + (sy & 3) * 16];
       }
   }
   return { min: [x0, y0, z0], max: [x1, y1, z1], size: [w, h, d], data, unloaded };
@@ -311,4 +311,15 @@ export function writeBox(world, min, max, data, opts = {}) {
   for (let m = 1; m < 256; m++) if (removed[m]) res.removed.push({ mat: m, count: removed[m], blocks: removed[m] / 64 });
   res.removed.sort((a, b) => b.count - a.count);
   return res;
+}
+
+// ---------- place (survival) ----------
+// Like fill, but only air, liquid and plant subs take the new material: a place box that straddles into a
+// neighbouring cell (e.g. on top of a ½ slab) never overwrites solid blocks or unbreakable Coreplate.
+export function placeBox(world, min, max, mat, opts = {}) {
+  const r = readBox(world, min, max);
+  const d = r.data;
+  mat &= 255;
+  for (let i = 0; i < d.length; i++) d[i] = REPLACEABLE[d[i]] ? mat : KEEP;
+  return writeBox(world, r.min, r.max, d, opts);
 }

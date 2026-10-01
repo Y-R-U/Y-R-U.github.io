@@ -1,5 +1,5 @@
 // In-game HUD: hotbar, Integrity/Charge/air, crosshair, droop warning, damage vignette, FPS, scale chip.
-import { h, click } from './dom.js';
+import { h, click, setText, setCls, setStyle } from './dom.js';
 import { g } from './glyphs.js';
 import { iconURL, fmtCount } from './icons.js';
 import { settings } from './settings.js';
@@ -70,16 +70,16 @@ export function createHud(ctx, root, actions) {
       try { compTarget = w.structuresNear(p.x, p.z, 400).find((s) => s.kind === 'outpost' || s.kind === 'starter') || null; } catch { compTarget = null; }
     }
     const t = ctx.game?.journal?.done?.outpost || ctx.session?.mode === 'minigame' ? null : compTarget;
-    if (!t || !p) { compass.classList.remove('on'); return; }
+    if (!t || !p) { setCls(compass, 'on', false); return; }
     const dx = t.pos[0] - p.x, dz = t.pos[2] - p.z, d = Math.hypot(dx, dz);
-    if (d < 20) { compass.classList.remove('on'); return; }
+    if (d < 20) { setCls(compass, 'on', false); return; }
     const e = ctx.camera?.matrixWorld?.elements;
     const yawCam = e ? Math.atan2(-e[8], -e[10]) : 0;
     const ang = Math.atan2(dx, dz) - yawCam;
-    compArrow.style.transform = `rotate(${(-ang * 180) / Math.PI}deg)`;
-    const txt = `${KIND[t.kind] || t.kind} · ${Math.round(d)} m`;
-    if (compText.textContent !== txt) compText.textContent = txt;
-    compass.classList.add('on');
+    const deg = Math.round((-ang * 180) / Math.PI);
+    if (deg !== compArrow._deg) { compArrow._deg = deg; compArrow.style.transform = `rotate(${deg}deg)`; }
+    setText(compText, `${KIND[t.kind] || t.kind} · ${Math.round(d)} m`);
+    setCls(compass, 'on', true);
   }
   // ~60 s before dusk (night starts at time01 0.75; a day is 1200 s), warn once per day in survival.
   let duskWarned = false, lastT = null;
@@ -138,7 +138,7 @@ export function createHud(ctx, root, actions) {
 
   function setCells(cells, frac10, mode) {
     for (let i = 0; i < cells.length; i++) {
-      const f = Math.max(0, Math.min(1, frac10 - i));
+      const f = Math.round(Math.max(0, Math.min(1, frac10 - i)) * 20) / 20;   // 5% steps: a draining meter isn't a write every frame
       const t = mode === 'v' ? `scaleY(${f})` : `scaleX(${f})`;
       if (cells[i]._t !== t) { cells[i].style.transform = t; cells[i]._t = t; }
     }
@@ -163,7 +163,7 @@ export function createHud(ctx, root, actions) {
       lastInteg = I;
       const maxA = sv.maxAir ?? 10, A = sv.air ?? maxA;
       const under = !!(sv.underwater ?? ctx.player?.underwater ?? A < maxA);
-      airEl.style.visibility = under || A < maxA ? 'visible' : 'hidden';
+      setStyle(airEl, 'visibility', under || A < maxA ? 'visible' : 'hidden');
       if (under || A < maxA) setCells(airCells, (A / maxA) * 10, 'h');
       chargeEl.classList.toggle('charging', (sv.trickle || 0) > 0 && C < maxC);
       const bow = ctx.game?.bow?.charge || 0;
@@ -171,19 +171,19 @@ export function createHud(ctx, root, actions) {
       eatRing.classList.toggle('on', ep > 0);
       eatRing.classList.toggle('bow', bow > 0);
       eatRing.classList.toggle('full', bow >= 1);
-      if (ep > 0) eatP.style.strokeDashoffset = String(100.5 * (1 - Math.min(1, ep)));
+      if (ep > 0) setStyle(eatP, 'strokeDashoffset', String(100.5 * (1 - Math.min(1, ep))));
       const night = sv.droop ?? (ctx.sky?.isNight && !settings.get('alwaysDay'));
-      droop.classList.toggle('on', !!night);
+      setCls(droop, 'on', night);
     } else {
-      droop.classList.remove('on');
-      airEl.style.visibility = 'hidden';
+      setCls(droop, 'on', false);
+      setStyle(airEl, 'visibility', 'hidden');
     }
     updateCompass(dt);
     duskWatch();
-    if (flashT > 0 && (flashT -= dt) <= 0) integEl.classList.remove('flash');
+    if (flashT > 0 && (flashT -= dt) <= 0) setCls(integEl, 'flash', false);
     cross.classList.toggle('target', !!(ctx.brush?.target || ctx.brush?.placeTarget || ctx.player?.target));
     const uw = !!(ctx.player?.underwater ?? sv?.underwater);
-    water.style.display = uw ? '' : 'none';
+    setStyle(water, 'display', uw ? '' : 'none');
 
     const b = ctx.brush;
     if (b) {

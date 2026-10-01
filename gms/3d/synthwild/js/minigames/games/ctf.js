@@ -2,7 +2,7 @@
 // Tap a rival to tag it (it's zapped back to base). First to 3 captures, or the most in 6 minutes.
 import { BotSquad } from '../bots/index.js';
 import { disposeObject } from '../../core/dispose.js';
-import { pad, fill, put, W } from '../bots/arena.js';
+import { pad, fill, put, W } from '../arena.js';
 
 const HX = 22, HZ = 12, BASE = 18, WIN = 3, TIME = 360;
 const TEAM = { blue: { sign: -1, color: 0x3fa9ff, css: '#7cc6ff' }, red: { sign: 1, color: 0xff4a5e, css: '#ff8a96' } };

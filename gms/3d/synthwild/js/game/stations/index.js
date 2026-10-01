@@ -3,6 +3,7 @@ import { BLOCKS } from '../../data/blocks.js';
 import { Inventory } from '../inventory.js';
 import { newOven, ovenTick } from './oven.js';
 import { rollLoot } from '../../data/loot.js';
+import { toast } from '../../ui/dom.js';
 
 export const STATION_KEYS = { fabricator: 'fabricator', reflow_oven: 'oven', cache: 'cache', sleep_pod: 'pod' };
 export const CACHE_SLOTS = 27;
@@ -127,8 +128,8 @@ export class Stations {
     return true;
   }
 
-  async say(text, kind = 'info') {
-    try { (await import('../../ui/dom.js')).toast(text, { kind }); } catch { console.log('[station]', text); }
+  say(text, kind = 'info') {
+    try { toast(text, { kind }); } catch { console.log('[station]', text); }
   }
 
   update(dt) {

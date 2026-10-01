@@ -1,8 +1,5 @@
 // Amanatides-Woo DDA on the 0.25 fine grid.
-import { BLOCKS } from '../data/blocks.js';
-
-const LIQ = new Uint8Array(256), PLANT = new Uint8Array(256);
-for (const b of BLOCKS) if (b) { LIQ[b.id] = b.liquid ? 1 : 0; PLANT[b.id] = b.plant ? 1 : 0; }
+import { LIQUID as LIQ, PLANT } from '../data/blocks.js';
 
 // opts: { liquids:false, plants:true }
 export function raycast(world, origin, dir, maxDist = 8, opts = {}) {

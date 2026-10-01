@@ -4,7 +4,7 @@
 //  Seek (seekGame): 4 Rivals hide while you count; find them in 3 minutes. A ping every 30 s points the way.
 import { BotSquad, NAMES } from '../bots/index.js';
 import { disposeObject } from '../../core/dispose.js';
-import { pad, fill, put, W } from '../bots/arena.js';
+import { pad, fill, put, W } from '../arena.js';
 
 const H = 17;
 // Huts: centre and door side (dx,dz toward the street).

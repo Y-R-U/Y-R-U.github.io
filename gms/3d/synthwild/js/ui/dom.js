@@ -16,6 +16,12 @@ export function h(tag, attrs = {}, ...kids) {
   return el;
 }
 
+// Per-frame UI writes: touch the DOM only when the value really changes (no-op writes still cost a style pass).
+export function setText(el, t) { t = t == null ? '' : String(t); if (el._txt !== t) { el._txt = t; el.textContent = t; } }
+export function setHtml(el, t) { t = t == null ? '' : String(t); if (el._html !== t) { el._html = t; el.innerHTML = t; } }
+export function setCls(el, c, on) { on = !!on; if (el.classList.contains(c) !== on) el.classList.toggle(c, on); }
+export function setStyle(el, k, v) { if (el.style[k] !== v) el.style[k] = v; }
+
 let layer = null;
 let audioRef = null;
 export function setLayer(root, audio) { layer = root; audioRef = audio; }

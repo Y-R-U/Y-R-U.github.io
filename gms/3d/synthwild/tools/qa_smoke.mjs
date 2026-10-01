@@ -58,7 +58,7 @@ async function runViewport({ url, port, out, F, vpName, missingOk, quick, expect
   const skipRest = (names, why) => names.forEach((n) => add(n, SKIP, why));
   const shot = (n) => pg.shot(path.join(out, `${vpName}_${n}.png`));
   const ALL = ['page loads', 'title screen', 'settings toggles', 'new survival world', 'intro skippable', 'world plays',
-    'chunks render', 'HUD controls reachable', 'fps (10 s)', 'break (real input)', 'place (real input)', 'new build world', 'build place+break',
+    'chunks render', 'HUD controls reachable', 'fps (10 s)', 'break (real input)', 'place (real input)', 'place into water', 'new build world', 'build place+break',
     'save & quit', 'reload: settings persisted', 'reload: world persisted', 'no uncaught errors', 'no console errors',
     'no 4xx/5xx', 'no foreign origins'];
   const done = new Set();
@@ -137,6 +137,7 @@ async function runViewport({ url, port, out, F, vpName, missingOk, quick, expect
     await reachCheck();
     await fpsCheck();
     const sv = await breakPlace('survival');
+    await waterPlace();
     await saveQuit();
 
     // ---- build world
@@ -306,7 +307,10 @@ async function runViewport({ url, port, out, F, vpName, missingOk, quick, expect
         await pg.game(`C.player.yaw=${k}*Math.PI/8;C.player.pitch=-0.75;return 1`).catch(() => {});
         await sleep(150);
         aim = await pg.game(`const t=C.brush.target;const p=C.brush.placeTarget;if(!t||!p||t.dist<1.3||t.dist>4)return null;
-          const pmin=p.min;return C.world.getSub(pmin[0],pmin[1],pmin[2])===0?{yaw:+C.player.yaw.toFixed(2),dist:+t.dist.toFixed(2),mat:t.mat}:null`).catch(() => null);
+          const pmin=p.min;if(C.world.getSub(pmin[0],pmin[1],pmin[2])!==0)return null;
+          const {WET}=await import('./js/data/blocks.js'),c=C.brush.breakTarget.min.map(v=>v>>2);
+          for(const [dx,dy,dz] of [[0,0,0],[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]])if(WET[C.world.getCell(c[0]+dx,c[1]+dy,c[2]+dz)])return null;
+          return {yaw:+C.player.yaw.toFixed(2),dist:+t.dist.toFixed(2),mat:t.mat}`).catch(() => null);
       }
       await sleep(200);
       let tgt = await pg.game(`const b=C.brush;return {bt:b.breakTarget&&{min:b.breakTarget.min,max:b.breakTarget.max},pt:b.placeTarget&&{min:b.placeTarget.min,max:b.placeTarget.max},mat:b.target?.mat,held:C.game?.inv?.held?.()}`).catch(() => null);
@@ -382,6 +386,26 @@ async function runViewport({ url, port, out, F, vpName, missingOk, quick, expect
       else add(pName, pOk ? PASS : FAIL, pDetail);
       if (!vp.mobile) await pg.evalSafe('document.exitPointerLock()');
       return pOk ? { world: 'QA ' + (mode === 'build' ? 'Build' : 'Survival') + ' ' + vpName, sub: last.minSub, mat: last.mat, brokeSub: bOk && !samebox(breakTarget.min, last.minSub) ? breakTarget.min : null } : null;
+    }
+
+    // Placing a block into a water cell must work (the hook builds a small pool; the place goes through the brush).
+    async function waterPlace() {
+      mark('place into water');
+      const r = await pg.game(`
+        const W=C.world,P=C.player,B=C.brush,inv=C.game.inv,items=C.game.items;
+        const {BLOCK}=await import('./js/data/blocks.js');const {placeBox}=await import('./js/player/brushmath.js');
+        const x=Math.floor(P.pos.x)+5,z=Math.floor(P.pos.z),s=Math.floor(W.surfaceY(x+0.5,z+0.5));
+        W.setBox([(x-2)*4,(s-2)*4,(z-2)*4],[(x+3)*4,(s+1)*4,(z+3)*4],BLOCK.BASALT_MATRIX,'fill',{flow:false});
+        W.setBox([(x-1)*4,(s-1)*4,(z-1)*4],[(x+2)*4,(s+1)*4,(z+2)*4],BLOCK.WATER,'fill',{flow:false});
+        W.setBox([(x-2)*4,(s+1)*4,(z-2)*4],[(x+3)*4,(s+5)*4,(z+3)*4],0,'fill',{flow:false});
+        const ray=W.raycast([x+0.5,s+3.5,z+0.5],[0,-1,0],8);
+        if(!ray)return {err:'no ray hit'};
+        inv.setSlot(inv.sel,items.id('polymer_brick'),5);B.setScale(1);
+        const box=placeBox(ray.sub,ray.normal,1,[1,1,1]);
+        const water=W.getCell(box.min[0]>>2,box.min[1]>>2,box.min[2]>>2)===BLOCK.WATER;
+        const placed=B._doPlace(box,'fill');
+        return {water,placed,cell:W.getCell(box.min[0]>>2,box.min[1]>>2,box.min[2]>>2),brick:BLOCK.POLYMER_BRICK,bricks:inv.count(items.id('polymer_brick'))}`).catch((e) => ({ err: e.message }));
+      add('place into water', r && r.water && r.placed && r.cell === r.brick && r.bricks === 4 ? PASS : FAIL, JSON.stringify(r));
     }
 
     async function saveQuit() {

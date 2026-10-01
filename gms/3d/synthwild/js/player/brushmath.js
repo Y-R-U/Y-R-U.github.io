@@ -95,10 +95,4 @@ export function payUnits(credit, units, have) {
   return { ok: true, blocks, credit: credit + blocks * SUBS_PER_BLOCK - units };
 }
 
-// For drops: removed subs + carried remainder -> whole blocks and new remainder.
-export function subsToBlocks(subs, carry = 0) {
-  const t = subs + carry;
-  return { blocks: Math.floor(t / SUBS_PER_BLOCK), carry: t % SUBS_PER_BLOCK };
-}
-
 export function fmtScale(s) { return String(s); }

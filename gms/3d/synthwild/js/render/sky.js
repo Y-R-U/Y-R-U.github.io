@@ -82,17 +82,23 @@ void main() {
     float tw = 0.6 + 0.4 * sin(uTime * 3.0 + s * 50.0);
     float star = step(0.985, s) * smoothstep(0.35, 0.05, length(fract(sp.xz / (1.0 + y) + sp.y) - 0.5));
     col += vec3(0.8, 0.9, 1.0) * star * tw * uNight * smoothstep(0.0, 0.3, y);
+#ifndef MED
     // aurora ribbons
     vec2 ap = d.xz / max(y, 0.08);
     float ribbon = vn(vec2(ap.x * 0.6 + uTime * 0.02, ap.y * 0.15));
     float a = smoothstep(0.55, 0.75, ribbon) * smoothstep(0.05, 0.35, y) * smoothstep(0.9, 0.4, y);
     a *= 0.6 + 0.4 * sin(ap.x * 6.0 + uTime * 0.7);
     col += mix(vec3(0.1, 0.9, 0.7), vec3(0.8, 0.2, 0.9), vn(ap * 0.4)) * a * 0.35 * uNight;
+#endif
   }
   // soft high clouds
   if (y > 0.0) {
     vec2 cp = d.xz / (y + 0.12) * 2.0 + vec2(uTime * 0.01, 0.0);
+#ifdef MED
+    float c = vn(cp) * 0.75 + 0.12;
+#else
     float c = vn(cp) * 0.6 + vn(cp * 2.3) * 0.3 + vn(cp * 5.1) * 0.1;
+#endif
     c = smoothstep(0.55, 0.85, c) * smoothstep(0.0, 0.25, y);
     vec3 cc = mix(vec3(1.0, 0.98, 0.95), uHorizon * 1.2 + uSunTint * 0.3 * (1.0 - uNight), 0.35) * (0.12 + uDaylight * 0.95);
     cc = mix(cc, uZenith * 1.6 + vec3(0.02, 0.03, 0.06), uNight * 0.85);
@@ -123,14 +129,16 @@ export function createSky(ctx) {
     uUnderwater: { value: 0 },
   };
 
-  const lowQ = () => ctx.settings?.get?.('quality') === 'low' || ctx.flags?.lite;
+  // sky shader tiers: high = everything; med = stars + one cloud octave; low = gradient, sun, moon, ring only
+  const skyDefines = (q) => (q === 'low' ? { LOW: '' } : q === 'med' ? { MED: '' } : {});
   const domeMat = new THREE.ShaderMaterial({
     uniforms: u, vertexShader: SKY_VS, fragmentShader: SKY_FS,
-    side: THREE.BackSide, depthWrite: false, depthTest: true, fog: false, defines: lowQ() ? { LOW: '' } : {},
+    side: THREE.BackSide, depthWrite: false, depthTest: true, fog: false, defines: skyDefines(ctx.quality ? ctx.quality() : 'high'),
   });
   const dome = new THREE.Mesh(new THREE.SphereGeometry(400, 32, 16), domeMat);
   dome.frustumCulled = false;
-  dome.renderOrder = -10;
+  // after opaque + cutout terrain (0, 1) and before water (2): only pixels that are still sky get shaded (early-Z on phones)
+  dome.renderOrder = 1.5;
   scene.add(dome);
 
   // Lights so lane 3/4's standard materials (avatar, mobs) match the world lighting.
@@ -150,7 +158,7 @@ export function createSky(ctx) {
     speed: 1,
     frozen: false,
     setTime(t) { this.time01 = ((t % 1) + 1) % 1; this.apply(true); },
-    setQuality(q) { if (q === 'low') domeMat.defines.LOW = ''; else delete domeMat.defines.LOW; domeMat.needsUpdate = true; },
+    setQuality(q) { domeMat.defines = skyDefines(q); domeMat.needsUpdate = true; },
     fogNear: 60, fogFar: 120,
     setFog(near, far) { this.fogNear = near; this.fogFar = far; },
     update(dt) {

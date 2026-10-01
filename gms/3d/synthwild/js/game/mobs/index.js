@@ -4,15 +4,16 @@ import { KINDS as K1, EMP_RADIUS } from './kinds.js';
 import { KINDS2 } from './kinds2.js';
 import { sweep, boxHitsSolid } from '../../player/physics.js';
 import { lightAt, liquidAt, solidFn } from '../env.js';
+import { segBox } from '../../core/math.js';
+import { isMobile } from '../../core/quality.js';
 import { dropsFor } from '../rules.js';
 import { BLOCKS } from '../../data/blocks.js';
 
 const KINDS = { ...K1, ...KINDS2 };
 export const ALL_KINDS = KINDS;
 const CAP_HOSTILE = 8;
-const MOBILE = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
-const CAP_PASSIVE = MOBILE ? 3 : 6;
-const CAP_TOTAL = MOBILE ? 10 : 16;
+const CAP_PASSIVE = isMobile ? 3 : 6;
+const CAP_TOTAL = isMobile ? 10 : 16;
 const DRAW_DIST = 56;
 const LAND = ['forest', 'shore', 'desert', 'mountains', 'plains'];
 // Weighted spawn tables. where: surface | cave. biomes: where on the surface it may appear.
@@ -345,32 +346,13 @@ export class Mobs {
     const b = [];
     for (const m of this.list) {
       if (m.dying) continue;
-      this.box(m, b);
-      const pad = 0.12;
-      let t0 = 0, t1 = maxDist;
-      for (let a = 0; a < 3; a++) {
-        const lo = b[a] - pad, hi = b[a + 3] + pad;
-        if (Math.abs(d[a]) < 1e-9) { if (o[a] < lo || o[a] > hi) { t0 = Infinity; break; } continue; }
-        let ta = (lo - o[a]) / d[a], tb = (hi - o[a]) / d[a];
-        if (ta > tb) [ta, tb] = [tb, ta];
-        t0 = Math.max(t0, ta); t1 = Math.min(t1, tb);
-        if (t0 > t1) break;
-      }
-      if (t0 <= t1 && t0 <= maxDist && (!best || t0 < best.dist)) best = { mob: m, dist: t0 };
+      const t = segBox(o, d, maxDist, this.box(m, b), 0.12);
+      if (t >= 0 && (!best || t < best.dist)) best = { mob: m, dist: t };
     }
     for (const x of this.extra) {
       if (x.hidden) continue;
-      x.box(b);
-      let t0 = 0, t1 = maxDist;
-      for (let a = 0; a < 3; a++) {
-        const lo = b[a] - 0.15, hi = b[a + 3] + 0.15;
-        if (Math.abs(d[a]) < 1e-9) { if (o[a] < lo || o[a] > hi) { t0 = Infinity; break; } continue; }
-        let ta = (lo - o[a]) / d[a], tb = (hi - o[a]) / d[a];
-        if (ta > tb) [ta, tb] = [tb, ta];
-        t0 = Math.max(t0, ta); t1 = Math.min(t1, tb);
-        if (t0 > t1) break;
-      }
-      if (t0 <= t1 && t0 <= maxDist && (!best || t0 < best.dist)) best = { mob: x, dist: t0 };
+      const t = segBox(o, d, maxDist, x.box(b), 0.15);
+      if (t >= 0 && (!best || t < best.dist)) best = { mob: x, dist: t };
     }
     return best;
   }

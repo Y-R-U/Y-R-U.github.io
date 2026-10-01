@@ -2,6 +2,7 @@
 // Keep moving, drop through holes to the next floor, and be the last one standing.
 import { fill, put, top, mat } from '../arena.js';
 import { countdown } from '../index.js';
+import { BotSquad } from '../bots/index.js';
 
 const HALF = 12, GAP = 7, FLOORS = 3, MAX_TIME = 180;
 const CRACK = { easy: 0.9, normal: 0.7, hard: 0.55 };
@@ -11,26 +12,6 @@ const FLOOR_KEY = ['clearglass', 'clearglass', 'clearglass'];
 const RIM = ['neon_cyan', 'neon_magenta', 'neon_amber'];
 const BOT_TEAMS = ['red', 'gold', 'green', 'red'];
 const BOT_NAMES = ['Zip', 'Nova', 'Bolt', 'Pixel'];
-
-// Bot stand-in until js/minigames/bots/ is present: wanders on the floor grid with simple gravity.
-class StubBot {
-  constructor(name, x, y, z, solid) { Object.assign(this, { name, x, y, z, solid }); this.vy = 0; this.goal = null; this.hidden = false; this.p = { speed: 3.4 }; }
-  goTo(x, y, z) { this.goal = [x, y, z]; }
-  arrived(n = 0.6) { return !this.goal || Math.hypot(this.goal[0] + 0.5 - this.x, this.goal[2] + 0.5 - this.z) < n; }
-  update(dt) {
-    const fx = Math.floor(this.x), fz = Math.floor(this.z);
-    if (!this.solid(fx, Math.floor(this.y - 0.05), fz)) {
-      this.vy -= 22 * dt; const ny = this.y + this.vy * dt;
-      if (this.solid(fx, Math.floor(ny), fz)) { this.y = Math.floor(ny) + 1; this.vy = 0; } else this.y = ny;
-      return;
-    }
-    if (!this.goal || this.arrived()) return;
-    const dx = this.goal[0] + 0.5 - this.x, dz = this.goal[2] + 0.5 - this.z, d = Math.hypot(dx, dz);
-    this.x += (dx / d) * this.p.speed * dt; this.z += (dz / d) * this.p.speed * dt;
-  }
-  stop() { this.goal = null; }
-  teleport(x, y, z) { this.x = x; this.y = y; this.z = z; this.vy = 0; }
-}
 
 const floorfall = {
   id: 'floorfall', name: 'Floor Fall', icon: 'layers', minutes: 1.5,
@@ -54,7 +35,7 @@ const floorfall = {
     for (let f = 0; f < FLOORS; f++) put(A, 0, -1 - f * GAP - 4, 0, 'light_panel');
   },
 
-  async start(mg) {
+  start(mg) {
     const { ctx, A } = { ctx: mg.ctx, A: this.A };
     this.mg = mg; this.ctx = ctx;
     this.cracks = new Map();   // "x,y,z" -> seconds left
@@ -69,22 +50,13 @@ const floorfall = {
     mg.hud.objective('Last one standing wins');
     mg.hud.hint('Don’t stand still: the glass cracks under your feet!');
 
-    const solid = (x, y, z) => !!ctx.world?.isSolidSub(x * 4 + 2, y * 4 + 2, z * 4 + 2);
     const spots = [[-7, -7], [7, -7], [-7, 7], [7, 7]];
     this.bots = [];
-    let squad = null;
-    try {
-      const m = await import('../bots/index.js');
-      squad = new m.BotSquad(ctx, { level: mg.level });
-    } catch { squad = null; }
-    this.squad = squad;
-    if (squad) squad.grid.avoid = (x, y, z) => this.cracks.has(x + ',' + y + ',' + z);
+    const squad = this.squad = new BotSquad(ctx, { level: mg.level });
+    squad.grid.avoid = (x, y, z) => this.cracks.has(x + ',' + y + ',' + z);
     spots.forEach(([x, z], i) => {
       const p = top(A, x, -1, z);
-      const b = squad
-        ? squad.add({ name: BOT_NAMES[i], team: BOT_TEAMS[i], x: p.x, y: p.y, z: p.z, taggable: false })
-        : new StubBot(BOT_NAMES[i], p.x, p.y, p.z, solid);
-      b.mem = b.mem || {};
+      const b = squad.add({ name: BOT_NAMES[i], team: BOT_TEAMS[i], x: p.x, y: p.y, z: p.z, taggable: false });
       b.mem.think = Math.random();
       this.bots.push(b);
     });
@@ -115,7 +87,7 @@ const floorfall = {
     const { ctx, mg, A } = this;
     const counting = this.count(dt);
     if (!counting && ctx.input && !ctx.input.enabled && !this.playerOut && !ctx.ui?.blocking) { ctx.input.enabled = true; ctx.input.requestPointer?.(); mg.hud.hint(''); }
-    if (counting) { this.squad?.update?.(0); return; }
+    if (counting) { this.squad.update(0); return; }
     this.t += dt;
     mg.hud.timer(Math.max(0, MAX_TIME - this.t));
 
@@ -135,7 +107,7 @@ const floorfall = {
     for (const [k, left] of this.cracks) {
       const l = left - dt;
       if (l > 0) { this.cracks.set(k, l); continue; }
-      this.cracks.set(k, -999);
+      this.cracks.delete(k);
       const [x, y, z] = k.split(',').map(Number);
       ctx.world.setBox([x * 4, y * 4, z * 4], [x * 4 + 4, y * 4 + 4, z * 4 + 4], 0, 'fill', { flow: false, support: false });
       if (Math.random() < 0.35) ctx.fx?.spark?.([x + 0.5, y + 0.5, z + 0.5], 0xbff6ff, 4);
@@ -149,7 +121,6 @@ const floorfall = {
     }
 
     for (const b of this.alive()) {
-      if (b.hidden) continue;
       if (b.y < bottom) { this.eliminate(b); continue; }
       const grounded = !b.falling && b.vy === 0;
       if (grounded) this.stepOn(b);
@@ -166,7 +137,7 @@ const floorfall = {
         this.think(b);
       }
     }
-    if (this.squad) this.squad.update(dt); else for (const b of this.bots) if (!b.out) b.update(dt);
+    this.squad.update(dt);
 
     if (!this.playerOut && this.alive().length === 0) return this.end2(true);
     if (this.playerOut && this.alive().length <= 1) return this.end2(false);
@@ -212,7 +183,7 @@ const floorfall = {
       ctx.player.yaw = Math.PI / 2; ctx.player.pitch = -0.45;
     } else {
       who.out = true; who.stop?.();
-      if (this.squad) this.squad.remove(who); else who.hidden = true;
+      this.squad.remove(who);
       mg.hud.toast(`${who.name} fell out!`);
       ctx.audio?.sfx('whiff');
     }

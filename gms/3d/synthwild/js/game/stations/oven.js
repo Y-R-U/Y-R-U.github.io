@@ -32,4 +32,3 @@ export function ovenTick(o, dt, items) {
   return o;
 }
 
-export const ovenActive = (o) => o.burn > 0;

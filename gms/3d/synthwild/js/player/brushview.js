@@ -1,4 +1,4 @@
-// Brush visuals: the 3D target outline (thick edge bars + faint faces), the crosshair with the
+// Brush visuals: the 3D target outline (thick edge bars + faint faces, two draws), the crosshair with the
 // hologram scale readout, and the volume confirm strip.
 import { fmtScale } from './brushmath.js';
 
@@ -32,14 +32,20 @@ const CSS = `
 .swp-vol button.no{background:rgba(255,90,90,.25);border-color:#ffb0b0;min-width:22px;text-align:center}
 `;
 
+// Two draws: all 12 edge bars live in one geometry (rewritten only when the box or bar thickness changes), plus the face.
 export function createOutline(THREE) {
   const group = new THREE.Group();
   group.name = 'brush-outline';
   const edgeMat = new THREE.MeshBasicMaterial({ color: COLORS.place, toneMapped: false, transparent: true, opacity: 0.95, depthWrite: false });
   const faceMat = new THREE.MeshBasicMaterial({ color: COLORS.place, toneMapped: false, transparent: true, opacity: 0.1, depthWrite: false, side: THREE.DoubleSide });
   const unit = new THREE.BoxGeometry(1, 1, 1);
-  const bars = [];
-  for (let i = 0; i < 12; i++) { const m = new THREE.Mesh(unit, edgeMat); m.renderOrder = 5; bars.push(m); group.add(m); }
+  const tp = unit.attributes.position.array, ti = unit.index.array, nv = tp.length / 3;
+  const pos = new Float32Array(tp.length * 12), idx = new Uint16Array(ti.length * 12);
+  for (let b = 0; b < 12; b++) for (let i = 0; i < ti.length; i++) idx[b * ti.length + i] = ti[i] + b * nv;
+  const barsGeo = new THREE.BufferGeometry();
+  barsGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  barsGeo.setIndex(new THREE.BufferAttribute(idx, 1));
+  const bars = new THREE.Mesh(barsGeo, edgeMat); bars.renderOrder = 5; group.add(bars);
   const face = new THREE.Mesh(unit, faceMat); face.renderOrder = 4; group.add(face);
   group.visible = false;
   group.traverse(o => (o.frustumCulled = false));
@@ -63,12 +69,16 @@ export function createOutline(THREE) {
         for (let a = 0; a < 3; a++) {
           const b = (a + 1) % 3, d = (a + 2) % 3;
           for (const sb of [-1, 1]) for (const sd of [-1, 1]) {
-            const m = bars[n++], p = [0, 0, 0], sc = [t, t, t];
+            const p = [0, 0, 0], sc = [t, t, t];
             p[a] = c[a]; sc[a] = s[a] + t;
             p[b] = c[b] + sb * s[b] / 2; p[d] = c[d] + sd * s[d] / 2;
-            m.position.set(p[0], p[1], p[2]); m.scale.set(sc[0], sc[1], sc[2]);
+            const o = n++ * tp.length;
+            for (let v = 0; v < tp.length; v += 3) {
+              pos[o + v] = tp[v] * sc[0] + p[0]; pos[o + v + 1] = tp[v + 1] * sc[1] + p[1]; pos[o + v + 2] = tp[v + 2] * sc[2] + p[2];
+            }
           }
         }
+        barsGeo.attributes.position.needsUpdate = true;
       }
     },
   };

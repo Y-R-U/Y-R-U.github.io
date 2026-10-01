@@ -1,25 +1,23 @@
 // ctx.player: movement, physics state, camera rig, avatar/hand. pos = feet centre (THREE.Vector3).
-import { BODY, moveBody, canJumpOver, unstick, fallDamage, boxOf, boxHitsSolid } from './physics.js';
+import { BODY, moveBody, canJumpOver, unstick, boxOf, boxHitsSolid } from './physics.js';
+import { clampToBorder } from '../world/world.js';
 import { createCameraRig } from './camera.js';
 import { initAvatarLib, setAvatarLight, createAvatar, createHand } from './avatar.js';
 import { createAuto } from './auto.js';
-import { BLOCKS } from '../data/blocks.js';
+import { BLOCKS, CLIMB, PLANT, WET } from '../data/blocks.js';
 
 const PITCH_MAX = 1.55, STEP = 1 / 60, AIM_RANGE = 4.5, AIM_CONE = 0.22;
 const wrapAngle = a => Math.atan2(Math.sin(a), Math.cos(a));
-// Ladders: data vines, lane 1's climb rail, or any block flagged climb:true. Kelp slows you down.
-const CLIMB = new Uint8Array(256), KELP = new Uint8Array(256);
-for (const b of BLOCKS) if (b) {
-  if (b.climb || b.key === 'data_vine' || b.key === 'climb_rail') CLIMB[b.id] = 1;
-  if (b.waterlogged && b.plant) KELP[b.id] = 1;
-}
+// Kelp (a waterlogged plant) slows you down.
+const KELP = new Uint8Array(256);
+for (let i = 0; i < 256; i++) KELP[i] = PLANT[i] & WET[i];
 const CLIMB_UP = 2.8, CLIMB_SLIDE = 2.2;
 
 export const player = {
   pos: null, vel: null, yaw: 0, pitch: 0, h: BODY.H, eyeH: BODY.EYE,
   onGround: false, inWater: false, headInWater: false, flying: false, crouching: false, sprinting: false,
   speed: 0, view: 'first', ready: false,
-  _ctx: null, _frame: -1, _fallPeak: null, _lastJump: 0, _stepDist: 0, _blocked: false, _pendingSpawn: null, _t: 0,
+  _ctx: null, _frame: -1, _lastJump: 0, _stepDist: 0, _blocked: false, _pendingSpawn: null, _t: 0,
 
   // Survival owns death; this mirror can never drift from it across worlds or mini-games.
   get dead() { return !!this._ctx?.game?.survival?.dead; },
@@ -73,7 +71,7 @@ export const player = {
 
   spawn(x = 0.5, z = 0.5) { this._pendingSpawn = [x, z]; this.ready = false; },
   teleport(x, y, z) {
-    this.pos.set(x, y, z); this.rpos?.copy(this.pos); this._prev?.copy(this.pos); this.vel.set(0, 0, 0); this._fallPeak = null; this._pendingSpawn = null; this.ready = true;
+    this.pos.set(x, y, z); this.rpos?.copy(this.pos); this._prev?.copy(this.pos); this.vel.set(0, 0, 0); this._pendingSpawn = null; this.ready = true;
   },
   knock(vx, vy, vz) {
     if (typeof vx === 'object') ({ x: vx, y: vy, z: vz } = vx);
@@ -120,8 +118,7 @@ export const player = {
   },
   _liquidAt(x, y, z) {
     const m = this._ctx.world?.getSub?.(Math.floor(x * 4), Math.floor(y * 4), Math.floor(z * 4));
-    const b = BLOCKS[m];
-    return !!(b && (b.liquid || b.waterlogged));
+    return WET[m] === 1;
   },
 
   update(dt) {
@@ -165,7 +162,6 @@ export const player = {
       this.rpos.lerpVectors(this._prev, this.pos, this._acc / STEP);
     } else { this._prev.copy(this.pos); this.rpos.copy(this.pos); }
     this._present(dt, ctx);
-    ctx.brush?.update?.(dt);
   },
 
   _simulate(dt, inp, ctx, jumpEdge) {
@@ -190,7 +186,6 @@ export const player = {
 
     this.inWater = this._liquidAt(this.pos.x, this.pos.y + 0.4, this.pos.z);
     this.headInWater = this._liquidAt(this.pos.x, this.pos.y + this.eyeH, this.pos.z);
-    const feetWet = this.inWater || this._liquidAt(this.pos.x, this.pos.y + 0.05, this.pos.z);
 
     const touch = this._touching();
     this.climbing = !!(touch & 1) && !this.flying;
@@ -245,7 +240,6 @@ export const player = {
       if (r.hitZ) { v.z = 0; blocked = true; }
     }
     this._blocked = blocked;
-    const wasGround = this.onGround;
     this.onGround = landed || (body.onGround && v.y <= 0);
     if (!this.onGround && v.y <= 0 && !this.flying) {
       const probe = { ...body };
@@ -266,18 +260,10 @@ export const player = {
       }
     }
 
-    // Fall damage measured from the highest point since last on the ground / in water / flying.
-    if (this.onGround || feetWet || this.flying || this.climbing) {
-      if (this._fallPeak !== null && this.onGround && !feetWet && !this.flying && !this.climbing) {
-        const d = this._fallPeak - this.pos.y;
-        if (!wasGround) ctx.bus?.emit?.('player:land', { fall: d });
-        const dmg = fallDamage(d);
-        // Lane 4's survival already derives fall damage from this state; only emit when it isn't there.
-        const noFall = ctx.settings?.get?.('noFallDamage') || this.mode === 'build' || ctx.game?.survival;
-        if (dmg > 0 && !noFall) ctx.bus?.emit?.('player:damage', { amount: dmg, src: 'fall' });
-      }
-      this._fallPeak = this.pos.y;
-    } else this._fallPeak = Math.max(this._fallPeak ?? this.pos.y, this.pos.y);
+    if (clampToBorder(this.pos)) {
+      this.vel.x = 0; this.vel.z = 0;
+      if (this._t - (this._borderT ?? -9) > 4) { this._borderT = this._t; ctx.ui?.toast?.('You reached the edge of the world. Turn back!', { kind: 'warn' }); }
+    }
   },
 
   _present(dt, ctx) {

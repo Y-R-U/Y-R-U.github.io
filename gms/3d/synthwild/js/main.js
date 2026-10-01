@@ -1,12 +1,12 @@
 // SYNTHWILD boot: renderer, ctx, every lane's init in order, and the frame loop.
 import * as THREE from 'three';
 import { createBus } from './core/bus.js';
-import { createRng } from './core/rng.js';
 import { createSky } from './render/sky.js';
 import { createChunkRenderer } from './render/chunks.js';
 import { createFx } from './render/fx.js';
 import { createSwimmers } from './render/swimmers.js';
 import { createPost } from './render/post.js';
+import { isMobile, resolveQuality } from './core/quality.js';
 
 const Q = new URLSearchParams(location.search);
 const flags = {
@@ -22,7 +22,6 @@ const flags = {
   quality: Q.get('q'),
   noshell: Q.get('noshell') === '1',
 };
-const isMobile = (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches) || /Android|iPhone|iPad/i.test(navigator.userAgent);
 
 async function optional(path, pick) {
   try {
@@ -46,7 +45,6 @@ const uiRoot = document.getElementById('ui-root');
 const bus = createBus();
 const ctx = {
   THREE, canvas, uiRoot, bus, flags, isMobile,
-  rng: createRng(flags.seed ?? 'synthwild'),
   renderer: null, scene: null, camera: null,
   world: null, render: null, sky: null, fx: null,
   input: null, player: null, brush: null, game: null,
@@ -54,13 +52,10 @@ const ctx = {
   session: { meta: null, mode: 'survival', paused: false, playing: false },
   stats: { fps: 0, ms: 0, cpu: 0, calls: 0, tris: 0 },
   engine: null,
+  quality: () => resolveQuality(ctx.settings),
 };
 
-function quality() {
-  if (flags.quality) return flags.quality;
-  if (flags.lite) return 'low';
-  return ctx.settings.get('quality') || (isMobile ? 'med' : 'high');
-}
+const quality = () => resolveQuality(ctx.settings);
 function pixelRatio(q) {
   const dpr = window.devicePixelRatio || 1;
   if (q === 'low') return Math.min(dpr, 1);
@@ -96,9 +91,8 @@ async function boot() {
   ctx.sky = createSky(ctx);
   ctx.render = createChunkRenderer(ctx, BLOCKS_MOD);
   ctx.fx = createFx(ctx);
-  const waterIds = new Uint8Array(256);
-  for (const b of BLOCKS_MOD.BLOCKS) if (b && (b.liquid || b.waterlogged)) waterIds[b.id] = 1;
-  swimmers = createSwimmers(ctx, (w, x, y, z) => { const m = w.getCell(x, y, z); return m > 0 && m < 256 && waterIds[m] === 1; });
+  const WET = BLOCKS_MOD.WET;
+  swimmers = createSwimmers(ctx, (w, x, y, z) => { const m = w.getCell(x, y, z); return m > 0 && m < 256 && WET[m] === 1; });
   post = createPost(ctx);
   applyQuality();
 
@@ -235,18 +229,6 @@ const engine = {
     safe('player.serialize', () => { out.player = ctx.player?.serialize?.() ?? null; });
     safe('game.save', () => { out.game = ctx.game?.save?.() ?? null; });
     return out;
-  },
-  // Small JPEG data URL of the current view, for world thumbnails (rendered and read in the same task).
-  thumbnail(w = 320, h = 180) {
-    if (post?.enabled) post.render(); else ctx.renderer.render(ctx.scene, ctx.camera);
-    const src = ctx.renderer.domElement;
-    const c = document.createElement('canvas'); c.width = w; c.height = h;
-    const g = c.getContext('2d');
-    const sa = src.width / src.height, da = w / h;
-    let sw = src.width, sh = src.height, sx = 0, sy = 0;
-    if (sa > da) { sw = sh * da; sx = (src.width - sw) / 2; } else { sh = sw / da; sy = (src.height - sh) / 2; }
-    g.drawImage(src, sx, sy, sw, sh, 0, 0, w, h);
-    return c.toDataURL('image/jpeg', 0.8);
   },
   pause(p = true) { ctx.session.paused = p; bus.emit(p ? 'game:pause' : 'game:resume', {}); },
 };
