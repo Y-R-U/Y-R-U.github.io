@@ -90,3 +90,27 @@ Status (2026-10-02): **M1 built** (+ the M2 hooks lanes 3/4 asked for). `node to
   `ctx.player.setView(v)` if it exists, and settings `view` changes too).
 - **Lane 4:** `buildMobs` setting added (default off). HUD reads `survival.trickle`, `eatProgress`, `droop`, `underwater`, `air`.
 - **Lane 6:** login panel, admin-only player panel, offline hiding and the 409 Overwrite / Save-as-copy choice are in.
+
+## Mini-games (D10), lane 5 framework + Parkour Dash, Floor Fall, Treasure Hunt
+| File | What |
+|---|---|
+| `js/minigames/registry.js` | `GAMES` (lazy loaders; `hideseek-seek` picks `seekGame`), `loadGame(id)`, `listGames()`, personal bests in localStorage `synthwild.mg` (`recordResult(key, result)`) |
+| `js/minigames/index.js` | runner: `minigames.begin(ctx, root, id, {variant, actions})`, `update(dt)` (driven by `ui.update` → shell), `stop()`; `countdown(mg)` 3-2-1-GO helper |
+| `js/minigames/arena.js` | `createArena(ctx, def, variant)` → `{ctx, world, origin, variant}` at `def.arenaY` (default 80) above the throwaway world's spawn; re-exports lane 4's `fill/put/W/pad/ring/mat`; `top()`, seeded `rng()` |
+| `js/minigames/hud.js` | glassy mini-game HUD with lane 4's minihud API (`objective score timer big toast`) + `hint`, `add`, `results(r, actions, info)` (stars, new-best chip, Play again / Mini-games / Title) |
+| `js/minigames/command.js` | command bar (`/` or `T` while playing; "Commands" chip in the pause menu). DOM exists only while open. `/play <game> [length]`, `/quit`, `/help`, `/time day|night`, `/tp spawn` (cheats: Build mode or a world created with Commands = On; never in mini-games) |
+| `js/minigames/menu.js` | title "Games" tab: bots difficulty (Easy/Normal/Hard → `minigamesBots`), a card per game (icon, blurb, minutes, stars + best, length chips) |
+| `js/minigames/games/parkour.js` | seeded spiral of floating platforms (Short 18 / Medium 30 / Long 46), checkpoints every 8, falls → last checkpoint, timer, ghost of your best run (`synthwild.mg.ghost.<length>`), 3 stars under 1.15 s/platform |
+| `js/minigames/games/floorfall.js` | 3 glass floors 17×17, 7 apart; tiles under anyone turn coral then vanish after 0.6 s; 4 lane-4 `BotSquad` bots (built-in StubBot fallback); spectator ledge when you're out; 3-min cap |
+| `js/minigames/games/treasure.js` | floating island with landmarks (tree, rocks, pool, hut, light tower with a climb rail); 5 Caches in random order, one riddle at a time, hot/cold pulse ring; 4 min |
+| `css/minigames.css` | menu cards, HUD, results, heat ring, command bar |
+
+Flow: title Games tab / `/play` → `shell.playMinigame(id, {variant})` (saves and leaves a real world first) → loading screen →
+`engine.start({temp:true, mode:'minigame', seed:'mg-<id>'})` → `minigames.begin` → playing. The world is temp: never saved.
+Pause in a mini-game: Resume / Restart / Settings / Leave (back to the Games tab). Results: Play again / Mini-games / Title.
+HUD in mini-games: hotbar only when the game hands out items; Integrity only with `session.mgSurvival`; no compass/wheel.
+Lane 4's CTF, Hide & Seek (both roles) and Glitch Siege start from the menu and from `/play` unchanged (verified).
+Screenshots: `tools/ui_mgshot.sh <game> out.png [waitMs] [js]` (915×412, real game, `?q=low`).
+
+Also fixed: the title's mote canvas had no CSS size, so at DPR ≥ 2 its backing store doubled every frame (grey title,
+memory blow-up on phones). It's now sized from the parent only when that changes. Verified at DPR 2.

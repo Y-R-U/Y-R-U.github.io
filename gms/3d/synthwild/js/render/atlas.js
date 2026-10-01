@@ -85,18 +85,21 @@ function paintTile(t) {
       if (rand() < 0.04) c = mix(c, acc, 0.6);
     } else if (P === 'film') {
       if (cut) {
-        // solar-film leaves: overlapping lobes shaded centre→edge, a few gaps, some lobes are gold solar cells
-        const w = makeWorleyCached(t, rand, 11)(x, y);
+        // solar-film leaves: overlapping translucent film panels, each with a fine cell grid; lighter at the
+        // panel centre (reads as light passing through), gold conductors on the panel edges, few gaps
+        const w = makeWorleyCached(t, rand, 10)(x, y);
         const edge = w[1] - w[0];
-        const cell = w[2] > 0.78;
-        c = shade(mix(base, scale(base, 1.35), w[2]), 1.12 - w[0] * 0.07 + nv * 0.15);
-        if (cell) {
-          c = mix(c, acc, 0.45);
-          if ((x + y) % 4 === 0) { c = mix(c, acc, 0.5); em = 1; }
-          gl = 0.7;
-        } else gl = 0.35;
-        if (edge < 0.9) c = shade(c, 0.55);
-        if (w[0] > 6.6) a = 0;
+        const tint = w[2];
+        c = shade(mix(base, mix(base, [70, 220, 200], 0.6), tint * 0.7), 1.18 - w[0] * 0.06 + nv * 0.08);
+        const grid = (x % 4 === 0) || (y % 4 === 0);
+        if (grid) c = mix(shade(c, 0.86), acc, tint > 0.6 ? 0.25 : 0.08);
+        gl = 0.75;
+        if (edge < 1.0) {
+          const gold = tint > 0.45;
+          c = gold ? mix(shade(base, 0.7), acc, 0.75) : shade(base, 0.6);
+          if (gold) { em = 0.8; gl = 0.9; }
+        } else if (tint > 0.82 && grid) { c = mix(c, acc, 0.6); em = 1; }
+        if (w[0] > 7.2) a = 0;
       } else {
         // photomoss: soft moss grain over a faint solar-cell grid
         const g = n2(x * 1.7, y * 1.7), g2 = n1(x * 0.9 + 3, y * 0.9);

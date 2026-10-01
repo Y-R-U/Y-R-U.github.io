@@ -69,7 +69,7 @@ export function createHud(ctx, root, actions) {
       compT = 1;
       try { compTarget = w.structuresNear(p.x, p.z, 400).find((s) => s.kind === 'outpost' || s.kind === 'starter') || null; } catch { compTarget = null; }
     }
-    const t = ctx.game?.journal?.done?.outpost ? null : compTarget;
+    const t = ctx.game?.journal?.done?.outpost || ctx.session?.mode === 'minigame' ? null : compTarget;
     if (!t || !p) { compass.classList.remove('on'); return; }
     const dx = t.pos[0] - p.x, dz = t.pos[2] - p.z, d = Math.hypot(dx, dz);
     if (d < 20) { compass.classList.remove('on'); return; }
@@ -146,7 +146,10 @@ export function createHud(ctx, root, actions) {
 
   function update(dt) {
     if (dirty) { dirty = false; renderHotbar(); }
-    const survival = (ctx.session?.mode || 'survival') === 'survival';
+    const mgMode = ctx.session?.mode === 'minigame';
+    const survival = (ctx.session?.mode || 'survival') === 'survival' || (mgMode && !!ctx.session?.mgSurvival);
+    const hideBar = mgMode && !ctx.game?.inv?.slots?.some(Boolean);
+    if (bottom._mg !== hideBar) { bottom._mg = hideBar; bottom.style.display = hideBar ? 'none' : ''; }
     const sv = ctx.game?.survival;
     stats.classList.toggle('hidden', !survival || !sv);
     if (survival && sv) {

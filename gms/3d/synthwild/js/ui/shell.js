@@ -8,6 +8,8 @@ import { createStore } from './store.js';
 import { openSettings, settingsOpen, closeSettings } from './settings_panel.js';
 import { playIntro, preloadIntro } from './intro.js';
 import { fullscreen } from './fullscreen.js';
+import { minigames } from '../minigames/index.js';
+import { loadGame } from '../minigames/registry.js';
 
 const AUTOSAVE = 60;
 const TIPS = [
@@ -33,6 +35,7 @@ export function createShell(ctx, root, ui) {
     onPlay: (m, o) => play(m, o),
     onSettings: () => openSettings(root, {}),
     onIntro: () => runIntro(true),
+    onMinigame: (id, o) => playMinigame(id, o),
   });
 
   async function game() {
@@ -123,6 +126,43 @@ export function createShell(ctx, root, ui) {
     else ctx.input?.requestPointer?.();
   }
 
+  async function playMinigame(id, opts = {}) {
+    if (st.state === 'loading' || st.state === 'intro') return;
+    const from = st.state;
+    if (meta && !meta.temp && (from === 'playing' || from === 'paused')) await save('quit', true);
+    minigames.stop();
+    pauseEl?.remove(); pauseEl = null;
+    ui.closePanels?.(); ui.cmd?.close();
+    if (from === 'title' || from === 'boot') title.hide();
+    st.state = 'loading';
+    ctx.audio?.music(null);
+    const def = await loadGame(id);
+    const ld = loadingScreen(def?.name || 'Mini-game');
+    try {
+      if (!def) throw new Error('missing game ' + id);
+      meta = { id: null, temp: true, minigame: id, name: def.name, seed: 'mg-' + id, mode: 'minigame', difficulty: 'normal', source: 'local', mine: true };
+      if (ctx.session) { ctx.session.meta = meta; ctx.session.mode = 'minigame'; }
+      ld.set(0.2, 'Building the arena…');
+      await (await game()).start(meta, null);
+      enterPlaying();
+      const r = await minigames.begin(ctx, root, id, { variant: opts.variant, actions: {
+        replay: () => playMinigame(id, { variant: r.mg.variant }),
+        menu: () => quit({ toMenu: true }),
+        quit: () => quit(),
+      } });
+      ld.done();
+      ctx.input?.requestPointer?.();
+    } catch (e) {
+      console.error('[shell] mini-game failed', e);
+      ld.done();
+      minigames.stop();
+      toast('That mini-game would not start: ' + (e?.message || e), { kind: 'bad', ms: 5000 });
+      try { (await game()).stop?.(); } catch {}
+      meta = null;
+      showTitle();
+    }
+  }
+
   let pauseEl = null;
   function pause() {
     if (st.state !== 'playing') return;
@@ -130,12 +170,20 @@ export function createShell(ctx, root, ui) {
     setPaused(true); inputOn(false);
     ui.closePanels?.();
     save('pause');
-    const mode = meta?.mode === 'build' ? 'Build' : 'Survival';
-    pauseEl = h('div.sw-pause', {}, h('div.card.glass', {},
+    const mode = meta?.mode === 'build' ? 'Build' : meta?.mode === 'minigame' ? 'Mini-game' : 'Survival';
+    const mg = meta?.mode === 'minigame' ? minigames.running : null;
+    pauseEl = mg ? h('div.sw-pause', {}, h('div.card.glass', {},
+      h('h2', {}, 'PAUSED'), h('div.sub', {}, `${meta?.name || ''} · ${mode}`),
+      h('button.sw-btn.primary', { onclick: () => { click(); resume(); } }, g('play', 16), 'Resume'),
+      h('button.sw-btn', { onclick: () => { click(); playMinigame(mg.id, { variant: mg.mg.variant }); } }, g('rotate', 16), 'Restart'),
+      h('button.sw-btn', { onclick: () => { click(); openSettings(root, {}); } }, g('gear', 16), 'Settings'),
+      h('button.sw-btn', { onclick: () => { click(); quit({ toMenu: true }); } }, g('exit', 16), 'Leave'))) : h('div.sw-pause', {}, h('div.card.glass', {},
       h('h2', {}, 'PAUSED'), h('div.sub', {}, `${meta?.name || ''} · ${mode}`),
       h('button.sw-btn.primary', { onclick: () => { click(); resume(); } }, g('play', 16), 'Resume'),
       h('button.sw-btn', { onclick: () => { click(); openSettings(root, {}); } }, g('gear', 16), 'Settings'),
-      fullscreen.supported() && h('button.sw-btn', { onclick: () => { click(); fullscreen.toggle(); } }, g('expand', 16), 'Full screen'),
+      h('div.sw-pause-row', {},
+        fullscreen.supported() && h('button.sw-btn', { onclick: () => { click(); fullscreen.toggle(); } }, g('expand', 16), 'Full screen'),
+        h('button.sw-btn', { onclick: () => { click(); resume(); setTimeout(() => ui.cmd?.open(), 60); } }, h('b', { style: { fontFamily: 'var(--display)' } }, '/'), 'Commands')),
       visiting() && h('button.sw-btn', { onclick: async (e) => { click(); e.currentTarget.disabled = true; if (await save('copy', true)) { toast('Saved to My Worlds', { kind: 'good' }); } } }, g('copy', 16), 'Save a copy'),
       h('button.sw-btn', { onclick: () => { click(); quit(); } }, g(visiting() ? 'exit' : 'save', 16), visiting() ? 'Leave' : 'Save & quit')));
     root.append(pauseEl);
@@ -145,7 +193,16 @@ export function createShell(ctx, root, ui) {
     if (settingsOpen()) closeSettings();
     enterPlaying();
   }
-  async function quit() {
+  async function quit({ toMenu = false } = {}) {
+    if (meta?.mode === 'minigame') {
+      minigames.stop();
+      try { (await game()).stop?.(); } catch (e) { console.warn(e); }
+      pauseEl?.remove(); pauseEl = null;
+      meta = null;
+      await showTitle();
+      if (toMenu) title.openTab('mg');
+      return;
+    }
     if (pauseEl) pauseEl.querySelectorAll('button').forEach((b) => { b.disabled = true; });
     if (visiting() && !(await confirmPop('Leave this world?', 'This is someone else’s world. Use “Save a copy” first if you want to keep what you built.', 'Leave'))) {
       pauseEl?.querySelectorAll('button').forEach((b) => { b.disabled = false; });
@@ -215,6 +272,7 @@ export function createShell(ctx, root, ui) {
     get state() { return st.state; },
     get meta() { return meta; },
     start: showTitle,
+    playMinigame,
     adopt() {
       meta = { id: null, temp: true, name: 'Dev World', mode: ctx.session?.mode || 'survival', source: 'local', mine: true };
       const go = () => { if (st.state !== 'playing') enterPlaying(); };
@@ -222,6 +280,7 @@ export function createShell(ctx, root, ui) {
     },
     play, pause, resume, save, quit, runIntro,
     update(dt) {
+      minigames.update(dt);
       if (st.state !== 'playing') return;
       autoT += dt;
       if (autoT >= AUTOSAVE) { autoT = 0; save('auto'); }

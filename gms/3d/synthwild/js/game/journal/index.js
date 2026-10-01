@@ -77,6 +77,7 @@ export class Journal {
   }
 
   update(dt) {
+    if (this.game.minigame) { this.ui?.update?.(dt); return; }
     this.hurtT = Math.max(0, this.hurtT - dt);
     if ((this.pollT -= dt) <= 0) {
       this.pollT = 1;
@@ -94,7 +95,7 @@ export class Journal {
   // Hide the chip during fights, while panels are open, and when the guide is off.
   get hidden() {
     const g = this.game;
-    if (!this.enabled || g.survival?.dead || g.stations?.isOpen || this.ctx.ui?.panel || this.ctx.session?.paused) return true;
+    if (!this.enabled || g.minigame || g.survival?.dead || g.stations?.isOpen || this.ctx.ui?.panel || this.ctx.session?.paused) return true;
     if (this.hurtT > 0) return true;
     const p = this.ctx.player?.pos;
     if (p && g.mobs?.list.some((m) => m.def.hostile && !m.dying && (m.seen > 0 || m.provoked > 0 || m.fusing) && m.pos.distanceTo(p) < 14)) return true;

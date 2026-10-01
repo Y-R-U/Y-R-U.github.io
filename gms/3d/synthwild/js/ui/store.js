@@ -5,7 +5,7 @@ const writeExtra = (o) => { try { localStorage.setItem(EXTRA, JSON.stringify(o))
 
 export function createStore(getApi, account) {
   const api = () => getApi();
-  const withExtra = (m) => (m ? { ...m, difficulty: readExtra()[m.id]?.difficulty || m.difficulty || 'normal' } : m);
+  const withExtra = (m) => (m ? { ...m, difficulty: readExtra()[m.id]?.difficulty || m.difficulty || 'normal', cheats: !!readExtra()[m.id]?.cheats } : m);
   const setExtra = (id, o) => { const x = readExtra(); x[id] = { ...(x[id] || {}), ...o }; writeExtra(x); };
 
   return {
@@ -20,12 +20,12 @@ export function createStore(getApi, account) {
       const mine = [...local, ...cloud].sort((x, y) => (y.updatedAt || 0) - (x.updatedAt || 0)).map(withExtra);
       return { mine, pub: pub.map(withExtra) };
     },
-    async create({ name, seed, mode, difficulty, where }) {
+    async create({ name, seed, mode, difficulty, where, cheats = false }) {
       const a = api();
       const meta = where === 'cloud' && account.user
         ? await a.worlds.create({ name, seed, mode })
         : await a.local.put({ name, seed, mode, data: null });
-      setExtra(meta.id, { difficulty });
+      setExtra(meta.id, { difficulty, cheats });
       return withExtra(meta);
     },
     async load(meta) {

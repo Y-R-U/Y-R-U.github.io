@@ -60,6 +60,7 @@ export class Mobs {
     this.solid = solidFn(() => ctx.world);
     this.tmpV = new this.T.Vector3();
     this.env = this.makeEnv();
+    this.extra = new Set();   // minigame bots etc: { extraTarget:true, box(out), onHit(dmg, dir, src) }
   }
 
   get world() { return this.ctx.world; }
@@ -222,10 +223,11 @@ export class Mobs {
         return speed;
       },
       sunlit: (m) => {
-        if (e.night || e.daylight < 0.5) return false;
+        if (self.game.minigame || e.night || e.daylight < 0.5) return false;
         return lightAt(self.world, m.pos.x, m.pos.y + m.h - 0.1, m.pos.z).sky >= 14 && !m.inWater;
       },
       hurtPlayer: (amount, src, m) => {
+        if (e.usingTarget) return m.target.hurt?.(amount, src, m);
         const dir = self.tmpV.set(e.player.x - m.pos.x, 0, e.player.z - m.pos.z).normalize();
         self.game.hurtPlayer(amount, src, { x: dir.x * 6, y: 4, z: dir.z * 6 });
       },
@@ -254,7 +256,7 @@ export class Mobs {
       },
       teleport: (m, c, rMin, rMax) => self.teleport(m, c, rMin, rMax),
       bowPos: (m) => ({ x: m.pos.x + Math.sin(m.yaw) * 0.45, y: m.pos.y + 1.35, z: m.pos.z + Math.cos(m.yaw) * 0.45 }),
-      fire: (m, from, vel, o) => self.game.projectiles?.fire(from, vel, { owner: 'mob', mob: m, ...o }),
+      fire: (m, from, vel, o) => self.game.projectiles?.fire(from, vel, { owner: 'mob', mob: m, ...o, extraTarget: e.usingTarget ? m.target : null }),
       // Shared sun burn (reboot, archer). Returns true once it has burned out.
       sunBurn: (m) => {
         if (e.sunlit(m)) {
@@ -281,7 +283,12 @@ export class Mobs {
     ctx.fx?.emp?.(c, EMP_RADIUS);
     ctx.audio?.sfx?.('emp', { pos: c });
     ctx.bus?.emit?.('mob:explode', { kind: m.kind, pos: c, radius: EMP_RADIUS });
-    const p = this.env.player;
+    if (m.target?.box) {
+      const b = m.target.box, tx = Math.max(b[0], Math.min(b[3], c.x)), ty = Math.max(b[1], Math.min(b[4], c.y)), tz = Math.max(b[2], Math.min(b[5], c.z));
+      const td = Math.hypot(tx - c.x, ty - c.y, tz - c.z);
+      if (td < EMP_RADIUS) m.target.hurt?.(Math.max(1, Math.round(13 * (1 - td / EMP_RADIUS))), 'glitchfuse', m);
+    }
+    const p = this.env.realPlayer || this.env.player;
     const dx = p.x - c.x, dy = p.y + 0.9 - c.y, dz = p.z - c.z;
     const d = Math.hypot(dx, dy, dz);
     if (d < EMP_RADIUS && !p.dead) {
@@ -351,10 +358,25 @@ export class Mobs {
       }
       if (t0 <= t1 && t0 <= maxDist && (!best || t0 < best.dist)) best = { mob: m, dist: t0 };
     }
+    for (const x of this.extra) {
+      if (x.hidden) continue;
+      x.box(b);
+      let t0 = 0, t1 = maxDist;
+      for (let a = 0; a < 3; a++) {
+        const lo = b[a] - 0.15, hi = b[a + 3] + 0.15;
+        if (Math.abs(d[a]) < 1e-9) { if (o[a] < lo || o[a] > hi) { t0 = Infinity; break; } continue; }
+        let ta = (lo - o[a]) / d[a], tb = (hi - o[a]) / d[a];
+        if (ta > tb) [ta, tb] = [tb, ta];
+        t0 = Math.max(t0, ta); t1 = Math.min(t1, tb);
+        if (t0 > t1) break;
+      }
+      if (t0 <= t1 && t0 <= maxDist && (!best || t0 < best.dist)) best = { mob: x, dist: t0 };
+    }
     return best;
   }
 
   hit(m, dmg, dir, src = 'player') {
+    if (m?.extraTarget) return m.onHit?.(dmg, dir, src) !== false;
     if (!m || m.dying || m.removed || m.invuln > 0) return false;
     m.hp -= dmg;
     m.invuln = 0.45;
@@ -477,11 +499,11 @@ export class Mobs {
     e.night = !settings.get('alwaysDay') && (sky?.isNight ?? false);
     e.daylight = settings.get('alwaysDay') ? 1 : sky?.daylight01 ?? 1;
     const build = this.ctx.session?.mode === 'build';
-    const noHostile = settings.get('peaceful') || (build && !settings.get('buildMobs')) || this.game.diff?.hostiles === false;
+    const noHostile = !this.game.minigame && (settings.get('peaceful') || (build && !settings.get('buildMobs')) || this.game.diff?.hostiles === false);
     const noMobs = build && !settings.get('buildMobs');
 
     this.spawnT -= dt;
-    if (this.spawnT <= 0) { this.spawnT = 0.5; this.spawnTick(p, settings, sky); }
+    if (this.spawnT <= 0 && !this.game.minigame) { this.spawnT = 0.5; this.spawnTick(p, settings, sky); }
 
     for (const m of [...this.list]) {
       if (m.removed) continue;
@@ -503,9 +525,21 @@ export class Mobs {
         continue;
       }
       e.m = m;
-      e.dist = Math.hypot(dx, p.y - m.pos.y, dz);
-      e.dy = p.y - m.pos.y;
-      if (far < 48) m.def.think(m, e);
+      // Siege mobs go for their target (the core) unless the player is close.
+      e.usingTarget = false;
+      if (m.target && !(far < (m.target.aggro ?? 6) && !p.dead)) {
+        const b = m.target.box;
+        const tx = b ? Math.max(b[0], Math.min(b[3], m.pos.x)) : m.target.x;
+        const ty = b ? Math.max(b[1], Math.min(b[4] - 1, m.pos.y)) : m.target.y;
+        const tz = b ? Math.max(b[2], Math.min(b[5], m.pos.z)) : m.target.z;
+        e.realPlayer = e.player;
+        e.player = { x: tx, y: ty, z: tz, eyeY: ty + 1, dead: false, dir: null };
+        e.usingTarget = true;
+      }
+      e.dist = Math.hypot(e.player.x - m.pos.x, e.player.y - m.pos.y, e.player.z - m.pos.z);
+      e.dy = e.player.y - m.pos.y;
+      if (far < 48 || m.target) m.def.think(m, e);
+      if (e.usingTarget) { e.player = e.realPlayer; e.realPlayer = null; e.usingTarget = false; }
       if (m.removed) continue;
       this.physics(m, dt);
       if (m.pos.y < -10) { this.remove(m); continue; }

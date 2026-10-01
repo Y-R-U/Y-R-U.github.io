@@ -29,13 +29,13 @@ export class Projectiles {
     this.v = new T.Vector3();
   }
 
-  fire(from, vel, { owner = 'player', dmg = 3, gravity = 6, src = 'pulse', mob = null } = {}) {
+  fire(from, vel, { owner = 'player', dmg = 3, gravity = 6, src = 'pulse', mob = null, extraTarget = null } = {}) {
     if (this.list.length >= CAP) this.kill(this.list[0]);
     const mesh = this.pool.pop() || new this.T.Mesh(this.geo, this.mats.player);
     mesh.material = this.mats[owner === 'player' ? 'player' : 'mob'];
     mesh.visible = true;
     this.group.add(mesh);
-    const p = { x: from.x, y: from.y, z: from.z, vx: vel.x, vy: vel.y, vz: vel.z, g: gravity, owner, dmg, src, mob, life: 4, mesh };
+    const p = { x: from.x, y: from.y, z: from.z, vx: vel.x, vy: vel.y, vz: vel.z, g: gravity, owner, dmg, src, mob, life: 4, mesh, extraTarget };
     this.list.push(p);
     this.place(p);
     return p;
@@ -74,11 +74,13 @@ export class Projectiles {
         const t = segBox(o, d, best, pb);
         if (t >= 0) { best = t; what = 'player'; }
       }
+      if (p.extraTarget?.box) { const t = segBox(o, d, best, p.extraTarget.box); if (t >= 0) { best = t; what = 'extra'; } }
       p.x += d[0] * best; p.y += d[1] * best; p.z += d[2] * best;
       if (what) {
         const at = this.v.set(p.x, p.y, p.z).clone();
         if (what === 'mob') mobs.hit(target, p.dmg, { x: d[0], z: d[2] }, 'player');
         else if (what === 'player') this.game.hurtPlayer(p.dmg, p.src, { x: d[0] * 4, y: 2, z: d[2] * 4 });
+        else if (what === 'extra') p.extraTarget.hurt?.(p.dmg, p.src, p.mob);
         this.ctx.fx?.spark?.(at, p.owner === 'player' ? 0x7ff6ff : 0xff4fd8, 8);
         this.ctx.audio?.sfx?.('pulseHit', { pos: at });
         this.kill(p);

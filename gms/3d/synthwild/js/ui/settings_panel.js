@@ -35,6 +35,7 @@ const TABS = [
     C('view', 'Camera', 'See through your eyes, or from behind you.', [['first', 'First person'], ['third', 'Third person']]),
   ] },
   { id: 'ease', icon: 'sprout', label: 'Easier play', rows: [
+    C('minigamesBots', 'Mini-game bots', 'How tricky the bots are in mini-games.', [['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']]),
     T('guide', 'Growth Journal hints', 'A little goal in the corner that shows what to try next.'),
     T('autoJump', 'Auto-jump', 'Hop up one block by just walking into it.'),
     T('aimAssist', 'Aim help', 'Touch aiming snaps gently onto creatures and blocks.'),

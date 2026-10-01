@@ -7,7 +7,7 @@ export const DEFAULTS = {
   fullscreen: false, renderDistance: touch ? 6 : 8, quality: touch ? 'med' : 'high', fov: 75, showFps: false,
   sensitivity: 1, invertY: false, leftHanded: false, uiScale: 1, view: 'first',
   autoJump: true, aimAssist: true, noFallDamage: false, keepInventory: false, toolsNeverBreak: false,
-  peaceful: false, alwaysDay: false, mobGrief: false, buildMobs: false, highContrast: false, subtitles: true, guide: true, treeFelling: true,
+  peaceful: false, alwaysDay: false, mobGrief: false, buildMobs: false, highContrast: false, subtitles: true, guide: true, treeFelling: true, minigamesBots: 'normal',
   introSeen: false,
 };
 

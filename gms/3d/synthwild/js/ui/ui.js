@@ -7,8 +7,9 @@ import { openWheel } from './wheel.js';
 import { createShell } from './shell.js';
 import { fullscreen } from './fullscreen.js';
 import { openSettings } from './settings_panel.js';
+import { createCommandBar } from '../minigames/command.js';
 
-const CSS = ['../../css/ui.css', '../../css/hud.css'];
+const CSS = ['../../css/ui.css', '../../css/hud.css', '../../css/minigames.css'];
 function loadCss() {
   for (const p of CSS) {
     const href = new URL(p, import.meta.url).href;
@@ -24,9 +25,9 @@ function loadCss() {
 let ctxRef = null, root = null, panel = null, deathEl = null;
 
 export const ui = {
-  hud: null, shell: null, game: null, handlesDeath: true,
+  hud: null, shell: null, cmd: null, game: null, handlesDeath: true,
   toast, popup, confirm: confirmPop,
-  get blocking() { return !!panel || !!ctxRef?.game?.stations?.isOpen || ui.shell?.state !== 'playing'; },
+  get blocking() { return !!panel || !!ui.cmd?.isOpen || !!ctxRef?.game?.stations?.isOpen || ui.shell?.state !== 'playing'; },
   get panel() { return panel?.kind || null; },
 
   // game: optional { start, stop, save } (otherwise js/main.js's `game` export is imported lazily).
@@ -54,12 +55,13 @@ export const ui = {
       dusk: () => duskWarning(),
     });
     ui.shell = createShell(ctx, root, ui);
+    ui.cmd = createCommandBar(ctx, root, ui);
 
     const inp = ctx.input;
     if (inp?.on) {
       inp.on('inventory', () => ui.toggle('inventory'));
       inp.on('wheel', () => ui.toggle('wheel'));
-      inp.on('pause', () => { if (panel || ctx.game?.stations?.isOpen) ui.closePanels(); else if (ui.shell.state === 'playing') ui.shell.pause(); else if (ui.shell.state === 'paused') ui.shell.resume(); });
+      inp.on('pause', () => { if (ui.cmd?.isOpen) { ui.cmd.close(); return; } if (panel || ctx.game?.stations?.isOpen) ui.closePanels(); else if (ui.shell.state === 'playing') ui.shell.pause(); else if (ui.shell.state === 'paused') ui.shell.resume(); });
       inp.on('toggleView', () => settings.set('view', settings.get('view') === 'first' ? 'third' : 'first'));
     }
     // Esc on desktop while the pointer is free: pause (input only emits when unlocked)
@@ -93,6 +95,7 @@ export const ui = {
     if (panel?.kind === kind) { ui.closePanels(); return; }
     if (ctxRef?.game?.stations?.isOpen) { ctxRef.game.stations.close(); return; }
     if (ui.shell?.state !== 'playing') return;
+    if (ctxRef?.session?.mode === 'minigame' && (kind === 'wheel' || !ctxRef.game?.inv?.slots?.some(Boolean))) return;
     ui.closePanels();
     const ctx = ctxRef;
     ctx.input?.releasePointer?.(); ctx.input?.releaseAll?.();

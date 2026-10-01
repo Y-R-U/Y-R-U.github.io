@@ -186,6 +186,10 @@ CROP.forEach(([base, acc, em], i) => block(51 + i, 'sun_crop_' + i, 'Sun Crop (s
 block(55, 'bio_sapling', 'Bio Sapling', tile('bio_sapling', 'plant', '#2e2a2a', '#4fe0a0', { alpha: 'cutout', emissive: 0.3, glow: 'night', scale: 0.6 }),
   { solid: false, plant: true, cutout: true, emissive: 0.3, glow: 'night', hardness: 0 });
 
+// Floor Fall: glass that is about to give way (a coral crack glows through it). Mini-games only.
+block(56, 'glass_crack', 'Cracking Glass', tile('glass_crack', 'crystal', '#cfefff', '#ff6a5a', { fallback: 'veins', alpha: 'cutout', emissive: 0.7, glow: 'always' }),
+  { transparent: true, cutout: true, emissive: 0.7, glow: 'always', hardness: 0.3, drops: 'none', buildOnly: true });
+
 // representative colours matching lane 2's repainted tiles (js/render/atlas_styles.js STYLE): particles, map, icons
 const REPAINT = {
   photomoss: '#1c9a86', loam_mesh: '#4a3f52', grow_bed: '#33293a', mirror_sand: '#aaa3c4', mirror_sandstone: '#a49cbe',

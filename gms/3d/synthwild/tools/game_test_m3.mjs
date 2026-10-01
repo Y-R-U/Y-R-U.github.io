@@ -70,6 +70,9 @@ export async function m3Tests({ ok, section }) {
     ok(items.get('bio_sapling')?.kind === 'block', 'sapling is a placeable item');
   }
 
+  section('item descriptions');
+  for (const it of items.list) if (it) ok(it.desc && it.desc.length <= 70, `desc for ${it.key} (${it.desc?.length})`);
+
   section('loot tables');
   {
     const { LOOT_TABLES, rollLoot } = await import('../js/data/loot.js');

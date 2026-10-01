@@ -24,7 +24,7 @@ const evalJs = async (expr) => (await send('Runtime.evaluate', { expression: exp
 await send('Runtime.enable');
 await send('Network.enable');
 await send('Network.setCacheDisabled', { cacheDisabled: true });
-await send('Emulation.setDeviceMetricsOverride', { width: +W, height: +H, deviceScaleFactor: 1, mobile: false });
+await send('Emulation.setDeviceMetricsOverride', { width: +W, height: +H, deviceScaleFactor: +(process.env.DPR || 1), mobile: false });
 if (process.env.THROTTLE) await send('Emulation.setCPUThrottlingRate', { rate: +process.env.THROTTLE });
 await send('Page.enable');
 await send('Page.navigate', { url: BASE + query });

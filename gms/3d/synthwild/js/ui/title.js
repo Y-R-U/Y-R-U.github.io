@@ -1,6 +1,7 @@
 // Title screen: wordmark over the key-art backdrop, worlds (mine/public), new world form, account.
 import { h, click, toast, confirmPop, promptPop, fmtAgo } from './dom.js';
 import { g } from './glyphs.js';
+import { renderMinigameMenu } from '../minigames/menu.js';
 
 const ASSETS = new URL('../../assets/', import.meta.url).href;
 const ADJ = ['Glowmoss', 'Mirror', 'Solar', 'Humming', 'Lumen', 'Kelp', 'Crystal', 'Sunfilm', 'Whispering', 'Bright', 'Lattice', 'Drifting'];
@@ -14,10 +15,10 @@ export const randomSeed = () => {
   return s;
 };
 
-export function createTitle({ store, account, onPlay, onSettings, onIntro }) {
+export function createTitle({ store, account, onPlay, onSettings, onIntro, onMinigame }) {
   let tab = 'mine';
   let lists = { mine: [], pub: [] };
-  const form = { name: randomName(), seed: randomSeed(), mode: 'survival', difficulty: 'normal', where: 'local' };
+  const form = { name: randomName(), seed: randomSeed(), mode: 'survival', difficulty: 'normal', where: 'local', cheats: 'off' };
 
   const motes = h('canvas.sw-motes');
   const backdrop = h('div.sw-backdrop', {}, h('img', { src: ASSETS + 'intro/forest.webp', alt: '', onerror: (e) => { e.target.style.display = 'none'; } }), motes);
@@ -38,10 +39,11 @@ export function createTitle({ store, account, onPlay, onSettings, onIntro }) {
   el.style.isolation = 'isolate';
 
   function drawTabs() {
-    const T = [['mine', 'My Worlds', lists.mine.length], ...(account.user ? [['pub', 'Public', lists.pub.length]] : []), ['new', 'New World', null]];
+    const T = [['mine', 'My Worlds', lists.mine.length], ...(account.user ? [['pub', 'Public', lists.pub.length]] : []), ['new', 'New World', null], ['mg', 'Games', null]];
     if (tab === 'pub' && !account.user) tab = 'mine';
     tabs.replaceChildren(...T.map(([id, lb, n]) => h('button', { class: tab === id ? 'on' : '', onclick: () => { click(); tab = id; draw(); } },
-      id === 'new' ? h('span', { style: { display: 'inline-flex', gap: '5px', alignItems: 'center', color: tab === id ? '' : 'var(--teal)' } }, g('plus', 15), lb) : lb,
+      id === 'new' ? h('span', { style: { display: 'inline-flex', gap: '5px', alignItems: 'center', color: tab === id ? '' : 'var(--teal)' } }, g('plus', 15), lb)
+        : id === 'mg' ? h('span', { style: { display: 'inline-flex', gap: '5px', alignItems: 'center', color: tab === id ? '' : 'var(--gold)' } }, g('flag', 15), lb) : lb,
       n ? h('span.n', {}, ` ${n}`) : null)));
   }
 
@@ -96,6 +98,8 @@ export function createTitle({ store, account, onPlay, onSettings, onIntro }) {
         modeCard('build', 'Build', 'Every block, flying, no danger. Just create.')),
       form.mode === 'survival' && h('div.sw-field', {}, h('label', {}, 'Difficulty'),
         seg('difficulty', [['peaceful', 'Peaceful'], ['easy', 'Easy'], ['normal', 'Normal'], ['hard', 'Hard']])),
+      h('div.sw-field', {}, h('label', {}, 'Commands'), seg('cheats', [['off', 'Off'], ['on', 'On']]),
+        h('div.hint', {}, 'On lets you type /time and /tp in this world.')),
       cloudOk && h('div.sw-field', {}, h('label', {}, 'Save to'), seg('where', [['cloud', 'Cloud'], ['local', 'This device']])),
       h('button.sw-btn.primary', { style: { marginTop: '4px', fontSize: '17px', minHeight: '46px' }, onclick: create }, g('sprout', 20), 'Plant the seed')));
   }
@@ -105,7 +109,7 @@ export function createTitle({ store, account, onPlay, onSettings, onIntro }) {
     const name = (form.name || '').trim() || randomName();
     const seed = (form.seed || '').trim() || randomSeed();
     try {
-      const meta = await store.create({ name, seed, mode: form.mode, difficulty: form.difficulty, where: form.where });
+      const meta = await store.create({ name, seed, mode: form.mode, difficulty: form.difficulty, where: form.where, cheats: form.cheats === 'on' });
       form.name = randomName(); form.seed = randomSeed();
       onPlay(meta, { fresh: true });
     } catch (e) { toast(e?.code === 'quota' ? 'You have too many worlds. Delete one first.' : 'Could not create the world: ' + (e?.message || e), { kind: 'bad', ms: 4000 }); }
@@ -132,6 +136,7 @@ export function createTitle({ store, account, onPlay, onSettings, onIntro }) {
   function draw() {
     drawTabs();
     if (tab === 'new') drawNew();
+    else if (tab === 'mg') renderMinigameMenu(body, (id, o) => onMinigame?.(id, o));
     else if (tab === 'pub') drawWorlds(lists.pub, true);
     else drawWorlds(lists.mine, false);
   }
@@ -146,10 +151,12 @@ export function createTitle({ store, account, onPlay, onSettings, onIntro }) {
   let raf = 0;
   const parts = Array.from({ length: 26 }, () => ({ x: Math.random(), y: Math.random(), s: 2 + Math.random() * 5, v: 0.01 + Math.random() * 0.025, p: Math.random() * 6, c: Math.random() < 0.7 ? '120,255,225' : Math.random() < 0.5 ? '255,140,230' : '255,220,120' }));
   function anim(t) {
-    const w = motes.clientWidth, hgt = motes.clientHeight;
+    const par = motes.parentElement;
+    const w = par?.clientWidth || 0, hgt = par?.clientHeight || 0;
     if (!w) { raf = requestAnimationFrame(anim); return; }
     const dpr = Math.min(2, devicePixelRatio || 1);
-    if (motes.width !== (w * dpr | 0)) { motes.width = w * dpr; motes.height = hgt * dpr; }
+    const bw = Math.round(w * dpr), bh = Math.round(hgt * dpr);
+    if (motes.width !== bw || motes.height !== bh) { motes.width = bw; motes.height = bh; }
     const c = motes.getContext('2d');
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
     c.clearRect(0, 0, w, hgt);
@@ -171,5 +178,6 @@ export function createTitle({ store, account, onPlay, onSettings, onIntro }) {
     show(root) { root.append(el); el.classList.remove('fade-out'); cancelAnimationFrame(raf); raf = requestAnimationFrame(anim); reload(); },
     hide() { el.classList.add('fade-out'); cancelAnimationFrame(raf); setTimeout(() => el.remove(), 450); },
     openNew() { tab = 'new'; draw(); },
+    openTab(t) { tab = t; el._loadedOnce = true; draw(); },
   };
 }

@@ -27,3 +27,5 @@
   only; full survival elements follow in M2).
 - D7: Landscape only (first-person, so the threat arrives on the horizontal axis).
 - D8 (Aaron, 2026-10-02): narrator defaults to a low, rich baritone; Settings → Audio "Narrator voice" toggle labelled Male / Female (default Male = the baritone). All VO is generated in both voices, in per-voice folders.
+- D9 (Aaron, 2026-10-02): max 2 sub-agents at a time from now. Next phases: mini-games → adversarial code review + fixes → art pass → perf/bug/duplication review + fixes. Manager picks what gets fixed.
+- D10: Mini-games are single-player vs AI bots, in a temporary arena world (never saved over the player's world). Launched from a title-screen "Mini-games" menu or an in-game command bar (`/play <game>`; `/help` lists them). Line-up: Capture the Flag, Hide & Seek (both roles), Parkour Dash, Floor Fall (spleef), Glitch Siege (wave defence), Treasure Hunt.

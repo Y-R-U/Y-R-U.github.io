@@ -3,6 +3,7 @@
 // Ids and tile indices are untouched; only the pixels change.
 
 export const STYLE = {
+  solar_leaves: { base: '#178f80', accent: '#f2c84b' },
   photomoss_top: { pattern: 'hexfilm', base: '#1c9a86', accent: '#f2c84b', glow: 'night', emissive: 0.5 },
   photomoss_side: { pattern: 'weave', base: '#4a3f52', accent: '#8a7396', lip: { color: '#1c9a86', glow: '#7af7dc', px: 4 } },
   loam_mesh: { pattern: 'weave', base: '#4a3f52', accent: '#8a7396' },

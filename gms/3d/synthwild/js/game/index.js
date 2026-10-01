@@ -40,12 +40,15 @@ export function init(ctx) {
     respawnT: 0,
 
     get creative() { return ctx.session?.mode === 'build'; },
+    get minigame() { return ctx.session?.mode === 'minigame'; },
+    get mgSurvival() { return game.minigame && !!ctx.session?.mgSurvival; },
     get difficulty() { return ctx.session?.meta?.difficulty || 'normal'; },
     get diff() { return difficultyOf(game.difficulty); },
     nights: 0,
     get firstNight() { return game.nights <= 1; },
 
     breakTime(mat, held = inv.held(), scale = 1) {
+      if (game.minigame && !ctx.session?.mgBreak) return Infinity;
       return rules.breakTime(BLOCKS, mat, held, { creative: game.creative, scale });
     },
     canHarvest(mat, held = inv.held()) { return game.creative || rules.canHarvest(BLOCKS[mat], held); },
@@ -64,7 +67,7 @@ export function init(ctx) {
     },
 
     hurtPlayer(amount, src, knock = null) {
-      if (game.creative || survival.dead) return 0;
+      if (game.creative || survival.dead || (game.minigame && !game.mgSurvival)) return 0;
       if (MOB_SOURCES.has(src)) {
         const m = game.diff.mobDmg;
         if (!m) return 0;
@@ -90,7 +93,7 @@ export function init(ctx) {
       const ws = ctx.world?.spawn;
       const sp = game.spawnPoint || (ws ? { x: ws[0], y: ws[1], z: ws[2] } : { x: 0.5, y: ctx.world?.surfaceY?.(0.5, 0.5) ?? 40, z: 0.5 });
       playerTeleport(sp);
-      game.mobs.calm(sp);
+      if (!game.minigame) game.mobs.calm(sp);
       game.peak = null;
       game.respawnT = 0;
       bus?.emit?.('player:respawn', { pos: sp });
@@ -176,7 +179,8 @@ export function init(ctx) {
       const moved = last ? Math.hypot(p.x - last.x, p.z - last.z) / Math.max(dt, 1e-4) : 0;
       game.last = { x: p.x, y: p.y, z: p.z };
 
-      if (!game.creative && !survival.dead) {
+      if (game.minigame && !game.mgSurvival) survival.tick(dt, { creative: true });
+      else if (!game.creative && !survival.dead) {
         // Fall damage: track the peak height while airborne.
         if (p.onGround || p.inWater || p.flying || p.climbing) {
           if (game.peak != null && p.onGround && !p.inWater && !p.flying && !p.climbing) {
@@ -199,7 +203,7 @@ export function init(ctx) {
 
       if (survival.dead) {
         game.respawnT += dt;
-        if (!(ctx.ui?.handlesDeath ?? !!ctx.ui) && game.respawnT > 3) { game.respawn(); return; }
+        if ((game.minigame ? game.respawnT > 2 : !(ctx.ui?.handlesDeath ?? !!ctx.ui) && game.respawnT > 3)) { game.respawn(); return; }
       }
       game.drops.update(dt, p, inv);
       game.mobs.update(dt, p, st, alwaysDay ? { isNight: false, daylight01: 1 } : sky);

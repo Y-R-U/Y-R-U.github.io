@@ -1,4 +1,6 @@
 // Item registry. Block items reuse their block id (1..255); every other item has an id >= 256.
+import { descFor } from './itemdesc.js';
+
 // Build it with createItems(BLOCKS) so this file never hard-depends on the block registry's shape.
 
 export const TIERS = ['lattice', 'basalt', 'ferrite', 'qubit'];
@@ -81,6 +83,8 @@ export function createItems(blocks = []) {
     if (it.kind === 'food') it.food = { charge: it.charge, eat: it.eat };
     add(it);
   }
+
+  for (const it of list) if (it) it.desc = descFor(it);
 
   const get = (id) => (typeof id === 'string' ? list[KEY[id]] : list[id]);
   return {

@@ -32,3 +32,9 @@ Started 2026-10-02. Manager session spawns lane agents (Aaron: 6 at once initial
 - QA found DESKTOP UNPLAYABLE (#ui-root > * pointer-events beats .sw-layer) + intermittent desktop black frame → sent to lane 2 as urgent.
 - Checkpoint 2: commit 2c1684f5 + deploy; unit 6/6, smoke 38/0 (mobile+desktop), live parity 125+12 files PASS.
   Pending: lane 5 M1 shell/intro + narrator Male/Female (D8). Lanes 1,2,3,4 idle; QA idle.
+- Checkpoint 3: a2f82b37 + deploy — lane 5 M1 (shell, settings, HUD, inventory, wheel, audio, voiced intro Male/Female). Live QA 44 PASS / 0 FAIL.
+  M1 + most of M2 complete. Polish running: lane 2 leaves/fps box/title backdrop; lane 4 item descs.
+  Open: music lacks a bright "wondrous synth" track (Suno session needed); LTX intro clips skipped; not yet in games hub (games/js/games.js dirty from another session) or projects.js; never human-played.
+- Registries: 9d29e5a8 + 1807ed7e — SYNTHWILD hub card + projects entry, HEIRFRAME hub card; hub deployed from a clean HEAD worktree (other session's ragdojo hunks still uncommitted/unreleased — never deploy hub from the dirty tree).
+- Lane 2 leaves repaint done (uncommitted). Phone bug: .sw-motes canvas doubling per frame at DPR≥2 → lane 5 fixing first.
+- MINIGAMES phase: lane 4 (bots, ctf, hideseek, siege) + lane 5 (framework, command bar, parkour, floorfall, treasure). Max 2 agents (D9).

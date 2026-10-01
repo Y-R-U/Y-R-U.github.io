@@ -42,6 +42,10 @@ const P = {
   mirror: '<path d="M12 3v18" stroke-dasharray="2 2"/><path d="M9 7L4 17h5zM15 7l5 10h-5z"/>',
   pick: '<path d="M14.5 4.5l5 5-2 2-5-5z"/><path d="M13.5 8.5L5 17l-1 3 3-1 8.5-8.5"/>',
   arrow: '<path d="M12 3l6 15-6-4-6 4z" fill="currentColor"/>',
+  flag: '<path d="M5 21V4"/><path d="M5 4h12l-2.5 4L17 12H5"/>',
+  run: '<circle cx="14" cy="4.5" r="2"/><path d="M8 21l3-6 3 2v5M6 12l3-4h5l3 4 3 1M11 8l-1 7"/>',
+  layers: '<path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5M3 16.5L12 21l9-4.5"/>',
+  gem: '<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l3 18 3-18"/>',
   moon: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
   bolt: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
 };

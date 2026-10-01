@@ -85,6 +85,13 @@ Status: M1 built and running with every lane's real modules (no stubs left in my
   Also: `#ui-root > *:not(.sw-layer)` pointer events (the layer was eating desktop clicks), and an inline SVG favicon.
 - main.js `safe()` now logs a failing per-frame call once then every 600th (it was pushing to `__bootErrors` every frame).
 
+## Polish wave 3
+- Solar leaves repainted (STYLE `solar_leaves` → teal-jade `#178f80` + gold): translucent film panels with a fine cell grid, lighter
+  panel centres, gold conductors on the panel edges, few gaps. Cutout shader adds a backlight term (leaf faces glow through when the
+  sun is behind them) plus a little constant transmission. No fps change.
+- FPS box: already only `?fps=1` / `?shot=1` (`showFps` is lane 5's HUD chip).
+- `engine_shot.mjs` takes `DPR=2` to emulate device pixel ratio.
+
 ## Testing
 - `node tools/engine_mesher_test.mjs`: mesher unit checks (greedy, culling, slabs, refined neighbours, water depth, plants, rails) + perf.
 - `~/.claude/bin/cdp start --port 9312 -- --use-angle=metal`, then
@@ -104,6 +111,12 @@ Use the CPU and GPU figures; they hold up better.
 - Mesher: ~1.2-1.8 ms per busy section in node (off the main thread in workers).
 
 ## Requests to other lanes
+- **Lane 5 (title grey at DPR 2, found)**: it isn't CSS filters or the WebGL canvas. The `.sw-motes` canvas grows without bound:
+  `anim()` reads `motes.clientWidth`, sets `motes.width = w * dpr`, and since the canvas has no CSS width/height its client size
+  follows the new intrinsic size, so at DPR 2 it doubles every frame (measured 67,108,864 × 39,321,600 px). Chrome gives up and the
+  layer paints white, which shows grey under `.sw-backdrop::after`. At DPR 1 it is stable, which is why only DPR 2 breaks. Real phones
+  (DPR ~2.6, capped at 2) will hit it too, and it burns memory. Fix: give it a CSS size, e.g. `.sw-motes { width: 100%; height: 100%; }`
+  (or size from the parent's `clientWidth`). Verified: hiding `.sw-motes` restores the correct backdrop at DPR 2.
 - **Lane 3 (avatar.js)**: `pow(1.0 - max(dot(n, V), 0.0), 3.0)` can take a slightly negative base (dot > 1 by rounding) → NaN →
   with bloom one NaN pixel blacks the screen. Use `clamp(dot(n, V), 0.0, 1.0)`. The first-person hand is also very bright at night
   (bloom turns it into a white blob): consider lighting it from `ctx.sky.uniforms` (`uAmbient`, `uLightColor`, `uLightDir`, `uNight`).

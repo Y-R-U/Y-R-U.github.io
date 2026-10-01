@@ -95,6 +95,13 @@ vec3 shadeBlock(vec4 alb, vec4 m, vec3 n, bool plant) {
   vec3 light = (amb + direct) * ao + bl * mix(ao, 1.0, 0.6);
   vec3 col = alb.rgb * light;
   vec3 V = normalize(cameraPosition - vWorld);
+#ifdef CUTOUT
+  // solar film is translucent: glow through when the sun is behind the leaves
+  if (!plant && mod(vFlags, 2.0) >= 1.0) {
+    float back = pow(clamp(dot(-V, uLightDir), 0.0, 1.0), 3.0);
+    col += alb.rgb * uLightColor * (0.25 + back * 0.9) * smoothstep(0.4, 0.9, sky) * 0.45;
+  }
+#endif
 #ifndef LOW
   vec3 H = normalize(uLightDir + V);
   float spec = pow(max(dot(n, H), 0.0), 48.0) * m.g * skyL;
