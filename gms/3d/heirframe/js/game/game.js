@@ -827,18 +827,18 @@ export async function createGame(api) {
     const canMove = G.state === 'free' && !panelOpen() && !ui?.dialogue.open && !overlay.cardOpen && !G.frames.busy;
     G.frames.update(dt);
     if (G.finale.human && !G.runner.active && G.state === 'free') G.finale.humanOff();
-    G.dayNight.update(dt);
+    if (!paused) G.dayNight.update(dt);
     if (kitCd > 0) kitCd -= dt;
     ui?.skills.kit(sim.state.consumables.repairKit || 0, { cooling: kitCd > 0 });
     let hs = 1;
     if (G.hitstopT > 0) { G.hitstopT -= rawDt; hs = 0.15; }
     player.update(dt * (hs < 1 ? 0.5 : 1), canMove ? stick : null);
     if (canMove && !G.finale.human) G.combat.update(dt, { attackHeld: !!ui?.controls.attackHeld || G.auto?.attackHeld });
-    G.enemies.update(dt * hs, { playerDead: G.state === 'down', sneaking: !!ui?.controls.sneak });
+    if (!paused) G.enemies.update(dt * hs, { playerDead: G.state === 'down', sneaking: !!ui?.controls.sneak });
     if (!paused && G.state === 'free' && !ui?.dialogue.open && !overlay.cardOpen) G.runner.update(dt);
-    G.boss.update(dt);
+    if (!paused) G.boss.update(dt);
     G.heat.update(dt, { paused: paused || G.state !== 'free', calm: !!ui?.dialogue.open || overlay.cardOpen });
-    G.props.update(dt, player.pos, onLootCollect);
+    if (!paused) G.props.update(dt, player.pos, onLootCollect);
 
     // interactables near the player
     G.near = null;

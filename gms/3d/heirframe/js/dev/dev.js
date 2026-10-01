@@ -22,8 +22,8 @@ export function devStorage() {
 }
 
 const CSS = `
-.hfdev-btn { position: fixed; z-index: 60; top: max(8px, env(safe-area-inset-top)); left: 300px; height: 34px; padding: 0 12px; border-radius: 17px;
-  font: 700 13px/34px 'Rajdhani', system-ui, sans-serif; letter-spacing: .14em; color: #1a0f00; background: linear-gradient(180deg, #fff6d6, #ffd986 40%, #dc9a34);
+.hfdev-btn { position: fixed; z-index: 60; top: 42%; left: max(10px, env(safe-area-inset-left)); height: 44px; padding: 0 16px; border-radius: 22px;
+  font: 700 15px/44px 'Rajdhani', system-ui, sans-serif; letter-spacing: .14em; color: #1a0f00; background: linear-gradient(180deg, #fff6d6, #ffd986 40%, #dc9a34);
   border: 1px solid rgba(255, 240, 200, .8); box-shadow: 0 2px 10px rgba(0, 0, 0, .35); touch-action: manipulation; user-select: none; }
 body:has(.hf-panel.show) .hfdev-btn:not(.open) { opacity: .35; }
 .hfdev-btn.god { box-shadow: 0 0 0 2px #5dffb3, 0 2px 10px rgba(0, 0, 0, .35); }
@@ -46,7 +46,7 @@ body:has(.hf-panel.show) .hfdev-btn:not(.open) { opacity: .35; }
 const storyIdFromUrl = (v) => (v ? v.toLowerCase().replace('-', '_') : null);
 
 export function createDev(G, { world, ui, player, rig, createSim, loadGame, store, sites, startSession, Q }) {
-  const D = { god: false, oneHit: false, open: false };
+  const D = { god: Q?.get('god') === '1', oneHit: Q?.get('onehit') === '1', open: false };
   const staged = () => STORY_MISSIONS.filter((m) => (m.steps || m.fixed) && m.act <= (G.sim?.storyActCap ?? 2));
 
   // ---- actions ----------------------------------------------------------------------------------------------
