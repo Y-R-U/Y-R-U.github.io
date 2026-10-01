@@ -32,7 +32,7 @@
   background: linear-gradient(170deg, rgba(255, 255, 255, .85), var(--acc) 18%, rgba(var(--cyan-rgb), .22) 55%, rgba(255, 210, 122, .75) 100%);
   -webkit-mask-image: linear-gradient(180deg, #000 78%, rgba(0, 0, 0, .35) 100%); mask-image: linear-gradient(180deg, #000 78%, rgba(0, 0, 0, .35) 100%);
 }
-.hf-dlg .dl-portrait .pf, .hf-dlg .dl-portrait .pc, .hf-dlg .dl-portrait .pscan {
+.hf-dlg .dl-portrait .pf, .hf-dlg .dl-portrait .pc, .hf-dlg .dl-portrait .pscan, .hf-dlg .dl-portrait .pv {
   position: absolute; inset: 1.5px 1.5px 0; width: calc(100% - 3px); height: calc(100% - 1.5px);
   clip-path: polygon(calc(var(--cut) - 1px) 0, calc(100% - var(--cut) + 1px) 0, 100% calc(var(--cut) - 1px), 100% 100%, 0 100%, 0 calc(var(--cut) - 1px));
 }
@@ -61,6 +61,13 @@
 .hf-dlg .dl-name::after { content: ''; position: absolute; left: 0; bottom: 0; width: 160px; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); box-shadow: 0 0 6px rgba(255, 200, 100, .6); }
 .hf-dlg .dl-name b { font-family: var(--font-d); font-weight: 400; font-size: 13.5px; letter-spacing: .14em; text-transform: uppercase; color: #fff; text-shadow: 0 0 10px rgba(var(--cyan-rgb), .7); }
 .hf-dlg .dl-name span { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); opacity: .85; }
+.hf-dlg .dl-name .dl-tag { display: none; align-self: center; font-style: normal; font-size: 9.5px; font-weight: 700; letter-spacing: .16em; padding: 2px 6px 1px; border: 1px solid var(--acc-tag, rgba(var(--cyan-rgb), .55)); color: var(--acc-tag, var(--cyan)); border-radius: 2px; white-space: nowrap; opacity: .9; }
+.hf-dlg .dl-name .dl-tag.on { display: inline-block; }
+.hf-dlg .dl-name .dl-tag.warm { --acc-tag: #ffd9a8; box-shadow: 0 0 8px rgba(255, 200, 140, .35); }
+/* the unveiled call: a real face in warm light, no hologram scan */
+.hf-dlg .dl-portrait .pv { object-fit: cover; object-position: 50% 30%; display: none; background: #2a2018; }
+.hf-dlg .dl-portrait.vid .pv { display: block; }
+.hf-dlg .dl-portrait.vid .pf, .hf-dlg .dl-portrait.vid .pc, .hf-dlg .dl-portrait.vid .pscan { visibility: hidden; }
 .hf-dlg .dl-text { font-size: 17.5px; font-weight: 500; line-height: 1.32; color: #f2f9ff; text-shadow: 0 1px 2px #000; overflow: hidden; }
 .hf-dlg .dl-text .ghost { color: transparent; text-shadow: none; }
 .hf-dlg.nosubs .dl-text { visibility: hidden; }

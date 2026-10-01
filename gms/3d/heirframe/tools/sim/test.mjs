@@ -14,6 +14,9 @@ import { DISTRICTS, DISTRICT_ORDER } from '../../js/data/districts.js';
 import { THREATS } from '../../js/data/missions.js';
 import { runBalance, P2A_ARCH, P2A_TWISTS } from './balance.mjs';
 import { FRAMES, SKILLS, SYNC_MODS } from '../../js/data/frames.js';
+import { SCRIPTS, SPEAKERS } from '../../js/data/story_a1.js';
+import { VEILS, UNVEILED } from '../../js/data/veils.js';
+import { codexView } from '../../js/sim/story.js';
 
 const QUICK = process.argv.includes('--quick');
 let pass = 0, fail = 0;
@@ -576,6 +579,18 @@ test('P7: a wreck drops Heat a star, on and off the story', () => {
   g.state.factions.heat = 3;
   g.playerWrecked();
   eq(g.state.factions.heat, 2, 'story contract: 3★ → 2★');
+});
+
+test('P8: every human speaker has a veil; only Mara\'s closing call unveils; Veils lore opens at A6-M4', () => {
+  for (const [id, sp] of Object.entries(SPEAKERS)) if (sp.portrait?.kind === 'human') assert(VEILS[sp.portrait.veil], `${id} has a veil`);
+  const unv = Object.values(SCRIPTS).flat().filter((b) => b.unveil);
+  eq(unv.map((b) => b.speaker + ':' + b.trigger), ['mara:closing', 'mara:closing'], 'unveil beats');
+  assert(UNVEILED.mara, 'Mara has a portrait');
+  const st = newStoryState();
+  const at = (s) => codexView(s).places.find((p) => p.id === 'veils');
+  assert(at(st) && !at(st).revealed, 'veils lore visible, not deepened');
+  st.done.push('a6_m4');
+  assert(at(st).revealed, 'revealed after Walk as Yourself');
 });
 
 console.log(`\n${pass} passed, ${fail} failed${fail ? ': ' + failures.join(', ') : ''}`);

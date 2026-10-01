@@ -16,7 +16,7 @@ export const SCRIPTS = {
     { n: 5, trigger: 'after:4', mode: 'bark', speaker: 'harmony', vo: 'a1_s00_harmony_01', text: 'Good morning, Halcyon. Renewal Day is one hundred days away. Two hundred and twenty-five years of unity. The journey continues.', fx: 'billboards_face' },
     { n: 6, trigger: 'after:5', mode: 'dlg', speaker: 'mara', vo: 'a1_s00_mara_01', text: "Wren? It's Mara. Quill Contracts, the kiosk by the fountain. You said you wanted work." },
     { n: 7, trigger: 'after:6', mode: 'dlg', speaker: 'mara', vo: 'a1_s00_mara_02', text: "I've got a parcel that needs legs. Yours are rented, but they'll do.",
-      choices: ['On my way.', 'How much does it pay?'], replies: { 1: { speaker: 'mara', text: 'Enough for rent. Barely. Move.' } } },
+      choices: ['On my way.', 'How much does it pay?', 'What do you actually look like?'], replies: { 1: { speaker: 'mara', text: 'Enough for rent. Barely. Move.' }, 2: { speaker: 'mara', text: "Like a woman who gets paid on time. Nobody shows a face on the Link, kid. Parcel." } } },
     { n: 8, trigger: 'after:7', mode: 'bark', speaker: 'hira', vo: 'a1_s00_hira_03', text: 'Tip! Drag the left side of the screen to walk…', action: { tutorial: 'move', marker: 'mara_kiosk' } },
     { n: 9, trigger: 'reachKiosk', mode: 'action', action: { openBoard: true, highlight: 'a1_m1', tutorial: 'accept' } },
   ],
@@ -48,6 +48,7 @@ export const SCRIPTS = {
     { n: 2, trigger: 'shot:2', mode: 'bark', speaker: 'harmony', vo: 'a1_s08_harmony_01', text: 'A brighter future… little… little star… together.', fx: 'billboards_glitch' },
     { n: 3, trigger: 'after:2', mode: 'bark', speaker: 'hira', vo: 'a1_s08_hira_01', text: 'Did that billboard just… no. Brand-safe thoughts only!' },
     { n: 4, trigger: 'done:1', mode: 'action', action: { toast: 'Codex updated: Stuttering Billboard' } },
+    { n: 5, trigger: 'after:3', mode: 'bark', speaker: 'civ', text: "Harmony stuttering in broad daylight. Next they'll have us going out unveiled." },
   ],
   a1_m4: [
     { n: 1, trigger: 'accept', mode: 'dlg', speaker: 'mara', vo: 'a1_s09_mara_01', text: "You can't keep taking jobs in a rented tin can. I know a dealer. Thirty percent off; don't ask why.", action: { discount: true } },
@@ -75,7 +76,7 @@ export const SCRIPTS = {
 };
 
 export const SPEAKERS = {
-  mara: { name: 'Mara Quill', role: 'Quill Contracts', portrait: { kind: 'human', seed: 11, hue: 30 } },
+  mara: { name: 'Mara Quill', role: 'Quill Contracts', portrait: { kind: 'human', seed: 11, hue: 30, veil: 'mara' } },
   hira: { name: 'HIRA', role: 'HireFrame Rental Assistant', portrait: { kind: 'rental', seed: 3 } },
   harmony: { name: 'Harmony', role: 'Civic AI', portrait: { kind: 'gold', seed: 1 } },
   iris: { name: 'Dr. Iris Vael', role: '', portrait: { kind: 'unknown', seed: 7 } },
@@ -83,14 +84,15 @@ export const SPEAKERS = {
   lyra: { name: 'Lyra Vael', role: 'Your mother', portrait: { kind: 'ghost', seed: 5 } },
   seraph: { name: 'Seraph', role: '', portrait: { kind: 'gold', seed: 9, model: 'seraph', tier: 3 } },
   kettle: { name: 'Big Kettle', role: 'Silverhand Syndicate', portrait: { kind: 'black', seed: 4, model: 'boss_kettle' } },
-  fenn: { name: 'Dr. Abel Fenn', role: 'Retired archivist', portrait: { kind: 'human', seed: 8 } },
-  jun: { name: 'Jun Okafor', role: 'The Unlinked', portrait: { kind: 'human', seed: 12 } },
+  fenn: { name: 'Dr. Abel Fenn', role: 'Retired archivist', portrait: { kind: 'human', seed: 8, veil: 'fenn' } },
+  jun: { name: 'Jun Okafor', role: 'The Unlinked', portrait: { kind: 'human', seed: 12, veil: 'jun' } },
   halloran: { name: 'Warden-Captain Halloran', role: 'Concord security', portrait: { kind: 'robot', seed: 6, model: 'boss_halloran' } },
   rook: { name: 'Rook', role: 'Info broker', portrait: { kind: 'robot', seed: 13, model: 'civ_worker' } },
   tinsel: { name: 'Tinsel', role: "Tinsel's Pre-Loved Electronics", portrait: { kind: 'robot', seed: 21, model: 'civ_worker' } },
   sal: { name: 'Sal Venn', role: 'Nexus Frames', portrait: { kind: 'chrome', seed: 17 } },
   thug: { name: 'Silverhand thug', role: 'Syndicate', portrait: { kind: 'black', seed: 19, model: 'enforcer' } },
   warden: { name: 'Warden dispatch', role: 'Concord security', portrait: { kind: 'robot', seed: 6 } },
+  civ: { name: 'Plaza resident', role: '', portrait: { kind: 'gold', seed: 27 } },
 };
 
 Object.assign(SCRIPTS, SCRIPTS_A2, SCRIPTS_A3, SCRIPTS_A4, SCRIPTS_A5, SCRIPTS_A6);

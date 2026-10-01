@@ -26,7 +26,8 @@ export const SCRIPTS_A2 = {
     { n: 1, trigger: 'accept', mode: 'bark', speaker: 'fenn', text: 'The gold one by the atrium fountain. It never Links out and it never rests. Follow it, and do not let it see you.' },
     { n: 2, trigger: 'shot:1', mode: 'bark', speaker: 'voice', text: 'Brother Dray sends his regards. The garden is quiet. As it should be.' },
     { n: 3, trigger: 'done:2', mode: 'bark', speaker: 'fenn', vo: 'a2_s03_fenn_01', text: "No pod. There's no body at the other end of that frame, Wren." },
-    { n: 4, trigger: 'deliver', mode: 'dlg', speaker: 'fenn', vo: 'a2_s03_fenn_02', text: "I should tell you. I'm one of them too. I was dying. They offered. I'm not proud.", choices: ["You're a frame too?", 'Why tell me now?'] },
+    { n: 4, trigger: 'deliver', mode: 'dlg', speaker: 'fenn', vo: 'a2_s03_fenn_02', text: "I should tell you. I'm one of them too. I was dying. They offered. I'm not proud.", choices: ["You're a frame too?", 'Why tell me now?'],
+      replies: { 0: { speaker: 'fenn', text: "Under this old-man veil? Gold and wire. The face I wear on calls is the one I had at eighty. Vanity, I suppose." } } },
     { n: 5, trigger: 'after:4', mode: 'dlg', speaker: 'fenn', text: 'Twenty years in a body that never tires, and never quite feels anything. If they ever offer it to you, say no.' },
     { n: 6, trigger: 'after:5', mode: 'action', action: { toast: 'Codex updated: The Voice Without a Body' } },
   ],
@@ -51,6 +52,6 @@ export const SCRIPTS_A2 = {
 };
 
 export const SPEAKERS_A2 = {
-  tomas: { name: 'Tomas Quill', role: 'Memory shard', portrait: { kind: 'human', seed: 14, hue: 30 } },
+  tomas: { name: 'Tomas Quill', role: 'Memory shard', portrait: { kind: 'human', seed: 14, hue: 30, veil: 'tomas' } },
   voice: { name: 'Gold frame', role: 'Voice of the Concord', portrait: { kind: 'gold', seed: 23 } },
 };

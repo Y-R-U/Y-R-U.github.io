@@ -8,7 +8,7 @@ export function createDialogue(bus, root) {
     <div class="dl-box">
       <div class="dl-portrait"><i class="pglow"></i><div class="pwin"><div class="pf"></div><canvas class="pc"></canvas><div class="pscan"></div></div><i class="ptick"></i></div>
       <div class="dl-body">
-        <div class="dl-name"><b></b><span></span></div>
+        <div class="dl-name"><b></b><em class="dl-tag"></em><span></span></div>
         <div class="dl-text"></div>
         <div class="dl-next">${icon('down')}</div>
       </div>
@@ -16,7 +16,7 @@ export function createDialogue(bus, root) {
     </div>`,
   });
   const $ = s => el.querySelector(s);
-  const pf = $('.pf'), nm = $('.dl-name b'), role = $('.dl-name span'), txt = $('.dl-text'), choicesEl = $('.dl-choices');
+  const pf = $('.pf'), nm = $('.dl-name b'), role = $('.dl-name span'), tagEl = $('.dl-tag'), txt = $('.dl-text'), choicesEl = $('.dl-choices');
 
   let cur = null, raf = 0, closeT = 0, audio = null, voiceFn = null;
 
@@ -84,6 +84,9 @@ export function createDialogue(bus, root) {
       const speakerChanged = nm.textContent !== (o.speaker || '');
       nm.textContent = o.speaker || '';
       role.textContent = o.role || '';
+      tagEl.textContent = o.tag || '';
+      tagEl.classList.toggle('on', !!o.tag);
+      tagEl.classList.toggle('warm', o.tag === 'UNVEILED');
       if (speakerChanged || !wasOpen) {
         pf.innerHTML = portrait(o.portrait || { kind: 'unknown' });
         el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap');

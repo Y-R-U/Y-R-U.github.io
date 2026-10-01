@@ -1,6 +1,7 @@
 // Act 6 "Heirframe" scripts (STORY §4, VO_LINES §3). Same beat format as story_a1.js.
 // Extra actions (js/game/game.js + finale.js): helm (setMode), human ('on'|'off'), voicesFlee.
-// a6_m5 'epilogue' runs after the results card (the city, the billboards, Mara's last line).
+// a6_m5 'epilogue' runs after the results card (the city, the billboards, Mara's last line). `unveil` (D30): that last
+// call is the one time anyone drops their Link veil, so it shows Mara's real face.
 
 export const SCRIPTS_A6 = {
   a6_m1: [
@@ -32,6 +33,7 @@ export const SCRIPTS_A6 = {
     { n: 4, trigger: 'done:1', mode: 'bark', speaker: 'lyra', vo: 'a6_s04_lyra_01', text: 'You walk like your father. All elbows. I love it.' },
     { n: 5, trigger: 'after:4', mode: 'bark', speaker: 'jun', vo: 'a6_s04_jun_01', text: "I'm not crying. The helmet's fogging. Helmets fog." },
     { n: 6, trigger: 'done:2', mode: 'bark', speaker: 'hira', vo: 'a6_s04_hira_01', text: "For the record, you're my favourite rider. Premium tier." },
+    { n: 10, trigger: 'after:6', mode: 'bark', speaker: 'mara', text: "Your own face, out in the open. Nobody's seen mine in twenty years, kiddo. Maybe that's next." },
     { n: 7, trigger: 'deliver', mode: 'dlg', speaker: 'helm', vo: 'a6_s04_helm_02', text: 'Heir present. Living. Renewal may proceed.' },
     { n: 8, trigger: 'after:7', mode: 'dlg', speaker: 'dray', vo: 'a6_s04_dray_01', text: "There you are, child. Right where I needed you. Stay very still." },
     { n: 9, trigger: 'after:8', mode: 'card', lines: ['THE SOVEREIGN FRAME', 'Gold light floods the dais. Your frame beams back in around you, just in time.'], ms: 3000, sfx: ['alarm'], action: { human: 'off' } },
@@ -52,8 +54,8 @@ export const SCRIPTS_A6 = {
     { n: 13, trigger: 'after:11', mode: 'bark', speaker: 'harmony', vo: 'a6_s06_harmony_01', text: 'A brighter future, together. For real this time.', fx: 'billboards_epilogue' },
     { n: 14, trigger: 'after:12', mode: 'action', action: { closing: true } },
     { n: 15, trigger: 'after:13', mode: 'action', action: { closing: true } },
-    { n: 20, trigger: 'closing', when: { maraTone: 'cold' }, mode: 'dlg', speaker: 'mara', vo: 'a6_s06_mara_cold_01', text: "I said I'd earn it back one job at a time. Board's still open, kiddo. Contracts don't stop just because the sky did." },
-    { n: 21, trigger: 'closing', when: { maraTone: 'warm' }, mode: 'dlg', speaker: 'mara', vo: 'a6_s06_mara_warm_01', text: "We burned his world down, kiddo. Now let's build a better one. Board's open. Contracts don't stop just because the sky did." },
+    { n: 20, trigger: 'closing', when: { maraTone: 'cold' }, mode: 'dlg', speaker: 'mara', unveil: true, vo: 'a6_s06_mara_cold_01', text: "I said I'd earn it back one job at a time. Board's still open, kiddo. Contracts don't stop just because the sky did." },
+    { n: 21, trigger: 'closing', when: { maraTone: 'warm' }, mode: 'dlg', speaker: 'mara', unveil: true, vo: 'a6_s06_mara_warm_01', text: "We burned his world down, kiddo. Now let's build a better one. Board's open. Contracts don't stop just because the sky did." },
     { n: 22, trigger: 'after:20', mode: 'action', action: { theEnd: true } },
     { n: 23, trigger: 'after:21', mode: 'action', action: { theEnd: true } },
   ],

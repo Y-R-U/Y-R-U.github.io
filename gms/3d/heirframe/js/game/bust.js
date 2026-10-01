@@ -1,8 +1,11 @@
 import * as THREE from 'three';
+import { createVeils } from './veil.js';
+import { UNVEILED } from '../data/veils.js';
 
 // Live 3D bust of the speaker in the dialogue portrait. The main renderer draws it into a corner of the canvas before
 // the world frame (which then overwrites it), and the pixels are copied into the portrait's 2D canvas. Humans call in
-// over the Link, so they render as a hologram; unknown voices get a 2D waveform emblem.
+// over the Link wearing their veil (veil.js, D30); unknown voices get a 2D waveform emblem. The one unveiled call
+// plays a real portrait clip instead (portrait.unveiled).
 const MODEL = { rental: 'rental', bulwark: 'brawler', ghost: 'ghost', gold: 'civ_gold', chrome: 'civ_chrome', black: 'civ_black', robot: 'security', human: 'human' };
 const ACCENT = { human: 0x5fd8ff, gold: 0xffc865, civ_gold: 0xffc865, black: 0xff6a4a, civ_black: 0xff6a4a, ghost: 0x46e0ff, rental: 0xff9a4a };
 
@@ -18,20 +21,8 @@ export function createBust({ world, robots, tier, ui, audio }) {
   const key = new THREE.DirectionalLight(0xfff1dc, 2.6); key.position.set(1.6, 2.4, 2.2);
   const rim = new THREE.DirectionalLight(0x7fdcff, 3.2); rim.position.set(-2.2, 1.4, -2.0);
   scene.add(key, rim, key.target, rim.target);
-  const holoT = { value: 0 }, holoC = { value: new THREE.Color(0x5fd8ff) };
-  const holo = new THREE.MeshStandardMaterial({ color: 0x0c2a3a, emissive: 0, metalness: 0.1, roughness: 0.5, transparent: true, opacity: 0.88, envMapIntensity: 0.25 });
-  holo.onBeforeCompile = (sh) => {
-    sh.uniforms.uT = holoT; sh.uniforms.uTint = holoC;
-    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float uT;\nuniform vec3 uTint;')
-      .replace('#include <opaque_fragment>', `{
-        float fr = pow( 1.0 - abs( dot( normal, normalize( vViewPosition ) ) ), 1.7 );
-        float scan = 0.62 + 0.38 * smoothstep( 0.2, 0.9, sin( gl_FragCoord.y * 1.25 - uT * 5.0 ) * 0.5 + 0.5 );
-        float flick = 0.94 + 0.06 * sin( uT * 37.0 ) * sin( uT * 11.0 );
-        outgoingLight = ( outgoingLight * 0.55 + uTint * ( 0.12 + fr * 1.9 ) ) * scan * flick;
-        diffuseColor.a *= 0.55 + 0.45 * fr;
-      }\n#include <opaque_fragment>`);
-  };
-  holo.customProgramCacheKey = () => 'bustHolo';
+  const veils = createVeils();
+  let vid = null, veil = null;
   const bgCache = new Map();
   function bgTex(hex) {
     if (bgCache.has(hex)) return bgCache.get(hex);
@@ -55,36 +46,60 @@ export function createBust({ world, robots, tier, ui, audio }) {
   const stats = { renders: 0, calls: 0, ms: 0, compileMs: 0 };
 
   function clear() {
+    veils.remove(); veil = null;
     if (actor) { scene.remove(actor.root); actor.dispose?.(); actor = null; }
     pendingMats = [];
     eyes.length = 0; ready = false; curKey = '';
-    scene.overrideMaterial = null;
+    stopVideo();
+  }
+
+  // the unveiled call: mp4 loop (muted, inline) → jpg still → the SVG portrait underneath, never a broken frame
+  function stopVideo() {
+    box.classList.remove('vid');
+    if (vid) vid.pause();
+  }
+  function playVideo(base) {
+    const win = box.querySelector('.pwin');
+    if (!vid) {
+      vid = document.createElement('video');
+      vid.className = 'pv';
+      for (const a of ['muted', 'playsinline', 'webkit-playsinline', 'loop', 'disablepictureinpicture']) vid.setAttribute(a, '');
+      vid.muted = true; vid.preload = 'none';
+      vid.addEventListener('error', () => { if (vid.dataset.base) { const im = new Image(); im.className = 'pv'; im.onerror = () => { im.remove(); box.classList.remove('vid'); }; im.src = vid.dataset.base + '.jpg'; vid.replaceWith(im); vid = null; } });
+      win.insertBefore(vid, win.querySelector('.pscan'));
+    }
+    if (vid.dataset.base !== base) { vid.dataset.base = base; vid.poster = base + '.jpg'; vid.src = base + '.mp4'; }
+    box.classList.add('vid');
+    vid.play?.().catch(() => {});
   }
 
   function setSpeaker(o) {
     const p = typeof o.portrait === 'string' ? { kind: /[/.]/.test(o.portrait) ? 'unknown' : o.portrait } : (o.portrait || { kind: 'unknown' });
     const kind = p.model || MODEL[p.kind] || (robots.ROBOT_KINDS?.includes(p.kind) ? p.kind : null);
-    const k = kind ? `${kind}|${p.seed ?? 1}|${p.tier ?? 0}|${p.hue ?? ''}` : 'emblem|' + (p.hue ?? '');
+    const unv = p.unveiled && p.veil && UNVEILED[p.veil];
+    const k = unv ? 'unveiled|' + p.veil : kind ? `${kind}|${p.seed ?? 1}|${p.tier ?? 0}|${p.hue ?? ''}|${p.veil ?? ''}` : 'emblem|' + (p.hue ?? '');
     wantLive = true;
     if (k === curKey) return;
     clear();
     curKey = k;
+    const human = kind === 'human';
     const hue = p.hue != null ? new THREE.Color().setHSL(p.hue / 360, 0.95, 0.62).getHex() : null;
-    const accent = hue ?? ACCENT[p.kind] ?? ACCENT[kind] ?? 0x66d8ff;
+    const accent = unv ? 0xffd9a8 : human ? veils.tintOf(p.veil) : hue ?? ACCENT[p.kind] ?? ACCENT[kind] ?? 0x66d8ff;
     accStr = '#' + new THREE.Color(accent).getHexString();
     box.style.setProperty('--acc', accStr);
+    dlg.el.style.setProperty('--acc-tag', human || unv ? accStr : '');
+    if (unv) { mode = 'video'; ready = true; box.classList.remove('live'); playVideo(unv); return; }
     if (!kind) { mode = 'emblem'; ready = true; box.classList.add('live'); return; }
     mode = 'bust';
     box.classList.remove('live');
     try { actor = robots.createRobot({ kind, tier: p.tier ?? 0, seed: p.seed ?? 1, quality: tier.name }); } catch (e) { console.warn('[bust]', e); mode = 'off'; return; }
     actor.mesh.castShadow = false; actor.mesh.frustumCulled = false;
-    actor.root.rotation.y = kind === 'human' ? -0.3 : -0.38;
+    actor.root.rotation.y = -0.38;
     actor.play('idle');
+    if (human) veil = veils.wear(actor, p.veil);
     actor.update(0.016);
+    if (veil) veils.pose(actor, t, 0);
     scene.add(actor.root);
-    const human = kind === 'human';
-    scene.overrideMaterial = human ? holo : null;
-    if (human) { holoC.value.setHex(accent); holo.color.setHex(accent).multiplyScalar(0.3); }
     rim.color.setHex(accent);
     scene.background = bgTex(human ? accent : 0x2a6f9a);
     scene.environment = world.scene.environment;
@@ -94,11 +109,6 @@ export function createBust({ world, robots, tier, ui, audio }) {
     // compile without blocking (KHR_parallel_shader_compile); update() shows the bust once every program links.
     // three's own compileAsync throws if a material is disposed while it polls, so poll here instead.
     pendingMats = [...renderer.compile(scene, cam)];
-    if (human) {
-      const m0 = actor.mesh.material; actor.mesh.material = holo;
-      pendingMats.push(...renderer.compile(actor.mesh, cam, scene));
-      actor.mesh.material = m0;
-    }
     compileT0 = performance.now();
   }
 
@@ -122,6 +132,7 @@ export function createBust({ world, robots, tier, ui, audio }) {
 
   function frame(dt) {
     actor.update(dt);
+    if (veil) veils.pose(actor, t, level);
     const talking = dlg.open && !dlg.el.classList.contains('typed');
     const want = talking ? 'talk' : 'idle';
     if (actor.state.base !== want && actor.state.action !== want) actor.play(want, { loop: true, fade: 0.3 });
@@ -149,9 +160,9 @@ export function createBust({ world, robots, tier, ui, audio }) {
 
   function update(dt) {
     t += dt;
-    holoT.value = t;
-    if (!dlg.open && !dlg.el.classList.contains('show')) { if (wantLive) { wantLive = false; box.classList.remove('live'); } return; }
-    if (mode === 'off') return;
+    veils.U.uT.value = t;
+    if (!dlg.open && !dlg.el.classList.contains('show')) { if (wantLive) { wantLive = false; box.classList.remove('live'); stopVideo(); } return; }
+    if (mode === 'off' || mode === 'video') return;
     if (!ready) { if (!linked()) return; ready = true; stats.compileMs = performance.now() - compileT0; }
     const lv = audio?.voLevel?.() ?? 0;
     level += (lv - level) * (1 - Math.exp(-dt * (lv > level ? 30 : 8)));
@@ -183,6 +194,6 @@ export function createBust({ world, robots, tier, ui, audio }) {
   }
 
   ui.on('dialogue:line', (o) => { try { setSpeaker(o); } catch (e) { console.warn('[bust]', e); } });
-  ui.on('dialogue:end', () => { wantLive = false; box.classList.remove('live'); level = 0; box.style.setProperty('--vl', 0); });
-  return { update, stats, get mode() { return mode; }, get ready() { return ready; }, get key() { return curKey; } };
+  ui.on('dialogue:end', () => { wantLive = false; box.classList.remove('live'); stopVideo(); if (mode === 'video') curKey = ''; level = 0; box.style.setProperty('--vl', 0); });
+  return { update, stats, get mode() { return mode; }, get ready() { return ready; }, get key() { return curKey; }, get veil() { return veil; }, get video() { return vid; } };
 }

@@ -674,3 +674,48 @@ Owns: js/game/*, js/main.js, js/engine/{player,camera,input,devpad}.js, js/sim/*
 - Humans speak as a hologram of the generic human body (the Walk as Yourself mannequin), tinted by speaker hue; they
   have no individual faces. Codex and contract-board portraits are still the SVG busts.
 - Speaker data now carries `portrait.model` (Kettle, Halloran, Dray, Seraph, Choir, Rook, Tinsel, thug).
+
+## P8 Veils (D30)
+| item | result | evidence (scratchpad p8/) |
+|---|---|---|
+| Per-person veils in the bust | DONE | before_after_915.png / before_after_1280.png (left before, right after), after_close.png |
+| "LINK · VEILED" tag next to the name | DONE | same shots; per-person wording, tinted by the veil |
+| Codex "Veils" + text-only flavour lines | DONE | codex Places entry; 5 new lines, no new VO |
+| Late payoff: Mara unveils | DONE | Flux still + LTX talking loop on her closing epilogue call; after_payoff_*.png, nomp4_payoff_915.png (fallback) |
+| Bust cost | same | bperf.mjs (Mara veil): 60 fps high 1280x720 and 915x412, 6 calls, 0.2–0.7 ms (P7: 6–9 calls, 0.2–0.8 ms) |
+| sim tests | PASS | test.mjs 31/31 (+1 P8; it fails with a veil removed) |
+| smoke + story replays | PASS | smoke ok; A1-M3, A6-M4, A6-M5 complete (story2m.mjs), 0 console errors |
+| normal boot fetches 0 js/dev | PASS | 158 js, 0 dev; the mp4 is only fetched when the unveiled call opens (preload none, src set then) |
+
+- **Veils** (js/data/veils.js = data, js/game/veil.js = look). One shared veil shader replaces P7's hologram override:
+  scanlines / gold filigree / wire lattice / glitch rows / shard dropout, all uniforms, so a speaker swap never
+  recompiles. Patterns use bind-space position, so they stick to the body as it sways. Every veil has a blank
+  mirrored faceplate (faceless by choice) with an additive emblem, an optional head piece and a pose offset.
+  - Mara: smoked glass in amber filigree, a deep hood, quill emblem, turned three-quarters away, head down (a fixer who never shows herself).
+  - Fenn: sepia paper glass, faint filigree, leaf emblem (the memorial garden), a stoop. His reply in A2-M3 says the veil is the face he had at eighty.
+  - Jun: pirated veil, acid-green wire lattice, glitch rows and a jitter, cat ears, pixel grin. Tag "SPOOFED · VEILED".
+  - Tomas: memory shard, cold blue with fractured dropout, a little star. Tag "SHARD · VEILED".
+  - Elena: amber archive tape with heavy scanlines and dropout, a captain's cap whose badge is the ark ring. Tag "ARCHIVE · LOG".
+  - Any other human uses VEIL_DEFAULT (cyan scanline, ring emblem, "LINK · VEILED").
+- **Tag:** `ui.dialogue.show({tag})` (an `<em class="dl-tag">` beside the name, colour from `--acc-tag`); story.js fills
+  it from the speaker's `portrait.veil` (dialogue lines and replies). Barks (subtitles) carry no tag.
+- **Lore:** codex PLACES `veils` (beside House Vael). The early blurb is etiquette. After A6-M4 it deepens: Iris made the
+  veil as the Link's privacy setting, and the Concord turned it into manners because a city of masks never asks whose
+  face stopped ageing. Text-only lines: Mara's intro gets a third choice, "What do you actually look like?", with a
+  deflecting reply; a plaza resident bark in A1-M3 ("…they'll have us going out unveiled", new `civ` speaker); Fenn's A2-M3
+  reply; Jun's A3-M1 reply; Mara in A6-M4 after HIRA ("Nobody's seen mine in twenty years… Maybe that's next").
+- **Payoff (manager addition: a real portrait instead of the 3D body):** beats a6_m5 n20/n21 (Mara's closing call, both
+  tones) carry `unveil: true`, so story.js sends `portrait.unveiled` + tag "UNVEILED". bust.js then plays
+  `assets/portraits/mara.mp4` in the portrait window (muted, playsinline, loop, disablepictureinpicture, preload none,
+  poster = jpg), warm frame accent, with no hologram scan. If the mp4 fails it shows mara.jpg; if that fails it shows the
+  SVG portrait. It never shows a broken frame. Verified in headless Chrome: playing inline (paused false, not fullscreen), and the 404 path lands on the jpg.
+  - Assets 96 KB total: mara.jpg 384x480 (29 KB), mara_thumb.jpg 96x120 (3 KB, unused for now), mara.mp4 288x360 H.264 4.0 s (64 KB).
+  - Flux flux2-klein-9b-mlx-4bit 768x1280, 10 steps, seeds 5101/5202/5303 (p8/media/cands.png). **Chose 5101**: warm
+    side light, grey-streaked auburn hair, guarded half-smile. The other two are in p8/media.
+  - LTX-2.3, tried both loops (p8/media/seam.py measures the mean abs frame step):
+    (a) start=end true loop (`image` = `image_end`, 97 f): nearly a still (mean step 0.23), and the end anchor snaps once
+    at frame 89 (5.39, 23x the mean), so the only motion is a visible hitch. (b) NEONHAUL ping-pong (49 f → 96 f): she
+    actually talks (mean 2.08), the turn and the wrap are inside normal motion (max 4.33, wrap 3.36). **Kept (b).**
+- Not done / for review: Mara's quill only shows as a sliver inside the hood at her three-quarter turn (deliberate,
+  but it's subtle). Tomas's star sits off-centre at his turn. Wren's own A6-M4 body and the codex/contract SVG busts are
+  unchanged. No new VO.

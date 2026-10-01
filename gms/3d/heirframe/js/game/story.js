@@ -1,4 +1,5 @@
 import { SCRIPTS, SPEAKERS } from '../data/story_a1.js';
+import { VEILS, VEIL_DEFAULT } from '../data/veils.js';
 
 // Plays STORY §8 script tables (js/data/story_a1.js): cards, barks (subtitle + VO), dialogue (ui.dialogue + VO), actions.
 export function createStoryPlayer(ctx) {
@@ -12,6 +13,8 @@ export function createStoryPlayer(ctx) {
   const fullText = (b) => audio.voInfo(b.vo)?.text || b.text || '';
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const readMs = (t) => Math.max(1800, Math.min(7000, t.length * 55));
+  // D30: humans call in veiled; `unveil` beats show the face (the one late payoff)
+  const veilTag = (p) => p?.kind === 'human' ? (VEILS[p.veil] || VEIL_DEFAULT).tag : '';
 
   async function bark(b) {
     const s = who(b.speaker), text = fullText(b);
@@ -26,11 +29,13 @@ export function createStoryPlayer(ctx) {
   async function dlg(b) {
     const s = who(b.speaker), text = fullText(b);
     overlay.hideSubtitle();
-    const p = { speaker: b.label || s.name, role: b.label ? '' : s.role, portrait: typeof b.portrait === 'string' ? { kind: 'unknown', seed: 7 } : (b.portrait || s.portrait), text, choices: b.choices };
+    let portrait = typeof b.portrait === 'string' ? { kind: 'unknown', seed: 7 } : (b.portrait || s.portrait);
+    if (b.unveil) portrait = { ...portrait, unveiled: true };
+    const p = { speaker: b.label || s.name, role: b.label ? '' : s.role, tag: b.unveil ? 'UNVEILED' : veilTag(portrait), portrait, text, choices: b.choices };
     if (b.vo) p.voiceKey = b.vo;
     const choice = await ui.dialogue.show(p);
     const reply = b.replies?.[choice];
-    if (reply) await ui.dialogue.show({ speaker: who(reply.speaker).name, role: who(reply.speaker).role, portrait: who(reply.speaker).portrait, text: reply.text });
+    if (reply) { const r = who(reply.speaker); await ui.dialogue.show({ speaker: r.name, role: r.role, tag: veilTag(r.portrait), portrait: r.portrait, text: reply.text }); }
     return choice;
   }
 

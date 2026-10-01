@@ -17,6 +17,7 @@ export const PLACES = [
   { id: 'halcyon', name: 'Halcyon', blurb: 'A gleaming city under a warm sun.', revealedBlurb: 'The inside of a generation ark, 40 km long.', revealedBy: 'R5' },
   { id: 'meridian', name: 'Meridian', blurb: 'Site of the reactor breach, 22 years ago.', revealedBlurb: 'The Landfall-prep station where the Sundering happened.', revealedBy: 'a5_m2' },
   { id: 'verdance', name: 'Verdance', blurb: 'The pale moon.', revealedBlurb: 'A living green world. The ark arrived 61 years ago.', revealedBy: 'R7' },
+  { id: 'veils', name: 'Veils', blurb: 'Halcyon talks through masks. On the Link, people wear a veil: a chosen avatar of light, never their own face. Bodies stay home in the pods, and going out unveiled is about as polite as going out naked.', revealedBlurb: "Iris built the veil as the Link's privacy setting. The Concord turned it into manners, then into habit. A city of masks never asks whose face stopped ageing, or which gold frame has nobody inside it. Walking as yourself is the rarest, most intimate thing in Halcyon.", revealedBy: 'a6_m4' },
   { id: 'vael', name: 'House Vael', blurb: 'An eight-pointed star, erased from every plaque.', revealedBy: 'a1_m5' },
 ];
 

@@ -96,3 +96,5 @@ Contracts: see TEAM_BRIEF.md "Shared contracts".
 - 2026-10-01: **P6 PLAYABLE**, pushed dcea3fde; registered in projects.js + assets/screenshots/heirframe.jpg (3e908283), live verified. Launched **P7 polish** (a3cc7f94…: speaker portrait, soak stall, Gunner defend). After P7: HEIRFRAME only (NEONHAUL removed from our queue per D29).
 - 2026-10-01: Aaron: don't start NEONHAUL (another agent owns it). D29.
 - 2026-10-01 13:50+: P7 died at the limit (before capturing portraits); resumed.
+- 2026-10-01: **P7 DONE** (3D speaker busts; heat spiral, escortee and autopilot fixes; soak 1→34 contracts in 30 min). Pushed; live check done. No agent running. Open: human speakers are a faceless hologram mannequin; codex/board portraits are still SVG.
+- 2026-10-01: Aaron proposed anonymous avatars for humans → D30 Veils. Launched the P8 veils agent (sole).
