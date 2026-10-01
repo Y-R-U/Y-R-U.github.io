@@ -27,7 +27,9 @@ GAMES=(
   "gms/2d/crazyspace"
   "gms/3d/fable5_crow_tank_battle"
   "gms/3d/outpace"
+  "gms/3d/heirframe"
 )
+# SYNTHWILD is NOT listed: it ships (client + Go API) via gms/3d/synthwild/server/deploy.sh
 
 echo ">> ensuring dirs"
 ssh "$HOST" "sudo install -d -o deploy -g deploy /srv/apps/br8tgames '$SITE'"
@@ -45,7 +47,10 @@ rsync -az --delete "$REPO/lib/auth/" "$HOST:$SITE/lib/auth/"
 for g in "${GAMES[@]}"; do
   echo ">> $g"
   ssh "$HOST" "install -d '$SITE/$g'"
-  rsync -az --delete --exclude='PLAN.md' --exclude='*.md' \
+  EXTRA=()
+  # heirframe keeps ~90 MB of VO sources and refs under tools/ and refs/ that the game never loads
+  if [[ "$g" == "gms/3d/heirframe" ]]; then EXTRA=(--exclude=/tools/ --exclude=/refs/ --exclude=/docs/); fi
+  rsync -az --delete --exclude='PLAN.md' --exclude='*.md' "${EXTRA[@]}" \
     "$REPO/$g/" "$HOST:$SITE/$g/"
 done
 
