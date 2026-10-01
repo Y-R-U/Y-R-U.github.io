@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -59,7 +60,8 @@ func handleListUsers(w http.ResponseWriter, r *http.Request, _ *User) {
 	writeJSON(w, 200, map[string]any{"users": out})
 }
 
-// Re-adding a removed username restores that account (and its hidden worlds).
+// Re-adding a removed username makes a NEW account. The old row is renamed
+// out of the way (name~id can never log in) and its worlds stay hidden.
 func handleAddUser(w http.ResponseWriter, r *http.Request, admin *User) {
 	var body struct {
 		Username string `json:"username"`
@@ -75,20 +77,29 @@ func handleAddUser(w http.ResponseWriter, r *http.Request, admin *User) {
 	}
 	display := cleanDisplay(body.Display, name)
 	now := time.Now().Unix()
+	tx, err := db.Begin()
+	if err != nil {
+		writeErr(w, 500, "server", "db error")
+		return
+	}
+	defer tx.Rollback()
 	var id int64
 	var removed sql.NullInt64
-	err := db.QueryRow(`SELECT id, removed_at FROM users WHERE username=?`, name).Scan(&id, &removed)
+	err = tx.QueryRow(`SELECT id, removed_at FROM users WHERE username=?`, name).Scan(&id, &removed)
 	switch {
 	case err == nil && !removed.Valid:
 		writeErr(w, http.StatusConflict, "conflict", "that username is taken")
 		return
 	case err == nil:
-		_, err = db.Exec(`UPDATE users SET removed_at=NULL, display=?, created_by=? WHERE id=?`, display, admin.Username, id)
+		_, err = tx.Exec(`UPDATE users SET username=? WHERE id=?`, fmt.Sprintf("%s~%d", name, id), id)
 	default:
-		_, err = db.Exec(`INSERT INTO users(username,display,created_at,created_by) VALUES(?,?,?,?)`,
+		err = nil
+	}
+	if err == nil {
+		_, err = tx.Exec(`INSERT INTO users(username,display,created_at,created_by) VALUES(?,?,?,?)`,
 			name, display, now, admin.Username)
 	}
-	if err != nil {
+	if err != nil || tx.Commit() != nil {
 		writeErr(w, 500, "server", "could not add user")
 		return
 	}

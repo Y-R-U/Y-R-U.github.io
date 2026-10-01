@@ -36,7 +36,7 @@ try {
   await send('Network.setCacheDisabled', { cacheDisabled: true });
   await send('Page.navigate', { url: link });
   await sleep(1000);
-  await send('Page.navigate', { url: `${base}/tools/server_apitest.html` });
+  await send('Page.navigate', { url: `${base}/tools/${process.env.PAGE || 'server_apitest.html'}` });
   let res;
   for (let i = 0; i < 60; i++) {
     await sleep(500);

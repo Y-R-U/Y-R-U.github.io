@@ -1,4 +1,6 @@
 // World storage façade over js/net/api.js (local IndexedDB + cloud). Works offline.
+import { sanitizeSave } from '../net/savecheck.js';
+
 const EXTRA = 'synthwild.worldExtra';
 const readExtra = () => { try { return JSON.parse(localStorage.getItem(EXTRA) || '{}'); } catch { return {}; } };
 const writeExtra = (o) => { try { localStorage.setItem(EXTRA, JSON.stringify(o)); } catch {} };
@@ -31,7 +33,7 @@ export function createStore(getApi, account) {
     async load(meta) {
       const a = api();
       const r = meta.source === 'cloud' ? await a.worlds.get(meta.id) : await a.local.get(meta.id);
-      return { meta: withExtra({ ...meta, ...r.meta }), data: r.data };
+      return { meta: withExtra({ ...meta, ...r.meta }), data: sanitizeSave(r.data) };
     },
     // Returns the (possibly new) meta. A visitor's first save becomes their own copy.
     // onConflict(serverMeta, kind) -> 'overwrite' | 'copy' | null. kind 'missing' = the world was deleted elsewhere.

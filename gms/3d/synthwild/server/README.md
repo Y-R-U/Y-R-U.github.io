@@ -30,14 +30,15 @@ admin sign-in works on `localhost`, since Firebase allows it by default.
 
 ## Test
 ```bash
-./test.sh                          # builds, starts a temp instance, 160 checks
-node ../tools/server_apitest.mjs   # api.js in headless Chrome against a temp server (28 checks)
+./test.sh                          # builds, starts a temp instance, 186 checks (KEEP=1 keeps the temp dir)
+node ../tools/server_apitest.mjs   # api.js in headless Chrome against a temp server (48 checks)
 ```
 
 ## Deploy
 ```bash
 ./deploy.sh                 # build on the box, unit, Caddy route, static client, three.js, health check
 RUN_TESTS=1 ./deploy.sh     # also runs test.sh on the box first
+ROLLBACK_DRILL=1 ./deploy.sh  # ships a binary that cannot start; proves the auto-rollback (exits 1)
 SKIP_STATIC=1 ./deploy.sh   # server only
 ```
 The static client goes to `/srv/apps/br8tgames/site/gms/3d/synthwild/` (excluding `docs/`, `server/`, `tools/` and
@@ -45,6 +46,9 @@ The static client goes to `/srv/apps/br8tgames/site/gms/3d/synthwild/` (excludin
 `caddy_route.py` adds `handle /gms/3d/synthwild/api/* { reverse_proxy 127.0.0.1:8011 }` to the
 `games.br8t.com` block once. It backs up the file, validates it and restores the backup on failure.
 This script does not touch `games/deploy.sh`.
+The box build runs with `GOMAXPROCS=1 nice go build -p 1`. The previous binary and unit are kept, and a failed health check
+restores them and exits 1. The rate limiter relies on Caddy replacing any client-sent `X-Forwarded-For`, which it does
+by default; this was verified live. If `trusted_proxies` is ever configured, revisit `clientIP` in `auth.go`.
 
 ## Admin sign-in
 - Normal: the "Admin" button calls `api.adminGoogleSignIn()` (a Google popup via Firebase project `br8t-games`), and the

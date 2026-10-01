@@ -6,6 +6,8 @@
 // Exercises js/net/api.js against a running server. Needs an admin session first
 // (open an admin-link URL in the same browser). Results land in window.__results.
 import { api, ApiError } from '../js/net/api.js';
+import { createStore } from '../js/ui/store.js';
+import { msg as accountMsg } from '../js/ui/account.js';
 
 const out = document.getElementById('out');
 const results = { pass: 0, fail: 0, lines: [] };
@@ -17,7 +19,7 @@ const ok = (name, cond, info = '') => {
   out.textContent += line + '\n';
 };
 const expectErr = async (name, p, code) => {
-  try { await p; ok(name, false, 'no error'); } catch (e) { ok(name, e instanceof ApiError && e.code === code, `${e.code} ${e.message}`); return e; }
+  try { await p; ok(name, false, 'no error'); } catch (e) { ok(name, (e instanceof ApiError || e.name === 'SaveError') && e.code === code, `${e.code} ${e.message}`); return e; }
 };
 
 const thumbBlob = () => new Promise((res) => {
@@ -37,7 +39,16 @@ try {
   await expectErr('addUser duplicate → conflict', api.admin.addUser('apitest'), 'conflict');
   await expectErr('addUser bad name → bad_request', api.admin.addUser('a!'), 'bad_request');
 
+  try { await api.admin.removeUser('apitest2'); } catch {}
+  await api.admin.addUser('apitest2', 'Second Tester');
+
+  // B1: other players see only the display name, never the username
+  await api.login('apitest2');
+  const other = await api.worlds.create({ name: 'Other public', seed: 1, public: true });
   const p = await api.login('apitest');
+  const seen = (await api.worlds.listPublic()).find((w) => w.id === other.id);
+  ok('B1 public world shows ownerDisplay', seen && seen.ownerDisplay === 'Second Tester', JSON.stringify(seen));
+  ok('B1 public world carries no username', seen && seen.owner === '' && !JSON.stringify(seen).includes('apitest2'), JSON.stringify(seen));
   ok('login(username)', p.username === 'apitest' && !p.admin);
   await expectErr('player cannot list users', api.admin.listUsers(), 'forbidden');
 
@@ -65,6 +76,48 @@ try {
   await api.worlds.remove(meta.id);
   await expectErr('removed world → not_found', api.worlds.get(meta.id), 'not_found');
 
+  // B4: a failed thumbnail never desyncs the version
+  const badThumb = 'data:image/png;base64,iVBORw0KGgo=';
+  let tm = await api.worlds.create({ name: 'thumb desync', seed: 2, data });
+  let threw = null;
+  try { tm = await api.worlds.save(tm.id, { n: 2 }, tm.version, { thumb: badThumb }); } catch (e) { threw = e; }
+  ok('B4 save with a rejected thumb still resolves', !threw && tm.version === 2, threw && threw.code);
+  try { tm = await api.worlds.save(tm.id, { n: 3 }, tm.version); ok('B4 next save has no false conflict', tm.version === 3); }
+  catch (e) { ok('B4 next save has no false conflict', false, e.code); }
+  const before = (await api.worlds.listMine()).length;
+  let cm = null;
+  try { cm = await api.worlds.create({ name: 'copy w/ bad thumb', seed: 3, data, thumb: badThumb }); } catch (e) { threw = e; }
+  ok('B4 create with a rejected thumb resolves once (no duplicate)', cm && cm.version === 1 && (await api.worlds.listMine()).length === before + 1);
+  await api.worlds.remove(tm.id); if (cm) await api.worlds.remove(cm.id);
+
+  // B6: decompression bomb and hostile saves
+  const zeros = new Uint8Array(70 << 20);
+  const bomb = new Uint8Array(await new Response(new Blob([zeros]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());
+  const bm = await api.worlds.create({ name: 'bomb', seed: 4 });
+  const put = await fetch(api.base + `worlds/${bm.id}/blob?version=0`, { method: 'PUT', body: bomb, headers: { 'Content-Type': 'application/gzip' } });
+  ok('B6 bomb uploaded (' + bomb.byteLength + ' bytes gzip)', put.ok);
+  await expectErr('B6 70 MB gzip bomb → corrupt, not a crash', api.worlds.get(bm.id), 'corrupt');
+  const junk = new Uint8Array(await new Response(new Blob(['not json']).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());
+  await fetch(api.base + `worlds/${bm.id}/blob?version=1`, { method: 'PUT', body: junk, headers: { 'Content-Type': 'application/gzip' } });
+  await expectErr('B6 non-JSON save → corrupt', api.worlds.get(bm.id), 'corrupt');
+  await api.worlds.remove(bm.id);
+  const store = createStore(() => api, { user: null, online: false });
+  const hostile = { v: 1, mode: 'survival', time: NaN, world: { seed: 'x', mode: 'survival', sections: { '0,1,0': 'AQ==' } },
+    player: { pos: [1e9, 50, -1e9], yaw: Infinity, pitch: 9 },
+    game: { stats: { integrity: 'lots', charge: -5 }, inv: { sel: 3, slots: [{ id: 'a', n: 1e12 }, 'junk'] }, nights: NaN } };
+  const hm = await api.local.put({ name: 'hostile', data: hostile });
+  const hl = (await store.load(hm)).data;
+  ok('B6 positions clamped to world bounds', hl.player.pos[0] === 1e6 && hl.player.pos[2] === -1e6 && hl.player.yaw === 0 && hl.player.pitch <= Math.PI / 2, JSON.stringify(hl.player));
+  ok('B6 bad stats replaced', hl.game.stats.integrity === 20 && hl.game.stats.charge === 0 && hl.game.nights === 0 && hl.time === undefined, JSON.stringify(hl.game.stats) + ' time ' + hl.time);
+  ok('B6 inventory sane', hl.game.inv.slots[0].n === 1e7 && hl.game.inv.slots[1] === null);
+  await api.local.put({ id: hm.id, data: { ...hostile, player: { pos: [NaN, 1, 1] } } });
+  ok('B6 NaN position dropped (player respawns)', (await store.load(hm)).data.player === null);
+  await api.local.put({ id: hm.id, data: { ...hostile, world: { seed: 'x', sections: { '../evil': 'x' } } } });
+  await expectErr('B6 malformed sections → corrupt', store.load(hm), 'corrupt');
+  await api.local.put({ id: hm.id, data: 'just a string' });
+  await expectErr('B6 non-object save → corrupt', store.load(hm), 'corrupt');
+  await api.local.remove(hm.id);
+
   let lm = await api.local.put({ name: 'Local one', seed: 7, mode: 'survival', data, thumb });
   ok('local.put new', lm.source === 'local' && lm.version === 1 && lm.thumbUrl.startsWith('data:image/jpeg'));
   lm = await api.local.put({ id: lm.id, data: { ...data, n: 3 } });
@@ -74,6 +127,27 @@ try {
   ok('local.list has it', (await api.local.list()).some((w) => w.id === lm.id));
   await api.local.remove(lm.id);
   ok('local.remove', !(await api.local.list()).some((w) => w.id === lm.id));
+
+  // B7: a failed probe is not cached for the session
+  const realFetch = window.fetch;
+  window.fetch = (u, o) => (String(u).endsWith('/health') ? Promise.reject(new TypeError('offline')) : realFetch(u, o));
+  ok('B7 probe fails while offline', (await api.available(true)) === false);
+  window.fetch = realFetch;
+  window.dispatchEvent(new Event('online'));
+  ok('B7 the online event re-probes', (await api.available()) === true);
+  window.fetch = (u, o) => (String(u).endsWith('/health') ? Promise.reject(new TypeError('offline')) : realFetch(u, o));
+  await api.available(true);
+  window.fetch = realFetch;
+  const realNow = Date.now;
+  Date.now = () => realNow() + 31000;
+  const again = await api.available();
+  Date.now = realNow;
+  ok('B7 a false result expires after 30 s', again === true);
+
+  // B15: friendly fallback text
+  ok('B15 blocked popup explains the admin link', /admin sign-in link/.test(accountMsg({ code: 'popup' })));
+  ok('B15 failed Google sign-in explains the admin link', /admin sign-in link/.test(accountMsg({ code: 'google_failed' })));
+  ok('B15 SDK can be preloaded before the click', typeof api.prepareAdminSignIn === 'function');
 
   await api.logout();
   ok('logout → me() null', (await api.me()) === null);

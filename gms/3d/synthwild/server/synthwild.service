@@ -16,6 +16,7 @@ Environment=SYNTHWILD_PREFIX=/gms/3d/synthwild
 Environment=SYNTHWILD_PUBLIC_URL=https://games.br8t.com/gms/3d/synthwild
 Environment=GOMEMLIMIT=96MiB
 MemoryMax=192M
+UMask=0077
 
 NoNewPrivileges=true
 ProtectSystem=strict

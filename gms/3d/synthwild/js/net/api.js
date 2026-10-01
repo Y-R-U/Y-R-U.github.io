@@ -20,26 +20,40 @@ const CODE_BY_STATUS = { 400: 'bad_request', 401: 'unauthorized', 403: 'forbidde
 
 let availProbe = null;
 let availKnown = false;
+let availAt = 0;
+const RETRY_FALSE_MS = 30000;
 
-async function available(force = false) {
-  if (!availProbe || force) {
-    availProbe = (async () => {
+// A true result is kept; a false one only for 30 s, and the 'online' and
+// visibilitychange events drop it at once, so one slow probe can't hide the cloud.
+function available(force = false) {
+  const stale = availProbe && !availKnown && Date.now() - availAt > RETRY_FALSE_MS;
+  if (!availProbe || force || stale) {
+    availAt = Date.now();
+    const p = availProbe = (async () => {
       const ctl = new AbortController();
-      const t = setTimeout(() => ctl.abort(), 2500);
+      const t = setTimeout(() => ctl.abort(), 4000);
       try {
         const r = await fetch(BASE + 'health', { signal: ctl.signal, cache: 'no-store', credentials: 'same-origin' });
         if (!r.ok) return false;
         const j = await r.json();
-        return j && j.name === 'synthwild';
+        return !!j && j.name === 'synthwild';
       } catch {
         return false;
       } finally {
         clearTimeout(t);
       }
     })();
+    p.then((v) => { if (availProbe === p) { availKnown = v; availAt = Date.now(); } });
   }
-  availKnown = await availProbe;
-  return availKnown;
+  return availProbe;
+}
+
+function dropFalseProbe() {
+  if (availProbe && !availKnown) availProbe = null;
+}
+if (typeof addEventListener === 'function') {
+  addEventListener('online', dropFalseProbe);
+  if (typeof document !== 'undefined') document.addEventListener('visibilitychange', () => { if (!document.hidden) dropFalseProbe(); });
 }
 
 async function request(method, path, { json, body, type, raw } = {}) {
@@ -70,6 +84,36 @@ async function request(method, path, { json, body, type, raw } = {}) {
 
 /* ------------------------------------------------------------ encoding */
 
+const MAX_DECODED = 64 << 20;
+
+const corrupt = () => new ApiError(0, 'corrupt', "This world's save is damaged and can't be opened.");
+
+// Inflates with a running byte count and aborts past MAX_DECODED, so a tiny
+// gzip "bomb" in someone's public world can't take the tab down.
+async function gunzipCapped(bytes) {
+  const reader = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')).getReader();
+  const parts = [];
+  let total = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_DECODED) {
+        reader.cancel().catch(() => {});
+        throw corrupt();
+      }
+      parts.push(value);
+    }
+  } catch (e) {
+    throw e instanceof ApiError ? e : corrupt();
+  }
+  const out = new Uint8Array(total);
+  let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.byteLength; }
+  return out;
+}
+
 const hasGzip = typeof CompressionStream === 'function' && typeof DecompressionStream === 'function';
 
 async function encodeData(data) {
@@ -87,10 +131,14 @@ async function decodeData(bytes, type) {
   if (type === 'application/octet-stream') return bytes;
   if (type === 'application/gzip') {
     if (!hasGzip) throw new ApiError(0, 'bad_request', 'This browser cannot decompress the save');
-    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-    return JSON.parse(await new Response(stream).text());
+    bytes = await gunzipCapped(bytes);
   }
-  return JSON.parse(new TextDecoder().decode(bytes));
+  if (bytes.byteLength > MAX_DECODED) throw corrupt();
+  try {
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch {
+    throw corrupt();
+  }
 }
 
 async function thumbToBlob(thumb) {
@@ -113,7 +161,7 @@ function blobToDataURL(blob) {
 
 function cloudMeta(w) {
   return {
-    id: w.id, source: 'cloud', owner: w.owner, ownerDisplay: w.ownerDisplay, mine: !!w.mine,
+    id: w.id, source: 'cloud', owner: w.owner || '', ownerDisplay: w.ownerDisplay, mine: !!w.mine,
     name: w.name, seed: w.seed, mode: w.mode, public: !!w.public, version: w.version, size: w.size,
     thumbUrl: w.thumb ? `${BASE}worlds/${w.id}/thumb?v=${w.updatedAt}` : null,
     createdAt: w.createdAt, updatedAt: w.updatedAt,
@@ -122,10 +170,17 @@ function cloudMeta(w) {
 
 const eid = (id) => encodeURIComponent(id);
 
+// Thumbnails are best-effort: a failure is logged and never undoes the save
+// that came before it (the blob's version is what the caller must keep).
 async function putThumb(id, thumb) {
-  const blob = await thumbToBlob(thumb);
-  if (!blob) return null;
-  return cloudMeta((await request('PUT', `worlds/${eid(id)}/thumb`, { body: blob, type: 'image/jpeg' })).world);
+  try {
+    const blob = await thumbToBlob(thumb);
+    if (!blob) return null;
+    return cloudMeta((await request('PUT', `worlds/${eid(id)}/thumb`, { body: blob, type: 'image/jpeg' })).world);
+  } catch (e) {
+    console.warn('[api] thumbnail not saved', e && (e.code || e.message));
+    return null;
+  }
 }
 
 const worlds = {
@@ -147,13 +202,19 @@ const worlds = {
   async create({ name, seed = '', mode = 'survival', public: pub = false, data, thumb } = {}) {
     let meta = cloudMeta((await request('POST', 'worlds', { json: { name, seed: String(seed), mode, public: !!pub } })).world);
     if (data !== undefined && data !== null) meta = await worlds.save(meta.id, data, 0);
-    if (thumb) meta = (await putThumb(meta.id, thumb)) || meta;
+    if (thumb) {
+      const t = await putThumb(meta.id, thumb);
+      if (t && t.version === meta.version) meta = t;
+    }
     return meta;
   },
   async save(id, data, version, { thumb } = {}) {
     const { bytes, type } = await encodeData(data);
     let meta = cloudMeta((await request('PUT', `worlds/${eid(id)}/blob?version=${version | 0}`, { body: bytes, type })).world);
-    if (thumb) meta = (await putThumb(id, thumb)) || meta;
+    if (thumb) {
+      const t = await putThumb(id, thumb);
+      if (t && t.version === meta.version) meta = t;
+    }
     return meta;
   },
   async patch(id, { name, public: pub } = {}) {
@@ -187,33 +248,47 @@ async function logout() {
   await request('POST', 'logout');
 }
 
+let googleReady = null;
+
+// Loads the Firebase SDK ahead of time (call it when the sign-in sheet opens),
+// so the popup can open straight from the click: iOS Safari blocks popups that
+// open after slow awaits.
+function prepareAdminSignIn() {
+  if (!googleReady) {
+    googleReady = (async () => {
+      const { firebaseConfig, SDK } = await import(AUTH_CONFIG);
+      const [{ initializeApp, getApps }, fa] = await Promise.all([
+        import(`${SDK}/firebase-app.js`), import(`${SDK}/firebase-auth.js`)]);
+      // A named app with in-memory persistence: we only want one ID token and must
+      // not disturb the hub's own Firebase session on this origin.
+      const app = getApps().find((a) => a.name === 'synthwild-admin') || initializeApp(firebaseConfig, 'synthwild-admin');
+      let auth;
+      try {
+        auth = fa.initializeAuth(app, { persistence: fa.inMemoryPersistence, popupRedirectResolver: fa.browserPopupRedirectResolver });
+      } catch {
+        auth = fa.getAuth(app);
+      }
+      return { fa, auth };
+    })();
+    googleReady.catch(() => { googleReady = null; });
+  }
+  return googleReady;
+}
+
 async function adminGoogleSignIn() {
-  if (!(await available())) throw new ApiError(0, 'offline', 'The world server is not reachable');
   let idToken;
   try {
-    const { firebaseConfig, SDK } = await import(AUTH_CONFIG);
-    const [{ initializeApp, getApps }, fa] = await Promise.all([
-      import(`${SDK}/firebase-app.js`), import(`${SDK}/firebase-auth.js`)]);
-    // A named app with in-memory persistence: we only want one ID token and must
-    // not disturb the hub's own Firebase session on this origin.
-    const app = getApps().find((a) => a.name === 'synthwild-admin') || initializeApp(firebaseConfig, 'synthwild-admin');
-    let auth;
-    try {
-      auth = fa.initializeAuth(app, { persistence: fa.inMemoryPersistence, popupRedirectResolver: fa.browserPopupRedirectResolver });
-    } catch {
-      auth = fa.getAuth(app);
-    }
+    const { fa, auth } = await prepareAdminSignIn();
     const provider = new fa.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
     const cred = await fa.signInWithPopup(auth, provider);
     idToken = await cred.user.getIdToken();
     fa.signOut(auth).catch(() => {});
   } catch (e) {
-    if (e instanceof ApiError) throw e;
     const c = (e && e.code) || '';
-    if (c.includes('popup-blocked')) throw new ApiError(0, 'popup', 'The sign-in popup was blocked');
     if (c.includes('popup-closed') || c.includes('cancelled-popup')) throw new ApiError(0, 'cancelled', 'Sign-in was cancelled');
-    throw new ApiError(0, 'server', 'Google sign-in failed: ' + ((e && e.message) || e));
+    if (c.includes('popup-blocked')) throw new ApiError(0, 'popup', 'The sign-in popup was blocked');
+    throw new ApiError(0, 'google_failed', 'Google sign-in failed: ' + ((e && e.message) || e));
   }
   return (await request('POST', 'admin/google', { json: { idToken } })).user;
 }
@@ -224,7 +299,7 @@ const admin = {
   },
   async addUser(username, display) {
     const name = String(username || '').trim().toLowerCase();
-    return (await request('POST', 'admin/users', { json: { username: name, display: display || name } })).user;
+    return (await request('POST', 'admin/users', { json: { username: name, display: display || '' } })).user;
   },
   async removeUser(username) {
     await request('DELETE', `admin/users/${encodeURIComponent(String(username).toLowerCase())}`);
@@ -320,7 +395,7 @@ const local = {
 export const api = {
   available,
   get online() { return availKnown; },
-  me, login, logout, adminGoogleSignIn,
+  me, login, logout, adminGoogleSignIn, prepareAdminSignIn,
   admin, worlds, local,
   isCloud: (meta) => !!meta && meta.source === 'cloud',
   base: BASE,

@@ -1,6 +1,8 @@
 # Lane 6 — Server notes
 
-Status (2026-10-02): **server, api.js and deploy DONE and LIVE.** `https://games.br8t.com/gms/3d/synthwild/api/health` → ok.
+Status (2026-10-02, after R2 review fixes): **server, api.js and deploy DONE and LIVE.** Now `server/test.sh` passes 186/186
+(27 of those checks fail against the pre-R2 binary). `tools/server_apitest.mjs` passes 48/48 (12 fail against the pre-R2 api.js).
+`qa_live --no-browser` passes 4/4 (1 skip). See "R2 fixes" below. Earlier status line: `https://games.br8t.com/gms/3d/synthwild/api/health` → ok.
 `server/test.sh` 160/160 locally and on the box, and `tools/server_apitest.mjs` (api.js in headless Chrome) 28/28.
 The contract below is what lane 5 codes against. It is implemented as written.
 
@@ -11,7 +13,8 @@ import { api, ApiError } from './net/api.js';   // also `export default api`
 ```
 Every call is async. Errors throw `ApiError { status, code, message }` (status 0 = network/offline).
 `code` values: `offline`, `unauthorized`, `forbidden`, `not_found`, `conflict`, `bad_request`,
-`too_large`, `rate_limited`, `quota`, `server`.
+`too_large`, `rate_limited`, `quota`, `busy` (503, retry shortly), `corrupt` (a save that can't be decoded, or a
+`sanitizeSave` rejection), `server`. The Google flow adds `popup`, `cancelled` and `google_failed`.
 
 ### Availability and session
 | call | returns | notes |
@@ -20,11 +23,12 @@ Every call is async. Errors throw `ApiError { status, code, message }` (status 0
 | `api.me()` | `User \| null` | null = not signed in (or offline) |
 | `api.login(username)` | `User` | 404 `not_found` if the username doesn't exist; 429 `rate_limited` |
 | `api.logout()` | `void` | |
-| `api.adminGoogleSignIn()` | `User` (`admin:true`) | loads the Firebase SDK on demand, Google popup, server verifies. 403 `forbidden` if the email isn't one of the 3 admins. Popup blocked → `code:'popup'`. |
+| `api.prepareAdminSignIn()` | `Promise` | preloads the Firebase SDK. Call it when the sign-in sheet opens, so the popup opens straight from the click (iOS). |
+| `api.adminGoogleSignIn()` | `User` (`admin:true`) | Google popup, then the server verifies the token. 403 `forbidden` if the email isn't one of the 3 admins. `popup`, `cancelled` or `google_failed` → account.js tells the user to ask for an admin link. |
 
 `User = { username, display, admin: bool, email: string|null }`.
 An admin who signs in with Google is logged in **as their player username** with `admin:true`.
-Logging in with the same username via `login()` gives a normal (non-admin) session.
+Admin player names (aaron, dante, malaki) **cannot** be used with `login()`. They get the same 404 as an unknown name.
 
 ### Admin (needs `admin:true`, else 403)
 | call | returns |
@@ -38,7 +42,8 @@ Logging in with the same username via `login()` gives a normal (non-admin) sessi
 WorldMeta = {
   id,                     // cloud: 'w_<16 hex>'   local: 'l_<...>'
   source: 'cloud'|'local',
-  owner, ownerDisplay,    // local: owner = '' , ownerDisplay = 'This device'
+  owner, ownerDisplay,    // owner (the username) is '' unless it's your own world. Show ownerDisplay only.
+                          // A display name that is just the username shows as 'Player XXXX'. local: ownerDisplay 'This device'
   mine: bool,             // local: always true
   name, seed /*string*/, mode: 'survival'|'build', public: bool,
   version /*int, 0 = no save data yet*/, size /*bytes of stored blob*/,
@@ -81,7 +86,7 @@ Errors are `{error, code}`. A session is required except where it says none.
 | `POST admin/google` | none, rate-limited | `{idToken}` (Firebase) → `{user}` admin session; 401 bad token, 403 not allowlisted |
 | `GET admin/link?t=` | none, rate-limited | one-time link from the CLI → 302 to the game with an admin session |
 | `GET admin/users` | admin | `{users:[...]}` |
-| `POST admin/users` | admin | `{username, display}` → 201 `{user}`; 409 taken. Re-adding a removed name restores it (and its worlds) |
+| `POST admin/users` | admin | `{username, display}` → 201 `{user}`; 409 taken. Re-adding a removed name creates a NEW account (old worlds stay hidden) |
 | `DELETE admin/users/{username}` | admin | removes it, kills sessions, hides worlds; 400 for admin accounts |
 | `GET worlds?scope=mine|public` | user | `{worlds:[World]}` (public: max 500, newest first) |
 | `POST worlds` | user | `{name, seed, mode, public}` → 201 `{world}` (version 0) |
@@ -141,3 +146,27 @@ Server `World` JSON = `WorldMeta` minus `source`/`thumbUrl`, plus `thumb: bool` 
   `api.available()` first and hide the cloud UI when it's false (GitHub Pages). Handle `conflict` on save by offering
   "Overwrite" (re-save with `err.current.version`) or "Save as copy".
 - Lane 2 (main.js): for thumbnails, either `preserveDrawingBuffer:true` or call `canvas.toBlob` right after a render.
+
+## R2 fixes (review docs/reviews/R2_server_net_render.md)
+| id | status | what changed | tests |
+|---|---|---|---|
+| B1a | fixed | `owner` is sent only to the owner. `ownerDisplay` is masked to "Player XXXX" when it equals or contains the username. api.js no longer defaults the display name to the username. | test.sh "B1a" ×5, apitest "B1" ×2 |
+| B1b | fixed | Admin-linked accounts can't log in by username (404, the same "no such player"). | test.sh "B1b" ×3, plus a live check (aaron → 404) |
+| B1c | fixed | The admin Players panel shows a hint that usernames work like passwords. The display field asks for a separate shown name. | UI text (account.js) |
+| B2 | fixed | PUT blob checks ownership, version (409), type, Content-Length (413/411) and the quota before reading the body. It reads exactly the Content-Length bytes (no ReadAll doubling). Uploads have 4 global slots (`SYNTHWILD_UPLOAD_SLOTS`) and 1 per user, so a full slot answers 503 `busy`. Blob GETs have 4 slots and use the request context. memburst N=60: peak RSS **34 MiB** (was 254 MiB). | test.sh "B2" ×8 |
+| B4 | fixed | Thumbnails are best-effort in `worlds.save`/`create`: a failure is logged and the blob's meta (new version) is returned. The server's thumb PUT never bumps the version. | apitest "B4" ×3 |
+| B5 | fixed | The world count and the storage cap are checked inside the write transaction (one DB connection plus `_txlock=immediate`), with a cheap pre-check before the body is read. | test.sh "B5" ×3 (60 concurrent creates → exactly 50; cap race → 1 stored) |
+| B6 | fixed | gzip is inflated through a counting reader that aborts above 64 MB (`corrupt`). Bad JSON → `corrupt`. New `js/net/savecheck.js` `sanitizeSave()` is called from `store.load()`. It clamps the position to ±1e6 / y −16..256, drops NaN positions, keeps stats finite and clamped, keeps inventory slots sane, and validates section keys, count and size. A structural problem throws `corrupt` (shell shows "That world would not start: …"). Not validated: caches/stations/farm/journal, which their own modules load. | apitest "B6" ×9 (a 70 MB gzip bomb included) |
+| B7 | fixed | `available()` keeps a false result for only 30 s. The `online` and `visibilitychange` (visible) events drop it, and account.js refreshes on `online`. The probe timeout is 4 s. | apitest "B7" ×3 |
+| B8 | fixed | The box build uses `GOMAXPROCS=1 nice -n 15 go build -p 1`. Deploy keeps `$BIN.prev` and the old unit, health-checks for 15 s, and on failure restores both, restarts and exits 1. `ROLLBACK_DRILL=1 ./deploy.sh` proves it, and it was run live: rolled back, healthy. | live drill |
+| B9 | fixed | Logged paths have control characters replaced with `?` and are cut at 200 chars. | test.sh "B9" ×2 |
+| B10 | fixed | The rate limit is 10/min per IP **plus** target (the username, or "google"/"link"), with a ceiling of 60/min per IP. The rightmost X-Forwarded-For hop is used. **Caddy verified live:** with no `trusted_proxies` it replaces a client-sent XFF (11 logins with spoofed XFF values all counted against the real IP → 429 on the 11th). If `trusted_proxies` is ever added, revisit `clientIP`. | test.sh "B10" ×3 |
+| B11 | skipped | (manager) | |
+| B12 | fixed | Re-adding a removed name creates a NEW account. The old row becomes `name~<id>`, which can never log in, and its worlds stay hidden. | test.sh "B12" ×3 |
+| B13 | fixed | The process umask is 077, the data dir 0700 and the db/-wal/-shm 0600 (chmodded at start). The unit has `UMask=0077`, and deploy chmods the dir and files. Box verified: 700/600, owned by deploy. | test.sh "B13" ×3, deploy prints `stat` |
+| B15 | fixed | The SDK is preloaded when the sign-in sheet opens, and `adminGoogleSignIn` no longer awaits a probe before the popup. A blocked or failed popup shows: "…Ask Aaron for a one-time admin sign-in link instead. It works in any browser, including on iPhone." | apitest "B15" ×3 |
+| B16 | fixed | An unknown kid forces at most 1 cert refetch a minute. Fetches run under a separate fetch mutex, and cache readers use an RWMutex, so they never wait on the network when the cache is fresh. | test.sh "B16" |
+
+Note: `tools/review_b_thumbdesync.mjs` still prints a 409 for save #3. That's because the script expects save #2 to throw and so
+never stores its returned meta. Save #2 now resolves with v2, as the apitest B4 checks show. `review_b_memburst.sh`'s
+401s come from 60 curls writing one cookie jar at once, not from the server.

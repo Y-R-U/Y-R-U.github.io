@@ -2,11 +2,17 @@
 import { h, click, toast, confirmPop } from './dom.js';
 import { g } from './glyphs.js';
 
-const msg = (e) => ({
+const LINK_HELP = 'Ask Aaron for a one-time admin sign-in link instead. It works in any browser, including on iPhone.';
+
+export const msg = (e) => ({
   not_found: "We couldn't find that name. Ask a grown-up to add it.",
   rate_limited: 'Too many tries. Wait a moment and try again.',
   forbidden: 'That Google account is not one of the admins.',
-  popup: 'The Google window was blocked. Allow pop-ups and try again.',
+  popup: 'The Google window was blocked. ' + LINK_HELP,
+  google_failed: 'Google sign-in did not work here. ' + LINK_HELP,
+  cancelled: 'Sign-in was cancelled.',
+  corrupt: "This world's save is damaged and can't be opened.",
+  busy: 'The server is busy. Try again in a moment.',
   offline: 'The world server is not reachable right now.',
   conflict: 'That name is already taken.',
   bad_request: 'Names are 3–20 letters, numbers or _.',
@@ -15,6 +21,7 @@ const msg = (e) => ({
 export function createAccount(getApi, onChange) {
   let user = null, online = false;
   const el = h('div.sw-account');
+  addEventListener('online', () => { if (!online) refresh(); });
 
   async function refresh() {
     const api = getApi();
@@ -43,6 +50,7 @@ export function createAccount(getApi, onChange) {
   async function login() {
     const api = getApi();
     click();
+    api.prepareAdminSignIn?.().catch(() => {});
     const field = h('input.sw-input', { placeholder: 'player name', maxLength: 20, autocomplete: 'off', spellcheck: false, autocapitalize: 'off' });
     const err = h('p', { style: { color: '#ff9aa8', margin: '0 0 10px', minHeight: '1.2em', fontSize: '13px' } });
     const close = () => scrim.remove();
@@ -75,7 +83,7 @@ export function createAccount(getApi, onChange) {
       user = await api.adminGoogleSignIn();
       toast(`Signed in as admin ${user.username}`, { kind: 'good' });
       await refresh();
-    } catch (e) { toast(msg(e), { kind: 'bad', ms: 4000 }); }
+    } catch (e) { toast(msg(e), { kind: 'bad', ms: 8000 }); }
   }
   async function logout() {
     const api = getApi();
@@ -90,7 +98,7 @@ export function createAccount(getApi, onChange) {
     click();
     const list = h('div', { style: { maxHeight: '46vh', overflowY: 'auto', margin: '8px 0' } });
     const name = h('input.sw-input', { placeholder: 'new player name', maxLength: 20, autocomplete: 'off', style: { marginBottom: 0 } });
-    const disp = h('input.sw-input', { placeholder: 'shown as (optional)', maxLength: 32, autocomplete: 'off', style: { marginBottom: 0 } });
+    const disp = h('input.sw-input', { placeholder: 'shown to others as, e.g. Sam', maxLength: 32, autocomplete: 'off', style: { marginBottom: 0 } });
     const close = () => scrim.remove();
     async function load() {
       list.replaceChildren(h('div.sw-empty', {}, 'Loading…'));
@@ -110,12 +118,13 @@ export function createAccount(getApi, onChange) {
     async function add() {
       const n = name.value.trim().toLowerCase();
       if (!n) return;
-      try { await api.admin.addUser(n, disp.value.trim() || n); name.value = ''; disp.value = ''; toast('Added ' + n, { kind: 'good' }); load(); }
+      try { await api.admin.addUser(n, disp.value.trim()); name.value = ''; disp.value = ''; toast('Added ' + n, { kind: 'good' }); load(); }
       catch (e) { toast(msg(e), { kind: 'bad' }); }
     }
     const card = h('div.sw-pop.glass', { style: { width: 'min(520px, 94vw)' } },
       h('h3', {}, 'Players'),
       h('p', { style: { marginBottom: '6px' } }, 'Anyone on this list can sign in with just their name.'),
+      h('p.sw-hint', { style: { marginBottom: '6px', fontSize: '13px', color: '#ffd27a' } }, 'Usernames work like passwords — pick ones that are hard to guess (e.g. sam_tiger42), and give each a separate display name. Other players only ever see the display name.'),
       list,
       h('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '8px', alignItems: 'center' } },
         name, disp, h('button.sw-btn.primary', { onclick: add }, g('plus', 16), 'Add')),

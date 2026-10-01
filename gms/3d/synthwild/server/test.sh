@@ -14,7 +14,7 @@ P="/gms/3d/synthwild"
 TMP="$(mktemp -d)"
 PASS=0; FAIL=0
 
-cleanup() { [ -n "${SRV:-}" ] && kill "$SRV" 2>/dev/null; rm -rf "$TMP"; }
+cleanup() { [ -n "${SRV:-}" ] && kill "$SRV" 2>/dev/null; [ -n "${KEEP:-}" ] && echo "kept $TMP" || rm -rf "$TMP"; }
 trap cleanup EXIT
 
 ok()   { PASS=$((PASS+1)); printf '  \033[32mok\033[0m   %s\n' "$1"; }
@@ -34,6 +34,9 @@ req() {
   curl "${args[@]}" "$BASE$P$p"
 }
 code() { req "$@" | tail -n1; }
+# read-only jar, safe to run many in parallel
+pcode() { curl -sS -o /dev/null -w '%{http_code}' -b "$TMP/$1.jar" -X "$2" -H "X-Forwarded-For: $(ip)" -H 'Content-Type: application/json' --data-binary "$4" "$BASE$P$3"; }
+pput() { curl -sS -o /dev/null -w '%{http_code}' -b "$TMP/$1.jar" -X PUT -H "X-Forwarded-For: $(ip)" -H "Content-Type: $3" --data-binary "@$4" "$BASE$P$2"; }
 body() { req "$@" | sed '$d'; }
 jget() { python3 -c "import sys,json;d=json.load(sys.stdin);print(eval('d'+sys.argv[1]))" "$1" 2>/dev/null; }
 # put <jar> <path> <content-type> <file>  -> status
@@ -53,7 +56,7 @@ MINT="$TMP/mintjwt"
 mint() { "$MINT" mint "$TMP" "$@"; }
 
 export SYNTHWILD_ADDR="127.0.0.1:$PORT" SYNTHWILD_DATA="$TMP/data" SYNTHWILD_INSECURE_COOKIE=1 \
-       SYNTHWILD_TEST_CERTS="$TMP/certs.json" SYNTHWILD_GLOBAL_CAP=$((12*1024*1024)) \
+       SYNTHWILD_TEST_CERTS="$TMP/certs.json" SYNTHWILD_GLOBAL_CAP=$((12*1024*1024)) SYNTHWILD_UPLOAD_SLOTS=3 \
        SYNTHWILD_PUBLIC_URL="$BASE$P"
 "$BIN" > "$TMP/server.log" 2>&1 &
 SRV=$!
@@ -130,12 +133,12 @@ eq    "invalid username → 404"               "$(code y POST /api/login '{"user
 eq    "bad JSON → 400"                       "$(code y POST /api/login 'nope')" 400
 r=$(body kid2 POST /api/login '{"username":"kid_two"}')
 check "kid_two logs in"                      "$r" '"username":"kid_two"'
-r=$(body aaronplay POST /api/login '{"username":"aaron"}')
-check "admin's username via login is NOT admin" "$r" '"admin":false'
+eq    "B1b admin player name can't log in by username" "$(code aaronplay POST /api/login '{"username":"aaron"}')" 404
+check "B1b same generic error as an unknown name" "$(body aaronplay POST /api/login '{"username":"dante"}')" '"error":"no such player"'
 eq    "player session can't list users"      "$(code kid1 GET /api/admin/users)" 403
 eq    "player session can't add users"       "$(code kid1 POST /api/admin/users '{"username":"sneaky"}')" 403
 eq    "player session can't remove users"    "$(code kid1 DELETE /api/admin/users/kid_two)" 403
-eq    "admin-by-username can't list users"   "$(code aaronplay GET /api/admin/users)" 403
+eq    "no session from the admin-name attempt" "$(code aaronplay GET /api/admin/users)" 401
 eq    "cross-origin POST is refused"         "$(curl -s -o /dev/null -w '%{http_code}' -H 'Origin: https://evil.example' -H 'Content-Type: application/json' -d '{"username":"kid_one"}' $BASE$P/api/login)" 403
 eq    "same-origin POST is fine"             "$(curl -s -o /dev/null -w '%{http_code}' -H "Origin: $BASE" -H "X-Forwarded-For: $(ip)" -H 'Content-Type: application/json' -d '{"username":"kid_one"}' $BASE$P/api/login)" 200
 
@@ -206,7 +209,11 @@ check "rename applied"                       "$r" '"name":"Shared Glow"'
 eq    "patch with bad name → 400"            "$(code kid1 PATCH /api/worlds/$W '{"name":""}')" 400
 r=$(body kid2 GET '/api/worlds?scope=public')
 check "public list shows it to kid_two"      "$r" "\"id\":\"$W\""
-check "public list has owner display name"   "$r" '"ownerDisplay":"Kid One"'
+checkno "B1a public list never carries owner"  "$r" '"owner"'
+checkno "B1a public list never shows the username" "$r" 'kid_one'
+check "B1a a display that is the username is masked" "$r" '"ownerDisplay":"Player '
+checkno "B1a single world view hides the owner" "$(body kid2 GET /api/worlds/$W)" 'kid_one'
+check "owner still sees their own username"  "$(body kid1 GET /api/worlds/$W)" '"owner":"kid_one"'
 check "public list marks it not mine"        "$r" '"mine":false'
 eq    "kid_two can open the public world"    "$(code kid2 GET /api/worlds/$W)" 200
 curl -sS -o "$TMP/got2.gz" -b "$TMP/kid2.jar" "$BASE$P/api/worlds/$W/blob"
@@ -234,9 +241,11 @@ eq    "kid_one can't log in"                 "$(code z POST /api/login '{"userna
 checkno "kid_one gone from the user list"    "$(body admin GET /api/admin/users)" '"kid_one"'
 checkno "their public world is hidden"       "$(body kid2 GET '/api/worlds?scope=public')" "$W"
 eq    "and can't be opened"                  "$(code kid2 GET /api/worlds/$W)" 404
-eq    "re-adding restores the account"       "$(code admin POST /api/admin/users '{"username":"kid_one","display":"Kid One"}')" 201
+eq    "re-adding the name → 201"             "$(code admin POST /api/admin/users '{"username":"kid_one","display":"Kid One"}')" 201
 body kid1 POST /api/login '{"username":"kid_one"}' >/dev/null
-check "and their worlds are back"            "$(body kid1 GET /api/worlds)" "$W"
+checkno "B12 the new kid_one gets NONE of the old worlds" "$(body kid1 GET /api/worlds)" "$W"
+eq    "B12 the old public world stays hidden" "$(code kid2 GET /api/worlds/$W)" 404
+eq    "B12 the new account can't touch it"   "$(code kid1 DELETE /api/worlds/$W)" 404
 
 head1 "delete"
 eq    "owner deletes the copy"               "$(code kid2 DELETE /api/worlds/$C)" 200
@@ -260,14 +269,96 @@ eq    "re-saving the same size still fits"   "$(put kid2 "/api/worlds/$B1/blob?v
 code kid2 DELETE /api/worlds/$B1 >/dev/null
 eq    "after delete the space is free"       "$(put kid2 "/api/worlds/$B2/blob?version=0" application/octet-stream $TMP/eight)" 200
 
-head1 "rate limiting"
-last=""
-for i in $(seq 1 11); do
-  last=$(curl -s -o /dev/null -w '%{http_code}' -H 'X-Forwarded-For: 10.250.250.250' -H 'Content-Type: application/json' -d '{"username":"ghost"}' $BASE$P/api/login)
+head1 "B5 atomic quotas"
+for u in racer_a racer_b racer_c; do code admin POST /api/admin/users "{\"username\":\"$u\"}" >/dev/null; body $u POST /api/login "{\"username\":\"$u\"}" >/dev/null; done
+PIDS=()
+for i in $(seq 1 60); do pcode racer_a POST /api/worlds "{\"name\":\"r$i\"}" > /dev/null & PIDS+=($!); done
+wait "${PIDS[@]}"
+eq    "B5 60 concurrent creates → exactly 50 worlds" "$(body racer_a GET /api/worlds | jget "['worlds'].__len__()")" 50
+used=$(python3 - "$TMP/data/synthwild.db" <<'PY'
+import sqlite3,sys; print(sqlite3.connect(sys.argv[1]).execute("select sum(size+thumb_size) from worlds").fetchone()[0])
+PY
+)
+room=$(( 12*1024*1024 - used ))
+chunk=$(( room / 2 + 4096 ))
+head -c $chunk /dev/urandom > "$TMP/chunk"
+for u in racer_a racer_b racer_c; do eval "R_$u=\$(body $u POST /api/worlds '{\"name\":\"cap race\"}' | jget \"['world']['id']\")"; done
+code racer_a DELETE /api/worlds/$(body racer_a GET /api/worlds | jget "['worlds'][-1]['id']") >/dev/null
+R_racer_a=$(body racer_a POST /api/worlds '{"name":"cap race"}' | jget "['world']['id']")
+PIDS=()
+for u in racer_a racer_b racer_c; do id=$(eval echo \$R_$u); ( pput $u "/api/worlds/$id/blob?version=0" application/octet-stream $TMP/chunk > "$TMP/race_$u" ) & PIDS+=($!); done
+wait "${PIDS[@]}"
+oks=$(cat $TMP/race_racer_* | grep -o 200 | wc -l | tr -d ' ')
+eq    "B5 3 concurrent uploads that each fit alone, 2 would overflow → only 1 stored" "$oks" 1
+used2=$(python3 - "$TMP/data/synthwild.db" <<'PY'
+import sqlite3,sys; print(sqlite3.connect(sys.argv[1]).execute("select sum(size+thumb_size) from worlds").fetchone()[0])
+PY
+)
+eq    "B5 stored bytes stay under the global cap" "$([ "$used2" -le $((12*1024*1024)) ] && echo under)" under
+
+head1 "B2 upload checks before the body + upload slots"
+code kid2 DELETE /api/worlds/$B2 >/dev/null
+cat > "$TMP/slow.py" <<'PY'
+import socket, sys
+port, path, cookie, cl, hold = int(sys.argv[1]), sys.argv[2], sys.argv[3], int(sys.argv[4]), float(sys.argv[5])
+s = socket.create_connection(("127.0.0.1", port))
+s.sendall((f"PUT {path} HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nCookie: sw_session={cookie}\r\n"
+           f"Content-Type: application/octet-stream\r\nContent-Length: {cl}\r\n\r\n").encode() + b"x" * 1024)
+s.settimeout(hold)
+try:
+    print(s.recv(200).split(b"\r\n")[0].split(b" ")[1].decode())
+except socket.timeout:
+    print("timeout")
+PY
+ck() { grep sw_session "$TMP/$1.jar" | awk '{print $NF}'; }
+W_A=$(body racer_a GET /api/worlds | jget "['worlds'][0]['id']")
+VA=$(body racer_a GET /api/worlds/$W_A | jget "['world']['version']")
+eq    "B2 stale version answers 409 before the 8 MB body arrives" "$(python3 $TMP/slow.py $PORT "$P/api/worlds/$W_A/blob?version=$((VA+5))" "$(ck racer_a)" $((8*1024*1024)) 3)" 409
+eq    "B2 oversize Content-Length answers 413 before the body" "$(python3 $TMP/slow.py $PORT "$P/api/worlds/$W_A/blob?version=$VA" "$(ck racer_a)" $((9*1024*1024)) 3)" 413
+eq    "B2 chunked (no Content-Length) upload → 411" "$(curl -s -o /dev/null -w '%{http_code}' -b $TMP/racer_a.jar -X PUT -H 'Transfer-Encoding: chunked' -H 'Content-Type: application/json' --data-binary @$TMP/x.txt "$BASE$P/api/worlds/$W_A/blob?version=$VA")" 411
+python3 $TMP/slow.py $PORT "$P/api/worlds/$W_A/blob?version=$VA" "$(ck racer_a)" 1000000 6 > "$TMP/hold_a" &
+HA=$!
+sleep 0.7
+W_A2=$(body racer_a GET /api/worlds | jget "['worlds'][1]['id']")
+VA2=$(body racer_a GET /api/worlds/$W_A2 | jget "['world']['version']")
+eq    "B2 a second upload by the same user while one is in flight → 503" "$(put racer_a "/api/worlds/$W_A2/blob?version=$VA2" application/gzip $TMP/save1.gz)" 503
+check "with code busy"                       "$(cat $TMP/put.out)" '"code":"busy"'
+HOLDS=($HA)
+for u in racer_b racer_c; do
+  id=$(body $u GET /api/worlds | jget "['worlds'][0]['id']"); v=$(body $u GET /api/worlds/$id | jget "['world']['version']")
+  python3 $TMP/slow.py $PORT "$P/api/worlds/$id/blob?version=$v" "$(ck $u)" 1000000 6 > "$TMP/hold_$u" &
+  HOLDS+=($!)
 done
-eq    "11th login in a minute from one IP → 429" "$last" 429
-eq    "valid name is throttled too"          "$(curl -s -o /dev/null -w '%{http_code}' -H 'X-Forwarded-For: 10.250.250.250' -H 'Content-Type: application/json' -d '{"username":"kid_two"}' $BASE$P/api/login)" 429
-eq    "another IP is unaffected"             "$(code q POST /api/login '{"username":"kid_two"}')" 200
+sleep 0.7
+K=$(body kid2 POST /api/worlds '{"name":"slots"}' | jget "['world']['id']")
+eq    "B2 global slots full (3 in test) → 503 for another user" "$(put kid2 "/api/worlds/$K/blob?version=0" application/gzip $TMP/save1.gz)" 503
+wait "${HOLDS[@]}"
+eq    "B2 slots free again after the slow uploads give up" "$(put kid2 "/api/worlds/$K/blob?version=0" application/gzip $TMP/save1.gz)" 200
+
+head1 "B9 B13 B16"
+curl -s -o /dev/null "$BASE$P/api/x%0a2026/10/02%2000:00:00%20POST%20/api/admin/users%20FORGED"
+eq    "B9 encoded newline can't forge a log line" "$(grep -c '^2026/10/02 00:00:00 POST' $TMP/server.log)" 0
+check "B9 the attempt is logged escaped"     "$(cat $TMP/server.log)" '/api/x?2026/10/02'
+perm() { stat -c %a "$1" 2>/dev/null || stat -f %Lp "$1"; }
+eq    "B13 data dir is 0700"                 "$(perm $TMP/data)" 700
+eq    "B13 database file is 0600"            "$(perm $TMP/data/synthwild.db)" 600
+eq    "B13 WAL file is 0600"                 "$(perm $TMP/data/synthwild.db-wal)" 600
+f0=$(grep -c 'fetching signing certs' $TMP/server.log)
+for i in 1 2 3 4 5; do code x POST /api/admin/google "{\"idToken\":\"$(mint kid=rand$i)\"}" >/dev/null; done
+f1=$(grep -c 'fetching signing certs' $TMP/server.log)
+check "B16 cert fetches are logged"          "$f0" ''
+eq    "B16 five unknown-kid tokens → at most one refetch" "$([ "$f0" -ge 1 ] && [ $((f1-f0)) -le 1 ] && echo bounded)" bounded
+
+head1 "rate limiting"
+lg() { curl -s -o /dev/null -w '%{http_code}' -H "X-Forwarded-For: $1" -H 'Content-Type: application/json' -d "{\"username\":\"$2\"}" $BASE$P/api/login; }
+last=""
+for i in $(seq 1 11); do last=$(lg 10.250.250.250 ghost); done
+eq    "11th try of one name from one IP → 429" "$last" 429
+eq    "B10 another name from the same IP still works" "$(lg 10.250.250.250 kid_two)" 200
+eq    "another IP is unaffected"             "$(lg 10.250.250.251 ghost)" 404
+for i in $(seq 1 60); do last=$(lg 10.250.250.252 "nobody_$i"); done
+eq    "B10 per-IP ceiling: 61st try from one IP → 429" "$(lg 10.250.250.252 kid_two)" 429
+eq    "B10 rightmost X-Forwarded-For hop is used" "$(lg '10.250.250.250, 10.250.250.253' ghost)" 404
 
 head1 "admin-link CLI"
 L=$("$BIN" admin-link malaki@br8t.com 2>/dev/null)
@@ -289,7 +380,7 @@ SRV=$!
 for i in $(seq 1 50); do curl -sf "$BASE$P/api/health" >/dev/null && break; sleep 0.2; done
 h=$(curl -sS -D - -o /dev/null -H "X-Forwarded-For: $(ip)" -H 'Content-Type: application/json' -d '{"username":"kid_two"}' "$BASE$P/api/login" | grep -i '^set-cookie')
 check "cookie is Secure in production mode"  "$h" 'Secure'
-check "data survived a restart"              "$(curl -sS -b "$TMP/kid2.jar" $BASE$P/api/worlds)" 'big two'
+check "data survived a restart"              "$(curl -sS -b "$TMP/kid2.jar" $BASE$P/api/worlds)" '"name":"slots"'
 
 printf '\n\033[1m%d passed, %d failed\033[0m\n' "$PASS" "$FAIL"
 [ "$FAIL" -eq 0 ]

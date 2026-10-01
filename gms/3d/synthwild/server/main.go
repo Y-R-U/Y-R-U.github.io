@@ -11,7 +11,9 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
+	"unicode"
 )
 
 const buildVersion = "1.0.0"
@@ -65,10 +67,15 @@ func loadConfig() {
 
 func main() {
 	loadConfig()
-	if err := os.MkdirAll(cfg.Data, 0o750); err != nil {
+	syscall.Umask(0o077)
+	if err := os.MkdirAll(cfg.Data, 0o700); err != nil {
 		log.Fatalf("data dir: %v", err)
 	}
+	os.Chmod(cfg.Data, 0o700)
 	openDB(cfg.Data + "/synthwild.db")
+	for _, f := range []string{"", "-wal", "-shm"} {
+		os.Chmod(cfg.Data+"/synthwild.db"+f, 0o600)
+	}
 
 	if len(os.Args) > 1 {
 		runCLI(os.Args[1:])
@@ -223,7 +230,20 @@ func logRequests(next http.Handler) http.Handler {
 		start := time.Now()
 		next.ServeHTTP(w, r)
 		if strings.Contains(r.URL.Path, "/api/") && !strings.HasSuffix(r.URL.Path, "/health") {
-			log.Printf("%s %s %s", r.Method, r.URL.Path, time.Since(start).Round(time.Millisecond))
+			log.Printf("%s %s %s", r.Method, logSafe(r.URL.Path), time.Since(start).Round(time.Millisecond))
 		}
 	})
+}
+
+// logSafe escapes control characters so a crafted path can't forge log lines.
+func logSafe(s string) string {
+	if len(s) > 200 {
+		s = s[:200] + "…"
+	}
+	return strings.Map(func(c rune) rune {
+		if unicode.IsControl(c) {
+			return '?'
+		}
+		return c
+	}, s)
 }

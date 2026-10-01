@@ -24,6 +24,7 @@ const (
 	adminLinkTTL    = 15 * time.Minute
 	rateWindow      = time.Minute
 	rateMaxAttempts = 10
+	ratePerIP       = 60
 )
 
 type User struct {
@@ -143,8 +144,11 @@ var (
 	rlHits = map[string][]time.Time{}
 )
 
-// Caddy is the only thing in front of the app and it sets X-Forwarded-For; the
-// header is trusted only from loopback so a direct caller can't spoof it.
+// Caddy is the only thing in front of the app. Without trusted_proxies it
+// replaces any client-sent X-Forwarded-For with the real peer address, so the
+// header holds one entry; the rightmost hop is used so that adding a trusted
+// proxy later can't make the value attacker-chosen. The header is only trusted
+// from loopback.
 func clientIP(r *http.Request) string {
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
@@ -154,8 +158,8 @@ func clientIP(r *http.Request) string {
 		return host
 	}
 	xff := r.Header.Get("X-Forwarded-For")
-	if i := strings.IndexByte(xff, ','); i >= 0 {
-		xff = xff[:i]
+	if i := strings.LastIndexByte(xff, ','); i >= 0 {
+		xff = xff[i+1:]
 	}
 	if v := strings.TrimSpace(xff); v != "" {
 		return v
@@ -163,23 +167,22 @@ func clientIP(r *http.Request) string {
 	return host
 }
 
-func rateAllowed(r *http.Request) bool {
-	ip := clientIP(r)
+func hit(key string, max int) bool {
 	now := time.Now()
 	rlMu.Lock()
 	defer rlMu.Unlock()
-	keep := rlHits[ip][:0]
-	for _, t := range rlHits[ip] {
+	keep := rlHits[key][:0]
+	for _, t := range rlHits[key] {
 		if now.Sub(t) < rateWindow {
 			keep = append(keep, t)
 		}
 	}
-	if len(keep) >= rateMaxAttempts {
-		rlHits[ip] = keep
+	if len(keep) >= max {
+		rlHits[key] = keep
 		return false
 	}
-	rlHits[ip] = append(keep, now)
-	if len(rlHits) > 2000 {
+	rlHits[key] = append(keep, now)
+	if len(rlHits) > 5000 {
 		for k, v := range rlHits {
 			if len(v) == 0 || now.Sub(v[len(v)-1]) > rateWindow {
 				delete(rlHits, k)
@@ -187,6 +190,13 @@ func rateAllowed(r *http.Request) bool {
 		}
 	}
 	return true
+}
+
+// rateAllowed: a generous ceiling per IP (a classroom shares one) plus a tight
+// budget per IP and target, so one child's typos don't lock out the others.
+func rateAllowed(r *http.Request, target string) bool {
+	ip := clientIP(r)
+	return hit("ip|"+ip, ratePerIP) && hit("t|"+ip+"|"+target, rateMaxAttempts)
 }
 
 func rateLimited(w http.ResponseWriter) {
@@ -201,10 +211,6 @@ func handleMe(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
-	if !rateAllowed(r) {
-		rateLimited(w)
-		return
-	}
 	var body struct {
 		Username string `json:"username"`
 	}
@@ -212,12 +218,21 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	name := strings.ToLower(strings.TrimSpace(body.Username))
+	target := "?"
+	if usernameRe.MatchString(name) {
+		target = name
+	}
+	if !rateAllowed(r, "login|"+target) {
+		rateLimited(w)
+		return
+	}
 	if !usernameRe.MatchString(name) {
 		writeErr(w, http.StatusNotFound, "not_found", "no such player")
 		return
 	}
 	var id int64
-	err := db.QueryRow(`SELECT id FROM users WHERE username=? AND removed_at IS NULL`, name).Scan(&id)
+	// Admin player accounts need Google or an admin link; same answer as an unknown name.
+	err := db.QueryRow(`SELECT id FROM users WHERE username=? AND removed_at IS NULL AND admin_email IS NULL`, name).Scan(&id)
 	if err != nil {
 		writeErr(w, http.StatusNotFound, "not_found", "no such player")
 		return
@@ -292,7 +307,7 @@ func ensureAdminUser(email string) (int64, error) {
 }
 
 func handleAdminGoogle(w http.ResponseWriter, r *http.Request) {
-	if !rateAllowed(r) {
+	if !rateAllowed(r, "google") {
 		rateLimited(w)
 		return
 	}
@@ -342,7 +357,7 @@ func makeAdminLink(email string) (string, error) {
 }
 
 func handleAdminLink(w http.ResponseWriter, r *http.Request) {
-	if !rateAllowed(r) {
+	if !rateAllowed(r, "link") {
 		rateLimited(w)
 		return
 	}

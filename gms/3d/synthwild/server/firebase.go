@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -28,10 +29,16 @@ const (
 )
 
 var certCache struct {
-	sync.Mutex
-	keys    map[string]*rsa.PublicKey
-	expires time.Time
+	sync.RWMutex
+	keys       map[string]*rsa.PublicKey
+	expires    time.Time
+	lastForced time.Time
 }
+
+// fetchMu serialises fetches; it is never held by readers of a fresh cache.
+var fetchMu sync.Mutex
+
+const forcedRefetchEvery = time.Minute
 
 func parseCerts(raw []byte) (map[string]*rsa.PublicKey, error) {
 	var m map[string]string
@@ -58,39 +65,71 @@ func parseCerts(raw []byte) (map[string]*rsa.PublicKey, error) {
 	return keys, nil
 }
 
-func signingKeys() (map[string]*rsa.PublicKey, error) {
-	certCache.Lock()
-	defer certCache.Unlock()
-	if certCache.keys != nil && time.Now().Before(certCache.expires) {
-		return certCache.keys, nil
+func cachedKeys(force bool) (map[string]*rsa.PublicKey, bool) {
+	certCache.RLock()
+	defer certCache.RUnlock()
+	if certCache.keys == nil {
+		return nil, false
 	}
+	if force {
+		return certCache.keys, time.Since(certCache.lastForced) < forcedRefetchEvery
+	}
+	return certCache.keys, time.Now().Before(certCache.expires)
+}
+
+// signingKeys returns Google's keys. force (an unknown kid) refetches at most
+// once a minute; the network fetch runs without the cache lock held.
+func signingKeys(force bool) (map[string]*rsa.PublicKey, error) {
+	if keys, ok := cachedKeys(force); ok {
+		return keys, nil
+	}
+	fetchMu.Lock()
+	defer fetchMu.Unlock()
+	if keys, ok := cachedKeys(force); ok {
+		return keys, nil
+	}
+	keys, maxAge, err := fetchCerts()
+	if err != nil {
+		if old, _ := cachedKeys(false); old != nil && force {
+			return old, nil
+		}
+		return nil, err
+	}
+	certCache.Lock()
+	certCache.keys, certCache.expires = keys, time.Now().Add(maxAge)
+	if force {
+		certCache.lastForced = time.Now()
+	}
+	certCache.Unlock()
+	return keys, nil
+}
+
+func fetchCerts() (map[string]*rsa.PublicKey, time.Duration, error) {
+	log.Printf("fetching signing certs")
 	if cfg.TestCerts != "" {
 		raw, err := os.ReadFile(cfg.TestCerts)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		keys, err := parseCerts(raw)
-		if err == nil {
-			certCache.keys, certCache.expires = keys, time.Now().Add(time.Minute)
-		}
-		return keys, err
+		return keys, time.Hour, err
 	}
 	c := &http.Client{Timeout: 10 * time.Second}
 	resp, err := c.Get(certsURL)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	defer resp.Body.Close()
 	raw, err := io.ReadAll(io.LimitReader(resp.Body, 256<<10))
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("certs: HTTP %d", resp.StatusCode)
+		return nil, 0, fmt.Errorf("certs: HTTP %d", resp.StatusCode)
 	}
 	keys, err := parseCerts(raw)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 	maxAge := time.Hour
 	for _, part := range strings.Split(resp.Header.Get("Cache-Control"), ",") {
@@ -101,8 +140,7 @@ func signingKeys() (map[string]*rsa.PublicKey, error) {
 			}
 		}
 	}
-	certCache.keys, certCache.expires = keys, time.Now().Add(maxAge)
-	return keys, nil
+	return keys, maxAge, nil
 }
 
 func b64seg(s string) ([]byte, error) {
@@ -127,17 +165,14 @@ func verifyFirebaseToken(tok string) (string, error) {
 	if json.Unmarshal(hb, &hdr) != nil || hdr.Alg != "RS256" || hdr.Kid == "" {
 		return "", errors.New("bad header")
 	}
-	keys, err := signingKeys()
+	keys, err := signingKeys(false)
 	if err != nil {
 		return "", fmt.Errorf("fetch certs: %w", err)
 	}
 	key := keys[hdr.Kid]
 	if key == nil {
-		// A key rotation can land before our cache expires: refetch once.
-		certCache.Lock()
-		certCache.expires = time.Time{}
-		certCache.Unlock()
-		if keys, err = signingKeys(); err == nil {
+		// A key rotation can land before our cache expires.
+		if keys, err = signingKeys(true); err == nil {
 			key = keys[hdr.Kid]
 		}
 		if key == nil {
