@@ -4,6 +4,7 @@
   <title>Y-R-U Website</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="project-explorer.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Share+Tech+Mono&display=swap');
 
@@ -746,14 +747,22 @@
         <button class="filter-btn" data-filter="app">Apps</button>
         <button class="filter-btn" data-filter="game">Games</button>
       </div>
+      <div class="view-bar" aria-label="Project view">
+        <button class="view-btn active" data-view="grid" aria-pressed="true">Grid</button>
+        <button class="view-btn" data-view="timeline" aria-pressed="false">Timeline</button>
+        <button class="view-btn" data-view="type" aria-pressed="false">Type</button>
+      </div>
       <div class="month-bar" id="month-bar"></div>
     </div>
     <div class="card-grid" id="card-grid"></div>
+    <div id="project-explorer" hidden></div>
     <div id="grid-sentinel"></div>
     <div id="reveal-toast" class="reveal-toast"></div>
   </div>
 
   <script src="projects.js"></script>
+  <script src="project-taxonomy.js"></script>
+  <script src="project-explorer.js"></script>
   <script>
     // ─── PROJECT POOL + MONTH GROUPING STATE ───
     // PROJECTS comes from projects.js. Only app/game entries show; some are
@@ -767,6 +776,8 @@
     const now = new Date();
     const CURRENT_MONTH = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
+    let projectView = 'grid', savedGridMonth = CURRENT_MONTH;
+    let gridRenderTimer = null, gridGeneration = 0;
     let typeFilter = 'all';
     let monthFilter = CURRENT_MONTH;     // default view = current month
     let hiddenRevealed = false;
@@ -809,7 +820,7 @@
       const wrapper = document.createElement('div');
       wrapper.className = 'card-wrapper';
       wrapper.dataset.category = project.type;
-      wrapper.style.animationDelay = `${index * 50}ms`;
+      wrapper.style.animationDelay = `${Math.min(index, 12) * 35}ms`;
 
       wrapper.innerHTML = `
         <div class="card">
@@ -847,25 +858,41 @@
       renderedCount += slice.length;
       attachFlipListeners();
     }
-    function fillUntilSentinelOffscreen() {
+    function fillUntilSentinelOffscreen(generation = gridGeneration) {
+      if (generation !== gridGeneration || projectView !== 'grid') return;
       appendBatch();
       if (renderedCount < renderQueue.length) {
         const r = document.getElementById('grid-sentinel').getBoundingClientRect();
-        if (r.top < window.innerHeight + 400) requestAnimationFrame(fillUntilSentinelOffscreen);
+        if (r.top < window.innerHeight + 400) requestAnimationFrame(() => fillUntilSentinelOffscreen(generation));
       }
     }
     function renderGrid() {
+      clearTimeout(gridRenderTimer);
+      const generation = ++gridGeneration;
+      if (gridIO) gridIO.disconnect();
       const grid = document.getElementById('card-grid');
+      const explorer = document.getElementById('project-explorer');
+      grid.hidden = projectView !== 'grid';
+      explorer.hidden = projectView === 'grid';
+      document.getElementById('grid-sentinel').hidden = projectView !== 'grid';
+      if (projectView !== 'grid') {
+        grid.replaceChildren();
+        ProjectExplorer.render({ mode:projectView, projects:filteredProjects(), available:pool(), container:explorer, onChange:renderGrid });
+        return;
+      }
+      ProjectExplorer.close();
+      explorer.replaceChildren();
       const existing = Array.from(grid.children);
       existing.forEach(el => el.classList.add('hiding'));
-      setTimeout(() => {
+      gridRenderTimer = setTimeout(() => {
+        if (generation !== gridGeneration) return;
         grid.innerHTML = '';
         renderQueue = filteredProjects();
         renderedCount = 0;
-        fillUntilSentinelOffscreen();
+        fillUntilSentinelOffscreen(generation);
         if (gridIO) gridIO.disconnect();
         gridIO = new IntersectionObserver(es => {
-          if (es[0].isIntersecting && renderedCount < renderQueue.length) fillUntilSentinelOffscreen();
+          if (es[0].isIntersecting && renderedCount < renderQueue.length) fillUntilSentinelOffscreen(generation);
         }, { rootMargin: '400px' });
         gridIO.observe(document.getElementById('grid-sentinel'));
       }, existing.length > 0 ? 250 : 0);
@@ -993,6 +1020,7 @@
       }
 
       function draw() {
+        if (document.hidden || document.getElementById('projects-page').classList.contains('active')) return;
         ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#0f0';
@@ -1076,7 +1104,7 @@
         if (video) { video.style.display = 'block'; video.play(); }
       } else {
         const video = document.querySelector('#home-page video');
-        if (video) video.style.display = 'none';
+        if (video) { video.style.display = 'none'; video.pause(); }
       }
 
       if (pageName === 'utils' && !utilsInited) { utilsInited = true; buildUtils(); }
@@ -1098,6 +1126,23 @@
         link.addEventListener('click', function(e) {
           e.preventDefault();
           showPage(this.dataset.page);
+        });
+      });
+
+      document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const next = btn.dataset.view;
+          if (next === projectView) return;
+          if (projectView === 'grid') savedGridMonth = monthFilter;
+          if (next === 'grid') monthFilter = savedGridMonth;
+          else if (projectView === 'grid') monthFilter = 'all';
+          projectView = next;
+          document.querySelectorAll('.view-btn').forEach(b => {
+            const active = b.dataset.view === projectView;
+            b.classList.toggle('active', active);
+            b.setAttribute('aria-pressed', String(active));
+          });
+          markActiveChips(); renderGrid();
         });
       });
 

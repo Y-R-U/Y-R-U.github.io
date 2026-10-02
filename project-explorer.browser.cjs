@@ -1,0 +1,118 @@
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const assert=require('node:assert/strict');
+const path=require('node:path'),os=require('node:os');
+const capture=name=>path.join(os.tmpdir(),name);
+const base=process.env.YRU_TEST_URL||'http://127.0.0.1:8888/';
+(async()=>{
+ const browser=await chromium.launch({channel:'chrome',headless:true});
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});
+ const errors=[],bad=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ page.on('response',r=>{if(r.status()>=400 && r.url().startsWith(base))bad.push(`${r.status()} ${r.url()}`)});
+ await page.goto(base+'#projects');
+ await page.locator('.card-wrapper').first().waitFor();
+ const originalMonth=await page.locator('.month-chip.active').getAttribute('data-month');
+ const publicCount=await page.evaluate(()=>pool().length);
+ await page.locator('[data-view="timeline"]').click();
+ assert.equal(await page.locator('.evolution-card').count(),publicCount);
+ assert.equal(await page.locator('.month-chip.active').getAttribute('data-month'),'all');
+ assert.equal(await page.locator('#card-grid').isVisible(),false);
+ assert.equal(await page.locator('[data-project="gallery"]').count(),0);
+ const dates=await page.locator('.atlas-date strong').allTextContents();
+ assert.match(dates[0],/June 2024/);
+ await page.screenshot({path:capture('yru-timeline-desktop.png'),fullPage:false});
+ const camera=page.locator('.atlas-viewport');
+ const initialZoom=await page.locator('.atlas-zoom').textContent();
+ await page.locator('[data-camera="in"]').click();
+ assert.notEqual(await page.locator('.atlas-zoom').textContent(),initialZoom);
+ await camera.focus(); await page.keyboard.press('ArrowRight');
+ assert.ok(await camera.evaluate(e=>e.scrollLeft)>0);
+ await page.locator('[data-camera="latest"]').click();
+ assert.ok(await camera.evaluate(e=>e.scrollTop)>1000);
+ await page.locator('[data-camera="origin"]').click();
+ assert.equal(await camera.evaluate(e=>e.scrollTop),0);
+ await page.locator('[data-camera="fit"]').click();
+ assert.ok(await camera.evaluate(e=>e.scrollWidth-e.clientWidth)<3);
+ await page.locator('[data-camera="in"]').click();
+ const rect=await camera.boundingBox();
+ await page.mouse.move(rect.x+rect.width*.75,rect.y+100);await page.mouse.down();await page.mouse.move(rect.x+rect.width*.3,rect.y+70,{steps:8});await page.mouse.up();
+ assert.ok(await camera.evaluate(e=>e.scrollLeft)>0);
+
+ await page.selectOption('#explorer-lineage','grudgebugs');
+ assert.equal(await page.locator('.evolution-card').count(),2);
+ assert.match(await page.locator('[data-project="grumpybugs"] .evolution-parent').textContent(),/Graphics rebuild from Grudge Bugs/);
+ await page.selectOption('#explorer-model','Opus 5');
+ assert.equal(await page.locator('.evolution-card').count(),1);
+ await page.selectOption('#explorer-lineage','all'); await page.selectOption('#explorer-model','all');
+ await page.locator('[data-view="type"]').click();
+ assert.equal(await page.locator('.evolution-card').count(),publicCount);
+ await page.selectOption('#explorer-category','3d'); await page.selectOption('#explorer-genre','rpg');
+ assert.ok(await page.locator('[data-project="heirframe"]').count());
+ assert.equal(await page.locator('[data-project="crpg"]').count(),0);
+ assert.ok(await page.locator('[data-project="emberwake"]').count());
+ await page.locator('.atlas-shell').scrollIntoViewIfNeeded();await page.screenshot({path:capture('yru-type-desktop.png')});
+ await page.locator('[data-filter="app"]').click();
+ assert.equal(await page.locator('.evolution-card').count(),0);
+ assert.ok(await page.locator('.explorer-empty').isVisible());
+ await page.locator('[data-filter="all"]').click();
+ await page.locator('[data-view="grid"]').click();
+ await page.waitForTimeout(400);
+ assert.equal(await page.locator('.month-chip.active').getAttribute('data-month'),originalMonth);
+ assert.equal(await page.locator('#project-explorer').isVisible(),false);
+ // Stress switches while the existing grid's delayed render is pending.
+ await page.evaluate(()=>{document.querySelector('[data-filter="game"]').click();document.querySelector('[data-view="timeline"]').click();document.querySelector('[data-view="grid"]').click();document.querySelector('[data-view="type"]').click()});
+ await page.waitForTimeout(500);
+ assert.equal(await page.locator('#card-grid .card-wrapper').count(),0);
+ assert.ok(await page.locator('.evolution-card').count());
+ await page.locator('[data-filter="all"]').click();
+ await page.selectOption('#explorer-category','all');await page.selectOption('#explorer-genre','all');
+ for(const width of [320,390,430,768]){
+   await page.setViewportSize({width,height:850});
+   for(const view of ['timeline','type']){
+    await page.locator(`[data-view="${view}"]`).click();
+    const size=await page.evaluate(()=>({doc:document.documentElement.scrollWidth,win:innerWidth}));
+    assert.ok(size.doc<=size.win,`${view} overflow at ${width}: ${JSON.stringify(size)}`);
+    const controls=await page.locator('#projects-controls button:visible, .explorer-select select').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().height));
+    assert.ok(controls.every(h=>h>=44));
+   }
+ }
+ await page.setViewportSize({width:390,height:844});
+ await page.selectOption('#explorer-category','3d');await page.selectOption('#explorer-genre','rpg');
+ await page.locator('.atlas-shell').scrollIntoViewIfNeeded();await page.screenshot({path:capture('yru-type-mobile.png')});
+ await page.selectOption('#explorer-category','all');await page.selectOption('#explorer-genre','all');
+ // Actual reveal trigger must apply in explorer modes as well.
+ const current=await page.evaluate(()=>CURRENT_MONTH);
+ for(let i=0;i<5;i++)await page.locator(`[data-month="${current}"]`).click();
+ assert.equal(await page.locator('[data-project="gallery"]').count(),1);
+ await page.locator(`[data-month="${current}"]`).click();
+ assert.equal(await page.locator('[data-project="gallery"]').count(),0);
+ // Force every preview into view once, then check decoding, lazy loading and errors.
+ await page.locator('[data-month="all"]').click();
+ const imgs=page.locator('.evolution-card img');
+ for(let i=0;i<await imgs.count();i++)await imgs.nth(i).scrollIntoViewIfNeeded();
+ await page.waitForTimeout(1000);
+ const broken=await imgs.evaluateAll(es=>es.filter(e=>!e.complete||!e.naturalWidth).map(e=>e.src));
+ assert.deepEqual(broken,[]);assert.deepEqual(errors,[]);assert.deepEqual(bad,[]);
+ // Exercise real touch events: pinch zoom and a one-finger vertical pan.
+ const touchContext=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true});
+ const touchPage=await touchContext.newPage();await touchPage.goto(base+'#projects');
+ await touchPage.locator('[data-view="timeline"]').click();await touchPage.locator('.atlas-shell').scrollIntoViewIfNeeded();
+ const touchViewport=touchPage.locator('.atlas-viewport');
+ const bounds=await touchViewport.boundingBox(), touchY=Math.min(730,bounds.y+250);
+ const cdp=await touchContext.newCDPSession(touchPage);
+ const touch=(type,touchPoints)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints});
+ const beforePinch=await touchPage.locator('.atlas-zoom').textContent();
+ await touch('touchStart',[{x:130,y:touchY},{x:230,y:touchY}]);
+ await touch('touchMove',[{x:90,y:touchY},{x:270,y:touchY}]);await touch('touchEnd',[]);
+ assert.notEqual(await touchPage.locator('.atlas-zoom').textContent(),beforePinch);
+ const beforePan=await touchViewport.evaluate(e=>e.scrollTop);
+ await touch('touchStart',[{x:240,y:touchY}]);
+ for(let i=1;i<=6;i++)await touch('touchMove',[{x:240,y:touchY-i*20}]);
+ await touch('touchEnd',[]);await touchPage.waitForTimeout(250);
+ assert.ok(await touchViewport.evaluate(e=>e.scrollTop)>beforePan);
+ const nav=await touchPage.locator('.atlas-navigation').boundingBox();
+ assert.ok(nav.y>=240 && nav.y<300,'Camera toolbar remains visible below the project filters');
+ await touchContext.close();
+ console.log(JSON.stringify({base,publicCount,widths:[320,390,430,768,1440],previews:await imgs.count(),errors,bad,passed:true}));
+ await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});
