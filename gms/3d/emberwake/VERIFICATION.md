@@ -1,13 +1,23 @@
-# Enhancement verification — 2026-09-15
+# Enhancement verification — updated 2026-10-02
 
-## Artisan milestone — schema 4
+## Current status audit — 2026-10-02
+
+- Artisan work was recovered and committed as `b1084d16` on 2026-09-18; this commit and the original `bed969b2` are ancestors of remote main. The shared checkout has no active merge or pending Emberwake code changes. The prior temporary release checkout no longer exists.
+- Fresh `node --test tests/*.test.mjs`: **29/29 passed**.
+- Public deployment parity: `index.html`, `state.mjs`, `main.js`, `professions.mjs`, `professions-ui.js`, `regions.js`, `icons.js` and `style.css` all return 200 and match the local files byte for byte.
+- Fresh `tests/release.mjs` on **https://yru.br8t.com/gms/3d/emberwake/**: **PASS**, schema 4, public assets, shop purchase, manual fishing, Cooking recipe, real world rendering and no browser/asset errors. Mobile Chrome viewport 390x844; **346 draw calls / 199,079 triangles**.
+- The old Playwright dependency was removed by temporary-directory cleanup. Restored an isolated dependency at `/private/tmp/emberwake-audit-tools/node_modules/playwright`; any installed Playwright module can be supplied instead.
+- The full local browser suites below record the earlier implementation run; they were not rerun for this status audit. Physical phone/Safari and extended pacing remain unverified.
+- Server hub reconciliation: Emberwake has no lineup/deploy entry or account integration, and **https://games.br8t.com/gms/3d/emberwake/** returns 404. SYNTHWILD/HEIRFRAME hub additions are separate work. This is a hosting distinction, not a failure of the Pages release.
+
+## Artisan implementation checks — 2026-09-15, schema 4
 
 - `node --test tests/*.test.mjs`: **29/29 passed**. Adds version 3-to-4 migration, recipe shortages/atomic ingredient spending, five bounded temper tiers, tool purchases, Cooking heat control, Smithing timing and buy/craft/sell economy checks.
 - `tests/artisans.mjs`: **8 grouped checks passed** with actual touch heat control and keyboard anvil timing. Manual Cooking/Smithing wait between queued actions; level-5 mastery unlocks automatic batches that stop at the exact quantity; Cooking upgrades stored food; tempering applies a permanent blade bonus; purchased tools appear while gathering; ranks/tools/temper survive reload; seven-skill details fit 320x568 and 390x844. No browser/asset errors. Island scene: **338 draw calls / 198,919 triangles**.
 - `tests/professions.mjs`: all **10 groups passed again** with the shared artisan UI and tool rendering. Mainland scene: **298 draw calls / 199,909 triangles**; no browser/asset errors.
 - `tests/interactions.mjs`: all **10 groups passed again**, updated to use the kitchen recipe button for cooking.
 - `tests/browser.mjs`: all **21 groups passed again**, including the complete narrated chapter, crossings, four viewport sizes and save/resume. Final mainland scene: **316 draw calls / 202,526 triangles**; no browser/asset errors.
-- `tests/release.mjs` verified the first skilling release (`bed969b2`, schema 3) on **https://yru.br8t.com/gms/3d/emberwake/**: public assets, shop purchase, manual fishing and real world rendering (**322 draw calls / 198,047 triangles**), no errors. Artisan public verification follows its push.
+- `tests/release.mjs` verified the first skilling release (`bed969b2`, schema 3) on **https://yru.br8t.com/gms/3d/emberwake/**: public assets, shop purchase, manual fishing and real world rendering (**322 draw calls / 198,047 triangles**), no errors. The later artisan public verification is recorded in the current audit above.
 
 ## First skilling milestone
 
@@ -27,7 +37,7 @@ Screenshots are under `docs/verification/`: fishing mastery, automatic mining on
 
 - Physical phone performance and feel.
 - Extended economy/level pacing playtest from a fresh journey (roughly 25 manual fish catches, 34 woodcutting actions or 29 mining actions to level 5 at the current XP rates).
-- Artisan public deployment verification is pending its push. The first skilling milestone is already committed, pushed and verified live.
+- Both skilling/artisan milestones are committed, pushed and verified live as recorded in the current audit above.
 - `tests/expansion.mjs` and `tests/speech.mjs` were not rerun for this milestone. The chapter/interaction suites cover the affected core flows; narration assets and story content were not changed.
 
 ## Reproduce
@@ -36,7 +46,7 @@ From this directory, with the site root served on port 8888:
 
 ```sh
 node --test tests/*.test.mjs
-export PLAYWRIGHT_MODULE=/private/tmp/tanking-tools/node_modules/playwright
+export PLAYWRIGHT_MODULE=/private/tmp/emberwake-audit-tools/node_modules/playwright
 export EMBERWAKE_URL=http://127.0.0.1:8888/gms/3d/emberwake/
 node tests/professions.mjs
 node tests/artisans.mjs

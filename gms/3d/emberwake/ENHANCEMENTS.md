@@ -1,6 +1,6 @@
 # Emberwake enhancement checklist
 
-Last updated: 2026-09-15. This file is the continuation handoff; update it as work lands.
+Last updated: 2026-10-02. This file is the continuation handoff; update it as work lands.
 
 ## Design decisions
 
@@ -24,7 +24,7 @@ Last updated: 2026-09-15. This file is the continuation handoff; update it as wo
 - [x] Automated state/challenge tests, desktop/touch browser checks and screenshots.
 - [x] Record exact verification results and continuation instructions below.
 
-## 2. Complete the artisan loop (current milestone)
+## 2. Complete the artisan loop (released; balancing remains)
 
 - [x] Introduce Cooking XP with manual early levels and earned automatic batch cooking and a temperature-control mastery challenge.
 - [x] Repeatable Smithing recipes, earned automatic crafting, an anvil timing challenge, and permanent equipment upgrades.
@@ -44,20 +44,31 @@ Last updated: 2026-09-15. This file is the continuation handoff; update it as wo
 
 ## 4. Presentation and release
 
-- [ ] Fishing rod/line, chopping and pickaxe animations; visible tool upgrades.
+- [x] Working hand animation, fishing rod/line, axe, pickaxe and visible tool upgrades.
+- [ ] Refine gathering animations and connect fishing line/ripples to the water.
 - [ ] Richer water/ripples, wildlife and time-of-day ambience.
 - [ ] Sound and optional short tutorial narration for mastery/trading.
 - [ ] Accessibility pass: reduced motion, keyboard challenges, readable feedback.
 - [ ] Physical phone performance/playability rehearsal.
-- [ ] Refresh project description/screenshot, then publish and smoke-test the public URL when release is requested.
+- [x] Refresh project description/screenshot, publish and smoke-test the public URL.
+
+## Server hub integration (additional scope)
+
+The other agent's server-game work added SYNTHWILD and HEIRFRAME to the hub; it did not integrate Emberwake. On 2026-10-02, Emberwake is absent from both the local/live hub lineup and the server deploy list; its games.br8t.com path returns 404. It remains a local-save game on the Pages site. The existing shared account layer can be reused if Emberwake is brought across.
+
+- [ ] Add Emberwake to the hub lineup and deploy list, including its Three.js dependency and narration assets.
+- [ ] Integrate optional shared sign-in and cloud saves with safe conflict handling; preserve existing device saves and avoid syncing active work/challenge timers.
+- [ ] Verify signed-in save/reload, adoption/conflicts, account-control layout, and actual server deployment.
+
+These are additional integration options, not requirements of the original skilling request. Keep unrelated Ragdojo/account-layer changes separate.
 
 ## Continuation
 
 Read this file, README.md, and the nearest AGENTS.md before continuing. Work is limited to this game directory; the repository has many unrelated modified/staged files.
 
-Current implementation: **Milestone 1 committed/pushed as bed969b2 and verified on https://yru.br8t.com/gms/3d/emberwake/** (public shop purchase, manual fishing, clean WebGL/assets). **Milestone 2 artisan changes implemented and verified locally; commit/push/public verification next.** State tests pass 29/29. User expects tested work to be committed/pushed as progress continues.
+Current implementation: **Milestone 1 released as bed969b2; milestone 2 recovered and committed by the other agent as b1084d16 on 2026-09-18. Both are on remote main.** The 2026-10-02 audit confirms the eight public gameplay files match the checkout and the schema-4 public browser smoke test passes shops, manual fishing, Cooking and world rendering without errors. State tests pass 29/29 again. User expects tested work to be committed/pushed as progress continues. There are no pending Emberwake code changes or active merge; the old temporary release checkout is gone.
 
-Next work: commit/push the artisan batch and verify the public version 4 game. Then review level/price pacing, add merchant requests and resource unlocks, and continue the remaining checklist. Cooking/Smithing now use earned auto at level 5; combat still uses its original repeated attacks until its separate checklist item is addressed.
+Next work: review level/price pacing through a fresh journey, then implement earned automation for Melee/Magic (the remaining gap in the request that each skill earns auto). Follow with merchant requests and resource unlocks before larger story/presentation additions. Cooking/Smithing already use earned auto at level 5; combat still uses its original repeated attacks. Server integration is separate additional scope, as recorded above.
 
 New modules: `professions.mjs` contains pure rules and challenge simulations; `professions-ui.js` contains activity/modal/input handling. `main.js` stops work on movement/damage/dodge/travel, pauses it through `paused()`, and awards quest progression after gathering or buying materials. Saved activity/challenge timers are intentionally absent. Ranks 1–20 unlock at levels 5–100.
 
@@ -67,7 +78,7 @@ Commands from this directory:
 
 ```sh
 node --test tests/*.test.mjs
-export PLAYWRIGHT_MODULE=/private/tmp/tanking-tools/node_modules/playwright
+export PLAYWRIGHT_MODULE=/private/tmp/emberwake-audit-tools/node_modules/playwright
 export EMBERWAKE_URL=http://127.0.0.1:8888/gms/3d/emberwake/
 node tests/professions.mjs
 node tests/artisans.mjs
