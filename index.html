@@ -866,6 +866,21 @@
         if (r.top < window.innerHeight + 400) requestAnimationFrame(() => fillUntilSentinelOffscreen(generation));
       }
     }
+    function setProjectView(next) {
+      if (next === projectView) return;
+      if (projectView === 'grid') savedGridMonth = monthFilter;
+      if (next === 'grid') monthFilter = savedGridMonth;
+      else if (projectView === 'grid') monthFilter = 'all';
+      projectView = next;
+      document.body.classList.toggle('graph-open', next !== 'grid');
+      document.querySelectorAll('.view-btn').forEach(button => {
+        const active = button.dataset.view === next;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+      markActiveChips(); renderGrid();
+      if (next === 'grid') document.querySelector('[data-view="grid"]').focus({ preventScroll:true });
+    }
     function renderGrid() {
       clearTimeout(gridRenderTimer);
       const generation = ++gridGeneration;
@@ -877,7 +892,7 @@
       document.getElementById('grid-sentinel').hidden = projectView !== 'grid';
       if (projectView !== 'grid') {
         grid.replaceChildren();
-        ProjectExplorer.render({ mode:projectView, projects:filteredProjects(), available:pool(), container:explorer, onChange:renderGrid });
+        ProjectExplorer.render({ mode:projectView, projects:filteredProjects(), available:pool(), container:explorer, onView:setProjectView, onClose:() => setProjectView('grid') });
         return;
       }
       ProjectExplorer.close();
@@ -1141,18 +1156,7 @@
 
       document.querySelectorAll('.view-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          const next = btn.dataset.view;
-          if (next === projectView) return;
-          if (projectView === 'grid') savedGridMonth = monthFilter;
-          if (next === 'grid') monthFilter = savedGridMonth;
-          else if (projectView === 'grid') monthFilter = 'all';
-          projectView = next;
-          document.querySelectorAll('.view-btn').forEach(b => {
-            const active = b.dataset.view === projectView;
-            b.classList.toggle('active', active);
-            b.setAttribute('aria-pressed', String(active));
-          });
-          markActiveChips(); renderGrid();
+          setProjectView(btn.dataset.view);
         });
       });
 

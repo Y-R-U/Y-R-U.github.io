@@ -2,23 +2,11 @@
 window.ProjectExplorer = (() => {
   const taxonomy = window.PROJECT_TAXONOMY;
   const categories = { all: 'All types', '2d': '2D games', '3d': '3D games', apps: 'Apps' };
-  let category = 'all', genre = 'all', model = 'all', lineage = 'all';
   const cameras = {};
   let disposeCamera = () => {};
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
   const ascending = (a, b) => (a.date || '').localeCompare(b.date || '') || a.name.localeCompare(b.name);
   const date = iso => new Date(`${iso}T12:00:00`).toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' });
-  function select(label, id, values, active) {
-    return `<label class="explorer-select">${label}<select id="${id}">${Object.entries(values).map(([key, text]) => `<option value="${esc(key)}" ${key === active ? 'selected' : ''}>${esc(text)}</option>`).join('')}</select></label>`;
-  }
-  function family(project, byId) {
-    let id = project.screenshot;
-    const seen = new Set();
-    while (taxonomy.entries[id]?.parent && byId.has(taxonomy.entries[id].parent) && !seen.has(id)) {
-      seen.add(id); id = taxonomy.entries[id].parent;
-    }
-    return id;
-  }
   function card(project, byId) {
     const meta = taxonomy.get(project), parent = byId.get(meta.parent);
     const status = project.status === 'cancelled' ? 'Cancelled' : project.wip ? 'In progress' : '';
@@ -33,20 +21,9 @@ window.ProjectExplorer = (() => {
       ${parent ? `<div class="evolution-parent">↳ ${esc(meta.evolution)} from <a href="${esc(parent.path)}">${esc(parent.name)}</a></div>` : ''}
     </article>`;
   }
-  function render({ mode, projects, available, container, onChange }) {
+  function render({ mode, projects, available, container, onView, onClose }) {
     const byId = new Map(available.map(p => [p.screenshot, p]));
-    const models = { all: 'All models', ...Object.fromEntries([...new Set(available.map(p => p.creator || 'Creator unknown'))].sort().map(m => [m, m])) };
-    const families = { all: 'All projects', ...Object.fromEntries(available.filter(p => available.some(child => taxonomy.get(child).parent === p.screenshot)).sort(ascending).map(p => [p.screenshot, `${p.name} → successors`])) };
-    if (!models[model]) model = 'all';
-    if (!families[lineage]) lineage = 'all';
-    const controls = mode === 'timeline' ? select('Model credit', 'explorer-model', models, model) + select('Version family', 'explorer-lineage', families, lineage) :
-      select('High-level type', 'explorer-category', categories, category) + select('Also filter by', 'explorer-genre', { all:'All styles & genres', ...taxonomy.labels }, genre);
-    // Type filters apply only to Type; model/family filters apply only to Timeline.
-    const visible = projects.filter(p => mode === 'timeline' ?
-      (model === 'all' || (p.creator || 'Creator unknown') === model) && (lineage === 'all' || family(p, byId) === lineage) :
-      (category === 'all' || taxonomy.get(p).category === category) && (genre === 'all' || taxonomy.get(p).tags.includes(genre))).sort(ascending);
-    const title = mode === 'timeline' ? 'The evolution tree' : 'Similar games, through time';
-    const subtitle = mode === 'timeline' ? 'Follow model credits, versions and visual changes. Branches group projects by their credited model; arrows identify sequels and rebuilds.' : 'Start with 2D, 3D or Apps. Add a style or genre to trace related projects from the earliest experiments to the latest releases.';
+    const visible = projects.slice().sort(ascending);
     const months = new Map();
     for (const p of visible) {
       const key = p.date.slice(0,7);
@@ -55,81 +32,90 @@ window.ProjectExplorer = (() => {
     }
     close();
     const tree = buildTree(months, mode, byId);
-    container.innerHTML = `<header class="explorer-intro"><div class="explorer-eyebrow">Y-R-U / PROJECT ATLAS</div><h1>${title}</h1><p>${subtitle}</p></header>
-      <div class="explorer-toolbar">${controls}<div class="explorer-result" role="status">${visible.length} projects · oldest → newest</div></div>
-      ${visible.length ? `<div class="atlas-shell">
-        <div class="atlas-navigation" aria-label="Tree navigation">
-          <button type="button" data-camera="out" aria-label="Zoom out">−</button><output class="atlas-zoom" aria-live="polite">100%</output><button type="button" data-camera="in" aria-label="Zoom in">+</button>
-          <button type="button" data-camera="fit">Fit width</button><button type="button" data-camera="origin">Origins</button><button type="button" data-camera="latest">Latest</button>
-          <label class="atlas-jump">Jump to<select aria-label="Jump to timeline month">${tree.jumps.map(j => `<option value="${j.y}" data-x="${j.x}">${esc(j.label)}</option>`).join('')}</select></label>
+    container.innerHTML = `<div class="atlas-shell" role="dialog" aria-modal="true" aria-label="${mode === 'timeline' ? 'Project timeline' : 'Projects by type'}">
+      <div class="atlas-actions">
+        <div class="atlas-switch" aria-label="Graph view">
+          <button type="button" data-graph-view="timeline" aria-pressed="${mode === 'timeline'}">Timeline</button>
+          <button type="button" data-graph-view="type" aria-pressed="${mode === 'type'}">Type</button>
         </div>
-        <div class="atlas-hint">Drag or swipe to explore · pinch or Ctrl + wheel to zoom · arrow keys to pan</div>
-        <div class="atlas-viewport" tabindex="0" role="region" aria-label="Interactive project tree. Use arrow keys to pan, plus or minus to zoom.">
-          <div class="atlas-space"><div class="atlas-world" style="width:${tree.width}px;height:${tree.height}px">${tree.html}</div></div>
-        </div>
-      </div><p class="explorer-footnote">Dates and model credits come from the project registry. Previews show the current graphics of each project, rather than historical snapshots.</p>` : '<div class="explorer-empty">No projects match these filters. Try All months or a broader type.</div>'}`;
-    if (visible.length) disposeCamera = mountCamera(container, tree, mode);
-    for (const [id, update] of Object.entries({ 'explorer-model': v => model = v, 'explorer-lineage': v => lineage = v, 'explorer-category': v => category = v, 'explorer-genre': v => genre = v })) {
-      container.querySelector(`#${id}`)?.addEventListener('change', event => {
-        const restoreId = event.target.id;
-        update(event.target.value); onChange();
-        container.querySelector(`#${restoreId}`)?.focus({ preventScroll:true });
-      });
-    }
+        <button type="button" class="atlas-close" aria-label="Close graph" title="Close graph (Escape)">×</button>
+      </div>
+      <div class="atlas-viewport" tabindex="0" role="region" aria-label="Horizontal project graph. Drag or swipe to pan, pinch or Ctrl plus wheel to zoom. Arrow keys pan; plus and minus zoom.">
+        <div class="atlas-space"><div class="atlas-world" style="width:${tree.width}px;height:${tree.height}px">${tree.html}</div></div>
+      </div>
+      ${visible.length ? '' : '<div class="atlas-empty">No projects in this selection.</div>'}
+    </div>`;
+    container.querySelectorAll('[data-graph-view]').forEach(button => button.addEventListener('click', () => {
+      if (button.dataset.graphView !== mode) onView(button.dataset.graphView);
+    }));
+    container.querySelector('.atlas-close').addEventListener('click', onClose);
+    container.querySelector('.atlas-shell').addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); onClose(); }
+      if (event.key === 'Tab') {
+        const targets = [...container.querySelectorAll('button, a, [tabindex="0"]')];
+        const first = targets[0], last = targets.at(-1);
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    });
+    disposeCamera = mountCamera(container, tree, mode);
+    container.querySelector('.atlas-viewport').focus({ preventScroll:true });
   }
   function buildTree(months, mode, byId) {
     const branchFor = p => mode === 'timeline' ? p.creator || 'Creator unknown' : categories[taxonomy.get(p).category];
-    const lanes = [...new Set([...months.values()].flat().map(branchFor))];
-    const laneWidth = 330, cardWidth = 280, cardHeight = 332, rowHeight = 362;
-    const width = Math.max(700, 250 + lanes.length * laneWidth);
-    let y = 140;
-    const lines = [], nodes = [], jumps = [], positions = new Map();
-    nodes.push(`<div class="atlas-origin" style="left:32px;top:24px">PROJECT ORIGINS<span>↓ time</span></div>`);
-    lanes.forEach((label, i) => nodes.push(`<div class="atlas-lane-heading" style="left:${250 + i*laneWidth}px;top:28px;width:${cardWidth}px">${esc(label)}</div>`));
+    const cardWidth = 280, cardHeight = 332, columnWidth = 312, rowHeight = 390, spineY = 120;
+    let x = 240, height = 650;
+    const lines = [], nodes = [], positions = new Map();
+    nodes.push(`<div class="atlas-origin" style="left:24px;top:84px">PROJECT ORIGINS<span>time →</span></div>`);
     for (const [key, projects] of months) {
       const label = new Date(`${key}-01T12:00:00`).toLocaleDateString('en-AU', { month:'long', year:'numeric' });
-      jumps.push({ y, label, x:250+lanes.indexOf(branchFor(projects[0]))*laneWidth });
-      nodes.push(`<div class="atlas-date" style="left:25px;top:${y}px"><strong>${esc(label)}</strong><span>${projects.length} projects</span></div>`);
-      lines.push(`<circle cx="105" cy="${y+54}" r="6" class="atlas-dot"/>`);
-      let longest = 0;
-      lanes.forEach((lane, i) => {
-        const branch = projects.filter(p => branchFor(p) === lane);
-        if (!branch.length) return;
+      const branches = new Map();
+      for (const project of projects) {
+        const label = branchFor(project);
+        if (!branches.has(label)) branches.set(label, []);
+        branches.get(label).push(project);
+      }
+      const bus = x+30;
+      nodes.push(`<div class="atlas-date" style="left:${x}px;top:65px"><strong>${esc(label)}</strong><span>${projects.length} projects</span></div>`);
+      lines.push(`<circle cx="${bus}" cy="${spineY}" r="6" class="atlas-dot"/>`);
+      let row = 0, longest = 0;
+      for (const [label, branch] of branches) {
+        const top = 210+row*rowHeight, center = top+cardHeight/2;
         longest = Math.max(longest, branch.length);
-        const x = 250+i*laneWidth, bus = x-20;
-        lines.push(`<path d="M105 ${y+54} H${bus} V${y+120+(branch.length-1)*rowHeight+cardHeight/2}"/>`);
-        nodes.push(`<div class="atlas-branch-heading" style="left:${x}px;top:${y+38}px">${esc(lane)} <span>${branch.length}</span></div>`);
+        lines.push(`<path d="M${bus} ${spineY} V${center} H${x+80+(branch.length-1)*columnWidth}"/>`);
+        nodes.push(`<div class="atlas-branch-heading" style="left:${x+80}px;top:${top-34}px">${esc(label)} <span>${branch.length}</span></div>`);
         branch.forEach((project, index) => {
-          const top = y+120+index*rowHeight;
-          lines.push(`<path d="M${bus} ${top+cardHeight/2} H${x}"/><circle cx="${bus}" cy="${top+cardHeight/2}" r="3"/>`);
-          positions.set(project.screenshot, { x, y:top });
-          nodes.push(`<div class="atlas-project" style="left:${x}px;top:${top}px;width:${cardWidth}px;height:${cardHeight}px">${card(project, byId)}</div>`);
+          const left = x+80+index*columnWidth;
+          lines.push(`<circle cx="${left-12}" cy="${center}" r="3"/>`);
+          positions.set(project.screenshot, { x:left, y:top });
+          nodes.push(`<div class="atlas-project" style="left:${left}px;top:${top}px;width:${cardWidth}px;height:${cardHeight}px">${card(project, byId)}</div>`);
         });
-      });
-      y += 180 + longest*rowHeight;
+        height = Math.max(height, top+cardHeight+90); row++;
+      }
+      x += 180+longest*columnWidth;
     }
-    const height = y+40;
-    lines.unshift(`<path d="M105 90 V${height-70}" class="atlas-spine"/>`);
-    // Successor edges are separate from chronological/model branches.
+    const width = Math.max(1000,x+40);
+    lines.unshift(`<path d="M180 ${spineY} H${width-60}" class="atlas-spine"/>`);
     for (const [id, pos] of positions) {
       const parent = positions.get(taxonomy.entries[id]?.parent);
       if (!parent) continue;
-      const sx = parent.x+cardWidth+5, sy = parent.y+cardHeight-16;
-      const ex = pos.x+cardWidth+5, ey = pos.y+cardHeight-16;
-      lines.push(`<path d="M${sx} ${sy} C${sx+26} ${sy+60},${ex+26} ${ey-60},${ex} ${ey}" class="atlas-successor"/>`);
+      const sx=parent.x+cardWidth/2, sy=parent.y+cardHeight+5, ex=pos.x+cardWidth/2, ey=pos.y+cardHeight+5;
+      lines.push(`<path d="M${sx} ${sy} C${sx+60} ${sy+28},${ex-60} ${ey+28},${ex} ${ey}" class="atlas-successor"/>`);
     }
-    return { width, height, jumps, signature:[...positions.keys()].join(','), html:`<svg class="atlas-connectors" width="${width}" height="${height}" aria-hidden="true">${lines.join('')}</svg>${nodes.join('')}` };
+    return { width, height, signature:[...positions.keys()].join(','), html:`<svg class="atlas-connectors" width="${width}" height="${height}" aria-hidden="true">${lines.join('')}</svg>${nodes.join('')}` };
   }
   function mountCamera(container, tree, mode) {
-    const viewport = container.querySelector('.atlas-viewport'), world = container.querySelector('.atlas-world'), space = container.querySelector('.atlas-space'), output = container.querySelector('.atlas-zoom');
+    const viewport = container.querySelector('.atlas-viewport'), world = container.querySelector('.atlas-world'), space = container.querySelector('.atlas-space');
     const previous = cameras[mode]?.signature === tree.signature ? cameras[mode] : null;
-    let scale = previous?.scale || (innerWidth < 600 ? .55 : .85);
+    const fitHeight = () => Math.max(.5,Math.min(.95,(viewport.clientHeight-55)/560));
+    let responsiveScale = fitHeight();
+    let scale = previous ? previous.scale * responsiveScale/(previous.responsiveScale || responsiveScale) : responsiveScale;
     let drag = null, moved = false;
-    const save = () => cameras[mode] = { scale, left:viewport.scrollLeft, top:viewport.scrollTop, signature:tree.signature };
+    const save = () => cameras[mode] = { scale, responsiveScale, left:viewport.scrollLeft, top:viewport.scrollTop, signature:tree.signature };
     const paint = () => {
       world.style.transform = `scale(${scale})`;
       space.style.width = `${tree.width*scale}px`; space.style.height = `${tree.height*scale}px`;
-      output.textContent = `${Math.round(scale*100)}%`;
+      viewport.dataset.zoom = String(scale);
     };
     const zoom = (next, cx=viewport.clientWidth/2, cy=viewport.clientHeight/2) => {
       const wx=(viewport.scrollLeft+cx)/scale, wy=(viewport.scrollTop+cy)/scale;
@@ -137,21 +123,14 @@ window.ProjectExplorer = (() => {
       viewport.scrollLeft=wx*scale-cx; viewport.scrollTop=wy*scale-cy; save();
     };
     paint();
-    if (previous) { viewport.scrollLeft=previous.left; viewport.scrollTop=previous.top; }
+    if (previous) { viewport.scrollLeft=previous.left*scale/previous.scale; viewport.scrollTop=previous.top*scale/previous.scale; }
+    else { viewport.scrollLeft=215*scale; }
     viewport.addEventListener('scroll',save,{passive:true});
-    container.querySelectorAll('[data-camera]').forEach(button => button.addEventListener('click',()=>{
-      const action=button.dataset.camera;
-      if(action==='in') zoom(scale*1.25);
-      if(action==='out') zoom(scale/1.25);
-      if(action==='fit') { zoom(viewport.clientWidth/tree.width,0,0); viewport.scrollLeft=0; }
-      if(action==='origin') { viewport.scrollTop=0; viewport.scrollLeft=0; }
-      if(action==='latest') { const last=tree.jumps.at(-1); viewport.scrollTop=last.y*scale; viewport.scrollLeft=Math.max(0,last.x-220)*scale; }
-      save();
-    }));
-    container.querySelector('.atlas-jump select').addEventListener('change',event=>{ viewport.scrollTop=Number(event.target.value)*scale; viewport.scrollLeft=Math.max(0,Number(event.target.selectedOptions[0].dataset.x)-220)*scale; save(); });
     viewport.addEventListener('wheel',event=>{
       if(event.ctrlKey || event.metaKey) {
         event.preventDefault(); const r=viewport.getBoundingClientRect(); zoom(scale*Math.exp(-event.deltaY*.006),event.clientX-r.left,event.clientY-r.top);
+      } else if (!event.deltaX) {
+        event.preventDefault(); viewport.scrollLeft += event.deltaY;
       }
     },{passive:false});
     viewport.addEventListener('keydown',event=>{
@@ -188,8 +167,11 @@ window.ProjectExplorer = (() => {
     },{passive:false});
     viewport.addEventListener('touchend',()=>{pinch=null;},{passive:true});
     const resize = new ResizeObserver(()=>{
-      container.style.setProperty('--atlas-sticky-top', `${60+document.getElementById('projects-controls').offsetHeight}px`);
-      paint();
+      const next = fitHeight();
+      if (next !== responsiveScale) {
+        const ratio = next/responsiveScale; responsiveScale = next;
+        zoom(scale*ratio,0,0);
+      } else paint();
     }); resize.observe(viewport);
     return () => { save(); resize.disconnect();window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up); };
   }
