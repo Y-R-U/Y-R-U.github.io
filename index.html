@@ -1088,6 +1088,16 @@
         '~/cc/airon/voicelab/data/voices.json.';
     }
 
+    // Starting a remote video is asynchronous; leaving Home can pause it
+    // before play resolves. Autoplay denial and that interruption are normal.
+    function playHomeVideo(video) {
+      video.play().catch(error => {
+        if (error.name !== 'AbortError' && error.name !== 'NotAllowedError') {
+          console.warn('Home video playback failed:', error);
+        }
+      });
+    }
+
     // ─── PAGE NAVIGATION ───
     function showPage(pageName) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1101,7 +1111,7 @@
 
       if (pageName === 'home') {
         const video = document.querySelector('#home-page video');
-        if (video) { video.style.display = 'block'; video.play(); }
+        if (video) { video.style.display = 'block'; playHomeVideo(video); }
       } else {
         const video = document.querySelector('#home-page video');
         if (video) { video.style.display = 'none'; video.pause(); }
@@ -1159,7 +1169,7 @@
       // Video
       const video = document.querySelector('#home-page video');
       const heroText = document.querySelector('.home-hero');
-      video.play();
+      playHomeVideo(video);
       video.style.display = 'block';
       heroText.style.display = 'none';
 
@@ -1170,7 +1180,7 @@
           video.style.display = 'none';
           heroText.style.display = 'flex';
         } else {
-          video.play();
+          playHomeVideo(video);
         }
       });
 
