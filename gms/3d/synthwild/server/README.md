@@ -11,7 +11,7 @@ cd server
 SYNTHWILD_DATA=/tmp/sw SYNTHWILD_INSECURE_COOKIE=1 SYNTHWILD_STATIC=../../../.. \
 SYNTHWILD_PUBLIC_URL=http://localhost:8011/gms/3d/synthwild go run .
 # game + API on one origin:  http://localhost:8011/gms/3d/synthwild/
-SYNTHWILD_DATA=/tmp/sw SYNTHWILD_PUBLIC_URL=http://localhost:8011/gms/3d/synthwild go run . admin-link aaron@br8t.com
+SYNTHWILD_DATA=/tmp/sw SYNTHWILD_PUBLIC_URL=http://localhost:8011/gms/3d/synthwild go run . admin-link aaron@itmatters.mobi
 ```
 `SYNTHWILD_STATIC` (local only) serves the site root so the game and the API share an origin. Google
 admin sign-in works on `localhost`, since Firebase allows it by default.
@@ -22,7 +22,7 @@ admin sign-in works on `localhost`, since Firebase allows it by default.
 | `SYNTHWILD_DATA` | `./data` |
 | `SYNTHWILD_PREFIX` | `/gms/3d/synthwild` (stripped from incoming paths; `/api/...` also works) |
 | `SYNTHWILD_PUBLIC_URL` | `https://games.br8t.com/gms/3d/synthwild` (for admin links) |
-| `SYNTHWILD_ADMINS` | `aaron@br8t.com,dante@br8t.com,malaki@br8t.com` |
+| `SYNTHWILD_ADMINS` | `aaron@itmatters.mobi,dante@itmatters.mobi,malaki@itmatters.mobi` |
 | `SYNTHWILD_GLOBAL_CAP` | 3 GiB of stored blobs + thumbs |
 | `SYNTHWILD_DISK_FLOOR` | 400 MiB that must stay free on the data disk |
 | `SYNTHWILD_INSECURE_COOKIE` | unset (set it for plain-http local testing) |
@@ -53,7 +53,7 @@ by default; this was verified live. If `trusted_proxies` is ever configured, rev
 ## Admin sign-in
 - Normal: the "Admin" button calls `api.adminGoogleSignIn()` (a Google popup via Firebase project `br8t-games`), and the
   server verifies the ID token and checks the allowlist.
-- Fallback: `./admin-link.sh aaron@br8t.com` prints a one-time URL that is valid for 15 minutes. Opening it signs you in as admin.
+- Fallback: `./admin-link.sh aaron@itmatters.mobi` prints a one-time URL that is valid for 15 minutes. Opening it signs you in as admin.
   On the box it runs `SYNTHWILD_DATA=/srv/data/synthwild /srv/apps/synthwild/synthwild admin-link <email>`.
 
 ## Backups

@@ -58,7 +58,7 @@ func loadConfig() {
 	cfg.GlobalCap = envInt("SYNTHWILD_GLOBAL_CAP", 3<<30)
 	cfg.DiskFloor = envInt("SYNTHWILD_DISK_FLOOR", 400<<20)
 	cfg.Admins = map[string]bool{}
-	for _, e := range strings.Split(env("SYNTHWILD_ADMINS", "aaron@br8t.com,dante@br8t.com,malaki@br8t.com"), ",") {
+	for _, e := range strings.Split(env("SYNTHWILD_ADMINS", "aaron@itmatters.mobi,dante@itmatters.mobi,malaki@itmatters.mobi"), ",") {
 		if e = strings.ToLower(strings.TrimSpace(e)); e != "" {
 			cfg.Admins[e] = true
 		}

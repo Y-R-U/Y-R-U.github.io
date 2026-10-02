@@ -110,7 +110,7 @@ Go + SQLite (modernc.org/sqlite, CGO off), built on the box (amd64). The service
 **127.0.0.1:8011**, with data in `/srv/data/synthwild/`. Public at **https://games.br8t.com/gms/3d/synthwild/**: the static
 client goes to `/srv/apps/br8tgames/site/gms/3d/synthwild/`, and Caddy routes `/gms/3d/synthwild/api/*` → :8011.
 The client calls the relative `api/…`. On GitHub Pages (no API) the game runs fully offline with local worlds.
-- Admins: **aaron@br8t.com, dante@br8t.com, malaki@br8t.com** only. Admin sign-in = Google via the
+- Admins: **aaron@itmatters.mobi, dante@itmatters.mobi, malaki@itmatters.mobi** only. Admin sign-in = Google via the
   existing Firebase project `br8t-games` (`/lib/auth/config.js`; don't edit `/lib/auth/*`); the Go server verifies the
   Firebase ID token (RS256 against Google's securetoken certs, aud `br8t-games`, `email_verified`, email in the allowlist).
   Fallback: `synthwild admin-link <email>` CLI prints a one-time login URL.

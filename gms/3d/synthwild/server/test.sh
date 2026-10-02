@@ -92,13 +92,14 @@ eq "unverified email → 401"                 "$(code x POST /api/admin/google "
 eq "unknown kid → 401"                      "$(code x POST /api/admin/google "{\"idToken\":\"$(mint kid=nope)\"}")" 401
 eq "alg other than RS256 → 401"             "$(code x POST /api/admin/google "{\"idToken\":\"$(mint alg=HS256)\"}")" 401
 eq "valid token, non-admin email → 403"     "$(code x POST /api/admin/google "{\"idToken\":\"$(mint email=someone@gmail.com)\"}")" 403
-eq "lookalike admin email → 403"            "$(code x POST /api/admin/google "{\"idToken\":\"$(mint email=aaron@br8t.com.evil.io)\"}")" 403
+eq "lookalike admin email → 403"            "$(code x POST /api/admin/google "{\"idToken\":\"$(mint email=aaron@itmatters.mobi.evil.io)\"}")" 403
+eq "old br8t.com admin email → 403"       "$(code x POST /api/admin/google "{\"idToken\":\"$(mint email=aaron@br8t.com)\"}")" 403
 check "x is still signed out"               "$(body x GET /api/me)" '"user":null'
-r=$(body admin POST /api/admin/google "{\"idToken\":\"$(mint email=Aaron@BR8T.com)\"}")
+r=$(body admin POST /api/admin/google "{\"idToken\":\"$(mint email=Aaron@ItMatters.MOBI)\"}")
 check "aaron signs in (email case-insensitive)" "$r" '"admin":true'
 check "aaron gets player username 'aaron'"  "$r" '"username":"aaron"'
 check "me shows admin"                      "$(body admin GET /api/me)" '"admin":true'
-r=$(body dante POST /api/admin/google "{\"idToken\":\"$(mint email=dante@br8t.com)\"}")
+r=$(body dante POST /api/admin/google "{\"idToken\":\"$(mint email=dante@itmatters.mobi)\"}")
 check "dante signs in as admin"             "$r" '"username":"dante"'
 
 head1 "admin user management"
@@ -114,7 +115,7 @@ eq    "add an admin's own name → 409"       "$(code admin POST /api/admin/user
 r=$(body admin GET /api/admin/users)
 check "list has kid_one"                    "$r" '"username":"kid_one"'
 check "list has kid_two"                    "$r" '"username":"kid_two"'
-check "list marks admin accounts"           "$r" '"adminEmail":"aaron@br8t.com"'
+check "list marks admin accounts"           "$r" '"adminEmail":"aaron@itmatters.mobi"'
 eq    "admin player can't be removed"       "$(code admin DELETE /api/admin/users/dante)" 400
 eq    "removing a missing user → 404"       "$(code admin DELETE /api/admin/users/nobody)" 404
 eq    "oversize JSON body → 400"            "$(code admin POST /api/admin/users "{\"username\":\"$(head -c 70000 /dev/zero | tr '\0' a)\"}")" 400
@@ -361,7 +362,7 @@ eq    "B10 per-IP ceiling: 61st try from one IP → 429" "$(lg 10.250.250.252 ki
 eq    "B10 rightmost X-Forwarded-For hop is used" "$(lg '10.250.250.250, 10.250.250.253' ghost)" 404
 
 head1 "admin-link CLI"
-L=$("$BIN" admin-link malaki@br8t.com 2>/dev/null)
+L=$("$BIN" admin-link malaki@itmatters.mobi 2>/dev/null)
 check "admin-link prints a URL"              "$L" "$P/api/admin/link?t="
 "$BIN" admin-link kid@example.com >/dev/null 2>&1; eq "admin-link refuses non-admins" "$?" 1
 T=${L#*t=}

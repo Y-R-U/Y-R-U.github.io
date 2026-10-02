@@ -47,3 +47,6 @@ Started 2026-10-02. Manager session spawns lane agents (Aaron: 6 at once initial
 - Running: R2 server fixer (lane 6 agent) + R3 review (perf/bugs/duplication) a4690c1f0c7169ff5.
 - ff7687ca: R2 server/net fixes live (server tests 186/186 laptop+box; apitest 48/48). LESSON: a static-only deploy from HEAD overwrote an agent's uncommitted live api.js — when an agent owns deploy for its in-flight files, commit their work before any deploy, or don't deploy.
 - R3 review → docs/reviews/R3_perf_bugs_dup.md. CPU fits 30 fps phone budget except Floor Fall late game (C1) + big stamps (C2); heap leak gone. Fixing everything selected; split: engine agent (C2,C5,C6,C7,C13, quality helper) + fixer afe6 (C1,C11,C12,C3,C4,C14, C17–C25 dup, QA harness water flake). Do NOT change world/noise.js or mini-game layout RNG.
+- c82f253d: R3 fixes live. Gate: unit 9/9, r1_regress 22/0, r3_regress 9/0, smoke 42/0 (60 fps both), minigames mobile 62/0, live 46/0.
+  ALL PHASES OF AARON'S PLAN DONE (2026-10-02): M1+M2 → mini-games → R1 review+fix → R2 review+fix → art pass → R3 perf/bug/dup review+fix.
+  Open/next ideas: real-phone fps check (Adreno untested), human playtest by the kids, Suno "wondrous" day track, C17/C25 leftovers, per-player secret codes (D11 option).
