@@ -44,7 +44,7 @@ Contract remains in docs/CONTRACT.md. Individual checkpoint files explain APIs a
 - Final fresh tools/capture.mjs run after scenery refinements: ten screenshots, zero console errors, and row camera pin reveals hero.
 - docs/verification/report.json records automated checks. docs/verification/desktop.png, mobile-*.png, mobile-routes.png and region-*.png are review evidence. Regional captures deliberately load a progressed test company, not a naturally played save.
 - Physical phone/Safari have not been tested. Desktop GPU/browser evidence does not establish phone frame rates. Public release verification follows the Pages deployment in GitHub Actions.
-- Automated no-dispatch pacing benchmark: first region ~4 minutes, final region ~58 minutes, all routes ~88 minutes. This is an optimistic automated investment policy, not measured human play.
+- Automated no-dispatch pacing benchmark: first region ~4 minutes, final region ~58 minutes, all routes ~78 minutes. This is an optimistic automated investment policy, not measured human play.
 
 ## Resume commands
 
