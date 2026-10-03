@@ -37,3 +37,7 @@ Aaron's words, condensed (inspiration, not a spec — improve on it):
 - 2026-10-04 Aaron: Codex image model is allowed as an option (`codex exec --skip-git-repo-check -s workspace-write "Use your image generation tool..."`, cloud, no local GPU). Smoke test was excellent.
 - 2026-10-04 P0A done: research/DESIGN_PROPOSAL.md ("Big Hat Energy", Dribble Creek, 12 businesses in 4 blocks, built by the Mulligan Bros, hats = status, Fake Your Death prestige, Ghost Town season). P0b challenge launched.
 - 2026-10-04 P0b done (research/DESIGN_CHALLENGE.md). P1: manager wrote DESIGN.md rulings W1–W17 (v1 = 9 businesses/3 blocks, ownership visible, fling, Leone duel, perf contract, piano phrases, Ghost Town overlay gated on 20 Oct). Audio lane launched (phase 1 script, phase 2 GPU after Flux idle).
+- 2026-10-04 P0C engine fork done (ENGINE.md; all tests green). Committed bfe257fa (not pushed). CONTRACT.md written (lanes E/A/P/S/U/AU). Lane E (economy/state, CDP 9321) launched. Lanes A/P/S/U wait for art direction refs (+ show Aaron).
+  Ports: engine 9311, E 9321; next: A 9331, P 9341, S 9351, U 9361.
+- 2026-10-04 P0B art direction done: Look A "Clay Caricature" (ART_DIRECTION.md, refs/a_clay_*). Shown to Aaron (5 refs), proceeding unless he objects. Note: avoid sombrero+moustache stereotypes from build ref.
+- 2026-10-04 P2 build launched: E (9321), A (9331), P (9341), S (9351), U (9361), AU (audio, GPU after Flux idle). Contract in CONTRACT.md.
