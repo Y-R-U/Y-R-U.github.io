@@ -1,24 +1,24 @@
 import * as THREE from 'three';
-import { createCardRig, createHeroDirector } from './cameras.js?v=20261004a';
-import { createLighting, lerpLight } from './kit/lighting.js?v=20261004a';
-import { createField, buildTerrain, buildWater, terrainMesh } from './kit/terrain.js?v=20261004a';
-import { buildTown } from './kit/town.js?v=20261004a';
-import { createAmbient } from './kit/ambient.js?v=20261004a';
-import { LIGHTS, DAY_KEYS } from '../data/palette.js?v=20261004a';
-import * as PL from '../data/plots.js?v=20261004a';
-import lemonade from './plots/lemonade.js?v=20261004a';
-import foodtruck from './plots/foodtruck.js?v=20261004a';
-import barber from './plots/barber.js?v=20261004a';
-import cafe from './plots/cafe.js?v=20261004a';
-import carwash from './plots/carwash.js?v=20261004a';
-import petsalon from './plots/petsalon.js?v=20261004a';
-import fishchips from './plots/fishchips.js?v=20261004a';
-import ferry from './plots/ferry.js?v=20261004a';
-import boatyard from './plots/boatyard.js?v=20261004a';
-import boutique from './plots/boutique.js?v=20261004a';
-import bistro from './plots/bistro.js?v=20261004a';
-import appstudio from './plots/appstudio.js?v=20261004a';
-import home from './plots/home.js?v=20261004a';
+import { createCardRig, createHeroDirector } from './cameras.js?v=20261004b';
+import { createLighting, lerpLight } from './kit/lighting.js?v=20261004b';
+import { createField, buildTerrain, buildWater, terrainMesh } from './kit/terrain.js?v=20261004b';
+import { buildTown } from './kit/town.js?v=20261004b';
+import { createAmbient } from './kit/ambient.js?v=20261004b';
+import { LIGHTS, DAY_KEYS } from '../data/palette.js?v=20261004b';
+import * as PL from '../data/plots.js?v=20261004b';
+import lemonade from './plots/lemonade.js?v=20261004b';
+import foodtruck from './plots/foodtruck.js?v=20261004b';
+import barber from './plots/barber.js?v=20261004b';
+import cafe from './plots/cafe.js?v=20261004b';
+import carwash from './plots/carwash.js?v=20261004b';
+import petsalon from './plots/petsalon.js?v=20261004b';
+import fishchips from './plots/fishchips.js?v=20261004b';
+import ferry from './plots/ferry.js?v=20261004b';
+import boatyard from './plots/boatyard.js?v=20261004b';
+import boutique from './plots/boutique.js?v=20261004b';
+import bistro from './plots/bistro.js?v=20261004b';
+import appstudio from './plots/appstudio.js?v=20261004b';
+import home from './plots/home.js?v=20261004b';
 
 export const PLOT_BUILDERS = { home, lemonade, foodtruck, barber, cafe, carwash, petsalon, fishchips, ferry, boatyard, boutique, bistro, appstudio };
 
@@ -98,7 +98,7 @@ export function createWorld({ kit, data, skin = null }) {
   const bounds = { ...PL.WORLD_BOUNDS };
   const rigs = new Map();
   const heroRig = createHeroDirector({ plots, bounds });
-  let time = 0, lightClock = 0, cfgRenderer = null, cfgTier = null, tierName = 'mid';
+  let time = 0, lightClock = 0, splitClock = 0, warmCam = null, primed = false, cfgRenderer = null, cfgTier = null, tierName = 'mid';
   const homeStats = { owned: true, managed: false, visualTier: 0, stockRatio: 0 };
   const _look = new THREE.Vector3(), _dir = new THREE.Vector3(), _lamps = [];
 
@@ -128,6 +128,19 @@ export function createWorld({ kit, data, skin = null }) {
     scene, plots, heroRig, bounds, field, rig, ambient,
     roads: data.roadGraph, hub: data.homeAnchor,
     configureRenderer,
+    warmup(on) {
+      if (!on) return null;
+      kit.materials.splitUber(scene);
+      for (const p of plots.values()) p.group.visible = true;
+      setTownCast(true);
+      const b = geo.bounds, cx = (b.x0 + b.x1) / 2, cz = (b.z0 + b.z1) / 2, hw = (b.x1 - b.x0) / 2, hd = (b.z1 - b.z0) / 2;
+      warmCam ||= new THREE.OrthographicCamera(-hw, hw, hd, -hd, 1, 600);
+      warmCam.position.set(cx, 300, cz);
+      warmCam.lookAt(cx, 0, cz);
+      warmCam.updateMatrixWorld();
+      rig.place(_look.set(cx, 0, cz), Math.max(hw, hd));
+      return warmCam;
+    },
     cardRig(lineId) {
       if (!rigs.has(lineId)) rigs.set(lineId, createCardRig(plots.get(lineId)));
       return rigs.get(lineId);
@@ -166,6 +179,7 @@ export function createWorld({ kit, data, skin = null }) {
       time += dt;
       tierName = typeof tier === 'string' ? tier : tier?.name || 'mid';
       kit.setTime(time);
+      if ((splitClock -= dt) <= 0) { splitClock = 4; kit.materials.splitUber(scene); }
       lightClock -= dt;
       if (lightClock <= 0) {
         lightClock = 20;
@@ -186,9 +200,11 @@ export function createWorld({ kit, data, skin = null }) {
       if (!tour.length) tour.push('home');
       heroRig.update(dt, tour);
       lookOf(heroRig.camera, _look);
+      const heroOn = !visibleLineIds || visibleLineIds.hero !== false;
+      if (!primed) { primed = true; for (const [id, p] of plots) p.update(0, id === 'home' ? homeStats : game.stats(id), time, tierName); }
       for (const [id, p] of plots) {
-        const near = Math.abs(p.group.position.x - _look.x) < 45;
-        if (visibleLineIds && !visibleLineIds.has(id) && id !== heroRig.current && !near) continue;
+        const near = heroOn && Math.abs(p.group.position.x - _look.x) < 45;
+        if (visibleLineIds && !visibleLineIds.has(id) && !(heroOn && id === heroRig.current) && !near) continue;
         p.update(dt, id === 'home' ? homeStats : game.stats(id), time, tierName);
       }
       ambient.update(dt, time, light.night);

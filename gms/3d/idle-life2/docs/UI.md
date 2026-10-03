@@ -6,7 +6,7 @@ UI reads `game.state` / `game.data` and writes only through `game.act`. `ui/mode
 ## Files
 | File | Role |
 |---|---|
-| `app.js` | Composition: DOM shell, hero/card taps (`host.pick` → event / courier / pile / bin / hustle), reveal rules, card modes, fold, tabs, game-event reactions, job scheduler |
+| `app.js` | Composition: DOM shell, hero/card taps (`host.pick` → event / courier / pile / bin / hustle), reveal rules, card modes, jump dock, tabs, game-event reactions, job scheduler |
 | `model.js` | Read-only adapters (stats, quotes, managers, items, goals, life, retire preview, season, keepsakes) |
 | `hud.js` | Rolling cash counter (snaps on big drops, e.g. retire), income/s glow, 🎟️, age/gen/family chip, 🎃, ⚙️ |
 | `linecard.js` | Line card: diorama, badge, ⓘ, 📌, themed glyphs from `quote()`, hold-to-buy, ghost/compact modes, order chip, `.prog` progress leaf |
@@ -29,14 +29,21 @@ UI reads `game.state` / `game.data` and writes only through `game.act`. `ui/mode
 - Town mode tap → `town.close()` then `heroRig.flyTo(lineId ?? nearestPlot(point))`.
 - `graphics:paused` → centred chip → `host.restart()`, else reload with `?v=`. `graphics:resumed` hides it.
 - Settings quality → `host.setTier('auto'|'battery'|'high')`; the saved tier is applied at mount unless `?tier=` is set.
-- Compact strips → `host.setViewFps('line:'+id, 4)`; 0 when expanded.
+- Compact strips (opt-in setting only) → `host.setViewFps('line:'+id, 4)`; 0 when expanded.
 - Toasts for `item` (crates outside mini-games), `achievement`, `order:done`, `life:offer`, `season` rank, dog-fetched pigeons; postcard offer pulses 📷 on life beats.
 
 ## Performance rules (S22 412×915, CPU 4×: ui.update p95 0.9 ms, whole rAF p95 5.7 ms)
-- No layout reads in rAF. Geometry (`geo.viewW/viewH/spacerH`) comes from ResizeObservers; the fold is computed (`heroH = viewH − fold`, `offY = −fold/2`). `--fold` is set on the hero only, not `:root`.
+- No layout reads in rAF. Geometry (`geo.viewW/viewH`, doc height) comes from ResizeObservers; hero visibility (`heroOn`) from an IntersectionObserver.
 - Per frame: cash counter, one `--p` var on each visible card's `.prog` leaf (quantised, skipped if unchanged), bin position during bootstrap, mini-game/town positions.
 - Everything else runs as round-robin jobs (`runJobs`, ≤ ~0.8 ms per frame): visible cards 4 Hz / others 1 Hz (≤3 per slice), core HUD/tabs 4 Hz, events 6 Hz, open sheet 4 Hz, gate 2 Hz, hints 2.5 Hz. `textNow()` runs all of them immediately after player input (outside rAF).
 - Animations restart via class remove + rAF re-add, never `offsetWidth`.
+
+## Scrolling layout (2026-10-04, Aaron's S22 feedback)
+- Phones/tablets (<900 px): the hero is an ordinary block under the fixed HUD and scrolls away with the page (no sticky hero, no fold). Hero and every line card are `--view-h` tall (`clamp(250px, 57vh, 640px)`; tablet `clamp(300px, 55vh, 680px)`, single column), so fewer than two views are ever fully on screen. Desktop keeps the fixed left hero; side cards are `clamp(260px, 47vh, 440px)`.
+- Fewer on-screen views means fewer renders: the host skips views outside the viewport, including the hero (`heroRenders` stays 0 while it's scrolled away), and pre-paints within its `rootMargin: 100%` IO band, so cards scroll in already painted (blank max 0 ms). Demo save, 6 s scroll at 412×915: visible views max 8 / avg 6.3 → **max 3 / avg 2.6**; renders per frame avg 2.4 → 0.9; fully-visible views max 6 → 1. Desktop: max 7 / avg 5.9 → max 5 / avg 3.9.
+- Jump dock (`.jump`, bottom-left above the tabs; top-right of the hero on desktop): ⤒ (hero away), ⤓ jump to the bottom (ghost card + gate), and a ×1/×10/MAX cycle button while the hero's qty bar is off-screen. Tapping the HUD cash, or the Lines tab again, also scrolls to the top.
+- Events with the hero away: edge chips hide and a fixed `.ev-float` chip under the HUD shows the soonest event (emoji, `+N`, timer bar). A tap scrolls to the top and cuts to the event. Mini-games jump the page to the hero before they start, even when they were triggered from a card pick.
+- `test-layout` now asserts, mid-list on every phone/tablet viewport: <2 views fully visible, hero not in `visibleViews`, jump dock shown.
 
 ## Onboarding (P4)
 One coach at a time (queue), each shown once and stored with `act('hint')`. Order of discovery: tap → bin → first stand → **pile** (as soon as stock appears, stays until a pile is sold) → shelf badge → ⬆ level → qty → pin → new tabs → **Move in!** on Life whenever the next home is affordable → 🎟️ tickets / 🎁 gear / ✨ merge on Crew → 📷 postcard at the first life beat. 3D-only things get a **hero tip** (dark chip under the hero label, tap to dismiss): couriers, golden pigeon (once), Rush Hour and Lucky Delivery (every spawn). Rush starts with a stamp + "Tap customers!" header.
@@ -54,7 +61,7 @@ One coach at a time (queue), each shown once and stored with `act('hint')`. Orde
 ## Rules the UI keeps
 - **Fresh start**: cash, the scene and a ghost 🍋 card only. Every other control appears through play with one coach hint each.
 - **Cards**: ≤5 controls (ⓘ, 📌, ⬆ + the 2 most useful of next staff / next boost / 🕴), maxed glyphs hidden. Global ×1/×10/MAX lives once, on the hero.
-- **Compact calm lines** (default on from 6 lines), **fold**, **no alert/confirm/blocking nudges**, **desktop ≥900 px** docked layout, **reduced motion** — unchanged.
+- **Compact calm lines** are OFF by default (Settings toggle kept, opt-in). **No alert/confirm/blocking nudges**, **desktop ≥900 px** docked layout, **reduced motion** — unchanged.
 
 ## Tests
 - `node tools/test-layout.mjs [--shots]`: PASS on all six viewports.

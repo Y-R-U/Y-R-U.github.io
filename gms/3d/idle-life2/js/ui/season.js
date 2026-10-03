@@ -1,6 +1,6 @@
-import { el, btn, bar, setText, show } from './dom.js?v=20261004a';
-import { fmtNum, fmtTime, fmtRate } from '../state/format.js?v=20261004a';
-import { section } from './kit.js?v=20261004a';
+import { el, btn, bar, setText, show } from './dom.js?v=20261004b';
+import { fmtNum, fmtTime, fmtRate } from '../state/format.js?v=20261004b';
+import { section } from './kit.js?v=20261004b';
 
 const CRATE = { basic: '📦', silver: '🎁', gold: '🏆' };
 

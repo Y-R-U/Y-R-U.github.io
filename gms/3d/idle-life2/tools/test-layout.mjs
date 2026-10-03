@@ -84,6 +84,16 @@ try {
         await sleep(700);
         const r2 = await page.eval(MEASURE);
         verify(`${name}/scrolled`, r2, { fresh: false, folded: true });
+        if (vp.width < 900) {
+          await page.eval('scrollTo(0, 2400)');
+          await sleep(700);
+          const v = await page.eval(`(() => { const top = document.querySelector('.hud').getBoundingClientRect().bottom, tb = document.querySelector('.tabbar'), bot = tb && !tb.hidden ? tb.getBoundingClientRect().top : innerHeight;
+            const full = [...document.querySelectorAll('.hero, .line-card:not([hidden])')].filter((c) => { const r = c.getBoundingClientRect(); return r.top >= top - 1 && r.bottom <= bot + 1; }).length;
+            return { full, vis: __il2.host.debug.visibleViews, up: !document.querySelector('.jump').hidden }; })()`);
+          check(v.full < 2, `${name} <2 views fully on screen mid-list (${v.full})`);
+          check(!v.vis.includes('hero'), `${name} hero stops rendering when scrolled away (${v.vis.join(',')})`);
+          check(v.up, `${name} jump buttons shown when the hero is away`);
+        }
         if (SHOTS) await page.shot(OUT + `layout-${name}-scrolled.png`);
         await page.eval('scrollTo(0, 0)');
         await sleep(300);

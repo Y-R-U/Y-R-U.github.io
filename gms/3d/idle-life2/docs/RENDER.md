@@ -38,6 +38,7 @@ The overlay is an escape hatch for an iOS case where `drawImage(webgl)` proves t
 | DPR cap (desktop / phone) | 1 / 1 | 1.5 / 1.25 | 2 / 1.5 |
 | Card DPR cap (phone) | 1 | 1.5 | 2 |
 | Card AA (phone) | none | sharpen 0.45 | 4× MSAA target + sharpen 0.45 |
+| Card pixel budget (phone) | — | 0.35 Mpx | 0.5 Mpx |
 | Context MSAA | per device: desktop on, phone off (never changed by the governor) | | |
 | Hero post target MSAA | 0 | 0 | 4× |
 | Hero fps / cards (focused, other) / K | 30 / 15, 8 / 1 | 30 / 20, 10 / 2 | 60 / 30, 15 / 3 |
@@ -57,6 +58,46 @@ The overlay is an escape hatch for an iOS case where `drawImage(webgl)` proves t
 - `setTier('auto'|'battery'|'low'|'mid'|'high')`.
 - **Card sharpness (phones):** cards are small and render at ≤ 30 fps, so they get their own DPR (`cardDprCap`, × the ladder's `dprMul`) and, on high, a 4× MSAA half-float target that `post.js` resolves with a light unsharp mask plus tone mapping (no blur chain). Before, a 1.5-DPR card with no AA was stretched ~2× on a 2.6–3 DPR screen (staircased edges). Shots: `docs/shots/sharp-before-card.png`, `sharp-after-card.png`, zoomed `sharp-compare-zoom.png`. The blit presenter sizes the offscreen buffer per view (`v.d`). The hero composite gets the same sharpen (0.3). `?cardsharp=0` turns the card path off for A/B. `host.debug.cardDpr` reports it.
   - Cost (interleaved A/B, S22 profile, CPU 4×, 3 runs each): card render 2.68 → 2.36 ms CPU, present 0.16 → 0.21 ms. That is noise-level, because the extra cost is GPU fill, which headless Metal doesn't show. **Still unmeasured on a real Adreno 730.** If the governor steps down, the card DPR drops with it (2 → 1.6).
+
+- **Card pixel budget (phones, `MOBILE_CARD_PX`):** a card gets at most 0.5 Mpx on high (0.35 on mid, × the ladder's
+  `dprMul²`), never below the hero DPR. The tall portrait cards (~388×521 CSS) therefore render at DPR 1.55 instead of 2
+  (0.48 vs 0.81 Mpx, still 4× MSAA + sharpen), about 40% less GPU fill per card; small cards still reach the cap.
+  `?cardpx=0` turns it off for A/B. Zoomed A/B (left DPR 2, right 1.55): `docs/shots/cardpx-compare-zoom.png`.
+
+## CPU per frame (perf pass, 2026-10-04)
+After art rounds 3–4 the phone profile (S22, CPU 4×) went to rAF work p95 ~18–21 ms. The causes, in order of cost:
+1. **Program thrash.** One `uber` material was shared by plain, instanced, instance-coloured and non-shadow-receiving
+   meshes. three rebuilds the program parameters and key whenever consecutive objects differ in those flags, which came to
+   about 20 `getProgram` calls per frame (`setProgram` was 15% of all CPU). The shadow pass had the same problem with its
+   single shared depth material. Fix: `materials.splitUber(root)` gives each mesh flavour its own identical copy of the uber
+   material (`materials.uberAll`, which `setLight` keeps in sync; test for an uber with `material.userData.uber`, never
+   `=== materials.uber`) and a per-flavour `customDepthMaterial`. World sweeps the scene on its first update and then every
+   4 s; `plotbase.setTier` sweeps its new mesh straight away. The result is zero per-frame program lookups.
+2. **Late shader compiles.** `warm()` compiled with the wrong tone mapping (direct rather than through the post target), and
+   it ran before the flavour split, so a card or flavour seen for the first time mid-scroll linked a program then (22–56 ms
+   at 4×, and far worse on Adreno). It now calls `world.warmup()`, which splits flavours, shows every plot and fits the sun
+   over the whole town. It compiles for the paths the tier really uses (the post RT and/or direct), and runs one tiny
+   top-down render with a shadow pass to cover the depth programs. Programs at boot fell from 36 to 25, with none compiled
+   during the scroll.
+3. **Lazy plot builds.** A plot's first `update()` (`setTier` → `mergeGeometries`) used to happen when it first scrolled
+   into view. World now primes every plot on its first update.
+4. **Off-screen work.** Frame hooks get `visibleLines.hero` (the hero is visible or within the near margin). When it's
+   false, world skips the plots near the hero's look-at, so an off-screen hero costs nothing. The hero now pre-paints when
+   it is near and dirty, like the cards do. Hollow's Eve variant updates and bats only run while the season is drawn (or in
+   the last 1 s). Lamp selection (`ambient.nearest`, the season's lamp mix) is allocation-free.
+
+The numbers below are interleaved runs on a loaded machine (other agents running, load 3–8). Runs where the desktop
+profile was also ~2× its normal cost were contended and are excluded.
+
+| | rAF work p50 / p95 | host work avg |
+|---|---|---|
+| before (HEAD) | 11.1 / 18.5–21 ms | 9.6 ms, governor stepped down |
+| after, old layout | 4.0 / 5.5–8.0 ms | 3.2–4.7 ms |
+| after, new layout (hero scrolls away, tall cards) | 2.3–3.1 / 4.1–6.1 ms | 1.6–2.5 ms |
+
+- Idle, as laid out: p95 3.8 ms. With the hero off and 2 cards: p95 3.1 ms, hooks 0.3 ms. With everything off: 0.2 ms.
+- Desktop: p95 2.2–2.6 ms.
+- `node tools/prof-scroll.mjs` prints the self and total CPU profile of the phone scroll.
 
 ## Lighting hooks (with L3a)
 - **Tone mapping and exposure:** the world's `configureRenderer` sets them on the renderer. Alternatively it can expose `world.renderConfig`, which the host applies every frame. The hero bloom composite does its own tone mapping plus sRGB, so cards (rendered direct) and the bloomed hero match.

@@ -1,4 +1,4 @@
-import { el, btn, setText } from './dom.js?v=20261004a';
+import { el, btn, setText } from './dom.js?v=20261004b';
 
 const CRATE = { gold: '🏆 Gold crate', silver: '🎁 Silver crate', basic: '📦 Gear crate' };
 
@@ -44,7 +44,7 @@ export function createMinigames(hero, ctx) {
     const W = geo.viewW, H = geo.heroH;
     for (const a of [host.anchor(ev), lineId && host.anchor(lineId)]) {
       const p = a && host.project('hero', a);
-      if (p && p.visible) return { x: Math.max(W * 0.18, Math.min(W * 0.82, p.x)), y: Math.max(H * 0.3, Math.min(H * 0.78, p.y + geo.offY)) };
+      if (p && p.visible) return { x: Math.max(W * 0.18, Math.min(W * 0.82, p.x)), y: Math.max(H * 0.3, Math.min(H * 0.78, p.y)) };
     }
     return { x: W / 2, y: H * 0.55 };
   }

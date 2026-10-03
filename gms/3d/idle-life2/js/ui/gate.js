@@ -1,6 +1,6 @@
-import { el, btn, setText, show } from './dom.js?v=20261004a';
-import { fmtCash, fmtNum } from '../state/format.js?v=20261004a';
-import { rewardText } from './goals.js?v=20261004a';
+import { el, btn, setText, show } from './dom.js?v=20261004b';
+import { fmtCash, fmtNum } from '../state/format.js?v=20261004b';
+import { rewardText } from './goals.js?v=20261004b';
 
 // The next district's permit, bought right here; when contracts block it, the missing ones are listed inline.
 export function createGate(ctx) {

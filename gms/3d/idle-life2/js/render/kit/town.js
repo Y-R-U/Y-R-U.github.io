@@ -1,9 +1,9 @@
 // The static town around the plots: streets, pavements, backdrop districts, river + bridge, quays, the far coast.
 // Output is a handful of merged chunks (one draw each) split by x so the frustum and shadow passes cull them.
-import * as S from './shape.js?v=20261004a';
-import * as props from './props.js?v=20261004a';
-import { WATER_Y } from './terrain.js?v=20261004a';
-import { contactMesh } from './build.js?v=20261004a';
+import * as S from './shape.js?v=20261004b';
+import * as props from './props.js?v=20261004b';
+import { WATER_Y } from './terrain.js?v=20261004b';
+import { contactMesh } from './build.js?v=20261004b';
 
 export function buildTown(kit, data, field, pal, districtPal) {
   const { STREET: ST, DISTRICT_SPAN: SPAN, RIVER_X } = data;

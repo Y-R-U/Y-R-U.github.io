@@ -1,27 +1,27 @@
-import { el, btn, show, setText } from './dom.js?v=20261004a';
-import { createHud } from './hud.js?v=20261004a';
-import { createLineCard } from './linecard.js?v=20261004a';
-import { createSheets } from './sheets.js?v=20261004a';
-import { createToasts } from './toast.js?v=20261004a';
-import { createJuice } from './juice.js?v=20261004a';
-import { createAudio, haptic } from './audio.js?v=20261004a';
-import { createModel } from './model.js?v=20261004a';
-import { createReveal, createCoach } from './reveal.js?v=20261004a';
-import { createEvents } from './events.js?v=20261004a';
-import { createMinigames } from './minigames.js?v=20261004a';
-import { createTown } from './town.js?v=20261004a';
-import { createOffline } from './offline.js?v=20261004a';
-import { createPostcard } from './postcard.js?v=20261004a';
-import { createTabs } from './tabs.js?v=20261004a';
-import { fillLineInfo } from './lineinfo.js?v=20261004a';
-import { fillManager } from './manager.js?v=20261004a';
-import { fillCrew } from './crew.js?v=20261004a';
-import { fillLife, kin } from './life.js?v=20261004a';
-import { fillGoals } from './goals.js?v=20261004a';
-import { fillSettings } from './settings.js?v=20261004a';
-import { fillSeason, createSeasonCards } from './season.js?v=20261004a';
-import { createGate } from './gate.js?v=20261004a';
-import { fmtCash, fmtNum } from '../state/format.js?v=20261004a';
+import { el, btn, show, setText } from './dom.js?v=20261004b';
+import { createHud } from './hud.js?v=20261004b';
+import { createLineCard } from './linecard.js?v=20261004b';
+import { createSheets } from './sheets.js?v=20261004b';
+import { createToasts } from './toast.js?v=20261004b';
+import { createJuice } from './juice.js?v=20261004b';
+import { createAudio, haptic } from './audio.js?v=20261004b';
+import { createModel } from './model.js?v=20261004b';
+import { createReveal, createCoach } from './reveal.js?v=20261004b';
+import { createEvents } from './events.js?v=20261004b';
+import { createMinigames } from './minigames.js?v=20261004b';
+import { createTown } from './town.js?v=20261004b';
+import { createOffline } from './offline.js?v=20261004b';
+import { createPostcard } from './postcard.js?v=20261004b';
+import { createTabs } from './tabs.js?v=20261004b';
+import { fillLineInfo } from './lineinfo.js?v=20261004b';
+import { fillManager } from './manager.js?v=20261004b';
+import { fillCrew } from './crew.js?v=20261004b';
+import { fillLife, kin } from './life.js?v=20261004b';
+import { fillGoals } from './goals.js?v=20261004b';
+import { fillSettings } from './settings.js?v=20261004b';
+import { fillSeason, createSeasonCards } from './season.js?v=20261004b';
+import { createGate } from './gate.js?v=20261004b';
+import { fmtCash, fmtNum } from '../state/format.js?v=20261004b';
 
 const BEAT = { move: '🏠 New home', partner: '💑 Together', dog: '🐕 New friend', birth: '👶 Welcome!', retire: '🌅 Passed on' };
 
@@ -32,17 +32,13 @@ export function createUI({ game, host, bus }) {
   const visibleCards = new Set();
   const doc = document.documentElement;
   let root, sheets, toasts, juice, hud, coach, reveal, events, minis, town, offline, postcard, tabs, seasonCards;
-  let heroWrap, heroView, heroSpacer, qtyBar, qtyBtns, list, gate, pinChip, focusChip, tipChip, binAnchor, canChip, camBtn, gfxChip;
-  let lastFrame = 0, combo = 0, lastTapAt = 0, desktop = false;
+  let heroWrap, heroView, jump, jumpUp, jumpDown, jumpQty, evFloat, qtyBar, qtyBtns, list, gate, pinChip, focusChip, tipChip, binAnchor, canChip, camBtn, gfxChip;
+  let lastFrame = 0, combo = 0, lastTapAt = 0, desktop = false, heroOn = true, docH = 0;
   let qty = model.setting('qty', 1);
   const audio = createAudio({ enabled: model.setting('sound', true) !== false });
   const R = {};
-  // Layout cache: filled by ResizeObservers and the fold, never read from the DOM in rAF.
-  const geo = {
-    viewW: 0, viewH: 0, spacerH: 0, fold: -1,
-    get heroH() { return desktop ? this.viewH : this.viewH - Math.max(0, this.fold); },
-    get offY() { return desktop ? 0 : -Math.max(0, this.fold) / 2; },
-  };
+  // Layout cache: filled by ResizeObservers, never read from the DOM in rAF.
+  const geo = { viewW: 0, viewH: 0, get heroH() { return this.viewH; } };
 
   const rig = () => host.world.heroRig;
   const lineById = model.lineById;
@@ -117,8 +113,7 @@ export function createUI({ game, host, bus }) {
     requestAnimationFrame(() => {
       if (onlyIfHidden) {
         const r = c.card.getBoundingClientRect();
-        const top = desktop ? 0 : geo.heroH + 54;
-        if (r.top >= top && r.bottom <= innerHeight - 70) return;
+        if (r.top >= 54 && r.bottom <= innerHeight - 70) return;
       }
       c.card.scrollIntoView({ behavior: doc.classList.contains('calm') ? 'auto' : 'smooth', block: 'center' });
     });
@@ -270,7 +265,7 @@ export function createUI({ game, host, bus }) {
     const pr = host.project('hero', binPos);
     show(binAnchor, pr.visible);
     if (!pr.visible) return;
-    const xy = `${pr.x | 0}px ${(pr.y + geo.offY) | 0}px`;
+    const xy = `${pr.x | 0}px ${pr.y | 0}px`;
     if (xy !== binXY) { binXY = xy; binAnchor.style.translate = xy; }
   }
 
@@ -315,11 +310,9 @@ export function createUI({ game, host, bus }) {
   }
 
   function cardCtx() {
-    const owned = model.ownedCount();
-    const compactPref = model.setting('compact', null);
     const ev = model.events();
     const evLines = ev.length ? new Set(ev.map((e) => e.lineId).filter(Boolean)) : null;
-    return { nextGhost: nextGhostId(), pinned: rig().pinned, compactOn: compactPref == null ? owned >= 6 : !!compactPref, evLines, started: model.started() };
+    return { nextGhost: nextGhostId(), pinned: rig().pinned, compactOn: model.setting('compact', false) === true, evLines, started: model.started() };
   }
 
   function syncFps(c) {
@@ -390,6 +383,7 @@ export function createUI({ game, host, bus }) {
     if (pinned) setText(pinChip, '📌 ' + lineById[pinned].emoji + ' ✕');
     show(qtyBar, R.qty);
     show(camBtn, R.postcard);
+    syncJump();
   }
 
   function hints() {
@@ -470,24 +464,32 @@ export function createUI({ game, host, bus }) {
     hints();
   }
 
-  function onScroll() {
-    if (desktop || town?.active) { setFold(0); return; }
-    const full = geo.spacerH;
-    const min = Math.min(full, Math.max(150, innerHeight * 0.2));
-    setFold(Math.max(0, Math.min(full - min, scrollY)), (full - min) * 0.7);
+  const smooth = () => (doc.classList.contains('calm') ? 'auto' : 'smooth');
+  function toTop() { scrollTo({ top: 0, behavior: smooth() }); }
+  function toBottom() { scrollTo({ top: doc.scrollHeight, behavior: smooth() }); }
+  function heroInView() { if (!heroOn) scrollTo({ top: 0, behavior: 'auto' }); }
+
+  let jumpKey = '';
+  function syncJump() {
+    if (!jump) return;
+    const y = scrollY, vh = innerHeight;
+    const up = !desktop && !heroOn && !town?.active, down = !town?.active && docH - y - vh > vh * 0.6 && model.started();
+    const q = up && R.qty;
+    const key = +up + '' + +down + +q + qty;
+    if (key === jumpKey) return;
+    jumpKey = key;
+    show(jumpUp, up);
+    show(jumpDown, down);
+    show(jumpQty, q);
+    if (q) setText(jumpQty, qty === 'max' ? 'MAX' : '×' + qty);
+    show(jump, up || down);
   }
 
-  function setFold(f, foldAt = Infinity) {
-    if (f === geo.fold) return;
-    geo.fold = f;
-    heroWrap.style.setProperty('--fold', f + 'px');
-    root.classList.toggle('folded', f > foldAt);
-  }
+  function onScroll() { syncJump(); }
 
   function layoutMode() {
     desktop = innerWidth >= 900;
-    geo.fold = -1;
-    onScroll();
+    syncJump();
   }
 
   function showGfxChip(on) {
@@ -512,7 +514,7 @@ export function createUI({ game, host, bus }) {
   };
 
   function openTab(id) {
-    if (id === 'lines') { sheets.close(); town.close(); tabs.set('lines'); return; }
+    if (id === 'lines') { if (tabs.current === 'lines' && !town.active) toTop(); sheets.close(); town.close(); tabs.set('lines'); return; }
     if (id === 'town') { sheets.close(); town.open(); tabs.set('town'); coach.done('tab:town'); return; }
     town.close();
     const specs = {
@@ -678,8 +680,7 @@ export function createUI({ game, host, bus }) {
       qtyBtns = [1, 10, 'max'].map((v) => {
         const b = btn('qty-btn', v === 'max' ? 'MAX' : '×' + v, (e) => {
           e.stopPropagation();
-          const vals = [1, 10, 'max'];
-          setQty(root.classList.contains('folded') && String(v) === String(qty) ? vals[(vals.indexOf(v) + 1) % 3] : v);
+          setQty(v);
         });
         b.dataset.q = String(v);
         b.classList.toggle('on', String(v) === String(qty));
@@ -687,15 +688,21 @@ export function createUI({ game, host, bus }) {
       });
       qtyBar.append(...qtyBtns);
       heroWrap.append(heroView, tapzone, binAnchor, pinChip, focusChip, tipChip, camBtn, gfxChip, qtyBar);
-      heroSpacer = el('div', 'hero-spacer');
+      jump = el('div', 'jump');
+      jumpQty = btn('jump-btn qty-mini', '', () => { const vals = [1, 10, 'max']; setQty(vals[(vals.indexOf(qty) + 1) % 3]); }, 'Buy amount');
+      jumpUp = btn('jump-btn', '⤒', toTop, 'Jump to top');
+      jumpDown = btn('jump-btn', '⤓', toBottom, 'Jump to newest');
+      jump.append(jumpQty, jumpUp, jumpDown);
+      jump.hidden = jumpQty.hidden = jumpUp.hidden = jumpDown.hidden = true;
+      hud.root.querySelector('.hud-money').addEventListener('click', (e) => { if (!e.target.closest('button')) toTop(); });
 
       const side = el('div', 'side');
       list = el('main', 'lines');
       gate = createGate(ctx);
       seasonCards = createSeasonCards(list, ctx);
       side.append(list, gate.root, el('div', 'list-end'));
-      app.append(hud.root, heroSpacer, heroWrap, side);
-      root.appendChild(app);
+      app.append(hud.root, heroWrap, side);
+      root.append(app, jump);
 
       toasts = createToasts(root);
       juice = createJuice({ root, target: () => hud.cashEl, audio });
@@ -704,7 +711,7 @@ export function createUI({ game, host, bus }) {
       coach = createCoach({ reveal });
       tabs = createTabs(root, { onTab: openTab, model });
       town = createTown(heroWrap, ctx, { onClose: () => { root.classList.remove('town'); tabs.set('lines'); onScroll(); }, onOpen: () => { root.classList.add('town'); scrollTo({ top: 0 }); onScroll(); } });
-      events = createEvents(heroWrap, ctx, { onMini: (kind, ev) => minis.start(kind, ev) });
+      events = createEvents(heroWrap, ctx, { onMini: (kind, ev) => { heroInView(); minis.start(kind, ev); }, heroOn: () => heroOn || desktop, toHero: (id) => { toTop(); rig().cut(id); } });
       minis = createMinigames(heroWrap, ctx);
       offline = createOffline(root, ctx);
       postcard = createPostcard(heroWrap, ctx);
@@ -728,15 +735,15 @@ export function createUI({ game, host, bus }) {
       const ro = new ResizeObserver((es) => {
         for (const e of es) {
           if (e.target === heroView) { geo.viewW = e.contentRect.width; geo.viewH = e.contentRect.height; }
-          else geo.spacerH = e.contentRect.height;
+          else docH = e.contentRect.height;
         }
-        geo.fold = -1;
-        onScroll();
+        syncJump();
       });
       ro.observe(heroView);
-      ro.observe(heroSpacer);
+      ro.observe(app);
+      new IntersectionObserver(([e]) => { heroOn = e.isIntersecting; syncJump(); }, { rootMargin: '-80px 0px 0px 0px', threshold: 0.25 }).observe(heroWrap);
       const hr = heroView.getBoundingClientRect();
-      geo.viewW = hr.width; geo.viewH = hr.height; geo.spacerH = heroSpacer.offsetHeight;
+      geo.viewW = hr.width; geo.viewH = hr.height; docH = app.offsetHeight;
       rig().onChange(() => { if (focusLabel()) restartAnim(focusChip, 'pop'); });
       onGameEvents();
       addEventListener('scroll', onScroll, { passive: true });

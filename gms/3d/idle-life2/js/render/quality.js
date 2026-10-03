@@ -8,6 +8,9 @@ export const MOBILE_DPR = { low: 1, mid: 1.25, high: 1.5 };
 // Cards are small and run at ≤ 30 fps, so on phones they get more pixels than the hero, plus 4× MSAA and a sharpen
 // on high (through post.js's resolve pass): a 1.5 card on a DPR 2.6–3 screen was upscaled ~2× with no AA.
 export const MOBILE_CARD_DPR = { low: 1, mid: 1.5, high: 2 };
+// …but a card never gets more than this many device pixels: the tall portrait cards (~388×521 CSS) land at ≈1.57 on
+// high instead of 2 (0.5 Mpx ×4 MSAA instead of 0.8), while small cards still reach the full cap.
+export const MOBILE_CARD_PX = { low: 0, mid: 0.35e6, high: 0.5e6 };
 
 // Governor ladder: DPR first, then fps, then tier. Context MSAA is fixed per device (desktop on, phone off; the phone
 // hero still gets 4× MSAA through the bloom target on high), so only shadows on/off (mid↔low) needs a renderer recreate.
@@ -61,7 +64,7 @@ export function qualityAt(level) {
   const cap = device.mobile ? MOBILE_DPR[step.tier] : base.dprCap;
   const ccap = device.mobile ? MOBILE_CARD_DPR[step.tier] : base.dprCap;
   const cardSamples = device.mobile && step.tier === 'high' ? 4 : 0;
-  return { ...base, ...step, name: step.tier, msaa: device.msaa, cardDprCap: Math.max(1, ccap * (step.dprMul || 1)), cardSamples, cardSharpen: device.mobile ? (step.tier === 'low' ? 0 : 0.45) : 0, heroSharpen: step.tier === 'low' ? 0 : 0.3, cardShadowSize: Math.min(base.cardShadowSize || 512, device.mobile ? 512 : 1024), postCards: step.tier === 'high' && !device.mobile, rtSamples: step.tier === 'high' ? 4 : 0, dprCap: Math.max(1, cap * (step.dprMul || 1)) };
+  return { ...base, ...step, name: step.tier, msaa: device.msaa, cardDprCap: Math.max(1, ccap * (step.dprMul || 1)), cardSamples, cardSharpen: device.mobile ? (step.tier === 'low' ? 0 : 0.45) : 0, heroSharpen: step.tier === 'low' ? 0 : 0.3, cardShadowSize: Math.min(base.cardShadowSize || 512, device.mobile ? 512 : 1024), cardPx: device.mobile ? MOBILE_CARD_PX[step.tier] * (step.dprMul || 1) ** 2 : 0, postCards: step.tier === 'high' && !device.mobile, rtSamples: step.tier === 'high' ? 4 : 0, dprCap: Math.max(1, cap * (step.dprMul || 1)) };
 }
 
 // Rolling 2 s window of rAF interval and our own frame work. A steady ~33 ms interval with light work is a

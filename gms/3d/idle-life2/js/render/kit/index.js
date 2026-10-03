@@ -1,13 +1,13 @@
-import { createMaterials } from './materials.js?v=20261004a';
-import { createBuilder } from './build.js?v=20261004a';
-import { createCrowd, crowdMaterial, CLIP, OUTFITS, PANTS } from './crowd.js?v=20261004a';
-import { createPile, stockUnit } from './piles.js?v=20261004a';
-import { GEO } from './geo.js?v=20261004a';
-import { basePlot, createPlot, FIT } from './plotbase.js?v=20261004a';
-import * as vehicles from './vehicles.js?v=20261004a';
-import * as props from './props.js?v=20261004a';
-import * as shape from './shape.js?v=20261004a';
-import { makeRng, noise2 } from './rng.js?v=20261004a';
+import { createMaterials } from './materials.js?v=20261004b';
+import { createBuilder } from './build.js?v=20261004b';
+import { createCrowd, crowdMaterial, CLIP, OUTFITS, PANTS } from './crowd.js?v=20261004b';
+import { createPile, stockUnit } from './piles.js?v=20261004b';
+import { GEO } from './geo.js?v=20261004b';
+import { basePlot, createPlot, FIT } from './plotbase.js?v=20261004b';
+import * as vehicles from './vehicles.js?v=20261004b';
+import * as props from './props.js?v=20261004b';
+import * as shape from './shape.js?v=20261004b';
+import { makeRng, noise2 } from './rng.js?v=20261004b';
 
 export function createKit() {
   const materials = createMaterials();
@@ -37,7 +37,7 @@ export function createKit() {
       }
     },
     setLight(l) {
-      materials.uber.envMapIntensity = l.envK ?? 0.15;
+      for (const m of materials.uberAll) m.envMapIntensity = l.envK ?? 0.15;
       if (materials.crowd) materials.crowd.envMapIntensity = (l.envK ?? 0.15) * 1.4;
       materials.uRim.value.set(l.sheen || l.sky.horizon).multiplyScalar(0.16);
       materials.uRimCrowd.value.set(l.sheen || l.sky.horizon).multiplyScalar(0.55 + 0.55 * (l.night || 0));

@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { createBlitPresenter } from './presenter-blit.js?v=20261004a';
-import { createOverlayPresenter } from './presenter-overlay.js?v=20261004a';
-import { TIERS, LADDER, LADDER_START, startTier, qualityAt, createGovernor, device } from './quality.js?v=20261004a';
-import { createPost, POST_DEFAULTS } from './post.js?v=20261004a';
+import { createBlitPresenter } from './presenter-blit.js?v=20261004b';
+import { createOverlayPresenter } from './presenter-overlay.js?v=20261004b';
+import { TIERS, LADDER, LADDER_START, startTier, qualityAt, createGovernor, device } from './quality.js?v=20261004b';
+import { createPost, POST_DEFAULTS } from './post.js?v=20261004b';
 
 const LIVE_CAP = 10, LOSS_WAIT = 1000, MAX_RECREATE = 3, FRAME_BUDGET = 5;
 const _v3 = new THREE.Vector3(), _ndc = new THREE.Vector2(), _ray = new THREE.Raycaster(), _c = new THREE.Vector3(),
@@ -35,7 +35,7 @@ export function createRenderHost({ lifecycle, flags, bus }) {
   resetPerf();
 
   const dpr = () => Math.min(flags.dpr || devicePixelRatio || 1, q.dprCap);
-  const sharpOff = new URLSearchParams(location.search).get('cardsharp') === '0';
+  const qs = new URLSearchParams(location.search), sharpOff = qs.get('cardsharp') === '0', cardPxOff = qs.get('cardpx') === '0';
   const cardDpr = () => sharpOff ? dpr() : Math.max(dpr(), Math.min(flags.dpr || devicePixelRatio || 1, q.cardDprCap || q.dprCap));
 
   function makeRenderer() {
@@ -150,10 +150,32 @@ export function createRenderHost({ lifecycle, flags, bus }) {
     } catch (e) { console.warn('[il2] env map failed', e); }
   }
 
+  // Compile every program (incl. shadow depth flavours) up front for the paths this tier uses, so a card or flavour
+  // seen for the first time mid-scroll never stalls on a shader link.
   function warm() {
     const cam = world?.heroRig?.camera;
     if (!cam) return;
-    try { renderer.compile(world.scene, cam); } catch {}
+    const cardsRT = !sharpOff && (q.postCards || q.cardSamples || q.cardSharpen);
+    const viaRT = !!q.post || cardsRT, direct = !q.post || !cardsRT;
+    const rt = viaRT ? new THREE.WebGLRenderTarget(8, 8, { type: THREE.HalfFloatType }) : null;
+    try {
+      const wc = world.warmup?.(true);
+      if (direct) renderer.compile(world.scene, cam);
+      if (rt) { renderer.setRenderTarget(rt); renderer.compile(world.scene, cam); }
+      if (wc && renderer.shadowMap.enabled) {
+        renderer.setViewport(0, 0, 8, 8);
+        renderer.setScissor(0, 0, 8, 8);
+        renderer.shadowMap.needsUpdate = true;
+        renderer.render(world.scene, wc);
+        renderer.shadowMap.needsUpdate = false;
+      }
+    } catch (e) { console.warn('[il2] warm failed', e); }
+    renderer.setRenderTarget(null);
+    rt?.dispose();
+    world.warmup?.(false);
+    const L = findShadowLight();
+    if (L?.shadow.map) { L.shadow.map.dispose(); L.shadow.map = null; }
+    clearShadowCache();
   }
 
   let lossAt = 0;
@@ -444,15 +466,16 @@ export function createRenderHost({ lifecycle, flags, bus }) {
       dbg.frames++;
       const d = dpr(), dc = presenter.direct ? d : cardDpr();
       dbg.dpr = d;
-      dbg.cardDpr = dc;
       focus = focusLine ?? world.heroRig?.pinned ?? world.heroRig?.current ?? null;
 
       vis.length = due.length = pre.length = todo.length = nearOrVis.length = 0;
       let heroDue = false;
+      let cardMax = 0;
       for (const v of views.values()) {
-        v.d = v.kind === 'hero' ? d : dc;
+        v.d = v.kind === 'hero' ? d : q.cardPx && !cardPxOff && !presenter.direct ? Math.max(d, Math.min(dc, Math.floor(Math.sqrt(q.cardPx / (v.w * v.h)) * 20) / 20)) : dc;
+        if (v.kind !== 'hero' && (v.visible || v.near) && v.d > cardMax) cardMax = v.d;
         if (v.visible || v.near) nearOrVis.push(v);
-        if (!v.visible) { if (v.near && v.dirty && v.kind !== 'hero') pre.push(v); continue; }
+        if (!v.visible) { if (v.near && v.dirty) { if (v.kind === 'hero') pre.unshift(v); else pre.push(v); } continue; }
         vis.push(v);
         if (v.kind === 'hero') {
           if (forceAll || v.dirty || now - v.last >= 1000 / q.heroFps - 2) { heroDue = true; todo.unshift(v); }
@@ -474,9 +497,12 @@ export function createRenderHost({ lifecycle, flags, bus }) {
         for (let i = 0; i < pre.length && n < K; i++, n++) todo.push(pre[i]);
       }
 
+      dbg.cardDpr = cardMax || dc;
       presenter.frameSize(nearOrVis, d, size);
       if (size.W !== srcW || size.H !== srcH) { srcW = size.W; srcH = size.H; renderer.setSize(srcW, srcH, false); }
       visibleLines.clear();
+      visibleLines.hero = false;
+      for (const v of nearOrVis) if (v.kind === 'hero') visibleLines.hero = true;
       for (const v of vis) if (v.lineId) visibleLines.add(v.lineId);
       for (const v of todo) if (v.lineId) visibleLines.add(v.lineId);
       const th = performance.now();

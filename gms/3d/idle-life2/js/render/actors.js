@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { fxRegistry } from './fx.js?v=20261004a';
-import { createEventArt } from './eventart.js?v=20261004a';
+import { fxRegistry } from './fx.js?v=20261004b';
+import { createEventArt } from './eventart.js?v=20261004b';
 
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(),
   _y = new THREE.Vector3(0, 1, 0), _c = new THREE.Color(), _w = new THREE.Vector3();

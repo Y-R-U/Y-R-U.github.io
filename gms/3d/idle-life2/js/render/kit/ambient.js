@@ -1,7 +1,7 @@
 // Town life that belongs to no plot: lamp halos at night, pecking pigeons, wheeling gulls, joggers, traffic.
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004a';
-import { createCrowd, CLIP } from './crowd.js?v=20261004a';
+import * as S from './shape.js?v=20261004b';
+import { createCrowd, CLIP } from './crowd.js?v=20261004b';
 
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3();
 
@@ -120,10 +120,18 @@ export function createAmbient(kit, scene, { lamps, life, street, span, palette }
     group,
     lamps: lampPos,
     nearest(x, z, n = 12, out = []) {
-      out.length = 0;
-      for (const l of lampPos) { const d = (l[0] - x) ** 2 + (l[2] - z) ** 2; if (d < 2500) out.push([l[0], l[1], l[2], 1, d]); }
-      out.sort((a, b) => a[4] - b[4]);
-      out.length = Math.min(out.length, n);
+      let k = 0;
+      for (const l of lampPos) {
+        const d = (l[0] - x) ** 2 + (l[2] - z) ** 2;
+        if (d >= 2500 || (k >= n && d >= out[n - 1][4])) continue;
+        let i = Math.min(k, n - 1);
+        const e = k < n ? (out[k] ||= [0, 0, 0, 1, 0]) : out[n - 1];
+        e[0] = l[0]; e[1] = l[1]; e[2] = l[2]; e[3] = 1; e[4] = d;
+        while (i > 0 && out[i - 1][4] > d) { out[i] = out[i - 1]; i--; }
+        out[i] = e;
+        if (k < n) k++;
+      }
+      out.length = k;
       return out;
     },
     addLamp(p) { lampPos.push(p); setLamps(); },

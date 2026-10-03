@@ -1,6 +1,6 @@
-import { el, btn } from './dom.js?v=20261004a';
-import { BUILD } from '../core/version.js?v=20261004a';
-import { section, toggle, seg } from './kit.js?v=20261004a';
+import { el, btn } from './dom.js?v=20261004b';
+import { BUILD } from '../core/version.js?v=20261004b';
+import { section, toggle, seg } from './kit.js?v=20261004b';
 
 const KEY = 'il2.save', BAK = 'il2.save.bak';
 let pending;
@@ -52,7 +52,7 @@ export function fillSettings(body, ctx) {
   }));
   ups.push(toggle(s1, {
     icon: '📏', label: 'Compact calm lines',
-    get: () => model.setting('compact', model.ownedCount() >= 6),
+    get: () => model.setting('compact', false) === true,
     set: (v) => set('compact', v),
   }));
   ups.push(toggle(s1, {

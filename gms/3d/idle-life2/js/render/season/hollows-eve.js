@@ -3,7 +3,7 @@
 // player is inside the season) get the moonlit palette, purple fog, jack-o'-lanterns, string lights, mist, bats and the
 // three variant overlays (Witch's Brew on lemonade, Pumpkin Pie Wagon on foodtruck, Haunted Haircuts on barber).
 import * as THREE from 'three';
-import { flock, lights } from '../plots/fishchips.js?v=20261004a';
+import { flock, lights } from '../plots/fishchips.js?v=20261004b';
 
 export const LIGHT = {
   sky: { top: '#1e1450', mid: '#46308e', horizon: '#8058b8' },
@@ -113,8 +113,8 @@ export function install(world, { kit, game = null, always = false } = {}) {
   }
 
   // ---- per-view switching
-  let on = false, saved = null, focus = null, insideHero = false;
-  const _look = new THREE.Vector3(), _f = new THREE.Vector3(), _u = new THREE.Vector3(), _r = new THREE.Vector3(), _lampList = [];
+  let on = false, saved = null, focus = null, insideHero = false, usedAt = -1e9;
+  const _look = new THREE.Vector3(), _f = new THREE.Vector3(), _u = new THREE.Vector3(), _r = new THREE.Vector3(), _lampList = [], _lampMix = [], _lampPool = [], byDist = (a, b) => a[4] - b[4];
   const lampPts = lanternPts.map((p) => [p[0], p[1], p[2], 0.6]).concat(glowPts.filter((_, i) => i % 3 === 0).map((p) => [p[0], 0.7, p[2], 0.42]));
   const crowdSave = new Map();
   const glow = world.ambient?.group?.children?.find((o) => o.isPoints) || null;
@@ -141,7 +141,7 @@ export function install(world, { kit, game = null, always = false } = {}) {
 
   function basePiles(show) {
     for (const v of Object.values(variants)) for (const o of v.plot.group.children) {
-      if (o.isInstancedMesh && o.material === kit.materials.uber && !o.place && o !== v.group) o.visible = show;
+      if (o.isInstancedMesh && o.material?.userData.uber && !o.place && o !== v.group) o.visible = show;
     }
   }
 
@@ -176,6 +176,7 @@ export function install(world, { kit, game = null, always = false } = {}) {
     if (want && !on) enter();
     else if (!want && on) leave();
     if (!want) return cam;
+    usedAt = performance.now();
     if (rig.palette !== LIGHT) { saved.light = rig.palette; rig.apply(LIGHT); }
     kit.setNight(1.3);
     kit.setLight?.(LIGHT);
@@ -186,9 +187,18 @@ export function install(world, { kit, game = null, always = false } = {}) {
     {
       const t0 = _f.y < -0.05 ? -cam.position.y / _f.y : 40;
       const cx = cam.position.x + _f.x * Math.min(t0, 300), cz = cam.position.z + _f.z * Math.min(t0, 300);
-      const list = world.ambient?.nearest ? world.ambient.nearest(cx, cz, 8, _lampList).slice() : [];
-      for (const g of lampPts) { const d = (g[0] - cx) ** 2 + (g[2] - cz) ** 2; if (d < 900) list.push([g[0], g[1], g[2], g[3], d]); }
-      list.sort((a2, b2) => a2[4] - b2[4]);
+      const list = _lampMix;
+      list.length = 0;
+      if (world.ambient?.nearest) for (const e of world.ambient.nearest(cx, cz, 8, _lampList)) list.push(e);
+      let j = 0;
+      for (const g of lampPts) {
+        const d = (g[0] - cx) ** 2 + (g[2] - cz) ** 2;
+        if (d >= 900) continue;
+        const e = (_lampPool[j++] ||= [0, 0, 0, 0, 0]);
+        e[0] = g[0]; e[1] = g[1]; e[2] = g[2]; e[3] = g[3]; e[4] = d;
+        list.push(e);
+      }
+      list.sort(byDist);
       list.length = Math.min(8, list.length);
       kit.setLamps?.(list);
     }
@@ -216,6 +226,7 @@ export function install(world, { kit, game = null, always = false } = {}) {
     const st = (g || game)?.state;
     insideHero = !!st?.seasons?.['hollows-eve']?.inside;
     const t = performance.now() / 1000;
+    if (!always && !insideHero && t * 1000 - usedAt > 1000) return;
     for (const v of Object.values(variants)) v.update?.(dt, t, (g || game)?.seasonStats?.(v.id) || null);
     if (focus) {
       for (let i = 0; i < 9; i++) {

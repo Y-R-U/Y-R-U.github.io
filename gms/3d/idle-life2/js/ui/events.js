@@ -1,14 +1,18 @@
-import { el, btn } from './dom.js?v=20261004a';
-import { fmtCash } from '../state/format.js?v=20261004a';
+import { el, btn, show } from './dom.js?v=20261004b';
+import { fmtCash } from '../state/format.js?v=20261004b';
 
 const MINI = { rush: 'rush', lucky: 'lucky' };
 
 // Events are 3D actors (render/eventart.js, picked as {kind:'event'}); the UI adds an edge chip when the
-// actor is off the hero frame, and runs the claim / mini-game flow.
-export function createEvents(hero, ctx, { onMini }) {
+// actor is off the hero frame, a floating chip when the hero is scrolled away, and runs the claim / mini-game flow.
+export function createEvents(hero, ctx, { onMini, heroOn, toHero }) {
   const { game, host, model, geo } = ctx;
   const layer = el('div', 'ev-layer');
   hero.appendChild(layer);
+  let floatEv = null, floatKey = '', floatT = '';
+  const float = btn('ev-float', '', (ev) => { ev.stopPropagation(); if (floatEv) toHero(floatEv.lineId || 'home'); ctx.audio.sfx.whoosh(); }, 'Show event');
+  float.hidden = true;
+  (hero.closest('.il2') || document.body).appendChild(float);
   const live = new Map();
   let busy = null;
 
@@ -69,13 +73,25 @@ export function createEvents(hero, ctx, { onMini }) {
       const act = model.events();
       for (const id of live.keys()) if (busy !== id && !act.some((e) => e.id === id)) drop(id);
       for (const e of act) ensure(e);
+      const away = !heroOn() && !ctx.townActive();
+      let first = null, n = 0;
+      if (away) for (const m of live.values()) if (busy !== m.e.id) { n++; if (!first || m.e.expires < first.e.expires) first = m; }
+      floatEv = first?.e || null;
+      show(float, !!first);
+      if (first) {
+        const key = first.e.id + ':' + n;
+        if (key !== floatKey) { floatKey = key; float.replaceChildren(el('span', '', first.e.emoji), el('small', '', (n > 1 ? '+' + (n - 1) + ' ' : '') + '⤒')); }
+        const t = Math.max(0, (first.e.expires - game.simTime) / first.life).toFixed(2);
+        if (t !== floatT) { floatT = t; float.style.setProperty('--t', t); }
+      }
       if (!live.size) return;
       const H = geo.heroH, W = geo.viewW;
       for (const m of live.values()) {
+        if (away) { m.edge.hidden = true; continue; }
         if (busy === m.e.id || ctx.townActive()) { m.edge.hidden = true; continue; }
         const a = host.anchor(m.e);
         const p = a ? host.project('hero', a) : null;
-        const y = p ? p.y + geo.offY : 0;
+        const y = p ? p.y : 0;
         const onScreen = !p || (p.visible && y > 8 && y < H - 8);
         m.edge.hidden = onScreen;
         if (onScreen) continue;

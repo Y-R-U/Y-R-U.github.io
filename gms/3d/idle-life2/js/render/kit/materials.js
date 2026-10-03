@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { createSurfaces, SURF_HEAD, SURF_COLOR, SURF_NORMAL } from './surface.js?v=20261004a';
+import { createSurfaces, SURF_HEAD, SURF_COLOR, SURF_NORMAL } from './surface.js?v=20261004b';
 
 // One PBR material for every merged static mesh. Per-vertex `aPbr` = (roughness, metalness, glow, sway+1):
 // glow > 0 always emits (neon, bulbs), glow < 0 emits only at night (windows); w = 1 means rigid.
@@ -95,7 +95,28 @@ export function createMaterials() {
   const uBounce = { value: new THREE.Color(0, 0, 0) }, uLampCol = { value: new THREE.Color('#ff7418') }, uLampK = { value: 0 };
   const uLamps = { value: Array.from({ length: 8 }, () => new THREE.Vector4(0, -999, 0, 0)) };
   const shared = { ...createSurfaces(), uTime, uNight, uWind, uGlow, uRim, uRimCrowd, uBounce, uLamps, uLampCol, uLampK };
-  const uber = pbrPatch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.7, metalness: 0, envMapIntensity: 0.2 }), shared, 'il2-uber');
+  const makeUber = () => pbrPatch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.7, metalness: 0, envMapIntensity: 0.2 }), shared, 'il2-uber');
+  const uber = makeUber();
+  uber.userData.uber = true;
+  // three recompiles the program key whenever one material alternates between instanced / non-instanced / receiveShadow
+  // meshes (~20 getProgram calls per frame here), so each mesh flavour gets its own identical copy of the uber material.
+  const flavours = new Map([['rs', uber]]), uberAll = [uber];
+  const flavour = (o) => (o.receiveShadow ? 'rs' : '') + (o.isInstancedMesh ? 'i' : '') + (o.instanceColor ? 'c' : '') + (o.geometry?.attributes.color?.itemSize === 4 ? 'a' : '');
+  const depths = new Map();
+  function splitUber(root) {
+    root.traverse((o) => {
+      if (o.isMesh && o.material && !o.customDepthMaterial && !o.material.map && !o.material.alphaTest && !o.material.displacementMap) {
+        const k = (o.receiveShadow ? 'r' : '') + (o.isInstancedMesh ? 'i' : '') + (o.isSkinnedMesh ? 's' : '');
+        if (!depths.has(k)) depths.set(k, new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }));
+        o.customDepthMaterial = depths.get(k);
+      }
+      if (!o.material?.userData?.uber) return;
+      const k = flavour(o);
+      let m = flavours.get(k);
+      if (!m) { m = makeUber(); m.userData.uber = true; m.envMapIntensity = uber.envMapIntensity; flavours.set(k, m); uberAll.push(m); }
+      if (o.material !== m) o.material = m;
+    });
+  }
   const water = pbrPatch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.18, metalness: 0, envMapIntensity: 0.4, transparent: true, opacity: 0.92 }), shared, 'il2-water');
   const blobTex = radialTexture();
   const basicBlob = new THREE.MeshBasicMaterial({ color: 0x34243f, map: blobTex, transparent: true, opacity: 0.58, depthWrite: false, toneMapped: false, fog: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
@@ -104,7 +125,7 @@ export function createMaterials() {
   const glowSprite = new THREE.MeshBasicMaterial({ map: blobTex, color: 0xffd28a, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, toneMapped: false });
   const basicSky = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false });
   return {
-    uber, water, basicBlob, contact, contactInst: new THREE.MeshBasicMaterial({ color: 0x3b2c4a, map: boxTex, transparent: true, opacity: 0.5, depthWrite: false, toneMapped: false, fog: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }), glowSprite, basicSky, uTime, uNight, uWind, uGlow, uRim, uRimCrowd, uBounce, uLamps, uLampCol, uLampK, shared,
+    uber, uberAll, splitUber, water, basicBlob, contact, contactInst: new THREE.MeshBasicMaterial({ color: 0x3b2c4a, map: boxTex, transparent: true, opacity: 0.5, depthWrite: false, toneMapped: false, fog: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }), glowSprite, basicSky, uTime, uNight, uWind, uGlow, uRim, uRimCrowd, uBounce, uLamps, uLampCol, uLampK, shared,
     lambertVC: uber, lambertVCInst: uber,
     crowd: null,
   };

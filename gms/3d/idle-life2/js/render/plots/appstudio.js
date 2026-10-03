@@ -1,8 +1,8 @@
 // 💻 App Studio: a garage startup with its doors rolled up. Devs type at glowing screens, the server rack blinks,
 // and finished apps float out as bright icon cubes into a little cloud. L1 garage → L25 glass office → L100 campus + slide.
 import * as THREE from 'three';
-import { extras, lights } from './fishchips.js?v=20261004a';
-import { nightSign, blade } from './boutique.js?v=20261004a';
+import { extras, lights } from './fishchips.js?v=20261004b';
+import { nightSign, blade } from './boutique.js?v=20261004b';
 
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({

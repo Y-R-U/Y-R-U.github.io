@@ -1,6 +1,6 @@
-import { el, btn, bar } from './dom.js?v=20261004a';
-import { fmtNum } from '../state/format.js?v=20261004a';
-import { section, empty } from './kit.js?v=20261004a';
+import { el, btn, bar } from './dom.js?v=20261004b';
+import { fmtNum } from '../state/format.js?v=20261004b';
+import { section, empty } from './kit.js?v=20261004b';
 
 const CRATE = { basic: '📦', silver: '🎁', gold: '🏆' };
 export function rewardText(r) {

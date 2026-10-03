@@ -1,7 +1,7 @@
-import { el, btn, setText } from './dom.js?v=20261004a';
-import { fmtCash, fmtNum, fmtMult } from '../state/format.js?v=20261004a';
-import { section, buyRow, empty } from './kit.js?v=20261004a';
-import { face, lookFor } from './face.js?v=20261004a';
+import { el, btn, setText } from './dom.js?v=20261004b';
+import { fmtCash, fmtNum, fmtMult } from '../state/format.js?v=20261004b';
+import { section, buyRow, empty } from './kit.js?v=20261004b';
+import { face, lookFor } from './face.js?v=20261004b';
 
 const KID_TOPS = ['#f2b84b', '#9bc66b', '#e58fb0'];
 const KID_AGE = { baby: 'baby', toddler: 'kid', kid: 'kid', teen: 'adult' };

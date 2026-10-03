@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004a';
-import { WORLD_LIGHT_HEAD, WORLD_LIGHT_FRAG, WORLD_POS_VERT } from './materials.js?v=20261004a';
+import * as S from './shape.js?v=20261004b';
+import { WORLD_LIGHT_HEAD, WORLD_LIGHT_FRAG, WORLD_POS_VERT } from './materials.js?v=20261004b';
 
 // Chibi townsfolk: one merged rig, one InstancedMesh per crowd, limbs animated in the vertex shader.
 // aPart = (limb, colourSlot, style). limb: 0 body 1/2 legs 3/4 arms 5 head 6 carried item 7 apron.

@@ -1,5 +1,5 @@
-import { el, btn, setText } from './dom.js?v=20261004a';
-import { fmtCash } from '../state/format.js?v=20261004a';
+import { el, btn, setText } from './dom.js?v=20261004b';
+import { fmtCash } from '../state/format.js?v=20261004b';
 
 // Town tab = the 3D world: the hero rig pulls back to an establishing shot (heroRig.town), district pins
 // are projected over it, and a tap on the world flies there (handled by app.onHeroTap).
@@ -114,7 +114,7 @@ export function createTown(hero, ctx, { onOpen, onClose }) {
         const pr = c && host.project('hero', c);
         const off = !pr || !pr.visible;
         p.classList.toggle('off', off);
-        if (!off) p.style.translate = `${pr.x | 0}px ${(pr.y + geo.offY) | 0}px`;
+        if (!off) p.style.translate = `${pr.x | 0}px ${pr.y | 0}px`;
       }
     },
     refresh,
