@@ -1,5 +1,5 @@
-import { el, btn, setText, show } from './dom.js?v=20261004b';
-import { fmtCash, fmtRate } from '../state/format.js?v=20261004b';
+import { el, btn, setText, show } from './dom.js?v=20261004c';
+import { fmtCash, fmtRate } from '../state/format.js?v=20261004c';
 
 const HOLD_DELAY = 380, HOLD_START = 170, HOLD_MIN = 45;
 

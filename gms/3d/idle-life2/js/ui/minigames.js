@@ -1,4 +1,4 @@
-import { el, btn, setText } from './dom.js?v=20261004b';
+import { el, btn, setText } from './dom.js?v=20261004c';
 
 const CRATE = { gold: '🏆 Gold crate', silver: '🎁 Silver crate', basic: '📦 Gear crate' };
 

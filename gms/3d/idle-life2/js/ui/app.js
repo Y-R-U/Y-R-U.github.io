@@ -1,27 +1,28 @@
-import { el, btn, show, setText } from './dom.js?v=20261004b';
-import { createHud } from './hud.js?v=20261004b';
-import { createLineCard } from './linecard.js?v=20261004b';
-import { createSheets } from './sheets.js?v=20261004b';
-import { createToasts } from './toast.js?v=20261004b';
-import { createJuice } from './juice.js?v=20261004b';
-import { createAudio, haptic } from './audio.js?v=20261004b';
-import { createModel } from './model.js?v=20261004b';
-import { createReveal, createCoach } from './reveal.js?v=20261004b';
-import { createEvents } from './events.js?v=20261004b';
-import { createMinigames } from './minigames.js?v=20261004b';
-import { createTown } from './town.js?v=20261004b';
-import { createOffline } from './offline.js?v=20261004b';
-import { createPostcard } from './postcard.js?v=20261004b';
-import { createTabs } from './tabs.js?v=20261004b';
-import { fillLineInfo } from './lineinfo.js?v=20261004b';
-import { fillManager } from './manager.js?v=20261004b';
-import { fillCrew } from './crew.js?v=20261004b';
-import { fillLife, kin } from './life.js?v=20261004b';
-import { fillGoals } from './goals.js?v=20261004b';
-import { fillSettings } from './settings.js?v=20261004b';
-import { fillSeason, createSeasonCards } from './season.js?v=20261004b';
-import { createGate } from './gate.js?v=20261004b';
-import { fmtCash, fmtNum } from '../state/format.js?v=20261004b';
+import { el, btn, show, setText } from './dom.js?v=20261004c';
+import { createHud } from './hud.js?v=20261004c';
+import { createLineCard } from './linecard.js?v=20261004c';
+import { createSheets } from './sheets.js?v=20261004c';
+import { createToasts } from './toast.js?v=20261004c';
+import { createJuice } from './juice.js?v=20261004c';
+import { createAudio, haptic } from './audio.js?v=20261004c';
+import { createModel } from './model.js?v=20261004c';
+import { createReveal, createCoach } from './reveal.js?v=20261004c';
+import { createEvents } from './events.js?v=20261004c';
+import { createMinigames } from './minigames.js?v=20261004c';
+import { createTown } from './town.js?v=20261004c';
+import { createOffline } from './offline.js?v=20261004c';
+import { createPostcard } from './postcard.js?v=20261004c';
+import { createTabs } from './tabs.js?v=20261004c';
+import { fillLineInfo } from './lineinfo.js?v=20261004c';
+import { fillManager } from './manager.js?v=20261004c';
+import { fillCrew } from './crew.js?v=20261004c';
+import { fillLife, kin } from './life.js?v=20261004c';
+import { fillGoals } from './goals.js?v=20261004c';
+import { fillSettings } from './settings.js?v=20261004c';
+import { fillSeason, createSeasonCards } from './season.js?v=20261004c';
+import { createGate } from './gate.js?v=20261004c';
+import { createLook } from './look.js?v=20261004c';
+import { fmtCash, fmtNum } from '../state/format.js?v=20261004c';
 
 const BEAT = { move: '🏠 New home', partner: '💑 Together', dog: '🐕 New friend', birth: '👶 Welcome!', retire: '🌅 Passed on' };
 
@@ -31,7 +32,7 @@ export function createUI({ game, host, bus }) {
   const cards = new Map();
   const visibleCards = new Set();
   const doc = document.documentElement;
-  let root, sheets, toasts, juice, hud, coach, reveal, events, minis, town, offline, postcard, tabs, seasonCards;
+  let root, look, sheets, toasts, juice, hud, coach, reveal, events, minis, town, offline, postcard, tabs, seasonCards;
   let heroWrap, heroView, jump, jumpUp, jumpDown, jumpQty, evFloat, qtyBar, qtyBtns, list, gate, pinChip, focusChip, tipChip, binAnchor, canChip, camBtn, gfxChip;
   let lastFrame = 0, combo = 0, lastTapAt = 0, desktop = false, heroOn = true, docH = 0;
   let qty = model.setting('qty', 1);
@@ -717,6 +718,9 @@ export function createUI({ game, host, bus }) {
       postcard = createPostcard(heroWrap, ctx);
 
       host.addView('hero', heroView, { kind: 'hero', priority: 10 });
+      look = createLook({ host, buzz, blocked: () => town.active || !!minis.active });
+      look.attach(heroView, heroWrap, 'hero', () => rig().orbit);
+      for (const c of seasonCards?.cards || []) look.attach(c.view, c.card, 'season:' + c.l.id, () => host.world.cardRig(c.l.basePlot).orbit, { lineId: c.l.basePlot, allow: () => !c.card.hidden && !c.card.classList.contains('ghost') });
       const io = new IntersectionObserver((es) => {
         for (const e of es) {
           const c = e.target.__card;
@@ -730,6 +734,7 @@ export function createUI({ game, host, bus }) {
         cards.set(line.id, c);
         cardList.push(c);
         host.addView('line:' + line.id, c.view, { kind: 'line', lineId: line.id });
+        look.attach(c.view, c.card, 'line:' + line.id, () => host.world.cardRig(line.id).orbit, { lineId: line.id, allow: () => c.mode === 'full' });
         io.observe(c.card);
       }
       const ro = new ResizeObserver((es) => {
@@ -773,7 +778,7 @@ export function createUI({ game, host, bus }) {
     showOffline(report) { offline.show(report); },
     toast(text, opts) { toasts.toast(text, opts); },
     openTab,
-    get debug() { return { model, reveal, R, cards, minis, events, town, postcard, sheets, coach, cashIn, openManager, audio, geo, jobs }; },
+    get debug() { return { model, look, reveal, R, cards, minis, events, town, postcard, sheets, coach, cashIn, openManager, audio, geo, jobs }; },
   };
   return ui;
 }

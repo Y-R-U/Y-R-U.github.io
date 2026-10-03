@@ -1,8 +1,8 @@
 // 🍝 Bistro: a brick bistro with an open pass-through kitchen. The chef tosses a flaming pan, plates land on the pass,
 // a waiter carries them to candlelit tables under string lights. L1 bistro → L25 terrace → L100 rooftop dining.
 import * as THREE from 'three';
-import { extras, lights } from './fishchips.js?v=20261004b';
-import { nightSign, blade } from './boutique.js?v=20261004b';
+import { extras, lights } from './fishchips.js?v=20261004c';
+import { nightSign, blade } from './boutique.js?v=20261004c';
 
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({

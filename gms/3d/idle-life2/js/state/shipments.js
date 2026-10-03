@@ -1,4 +1,4 @@
-import { PLOTS, STREET } from '../data/plots.js?v=20261004b';
+import { PLOTS, STREET } from '../data/plots.js?v=20261004c';
 
 export const KIND_BY_LINE = {
   lemonade: 'walker', foodtruck: 'walker', barber: 'walker',

@@ -1,6 +1,6 @@
-import { el, btn, bar, setText, show } from './dom.js?v=20261004b';
-import { fmtNum, fmtTime, fmtRate } from '../state/format.js?v=20261004b';
-import { section } from './kit.js?v=20261004b';
+import { el, btn, bar, setText, show } from './dom.js?v=20261004c';
+import { fmtNum, fmtTime, fmtRate } from '../state/format.js?v=20261004c';
+import { section } from './kit.js?v=20261004c';
 
 const CRATE = { basic: '📦', silver: '🎁', gold: '🏆' };
 
@@ -166,6 +166,7 @@ export function createSeasonCards(list, ctx) {
   }
 
   return {
+    cards,
     get on() { return on; },
     update() {
       const s = model.season();

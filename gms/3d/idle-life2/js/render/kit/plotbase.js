@@ -1,10 +1,10 @@
 // The plot framework every business diorama is built on. See docs/ART.md for the contract.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { createBuilder, contactMesh } from './build.js?v=20261004b';
-import { createCrowd, CLIP, OUTFITS } from './crowd.js?v=20261004b';
-import { createPile } from './piles.js?v=20261004b';
-import * as props from './props.js?v=20261004b';
+import { createBuilder, contactMesh } from './build.js?v=20261004c';
+import { createCrowd, CLIP, OUTFITS } from './crowd.js?v=20261004c';
+import { createPile } from './piles.js?v=20261004c';
+import * as props from './props.js?v=20261004c';
 
 export const PLOT_W = 24, PLOT_D = 9;
 // world.prepare raises `card` while a card rig fits, so `bounds.w` can answer the card width (spec.cardW) there

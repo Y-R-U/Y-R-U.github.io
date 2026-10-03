@@ -1,7 +1,7 @@
 // ⛵ Boatyard: a hull is built on the berth (ribs → planks → paint), the tower crane lowers the mast, and the finished
 // yacht slides down the slipway and sails out. L1 shed → L25 steel gantry + floodlights → L100 superyacht hangar.
 import * as THREE from 'three';
-import { hullGeo, extras, flock, post, swag, ripple, linkVan, LINK_BAY, fq, seaPlane } from './fishchips.js?v=20261004b';
+import { hullGeo, extras, flock, post, swag, ripple, linkVan, LINK_BAY, fq, seaPlane } from './fishchips.js?v=20261004c';
 
 const QZ = -8.2, WY = -0.55;
 

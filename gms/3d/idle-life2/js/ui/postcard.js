@@ -1,4 +1,4 @@
-import { el, btn } from './dom.js?v=20261004b';
+import { el, btn } from './dom.js?v=20261004c';
 
 export function createPostcard(hero, ctx) {
   const { model, game } = ctx;

@@ -198,6 +198,14 @@ Events are diegetic 3D actors, filled per camera from `actors.fill` (hero: all, 
   - Card rigs fit the plot width to the card aspect and get the same clamp.
 - **Town mode** (`town(true)`, alias `establish(on)`): an establishing shot of every plot. It searches 6 azimuths × 4 elevations for the pose with the fewest out-of-bounds probes, then the closest. A tap uses `host.pick`; when no plot contains the ground point, `pick` falls back to `nearestPlot`. `flyTo(id)` leaves town mode.
 
+- **Hold-to-look orbit** (`createOrbit`, `heroRig.orbit` / `world.cardRig(id).orbit`): an offset (yaw, pitch, zoom) on top of the rig's pose,
+  orbiting its look-at point. Hero yaw ±75°, cards ±60°; elevation 15°–60° (widened to include the base pose); zoom 0.75–1.3×.
+  `engage / drag(dYaw, dPitch) / pinch(k) / release`. After release it holds 1.5 s, then eases home over 0.9 s (reduced motion: holds, then snaps).
+  Each applied pose is checked with the same 7 frame probes as `keepInWorld` plus camera y ≥ 2.2 m; if it fails, a binary search scales
+  the offset back toward the (clean) base pose, and while held the stored offset is clipped too, so the edge feels like a wall instead of
+  building up. Fog is untouched (per-view `prepare`). While `orbit.busy` the director's clock stops: no shot change, glide, drift,
+  override timeout or event cut (events queue and play after). The card rig re-poses every `fit()` while busy, once more when it ends.
+
 ## FX (`fx.js`)
 All effects are pooled and instanced, at most 3 draw calls.
 - **Coins:** 96 lit gold discs that arc, spin and bounce once.

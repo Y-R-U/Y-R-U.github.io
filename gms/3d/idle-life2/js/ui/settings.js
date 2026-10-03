@@ -1,6 +1,6 @@
-import { el, btn } from './dom.js?v=20261004b';
-import { BUILD } from '../core/version.js?v=20261004b';
-import { section, toggle, seg } from './kit.js?v=20261004b';
+import { el, btn } from './dom.js?v=20261004c';
+import { BUILD } from '../core/version.js?v=20261004c';
+import { section, toggle, seg } from './kit.js?v=20261004c';
 
 const KEY = 'il2.save', BAK = 'il2.save.bak';
 let pending;

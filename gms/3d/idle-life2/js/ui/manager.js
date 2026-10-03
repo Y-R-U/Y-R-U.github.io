@@ -1,6 +1,6 @@
-import { el, btn, setText } from './dom.js?v=20261004b';
-import { fmtCash } from '../state/format.js?v=20261004b';
-import { section, buyRow, empty } from './kit.js?v=20261004b';
+import { el, btn, setText } from './dom.js?v=20261004c';
+import { fmtCash } from '../state/format.js?v=20261004c';
+import { section, buyRow, empty } from './kit.js?v=20261004c';
 
 const STARS = 5;
 

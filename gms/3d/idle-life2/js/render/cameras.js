@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 const D2R = Math.PI / 180;
 const _v = new THREE.Vector3(), _d = new THREE.Vector3(), _a = new THREE.Vector3(), _b = new THREE.Vector3();
-const shared = { bounds: null };
+const shared = { bounds: null, still: () => false };
 
 export function boundsFromPlots(plots, margin = { x: 52, z: 55 }) {
   let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
@@ -97,6 +97,53 @@ function heroPoints(px, pz, ry, w, hb) {
 
 const dirFrom = (az, el, out = new THREE.Vector3()) => out.set(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
 
+// Hold-to-look offset on top of a rig's pose. Held: follows the finger; released: holds, then eases home.
+const _op = new THREE.Vector3(), _ol = new THREE.Vector3();
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+export function createOrbit({ yaw = 60, pitch = [15, 60], zoom = [0.75, 1.3], hold = 1.5, back = 0.9, minY = 2.2 } = {}) {
+  const Y = yaw * D2R, P0 = pitch[0] * D2R, P1 = pitch[1] * D2R;
+  let az = 0, el = 0, zm = 1, w = 0, wFrom = 0, active = false, relAt = 0;
+  const now = () => performance.now() / 1000;
+  const o = {
+    get active() { return active; },
+    get busy() { return active || w > 0; },
+    get offset() { return { yaw: az / D2R, pitch: el / D2R, zoom: zm, w }; },
+    engage() { if (!active && w <= 0) { az = el = 0; zm = 1; } active = true; w = 1; },
+    drag(dYaw, dPitch) { az = clamp(az + dYaw, -Y, Y); el += dPitch; },
+    pinch(k) { zm = clamp(zm * k, zoom[0], zoom[1]); },
+    release() { if (!active) return; active = false; relAt = now(); wFrom = w; },
+    reset() { active = false; w = 0; az = el = 0; zm = 1; },
+    // Mutates pos (camera position for the rig's base pose around look). Returns true when an offset was applied.
+    apply(camera, pos, look) {
+      if (!active && w > 0) {
+        const s = now() - relAt - (shared.still() ? 0 : hold);
+        if (shared.still()) w = s >= hold ? 0 : wFrom;
+        else w = s <= 0 ? wFrom : s >= back ? 0 : wFrom * (1 - ease(s / back));
+        if (w <= 0) { w = 0; az = el = 0; zm = 1; }
+      }
+      if (w <= 0) return false;
+      _op.copy(pos).sub(look);
+      const r = _op.length(), baseEl = Math.asin(clamp(_op.y / r, -1, 1)), baseAz = Math.atan2(_op.x, _op.z);
+      if (active) el = clamp(baseEl + el, Math.min(P0, baseEl), Math.max(P1, baseEl)) - baseEl;
+      const pose = (k) => {
+        dirFrom(baseAz + az * k, baseEl + el * k, _ol);
+        pos.copy(_ol).multiplyScalar(r / (1 + (zm - 1) * k)).add(look);
+        camera.position.copy(pos);
+        camera.lookAt(look);
+        return pos.y >= minY && (!shared.bounds || frameOk(camera, shared.bounds));
+      };
+      if (!pose(w)) {
+        let lo = 0, hi = w;
+        for (let i = 0; i < 8; i++) { const m = (lo + hi) / 2; if (pose(m)) lo = m; else hi = m; }
+        if (active && w > 0) { const f = lo / w; az *= f; el *= f; zm = 1 + (zm - 1) * f; }
+        pose(lo);
+      }
+      return true;
+    },
+  };
+  return o;
+}
+
 export function createCardRig(plot) {
   const c = plot.camera;
   const camera = new THREE.PerspectiveCamera(c.fov, 2.3, 0.5, 400);
@@ -105,12 +152,21 @@ export function createCardRig(plot) {
   const dir = posL.clone().sub(lookL);
   const baseDist = dir.length();
   dir.normalize();
-  const look = new THREE.Vector3(), pos = new THREE.Vector3();
-  let lastAspect = 0;
+  const look = new THREE.Vector3(), pos = new THREE.Vector3(), p = new THREE.Vector3();
+  const orbit = createOrbit({ yaw: 60 });
+  let lastAspect = 0, posed = false;
   return {
     camera,
+    orbit,
     fit(aspect) {
-      if (Math.abs(aspect - lastAspect) < 1e-3) return;
+      if (Math.abs(aspect - lastAspect) < 1e-3) {
+        if (!posed && !orbit.busy) return;
+        posed = orbit.apply(camera, p.copy(pos), look);
+        if (!posed) camera.position.copy(pos);
+        camera.lookAt(look);
+        camera.updateMatrixWorld();
+        return;
+      }
       lastAspect = aspect;
       camera.aspect = aspect;
       camera.updateProjectionMatrix();
@@ -122,7 +178,8 @@ export function createCardRig(plot) {
       _a.copy(dir).transformDirection(plot.group.matrixWorld);
       pos.copy(_a).multiplyScalar(d).add(look);
       keepInWorld(camera, pos, look);
-      camera.position.copy(pos);
+      posed = orbit.apply(camera, p.copy(pos), look);
+      camera.position.copy(posed ? p : pos);
       camera.lookAt(look);
       camera.updateMatrixWorld();
     },
@@ -147,6 +204,9 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
   const evQueue = [];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const still = () => reduce.matches || !!game?.state?.settings?.reducedMotion;
+  shared.still = still;
+  const orbit = createOrbit({ yaw: 75 });
+  const _p = new THREE.Vector3();
 
   function poseFor(id, out) {
     if (id === '@town') return townPose(out);
@@ -300,6 +360,7 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
 
   const dir = {
     camera,
+    orbit,
     get current() { return current; },
     get pinned() { return pinned; },
     get isTown() { return town; },
@@ -343,7 +404,8 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
       return best;
     },
     update(dt, tourIds) {
-      t += dt;
+      const looking = orbit.busy && snapped;
+      if (!looking) t += dt;
       if (!snapped) {
         if (!tourIds.includes(current) && tourIds.length) current = tourIds[0];
         poseFor(current, dest);
@@ -352,8 +414,9 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
         shotStart = t;
         lastShown[current] = t;
       }
-      handleEvents();
-      if (override) { if (t >= override.until) endOverride(); }
+      if (!looking) handleEvents();
+      if (looking) {}
+      else if (override) { if (t >= override.until) endOverride(); }
       else if (town) {}
       else if (pinned) { if (current !== pinned) go(pinned, { len: 1e9 }); }
       else if (tourIds.length && (t - shotStart >= shotLen || !tourIds.includes(current) && !(game && current === 'home'))) {
@@ -378,7 +441,7 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
         cur.pos.lerp(_a, k);
         cur.look.lerp(dest.look, k);
       }
-      camera.position.copy(cur.pos);
+      camera.position.copy(orbit.apply(camera, _p.copy(cur.pos), cur.look) ? _p : cur.pos);
       camera.lookAt(cur.look);
       camera.updateMatrixWorld();
     },

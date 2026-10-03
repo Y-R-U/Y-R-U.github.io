@@ -1,7 +1,7 @@
 // 👗 Boutique: a lilac shopfront with mannequins spinning on pedestals (outfits swap each turn) and shoppers leaving
 // with gold bags. L1 shopfront → L25 second storey + spotlights → L100 flagship catwalk. Neon after dark.
 import * as THREE from 'three';
-import { extras, lights } from './fishchips.js?v=20261004b';
+import { extras, lights } from './fishchips.js?v=20261004c';
 
 // Projecting blade sign with a neon border and icon (lit at night). icon: 'dress' | 'glass' | 'app'.
 export function blade(kit, B, x, y, z, ry, { board = '#2a2440', a = '#ff7ac0', b = '#ffd36a', icon = 'dress' } = {}) {

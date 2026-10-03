@@ -1,7 +1,7 @@
 // ⛴️ Ferry: ticket booth, turnstile and a chunky red ferry that boards at the quay, sails out across the bay and back.
 // The ferry is a plot part, so the hero view sees the same boat. L1 quay → L25 shelter + flags → L100 terminal + bigger ferry.
 import * as THREE from 'three';
-import { extras, flock, post, swag, lights, ripple, linkVan, LINK_BAY, fq, seaPlane } from './fishchips.js?v=20261004b';
+import { extras, flock, post, swag, lights, ripple, linkVan, LINK_BAY, fq, seaPlane } from './fishchips.js?v=20261004c';
 
 const QZ = -8.2, WY = -0.55;
 const DOCK = [-1.4, -12.6];

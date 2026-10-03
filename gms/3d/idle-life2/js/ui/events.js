@@ -1,5 +1,5 @@
-import { el, btn, show } from './dom.js?v=20261004b';
-import { fmtCash } from '../state/format.js?v=20261004b';
+import { el, btn, show } from './dom.js?v=20261004c';
+import { fmtCash } from '../state/format.js?v=20261004c';
 
 const MINI = { rush: 'rush', lucky: 'lucky' };
 

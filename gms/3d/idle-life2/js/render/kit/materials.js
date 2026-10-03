@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { createSurfaces, SURF_HEAD, SURF_COLOR, SURF_NORMAL } from './surface.js?v=20261004b';
+import { createSurfaces, SURF_HEAD, SURF_COLOR, SURF_NORMAL } from './surface.js?v=20261004c';
 
 // One PBR material for every merged static mesh. Per-vertex `aPbr` = (roughness, metalness, glow, sway+1):
 // glow > 0 always emits (neon, bulbs), glow < 0 emits only at night (windows); w = 1 means rigid.

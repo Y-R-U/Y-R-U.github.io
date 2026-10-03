@@ -3,7 +3,7 @@
 // player is inside the season) get the moonlit palette, purple fog, jack-o'-lanterns, string lights, mist, bats and the
 // three variant overlays (Witch's Brew on lemonade, Pumpkin Pie Wagon on foodtruck, Haunted Haircuts on barber).
 import * as THREE from 'three';
-import { flock, lights } from '../plots/fishchips.js?v=20261004b';
+import { flock, lights } from '../plots/fishchips.js?v=20261004c';
 
 export const LIGHT = {
   sky: { top: '#1e1450', mid: '#46308e', horizon: '#8058b8' },

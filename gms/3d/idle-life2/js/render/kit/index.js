@@ -1,13 +1,13 @@
-import { createMaterials } from './materials.js?v=20261004b';
-import { createBuilder } from './build.js?v=20261004b';
-import { createCrowd, crowdMaterial, CLIP, OUTFITS, PANTS } from './crowd.js?v=20261004b';
-import { createPile, stockUnit } from './piles.js?v=20261004b';
-import { GEO } from './geo.js?v=20261004b';
-import { basePlot, createPlot, FIT } from './plotbase.js?v=20261004b';
-import * as vehicles from './vehicles.js?v=20261004b';
-import * as props from './props.js?v=20261004b';
-import * as shape from './shape.js?v=20261004b';
-import { makeRng, noise2 } from './rng.js?v=20261004b';
+import { createMaterials } from './materials.js?v=20261004c';
+import { createBuilder } from './build.js?v=20261004c';
+import { createCrowd, crowdMaterial, CLIP, OUTFITS, PANTS } from './crowd.js?v=20261004c';
+import { createPile, stockUnit } from './piles.js?v=20261004c';
+import { GEO } from './geo.js?v=20261004c';
+import { basePlot, createPlot, FIT } from './plotbase.js?v=20261004c';
+import * as vehicles from './vehicles.js?v=20261004c';
+import * as props from './props.js?v=20261004c';
+import * as shape from './shape.js?v=20261004c';
+import { makeRng, noise2 } from './rng.js?v=20261004c';
 
 export function createKit() {
   const materials = createMaterials();

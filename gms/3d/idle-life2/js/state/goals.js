@@ -1,4 +1,4 @@
-import { hashStr, mulberry32 } from './events.js?v=20261004b';
+import { hashStr, mulberry32 } from './events.js?v=20261004c';
 
 export function contractProgress(c, state, data, equipped) {
   const lines = state.lines;

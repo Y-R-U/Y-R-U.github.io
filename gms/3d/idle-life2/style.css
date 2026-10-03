@@ -566,3 +566,12 @@ html.calm .float.go { animation: none; }
   .jump { left: auto; right: calc(var(--side-w) + 24px); top: calc(var(--hud-h) + 74px); bottom: auto; }
   .ev-float { left: calc((100vw - var(--side-w)) / 2); top: calc(var(--hud-h) + 26px); }
 }
+
+/* Hold-to-look */
+.hero-view, .line-view { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.look-veil { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .35s; box-shadow: inset 0 0 70px 6px rgba(18, 26, 38, .38); border-radius: inherit; }
+.look-ring { position: absolute; left: 0; top: 0; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .85); box-shadow: 0 0 12px rgba(255, 255, 255, .45), inset 0 0 10px rgba(255, 255, 255, .3); transform: scale(.5); transition: transform .3s cubic-bezier(.3, 1.5, .5, 1); }
+.looking > .look-veil { opacity: 1; transition-duration: .2s; }
+.looking > .look-veil .look-ring { transform: scale(1); }
+.looking { cursor: grabbing; }
+.calm .look-veil, .calm .look-ring { transition: none; }
