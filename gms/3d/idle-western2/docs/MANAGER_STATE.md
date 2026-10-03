@@ -53,3 +53,5 @@ Aaron's words, condensed (inspiration, not a spec — improve on it):
 4. Then blind critics vs refs, perf fixes, P anchors (hay cart, jail wagon, dentist chair, Garter window, mud spot), acquisition cutscenes, FYD moustache swap, Ghost Town scenes (cut if not integrated by 20 Oct).
 5. Not pushed yet; not in projects.js. UI contact sheet: scratchpad ui_sheet.jpg (regen: CDP_PORT=9371 node tools/ui-shots.mjs docs/shots/ui/ s22).
 - 2026-10-04 Resumed after limit. W18 time-of-day ruling added (compressed ~20 min cycle, golden boot). Relaunched AU (resume), perf audit (9381), playtest (9391). Next: round 2 visual+perf lanes from PERF.md + PLAYTEST_1.md.
+- 2026-10-04 Perf audit: CPU fine on quiet machine (p95 4–5 ms); GPU vertex-bound: hero 2–2.8M verts, 89 townsfolk × 18k verts (budget said ≤24 crowd!). Top fixes in PERF.md (light crowd rig, cards hide town, no hero+card same frame, shadows 4 Hz).
+- 2026-10-04 Playtest 1 done (PLAYTEST_1.md: stuck hurry hint, fling/stagecoach off camera, pacing slow for real play, Android audio unlock). Round 2 assignments in docs/ROUND2.md; launching A,S,P,U,E,M.
