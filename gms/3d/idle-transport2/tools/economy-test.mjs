@@ -1,0 +1,67 @@
+import assert from 'node:assert/strict';
+import {createGame,ROUTES,REGIONS,SAVE_KEY} from '../js/economy.mjs';
+const memory=()=>{const values=new Map();return {getItem:k=>values.get(k)||null,setItem:(k,v)=>values.set(k,v)};};
+let timestamp=1800000000000; const storage=memory();const game=createGame({storage,now:()=>timestamp});
+assert.equal(REGIONS.length,5);assert.equal(ROUTES.length,15);
+assert.equal(game.state.cash,0);assert.equal(game.state.routes.grain.unlocked,false);game.tick(30);assert.equal(game.state.cash,0);assert.equal(game.state.deliveries,0);
+for(let i=0;i<12;i++)assert(game.action('work').ok);assert.equal(game.state.cash,60);assert(game.action('unlockRoute','grain').ok);assert.equal(game.state.cash,0);for(let i=0;i<24;i++)game.action('work');assert.equal(game.state.cash,120);assert.equal(game.stats('grain').progress,0);
+assert.equal(game.action('fleet','grain').ok,false);assert.equal(game.state.routes.grain.fleet,1);
+game.tick(4);assert.equal(game.stats('grain').progress,.5);game.tick(4);
+assert.equal(game.state.deliveries,1);assert.equal(game.state.cash,138);
+assert.equal(game.action('dispatch','grain').ok,true);assert.equal(game.action('dispatch','grain').ok,false);
+game.tick(6);assert.equal(game.state.cash,178);assert.equal(game.state.deliveries,2);
+assert.equal(game.action('unlockRegion','aerospace').ok,false);
+assert.equal(game.action('claimContract','first').ok,false);
+game.tick(30);assert(game.state.deliveries>=5);
+assert.equal(game.action('claimContract','first').ok,true);const claimedBalance=game.state.cash;
+assert.equal(game.action('claimContract','first').ok,false);assert.equal(game.state.cash,claimedBalance);
+assert.equal(game.action('manager','grain').ok,true);assert.equal(game.stats('grain').automaticRate,1);
+assert.equal(game.action('unlockRoute','timber').ok,true);
+const snapshot=game.exportSave();const copy=createGame({storage:memory(),now:()=>timestamp});
+assert.equal(copy.importSave(snapshot).ok,true);assert.equal(copy.state.cash,game.state.cash);
+assert.equal(copy.importSave('{bad').ok,false);assert.equal(copy.state.cash,game.state.cash);
+const invalid=JSON.parse(snapshot);invalid.cash=-2;assert.equal(copy.importSave(JSON.stringify(invalid)).ok,false);
+invalid.cash=null;assert.equal(copy.importSave(JSON.stringify(invalid)).ok,false);
+const malformed=JSON.parse(snapshot);malformed.unlockedRegions=['meadow','aerospace'];malformed.region='aerospace';malformed.routes.grain.fleet=99999;malformed.routes.grain.level=99999;malformed.routes.grain.progress=2;
+assert.equal(copy.importSave(JSON.stringify(malformed)).ok,true);assert.deepEqual(copy.state.unlockedRegions,['meadow']);assert.equal(copy.state.region,'meadow');assert.equal(copy.state.routes.grain.fleet,30);assert.equal(copy.state.routes.grain.level,200);assert(copy.stats('grain').progress<1);
+// Reload only managed routes advance, cap four hours, and credited time is saved immediately.
+const before=game.state.cash,unmanaged=game.state.routes.timber.deliveries,managed=game.state.routes.grain.deliveries;
+game.save();timestamp+=24*3600000;
+const away=createGame({storage,now:()=>timestamp});assert.equal(away.offlineReport.seconds,14400);assert(away.state.cash>before);assert.equal(away.state.routes.timber.deliveries,unmanaged);assert(away.state.routes.grain.deliveries>managed);assert(away.offlineReport.cash<=game.stats('grain').income*14400+game.stats('grain').fullPayout);
+const secondReload=createGame({storage,now:()=>timestamp});assert.equal(secondReload.state.cash,away.state.cash);assert.equal(secondReload.offlineReport.cash,0);
+// Prestige resets company but preserves settings and permanent reputation.
+const rich=JSON.parse(snapshot);rich.totalEarned=8000000;rich.cash=8000000;rich.unlockedRegions=['meadow','industrial','coastal','alpine'];rich.settings.quality='low';
+assert.equal(copy.importSave(JSON.stringify(rich)).ok,true);assert.equal(copy.prestigeInfo().reward,2);assert.equal(copy.action('prestige').ok,true);assert.equal(copy.state.prestige,2);assert.equal(copy.state.cash,0);assert.equal(copy.state.settings.quality,'low');assert.equal(copy.state.routes.timber.unlocked,false);assert.deepEqual(copy.state.contracts,[]);
+assert.equal(copy.action('research','engines').ok,false);
+const oldcash=copy.state.cash;copy.tick(NaN);copy.tick(-1);assert.equal(copy.state.cash,oldcash);
+assert(JSON.parse(storage.getItem(SAVE_KEY)).lastSaved===timestamp);
+console.log('Economy: journeys, purchases, dispatch, contracts, validated saves, capped offline income and prestige passed.');
+// Regional gates require both prior land and completed deliveries. Research effects compound.
+const progression=createGame({storage:memory(),now:()=>timestamp});for(let i=0;i<12;i++)progression.action('work');assert(progression.action('unlockRoute','grain').ok);
+const funded=JSON.parse(progression.exportSave());funded.cash=1e10;funded.deliveries=29;
+assert(progression.importSave(JSON.stringify(funded)).ok);assert.equal(progression.action('unlockRegion','industrial').ok,false);
+progression.tick(8);assert(progression.action('unlockRegion','industrial').ok);
+assert.equal(progression.action('unlockRegion','coastal').ok,false);
+const baseline=progression.stats('grain');assert(progression.action('research','routing').ok);assert(progression.stats('grain').duration<baseline.duration);
+assert(progression.action('research','cargo').ok);assert(progression.stats('grain').fullPayout>baseline.fullPayout);
+assert(progression.action('upgrade','grain').ok);assert(progression.action('fleet','grain').ok);
+assert(progression.action('manager','grain').ok);assert(progression.action('research','nightshift').ok);
+const longStorage=memory();longStorage.setItem(SAVE_KEY,progression.exportSave());timestamp+=86400000;
+const longAway=createGame({storage:longStorage,now:()=>timestamp});assert.equal(longAway.offlineReport.seconds,28800);
+console.log('Economy: region gates, compounding research and eight-hour offline research passed.');
+const awake=new Map(Object.entries(longAway.state.routes).map(([id,s])=>[id,s.deliveries]));
+timestamp+=999999000;const liveReport=longAway.resumeAway(999999);assert.equal(liveReport.seconds,28800);assert(liveReport.cash>0);assert.equal(longAway.state.routes.timber.deliveries,awake.get('timber'));assert.equal(longAway.resumeAway(NaN).cash,0);assert.equal(longAway.resumeAway(999999).cash,0);
+const newGame=createGame({storage:memory(),now:()=>timestamp});assert.equal(newGame.action('unlockRoute','steel').ok,false);
+const fundedResearch=JSON.parse(newGame.exportSave());fundedResearch.cash=1000000;assert(newGame.importSave(JSON.stringify(fundedResearch)).ok);
+assert(newGame.action('research','routing').ok);const beforeEngine=newGame.stats('grain').duration,beforeEngineCash=newGame.state.cash;
+assert(newGame.action('research','engines').ok);assert(newGame.stats('grain').duration<beforeEngine);assert.equal(beforeEngineCash-newGame.state.cash,260000);
+console.log('Economy: live suspension resume and positive prerequisite research passed.');
+
+// Opportunities require a company, use injected random, expire, and pay once.
+const events=createGame({storage:memory(),now:()=>timestamp,random:()=>0});events.tick(60);assert.equal(events.state.event,null);
+for(let i=0;i<12;i++)events.action('work');events.action('unlockRoute','grain');events.tick(44);assert.equal(events.state.event,null);events.tick(1);assert.equal(events.state.event.kind,'rush');assert.equal(events.state.event.remaining,25);
+const reward=events.state.event.reward,beforeReward=events.state.cash;assert(events.action('claimEvent').ok);assert.equal(events.state.cash,beforeReward+reward);assert.equal(events.action('claimEvent').ok,false);
+events.tick(60);events.tick(20);assert(events.state.event);events.tick(25);assert.equal(events.state.event,null);const expireBalance=events.state.cash;assert.equal(events.action('claimEvent').ok,false);assert.equal(events.state.cash,expireBalance);
+const stopped=JSON.parse(events.exportSave());stopped.routes.grain.unlocked=false;assert(events.importSave(JSON.stringify(stopped)).ok);assert.equal(events.state.routes.grain.unlocked,false);
+const noCompany=createGame({storage:memory(),now:()=>timestamp});assert.equal(noCompany.resumeAway(14400).cash,0);assert.equal(noCompany.state.event,null);
+console.log('Economy: zero-cash work bootstrap, persisted closed routes, random opportunities/expiry/single claim and no offline events passed.');

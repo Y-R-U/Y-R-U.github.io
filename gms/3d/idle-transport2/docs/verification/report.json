@@ -1,0 +1,109 @@
+{
+  "url": "http://127.0.0.1:8888/gms/3d/idle-transport2/",
+  "date": "2026-10-03T02:27:42.801Z",
+  "checks": [
+    "company starts closed with no idle income",
+    "closed company earns nothing idle",
+    "cargo loading earns first purchase",
+    "first company must be bought",
+    "simulation pays deliveries",
+    "save round trip",
+    "invalid save rejected",
+    "hero has size",
+    "upgrade works through visible control",
+    "camera pin works",
+    "auto tour resumes",
+    "random opportunity appears with a countdown",
+    "event claim pays the displayed reward",
+    "research tab works",
+    "contracts tab works",
+    "settings open with touch",
+    "dialog fits portrait",
+    "settings close with touch",
+    "scene shares economy progress: stone",
+    "scene shares economy progress: steel",
+    "scene shares economy progress: containers",
+    "scene shares economy progress: summit",
+    "scene shares economy progress: orbital",
+    "full network has fifteen live route views",
+    "truck moves with shared delivery progress",
+    "pin holds across a complete tour interval",
+    "automatic highlights advance after twelve seconds",
+    "battery quality reduces pixel ratio"
+  ],
+  "viewports": [
+    {
+      "width": 320,
+      "scroll": 320,
+      "canvases": 4,
+      "hero": {
+        "x": 10,
+        "y": 48,
+        "width": 300,
+        "height": 230,
+        "top": 48,
+        "right": 310,
+        "bottom": 278,
+        "left": 10
+      }
+    },
+    {
+      "width": 390,
+      "scroll": 390,
+      "canvases": 4,
+      "hero": {
+        "x": 10,
+        "y": 48,
+        "width": 370,
+        "height": 230,
+        "top": 48,
+        "right": 380,
+        "bottom": 278,
+        "left": 10
+      }
+    },
+    {
+      "width": 430,
+      "scroll": 430,
+      "canvases": 4,
+      "hero": {
+        "x": 10,
+        "y": 48,
+        "width": 410,
+        "height": 230,
+        "top": 48,
+        "right": 420,
+        "bottom": 278,
+        "left": 10
+      }
+    }
+  ],
+  "errors": [],
+  "scene": {
+    "id": "orbital",
+    "progress": 0.3428199519999992,
+    "focused": true,
+    "locked": true,
+    "vehicles": [
+      {
+        "x": 13.905922517617228,
+        "y": 0.48,
+        "z": 3.1215011270814386,
+        "heading": 0.8965609014144007
+      },
+      {
+        "x": -2.580150084422346,
+        "y": 0.48,
+        "z": -5,
+        "heading": 3.141592653589793
+      },
+      {
+        "x": -9.322504338227318,
+        "y": 0.48,
+        "z": 5,
+        "heading": 0
+      }
+    ],
+    "drawCalls": 481
+  }
+}

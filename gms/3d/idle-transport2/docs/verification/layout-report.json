@@ -1,0 +1,33 @@
+{
+  "url": "http://127.0.0.1:8888/gms/3d/idle-transport2/",
+  "result": [
+    {
+      "width": 320,
+      "height": 740,
+      "fullHero": 214.59375,
+      "compactHero": 118,
+      "twoRowsAtTop": true,
+      "threeRowsCollapsed": true,
+      "rendererCount": 1
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "fullHero": 230,
+      "compactHero": 118,
+      "twoRowsAtTop": true,
+      "threeRowsCollapsed": true,
+      "rendererCount": 1
+    },
+    {
+      "width": 430,
+      "height": 844,
+      "fullHero": 230,
+      "compactHero": 118,
+      "twoRowsAtTop": true,
+      "threeRowsCollapsed": true,
+      "rendererCount": 1
+    }
+  ],
+  "errors": []
+}

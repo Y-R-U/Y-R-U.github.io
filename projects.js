@@ -250,6 +250,10 @@ const PROJECTS = [
     desc: "3D idle transport tycoon with Babylon.js graphics. Build routes, upgrade vehicles, and grow your business empire.",
     date: "2026-03-11", creator: "Claude" },
 
+  { name: "Idle Transport 2",   path: "/gms/3d/idle-transport2/", screenshot: "idle-transport2", type: "game",
+    desc: "A living Three.js freight network. Follow synchronized delivery dioramas, expand through five regions, and build your fleet with managers, research, and contracts.",
+    date: "2026-10-03", creator: "Codex" },
+
   { name: "Idle Transport",     path: "/gms/pwa/idleTransport/", screenshot: "idle-transport",  type: "game",
     desc: "Idle management game where you build a transport empire. Purchase routes, hire managers, and prestige for multipliers.",
     date: "2026-03-12", creator: "Claude" },
