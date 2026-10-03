@@ -162,6 +162,42 @@ character's device-px height); sheets in `docs/shots/spectacle/r3/` (`sheet_stag
 **Gate (R3):** test-spectacle PASS (A: work best ~4 ms, actors ≤ 6, particles ≤ 60; B nobudget: actors 35 → FAIL as
 required), test-look, test-boot, test-scroll PASS on 9351.
 
+## Round 4 (2026-10-04): composed hero vignettes
+Every hero shot (tour, pin and the establishing `@town` shot) stages ONE vignette composed like `refs/a_clay_hero.jpg`
+(`spectacle/vignettes.js`, picked by `pickVignette` in scenes.js; the old R3 gags are kept only as a 15% Ghost-Town mix):
+- **Layout, solved on the live hero camera in NDC.** The Stranger stands in the foreground seen from behind (`FORE`
+  nx ±0.3, feet at ny −0.5, ≈ 0.2 of the frame tall on the S22, hat capped at 0.68× so a Hundred-Gallon brim doesn't
+  eat the frame). The gag sits on the other side of the frame (`layout()`: a street spot where a 2 m figure is
+  `MID_FRAC` 0.072 of the frame — ≈ 170–190 device px with hats, like the ref's rival — at least `SEP` 0.42 across
+  the screen from him after the street clamp, else the sides swap).
+- **Open dirt.** A vignette publishes `sc.clear` zones `[x, z, r]` (him r 4.5, the gag 4–5.5, the gap between);
+  `spectacle.clear` feeds `heroTidy`/`heroNearCut` (cameras.js), which drop pooled townsfolk AND shipments
+  (walkers, couriers, wagons) inside them. While a vignette is live the people-free foreground band rises from
+  NDC y −0.55 to −0.3 (`FOOT_VIG`).
+- **Vignettes:** `eject` (saloon + hub shots, the showpiece: Mabel kicks the doors, dust puff, the drunk cartwheels
+  into the street a few metres out, his hat spins off, belly slide, dazed sit-up facing the lens, staggers off; you
+  throw your hands up, point, tip your hat), `duel` (rival down the street facing the lens, tumbleweed between you,
+  you draw first, his hat spins off, he faints, Mortimer strolls in with his tape), `pickles` (asleep in the dirt,
+  a chicken pecks him, he sits up hatless and sozzled with stars, flops back; you shrug), `barrel` (Wendell hunts
+  the escaped prisoner — a barrel with legs that freezes whenever he turns round, then bolts; you point),
+  `pomfrey` (his procession stops in front of you, hat tips both ways). Shot preference: saloon/hub → eject,
+  jail → barrel, tubs/livery → pickles, bank/shine/garter → pomfrey, undertaker/dentist → duel, @town → duel/eject.
+- **Establishing shot** lowered to the ref's height (`HERO_VIEW` defaults in cameras.js: `townH` 10.5, `townPitch`
+  19, `townX` −10, `townYaw` 0.16) and stages vignettes continuously like the tour.
+- Ghost Town ghosts drift 20 m behind the stage so they never cover the vignette.
+
+Check: `CDP_PORT=9351 node tools/stageshot.mjs docs/shots/spectacle/r4 <ids|@town> <tod> <vignette> <t1,t2,…>`
+(one shot per time after the vignette starts). Sheet with the ref: `docs/shots/spectacle/r4/sheet_vignettes.jpg`,
+sequences in `r4/seq/`, R3 baseline in `r4/base/`.
+
+**Honest comparison to the ref:** the composition now matches (him from behind lower-left/right, one readable gag
+mid-ground, open dirt, eject + dust at the saloon doors). Still short of the ref: our camera sees more set dressing
+and porch crowds around the gag; the far street still reads busy; his brim is still big and flat from 7.5 m up;
+characters are smaller and stiffer than the ref's (rig/lighting are lane A).
+
+**Gate (R4):** test-spectacle PASS (incl. falsification), test-look, test-boot PASS; test-scroll PASS (desktop draw
+calls 246–253 vs ≤ 250 is borderline and flaky under load — hero ~151 draws are town/plots, not spectacle).
+
 ## Known gaps / next
 - The saloon plot's hitched horse is merged into its static mesh, so it still shows cut by the bottom edge in the
   dentist shot (camera stands in front of the saloon); needs P's `heroNear` tag (CONTRACT request).

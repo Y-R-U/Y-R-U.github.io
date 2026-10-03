@@ -2,6 +2,7 @@ import { EJECT_LOOK, OPPONENTS, townsfolk, hatFor, pomfreyHat } from './looks.js
 import { CLIP as RIG, CHARACTERS } from '../kit/crowd.js?v=20261004d';
 import { PCOL } from './particles.js?v=20261004d';
 import { HATS, POMFREY_HATS } from '../../data/hats.js?v=20261004d';
+import { createVignettes } from './vignettes.js?v=20261004d';
 
 // Every spectacle as a small state machine: { prio, slot, line, begin, update(dt) → false when done, pick, on, end }.
 // prio: 3 special · 2 beat/fling · 1 ambient duel · 0 gag. Actors come from ctx.actor() and may be null (budget):
@@ -134,7 +135,7 @@ export function createScenes(ctx) {
 
   S.eject = (args) => {
     if (!world.plots.has('saloon')) return null;
-    const sc = { prio: 2, line: 'saloon', ejectId: args.id, phase: 'hold', cosmetic: !!args.cosmetic };
+    const sc = { prio: 2, line: 'saloon', ejectId: args.id, phase: 'hold', cosmetic: !!args.cosmetic, heroOnly: true };
     const lv = args.level || 1;
     const D = ctx.anchor('saloon', 'doors');
     // Mabel steps out to the porch step so the held drunk is clear of the balcony roof.
@@ -959,7 +960,7 @@ export function createScenes(ctx) {
       if (caught < 0) {
         const u = Math.min(1, t / life);
         x = a + (b - a) * u;
-        if (st?.ok) { const k = x; x = st.x + st.ax * k + st.fx * 4; z = st.z + st.az * k + st.fz * 4; }
+        if (st?.ok) { const k = x; x = st.x + st.ax * k + st.fx * 20; z = st.z + st.az * k + st.fz * 20; }
         y = 1.5 + Math.sin(t * 2.2) * 0.25;
         fade = Math.min(1, t / 0.6) * (out < 0 ? 1 : Math.max(0, 1 - (t - out) / 0.6));
         if (Math.floor(t * 3) !== Math.floor((t - dt) * 3)) parts.puff([x - Math.sign(b - a) * 0.4, y - 0.4, z], 1, { r: 0.15, size: 0.18, up: 0.3, col: PCOL.ECTO, life: 1.2 });
@@ -1014,10 +1015,33 @@ export function createScenes(ctx) {
     { id: 'ghostduel', w: 4, ok: () => !!ctx.game.state.season?.live },
   ];
   function garterInView() { const p = world.plots.has('garter') && ctx.anchor('garter', 'window'); return !!p && ctx.inHero(p, 0.85); }
+  // R4: every hero shot stages one composed vignette (vignettes.js): you in the foreground, a 1–3 character gag in the
+  // mid-ground, open dirt around it. The ejection is the showpiece on the saloon/hub shots.
+  const VIG = createVignettes(ctx, { CLIP, strangerSpec, popHat, hatPhysics, arc, face, walkTo, hv: [0, 0, 0], c3: [0, 0, 0], pick: pickOf, OPPONENTS });
+  const VIGS = [{ id: 'eject', w: 2 }, { id: 'duel', w: 2.2 }, { id: 'pickles', w: 1.8 }, { id: 'barrel', w: 1.8 }, { id: 'pomfrey', w: 1.4 }];
+  const VPREFER = { saloon: ['eject'], hub: ['eject'], jail: ['barrel'], tubs: ['pickles'], bank: ['pomfrey'], shine: ['pomfrey'], undertaker: ['duel'], dentist: ['duel'], livery: ['pickles'], garter: ['pomfrey'], '@town': ['duel', 'eject'] };
+  const recentVig = [];
+  function pickVignette(o) {
+    const pref = VPREFER[o.shot] || [];
+    const pool = VIGS.filter((g) => !(recentVig.includes(g.id) && !(pref[0] === g.id && recentVig[recentVig.length - 1] !== g.id)));
+    const w = (g) => g.w * (pref[0] === g.id ? 6 : pref.includes(g.id) ? 2.5 : 1);
+    const tried = new Set();
+    while (tried.size < pool.length) {
+      let r = R() * pool.reduce((s, g) => s + (tried.has(g.id) ? 0 : w(g)), 0), g = null;
+      for (const x of pool) if (!tried.has(x.id) && (r -= w(x)) <= 0) { g = x; break; }
+      g ||= pool.find((x) => !tried.has(x.id));
+      tried.add(g.id);
+      const sc = api.playScene('gag', { which: g.id, staged: true, vig: true });
+      if (sc) { recentVig.push(g.id); if (recentVig.length > 2) recentVig.shift(); return sc; }
+    }
+    return null;
+  }
   // R3: the tour stages one gag per shot; the shot's own business pulls its character's gag forward.
   const PREFER = { jail: ['barrel'], undertaker: ['mortimer', 'duel'], tubs: ['pickles'], saloon: ['duel', 'pickles', 'eject'], bank: ['pomfrey'], shine: ['pomfrey', 'chickens'], dentist: ['chickens', 'mortimer'], garter: ['garter', 'pomfrey'], livery: ['horse', 'chickens'], hub: ['pickles', 'eject'] };
   S.pickGag = (force, o = {}) => {
     const staged = !!o.staged;
+    if (staged && !force && !(ctx.game.state.season?.live && R() < 0.15)) { const v = pickVignette(o); if (v) return v; }
+    if (force && VIG[force] && o.vig !== false) return api.playScene('gag', { which: force, staged: true, vig: true });
     const pool = GAGS.filter((g) => (force ? g.id === force : !recentGags.includes(g.id) && (!g.ok || g.ok()) && !(staged && (g.stage === false || (g.id === 'garter' && o.shot !== 'garter') || (g.id === 'eject' && o.shot !== 'saloon' && o.shot !== 'hub')))));
     if (!pool.length) return null;
     const pref = PREFER[o.shot] || [];
@@ -1042,6 +1066,7 @@ export function createScenes(ctx) {
 
   S.gag = (args) => {
     const which = args.which;
+    if (args.vig && VIG[which]) return VIG[which](args);
     const sc = { prio: 0, kind: 'gag', which, cosmetic: true, dur: 8 };
     const L = ctx.heroLook();
     // Staged (R3): placed on ctx.stage(), moving ACROSS the view (u) so they stay big and in frame; idle = face the lens.

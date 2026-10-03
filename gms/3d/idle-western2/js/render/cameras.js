@@ -208,7 +208,8 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
 
   let midX = 0;
   { let a = Infinity, b = -Infinity; for (const p of plots.values()) { a = Math.min(a, p.group.position.x); b = Math.max(b, p.group.position.x); } midX = (a + b) / 2 + 8; }
-  const HV = { vanish: 0.3, subject: 0.5, camZ: 8.4, height: 8, pitch: 17, fov: 50, minBack: 13, ...(HERO_VIEW || {}) };
+  // R4 establishing shot: low enough at the west end that the staged vignette reads like refs/a_clay_hero.jpg.
+  const HV = { vanish: 0.3, subject: 0.5, camZ: 8.4, height: 8, pitch: 17, fov: 50, minBack: 13, townH: 10.5, townPitch: 19, townX: -10, townYaw: 0.16, ...(HERO_VIEW || {}) };
   // Plot shot like refs/a_clay_hero.jpg: standing in the street and looking DOWN it, the business near-left (near-right for
   // east plots, shot from the east), its neighbours' facades receding to a vanishing point right of centre, the south
   // frontages on the far side, sky + mesas on top. Solved per aspect: the street axis lands at NDC x = ±vanish and the
@@ -250,8 +251,8 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
     let x0 = Infinity;
     for (const p of plots.values()) x0 = Math.min(x0, p.group.position.x - (p.bounds.heroW || 14) / 2);
     const tanH = Math.tan((camera.fov / 2) * D2R) * Math.max(0.4, aspect);
-    const yaw = Math.atan(0.12 * tanH), pitch = 21 * D2R, H = 20, L = H / Math.sin(pitch);
-    out.pos.set(x0 - 22, H, ROAD_Z + 1.5);
+    const yaw = Math.atan(HV.townYaw * tanH), pitch = HV.townPitch * D2R, H = HV.townH, L = H / Math.sin(pitch);
+    out.pos.set(x0 + HV.townX, H, ROAD_Z + 1.5);
     out.look.set(out.pos.x + Math.cos(yaw) * Math.cos(pitch) * L, 0, out.pos.z - Math.sin(yaw) * Math.cos(pitch) * L);
     keepInWorld(camera, out.pos, out.look, shared.bounds, LOW);
     return polar(out);
@@ -477,19 +478,24 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
 // plane; idle ones in the mid-ground turn to face the lens. Meshes tagged `userData.heroNear` (plot street-front
 // props) hide inside NEAR_PROP m. The hub's placeholder street props (well, wagon, trough, sign) sit on the street axis
 // of every shot near the saloon, so they only show for the opening.
-const NEAR = 10, NEAR_PROP = 13, FOOT_Y = -0.55, FACE_R = 34;
+const NEAR = 10, NEAR_PROP = 13, FOOT_Y = -0.55, FOOT_VIG = -0.3, FACE_R = 34;
 const FACE_CLIPS = new Set([0, 4, 6, 12, 17]);
 const _vp = new THREE.Matrix4(), _sph = new THREE.Sphere();
 const hidden = [];
 let tagged = null, scanIn = 0;
+// R4: the staged vignette's open dirt (spectacle.clear = [[x, z, r], ...]) — no townsfolk or shipments inside it.
+let zones = [];
+const inZone = (x, z) => { for (const q of zones) { const dx = x - q[0], dz = z - q[1]; if (dx * dx + dz * dz < q[2] * q[2]) return true; } return false; };
 export function heroNearCut(camera, x, y, z) {
   if (Math.hypot(camera.position.x - x, camera.position.z - z) < NEAR) return true;
+  if (zones.length && inZone(x, z)) return true;
   _vp.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-  return _v.set(x, y, z).applyMatrix4(_vp).y < FOOT_Y;
+  return _v.set(x, y, z).applyMatrix4(_vp).y < (zones.length ? FOOT_VIG : FOOT_Y);
 }
 function hide(o) { if (o.visible) { o.visible = false; hidden.push(o); } }
 export function heroTidy(world, camera, game) {
-  if (camera !== world.heroRig?.camera) return;
+  if (camera !== world.heroRig?.camera) { zones = []; return; }
+  zones = world.spectacle?.clear || [];
   const hub = world.plots.get('hub');
   if (hub && game?.state?.bootstrap?.done && !world.spectacle?.scenes?.includes('opening')) hide(hub.group);
   if (!tagged || --scanIn <= 0) { tagged = []; scanIn = 240; world.scene.traverse((o) => { if (o.userData?.heroNear) tagged.push(o); }); }
@@ -504,14 +510,14 @@ export function heroTidy(world, camera, game) {
   if (!n) return;
   _vp.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
   const im = pool.mesh.instanceMatrix.array, bm = pool.blob.instanceMatrix.array, anim = pool.mesh.geometry.attributes.aAnim.array;
-  const cx = camera.position.x, cz = camera.position.z;
+  const cx = camera.position.x, cz = camera.position.z, footY = zones.length ? FOOT_VIG : FOOT_Y;
   let cut = 0;
   for (let i = 0; i < n; i++) {
     const o = i * 16, tx = im[o + 12], ty = im[o + 13], tz = im[o + 14];
     const sx = Math.hypot(im[o], im[o + 1], im[o + 2]), sy = Math.hypot(im[o + 4], im[o + 5], im[o + 6]), sz = Math.hypot(im[o + 8], im[o + 9], im[o + 10]);
     if (sy < 1e-6) continue;
     const dx = cx - tx, dz = cz - tz, hd = Math.hypot(dx, dz);
-    if (hd < NEAR || _v.set(tx, ty, tz).applyMatrix4(_vp).y < FOOT_Y) {
+    if (hd < NEAR || (zones.length && inZone(tx, tz)) || _v.set(tx, ty, tz).applyMatrix4(_vp).y < footY) {
       for (let k = 0; k < 16; k++) im[o + k] = bm[o + k] = 0;
       cut++;
       continue;

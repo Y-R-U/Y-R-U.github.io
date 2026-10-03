@@ -41,6 +41,7 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
   let t = 0, frame = 0, filled = -1, filledLine, heroVisible = true, saloonVisible = false, visAt = 0, nextAmbient = 12, lastPick = null;
   let drawPending = null, shotOwner = null, uiHero = true;
   const caps = new Set(['ghost']);
+  const clear = [];
 
   const count = (extra) => { let n = 0; for (const a of pool) if (a.used && a.extra === extra) n++; return n; };
 
@@ -312,7 +313,7 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
   function ambient() {
     if (!game.state.bootstrap?.done || !heroVisible) return;
     const rig = world.heroRig, mode = rig.mode;
-    if (mode === 'tour' || mode === 'pin') {
+    if (mode === 'tour' || mode === 'pin' || mode === 'town') {
       if (rig.current !== stageShot) {
         stageShot = rig.current; stageAt = t + 0.4;
         if (lim.on) for (const s of [...scenes]) if (STAGED(s)) end(s);
@@ -364,6 +365,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
       if (!alive) end(sc);
     }
     S.always?.(dt);
+    clear.length = 0;
+    for (const sc of scenes) if (sc.clear) for (const q of sc.clear) clear.push(q);
     parts.update(dt);
     fxLive = fx?.live ? fx.live() : 0;
     const na = count(false), ne = count(true), np = parts.live + fxLive;
@@ -377,7 +380,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
 
   // ---- render: fill instance buffers once per (frame, camera filter)
   let showLine = null;
-  const show = (a) => !showLine || a.line === showLine;
+  // Hero-only scenes (R4 vignettes, the saloon ejection) never show in a card: the plot's own card gag plays there.
+  const show = (a) => !showLine || (a.line === showLine && !a.scene?.heroOnly);
   function fill(line) {
     if (filled === frame && filledLine === line) return;
     filled = frame; filledLine = line;
@@ -455,7 +459,7 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
   }
   function charHits(ray, line, hits) {
     for (const a of pool) {
-      if (!a.used || a.extra || !a.char || !CHARS[a.char] || a.hidden || (line && a.line !== line)) continue;
+      if (!a.used || a.extra || !a.char || !CHARS[a.char] || a.hidden || (line && (a.line !== line || a.scene?.heroOnly))) continue;
       cast.centre(a, _c3);
       const d = near(ray, _c3, 0.9 * (a.s || 1));
       if (d >= 0) hits.push({ rank: RANK.char, kind: 'char', id: a.char, char: a.char, dist: d, point: _c3.slice() });
@@ -536,6 +540,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     budget(on) { if (on !== undefined) lim.on = !!on; return lim.on; },
     get scenes() { return scenes.map((s) => s.kind); },
     caps,
+    // R4: open-dirt zones [[x, z, r]] around the staged vignette; cameras.heroTidy keeps townsfolk and shipments out.
+    clear,
     // M's "hot" flag: the hero runs at 60 fps while a slot scene, an ejection, a duel or a borrowed camera is live.
     get hot() { return !!shotOwner || scenes.some((s) => s.slot || s.kind === 'eject' || s.kind === 'duel'); },
     get beatsQueued() { return beats.map((b) => b.kind); },
