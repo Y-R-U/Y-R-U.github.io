@@ -1,7 +1,7 @@
-import { el, btn } from './dom.js?v=20261004b';
-import { fmtCash } from '../state/format.js?v=20261004b';
-import { section, empty } from './kit.js?v=20261004b';
-import { BOX_INFO } from './boxes.js?v=20261004b';
+import { el, btn } from './dom.js?v=20261004c';
+import { fmtCash } from '../state/format.js?v=20261004c';
+import { section, empty } from './kit.js?v=20261004c';
+import { BOX_INFO } from './boxes.js?v=20261004c';
 
 export function fillCrew(body, ctx) {
   const { model, game } = ctx;

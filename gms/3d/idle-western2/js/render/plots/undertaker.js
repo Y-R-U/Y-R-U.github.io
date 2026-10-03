@@ -4,8 +4,8 @@
 // the lot shows the late Mr Grimsby's version with Pomfrey's purple board.
 // L1 parlour → L25 a little Boot Hill of crosses + a gravedigger → L100 a bell tower with a gilded coffin weather vane.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, tone } from './western.js?v=20261004b';
-import { createConstruction, finishPlot } from './construction.js?v=20261004b';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, tone } from './western.js?v=20261004c';
+import { createConstruction, finishPlot } from './construction.js?v=20261004c';
 
 const BX = -2.0, FZ = 0.5, W = 7.4, D = 5.6, H = 3.6, FH = 6.4;
 const DOM = { x: 1.7, z: 2.5, n: 9, gap: 0.42 };

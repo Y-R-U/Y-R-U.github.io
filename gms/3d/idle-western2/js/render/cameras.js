@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { HERO_VIEW } from '../data/plots.js?v=20261004b';
+import { HERO_VIEW, ROAD_Z, STREET_W } from '../data/plots.js?v=20261004c';
+const FACADE_Z = ROAD_Z - STREET_W / 2 - 5;
 
 const D2R = Math.PI / 180;
 const _v = new THREE.Vector3(), _d = new THREE.Vector3(), _a = new THREE.Vector3(), _b = new THREE.Vector3();
@@ -63,41 +64,6 @@ export function keepInWorld(camera, pos, look, b = shared.bounds, probes = PROBE
   return pos;
 }
 
-// Distance along dir (unit, from look toward camera) at which every point fits inside ±m NDC.
-function fitPoints(camera, look, dir, points, m = 0.9, lo = 4, hi = 900) {
-  for (let i = 0; i < 24; i++) {
-    const mid = (lo + hi) / 2;
-    camera.position.copy(dir).multiplyScalar(mid).add(look);
-    camera.lookAt(look);
-    camera.updateMatrixWorld();
-    let ok = true;
-    for (const p of points) {
-      _b.copy(p).project(camera);
-      if (_b.z > 1 || Math.abs(_b.x) > m || Math.abs(_b.y) > m) { ok = false; break; }
-    }
-    if (ok) hi = mid; else lo = mid;
-  }
-  return hi;
-}
-
-function boxCorners(cx, cz, w, d, h, ry = 0) {
-  const out = [];
-  const c = Math.cos(ry), s = Math.sin(ry);
-  for (const dx of [-w / 2, w / 2]) for (const dz of [-d / 2, d / 2]) for (const y of [0, h]) {
-    out.push(new THREE.Vector3(cx + dx * c + dz * s, y, cz - dx * s + dz * c));
-  }
-  return out;
-}
-
-// Hero framing box in plot space: the back edge carries the facades (with roofs), the front edge stops at the kerb.
-function heroPoints(px, pz, ry, w, hb) {
-  const out = [], c = Math.cos(ry), s = Math.sin(ry), W = (hb.w ?? w) / 2, x0 = hb.x ?? 0;
-  for (const dx of [x0 - W, x0 + W]) for (const [z, y] of [[hb.z0, 0], [hb.z0, hb.h], [hb.z1, 0], [hb.z1, hb.hf ?? 1.8]]) {
-    out.push(new THREE.Vector3(px + dx * c + z * s, y, pz - dx * s + z * c));
-  }
-  return out;
-}
-
 const dirFrom = (az, el, out = new THREE.Vector3()) => out.set(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
 
 // Hold-to-look offset on top of a rig's pose. Held: follows the finger; released: holds, then eases home.
@@ -154,13 +120,25 @@ export function createCardRig(plot) {
   const lookL = new THREE.Vector3(), posL = new THREE.Vector3(), dir = new THREE.Vector3();
   let baseDist = 1, key = null, probes = PROBES;
   // P's facade cameras (camera.facade) may show sky above the roofs; only their lower frame must stay on the ground.
+  // While the Mulligans build, the site (frame + crew + mule cart) is framed whole instead of the open shop's gag.
+  const building = () => !!plot.construction?.root?.visible;
+  const keyOf = () => (plot.cameraKey ?? '') + (building() ? '#b' : '');
   function load() {
     c = plot.camera;
-    key = plot.cameraKey ?? null;
+    key = keyOf();
     lookL.set(...c.look); posL.set(...c.pos);
     dir.copy(posL).sub(lookL);
     baseDist = dir.length();
     dir.normalize();
+    if (building()) {
+      const S = plot.construction.site, y = plot.construction.anchors?.yard;
+      const x0 = Math.min(S.x - S.w / 2, y ? y[0] - 1.5 : 1e9), x1 = Math.max(S.x + S.w / 2, y ? y[0] + 3.5 : -1e9);
+      lookL.set((x0 + x1) / 2, S.fh * 0.4, S.fz + 1.2);
+      dir.y += 0.12;
+      dir.normalize();
+      const t = Math.tan((c.fov / 2) * D2R);
+      baseDist = Math.max(baseDist * 1.1, ((x1 - x0) / 2 + 0.5) / (t * 0.78) / 1.15, (S.fh + 1.5) / (2 * t) / 1.15);
+    }
     probes = c.facade ? LOW : PROBES;
     if (Math.abs(camera.fov - c.fov) > 1e-3) { camera.fov = c.fov; camera.updateProjectionMatrix(); }
   }
@@ -172,7 +150,7 @@ export function createCardRig(plot) {
     camera,
     orbit,
     fit(aspect) {
-      if ((plot.cameraKey ?? null) !== key) { load(); lastAspect = 0; }
+      if (keyOf() !== key) { load(); lastAspect = 0; }
       if (Math.abs(aspect - lastAspect) < 1e-3) {
         if (!posed && !orbit.busy) return;
         posed = orbit.apply(camera, p.copy(pos), look);
@@ -229,30 +207,29 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
 
   let midX = 0;
   { let a = Infinity, b = -Infinity; for (const p of plots.values()) { a = Math.min(a, p.group.position.x); b = Math.max(b, p.group.position.x); } midX = (a + b) / 2 + 8; }
-  const HV = { yawOffAxis: 22, elevation: 32, pitch: 19, fov: 50, distance: 34, lookZ: 5, ...(HERO_VIEW || {}) };
-  // Plot shot like refs/a_clay_hero.jpg: low, down the street from the west and yawed onto the north facades. The
-  // camera orbits a street point at `elevation` but aims `pitch` below the horizon, so sky and mesas fill the top.
+  const HV = { vanish: 0.3, subject: 0.5, camZ: 8.4, height: 8, pitch: 17, fov: 50, minBack: 13, ...(HERO_VIEW || {}) };
+  // Plot shot like refs/a_clay_hero.jpg: standing in the street and looking DOWN it, the business near-left (near-right for
+  // east plots, shot from the east), its neighbours' facades receding to a vanishing point right of centre, the south
+  // frontages on the far side, sky + mesas on top. Solved per aspect: the street axis lands at NDC x = ±vanish and the
+  // business front at ∓subject, so a narrow portrait frame never looks across the desert.
   function poseFor(id, out) {
     if (id === '@town') return townPose(out);
     const p = plots.get(id);
     if (!p) return false;
     const g = p.group.position;
-    const ry = p.group.rotation.y;
     const pre = id === 'hub' && game && !game.state.bootstrap?.done;
     if (pre) return openingPose(p, out);
-    const w = p.bounds.w || 14;
     const fc = p.heroFocus || p.focus || null;
-    const east = g.x > midX;
-    const fx = (fc ? fc[0] * 0.5 : 0) + (east ? 1 : -1) * w * 0.14;
-    const lz = HV.lookZ + (aspect < 1.1 ? 0 : 1);
-    const lx = g.x + fx * Math.cos(ry) + lz * Math.sin(ry), lzw = g.z - fx * Math.sin(ry) + lz * Math.cos(ry);
-    const el = (HV.elevation + (aspect < 1.1 ? 0 : -4)) * D2R, pitch = (HV.pitch + (aspect < 1.1 ? 0 : -2)) * D2R;
-    out.az = (east ? 90 - HV.yawOffAxis : -90 + HV.yawOffAxis) * D2R + 3 * side * D2R + ry;
-    const r = HV.distance * (0.55 + 0.45 * w / 16) * (aspect < 1.1 ? 1 : 0.8);
-    const rise = r * (Math.sin(el) - Math.cos(el) * Math.tan(pitch));
-    out.look.set(lx, 1 + rise, lzw);
-    dirFrom(out.az, el, _d);
-    out.pos.set(lx, 1, lzw).addScaledVector(_d, r);
+    const s = g.x > midX ? -1 : 1;
+    const tanH = Math.tan((camera.fov / 2) * D2R) * Math.max(0.4, aspect);
+    const yaw = Math.atan(HV.vanish * tanH), th = yaw + Math.atan(HV.subject * tanH);
+    const bx = g.x + (fc ? fc[0] * 0.3 : 0) + s * (p.bounds.heroW || 14) * 0.05, bz = FACADE_Z + 1.5;
+    const lat = HV.camZ - bz, hw = (p.bounds.heroW || 14) / 2;
+    // ...but the lot's near corner stays inside the frame.
+    const back = Math.max(HV.minBack, lat / Math.tan(th), hw - s * (bx - g.x) + lat / Math.tan(yaw + Math.atan(0.9 * tanH)));
+    const pitch = HV.pitch * D2R, L = HV.height / Math.sin(pitch);
+    out.pos.set(bx - s * back, HV.height, HV.camZ);
+    out.look.set(out.pos.x + s * Math.cos(yaw) * Math.cos(pitch) * L, 0, out.pos.z - Math.sin(yaw) * Math.cos(pitch) * L);
     keepInWorld(camera, out.pos, out.look, shared.bounds, LOW);
     return polar(out);
   }
@@ -267,28 +244,15 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
     return polar(out);
   }
 
+  // Establishing shot: high at the west end of the street, looking down its whole length with sky + mesas above.
   function townPose(out) {
-    const pts = [];
-    for (const p of plots.values()) pts.push(...boxCorners(p.group.position.x, p.group.position.z, p.bounds.w, p.bounds.d, 2, p.group.rotation.y));
-    const c = new THREE.Vector3();
-    for (const q of pts) c.add(q);
-    c.divideScalar(pts.length).setY(0);
-    let best = null;
-    const b = shared.bounds;
-    for (const az of [-90, -72, -55, -35, -18, 0]) for (const el of [38, 50, 62, 74]) {
-      dirFrom(az * D2R, el * D2R, _d);
-      const r = fitPoints(camera, c, _d, pts, 0.92);
-      camera.position.copy(_d).multiplyScalar(r).add(c);
-      camera.lookAt(c);
-      const out = b ? outside(camera, b, 99) : 0;
-      const score = out * 1000 + r;
-      if (!best || score < best.score) best = { score, az: az * D2R, el: el * D2R, r };
-    }
-    out.look.copy(c);
-    out.az = best.az; out.el = best.el; out.r = best.r;
-    dirFrom(best.az, best.el, _d);
-    out.pos.copy(_d).multiplyScalar(best.r).add(c);
-    keepInWorld(camera, out.pos, out.look);
+    let x0 = Infinity;
+    for (const p of plots.values()) x0 = Math.min(x0, p.group.position.x - (p.bounds.heroW || 14) / 2);
+    const tanH = Math.tan((camera.fov / 2) * D2R) * Math.max(0.4, aspect);
+    const yaw = Math.atan(0.12 * tanH), pitch = 21 * D2R, H = 20, L = H / Math.sin(pitch);
+    out.pos.set(x0 - 22, H, ROAD_Z + 1.5);
+    out.look.set(out.pos.x + Math.cos(yaw) * Math.cos(pitch) * L, 0, out.pos.z - Math.sin(yaw) * Math.cos(pitch) * L);
+    keepInWorld(camera, out.pos, out.look, shared.bounds, LOW);
     return polar(out);
   }
 
@@ -465,7 +429,7 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
 
       const hold = Math.min(1, (t - shotStart) / Math.max(1, Math.min(shotLen, 40)));
       const isTown = current === '@town';
-      const drift = still() ? 0 : isTown ? Math.sin(t * 0.05) * 4 * D2R : pinned && !override ? Math.sin(t * 0.16) * 5 * D2R : (hold - 0.5) * 7 * D2R * side;
+      const drift = still() ? 0 : isTown ? Math.sin(t * 0.05) * 4 * D2R : pinned && !override ? Math.sin(t * 0.16) * 2.5 * D2R : (hold - 0.5) * 4 * D2R * side;
       const push = isTown || still() ? 1 : 1 - 0.05 * hold;
       dirFrom(dest.az + drift, dest.el, _d);
       _a.copy(_d).multiplyScalar(dest.r * push).add(dest.look);

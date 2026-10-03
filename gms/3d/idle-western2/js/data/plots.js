@@ -1,7 +1,7 @@
 // Dribble Creek (DESIGN W1/W3): ONE main street along +x. The 9 business lots sit on the NORTH side (z ≈ 0, facing +z
 // toward the street) in three blocks split by alleys; Pomfrey's 7 frontages and the Town Hall face them from the SOUTH
 // side (facing −z); the church closes the far end of the street and Boot Hill rises behind it. See docs/ART.md.
-import { LINES } from './lines.js?v=20261004b';
+import { LINES } from './lines.js?v=20261004c';
 
 export const PLOT_D = 9;
 export const ROAD_Z = 9;
@@ -11,8 +11,9 @@ export const HUB = 'hub';
 export const LOT_W = { shine: 12, tubs: 13, livery: 16, saloon: 16, dentist: 12, garter: 14, undertaker: 13, jail: 13, bank: 14 };
 export const PLOT_W = 14;
 const LOT_GAP = 1, ALLEY = 8;
-// Hero camera (lane S): like refs/a_clay_hero.jpg — low, down the street from the west, sky + mesas in the top ~18%.
-export const HERO_VIEW = { yawOffAxis: 24, elevation: 32, pitch: 19.5, fov: 50, distance: 31, lookZ: 3.5 };
+// Hero camera (cameras.js poseFor): like refs/a_clay_hero.jpg — in the street at world z camZ, `height` up, looking down
+// the street; vanish/subject are the NDC x of the street's vanishing point and of the business front.
+export const HERO_VIEW = { vanish: 0.28, subject: 0.56, camZ: 8.2, height: 7.5, pitch: 16, fov: 50, minBack: 11 };
 
 const plots = [];
 const span = {};

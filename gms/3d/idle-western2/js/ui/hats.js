@@ -1,4 +1,4 @@
-import { el, btn, setText, show } from './dom.js?v=20261004b';
+import { el, btn, setText, show } from './dom.js?v=20261004c';
 
 // The hat war (W3/W14): a ribbon "🤠 You 3/18 · 🎩 Pomfrey 7/18" whose hat icons scale with each side's tier,
 // the promotion toast, and the upturned mud hat of the opening (W15) that you tap to bank coins.

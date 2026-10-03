@@ -3,8 +3,8 @@
 // every so often (he has never recovered from Black Bart). Stock: money bags. Bought after the robbery (W13).
 // L1 bank → L25 the vault annex gains a second door + gold-bar stack → L100 a clock pediment with a gilded dome.
 import * as THREE from 'three';
-import { COLORS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, tone, tilt, smooth01 } from './western.js?v=20261004b';
-import { createConstruction, finishPlot } from './construction.js?v=20261004b';
+import { COLORS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, tone, tilt, smooth01 } from './western.js?v=20261004c';
+import { createConstruction, finishPlot } from './construction.js?v=20261004c';
 
 const BX = -2.4, FZ = 0.6, W = 7.4, D = 6.0, H = 4.2, FH = 6.4;
 const VAULT = [3.4, 1.2, -0.6];
