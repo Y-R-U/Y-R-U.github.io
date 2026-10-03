@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { fxRegistry } from './fx.js?v=20261004c';
 import { createEventArt } from './eventart.js?v=20261004c';
 import { createSpectacle } from './spectacle/director.js?v=20261004c';
+import { heroTidy, heroTidyDone, heroNearCut } from './cameras.js?v=20261004c';
 
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(),
   _y = new THREE.Vector3(0, 1, 0), _c = new THREE.Color(), _w = new THREE.Vector3();
@@ -20,29 +21,34 @@ function hash01(n) {
 
 function templates(kit, data) {
   const T = {};
+  // Western shipments (R3): the van is a covered wagon behind a mule, the courier a cowboy on horseback; both face +x.
   let b = kit.builder(data.palette || {});
   b.ao(0.25);
-  const paint = { c: 0xffffff, r: 0.32, m: 0.1 }, glass = { c: 0x9fd6e8, r: 0.08, m: 0.2 };
-  b.box(paint, 0, 0.28, 0, 2.6, 1.25, 1.3).box(glass, 1.12, 0.78, 0, 0.42, 0.55, 1.2).box(0xffffff, -0.2, 1.53, 0, 1.4, 0.12, 1.0);
-  for (const [x, z] of [[-0.8, 0.62], [0.8, 0.62], [-0.8, -0.62], [0.8, -0.62]]) b.box(0x33343a, x, 0, z, 0.5, 0.48, 0.16);
-  b.box(0xfff3b0, 1.32, 0.45, 0.42, 0.06, 0.18, 0.22).box(0xfff3b0, 1.32, 0.45, -0.42, 0.06, 0.18, 0.22);
+  const canvas = { c: 0xffffff, r: 0.85 }, plank = { c: '#a8714a', r: 0.8 }, dark = { c: '#4a2f22', r: 0.8 }, mule = { c: '#8f7a68', r: 0.8 };
+  b.slab(plank, -0.4, 0.7, 0, 3.2, 0.55, 1.6, { round: 0.06 });
+  b.ball(canvas, -0.4, 1.35, 0, 0.95, { sx: 1.75, sz: 0.88, sy: 1.0, smooth: true });
+  for (const x of [-1.5, 0.7]) for (const z of [-0.86, 0.86]) b.cyl(dark, x, 0.6, z, 0.6, 0.1, 0, { rx: Math.PI / 2, sides: 12, taper: 1 });
+  b.slab(dark, 1.5, 0.7, 0, 1.0, 0.08, 0.1);
+  b.ball(mule, 2.3, 1.05, 0, 0.42, { sx: 1.5, smooth: true });
+  b.ball(mule, 2.95, 1.5, 0, 0.2, { sx: 1.6, smooth: true });
+  for (const s of [-1, 1]) b.cone(mule, 2.85, 1.7, s * 0.1, 0.06, 0.28, 0);
+  for (const [x, z] of [[1.95, -0.15], [1.95, 0.15], [2.6, -0.15], [2.6, 0.15]]) b.cyl(mule, x, 0, z, 0.08, 0.8, 0, { sides: 6 });
   T.van = b.finish().geometry;
 
   b = kit.builder(data.palette || {});
   b.ao(0.2);
-  const tyre = 0x2a2b31, jacket = 0x3d7dd8, orange = 0xff8c42;
-  for (const x of [-0.5, 0.5]) b.cyl(tyre, x, 0.2, -0.07, 0.2, 0.14, 0, { rx: Math.PI / 2, sides: 11, taper: 1 }).cyl(0xd8dde3, x, 0.2, -0.08, 0.09, 0.16, 0, { rx: Math.PI / 2, sides: 9, taper: 1 });
-  b.slab(0xf3efe6, -0.02, 0.2, 0, 1.0, 0.12, 0.36, { round: 0.05 });
-  b.slab(orange, -0.3, 0.24, 0, 0.66, 0.32, 0.42, { round: 0.14 });
-  b.slab(orange, 0.43, 0.22, 0, 0.14, 0.62, 0.42, { rz: 0.25, round: 0.06 });
-  b.slab(0x55565e, 0.4, 0.5, 0, 0.08, 0.55, 0.1, { rz: 0.25 }).slab(0x2b2d36, 0.3, 1.0, 0, 0.08, 0.06, 0.64, { round: 0.03 });
-  b.ball({ c: 0xfff4c2, g: 1.2 }, 0.47, 0.84, 0, 0.08, { sx: 0.6 });
-  b.slab(0x2b2d36, -0.2, 0.52, 0, 0.5, 0.1, 0.32, { round: 0.05 });
-  b.slab(0xffbf69, -0.6, 0.62, 0, 0.5, 0.48, 0.5, { round: 0.05 }).slab(0xffffff, -0.6, 1.08, 0, 0.52, 0.05, 0.14).ball(0xe63946, -0.34, 0.86, 0, 0.07, { sx: 0.3 });
-  b.slab(0x3d405b, -0.08, 0.32, 0.13, 0.13, 0.3, 0.13, { rz: -0.3 }).slab(0x3d405b, -0.08, 0.32, -0.13, 0.13, 0.3, 0.13, { rz: -0.3 });
-  b.slab(jacket, -0.16, 0.56, 0, 0.32, 0.48, 0.38, { rz: -0.18, round: 0.12 });
-  for (const z of [0.2, -0.2]) b.slab(jacket, 0.08, 0.86, z, 0.09, 0.42, 0.09, { rz: -1.05, round: 0.04 });
-  b.ball(0xf2c6a0, -0.06, 1.18, 0, 0.16).ball(0xe63946, -0.08, 1.27, 0, 0.2, { sy: 0.85, smooth: true }).slab(0x2b2d36, 0.1, 1.17, 0, 0.05, 0.1, 0.26, { round: 0.02 });
+  const coat = { c: '#8a5232', r: 0.75 }, mane = { c: '#3b2a24', r: 0.8 }, shirt = { c: '#b5483a', r: 0.8 }, jeans = { c: '#4a5878', r: 0.8 }, hat = { c: '#7a5236', r: 0.8 };
+  b.ball(coat, 0, 1.0, 0, 0.42, { sx: 1.6, smooth: true });
+  b.slab(coat, 0.55, 1.05, 0, 0.32, 0.62, 0.28, { rz: -0.6, round: 0.1 });
+  b.ball(coat, 0.85, 1.55, 0, 0.2, { sx: 1.6, sy: 0.9, smooth: true }).ball({ c: '#e9d8c0', r: 0.7 }, 1.1, 1.5, 0, 0.12, { sy: 0.85 });
+  for (const z of [-0.07, 0.07]) b.cone(mane, 0.78, 1.72, z, 0.05, 0.14, 0);
+  b.ball(mane, -0.72, 0.95, 0, 0.1, { sy: 2.6, rz: -0.6 });
+  for (const [x, z] of [[0.42, -0.16], [0.42, 0.16], [-0.42, -0.16], [-0.42, 0.16]]) b.cyl(coat, x, 0, z, 0.08, 0.85, 0, { sides: 6, taper: 1.15 });
+  b.slab(dark, 0, 1.36, 0, 0.6, 0.1, 0.62, { round: 0.04 });
+  for (const z of [-0.2, 0.2]) b.slab(jeans, 0.05, 0.95, z, 0.14, 0.5, 0.14, { round: 0.05 });
+  b.slab(shirt, -0.05, 1.4, 0, 0.34, 0.5, 0.38, { round: 0.12 });
+  b.ball({ c: '#efb98f', r: 0.7 }, -0.03, 2.05, 0, 0.17);
+  b.cyl(hat, -0.03, 2.15, 0, 0.34, 0.04, 0, { sides: 12, taper: 1 }).cyl(hat, -0.03, 2.17, 0, 0.17, 0.22, 0, { sides: 10, taper: 0.9 });
   T.courier = b.finish().geometry;
 
   b = kit.builder(data.palette || {});
@@ -421,16 +427,18 @@ export function createActors(world, kit, data) {
       return out;
     },
     // Writes instance buffers for one camera; null = hero (everything), lineId = that line's actors only.
-    fill(line) {
+    fill(line, cam = null) {
       if (filledFrame === frame && filledLine === line) return;
       filledFrame = frame;
       filledLine = line;
+      const hero = !line && cam && cam === world.heroRig?.camera ? cam : null;
       let nv = 0, nc = 0, nb = 0, nd = 0, nw = 0, ns = 0, nm = 0;
       for (let i = 0; i < nrec; i++) {
         const r = recs[i];
         r.on = false;
         if (line && r.lineId !== line) continue;
         if (r.s <= 0.001) continue;
+        if (hero && r.kind !== 'boat' && r.kind !== 'drone' && heroNearCut(hero, r.x, r.y, r.z)) continue;
         r.on = true;
         const sc = r.s;
         if (r.kind === 'walker') {
@@ -500,7 +508,13 @@ export function createActors(world, kit, data) {
   const prev = scene.onBeforeRender;
   scene.onBeforeRender = function (renderer, sc, camera, rt) {
     prev.call(this, renderer, sc, camera, rt);
-    api.fill(camera.userData.iw2Line || null);
+    heroTidy(world, camera, wired);
+    api.fill(camera.userData.iw2Line || null, camera);
+  };
+  const prevAfter = scene.onAfterRender;
+  scene.onAfterRender = function (renderer, sc, camera, rt) {
+    prevAfter?.call(this, renderer, sc, camera, rt);
+    heroTidyDone();
   };
 
   queueMicrotask(() => {

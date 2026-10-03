@@ -120,6 +120,34 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     out[0] = cam.position.x + _v.x * k; out[1] = 0; out[2] = cam.position.z + _v.z * k;
     return out;
   }
+  // The R3 stage: a street point in the current hero shot where a 2 m character reads ~150–250 px tall on the S22
+  // (STAGE_FRAC of the frame height), inside the tilt-shift focus band. `ax/az` run across the view, `fx/fz` along it.
+  const STAGE_H = 2.0, STAGE_FRAC = 0.105;
+  const stageP = { x: 0, z: 0, ax: 0, az: 1, fx: 1, fz: 0, ok: false };
+  const _sf = new THREE.Vector3(), _sh = new THREE.Vector3();
+  function stage() {
+    const cam = world.heroRig.camera;
+    cam.updateMatrixWorld();
+    cam.getWorldDirection(_v);
+    let fx = _v.x, fz = _v.z;
+    const n = Math.hypot(fx, fz) || 1;
+    fx /= n; fz /= n;
+    const z0 = (street.north ?? street.z - street.width / 2) + 0.9, z1 = (street.south ?? street.z + street.width / 2) - 0.9;
+    const at = (d) => {
+      const x = cam.position.x + fx * d, z = Math.min(z1, Math.max(z0, cam.position.z + fz * d));
+      _sf.set(x, 0, z).project(cam); _sh.set(x, STAGE_H, z).project(cam);
+      return (_sh.y - _sf.y) / 2;
+    };
+    let lo = 4, hi = 80;
+    for (let i = 0; i < 16; i++) { const m = (lo + hi) / 2; if (at(m) > STAGE_FRAC) lo = m; else hi = m; }
+    at(lo);
+    const ok = _sf.z < 1 && _sf.y > -0.85 && _sh.y < 0.6 && Math.abs(_sf.x) < 0.8;
+    if (ok) { stageP.x = cam.position.x + fx * lo; stageP.z = Math.min(z1, Math.max(z0, cam.position.z + fz * lo)); }
+    else { const L = heroLook(); stageP.x = L[0]; stageP.z = Math.min(z1, Math.max(z0, L[2])); }
+    stageP.fx = fx; stageP.fz = fz; stageP.ax = -fz; stageP.az = fx; stageP.ok = ok;
+    if (stageP.az < 0) { stageP.ax = -stageP.ax; stageP.az = -stageP.az; }
+    return stageP;
+  }
   function inHero(p, m = 0.9) {
     _v.set(p[0], p[1] ?? 1, p[2]).project(world.heroRig.camera);
     return _v.z < 1 && Math.abs(_v.x) < m && Math.abs(_v.y) < m;
@@ -142,7 +170,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     get t() { return t; }, game, world, bus, fx, parts, street, PV, lim,
     actor: (sc, spec) => alloc(sc, spec, false),
     extra: (sc, spec) => alloc(sc, spec, true),
-    release, prop, anchor, hasAnchor, lineOpen, heroLook, inHero, act,
+    release, prop, anchor, hasAnchor, lineOpen, heroLook, inHero, act, stage,
+    camPos: () => world.heroRig.camera.position,
     head: (a, out) => cast.head(a, out),
     hatRest: (a) => cast.hatRest(a),
     hatRadius: (a) => cast.hatRadius(a),
@@ -195,6 +224,7 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     try { sc.end?.(ctx); } catch (e) { console.error(e); }
     for (const a of [...sc.actors]) release(a);
     if (sc.shotOn) ctx.dropShot(sc);
+    if (STAGED(sc)) stageAt = Math.max(stageAt, t + 2.5 + R() * 2.5);
     if (sc.beat) bus?.emit('spectacle:beat', { kind: sc.beatKind || sc.beat, phase: 'end' });
   }
   const slotBusy = () => scenes.some((s) => s.slot && s.prio >= 2);
@@ -275,8 +305,26 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     for (const id of pendingSpecials.keys()) if (!game.state.events.active.some((x) => x.id === id)) pendingSpecials.delete(id);
   }
 
+  // R3: every tour/pinned shot gets one staged mid-ground gag. A new shot ends the old shot's gag and stages a fresh one
+  // once the glide lands; the tour holds the shot until it has played. Town keeps the old 15–30 s ambient cadence.
+  let stageShot = null, stageAt = 0;
+  const STAGED = (s) => s.kind === 'gag' || (s.kind === 'duel' && s.ambient) || (s.kind === 'eject' && s.amb);
   function ambient() {
     if (!game.state.bootstrap?.done || !heroVisible) return;
+    const rig = world.heroRig, mode = rig.mode;
+    if (mode === 'tour' || mode === 'pin') {
+      if (rig.current !== stageShot) {
+        stageShot = rig.current; stageAt = t + 0.4;
+        if (lim.on) for (const s of [...scenes]) if (STAGED(s)) end(s);
+        return;
+      }
+      if (t < stageAt || rig.gliding || rig.shooting) return;
+      if (scenes.some((s) => s.slot || s.kind === 'gag')) { stageAt = t + 1; return; }
+      stageAt = t + 1;
+      const sc = S.pickGag?.(null, { staged: true, shot: stageShot });
+      if (sc && mode === 'tour') rig.hold?.((sc.dur || 8) + 0.6);
+      return;
+    }
     if (t < nextAmbient) return;
     if (lim.on && scenes.some((s) => s.slot || s.kind === 'gag')) { nextAmbient = t + 2; return; }
     nextAmbient = t + (lim.on ? AMBIENT_GAP[0] + R() * (AMBIENT_GAP[1] - AMBIENT_GAP[0]) : 2.5);
@@ -482,6 +530,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     gag(id) { return S.pickGag?.(id); },
     has(kind) { return typeof S[kind] === 'function' && !['attach', 'always', 'pickGag', 'buildFx'].includes(kind); },
     play(kind, args = {}) { return !!start(kind, { cosmetic: true, ...args }); },
+    stage,
+    playScene(kind, args = {}) { return start(kind, { cosmetic: true, ...args }); },
     stop(kind) { for (const s of [...scenes]) if (!kind || s.kind === kind) end(s); },
     budget(on) { if (on !== undefined) lim.on = !!on; return lim.on; },
     get scenes() { return scenes.map((s) => s.kind); },

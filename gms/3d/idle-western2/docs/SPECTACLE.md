@@ -101,12 +101,7 @@ Runs on 2026-10-04 (machine load 6–13 from parallel lanes, so absolute ms are 
 test-boot, test-look, test-lifecycle: PASS on 9351.
 
 ## Round 2 (2026-10-04)
-**Hero camera** (`HERO_VIEW` in `data/plots.js`, S-owned this round): `{yawOffAxis 24, elevation 32, pitch 19.5, fov 50,
-distance 31, lookZ 3.5}`. The camera orbits a street point in front of the business at 32° but aims 19.5° down, so sky and
-the mesa ring fill the top ~12–18% like `refs/a_clay_hero.jpg`. Plots west of the town middle are shot from the west looking
-east, plots east of it from the east looking west, so the street always recedes behind the focus. Only the lower frame
-must land inside the world (`keepInWorld(..., LOW)`; `tools/test-look.mjs`'s hero probe matches). Pre-bootstrap: a fixed
-street shot on the saloon doors + mud (`openingPose`).
+**Hero camera:** superseded by the integration fix (BUILD c) and Round 3, below.
 
 **Borrowed cameras.** Scenes call `ctx.takeShot(sc, fn)` / `frameAt(sc, at, {p, l, fov})` (offsets from a world point);
 a higher-prio scene (or the same kind) takes over, an ending scene only drops its own. `spectacle.hot` (M's 60 fps flag) is
@@ -130,7 +125,44 @@ particles 2 + rings 1 + ghosts 1 ≤ 8. The cast crowd is `rig:'full', pool:fals
 **Gate (2026-10-04, round 2):** test-spectacle PASS (A: dt p95 16.7, work best 5.2 ms ≤ 8, actors 6, particles 56,
 spectacle draws ≤ 6; B nobudget: actors 37 → FAIL as required). test-boot, test-look, test-lifecycle PASS on 9351.
 
+## Round 3 (2026-10-04)
+**Hero camera** (`poseFor` in `cameras.js`, numbers in `HERO_VIEW`, `data/plots.js`): the camera stands IN the street
+(world z `camZ` 8.2, `height` 7.5 m, pitch 16°, fov 50) and looks DOWN it like `refs/a_clay_hero.jpg`. Per aspect it solves
+a yaw so the street's vanishing point lands at NDC x = ±`vanish` (0.28) and the business front at ∓`subject` (0.56);
+plots west of the town middle are shot from the west looking east, east ones from the east. `minBack` 11 m keeps the lot's
+near corner in frame. Only the lower frame must land in the world (`LOW` probes), so sky + mesas fill the top. Town
+(`@town`) is a high establishing shot from the west end; pre-bootstrap is the fixed opening shot on the saloon doors + mud.
+
+**Near-plane cleanup** (`heroTidy` in `cameras.js`, called from `actors.js`'s `scene.onBeforeRender` for the hero
+camera only, after the crowd-pool gather; `heroTidyDone` restores in `onAfterRender`):
+- The bottom of the frame is a people-free foreground band: pooled townsfolk and couriers/wagons whose feet project below
+  NDC y −0.55, or that stand within 10 m of the lens, are dropped (pool instance matrix zeroed for that render;
+  `actors.fill(line, cam)` skips them). `world.pool.stats.nearCut` counts them.
+- Idle-ish pooled folk (idle/cheer/sip/point/tiphat) within 34 m turn to face the lens.
+- The hub plot (placeholder well, wagon, trough, sign — the critic's pink plinth, black slabs and white blob) is hidden in
+  the hero once `bootstrap.done` (the opening still shows it).
+- Any mesh with `userData.heroNear = true` hides within 13 m of the hero camera (P: tag street-front props such as
+  hitched horses; rescanned every ~240 frames).
+- Shipments are western now: the van is a covered wagon behind a mule, the courier a cowboy on horseback (actors.js).
+
+**Director staging** (one mid-ground comedic beat per tour shot): `spectacle.stage()` solves, on the live hero camera, the
+street point where a 2 m figure is `STAGE_FRAC` 0.105 of the frame height (≈ 200–260 S22 device px with A's R3 people)
+inside the tilt-shift focus band, with `ax/az` across the view and `fx/fz` along it. In tour/pin mode a new shot ends the old
+shot's staged gag and stages a fresh one once the glide lands; the tour `heroRig.hold(sc.dur)`s the shot until it has
+played; a 2.5–5 s gap follows each gag. Town keeps the old 15–30 s cadence. Staged gags move ACROSS the view (they stay big
+and in frame) and face the lens when idle: Wendell's barrel (stops, turns, hops), Pickles (snores, sits up sozzled with
+stars, flops back), chicken chase that turns on its chaser, Pomfrey's procession (stops mid-street to tip the hat),
+Mortimer measuring a passer-by (who turns to the lens, hands up), the staring horse + a pointing local, tumbleweed, and an
+ambient duel side-on across the street (paces 2.6 m). The shot's own business pulls its character's gag forward
+(`PREFER`: jail→barrel, undertaker→Mortimer, tubs→Pickles, saloon→duel/eject…); the Garter window gag only plays on the
+Garter shot, the ambient ejection only on the saloon/hub shot. Ghost Town ghosts drift across the shot 4 m behind the stage.
+Check with `CDP_PORT=9351 node tools/stageshot.mjs docs/shots/spectacle/r3 [ids] [tod] [gag]` (logs each staged
+character's device-px height); sheets in `docs/shots/spectacle/r3/` (`sheet_stage`, `sheet_hero_day`, `sheet_night`).
+
+**Gate (R3):** test-spectacle PASS (A: work best ~4 ms, actors ≤ 6, particles ≤ 60; B nobudget: actors 35 → FAIL as
+required), test-look, test-boot, test-scroll PASS on 9351.
+
 ## Known gaps / next
-- Clutter is the main legibility problem now: the hub's placeholder props (well, covered wagon, stalls, cows) sit in the
-  fling/brawl/opening frames, and the hub walkers (`hub.js` path at local z 3.3) cross the opening shot's foreground.
-- Hero characters at tour distance are still small (~20–30 px); the beats/specials carry the faces.
+- The saloon plot's hitched horse is merged into its static mesh, so it still shows cut by the bottom edge in the
+  dentist shot (camera stands in front of the saloon); needs P's `heroNear` tag (CONTRACT request).
+- Hub placeholder props still clutter the fling/brawl/opening frames (hidden only in the tour).

@@ -329,9 +329,12 @@ export function createScenes(ctx) {
   // ======================================================= LEONE DUEL (W8) — real (minigame) or ambient (no reward)
   S.duel = (args) => {
     const ev = args.event, amb = !!args.ambient;
-    const sc = { prio: amb ? 1 : 3, slot: true, eventId: ev?.id, ambient: amb, phase: 'intro', cosmetic: amb || !!args.cosmetic };
+    const sc = { prio: amb ? 1 : 3, slot: true, eventId: ev?.id, ambient: amb, phase: 'intro', cosmetic: amb || !!args.cosmetic, dur: 12 };
+    // R3 staged ambient duel: across the street at the shot's stage point, side-on to the lens, paces 2.8 m each.
+    const staged = amb && !!args.staged, st = staged ? ctx.stage() : null;
     const L = ctx.heroLook();
-    const cx = L[0], z = ROAD + 0.6;
+    const cx = staged ? st.x : L[0], z = ROAD + 0.6, cz = ROAD, pace = staged ? 2.6 : 6, ro = staged ? -PI / 2 : 0;
+    const place = (a, off) => { if (staged) { a.x = cx; a.z = cz + off; } else { a.x = cx + off; a.z = z; } };
     let you = null, opp = null, mort = null, intr = null, result = null, resultAt = 0, tDraw = 0, last = 'intro';
     const I = { kind: null, a: null, t0: 0 };
     const oppId = args.opponent || pickOf(OPPONENTS);
@@ -339,6 +342,7 @@ export function createScenes(ctx) {
       you = ctx.actor(sc, amb ? { ...townsfolk(7 + Math.floor(R() * 20)), x: cx - 0.4, z, h: -PI / 2 } : strangerSpec({ x: cx - 0.4, z, h: -PI / 2 }));
       opp = ctx.actor(sc, { char: oppId, x: cx + 0.4, z, h: PI / 2 });
       if (!you || !opp) return;
+      place(you, -0.4); place(opp, 0.4); you.h = -PI / 2 + ro; opp.h = PI / 2 + ro;
       tDraw = (amb ? 5.4 : 8.0) + R() * 1.8;
       if (!amb && R() < 0.6) { I.kind = pickOf(['horse', 'pickles', 'fly']); tDraw += 2.0; }
       if (!amb) ctx.takeShot(sc, shot);
@@ -371,15 +375,19 @@ export function createScenes(ctx) {
         else if (t < 4) {
           sc.phase = 'paces';
           const u = (t - 1) / 3, step = Math.floor(u * 10);
-          you.x = cx - 0.4 - u * 6; opp.x = cx + 0.4 + u * 6;
+          place(you, -0.4 - u * pace); place(opp, 0.4 + u * pace);
           you.clip = opp.clip = CLIP.walk; you.speed = opp.speed = 6;
-          if (step !== sc.step) { sc.step = step; parts.puff([you.x, 0, z], 1, { r: 0.1, size: 0.18 }); parts.puff([opp.x, 0, z], 1, { r: 0.1, size: 0.18 }); }
+          if (step !== sc.step) { sc.step = step; parts.puff([you.x, 0, you.z], 1, { r: 0.1, size: 0.18 }); parts.puff([opp.x, 0, opp.z], 1, { r: 0.1, size: 0.18 }); }
         } else {
-          if (t < 4.4) { you.h = PI / 2 * ((t - 4) / 0.4) * 2 - PI / 2; opp.h = PI / 2 - PI * ((t - 4) / 0.4); }
-          else { you.h = PI / 2; opp.h = -PI / 2; }
+          if (t < 4.4) { you.h = PI / 2 * ((t - 4) / 0.4) * 2 - PI / 2 + ro; opp.h = PI / 2 - PI * ((t - 4) / 0.4) + ro; }
+          else { you.h = PI / 2 + ro; opp.h = -PI / 2 + ro; }
           you.clip = opp.clip = sc.phase === 'draw' ? CLIP.draw : CLIP.duel;
           sc.phase = !amb && t > 5.5 && t < 6.9 ? 'ecu' : t >= tDraw ? 'draw' : 'standoff';
-          if (t > 4.6 && t < 8) { const u = (t - 4.6) / 3.4; ctx.prop(PV.tumbleweed, cx, 0.45 + Math.abs(Math.sin(t * 5)) * 0.4, z - 5 + u * 11, { rx: t * 6, s: 0.8 }); }
+          if (t > 4.6 && t < 8) {
+            const u = (t - 4.6) / 3.4, b = 0.45 + Math.abs(Math.sin(t * 5)) * 0.4;
+            if (staged) ctx.prop(PV.tumbleweed, cx + st.fx * (7 - u * 9), b, cz + 0.3 + st.fz * (7 - u * 9), { rx: t * 6, s: 0.9 });
+            else ctx.prop(PV.tumbleweed, cx, b, z - 5 + u * 11, { rx: t * 6, s: 0.8 });
+          }
           if (I.kind && t > 7.1 && t < tDraw - 0.3) interruption(dt, t);
         }
         if (sc.phase === 'draw' && !sc.drew) {
@@ -940,15 +948,18 @@ export function createScenes(ctx) {
     const g = args.ghost;
     if (!g) return null;
     const sc = { prio: 0.4, gid: g.id, cosmetic: false };
-    const z = Math.min(ROAD - 1.5, ctx.heroLook()[2] + 2 + R() * 1.5);
-    const [a, b] = crossing(z, 9);
+    // R3: drifts ACROSS the tour shot a little behind the stage point (mid-ground, not at the lens).
+    const st = world.heroRig.mode !== 'town' ? ctx.stage() : null;
+    let z = Math.min(ROAD - 1.5, ctx.heroLook()[2] + 2 + R() * 1.5);
+    const [a, b] = st?.ok ? (R() < 0.5 ? [-5, 5] : [5, -5]) : crossing(z, 9);
     const life = Math.max(3, (g.until - g.born) || 9);
-    let x = a, y = 1.6, h = Math.sign(b - a) * PI / 2, fade = 0, out = -1, caught = -1;
+    let x = a, y = 1.6, h = st?.ok ? Math.atan2(st.ax * Math.sign(b - a), st.az * Math.sign(b - a)) : Math.sign(b - a) * PI / 2, fade = 0, out = -1, caught = -1;
     sc.update = (dt) => {
       const t = sc.t;
       if (caught < 0) {
         const u = Math.min(1, t / life);
         x = a + (b - a) * u;
+        if (st?.ok) { const k = x; x = st.x + st.ax * k + st.fx * 4; z = st.z + st.az * k + st.fz * 4; }
         y = 1.5 + Math.sin(t * 2.2) * 0.25;
         fade = Math.min(1, t / 0.6) * (out < 0 ? 1 : Math.max(0, 1 - (t - out) / 0.6));
         if (Math.floor(t * 3) !== Math.floor((t - dt) * 3)) parts.puff([x - Math.sign(b - a) * 0.4, y - 0.4, z], 1, { r: 0.15, size: 0.18, up: 0.3, col: PCOL.ECTO, life: 1.2 });
@@ -996,23 +1007,28 @@ export function createScenes(ctx) {
   const recentGags = [];
   const GAGS = [
     { id: 'barrel', w: 3 }, { id: 'pickles', w: 3 }, { id: 'chickens', w: 3 }, { id: 'pomfrey', w: 2 },
-    { id: 'vultures', w: 1.5, ok: () => ctx.lineOpen('undertaker') }, { id: 'garter', w: 2.5, ok: () => ctx.lineOpen('garter') && !ctx.game.state.sunday && garterInView() },
+    { id: 'vultures', w: 1.5, stage: false, ok: () => ctx.lineOpen('undertaker') }, { id: 'garter', w: 2.5, ok: () => ctx.lineOpen('garter') && !ctx.game.state.sunday && garterInView() },
     { id: 'mortimer', w: 1.5, ok: () => ctx.lineOpen('undertaker') }, { id: 'duel', w: 1.2, ok: () => ctx.lineOpen('saloon') },
     { id: 'horse', w: 1.2 }, { id: 'eject', w: 2, ok: () => !ctx.lineOpen('saloon') && world.plots.has('saloon') && ctx.inHero(ctx.anchor('saloon', 'doors'), 0.8) },
-    { id: 'tumbleweed', w: 1 },
+    { id: 'tumbleweed', w: 1, sw: 0.3 },
     { id: 'ghostduel', w: 4, ok: () => !!ctx.game.state.season?.live },
   ];
   function garterInView() { const p = world.plots.has('garter') && ctx.anchor('garter', 'window'); return !!p && ctx.inHero(p, 0.85); }
-  S.pickGag = (force) => {
-    const pool = GAGS.filter((g) => (force ? g.id === force : !recentGags.includes(g.id) && (!g.ok || g.ok())));
+  // R3: the tour stages one gag per shot; the shot's own business pulls its character's gag forward.
+  const PREFER = { jail: ['barrel'], undertaker: ['mortimer', 'duel'], tubs: ['pickles'], saloon: ['duel', 'pickles', 'eject'], bank: ['pomfrey'], shine: ['pomfrey', 'chickens'], dentist: ['chickens', 'mortimer'], garter: ['garter', 'pomfrey'], livery: ['horse', 'chickens'], hub: ['pickles', 'eject'] };
+  S.pickGag = (force, o = {}) => {
+    const staged = !!o.staged;
+    const pool = GAGS.filter((g) => (force ? g.id === force : !recentGags.includes(g.id) && (!g.ok || g.ok()) && !(staged && (g.stage === false || (g.id === 'garter' && o.shot !== 'garter') || (g.id === 'eject' && o.shot !== 'saloon' && o.shot !== 'hub')))));
     if (!pool.length) return null;
-    let r = R() * pool.reduce((s, g) => s + g.w, 0), g = pool[0];
-    for (const x of pool) if ((r -= x.w) <= 0) { g = x; break; }
+    const pref = PREFER[o.shot] || [];
+    const w = (g) => (staged ? g.sw ?? g.w : g.w) * (pref.includes(g.id) ? 3 : 1);
+    let r = R() * pool.reduce((s, g) => s + w(g), 0), g = pool[0];
+    for (const x of pool) if ((r -= w(x)) <= 0) { g = x; break; }
     recentGags.push(g.id);
     if (recentGags.length > 3) recentGags.shift();
-    if (g.id === 'duel') return api.play('duel', { ambient: true });
-    if (g.id === 'eject') return api.play('eject', { id: 'amb', kind: 'drunk', level: 1, autoAfter: 1.0 });
-    return api.play('gag', { which: g.id });
+    if (g.id === 'duel') return api.playScene('duel', { ambient: true, staged });
+    if (g.id === 'eject') { const sc = api.playScene('eject', { id: 'amb', kind: 'drunk', level: 1, autoAfter: 1.0 }); if (sc) { sc.amb = true; sc.dur = 6; } return sc; }
+    return api.playScene('gag', { which: g.id, staged });
   };
 
   // A path across the current hero frame along the street at depth z.
@@ -1026,9 +1042,153 @@ export function createScenes(ctx) {
 
   S.gag = (args) => {
     const which = args.which;
-    const sc = { prio: 0, kind: 'gag', which, cosmetic: true };
+    const sc = { prio: 0, kind: 'gag', which, cosmetic: true, dur: 8 };
     const L = ctx.heroLook();
-    const G = {
+    // Staged (R3): placed on ctx.stage(), moving ACROSS the view (u) so they stay big and in frame; idle = face the lens.
+    const st = args.staged ? ctx.stage() : null, cam = ctx.camPos();
+    const P = (u, v = 0) => [st.x + st.ax * u + st.fx * v, st.z + st.az * u + st.fz * v];
+    const faceCam = (a) => face(a, cam.x, cam.z);
+    const toward = (a, b) => Math.atan2(st.ax * Math.sign(b - a), st.az * Math.sign(b - a));
+    function spanU(max) {
+      const ok = (u) => { const p = P(u); return p[1] > NORTH + 0.4 && p[1] < SOUTH - 0.4 && ctx.inHero([p[0], 1, p[1]], 0.92); };
+      let a = -max, b = max;
+      for (let i = 0; i < 12 && !ok(a) && a < -1; i++) a += max / 12;
+      for (let i = 0; i < 12 && !ok(b) && b > 1; i++) b -= max / 12;
+      return R() < 0.5 ? [a, b] : [b, a];
+    }
+    const G = st ? {
+      barrel() {
+        const [a, b] = spanU(5.5), mid = (a + b) / 2;
+        const T1 = Math.abs(mid - a) / 1.1, T2 = T1 + 2.2;
+        sc.dur = T2 + Math.abs(b - mid) / 1.1;
+        return () => {
+          const t = sc.t, stop = t > T1 && t < T2;
+          const u = t <= T1 ? a + (mid - a) * (t / T1) : stop ? mid : mid + (b - mid) * Math.min(1, (t - T2) / (sc.dur - T2));
+          const step = stop ? 0 : Math.sin(t * 10), [x, z] = P(u);
+          const ry = stop ? Math.atan2(cam.x - x, cam.z - z) : toward(a, b);
+          const hop = stop && t - T1 > 0.6 && t - T1 < 1.6 ? Math.abs(Math.sin((t - T1 - 0.6) * PI * 2)) * 0.35 : 0;
+          if (stop && hop > 0.3 && !sc.hopped) { sc.hopped = true; parts.puff([x, 0, z], 4, { r: 0.4 }); }
+          ctx.prop(PV.legs, x, Math.max(0, step) * 0.08 + hop, z, { ry, sx: 1 + step * 0.15, s: 1.7 });
+          ctx.prop(PV.barrel, x, 0.5 + Math.abs(step) * 0.1 + hop, z, { rz: step * 0.12, ry: stop ? ry : t, s: 1.7 });
+          return t < sc.dur;
+        };
+      },
+      pickles() {
+        const [x, z] = P(R() < 0.5 ? -1 : 1);
+        const a = ctx.actor(sc, { char: 'pickles', x, y: 0.18, z, h: 0, clip: CLIP.sprawl });
+        if (!a) return null;
+        a.h = Math.atan2(cam.x - x, cam.z - z) + PI / 2;
+        a.pitch = -PI / 2; a.prone = true;
+        sc.dur = 10;
+        return () => {
+          const t = sc.t;
+          if (t > 4 && t < 7.2) {
+            const k = Math.min(1, (t - 4) / 0.5) * Math.min(1, (7.2 - t) / 0.3);
+            a.pitch = -PI / 2 * (1 - k); a.y = 0.18 * (1 - k); a.prone = k < 0.5;
+            a.clip = k > 0.5 ? CLIP.slump : CLIP.sprawl;
+            if (k > 0.5) faceCam(a);
+            if (t > 5.4 && !sc.hic) { sc.hic = true; parts.stars([a.x, 2.2, a.z], 3, { follow: () => ctx.head(a, _h), life: 1.6 }); }
+          } else {
+            if (t >= 7.2 && !sc.flop) { sc.flop = true; parts.puff([a.x, 0, a.z], 8, { r: 0.8 }); a.h = Math.atan2(cam.x - a.x, cam.z - a.z) + PI / 2; }
+            a.pitch = -PI / 2; a.y = 0.18; a.prone = true; a.clip = CLIP.sprawl;
+            if (Math.floor(t * 1.2) !== Math.floor((t - 0.05) * 1.2)) parts.puff([a.x, 0.9, a.z], 1, { r: 0.05, size: 0.14, up: 0.6, col: PCOL.SMOKE });
+          }
+          a.roll = Math.sin(t * 0.9) * 0.05;
+          return t < sc.dur;
+        };
+      },
+      chickens() {
+        const [a, b] = spanU(5);
+        const dir = Math.sign(b - a);
+        const man = ctx.extra(sc, { ...townsfolk(3 + Math.floor(R() * 20)), x: P(a)[0], z: P(a)[1], clip: CLIP.walk });
+        sc.dur = 7;
+        return () => {
+          const t = sc.t, back = t > 3.4, k = back ? Math.min(1, (t - 3.4) / 3.2) : Math.min(1, t / 3.4);
+          const u = back ? b + (a - b) * k : a + (b - a) * k, d = back ? -dir : dir;
+          const ry = toward(0, d);
+          const hop = (q) => Math.abs(Math.sin(t * 14 + q)) * 0.25;
+          const lead = back ? 1.6 : 0, chase = back ? 0 : 1.6;
+          for (let i = 0; i < 2; i++) { const [x, z] = P(u - d * (lead ? 0 : 0.9 * i) + d * (lead ? -0.9 * i - 1.4 : 0), 0.4 * i); ctx.prop(PV.chicken, x, hop(i), z, { ry, ph: t * 4 + i, s: 1.9 }); }
+          if (man) {
+            const [x, z] = P(u - d * chase + (back ? d * 0.4 : 0), 0.2);
+            man.x = x; man.z = z; man.h = ry; man.clip = back ? CLIP.flail : CLIP.walk; man.speed = back ? 8 : 9;
+            if (t > 3.0 && t < 3.6) { faceCam(man); man.clip = CLIP.handsup; }
+          }
+          if (Math.floor(t * 6) !== Math.floor((t - 0.02) * 6)) { const [x, z] = P(u); parts.puff([x, 0, z], 1, { r: 0.1, size: 0.18 }); }
+          return t < sc.dur;
+        };
+      },
+      pomfrey() {
+        const def = POMFREY_HATS[ctx.game.state.pomfrey ?? 7];
+        const [a, b] = spanU(6), dir = Math.sign(b - a), mid = (a + b) / 2;
+        const p = ctx.actor(sc, { char: 'pomfrey', hat: pomfreyHat(def), x: P(a)[0], z: P(a)[1] });
+        if (!p) return null;
+        const bearers = [];
+        if ((def?.scale || 1) >= 2) for (const s of [-1, 1]) { const e = ctx.extra(sc, { char: 'goon', x: p.x, z: p.z, clip: CLIP.cheer, speed: 2 }); if (e) bearers.push([e, s]); }
+        ctx.say('pomfrey', 'pomfrey_pass');
+        const T1 = Math.abs(mid - a) / 1.2, T2 = T1 + 2.2;
+        sc.dur = T2 + Math.abs(b - mid) / 1.2;
+        return () => {
+          const t = sc.t, stop = t > T1 && t < T2;
+          const u = t <= T1 ? a + (mid - a) * (t / T1) : stop ? mid : mid + (b - mid) * Math.min(1, (t - T2) / (sc.dur - T2));
+          [p.x, p.z] = P(u);
+          if (stop) { faceCam(p); p.clip = t - T1 < 1.4 ? CLIP.tiphat : CLIP.idle; p.speed = 4; }
+          else { p.h = toward(0, dir); p.clip = CLIP.walk; p.speed = 3.5; }
+          for (const [e, s] of bearers) {
+            [e.x, e.z] = P(u - dir * 0.2, s * (def.scale || 1) * 0.42);
+            e.h = p.h; e.clip = stop ? CLIP.idle : CLIP.cheer; e.y = stop ? 0 : Math.abs(Math.sin(t * 7 + s)) * 0.03;
+          }
+          return t < sc.dur;
+        };
+      },
+      mortimer() {
+        const [a, b] = spanU(5), dir = Math.sign(b - a);
+        const pass = ctx.extra(sc, { ...townsfolk(Math.floor(R() * 30)), x: P(a)[0], z: P(a)[1] });
+        const m = ctx.actor(sc, { char: 'mortimer', x: P(b)[0], z: P(b)[1] });
+        if (!pass || !m) { if (pass) ctx.release(pass); if (m) ctx.release(m); return null; }
+        const pa = P(-dir * 0.5), pm = P(dir * 0.5), ea = P(a - dir * 3), eb = P(b + dir * 3);
+        sc.dur = 10;
+        return () => {
+          const t = sc.t, dt = 1 / 60;
+          if (t < 3) { walkTo(pass, pa[0], pa[1], 1.6, dt); walkTo(m, pm[0], pm[1], 1.6, dt); }
+          else if (t < 6.8) {
+            m.clip = CLIP.work; face(m, pass.x, pass.z);
+            if (t < 5) { pass.clip = CLIP.idle; face(pass, m.x, m.z); } else { faceCam(pass); pass.clip = CLIP.handsup; }
+            const top = ctx.head(pass, _h)[1];
+            ctx.prop(PV.tape, pass.x + (m.x - pass.x) * 0.3, 0.05, pass.z + (m.z - pass.z) * 0.3, { rx: -PI / 2, sz: top / 1.2 * Math.min(1, (t - 3) / 0.8) });
+          } else { walkTo(pass, ea[0], ea[1], 3.2, dt); pass.clip = CLIP.flail; pass.speed = 10; walkTo(m, eb[0], eb[1], 1.2, dt); }
+          return t < sc.dur;
+        };
+      },
+      horse() {
+        const [x, z] = P(R() < 0.5 ? -1.2 : 1.2);
+        const man = ctx.extra(sc, { ...townsfolk(Math.floor(R() * 30)), x: x, z: z, clip: CLIP.idle });
+        const [mx, mz] = P(x > st.x ? -0.6 : 0.6, -1.5);
+        if (man) { man.x = mx; man.z = mz; }
+        sc.dur = 9;
+        return () => {
+          const want = Math.atan2(cam.x - x, cam.z - z);
+          const ry = sc.t < 2 ? -PI / 2 + (want + PI / 2) * ease(Math.min(1, sc.t / 2)) : want;
+          ctx.prop(PV.horse, x, 0, z, { ry, rz: Math.sin(sc.t * 0.8) * 0.01, s: 1.1 });
+          if (man) {
+            if (sc.t < 3) { face(man, x, z); man.clip = CLIP.point; }
+            else if (sc.t < 6) { faceCam(man); man.clip = CLIP.idle; }
+            else { faceCam(man); man.clip = CLIP.handsup; }
+          }
+          return sc.t < sc.dur;
+        };
+      },
+      tumbleweed() {
+        const [a, b] = spanU(7);
+        sc.dur = 5;
+        return () => {
+          const u = sc.t / 5, [x, z] = P(a + (b - a) * Math.min(1, u), Math.sin(sc.t) * 0.5);
+          ctx.prop(PV.tumbleweed, x, 0.5 + Math.abs(Math.sin(sc.t * 4)) * 0.6, z, { rx: sc.t * 5 * Math.sign(b - a), rz: sc.t * 2, s: 1.1 });
+          return u < 1;
+        };
+      },
+    } : {};
+    const LEGACY = {
       barrel() {
         const [a, b] = crossing(ROAD + 0.8);
         return () => {
@@ -1168,6 +1328,7 @@ export function createScenes(ctx) {
         };
       },
     };
+    for (const k in LEGACY) G[k] ||= LEGACY[k];
     let step = null;
     sc.begin = () => { step = G[which]?.() || null; };
     sc.update = (dt) => (step ? step(dt) : false);

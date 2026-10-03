@@ -126,11 +126,12 @@ export function createCardRig(plot) {
   function load() {
     c = plot.camera;
     key = keyOf();
-    lookL.set(...c.look); posL.set(...c.pos);
+    const auth = building() && c.build ? c.build : c;
+    lookL.set(...auth.look); posL.set(...auth.pos);
     dir.copy(posL).sub(lookL);
     baseDist = dir.length();
     dir.normalize();
-    if (building()) {
+    if (building() && !c.build) {
       const S = plot.construction.site, y = plot.construction.anchors?.yard;
       const x0 = Math.min(S.x - S.w / 2, y ? y[0] - 1.5 : 1e9), x1 = Math.max(S.x + S.w / 2, y ? y[0] + 3.5 : -1e9);
       lookL.set((x0 + x1) / 2, S.fh * 0.4, S.fz + 1.2);
@@ -384,6 +385,9 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
     pin(id) { if (!plots.has(id)) return; pinned = id; if (!override && !town) go(id, { len: 1e9 }); },
     unpin() { pinned = null; if (!override && !town) shotStart = t - shotLen + 3; },
     cut(id, sec = interval) { startOverride(id, sec, 'cut'); },
+    // A staged beat asks the tour to stay on this shot until it has played out.
+    hold(sec) { if (!override && !town && !pinned) shotLen = Math.max(shotLen, t - shotStart + sec); },
+    get gliding() { return t - glideStart < glideDur; },
     shot(fn) { if (fn && !shotFn) { shotPose.pos.copy(camera.position); shotPose.look.copy(cur.look); shotPose.fov = FOV; } shotFn = fn || null; },
     get shooting() { return !!shotFn || shotW > 0.01; },
     // The street point the tour shot is built around (its look sits straight above it).
@@ -465,4 +469,61 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
     },
   };
   return dir;
+}
+
+// Hero near-plane tidy (R3), run in scene.onBeforeRender for the hero camera after the crowd pool gather. The bottom of
+// the hero frame is a people-free foreground band (dirt, boardwalk, props): pooled townsfolk and couriers whose feet
+// land below FOOT_Y, or that stand within NEAR m of the lens, are dropped, so no blurry giant half-bodies at the near
+// plane; idle ones in the mid-ground turn to face the lens. Meshes tagged `userData.heroNear` (plot street-front
+// props) hide inside NEAR_PROP m. The hub's placeholder street props (well, wagon, trough, sign) sit on the street axis
+// of every shot near the saloon, so they only show for the opening.
+const NEAR = 10, NEAR_PROP = 13, FOOT_Y = -0.55, FACE_R = 34;
+const FACE_CLIPS = new Set([0, 4, 6, 12, 17]);
+const _vp = new THREE.Matrix4(), _sph = new THREE.Sphere();
+const hidden = [];
+let tagged = null, scanIn = 0;
+export function heroNearCut(camera, x, y, z) {
+  if (Math.hypot(camera.position.x - x, camera.position.z - z) < NEAR) return true;
+  _vp.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+  return _v.set(x, y, z).applyMatrix4(_vp).y < FOOT_Y;
+}
+function hide(o) { if (o.visible) { o.visible = false; hidden.push(o); } }
+export function heroTidy(world, camera, game) {
+  if (camera !== world.heroRig?.camera) return;
+  const hub = world.plots.get('hub');
+  if (hub && game?.state?.bootstrap?.done && !world.spectacle?.scenes?.includes('opening')) hide(hub.group);
+  if (!tagged || --scanIn <= 0) { tagged = []; scanIn = 240; world.scene.traverse((o) => { if (o.userData?.heroNear) tagged.push(o); }); }
+  for (const o of tagged) {
+    if (!o.geometry) continue;
+    if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+    _sph.copy(o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);
+    if (Math.hypot(camera.position.x - _sph.center.x, camera.position.z - _sph.center.z) - _sph.radius < NEAR_PROP) hide(o);
+  }
+  const pool = world.pool;
+  const n = pool?.mesh.visible ? pool.mesh.count : 0;
+  if (!n) return;
+  _vp.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+  const im = pool.mesh.instanceMatrix.array, bm = pool.blob.instanceMatrix.array, anim = pool.mesh.geometry.attributes.aAnim.array;
+  const cx = camera.position.x, cz = camera.position.z;
+  let cut = 0;
+  for (let i = 0; i < n; i++) {
+    const o = i * 16, tx = im[o + 12], ty = im[o + 13], tz = im[o + 14];
+    const sx = Math.hypot(im[o], im[o + 1], im[o + 2]), sy = Math.hypot(im[o + 4], im[o + 5], im[o + 6]), sz = Math.hypot(im[o + 8], im[o + 9], im[o + 10]);
+    if (sy < 1e-6) continue;
+    const dx = cx - tx, dz = cz - tz, hd = Math.hypot(dx, dz);
+    if (hd < NEAR || _v.set(tx, ty, tz).applyMatrix4(_vp).y < FOOT_Y) {
+      for (let k = 0; k < 16; k++) im[o + k] = bm[o + k] = 0;
+      cut++;
+      continue;
+    }
+    if (hd < FACE_R && FACE_CLIPS.has(Math.round(anim[i * 3])) && im[o + 5] > sy * 0.98) {
+      const h = Math.atan2(dx, dz), c = Math.cos(h), s = Math.sin(h);
+      im[o] = c * sx; im[o + 1] = 0; im[o + 2] = -s * sx;
+      im[o + 8] = s * sz; im[o + 9] = 0; im[o + 10] = c * sz;
+    }
+  }
+  pool.stats.nearCut = cut;
+}
+export function heroTidyDone() {
+  while (hidden.length) hidden.pop().visible = true;
 }
