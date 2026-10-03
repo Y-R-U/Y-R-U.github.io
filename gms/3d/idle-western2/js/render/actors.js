@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { fxRegistry } from './fx.js?v=20261004a';
 import { createEventArt } from './eventart.js?v=20261004a';
+import { createSpectacle } from './spectacle/director.js?v=20261004a';
 
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3(),
   _y = new THREE.Vector3(0, 1, 0), _c = new THREE.Color(), _w = new THREE.Vector3();
@@ -158,13 +159,14 @@ export function createActors(world, kit, data) {
     cam.updateMatrixWorld();
     const seed = (p.n = (p.n || 0) + 1) * 97 + (parseInt(String(e.id).replace(/\D/g, ''), 10) || 0);
     const A = new THREE.Vector3(), B = new THREE.Vector3();
-    if ((e.art || e.kind) === 'pigeon') {
-      const rows = [0.3, 0.15, 0, 0.42, -0.12];
+    const ak = e.art || e.kind;
+    if (ak === 'pigeon' || ak === 'tumbleweed') {
+      const roll = ak === 'tumbleweed', rows = roll ? [-0.2, -0.35, -0.05, -0.5] : [0.3, 0.15, 0, 0.42, -0.12], hh = roll ? 0.6 : 4.2;
       for (const i of order(rows.length, seed)) {
         const ny = rows[i], dir = hash01(seed + i) < 0.5 ? 1 : -1;
-        if (!rayGround(cam, -0.72 * dir, ny, 4.2, A) || !rayGround(cam, 0.72 * dir, ny + 0.06, 4.2, B)) continue;
+        if (!rayGround(cam, -0.72 * dir, ny, hh, A) || !rayGround(cam, 0.72 * dir, ny + (roll ? 0.03 : 0.06), hh, B)) continue;
         if (!pathClear(cam, A, B, e.id)) continue;
-        return setPath(p, 'fly', A, B, Math.max(7, A.distanceTo(B) / 3.2));
+        return setPath(p, roll ? 'roll' : 'fly', A, B, Math.max(roll ? 5 : 7, A.distanceTo(B) / (roll ? 2.6 : 3.2)));
       }
     }
     if ((e.art || e.kind) === 'parade') {
@@ -218,6 +220,7 @@ export function createActors(world, kit, data) {
     const a = p.a, b = p.b;
     out[0] = a[0] + (b[0] - a[0]) * k; out[1] = a[1] + (b[1] - a[1]) * k; out[2] = a[2] + (b[2] - a[2]) * k;
     if (p.mode === 'fly') out[1] += Math.sin(time * 2.6) * 0.35;
+    if (p.mode === 'roll') out[1] = 0.55 + Math.abs(Math.sin(time * 4.5)) * 0.7;
     if (p.mode === 'march') out[1] = 2.4;
     p.dirx = (b[0] - a[0]) * (ph < 1 ? 1 : -1); p.dirz = (b[2] - a[2]) * (ph < 1 ? 1 : -1);
     return out;
@@ -314,7 +317,7 @@ export function createActors(world, kit, data) {
       const p = updateFree(e, dt);
       if (!p) return false;
       r.x = p.cur[0]; r.z = p.cur[2];
-      r.y = p.mode === 'fly' ? p.cur[1] : 0.1;
+      r.y = p.mode === 'fly' || p.mode === 'roll' ? p.cur[1] : 0.1;
       if (p.dirx || p.dirz) r.h = Math.atan2(p.dirx, p.dirz);
     } else {
       const plot = world.plots.get(e.lineId);
@@ -334,9 +337,9 @@ export function createActors(world, kit, data) {
       r.y = 0.1;
     }
     if (r.kind !== 'limo') r.u = 1;
-    if ((r.kind === 'pigeon' || r.kind === 'wallet') && fxRegistry.current && dt > 0) {
+    if ((r.kind === 'pigeon' || r.kind === 'wallet' || r.kind === 'tumbleweed') && fxRegistry.current && dt > 0) {
       r.trail = (r.trail || 0) + dt;
-      if (r.trail > (r.kind === 'pigeon' ? 0.14 : 0.6)) { r.trail = 0; fxRegistry.current.sparkle([r.x, r.y - 0.2, r.z], 1, r.kind === 'pigeon' ? 0.5 : 0.4); }
+      if (r.trail > (r.kind === 'wallet' ? 0.6 : 0.14)) { r.trail = 0; fxRegistry.current.sparkle([r.x, r.y - 0.2, r.z], 1, r.kind === 'wallet' ? 0.4 : 0.5); }
     }
     r.px = r.x; r.py = r.y + 1; r.pz = r.z; r.pr = 1.5;
     return true;
@@ -344,6 +347,8 @@ export function createActors(world, kit, data) {
 
   const api = {
     meshes,
+    kit,
+    street: data.street,
     get count() { return nrec; },
     update(shipments, simTime) {
       frame++;
@@ -392,6 +397,7 @@ export function createActors(world, kit, data) {
       for (const id of free.keys()) if (!active.some((e) => e.id === id)) free.delete(id);
       for (const e of active) {
         if (nev >= EVMAX) break;
+        if (e.special) continue;
         const r = evRecs[nev];
         if (!placeEvent(e, r, dt)) continue;
         nev++;
@@ -505,6 +511,7 @@ export function createActors(world, kit, data) {
 }
 
 let wired = null;
+const STREET_FALLBACK = (world) => world.street || { x0: -24, x1: 300, z: 7.5, width: 8 };
 // One call wires render core to the game: courier picking, director inputs, fx triggers. Idempotent.
 export function wireRenderCore({ game, host, world, shipments, actors, fx, bus }) {
   if (!game || wired === game) return false;
@@ -515,6 +522,12 @@ export function wireRenderCore({ game, host, world, shipments, actors, fx, bus }
   }
   if (host?.markShadow) for (const k of ['bought', 'unlocked', 'milestone']) game.on(k, (e) => e?.lineId && host.markShadow(e.lineId));
   world.heroRig?.attach?.({ game, shipments, world, bus });
+  if (actors?.kit && !world.spectacle && !/[?&]nospectacle/.test(globalThis.location?.search || '')) {
+    try {
+      world.spectacle = createSpectacle({ world, kit: actors.kit, host, game, bus, fx, street: actors.street || STREET_FALLBACK(world) });
+      host?.onFrame((dt, now, vis) => world.spectacle.update(dt, now, vis));
+    } catch (e) { console.error('[spectacle] failed to start', e); }
+  }
   if (!fx) return true;
   fx.setMotionPref(() => !!game.state.settings?.reducedMotion);
   host?.onFrame((dt, now, vis, q) => fx.setScale(q?.fx ?? 1));

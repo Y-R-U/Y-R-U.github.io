@@ -3,7 +3,7 @@ import * as THREE from 'three';
 // Diegetic event actors. Every prop shape lives in ONE instanced mesh: each instance picks its shape (iVar) and the
 // vertex shader collapses the others, so all event props cost a single draw call. Townsfolk roles (band, celebrity,
 // paparazzi, customers) share one crowd instance pool, and a billboard halo + claim-timer ring marks anything tappable.
-const V = { pigeon: 0, limo: 1, wallet: 2, parcel: 3, clipboard: 4, drum: 5, horn: 6, flag: 7, camera: 8, flash: 9, glowDisc: 10, glint: 11, boxes: 12 };
+const V = { pigeon: 0, limo: 1, wallet: 2, parcel: 3, clipboard: 4, drum: 5, horn: 6, flag: 7, camera: 8, flash: 9, glowDisc: 10, glint: 11, boxes: 12, tumbleweed: 13 };
 const PROPS = 48, PEOPLE = 24, HALOS = 12;
 const GOLD = { c: '#f4b52a', r: 0.3, m: 0.3, g: 0.3 };
 const BRASS = { c: '#e9b949', r: 0.25, m: 0.55, g: 0.12 };
@@ -133,6 +133,12 @@ function templates(kit) {
       y += h;
     }
   });
+  make(V.tumbleweed, (b) => {
+    const dry = { c: '#e0b25a', r: 0.9 }, gold = { c: '#ffd27a', r: 0.3, m: 0.45, g: 0.7 };
+    for (let i = 0; i < 8; i++) b.ball(i % 2 ? gold : dry, 0, 0, 0, 0.62, { sx: 1, sy: 0.16, sz: 1, rx: i * 0.8, ry: i * 1.9, rz: i * 0.55 });
+    b.ball({ c: '#c9984f', r: 0.8, g: 0.2 }, 0, 0, 0, 0.36, { smooth: true });
+    b.ball({ c: '#fff3b0', r: 0.3, g: 1.6 }, 0.2, 0.25, 0.3, 0.07);
+  });
   let n = 0;
   for (const g of out) n += g.attributes.position.count;
   const merged = new THREE.BufferGeometry();
@@ -146,7 +152,7 @@ function templates(kit) {
   return merged;
 }
 
-function propMaterial(kit) {
+export function propMaterial(kit) {
   const uber = kit.materials.uber;
   const m = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.7, metalness: 0, envMapIntensity: 0.3 });
   m.onBeforeCompile = (sh, r) => {
@@ -270,6 +276,12 @@ export function createEventArt(world, kit) {
     const { x, z, h } = e, t = time, sd = e.seed;
     const g = 0.1;
     switch (e.kind) {
+      case 'tumbleweed': {
+        const roll = t * 5 + sd;
+        prop(V.tumbleweed, x, e.y, z, h, 1.5, 0, roll, Math.sin(roll * 0.3) * 0.4);
+        e.px = x; e.py = e.y; e.pz = z; e.pr = 1.4;
+        break;
+      }
       case 'pigeon': {
         const bob = Math.sin(t * 7 + sd) * 0.12;
         prop(V.pigeon, x, e.y + bob, z, h, 1.7, sd, Math.sin(t * 7 + sd) * 0.12);

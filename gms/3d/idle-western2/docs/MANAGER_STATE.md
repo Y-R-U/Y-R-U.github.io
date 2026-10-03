@@ -41,3 +41,6 @@ Aaron's words, condensed (inspiration, not a spec — improve on it):
   Ports: engine 9311, E 9321; next: A 9331, P 9341, S 9351, U 9361.
 - 2026-10-04 P0B art direction done: Look A "Clay Caricature" (ART_DIRECTION.md, refs/a_clay_*). Shown to Aaron (5 refs), proceeding unless he objects. Note: avoid sombrero+moustache stereotypes from build ref.
 - 2026-10-04 P2 build launched: E (9321), A (9331), P (9341), S (9351), U (9361), AU (audio, GPU after Flux idle). Contract in CONTRACT.md.
+- 2026-10-04 Lane E done (41/41 econ tests; FYD recommended 59:33; active/idle 2.31×, thin margin). Committed. Decision: keep FYD unlock at Bank Block+Undertaker (~18 min).
+- 2026-10-04 Lane P round 1 done, committed. Manager review: card cameras far too steep (roof dominates, saloon doors/piano/people not readable), construction card framed off-centre with empty dirt; faces illegible. P round 2 after lane A's rig lands: ref-like ~30–35° facade-facing cameras, clutter + window glow. test-scroll unverified (machine loaded).
+- 2026-10-04 Lane A round 1 done, committed 241131cb. Perf: hero 93–113 draws, ~20k verts/person, rAF p95 10.9 ms (gate 8) under load → dedicated perf pass needed. Manager review: hero cam too high/steep, no sky/mesas, empty foreground (ref has low ~35° cam, sky + mesas, duel in frame). Cast lineup decent (cute > caricature; could push noses/brows).

@@ -95,6 +95,7 @@ export function createFx(world, kit) {
       api.pop(lineId, 'big');
     },
     plotPos,
+    live() { let k = 0; for (const c of C) if (c.life > 0) k++; for (const s of S) if (s.life > 0) k++; return k; },
     setScale(s) { scale = s; },
     setMotionPref(fn) { motionPref = fn; },
     update(dt) {

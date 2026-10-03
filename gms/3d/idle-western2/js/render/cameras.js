@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { HERO_VIEW } from '../data/plots.js?v=20261004a';
 
 const D2R = Math.PI / 180;
 const _v = new THREE.Vector3(), _d = new THREE.Vector3(), _a = new THREE.Vector3(), _b = new THREE.Vector3();
@@ -207,6 +208,10 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
   shared.still = still;
   const orbit = createOrbit({ yaw: 75 });
   const _p = new THREE.Vector3();
+  // Spectacle shots (duel, chase): a provider fills {pos, look, fov} each frame and the camera blends to it.
+  let shotFn = null, shotW = 0;
+  const shotPose = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 34, snap: false };
+  const _sl = new THREE.Vector3();
 
   function poseFor(id, out) {
     if (id === '@town') return townPose(out);
@@ -215,7 +220,7 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
     const g = p.group.position;
     const ry = p.group.rotation.y;
     const pre = id === 'hub' && game && !game.state.bootstrap?.done;
-    const w = pre ? 15 : p.bounds.w * 1.02, d = pre ? 6 : p.bounds.d + 2, h = pre ? 2.5 : Math.min(p.bounds.h || 6, 8);
+    const w = pre ? 10 : p.bounds.w * 1.02, d = pre ? 5 : p.bounds.d + 2, h = pre ? 2.5 : Math.min(p.bounds.h || 6, 8);
     const hf = !pre && p.heroFocus ? p.heroFocus : null;
     const fc = hf || (!pre && p.focus ? p.focus : null);
     const fx = fc ? fc[0] * Math.cos(ry) + fc[1] * Math.sin(ry) : 0, fz = fc ? -fc[0] * Math.sin(ry) + fc[1] * Math.cos(ry) : -2.0;
@@ -223,8 +228,9 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
     const hb0 = !pre && p.heroBox;
     if (hb0) out.look.set(cx, hb0.h * 0.32, g.z + (hb0.z0 + hb0.z1) / 2 + 1.6);
     else out.look.set(cx, pre ? 0.9 : 1.4, cz);
-    out.az = (-19 * side + (aspect < 1.1 ? 0 : 3)) * D2R + ry;
-    out.el = (aspect < 1.1 ? 35 : 31) * D2R;
+    const HV = HERO_VIEW || { yawOffAxis: 26, elevation: 34 };
+    out.az = (-90 + HV.yawOffAxis + (pre ? 4 : 12) + 4 * side + (aspect < 1.1 ? 0 : 6)) * D2R + ry;
+    out.el = (HV.elevation + (aspect < 1.1 ? 1 : -3)) * D2R;
     dirFrom(out.az, out.el, _d);
     const hb = hb0;
     out.r = fitPoints(camera, out.look, _d, hb ? heroPoints(g.x, g.z, ry, w * Math.min(1, 0.45 + aspect * 0.4), hb) : boxCorners(cx, cz, w, d, h, ry), 0.94);
@@ -386,6 +392,9 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
     pin(id) { if (!plots.has(id)) return; pinned = id; if (!override && !town) go(id, { len: 1e9 }); },
     unpin() { pinned = null; if (!override && !town) shotStart = t - shotLen + 3; },
     cut(id, sec = interval) { startOverride(id, sec, 'cut'); },
+    shot(fn) { if (fn && !shotFn) { shotPose.pos.copy(camera.position); shotPose.look.copy(cur.look); shotPose.fov = 34; } shotFn = fn || null; },
+    get shooting() { return !!shotFn || shotW > 0.01; },
+    note(id) { if (plots.has(id)) recent[id] = t; },
     cutIn(id, sec = 7, reason = 'beat') { startOverride(id, sec, reason); },
     flyTo(id) { town = false; startOverride(id, 12, 'fly'); },
     town(on = true) {
@@ -441,8 +450,23 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
         cur.pos.lerp(_a, k);
         cur.look.lerp(dest.look, k);
       }
-      camera.position.copy(orbit.apply(camera, _p.copy(cur.pos), cur.look) ? _p : cur.pos);
-      camera.lookAt(cur.look);
+      if (shotFn && shotFn(shotPose, dt) === false) shotFn = null;
+      const sw = shotFn ? 1 : 0;
+      shotW = shotPose.snap && shotFn ? 1 : shotW + Math.sign(sw - shotW) * Math.min(Math.abs(sw - shotW), dt * (still() ? 99 : 1.8));
+      shotPose.snap = false;
+      if (shotW > 0.001) {
+        if (orbit.active || orbit.busy) orbit.reset();
+        const e = ease(shotW);
+        camera.position.lerpVectors(cur.pos, shotPose.pos, e);
+        _sl.lerpVectors(cur.look, shotPose.look, e);
+        const fov = 34 + (shotPose.fov - 34) * e;
+        if (Math.abs(camera.fov - fov) > 1e-3) { camera.fov = fov; camera.updateProjectionMatrix(); }
+        camera.lookAt(_sl);
+      } else {
+        if (camera.fov !== 34) { camera.fov = 34; camera.updateProjectionMatrix(); }
+        camera.position.copy(orbit.apply(camera, _p.copy(cur.pos), cur.look) ? _p : cur.pos);
+        camera.lookAt(cur.look);
+      }
       camera.updateMatrixWorld();
     },
   };
