@@ -44,3 +44,11 @@ Aaron's words, condensed (inspiration, not a spec — improve on it):
 - 2026-10-04 Lane E done (41/41 econ tests; FYD recommended 59:33; active/idle 2.31×, thin margin). Committed. Decision: keep FYD unlock at Bank Block+Undertaker (~18 min).
 - 2026-10-04 Lane P round 1 done, committed. Manager review: card cameras far too steep (roof dominates, saloon doors/piano/people not readable), construction card framed off-centre with empty dirt; faces illegible. P round 2 after lane A's rig lands: ref-like ~30–35° facade-facing cameras, clutter + window glow. test-scroll unverified (machine loaded).
 - 2026-10-04 Lane A round 1 done, committed 241131cb. Perf: hero 93–113 draws, ~20k verts/person, rAF p95 10.9 ms (gate 8) under load → dedicated perf pass needed. Manager review: hero cam too high/steep, no sky/mesas, empty foreground (ref has low ~35° cam, sky + mesas, duel in frame). Cast lineup decent (cute > caricature; could push noses/brows).
+- 2026-10-04 Lane S done, committed. W10 gate passes + falsified. Open: P anchors (hay cart, jail wagon, dentist chair, Garter window, mud spot), acquisition cutscenes, Ghost Town scenes, FYD moustache swap.
+- 2026-10-04 Lanes A/P/S/U round 1 all committed (af69a9f2). USAGE LIMIT hit: stopped AU (audio, mid-run — read docs/AUDIO.md progress, audio/ + tools/audio/ uncommitted), perf audit, playtest.
+## RESUME (on "continue")
+1. Relaunch AU from docs/AUDIO.md progress (GPU: TTS/ACE one at a time). Commit audio/ once sizes checked (≤12 MB).
+2. Relaunch perf audit (tools/perf-audit.mjs, docs/PERF.md, CDP 9381) + adversarial playtest (docs/review/PLAYTEST_1.md, CDP 9391).
+3. Round 2 visual: hero cam low ~35° with sky + mesas + duel in frame (S cameras + A HERO_VIEW); card cams facade-facing ~30–35° (P); night currently lilac/muddy (UI shots at 4am local) → ruling pending W18: compressed in-game day cycle (~20 min: mostly golden/day, short warm lantern night) instead of local time (world.js:41/173, economy.js:62, app.js:484). Push faces/caricature.
+4. Then blind critics vs refs, perf fixes, P anchors (hay cart, jail wagon, dentist chair, Garter window, mud spot), acquisition cutscenes, FYD moustache swap, Ghost Town scenes (cut if not integrated by 20 Oct).
+5. Not pushed yet; not in projects.js. UI contact sheet: scratchpad ui_sheet.jpg (regen: CDP_PORT=9371 node tools/ui-shots.mjs docs/shots/ui/ s22).
