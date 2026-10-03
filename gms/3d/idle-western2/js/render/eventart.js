@@ -172,7 +172,7 @@ transformed *= float(abs(aEv.x - iVar.x) < 0.5);`);
   return m;
 }
 
-const HALO_VERT = `attribute vec4 iRing;
+export const HALO_VERT = `attribute vec4 iRing;
 varying vec2 vUv;
 varying vec4 vR;
 void main() {
@@ -183,7 +183,7 @@ void main() {
   vR = iRing;
 }`;
 // x = time left (0..1, ≥1.5 = no timer), y = radius, z = pulse phase, w = strength.
-const HALO_FRAG = `uniform float uTime;
+export const HALO_FRAG = `uniform float uTime;
 varying vec2 vUv;
 varying vec4 vR;
 void main() {

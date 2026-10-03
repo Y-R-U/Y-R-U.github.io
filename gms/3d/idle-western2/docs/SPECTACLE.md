@@ -13,7 +13,8 @@ Lane S owns `js/render/{cameras,actors,eventart,fx}.js` and `js/render/spectacle
 | `spectacle/looks.js` | Casting: named characters → `kit.CHARACTERS`; bit parts (drunk, cowboy, cardsharp, goon, hired gun, nephew, nun, passengers, townsfolk) in A's look vocabulary |
 | `spectacle/props.js` | All spectacle props in ONE instanced mesh (eventart's variant trick): barrel, chicken, goat, coffin, piano, table, Pomfrey sign, money bag, horse, stagecoach, hay cart, jail wagon, trough, tape, gun, rolling pin, vulture, tumbleweed, fly, plank… |
 | `spectacle/particles.js` | Budgeted particles: clay dust/smoke/splash spheres (lit) + glowing stars/flash/glass shards. 2 draws |
-| `cameras.js` | Hero director now uses `HERO_VIEW` (lane A: down the street from the west, yawed toward the north facades); plot shots +12° more yaw so facades read; `heroRig.shot(fn)` blends to a spectacle camera; `heroRig.note(id)` biases the tour |
+| `spectacle/overlay.js` | Tap rings (eventart's halo shader, 1 draw) and the Ghost Town ghosts (lane A's `kit.ghost`, own sheet-ghost fallback; 1 draw) |
+| `cameras.js` | Hero director (round 2: low ref-style shots with sky, below); `heroRig.shot(fn)` blends to a spectacle camera; `heroRig.focus` = the tour's street point; `heroRig.note(id)` biases the tour; card rigs (facade cams may show sky, re-fit on `plot.cameraKey`) |
 | `eventart.js` / `actors.js` | Golden Tumbleweed art + rolling path; specials are no longer drawn as generic event props (the director owns them) |
 | `tools/test-spectacle.mjs` | The W10 gate (below). `tools/spectashot.mjs` = dev screenshots of cosmetic scenes |
 
@@ -99,9 +100,37 @@ Runs on 2026-10-04 (machine load 6–13 from parallel lanes, so absolute ms are 
   `?nospectacle` showed no measurable difference (noise dominates).
 test-boot, test-look, test-lifecycle: PASS on 9351.
 
+## Round 2 (2026-10-04)
+**Hero camera** (`HERO_VIEW` in `data/plots.js`, S-owned this round): `{yawOffAxis 24, elevation 32, pitch 19.5, fov 50,
+distance 31, lookZ 3.5}`. The camera orbits a street point in front of the business at 32° but aims 19.5° down, so sky and
+the mesa ring fill the top ~12–18% like `refs/a_clay_hero.jpg`. Plots west of the town middle are shot from the west looking
+east, plots east of it from the east looking west, so the street always recedes behind the focus. Only the lower frame
+must land inside the world (`keepInWorld(..., LOW)`; `tools/test-look.mjs`'s hero probe matches). Pre-bootstrap: a fixed
+street shot on the saloon doors + mud (`openingPose`).
+
+**Borrowed cameras.** Scenes call `ctx.takeShot(sc, fn)` / `frameAt(sc, at, {p, l, fov})` (offsets from a world point);
+a higher-prio scene (or the same kind) takes over, an ending scene only drops its own. `spectacle.hot` (M's 60 fps flag) is
+true while a shot, a slot scene, an ejection or a duel is live.
+
+| Moment | Framing |
+|---|---|
+| Fling (PT#3/#4) | Cut to the saloon doors from the street SW; Mabel holds him on the porch step (`doorsOut`, clear of the balcony). All four landings project on screen (S22: trough ← lower-left, Pete's chair → upper-right next door, P's jail wagon ↓, Pomfrey's room ↑ = the saloon's upper window under a purple+gold `pomsign` nameplate). Ring on the held drunk. A ↑ throw knocks Pomfrey's hat out of the window. |
+| Brawl (PT#10) | Tight card-like shot on the doors + upper windows; gold rings on every tappable body. |
+| Stagecoach (PT#2) | Held for the whole pick window from the north boardwalk across the street: passengers (rings) in front, coach and Pomfrey's frontages behind. Also fixed: a special that starts while the previous special's tail still holds the slot now evicts it (it used to get no scene). |
+| Beats (PT#5/#6/#7) | `hat:promo`, `deed`, `prestige` and acquisitions queue (`spectacle.queueBeat`, TTL 180 s) until the director's view check AND U's `ui:hero` say the hero is visible; bus `spectacle:beat {kind: promo|deed|prestige|poker|takeover|bought|opening, phase}`. Low, side-on shots scaled by the Stranger's hat (`hatShot`) so a Hundred-Gallon brim sits above the faces. |
+| Duel OTS (PT#8) | Steps up and aside by the brim radius (`cast.hatRadius`). |
+| Opening (W15) | Street shot; Mabel at the doors (punch → cheer), `bark mabel/opening` ("And STAY out!"), slow-mo throw, belly slide into P's `mud`, the derby lands upturned 1.5 m ahead (the UI's hat ring, `bubble('hat')`), `bubble('mud')` for the mud ring. |
+| Acquisitions (W13) | `build:start` with `acq` poker/takeover/bought → beat `acquire` at the lot front: poker = You vs Pomfrey at a card table, five aces fan up, Pomfrey topples off his chair; takeover = the widow in black skips up with a giant key, then skips off delighted; bought = Wendell / Thrupp signs with a quivering hand (pen jitter), then Wendell's hat grows / Thrupp faints. |
+| Fake Your Death (W2) | Procession, coffin onto the coach, then the Stranger pops out by a barrel, rips off his moustache (it flies) and slaps on the disguise's (`state.disguise.moustache` → rig stache). The Stranger is a look (not a dress) so every scene wears the current disguise. |
+| Ghost Town (W12) | One 3D ghost per `state.season.ghost` drifts across the tour focus (ring; `pickHero` → `{kind:'ghost', id, act:'ghost:tap'}`), poofs green on `ghost:tap`, fades on `ghost:gone`. Ambient gag `ghostduel` (season only): two ghosts draw, both fire, nothing happens, both shrug. `spectacle.caps` has `ghost`, so U drops the DOM 👻. |
+
+**Draws:** cast 2 + flying hats 1 (P#9: every hat type folded into one instanced mesh, shader picks the type) + props 1 +
+particles 2 + rings 1 + ghosts 1 ≤ 8. The cast crowd is `rig:'full', pool:false`.
+
+**Gate (2026-10-04, round 2):** test-spectacle PASS (A: dt p95 16.7, work best 5.2 ms ≤ 8, actors 6, particles 56,
+spectacle draws ≤ 6; B nobudget: actors 37 → FAIL as required). test-boot, test-look, test-lifecycle PASS on 9351.
+
 ## Known gaps / next
-- Anchors still on fallbacks: `haycart`, `wagon` (jail wagon), `chair` (dentist), `pomfreyWindow`, garter `window`/`haycart`,
-  hub `mud`. Fallback props are drawn for trough/haycart/wagon only when the plot has no anchor (see CONTRACT request).
-- Acquisition cutscenes (poker five aces, takeover) are not staged; the camera cut plays.
-- Ghost Town ghosts/ghost duels are not built (season overlay).
-- Fake-death moustache: new face = new colours; a moustache swap needs the disguise → `stache` mapping.
+- Clutter is the main legibility problem now: the hub's placeholder props (well, covered wagon, stalls, cows) sit in the
+  fling/brawl/opening frames, and the hub walkers (`hub.js` path at local z 3.3) cross the opening shot's foreground.
+- Hero characters at tour distance are still small (~20–30 px); the beats/specials carry the faces.

@@ -16,26 +16,53 @@ export const hatIndex = (t) => (t == null || t === -1 ? -1 : typeof t === 'strin
 export const hatColor = (c) => HAT_COLORS[c] || c || '#c9a06a';
 export const dressScale = (name) => CHARACTERS[name]?.s ?? 1.15;
 
+function mergedHats() {
+  const parts = Object.values(HAT).map((t) => [t, hatGeometry(t)]);
+  let n = 0;
+  for (const [, g] of parts) n += g.attributes.position.count;
+  const out = new THREE.BufferGeometry();
+  for (const [k, size] of [['position', 3], ['normal', 3], ['color', 3], ['aPbr', 3]]) {
+    const arr = new Float32Array(n * size);
+    let o = 0;
+    for (const [, g] of parts) { const a = g.attributes[k]; if (a) arr.set(a.array, o); o += g.attributes.position.count * size; }
+    out.setAttribute(k, new THREE.BufferAttribute(arr, size));
+  }
+  const ht = new Float32Array(n);
+  let o = 0;
+  for (const [t, g] of parts) { ht.fill(t, o, o + g.attributes.position.count); o += g.attributes.position.count; }
+  out.setAttribute('aHat', new THREE.BufferAttribute(ht, 1));
+  out.computeBoundingSphere();
+  return out;
+}
+
 export function createCast(kit, scene, cap = 48) {
-  const crowd = kit.crowd({ count: cap, blobs: true, scale: RIG_SCALE, radius: 1e5, hats: false });
+  const crowd = kit.crowd({ count: cap, blobs: true, scale: RIG_SCALE, radius: 1e5, hats: false, rig: 'full', pool: false });
   const mesh = crowd.mesh, blobs = crowd.blobMesh;
   mesh.name = 'spectacle:cast';
   mesh.frustumCulled = false;
   if (blobs) blobs.frustumCulled = false;
   mesh.count = 0;
   scene.add(mesh);
-  const flying = new Map();
-  function hatMesh(t) {
-    let m = flying.get(t);
-    if (m) return m;
-    m = new THREE.InstancedMesh(hatGeometry(t), kit.materials.lambertVCInst, 12);
-    for (let k = 0; k < 12; k++) m.setColorAt(k, _c.set(0xffffff));
-    m.frustumCulled = false; m.count = 0; m.visible = false; m.name = 'spectacle:hat' + t;
-    m.userData.n = 0;
-    scene.add(m);
-    flying.set(t, m);
-    return m;
-  }
+  // Every hat type merged into one geometry; each instance picks its type (iHat) and the shader collapses the rest
+  // (PERF P#9: one draw for all tossed / shot-off / dropping hats instead of one mesh per type).
+  const HATS_N = 16;
+  const hatGeo = mergedHats();
+  const iHat = new THREE.InstancedBufferAttribute(new Float32Array(HATS_N), 1);
+  hatGeo.setAttribute('iHat', iHat);
+  const hatMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.8, metalness: 0, envMapIntensity: 0.3 });
+  const uber = kit.materials.uber;
+  hatMat.onBeforeCompile = (sh, r) => {
+    uber.onBeforeCompile?.(sh, r);
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nattribute float aHat;\nattribute float iHat;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed *= float(abs(aHat - iHat) < 0.5);');
+  };
+  hatMat.customProgramCacheKey = () => 'iw2-spectacle-hats';
+  const hats = new THREE.InstancedMesh(hatGeo, hatMat, HATS_N);
+  for (let k = 0; k < HATS_N; k++) hats.setColorAt(k, _c.set(0xffffff));
+  hats.frustumCulled = false; hats.count = 0; hats.visible = false; hats.name = 'spectacle:hats';
+  scene.add(hats);
+  let nHats = 0;
   const keys = new Array(cap).fill(null), hatKeys = new Array(cap).fill(null);
   const bodyS = (a) => RIG_SCALE * CROWD_K * (a.bodyS || 1) * (a.s || 1);
   function bodyMatrix(a, out) {
@@ -66,7 +93,7 @@ export function createCast(kit, scene, cap = 48) {
     mesh, cap, bodyS,
     // pool: every actor slot (index = instance); show(a) says whether this camera sees it.
     write(pool, show) {
-      for (const m of flying.values()) m.userData.n = 0;
+      nHats = 0;
       let hi = 0;
       for (let i = 0; i < pool.length; i++) {
         const a = pool[i];
@@ -80,8 +107,8 @@ export function createCast(kit, scene, cap = 48) {
         }
         const h = a.hat;
         if (h.type >= 0 && !h.gone && (h.off || h.lift > 0)) {
-          const m = hatMesh(h.type), j = m.userData.n;
-          if (j < 12) {
+          const j = nHats;
+          if (j < HATS_N) {
             if (h.off) {
               _e.set(h.off.rx || 0, h.off.ry || 0, h.off.rz || 0, 'YXZ');
               _q.setFromEuler(_e);
@@ -91,9 +118,10 @@ export function createCast(kit, scene, cap = 48) {
               _r.makeScale(h.scale, h.scale, h.scale).setPosition(0, HAT_SEAT + h.lift, 0);
               _m.multiply(_r);
             }
-            m.setMatrixAt(j, _m);
-            m.setColorAt(j, _c.set(hatColor(h.color)));
-            m.userData.n = j + 1;
+            hats.setMatrixAt(j, _m);
+            hats.setColorAt(j, _c.set(hatColor(h.color)));
+            iHat.setX(j, h.type);
+            nHats = j + 1;
           }
         }
       }
@@ -101,12 +129,24 @@ export function createCast(kit, scene, cap = 48) {
       mesh.visible = hi > 0;
       if (blobs) { blobs.count = hi; blobs.visible = hi > 0; }
       if (hi) crowd.commit();
-      for (const m of flying.values()) {
-        m.count = m.userData.n;
-        m.visible = m.count > 0;
-        if (m.count) { m.instanceMatrix.needsUpdate = true; m.instanceColor.needsUpdate = true; }
-      }
+      hats.count = nHats;
+      hats.visible = nHats > 0;
+      if (nHats) { hats.instanceMatrix.needsUpdate = true; hats.instanceColor.needsUpdate = true; iHat.needsUpdate = true; }
       return hi;
+    },
+    // Height of a hat lying crown-down (upturned) on the ground, so its brim sits at the surface.
+    hatRest(a) {
+      const g = hatGeometry(a.hat.type);
+      if (!g.boundingBox) g.computeBoundingBox();
+      return g.boundingBox.max.y * a.hat.scale * bodyS(a) + 0.02;
+    },
+    // Brim radius of the hat on a's head (0 without one): spectacle cameras keep big hats out of the lens.
+    hatRadius(a) {
+      if (a.hat.type < 0) return 0;
+      const g = hatGeometry(a.hat.type);
+      if (!g.boundingBox) g.computeBoundingBox();
+      const b = g.boundingBox;
+      return Math.max(b.max.x, -b.min.x, b.max.z, -b.min.z) * a.hat.scale * bodyS(a);
     },
     head(a, out = []) { return api.local(a, 0, HEAD_TOP + 0.1, 0, out); },
     local(a, lx, ly, lz, out = []) {
@@ -118,13 +158,10 @@ export function createCast(kit, scene, cap = 48) {
     centre(a, out = []) { return api.local(a, 0, BODY_C, 0, out); },
     // Every flying-hat mesh exists (and is visible once) for the boot shader warm-up.
     warm(on) {
-      for (const t of Object.values(HAT)) {
-        const m = hatMesh(t);
-        if (on) { m.setMatrixAt(0, _m.makeTranslation(0, -40, 0)); m.count = 1; m.visible = true; }
-        else { m.count = 0; m.visible = false; }
-      }
+      if (on) { hats.setMatrixAt(0, _m.makeTranslation(0, -40, 0)); iHat.setX(0, 0); hats.count = 1; hats.visible = true; iHat.needsUpdate = true; hats.instanceMatrix.needsUpdate = true; }
+      else { hats.count = 0; hats.visible = false; }
     },
-    get calls() { let n = mesh.visible ? 2 : 0; for (const m of flying.values()) if (m.visible) n++; return n; },
+    get calls() { return (mesh.visible ? 2 : 0) + (hats.visible ? 1 : 0); },
   };
   return api;
 }

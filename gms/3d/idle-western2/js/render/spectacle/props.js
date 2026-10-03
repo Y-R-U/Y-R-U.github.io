@@ -6,7 +6,7 @@ import { propMaterial } from '../eventart.js?v=20261004a';
 export const PV = {
   barrel: 0, chicken: 1, goat: 2, coffin: 3, piano: 4, table: 5, sign: 6, bag: 7, horse: 8, coach: 9, haycart: 10,
   wagon: 11, trough: 12, tape: 13, gun: 14, pin: 15, vulture: 16, bottle: 17, tumbleweed: 18, fly: 19, door: 20,
-  chair: 21, legs: 22, wheel: 23, star: 24, plank: 25,
+  chair: 21, legs: 22, wheel: 23, star: 24, plank: 25, card: 26, key: 27, deed: 28, pen: 29, stache: 30, pomsign: 31,
 };
 const WOOD = { c: '#a8714a', r: 0.8 }, WOOD2 = { c: '#7a5236', r: 0.85 }, DARK = { c: '#3b2a24', r: 0.7 },
   IRON = { c: '#55565e', r: 0.4, m: 0.6 }, GOLDC = { c: '#ffd27a', r: 0.3, m: 0.4, g: 0.25 }, PURPLE = { c: '#6a3d8a', r: 0.6 };
@@ -168,6 +168,35 @@ function makers() {
     for (let i = 0; i < 5; i++) b.slab(y, 0, 0, 0, 0.09, 0.28, 0.05, { rz: i * 1.2566, round: 0.02 });
   });
   add(PV.plank, (b) => b.slab(WOOD, 0, 0, 0, 0.25, 0.08, 2.2, { round: 0.02 }));
+  // a playing card standing up (+z face): an ace, red pip
+  add(PV.card, (b) => {
+    b.slab({ c: '#fbf6ea', r: 0.5 }, 0, 0, 0, 0.36, 0.5, 0.012, { round: 0.02 });
+    b.ball({ c: '#d23a3a', r: 0.4 }, 0, 0.25, 0.012, 0.07, { sz: 0.25, sy: 1.15 });
+    for (const [x, y] of [[-0.12, 0.42], [0.12, 0.06]]) b.slab({ c: '#d23a3a', r: 0.4 }, x, y, 0.01, 0.05, 0.06, 0.004);
+  });
+  add(PV.key, (b) => {
+    b.cyl(GOLDC, 0, 0, 0, 0.05, 0.9, 0, { sides: 7, taper: 1 });
+    b.cyl(GOLDC, 0, 0.98, 0, 0.17, 0.06, 0, { rx: Math.PI / 2, sides: 12, taper: 1 });
+    b.slab(GOLDC, 0.08, 0.06, 0, 0.16, 0.08, 0.05).slab(GOLDC, 0.08, 0.2, 0, 0.12, 0.07, 0.05);
+  });
+  add(PV.deed, (b) => {
+    b.slab({ c: '#f3e6c4', r: 0.8 }, 0, 0, 0, 0.6, 0.012, 0.8, { round: 0.005 });
+    for (let i = 0; i < 4; i++) b.slab({ c: '#8a6a52', r: 0.8 }, -0.05, 0.012, 0.25 - i * 0.12, 0.42, 0.004, 0.03);
+    b.ball({ c: '#b5483a', r: 0.5 }, 0.18, 0.02, -0.28, 0.07, { sy: 0.25 });
+  });
+  add(PV.pen, (b) => {
+    b.cyl({ c: '#f6f1e6', r: 0.7 }, 0, 0, 0, 0.012, 0.32, 0, { sides: 5, taper: 0.4 });
+    b.ball({ c: '#e9e4da', r: 0.8 }, 0.03, 0.3, 0, 0.05, { sx: 0.4, sy: 1.8 });
+  });
+  add(PV.stache, (b) => {
+    for (const s of [-1, 1]) b.ball({ c: '#3b2a24', r: 0.85 }, s * 0.11, 0, 0, 0.11, { sx: 1.25, sy: 0.55, sz: 0.6, rz: s * -0.35, smooth: true });
+  });
+  // Pomfrey's brass nameplate over his upstairs room at the saloon (the fling's "↑ Pomfrey's window")
+  add(PV.pomsign, (b) => {
+    b.slab(PURPLE, 0, 0, 0, 1.5, 0.42, 0.08, { round: 0.04 });
+    b.slab(GOLDC, 0, -0.03, -0.01, 1.6, 0.05, 0.1).slab(GOLDC, 0, 0.4, -0.01, 1.6, 0.05, 0.1);
+    b.ball(GOLDC, 0, 0.21, 0.05, 0.13, { sz: 0.3 });
+  });
   return M;
 }
 

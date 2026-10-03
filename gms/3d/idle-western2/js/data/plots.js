@@ -11,9 +11,8 @@ export const HUB = 'hub';
 export const LOT_W = { shine: 12, tubs: 13, livery: 16, saloon: 16, dentist: 12, garter: 14, undertaker: 13, jail: 13, bank: 14 };
 export const PLOT_W = 14;
 const LOT_GAP = 1, ALLEY = 8;
-// Hero framing hint for the director: look down the street (+x) from the west, yawed this far off the axis toward
-// the south side so the north facades read, at this elevation.
-export const HERO_VIEW = { yawOffAxis: 20, elevation: 30, distance: 50, lookZ: 4.5 };
+// Hero camera (lane S): like refs/a_clay_hero.jpg — low, down the street from the west, sky + mesas in the top ~18%.
+export const HERO_VIEW = { yawOffAxis: 24, elevation: 32, pitch: 19.5, fov: 50, distance: 31, lookZ: 3.5 };
 
 const plots = [];
 const span = {};

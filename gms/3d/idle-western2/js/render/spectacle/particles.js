@@ -5,7 +5,7 @@ import { white } from '../fx.js?v=20261004a';
 // Two instanced draws. `budget()` returns how many may still spawn (W10: ≤ 256 in the hero, fx.js juice included).
 const C = (h) => new THREE.Color(h);
 const DUST = C('#f3e2c4'), SMOKE = C('#c9bfd6'), SPLASH = C('#bfe3f2'), STAR = C('#ffe45c'), FLASH = C('#fff3b0'), GLASS = C('#dff3ff');
-export const PCOL = { DUST, SMOKE, SPLASH, STAR, FLASH, GLASS, SOOT: C('#4a4048'), GOLD: C('#ffd27a'), RED: C('#e8776a') };
+export const PCOL = { DUST, SMOKE, SPLASH, STAR, FLASH, GLASS, SOOT: C('#4a4048'), GOLD: C('#ffd27a'), RED: C('#e8776a'), ECTO: C('#8ff0c0') };
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _c = new THREE.Color();
 
 function starGeo() {

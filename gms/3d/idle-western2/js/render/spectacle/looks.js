@@ -19,7 +19,7 @@ export const CHARS = {
 };
 export const EJECT_LOOK = { drunk: 'drunk', cowboy: 'cowboy', cardsharp: 'cardsharp', dentist: 'pete', sheriff: 'wendell', pianist: 'fingers' };
 export const OPPONENTS = ['bart', 'hiredgun', 'nephew', 'nun'];
-const PASSENGER_HATS = [['stovepipe', 1.9, 'red'], ['feathered', 1.9, '#7ec2d6'], ['boater', 2.2, 'straw'], ['bonnet', 1.6, 'pink'], ['bowler', 2.4, '#7fbf5a']];
+const PASSENGER_HATS = [['stovepipe', 1.45, 'red'], ['feathered', 1.5, '#7ec2d6'], ['boater', 1.6, 'straw'], ['bonnet', 1.35, 'pink'], ['bowler', 1.7, '#7fbf5a']];
 const TOPS = ['#e8776a', '#d9a441', '#5e8f8c', '#7d8fa3', '#c98b7e', '#8fa27a', '#e9e4da', '#c98a4a', '#8a5a6e', '#4f86a8'];
 const BOTS = ['#4a5878', '#6b5a7d', '#3f6b74', '#8a6a52', '#5b5f66', '#2f4a66'];
 const TOWN_HATS = [['stetson', 1.1, 'tan'], ['derby', 1, 'brown'], ['bowler', 1, 'black'], ['boater', 1, 'straw'], ['bonnet', 1, 'white'], ['stetson', 1.3, 'brown'], ['cap', 1, 'grey'], ['ten', 0.9, 'cream']];

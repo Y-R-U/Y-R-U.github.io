@@ -11,10 +11,12 @@ const SETUP = `(() => {
   window.__clicks = { hero: 0, card: 0 };
   document.querySelector('.hero-view').addEventListener('click', () => __clicks.hero++);
   for (const v of document.querySelectorAll('.line-view')) v.addEventListener('click', () => __clicks.card++);
+  // The hero shows sky + mesas by design (round 2, refs/a_clay_hero.jpg): only its lower frame must land in the world.
   window.__probe = (cam) => {
     const V = cam.position.constructor, b = __iw2.world.heroRig.bounds; let bad = 0;
     cam.updateMatrixWorld();
-    for (const [x, y] of [[-1, 1], [0, 1], [1, 1], [-1, 0], [1, 0], [-1, -1], [1, -1]]) {
+    const hero = cam === __iw2.world.heroRig.camera;
+    for (const [x, y] of hero ? [[-1, -1], [0, -1], [1, -1], [-1, -0.4], [1, -0.4]] : [[-1, 1], [0, 1], [1, 1], [-1, 0], [1, 0], [-1, -1], [1, -1]]) {
       const p = new V(x, y, 0.5).unproject(cam), d = p.sub(cam.position).normalize();
       if (d.y > -0.004) { bad++; continue; }
       const t = -cam.position.y / d.y, gx = cam.position.x + d.x * t, gz = cam.position.z + d.z * t;

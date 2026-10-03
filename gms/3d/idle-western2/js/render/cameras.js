@@ -16,10 +16,12 @@ export function boundsFromPlots(plots, margin = { x: 52, z: 55 }) {
 
 // Every corner/edge ray of the frame must land on the ground inside the world, so no frame shows sky or the edge.
 const PROBES = [[-1, 1], [0, 1], [1, 1], [-1, 0], [1, 0], [-1, -1], [1, -1]];
-function outside(camera, b, stopAt = 1) {
+// The hero shows sky and the mesa ring like the ref, so only its lower frame must land inside the world.
+const LOW = [[-1, -1], [0, -1], [1, -1], [-1, -0.4], [1, -0.4]];
+function outside(camera, b, stopAt = 1, probes = PROBES) {
   camera.updateMatrixWorld();
   let n = 0;
-  for (const [nx, ny] of PROBES) {
+  for (const [nx, ny] of probes) {
     _v.set(nx, ny, 0.5).unproject(camera);
     _d.copy(_v).sub(camera.position).normalize();
     let bad = _d.y > -0.004;
@@ -32,13 +34,13 @@ function outside(camera, b, stopAt = 1) {
   }
   return n;
 }
-const frameOk = (camera, b) => outside(camera, b) === 0;
+const frameOk = (camera, b, probes) => outside(camera, b, 1, probes) === 0;
 
 // Steepen (orbit up around look) then slide toward the world centre until the frame is clean.
-export function keepInWorld(camera, pos, look, b = shared.bounds) {
+export function keepInWorld(camera, pos, look, b = shared.bounds, probes = PROBES) {
   camera.position.copy(pos);
   camera.lookAt(look);
-  if (!b || frameOk(camera, b)) return pos;
+  if (!b || frameOk(camera, b, probes)) return pos;
   const off = _a.copy(pos).sub(look);
   const r = off.length();
   let el = Math.asin(Math.max(-1, Math.min(1, off.y / r)));
@@ -48,7 +50,7 @@ export function keepInWorld(camera, pos, look, b = shared.bounds) {
     pos.set(look.x + Math.sin(az) * Math.cos(el) * r, look.y + Math.sin(el) * r, look.z + Math.cos(az) * Math.cos(el) * r);
     camera.position.copy(pos);
     camera.lookAt(look);
-    if (frameOk(camera, b)) return pos;
+    if (frameOk(camera, b, probes)) return pos;
   }
   const cx = (b.x0 + b.x1) / 2, cz = (b.z0 + b.z1) / 2;
   for (let i = 0; i < 40; i++) {
@@ -56,7 +58,7 @@ export function keepInWorld(camera, pos, look, b = shared.bounds) {
     look.x += sx; look.z += sz; pos.x += sx; pos.z += sz;
     camera.position.copy(pos);
     camera.lookAt(look);
-    if (frameOk(camera, b)) break;
+    if (frameOk(camera, b, probes)) break;
   }
   return pos;
 }
@@ -101,7 +103,7 @@ const dirFrom = (az, el, out = new THREE.Vector3()) => out.set(Math.sin(az) * Ma
 // Hold-to-look offset on top of a rig's pose. Held: follows the finger; released: holds, then eases home.
 const _op = new THREE.Vector3(), _ol = new THREE.Vector3();
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-export function createOrbit({ yaw = 60, pitch = [15, 60], zoom = [0.75, 1.3], hold = 1.5, back = 0.9, minY = 2.2 } = {}) {
+export function createOrbit({ yaw = 60, pitch = [15, 60], zoom = [0.75, 1.3], hold = 1.5, back = 0.9, minY = 2.2, probes = PROBES } = {}) {
   const Y = yaw * D2R, P0 = pitch[0] * D2R, P1 = pitch[1] * D2R;
   let az = 0, el = 0, zm = 1, w = 0, wFrom = 0, active = false, relAt = 0;
   const now = () => performance.now() / 1000;
@@ -131,7 +133,7 @@ export function createOrbit({ yaw = 60, pitch = [15, 60], zoom = [0.75, 1.3], ho
         pos.copy(_ol).multiplyScalar(r / (1 + (zm - 1) * k)).add(look);
         camera.position.copy(pos);
         camera.lookAt(look);
-        return pos.y >= minY && (!shared.bounds || frameOk(camera, shared.bounds));
+        return pos.y >= minY && (!shared.bounds || frameOk(camera, shared.bounds, probes));
       };
       if (!pose(w)) {
         let lo = 0, hi = w;
@@ -146,20 +148,31 @@ export function createOrbit({ yaw = 60, pitch = [15, 60], zoom = [0.75, 1.3], ho
 }
 
 export function createCardRig(plot) {
-  const c = plot.camera;
+  let c = plot.camera;
   const camera = new THREE.PerspectiveCamera(c.fov, 2.3, 0.5, 400);
   camera.userData.iw2Line = plot.id;
-  const lookL = new THREE.Vector3(...c.look), posL = new THREE.Vector3(...c.pos);
-  const dir = posL.clone().sub(lookL);
-  const baseDist = dir.length();
-  dir.normalize();
+  const lookL = new THREE.Vector3(), posL = new THREE.Vector3(), dir = new THREE.Vector3();
+  let baseDist = 1, key = null, probes = PROBES;
+  // P's facade cameras (camera.facade) may show sky above the roofs; only their lower frame must stay on the ground.
+  function load() {
+    c = plot.camera;
+    key = plot.cameraKey ?? null;
+    lookL.set(...c.look); posL.set(...c.pos);
+    dir.copy(posL).sub(lookL);
+    baseDist = dir.length();
+    dir.normalize();
+    probes = c.facade ? LOW : PROBES;
+    if (Math.abs(camera.fov - c.fov) > 1e-3) { camera.fov = c.fov; camera.updateProjectionMatrix(); }
+  }
+  load();
   const look = new THREE.Vector3(), pos = new THREE.Vector3(), p = new THREE.Vector3();
-  const orbit = createOrbit({ yaw: 60 });
+  const orbit = createOrbit({ yaw: 60, probes: c.facade ? LOW : PROBES });
   let lastAspect = 0, posed = false;
   return {
     camera,
     orbit,
     fit(aspect) {
+      if ((plot.cameraKey ?? null) !== key) { load(); lastAspect = 0; }
       if (Math.abs(aspect - lastAspect) < 1e-3) {
         if (!posed && !orbit.busy) return;
         posed = orbit.apply(camera, p.copy(pos), look);
@@ -178,7 +191,7 @@ export function createCardRig(plot) {
       look.copy(lookL).applyMatrix4(plot.group.matrixWorld);
       _a.copy(dir).transformDirection(plot.group.matrixWorld);
       pos.copy(_a).multiplyScalar(d).add(look);
-      keepInWorld(camera, pos, look);
+      keepInWorld(camera, pos, look, shared.bounds, probes);
       posed = orbit.apply(camera, p.copy(pos), look);
       camera.position.copy(posed ? p : pos);
       camera.lookAt(look);
@@ -192,7 +205,8 @@ const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 export function createHeroDirector(world, { interval = 10 } = {}) {
   const plots = world.plots;
   shared.bounds = world.bounds || boundsFromPlots(plots);
-  const camera = new THREE.PerspectiveCamera(34, 1, 0.5, 900);
+  const camera = new THREE.PerspectiveCamera(HERO_VIEW?.fov || 50, 1, 0.5, 900);
+  const FOV = camera.fov;
   const cur = { pos: new THREE.Vector3(), look: new THREE.Vector3() };
   const from = { pos: new THREE.Vector3(), look: new THREE.Vector3() };
   const dest = { pos: new THREE.Vector3(), look: new THREE.Vector3(), az: 0, el: 0, r: 30 };
@@ -206,13 +220,18 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
   const still = () => reduce.matches || !!game?.state?.settings?.reducedMotion;
   shared.still = still;
-  const orbit = createOrbit({ yaw: 75 });
+  const orbit = createOrbit({ yaw: 75, pitch: [12, 60], probes: LOW });
   const _p = new THREE.Vector3();
   // Spectacle shots (duel, chase): a provider fills {pos, look, fov} each frame and the camera blends to it.
   let shotFn = null, shotW = 0;
-  const shotPose = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 34, snap: false };
+  const shotPose = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: FOV, snap: false };
   const _sl = new THREE.Vector3();
 
+  let midX = 0;
+  { let a = Infinity, b = -Infinity; for (const p of plots.values()) { a = Math.min(a, p.group.position.x); b = Math.max(b, p.group.position.x); } midX = (a + b) / 2 + 8; }
+  const HV = { yawOffAxis: 22, elevation: 32, pitch: 19, fov: 50, distance: 34, lookZ: 5, ...(HERO_VIEW || {}) };
+  // Plot shot like refs/a_clay_hero.jpg: low, down the street from the west and yawed onto the north facades. The
+  // camera orbits a street point at `elevation` but aims `pitch` below the horizon, so sky and mesas fill the top.
   function poseFor(id, out) {
     if (id === '@town') return townPose(out);
     const p = plots.get(id);
@@ -220,22 +239,31 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
     const g = p.group.position;
     const ry = p.group.rotation.y;
     const pre = id === 'hub' && game && !game.state.bootstrap?.done;
-    const w = pre ? 10 : p.bounds.w * 1.02, d = pre ? 5 : p.bounds.d + 2, h = pre ? 2.5 : Math.min(p.bounds.h || 6, 8);
-    const hf = !pre && p.heroFocus ? p.heroFocus : null;
-    const fc = hf || (!pre && p.focus ? p.focus : null);
-    const fx = fc ? fc[0] * Math.cos(ry) + fc[1] * Math.sin(ry) : 0, fz = fc ? -fc[0] * Math.sin(ry) + fc[1] * Math.cos(ry) : -2.0;
-    const cx = g.x + (pre ? -1 : fx), cz = g.z + fz;
-    const hb0 = !pre && p.heroBox;
-    if (hb0) out.look.set(cx, hb0.h * 0.32, g.z + (hb0.z0 + hb0.z1) / 2 + 1.6);
-    else out.look.set(cx, pre ? 0.9 : 1.4, cz);
-    const HV = HERO_VIEW || { yawOffAxis: 26, elevation: 34 };
-    out.az = (-90 + HV.yawOffAxis + (pre ? 4 : 12) + 4 * side + (aspect < 1.1 ? 0 : 6)) * D2R + ry;
-    out.el = (HV.elevation + (aspect < 1.1 ? 1 : -3)) * D2R;
-    dirFrom(out.az, out.el, _d);
-    const hb = hb0;
-    out.r = fitPoints(camera, out.look, _d, hb ? heroPoints(g.x, g.z, ry, w * Math.min(1, 0.45 + aspect * 0.4), hb) : boxCorners(cx, cz, w, d, h, ry), 0.94);
-    out.pos.copy(_d).multiplyScalar(out.r).add(out.look);
-    keepInWorld(camera, out.pos, out.look);
+    if (pre) return openingPose(p, out);
+    const w = p.bounds.w || 14;
+    const fc = p.heroFocus || p.focus || null;
+    const east = g.x > midX;
+    const fx = (fc ? fc[0] * 0.5 : 0) + (east ? 1 : -1) * w * 0.14;
+    const lz = HV.lookZ + (aspect < 1.1 ? 0 : 1);
+    const lx = g.x + fx * Math.cos(ry) + lz * Math.sin(ry), lzw = g.z - fx * Math.sin(ry) + lz * Math.cos(ry);
+    const el = (HV.elevation + (aspect < 1.1 ? 0 : -4)) * D2R, pitch = (HV.pitch + (aspect < 1.1 ? 0 : -2)) * D2R;
+    out.az = (east ? 90 - HV.yawOffAxis : -90 + HV.yawOffAxis) * D2R + 3 * side * D2R + ry;
+    const r = HV.distance * (0.55 + 0.45 * w / 16) * (aspect < 1.1 ? 1 : 0.8);
+    const rise = r * (Math.sin(el) - Math.cos(el) * Math.tan(pitch));
+    out.look.set(lx, 1 + rise, lzw);
+    dirFrom(out.az, el, _d);
+    out.pos.set(lx, 1, lzw).addScaledVector(_d, r);
+    keepInWorld(camera, out.pos, out.look, shared.bounds, LOW);
+    return polar(out);
+  }
+
+  // Before the first business: down in the street, low, on the saloon doors and the Stranger face-down in the mud.
+  function openingPose(p, out) {
+    const sp = plots.get('saloon'), d = sp?.anchors?.doors;
+    if (d) { sp.group.updateMatrixWorld(); _a.set(d[0], 0, d[2]).applyMatrix4(sp.group.matrixWorld); }
+    else _a.set(p.group.position.x, 0, p.group.position.z - 6);
+    out.pos.set(_a.x - 0.6, 7.2, _a.z + 11.9);
+    out.look.set(_a.x + 2.0, 1.4, _a.z + 3.4);
     return polar(out);
   }
 
@@ -392,8 +420,10 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
     pin(id) { if (!plots.has(id)) return; pinned = id; if (!override && !town) go(id, { len: 1e9 }); },
     unpin() { pinned = null; if (!override && !town) shotStart = t - shotLen + 3; },
     cut(id, sec = interval) { startOverride(id, sec, 'cut'); },
-    shot(fn) { if (fn && !shotFn) { shotPose.pos.copy(camera.position); shotPose.look.copy(cur.look); shotPose.fov = 34; } shotFn = fn || null; },
+    shot(fn) { if (fn && !shotFn) { shotPose.pos.copy(camera.position); shotPose.look.copy(cur.look); shotPose.fov = FOV; } shotFn = fn || null; },
     get shooting() { return !!shotFn || shotW > 0.01; },
+    // The street point the tour shot is built around (its look sits straight above it).
+    get focus() { return cur.look; },
     note(id) { if (plots.has(id)) recent[id] = t; },
     cutIn(id, sec = 7, reason = 'beat') { startOverride(id, sec, reason); },
     flyTo(id) { town = false; startOverride(id, 12, 'fly'); },
@@ -459,11 +489,11 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
         const e = ease(shotW);
         camera.position.lerpVectors(cur.pos, shotPose.pos, e);
         _sl.lerpVectors(cur.look, shotPose.look, e);
-        const fov = 34 + (shotPose.fov - 34) * e;
+        const fov = FOV + (shotPose.fov - FOV) * e;
         if (Math.abs(camera.fov - fov) > 1e-3) { camera.fov = fov; camera.updateProjectionMatrix(); }
         camera.lookAt(_sl);
       } else {
-        if (camera.fov !== 34) { camera.fov = 34; camera.updateProjectionMatrix(); }
+        if (camera.fov !== FOV) { camera.fov = FOV; camera.updateProjectionMatrix(); }
         camera.position.copy(orbit.apply(camera, _p.copy(cur.pos), cur.look) ? _p : cur.pos);
         camera.lookAt(cur.look);
       }

@@ -5,6 +5,7 @@ import { createParticles } from './particles.js?v=20261004a';
 import { CHARS, townsfolk } from './looks.js?v=20261004a';
 import { hatIndex, dressScale } from './cast.js?v=20261004a';
 import { createScenes } from './scenes.js?v=20261004a';
+import { createHalos, createGhosts } from './overlay.js?v=20261004a';
 import { FRONTS } from '../../data/plots.js?v=20261004a';
 
 // The spectacle director (DESIGN W9/W10): ONE slot for the big moment (a special or a story beat), a hard actor budget
@@ -23,6 +24,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
   const cast = createCast(kit, scene, CAP);
   const props = createProps(kit, scene, 192);
   const parts = createParticles(kit, scene, 2048);
+  const halos = createHalos(kit, scene, 24);
+  const ghosts = createGhosts(kit, scene, 8);
   const q = typeof location !== 'undefined' ? new URLSearchParams(location.search) : new URLSearchParams();
   const lim = { ...BUDGET, on: !q.has('nobudget') };
   let fxLive = 0;
@@ -36,7 +39,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
   const pendingSpecials = new Map();
   const stats = { actors: 0, extras: 0, particles: 0, maxActors: 0, maxExtras: 0, maxParticles: 0, denied: 0, scenes: [], calls: 0, frames: 0 };
   let t = 0, frame = 0, filled = -1, filledLine, heroVisible = true, saloonVisible = false, visAt = 0, nextAmbient = 12, lastPick = null;
-  let drawPending = null;
+  let drawPending = null, shotOwner = null, uiHero = true;
+  const caps = new Set(['ghost']);
 
   const count = (extra) => { let n = 0; for (const a of pool) if (a.used && a.extra === extra) n++; return n; };
 
@@ -108,6 +112,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
   const hasAnchor = (lineId, name) => !!world.plots.get(lineId)?.anchors?.[name];
   const lineOpen = (id) => (game.state.lines[id]?.lv || 0) > 0;
   function heroLook(out = [0, 0, 0]) {
+    const f = world.heroRig.focus;
+    if (f) { out[0] = f.x; out[1] = 0; out[2] = f.z; return out; }
     const cam = world.heroRig.camera;
     cam.getWorldDirection(_v);
     const k = _v.y < -0.05 ? -cam.position.y / _v.y : 30;
@@ -138,15 +144,26 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     extra: (sc, spec) => alloc(sc, spec, true),
     release, prop, anchor, hasAnchor, lineOpen, heroLook, inHero, act,
     head: (a, out) => cast.head(a, out),
+    hatRest: (a) => cast.hatRest(a),
+    hatRadius: (a) => cast.hatRadius(a),
     setHat,
     local: (a, x, y, z, out) => cast.local(a, x, y, z, out),
     project: (p) => (host?.project ? { ...host.project('hero', p) } : { x: 0, y: 0, visible: false }),
     nearRay: (ray, p, r) => near(ray, p, r),
     centre: (a, out) => cast.centre(a, out),
     shot: (fn) => world.heroRig.shot?.(fn),
+    // A scene borrows the hero camera; a higher-priority scene may take it over, an ending scene only drops its own.
+    takeShot(sc, fn) {
+      if (shotOwner && shotOwner !== sc && scenes.includes(shotOwner) && (shotOwner.prio > sc.prio || (shotOwner.prio === sc.prio && shotOwner.kind !== sc.kind))) return false;
+      shotOwner = sc; sc.shotOn = true; world.heroRig.shot?.(fn); return true;
+    },
+    dropShot(sc) { if (shotOwner === sc) { shotOwner = null; world.heroRig.shot?.(null); } sc.shotOn = false; },
+    ownsShot: (sc) => shotOwner === sc,
+    halo(x, y, z, r, k = 1, ph = 0, left = 2, line = null) { halos.add(x, y, z, r, k, ph, left, line); },
+    ghost(x, y, z, o) { ghosts.add(x, y, z, o); },
     cutIn: (id, sec) => world.heroRig.cutIn?.(id, sec, 'spectacle'),
     markDraw(sc) { drawPending = sc; host?.markDirty?.('hero'); },
-    get heroVisible() { return heroVisible; },
+    get heroVisible() { return heroVisible && uiHero; },
     say(char, trig) { bus?.emit('bark', { char, trig, prio: false, src: 'spectacle' }); },
     emit(type, e) { bus?.emit(type, e); },
   };
@@ -162,7 +179,9 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     if (lim.on && kind === 'gag' && scenes.some((o) => o.kind === 'gag' || (o.slot && o.prio >= 2))) return null;
     if (lim.on && kind === 'eject' && scenes.filter((o) => o.kind === 'eject').length >= 2) return null;
     if (sc.slot && lim.on) {
-      for (const o of [...scenes]) if (o.slot && o.prio < sc.prio) end(o);
+      // A finished special still playing its tail (bodies limping back in) gives way to the next live one.
+      const stale = (o) => o.eventId && o.eventId !== sc.eventId && !game.state.events.active.some((x) => x.id === o.eventId);
+      for (const o of [...scenes]) if (o.slot && (o.prio < sc.prio || (sc.eventId && stale(o)))) end(o);
       if (scenes.some((o) => o.slot)) return null;
     }
     scenes.push(sc);
@@ -175,7 +194,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     scenes.splice(k, 1);
     try { sc.end?.(ctx); } catch (e) { console.error(e); }
     for (const a of [...sc.actors]) release(a);
-    if (sc.shotOn) ctx.shot(null);
+    if (sc.shotOn) ctx.dropShot(sc);
+    if (sc.beat) bus?.emit('spectacle:beat', { kind: sc.beatKind || sc.beat, phase: 'end' });
   }
   const slotBusy = () => scenes.some((s) => s.slot && s.prio >= 2);
 
@@ -207,18 +227,27 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     else start('eject', { id: e.id, kind: e.kind, level: game.state.lines.saloon?.lv || 1, thrown: e });
   });
   on('piano', (e) => { for (const s of scenes) s.on?.('piano', e, ctx); pianoFx(e); });
-  on('piano:frenzy', (e) => { if (e.brawl) start('eject', { id: 'frenzy' + t, kind: 'drunk', level: game.state.lines.saloon?.lv || 1, cosmetic: true, autoAfter: 0.6 }); });
+  on('piano:frenzy', (e) => { if (e.brawl) start('eject', { id: 'frenzy' + t, kind: 'drunk', level: game.state.lines.saloon?.lv || 1, cosmetic: true, frenzy: true, autoAfter: 0.6 }); });
   on('build:stage', (e) => S.buildFx?.(e, 'stage'));
   on('build:done', (e) => S.buildFx?.(e, 'done'));
   on('build:start', (e) => S.buildFx?.(e, 'start'));
   on('hat:promo', (e) => queueBeat('hat', e));
   on('deed', (e) => queueBeat('deed', e));
   on('prestige', (e) => queueBeat('prestige', e));
+  on('build:start', (e) => { if (e.acq === 'poker' || e.acq === 'takeover' || e.acq === 'bought') queueBeat('acquire', e); });
+  const ghostLive = (g) => scenes.some((s) => s.kind === 'ghost' && s.gid === g.id);
+  on('ghost:spawn', (e) => { if (e.ghost && !ghostLive(e.ghost)) start('ghost', { ghost: e.ghost }); });
+  on('ghost:gone', (e) => { for (const s of scenes) if (s.kind === 'ghost') s.on?.('gone', e, ctx); });
+  on('ghost:tap', (e) => { for (const s of scenes) if (s.kind === 'ghost') s.on?.('tap', e, ctx); });
   on('tap', (e) => { if (e.kind === 'mud') for (const s of scenes) s.on?.('mud', e, ctx); });
   on('unlocked', () => { for (const s of scenes) s.on?.('unlocked', null, ctx); });
 
+  // Story beats (hat promo, Deed, Fake Your Death, acquisitions) wait until the hero is really on screen (PT#6/#7):
+  // the director's view check AND the UI's `ui:hero` (sheets, Town). They keep for BEAT_TTL, then are dropped.
+  const BEAT_TTL = 180;
   const beats = [];
   function queueBeat(kind, e) { beats.push({ kind, e, at: t }); }
+  bus?.on?.('ui:hero', (e) => { uiHero = !!e?.visible; });
 
   function pianoFx(e) {
     const id = 'saloon';
@@ -254,13 +283,16 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     S.pickGag?.();
   }
 
+  let beatGap = 0;
   function runBeats() {
     while (beats.length) {
       const b = beats[0];
-      if (t - b.at > 6) { beats.shift(); continue; }
-      if (lim.on && scenes.some((s) => s.slot && s.prio >= 3)) return;
+      if (t - b.at > BEAT_TTL) { beats.shift(); continue; }
+      if (!heroVisible || !uiHero || t < beatGap) return;
+      if (lim.on && scenes.some((s) => s.slot && s.prio >= 2)) return;
       beats.shift();
-      start(b.kind, b.e);
+      const sc = start(b.kind, b.e);
+      if (sc) { sc.beat = b.kind; beatGap = t + 0.8; bus?.emit('spectacle:beat', { kind: sc.beatKind || b.kind, phase: 'start' }); return; }
     }
   }
 
@@ -271,9 +303,12 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     heroCheck(now, visibleLines);
     if (game.state.bootstrap && !game.state.bootstrap.done && !scenes.some((s) => s.kind === 'opening')) start('opening', {});
     stageSpecials();
+    const g = game.state.season?.ghost;
+    if (g && frame % 30 === 0 && !ghostLive(g)) start('ghost', { ghost: g });
     runBeats();
     ambient();
     nprops = 0;
+    halos.clear(); ghosts.clear();
     for (const sc of [...scenes]) {
       sc.t += dt;
       let alive = true;
@@ -306,7 +341,8 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
       props.write(propList, n);
     } else props.write(propList, nprops);
     parts.write(line);
-    stats.calls = cast.calls + (props.mesh.visible ? 1 : 0) + parts.calls;
+    halos.write(line); ghosts.write(line);
+    stats.calls = cast.calls + (props.mesh.visible ? 1 : 0) + parts.calls + halos.calls + ghosts.calls;
   }
   const prevBefore = scene.onBeforeRender;
   scene.onBeforeRender = function (renderer, sc, camera, rt) {
@@ -330,12 +366,13 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
       nprops = 0;
       prop(PV.barrel, 0, -40, 0);
       parts.puff([0, -40, 0], 1); parts.stars([0, -40, 0], 1);
+      halos.clear(); halos.add(0, -40, 0, 0.1, 0, 0, 2); ghosts.clear(); ghosts.add(0, -40, 0);
       filled = -1;
       fill(null);
     } else if (warmSc) {
       for (const x of [...warmSc.actors]) release(x);
       cast.warm(false);
-      warmSc = null; nprops = 0; parts.clear(); filled = -1;
+      warmSc = null; nprops = 0; parts.clear(); halos.clear(); ghosts.clear(); filled = -1;
       fill(null);
     }
     return warm0.call(this, on);
@@ -421,6 +458,7 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     if (bubbles.frame !== frame) { bubbles.cache.clear(); bubbles.frame = frame; }
     let pos = null, actor = false;
     for (const sc of scenes) { const p = sc.anchor?.(charId); if (p) { _h[0] = p[0]; _h[1] = p[1]; _h[2] = p[2]; pos = _h; break; } }
+    if (!pos && charId === 'mud' && world.plots.get('hub')?.anchors?.mud) pos = anchor('hub', 'mud', _h);
     if (!pos) for (const a of pool) if (a.used && a.char === charId && !a.hidden) { cast.head(a, _h); _h[1] += 0.35; pos = _h; actor = true; break; }
     if (!pos) {
       const home = CHAR_HOME[charId];
@@ -447,11 +485,17 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     stop(kind) { for (const s of [...scenes]) if (!kind || s.kind === kind) end(s); },
     budget(on) { if (on !== undefined) lim.on = !!on; return lim.on; },
     get scenes() { return scenes.map((s) => s.kind); },
+    caps,
+    // M's "hot" flag: the hero runs at 60 fps while a slot scene, an ejection, a duel or a borrowed camera is live.
+    get hot() { return !!shotOwner || scenes.some((s) => s.slot || s.kind === 'eject' || s.kind === 'duel'); },
+    get beatsQueued() { return beats.map((b) => b.kind); },
+    // Queue a story beat (kind: hat | deed | prestige | acquire) — it plays once the hero is visible.
+    queueBeat,
     debug: stats,
     resetStats() { stats.maxActors = stats.maxExtras = stats.maxParticles = stats.denied = 0; stats.frames = 0; },
     duel() { const s = scenes.find((x) => x.kind === 'duel' && !x.ambient); return s ? { phase: s.phase, drawAt: s.drawAt || 0, id: s.eventId } : null; },
     fling() { const s = scenes.find((x) => x.kind === 'eject' && x.phase === 'hold'); return s ? s.flingInfo?.(ctx) : null; },
-    parts, cast, props,
+    parts, cast, props, pool,
   };
   S.attach?.(api);
   return api;
