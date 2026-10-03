@@ -65,6 +65,7 @@ export function createWorld({ kit, data, skin = null }) {
   const casters = town.chunks.filter((m) => m.castShadow);
   const cells = town.chunks.filter((m) => m.userData.cell);
   const farMesh = town.chunks.find((m) => m.name === 'town:far');
+  const bulbMesh = town.chunks.find((m) => m.name === 'town:bulbs');
   const cellDist = (c, x, z) => Math.max(0, c.x0 - x, x - c.x1) + (c.band === 'n' ? Math.max(0, z - 5) : c.band === 's' ? Math.max(0, 13 - z) : Math.max(0, 5 - z, z - 13));
   // P#5: only chunks near what the view looks at cast into the shadow map; far ones never do.
   const setTownCast = (on, x = 0, z = 0) => { for (const m of casters) m.castShadow = on && (!m.userData.cell || cellDist(m.userData.cell, x, z) < SHADOW_R); };
@@ -75,6 +76,7 @@ export function createWorld({ kit, data, skin = null }) {
       m.visible = !card || (c.x1 > x - CARD_R && c.x0 < x + CARD_R && (c.band !== 's' || southOn));
     }
     if (farMesh) farMesh.visible = !card;
+    if (bulbMesh) bulbMesh.visible = !card;
   };
   const pool = kit.materials.crowdPool;
   const CARD_L = kit.CROWD_LAYER?.card ?? 1, TOWN_L = kit.CROWD_LAYER?.town ?? 2;
@@ -100,6 +102,11 @@ export function createWorld({ kit, data, skin = null }) {
     plots.set(p.id, plot);
     plot.lamps?.forEach((l) => ambient.addLamp([l[0] + p.x, l[1], l[2] + p.z]));
   }
+  // Warm spill on the dirt in front of every lit frontage (night pools; same decal draw as the lamps).
+  const spill = [];
+  for (const p of data.plots) if (p.kind === 'line') spill.push([p.x, p.z + 4.1, (p.w || 14) * 0.3, 2.1]);
+  for (const f of PL.FRONTS || []) if (f.side === 's') spill.push([f.x, f.z - 3.4, (f.w || 12) * 0.28, 1.6]);
+  ambient.addSpill?.(spill);
   scene.updateMatrixWorld(true);
 
   const bounds = { ...PL.WORLD_BOUNDS };

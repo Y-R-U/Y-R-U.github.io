@@ -52,7 +52,7 @@ export function createKit() {
       for (const m of materials.uberAll) m.envMapIntensity = l.envK ?? 0.15;
       if (materials.crowd) materials.crowd.envMapIntensity = (l.envK ?? 0.15) * 1.4;
       materials.uRim.value.set(l.sheen || l.sky.horizon).multiplyScalar(0.16);
-      materials.uRimCrowd.value.set(l.sheen || l.sky.horizon).multiplyScalar(0.55 + 0.55 * (l.night || 0));
+      materials.uRimCrowd.value.set(l.sheen || l.sky.horizon).multiplyScalar(0.55 + 0.1 * (l.night || 0));
       materials.uBounce.value.set(l.bounce || '#000000').multiplyScalar(l.bounceK || 0);
       materials.uLampK.value = (l.lamps || 0) * 2.6;
     },

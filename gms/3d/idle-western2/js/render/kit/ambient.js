@@ -33,13 +33,14 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
   pool.renderOrder = 3;
   pool.raycast = () => {};
   group.add(pool);
+  // Night light pools: one additive decal draw for every lamp plus the warm spill in front of lit doors and windows.
+  const spill = [];
   const setLamps = () => {
     glowGeo.setAttribute('position', new THREE.Float32BufferAttribute(lampPos.flat(), 3));
-    const pos = [], uv = [], R = 4.2;
-    for (const [x, , z] of lampPos) {
-      const q = [[-1, -1], [1, -1], [1, 1], [-1, -1], [1, 1], [-1, 1]];
-      for (const [u, v] of q) { pos.push(x + u * R, 0.1, z - v * R); uv.push((u + 1) / 2, (v + 1) / 2); }
-    }
+    const pos = [], uv = [], q = [[-1, -1], [1, -1], [1, 1], [-1, -1], [1, 1], [-1, 1]];
+    const disc = (x, y, z, rx, rz) => { for (const [u, v] of q) { pos.push(x + u * rx, y, z - v * rz); uv.push((u + 1) / 2, (v + 1) / 2); } };
+    for (const [x, y, z] of lampPos) disc(x, y > 3.2 ? 0.1 : Math.max(0.1, y - 1.6), z, 4.2, 4.2);
+    for (const [x, z, rx, rz, y] of spill) disc(x, y ?? 0.1, z, rx, rz);
     pool.geometry.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     pool.geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
   };
@@ -136,12 +137,13 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
       return out;
     },
     addLamp(p) { lampPos.push(p); setLamps(); },
+    addSpill(list) { spill.push(...list); setLamps(); },
     prepare() {},
     update(dt, time, n) {
       night = n;
       glow.material.opacity = Math.max(0, (n - 0.15) / 0.85) * 0.85;
       glow.visible = glow.material.opacity > 0.01;
-      poolMat.opacity = Math.max(0, (n - 0.2) / 0.8) * 0.28;
+      poolMat.opacity = Math.max(0, (n - 0.2) / 0.8) * 0.55;
       pool.visible = poolMat.opacity > 0.01;
       mistMat.opacity = Math.max(0, (n - 0.3) / 0.7) * 0.18;
       mist.visible = mistMat.opacity > 0.01;

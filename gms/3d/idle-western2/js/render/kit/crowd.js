@@ -15,7 +15,7 @@ export const CLIP = {
 };
 export const SKIN = ['#f8cfae', '#efb98f', '#dc9c70', '#bd7b51', '#8f5838', '#fad6bd'];
 export const HAIR = ['#5a3a2c', '#7c4a2c', '#b8743e', '#e8bc66', '#46343c', '#cc6440', '#e0dbd3', '#a09692', '#3c3a52', '#b8502a'];
-export const CROWD_K = 1.22;
+export const CROWD_K = 1.4;
 const STYLES = 7;
 export const OUTFITS = ['#b5483a', '#d9a441', '#5e8f8c', '#7d8fa3', '#c98b7e', '#8fa27a', '#e9e4da', '#c98a4a', '#8a5a6e', '#e8776a', '#4f86a8', '#f2d08a'];
 export const PANTS = ['#4a5878', '#6b5a7d', '#3f6b74', '#8a6a52', '#5b5f66', '#7a4f5a', '#2f4a66', '#c9b08a', '#5f7d4a', '#6e452d'];
@@ -223,8 +223,8 @@ function rigGeometry(kind = 'full') {
   P(ball(2), M(0, 0.98, 0.01, 0.262, 0.245, 0.25), 5, 3);
   for (const sx of [-1, 1]) {
     P(ball(fd), M(sx * 0.262, 0.955, -0.01, 0.062, 0.088, 0.045, 0, sx * 0.3), 5, 3);
-    P(ball(fd), M(sx * 0.085, 0.99, 0.222, 0.04, 0.054, 0.03), 5, 0, -1, DARK);
-    P(ball(0), M(sx * 0.085 + 0.013, 1.008, 0.247, 0.013, 0.016, 0.008), 5, 0, -1, '#ffffff');
+    P(ball(fd), M(sx * 0.088, 0.99, 0.222, 0.049, 0.064, 0.034), 5, 0, -1, DARK);
+    P(ball(0), M(sx * 0.088 + 0.015, 1.012, 0.252, 0.016, 0.019, 0.009), 5, 0, -1, '#ffffff');
     P(ball(0), M(sx * 0.17, 0.885, 0.19, 0.068, 0.04, 0.03), 5, 0, -1, '#f08a86');
   }
   P(ball(1), M(0, 0.915, 0.272, 0.112, 0.098, 0.102), 5, 7);
@@ -232,24 +232,24 @@ function rigGeometry(kind = 'full') {
   // expressions (brows: hair colour; lids: skin; mouths): grump 0, grin 1, shock 2, angry 3, sozzled 4
   const E = (...e) => 400 + MASK(...e);
   for (const sx of [-1, 1]) {
-    if (lite) P(ball(0), M(sx * 0.09, 1.052, 0.228, 0.092, 0.032, 0.03, 0, 0, sx * 0.36), 5, 4, E(0, 3));
+    if (lite) P(ball(0), M(sx * 0.092, 1.056, 0.232, 0.108, 0.047, 0.036, 0, 0, sx * 0.4), 5, 4, E(0, 3));
     else {
-      P(ball(1), M(sx * 0.092, 1.058, 0.226, 0.09, 0.03, 0.03, 0, 0, sx * 0.24), 5, 4, E(0));
-      P(ball(1), M(sx * 0.088, 1.045, 0.23, 0.095, 0.034, 0.032, 0, 0, sx * 0.5), 5, 4, E(3));
+      P(ball(1), M(sx * 0.094, 1.062, 0.23, 0.104, 0.044, 0.036, 0, 0, sx * 0.28), 5, 4, E(0));
+      P(ball(1), M(sx * 0.09, 1.05, 0.234, 0.11, 0.048, 0.038, 0, 0, sx * 0.55), 5, 4, E(3));
     }
-    P(ball(fd), M(sx * 0.094, 1.105, 0.214, 0.085, 0.028, 0.028, 0, 0, sx * -0.2), 5, 4, E(1, 2));
-    P(ball(fd), M(sx * 0.094, 1.072, 0.222, 0.085, 0.028, 0.028, 0, 0, sx * -0.38), 5, 4, E(4));
+    P(ball(fd), M(sx * 0.096, 1.11, 0.218, 0.1, 0.04, 0.034, 0, 0, sx * -0.24), 5, 4, E(1, 2));
+    P(ball(fd), M(sx * 0.096, 1.076, 0.226, 0.1, 0.04, 0.034, 0, 0, sx * -0.4), 5, 4, E(4));
     if (lite) P(ball(0), M(sx * 0.086, 1.036, 0.236, 0.052, 0.024, 0.03, 0, 0, sx * 0.15), 5, 3, E(0, 3, 4));
     else {
       P(ball(1), M(sx * 0.086, 1.038, 0.236, 0.052, 0.022, 0.03, 0, 0, sx * 0.3), 5, 3, E(0, 3));
       P(ball(1), M(sx * 0.086, 1.026, 0.237, 0.052, 0.028, 0.03, 0, 0, sx * -0.15), 5, 3, E(4));
     }
   }
-  P(ball(0), M(0, 0.805, 0.205, 0.045, 0.012, 0.014, 0, 0, 0), 5, 0, E(0), MOUTH);
-  P(ball(fd), M(0, 0.808, 0.198, 0.09, 0.042, 0.03), 5, 0, E(1), MOUTH);
-  P(ball(0), M(0, 0.822, 0.212, 0.074, 0.014, 0.022), 5, 0, E(1, 3), TEETH);
-  P(ball(fd), M(0, 0.8, 0.2, 0.042, 0.052, 0.03), 5, 0, E(2), MOUTH);
-  P(ball(0), M(0, 0.818, 0.2, 0.08, 0.03, 0.02), 5, 0, E(3), MOUTH);
+  P(ball(0), M(0, 0.8, 0.207, 0.062, 0.018, 0.018, 0, 0, 0), 5, 0, E(0), MOUTH);
+  P(ball(fd), M(0, 0.804, 0.2, 0.11, 0.054, 0.034), 5, 0, E(1), MOUTH);
+  P(ball(0), M(0, 0.82, 0.216, 0.09, 0.018, 0.024), 5, 0, E(1, 3), TEETH);
+  P(ball(fd), M(0, 0.796, 0.202, 0.054, 0.068, 0.034), 5, 0, E(2), MOUTH);
+  P(ball(0), M(0, 0.814, 0.204, 0.1, 0.038, 0.024), 5, 0, E(3), MOUTH);
   P(ball(0), M(0.025, 0.81, 0.205, 0.06, 0.02, 0.016, 0, 0, 0.32), 5, 0, E(4), MOUTH);
   // hair styles (100 + mask of the styles a part serves; hair colour)
   const H = (...s) => 100 + MASK(...s);
@@ -279,8 +279,8 @@ function rigGeometry(kind = 'full') {
   // moustaches (300 + mask; hair colour): walrus 0, handlebar 1, pencil 2, beard 3, chops 4 — bushy, under the nose
   const T = (...s) => 300 + MASK(...s);
   for (const sx of [-1, 1]) {
-    P(ball(fd), M(sx * 0.07, 0.852, 0.262, 0.105, 0.055, 0.046, 0, 0, sx * 0.38), 5, 4, T(0, 3));
-    P(ball(fd), M(sx * 0.075, 0.858, 0.262, 0.088, 0.03, 0.034, 0, 0, sx * -0.12), 5, 4, T(1, 2));
+    P(ball(fd), M(sx * 0.075, 0.85, 0.264, 0.124, 0.066, 0.052, 0, 0, sx * 0.4), 5, 4, T(0, 3));
+    P(ball(fd), M(sx * 0.08, 0.856, 0.264, 0.104, 0.04, 0.04, 0, 0, sx * -0.12), 5, 4, T(1, 2));
     P(ball(0), M(sx * 0.165, 0.89, 0.238, 0.034, 0.048, 0.03, 0, 0, sx * 0.45), 5, 4, T(1));
     P(ball(0), M(sx * 0.215, 0.875, 0.1, 0.075, 0.13, 0.095), 5, 4, T(3, 4));
   }
@@ -467,7 +467,7 @@ else if (st > 49.5) vis = float(abs(st - 50.0 - aHat.x) < 0.1);
 else if (st > 9.5) vis = bitOn(aLook.w, st - 10.0);
 else if (st > -0.5) vis = float(abs(st - aLook.z) < 0.1);
 if (limb > 5.5 && limb < 6.5) vis *= isCarry;
-float headK = aBody.x, legK = aBody.y, girth = aBody.z;
+float headK = aBody.x * 1.14, legK = aBody.y, girth = aBody.z;
 vec3 piv = vec3(0.0);
 float ang = 0.0, angZ = 0.0;
 if (limb > 0.5 && limb < 2.5) {

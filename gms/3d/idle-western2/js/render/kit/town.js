@@ -23,6 +23,7 @@ export function buildTown(kit, data, field, pal) {
   const B = (x, z = 0) => { const k = cellKey(x, z); if (!cells.has(k)) cells.set(k, kit.builder(pal, { seed: 100 + cells.size * 31 })); return cells.get(k); };
   const G = (x = 0, z = 0) => { const k = cellKey(x, z); if (!gcells.has(k)) gcells.set(k, kit.builder(pal, { seed: 500 + gcells.size * 7 })); return gcells.get(k); };
   const far = kit.builder(pal, { seed: 999 });
+  const bulbs = kit.builder(pal, { seed: 777 });
   const signs = kit.signs.batch();
   const lamps = [];
   const life = { pigeonSpots: [], joggerPaths: [], gullSpots: [], benches: [], walks: [] };
@@ -78,10 +79,10 @@ export function buildTown(kit, data, field, pal) {
   { // Saloon Row: bulb strings across the street (night), Pomfrey bunting over the hotel
     const pl = (id) => data.PLOTS?.find((p) => p.id === id);
     const sal = pl('saloon'), gar = pl('garter');
+    // Bulb strings live in their own mesh (`town:bulbs`), high over the street; cards hide it so no wire crosses a card.
     for (const p of [sal, gar].filter(Boolean)) {
-      const b = B(p.x, rz);
-      W.bulbString(b, [p.x - 4, 4.9, 2.4], [p.x - 1, 5.2, SZ - 0.2], { n: 16, sag: 0.9 });
-      W.bulbString(b, [p.x + 4, 4.9, 2.4], [p.x + 6, 5.2, SZ - 0.2], { n: 16, sag: 0.9 });
+      W.bulbString(bulbs, [p.x - 5, 7.4, 1.2], [p.x - 2, 7.6, SZ - 0.6], { n: 18, sag: 0.55 });
+      W.bulbString(bulbs, [p.x + 5, 7.4, 1.2], [p.x + 7, 7.6, SZ - 0.6], { n: 18, sag: 0.55 });
     }
     const hot = FR.find((f) => f.id === 'p_hotel'), op = FR.find((f) => f.id === 'p_opera');
     if (hot && op) W.bunting(B(hot.x + 8, SZ), [hot.x - 4, 6.4, SZ - 2.3], [op.x + 4, 6.4, SZ - 2.3], { sag: 0.6 });
@@ -214,10 +215,12 @@ export function buildTown(kit, data, field, pal) {
   const chunks = [...cells.entries()].map(([k, b]) => { const m = b.finish(); m.name = 'town:' + k; return tag(m, k); });
   const ground = [...gcells.entries()].map(([k, b]) => { const m = b.finish({ cast: false }); m.name = 'ground:' + k; return tag(m, k); });
   const farMesh = far.finish({ cast: false });
+  const bulbMesh = bulbs.finish({ cast: false });
+  bulbMesh.name = 'town:bulbs';
   farMesh.name = 'town:far';
   const rows = [...cells.values(), ...gcells.values()].flatMap((b) => b.contacts);
   for (const b of cells.values()) lamps.push(...b.lamps);
-  const out = [...chunks, ...ground, farMesh];
+  const out = [...chunks, ...ground, farMesh, bulbMesh];
   if (rows.length) out.push(contactMesh(kit.materials, rows));
   const sm = signs.finish({ name: 'town:signs' });
   if (sm) out.push(sm);

@@ -72,6 +72,13 @@ export function windowW(b, x, y, z, o = {}) {
   b.slab(trim, x, y + h, z, w + 0.24, 0.16, 0.12, { parent: M, round: 0.03, taper: 0 });
   for (const s of [-1, 1]) b.slab(trim, x + s * (w / 2 + 0.06), y, z, 0.12, h, 0.12, { parent: M, round: 0.025, taper: 0 });
   b.slab(o.glass || 'window', x, y, z + 0.03, w, h, 0.05, { parent: M, round: 0.01, taper: 0, noAo: true });
+  // lit interior card: a silhouette (head + shoulders, sometimes a hat) against the glow in about half the windows
+  if (!o.glass && o.interior !== false && b.rnd() < 0.5) {
+    const sx = x + (b.rnd() - 0.5) * w * 0.4, sy = y + h * 0.08, k = Math.min(w, h) / 1.2;
+    b.slab('dark', sx, sy, z + 0.056, 0.62 * k, 0.32 * k, 0.008, { parent: M, round: 0.12 * k, taper: 0.25, noAo: true });
+    b.ball('dark', sx, sy + 0.5 * k, z + 0.058, 0.17 * k, { parent: M, sz: 0.04, detail: 0, noAo: true });
+    if (b.rnd() < 0.6) b.slab('dark', sx, sy + 0.66 * k, z + 0.06, 0.62 * k, 0.05 * k, 0.008, { parent: M, round: 0.02, taper: 0, noAo: true });
+  }
   b.slab('woodDark', x, y, z + 0.07, 0.05, h, 0.05, { parent: M, round: 0.01, taper: 0, noAo: true });
   b.slab('woodDark', x, y + h * 0.5, z + 0.07, w, 0.05, 0.05, { parent: M, round: 0.01, taper: 0, noAo: true });
   if (o.shutters) for (const s of [-1, 1]) b.slab(o.shutters, x + s * (w / 2 + 0.36), y, z + 0.02, 0.48, h, 0.06, { parent: M, round: 0.02, taper: 0, surf: PLANK });

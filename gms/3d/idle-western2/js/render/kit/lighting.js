@@ -101,12 +101,21 @@ void main() {
   float cl = smoothstep(0.55, 0.85, vn(cp * vec2(0.9, 3.2) + 7.0) * 0.65 + vn(cp * vec2(2.3, 7.0)) * 0.35) * smoothstep(0.02, 0.12, y) * (1.0 - smoothstep(0.45, 0.8, y));
   vec3 cc = mix(uMid * 1.08, uSun * 0.9 + uHor * 0.35, pow(s, 3.0)) * (1.0 - 0.55 * uNight);
   c = mix(c, cc, cl * 0.55);
-  float disc = smoothstep(cos(0.042), cos(0.034), s);
+  float dr = mix(0.042, 0.052, uNight);
+  float disc = smoothstep(cos(dr), cos(dr * 0.86), s);
+  if (uNight > 0.5) {
+    c += uDisc * 0.05 * pow(s, 90.0) * uNight + uDisc * 0.02 * pow(s, 14.0) * uNight;
+    vec3 ax = normalize(cross(uDiscDir, vec3(0.0, 1.0, 0.0)));
+    vec2 mp = vec2(dot(d - uDiscDir, ax), dot(d - uDiscDir, cross(ax, uDiscDir))) / dr;
+    float mare = vn(mp * 2.3 + 4.0) * 0.6 + vn(mp * 5.0) * 0.4;
+    disc *= 1.0 - 0.32 * smoothstep(0.45, 0.75, mare);
+  }
   c = mix(c, uDisc, disc);
   if (uNight > 0.3) {
-    vec2 sp = floor(d.xz / max(0.15, y + 0.15) * 160.0);
-    float st = step(0.9965, h21(sp)) * smoothstep(0.08, 0.3, y) * (uNight - 0.3) * 1.4;
-    c += vec3(st) * (0.6 + 0.4 * h21(sp + 3.0));
+    vec2 sp = floor(d.xz / max(0.06, y + 0.06) * 150.0);
+    float tw = 0.75 + 0.25 * h21(sp + 7.0);
+    float st = step(0.9955, h21(sp)) * smoothstep(0.004, 0.05, y) * (uNight - 0.3) * 1.6 * tw;
+    c += vec3(0.9, 0.95, 1.1) * st * (0.6 + 0.6 * h21(sp + 3.0));
   }
   gl_FragColor = vec4(c, 1.0);
   #include <colorspace_fragment>

@@ -7,6 +7,17 @@ import { createPile } from './piles.js?v=20261004c';
 import * as props from './props.js?v=20261004c';
 
 export const PLOT_W = 24, PLOT_D = 9;
+
+// 'The Thirsty Gizzard' → 'THIRSTY\nGIZZARD' style board text (two lines when long).
+export function signName(name, aspect = 4) {
+  if (!name) return '';
+  const t = name.replace(/^The /, '').toUpperCase();
+  if (t.length <= 11 || aspect > 7) return t;
+  const w = t.split(' ');
+  let best = 0, bd = 1e9;
+  for (let i = 1; i < w.length; i++) { const d = Math.abs(w.slice(0, i).join(' ').length - w.slice(i).join(' ').length); if (d < bd) { bd = d; best = i; } }
+  return best ? w.slice(0, best).join(' ') + '\n' + w.slice(best).join(' ') : t;
+}
 // world.prepare raises `card` while a card rig fits, so `bounds.w` can answer the card width (spec.cardW) there
 // and the hero width everywhere else.
 export const FIT = { card: false };
@@ -151,6 +162,13 @@ export function createPlot(kit, { id, line = null, palette, rng = Math.random, c
       };
     },
   };
+  // Painted business names (R3): every builder carries `signText` (the line's name, sign-shaped) and a lazy `signs`
+  // batch on its own tier, so plots/western.js signBoard() letters the board without a per-plot call change.
+  const signText = signName(line?.name);
+  [...tiers, lot].forEach((t, i) => {
+    t.signText = signText;
+    Object.defineProperty(t, 'signs', { get: () => P.text(i < 3 ? i : 'lot'), configurable: true });
+  });
 
   function setTier(vt) {
     if (staticMesh) { staticHolder.remove(staticMesh); staticMesh.geometry.dispose(); staticMesh = null; }

@@ -133,8 +133,13 @@ if (vSurf > 0.04 && vSurf < 0.235) {
     float fade = 1.0 - smoothstep(0.3, 0.8, fwidth(cy));
     float lip = mix(0.7, 1.0, smoothstep(0.0, 0.22, fy)) * (1.0 - 0.06 * smoothstep(0.8, 1.0, fy));
     float grain = 0.96 + 0.08 * sfNoise(vec2(along * 1.3, vWP.y * 22.0));
-    float sh = mix(0.93, lip * (0.93 + 0.12 * jit) * grain, fade);
-    diffuseColor.rgb *= sh;
+    float sh = mix(0.93, lip * (0.86 + 0.24 * jit) * grain, fade);
+    float wv = sfHash(vec2(seg, course) + 5.1);
+    vec3 dc = diffuseColor.rgb;
+    float bleach = step(0.84, wv) * fade * 0.32, repl = step(wv, 0.07) * fade;
+    dc = mix(dc, vec3(dot(dc, vec3(0.33))) * vec3(1.08, 1.04, 1.0), bleach);
+    dc *= mix(1.0, 0.78, repl);
+    diffuseColor.rgb = dc * sh;
     sfAO = sh;
   } else {
     vec2 p = vSurf > 0.195 ? vWP.zx : vWP.xz;
@@ -149,7 +154,11 @@ if (vSurf > 0.04 && vSurf < 0.235) {
     float butt = smoothstep(0.0, 0.02, fract((p.y + off) / 2.4)) ;
     float grain = 0.95 + 0.1 * sfNoise(vec2(u * 2.0, p.y * 3.0));
     float sh = mix(0.92, (0.62 + 0.38 * seam * butt) * (0.9 + 0.18 * jit) * grain, fade);
-    diffuseColor.rgb *= sh * mix(vec3(1.0), vec3(1.03, 0.99, 0.95), (jit - 0.5) * fade);
+    float wv = sfHash(vec2(iv, iu) + 9.7);
+    vec3 dc = diffuseColor.rgb * mix(vec3(1.0), vec3(1.06, 0.99, 0.92), (jit - 0.5) * 2.0 * fade);
+    dc = mix(dc, vec3(dot(dc, vec3(0.33))) * vec3(1.04, 1.02, 1.0), step(0.82, wv) * fade * 0.4);
+    dc *= mix(1.0, 0.8, step(wv, 0.1) * fade);
+    diffuseColor.rgb = dc * sh;
     sfAO = sh;
   }
 } else if (vSurf > 0.32 && vSurf < 0.48 && sfWN.y > 0.2) {

@@ -164,3 +164,19 @@ ghost in a dark stetson, translucent with a cyan fresnel rim, hem flutter + bob 
   cards 754–1,095 k → 244–451 k verts (−60 to −70 %), 25–29 → 19–25 draws. rAF p95 is not comparable under that load
   (before 3.1–3.6 ms at load 3.4; after 5.9–10.5 ms at load 6–16); test-scroll phone 8.2 ms at load 13–20 (gate 8),
   desktop 6.2 ms pass. Pool gather costs ~0.1 ms at CPU 4×. Re-measure on a quiet machine.
+- 2026-10-04 A round 3 (critic r2 fixes). **Light:** golden is the hero default look (sun el 23°, az 36, warm `#ffbf78`
+  6.6, cool blue hemisphere `#8494e0` 0.46, long raking shadows); "day" is now a low warm afternoon too (el 30, was 46).
+  **Night:** fill −67 % (0.72 → 0.24, blue `#3c5290`), deep navy sky, moon disc low in the hero frame (el 4°, bigger, with
+  maria), stars down to the horizon band, crowd rim no longer blue-washed. Light pools = the existing additive decal
+  draw, now 2× stronger plus `ambient.addSpill([[x, z, rx, rz]])` warm spill in front of every frontage (world.js adds one
+  per lot and Pomfrey front; no extra draws, no point lights). **Characters:** `CROWD_K` 1.22 → 1.4 (people ≈ 15 % bigger
+  vs buildings), heads ×1.14 in the rig shader (every rig, incl. the cast), bigger eyes/catchlights, thicker brows,
+  mouths and moustaches (read at ~150 px). **Materials:** per-board tone ±12 % on clapboard and planks, bleached grey and
+  dark replaced boards. **Windows:** `windowW` puts a dark silhouette (head + shoulders, sometimes a hat brim) in ~½ of
+  the lit windows (`interior:false` opts out; +11 k verts town-wide). **Signs:** every plot builder carries
+  `b.signText` (line name, sign-shaped by `signName()` in plotbase.js) and a lazy `b.signs` batch on its own tier;
+  `plots/western.js signBoard()` paints it (style `pomfrey` on purple boards, else `civic`; `o.text` overrides).
+  **Bulb strings** moved to their own mesh `town:bulbs`, raised to 7.4–7.6 m; `world.prepare(line)` hides it in cards.
+  Shots: `docs/art/a/r3_before/`, `r3_before_sheet.jpg`, `r3_after/`, `r3_after_hero17.jpg`, `r3_after_hero22.jpg`,
+  `r3_after_cards.jpg`. Perf (CDP 9331, load ~3): hero 1.63 M verts/render idle (static 1.70 M, 97 calls avg, 122 max —
+  +~9 sign draws), S22 test-scroll rAF p95 3.9 ms, desktop 2.7–5.6 ms, PASS.
