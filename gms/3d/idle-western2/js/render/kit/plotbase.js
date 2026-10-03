@@ -22,7 +22,7 @@ export function createPlot(kit, { id, line = null, palette, rng = Math.random, c
   const lot = mk(4);
   const staticHolder = new THREE.Group();
   group.add(staticHolder);
-  const tickers = [], crowds = [], piles = [], tierObjs = [[], [], []], ownedObjs = [];
+  const tickers = [], crowds = [], piles = [], tierObjs = [[], [], []], ownedObjs = [], lotObjs = [], texts = [];
   let contactObj = null;
   let staticMesh = null, lotMesh = null, geos = null, shownTier = -2, pop = 1, popFrom = 1;
   const anims = { t: 0 };
@@ -92,12 +92,27 @@ export function createPlot(kit, { id, line = null, palette, rng = Math.random, c
         commit() { m.instanceMatrix.needsUpdate = true; },
       });
     },
+    // Painted sign text (kit/signs.js batch, one draw per plot per tier): tier 'lot' (unowned only), 0|1|2 (from that
+    // visual tier up) or 'always'. Use with kit.western builders: western.falseFront(P.b, …, { signs: P.text(0), text }).
+    text(tier = 0) {
+      let t = texts.find((e) => e.tier === tier);
+      if (!t) texts.push((t = { tier, batch: kit.signs.batch() }));
+      return t.batch;
+    },
     tick(fn) { tickers.push(fn); return P; },
     // Customers loop: spawn → queue toward `counter` → served for `serve` s → leave via `exit` path (carrying).
     queue(crowd, o) { const q = makeQueue(crowd, o); tickers.push(q.update); return q; },
     walkers(crowd, o) { const w = makeWalkers(crowd, o); tickers.push(w.update); return w; },
     done(spec = {}) {
       geos = tiers.map((t) => (t.count ? t.geometry() : null));
+      for (const t of texts) {
+        const m = t.batch.finish({ name: 'signs:' + P.id + ':' + t.tier });
+        if (!m) continue;
+        group.add(m);
+        if (t.tier === 'lot') lotObjs.push(m);
+        else if (t.tier === 'always') m.visible = true;
+        else (tierObjs[t.tier] || ownedObjs).push(m);
+      }
       if (lot.count) {
         lotMesh = new THREE.Mesh(lot.geometry(), kit.materials.uber);
         lotMesh.castShadow = lotMesh.receiveShadow = true;
@@ -154,6 +169,7 @@ export function createPlot(kit, { id, line = null, palette, rng = Math.random, c
     const rows = vt < 0 ? lot.contacts : tiers.slice(0, vt + 1).flatMap((t) => t.contacts);
     if (rows.length) { contactObj = contactMesh(kit.materials, rows); group.add(contactObj); }
     if (lotMesh) lotMesh.visible = vt < 0;
+    lotObjs.forEach((m) => { m.visible = vt < 0; });
     tierObjs.forEach((arr, i) => arr.forEach((m) => { m.visible = vt >= i; }));
     ownedObjs.forEach((m) => { m.visible = vt >= 0; });
   }

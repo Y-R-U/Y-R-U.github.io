@@ -1,63 +1,92 @@
-// Colours (sRGB hex) for every builder slot, per-district overrides, and the time-of-day light palettes.
-// PLACEHOLDER western look (dust, weathered wood, red rock) until the art-direction lane replaces it.
+// Look A "Clay Caricature" (docs/ART_DIRECTION.md §3): sun-baked barn paint on a dusty diorama, violet shadows.
+// Builder slot colours (sRGB hex or { c, r, m, g }), ownership skins (W3) and the time-of-day light palettes.
 export const PALETTE = {
-  sky: '#f3c9a0', fog: '#f2d2a8',
-  ground: '#d9b27c', grass: '#c9b06a', grass2: '#d4bd78', grassDark: '#a8925a', dirt: '#c99a66', sand: '#e9cf9e',
-  road: '#c79a68', roadLine: '#e2c18e', kerb: '#9a6f48', pave: '#b88a5c', pave2: '#a77b4f', pad: '#d1a774', grout: '#8a6040',
-  wall: '#c9a27a', wall2: '#b5835a', trim: '#efe0c4', white: '#f6ecda', roof: '#8a5a3a', roof2: '#6f4a33',
-  wood: '#b07a4a', wood2: '#93633c', woodDark: '#6e4a2e', dark: '#3e2f28', iron: '#4a4040', stone: '#c8a888', stone2: '#b08d6c',
-  brick: '#b5674a', brick2: '#9c573e', rock: '#c4704a', rock2: '#a85a3c',
-  glass: '#7d9db5', window: { c: '#ffb45a', r: 0.3, g: -1 }, curtain: '#c9473a', door: '#7a4a2e',
-  leaf: '#8aa05a', leaf2: '#a3b46a', leafDark: '#6f8648', pine: '#6a8a5a', trunk: '#7a5638', cactus: '#6f9a5a',
-  water: '#7fb8c0', waterDeep: '#4f8e98', foam: '#f4fbfb',
-  skin: '#e8b48a', metal: '#9aa4b0', chrome: '#d6dde4', lamp: { c: '#ffd08a', r: 0.3, g: -1 }, bulb: { c: '#fff1c4', r: 0.3, g: 1.2 },
-  gold: { c: '#e8c25a', r: 0.3, m: 0.85 }, accent: '#c9473a', sign: '#f1d9a0', stock: '#d9a441', red: '#c9473a', yellow: '#e8b84a', blue: '#5f86b0', green: '#6f9a5a',
-  pink: '#d98a8a', orange: '#d9853a', teal: '#5f9f98', lilac: '#9a83b8', cream: '#f4e6c8', pot: '#b86a44',
-  flowers: ['#e8b84a', '#c9473a', '#f6ecda', '#d9853a', '#9a83b8'],
-  cobbles: ['#c9a074', '#c29a6e', '#cfa77a', '#bf9469', '#c8a27a'],
-  walls: ['#c9a27a', '#b5835a', '#d8b48a', '#a9785a', '#e0c49a', '#9c6b4a', '#c98f6a'],
-  roofs: ['#8a5a3a', '#6f4a33', '#9c6b4a', '#7a5040', '#5f4a3a'],
+  sky: '#f4b88a', fog: '#fcd9a6',
+  ground: '#dcae80', grass: '#e6b07e', grass2: '#ecbc8c', grassDark: '#d49868', dirt: '#d49a6a', sand: '#e8b888',
+  road: '#ecb98a', roadLine: '#e8b888', rut: '#b97b52', kerb: '#8e5c3c', pave: '#a8714a', pave2: '#8e5c3c', pad: '#d9a676', grout: '#6e452d',
+  plank: '#a8714a', plank2: '#8e5c3c', plank3: '#6e452d',
+  wall: '#c9a27a', wall2: '#b5835a', trim: '#ead9b8', white: '#f3e7cf', roof: '#8a8f93', roof2: '#7c6a5c', tin: '#8a8f93', rust: '#a86b4a',
+  wood: '#b88b60', wood2: '#9a6c48', woodDark: '#7a5236', raw: '#c99a6c', dark: '#3e2f28', iron: '#4a4246', stone: '#c8a888', stone2: '#b08d6c',
+  brick: '#b5674a', brick2: '#9c573e', rock: '#c5653f', rock2: '#b8705a', rock3: '#d9a08a', rockDark: '#9a4a32',
+  glass: { c: '#5b5470', r: 0.12 }, window: { c: '#ffb45a', r: 0.25, g: -1 }, winDay: { c: '#ffb45a', r: 0.3, g: 0.12 }, curtain: '#b5483a', door: '#6e452d',
+  leaf: '#8a9a5a', leaf2: '#a3a86a', leafDark: '#6f7a48', trunk: '#7a5638', cactus: '#6e9b57', cactusDark: '#4e7a45', scrub: '#b8a564', hay: '#e2bf6a',
+  water: '#7fb0b8', waterDeep: '#4f8e98', foam: '#f4fbfb',
+  skin: '#e8b48a', metal: '#8a8f93', chrome: '#c9ced4', lamp: { c: '#ffc978', r: 0.3, g: -1 }, bulb: { c: '#ffe2a8', r: 0.3, g: 1.2 },
+  gold: { c: '#e8c25a', r: 0.3, m: 0.85 }, brass: { c: '#c9a24a', r: 0.32, m: 0.8 }, badge: { c: '#ffd27a', r: 0.25, m: 0.9, g: 0.2 },
+  accent: '#b5483a', sign: '#ead9b8', stock: '#d9a441', bone: '#efe6d2', cloth: '#efe2c8',
+  // barn paint (same value band; roofs/awnings carry the contrast)
+  red: '#b5483a', teal: '#5e8f8c', mustard: '#d9a441', sage: '#8fa27a', rose: '#c98b7e', cream: '#ead9b8', slate: '#7d8fa3', ochre: '#c98a4a', plum: '#8a5a6e',
+  yellow: '#e8b84a', blue: '#5f86b0', green: '#6f9a5a', pink: '#d98aa8', orange: '#d9853a', lilac: '#9a83b8', pot: '#b86a44',
+  // ownership camps (W3)
+  you: '#3f8f8a', you2: '#2f6f6c', youTrim: '#c9a24a', youCream: '#f1e3c2',
+  pom: '#6b3f86', pom2: '#4f2c66', pomTrim: { c: '#e2b33c', r: 0.3, m: 0.7 }, pomCream: '#efe0f0',
+  dust: '#f3e2c4', star: { c: '#ffe45c', r: 0.4, g: 1 }, potion: { c: '#7dff6a', r: 0.2, g: 1.2 },
+  flowers: ['#e8b84a', '#b5483a', '#f3e7cf', '#d9853a', '#9a83b8'],
+  cobbles: ['#e2ae80', '#dca878', '#e6b486'],
+  walls: ['#b5483a', '#5e8f8c', '#d9a441', '#8fa27a', '#c98b7e', '#ead9b8', '#7d8fa3', '#c98a4a', '#a8714a'],
+  roofs: ['#8a8f93', '#7c6a5c', '#a86b4a', '#6e5a4e', '#9a8a7a'],
+  awnings: ['#b5483a', '#5e8f8c', '#d9a441', '#8fa27a', '#7d8fa3'],
+};
+
+// Ownership skins applied per frontage (kit `western.skin(owner)`): trim, awning, sign board, door, banner, letters.
+export const SKINS = {
+  you: { key: 'you', trim: 'youTrim', board: 'you', board2: 'you2', awning: 'you', awningAlt: 'youCream', door: 'you2', letter: '#f3d68a', boardHex: '#2f6f6c', edgeHex: '#c9a24a', crest: false },
+  pomfrey: { key: 'pomfrey', trim: 'pomTrim', board: 'pom', board2: 'pom2', awning: 'pom', awningAlt: 'pomTrim', door: 'pom2', letter: '#f2c64a', boardHex: '#4f2c66', edgeHex: '#e2b33c', crest: true },
+  civic: { key: 'civic', trim: 'trim', board: 'cream', board2: 'wood2', awning: 'red', awningAlt: 'cream', door: 'door', letter: '#5a3a26', boardHex: '#ead9b8', edgeHex: '#7a5236', crest: false },
+  none: { key: 'none', trim: 'trim', board: 'sign', board2: 'wood2', awning: 'tin', awningAlt: 'rust', door: 'door', letter: '#5a3a26', boardHex: '#d9c49a', edgeHex: '#7a5236', crest: false },
 };
 
 export const DISTRICT_PALETTES = {
+  lower: {},
+  saloonrow: {},
+  bankblock: {},
   main: {},
 };
 
-// sun.azimuth: degrees from +x toward +z (east = 0, south = 90). Hero cameras look north from the south.
+// sun.azimuth: degrees from +x toward +z. The street runs along +x; the hero looks down it, so a sun at az ≈ 40
+// sits ahead-right of the camera, lights the north (business) facades obliquely and throws long shadows toward the lens.
 export const LIGHTS = {
   dawn: {
-    sky: { top: '#a9c4ee', mid: '#f3cfc0', horizon: '#fbe2cc' },
-    sun: { color: '#ffdcae', intensity: 5.0, azimuth: 36, elevation: 31 },
-    fill: { sky: '#8aa6ee', ground: '#f4c69e', intensity: 0.62 },
+    sky: { top: '#a9a8dc', mid: '#f3c2b0', horizon: '#fcd8b8' },
+    sun: { color: '#ffc7a0', intensity: 4.6, azimuth: 150, elevation: 20 },
+    fill: { sky: '#b9b6e0', ground: '#d9a47a', intensity: 0.7 },
     rim: { color: '#ffc884', intensity: 1.0 },
-    bounce: '#ffb47e', bounceK: 0.12,
-    env: { ground: '#d8b496' }, night: 0, exposure: 1.2, sheen: '#ffd0a0', envK: 0.13,
+    bounce: '#ffb47e', bounceK: 0.14,
+    env: { ground: '#d8a886' }, night: 0, exposure: 1.18, sheen: '#ffc8a8', envK: 0.13,
   },
   day: {
-    sky: { top: '#8fc0e6', mid: '#d6e2e4', horizon: '#f6d8b0' },
-    sun: { color: '#ffe2bc', intensity: 4.6, azimuth: 40, elevation: 38 },
-    fill: { sky: '#88a6ee', ground: '#f6d4ae', intensity: 0.62 },
-    rim: { color: '#ffd29a', intensity: 0.7 },
-    bounce: '#ffad70', bounceK: 0.13,
-    env: { ground: '#d9c09c' }, night: 0, exposure: 1.22, sheen: '#ffc890', envK: 0.14,
+    sky: { top: '#8fb8d8', mid: '#e8dcc8', horizon: '#fce0b8' },
+    sun: { color: '#fff0d8', intensity: 4.4, azimuth: 52, elevation: 46 },
+    fill: { sky: '#9fc4d8', ground: '#f0c898', intensity: 0.66 },
+    rim: { color: '#ffe0b0', intensity: 0.6 },
+    bounce: '#ffb070', bounceK: 0.14,
+    env: { ground: '#dcb890' }, night: 0, exposure: 1.16, sheen: '#ffd8a8', envK: 0.14,
+  },
+  golden: {
+    sky: { top: '#8c8fc4', mid: '#f4b88a', horizon: '#fcd9a6' },
+    sun: { color: '#ffbc6a', intensity: 5.6, azimuth: 40, elevation: 21 },
+    fill: { sky: '#9a9ad0', ground: '#e0a070', intensity: 0.72 },
+    rim: { color: '#ffb860', intensity: 1.2 },
+    bounce: '#ffa050', bounceK: 0.12,
+    env: { ground: '#d09060' }, night: 0, exposure: 1.18, sheen: '#ffb880', envK: 0.16,
   },
   dusk: {
-    sky: { top: '#7a6cb8', mid: '#f29a88', horizon: '#ffbf80' },
-    sun: { color: '#ff8a38', intensity: 6.2, azimuth: 150, elevation: 14 },
-    fill: { sky: '#6c64c8', ground: '#e0845e', intensity: 0.46 },
-    rim: { color: '#ffb050', intensity: 1.4 },
-    bounce: '#ff7a38', bounceK: 0.24,
-    env: { ground: '#a8706a' }, night: 0.4, lamps: 0.5, exposure: 1.05, sheen: '#ff9858', envK: 0.14,
+    sky: { top: '#5b4a96', mid: '#e88a78', horizon: '#ffb070' },
+    sun: { color: '#ff8a40', intensity: 5.2, azimuth: 34, elevation: 9 },
+    fill: { sky: '#6c64c0', ground: '#c8785e', intensity: 0.56 },
+    rim: { color: '#ffa050', intensity: 1.4 },
+    bounce: '#ff7a38', bounceK: 0.22,
+    env: { ground: '#a0706a' }, night: 0.45, lamps: 0.55, exposure: 1.1, sheen: '#ff9858', envK: 0.14,
   },
   night: {
-    sky: { top: '#271f62', mid: '#47378a', horizon: '#7b5ba8' },
-    sun: { color: '#9aa4ff', intensity: 0.85, azimuth: 40, elevation: 46 },
-    fill: { sky: '#6460c0', ground: '#6e5468', intensity: 0.62 },
-    rim: { color: '#9fb4ff', intensity: 0.8 },
-    bounce: '#ff9a50', bounceK: 0.05,
-    env: { ground: '#36304e' }, night: 1, lamps: 1.35, exposure: 1.24, sheen: '#9c8ee0', envK: 0.12,
+    sky: { top: '#2b2a5c', mid: '#463c7c', horizon: '#5b4a86' },
+    sun: { color: '#9aa8ff', intensity: 0.7, azimuth: 60, elevation: 44 },
+    fill: { sky: '#5f5ab8', ground: '#5e4462', intensity: 0.62 },
+    rim: { color: '#9fb0ff', intensity: 0.9 },
+    bounce: '#ff9a50', bounceK: 0.06,
+    env: { ground: '#3a3254' }, night: 1, lamps: 1.9, exposure: 1.28, sheen: '#9c8ee0', envK: 0.12,
   },
 };
 
-// Local hour → [palette, palette, t]. Never fully dark; warm dawn holds the morning.
-export const DAY_KEYS = [[0, 'night'], [5.5, 'night'], [7, 'dawn'], [9.5, 'dawn'], [12, 'day'], [16.5, 'day'], [18.5, 'dusk'], [20.5, 'night'], [24, 'night']];
+// Local hour → palette keys. Golden hour owns the long afternoon (the money shot); night is violet, never black.
+export const DAY_KEYS = [[0, 'night'], [5, 'night'], [6.5, 'dawn'], [8.5, 'dawn'], [10.5, 'day'], [13.5, 'day'], [15.5, 'golden'], [19, 'golden'], [20.2, 'dusk'], [21.2, 'night'], [24, 'night']];

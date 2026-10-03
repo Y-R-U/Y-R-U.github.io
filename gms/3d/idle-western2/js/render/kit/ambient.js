@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import * as S from './shape.js?v=20261004a';
 import { createCrowd, CLIP } from './crowd.js?v=20261004a';
+import * as WK from './western.js?v=20261004a';
 
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3();
 
@@ -92,19 +93,27 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
   gl.boundingSphere = new THREE.Sphere(new THREE.Vector3(midX, 18, -20), 70);
   group.add(gl);
 
-  const crowd = createCrowd(kit.materials, { count: 12, seed: 5, radius: 600, center: [(street.x0 + street.x1) / 2, 0, 0] });
+  const N = 8;
+  const crowd = createCrowd(kit.materials, { count: N, seed: 5, radius: 600, center: [(street.x0 + street.x1) / 2, 0, 0] });
   group.add(crowd.mesh);
-  const roadS = street.z + street.width / 2;
+  const walks = life.walks?.length ? life.walks : [{ z: street.z + street.width / 2 - 0.6, x0: street.x0, x1: street.x1 }];
   const runners = [];
-  for (let i = 0; i < 12; i++) {
-    const back = i >= 8;
-    runners.push({
-      i, s: Math.random(), dir: i % 2 ? 1 : -1, sp: back ? 1.0 : i < 3 ? 3.0 : 1.2,
-      z: back ? -6.9 + (i % 2) * 0.7 : roadS + 1.2 + (i % 3) * 0.55,
-      x0: back ? street.x0 - 40 : street.x0 - 40, x1: street.x1 + 30,
-    });
-    crowd.look(i, { top: ['#e8776a', '#6fb7a8', '#f2b84b', '#7d9ad6', '#e58fb0', '#9bc66b'][i % 6], style: i % 5, hair: i % 6, skin: i % 5 });
+  const TOPS = ['#b5483a', '#5e8f8c', '#d9a441', '#7d8fa3', '#c98b7e', '#8fa27a', '#e9e4da', '#8a5a6e'];
+  for (let i = 0; i < N; i++) {
+    const w = walks[i % walks.length];
+    runners.push({ i, s: (i * 0.37) % 1, dir: i % 2 ? 1 : -1, sp: i === 3 ? 0.7 : 1.0 + (i % 3) * 0.15, z: w.z + ((i * 0.31) % 0.6) - 0.3, y: w.y ?? 0.06, x0: w.x0, x1: w.x1, clip: i === 3 ? CLIP.stagger : CLIP.walk });
+    crowd.look(i, { top: TOPS[i % TOPS.length], style: i % 5, hair: i % 6, skin: i % 5 });
   }
+  if (N > 3) crowd.dress(3, 'pickles');
+  // a tumbleweed bowls down the street now and then (one dynamic draw)
+  const tw = new THREE.Mesh(WK.tumbleweedGeo(), kit.materials.uber);
+  tw.castShadow = true;
+  tw.name = 'ambient:tumbleweed';
+  group.add(tw);
+  const twBlob = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), kit.materials.basicBlob);
+  twBlob.renderOrder = 1;
+  group.add(twBlob);
+  const twState = { t: -8, dur: 26, z: street.z };
 
   let night = 0;
   return {
@@ -160,9 +169,20 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
         r.s += (r.sp * dt * r.dir) / L;
         if (r.s > 1) r.s -= 1; if (r.s < 0) r.s += 1;
         const x = r.x0 + r.s * L;
-        crowd.set(r.i, x, 0.06, r.z, r.dir > 0 ? Math.PI / 2 : -Math.PI / 2, CLIP.walk, undefined, r.sp > 2 ? 8.5 : 4.2);
+        crowd.set(r.i, x, r.y, r.z, r.dir > 0 ? Math.PI / 2 : -Math.PI / 2, r.clip, undefined, r.clip === CLIP.stagger ? 2.6 : 4.2);
       }
       crowd.commit();
+      twState.t += dt;
+      if (twState.t > twState.dur + 10) { twState.t = 0; twState.z = street.z + (Math.sin(time) * 0.5) * street.width * 0.6; }
+      const u = twState.t / twState.dur;
+      tw.visible = twBlob.visible = u >= 0 && u <= 1;
+      if (tw.visible) {
+        const x = street.x0 - 10 + u * (street.x1 - street.x0 + 20), hop = Math.abs(Math.sin(twState.t * 2.6)) * 0.55;
+        tw.position.set(x, 0.42 + hop, twState.z + Math.sin(twState.t * 0.7) * 1.2);
+        tw.rotation.set(0, 0.3, -twState.t * 3.4);
+        twBlob.position.set(x, 0.1, twState.z + Math.sin(twState.t * 0.7) * 1.2);
+        twBlob.scale.setScalar(0.9 - hop * 0.6);
+      }
     },
   };
 }

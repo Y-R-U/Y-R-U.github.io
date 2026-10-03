@@ -47,7 +47,7 @@ export function createWorld({ kit, data, skin = null }) {
   // No sea or river in the desert: the field's shore/coast/river sit far outside the world.
   const geo = {
     bounds: { x0: PL.WORLD_BOUNDS.x0 - 60, x1: PL.WORLD_BOUNDS.x1 + 60, z0: PL.WORLD_BOUNDS.z0 - 60, z1: PL.WORLD_BOUNDS.z1 + 50 },
-    core: { x0: ST.x0 - 50, x1: ST.x1 + 40, z0: -60, z1: 44 },
+    core: { x0: ST.x0 - 60, x1: ST.x1 + 50, z0: -70, z1: 60 },
     shore: [[-1e5, -1e6], [1e5, -1e6]], coast: [[-1e5, -2e6], [1e5, -2e6]], river: [[1e6, 1e6], [1e6 + 1, 1e6 + 1]], riverW: 1, quays: [],
   };
   const field = createField(geo);
@@ -111,7 +111,7 @@ export function createWorld({ kit, data, skin = null }) {
   tuneBloom();
   const world = {
     renderConfig,
-    scene, plots, heroRig, bounds, field, rig, ambient,
+    scene, plots, heroRig, bounds, field, rig, ambient, town,
     roads: data.roadGraph, hub: data.hubAnchor,
     configureRenderer,
     warmup(on) {
@@ -192,6 +192,8 @@ export function createWorld({ kit, data, skin = null }) {
         p.update(dt, id === HUB ? hubStats : game.stats(id), time, tierName);
       }
       ambient.update(dt, time, light.night);
+      town.tick?.(dt, time);
+      town.graves?.setCount(st.graves?.length || 0);
     },
     dispose() {
       scene.traverse((o) => { if (o.geometry && o.geometry.dispose) o.geometry.dispose(); });

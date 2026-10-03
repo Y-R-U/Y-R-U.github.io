@@ -51,11 +51,11 @@ export function createField(geo) {
       const out = Math.max(core.x0 - x, x - core.x1, core.z0 - z, z - core.z1, 0);
       const hills = smooth(0, 70, out);
       const nn = n.fbm(x * 0.012, z * 0.012, 4) * 0.5 + 0.5;
-      let h = hills * (2 + nn * 16 + Math.max(0, n.fbm(x * 0.004 + 3, z * 0.004, 2)) * 22);
-      h += (1 - hills) * n.fbm(x * 0.05, z * 0.05, 2) * 0.25 * smooth(4, 20, Math.abs(z - 7.5));
+      let h = hills * (0.6 + nn * 4 + Math.max(0, n.fbm(x * 0.004 + 3, z * 0.004, 2)) * 7);
+      h += (1 - hills) * n.fbm(x * 0.05, z * 0.05, 2) * 0.25 * smooth(30, 46, Math.abs(z - 4));
       const w = field.wet(x, z);
       h = h * (1 - w) + (-3.2 - nn * 2) * w;
-      if (w < 0.05 && x > core.x0 && x < core.x1 && z > -24 && z < 30) h = Math.min(h, -0.04);
+      if (w < 0.05 && x > core.x0 && x < core.x1 && z > -46 && z < 52) h = Math.min(h, -0.012);
       return h;
     },
   };
@@ -104,7 +104,7 @@ export function buildTerrain(field, pal, { cell = 5, seed = 3 } = {}) {
   }
   const g = m.geo();
   const pp = g.attributes.position.array, n4 = pp.length / 3, a = new Float32Array(n4 * 4);
-  for (let i = 0; i < n4; i++) { a[i * 4] = 0.92; a[i * 4 + 3] = pp[i * 3 + 1] > -0.25 && field.wet(pp[i * 3], pp[i * 3 + 2]) < 0.02 ? 0.25 : 1; }
+  for (let i = 0; i < n4; i++) { a[i * 4] = 0.92; a[i * 4 + 3] = pp[i * 3 + 1] > -0.25 && field.wet(pp[i * 3], pp[i * 3 + 2]) < 0.02 ? -1 : 1; }
   g.setAttribute('aPbr', new THREE.BufferAttribute(a, 4));
   return g;
 }

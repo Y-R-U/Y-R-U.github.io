@@ -65,11 +65,18 @@ export function mergeParts(parts, { ao = 0.35, aoH = 0.9, speckle = 0.05, seed =
   return g;
 }
 
-// aPbr.w < 0.5 selects a textured ground surface: GRASS, or cobble(moss 0..1) = -1 - moss.
+// aPbr.w < 0.5 selects a procedural surface (kit/surface.js): DIRT(k) street dirt, CLAP clapboard, PLANK/PLANKX boards,
+// GRASS desert scrub, ROOF shingle courses. `cobble` is the old name for DIRT.
 export const GRASS = 0.25;
 export const ROOF = 0.4;
-export const cobble = (moss = 0) => -1 - Math.max(0, Math.min(1, moss));
+export const CLAP = 0.1;
+export const PLANK = 0.18;
+export const PLANKX = 0.21;
+export const DIRT = (wet = 0) => -1 - Math.max(0, Math.min(1, wet));
+export const cobble = DIRT;
+export const SURF = { GRASS, ROOF, CLAP, PLANK, PLANKX, DIRT };
 const GRASS_SLOTS = new Set(['grass', 'grass2', 'lawn']);
+const AUTO_SURF = { plank: PLANK, plank2: PLANK, plank3: PLANK, road: DIRT(0), dirt: DIRT(0.15), rut: DIRT(0.5) };
 
 const cache = new Map();
 const unit = (key, make) => { let g = cache.get(key); if (!g) { g = make(); cache.set(key, g); } return g; };
@@ -94,7 +101,7 @@ export function createBuilder(materials, palette = {}, { seed = 7 } = {}) {
       color = rs2.c;
       pbr = [o.r ?? rs2.r, o.m ?? rs2.m, o.g ?? rs2.g, o.sway || 0];
     } else if (o.r != null || o.g != null || o.sway) pbr = [o.r ?? 0.8, o.m ?? 0, o.g ?? 0, o.sway || 0];
-    const surf = o.surf !== undefined ? o.surf : GRASS_SLOTS.has(slot) ? GRASS : undefined;
+    const surf = o.surf !== undefined ? o.surf : GRASS_SLOTS.has(slot) ? GRASS : AUTO_SURF[slot];
     parts.push({ geo, m: _m.clone(), color, pbr, noAo: o.noAo, aoBase: o.aoBase, speckle: o.speckle, surf });
     return b;
   }

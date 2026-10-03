@@ -1,9 +1,12 @@
-// Procedural ground detail, generated once at boot (~2.4 MB GPU with mips).
-// cobA: rgb = albedo multiplier / 1.4, a = roughness. cobB: rg = height slope, b = gap (joint) mask, a = height.
-// grass: rgb = albedo multiplier / 1.4, a = height.
+// Procedural surfaces for the uber shader, picked per vertex by aPbr.w < 0.5 (see build.js SURF):
+//   DIRT  (w ≤ −1, −1 − k: k = extra wetness/darkening)  packed street dirt: 256² mottle+pebble texture, wheel ruts from uStreet
+//   CLAP  0.10  weathered clapboard: horizontal boards with a shadow lip on walls; grain on tops
+//   PLANK 0.18  planks: floor boards running along z (seams across x); vertical boards on walls
+//   PLANKX 0.21 floor boards running along x
+//   GRASS 0.25  desert scrub ground (terrain), 256² clump map
+//   ROOF  0.40  shingle/tin courses on up-facing roof faces
+// Everything is world-space planar: no UVs, no lettering, derivative-faded so it never aliases at distance.
 import * as THREE from 'three';
-
-const N = 512, CN = 6;
 
 function hash(i) { i = Math.imul(i ^ 0x27d4eb2d, 0x165667b1); i ^= i >>> 15; i = Math.imul(i, 0x85ebca6b); i ^= i >>> 13; return (i >>> 0) / 4294967296; }
 
@@ -33,94 +36,82 @@ function tex(data, n) {
   return t;
 }
 
-const TINTS = [[1, 1, 1], [1.024, 0.984, 0.988], [1.0, 0.988, 1.04], [0.98, 1.016, 0.992], [1.024, 1.012, 0.968], [0.992, 0.996, 1.016], [1.012, 1.0, 1.0]];
-
-function cobbles() {
-  const seeds = [];
-  for (let j = 0; j < CN; j++) for (let i = 0; i < CN; i++) {
-    const r = j * CN + i;
-    seeds.push([(i + 0.5 + (j % 2) * 0.5 + (hash(r * 3 + 1) - 0.5) * 0.42) / CN, (j + 0.5 + (hash(r * 3 + 2) - 0.5) * 0.38) / CN, r]);
-  }
-  const H = new Float32Array(N * N), A = new Uint8Array(N * N * 4), B = new Uint8Array(N * N * 4);
-  const gap = new Float32Array(N * N), cid = new Int32Array(N * N), edge = new Float32Array(N * N);
-  const nz = vnoise(N, 32, 5), nz2 = vnoise(N, 96, 9);
+// Packed dirt: soft mottling, faint dried-mud cells, scattered pebbles with a little height.
+function dirt() {
+  const N = 256, A = new Uint8Array(N * N * 4), B = new Uint8Array(N * N * 4), H = new Float32Array(N * N), peb = new Float32Array(N * N), tone = new Float32Array(N * N);
+  const a = vnoise(N, 8, 31), b = vnoise(N, 24, 32), c = vnoise(N, 80, 33);
+  const CC = 12, seeds = [];
+  for (let j = 0; j < CC; j++) for (let i = 0; i < CC; i++) seeds.push([(i + hash(j * CC + i) * 0.9 + 0.05) / CC, (j + hash(j * CC + i + 999) * 0.9 + 0.05) / CC]);
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-    const px = x / N, py = y / N;
-    let d1 = 9, d2 = 9, id = 0, s1 = null;
-    const wx = (nz[y * N + x] - 0.5) * 0.018, wy = (nz[((y + 128) % N) * N + x] - 0.5) * 0.018;
-    for (const s of seeds) for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) {
-      const dx = s[0] + ox - px - wx, dy = (s[1] + oy - py - wy) * 1.12;
-      const d = dx * dx + dy * dy;
-      if (d < d1) { d2 = d1; d1 = d; id = s[2]; s1 = s; } else if (d < d2) d2 = d;
+    const px = x / N, py = y / N, ci = Math.floor(px * CC), cj = Math.floor(py * CC);
+    let d1 = 9, d2 = 9;
+    for (let oj = -1; oj <= 1; oj++) for (let oi = -1; oi <= 1; oi++) {
+      const ii = (ci + oi + CC) % CC, jj = (cj + oj + CC) % CC, s = seeds[jj * CC + ii];
+      const dx = s[0] + (ci + oi - ii) / CC - px, dy = s[1] + (cj + oj - jj) / CC - py, d = dx * dx + dy * dy;
+      if (d < d1) { d2 = d1; d1 = d; } else if (d < d2) d2 = d;
     }
-    const e = (Math.sqrt(d2) - Math.sqrt(d1)) * CN * 0.5;
     const k = y * N + x;
-    edge[k] = e; cid[k] = id;
-    const g0 = 0.032 + nz2[k] * 0.025;
-    gap[k] = 1 - Math.min(1, Math.max(0, (e - g0 * 0.4) / (g0 * 0.9)));
-    const t = Math.min(1, e / 0.34);
-    const dome = Math.sqrt(t * (2 - t));
-    H[k] = dome * (0.85 + hash(id * 5 + 3) * 0.2) + (nz2[k] - 0.5) * 0.04;
+    const crack = 1 - Math.min(1, (Math.sqrt(d2) - Math.sqrt(d1)) * CC * 6);
+    tone[k] = a[k] * 0.5 + b[k] * 0.3 + c[k] * 0.2;
+    H[k] = tone[k] * 0.4 - crack * 0.25 * b[k];
   }
-  const crack = new Float32Array(N * N);
-  for (let c = 0; c < 9; c++) {
-    let x = hash(c * 11 + 1) * N, y = hash(c * 11 + 2) * N, a = hash(c * 11 + 3) * 6.28;
-    const L = 30 + hash(c * 11 + 4) * 50;
-    for (let s = 0; s < L; s++) {
-      a += (hash(c * 999 + s) - 0.5) * 0.7;
-      x += Math.cos(a); y += Math.sin(a);
-      const k = (((y | 0) % N + N) % N) * N + (((x | 0) % N + N) % N);
-      crack[k] = 1;
-      crack[(k + 1) % (N * N)] = Math.max(crack[(k + 1) % (N * N)], 0.5);
+  for (let i = 0; i < 190; i++) {
+    const cx = hash(i * 3 + 1) * N, cy = hash(i * 3 + 2) * N, r = 1.2 + hash(i * 3 + 3) * (i < 40 ? 3.6 : 1.6), lum = hash(i * 5 + 7);
+    for (let y = Math.floor(cy - r - 1); y <= cy + r + 1; y++) for (let x = Math.floor(cx - r - 1); x <= cx + r + 1; x++) {
+      const d = Math.hypot(x - cx, y - cy) / r;
+      if (d >= 1) continue;
+      const k = ((y + N) % N) * N + ((x + N) % N);
+      const dome = Math.sqrt(1 - d * d);
+      H[k] = Math.max(H[k], 0.3 + dome * 0.6);
+      peb[k] = lum < 0.55 ? Math.max(peb[k], 0.4 + 0.6 * dome) : Math.min(peb[k], -(0.3 + 0.4 * dome));
     }
   }
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-    const k = y * N + x, id = cid[k];
-    const tint = TINTS[Math.floor(hash(id * 13 + 7) * TINTS.length)];
-    const lum = 0.935 + hash(id * 17 + 5) * 0.1;
-    const wear = Math.min(1, edge[k] / 0.3);
-    const cr = crack[k] * (1 - gap[k]);
-    let m = lum * (0.95 + 0.05 * wear) * (0.975 + nz2[k] * 0.04) * (1 - 0.18 * cr);
-    const g = gap[k];
-    const gr = [0.72, 0.68, 0.66];
-    for (let ch = 0; ch < 3; ch++) {
-      const v = (m * tint[ch]) * (1 - g) + gr[ch] * g;
-      A[k * 4 + ch] = Math.min(255, Math.round(v / 1.4 * 255));
-    }
-    A[k * 4 + 3] = Math.round((0.62 + 0.3 * g + (1 - wear) * 0.06 - (wear > 0.9 ? 0.08 : 0)) * 255);
+    const k = y * N + x;
+    let m = 0.86 + tone[k] * 0.28;
+    const p = peb[k];
+    let r = m, g = m, bl = m;
+    if (p > 0) { r *= 1 + 0.2 * p; g *= 1 + 0.19 * p; bl *= 1 + 0.24 * p; }
+    else if (p < 0) { r *= 1 + 0.3 * p; g *= 1 + 0.32 * p; bl *= 1 + 0.26 * p; }
+    A[k * 4] = Math.min(255, Math.round(r / 1.4 * 255));
+    A[k * 4 + 1] = Math.min(255, Math.round(g / 1.4 * 255));
+    A[k * 4 + 2] = Math.min(255, Math.round(bl / 1.4 * 255));
+    A[k * 4 + 3] = Math.round((0.9 - Math.abs(p) * 0.25) * 255);
     const xl = (x + N - 1) % N, xr = (x + 1) % N, yu = (y + N - 1) % N, yd = (y + 1) % N;
-    const hx = (H[y * N + xr] - H[y * N + xl]) * 7, hy = (H[yd * N + x] - H[yu * N + x]) * 7;
+    const hx = (H[y * N + xr] - H[y * N + xl]) * 1.6, hy = (H[yd * N + x] - H[yu * N + x]) * 1.6;
     B[k * 4] = Math.max(0, Math.min(255, Math.round((0.5 + hx * 0.5) * 255)));
     B[k * 4 + 1] = Math.max(0, Math.min(255, Math.round((0.5 + hy * 0.5) * 255)));
-    B[k * 4 + 2] = Math.round(Math.max(g, cr * 0.6) * 255);
+    B[k * 4 + 2] = Math.round(Math.abs(p) * 255);
     B[k * 4 + 3] = Math.round(Math.max(0, Math.min(1, H[k])) * 255);
   }
   return [tex(A, N), tex(B, N)];
 }
 
-function grass() {
+function scrub() {
   const n = 256, D = new Uint8Array(n * n * 4);
   const a = vnoise(n, 8, 21), b = vnoise(n, 32, 22), c = vnoise(n, 128, 23);
   for (let i = 0; i < n * n; i++) {
-    const h = a[i] * 0.35 + b[i] * 0.35 + c[i] * 0.3;
-    const k = 0.82 + h * 0.36;
-    const yel = (a[i] - 0.5) * 0.12;
-    D[i * 4] = Math.round(Math.min(1.39, k * (1 + yel)) / 1.4 * 255);
+    const h = a[i] * 0.4 + b[i] * 0.35 + c[i] * 0.25;
+    const k = 0.88 + h * 0.24;
+    const warm = (a[i] - 0.5) * 0.1;
+    D[i * 4] = Math.round(Math.min(1.39, k * (1 + warm)) / 1.4 * 255);
     D[i * 4 + 1] = Math.round(Math.min(1.39, k) / 1.4 * 255);
-    D[i * 4 + 2] = Math.round(Math.min(1.39, k * (1 - yel * 1.5)) / 1.4 * 255);
+    D[i * 4 + 2] = Math.round(Math.min(1.39, k * (1 - warm * 1.4)) / 1.4 * 255);
     D[i * 4 + 3] = Math.round(h * 255);
   }
   return tex(D, n);
 }
 
+// uStreet: (centre z, half width, rut offset from centre, on). Set by town.js; ruts fade off the street edge.
 export function createSurfaces() {
-  const [cobA, cobB] = cobbles();
-  return { cobA: { value: cobA }, cobB: { value: cobB }, grassT: { value: grass() } };
+  const [cobA, cobB] = dirt();
+  return { cobA: { value: cobA }, cobB: { value: cobB }, grassT: { value: scrub() }, uStreet: { value: new THREE.Vector4(0, 0, 0, 0) } };
 }
 
 export const SURF_HEAD = `uniform sampler2D cobA;
 uniform sampler2D cobB;
 uniform sampler2D grassT;
+uniform vec4 uStreet;
 varying float vSurf;
 float sfHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float sfNoise(vec2 p) {
@@ -130,44 +121,84 @@ float sfNoise(vec2 p) {
 
 // After color_fragment: tints diffuseColor and leaves sfN (world normal tilt), sfR (roughness) for later chunks.
 export const SURF_COLOR = `vec3 sfN = vec3(0.0, 1.0, 0.0); float sfR = -1.0; float sfAO = 1.0;
-if (vSurf > 0.32 && vSurf < 0.48 && normalize(vWN).y > 0.2) {
-  vec3 wn = normalize(vWN);
-  vec2 tg = normalize(vec2(-wn.z, wn.x) + 1e-5);
+vec3 sfWN = normalize(vWN);
+if (vSurf > 0.04 && vSurf < 0.235) {
+  float vert = 1.0 - smoothstep(0.45, 0.7, abs(sfWN.y));
+  vec2 tg = normalize(vec2(-sfWN.z, sfWN.x) + 1e-5);
+  float along = dot(vWP.xz, tg);
+  if (vSurf < 0.14 && vert > 0.5) {
+    float cy = vWP.y / 0.21, course = floor(cy), fy = fract(cy);
+    float seg = floor(along / 2.6 + sfHash(vec2(course, 1.7)) * 3.0);
+    float jit = sfHash(vec2(course, seg));
+    float fade = 1.0 - smoothstep(0.3, 0.8, fwidth(cy));
+    float lip = mix(0.7, 1.0, smoothstep(0.0, 0.22, fy)) * (1.0 - 0.06 * smoothstep(0.8, 1.0, fy));
+    float grain = 0.96 + 0.08 * sfNoise(vec2(along * 1.3, vWP.y * 22.0));
+    float sh = mix(0.93, lip * (0.93 + 0.12 * jit) * grain, fade);
+    diffuseColor.rgb *= sh;
+    sfAO = sh;
+  } else {
+    vec2 p = vSurf > 0.195 ? vWP.zx : vWP.xz;
+    if (vert > 0.5) p = vec2(along, vWP.y);
+    float bw = vert > 0.5 ? 0.3 : 0.24;
+    float u = p.x / bw, iu = floor(u), fu = fract(u);
+    float off = sfHash(vec2(iu, 3.3)) * 2.4;
+    float iv = floor((p.y + off) / 2.4);
+    float jit = sfHash(vec2(iu, iv));
+    float fade = 1.0 - smoothstep(0.3, 0.8, fwidth(u));
+    float seam = smoothstep(0.0, 0.07, fu) * smoothstep(0.0, 0.07, 1.0 - fu);
+    float butt = smoothstep(0.0, 0.02, fract((p.y + off) / 2.4)) ;
+    float grain = 0.95 + 0.1 * sfNoise(vec2(u * 2.0, p.y * 3.0));
+    float sh = mix(0.92, (0.62 + 0.38 * seam * butt) * (0.9 + 0.18 * jit) * grain, fade);
+    diffuseColor.rgb *= sh * mix(vec3(1.0), vec3(1.03, 0.99, 0.95), (jit - 0.5) * fade);
+    sfAO = sh;
+  }
+} else if (vSurf > 0.32 && vSurf < 0.48 && sfWN.y > 0.2) {
+  vec2 tg = normalize(vec2(-sfWN.z, sfWN.x) + 1e-5);
   float cy = vWP.y / 0.24, along = dot(vWP.xz, tg) / 0.3;
   float course = floor(cy), fy = fract(cy);
   float u = along + course * 0.5, fu = fract(u);
   float fade = 1.0 - smoothstep(0.35, 0.9, fwidth(cy) + fwidth(along));
   float jit = sfHash(vec2(course, floor(u)) + 3.1);
-  float tile = mix(0.66, 1.0, smoothstep(0.0, 0.32, fy)) * (1.0 - 0.22 * (1.0 - smoothstep(0.0, 0.07, min(fu, 1.0 - fu)))) * (0.92 + 0.14 * jit);
+  float tile = mix(0.7, 1.0, smoothstep(0.0, 0.32, fy)) * (1.0 - 0.18 * (1.0 - smoothstep(0.0, 0.07, min(fu, 1.0 - fu)))) * (0.92 + 0.14 * jit);
   float sh = mix(0.9, tile, fade);
   diffuseColor.rgb *= sh * mix(vec3(1.0), vec3(1.04, 0.98, 0.95), (jit - 0.5) * fade);
   sfAO = sh;
-} else if (vSurf < 0.5 && normalize(vWN).y > 0.6) {
+} else if (vSurf < 0.5 && sfWN.y > 0.6) {
   vec2 wp = vWP.xz;
-  float big = sfNoise(wp * 0.11) * 0.6 + sfNoise(wp * 0.37 + 7.0) * 0.4;
+  float big = sfNoise(wp * 0.07) * 0.55 + sfNoise(wp * 0.23 + 7.0) * 0.3 + sfNoise(wp * 0.9 + 3.0) * 0.15;
   if (vSurf < -0.5) {
-    float moss = clamp(-vSurf - 1.0, 0.0, 1.0);
-    vec2 uv = wp / 3.9;
+    float wet = clamp(-vSurf - 1.0, 0.0, 1.0);
+    vec2 uv = wp / 7.5;
     vec4 a = texture2D(cobA, uv), b = texture2D(cobB, uv);
     vec3 alb = a.rgb * 1.4;
-    float dirt = smoothstep(0.55, 0.85, big);
-    alb *= mix(vec3(1.0), vec3(0.9, 0.88, 0.85), dirt * 0.6);
-    float soft = sfNoise(wp * 0.07 + 3.0) * 0.65 + sfNoise(wp * 0.19) * 0.35;
-    alb *= mix(vec3(0.9, 0.91, 0.93), vec3(1.05, 1.03, 1.0), soft);
-    float mz = clamp(moss * 1.5 + (sfNoise(wp * 0.9) - 0.5) * 0.9 * moss + smoothstep(0.72, 0.95, big) * 0.45, 0.0, 1.0);
-    vec3 mossC = vec3(0.3, 0.46, 0.16);
-    vec3 cb = diffuseColor.rgb * alb;
-    cb = mix(vec3(dot(cb, vec3(0.3, 0.55, 0.15))), cb, 0.62);
-    diffuseColor.rgb = mix(cb, mossC * (0.7 + 0.4 * b.a), clamp(b.b * mz * 1.4 + mz * mz * 0.35 * (1.0 - b.a), 0.0, 1.0));
-    sfAO = mix(1.0, 0.84, b.b) * (0.96 + 0.04 * b.a);
+    float dusty = smoothstep(0.45, 0.85, big), packed = 1.0 - smoothstep(0.15, 0.5, big);
+    alb *= mix(vec3(1.0), vec3(1.1, 1.07, 1.02), dusty) * mix(vec3(1.0), vec3(0.86, 0.8, 0.8), packed * 0.8);
+    float rut = 0.0, tread = 0.0;
+    if (uStreet.w > 0.5) {
+      float wob = sin(wp.x * 0.071) * 0.22 + sin(wp.x * 0.23 + 1.3) * 0.08;
+      float dz = wp.y - uStreet.x - wob;
+      float d1 = abs(abs(dz) - uStreet.z);
+      float on = 1.0 - smoothstep(uStreet.y - 0.4, uStreet.y + 0.8, abs(dz));
+      rut = (1.0 - smoothstep(0.16, 0.5, d1)) * on * (0.7 + 0.3 * sfNoise(wp * vec2(0.4, 2.0)));
+      tread = (1.0 - smoothstep(0.0, uStreet.z * 0.8, abs(dz))) * on;
+      float hoof = step(0.83, sfNoise(wp * 3.1)) * tread * 0.5;
+      alb *= 1.0 - 0.07 * hoof;
+      sfN = normalize(vec3(0.0, 1.0, -sign(abs(dz) - uStreet.z) * sign(dz) * rut * 0.35));
+    }
+    alb *= mix(vec3(1.0), vec3(0.8, 0.74, 0.76), rut * 0.9);
+    alb *= mix(vec3(1.0), vec3(1.035, 1.03, 1.02), tread * 0.6);
+    alb *= mix(vec3(1.0), vec3(0.78, 0.74, 0.76), wet);
+    diffuseColor.rgb *= alb;
+    sfAO = (0.94 + 0.06 * b.a) * (1.0 - 0.12 * rut);
     diffuseColor.rgb *= sfAO;
-    sfN = normalize(vec3(-(b.r - 0.5) * 1.1, 1.0, -(b.g - 0.5) * 1.1));
+    vec3 pn = normalize(vec3(-(b.r - 0.5) * 0.9, 1.0, -(b.g - 0.5) * 0.9));
+    sfN = normalize(sfN + pn - vec3(0.0, 1.0, 0.0));
     sfR = a.a;
   } else {
-    vec4 g = texture2D(grassT, wp / 4.5);
-    vec4 g2 = texture2D(grassT, wp / 23.0 + 0.3);
-    diffuseColor.rgb *= g.rgb * 1.4 * mix(0.88, 1.12, g2.a) * mix(vec3(1.0), vec3(1.06, 1.04, 0.86), smoothstep(0.6, 0.9, big) * 0.6);
-    sfAO = 0.82 + 0.18 * g.a;
+    vec4 g = texture2D(grassT, wp / 5.0);
+    vec4 g2 = texture2D(grassT, wp / 27.0 + 0.3);
+    diffuseColor.rgb *= g.rgb * 1.4 * mix(0.9, 1.08, g2.a) * mix(vec3(1.0), vec3(1.04, 1.0, 0.93), smoothstep(0.6, 0.9, big) * 0.6);
+    sfAO = 0.88 + 0.12 * g.a;
     diffuseColor.rgb *= sfAO;
     sfR = 0.95;
   }
