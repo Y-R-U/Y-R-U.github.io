@@ -1,4 +1,4 @@
-import { CHARACTERS, hatForTier, hatForPomfrey } from '../kit/crowd.js?v=20261004d';
+import { CHARACTERS, hatForTier, hatForPomfrey } from '../kit/crowd.js?v=20261004e';
 
 // Who plays whom. Named characters wear lane A's costumes (kit.CHARACTERS via crowd.dress); bit parts get a look in
 // the same vocabulary (acc / stache / hat names). hat = [type, scale, color] or {type, scale, color}.

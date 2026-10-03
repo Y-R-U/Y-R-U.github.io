@@ -1,5 +1,5 @@
-import { el, btn } from './dom.js?v=20261004d';
-import { fmtCash } from '../state/format.js?v=20261004d';
+import { el, btn } from './dom.js?v=20261004e';
+import { fmtCash } from '../state/format.js?v=20261004e';
 
 // W6 swipe-to-fling. Mabel holds a drunk at the Gizzard's doors for holdSec; a swipe anywhere on the hero throws
 // him (direction picks the target), or tap one of the four target chips. Unflung, Mabel throws him herself.

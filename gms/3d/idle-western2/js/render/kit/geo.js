@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004d';
+import * as S from './shape.js?v=20261004e';
 
 const prep = (g, rough = 0.5) => S.setPbr(g, rough, 0, 0);
 

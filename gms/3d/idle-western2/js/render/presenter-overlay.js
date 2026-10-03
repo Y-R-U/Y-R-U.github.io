@@ -1,4 +1,4 @@
-import { lumOf } from './presenter-blit.js?v=20261004d';
+import { lumOf } from './presenter-blit.js?v=20261004e';
 
 // Escape hatch (?presenter=overlay): the WebGL canvas itself is fixed full-screen behind the page (z-index -1) and
 // each view is scissored into its on-screen rect. No copies, but it reads rects every frame, lags compositor scroll by

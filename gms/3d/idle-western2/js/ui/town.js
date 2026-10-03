@@ -1,5 +1,5 @@
-import { el, btn, setText } from './dom.js?v=20261004d';
-import { fmtCash } from '../state/format.js?v=20261004d';
+import { el, btn, setText } from './dom.js?v=20261004e';
+import { fmtCash } from '../state/format.js?v=20261004e';
 
 // Town tab = the 3D world: the hero rig pulls back to an establishing shot (heroRig.town), district pins
 // are projected over it, and a tap on the world flies there (handled by app.onHeroTap).

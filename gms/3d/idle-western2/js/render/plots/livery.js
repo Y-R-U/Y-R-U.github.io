@@ -2,8 +2,8 @@
 // and a mule that kicks the barn wall every few seconds (dust, a plank pops loose). Stock: the manure heap, with flies.
 // L1 barn + corral → L25 lean-to stalls + more horses → L100 a big horseshoe on the roof and a horse weather vane.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, horse, bale, tone, battens, wheel, vignette } from './western.js?v=20261004d';
-import { createConstruction, finishPlot } from './construction.js?v=20261004d';
+import { COLORS, EXTRA_HATS, cardCam, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, horse, bale, tone, battens, wheel, vignette } from './western.js?v=20261004e';
+import { createConstruction, finishPlot } from './construction.js?v=20261004e';
 
 const BX = -3.4, FZ = 0.6, W = 7.4, D = 6.4, H = 3.6, FH = 6.6;
 const ANVIL = [1.6, 2.2];

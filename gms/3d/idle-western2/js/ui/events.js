@@ -1,5 +1,5 @@
-import { el, btn, show } from './dom.js?v=20261004d';
-import { fmtCash } from '../state/format.js?v=20261004d';
+import { el, btn, show } from './dom.js?v=20261004e';
+import { fmtCash } from '../state/format.js?v=20261004e';
 
 // Events are 3D actors (render/eventart.js, picked as {kind:'event'}); the UI adds an edge chip when the
 // actor is off the hero frame, a floating chip when the hero is scrolled away, and runs the claim flow.

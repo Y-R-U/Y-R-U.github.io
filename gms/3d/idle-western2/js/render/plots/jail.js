@@ -4,8 +4,8 @@
 // while unowned the lot shows the office with Pomfrey's board.
 // L1 one cell → L25 a second cell + a jail wagon → L100 a lookout tower with a bell.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, cart, tone, vignette } from './western.js?v=20261004d';
-import { createConstruction, finishPlot } from './construction.js?v=20261004d';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, cart, tone, vignette } from './western.js?v=20261004e';
+import { createConstruction, finishPlot } from './construction.js?v=20261004e';
 
 const BX = -2.8, FZ = 0.5, W = 5.6, D = 5.4, H = 3.4, FH = 5.4;
 const CELL = { x: 2.0, z: -0.4, w: 4.2, d: 3.0, h: 3.0 };

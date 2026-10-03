@@ -1,30 +1,30 @@
 // The pure economy: no DOM, no renderer, no wall clock or unseeded randomness (test-boot and test-economy check). Fixed 0.1 s steps.
 // API and every state field / act / bus event: docs/ECONOMY.md.
-import * as E from './economy.js?v=20261004d';
-import { newLineState, stepLine, sellPile } from './lines.js?v=20261004d';
-import { pickEvent, nextGap, mulberry32 } from './events.js?v=20261004d';
-import { offlineClosedForm } from './offline.js?v=20261004d';
-import { SAVE_VERSION, GAME_ID } from './save.js?v=20261004d';
-import { managerFor, managerSlots, newManagerState, openBox, equip, unequip, merge, autoEquip, fitSlots } from './managers.js?v=20261004d';
-import { contractsView, statValue } from './goals.js?v=20261004d';
-import { deathPreview, bountyMult, disguiseFor, epitaphFor } from './prestige.js?v=20261004d';
-import { seasonLive, seasonYear, newSeasonState } from './season.js?v=20261004d';
-import { ECON, LINES, LINKS } from '../data/lines.js?v=20261004d';
-import { DISTRICTS, COURIER } from '../data/districts.js?v=20261004d';
-import { MANAGERS, MANAGER_LEVELS } from '../data/managers.js?v=20261004d';
-import { ITEMS, RARITIES, RARITY_SCORE, STRONGBOXES } from '../data/items.js?v=20261004d';
-import { EVENTS, EVENT_GAP, SPECIAL_GAP, FIRST_EVENT } from '../data/events.js?v=20261004d';
-import { CONTRACTS } from '../data/contracts.js?v=20261004d';
-import { ACHIEVEMENTS, ACHIEVEMENT_MULT } from '../data/achievements.js?v=20261004d';
-import { HATS, POMFREY_HATS, FRONTAGES } from '../data/hats.js?v=20261004d';
-import { STAGES, CONSTRUCTION } from '../data/construction.js?v=20261004d';
-import { EJECT, PIANO } from '../data/saloon.js?v=20261004d';
-import { BOUNTY } from '../data/bounty.js?v=20261004d';
-import * as EPITAPHS from '../data/epitaphs.js?v=20261004d';
-import { SEASON, KEEPSAKES, KEEPSAKE_TARGET } from '../data/season.js?v=20261004d';
-import { DAY } from '../data/day.js?v=20261004d';
-import { dayAt, readClock } from './dayclock.js?v=20261004d';
-import { BARK_CHARS, BARK_PRIORITY, BARK_GATE, CHAR_LINE } from '../data/barks.js?v=20261004d';
+import * as E from './economy.js?v=20261004e';
+import { newLineState, stepLine, sellPile } from './lines.js?v=20261004e';
+import { pickEvent, nextGap, mulberry32 } from './events.js?v=20261004e';
+import { offlineClosedForm } from './offline.js?v=20261004e';
+import { SAVE_VERSION, GAME_ID } from './save.js?v=20261004e';
+import { managerFor, managerSlots, newManagerState, openBox, equip, unequip, merge, autoEquip, fitSlots } from './managers.js?v=20261004e';
+import { contractsView, statValue } from './goals.js?v=20261004e';
+import { deathPreview, bountyMult, disguiseFor, epitaphFor } from './prestige.js?v=20261004e';
+import { seasonLive, seasonYear, newSeasonState } from './season.js?v=20261004e';
+import { ECON, LINES, LINKS } from '../data/lines.js?v=20261004e';
+import { DISTRICTS, COURIER } from '../data/districts.js?v=20261004e';
+import { MANAGERS, MANAGER_LEVELS } from '../data/managers.js?v=20261004e';
+import { ITEMS, RARITIES, RARITY_SCORE, STRONGBOXES } from '../data/items.js?v=20261004e';
+import { EVENTS, EVENT_GAP, SPECIAL_GAP, FIRST_EVENT } from '../data/events.js?v=20261004e';
+import { CONTRACTS } from '../data/contracts.js?v=20261004e';
+import { ACHIEVEMENTS, ACHIEVEMENT_MULT } from '../data/achievements.js?v=20261004e';
+import { HATS, POMFREY_HATS, FRONTAGES } from '../data/hats.js?v=20261004e';
+import { STAGES, CONSTRUCTION } from '../data/construction.js?v=20261004e';
+import { EJECT, PIANO } from '../data/saloon.js?v=20261004e';
+import { BOUNTY } from '../data/bounty.js?v=20261004e';
+import * as EPITAPHS from '../data/epitaphs.js?v=20261004e';
+import { SEASON, KEEPSAKES, KEEPSAKE_TARGET } from '../data/season.js?v=20261004e';
+import { DAY } from '../data/day.js?v=20261004e';
+import { dayAt, readClock } from './dayclock.js?v=20261004e';
+import { BARK_CHARS, BARK_PRIORITY, BARK_GATE, CHAR_LINE } from '../data/barks.js?v=20261004e';
 
 const STEP = 0.1;
 
