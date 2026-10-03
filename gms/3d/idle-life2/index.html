@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#bfe3f2">
+<title>Idle Life 2</title>
+<link rel="icon" href="favicon.svg?v=20261004a" type="image/svg+xml">
+<link rel="stylesheet" href="style.css?v=20261004a">
+<script type="importmap">
+{ "imports": {
+  "three": "/gms/lib/three/0.160.0/three.module.js",
+  "three/addons/": "/gms/lib/three/0.160.0/addons/"
+} }
+</script>
+</head>
+<body>
+<!-- BOOT GUARD (manager-owned) -->
+<div id="boot" role="status" aria-live="polite">
+  <div class="boot-card">
+    <div class="boot-logo">🍋</div>
+    <h1 id="boot-title">Idle Life 2</h1>
+    <p id="boot-detail">Waking up on the bench…</p>
+    <button id="boot-reload" hidden>Reload</button>
+  </div>
+</div>
+<div id="err-chip" hidden></div>
+<script>
+(function () {
+  var booted = false, failed = false;
+  var $ = function (id) { return document.getElementById(id); };
+  function reload() { location.href = location.pathname + '?v=' + Date.now(); }
+  function fail(msg) {
+    if (booted) {
+      var c = $('err-chip');
+      c.hidden = false;
+      c.textContent = '⚠️ ' + String(msg).slice(0, 140);
+      c.onclick = function () { c.hidden = true; };
+      return;
+    }
+    if (failed) return;
+    failed = true;
+    $('boot').classList.add('failed');
+    $('boot-title').textContent = 'Idle Life 2 could not start';
+    $('boot-detail').textContent = String(msg);
+    var b = $('boot-reload');
+    b.hidden = false;
+    b.onclick = reload;
+  }
+  addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t !== window && (t.src || t.href)) fail('Failed to load ' + (t.src || t.href));
+    else fail((e.message || 'Error') + (e.filename ? '\n' + e.filename + ':' + e.lineno : ''));
+  }, true);
+  addEventListener('unhandledrejection', function (e) {
+    var r = e.reason;
+    fail('Unhandled: ' + (r && (r.stack || r.message) || r));
+  });
+  setTimeout(function () { if (!booted) fail('Still loading after 15 s — a file may be stale or blocked.'); }, 15000);
+  window.__il2Boot = function () {
+    booted = true;
+    $('boot').classList.add('done');
+    setTimeout(function () { $('boot').hidden = true; }, 400);
+  };
+})();
+</script>
+<!-- /BOOT GUARD -->
+<div id="root"></div>
+<script type="module" src="js/main.js?v=20261004a"></script>
+</body>
+</html>

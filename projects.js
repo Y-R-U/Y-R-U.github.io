@@ -250,6 +250,10 @@ const PROJECTS = [
     desc: "3D idle transport tycoon with Babylon.js graphics. Build routes, upgrade vehicles, and grow your business empire.",
     date: "2026-03-11", creator: "Claude" },
 
+  { name: "Idle Life 2",        path: "/gms/3d/idle-life2/",      screenshot: "idle-life2",      type: "game",
+    desc: "Live one life, then hand the town to your child. A warm 3D toy-diorama town where every business is a live scene: tap cans to buy a lemonade stand, grow through Old Town, Suburbs, Harbour and Downtown, move house, meet a partner, raise kids who work your shops, and retire to pass it all on. Each generation leaves landmarks behind. Managers with gear, 3D random events, two mini-games and a live Hollow's Eve season.",
+    date: "2026-10-04", creator: "Claude" },
+
   { name: "Idle Transport 2",   path: "/gms/3d/idle-transport2/", screenshot: "idle-transport2", type: "game",
     desc: "A living Three.js freight network. Follow synchronized delivery dioramas, expand through five regions, and build your fleet with managers, research, and contracts.",
     date: "2026-10-03", creator: "Codex" },
