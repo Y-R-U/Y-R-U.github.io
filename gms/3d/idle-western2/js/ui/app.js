@@ -275,7 +275,7 @@ export function createUI({ game, host, bus }) {
     if (hit.kind === 'event' && events.tryClaimHit(hit.hit || hit, { x: e.clientX, y: e.clientY })) return;
     if (hit.kind === 'courier' && tipCourier(hit.hit, heroWrap, e)) return;
     if (hit.kind === 'ghost' && ghosts.tap(hit.id)) return;
-    if (hit.kind === 'fling') { toasts.toast('👆 Swipe to fling him!'); return; }
+    if (hit.kind === 'fling') { toasts.toast('👆 Swipe to fling!'); return; }
     if (hit.kind === 'piano') { playPiano(heroWrap, e); return; }
     if (hit.kind === 'hat') { onHat(e); return; }
     if (hit.kind === 'char' && hit.char && !(hit.char === 'stranger' && model.bootstrapping())) { barks.tap(hit.char); return; }
@@ -435,6 +435,7 @@ export function createUI({ game, host, bus }) {
     const early = model.started() || game.state.stats.bootTaps >= 3;
     show(pianoBtn, early && (!hasPianoTarget() || !reveal.is('h:piano')) && !town.active && !specials.active && !captions.active);
     hats.update(R);
+    anchorMud();
     syncJump();
   }
 
@@ -532,6 +533,12 @@ export function createUI({ game, host, bus }) {
     }
     if (now - heroSince >= BEAT_SETTLE) runBeat(0);
   }
+  // The "Tap the mud" ring sits on S's hub mud anchor (where the Stranger lies) when there is one.
+  function anchorMud() {
+    const a = model.bootstrapping() ? spectacle?.bubbleAnchor('mud') : null;
+    if (a && a.visible) { tapzone.style.transform = `translate(${a.x | 0}px, ${a.y | 0}px)`; tapzone.classList.add('anchored'); }
+    else if (tapzone.classList.contains('anchored')) { tapzone.classList.remove('anchored'); tapzone.style.transform = ''; }
+  }
   function heroJob(now) {
     const hv = heroVisible();
     if (hv !== heroWas) {
@@ -541,6 +548,7 @@ export function createUI({ game, host, bus }) {
     }
     root.classList.toggle('special-on', !!specials.active);
     root.classList.toggle('hero-off', !hv);
+    toasts.place(hv);
     flushBeats();
   }
 
@@ -686,6 +694,14 @@ export function createUI({ game, host, bus }) {
     if (quietQ.length < 4) quietQ.push([text, opts]);
     pumpQuiet();
   }
+  // Achievements / gag links that fire together become one toast.
+  const batches = {};
+  function batched(key, item, text, opts) {
+    const b = batches[key] || (batches[key] = { list: [], t: 0 });
+    b.list.push(item);
+    clearTimeout(b.t);
+    b.t = setTimeout(() => { const l = b.list; b.list = []; quietToast(text(l), opts); }, 350);
+  }
   function pumpQuiet() {
     const now = performance.now();
     if (!quietQ.length || specials?.active || captions?.active || now < quietAt) return;
@@ -769,9 +785,9 @@ export function createUI({ game, host, bus }) {
       toasts.toast(`${BOX_INFO[kind]?.e || '📦'} ${BOX_INFO[kind]?.n || 'Strongbox'}${n > 1 ? ' ×' + n : ''}!`, { cls: 'gold' });
       ctx.onBox();
     });
-    game.on('achievement', ({ achievement: a }) => quietToast(`🏅 ${a.emoji} ${a.name} · +1%`, { cls: 'gold', ms: 2600 }));
-    game.on('link', ({ from, to }) => quietToast(`🔗 ${lineById[from]?.emoji} → ${lineById[to]?.emoji} gag link · +5%`, { ms: 2600 }));
-    game.on('season', ({ kind, rank }) => { if (kind === 'rank') quietToast(`👻 Ghost Town rank ${rank}! A keepsake hat`, { cls: 'gold', ms: 2800 }); });
+    game.on('achievement', ({ achievement: a }) => batched('ach', a, (l) => l.length > 1 ? `🏅 ${l.length} achievements +${l.length}%` : `${l[0].emoji || '🏅'} ${l[0].name} +1%`, { cls: 'gold', ms: 2600 }));
+    game.on('link', (e) => batched('link', e, (l) => l.length > 1 ? `🔗 ${l.length} gag links +${l.length * 5}%` : `🔗 Gag link +5%`, { ms: 2400 }));
+    game.on('season', ({ kind, rank }) => { if (kind === 'rank') quietToast(`👻 Ghost rank ${rank}!`, { cls: 'gold', ms: 2600 }); });
     game.on('piano:frenzy', () => bus.emit('ui:frenzy', {}));
     game.on('offline', ({ report }) => offline.show(report));
     game.on('district', () => { for (const c of cards.values()) c.at = 0; });
@@ -835,7 +851,7 @@ export function createUI({ game, host, bus }) {
       app.append(hud.root, heroWrap, side);
       root.append(app);
 
-      toasts = createToasts(root);
+      toasts = createToasts(root, heroWrap);
       juice = createJuice({ root, target: () => hud.cashEl, audio });
       sheets = createSheets(root, { onChange: (id) => { root.classList.toggle('sheet-open', !!id); if (!id && !town?.active) tabs?.set('lines'); } });
       reveal = createReveal({ game, onReveal: (id) => root.classList.add('rv-' + id) });

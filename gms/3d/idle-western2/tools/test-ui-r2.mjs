@@ -154,6 +154,42 @@ try {
   check(await p.eval(`document.querySelector('.welcome')?.hidden !== false`), 'gen 2 skips the fresh-start poster');
   check(p.exceptions.length === 0, 'no exceptions');
   await p.close();
+
+  // ---------- R4: toasts keep off the hero's central 50% ----------
+  console.log('R4 toasts (demo, hero centre stays clear)');
+  p = await open('?nosave=1&demo=1');
+  await p.eval('scrollTo(0, 0)');
+  await p.until('__iw2ui.heroVisible() && !ui.specials.active && !ui.captions.active', 15000);
+  await p.until(`ui.quietQ.length === 0 && !document.querySelector('.toast:not(.out)')`, 20000);
+  await sleep(600);
+  const sample = () => p.eval(`(() => { const h = document.querySelector('.hero').getBoundingClientRect(); const c = { l: h.left + h.width * .25, r: h.left + h.width * .75, t: h.top + h.height * .25, b: h.top + h.height * .75 };
+    const ts = [...document.querySelectorAll('.toast, .hero > .stamp')].filter((t) => !t.classList.contains('out')).map((t) => { const r = t.getBoundingClientRect(); return { text: t.textContent, inHero: !!t.closest('.hero'), hit: r.width > 0 && r.right > c.l && r.left < c.r && r.bottom > c.t && r.top < c.b }; });
+    return { n: document.querySelectorAll('.toast:not(.out)').length, hits: ts.filter((t) => t.hit).map((t) => t.text), texts: ts.map((t) => t.text), inHero: ts.every((t) => t.inHero) }; })()`);
+  const got = await p.S(`(() => { const ids = Object.keys(st.achievements).filter((k) => st.achievements[k]).slice(0, 3); ids.forEach((k) => delete st.achievements[k]); const ls = Object.keys(st.links || {}).filter((k) => st.links[k]).slice(0, 2); ls.forEach((k) => delete st.links[k]); return { a: ids.length, l: ls.length }; })()`);
+  for (let i = 0; i < 6; i++) await p.S(`(__iw2ui.toast('🧪 Toast ${i}'), 0)`);
+  let maxN = 0, hits = [], seen = new Set(), allIn = true;
+  for (let i = 0; i < 30; i++) {
+    const s = await sample();
+    maxN = Math.max(maxN, s.n); hits.push(...s.hits); s.texts.forEach((t) => seen.add(t)); allIn &&= s.inHero;
+    await sleep(150);
+  }
+  check(hits.length === 0, `no toast/stamp rect overlaps the hero's central 50% box (${[...new Set(hits)].join(' | ') || 'none'})`);
+  check(maxN <= 2, `toasts stack at most 2 (max ${maxN})`);
+  check(allIn, 'with the hero up, toasts sit inside the hero');
+  const achT = [...seen].filter((t) => /achievement|\+1%/.test(t));
+  if (got.a > 1) check(achT.length === 1 && /\d+ achievements/.test(achT[0]), `${got.a} achievements at once → one toast (${achT.join(' | ') || 'none'})`);
+  if (got.l > 1) check([...seen].filter((t) => /gag link/.test(t)).length === 1, `${got.l} gag links at once → one toast`);
+  const long = [...seen].filter((t) => !/🧪/.test(t) && t.split(/\s+/).filter((w) => /[A-Za-z]/.test(w)).length > 4);
+  check(!long.length, `achievement / link toasts ≤ 4 words (${long.join(' | ') || 'ok'})`);
+  await p.eval(`document.querySelector('.line-card:nth-of-type(3)').scrollIntoView({ block: 'center' })`);
+  await p.until('!__iw2ui.heroVisible()', 3000);
+  await sleep(700);
+  await p.S(`(__iw2ui.toast('🧪 Away'), 0)`);
+  await sleep(200);
+  const away = await p.eval(`(() => { const t = [...document.querySelectorAll('.toast')].find((e) => e.textContent === '🧪 Away'); if (!t) return null; const r = t.parentNode.getBoundingClientRect(), hud = document.querySelector('.hud').getBoundingClientRect(); return { inHero: !!t.closest('.hero'), top: r.top, hud: hud.bottom }; })()`);
+  check(away && !away.inHero && away.top >= away.hud && away.top < away.hud + 40, `hero away: toast drops to just under the HUD ${JSON.stringify(away)}`);
+  check(p.exceptions.length === 0, 'no exceptions');
+  await p.close();
 } finally {
   stop(PORT);
 }
