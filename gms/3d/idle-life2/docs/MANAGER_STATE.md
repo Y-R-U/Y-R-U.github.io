@@ -82,3 +82,7 @@ Use the same brief Aaron gave Codex ("Astra") for Idle Transport 2 (/gms/3d/idle
   Actions: perf agent re-scoped to business-count-scaling costs; UI layout agent launched (scrolling hero, tall cards, compact off). NEXT: look-around agent (cameras.js + ui gesture) after both finish.
 - 2026-10-04: layout agent DONE (hero scrolls on phone/tablet, jump dock ⤒⤓, cards 57vh, compact off, event chip when hero off-screen; visible views max 8→3, renders/frame 2.4→0.9). Told perf agent to retune card DPR/MSAA for 3× bigger cards.
 - 2026-10-04: perf agent DONE (shader program churn removed, full boot warm-up, plots built up front, phone card pixel budget 0.5Mpx; phone CPU4× rAF p95 4.1ms). SHIPPED 3cf292db (BUILD 20261004b). Look-around agent launched (CDP 9641; cameras.js + new ui/look.js).
+- 2026-10-04: look-around DONE + season cards wired by manager; SHIPPED (BUILD 20261004c). Unverified on real Android: long-press contextmenu/pointercancel timing.
+- 2026-10-04: Aaron: "Looks good atm" — PAUSED here (he's moving to another project).
+  RESUME BACKLOG: (1) jump dock ⤒⤓ overlaps card badges while scrolling; (2) verify on real S22: long-press contextmenu vs look mode, GPU fill of 0.5Mpx MSAA cards; (3) P5 Coast Resort (3 businesses); (4) P6 Frostbridge Christmas season before Dec 1; (5) art polish: appstudio weakest (5.5), hero moon/sky never framed; (6) fresh-screen empty space below ghost card.
+  No agents running. All work committed (last 8f9783a6, BUILD 20261004c).
