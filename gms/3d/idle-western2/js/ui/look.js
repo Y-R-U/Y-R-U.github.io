@@ -1,6 +1,6 @@
 import { el as mk } from './dom.js?v=20261004a';
 
-const HOLD_MS = 240, SLOP = 8, YAW_PER_W = 2.3, PITCH_PER_H = 1.4;
+const HOLD_MS = 300, SLOP = 8, YAW_PER_W = 2.3, PITCH_PER_H = 1.4;
 
 // Hold a 3D view still for HOLD_MS, then drag to orbit (pinch to zoom). A move before that is a scroll; a short press is a tap.
 export function createLook({ host, blocked = () => false, buzz = () => {} }) {

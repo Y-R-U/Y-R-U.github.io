@@ -7,14 +7,14 @@ export function createJuice({ root, target, audio }) {
   let live = 0;
   const floats = new Map();
 
-  function targetPoint() {
-    const r = target().getBoundingClientRect();
+  function targetPoint(node) {
+    const r = (node || target()).getBoundingClientRect();
     return { x: r.left + Math.min(r.width, 120) * 0.35, y: r.top + r.height / 2 };
   }
 
-  function coins(x, y, n = 3, { big = false, step = 0 } = {}) {
-    const to = targetPoint();
-    if (reducedMotion()) { bump(); return; }
+  function coins(x, y, n = 3, { big = false, step = 0, to: toEl = null } = {}) {
+    const to = targetPoint(toEl);
+    if (reducedMotion()) { bump(toEl); return; }
     n = Math.min(n, 12 - live);
     for (let i = 0; i < n; i++) {
       const c = el('i', 'coin' + (big ? ' big' : ''));
@@ -32,14 +32,14 @@ export function createJuice({ root, target, audio }) {
       a.onfinish = () => {
         c.remove();
         live--;
-        bump();
+        bump(toEl);
         if (i === n - 1) audio?.sfx.tink(step);
       };
     }
   }
 
-  function bump() {
-    const t = target();
+  function bump(node) {
+    const t = node || target();
     t.classList.remove('bump');
     void t.offsetWidth;
     t.classList.add('bump');
@@ -80,11 +80,11 @@ export function createJuice({ root, target, audio }) {
     if (floats.get(container) === f) floats.delete(container);
   }
 
-  function stamp(container, text) {
-    const s = el('div', 'stamp', text);
+  function stamp(container, text, cls = '') {
+    const s = el('div', 'stamp ' + cls, text);
     container.appendChild(s);
     audio?.sfx.stamp();
-    setTimeout(() => s.remove(), 1400);
+    setTimeout(() => s.remove(), cls ? 2300 : 1400);
   }
 
   function ring(node) {

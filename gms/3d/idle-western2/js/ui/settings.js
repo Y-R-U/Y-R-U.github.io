@@ -1,6 +1,6 @@
 import { el, btn } from './dom.js?v=20261004a';
 import { BUILD } from '../core/version.js?v=20261004a';
-import { section, toggle, seg } from './kit.js?v=20261004a';
+import { section, toggle, seg, slider } from './kit.js?v=20261004a';
 
 const KEY = 'iw2.save', BAK = 'iw2.save.bak';
 let pending;
@@ -34,14 +34,31 @@ function restart(value) {
 
 export function fillSettings(body, ctx) {
   const { game, host, model } = ctx;
-  const set = (key, value) => { game.act('setting', { key, value }); ctx.textNow(); };
+  const set = (key, value) => { game.act('setting', { key, value }); ctx.audio.applyVolumes(); ctx.textNow(); };
   const ups = [];
 
-  const s1 = section(body);
-  ups.push(toggle(s1, {
+  const s0 = section(body, 'Sound');
+  ups.push(toggle(s0, {
     icon: '🔊', label: 'Sound',
     get: () => model.setting('sound', true) !== false,
     set: (v) => { set('sound', v); ctx.audio.set(v); if (v) ctx.audio.sfx.pop(); },
+  }));
+  for (const [k, icon, label, def] of [['voice', '🗣️', 'Voices', 0.9], ['music', '🎻', 'Music', 0.55], ['sfx', '🔔', 'Effects & piano', 0.8]]) {
+    ups.push(slider(s0, {
+      icon, label,
+      get: () => (model.setting('mute.' + k, false) ? 0 : model.setting('vol.' + k, def)),
+      set: (v) => { set('vol.' + k, v); if (v > 0 && model.setting('mute.' + k, false)) set('mute.' + k, false); },
+      muted: () => !!model.setting('mute.' + k, false),
+      mute: (m) => set('mute.' + k, m),
+      preview: () => { if (k === 'sfx') ctx.audio.sfx.kaching(); },
+    }));
+  }
+
+  const s1 = section(body, 'Saloon rules');
+  ups.push(toggle(s1, {
+    icon: '⛪', label: 'Sunday School (clean jokes)',
+    get: () => model.sunday(),
+    set: (v) => { game.act('sunday', { on: v }); ctx.textNow(); ctx.toast(v ? '⛪ Sunday School: hats off, language clean' : '🥃 Back to the saloon'); },
   }));
   if ('vibrate' in navigator) ups.push(toggle(s1, { icon: '📳', label: 'Haptics', get: () => model.setting('haptics', true) !== false, set: (v) => set('haptics', v) }));
   ups.push(seg(s1, {
@@ -51,7 +68,7 @@ export function fillSettings(body, ctx) {
     set: (v) => { set('tier', v); host.setTier(v); },
   }));
   ups.push(toggle(s1, {
-    icon: '📏', label: 'Compact calm lines',
+    icon: '📏', label: 'Compact calm cards',
     get: () => model.setting('compact', false) === true,
     set: (v) => set('compact', v),
   }));
@@ -98,15 +115,15 @@ export function fillSettings(body, ctx) {
   s2.appendChild(box);
 
   const s3 = section(body);
-  const reset = btn('pill danger', '🗑️ Reset', () => { confirm.hidden = false; reset.hidden = true; });
-  const confirm = el('div', 'confirm');
-  confirm.hidden = true;
-  confirm.append(
-    el('span', '', 'Erase everything?'),
-    btn('pill', 'Keep', () => { confirm.hidden = true; reset.hidden = false; }),
+  const reset = btn('pill danger', '🗑️ Reset', () => { confirmRow.hidden = false; reset.hidden = true; });
+  const confirmRow = el('div', 'confirm');
+  confirmRow.hidden = true;
+  confirmRow.append(
+    el('span', '', 'Burn the whole town down?'),
+    btn('pill', 'Keep', () => { confirmRow.hidden = true; reset.hidden = false; }),
     btn('pill danger', 'Erase', () => restart(null)),
   );
-  s3.append(reset, confirm);
+  s3.append(reset, confirmRow);
 
   body.appendChild(el('p', 'version', `Idle Western 2 · ${BUILD}`));
   armLateWrite(window.__iw2?.lifecycle);

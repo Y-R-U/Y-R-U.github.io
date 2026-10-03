@@ -18,12 +18,13 @@ export function createOffline(root, ctx) {
 
   return {
     show(report) {
-      if (!report || report === shownFor || !(report.cash > 0)) return;
+      if (!report || report === shownFor || !(report.cash > 0 || report.built?.length)) return;
       shownFor = report;
       card.replaceChildren();
       const top = el('div', 'away-top');
-      top.append(el('span', 'away-moon', '🌙'), el('span', 'away-t', fmtTime(report.awaySec)), el('b', 'away-cash', '+' + fmtCash(report.cash)));
+      top.append(el('span', 'away-moon', '🌵'), el('span', 'away-t', fmtTime(report.awaySec)), el('b', 'away-cash', '+' + fmtCash(report.cash)));
       card.appendChild(top);
+      for (const id of report.built || []) card.appendChild(el('div', 'away-built', `🔨 ${ctx.model.line(id)?.emoji || ''} ${ctx.model.lineName(id)} opened while you were out`));
       const lines = Object.entries(report.lines).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]).slice(0, 4);
       if (lines.length) {
         const row = el('div', 'away-lines');
@@ -31,7 +32,7 @@ export function createOffline(root, ctx) {
         card.appendChild(row);
       }
       const foot = el('div', 'away-foot');
-      foot.append(el('span', '', report.capped ? '⏳ Cap ' + fmtTime(report.capSec) : report.harvest.length ? '📦 Piles ×1.5' : '🌙 Welcome back'), btn('away-ok', '👍', hide, 'OK'));
+      foot.append(el('span', '', report.capped ? '⏳ Cap ' + fmtTime(report.capSec) : report.harvest.length ? '📦 Piles ×1.5' : '🤠 Welcome back, stranger'), btn('away-ok', '👍', hide, 'OK'));
       card.appendChild(foot);
       card.hidden = false;
       requestAnimationFrame(() => card.classList.add('in'));

@@ -3,7 +3,7 @@ import { fmtCash } from '../state/format.js?v=20261004a';
 
 // Events are 3D actors (render/eventart.js, picked as {kind:'event'}); the UI adds an edge chip when the
 // actor is off the hero frame, a floating chip when the hero is scrolled away, and runs the claim flow.
-// A mini-game event is a later lane's job: add a `game` field on the event def and route it from claim().
+// Specials (duel, brawl, robbery, stagecoach) are ui/specials.js; this file only runs the frequent ones.
 export function createEvents(hero, ctx, { heroOn, toHero }) {
   const { game, host, model, geo } = ctx;
   const layer = el('div', 'ev-layer');
@@ -20,7 +20,7 @@ export function createEvents(hero, ctx, { heroOn, toHero }) {
     if (!r.ok) return;
     const rw = r.reward;
     let msg;
-    if (rw.cash > 0) msg = `${e.emoji} ${rw.jackpot ? 'JACKPOT ' : ''}+${fmtCash(rw.cash)}`;
+    if (rw.cash > 0) msg = `${e.emoji} ${rw.jackpot ? 'JACKPOT! ' : ''}+${fmtCash(rw.cash)}${rw.teeth ? ' +🦷' + rw.teeth : ''}`;
     else if (rw.mult) msg = `${e.emoji} ${e.lineId ? model.line(e.lineId).emoji + ' income' : 'All income'} ×${rw.mult} · ${rw.sec}s`;
     else msg = `${e.emoji} ${e.name}`;
     ctx.toast(msg, { cls: 'gold' });
@@ -59,7 +59,7 @@ export function createEvents(hero, ctx, { heroOn, toHero }) {
   return {
     // ~6 Hz: sync with state, place edge chips for events whose plot is off the hero frame.
     update() {
-      const act = model.events();
+      const act = model.events().filter((e) => !e.special);
       for (const id of live.keys()) if (busy !== id && !act.some((e) => e.id === id)) drop(id);
       for (const e of act) ensure(e);
       const away = !heroOn() && !ctx.townActive();
@@ -92,7 +92,7 @@ export function createEvents(hero, ctx, { heroOn, toHero }) {
     tryClaimHit(hit, at) {
       const id = hit.eventId || hit.id;
       const e = live.get(id)?.e || model.events().find((x) => x.id === id);
-      if (!e) return false;
+      if (!e || e.special) return false;
       claim(e, at);
       return true;
     },

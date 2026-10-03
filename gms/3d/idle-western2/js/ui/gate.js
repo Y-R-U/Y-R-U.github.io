@@ -22,7 +22,7 @@ export function createGate(ctx) {
     const d = next;
     const r = game.act('permit', { districtId: d.id });
     if (r.ok) {
-      ctx.celebrate(d.emoji + ' ' + d.name + ' open!');
+      ctx.celebrate(d.emoji + ' ' + d.name + ' is yours!');
       ctx.audio.sfx.kaching();
       ctx.buzz(25);
       ctx.bus.emit('ui:district', { districtId: d.id });
@@ -37,7 +37,7 @@ export function createGate(ctx) {
     requestAnimationFrame(() => root.classList.add('nope'));
     setTimeout(() => root.classList.remove('nope'), 400);
     if (r.code === 'funds') ctx.toast('💵 Need ' + fmtCash(model.q('permit', { districtId: d.id }).cost - model.cash()) + ' more');
-    else if (r.msg) ctx.toast('🔒 ' + r.msg);
+    else if (r.msg) { ctx.toast('🔒 ' + r.msg); if (/demand/i.test(r.msg)) ctx.openTab('goals'); }
   }
 
   return {
@@ -50,7 +50,7 @@ export function createGate(ctx) {
       const showIt = allOwned || model.cash() >= qp.cost * 0.3 || R.town;
       root.hidden = !showIt;
       if (!showIt) return;
-      setText(name, `${next.emoji} ${next.name}`);
+      setText(name, `📜 Deed · ${next.emoji} ${next.name}`);
       setText(cost, qp.affordable ? (qp.cost > 0 ? '🔓 Open · ' + fmtCash(qp.cost) : '🔓 Open') : '🔒 ' + fmtCash(qp.cost));
       fill.style.setProperty('--p', Math.min(1, model.cash() / Math.max(1, qp.cost)).toFixed(2));
       root.classList.toggle('can', !!qp.affordable);

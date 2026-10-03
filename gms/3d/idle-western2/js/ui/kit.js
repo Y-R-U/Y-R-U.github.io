@@ -96,3 +96,20 @@ export function empty(parent, icon, text) {
   parent.appendChild(e);
   return e;
 }
+
+// Volume row: mute toggle + range. get() returns 0..1; preview() plays a sample on release.
+export function slider(parent, { icon, label, get, set, muted, mute, preview }) {
+  const r = el('div', 'vol-row');
+  const m = btn('vol-mute', icon, () => { mute(!muted()); paint(); }, 'Mute ' + label);
+  const inp = el('input');
+  inp.type = 'range';
+  inp.min = '0'; inp.max = '1'; inp.step = '0.05';
+  inp.setAttribute('aria-label', label + ' volume');
+  inp.addEventListener('input', () => set(+inp.value));
+  inp.addEventListener('change', () => preview?.());
+  r.append(m, el('span', 'tog-l', label), inp);
+  parent.appendChild(r);
+  const paint = () => { const v = get(); if (document.activeElement !== inp) inp.value = String(v); r.classList.toggle('muted', !!muted()); };
+  paint();
+  return paint;
+}
