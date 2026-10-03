@@ -1,0 +1,72 @@
+{
+  "url": "http://127.0.0.1:8888/gms/3d/idle-transport2/",
+  "checks": [
+    "high-DPR phone has one bounded renderer and keeps painting",
+    "repeated district changes keep GPU texture and geometry counts stable",
+    "all fifteen business district remains active in one renderer",
+    "cinematic tour follows and keeps the actual route vehicle in frame",
+    "reduced-motion preference replaces truck following with a steady business camera"
+  ],
+  "meadow": {
+    "p50": 16.699999999999818,
+    "p95": 16.799999999999955,
+    "renderFps": 30.079711234772148,
+    "dpr": 1.75,
+    "drawCalls": 458,
+    "source": {
+      "width": 686,
+      "height": 402
+    },
+    "graphics": {
+      "triangles": 120857,
+      "geometries": 43,
+      "textures": 19,
+      "drawCalls": 458
+    },
+    "staticInstances": 1900,
+    "rendererCount": 1
+  },
+  "network": {
+    "p50": 16.69999999999891,
+    "p95": 16.799999999999272,
+    "renderFps": 30.118969928344605,
+    "dpr": 1.75,
+    "drawCalls": 929,
+    "source": {
+      "width": 686,
+      "height": 402
+    },
+    "graphics": {
+      "triangles": 382136,
+      "geometries": 128,
+      "textures": 56,
+      "drawCalls": 929
+    },
+    "staticInstances": 4706,
+    "rendererCount": 1
+  },
+  "resources": [
+    {
+      "triangles": 120857,
+      "geometries": 81,
+      "textures": 56,
+      "drawCalls": 458,
+      "staticInstances": 1900
+    },
+    {
+      "triangles": 120857,
+      "geometries": 81,
+      "textures": 56,
+      "drawCalls": 458,
+      "staticInstances": 1900
+    },
+    {
+      "triangles": 120857,
+      "geometries": 81,
+      "textures": 56,
+      "drawCalls": 458,
+      "staticInstances": 1900
+    }
+  ],
+  "errors": []
+}

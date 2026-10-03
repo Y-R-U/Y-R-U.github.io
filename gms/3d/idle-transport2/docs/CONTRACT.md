@@ -27,3 +27,9 @@ Full-width route cards retain `.route-view[data-scene=id]` DOM targets. The rend
 ## Connected district correction
 
 One active THREE.Scene and one central depot serve every route provided to setRoutes. Business sites are plot groups on a continuous one-way arterial, not independent islands or scene replicas. Hero and row cameras render the exact same physical plot/vehicle objects. overview() selects a broad district camera; focus(id,true) pins a business inside that district, and focus(null,false) starts its district tour. onFocus(id,locked,mode) describes overview/tour/focus. Traffic preserves business-loading, outbound, depot-unloading and empty-return phases derived from shared economic delivery progress. Bulk controls, manager/seasonal equipment, saves and resume behavior are unchanged. Release imports use v=20261003-district4.
+
+## Miniature challenge release
+
+Release queries20261004-miniature1. New pure freight.mjs helpers are wired through economy action(freightStart,id), action(freightLoad), action(freightClaim) and freightInfo(). Completed job tools join ITEMS and existing equipment slots; three live route cycles plus one loading-window action are required. No offline progress or duplicate receipt; see ECONOMY.md.
+
+Art module render/art.mjs owns shared procedural material surfaces and softened geometry. Cached physical site art is rehydrated into static color batches when districts rebuild. Shared textures live through region changes; only private district/sign resources are disposed per rebuild. Tour establishes a site then follows the same leader object; debug.follow exposes actual projected truck coordinates. Reduced motion selects a steady business camera. deliveryPulse/upgradePulse are bounded optional visual hooks, never economic mutations.

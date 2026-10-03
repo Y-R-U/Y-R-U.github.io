@@ -22,10 +22,10 @@
       "timber",
       "stone"
     ],
-    "sceneUuid": "56b77bc0-b15b-4996-a55a-5002cb223997",
+    "sceneUuid": "4af94eb0-9716-4e30-90cd-d51a336a5956",
     "sceneCount": 1,
     "centralDepotCount": 1,
-    "centralDepotUuid": "4f4a05ad-9c3f-445b-842b-b97672a6ea4a",
+    "centralDepotUuid": "d4d3edae-6c4c-4145-bc47-4b85a334b77b",
     "depotPosition": [
       0,
       0,
@@ -46,7 +46,7 @@
     },
     "overview": true,
     "mode": "overview",
-    "heroSceneUuid": "56b77bc0-b15b-4996-a55a-5002cb223997"
+    "heroSceneUuid": "4af94eb0-9716-4e30-90cd-d51a336a5956"
   },
   "network": {
     "region": "network",
@@ -67,10 +67,10 @@
       "precision",
       "orbital"
     ],
-    "sceneUuid": "ba9723d3-781e-4c69-a68a-d0ec5ec8d64f",
+    "sceneUuid": "266edfab-01a4-44eb-a769-f87ae420bb90",
     "sceneCount": 1,
     "centralDepotCount": 1,
-    "centralDepotUuid": "c79e1ef3-c345-4ff9-9143-38a3990405cd",
+    "centralDepotUuid": "74336794-db72-41ab-ba71-8359a19be23f",
     "depotPosition": [
       0,
       0,
@@ -91,7 +91,7 @@
     },
     "overview": true,
     "mode": "overview",
-    "heroSceneUuid": "ba9723d3-781e-4c69-a68a-d0ec5ec8d64f"
+    "heroSceneUuid": "266edfab-01a4-44eb-a769-f87ae420bb90"
   },
   "errors": []
 }

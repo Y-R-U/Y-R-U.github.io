@@ -1,20 +1,22 @@
 # Idle Transport 2 — resumable manager checkpoint
 
-Status: connected district implementation complete, 2026-10-03. Local verification passed: economy suite, gameplay28, touch10, expansion9, recovery6, district13, portrait3 sizes and ten captures without console errors. Authorized Pages release follows this checkpoint. Preserve unrelated repo changes.
+Status: miniature logistics challenge implementation complete, 2026-10-04. Last published transport baseline 684ad2dc. Scoped commit/push/Pages publication remains authorized and follows the final verification checkpoint. Preserve unrelated work, including Idle Life 2.
 
-All agent assignments are complete. Main and row views use ONE physical scene, central depot and continuous three-lane one-way road for every displayed business. Overview, tour and pin change only camera framing. All operations connects all fifteen businesses to the same depot. Individual checkpoint docs contain restart details; actual agent sessions may not survive restart.
+All builders completed; see CHALLENGE.md for direction, ownership and honest comparison. New art kit uses softened forms, procedural grass/road/paving, detailed central depot, landscaped distinct yards, moving workers and teal fleets. Hero/rows still observe one physical scene and identical trucks. Tour now establishes a business then follows its real leader; close pins and steady reduced-motion views are supported. Camera projection checks keep the followed truck in frame.
 
-District verification: 13 browser checks, including identical site/vehicle UUIDs in hero and rows, continuous forward traffic across all 105 possible truck paths, distinct depot/loading bays, and one renderer. Existing gameplay, tap, expansion, GPU recovery and portrait checks are rerun for this release. The road uses deterministic animation tied to delivery progress; it does not simulate traffic collisions.
+UI now uses warm paper/ink/teal/copper, inline income badges, lower-right floating controls, named manager portraits, contextual first-$60 guidance, bounded delivery/upgrade feedback and merged rapid tap floats. Optional Priority Freight requires three live route cycles and one loading-window action; the first three completed jobs grant business/manager/character equipment. Offline cannot complete jobs; deadlines expire while away, claims persist exactly once, tools survive prestige, imports/timestamps are sanitized.
+
+Verification: economy and freight Node suites; gameplay28, touch10, expansion9, recovery6, district13, freight-browser8, graphics/camera5 and portrait3 size checks. Recovery includes three real GPU loss cycles and freeze/foreground return. Same high-DPR starter Chrome measurement:458 draw calls versus606 baseline;15-business network929, both about30 scene paints/sec. GPU texture/geometry/static-instance counts remain stable across repeated region changes. These are Mac Chrome measurements, not physical Samsung/Safari proof. Reports/captures live in docs/verification; test fixtures are explicitly progressed saves. Release version20261004-miniature1.
 
 New delivery:
 - Resume recovery for visibility, pagehide/pageshow, freeze/resume and GPU loss/restoration; preserved last good images, one restarted RAF, no duplicate offline interval credit.
 - Full-width business scenes, small name badges and floating translucent production/truck/storage/manager icons; ×1/×10/MAX with 44px targets. Journey progress becomes the bottom border. Detailed info and manager office are dialogs.
 - Golden Harvest has wheat/corn, combine harvesting, moving conveyor/bin/chute, loaded trucks leaving left. Other business types animate matching commodities/machinery. Same physical truck groups/progress in hero and row. Bin grows only up to18% width/24% height and changes color with storage.
-- Production/storage/fleet bulk tracks, manager development through level5 and1–3 equipment slots. Six unique permanent tools can attach/detach to character, business or manager; character tools benefit main and seasonal fares.
+- Production/storage/fleet bulk tracks, manager development through level5 and1–3 equipment slots. Nine unique permanent tools can attach/detach to character, business or manager; character tools benefit main and seasonal fares.
 - Eight-minute Halloween side company with pumpkin/candy/ghost businesses, separate currency, six milestones and permanent rewards. Practice available now/year-round; official Oct15–Nov2 UTC. Challenge timer expires while away but earns no offline coins.
 - Adversarial fixes: short-away seasonal countdown, failed-save status/warning recovery, over-capacity equipment imports, complete once-only lifecycle credits, parked-truck wheel/dust and cargo/loading phase correctness, unobstructed scene focal area, compact mobile toasts.
 
-Current verification: Node economy/validation/audit suite passes; browser28 checks, tap10, expansion9, resume6 and portrait3size checks. Resume test includes three real WEBGL_lose_context cycles and Chrome freeze/active foreground return. Physical phone/Safari remains untested. Reports/screenshots under docs/verification. All final source modules and assets use v=20261003-district4.
+Current verification: Node economy/validation/audit suite passes; browser28 checks, tap10, expansion9, resume6 and portrait3size checks. Resume test includes three real WEBGL_lose_context cycles and Chrome freeze/active foreground return. Physical phone/Safari remains untested. Reports/screenshots under docs/verification. All final source modules and assets use v=20261004-miniature1.
 
 Ownership remains scenery/scenes, economy/economy, interface/HTML-CSS-app; root owns regression/tools/docs/release. Actual agent sessions may not survive restart; individual checkpoint docs and this file contain the required continuation state. No outstanding implementation blockers.
 
@@ -76,6 +78,9 @@ node tools/resume-test.mjs
 node tools/expansion-test.mjs
 node tools/economy-pacing.mjs
 node tools/district-test.mjs
+node tools/freight-test.mjs
+node tools/freight-browser-test.mjs
+node tools/quality-test.mjs
 ```
 
 Browser scripts require local Chrome/socket access outside the restricted sandbox. TRANSPORT_URL can point the browser scripts at an explicitly requested deployment.
@@ -86,4 +91,4 @@ Only gms/3d/idle-transport2/, projects.js, and assets/screenshots/idle-transport
 
 Scene-wide tapping expansion: economy tests cover legacy save migration, policy timing, mastery transitions and combo limits. tools/tap-test.mjs verifies actual touch positions, swipe/multi-touch/control exclusion, keyboard earning, continued tapping, policy UI and visible depot progression. Tap FX use bounded DOM nodes and a fixed 24-particle world pool.
 
-Release assets use the same v=20261003-district4 query across HTML stylesheet/app and app/scene economy imports to avoid mixing old cached interfaces with new modules. Keep the shared economy import version identical across modules when changing it.
+Release assets use the same v=20261004-miniature1 query across HTML stylesheet/app and app/scene economy imports to avoid mixing old cached interfaces with new modules. Keep the shared economy import version identical across modules when changing it.

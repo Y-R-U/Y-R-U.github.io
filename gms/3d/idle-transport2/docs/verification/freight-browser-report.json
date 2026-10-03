@@ -1,0 +1,14 @@
+{
+  "url": "http://127.0.0.1:8888/gms/3d/idle-transport2/",
+  "checks": [
+    "fresh company has no unearned freight jobs or equipment",
+    "priority assignment starts through the visible Fleet control",
+    "priority cargo cannot be loaded while truck is travelling",
+    "44px scene control loads priority cargo without earning a scene tap",
+    "priority load is single use",
+    "three real delivery cycles yield a permanent tool and one reward claim",
+    "earned freight tool attaches through business information",
+    "active job control remains visible and usable in all three folded portrait sizes"
+  ],
+  "errors": []
+}

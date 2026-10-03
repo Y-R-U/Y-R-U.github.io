@@ -1,3 +1,4 @@
+import {FREIGHT_TOOLS,freshFreight,normalizeFreight,freightClock,freightStatus,freightOffer,beginFreight,recordFreight,claimFreight} from './freight.mjs?v=20261004-miniature1';
 export const SAVE_KEY = 'idle-transport2-v1';
 export const POLICIES = [
   {id:'steady',name:'Steady',description:'Balanced journey time and fare.',speedFactor:1,fareFactor:1},
@@ -6,6 +7,7 @@ export const POLICIES = [
 ];
 const MASTERY = [{deliveries:10,bonus:.1},{deliveries:50,bonus:.2},{deliveries:150,bonus:.3},{deliveries:500,bonus:.5}];
 export const ITEMS = [
+  ...FREIGHT_TOOLS,
   {id:'pumpkin-crate',name:'Pumpkin crate',slot:'business',bonus:.08,description:'Assigned business fares +8%.'},
   {id:'lantern-gloves',name:'Lantern gloves',slot:'manager',bonus:.08,description:'Assigned manager fares +8%.'},
   {id:'moon-compass',name:'Moon compass',slot:'character',bonus:.08,description:'All network and seasonal fares +8%.'},
@@ -81,7 +83,7 @@ export const CONTRACTS = [
 ];
 const MAX = 1e100;
 const number = (value, fallback=0, max=MAX) => typeof value === 'number' && Number.isFinite(value) && value >= 0 ? Math.min(max,value) : fallback;
-const fresh = (timestamp=Date.now()) => ({version:1,cash:0,totalEarned:0,deliveries:0,prestige:0,region:'meadow',unlockedRegions:['meadow'],routes:Object.fromEntries(ROUTES.map((r,i)=>[r.id,{unlocked:false,level:1,fleet:1,manager:false,progress:0,deliveries:0,attended:false,policy:'steady',queuedPolicy:null,storageLevel:0,managerLevel:0}])),research:[],contracts:[],settings:{quality:'high',sound:false},lastSaved:timestamp,event:null,eventTimer:45,eventsServed:0,workCount:0,inventory:[],equipment:{character:[],businesses:{},managers:{}},season:freshSeason()});
+const fresh = (timestamp=Date.now()) => ({version:1,cash:0,totalEarned:0,deliveries:0,prestige:0,region:'meadow',unlockedRegions:['meadow'],routes:Object.fromEntries(ROUTES.map((r,i)=>[r.id,{unlocked:false,level:1,fleet:1,manager:false,progress:0,deliveries:0,attended:false,policy:'steady',queuedPolicy:null,storageLevel:0,managerLevel:0}])),research:[],contracts:[],settings:{quality:'high',sound:false},lastSaved:timestamp,event:null,eventTimer:45,eventsServed:0,workCount:0,inventory:[],equipment:{character:[],businesses:{},managers:{}},season:freshSeason(),freight:freshFreight()});
 function normalize(raw,timestamp=Date.now()) {
   if (!raw || raw.version!==1 || !raw.routes || typeof raw.routes!=='object') throw new Error('This is not an Idle Transport 2 save.');
   const out=fresh(timestamp);
@@ -118,6 +120,8 @@ function normalize(raw,timestamp=Date.now()) {
   function equipList(values,slot,limit){const result=[];if(!Array.isArray(values))return result;for(const id of values){if(result.length>=limit)break;const item=ITEMS.find(i=>i.id===id);if(!item||item.slot!==slot||!out.inventory.includes(id)||used.has(id))continue;used.add(id);result.push(id);}return result;}
   out.equipment.character=equipList(raw.equipment?.character,'character',2);
   for(const r of ROUTES){if(!out.routes[r.id].unlocked)continue;out.equipment.businesses[r.id]=equipList(raw.equipment?.businesses?.[r.id],'business',2);if(out.routes[r.id].manager)out.equipment.managers[r.id]=equipList(raw.equipment?.managers?.[r.id],'manager',Math.min(3,1+Math.floor((out.routes[r.id].managerLevel-1)/2)));}
+  out.freight=normalizeFreight(raw.freight,timestamp,ROUTES.map(r=>r.id));if(out.freight.job&&!out.routes[out.freight.job.routeId].unlocked)out.freight.job=null;
+  for(let index=0;index<Math.min(FREIGHT_TOOLS.length,out.freight.completed);index++)if(!out.inventory.includes(FREIGHT_TOOLS[index].id))out.inventory.push(FREIGHT_TOOLS[index].id);
   return out;
 }
 export function createGame(options={}) {
@@ -152,7 +156,7 @@ export function createGame(options={}) {
         remaining=Math.max(0,remaining-(count-s.progress)*info.duration);s.progress=0;
         const base=info.fullPayout*info.automaticRate,earned=Math.min(MAX,base*count+(s.attended&&!s.manager?info.fullPayout-base:0));
         s.attended=false;s.deliveries=Math.min(MAX,s.deliveries+count);state.deliveries=Math.min(MAX,state.deliveries+count);state.cash=Math.min(MAX,state.cash+earned);state.totalEarned=Math.min(MAX,state.totalEarned+earned);
-        if(offline){offlineReport.cash+=earned;offlineReport.deliveries+=count;}else emit('delivery',`${r.name}: delivery complete`,{id:r.id,earned,count});
+        if(offline){offlineReport.cash+=earned;offlineReport.deliveries+=count;}else {const freightReady=recordFreight(state.freight,r.id,count,now());emit('delivery',`${r.name}: delivery complete`,{id:r.id,earned,count});if(freightReady)emit('freightReady','Priority freight complete. Claim your dispatch reward.',{id:r.id});}
         if(info.nextMastery&&s.deliveries>=info.nextMastery&&!offline)emit('mastery',`${r.name} mastery: +${Math.round(stats(r.id).masteryBonus*100)}% fares.`,{id:r.id,masteryLevel:stats(r.id).masteryLevel});
         if(s.queuedPolicy){s.policy=s.queuedPolicy;s.queuedPolicy=null;if(!offline)emit('policyApplied',`${r.name}: ${stats(r.id).policyName} policy started.`,{id:r.id});}
       }
@@ -183,6 +187,7 @@ export function createGame(options={}) {
   function seasonInfo(){const date=new Date(now()),year=date.getUTCFullYear(),start=Date.UTC(year,9,15),end=Date.UTC(year,10,2),active=now()>=start&&now()<end,nextYear=now()>=end?year+1:year;return {active,name:active?'Halloween Haul':'Halloween Haul · Practice',practiceAvailable:true,duration:480,startsAt:Date.UTC(nextYear,9,15),endsAt:Date.UTC(nextYear,10,2)};}
   function seasonStats(id){const b=SEASON_BUSINESSES.find(b=>b.id===id),s=state.season.run?.businesses[id];if(!b||!s)return null;const payout=b.baseEarn*Math.pow(1.35,s.level-1)*(1+toolBonus(state.equipment.character)),duration=b.baseTime/(1+(s.level-1)*.025);return {payout,duration,income:s.unlocked?payout/duration:0,upgradeCost:price(b.baseCost*Math.pow(1.5,s.level-1)),progress:s.progress,active:s.unlocked};}
   function advanceSeason(dt){const run=state.season.run;if(!run||run.remaining<=0)return;const elapsed=Math.min(dt,run.remaining);run.remaining=Math.max(0,run.remaining-elapsed);for(const b of SEASON_BUSINESSES){const s=run.businesses[b.id];if(!s.unlocked)continue;const info=seasonStats(b.id),position=s.progress+elapsed/info.duration,count=Math.floor(position);s.progress=position-count;if(count){const earned=Math.min(MAX,count*info.payout);run.coins=Math.min(MAX,run.coins+earned);run.totalEarned=Math.min(MAX,run.totalEarned+earned);}}if(run.remaining===0)emit('seasonEnd','Halloween run completed. Claim earned keepsakes or start another run.');}
+  function freightInfo(){const clock=freightClock(state.freight,now()),status=freightStatus(state.freight.job,clock),networkIncome=ROUTES.reduce((sum,r)=>sum+stats(r.id).income,0),offers=ROUTES.filter(r=>state.routes[r.id].unlocked).map(r=>freightOffer(r,stats(r.id),networkIncome)),active=state.freight.job;return {active:active?{...active,name:ROUTES.find(r=>r.id===active.routeId)?.name}:null,offers,completed:state.freight.completed,loadingEligible:status==='active'&&state.routes[active.routeId].progress<.18&&active.priorityLoads===0,canClaim:status==='ready',remaining:active?Math.max(0,(active.expiresAt-clock)/1000):0,status,nextTool:FREIGHT_TOOLS[state.freight.completed]||null};}
   function action(type,id,quantity=1) {
     const r=ROUTES.find(r=>r.id===id),s=state.routes[id];
     const reject=message=>({ok:false,message});
@@ -212,7 +217,13 @@ export function createGame(options={}) {
     } else if(type==='claimContract') {
       const status=contractStatus(id);if(!status)return reject('Unknown contract.');if(status.claimed)return reject('Reward already claimed.');if(!status.complete)return reject('This contract is not complete yet.');state.contracts.push(id);state.cash=Math.min(MAX,state.cash+status.reward);message='Contract reward received.';
     } else if(type==='prestige') {
-      const info=prestigeInfo();if(!info.available)return reject(info.requirement);const reputation=state.prestige+info.reward,settings=state.settings,inventory=state.inventory,season=state.season,character=state.equipment.character;state=fresh(now());state.inventory=inventory;state.season=season;state.equipment.character=character;tapCombo=0;lastTap=-Infinity;state.prestige=reputation;state.settings=settings;for(const key of Object.keys(cooldowns))delete cooldowns[key];message=`New company founded with ${reputation} reputation: +${reputation*15}% fares.`;
+      const info=prestigeInfo();if(!info.available)return reject(info.requirement);const reputation=state.prestige+info.reward,settings=state.settings,inventory=state.inventory,season=state.season,character=state.equipment.character,freight=state.freight;state=fresh(now());state.inventory=inventory;state.season=season;state.freight=freight;state.freight.job=null;state.equipment.character=character;tapCombo=0;lastTap=-Infinity;state.prestige=reputation;state.settings=settings;for(const key of Object.keys(cooldowns))delete cooldowns[key];message=`New company founded with ${reputation} reputation: +${reputation*15}% fares.`;
+    } else if(type==='freightStart') {
+      const offer=freightInfo().offers.find(offer=>offer.id===id);if(!offer)return reject('Open this route before accepting freight.');const started=beginFreight(state.freight,offer,now());if(!started.ok)return started;message=started.message;
+    } else if(type==='freightLoad') {
+      const info=freightInfo();if(!info.loadingEligible)return reject('Load priority cargo when the assigned business truck is at its loading bay.');const routeId=state.freight.job.routeId,loaded=action('dispatch',routeId);if(!loaded.ok)return loaded;const ready=recordFreight(state.freight,routeId,1,now(),'load');message=ready?'Priority freight complete. Claim your dispatch reward.':'Priority shipment loaded. Complete three real journeys before the deadline.';
+    } else if(type==='freightClaim') {
+      const claimed=claimFreight(state.freight,now());if(!claimed.ok)return claimed;state.cash=Math.min(MAX,state.cash+claimed.reward);state.totalEarned=Math.min(MAX,state.totalEarned+claimed.reward);if(claimed.tool&&!state.inventory.includes(claimed.tool.id))state.inventory.push(claimed.tool.id);resultExtra={earned:claimed.reward,tool:claimed.tool?.id||null,jobId:claimed.jobId};message=claimed.tool?`${claimed.tool.name} earned permanently. Assign it in Fleet planning or your manager office.`:'Freight bonus received. Your next assignment is ready.';
     } else if(type==='equip') {
       const [itemId,target]=String(id).split('|'),item=ITEMS.find(i=>i.id===itemId);if(!item||!state.inventory.includes(itemId))return reject('Earn this keepsake first.');const [slot,routeId]=String(target).split(':');if(slot!==item.slot)return reject('This keepsake belongs in a different slot.');let list,limit;
       if(slot==='character'){list=state.equipment.character;limit=2;}else {const routeState=state.routes[routeId];if(!routeState?.unlocked)return reject('Open this business first.');if(slot==='manager'&&!routeState.manager)return reject('Hire a manager first.');const area=slot==='business'?'businesses':'managers';list=state.equipment[area][routeId]||(state.equipment[area][routeId]=[]);limit=slot==='business'?2:stats(routeId).managerSlots;}
@@ -252,5 +263,5 @@ export function createGame(options={}) {
   }
 
   save();
-  return {get state(){return state;},get offlineReport(){return offlineReport;},get persistenceAvailable(){return persistenceAvailable;},tapInfo(){const active=now()-lastTap<=900&&tapCombo>0;return {combo:active?tapCombo:0,multiplier:active?1+Math.max(0,tapCombo-1)/19:1,remaining:active?Math.max(0,900-(now()-lastTap)):0};},stats,quote,seasonInfo,seasonStats,action,contractStatus,prestigeInfo,save,resumeAway,subscribe(fn){listeners.add(fn);return()=>listeners.delete(fn);},tick(dt){if(!Number.isFinite(dt)||dt<=0)return;dt=Math.min(dt,60);for(const id of Object.keys(cooldowns)){cooldowns[id]=Math.max(0,cooldowns[id]-dt);}advance(dt);tickEvents(dt);advanceSeason(dt);saveTimer+=dt;if(saveTimer>=12){saveTimer=0;save();}},exportSave(){save();return JSON.stringify(state,null,2);},importSave(text){try {if(typeof text!=='string'||text.length>100000)return {ok:false,message:'Save file is too large.'};const next=normalize(JSON.parse(text),now());state=next;tapCombo=0;lastTap=-Infinity;state.lastSaved=now();offlineReport={seconds:0,cash:0,deliveries:0};for(const key of Object.keys(cooldowns))delete cooldowns[key];save();emit('import','Company save imported.');return {ok:true,message:'Company save imported.'};}catch(error){return {ok:false,message:error.message||'Invalid save file.'};}}};
+  return {get state(){return state;},get offlineReport(){return offlineReport;},get persistenceAvailable(){return persistenceAvailable;},tapInfo(){const active=now()-lastTap<=900&&tapCombo>0;return {combo:active?tapCombo:0,multiplier:active?1+Math.max(0,tapCombo-1)/19:1,remaining:active?Math.max(0,900-(now()-lastTap)):0};},stats,quote,seasonInfo,seasonStats,freightInfo,action,contractStatus,prestigeInfo,save,resumeAway,subscribe(fn){listeners.add(fn);return()=>listeners.delete(fn);},tick(dt){if(!Number.isFinite(dt)||dt<=0)return;dt=Math.min(dt,60);for(const id of Object.keys(cooldowns)){cooldowns[id]=Math.max(0,cooldowns[id]-dt);}advance(dt);tickEvents(dt);advanceSeason(dt);saveTimer+=dt;if(saveTimer>=12){saveTimer=0;save();}},exportSave(){save();return JSON.stringify(state,null,2);},importSave(text){try {if(typeof text!=='string'||text.length>100000)return {ok:false,message:'Save file is too large.'};const next=normalize(JSON.parse(text),now());state=next;tapCombo=0;lastTap=-Infinity;state.lastSaved=now();offlineReport={seconds:0,cash:0,deliveries:0};for(const key of Object.keys(cooldowns))delete cooldowns[key];save();emit('import','Company save imported.');return {ok:true,message:'Company save imported.'};}catch(error){return {ok:false,message:error.message||'Invalid save file.'};}}};
 }

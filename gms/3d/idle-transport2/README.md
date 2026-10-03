@@ -54,3 +54,5 @@ Mobile recovery preserves the last rendered images while WebGL is unavailable, p
 
 
 The main scene is a connected transport district. Every listed business occupies a plot along a continuous one-way road around a single central depot. Overview shows the complete district; District tour and business pins move the camera within it. Business rows are closer cameras on the same physical plots, trucks and production machinery. The shared fleet loads at each business, travels to the depot, unloads, then returns empty. All operations lays out the listed network together, rather than cycling through separate miniature worlds.
+
+The miniature logistics upgrade adds crafted terrain/buildings, workers and rounded fleets, warm compact controls, named managers, close pins and a true truck-follow district tour. Priority Freight is available in Fleet: finish three live journeys and load one priority cargo to earn cash and permanent business/manager/character tools. Missing a job has no penalty; tools survive company restarts. Tests include `node tools/freight-test.mjs`, `node tools/freight-browser-test.mjs` and `node tools/quality-test.mjs`.

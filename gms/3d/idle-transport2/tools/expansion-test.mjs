@@ -17,7 +17,7 @@ try{
  await c.eval(`(()=>{const s=JSON.parse(transport2.game.exportSave());s.cash=1e14;for(const id of ['grain','timber','stone'])s.routes[id].unlocked=true;transport2.game.importSave(JSON.stringify(s));})()`);
  for(const width of [320,390,430]){
   await c.viewport(width,844,1,true);await c.frames(5);
-  assert(await c.eval(`(()=>{const row=document.querySelector('[data-route=grain]'),scene=row.querySelector('.route-view');return scene.getBoundingClientRect().width/row.getBoundingClientRect().width>.98&&[...row.querySelectorAll('button')].every(b=>{const r=b.getBoundingClientRect();return r.width>=44&&r.height>=44})&&document.documentElement.scrollWidth<=innerWidth})()`));
+  assert(await c.eval(`(()=>{const rows=[...document.querySelectorAll('.route-card')];return rows.every(row=>{const card=row.getBoundingClientRect(),scene=row.querySelector('.route-view').getBoundingClientRect();return card.left>=0&&card.right<=innerWidth&&scene.width/card.width>.98&&[...row.querySelectorAll('button')].every(b=>{const r=b.getBoundingClientRect();return r.width>=44&&r.height>=44&&r.left>=card.left&&r.right<=card.right&&r.top>=card.top&&r.bottom<=card.bottom})})&&document.documentElement.scrollWidth<=innerWidth})()`),'full-size controls must be entirely inside every portrait card at '+width);
  }
  checks.push('full-width scenes and 44px controls fit three portrait widths');
  await c.viewport(390,844,1,true);await touch('[data-route=grain] [data-quantity="10"]');

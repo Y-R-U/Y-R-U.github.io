@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict';
+import {createGame,ITEMS} from '../js/economy.mjs';
+import {freshFreight,normalizeFreight,freightStatus,beginFreight,recordFreight,claimFreight} from '../js/freight.mjs';
+const memory=()=>{const records=new Map();return {getItem:k=>records.get(k)||null,setItem:(k,v)=>records.set(k,v)};};
+let clock=1800000000000;const storage=memory();let game=createGame({storage,now:()=>clock});
+const step=dt=>{clock+=dt*1000;game.tick(dt);};
+assert.equal(game.freightInfo().offers.length,0);assert.equal(game.action('freightStart','grain').ok,false);
+for(let i=0;i<12;i++)game.action('work');game.action('unlockRoute','grain');
+assert.equal(game.freightInfo().offers.length,1);assert(game.action('freightStart','grain').ok);assert.equal(game.freightInfo().active.target,3);assert.equal(game.freightInfo().remaining,50);assert.equal(game.action('freightStart','grain').ok,false);assert.equal(game.action('freightClaim').ok,false);
+assert(game.action('freightLoad').ok);assert.equal(game.freightInfo().active.priorityLoads,1);assert.equal(game.state.routes.grain.progress,.3);assert.equal(game.action('freightLoad').ok,false);
+step(24);assert.equal(game.freightInfo().active.delivered,3);assert(game.freightInfo().canClaim);const readySave=game.exportSave(),firstJob=game.freightInfo().active.id;game=createGame({storage,now:()=>clock});assert.equal(game.freightInfo().active.id,firstJob);assert(game.freightInfo().canClaim);
+const beforeClaim=game.state.cash,reward=game.freightInfo().active.reward;const first=game.action('freightClaim');assert(first.ok);assert.equal(first.tool,'dispatch-pennant');assert.equal(game.state.cash,beforeClaim+reward);assert.equal(game.state.inventory.filter(x=>x==='dispatch-pennant').length,1);const afterClaim=game.state.cash;assert.equal(game.action('freightClaim').ok,false);assert.equal(game.state.cash,afterClaim);
+game=createGame({storage,now:()=>clock});assert.equal(game.action('freightClaim').ok,false);assert.equal(game.state.freight.completed,1);
+// Further distinct LIVE jobs earn manager and character tools, then cash only.
+for(let index=1;index<4;index++){
+  const s=game.state.routes.grain;s.progress=0;assert(game.action('freightStart','grain').ok);assert(game.action('freightLoad').ok);step(game.stats('grain').duration*3+.001);assert(game.freightInfo().canClaim);const result=game.action('freightClaim');assert(result.ok);assert.equal(result.tool,index===1?'crew-whistle':index===2?'freight-compass':null);
+}
+assert.equal(game.state.freight.completed,4);assert.equal(new Set(game.state.freight.claimedJobIds).size,4);assert.equal(game.state.inventory.filter(x=>ITEMS.find(i=>i.id===x&&x.startsWith('dispatch-'))).length,1);
+// Loading eligibility uses authoritative lead journey; unrelated routes cannot progress a job.
+game.state.routes.grain.progress=.5;assert(game.action('freightStart','grain').ok);assert.equal(game.freightInfo().loadingEligible,false);assert.equal(game.action('freightLoad').ok,false);
+clock+=181000;const failedBalance=game.state.cash;assert.equal(game.freightInfo().status,'expired');assert.equal(game.action('freightClaim').ok,false);assert.equal(game.state.cash,failedBalance);assert(game.action('freightStart','grain').ok);
+// Offline journeys cannot count, and absolute deadline persists across reload/import.
+game.state.cash+=1000;game.action('manager','grain');game.state.routes.grain.progress=0;game.action('freightLoad');game.save();const completedBefore=game.state.freight.completed;clock+=3600000;game=createGame({storage,now:()=>clock});assert.equal(game.freightInfo().status,'expired');assert.equal(game.freightInfo().active.delivered,0);assert.equal(game.state.freight.completed,completedBefore);assert.equal(game.action('freightClaim').ok,false);
+assert(game.action('freightStart','grain').ok);game.state.routes.grain.progress=0;game.action('freightLoad');game.save();clock+=3600000;game.resumeAway(3600);assert.equal(game.freightInfo().active.delivered,0);assert.equal(game.freightInfo().status,'expired');
+const legacy=JSON.parse(game.exportSave());delete legacy.freight;assert(game.importSave(JSON.stringify(legacy)).ok);assert.equal(game.freightInfo().status,'idle');assert.equal(game.state.freight.completed,0);assert(game.state.inventory.includes('dispatch-pennant'));
+// Main save import keeps a completed job; claims remain exactly once within the imported company.
+const savedReady=JSON.parse(readySave);savedReady.lastSaved=clock;assert(game.importSave(JSON.stringify(savedReady)).ok);assert(game.freightInfo().canClaim);assert(game.action('freightClaim').ok);assert.equal(game.action('freightClaim').ok,false);
+const prestige=JSON.parse(game.exportSave());prestige.totalEarned=2e6;prestige.cash=2e6;prestige.unlockedRegions=['meadow','industrial','coastal','alpine'];assert(game.importSave(JSON.stringify(prestige)).ok);game.action('freightStart','grain');assert(game.action('prestige').ok);assert.equal(game.freightInfo().active,null);assert.equal(game.state.freight.completed,1);assert(game.state.inventory.includes('dispatch-pennant'));
+// Pure helper adversarial normalization, zero-epoch completion and clock-back guard.
+const malformed=normalizeFreight({version:1,completed:-1,nextId:1,claimedJobIds:['freight-8','freight-8','bad'],job:{id:'freight-7',routeId:'missing',reward:Infinity}},clock,['grain']);assert.equal(malformed.job,null);assert.equal(malformed.nextId,9);assert.deepEqual(malformed.claimedJobIds,['freight-8']);
+const pure=freshFreight();assert(beginFreight(pure,{routeId:'grain',duration:45,reward:80},0).ok);assert.equal(recordFreight(pure,'timber',3,1000),false);recordFreight(pure,'grain',1,0,'load');assert(recordFreight(pure,'grain',3,0));assert.equal(freightStatus(pure.job,0),'ready');assert(claimFreight(pure,0).ok);assert.equal(claimFreight(pure,0).ok,false);
+const expired=freshFreight();beginFreight(expired,{routeId:'grain',duration:45,reward:80},clock);recordFreight(expired,'grain',3,clock+46000);assert.equal(freightStatus(expired.job,clock+46000),'expired');assert.equal(recordFreight(expired,'grain',3,clock+1000),false);assert.equal(claimFreight(expired,clock+1000).ok,false);
+console.log('Freight: live journeys + loading gate, four unique receipts/three tools, persistent one-time claims, expiry/restart, offline exclusion, migration/import/prestige and clock-back guards passed.');
+// Future/imported clocks never freeze assignments; unsafe live timers expire and can restart.
+const future=normalizeFreight({version:1,completed:0,lastClock:1e100,nextId:2,job:{id:'freight-1',routeId:'grain',duration:180,startedAt:clock,expiresAt:clock+180000,delivered:0,priorityLoads:0,reward:80}},clock,['grain']);assert.equal(future.lastClock,clock);assert.equal(freightStatus(future.job,clock),'expired');assert(beginFreight(future,{routeId:'grain',duration:45,reward:80},clock).ok);assert.equal(freightStatus(future.job,clock),'active');
+for(const bad of [{startedAt:null,expiresAt:null},{startedAt:Infinity,expiresAt:NaN},{startedAt:clock,expiresAt:-1}]){const normalized=normalizeFreight({version:1,job:{id:'freight-1',routeId:'grain',duration:Infinity,reward:-1,...bad}},clock,['grain']);assert(Number.isFinite(normalized.job.startedAt));assert(Number.isFinite(normalized.job.expiresAt));assert.equal(normalized.job.reward,0);assert.equal(freightStatus(normalized.job,clock),'expired');}
+console.log('Freight: huge future clocks and malformed timestamps sanitize safely without freezing new jobs.');

@@ -2,10 +2,10 @@
 import {CDP} from './cdp.mjs';
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
-const out=fileURLToPath(new URL('../docs/verification/',import.meta.url));mkdirSync(out,{recursive:true});
+const out=process.env.TRANSPORT_OUTPUT_DIR||fileURLToPath(new URL('../docs/verification/',import.meta.url));mkdirSync(out,{recursive:true});
 const c=await CDP.launch({gpu:true});
 const url=process.env.TRANSPORT_URL||'http://127.0.0.1:8888/gms/3d/idle-transport2/';
-async function capture(name){await c.eval("document.querySelector('#toast-stack').style.opacity='0'");await c.frames(20);const {data}=await c.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});writeFileSync(out+name+'.png',Buffer.from(data,'base64'));}
+async function capture(name){await c.eval("document.querySelector('#toast-stack').style.opacity='0'");await c.frames(20);const {data}=await c.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});writeFileSync(out+'/'+name+'.png',Buffer.from(data,'base64'));}
 try{
  await c.viewport(1440,1050,1,false);await c.goto(url+'?dpr=1');if(!await c.waitFor('window.transport2?.scenes',20000))throw new Error('Game failed to load');
  await capture('desktop');const original=await c.eval('transport2.game.exportSave()');
