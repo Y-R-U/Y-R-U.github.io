@@ -226,3 +226,53 @@ Owner: lane P. The files are `js/render/plots/*`. Each business has one file. Th
   - (3) The ref's buildings are much bigger than its people. Ours read small next to A's 1.4× crowd, so the frames look like toy sheds.
   - (4) The build card's crew and mule cart stand in front of the frame and hide its lower half. The ref stages the crew in the foreground with the frame clear behind.
   - (5) Pomfrey's south blade signs and a covered wagon still poke into the lower edge of some cards.
+
+## Round 4 (2026-10-04)
+
+### Saloon (the reference card)
+- **Deep porch:** it runs to `PZ1 = 3.9` on stout posts. The porch roof is raised (`H1` is now 3.9, `H2` 6.8, `FH` 7.9) and the balcony is shallow (to `BALZ = FZ + 1.75`).
+- **Glowing interior card:** the open doorway is 3.3 × 2.75 m. Through it you see a painted bar: a warm back wall, a mirror, two shelves of bottles, two hanging lamps, the counter and three drinkers in silhouette. It is part of the static mesh, so 0 draws. It uses the new glow slots `inGlow`, `inDeep`, `mirror` and `inLamp`.
+- **Lanterns:** three hang on porch posts facing the street, and two flank the doorway.
+- **Barrel/crate pyramid:** it sits at the right front of the porch (3-2-1 barrels plus crates and bottles). The queue (now 3 people) stands behind it. Pickles slumps in front of it, and Mabel stands left of the doors.
+- **Paddy wagon:** moved from the doors to the street east of the card (`WAGON = [9.8, 8.8]`). The `wagon` anchor follows it.
+- **Ejection:** the cowboy lands face-down in open dirt straight out from the steps (`[DOOR − 0.4, 0, PZ1 + 2.5]`). The flight is slower and lower, so he stays under the porch roof, and the 18-clod dirt puff is smaller. `doorsOut` moved to the step foot.
+- **Camera:** `cardCam([-0.3, 3.0, 2.8], 22, 11, 22, 40)`, which is lower and closer so it sees under the porch roof.
+- **Hub loafers:** they are crowd-scale 1.08 (they were 1.36, giants) and their paths stay off the ejection lane.
+
+### Construction (construction.js), in chunky readable stages
+- **Stage 0, survey + deck:** stakes and string (stage 0 only), then piers, sills, joists and deck boards laid front to back. The deck top is at 0.43 m and runs out to `zf + 1.5` as a porch. Instances now also grow inside stage 0.
+- **Stage 1, frame:**
+  - posts 0.3 thick and plates 0.28;
+  - X-braces in both front end bays and on both side walls;
+  - roof joists and an upper-storey front (posts and a head plate) against the sky;
+  - a chunky ladder leaning from the deck onto the top plate.
+- **Removed:** the thin scaffold, the gin pole with its floating plank, and the white plan table.
+- **Stage 2, walls:** thick planks clad the walls bottom-up from the deck, then the roof deck goes on.
+- **Stage 3:** the false front is hinged on the deck. The arched/peak parapet is three stepped boards (it was a giant disc).
+- **Yard:**
+  - the lumber stack front-left with a chunky theodolite beside it;
+  - the toolbox and nail kegs at the deck edge;
+  - the sawhorse front-right;
+  - the mule cart parked right of the frame facing the street. It no longer bolts.
+- **Crew jobs:**
+  - A hammers on the deck, climbs the ladder (stage 1, 30–40%), then hammers on the top plate.
+  - B surveys, then saws at the sawhorse. He is the bonk victim.
+  - C carries a plank on his shoulder from the stack.
+  - The foreman reads the blueprint front-right.
+- **Site cleared:** while a plot is being built and not owned, its own walkers and regulars (crowd meshes) are hidden.
+- **One build camera:** `finishPlot` derives every buildable plot's `camera.build` from its site with the exported `BC` constants (yaw 22, elev 18, fov 42, dist = max(17, (w + 4.2) × 1.8)). The per-plot `build` args are now only a flag.
+
+### Foreground framing (all cards)
+- `fgProp(b, cam, f)` (western.js) places a near prop in a bottom corner of a card camera. The kinds are `saguaro`, `post` (rails run out of frame, with a WANTED bill), `pole` and `barrels`.
+- `finishPlot` builds them as one extra mesh per state (`spec.fg`, by default a saguaro plus a post with the side chosen by id hash; the build state gets `FG_BUILD`).
+- They are drawn only by the plot's own card camera in the matching state. `onBeforeRender` zero-scales the mesh for every other camera, and the mesh has `frustumCulled = false` and casts no shadow. Cost: +1 draw, card only. The hero never sees them.
+
+### Checks (CDP 9341, real game)
+- test-boot PASS, test-cards PASS, and test-scroll PASS. On desktop: p95 rAF 4.1 ms, 215 max draws, card 37.
+- Shots in `docs/art/shots/r4/` (gitignored):
+  - `p_vs_refs_r4.jpg` (saloon and build cards beside the refs);
+  - `p_cards_open_r4.jpg`;
+  - `p_build_mid_r4.jpg`;
+  - `p_build_stages_r4.jpg`;
+  - `p_saloon_ejection_r4.jpg`.
+- **Open issue:** lane S's hero saloon vignette (`vignettes.js`, a 1.7× Mabel plus a thrown drunk with a white puff) also renders in the saloon card. It sits in front of the doors and doubles P's card ejection. S should skip its actors for `camera.userData.iw2Line === 'saloon'`, or ask P to drop the card gag.

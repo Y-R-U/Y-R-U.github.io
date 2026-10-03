@@ -447,3 +447,49 @@ export function vignette(b, x, z, o = {}) {
   tufts(b, [[x - 1.5 * s, z + 0.7 * s], [px + sd * 0.3, pz + 0.4]], s);
   return b;
 }
+
+// R4 card framing: a near prop in a bottom corner of a card camera (refs: cactus / post / barrels framing the diorama).
+// cam = a cardCam() result; f = { kind: 'saguaro' | 'pole' | 'post' | 'barrels', sx: NDC x of the corner, dist: metres
+// from the camera along the ground, up: metres the prop rises above the frame's bottom edge there, s }.
+const ASPECT = 0.745;
+export function fgProp(b, cam, f) {
+  const pos = cam.look.map((a, i) => a + (cam.pos[i] - a) * 1.15);
+  const F = new THREE.Vector3(...cam.look).sub(new THREE.Vector3(...pos)).normalize();
+  const R = new THREE.Vector3().crossVectors(F, new THREE.Vector3(0, 1, 0)).normalize(), U = new THREE.Vector3().crossVectors(R, F);
+  const t = Math.tan((cam.fov * Math.PI) / 360);
+  const d = F.clone().addScaledVector(R, f.sx * t * ASPECT).addScaledVector(U, -t);
+  const hl = Math.hypot(d.x, d.z), x = pos[0] + (d.x / hl) * f.dist, z = pos[2] + (d.z / hl) * f.dist;
+  const yb = pos[1] + (d.y / hl) * f.dist, H = Math.max(1, yb + (f.up ?? 1.5)), s = f.s ?? 1, side = f.sx < 0 ? 1 : -1;
+  const face = Math.atan2(pos[0] - x, pos[2] - z), out = Math.sign(f.sx) || 1, ox = R.x * out, oz = R.z * out, ry = Math.atan2(-oz, ox);
+  if (f.kind === 'saguaro') {
+    const r = Math.max(0.3, H * 0.06) * s;
+    b.cyl('cactus', x, 0, z, r, H, 0, { sides: 11, taper: 0.9 });
+    b.ball('cactus', x, H - r * 0.2, z, r * 0.9, { detail: 1, sy: 0.9 });
+    for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2; b.slab('cactus2', x + Math.cos(a) * r * 0.95, H * 0.08, z + Math.sin(a) * r * 0.95, r * 0.14, H * 0.84, r * 0.14, { round: r * 0.05, taper: 0, ry: -a }); }
+    // one arm reaching into the frame: an elbow out, then up
+    const ay = H * 0.5, L = r * 2.6, ax = x - ox * L, az = z - oz * L;
+    b.slab('cactus', x - ox * L * 0.5, ay - r * 0.55, z - oz * L * 0.5, L, r * 1.1, r * 1.1, { round: r * 0.5, taper: 0, ry });
+    b.cyl('cactus', ax, ay - r * 0.5, az, r * 0.62, H * 0.3, 0, { sides: 9, taper: 0.85 });
+    b.ball('cactus', ax, ay - r * 0.5 + H * 0.3, az, r * 0.55, { detail: 1 });
+    for (let i = 0; i < 4; i++) b.cone(i % 2 ? 'hay2' : 'hay', x + Math.cos(i * 1.7) * r * 1.6, 0, z + Math.sin(i * 1.7) * r * 1.6, 0.14, 0.7, 0, { sides: 4, rz: Math.cos(i * 2.1) * 0.4, rx: Math.sin(i * 2.1) * 0.4 });
+  } else if (f.kind === 'pole') {
+    const r = Math.max(0.16, H * 0.022) * s;
+    b.cyl('raw2', x, 0, z, r, H, 0, { sides: 8, taper: 0.85 });
+    for (const y of [H * 0.92, H * 0.8]) b.slab('raw2', x, y, z, H * 0.2, r * 1.3, r * 1.3, { round: 0.03, taper: 0, ry: face + Math.PI / 2 });
+    for (const k of [-1, 1]) b.cyl('#6fae9a', x + Math.cos(face) * k * H * 0.08, H * 0.92 + r * 1.3, z - Math.sin(face) * k * H * 0.08, r * 0.35, r * 1.4, 0, { sides: 6, taper: 0.8 });
+    b.slab('#f1e4c4', x + Math.sin(face) * r * 1.05, H * 0.42, z + Math.cos(face) * r * 1.05, H * 0.07, H * 0.09, 0.03, { round: 0.01, taper: 0, ry: face, rz: 0.08, noAo: true });
+  } else if (f.kind === 'post') {
+    // a fence post whose rails run out of frame, a WANTED bill tacked on its inner face
+    const r = Math.max(0.14, H * 0.03) * s, L = H * 0.9;
+    b.slab('raw2', x, 0, z, r * 2, H, r * 2, { round: 0.04, taper: 0, ry });
+    b.slab('raw2', x, H, z, r * 2.3, r * 0.5, r * 2.3, { round: 0.04, taper: 0, ry });
+    for (const y of [H * 0.74, H * 0.36]) b.slab('raw', x + ox * L * 0.5, y, z + oz * L * 0.5, L, r * 1.2, r * 0.8, { round: 0.03, taper: 0, ry, rz: 0.03 });
+    b.slab('#f1e4c4', x - ox * r * 1.05, H * 0.55, z - oz * r * 1.05, r * 1.6, r * 2.1, 0.03, { round: 0.01, taper: 0, ry: ry + Math.PI / 2, rz: 0.06, noAo: true });
+  } else {
+    const k = Math.min(1.6, Math.max(1, H / 2.2)) * s;
+    barrel(b, x, 0, z, 1.2 * k);
+    barrel(b, x + Math.cos(face) * 1.1 * k, 0, z - Math.sin(face) * 1.1 * k, 1.1 * k, 'plank2');
+    barrel(b, x + Math.cos(face) * 0.55 * k, 1.15 * k, z - Math.sin(face) * 0.55 * k, 1.0 * k);
+  }
+  return [x, z];
+}

@@ -6,16 +6,18 @@ import * as THREE from 'three';
 import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, barrel, crate, lantern, blade, signBoard, horse, hatted, particles, tufts, tone, cart, bale, tilt, vignette } from './western.js?v=20261004d';
 import { createConstruction, finishPlot } from './construction.js?v=20261004d';
 
-const BX = -1.2, FZ = 0.7, W = 11, D = 6.4, H1 = 3.4, H2 = 6.5, FH = 7.6;
+const BX = -1.2, FZ = 0.7, W = 11, D = 6.4, H1 = 3.9, H2 = 6.8, FH = 7.9;
 const DOOR = [BX + 0.6, FZ];
 const PIANO = [BX - 1.85, 0.35, FZ + 1.2], PRY = -Math.PI / 2 + 0.3;
 const PF = [Math.sin(PRY), Math.cos(PRY)];
-const HAYCART = [6.4, 3.7], WAGON = [-4.0, 7.8], BALC_Y = H1 + 0.36;
+const HAYCART = [6.4, 3.7], WAGON = [9.8, 8.8], BALC_Y = H1 + 0.36;
+// R4: a deep porch (to PZ1) under a shallow balcony (to BALZ), a wide glowing doorway (OPEN_W) showing the bar inside
+const PZ1 = 3.9, BALZ = FZ + 1.75, OPEN_W = 3.3, OPEN_H = 2.75;
 
 export default function buildPlot(kit, { line, palette, rng }) {
-  const P = kit.plot({ id: 'saloon', line, palette, rng, seed: 41, colors: { ...COLORS, bottle: { c: '#7a3a1e', r: 0.2 }, felt: '#3f7a52', pom: '#6b3f8f', pomGold: COLORS.gold } });
+  const P = kit.plot({ id: 'saloon', line, palette, rng, seed: 41, colors: { ...COLORS, bottle: { c: '#7a3a1e', r: 0.2 }, felt: '#3f7a52', pom: '#6b3f8f', pomGold: COLORS.gold, inGlow: { c: '#ffb257', r: 0.5, g: 0.55 }, inDeep: { c: '#d9783a', r: 0.6, g: 0.3 }, inBar: { c: '#7a3a22', r: 0.7 }, inLamp: { c: '#ffe3a6', r: 0.2, g: 1.2 }, mirror: { c: '#ffd890', r: 0.1, g: 0.75 }, inSil: { c: '#4a2620', r: 0.9 } } });
   const { b, t1, t2, lot } = P;
-  vignette(b, -6.6, 3.8);
+  vignette(b, -7.0, 5.7);
 
   saloon(b, true);
   saloon(lot, false);
@@ -25,7 +27,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
   horse(b, 4.6, 5.25, { ry: Math.PI * 0.94, c: '#9a5a35', blanket: '#D9A441' });
   tufts(b, [[-7.4, 3.2], [7.4, 3.0], [-7.6, -3.5], [-5.6, 5.6], [1.2, 5.4], [5.2, 6.4]]);
   // the sheriff's paddy wagon parked out front (fling 'down' lands in it)
-  cart(b, WAGON[0], WAGON[1], { ry: 0, c: 'soot', side: 'iron' });
+  cart(b, WAGON[0], WAGON[1], { ry: 0.2, c: 'soot', side: 'iron' });
   for (let i = 0; i < 5; i++) b.cyl('iron', WAGON[0] - 0.9 + i * 0.45, 0.85, WAGON[1], 0.03, 1.2, 0, { sides: 4, taper: 1 });
   b.slab('soot', WAGON[0], 2.05, WAGON[1], 2.5, 0.12, 1.4, { round: 0.04 });
   b.slab('#c9a43a', WAGON[0], 1.4, WAGON[1] + 0.68, 0.5, 0.3, 0.02, { round: 0.1, taper: 0, noAo: true });
@@ -73,8 +75,8 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   // Card gag (R3): Mabel throws a cowboy through the bat-wings every EJ s; he tumbles into the street in a dust puff,
   // lies flat, sits up dizzy and staggers off. Card-only (out.inCard), so it never doubles lane S's hero ejection.
-  const puff = particles(kit, P, (n) => { n.ball('dust', 0, 0, 0, 1, { detail: 1, smooth: true }); }, 16);
-  const EJ = 8.5, LAND = [DOOR[0] + 1.7, 0, FZ + 4.1];
+  const puff = particles(kit, P, (n) => { n.ball('dirtL', 0, 0, 0, 1, { detail: 1, smooth: true }); }, 18);
+  const EJ = 8.5, LAND = [DOOR[0] - 0.4, 0, PZ1 + 2.5];
   let ej = 0, landed = false;
 
   // Stock: crates of rotgut on the porch's right end (the brightest warm thing in frame).
@@ -82,20 +84,20 @@ export default function buildPlot(kit, { line, palette, rng }) {
   rot.slab('raw', 0, 0, 0, 1, 0.55, 0.75, { round: 0.06 });
   rot.slab('raw2', 0, 0.22, 0, 1.04, 0.08, 0.79, { round: 0.02, taper: 0 });
   for (let i = 0; i < 3; i++) { rot.cyl('bottle', -0.3 + i * 0.3, 0.5, 0, 0.11, 0.32, 0, { sides: 7, taper: 0.8 }); rot.cyl('bottle', -0.3 + i * 0.3, 0.8, 0, 0.045, 0.16, 0, { sides: 5, taper: 1 }); rot.ball('#e9dcc0', -0.3 + i * 0.3, 0.97, 0, 0.05, { detail: 0 }); }
-  const PILE = [BX + 4.3, 0.35, 2.15];
+  const PILE = [BX - 4.5, 0.35, FZ + 0.85];
   P.pile({ at: PILE, geo: rot.geometry({ ao: 0.15, aoH: 0.4 }), size: 0.62, max: 12, cols: 3, ry: -0.15 });
 
   // People: queue (0–4), Fingers at the piano (5), Pickles slumped on the barrels (6), a loafer on a post (7), Mabel the
   // bouncer by the doors (8), Lulu and a cowboy on the balcony (9, 10)
   const SC = 1.08;
   const folk = hatted(P.crowd({ count: 12, seed: 23, scale: SC }), EXTRA_HATS, ['#7a5236', '#3a2c2c', '#c9b08a', '#8a3a2a', '#e6d6b8', '#2e2630', '#6a5a3a', '#d9c6a0', '#3a2c2c', '#c4473a', '#3a2c2c', '#c9a06a'], [1, 1.1, 0.9, 1.0, 1, 0.9, 1.3, 1.15, 0.38, 1, 1, 1.25]);
-  P.queue(folk, { ids: [0, 1, 2, 3, 4], spawn: [[8.4, 4.6], [8.4, 4.2]], counter: [DOOR[0] + 0.15, FZ + 1.25], dir: [1, 0.05], gap: 0.85, y: 0.37, exit: [[DOOR[0], FZ - 0.6], [DOOR[0], FZ - 1.6]], carry: false, faceCounter: Math.PI });
+  P.queue(folk, { ids: [0, 1, 2], spawn: [[8.4, 4.6], [8.4, 4.2]], counter: [DOOR[0] + 0.4, FZ + 1.25], dir: [1, 0.02], gap: 1.15, y: 0.37, exit: [[DOOR[0], FZ - 0.6], [DOOR[0], FZ - 1.6]], carry: false, faceCounter: Math.PI });
   folk.dress(5, 'fingers');
   folk.dress(6, 'pickles');
   folk.look(7, { top: '#5E8F8C', bot: '#4a3a32', skin: 3, hair: 0, style: 1 }).body(7, 1.18, 1.0, 1.0);
   folk.dress(8, 'mabel');
   folk.dress(9, 'lulu').body(9, 1.24, 0.95, 0.92).look(9, { hatScale: 0.8 });
-  folk.look(11, { top: '#c4473a', bot: '#4a5878', skin: 1, hair: 2, style: 3, stache: 'walrus', hat: 'stetson', hatScale: 1.0, hatColor: 'tan', acc: ['vest'] }).body(11, 1.2, 0.95, 1.0);
+  folk.look(11, { top: '#c4473a', bot: '#4a5878', skin: 1, hair: 2, style: 3, stache: 'walrus', hat: 'stetson', hatScale: 0.8, hatColor: 'tan', acc: ['vest'] }).body(11, 1.2, 0.95, 1.0);
   folk.look(10, { top: '#D9A441', bot: '#4a5878', skin: 3, hair: 1, style: 2, stache: 'walrus', hat: 'stetson', hatScale: 0.9, hatColor: 'brown' }).body(10, 1.2, 0.95, 1.05);
 
   let playK = 0, frenzy = 0, nextNote = 0;
@@ -107,17 +109,18 @@ export default function buildPlot(kit, { line, palette, rng }) {
   const out = finishPlot(P, C, {
     w: 16, cardW: 13, d: 9, h: FH + 2,
     acquired: true,
-    camera: cardCam([-1.4, 2, 2.5], 24, 20, 27, 38, 7),
+    camera: cardCam([-0.3, 3.0, 2.8], 22, 11, 22, 40),
+    fg: [{ kind: 'saguaro', sx: -1.0, dist: 8.5, up: 2.6 }, { kind: 'post', sx: 1.0, dist: 7, up: 3.4 }],
     pileAnchor: PILE, pileR: 1.4,
-    lamps: [[BX - 1.0, 2.6, FZ + 0.45], [BX + 2.2, 2.6, FZ + 0.45]],
+    lamps: [[DOOR[0] - 2.0, 2.6, FZ + 0.45], [DOOR[0] + 2.0, 2.6, FZ + 0.45], [DOOR[0], 1.8, FZ - 0.2]],
     exit: [[DOOR[0] + 1, 3.6], [6, 4.0], [8.5, 4.4]],
     focus: [BX, 1],
     tapTargets: [{ id: 'piano', pos: [PIANO[0] + PF[0] * 0.3, PIANO[1] + 0.85, PIANO[2] + PF[1] * 0.3], r: 1.2, box: { min: [PIANO[0] - 1.0, PIANO[1], PIANO[2] - 0.9], max: [PIANO[0] + 1.3, PIANO[1] + 1.75, PIANO[2] + 1.0] } }],
     anchors: {
-      doors: [DOOR[0], 0.35, FZ + 0.25], doorsOut: [DOOR[0], 0.0, FZ + 2.9], porch: [DOOR[0], 0.35, FZ + 1.4],
+      doors: [DOOR[0], 0.35, FZ + 0.25], doorsOut: [DOOR[0], 0.0, PZ1 + 0.6], porch: [DOOR[0], 0.35, FZ + 1.4],
       piano: [PIANO[0], PIANO[1], PIANO[2]], pianist: [PIANO[0] + PF[0], PIANO[1], PIANO[2] + PF[1]],
       wagon: [WAGON[0], 1.0, WAGON[1]], haycart: [HAYCART[0], 1.15, HAYCART[1]], hayCart: [HAYCART[0], 1.15, HAYCART[1]], center: [BX, 0.35, FZ + 1.4],
-      trough: [-5.2, 0.85, 4.4], balcony: [BX - 1.5, H1 + 0.45, FZ + 1.6], upstairs: [BX + 2.5, H1 + 1.6, FZ + 0.1],
+      trough: [-5.2, 0.85, 4.4], balcony: [BX - 1.5, H1 + 0.45, FZ + 1.2], upstairs: [BX + 2.5, H1 + 1.6, FZ + 0.1],
       street: [DOOR[0], 0, 8.5],
     },
     update(dt, stats, time, tier, ctx) {
@@ -141,36 +144,36 @@ export default function buildPlot(kit, { line, palette, rng }) {
       notes.step(dt);
       void frenzy;
       // the drunk slumped against the barrels, the loafer on the post, the tiny-bowlered barkeep in the window
-      folk.set(6, BX + 3.0, 0.37, FZ + 1.25, -0.4, 5, 0, 0.6);
-      folk.set(7, BX + 5.6, 0.37, FZ + 2.35, -0.6, 0, 1.2, 1.0);
+      folk.set(6, DOOR[0] + 1.35, 0.37, PZ1 - 0.3, -0.3, 5, 0, 0.6);
+      folk.hide(3); folk.hide(4); folk.hide(7);
       const card = out.inCard();
       ej = card ? ej + dt : 0;
       const u = ej % EJ;
-      folk.set(8, DOOR[0] + 1.35, 0.37, FZ + 0.45, card && u < 0.6 ? -1.2 : -0.2, card && u < 0.6 ? P.CLIP.punch : card && u > 1.3 && u < 2.6 ? P.CLIP.tiphat : (time % 11) < 2 ? P.CLIP.point : 0, 2.0, 1.0);
+      folk.set(8, DOOR[0] - 1.25, 0.37, FZ + 0.6, card && u < 0.6 ? 1.2 : 0.25, card && u < 0.6 ? P.CLIP.punch : card && u > 1.3 && u < 2.6 ? P.CLIP.tiphat : (time % 11) < 2 ? P.CLIP.point : 0, 2.0, 1.0);
       if (!card || ej < 0.2) { folk.hide(11); landed = false; }
       else eject(u);
       puff.visible = true;
       puff.step(dt, (k) => Math.min(1, k * 5) * (1 - k * 0.7));
       // upstairs on the balcony: Lulu waves at the street, a cowboy leans on the rail sipping
-      folk.set(9, BX - 2.6, BALC_Y, 1.45, 0.15, (time % 7) < 3 ? 4 : 0, 0, 1.2);
-      folk.set(10, BX + 3.8, BALC_Y, 1.5, -0.25, 6, 1.1, 1.0);
+      folk.set(9, BX - 2.6, BALC_Y, FZ + 1.0, 0.15, (time % 7) < 3 ? 4 : 0, 0, 1.2);
+      folk.set(10, BX + 3.8, BALC_Y, FZ + 1.05, -0.25, 6, 1.1, 1.0);
     },
   });
   function eject(u) {
     const C = P.CLIP;
     if (u < 0.3) { folk.hide(11); landed = false; return; }
     if (u < 0.4) { doorKick = 0.6; doorSwing = 1; }
-    if (u < 1.2) {
-      const f = (u - 0.3) / 0.9, x = DOOR[0] + (LAND[0] - DOOR[0]) * f, z = FZ + 0.2 + (LAND[2] - FZ - 0.2) * f;
-      folk.place(11, { x, y: 0.4 * (1 - f) + 2.3 * Math.sin(Math.PI * f), z, heading: 0.2, pitch: -f * 5.2, roll: Math.sin(f * 9) * 0.25, clip: C.flail, speed: 2.2 });
+    if (u < 1.4) {
+      const f = (u - 0.3) / 1.1, x = DOOR[0] + (LAND[0] - DOOR[0]) * f, z = FZ + 0.2 + (LAND[2] - FZ - 0.2) * f;
+      folk.place(11, { x, y: 0.4 * (1 - f) + 1.5 * Math.sin(Math.PI * f), z, heading: 0.2, pitch: -f * 5.6, roll: Math.sin(f * 9) * 0.25, clip: C.flail, speed: 2.2 });
       return;
     }
     if (!landed) {
       landed = true;
-      for (let i = 0; i < 12; i++) { const a = i * 0.52 + Math.sin(i * 7) * 0.3, v = 0.9 + (i % 3) * 0.45; puff.emit(LAND[0] + Math.cos(a) * 0.45, 0.25, LAND[2] + Math.sin(a) * 0.35, Math.cos(a) * v, 0.5 + (i % 4) * 0.25, Math.sin(a) * v * 0.7, 1.2 + (i % 3) * 0.3, 0.42 + (i % 4) * 0.08, 0.4); }
+      for (let i = 0; i < 18; i++) { const a = i * 0.35 + Math.sin(i * 7) * 0.3, v = 1.1 + (i % 3) * 0.5; puff.emit(LAND[0] + Math.cos(a) * 0.6, 0.15, LAND[2] + Math.sin(a) * 0.45, Math.cos(a) * v, 0.35 + (i % 4) * 0.2, Math.sin(a) * v * 0.6, 1.0 + (i % 3) * 0.3, 0.13 + (i % 4) * 0.045, 0.5); }
       doorSwing = 1;
     }
-    if (u < 3.6) { const k = Math.min(1, (u - 1.2) / 0.25), slide = 0.5 * Math.min(1, (u - 1.2) / 0.4); folk.place(11, { x: LAND[0], y: 0.08 * Math.abs(Math.sin(k * Math.PI)), z: LAND[2] + slide, heading: 0.2, pitch: -Math.PI / 2, clip: C.sprawl }); return; }
+    if (u < 3.6) { const k = Math.min(1, (u - 1.4) / 0.25), slide = 0.6 * Math.min(1, (u - 1.4) / 0.4); folk.place(11, { x: LAND[0], y: 0.08 * Math.abs(Math.sin(k * Math.PI)), z: LAND[2] + slide, heading: 0.2, pitch: -Math.PI / 2, clip: C.sprawl }); return; }
     if (u < 4.6) { folk.set(11, LAND[0], 0, LAND[2] + 0.5, 0.3, C.dizzy, 0, 1.4); return; }
     const w = Math.min(1, (u - 4.6) / 3.2);
     if (w >= 1) { folk.hide(11); return; }
@@ -183,37 +186,53 @@ export default function buildPlot(kit, { line, palette, rng }) {
   function saloon(B, own) {
     const boardC = own ? 'cream' : 'pom', trimC = own ? 'brass' : 'pomGold';
     falseFront(B, { x: BX, fz: FZ, w: W, d: D, h: H2, fh: FH, front: 'barn', wall: tone(COLORS.barn, 0.85), parapet: 'stepped', door: false, windows: [], trim: 'cream' });
-    // ground-floor: big windows, the door opening, lanterns
-    B.slab('interior', DOOR[0], 0.35, FZ + 0.12, 1.5, 2.5, 0.05, { round: 0.01, taper: 0, noAo: true });
-    B.slab('cream', DOOR[0], 2.85, FZ + 0.18, 1.9, 0.16, 0.16, { round: 0.03, taper: 0 });
-    for (const s of [-1, 1]) B.slab('cream', DOOR[0] + s * 0.86, 0.35, FZ + 0.18, 0.14, 2.5, 0.14, { round: 0.03, taper: 0 });
-    for (const dx of [-3.2, 3.2]) win(B, DOOR[0] + dx - (dx < 0 ? 0.3 : 0), 1.0, FZ + 0.16, { w: 2.0, h: 1.5, trim: 'cream', sil: 2 });
+    // ground floor: a wide open doorway glowing with the bar inside (bat-wings in the middle), big windows each side
+    if (own) interior(B, DOOR[0], 0.35, FZ + 0.12);
+    else B.slab('interior', DOOR[0], 0.35, FZ + 0.12, OPEN_W, OPEN_H, 0.05, { round: 0.01, taper: 0, noAo: true });
+    B.slab('cream', DOOR[0], 0.35 + OPEN_H, FZ + 0.2, OPEN_W + 0.5, 0.2, 0.2, { round: 0.03, taper: 0 });
+    for (const sd of [-1, 1]) B.slab('cream', DOOR[0] + sd * (OPEN_W / 2 + 0.1), 0.35, FZ + 0.2, 0.2, OPEN_H, 0.2, { round: 0.03, taper: 0 });
+    win(B, DOOR[0] - 3.35, 1.0, FZ + 0.16, { w: 2.0, h: 1.5, trim: 'cream', sil: 2 });
+    win(B, DOOR[0] + 3.15, 1.0, FZ + 0.16, { w: 1.6, h: 1.5, trim: 'cream', sil: 1 });
     // upstairs: three windows with shutters, one with a lady's curtain
     for (let i = 0; i < 3; i++) win(B, BX - 3.4 + i * 3.4, H1 + 0.95, FZ + 0.16, { w: 1.1, h: 1.35, trim: 'cream', shutters: i === 1 ? 'teal' : 'mustard' });
     // the big sign + blade sign
     signBoard(B, BX + 0.6, H1 + 1.45 + 1.0, FZ + 0.18, 5.6, 1.25, { board: boardC, trim: trimC });
     bottle(B, BX + 0.6, H1 + 4.25, FZ + 0.3, own);
-    if (own) blade(B, BX + W / 2 - 0.5, 2.0, FZ + 1.9, { board: 'ownTeal' });
+    if (own) blade(B, BX + W / 2 - 0.5, 2.0, PZ1 - 0.1, { board: 'ownTeal' });
     else B.slab('pomGold', BX - 3.2, H1 + 2.3, FZ + 0.32, 0.6, 0.6, 0.06, { round: 0.25, taper: 0 });
-    // porch + balcony (spindle rail) on the porch roof
-    porch(B, BX - W / 2 - 0.2, BX + W / 2 + 0.2, FZ, 3.0, { h: 0.35, awnY: H1, awn: 'plank2', posts: 5, stepX: DOOR[0], stepW: 2.4 });
+    // deep porch on stout posts, a shallow spindle balcony over its back half
+    porch(B, BX - W / 2 - 0.2, BX + W / 2 + 0.2, FZ, PZ1, { h: 0.35, awnY: H1, awn: 'plank2', posts: 5, stepX: DOOR[0], stepW: 3.0 });
+    for (let i = 0; i < 5; i++) { const px = BX - W / 2 + i * ((W - 0.0) / 4); B.cyl('raw2', px, 0.3, PZ1 - 0.2, 0.15, 0.25, 0, { sides: 6, taper: 1.15 }); }
     const by = H1 + 0.22;
-    B.slab('plank', BX, by, (FZ + 3.0) / 2 + 0.05, W + 0.5, 0.12, 3.0 - FZ + 0.4, { round: 0.03, taper: 0 });
+    B.slab('plank', BX, by, (FZ + BALZ) / 2, W + 0.5, 0.12, BALZ - FZ + 0.3, { round: 0.03, taper: 0 });
+    B.slab('raw2', BX, by - 0.18, BALZ + 0.1, W + 0.5, 0.2, 0.2, { round: 0.03, taper: 0 });
     const n = 30;
-    for (let i = 0; i <= n; i++) B.cyl('cream', BX - W / 2 + i * (W / n), by + 0.1, 3.15, 0.045, 0.62, 0, { sides: 5, taper: 0.8 });
-    B.slab('raw', BX, by + 0.7, 3.15, W + 0.3, 0.1, 0.16, { round: 0.03, taper: 0 });
-    for (const k of [-1, 1]) for (let i = 0; i <= 5; i++) B.cyl('cream', BX + k * (W / 2 + 0.1), by + 0.1, FZ + 0.2 + i * 0.42, 0.045, 0.62, 0, { sides: 5, taper: 0.8 });
-    for (const k of [-1, 1]) B.slab('raw', BX + k * (W / 2 + 0.1), by + 0.7, (FZ + 3.15) / 2, 0.14, 0.1, 3.15 - FZ, { round: 0.03, taper: 0 });
-    lantern(B, DOOR[0] - 1.25, 2.4, FZ + 0.42, { glow: own ? 'lantern' : 'lanternN' });
-    lantern(B, DOOR[0] + 1.25, 2.4, FZ + 0.42, { glow: own ? 'lantern' : 'lanternN' });
+    for (let i = 0; i <= n; i++) B.cyl('cream', BX - W / 2 + i * (W / n), by + 0.1, BALZ + 0.1, 0.045, 0.62, 0, { sides: 5, taper: 0.8 });
+    B.slab('raw', BX, by + 0.7, BALZ + 0.1, W + 0.3, 0.1, 0.16, { round: 0.03, taper: 0 });
+    for (const k of [-1, 1]) for (let i = 0; i <= 3; i++) B.cyl('cream', BX + k * (W / 2 + 0.1), by + 0.1, FZ + 0.2 + i * ((BALZ - FZ - 0.1) / 3), 0.045, 0.62, 0, { sides: 5, taper: 0.8 });
+    for (const k of [-1, 1]) B.slab('raw', BX + k * (W / 2 + 0.1), by + 0.7, (FZ + BALZ) / 2 + 0.05, 0.14, 0.1, BALZ - FZ, { round: 0.03, taper: 0 });
+    const glow = own ? 'lantern' : 'lanternN';
+    lantern(B, DOOR[0] - 2.0, 2.35, FZ + 0.42, { glow });
+    lantern(B, DOOR[0] + 2.0, 2.35, FZ + 0.42, { glow });
+    // lanterns hung on the porch posts, facing the street
+    for (const i of [0, 2, 4]) lantern(B, BX - W / 2 + i * (W / 4) + (i === 0 ? 0.2 : i === 4 ? -0.2 : 0.6), 2.3, PZ1 + 0.12, { glow });
+    // the barrel + crate pyramid right of the doors (ref: the porch's big warm prop mass)
+    const PX = DOOR[0] + 2.45, PZ = PZ1 - 0.62;
+    for (let i = 0; i < 3; i++) barrel(B, PX + i * 0.8, 0.35, PZ, 0.95, i === 1 ? 'plank2' : 'plank');
+    for (let i = 0; i < 2; i++) barrel(B, PX + 0.4 + i * 0.8, 0.35 + 0.93, PZ + 0.02, 0.92, i ? 'plank' : 'plank2');
+    barrel(B, PX + 0.8, 0.35 + 1.83, PZ + 0.04, 0.88);
+    crate(B, PX + 2.35, 0.35, PZ + 0.5, 1.0, 0.2);
+    crate(B, PX + 2.3, 0.35 + 0.62, PZ + 0.45, 0.85, -0.15, 'raw2');
+    crate(B, PX - 0.75, 0.35, PZ + 0.05, 0.75, 0.5);
+    for (const [dx, dz, c] of [[2.15, 0.35, '#7a3a1e'], [2.45, 0.55, '#4f6b3a'], [0.8, 0.0, '#7a3a1e']]) { const y = dx > 2 ? 0.35 + 1.15 : 0.35 + 2.68; B.cyl(c, PX + dx, y, PZ + dz, 0.08, 0.36, 0, { sides: 6, taper: 0.75 }); B.cyl('#e9dcc0', PX + dx, y + 0.36, PZ + dz, 0.035, 0.1, 0, { sides: 4, taper: 1 }); }
+    B.contact(PX + 1.0, PZ + 0.3, 3.8, 1.6);
     // the piano, barrels, a bench
     piano(B, PIANO[0], PIANO[1], PIANO[2]);
-    for (const [dx, dz, s] of [[0, 0, 1], [0.85, 0.1, 1], [0.42, 0.05, 0.9]]) barrel(B, BX + 3.0 + dx * 1.0 - 0.4, 0.35 + (s < 1 ? 0.95 : 0), FZ + 0.45 + dz, s);
     lantern(B, PIANO[0] - 0.3, 2.45, FZ + 1.75, { glow: own ? 'lantern' : 'lanternN' });
     // porch clutter: spittoon, posters, bottles on the barrels, a broom, a sleeping hound under the piano bench
-    B.cyl('brass', DOOR[0] - 1.1, 0.35, FZ + 0.6, 0.2, 0.28, 0, { sides: 9, taper: 0.7 });
-    B.cyl('brass', DOOR[0] - 1.1, 0.6, FZ + 0.6, 0.16, 0.06, 0, { sides: 9, taper: 1.4 });
-    for (const [px, py, rz] of [[DOOR[0] - 1.55, 1.45, 0.06], [DOOR[0] + 1.6, 1.6, -0.08]]) { B.slab('#f1e4c4', px, py, FZ + 0.2, 0.55, 0.72, 0.02, { round: 0.01, taper: 0, rz, noAo: true }); B.slab('ink', px, py + 0.45, FZ + 0.22, 0.4, 0.1, 0.01, { round: 0, taper: 0, rz, noAo: true }); B.ball('#b98a6a', px, py + 0.25, FZ + 0.22, 0.13, { sz: 0.1, detail: 0, noAo: true }); }
+    B.cyl('brass', DOOR[0] - 2.1, 0.35, FZ + 0.7, 0.2, 0.28, 0, { sides: 9, taper: 0.7 });
+    B.cyl('brass', DOOR[0] - 2.1, 0.6, FZ + 0.7, 0.16, 0.06, 0, { sides: 9, taper: 1.4 });
+    for (const [px, py, rz] of [[DOOR[0] - 4.85, 1.5, 0.06]]) { B.slab('#f1e4c4', px, py, FZ + 0.2, 0.55, 0.72, 0.02, { round: 0.01, taper: 0, rz, noAo: true }); B.slab('ink', px, py + 0.45, FZ + 0.22, 0.4, 0.1, 0.01, { round: 0, taper: 0, rz, noAo: true }); B.ball('#b98a6a', px, py + 0.25, FZ + 0.22, 0.13, { sz: 0.1, detail: 0, noAo: true }); }
     B.cyl('raw', BX - 5.2, 0.35, FZ + 0.35, 0.03, 1.4, 0, { sides: 4, taper: 1, rz: 0.18 });
     B.cone('hay2', BX - 5.32, 0.35, FZ + 0.35, 0.2, 0.42, 0, { sides: 6, rz: 0.18 });
     hound(B, PIANO[0] + 0.5, 0.37, FZ + 2.15);
@@ -222,9 +241,8 @@ export default function buildPlot(kit, { line, palette, rng }) {
     B.ball('hay', HAYCART[0], 1.0, HAYCART[1], 0.95, { sx: 1.25, sy: 0.55, sz: 0.65, detail: 1, smooth: true });
     bale(B, HAYCART[0] - 0.5, 0.78, HAYCART[1] + 0.1, 0.1, 0.8);
     bale(B, HAYCART[0] + 1.6, 0, HAYCART[1] + 0.9, 0.5, 0.9);
-    crate(B, BX + 5.2, 0.0, 3.3, 0.9, 0.4);
-    if (!own) for (const dx of [-1, 1]) B.slab('plank3', DOOR[0] + dx * 0.36, 0.4, FZ + 0.2, 0.7, 2.3, 0.06, { round: 0.02, taper: 0, rz: dx * 0.04 });
-    if (!own) for (const s of [-1, 1]) B.slab('plank2', DOOR[0], 1.3 + s * 0.45, FZ + 0.3, 1.9, 0.18, 0.06, { round: 0.02, taper: 0, rz: s * 0.35 });
+    if (!own) for (const dx of [-1, 1]) B.slab('plank3', DOOR[0] + dx * 0.8, 0.4, FZ + 0.2, 1.6, 2.6, 0.06, { round: 0.02, taper: 0, rz: dx * 0.04 });
+    if (!own) for (const s of [-1, 1]) B.slab('plank2', DOOR[0], 1.3 + s * 0.45, FZ + 0.3, OPEN_W + 0.2, 0.18, 0.06, { round: 0.02, taper: 0, rz: s * 0.35 });
   }
 
   // upright piano, keys facing local +z turned by PRY (toward the door, so Fingers plays in profile to the card camera)
@@ -245,6 +263,32 @@ export default function buildPlot(kit, { line, palette, rng }) {
     C('#e9dcc0', 0.25, 1.53, 0.05, 0.12, 0.12, { sides: 7, taper: 0.8 });
     C('#7a4a2e', 0, 0, 1.0, 0.25, 0.5, { sides: 9, taper: 1 });
     B.contact(x + sn * 0.3, z + c * 0.3, 2.0, 1.6, { ry: PRY });
+  }
+
+  // The bar seen through the open doorway, painted in shallow layers (zero draws: part of the static mesh): a warm back
+  // wall, a mirror and shelves of bottles, two hanging lamps, the bar counter and drinkers silhouetted against it.
+  function interior(B, x, y, z) {
+    const w = OPEN_W, h = OPEN_H;
+    B.slab('inDeep', x, y, z - 0.04, w, h, 0.04, { round: 0, taper: 0, noAo: true });
+    B.slab('inGlow', x, y + 1.0, z - 0.02, w - 0.3, 1.45, 0.03, { round: 0.02, taper: 0, noAo: true });
+    B.slab('mirror', x + 0.35, y + 1.5, z - 0.005, 1.3, 0.7, 0.02, { round: 0.05, taper: 0, noAo: true });
+    B.slab('inBar', x + 0.35, y + 1.47, z, 1.45, 0.06, 0.03, { round: 0.01, taper: 0, noAo: true });
+    for (const sy of [1.25, 2.25]) {
+      B.slab('inBar', x, y + sy, z, w - 0.4, 0.06, 0.06, { round: 0.01, taper: 0, noAo: true });
+      for (let i = 0; i < 11; i++) { const bx = x - w / 2 + 0.35 + i * ((w - 0.7) / 10); if (sy < 2 && Math.abs(bx - x - 0.35) < 0.7) continue; B.cyl(['#6b2a18', '#3f5a2a', '#8a4a1e', '#2e2a3a'][(i * 3 + (sy > 2 ? 1 : 0)) % 4], bx, y + sy + 0.06, z + 0.01, 0.06, 0.2 + (i % 3) * 0.05, 0, { sides: 5, taper: 0.7, noAo: true }); }
+    }
+    for (const lx of [-0.9, 1.0]) { B.cyl('inBar', x + lx, y + h - 0.35, z + 0.02, 0.012, 0.35, 0, { sides: 3, taper: 1, noAo: true }); B.ball('inLamp', x + lx, y + h - 0.42, z + 0.03, 0.13, { sz: 0.6, detail: 1, noAo: true }); }
+    B.slab('inBar', x, y, z + 0.01, w - 0.1, 0.95, 0.04, { round: 0.02, taper: 0, noAo: true });
+    B.slab('#b5683a', x, y + 0.92, z + 0.03, w - 0.05, 0.08, 0.05, { round: 0.02, taper: 0, noAo: true });
+    // drinkers at the bar, hats on, one with a raised glass
+    for (const [dx, s, hat] of [[-1.15, 1.0, 1], [-0.45, 0.9, 0], [0.95, 1.05, 1]]) {
+      const px = x + dx, base = y + 0.25;
+      B.slab('inSil', px, base, z + 0.05, 0.5 * s, 0.8 * s, 0.01, { round: 0.14 * s, taper: 0.2, noAo: true });
+      B.ball('inSil', px, base + 0.98 * s, z + 0.05, 0.2 * s, { sz: 0.08, detail: 1, noAo: true });
+      if (hat) { B.slab('inSil', px, base + 1.12 * s, z + 0.05, 0.62 * s, 0.05, 0.01, { round: 0.01, taper: 0, noAo: true }); B.slab('inSil', px, base + 1.15 * s, z + 0.05, 0.3 * s, 0.2 * s, 0.01, { round: 0.05, taper: 0.1, noAo: true }); }
+    }
+    B.slab('inSil', x - 0.2, y + 0.95, z + 0.05, 0.08, 0.4, 0.01, { round: 0.03, taper: 0, rz: 0.5, noAo: true });
+    B.slab('inSil', x - 0.08, y + 1.3, z + 0.05, 0.1, 0.15, 0.01, { round: 0.02, taper: 0, noAo: true });
   }
 
   function hound(B, x, y, z) {

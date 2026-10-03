@@ -22,8 +22,9 @@ export default function buildPlot(kit, { palette, rng }) {
   b.cyl('woodDark', -9, 0, 2.8, 0.1, 2.6, 0, { sides: 5 });
   b.slab('sign', -9, 1.8, 2.85, 2.4, 0.9, 0.08, { round: 0.02, noAo: true });
   const lamp = kit.props.lamp(b, 0.5, 3.4, { h: 3 });
-  const crowd = P.crowd({ count: 4 });
-  P.walkers(crowd, { ids: [0, 1, 2, 3], paths: [[[-9, 3.3], [9, 3.3]], [[-2, 0.8], [1.5, 1.6]], [[2, 3.6], [8, 3.0]]], speed: 0.7 });
+  // R4: town-sized loafers (plots use 1.08) kept off the saloon's ejection lane in front of its doors
+  const crowd = P.crowd({ count: 4, scale: 1.08 });
+  P.walkers(crowd, { ids: [0, 1, 2, 3], paths: [[[-9, 3.6], [-3.6, 3.6]], [[3.4, 0.6], [8, 1.0]], [[3, 3.6], [8, 3.0]]], speed: 0.7 });
   const out = P.done({
     w: 18, d: 7, h: 5,
     lamps: [lamp],

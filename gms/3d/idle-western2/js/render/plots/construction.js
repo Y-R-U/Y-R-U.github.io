@@ -4,7 +4,7 @@
 // walls rise with t. No geometry is made after boot: timbers and planks are one InstancedMesh, the swinging front and
 // the sign are two prebuilt meshes, the crew is one crowd. Also plays the Lv25/Lv100 "extension" crew bustle.
 import * as THREE from 'three';
-import { tone, wheel, crate, particles, placed, headY, tilt, rand, smooth01, COLORS, CROWD_K } from './western.js?v=20261004d';
+import { tone, wheel, crate, particles, placed, headY, tilt, rand, smooth01, cardCam, fgProp, COLORS, CROWD_K } from './western.js?v=20261004d';
 
 const easeBack = (x) => { const t = Math.max(0, Math.min(1, x)); const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _c = new THREE.Color();
@@ -26,108 +26,111 @@ export function createConstruction(kit, P, site) {
   P.group.add(root);
   const rnd = rand(17 + Math.round(S.w * 13));
 
-  // ---- the yard (always on while building): dirt pad, stakes + string, theodolite, lumber pile, mule cart
+  // ---- the yard (always on while building), staged like refs/a_clay_build.jpg: lumber stack front-left, theodolite
+  // beside it, toolbox and nail kegs at the deck edge, a sawhorse front-right, the mule cart parked right of the frame
   const g = kit.builder(P.pal, { seed: 71 });
-  g.slab('dirtM', S.x, -0.02, zf - S.d / 2 + 0.4, S.w + 2.2, 0.05, S.d + 2.4, { round: 0.04, taper: 0, noAo: true });
-  for (let i = 0; i < 9; i++) g.slab(i % 2 ? 'rut' : 'dirtL', S.x + (rnd() - 0.5) * S.w, 0.0, zf - rnd() * S.d, 0.6 + rnd() * 1.2, 0.04, 0.4 + rnd() * 0.6, { round: 0.02, taper: 0, ry: rnd() * 3, noAo: true });
-  const corners = [[x0, zf], [x1, zf], [x1, zb], [x0, zb]];
-  for (const [cx, cz] of corners) { g.cyl('raw', cx, 0, cz, 0.05, 0.75, 0, { sides: 4, taper: 0.6 }); g.slab('#f2d16a', cx, 0.6, cz, 0.12, 0.08, 0.04, { round: 0.01, taper: 0 }); }
-  for (let i = 0; i < 4; i++) {
-    const [ax, az] = corners[i], [bx, bz] = corners[(i + 1) % 4], L = Math.hypot(bx - ax, bz - az);
-    g.slab('rope', (ax + bx) / 2, 0.55, (az + bz) / 2, L, 0.025, 0.025, { round: 0, taper: 0, ry: -Math.atan2(bz - az, bx - ax), noAo: true });
-  }
-  // theodolite on a tripod, pointed proudly at the wrong building
-  const tx = x0 - 1.0, tz = zf + 1.6;
-  for (let i = 0; i < 3; i++) { const a = i * 2.09 + 0.3; g.cyl('raw2', tx + Math.cos(a) * 0.25, 0, tz + Math.sin(a) * 0.25, 0.03, 1.25, 0, { sides: 4, taper: 1, rz: Math.cos(a) * 0.2, rx: -Math.sin(a) * 0.2 }); }
-  g.slab('brass', tx, 1.22, tz, 0.4, 0.2, 0.2, { round: 0.05, ry: 2.4 });
-  g.cyl('brass', tx - 0.18, 1.32, tz - 0.16, 0.06, 0.34, 0, { sides: 7, taper: 1, rx: Math.PI / 2, ry: 2.4 });
-  // lumber pile and the mule cart, turned to face the street so the yard stays compact beside the site
-  const [yx, yz] = yard;
-  const lg = placed(g, yx - 1.05, yz, Math.PI / 2 + 0.08);
-  for (let r = 0; r < 4; r++) for (let k = 0; k < 4 - (r >> 1); k++) lg.slab(tone(COLORS.raw, 0.92 + ((r + k) % 3) * 0.06), (k - 1.5) * 0.36 + (r % 2) * 0.1 - 0.0, 0.02 + r * 0.17, 0, 0.32, 0.16, 2.6, { round: 0.03, taper: 0, ry: Math.PI / 2 + (r % 2 ? 0.05 : -0.04) });
-  lg.contact(0, 0, 2.8, 1.5);
-  g.slab('raw2', yx - 0.1, 0, yz + 1.2, 0.5, 0.42, 0.5, { round: 0.04 });
-  g.cyl('iron', yx - 0.1, 0.42, yz + 1.2, 0.12, 0.08, 0, { sides: 7, taper: 1 });
-  crate(g, x1 + 0.7, 0, zf + 0.5, 0.9, 0.3);
-  g.slab('canvas', x0 - 0.2, 0.0, zf + 2.4, 1.1, 0.75, 0.6, { round: 0.04, ry: 0.2 });
-  g.slab('#f4f0e2', x0 - 0.2, 0.76, zf + 2.4, 0.9, 0.02, 0.62, { round: 0, taper: 0, ry: 0.4, noAo: true });
-  g.slab('#5f86b0', x0 - 0.2, 0.775, zf + 2.4, 0.7, 0.01, 0.45, { round: 0, taper: 0, ry: 0.4, noAo: true });
-  // site clutter: a sawhorse with a half-cut plank, nail kegs, a bucket and offcuts (the build card's foreground)
-  const sx0 = x0 + 0.6, sz0 = zf + 2.0;
-  for (const k of [-1, 1]) for (const j of [-1, 1]) g.slab('raw2', sx0 + k * 0.55, 0, sz0 + j * 0.18, 0.08, 0.7, 0.08, { round: 0.02, taper: 0, rz: k * 0.12, rx: j * 0.18 });
-  g.slab('raw', sx0, 0.66, sz0, 1.4, 0.1, 0.18, { round: 0.02, taper: 0 });
-  g.slab(tone(COLORS.raw, 1.05), sx0 + 0.3, 0.76, sz0, 1.9, 0.07, 0.26, { round: 0.02, taper: 0, rz: -0.05 });
-  for (const [dx, dz] of [[1.6, 0.5], [1.95, 0.25], [x1 - x0 - 0.8, 2.6]]) { g.cyl('plank', x0 + dx, 0, zf + 2.0 + dz, 0.2, 0.42, 0, { sides: 9, taper: 0.9 }); g.cyl('iron', x0 + dx, 0.4, zf + 2.0 + dz, 0.18, 0.05, 0, { sides: 9, taper: 1, noAo: true }); }
-  for (let i = 0; i < 5; i++) g.slab(tone(COLORS.raw, 0.9 + (i % 3) * 0.06), x0 + 0.4 + i * 0.5, 0.02, zf + 3.1 + (i % 2) * 0.3, 0.5 + (i % 3) * 0.2, 0.06, 0.16, { round: 0.02, taper: 0, ry: i * 1.3 });
+  g.slab('dirtM', S.x, -0.02, zf - S.d / 2 + 0.6, S.w + 2.6, 0.05, S.d + 3.0, { round: 0.04, taper: 0, noAo: true });
+  for (let i = 0; i < 9; i++) g.slab(i % 2 ? 'rut' : 'dirtL', S.x + (rnd() - 0.5) * S.w, 0.0, zf + 1.8 - rnd() * (S.d + 1.5), 0.6 + rnd() * 1.2, 0.04, 0.4 + rnd() * 0.6, { round: 0.02, taper: 0, ry: rnd() * 3, noAo: true });
+  const tx = S.x - 0.9, tz = zf + 2.5;
+  for (let i = 0; i < 3; i++) { const a = i * 2.09 + 0.3; g.cyl('raw2', tx + Math.cos(a) * 0.3, 0, tz + Math.sin(a) * 0.3, 0.06, 1.3, 0, { sides: 5, taper: 0.8, rz: Math.cos(a) * 0.22, rx: -Math.sin(a) * 0.22 }); }
+  g.slab('brass', tx, 1.22, tz, 0.5, 0.26, 0.26, { round: 0.06, ry: 2.4 });
+  g.cyl('brass', tx - 0.2, 1.35, tz - 0.18, 0.08, 0.42, 0, { sides: 7, taper: 1, rx: Math.PI / 2, ry: 2.4 });
+  const LUM = [x0 + 0.2, zf + 3.4];
+  for (let r = 0; r < 4; r++) for (let k = 0; k < 4 - (r >> 1); k++) g.slab(tone(COLORS.raw, 0.9 + ((r * 3 + k) % 4) * 0.05), LUM[0] + (k - 1.5 + (r >> 1) * 0.5) * 0.44 + (r % 2) * 0.06, 0.02 + r * 0.24, LUM[1], 0.42, 0.22, 2.6, { round: 0.04, taper: 0, ry: Math.PI / 2 + 0.25 + (r % 2 ? 0.04 : -0.03) });
+  for (const k of [-1, 1]) g.slab('raw2', LUM[0], 0, LUM[1] + k * 0.9, 1.9, 0.08, 0.2, { round: 0.02, taper: 0, ry: 0.25 });
+  g.contact(LUM[0], LUM[1], 2.4, 3.0, { ry: 0.25 });
+  // toolbox with a hammer and a saw, two nail kegs, offcuts
+  const TB = [S.x + 0.9, zf + 1.95];
+  g.slab('raw', TB[0], 0, TB[1], 0.9, 0.4, 0.45, { round: 0.05, ry: 0.3 });
+  g.slab('raw2', TB[0], 0.4, TB[1], 0.08, 0.32, 0.08, { round: 0.02, taper: 0, ry: 0.3, rz: 0 });
+  g.slab('raw2', TB[0], 0.68, TB[1], 0.8, 0.07, 0.07, { round: 0.02, taper: 0, ry: 0.3 });
+  g.slab('iron', TB[0] + 0.15, 0.4, TB[1] + 0.05, 0.5, 0.06, 0.2, { round: 0.02, taper: 0, ry: 1.2 });
+  g.cyl('raw', TB[0] - 0.25, 0.42, TB[1] + 0.1, 0.04, 0.45, 0, { sides: 5, taper: 1, rz: 1.2, ry: 0.3 });
+  for (const [dx, dz] of [[1.2, -0.25], [1.65, 0.05]]) { g.cyl('plank', TB[0] + dx, 0, TB[1] + dz, 0.24, 0.5, 0, { sides: 9, taper: 0.9 }); g.cyl('iron', TB[0] + dx, 0.47, TB[1] + dz, 0.22, 0.06, 0, { sides: 9, taper: 1, noAo: true }); }
+  for (let i = 0; i < 4; i++) g.slab(tone(COLORS.raw, 0.9 + (i % 3) * 0.06), x0 + 1.6 + i * 0.6, 0.02, zf + 3.6 + (i % 2) * 0.4, 0.55 + (i % 3) * 0.2, 0.1, 0.2, { round: 0.02, taper: 0, ry: i * 1.3 });
+  // sawhorse with a plank half sawn (B works here: the bonk victim)
+  const SAW = [S.x + S.w * 0.22, zf + 2.9];
+  for (const k of [-1, 1]) for (const j of [-1, 1]) g.slab('raw2', SAW[0] + k * 0.6, 0, SAW[1] + j * 0.2, 0.13, 0.8, 0.13, { round: 0.03, taper: 0, rz: k * 0.14, rx: j * 0.2 });
+  g.slab('raw', SAW[0], 0.74, SAW[1], 1.5, 0.16, 0.24, { round: 0.03, taper: 0 });
+  g.slab(tone(COLORS.raw, 1.06), SAW[0] + 0.3, 0.9, SAW[1], 2.0, 0.12, 0.38, { round: 0.03, taper: 0, rz: -0.04 });
+  g.contact(SAW[0], SAW[1], 1.8, 0.9);
   const yardMesh = g.finish();
   root.add(yardMesh);
-  // the mule cart (own mesh): parked front-left, facing up the street; it bolts clear when the false front swings down
+  // the mule cart (own mesh) parked right of the frame, its mule facing the street
   const cb = kit.builder(P.pal, { seed: 76 });
   cartAndMule(cb, -1.3, 0);
   const cartM = cb.finish();
   cartM.matrixAutoUpdate = true;
-  const CART = S.cart || [x0 + 3.4, zf + 3.9];
+  const CART = S.cart || [x1 + 1.05, zf - 1.7];
   cartM.position.set(CART[0], 0, CART[1]);
+  cartM.rotation.y = -Math.PI / 2;
   root.add(cartM);
 
-  // ---- timbers + planks: one InstancedMesh with per-instance stage, reveal time and colour
+  // ---- timbers + planks: one InstancedMesh with per-instance stage, reveal time and colour. Chunky (R4 critic: "a
+  // lattice of thin sticks"): posts 0.3, plates 0.28, braces 0.2. Stages read as deck → braced frame + ladder → walls.
   const items = [];
   const T = (stage, r, x, y, z, sx, sy, sz, rx = 0, ry = 0, rz = 0, col = COLORS.raw, grow = 'pop', until = 9) => items.push({ stage, r, x, y, z, sx, sy, sz, rx, ry, rz, col, grow, until });
-  const tb = 0.16;
-  // frame: posts up first, then plates, then studs, braces, rafters, scaffold + ladder
-  for (const [i, [cx, cz]] of corners.entries()) T(1, i * 0.05, cx, 0.2, cz, tb, S.h - 0.2, tb, 0, 0, 0, COLORS.raw, 'up');
-  const studs = Math.max(2, Math.round(S.w / 1.4));
-  for (let i = 1; i < studs; i++) T(1, 0.18 + i * 0.02, x0 + (i / studs) * S.w, 0.2, zf, tb * 0.8, S.fh - 0.25, tb * 0.8, 0, 0, 0, COLORS.raw, 'up');
-  const sstuds = Math.max(2, Math.round(S.d / 1.4));
-  for (const sx of [x0, x1]) for (let i = 1; i < sstuds; i++) T(1, 0.25 + i * 0.03, sx, 0.2, zf - (i / sstuds) * S.d, tb * 0.8, S.h - 0.25, tb * 0.8, 0, 0, 0, COLORS.raw, 'up');
-  for (const y of [S.h - 0.05, 1.3]) {
-    T(1, y > 2 ? 0.4 : 0.55, S.x, y, zf, S.w + 0.2, tb, tb);
-    T(1, y > 2 ? 0.42 : 0.57, S.x, y, zb, S.w + 0.2, tb, tb);
-    for (const sx of [x0, x1]) T(1, y > 2 ? 0.44 : 0.59, sx, y, (zf + zb) / 2, tb, tb, S.d + 0.2);
+  const tb = 0.3, pl = 0.28, DECK = 0.43, zd = zf + 1.5;
+  const wood = (k) => tone(COLORS.raw, 0.9 + (k % 4) * 0.05);
+  // stage 0 survey + deck: stakes and string first, then piers, sills, joists and deck boards laid front to back
+  const corners = [[x0, zf], [x1, zf], [x1, zb], [x0, zb]];
+  for (const [cx, cz] of corners) { T(0, 0, cx, 0, cz, 0.1, 0.8, 0.1, 0, 0, 0, COLORS.raw2, 'pop', 0); T(0, 0, cx, 0.66, cz + 0.06, 0.2, 0.12, 0.04, 0, 0, 0, '#f2d16a', 'pop', 0); }
+  for (let i = 0; i < 4; i++) {
+    const [ax, az] = corners[i], [bx, bz] = corners[(i + 1) % 4], L = Math.hypot(bx - ax, bz - az);
+    T(0, 0, (ax + bx) / 2, 0.58, (az + bz) / 2, L, 0.04, 0.04, 0, -Math.atan2(bz - az, bx - ax), 0, COLORS.rope, 'pop', 0);
   }
-  T(1, 0.48, S.x, S.fh - 0.25, zf, S.w + 0.1, tb, tb);
-  for (const sx of [x0, x1]) T(1, 0.64, sx, S.h / 2 - 0.35, (zf + zb) / 2, tb * 0.7, tb * 0.7, Math.hypot(S.d, S.h) * 0.8, Math.atan2(S.h - 0.6, S.d), 0, 0, COLORS.raw2);
-  const raft = Math.max(3, Math.round(S.w / 1.2));
-  for (let i = 0; i <= raft; i++) T(1, 0.7 + i * 0.02, x0 + (i / raft) * S.w, S.h, (zf + zb) / 2, tb * 0.7, tb * 0.7, S.d + 0.3, 0, 0, 0, COLORS.raw2);
-  // scaffold on the left with a plank deck and a ladder
-  const scx = x0 - 0.7;
-  for (const dz of [0.2, -1.6]) T(1, 0.8, scx, 0, zf + dz, 0.1, S.h + 0.3, 0.1, 0, 0, 0, COLORS.raw2, 'up');
-  for (const y of [1.6, S.h - 0.3]) T(1, 0.84, scx, y, zf - 0.7, 0.62, 0.08, 2.2, 0, 0, 0, tone(COLORS.plank, 1.05));
-  const lx = x0 - 1.25, lz = zf + 0.7, LH = S.h + 0.5, lean = 0.22;
-  for (const s of [-1, 1]) T(1, 0.9, lx + s * 0.22, 0, lz, 0.07, LH, 0.07, -lean, 0, 0, COLORS.raw);
-  for (let k = 1; k < 9; k++) { const y = (k / 9) * LH * Math.cos(lean); T(1, 0.9, lx, y, lz - Math.sin(lean) * (k / 9) * LH, 0.5, 0.05, 0.06, 0, 0, 0, COLORS.raw2); }
-  // R3 build card: the frame reads two-storey against the sky (back posts + plates up to the false-front height while
-  // framing) and a gin pole with a dangling plank stands beside it until the walls are done.
-  for (const [cx, cz] of corners.slice(2)) T(1, 0.6, cx, S.h, cz, tb, S.fh - S.h - 0.2, tb, 0, 0, 0, COLORS.raw, 'up', 1);
-  T(1, 0.66, S.x, S.fh - 0.25, zb, S.w + 0.2, tb, tb, 0, 0, 0, COLORS.raw, 'pop', 1);
-  for (const sx of [x0, x1]) T(1, 0.68, sx, S.fh - 0.25, (zf + zb) / 2, tb, tb, S.d + 0.2, 0, 0, 0, COLORS.raw, 'pop', 1);
-  const gx = x1 + 0.7, gz = zf - 0.8, GH = S.fh + 1.8;
-  T(1, 0.3, gx, 0, gz, 0.2, GH, 0.2, 0, 0, 0.04, COLORS.raw2, 'up', 2);
-  T(1, 0.5, gx - 0.9, GH - 0.25, gz, 2.2, 0.14, 0.14, 0, 0, -0.18, COLORS.raw2, 'pop', 2);
-  T(1, 0.52, gx - 1.85, GH - 1.5, gz, 0.035, 2.1, 0.035, 0, 0, 0, COLORS.rope, 'pop', 2);
-  T(1, 0.54, gx - 1.85, GH - 1.6, gz, 2.2, 0.12, 0.28, 0, 0.5, 0.1, tone(COLORS.raw, 1.05), 'pop', 2);
-  // walls: planks clad bottom-up (front has door + window gaps), then roof boards
-  const PH = 0.3, rows = Math.max(4, Math.floor((S.h - 0.25) / PH));
-  const doorW = 1.4, winW = 1.4;
+  const nx = Math.max(2, Math.round(S.w / 2.2));
+  for (let i = 0; i <= nx; i++) for (const pz of [zd - 0.2, zf, zb + 0.2]) T(0, 0.3 + i * 0.015, x0 + (i / nx) * S.w, 0, pz, 0.36, 0.12, 0.36, 0, 0, 0, '#9a8a78', 'up');
+  for (const pz of [zd - 0.2, zf, zb + 0.2]) T(0, 0.4, S.x, 0.12, pz, S.w + 0.3, 0.24, pl, 0, 0, 0, wood(1));
+  for (const sx of [x0, x1]) T(0, 0.42, sx, 0.12, (zd + zb) / 2, pl, 0.24, zd - zb + 0.1, 0, 0, 0, wood(2));
+  const nb = Math.round((zd - zb) / 0.46);
+  for (let i = 0; i < nb; i++) T(0, 0.5 + (i / nb) * 0.45, S.x, DECK - 0.08, zd - (i + 0.5) * ((zd - zb) / nb), S.w + 0.4, 0.08, (zd - zb) / nb - 0.04, 0, 0, 0, tone(COLORS.plank, 0.92 + ((i * 7) % 4) * 0.05));
+  // stage 1 frame: chunky posts, top plates, joists, X-braced sides and end bays, an upper-storey front, a leaning ladder
+  for (const [i, [cx, cz]] of corners.entries()) T(1, i * 0.04, cx, DECK, cz, tb, S.h - DECK, tb, 0, 0, 0, wood(i), 'up');
+  const dX = 0.9, fposts = [S.x - dX, S.x + dX];
+  if (S.w >= 8.5) fposts.push(x0 + S.w * 0.18, x1 - S.w * 0.18);
+  fposts.forEach((px, i) => T(1, 0.12 + i * 0.03, px, DECK, zf, tb * 0.9, S.h - DECK, tb * 0.9, 0, 0, 0, wood(i + 1), 'up'));
+  for (const sx of [x0, x1]) T(1, 0.2, sx, DECK, (zf + zb) / 2, tb * 0.9, S.h - DECK, tb * 0.9, 0, 0, 0, wood(3), 'up');
+  T(1, 0.36, S.x, S.h, zf, S.w + 0.3, pl, pl, 0, 0, 0, wood(0));
+  T(1, 0.38, S.x, S.h, zb, S.w + 0.3, pl, pl, 0, 0, 0, wood(2));
+  for (const sx of [x0, x1]) T(1, 0.4, sx, S.h, (zf + zb) / 2, pl, pl, S.d + 0.3, 0, 0, 0, wood(1));
+  T(1, 0.42, S.x, DECK + 2.45, zf, dX * 2, 0.22, 0.24, 0, 0, 0, wood(3));
+  const braceX = (r, ax, bx, z, k) => { const w = bx - ax, h = S.h - DECK - 0.3, L = Math.hypot(w, h) - 0.15, a = Math.atan2(h, w); for (const s of [-1, 1]) T(1, r, (ax + bx) / 2, DECK + 0.15 + h / 2, z, L, 0.2, 0.18, 0, 0, s * a, wood(k + (s > 0 ? 1 : 0)), 'pop'); };
+  braceX(0.5, x0 + 0.15, S.x - dX - 0.15, zf - 0.05, 0);
+  braceX(0.54, S.x + dX + 0.15, x1 - 0.15, zf - 0.05, 2);
+  for (const sx of [x0, x1]) { const h = S.h - DECK - 0.3, L = Math.hypot(S.d, h) - 0.2, a = Math.atan2(h, S.d); for (const s of [-1, 1]) T(1, 0.58, sx, DECK + 0.15 + h / 2, (zf + zb) / 2, 0.18, 0.2, L, s * a, 0, 0, wood(s > 0 ? 1 : 3)); }
+  const nj = Math.max(3, Math.round(S.w / 1.3));
+  for (let i = 0; i <= nj; i++) T(1, 0.64 + i * 0.015, x0 + (i / nj) * S.w, S.h + pl, (zf + zb) / 2, 0.2, 0.22, S.d + 0.3, 0, 0, 0, wood(i));
+  // upper storey of the front (it carries the false front later): posts and a head plate against the sky
+  const up = [x0, ...fposts.slice(0, 2), x1];
+  up.forEach((px, i) => T(1, 0.74 + i * 0.03, px, S.h + pl, zf, tb * 0.85, S.fh - S.h - pl - 0.3, tb * 0.85, 0, 0, 0, wood(i + 2), 'up'));
+  T(1, 0.86, S.x, S.fh - 0.32, zf, S.w + 0.3, pl, pl, 0, 0, 0, wood(1));
+  // the ladder: leans from the deck onto the top plate, left of the door
+  const lx = x0 + Math.min(1.3, S.w * 0.2), lz = zf + 1.15, LV = S.h + 0.5 - DECK, lean = Math.atan2(1.0, LV), LH = Math.hypot(1.0, LV);
+  for (const s of [-1, 1]) T(1, 0.3, lx + s * 0.3, DECK, lz, 0.13, LH, 0.13, -lean, 0, 0, wood(2), 'up', 2);
+  for (let k = 1; k < 9; k++) T(1, 0.32 + k * 0.01, lx, DECK + (k / 9) * LV, lz - (k / 9) * 1.0, 0.66, 0.08, 0.1, 0, 0, 0, wood(3), 'pop', 2);
+  // stage 2 walls: thick planks clad bottom-up (door + window gaps), then the roof deck
+  const PH = 0.34, rows = Math.max(4, Math.floor((S.h - DECK) / PH));
+  const doorW = 1.5, winW = 1.4;
   const gaps = (y) => {
-    const g2 = [[S.x - doorW / 2, S.x + doorW / 2, 2.4]];
-    for (const dx of [-S.w * 0.3, S.w * 0.3]) g2.push([S.x + dx - winW / 2, S.x + dx + winW / 2, 2.45, 1.0]);
+    const g2 = [[S.x - doorW / 2, S.x + doorW / 2, DECK + 2.3]];
+    for (const dx of [-S.w * 0.3, S.w * 0.3]) g2.push([S.x + dx - winW / 2, S.x + dx + winW / 2, DECK + 2.1, DECK + 0.9]);
     return g2.filter(([, , top, bot = 0]) => y < top && y >= bot);
   };
   for (let r = 0; r < rows; r++) {
-    const y = 0.25 + r * PH, rr = r / rows;
+    const y = DECK + r * PH, rr = r / rows;
     const segs = [];
-    let cur = x0 - 0.05;
+    let cur = x0 - 0.2;
     for (const [a, b] of gaps(y).sort((u, v) => u[0] - v[0])) { if (a > cur) segs.push([cur, a]); cur = b; }
-    if (cur < x1 + 0.05) segs.push([cur, x1 + 0.05]);
-    const col = tone(COLORS.plank, 0.95 + ((r * 7) % 3) * 0.05);
-    for (const [a, b] of segs) T(2, rr * 0.8, (a + b) / 2, y, zf + 0.08, b - a, PH * 0.92, 0.07, 0, 0, 0, col);
-    for (const sx of [x0 - 0.05, x1 + 0.05]) T(2, rr * 0.8 + 0.02, sx, y, (zf + zb) / 2, 0.07, PH * 0.92, S.d + 0.1, 0, 0, 0, col);
+    if (cur < x1 + 0.2) segs.push([cur, x1 + 0.2]);
+    const col = tone(COLORS.plank, 0.92 + ((r * 7) % 4) * 0.05);
+    for (const [a, b] of segs) T(2, rr * 0.8, (a + b) / 2, y, zf + 0.2, b - a, PH * 0.92, 0.1, 0, 0, 0, col);
+    for (const sx of [x0 - 0.2, x1 + 0.2]) T(2, rr * 0.8 + 0.02, sx, y, (zf + zb) / 2, 0.1, PH * 0.92, S.d + 0.3, 0, 0, 0, col);
   }
   const rb = Math.round(S.d / 0.5);
-  for (let i = 0; i < rb; i++) T(2, 0.82 + (i / rb) * 0.16, S.x, S.h + 0.1, zb + (i + 0.5) * (S.d / rb), S.w + 0.4, 0.07, S.d / rb - 0.03, 0, 0, 0, tone(COLORS.plank2, 0.95 + (i % 3) * 0.05));
+  for (let i = 0; i < rb; i++) T(2, 0.82 + (i / rb) * 0.16, S.x, S.h + pl + 0.2, zb + (i + 0.5) * (S.d / rb), S.w + 0.5, 0.08, S.d / rb - 0.03, 0, 0, 0, tone(COLORS.plank2, 0.95 + (i % 3) * 0.05));
   // two extra instances: a carried plank (bonk gag) and the hoist rope; driven by hand each frame
-  const CARRY = items.length; T(-1, 0, 0, 0, 0, 2.4, 0.12, 0.28, 0, 0, 0, tone(COLORS.raw, 1.05));
+  const CARRY = items.length; T(-1, 0, 0, 0, 0, 2.6, 0.18, 0.36, 0, 0, 0, tone(COLORS.raw, 1.05));
   const ROPES = items.length; for (let i = 0; i < 3; i++) T(-1, 0, 0, 0, 0, 0.03, 1, 0.03, 0, 0, 0, COLORS.rope);
   const PLAN = items.length; T(-1, 0, 0, 0, 0, 0.78, 0.56, 0.02, 0, 0, 0, '#f1ead2');
   const ub = kit.builder(P.pal);
@@ -158,16 +161,16 @@ export function createConstruction(kit, P, site) {
 
   // ---- the false front (raw, unpainted), hinged at its foot: lies flat toward the street, swings up on ropes
   const fb = kit.builder(P.pal, { seed: 72 });
-  const FH = S.fh - 0.25;
+  const FH = S.fh - DECK;
   for (let r = 0, n = Math.round(FH / 0.32); r < n; r++) fb.slab(tone(COLORS.raw, 0.93 + ((r * 5) % 3) * 0.05), 0, r * (FH / n), 0, S.w + 0.1, FH / n * 0.92, 0.1, { round: 0.03, taper: 0 });
   for (const s of [-1, 0, 1]) fb.slab('raw2', s * (S.w / 2 - 0.2), 0, -0.1, 0.16, FH, 0.1, { round: 0.02, taper: 0 });
   if ((S.parapet ?? 'stepped') === 'stepped') { fb.slab(tone(COLORS.raw, 1.02), 0, FH, 0, S.w * 0.62, 0.7, 0.1, { round: 0.03, taper: 0 }); fb.slab(tone(COLORS.raw, 0.96), 0, FH + 0.7, 0, S.w * 0.3, 0.55, 0.1, { round: 0.03, taper: 0 }); }
-  else if (S.parapet === 'arched' || S.parapet === 'gabled') fb.cyl(tone(COLORS.raw, 1.0), 0, FH - 0.2, -0.05, S.w * 0.36, 0.1, 0, { sides: 13, taper: 1, rx: Math.PI / 2, sz: S.w * 0.2 });
+  else if (S.parapet === 'arched' || S.parapet === 'gabled' || S.parapet === 'peak') for (let k = 0; k < 3; k++) fb.slab(tone(COLORS.raw, 0.94 + k * 0.04), 0, FH + k * 0.36, 0, S.w * (S.parapet === 'arched' ? [0.7, 0.55, 0.32] : [0.66, 0.42, 0.18])[k], 0.34, 0.1, { round: 0.04, taper: 0 });
   fb.slab('interior', 0, 0, 0.05, doorW, 2.3, 0.05, { round: 0.01, taper: 0, noAo: true });
   for (const dx of [-S.w * 0.3, S.w * 0.3]) fb.slab('interior', dx, 1.0, 0.05, winW, 1.35, 0.05, { round: 0.01, taper: 0, noAo: true });
   const front = fb.finish();
   front.matrixAutoUpdate = true;
-  front.position.set(S.x, 0.25, zf + 0.15);
+  front.position.set(S.x, DECK, zf + 0.32);
   root.add(front);
 
   // ---- the sign (blank cream board, brass edge): hoisted, hit level with a hat
@@ -261,8 +264,8 @@ export function createConstruction(kit, P, site) {
   }
 
   const api = {
-    root, site: S, crew, scaff, stakes,
-    anchors: { site: [S.x, S.h / 2, zf], yard: [yard[0], 0, yard[1]], sign: [S.x, signY, zf + 0.4] },
+    root, site: S, crew, scaff, stakes, kit,
+    anchors: { site: [S.x, S.h / 2, zf], yard: [CART[0], 0, CART[1]], sign: [S.x, signY, zf + 0.4] },
     // stats.building drives it; returns true while the site (or a bustle) owns the plot visuals.
     update(dt, stats, ctx) {
       const bld = stats?.building || null;
@@ -297,7 +300,7 @@ export function createConstruction(kit, P, site) {
         setStage(st, rebrand);
       }
       // per-frame growth inside the current stage
-      if (st === 1 || st === 2) {
+      if (st <= 2) {
         for (let i = 0; i < items.length; i++) {
           const it = items[i];
           if (it.stage !== st) continue;
@@ -312,7 +315,6 @@ export function createConstruction(kit, P, site) {
       } else root.scale.set(1, 1, 1);
       // the false front: flat on the street during stage 3, swings up with an overshoot, THUMP, dust
       front.visible = st >= 3;
-      cartM.position.x = CART[0] + (st === 3 ? smooth01(sp / 0.25) * (1 - smooth01((sp - 0.9) / 0.1)) * (S.w + 3) : 0);
       if (st === 3) {
         const u = smooth01(sp / 0.86);
         const swing = u < 1 ? (1 - u) * (Math.PI / 2) : 0;
@@ -333,7 +335,7 @@ export function createConstruction(kit, P, site) {
       // ropes
       rope(0); rope(1); rope(2);
       if (st === 3 && sp < 0.95) {
-        const ang = front.rotation.x, topY = 0.25 + Math.cos(ang) * FH, topZ = zf + 0.15 + Math.sin(ang) * FH;
+        const ang = front.rotation.x, topY = DECK + Math.cos(ang) * FH, topZ = zf + 0.32 + Math.sin(ang) * FH;
         for (const [i, sx] of [[0, -1], [1, 1]]) rope(i, S.x + sx * (S.w / 2 - 0.3), topY, topZ, S.x + sx * (S.w / 2 - 0.3), S.h + 1.1, zb + 0.6);
       }
       if (st === 4 && sp < 0.75) rope(2, S.x, sign.position.y, zf + 0.42, S.x, S.fh + 0.6, zf + 0.3);
@@ -351,43 +353,46 @@ export function createConstruction(kit, P, site) {
     for (const a of [A, B, C]) { a.y = 0; a.clip = 3; a.sp = 3.6 * fast; a.tilt = null; a.hide = false; }
     M.hide = true;
     let carry = false;
+    // R4 staging: every Mulligan has a job and a prop, spread across the frame. A hammers up high, B works the sawhorse
+    // (and catches the plank), C carries planks from the lumber stack, the foreman (M) reads the blueprint front-right.
+    const cyc = (per) => { const u = (time % per) / per; return u; };
     if (st === 0) {
-      const ci = Math.floor(sp * 4) % 4, [cx, cz] = corners[ci];
-      if (go(A, cx + 0.5, cz + 0.6, dt, 3)) { A.h = Math.atan2(-0.5, -0.6); A.clip = 3; } else A.clip = 1;
-      B.x = tx + 0.15; B.z = tz + 0.55; B.h = 2.4 + Math.PI; B.clip = 0;
-      const u = (time * 0.18) % 2, f = u < 1 ? u : 2 - u;
-      C.x = x0 + f * S.w; C.z = zf + 0.5; C.h = u < 1 ? Math.PI / 2 : -Math.PI / 2; C.clip = 1;
+      if (sp < 0.4) { const ci = Math.floor(sp * 10) % 4, [cx, cz] = corners[ci]; if (go(A, cx + 0.5, cz + 0.6, dt, 3)) { A.h = Math.atan2(-0.5, -0.6); A.clip = 3; } else A.clip = 1; }
+      else { A.x = x0 + S.w * 0.3; A.z = zf + 0.5; A.y = DECK; A.h = FACE; A.clip = 3; }
+      if (sp < 0.55) { B.x = tx + 0.2; B.z = tz + 0.6; B.h = 2.4 + Math.PI; B.clip = 0; }
+      else { B.x = SAW[0] - 1.0; B.z = SAW[1] + 0.25; B.h = Math.PI / 2 + 0.25; B.clip = 3; }
     } else if (st === 1 || st === 2 || st === 4) {
-      const ry = st === 2 ? 0.25 + sp * (S.h - 0.4) : S.h - 0.3;
-      A.x = scx; A.z = zf - 0.4; A.y = st === 4 ? 0 : Math.min(S.h - 0.3, ry - 0.3); A.h = Math.PI / 2;
-      if (st === 1) A.y = sp > 0.84 ? S.h - 0.25 : sp > 0.4 ? 1.65 : 0;
-      // a brother up on the front plate against the sky, hammering (R3 build card)
-      if ((st === 1 && sp > 0.45) || st === 2) { A.x = x0 + S.w * 0.3; A.z = zf; A.y = S.h + 0.08; A.h = FACE; }
-      if (st === 4) { A.x = S.x - SW / 2 + 0.2; A.z = zf - 0.35; A.y = S.h + 0.12; A.h = 0.3; A.clip = sp > 0.6 && sp < 0.78 ? 4 : 0; }
-      B.x = S.x + S.w * 0.18; B.z = zf + 0.55; B.h = Math.PI; B.clip = 3;
-      if (st === 4) { B.x = S.x + 0.3; B.z = zf + 1.3; B.h = Math.PI; B.clip = sp < 0.6 ? 2 : 0; }
-      // C carries planks from the yard and swings one into B now and then (stars)
-      if (st !== 4) {
-        bonkCd -= dt;
-        const per = 7, u = (time % per) / per, ya = [yard[0] - 1.05, yard[1] + 1.5], tb2 = [B.x + 1.5, B.z + 0.15];
-        const f = u < 0.45 ? u / 0.45 : u < 0.55 ? 1 : 1 - (u - 0.55) / 0.45;
-        C.x = ya[0] + (tb2[0] - ya[0]) * smooth01(f); C.z = ya[1] + (tb2[1] - ya[1]) * smooth01(f);
-        C.h = Math.atan2(tb2[0] - ya[0], tb2[1] - ya[1]) + (u > 0.5 ? Math.PI : 0);
-        carry = u < 0.5; C.clip = carry ? 2 : 1;
-        if (u > 0.43 && u < 0.5) { C.h += Math.sin((u - 0.43) / 0.07 * Math.PI) * 1.4; }
-        if (u > 0.46 && bonk <= 0 && bonkCd <= 0) { bonk = 2.6; bonkCd = 4 + rnd() * 3; }
-      } else {
-        C.x = S.x - 1.4; C.z = zf + 2.6; C.h = Math.PI * 0.95; C.clip = sp > 0.75 ? 4 : 0;
-      }
-    } else if (st === 3) {
-      A.x = S.x - S.w / 2 + 0.4; A.z = zb + 0.6; A.y = S.h + 0.1; A.h = Math.PI; A.clip = 2;
-      B.x = S.x + S.w / 2 - 0.4; B.z = zb + 0.6; B.y = S.h + 0.1; B.h = Math.PI; B.clip = 2;
+      // A: on the deck, then up the ladder and on the top plate hammering against the sky
+      if (st === 4) { A.x = S.x - SW / 2 + 0.2; A.z = zf - 0.35; A.y = S.h + pl + 0.2; A.h = 0.3; A.clip = sp > 0.6 && sp < 0.78 ? 4 : 0; }
+      else if (st === 1 && sp < 0.3) { A.x = x0 + S.w * 0.55; A.z = zf + 0.5; A.y = DECK; A.h = FACE; }
+      else if (st === 1 && sp < 0.4) { const k = (sp - 0.3) / 0.1; A.x = lx; A.z = lz - 0.3 - k * 0.9; A.y = DECK + k * (S.h + pl - DECK); A.h = Math.PI; A.clip = 1; }
+      else { A.x = x0 + S.w * 0.36; A.z = zf; A.y = S.h + pl + (st === 2 ? 0.2 : 0); A.h = FACE; }
+      // B at the sawhorse
+      B.x = SAW[0] - 1.0; B.z = SAW[1] + 0.25; B.h = Math.PI / 2 + 0.25; B.clip = 3;
+      if (st === 4) { B.x = S.x + 0.3; B.z = zf + 1.9; B.h = Math.PI; B.clip = sp < 0.6 ? 2 : 0; }
+      if (st !== 4) carrier();
+      else { C.x = S.x - 1.6; C.z = zf + 2.8; C.h = Math.PI * 0.95; C.clip = sp > 0.75 ? 4 : 0; }
+    }
+    if (st === 0) carrier();
+    function carrier() {
+      bonkCd -= dt;
+      const u = cyc(7), ya = [LUM[0] + 0.9, LUM[1] - 0.2], tb2 = [B.x - 0.6, B.z - 0.9];
+      const f = u < 0.45 ? u / 0.45 : u < 0.55 ? 1 : 1 - (u - 0.55) / 0.45;
+      C.x = ya[0] + (tb2[0] - ya[0]) * smooth01(f); C.z = ya[1] + (tb2[1] - ya[1]) * smooth01(f);
+      C.h = Math.atan2(tb2[0] - ya[0], tb2[1] - ya[1]) + (u > 0.5 ? Math.PI : 0);
+      carry = u < 0.5; C.clip = carry ? 2 : 1;
+      if (u > 0.43 && u < 0.5) C.h += Math.sin((u - 0.43) / 0.07 * Math.PI) * 1.4;
+      if (u > 0.46 && bonk <= 0 && bonkCd <= 0) { bonk = 2.6; bonkCd = 4 + rnd() * 3; }
+    }
+    if (st === 3) {
+      A.x = S.x - S.w / 2 + 0.4; A.z = zb + 0.6; A.y = S.h + pl + 0.2; A.h = Math.PI; A.clip = 2;
+      B.x = S.x + S.w / 2 - 0.4; B.z = zb + 0.6; B.y = S.h + pl + 0.2; B.h = Math.PI; B.clip = 2;
       // C reads the plan right where the front will land, and dives clear at the last second
       const dive = smooth01((sp - 0.7) / 0.12);
       C.x = S.x + 0.3 + dive * (S.w / 2 + 1.0); C.z = zf + 1.6 + dive * 0.8; C.h = Math.PI * 0.9 + dive * 1.2; C.clip = sp > 0.7 && sp < 0.85 ? 1 : 0;
       if (sp > 0.84) { C.clip = 5; if (!dove) { dove = true; bonk = 2.4; } }
     }
-    if (st < 4) { M.hide = false; M.x = Math.min(x1 + 1.3, S.x + S.w / 2 + 1.3); M.z = zf + 2.9; M.y = 0; M.h = FACE + 0.25; M.clip = 2; M.sp = 1; }
+    if (st < 4) { M.hide = false; M.x = x1 + 0.2; M.z = zf + 3.3; M.y = 0; M.h = FACE + 0.25; M.clip = 2; M.sp = 1; }
     if (st === 4 && sp > 0.8) { M.hide = false; const u = smooth01((sp - 0.8) / 0.12); M.x = S.x; M.z = zf + 0.4 + u * 2.0; M.h = 0; M.y = 0.3 * (1 - u); M.clip = u < 1 ? 1 : 4; M.sp = 4; }
     // bonked brother sits seeing stars (B normally; C after the near-flattening)
     const victim = st === 3 ? C : B;
@@ -405,7 +410,7 @@ export function createConstruction(kit, P, site) {
     // carried plank
     if (carry && st !== 4) {
       const ch = Math.cos(C.h), sh = Math.sin(C.h);
-      placeRaw(CARRY, C.x + sh * 0.35, C.y + 1.15, C.z + ch * 0.35, 2.4, 0.12, 0.28, 0, C.h + Math.PI / 2, 0);
+      placeRaw(CARRY, C.x + (sh * 0.12 + ch * 0.2) * C.k, C.y + 0.66 * C.k, C.z + (ch * 0.12 - sh * 0.2) * C.k, 2.6, 0.18, 0.36, 0, C.h + Math.PI / 2 + 0.15, 0.06);
     } else timbers.setMatrixAt(CARRY, _m.makeScale(0, 0, 0));
     pose(time, [A, B, C, M]);
   }
@@ -476,11 +481,18 @@ function cartAndMule(b, x, z) {
 // Wraps P.done: runs the construction kit first, keeps the lot hidden while the Mulligans build on it, adds a 'site' tap
 // target (hurry) only while building, and exposes anchors. spec.acquired = true keeps the lot (Pomfrey's version of the
 // building) on screen through an acquisition cutscene.
+export const BC = { dx: 0.1, y: 1.8, dz: 1.4, yaw: 22, elev: 18, k: 1.8, min: 17, fov: 42, sky: 8 };
 export function finishPlot(P, C, spec) {
   const before = new Set(P.group.children);
   const user = spec.update;
   const tapSite = { id: 'site', pos: C.anchors.site, r: Math.max(C.site.w, C.site.fh) * 0.55 };
-  let out = null, lotMeshes = [];
+  let out = null, lotMeshes = [], folkMeshes = [], cleared = false;
+  // R4: one build framing for every buildable plot, authored from the site: the braced frame fills the upper middle,
+  // the yard (lumber left, sawhorse + foreman right, mule cart behind right) and the spaced crew sit under it.
+  if (spec.camera?.build) {
+    const S = C.site, span = S.w + 4.2;
+    spec.camera.build = cardCam([S.x + BC.dx, BC.y, S.fz + BC.dz], BC.yaw, BC.elev, Math.max(BC.min, span * BC.k), BC.fov, BC.sky);
+  }
   out = P.done({
     ...spec,
     cardW: spec.camera?.facade ? 0.5 : spec.cardW,
@@ -489,6 +501,9 @@ export function finishPlot(P, C, spec) {
       const building = !!stats?.building;
       ctx.building = building;
       if (!ctx.owned) for (const m of lotMeshes) m.visible = !building || !!spec.acquired;
+      // passers-by and plot regulars stay off the building site so the crew reads (R4: "a huddle of identical characters")
+      const clear = building && !ctx.owned;
+      if (clear || cleared) { cleared = clear; for (const m of folkMeshes) m.visible = !clear; }
       const tt = out.tapTargets, has = tt.includes(tapSite);
       if (building && !has) tt.push(tapSite); else if (!building && has) tt.splice(tt.indexOf(tapSite), 1);
       user?.(dt, stats, time, tier, ctx);
@@ -497,10 +512,39 @@ export function finishPlot(P, C, spec) {
   // the unowned lot = its static mesh (first unnamed new mesh) + its painted sign text ('signs:<id>:lot')
   const fresh = P.group.children.filter((o) => !before.has(o) && o.isMesh);
   lotMeshes = [fresh.find((o) => !o.name), ...fresh.filter((o) => o.name.endsWith(':lot'))].filter(Boolean);
+  folkMeshes = P.group.children.filter((o) => o.isInstancedMesh && o !== C.crew.mesh && o.material === C.crew.mesh.material);
   out.anchors = { ...C.anchors, ...(spec.anchors || {}) };
   out.construction = C;
   throttle(out, P);
+  framers(P, C, spec);
   return out;
+}
+
+// R4: card-only foreground framing props (spec.fg for the open framing, a default saguaro + pole pair for the build
+// framing). Each is one mesh drawn only by this plot's own card camera in its own state: onBeforeRender runs before
+// three builds the model-view matrix, so other cameras (hero, neighbours' cards) get a zero-scale matrix. +1 draw, card only.
+const _z = new THREE.Matrix4().makeScale(0, 0, 0);
+const FG_BUILD = [{ kind: 'saguaro', sx: -0.92, dist: 8, up: 2.8 }, { kind: 'post', sx: 0.97, dist: 7, up: 1.4 }];
+function framers(P, C, spec) {
+  const cam = spec.camera;
+  if (!cam?.facade) return;
+  const mk = (c, list, build) => {
+    if (!c || !list?.length) return;
+    const b = C.kit.builder(P.pal, { seed: 77 });
+    for (const f of list) fgProp(b, c, f);
+    const m = b.finish({ cast: false });
+    m.name = 'fg';
+    m.frustumCulled = false;
+    P.group.add(m);
+    m.updateMatrixWorld(true);
+    m.onBeforeRender = (r, s, camera) => {
+      if (camera.userData?.iw2Line === P.id && C.root.visible === build) m.matrixWorld.multiplyMatrices(P.group.matrixWorld, m.matrix);
+      else m.matrixWorld.copy(_z);
+    };
+  };
+  const flip = [...P.id].reduce((h, c) => h + c.charCodeAt(0), 0) % 2 ? 1 : -1;
+  mk(cam, spec.fg ?? [{ kind: 'saguaro', sx: -1.0 * flip, dist: 9, up: 2.4 }, { kind: 'post', sx: 1.02 * flip, dist: 8, up: 2.2 }], false);
+  mk(cam.build, spec.fgBuild ?? FG_BUILD, true);
 }
 
 // PERF P#6: a plot runs every frame only while it is in focus: drawn by its own card camera, or drawn by a camera whose
