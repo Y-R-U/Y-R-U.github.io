@@ -17,10 +17,11 @@ export function buildTown(kit, data, field, pal) {
   const ST = data.STREET, FR = data.FRONTS || [], END = ST.end ?? ST.x1 - 18;
   const CELL = 56, X0 = ST.x0 - 160;
   const cells = new Map(), gcells = new Map();
-  const band = (z) => (z < ST.z ? 'n' : 's');
+  // three bands: north lots (n), the street and its edges (m), Pomfrey's side (s) — cards hide s when it would occlude.
+  const band = (z) => (z < ST.north ? 'n' : z < ST.south + 0.2 ? 'm' : 's');
   const cellKey = (x, z) => Math.floor((x - X0) / CELL) + ':' + band(z);
   const B = (x, z = 0) => { const k = cellKey(x, z); if (!cells.has(k)) cells.set(k, kit.builder(pal, { seed: 100 + cells.size * 31 })); return cells.get(k); };
-  const G = () => { if (!gcells.has(0)) gcells.set(0, kit.builder(pal, { seed: 500 })); return gcells.get(0); };
+  const G = (x = 0, z = 0) => { const k = cellKey(x, z); if (!gcells.has(k)) gcells.set(k, kit.builder(pal, { seed: 500 + gcells.size * 7 })); return gcells.get(k); };
   const far = kit.builder(pal, { seed: 999 });
   const signs = kit.signs.batch();
   const lamps = [];
@@ -94,9 +95,9 @@ export function buildTown(kit, data, field, pal) {
     const r = rngOf(i * 7 + 11), x = XA + r() * (XB - XA), z = -26 + r() * 62;
     const onStreet = z > roadN && z < roadS;
     const k = r();
-    if (onStreet && k < 0.08) G().ball('woodDark', x, 0.02, z, 0.09 + r() * 0.05, { sy: 0.55, detail: 0 });
-    else if (k < 0.7) G().ball(r() < 0.5 ? 'rock3' : 'stone2', x, 0.01, z, 0.05 + r() * 0.09, { sy: 0.5, detail: 0, ry: r() * 6 });
-    else if (!onStreet) W.tuft(G(), x, z, { s: 0.6 + r() * 0.6 });
+    if (onStreet && k < 0.08) G(x, z).ball('woodDark', x, 0.02, z, 0.09 + r() * 0.05, { sy: 0.55, detail: 0 });
+    else if (k < 0.7) G(x, z).ball(r() < 0.5 ? 'rock3' : 'stone2', x, 0.01, z, 0.05 + r() * 0.09, { sy: 0.5, detail: 0, ry: r() * 6 });
+    else if (!onStreet) W.tuft(G(x, z), x, z, { s: 0.6 + r() * 0.6 });
   }
   // the town's welcome arch over the trail (west), the wanted board by the jail, a church-side noticeboard
   arch(B(XA + 26, rz), XA + 26, rz, signs);
@@ -153,6 +154,14 @@ export function buildTown(kit, data, field, pal) {
     rotorAt = { pos: wm.hub, ry: -0.5 };
     W.trough(B(LM.windmill[0], LM.windmill[1]), LM.windmill[0] + 2.4, LM.windmill[1] + 1.2, { ry: -0.5 });
   }
+  // skyline silhouettes past the far end of the street (the hero looks down +x at them): a ranch windmill + tank
+  {
+    const fx = END + 78, b = B(fx, -26);
+    W.waterTower(b, fx, -30, { h: 9 });
+    W.windmill(b, fx + 16, -12, { ry: 0.4, h: 11 });
+    W.rail(b, fx - 6, -22, fx + 22, -22, { span: 3.2 });
+    for (let i = 0; i < 5; i++) W.cactus(b, fx - 14 + i * 9, -40 + (i % 2) * 22, { s: 1.1 + (i % 3) * 0.3, arms: 1 + (i % 3) });
+  }
   // telegraph line along the north backs
   for (let x = XA + 10; x < XB - 10; x += 26) {
     const b = B(x, -30), z = -30 + Math.sin(x * 0.05) * 1.5;
@@ -180,7 +189,7 @@ export function buildTown(kit, data, field, pal) {
   // tufts and pebbles along the street edges / lot fronts
   for (let x = XA; x < XB; x += 2.6) {
     const r = rngOf(x * 17 + 3);
-    for (const z of [roadN + 0.3 + r() * 0.5, roadS - 0.4 - r() * 0.5]) if (r() < 0.45) W.tuft(G(x), x + r() * 2, z, { s: 0.6 + r() * 0.5 });
+    for (const z of [roadN + 0.3 + r() * 0.5, roadS - 0.4 - r() * 0.5]) if (r() < 0.45) W.tuft(G(x, z), x + r() * 2, z, { s: 0.6 + r() * 0.5 });
   }
 
   // ---- the mesa ring (3 haze layers) and distant hills
@@ -193,15 +202,17 @@ export function buildTown(kit, data, field, pal) {
   mesas.forEach(([x, z, w, d, h, sp], i) => {
     const r = rngOf(i * 19 + 3);
     const slot = Math.hypot(x - 100, z) > 300 ? 'rock3' : Math.hypot(x - 100, z) > 220 ? 'rock2' : 'rock';
-    W.mesa(far, x, z, w, d, h, { y: field.height(x, z) - 3, ry: r() * 3, slot, band: slot === 'rock' ? 'rockDark' : 'rock', rnd: r, spire: sp && r() < 0.6 });
+    W.mesa(far, x, z, w, d, h * (Math.hypot(x - 60, z) > 200 ? 1.35 : 0.9), { y: field.height(x, z) - 3, ry: r() * 3, slot, band: slot === 'rock' ? 'rockDark' : 'rock', rnd: r, spire: sp || r() < 0.3 });
   });
 
   life.pigeonSpots.push([12, 6], [ST.x1 * 0.5, roadN + 1], [END - 10, roadS - 1.5]);
   life.walks.push({ z: roadN - 0.3, y: 0.02, x0: XA, x1: END + 6 }, { z: SZ - 1.2, y: 0.36, x0: 0, x1: lastS }, { z: roadS - 0.7, y: 0.02, x0: XA, x1: END + 6 });
   life.joggerPaths.push([[ST.x0 - 30, roadS - 0.5], [ST.x1 + 30, roadS - 0.5]]);
 
-  const chunks = [...cells.entries()].map(([k, b]) => { const m = b.finish(); m.name = 'town:' + k; return m; });
-  const ground = [...gcells.entries()].map(([k, b]) => { const m = b.finish({ cast: false }); m.name = 'ground:' + k; return m; });
+  // userData.cell = { x0, x1, band } lets world.prepare cull by x-range/band for cards and drop far shadow casters.
+  const tag = (m, k) => { const [ix, bd] = k.split(':'); m.userData.cell = { x0: X0 + +ix * CELL, x1: X0 + (+ix + 1) * CELL, band: bd }; return m; };
+  const chunks = [...cells.entries()].map(([k, b]) => { const m = b.finish(); m.name = 'town:' + k; return tag(m, k); });
+  const ground = [...gcells.entries()].map(([k, b]) => { const m = b.finish({ cast: false }); m.name = 'ground:' + k; return tag(m, k); });
   const farMesh = far.finish({ cast: false });
   farMesh.name = 'town:far';
   const rows = [...cells.values(), ...gcells.values()].flatMap((b) => b.contacts);

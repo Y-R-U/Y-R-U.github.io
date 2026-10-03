@@ -52,7 +52,7 @@ export const LIGHTS = {
     fill: { sky: '#b9b6e0', ground: '#d9a47a', intensity: 0.7 },
     rim: { color: '#ffc884', intensity: 1.0 },
     bounce: '#ffb47e', bounceK: 0.14,
-    env: { ground: '#d8a886' }, night: 0, exposure: 1.18, sheen: '#ffc8a8', envK: 0.13,
+    env: { ground: '#d8a886' }, night: 0, exposure: 1.18, sheen: '#ffc8a8', envK: 0.13, disc: { az: -12, el: 6 },
   },
   day: {
     sky: { top: '#8fb8d8', mid: '#e8dcc8', horizon: '#fce0b8' },
@@ -60,7 +60,7 @@ export const LIGHTS = {
     fill: { sky: '#9fc4d8', ground: '#f0c898', intensity: 0.66 },
     rim: { color: '#ffe0b0', intensity: 0.6 },
     bounce: '#ffb070', bounceK: 0.14,
-    env: { ground: '#dcb890' }, night: 0, exposure: 1.16, sheen: '#ffd8a8', envK: 0.14,
+    env: { ground: '#dcb890' }, night: 0, exposure: 1.16, sheen: '#ffd8a8', envK: 0.14, disc: { az: 4, el: 34 },
   },
   golden: {
     sky: { top: '#8c8fc4', mid: '#f4b88a', horizon: '#fcd9a6' },
@@ -68,7 +68,7 @@ export const LIGHTS = {
     fill: { sky: '#9a9ad0', ground: '#e0a070', intensity: 0.72 },
     rim: { color: '#ffb860', intensity: 1.2 },
     bounce: '#ffa050', bounceK: 0.12,
-    env: { ground: '#d09060' }, night: 0, exposure: 1.18, sheen: '#ffb880', envK: 0.16,
+    env: { ground: '#d09060' }, night: 0, exposure: 1.18, sheen: '#ffb880', envK: 0.16, disc: { az: -8, el: 7 },
   },
   dusk: {
     sky: { top: '#5b4a96', mid: '#e88a78', horizon: '#ffb070' },
@@ -76,17 +76,18 @@ export const LIGHTS = {
     fill: { sky: '#6c64c0', ground: '#c8785e', intensity: 0.56 },
     rim: { color: '#ffa050', intensity: 1.4 },
     bounce: '#ff7a38', bounceK: 0.22,
-    env: { ground: '#a0706a' }, night: 0.45, lamps: 0.55, exposure: 1.1, sheen: '#ff9858', envK: 0.14,
+    env: { ground: '#a0706a' }, night: 0.45, lamps: 0.55, exposure: 1.1, sheen: '#ff9858', envK: 0.14, disc: { az: -10, el: 2.5 },
   },
+  // W18 night: deep blue sky with a warm dusty glow on the horizon, warm lantern pools; never a lilac wash.
   night: {
-    sky: { top: '#2b2a5c', mid: '#463c7c', horizon: '#5b4a86' },
-    sun: { color: '#9aa8ff', intensity: 0.7, azimuth: 60, elevation: 44 },
-    fill: { sky: '#5f5ab8', ground: '#5e4462', intensity: 0.62 },
-    rim: { color: '#9fb0ff', intensity: 0.9 },
-    bounce: '#ff9a50', bounceK: 0.06,
-    env: { ground: '#3a3254' }, night: 1, lamps: 1.9, exposure: 1.28, sheen: '#9c8ee0', envK: 0.12,
+    sky: { top: '#16203f', mid: '#2a3a62', horizon: '#6a5a5c' },
+    sun: { color: '#a8bce8', intensity: 0.85, azimuth: 60, elevation: 44 },
+    fill: { sky: '#4f6292', ground: '#7a5440', intensity: 0.72 },
+    rim: { color: '#9fb8e8', intensity: 0.85 },
+    bounce: '#ff9a50', bounceK: 0.12,
+    env: { ground: '#3e3440' }, night: 1, lamps: 2.3, exposure: 1.42, sheen: '#8fa4d0', envK: 0.12, disc: { az: -18, el: 24 },
   },
 };
 
-// Local hour → palette keys. Golden hour owns the long afternoon (the money shot); night is violet, never black.
+// Virtual hour (data/clock.js maps game time onto it) → palette keys. Golden hour owns the long afternoon (the money shot); night is violet, never black.
 export const DAY_KEYS = [[0, 'night'], [5, 'night'], [6.5, 'dawn'], [8.5, 'dawn'], [10.5, 'day'], [13.5, 'day'], [15.5, 'golden'], [19, 'golden'], [20.2, 'dusk'], [21.2, 'night'], [24, 'night']];

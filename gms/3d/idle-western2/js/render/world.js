@@ -5,6 +5,7 @@ import { createField, buildTerrain, terrainMesh } from './kit/terrain.js?v=20261
 import { buildTown } from './kit/town.js?v=20261004a';
 import { createAmbient } from './kit/ambient.js?v=20261004a';
 import { LIGHTS, DAY_KEYS } from '../data/palette.js?v=20261004a';
+import { gameClock, CYCLE_SEC } from '../data/clock.js?v=20261004a';
 import * as PL from '../data/plots.js?v=20261004a';
 
 import { PLOT_BUILDERS, FALLBACK_PLOT } from './plots/index.js?v=20261004a';
@@ -26,6 +27,10 @@ const params = typeof location !== 'undefined' ? new URLSearchParams(location.se
 const TOD = params.has('tod') ? +params.get('tod') : null;
 const TM = { aces: THREE.ACESFilmicToneMapping, agx: THREE.AgXToneMapping, none: THREE.NoToneMapping, cineon: THREE.CineonToneMapping }[params.get('tm') || 'aces'];
 const EXPO = params.has('expo') ? +params.get('expo') : 1;
+// ?cycle=60 runs the W18 day in 60 s (tests); ?clock=sec offsets the game clock.
+const CYCLE = params.has('cycle') ? +params.get('cycle') : CYCLE_SEC;
+const CLOCK0 = params.has('clock') ? +params.get('clock') : 0;
+const CARD_R = 40, SHADOW_R = 60;
 
 function lightAt(hour) {
   let i = 0;
@@ -38,7 +43,8 @@ export function createWorld({ kit, data, skin = null }) {
   const P = Object.assign({}, data.palette, skin?.palette || {});
   const scene = new THREE.Scene();
   const rig = createLighting(scene, null);
-  let light = lightAt(TOD ?? new Date().getHours() + new Date().getMinutes() / 60);
+  const clock = { sec: 0, ...gameClock(CLOCK0, CYCLE) };
+  let light = lightAt(TOD ?? clock.hour);
   rig.apply(light);
   kit.setNight(light.night);
   kit.setLight?.(light);
@@ -57,7 +63,22 @@ export function createWorld({ kit, data, skin = null }) {
   const town = buildTown(kit, { ...PL, STREET: ST }, field, P);
   for (const m of town.chunks) scene.add(m);
   const casters = town.chunks.filter((m) => m.castShadow);
-  const setTownCast = (on) => { for (const m of casters) m.castShadow = on; };
+  const cells = town.chunks.filter((m) => m.userData.cell);
+  const farMesh = town.chunks.find((m) => m.name === 'town:far');
+  const cellDist = (c, x, z) => Math.max(0, c.x0 - x, x - c.x1) + (c.band === 'n' ? Math.max(0, z - 5) : c.band === 's' ? Math.max(0, 13 - z) : Math.max(0, 5 - z, z - 13));
+  // P#5: only chunks near what the view looks at cast into the shadow map; far ones never do.
+  const setTownCast = (on, x = 0, z = 0) => { for (const m of casters) m.castShadow = on && (!m.userData.cell || cellDist(m.userData.cell, x, z) < SHADOW_R); };
+  // P#2: cards draw only the chunks around their plot; Pomfrey's side only when a card camera is turned to face it.
+  const cullTown = (card, x, southOn) => {
+    for (const m of cells) {
+      const c = m.userData.cell;
+      m.visible = !card || (c.x1 > x - CARD_R && c.x0 < x + CARD_R && (c.band !== 's' || southOn));
+    }
+    if (farMesh) farMesh.visible = !card;
+  };
+  const pool = kit.materials.crowdPool;
+  const CARD_L = kit.CROWD_LAYER?.card ?? 1, TOWN_L = kit.CROWD_LAYER?.town ?? 2;
+  pool?.activate(scene);
   const ambient = createAmbient(kit, scene, { lamps: town.lamps, life: town.life, street: ST });
 
   const plots = new Map();
@@ -84,7 +105,7 @@ export function createWorld({ kit, data, skin = null }) {
   const bounds = { ...PL.WORLD_BOUNDS };
   const rigs = new Map();
   const heroRig = createHeroDirector({ plots, bounds });
-  let time = 0, lightClock = 0, splitClock = 0, warmCam = null, primed = false, cfgRenderer = null, cfgTier = null, tierName = 'mid';
+  let time = 0, lightClock = 0, simSec = null, splitClock = 0, warmCam = null, primed = false, cfgRenderer = null, cfgTier = null, tierName = 'mid';
   const hubStats = { owned: true, managed: false, visualTier: 0, stockRatio: 0, state: null };
   const _look = new THREE.Vector3(), _dir = new THREE.Vector3(), _lamps = [];
 
@@ -111,7 +132,10 @@ export function createWorld({ kit, data, skin = null }) {
   tuneBloom();
   const world = {
     renderConfig,
-    scene, plots, heroRig, bounds, field, rig, ambient, town,
+    scene, plots, heroRig, bounds, field, rig, ambient, town, clock, pool,
+    get light() { return light; },
+    // W18 game clock for U/E: { sec, f, hour, phase, night (bool), golden } — same object every call, updated per tick.
+    gameClock() { return clock; },
     roads: data.roadGraph, hub: data.hubAnchor,
     configureRenderer,
     warmup(on) {
@@ -121,6 +145,8 @@ export function createWorld({ kit, data, skin = null }) {
       setTownCast(true);
       const b = geo.bounds, cx = (b.x0 + b.x1) / 2, cz = (b.z0 + b.z1) / 2, hw = (b.x1 - b.x0) / 2, hd = (b.z1 - b.z0) / 2;
       warmCam ||= new THREE.OrthographicCamera(-hw, hw, hd, -hd, 1, 600);
+      warmCam.layers.enableAll();
+      if (pool) { pool.mesh.count = pool.blob.count = 1; pool.mesh.visible = pool.blob.visible = true; }
       warmCam.position.set(cx, 300, cz);
       warmCam.lookAt(cx, 0, cz);
       warmCam.updateMatrixWorld();
@@ -140,19 +166,24 @@ export function createWorld({ kit, data, skin = null }) {
         kit.FIT.card = true;
         try { r.fit(view.w / view.h); } finally { kit.FIT.card = false; }
         cam = r.camera;
+        cam.layers.enable(CARD_L); cam.layers.disable(TOWN_L);
         lookOf(cam, _look);
+        cullTown(true, plots.get(view.lineId)?.group.position.x ?? _look.x, cam.getWorldDirection(_dir).z > 0.2);
         rig.place(_look, 22);
         scene.fog.near = 120; scene.fog.far = 560;
       } else {
         for (const p of plots.values()) p.group.visible = true;
-        setTownCast(true);
         heroRig.setAspect(view.w / view.h);
         cam = heroRig.camera;
+        cam.layers.enable(TOWN_L); cam.layers.disable(CARD_L);
         lookOf(cam, _look);
+        cullTown(false);
+        setTownCast(true, _look.x, _look.z);
         const dist = cam.position.distanceTo(_look);
         rig.place(_look, Math.min(160, Math.max(30, dist * 0.9)));
-        scene.fog.near = dist + 90;
-        scene.fog.far = dist * 3 + 480;
+        scene.fog.near = dist + 110;
+        scene.fog.far = dist * 3 + 980;
+        if (pool) { cam.updateMatrixWorld(); pool.gather(cam); }
       }
       if (light.lamps > 0.01) {
         _dir.copy(cam.position).sub(_look).setY(0).normalize();
@@ -166,11 +197,14 @@ export function createWorld({ kit, data, skin = null }) {
       tierName = typeof tier === 'string' ? tier : tier?.name || 'mid';
       kit.setTime(time);
       if ((splitClock -= dt) <= 0) { splitClock = 4; kit.materials.splitUber(scene); }
+      // W18: the game's own day, from game time (simTime is saved, so a fresh save boots in golden hour).
+      const sim = typeof game?.simTime === 'number' ? game.simTime : (simSec ?? 0) + dt;
+      simSec = sim;
+      Object.assign(clock, gameClock(sim + CLOCK0, CYCLE), { sec: sim + CLOCK0 });
       lightClock -= dt;
       if (lightClock <= 0) {
-        lightClock = 20;
-        const d = new Date();
-        light = lightAt(TOD ?? d.getHours() + d.getMinutes() / 60);
+        lightClock = 1;
+        light = lightAt(TOD ?? clock.hour);
         rig.apply(light);
         kit.setNight(light.night);
         kit.setLight?.(light);
@@ -191,7 +225,7 @@ export function createWorld({ kit, data, skin = null }) {
         if (visibleLineIds && !visibleLineIds.has(id) && !(heroOn && id === heroRig.current) && !near) continue;
         p.update(dt, id === HUB ? hubStats : game.stats(id), time, tierName);
       }
-      ambient.update(dt, time, light.night);
+      ambient.update(dt, time, light.night, light);
       town.tick?.(dt, time);
       town.graves?.setCount(st.graves?.length || 0);
     },

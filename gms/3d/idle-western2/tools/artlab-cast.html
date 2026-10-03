@@ -20,7 +20,7 @@ const L = LIGHTS[q.get('light') || 'golden'];
 rig.apply(L); kit.setNight(L.night || 0); kit.setLight(L);
 const names = (q.get('chars') || 'wendell,mabel,lulu,mortimer,pickles,pomfrey,stranger,fingers,bart,nubbin,mulligan1,mulligan2,mulligan3').split(',');
 const clips = (q.get('clips') || '').split(',').filter(Boolean);
-const crowd = kit.crowd({ count: names.length, radius: 100 });
+const crowd = kit.crowd({ count: names.length, radius: 100, rig: q.get('rig') || 'full', pool: false });
 const gap = +(q.get('gap') || 1.25);
 names.forEach((n, i) => {
   crowd.dress(i, n);

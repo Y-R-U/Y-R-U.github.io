@@ -1,6 +1,7 @@
 import { createMaterials } from './materials.js?v=20261004a';
 import { createBuilder } from './build.js?v=20261004a';
-import { createCrowd, crowdMaterial, CLIP, OUTFITS, PANTS, HAT, HAT_TYPES, HAT_SEAT, HAT_COLORS, ACC, STACHE, CHARACTERS, hatGeometry, hatForTier, hatForPomfrey } from './crowd.js?v=20261004a';
+import { createCrowd, crowdMaterial, createCrowdPool, CROWD_LAYER, EXPR, rigVertexCount, CLIP, OUTFITS, PANTS, HAT, HAT_TYPES, HAT_SEAT, HAT_COLORS, ACC, STACHE, CHARACTERS, hatGeometry, hatForTier, hatForPomfrey } from './crowd.js?v=20261004a';
+import { createGhosts } from './ghost.js?v=20261004a';
 import { createPile, stockUnit } from './piles.js?v=20261004a';
 import { GEO } from './geo.js?v=20261004a';
 import { basePlot, createPlot, FIT } from './plotbase.js?v=20261004a';
@@ -15,6 +16,7 @@ import { SURF } from './build.js?v=20261004a';
 export function createKit() {
   const materials = createMaterials();
   materials.crowd = crowdMaterial(materials.shared);
+  materials.crowdPool = createCrowdPool(materials);
   const kit = {
     materials,
     FIT,
@@ -26,11 +28,13 @@ export function createKit() {
     SURF,
     SKINS: western.SKINS,
     signs: createSigns(materials),
-    CLIP, OUTFITS, PANTS, ACC, STACHE, CHARACTERS,
+    CLIP, OUTFITS, PANTS, ACC, STACHE, CHARACTERS, EXPR, CROWD_LAYER,
+    crowdPool: materials.crowdPool, rigVertexCount,
     hats: { geometry: hatGeometry, HAT, TYPES: HAT_TYPES, SEAT: HAT_SEAT, COLORS: HAT_COLORS, forTier: hatForTier, forPomfrey: hatForPomfrey },
     makeRng, noise2,
     builder: (palette, o) => createBuilder(materials, palette, o),
     crowd: (opts) => createCrowd(materials, opts),
+    ghost: (opts) => createGhosts(materials, opts),
     pile: (opts) => createPile(materials, opts),
     stockUnit: (kind, palette, color) => stockUnit(materials, kind, palette, color),
     plot: (opts) => createPlot(kit, opts),

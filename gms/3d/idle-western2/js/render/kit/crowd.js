@@ -85,10 +85,10 @@ function hatVertex(k, c, sn, P) {
   return { p: [x, y * ct - z * st, y * st + z * ct], n: [n[0], n[1] * ct - n[2] * st, n[1] * st + n[2] * ct] };
 }
 // Encoded lathe for the rig: position = (cos θ, k, sin θ); the shader rebuilds the shape from uHatP.
-function hatLatheEncoded(k0, k1) {
+function hatLatheEncoded(k0, k1, seg = HAT_SEG) {
   const pos = [];
-  for (let k = k0; k < k1; k++) for (let i = 0; i < HAT_SEG; i++) {
-    const a0 = (i / HAT_SEG) * Math.PI * 2, a1 = ((i + 1) / HAT_SEG) * Math.PI * 2;
+  for (let k = k0; k < k1; k++) for (let i = 0; i < seg; i++) {
+    const a0 = (i / seg) * Math.PI * 2, a1 = ((i + 1) / seg) * Math.PI * 2;
     const A = [Math.cos(a0), k, Math.sin(a0)], B = [Math.cos(a1), k, Math.sin(a1)], C = [Math.cos(a1), k + 1, Math.sin(a1)], D = [Math.cos(a0), k + 1, Math.sin(a0)];
     pos.push(...A, ...C, ...B, ...A, ...D, ...C);
   }
@@ -110,10 +110,10 @@ function hatLatheCPU(t, k0, k1, seg = 18) {
   return g;
 }
 // Special (non-parametric) hat parts in hat-local space (seat at y = 0): feathers, bonnet, cap, thimble.
-function hatParts(type) {
+function hatParts(type, lite = false) {
   const P = [];
   const felt = (g) => P.push({ geo: flat(g), kind: 'felt' }), band = (g) => P.push({ geo: flat(g), kind: 'band' }), col = (g, c) => P.push({ geo: flat(g), kind: c });
-  const blob = () => S.smooth(S.blob(1, 1, { jitter: 0, rng: () => 0.5 }));
+  const blob = () => S.smooth(S.blob(1, lite ? 0 : 1, { jitter: 0, rng: () => 0.5 }));
   switch (HAT_TYPES[type]) {
     case 'feathered':
       [['#e58fb0', -0.1, 0.0, 0.25], ['#7a4a9a', 0.06, -0.08, -0.15], ['#f3e2c4', 0.16, 0.02, -0.45], ['#b5483a', -0.2, -0.06, 0.55]].forEach(([c, x, z, rz]) => {
@@ -124,13 +124,13 @@ function hatParts(type) {
       break;
     case 'bonnet': {
       const sh = blob(); sh.scale(0.3, 0.29, 0.3); sh.translate(0, -0.05, -0.06); felt(sh);
-      const brim = lathe([[0.0005, 0], [0.36, 0], [0.38, 0.02], [0.0005, 0.03]], 12); brim.rotateX(1.25); brim.translate(0, -0.07, 0.12); felt(brim);
+      const brim = lathe([[0.0005, 0], [0.36, 0], [0.38, 0.02], [0.0005, 0.03]], lite ? 8 : 12); brim.rotateX(1.25); brim.translate(0, -0.07, 0.12); felt(brim);
       const rb = S.smooth(S.blob(1, 0, { jitter: 0, rng: () => 0.5 })); rb.scale(0.05, 0.16, 0.03); rb.translate(0.2, -0.32, 0.1); col(rb, '#b5483a');
       break;
     }
     case 'cap': {
       const sh = blob(); sh.scale(0.29, 0.14, 0.3); sh.translate(0, 0.06, -0.01); felt(sh);
-      const v = blob(); v.scale(0.2, 0.025, 0.14); v.translate(0, 0.02, 0.26); band(v);
+      const v = lite ? S.smooth(S.blob(1, 0, { jitter: 0, rng: () => 0.5 })) : blob(); v.scale(0.2, 0.025, 0.14); v.translate(0, 0.02, 0.26); band(v);
       break;
     }
     case 'thimble':
@@ -183,109 +183,150 @@ export function hatForPomfrey(def) {
 }
 
 // ---------------------------------------------------------------- the rig
-let baseGeo = null;
-function rigGeometry() {
-  if (baseGeo) return baseGeo;
+// Two rigs share one shader: 'full' (every variant; the spectacle cast) and 'lite' (crowds: ~7 k vertices, fewer hair/
+// moustache/accessory variants, a 10-segment hat lathe). Variant codes in aPart.z: 90/91 hat lathe, 50+n hat part,
+// 10+n accessory bit, 100+mask hair styles, 300+mask moustaches, 400+mask expressions (EXPR) — a part shows when the
+// instance's style is in its mask, so a lite part can stand in for several full variants.
+export const EXPR = { grump: 0, grin: 1, shock: 2, angry: 3, sozzled: 4 };
+const MASK = (...b) => b.reduce((m, n) => m + 2 ** n, 0);
+const rigCache = {};
+// Accessories the lite rig keeps (the rest are cast-only).
+const LITE_ACC = new Set(['apron', 'badge', 'vest', 'dress', 'bottle', 'scarf']);
+function rigGeometry(kind = 'full') {
+  if (rigCache[kind]) return rigCache[kind];
+  const lite = kind === 'lite';
   const parts = [];
   const P = (geo, m, limb, slot, style = -1, col = '#ffffff', glow = 0) => {
     if (!geo.attributes.color || col !== null) S.paint(geo, col || '#ffffff');
     if (m) geo.applyMatrix4(m);
     parts.push({ geo, limb, slot, style, glow });
   };
+  const A = (name, ...rest) => { if (!lite || LITE_ACC.has(name)) P(...rest); };
   const M = (x, y, z, sx = 1, sy = sx, sz = sx, rx = 0, ry = 0, rz = 0) => S.matrix({ pos: [x, y, z], scale: [sx, sy, sz], rx, ry, rz });
   const ball = (d = 1, j = 0.0) => S.smooth(S.blob(1, d, { jitter: j, rng: () => 0.5 }));
-  const BOOT = '#4a3328', BELT = '#3a2a22', BRASS = '#e2b84a', DARK = '#241a2c';
+  const fd = lite ? 0 : 1;
+  const BOOT = '#4a3328', BELT = '#3a2a22', BRASS = '#e2b84a', DARK = '#241a2c', MOUTH = '#5a1e26', TEETH = '#fff8ea';
   for (const sx of [-1, 1]) {
     const leg = sx < 0 ? 1 : 2, arm = sx < 0 ? 3 : 4;
-    P(ball(1), M(sx * 0.08, 0.05, 0.04, 0.075, 0.06, 0.12), leg, 0, -1, BOOT);
+    P(ball(fd), M(sx * 0.08, 0.05, 0.04, 0.075, 0.06, 0.12), leg, 0, -1, BOOT);
     P(S.prism(7, 0.07, 0.068, 0.12), M(sx * 0.08, 0.04, 0), leg, 0, -1, BOOT);
     P(S.prism(7, 0.07, 0.075, 0.28), M(sx * 0.08, 0.13, 0), leg, 2);
     P(S.prism(7, 0.066, 0.074, 0.3), M(sx * 0.2, 0.38, 0, 1, 1, 1, 0, 0, -sx * 0.1), arm, 1);
-    P(ball(1), M(sx * 0.22, 0.355, 0.005, 0.07), arm, 3);
+    P(ball(fd), M(sx * 0.22, 0.355, 0.005, 0.072), arm, 3);
   }
   P(S.smooth(S.prism(9, 0.17, 0.13, 0.4, { rings: 2, squash: 0.84 })), M(0, 0.33, 0), 0, 1);
   P(ball(1), M(0, 0.36, 0, 0.175, 0.095, 0.145), 0, 2);
   P(S.prism(9, 0.172, 0.17, 0.05, { squash: 0.84 }), M(0, 0.4, 0), 0, 0, -1, BELT);
   P(S.block(0.07, 0.055, 0.02, { cut: 0.01, taper: 0 }), M(0, 0.398, 0.146), 0, 0, -1, BRASS);
   P(S.prism(7, 0.055, 0.05, 0.08), M(0, 0.71, 0), 5, 3);
-  // head: big round face, ears, eyes with catchlights, thick brows, a BIG nose, cheeks, a small mouth
+  // head: big round face, jug ears, beady catchlit eyes, a BIG bulbous rosy nose, heavy brows (by expression)
   P(ball(2), M(0, 0.98, 0.01, 0.262, 0.245, 0.25), 5, 3);
   for (const sx of [-1, 1]) {
-    P(ball(0), M(sx * 0.255, 0.96, -0.01, 0.05, 0.07, 0.04), 5, 3);
-    P(ball(1), M(sx * 0.088, 0.985, 0.225, 0.042, 0.058, 0.03), 5, 0, -1, DARK);
-    P(ball(0), M(sx * 0.088 + 0.014, 1.005, 0.25, 0.014, 0.017, 0.008), 5, 0, -1, '#ffffff');
-    P(ball(0), M(sx * 0.165, 0.905, 0.2, 0.05, 0.03, 0.02), 5, 0, -1, '#f08a86');
-    P(ball(0), M(sx * 0.09, 1.07, 0.222, 0.068, 0.024, 0.024, 0, 0, sx * -0.16), 5, 4, -1);
+    P(ball(fd), M(sx * 0.262, 0.955, -0.01, 0.062, 0.088, 0.045, 0, sx * 0.3), 5, 3);
+    P(ball(fd), M(sx * 0.085, 0.99, 0.222, 0.04, 0.054, 0.03), 5, 0, -1, DARK);
+    P(ball(0), M(sx * 0.085 + 0.013, 1.008, 0.247, 0.013, 0.016, 0.008), 5, 0, -1, '#ffffff');
+    P(ball(0), M(sx * 0.17, 0.885, 0.19, 0.068, 0.04, 0.03), 5, 0, -1, '#f08a86');
   }
-  P(ball(1), M(0, 0.92, 0.27, 0.088, 0.08, 0.085), 5, 7);
-  P(ball(0), M(0, 0.85, 0.232, 0.04, 0.012, 0.012), 5, 0, -1, '#7a3038');
-  // hair styles 0..6 (hair colour)
-  P(ball(1), M(0, 1.0, -0.06, 0.29, 0.29, 0.27), 5, 4, 5);
-  P(ball(1), M(0, 0.78, -0.12, 0.24, 0.24, 0.16), 5, 4, 5);
-  P(ball(1), M(0, 1.13, 0.1, 0.235, 0.1, 0.14, 0.35), 5, 4, 5);
-  P(ball(1), M(0, 1.02, -0.04, 0.272, 0.23, 0.262), 5, 4, 6);
-  P(ball(1), M(0, 1.15, 0.11, 0.21, 0.08, 0.13, 0.4), 5, 4, 6);
-  for (const sx of [-1, 1]) P(ball(1), M(sx * 0.27, 0.92, -0.06, 0.09, 0.13, 0.09, 0, 0, sx * 0.3), 5, 4, 6);
-  P(ball(1), M(0, 1.03, -0.035, 0.274, 0.235, 0.265), 5, 4, 0);
-  P(ball(1), M(0, 1.14, 0.12, 0.2, 0.08, 0.13, 0.4), 5, 4, 0);
-  P(ball(1), M(0, 1.0, -0.05, 0.287, 0.27, 0.28), 5, 4, 1);
-  P(ball(1), M(0, 0.86, -0.08, 0.25, 0.14, 0.2), 5, 4, 1);
-  P(ball(1), M(0, 1.14, 0.12, 0.22, 0.09, 0.13, 0.4), 5, 4, 1);
-  P(ball(1), M(0, 1.04, -0.035, 0.272, 0.23, 0.262), 5, 4, 2);
-  P(ball(1), M(0, 1.27, -0.04, 0.11), 5, 4, 2);
-  P(ball(1), M(0, 1.035, -0.03, 0.267, 0.215, 0.26), 5, 4, 3);
-  P(ball(1), M(0, 0.98, -0.25, 0.08, 0.16, 0.08, -0.4), 5, 4, 3);
-  for (const sx of [-1, 1]) P(ball(1), M(sx * 0.2, 0.93, -0.12, 0.11, 0.1, 0.14), 5, 4, 4);
-  // moustaches 30+n (hair colour)
+  P(ball(1), M(0, 0.915, 0.272, 0.112, 0.098, 0.102), 5, 7);
+  P(ball(0), M(0.03, 0.945, 0.36, 0.026, 0.02, 0.012), 5, 0, -1, '#ffe8dc');
+  // expressions (brows: hair colour; lids: skin; mouths): grump 0, grin 1, shock 2, angry 3, sozzled 4
+  const E = (...e) => 400 + MASK(...e);
   for (const sx of [-1, 1]) {
-    P(ball(1), M(sx * 0.06, 0.875, 0.252, 0.085, 0.048, 0.04, 0, 0, sx * 0.35), 5, 4, 30);
-    P(ball(0), M(sx * 0.07, 0.88, 0.248, 0.08, 0.026, 0.03, 0, 0, sx * -0.1), 5, 4, 31);
-    P(ball(0), M(sx * 0.15, 0.905, 0.226, 0.03, 0.04, 0.026, 0, 0, sx * 0.4), 5, 4, 31);
-    P(ball(0), M(sx * 0.04, 0.878, 0.258, 0.045, 0.012, 0.012), 5, 4, 32);
-    P(ball(0), M(sx * 0.06, 0.875, 0.252, 0.075, 0.035, 0.035, 0, 0, sx * 0.25), 5, 4, 33);
-    P(ball(0), M(sx * 0.21, 0.88, 0.1, 0.07, 0.12, 0.09), 5, 4, 34);
+    if (lite) P(ball(0), M(sx * 0.09, 1.052, 0.228, 0.092, 0.032, 0.03, 0, 0, sx * 0.36), 5, 4, E(0, 3));
+    else {
+      P(ball(1), M(sx * 0.092, 1.058, 0.226, 0.09, 0.03, 0.03, 0, 0, sx * 0.24), 5, 4, E(0));
+      P(ball(1), M(sx * 0.088, 1.045, 0.23, 0.095, 0.034, 0.032, 0, 0, sx * 0.5), 5, 4, E(3));
+    }
+    P(ball(fd), M(sx * 0.094, 1.105, 0.214, 0.085, 0.028, 0.028, 0, 0, sx * -0.2), 5, 4, E(1, 2));
+    P(ball(fd), M(sx * 0.094, 1.072, 0.222, 0.085, 0.028, 0.028, 0, 0, sx * -0.38), 5, 4, E(4));
+    if (lite) P(ball(0), M(sx * 0.086, 1.036, 0.236, 0.052, 0.024, 0.03, 0, 0, sx * 0.15), 5, 3, E(0, 3, 4));
+    else {
+      P(ball(1), M(sx * 0.086, 1.038, 0.236, 0.052, 0.022, 0.03, 0, 0, sx * 0.3), 5, 3, E(0, 3));
+      P(ball(1), M(sx * 0.086, 1.026, 0.237, 0.052, 0.028, 0.03, 0, 0, sx * -0.15), 5, 3, E(4));
+    }
   }
-  P(ball(1), M(0, 0.8, 0.14, 0.2, 0.15, 0.14), 5, 4, 33);
-  P(ball(1), M(0, 0.86, 0.06, 0.25, 0.12, 0.2), 5, 4, 33);
+  P(ball(0), M(0, 0.805, 0.205, 0.045, 0.012, 0.014, 0, 0, 0), 5, 0, E(0), MOUTH);
+  P(ball(fd), M(0, 0.808, 0.198, 0.09, 0.042, 0.03), 5, 0, E(1), MOUTH);
+  P(ball(0), M(0, 0.822, 0.212, 0.074, 0.014, 0.022), 5, 0, E(1, 3), TEETH);
+  P(ball(fd), M(0, 0.8, 0.2, 0.042, 0.052, 0.03), 5, 0, E(2), MOUTH);
+  P(ball(0), M(0, 0.818, 0.2, 0.08, 0.03, 0.02), 5, 0, E(3), MOUTH);
+  P(ball(0), M(0.025, 0.81, 0.205, 0.06, 0.02, 0.016, 0, 0, 0.32), 5, 0, E(4), MOUTH);
+  // hair styles (100 + mask of the styles a part serves; hair colour)
+  const H = (...s) => 100 + MASK(...s);
+  if (lite) {
+    P(ball(1), M(0, 1.03, -0.035, 0.274, 0.235, 0.265), 5, 4, H(0, 1, 2, 3, 5, 6));
+    P(ball(1), M(0, 0.86, -0.08, 0.25, 0.16, 0.2), 5, 4, H(1, 3, 5));
+    P(ball(0), M(0, 1.14, 0.12, 0.21, 0.08, 0.13, 0.4), 5, 4, H(0, 1, 2, 5, 6));
+    for (const sx of [-1, 1]) P(ball(0), M(sx * 0.2, 0.93, -0.12, 0.11, 0.1, 0.14), 5, 4, H(4));
+  } else {
+    P(ball(1), M(0, 1.0, -0.06, 0.29, 0.29, 0.27), 5, 4, H(5));
+    P(ball(1), M(0, 0.78, -0.12, 0.24, 0.24, 0.16), 5, 4, H(5));
+    P(ball(1), M(0, 1.13, 0.1, 0.235, 0.1, 0.14, 0.35), 5, 4, H(5));
+    P(ball(1), M(0, 1.02, -0.04, 0.272, 0.23, 0.262), 5, 4, H(6));
+    P(ball(1), M(0, 1.15, 0.11, 0.21, 0.08, 0.13, 0.4), 5, 4, H(6));
+    for (const sx of [-1, 1]) P(ball(1), M(sx * 0.27, 0.92, -0.06, 0.09, 0.13, 0.09, 0, 0, sx * 0.3), 5, 4, H(6));
+    P(ball(1), M(0, 1.03, -0.035, 0.274, 0.235, 0.265), 5, 4, H(0));
+    P(ball(1), M(0, 1.14, 0.12, 0.2, 0.08, 0.13, 0.4), 5, 4, H(0));
+    P(ball(1), M(0, 1.0, -0.05, 0.287, 0.27, 0.28), 5, 4, H(1));
+    P(ball(1), M(0, 0.86, -0.08, 0.25, 0.14, 0.2), 5, 4, H(1));
+    P(ball(1), M(0, 1.14, 0.12, 0.22, 0.09, 0.13, 0.4), 5, 4, H(1));
+    P(ball(1), M(0, 1.04, -0.035, 0.272, 0.23, 0.262), 5, 4, H(2));
+    P(ball(1), M(0, 1.27, -0.04, 0.11), 5, 4, H(2));
+    P(ball(1), M(0, 1.035, -0.03, 0.267, 0.215, 0.26), 5, 4, H(3));
+    P(ball(1), M(0, 0.98, -0.25, 0.08, 0.16, 0.08, -0.4), 5, 4, H(3));
+    for (const sx of [-1, 1]) P(ball(1), M(sx * 0.2, 0.93, -0.12, 0.11, 0.1, 0.14), 5, 4, H(4));
+  }
+  // moustaches (300 + mask; hair colour): walrus 0, handlebar 1, pencil 2, beard 3, chops 4 — bushy, under the nose
+  const T = (...s) => 300 + MASK(...s);
+  for (const sx of [-1, 1]) {
+    P(ball(fd), M(sx * 0.07, 0.852, 0.262, 0.105, 0.055, 0.046, 0, 0, sx * 0.38), 5, 4, T(0, 3));
+    P(ball(fd), M(sx * 0.075, 0.858, 0.262, 0.088, 0.03, 0.034, 0, 0, sx * -0.12), 5, 4, T(1, 2));
+    P(ball(0), M(sx * 0.165, 0.89, 0.238, 0.034, 0.048, 0.03, 0, 0, sx * 0.45), 5, 4, T(1));
+    P(ball(0), M(sx * 0.215, 0.875, 0.1, 0.075, 0.13, 0.095), 5, 4, T(3, 4));
+  }
+  P(ball(fd), M(0, 0.79, 0.12, 0.21, 0.16, 0.15), 5, 4, T(3));
+  if (!lite) P(ball(1), M(0, 0.85, 0.05, 0.255, 0.12, 0.21), 5, 4, T(3));
   // accessories 10+n
-  P(S.block(0.25, 0.36, 0.02, { cut: 0.03, taper: -0.1 }), M(0, 0.17, 0.15, 1, 1, 1, -0.08), 0, 0, 10 + ACC.apron, '#f3ede0');
-  starGeo(P, M(-0.07, 0.6, 0.142, 0.05, 0.05, 1), 0, 10 + ACC.badge, BRASS);
-  for (const sx of [-1, 1]) P(S.block(0.11, 0.3, 0.03, { cut: 0.02, taper: 0.1 }), M(sx * 0.085, 0.42, 0.13, 1, 1, 1, -0.08, sx * -0.25), 0, 2, 10 + ACC.vest);
-  for (const sx of [-1, 1]) P(S.block(0.1, 0.34, 0.03, { cut: 0.02, taper: 0.25 }), M(sx * 0.06, 0.12, -0.15, 1, 1, 1, 0.2), 0, 1, 10 + ACC.tails);
-  P(S.smooth(S.prism(10, 0.21, 0.17, 0.44, { rings: 2, squash: 0.9 })), M(0, 0.2, -0.01), 0, 0, 10 + ACC.duster, '#8a6a52');
-  for (const sx of [-1, 1]) P(S.block(0.11, 0.34, 0.03, { cut: 0.02, taper: 0.1 }), M(sx * 0.1, 0.32, 0.142, 1, 1, 1, -0.06, sx * -0.3), 0, 0, 10 + ACC.duster, '#7a5a44');
-  P(S.block(0.2, 0.2, 0.03, { cut: 0.02, taper: 0.05 }), M(0, 0.44, 0.14, 1, 1, 1, -0.08), 0, 2, 10 + ACC.overalls);
-  for (const sx of [-1, 1]) P(S.block(0.035, 0.24, 0.02, { cut: 0.01, taper: 0 }), M(sx * 0.08, 0.55, 0.14, 1, 1, 1, -0.1), 0, 2, 10 + ACC.overalls);
-  P(S.smooth(S.prism(12, 0.32, 0.16, 0.34, { rings: 3, squash: 0.95 })), M(0, 0.05, 0), 0, 1, 10 + ACC.dress);
-  P(S.prism(12, 0.33, 0.33, 0.06), M(0, 0.05, 0), 0, 0, 10 + ACC.dress, '#f3ede0');
-  P(ball(1), M(0, 0.86, 0.14, 0.24, 0.13, 0.16, 0.15), 5, 0, 10 + ACC.mask, DARK);
-  P(S.prism(7, 0.04, 0.034, 0.16), M(0.235, 0.28, 0.07, 1, 1, 1, 0.3), 4, 0, 10 + ACC.bottle, '#4f8a4a');
-  P(S.prism(6, 0.014, 0.014, 0.07), M(0.235, 0.43, 0.12, 1, 1, 1, 0.3), 4, 0, 10 + ACC.bottle, '#3a2a22');
-  P(S.prism(10, 0.04, 0.04, 0.01), M(0.088, 0.985, 0.25, 1, 1, 1, Math.PI / 2), 5, 0, 10 + ACC.monocle, BRASS);
-  P(S.prism(6, 0.015, 0.014, 0.12), M(0.06, 0.85, 0.24, 1, 1, 1, Math.PI / 2 - 0.2, 0.3), 5, 0, 10 + ACC.cigar, '#6e452d');
-  P(S.block(0.2, 0.08, 0.03, { cut: 0.015, taper: 0.5 }), M(0, 0.62, 0.15, 1, 1, 1, -0.2), 0, 0, 10 + ACC.scarf, '#b5483a');
-  P(S.prism(9, 0.18, 0.18, 0.045, { squash: 0.86 }), M(0, 0.33, 0), 0, 0, 10 + ACC.gunbelt, '#5a3a26');
-  P(S.block(0.06, 0.15, 0.06, { cut: 0.015, taper: 0.1 }), M(0.17, 0.22, 0.03), 0, 0, 10 + ACC.gunbelt, '#5a3a26');
-  P(S.block(0.03, 0.08, 0.04, { cut: 0.01, taper: 0 }), M(0.17, 0.34, 0.03), 0, 0, 10 + ACC.gunbelt, '#3a3a42');
-  starGeo(P, M(-0.02, 0.55, 0.16, 0.17, 0.17, 1), 0, 10 + ACC.bigbadge, BRASS);
-  P(S.block(0.035, 0.05, 0.16, { cut: 0.01, taper: 0 }), M(0.225, 0.33, 0.1), 4, 0, 10 + ACC.pistol, '#3a3a42');
-  P(S.block(0.03, 0.08, 0.04, { cut: 0.01, taper: 0 }), M(0.225, 0.29, 0.04, 1, 1, 1, 0.3), 4, 0, 10 + ACC.pistol, '#6e452d');
-  P(S.prism(6, 0.06, 0.07, 0.14), M(-0.225, 0.21, 0.04), 3, 0, 10 + ACC.lantern, '#ffc978', 1.2);
-  P(S.prism(6, 0.07, 0.03, 0.05), M(-0.225, 0.35, 0.04), 3, 0, 10 + ACC.lantern, '#3a3a42');
-  P(S.prism(8, 0.025, 0.025, 0.36), M(0.225, 0.35, -0.1, 1, 1, 1, Math.PI / 2), 4, 0, 10 + ACC.rollingpin, '#d9b07a');
-  P(S.block(0.03, 0.03, 0.18, { cut: 0.005, taper: 0 }), M(0.225, 0.34, 0.1), 4, 0, 10 + ACC.pliers, '#9aa4b0');
-  for (const sx of [-1, 1]) P(S.prism(7, 0.074, 0.074, 0.025), M(sx * 0.205, 0.53, 0, 1, 1, 1, 0, 0, -sx * 0.1), sx < 0 ? 3 : 4, 0, 10 + ACC.garters, '#b5483a');
-  P(S.prism(6, 0.02, 0.02, 0.26), M(0.225, 0.35, -0.04, 1, 1, 1, Math.PI / 2), 4, 0, 10 + ACC.hammer, '#9a6c48');
-  P(S.block(0.05, 0.05, 0.1, { cut: 0.01, taper: 0 }), M(0.225, 0.36, 0.17), 4, 0, 10 + ACC.hammer, '#5b5f66');
-  for (let i = 0; i < 4; i++) P(ball(0), M(0, 0.62 - i * 0.07, 0.15, 0.014), 0, 0, 10 + ACC.longjohns, '#f3ede0');
+  A('apron', S.block(0.25, 0.36, 0.02, { cut: 0.03, taper: -0.1 }), M(0, 0.17, 0.15, 1, 1, 1, -0.08), 0, 0, 10 + ACC.apron, '#f3ede0');
+  if (!lite || LITE_ACC.has('badge')) starGeo(P, M(-0.07, 0.6, 0.142, 0.05, 0.05, 1), 0, 10 + ACC.badge, BRASS);
+  for (const sx of [-1, 1]) A('vest', S.block(0.11, 0.3, 0.03, { cut: 0.02, taper: 0.1 }), M(sx * 0.085, 0.42, 0.13, 1, 1, 1, -0.08, sx * -0.25), 0, 2, 10 + ACC.vest);
+  for (const sx of [-1, 1]) A('tails', S.block(0.1, 0.34, 0.03, { cut: 0.02, taper: 0.25 }), M(sx * 0.06, 0.12, -0.15, 1, 1, 1, 0.2), 0, 1, 10 + ACC.tails);
+  A('duster', S.smooth(S.prism(10, 0.21, 0.17, 0.44, { rings: 2, squash: 0.9 })), M(0, 0.2, -0.01), 0, 0, 10 + ACC.duster, '#8a6a52');
+  for (const sx of [-1, 1]) A('duster', S.block(0.11, 0.34, 0.03, { cut: 0.02, taper: 0.1 }), M(sx * 0.1, 0.32, 0.142, 1, 1, 1, -0.06, sx * -0.3), 0, 0, 10 + ACC.duster, '#7a5a44');
+  A('overalls', S.block(0.2, 0.2, 0.03, { cut: 0.02, taper: 0.05 }), M(0, 0.44, 0.14, 1, 1, 1, -0.08), 0, 2, 10 + ACC.overalls);
+  for (const sx of [-1, 1]) A('overalls', S.block(0.035, 0.24, 0.02, { cut: 0.01, taper: 0 }), M(sx * 0.08, 0.55, 0.14, 1, 1, 1, -0.1), 0, 2, 10 + ACC.overalls);
+  A('dress', S.smooth(S.prism(lite ? 9 : 12, 0.32, 0.16, 0.34, { rings: lite ? 2 : 3, squash: 0.95 })), M(0, 0.05, 0), 0, 1, 10 + ACC.dress);
+  A('dress', S.prism(lite ? 9 : 12, 0.33, 0.33, 0.06), M(0, 0.05, 0), 0, 0, 10 + ACC.dress, '#f3ede0');
+  A('mask', ball(1), M(0, 0.86, 0.14, 0.24, 0.13, 0.16, 0.15), 5, 0, 10 + ACC.mask, DARK);
+  A('bottle', S.prism(7, 0.04, 0.034, 0.16), M(0.235, 0.28, 0.07, 1, 1, 1, 0.3), 4, 0, 10 + ACC.bottle, '#4f8a4a');
+  A('bottle', S.prism(6, 0.014, 0.014, 0.07), M(0.235, 0.43, 0.12, 1, 1, 1, 0.3), 4, 0, 10 + ACC.bottle, '#3a2a22');
+  A('monocle', S.prism(10, 0.04, 0.04, 0.01), M(0.085, 0.99, 0.25, 1, 1, 1, Math.PI / 2), 5, 0, 10 + ACC.monocle, BRASS);
+  A('cigar', S.prism(6, 0.015, 0.014, 0.12), M(0.06, 0.815, 0.235, 1, 1, 1, Math.PI / 2 - 0.2, 0.3), 5, 0, 10 + ACC.cigar, '#6e452d');
+  A('scarf', S.block(0.2, 0.08, 0.03, { cut: 0.015, taper: 0.5 }), M(0, 0.62, 0.15, 1, 1, 1, -0.2), 0, 0, 10 + ACC.scarf, '#b5483a');
+  A('gunbelt', S.prism(9, 0.18, 0.18, 0.045, { squash: 0.86 }), M(0, 0.33, 0), 0, 0, 10 + ACC.gunbelt, '#5a3a26');
+  A('gunbelt', S.block(0.06, 0.15, 0.06, { cut: 0.015, taper: 0.1 }), M(0.17, 0.22, 0.03), 0, 0, 10 + ACC.gunbelt, '#5a3a26');
+  A('gunbelt', S.block(0.03, 0.08, 0.04, { cut: 0.01, taper: 0 }), M(0.17, 0.34, 0.03), 0, 0, 10 + ACC.gunbelt, '#3a3a42');
+  if (!lite || LITE_ACC.has('bigbadge')) starGeo(P, M(-0.02, 0.55, 0.16, 0.17, 0.17, 1), 0, 10 + ACC.bigbadge, BRASS);
+  A('pistol', S.block(0.035, 0.05, 0.16, { cut: 0.01, taper: 0 }), M(0.225, 0.33, 0.1), 4, 0, 10 + ACC.pistol, '#3a3a42');
+  A('pistol', S.block(0.03, 0.08, 0.04, { cut: 0.01, taper: 0 }), M(0.225, 0.29, 0.04, 1, 1, 1, 0.3), 4, 0, 10 + ACC.pistol, '#6e452d');
+  A('lantern', S.prism(6, 0.06, 0.07, 0.14), M(-0.225, 0.21, 0.04), 3, 0, 10 + ACC.lantern, '#ffc978', 1.2);
+  A('lantern', S.prism(6, 0.07, 0.03, 0.05), M(-0.225, 0.35, 0.04), 3, 0, 10 + ACC.lantern, '#3a3a42');
+  A('rollingpin', S.prism(8, 0.025, 0.025, 0.36), M(0.225, 0.35, -0.1, 1, 1, 1, Math.PI / 2), 4, 0, 10 + ACC.rollingpin, '#d9b07a');
+  A('pliers', S.block(0.03, 0.03, 0.18, { cut: 0.005, taper: 0 }), M(0.225, 0.34, 0.1), 4, 0, 10 + ACC.pliers, '#9aa4b0');
+  for (const sx of [-1, 1]) A('garters', S.prism(7, 0.074, 0.074, 0.025), M(sx * 0.205, 0.53, 0, 1, 1, 1, 0, 0, -sx * 0.1), sx < 0 ? 3 : 4, 0, 10 + ACC.garters, '#b5483a');
+  A('hammer', S.prism(6, 0.02, 0.02, 0.26), M(0.225, 0.35, -0.04, 1, 1, 1, Math.PI / 2), 4, 0, 10 + ACC.hammer, '#9a6c48');
+  A('hammer', S.block(0.05, 0.05, 0.1, { cut: 0.01, taper: 0 }), M(0.225, 0.36, 0.17), 4, 0, 10 + ACC.hammer, '#5b5f66');
+  for (let i = 0; i < 4; i++) A('longjohns', ball(0), M(0, 0.62 - i * 0.07, 0.15, 0.014), 0, 0, 10 + ACC.longjohns, '#f3ede0');
   // carried cup (limb 6, shown in the carry clip)
   P(S.prism(7, 0.07, 0.085, 0.18), M(0, 0.47, 0.27), 6, 0, -1, '#fff6dc');
   P(S.prism(7, 0.07, 0.07, 0.02), M(0, 0.62, 0.27), 6, 0, -1, '#f4d64a');
   // hats 50+n, sat on the head (limb 8 follows the head and scales about the seat)
-  P(hatLatheEncoded(0, 9), null, 8, 5, 90, '#ffffff');
-  P(hatLatheEncoded(20, 23), null, 8, 6, 91, '#ffffff');
+  const seg = lite ? 8 : HAT_SEG;
+  P(hatLatheEncoded(0, 9, seg), null, 8, 5, 90, '#ffffff');
+  P(hatLatheEncoded(20, 23, seg), null, 8, 6, 91, '#ffffff');
   HAT_TYPES.forEach((_, t) => {
-    for (const p of hatParts(t)) {
+    if (lite && HAT_TYPES[t] === 'thimble') return;
+    for (const p of hatParts(t, lite)) {
       const slot = p.kind === 'felt' ? 5 : p.kind === 'band' ? 6 : 0;
       P(p.geo, M(0, HAT_SEAT, 0), 8, slot, 50 + t, slot ? '#ffffff' : p.kind);
     }
@@ -293,12 +334,12 @@ function rigGeometry() {
   const pos = [], col = [], nor = [], part = [];
   for (const p of parts) {
     if (!p.geo.attributes.normal) p.geo.computeVertexNormals();
-    const A = p.geo.attributes;
-    for (let i = 0; i < A.position.count; i++) {
-      pos.push(A.position.getX(i), A.position.getY(i), A.position.getZ(i));
-      nor.push(A.normal.getX(i), A.normal.getY(i), A.normal.getZ(i));
+    const A2 = p.geo.attributes;
+    for (let i = 0; i < A2.position.count; i++) {
+      pos.push(A2.position.getX(i), A2.position.getY(i), A2.position.getZ(i));
+      nor.push(A2.normal.getX(i), A2.normal.getY(i), A2.normal.getZ(i));
       const g = p.glow;
-      col.push(A.color.getX(i) * (1 + g), A.color.getY(i) * (1 + g), A.color.getZ(i) * (1 + g));
+      col.push(A2.color.getX(i) * (1 + g), A2.color.getY(i) * (1 + g), A2.color.getZ(i) * (1 + g));
       part.push(p.limb, p.slot, p.style);
     }
   }
@@ -307,9 +348,11 @@ function rigGeometry() {
   g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   g.setAttribute('aPart', new THREE.Float32BufferAttribute(part, 3));
-  baseGeo = g;
+  g.userData.kind = kind;
+  rigCache[kind] = g;
   return g;
 }
+export const rigVertexCount = (kind = 'lite') => rigGeometry(kind).attributes.position.count;
 function starGeo(P, m, limb, style, col) {
   const pts = [];
   for (let i = 0; i < 10; i++) { const a = Math.PI / 2 + (i * Math.PI) / 5, r = i % 2 ? 0.45 : 1; pts.push(new THREE.Vector2(Math.cos(a) * r, Math.sin(a) * r)); }
@@ -341,7 +384,7 @@ attribute vec3 aAnim;
 attribute vec3 aTop;
 attribute vec3 aBot;
 attribute vec4 aLook;
-attribute vec3 aBody;
+attribute vec4 aBody;
 attribute vec4 aHat;
 uniform float uTime;
 varying float vSkin;
@@ -389,8 +432,14 @@ float isWalk = isClip(clip, 1.0) + isCarry;
 float walkK = isWalk + isStag * 0.6;
 float vis = 1.0;
 float st = aPart.z;
+float expr = aBody.w;
+if (isFlail + isUp + isSprawl > 0.5) expr = 2.0;
+else if (isPunch + isDuel + isDraw > 0.5) expr = 3.0;
+else if (isCheer + isTip + isCan > 0.5) expr = 1.0;
+else if (isStag + isSlump + isDizzy > 0.5) expr = 4.0;
 vec3 hatP = vec3(0.0), hatN = vec3(0.0, 1.0, 0.0);
-if (st > 89.5) {
+bool isHatL = st > 89.5 && st < 99.5;
+if (isHatL) {
   int ti = int(max(0.0, aHat.x) + 0.5) * 3;
   vec4 p0 = uHatP[ti], p1 = uHatP[ti + 1], p2 = uHatP[ti + 2];
   vis = aHat.x > -0.5 ? p0.w : 0.0;
@@ -411,8 +460,10 @@ if (st > 89.5) {
   vec3 nn = vec3(nr / L * c, ny / L, nr / L * sn);
   hatN = vec3(nn.x, nn.y * ct - nn.z * stl, nn.y * stl + nn.z * ct);
 }
+else if (st > 399.5) vis = bitOn(st - 400.0, expr);
+else if (st > 299.5) vis = aHat.w > -0.5 ? bitOn(st - 300.0, aHat.w) : 0.0;
+else if (st > 99.5) vis = bitOn(st - 100.0, aLook.z);
 else if (st > 49.5) vis = float(abs(st - 50.0 - aHat.x) < 0.1);
-else if (st > 29.5) vis = float(abs(st - 30.0 - aHat.w) < 0.1);
 else if (st > 9.5) vis = bitOn(aLook.w, st - 10.0);
 else if (st > -0.5) vis = float(abs(st - aLook.z) < 0.1);
 if (limb > 5.5 && limb < 6.5) vis *= isCarry;
@@ -459,12 +510,12 @@ float roll = isStag * 0.14 * sin(t * 0.9) + isDizzy * 0.1 * sin(t * 1.3) + isFla
 mat3 R = rotX(ang) * rotZ(angZ);
 mat3 RB = rotX(lean) * rotZ(roll);
 float upper = (limb > 0.5 && limb < 2.5) ? 0.0 : 1.0;
-vec3 objectNormal = R * (st > 89.5 ? hatN : vec3(normal));
+vec3 objectNormal = R * (isHatL ? hatN : vec3(normal));
 if (upper > 0.5) objectNormal = RB * objectNormal;
 #ifdef USE_TANGENT
 vec3 objectTangent = vec3(tangent.xyz);
 #endif`)
-      .replace('#include <begin_vertex>', `vec3 transformed = st > 89.5 ? hatP + vec3(0.0, ${HAT_SEAT.toFixed(3)}, 0.0) : vec3(position);
+      .replace('#include <begin_vertex>', `vec3 transformed = isHatL ? hatP + vec3(0.0, ${HAT_SEAT.toFixed(3)}, 0.0) : vec3(position);
 if (limb > 7.5) transformed = (transformed - vec3(0.0, ${HAT_SEAT.toFixed(3)}, 0.0)) * aHat.y + vec3(0.0, ${HAT_SEAT.toFixed(3)}, 0.0);
 if (limb < 0.5 || (limb > 6.5 && limb < 7.5)) transformed.xz *= girth;
 if (limb > 2.5 && limb < 4.5) transformed.x += sign(transformed.x) * (girth - 1.0) * 0.17;
@@ -486,7 +537,7 @@ else if (slot < 2.5) vColor = aBot;
 else if (slot < 3.5) vColor = uSkin[int(aLook.x + 0.5)];
 else if (slot < 4.5) vColor = uHair[int(aLook.y + 0.5)];
 else if (slot < 6.5) vColor = unpackRGB(aHat.z) * (slot < 5.5 ? 1.0 : 0.45);
-else vColor = uSkin[int(aLook.x + 0.5)] * vec3(1.03, 0.8, 0.76);
+else vColor = uSkin[int(aLook.x + 0.5)] * vec3(1.06, 0.7, 0.64);
 vSkin = float(abs(slot - 3.0) < 0.5 || slot > 6.5);`)
       .replace('#include <project_vertex>', WORLD_POS_VERT);
     sh.fragmentShader = sh.fragmentShader
@@ -501,7 +552,7 @@ vSkin = float(abs(slot - 3.0) < 0.5 || slot > 6.5);`)
 ${WORLD_LIGHT_FRAG}
 #include <opaque_fragment>`);
   };
-  m.customProgramCacheKey = () => 'iw2-crowd4';
+  m.customProgramCacheKey = () => 'iw2-crowd5';
   return m;
 }
 
@@ -517,13 +568,16 @@ export function accMask(acc) {
   return 2 ** acc;
 }
 
-export function createCrowd(materials, { count = 8, colors = OUTFITS, scale = 1.25, seed = 1, radius = 22, center = [0, 1, 0], blobs = true, hats = true } = {}) {
-  const base = rigGeometry();
+// rig: 'lite' (default; joins the town crowd pool — one hero draw for every crowd) or 'full' (spectacle cast; the
+// default when hats:false, which only the cast asks for). pool:false keeps a lite crowd out of the town pool.
+export function createCrowd(materials, { count = 8, colors = OUTFITS, scale = 1.25, seed = 1, radius = 22, center = [0, 1, 0], blobs = true, hats = true, rig, pool = true } = {}) {
+  rig ||= hats === false ? 'full' : 'lite';
+  const base = rigGeometry(rig);
   if (!materials.crowd) materials.crowd = crowdMaterial(materials.shared);
   const geo = new THREE.BufferGeometry();
   for (const k of ['position', 'normal', 'color', 'aPart']) geo.setAttribute(k, base.attributes[k]);
   const mk = (n) => new THREE.InstancedBufferAttribute(new Float32Array(count * n), n);
-  const anim = mk(3), top = mk(3), bot = mk(3), look = mk(4), body = mk(3), hat = mk(4);
+  const anim = mk(3), top = mk(3), bot = mk(3), look = mk(4), body = mk(4), hat = mk(4);
   geo.setAttribute('aAnim', anim);
   geo.setAttribute('aTop', top);
   geo.setAttribute('aBot', bot);
@@ -537,16 +591,18 @@ export function createCrowd(materials, { count = 8, colors = OUTFITS, scale = 1.
   let r = seed * 9301 + 49297;
   const rnd = () => { r = (r * 9301 + 49297) % 233280; return r / 233280; };
   const scales = new Float32Array(count).fill(1);
-  const TOWN_HATS = [[HAT.stetson, 1, 'tan'], [HAT.stetson, 1.2, 'brown'], [HAT.bowler, 1, 'black'], [HAT.derby, 1, 'brown'], [HAT.ten, 0.9, 'cream'], [HAT.boater, 1, 'straw'], [HAT.flat, 1, 'dark'], [HAT.stetson, 1.35, 'grey'], [HAT.cap, 1, 'brown'], [HAT.bonnet, 1, 'white']];
-  const staches = [-1, -1, 0, 1, 2, 3, 4, -1];
+  // Passers-by wear everyday hats at everyday sizes (the big hats belong to the named cast and your hat tier).
+  const TOWN_HATS = [[HAT.stetson, 0.85, 'tan'], [HAT.stetson, 0.9, 'brown'], [HAT.bowler, 0.95, 'black'], [HAT.derby, 0.95, 'brown'], [HAT.boater, 0.9, 'straw'], [HAT.flat, 0.9, 'dark'], [HAT.cap, 1, 'brown'], [HAT.cap, 1, 'grey'], [HAT.bonnet, 1, 'white'], [HAT.stetson, 0.85, 'sand'], null, null];
+  const staches = [-1, -1, 0, 1, 2, 3, 4, -1, 0, 1];
+  const EXPRS = [0, 0, 0, 1, 1, 1, 1, 3, 4, 0];
   for (let i = 0; i < count; i++) {
     _c.set(colors[i % colors.length]); top.setXYZ(i, _c.r, _c.g, _c.b);
     _c.set(PANTS[Math.floor(rnd() * PANTS.length)]); bot.setXYZ(i, _c.r, _c.g, _c.b);
     look.setXYZ(i, Math.floor(rnd() * 5), Math.floor(rnd() * HAIR.length), Math.floor(rnd() * STYLES));
     look.setW(i, rnd() < 0.3 ? 2 ** ACC.vest : rnd() < 0.2 ? 2 ** ACC.scarf : 0);
-    body.setXYZ(i, 1.24, 0.95, 1);
+    body.setXYZW(i, 1.24, 0.95, 1, EXPRS[Math.floor(rnd() * EXPRS.length)]);
     const h = hats ? TOWN_HATS[Math.floor(rnd() * TOWN_HATS.length)] : null;
-    hat.setXYZW(i, h ? h[0] : -1, h ? h[1] * (0.9 + rnd() * 0.25) : 1, packRGB(HAT_COLORS[h ? h[2] : 'tan']), staches[Math.floor(rnd() * staches.length)]);
+    hat.setXYZW(i, h ? h[0] : -1, h ? h[1] * (0.95 + rnd() * 0.12) : 1, packRGB(HAT_COLORS[h ? h[2] : 'tan']), staches[Math.floor(rnd() * staches.length)]);
     anim.setXYZ(i, 0, rnd() * 6.28, 3.6 + rnd() * 1.6);
     scales[i] = 0.93 + rnd() * 0.14;
     mesh.setMatrixAt(i, _m.makeScale(0, 0, 0));
@@ -561,7 +617,7 @@ export function createCrowd(materials, { count = 8, colors = OUTFITS, scale = 1.
     mesh.add(blobMesh);
   }
   const api = {
-    mesh, blobMesh, count,
+    mesh, blobMesh, count, rig,
     set(i, x, y, z, heading = 0, clip = 0, phase, speed) {
       _q.setFromAxisAngle(_y, heading);
       _m.compose(_p.set(x, y, z), _q, _s.setScalar(scale * CROWD_K * scales[i]));
@@ -603,7 +659,7 @@ export function createCrowd(materials, { count = 8, colors = OUTFITS, scale = 1.
       return api;
     },
     // Colours/looks. acc: index, name, array of names/indices, or { mask }. stache: STACHE name/index (-1 none).
-    look(i, { top: t, bot: b, skin, hair, style, acc, stache, hat: h, hatScale, hatColor } = {}) {
+    look(i, { top: t, bot: b, skin, hair, style, acc, stache, hat: h, hatScale, hatColor, expr } = {}) {
       if (t != null) { _c.set(t); top.setXYZ(i, _c.r, _c.g, _c.b); }
       if (b != null) { _c.set(b); bot.setXYZ(i, _c.r, _c.g, _c.b); }
       if (skin != null) look.setX(i, skin);
@@ -614,6 +670,7 @@ export function createCrowd(materials, { count = 8, colors = OUTFITS, scale = 1.
       if (h !== undefined) hat.setX(i, h == null || h === -1 ? -1 : typeof h === 'string' ? HAT[h] : h);
       if (hatScale != null) hat.setY(i, hatScale);
       if (hatColor != null) hat.setZ(i, packRGB(HAT_COLORS[hatColor] || hatColor));
+      if (expr != null) { body.setW(i, typeof expr === 'string' ? EXPR[expr] ?? 0 : expr); body.needsUpdate = true; }
       top.needsUpdate = bot.needsUpdate = look.needsUpdate = hat.needsUpdate = true;
       return api;
     },
@@ -630,7 +687,7 @@ export function createCrowd(materials, { count = 8, colors = OUTFITS, scale = 1.
     dress(i, name) {
       const c = CHARACTERS[name];
       if (!c) return api;
-      api.look(i, { top: c.top, bot: c.bot, skin: c.skin, hair: c.hair, style: c.style, acc: c.acc || [], stache: c.stache ?? -1, hat: c.hat ?? -1, hatScale: c.hatScale ?? 1, hatColor: c.hatColor || 'tan' });
+      api.look(i, { top: c.top, bot: c.bot, skin: c.skin, hair: c.hair, style: c.style, acc: c.acc || [], stache: c.stache ?? -1, hat: c.hat ?? -1, hatScale: c.hatScale ?? 1, hatColor: c.hatColor || 'tan', expr: c.expr ?? 0 });
       api.body(i, c.head ?? 1.24, c.legs ?? 0.95, c.s ?? 1.15, c.girth ?? 1);
       return api;
     },
@@ -647,29 +704,128 @@ export function createCrowd(materials, { count = 8, colors = OUTFITS, scale = 1.
       if (blobMesh) blobMesh.instanceMatrix.needsUpdate = true;
     },
   };
+  if (rig === 'lite' && pool && materials.crowdPool) materials.crowdPool.register(api);
   return api;
+}
+
+// ---------------------------------------------------------------- the town crowd pool (PERF P#4)
+// Every lite crowd (plots, ambient, walkers, event extras) is mirrored into ONE town-wide InstancedMesh (+ one blob
+// mesh) for the hero: gather() copies the visible, on-screen instances (world matrix + per-instance look) each hero
+// frame, so the hero pays 2 draws and only the vertices of people actually in its frustum. The source crowds stay
+// where they are for cards (layer CARD); the pool mesh is on layer TOWN. world.prepare sets the camera layers.
+export const CROWD_LAYER = { card: 1, town: 2, never: 3 };
+const ATTRS = ['aAnim', 'aTop', 'aBot', 'aLook', 'aBody', 'aHat'];
+export function createCrowdPool(materials, { max = 480 } = {}) {
+  if (!materials.crowd) materials.crowd = crowdMaterial(materials.shared);
+  const base = rigGeometry('lite');
+  const geo = new THREE.BufferGeometry();
+  for (const k of ['position', 'normal', 'color', 'aPart']) geo.setAttribute(k, base.attributes[k]);
+  const sizes = { aAnim: 3, aTop: 3, aBot: 3, aLook: 4, aBody: 4, aHat: 4 };
+  for (const k of ATTRS) geo.setAttribute(k, new THREE.InstancedBufferAttribute(new Float32Array(max * sizes[k]), sizes[k]).setUsage(THREE.DynamicDrawUsage));
+  const mesh = new THREE.InstancedMesh(geo, materials.crowd, max);
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  mesh.name = 'town:crowd';
+  mesh.frustumCulled = false;
+  mesh.castShadow = false;
+  mesh.receiveShadow = true;
+  mesh.count = 0;
+  mesh.layers.set(CROWD_LAYER.town);
+  blobGeo ||= new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+  const blob = new THREE.InstancedMesh(blobGeo, materials.basicBlob, max);
+  blob.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  blob.name = 'town:crowdBlobs';
+  blob.frustumCulled = false;
+  blob.renderOrder = 1;
+  blob.count = 0;
+  blob.layers.set(CROWD_LAYER.town);
+  const members = [];
+  let active = false;
+  const _f = new THREE.Frustum(), _pm = new THREE.Matrix4(), _w = new THREE.Matrix4(), _sp = new THREE.Sphere();
+  const setLayers = (c) => {
+    const L = c.poolOnly ? CROWD_LAYER.never : CROWD_LAYER.card;
+    c.mesh.layers.set(L);
+    c.blobMesh?.layers.set(L);
+  };
+  const inScene = (o) => { for (; o; o = o.parent) { if (!o.visible) return false; if (o.isScene) return true; } return false; };
+  const pool = {
+    mesh, blob, members, max, stats: { n: 0, members: 0 },
+    register(c, { poolOnly = false } = {}) {
+      if (members.includes(c)) { c.poolOnly = poolOnly; if (active) setLayers(c); return c; }
+      c.poolOnly = poolOnly;
+      members.push(c);
+      if (active) setLayers(c);
+      return c;
+    },
+    // A crowd that should only ever be drawn through the pool (no card draws), e.g. the ambient boardwalk folk.
+    poolOnly(c) { return pool.register(c, { poolOnly: true }); },
+    activate(scene) {
+      if (!active) { active = true; for (const c of members) setLayers(c); }
+      if (scene && mesh.parent !== scene) { scene.add(mesh); scene.add(blob); }
+    },
+    gather(camera, pad = 1) {
+      _pm.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+      _f.setFromProjectionMatrix(_pm);
+      const im = mesh.instanceMatrix.array, bm = blob.instanceMatrix.array, dst = ATTRS.map((k) => geo.attributes[k]);
+      let n = 0;
+      for (const c of members) {
+        if (n >= max) break;
+        const m = c.mesh;
+        if (!inScene(m)) continue;
+        const W = m.matrixWorld, src = m.instanceMatrix.array, srcB = c.blobMesh?.instanceMatrix.array, we = W.elements;
+        const ws = Math.sqrt(we[0] * we[0] + we[1] * we[1] + we[2] * we[2]);
+        const lim = Math.min(m.count, c.count), sa = ATTRS.map((k) => m.geometry.attributes[k]);
+        const blobOn = !!(c.blobMesh && c.blobMesh.visible);
+        for (let i = 0; i < lim && n < max; i++) {
+          const o = i * 16;
+          const s2 = src[o] * src[o] + src[o + 1] * src[o + 1] + src[o + 2] * src[o + 2];
+          if (s2 < 1e-8) continue;
+          const s = Math.sqrt(s2) * ws, tx = src[o + 12], ty = src[o + 13], tz = src[o + 14];
+          _sp.center.set(we[0] * tx + we[4] * ty + we[8] * tz + we[12], we[1] * tx + we[5] * ty + we[9] * tz + we[13] + 0.9 * s, we[2] * tx + we[6] * ty + we[10] * tz + we[14]);
+          _sp.radius = 1.6 * s * pad;
+          if (!_f.intersectsSphere(_sp)) continue;
+          _w.fromArray(src, o).premultiply(W).toArray(im, n * 16);
+          if (blobOn) { _w.fromArray(srcB, o).premultiply(W).toArray(bm, n * 16); }
+          else for (let k = 0; k < 16; k++) bm[n * 16 + k] = 0;
+          for (let a = 0; a < sa.length; a++) {
+            const S0 = sa[a], D = dst[a], sz = D.itemSize, sarr = S0.array, darr = D.array;
+            for (let k = 0; k < sz; k++) darr[n * sz + k] = sarr[i * sz + k];
+          }
+          n++;
+        }
+      }
+      mesh.count = blob.count = n;
+      pool.stats.n = n; pool.stats.members = members.length;
+      if (n) for (const D of [mesh.instanceMatrix, blob.instanceMatrix, ...dst]) {
+        if (D.addUpdateRange) { D.clearUpdateRanges(); D.addUpdateRange(0, n * D.itemSize); }
+        D.needsUpdate = true;
+      }
+      mesh.visible = blob.visible = n > 0;
+      return n;
+    },
+  };
+  return pool;
 }
 
 // Named cast (DESIGN W5 characters). s = body scale (named read ≥ 1.15× the crowd), girth = torso width, head/legs =
 // headK/legK. Avoid ethnic caricature: no sombrero-and-moustache bandits; the Stranger is a Leone duster, not a poncho.
 export const CHARACTERS = {
-  mabel: { top: '#b5483a', bot: '#6e452d', skin: 1, hair: 5, style: 2, acc: ['apron', 'garters'], stache: -1, hat: HAT.bowler, hatScale: 0.42, hatColor: 'dark', s: 1.7, girth: 1.65, head: 1.2, legs: 0.9 },
-  wendell: { top: '#c9b08a', bot: '#4a5878', skin: 3, hair: 2, style: 0, acc: ['bigbadge', 'gunbelt', 'scarf'], stache: 'walrus', hat: HAT.ten, hatScale: 1.25, hatColor: 'sand', s: 1.15 },
-  mortimer: { top: '#2b2230', bot: '#2b2230', skin: 5, hair: 4, style: 0, acc: ['tails'], stache: 'pencil', hat: HAT.stovepipe, hatScale: 1.15, hatColor: 'black', s: 1.2, girth: 0.78, legs: 1.35, head: 1.18 },
-  lulu: { top: '#c98b7e', bot: '#7a4f5a', skin: 5, hair: 5, style: 3, acc: ['dress'], stache: -1, hat: HAT.feathered, hatScale: 1.3, hatColor: 'red', s: 1.15 },
-  pickles: { top: '#8a6a52', bot: '#5b5f66', skin: 2, hair: 7, style: 1, acc: ['bottle', 'longjohns'], stache: 'chops', hat: HAT.droopy, hatScale: 1.05, hatColor: 'brown', s: 1.1 },
-  pomfrey: { top: '#6b3f86', bot: '#2b2230', skin: 0, hair: 6, style: 0, acc: ['tails', 'monocle', 'vest'], stache: 'handlebar', hat: HAT.stovepipe, hatScale: 2.2, hatColor: 'purple', s: 1.2, girth: 1.15 },
-  stranger: { top: '#7a6a5a', bot: '#4a5878', skin: 1, hair: 1, style: 0, acc: ['duster', 'cigar', 'gunbelt'], stache: -1, hat: HAT.flat, hatScale: 1.05, hatColor: 'dark', s: 1.15, legs: 1.05 },
-  mulligan1: { top: '#d9a441', bot: '#3f6b74', skin: 3, hair: 9, style: 0, acc: ['overalls', 'hammer'], stache: 'beard', hat: HAT.cap, hatScale: 1, hatColor: 'brown', s: 1.1, girth: 1.2 },
-  mulligan2: { top: '#b5483a', bot: '#3f6b74', skin: 3, hair: 9, style: 0, acc: ['overalls'], stache: 'beard', hat: HAT.derby, hatScale: 1, hatColor: 'brown', s: 1.0, girth: 1.0, legs: 0.85 },
-  mulligan3: { top: '#8fa27a', bot: '#3f6b74', skin: 3, hair: 9, style: 0, acc: ['overalls', 'scarf'], stache: 'beard', hat: HAT.stetson, hatScale: 0.8, hatColor: 'brown', s: 1.25, girth: 0.9, legs: 1.2 },
-  fingers: { top: '#e9e4da', bot: '#3c3a52', skin: 1, hair: 4, style: 2, acc: ['vest', 'garters'], stache: 'pencil', hat: HAT.bowler, hatScale: 0.9, hatColor: 'black', s: 1.1 },
-  bart: { top: '#3c3a52', bot: '#2b2230', skin: 2, hair: 0, style: 0, acc: ['mask', 'gunbelt', 'duster'], stache: -1, hat: HAT.stetson, hatScale: 1.35, hatColor: 'black', s: 1.15 },
-  nubbin: { top: '#5e8f8c', bot: '#8a6a52', skin: 0, hair: 2, style: 1, acc: ['scarf'], stache: -1, hat: HAT.cap, hatScale: 1.1, hatColor: 'grey', s: 0.85, head: 1.36, legs: 0.68 },
-  pete: { top: '#f3ede0', bot: '#5b5f66', skin: 0, hair: 6, style: 0, acc: ['apron', 'pliers'], stache: 'handlebar', hat: -1, s: 1.1 },
-  thrupp: { top: '#4a5878', bot: '#2b2230', skin: 5, hair: 7, style: 0, acc: ['vest', 'monocle'], stache: 'chops', hat: HAT.bowler, hatScale: 0.8, hatColor: 'black', s: 1.05, girth: 0.85 },
-  hortense: { top: '#8fa27a', bot: '#6e452d', skin: 2, hair: 3, style: 3, acc: ['apron'], stache: -1, hat: HAT.stetson, hatScale: 1.1, hatColor: 'straw', s: 1.1 },
-  wife: { top: '#8fa27a', bot: '#6b5a7d', skin: 1, hair: 3, style: 3, acc: ['dress', 'rollingpin'], stache: -1, hat: HAT.bonnet, hatScale: 1.05, hatColor: 'white', s: 1.1 },
-  longjohns: { top: '#d9545e', bot: '#d9545e', skin: 0, hair: 7, style: 1, acc: ['longjohns'], stache: 'walrus', hat: -1, s: 1.05 },
-  you: { top: '#5e8f8c', bot: '#4a5878', skin: 1, hair: 1, style: 0, acc: ['scarf', 'gunbelt'], stache: -1, hat: HAT.derby, hatScale: 1, hatColor: 'brown', s: 1.15 },
+  mabel: { top: '#b5483a', bot: '#6e452d', skin: 1, hair: 5, style: 2, acc: ['apron', 'garters'], stache: -1, hat: HAT.bowler, hatScale: 0.42, hatColor: 'dark', s: 1.7, girth: 1.65, head: 1.2, legs: 0.9, expr: 'angry' },
+  wendell: { top: '#c9b08a', bot: '#4a5878', skin: 3, hair: 2, style: 0, acc: ['bigbadge', 'gunbelt', 'scarf'], stache: 'walrus', hat: HAT.ten, hatScale: 1.25, hatColor: 'sand', s: 1.15, expr: 'grump' },
+  mortimer: { top: '#2b2230', bot: '#2b2230', skin: 5, hair: 4, style: 0, acc: ['tails'], stache: 'pencil', hat: HAT.stovepipe, hatScale: 1.15, hatColor: 'black', s: 1.2, girth: 0.78, legs: 1.35, head: 1.18, expr: 'grump' },
+  lulu: { top: '#c98b7e', bot: '#7a4f5a', skin: 5, hair: 5, style: 3, acc: ['dress'], stache: -1, hat: HAT.feathered, hatScale: 1.3, hatColor: 'red', s: 1.15, expr: 'grin' },
+  pickles: { top: '#8a6a52', bot: '#5b5f66', skin: 2, hair: 7, style: 1, acc: ['bottle', 'longjohns'], stache: 'chops', hat: HAT.droopy, hatScale: 1.05, hatColor: 'brown', s: 1.1, expr: 'sozzled' },
+  pomfrey: { top: '#6b3f86', bot: '#2b2230', skin: 0, hair: 6, style: 0, acc: ['tails', 'monocle', 'vest'], stache: 'handlebar', hat: HAT.stovepipe, hatScale: 2.2, hatColor: 'purple', s: 1.2, girth: 1.15, expr: 'grin' },
+  stranger: { top: '#7a6a5a', bot: '#4a5878', skin: 1, hair: 1, style: 0, acc: ['duster', 'cigar', 'gunbelt'], stache: -1, hat: HAT.flat, hatScale: 1.05, hatColor: 'dark', s: 1.15, legs: 1.05, expr: 'angry' },
+  mulligan1: { top: '#d9a441', bot: '#3f6b74', skin: 3, hair: 9, style: 0, acc: ['overalls', 'hammer'], stache: 'beard', hat: HAT.cap, hatScale: 1, hatColor: 'brown', s: 1.1, girth: 1.2, expr: 'grin' },
+  mulligan2: { top: '#b5483a', bot: '#3f6b74', skin: 3, hair: 9, style: 0, acc: ['overalls'], stache: 'beard', hat: HAT.derby, hatScale: 1, hatColor: 'brown', s: 1.0, girth: 1.0, legs: 0.85, expr: 'shock' },
+  mulligan3: { top: '#8fa27a', bot: '#3f6b74', skin: 3, hair: 9, style: 0, acc: ['overalls', 'scarf'], stache: 'beard', hat: HAT.stetson, hatScale: 0.8, hatColor: 'brown', s: 1.25, girth: 0.9, legs: 1.2, expr: 'grump' },
+  fingers: { top: '#e9e4da', bot: '#3c3a52', skin: 1, hair: 4, style: 2, acc: ['vest', 'garters'], stache: 'pencil', hat: HAT.bowler, hatScale: 0.9, hatColor: 'black', s: 1.1, expr: 'grin' },
+  bart: { top: '#3c3a52', bot: '#2b2230', skin: 2, hair: 0, style: 0, acc: ['mask', 'gunbelt', 'duster'], stache: -1, hat: HAT.stetson, hatScale: 1.35, hatColor: 'black', s: 1.15, expr: 'angry' },
+  nubbin: { top: '#5e8f8c', bot: '#8a6a52', skin: 0, hair: 2, style: 1, acc: ['scarf'], stache: -1, hat: HAT.cap, hatScale: 1.1, hatColor: 'grey', s: 0.85, head: 1.36, legs: 0.68, expr: 'grin' },
+  pete: { top: '#f3ede0', bot: '#5b5f66', skin: 0, hair: 6, style: 0, acc: ['apron', 'pliers'], stache: 'handlebar', hat: -1, s: 1.1, expr: 'grin' },
+  thrupp: { top: '#4a5878', bot: '#2b2230', skin: 5, hair: 7, style: 0, acc: ['vest', 'monocle'], stache: 'chops', hat: HAT.bowler, hatScale: 0.8, hatColor: 'black', s: 1.05, girth: 0.85, expr: 'grump' },
+  hortense: { top: '#8fa27a', bot: '#6e452d', skin: 2, hair: 3, style: 3, acc: ['apron'], stache: -1, hat: HAT.stetson, hatScale: 1.1, hatColor: 'straw', s: 1.1, expr: 'grump' },
+  wife: { top: '#8fa27a', bot: '#6b5a7d', skin: 1, hair: 3, style: 3, acc: ['dress', 'rollingpin'], stache: -1, hat: HAT.bonnet, hatScale: 1.05, hatColor: 'white', s: 1.1, expr: 'angry' },
+  longjohns: { top: '#d9545e', bot: '#d9545e', skin: 0, hair: 7, style: 1, acc: ['longjohns'], stache: 'walrus', hat: -1, s: 1.05, expr: 'shock' },
+  you: { top: '#5e8f8c', bot: '#4a5878', skin: 1, hair: 1, style: 0, acc: ['scarf', 'gunbelt'], stache: -1, hat: HAT.derby, hatScale: 1, hatColor: 'brown', s: 1.15, expr: 'grin' },
 };

@@ -57,7 +57,7 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
     }
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   })();
-  const mistMat = new THREE.MeshBasicMaterial({ map: mistTex, color: 0x8f86c8, transparent: true, depthWrite: false, opacity: 0, fog: false, toneMapped: false });
+  const mistMat = new THREE.MeshBasicMaterial({ map: mistTex, color: 0x8a94b0, transparent: true, depthWrite: false, opacity: 0, fog: false, toneMapped: false });
   const mist = (() => {
     const pos = [], uv = [];
     let r = 7;
@@ -95,6 +95,7 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
 
   const N = 8;
   const crowd = createCrowd(kit.materials, { count: N, seed: 5, radius: 600, center: [(street.x0 + street.x1) / 2, 0, 0] });
+  kit.materials.crowdPool?.poolOnly(crowd);
   group.add(crowd.mesh);
   const walks = life.walks?.length ? life.walks : [{ z: street.z + street.width / 2 - 0.6, x0: street.x0, x1: street.x1 }];
   const runners = [];
@@ -142,7 +143,7 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
       glow.visible = glow.material.opacity > 0.01;
       poolMat.opacity = Math.max(0, (n - 0.2) / 0.8) * 0.28;
       pool.visible = poolMat.opacity > 0.01;
-      mistMat.opacity = Math.max(0, (n - 0.3) / 0.7) * 0.32;
+      mistMat.opacity = Math.max(0, (n - 0.3) / 0.7) * 0.18;
       mist.visible = mistMat.opacity > 0.01;
       mist.position.x = Math.sin(time * 0.04) * 3;
       pigeons.forEach((p, i) => {

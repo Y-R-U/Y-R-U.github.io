@@ -75,7 +75,16 @@ One shared canvas atlas (2048×1024 pages, 64 px rows), cells cached by text+sty
   and `kit.western.stake(P.lot, 3, 3, { kind: 'reserved', signs: P.text('lot') })`.
 
 ### Characters (`kit.crowd`, `js/render/kit/crowd.js`)
-One rig, one InstancedMesh (+ one blob draw) per crowd. Head ≈ 40 %, big rosy nose, thick brows, ears, catchlit eyes.
+Two rigs, one shader. **lite** (default, ~7.6 k verts) and **full** (~22 k, every variant; the spectacle cast — default when
+`hats:false`, or pass `rig:'full'`). Head ≈ 40 %, a big bulbous rosy nose with a highlight, jug ears, heavy brows, beady
+catchlit eyes with lids, bushy moustaches spreading from under the nose, and five **expressions** (`kit.EXPR` grump · grin ·
+shock · angry · sozzled; `look(i, {expr})`; clips override: flail/handsup/sprawl → shock, punch/duel/draw → angry,
+cheer/tiphat/cancan → grin, stagger/slump/dizzy → sozzled). Variant codes are masks (hair 100+, moustache 300+, expression
+400+), so a lite part stands in for several full variants. Lite accessories: apron badge vest dress bottle scarf.
+**Town crowd pool** (`kit.crowdPool`, PERF P#4): every lite crowd is mirrored each hero frame into ONE `town:crowd`
+InstancedMesh + one blob mesh (per-instance frustum cull, hidden instances skipped). Source meshes sit on
+`kit.CROWD_LAYER.card` (cards only); `pool.poolOnly(crowd)` = never drawn directly (ambient folk). `world.prepare` sets layers.
+Passers-by wear everyday hats at 0.85–1.05 scale (1 in 6 bare-headed); giant hats are for the named cast and your tier.
 Hats, moustaches and accessories are **inside the rig** and chosen per instance, so a crowd is still one draw.
 - `crowd.set(i, x, y, z, heading, clip, phase?, speed?)` (unchanged) · `crowd.place(i, { x, y, z, heading, pitch, roll, clip,
   phase, speed, s, ground })` — full tumble pose; pitch/roll pivot about the body centre, blob stays on `ground`.
@@ -99,12 +108,31 @@ Hats, moustaches and accessories are **inside the rig** and chosen per instance,
   `SEAT` (1.13, rig units, head-top seat), `COLORS`, `forTier(HATS row)` → `{type, scale, color}` (derby → bowler → stetson →
   ten-gallon scaled up to the hundred-gallon), `forPomfrey(POMFREY_HATS row)` (purple top hat shrinking to a silver thimble).
 
+### Ghosts (`kit.ghost`, `kit/ghost.js`)
+`kit.ghost({ count, hat, tint, glow })` → `{ mesh, set(i, x, y, z, heading, s), hide(i), alpha(a), commit() }`. Bedsheet
+ghost in a dark stetson, translucent with a cyan fresnel rim, hem flutter + bob in the shader; one draw, ~1.6 k verts each.
+
+### Sky and day cycle (W18)
+- `kit/lighting.js` sky dome (one draw, follows the camera, layers all): gradient horizon → mid → top, warm band toward the
+  sun, sun disc that blooms, streaky clouds lit from the sun side, moon + stars at night. Disc position is decorative:
+  `LIGHTS[k].disc {az, el}` (golden −8°/7°, low on the horizon where the hero looks).
+- `js/data/clock.js` (pure): ~20 min cycle on `game.simTime` — golden 15 %, dusk 4 %, night 21 %, dawn 6 %, day 54 %; a fresh
+  save boots in golden hour. `world.clock` / `world.gameClock()`; light re-evaluated every 1 s. `?cycle=60` fast day,
+  `?clock=sec` offset, `?tod=h` pins the light.
+- Night is deep blue with a warm horizon glow and warm lantern pools (hero luma 0.42 at tod 23; mist is blue-grey, not lilac).
+- Mesas: faceted Monument-Valley buttes (talus skirt, striped cliff strata, overhanging caprock, spires), far ones 1.35× taller;
+  a ranch windmill + water tower silhouette past the end of the street.
+
 ### Town (`kit/town.js`, built by `world.js`; `world.town`)
+- Chunks are x-cells (56 m) × three bands: `n` (north lots, z < 5), `m` (street + edges), `s` (Pomfrey's side); ground
+  pebbles/tufts are split the same way. `mesh.userData.cell = {x0, x1, band}`. Cards (`world.prepare` line) show only cells
+  within ±40 m of the plot, hide `s` unless the card camera faces south, hide `town:far`; hero chunks > 60 m from the look
+  point don't cast shadows (P#2/P#5).
 - `world.town.signs` (town sign batch mesh), `world.town.graves.setCount(n)` (world calls it from `state.graves.length`;
   40 slots on Boot Hill), `world.town.lamps`, `world.town.life` (`walks`, `pigeonSpots`), windmill rotor spins in `tick`.
 
 ## Budgets (W10)
-- Crowd: 1 draw + 1 blob draw per crowd, whatever the hats/accessories. ~9 k rig vertices per instance (hats are ~45 %).
+- Crowd: hero = 2 draws total for every lite crowd (pool); cards = 1 + 1 blob per crowd. Lite rig 7.6 k verts/person.
 - Signs: 1 draw per batch (town: 1; plots: 1 per text tier used).
 - Town: ~3 bands × x-cells of 40 m merged chunks + ground cells + far/mesas + contact + signs + rotor + graves.
 
@@ -126,3 +154,13 @@ Hats, moustaches and accessories are **inside the rig** and chosen per instance,
   far, signs, rotor, ambient 3); desktop pass. Biggest call counts are plot dioramas and spectacle meshes.
 - Next for A: street-edge clutter density, south-row backs (bodies read as boxes from the town view), mesa haze/scale in town
   view, rig vert trim (hair styles), per-plot sign examples for lane P.
+- 2026-10-04 A round 2: lite crowd rig (7.6 k vs 22.3 k full) + town crowd pool (one hero draw), card culling in
+  `world.prepare` (cells ±40 m, Pomfrey's side and `town:far` hidden, ambient folk pool-only), far chunks don't cast shadows,
+  W18 game clock (`data/clock.js`) + warm blue night, sky dome with sun disc/clouds/stars, faceted striped mesas, skyline
+  windmill + tank, caricature push (bulbous nose, jug ears, lids, bushy moustaches, five expressions), smaller everyday hats on
+  passers-by, `kit.ghost`. Shots `docs/art/a/r2_*.png`.
+  Perf (perf-audit, CDP 9331; vertex and draw counts are exact, timings were taken with load avg 6–16 from other lanes):
+  static hero 109 calls / 2,793 k verts → 80 / 1,373 k (−51 %; all crowds 1.40 M → 272 k in 1 draw);
+  cards 754–1,095 k → 244–451 k verts (−60 to −70 %), 25–29 → 19–25 draws. rAF p95 is not comparable under that load
+  (before 3.1–3.6 ms at load 3.4; after 5.9–10.5 ms at load 6–16); test-scroll phone 8.2 ms at load 13–20 (gate 8),
+  desktop 6.2 ms pass. Pool gather costs ~0.1 ms at CPU 4×. Re-measure on a quiet machine.

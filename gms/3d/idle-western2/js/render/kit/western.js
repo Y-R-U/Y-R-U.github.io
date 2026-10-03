@@ -440,12 +440,27 @@ export function tumbleweedGeo() {
 
 // Faceted mesa: 2–3 stacked tapered blocks with a darker cap band (steal from Look B). h ~25–60 at 150–400 m.
 export function mesa(b, x, z, w, d, h, o = {}) {
+  // Monument-Valley butte, faceted (Look B steal): talus skirt, striped vertical cliff strata, an overhanging caprock,
+  // and sometimes a lone spire. Flat-shaded prisms so the facets catch the low sun.
   const M = at(x, o.y || 0, z, o.ry || 0, o.parent);
   const slot = o.slot || 'rock', band = o.band || 'rockDark', r = o.rnd || b.rnd;
-  b.add(S.jitter(S.prism(7, w * 0.62, w * 0.48, h * 0.62, { rot: r() }), w * 0.03, r), slot, { parent: M, sz: d / w, noAo: true });
-  b.add(S.prism(7, w * 0.48, w * 0.44, h * 0.08, { rot: r() }), band, { parent: at(0, h * 0.6, 0, 0, M), sz: d / w, noAo: true });
-  b.add(S.jitter(S.prism(6, w * 0.44, w * 0.38, h * 0.3, { rot: r() }), w * 0.02, r), slot, { parent: at(0, h * 0.68, 0, 0, M), sz: d / w, noAo: true });
-  if (o.spire) b.add(S.prism(5, w * 0.1, w * 0.07, h * 0.45, { rot: r() }), slot, { parent: at(w * 0.25, h * 0.9, 0, 0, M), noAo: true });
+  const sz = d / w, R = w * 0.5;
+  b.add(S.jitter(S.prism(9, R * 1.5, R * 1.02, h * 0.24, { rot: r() }), w * 0.035, r), slot, { parent: M, sz, noAo: true });
+  let y = h * 0.22, rr = R;
+  const strata = [[0.2, slot], [0.07, band], [0.22, slot], [0.05, band], [0.12, slot]];
+  for (const [k, sl] of strata) {
+    const r1 = rr * (0.97 + r() * 0.02);
+    b.add(S.jitter(S.prism(8, rr, r1, h * k, { rot: 0.3 }), w * 0.008, r), sl, { parent: at(0, y, 0, 0, M), sz, noAo: true });
+    y += h * k; rr = r1;
+  }
+  b.add(S.prism(8, rr * 1.04, rr * 1.06, h * 0.06, { rot: 0.3 }), band, { parent: at(0, y, 0, 0, M), sz, noAo: true });
+  b.add(S.prism(8, rr * 1.0, rr * 0.92, h * 0.025, { rot: 0.3 }), slot, { parent: at(0, y + h * 0.06, 0, 0, M), sz, noAo: true });
+  if (o.spire) {
+    const sx = R * (1.25 + r() * 0.3), sh = h * (0.9 + r() * 0.35), sr = w * 0.07;
+    b.add(S.jitter(S.prism(7, sr * 2.4, sr * 1.3, sh * 0.25, { rot: r() }), sr * 0.2, r), slot, { parent: at(sx, 0, 0, 0, M), noAo: true });
+    b.add(S.prism(6, sr * 1.15, sr * 0.85, sh * 0.72, { rot: r() }), slot, { parent: at(sx, sh * 0.22, 0, 0, M), noAo: true });
+    b.add(S.prism(6, sr * 1.05, sr * 1.1, sh * 0.06, { rot: 0.2 }), band, { parent: at(sx, sh * 0.92, 0, 0, M), noAo: true });
+  }
 }
 
 // Water tower: a 3 m tank on a 7 m trestle with a conical cap (skyline hero).
