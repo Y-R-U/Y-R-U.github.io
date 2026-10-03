@@ -4,7 +4,7 @@
 // while unowned the lot shows the office with Pomfrey's board.
 // L1 one cell → L25 a second cell + a jail wagon → L100 a lookout tower with a bell.
 import * as THREE from 'three';
-import { COLORS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, cart, tone } from './western.js?v=20261004a';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, cart, tone } from './western.js?v=20261004a';
 import { createConstruction, finishPlot } from './construction.js?v=20261004a';
 
 const BX = -2.8, FZ = 0.5, W = 5.6, D = 5.4, H = 3.4, FH = 5.4;
@@ -61,11 +61,12 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   const SC = 1.08;
   // 0–2 the singing drunks, 3 Sheriff Wendell, 4 a deputy-ish passer-by
-  const folk = hatted(P.crowd({ count: 5, seed: 53, scale: SC }), hats(kit, P, 'ten', 5, ['#6a5a3a', '#3a2c2c', '#b5483a', '#e6d6b8', '#8a5a3a']), SC, [0.95, 1.1, 0.85, 1.4, 0.9]);
+  const folk = hatted(P.crowd({ count: 5, seed: 53, scale: SC }), EXTRA_HATS, ['#6a5a3a', '#3a2c2c', '#b5483a', '#e6d6b8', '#8a5a3a'], [0.95, 1.1, 0.85, 1.4, 0.9]);
   folk.look(0, { top: '#C98B7E', bot: '#5a4632', skin: 1, hair: 2, style: 4 }).body(0, 1.25, 0.95, 1.0);
   folk.look(1, { top: '#8FA27A', bot: '#4a5878', skin: 3, hair: 0, style: 1 }).body(1, 1.2, 0.95, 1.05);
   folk.look(2, { top: '#D9A441', bot: '#6b5a7d', skin: 0, hair: 5, style: 3 }).body(2, 1.3, 0.9, 0.95);
-  folk.look(3, { top: '#e9e4da', bot: '#4a3a32', skin: 2, hair: 6, style: 0 }).body(3, 1.2, 0.95, 1.05);
+  folk.dress(3, 'wendell').look(3, { expr: 'shock' });
+  for (let i = 0; i < 3; i++) folk.look(i, { expr: 'sozzled' });
   P.walkers(folk, { ids: [4], paths: [[[-6.5, 4.2], [6.5, 4.2]]], loop: 'wrap', speed: 0.9, ownedOnly: false });
   let nextNote = 0;
 
@@ -74,11 +75,11 @@ export default function buildPlot(kit, { line, palette, rng }) {
   return finishPlot(P, C, {
     w: 13, cardW: 12, d: 9, h: FH + 2,
     acquired: true,
-    camera: cardCam([-0.6, 2.6, 0.0], 20, 42, 19),
+    camera: cardCam([-0.2, 2.0, 0.8], 12, 28, 12.5, 42),
     pileAnchor: [BX + 1.5, 0.8, FZ + 0.6], pileR: 1.2,
     exit: [[0, 3.4], [5, 4.0], [6.6, 4.2]],
     focus: [0, 1],
-    anchors: { cell: [CELL.x, 1.2, CELL.z + 1.4], cellDoor: [CELL.x - 1.2, 0.3, CELL.z + 1.6], jailWagon: [4.2, 1.0, 3.3], sheriff: [CH[0], 0.37, CH[1]], door: [BX + 0.6, 0.35, FZ + 0.3], vane: [BX + 1.2, FH + 1.6, FZ - 1.2] },
+    anchors: { cell: [CELL.x, 1.2, CELL.z + 1.4], cellDoor: [CELL.x - 1.2, 0.3, CELL.z + 1.6], jailWagon: [4.2, 1.0, 3.3], wagon: [4.2, 1.0, 3.3], doors: [BX + 0.6, 0.35, FZ + 0.3], center: [BX + 1.5, 0.0, FZ + 2.4], sheriff: [CH[0], 0.37, CH[1]], door: [BX + 0.6, 0.35, FZ + 0.3], vane: [BX + 1.2, FH + 1.6, FZ - 1.2] },
     update(dt, stats, time, tier, ctx) {
       vane.rotation.y = time * 1.4 + Math.sin(time * 0.7) * 2;
       const owned = ctx.owned;

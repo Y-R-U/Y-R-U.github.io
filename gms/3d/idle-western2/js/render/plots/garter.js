@@ -4,7 +4,7 @@
 // upstairs window and drops into the hay cart while his wife, rolling pin raised, storms in at the front door.
 // L1 parlour → L25 a gazebo of pink lanterns + a second boa'd balcony → L100 an onion-dome cupola with a heart weather vane.
 import * as THREE from 'three';
-import { COLORS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, cart, tone, tilt, hatGeo, smooth01 } from './western.js?v=20261004a';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, cart, tone, tilt, hatGeo, smooth01 } from './western.js?v=20261004a';
 import { createConstruction, finishPlot } from './construction.js?v=20261004a';
 
 const BX = -1.6, FZ = 0.6, W = 8.6, D = 6.0, H1 = 3.3, H2 = 6.4, FH = 7.6;
@@ -68,33 +68,32 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   const SC = 1.08;
   // 0 the gentleman (long johns), 1 his wife (bonnet + rolling pin), 2 Madame Lulu on the balcony, 3–4 gentlemen queueing, 5 a passer-by
-  const folk = hatted(P.crowd({ count: 6, seed: 43, scale: SC }), hats(kit, P, 'ten', 6, ['#3a2c2c', '#7a3a5a', '#9a2a4a', '#2e2630', '#6a5a3a', '#c9b08a']), SC, [1.0, 0.0, 1.6, 1.1, 1.0, 1.0]);
-  folk.look(0, { top: '#c4473a', bot: '#c4473a', skin: 0, hair: 6, style: 4 }).body(0, 1.2, 0.95, 1.05);
-  folk.look(1, { top: '#5a4a7a', bot: '#5a4a7a', skin: 1, hair: 7, style: 2 }).body(1, 1.25, 0.95, 1.08);
-  folk.look(2, { top: '#9a2a4a', bot: '#9a2a4a', skin: 0, hair: 3, style: 1 }).body(2, 1.25, 0.95, 1.08);
+  const folk = hatted(P.crowd({ count: 6, seed: 43, scale: SC }), EXTRA_HATS, ['#3a2c2c', '#7a3a5a', '#9a2a4a', '#2e2630', '#6a5a3a', '#c9b08a'], [1.0, 0.0, 1.6, 1.1, 1.0, 1.0]);
+  folk.dress(0, 'longjohns').body(0, 1.24, 0.95, 1.05);
+  folk.dress(1, 'wife').body(1, 1.24, 0.95, 1.08);
+  folk.dress(2, 'lulu').body(2, 1.24, 0.95, 1.05).look(2, { hatScale: 0.95 });
   folk.look(3, { top: '#3a3a4a', bot: '#3a3a4a', skin: 2, hair: 0, style: 0 });
   folk.look(4, { top: '#5E8F8C', bot: '#3a2c2c', skin: 3, hair: 1, style: 1 });
   P.queue(folk, { ids: [3, 4], spawn: [[7, 3.4], [7, 3.0]], counter: [DOOR[0], FZ + 0.9], dir: [1, 0.08], gap: 0.9, y: 0.37, exit: [[DOOR[0], FZ - 0.6], [DOOR[0], FZ - 1.6]], carry: false, faceCounter: Math.PI });
   P.walkers(folk, { ids: [5], paths: [[[-7, 4.4], [7, 4.4]]], loop: 'wrap', speed: 0.9, ownedOnly: false });
-  const bonnet = hats(kit, P, 'bonnet', 1, ['#e9d0e0']);
   const lostHat = hats(kit, P, 'ten', 1, ['#3a2c2c']);
   const dust = particles(kit, P, (n) => n.ball('hay', 0, 0, 0, 1, { detail: 0 }), 12);
   const r = (() => { let a = 13; return () => { a = (a * 16807) % 2147483647; return a / 2147483647; }; })();
   let exitAuto = true, exitT = 8, landed = false;
 
-  const C = createConstruction(kit, P, { x: BX, fz: FZ, w: W, d: D, h: H1, fh: FH, parapet: 'arched', ext: { x: BX + W / 2 + 1.9, z: 0.0, w: 2.6, h: 3.4 }, yard: [3.4, 3.4], stake: [1.8, 2.8] });
+  const C = createConstruction(kit, P, { x: BX, fz: FZ, w: W, d: D, h: H1, fh: FH, parapet: 'arched', ext: { x: BX + W / 2 + 1.9, z: 0.0, w: 2.6, h: 3.4 }, yard: [3.9, 2.2], stake: [1.8, 2.8] });
 
   const out = finishPlot(P, C, {
     w: 14, cardW: 12.5, d: 9, h: FH + 2,
-    camera: cardCam([-0.4, 3.4, 0.5], 18, 42, 20),
+    camera: cardCam([-0.6, 2.6, 1.5], 12, 26, 14, 42),
     pileAnchor: PILE, pileR: 1.2,
     exit: [[DOOR[0] + 1, 3.4], [5, 4.0], [7.2, 4.2]],
     focus: [0, 1],
-    anchors: { window: WIN, windowSill: [WIN[0], WIN[1] - 0.05, WIN[2] + 0.4], hayCart: [CART[0], 1.1, CART[1]], door: [DOOR[0], 0.37, FZ + 0.3], balcony: [BX - 1.5, H1 + 0.45, FZ + 1.6], lanterns: [BX, 2.4, FZ + 0.5] },
+    anchors: { window: WIN, windowSill: [WIN[0], WIN[1] - 0.05, WIN[2] + 0.4], hayCart: [CART[0], 1.1, CART[1]], haycart: [CART[0], 1.1, CART[1]], door: [DOOR[0], 0.37, FZ + 0.3], doors: [DOOR[0], 0.37, FZ + 0.3], center: [BX, 0.37, FZ + 1.4], balcony: [BX - 1.5, H1 + 0.45, FZ + 1.6], lanterns: [BX, 2.4, FZ + 0.5] },
     update(dt, stats, time, tier, ctx) {
       const owned = ctx.owned;
       dust.visible = owned;
-      if (!owned) { for (const i of [0, 1, 2]) folk.hide(i); bonnet.hide(0); bonnet.commit(); lostHat.hide(0); lostHat.commit(); pin.visible = false; return; }
+      if (!owned) { for (const i of [0, 1, 2]) folk.hide(i); lostHat.hide(0); lostHat.commit(); pin.visible = false; return; }
       // can-can
       const kick = Math.max(0, Math.sin(time * 4.2));
       leg.position.set(BX + 2.0 + Math.sin(time * 2.1) * 0.35, 1.95, FZ - 0.25);
@@ -138,16 +137,14 @@ export default function buildPlot(kit, { line, palette, rng }) {
     }
     lostHat.commit();
     // the wife
-    if (u < 2.4 || u > 5.6) { folk.hide(1); bonnet.hide(0); pin.visible = false; }
+    if (u < 2.4 || u > 5.6) { folk.hide(1); pin.visible = false; }
     else {
       const s = smooth01((u - 2.4) / 2.6), x = -7 + (DOOR[0] - -7) * s, z = 3.6 - (3.6 - FZ - 0.6) * smooth01((u - 4.2) / 1.0);
       folk.set(1, x, z > 2.5 ? 0.02 : 0.37, z, u < 4.2 ? Math.PI / 2 : Math.PI, u < 5.2 ? 1 : 0, 0, 7);
-      bonnet.put(0, x, (z > 2.5 ? 0.02 : 0.37) + 1.75, z, u < 4.2 ? Math.PI / 2 : Math.PI, 1.2);
       pin.visible = true;
       pin.position.set(x + (u < 4.2 ? 0.2 : -0.2), (z > 2.5 ? 0.02 : 0.37) + 2.15, z + 0.2);
       pin.rotation.set(0, 0, 0.6 + Math.sin(time * 14) * 0.5);
     }
-    bonnet.commit();
     void dt;
   }
   function headHat() { return 1.95; }

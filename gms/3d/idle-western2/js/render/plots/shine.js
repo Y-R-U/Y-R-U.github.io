@@ -1,7 +1,7 @@
 // 🥾 Spit & Shine: Lil' Nubbin's shoeshine throne in front of a mustard shack with a giant wooden boot on the roof.
 // Gag (W4): Nubbin spits on the boot, buffs, and the boot flashes a star glint. Stock: a tip jar with a coin heap.
 // L1 throne + shack → L25 second throne, striped awning, blade sign → L100 "Boot Emporium" with a golden boot.
-import { COLORS, cardCam, falseFront, porch, crate, blade, signBoard, hats, hatted, particles, tufts, rock, cactus, barrel, lantern, tone } from './western.js?v=20261004a';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, crate, blade, signBoard, hats, hatted, particles, tufts, rock, cactus, barrel, lantern, tone } from './western.js?v=20261004a';
 import { createConstruction, finishPlot } from './construction.js?v=20261004a';
 
 const BX = -2.9, FZ = 0.3, W = 5.6, D = 4.6, H = 3.0, FH = 4.6;
@@ -60,8 +60,8 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   // People: Nubbin (0), the customer on the throne (1), second shiner + customer at L25 (2, 3), bench waiters (4, 5), passers-by (6, 7)
   const SC = 1.08;
-  const folk = hatted(P.crowd({ count: 8, seed: 31, scale: SC }), hats(kit, P, 'ten', 8, ['#c9b08a', '#2e2630', '#8a5a3a', '#e6d6b8', '#6a5a3a', '#3a2c2c', '#b5483a', '#7a5236']), SC, [0.8, 1.45, 0.85, 1.2, 0.75, 0.8, 0.9, 0.9]);
-  folk.look(0, { top: '#c4473a', bot: '#5a4632', skin: 2, hair: 2, style: 0 }).body(0, 1.3, 0.62, 0.78);
+  const folk = hatted(P.crowd({ count: 8, seed: 31, scale: SC }), EXTRA_HATS, ['#c9b08a', '#2e2630', '#8a5a3a', '#e6d6b8', '#6a5a3a', '#3a2c2c', '#b5483a', '#7a5236'], [0.8, 1.45, 0.85, 1.2, 0.75, 0.8, 0.9, 0.9]);
+  folk.dress(0, 'nubbin');
   folk.look(1, { top: '#5E8F8C', bot: '#3a2c2c', skin: 1, hair: 4, style: 1 }).body(1, 1.2, 0.95, 1.05);
   folk.look(2, { top: '#D9A441', bot: '#5a4632', skin: 4, hair: 0, style: 2 }).body(2, 1.3, 0.62, 0.8);
   folk.look(3, { top: '#e9e4da', bot: '#6b5a7d', skin: 0, hair: 1, style: 3 }).body(3, 1.2, 1.0, 1.0);
@@ -72,11 +72,11 @@ export default function buildPlot(kit, { line, palette, rng }) {
   const glint = particles(kit, P, (n) => { n.ball('star', 0, 0, 0, 0.3, { detail: 0 }); for (let i = 0; i < 4; i++) n.cone('star', Math.cos(i * 1.5708) * 0.25, Math.sin(i * 1.5708) * 0.25, 0, 0.12, 0.7, 0, { sides: 4, rz: i * 1.5708 - Math.PI / 2 }); }, 3);
   let lastSpit = -1;
 
-  const C = createConstruction(kit, P, { x: BX, fz: FZ, w: W, d: D, h: H, fh: FH, parapet: 'arched', ext: { x: THRONE[0] + 1.2, z: THRONE[1] - 1.2, w: 4.2, h: 3.4 }, yard: [3.2, 3.4], stake: [1.4, 2.6] });
+  const C = createConstruction(kit, P, { x: BX, fz: FZ, w: W, d: D, h: H, fh: FH, parapet: 'arched', ext: { x: THRONE[0] + 1.2, z: THRONE[1] - 1.2, w: 4.2, h: 3.4 }, yard: [1.0, 2.2], stake: [1.4, 2.6] });
 
   return finishPlot(P, C, {
     w: 12, cardW: 11, d: 9, h: FH + 2,
-    camera: cardCam([-1.4, 2.4, 0.6], 20, 42, 18),
+    camera: cardCam([-1.4, 1.9, 1.4], 12, 26, 12.5, 42),
     pileAnchor: [THRONE[0] - 1.5, 0.62, THRONE[1] + 0.8], pileR: 1.2,
     exit: [[THRONE[0], 3.6], [5, 4.0], [6.5, 4.2]],
     focus: [THRONE[0] - 2, 1.2],

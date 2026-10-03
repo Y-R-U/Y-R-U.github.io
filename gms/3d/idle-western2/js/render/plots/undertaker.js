@@ -4,7 +4,7 @@
 // the lot shows the late Mr Grimsby's version with Pomfrey's purple board.
 // L1 parlour → L25 a little Boot Hill of crosses + a gravedigger → L100 a bell tower with a gilded coffin weather vane.
 import * as THREE from 'three';
-import { COLORS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, tone } from './western.js?v=20261004a';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, tone } from './western.js?v=20261004a';
 import { createConstruction, finishPlot } from './construction.js?v=20261004a';
 
 const BX = -2.0, FZ = 0.5, W = 7.4, D = 5.6, H = 3.6, FH = 6.4;
@@ -64,9 +64,8 @@ export default function buildPlot(kit, { line, palette, rng }) {
   const dust = particles(kit, P, (n) => n.ball('dust', 0, 0, 0, 1, { detail: 1, smooth: true }), 10);
 
   const SC = 1.08;
-  const folk = hatted(P.crowd({ count: 5, seed: 47, scale: SC }), hats(kit, P, 'ten', 5, ['#1e1a22', '#c9b08a', '#6a5a3a', '#8a5a3a', '#3a2c2c']), SC, [0, 1.0, 1.1, 1.0, 0.9]);
-  const pipe = hats(kit, P, 'pipe', 1, ['#1e1a22']);
-  folk.look(0, { top: '#2a2230', bot: '#2a2230', skin: 5, hair: 6, style: 0 }).body(0, 1.1, 1.35, 1.05);
+  const folk = hatted(P.crowd({ count: 5, seed: 47, scale: SC }), EXTRA_HATS, ['#1e1a22', '#c9b08a', '#6a5a3a', '#8a5a3a', '#3a2c2c'], [0, 1.0, 1.1, 1.0, 0.9]);
+  folk.dress(0, 'mortimer').look(0, { hatScale: 0.85 });
   folk.look(1, { top: '#8FA27A', bot: '#5a4632', skin: 2, hair: 2, style: 1 });
   folk.look(2, { top: '#D9A441', bot: '#4a5878', skin: 1, hair: 4, style: 2 });
   folk.look(3, { top: '#6a5a4a', bot: '#3a2c2c', skin: 3, hair: 0, style: 3 }).body(3, 1.15, 0.95, 1.05);
@@ -79,24 +78,22 @@ export default function buildPlot(kit, { line, palette, rng }) {
   return finishPlot(P, C, {
     w: 13, cardW: 12, d: 9, h: FH + 2,
     acquired: true,
-    camera: cardCam([-1.0, 3.0, 0.2], 20, 42, 19),
+    camera: cardCam([0.2, 2.1, 1.0], 12, 27, 12.5, 42),
     pileAnchor: [DOM.x + DOM.gap * 4, 1.0, DOM.z], pileR: 1.6,
     exit: [[0, 3.4], [5, 4.0], [6.6, 4.2]],
     focus: [0, 1],
-    anchors: { door: [BX + 0.8, 0.35, FZ + 0.3], coffins: [BX - 2.4, 1.2, FZ + 0.45], vultures: [BX, FH + 0.2, FZ], hearse: [4.4, 1.2, -1.2], dominoes: [DOM.x, 0, DOM.z], mortimer: [BX - 0.4, 0, FZ + 2.2] },
+    anchors: { door: [BX + 0.8, 0.35, FZ + 0.3], doors: [BX + 0.8, 0.35, FZ + 0.3], center: [BX + 1.6, 0.0, FZ + 2.6], coffins: [BX - 2.4, 1.2, FZ + 0.45], vultures: [BX, FH + 0.2, FZ], hearse: [4.4, 1.2, -1.2], dominoes: [DOM.x, 0, DOM.z], mortimer: [BX - 0.4, 0, FZ + 2.2] },
     update(dt, stats, time, tier, ctx) {
       const owned = ctx.owned;
       dust.visible = owned;
       // vultures (they stay on Pomfrey's version too — the town knows)
       for (let i = 0; i < 3; i++) { const bob = Math.max(0, Math.sin(time * 1.3 + i * 2.1)) * 0.25; vult.place(i, BX - 1.4 + i * 1.4, FH + 0.85 + (i === 1 ? 0.55 : 0), FZ - 0.05, Math.sin(time * 0.4 + i) * 0.4, 1, bob, 0); }
       vult.commit();
-      if (!owned) { folk.hide(0); folk.hide(3); pipe.hide(0); pipe.commit(); tape.visible = false; return; }
+      if (!owned) { folk.hide(0); folk.hide(3); tape.visible = false; return; }
       // Mortimer measures the nearest passer-by with his tape; a customer waits by the door
       const a = folk.agents ? null : null; void a;
       const mx = BX - 0.4, mz = FZ + 2.0;
       folk.set(0, mx, 0.37, mz, Math.PI / 2 + Math.sin(time * 0.5) * 0.4, 3, 0, 2);
-      pipe.put(0, mx, 0.37 + 2.22, mz, Math.PI / 2, 1.2, Math.sin(time * 3) * 0.06, 0);
-      pipe.commit();
       tape.position.set(mx + 0.3, 1.25, mz + 0.2);
       const reach = 1.2 + Math.sin(time * 1.1) * 0.8;
       tape.scale.set(reach, 1, 1);

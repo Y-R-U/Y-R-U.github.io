@@ -4,12 +4,11 @@
 // walls rise with t. No geometry is made after boot: timbers and planks are one InstancedMesh, the swinging front and
 // the sign are two prebuilt meshes, the crew is one crowd. Also plays the Lv25/Lv100 "extension" crew bustle.
 import * as THREE from 'three';
-import { tone, wheel, crate, particles, hats, headY, tilt, rand, smooth01, COLORS } from './western.js?v=20261004a';
+import { tone, wheel, crate, particles, placed, headY, tilt, rand, smooth01, COLORS } from './western.js?v=20261004a';
 
 const easeBack = (x) => { const t = Math.max(0, Math.min(1, x)); const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _c = new THREE.Color();
 const NSTAGE = 5, UP = new THREE.Vector3(0, 1, 0);
-const MULLIGAN = { top: '#c4473a', bot: '#4a5878', skin: 1, hair: 5, style: 2 };
 const CREW_SCALE = 1.08, CREW_K = 1.0;
 
 // site: { x, fz, w, d, h, fh, parapet, ext: {x, z, w, h} (Lv25/100 bustle spot), yard: [x, z] (lumber pile + mule cart) }
@@ -17,10 +16,12 @@ export function createConstruction(kit, P, site) {
   const S = { x: 0, fz: 0.9, w: 8, d: 5.5, h: 3.4, ...site };
   S.fh ??= S.h + 2;
   const x0 = S.x - S.w / 2, x1 = S.x + S.w / 2, zf = S.fz, zb = S.fz - S.d;
-  const yard = S.yard || [x1 + 2.6, zf + 1.4];
+  const yard = S.yard || [x1 + 1.2, zf + 2.0];
   const root = new THREE.Group();
   root.name = 'construction';
-  root.visible = false;
+  // Visible until the first update so the boot warm-up (host.warm, before any world.update) links its programs incl. the
+  // instanced shadow-depth flavour (PERF P#7); the first update hides it again.
+  root.visible = true;
   P.group.add(root);
   const rnd = rand(17 + Math.round(S.w * 13));
 
@@ -39,17 +40,34 @@ export function createConstruction(kit, P, site) {
   for (let i = 0; i < 3; i++) { const a = i * 2.09 + 0.3; g.cyl('raw2', tx + Math.cos(a) * 0.25, 0, tz + Math.sin(a) * 0.25, 0.03, 1.25, 0, { sides: 4, taper: 1, rz: Math.cos(a) * 0.2, rx: -Math.sin(a) * 0.2 }); }
   g.slab('brass', tx, 1.22, tz, 0.4, 0.2, 0.2, { round: 0.05, ry: 2.4 });
   g.cyl('brass', tx - 0.18, 1.32, tz - 0.16, 0.06, 0.34, 0, { sides: 7, taper: 1, rx: Math.PI / 2, ry: 2.4 });
-  // lumber pile and the mule cart
+  // lumber pile and the mule cart, turned to face the street so the yard stays compact beside the site
   const [yx, yz] = yard;
-  for (let r = 0; r < 4; r++) for (let k = 0; k < 4 - (r >> 1); k++) g.slab(tone(COLORS.raw, 0.92 + ((r + k) % 3) * 0.06), yx - 2.4 + (k - 1.5) * 0.36 + (r % 2) * 0.1, 0.02 + r * 0.17, yz - 0.9, 0.32, 0.16, 2.6, { round: 0.03, taper: 0, ry: Math.PI / 2 + (r % 2 ? 0.05 : -0.04) });
-  g.contact(yx - 2.4, yz - 0.9, 2.8, 1.5);
-  cartAndMule(g, yx + 0.4, yz + 0.3);
+  const lg = placed(g, yx - 1.05, yz, Math.PI / 2 + 0.08);
+  for (let r = 0; r < 4; r++) for (let k = 0; k < 4 - (r >> 1); k++) lg.slab(tone(COLORS.raw, 0.92 + ((r + k) % 3) * 0.06), (k - 1.5) * 0.36 + (r % 2) * 0.1 - 0.0, 0.02 + r * 0.17, 0, 0.32, 0.16, 2.6, { round: 0.03, taper: 0, ry: Math.PI / 2 + (r % 2 ? 0.05 : -0.04) });
+  lg.contact(0, 0, 2.8, 1.5);
+  g.slab('raw2', yx - 0.1, 0, yz + 1.2, 0.5, 0.42, 0.5, { round: 0.04 });
+  g.cyl('iron', yx - 0.1, 0.42, yz + 1.2, 0.12, 0.08, 0, { sides: 7, taper: 1 });
   crate(g, x1 + 0.7, 0, zf + 0.5, 0.9, 0.3);
   g.slab('canvas', x0 - 0.2, 0.0, zf + 2.4, 1.1, 0.75, 0.6, { round: 0.04, ry: 0.2 });
   g.slab('#f4f0e2', x0 - 0.2, 0.76, zf + 2.4, 0.9, 0.02, 0.62, { round: 0, taper: 0, ry: 0.4, noAo: true });
   g.slab('#5f86b0', x0 - 0.2, 0.775, zf + 2.4, 0.7, 0.01, 0.45, { round: 0, taper: 0, ry: 0.4, noAo: true });
+  // site clutter: a sawhorse with a half-cut plank, nail kegs, a bucket and offcuts (the build card's foreground)
+  const sx0 = x0 + 0.6, sz0 = zf + 2.0;
+  for (const k of [-1, 1]) for (const j of [-1, 1]) g.slab('raw2', sx0 + k * 0.55, 0, sz0 + j * 0.18, 0.08, 0.7, 0.08, { round: 0.02, taper: 0, rz: k * 0.12, rx: j * 0.18 });
+  g.slab('raw', sx0, 0.66, sz0, 1.4, 0.1, 0.18, { round: 0.02, taper: 0 });
+  g.slab(tone(COLORS.raw, 1.05), sx0 + 0.3, 0.76, sz0, 1.9, 0.07, 0.26, { round: 0.02, taper: 0, rz: -0.05 });
+  for (const [dx, dz] of [[1.6, 0.5], [1.95, 0.25], [x1 - x0 - 0.8, 2.6]]) { g.cyl('plank', x0 + dx, 0, zf + 2.0 + dz, 0.2, 0.42, 0, { sides: 9, taper: 0.9 }); g.cyl('iron', x0 + dx, 0.4, zf + 2.0 + dz, 0.18, 0.05, 0, { sides: 9, taper: 1, noAo: true }); }
+  for (let i = 0; i < 5; i++) g.slab(tone(COLORS.raw, 0.9 + (i % 3) * 0.06), x0 + 0.4 + i * 0.5, 0.02, zf + 3.1 + (i % 2) * 0.3, 0.5 + (i % 3) * 0.2, 0.06, 0.16, { round: 0.02, taper: 0, ry: i * 1.3 });
   const yardMesh = g.finish();
   root.add(yardMesh);
+  // the mule cart (own mesh): parked front-left, facing up the street; it bolts clear when the false front swings down
+  const cb = kit.builder(P.pal, { seed: 76 });
+  cartAndMule(cb, -1.3, 0);
+  const cartM = cb.finish();
+  cartM.matrixAutoUpdate = true;
+  const CART = S.cart || [x0 + 3.4, zf + 3.9];
+  cartM.position.set(CART[0], 0, CART[1]);
+  root.add(cartM);
 
   // ---- timbers + planks: one InstancedMesh with per-instance stage, reveal time and colour
   const items = [];
@@ -158,17 +176,12 @@ export function createConstruction(kit, P, site) {
   for (let k = 1; k <= 3; k++) eb.slab(tone(COLORS.plank, 1 + (k % 2) * 0.06), E.x, (k / 3) * E.h - 0.2, E.z, E.w + 0.3, 0.08, 1.9, { round: 0.02, taper: 0 });
   for (const sx of [-1, 1]) eb.slab('raw', E.x + sx * E.w / 2, 0.3, E.z + 0.95, 0.06, 0.06, Math.hypot(E.h, 0.1) * 0.9, { round: 0.01, taper: 0, rx: -Math.PI / 2 + 0.05, rz: sx * 0.5 });
   const scaff = eb.finish();
-  scaff.visible = false;
   P.group.add(scaff);
 
   // ---- crew: 3 identical Mulligans + the manager who runs out at the sign; hammers; bonk stars; dust
   const crew = P.crowd({ count: 4, seed: 5, scale: CREW_SCALE });
-  for (let i = 0; i < 3; i++) crew.look(i, MULLIGAN).body(i, 1.22, 0.9, CREW_K);
-  crew.look(3, { top: '#3f8f8a', bot: '#5a4632', skin: 2, hair: 0, style: 1 }).body(3, 1.2, 0.95, 1.0);
-  crew.mesh.visible = false;
-  const crewK = CREW_SCALE * 1.22 * CREW_K;
-  const crewHats = hats(kit, P, 'ten', 4, ['#8a5a3a', '#8a5a3a', '#8a5a3a', '#e9dcc0']);
-  crewHats.visible = false;
+  for (let i = 0; i < 3; i++) crew.dress(i, 'mulligan' + (i + 1));
+  crew.look(3, { top: '#3f8f8a', bot: '#5a4632', skin: 2, hair: 0, style: 1, acc: ['vest'], stache: 'handlebar', hat: 'bowler', hatScale: 0.85, hatColor: 'dark' }).body(3, 1.2, 0.95, 1.0);
   const hb = kit.builder(P.pal);
   hb.cyl('raw', 0, -0.05, 0, 0.025, 0.4, 0, { sides: 5, taper: 1, rx: Math.PI / 2 });
   hb.slab('iron', 0, -0.06, 0.36, 0.08, 0.12, 0.22, { round: 0.02, taper: 0, rx: Math.PI / 2 });
@@ -176,6 +189,7 @@ export function createConstruction(kit, P, site) {
   hammers.castShadow = false; hammers.boundingSphere = timbers.boundingSphere;
   root.add(hammers);
   const stars = particles(kit, P, (b) => { b.ball('star', 0, 0, 0, 0.35, { detail: 0 }); for (let i = 0; i < 5; i++) b.cone('star', Math.cos(i * 1.2566) * 0.3, Math.sin(i * 1.2566) * 0.3, 0, 0.22, 0.55, 0, { sides: 4, rz: i * 1.2566 - Math.PI / 2 }); }, 6);
+  stars.manual = true;
   stars.visible = false;
   root.add(stars);
   const dust = particles(kit, P, (b) => { b.ball('dust', 0, 0, 0, 1, { detail: 1, smooth: true }); }, 24);
@@ -195,10 +209,10 @@ export function createConstruction(kit, P, site) {
     const vy = -0.275, vz = 0.005;
     const ly = 0.68 + c * vy - s * vz - 0.04, lz = s * vy + c * vz, lx = 0.215;
     const ch = Math.cos(a.h), sh = Math.sin(a.h);
-    out[0] = a.x + (lx * ch + lz * sh) * crewK; out[1] = a.y + ly * crewK; out[2] = a.z + (-lx * sh + lz * ch) * crewK; out[3] = ang;
+    out[0] = a.x + (lx * ch + lz * sh) * a.k; out[1] = a.y + ly * a.k; out[2] = a.z + (-lx * sh + lz * ch) * a.k; out[3] = ang;
     return out;
   };
-  ag.forEach((a, k) => { a.ph = k * 1.7; });
+  ag.forEach((a, k) => { a.ph = k * 1.7; a.k = CREW_SCALE * 1.22 * [1.1, 1.0, 1.25, 1.0][k]; });
 
   let shownStage = -1, popT = 1, lastT = null, lastP = 0, bustle = 0, bonk = 0, bonkCd = 4, hurryKick = 0, thumped = false, dove = false, levelled = false, cheer = 0, prevVt = null;
   const hand = [0, 0, 0, 0];
@@ -249,17 +263,17 @@ export function createConstruction(kit, P, site) {
       if (prevVt != null && vt > prevVt && vt > 0) { bustle = 4.5; burst(E.x, 0.2, E.z + 1, 10, 0.6); }
       prevVt = vt;
       if (!bld && bustle <= 0) {
-        if (root.visible || crew.mesh.visible) { root.visible = false; scaff.visible = false; crew.mesh.visible = crewHats.visible = false; stars.visible = false; }
+        if (root.visible || crew.mesh.visible) { root.visible = false; scaff.visible = false; crew.mesh.visible = false; stars.visible = false; }
         shownStage = -1; lastT = null;
         return false;
       }
       const time = ctx.time;
-      crew.mesh.visible = crewHats.visible = true;
+      crew.mesh.visible = true;
       if (!bld) return bustleTick(dt, time);
       root.visible = true; scaff.visible = false;
       const rebrand = bld.acq === 'rebrand';
       const acquired = bld.acq && bld.acq !== 'built' && !rebrand;
-      if (acquired) { root.visible = false; crew.mesh.visible = crewHats.visible = false; return false; }
+      if (acquired) { root.visible = false; crew.mesh.visible = false; return false; }
       const st = rebrand ? 4 : Math.max(0, Math.min(NSTAGE - 1, bld.stage | 0));
       const p01 = Math.max(0, Math.min(1, bld.p01 ?? (bld.t / Math.max(1e-3, bld.T))));
       const sp = rebrand ? p01 : Math.max(0, Math.min(1, p01 * NSTAGE - st));
@@ -286,6 +300,7 @@ export function createConstruction(kit, P, site) {
       } else root.scale.set(1, 1, 1);
       // the false front: flat on the street during stage 3, swings up with an overshoot, THUMP, dust
       front.visible = st >= 3;
+      cartM.position.x = CART[0] + (st === 3 ? smooth01(sp / 0.25) * (1 - smooth01((sp - 0.9) / 0.1)) * (S.w + 3) : 0);
       if (st === 3) {
         const u = smooth01(sp / 0.86);
         const swing = u < 1 ? (1 - u) * (Math.PI / 2) : 0;
@@ -340,7 +355,7 @@ export function createConstruction(kit, P, site) {
       // C carries planks from the yard and swings one into B now and then (stars)
       if (st !== 4) {
         bonkCd -= dt;
-        const per = 7, u = (time % per) / per, ya = [yard[0] - 2.4, yard[1] + 0.4], tb2 = [B.x + 1.5, B.z + 0.15];
+        const per = 7, u = (time % per) / per, ya = [yard[0] - 1.05, yard[1] + 1.5], tb2 = [B.x + 1.5, B.z + 0.15];
         const f = u < 0.45 ? u / 0.45 : u < 0.55 ? 1 : 1 - (u - 0.55) / 0.45;
         C.x = ya[0] + (tb2[0] - ya[0]) * smooth01(f); C.z = ya[1] + (tb2[1] - ya[1]) * smooth01(f);
         C.h = Math.atan2(tb2[0] - ya[0], tb2[1] - ya[1]) + (u > 0.5 ? Math.PI : 0);
@@ -393,7 +408,7 @@ export function createConstruction(kit, P, site) {
     pose(time, ag);
     if (bustle <= 0) {
       for (const o of root.children) o.visible = true;
-      root.visible = false; scaff.visible = false; crew.mesh.visible = crewHats.visible = false;
+      root.visible = false; scaff.visible = false; crew.mesh.visible = false;
       return false;
     }
     return true;
@@ -401,10 +416,8 @@ export function createConstruction(kit, P, site) {
 
   function pose(time, list) {
     for (const a of list) {
-      if (a.hide) { crew.hide(a.i); crewHats.hide(a.i); if (a.i < 3) hammers.setMatrixAt(a.i, _m.makeScale(0, 0, 0)); continue; }
+      if (a.hide) { crew.hide(a.i); if (a.i < 3) hammers.setMatrixAt(a.i, _m.makeScale(0, 0, 0)); continue; }
       crew.set(a.i, a.x, a.y + 0.02, a.z, a.h, a.clip, a.ph, a.sp);
-      const hk = a.i === 3 ? 1.0 : CREW_K, hy = a.y + headY(CREW_SCALE, hk, 0.9, 1.22) - (a.clip === 5 ? 0.3 : 0);
-      crewHats.put(a.i, a.x - Math.sin(a.h) * 0.04, hy, a.z - Math.cos(a.h) * 0.04, a.h, 1.15, a.clip === 5 ? 0.3 : -0.08);
       if (a.i < 3) {
         if (a.clip === 3) {
           handAt(a, time, hand);
@@ -414,7 +427,6 @@ export function createConstruction(kit, P, site) {
       }
     }
     hammers.instanceMatrix.needsUpdate = true;
-    crewHats.commit();
   }
   void tilt; void wheel;
   return api;
@@ -424,7 +436,7 @@ function cartAndMule(b, x, z) {
   b.slab('plank', x, 0.62, z, 2.2, 0.14, 1.2, { round: 0.04 });
   for (const k of [-1, 1]) b.slab('plank2', x, 0.72, z + k * 0.56, 2.2, 0.36, 0.08, { round: 0.03, taper: 0 });
   for (let r = 0; r < 2; r++) for (let i = 0; i < 4; i++) b.slab(tone(COLORS.raw, 0.94 + ((r + i) % 3) * 0.05), x - 0.2, 0.76 + r * 0.15, z - 0.42 + i * 0.28, 2.8, 0.14, 0.24, { round: 0.03, taper: 0 });
-  for (const k of [-1, 1]) wheel(b, x - 0.3, 0.55, z + k * 0.72, 0.52);
+  for (const k of [-1, 1]) wheel(b, x - 0.3, 0.55, z + k * 0.72, 0.52, { ry: Math.PI / 2 });
   for (const k of [-1, 1]) b.slab('raw2', x + 1.75, 0.6, z + k * 0.38, 1.4, 0.07, 0.07, { round: 0.02, rz: 0.12 });
   // the mule: chunky body, long ears and a tail that sway, a judgemental face
   const mx = x + 2.55, mule = '#8a6a55', dark = '#5e4536';
@@ -453,6 +465,7 @@ export function finishPlot(P, C, spec) {
   let out = null, lotMesh = null;
   out = P.done({
     ...spec,
+    cardW: spec.camera?.facade ? 0.5 : spec.cardW,
     update(dt, stats, time, tier, ctx) {
       C.update(dt, stats, ctx);
       const building = !!stats?.building;
@@ -466,5 +479,41 @@ export function finishPlot(P, C, spec) {
   lotMesh = P.group.children.find((o) => !before.has(o) && o.isMesh) || null;
   out.anchors = { ...C.anchors, ...(spec.anchors || {}) };
   out.construction = C;
+  throttle(out, P);
   return out;
+}
+
+// PERF P#6: a plot runs every frame only while it is in focus: drawn by its own card camera, or drawn by a camera whose
+// look point (ground hit) lies on or near this lot (the hero framed on it). Otherwise its animation ticks at OFF_HZ with
+// the accumulated dt. Focus is sniffed with onBeforeRender on the plot's persistent meshes, so world.update needs no
+// hook. ?plotHz=60 disables it.
+const OFF_HZ = 16;
+const OFF_ON = typeof location === 'undefined' || !/[?&]plotHz=60\b/.test(location.search);
+const _wp = new THREE.Vector3(), _dir = new THREE.Vector3(), look = { cam: null, f: -1, x: 0, z: 0 };
+function throttle(out, P) {
+  if (!OFF_ON) return;
+  const update = out.update, halfW = out.bounds.heroW / 2 + 8;
+  let frame = 0, seen = -99, acc = 0;
+  const spy = (r, s, cam) => {
+    if (seen === frame) return;
+    if (cam.userData?.iw2Line === P.id) { seen = frame; return; }
+    const f = r.info.render.frame;
+    if (look.cam !== cam || look.f !== f) {
+      look.cam = cam; look.f = f;
+      cam.getWorldDirection(_dir);
+      const t = _dir.y < -0.05 ? Math.min(400, -cam.position.y / _dir.y) : 40;
+      look.x = cam.position.x + _dir.x * t; look.z = cam.position.z + _dir.z * t;
+    }
+    P.group.getWorldPosition(_wp);
+    if (Math.abs(_wp.x - look.x) < halfW && Math.abs(_wp.z - look.z) < 24) seen = frame;
+  };
+  P.group.traverse((o) => { if (o.isMesh) o.onBeforeRender = spy; });
+  out.update = (dt, stats, time, tier) => {
+    frame++;
+    acc += dt;
+    if (frame - seen > 3 && acc < 1 / OFF_HZ && dt > 0) return;
+    const d = acc;
+    acc = 0;
+    update(d, stats, time, tier);
+  };
 }

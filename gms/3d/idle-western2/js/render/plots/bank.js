@@ -61,14 +61,15 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   const SC = 1.08;
   // 0 Thrupp (tiny bowler), 1 a customer in line, 2 a second customer, 3 a passer-by
-  const folk = hatted(P.crowd({ count: 4, seed: 59, scale: SC }), hats(kit, P, 'bowler', 4, ['#2e2630', '#6a5a3a', '#5a4632', '#3a2c2c']), SC, [0.7, 1.3, 1.3, 1.3]);
-  folk.look(0, { top: '#3a3a4a', bot: '#3a3a4a', skin: 5, hair: 6, style: 0 }).body(0, 1.3, 0.9, 0.95);
+  const folk = hatted(P.crowd({ count: 4, seed: 59, scale: SC }), 'bowler', ['#2e2630', '#6a5a3a', '#5a4632', '#3a2c2c'], [0.7, 1.3, 1.3, 1.3]);
+  folk.dress(0, 'thrupp');
   folk.look(1, { top: '#8FA27A', bot: '#5a4632', skin: 2, hair: 2, style: 1 });
   folk.look(2, { top: '#C98B7E', bot: '#4a5878', skin: 1, hair: 4, style: 3 });
   folk.look(3, { top: '#D9A441', bot: '#4a5878', skin: 0, hair: 1, style: 2 });
   P.queue(folk, { ids: [1, 2], spawn: [[7, 3.6], [-7, 3.6]], counter: [BX + 0.8, FZ + 1.2], dir: [-1, 0.1], gap: 0.95, y: 0.37, exit: [[BX + 0.8, FZ - 0.4], [BX + 0.8, FZ - 1.6]], carry: false, faceCounter: Math.PI });
   P.walkers(folk, { ids: [3], paths: [[[-7, 4.3], [7, 4.3]]], loop: 'wrap', speed: 0.9, ownedOnly: false });
   const stars = particles(kit, P, (n) => { n.ball('star', 0, 0, 0, 0.35, { detail: 0 }); for (let i = 0; i < 5; i++) n.cone('star', Math.cos(i * 1.2566) * 0.3, Math.sin(i * 1.2566) * 0.3, 0, 0.22, 0.55, 0, { sides: 4, rz: i * 1.2566 - Math.PI / 2 }); }, 5);
+  stars.manual = true;
   const _m = new THREE.Matrix4(), _e = new THREE.Euler(), _q = new THREE.Quaternion(), _p = new THREE.Vector3(), _s = new THREE.Vector3();
 
   const C = createConstruction(kit, P, { x: BX, fz: FZ, w: W, d: D, h: H, fh: FH, parapet: 'flat', stakes: false, ext: { x: VAULT[0], z: VAULT[2], w: 3.0, h: 3.0 } });
@@ -76,11 +77,11 @@ export default function buildPlot(kit, { line, palette, rng }) {
   return finishPlot(P, C, {
     w: 14, cardW: 12.5, d: 9, h: FH + 2,
     acquired: true,
-    camera: cardCam([-0.6, 2.8, 0.0], 20, 42, 20),
+    camera: cardCam([0.0, 2.2, 0.8], 12, 27, 12.5, 42),
     pileAnchor: [PILE[0], 0.8, PILE[2]], pileR: 1.4,
     exit: [[BX + 1.5, 3.4], [5, 4.0], [7.2, 4.2]],
     focus: [0, 1],
-    anchors: { vault: [VAULT[0], VAULT[1], VAULT[2] + 0.5], door: [BX + 0.8, 0.35, FZ + 0.3], noGuns: [BX - 2.4, 1.6, FZ + 0.25], teller: [BX + 2.2, 1.3, FZ + 0.2], thrupp: [VAULT[0] - 1.6, 0.32, VAULT[2] + 1.0], robberyExit: [BX + 0.8, 0, 4.0] },
+    anchors: { vault: [VAULT[0], VAULT[1], VAULT[2] + 0.5], door: [BX + 0.8, 0.35, FZ + 0.3], doors: [BX + 0.8, 0.35, FZ + 0.3], center: [BX + 0.8, 0.0, FZ + 2.4], noGuns: [BX - 2.4, 1.6, FZ + 0.25], teller: [BX + 2.2, 1.3, FZ + 0.2], thrupp: [VAULT[0] - 1.6, 0.32, VAULT[2] + 1.0], robberyExit: [BX + 0.8, 0, 4.0] },
     update(dt, stats, time, tier, ctx) {
       const owned = ctx.owned;
       const sw = 0.9 + Math.sin(time * 0.35) * 0.5;
@@ -97,6 +98,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
         folk.hats.put(0, x - Math.sin(Math.PI * 0.75) * fall * 1.9, 0.4, z - Math.cos(Math.PI * 0.75) * fall * 1.9 + fall * 0.3, 0, 0.75, 1.2);
       }
       const on = u > 9.5 && u < 13;
+      stars.visible = on;
       for (let i = 0; i < 5; i++) {
         if (!on) { stars.setMatrixAt(i, _m.makeScale(0, 0, 0)); continue; }
         const a = time * 4 + i * 1.2566, hx = x - Math.sin(Math.PI * 0.75) * 1.6, hz = z - Math.cos(Math.PI * 0.75) * 1.6;

@@ -3,7 +3,7 @@
 // bathwater (murky, sold to the saloon as "house beer"). Gag: every few seconds a bather leaps up and the duck flies.
 // L1 two tubs → L25 a third tub behind a rose privacy screen → L100 a water tower piping hot water to the deck.
 import * as THREE from 'three';
-import { COLORS, cardCam, falseFront, porch, win, barrel, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, tone } from './western.js?v=20261004a';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, barrel, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, tone } from './western.js?v=20261004a';
 import { createConstruction, finishPlot } from './construction.js?v=20261004a';
 
 const BX = -3.0, FZ = 0.4, W = 6.0, D = 5.0, H = 3.2, FH = 5.0;
@@ -70,19 +70,20 @@ export default function buildPlot(kit, { line, palette, rng }) {
   const steam = particles(kit, P, (n) => { n.ball('steam', 0, 0, 0, 1, { detail: 1, smooth: true }); }, 24);
   const fire = particles(kit, P, (n) => { n.ball('fire', 0, 0, 0, 1, { detail: 0 }); }, 6);
   const SC = 1.08;
-  const folk = hatted(P.crowd({ count: 6, seed: 17, scale: SC }), hats(kit, P, 'ten', 6, ['#c9b08a', '#3a2c2c', '#e6d6b8', '#8a5a3a', '#6a5a3a', '#b5483a']), SC, [1.1, 1.3, 0.9, 0.8, 1.0, 0.8]);
+  const folk = hatted(P.crowd({ count: 6, seed: 17, scale: SC }), EXTRA_HATS, ['#c9b08a', '#3a2c2c', '#e6d6b8', '#8a5a3a', '#6a5a3a', '#b5483a'], [1.1, 1.3, 0.9, 0.8, 1.0, 0.8]);
   for (let i = 0; i < 3; i++) folk.look(i, { top: '#c4473a', bot: '#c4473a', skin: i, hair: i * 2, style: i + 1 }).body(i, 1.25, 0.9, 1.0);
+  for (let i = 0; i < 3; i++) folk.look(i, { expr: 'grin' });
   folk.look(3, { top: '#e9e4da', bot: '#6b5a7d', skin: 1, hair: 3, style: 0 }).body(3, 1.15, 0.95, 1.0);
   folk.look(4, { top: '#8FA27A', bot: '#4a3a32', skin: 3, hair: 0, style: 1 });
   folk.look(5, { top: '#D9A441', bot: '#4a5878', skin: 0, hair: 5, style: 2 });
   P.walkers(folk, { ids: [4, 5], paths: [[[-6.4, 4.0], [6.4, 3.9]], [[6.4, 4.4], [-6.4, 4.5]]], loop: 'wrap', speed: 0.9, ownedOnly: false });
   const r = (() => { let a = 9; return () => { a = (a * 16807) % 2147483647; return a / 2147483647; }; })();
 
-  const C = createConstruction(kit, P, { x: BX, fz: FZ, w: W, d: D, h: H, fh: FH, parapet: 'gabled', ext: { x: 4.6, z: 0.4, w: 3.6, h: 3.4 }, yard: [3.2, 3.4], stake: [1.6, 2.6] });
+  const C = createConstruction(kit, P, { x: BX, fz: FZ, w: W, d: D, h: H, fh: FH, parapet: 'gabled', ext: { x: 4.6, z: 0.4, w: 3.6, h: 3.4 }, yard: [1.2, 2.2], stake: [1.6, 2.6] });
 
   return finishPlot(P, C, {
     w: 13, cardW: 12, d: 9, h: FH + 2,
-    camera: cardCam([0.0, 2.2, 0.4], 20, 42, 19),
+    camera: cardCam([-0.8, 1.9, 1.2], 12, 26, 14, 42),
     pileAnchor: [PILE[0], 0.8, PILE[2]], pileR: 1.4,
     exit: [[BX + 1.4, 3.4], [5, 4.0], [6.6, 4.2]],
     focus: [1.5, 1.2],

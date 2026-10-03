@@ -2,7 +2,7 @@
 // and a mule that kicks the barn wall every few seconds (dust, a plank pops loose). Stock: the manure heap, with flies.
 // L1 barn + corral → L25 lean-to stalls + more horses → L100 a big horseshoe on the roof and a horse weather vane.
 import * as THREE from 'three';
-import { COLORS, cardCam, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, horse, bale, tone, battens, wheel } from './western.js?v=20261004a';
+import { COLORS, EXTRA_HATS, cardCam, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, horse, bale, tone, battens, wheel } from './western.js?v=20261004a';
 import { createConstruction, finishPlot } from './construction.js?v=20261004a';
 
 const BX = -3.4, FZ = 0.6, W = 7.4, D = 6.4, H = 3.6, FH = 6.6;
@@ -80,8 +80,9 @@ export default function buildPlot(kit, { line, palette, rng }) {
   const sparks = particles(kit, P, (n) => n.ball('spark', 0, 0, 0, 1, { detail: 0 }), 18);
   const dust = particles(kit, P, (n) => n.ball('dust', 0, 0, 0, 1, { detail: 1, smooth: true }), 10);
   const flies = particles(kit, P, (n) => n.ball('#1e1a1a', 0, 0, 0, 1, { detail: 0 }), 5);
+  flies.manual = true;
   const SC = 1.08;
-  const folk = hatted(P.crowd({ count: 5, seed: 29, scale: SC }), hats(kit, P, 'ten', 5, ['#3a2c2c', '#e6d6b8', '#8a5a3a', '#c9b08a', '#6a5a3a']), SC, [0.9, 1.6, 1.0, 1.1, 1.0]);
+  const folk = hatted(P.crowd({ count: 5, seed: 29, scale: SC }), EXTRA_HATS, ['#3a2c2c', '#e6d6b8', '#8a5a3a', '#c9b08a', '#6a5a3a'], [0.9, 1.6, 1.0, 1.1, 1.0]);
   folk.look(0, { top: '#6a5a4a', bot: '#3a2c2c', skin: 3, hair: 0, style: 0, acc: 0 }).body(0, 1.15, 1.0, 1.12);
   folk.look(1, { top: '#C98B7E', bot: '#5a4632', skin: 1, hair: 2, style: 3 }).body(1, 1.25, 0.9, 1.0);
   folk.look(2, { top: '#5E8F8C', bot: '#4a5878', skin: 2, hair: 4, style: 1 });
@@ -92,11 +93,11 @@ export default function buildPlot(kit, { line, palette, rng }) {
   let kicked = -1;
   const _hip = new THREE.Vector3(), _fm = new THREE.Matrix4();
 
-  const C = createConstruction(kit, P, { x: BX, fz: FZ, w: W, d: D, h: H, fh: FH, parapet: 'gabled', ext: { x: BX - W / 2 - 1.3, z: FZ - 2.6, w: 2.8, h: 3.4 }, yard: [3.6, 3.4], stake: [1.0, 2.8] });
+  const C = createConstruction(kit, P, { x: BX, fz: FZ, w: W, d: D, h: H, fh: FH, parapet: 'gabled', ext: { x: BX - W / 2 - 1.3, z: FZ - 2.6, w: 2.8, h: 3.4 }, yard: [1.5, 2.4], stake: [1.0, 2.8] });
 
   return finishPlot(P, C, {
     w: 16, cardW: 13, d: 9, h: FH + 2,
-    camera: cardCam([-0.8, 2.6, 0.0], 18, 42, 21),
+    camera: cardCam([-1.6, 2.2, 1.0], 12, 26, 15, 42),
     pileAnchor: [PILE[0], 0.6, PILE[2]], pileR: 1.4,
     exit: [[BX + 0.4, 3.4], [6, 4.0], [8.5, 4.3]],
     focus: [0, 0.5],

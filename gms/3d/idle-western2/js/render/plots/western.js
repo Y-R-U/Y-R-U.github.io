@@ -11,7 +11,7 @@ export const COLORS = {
   dust: '#F3E2C4', dirtL: '#E8B888', dirtM: '#D49A6A', rut: '#B97B52',
   cactus: '#6E9B57', cactus2: '#4E7A45', rockN: '#C5653F',
   brass: { c: '#D9A84A', r: 0.3, m: 0.8 }, gold: { c: '#FFD27A', r: 0.25, m: 0.9 }, ownTeal: '#3f8f8a',
-  glass: { c: '#ffb45a', r: 0.2, g: -1.2 }, interior: { c: '#ffb860', r: 0.6, g: 0.22 }, lantern: { c: '#FFC978', r: 0.3, g: 1.1 },
+  glass: { c: '#e8842e', r: 0.3, g: 0.3 }, glassN: { c: '#ffb45a', r: 0.2, g: -1.2 }, sil: { c: '#5a2e26', r: 0.9 }, interior: { c: '#ffb860', r: 0.6, g: 0.22 }, lantern: { c: '#FFC978', r: 0.3, g: 1.1 },
   lanternN: { c: '#ffb45a', r: 0.3, g: -1.6 }, star: { c: '#FFE45C', r: 0.4, g: 1.4 }, spark: { c: '#ffd36a', r: 0.4, g: 2.6 },
   hay: '#E3BE62', hay2: '#C99D45', iron: { c: '#4a4446', r: 0.5, m: 0.5 }, steam: '#f6efe6', water: { c: '#8cb8b4', r: 0.12 },
   pinkL: { c: '#ff8fb4', r: 0.35, g: 0.7 }, rope: '#d9c08a', canvas: '#efe2c6', bone: '#efe6d2',
@@ -111,6 +111,21 @@ export function win(b, x, y, z, o = {}) {
   b.slab(trim, x, y + h * 0.5 - 0.03, z + 0.02, w, 0.06, 0.06, { round: 0.01, taper: 0 });
   b.slab(trim, x, y, z + 0.02, 0.06, h, 0.06, { round: 0.01, taper: 0 });
   if (o.shutters) for (const s of [-1, 1]) b.slab(o.shutters, x + s * (w / 2 + 0.32), y, z + 0.04, 0.42, h, 0.06, { round: 0.02, taper: 0 });
+  if (o.sil !== false && w >= 0.8 && h >= 0.9) silhouettes(b, x, y, z + 0.012, w, h, o.sil ?? 1);
+  return b;
+}
+
+// Warm-lit interior figures painted on the glass (a drinker, a hat, a raised glass): hashed by position so neighbours differ.
+export function silhouettes(b, x, y, z, w, h, n = 1) {
+  let a = Math.abs(Math.round(x * 97 + y * 31 + z * 13)) + 7;
+  const r = () => { a = (a * 16807) % 2147483647; return a / 2147483647; };
+  for (let k = 0; k < n; k++) {
+    const sx = x + (n > 1 ? (k / (n - 1) - 0.5) * w * 0.55 : (r() - 0.5) * w * 0.45), s = Math.min(1, h / 1.3) * (0.85 + r() * 0.25), base = y + 0.02;
+    b.slab('sil', sx, base, z, 0.5 * s, 0.42 * s, 0.01, { round: 0.12 * s, taper: 0.25, noAo: true });
+    b.ball('sil', sx, base + 0.58 * s, z, 0.15 * s, { sz: 0.08, detail: 1, noAo: true });
+    if (r() < 0.7) { b.slab('sil', sx, base + 0.68 * s, z, 0.5 * s, 0.04, 0.01, { round: 0.01, taper: 0, noAo: true }); b.slab('sil', sx, base + 0.7 * s, z, 0.24 * s, 0.17 * s, 0.01, { round: 0.04, taper: 0.1, noAo: true }); }
+    if (r() < 0.5) { const d = r() < 0.5 ? -1 : 1; b.slab('sil', sx + d * 0.25 * s, base + 0.3 * s, z, 0.08 * s, 0.42 * s, 0.01, { round: 0.03, taper: 0, rz: -d * 0.5, noAo: true }); b.slab('sil', sx + d * 0.42 * s, base + 0.62 * s, z, 0.09 * s, 0.14 * s, 0.01, { round: 0.02, taper: 0, noAo: true }); }
+  }
   return b;
 }
 
@@ -289,22 +304,17 @@ export function hats(kit, P, kind, count, colors = []) {
 // Where a hat sits on a crowd head: the rig's head scales about y = 0.76 by headK; legs shift everything by 0.4·(legK−1).
 export function headY(scale, s = 1, legK = 0.95, headK = 1.2) { return (0.76 + 0.37 * headK + 0.4 * (legK - 1)) * scale * 1.22 * s; }
 
-// Gives a crowd hats: wraps set/hide/body/commit so every placed person wears hat i (one instanced draw).
-// sizes[i] scales a hat (the barkeep's tiny bowler is the inverse joke); tilt by clip: sit slumps the hat forward.
-export function hatted(crowd, hm, scale = 1.36, sizes = []) {
-  const bodies = Array.from({ length: crowd.count }, () => [1.2, 0.95, 1]);
-  const { set, hide, body, commit } = crowd;
-  crowd.body = (i, headK = 1, legK = 1, s = null) => { bodies[i] = [headK, legK, s ?? bodies[i][2]]; body(i, headK, legK, s); return crowd; };
-  crowd.set = (i, x, y, z, h = 0, clip = 0, ph, sp) => {
-    set(i, x, y, z, h, clip, ph, sp);
-    const [hk, lk, s] = bodies[i], k = scale * 1.22 * s;
-    const sit = clip === 5;
-    hm.put(i, x - Math.sin(h) * 0.03 * k, y + headY(scale, s, lk, hk) - (sit ? 0.36 * k : 0) + (sit ? 0.12 * k : 0), z - Math.cos(h) * 0.03 * k + (sit ? Math.cos(h) * 0.12 * k : 0), h, (sizes[i] ?? 1) * 0.9 * hk * s * (scale / 1.36), sit ? 0.25 : -0.1);
-    return crowd;
-  };
-  crowd.hide = (i) => { hide(i); hm.hide(i); return crowd; };
-  crowd.commit = () => { commit(); hm.commit(); };
-  crowd.hats = hm;
+// Gives a crowd in-rig hats (lane A's parametric hat: zero extra draws, follows head bob/pose/tilt). kind: a hat type
+// name or a list cycled per instance; sizes[i] scales a hat (0 = bare head, the barkeep's tiny bowler is the inverse joke). Extras are capped so the
+// brims never eat the faces at card distance (PLAYTEST_1 #3). crowd.hats is a no-op shim for old call sites.
+export const EXTRA_HATS = ['stetson', 'bowler', 'derby', 'ten', 'flat', 'boater', 'stetson', 'droopy'];
+export function hatted(crowd, kind = EXTRA_HATS, colors = [], sizes = [], cap = 1.0) {
+  for (let i = 0; i < crowd.count; i++) {
+    const s = sizes[i] ?? 0.9;
+    if (s <= 0) crowd.look(i, { hat: -1 });
+    else crowd.look(i, { hat: Array.isArray(kind) ? kind[i % kind.length] : kind, hatScale: Math.min(cap, s) * 0.8, hatColor: colors[i % Math.max(1, colors.length)] || '#7a5236' });
+  }
+  crowd.hats = { put() {}, hide() {}, commit() {}, setColorAt: (i, c) => crowd.look(i, { hatColor: '#' + c.getHexString() }) };
   return crowd;
 }
 
@@ -344,7 +354,10 @@ export function particles(kit, P, build, count, { cast = false } = {}) {
   for (let i = 0; i < count; i++) m.setMatrixAt(i, _m.makeScale(0, 0, 0));
   P.group.add(m);
   const live = Array.from({ length: count }, () => ({ t: 1, life: 0, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0, s: 1, g: 0, spin: 0 }));
-  let next = 0, dirty = false;
+  let next = 0, dirty = false, want = true;
+  // An idle pool costs a draw call for nothing (P#4): it only renders while it is wanted (plots still set .visible) AND
+  // has a live particle. Pools posed by hand (setMatrixAt) set .manual = true and are shown while wanted.
+  Object.defineProperty(m, 'visible', { get: () => want && (m.manual || dirty), set: (v) => { want = !!v; }, configurable: true });
   return Object.assign(m, {
     emit(x, y, z, vx, vy, vz, life = 1, s = 0.3, g = 0, spin = 0) {
       const p = live[next]; next = (next + 1) % count;
@@ -380,9 +393,25 @@ export function rand(seed) {
 
 export const smooth01 = (x) => { const t = Math.max(0, Math.min(1, x)); return t * t * (3 - 2 * t); };
 
-// Card camera from a look point: yaw (deg, + = from the left/west), elevation (deg), distance, fov. Steep enough that the
-// south-side frontages (local z ≳ 14) stay under the frustum on portrait cards.
-export function cardCam(look, yaw = 22, elev = 44, dist = 20, fov = 34) {
-  const a = (yaw * Math.PI) / 180, e = (elev * Math.PI) / 180;
-  return { pos: [look[0] - Math.sin(a) * Math.cos(e) * dist, look[1] + Math.sin(e) * dist, look[2] + Math.cos(a) * Math.cos(e) * dist], look, fov };
+// Card camera (round 2, refs/a_clay_card_saloon.jpg): faces the facade from the street at ~30–35°, so the porch, doors
+// and people read. look = the joke's centre; yaw (deg, + = from the west), elevation (deg), dist = final distance on a
+// portrait card. createCardRig pushes portrait cameras out by 1.15 and would widen to fit bounds.w, so facade cams
+// pre-divide the distance and finishPlot sets cardW ≈ 0 (the framing is authored, not fitted).
+export function cardCam(look, yaw = 16, elev = 32, dist = 14, fov = 40) {
+  const a = (yaw * Math.PI) / 180, e = (elev * Math.PI) / 180, d = dist / 1.15;
+  return { pos: [look[0] - Math.sin(a) * Math.cos(e) * d, look[1] + Math.sin(e) * d, look[2] + Math.cos(a) * Math.cos(e) * d], look, fov, facade: true };
+}
+
+// A builder view that places everything it draws at (x, z) turned by ry (uses the builder's `parent` option), so a
+// prop authored along +x can be dropped in at any heading.
+const OPT_AT = { slab: 7, cyl: 7, cone: 7, ball: 5, contact: 4 };
+export function placed(b, x, z, ry = 0, y = 0) {
+  const parent = new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), ry), new THREE.Vector3(1, 1, 1));
+  return new Proxy(b, {
+    get(t, k) {
+      const at = OPT_AT[k];
+      if (at == null) return t[k];
+      return (...a) => { while (a.length < at) a.push(k === 'cyl' || k === 'cone' ? 0 : undefined); a[at] = { ...(a[at] || {}), parent }; return t[k](...a); };
+    },
+  });
 }

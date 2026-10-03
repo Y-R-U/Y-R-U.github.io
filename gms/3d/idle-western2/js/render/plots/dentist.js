@@ -3,11 +3,11 @@
 // Stock: a big glass jar of pulled teeth (a few gold). A patient waits on the bench holding his jaw.
 // L1 one chair → L25 a shaving chair with a lathered customer → L100 a gilded tooth on the roof and a second storey sign.
 import * as THREE from 'three';
-import { COLORS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, tone, tilt } from './western.js?v=20261004a';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hatted, particles, tufts, rock, tone, tilt } from './western.js?v=20261004a';
 import { createConstruction, finishPlot } from './construction.js?v=20261004a';
 
 const BX = -1.9, FZ = 0.5, W = 6.2, D = 5.2, H = 6.0, FH = 7.2;
-const CHAIR = [1.0, 1.75];
+const CHAIR = [2.5, 1.85];
 
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({ id: 'dentist', line, palette, rng, seed: 29, colors: { ...COLORS, tooth: '#fbf6ea', leatherR: '#a8302a', jar: { c: '#cfe6e2', r: 0.06 }, foam: '#ffffff', poleR: '#c9302a' } });
@@ -28,10 +28,10 @@ export default function buildPlot(kit, { line, palette, rng }) {
   lantern(b, BX - 0.2, 2.4, FZ + 0.45);
   chairBase(b, CHAIR[0], CHAIR[1]);
   // instruments tray, a spittoon, the waiting bench
-  b.cyl('iron', CHAIR[0] + 1.1, 0.26, CHAIR[1] - 0.3, 0.05, 1.0, 0, { sides: 5, taper: 1 });
-  b.slab('metal', CHAIR[0] + 1.1, 1.26, CHAIR[1] - 0.3, 0.6, 0.04, 0.4, { round: 0.02, taper: 0 });
-  for (let i = 0; i < 3; i++) b.slab('iron', CHAIR[0] + 0.95 + i * 0.13, 1.3, CHAIR[1] - 0.3, 0.04, 0.03, 0.32, { round: 0.005, taper: 0, ry: i * 0.3 });
-  b.cyl('brass', CHAIR[0] - 1.0, 0.26, CHAIR[1] + 0.5, 0.2, 0.35, 0, { sides: 9, taper: 0.7 });
+  b.cyl('iron', CHAIR[0] - 1.05, 0.26, CHAIR[1] - 0.3, 0.05, 1.0, 0, { sides: 5, taper: 1 });
+  b.slab('metal', CHAIR[0] - 1.05, 1.26, CHAIR[1] - 0.3, 0.6, 0.04, 0.4, { round: 0.02, taper: 0 });
+  for (let i = 0; i < 3; i++) b.slab('iron', CHAIR[0] - 1.2 + i * 0.13, 1.3, CHAIR[1] - 0.3, 0.04, 0.03, 0.32, { round: 0.005, taper: 0, ry: i * 0.3 });
+  b.cyl('brass', CHAIR[0] - 0.9, 0.26, CHAIR[1] + 0.75, 0.2, 0.35, 0, { sides: 9, taper: 0.7 });
   b.slab('plank2', 4.3, 0.26, FZ + 0.55, 1.6, 0.42, 0.5, { round: 0.04 });
   tufts(b, [[-5.6, 3.6], [5.6, 3.6], [-5.4, -2.6]]);
   rock(b, 5.5, -1.6, 0.9);
@@ -76,24 +76,24 @@ export default function buildPlot(kit, { line, palette, rng }) {
   P.pile({ at: [JAR[0], JAR[1] + 0.5, JAR[2]], geo: gold.geometry({ ao: 0 }), size: 0.2, max: 5, layout: 'heap', range: [0.4, 1] });
 
   const SC = 1.08;
-  const folk = hatted(P.crowd({ count: 6, seed: 37, scale: SC }), hats(kit, P, 'ten', 6, ['#3a2c2c', '#c9b08a', '#e6d6b8', '#8a5a3a', '#6a5a3a', '#b5483a']), SC, [0.0, 1.2, 1.1, 0.9, 1.0, 1.0]);
-  folk.look(0, { top: '#f4efe4', bot: '#3a2c2c', skin: 0, hair: 6, style: 0, acc: 0 }).body(0, 1.2, 1.0, 1.05);
+  const folk = hatted(P.crowd({ count: 6, seed: 37, scale: SC }), EXTRA_HATS, ['#3a2c2c', '#c9b08a', '#e6d6b8', '#8a5a3a', '#6a5a3a', '#b5483a'], [0.0, 1.2, 1.1, 0.9, 1.0, 1.0]);
+  folk.dress(0, 'pete');
+  folk.look(1, { expr: 'shock' }).look(2, { expr: 'grump' });
   folk.look(1, { top: '#8FA27A', bot: '#5a4632', skin: 2, hair: 2, style: 1 }).body(1, 1.25, 0.9, 1.0);
   folk.look(2, { top: '#D9A441', bot: '#4a5878', skin: 1, hair: 4, style: 2 });
   folk.look(3, { top: '#e9e4da', bot: '#6b5a7d', skin: 3, hair: 0, style: 3 });
-  folk.hats.setColorAt(0, new THREE.Color('#3a2c2c'));
   P.walkers(folk, { ids: [4, 5], paths: [[[-6, 4.0], [6, 3.9]], [[6, 4.4], [-6, 4.5]]], loop: 'wrap', speed: 0.9, ownedOnly: false });
   let lastPull = -1;
 
-  const C = createConstruction(kit, P, { x: BX, fz: FZ, w: W, d: D, h: 3.4, fh: FH, parapet: 'peak', ext: { x: 4.0, z: FZ - 2.2, w: 3.2, h: 3.2 }, yard: [3.4, 3.4], stake: [1.4, 2.7] });
+  const C = createConstruction(kit, P, { x: BX, fz: FZ, w: W, d: D, h: 3.4, fh: FH, parapet: 'peak', ext: { x: 4.0, z: FZ - 2.2, w: 3.2, h: 3.2 }, yard: [2.4, 2.2], stake: [1.4, 2.7] });
 
   return finishPlot(P, C, {
     w: 12, cardW: 11, d: 9, h: FH + 2,
-    camera: cardCam([-0.2, 3.0, 0.4], 22, 42, 19),
+    camera: cardCam([-0.4, 2.2, 1.2], 12, 26, 13, 42),
     pileAnchor: JAR, pileR: 1.0,
     exit: [[BX - 1.6, 3.4], [4, 4.0], [6.3, 4.2]],
     focus: [0.5, 1.2],
-    anchors: { chair: [CHAIR[0], 0.9, CHAIR[1]], chairLanding: [CHAIR[0], 1.0, CHAIR[1] + 0.2], pole: [BX + W / 2 + 0.3, 1.5, FZ + 0.55], jar: JAR, bench: [4.3, 0.7, FZ + 0.55] },
+    anchors: { chair: [CHAIR[0], 0.9, CHAIR[1]], doors: [BX - 1.6, 0.26, FZ + 0.3], center: [BX + 1.5, 0.0, FZ + 2.4], chairLanding: [CHAIR[0], 1.0, CHAIR[1] + 0.2], pole: [BX + W / 2 + 0.3, 1.5, FZ + 0.55], jar: JAR, bench: [4.3, 0.7, FZ + 0.55] },
     update(dt, stats, time, tier, ctx) {
       const owned = ctx.owned;
       teeth.visible = stars.visible = owned;
