@@ -64,3 +64,5 @@ Aaron's words, condensed (inspiration, not a spec — improve on it):
 - 2026-10-04 Blind critic r2: game ~3.4 vs refs 8.6 (REPORT.md). Round 3 (ROUND3.md) launched: A lighting/night/characters/signs (9331), P card framing/gags/vignettes (9341), S near-plane + hero staging (9351), M blank-card bug + test-cards (9301).
 - 2026-10-04 R3 A committed 8631fabd. R3 M: blank cards were capture artefact from auto-scroll on open (no engine bug); cardShot + test-cards (falsified) committed. Manager fix: auto-scroll to opened business only if no touch/scroll for 3 s and ≥8 s since last auto-scroll.
 - 2026-10-04 Round 3 complete + pushed (BUILD d). Blind critic r3 still ~3.9 avg. Round 4 (ROUND4.md) launched: A/P/S/U.
+- 2026-10-04 Round 4 complete, all suites green, pushed BUILD 20261004e. Hero now matches ref layout (Stranger from behind + vignette). Draw calls borderline 246/250 desktop (hero 154) → needs trim. Blind critic r4 running.
+- 2026-10-04 Blind critic r4 avg ~4.25 (trend 3.4→3.9→4.25). Round 5 (ROUND5.md) launched: A light/faces/wood/night/draw-trim, P build/saloon cards, S gag scale.
