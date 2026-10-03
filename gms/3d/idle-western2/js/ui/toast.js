@@ -1,4 +1,4 @@
-import { el } from './dom.js?v=20261004c';
+import { el } from './dom.js?v=20261004d';
 
 export function createToasts(root) {
   const box = el('div', 'toasts');

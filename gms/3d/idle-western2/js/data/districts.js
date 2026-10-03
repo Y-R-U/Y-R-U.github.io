@@ -1,6 +1,6 @@
 // Blocks of Dribble Creek, in unlock order. Each later block is opened by a Deed (the permit): the cost below plus
 // `needContracts` finished Town Council Demands from the previous block. Railroad End is v1.1 (append it here).
-import { LINES } from './lines.js?v=20261004c';
+import { LINES } from './lines.js?v=20261004d';
 
 const first = (d) => LINES.find((l) => l.district === d).baseCost;
 

@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import { createCast } from './cast.js?v=20261004c';
-import { createProps, PV } from './props.js?v=20261004c';
-import { createParticles } from './particles.js?v=20261004c';
-import { CHARS, townsfolk } from './looks.js?v=20261004c';
-import { hatIndex, dressScale } from './cast.js?v=20261004c';
-import { createScenes } from './scenes.js?v=20261004c';
-import { createHalos, createGhosts } from './overlay.js?v=20261004c';
-import { FRONTS } from '../../data/plots.js?v=20261004c';
+import { createCast } from './cast.js?v=20261004d';
+import { createProps, PV } from './props.js?v=20261004d';
+import { createParticles } from './particles.js?v=20261004d';
+import { CHARS, townsfolk } from './looks.js?v=20261004d';
+import { hatIndex, dressScale } from './cast.js?v=20261004d';
+import { createScenes } from './scenes.js?v=20261004d';
+import { createHalos, createGhosts } from './overlay.js?v=20261004d';
+import { FRONTS } from '../../data/plots.js?v=20261004d';
 
 // The spectacle director (DESIGN W9/W10): ONE slot for the big moment (a special or a story beat), a hard actor budget
 // (≤ 6 animated + ≤ 24 crowd extras + ≤ 256 particles), a pre-allocated actor pool, blob shadows, hero picking in the

@@ -1,17 +1,17 @@
-import { createMaterials } from './materials.js?v=20261004c';
-import { createBuilder } from './build.js?v=20261004c';
-import { createCrowd, crowdMaterial, createCrowdPool, CROWD_LAYER, EXPR, rigVertexCount, CLIP, OUTFITS, PANTS, HAT, HAT_TYPES, HAT_SEAT, HAT_COLORS, ACC, STACHE, CHARACTERS, hatGeometry, hatForTier, hatForPomfrey } from './crowd.js?v=20261004c';
-import { createGhosts } from './ghost.js?v=20261004c';
-import { createPile, stockUnit } from './piles.js?v=20261004c';
-import { GEO } from './geo.js?v=20261004c';
-import { basePlot, createPlot, FIT } from './plotbase.js?v=20261004c';
-import * as vehicles from './vehicles.js?v=20261004c';
-import * as props from './props.js?v=20261004c';
-import * as shape from './shape.js?v=20261004c';
-import { makeRng, noise2 } from './rng.js?v=20261004c';
-import * as western from './western.js?v=20261004c';
-import { createSigns } from './signs.js?v=20261004c';
-import { SURF } from './build.js?v=20261004c';
+import { createMaterials } from './materials.js?v=20261004d';
+import { createBuilder } from './build.js?v=20261004d';
+import { createCrowd, crowdMaterial, createCrowdPool, CROWD_LAYER, EXPR, rigVertexCount, CLIP, OUTFITS, PANTS, HAT, HAT_TYPES, HAT_SEAT, HAT_COLORS, ACC, STACHE, CHARACTERS, hatGeometry, hatForTier, hatForPomfrey } from './crowd.js?v=20261004d';
+import { createGhosts } from './ghost.js?v=20261004d';
+import { createPile, stockUnit } from './piles.js?v=20261004d';
+import { GEO } from './geo.js?v=20261004d';
+import { basePlot, createPlot, FIT } from './plotbase.js?v=20261004d';
+import * as vehicles from './vehicles.js?v=20261004d';
+import * as props from './props.js?v=20261004d';
+import * as shape from './shape.js?v=20261004d';
+import { makeRng, noise2 } from './rng.js?v=20261004d';
+import * as western from './western.js?v=20261004d';
+import { createSigns } from './signs.js?v=20261004d';
+import { SURF } from './build.js?v=20261004d';
 
 export function createKit() {
   const materials = createMaterials();

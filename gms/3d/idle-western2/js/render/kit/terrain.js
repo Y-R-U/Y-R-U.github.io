@@ -1,7 +1,7 @@
 // Faceted ground for the whole town: one jittered, alternating-diagonal grid; heights from a land/sea/river field.
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004c';
-import { noise2 } from './rng.js?v=20261004c';
+import * as S from './shape.js?v=20261004d';
+import { noise2 } from './rng.js?v=20261004d';
 
 export const WATER_Y = -0.55;
 const smooth = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };

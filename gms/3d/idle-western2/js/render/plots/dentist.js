@@ -3,8 +3,8 @@
 // Stock: a big glass jar of pulled teeth (a few gold). A patient waits on the bench holding his jaw.
 // L1 one chair → L25 a shaving chair with a lathered customer → L100 a gilded tooth on the roof and a second storey sign.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hatted, particles, tufts, rock, tone, tilt, vignette, CROWD_K } from './western.js?v=20261004c';
-import { createConstruction, finishPlot } from './construction.js?v=20261004c';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hatted, particles, tufts, rock, tone, tilt, vignette, CROWD_K } from './western.js?v=20261004d';
+import { createConstruction, finishPlot } from './construction.js?v=20261004d';
 
 const BX = -1.9, FZ = 0.5, W = 6.2, D = 5.2, H = 6.0, FH = 7.2;
 const CHAIR = [2.5, 1.85];

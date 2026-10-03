@@ -1,6 +1,6 @@
-import { el, btn, setText } from './dom.js?v=20261004c';
-import { fmtCash, fmtRate, fmtNum, fmtTime, fmtMult } from '../state/format.js?v=20261004c';
-import { section, stat, buyRow } from './kit.js?v=20261004c';
+import { el, btn, setText } from './dom.js?v=20261004d';
+import { fmtCash, fmtRate, fmtNum, fmtTime, fmtMult } from '../state/format.js?v=20261004d';
+import { section, stat, buyRow } from './kit.js?v=20261004d';
 
 export function fillLineInfo(body, ctx, lineId) {
   const { model, game } = ctx;

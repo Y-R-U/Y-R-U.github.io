@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004c';
-import { createBuilder } from './build.js?v=20261004c';
+import * as S from './shape.js?v=20261004d';
+import { createBuilder } from './build.js?v=20261004d';
 
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _c = new THREE.Color();
 
