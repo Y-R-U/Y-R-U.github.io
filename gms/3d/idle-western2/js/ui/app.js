@@ -136,8 +136,12 @@ export function createUI({ game, host, bus }) {
     juice.stamp(c.card, 'OPEN FOR BUSINESS', 'open');
     if (heroVisible() && !captions.active) juice.stamp(heroWrap, 'OPEN FOR BUSINESS', 'open');
     bus.emit('ui:unlocked', { lineId });
-    scrollToCard(lineId, true);
+    const now = performance.now();
+    if (now - lastTouch > 3000 && now - lastAutoScroll > 8000) { lastAutoScroll = now; scrollToCard(lineId, true); }
   }
+  let lastTouch = -1e9, lastAutoScroll = -1e9;
+  addEventListener('pointerdown', () => { lastTouch = performance.now(); }, { capture: true, passive: true });
+  addEventListener('scroll', () => { lastTouch = performance.now(); }, { capture: true, passive: true });
 
   function scrollToCard(lineId, onlyIfHidden = false) {
     const c = cards.get(lineId);
