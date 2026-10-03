@@ -12,6 +12,7 @@ import { PLOT_BUILDERS, FALLBACK_PLOT } from './plots/index.js?v=20261004d';
 
 export { PLOT_BUILDERS };
 const HUB = PL.HUB;
+const HUB_X = PL.HUB_ANCHOR?.[0] ?? 0;
 
 function rngFrom(seed) {
   let a = seed >>> 0;
@@ -81,6 +82,8 @@ export function createWorld({ kit, data, skin = null }) {
   const pool = kit.materials.crowdPool;
   const CARD_L = kit.CROWD_LAYER?.card ?? 1, TOWN_L = kit.CROWD_LAYER?.town ?? 2;
   pool?.activate(scene);
+  // Open dirt in front of the Thirsty Gizzard's doors for the ejection gag (lane S may push more [x, z, r] zones).
+  if (pool) pool.clear.push([HUB_X, PL.ROAD_Z - 1.2, 4.2]);
   const ambient = createAmbient(kit, scene, { lamps: town.lamps, life: town.life, street: ST });
 
   const plots = new Map();
@@ -135,7 +138,9 @@ export function createWorld({ kit, data, skin = null }) {
   }
 
   const renderConfig = { bloom: { strength: 0.25, threshold: 2.4, knee: 1.0 }, tilt: { focus: 0.5, band: 0.2, feather: 0.34, strength: 0.6 } };
-  const tuneBloom = () => { const n = light.night || 0; renderConfig.bloom.threshold = 2.6 - 1.8 * n; renderConfig.bloom.strength = 0.22 + 0.2 * n; };
+  // R4: the threshold stays above anything lamp-lit (lamp light is soft-clipped in the shader), so only emissives
+  // (windows, bulbs, lanterns, the sun disc) bloom; characters and the street never do.
+  const tuneBloom = () => { const n = light.night || 0; renderConfig.bloom.threshold = 2.6 - 0.95 * n; renderConfig.bloom.strength = 0.22 + 0.34 * n; };
   tuneBloom();
   const world = {
     renderConfig,
@@ -177,7 +182,7 @@ export function createWorld({ kit, data, skin = null }) {
         lookOf(cam, _look);
         cullTown(true, plots.get(view.lineId)?.group.position.x ?? _look.x, cam.getWorldDirection(_dir).z > 0.2);
         rig.place(_look, 22);
-        scene.fog.near = 120; scene.fog.far = 560;
+        scene.fog.near = 70; scene.fog.far = 430;
       } else {
         for (const p of plots.values()) p.group.visible = true;
         heroRig.setAspect(view.w / view.h);
@@ -188,8 +193,8 @@ export function createWorld({ kit, data, skin = null }) {
         setTownCast(true, _look.x, _look.z);
         const dist = cam.position.distanceTo(_look);
         rig.place(_look, Math.min(160, Math.max(30, dist * 0.9)));
-        scene.fog.near = dist + 110;
-        scene.fog.far = dist * 3 + 980;
+        scene.fog.near = dist + 45;
+        scene.fog.far = dist * 2 + 560;
         if (pool) { cam.updateMatrixWorld(); pool.gather(cam); }
       }
       if (light.lamps > 0.01) {

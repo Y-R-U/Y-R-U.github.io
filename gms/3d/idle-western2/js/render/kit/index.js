@@ -55,6 +55,9 @@ export function createKit() {
       materials.uRimCrowd.value.set(l.sheen || l.sky.horizon).multiplyScalar(0.55 + 0.1 * (l.night || 0));
       materials.uBounce.value.set(l.bounce || '#000000').multiplyScalar(l.bounceK || 0);
       materials.uLampK.value = (l.lamps || 0) * 2.6;
+      const az = l.sun.azimuth * Math.PI / 180, el = l.sun.elevation * Math.PI / 180;
+      materials.uSunDir.value.set(Math.cos(az) * Math.cos(el), Math.sin(el), Math.sin(az) * Math.cos(el));
+      materials.uSunCol.value.set(l.sun.color).multiplyScalar(l.sun.intensity * 0.06 * (1 - 0.7 * (l.night || 0)));
     },
   };
   return kit;

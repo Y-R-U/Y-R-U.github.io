@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { createSurfaces, SURF_HEAD, SURF_COLOR, SURF_NORMAL } from './surface.js?v=20261004d';
 
 // One PBR material for every merged static mesh. Per-vertex `aPbr` = (roughness, metalness, glow, sway+1):
-// glow > 0 always emits (neon, bulbs), glow < 0 emits only at night (windows); w = 1 means rigid.
+// glow > 0 always emits (neon, bulbs; > 2 = half by day, full at night), glow < 0 emits only at night (windows); w = 1 means rigid.
 const PBR_VERT_HEAD = `#include <common>
 attribute vec4 aPbr;
 varying vec3 vPbr;
@@ -50,7 +50,9 @@ export const WORLD_LIGHT_FRAG = `{
       float ndl = 0.35 + 0.65 * max(dot(wn, d * inversesqrt(r2 + 1e-4)), 0.0);
       acc += fall * ndl * (0.28 + 0.72 * max(wn.y, 0.0));
     }
-    outgoingLight += diffuseColor.rgb * uLampCol * acc * uLampK;
+    // soft-clipped so a lamp pool reads amber but never pushes a surface (or a face) past the bloom threshold
+    vec3 lp = uLampCol * acc * uLampK;
+    outgoingLight += diffuseColor.rgb * 1.5 * (vec3(1.0) - exp(-lp / 1.5));
   }
 }`;
 export const WORLD_POS_VERT = `#include <project_vertex>
@@ -80,7 +82,7 @@ function pbrPatch(mat, uniforms, key) {
       .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = clamp(vPbr.x, 0.04, 1.0);\nif (sfR >= 0.0) roughnessFactor = sfR;')
       .replace('#include <metalnessmap_fragment>', 'float metalnessFactor = vPbr.y;')
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-totalEmissiveRadiance += vColor.rgb * (max(vPbr.z, 0.0) * uGlow + max(-vPbr.z, 0.0) * uNight * 2.2);`)
+totalEmissiveRadiance += vColor.rgb * (max(vPbr.z, 0.0) * uGlow * (vPbr.z > 2.0 ? 0.5 + 0.5 * uNight : 1.0) + max(-vPbr.z, 0.0) * uNight * 2.2);`)
       .replace('#include <opaque_fragment>', `${RIM_FRAG}
 ${WORLD_LIGHT_FRAG}
 #include <opaque_fragment>`);
@@ -94,7 +96,8 @@ export function createMaterials() {
   const uRim = { value: new THREE.Color(0.12, 0.1, 0.1) }, uRimCrowd = { value: new THREE.Color(0.5, 0.4, 0.35) };
   const uBounce = { value: new THREE.Color(0, 0, 0) }, uLampCol = { value: new THREE.Color('#ff7418') }, uLampK = { value: 0 };
   const uLamps = { value: Array.from({ length: 8 }, () => new THREE.Vector4(0, -999, 0, 0)) };
-  const shared = { ...createSurfaces(), uTime, uNight, uWind, uGlow, uRim, uRimCrowd, uBounce, uLamps, uLampCol, uLampK };
+  const uSunDir = { value: new THREE.Vector3(0.6, 0.4, 0.4).normalize() }, uSunCol = { value: new THREE.Color(0.3, 0.2, 0.12) };
+  const shared = { ...createSurfaces(), uTime, uNight, uWind, uGlow, uRim, uRimCrowd, uBounce, uLamps, uLampCol, uLampK, uSunDir, uSunCol };
   const makeUber = () => pbrPatch(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.7, metalness: 0, envMapIntensity: 0.2 }), shared, 'iw2-uber');
   const uber = makeUber();
   uber.userData.uber = true;
@@ -125,7 +128,7 @@ export function createMaterials() {
   const glowSprite = new THREE.MeshBasicMaterial({ map: blobTex, color: 0xffd28a, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: false, toneMapped: false });
   const basicSky = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false });
   return {
-    uber, uberAll, splitUber, water, basicBlob, contact, contactInst: new THREE.MeshBasicMaterial({ color: 0x3b2c4a, map: boxTex, transparent: true, opacity: 0.5, depthWrite: false, toneMapped: false, fog: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }), glowSprite, basicSky, uTime, uNight, uWind, uGlow, uRim, uRimCrowd, uBounce, uLamps, uLampCol, uLampK, shared,
+    uber, uberAll, splitUber, water, basicBlob, contact, contactInst: new THREE.MeshBasicMaterial({ color: 0x3b2c4a, map: boxTex, transparent: true, opacity: 0.5, depthWrite: false, toneMapped: false, fog: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }), glowSprite, basicSky, uTime, uNight, uWind, uGlow, uRim, uRimCrowd, uBounce, uLamps, uLampCol, uLampK, uSunDir, uSunCol, shared,
     lambertVC: uber, lambertVCInst: uber,
     crowd: null,
   };

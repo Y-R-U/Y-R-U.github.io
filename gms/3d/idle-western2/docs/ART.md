@@ -120,8 +120,12 @@ ghost in a dark stetson, translucent with a cyan fresnel rim, hem flutter + bob 
   save boots in golden hour. `world.clock` / `world.gameClock()`; light re-evaluated every 1 s. `?cycle=60` fast day,
   `?clock=sec` offset, `?tod=h` pins the light.
 - Night is deep blue with a warm horizon glow and warm lantern pools (hero luma 0.42 at tod 23; mist is blue-grey, not lilac).
-- Mesas: faceted Monument-Valley buttes (talus skirt, striped cliff strata, overhanging caprock, spires), far ones 1.35× taller;
-  a ranch windmill + water tower silhouette past the end of the street.
+- Mesas (R4): painted into the sky dome, not geometry — `buttes()` in lighting.js, 26 buttes in three haze layers (far
+  low/hazy → near taller/clearer), 1–3.5° tall so the sky stays open, sun-side flanks lit, strata stripes, a notch for the sun
+  disc. Colours `LIGHTS[k].rock {lit, shade}`. Visible in the hero AND every card (cards used to hide `town:far`). A ranch
+  windmill + water tower silhouette past the end of the street are still geometry.
+- Sky gradient (R4) is framed per view: `uTopY` (sky height at the frame's top edge) maps horizon → rose → violet onto
+  whatever slice of sky the camera sees, so a card with 6° of sky still gets the full sunset ramp.
 
 ### Town (`kit/town.js`, built by `world.js`; `world.town`)
 - Chunks are x-cells (56 m) × three bands: `n` (north lots, z < 5), `m` (street + edges), `s` (Pomfrey's side); ground
@@ -132,7 +136,7 @@ ghost in a dark stetson, translucent with a cyan fresnel rim, hem flutter + bob 
   40 slots on Boot Hill), `world.town.lamps`, `world.town.life` (`walks`, `pigeonSpots`), windmill rotor spins in `tick`.
 
 ## Budgets (W10)
-- Crowd: hero = 2 draws total for every lite crowd (pool); cards = 1 + 1 blob per crowd. Lite rig 7.6 k verts/person.
+- Crowd: hero = 2 draws total for every lite crowd (pool); cards = 1 + 1 blob per crowd. Lite rig 8.0 k verts/person (R4).
 - Signs: 1 draw per batch (town: 1; plots: 1 per text tier used).
 - Town: ~3 bands × x-cells of 40 m merged chunks + ground cells + far/mesas + contact + signs + rotor + graves.
 
@@ -180,3 +184,21 @@ ghost in a dark stetson, translucent with a cyan fresnel rim, hem flutter + bob 
   Shots: `docs/art/a/r3_before/`, `r3_before_sheet.jpg`, `r3_after/`, `r3_after_hero17.jpg`, `r3_after_hero22.jpg`,
   `r3_after_cards.jpg`. Perf (CDP 9331, load ~3): hero 1.63 M verts/render idle (static 1.70 M, 97 calls avg, 122 max —
   +~9 sign draws), S22 test-scroll rAF p95 3.9 ms, desktop 2.7–5.6 ms, PASS.
+- 2026-10-04 A round 4 (critic r3). **Crowd:** hero pool keeps ~30 % of each crowd (`pool.keep`, first live instances)
+  plus `pool.clear` zones (saloon door ejection lane) → 63 → 24 people in the saloon hero (−62 %); `crowd.thin=false` opts out.
+  **Rig** (lite + full): stocky boots with sole + shaft, thicker legs, barrel torso + belly, arms standing clear of the body
+  (shoulder ball, angled sleeve, cuff on full) ending in big mitten hands with a thumb; held props moved to the new hands;
+  idle acting variants by instance (talker gesturing, akimbo, relaxed), bigger walk swing + forward lean. Lite 7,968 verts
+  (full 22.9 k). **Clay shading:** crowd shader gets a warm terminator (subsurface-ish) band + wrap fill from the sun
+  (`uSunDir/uSunCol`, set in `kit.setLight`) and an under-side occlusion. **Sky:** sunset palette (golden top `#6656b0`,
+  mid `#e8869a`, horizon `#ffb47c`), view-framed gradient, broader sun glow, painted butte layers; the geometric mesa ring is
+  gone (perf). Haze: hero fog `dist+45 … dist·2+560`, cards `70 … 430`. **Ground:** hashed boot/hoof prints and sunbaked red
+  patches in DIRT; rock clusters, tufts and pebble scatter along both kerbs and the porch fronts. **Facades:** trim slot is
+  now dark wood `#8a5c3e`; chipped/worn paint at clapboard edges; ground-contact AO on every upright face (y < 0.85 m).
+  **Night:** violet ambient + sky + purple butte silhouettes; lamp light soft-clipped in the shader (amber, never > the bloom
+  threshold); bloom threshold 1.65 at night (was 0.8) so only emissives bloom; glow > 2 = half by day, full at night
+  (bulbs 2.4); lamp pool decals deeper amber, lighter; mist violet.
+  Shots `docs/art/a/r4_before/`, `r4_after/` (includes other lanes' R4 work), `r4_before_sheet.jpg`, `r4_after_sheet.jpg`,
+  `r4_after/lineup_lite.png`. Perf (perf-audit static, CDP 9331): hero 101 calls / 1.72 M verts / GPU 4.0 ms with post →
+  109 calls (other lanes) / 1.56 M / 2.62 ms; cards +20–35 k verts each (rig + kerb dressing), GPU equal or lower.
+  test-boot, test-cards PASS; test-scroll desktop pass, phone 3.8 ms PASS on the first run, 8.2–10.5 ms under load avg 7–11.

@@ -139,6 +139,9 @@ if (vSurf > 0.04 && vSurf < 0.235) {
     float bleach = step(0.84, wv) * fade * 0.32, repl = step(wv, 0.07) * fade;
     dc = mix(dc, vec3(dot(dc, vec3(0.33))) * vec3(1.08, 1.04, 1.0), bleach);
     dc *= mix(1.0, 0.78, repl);
+    // worn paint: chipped to raw wood along board edges, and grime creeping up from the ground
+    float wear = smoothstep(0.66, 0.84, sfNoise(vec2(along * 1.7, vWP.y * 7.0))) * fade * (1.0 - smoothstep(0.1, 0.3, fy) * (1.0 - smoothstep(0.75, 0.95, fy)));
+    dc = mix(dc, vec3(0.36, 0.22, 0.13), wear * 0.75);
     diffuseColor.rgb = dc * sh;
     sfAO = sh;
   } else {
@@ -194,6 +197,20 @@ if (vSurf > 0.04 && vSurf < 0.235) {
       alb *= 1.0 - 0.07 * hoof;
       sfN = normalize(vec3(0.0, 1.0, -sign(abs(dz) - uStreet.z) * sign(dz) * rut * 0.35));
     }
+    // boot prints and hoof prints scattered over the street (hashed 0.6 m cells), sunbaked red patches
+    {
+      vec2 cell = floor(wp / 0.6), f = fract(wp / 0.6) - 0.5;
+      float hp = sfHash(cell + 17.0);
+      vec2 o = vec2(sfHash(cell + 3.0), sfHash(cell + 5.0)) - 0.5;
+      vec2 q = f - o * 0.5;
+      float ang = (sfHash(cell + 9.0) - 0.5) * 0.8;
+      q = mat2(cos(ang), -sin(ang), sin(ang), cos(ang)) * q;
+      float prt = (1.0 - smoothstep(0.7, 1.0, length(q * vec2(5.0, 9.5)))) * step(0.72, hp) * (0.55 + 0.45 * tread);
+      float dfade = 1.0 - smoothstep(0.04, 0.12, fwidth(wp.x));
+      alb *= 1.0 - 0.16 * prt * dfade;
+      sfN = normalize(sfN + vec3(-q.x, 0.0, -q.y) * prt * 0.9 * dfade);
+    }
+    alb *= mix(vec3(1.0), vec3(1.06, 0.92, 0.84), smoothstep(0.55, 0.85, sfNoise(wp * 0.031 + 11.0)) * 0.8);
     alb *= mix(vec3(1.0), vec3(0.8, 0.74, 0.76), rut * 0.9);
     alb *= mix(vec3(1.0), vec3(1.035, 1.03, 1.02), tread * 0.6);
     alb *= mix(vec3(1.0), vec3(0.78, 0.74, 0.76), wet);
@@ -211,5 +228,6 @@ if (vSurf > 0.04 && vSurf < 0.235) {
     diffuseColor.rgb *= sfAO;
     sfR = 0.95;
   }
-}`;
+}
+if (abs(sfWN.y) < 0.55 && vWP.y < 1.0) diffuseColor.rgb *= mix(0.66, 1.0, smoothstep(0.0, 0.85, vWP.y));`;
 export const SURF_NORMAL = `if (sfR >= 0.0) normal = normalize(mix(normal, normalize((viewMatrix * vec4(sfN, 0.0)).xyz), 0.85));`;

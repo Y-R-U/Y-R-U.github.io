@@ -206,18 +206,25 @@ function rigGeometry(kind = 'full') {
   const ball = (d = 1, j = 0.0) => S.smooth(S.blob(1, d, { jitter: j, rng: () => 0.5 }));
   const fd = lite ? 0 : 1;
   const BOOT = '#4a3328', BELT = '#3a2a22', BRASS = '#e2b84a', DARK = '#241a2c', MOUTH = '#5a1e26', TEETH = '#fff8ea';
+  // R4 body: chunky boots with a toe cap and shaft, stocky legs, a barrel torso with a belly, and arms that stand
+  // clear of the body (shoulder ball, sleeve angled out, cuff) ending in big mitten hands with a thumb.
+  const SOLE = '#2e211b';
   for (const sx of [-1, 1]) {
     const leg = sx < 0 ? 1 : 2, arm = sx < 0 ? 3 : 4;
-    P(ball(fd), M(sx * 0.08, 0.05, 0.04, 0.075, 0.06, 0.12), leg, 0, -1, BOOT);
-    P(S.prism(7, 0.07, 0.068, 0.12), M(sx * 0.08, 0.04, 0), leg, 0, -1, BOOT);
-    P(S.prism(7, 0.07, 0.075, 0.28), M(sx * 0.08, 0.13, 0), leg, 2);
-    P(S.prism(7, 0.066, 0.074, 0.3), M(sx * 0.2, 0.38, 0, 1, 1, 1, 0, 0, -sx * 0.1), arm, 1);
-    P(ball(fd), M(sx * 0.22, 0.355, 0.005, 0.072), arm, 3);
+    P(ball(fd), M(sx * 0.09, 0.06, 0.055, 0.1, 0.075, 0.155), leg, 0, -1, BOOT);
+    P(S.prism(7, 0.1, 0.104, 0.03), M(sx * 0.09, 0.0, 0.02, 1, 1, 1.45), leg, 0, -1, SOLE);
+    P(S.prism(7, 0.092, 0.09, 0.17), M(sx * 0.09, 0.02, 0), leg, 0, -1, BOOT);
+    P(S.prism(7, 0.08, 0.086, 0.24), M(sx * 0.09, 0.17, 0), leg, 2);
+    P(ball(0), M(sx * 0.215, 0.645, 0, 0.088, 0.08, 0.085), arm, 1);
+    P(S.prism(7, 0.07, 0.082, 0.3), M(sx * 0.29, 0.355, 0.01, 1, 1, 1, 0, 0, sx * 0.24), arm, 1);
+    if (!lite) P(S.prism(7, 0.084, 0.084, 0.04), M(sx * 0.29, 0.345, 0.01, 1, 1, 1, 0, 0, sx * 0.24), arm, 1);
+    P(ball(fd), M(sx * 0.3, 0.3, 0.02, 0.098, 0.1, 0.086), arm, 3);
+    P(ball(0), M(sx * 0.27, 0.335, 0.08, 0.04, 0.052, 0.04, 0.3), arm, 3);
   }
-  P(S.smooth(S.prism(9, 0.17, 0.13, 0.4, { rings: 2, squash: 0.84 })), M(0, 0.33, 0), 0, 1);
-  P(ball(1), M(0, 0.36, 0, 0.175, 0.095, 0.145), 0, 2);
-  P(S.prism(9, 0.172, 0.17, 0.05, { squash: 0.84 }), M(0, 0.4, 0), 0, 0, -1, BELT);
-  P(S.block(0.07, 0.055, 0.02, { cut: 0.01, taper: 0 }), M(0, 0.398, 0.146), 0, 0, -1, BRASS);
+  P(S.smooth(S.prism(9, 0.205, 0.155, 0.4, { rings: 2, squash: 0.86 })), M(0, 0.33, 0), 0, 1);
+  P(ball(1), M(0, 0.37, 0.01, 0.205, 0.11, 0.175), 0, 2);
+  P(S.prism(9, 0.21, 0.205, 0.055, { squash: 0.86 }), M(0, 0.4, 0), 0, 0, -1, BELT);
+  P(S.block(0.085, 0.065, 0.02, { cut: 0.01, taper: 0 }), M(0, 0.398, 0.178), 0, 0, -1, BRASS);
   P(S.prism(7, 0.055, 0.05, 0.08), M(0, 0.71, 0), 5, 3);
   // head: big round face, jug ears, beady catchlit eyes, a BIG bulbous rosy nose, heavy brows (by expression)
   P(ball(2), M(0, 0.98, 0.01, 0.262, 0.245, 0.25), 5, 3);
@@ -287,36 +294,36 @@ function rigGeometry(kind = 'full') {
   P(ball(fd), M(0, 0.79, 0.12, 0.21, 0.16, 0.15), 5, 4, T(3));
   if (!lite) P(ball(1), M(0, 0.85, 0.05, 0.255, 0.12, 0.21), 5, 4, T(3));
   // accessories 10+n
-  A('apron', S.block(0.25, 0.36, 0.02, { cut: 0.03, taper: -0.1 }), M(0, 0.17, 0.15, 1, 1, 1, -0.08), 0, 0, 10 + ACC.apron, '#f3ede0');
-  if (!lite || LITE_ACC.has('badge')) starGeo(P, M(-0.07, 0.6, 0.142, 0.05, 0.05, 1), 0, 10 + ACC.badge, BRASS);
-  for (const sx of [-1, 1]) A('vest', S.block(0.11, 0.3, 0.03, { cut: 0.02, taper: 0.1 }), M(sx * 0.085, 0.42, 0.13, 1, 1, 1, -0.08, sx * -0.25), 0, 2, 10 + ACC.vest);
-  for (const sx of [-1, 1]) A('tails', S.block(0.1, 0.34, 0.03, { cut: 0.02, taper: 0.25 }), M(sx * 0.06, 0.12, -0.15, 1, 1, 1, 0.2), 0, 1, 10 + ACC.tails);
-  A('duster', S.smooth(S.prism(10, 0.21, 0.17, 0.44, { rings: 2, squash: 0.9 })), M(0, 0.2, -0.01), 0, 0, 10 + ACC.duster, '#8a6a52');
-  for (const sx of [-1, 1]) A('duster', S.block(0.11, 0.34, 0.03, { cut: 0.02, taper: 0.1 }), M(sx * 0.1, 0.32, 0.142, 1, 1, 1, -0.06, sx * -0.3), 0, 0, 10 + ACC.duster, '#7a5a44');
-  A('overalls', S.block(0.2, 0.2, 0.03, { cut: 0.02, taper: 0.05 }), M(0, 0.44, 0.14, 1, 1, 1, -0.08), 0, 2, 10 + ACC.overalls);
-  for (const sx of [-1, 1]) A('overalls', S.block(0.035, 0.24, 0.02, { cut: 0.01, taper: 0 }), M(sx * 0.08, 0.55, 0.14, 1, 1, 1, -0.1), 0, 2, 10 + ACC.overalls);
+  A('apron', S.block(0.25, 0.36, 0.02, { cut: 0.03, taper: -0.1 }), M(0, 0.17, 0.19, 1, 1, 1, -0.08), 0, 0, 10 + ACC.apron, '#f3ede0');
+  if (!lite || LITE_ACC.has('badge')) starGeo(P, M(-0.075, 0.6, 0.172, 0.05, 0.05, 1), 0, 10 + ACC.badge, BRASS);
+  for (const sx of [-1, 1]) A('vest', S.block(0.11, 0.3, 0.03, { cut: 0.02, taper: 0.1 }), M(sx * 0.09, 0.42, 0.16, 1, 1, 1, -0.08, sx * -0.25), 0, 2, 10 + ACC.vest);
+  for (const sx of [-1, 1]) A('tails', S.block(0.1, 0.34, 0.03, { cut: 0.02, taper: 0.25 }), M(sx * 0.07, 0.12, -0.18, 1, 1, 1, 0.2), 0, 1, 10 + ACC.tails);
+  A('duster', S.smooth(S.prism(10, 0.24, 0.195, 0.44, { rings: 2, squash: 0.9 })), M(0, 0.2, -0.01), 0, 0, 10 + ACC.duster, '#8a6a52');
+  for (const sx of [-1, 1]) A('duster', S.block(0.11, 0.34, 0.03, { cut: 0.02, taper: 0.1 }), M(sx * 0.11, 0.32, 0.172, 1, 1, 1, -0.06, sx * -0.3), 0, 0, 10 + ACC.duster, '#7a5a44');
+  A('overalls', S.block(0.2, 0.2, 0.03, { cut: 0.02, taper: 0.05 }), M(0, 0.44, 0.168, 1, 1, 1, -0.08), 0, 2, 10 + ACC.overalls);
+  for (const sx of [-1, 1]) A('overalls', S.block(0.035, 0.24, 0.02, { cut: 0.01, taper: 0 }), M(sx * 0.08, 0.55, 0.165, 1, 1, 1, -0.1), 0, 2, 10 + ACC.overalls);
   A('dress', S.smooth(S.prism(lite ? 9 : 12, 0.32, 0.16, 0.34, { rings: lite ? 2 : 3, squash: 0.95 })), M(0, 0.05, 0), 0, 1, 10 + ACC.dress);
   A('dress', S.prism(lite ? 9 : 12, 0.33, 0.33, 0.06), M(0, 0.05, 0), 0, 0, 10 + ACC.dress, '#f3ede0');
   A('mask', ball(1), M(0, 0.86, 0.14, 0.24, 0.13, 0.16, 0.15), 5, 0, 10 + ACC.mask, DARK);
-  A('bottle', S.prism(7, 0.04, 0.034, 0.16), M(0.235, 0.28, 0.07, 1, 1, 1, 0.3), 4, 0, 10 + ACC.bottle, '#4f8a4a');
-  A('bottle', S.prism(6, 0.014, 0.014, 0.07), M(0.235, 0.43, 0.12, 1, 1, 1, 0.3), 4, 0, 10 + ACC.bottle, '#3a2a22');
+  A('bottle', S.prism(7, 0.04, 0.034, 0.16), M(0.3, 0.23, 0.07, 1, 1, 1, 0.3), 4, 0, 10 + ACC.bottle, '#4f8a4a');
+  A('bottle', S.prism(6, 0.014, 0.014, 0.07), M(0.3, 0.38, 0.12, 1, 1, 1, 0.3), 4, 0, 10 + ACC.bottle, '#3a2a22');
   A('monocle', S.prism(10, 0.04, 0.04, 0.01), M(0.085, 0.99, 0.25, 1, 1, 1, Math.PI / 2), 5, 0, 10 + ACC.monocle, BRASS);
   A('cigar', S.prism(6, 0.015, 0.014, 0.12), M(0.06, 0.815, 0.235, 1, 1, 1, Math.PI / 2 - 0.2, 0.3), 5, 0, 10 + ACC.cigar, '#6e452d');
-  A('scarf', S.block(0.2, 0.08, 0.03, { cut: 0.015, taper: 0.5 }), M(0, 0.62, 0.15, 1, 1, 1, -0.2), 0, 0, 10 + ACC.scarf, '#b5483a');
-  A('gunbelt', S.prism(9, 0.18, 0.18, 0.045, { squash: 0.86 }), M(0, 0.33, 0), 0, 0, 10 + ACC.gunbelt, '#5a3a26');
-  A('gunbelt', S.block(0.06, 0.15, 0.06, { cut: 0.015, taper: 0.1 }), M(0.17, 0.22, 0.03), 0, 0, 10 + ACC.gunbelt, '#5a3a26');
-  A('gunbelt', S.block(0.03, 0.08, 0.04, { cut: 0.01, taper: 0 }), M(0.17, 0.34, 0.03), 0, 0, 10 + ACC.gunbelt, '#3a3a42');
-  if (!lite || LITE_ACC.has('bigbadge')) starGeo(P, M(-0.02, 0.55, 0.16, 0.17, 0.17, 1), 0, 10 + ACC.bigbadge, BRASS);
-  A('pistol', S.block(0.035, 0.05, 0.16, { cut: 0.01, taper: 0 }), M(0.225, 0.33, 0.1), 4, 0, 10 + ACC.pistol, '#3a3a42');
-  A('pistol', S.block(0.03, 0.08, 0.04, { cut: 0.01, taper: 0 }), M(0.225, 0.29, 0.04, 1, 1, 1, 0.3), 4, 0, 10 + ACC.pistol, '#6e452d');
-  A('lantern', S.prism(6, 0.06, 0.07, 0.14), M(-0.225, 0.21, 0.04), 3, 0, 10 + ACC.lantern, '#ffc978', 1.2);
-  A('lantern', S.prism(6, 0.07, 0.03, 0.05), M(-0.225, 0.35, 0.04), 3, 0, 10 + ACC.lantern, '#3a3a42');
-  A('rollingpin', S.prism(8, 0.025, 0.025, 0.36), M(0.225, 0.35, -0.1, 1, 1, 1, Math.PI / 2), 4, 0, 10 + ACC.rollingpin, '#d9b07a');
-  A('pliers', S.block(0.03, 0.03, 0.18, { cut: 0.005, taper: 0 }), M(0.225, 0.34, 0.1), 4, 0, 10 + ACC.pliers, '#9aa4b0');
-  for (const sx of [-1, 1]) A('garters', S.prism(7, 0.074, 0.074, 0.025), M(sx * 0.205, 0.53, 0, 1, 1, 1, 0, 0, -sx * 0.1), sx < 0 ? 3 : 4, 0, 10 + ACC.garters, '#b5483a');
-  A('hammer', S.prism(6, 0.02, 0.02, 0.26), M(0.225, 0.35, -0.04, 1, 1, 1, Math.PI / 2), 4, 0, 10 + ACC.hammer, '#9a6c48');
-  A('hammer', S.block(0.05, 0.05, 0.1, { cut: 0.01, taper: 0 }), M(0.225, 0.36, 0.17), 4, 0, 10 + ACC.hammer, '#5b5f66');
-  for (let i = 0; i < 4; i++) A('longjohns', ball(0), M(0, 0.62 - i * 0.07, 0.15, 0.014), 0, 0, 10 + ACC.longjohns, '#f3ede0');
+  A('scarf', S.block(0.2, 0.08, 0.03, { cut: 0.015, taper: 0.5 }), M(0, 0.62, 0.165, 1, 1, 1, -0.2), 0, 0, 10 + ACC.scarf, '#b5483a');
+  A('gunbelt', S.prism(9, 0.214, 0.214, 0.05, { squash: 0.88 }), M(0, 0.33, 0), 0, 0, 10 + ACC.gunbelt, '#5a3a26');
+  A('gunbelt', S.block(0.06, 0.15, 0.06, { cut: 0.015, taper: 0.1 }), M(0.215, 0.22, 0.03), 0, 0, 10 + ACC.gunbelt, '#5a3a26');
+  A('gunbelt', S.block(0.03, 0.08, 0.04, { cut: 0.01, taper: 0 }), M(0.215, 0.34, 0.03), 0, 0, 10 + ACC.gunbelt, '#3a3a42');
+  if (!lite || LITE_ACC.has('bigbadge')) starGeo(P, M(-0.02, 0.55, 0.185, 0.17, 0.17, 1), 0, 10 + ACC.bigbadge, BRASS);
+  A('pistol', S.block(0.035, 0.05, 0.16, { cut: 0.01, taper: 0 }), M(0.3, 0.28, 0.1), 4, 0, 10 + ACC.pistol, '#3a3a42');
+  A('pistol', S.block(0.03, 0.08, 0.04, { cut: 0.01, taper: 0 }), M(0.3, 0.24, 0.04, 1, 1, 1, 0.3), 4, 0, 10 + ACC.pistol, '#6e452d');
+  A('lantern', S.prism(6, 0.06, 0.07, 0.14), M(-0.3, 0.16, 0.04), 3, 0, 10 + ACC.lantern, '#ffc978', 1.2);
+  A('lantern', S.prism(6, 0.07, 0.03, 0.05), M(-0.3, 0.3, 0.04), 3, 0, 10 + ACC.lantern, '#3a3a42');
+  A('rollingpin', S.prism(8, 0.025, 0.025, 0.36), M(0.3, 0.3, -0.1, 1, 1, 1, Math.PI / 2), 4, 0, 10 + ACC.rollingpin, '#d9b07a');
+  A('pliers', S.block(0.03, 0.03, 0.18, { cut: 0.005, taper: 0 }), M(0.3, 0.29, 0.1), 4, 0, 10 + ACC.pliers, '#9aa4b0');
+  for (const sx of [-1, 1]) A('garters', S.prism(7, 0.074, 0.074, 0.025), M(sx * 0.25, 0.53, 0.01, 1.05, 1, 1.05, 0, 0, sx * 0.24), sx < 0 ? 3 : 4, 0, 10 + ACC.garters, '#b5483a');
+  A('hammer', S.prism(6, 0.02, 0.02, 0.26), M(0.3, 0.3, -0.04, 1, 1, 1, Math.PI / 2), 4, 0, 10 + ACC.hammer, '#9a6c48');
+  A('hammer', S.block(0.05, 0.05, 0.1, { cut: 0.01, taper: 0 }), M(0.3, 0.31, 0.17), 4, 0, 10 + ACC.hammer, '#5b5f66');
+  for (let i = 0; i < 4; i++) A('longjohns', ball(0), M(0, 0.62 - i * 0.07, 0.17, 0.014), 0, 0, 10 + ACC.longjohns, '#f3ede0');
   // carried cup (limb 6, shown in the carry clip)
   P(S.prism(7, 0.07, 0.085, 0.18), M(0, 0.47, 0.27), 6, 0, -1, '#fff6dc');
   P(S.prism(7, 0.07, 0.07, 0.02), M(0, 0.62, 0.27), 6, 0, -1, '#f4d64a');
@@ -376,7 +383,7 @@ export function crowdMaterial(shared) {
     sh.uniforms.uSkin = { value: skins };
     sh.uniforms.uHair = { value: hairs };
     sh.uniforms.uHatP = { value: HAT_P.flatMap((t) => t.map((v) => new THREE.Vector4(...v))) };
-    for (const k of ['uBounce', 'uLamps', 'uLampCol', 'uLampK']) sh.uniforms[k] = shared[k];
+    for (const k of ['uBounce', 'uLamps', 'uLampCol', 'uLampK', 'uSunDir', 'uSunCol']) sh.uniforms[k] = shared[k];
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', `#include <common>
 attribute vec3 aPart;
@@ -478,8 +485,12 @@ if (limb > 0.5 && limb < 2.5) {
 } else if (limb > 2.5 && limb < 4.5) {
   float sd = limb < 3.5 ? 1.0 : -1.0;
   float right = limb > 3.5 ? 1.0 : 0.0;
-  piv = vec3(sd * -(0.18 + (girth - 1.0) * 0.17), 0.68, 0.0);
-  ang = -sd * sw * 0.55 * isWalk * (1.0 - isCarry) - isStag * sd * sw * 0.3;
+  piv = vec3(sd * -(0.215 + (girth - 1.0) * 0.17), 0.65, 0.0);
+  ang = -sd * sw * 0.78 * isWalk * (1.0 - isCarry) - isStag * sd * sw * 0.3;
+  float isIdle = isClip(clip, 0.0), iv = fract(aAnim.y * 0.618 + float(gl_InstanceID) * 0.381966 + 0.13);
+  float talk = isIdle * step(iv, 0.38), akimbo = isIdle * step(0.38, iv) * step(iv, 0.62);
+  ang += talk * right * (-1.05 + 0.4 * sin(t * 1.9)) + talk * (1.0 - right) * (-0.25 + 0.15 * sin(t * 0.9));
+  ang += akimbo * 0.35;
   ang += -1.25 * isCarry;
   ang += isWork * mix(-0.55 + 0.15 * sw, -1.0 + 0.55 * sin(t * 2.0), right);
   ang += isSweep * (-0.7 + 0.35 * sin(t * 1.6) * sd);
@@ -498,14 +509,14 @@ if (limb > 0.5 && limb < 2.5) {
   ang += isUp * (-2.95 + 0.06 * sin(t * 6.0 + sd));
   ang += isCan * 0.25;
   ang += isPunch * (-1.45 + 0.85 * max(0.0, sin(t * 1.8 + right * 3.1416)));
-  angZ = isCheer * sd * 0.35 - isFlail * sd * 0.45 - isDuel * sd * mix(0.18, 0.4, right) - isPoint * (1.0 - right) * sd * 0.9;
+  angZ = -sd * (0.1 * isWalk + 0.05 * isIdle + 0.45 * akimbo + talk * right * 0.25 * (0.6 + 0.4 * sin(t * 1.3))) + isCheer * sd * 0.35 - isFlail * sd * 0.45 - isDuel * sd * mix(0.18, 0.4, right) - isPoint * (1.0 - right) * sd * 0.9;
   angZ += -isStag * sd * 0.5 - isDizzy * sd * 0.35 * (0.6 + 0.4 * sin(t)) - isSprawl * sd * 1.35 - isCan * sd * 0.9 + isTip * right * 0.3 + isUp * sd * 0.15;
 } else if ((limb > 4.5 && limb < 5.5) || limb > 7.5) {
   piv = vec3(0.0, 0.74, 0.0);
   ang = 0.08 * sin(t * 0.5) * (1.0 - isWalk) + isWork * 0.18 + isSlump * 0.45 + isFlail * 0.3 * sin(t * 2.0) - isDuel * 0.06 + isPiano * 0.1 * sin(t * 2.0) + isDizzy * 0.15 * cos(t * 1.3) + isStag * 0.12;
   angZ = 0.06 * sin(t * 0.37) + isDizzy * 0.22 * sin(t * 1.3) + isStag * 0.15 * sin(t * 0.7);
 }
-float lean = isSlump * 0.32 + isPunch * 0.12 + isPiano * 0.12 + isHammer * 0.15 * max(0.0, sin(t * 1.6));
+float lean = isSlump * 0.32 + isWalk * 0.07 + isPunch * 0.12 + isPiano * 0.12 + isHammer * 0.15 * max(0.0, sin(t * 1.6));
 float roll = isStag * 0.14 * sin(t * 0.9) + isDizzy * 0.1 * sin(t * 1.3) + isFlail * 0.2 * sin(t * 1.3);
 mat3 R = rotX(ang) * rotZ(angZ);
 mat3 RB = rotX(lean) * rotZ(roll);
@@ -541,8 +552,13 @@ else vColor = uSkin[int(aLook.x + 0.5)] * vec3(1.06, 0.7, 0.64);
 vSkin = float(abs(slot - 3.0) < 0.5 || slot > 6.5);`)
       .replace('#include <project_vertex>', WORLD_POS_VERT);
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform vec3 uRim;\nvarying float vSkin;\nvarying vec3 vWP;\nvarying vec3 vWN;\n' + WORLD_LIGHT_HEAD)
+      .replace('#include <common>', '#include <common>\nuniform vec3 uRim;\nuniform vec3 uSunDir;\nuniform vec3 uSunCol;\nvarying float vSkin;\nvarying vec3 vWP;\nvarying vec3 vWN;\n' + WORLD_LIGHT_HEAD)
       .replace('#include <opaque_fragment>', `{
+  vec3 cwn = normalize(vWN);
+  float ndl = dot(cwn, uSunDir);
+  float term = exp(-pow((ndl + 0.08) * 3.2, 2.0));
+  outgoingLight += diffuseColor.rgb * uSunCol * (term * vec3(1.0, 0.55, 0.38) * 0.55 + max(0.0, (ndl + 0.6) / 1.6) * 0.18);
+  outgoingLight *= 0.8 + 0.2 * smoothstep(-0.8, 0.4, cwn.y);
   float nv = saturate(dot(geometryNormal, geometryViewDir));
   float fr = pow(1.0 - nv, 2.2);
   outgoingLight += uRim * fr * (0.55 + 0.6 * diffuseColor.rgb);
@@ -552,7 +568,7 @@ vSkin = float(abs(slot - 3.0) < 0.5 || slot > 6.5);`)
 ${WORLD_LIGHT_FRAG}
 #include <opaque_fragment>`);
   };
-  m.customProgramCacheKey = () => 'iw2-crowd5';
+  m.customProgramCacheKey = () => 'iw2-crowd6';
   return m;
 }
 
@@ -748,7 +764,10 @@ export function createCrowdPool(materials, { max = 480 } = {}) {
   };
   const inScene = (o) => { for (; o; o = o.parent) { if (!o.visible) return false; if (o.isScene) return true; } return false; };
   const pool = {
-    mesh, blob, members, max, stats: { n: 0, members: 0 },
+    mesh, blob, members, max, stats: { n: 0, members: 0, cut: 0 },
+    // R4 crowd cut: the hero shows only the first ~third of each crowd's live instances (min 1; crowds with
+    // c.thin === false keep everyone) and nobody inside a clear zone [x, z, r] (staged gags need open dirt).
+    keep: 0.3, clear: [],
     register(c, { poolOnly = false } = {}) {
       if (members.includes(c)) { c.poolOnly = poolOnly; if (active) setLayers(c); return c; }
       c.poolOnly = poolOnly;
@@ -767,6 +786,7 @@ export function createCrowdPool(materials, { max = 480 } = {}) {
       _f.setFromProjectionMatrix(_pm);
       const im = mesh.instanceMatrix.array, bm = blob.instanceMatrix.array, dst = ATTRS.map((k) => geo.attributes[k]);
       let n = 0;
+      pool.stats.cut = 0;
       for (const c of members) {
         if (n >= max) break;
         const m = c.mesh;
@@ -775,13 +795,22 @@ export function createCrowdPool(materials, { max = 480 } = {}) {
         const ws = Math.sqrt(we[0] * we[0] + we[1] * we[1] + we[2] * we[2]);
         const lim = Math.min(m.count, c.count), sa = ATTRS.map((k) => m.geometry.attributes[k]);
         const blobOn = !!(c.blobMesh && c.blobMesh.visible);
+        let live = 0;
+        if (c.thin !== false) for (let i = 0; i < lim; i++) { const o = i * 16; if (src[o] * src[o] + src[o + 1] * src[o + 1] + src[o + 2] * src[o + 2] >= 1e-8) live++; }
+        const quota = c.thin === false ? 1e9 : Math.max(1, Math.round(live * pool.keep));
+        let took = 0;
         for (let i = 0; i < lim && n < max; i++) {
           const o = i * 16;
           const s2 = src[o] * src[o] + src[o + 1] * src[o + 1] + src[o + 2] * src[o + 2];
           if (s2 < 1e-8) continue;
+          if (took >= quota) { pool.stats.cut++; continue; }
           const s = Math.sqrt(s2) * ws, tx = src[o + 12], ty = src[o + 13], tz = src[o + 14];
           _sp.center.set(we[0] * tx + we[4] * ty + we[8] * tz + we[12], we[1] * tx + we[5] * ty + we[9] * tz + we[13] + 0.9 * s, we[2] * tx + we[6] * ty + we[10] * tz + we[14]);
           _sp.radius = 1.6 * s * pad;
+          let blocked = false;
+          for (const z of pool.clear) if ((_sp.center.x - z[0]) ** 2 + (_sp.center.z - z[1]) ** 2 < z[2] * z[2]) { blocked = true; break; }
+          if (blocked) { pool.stats.cut++; continue; }
+          took++;
           if (!_f.intersectsSphere(_sp)) continue;
           _w.fromArray(src, o).premultiply(W).toArray(im, n * 16);
           if (blobOn) { _w.fromArray(srcB, o).premultiply(W).toArray(bm, n * 16); }

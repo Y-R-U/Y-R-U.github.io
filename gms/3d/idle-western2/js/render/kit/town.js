@@ -100,6 +100,20 @@ export function buildTown(kit, data, field, pal) {
     else if (k < 0.7) G(x, z).ball(r() < 0.5 ? 'rock3' : 'stone2', x, 0.01, z, 0.05 + r() * 0.09, { sy: 0.5, detail: 0, ry: r() * 6 });
     else if (!onStreet) W.tuft(G(x, z), x, z, { s: 0.6 + r() * 0.6 });
   }
+  // R4 street-edge dressing: rock clusters, tufts and pebble scatter hugging both kerbs and the porch fronts
+  for (let x = XA + 1; x < XB; x += 1.7) {
+    const r = rngOf(x * 29 + 5);
+    for (const [z0, dz] of [[roadN, 0.35], [roadS, -0.35], [roadN - 2.35, 0.25], [roadS + 2.4, -0.2]]) {
+      const k = r();
+      if (k > 0.62) continue;
+      const z = z0 + dz * (0.4 + r()), xx = x + r() * 1.2, g = G(xx, z);
+      if (k < 0.22) {
+        const n = 1 + Math.floor(r() * 3);
+        for (let j = 0; j < n; j++) g.ball(r() < 0.6 ? 'rock2' : 'rockDark', xx + (r() - 0.5) * 0.7, 0.02, z + (r() - 0.5) * 0.4, 0.1 + r() * (j ? 0.1 : 0.2), { sy: 0.6, detail: 0, ry: r() * 6 });
+      } else if (k < 0.45) W.tuft(g, xx, z, { s: 0.7 + r() * 0.7 });
+      else for (let j = 0; j < 3; j++) g.ball(r() < 0.5 ? 'rock3' : 'stone2', xx + (r() - 0.5) * 1.2, 0.01, z + (r() - 0.5) * 0.6, 0.04 + r() * 0.05, { sy: 0.5, detail: 0, ry: r() * 6 });
+    }
+  }
   // the town's welcome arch over the trail (west), the wanted board by the jail, a church-side noticeboard
   arch(B(XA + 26, rz), XA + 26, rz, signs);
   const jail = data.PLOTS?.find((p) => p.id === 'jail');
@@ -193,18 +207,7 @@ export function buildTown(kit, data, field, pal) {
     for (const z of [roadN + 0.3 + r() * 0.5, roadS - 0.4 - r() * 0.5]) if (r() < 0.45) W.tuft(G(x, z), x + r() * 2, z, { s: 0.6 + r() * 0.5 });
   }
 
-  // ---- the mesa ring (3 haze layers) and distant hills
-  const mesas = [
-    [-60, -230, 90, 40, 46, 0], [60, -260, 120, 50, 58, 1], [190, -240, 80, 38, 40, 0], [300, -200, 110, 46, 52, 1],
-    [380, -40, 90, 50, 44, 0], [370, 120, 80, 36, 38, 1], [250, 230, 120, 50, 50, 0], [90, 260, 100, 44, 46, 1],
-    [-60, 220, 90, 40, 42, 0], [-210, 120, 70, 36, 36, 1], [-240, -40, 90, 44, 48, 0], [-180, -170, 80, 40, 40, 1],
-    [140, -330, 140, 60, 70, 0], [420, 60, 120, 56, 62, 1], [-320, 60, 130, 60, 64, 0], [30, -150, 40, 22, 22, 1], [250, -130, 46, 24, 26, 0],
-  ];
-  mesas.forEach(([x, z, w, d, h, sp], i) => {
-    const r = rngOf(i * 19 + 3);
-    const slot = Math.hypot(x - 100, z) > 300 ? 'rock3' : Math.hypot(x - 100, z) > 220 ? 'rock2' : 'rock';
-    W.mesa(far, x, z, w, d, h * (Math.hypot(x - 60, z) > 200 ? 1.35 : 0.9), { y: field.height(x, z) - 3, ry: r() * 3, slot, band: slot === 'rock' ? 'rockDark' : 'rock', rnd: r, spire: sp || r() < 0.3 });
-  });
+  // ---- the mesa ring now lives in the sky dome (kit/lighting.js buttes: three painted haze layers, every view).
 
   life.pigeonSpots.push([12, 6], [ST.x1 * 0.5, roadN + 1], [END - 10, roadS - 1.5]);
   life.walks.push({ z: roadN - 0.3, y: 0.02, x0: XA, x1: END + 6 }, { z: SZ - 1.2, y: 0.36, x0: 0, x1: lastS }, { z: roadS - 0.7, y: 0.02, x0: XA, x1: END + 6 });

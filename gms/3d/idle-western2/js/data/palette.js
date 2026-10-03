@@ -5,13 +5,13 @@ export const PALETTE = {
   ground: '#dcae80', grass: '#e6b07e', grass2: '#ecbc8c', grassDark: '#d49868', dirt: '#d49a6a', sand: '#e8b888',
   road: '#ecb98a', roadLine: '#e8b888', rut: '#b97b52', kerb: '#8e5c3c', pave: '#a8714a', pave2: '#8e5c3c', pad: '#d9a676', grout: '#6e452d',
   plank: '#a8714a', plank2: '#8e5c3c', plank3: '#6e452d',
-  wall: '#c9a27a', wall2: '#b5835a', trim: '#ead9b8', white: '#f3e7cf', roof: '#8a8f93', roof2: '#7c6a5c', tin: '#8a8f93', rust: '#a86b4a',
+  wall: '#c9a27a', wall2: '#b5835a', trim: '#8a5c3e', white: '#f3e7cf', roof: '#8a8f93', roof2: '#7c6a5c', tin: '#8a8f93', rust: '#a86b4a',
   wood: '#b88b60', wood2: '#9a6c48', woodDark: '#7a5236', raw: '#c99a6c', dark: '#3e2f28', iron: '#4a4246', stone: '#c8a888', stone2: '#b08d6c',
   brick: '#b5674a', brick2: '#9c573e', rock: '#c5653f', rock2: '#b8705a', rock3: '#d9a08a', rockDark: '#9a4a32',
   glass: { c: '#5b5470', r: 0.12 }, window: { c: '#ffb45a', r: 0.25, g: -1 }, winDay: { c: '#ffb45a', r: 0.3, g: 0.12 }, curtain: '#b5483a', door: '#6e452d',
   leaf: '#8a9a5a', leaf2: '#a3a86a', leafDark: '#6f7a48', trunk: '#7a5638', cactus: '#6e9b57', cactusDark: '#4e7a45', scrub: '#b8a564', hay: '#e2bf6a',
   water: '#7fb0b8', waterDeep: '#4f8e98', foam: '#f4fbfb',
-  skin: '#e8b48a', metal: '#8a8f93', chrome: '#c9ced4', lamp: { c: '#ffc978', r: 0.3, g: -1 }, bulb: { c: '#ffe2a8', r: 0.3, g: 1.2 },
+  skin: '#e8b48a', metal: '#8a8f93', chrome: '#c9ced4', lamp: { c: '#ffc978', r: 0.3, g: -1 }, bulb: { c: '#ffe2a8', r: 0.3, g: 2.4 },
   gold: { c: '#e8c25a', r: 0.3, m: 0.85 }, brass: { c: '#c9a24a', r: 0.32, m: 0.8 }, badge: { c: '#ffd27a', r: 0.25, m: 0.9, g: 0.2 },
   accent: '#b5483a', sign: '#ead9b8', stock: '#d9a441', bone: '#efe6d2', cloth: '#efe2c8',
   // barn paint (same value band; roofs/awnings carry the contrast)
@@ -53,6 +53,7 @@ export const LIGHTS = {
     rim: { color: '#ffc884', intensity: 1.0 },
     bounce: '#ffb47e', bounceK: 0.14,
     env: { ground: '#d8a886' }, night: 0, exposure: 1.18, sheen: '#ffc8a8', envK: 0.13, disc: { az: -12, el: 6 },
+    rock: { lit: '#d79a86', shade: '#9a7a9a' },
   },
   day: {
     sky: { top: '#7fa8d4', mid: '#e6d4bc', horizon: '#fad8b0' },
@@ -61,14 +62,16 @@ export const LIGHTS = {
     rim: { color: '#ffd8a0', intensity: 0.8 },
     bounce: '#ffa868', bounceK: 0.1,
     env: { ground: '#c8a07c' }, night: 0, exposure: 1.12, sheen: '#ffd0a0', envK: 0.12, disc: { az: -4, el: 9 },
+    rock: { lit: '#d48a62', shade: '#a0707a' },
   },
   golden: {
-    sky: { top: '#6f80c8', mid: '#eea888', horizon: '#f8c48e' },
+    sky: { top: '#6656b0', mid: '#e8869a', horizon: '#ffb47c' },
     sun: { color: '#ffbf78', intensity: 6.6, azimuth: 36, elevation: 23 },
     fill: { sky: '#8494e0', ground: '#b88262', intensity: 0.46 },
     rim: { color: '#ffb05a', intensity: 1.5 },
     bounce: '#ff9a48', bounceK: 0.08,
-    env: { ground: '#b88058' }, night: 0, exposure: 1.2, sheen: '#ffb070', envK: 0.14, disc: { az: -8, el: 4.5 },
+    env: { ground: '#b88058' }, night: 0, exposure: 1.2, sheen: '#ffb070', envK: 0.14, disc: { az: -8, el: 6.5 },
+    rock: { lit: '#d8774e', shade: '#94546e' },
   },
   dusk: {
     sky: { top: '#5b4a96', mid: '#e88a78', horizon: '#ffb070' },
@@ -77,16 +80,19 @@ export const LIGHTS = {
     rim: { color: '#ffa050', intensity: 1.4 },
     bounce: '#ff7a38', bounceK: 0.22,
     env: { ground: '#a0706a' }, night: 0.45, lamps: 0.55, exposure: 1.1, sheen: '#ff9858', envK: 0.14, disc: { az: -10, el: 2.5 },
+    rock: { lit: '#b85a4a', shade: '#5e3a62' },
   },
-  // W18 night: deep blue sky with a warm dusty glow on the horizon, warm lantern pools; never a lilac wash.
+  // W18 night: deep blue-violet sky, purple butte silhouettes, violet ambient, amber lantern pools; never a grey wash.
   night: {
-    sky: { top: '#0a1230', mid: '#1c2a58', horizon: '#4a4a68' },
-    sun: { color: '#9fb6f0', intensity: 0.75, azimuth: 60, elevation: 38 },
-    fill: { sky: '#3c5290', ground: '#2c2430', intensity: 0.24 },
-    rim: { color: '#8fb0f0', intensity: 0.55 },
+    sky: { top: '#0e1036', mid: '#2a2c6a', horizon: '#5a4c86' },
+    sun: { color: '#a8b0f0', intensity: 0.7, azimuth: 60, elevation: 38 },
+    fill: { sky: '#5a4aa8', ground: '#2c2238', intensity: 0.3 },
+    rim: { color: '#9a90f0', intensity: 0.55 },
     bounce: '#ff9a50', bounceK: 0.05,
-    env: { ground: '#241e2c' }, night: 1, lamps: 1.6, exposure: 1.34, sheen: '#7f98d8', envK: 0.08, disc: { az: -14, el: 4.2 },
+    env: { ground: '#241e30' }, night: 1, lamps: 1.6, exposure: 1.3, sheen: '#8a80d8', envK: 0.08, disc: { az: -14, el: 7 },
+    rock: { lit: '#4e3e74', shade: '#2c2550' },
   },
+
 };
 
 // Virtual hour (data/clock.js maps game time onto it) → palette keys. Golden hour owns the long afternoon (the money shot); night is violet, never black.
