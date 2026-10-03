@@ -13,7 +13,7 @@ c.on('Network.responseReceived',p=>{if(p.response.status>=400)report.errors.push
 c.on('Network.loadingFailed',p=>{if(!p.canceled)report.errors.push(`Network: ${p.errorText}`);});
 async function check(name,expr){const result=await c.eval(expr);assert.ok(result,name+': '+JSON.stringify(result));report.checks.push(name);}
 async function capture(name){await c.eval(`document.querySelector('#toast-stack').style.opacity='0'`);const {data}=await c.send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});writeFileSync(resolve(out,name+'.png'),Buffer.from(data,'base64'));await c.eval(`document.querySelector('#toast-stack').style.opacity=''`);}
-async function click(selector,touch=false){const r=await c.eval(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`);if(touch){await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:r.x,y:r.y}]});await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}else{await c.send('Input.dispatchMouseEvent',{type:'mousePressed',x:r.x,y:r.y,button:'left',clickCount:1});await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x:r.x,y:r.y,button:'left',clickCount:1});}await c.frames(2);}
+async function click(selector,touch=false){await c.eval(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:'center'})`);await c.frames(3);const r=await c.eval(`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`);if(touch){await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:r.x,y:r.y}]});await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}else{await c.send('Input.dispatchMouseEvent',{type:'mousePressed',x:r.x,y:r.y,button:'left',clickCount:1});await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x:r.x,y:r.y,button:'left',clickCount:1});}await c.frames(2);}
 try{
  await c.viewport(1440,1050,1,false);await c.goto(base+'?dpr=1');
  assert.ok(await c.waitFor('window.transport2?.game && document.querySelector("canvas")',30000),'game starts');
@@ -33,7 +33,7 @@ try{
  await check('hero has size',`(()=>{const r=document.querySelector('#hero-view').getBoundingClientRect();return r.width>200&&r.height>150})()`);
  await click('[data-action="upgrade"][data-id="grain"]');
  await check('upgrade works through visible control','transport2.game.state.routes.grain.level===2');
- await click('#hero-pin');await check('camera pin works','transport2.scenes.debug.pinned===true');
+ await click('[data-camera=grain]');await check('camera pin works','transport2.scenes.debug.pinned===true');
  await click('#tour-button');await check('auto tour resumes','transport2.scenes.debug.pinned===false');
  await c.eval(`(()=>{for(let i=0;i<12&&!transport2.game.state.event;i++)transport2.game.tick(15)})()`);
  await check('random opportunity appears with a countdown',`!!transport2.game.state.event && !document.querySelector('#event-banner').hidden`);
@@ -71,7 +71,7 @@ try{
  assert.notEqual(before.vehicles[0].x+','+before.vehicles[0].z,after.vehicles[0].x+','+after.vehicles[0].z,'truck follows delivery progress');report.checks.push('truck moves with shared delivery progress');
  await c.eval('new Promise(r=>setTimeout(r,12300))');
  await check('pin holds across a complete tour interval',`transport2.scenes.debug.focus==='grain' && transport2.scenes.debug.pinned`);
- await c.eval('transport2.scenes.focus(null,false)');
+ await c.eval("transport2.scenes.focus('grain',false)");
  await c.eval('new Promise(r=>setTimeout(r,12300))');
  await check('automatic highlights advance after twelve seconds',`transport2.scenes.debug.focus!=='grain' && !transport2.scenes.debug.pinned`);
  await c.eval(`document.querySelector('#quality-select').value='low';document.querySelector('#quality-select').dispatchEvent(new Event('change'))`);

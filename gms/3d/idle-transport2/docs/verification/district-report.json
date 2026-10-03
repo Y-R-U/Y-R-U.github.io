@@ -1,0 +1,97 @@
+{
+  "url": "http://127.0.0.1:8888/gms/3d/idle-transport2/",
+  "checks": [
+    "initial district has three businesses and one central depot in one scene",
+    "main camera starts in district overview",
+    "all business cameras observe the same physical scene",
+    "pinning a business moves the camera inside the existing district",
+    "overview returns to the complete connected district",
+    "multiple fleet trucks use distinct loading and queue positions",
+    "all route phases and cycle wraps keep continuous physical truck positions",
+    "business loading and central depot unloading use their physical bays",
+    "actual trucks travel forward along the shared one-way road",
+    "main scene and row views use identical site and vehicle objects",
+    "all fifteen listed businesses connect to one depot and one renderer",
+    "all 105 network vehicle paths stay continuous, use forward traffic and have distinct depot bays",
+    "network overview and every close-up retain one scene identity"
+  ],
+  "initial": {
+    "region": "meadow",
+    "siteIds": [
+      "grain",
+      "timber",
+      "stone"
+    ],
+    "sceneUuid": "56b77bc0-b15b-4996-a55a-5002cb223997",
+    "sceneCount": 1,
+    "centralDepotCount": 1,
+    "centralDepotUuid": "4f4a05ad-9c3f-445b-842b-b97672a6ea4a",
+    "depotPosition": [
+      0,
+      0,
+      0
+    ],
+    "road": {
+      "length": 177.68140899333463,
+      "oneWay": true,
+      "half": 24,
+      "radius": 13,
+      "width": 7.2,
+      "lanes": 3,
+      "laneOffsets": [
+        -1.8,
+        0,
+        1.8
+      ]
+    },
+    "overview": true,
+    "mode": "overview",
+    "heroSceneUuid": "56b77bc0-b15b-4996-a55a-5002cb223997"
+  },
+  "network": {
+    "region": "network",
+    "siteIds": [
+      "grain",
+      "timber",
+      "stone",
+      "steel",
+      "machinery",
+      "fuel",
+      "containers",
+      "offshore",
+      "ferry",
+      "summit",
+      "crystal",
+      "resort",
+      "airfreight",
+      "precision",
+      "orbital"
+    ],
+    "sceneUuid": "ba9723d3-781e-4c69-a68a-d0ec5ec8d64f",
+    "sceneCount": 1,
+    "centralDepotCount": 1,
+    "centralDepotUuid": "c79e1ef3-c345-4ff9-9143-38a3990405cd",
+    "depotPosition": [
+      0,
+      0,
+      0
+    ],
+    "road": {
+      "length": 381.6814089933346,
+      "oneWay": true,
+      "half": 75,
+      "radius": 13,
+      "width": 7.2,
+      "lanes": 3,
+      "laneOffsets": [
+        -1.8,
+        0,
+        1.8
+      ]
+    },
+    "overview": true,
+    "mode": "overview",
+    "heroSceneUuid": "ba9723d3-781e-4c69-a68a-d0ec5ec8d64f"
+  },
+  "errors": []
+}

@@ -1,6 +1,10 @@
 # Idle Transport 2 — resumable manager checkpoint
 
-Status: COMPLETE expansion and local regression, 2026-10-03. Publication remains authorized. Last published HEAD before this expansion: 20e52c52. All three implementation agents and independent adversarial reviews finished. Final captures and local checks passed; root is completing scoped Pages publication and exact live verification.
+Status: connected district implementation complete, 2026-10-03. Local verification passed: economy suite, gameplay28, touch10, expansion9, recovery6, district13, portrait3 sizes and ten captures without console errors. Authorized Pages release follows this checkpoint. Preserve unrelated repo changes.
+
+All agent assignments are complete. Main and row views use ONE physical scene, central depot and continuous three-lane one-way road for every displayed business. Overview, tour and pin change only camera framing. All operations connects all fifteen businesses to the same depot. Individual checkpoint docs contain restart details; actual agent sessions may not survive restart.
+
+District verification: 13 browser checks, including identical site/vehicle UUIDs in hero and rows, continuous forward traffic across all 105 possible truck paths, distinct depot/loading bays, and one renderer. Existing gameplay, tap, expansion, GPU recovery and portrait checks are rerun for this release. The road uses deterministic animation tied to delivery progress; it does not simulate traffic collisions.
 
 New delivery:
 - Resume recovery for visibility, pagehide/pageshow, freeze/resume and GPU loss/restoration; preserved last good images, one restarted RAF, no duplicate offline interval credit.
@@ -10,7 +14,7 @@ New delivery:
 - Eight-minute Halloween side company with pumpkin/candy/ghost businesses, separate currency, six milestones and permanent rewards. Practice available now/year-round; official Oct15–Nov2 UTC. Challenge timer expires while away but earns no offline coins.
 - Adversarial fixes: short-away seasonal countdown, failed-save status/warning recovery, over-capacity equipment imports, complete once-only lifecycle credits, parked-truck wheel/dust and cargo/loading phase correctness, unobstructed scene focal area, compact mobile toasts.
 
-Current verification: Node economy/validation/audit suite passes; browser28 checks, tap10, expansion9, resume6 and portrait3size checks. Resume test includes three real WEBGL_lose_context cycles and Chrome freeze/active foreground return. Physical phone/Safari remains untested. Reports/screenshots under docs/verification. All final source modules and assets use v=20261003-business3.
+Current verification: Node economy/validation/audit suite passes; browser28 checks, tap10, expansion9, resume6 and portrait3size checks. Resume test includes three real WEBGL_lose_context cycles and Chrome freeze/active foreground return. Physical phone/Safari remains untested. Reports/screenshots under docs/verification. All final source modules and assets use v=20261003-district4.
 
 Ownership remains scenery/scenes, economy/economy, interface/HTML-CSS-app; root owns regression/tools/docs/release. Actual agent sessions may not survive restart; individual checkpoint docs and this file contain the required continuation state. No outstanding implementation blockers.
 
@@ -71,14 +75,15 @@ node tools/tap-test.mjs
 node tools/resume-test.mjs
 node tools/expansion-test.mjs
 node tools/economy-pacing.mjs
+node tools/district-test.mjs
 ```
 
 Browser scripts require local Chrome/socket access outside the restricted sandbox. TRANSPORT_URL can point the browser scripts at an explicitly requested deployment.
 
 ## Change boundaries
 
-Only gms/3d/idle-transport2/, projects.js, and assets/screenshots/idle-transport2.jpg belong to this task. Unrelated changes already existed in games/, tinpot/, and lib/auth/; preserve them. Release only these files if the user later requests publication; verify deployment completion and the actual public URL.
+Only gms/3d/idle-transport2/, projects.js, and assets/screenshots/idle-transport2.jpg belong to this task. Unrelated changes already existed in games/, tinpot/, and lib/auth/; preserve them. Publication is authorized; release only these files and verify deployment completion and the actual public URL.
 
 Scene-wide tapping expansion: economy tests cover legacy save migration, policy timing, mastery transitions and combo limits. tools/tap-test.mjs verifies actual touch positions, swipe/multi-touch/control exclusion, keyboard earning, continued tapping, policy UI and visible depot progression. Tap FX use bounded DOM nodes and a fixed 24-particle world pool.
 
-Release assets use the same v=20261003-business3 query across HTML stylesheet/app and app/scene economy imports to avoid mixing old cached interfaces with new modules. Keep the shared economy import version identical across modules when changing it.
+Release assets use the same v=20261003-district4 query across HTML stylesheet/app and app/scene economy imports to avoid mixing old cached interfaces with new modules. Keep the shared economy import version identical across modules when changing it.

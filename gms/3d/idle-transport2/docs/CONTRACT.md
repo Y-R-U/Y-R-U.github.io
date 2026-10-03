@@ -22,3 +22,8 @@ Root owns integration, tests, registry/screenshot, docs. Agents edit only assign
 `ITEMS`, `SEASON_BUSINESSES` and `SEASON_MILESTONES` are exported. `seasonInfo()`, `seasonStats(id)` and actions seasonStart/seasonTap/seasonUnlock/seasonUpgrade/seasonClaim drive the separate eight-minute challenge. equip uses `itemId|character`, `itemId|business:routeId` or `itemId|manager:routeId`; detach uses itemId. Inventory/equipment/season progress survive old-save normalization and prestige. See ECONOMY.md for caps, scopes and calendar behavior.
 
 Full-width route cards retain `.route-view[data-scene=id]` DOM targets. The renderer keeps one WebGL context and native DOM 2D presentation canvases. It retains last good snapshots during context loss, restarts once on restoration/resume and exposes debug recovery hooks for regression. App simulation handles visibility/pagehide/pageshow/freeze/resume once per away interval. Shared module imports and HTML assets use `v=20261003-business3`.
+
+
+## Connected district correction
+
+One active THREE.Scene and one central depot serve every route provided to setRoutes. Business sites are plot groups on a continuous one-way arterial, not independent islands or scene replicas. Hero and row cameras render the exact same physical plot/vehicle objects. overview() selects a broad district camera; focus(id,true) pins a business inside that district, and focus(null,false) starts its district tour. onFocus(id,locked,mode) describes overview/tour/focus. Traffic preserves business-loading, outbound, depot-unloading and empty-return phases derived from shared economic delivery progress. Bulk controls, manager/seasonal equipment, saves and resume behavior are unchanged. Release imports use v=20261003-district4.

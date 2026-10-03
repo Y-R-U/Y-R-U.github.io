@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ROUTES } from './economy.mjs?v=20261003-business3';
+import { ROUTES } from './economy.mjs?v=20261003-district4';
 
 // Every site is built from batched primitives. One offscreen renderer feeds
 // DOM-owned presentation canvases; hero and cards observe the same world.
@@ -203,100 +203,119 @@ function sunsetSky(cold,night) {
   gradient.addColorStop(0,colors[0]);gradient.addColorStop(.55,colors[1]);gradient.addColorStop(1,colors[2]);
   ctx.fillStyle=gradient;ctx.fillRect(0,0,4,512);const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;skies.set(key,texture);return texture;
 }
-function createWorld(route) {
-  const scene=new THREE.Scene(), rng=random(route.id), b=makeBuilder(scene);
-  const cold=route.region==='alpine'||route.kind==='space', night=route.kind==='space';
-  scene.background=sunsetSky(cold,night);
-  scene.fog=new THREE.Fog(night?'#63737f':cold?'#c0cbcc':'#c5c1ac',52,125);
-  const ambient=new THREE.HemisphereLight(night?'#88b9fb':'#abc9dc',cold?'#4b5860':'#4a5037',.9);scene.add(ambient);
-  const sun=new THREE.DirectionalLight(night?'#bfd5ff':'#ffd59d',night?2.7:4);sun.position.set(-32,23,14);sun.castShadow=true;
-  sun.shadow.autoUpdate=false;sun.shadow.needsUpdate=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-34;sun.shadow.camera.right=34;sun.shadow.camera.top=28;sun.shadow.camera.bottom=-28;sun.shadow.camera.far=100;sun.shadow.bias=-.0003;sun.shadow.normalBias=.06;scene.add(sun);scene.add(sun.target);
-  const rim=new THREE.DirectionalLight('#89b7c8',.65);rim.position.set(15,10,-22);scene.add(rim);
-  // A gently terraced island creates a tactile tabletop, including exposed geology.
-  b.box(cold?'#a5b8bc':'#637e59',0,-.75,0,52,1.8,38);
-  b.box('#8b856d',0,-1.9,0,51,1.0,37);
-  b.box('#6c6b5c',0,-2.6,0,50,.55,36);
-  b.box(cold?'#d5dcda':'#8a9d61',0,.16,0,51,.15,37);
-  b.box(cold?'#b8c9c9':'#6f9160',-9,.25,-9,24,.16,10);
-  b.box(cold?'#ced5cf':'#95a366',14,.25,-1,15,.2,18);
-  // River is cut through the landscape; layered transparent sheets and light streaks.
-  b.box('#3a7b89',.3,.28,0,3.8,.16,38,0,0,.35,.25);
-  b.box('#73b9ae',.3,.38,0,2.7,.08,38,0,.06,.3,.18);
-  for(let i=0;i<24;i++)b.box('#b1d2c2',-.8+rng()*2,.445,-18+rng()*36,.03,.015,.6+rng()*1.6,0,.1);
-  for(let i=0;i<23;i++){const z=-18+rng()*36;for(const side of [-1,1])b.rock('#aaa98b',.3+side*(2.2+rng()*.3),.35,z,.7+rng()*.7,.5+rng()*.3,.8+rng()*.8,rng()*6);}
-  const road=new THREE.Mesh(roadGeo,mat('#495958'));road.position.y=.5;road.receiveShadow=true;road.material.side=THREE.DoubleSide;scene.add(road);
-  // Inset shoulders, clean paint, stone bridge piers, and safety rails.
-  for(let i=0;i<64;i++) {const p=journey(i/64);b.box('#e9d5aa',p.x,.525,p.z,.56,.02,.08,-p.angle);}
-  for(const z of [-5,5]) {
-    b.box('#858e81',.3,.53,z,5,.25,2.45);
-    b.box('#d2c7a7',.3,.74,z+1.18,5,.28,.16);b.box('#d2c7a7',.3,.74,z-1.18,5,.28,.16);
-    for(const x of [-1.45,2.05])b.box('#818b79',x,.1,z,.65,.75,2.5);
-    for(const x of [-1.9,-.8,.3,1.4,2.5])for(const zz of [-1.15,1.15])b.box('#536c66',x,1,z+zz,.08,.65,.08);
-    for(const zz of [-1.15,1.15])b.box('#536c66',.3,1.29,z+zz,4.7,.08,.08);
-  }
-  // Shared logistics terminal on the left side of every site.
-  b.box('#788679',-13,.32,0,10,.15,10);
-  building(b,-13.5,-.6,5.8,4.2,3.0,'#e3d9be','#3d7073');
-  b.box('#294d55',-13.5,1.5,1.56,2.5,2.2,.04);
-  b.box('#f1bf66',-13.5,2.63,1.62,2.8,.12,.25,0,.5);
-  b.box('#c0c4ad',-13.5,.64,2.7,4.3,.24,2);
-  building(b,-19,1.1,2.3,2.5,1.7,'#e7c799');
-  sign(scene,'Dispatch',-13.5,3.0,1.6,'#f6cd87',3.2);
-  for(let i=0;i<3;i++)container(b,-19,.45,-4+i*1.65,['#ba7153','#688c86','#d5a359'][i]);
-  for(let i=0;i<4;i++) {b.box('#bb9060',-10.6+i%2*.7,.7,-1.5+Math.floor(i/2)*.8,.56,.64,.56);b.box('#e1c89e',-10.6+i%2*.7,1.06,-1.5+Math.floor(i/2)*.8,.6,.08,.6);}
-  // Street lamps and warm spill pools continue into the main view.
-  for(const [x,z] of [[-8,7],[8,7],[-8,-7],[8,-7]]) {
-    b.cyl('#38555a',x,2,z,.1,3.5,.1);b.box('#38555a',x+.4,3.75,z,.85,.1,.12);
-    b.box('#ffda96',x+.7,3.66,z,.32,.1,.24,0,2);
-    if(x===8){const light=new THREE.PointLight('#ffcc83',night?14:3,7,2);light.position.set(x+.7,3.5,z);scene.add(light);}
-  }
-  // Successive receding silhouettes keep atmospheric depth without giant
-  // close boulders swallowing the scene. Low foothills meet the wooded island.
-  for(let i=0;i<9;i++) {
-    const x=-38+i*10,z=-48-rng()*8,h=(cold?9:5)+rng()*(cold?7:4);
-    b.rock(cold?'#849ba8':'#78949a',x,-1,z,16+rng()*6,h,9,rng()*2);
-    if(cold)b.rock('#d3dcda',x,h*.57,z,7,3.5,5,rng()*3);
-  }
-  for(let i=0;i<10;i++) {
-    const x=-32+i*7.1,z=-31-rng()*6,h=(cold?5:3)+rng()*3;
-    b.rock(cold?'#8b9ca0':'#638177',x,-.7,z,11+rng()*4,h,8,rng()*3);
-  }
-  for(let i=0;i<11;i++) {
-    const x=-27+i*5.4,z=-20-rng()*3,h=1.7+rng()*2;
-    b.rock(cold?'#a6b7b5':'#72906b',x,-.3,z,8+rng()*3,h,6,rng()*6);
-  }
-  for(let i=0;i<54;i++) {
-    const x=-24+rng()*47,z=i<36?-9-rng()*7:8+rng()*8;
-    if(Math.abs(x)<3||x>10&&z<11)continue;
-    tree(b,x,z,.7+rng()*.6,rng,route.kind==='farm'&&i%3===0?'leaf':'pine');
-  }
-  for(let i=0;i<25;i++){const x=-24+rng()*48,z=-15+rng()*30;if(Math.abs(x)<3||Math.abs(z)<7)continue;b.rock(cold?'#9cacac':'#92977a',x,.45,z,.4+rng(),.3+rng()*.7,.4+rng(),rng()*6);}
-  const anim=[];
-  // One instanced shimmer pass animates across the river; lit water still
-  // receives the landscape's real shadows underneath these fine highlights.
-  const glints=new THREE.InstancedMesh(geometries.box,new THREE.MeshBasicMaterial({color:'#f9e9bd',transparent:true,opacity:.3,depthWrite:false}),18);
-  glints.frustumCulled=false;scene.add(glints);anim.push({type:'water',obj:glints});
-  buildSite(route,scene,b,rng,anim);
-  // Clouds are soft low-poly sculptures rather than flat background stickers.
-  for(let i=0;i<6;i++) {const cloud=new THREE.Group();cloud.position.set(-30+i*13,13+rng()*5,-28-rng()*12);for(let j=0;j<4;j++)dynamicMesh(cloud,'sphere',cold?'#f0ece1':'#f0dfba',j*1.8,Math.sin(j)*.4,0,4,1.6,2.1);scene.add(cloud);anim.push({type:'cloud',obj:cloud,offset:cloud.position.x});}
-  b.finish();
-  const vehicles=[];for(let i=0;i<7;i++){const vehicle=truck(route.color||'#f6b56d',route.kind);if(i===0){const lights=new THREE.PointLight('#ffce83',night?7:2,5,2);lights.position.set(1.8,.8,0);vehicle.group.add(lights);}scene.add(vehicle.group);vehicles.push(vehicle);}
-  const heroCamera=new THREE.PerspectiveCamera(35,1,.1,220),rowCamera=new THREE.PerspectiveCamera(39,1,.1,160);
-  const production=productionSite(scene,route);
-  const upgrades=[];
-  for(let tier=0;tier<3;tier++) {
-    const group=new THREE.Group(),detail=makeBuilder(group);scene.add(group);group.visible=false;
-    // New goods in the destination apron are visible from both perspectives.
-    for(let i=0;i<3+tier*3;i++){const x=17+(i%3)*.65+tier*2.2,z=2.5+Math.floor(i/3)*.75;detail.box(tier===2?'#b6bd99':'#bd9362',x,.65+tier*.12,z,.55,.7+tier*.24,.55);detail.box('#dfc9a0',x,1.04+tier*.24,z,.58,.07,.58);}
-    if(tier===0){building(detail,-20,-8.3,4,3,1.8,'#b9ba99','#517575');sign(group,'Cargo annex',-20,2.1,-6.77,'#ead6a2',2.4);}
-    if(tier===1){building(detail,-14,-9.7,7,3.5,2.2,'#d8d0ad','#3a6b72');sign(group,'Fleet operations',-14,2.4,-7.92,'#d4ecb8',3.8);for(let i=0;i<5;i++)detail.box('#8ba293',-17+i*1.3,.5,-6.5,.8,.25,.8);}
-    if(tier===2){building(detail,-20,8.8,4.8,3.1,3.5,'#d8ba86','#365c66');sign(group,'Regional HQ',-20,3.2,10.37,'#ffe2a0',3.7);for(const x of [-22,-18]){detail.cyl('#7d9688',x,3,7,.12,5.6,.12);detail.box(route.color,x+.4,5.5,7,.8,.55,.08);}}
+function createBusiness(route) {
+  const root=new THREE.Group(),art=new THREE.Group();art.position.x=-20;root.add(art);
+  root.name='BusinessPlot:'+route.id;
+  const rng=random(route.id),b=makeBuilder(art),anim=[];
+  buildSite(route,art,b,rng,anim);b.finish();
+  const production=productionSite(art,route),upgrades=[];
+  for(let tier=0;tier<3;tier++){
+    const group=new THREE.Group(),detail=makeBuilder(group);art.add(group);group.visible=false;
+    for(let i=0;i<3+tier*3;i++)detail.box(tier===2?'#b6bd99':'#bd9362',22.5+i%3*.65,.8,4.5+Math.floor(i/3)*.7+tier*2.3,.55,1,.55);
+    if(tier===0)building(detail,24,3,2.7,2,1.4,'#b9ba99','#517575');
+    if(tier===1)sign(group,'Production II',20,3.8,1.4,'#d4ecb8',3);
+    if(tier===2)sign(group,'Mastered',20,4.4,1.4,'#ffe2a0',2.7);
     detail.finish();upgrades.push(group);
   }
-  const particles=new THREE.InstancedMesh(geometries.sphere,new THREE.MeshBasicMaterial({color:'#ffe6a3',transparent:true,opacity:.86,depthWrite:false}),24);particles.frustumCulled=false;particles.visible=false;scene.add(particles);
-  const dust=new THREE.InstancedMesh(geometries.sphere,new THREE.MeshBasicMaterial({color:cold?'#dfe5da':'#dbbd95',transparent:true,opacity:.19,depthWrite:false}),14);dust.frustumCulled=false;scene.add(dust);
-  const pulseLight=new THREE.PointLight('#ffe5a3',0,13,2);pulseLight.position.set(-13.5,3,2);scene.add(pulseLight);
-  return {scene,sun,heroCamera,rowCamera,vehicles,anim,route,progress:0,rendered:false,upgrades,particles,dust,pulseLight,particlePool:Array.from({length:24},()=>({born:-100,x:0,y:0,z:0,vx:0,vy:0,vz:0})),particleIndex:0,tapUntil:0,loadingCount:0,production};
+  const vehicles=Array.from({length:7},()=>truck(route.color,route.kind));
+  const particles=new THREE.InstancedMesh(geometries.sphere,new THREE.MeshBasicMaterial({color:'#ffe6a3',transparent:true,opacity:.86,depthWrite:false}),24);particles.frustumCulled=false;particles.visible=false;
+  const dust=new THREE.InstancedMesh(geometries.sphere,new THREE.MeshBasicMaterial({color:'#dbbd95',transparent:true,opacity:.16,depthWrite:false}),14);dust.frustumCulled=false;
+  return {root,art,route,anim,production,upgrades,vehicles,particles,dust,rowCamera:new THREE.PerspectiveCamera(36,1,.1,800),particlePool:Array.from({length:24},()=>({born:-100,x:0,y:0,z:0,vx:0,vy:0,vz:0})),particleIndex:0,tapUntil:0,loadingCount:0,progress:0,paths:[],siteOrigin:new THREE.Vector3()};
+}
+function ringPose(d,half,radius){
+  const length=half*4+radius*Math.PI*2;let s=((d%length)+length)%length;
+  if(s<half*2)return{x:-half+s,z:radius,angle:0};s-=half*2;
+  if(s<Math.PI*radius){const a=Math.PI/2-s/radius;return{x:half+Math.cos(a)*radius,z:Math.sin(a)*radius,angle:a-Math.PI/2};}s-=Math.PI*radius;
+  if(s<half*2)return{x:half-s,z:-radius,angle:-Math.PI};s-=half*2;const a=-Math.PI/2-s/radius;return{x:-half+Math.cos(a)*radius,z:Math.sin(a)*radius,angle:a-Math.PI/2};
+}
+function arterialGeometry(half,radius,width=3.2){
+  const outer=radius+width/2,inner=radius-width/2,shape=new THREE.Shape();
+  shape.moveTo(-half,outer);shape.lineTo(half,outer);shape.absarc(half,0,outer,Math.PI/2,-Math.PI/2,true);shape.lineTo(-half,-outer);shape.absarc(-half,0,outer,-Math.PI/2,Math.PI/2,true);
+  const hole=new THREE.Path();hole.moveTo(-half,inner);hole.absarc(-half,0,inner,Math.PI/2,Math.PI*1.5,false);hole.lineTo(half,-inner);hole.absarc(half,0,inner,-Math.PI/2,Math.PI/2,false);hole.lineTo(-half,inner);shape.holes.push(hole);
+  const geometry=new THREE.ShapeGeometry(shape,64);geometry.rotateX(Math.PI/2);return geometry;
+}
+function flatLane(scene,points,width,color,owned){
+  const positions=[],indices=[];
+  for(let i=0;i<points.length;i++){const prev=points[Math.max(0,i-1)],next=points[Math.min(points.length-1,i+1)],dx=next.x-prev.x,dz=next.z-prev.z,len=Math.hypot(dx,dz)||1,nx=-dz/len*width/2,nz=dx/len*width/2;positions.push(points[i].x+nx,.54,points[i].z+nz,points[i].x-nx,.54,points[i].z-nz);if(i<points.length-1){const k=i*2;indices.push(k,k+2,k+1,k+1,k+2,k+3);}}
+  const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geometry.setIndex(indices);geometry.computeVertexNormals();owned.push(geometry);const material=mat(color);material.side=THREE.DoubleSide;const mesh=new THREE.Mesh(geometry,material);mesh.receiveShadow=true;scene.add(mesh);return mesh;
+}
+function curve(points){const c=new THREE.CatmullRomCurve3(points,false,'centripetal');c.arcLengthDivisions=Math.max(180,points.length*8);return c;}
+function createDistrict(ids,businesses){
+  const scene=new THREE.Scene(),count=ids.length,half=Math.max(24,count*5),radius=13,length=half*4+radius*Math.PI*2;
+  const cold=ids.every(id=>businesses.get(id).route.region==='alpine'),region=new Set(ids.map(id=>businesses.get(id).route.region)).size===1?businesses.get(ids[0]).route.region:'network';
+  scene.name='TransportDistrict';scene.background=sunsetSky(cold,false);scene.fog=new THREE.Fog('#c7c5af',170,450);
+  scene.add(new THREE.HemisphereLight('#abc9dc','#4a5037',.9));const sun=new THREE.DirectionalLight('#ffd59d',4);sun.position.set(-65,90,55);sun.castShadow=true;sun.shadow.autoUpdate=false;sun.shadow.needsUpdate=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-half-45;sun.shadow.camera.right=half+45;sun.shadow.camera.top=65;sun.shadow.camera.bottom=-65;sun.shadow.camera.far=300;sun.shadow.bias=-.0003;sun.shadow.normalBias=.06;scene.add(sun,sun.target);const rim=new THREE.DirectionalLight('#89b7c8',.65);rim.position.set(60,30,-60);scene.add(rim);
+  const pulseLight=new THREE.PointLight('#ffe5a3',0,25,2);pulseLight.position.set(0,4,4);scene.add(pulseLight);
+  const staticRoot=new THREE.Group();scene.add(staticRoot);const b=makeBuilder(staticRoot),rng=random(ids.join(':'));
+  const groundWidth=(half+radius+38)*2,groundDepth=102;
+  b.box('#637e59',0,-.7,0,groundWidth,1.5,groundDepth);b.box('#8b856d',0,-1.75,0,groundWidth-1,.75,groundDepth-1);b.box(cold?'#c2d2c8':'#8a9d61',0,.18,0,groundWidth,.13,groundDepth);
+  b.box('#748579',0,.34,0,Math.min(half*1.3,75),.14,21);
+  // A single headquarters serves every route in this physically shared suburb.
+  const depot=new THREE.Group();depot.name='CentralDepot';scene.add(depot);const db=makeBuilder(depot);
+  const columns=count<=3?7:count,depotWidth=Math.max(13,Math.min(46,columns*3.8));
+  building(db,0,-5,depotWidth,6,4.4,'#e1d7b9','#3d7073');db.box('#294d55',0,2,-1.97,6,3,.05);db.box('#f1bf66',0,3.65,-1.9,6.3,.13,.2,0,.5);sign(depot,'Central Depot',0,4,-1.85,'#ffe1a3',Math.min(9,depotWidth*.7));
+  for(let i=0;i<Math.min(8,count+2);i++)container(db,-depotWidth/2+2+i*3.4,.45,-10,['#ba7153','#688c86','#d5a359'][i%3]);
+  db.finish();
+  const ownedGeometries=[],roadGeometry=arterialGeometry(half,radius,7.2);ownedGeometries.push(roadGeometry);const arterial=new THREE.Mesh(roadGeometry,mat('#495958'));arterial.material.side=THREE.DoubleSide;arterial.position.y=.5;arterial.receiveShadow=true;scene.add(arterial);
+  for(let d=0;d<length;d+=3.5){const p=ringPose(d,half,radius);for(const offset of [-.9,.9])b.box('#dfd7b5',p.x-Math.sin(p.angle)*offset,.53,p.z+Math.cos(p.angle)*offset,.75,.02,.07,-p.angle);}
+  for(let d=9;d<length;d+=25){const p=ringPose(d,half,radius),tx=Math.cos(p.angle),tz=Math.sin(p.angle),nx=-tz,nz=tx;for(const lane of [-1.8,0,1.8]){const x=p.x+nx*lane,z=p.z+nz*lane;for(const side of [-1,1])b.beam('#dfd7b5',[x-tx*.45+nx*.35*side,.56,z-tz*.45+nz*.35*side],[x+tx*.45,.56,z+tz*.45],.075,.03);}}
+  for(let d=0;d<length;d+=18){const p=ringPose(d,half,radius),out=new THREE.Vector3(-Math.sin(p.angle),0,Math.cos(p.angle));const x=p.x+out.x*4.4,z=p.z+out.z*4.4;b.cyl('#526866',x,1.85,z,.11,3.3,.11);b.box('#526866',x+.35,3.53,z,.7,.1,.12);b.box('#ffda96',x+.6,3.47,z,.25,.08,.22,0,2);}
+  // The river and its bridges belong to the district, rather than each site.
+  const riverX=-Math.max(depotWidth/2+5,half*.35);b.box('#377989',riverX,.25,0,3.5,.11,groundDepth,0,0,.25,.25);b.box('#71b4ac',riverX,.34,0,2.5,.08,groundDepth,0,.07,.25,.18);
+  for(const z of [-radius,radius]){b.box('#858e81',riverX,.56,z,5,.27,7.6);for(const side of [-1,1])b.box('#c9c3a5',riverX,.9,z+side*3.72,5,.28,.15);}
+  const depotEntryD=half-3,depotExitD=half+3,depotEntry=ringPose(depotEntryD,half,radius),depotExit=ringPose(depotExitD,half,radius);
+  const active=[];
+  ids.forEach((id,index)=>{
+    const w=businesses.get(id),anchorD=count===3?[half*2+Math.PI*radius+half+18,half*2+Math.PI*radius+half-18,half][index]:(index+.16)/count*length,anchor=ringPose(anchorD,half,radius),outward=new THREE.Vector3(-Math.sin(anchor.angle),0,Math.cos(anchor.angle));
+    w.root.position.set(anchor.x+outward.x*17,0,anchor.z+outward.z*17);w.root.rotation.y=Math.PI-anchor.angle;w.root.updateMatrixWorld(true);w.siteOrigin.copy(w.root.position);w.index=index;w.scene=scene;w.sun=sun;w.heroCamera=null;scene.add(w.root,w.particles,w.dust);for(const vehicle of w.vehicles)scene.add(vehicle.group);
+    const siteExitD=anchorD-12,siteJoinD=anchorD+12,siteExit=ringPose(siteExitD,half,radius),siteJoin=ringPose(siteJoinD,half,radius);
+    w.paths=[];
+    const local=new THREE.Vector3();
+    for(let i=0;i<7;i++){
+      const bay=local.set(-8-(i%4)*3.9,.48,5+Math.floor(i/4)*2.4).applyMatrix4(w.root.matrixWorld).clone();
+      const depotSlot=index*7+i,depotBay=new THREE.Vector3((depotSlot%columns-(columns-1)/2)*3.8,.48,-1+Math.floor(depotSlot/columns)*1.7);
+      const tangent=new THREE.Vector3(Math.cos(anchor.angle),0,Math.sin(anchor.angle)),lane=(index%3-1)*1.8;
+      const lanePoint=(d)=>{const p=ringPose(d,half,radius);return new THREE.Vector3(p.x-Math.sin(p.angle)*lane,.48,p.z+Math.cos(p.angle)*lane);};
+      const join=lanePoint(siteJoinD),exit=lanePoint(siteExitD),entry=lanePoint(depotEntryD),depart=lanePoint(depotExitD);
+      const joinPose=ringPose(siteJoinD,half,radius),exitPose=ringPose(siteExitD,half,radius),jt=new THREE.Vector3(Math.cos(joinPose.angle),0,Math.sin(joinPose.angle)),jo=new THREE.Vector3(-jt.z,0,jt.x),et=new THREE.Vector3(Math.cos(exitPose.angle),0,Math.sin(exitPose.angle)),eo=new THREE.Vector3(-et.z,0,et.x);
+      const outboundConnector=curve([bay.clone(),bay.clone().addScaledVector(tangent,2.2),join.clone().addScaledVector(jt,-6).addScaledVector(jo,8),join.clone().addScaledVector(jt,-2),join.clone()]);
+      const depotIn=curve([entry.clone(),entry.clone().add(new THREE.Vector3(2,0,0)),new THREE.Vector3(entry.x+4,.48,radius-4),new THREE.Vector3(depotBay.x-2.5,.48,depotBay.z),depotBay.clone()]);
+      const depotOut=curve([depotBay.clone(),depotBay.clone().add(new THREE.Vector3(2.5,0,0)),new THREE.Vector3(depart.x-4,.48,radius-4),depart.clone().add(new THREE.Vector3(-2,0,0)),depart.clone()]);
+      const inboundConnector=curve([exit.clone(),exit.clone().addScaledVector(et,2),exit.clone().addScaledVector(et,4).addScaledVector(eo,7),bay.clone().addScaledVector(tangent,-2.2),bay.clone()]);
+      const outDistance=((depotEntryD-siteJoinD)%length+length)%length,returnDistance=((siteExitD-depotExitD)%length+length)%length;
+      const outA=outboundConnector.getLength(),outB=depotIn.getLength(),returnA=depotOut.getLength(),returnB=inboundConnector.getLength();
+      w.paths.push({bay,depotBay,outboundConnector,depotIn,depotOut,inboundConnector,outA,outB,returnA,returnB,outTotal:outA+outDistance+outB,returnTotal:returnA+returnDistance+returnB,siteJoinD,siteExitD,outDistance,returnDistance,angle:anchor.angle,lane,roadLength:length,depotEntryD,depotExitD});
+      if(i===0){flatLane(scene,outboundConnector.getPoints(24),2.5,'#69786c',ownedGeometries);flatLane(scene,inboundConnector.getPoints(24),2.5,'#69786c',ownedGeometries);flatLane(scene,depotIn.getPoints(24),2.4,'#61716b',ownedGeometries);flatLane(scene,depotOut.getPoints(24),2.4,'#61716b',ownedGeometries);}
+
+    }
+    active.push(w);
+    // Small fences and planted verges stitch the plots into a common suburb.
+    for(let i=0;i<9;i++){const p=ringPose(anchorD-14+i*3.5,half,radius);tree(b,p.x+outward.x*(22+rng()*7),p.z+outward.z*(22+rng()*7),.85+rng()*.5,rng,'pine');}
+  });
+  flatLane(scene,[new THREE.Vector3(depotEntry.x,0,radius),new THREE.Vector3(depotEntry.x,0,radius-3),new THREE.Vector3(-8,0,3)],3.0,'#61716b',ownedGeometries);
+  flatLane(scene,[new THREE.Vector3(8,0,3),new THREE.Vector3(depotExit.x,0,radius-3),new THREE.Vector3(depotExit.x,0,radius)],3.0,'#61716b',ownedGeometries);
+  for(let i=0;i<35;i++){const x=-half-25+rng()*(half*2+50),z=(rng()>.5?1:-1)*(39+rng()*10);tree(b,x,z,.8+rng(),rng,i%4===0?'leaf':'pine');}
+  for(let i=0;i<12;i++)b.rock('#78949a',-half-35+i*(half*2+70)/11,-1,-groundDepth/2+2-rng(),16,5+rng()*5,9,rng()*3);
+  b.finish();
+  const vehicleBatches=new Map();
+  for(const w of active)for(const vehicle of w.vehicles)vehicle.group.traverse(mesh=>{
+    if(!mesh.isMesh||mesh.isInstancedMesh)return;const key=mesh.geometry.uuid+mesh.material.uuid;if(!vehicleBatches.has(key))vehicleBatches.set(key,{geometry:mesh.geometry,material:mesh.material,parts:[]});vehicleBatches.get(key).parts.push({mesh,vehicle,w});mesh.visible=false;
+  });
+  for(const batch of vehicleBatches.values()){batch.mesh=new THREE.InstancedMesh(batch.geometry,batch.material,batch.parts.length);batch.mesh.castShadow=true;batch.mesh.receiveShadow=true;batch.mesh.frustumCulled=false;scene.add(batch.mesh);}
+  const heroCamera=new THREE.PerspectiveCamera(38,1,.1,1000);
+  return {scene,sun,pulseLight,depot,ids,active,region,half,radius,length,groundWidth,groundDepth,heroCamera,vehicleBatches,ownedGeometries,staticRoot,cameraReady:false,disposed:false};
+}
+const posePoint=new THREE.Vector3(),poseTangent=new THREE.Vector3();
+function districtPose(w,phase,index=0){
+  const p=((phase%1)+1)%1,path=w.paths[index%w.paths.length];if(!path)return null;
+  let point,angle,onRoad=false,roadDistance=null,stage;
+  function sampleCurve(c,u){point=c.getPointAt(THREE.MathUtils.clamp(u,0,1),posePoint);poseTangent.copy(c.getTangentAt(THREE.MathUtils.clamp(u,0,1)));angle=Math.atan2(poseTangent.z,poseTangent.x);}
+  function sampleRoad(d){const r=ringPose(d,w.district.half,w.district.radius);posePoint.set(r.x-Math.sin(r.angle)*path.lane,.48,r.z+Math.cos(r.angle)*path.lane);point=posePoint;angle=r.angle;onRoad=true;roadDistance=d;}
+  if(p<.18){point=path.bay;angle=path.angle;stage='loading';}
+  else if(p<.55){const distance=(p-.18)/.37*path.outTotal;stage='outbound';if(distance<path.outA)sampleCurve(path.outboundConnector,distance/path.outA);else if(distance<path.outA+path.outDistance)sampleRoad(path.siteJoinD+distance-path.outA);else sampleCurve(path.depotIn,(distance-path.outA-path.outDistance)/path.outB);}
+  else if(p<.64){point=path.depotBay;angle=0;stage='unloading';}
+  else {const distance=(p-.64)/.36*path.returnTotal;stage=p<.92?'returning':'approach';if(distance<path.returnA)sampleCurve(path.depotOut,distance/path.returnA);else if(distance<path.returnA+path.returnDistance)sampleRoad(path.depotExitD+distance-path.returnA);else sampleCurve(path.inboundConnector,(distance-path.returnA-path.returnDistance)/path.returnB);}
+  return {x:point.x,y:point.y,z:point.z,angle,phase:p,stage,onRoad,lane:path.lane,roadDistance,roadPhase:roadDistance===null?null:((roadDistance%path.roadLength)+path.roadLength)%path.roadLength/path.roadLength};
 }
 function buildSite(route,scene,b,rng,anim) {
   const kind=route.kind;
@@ -421,24 +440,33 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
   }
   presentation(hero);
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.94;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setClearColor(0,0);
-  let quality='high',rows=[],focusId=null,pinned=false,lastTour=performance.now(),lastFrame=0,raf=0,disposed=false,frames=0,draws=0,contextLost=false,suspended=false,recoveries=0,lossExtension=null;
+  let quality='high',rows=[],focusId=null,pinned=false,lastTour=performance.now(),lastFrame=0,raf=0,disposed=false,frames=0,draws=0,contextLost=false,suspended=false,recoveries=0,lossExtension=null,district=null,mode='overview';
   const worlds=new Map(),routeMap=new Map(ROUTES.map(route=>[route.id,route]));
-  const debug={get views(){return rows.length+1;},get worlds(){return worlds.size;},get focus(){return focusId;},get pinned(){return pinned;},get drawCalls(){return draws;},get frames(){return frames;},get dpr(){return renderer.getPixelRatio();},rendererCount:1,get contextLost(){return contextLost||renderer.getContext().isContextLost();},get suspended(){return suspended;},get recoveries(){return recoveries;},suspend:()=>suspend(),resume:()=>recover(),loseContext:()=>{lossExtension=renderer.getContext().getExtension('WEBGL_lose_context');lossExtension?.loseContext();return !!lossExtension;},restoreContext:()=>{lossExtension?.restoreContext();return !!lossExtension;},get presentationCount(){return targets.size;},get sourceSize(){return {width:canvas.width,height:canvas.height};},snapshot(id=focusId){const w=worlds.get(id);return w?{id,progress:w.progress,focused:focusId===id,locked:pinned,vehicles:w.vehicles.filter(v=>v.group.visible).map(v=>({x:v.group.position.x,y:v.group.position.y,z:v.group.position.z,heading:v.group.rotation.y})),drawCalls:draws,visualTier:w.upgrades.filter(group=>group.visible).length,particles:w.particles.visible,tapUntil:w.tapUntil,production:{capacity:w.production.capacity,stockRatio:w.production.stockRatio,storageLevel:w.production.storageLevel,productionRate:w.production.productionRate},loading:w.loadingCount>0,loadingCount:w.loadingCount||0,leaderLoading:w.progress<.18}:null;}};
-  function world(id) {if(!worlds.has(id)&&routeMap.has(id))worlds.set(id,createWorld(routeMap.get(id)));return worlds.get(id);}
-  function notify(){onFocus(focusId,pinned);}
+  function snapshot(id=focusId||district?.ids[0]){
+    const w=worlds.get(id);if(!w||!district?.ids.includes(id))return null;
+    const bounds=new THREE.Box3().setFromObject(w.root);
+    return {id,progress:w.progress,focused:focusId===id,locked:pinned,sceneUuid:district.scene.uuid,rowSceneUuid:w.scene.uuid,siteUuid:w.root.uuid,siteOrigin:w.siteOrigin.toArray(),siteBounds:{min:bounds.min.toArray(),max:bounds.max.toArray()},loadingBay:w.paths[0].bay.toArray(),depotBay:w.paths[0].depotBay.toArray(),vehicles:w.vehicles.filter(v=>v.group.visible).map(v=>({uuid:v.group.uuid,x:v.group.position.x,y:v.group.position.y,z:v.group.position.z,worldPosition:v.group.position.toArray(),heading:v.group.rotation.y,...v.pose})),drawCalls:draws,visualTier:w.upgrades.filter(group=>group.visible).length,particles:w.particles.visible,tapUntil:w.tapUntil,production:{capacity:w.production.capacity,stockRatio:w.production.stockRatio,storageLevel:w.production.storageLevel,productionRate:w.production.productionRate},loading:w.loadingCount>0,loadingCount:w.loadingCount||0,leaderLoading:w.progress<.18};
+  }
+  const debug={get views(){return rows.length+1;},get worlds(){return district?1:0;},get focus(){return focusId;},get mode(){return mode;},get pinned(){return pinned;},get drawCalls(){return draws;},get frames(){return frames;},get dpr(){return renderer.getPixelRatio();},rendererCount:1,get contextLost(){return contextLost||renderer.getContext().isContextLost();},get suspended(){return suspended;},get recoveries(){return recoveries;},suspend:()=>suspend(),resume:()=>recover(),loseContext:()=>{lossExtension=renderer.getContext().getExtension('WEBGL_lose_context');lossExtension?.loseContext();return !!lossExtension;},restoreContext:()=>{lossExtension?.restoreContext();return !!lossExtension;},get presentationCount(){return targets.size;},get sourceSize(){return {width:canvas.width,height:canvas.height};},get district(){return district?{region:district.region,siteIds:[...district.ids],sceneUuid:district.scene.uuid,sceneCount:1,centralDepotCount:district.scene.children.filter(obj=>obj.name==='CentralDepot').length,centralDepotUuid:district.depot.uuid,depotPosition:district.depot.position.toArray(),road:{length:district.length,oneWay:true,half:district.half,radius:district.radius,width:7.2,lanes:3,laneOffsets:[-1.8,0,1.8]},overview:mode==='overview',mode,heroSceneUuid:district.scene.uuid}:null;},snapshot,pose(id,phase,index=0){const w=worlds.get(id);return w&&district?.ids.includes(id)?districtPose(w,phase,index):null;},audit(){return district?{...debug.district,heroCameraPosition:district.heroCamera.position.toArray(),rows:rows.map(row=>({id:row.id,sceneUuid:district.scene.uuid,siteUuid:worlds.get(row.id).root.uuid,vehicleUuids:worlds.get(row.id).vehicles.filter(v=>v.group.visible).map(v=>v.group.uuid)}))}:null;}};
+  function world(id) {if(!id)return null;if(!worlds.has(id)&&routeMap.has(id))worlds.set(id,createBusiness(routeMap.get(id)));return worlds.get(id);}
+  function notify(){onFocus(focusId,pinned,mode);}
+  function overview(){focusId=null;pinned=false;mode='overview';lastTour=performance.now();notify();}
   function focus(id,locked=false) {
-    if(id&&routeMap.has(id)){focusId=id;pinned=locked;world(id);}else pinned=false;
+    if(id&&district?.ids.includes(id)){focusId=id;pinned=locked;mode=locked?'focus':'tour';}else{focusId=null;pinned=false;mode='tour';}
     lastTour=performance.now();notify();
   }
+  function releaseDistrict(previous){if(!previous)return;for(const batch of previous.vehicleBatches.values())batch.mesh.dispose();previous.staticRoot.traverse(obj=>{if(obj.isInstancedMesh)obj.dispose();});previous.depot.traverse(obj=>{if(obj.isInstancedMesh)obj.dispose();if(obj.material?.map){obj.material.map.dispose();obj.material.dispose();}if(obj.geometry&&!Object.values(geometries).includes(obj.geometry))obj.geometry.dispose();});for(const geometry of previous.ownedGeometries)geometry.dispose();previous.sun.shadow.dispose();for(const w of previous.active)if(w.district===previous){w.scene=null;w.district=null;w.sun=null;}previous.scene.clear();previous.disposed=true;}
   function setRoutes(next) {
     rows=next.filter(row=>row.element&&routeMap.has(row.id));
     const keep=new Set([hero,...rows.map(row=>row.element)]);
     for(const [element,entry] of targets)if(!keep.has(element)){entry.canvas.remove();targets.delete(element);}
     for(const row of rows)presentation(row.element);
-    const game=getGame();const available=rows.filter(row=>game?.state.routes[row.id]?.unlocked);
-    const pool=available.length?available:rows;
-    if(!focusId||!rows.some(row=>row.id===focusId)){focusId=pool[0]?.id||ROUTES[0]?.id;pinned=false;lastTour=performance.now();notify();}
-    if(focusId)world(focusId);
+    const ids=[...new Set(rows.map(row=>row.id))];if(!ids.length)return;
+    if(!district||ids.join('|')!==district.ids.join('|')){
+      for(const id of ids)world(id);const previous=district;district=createDistrict(ids,worlds);for(const w of district.active)w.district=district;releaseDistrict(previous);
+      if(!focusId||!ids.includes(focusId)){focusId=null;pinned=false;mode='overview';}
+      lastTour=performance.now();notify();
+    }
   }
   function setQuality(value) {quality=value;renderer.shadowMap.enabled=value!=='low';resize();}
   function resize() {
@@ -456,10 +484,10 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
   const waterDummy=new THREE.Object3D();
   const tapRay=new THREE.Raycaster(),tapPoint=new THREE.Vector3(),tapPlane=new THREE.Plane(UP,-.6);
   function celebrateTap(xNormalized=.5,yNormalized=.5){
-    const w=world(focusId);if(!w)return;const time=performance.now()/1000;
-    tapRay.setFromCamera(new THREE.Vector2(Math.max(0,Math.min(1,xNormalized))*2-1,1-Math.max(0,Math.min(1,yNormalized))*2),w.heroCamera);
+    const w=world(focusId||district?.ids.find(id=>getGame()?.state.routes[id]?.unlocked)||district?.ids[0]);if(!w||!district)return;const time=performance.now()/1000;
+    tapRay.setFromCamera(new THREE.Vector2(Math.max(0,Math.min(1,xNormalized))*2-1,1-Math.max(0,Math.min(1,yNormalized))*2),district.heroCamera);
     const hit=tapRay.ray.intersectPlane(tapPlane,tapPoint);
-    const x=hit?THREE.MathUtils.clamp(hit.x,-23,23):w.vehicles[0].group.position.x,z=hit?THREE.MathUtils.clamp(hit.z,-16,16):w.vehicles[0].group.position.z;
+    const x=hit?THREE.MathUtils.clamp(hit.x,-district.groundWidth/2,district.groundWidth/2):w.vehicles[0].group.position.x,z=hit?THREE.MathUtils.clamp(hit.z,-district.groundDepth/2,district.groundDepth/2):w.vehicles[0].group.position.z;
     for(let i=0;i<8;i++){const p=w.particlePool[w.particleIndex++%24],a=i*Math.PI/4;p.born=time;p.x=x;p.y=.8;p.z=z;p.vx=Math.cos(a)*2.5;p.vz=Math.sin(a)*2.5;p.vy=3.5+Math.random()*1.6;}
     w.tapUntil=time+.75;w.particles.visible=true;
   }
@@ -467,7 +495,7 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
     w.sun.shadow.needsUpdate=true;
     const game=getGame(),r=game?.state.routes[w.route.id],stats=game?.stats(w.route.id),unlocked=!!r?.unlocked;
     const progress=Number(stats?.progress??r?.progress??0);w.progress=progress;
-    const count=unlocked?Math.min(7,Math.max(1,Number(r?.fleet)||1)):1;
+    const count=unlocked?Math.min(7,Math.max(1,Number(r?.fleet)||1)):0;
     const production=w.production;
     production.storageLevel=Math.max(0,Number(stats?.storageLevel??r?.storageLevel??r?.storage??0)||0);
     production.capacity=Math.max(1,Number(stats?.capacity)||20*(1+production.storageLevel*.2));
@@ -479,26 +507,27 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
     production.binMaterial.color.set(production.storageLevel>=10?'#d0ac64':production.storageLevel>=6?'#71a596':production.storageLevel>=3?'#759ca7':'#bac2aa');
     production.meter.scale.x=Math.max(.03,production.stockRatio*2.7);production.meter.material.color.set(production.stockRatio>.82?'#edc56a':'#b9dc79');
     const productionSpeed=Math.min(.65,.12+production.productionRate*.5+Number(stats?.productionLevel??r?.level??1)*.004);
-    for(let i=0;i<8;i++){const u=(time*productionSpeed+i/8)%1;waterDummy.position.copy(production.source).lerp(production.end,u);waterDummy.position.y+=.22;waterDummy.rotation.set(0,0,w.route.kind==='timber'?Math.PI/2:0);waterDummy.scale.set(unlocked?.24:0,unlocked?(w.route.kind==='timber'?.65:.22):0,unlocked?.24:0);waterDummy.updateMatrix();production.pieces.setMatrixAt(i,waterDummy.matrix);}production.pieces.instanceMatrix.needsUpdate=true;
+    for(let i=0;i<8;i++){const u=(time*productionSpeed+i/8)%1;waterDummy.position.copy(production.source).lerp(production.end,u);waterDummy.position.y+=.22;waterDummy.rotation.set(0,0,w.route.kind==='timber'?Math.PI/2:0);waterDummy.scale.set(unlocked?.24:0,unlocked?(w.route.kind==='timber'?.65:.22):0,unlocked?.24:0);waterDummy.updateMatrix();production.pieces.setMatrixAt(i,waterDummy.matrix);}production.pieces.visible=unlocked;production.pieces.instanceMatrix.needsUpdate=true;production.pieces.computeBoundingBox();production.pieces.computeBoundingSphere();production.pieces.frustumCulled=true;
     w.loadingCount=unlocked?Array.from({length:count},(_,i)=>(progress+i/count)%1).filter(p=>p<.18).length:0;
-    for(let i=0;i<6;i++){const u=(time*3+i/6)%1;waterDummy.position.set(12.9,2.7-u*.8,5);waterDummy.scale.setScalar(w.loadingCount>0?.11:0);waterDummy.updateMatrix();production.loading.setMatrixAt(i,waterDummy.matrix);}production.loading.instanceMatrix.needsUpdate=true;
+    for(let i=0;i<6;i++){const u=(time*3+i/6)%1;waterDummy.position.set(12.9,2.7-u*.8,5);waterDummy.scale.setScalar(w.loadingCount>0?.11:0);waterDummy.updateMatrix();production.loading.setMatrixAt(i,waterDummy.matrix);}production.loading.visible=w.loadingCount>0;production.loading.instanceMatrix.needsUpdate=true;production.loading.computeBoundingBox();production.loading.computeBoundingSphere();production.loading.frustumCulled=true;
     if(production.harvester&&unlocked){production.harvester.position.x=20+Math.sin(time*productionSpeed*.7)*2.4;production.harvester.position.z=10.3;production.harvester.rotation.y=Math.cos(time*productionSpeed*.7)>0?0:Math.PI;production.reel.rotation.y=time*productionSpeed*15;}
 
     const mastery=Number(stats?.masteryLevel??r?.masteryLevel??r?.mastery??0)||0;
     w.upgrades.forEach((group,tier)=>{group.visible=unlocked&&(Number(r?.level)>= [5,15,30][tier]||Number(r?.fleet)>=[3,6,12][tier]||mastery>=[1,2,4][tier]);});
     let liveParticles=0;
     for(let i=0;i<24;i++){const p=w.particlePool[i],age=time-p.born,live=age>=0&&age<.85;waterDummy.position.set(p.x+p.vx*age,p.y+p.vy*age-3*age*age,p.z+p.vz*age);waterDummy.scale.setScalar(live?.25*(1-age/.85):0);waterDummy.updateMatrix();w.particles.setMatrixAt(i,waterDummy.matrix);if(live)liveParticles++;}
-    w.particles.visible=liveParticles>0;w.particles.instanceMatrix.needsUpdate=true;w.pulseLight.intensity=Math.max(0,w.tapUntil-time)*18;
+    w.particles.visible=liveParticles>0;w.particles.instanceMatrix.needsUpdate=true;if(w.tapUntil>time)district.pulseLight.intensity=Math.max(district.pulseLight.intensity,(w.tapUntil-time)*18);
     for(let i=0;i<w.vehicles.length;i++) {
       const vehicle=w.vehicles[i];vehicle.group.visible=i<count;
       if(i>=count)continue;
       // Visual traffic shares the route's real journey. Inactive routes wait at dispatch.
       const p=unlocked?(progress+i/count)%1:.03;
-      vehicle.cargo.visible=p<.64;vehicle.cargo.scale.y=p<.18?Math.max(.05,p/.18):1;vehicle.cargo.position.y=0;
-      const pose=businessJourney(p);vehicle.group.position.set(pose.x,.48,pose.z);vehicle.group.rotation.y=-pose.angle;vehicle.group.rotation.z=stats?.active&&p>=.18?Math.sin(time*6+i)*.008:0;
-      if(stats?.active&&p>=.18)for(const wheel of vehicle.wheels)wheel.rotation.y=-time*5;
+      vehicle.cargo.visible=p<.64;vehicle.cargo.scale.y=p<.18?Math.max(.05,p/.18):p>=.55?Math.max(.01,1-(p-.55)/.09):1;vehicle.cargo.position.y=0;
+      const pose=districtPose(w,p,i);vehicle.pose=pose;vehicle.group.position.set(pose.x,.48,pose.z);vehicle.group.rotation.y=-pose.angle;
+      const moving=pose.stage!=='loading'&&pose.stage!=='unloading';vehicle.group.rotation.z=stats?.active&&moving?Math.sin(time*6+i)*.008:0;
+      if(stats?.active&&moving)for(const wheel of vehicle.wheels)wheel.rotation.y=-time*5;
     }
-    for(let i=0;i<14;i++){const index=Math.floor(i/2),vehicle=w.vehicles[index],live=index<count&&stats?.active&&(progress+index/count)%1>=.18&&(progress+index/count)%1<.92,age=(time*1.5+i*.47)%1,pose=businessJourney((progress+index/count-.014*age+1)%1);waterDummy.position.set(pose.x, .9+age*.45,pose.z);waterDummy.scale.setScalar(live?.16+age*.36:0);waterDummy.updateMatrix();w.dust.setMatrixAt(i,waterDummy.matrix);}w.dust.instanceMatrix.needsUpdate=true;
+    for(let i=0;i<14;i++){const index=Math.floor(i/2),phase=count?(progress+index/count)%1:0,pose=count?districtPose(w,phase,index):null,live=pose&&index<count&&stats?.active&&pose.stage!=='loading'&&pose.stage!=='unloading',age=(time*1.5+i*.47)%1;waterDummy.position.set(pose?.x||0,.9+age*.45,pose?.z||0);waterDummy.scale.setScalar(live?.16+age*.26:0);waterDummy.rotation.set(0,0,0);waterDummy.updateMatrix();w.dust.setMatrixAt(i,waterDummy.matrix);}w.dust.visible=count>0;w.dust.instanceMatrix.needsUpdate=true;
     for(const animation of w.anim) {
       const obj=animation.obj;
       switch(animation.type) {
@@ -519,33 +548,32 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
       }
     }
   }
-  const target=new THREE.Vector3(),look=new THREE.Vector3(),vehicleLook=new THREE.Vector3(),highlightPosition=new THREE.Vector3(31,18,22),highlightLook=new THREE.Vector3(17,1.8,0);
+  const target=new THREE.Vector3(),look=new THREE.Vector3(),rowOffset=new THREE.Vector3(),batchMatrix=new THREE.Matrix4(),zeroMatrix=new THREE.Matrix4().makeScale(0,0,0);
+  function updateVehicleBatches(){
+    for(const w of district.active)for(const vehicle of w.vehicles)vehicle.group.updateMatrixWorld(true);
+    for(const batch of district.vehicleBatches.values()){
+      batch.parts.forEach(({mesh,vehicle},i)=>{
+        let visible=vehicle.group.visible;for(let parent=mesh.parent;parent&&parent!==vehicle.group;parent=parent.parent)if(!parent.visible)visible=false;
+        batch.mesh.setMatrixAt(i,visible?mesh.matrixWorld:zeroMatrix);
+      });batch.mesh.instanceMatrix.needsUpdate=true;
+    }
+  }
   function renderView(element,rect,w,isHero,time) {
-    if(!element||!w)return;
-    const camera=isHero?w.heroCamera:w.rowCamera;
-    const ratio=rect.width/rect.height;camera.aspect=ratio;
-    if(isHero) {
-      // Wide scenes frame the whole delivery network. Portrait views orbit closer
-      // around the destination so the site remains legible instead of shrinking.
-      const phase=(time%72)/72*Math.PI*2;
-      const portrait=ratio<1.15;
-      const x=portrait?10:2.6;
-      const distance=portrait?39:Math.max(39,52/Math.max(1,ratio*.72));
-      target.set(x+Math.sin(phase)*5+distance*.6,portrait?25:distance*.55,Math.cos(phase)*3+distance*.76);
-      look.set(x,1.8,0);
-      // Gentle delivery camera motion links to the physical leading truck.
-      const pose=businessJourney(w.progress);vehicleLook.set(pose.x*.065,0,pose.z*.12);look.add(vehicleLook);
-      // A smooth infrequent highlight leans toward the working destination,
-      // while compact sticky feeds keep the whole arterial network in view.
-      const tourSeconds=(time-lastTour/1000+72)%24;
-      const beat=Math.max(0,1-Math.abs(tourSeconds-8)/3);
-      const highlight=rect.height>=240?(1-Math.cos(beat*Math.PI))*.24:0;
-      target.lerp(highlightPosition,highlight);look.lerp(highlightLook,highlight);
-      camera.position.copy(target);camera.lookAt(look);
-    } else {
-      const compact=ratio<1.5;
-      camera.position.set(14,compact?17:15,compact?30:28);
-      camera.lookAt(14,1.5,8);camera.fov=compact?40:36;
+    if(!element||!w||!district)return;
+    const camera=isHero?district.heroCamera:w.rowCamera,ratio=rect.width/rect.height;camera.aspect=ratio;
+    if(isHero){
+      const extent=Math.max(district.groundDepth*.73,(district.half*2+district.radius*2+34)/(Math.max(1,ratio)*.96));
+      target.set(district.half*.23,extent*.8,extent*1.03);look.set(0,1,0);
+      if(focusId&&mode!=='overview'){
+        const selected=worlds.get(focusId);
+        if(pinned){rowOffset.set(0,35,49).applyAxisAngle(UP,selected.root.rotation.y);target.copy(selected.siteOrigin).add(rowOffset);look.copy(selected.siteOrigin);rowOffset.set(0,0,8).applyAxisAngle(UP,selected.root.rotation.y);look.add(rowOffset);}
+        else {look.lerp(selected.siteOrigin,.22);target.addScaledVector(selected.siteOrigin,.14);}
+      }
+      if(!district.cameraReady){camera.position.copy(target);district.cameraReady=true;}else camera.position.lerp(target,.06);
+      camera.userData.look ||= new THREE.Vector3();camera.userData.look.lerp(look,.06);camera.lookAt(camera.userData.look);
+    }else{
+      const compact=ratio<1.5;rowOffset.set(0,compact?17:15,compact?30:28).applyAxisAngle(UP,w.root.rotation.y);camera.position.copy(w.siteOrigin).add(rowOffset);
+      rowOffset.set(0,1.5,8).applyAxisAngle(UP,w.root.rotation.y);camera.lookAt(w.siteOrigin.clone().add(rowOffset));camera.fov=compact?40:36;
     }
     camera.updateProjectionMatrix();
     const output=presentation(element);
@@ -553,7 +581,7 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
     if(output.width!==width||output.height!==height){output.canvas.width=width;output.canvas.height=height;output.width=width;output.height=height;}
     renderer.setViewport(0,0,rect.width,rect.height);
     renderer.setScissor(0,0,rect.width,rect.height);renderer.setScissorTest(true);renderer.clear();
-    renderer.render(w.scene,camera);draws+=renderer.info.render.calls;
+    renderer.render(district.scene,camera);draws+=renderer.info.render.calls;
     if(contextLost||renderer.getContext().isContextLost())return;
     // WebGL viewport originates at bottom-left; drawImage reads from top-left.
     // Copy immediately before the shared source is reused by the next camera.
@@ -567,7 +595,7 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
     const limit=quality==='low'||innerWidth<600?30:60;
     if(now-lastFrame<1000/limit-1)return;lastFrame=now;
     const game=getGame();
-    if(!pinned&&now-lastTour>12000) {
+    if(mode==='tour'&&!pinned&&now-lastTour>12000) {
       const unlocked=rows.filter(row=>game?.state.routes[row.id]?.unlocked),pool=unlocked.length?unlocked:rows;
       if(pool.length){const index=pool.findIndex(row=>row.id===focusId);focusId=pool[(index+1)%pool.length].id;notify();}lastTour=now;
     }
@@ -577,13 +605,13 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
       const rect=element.getBoundingClientRect();
       if(rect.bottom>0&&rect.top<innerHeight&&rect.right>0&&rect.left<innerWidth&&rect.width>=4&&rect.height>=4)views.push({element,id,isHero,rect});
     }
-    if(focusId)visible(hero,focusId,true);
+    if(district)visible(hero,focusId||district.ids[0],true);
     for(const row of rows)visible(row.element,row.id,false);
     let requiredWidth=sourceWidth,requiredHeight=sourceHeight;
     for(const view of views){requiredWidth=Math.max(requiredWidth,Math.ceil(view.rect.width));requiredHeight=Math.max(requiredHeight,Math.ceil(view.rect.height));}
     if(requiredWidth!==sourceWidth||requiredHeight!==sourceHeight){sourceWidth=requiredWidth;sourceHeight=requiredHeight;renderer.setSize(sourceWidth,sourceHeight,false);}
     const time=now/1000;
-    for(const id of new Set(views.map(view=>view.id))){const w=world(id);if(w)updateWorld(w,time);}
+    if(district){district.pulseLight.intensity=0;for(const w of district.active)updateWorld(w,time);updateVehicleBatches();}
     for(const view of views)renderView(view.element,view.rect,world(view.id),view.isHero,time);
     frames++;
   }
@@ -595,15 +623,15 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
     recoveries++;resize();renderer.shadowMap.needsUpdate=true;
     // Explicitly dirty retained GPU-facing data following mobile suspension.
     // 2D views retain their last complete image until this fresh render copies.
-    for(const w of worlds.values()){w.sun.shadow.needsUpdate=true;w.scene.traverse(obj=>{if(obj.isInstancedMesh)obj.instanceMatrix.needsUpdate=true;});}
+    for(const w of worlds.values()){if(w.sun)w.sun.shadow.needsUpdate=true;w.root.traverse(obj=>{if(obj.isInstancedMesh)obj.instanceMatrix.needsUpdate=true;});}
     cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);
   }
   function visibility(){if(document.hidden)suspend();else recover();}
   function lost(event){event.preventDefault();contextLost=true;suspend();}
   function restored(){contextLost=false;recover();}
-  function destroy(){disposed=true;cancelAnimationFrame(raf);window.removeEventListener('resize',resize);document.removeEventListener('visibilitychange',visibility);document.removeEventListener('freeze',suspend);document.removeEventListener('resume',recover);window.removeEventListener('focus',recover);window.removeEventListener('pagehide',suspend);window.removeEventListener('pageshow',recover);canvas.removeEventListener('webglcontextlost',lost);canvas.removeEventListener('webglcontextrestored',restored);renderer.dispose();for(const entry of targets.values())entry.canvas.remove();targets.clear();const sharedMaterials=new Set(materials.values()),ownedMaterials=new Set(),ownedTextures=new Set();for(const w of worlds.values())w.scene.traverse(obj=>{if(obj.geometry&&!Object.values(geometries).includes(obj.geometry)&&obj.geometry!==roadGeo)obj.geometry.dispose();for(const material of Array.isArray(obj.material)?obj.material:[obj.material])if(material&&!sharedMaterials.has(material)){ownedMaterials.add(material);if(material.map)ownedTextures.add(material.map);}});for(const texture of ownedTextures)texture.dispose();for(const material of ownedMaterials)material.dispose();}
+  function destroy(){disposed=true;cancelAnimationFrame(raf);window.removeEventListener('resize',resize);document.removeEventListener('visibilitychange',visibility);document.removeEventListener('freeze',suspend);document.removeEventListener('resume',recover);window.removeEventListener('focus',recover);window.removeEventListener('pagehide',suspend);window.removeEventListener('pageshow',recover);canvas.removeEventListener('webglcontextlost',lost);canvas.removeEventListener('webglcontextrestored',restored);releaseDistrict(district);renderer.dispose();for(const entry of targets.values())entry.canvas.remove();targets.clear();const sharedMaterials=new Set(materials.values()),ownedMaterials=new Set(),ownedTextures=new Set();for(const w of worlds.values())[w.root,w.particles,w.dust].forEach(root=>root.traverse(obj=>{if(obj.isInstancedMesh)obj.dispose();if(obj.geometry&&!Object.values(geometries).includes(obj.geometry)&&obj.geometry!==roadGeo)obj.geometry.dispose();for(const material of Array.isArray(obj.material)?obj.material:[obj.material])if(material&&!sharedMaterials.has(material)){ownedMaterials.add(material);if(material.map)ownedTextures.add(material.map);}}));for(const texture of ownedTextures)texture.dispose();for(const material of ownedMaterials)material.dispose();}
   canvas.addEventListener('webglcontextlost',lost);canvas.addEventListener('webglcontextrestored',restored);
   document.addEventListener('visibilitychange',visibility);document.addEventListener('freeze',suspend);document.addEventListener('resume',recover);window.addEventListener('focus',recover);window.addEventListener('pagehide',suspend);window.addEventListener('pageshow',recover);
   window.addEventListener('resize',resize);resize();raf=requestAnimationFrame(frame);
-  return {setRoutes,focus,setQuality,resize,destroy,celebrateTap,debug};
+  return {setRoutes,focus,overview,setQuality,resize,destroy,celebrateTap,debug};
 }

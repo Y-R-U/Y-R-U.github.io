@@ -30,6 +30,7 @@ node tools/layout-test.mjs
 node tools/tap-test.mjs
 node tools/resume-test.mjs
 node tools/expansion-test.mjs
+node tools/district-test.mjs
 ```
 
 Browser verification uses local Google Chrome, Node's built-in WebSocket, and the existing site server at port 8888. It writes review captures and a machine-readable report under `docs/verification/`. Chrome requires local socket/process access outside the restricted sandbox.
@@ -50,3 +51,6 @@ Golden Harvest shows a combine working wheat and corn, a moving conveyor feeding
 The Season tab opens **Halloween Haul**, an eight-minute side company with pumpkin, candy and ghost freight businesses. Its official window is October 15 through November 1 UTC, with practice available year-round. Six milestones award unique permanent keepsakes for character, business or manager slots. Attach/detach them in Fleet, business info or the manager office. Rewards persist through new shifts and company prestige; practice and the official season share the same one-time rewards. Seasonal coins are separate from company cash. The clock continues while away, but the shift earns no offline coins.
 
 Mobile recovery preserves the last rendered images while WebGL is unavailable, pauses hidden rendering, and redraws on visibility, page restoration and GPU context recovery. The recovery test forces three context losses and exercises browser freeze/resume, back-forward-cache lifecycle events and portrait resizing. Chrome emulation is verified; physical Safari remains a separate device check.
+
+
+The main scene is a connected transport district. Every listed business occupies a plot along a continuous one-way road around a single central depot. Overview shows the complete district; District tour and business pins move the camera within it. Business rows are closer cameras on the same physical plots, trucks and production machinery. The shared fleet loads at each business, travels to the depot, unloads, then returns empty. All operations lays out the listed network together, rather than cycling through separate miniature worlds.

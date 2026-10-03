@@ -1,6 +1,6 @@
 {
   "url": "http://127.0.0.1:8888/gms/3d/idle-transport2/",
-  "date": "2026-10-03T10:13:03.728Z",
+  "date": "2026-10-03T12:28:03.878Z",
   "checks": [
     "company starts closed with no idle income",
     "closed company earns nothing idle",
@@ -81,36 +81,105 @@
   "errors": [],
   "scene": {
     "id": "orbital",
-    "progress": 0.3742439039999986,
+    "progress": 0.43536583199999795,
     "focused": true,
     "locked": true,
+    "sceneUuid": "c67ae87b-cb76-4b4b-8176-e844f4127f7f",
+    "rowSceneUuid": "c67ae87b-cb76-4b4b-8176-e844f4127f7f",
+    "siteUuid": "557f5282-fa6c-4c96-8af2-c82809b06713",
+    "siteOrigin": [
+      0,
+      0,
+      30
+    ],
+    "siteBounds": {
+      "min": [
+        -18.919100340455778,
+        0,
+        19.224999994039536
+      ],
+      "max": [
+        57.19885116443037,
+        35.965658720582724,
+        104.12771850451827
+      ]
+    },
+    "loadingBay": [
+      8,
+      0.48,
+      25
+    ],
+    "depotBay": [
+      -11.399999999999999,
+      0.48,
+      2.4
+    ],
     "vehicles": [
       {
-        "x": -4.098754096994166,
+        "uuid": "e9673b7e-e2bd-4516-bb69-3c8f4225e989",
+        "x": -37.989424993313456,
         "y": 0.48,
-        "z": 5,
-        "heading": -3.141592653589793
+        "z": 4.830733728581699,
+        "worldPosition": [
+          -37.989424993313456,
+          0.48,
+          4.830733728581699
+        ],
+        "heading": 5.044882430077419,
+        "angle": -5.044882430077419,
+        "phase": 0.435365831999998,
+        "stage": "outbound",
+        "onRoad": true,
+        "lane": 1.8,
+        "roadDistance": 161.58347159100646,
+        "roadPhase": 0.9093999901648008
       },
       {
-        "x": 3.398597954485343,
+        "uuid": "2ec6bdfd-a4e8-4876-a120-ca8e2c0052ca",
+        "x": 29.52949639726544,
         "y": 0.48,
-        "z": -5,
-        "heading": 0
+        "z": -13.728243499902984,
+        "worldPosition": [
+          29.52949639726544,
+          0.48,
+          -13.728243499902984
+        ],
+        "heading": 2.7586898634667048,
+        "angle": -2.7586898634667048,
+        "phase": 0.7686991653333313,
+        "stage": "returning",
+        "onRoad": true,
+        "lane": 1.8,
+        "roadDistance": 83.86296822506716,
+        "roadPhase": 0.47198504728321417
       },
       {
-        "x": 12,
+        "uuid": "b19377df-5252-4305-b26b-0c3f20e6ff90",
+        "x": 15.8,
         "y": 0.48,
-        "z": 5,
-        "heading": -3.141592653589793
+        "z": 25,
+        "worldPosition": [
+          15.8,
+          0.48,
+          25
+        ],
+        "heading": 0,
+        "angle": 0,
+        "phase": 0.10203249866666453,
+        "stage": "loading",
+        "onRoad": false,
+        "lane": 1.8,
+        "roadDistance": null,
+        "roadPhase": null
       }
     ],
-    "drawCalls": 695,
+    "drawCalls": 488,
     "visualTier": 1,
     "particles": false,
     "tapUntil": 0,
     "production": {
       "capacity": 6,
-      "stockRatio": 0.6184414048780479,
+      "stockRatio": 0.6557108731707305,
       "storageLevel": 0,
       "productionRate": 0.06216000000000001
     },

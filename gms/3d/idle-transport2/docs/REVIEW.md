@@ -16,3 +16,11 @@ Verification passed: economy migration/pricing/season/equipment/audit suite;28 e
 Recovery verification includes three real forced GPU-loss/restoration cycles, retained colored2D snapshots, browser freeze/active foreground return, repeated pagehide/pageshow events, once-only60second manager credit, challenge countdown, and resizing after recovery. These are Chrome checks, not physical iPhone/Safari evidence.
 
 Boundaries: reserve fill is visual staging linked to real delivery progress, rather than a separately simulated resource bottleneck. Character bonuses cover Idle Transport2 main/seasonal businesses, not unrelated Y-R-U projects. Halloween is the first three-business seasonal challenge; practice remains available year-round and shares once-only rewards with its calendar window.
+
+## Connected district correction
+
+The scene agent built one central-depot district, the interface agent added overview/tour/pin framing, and the economy agent independently reviewed physical traffic and resource lifetime. Root verifies object identity and actual motion rather than trusting scene labels.
+
+Fixed findings: Catmull curves formerly cut backwards across arterial segments; exact forward ring arcs now join tangent-guided business/depot connectors. Fleets have distinct loading bays and depot slots clear of the road. Three one-way lanes distribute routes. Instanced vehicle parts limit draw calls; rebuilding districts disposes private meshes, lane geometry, signs and shadows. Starter sites are balanced around the depot, overview avoids excessive empty terrain, and pinned cameras move closer. Closed businesses hide production goods and dust.
+
+The district regression samples every one of 105 vehicle paths across all fifteen businesses, checks continuity and world-space forward motion, verifies unique depot bays, and confirms every row uses the same physical scene/site/vehicle identity as the hero. It passed 13 checks with no browser errors. Paths are synchronized animations from game progress, not collision-aware traffic AI.
