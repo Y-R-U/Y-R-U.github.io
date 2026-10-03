@@ -28,8 +28,9 @@ export function createModel(game) {
     ownedCount() { let n = 0; for (const l of D.lines) if (S().lines[l.id].lv > 0) n++; return n; },
     building: (id) => S().build?.[id] || null,
     anyBuilding: () => Object.keys(S().build || {}).length > 0,
-    started: () => S().bootstrap.done || m.ownedCount() > 0,
-    bootstrapping: () => !S().bootstrap.done,
+    started: () => S().bootstrap.done || !!S().bootstrap.skip || m.ownedCount() > 0,
+    // Gen 2+ (E: bootstrap.skip) has no mud opening: taps pay cash and the hat stays empty.
+    bootstrapping: () => !S().bootstrap.done && !S().bootstrap.skip,
     hatCoins: () => S().bootstrap?.hat || 0,
     districtOpen: (id) => S().districts.includes(id),
     setting: (k, d) => (S().settings[k] ?? d),

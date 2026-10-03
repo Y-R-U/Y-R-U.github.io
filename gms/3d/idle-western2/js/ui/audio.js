@@ -39,8 +39,14 @@ export function createAudio({ settings = () => ({}), base = '' } = {}) {
       const d = noiseBuf.getChannelData(0);
       for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
     }
-    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
     return ctx;
+  }
+
+  // Resume only from a real activation (touchend/click/keydown, or a mouse pointerdown): on Chrome Android a touch
+  // pointerdown is not activation, and resume() there only logs "AudioContext was not allowed to start".
+  function tryResume() {
+    if (!ctx || ctx.state === 'running' || ctx.state === 'closed') return;
+    ctx.resume().then(() => { if (ctx.state === 'running') { detach(); music.resume(); } }).catch(() => {});
   }
 
   function applyVolumes() {
@@ -52,18 +58,32 @@ export function createAudio({ settings = () => ({}), base = '' } = {}) {
     music.volumeChanged();
   }
 
-  const GESTURES = ['pointerdown', 'touchend', 'keydown', 'click'];
-  const unlock = () => {
-    if (gestured) return;
-    gestured = true;
-    ensure();
-    for (const g of GESTURES) removeEventListener(g, unlock, true);
-    loadManifest();
-    piano.load();
-    for (const fn of unlockFns.splice(0)) try { fn(); } catch (e) { console.error(e); }
-    music.kick();
+  const GESTURES = ['touchend', 'click', 'keydown', 'pointerdown'];
+  let attached = false;
+  function attach() { if (attached) return; attached = true; for (const g of GESTURES) addEventListener(g, unlock, true); }
+  function detach() { if (!attached) return; attached = false; for (const g of GESTURES) removeEventListener(g, unlock, true); }
+  // Listeners stay until the context reports 'running'; they come back if it drops out (Android interrupts it).
+  const unlock = (e) => {
+    if (e?.type === 'pointerdown' && e.pointerType !== 'mouse') return;
+    if (!gestured) {
+      gestured = true;
+      ensure();
+      if (ctx) ctx.onstatechange = () => { if (ctx.state !== 'running') attach(); };
+      loadManifest();
+      piano.load();
+      for (const fn of unlockFns.splice(0)) try { fn(); } catch (err) { console.error(err); }
+      music.kick();
+    }
+    if (!ctx) { ensure(); if (!ctx) { detach(); return; } }
+    if (ctx.state === 'running') { detach(); music.resume(); }
+    else tryResume();
   };
-  for (const g of GESTURES) addEventListener(g, unlock, true);
+  attach();
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden || !ctx || ctx.state === 'running') return;
+    attach();
+    tryResume();
+  });
 
   async function loadManifest() {
     if (manifestState !== 'idle') return;
@@ -268,6 +288,7 @@ export function createAudio({ settings = () => ({}), base = '' } = {}) {
     });
     return {
       kick,
+      resume() { if (el && cur && el.paused && !paused) el.play().catch(() => {}); },
       // Cue switching with a hold so a flicker in focus never thrashes the stream. Beds (duel, robbery, fakedeath) cut in at once.
       want(id, { now = false } = {}) {
         if (id === want) return;
@@ -372,6 +393,8 @@ export function createAudio({ settings = () => ({}), base = '' } = {}) {
     get script() { return scriptFallback; },
     get manifestDone() { return manifestState === 'done'; },
     get unlocked() { return gestured && !!ctx; },
+    get running() { return ctx?.state === 'running'; },
+    get listening() { return attached; },
     get ctx() { return ctx; },
     onUnlock(fn) { if (gestured) fn(); else unlockFns.push(fn); },
     applyVolumes,

@@ -25,48 +25,63 @@ export function createReveal({ game, onReveal }) {
 }
 
 // One coach hint at a time: a pulse on the target plus at most two words, parented to the target so it
-// scrolls with it and never needs measuring per frame.
+// scrolls with it and never needs measuring per frame. A hint lives only while its `when` holds (dropped unmarked
+// when it stops, so it can come back) and for at most `ms` (then marked seen). Nothing can wait forever: without
+// `when` the cap is 20 s. A higher `prio` hint pre-empts the current one, which goes back to the queue.
+const CAP_MS = 20000;
 export function createCoach({ reveal }) {
-  const queue = [];
+  let queue = [];
   let cur = null;
   const tag = el('div', 'coach');
+  const live = (h) => !reveal.is('h:' + h.id) && h.target.isConnected && !h.target.closest('[hidden]') && (!h.when || safe(h.when));
 
-  function next() {
+  function safe(fn) { try { return !!fn(); } catch { return false; } }
+  function detach() {
     cur?.target.classList.remove('coach-pulse');
     tag.remove();
     cur = null;
-    while (queue.length) {
-      const h = queue.shift();
-      if (reveal.is('h:' + h.id) || !h.target.isConnected) continue;
-      cur = h;
-      cur.t0 = performance.now();
-      h.target.classList.add('coach-pulse');
-      if (h.text) {
-        tag.textContent = h.text;
-        tag.className = 'coach ' + h.at;
-        h.target.appendChild(tag);
-      }
-      return;
+  }
+  function next() {
+    detach();
+    queue = queue.filter(live);
+    if (!queue.length) return;
+    let k = 0;
+    for (let i = 1; i < queue.length; i++) if (queue[i].prio > queue[k].prio) k = i;
+    const h = queue.splice(k, 1)[0];
+    cur = h;
+    cur.t0 = performance.now();
+    h.target.classList.add('coach-pulse');
+    if (h.text) {
+      tag.textContent = h.text;
+      tag.className = 'coach ' + h.at;
+      h.target.appendChild(tag);
     }
   }
 
   return {
-    show(id, target, text = '', { ms = 9000, at = 'above' } = {}) {
+    show(id, target, text = '', { ms = 9000, at = 'above', when = null, prio = 0 } = {}) {
       if (!target || reveal.is('h:' + id) || queue.some((q) => q.id === id) || cur?.id === id) return;
-      queue.push({ id, target, text, ms, at });
+      const h = { id, target, text, ms: when ? ms : Math.min(ms, CAP_MS), at, when, prio };
+      if (!live(h)) return;
+      queue.push(h);
       if (!cur) next();
+      else if (prio > cur.prio) { const c = cur; detach(); if (live(c)) queue.unshift(c); next(); }
     },
     done(id) {
       if (!reveal.is('h:' + id)) reveal.mark('h:' + id);
+      queue = queue.filter((q) => q.id !== id);
       if (cur?.id === id) next();
-      const i = queue.findIndex((q) => q.id === id);
-      if (i >= 0) queue.splice(i, 1);
+    },
+    drop(id) {
+      queue = queue.filter((q) => q.id !== id);
+      if (cur?.id === id) next();
     },
     tick() {
-      if (!cur) return;
-      if (!cur.target.isConnected || cur.target.closest('[hidden]')) { next(); return; }
-      if (performance.now() - cur.t0 > cur.ms) { reveal.mark('h:' + cur.id); next(); }
+      if (!cur) { if (queue.length) next(); return; }
+      if (performance.now() - cur.t0 > cur.ms) { reveal.mark('h:' + cur.id); next(); return; }
+      if (!live(cur)) next();
     },
     get current() { return cur?.id || null; },
+    get queued() { return queue.map((q) => q.id); },
   };
 }

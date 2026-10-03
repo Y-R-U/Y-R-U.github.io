@@ -78,7 +78,9 @@ export function createLineCard(line, h) {
   const ghostBar = el('div', 'bar ghost-bar');
   const ghostFill = el('i');
   ghostBar.appendChild(ghostFill);
-  ghost.append(el('div', 'ghost-e', line.emoji), el('div', 'ghost-sale', 'For sale'), ghostName, ghostCost, ghostBar);
+  const ghostSave = el('div', 'ghost-save');
+  ghostSave.hidden = true;
+  ghost.append(el('div', 'ghost-e', line.emoji), el('div', 'ghost-sale', 'For sale'), ghostName, ghostCost, ghostBar, ghostSave);
 
   const strip = el('div', 'strip');
   const sName = el('span', 'strip-name', line.emoji + ' ' + line.name);
@@ -99,6 +101,7 @@ export function createLineCard(line, h) {
     card, view, line, glyphs: { level: gLevel, throughput: gThr, boost: gBoost, hire: gMgr, hurry: gHurry },
     at: 0, fps: 0,
     get mode() { return mode; },
+    saveHint(text) { show(ghostSave, !!text); if (text) setText(ghostSave, text); },
     setMode(m) {
       if (m === mode) return;
       const was = mode;

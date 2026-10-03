@@ -5,8 +5,8 @@ const TABS = [
   { id: 'town', icon: '🗺️', label: 'Town' },
   { id: 'crew', icon: '🕴', label: 'Crew' },
   { id: 'goals', icon: '📜', label: 'Demands' },
-  { id: 'boothill', icon: '⚰️', label: 'Boot Hill' },
   { id: 'season', icon: '👻', label: 'Ghosts' },
+  { id: 'boothill', icon: '⚰️', label: 'Boot Hill' },
 ];
 
 // The tab bar also carries the jump dock (⤒ ×qty … ⤓). Docked in the bar, the jump buttons can never sit over a
@@ -30,7 +30,7 @@ export function createTabs(root, { onTab, model, onJump }) {
     tabs.appendChild(b);
   }
   root.appendChild(bar);
-  let cur = 'lines', jumpKey = '';
+  let cur = 'lines', jumpKey = '', dotted = null;
   const fresh = new Set();
 
   return {
@@ -50,9 +50,20 @@ export function createTabs(root, { onTab, model, onJump }) {
       }
       bar.hidden = !started;
       root.classList.toggle('has-tabs', !bar.hidden);
-      btns.get('goals').classList.toggle('dot', model.goalsReady() > 0);
-      btns.get('crew').classList.toggle('dot', model.boxCount() > 0 || (model.freeItemCount() > 0 && model.managers().some((m) => m.hired)));
-      btns.get('boothill').classList.toggle('dot', !!model.death().recommended);
+      // PT#11: one red dot at a time, highest priority first: strongboxes, ready Demands, a Fake Your Death worth
+      // taking, then newly revealed tabs in bar order, then spare gear.
+      const want = [];
+      if (model.boxCount() > 0) want.push('crew');
+      if (model.goalsReady() > 0) want.push('goals');
+      if (!btns.get('boothill').hidden && model.death().recommended) want.push('boothill');
+      for (const t of TABS) if (fresh.has(t.id)) want.push(t.id);
+      if (model.freeItemCount() > 0 && model.managers().some((m) => m.hired)) want.push('crew');
+      const top = want.find((id) => id !== cur && !btns.get(id).hidden) || null;
+      if (top !== dotted) {
+        btns.get(dotted)?.classList.remove('dot');
+        btns.get(top)?.classList.add('dot');
+        dotted = top;
+      }
     },
     jump({ up: u, down: d, qty: q, qtyText }) {
       const key = +u + '' + +d + +q + qtyText;

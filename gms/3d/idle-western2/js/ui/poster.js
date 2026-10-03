@@ -115,7 +115,7 @@ export async function savePoster(canvas, name, toast) {
   if (!blob) return false;
   const file = typeof File === 'function' ? new File([blob], name, { type: 'image/png' }) : null;
   if (file && navigator.canShare?.({ files: [file] }) && matchMedia('(pointer:coarse)').matches) {
-    try { await navigator.share({ files: [file], title: 'WANTED' }); return true; } catch {}
+    try { await navigator.share({ files: [file], title: 'WANTED' }); return true; } catch (e) { if (e?.name === 'AbortError') return false; }
   }
   const a = el('a');
   a.href = URL.createObjectURL(blob);

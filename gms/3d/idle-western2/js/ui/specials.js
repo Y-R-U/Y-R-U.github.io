@@ -29,11 +29,12 @@ export function createSpecials(hero, ctx, { heroVisible, cardFor, toHero, specta
     setTimeout(() => audio.sfx.bell(), 900);
     paintChip();
   });
-  // The chip stays up ~1.4 s as the announcement even when the special starts at once.
+  // The wind-up chip goes the moment the special opens, so it never sits over the duel title or the timer (B9).
   game.on('special:start', ({ event }) => {
     if (pending?.ev.id === event.id) {
       pending = null;
-      setTimeout(() => { if (!pending) { chip.classList.add('fade'); setTimeout(() => { if (!pending) { chip.hidden = true; chip.classList.remove('fade'); } }, 500); } }, 1400);
+      chip.classList.add('fade');
+      setTimeout(() => { if (!pending) { chip.hidden = true; chip.classList.remove('fade'); } }, 220);
     }
     if (!cur) open(event);
   });

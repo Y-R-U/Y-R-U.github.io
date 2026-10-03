@@ -5,6 +5,8 @@ import { fmtCash } from '../state/format.js?v=20261004a';
 // him (direction picks the target), or tap one of the four target chips. Unflung, Mabel throws him herself.
 const SWIPE_MIN = 34, SWIPE_MS = 900;
 const DIRS = { left: '⬅', right: '➡', up: '⬆', down: '⬇' };
+const LABEL = { trough: 'Trough', dentist: 'Dentist', jail: 'Jail', pomfrey: "Pomfrey's" };
+const LABEL_SHOWS = 4;
 const JOKE = {
   trough: { t: '💦 SPLOOSH! Into the trough', s: 'splash' },
   dentist: { t: '🦷 A walk-in for Pliers Pete', s: 'thud' },
@@ -27,15 +29,16 @@ export function createFling(hero, heroView, ctx, { canShow, spectacle }) {
   const chips = {};
   for (const [id, t] of Object.entries(T)) {
     const b = btn('fling-t ' + t.dir, '', (e) => { e.stopPropagation(); throwAt(id); }, t.text);
-    b.append(el('i', 'ft-a', DIRS[t.dir] || ''), el('span', 'ft-e', t.emoji));
+    b.append(el('i', 'ft-a', DIRS[t.dir] || ''), el('span', 'ft-e', t.emoji), el('small', 'ft-l', LABEL[id] || id));
     chips[id] = b;
     layer.appendChild(b);
   }
   hero.appendChild(layer);
 
-  let held = null, start = null, swallow = 0;
+  let held = null, start = null, swallow = 0, shows = 0;
 
-  // Spectacle knows where the drunk and the four targets are on screen; otherwise a fixed cross around Mabel.
+  // The grab sits on Spectacle's held drunk when he is on screen, else at the Gizzard's doors or mid-hero. The four
+  // chips always sit in their cardinal spots, because the swipe direction is cardinal (PT#4: ↓ is always jail).
   let placedAt = 0;
   function place() {
     placedAt = performance.now();
@@ -43,43 +46,21 @@ export function createFling(hero, heroView, ctx, { canShow, spectacle }) {
     const info = spectacle.fling();
     const a = info || spectacle.anchor('mabel', 'saloon');
     const vis = info ? info.x > 0 && info.x < W && info.y > 0 && info.y < H : a?.visible;
-    const x = vis ? Math.max(70, Math.min(W - 70, a.x)) : W / 2;
-    const y = vis ? Math.max(100, Math.min(H - 70, a.y)) : H * 0.56;
+    const x = vis ? Math.max(120, Math.min(W - 120, a.x)) : W / 2;
+    const y = vis ? Math.max(130, Math.min(H - 150, a.y)) : H * 0.5;
     layer.style.setProperty('--gx', (x | 0) + 'px');
     layer.style.setProperty('--gy', (y | 0) + 'px');
     layer.classList.toggle('real', !!info && vis);
-    for (const [id, b] of Object.entries(chips)) {
-      const t = info?.targets?.find((q) => q.id === id);
-      if (t && t.visible && vis) {
-        let dx = t.x - x, dy = t.y - y;
-        const d = Math.hypot(dx, dy) || 1, k = Math.max(1, 80 / d);
-        dx = Math.max(26 - x, Math.min(W - 26 - x, dx * k));
-        dy = Math.max(70 - y, Math.min(H - 26 - y, dy * k));
-        b.style.translate = `${dx | 0}px ${dy | 0}px`;
-      } else b.style.translate = '';
-    }
   }
 
-  function dirFor(dx, dy) {
-    const info = spectacle.fling();
-    const W = ctx.geo.viewW, H = ctx.geo.heroH;
-    const onScreen = info && info.x > 0 && info.x < W && info.y > 0 && info.y < H;
-    const seen = onScreen ? info.targets.filter((t) => t.visible) : [];
-    if (seen.length < 2) return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
-    let best = 'trough', bc = -2;
-    const m = Math.hypot(dx, dy) || 1;
-    for (const t of seen) {
-      const vx = t.x - info.x, vy = t.y - info.y, n = Math.hypot(vx, vy) || 1;
-      const c = (vx * dx + vy * dy) / (n * m);
-      if (c > bc) { bc = c; best = t.id; }
-    }
-    return best;
-  }
+  // Same mapping as Spectacle's dirFor and E's targets: ←trough →dentist ↓jail ↑Pomfrey.
+  const dirFor = (dx, dy) => (Math.abs(dx) >= Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : dy < 0 ? 'up' : 'down');
 
   function open(ev) {
     held = { id: ev.id, kind: ev.kind, until: performance.now() + (ev.holdSec || 2.2) * 1000 };
     place();
     layer.hidden = false;
+    layer.classList.toggle('labelled', shows++ < LABEL_SHOWS);
     layer.style.setProperty('--hold', (ev.holdSec || 2.2) + 's');
     layer.classList.remove('go'); void layer.offsetWidth; layer.classList.add('go');
     hero.classList.add('fling-on');
@@ -138,6 +119,7 @@ export function createFling(hero, heroView, ctx, { canShow, spectacle }) {
 
   return {
     get held() { return held; },
+    dirFor,
     frame(now) {
       if (!held) return;
       if (now > held.until + 400) { close(); return; }

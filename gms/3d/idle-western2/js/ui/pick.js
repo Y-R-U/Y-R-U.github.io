@@ -33,7 +33,8 @@ export function createSpectacle({ host, game }) {
 
   const api = {
     get live() { return !!sp(); },
-    has(kind) { return !!sp() && S_SCENES.has(kind); },
+    // S may publish `caps` (a Set) as scenes land; 'ghost' only counts from caps.
+    has(kind) { const s = sp(); return !!s && (S_SCENES.has(kind) || !!s.caps?.has?.(kind)); },
 
     // W7 winner for a hero tap: minigame > event > fling > piano > char > construction > pile > street.
     // Spectacle answers {kind, act?, payload?, ...}; 'site' is normalised to 'build'.

@@ -38,8 +38,8 @@ export function createUI({ game, host, bus }) {
   const visibleCards = new Set();
   const doc = document.documentElement;
   let root, look, sheets, toasts, juice, hud, coach, reveal, events, town, offline, tabs, hats, barks, captions, fling, specials, ghosts, boxes;
-  let heroWrap, heroView, tapzone, qtyBar, qtyBtns, list, gate, pinChip, focusChip, tipChip, gfxChip, pianoBtn, posterChip;
-  let lastFrame = 0, combo = 0, lastTapAt = 0, desktop = false, heroOn = true, docH = 0, ceremony = false;
+  let welcome, heroWrap, heroView, tapzone, qtyBar, qtyBtns, list, gate, pinChip, focusChip, tipChip, gfxChip, pianoBtn, posterChip;
+  let lastFrame = 0, combo = 0, lastTapAt = 0, desktop = false, heroOn = true, ceremony = false;
   let qty = model.setting('qty', 1);
   const audio = createAudio({ settings: () => game.state.settings });
   const spectacle = createSpectacle({ host, game });
@@ -338,7 +338,7 @@ export function createUI({ game, host, bus }) {
     R.crew = reveal.check('crew', () => model.owned().some((l) => st.lines[l.id].mgr) || (st.items || []).length > 0 || model.boxCount() > 0);
     R.goals = reveal.check('goals', () => model.ownedCount() >= 2 || model.contracts().some((c) => c.done && c.visible));
     R.boothill = reveal.check('boothill', () => model.districtOpen('bankblock') || model.graves().length > 0);
-    R.season = started && model.ownedCount() >= 1 && !!model.season();
+    R.season = started && !!model.season() && (R.season || st.deeds.length > 1 || model.graves().length > 0 || (game.simTime || 0) >= 600);
   }
 
   function cardCtx() {
@@ -403,9 +403,10 @@ export function createUI({ game, host, bus }) {
     show(focusChip, on);
     if (!on) return false;
     const l = lineById[id];
-    const text = l ? l.emoji + ' ' + model.lineName(id) + ' ›' : '🌵 Main Street';
-    if (text === focusChip.textContent) return false;
-    focusChip.textContent = text;
+    const e = l ? l.emoji : '🌵', n = l ? model.lineName(id) + ' ›' : 'Main Street';
+    if (e + ' ' + n === focusChip.dataset.k) return false;
+    focusChip.dataset.k = e + ' ' + n;
+    focusChip.replaceChildren(el('span', 'fc-e', e), el('span', 'fc-n', ' ' + n));
     focusChip.dataset.line = l ? id : '';
     return true;
   }
@@ -427,51 +428,136 @@ export function createUI({ game, host, bus }) {
     show(pinChip, !!pinned && !town.active);
     if (pinned) setText(pinChip, '📌 ' + lineById[pinned].emoji + ' ✕');
     show(qtyBar, R.qty && !specials.active);
-    show(pianoBtn, !hasPianoTarget() && !town.active && !specials.active);
+    const early = model.started() || game.state.stats.bootTaps >= 3;
+    show(pianoBtn, early && (!hasPianoTarget() || !reveal.is('h:piano')) && !town.active && !specials.active && !captions.active);
     hats.update(R);
     syncJump();
   }
 
+  // PT#1: every hint carries the condition that keeps it relevant, so a stale one drops out instead of blocking the
+  // queue. Hurry hints only for builds long enough to matter.
+  const HURRY_MIN_T = 8;
   function hints() {
+    if (ceremony || captions.active) return;
     const st = game.state;
-    if (model.bootstrapping()) {
-      if (st.stats.bootTaps === 0 && !model.anyBuilding()) coach.show('mud', tapzone, '👆 Tap the mud', { ms: Infinity });
-      else coach.done('mud');
-      if (model.hatCoins() >= 6 && !hats.mud.hidden) coach.show('hat', hats.mud, '🎩 Tap your hat', { ms: Infinity, at: 'above' });
+    const boot = model.bootstrapping();
+    if (boot) {
+      if (model.gen() < 2) {
+        coach.show('mud', tapzone, '👆 Tap the mud', { ms: Infinity, prio: 1, when: () => model.bootstrapping() && !ceremony && game.state.stats.bootTaps === 0 && !model.anyBuilding() });
+        if (model.hatCoins() >= 6) coach.show('hat', hats.mud, '🎩 Tap your hat', { ms: Infinity, at: 'above', prio: 2, when: () => model.bootstrapping() && model.hatCoins() > 0 });
+      }
       const first = data.lines[0];
       const c = cards.get(first.id);
-      if (c.mode === 'ghost' && model.q('unlock', { lineId: first.id }).affordable) coach.show('buy', c.card, '🥾 Buy it!', { ms: Infinity, at: 'inside' });
-      if (c.mode === 'build') {
-        const r = c.glyphs.hurry.b.getBoundingClientRect();
-        const seen = r.top > 0 && r.bottom < innerHeight - 4;
-        coach.show(seen ? 'hurry' : 'hurry-hero', seen ? c.glyphs.hurry.b : tapzone, '🔨 Tap to hurry', { ms: Infinity });
-      }
-      coach.tick();
-      return;
+      if (c.mode === 'ghost' && model.q('unlock', { lineId: first.id }).affordable) coach.show('buy', c.card, '🥾 Buy it!', { ms: Infinity, at: 'inside', prio: 3, when: () => c.mode === 'ghost' });
     }
-    for (const id of ['mud', 'hat', 'buy']) if (coach.current === id) coach.done(id);
+    for (const [id, b] of Object.entries(st.build || {})) {
+      const c = cards.get(id);
+      if (!c || c.mode !== 'build' || !(b.T > HURRY_MIN_T) || b.T - b.t < 3) continue;
+      const live = () => !!game.state.build?.[id];
+      if (visibleCards.has(c)) coach.show('hurry', c.glyphs.hurry.b, '🔨 Tap to hurry', { ms: 7000, prio: 1, when: () => live() && visibleCards.has(c) });
+      else if (boot && heroVisible()) coach.show('hurry-hero', tapzone, '🔨 Tap to hurry', { ms: 7000, prio: 1, when: () => live() && heroVisible() && !visibleCards.has(c) });
+      break;
+    }
+    if (boot) { coach.tick(); return; }
     const first = model.owned()[0];
     if (first) {
       const c = cards.get(first.id);
       const s1 = model.stats(first.id);
-      if (s1.managed) { if (coach.current === 'pile') coach.done('pile'); }
-      else if (c.mode === 'full' && s1.stockRatio > 0.15) coach.show('pile', c.view, '👆 Tap to sell', { ms: Infinity, at: 'inside' });
-      if (reveal.is('h:pile') && c.mode === 'full' && c.glyphs.level.b.classList.contains('can')) coach.show('level', c.glyphs.level.b, '⬆ Level up');
+      if (!s1.managed && c.mode === 'full' && s1.stockRatio > 0.02) coach.show('pile', c.view, '👆 Tap to sell', { ms: 20000, at: 'inside', when: () => c.mode === 'full' && !model.stats(first.id).managed });
+      const lv = c.glyphs.level.b;
+      if (reveal.is('h:pile') && c.mode === 'full' && lv.classList.contains('can')) coach.show('level', lv, '⬆ Level up', { when: () => lv.classList.contains('can') });
       if (s1.full && reveal.mark('h:full')) toasts.cardToast(c.card, '💰 Takings full · tap to bank');
     }
-    for (const [id] of Object.entries(game.state.build || {})) {
-      const c = cards.get(id);
-      if (c?.mode === 'build' && visibleCards.has(c)) { coach.show('hurry', c.glyphs.hurry.b, '🔨 Tap to hurry', { ms: 7000 }); break; }
-    }
-    if (!pianoBtn.hidden && model.ownedCount() >= 1 && !reveal.is('h:piano')) { pianoBtn.classList.add('glint'); }
-    if (R.qty) coach.show('qty', qtyBar, '');
+    goalHint();
+    if (!pianoBtn.hidden && !reveal.is('h:piano')) pianoBtn.classList.add('glint');
+    if (R.qty) coach.show('qty', qtyBar, '', { when: () => !qtyBar.hidden });
     if (R.pin) { const c = cards.get(model.owned()[1]?.id); if (c?.mode === 'full') coach.show('pin', c.card.querySelector('.pin'), ''); }
-    if (R.crew && model.boxCount() > 0) coach.show('boxes', tabs.tab('crew'), '🧰 Open it!');
+    if (R.crew && model.boxCount() > 0) coach.show('boxes', tabs.tab('crew'), '🧰 Open it!', { when: () => model.boxCount() > 0 });
     tabs.hintNew(coach);
     coach.tick();
   }
 
+  // Lane E's next goal (ECONOMY.md §13, PT#5): "💰 Save for it · 0:25" on the goal's FOR SALE card while saving is
+  // the right call, a gold glow on the best-payback glyph when affordable, a glint when it is a few seconds away.
+  let goalCard = null;
+  const glow = { best: null, near: null };
+  const fmtEta = (sec) => { const t = Math.max(1, Math.ceil(sec)); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
+  function glyphOf(b) {
+    const c = b && cards.get(b.lineId);
+    return c && c.mode === 'full' ? c.glyphs[b.act]?.b || null : null;
+  }
+  function setGlow(kind, node) {
+    if (glow[kind] === node) return;
+    glow[kind]?.classList.remove(kind);
+    node?.classList.add(kind);
+    glow[kind] = node;
+  }
+  function goalHint() {
+    let g = null;
+    try { g = game.nextGoal?.() || null; } catch {}
+    const c = g?.kind === 'line' ? cards.get(g.lineId) : null;
+    const save = !!c && c.mode === 'ghost' && g.hint === 'save' && g.eta > 0;
+    if (goalCard && goalCard !== c) goalCard.saveHint(null);
+    goalCard = c || null;
+    c?.saveHint(save ? `💰 Save for it · ${fmtEta(g.eta)}` : null);
+    setGlow('best', g?.bestBuy?.affordable ? glyphOf(g.bestBuy) : null);
+    setGlow('near', g?.save?.kind === 'upgrade' ? glyphOf(g.save) : null);
+  }
+
+  // Promo cards and story captions wait until the hero is actually on screen (PT B5/B6); S's beats announce
+  // themselves on bus 'spectacle:beat', otherwise ours run after the hero has been visible for BEAT_SETTLE ms.
+  const BEAT_SETTLE = 1200, BEAT_TTL = 120000;
+  const beatQ = [];
+  let heroWas = null, heroSince = 0;
+  function queueBeat(kind, run, { fallback = null, ttl = BEAT_TTL } = {}) {
+    beatQ.push({ kind, run, fallback, until: performance.now() + ttl });
+    if (!heroVisible() && fallback) { fallback(); beatQ[beatQ.length - 1].fallback = null; }
+    flushBeats();
+  }
+  function runBeat(i) {
+    const b = beatQ.splice(i, 1)[0];
+    try { b.run(); } catch (e) { console.error(e); }
+  }
+  function flushBeats(sKind = null) {
+    const now = performance.now();
+    for (let i = beatQ.length - 1; i >= 0; i--) if (now > beatQ[i].until) beatQ.splice(i, 1);
+    if (!beatQ.length || !heroVisible() || captions.active || specials.active) return;
+    if (sKind) {
+      const i = beatQ.findIndex((b) => b.kind === sKind || (sKind === 'hat' && b.kind === 'promo') || (sKind === 'bought' && !!lineById[b.kind]));
+      if (i >= 0) { runBeat(i); return; }
+    }
+    if (now - heroSince >= BEAT_SETTLE) runBeat(0);
+  }
+  function heroJob(now) {
+    const hv = heroVisible();
+    if (hv !== heroWas) {
+      heroWas = hv;
+      if (hv) heroSince = now;
+      bus.emit('ui:hero', { visible: hv });
+    }
+    root.classList.toggle('special-on', !!specials.active);
+    root.classList.toggle('hero-off', !hv);
+    flushBeats();
+  }
+
+  // The empty parchment under the first FOR SALE card on a fresh start: the Stranger's wanted poster nailed up
+  // next to the town sign. Gone once the first business opens.
+  function freshPoster() {
+    const w = el('div', 'welcome');
+    const poster = el('div', 'wp');
+    const face = el('div', 'wp-face');
+    face.append(el('span', 'wp-head', '🥴'), el('span', 'wp-hat', '🎩'));
+    poster.append(el('b', 'wp-t', 'WANTED'), face, el('i', 'wp-n', 'The Stranger'), el('small', 'wp-for', 'For loitering face-down'), el('b', 'wp-r', 'REWARD $2'));
+    const sign = el('div', 'town-sign');
+    sign.append(el('b', 'ts-n', 'DRIBBLE CREEK'), el('small', 'ts-p', 'Pop. 212'), el('span', 'ts-post'));
+    w.append(poster, sign);
+    w.hidden = true;
+    return w;
+  }
+
   function coreJob() {
+    heroJob(performance.now());
+    show(welcome, !model.started() && model.gen() < 2);
     computeReveals();
     hud.update(model, R);
     updateHeroChrome();
@@ -479,10 +565,11 @@ export function createUI({ game, host, bus }) {
   }
 
   // Music cue (W10/AUDIO.md): beds own the stream during their special; saloon when it has focus; build hoedown
-  // while anything is going up; night (or Ghost Town in season) 18:00–06:00; main otherwise.
+  // while anything is going up; night (or Ghost Town in season) by the W18 game clock (`game.day().night`).
   function musicJob() {
-    const h = new Date().getHours();
-    const night = h >= 18 || h < 6;
+    let night;
+    try { const d = game.day?.(); if (d) night = !!d.night; } catch {}
+    if (night == null) { const h = new Date().getHours(); night = h >= 18 || h < 6; }
     const sp = specials.active;
     let cue = 'main';
     if (ceremony) cue = 'fakedeath';
@@ -502,6 +589,7 @@ export function createUI({ game, host, bus }) {
     { ms: 500, fn: updateGate },
     { ms: 400, fn: hints },
     { ms: 700, fn: musicJob },
+    { ms: 500, fn: pumpQuiet },
   ];
   for (const j of jobs) j.at = 0;
   let jobCursor = 0;
@@ -533,16 +621,18 @@ export function createUI({ game, host, bus }) {
   function toTop() { scrollTo({ top: 0, behavior: smooth() }); }
   function toBottom() { scrollTo({ top: doc.scrollHeight, behavior: smooth() }); }
 
+  // P#8: no scrollY/innerHeight reads. heroOn and nearEnd come from IntersectionObservers.
+  let nearEnd = true;
   function syncJump() {
     if (!tabs) return;
-    const y = scrollY, vh = innerHeight;
     const up = !desktop && !heroOn && !town?.active;
-    const down = !desktop && !town?.active && docH - y - vh > vh * 0.6 && model.started();
+    const down = !desktop && !town?.active && !nearEnd && model.started();
     tabs.jump({ up, down, qty: up && !!R.qty, qtyText: qty === 'max' ? 'MAX' : '×' + qty });
   }
 
+  const wide = matchMedia('(min-width: 900px)');
   function layoutMode() {
-    desktop = innerWidth >= 900;
+    desktop = wide.matches;
     syncJump();
   }
 
@@ -583,6 +673,21 @@ export function createUI({ game, host, bus }) {
     tabs.set(id);
     coach.done('tab:' + id);
     if (id === 'crew') coach.done('boxes');
+  }
+
+  // Low-priority toasts hold while a special or a caption owns the hero, then trickle out one at a time.
+  const quietQ = [];
+  let quietAt = 0;
+  function quietToast(text, opts) {
+    if (quietQ.length < 4) quietQ.push([text, opts]);
+    pumpQuiet();
+  }
+  function pumpQuiet() {
+    const now = performance.now();
+    if (!quietQ.length || specials?.active || captions?.active || now < quietAt) return;
+    const [text, opts] = quietQ.shift();
+    toasts.toast(text, opts);
+    quietAt = now + 1400;
   }
 
   let tipTimer = 0;
@@ -635,8 +740,11 @@ export function createUI({ game, host, bus }) {
       if (c) { c.at = 0; if (c.mode !== 'build') c.setMode('build'); }
       const script = acq === 'bought' ? lineId : ACQ_SCRIPT[acq];
       if (script && SCRIPTS[script]) {
-        if (heroVisible()) captions.fit(script, T);
-        else toasts.toast(SCRIPTS[script][0][0], { ms: 2600 });
+        const t0 = performance.now();
+        queueBeat(script, () => captions.fit(script, Math.max(3, T - (performance.now() - t0) / 1000)), {
+          ttl: Math.max(0, (T - 3) * 1000),
+          fallback: () => toasts.toast(SCRIPTS[script][0][0], { ms: 2600 }),
+        });
       }
     });
     game.on('build:stage', ({ lineId, name }) => {
@@ -646,9 +754,10 @@ export function createUI({ game, host, bus }) {
       if (name === 'frame' || name === 'sign') barks.wordless('mulligan');
     });
     game.on('unlocked', ({ lineId }) => { const c = cards.get(lineId); if (c && (c.mode === 'ghost' || c.mode === 'build')) celebrateOpen(lineId); });
-    game.on('hat:promo', (p) => hats.promo(p));
-    game.on('half_town', () => { if (heroVisible()) captions.script('halfTown'); juice.stamp(heroWrap, 'HALF THE TOWN', 'open'); });
-    game.on('deed', ({ reopen }) => { if (!reopen && heroVisible()) captions.script('deed'); });
+    game.on('hat:promo', (p) => queueBeat('promo', () => hats.promo(p), { fallback: () => toasts.toast(`🤠 New hat: ${p.hat?.name || 'bigger'}! ⤒`, { cls: 'gold', ms: 2600 }) }));
+    game.on('half_town', () => queueBeat('halfTown', () => { captions.script('halfTown'); juice.stamp(heroWrap, 'HALF THE TOWN', 'open'); }));
+    game.on('deed', ({ reopen }) => { if (!reopen) queueBeat('deed', () => captions.script('deed')); });
+    bus.on('spectacle:beat', (b) => { if (b?.phase === 'start') flushBeats(b.kind); });
     game.on('bark', ({ char, trig, prio }) => barks.say(char, trig, prio));
     bus.on('bark', (b) => { if (b?.src === 'spectacle') barks.say(b.char, b.trig, false, { gated: true }); });
     game.on('box', ({ kind, n, source }) => {
@@ -656,9 +765,9 @@ export function createUI({ game, host, bus }) {
       toasts.toast(`${BOX_INFO[kind]?.e || '📦'} ${BOX_INFO[kind]?.n || 'Strongbox'}${n > 1 ? ' ×' + n : ''}!`, { cls: 'gold' });
       ctx.onBox();
     });
-    game.on('achievement', ({ achievement: a }) => toasts.toast(`🏅 ${a.emoji} ${a.name} · +1%`, { cls: 'gold', ms: 2600 }));
-    game.on('link', ({ from, to }) => toasts.toast(`🔗 ${lineById[from]?.emoji} → ${lineById[to]?.emoji} gag link · +5%`, { ms: 2600 }));
-    game.on('season', ({ kind, rank }) => { if (kind === 'rank') toasts.toast(`👻 Ghost Town rank ${rank}! A keepsake hat`, { cls: 'gold', ms: 2800 }); });
+    game.on('achievement', ({ achievement: a }) => quietToast(`🏅 ${a.emoji} ${a.name} · +1%`, { cls: 'gold', ms: 2600 }));
+    game.on('link', ({ from, to }) => quietToast(`🔗 ${lineById[from]?.emoji} → ${lineById[to]?.emoji} gag link · +5%`, { ms: 2600 }));
+    game.on('season', ({ kind, rank }) => { if (kind === 'rank') quietToast(`👻 Ghost Town rank ${rank}! A keepsake hat`, { cls: 'gold', ms: 2800 }); });
     game.on('piano:frenzy', () => bus.emit('ui:frenzy', {}));
     game.on('offline', ({ report }) => offline.show(report));
     game.on('district', () => { for (const c of cards.values()) c.at = 0; });
@@ -717,7 +826,8 @@ export function createUI({ game, host, bus }) {
       const side = el('div', 'side');
       list = el('main', 'lines');
       gate = createGate(ctx);
-      side.append(list, gate.root, el('div', 'list-end'));
+      welcome = freshPoster();
+      side.append(list, gate.root, welcome, el('div', 'list-end'));
       app.append(hud.root, heroWrap, side);
       root.append(app);
 
@@ -737,7 +847,7 @@ export function createUI({ game, host, bus }) {
         cardFor: (id) => { const c = cards.get(id); return c && c.mode === 'full' && visibleCards.has(c) ? c.card : null; },
       });
       fling = createFling(heroWrap, heroView, ctx, { spectacle, canShow: () => heroVisible() && !specials.active && !captions.active });
-      ghosts = createGhosts(heroWrap, ctx, { spectacle, canShow: () => heroVisible() && !specials.active });
+      ghosts = createGhosts(heroWrap, ctx, { spectacle, canShow: () => heroVisible() && !specials.active && !!R.season });
       offline = createOffline(root, ctx);
       boxes = createBoxes(root, ctx);
 
@@ -763,19 +873,17 @@ export function createUI({ game, host, bus }) {
       const ro = new ResizeObserver((es) => {
         for (const e of es) {
           if (e.target === heroView) { geo.viewW = e.contentRect.width; geo.viewH = e.contentRect.height; }
-          else docH = e.contentRect.height;
         }
         syncJump();
       });
       ro.observe(heroView);
-      ro.observe(app);
       new IntersectionObserver(([e]) => { heroOn = e.isIntersecting; syncJump(); }, { rootMargin: '-80px 0px 0px 0px', threshold: 0.25 }).observe(heroWrap);
       const hr = heroView.getBoundingClientRect();
-      geo.viewW = hr.width; geo.viewH = hr.height; docH = app.offsetHeight;
+      geo.viewW = hr.width; geo.viewH = hr.height;
+      new IntersectionObserver(([e]) => { nearEnd = e.isIntersecting; syncJump(); }, { rootMargin: '0px 0px 60% 0px' }).observe(side.querySelector('.list-end'));
       rig().onChange(() => { if (focusLabel()) restartAnim(focusChip, 'pop'); });
       onGameEvents();
-      addEventListener('scroll', syncJump, { passive: true });
-      addEventListener('resize', layoutMode);
+      wide.addEventListener?.('change', layoutMode);
       matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change', applyCalm);
       layoutMode();
       const tier = model.setting('tier', 'auto');
@@ -804,7 +912,8 @@ export function createUI({ game, host, bus }) {
     showOffline(report) { offline.show(report); },
     toast(text, opts) { toasts.toast(text, opts); },
     openTab,
-    get debug() { return { model, look, reveal, R, cards, events, town, sheets, coach, openManager, audio, geo, jobs, barks, captions, fling, specials, ghosts, boxes, hats, spectacle, fakeDeath, heroVisible, playPiano: () => playPiano(heroWrap, null), onHeroTap }; },
+    heroVisible: () => heroVisible(),
+    get debug() { return { model, look, reveal, R, cards, events, town, sheets, coach, openManager, audio, geo, jobs, barks, captions, fling, specials, ghosts, boxes, hats, spectacle, fakeDeath, heroVisible, beatQ, quietQ, playPiano: () => playPiano(heroWrap, null), onHeroTap }; },
   };
   return ui;
 }

@@ -69,7 +69,7 @@ try {
   check(r.b && /building/.test(r.cls), 'buying starts construction and the card shows the site');
   check(/\d+s/.test(r.badge), `stage badge with countdown (${r.badge})`);
   check(r.hurry, 'single hurry glyph shown');
-  check(/hurry/i.test(r.coach), `coach says tap to hurry (${r.coach})`);
+  check(!/hurry/i.test(r.coach), `no hurry coach for a 6 s build (${r.coach || 'none'})`);
   await page.eval(`document.querySelector('.line-card[data-line="shine"]').scrollIntoView({ block: 'end' })`);
   await sleep(400);
   const h0 = await page.eval(S(`st.stats.hurries`));
@@ -109,14 +109,9 @@ try {
   await sleep(250);
   r = await page.eval(`({ on: !document.querySelector('.fling').hidden, held: !!__iw2.game.state.saloon.held })`);
   check(r.on && r.held, 'Mabel holds a drunk: fling overlay up');
-  // Swipe toward a target on screen (Spectacle's projected targets), else by axis.
-  const swipeTo = async (target, axis) => {
-    const f = await page.eval(`(() => { const f = __iw2ui.debug.spectacle.fling(), g = __iw2ui.debug.geo; return f && f.x > 0 && f.x < g.viewW && f.y > 0 && f.y < g.heroH && f.targets.filter(t => t.visible).length >= 2 ? f : null; })()`);
-    const t = f?.targets?.find((q) => q.id === target && q.visible);
-    let [dx, dy] = axis;
-    if (f && t) { const n = Math.hypot(t.x - f.x, t.y - f.y) || 1; dx = (t.x - f.x) / n; dy = (t.y - f.y) / n; }
-    const x0 = Math.max(h.x - 100, Math.min(h.x + 100, h.x)), y0 = h.y;
-    await swipe(page, x0, y0, x0 + dx * 140, y0 + dy * 140);
+  // Swipes are cardinal (←trough →dentist ↓jail ↑Pomfrey) whatever the camera shows.
+  const swipeTo = async (target, [dx, dy]) => {
+    await swipe(page, h.x, h.y, h.x + dx * 140, h.y + dy * 140);
   };
   const fl0 = await page.eval(S('st.stats.flings'));
   await swipeTo('trough', [-1, 0]);

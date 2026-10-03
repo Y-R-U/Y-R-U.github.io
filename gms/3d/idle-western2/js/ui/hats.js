@@ -12,8 +12,8 @@ export function createHats(hero, ctx) {
   const pom = el('span', 'rb-side pom');
   const pomHat = el('i', 'rb-hat', '🎩');
   const pomN = el('b', '');
-  pom.append(pomHat, el('small', '', 'Pomfrey'), pomN);
-  ribbon.append(you, el('span', 'rb-dot', '·'), pom);
+  pom.append(pomHat, el('small', '', 'Pom'), pomN);
+  ribbon.append(you, pom);
   ribbon.hidden = true;
 
   const mud = btn('mud-hat', '', (e) => { e.stopPropagation(); ctx.onHat(e); }, 'Your hat: tap to pocket the coins');
@@ -34,7 +34,7 @@ export function createHats(hero, ctx) {
       const started = model.started();
       show(ribbon, started && !ctx.townActive());
       const boot = model.bootstrapping();
-      show(mud, boot && !ctx.townActive());
+      show(mud, boot && !ctx.townActive() && !ctx.captions?.active && (model.gen() < 2 || model.hatCoins() > 0));
       if (boot) {
         const a = ctx.spectacle?.bubbleAnchor('hat');
         if (a && a.visible) { mud.style.transform = `translate(${a.x | 0}px, ${a.y | 0}px)`; mud.classList.add('anchored'); }
@@ -52,7 +52,7 @@ export function createHats(hero, ctx) {
       setText(youN, `${h.own}/${h.frontages}`);
       setText(pomN, `${pf}/${h.frontages}`);
       youHat.style.setProperty('--s', Math.max(0.75, Math.min(1.6, 0.7 + (h.hat?.scale || 1) * 0.22)).toFixed(2));
-      pomHat.style.setProperty('--s', Math.max(0.45, Math.min(1.6, 0.4 + (h.pomfreyHat?.scale || 1) * 0.26)).toFixed(2));
+      pomHat.style.setProperty('--s', Math.max(0.68, Math.min(1.6, 0.55 + (h.pomfreyHat?.scale || 1) * 0.22)).toFixed(2));
       ribbon.classList.toggle('winning', h.pomfrey <= 0);
     },
     promo({ hat, pomfreyHat, pomfrey }) {
