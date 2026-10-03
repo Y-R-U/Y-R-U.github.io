@@ -72,7 +72,7 @@ export function createPost() {
     tScene: U(null), tS1: U(null), tS2: U(null), uSharp: U(0), uTexel: U(new THREE.Vector2()), uBloom: U(0), uTh: U(1), uKnee: U(0.5), uTilt: U(0), uFocus: U(0.5), uBand: U(0.2), uFeather: U(0.3),
   }, true);
   const resolve = mat(RESOLVE, { tScene: U(null), uTexel: U(new THREE.Vector2()), uSharp: U(0) }, true);
-  let rts = null, key = '';
+  let rts = null, key = '', last = null;
 
   const rt = (w, h, samples = 0, depth = false) => new THREE.WebGLRenderTarget(Math.max(2, w), Math.max(2, h), {
     type: THREE.HalfFloatType, samples, depthBuffer: depth, stencilBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
@@ -127,7 +127,7 @@ export function createPost() {
         resolve.uniforms.tScene.value = rts.scene.texture;
         resolve.uniforms.uTexel.value.set(1 / v.pw, 1 / v.ph);
         resolve.uniforms.uSharp.value = sharpen;
-        quad.material = resolve;
+        quad.material = last = resolve;
         renderer.setRenderTarget(prevTarget);
         renderer.setViewport(v.vx, v.vy, v.pw, v.ph);
         renderer.setScissor(v.vx, v.vy, v.pw, v.ph);
@@ -151,12 +151,23 @@ export function createPost() {
       u.uFocus.value = tilt?.focus ?? 0.5;
       u.uBand.value = tilt?.band ?? 0.17;
       u.uFeather.value = tilt?.feather ?? 0.32;
-      quad.material = comp;
+      quad.material = last = comp;
       renderer.setRenderTarget(prevTarget);
       renderer.setViewport(v.vx, v.vy, v.pw, v.ph);
       renderer.setScissor(v.vx, v.vy, v.pw, v.ph);
       renderer.render(scene, cam);
     },
-    dispose,
+    // Re-run only the final pass (the targets still hold the last frame): the hero-direct presenter uses it to put the
+    // hero back after a card frame drew into the shared canvas.
+    replay(renderer, v) {
+      if (!rts || !last) return false;
+      quad.material = last;
+      renderer.setRenderTarget(null);
+      renderer.setViewport(v.vx, v.vy, v.pw, v.ph);
+      renderer.setScissor(v.vx, v.vy, v.pw, v.ph);
+      renderer.render(scene, cam);
+      return true;
+    },
+    dispose() { dispose(); last = null; },
   };
 }

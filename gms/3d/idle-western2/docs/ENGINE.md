@@ -159,3 +159,34 @@ Append to `EVENTS`.
 | `node tools/test-look.mjs` | Hold-to-look on the hero and a card (touch plus mouse), the edge clamp, tap and swipe still working. |
 
 URL flags (`core/flags.js`): `?nosave ?reset ?debug ?demo ?tier= ?dpr= ?fast= ?focus=<id> ?presenter=overlay ?break=norecover ?seed=`. The art params `?tod= ?tm= ?expo=` are read by world.js.
+
+## Phone frame scheduling (round 2, lane M — PERF P#3, P#5, P#10)
+Phones are `device.mobile` (Android/iOS UA or `pointer:coarse`). Desktop scheduling is unchanged.
+
+- **Hero 30/60 (P#3).** `quality.js` gives phones `heroFpsIdle` 30; the hero runs at `heroFps` (60 on high) only while **hot**:
+  - `host.setHeroHot(fn)` — main.js wires `heroRig.orbit.busy` (hold-to-look) `|| heroRig.shooting || heroRig.mode === 'cutin' || spectacle.hot` (fallback until S exposes `hot`: any spectacle scene other than an ambient `gag`);
+  - the director camera is moving (> 4 m/s or > 8°/s, measured by the host after the frame hooks; the between-shot drift is ~0.35 m/s, glides peak ~65 m/s);
+  - the hero became visible less than 0.8 s ago (scroll-in);
+  - `host.heat(ms)` (for the UI, e.g. on a hero tap).
+  `host.hot` and `debug.hot` report it.
+- **Solo frames (P#3).** On phones the hero and a card never render in the same frame (`q.solo`). A frame where the hero is due renders only the hero; cards and pre-paints take the next frame. The hero yields a frame (never two in a row) when a visible card is starving past 2× its interval (3× while hot). At 30 fps idle they simply alternate. `forceAll` (resume/restore) and the overlay presenter ignore solo. Counters: `debug.perf.bothFrames` (must stay 0 on phones), `heroYields`, `hotFrames`.
+- **Shadows (P#5).** Phone hero shadow map refreshes at `shadowHz` 4 (mid and high), `shadowHzHot` 12 (8 on mid) while the camera is moving so the map's coverage keeps up with a glide; desktop stays 12. Cards are unchanged (cache miss / `markShadow` only).
+- **Movers never cast.** A shadow map refreshed at 4 Hz (or, on cards, only on a miss) would leave stepping or frozen shadows under anything that moves. The host checks shadow casters at 4 Hz; one whose world matrix (or instance matrices) changed on 3 consecutive checks is a mover, and its `castShadow` is forced off for good. Blob shadows stand in (crowds, walkers and actors already cast nothing). Seen in the demo: `town:rotor` (windmill), `ambient:tumbleweed`, the livery's and the dentist's moving parts. `debug.movers`, `debug.listMovers()`. A short pop (`fx.pop`, ≤ 0.5 s) or a pile changing stock doesn't qualify.
+- **Hero-direct presenter (P#10, `?presenter=hero`, opt-in).** The WebGL canvas sits bottom-left inside the hero element (clipped, so it scrolls natively with no lag) and the hero is never copied; cards still blit. After a card frame (or a resize) the host replays the hero's final post pass (`post.replay`) so the hero comes back; the hero's 2D canvas is a 1 Hz snapshot shown while the context is lost. See the measurements below for why it is not the default.
+- **A/B flags:** `?solo=0` (old scheduling: hero always at heroFps, hero+card frames allowed), `?shz=<hz>` (force the hero shadow rate), `?movershadow=1` (movers keep casting). `tools/perf-audit.mjs` takes `PA_QS='&solo=0&shz=12&movershadow=1'` to audit the old behaviour, and prints `hero+card frames %`.
+- **Card culling hook with lane A (P#2):** the existing `world.prepare(view)` is called before every view render; A hides the far town/ambient crowd in its `line` branch and restores in the hero branch (CONTRACT.md).
+
+### Measurements (2026-10-04, `perf-audit --only=frame --reps=3`, S22 profile CPU 4×, medians of 3 windows)
+The machine was heavily shared (load 5–26 from four other lanes' Chromes; Flux/LTX/TTS/ACE idle), so p95s are noisy; the A/B pairs were interleaved back to back and the structural counters are exact.
+
+| | old (`PA_QS='&solo=0&shz=12&movershadow=1'`) | new |
+|---|---|---|
+| hero+card in one frame, top / storm / scroll | 13.3–9.2% / 8.5–11.1% / 3.3–5.3% | **0% / 0% / 0%** |
+| hero renders per frame, top (idle) | 1.00 | 0.58–0.64 (idle 30 + hot glides/ejects) |
+| shadow bucket mean, top / storm | 0.13–0.16 / 0.22–0.24 ms | 0.03–0.06 / 0.07 ms |
+| rAF work p95, top (pairs) | 12.0, 10.5 | 5.7, 7.5 |
+| rAF work p95, storm / scroll (pairs) | 13.2, 13.3 / 11.5, 8.0 | 15.3, 12.6 / 10.4, 8.0 |
+
+Storm runs at 60 fps by design (hot), so it gains only the shadow cut and the solo split. Final run on the finished code (load 11–23): top 7.1, storm 5.0, scroll 4.1 ms p95, all with 0% shared frames. test-scroll S22: dt p95 16.7, rAF work p95 7.4 ms (load ~10).
+
+**P#10 hero-direct verdict: kept opt-in, not the default.** Interleaved: `present` 0.04 vs 0.17 ms mean (top) and 0.07 vs 0.11–0.16 (scroll), so about −0.1 ms CPU per frame including the replays; host.render differences were inside the load noise. On the GPU it removes one 0.48 Mpx copy per hero frame but adds a 0.48 Mpx composite replay per card frame while the hero is near, which is close to neutral at the idle 30/30 alternation and cannot be measured on the M5. The cost is a weaker never-black layer (on loss the hero shows a ≤ 1 s old snapshot instead of its last frame). Worth a Perfetto check on the S22 before switching: `?presenter=hero`. test-lifecycle (default presenter) passes; a manual loss/recreate under `?presenter=hero` showed the snapshot, then recreated with no errors.

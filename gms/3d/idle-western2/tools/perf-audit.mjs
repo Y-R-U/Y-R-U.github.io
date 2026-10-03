@@ -19,7 +19,7 @@ const ONLY = new Set(arg('only', 'frame,profile,static').split(','));
 const JSON_OUT = arg('json', '');
 const S22_UA = 'Mozilla/5.0 (Linux; Android 14; SM-S908B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36';
 const VP = { width: 412, height: 915, deviceScaleFactor: 2.625, mobile: true };
-const BASE = '?nosave=1&demo=1&debug=1&tod=17';
+const BASE = '?nosave=1&demo=1&debug=1&tod=17' + (process.env.PA_QS || '');
 const med = (a) => { const s = a.filter((x) => x != null && !Number.isNaN(x)).sort((x, y) => x - y); return s.length ? s[(s.length - 1) >> 1] : NaN; };
 const pct = (a, p) => { const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(s.length * p))] || 0; };
 const f = (x, n = 2) => (x == null || Number.isNaN(x) ? '—' : (+x).toFixed(n));
@@ -215,7 +215,7 @@ function summarise(w) {
   const rows = w.rows, n = Math.max(1, rows.length);
   const fr = w.frames, dts = fr.slice(1).map((x, i) => x[0] - fr[i][0]), work = fr.map((x) => x[1]);
   const avg = (k) => rows.reduce((s, r) => s + (r[k] || 0), 0) / n;
-  for (const r of rows) r.body = r['game.tick'] + r.shipments + r['host.render'] + r['ui.update'];
+  for (const r of rows) { r.body = r['game.tick'] + r.shipments + r['host.render'] + r['ui.update']; r.both = r.hero > 0 && r.cards > 0 ? 1 : 0; }
   const keys = Object.keys(rows[0] || {});
   const mean = Object.fromEntries(keys.map((k) => [k, avg(k)]));
   // What the slow frames are made of: mean of each bucket over the slowest 10% of loop bodies.
@@ -276,7 +276,7 @@ async function frameScenario(port, name) {
   console.log('   bucket (body = loop body)  mean ms   slowest-10%-body frames ms');
   for (const k of ['body', 'game.tick', 'shipments', 'ui.update', 'host.render', 'world.update', 'plots.update', 'ambient', 'town.tick', 'spectacle.update', 'prepare', 'hero.scene', 'hero.post', 'card.scene', 'card.post', 'shadow', 'present'])
     console.log(`   ${k.padEnd(18)} ${f(M[k]).padStart(8)} ${f(S[k]).padStart(10)}`);
-  console.log(`   hero renders/frame ${f(M.hero)} cards/frame ${f(M.cards)} (p90+: ${f(S.hero)} / ${f(S.cards)}); draws/frame ${f(M.draws, 0)} verts/frame ${f(M.verts / 1e6)} M; calls max ${res.callsMax} (hero ${res.heroCallsMax}, card ${res.cardCallsMax})`);
+  console.log(`   hero renders/frame ${f(M.hero)} cards/frame ${f(M.cards)} hero+card frames ${f(100 * (M.both || 0), 1)}% (p90+: ${f(S.hero)} / ${f(S.cards)}); draws/frame ${f(M.draws, 0)} verts/frame ${f(M.verts / 1e6)} M; calls max ${res.callsMax} (hero ${res.heroCallsMax}, card ${res.cardCallsMax})`);
   console.log(`   shader links during play ${res.links.join('/')} (programs ${res.programs.join('/')}); JS heap churn ${f(res.heapMBs)} MB/s; textures ${res.textures} geometries ${res.geometries}; errors ${res.errors.length}`);
   for (const [id, v] of Object.entries(res.views)) if (v.perRender) console.log(`   view ${id.padEnd(16)} ${String(v.renders).padStart(4)} renders  ${f(v.perRender.ms)} ms/render (scene ${f(v.perRender.scene)} post ${f(v.perRender.post)}) ${f(v.perRender.calls, 0)} draws ${f(v.perRender.verts / 1e3, 0)}k verts ${f(v.perRender.px / 1e6)} Mpx`);
   return res;

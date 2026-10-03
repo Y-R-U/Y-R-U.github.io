@@ -11,6 +11,12 @@ export const MOBILE_CARD_DPR = { low: 1, mid: 1.5, high: 2 };
 // …but a card never gets more than this many device pixels: the tall portrait cards (~388×521 CSS) land at ≈1.57 on
 // high instead of 2 (0.5 Mpx ×4 MSAA instead of 0.8), while small cards still reach the full cap.
 export const MOBILE_CARD_PX = { low: 0, mid: 0.35e6, high: 0.5e6 };
+// Phones (PERF P#3/P#5): the hero idles at 30 fps and only runs at heroFps while "hot" (look, spectacle, camera moving,
+// scroll-in); the hero and a card never share a frame (solo); the hero shadow map refreshes at 4 Hz (shadowHzHot while
+// the camera is moving, so the map's coverage keeps up). Movers never cast (host), blob shadows stand in for them.
+export const MOBILE_HERO_IDLE_FPS = 30;
+export const MOBILE_SHADOW_HZ = { low: 0, mid: 4, high: 4 };
+export const MOBILE_SHADOW_HZ_HOT = { low: 0, mid: 8, high: 12 };
 
 // Governor ladder: DPR first, then fps, then tier. Context MSAA is fixed per device (desktop on, phone off; the phone
 // hero still gets 4× MSAA through the bloom target on high), so only shadows on/off (mid↔low) needs a renderer recreate.
@@ -64,7 +70,9 @@ export function qualityAt(level) {
   const cap = device.mobile ? MOBILE_DPR[step.tier] : base.dprCap;
   const ccap = device.mobile ? MOBILE_CARD_DPR[step.tier] : base.dprCap;
   const cardSamples = device.mobile && step.tier === 'high' ? 4 : 0;
-  return { ...base, ...step, name: step.tier, msaa: device.msaa, cardDprCap: Math.max(1, ccap * (step.dprMul || 1)), cardSamples, cardSharpen: device.mobile ? (step.tier === 'low' ? 0 : 0.45) : 0, heroSharpen: step.tier === 'low' ? 0 : 0.3, cardShadowSize: Math.min(base.cardShadowSize || 512, device.mobile ? 512 : 1024), cardPx: device.mobile ? MOBILE_CARD_PX[step.tier] * (step.dprMul || 1) ** 2 : 0, postCards: step.tier === 'high' && !device.mobile, rtSamples: step.tier === 'high' ? 4 : 0, dprCap: Math.max(1, cap * (step.dprMul || 1)) };
+  const heroFps = step.heroFps || base.heroFps, m = device.mobile;
+  return { ...base, ...step, heroFpsIdle: m ? Math.min(heroFps, MOBILE_HERO_IDLE_FPS) : heroFps, solo: m,
+    shadowHz: m ? Math.min(base.shadowHz, MOBILE_SHADOW_HZ[step.tier]) : base.shadowHz, shadowHzHot: m ? Math.min(base.shadowHz, MOBILE_SHADOW_HZ_HOT[step.tier]) : base.shadowHz, name: step.tier, msaa: device.msaa, cardDprCap: Math.max(1, ccap * (step.dprMul || 1)), cardSamples, cardSharpen: device.mobile ? (step.tier === 'low' ? 0 : 0.45) : 0, heroSharpen: step.tier === 'low' ? 0 : 0.3, cardShadowSize: Math.min(base.cardShadowSize || 512, device.mobile ? 512 : 1024), cardPx: device.mobile ? MOBILE_CARD_PX[step.tier] * (step.dprMul || 1) ** 2 : 0, postCards: step.tier === 'high' && !device.mobile, rtSamples: step.tier === 'high' ? 4 : 0, dprCap: Math.max(1, cap * (step.dprMul || 1)) };
 }
 
 // Rolling 2 s window of rAF interval and our own frame work. A steady ~33 ms interval with light work is a

@@ -9,7 +9,7 @@ const _v3 = new THREE.Vector3(), _ndc = new THREE.Vector2(), _ray = new THREE.Ra
   _hit = new THREE.Vector3(), _plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 
 export function createRenderHost({ lifecycle, flags, bus }) {
-  const presenter = flags.presenter === 'overlay' ? createOverlayPresenter({ debug: flags.debug }) : createBlitPresenter();
+  const presenter = flags.presenter === 'overlay' ? createOverlayPresenter({ debug: flags.debug }) : createBlitPresenter({ heroDirect: flags.presenter === 'hero' });
   const views = new Map();
   const frameHooks = new Set(), pickers = new Set();
   const vis = [], due = [], pre = [], todo = [], nearOrVis = [], visibleLines = new Set(), lossLog = [];
@@ -22,20 +22,23 @@ export function createRenderHost({ lifecycle, flags, bus }) {
   let world = null, renderer = null, lost = false, paused = false, lossTimer = null, focusLine = null;
   let srcW = 0, srcH = 0, lastNow = 0, lastWork = 0, forceAll = true, lastRenderCall = 0, focus = null;
   let cardCost = 1, pressure = 0, pressureAt = 0, anchorFn = null;
+  let hotFn = null, hotUntil = 0, hot = false, camHot = false, yielded = false;
+  const camPrev = new THREE.Vector3(), camDir = new THREE.Vector3(), camDirPrev = new THREE.Vector3();
 
   const dbg = {
     frames: 0, presented: 0, lastPresentAt: 0, views: 0, renderedThisFrame: 0, calls: 0, tris: 0, heroCalls: 0,
     dpr: 1, tier: q.name, level, mode, lost: false, paused: false, losses: 0, restores: 0, recreations: 0,
     tierRecreations: 0, stalls: 0, shadowUpdates: 0, shadows: false, programs: 0, ctx2dLost: 0, prepaints: 0, live2d: 0, presenter: presenter.name,
-    workMs: 0, governor: governor.stats, device, post: false, env: false,
+    workMs: 0, governor: governor.stats, device, post: false, env: false, hot: false, movers: 0,
     perf: null,
     get visibleViews() { return vis.map((v) => v.id); },
   };
-  const resetPerf = () => { dbg.perf = { frames: 0, workMax: 0, workSum: 0, hookSum: 0, presentSum: 0, heroSum: 0, cardSum: 0, cardRenders: 0, heroRenders: 0, callsMax: 0, heroCallsMax: 0, cardCallsMax: 0, blankMaxMs: 0, rendersMax: 0 }; };
+  const resetPerf = () => { dbg.perf = { frames: 0, workMax: 0, workSum: 0, hookSum: 0, presentSum: 0, heroSum: 0, cardSum: 0, cardRenders: 0, heroRenders: 0, bothFrames: 0, heroYields: 0, hotFrames: 0, callsMax: 0, heroCallsMax: 0, cardCallsMax: 0, blankMaxMs: 0, rendersMax: 0 }; };
   resetPerf();
 
   const dpr = () => Math.min(flags.dpr || devicePixelRatio || 1, q.dprCap);
   const qs = new URLSearchParams(location.search), sharpOff = qs.get('cardsharp') === '0', cardPxOff = qs.get('cardpx') === '0';
+  const soloOff = qs.get('solo') === '0', moversCast = qs.get('movershadow') === '1', shzFlag = +qs.get('shz') || 0;
   const cardDpr = () => sharpOff ? dpr() : Math.max(dpr(), Math.min(flags.dpr || devicePixelRatio || 1, q.cardDprCap || q.dprCap));
 
   function makeRenderer() {
@@ -99,7 +102,7 @@ export function createRenderHost({ lifecycle, flags, bus }) {
     if (key == null) return;
     const hero = v.kind === 'hero';
     const want = hero ? worldMapSize : Math.min(worldMapSize, q.cardShadowSize || 1024);
-    const hz = hero ? q.shadowHz : q.cardShadowHz;
+    const hz = shzFlag || (hero ? (camHot ? q.shadowHzHot || q.shadowHz : q.shadowHz) : q.cardShadowHz);
     const e = shadowCache.get(key);
     const usable = e && e.w === want;
     const fresh = usable && !e.stale && (!hz || now - e.at < 1000 / hz || (key === 'world' && !hero));
@@ -115,6 +118,7 @@ export function createRenderHost({ lifecycle, flags, bus }) {
     if (e && !usable) { e.map.dispose(); shadowCache.delete(key); }
     sh.map = usable ? e.map : null;
     renderer.shadowMap.needsUpdate = true;
+    for (const m of movers.set) m.castShadow = false;
     pendingShadow = { key, e: usable ? e : null, w: want, now };
     dbg.shadowUpdates++;
   }
@@ -133,6 +137,41 @@ export function createRenderHost({ lifecycle, flags, bus }) {
       if (old.map === sh.map) continue;
       old.map.dispose();
       shadowCache.delete(k);
+    }
+  }
+
+  // Movers never cast: shadow maps refresh at a few Hz (cards only on a cache miss), so a moving caster would leave a
+  // stepping or frozen shadow. A caster whose world matrix (or instance matrices) changed on 3 consecutive 4 Hz checks is
+  // a mover; its castShadow is forced off for good and the blob shadows stand in. ?movershadow=1 turns this off.
+  const movers = { list: [], scanAt: -1e9, checkAt: 0, set: new Set(), st: new WeakMap() };
+  function sigOf(o) {
+    if (o.isInstancedMesh) {
+      const a = o.instanceMatrix.array, n = Math.min(o.count, a.length >> 4);
+      let h = n;
+      for (let i = 0; i < n; i++) { const k = i << 4; h += a[k] * 0.7 + a[k + 2] * 0.3 + a[k + 12] * (1 + (i % 7)) + a[k + 13] * 1.3 + a[k + 14] * (2 + (i % 5)); }
+      return h;
+    }
+    const e = o.matrixWorld.elements;
+    return e[0] * 0.7 + e[2] * 0.3 + e[5] * 0.11 + e[12] * 1.1 + e[13] * 1.7 + e[14] * 2.3;
+  }
+  function checkMovers(now) {
+    if (moversCast || !world || !renderer.shadowMap.enabled || now - movers.checkAt < 250) return;
+    movers.checkAt = now;
+    if (now - movers.scanAt > 3000) {
+      movers.scanAt = now;
+      movers.list.length = 0;
+      world.scene.traverse((o) => { if (o.isMesh && o.castShadow && !movers.set.has(o)) movers.list.push(o); });
+    }
+    for (const o of movers.list) {
+      if (movers.set.has(o)) continue;
+      const sig = sigOf(o);
+      let s = movers.st.get(o);
+      if (!s) { movers.st.set(o, { sig, run: 0, v: o.isInstancedMesh ? o.instanceMatrix.version : 0 }); continue; }
+      if (o.isInstancedMesh && o.instanceMatrix.version === s.v) { s.run = 0; continue; }
+      if (o.isInstancedMesh) s.v = o.instanceMatrix.version;
+      s.run = Math.abs(sig - s.sig) > 1e-4 ? s.run + 1 : 0;
+      s.sig = sig;
+      if (s.run >= 3) { movers.set.add(o); o.castShadow = false; dbg.movers = movers.set.size; }
     }
   }
 
@@ -329,6 +368,23 @@ export function createRenderHost({ lifecycle, flags, bus }) {
   function onDpr() { srcW = srcH = 0; dirtyAll(); watchDpr(); }
   watchDpr();
 
+  function heroHotNow(now) {
+    if (now < hotUntil || camHot) return true;
+    try { return !!hotFn?.(); } catch { return false; }
+  }
+  // Camera speed from the director, measured after the frame hooks: a glide or cut wants 60 fps and fresher shadows;
+  // the slow drift between shots doesn't (thresholds sit far above it).
+  function trackCamera(dt) {
+    const cam = world.heroRig?.camera;
+    if (!cam || dt <= 0) { camHot = false; return; }
+    cam.getWorldDirection(camDir);
+    const sp = cam.position.distanceTo(camPrev) / dt, ang = Math.acos(Math.min(1, camDir.dot(camDirPrev))) / dt;
+    camPrev.copy(cam.position);
+    camDirPrev.copy(camDir);
+    camHot = sp > 4 || ang > 0.14;
+  }
+  const fpsOf = (v) => v.fps || (v.lineId === focus ? q.cardFps : q.cardFpsOther);
+
   const byPriority = (a, b) => (b.dirty - a.dirty) || ((b.lineId === focus) - (a.lineId === focus)) || (a.last - b.last);
 
   function renderView(v, d, now) {
@@ -423,6 +479,10 @@ export function createRenderHost({ lifecycle, flags, bus }) {
       dbg.views = views.size;
     },
     setFocus(lineId) { focusLine = lineId; },
+    // Phone hero fps: 30 when idle, q.heroFps while fn() is true (look, spectacle, cut-in) or for ms after heat(ms).
+    setHeroHot(fn) { hotFn = fn; },
+    heat(ms = 1500) { hotUntil = Math.max(hotUntil, performance.now() + ms); },
+    get hot() { return hot; },
     setViewFps(id, fps) { const v = views.get(id); if (v) v.fps = fps || 0; },
     markDirty(id) {
       if (id === '*') { dirtyAll(); forceAll = true; host.markShadow(); }
@@ -469,6 +529,8 @@ export function createRenderHost({ lifecycle, flags, bus }) {
       focus = focusLine ?? world.heroRig?.pinned ?? world.heroRig?.current ?? null;
 
       vis.length = due.length = pre.length = todo.length = nearOrVis.length = 0;
+      hot = dbg.hot = soloOff || heroHotNow(now);
+      const solo = q.solo && !soloOff && !forceAll && !presenter.direct;
       let heroDue = false;
       let cardMax = 0;
       for (const v of views.values()) {
@@ -478,11 +540,11 @@ export function createRenderHost({ lifecycle, flags, bus }) {
         if (!v.visible) { if (v.near && v.dirty) { if (v.kind === 'hero') pre.unshift(v); else pre.push(v); } continue; }
         vis.push(v);
         if (v.kind === 'hero') {
-          if (forceAll || v.dirty || now - v.last >= 1000 / q.heroFps - 2) { heroDue = true; todo.unshift(v); }
+          const fps = hot || now - v.visibleAt < 800 ? q.heroFps : q.heroFpsIdle || q.heroFps;
+          if (forceAll || v.dirty || now - v.last >= 1000 / fps - 2) { heroDue = true; todo.unshift(v); }
           continue;
         }
-        const fps = v.fps || (v.lineId === focus ? q.cardFps : q.cardFpsOther);
-        if (forceAll || v.dirty || now - v.last >= 1000 / fps - 2) due.push(v);
+        if (forceAll || v.dirty || now - v.last >= 1000 / fpsOf(v) - 2) due.push(v);
       }
       if (presenter.direct) {
         if (!heroDue && !due.length && !forceAll) { lastWork = performance.now() - t0; return; }
@@ -491,15 +553,28 @@ export function createRenderHost({ lifecycle, flags, bus }) {
         for (const v of vis) if (v.kind === 'hero') todo.push(v);
       } else {
         due.sort(byPriority);
-        const K = forceAll ? due.length : q.K;
+        let K = forceAll ? due.length : q.K;
+        // Phones: the hero and a card never share a frame. The hero wins its frame unless a visible card is starving
+        // (past 2× its interval, 3× while hot) and the hero didn't yield last frame; at 30 fps idle they simply alternate.
+        if (solo && heroDue && (due.length || pre.length)) {
+          let starving = false;
+          const lim = hot ? 3000 : 2000;
+          for (const v of due) if (now - v.last > lim / fpsOf(v)) { starving = true; break; }
+          if (starving && !yielded) { todo.shift(); heroDue = false; yielded = true; dbg.perf.heroYields++; }
+          else { K = 0; yielded = false; }
+        } else yielded = false;
         let n = 0;
         for (; n < due.length && n < K; n++) todo.push(due[n]);
-        for (let i = 0; i < pre.length && n < K; i++, n++) todo.push(pre[i]);
+        for (let i = 0; i < pre.length && n < K; i++, n++) {
+          if (solo && pre[i].kind === 'hero') { if (n) continue; todo.push(pre[i]); break; }
+          todo.push(pre[i]);
+        }
       }
 
       dbg.cardDpr = cardMax || dc;
       presenter.frameSize(nearOrVis, d, size);
-      if (size.W !== srcW || size.H !== srcH) { srcW = size.W; srcH = size.H; renderer.setSize(srcW, srcH, false); }
+      let replay = false;
+      if (size.W !== srcW || size.H !== srcH) { srcW = size.W; srcH = size.H; renderer.setSize(srcW, srcH, false); replay = true; }
       visibleLines.clear();
       visibleLines.hero = false;
       for (const v of nearOrVis) if (v.kind === 'hero') visibleLines.hero = true;
@@ -508,13 +583,15 @@ export function createRenderHost({ lifecycle, flags, bus }) {
       const th = performance.now();
       for (const fn of frameHooks) fn(dt, now, visibleLines, q);
       dbg.perf.hookSum += performance.now() - th;
+      trackCamera(dt);
+      checkMovers(now);
       renderer.info.reset();
       world.configureRenderer?.(renderer, q.name);
       applyConfig();
       dbg.renderedThisFrame = 0;
       if (todo.length) presenter.beginFrame(renderer);
       // Cards only start while the frame is under budget; a card starved past 3× its interval may overrun once.
-      let blocked = false, overrun = false;
+      let blocked = false, overrun = false, heroV = null;
       for (const v of todo) {
         if (v.kind !== 'hero' && !forceAll && !presenter.direct && dbg.renderedThisFrame > 0) {
           const fps = v.fps || (v.lineId === focus ? q.cardFps : q.cardFpsOther);
@@ -526,7 +603,19 @@ export function createRenderHost({ lifecycle, flags, bus }) {
         }
         const tv = performance.now();
         renderView(v, d, now);
-        if (v.kind !== 'hero') cardCost = cardCost * 0.8 + (performance.now() - tv) * 0.2;
+        if (v.last !== now) continue;
+        if (v.kind !== 'hero') { cardCost = cardCost * 0.8 + (performance.now() - tv) * 0.2; replay = true; }
+        else { heroV = v; replay = false; }
+      }
+      // Hero-direct: a card (or a resize) drew into the canvas the hero is shown from, so put the hero back.
+      if (presenter.heroDirect && replay && !lost) {
+        if (!heroV) for (const v of nearOrVis) if (v.kind === 'hero' && v.presented) heroV = v;
+        if (heroV) {
+          const tr = performance.now();
+          if (!heroPost?.replay(renderer, heroV)) renderView(heroV, d, now);
+          dbg.perf.presentSum += performance.now() - tr;
+          dbg.replays = (dbg.replays || 0) + 1;
+        }
       }
       pressure = pressure * 0.98 + (blocked ? 0.02 : 0);
       dbg.pressure = pressure;
@@ -539,6 +628,10 @@ export function createRenderHost({ lifecycle, flags, bus }) {
         const ms = now - Math.max(v.blankSince, v.visibleAt);
         if (ms > p.blankMaxMs) p.blankMaxMs = ms;
       }
+      let heroR = false, cardR = false;
+      for (const v of todo) if (v.last === now) { if (v.kind === 'hero') heroR = true; else cardR = true; }
+      if (heroR && cardR) dbg.perf.bothFrames++;
+      if (hot) dbg.perf.hotFrames++;
       dbg.calls = renderer.info.render.calls;
       dbg.tris = renderer.info.render.triangles;
       dbg.programs = renderer.info.programs?.length || 0;
@@ -612,6 +705,7 @@ export function createRenderHost({ lifecycle, flags, bus }) {
     presented: v.presented, last: v.last,
   }));
   dbg.resetPerf = resetPerf;
+  dbg.listMovers = () => [...movers.set].map((o) => (o.name || '?') + '<' + (o.parent?.name || o.parent?.type || ''));
   if (flags.debug) {
     let ext = null;
     dbg.loseContext = () => { ext = renderer.getContext().getExtension('WEBGL_lose_context'); ext?.loseContext(); };

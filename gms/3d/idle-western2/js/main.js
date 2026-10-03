@@ -48,6 +48,15 @@ const fx = createFx(world, kit);
 wireRenderCore({ game, host, world, shipments, actors, fx, bus });
 host.setWorld(world);
 if (flags.focus && world.plots.has(flags.focus)) world.heroRig.pin(flags.focus);
+host.setHeroHot(() => {
+  const r = world.heroRig, sp = world.spectacle;
+  if (r.orbit?.busy || r.shooting || r.mode === 'cutin') return true;
+  if (!sp) return false;
+  if ('hot' in sp) return !!sp.hot;
+  const k = sp.scenes;
+  for (let i = 0; i < k.length; i++) if (k[i] !== 'gag') return true;
+  return false;
+});
 
 host.onFrame((dt, now, visibleLines) => {
   world.update(dt, game, shipments, visibleLines, host.debug.tier);
