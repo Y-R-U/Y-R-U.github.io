@@ -1,7 +1,7 @@
-import { el, btn, bar } from './dom.js?v=20261004a';
-import { fmtNum } from '../state/format.js?v=20261004a';
-import { section } from './kit.js?v=20261004a';
-import { BOX_INFO } from './boxes.js?v=20261004a';
+import { el, btn, bar } from './dom.js?v=20261004b';
+import { fmtNum } from '../state/format.js?v=20261004b';
+import { section } from './kit.js?v=20261004b';
+import { BOX_INFO } from './boxes.js?v=20261004b';
 
 // Ghost Town (W12): a main-street overlay. The sheet shows ectoplasm, the 8 ranks and the keepsake hats (who wears
 // what). Hidden entirely outside the season window (the tab is only revealed while seasonInfo().live).

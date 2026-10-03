@@ -3,9 +3,9 @@
 // Ownership skins (W3): o.skin = 'you' | 'pomfrey' | 'civic' | 'none' recolours trim, sign board, door, awning and adds
 // Pomfrey's crest. Text is painted by kit.signs: pass o.signs (a batch) + o.text and the board gets lettered.
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004a';
-import { CLAP, PLANK, PLANKX, ROOF } from './build.js?v=20261004a';
-import { SKINS } from '../../data/palette.js?v=20261004a';
+import * as S from './shape.js?v=20261004b';
+import { CLAP, PLANK, PLANKX, ROOF } from './build.js?v=20261004b';
+import { SKINS } from '../../data/palette.js?v=20261004b';
 
 export { SKINS };
 const at = (x, y, z, ry = 0, parent = null) => {

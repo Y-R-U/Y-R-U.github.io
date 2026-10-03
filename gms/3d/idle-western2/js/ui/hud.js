@@ -1,5 +1,5 @@
-import { el, btn, setText, show } from './dom.js?v=20261004a';
-import { fmtCash, fmtRate, fmtNum } from '../state/format.js?v=20261004a';
+import { el, btn, setText, show } from './dom.js?v=20261004b';
+import { fmtCash, fmtRate, fmtNum } from '../state/format.js?v=20261004b';
 
 export function createHud({ onSettings, onTeeth }) {
   const root = el('header', 'hud');

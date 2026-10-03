@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { HALO_VERT, HALO_FRAG } from '../eventart.js?v=20261004a';
+import { HALO_VERT, HALO_FRAG } from '../eventart.js?v=20261004b';
 
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3();
 

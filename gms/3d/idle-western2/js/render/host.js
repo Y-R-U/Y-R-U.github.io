@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { createBlitPresenter } from './presenter-blit.js?v=20261004a';
-import { createOverlayPresenter } from './presenter-overlay.js?v=20261004a';
-import { TIERS, LADDER, LADDER_START, startTier, qualityAt, createGovernor, device } from './quality.js?v=20261004a';
-import { createPost, POST_DEFAULTS } from './post.js?v=20261004a';
+import { createBlitPresenter } from './presenter-blit.js?v=20261004b';
+import { createOverlayPresenter } from './presenter-overlay.js?v=20261004b';
+import { TIERS, LADDER, LADDER_START, startTier, qualityAt, createGovernor, device } from './quality.js?v=20261004b';
+import { createPost, POST_DEFAULTS } from './post.js?v=20261004b';
 
 const LIVE_CAP = 10, LOSS_WAIT = 1000, MAX_RECREATE = 3, FRAME_BUDGET = 5;
 const _v3 = new THREE.Vector3(), _ndc = new THREE.Vector2(), _ray = new THREE.Raycaster(), _c = new THREE.Vector3(),

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { HERO_VIEW } from '../data/plots.js?v=20261004a';
+import { HERO_VIEW } from '../data/plots.js?v=20261004b';
 
 const D2R = Math.PI / 180;
 const _v = new THREE.Vector3(), _d = new THREE.Vector3(), _a = new THREE.Vector3(), _b = new THREE.Vector3();

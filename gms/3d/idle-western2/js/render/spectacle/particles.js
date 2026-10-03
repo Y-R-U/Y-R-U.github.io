@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { white } from '../fx.js?v=20261004a';
+import { white } from '../fx.js?v=20261004b';
 
 // Budgeted particles: soft clay dust/smoke/splash spheres (lit) and glowing cartoon stars/flashes/shards.
 // Two instanced draws. `budget()` returns how many may still spawn (W10: ≤ 256 in the hero, fx.js juice included).

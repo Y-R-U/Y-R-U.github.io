@@ -1,7 +1,7 @@
-import { el, btn, setText } from './dom.js?v=20261004a';
-import { fmtNum, fmtCash, fmtMult } from '../state/format.js?v=20261004a';
-import { section, empty } from './kit.js?v=20261004a';
-import { composePoster, savePoster } from './poster.js?v=20261004a';
+import { el, btn, setText } from './dom.js?v=20261004b';
+import { fmtNum, fmtCash, fmtMult } from '../state/format.js?v=20261004b';
+import { section, empty } from './kit.js?v=20261004b';
+import { composePoster, savePoster } from './poster.js?v=20261004b';
 
 // Boot Hill: Fake Your Death (W2) — the Bounty preview, the ceremony, every grave with its epitaph, and the
 // Wanted Poster PNG (W16).

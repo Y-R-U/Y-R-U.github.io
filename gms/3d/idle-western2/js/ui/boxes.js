@@ -1,4 +1,4 @@
-import { el, btn } from './dom.js?v=20261004a';
+import { el, btn } from './dom.js?v=20261004b';
 
 // Strongbox opening: the box rattles three times, the lid pops, the loot fans out by rarity. Tap to close.
 export const BOX_INFO = { basic: { e: '📦', n: 'Strongbox' }, silver: { e: '🧰', n: 'Silver strongbox' }, gold: { e: '💰', n: 'Gold strongbox' } };

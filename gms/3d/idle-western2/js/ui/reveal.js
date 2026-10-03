@@ -1,4 +1,4 @@
-import { el } from './dom.js?v=20261004a';
+import { el } from './dom.js?v=20261004b';
 
 export function createReveal({ game, onReveal }) {
   const seen = new Set();

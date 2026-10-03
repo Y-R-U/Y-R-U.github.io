@@ -1,6 +1,6 @@
-import { PLOTS, STREET } from '../data/plots.js?v=20261004a';
+import { PLOTS, STREET } from '../data/plots.js?v=20261004b';
 
-import { LINES } from '../data/lines.js?v=20261004a';
+import { LINES } from '../data/lines.js?v=20261004b';
 
 // Each business row picks its actor kind (data/lines.js `actor`).
 export const KIND_BY_LINE = Object.fromEntries(LINES.map((l) => [l.id, l.actor || 'walker']));

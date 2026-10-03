@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import * as S from './shape.js?v=20261004a';
-import { hatGeometry } from './crowd.js?v=20261004a';
+import * as S from './shape.js?v=20261004b';
+import { hatGeometry } from './crowd.js?v=20261004b';
 
 // Cartoon bedsheet ghosts in cowboy hats (Ghost Town, DESIGN W12). One InstancedMesh, one transparent draw,
 // ~1.6 k vertices each; the hem flutters and the body bobs in the vertex shader. Origin = the ground under it.

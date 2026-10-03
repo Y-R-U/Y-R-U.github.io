@@ -1,4 +1,4 @@
-import { el, btn } from './dom.js?v=20261004a';
+import { el, btn } from './dom.js?v=20261004b';
 
 // Letterboxed cutscene captions over the hero (acquisitions, Deeds, Fake Your Death). One sequence at a time;
 // later ones queue. Lines are [text, ms]; a tap advances when the sequence is skippable.
