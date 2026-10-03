@@ -9,10 +9,10 @@ S = json.load(open(os.path.join(H, 'script.json')))
 VJ = os.path.join(H, 'voices.json')
 LOG = os.path.join(H, 'vo_log.json')
 OUT = os.path.join(ROOT, 'audio/vo')
-F0 = {'mabel': (130, 215), 'pickles': (95, 190), 'pomfrey': (80, 145), 'wendell': (115, 230), 'mortimer': (75, 140),
-      'lulu': (150, 260), 'pete': (115, 230), 'nubbin': (210, 380), 'hortense': (140, 240), 'thrupp': (95, 200),
-      'bart': (85, 190), 'fingers': (80, 150), 'mulligan': (80, 150), 'stranger': (65, 125)}
-SEEDS = [11, 23, 37]
+F0 = {'mabel': (150, 200), 'pickles': (105, 175), 'pomfrey': (80, 140), 'wendell': (125, 220), 'mortimer': (75, 135),
+      'lulu': (160, 240), 'pete': (120, 210), 'nubbin': (220, 380), 'hortense': (155, 230), 'thrupp': (100, 185),
+      'bart': (90, 170), 'fingers': (80, 145), 'mulligan': (80, 145), 'stranger': (65, 120)}
+SEEDS = [11, 23, 37, 51]
 
 
 def jload(p, d):
@@ -57,7 +57,7 @@ def design(chars):
             hyp = asr(wav); w = wer(c['audition'], hyp)
             f0, spread = f0_stats(load_pcm(wav))
             d = dur(wav)
-            pen = 0 if lo <= f0 <= hi else min(abs(f0 - lo), abs(f0 - hi)) / 25
+            pen = 0 if lo <= f0 <= hi else min(abs(f0 - lo), abs(f0 - hi)) / 8
             score = w * 4 + pen - min(spread, 4) * 0.1 + (0 if 3 <= d <= 30 else 9)
             cands.append(dict(seed=seed, job=jid, wav=wav, wer=round(w, 3), asr=hyp, f0=round(f0), spread=round(spread, 2), dur=round(d, 2), score=round(score, 3), settings=st))
             print(k, seed, f'wer={w:.2f} f0={f0:.0f} [{lo}-{hi}] spread={spread:.1f} dur={d:.1f} score={score:.2f} | {hyp}', flush=True)
@@ -77,7 +77,7 @@ def post(wav, mp3):
        '-ac', '1', '-ar', '24000', tmp)
     li = loudness(tmp)
     gain = -16 - li if li > -60 else 0
-    sh('ffmpeg', '-y', '-loglevel', 'error', '-i', tmp, '-af', f'volume={gain:.2f}dB,alimiter=limit=0.89:attack=1:release=30:level=false,afade=t=out:st=0:d=0.001',
+    sh('ffmpeg', '-y', '-loglevel', 'error', '-i', tmp, '-af', f'volume={gain:.2f}dB,alimiter=limit=0.89:attack=1:release=30:level=false',
        '-ac', '1', '-ar', '24000', '-b:a', '48k', mp3)
     os.remove(tmp)
     return dur(mp3)
@@ -98,10 +98,18 @@ def render(chars):
             takes = []
             nw = len(norm_words(text))
             for n, seed in enumerate([1, 2, 3, 4]):
-                if n >= 2 and takes and min(t['score'] for t in takes) < (0.6 if wordless else 0.35): break
+                if n >= 2 and takes and min(t['score'] for t in takes) < (0.6 if wordless else 0.85): break
                 if wordless and n >= 3: break
                 wav = f'{SCR}/takes/{k}/{iid}_s{seed}.wav'
-                jid = tts(dict(st, seed=seed), text, wav)
+                jl = wav + '.json'
+                if os.path.exists(wav) and os.path.exists(jl) and json.load(open(jl)).get('text') == text and json.load(open(jl)).get('voice') == V[k]['voice']['id']:
+                    jid = json.load(open(jl))['job']
+                else:
+                    try:
+                        jid = tts(dict(st, seed=seed), text, wav)
+                    except RuntimeError as e:
+                        print(iid, 'take failed', seed, e, flush=True); continue
+                    json.dump(dict(job=jid, text=text, voice=V[k]['voice']['id']), open(jl, 'w'))
                 tm = f'{SCR}/takes/{k}/{iid}_s{seed}.mp3'
                 d = post(wav, tm)
                 hyp = asr(tm); w = wer(text, hyp)
@@ -111,6 +119,8 @@ def render(chars):
                 else:
                     score = 4 * w + max(0, d - 3.8) * 1.5 + max(0, d - 5) * 3
                 takes.append(dict(seed=seed, job=jid, dur=round(d, 2), asr=hyp, wer=round(w, 3), score=round(score, 3), file=tm))
+            if not takes:
+                print(iid, 'NO TAKES', flush=True); continue
             best = min(takes, key=lambda t: t['score'])
             shutil.copy(best['file'], mp3)
             L[iid] = dict(char=k, text=text, voice=V[k]['voice']['id'], wordless=wordless, pick=best['seed'], dur=best['dur'],
@@ -120,6 +130,25 @@ def render(chars):
         print(k, 'DONE', flush=True)
 
 
+def fit(chars, cap=3.9):
+    """Pitch-preserving atempo on sentence barks longer than cap (max 1.25x), from the picked take."""
+    L = jload(LOG, {})
+    for k in chars:
+        for l in S['chars'][k]['lines']:
+            g = L.get(l['id']); mp3 = f"{OUT}/{k}/{l['id']}.mp3"
+            if not g: continue
+            src = f"{SCR}/takes/{k}/{l['id']}_s{g['pick']}.mp3"
+            d = dur(src) if os.path.exists(src) else dur(mp3)
+            if d <= cap: continue
+            r = min(1.25, d / (cap - 0.05))
+            sh('ffmpeg', '-y', '-loglevel', 'error', '-i', src if os.path.exists(src) else mp3, '-af', f'atempo={r:.3f}',
+               '-ac', '1', '-ar', '24000', '-b:a', '48k', mp3 + '.tmp.mp3')
+            os.replace(mp3 + '.tmp.mp3', mp3)
+            g['tempo'] = round(r, 3); g['dur'] = round(dur(mp3), 2)
+            print(l['id'], d, '->', g['dur'], f'x{r:.2f}', flush=True)
+    json.dump(L, open(LOG, 'w'), indent=1, ensure_ascii=False)
+
+
 if __name__ == '__main__':
     cmd, chars = sys.argv[1], sys.argv[2:] or list(S['chars'])
-    {'design': design, 'render': render}[cmd](chars)
+    {'design': design, 'render': render, 'fit': fit}[cmd](chars)

@@ -1,0 +1,5766 @@
+{
+ "mabel_01": {
+  "char": "mabel",
+  "text": "And STAY out!",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.0,
+  "wer": 0.0,
+  "asr": "and stay out.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.0,
+    "wer": 0.0,
+    "asr": "and stay out.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.07,
+    "wer": 0.0,
+    "asr": "and stay out.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_02": {
+  "char": "mabel",
+  "text": "Out! And take yer teeth with ya!",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.14,
+  "wer": 0.143,
+  "asr": "out and take your teeth with ya.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.14,
+    "wer": 0.143,
+    "asr": "out and take your teeth with ya.",
+    "score": 0.571
+   },
+   {
+    "seed": 2,
+    "dur": 2.31,
+    "wer": 0.143,
+    "asr": "out and take your teeth with ya.",
+    "score": 0.571
+   },
+   {
+    "seed": 3,
+    "dur": 1.95,
+    "wer": 0.143,
+    "asr": "out and take your teeth with ya.",
+    "score": 0.571
+   },
+   {
+    "seed": 4,
+    "dur": 2.24,
+    "wer": 0.143,
+    "asr": "out, and take your teeth with ya.",
+    "score": 0.571
+   }
+  ]
+ },
+ "mabel_03": {
+  "char": "mabel",
+  "text": "I don't break up fights. I finish 'em.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 4,
+  "dur": 2.84,
+  "wer": 0.0,
+  "asr": "I don't break up fights. I finish em.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.61,
+    "wer": 0.125,
+    "asr": "I don't break up fights. I finish them.",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 2.62,
+    "wer": 0.125,
+    "asr": "I don't break up fights. I finish them.",
+    "score": 0.5
+   },
+   {
+    "seed": 3,
+    "dur": 2.78,
+    "wer": 0.125,
+    "asr": "I don't break up fights. I finish him.",
+    "score": 0.5
+   },
+   {
+    "seed": 4,
+    "dur": 2.84,
+    "wer": 0.0,
+    "asr": "I don't break up fights. I finish em.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_04": {
+  "char": "mabel",
+  "text": "Whiskey's a dollar. Water's two. It's rarer.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 4,
+  "dur": 3.27,
+  "wer": 0.143,
+  "asr": "Whisky's a dollar, water's two, it's rarer.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.08,
+    "wer": 0.143,
+    "asr": "Whisky's a dollar. Water's two. It's rarer.",
+    "score": 0.997
+   },
+   {
+    "seed": 2,
+    "dur": 4.33,
+    "wer": 0.143,
+    "asr": "Whisky's a dollar, water's two, it's rarer.",
+    "score": 1.362
+   },
+   {
+    "seed": 3,
+    "dur": 4.05,
+    "wer": 0.143,
+    "asr": "Whisky's a dollar. Water's two. It's rarer.",
+    "score": 0.941
+   },
+   {
+    "seed": 4,
+    "dur": 3.27,
+    "wer": 0.143,
+    "asr": "Whisky's a dollar, water's two, it's rarer.",
+    "score": 0.571
+   }
+  ]
+ },
+ "mabel_05": {
+  "char": "mabel",
+  "text": "You spill it, you lick it.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.7,
+  "wer": 0.0,
+  "asr": "You spill it, you lick it.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.7,
+    "wer": 0.0,
+    "asr": "You spill it, you lick it.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.8,
+    "wer": 0.0,
+    "asr": "You spill it. You lick it.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_06": {
+  "char": "mabel",
+  "text": "Who threw that? ...Nice arm.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.08,
+  "wer": 0.0,
+  "asr": "Who threw that? Nice arm.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.08,
+    "wer": 0.0,
+    "asr": "Who threw that? Nice arm.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.37,
+    "wer": 0.0,
+    "asr": "Who threw that? Nice arm.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_07": {
+  "char": "mabel",
+  "text": "House beer. Locally sourced, sugar. Don't ask where.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 3,
+  "dur": 3.02,
+  "wer": 0.0,
+  "asr": "House beer, locally sourced sugar, don't ask where.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.2,
+    "wer": 0.0,
+    "asr": "House beer, locally sourced, sugar, don't ask where.",
+    "score": 0.596
+   },
+   {
+    "seed": 2,
+    "dur": 4.11,
+    "wer": 0.0,
+    "asr": "House beer, locally sourced, sugar, don't ask where.",
+    "score": 0.461
+   },
+   {
+    "seed": 3,
+    "dur": 3.02,
+    "wer": 0.0,
+    "asr": "House beer, locally sourced sugar, don't ask where.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_08": {
+  "char": "mabel",
+  "text": "Trough's that way. So's your dignity.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.29,
+  "wer": 0.167,
+  "asr": "Trust that way, so's your dignity.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.29,
+    "wer": 0.167,
+    "asr": "Trust that way, so's your dignity.",
+    "score": 0.667
+   },
+   {
+    "seed": 2,
+    "dur": 2.43,
+    "wer": 0.167,
+    "asr": "Trose that way. So's your dignity.",
+    "score": 0.667
+   },
+   {
+    "seed": 3,
+    "dur": 1.99,
+    "wer": 0.167,
+    "asr": "Trust that way so's your dignity.",
+    "score": 0.667
+   },
+   {
+    "seed": 4,
+    "dur": 2.82,
+    "wer": 0.167,
+    "asr": "Troffs that way. So's your dignity.",
+    "score": 0.667
+   }
+  ]
+ },
+ "mabel_09": {
+  "char": "mabel",
+  "text": "Pete! You got a walk-in!",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.77,
+  "wer": 0.333,
+  "asr": "Pete, you gotta walk in.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.77,
+    "wer": 0.333,
+    "asr": "Pete, you gotta walk in.",
+    "score": 1.333
+   },
+   {
+    "seed": 2,
+    "dur": 1.71,
+    "wer": 0.333,
+    "asr": "Pete, you gotta walk in.",
+    "score": 1.333
+   },
+   {
+    "seed": 3,
+    "dur": 1.74,
+    "wer": 0.333,
+    "asr": "Pete, you gotta walk in.",
+    "score": 1.333
+   },
+   {
+    "seed": 4,
+    "dur": 2.24,
+    "wer": 0.333,
+    "asr": "Pete, you gotta walk in.",
+    "score": 1.333
+   }
+  ]
+ },
+ "mabel_10": {
+  "char": "mabel",
+  "text": "Sheriff, catch! ...He won't catch.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.91,
+  "wer": 0.0,
+  "asr": "Sheriff. Catch. He won't catch.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.91,
+    "wer": 0.0,
+    "asr": "Sheriff. Catch. He won't catch.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.21,
+    "wer": 0.0,
+    "asr": "Sheriff, catch. He won't catch.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_11": {
+  "char": "mabel",
+  "text": "Special delivery for his Lordship!",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.9,
+  "wer": 0.0,
+  "asr": "Special delivery for his lordship.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.9,
+    "wer": 0.0,
+    "asr": "Special delivery for his lordship.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.12,
+    "wer": 0.0,
+    "asr": "Special delivery for his lordship.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_12": {
+  "char": "mabel",
+  "text": "Them doors are on a spring. For the distance.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.45,
+  "wer": 0.0,
+  "asr": "Them doors are on a spring for the distance.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.45,
+    "wer": 0.0,
+    "asr": "Them doors are on a spring for the distance.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.1,
+    "wer": 0.0,
+    "asr": "Them doors are on a spring for the distance.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_13": {
+  "char": "mabel",
+  "text": "Last call was an hour ago. This is the throwin'-out call.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 2,
+  "dur": 3.84,
+  "wer": 0.0,
+  "asr": "Last call was an hour ago. This is the throwin' out call.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.01,
+    "wer": 0.0,
+    "asr": "Last call was an hour ago, this is the throwin' out call.",
+    "score": 0.319
+   },
+   {
+    "seed": 2,
+    "dur": 3.92,
+    "wer": 0.0,
+    "asr": "Last call was an hour ago. This is the throwin' out call.",
+    "score": 0.18
+   }
+  ],
+  "tempo": 1.018
+ },
+ "mabel_14": {
+  "char": "mabel",
+  "text": "Tab's closed. So's your face. Out!",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.36,
+  "wer": 0.167,
+  "asr": "Tabs closed, sews your face out.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.36,
+    "wer": 0.167,
+    "asr": "Tabs closed, sews your face out.",
+    "score": 0.667
+   },
+   {
+    "seed": 2,
+    "dur": 2.51,
+    "wer": 0.167,
+    "asr": "Tabs closed, sews your face out.",
+    "score": 0.667
+   },
+   {
+    "seed": 3,
+    "dur": 2.6,
+    "wer": 0.167,
+    "asr": "Tabs closed. Sows your face out.",
+    "score": 0.667
+   },
+   {
+    "seed": 4,
+    "dur": 2.43,
+    "wer": 0.167,
+    "asr": "Tabs closed, sews your face out.",
+    "score": 0.667
+   }
+  ]
+ },
+ "mabel_15": {
+  "char": "mabel",
+  "text": "Hell of a throw, partner.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.51,
+  "wer": 0.0,
+  "asr": "Hell of a throw, partner.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.51,
+    "wer": 0.0,
+    "asr": "Hell of a throw, partner.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.3,
+    "wer": 0.0,
+    "asr": "Hell of a throw, partner.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_16": {
+  "char": "mabel",
+  "text": "Nobody leaves my bar on their feet.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.43,
+  "wer": 0.0,
+  "asr": "Nobody leaves my bar on their feet.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.43,
+    "wer": 0.0,
+    "asr": "Nobody leaves my bar on their feet.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.19,
+    "wer": 0.0,
+    "asr": "nobody leaves my bar on their feet.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_17": {
+  "char": "mabel",
+  "text": "Chairs cost extra! Throw the cheap ones!",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.11,
+  "wer": 0.0,
+  "asr": "Chairs cost extra. Throw the cheap ones.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.11,
+    "wer": 0.0,
+    "asr": "Chairs cost extra. Throw the cheap ones.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.0,
+    "wer": 0.0,
+    "asr": "Chairs cost extra. Throw the cheap ones.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_18": {
+  "char": "mabel",
+  "text": "Best rotgut in the territory. Also the only.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.81,
+  "wer": 0.0,
+  "asr": "best rotgut in the territory. Also the only-",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.81,
+    "wer": 0.0,
+    "asr": "best rotgut in the territory. Also the only-",
+    "score": 0.021
+   },
+   {
+    "seed": 2,
+    "dur": 2.99,
+    "wer": 0.25,
+    "asr": "best rot-gut in the territory also the only",
+    "score": 1.0
+   }
+  ]
+ },
+ "mabel_19": {
+  "char": "mabel",
+  "text": "Five aces? ...I like you. Don't do it again.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.89,
+  "wer": 0.0,
+  "asr": "Five aces? I like you. Don't do it again.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.89,
+    "wer": 0.0,
+    "asr": "Five aces? I like you. Don't do it again.",
+    "score": 0.135
+   },
+   {
+    "seed": 2,
+    "dur": 4.1,
+    "wer": 0.0,
+    "asr": "Five aces? I like you. Don't do it again.",
+    "score": 0.445
+   }
+  ]
+ },
+ "mabel_20": {
+  "char": "mabel",
+  "text": "Nice hat. Shame about what's under it.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.46,
+  "wer": 0.0,
+  "asr": "Nice hat, shame about what's under it.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.46,
+    "wer": 0.0,
+    "asr": "Nice hat, shame about what's under it.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.52,
+    "wer": 0.0,
+    "asr": "Nice hat, shame about what's under it.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_21": {
+  "char": "mabel",
+  "text": "Play faster, Fingers, or you're next out the door!",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.95,
+  "wer": 0.0,
+  "asr": "Play faster fingers or you're next out the door.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.95,
+    "wer": 0.0,
+    "asr": "Play faster fingers or you're next out the door.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.22,
+    "wer": 0.0,
+    "asr": "play faster, fingers, or you're next out the door.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_22": {
+  "char": "mabel",
+  "text": "Kiss my spittoon.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.29,
+  "wer": 0.0,
+  "asr": "Kiss my spittoon.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.29,
+    "wer": 0.0,
+    "asr": "Kiss my spittoon.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.3,
+    "wer": 0.0,
+    "asr": "Kiss my spittoon.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_w1": {
+  "char": "mabel",
+  "text": "HUP!",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": true,
+  "pick": 2,
+  "dur": 0.44,
+  "wer": 0.0,
+  "asr": "Hup!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.44,
+    "wer": 1.0,
+    "asr": "HOP!",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 0.44,
+    "wer": 0.0,
+    "asr": "Hup!",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_w2": {
+  "char": "mabel",
+  "text": "Hrrnngh... HUP!",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": true,
+  "pick": 1,
+  "dur": 1.8,
+  "wer": 0.5,
+  "asr": "Herng. Hup.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.8,
+    "wer": 0.5,
+    "asr": "Herng. Hup.",
+    "score": 0.25
+   },
+   {
+    "seed": 2,
+    "dur": 1.42,
+    "wer": 1.0,
+    "asr": "HUH! HUH!",
+    "score": 0.5
+   }
+  ]
+ },
+ "mabel_w3": {
+  "char": "mabel",
+  "text": "Ha! Ha ha ha!",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": true,
+  "pick": 1,
+  "dur": 1.61,
+  "wer": 0.0,
+  "asr": "Ha ha ha ha",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.61,
+    "wer": 0.0,
+    "asr": "Ha ha ha ha",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.5,
+    "wer": 0.0,
+    "asr": "Ha ha ha ha!",
+    "score": 0.0
+   }
+  ]
+ },
+ "mabel_w4": {
+  "char": "mabel",
+  "text": "Hmph.",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.29,
+  "wer": 0.0,
+  "asr": "Hmph.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.29,
+    "wer": 0.0,
+    "asr": "Hmph.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.28,
+    "wer": 1.0,
+    "asr": "Hm.",
+    "score": 0.5
+   }
+  ]
+ },
+ "mabel_w5": {
+  "char": "mabel",
+  "text": "Oi!",
+  "voice": "30a0b319e63a4eb3b9cd36c3456465cc",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.54,
+  "wer": 0.0,
+  "asr": "Oi!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.54,
+    "wer": 0.0,
+    "asr": "Oi!",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.56,
+    "wer": 0.0,
+    "asr": "Oi!",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_01": {
+  "char": "pickles",
+  "text": "I ain't drunk. The street's movin'.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.91,
+  "wer": 0.167,
+  "asr": "I ain't drunk, the streets moving.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.91,
+    "wer": 0.167,
+    "asr": "I ain't drunk, the streets moving.",
+    "score": 0.667
+   },
+   {
+    "seed": 2,
+    "dur": 1.52,
+    "wer": 0.167,
+    "asr": "I ain't drunk, the street's moving.",
+    "score": 0.667
+   },
+   {
+    "seed": 3,
+    "dur": 1.77,
+    "wer": 0.167,
+    "asr": "I ain't drunk, the street's moving.",
+    "score": 0.667
+   },
+   {
+    "seed": 4,
+    "dur": 1.83,
+    "wer": 0.167,
+    "asr": "I ain't drunk, the streets moving.",
+    "score": 0.667
+   }
+  ]
+ },
+ "pickles_02": {
+  "char": "pickles",
+  "text": "Who moved the ground? ...Put it back.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.38,
+  "wer": 0.0,
+  "asr": "Who moved the ground? Put it back.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.38,
+    "wer": 0.0,
+    "asr": "Who moved the ground? Put it back.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.43,
+    "wer": 0.0,
+    "asr": "Who moved the ground? Put it back.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_03": {
+  "char": "pickles",
+  "text": "I'll have whatever I just had.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.26,
+  "wer": 0.0,
+  "asr": "I'll have whatever I just had.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.26,
+    "wer": 0.0,
+    "asr": "I'll have whatever I just had.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.28,
+    "wer": 0.0,
+    "asr": "I'll have whatever I just had.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_04": {
+  "char": "pickles",
+  "text": "Hey! This trough's taken.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.4,
+  "wer": 0.0,
+  "asr": "Hey, this trough's taken.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.4,
+    "wer": 0.0,
+    "asr": "Hey, this trough's taken.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.15,
+    "wer": 0.0,
+    "asr": "Hey, this trough's taken!",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_05": {
+  "char": "pickles",
+  "text": "That's my hat! ...That's a chicken.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.37,
+  "wer": 0.0,
+  "asr": "That's my hat, that's a chicken.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.37,
+    "wer": 0.0,
+    "asr": "That's my hat, that's a chicken.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.54,
+    "wer": 0.0,
+    "asr": "That's my hat. That's a chicken.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_06": {
+  "char": "pickles",
+  "text": "He owed me a dollar. Beautiful man.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.04,
+  "wer": 0.0,
+  "asr": "He owed me a dollar. Beautiful man.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.04,
+    "wer": 0.0,
+    "asr": "He owed me a dollar. Beautiful man.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.24,
+    "wer": 0.0,
+    "asr": "He owed me a dollar, beautiful man.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_07": {
+  "char": "pickles",
+  "text": "Bath? Had one in sixty-one. Didn't take.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.2,
+  "wer": 0.25,
+  "asr": "Bath had one in 61, didn't take",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.2,
+    "wer": 0.25,
+    "asr": "Bath had one in 61, didn't take",
+    "score": 1.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.11,
+    "wer": 0.375,
+    "asr": "Bath had 1 in 61, didn't take",
+    "score": 1.5
+   },
+   {
+    "seed": 3,
+    "dur": 2.29,
+    "wer": 0.375,
+    "asr": "Bath had 1 in 61 didn't take.",
+    "score": 1.5
+   },
+   {
+    "seed": 4,
+    "dur": 2.72,
+    "wer": 0.375,
+    "asr": "Bath had 1 in 61. Didn't take.",
+    "score": 1.5
+   }
+  ]
+ },
+ "pickles_08": {
+  "char": "pickles",
+  "text": "Water's changed Tuesdays. I'm changed never.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 2,
+  "dur": 2.93,
+  "wer": 0.0,
+  "asr": "Water's changed Tuesdays. I'm changed never.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.75,
+    "wer": 0.167,
+    "asr": "Waters change Tuesdays, I'm changed never.",
+    "score": 0.667
+   },
+   {
+    "seed": 2,
+    "dur": 2.93,
+    "wer": 0.0,
+    "asr": "Water's changed Tuesdays. I'm changed never.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_09": {
+  "char": "pickles",
+  "text": "Who put a roof under me?",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.09,
+  "wer": 0.0,
+  "asr": "who put a roof under me.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.09,
+    "wer": 0.0,
+    "asr": "who put a roof under me.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.06,
+    "wer": 0.0,
+    "asr": "Who put a roof under me?",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_10": {
+  "char": "pickles",
+  "text": "Comfy coffin. Bit drafty on top.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.59,
+  "wer": 0.0,
+  "asr": "Comfy coffin, bit drafty on top.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.59,
+    "wer": 0.0,
+    "asr": "Comfy coffin, bit drafty on top.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.7,
+    "wer": 0.0,
+    "asr": "Comfy coffin, bit drafty on top.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_11": {
+  "char": "pickles",
+  "text": "Bank vault's lovely this time o' year.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.04,
+  "wer": 0.143,
+  "asr": "Bank Vault's lovely this time of year.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.04,
+    "wer": 0.143,
+    "asr": "Bank Vault's lovely this time of year.",
+    "score": 0.571
+   },
+   {
+    "seed": 2,
+    "dur": 1.94,
+    "wer": 0.429,
+    "asr": "BankVault's lovely this time of year.",
+    "score": 1.714
+   },
+   {
+    "seed": 3,
+    "dur": 2.05,
+    "wer": 0.143,
+    "asr": "Bank Vault's lovely this time of year.",
+    "score": 0.571
+   },
+   {
+    "seed": 4,
+    "dur": 2.07,
+    "wer": 0.429,
+    "asr": "Bankvault's lovely this time of year.",
+    "score": 1.714
+   }
+  ]
+ },
+ "pickles_12": {
+  "char": "pickles",
+  "text": "Jail's the only place that'll keep me.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.73,
+  "wer": 0.0,
+  "asr": "Jail's the only place that'll keep me.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.73,
+    "wer": 0.0,
+    "asr": "Jail's the only place that'll keep me.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.63,
+    "wer": 0.0,
+    "asr": "Jail's the only place that'll keep me.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_13": {
+  "char": "pickles",
+  "text": "My money's on the one that falls down.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.83,
+  "wer": 0.0,
+  "asr": "My money's on the one that falls down.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.83,
+    "wer": 0.0,
+    "asr": "My money's on the one that falls down.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.94,
+    "wer": 0.0,
+    "asr": "My money's on the one that falls down.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_14": {
+  "char": "pickles",
+  "text": "Shoot him in the hat! It's bigger!",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 3,
+  "dur": 1.61,
+  "wer": 0.0,
+  "asr": "Shoot him in the hat, it's bigger.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.6,
+    "wer": 0.143,
+    "asr": "Shoot him in the head, it's bigger.",
+    "score": 0.571
+   },
+   {
+    "seed": 2,
+    "dur": 1.33,
+    "wer": 0.143,
+    "asr": "Shoot them in the hat, it's bigger.",
+    "score": 0.571
+   },
+   {
+    "seed": 3,
+    "dur": 1.61,
+    "wer": 0.0,
+    "asr": "Shoot him in the hat, it's bigger.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_15": {
+  "char": "pickles",
+  "text": "Lovely house. Can I sleep in it?",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.07,
+  "wer": 0.0,
+  "asr": "Lovely house, can I sleep in it?",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.07,
+    "wer": 0.0,
+    "asr": "Lovely house, can I sleep in it?",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.86,
+    "wer": 0.0,
+    "asr": "Lovely house, can I sleep in it?",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_16": {
+  "char": "pickles",
+  "text": "Your hat's got a hat now.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.28,
+  "wer": 0.0,
+  "asr": "Your hat's got a hat now.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.28,
+    "wer": 0.0,
+    "asr": "Your hat's got a hat now.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.43,
+    "wer": 0.0,
+    "asr": "Your hat's got a hat now.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_17": {
+  "char": "pickles",
+  "text": "Robbery! ...Which way do I run?",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.82,
+  "wer": 0.0,
+  "asr": "Robbery. Which way do I run?",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.82,
+    "wer": 0.0,
+    "asr": "Robbery. Which way do I run?",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.79,
+    "wer": 0.0,
+    "asr": "Robbery. Which way do I run?",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_18": {
+  "char": "pickles",
+  "text": "I ain't lost. Everything else is.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.57,
+  "wer": 0.333,
+  "asr": "I ain't lost everything else's.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.57,
+    "wer": 0.333,
+    "asr": "I ain't lost everything else's.",
+    "score": 1.333
+   },
+   {
+    "seed": 2,
+    "dur": 1.59,
+    "wer": 0.333,
+    "asr": "I ain't lost everything else's",
+    "score": 1.333
+   },
+   {
+    "seed": 3,
+    "dur": 2.02,
+    "wer": 0.333,
+    "asr": "I ain't lost everything else's.",
+    "score": 1.333
+   },
+   {
+    "seed": 4,
+    "dur": 1.31,
+    "wer": 0.333,
+    "asr": "I ain't lost everything else's-",
+    "score": 1.333
+   }
+  ]
+ },
+ "pickles_19": {
+  "char": "pickles",
+  "text": "Is it mornin'? Is this Thursday? Is this my leg?",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.23,
+  "wer": 0.1,
+  "asr": "Is it morning? Is this Thursday? Is this my leg?",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.23,
+    "wer": 0.1,
+    "asr": "Is it morning? Is this Thursday? Is this my leg?",
+    "score": 0.4
+   },
+   {
+    "seed": 2,
+    "dur": 2.96,
+    "wer": 0.1,
+    "asr": "Is it morning? Is this Thursday? Is this my leg?",
+    "score": 0.4
+   },
+   {
+    "seed": 3,
+    "dur": 2.45,
+    "wer": 0.1,
+    "asr": "Is it morning? Is this Thursday? Is this my leg?",
+    "score": 0.4
+   },
+   {
+    "seed": 4,
+    "dur": 2.92,
+    "wer": 0.1,
+    "asr": "Is it morning? Is this Thursday? Is this my leg?",
+    "score": 0.4
+   }
+  ]
+ },
+ "pickles_20": {
+  "char": "pickles",
+  "text": "Mabel threw me so hard I landed yesterday.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.19,
+  "wer": 0.0,
+  "asr": "Mabel threw me so hard I landed yesterday.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.19,
+    "wer": 0.0,
+    "asr": "Mabel threw me so hard I landed yesterday.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.43,
+    "wer": 0.0,
+    "asr": "Mabel threw me so hard I landed yesterday.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_21": {
+  "char": "pickles",
+  "text": "I was sober once. Terrible. Everything was so... clear.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.36,
+  "wer": 0.0,
+  "asr": "I was sober once terrible. Everything was so clear.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.36,
+    "wer": 0.0,
+    "asr": "I was sober once terrible. Everything was so clear.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.85,
+    "wer": 0.0,
+    "asr": "I was sober once, terrible, everything was so clear.",
+    "score": 0.076
+   }
+  ]
+ },
+ "pickles_22": {
+  "char": "pickles",
+  "text": "I seen a ghost! ...Oh. Window.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 2,
+  "dur": 2.0,
+  "wer": 0.0,
+  "asr": "I seen a ghost, oh, window.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.0,
+    "wer": 0.167,
+    "asr": "I've seen a ghost. Oh, window.",
+    "score": 0.667
+   },
+   {
+    "seed": 2,
+    "dur": 2.0,
+    "wer": 0.0,
+    "asr": "I seen a ghost, oh, window.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_23": {
+  "char": "pickles",
+  "text": "Kiss my donkey. No, really. He's lonely.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.17,
+  "wer": 0.0,
+  "asr": "Kiss my donkey, no really, he's lonely.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.17,
+    "wer": 0.0,
+    "asr": "Kiss my donkey, no really, he's lonely.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.64,
+    "wer": 0.0,
+    "asr": "Kiss my donkey. No, really. He's lonely.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_w1": {
+  "char": "pickles",
+  "text": "Hic!",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.4,
+  "wer": 0.0,
+  "asr": "HIC",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.4,
+    "wer": 0.0,
+    "asr": "HIC",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.36,
+    "wer": 0.0,
+    "asr": "Hic.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_w2": {
+  "char": "pickles",
+  "text": "Hic! ...Hic!",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.85,
+  "wer": 0.0,
+  "asr": "Hic, hic.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.85,
+    "wer": 0.0,
+    "asr": "Hic, hic.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.99,
+    "wer": 0.0,
+    "asr": "Hic hic",
+    "score": 0.0
+   }
+  ]
+ },
+ "pickles_w3": {
+  "char": "pickles",
+  "text": "Hehehehe.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.43,
+  "wer": 1.0,
+  "asr": "Yeah.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.43,
+    "wer": 1.0,
+    "asr": "Yeah.",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 0.83,
+    "wer": 2.0,
+    "asr": "Ha ha!",
+    "score": 0.5
+   }
+  ]
+ },
+ "pickles_w4": {
+  "char": "pickles",
+  "text": "Whoaaa...",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.74,
+  "wer": 1.0,
+  "asr": "Whoa!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.74,
+    "wer": 1.0,
+    "asr": "Whoa!",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 3.56,
+    "wer": 5.0,
+    "asr": "Ooh, ooh, ooh, ooh, ooh!",
+    "score": 2.762
+   }
+  ]
+ },
+ "pickles_w5": {
+  "char": "pickles",
+  "text": "Mmmnnh... five more minutes.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": true,
+  "pick": 1,
+  "dur": 1.72,
+  "wer": 0.25,
+  "asr": "Mmm, five more minutes.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.72,
+    "wer": 0.25,
+    "asr": "Mmm, five more minutes.",
+    "score": 0.125
+   },
+   {
+    "seed": 2,
+    "dur": 2.34,
+    "wer": 0.25,
+    "asr": "Mmm, five more minutes.",
+    "score": 0.125
+   }
+  ]
+ },
+ "pickles_w6": {
+  "char": "pickles",
+  "text": "Yeeeehaw... hic.",
+  "voice": "c19cc4915f71446385d1ece0ff5041a0",
+  "wordless": true,
+  "pick": 1,
+  "dur": 1.53,
+  "wer": 1.0,
+  "asr": "Yeah, hick.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.53,
+    "wer": 1.0,
+    "asr": "Yeah, hick.",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 1.13,
+    "wer": 1.0,
+    "asr": "Yeehaw, hick.",
+    "score": 0.5
+   }
+  ]
+ },
+ "pomfrey_01": {
+  "char": "pomfrey",
+  "text": "Your hat, sir, is an embarrassment.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.21,
+  "wer": 0.0,
+  "asr": "Your hat, sir, is an embarrassment.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.21,
+    "wer": 0.0,
+    "asr": "Your hat, sir, is an embarrassment.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.07,
+    "wer": 0.0,
+    "asr": "Your hat, sir, is an embarrassment.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_02": {
+  "char": "pomfrey",
+  "text": "I own this street. And that dog.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.41,
+  "wer": 0.0,
+  "asr": "I own this street, and that dog...",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.41,
+    "wer": 0.0,
+    "asr": "I own this street, and that dog...",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.63,
+    "wer": 0.0,
+    "asr": "I own this street, and that dog—",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_03": {
+  "char": "pomfrey",
+  "text": "Charming shack. I'll buy it for kindling.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.01,
+  "wer": 0.0,
+  "asr": "Charming Shack. I'll buy it for kindling.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.01,
+    "wer": 0.0,
+    "asr": "Charming Shack. I'll buy it for kindling.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.87,
+    "wer": 0.0,
+    "asr": "Charming shack. I'll buy it for kindling.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_04": {
+  "char": "pomfrey",
+  "text": "Money talks, old boy. Mine sings opera.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.58,
+  "wer": 0.0,
+  "asr": "Money talks, old boy. Mine sings opera.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.58,
+    "wer": 0.0,
+    "asr": "Money talks, old boy. Mine sings opera.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.31,
+    "wer": 0.0,
+    "asr": "Money talks, old boy. Mine sings opera.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_05": {
+  "char": "pomfrey",
+  "text": "My hat stays on, sir. It's load-bearing.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.55,
+  "wer": 0.0,
+  "asr": "My hat stays on, sir. It's load-bearing.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.55,
+    "wer": 0.0,
+    "asr": "My hat stays on, sir. It's load-bearing.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.97,
+    "wer": 0.0,
+    "asr": "My hat stays on, sir. It's load-bearing.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_06": {
+  "char": "pomfrey",
+  "text": "Half the town? I have the better half.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.94,
+  "wer": 0.0,
+  "asr": "Half the town, I have the better half.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.94,
+    "wer": 0.0,
+    "asr": "Half the town, I have the better half.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.63,
+    "wer": 0.0,
+    "asr": "Half the town, I have the better half.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_07": {
+  "char": "pomfrey",
+  "text": "Father sent me West to build character. I bought one.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.5,
+  "wer": 0.0,
+  "asr": "Father sent me west to build character. I bought one.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.5,
+    "wer": 0.0,
+    "asr": "Father sent me west to build character. I bought one.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.86,
+    "wer": 0.0,
+    "asr": "Father sent me west to build character. I bought one.",
+    "score": 0.083
+   }
+  ]
+ },
+ "pomfrey_08": {
+  "char": "pomfrey",
+  "text": "Mud suits you. Brings out the eyes.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.29,
+  "wer": 0.0,
+  "asr": "Mud suits you, brings out the eyes.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.29,
+    "wer": 0.0,
+    "asr": "Mud suits you, brings out the eyes.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.84,
+    "wer": 0.0,
+    "asr": "mud suits you, brings out the eyes.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_09": {
+  "char": "pomfrey",
+  "text": "My window! That was imported glass!",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.92,
+  "wer": 0.0,
+  "asr": "My window. That was imported glass.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.92,
+    "wer": 0.0,
+    "asr": "My window. That was imported glass.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.51,
+    "wer": 0.0,
+    "asr": "My window, that was imported glass.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_10": {
+  "char": "pomfrey",
+  "text": "Is it me, or is my hat getting smaller?",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.59,
+  "wer": 0.0,
+  "asr": "Is it me, or is my hat getting smaller?",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.59,
+    "wer": 0.0,
+    "asr": "Is it me, or is my hat getting smaller?",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.42,
+    "wer": 0.0,
+    "asr": "Is it me or is my hat getting smaller?",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_11": {
+  "char": "pomfrey",
+  "text": "Cut the cards. Mine are marked, naturally.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.12,
+  "wer": 0.0,
+  "asr": "cut the cards. Mine are marked naturally.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.12,
+    "wer": 0.0,
+    "asr": "cut the cards. Mine are marked naturally.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.14,
+    "wer": 0.0,
+    "asr": "Cut the cards, mine are marked naturally.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_12": {
+  "char": "pomfrey",
+  "text": "Take it. I've plenty more... street.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.18,
+  "wer": 0.0,
+  "asr": "Take it, I've plenty more street.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.18,
+    "wer": 0.0,
+    "asr": "Take it, I've plenty more street.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.1,
+    "wer": 0.0,
+    "asr": "Take it. I've plenty more street.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_13": {
+  "char": "pomfrey",
+  "text": "Damn and blast. Fetch my other sign.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.82,
+  "wer": 0.0,
+  "asr": "Damn and blast! Fetch my other sign!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.82,
+    "wer": 0.0,
+    "asr": "Damn and blast! Fetch my other sign!",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.55,
+    "wer": 0.0,
+    "asr": "Damn and blast, fetch my other sign.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_14": {
+  "char": "pomfrey",
+  "text": "Ghastly town. I adore owning it.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 2,
+  "dur": 2.56,
+  "wer": 0.0,
+  "asr": "Ghastly Town, I adore owning it.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.81,
+    "wer": 0.333,
+    "asr": "Gastlytown, I adore owning it.",
+    "score": 1.333
+   },
+   {
+    "seed": 2,
+    "dur": 2.56,
+    "wer": 0.0,
+    "asr": "Ghastly Town, I adore owning it.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_15": {
+  "char": "pomfrey",
+  "text": "Do stand downwind, there's a good fellow.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.07,
+  "wer": 0.0,
+  "asr": "Do stand downwind. There's a good fellow.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.07,
+    "wer": 0.0,
+    "asr": "Do stand downwind. There's a good fellow.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.45,
+    "wer": 0.0,
+    "asr": "Do stand downwind, there's a good fellow.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_16": {
+  "char": "pomfrey",
+  "text": "Mother writes. She says I'm winning.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.66,
+  "wer": 0.0,
+  "asr": "Mother writes, she says I'm winning.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.66,
+    "wer": 0.0,
+    "asr": "Mother writes, she says I'm winning.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.6,
+    "wer": 0.0,
+    "asr": "Mother writes. She says I'm winning.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_17": {
+  "char": "pomfrey",
+  "text": "Another one? Have you no shame? Have you any to sell?",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 2,
+  "dur": 3.86,
+  "wer": 0.0,
+  "asr": "Another one? Have you no shame? Have you any to sell?",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.07,
+    "wer": 0.0,
+    "asr": "Another one, have you no shame? Have you any to sell?",
+    "score": 0.407
+   },
+   {
+    "seed": 2,
+    "dur": 3.86,
+    "wer": 0.0,
+    "asr": "Another one? Have you no shame? Have you any to sell?",
+    "score": 0.085
+   }
+  ]
+ },
+ "pomfrey_18": {
+  "char": "pomfrey",
+  "text": "Dead, is he? Splendid. ...Why is the coffin winking?",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.85,
+  "wer": 0.0,
+  "asr": "Dead, is he? Splendid! Why is the coffin winking?",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.01,
+    "wer": 0.0,
+    "asr": "Dead, is he? Splendid! Why is the coffin winking?",
+    "score": 0.32
+   },
+   {
+    "seed": 2,
+    "dur": 4.22,
+    "wer": 0.0,
+    "asr": "Dead, is he? Splendid! Why is the coffin winking?",
+    "score": 0.633
+   }
+  ],
+  "tempo": 1.042
+ },
+ "pomfrey_19": {
+  "char": "pomfrey",
+  "text": "Half the town. I shall tell Mother I kept the nice half.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.85,
+  "wer": 0.0,
+  "asr": "Half the town. I shall tell mother I kept the nice half.\"",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.97,
+    "wer": 0.0,
+    "asr": "Half the town. I shall tell mother I kept the nice half.\"",
+    "score": 0.255
+   },
+   {
+    "seed": 2,
+    "dur": 4.1,
+    "wer": 0.0,
+    "asr": "Half the town. I shall tell mother I kept the nice half.\"",
+    "score": 0.446
+   }
+  ],
+  "tempo": 1.031
+ },
+ "pomfrey_20": {
+  "char": "pomfrey",
+  "text": "A thimble. I am wearing a thimble.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 2,
+  "dur": 2.65,
+  "wer": 0.0,
+  "asr": "A thimble. I am wearing a thimble.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.67,
+    "wer": 0.286,
+    "asr": "a symbol. I am wearing a symbol.",
+    "score": 1.143
+   },
+   {
+    "seed": 2,
+    "dur": 2.65,
+    "wer": 0.0,
+    "asr": "A thimble. I am wearing a thimble.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_21": {
+  "char": "pomfrey",
+  "text": "Ah. The help has arrived. How quaint.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.21,
+  "wer": 0.0,
+  "asr": "Ah, the help has arrived. How quaint.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.21,
+    "wer": 0.0,
+    "asr": "Ah, the help has arrived. How quaint.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.09,
+    "wer": 0.0,
+    "asr": "Ah, the help has arrived, how quaint!",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_22": {
+  "char": "pomfrey",
+  "text": "Pick up the brim, Jenkins. It's dragging in the peasants.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.28,
+  "wer": 0.0,
+  "asr": "Pick up the brim, Jenkins, it's dragging in the peasants.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.28,
+    "wer": 0.0,
+    "asr": "Pick up the brim, Jenkins, it's dragging in the peasants.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.5,
+    "wer": 0.0,
+    "asr": "Pick up the Brim Jenkins. It's dragging in the peasants.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_w1": {
+  "char": "pomfrey",
+  "text": "Hmph!",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.29,
+  "wer": 1.0,
+  "asr": "Hm.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.29,
+    "wer": 1.0,
+    "asr": "Hm.",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 0.41,
+    "wer": 1.0,
+    "asr": "Hm.",
+    "score": 0.5
+   }
+  ]
+ },
+ "pomfrey_w2": {
+  "char": "pomfrey",
+  "text": "Harrumph.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.7,
+  "wer": 1.0,
+  "asr": "Hahrumpf.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.7,
+    "wer": 1.0,
+    "asr": "Hahrumpf.",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 0.59,
+    "wer": 1.0,
+    "asr": "Harrimph",
+    "score": 0.5
+   }
+  ]
+ },
+ "pomfrey_w3": {
+  "char": "pomfrey",
+  "text": "Ha-ha-ha-ha.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.88,
+  "wer": 0.25,
+  "asr": "Ha ha ha.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.88,
+    "wer": 0.25,
+    "asr": "Ha ha ha.",
+    "score": 0.125
+   },
+   {
+    "seed": 2,
+    "dur": 1.02,
+    "wer": 0.25,
+    "asr": "Ha ha ha.",
+    "score": 0.125
+   }
+  ]
+ },
+ "pomfrey_w4": {
+  "char": "pomfrey",
+  "text": "Good LORD!",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.81,
+  "wer": 0.0,
+  "asr": "Good lord.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.81,
+    "wer": 0.0,
+    "asr": "Good lord.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.19,
+    "wer": 0.0,
+    "asr": "Good lord.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pomfrey_w5": {
+  "char": "pomfrey",
+  "text": "Ugh. Peasants.",
+  "voice": "6392c5d385f54dac9c71294a5926060d",
+  "wordless": true,
+  "pick": 1,
+  "dur": 1.6,
+  "wer": 0.0,
+  "asr": "Ugh, peasants.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.6,
+    "wer": 0.0,
+    "asr": "Ugh, peasants.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.56,
+    "wer": 0.5,
+    "asr": "Oog. Peasants.",
+    "score": 0.25
+   }
+  ]
+ },
+ "wendell_01": {
+  "char": "wendell",
+  "text": "I'm deputisin' you. Bye!",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.17,
+  "wer": 0.25,
+  "asr": "I'm deputizing you. Bye.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.17,
+    "wer": 0.25,
+    "asr": "I'm deputizing you. Bye.",
+    "score": 1.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.84,
+    "wer": 0.5,
+    "asr": "I'm deputist in you, bye!",
+    "score": 2.0
+   },
+   {
+    "seed": 3,
+    "dur": 1.98,
+    "wer": 0.25,
+    "asr": "I'm deputizin' you. Bye!",
+    "score": 1.0
+   },
+   {
+    "seed": 4,
+    "dur": 1.95,
+    "wer": 0.25,
+    "asr": "I'm deputizing you, bye!",
+    "score": 1.0
+   }
+  ]
+ },
+ "wendell_02": {
+  "char": "wendell",
+  "text": "Nobody panic! ...Especially me.",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.22,
+  "wer": 0.0,
+  "asr": "Nobody panic, especially me.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.22,
+    "wer": 0.0,
+    "asr": "Nobody panic, especially me.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.89,
+    "wer": 0.0,
+    "asr": "Nobody panic, especially me.",
+    "score": 0.0
+   }
+  ]
+ },
+ "wendell_03": {
+  "char": "wendell",
+  "text": "I'm not hidin'. I'm surveillin'. From a barrel.",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.99,
+  "wer": 0.25,
+  "asr": "I'm not hiding! I'm surveilling from a barrel!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.99,
+    "wer": 0.25,
+    "asr": "I'm not hiding! I'm surveilling from a barrel!",
+    "score": 1.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.32,
+    "wer": 0.25,
+    "asr": "I'm not Haydn, I'm surveilling from a barrel.",
+    "score": 1.0
+   },
+   {
+    "seed": 3,
+    "dur": 3.48,
+    "wer": 0.25,
+    "asr": "I'm not hiding, I'm surveilling from a barrel.",
+    "score": 1.0
+   },
+   {
+    "seed": 4,
+    "dur": 2.52,
+    "wer": 0.25,
+    "asr": "I'm not Haydn, I'm surveilling from a barrel!",
+    "score": 1.0
+   }
+  ]
+ },
+ "wendell_04": {
+  "char": "wendell",
+  "text": "Halt! ...Or don't. I ain't fussy.",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.76,
+  "wer": 0.0,
+  "asr": "Halt, or don't? I ain't fussy.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.76,
+    "wer": 0.0,
+    "asr": "Halt, or don't? I ain't fussy.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.48,
+    "wer": 0.0,
+    "asr": "Halt or don't. I ain't fussy.",
+    "score": 0.0
+   }
+  ]
+ },
+ "wendell_05": {
+  "char": "wendell",
+  "text": "Is he gone? Tell me when he's gone.",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.02,
+  "wer": 0.0,
+  "asr": "Is he gone? Tell me when he's gone.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.02,
+    "wer": 0.0,
+    "asr": "Is he gone? Tell me when he's gone.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.1,
+    "wer": 0.0,
+    "asr": "Is he gone? Tell me when he's gone!",
+    "score": 0.0
+   }
+  ]
+ },
+ "wendell_06": {
+  "char": "wendell",
+  "text": "This badge stops bullets! ...Says so on the box.",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.46,
+  "wer": 0.0,
+  "asr": "This badge stops bullets, says so on the box.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.46,
+    "wer": 0.0,
+    "asr": "This badge stops bullets, says so on the box.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.04,
+    "wer": 0.0,
+    "asr": "This badge stops bullets, says so on the box.",
+    "score": 0.0
+   }
+  ]
+ },
+ "wendell_07": {
+  "char": "wendell",
+  "text": "Caught him! ...With my face.",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.83,
+  "wer": 0.0,
+  "asr": "Caught him, with my face.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.83,
+    "wer": 0.0,
+    "asr": "Caught him, with my face.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.77,
+    "wer": 0.0,
+    "asr": "Caught him, with my face.",
+    "score": 0.0
+   }
+  ]
+ },
+ "wendell_08": {
+  "char": "wendell",
+  "text": "Sold! Here's the badge. Don't let it get shot.",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.2,
+  "wer": 0.0,
+  "asr": "Sold! Here's the badge. Don't let it get shot!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.2,
+    "wer": 0.0,
+    "asr": "Sold! Here's the badge. Don't let it get shot!",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.96,
+    "wer": 0.0,
+    "asr": "Sold! Here's the badge. Don't let it get shot.",
+    "score": 0.0
+   }
+  ]
+ },
+ "wendell_09": {
+  "char": "wendell",
+  "text": "Crime's gotta make an appointment. I'm booked till Christmas.",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.61,
+  "wer": 0.0,
+  "asr": "Crime's gotta make an appointment. I'm booked till Christmas.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.61,
+    "wer": 0.0,
+    "asr": "Crime's gotta make an appointment. I'm booked till Christmas.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.21,
+    "wer": 0.0,
+    "asr": "Crime's gotta make an appointment? I'm booked till Christmas.",
+    "score": 0.0
+   }
+  ]
+ },
+ "wendell_10": {
+  "char": "wendell",
+  "text": "Every fella in them cells sings. None of 'em in tune.",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": false,
+  "pick": 3,
+  "dur": 3.07,
+  "wer": 0.091,
+  "asr": "Every fella in them cells sings, none of them in tune.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.4,
+    "wer": 0.273,
+    "asr": "Every fella in themselves sings, none of them in tune.",
+    "score": 1.091
+   },
+   {
+    "seed": 2,
+    "dur": 3.6,
+    "wer": 0.273,
+    "asr": "Every fella in themselves sings, none of them in tune.",
+    "score": 1.091
+   },
+   {
+    "seed": 3,
+    "dur": 3.07,
+    "wer": 0.091,
+    "asr": "Every fella in them cells sings, none of them in tune.",
+    "score": 0.364
+   }
+  ]
+ },
+ "wendell_w1": {
+  "char": "wendell",
+  "text": "Eep!",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": true,
+  "pick": 2,
+  "dur": 0.46,
+  "wer": 0.0,
+  "asr": "Eep.",
+  "takes": [
+   {
+    "seed": 2,
+    "dur": 0.46,
+    "wer": 0.0,
+    "asr": "Eep.",
+    "score": 0.0
+   }
+  ]
+ },
+ "wendell_w3": {
+  "char": "wendell",
+  "text": "Oh no no no no.",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.88,
+  "wer": 0.0,
+  "asr": "Oh, no, no, no, no.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.88,
+    "wer": 0.0,
+    "asr": "Oh, no, no, no, no.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.23,
+    "wer": 0.0,
+    "asr": "Oh no, no, no, no!",
+    "score": 0.0
+   }
+  ]
+ },
+ "wendell_w4": {
+  "char": "wendell",
+  "text": "Gulp.",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.47,
+  "wer": 0.0,
+  "asr": "Gulp.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.47,
+    "wer": 0.0,
+    "asr": "Gulp.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.47,
+    "wer": 0.0,
+    "asr": "Gulp.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mortimer_01": {
+  "char": "mortimer",
+  "text": "Ooh, a duel! Fetch my tape.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.76,
+  "wer": 0.0,
+  "asr": "Ooh, a duel. Fetch my tape.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.76,
+    "wer": 0.0,
+    "asr": "Ooh, a duel. Fetch my tape.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.65,
+    "wer": 0.0,
+    "asr": "Ooh, a duel. Fetch my tape.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mortimer_02": {
+  "char": "mortimer",
+  "text": "Stand still, sir. A lovely six-foot-two.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.28,
+  "wer": 0.0,
+  "asr": "Stand still, sir. A lovely six-foot-two.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.28,
+    "wer": 0.0,
+    "asr": "Stand still, sir. A lovely six-foot-two.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.07,
+    "wer": 0.0,
+    "asr": "Stand still, sir. A lovely six foot two.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mortimer_03": {
+  "char": "mortimer",
+  "text": "Business is dead. Wonderful!",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.5,
+  "wer": 0.0,
+  "asr": "Business is dead. Wonderful.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.5,
+    "wer": 0.0,
+    "asr": "Business is dead. Wonderful.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.48,
+    "wer": 0.0,
+    "asr": "Business is dead. Wonderful.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mortimer_04": {
+  "char": "mortimer",
+  "text": "Pine or oak? Oak's for people with friends.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.54,
+  "wer": 0.0,
+  "asr": "Pine or oak, oaks for people with friends.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.54,
+    "wer": 0.0,
+    "asr": "Pine or oak, oaks for people with friends.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.14,
+    "wer": 0.0,
+    "asr": "Pine or oak, oaks for people with friends.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mortimer_05": {
+  "char": "mortimer",
+  "text": "Ten paces, gentlemen. Take your time.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.69,
+  "wer": 0.0,
+  "asr": "Ten paces gentlemen. Take your time.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.69,
+    "wer": 0.0,
+    "asr": "Ten paces gentlemen. Take your time.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.55,
+    "wer": 0.0,
+    "asr": "Ten paces, gentlemen. Take your time.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mortimer_06": {
+  "char": "mortimer",
+  "text": "No refunds. Clients rarely complain.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.61,
+  "wer": 0.0,
+  "asr": "No refunds, clients rarely complain.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.61,
+    "wer": 0.0,
+    "asr": "No refunds, clients rarely complain.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.87,
+    "wer": 0.0,
+    "asr": "No refunds, clients rarely complain.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mortimer_07": {
+  "char": "mortimer",
+  "text": "Lie still, he's not finished measuring you.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.65,
+  "wer": 0.0,
+  "asr": "Lie still, he's not finished measuring you.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.65,
+    "wer": 0.0,
+    "asr": "Lie still, he's not finished measuring you.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.1,
+    "wer": 0.0,
+    "asr": "Lie still, he's not finished measuring you.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mortimer_08": {
+  "char": "mortimer",
+  "text": "A fake death? How thrilling. I'll invoice the real one.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.85,
+  "wer": 0.0,
+  "asr": "A fake death? How thrilling. I'll invoice the real one.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.28,
+    "wer": 0.0,
+    "asr": "A fake death? How thrilling. I'll invoice the real one.",
+    "score": 0.713
+   },
+   {
+    "seed": 2,
+    "dur": 5.02,
+    "wer": 0.0,
+    "asr": "A fake death? How thrilling. I'll invoice the real one.",
+    "score": 1.905
+   }
+  ],
+  "tempo": 1.11
+ },
+ "mortimer_09": {
+  "char": "mortimer",
+  "text": "My predecessor fell in his own grave. Perfect fit. So proud.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.86,
+  "wer": 0.0,
+  "asr": "My predecessor fell in his own grave, perfect fit, so proud.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.78,
+    "wer": 0.0,
+    "asr": "My predecessor fell in his own grave, perfect fit, so proud.",
+    "score": 1.468
+   },
+   {
+    "seed": 2,
+    "dur": 4.98,
+    "wer": 0.0,
+    "asr": "My predecessor fell in his own grave, perfect fit, so proud.",
+    "score": 1.771
+   },
+   {
+    "seed": 3,
+    "dur": 5.21,
+    "wer": 0.0,
+    "asr": "My predecessor fell in his own grave, perfect fit, so proud.",
+    "score": 2.723
+   },
+   {
+    "seed": 4,
+    "dur": 5.24,
+    "wer": 0.0,
+    "asr": "My predecessor fell in his own grave, perfect fit, so proud.",
+    "score": 2.875
+   }
+  ],
+  "tempo": 1.241
+ },
+ "mortimer_10": {
+  "char": "mortimer",
+  "text": "Measured the horse. One never knows.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.87,
+  "wer": 0.0,
+  "asr": "Measured the horse, one never knows.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.87,
+    "wer": 0.0,
+    "asr": "Measured the horse, one never knows.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.67,
+    "wer": 0.0,
+    "asr": "measured the horse, one never knows.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mortimer_w1": {
+  "char": "mortimer",
+  "text": "Ooh!",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.65,
+  "wer": 0.0,
+  "asr": "Ooh.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.65,
+    "wer": 0.0,
+    "asr": "Ooh.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.55,
+    "wer": 0.0,
+    "asr": "Ooh!",
+    "score": 0.0
+   }
+  ]
+ },
+ "mortimer_w2": {
+  "char": "mortimer",
+  "text": "Mmm, lovely.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": true,
+  "pick": 1,
+  "dur": 1.54,
+  "wer": 0.0,
+  "asr": "Mmm, lovely.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.54,
+    "wer": 0.0,
+    "asr": "Mmm, lovely.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.24,
+    "wer": 0.0,
+    "asr": "Mmm, lovely.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mortimer_w3": {
+  "char": "mortimer",
+  "text": "Heh heh heh.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.91,
+  "wer": 0.0,
+  "asr": "Heh heh heh.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.91,
+    "wer": 0.0,
+    "asr": "Heh heh heh.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.89,
+    "wer": 1.0,
+    "asr": "Heheheh...",
+    "score": 0.5
+   }
+  ]
+ },
+ "mortimer_w4": {
+  "char": "mortimer",
+  "text": "Tsk tsk.",
+  "voice": "f8e96b2f6d7347e69b0cba9df79f0c47",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.84,
+  "wer": 0.0,
+  "asr": "Tsk, tsk.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.84,
+    "wer": 0.0,
+    "asr": "Tsk, tsk.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.08,
+    "wer": 0.0,
+    "asr": "Tsk tsk.",
+    "score": 0.0
+   }
+  ]
+ },
+ "lulu_01": {
+  "char": "lulu",
+  "text": "Ze conversation is one dollar. Ze eye contact, extra.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.86,
+  "wer": 0.222,
+  "asr": "Z conversation is one dollar, Z eye contact extra.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.2,
+    "wer": 0.222,
+    "asr": "Z conversation is one dollar, Z eye contact extra.",
+    "score": 1.495
+   },
+   {
+    "seed": 2,
+    "dur": 4.24,
+    "wer": 0.444,
+    "asr": "Z Conversation is $1, Z Eye Contact Extra.",
+    "score": 2.431
+   },
+   {
+    "seed": 3,
+    "dur": 4.95,
+    "wer": 0.222,
+    "asr": "The conversation is one dollar. ZI Contact, extra.",
+    "score": 2.608
+   },
+   {
+    "seed": 4,
+    "dur": 3.96,
+    "wer": 0.444,
+    "asr": "Z conversation is $1. Z eye contact extra.",
+    "score": 2.014
+   }
+  ],
+  "tempo": 1.092
+ },
+ "lulu_02": {
+  "char": "lulu",
+  "text": "Non, non, chéri. Ze hands stay on ze hat.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.72,
+  "wer": 0.5,
+  "asr": "Non-non-sherry. Z-Hans stay on Z-hat.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.72,
+    "wer": 0.5,
+    "asr": "Non-non-sherry. Z-Hans stay on Z-hat.",
+    "score": 2.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.27,
+    "wer": 0.5,
+    "asr": "Non-Cherry, Z-Hands stay on Z-hat!",
+    "score": 2.0
+   },
+   {
+    "seed": 3,
+    "dur": 3.15,
+    "wer": 0.5,
+    "asr": "Non-Sherry, Z-Hands stay on Z-hat.",
+    "score": 2.0
+   },
+   {
+    "seed": 4,
+    "dur": 3.11,
+    "wer": 0.5,
+    "asr": "Non-Sherry! Z-Hands stay on Z-hat.",
+    "score": 2.0
+   }
+  ]
+ },
+ "lulu_03": {
+  "char": "lulu",
+  "text": "Ze accent? Ohio, darling. Keep it quiet.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.85,
+  "wer": 0.0,
+  "asr": "The accent, Ohio darling, keep it quiet.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.05,
+    "wer": 0.0,
+    "asr": "The accent, Ohio darling, keep it quiet.",
+    "score": 0.378
+   },
+   {
+    "seed": 2,
+    "dur": 5.05,
+    "wer": 0.286,
+    "asr": "The optional Z accent, Ohio darling. Keep it quiet.",
+    "score": 3.176
+   }
+  ],
+  "tempo": 1.053
+ },
+ "lulu_04": {
+  "char": "lulu",
+  "text": "Back so soon, Sheriff? Your wife was asking.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.38,
+  "wer": 0.0,
+  "asr": "Back so soon, Sheriff. Your wife was asking-",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.38,
+    "wer": 0.0,
+    "asr": "Back so soon, Sheriff. Your wife was asking-",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.28,
+    "wer": 0.0,
+    "asr": "Back so soon, Sheriff? Your wife was asking.",
+    "score": 0.0
+   }
+  ]
+ },
+ "lulu_05": {
+  "char": "lulu",
+  "text": "Pay at ze door. Leave with dignity. Optional.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.87,
+  "wer": 0.0,
+  "asr": "Pay at the door, leave with dignity optional.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.87,
+    "wer": 0.0,
+    "asr": "Pay at the door, leave with dignity optional.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.14,
+    "wer": 0.0,
+    "asr": "Pay at the door, leave with dignity optional.",
+    "score": 0.0
+   }
+  ]
+ },
+ "lulu_06": {
+  "char": "lulu",
+  "text": "Bonjour, cowboy. Your wallet looks... lonely.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": false,
+  "pick": 2,
+  "dur": 3.85,
+  "wer": 0.0,
+  "asr": "Bonjour, cowboy. Your wallet looks lonely.",
+  "takes": [
+   {
+    "seed": 2,
+    "dur": 4.01,
+    "wer": 0.0,
+    "asr": "Bonjour, cowboy. Your wallet looks lonely.",
+    "score": 0.312
+   }
+  ],
+  "tempo": 1.041
+ },
+ "lulu_07": {
+  "char": "lulu",
+  "text": "Monsieur! Ze window is not ze exit! ...Fine. It is now.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.85,
+  "wer": 0.0,
+  "asr": "Monsieur, the window is not the exit. Fine, it is now.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.43,
+    "wer": 0.0,
+    "asr": "Monsieur, the window is not the exit. Fine, it is now.",
+    "score": 0.945
+   },
+   {
+    "seed": 2,
+    "dur": 4.62,
+    "wer": 0.182,
+    "asr": "Monsieur, Z window is not Z exit. Fine, it is now-",
+    "score": 1.956
+   },
+   {
+    "seed": 3,
+    "dur": 4.58,
+    "wer": 0.182,
+    "asr": "Monsieur Z window is not Z exit. Fine, it is now.",
+    "score": 1.898
+   },
+   {
+    "seed": 4,
+    "dur": 4.97,
+    "wer": 0.182,
+    "asr": "Monsieur, Z window is not Z exit! Fine! It is now!",
+    "score": 2.489
+   }
+  ],
+  "tempo": 1.151
+ },
+ "lulu_08": {
+  "char": "lulu",
+  "text": "Oh my gosh, a robbery! ...I mean, sacré bleu.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": false,
+  "pick": 3,
+  "dur": 3.85,
+  "wer": 0.111,
+  "asr": "Oh my gosh, a robbery, I mean, Sacre Bleu!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.31,
+    "wer": 0.222,
+    "asr": "Oh my gosh, a robbery! I mean Sacrebleau-",
+    "score": 0.889
+   },
+   {
+    "seed": 2,
+    "dur": 4.36,
+    "wer": 0.111,
+    "asr": "Oh my gosh! A robbery! I mean, Sacre Bleu!",
+    "score": 1.286
+   },
+   {
+    "seed": 3,
+    "dur": 3.99,
+    "wer": 0.111,
+    "asr": "Oh my gosh, a robbery, I mean, Sacre Bleu!",
+    "score": 0.725
+   }
+  ],
+  "tempo": 1.036
+ },
+ "lulu_09": {
+  "char": "lulu",
+  "text": "Zey leave in such a hurry. Zey forget ze hat. And ze wife.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": false,
+  "pick": 4,
+  "dur": 3.85,
+  "wer": 0.154,
+  "asr": "They leave in such a hurry, they forget the hat, and the wife.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.66,
+    "wer": 0.308,
+    "asr": "They leave in such a hurry, they forget Z-hat and Z-wife.",
+    "score": 2.514
+   },
+   {
+    "seed": 2,
+    "dur": 5.06,
+    "wer": 0.308,
+    "asr": "Zay leave in such a hurry. Zay forget Z hat and Z wife",
+    "score": 3.318
+   },
+   {
+    "seed": 3,
+    "dur": 4.98,
+    "wer": 0.308,
+    "asr": "Zee leave in such a hurry, Zee forget Zee hat and Zee wife.",
+    "score": 3.0
+   },
+   {
+    "seed": 4,
+    "dur": 4.23,
+    "wer": 0.154,
+    "asr": "They leave in such a hurry, they forget the hat, and the wife.",
+    "score": 1.259
+   }
+  ],
+  "tempo": 1.098
+ },
+ "lulu_10": {
+  "char": "lulu",
+  "text": "Ze piano is out of tune. Like ze clientele.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.49,
+  "wer": 0.111,
+  "asr": "The piano is out of tune, like Z clientele.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.49,
+    "wer": 0.111,
+    "asr": "The piano is out of tune, like Z clientele.",
+    "score": 0.444
+   },
+   {
+    "seed": 2,
+    "dur": 3.06,
+    "wer": 0.222,
+    "asr": "Z piano is out of tune like Z clientele",
+    "score": 0.889
+   }
+  ]
+ },
+ "lulu_11": {
+  "char": "lulu",
+  "text": "A respectable parlour. Ze most respectable on ze whole block.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.84,
+  "wer": 0.0,
+  "asr": "A respectable parlour, the most respectable on the whole block.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.98,
+    "wer": 0.0,
+    "asr": "A respectable parlour, the most respectable on the whole block.",
+    "score": 0.27
+   },
+   {
+    "seed": 2,
+    "dur": 4.51,
+    "wer": 0.1,
+    "asr": "A respectable parlor. The most respectable on the whole block.",
+    "score": 1.471
+   }
+  ],
+  "tempo": 1.034
+ },
+ "pete_01": {
+  "char": "pete",
+  "text": "Shave, haircut or tooth? Why not all three!",
+  "voice": "3b7f839b47924a3dabd3b5ba9e922381",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.78,
+  "wer": 0.0,
+  "asr": "Shave haircut or tooth? Why not all three?",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.78,
+    "wer": 0.0,
+    "asr": "Shave haircut or tooth? Why not all three?",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.7,
+    "wer": 0.0,
+    "asr": "Shave, haircut or tooth? Why not all three?",
+    "score": 0.0
+   }
+  ]
+ },
+ "pete_02": {
+  "char": "pete",
+  "text": "Open wide. Wider. Bite this.",
+  "voice": "3b7f839b47924a3dabd3b5ba9e922381",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.21,
+  "wer": 0.0,
+  "asr": "Open wide. Wider. Bite this.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.21,
+    "wer": 0.0,
+    "asr": "Open wide. Wider. Bite this.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.82,
+    "wer": 0.0,
+    "asr": "Open wide wider, bite this!",
+    "score": 0.0
+   }
+  ]
+ },
+ "pete_03": {
+  "char": "pete",
+  "text": "That one's loose! ...Now it is.",
+  "voice": "3b7f839b47924a3dabd3b5ba9e922381",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.3,
+  "wer": 0.0,
+  "asr": "That one's loose, now it is.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.3,
+    "wer": 0.0,
+    "asr": "That one's loose, now it is.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.47,
+    "wer": 0.0,
+    "asr": "That one's loose. Now it is.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pete_04": {
+  "char": "pete",
+  "text": "Don't worry, I've done this twice.",
+  "voice": "3b7f839b47924a3dabd3b5ba9e922381",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.51,
+  "wer": 0.0,
+  "asr": "Don't worry, I've done this twice.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.51,
+    "wer": 0.0,
+    "asr": "Don't worry, I've done this twice.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.69,
+    "wer": 0.0,
+    "asr": "Don't worry, I've done this twice.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pete_05": {
+  "char": "pete",
+  "text": "Whiskey's the anaesthetic. And the tip.",
+  "voice": "3b7f839b47924a3dabd3b5ba9e922381",
+  "wordless": false,
+  "pick": 2,
+  "dur": 2.06,
+  "wer": 0.167,
+  "asr": "whiskey's the anesthetic, and the tip.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.93,
+    "wer": 0.333,
+    "asr": "Whisky's the anesthetic, and the tip.",
+    "score": 1.333
+   },
+   {
+    "seed": 2,
+    "dur": 2.06,
+    "wer": 0.167,
+    "asr": "whiskey's the anesthetic, and the tip.",
+    "score": 0.667
+   }
+  ]
+ },
+ "pete_06": {
+  "char": "pete",
+  "text": "Gold tooth! Mine now.",
+  "voice": "3b7f839b47924a3dabd3b5ba9e922381",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.57,
+  "wer": 0.0,
+  "asr": "Gold tooth, mine now.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.57,
+    "wer": 0.0,
+    "asr": "Gold tooth, mine now.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.44,
+    "wer": 0.5,
+    "asr": "Goldtooth, mine now.",
+    "score": 2.0
+   }
+  ]
+ },
+ "pete_07": {
+  "char": "pete",
+  "text": "A walk-in! Well, a fly-in!",
+  "voice": "3b7f839b47924a3dabd3b5ba9e922381",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.2,
+  "wer": 0.0,
+  "asr": "A walk-in. Well, a fly-in.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.2,
+    "wer": 0.0,
+    "asr": "A walk-in. Well, a fly-in.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.73,
+    "wer": 0.0,
+    "asr": "A walk-in. Well, a fly-in.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pete_08": {
+  "char": "pete",
+  "text": "Keep swingin', boys! I got a mortgage!",
+  "voice": "3b7f839b47924a3dabd3b5ba9e922381",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.78,
+  "wer": 0.143,
+  "asr": "Keep swinging boys, I got a mortgage!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.78,
+    "wer": 0.143,
+    "asr": "Keep swinging boys, I got a mortgage!",
+    "score": 0.571
+   },
+   {
+    "seed": 2,
+    "dur": 1.61,
+    "wer": 0.143,
+    "asr": "Keep swinging boys, I got a mortgage.",
+    "score": 0.571
+   }
+  ]
+ },
+ "pete_w1": {
+  "char": "pete",
+  "text": "Hee hee hee!",
+  "voice": "3b7f839b47924a3dabd3b5ba9e922381",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.54,
+  "wer": 1.0,
+  "asr": "Hehe.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.54,
+    "wer": 1.0,
+    "asr": "Hehe.",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 0.45,
+    "wer": 1.0,
+    "asr": "Hehehe.",
+    "score": 0.5
+   }
+  ]
+ },
+ "pete_w2": {
+  "char": "pete",
+  "text": "Ooh!",
+  "voice": "3b7f839b47924a3dabd3b5ba9e922381",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.4,
+  "wer": 0.0,
+  "asr": "Ooh!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.4,
+    "wer": 0.0,
+    "asr": "Ooh!",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.74,
+    "wer": 0.0,
+    "asr": "Ooh.",
+    "score": 0.0
+   }
+  ]
+ },
+ "pete_w3": {
+  "char": "pete",
+  "text": "Nngh! Got it!",
+  "voice": "3b7f839b47924a3dabd3b5ba9e922381",
+  "wordless": true,
+  "pick": 1,
+  "dur": 1.25,
+  "wer": 0.333,
+  "asr": "Nang! Got it!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.25,
+    "wer": 0.333,
+    "asr": "Nang! Got it!",
+    "score": 0.167
+   },
+   {
+    "seed": 2,
+    "dur": 1.21,
+    "wer": 0.333,
+    "asr": "Ning, got it.",
+    "score": 0.167
+   }
+  ]
+ },
+ "nubbin_01": {
+  "char": "nubbin",
+  "text": "Shine yer boots? Can't help yer face.",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.2,
+  "wer": 0.286,
+  "asr": "Shine your boots, can't help your face.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.2,
+    "wer": 0.286,
+    "asr": "Shine your boots, can't help your face.",
+    "score": 1.143
+   },
+   {
+    "seed": 2,
+    "dur": 2.39,
+    "wer": 0.286,
+    "asr": "Shine your boots, can't help your face.",
+    "score": 1.143
+   },
+   {
+    "seed": 3,
+    "dur": 2.54,
+    "wer": 0.286,
+    "asr": "Shine your boots, can't help your face.",
+    "score": 1.143
+   },
+   {
+    "seed": 4,
+    "dur": 2.35,
+    "wer": 0.286,
+    "asr": "Shine your boots, can't help your face.",
+    "score": 1.143
+   }
+  ]
+ },
+ "nubbin_02": {
+  "char": "nubbin",
+  "text": "Two bits. Three if there's horse in it.",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.25,
+  "wer": 0.0,
+  "asr": "Two bits, three if there's horse in it.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.25,
+    "wer": 0.0,
+    "asr": "Two bits, three if there's horse in it.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.37,
+    "wer": 0.0,
+    "asr": "Two bits. Three if there's horse in it.",
+    "score": 0.0
+   }
+  ]
+ },
+ "nubbin_03": {
+  "char": "nubbin",
+  "text": "That ain't mud, mister.",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.17,
+  "wer": 0.0,
+  "asr": "That ain't mud, mister.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.17,
+    "wer": 0.0,
+    "asr": "That ain't mud, mister.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.41,
+    "wer": 0.0,
+    "asr": "That ain't mud, mister.",
+    "score": 0.0
+   }
+  ]
+ },
+ "nubbin_04": {
+  "char": "nubbin",
+  "text": "Spit's free. Polish costs.",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.33,
+  "wer": 0.25,
+  "asr": "Spitz-free, Polish costs.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.33,
+    "wer": 0.25,
+    "asr": "Spitz-free, Polish costs.",
+    "score": 1.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.16,
+    "wer": 0.25,
+    "asr": "Spitz-free, Polish costs.",
+    "score": 1.0
+   },
+   {
+    "seed": 3,
+    "dur": 1.9,
+    "wer": 0.25,
+    "asr": "Spitz-free, Polish costs.",
+    "score": 1.0
+   },
+   {
+    "seed": 4,
+    "dur": 1.92,
+    "wer": 0.25,
+    "asr": "Spitz-free, Polish costs.",
+    "score": 1.0
+   }
+  ]
+ },
+ "nubbin_05": {
+  "char": "nubbin",
+  "text": "I'm eight. I got a business. You?",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.21,
+  "wer": 0.0,
+  "asr": "I'm eight, I got a business you.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.21,
+    "wer": 0.0,
+    "asr": "I'm eight, I got a business you.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.3,
+    "wer": 0.0,
+    "asr": "I'm eight. I got a business, you.",
+    "score": 0.0
+   }
+  ]
+ },
+ "nubbin_06": {
+  "char": "nubbin",
+  "text": "You call that a hat?",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.13,
+  "wer": 0.0,
+  "asr": "You call that a hat?",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.13,
+    "wer": 0.0,
+    "asr": "You call that a hat?",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.96,
+    "wer": 0.0,
+    "asr": "You call that a hat?",
+    "score": 0.0
+   }
+  ]
+ },
+ "nubbin_07": {
+  "char": "nubbin",
+  "text": "Nice landin'. Six outta ten.",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": false,
+  "pick": 2,
+  "dur": 2.33,
+  "wer": 0.8,
+  "asr": "Nice landin' 6 out of 10",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.11,
+    "wer": 1.0,
+    "asr": "Nice landing, 6 out of 10.",
+    "score": 4.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.33,
+    "wer": 0.8,
+    "asr": "Nice landin' 6 out of 10",
+    "score": 3.2
+   },
+   {
+    "seed": 3,
+    "dur": 2.32,
+    "wer": 0.8,
+    "asr": "Nice landin', 6 out of 10.",
+    "score": 3.2
+   },
+   {
+    "seed": 4,
+    "dur": 2.26,
+    "wer": 0.8,
+    "asr": "Nice landin'. 6 out of 10.",
+    "score": 3.2
+   }
+  ]
+ },
+ "nubbin_08": {
+  "char": "nubbin",
+  "text": "Prices went up. You got richer. I noticed.",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.9,
+  "wer": 0.0,
+  "asr": "Prices went up. You got richer. I noticed.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.9,
+    "wer": 0.0,
+    "asr": "Prices went up. You got richer. I noticed.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.01,
+    "wer": 0.0,
+    "asr": "Prices went up you got richer. I noticed",
+    "score": 0.0
+   }
+  ]
+ },
+ "nubbin_w1": {
+  "char": "nubbin",
+  "text": "Hey!",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.4,
+  "wer": 0.0,
+  "asr": "Hey!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.4,
+    "wer": 0.0,
+    "asr": "Hey!",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.37,
+    "wer": 0.0,
+    "asr": "Hey!",
+    "score": 0.0
+   }
+  ]
+ },
+ "nubbin_w2": {
+  "char": "nubbin",
+  "text": "Pfft.",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.27,
+  "wer": 0.0,
+  "asr": "PFFT",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.27,
+    "wer": 0.0,
+    "asr": "PFFT",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.23,
+    "wer": 0.0,
+    "asr": "PFFT",
+    "score": 0.0
+   }
+  ]
+ },
+ "nubbin_w3": {
+  "char": "nubbin",
+  "text": "Heh.",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.26,
+  "wer": 0.0,
+  "asr": "Heh.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.26,
+    "wer": 0.0,
+    "asr": "Heh.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.24,
+    "wer": 0.0,
+    "asr": "Heh.",
+    "score": 0.0
+   }
+  ]
+ },
+ "nubbin_w4": {
+  "char": "nubbin",
+  "text": "Ooh, fancy.",
+  "voice": "c445a2ef4af7417b8518d01a477cafd3",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.82,
+  "wer": 0.0,
+  "asr": "Ooh, fancy.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.82,
+    "wer": 0.0,
+    "asr": "Ooh, fancy.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.14,
+    "wer": 0.0,
+    "asr": "Ooh, fancy.",
+    "score": 0.0
+   }
+  ]
+ },
+ "hortense_01": {
+  "char": "hortense",
+  "text": "Buttercup says you smell like a mule. ...She means it nice.",
+  "voice": "eea8fbc54b774ee98602b7e18f38a5c2",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.67,
+  "wer": 0.0,
+  "asr": "Buttercup says you smell like a mule, she means it nice.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.67,
+    "wer": 0.0,
+    "asr": "Buttercup says you smell like a mule, she means it nice.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.42,
+    "wer": 0.0,
+    "asr": "Buttercup says you smell like a mule. She means it nice.",
+    "score": 0.0
+   }
+  ]
+ },
+ "hortense_02": {
+  "char": "hortense",
+  "text": "He says you can ride him when you lose some weight.",
+  "voice": "eea8fbc54b774ee98602b7e18f38a5c2",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.2,
+  "wer": 0.0,
+  "asr": "He says you can ride him when you lose some weight.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.2,
+    "wer": 0.0,
+    "asr": "He says you can ride him when you lose some weight.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.2,
+    "wer": 0.0,
+    "asr": "He says you can ride him when you lose some weight.",
+    "score": 0.0
+   }
+  ]
+ },
+ "hortense_03": {
+  "char": "hortense",
+  "text": "Don't feed him the hat. He's had three.",
+  "voice": "eea8fbc54b774ee98602b7e18f38a5c2",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.69,
+  "wer": 0.0,
+  "asr": "Don't feed him the hat, he's had three.\"",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.69,
+    "wer": 0.0,
+    "asr": "Don't feed him the hat, he's had three.\"",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.66,
+    "wer": 0.0,
+    "asr": "Don't feed him the hat he's had three",
+    "score": 0.0
+   }
+  ]
+ },
+ "hortense_04": {
+  "char": "hortense",
+  "text": "That mule ain't kickin' the wall. He's knockin'.",
+  "voice": "eea8fbc54b774ee98602b7e18f38a5c2",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.17,
+  "wer": 0.0,
+  "asr": "That mule ain't kickin' the wall, he's knockin'",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.17,
+    "wer": 0.0,
+    "asr": "That mule ain't kickin' the wall, he's knockin'",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.33,
+    "wer": 0.0,
+    "asr": "That mule ain't kickin' the wall, he's knockin'",
+    "score": 0.0
+   }
+  ]
+ },
+ "hortense_05": {
+  "char": "hortense",
+  "text": "Coach is in! Horses say the driver can't steer.",
+  "voice": "eea8fbc54b774ee98602b7e18f38a5c2",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.36,
+  "wer": 0.222,
+  "asr": "Coaches in, horses say the driver can't steer.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.36,
+    "wer": 0.222,
+    "asr": "Coaches in, horses say the driver can't steer.",
+    "score": 0.889
+   },
+   {
+    "seed": 2,
+    "dur": 2.42,
+    "wer": 0.333,
+    "asr": "Coaches and horses say the driver can't steer.",
+    "score": 1.333
+   },
+   {
+    "seed": 3,
+    "dur": 2.53,
+    "wer": 0.222,
+    "asr": "Coaches in, horses say the driver can't steer.",
+    "score": 0.889
+   },
+   {
+    "seed": 4,
+    "dur": 2.59,
+    "wer": 0.222,
+    "asr": "Coaches in, horses say the driver can't steer.",
+    "score": 0.889
+   }
+  ]
+ },
+ "hortense_06": {
+  "char": "hortense",
+  "text": "Horace says Bart's a horse's... well. Rhymes with 'brass'.",
+  "voice": "eea8fbc54b774ee98602b7e18f38a5c2",
+  "wordless": false,
+  "pick": 2,
+  "dur": 3.62,
+  "wer": 0.0,
+  "asr": "Horace says Bart's a horses, well rhymes with brass.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.22,
+    "wer": 0.222,
+    "asr": "Horace says Bart's a horse as well, rhymes with brass.",
+    "score": 0.889
+   },
+   {
+    "seed": 2,
+    "dur": 3.62,
+    "wer": 0.0,
+    "asr": "Horace says Bart's a horses, well rhymes with brass.",
+    "score": 0.0
+   }
+  ]
+ },
+ "hortense_07": {
+  "char": "hortense",
+  "text": "I don't speak donkey. Donkey speaks me.",
+  "voice": "eea8fbc54b774ee98602b7e18f38a5c2",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.29,
+  "wer": 0.0,
+  "asr": "I don't speak donkey, donkey speaks me.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.29,
+    "wer": 0.0,
+    "asr": "I don't speak donkey, donkey speaks me.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.5,
+    "wer": 0.0,
+    "asr": "I don't speak donkey, donkey speaks me.",
+    "score": 0.0
+   }
+  ]
+ },
+ "hortense_w1": {
+  "char": "hortense",
+  "text": "Whoa there!",
+  "voice": "eea8fbc54b774ee98602b7e18f38a5c2",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.86,
+  "wer": 0.0,
+  "asr": "Whoa there.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.86,
+    "wer": 0.0,
+    "asr": "Whoa there.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.68,
+    "wer": 0.0,
+    "asr": "Whoa there!",
+    "score": 0.0
+   }
+  ]
+ },
+ "hortense_w2": {
+  "char": "hortense",
+  "text": "Hyah!",
+  "voice": "eea8fbc54b774ee98602b7e18f38a5c2",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.59,
+  "wer": 1.0,
+  "asr": "higher.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.59,
+    "wer": 1.0,
+    "asr": "higher.",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 0.45,
+    "wer": 1.0,
+    "asr": "Yeah.",
+    "score": 0.5
+   }
+  ]
+ },
+ "hortense_w3": {
+  "char": "hortense",
+  "text": "Ha!",
+  "voice": "eea8fbc54b774ee98602b7e18f38a5c2",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.39,
+  "wer": 0.0,
+  "asr": "Ha!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.39,
+    "wer": 0.0,
+    "asr": "Ha!",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.62,
+    "wer": 0.0,
+    "asr": "Ha!",
+    "score": 0.0
+   }
+  ]
+ },
+ "thrupp_01": {
+  "char": "thrupp",
+  "text": "One coin. Two coin. ...One coin.",
+  "voice": "a44b026094cb48c3918e06242d5e7aaf",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.51,
+  "wer": 0.0,
+  "asr": "One coin, two coin, one coin.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.51,
+    "wer": 0.0,
+    "asr": "One coin, two coin, one coin.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.57,
+    "wer": 0.0,
+    "asr": "One coin, two coin, one coin.",
+    "score": 0.0
+   }
+  ]
+ },
+ "thrupp_02": {
+  "char": "thrupp",
+  "text": "Interest? Oh, I'm very interested.",
+  "voice": "a44b026094cb48c3918e06242d5e7aaf",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.52,
+  "wer": 0.0,
+  "asr": "Interest? Oh, I'm very interested.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.52,
+    "wer": 0.0,
+    "asr": "Interest? Oh, I'm very interested.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.65,
+    "wer": 0.0,
+    "asr": "Interest? Oh, I'm very interested.",
+    "score": 0.0
+   }
+  ]
+ },
+ "thrupp_03": {
+  "char": "thrupp",
+  "text": "A robbery! I'm going to faint. I'm fainting. I've fainted.",
+  "voice": "a44b026094cb48c3918e06242d5e7aaf",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.86,
+  "wer": 0.0,
+  "asr": "A robbery. I'm going to faint. I'm fainting. I've fainted.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 4.43,
+    "wer": 0.0,
+    "asr": "A robbery. I'm going to faint. I'm fainting. I've fainted.",
+    "score": 0.943
+   },
+   {
+    "seed": 2,
+    "dur": 4.92,
+    "wer": 0.0,
+    "asr": "A robbery. I'm going to faint. I'm fainting. I've fainted.",
+    "score": 1.68
+   },
+   {
+    "seed": 3,
+    "dur": 4.82,
+    "wer": 0.0,
+    "asr": "A robbery. I'm going to faint. I'm fainting. I've fainted.",
+    "score": 1.531
+   },
+   {
+    "seed": 4,
+    "dur": 4.65,
+    "wer": 0.0,
+    "asr": "A robbery. I'm going to faint. I'm fainting. I've fainted.",
+    "score": 1.278
+   }
+  ],
+  "tempo": 1.15
+ },
+ "thrupp_04": {
+  "char": "thrupp",
+  "text": "Withdrawals are Thursdays. It is never Thursday.",
+  "voice": "a44b026094cb48c3918e06242d5e7aaf",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.86,
+  "wer": 0.0,
+  "asr": "Withdrawals are Thursdays. It is never Thursday.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.86,
+    "wer": 0.0,
+    "asr": "Withdrawals are Thursdays. It is never Thursday.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.03,
+    "wer": 0.0,
+    "asr": "Withdrawals are Thursdays, it is never Thursday.",
+    "score": 0.0
+   }
+  ]
+ },
+ "thrupp_05": {
+  "char": "thrupp",
+  "text": "Take it! Take the vault! Take my smelling salts!",
+  "voice": "a44b026094cb48c3918e06242d5e7aaf",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.16,
+  "wer": 0.0,
+  "asr": "Take it, take the vault, take my smelling salts.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.16,
+    "wer": 0.0,
+    "asr": "Take it, take the vault, take my smelling salts.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.65,
+    "wer": 0.111,
+    "asr": "Take it, take the vault, take my smelling-sauce.",
+    "score": 0.444
+   }
+  ]
+ },
+ "thrupp_06": {
+  "char": "thrupp",
+  "text": "Another deposit from the Garter. A very discreet account.",
+  "voice": "a44b026094cb48c3918e06242d5e7aaf",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.75,
+  "wer": 0.0,
+  "asr": "Another deposit from the garter, a very discreet account.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.75,
+    "wer": 0.0,
+    "asr": "Another deposit from the garter, a very discreet account.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.79,
+    "wer": 0.0,
+    "asr": "Another deposit from the garter, a very discreet account.",
+    "score": 0.0
+   }
+  ]
+ },
+ "thrupp_07": {
+  "char": "thrupp",
+  "text": "Don't open it! It's... unspent!",
+  "voice": "a44b026094cb48c3918e06242d5e7aaf",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.24,
+  "wer": 0.0,
+  "asr": "Don't open it. It's unspent.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.24,
+    "wer": 0.0,
+    "asr": "Don't open it. It's unspent.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.81,
+    "wer": 0.0,
+    "asr": "Don't open it. It's... unspent.",
+    "score": 0.0
+   }
+  ]
+ },
+ "thrupp_w1": {
+  "char": "thrupp",
+  "text": "Ohhh...",
+  "voice": "a44b026094cb48c3918e06242d5e7aaf",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.73,
+  "wer": 1.0,
+  "asr": "Oh...",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.73,
+    "wer": 1.0,
+    "asr": "Oh...",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 0.63,
+    "wer": 1.0,
+    "asr": "Oh.",
+    "score": 0.5
+   }
+  ]
+ },
+ "thrupp_w2": {
+  "char": "thrupp",
+  "text": "Tsk.",
+  "voice": "a44b026094cb48c3918e06242d5e7aaf",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.35,
+  "wer": 1.0,
+  "asr": "sk",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.35,
+    "wer": 1.0,
+    "asr": "sk",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 0.52,
+    "wer": 1.0,
+    "asr": "Tisq.",
+    "score": 0.5
+   }
+  ]
+ },
+ "thrupp_w3": {
+  "char": "thrupp",
+  "text": "Oh! Oh my!",
+  "voice": "a44b026094cb48c3918e06242d5e7aaf",
+  "wordless": true,
+  "pick": 1,
+  "dur": 1.67,
+  "wer": 0.0,
+  "asr": "Oh, oh my...",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.67,
+    "wer": 0.0,
+    "asr": "Oh, oh my...",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.71,
+    "wer": 0.0,
+    "asr": "Oh, oh my!",
+    "score": 0.0
+   }
+  ]
+ },
+ "bart_01": {
+  "char": "bart",
+  "text": "Hands up! ...Not that high, show-off.",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.32,
+  "wer": 0.0,
+  "asr": "Hands up. Not that high. Show off.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.32,
+    "wer": 0.0,
+    "asr": "Hands up. Not that high. Show off.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.15,
+    "wer": 0.0,
+    "asr": "Hands up. Not that high show off.",
+    "score": 0.0
+   }
+  ]
+ },
+ "bart_02": {
+  "char": "bart",
+  "text": "This is a robbery! Er... stick-up.",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.4,
+  "wer": 0.0,
+  "asr": "This is a robbery. Er, stick up.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.4,
+    "wer": 0.0,
+    "asr": "This is a robbery. Er, stick up.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.35,
+    "wer": 0.0,
+    "asr": "This is a robbery. Er, stick up.",
+    "score": 0.0
+   }
+  ]
+ },
+ "bart_03": {
+  "char": "bart",
+  "text": "All yer money! ...And a sandwich.",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.1,
+  "wer": 0.167,
+  "asr": "all your money and a sandwich.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.1,
+    "wer": 0.167,
+    "asr": "all your money and a sandwich.",
+    "score": 0.667
+   },
+   {
+    "seed": 2,
+    "dur": 2.04,
+    "wer": 0.167,
+    "asr": "all your money, and a sandwich.",
+    "score": 0.667
+   }
+  ]
+ },
+ "bart_04": {
+  "char": "bart",
+  "text": "They'll never catch— OW. Who put a pole there?",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.69,
+  "wer": 0.111,
+  "asr": "They'll never catch out. Who put a pole there?",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.69,
+    "wer": 0.111,
+    "asr": "They'll never catch out. Who put a pole there?",
+    "score": 0.444
+   },
+   {
+    "seed": 2,
+    "dur": 2.59,
+    "wer": 0.222,
+    "asr": "They'll never catch out W. Who put a pole there?",
+    "score": 0.889
+   }
+  ]
+ },
+ "bart_05": {
+  "char": "bart",
+  "text": "Everyone stay calm! I'm very nervous!",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.12,
+  "wer": 0.0,
+  "asr": "Everyone stay calm. I'm very nervous.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.12,
+    "wer": 0.0,
+    "asr": "Everyone stay calm. I'm very nervous.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.51,
+    "wer": 0.0,
+    "asr": "Everyone stay calm, I'm very nervous.",
+    "score": 0.0
+   }
+  ]
+ },
+ "bart_06": {
+  "char": "bart",
+  "text": "Getaway horse! ...HORACE!",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.21,
+  "wer": 0.0,
+  "asr": "Getaway horse, Horace.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.21,
+    "wer": 0.0,
+    "asr": "Getaway horse, Horace.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.91,
+    "wer": 0.0,
+    "asr": "Getaway Horse. Horace.",
+    "score": 0.0
+   }
+  ]
+ },
+ "bart_07": {
+  "char": "bart",
+  "text": "You ain't seen the last of me! ...Probably next week.",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.05,
+  "wer": 0.0,
+  "asr": "You ain't seen the last of me, probably next week.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.05,
+    "wer": 0.0,
+    "asr": "You ain't seen the last of me, probably next week.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.01,
+    "wer": 0.0,
+    "asr": "You ain't seen the last of me. Probably next week.",
+    "score": 0.0
+   }
+  ]
+ },
+ "bart_08": {
+  "char": "bart",
+  "text": "I'm in disguise. As a different Bart.",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.27,
+  "wer": 0.0,
+  "asr": "I'm in disguise as a different Bart.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.27,
+    "wer": 0.0,
+    "asr": "I'm in disguise as a different Bart.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.27,
+    "wer": 0.0,
+    "asr": "I'm in disguise as a different Bart.",
+    "score": 0.0
+   }
+  ]
+ },
+ "bart_09": {
+  "char": "bart",
+  "text": "Draw! ...Oh, you mean the gun.",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.27,
+  "wer": 0.0,
+  "asr": "Draw. Oh, you mean the gun?",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.27,
+    "wer": 0.0,
+    "asr": "Draw. Oh, you mean the gun?",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.38,
+    "wer": 0.0,
+    "asr": "Draw. Oh, you mean the gun.",
+    "score": 0.0
+   }
+  ]
+ },
+ "bart_10": {
+  "char": "bart",
+  "text": "Fair cop. Nice poster, though?",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.07,
+  "wer": 0.0,
+  "asr": "Fair cop. Nice poster though.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.07,
+    "wer": 0.0,
+    "asr": "Fair cop. Nice poster though.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.84,
+    "wer": 0.0,
+    "asr": "Fair cop. Nice poster though?",
+    "score": 0.0
+   }
+  ]
+ },
+ "bart_w1": {
+  "char": "bart",
+  "text": "Grrr!",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.74,
+  "wer": 0.0,
+  "asr": "GRRR!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.74,
+    "wer": 0.0,
+    "asr": "GRRR!",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.68,
+    "wer": 1.0,
+    "asr": "Grrrr!",
+    "score": 0.5
+   }
+  ]
+ },
+ "bart_w2": {
+  "char": "bart",
+  "text": "Ow!",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.55,
+  "wer": 0.0,
+  "asr": "Ow!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.55,
+    "wer": 0.0,
+    "asr": "Ow!",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.52,
+    "wer": 0.0,
+    "asr": "Ow!",
+    "score": 0.0
+   }
+  ]
+ },
+ "bart_w3": {
+  "char": "bart",
+  "text": "Yah! Yah!",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": true,
+  "pick": 1,
+  "dur": 1.59,
+  "wer": 0.0,
+  "asr": "YAH! YAH!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.59,
+    "wer": 0.0,
+    "asr": "YAH! YAH!",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.11,
+    "wer": 0.0,
+    "asr": "YAH YAH!",
+    "score": 0.0
+   }
+  ]
+ },
+ "bart_w4": {
+  "char": "bart",
+  "text": "Oopsie.",
+  "voice": "b3f65ef3b7bd4474bb745fdbfd07bc64",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.49,
+  "wer": 0.0,
+  "asr": "Oopsie.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.49,
+    "wer": 0.0,
+    "asr": "Oopsie.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.53,
+    "wer": 0.0,
+    "asr": "oopsie",
+    "score": 0.0
+   }
+  ]
+ },
+ "fingers_01": {
+  "char": "fingers",
+  "text": "Requests? I take 'em. I don't play 'em.",
+  "voice": "8601e5e1f48e4800a38e4ee306d8b340",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.96,
+  "wer": 0.25,
+  "asr": "Requests? I take them. I don't play them.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.96,
+    "wer": 0.25,
+    "asr": "Requests? I take them. I don't play them.",
+    "score": 1.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.41,
+    "wer": 0.25,
+    "asr": "Requests? I take them, I don't play them.",
+    "score": 1.0
+   },
+   {
+    "seed": 3,
+    "dur": 3.1,
+    "wer": 0.25,
+    "asr": "Requests? I take them. I don't play them.",
+    "score": 1.0
+   },
+   {
+    "seed": 4,
+    "dur": 2.53,
+    "wer": 0.25,
+    "asr": "Requests I take him, I don't play him.",
+    "score": 1.0
+   }
+  ]
+ },
+ "fingers_02": {
+  "char": "fingers",
+  "text": "Faster? My fingers got fingers!",
+  "voice": "8601e5e1f48e4800a38e4ee306d8b340",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.13,
+  "wer": 0.0,
+  "asr": "Faster, my fingers got fingers.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.13,
+    "wer": 0.0,
+    "asr": "Faster, my fingers got fingers.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.44,
+    "wer": 0.0,
+    "asr": "Faster my fingers got fingers",
+    "score": 0.0
+   }
+  ]
+ },
+ "fingers_03": {
+  "char": "fingers",
+  "text": "Same song since eighteen-seventy. Still workin' on it.",
+  "voice": "8601e5e1f48e4800a38e4ee306d8b340",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.05,
+  "wer": 0.333,
+  "asr": "Same song since 1870, still working on it.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.05,
+    "wer": 0.333,
+    "asr": "Same song since 1870, still working on it.",
+    "score": 1.333
+   },
+   {
+    "seed": 2,
+    "dur": 2.92,
+    "wer": 0.333,
+    "asr": "Same song since 1870, still working on it.",
+    "score": 1.333
+   },
+   {
+    "seed": 3,
+    "dur": 3.37,
+    "wer": 0.333,
+    "asr": "Same song since 1870, still working on it.",
+    "score": 1.333
+   },
+   {
+    "seed": 4,
+    "dur": 3.31,
+    "wer": 0.333,
+    "asr": "Same song since 1870, still working on it.",
+    "score": 1.333
+   }
+  ]
+ },
+ "fingers_04": {
+  "char": "fingers",
+  "text": "Still playin'! Still playin'!",
+  "voice": "8601e5e1f48e4800a38e4ee306d8b340",
+  "wordless": false,
+  "pick": 4,
+  "dur": 2.4,
+  "wer": 0.0,
+  "asr": "Still playin', still playin'.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.46,
+    "wer": 0.5,
+    "asr": "Still playing, still playing.",
+    "score": 2.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.99,
+    "wer": 0.5,
+    "asr": "Still playing, still playing.",
+    "score": 2.0
+   },
+   {
+    "seed": 3,
+    "dur": 2.03,
+    "wer": 0.5,
+    "asr": "Still playing, still playing.",
+    "score": 2.0
+   },
+   {
+    "seed": 4,
+    "dur": 2.4,
+    "wer": 0.0,
+    "asr": "Still playin', still playin'.",
+    "score": 0.0
+   }
+  ]
+ },
+ "fingers_05": {
+  "char": "fingers",
+  "text": "That note was jazz. Look it up in thirty years.",
+  "voice": "8601e5e1f48e4800a38e4ee306d8b340",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.03,
+  "wer": 0.1,
+  "asr": "That note was jazz, look it up in 30 years.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.03,
+    "wer": 0.1,
+    "asr": "That note was jazz, look it up in 30 years.",
+    "score": 0.4
+   },
+   {
+    "seed": 2,
+    "dur": 3.16,
+    "wer": 0.1,
+    "asr": "That note was jazz. Look it up in 30 years.",
+    "score": 0.4
+   }
+  ]
+ },
+ "fingers_06": {
+  "char": "fingers",
+  "text": "Tip jar's the one on the left. Don't use the right.",
+  "voice": "8601e5e1f48e4800a38e4ee306d8b340",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.14,
+  "wer": 0.0,
+  "asr": "Tip jar's the one on the left. Don't use the right.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.14,
+    "wer": 0.0,
+    "asr": "Tip jar's the one on the left. Don't use the right.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.72,
+    "wer": 0.182,
+    "asr": "Tip jar is the one on the left. Don't use the right.",
+    "score": 0.727
+   }
+  ]
+ },
+ "fingers_07": {
+  "char": "fingers",
+  "text": "Piano's out of tune. So's the bar. We match.",
+  "voice": "8601e5e1f48e4800a38e4ee306d8b340",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.78,
+  "wer": 0.0,
+  "asr": "Piano's out of tune, so's the bar, we match.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.78,
+    "wer": 0.0,
+    "asr": "Piano's out of tune, so's the bar, we match.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 3.33,
+    "wer": 0.0,
+    "asr": "Piano's out of tune, so's the bar, we match.",
+    "score": 0.0
+   }
+  ]
+ },
+ "fingers_w1": {
+  "char": "fingers",
+  "text": "Yeah!",
+  "voice": "8601e5e1f48e4800a38e4ee306d8b340",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.48,
+  "wer": 0.0,
+  "asr": "Yeah.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.48,
+    "wer": 0.0,
+    "asr": "Yeah.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.6,
+    "wer": 0.0,
+    "asr": "Yeah.",
+    "score": 0.0
+   }
+  ]
+ },
+ "fingers_w2": {
+  "char": "fingers",
+  "text": "Mm-hm.",
+  "voice": "8601e5e1f48e4800a38e4ee306d8b340",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.51,
+  "wer": 0.5,
+  "asr": "Mm-hmm.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.51,
+    "wer": 0.5,
+    "asr": "Mm-hmm.",
+    "score": 0.25
+   },
+   {
+    "seed": 2,
+    "dur": 0.42,
+    "wer": 0.5,
+    "asr": "Mm-hmm.",
+    "score": 0.25
+   }
+  ]
+ },
+ "fingers_w3": {
+  "char": "fingers",
+  "text": "Oops.",
+  "voice": "8601e5e1f48e4800a38e4ee306d8b340",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.43,
+  "wer": 0.0,
+  "asr": "Oops.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.43,
+    "wer": 0.0,
+    "asr": "Oops.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.58,
+    "wer": 0.0,
+    "asr": "Oops.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mulligan_01": {
+  "char": "mulligan",
+  "text": "Measure twice, cut once, swear thrice.",
+  "voice": "3e445270c4d346da921396b7be1e21a6",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.58,
+  "wer": 0.0,
+  "asr": "measure twice, cut once, swear thrice",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.58,
+    "wer": 0.0,
+    "asr": "measure twice, cut once, swear thrice",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.84,
+    "wer": 0.0,
+    "asr": "Measure twice, cut once, swear thrice.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mulligan_02": {
+  "char": "mulligan",
+  "text": "Mick! Hand me the hammer! ...No, the other Mick.",
+  "voice": "3e445270c4d346da921396b7be1e21a6",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.26,
+  "wer": 0.0,
+  "asr": "Mick, hand me the hammer. No, the other Mick.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.26,
+    "wer": 0.0,
+    "asr": "Mick, hand me the hammer. No, the other Mick.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.7,
+    "wer": 0.0,
+    "asr": "Mick, hand me the hammer. No, the other Mick.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mulligan_03": {
+  "char": "mulligan",
+  "text": "She's up! Mostly!",
+  "voice": "3e445270c4d346da921396b7be1e21a6",
+  "wordless": false,
+  "pick": 1,
+  "dur": 1.24,
+  "wer": 0.0,
+  "asr": "She's up, mostly.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.24,
+    "wer": 0.0,
+    "asr": "She's up, mostly.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.01,
+    "wer": 0.0,
+    "asr": "She's up, mostly.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mulligan_04": {
+  "char": "mulligan",
+  "text": "Tap faster, boss. We're paid by the bang.",
+  "voice": "3e445270c4d346da921396b7be1e21a6",
+  "wordless": false,
+  "pick": 2,
+  "dur": 3.0,
+  "wer": 0.0,
+  "asr": "Tap faster, boss. We're paid by the bang.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.6,
+    "wer": 0.125,
+    "asr": "Tapped faster boss, we're paid by the bang.",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 3.0,
+    "wer": 0.0,
+    "asr": "Tap faster, boss. We're paid by the bang.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mulligan_05": {
+  "char": "mulligan",
+  "text": "Load-bearin'? Everythin's load-bearin' if you believe.",
+  "voice": "3e445270c4d346da921396b7be1e21a6",
+  "wordless": false,
+  "pick": 1,
+  "dur": 3.09,
+  "wer": 0.375,
+  "asr": "Load Baron? Everything's load baron if you believe.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 3.09,
+    "wer": 0.375,
+    "asr": "Load Baron? Everything's load baron if you believe.",
+    "score": 1.5
+   },
+   {
+    "seed": 2,
+    "dur": 2.71,
+    "wer": 0.375,
+    "asr": "Load Baron? Everything's Load Baron if you believe.",
+    "score": 1.5
+   },
+   {
+    "seed": 3,
+    "dur": 2.37,
+    "wer": 0.375,
+    "asr": "load baron everything's load baron if you believe",
+    "score": 1.5
+   },
+   {
+    "seed": 4,
+    "dur": 3.01,
+    "wer": 0.375,
+    "asr": "Load Baron? Everything's Load Baron, if you believe.",
+    "score": 1.5
+   }
+  ]
+ },
+ "mulligan_06": {
+  "char": "mulligan",
+  "text": "Who's got the nails? ...Who's got Mick?",
+  "voice": "3e445270c4d346da921396b7be1e21a6",
+  "wordless": false,
+  "pick": 1,
+  "dur": 2.48,
+  "wer": 0.0,
+  "asr": "Who's got the nails? Who's got Mick?",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 2.48,
+    "wer": 0.0,
+    "asr": "Who's got the nails? Who's got Mick?",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 2.38,
+    "wer": 0.0,
+    "asr": "Who's got the nails? Who's got Mick?",
+    "score": 0.0
+   }
+  ]
+ },
+ "mulligan_w1": {
+  "char": "mulligan",
+  "text": "Heave!",
+  "voice": "3e445270c4d346da921396b7be1e21a6",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.53,
+  "wer": 0.0,
+  "asr": "Heave.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.53,
+    "wer": 0.0,
+    "asr": "Heave.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.58,
+    "wer": 0.0,
+    "asr": "Heave.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mulligan_w2": {
+  "char": "mulligan",
+  "text": "Hup, two, three!",
+  "voice": "3e445270c4d346da921396b7be1e21a6",
+  "wordless": true,
+  "pick": 1,
+  "dur": 1.54,
+  "wer": 0.0,
+  "asr": "Hup, two, three.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 1.54,
+    "wer": 0.0,
+    "asr": "Hup, two, three.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 1.64,
+    "wer": 0.0,
+    "asr": "Hup, two, three.",
+    "score": 0.0
+   }
+  ]
+ },
+ "mulligan_w3": {
+  "char": "mulligan",
+  "text": "Ow, me thumb!",
+  "voice": "3e445270c4d346da921396b7be1e21a6",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.97,
+  "wer": 0.0,
+  "asr": "Ow me thumb.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.97,
+    "wer": 0.0,
+    "asr": "Ow me thumb.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.96,
+    "wer": 0.667,
+    "asr": "Owmy Thumb",
+    "score": 0.333
+   }
+  ]
+ },
+ "mulligan_w4": {
+  "char": "mulligan",
+  "text": "Ha ha!",
+  "voice": "3e445270c4d346da921396b7be1e21a6",
+  "wordless": true,
+  "pick": 2,
+  "dur": 0.68,
+  "wer": 0.0,
+  "asr": "Ha ha!",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.53,
+    "wer": 1.0,
+    "asr": "Aha!",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 0.68,
+    "wer": 0.0,
+    "asr": "Ha ha!",
+    "score": 0.0
+   }
+  ]
+ },
+ "stranger_w1": {
+  "char": "stranger",
+  "text": "Hrm.",
+  "voice": "e484aad9722b4a379b741dc7390e399f",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.97,
+  "wer": 1.0,
+  "asr": "Hem.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.97,
+    "wer": 1.0,
+    "asr": "Hem.",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 0.6,
+    "wer": 1.0,
+    "asr": "Hum.",
+    "score": 0.5
+   }
+  ]
+ },
+ "stranger_w2": {
+  "char": "stranger",
+  "text": "Hrm?",
+  "voice": "e484aad9722b4a379b741dc7390e399f",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.7,
+  "wer": 1.0,
+  "asr": "Home.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.7,
+    "wer": 1.0,
+    "asr": "Home.",
+    "score": 0.5
+   },
+   {
+    "seed": 2,
+    "dur": 0.5,
+    "wer": 1.0,
+    "asr": "Hum?",
+    "score": 0.5
+   }
+  ]
+ },
+ "stranger_w3": {
+  "char": "stranger",
+  "text": "No.",
+  "voice": "e484aad9722b4a379b741dc7390e399f",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.43,
+  "wer": 0.0,
+  "asr": "No.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.43,
+    "wer": 0.0,
+    "asr": "No.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.45,
+    "wer": 0.0,
+    "asr": "No.",
+    "score": 0.0
+   }
+  ]
+ },
+ "stranger_w4": {
+  "char": "stranger",
+  "text": "Yep.",
+  "voice": "e484aad9722b4a379b741dc7390e399f",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.39,
+  "wer": 0.0,
+  "asr": "Yep.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.39,
+    "wer": 0.0,
+    "asr": "Yep.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.33,
+    "wer": 0.0,
+    "asr": "Yep.",
+    "score": 0.0
+   }
+  ]
+ },
+ "stranger_w5": {
+  "char": "stranger",
+  "text": "Oof!",
+  "voice": "e484aad9722b4a379b741dc7390e399f",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.5,
+  "wer": 0.0,
+  "asr": "Oof.",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.5,
+    "wer": 0.0,
+    "asr": "Oof.",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.37,
+    "wer": 0.0,
+    "asr": "Oof.",
+    "score": 0.0
+   }
+  ]
+ },
+ "stranger_w6": {
+  "char": "stranger",
+  "text": "Pfft.",
+  "voice": "e484aad9722b4a379b741dc7390e399f",
+  "wordless": true,
+  "pick": 1,
+  "dur": 0.2,
+  "wer": 0.0,
+  "asr": "Pfft",
+  "takes": [
+   {
+    "seed": 1,
+    "dur": 0.2,
+    "wer": 0.0,
+    "asr": "Pfft",
+    "score": 0.0
+   },
+   {
+    "seed": 2,
+    "dur": 0.36,
+    "wer": 0.0,
+    "asr": "PFFT",
+    "score": 0.0
+   }
+  ]
+ },
+ "wendell_w2": {
+  "char": "wendell",
+  "text": "Aaaaaah!",
+  "voice": "727affe4fa1e435a94da9bb887c4e342",
+  "wordless": true,
+  "pick": "wendell_w2_c1.wav",
+  "dur": 0.51,
+  "wer": 1.0,
+  "asr": "Ah!",
+  "how": "carrier"
+ },
+ "lulu_w1": {
+  "char": "lulu",
+  "text": "Ooh la la.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": true,
+  "pick": "lulu_w1_c2.wav",
+  "dur": 0.96,
+  "wer": 0.0,
+  "asr": "Ooh la la",
+  "how": "carrier"
+ },
+ "lulu_w4": {
+  "char": "lulu",
+  "text": "Oh my gosh!",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": true,
+  "pick": "lulu_w4_c4.wav",
+  "dur": 0.76,
+  "wer": 0.0,
+  "asr": "Oh my gosh.",
+  "how": "carrier"
+ },
+ "lulu_w2": {
+  "char": "lulu",
+  "text": "Mmm-hmm.",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": true,
+  "pick": "lulu_w2_d23.wav",
+  "dur": 1.38,
+  "wer": 0.5,
+  "asr": "Um, hmm.",
+  "how": "design seed 23 (clone returns no audio for short text)"
+ },
+ "lulu_w3": {
+  "char": "lulu",
+  "text": "Ha ha ha!",
+  "voice": "71ab3e36d8904700a902521ee2ee713a",
+  "wordless": true,
+  "pick": "lulu_w3_d23.wav",
+  "dur": 1.36,
+  "wer": 1.0,
+  "asr": "Hahaha",
+  "how": "design seed 23 (clone returns no audio for short text)"
+ }
+}

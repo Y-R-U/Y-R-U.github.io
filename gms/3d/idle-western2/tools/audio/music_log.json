@@ -1,0 +1,482 @@
+{
+ "main": {
+  "pick": {
+   "file": "main_v3.mp3",
+   "sil": 0.042,
+   "words": 0,
+   "bpm_est": 113.2,
+   "lufs": -15.0,
+   "seam": 0.763,
+   "S": 323,
+   "E": 9441,
+   "score": 1.061
+  },
+  "cands": [
+   {
+    "file": "main_v1.mp3",
+    "sil": 0.057,
+    "words": 0,
+    "bpm_est": 113.2,
+    "lufs": -14.7,
+    "seam": 0.707,
+    "S": 24,
+    "E": 9035,
+    "score": 1.353
+   },
+   {
+    "file": "main_v2.mp3",
+    "sil": 0.093,
+    "words": 0,
+    "bpm_est": 113.2,
+    "lufs": -17.1,
+    "seam": 0.655,
+    "S": 320,
+    "E": 9221,
+    "score": 1.703
+   },
+   {
+    "file": "main_v3.mp3",
+    "sil": 0.042,
+    "words": 0,
+    "bpm_est": 113.2,
+    "lufs": -15.0,
+    "seam": 0.763,
+    "S": 323,
+    "E": 9441,
+    "score": 1.061
+   }
+  ],
+  "dur": 91.18,
+  "loop": true
+ },
+ "saloon": {
+  "pick": {
+   "file": "saloon_v1.mp3",
+   "sil": 0.092,
+   "words": 0,
+   "bpm_est": 130.4,
+   "lufs": -15.4,
+   "seam": 0.903,
+   "S": 94,
+   "E": 5939,
+   "score": 0.901
+  },
+  "cands": [
+   {
+    "file": "saloon_v1.mp3",
+    "sil": 0.092,
+    "words": 0,
+    "bpm_est": 130.4,
+    "lufs": -15.4,
+    "seam": 0.903,
+    "S": 94,
+    "E": 5939,
+    "score": 0.901
+   },
+   {
+    "file": "saloon_v2.mp3",
+    "sil": 0.156,
+    "words": 0,
+    "bpm_est": 133.3,
+    "lufs": -16.8,
+    "seam": 0.743,
+    "S": 360,
+    "E": 6522,
+    "score": 1.787
+   },
+   {
+    "file": "saloon_v3.mp3",
+    "sil": 0.095,
+    "words": 0,
+    "bpm_est": 133.3,
+    "lufs": -14.8,
+    "seam": 0.837,
+    "S": 291,
+    "E": 6099,
+    "score": 1.18
+   }
+  ],
+  "dur": 58.45,
+  "loop": true
+ },
+ "build": {
+  "pick": {
+   "file": "build_v3.mp3",
+   "sil": 0.08,
+   "words": 0,
+   "bpm_est": 139.5,
+   "lufs": -14.5,
+   "seam": 0.685,
+   "S": 142,
+   "E": 4654,
+   "score": 1.576
+  },
+  "cands": [
+   {
+    "file": "build_v1.mp3",
+    "sil": 0.042,
+    "words": 0,
+    "bpm_est": 139.5,
+    "lufs": -16.3,
+    "seam": 0.499,
+    "S": 333,
+    "E": 4807,
+    "score": 1.786
+   },
+   {
+    "file": "build_v2.mp3",
+    "sil": 0.16,
+    "words": 0,
+    "bpm_est": 139.5,
+    "lufs": -15.3,
+    "seam": 0.717,
+    "S": 234,
+    "E": 4660,
+    "score": 1.879
+   },
+   {
+    "file": "build_v3.mp3",
+    "sil": 0.08,
+    "words": 0,
+    "bpm_est": 139.5,
+    "lufs": -14.5,
+    "seam": 0.685,
+    "S": 142,
+    "E": 4654,
+    "score": 1.576
+   }
+  ],
+  "dur": 45.12,
+  "loop": true
+ },
+ "night": {
+  "pick": {
+   "file": "night_v2.mp3",
+   "sil": 0.07,
+   "words": 0,
+   "bpm_est": 69.8,
+   "lufs": -15.4,
+   "seam": 0.869,
+   "S": 20,
+   "E": 7591,
+   "score": 0.872
+  },
+  "cands": [
+   {
+    "file": "night_v1.mp3",
+    "sil": 0.144,
+    "words": 0,
+    "bpm_est": 69.8,
+    "lufs": -16.8,
+    "seam": 0.764,
+    "S": 321,
+    "E": 7462,
+    "score": 1.652
+   },
+   {
+    "file": "night_v2.mp3",
+    "sil": 0.07,
+    "words": 0,
+    "bpm_est": 69.8,
+    "lufs": -15.4,
+    "seam": 0.869,
+    "S": 20,
+    "E": 7591,
+    "score": 0.872
+   },
+   {
+    "file": "night_v3.mp3",
+    "sil": 0.083,
+    "words": 0,
+    "bpm_est": 46.5,
+    "lufs": -15.1,
+    "seam": 0.779,
+    "S": 357,
+    "E": 7558,
+    "score": 1.252
+   }
+  ],
+  "dur": 75.71,
+  "loop": true
+ },
+ "robbery": {
+  "pick": {
+   "file": "robbery_v2.mp3",
+   "sil": 0.061,
+   "words": 0,
+   "bpm_est": 157.9,
+   "lufs": -12.5,
+   "seam": 0.913,
+   "S": 213,
+   "E": 3213,
+   "score": 0.978
+  },
+  "cands": [
+   {
+    "file": "robbery_v1.mp3",
+    "sil": 0.113,
+    "words": 0,
+    "bpm_est": 157.9,
+    "lufs": -15.0,
+    "seam": 0.781,
+    "S": 171,
+    "E": 3172,
+    "score": 1.435
+   },
+   {
+    "file": "robbery_v2.mp3",
+    "sil": 0.061,
+    "words": 0,
+    "bpm_est": 157.9,
+    "lufs": -12.5,
+    "seam": 0.913,
+    "S": 213,
+    "E": 3213,
+    "score": 0.978
+   },
+   {
+    "file": "robbery_v3.mp3",
+    "sil": 0.087,
+    "words": 0,
+    "bpm_est": 157.9,
+    "lufs": -13.4,
+    "seam": 0.609,
+    "S": 147,
+    "E": 3072,
+    "score": 1.953
+   }
+  ],
+  "dur": 30.0,
+  "loop": true
+ },
+ "fakedeath": {
+  "pick": {
+   "file": "fakedeath_v1.mp3",
+   "sil": 0.114,
+   "words": 0,
+   "bpm_est": 89.6,
+   "lufs": -18.2,
+   "score": 0.901
+  },
+  "cands": [
+   {
+    "file": "fakedeath_v1.mp3",
+    "sil": 0.114,
+    "words": 0,
+    "bpm_est": 89.6,
+    "lufs": -18.2,
+    "score": 0.901
+   },
+   {
+    "file": "fakedeath_v2.mp3",
+    "sil": 0.17,
+    "words": 0,
+    "bpm_est": 89.6,
+    "lufs": -15.6,
+    "score": 1.06
+   }
+  ],
+  "dur": 25.0,
+  "loop": false
+ },
+ "ghost": {
+  "pick": {
+   "file": "ghost_v2.mp3",
+   "sil": 0.032,
+   "words": 0,
+   "bpm_est": 56.1,
+   "lufs": -14.5,
+   "seam": 0.825,
+   "S": 112,
+   "E": 7543,
+   "score": 0.869
+  },
+  "cands": [
+   {
+    "file": "ghost_v1.mp3",
+    "sil": 0.178,
+    "words": 0,
+    "bpm_est": 85.7,
+    "lufs": -15.0,
+    "seam": 0.414,
+    "S": 286,
+    "E": 7984,
+    "score": 2.927
+   },
+   {
+    "file": "ghost_v2.mp3",
+    "sil": 0.032,
+    "words": 0,
+    "bpm_est": 56.1,
+    "lufs": -14.5,
+    "seam": 0.825,
+    "S": 112,
+    "E": 7543,
+    "score": 0.869
+   },
+   {
+    "file": "ghost_v3.mp3",
+    "sil": 0.126,
+    "words": 0,
+    "bpm_est": 84.5,
+    "lufs": -14.5,
+    "seam": 0.698,
+    "S": 188,
+    "E": 7573,
+    "score": 1.811
+   }
+  ],
+  "dur": 74.31,
+  "loop": true
+ },
+ "duel": {
+  "pick": {
+   "file": "duel_v1.mp3",
+   "sil": 0.168,
+   "words": 0,
+   "bpm_est": 69.8,
+   "lufs": -14.7,
+   "score": 1.137
+  },
+  "cands": [
+   {
+    "file": "duel_v1.mp3",
+    "sil": 0.168,
+    "words": 0,
+    "bpm_est": 69.8,
+    "lufs": -14.7,
+    "score": 1.137
+   },
+   {
+    "file": "duel_v2.mp3",
+    "sil": 0.229,
+    "words": 0,
+    "bpm_est": 69.8,
+    "lufs": -16.1,
+    "score": 1.385
+   }
+  ],
+  "dur": 20.0,
+  "loop": false
+ },
+ "st_sign": {
+  "pick": {
+   "file": "st_sign_v1.mp3",
+   "sil": 0.306,
+   "words": 0,
+   "bpm_est": 120.0,
+   "lufs": -15.8,
+   "score": 1.853
+  },
+  "cands": [
+   {
+    "file": "st_sign_v1.mp3",
+    "sil": 0.306,
+    "words": 0,
+    "bpm_est": 120.0,
+    "lufs": -15.8,
+    "score": 1.853
+   },
+   {
+    "file": "st_sign_v2.mp3",
+    "sil": 0.306,
+    "words": 0,
+    "bpm_est": 80.0,
+    "lufs": -15.4,
+    "score": 1.893
+   }
+  ],
+  "dur": 3.2,
+  "loop": false
+ },
+ "st_hat": {
+  "pick": {
+   "file": "st_hat_v2.mp3",
+   "sil": 0.348,
+   "words": 0,
+   "bpm_est": 120.0,
+   "lufs": -15.9,
+   "score": 2.097
+  },
+  "cands": [
+   {
+    "file": "st_hat_v1.mp3",
+    "sil": 0.34,
+    "words": 0,
+    "bpm_est": 120.0,
+    "lufs": -17.1,
+    "score": 2.15
+   },
+   {
+    "file": "st_hat_v2.mp3",
+    "sil": 0.348,
+    "words": 0,
+    "bpm_est": 120.0,
+    "lufs": -15.9,
+    "score": 2.097
+   }
+  ],
+  "dur": 3.2,
+  "loop": false
+ },
+ "st_box": {
+  "pick": {
+   "file": "st_box_v1.mp3",
+   "sil": 0.307,
+   "words": 0,
+   "bpm_est": 120.0,
+   "lufs": -16.4,
+   "score": 1.88
+  },
+  "cands": [
+   {
+    "file": "st_box_v1.mp3",
+    "sil": 0.307,
+    "words": 0,
+    "bpm_est": 120.0,
+    "lufs": -16.4,
+    "score": 1.88
+   },
+   {
+    "file": "st_box_v2.mp3",
+    "sil": 0.361,
+    "words": 0,
+    "bpm_est": 120.0,
+    "lufs": -13.0,
+    "score": 2.467
+   }
+  ],
+  "dur": 3.0,
+  "loop": false
+ },
+ "st_coach": {
+  "pick": {
+   "file": "st_coach_v1.mp3",
+   "sil": 0.27,
+   "words": 0,
+   "bpm_est": 120.0,
+   "lufs": -17.0,
+   "score": 1.72
+  },
+  "cands": [
+   {
+    "file": "st_coach_v1.mp3",
+    "sil": 0.27,
+    "words": 0,
+    "bpm_est": 120.0,
+    "lufs": -17.0,
+    "score": 1.72
+   },
+   {
+    "file": "st_coach_v2.mp3",
+    "sil": 0.29,
+    "words": 1,
+    "bpm_est": 120.0,
+    "lufs": -15.3,
+    "score": 2.21
+   }
+  ],
+  "dur": 3.0,
+  "loop": false
+ }
+}

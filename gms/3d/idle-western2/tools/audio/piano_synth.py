@@ -152,6 +152,12 @@ add('wrong_clang', 'Wrong note: clang', 'original', 'wrong', 116, rh + stride([(
 rh, _ = seq(up + ' Db7+C7+B6:6', 0, 0.85)
 add('wrong_run', 'Wrong note: overshoot', 'original', 'wrong', 120, rh + [[0, 1.5, pm('C2'), 0.7], [0, 1.5, pm('C3'), 0.6], [2.25, 1.6, pm('F#2'), 0.8], [2.25, 1.6, pm('G2'), 0.8]], wrong=True)
 
+# W11: a tap phrase lasts 2-5 s; nudge the tempo of the long tunes so they fit (frenzy 'long' is exempt).
+for ph in P:
+    L = max(n[0] + n[1] for n in ph['notes']) * 60 / ph['bpm']
+    if ph['kind'] != 'long' and L > 4.9: ph['bpm'] = int(np.ceil(ph['bpm'] * L / 4.9))
+
+
 def render(ph, tempo=1.0):
     spb = 60 / (ph['bpm'] * tempo)
     end = max(n[0] + n[1] for n in ph['notes']) * spb + 1.0

@@ -47,7 +47,7 @@
   "mabel": {
    "name": "Big Mabel Boggs",
    "role": "barkeep, Thirsty Gizzard manager",
-   "voice": "A woman in her mid-fifties with a deep, booming, chesty contralto voice, gravelly from whiskey and years of shouting. Slow, lazy Texas drawl. Amused menace; she sounds like she could lift a horse and is mildly bored by it. Big, loud and confident.",
+   "voice": "A big, loud woman in her mid-fifties with a husky, chesty alto voice, low for a woman but unmistakably female, gravelly from whiskey and years of shouting. Slow, lazy Texas drawl. Amused menace; she sounds like she could lift a horse and is mildly bored by it.",
    "audition": "And stay out! Whiskey's a dollar, water's two, it's rarer. I don't break up fights, sugar. I finish 'em.",
    "lines": [
     {
@@ -246,7 +246,7 @@
   "pickles": {
    "name": "Ezekiel \"Pickles\" McGurk",
    "role": "town drunk, Tuppenny Tubs manager",
-   "voice": "An old man in his seventies, wet, slurred, raspy voice with hiccups, warbling unsteady pitch, rambling rural Appalachian drawl. Very drunk but cheerful and friendly, completely lost, slightly too close to the microphone.",
+   "voice": "An old man in his seventies with a low, wet, slurred, raspy male voice and hiccups, an unsteady wobbly delivery, rambling rural Appalachian drawl. Very drunk but cheerful and friendly, completely lost.",
    "audition": "I ain't drunk. The street's movin'. Who moved the ground? Put it back. I'll have whatever I just had.",
    "lines": [
     {
@@ -977,7 +977,7 @@
   "pete": {
    "name": "\"Pliers\" Pete Pettigrew",
    "role": "barber-dentist-surgeon, Pull & Pray manager",
-   "voice": "A man in his thirties with an eager, high, cheerful tenor voice and a light Southern twang. Giggly, alarmingly upbeat and enthusiastic, talks quickly, far too happy about pulling teeth.",
+   "voice": "A man in his thirties with a medium-pitched, ordinary male speaking voice and a Southern twang. Upbeat and friendly like a smiling salesman, quick and chatty, cheerfully unbothered by blood.",
    "audition": "Shave, haircut or tooth? Why not all three! Open wide. Wider. Don't worry, I've done this twice!",
    "lines": [
     {
@@ -1485,7 +1485,7 @@
   "mulligan": {
    "name": "The Mulligan Brothers (Mick, Mick and Other Mick)",
    "role": "construction crew",
-   "voice": "A burly, cheerful construction worker in his thirties with a gruff, hearty, gravelly working-man voice and a mild Irish-American accent. Loud, jolly and a bit dim.",
+   "voice": "A burly man in his thirties with a deep, gruff, low male voice and a mild Irish-American accent, speaking at a normal conversational volume. Hearty, cheerful and a bit dim, a construction worker.",
    "audition": "Measure twice, cut once, swear thrice. Mick! Hand me the hammer. No, the other Mick!",
    "lines": [
     {

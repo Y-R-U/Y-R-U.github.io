@@ -127,37 +127,37 @@ def pick(cues, force):
             words = vocal_check(p)
             est = tempo(flux, bpm * 0.6, bpm * 1.6)
             lu = loudness(p)
-            info = dict(file=f, sil=round(float(sil), 3), words=words, bpm_est=round(est, 1), lufs=lu)
+            info = dict(file=f, sil=round(float(sil), 3), words=int(words), bpm_est=round(float(est), 1), lufs=lu)
             score = sil * 6 + min(words, 10) * 0.4 + (abs(lu + 16) / 10)
             if c['loop']:
                 L = int(c['dur'] * 100)
                 sim, S, E = find_loop(B, flux, L, est if abs(est / bpm - 1) < 0.15 else bpm, 150)
-                info.update(seam=round(sim, 3), S=S, E=E)
+                info.update(seam=round(float(sim), 3), S=int(S), E=int(E))
                 score += (1 - sim) * 3
-            info['score'] = round(score, 3); cands.append(info)
+            info['score'] = round(float(score), 3); cands.append(info)
             print(k, info, flush=True)
         ch = force.get(k)
         best = [i for i in cands if i['file'] == f'{k}_v{ch}.mp3'][0] if ch else min(cands, key=lambda i: i['score'])
         p = f'{RAW}/{best["file"]}'
         x, sr = sf.read(p, always_2d=True)
-        if sr != SR: raise SystemExit('unexpected sr ' + str(sr))
+        hop = sr // 100
         if c['loop']:
-            S, E = best['S'] * 441, best['E'] * 441; X = int(1.5 * SR)
+            S, E = best['S'] * hop, best['E'] * hop; X = int(1.5 * sr)
             seg = x[S:E].copy()
             t = np.linspace(0, np.pi / 2, X)[:, None]
             seg[:X] = x[S:S + X] * np.sin(t) + x[E:E + X] * np.cos(t)
         else:
             x2, B, flux, db = analyse(p)
-            st = max(0, int(np.argmax(db > -38)) - 2) * 441
-            ln = int(c.get('trim', c['dur']) * SR)
+            st = max(0, int(np.argmax(db > -38)) - 2) * hop
+            ln = int(c.get('trim', c['dur']) * sr)
             seg = x[st:st + ln].copy()
-            fo = int((0.6 if 'trim' in c else 1.5) * SR)
+            fo = int((0.6 if 'trim' in c else 1.5) * sr)
             seg[-fo:] *= np.linspace(1, 0, fo)[:, None] ** 2
-            seg[:int(0.005 * SR)] *= np.linspace(0, 1, int(0.005 * SR))[:, None]
-        w = f'{RAW}/{k}_final.wav'; sf.write(w, seg, SR)
+            seg[:int(0.005 * sr)] *= np.linspace(0, 1, int(0.005 * sr))[:, None]
+        w = f'{RAW}/{k}_final.wav'; sf.write(w, seg, sr)
         br = '96k' if c['loop'] or c['dur'] > 10 else '96k'
         lu = loudness(w); g = -16 - lu if c['loop'] else -14 - lu
-        sh('ffmpeg', '-y', '-loglevel', 'error', '-i', w, '-af', f'volume={g:.2f}dB,alimiter=limit=0.92:level=false',
+        sh('ffmpeg', '-y', '-loglevel', 'error', '-i', w, '-af', f'volume={g:.2f}dB,alimiter=limit={0.92 if c["loop"] else 0.79}:level=false',
            '-ar', '44100', '-ac', '2', '-b:a', br, f'{OUT}/{k}.mp3')
         LOG[k] = dict(pick=best, cands=cands, dur=round(dur(f'{OUT}/{k}.mp3'), 2), loop=c['loop'])
         json.dump(LOG, open(LOGF, 'w'), indent=1)
