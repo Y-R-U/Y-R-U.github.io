@@ -1,5 +1,5 @@
 export function newLineState() {
-  return { lv: 0, thr: 0, sto: 0, boost: 0, stock: 0, mgr: null, cyc: 0, earned: 0 };
+  return { lv: 0, thr: 0, sto: 0, boost: 0, stock: 0, mgr: null, cyc: 0, earned: 0, tc: 0 };
 }
 
 export function stepLine(ls, d, h) {

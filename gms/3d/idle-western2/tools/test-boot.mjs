@@ -67,9 +67,10 @@ try {
         let a = true;
         for (let i = 0; i < n; i++) a = g.act('tap').ok && a;
         const b = g.act('unlock', { lineId: L.id });
+        for (let i = 0; i < 40 && !g.stats(L.id).owned; i++) g.tick(1);
         return { a, b: b.ok, owned: g.stats(L.id).owned };
       })()`);
-      check(t.a && t.b && t.owned, 'bootstrap: hero taps → first business bought');
+      check(t.a && t.b && t.owned, 'bootstrap: hero taps → first business bought and built');
     }
     const ours = (u) => u.startsWith(ORIGIN) || u.startsWith('data:') || u.startsWith('blob:');
     const foreign = page.requests.filter((u) => !ours(u));

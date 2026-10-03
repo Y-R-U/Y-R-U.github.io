@@ -61,3 +61,7 @@ export function hourOf(ms) {
   const d = new Date(ms);
   return d.getHours() + d.getMinutes() / 60;
 }
+
+export function inWindow(h, from, to) {
+  return from <= to ? h >= from && h < to : h >= from || h < to;
+}

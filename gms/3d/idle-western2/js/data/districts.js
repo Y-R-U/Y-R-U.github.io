@@ -1,8 +1,14 @@
-// Progression areas, in unlock order. The first is open from the start; each later one is bought with a permit
-// (the gate card under the list). A business row's `district` must name one of these.
+// Blocks of Dribble Creek, in unlock order. Each later block is opened by a Deed (the permit): the cost below plus
+// `needContracts` finished Town Council Demands from the previous block. Railroad End is v1.1 (append it here).
+import { LINES } from './lines.js?v=20261004a';
+
+const first = (d) => LINES.find((l) => l.district === d).baseCost;
+
 export const DISTRICTS = [
-  { id: 'main', name: 'Main Street', emoji: '🌵', permitCost: 0, verbText: '' },
+  { id: 'lower', name: 'Lower Street', emoji: '🌵', permitCost: 0, needContracts: 0, verb: null, verbText: '' },
+  { id: 'saloonrow', name: 'Saloon Row', emoji: '🥃', permitCost: first('saloonrow') * 3, needContracts: 3, verb: 'fling', verbText: 'Drunks get thrown out · swipe to fling them' },
+  { id: 'bankblock', name: 'Bank Block', emoji: '🏦', permitCost: first('bankblock') * 4, needContracts: 3, verb: 'fakeDeath', verbText: 'Boot Hill is open · fake your death for a Bounty' },
 ];
 
-// Tip carriers: every gap a random owned business sends out a tippable courier (tap it within `life` s).
+// Tip riders: every gap a random open business sends out a tippable rider (tap it within `life` s).
 export const COURIER = { gap: [25, 45], life: 12, rewardSec: 6 };
