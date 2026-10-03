@@ -21,10 +21,10 @@ try{
  await c.frames(20);
  await check('company starts closed with no idle income',`!Object.values(transport2.game.state.routes).some(r=>r.unlocked) && transport2.game.state.cash===0`);
  await check('closed company earns nothing idle',`(()=>{transport2.game.tick(20);return transport2.game.state.cash===0 && transport2.game.state.deliveries===0})()`);
- for(let i=0;i<12;i++)await click('#work-button');
+ for(let i=0;i<12;i++)await click('#hero-view');
  await check('cargo loading earns first purchase',`transport2.game.state.cash>=60 && !transport2.game.state.routes.grain.unlocked`);
  await click('[data-action=unlockRoute][data-id=grain]');
- await check('first company must be bought',`transport2.game.state.routes.grain.unlocked && document.querySelector('#work-button').hidden`);
+ await check('first company must be bought',`transport2.game.state.routes.grain.unlocked && !document.querySelector('#work-button')`);
  original=await c.eval('transport2.game.exportSave()');
  await check('simulation pays deliveries',`(()=>{const g=transport2.game;const d=g.state.deliveries;g.tick(60);return g.state.deliveries>d && Number.isFinite(g.state.cash)})()`);
  await check('save round trip',`(()=>{const g=transport2.game;g.save();const text=g.exportSave();const cash=g.state.cash;const r=g.importSave(text);return r.ok && Math.abs(g.state.cash-cash)<1})()`);

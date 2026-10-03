@@ -1,0 +1,16 @@
+{
+  "url": "http://127.0.0.1:8888/gms/3d/idle-transport2/",
+  "checks": [
+    "no anchored earn button",
+    "five distinct scene and HUD touch positions earn exactly once",
+    "floating money and pooled world particles",
+    "swipes do not earn",
+    "multi-touch does not earn",
+    "camera controls do not also pay",
+    "keyboard scene earning",
+    "scene tapping remains useful after first company",
+    "fleet policy queues and starts after delivery",
+    "mastery bonuses and visible depot progression"
+  ],
+  "errors": []
+}

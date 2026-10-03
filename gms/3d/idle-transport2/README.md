@@ -6,7 +6,7 @@ Open through the site root server: http://localhost:8888/gms/3d/idle-transport2/
 
 No build step or external package installation. Three.js is served from the existing `/gms/lib/three/0.160.0/` library.
 
-Start with no cash or idle income. Load cargo twelve times to earn $60, then buy Golden Harvest to start your first company. Dispatch a shipment for a full-fare boost, invest in route upgrades or another vehicle, then hire a manager for full automatic fares and earnings while away. Contracts reward milestones; research improves the whole network.
+Start with no cash or idle income. Tap anywhere on the main 3D scene twelve times to earn $60, then buy Golden Harvest to start your first company. Taps show floating earnings, a ripple and 3D sparkles; swipes and scene controls never earn accidentally. Dispatch a shipment for a full-fare boost, invest in route upgrades or another vehicle, then hire a manager for full automatic fares and earnings while away. Contracts reward milestones; research improves the whole network.
 
 Expand through Meadow County, Ironworks Basin, Sapphire Coast, Alpine Frontier, and Orbital Gateway. The fifteen routes feature farms, quarries, timber yards, factories, ports, oil infrastructure, mountain supply, air cargo, and orbital freight. Use **All operations** to see the entire working network, or select a region on the world map.
 
@@ -27,6 +27,7 @@ node tools/economy-test.mjs
 node tools/browser-test.mjs
 node tools/capture.mjs
 node tools/layout-test.mjs
+node tools/tap-test.mjs
 ```
 
 Browser verification uses local Google Chrome, Node's built-in WebSocket, and the existing site server at port 8888. It writes review captures and a machine-readable report under `docs/verification/`. Chrome requires local socket/process access outside the restricted sandbox.
@@ -34,3 +35,7 @@ Browser verification uses local Google Chrome, Node's built-in WebSocket, and th
 Regional review captures use an explicitly constructed progressed company to inspect later environments. The desktop and portrait starting captures show a fresh company. Pacing measurements in `docs/ECONOMY.md` use an optimistic automated investment policy, rather than human play.
 
 Random opportunities begin after your first company opens. Rush orders, backhaul loads, and supplier bonuses offer a reward for a limited time. Claim an opportunity before its countdown ends; ignoring it has no penalty. These events do not run while away.
+
+The Fleet planning tab lets you choose balanced Steady journeys, faster Express runs, or slower high-value Heavy haul. A policy change starts after the current delivery. Route mastery at 10, 50, 150, and 500 deliveries adds permanent fare bonuses of 10%, 20%, 30%, and 50%. Depots gain buildings and cargo as levels, fleets, and mastery grow.
+
+Once your first company is open, quick successive taps build momentum up to 2× earnings. Loading research can double manual earnings twice more. Existing saves retain progress and default to Steady policies.

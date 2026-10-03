@@ -1,6 +1,6 @@
 {
   "url": "http://127.0.0.1:8888/gms/3d/idle-transport2/",
-  "date": "2026-10-03T02:27:42.801Z",
+  "date": "2026-10-03T02:52:38.082Z",
   "checks": [
     "company starts closed with no idle income",
     "closed company earns nothing idle",
@@ -81,29 +81,32 @@
   "errors": [],
   "scene": {
     "id": "orbital",
-    "progress": 0.3428199519999992,
+    "progress": 0.3421299759999992,
     "focused": true,
     "locked": true,
     "vehicles": [
       {
-        "x": 13.905922517617228,
+        "x": 13.874970775890853,
         "y": 0.48,
-        "z": 3.1215011270814386,
-        "heading": 0.8965609014144007
+        "z": 3.1598420033273555,
+        "heading": 0.886705846348893
       },
       {
-        "x": -2.580150084422346,
+        "x": -2.530874809094808,
         "y": 0.48,
         "z": -5,
         "heading": 3.141592653589793
       },
       {
-        "x": -9.322504338227318,
+        "x": -9.371779613554843,
         "y": 0.48,
         "z": 5,
         "heading": 0
       }
     ],
-    "drawCalls": 481
+    "drawCalls": 485,
+    "visualTier": 1,
+    "particles": false,
+    "tapUntil": 0
   }
 }

@@ -1,4 +1,10 @@
 export const SAVE_KEY = 'idle-transport2-v1';
+export const POLICIES = [
+  {id:'steady',name:'Steady',description:'Balanced journey time and fare.',speedFactor:1,fareFactor:1},
+  {id:'express',name:'Express',description:'20% shorter journeys, 15% lower fares.',speedFactor:.8,fareFactor:.85},
+  {id:'heavy',name:'Heavy haul',description:'30% longer journeys, 60% higher fares.',speedFactor:1.3,fareFactor:1.6}
+];
+const MASTERY = [{deliveries:10,bonus:.1},{deliveries:50,bonus:.2},{deliveries:150,bonus:.3},{deliveries:500,bonus:.5}];
 export const REGIONS = [
   {id:'meadow',name:'Meadow County',subtitle:'Farm roads & first deliveries',color:'#b9d674',unlockCost:0,requireDeliveries:0},
   {id:'industrial',name:'Ironworks Basin',subtitle:'Heavy industry, bigger ambitions',color:'#f3a465',unlockCost:3600,requireDeliveries:30},
@@ -25,6 +31,8 @@ export const ROUTES = [
   route('orbital','aerospace','Orbital Supply','Rocket components','Launch Assembly','Orbital Pad','#e1b8ef','space',15000000000,2800000,2400000,50)
 ];
 export const RESEARCH = [
+  {id:'tap-tools',name:'Loading tools',description:'Manual loading taps earn twice as much.',cost:1200},
+  {id:'precision-loaders',name:'Precision loaders',description:'Manual loading taps earn another 2×.',cost:120000,requires:'tap-tools'},
   {id:'routing',name:'Smart routing',description:'All journeys are 15% faster.',cost:900},
   {id:'cargo',name:'Cargo handling',description:'All fares increase by 25%.',cost:3500},
   {id:'fleet',name:'Fleet purchasing',description:'New vehicles cost 20% less.',cost:14000},
@@ -49,7 +57,7 @@ export const CONTRACTS = [
 ];
 const MAX = 1e100;
 const number = (value, fallback=0, max=MAX) => typeof value === 'number' && Number.isFinite(value) && value >= 0 ? Math.min(max,value) : fallback;
-const fresh = (timestamp=Date.now()) => ({version:1,cash:0,totalEarned:0,deliveries:0,prestige:0,region:'meadow',unlockedRegions:['meadow'],routes:Object.fromEntries(ROUTES.map((r,i)=>[r.id,{unlocked:false,level:1,fleet:1,manager:false,progress:0,deliveries:0,attended:false}])),research:[],contracts:[],settings:{quality:'high',sound:false},lastSaved:timestamp,event:null,eventTimer:45,eventsServed:0,workCount:0});
+const fresh = (timestamp=Date.now()) => ({version:1,cash:0,totalEarned:0,deliveries:0,prestige:0,region:'meadow',unlockedRegions:['meadow'],routes:Object.fromEntries(ROUTES.map((r,i)=>[r.id,{unlocked:false,level:1,fleet:1,manager:false,progress:0,deliveries:0,attended:false,policy:'steady',queuedPolicy:null}])),research:[],contracts:[],settings:{quality:'high',sound:false},lastSaved:timestamp,event:null,eventTimer:45,eventsServed:0,workCount:0});
 function normalize(raw,timestamp=Date.now()) {
   if (!raw || raw.version!==1 || !raw.routes || typeof raw.routes!=='object') throw new Error('This is not an Idle Transport 2 save.');
   const out=fresh(timestamp);
@@ -65,7 +73,7 @@ function normalize(raw,timestamp=Date.now()) {
   out.contracts=CONTRACTS.filter(c=>raw.contracts?.includes(c.id)).map(c=>c.id);
   for(const r of ROUTES) {
     const s=raw.routes[r.id]||{};
-    out.routes[r.id]={unlocked:s.unlocked===true&&out.unlockedRegions.includes(r.region),level:Math.max(1,Math.floor(number(s.level,1,200))),fleet:Math.max(1,Math.floor(number(s.fleet,1,30))),manager:s.manager===true,progress:number(s.progress,0,.999999),deliveries:Math.floor(number(s.deliveries)),attended:s.attended===true};
+    out.routes[r.id]={unlocked:s.unlocked===true&&out.unlockedRegions.includes(r.region),level:Math.max(1,Math.floor(number(s.level,1,200))),fleet:Math.max(1,Math.floor(number(s.fleet,1,30))),manager:s.manager===true,progress:number(s.progress,0,.999999),deliveries:Math.floor(number(s.deliveries)),attended:s.attended===true,policy:POLICIES.some(p=>p.id===s.policy)?s.policy:'steady',queuedPolicy:POLICIES.some(p=>p.id===s.queuedPolicy)&&s.queuedPolicy!==s.policy?s.queuedPolicy:null};
   }
   out.settings={quality:['high','medium','low'].includes(raw.settings?.quality)?raw.settings.quality:'high',sound:raw.settings?.sound===true};
   out.lastSaved=number(raw.lastSaved,timestamp,timestamp);
@@ -79,31 +87,37 @@ export function createGame(options={}) {
   const now=options.now||(()=>Date.now());
   const random=options.random||Math.random;
   const listeners=new Set(), cooldowns={};
+  let lastTap=-Infinity,tapCombo=0;
   let state=fresh(now()), saveTimer=0, offlineReport={seconds:0,cash:0,deliveries:0};
   const emit=(type,message,extra={})=>{for(const fn of listeners)fn({type,message,...extra});};
   const has=id=>state.research.includes(id);
   const price=x=>Math.min(MAX,Math.ceil(x));
   const stats=id=>{
     const r=ROUTES.find(r=>r.id===id),s=state.routes[id]; if(!r||!s)return null;
-    const duration=r.baseTime*(has('routing')?.85:1)*(has('engines')?.8:1)/(1+Math.min(199,s.level-1)*.018);
-    const fullPayout=Math.min(MAX,r.baseEarn*Math.pow(1.12,s.level-1)*s.fleet*(1+state.prestige*.15)*(has('cargo')?1.25:1)*(has('contracts')?1.35:1)*(has('orbital')?1.5:1));
+    const policy=POLICIES.find(p=>p.id===s.policy)||POLICIES[0],masteryLevel=MASTERY.filter(m=>s.deliveries>=m.deliveries).length,masteryBonus=masteryLevel?MASTERY[masteryLevel-1].bonus:0,nextMastery=MASTERY[masteryLevel]?.deliveries||null,previousMastery=masteryLevel?MASTERY[masteryLevel-1].deliveries:0;
+    const duration=policy.speedFactor*r.baseTime*(has('routing')?.85:1)*(has('engines')?.8:1)/(1+Math.min(199,s.level-1)*.018);
+    const fullPayout=Math.min(MAX,r.baseEarn*policy.fareFactor*(1+masteryBonus)*Math.pow(1.12,s.level-1)*s.fleet*(1+state.prestige*.15)*(has('cargo')?1.25:1)*(has('contracts')?1.35:1)*(has('orbital')?1.5:1));
     const automaticRate=s.manager?1:has('automation')?.7:.45;
-    return {income:s.unlocked?fullPayout*automaticRate/duration:0,payout:fullPayout*(s.manager||s.attended?1:automaticRate),fullPayout,duration,upgradeCost:price(r.baseCost*Math.pow(1.28,s.level-1)),fleetCost:price(r.baseCost*3*Math.pow(1.7,s.fleet-1)*(has('fleet')?.8:1)),managerCost:price(r.baseCost*5),progress:s.progress,active:s.unlocked,dispatchReady:!cooldowns[id],automaticRate};
+    return {income:s.unlocked?fullPayout*automaticRate/duration:0,payout:fullPayout*(s.manager||s.attended?1:automaticRate),fullPayout,duration,upgradeCost:price(r.baseCost*Math.pow(1.28,s.level-1)),fleetCost:price(r.baseCost*3*Math.pow(1.7,s.fleet-1)*(has('fleet')?.8:1)),managerCost:price(r.baseCost*5),progress:s.progress,active:s.unlocked,dispatchReady:!cooldowns[id],automaticRate,policy:policy.id,policyName:policy.name,queuedPolicy:s.queuedPolicy,masteryLevel,masteryBonus,nextMastery,masteryProgress:nextMastery?Math.max(0,Math.min(1,(s.deliveries-previousMastery)/(nextMastery-previousMastery))):1};
   };
   function advance(dt,offline=false) {
     for(const r of ROUTES) {
-      const s=state.routes[r.id]; if(!s.unlocked||(offline&&!s.manager))continue;
-      const info=stats(r.id), position=s.progress+dt/info.duration, count=Math.floor(position);
-      s.progress=position-count;
-      if(count>0) {
-        const base=info.fullPayout*info.automaticRate;
-        const earned=Math.min(MAX,base*count+(s.attended&&!s.manager?info.fullPayout-base:0));
+      const s=state.routes[r.id];if(!s.unlocked||(offline&&!s.manager))continue;
+      let remaining=dt;
+      while(remaining>1e-9) {
+        const info=stats(r.id),position=s.progress+remaining/info.duration,possible=Math.floor(position);
+        if(possible<1){s.progress=position;break;}
+        const count=Math.min(possible,s.queuedPolicy?1:Infinity,info.nextMastery?info.nextMastery-s.deliveries:Infinity);
+        remaining=Math.max(0,remaining-(count-s.progress)*info.duration);s.progress=0;
+        const base=info.fullPayout*info.automaticRate,earned=Math.min(MAX,base*count+(s.attended&&!s.manager?info.fullPayout-base:0));
         s.attended=false;s.deliveries=Math.min(MAX,s.deliveries+count);state.deliveries=Math.min(MAX,state.deliveries+count);state.cash=Math.min(MAX,state.cash+earned);state.totalEarned=Math.min(MAX,state.totalEarned+earned);
-        if(offline){offlineReport.cash+=earned;offlineReport.deliveries+=count;}
-        else emit('delivery',`${r.name}: delivery complete`,{id:r.id,earned,count});
+        if(offline){offlineReport.cash+=earned;offlineReport.deliveries+=count;}else emit('delivery',`${r.name}: delivery complete`,{id:r.id,earned,count});
+        if(info.nextMastery&&s.deliveries>=info.nextMastery&&!offline)emit('mastery',`${r.name} mastery: +${Math.round(stats(r.id).masteryBonus*100)}% fares.`,{id:r.id,masteryLevel:stats(r.id).masteryLevel});
+        if(s.queuedPolicy){s.policy=s.queuedPolicy;s.queuedPolicy=null;if(!offline)emit('policyApplied',`${r.name}: ${stats(r.id).policyName} policy started.`,{id:r.id});}
       }
     }
   }
+
   try {const stored=storage?.getItem(SAVE_KEY);if(stored)state=normalize(JSON.parse(stored),now());}catch {emit('warning','Stored save could not be read. A fresh company is ready.');}
   const cap=has('nightshift')?28800:14400;
   offlineReport.seconds=Math.min(cap,Math.max(0,(now()-state.lastSaved)/1000));
@@ -121,10 +135,14 @@ export function createGame(options={}) {
     const r=ROUTES.find(r=>r.id===id),s=state.routes[id];
     const reject=message=>({ok:false,message});
     const purchase=(cost)=>{if(state.cash<cost)return false;state.cash-=cost;return true;};
-    let message='';
+    let message='',resultExtra={};
     if(['upgrade','fleet','manager','dispatch'].includes(type)&&(!r||!s.unlocked))return reject('Open this route first.');
     if(type==='work') {
-      const income=ROUTES.reduce((sum,r)=>sum+stats(r.id).income,0),earned=Math.min(MAX,Math.max(5,income*.5));state.cash=Math.min(MAX,state.cash+earned);state.totalEarned=Math.min(MAX,state.totalEarned+earned);state.workCount++;message=`Loading work earned $${Math.round(earned)}.`;
+      const owned=ROUTES.some(r=>state.routes[r.id].unlocked),timestamp=now();tapCombo=owned?(timestamp-lastTap<=900?Math.min(20,tapCombo+1):1):0;lastTap=timestamp;
+      const income=ROUTES.reduce((sum,r)=>sum+stats(r.id).income,0),multiplier=owned?1+Math.max(0,tapCombo-1)/19:1,earned=Math.min(MAX,Math.max(5,income*.5)*(has('tap-tools')?2:1)*(has('precision-loaders')?2:1)*multiplier);resultExtra={earned,combo:tapCombo,multiplier};state.cash=Math.min(MAX,state.cash+earned);state.totalEarned=Math.min(MAX,state.totalEarned+earned);state.workCount++;message=`Loading work earned $${Math.round(earned)}.`;
+    } else if(type==='policy') {
+      const [routeId,policyId]=String(id).split(':'),routeState=state.routes[routeId],policy=POLICIES.find(p=>p.id===policyId);if(!routeState?.unlocked)return reject('Open this route first.');if(!policy)return reject('Unknown operating policy.');
+      if(routeState.policy===policyId){routeState.queuedPolicy=null;message='Queued policy cleared; current policy retained.';}else {routeState.queuedPolicy=policyId;message=`${policy.name} starts after the current delivery.`;}
     } else if(type==='claimEvent') {
       const event=state.event;if(!event||event.remaining<=0)return reject('This opportunity has ended.');state.cash=Math.min(MAX,state.cash+event.reward);state.totalEarned=Math.min(MAX,state.totalEarned+event.reward);message=`${event.title}: bonus received.`;state.event=null;
     } else if(type==='unlockRoute') {
@@ -146,12 +164,12 @@ export function createGame(options={}) {
     } else if(type==='claimContract') {
       const status=contractStatus(id);if(!status)return reject('Unknown contract.');if(status.claimed)return reject('Reward already claimed.');if(!status.complete)return reject('This contract is not complete yet.');state.contracts.push(id);state.cash=Math.min(MAX,state.cash+status.reward);message='Contract reward received.';
     } else if(type==='prestige') {
-      const info=prestigeInfo();if(!info.available)return reject(info.requirement);const reputation=state.prestige+info.reward,settings=state.settings;state=fresh(now());state.prestige=reputation;state.settings=settings;for(const key of Object.keys(cooldowns))delete cooldowns[key];message=`New company founded with ${reputation} reputation: +${reputation*15}% fares.`;
+      const info=prestigeInfo();if(!info.available)return reject(info.requirement);const reputation=state.prestige+info.reward,settings=state.settings;state=fresh(now());tapCombo=0;lastTap=-Infinity;state.prestige=reputation;state.settings=settings;for(const key of Object.keys(cooldowns))delete cooldowns[key];message=`New company founded with ${reputation} reputation: +${reputation*15}% fares.`;
     } else if(type==='quality') {
       if(!['high','medium','low'].includes(id))return reject('Unknown quality.');state.settings.quality=id;message=`Visual quality: ${id}.`;
     } else if(type==='sound') {state.settings.sound=!state.settings.sound;message=state.settings.sound?'Sound enabled.':'Sound disabled.';
     } else return reject('Unknown action.');
-    save();emit(type,message,{id});return {ok:true,message};
+    save();emit(type,message,{id,...resultExtra});return {ok:true,message,...resultExtra};
   }
   function tickEvents(dt) {
     if(!ROUTES.some(r=>state.routes[r.id].unlocked))return;
@@ -169,5 +187,5 @@ export function createGame(options={}) {
     advance(offlineReport.seconds,true);save();emit('offline','Managed routes earned income while you were away.',{...offlineReport});return {...offlineReport};
   }
   save();
-  return {get state(){return state;},get offlineReport(){return offlineReport;},get persistenceAvailable(){return !!storage;},stats,action,contractStatus,prestigeInfo,save,resumeAway,subscribe(fn){listeners.add(fn);return()=>listeners.delete(fn);},tick(dt){if(!Number.isFinite(dt)||dt<=0)return;dt=Math.min(dt,60);for(const id of Object.keys(cooldowns)){cooldowns[id]=Math.max(0,cooldowns[id]-dt);}advance(dt);tickEvents(dt);saveTimer+=dt;if(saveTimer>=12){saveTimer=0;save();}},exportSave(){save();return JSON.stringify(state,null,2);},importSave(text){try {if(typeof text!=='string'||text.length>100000)return {ok:false,message:'Save file is too large.'};const next=normalize(JSON.parse(text),now());state=next;state.lastSaved=now();offlineReport={seconds:0,cash:0,deliveries:0};for(const key of Object.keys(cooldowns))delete cooldowns[key];save();emit('import','Company save imported.');return {ok:true,message:'Company save imported.'};}catch(error){return {ok:false,message:error.message||'Invalid save file.'};}}};
+  return {get state(){return state;},get offlineReport(){return offlineReport;},get persistenceAvailable(){return !!storage;},tapInfo(){const active=now()-lastTap<=900&&tapCombo>0;return {combo:active?tapCombo:0,multiplier:active?1+Math.max(0,tapCombo-1)/19:1,remaining:active?Math.max(0,900-(now()-lastTap)):0};},stats,action,contractStatus,prestigeInfo,save,resumeAway,subscribe(fn){listeners.add(fn);return()=>listeners.delete(fn);},tick(dt){if(!Number.isFinite(dt)||dt<=0)return;dt=Math.min(dt,60);for(const id of Object.keys(cooldowns)){cooldowns[id]=Math.max(0,cooldowns[id]-dt);}advance(dt);tickEvents(dt);saveTimer+=dt;if(saveTimer>=12){saveTimer=0;save();}},exportSave(){save();return JSON.stringify(state,null,2);},importSave(text){try {if(typeof text!=='string'||text.length>100000)return {ok:false,message:'Save file is too large.'};const next=normalize(JSON.parse(text),now());state=next;tapCombo=0;lastTap=-Infinity;state.lastSaved=now();offlineReport={seconds:0,cash:0,deliveries:0};for(const key of Object.keys(cooldowns))delete cooldowns[key];save();emit('import','Company save imported.');return {ok:true,message:'Company save imported.'};}catch(error){return {ok:false,message:error.message||'Invalid save file.'};}}};
 }

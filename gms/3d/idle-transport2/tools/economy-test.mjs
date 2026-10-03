@@ -4,7 +4,7 @@ const memory=()=>{const values=new Map();return {getItem:k=>values.get(k)||null,
 let timestamp=1800000000000; const storage=memory();const game=createGame({storage,now:()=>timestamp});
 assert.equal(REGIONS.length,5);assert.equal(ROUTES.length,15);
 assert.equal(game.state.cash,0);assert.equal(game.state.routes.grain.unlocked,false);game.tick(30);assert.equal(game.state.cash,0);assert.equal(game.state.deliveries,0);
-for(let i=0;i<12;i++)assert(game.action('work').ok);assert.equal(game.state.cash,60);assert(game.action('unlockRoute','grain').ok);assert.equal(game.state.cash,0);for(let i=0;i<24;i++)game.action('work');assert.equal(game.state.cash,120);assert.equal(game.stats('grain').progress,0);
+for(let i=0;i<12;i++)assert(game.action('work').ok);assert.equal(game.state.cash,60);assert(game.action('unlockRoute','grain').ok);assert.equal(game.state.cash,0);for(let i=0;i<24;i++){timestamp+=1000;game.action('work');}assert.equal(game.state.cash,120);assert.equal(game.stats('grain').progress,0);
 assert.equal(game.action('fleet','grain').ok,false);assert.equal(game.state.routes.grain.fleet,1);
 game.tick(4);assert.equal(game.stats('grain').progress,.5);game.tick(4);
 assert.equal(game.state.deliveries,1);assert.equal(game.state.cash,138);
@@ -27,7 +27,7 @@ assert.equal(copy.importSave(JSON.stringify(malformed)).ok,true);assert.deepEqua
 // Reload only managed routes advance, cap four hours, and credited time is saved immediately.
 const before=game.state.cash,unmanaged=game.state.routes.timber.deliveries,managed=game.state.routes.grain.deliveries;
 game.save();timestamp+=24*3600000;
-const away=createGame({storage,now:()=>timestamp});assert.equal(away.offlineReport.seconds,14400);assert(away.state.cash>before);assert.equal(away.state.routes.timber.deliveries,unmanaged);assert(away.state.routes.grain.deliveries>managed);assert(away.offlineReport.cash<=game.stats('grain').income*14400+game.stats('grain').fullPayout);
+const away=createGame({storage,now:()=>timestamp});assert.equal(away.offlineReport.seconds,14400);assert(away.state.cash>before);assert.equal(away.state.routes.timber.deliveries,unmanaged);assert(away.state.routes.grain.deliveries>managed);assert(away.offlineReport.cash<=game.stats('grain').income*14400*1.5+game.stats('grain').fullPayout);
 const secondReload=createGame({storage,now:()=>timestamp});assert.equal(secondReload.state.cash,away.state.cash);assert.equal(secondReload.offlineReport.cash,0);
 // Prestige resets company but preserves settings and permanent reputation.
 const rich=JSON.parse(snapshot);rich.totalEarned=8000000;rich.cash=8000000;rich.unlockedRegions=['meadow','industrial','coastal','alpine'];rich.settings.quality='low';
@@ -65,3 +65,17 @@ events.tick(60);events.tick(20);assert(events.state.event);events.tick(25);asser
 const stopped=JSON.parse(events.exportSave());stopped.routes.grain.unlocked=false;assert(events.importSave(JSON.stringify(stopped)).ok);assert.equal(events.state.routes.grain.unlocked,false);
 const noCompany=createGame({storage:memory(),now:()=>timestamp});assert.equal(noCompany.resumeAway(14400).cash,0);assert.equal(noCompany.state.event,null);
 console.log('Economy: zero-cash work bootstrap, persisted closed routes, random opportunities/expiry/single claim and no offline events passed.');
+// Operating policy is queued and cannot change the current cargo's fare.
+const policies=createGame({storage:memory(),now:()=>timestamp});for(let i=0;i<12;i++)policies.action('work');policies.action('unlockRoute','grain');policies.tick(4);
+const oldFare=policies.stats('grain').payout;assert(policies.action('policy','grain:heavy').ok);assert.equal(policies.stats('grain').policy,'steady');assert.equal(policies.stats('grain').queuedPolicy,'heavy');const policyCash=policies.state.cash;policies.tick(4);assert.equal(policies.state.cash-policyCash,oldFare);assert.equal(policies.stats('grain').policy,'heavy');assert.equal(policies.stats('grain').duration,10.4);assert.equal(policies.stats('grain').fullPayout,64);
+assert(policies.action('policy','grain:express').ok);assert(policies.action('policy','grain:heavy').ok);assert.equal(policies.stats('grain').queuedPolicy,null);
+assert.equal(policies.action('policy','grain:invalid').ok,false);assert.equal(policies.action('policy','steel:heavy').ok,false);
+let masteryNotices=0;policies.subscribe(e=>{if(e.type==='mastery')masteryNotices++;});
+const nine=JSON.parse(policies.exportSave());nine.routes.grain.deliveries=9;nine.routes.grain.progress=0;nine.deliveries=9;assert(policies.importSave(JSON.stringify(nine)).ok);assert.equal(policies.stats('grain').masteryLevel,0);policies.tick(10.4);assert.equal(policies.stats('grain').masteryLevel,1);assert.equal(policies.stats('grain').masteryBonus,.1);assert.equal(policies.stats('grain').nextMastery,50);assert.equal(masteryNotices,1);policies.tick(1);assert.equal(masteryNotices,1);
+const migrated=JSON.parse(policies.exportSave());delete migrated.routes.grain.policy;delete migrated.routes.grain.queuedPolicy;migrated.routes.grain.deliveries=500;assert(policies.importSave(JSON.stringify(migrated)).ok);assert.equal(policies.stats('grain').policy,'steady');assert.equal(policies.stats('grain').masteryBonus,.5);assert.equal(policies.stats('grain').nextMastery,null);assert.equal(policies.stats('grain').masteryProgress,1);
+// Combo is transient, capped at 20 / 2x and resets after 900 milliseconds.
+const tapping=createGame({storage:memory(),now:()=>timestamp});for(let i=0;i<12;i++){const work=tapping.action('work');assert.equal(work.earned,5);assert.equal(work.combo,0);}assert.equal(tapping.state.cash,60);tapping.action('unlockRoute','grain');
+let latest;for(let i=0;i<40;i++){timestamp+=100;latest=tapping.action('work');}assert.equal(latest.combo,20);assert.equal(latest.multiplier,2);assert.equal(latest.earned,10);assert.equal(tapping.tapInfo().combo,20);
+timestamp+=901;assert.equal(tapping.tapInfo().combo,0);assert.equal(tapping.action('work').multiplier,1);
+const tapSave=JSON.parse(tapping.exportSave());tapSave.cash=1000000;assert(tapping.importSave(JSON.stringify(tapSave)).ok);assert.equal(tapping.tapInfo().combo,0);assert(tapping.action('research','tap-tools').ok);timestamp+=1000;assert.equal(tapping.action('work').earned,10);assert(tapping.action('research','precision-loaders').ok);timestamp+=1000;assert.equal(tapping.action('work').earned,20);
+console.log('Economy: queued operating policies, mastery awards/migration, capped transient combos and tap research passed.');

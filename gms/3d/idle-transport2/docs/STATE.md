@@ -18,8 +18,10 @@ The established Python site-root server on port 8888 serves this game. Do not st
 - Shared real delivery progress, animated trucks and machinery, nine procedural site types, shadows, atmospheric sky, river shimmer, bridges and detailed scenery.
 - Twelve-second automatic highlights, camera pins, automatic reveal of the main scene when pinning a row.
 - Five regions and fifteen routes. Regional operations and full-network list modes.
-- Route upgrades, fleets, managers, hands-on dispatch, eight research projects, eleven milestone contracts, permanent prestige bonuses.
-- Fresh companies start closed with $0 and no idle income: twelve cargo-loading taps fund the $60 first company. Existing saves retain purchased companies.
+- Route upgrades, fleets, managers, hands-on dispatch, ten research projects, eleven milestone contracts, permanent prestige bonuses.
+- Scene-wide earning with floating hint/cash, ripples, pooled 3D particles, keyboard access, and gesture/control exclusion. Continued taps build a capped 2x momentum bonus after the first purchase.
+- Fleet policies Steady/Express/Heavy haul queue for the next departure; four delivery mastery levels add permanent fares. Depots visibly expand with level, fleet and mastery, while trucks unload returning cargo and kick up subtle dust.
+- Fresh companies start closed with $0 and no idle income: twelve taps anywhere on the main 3D scene fund the $60 first company. Existing saves retain purchased companies.
 - Random rush/backhaul/supplier opportunities with countdowns, scaling cash rewards, single-claim validation, and no offline spawning.
 - Automatic saves, validated JSON backups/imports, capped manager-only offline and background-tab earnings, quality/sound settings and guide.
 - Mobile layouts and touch controls, project registry entry and assets/screenshots/idle-transport2.jpg.
@@ -53,6 +55,7 @@ node tools/economy-test.mjs
 node tools/browser-test.mjs
 node tools/capture.mjs
 node tools/layout-test.mjs
+node tools/tap-test.mjs
 node tools/economy-pacing.mjs
 ```
 
@@ -61,3 +64,7 @@ Browser scripts require local Chrome/socket access outside the restricted sandbo
 ## Change boundaries
 
 Only gms/3d/idle-transport2/, projects.js, and assets/screenshots/idle-transport2.jpg belong to this task. Unrelated changes already existed in games/, tinpot/, and lib/auth/; preserve them. Release only these files if the user later requests publication; verify deployment completion and the actual public URL.
+
+Scene-wide tapping expansion: economy tests cover legacy save migration, policy timing, mastery transitions and combo limits. tools/tap-test.mjs verifies actual touch positions, swipe/multi-touch/control exclusion, keyboard earning, continued tapping, policy UI and visible depot progression. Tap FX use bounded DOM nodes and a fixed 24-particle world pool.
+
+Release assets use the same v=20261003-tap2 query across HTML stylesheet/app and app/scene economy imports to avoid mixing old cached interfaces with new modules. Keep the shared economy import version identical across modules when changing it.

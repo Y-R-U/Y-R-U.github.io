@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ROUTES } from './economy.mjs';
+import { ROUTES } from './economy.mjs?v=20261003-tap2';
 
 // Every site is built from batched primitives. One offscreen renderer feeds
 // DOM-owned presentation canvases; hero and cards observe the same world.
@@ -101,7 +101,7 @@ function container(b,x,y,z,color,angle=0) {
   b.box('#d7dfbd',x,y+1.32,z,3.13,.05,1.38,angle);
 }
 function truck(color,kind) {
-  const group=new THREE.Group(), wheels=[];
+  const group=new THREE.Group(), wheels=[],cargo=new THREE.Group();group.add(cargo);
   dynamicMesh(group,'box','#182c35',0,.6,0,3.6,.25,1.25);
   dynamicMesh(group,'box',color,1.08,1.1,0,1.16,.98,1.34);
   dynamicMesh(group,'box',color,1.48,.85,0,.5,.48,1.3);
@@ -118,18 +118,19 @@ function truck(color,kind) {
     const tank=dynamicMesh(group,'cylinder','#c7d6ce',-.7,1.16,0,1.25,2.25,1.25,0,.55); tank.rotation.z=Math.PI/2;
     for(const x of [-1.45,-.1]) dynamicMesh(group,'box',color,x,1.19,0,.15,.12,1.3);
   } else if(kind==='timber') {
-    for(let i=0;i<5;i++){const log=dynamicMesh(group,'cylinder',i%2?'#b48856':'#79583d',-.62,1+i%2*.29,(i-2)*.21,.3,2.3,.3);log.rotation.z=Math.PI/2;}
+    for(let i=0;i<5;i++){const log=dynamicMesh(cargo,'cylinder',i%2?'#b48856':'#79583d',-.62,1+i%2*.29,(i-2)*.21,.3,2.3,.3);log.rotation.z=Math.PI/2;}
     for(const x of [-1.4,.22]) dynamicMesh(group,'box','#7b9390',x,1.12,0,.1,.8,1.35);
   } else if(kind==='quarry') {
     dynamicMesh(group,'box','#eab35f',-.62,1.05,0,2.3,.78,1.4);
-    for(let i=0;i<5;i++)dynamicMesh(group,'rock','#b9b49f',-.6+(i%3-.8)*.5,1.51,(i%2-.5)*.65,.8,.5,.7);
+    for(let i=0;i<5;i++)dynamicMesh(cargo,'rock','#b9b49f',-.6+(i%3-.8)*.5,1.51,(i%2-.5)*.65,.8,.5,.7);
   } else {
-    dynamicMesh(group,'box','#ecdfbe',-.65,1.3,0,2.28,1.18,1.37);
-    dynamicMesh(group,'box',color,-.65,1.32,.696,2.12,.35,.025);
-    dynamicMesh(group,'box',color,-.65,1.32,-.696,2.12,.35,.025);
-    for(const x of [-1.4,-.6,.2])dynamicMesh(group,'box','#b6b7a1',x,1.32,.717,.025,1.1,.015);
+    dynamicMesh(group,'box','#70857e',-.65,.86,0,2.4,.24,1.4);
+    dynamicMesh(cargo,'box','#ecdfbe',-.65,1.3,0,2.28,1.18,1.37);
+    dynamicMesh(cargo,'box',color,-.65,1.32,.696,2.12,.35,.025);
+    dynamicMesh(cargo,'box',color,-.65,1.32,-.696,2.12,.35,.025);
+    for(const x of [-1.4,-.6,.2])dynamicMesh(cargo,'box','#b6b7a1',x,1.32,.717,.025,1.1,.015);
   }
-  return {group,wheels};
+  return {group,wheels,cargo};
 }
 const ROAD_RADIUS=5, ROAD_STRAIGHT=20, ROAD_LENGTH=40+Math.PI*10;
 function journey(progress) {
@@ -237,7 +238,20 @@ function createWorld(route) {
   b.finish();
   const vehicles=[];for(let i=0;i<7;i++){const vehicle=truck(route.color||'#f6b56d',route.kind);if(i===0){const lights=new THREE.PointLight('#ffce83',night?7:2,5,2);lights.position.set(1.8,.8,0);vehicle.group.add(lights);}scene.add(vehicle.group);vehicles.push(vehicle);}
   const heroCamera=new THREE.PerspectiveCamera(35,1,.1,220),rowCamera=new THREE.PerspectiveCamera(39,1,.1,160);
-  return {scene,sun,heroCamera,rowCamera,vehicles,anim,route,progress:0,rendered:false};
+  const upgrades=[];
+  for(let tier=0;tier<3;tier++) {
+    const group=new THREE.Group(),detail=makeBuilder(group);scene.add(group);group.visible=false;
+    // New goods in the destination apron are visible from both perspectives.
+    for(let i=0;i<3+tier*3;i++){const x=17+(i%3)*.65+tier*2.2,z=2.5+Math.floor(i/3)*.75;detail.box(tier===2?'#b6bd99':'#bd9362',x,.65+tier*.12,z,.55,.7+tier*.24,.55);detail.box('#dfc9a0',x,1.04+tier*.24,z,.58,.07,.58);}
+    if(tier===0){building(detail,-20,-8.3,4,3,1.8,'#b9ba99','#517575');sign(group,'Cargo annex',-20,2.1,-6.77,'#ead6a2',2.4);}
+    if(tier===1){building(detail,-14,-9.7,7,3.5,2.2,'#d8d0ad','#3a6b72');sign(group,'Fleet operations',-14,2.4,-7.92,'#d4ecb8',3.8);for(let i=0;i<5;i++)detail.box('#8ba293',-17+i*1.3,.5,-6.5,.8,.25,.8);}
+    if(tier===2){building(detail,-20,8.8,4.8,3.1,3.5,'#d8ba86','#365c66');sign(group,'Regional HQ',-20,3.2,10.37,'#ffe2a0',3.7);for(const x of [-22,-18]){detail.cyl('#7d9688',x,3,7,.12,5.6,.12);detail.box(route.color,x+.4,5.5,7,.8,.55,.08);}}
+    detail.finish();upgrades.push(group);
+  }
+  const particles=new THREE.InstancedMesh(geometries.sphere,new THREE.MeshBasicMaterial({color:'#ffe6a3',transparent:true,opacity:.86,depthWrite:false}),24);particles.frustumCulled=false;particles.visible=false;scene.add(particles);
+  const dust=new THREE.InstancedMesh(geometries.sphere,new THREE.MeshBasicMaterial({color:cold?'#dfe5da':'#dbbd95',transparent:true,opacity:.19,depthWrite:false}),14);dust.frustumCulled=false;scene.add(dust);
+  const pulseLight=new THREE.PointLight('#ffe5a3',0,13,2);pulseLight.position.set(-13.5,3,2);scene.add(pulseLight);
+  return {scene,sun,heroCamera,rowCamera,vehicles,anim,route,progress:0,rendered:false,upgrades,particles,dust,pulseLight,particlePool:Array.from({length:24},()=>({born:-100,x:0,y:0,z:0,vx:0,vy:0,vz:0})),particleIndex:0,tapUntil:0};
 }
 function buildSite(route,scene,b,rng,anim) {
   const kind=route.kind;
@@ -364,7 +378,7 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.94;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setClearColor(0,0);
   let quality='high',rows=[],focusId=null,pinned=false,lastTour=performance.now(),lastFrame=0,raf=0,disposed=false,frames=0,draws=0;
   const worlds=new Map(),routeMap=new Map(ROUTES.map(route=>[route.id,route]));
-  const debug={get views(){return rows.length+1;},get worlds(){return worlds.size;},get focus(){return focusId;},get pinned(){return pinned;},get drawCalls(){return draws;},get frames(){return frames;},get dpr(){return renderer.getPixelRatio();},rendererCount:1,get presentationCount(){return targets.size;},get sourceSize(){return {width:canvas.width,height:canvas.height};},snapshot(id=focusId){const w=worlds.get(id);return w?{id,progress:w.progress,focused:focusId===id,locked:pinned,vehicles:w.vehicles.filter(v=>v.group.visible).map(v=>({x:v.group.position.x,y:v.group.position.y,z:v.group.position.z,heading:v.group.rotation.y})),drawCalls:draws}:null;}};
+  const debug={get views(){return rows.length+1;},get worlds(){return worlds.size;},get focus(){return focusId;},get pinned(){return pinned;},get drawCalls(){return draws;},get frames(){return frames;},get dpr(){return renderer.getPixelRatio();},rendererCount:1,get presentationCount(){return targets.size;},get sourceSize(){return {width:canvas.width,height:canvas.height};},snapshot(id=focusId){const w=worlds.get(id);return w?{id,progress:w.progress,focused:focusId===id,locked:pinned,vehicles:w.vehicles.filter(v=>v.group.visible).map(v=>({x:v.group.position.x,y:v.group.position.y,z:v.group.position.z,heading:v.group.rotation.y})),drawCalls:draws,visualTier:w.upgrades.filter(group=>group.visible).length,particles:w.particles.visible,tapUntil:w.tapUntil}:null;}};
   function world(id) {if(!worlds.has(id)&&routeMap.has(id))worlds.set(id,createWorld(routeMap.get(id)));return worlds.get(id);}
   function notify(){onFocus(focusId,pinned);}
   function focus(id,locked=false) {
@@ -395,18 +409,34 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
     renderer.setSize(sourceWidth,sourceHeight,false);
   }
   const waterDummy=new THREE.Object3D();
+  const tapRay=new THREE.Raycaster(),tapPoint=new THREE.Vector3(),tapPlane=new THREE.Plane(UP,-.6);
+  function celebrateTap(xNormalized=.5,yNormalized=.5){
+    const w=world(focusId);if(!w)return;const time=performance.now()/1000;
+    tapRay.setFromCamera(new THREE.Vector2(Math.max(0,Math.min(1,xNormalized))*2-1,1-Math.max(0,Math.min(1,yNormalized))*2),w.heroCamera);
+    const hit=tapRay.ray.intersectPlane(tapPlane,tapPoint);
+    const x=hit?THREE.MathUtils.clamp(hit.x,-23,23):w.vehicles[0].group.position.x,z=hit?THREE.MathUtils.clamp(hit.z,-16,16):w.vehicles[0].group.position.z;
+    for(let i=0;i<8;i++){const p=w.particlePool[w.particleIndex++%24],a=i*Math.PI/4;p.born=time;p.x=x;p.y=.8;p.z=z;p.vx=Math.cos(a)*2.5;p.vz=Math.sin(a)*2.5;p.vy=3.5+Math.random()*1.6;}
+    w.tapUntil=time+.75;w.particles.visible=true;
+  }
   function updateWorld(w,time) {
     const game=getGame(),r=game?.state.routes[w.route.id],stats=game?.stats(w.route.id),unlocked=!!r?.unlocked;
     const progress=Number(stats?.progress??r?.progress??0);w.progress=progress;
     const count=unlocked?Math.min(7,Math.max(1,Number(r?.fleet)||1)):1;
+    const mastery=Number(stats?.masteryLevel??r?.masteryLevel??r?.mastery??0)||0;
+    w.upgrades.forEach((group,tier)=>{group.visible=unlocked&&(Number(r?.level)>= [5,15,30][tier]||Number(r?.fleet)>=[3,6,12][tier]||mastery>=[1,2,4][tier]);});
+    let liveParticles=0;
+    for(let i=0;i<24;i++){const p=w.particlePool[i],age=time-p.born,live=age>=0&&age<.85;waterDummy.position.set(p.x+p.vx*age,p.y+p.vy*age-3*age*age,p.z+p.vz*age);waterDummy.scale.setScalar(live?.25*(1-age/.85):0);waterDummy.updateMatrix();w.particles.setMatrixAt(i,waterDummy.matrix);if(live)liveParticles++;}
+    w.particles.visible=liveParticles>0;w.particles.instanceMatrix.needsUpdate=true;w.pulseLight.intensity=Math.max(0,w.tapUntil-time)*18;
     for(let i=0;i<w.vehicles.length;i++) {
       const vehicle=w.vehicles[i];vehicle.group.visible=i<count;
       if(i>=count)continue;
       // Visual traffic shares the route's real journey. Inactive routes wait at dispatch.
       const p=unlocked?(progress+i/count)%1:.03;
+      vehicle.cargo.visible=p<.43||p>.92;vehicle.cargo.position.y=p>.92?Math.sin((p-.92)/.08*Math.PI)*.3:0;
       const pose=journey(p);vehicle.group.position.set(pose.x,.48,pose.z);vehicle.group.rotation.y=-pose.angle;vehicle.group.rotation.z=stats?.active?Math.sin(time*6+i)*.008:0;
       if(stats?.active)for(const wheel of vehicle.wheels)wheel.rotation.y=-time*5;
     }
+    for(let i=0;i<14;i++){const index=Math.floor(i/2),vehicle=w.vehicles[index],live=index<count&&stats?.active,age=(time*1.5+i*.47)%1,pose=journey((progress+index/count-.014*age+1)%1);waterDummy.position.set(pose.x, .9+age*.45,pose.z);waterDummy.scale.setScalar(live?.16+age*.36:0);waterDummy.updateMatrix();w.dust.setMatrixAt(i,waterDummy.matrix);}w.dust.instanceMatrix.needsUpdate=true;
     for(const animation of w.anim) {
       const obj=animation.obj;
       switch(animation.type) {
@@ -427,7 +457,7 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
       }
     }
   }
-  const target=new THREE.Vector3(),look=new THREE.Vector3(),vehicleLook=new THREE.Vector3();
+  const target=new THREE.Vector3(),look=new THREE.Vector3(),vehicleLook=new THREE.Vector3(),highlightPosition=new THREE.Vector3(31,18,22),highlightLook=new THREE.Vector3(17,1.8,0);
   function renderView(element,rect,w,isHero,time) {
     if(!element||!w)return;
     const camera=isHero?w.heroCamera:w.rowCamera;
@@ -443,6 +473,12 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
       look.set(x,1.8,0);
       // Gentle delivery camera motion links to the physical leading truck.
       const pose=journey(w.progress);vehicleLook.set(pose.x*.065,0,pose.z*.12);look.add(vehicleLook);
+      // A smooth infrequent highlight leans toward the working destination,
+      // while compact sticky feeds keep the whole arterial network in view.
+      const tourSeconds=(time-lastTour/1000+72)%24;
+      const beat=Math.max(0,1-Math.abs(tourSeconds-8)/3);
+      const highlight=rect.height>=240?(1-Math.cos(beat*Math.PI))*.24:0;
+      target.lerp(highlightPosition,highlight);look.lerp(highlightLook,highlight);
       camera.position.copy(target);camera.lookAt(look);
     } else {
       const compact=ratio<1.5;
@@ -490,5 +526,5 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
   }
   function destroy(){disposed=true;cancelAnimationFrame(raf);window.removeEventListener('resize',resize);renderer.dispose();for(const entry of targets.values())entry.canvas.remove();targets.clear();for(const w of worlds.values())w.scene.traverse(obj=>{if(obj.geometry&&!Object.values(geometries).includes(obj.geometry)&&obj.geometry!==roadGeo)obj.geometry.dispose();if(obj.material?.map)obj.material.map.dispose();});}
   window.addEventListener('resize',resize);resize();raf=requestAnimationFrame(frame);
-  return {setRoutes,focus,setQuality,resize,destroy,debug};
+  return {setRoutes,focus,setQuality,resize,destroy,celebrateTap,debug};
 }

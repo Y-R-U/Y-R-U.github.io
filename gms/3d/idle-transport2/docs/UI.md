@@ -32,3 +32,6 @@ Route camera pinning reveals the main hero with a smooth scroll; reduced-motion 
 
 ## Compact cockpit revision
 Header, scene with overlaid accounts, and region/filter heading remain stationary outside the operations scroller. Explore world sits bottom-left of the main scene. Portrait cards use a 100px scene beside route info and full-width 44px controls below. Scrolling first folds the main view; three active cards enable a smaller 118px view. Native DOM presentation canvases keep scenes attached during scrolling. Layout suite verifies two full rows at top and three after folding at320x740,390x844,430x844.
+
+## Scene-wide earning and Fleet planning
+Earn by tapping the main scene; the anchored work button has been removed. Floating Tap to earn guidance, ring/rising cash and bounded world sparkles communicate input. Swipes, multi-touch, camera/world/event buttons never earn. Keyboard Enter/Space also works. Fleet tab provides queued policies and mastery progress without enlarging portrait route rows. Browser native tap highlight disabled.
