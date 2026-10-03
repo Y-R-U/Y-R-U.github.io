@@ -114,3 +114,9 @@ Tapping a building does **not** scroll the page; the floating label/badge does. 
 - **Strongboxes** are the crates.
 
 **W17 Tone** follows the proposal's allowed/banned table. No caricature of ethnic groups, and the kid is never near the Garter.
+
+**W18 Time of day** is a compressed in-game cycle, not the phone's clock (IL2's local-time nights read as a lilac wash at 4 am).
+- One cycle lasts about 20 minutes: ~60% day, ~15% golden hour, ~25% night.
+- Night is warm and lantern-lit, with luma ≥ 0.30. It is never a lilac wash.
+- Golden hour is the default boot look: a fresh save starts at golden hour.
+- Economy hooks that need "night" (night music cue, Witching Hour) read the game clock, not the real one. The season date window still uses the real date.
