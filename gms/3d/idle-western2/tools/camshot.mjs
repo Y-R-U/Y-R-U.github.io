@@ -1,5 +1,5 @@
 // node tools/camshot.mjs outDir [tod] [build] — real game at S22: hero pinned on every business + every card.
-import { launch, stop, openPage, GAME, VIEWPORTS, sleep } from './cdp.mjs';
+import { launch, stop, openPage, GAME, VIEWPORTS, sleep, cardShot } from './cdp.mjs';
 const [dir = 'docs/shots/cam', tod = '10', mode = 'open', only = ''] = process.argv.slice(2);
 const IDS = ['shine', 'tubs', 'livery', 'saloon', 'dentist', 'garter', 'undertaker', 'jail', 'bank'].filter((i) => !only || only.split(',').includes(i));
 const port = launch({ port: +(process.env.CDP_PORT || 9301) });
@@ -12,7 +12,7 @@ try {
   await sleep(2500);
   if (mode === 'build') {
     await page.eval(`(async () => { const g = window.__iw2.game, st = g.state; g.act('cheat', { cash: 1e18 }); st.bootstrap.done = true;
-      const { DISTRICTS } = await import('./js/data/districts.js?v=20261004b'); for (const d of DISTRICTS) if (!st.districts.includes(d.id)) st.districts.push(d.id); return st.districts; })()`);
+      const { DISTRICTS } = await import('./js/data/districts.js'); for (const d of DISTRICTS) if (!st.districts.includes(d.id)) st.districts.push(d.id); return st.districts; })()`);
     const r = await page.eval(`(() => { const g = window.__iw2.game; return ${JSON.stringify(IDS)}.map((id) => { const r = g.act('buy', { lineId: id }); return id + ':' + (r.ok ? 'ok' : r.reason || r.msg); }); })()`);
     console.log('buy', r.join(' '));
     await sleep(2000);
@@ -35,9 +35,7 @@ try {
   for (const id of IDS) {
     await page.eval(`document.querySelector('.line-card[data-line="${id}"]').scrollIntoView({ block: 'center' })`);
     await sleep(mode === 'build' ? 6000 : 1800);
-    const c = await clip(page, `.line-card[data-line="${id}"] .line-view`);
-    if (!c.width) { console.log('hidden', id); continue; }
-    await page.shot(`${dir}/card_${mode}_${tod}_${id}.jpg`, { clip: c, quality: 80 });
+    if (!await cardShot(page, id, `${dir}/card_${mode}_${tod}_${id}.jpg`)) console.log('hidden', id);
   }
   console.log(page.exceptions.slice(0, 3));
   await page.close();

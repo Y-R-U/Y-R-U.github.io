@@ -106,3 +106,28 @@ export async function openPage(port) {
   };
   return page;
 }
+
+// Screenshot one business card's 3D view. A clip only shows what is on screen at capture time, and the UI scrolls the
+// page to any business that opens (celebrateOpen → scrollToCard), so with several builds finishing a card centred a few
+// seconds ago can be a screen away by the shot: the capture is then the flat beige card poster (critic r2 "blank build
+// card"). Re-centre instantly, wait for the host to present that view twice, and retry if the card moved during the shot.
+export async function cardShot(page, id, path, { quality = 80, tries = 4 } = {}) {
+  const sel = `.line-card[data-line="${id}"] .line-view`;
+  const presented = `(window.__iw2.host.debug.listViews().find((v) => v.lineId === '${id}')?.presented || 0)`;
+  const rect = `(() => { const r = document.querySelector('${sel}').getBoundingClientRect(); return { x: r.x, y: r.y + scrollY, top: r.top, bottom: r.bottom, width: r.width, height: r.height, ih: innerHeight }; })()`;
+  for (let i = 0; i < tries; i++) {
+    const n0 = await page.eval(`(() => { document.querySelector('${sel}').closest('.line-card').scrollIntoView({ block: 'center', behavior: 'instant' }); return ${presented}; })()`);
+    if (!await page.wait(`${presented} >= ${n0 + 2}`, 4000).then(() => true, () => false)) continue;
+    await page.eval('new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))');
+    const a = await page.eval(rect);
+    if (!a.width) return null;
+    if (a.top < 0 || a.bottom > a.ih) continue;
+    const r = await page.send('Page.captureScreenshot', { format: path.endsWith('.jpg') ? 'jpeg' : 'png', ...(path.endsWith('.jpg') ? { quality } : {}), clip: { x: a.x, y: a.y, width: a.width, height: a.height, scale: 1 } });
+    const b = await page.eval(rect);
+    if (Math.abs(b.top - a.top) > 1) continue;
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, Buffer.from(r.data, 'base64'));
+    return path;
+  }
+  throw new Error('cardShot: ' + id + ' never presented on screen');
+}
