@@ -13,3 +13,12 @@ js/scenes.mjs exports createScenes({hero, getGame, onFocus}) returns {setRoutes(
 js/app.mjs integrates these, owns index.html/style.css. Desktop wide editorial dashboard, warm ivory text/deep navy panels, orange/lime accents; hero big cinematic full-width; responsive portrait, live route rows with 3D viewport, upgrades/managers/fleet, tabbed World/Research/Contracts, saves import/export, prestige/settings, camera pin/autotour, guide. No huge welcome modal obstructing initial visuals. All controls 44px targets. DOM hero id hero-view. expose window.transport2={game,scenes} for smoke checks.
 
 Root owns integration, tests, registry/screenshot, docs. Agents edit only assigned modules plus own docs checkpoint.
+
+
+## Business scene expansion contract (2026-10-03)
+
+`action(type,id,quantity=1)` and `quote(type,id,quantity=1)` support production/upgrade, storage, fleet and manager tracks with quantities 1, 10 or max. Quantity selection affects production/storage/fleet UI; manager development remains a single office action. `stats` adds productionLevel, productionRate, storageLevel, capacity, stockRatio, managerLevel and managerSlots. `stockRatio` is a staged visual reserve tied to journey progress; no separate commodity inventory exists.
+
+`ITEMS`, `SEASON_BUSINESSES` and `SEASON_MILESTONES` are exported. `seasonInfo()`, `seasonStats(id)` and actions seasonStart/seasonTap/seasonUnlock/seasonUpgrade/seasonClaim drive the separate eight-minute challenge. equip uses `itemId|character`, `itemId|business:routeId` or `itemId|manager:routeId`; detach uses itemId. Inventory/equipment/season progress survive old-save normalization and prestige. See ECONOMY.md for caps, scopes and calendar behavior.
+
+Full-width route cards retain `.route-view[data-scene=id]` DOM targets. The renderer keeps one WebGL context and native DOM 2D presentation canvases. It retains last good snapshots during context loss, restarts once on restoration/resume and exposes debug recovery hooks for regression. App simulation handles visibility/pagehide/pageshow/freeze/resume once per away interval. Shared module imports and HTML assets use `v=20261003-business3`.

@@ -1,0 +1,15 @@
+{
+  "url": "http://127.0.0.1:8888/gms/3d/idle-transport2/",
+  "checks": [
+    "full-width scenes and 44px controls fit three portrait widths",
+    "touch quantity selector buys ten production levels",
+    "bulk fleet purchase adds ten vehicles",
+    "maximum storage purchase respects the upgrade cap",
+    "business details and policies live in the info popup",
+    "manager icon opens development office and unlocks slots",
+    "season practice has three businesses and earns a permanent reward",
+    "earned tools attach and detach through the info popup",
+    "expired seasonal shift disables work and purchases"
+  ],
+  "errors": []
+}

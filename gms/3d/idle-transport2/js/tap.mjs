@@ -18,8 +18,11 @@ export function createTapInteraction({element,earn,onTap=()=>{}}){
  function move(e){if(candidate?.id===e.pointerId&&Math.hypot(e.clientX-candidate.x,e.clientY-candidate.y)>12)candidate=null;}
  function up(e){const start=candidate;candidate=null;pointers.delete(e.pointerId);if(start?.id!==e.pointerId||pointers.size||control(e.target)||Math.hypot(e.clientX-start.x,e.clientY-start.y)>12)return;activate(e.clientX,e.clientY);}
  function cancel(e){pointers.delete(e.pointerId);candidate=null;}
+ function reset(){pointers.clear();candidate=null;}
+ function visibility(){if(document.hidden)reset();}
  function key(e){if(e.target!==element||!['Enter',' '].includes(e.key)||e.repeat)return;e.preventDefault();const rect=element.getBoundingClientRect();activate(rect.left+rect.width*.55,rect.top+rect.height*.5);}
  element.tabIndex=0;element.setAttribute('aria-label','Live transport scene. Tap, click, or press Enter to earn.');
  element.addEventListener('pointerdown',down);element.addEventListener('pointermove',move);element.addEventListener('pointerup',up);element.addEventListener('pointercancel',cancel);element.addEventListener('keydown',key);
- return {destroy(){for(const [name,fn]of [['pointerdown',down],['pointermove',move],['pointerup',up],['pointercancel',cancel],['keydown',key]])element.removeEventListener(name,fn);effects.remove();}};
+ window.addEventListener('blur',reset);window.addEventListener('pagehide',reset);document.addEventListener('visibilitychange',visibility);
+ return {destroy(){for(const [name,fn]of [['pointerdown',down],['pointermove',move],['pointerup',up],['pointercancel',cancel],['keydown',key]])element.removeEventListener(name,fn);window.removeEventListener('blur',reset);window.removeEventListener('pagehide',reset);document.removeEventListener('visibilitychange',visibility);effects.remove();}};
 }

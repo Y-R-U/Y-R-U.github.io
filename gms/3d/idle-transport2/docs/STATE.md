@@ -1,6 +1,18 @@
 # Idle Transport 2 — resumable manager checkpoint
 
-Status: COMPLETE implementation and local verification, 2026-10-03. Publication to GitHub Pages authorized. Deployment history is available in GitHub Actions and git history. All agents have finished; no implementation blockers.
+Status: COMPLETE expansion and local regression, 2026-10-03. Publication remains authorized. Last published HEAD before this expansion: 20e52c52. All three implementation agents and independent adversarial reviews finished. Final captures and local checks passed; root is completing scoped Pages publication and exact live verification.
+
+New delivery:
+- Resume recovery for visibility, pagehide/pageshow, freeze/resume and GPU loss/restoration; preserved last good images, one restarted RAF, no duplicate offline interval credit.
+- Full-width business scenes, small name badges and floating translucent production/truck/storage/manager icons; ×1/×10/MAX with 44px targets. Journey progress becomes the bottom border. Detailed info and manager office are dialogs.
+- Golden Harvest has wheat/corn, combine harvesting, moving conveyor/bin/chute, loaded trucks leaving left. Other business types animate matching commodities/machinery. Same physical truck groups/progress in hero and row. Bin grows only up to18% width/24% height and changes color with storage.
+- Production/storage/fleet bulk tracks, manager development through level5 and1–3 equipment slots. Six unique permanent tools can attach/detach to character, business or manager; character tools benefit main and seasonal fares.
+- Eight-minute Halloween side company with pumpkin/candy/ghost businesses, separate currency, six milestones and permanent rewards. Practice available now/year-round; official Oct15–Nov2 UTC. Challenge timer expires while away but earns no offline coins.
+- Adversarial fixes: short-away seasonal countdown, failed-save status/warning recovery, over-capacity equipment imports, complete once-only lifecycle credits, parked-truck wheel/dust and cargo/loading phase correctness, unobstructed scene focal area, compact mobile toasts.
+
+Current verification: Node economy/validation/audit suite passes; browser28 checks, tap10, expansion9, resume6 and portrait3size checks. Resume test includes three real WEBGL_lose_context cycles and Chrome freeze/active foreground return. Physical phone/Safari remains untested. Reports/screenshots under docs/verification. All final source modules and assets use v=20261003-business3.
+
+Ownership remains scenery/scenes, economy/economy, interface/HTML-CSS-app; root owns regression/tools/docs/release. Actual agent sessions may not survive restart; individual checkpoint docs and this file contain the required continuation state. No outstanding implementation blockers.
 
 Public game URL: https://yru.br8t.com/gms/3d/idle-transport2/
 
@@ -56,6 +68,8 @@ node tools/browser-test.mjs
 node tools/capture.mjs
 node tools/layout-test.mjs
 node tools/tap-test.mjs
+node tools/resume-test.mjs
+node tools/expansion-test.mjs
 node tools/economy-pacing.mjs
 ```
 
@@ -67,4 +81,4 @@ Only gms/3d/idle-transport2/, projects.js, and assets/screenshots/idle-transport
 
 Scene-wide tapping expansion: economy tests cover legacy save migration, policy timing, mastery transitions and combo limits. tools/tap-test.mjs verifies actual touch positions, swipe/multi-touch/control exclusion, keyboard earning, continued tapping, policy UI and visible depot progression. Tap FX use bounded DOM nodes and a fixed 24-particle world pool.
 
-Release assets use the same v=20261003-tap2 query across HTML stylesheet/app and app/scene economy imports to avoid mixing old cached interfaces with new modules. Keep the shared economy import version identical across modules when changing it.
+Release assets use the same v=20261003-business3 query across HTML stylesheet/app and app/scene economy imports to avoid mixing old cached interfaces with new modules. Keep the shared economy import version identical across modules when changing it.

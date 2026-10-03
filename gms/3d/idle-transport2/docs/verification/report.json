@@ -1,6 +1,6 @@
 {
   "url": "http://127.0.0.1:8888/gms/3d/idle-transport2/",
-  "date": "2026-10-03T02:52:38.082Z",
+  "date": "2026-10-03T10:13:03.728Z",
   "checks": [
     "company starts closed with no idle income",
     "closed company earns nothing idle",
@@ -81,32 +81,41 @@
   "errors": [],
   "scene": {
     "id": "orbital",
-    "progress": 0.3421299759999992,
+    "progress": 0.3742439039999986,
     "focused": true,
     "locked": true,
     "vehicles": [
       {
-        "x": 13.874970775890853,
-        "y": 0.48,
-        "z": 3.1598420033273555,
-        "heading": 0.886705846348893
-      },
-      {
-        "x": -2.530874809094808,
-        "y": 0.48,
-        "z": -5,
-        "heading": 3.141592653589793
-      },
-      {
-        "x": -9.371779613554843,
+        "x": -4.098754096994166,
         "y": 0.48,
         "z": 5,
+        "heading": -3.141592653589793
+      },
+      {
+        "x": 3.398597954485343,
+        "y": 0.48,
+        "z": -5,
         "heading": 0
+      },
+      {
+        "x": 12,
+        "y": 0.48,
+        "z": 5,
+        "heading": -3.141592653589793
       }
     ],
-    "drawCalls": 485,
+    "drawCalls": 695,
     "visualTier": 1,
     "particles": false,
-    "tapUntil": 0
+    "tapUntil": 0,
+    "production": {
+      "capacity": 6,
+      "stockRatio": 0.6184414048780479,
+      "storageLevel": 0,
+      "productionRate": 0.06216000000000001
+    },
+    "loading": true,
+    "loadingCount": 1,
+    "leaderLoading": false
   }
 }

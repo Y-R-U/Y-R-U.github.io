@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ROUTES } from './economy.mjs?v=20261003-tap2';
+import { ROUTES } from './economy.mjs?v=20261003-business3';
 
 // Every site is built from batched primitives. One offscreen renderer feeds
 // DOM-owned presentation canvases; hero and cards observe the same world.
@@ -123,6 +123,10 @@ function truck(color,kind) {
   } else if(kind==='quarry') {
     dynamicMesh(group,'box','#eab35f',-.62,1.05,0,2.3,.78,1.4);
     for(let i=0;i<5;i++)dynamicMesh(cargo,'rock','#b9b49f',-.6+(i%3-.8)*.5,1.51,(i%2-.5)*.65,.8,.5,.7);
+  } else if(kind==='farm') {
+    dynamicMesh(group,'box','#b4a56e',-.65,1.0,0,2.3,.55,1.4);
+    for(const z of [-.65,.65])dynamicMesh(group,'box','#d1ba76',-.65,1.28,z,2.3,.5,.12);
+    dynamicMesh(cargo,'sphere','#edcc70',-.65,1.42,0,2.15,.5,1.2);
   } else {
     dynamicMesh(group,'box','#70857e',-.65,.86,0,2.4,.24,1.4);
     dynamicMesh(cargo,'box','#ecdfbe',-.65,1.3,0,2.28,1.18,1.37);
@@ -142,6 +146,46 @@ function journey(progress) {
   if(s<ROAD_STRAIGHT)return{x:10-s,z:-5,angle:-Math.PI};
   s-=ROAD_STRAIGHT;const a=-Math.PI/2-s/ROAD_RADIUS;
   return{x:-10+Math.cos(a)*5,z:Math.sin(a)*5,angle:a-Math.PI/2};
+}
+// Business-side loading is part of the same economic journey seen in both
+// cameras. The loaded convoy departs screen-left along the front road.
+function businessJourney(progress) {
+  const p=((progress%1)+1)%1;
+  if(p<.18)return{x:12,z:5,angle:Math.PI};
+  if(p<.24)return{x:12-(p-.18)/.06*2,z:5,angle:Math.PI};
+  if(p>.92)return{x:10+(p-.92)/.08*2,z:5,angle:Math.PI};
+  const pose=journey(20/ROAD_LENGTH-(p-.24)/.68);pose.angle+=Math.PI;return pose;
+}
+function productionSite(scene,route) {
+  const b=makeBuilder(scene),bin=new THREE.Group();bin.position.set(18,.6,3);scene.add(bin);
+  dynamicMesh(bin,'box','#526d69',0,.08,0,4.2,.18,2.5);
+  for(const x of [-2,2])dynamicMesh(bin,'box','#bac2aa',x,.7,0,.13,1.4,2.5);
+  dynamicMesh(bin,'box','#bdc1a2',0,.55,1.2,4,.85,.13);
+  dynamicMesh(bin,'box','#8ba59a',0,.8,-1.2,4,1.6,.13);
+  const binMaterial=new THREE.MeshStandardMaterial({color:'#bac2aa',roughness:.55,metalness:.25});for(const child of bin.children)if(child.position.y>.2)child.material=binMaterial;
+  const fillMaterial=new THREE.MeshStandardMaterial({color:route.color,roughness:.9});
+  const fill=new THREE.Mesh(geometries.box,fillMaterial);fill.position.set(0,.4,0);fill.scale.set(3.7,.3,2.12);fill.castShadow=true;bin.add(fill);
+  // The common business flow has a different source commodity and equipment.
+  const source=route.kind==='farm'?new THREE.Vector3(22,.9,11):route.kind==='quarry'?new THREE.Vector3(20,2.5,-4):route.kind==='harbor'?new THREE.Vector3(19,1.1,1):route.kind==='oil'?new THREE.Vector3(21,3,2):new THREE.Vector3(20,1.5,1);
+  const end=new THREE.Vector3(18,2.4,3);
+  b.beam('#5d7974',source.toArray(),end.toArray(),.72,.22);b.beam('#b8a76f',[source.x-.4,source.y+.1,source.z],[end.x-.4,end.y+.1,end.z],.08);b.beam('#b8a76f',[source.x+.4,source.y+.1,source.z],[end.x+.4,end.y+.1,end.z],.08);
+  b.beam('#b5bea1',[18,2.2,3],[12.9,2.7,5],.3,.3);b.beam('#8b9e8c',[12.9,2.7,5],[12.9,1.8,5],.32,.32);
+  for(const [x,z] of [[18,3],[20,5]]){b.cyl('#637e70',x,1,z,.12,1.4,.12);}
+  b.box('#8f9d88',18,.48,3,4.8,.14,3.1);
+  b.finish();
+  const pieces=new THREE.InstancedMesh(route.kind==='timber'?geometries.cylinder:route.kind==='quarry'?geometries.rock:route.kind==='oil'?geometries.sphere:geometries.box,mat(route.kind==='farm'?'#e9c55c':route.kind==='timber'?'#b38350':route.color),8);pieces.frustumCulled=false;pieces.castShadow=true;scene.add(pieces);
+  const loading=new THREE.InstancedMesh(geometries.sphere,mat(route.kind==='oil'?'#c3d7a1':'#f5d690'),6);loading.frustumCulled=false;scene.add(loading);
+  const meter=new THREE.Mesh(geometries.box,new THREE.MeshBasicMaterial({color:'#b9dc79'}));meter.position.set(18,1.2,4.28);meter.scale.set(2.7,.12,.03);scene.add(meter);
+  const label=sign(scene,route.kind==='farm'?'Harvest reserve':route.kind==='oil'?'Fuel reserve':'Cargo reserve',18,1.5,4.28,'#f3e4be',3);
+  let harvester=null,reel=null;
+  if(route.kind==='farm'){
+    harvester=new THREE.Group();harvester.position.set(20,.65,11);scene.add(harvester);
+    dynamicMesh(harvester,'box','#c3a642',0,.75,0,2.6,1.0,1.5);dynamicMesh(harvester,'box','#35545b',.3,1.5,0,.9,.7,1.2);dynamicMesh(harvester,'box','#e7cb65',-.75,1.6,0,.75,.55,1.35);
+    for(const z of [-.85,.85])for(const x of [-.85,.8]){const wheel=dynamicMesh(harvester,'cylinder','#344336',x,.35,z,.75,.2,.75);wheel.rotation.x=Math.PI/2;}
+    reel=dynamicMesh(harvester,'cylinder','#987d36',1.8,.4,0,.5,2.25,.5);reel.rotation.x=Math.PI/2;dynamicMesh(harvester,'box','#aa8d3b',1.6,.2,0,.6,.18,2.5);
+    dynamicMesh(harvester,'box','#d1b565',-.8,2.1,1.0,.2,.2,2.2);
+  }
+  return {bin,binMaterial,fill,fillMaterial,pieces,loading,meter,label,source,end,harvester,reel,capacity:1,stockRatio:0,productionRate:0,storageLevel:0};
 }
 function roadGeometry() {
   const shape=new THREE.Shape();shape.moveTo(-10,6.1);shape.lineTo(10,6.1);shape.absarc(10,0,6.1,Math.PI/2,-Math.PI/2,true);shape.lineTo(-10,-6.1);shape.absarc(-10,0,6.1,-Math.PI/2,Math.PI/2,true);
@@ -166,7 +210,7 @@ function createWorld(route) {
   scene.fog=new THREE.Fog(night?'#63737f':cold?'#c0cbcc':'#c5c1ac',52,125);
   const ambient=new THREE.HemisphereLight(night?'#88b9fb':'#abc9dc',cold?'#4b5860':'#4a5037',.9);scene.add(ambient);
   const sun=new THREE.DirectionalLight(night?'#bfd5ff':'#ffd59d',night?2.7:4);sun.position.set(-32,23,14);sun.castShadow=true;
-  sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-34;sun.shadow.camera.right=34;sun.shadow.camera.top=28;sun.shadow.camera.bottom=-28;sun.shadow.camera.far=100;sun.shadow.bias=-.0003;sun.shadow.normalBias=.06;scene.add(sun);scene.add(sun.target);
+  sun.shadow.autoUpdate=false;sun.shadow.needsUpdate=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-34;sun.shadow.camera.right=34;sun.shadow.camera.top=28;sun.shadow.camera.bottom=-28;sun.shadow.camera.far=100;sun.shadow.bias=-.0003;sun.shadow.normalBias=.06;scene.add(sun);scene.add(sun.target);
   const rim=new THREE.DirectionalLight('#89b7c8',.65);rim.position.set(15,10,-22);scene.add(rim);
   // A gently terraced island creates a tactile tabletop, including exposed geology.
   b.box(cold?'#a5b8bc':'#637e59',0,-.75,0,52,1.8,38);
@@ -238,6 +282,7 @@ function createWorld(route) {
   b.finish();
   const vehicles=[];for(let i=0;i<7;i++){const vehicle=truck(route.color||'#f6b56d',route.kind);if(i===0){const lights=new THREE.PointLight('#ffce83',night?7:2,5,2);lights.position.set(1.8,.8,0);vehicle.group.add(lights);}scene.add(vehicle.group);vehicles.push(vehicle);}
   const heroCamera=new THREE.PerspectiveCamera(35,1,.1,220),rowCamera=new THREE.PerspectiveCamera(39,1,.1,160);
+  const production=productionSite(scene,route);
   const upgrades=[];
   for(let tier=0;tier<3;tier++) {
     const group=new THREE.Group(),detail=makeBuilder(group);scene.add(group);group.visible=false;
@@ -251,7 +296,7 @@ function createWorld(route) {
   const particles=new THREE.InstancedMesh(geometries.sphere,new THREE.MeshBasicMaterial({color:'#ffe6a3',transparent:true,opacity:.86,depthWrite:false}),24);particles.frustumCulled=false;particles.visible=false;scene.add(particles);
   const dust=new THREE.InstancedMesh(geometries.sphere,new THREE.MeshBasicMaterial({color:cold?'#dfe5da':'#dbbd95',transparent:true,opacity:.19,depthWrite:false}),14);dust.frustumCulled=false;scene.add(dust);
   const pulseLight=new THREE.PointLight('#ffe5a3',0,13,2);pulseLight.position.set(-13.5,3,2);scene.add(pulseLight);
-  return {scene,sun,heroCamera,rowCamera,vehicles,anim,route,progress:0,rendered:false,upgrades,particles,dust,pulseLight,particlePool:Array.from({length:24},()=>({born:-100,x:0,y:0,z:0,vx:0,vy:0,vz:0})),particleIndex:0,tapUntil:0};
+  return {scene,sun,heroCamera,rowCamera,vehicles,anim,route,progress:0,rendered:false,upgrades,particles,dust,pulseLight,particlePool:Array.from({length:24},()=>({born:-100,x:0,y:0,z:0,vx:0,vy:0,vz:0})),particleIndex:0,tapUntil:0,loadingCount:0,production};
 }
 function buildSite(route,scene,b,rng,anim) {
   const kind=route.kind;
@@ -267,7 +312,7 @@ function buildSite(route,scene,b,rng,anim) {
     b.box('#7d8658',17,.4,11,15,.1,6.5);
     for(let row=0;row<10;row++) {
       b.box('#bc9c4e',10.9+row*1.38,.49,11,1.06,.08,6.2);
-      for(let j=0;j<15;j++) {const x=10.9+row*1.38+rng()*.45,z=8.3+j*.39;b.box('#ddc46d',x,.84,z,.08,.62,.08);b.cone('#ecdb90',x,1.21,z,.22,.32,.22);}
+      for(let j=0;j<15;j++) {const x=10.9+row*1.38+rng()*.45,z=8.3+j*.39;b.box('#ddc46d',x,row>6?1.02:.84,z,.08,row>6?1.05:.62,.08);b.cone('#ecdb90',x,row>6?1.55:1.21,z,row>6?.28:.22,.32,.22);if(row>6){b.beam('#91a256',[x,.9,z],[x+.24,1.18,z+.12],.07);b.beam('#91a256',[x,1.1,z],[x-.24,1.36,z-.12],.07);}}
     }
     for(let i=0;i<5;i++)tree(b,18+i%2*3,-11+Math.floor(i/2)*2,1,rng,'leaf');
     for(let i=0;i<5;i++){const x=11+i*3;b.box('#ccb895',x,.98,14.5,.15,1.1,.15);if(i<4){b.box('#ccb895',x+1.5,1.3,14.5,3,.1,.1);b.box('#ccb895',x+1.5,.88,14.5,3,.1,.1);}}
@@ -275,7 +320,7 @@ function buildSite(route,scene,b,rng,anim) {
     b.cyl('#e3d6af',24,2.85,5,1.35,5.1,1.35);b.cone('#6c756a',24,5.4,5,1.6,.9,1.6);
     for(let i=0;i<4;i++){const blade=new THREE.Group();blade.rotation.z=i*Math.PI/2;dynamicMesh(blade,'box','#efe5bc',0,1.1,.05,.2,2.4,.12);dynamicMesh(blade,'box','#b39c6c',.3,1.6,.03,.55,1.2,.08);windmill.add(blade);}dynamicMesh(windmill,'cylinder','#a18f64',0,0,.1,.4,.15,.4).rotation.x=Math.PI/2;
     anim.push({type:'windmill',obj:windmill});
-    const tractor=new THREE.Group();tractor.position.set(20,.4,11);dynamicMesh(tractor,'box','#617b51',0,.7,0,2,.8,1.1);dynamicMesh(tractor,'box','#e2d9ad',-.5,1.3,0,.7,.8,.85);for(const z of [-.65,.65])for(const x of [-.6,.8]){const w=dynamicMesh(tractor,'cylinder','#333d31',x,.4,z,.7,.22,.7);w.rotation.x=Math.PI/2;}scene.add(tractor);anim.push({type:'tractor',obj:tractor});
+    const tractor=new THREE.Group();tractor.position.set(20,.4,13.1);dynamicMesh(tractor,'box','#617b51',0,.7,0,2,.8,1.1);dynamicMesh(tractor,'box','#e2d9ad',-.5,1.3,0,.7,.8,.85);for(const z of [-.65,.65])for(const x of [-.6,.8]){const w=dynamicMesh(tractor,'cylinder','#333d31',x,.4,z,.7,.22,.7);w.rotation.x=Math.PI/2;}scene.add(tractor);anim.push({type:'tractor',obj:tractor});
     sign(scene,'Golden harvest',20,3.05,.17,'#ffe1a5',4.4);
   } else if(kind==='quarry') {
     // Layered excavation walls, crusher conveyors, moving excavator arm.
@@ -360,7 +405,7 @@ function crane(scene,b,x,z,color,anim,height) {
 
 export function createScenes({hero,getGame,onFocus=()=>{}}) {
   const query=new URLSearchParams(location.search);
-  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance',preserveDrawingBuffer:query.get('preserve')==='1'});
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'default',preserveDrawingBuffer:query.get('preserve')==='1'});
   // WebGL stays offscreen. Each view's DOM-owned 2D canvas follows scrolling,
   // sticky positioning and rounded clipping without a JavaScript positioning step.
   const canvas=renderer.domElement,targets=new Map();
@@ -376,9 +421,9 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
   }
   presentation(hero);
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.94;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setClearColor(0,0);
-  let quality='high',rows=[],focusId=null,pinned=false,lastTour=performance.now(),lastFrame=0,raf=0,disposed=false,frames=0,draws=0;
+  let quality='high',rows=[],focusId=null,pinned=false,lastTour=performance.now(),lastFrame=0,raf=0,disposed=false,frames=0,draws=0,contextLost=false,suspended=false,recoveries=0,lossExtension=null;
   const worlds=new Map(),routeMap=new Map(ROUTES.map(route=>[route.id,route]));
-  const debug={get views(){return rows.length+1;},get worlds(){return worlds.size;},get focus(){return focusId;},get pinned(){return pinned;},get drawCalls(){return draws;},get frames(){return frames;},get dpr(){return renderer.getPixelRatio();},rendererCount:1,get presentationCount(){return targets.size;},get sourceSize(){return {width:canvas.width,height:canvas.height};},snapshot(id=focusId){const w=worlds.get(id);return w?{id,progress:w.progress,focused:focusId===id,locked:pinned,vehicles:w.vehicles.filter(v=>v.group.visible).map(v=>({x:v.group.position.x,y:v.group.position.y,z:v.group.position.z,heading:v.group.rotation.y})),drawCalls:draws,visualTier:w.upgrades.filter(group=>group.visible).length,particles:w.particles.visible,tapUntil:w.tapUntil}:null;}};
+  const debug={get views(){return rows.length+1;},get worlds(){return worlds.size;},get focus(){return focusId;},get pinned(){return pinned;},get drawCalls(){return draws;},get frames(){return frames;},get dpr(){return renderer.getPixelRatio();},rendererCount:1,get contextLost(){return contextLost||renderer.getContext().isContextLost();},get suspended(){return suspended;},get recoveries(){return recoveries;},suspend:()=>suspend(),resume:()=>recover(),loseContext:()=>{lossExtension=renderer.getContext().getExtension('WEBGL_lose_context');lossExtension?.loseContext();return !!lossExtension;},restoreContext:()=>{lossExtension?.restoreContext();return !!lossExtension;},get presentationCount(){return targets.size;},get sourceSize(){return {width:canvas.width,height:canvas.height};},snapshot(id=focusId){const w=worlds.get(id);return w?{id,progress:w.progress,focused:focusId===id,locked:pinned,vehicles:w.vehicles.filter(v=>v.group.visible).map(v=>({x:v.group.position.x,y:v.group.position.y,z:v.group.position.z,heading:v.group.rotation.y})),drawCalls:draws,visualTier:w.upgrades.filter(group=>group.visible).length,particles:w.particles.visible,tapUntil:w.tapUntil,production:{capacity:w.production.capacity,stockRatio:w.production.stockRatio,storageLevel:w.production.storageLevel,productionRate:w.production.productionRate},loading:w.loadingCount>0,loadingCount:w.loadingCount||0,leaderLoading:w.progress<.18}:null;}};
   function world(id) {if(!worlds.has(id)&&routeMap.has(id))worlds.set(id,createWorld(routeMap.get(id)));return worlds.get(id);}
   function notify(){onFocus(focusId,pinned);}
   function focus(id,locked=false) {
@@ -419,9 +464,26 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
     w.tapUntil=time+.75;w.particles.visible=true;
   }
   function updateWorld(w,time) {
+    w.sun.shadow.needsUpdate=true;
     const game=getGame(),r=game?.state.routes[w.route.id],stats=game?.stats(w.route.id),unlocked=!!r?.unlocked;
     const progress=Number(stats?.progress??r?.progress??0);w.progress=progress;
     const count=unlocked?Math.min(7,Math.max(1,Number(r?.fleet)||1)):1;
+    const production=w.production;
+    production.storageLevel=Math.max(0,Number(stats?.storageLevel??r?.storageLevel??r?.storage??0)||0);
+    production.capacity=Math.max(1,Number(stats?.capacity)||20*(1+production.storageLevel*.2));
+    production.stockRatio=unlocked?THREE.MathUtils.clamp(Number(stats?.stockRatio??(.35+progress*.6)),0,1):0;
+    production.productionRate=unlocked?Math.max(0,Number(stats?.productionRate)||1+Number(r?.level||1)*.1):0;
+    const storageScale=1+Math.min(30,production.storageLevel)*.006;
+    production.bin.scale.set(storageScale,1+Math.min(30,production.storageLevel)*.008,1);
+    const fillHeight=.08+production.stockRatio*.95;production.fill.position.y=.2+fillHeight/2;production.fill.scale.y=fillHeight;
+    production.binMaterial.color.set(production.storageLevel>=10?'#d0ac64':production.storageLevel>=6?'#71a596':production.storageLevel>=3?'#759ca7':'#bac2aa');
+    production.meter.scale.x=Math.max(.03,production.stockRatio*2.7);production.meter.material.color.set(production.stockRatio>.82?'#edc56a':'#b9dc79');
+    const productionSpeed=Math.min(.65,.12+production.productionRate*.5+Number(stats?.productionLevel??r?.level??1)*.004);
+    for(let i=0;i<8;i++){const u=(time*productionSpeed+i/8)%1;waterDummy.position.copy(production.source).lerp(production.end,u);waterDummy.position.y+=.22;waterDummy.rotation.set(0,0,w.route.kind==='timber'?Math.PI/2:0);waterDummy.scale.set(unlocked?.24:0,unlocked?(w.route.kind==='timber'?.65:.22):0,unlocked?.24:0);waterDummy.updateMatrix();production.pieces.setMatrixAt(i,waterDummy.matrix);}production.pieces.instanceMatrix.needsUpdate=true;
+    w.loadingCount=unlocked?Array.from({length:count},(_,i)=>(progress+i/count)%1).filter(p=>p<.18).length:0;
+    for(let i=0;i<6;i++){const u=(time*3+i/6)%1;waterDummy.position.set(12.9,2.7-u*.8,5);waterDummy.scale.setScalar(w.loadingCount>0?.11:0);waterDummy.updateMatrix();production.loading.setMatrixAt(i,waterDummy.matrix);}production.loading.instanceMatrix.needsUpdate=true;
+    if(production.harvester&&unlocked){production.harvester.position.x=20+Math.sin(time*productionSpeed*.7)*2.4;production.harvester.position.z=10.3;production.harvester.rotation.y=Math.cos(time*productionSpeed*.7)>0?0:Math.PI;production.reel.rotation.y=time*productionSpeed*15;}
+
     const mastery=Number(stats?.masteryLevel??r?.masteryLevel??r?.mastery??0)||0;
     w.upgrades.forEach((group,tier)=>{group.visible=unlocked&&(Number(r?.level)>= [5,15,30][tier]||Number(r?.fleet)>=[3,6,12][tier]||mastery>=[1,2,4][tier]);});
     let liveParticles=0;
@@ -432,11 +494,11 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
       if(i>=count)continue;
       // Visual traffic shares the route's real journey. Inactive routes wait at dispatch.
       const p=unlocked?(progress+i/count)%1:.03;
-      vehicle.cargo.visible=p<.43||p>.92;vehicle.cargo.position.y=p>.92?Math.sin((p-.92)/.08*Math.PI)*.3:0;
-      const pose=journey(p);vehicle.group.position.set(pose.x,.48,pose.z);vehicle.group.rotation.y=-pose.angle;vehicle.group.rotation.z=stats?.active?Math.sin(time*6+i)*.008:0;
-      if(stats?.active)for(const wheel of vehicle.wheels)wheel.rotation.y=-time*5;
+      vehicle.cargo.visible=p<.64;vehicle.cargo.scale.y=p<.18?Math.max(.05,p/.18):1;vehicle.cargo.position.y=0;
+      const pose=businessJourney(p);vehicle.group.position.set(pose.x,.48,pose.z);vehicle.group.rotation.y=-pose.angle;vehicle.group.rotation.z=stats?.active&&p>=.18?Math.sin(time*6+i)*.008:0;
+      if(stats?.active&&p>=.18)for(const wheel of vehicle.wheels)wheel.rotation.y=-time*5;
     }
-    for(let i=0;i<14;i++){const index=Math.floor(i/2),vehicle=w.vehicles[index],live=index<count&&stats?.active,age=(time*1.5+i*.47)%1,pose=journey((progress+index/count-.014*age+1)%1);waterDummy.position.set(pose.x, .9+age*.45,pose.z);waterDummy.scale.setScalar(live?.16+age*.36:0);waterDummy.updateMatrix();w.dust.setMatrixAt(i,waterDummy.matrix);}w.dust.instanceMatrix.needsUpdate=true;
+    for(let i=0;i<14;i++){const index=Math.floor(i/2),vehicle=w.vehicles[index],live=index<count&&stats?.active&&(progress+index/count)%1>=.18&&(progress+index/count)%1<.92,age=(time*1.5+i*.47)%1,pose=businessJourney((progress+index/count-.014*age+1)%1);waterDummy.position.set(pose.x, .9+age*.45,pose.z);waterDummy.scale.setScalar(live?.16+age*.36:0);waterDummy.updateMatrix();w.dust.setMatrixAt(i,waterDummy.matrix);}w.dust.instanceMatrix.needsUpdate=true;
     for(const animation of w.anim) {
       const obj=animation.obj;
       switch(animation.type) {
@@ -472,7 +534,7 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
       target.set(x+Math.sin(phase)*5+distance*.6,portrait?25:distance*.55,Math.cos(phase)*3+distance*.76);
       look.set(x,1.8,0);
       // Gentle delivery camera motion links to the physical leading truck.
-      const pose=journey(w.progress);vehicleLook.set(pose.x*.065,0,pose.z*.12);look.add(vehicleLook);
+      const pose=businessJourney(w.progress);vehicleLook.set(pose.x*.065,0,pose.z*.12);look.add(vehicleLook);
       // A smooth infrequent highlight leans toward the working destination,
       // while compact sticky feeds keep the whole arterial network in view.
       const tourSeconds=(time-lastTour/1000+72)%24;
@@ -482,8 +544,8 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
       camera.position.copy(target);camera.lookAt(look);
     } else {
       const compact=ratio<1.5;
-      camera.position.set(compact?29:28,compact?14:12,compact?17:15);
-      camera.lookAt(18,1.6,0);camera.fov=compact?45:42;
+      camera.position.set(14,compact?17:15,compact?30:28);
+      camera.lookAt(14,1.5,8);camera.fov=compact?40:36;
     }
     camera.updateProjectionMatrix();
     const output=presentation(element);
@@ -492,16 +554,17 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
     renderer.setViewport(0,0,rect.width,rect.height);
     renderer.setScissor(0,0,rect.width,rect.height);renderer.setScissorTest(true);renderer.clear();
     renderer.render(w.scene,camera);draws+=renderer.info.render.calls;
+    if(contextLost||renderer.getContext().isContextLost())return;
     // WebGL viewport originates at bottom-left; drawImage reads from top-left.
     // Copy immediately before the shared source is reused by the next camera.
     output.context.drawImage(canvas,0,canvas.height-height,width,height,0,0,width,height);
   }
 
   function frame(now) {
-    if(disposed)return;
+    raf=0;
+    if(disposed||suspended||document.hidden||contextLost||renderer.getContext().isContextLost())return;
     raf=requestAnimationFrame(frame);
-    if(document.hidden)return;
-    const limit=quality==='low'?30:60;
+    const limit=quality==='low'||innerWidth<600?30:60;
     if(now-lastFrame<1000/limit-1)return;lastFrame=now;
     const game=getGame();
     if(!pinned&&now-lastTour>12000) {
@@ -524,7 +587,23 @@ export function createScenes({hero,getGame,onFocus=()=>{}}) {
     for(const view of views)renderView(view.element,view.rect,world(view.id),view.isHero,time);
     frames++;
   }
-  function destroy(){disposed=true;cancelAnimationFrame(raf);window.removeEventListener('resize',resize);renderer.dispose();for(const entry of targets.values())entry.canvas.remove();targets.clear();for(const w of worlds.values())w.scene.traverse(obj=>{if(obj.geometry&&!Object.values(geometries).includes(obj.geometry)&&obj.geometry!==roadGeo)obj.geometry.dispose();if(obj.material?.map)obj.material.map.dispose();});}
+  function suspend(){suspended=true;cancelAnimationFrame(raf);raf=0;}
+  function recover(){
+    if(disposed)return;
+    suspended=false;lastFrame=0;
+    if(document.hidden||contextLost||renderer.getContext().isContextLost())return;
+    recoveries++;resize();renderer.shadowMap.needsUpdate=true;
+    // Explicitly dirty retained GPU-facing data following mobile suspension.
+    // 2D views retain their last complete image until this fresh render copies.
+    for(const w of worlds.values()){w.sun.shadow.needsUpdate=true;w.scene.traverse(obj=>{if(obj.isInstancedMesh)obj.instanceMatrix.needsUpdate=true;});}
+    cancelAnimationFrame(raf);raf=requestAnimationFrame(frame);
+  }
+  function visibility(){if(document.hidden)suspend();else recover();}
+  function lost(event){event.preventDefault();contextLost=true;suspend();}
+  function restored(){contextLost=false;recover();}
+  function destroy(){disposed=true;cancelAnimationFrame(raf);window.removeEventListener('resize',resize);document.removeEventListener('visibilitychange',visibility);document.removeEventListener('freeze',suspend);document.removeEventListener('resume',recover);window.removeEventListener('focus',recover);window.removeEventListener('pagehide',suspend);window.removeEventListener('pageshow',recover);canvas.removeEventListener('webglcontextlost',lost);canvas.removeEventListener('webglcontextrestored',restored);renderer.dispose();for(const entry of targets.values())entry.canvas.remove();targets.clear();const sharedMaterials=new Set(materials.values()),ownedMaterials=new Set(),ownedTextures=new Set();for(const w of worlds.values())w.scene.traverse(obj=>{if(obj.geometry&&!Object.values(geometries).includes(obj.geometry)&&obj.geometry!==roadGeo)obj.geometry.dispose();for(const material of Array.isArray(obj.material)?obj.material:[obj.material])if(material&&!sharedMaterials.has(material)){ownedMaterials.add(material);if(material.map)ownedTextures.add(material.map);}});for(const texture of ownedTextures)texture.dispose();for(const material of ownedMaterials)material.dispose();}
+  canvas.addEventListener('webglcontextlost',lost);canvas.addEventListener('webglcontextrestored',restored);
+  document.addEventListener('visibilitychange',visibility);document.addEventListener('freeze',suspend);document.addEventListener('resume',recover);window.addEventListener('focus',recover);window.addEventListener('pagehide',suspend);window.addEventListener('pageshow',recover);
   window.addEventListener('resize',resize);resize();raf=requestAnimationFrame(frame);
   return {setRoutes,focus,setQuality,resize,destroy,celebrateTap,debug};
 }

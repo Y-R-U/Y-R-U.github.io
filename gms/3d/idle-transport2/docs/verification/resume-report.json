@@ -1,0 +1,13 @@
+{
+  "url": "http://127.0.0.1:8888/gms/3d/idle-transport2/",
+  "checks": [
+    "hero and visible business views contain rendered pixels",
+    "three forced GPU context losses restore without black frames",
+    "real browser freeze and resume recover rendering",
+    "back-forward-cache lifecycle retains one working renderer",
+    "repeated lifecycle events award one complete away interval and expire seasonal time",
+    "recovered renderer handles portrait resize"
+  ],
+  "errors": [],
+  "recoveries": 9
+}

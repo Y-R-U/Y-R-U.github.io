@@ -46,3 +46,30 @@ Status: scene expansion implemented; syntax checked. Parent owns game economy/DO
 - Debug snapshot adds `visualTier`, `particles`, `tapUntil`; all DOM-canvas, rendererCount, sourceSize, focus and vehicle diagnostics preserved.
 
 Resume: parent invokes `celebrateTap` after successful tap income, owns DOM feedback and real browser validation. Scenery work is complete; do not reset the presentation canvas architecture.
+
+## Follow-up: mobile resume recovery and business production views
+Status: implemented, syntax checked. Parent forced-loss/lifecycle browser suite passed; fresh expanded-scene captures and release remain parent-owned.
+
+### Recovery
+Switched WebGL power preference to `default` to reduce mobile high-power context eviction. Context loss prevents default and stops the sole RAF; 2D presentation canvases keep their last complete image. Rendering checks `isContextLost` before entering and again before blitting, so a lost source cannot replace the retained view with black. Restoration, visibility return, pageshow/BFCache, document freeze/resume and window focus trigger a fresh buffer sizing pass, instance upload invalidation, shadow invalidation and exactly one RAF restart. Hidden/frozen pages stop painting. All listeners are removed on destroy.
+
+`debug.loseContext()/restoreContext()` retain the WEBGL_lose_context extension across loss; `debug.suspend()/resume()`, `contextLost`, `suspended`, `recoveries`, `frames` support reproducible checks. Parent `tools/resume-test.mjs` verified three GPU losses with retained pixels/restored colored views, true browser freeze+foreground return, BFCache events and portrait resize. CDP active alone leaves a tab hidden; bringToFront correctly models real user return.
+
+### Business activity
+New `productionSite` creates a batched loading conveyor, visible open reserve bin, stock meter and six pooled loading grains/drops plus eight pooled moving commodities. Farm gets an actual combine with rotating header, distinct corn stalks alongside wheat, visible grain hopper on the truck, grain moving from harvested fields into the bin and chute into the waiting truck. Other sites retain their distinctive saw/crane/pump/excavator/ship/etc plus timber/rock/parcels/fuel movement through staging. No per-frame/per-tap meshes are created.
+
+The shared visual economic journey now starts with loading at the business on the RIGHT for progress 0–.18; trucks depart LEFT on the front road, traverse the arterial loop and return .92–1. The same world/groups render in both hero and business cameras. Row cameras face the production/loading yard rather than duplicating the hero overview. Cargo appearance fills while loading, carries outbound and is empty returning.
+
+Production state consumes exact economy stats: `storageLevel`, `capacity`, `stockRatio`, `productionRate`, `productionLevel`. Capacity upgrades grow and recolor storage; stock fill/meter follow the authoritative ratio (drains during loading, refills while away). Production upgrades speed the conveyor/combine. Debug snapshot exposes `production: {capacity,stockRatio,storageLevel,productionRate}` and `loading` alongside exact truck positions/progress.
+
+Performance: directional shadow `autoUpdate=false`, with needsUpdate once per world simulation update, prevents rendering duplicate shadow maps for hero and row cameras of the same world. Resume explicitly invalidates all shadows. Portrait below600px runs at30fps, desktop highquality60fps.
+
+### Independent mobile review
+At320px, no horizontal overflow; every visible button meets44px and all first-route button centers correctly hit their own control; zero browser errors. Review capture `/tmp/transport-review-320.png` showed production yard obscured by two-row upgrade/bulk overlays on204px cards, and three stacked action toasts covering lower views. Parent informed: increase mobile scene height or reserve a narrow controls strip; reduce stacked notifications. No UI files edited by scenery agent.
+
+### Final business-view refinements
+Parent adopted compact single-line name badges, smaller bulk pills with unchanged44px hit areas and single action toast. Row camera now looks forward toz8; loading reserve bins, conveyor endpoints and meters moved behind the road toz3 on a small apron, placing the business activity above purchase overlays. At maxstorage50, bin physical growth is intentionally capped at18%width/24%height; material color and fill level communicate stronger upgrades without overwhelming the diorama.
+
+Cargo stays empty for the entire return(.64–1) and fills only during loading(0–.18); parked loading vehicles stop wheels, suspension and dust. Loading chute checks every fleet-offset phase, so any waiting fleet truck receives cargo. Debug exposes loadingCount plus leaderLoading separately. Owned material/texture disposal is deduplicated and preserves shared module primitives. Economy cache import agrees with final`v=20261003-business3`.
+
+Independent live Chrome320 review after camera/overlay/bin changes: viewport scrollWidth320, no undersized visible targets, all first-row button centers hit their own buttons, current economy production values match snapshot, no browser errors. Final local capture `/tmp/transport-review-320.png`; parent owns enduring final captures. Scenery task complete, all edits on disk and uncommitted. No seasonal mini-scene API added; main business staging and robust recovery took priority.

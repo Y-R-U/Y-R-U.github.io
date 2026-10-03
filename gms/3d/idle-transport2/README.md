@@ -28,6 +28,8 @@ node tools/browser-test.mjs
 node tools/capture.mjs
 node tools/layout-test.mjs
 node tools/tap-test.mjs
+node tools/resume-test.mjs
+node tools/expansion-test.mjs
 ```
 
 Browser verification uses local Google Chrome, Node's built-in WebSocket, and the existing site server at port 8888. It writes review captures and a machine-readable report under `docs/verification/`. Chrome requires local socket/process access outside the restricted sandbox.
@@ -39,3 +41,12 @@ Random opportunities begin after your first company opens. Rush orders, backhaul
 The Fleet planning tab lets you choose balanced Steady journeys, faster Express runs, or slower high-value Heavy haul. A policy change starts after the current delivery. Route mastery at 10, 50, 150, and 500 deliveries adds permanent fare bonuses of 10%, 20%, 30%, and 50%. Depots gain buildings and cargo as levels, fleets, and mastery grow.
 
 Once your first company is open, quick successive taps build momentum up to 2× earnings. Loading research can double manual earnings twice more. Existing saves retain progress and default to Steady policies.
+
+
+Business rows now use the full card as their live 3D view. The name, info button and camera pin float above production activity. Production, trucks, storage and manager icons sit above a thin journey-progress border. Choose ×1, ×10 or MAX underneath; bulk orders buy the affordable amount without passing track limits. Info opens detailed statistics, dispatch policies and business tool slots. The manager icon hires a manager once, then opens their office for development up to level five and one to three equipment slots.
+
+Golden Harvest shows a combine working wheat and corn, a moving conveyor feeding a reserve bin, and trucks loading on the right before departing left. The same vehicles appear in the main view. Other businesses move their own commodities with saws, cranes, pumps and site machinery. Storage upgrades increase capacity and visibly grow/recolor the bin; its fill drains while loading and grows during the journey. Scenery remains illustrative staging linked to delivery progress, rather than a separate crop inventory simulation.
+
+The Season tab opens **Halloween Haul**, an eight-minute side company with pumpkin, candy and ghost freight businesses. Its official window is October 15 through November 1 UTC, with practice available year-round. Six milestones award unique permanent keepsakes for character, business or manager slots. Attach/detach them in Fleet, business info or the manager office. Rewards persist through new shifts and company prestige; practice and the official season share the same one-time rewards. Seasonal coins are separate from company cash. The clock continues while away, but the shift earns no offline coins.
+
+Mobile recovery preserves the last rendered images while WebGL is unavailable, pauses hidden rendering, and redraws on visibility, page restoration and GPU context recovery. The recovery test forces three context losses and exercises browser freeze/resume, back-forward-cache lifecycle events and portrait resizing. Chrome emulation is verified; physical Safari remains a separate device check.
