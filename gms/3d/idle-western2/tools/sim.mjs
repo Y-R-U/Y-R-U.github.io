@@ -4,6 +4,7 @@
 import { createGame } from '../js/state/game.js';
 import { LINES } from '../js/data/lines.js';
 import { MANAGER_LEVELS } from '../js/data/managers.js';
+import { mulberry32 } from '../js/state/events.js';
 
 const START = Date.parse('2026-09-05T09:00:00');
 const TOL = 0.3;
@@ -12,9 +13,9 @@ export const DEAD_GAP = 240;
 // [mark, label, lo s, hi s] for life 1, active profile (±30% tolerance, as in IL2).
 export const TARGETS = [
   ['shine', 'Spit & Shine open', 25, 45],
-  ['tubs', 'Tuppenny Tubs open', 60, 105],
-  ['livery', 'Livery open', 120, 210],
-  ['saloonrow', 'Saloon Row Deed', 270, 420],
+  ['tubs', 'Tuppenny Tubs open', 45, 90],
+  ['livery', 'Livery open', 90, 180],
+  ['saloonrow', 'Saloon Row Deed', 180, 360],
   ['garter', 'Velvet Garter open', 540, 780],
   ['bankblock', 'Bank Block Deed', 1200, 1620],
   ['bank', 'Bank open', 1680, 2400],
@@ -22,9 +23,21 @@ export const TARGETS = [
   ['deathRec', 'Fake Your Death recommended', 3300, 4200],
 ];
 
+// Casual (PT#5) ceilings, life 1: [mark, label, max s].
+export const CASUAL_TARGETS = [
+  ['tubs', 'Tuppenny Tubs open', 90],
+  ['livery', 'Livery open', 180],
+  ['saloonrow', 'Saloon Row Deed', 420],
+  ['special', 'First special (wind-up)', 300],
+];
+
 export const PROFILES = {
   active: { name: 'active', tapRate: (t) => (t < 600 ? 2.5 : 1.5), mudRate: 1.2, decideEvery: 2, pileEvery: 20, checkIn: 0, events: true, fling: true, hurry: true },
   typical: { name: 'typical', tapRate: (t) => (t < 600 ? 1 : 0.5), mudRate: 1, decideEvery: 5, pileEvery: 60, checkIn: 0, events: false, casual: true },
+  // PT#5: modelled on the playtester. Taps in bursts while looking (~1/s on average), buys the first lit thing
+  // (next business or Deed, else hire > level > staff > boost, street order), follows the "save for X" chip,
+  // never hurries a build, sells a pile when it looks full-ish, plays specials so-so and opens the sheets now and then.
+  casual: { name: 'casual', human: true, tapRate: () => 1, burst: { period: 20, on: 9, rate: 2.2 }, mudRate: 2.2, decideEvery: 1.2, sheetEvery: 150, pileFull: 0.6, pileSec: 60, followBest: true, eventP: 0.75, flingP: 0.5, events: true },
   idle: { name: 'idle', tapRate: () => 0, mudRate: 1.2, decideEvery: 0, pileEvery: 0, checkIn: 180, early: 60, events: false },
 };
 
@@ -220,10 +233,73 @@ function playSpecials(g, prof) {
 }
 
 const DIRS = ['left', 'right', 'down', 'up'];
+const PRIORITY = ['hire', 'level', 'throughput', 'boost'];
+const NEWEST_FIRST = [...LINES].reverse();
+
+function humanShop(g, prof, t, log) {
+  const st = g.state;
+  const goal = g.nextGoal();
+  if (goal && goal.affordable && !goal.blocked) {
+    const r = goal.kind === 'line' ? g.act('buy', { lineId: goal.lineId }) : g.act('permit', { districtId: goal.districtId });
+    if (r.ok) return true;
+  }
+  if (goal && goal.hint === 'save') return false;
+  const bb = goal?.bestBuy;
+  if (prof.followBest && goal?.save) return false;
+  if (prof.followBest && bb && bb.affordable && g.act(bb.act, { lineId: bb.lineId, qty: bb.qty || 1 }).ok) { log?.buy(t, { kind: bb.act === 'throughput' ? 'thr' : bb.act, l: LINES.find((l) => l.id === bb.lineId), p: {}, q: g.quote(bb.act, { lineId: bb.lineId }) }); return true; }
+  for (const act of PRIORITY) {
+    for (const l of NEWEST_FIRST) {
+      if (!(st.lines[l.id].lv > 0)) continue;
+      const q = g.quote(act, { lineId: l.id, qty: 1 });
+      if (!isFinite(q.cost) || st.cash < q.cost) continue;
+      if (g.act(act, { lineId: l.id, qty: 1 }).ok) { log?.buy(t, { kind: act === 'throughput' ? 'thr' : act, l, p: {}, q }); return true; }
+    }
+  }
+  return false;
+}
+
+function humanStep(g, prof, t, dt, H, ctx) {
+  const st = g.state;
+  const B = prof.burst;
+  const on = ((t + H.phase) % B.period) < B.on;
+  if (st.bootstrap.done) {
+    if (on) H.tapAcc += B.rate * dt;
+    while (H.tapAcc >= 1) { H.tapAcc--; g.act('tap'); }
+  }
+  for (const e of [...st.events.active]) {
+    if (H.seen[e.id] == null) H.seen[e.id] = H.rng() < prof.eventP;
+    if (!H.seen[e.id] || g.simTime - e.born < 3) continue;
+    if (!e.special) { g.act('claimEvent', { eventId: e.id }); continue; }
+    if (e.kind === 'stagecoach') { g.act('claimEvent', { eventId: e.id }); continue; }
+    if (e.phase === 'wind') { g.act('special:begin', { id: e.id }); continue; }
+    if (g.simTime - (e.started || 0) < 2) continue;
+    if (e.kind === 'duel') g.act('duel:result', { id: e.id, ms: 520 });
+    else if (e.kind === 'brawl' && e.hits < 4 && H.rng() < dt / 1.5) g.act('brawl:hit', { id: e.id });
+    else if (e.kind === 'robbery' && e.hits < 12 && H.rng() < dt) g.act('robbery:hit', { id: e.id });
+  }
+  for (const c of [...st.couriers]) { if (H.seen[c.id] == null) H.seen[c.id] = H.rng() < 0.4; if (H.seen[c.id] && g.simTime - c.t0 > 4) g.act('tapCourier', { id: c.id }); }
+  if (st.saloon.held && H.held !== st.saloon.held.id) { H.held = st.saloon.held.id; H.fling = H.rng() < prof.flingP; }
+  if (st.saloon.held && H.fling && g.simTime - st.saloon.held.born > 1) g.act('fling', { dir: DIRS[Math.floor(H.rng() * 4)] });
+  if (ctx.shop === false) return;
+  if (t >= H.nextSheet) {
+    H.nextSheet = t + prof.sheetEvery;
+    for (const c of g.goals().contracts) if (c.visible && c.done && !c.claimed) { g.act('claimContract', { id: c.id }); ctx.log?.beat(t, 'contract ' + c.id); }
+    for (const k of ['gold', 'silver', 'basic']) while (st.boxes[k] > 0) g.act('openBox', { kind: k });
+    if (st.items.some((i) => !i.equipped)) g.act('autoEquip', {});
+  }
+  if (t >= H.nextDecide) {
+    H.nextDecide = t + prof.decideEvery;
+    let best = null;
+    for (const l of LINES) { const s = g.stats(l.id); const r = Math.max(s.stockRatio, s.stock / Math.max(1e-9, s.grossPerSec * prof.pileSec)); if (s.owned && s.stock > 0 && r > 0.3 && (!best || r > best.r)) best = { id: l.id, r }; }
+    if (best && best.r >= prof.pileFull) g.act('tapPile', { lineId: best.id });
+    else if (!humanShop(g, prof, t, ctx.log) && best) g.act('tapPile', { lineId: best.id });
+  }
+}
 
 export function play(g, prof, sec, t0, clock, ctx = {}) {
   const st = g.state;
   const dt = 0.2;
+  const H = prof.human ? { rng: mulberry32(0xca5 ^ (g.state.seed | 0) ^ Math.floor(t0)), phase: 0, tapAcc: 0, nextDecide: 0, nextSheet: t0 + prof.sheetEvery, seen: {}, held: null, fling: false } : null;
   let nextDecide = 0, nextPile = 0, nextCheck = prof.checkIn ? t0 + (prof.early && ctx.shop !== false ? prof.early : prof.checkIn) : Infinity, tapAcc = 0, flingN = 0;
   for (let i = 0, n = Math.round(sec / dt); i < n; i++) {
     const t = Math.round((t0 + i * dt) * 10) / 10;
@@ -237,6 +313,7 @@ export function play(g, prof, sec, t0, clock, ctx = {}) {
       ctx.onTick?.(t, i);
       continue;
     }
+    if (H) { humanStep(g, prof, t, dt, H, ctx); g.tick(dt); ctx.onTick?.(t, i); continue; }
     tapAcc += (st.bootstrap.done ? prof.tapRate(t) : prof.hurry ? prof.mudRate : 0) * dt;
     while (tapAcc >= 1) {
       tapAcc--;
@@ -300,10 +377,11 @@ function wire(g, log, getT) {
   g.on('tier', ({ lineId, tier }) => log.beat(getT(), 'tier ' + lineId + ' ' + tier));
   g.on('special:end', ({ kind, expired }) => { if (!expired) log.beat(getT(), 'special ' + kind); });
   g.on('link', ({ id }) => log.beat(getT(), 'link ' + id));
+  g.on('event:spawn', ({ event }) => log.mark(event.special ? 'special' : 'tumble', getT()));
   g.on('contract', ({ id }) => log.beat(getT(), 'contract ' + id));
 }
 
-export function runLife(prof, { minutes = 75, save = null, seed = 7, audit = true, probes = true, stopAtRec = false, data } = {}) {
+export function runLife(prof, { minutes = 75, save = null, seed = 7, audit = true, probes = true, stopAtRec = false, data, trace } = {}) {
   const clock = { t: START };
   const g = mk(save, seed, clock, data);
   g.__data = data;
@@ -316,6 +394,7 @@ export function runLife(prof, { minutes = 75, save = null, seed = 7, audit = tru
     log, audit,
     onTick(t, i) {
       T = t;
+      trace?.(g, t, i);
       const pv = g.deathPreview();
       if (pv.available) log.mark('deathAvail', t);
       if (pv.recommended) { log.mark('deathRec', t); if (stopAtRec && !ctx.snap) ctx.snap = { save: JSON.parse(g.serialize()), t }; }
@@ -352,15 +431,18 @@ export function probe(g, clock, t, window = 300) {
 export const fmtT = (s) => { if (s == null) return '—'; s = Math.round(s); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
 const fmtN = (n) => { if (!isFinite(n)) return '∞'; const u = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi']; let i = 0; while (Math.abs(n) >= 1000 && i < u.length - 1) { n /= 1000; i++; } return (n < 10 ? n.toFixed(2) : n < 100 ? n.toFixed(1) : n.toFixed(0)) + u[i]; };
 
+// Casual falsification arm: the round-1 feel (no hustle floor, no "save for X" chip, first special at 5:00 after opening).
+export const CASUAL_FALSIFY = { econ: { tapFloor: 0, saveSec: 0, saveBestSec: 0 }, firstEvent: { frequent: 25, special: 300 } };
+
 export function buildData(mult) {
   return { lines: LINES.map((l) => ({ ...l, buildT: l.buildT * mult })) };
 }
 
 // The whole verdict, as data, so test-economy can run it (and the falsification arm) without parsing stdout.
-export function verdict({ minutes = 75, buildMult = 1, gen2 = true, profiles = ['active', 'typical', 'idle'], quiet = true } = {}) {
-  const data = buildMult !== 1 ? buildData(buildMult) : undefined;
+export function verdict({ minutes = 75, buildMult = 1, gen2 = true, profiles = ['active', 'casual', 'typical', 'idle'], quiet = true, seed = 7, data: extra } = {}) {
+  const data = buildMult !== 1 || extra ? { ...(buildMult !== 1 ? buildData(buildMult) : {}), ...(extra || {}) } : undefined;
   const res = {};
-  for (const p of profiles) res[p] = runLife(PROFILES[p], { minutes, data, probes: p === 'active' && !quiet ? true : p === 'active', audit: true, stopAtRec: p === 'active' });
+  for (const p of profiles) res[p] = runLife(PROFILES[p], { minutes, data, seed, probes: p === 'active' && !quiet ? true : p === 'active', audit: true, stopAtRec: p === 'active' });
   const A = res.active;
   const fails = [];
   const rows = TARGETS.map(([k, name, lo, hi]) => {
@@ -371,6 +453,12 @@ export function verdict({ minutes = 75, buildMult = 1, gen2 = true, profiles = [
     if (!ok) fails.push(`${name} active ${fmtT(a)} outside ${fmtT(lo)}–${fmtT(hi)} ±30%`);
     return { k, name, lo, hi, v, ok };
   });
+  const casual = res.casual ? CASUAL_TARGETS.map(([k, name, hi]) => {
+    const v = res.casual.log.marks[k];
+    const ok = v != null && v <= hi;
+    if (!ok) fails.push(`casual ${name} ${fmtT(v)} > ${fmtT(hi)}`);
+    return { k, name, hi, v, ok };
+  }) : [];
   const gaps = {};
   for (const p of profiles) {
     const R = res[p];
@@ -390,7 +478,7 @@ export function verdict({ minutes = 75, buildMult = 1, gen2 = true, profiles = [
   if (gen2) {
     if (!A.snap) fails.push('Fake Your Death never recommended in life 1');
     else {
-      const g1 = mk(A.snap.save, 7, { t: START + A.snap.t * 1000 }, data);
+      const g1 = mk(A.snap.save, seed, { t: START + A.snap.t * 1000 }, data);
       const pv = g1.deathPreview();
       g1.act('prestige');
       const r2 = runLife(PROFILES.active, { minutes: Math.min(minutes, 40), save: JSON.parse(g1.serialize()), probes: false, audit: false, data });
@@ -403,20 +491,24 @@ export function verdict({ minutes = 75, buildMult = 1, gen2 = true, profiles = [
       if (g2.ratio < 1.3) fails.push(`gen 2 only ×${g2.ratio.toFixed(2)} further than gen 1 at the same session time`);
     }
   }
-  return { res, rows, gaps, maxRatio, neg, g2, fails };
+  return { res, rows, casual, gaps, maxRatio, neg, g2, fails };
 }
 
 function main() {
   const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v] = a.replace(/^--/, '').split('='); return [k, v ?? true]; }));
   const minutes = +(args.minutes || 75);
   const buildMult = args['falsify-build'] ? 10 : 1;
-  const V = verdict({ minutes, buildMult, gen2: args.gen2 !== 'off' && buildMult === 1, quiet: false });
+  const extra = args['falsify-casual'] ? CASUAL_FALSIFY : undefined;
+  const V = verdict({ minutes, buildMult, gen2: args.gen2 !== 'off' && buildMult === 1 && !extra, quiet: false, seed: +(args.seed || 7), data: extra });
   if (args.json) { console.log(JSON.stringify({ rows: V.rows, gaps: V.gaps, maxRatio: V.maxRatio, g2: V.g2 && { ...V.g2, pv: undefined }, fails: V.fails }, null, 2)); process.exitCode = V.fails.length ? 1 : 0; return; }
   const { res } = V;
-  console.log(`Idle Western 2 sim — life 1, ${minutes} min${buildMult !== 1 ? `  [FALSIFICATION: construction T ×${buildMult}]` : ''}`);
-  console.log('\nmilestone                  | target       | active  | typical | idle    | ok');
-  for (const r of V.rows) console.log(`${r.name.padEnd(26)} | ${fmtT(r.lo).padStart(5)}–${fmtT(r.hi).padEnd(6)} | ${fmtT(r.v.active).padStart(7)} | ${fmtT(r.v.typical).padStart(7)} | ${fmtT(r.v.idle).padStart(7)} | ${r.ok ? 'yes' : 'NO'}`);
+  console.log(`Idle Western 2 sim — life 1, ${minutes} min${buildMult !== 1 ? `  [FALSIFICATION: construction T ×${buildMult}]` : ''}${extra ? '  [FALSIFICATION: casual without hustle floor / save chip / early special]' : ''}`);
+  console.log('\nmilestone                  | target       | active  | casual  | typical | idle    | ok');
+  for (const r of V.rows) console.log(`${r.name.padEnd(26)} | ${fmtT(r.lo).padStart(5)}–${fmtT(r.hi).padEnd(6)} | ${fmtT(r.v.active).padStart(7)} | ${fmtT(r.v.casual).padStart(7)} | ${fmtT(r.v.typical).padStart(7)} | ${fmtT(r.v.idle).padStart(7)} | ${r.ok ? 'yes' : 'NO'}`);
+  console.log('\ncasual (PT#5) ceilings: ' + V.casual.map((c) => `${c.name} ${fmtT(c.v)} ≤ ${fmtT(c.hi)} ${c.ok ? 'ok' : 'NO'}`).join(' · '));
+  console.log('first tumbleweed: ' + ['active', 'casual', 'typical', 'idle'].map((p) => `${p} ${fmtT(res[p]?.log.marks.tumble)}`).join(' · ') + ' · first special: ' + ['active', 'casual', 'typical', 'idle'].map((p) => `${p} ${fmtT(res[p]?.log.marks.special)}`).join(' · '));
   console.log('\nactive opens: ' + LINES.map((l) => `${l.emoji}${fmtT(res.active.log.marks[l.id])}`).join(' '));
+  console.log('casual opens: ' + LINES.map((l) => `${l.emoji}${fmtT(res.casual.log.marks[l.id])}`).join(' '));
   console.log('typical opens: ' + LINES.map((l) => `${l.emoji}${fmtT(res.typical.log.marks[l.id])}`).join(' '));
   for (const [p, gp] of Object.entries(V.gaps)) console.log(`${p}: longest novelty gap ${fmtT(gp.novelty)} from ${fmtT(gp.at)} · longest build wait ${gp.build.lineId || '—'} ${fmtT(gp.build.wait)} (limit ${fmtT(DEAD_GAP)}: novelty for active, build wait for all)`);
   for (const [p, R] of Object.entries(res)) console.log(`${p}: Deed affordable but blocked by demands for ${R.stall.sec} s (longest ${R.stall.worst} s)`);

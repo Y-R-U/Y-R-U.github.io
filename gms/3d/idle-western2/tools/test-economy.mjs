@@ -17,7 +17,9 @@ import { SEASON } from '../js/data/season.js';
 import { BARK_CHARS } from '../js/data/barks.js';
 import * as EPI from '../js/data/epitaphs.js';
 import { PLOTS, HUB } from '../js/data/plots.js';
-import { verdict } from './sim.mjs';
+import { verdict, CASUAL_FALSIFY } from './sim.mjs';
+import { DAY } from '../js/data/day.js';
+import { dayAt } from '../js/state/dayclock.js';
 
 const fx = (f) => readFileSync(new URL('../tests/fixtures/' + f, import.meta.url), 'utf8');
 const T0 = Date.parse('2026-09-15T10:00:00');
@@ -562,7 +564,8 @@ test('tumbleweed scales with income; stagecoach boosts one business and times ou
   const tw = g.state.events.active.find((e) => e.kind === 'tumbleweed');
   const inc = Math.max(g.totals().incomePerSec, g.totals().grossPerSec * 0.6);
   const r = g.act('event:claim', { eventId: tw.id });
-  assert.ok(r.delta.cash >= inc * 20 * 0.99 && r.delta.cash <= inc * 20 * 3 * 1.01);
+  const tws = g.data.events.find((e) => e.id === 'tumbleweed').reward;
+  assert.ok(r.delta.cash >= inc * tws.sec * 0.99 && r.delta.cash <= inc * tws.sec * tws.jackpotMult * 1.01);
   const [s, def] = special(g, 'stagecoach');
   const pa = g.stats('bank').grossPerSec, pb = g.stats('shine').grossPerSec;
   g.act('claimEvent', { eventId: s.id, lineId: 'bank' });
@@ -817,6 +820,124 @@ test('Ghost Town: live Oct 1 – Nov 2 on the injected clock; ghosts pay ectopla
   assert.equal(g.state.season.ecto, SEASON.ranks[7].xp, 'ectoplasm is kept');
 });
 
+// ---------- "save for X" (PT#5), the game clock (W18), gen-2 bootstrap ----------
+
+test('nextGoal: next business, then the next Deed; buy / save / grind / blocked; a best buy; stats() with no id', () => {
+  const g = mk();
+  let n = g.nextGoal();
+  assert.equal(n.kind, 'line');
+  assert.equal(n.lineId, A);
+  assert.equal(n.eta, null, 'no income yet');
+  for (let i = 0; i < BOOT_TAPS; i++) g.act('tap');
+  assert.equal(g.nextGoal().hint, 'buy', 'the hat counts for the first buy');
+  open(g, A);
+  n = g.nextGoal();
+  assert.equal(n.lineId, B);
+  assert.ok(n.eta > 0 && n.etaIdle >= n.eta);
+  assert.ok(['save', 'grind'].includes(n.hint));
+  assert.ok(n.bestBuy && n.bestBuy.payback > 0 && n.bestBuy.gain > 0);
+  g.state.cash = LINES[1].baseCost;
+  assert.equal(g.nextGoal().hint, 'buy');
+  assert.equal(g.nextGoal().affordable, true);
+  g.state.cash = LINES[1].baseCost * 0.9;
+  g.act('hint', { id: 'x' });
+  const near = g.nextGoal();
+  assert.ok(near.eta <= ECON.saveSec);
+  if (near.hint === 'grind') assert.ok(near.bestBuy.cost * g.totals().grossPerSec < near.bestBuy.gain * (near.cost - near.have), 'grind only while a best buy is sooner');
+  const h = mk();
+  for (let i = 0; i < BOOT_TAPS; i++) h.act('tap');
+  open(h, A);
+  h.state.cash = 1e12;
+  for (const l of LINES.filter((x) => x.district === 'lower')) if (!h.stats(l.id).owned) open(h, l.id);
+  const d = h.nextGoal();
+  assert.equal(d.kind, 'deed');
+  assert.equal(d.districtId, 'saloonrow');
+  assert.equal(d.hint, 'blocked');
+  assert.match(d.blocked, /demands/);
+  const all = h.stats();
+  assert.ok(all.nextGoal && all.day && all.totals);
+  h.act('cheat', { unlockAll: true });
+  assert.equal(h.nextGoal(), null, 'nothing left to save for');
+});
+
+test('game clock (W18): boots at golden hour, ~20 min cycle 60/15/25, night drives Hank, injectable, offline averages', () => {
+  assert.equal(dayAt(0, DAY).phase, 'golden');
+  const C = dayAt(0, DAY).cycleSec;
+  assert.ok(C >= 900 && C <= 1500, '~20 min cycle');
+  let nights = 0, golds = 0, firstNight = null;
+  for (let t = 0; t < C; t++) { const d = dayAt(t, DAY); if (d.night) { nights++; firstNight ??= t; } if (d.golden) golds++; }
+  assert.ok(Math.abs(nights / C - 0.25) < 0.02, 'night ~25%');
+  assert.ok(golds / C > 0.1 && golds / C < 0.2, 'golden ~15%');
+  assert.equal(dayAt(firstNight, DAY).witching, true);
+  assert.equal(dayAt(firstNight + Math.round(C * 0.2), DAY).witching, false, 'witching is the first half of night');
+  const p1 = dayAt(37, DAY), p2 = dayAt(37 + C * 5, DAY);
+  assert.ok(p1.phase === p2.phase && p1.night === p2.night && Math.abs(p1.hour - p2.hour) < 1e-6, 'pure and periodic');
+  const g = mk({ t: Date.parse('2026-09-15T03:00:00') });
+  assert.equal(g.day().phase, 'golden', 'a fresh save boots golden even at 3 am');
+  g.act('cheat', { cash: 1e9, unlockAll: true });
+  g.state.managers.m_hank = { level: 1, slots: [null] };
+  assert.equal(g.act('hire', { lineId: 'undertaker', managerId: 'm_hank' }).ok, true);
+  const P = () => g.stats('undertaker').grossPerSec;
+  clearEvents(g);
+  for (let i = 0; i < 2400 && !g.day().night; i++) g.run(0.5, 0.5);
+  clearEvents(g);
+  g.act('hint', { id: 'x' });
+  assert.equal(g.day().night, true);
+  g.setDayClock(() => ({ phase: 'golden' }));
+  g.act('hint', { id: 'x' });
+  const golden = P();
+  g.setDayClock(null);
+  g.act('hint', { id: 'x' });
+  const night = P();
+  g.setDayClock(() => ({ phase: 'day' }));
+  g.act('hint', { id: 'x' });
+  assert.equal(g.day().injected, true);
+  assert.ok(Math.abs(night / P() - 1.5) < 1e-6, 'Hank +50% at game night; an injected day clock wins');
+  assert.ok(Math.abs(golden / P() - 1) < 1e-6, 'golden hour is not night');
+  g.setDayClock(() => 22);
+  g.act('hint', { id: 'x' });
+  assert.equal(g.day().night, true, 'a 0–24 hour works too');
+  g.setDayClock(null);
+  const seen = [];
+  const pre = g.stats('undertaker').grossPerSec;
+  g.on('offline', ({ report }) => seen.push(report));
+  g.clock.t += 3600e3;
+  g.advanceOffline(3600);
+  assert.equal(seen.length, 1);
+  assert.ok(seen[0].lines.undertaker > 0);
+  g.act('hint', { id: 'x' });
+  assert.ok(Number.isFinite(pre));
+});
+
+test('Witching Hour: ghosts come twice as often and pay double ectoplasm in the first half of game night', () => {
+  const g = mk({ t: Date.parse('2026-10-20T12:00:00') });
+  for (let i = 0; i < BOOT_TAPS; i++) g.act('tap');
+  open(g, A);
+  for (let i = 0; i < 2400 && !g.day().night; i++) g.run(0.5, 0.5);
+  assert.equal(g.day().witching, true);
+  let paid = null;
+  for (let i = 0; i < 120 && paid == null; i++) { g.run(1, 0.5); const gh = g.state.season.ghost; if (gh) paid = g.act('ghost:tap', { id: gh.id }).ecto; }
+  assert.equal(paid, SEASON.ectoPerGhost * DAY.witchingEcto);
+});
+
+test('gen 2 skips the mud: after a fake death pre-business taps pay cash, not the hat', () => {
+  const g = started();
+  g.act('cheat', { cash: 1e9, unlockAll: true, managers: true, levels: 20 });
+  assert.equal(g.state.bootstrap.skip, false);
+  assert.equal(g.act('prestige').ok, true);
+  assert.equal(g.state.bootstrap.skip, true);
+  assert.equal(g.state.bootstrap.done, false);
+  const c0 = g.state.cash;
+  const r = g.act('tap');
+  assert.equal(r.delta.cash, ECON.bootTap);
+  assert.equal(g.state.bootstrap.hat, 0);
+  assert.equal(g.state.cash, c0 + ECON.bootTap);
+  open(g, A);
+  assert.equal(g.state.bootstrap.done, true);
+  const back = createGame({ save: JSON.parse(g.serialize()), nowWall: () => T0 });
+  assert.equal(back.state.bootstrap.skip, true, 'the flag survives a reload');
+});
+
 // ---------- the sim (DESIGN W1 pacing, W13 construction) ----------
 
 test('pacing sim: all targets, dead gap ≤ 4 min incl. construction, active ≤ 2.5× idle, no negative returns, gen 2', () => {
@@ -828,6 +949,11 @@ test('pacing sim: all targets, dead gap ≤ 4 min incl. construction, active ≤
 test('falsification: construction T ×10 must FAIL the dead-gap check', () => {
   const V = verdict({ minutes: 30, buildMult: 10, gen2: false, profiles: ['active', 'idle'] });
   assert.ok(V.fails.some((f) => /dead gap/.test(f)), 'the dead-gap check caught it: ' + V.fails.join(' | '));
+});
+
+test('falsification: casual without the hustle floor, the save chip and the early special must FAIL its ceilings', () => {
+  const V = verdict({ minutes: 12, gen2: false, profiles: ['active', 'casual'], data: CASUAL_FALSIFY });
+  assert.ok(V.fails.some((f) => /^casual /.test(f)), 'the casual gate caught it: ' + V.fails.join(' | '));
 });
 
 // ---------- robustness, contract, save ----------

@@ -15,6 +15,7 @@ export const ECON = {
   milestoneMult: 2,
   tapK: 0.12,
   bootTap: 2,
+  tapFloor: 1,
   comboMax: 2,
   comboTaps: 20,
   comboWindow: 1.2,
@@ -27,6 +28,8 @@ export const ECON = {
   offlineCapSec: 7200,
   tapRate: 8,
   tapBurst: 10,
+  saveSec: 60,
+  saveBestSec: 30,
 };
 
 export const BUSINESSES = [
@@ -98,7 +101,7 @@ export const BUSINESSES = [
 // rate(i) = rate0 · 3 · rateStep^(i−1); costs are rate × the per-row multipliers below (docs/ECONOMY.md §1).
 export const CURVE = {
   rate0: 1, rateStep: 20,
-  unlockPay: [50, 120, 150, 280, 420, 560, 720, 900, 1050],
+  unlockPay: [50, 50, 90, 240, 420, 560, 720, 900, 1050],
   levelPay: [8, 25, 60, 140, 220, 340, 450, 580, 740],
   growth0: 1.1, growthStep: 0.004,
   thrK: 6, thrBase: 3,

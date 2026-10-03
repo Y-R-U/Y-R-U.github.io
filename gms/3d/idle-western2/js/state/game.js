@@ -22,6 +22,8 @@ import { EJECT, PIANO } from '../data/saloon.js?v=20261004a';
 import { BOUNTY } from '../data/bounty.js?v=20261004a';
 import * as EPITAPHS from '../data/epitaphs.js?v=20261004a';
 import { SEASON, KEEPSAKES, KEEPSAKE_TARGET } from '../data/season.js?v=20261004a';
+import { DAY } from '../data/day.js?v=20261004a';
+import { dayAt, readClock } from './dayclock.js?v=20261004a';
 import { BARK_CHARS, BARK_PRIORITY, BARK_GATE, CHAR_LINE } from '../data/barks.js?v=20261004a';
 
 const STEP = 0.1;
@@ -36,6 +38,7 @@ export const DEFAULT_DATA = {
   stages: STAGES, construction: CONSTRUCTION, eject: EJECT, piano: PIANO,
   bounty: BOUNTY, epitaphs: EPITAPHS, season: SEASON, keepsakes: KEEPSAKES, keepsakeTarget: KEEPSAKE_TARGET,
   barkChars: BARK_CHARS, barkPriority: BARK_PRIORITY, barkGate: BARK_GATE, charLine: CHAR_LINE,
+  day: DAY,
 };
 
 const STATS0 = {
@@ -64,7 +67,7 @@ export function freshState(data, seed = 1) {
     couriers: [],
     combo: { n: 0, last: -99 },
     taps: { tokens: data.econ.tapBurst, at: 0 },
-    bootstrap: { done: false, hat: 0, opening: false },
+    bootstrap: { done: false, hat: 0, opening: false, skip: false },
     returnHarvest: {},
     barks: { last: -1e9, nextIdle: 60, once: {} },
     season: { id: data.season ? data.season.id : null, year: 0, ecto: 0, xp: 0, rank: 0, ghost: null, nextGhost: 0, seq: 0, live: false },
@@ -103,7 +106,7 @@ function normalize(s, fresh, data) {
   return out;
 }
 
-export function createGame({ data: given = {}, save = null, seed = 1, rng = null, nowWall = () => 0, allowCheat = false } = {}) {
+export function createGame({ data: given = {}, save = null, seed = 1, rng = null, nowWall = () => 0, allowCheat = false, dayClock = null } = {}) {
   const data = { ...DEFAULT_DATA, ...given };
   if (given.econ) data.econ = { ...ECON, ...given.econ };
   if (given.construction) data.construction = { ...CONSTRUCTION, ...given.construction };
@@ -128,7 +131,13 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
   for (const l of data.lines) D[l.id] = { P: 0, Pbase: 0, sigma: 0, cap: 0, speed: 1, cycleSec: l.cycleSec, crit: 0, auto: false, price: 1, m: 1, link: 0 };
   const G = { mult: 1, offlineCap: X.offlineCapSec, incomePerSec: 0, gross: 0, hat: 1, bounty: 1, duel: 1 };
   const wasFull = {}, pendSold = {}, tipped = new Set();
-  let wallNow = nowWall(), hourNow = E.hourOf(wallNow);
+  let wallNow = nowWall();
+  let clockFn = typeof dayClock === 'function' ? dayClock : null, nightAvg = null;
+  // W18: night comes from the game clock (injected by the renderer, else the pure simTime clock), never the phone's.
+  function day() {
+    if (clockFn) { try { const v = readClock(clockFn(), data.day); if (v) return v; } catch (e) { /* fall back */ } }
+    return dayAt(simTime, data.day);
+  }
   let tickNo = 0, statsTick = -1, acc = 0, slowAcc = 1, dirty = true;
   const statsCache = {};
 
@@ -223,7 +232,7 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
     let allEv = 1;
     for (const e of state.events.mults) if (!e.lineId && e.until > simTime) allEv *= e.mult;
     const quiet = !eventRunning();
-    const night = E.inWindow(hourNow, 18, 6);
+    const night = nightAvg ?? (day().night ? 1 : 0);
     const link = {};
     for (const k of data.links) if (state.links[k.id] && state.lines[k.to]?.lv > 0) link[k.to] = (link[k.to] || 0) + k.mult;
     let inc = 0, gross = 0;
@@ -245,7 +254,7 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
       if (mst) m *= data.managerLevels.mult[Math.min(data.managerLevels.mult.length, mst.level) - 1];
       if (tk === 'star' && ls.lv >= 50) m *= 1 + tv;
       if (tk === 'quiet' && quiet) m *= 1 + tv;
-      if (tk === 'night' && night) m *= 1 + tv;
+      if (tk === 'night' && night) m *= 1 + tv * night;
       if (tk === 'duel') G.duel = Math.max(G.duel, 1 + tv);
       m *= 1 + keepsakePower('line', l.id) + (mid ? keepsakePower('manager', mid) : 0);
       m *= 1 + (link[l.id] || 0);
@@ -291,7 +300,7 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
     return b;
   }
 
-  const tapValue = () => (state.bootstrap.done ? X.tapK * Math.max(G.gross, 0.1) : X.bootTap);
+  const tapValue = () => (state.bootstrap.done ? Math.max(X.tapK * G.gross, X.tapFloor || 0) : X.bootTap);
   const spendable = () => state.cash + (state.bootstrap.done ? 0 : state.bootstrap.hat);
 
   function ownedIds() {
@@ -317,6 +326,11 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
 
   function mudTap(p, kind = 'mud') {
     state.stats.bootTaps++;
+    if (state.bootstrap.skip) {
+      earn(X.bootTap);
+      emit('tap', { kind: 'coin', cash: X.bootTap, x: p?.x, y: p?.y });
+      return { ok: true, delta: { cash: X.bootTap } };
+    }
     state.stats.mudCoins++;
     state.bootstrap.hat += X.bootTap;
     emit('tap', { kind, coin: X.bootTap, hat: state.bootstrap.hat, coins: Math.round(state.bootstrap.hat / X.bootTap), x: p?.x, y: p?.y });
@@ -695,7 +709,7 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
     if (st.ghost && simTime >= st.ghost.until) { emit('ghost:gone', { ghost: st.ghost }); st.ghost = null; }
     if (!st.ghost && simTime >= st.nextGhost) {
       st.ghost = { id: 'g' + ++st.seq, born: simTime, until: simTime + def.ghostLife };
-      st.nextGhost = simTime + def.ghostLife + nextGap(def.ghostGap, rng);
+      st.nextGhost = simTime + def.ghostLife + nextGap(def.ghostGap, rng) * (day().witching ? data.day.witchingGhostGap : 1);
       emit('ghost:spawn', { ghost: st.ghost });
     }
   }
@@ -826,6 +840,66 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
   }
 
   function buildLeft(b) { return Math.max(0, b.T - b.t); }
+
+  // "Save for X" (PT#5): the next business in street order, else the next Deed. eta assumes piles get sold (gross);
+  // etaIdle assumes they don't. hint: 'buy' (affordable now), 'save' (≤ saveSec away: stop spending), 'grind'.
+  function nextGoal() {
+    let g = null;
+    const building = Object.keys(state.build);
+    for (const l of data.lines) {
+      if (state.lines[l.id].lv > 0 || state.build[l.id] || !state.districts.includes(l.district)) continue;
+      g = { kind: 'line', id: l.id, lineId: l.id, name: l.name, emoji: l.emoji, cost: l.baseCost, blocked: null };
+      break;
+    }
+    if (!g) {
+      const d = data.districts.find((x) => !state.districts.includes(x.id));
+      if (!d) return null;
+      g = { kind: 'deed', id: d.id, districtId: d.id, name: d.name + ' Deed', emoji: d.emoji, cost: permitCost(d), blocked: permitBlock(d) };
+    }
+    const have = g.kind === 'line' ? spendable() : state.cash;
+    const left = Math.max(0, g.cost - have);
+    const gross = state.bootstrap.done ? G.gross : 0, sold = state.bootstrap.done ? G.incomePerSec : 0;
+    g.have = have;
+    g.p01 = g.cost > 0 ? Math.min(1, have / g.cost) : 1;
+    g.affordable = left <= 0;
+    g.eta = left <= 0 ? 0 : gross > 0 ? left / gross : null;
+    g.etaIdle = left <= 0 ? 0 : sold > 0 ? left / sold : null;
+    g.building = building;
+    const best = bestBuy();
+    g.bestBuy = best;
+    // Save only when no upgrade would get you there sooner: buy first iff cost/left < gain/income.
+    const sooner = best && gross > 0 && best.cost < left && best.cost * gross < best.gain * left;
+    g.hint = g.blocked ? 'blocked' : g.affordable ? 'buy' : g.eta != null && g.eta <= X.saveSec && !sooner ? 'save' : 'grind';
+    // What to stop spending for right now: the goal, else a best buy that is only a few seconds away.
+    const bbEta = best && gross > 0 ? Math.max(0, best.cost - state.cash) / gross : null;
+    g.save = g.hint === 'save' ? { kind: 'goal', id: g.id, cost: g.cost, eta: g.eta }
+      : best && !best.affordable && bbEta != null && bbEta <= X.saveBestSec ? { kind: 'upgrade', act: best.act, lineId: best.lineId, qty: best.qty || 1, cost: best.cost, eta: bbEta } : null;
+    return g;
+  }
+
+  // The upgrade with the shortest payback (cost / extra gross $/s), for a "best buy" glow. Hire counts the walk-in
+  // share it lifts (σ 0.35 → 0.6) as its gain.
+  function bestBuy() {
+    let best = null;
+    const consider = (act, lineId, cost, gain, extra) => {
+      if (!(gain > 0) || !isFinite(cost)) return;
+      const pay = cost / gain;
+      if (!best || pay < best.payback) best = { act, lineId, cost, gain, payback: pay, affordable: state.cash >= cost, ...extra };
+    };
+    for (const l of data.lines) {
+      const ls = state.lines[l.id], d = D[l.id];
+      if (ls.lv <= 0) continue;
+      const P = d.Pbase, cm = costMult(l.id), lv = ls.lv;
+      const ms = (n) => Math.pow(X.milestoneMult, E.milestoneCount(n, X));
+      consider('level', l.id, E.bulkCost(l, lv, 1, cm), P * ((lv + 1) / lv * ms(lv + 1) / ms(lv) - 1), { qty: 1 });
+      const m = E.nextMilestone(lv, X);
+      if (m && m - lv > 1 && m - lv <= 25) consider('level', l.id, E.bulkCost(l, lv, m - lv, cm), P * (m / lv * X.milestoneMult - 1), { qty: m - lv });
+      if (l.throughput[ls.thr]) consider('throughput', l.id, l.throughput[ls.thr].cost, P * (X.sigmaPrice - 1));
+      if (l.boosts[ls.boost]) consider('boost', l.id, l.boosts[ls.boost].cost, P * (l.boosts[ls.boost].mult - 1));
+      if (!ls.mgr) { const def = managerFor(data, l.id); if (def && !def.seasonal) consider('hire', l.id, state.managers[def.id] ? 0.01 : def.hireCost, P * (X.sigma0 - X.sigmaWalkIn)); }
+    }
+    return best;
+  }
 
   const acts = {
     tap(p) {
@@ -1110,10 +1184,11 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
       const g = st.ghost;
       st.ghost = null;
       state.stats.ghosts++;
-      seasonGain(def, st, def.ectoPerGhost);
-      emit('ghost:tap', { ghost: g, ecto: def.ectoPerGhost, total: st.ecto });
+      const ecto = def.ectoPerGhost * (day().witching ? data.day.witchingEcto : 1);
+      seasonGain(def, st, ecto);
+      emit('ghost:tap', { ghost: g, ecto, total: st.ecto });
       bark('ghost');
-      return { ok: true, ecto: def.ectoPerGhost };
+      return { ok: true, ecto };
     },
     permit({ districtId }) {
       const d = districtById[districtId];
@@ -1166,6 +1241,7 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
       state.districts = state.deeds.slice();
       state.cash = pv.starterCash;
       state.bootstrap.opening = true;
+      state.bootstrap.skip = true;
       state.disguise = disguiseFor(state.seed, state.gen, EP);
       state.stats.plays++;
       for (const l of data.lines) state.lines[l.id].mgr = null;
@@ -1241,7 +1317,6 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
     tick(dt) {
       dt = Math.min(1, Math.max(0, +dt || 0));
       wallNow = nowWall();
-      hourNow = E.hourOf(wallNow);
       acc += dt;
       while (acc >= STEP - 1e-9) { acc -= STEP; step(STEP); }
       tickNo++;
@@ -1323,6 +1398,7 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
       }
     },
     stats(lineId) {
+      if (lineId == null) return { nextGoal: nextGoal(), day: day(), totals: game.totals() };
       if (statsTick !== tickNo) { statsTick = tickNo; for (const k in statsCache) statsCache[k]._fresh = false; if (dirty) derive(); }
       let s = statsCache[lineId];
       if (s && s._fresh) return s;
@@ -1380,6 +1456,9 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
       return { tier: state.hat, hat: data.hats[state.hat], next: data.hats[state.hat + 1] || null, pomfrey: state.pomfrey, pomfreyHat: data.pomfreyHats[state.pomfrey], own: state.own, frontages: data.frontages.length, mine: data.lines.length };
     },
     special() { return state.events.active.find((e) => e.special) || null; },
+    nextGoal() { if (dirty) derive(); return nextGoal(); },
+    day() { return day(); },
+    setDayClock(fn) { clockFn = typeof fn === 'function' ? fn : null; dirty = true; },
     seasonInfo() {
       const def = seasonDef();
       if (!def) return { live: false };
@@ -1393,7 +1472,6 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
     },
     advanceOffline(seconds) {
       wallNow = nowWall();
-      hourNow = E.hourOf(wallNow);
       const want = Math.max(0, +seconds || 0);
       let avail = want;
       let clockBack = false;
@@ -1402,11 +1480,12 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
         avail = Math.max(0, (wallNow - start) / 1000);
         clockBack = wallNow < (state.clock.hi || 0);
       }
+      nightAvg = data.day.night[1] - data.day.night[0];
       derive();
       const cap = G.offlineCap;
       const sec = Math.min(cap, avail);
       const empty = { awaySec: want, creditedSec: 0, cash: 0, lines: {}, piles: 0, harvest: [], built: [], teeth: 0, capSec: cap, clockBack };
-      if (sec < 5) { if (sec > 0) game.tick(Math.min(1, sec)); return empty; }
+      if (sec < 5) { nightAvg = null; dirty = true; if (sec > 0) game.tick(Math.min(1, sec)); return empty; }
       checkUnlocks();
       derive();
       const report = offlineClosedForm(D, state, sec);
@@ -1452,6 +1531,7 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
         for (const id of ownedIds()) if (state.lines[id].stock > 0) { state.returnHarvest[id] = true; report.harvest.push(id); }
       }
       if (wallNow > 0) state.clock.hi = Math.max(state.clock.hi || 0, wallNow);
+      nightAvg = null;
       dirty = true;
       tickNo++;
       emit('offline', { report });
