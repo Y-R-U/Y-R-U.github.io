@@ -1,0 +1,1598 @@
+{
+ "triggers": {
+  "opening": "W15 opening: the Stranger is thrown out face-first into the mud (first session only)",
+  "eject": "any saloon ejection (auto or flung)",
+  "fling": "the player swipe-flung the drunk (any target)",
+  "fling_trough": "fling landed in the trough",
+  "fling_dentist": "fling landed at Pull & Pray",
+  "fling_jail": "fling landed in the jail wagon",
+  "fling_pomfrey": "fling went through Pomfrey's window",
+  "tap": "player tapped this character (20 s per-character cooldown, wordless inside it)",
+  "idle": "ambient sentence bark (global 30-45 s cadence)",
+  "duel": "duel wind-up / standoff (speaker is a bystander or the opponent)",
+  "duel_win": "player won the duel",
+  "duel_boot": "player tapped early and shot their own boot",
+  "brawl": "bar brawl special",
+  "robbery": "bank robbery chase running",
+  "robbery_crash": "Bart hits the low sign / pole at the end of the chase",
+  "robbery_caught": "Bart captured (bounty paid)",
+  "stagecoach": "stagecoach arrival special",
+  "build": "a construction stage is in progress",
+  "hurry": "player tapping a construction site",
+  "sign_raise": "Open for Business sign raised on a new business",
+  "acquire_saloon": "poker-win cutscene",
+  "acquire_undertaker": "undertaker takeover cutscene",
+  "acquire_jail": "jail bought from Wendell",
+  "acquire_bank": "bank bought from a fainting Thrupp",
+  "acquire_garter": "Velvet Garter opens",
+  "deed": "Deed showdown with Pomfrey (his sign comes down)",
+  "half_town": "9/9 owned: Half the Town",
+  "hat_promo": "player's hat promotion (Pomfrey's shrinks)",
+  "hat_thimble": "Pomfrey's hat reaches the thimble",
+  "pomfrey_pass": "Pomfrey's hat procession rides past",
+  "fake_death": "Fake Your Death at Boot Hill",
+  "strongbox": "a strongbox is opened",
+  "piano": "the piano was tapped",
+  "frenzy": "piano frenzy (8 taps in 6 s)",
+  "wrong_note": "rare wrong-note riff",
+  "first_business": "the first business is bought (Spit & Shine)",
+  "levelup": "a line hits a Lv 25/50/100 milestone",
+  "pickles_spot": "Pickles found in a new hiding spot",
+  "garter_window": "the Garter window-exit gag plays",
+  "link": "a gag-link walker arrives (Tubs->Saloon, Saloon->Pull & Pray, Garter->Bank)",
+  "ghost": "Ghost Town season overlay event",
+  "offline_return": "player returns after time away"
+ },
+ "chars": {
+  "mabel": {
+   "name": "Big Mabel Boggs",
+   "role": "barkeep, Thirsty Gizzard manager",
+   "voice": "A woman in her mid-fifties with a deep, booming, chesty contralto voice, gravelly from whiskey and years of shouting. Slow, lazy Texas drawl. Amused menace; she sounds like she could lift a horse and is mildly bored by it. Big, loud and confident.",
+   "audition": "And stay out! Whiskey's a dollar, water's two, it's rarer. I don't break up fights, sugar. I finish 'em.",
+   "lines": [
+    {
+     "id": "mabel_01",
+     "text": "And STAY out!",
+     "trig": [
+      "opening",
+      "eject"
+     ]
+    },
+    {
+     "id": "mabel_02",
+     "text": "Out! And take yer teeth with ya!",
+     "trig": [
+      "eject"
+     ]
+    },
+    {
+     "id": "mabel_03",
+     "text": "I don't break up fights. I finish 'em.",
+     "trig": [
+      "brawl",
+      "tap"
+     ]
+    },
+    {
+     "id": "mabel_04",
+     "text": "Whiskey's a dollar. Water's two. It's rarer.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    },
+    {
+     "id": "mabel_05",
+     "text": "You spill it, you lick it.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    },
+    {
+     "id": "mabel_06",
+     "text": "Who threw that? ...Nice arm.",
+     "trig": [
+      "fling"
+     ]
+    },
+    {
+     "id": "mabel_07",
+     "text": "House beer. Locally sourced, sugar. Don't ask where.",
+     "trig": [
+      "link",
+      "tap"
+     ]
+    },
+    {
+     "id": "mabel_08",
+     "text": "Trough's that way. So's your dignity.",
+     "trig": [
+      "fling_trough"
+     ]
+    },
+    {
+     "id": "mabel_09",
+     "text": "Pete! You got a walk-in!",
+     "trig": [
+      "fling_dentist"
+     ]
+    },
+    {
+     "id": "mabel_10",
+     "text": "Sheriff, catch! ...He won't catch.",
+     "trig": [
+      "fling_jail"
+     ]
+    },
+    {
+     "id": "mabel_11",
+     "text": "Special delivery for his Lordship!",
+     "trig": [
+      "fling_pomfrey"
+     ]
+    },
+    {
+     "id": "mabel_12",
+     "text": "Them doors are on a spring. For the distance.",
+     "trig": [
+      "eject"
+     ],
+     "once": true
+    },
+    {
+     "id": "mabel_13",
+     "text": "Last call was an hour ago. This is the throwin'-out call.",
+     "trig": [
+      "eject"
+     ]
+    },
+    {
+     "id": "mabel_14",
+     "text": "Tab's closed. So's your face. Out!",
+     "trig": [
+      "eject"
+     ]
+    },
+    {
+     "id": "mabel_15",
+     "text": "Hell of a throw, partner.",
+     "trig": [
+      "fling"
+     ],
+     "rude": true
+    },
+    {
+     "id": "mabel_16",
+     "text": "Nobody leaves my bar on their feet.",
+     "trig": [
+      "eject",
+      "idle"
+     ]
+    },
+    {
+     "id": "mabel_17",
+     "text": "Chairs cost extra! Throw the cheap ones!",
+     "trig": [
+      "brawl"
+     ]
+    },
+    {
+     "id": "mabel_18",
+     "text": "Best rotgut in the territory. Also the only.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    },
+    {
+     "id": "mabel_19",
+     "text": "Five aces? ...I like you. Don't do it again.",
+     "trig": [
+      "acquire_saloon"
+     ],
+     "once": true
+    },
+    {
+     "id": "mabel_20",
+     "text": "Nice hat. Shame about what's under it.",
+     "trig": [
+      "hat_promo"
+     ]
+    },
+    {
+     "id": "mabel_21",
+     "text": "Play faster, Fingers, or you're next out the door!",
+     "trig": [
+      "frenzy"
+     ]
+    },
+    {
+     "id": "mabel_22",
+     "text": "Kiss my spittoon.",
+     "trig": [
+      "tap"
+     ]
+    }
+   ],
+   "wordless": [
+    {
+     "id": "mabel_w1",
+     "text": "HUP!",
+     "kind": "effort"
+    },
+    {
+     "id": "mabel_w2",
+     "text": "Hrrnngh... HUP!",
+     "kind": "effort"
+    },
+    {
+     "id": "mabel_w3",
+     "text": "Ha! Ha ha ha!",
+     "kind": "laugh"
+    },
+    {
+     "id": "mabel_w4",
+     "text": "Hmph.",
+     "kind": "grunt"
+    },
+    {
+     "id": "mabel_w5",
+     "text": "Oi!",
+     "kind": "shout"
+    }
+   ]
+  },
+  "pickles": {
+   "name": "Ezekiel \"Pickles\" McGurk",
+   "role": "town drunk, Tuppenny Tubs manager",
+   "voice": "An old man in his seventies, wet, slurred, raspy voice with hiccups, warbling unsteady pitch, rambling rural Appalachian drawl. Very drunk but cheerful and friendly, completely lost, slightly too close to the microphone.",
+   "audition": "I ain't drunk. The street's movin'. Who moved the ground? Put it back. I'll have whatever I just had.",
+   "lines": [
+    {
+     "id": "pickles_01",
+     "text": "I ain't drunk. The street's movin'.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    },
+    {
+     "id": "pickles_02",
+     "text": "Who moved the ground? ...Put it back.",
+     "trig": [
+      "tap",
+      "eject"
+     ]
+    },
+    {
+     "id": "pickles_03",
+     "text": "I'll have whatever I just had.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "pickles_04",
+     "text": "Hey! This trough's taken.",
+     "trig": [
+      "fling_trough"
+     ]
+    },
+    {
+     "id": "pickles_05",
+     "text": "That's my hat! ...That's a chicken.",
+     "trig": [
+      "idle"
+     ]
+    },
+    {
+     "id": "pickles_06",
+     "text": "He owed me a dollar. Beautiful man.",
+     "trig": [
+      "fake_death"
+     ]
+    },
+    {
+     "id": "pickles_07",
+     "text": "Bath? Had one in sixty-one. Didn't take.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "pickles_08",
+     "text": "Water's changed Tuesdays. I'm changed never.",
+     "trig": [
+      "tap",
+      "link"
+     ]
+    },
+    {
+     "id": "pickles_09",
+     "text": "Who put a roof under me?",
+     "trig": [
+      "pickles_spot"
+     ]
+    },
+    {
+     "id": "pickles_10",
+     "text": "Comfy coffin. Bit drafty on top.",
+     "trig": [
+      "pickles_spot"
+     ]
+    },
+    {
+     "id": "pickles_11",
+     "text": "Bank vault's lovely this time o' year.",
+     "trig": [
+      "pickles_spot"
+     ]
+    },
+    {
+     "id": "pickles_12",
+     "text": "Jail's the only place that'll keep me.",
+     "trig": [
+      "pickles_spot"
+     ]
+    },
+    {
+     "id": "pickles_13",
+     "text": "My money's on the one that falls down.",
+     "trig": [
+      "duel"
+     ]
+    },
+    {
+     "id": "pickles_14",
+     "text": "Shoot him in the hat! It's bigger!",
+     "trig": [
+      "duel"
+     ]
+    },
+    {
+     "id": "pickles_15",
+     "text": "Lovely house. Can I sleep in it?",
+     "trig": [
+      "build",
+      "sign_raise"
+     ]
+    },
+    {
+     "id": "pickles_16",
+     "text": "Your hat's got a hat now.",
+     "trig": [
+      "hat_promo"
+     ]
+    },
+    {
+     "id": "pickles_17",
+     "text": "Robbery! ...Which way do I run?",
+     "trig": [
+      "robbery"
+     ]
+    },
+    {
+     "id": "pickles_18",
+     "text": "I ain't lost. Everything else is.",
+     "trig": [
+      "idle"
+     ]
+    },
+    {
+     "id": "pickles_19",
+     "text": "Is it mornin'? Is this Thursday? Is this my leg?",
+     "trig": [
+      "idle",
+      "offline_return"
+     ]
+    },
+    {
+     "id": "pickles_20",
+     "text": "Mabel threw me so hard I landed yesterday.",
+     "trig": [
+      "eject"
+     ]
+    },
+    {
+     "id": "pickles_21",
+     "text": "I was sober once. Terrible. Everything was so... clear.",
+     "trig": [
+      "tap"
+     ],
+     "once": true
+    },
+    {
+     "id": "pickles_22",
+     "text": "I seen a ghost! ...Oh. Window.",
+     "trig": [
+      "ghost"
+     ]
+    },
+    {
+     "id": "pickles_23",
+     "text": "Kiss my donkey. No, really. He's lonely.",
+     "trig": [
+      "tap"
+     ],
+     "rude": true
+    }
+   ],
+   "wordless": [
+    {
+     "id": "pickles_w1",
+     "text": "Hic!",
+     "kind": "hic"
+    },
+    {
+     "id": "pickles_w2",
+     "text": "Hic! ...Hic!",
+     "kind": "hic"
+    },
+    {
+     "id": "pickles_w3",
+     "text": "Hehehehe.",
+     "kind": "laugh"
+    },
+    {
+     "id": "pickles_w4",
+     "text": "Whoaaa...",
+     "kind": "wobble"
+    },
+    {
+     "id": "pickles_w5",
+     "text": "Mmmnnh... five more minutes.",
+     "kind": "snore"
+    },
+    {
+     "id": "pickles_w6",
+     "text": "Yeeeehaw... hic.",
+     "kind": "cheer"
+    }
+   ]
+  },
+  "pomfrey": {
+   "name": "Colonel Augustus Pomfrey",
+   "role": "rival tycoon (not a manager)",
+   "voice": "A pompous English aristocrat in his sixties, a remittance man sent abroad by his family. Booming, plummy upper-class Received Pronunciation baritone, nasal and languid, drawn-out vowels, utterly condescending and pleased with himself. Theatrical, sneering, posh.",
+   "audition": "Your hat, sir, is an embarrassment. I own this street, and that dog. Money talks, old boy. Mine sings opera.",
+   "lines": [
+    {
+     "id": "pomfrey_01",
+     "text": "Your hat, sir, is an embarrassment.",
+     "trig": [
+      "pomfrey_pass",
+      "opening"
+     ]
+    },
+    {
+     "id": "pomfrey_02",
+     "text": "I own this street. And that dog.",
+     "trig": [
+      "pomfrey_pass",
+      "tap"
+     ]
+    },
+    {
+     "id": "pomfrey_03",
+     "text": "Charming shack. I'll buy it for kindling.",
+     "trig": [
+      "build"
+     ]
+    },
+    {
+     "id": "pomfrey_04",
+     "text": "Money talks, old boy. Mine sings opera.",
+     "trig": [
+      "tap",
+      "pomfrey_pass"
+     ]
+    },
+    {
+     "id": "pomfrey_05",
+     "text": "My hat stays on, sir. It's load-bearing.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "pomfrey_06",
+     "text": "Half the town? I have the better half.",
+     "trig": [
+      "deed"
+     ]
+    },
+    {
+     "id": "pomfrey_07",
+     "text": "Father sent me West to build character. I bought one.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    },
+    {
+     "id": "pomfrey_08",
+     "text": "Mud suits you. Brings out the eyes.",
+     "trig": [
+      "opening"
+     ],
+     "once": true
+    },
+    {
+     "id": "pomfrey_09",
+     "text": "My window! That was imported glass!",
+     "trig": [
+      "fling_pomfrey"
+     ]
+    },
+    {
+     "id": "pomfrey_10",
+     "text": "Is it me, or is my hat getting smaller?",
+     "trig": [
+      "hat_promo"
+     ]
+    },
+    {
+     "id": "pomfrey_11",
+     "text": "Cut the cards. Mine are marked, naturally.",
+     "trig": [
+      "deed"
+     ]
+    },
+    {
+     "id": "pomfrey_12",
+     "text": "Take it. I've plenty more... street.",
+     "trig": [
+      "deed"
+     ]
+    },
+    {
+     "id": "pomfrey_13",
+     "text": "Damn and blast. Fetch my other sign.",
+     "trig": [
+      "deed"
+     ],
+     "rude": true
+    },
+    {
+     "id": "pomfrey_14",
+     "text": "Ghastly town. I adore owning it.",
+     "trig": [
+      "idle",
+      "pomfrey_pass"
+     ]
+    },
+    {
+     "id": "pomfrey_15",
+     "text": "Do stand downwind, there's a good fellow.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "pomfrey_16",
+     "text": "Mother writes. She says I'm winning.",
+     "trig": [
+      "idle"
+     ]
+    },
+    {
+     "id": "pomfrey_17",
+     "text": "Another one? Have you no shame? Have you any to sell?",
+     "trig": [
+      "sign_raise"
+     ]
+    },
+    {
+     "id": "pomfrey_18",
+     "text": "Dead, is he? Splendid. ...Why is the coffin winking?",
+     "trig": [
+      "fake_death"
+     ]
+    },
+    {
+     "id": "pomfrey_19",
+     "text": "Half the town. I shall tell Mother I kept the nice half.",
+     "trig": [
+      "half_town"
+     ],
+     "once": true
+    },
+    {
+     "id": "pomfrey_20",
+     "text": "A thimble. I am wearing a thimble.",
+     "trig": [
+      "hat_thimble"
+     ],
+     "once": true
+    },
+    {
+     "id": "pomfrey_21",
+     "text": "Ah. The help has arrived. How quaint.",
+     "trig": [
+      "pomfrey_pass"
+     ]
+    },
+    {
+     "id": "pomfrey_22",
+     "text": "Pick up the brim, Jenkins. It's dragging in the peasants.",
+     "trig": [
+      "pomfrey_pass"
+     ]
+    }
+   ],
+   "wordless": [
+    {
+     "id": "pomfrey_w1",
+     "text": "Hmph!",
+     "kind": "grunt"
+    },
+    {
+     "id": "pomfrey_w2",
+     "text": "Harrumph.",
+     "kind": "grunt"
+    },
+    {
+     "id": "pomfrey_w3",
+     "text": "Ha-ha-ha-ha.",
+     "kind": "laugh"
+    },
+    {
+     "id": "pomfrey_w4",
+     "text": "Good LORD!",
+     "kind": "gasp"
+    },
+    {
+     "id": "pomfrey_w5",
+     "text": "Ugh. Peasants.",
+     "kind": "sneer"
+    }
+   ]
+  },
+  "wendell": {
+   "name": "Sheriff Wendell Pryce",
+   "role": "sheriff, Jail manager",
+   "voice": "A man in his forties with a thin, reedy, nasal tenor voice that cracks upward when frightened. Fast, nervous Midwestern patter. He tries very hard to sound tough and fails; jittery and cowardly.",
+   "audition": "Nobody panic! Especially me. I'm not hidin', I'm surveillin'. From a barrel. Is he gone? Tell me when he's gone.",
+   "lines": [
+    {
+     "id": "wendell_01",
+     "text": "I'm deputisin' you. Bye!",
+     "trig": [
+      "robbery",
+      "tap"
+     ]
+    },
+    {
+     "id": "wendell_02",
+     "text": "Nobody panic! ...Especially me.",
+     "trig": [
+      "brawl",
+      "robbery"
+     ]
+    },
+    {
+     "id": "wendell_03",
+     "text": "I'm not hidin'. I'm surveillin'. From a barrel.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    },
+    {
+     "id": "wendell_04",
+     "text": "Halt! ...Or don't. I ain't fussy.",
+     "trig": [
+      "robbery"
+     ]
+    },
+    {
+     "id": "wendell_05",
+     "text": "Is he gone? Tell me when he's gone.",
+     "trig": [
+      "duel"
+     ]
+    },
+    {
+     "id": "wendell_06",
+     "text": "This badge stops bullets! ...Says so on the box.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "wendell_07",
+     "text": "Caught him! ...With my face.",
+     "trig": [
+      "fling_jail"
+     ]
+    },
+    {
+     "id": "wendell_08",
+     "text": "Sold! Here's the badge. Don't let it get shot.",
+     "trig": [
+      "acquire_jail"
+     ],
+     "once": true
+    },
+    {
+     "id": "wendell_09",
+     "text": "Crime's gotta make an appointment. I'm booked till Christmas.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    },
+    {
+     "id": "wendell_10",
+     "text": "Every fella in them cells sings. None of 'em in tune.",
+     "trig": [
+      "idle"
+     ]
+    }
+   ],
+   "wordless": [
+    {
+     "id": "wendell_w1",
+     "text": "Eep!",
+     "kind": "yelp"
+    },
+    {
+     "id": "wendell_w2",
+     "text": "Aaaaaah!",
+     "kind": "scream"
+    },
+    {
+     "id": "wendell_w3",
+     "text": "Oh no no no no.",
+     "kind": "panic"
+    },
+    {
+     "id": "wendell_w4",
+     "text": "Gulp.",
+     "kind": "gulp"
+    }
+   ]
+  },
+  "mortimer": {
+   "name": "Mortimer Grimsby",
+   "role": "undertaker, Boot Hill manager",
+   "voice": "A man in his sixties with a soft, velvety, slow baritone, a delighted undertaker's purr. Gentle, unhurried, faintly old-fashioned American, smiling audibly, overly pleased by anything to do with death.",
+   "audition": "Ooh, a duel! Fetch my tape. Stand still, sir. A lovely six foot two. Pine or oak? Oak's for people with friends.",
+   "lines": [
+    {
+     "id": "mortimer_01",
+     "text": "Ooh, a duel! Fetch my tape.",
+     "trig": [
+      "duel"
+     ]
+    },
+    {
+     "id": "mortimer_02",
+     "text": "Stand still, sir. A lovely six-foot-two.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "mortimer_03",
+     "text": "Business is dead. Wonderful!",
+     "trig": [
+      "idle"
+     ]
+    },
+    {
+     "id": "mortimer_04",
+     "text": "Pine or oak? Oak's for people with friends.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "mortimer_05",
+     "text": "Ten paces, gentlemen. Take your time.",
+     "trig": [
+      "duel"
+     ]
+    },
+    {
+     "id": "mortimer_06",
+     "text": "No refunds. Clients rarely complain.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    },
+    {
+     "id": "mortimer_07",
+     "text": "Lie still, he's not finished measuring you.",
+     "trig": [
+      "duel_win"
+     ]
+    },
+    {
+     "id": "mortimer_08",
+     "text": "A fake death? How thrilling. I'll invoice the real one.",
+     "trig": [
+      "fake_death"
+     ]
+    },
+    {
+     "id": "mortimer_09",
+     "text": "My predecessor fell in his own grave. Perfect fit. So proud.",
+     "trig": [
+      "acquire_undertaker"
+     ],
+     "once": true
+    },
+    {
+     "id": "mortimer_10",
+     "text": "Measured the horse. One never knows.",
+     "trig": [
+      "idle"
+     ]
+    }
+   ],
+   "wordless": [
+    {
+     "id": "mortimer_w1",
+     "text": "Ooh!",
+     "kind": "delight"
+    },
+    {
+     "id": "mortimer_w2",
+     "text": "Mmm, lovely.",
+     "kind": "purr"
+    },
+    {
+     "id": "mortimer_w3",
+     "text": "Heh heh heh.",
+     "kind": "laugh"
+    },
+    {
+     "id": "mortimer_w4",
+     "text": "Tsk tsk.",
+     "kind": "tut"
+    }
+   ]
+  },
+  "lulu": {
+   "name": "Madame Lulu LaRue",
+   "role": "madam, Velvet Garter manager",
+   "voice": "A woman in her forties with a smoky, honeyed alto voice and a theatrical, exaggerated fake French accent. Teasing, knowing, flirtatious and businesslike, a ruthless saleswoman with a wink in every word.",
+   "audition": "Bonjour, cowboy. Ze conversation is one dollar. Ze eye contact, extra. Pay at ze door, and leave with dignity. Optional.",
+   "lines": [
+    {
+     "id": "lulu_01",
+     "text": "Ze conversation is one dollar. Ze eye contact, extra.",
+     "trig": [
+      "tap"
+     ],
+     "rude": true
+    },
+    {
+     "id": "lulu_02",
+     "text": "Non, non, chéri. Ze hands stay on ze hat.",
+     "trig": [
+      "tap"
+     ],
+     "rude": true
+    },
+    {
+     "id": "lulu_03",
+     "text": "Ze accent? Ohio, darling. Keep it quiet.",
+     "trig": [
+      "tap"
+     ],
+     "once": true
+    },
+    {
+     "id": "lulu_04",
+     "text": "Back so soon, Sheriff? Your wife was asking.",
+     "trig": [
+      "tap",
+      "idle"
+     ],
+     "rude": true
+    },
+    {
+     "id": "lulu_05",
+     "text": "Pay at ze door. Leave with dignity. Optional.",
+     "trig": [
+      "tap"
+     ],
+     "rude": true
+    },
+    {
+     "id": "lulu_06",
+     "text": "Bonjour, cowboy. Your wallet looks... lonely.",
+     "trig": [
+      "tap"
+     ],
+     "rude": true
+    },
+    {
+     "id": "lulu_07",
+     "text": "Monsieur! Ze window is not ze exit! ...Fine. It is now.",
+     "trig": [
+      "garter_window"
+     ],
+     "rude": true
+    },
+    {
+     "id": "lulu_08",
+     "text": "Oh my gosh, a robbery! ...I mean, sacré bleu.",
+     "trig": [
+      "robbery"
+     ]
+    },
+    {
+     "id": "lulu_09",
+     "text": "Zey leave in such a hurry. Zey forget ze hat. And ze wife.",
+     "trig": [
+      "idle"
+     ],
+     "rude": true
+    },
+    {
+     "id": "lulu_10",
+     "text": "Ze piano is out of tune. Like ze clientele.",
+     "trig": [
+      "piano",
+      "tap"
+     ]
+    },
+    {
+     "id": "lulu_11",
+     "text": "A respectable parlour. Ze most respectable on ze whole block.",
+     "trig": [
+      "acquire_garter"
+     ],
+     "once": true
+    }
+   ],
+   "wordless": [
+    {
+     "id": "lulu_w1",
+     "text": "Ooh la la.",
+     "kind": "tease"
+    },
+    {
+     "id": "lulu_w2",
+     "text": "Mmm-hmm.",
+     "kind": "purr"
+    },
+    {
+     "id": "lulu_w3",
+     "text": "Ha ha ha!",
+     "kind": "laugh"
+    },
+    {
+     "id": "lulu_w4",
+     "text": "Oh my gosh!",
+     "kind": "gasp"
+    }
+   ]
+  },
+  "pete": {
+   "name": "\"Pliers\" Pete Pettigrew",
+   "role": "barber-dentist-surgeon, Pull & Pray manager",
+   "voice": "A man in his thirties with an eager, high, cheerful tenor voice and a light Southern twang. Giggly, alarmingly upbeat and enthusiastic, talks quickly, far too happy about pulling teeth.",
+   "audition": "Shave, haircut or tooth? Why not all three! Open wide. Wider. Don't worry, I've done this twice!",
+   "lines": [
+    {
+     "id": "pete_01",
+     "text": "Shave, haircut or tooth? Why not all three!",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "pete_02",
+     "text": "Open wide. Wider. Bite this.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "pete_03",
+     "text": "That one's loose! ...Now it is.",
+     "trig": [
+      "tap",
+      "fling_dentist"
+     ]
+    },
+    {
+     "id": "pete_04",
+     "text": "Don't worry, I've done this twice.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "pete_05",
+     "text": "Whiskey's the anaesthetic. And the tip.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    },
+    {
+     "id": "pete_06",
+     "text": "Gold tooth! Mine now.",
+     "trig": [
+      "strongbox",
+      "fling_dentist"
+     ]
+    },
+    {
+     "id": "pete_07",
+     "text": "A walk-in! Well, a fly-in!",
+     "trig": [
+      "fling_dentist",
+      "link"
+     ]
+    },
+    {
+     "id": "pete_08",
+     "text": "Keep swingin', boys! I got a mortgage!",
+     "trig": [
+      "brawl"
+     ]
+    }
+   ],
+   "wordless": [
+    {
+     "id": "pete_w1",
+     "text": "Hee hee hee!",
+     "kind": "giggle"
+    },
+    {
+     "id": "pete_w2",
+     "text": "Ooh!",
+     "kind": "delight"
+    },
+    {
+     "id": "pete_w3",
+     "text": "Nngh! Got it!",
+     "kind": "effort"
+    }
+   ]
+  },
+  "nubbin": {
+   "name": "Lil' Nubbin",
+   "role": "shoeshine kid, Spit & Shine manager (always clean)",
+   "voice": "A nine-year-old boy with a scratchy, confident, boyish voice. Fast, streetwise New York newsboy patter, deadpan and unimpressed, a tiny businessman who thinks adults are slow.",
+   "audition": "Shine yer boots? Can't help yer face. Two bits. Three if there's horse in it. I'm eight. I got a business. You?",
+   "lines": [
+    {
+     "id": "nubbin_01",
+     "text": "Shine yer boots? Can't help yer face.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "nubbin_02",
+     "text": "Two bits. Three if there's horse in it.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "nubbin_03",
+     "text": "That ain't mud, mister.",
+     "trig": [
+      "tap",
+      "opening"
+     ]
+    },
+    {
+     "id": "nubbin_04",
+     "text": "Spit's free. Polish costs.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    },
+    {
+     "id": "nubbin_05",
+     "text": "I'm eight. I got a business. You?",
+     "trig": [
+      "first_business"
+     ],
+     "once": true
+    },
+    {
+     "id": "nubbin_06",
+     "text": "You call that a hat?",
+     "trig": [
+      "hat_promo",
+      "tap"
+     ]
+    },
+    {
+     "id": "nubbin_07",
+     "text": "Nice landin'. Six outta ten.",
+     "trig": [
+      "opening",
+      "eject"
+     ]
+    },
+    {
+     "id": "nubbin_08",
+     "text": "Prices went up. You got richer. I noticed.",
+     "trig": [
+      "levelup"
+     ]
+    }
+   ],
+   "wordless": [
+    {
+     "id": "nubbin_w1",
+     "text": "Hey!",
+     "kind": "shout"
+    },
+    {
+     "id": "nubbin_w2",
+     "text": "Pfft.",
+     "kind": "scoff"
+    },
+    {
+     "id": "nubbin_w3",
+     "text": "Heh.",
+     "kind": "laugh"
+    },
+    {
+     "id": "nubbin_w4",
+     "text": "Ooh, fancy.",
+     "kind": "whistle"
+    }
+   ]
+  },
+  "hortense": {
+   "name": "Hortense Hoofnagle",
+   "role": "Hoof & Mouth Livery manager, horse translator",
+   "voice": "A sturdy farm woman in her fifties with a warm, hearty, slightly hoarse voice and a broad rural Western drawl. Matter-of-fact and kindly, she relays rude things very politely.",
+   "audition": "Buttercup says you smell like a mule. She means it nice. Don't feed him the hat, now, he's had three.",
+   "lines": [
+    {
+     "id": "hortense_01",
+     "text": "Buttercup says you smell like a mule. ...She means it nice.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "hortense_02",
+     "text": "He says you can ride him when you lose some weight.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "hortense_03",
+     "text": "Don't feed him the hat. He's had three.",
+     "trig": [
+      "tap",
+      "hat_promo"
+     ]
+    },
+    {
+     "id": "hortense_04",
+     "text": "That mule ain't kickin' the wall. He's knockin'.",
+     "trig": [
+      "idle"
+     ]
+    },
+    {
+     "id": "hortense_05",
+     "text": "Coach is in! Horses say the driver can't steer.",
+     "trig": [
+      "stagecoach"
+     ]
+    },
+    {
+     "id": "hortense_06",
+     "text": "Horace says Bart's a horse's... well. Rhymes with 'brass'.",
+     "trig": [
+      "robbery_caught"
+     ],
+     "rude": true
+    },
+    {
+     "id": "hortense_07",
+     "text": "I don't speak donkey. Donkey speaks me.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    }
+   ],
+   "wordless": [
+    {
+     "id": "hortense_w1",
+     "text": "Whoa there!",
+     "kind": "call"
+    },
+    {
+     "id": "hortense_w2",
+     "text": "Hyah!",
+     "kind": "call"
+    },
+    {
+     "id": "hortense_w3",
+     "text": "Ha!",
+     "kind": "laugh"
+    }
+   ]
+  },
+  "thrupp": {
+   "name": "Ebenezer Thrupp",
+   "role": "banker, Bank manager",
+   "voice": "A thin, elderly miser in his seventies with a dry, wheezy, pinched voice. Fussy, fretful and stingy, prim old-fashioned New England diction, prone to swooning.",
+   "audition": "One coin. Two coin. One coin. Interest? Oh, I'm very interested. Withdrawals are Thursdays, and this is not Thursday.",
+   "lines": [
+    {
+     "id": "thrupp_01",
+     "text": "One coin. Two coin. ...One coin.",
+     "trig": [
+      "tap",
+      "idle"
+     ]
+    },
+    {
+     "id": "thrupp_02",
+     "text": "Interest? Oh, I'm very interested.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "thrupp_03",
+     "text": "A robbery! I'm going to faint. I'm fainting. I've fainted.",
+     "trig": [
+      "robbery"
+     ]
+    },
+    {
+     "id": "thrupp_04",
+     "text": "Withdrawals are Thursdays. It is never Thursday.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "thrupp_05",
+     "text": "Take it! Take the vault! Take my smelling salts!",
+     "trig": [
+      "acquire_bank"
+     ],
+     "once": true
+    },
+    {
+     "id": "thrupp_06",
+     "text": "Another deposit from the Garter. A very discreet account.",
+     "trig": [
+      "link"
+     ],
+     "rude": true
+    },
+    {
+     "id": "thrupp_07",
+     "text": "Don't open it! It's... unspent!",
+     "trig": [
+      "strongbox"
+     ]
+    }
+   ],
+   "wordless": [
+    {
+     "id": "thrupp_w1",
+     "text": "Ohhh...",
+     "kind": "swoon"
+    },
+    {
+     "id": "thrupp_w2",
+     "text": "Tsk.",
+     "kind": "tut"
+    },
+    {
+     "id": "thrupp_w3",
+     "text": "Oh! Oh my!",
+     "kind": "gasp"
+    }
+   ]
+  },
+  "bart": {
+   "name": "Black Bart Bumbleton",
+   "role": "recurring outlaw",
+   "voice": "A man in his thirties putting on a gruff, growly outlaw voice that keeps slipping into a polite, nervous, higher-pitched voice. Mumbly, apologetic, incompetent and earnest.",
+   "audition": "This is a robbery! Er, a stick-up. Hands up! Not that high, show-off. Everyone stay calm, I'm very nervous!",
+   "lines": [
+    {
+     "id": "bart_01",
+     "text": "Hands up! ...Not that high, show-off.",
+     "trig": [
+      "robbery"
+     ]
+    },
+    {
+     "id": "bart_02",
+     "text": "This is a robbery! Er... stick-up.",
+     "trig": [
+      "robbery"
+     ]
+    },
+    {
+     "id": "bart_03",
+     "text": "All yer money! ...And a sandwich.",
+     "trig": [
+      "robbery"
+     ]
+    },
+    {
+     "id": "bart_04",
+     "text": "They'll never catch— OW. Who put a pole there?",
+     "trig": [
+      "robbery_crash"
+     ]
+    },
+    {
+     "id": "bart_05",
+     "text": "Everyone stay calm! I'm very nervous!",
+     "trig": [
+      "robbery"
+     ]
+    },
+    {
+     "id": "bart_06",
+     "text": "Getaway horse! ...HORACE!",
+     "trig": [
+      "robbery"
+     ]
+    },
+    {
+     "id": "bart_07",
+     "text": "You ain't seen the last of me! ...Probably next week.",
+     "trig": [
+      "robbery_caught"
+     ]
+    },
+    {
+     "id": "bart_08",
+     "text": "I'm in disguise. As a different Bart.",
+     "trig": [
+      "robbery",
+      "duel"
+     ]
+    },
+    {
+     "id": "bart_09",
+     "text": "Draw! ...Oh, you mean the gun.",
+     "trig": [
+      "duel"
+     ]
+    },
+    {
+     "id": "bart_10",
+     "text": "Fair cop. Nice poster, though?",
+     "trig": [
+      "robbery_caught"
+     ]
+    }
+   ],
+   "wordless": [
+    {
+     "id": "bart_w1",
+     "text": "Grrr!",
+     "kind": "growl"
+    },
+    {
+     "id": "bart_w2",
+     "text": "Ow!",
+     "kind": "oof"
+    },
+    {
+     "id": "bart_w3",
+     "text": "Yah! Yah!",
+     "kind": "ride"
+    },
+    {
+     "id": "bart_w4",
+     "text": "Oopsie.",
+     "kind": "slip"
+    }
+   ]
+  },
+  "fingers": {
+   "name": "\"Fingers\" Fontaine",
+   "role": "saloon pianist",
+   "voice": "A wiry man in his forties with a laid-back, smoky, gravelly voice and a slow, laconic Southern drawl. Deadpan, unbothered, a musician who has seen everything and played through all of it.",
+   "audition": "Requests? I take 'em, I just don't play 'em. Been playin' this same song since eighteen seventy.",
+   "lines": [
+    {
+     "id": "fingers_01",
+     "text": "Requests? I take 'em. I don't play 'em.",
+     "trig": [
+      "piano",
+      "tap"
+     ]
+    },
+    {
+     "id": "fingers_02",
+     "text": "Faster? My fingers got fingers!",
+     "trig": [
+      "frenzy"
+     ]
+    },
+    {
+     "id": "fingers_03",
+     "text": "Same song since eighteen-seventy. Still workin' on it.",
+     "trig": [
+      "piano",
+      "idle"
+     ]
+    },
+    {
+     "id": "fingers_04",
+     "text": "Still playin'! Still playin'!",
+     "trig": [
+      "eject"
+     ]
+    },
+    {
+     "id": "fingers_05",
+     "text": "That note was jazz. Look it up in thirty years.",
+     "trig": [
+      "wrong_note"
+     ]
+    },
+    {
+     "id": "fingers_06",
+     "text": "Tip jar's the one on the left. Don't use the right.",
+     "trig": [
+      "tap"
+     ]
+    },
+    {
+     "id": "fingers_07",
+     "text": "Piano's out of tune. So's the bar. We match.",
+     "trig": [
+      "piano",
+      "tap"
+     ]
+    }
+   ],
+   "wordless": [
+    {
+     "id": "fingers_w1",
+     "text": "Yeah!",
+     "kind": "cheer"
+    },
+    {
+     "id": "fingers_w2",
+     "text": "Mm-hm.",
+     "kind": "hum"
+    },
+    {
+     "id": "fingers_w3",
+     "text": "Oops.",
+     "kind": "slip"
+    }
+   ]
+  },
+  "mulligan": {
+   "name": "The Mulligan Brothers (Mick, Mick and Other Mick)",
+   "role": "construction crew",
+   "voice": "A burly, cheerful construction worker in his thirties with a gruff, hearty, gravelly working-man voice and a mild Irish-American accent. Loud, jolly and a bit dim.",
+   "audition": "Measure twice, cut once, swear thrice. Mick! Hand me the hammer. No, the other Mick!",
+   "lines": [
+    {
+     "id": "mulligan_01",
+     "text": "Measure twice, cut once, swear thrice.",
+     "trig": [
+      "build"
+     ]
+    },
+    {
+     "id": "mulligan_02",
+     "text": "Mick! Hand me the hammer! ...No, the other Mick.",
+     "trig": [
+      "build"
+     ]
+    },
+    {
+     "id": "mulligan_03",
+     "text": "She's up! Mostly!",
+     "trig": [
+      "sign_raise"
+     ]
+    },
+    {
+     "id": "mulligan_04",
+     "text": "Tap faster, boss. We're paid by the bang.",
+     "trig": [
+      "hurry"
+     ]
+    },
+    {
+     "id": "mulligan_05",
+     "text": "Load-bearin'? Everythin's load-bearin' if you believe.",
+     "trig": [
+      "build",
+      "hurry"
+     ]
+    },
+    {
+     "id": "mulligan_06",
+     "text": "Who's got the nails? ...Who's got Mick?",
+     "trig": [
+      "build"
+     ]
+    }
+   ],
+   "wordless": [
+    {
+     "id": "mulligan_w1",
+     "text": "Heave!",
+     "kind": "effort"
+    },
+    {
+     "id": "mulligan_w2",
+     "text": "Hup, two, three!",
+     "kind": "effort"
+    },
+    {
+     "id": "mulligan_w3",
+     "text": "Ow, me thumb!",
+     "kind": "oof"
+    },
+    {
+     "id": "mulligan_w4",
+     "text": "Ha ha!",
+     "kind": "laugh"
+    }
+   ]
+  },
+  "stranger": {
+   "name": "The Stranger (you)",
+   "role": "player character, grunts only",
+   "voice": "A man in his thirties with a very low, dry, gravelly baritone voice. Laconic, terse, a squinting gunslinger of very few words, almost a whisper-growl.",
+   "audition": "Hrm. No. Yep. Nice town. I'll take it. And the hat. Hrm.",
+   "lines": [],
+   "wordless": [
+    {
+     "id": "stranger_w1",
+     "text": "Hrm.",
+     "kind": "grunt"
+    },
+    {
+     "id": "stranger_w2",
+     "text": "Hrm?",
+     "kind": "grunt"
+    },
+    {
+     "id": "stranger_w3",
+     "text": "No.",
+     "kind": "word"
+    },
+    {
+     "id": "stranger_w4",
+     "text": "Yep.",
+     "kind": "word"
+    },
+    {
+     "id": "stranger_w5",
+     "text": "Oof!",
+     "kind": "oof"
+    },
+    {
+     "id": "stranger_w6",
+     "text": "Pfft.",
+     "kind": "spit"
+    }
+   ]
+  }
+ }
+}

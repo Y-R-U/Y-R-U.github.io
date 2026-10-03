@@ -1,0 +1,83 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>IW2 art lab</title>
+<style>html,body{margin:0;background:#222;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/gms/lib/three/0.160.0/three.module.js", "three/addons/": "/gms/lib/three/0.160.0/addons/" } }</script>
+</head><body>
+<script type="module">
+// Renders one world view without the UI: ?view=hero|card|town&plot=stable&vt=0..2&owned=1&tier=high&tod=8&frames=40
+import * as THREE from 'three';
+import { createKit } from '../js/render/kit/index.js?v=20261004a';
+import { createWorld } from '../js/render/world.js?v=20261004a';
+import { LINES } from '../js/data/lines.js?v=20261004a';
+import { PALETTE, DISTRICT_PALETTES } from '../js/data/palette.js?v=20261004a';
+import { PLOTS, STREET, ROAD_GRAPH, HUB_ANCHOR } from '../js/data/plots.js?v=20261004a';
+import { createPost } from '../js/render/post.js?v=20261004a';
+const q = new URLSearchParams(location.search);
+const view = q.get('view') || 'card', plot = q.get('plot') || LINES[0].id, tier = q.get('tier') || 'high';
+const vt = +(q.get('vt') ?? 0), owned = q.get('owned') !== '0', W = innerWidth, H = innerHeight;
+const stock = +(q.get('stock') ?? 0.6);
+const kit = createKit(); window.__kit = kit;
+const world = createWorld({ kit, data: { lines: LINES, plots: PLOTS, street: STREET, roadGraph: ROAD_GRAPH, hubAnchor: HUB_ANCHOR, palette: PALETTE, districtPalettes: DISTRICT_PALETTES } }); window.__world = world;
+const lines = Object.fromEntries(LINES.map((l) => [l.id, { lv: owned ? (vt === 2 ? 120 : vt === 1 ? 30 : 5) : 0 }]));
+const game = {
+  state: { lines, bootstrap: { done: q.get('boot') !== '0' }, events: { active: [] } },
+  simTime: 0,
+  stats: (id) => ({ owned, managed: true, level: lines[id].lv, visualTier: vt, stockRatio: stock, cycleSec: 2.2, cycle01: 0, sigmaUpgrades: +(q.get('thr') ?? 2), boosts: +(q.get('boosts') ?? 2) }),
+  on() {},
+};
+const renderer = new THREE.WebGLRenderer({ antialias: tier === 'high' });
+renderer.setPixelRatio(+(q.get('dpr') || 1));
+renderer.setSize(W, H);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+let cam;
+if (view === 'prop') {
+  const b = kit.builder(PALETTE);
+  const which = q.get('prop') || 'car';
+  if (which === 'car') kit.vehicles.car(b, 0, 0, 0, 'orange', { dirty: true });
+  else if (which === 'van') kit.vehicles.van(b, 0, 0, 0, 'teal');
+  else if (which === 'house') kit.props.house(b, 0, 0, { shop: { awning: 'accent' } });
+  else if (which === 'dog') kit.props.dog(b, 0, 0, { bow: 'pink' });
+  else if (which === 'people') { const c = kit.crowd({ count: 5 }); for (let i = 0; i < 5; i++) c.set(i, (i - 2) * 0.9, 0, 0, 0.4, i); c.commit(); world.scene.add(c.mesh); }
+  const m = b.count ? b.finish() : null;
+  for (const o of [...world.scene.children]) if (o.isMesh || o.isGroup) o.visible = false;
+  if (m) { m.position.set(0, 0, 0); world.scene.add(m); }
+  world.scene.children.forEach((o) => { if (o.isInstancedMesh) o.visible = true; });
+  cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 100);
+  cam.position.set(+(q.get('cx') ?? -3), +(q.get('cy') ?? 2.5), +(q.get('cz') ?? 5));
+  cam.lookAt(0, 0.6, 0);
+  world.rig.place(new THREE.Vector3(), 8);
+  renderer.shadowMap.enabled = true;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.render(world.scene, cam);
+  window.__lab = { ready: true };
+  throw 'done';
+}
+const v = view === 'card' ? { kind: 'line', lineId: plot, w: W, h: H } : { kind: 'hero', w: W, h: H };
+const tour = view === 'town' ? [plot] : [plot];
+if (view === 'hero') world.heroRig.pin(plot);
+const frames = +(q.get('frames') || 40);
+if (q.get('js')) new Function('world', 'kit', 'THREE', 'renderer', q.get('js'))(world, kit, THREE, renderer);
+let f = 0;
+const usePost = q.get('post') ? q.get('post') === '1' : view === 'hero';
+const post = usePost ? createPost() : null;
+const t0 = performance.now();
+function frame() {
+  const dt = 1 / 30;
+  game.simTime += dt;
+  world.update(dt, game, null, new Set([plot]), tier);
+  if (view === 'town' && f === 0) world.heroRig.town(true);
+  cam = world.prepare(v);
+  renderer.info.reset();
+  renderer.info.autoReset = false;
+  if (usePost) {
+    const rc = world.renderConfig, dpr = renderer.getPixelRatio();
+    world.configureRenderer(renderer, tier);
+    post.render(renderer, world.scene, cam, { vx: 0, vy: 0, pw: W * dpr, ph: H * dpr }, { bloom: rc.bloom, tilt: view === 'card' ? { ...rc.tilt, band: rc.tilt.band + 0.08, strength: rc.tilt.strength * 0.6 } : rc.tilt, samples: 4, div: 2 });
+  } else renderer.render(world.scene, cam);
+  f++;
+  if (f < frames) requestAnimationFrame(frame);
+  else window.__lab = { ready: true, calls: renderer.info.render.calls, tris: renderer.info.render.triangles, programs: renderer.info.programs.length, ms: performance.now() - t0, top: (() => { const a = []; world.scene.traverse((o) => { if (o.isMesh && o.geometry) a.push([o.name || o.parent?.name || o.type, Math.round((o.geometry.attributes.position.count / 3) * (o.isInstancedMesh ? o.count : 1))]); }); return a.sort((x, y) => y[1] - x[1]).slice(0, 12); })(), cur: world.heroRig.current, mode: world.heroRig.mode, cam: cam.position.toArray().map((x) => +x.toFixed(1)), sun: world.rig.sun.position.clone().sub(world.rig.target.position).normalize().toArray().map((x) => +x.toFixed(2)), sm: renderer.shadowMap.enabled, cast: world.rig.sun.castShadow, smap: !!world.rig.sun.shadow.map };
+}
+frame();
+</script></body></html>
