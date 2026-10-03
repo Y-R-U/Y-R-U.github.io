@@ -3,7 +3,7 @@
 // Stock: a big glass jar of pulled teeth (a few gold). A patient waits on the bench holding his jaw.
 // L1 one chair → L25 a shaving chair with a lathered customer → L100 a gilded tooth on the roof and a second storey sign.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hatted, particles, tufts, rock, tone, tilt } from './western.js?v=20261004c';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hatted, particles, tufts, rock, tone, tilt, vignette, CROWD_K } from './western.js?v=20261004c';
 import { createConstruction, finishPlot } from './construction.js?v=20261004c';
 
 const BX = -1.9, FZ = 0.5, W = 6.2, D = 5.2, H = 6.0, FH = 7.2;
@@ -12,6 +12,7 @@ const CHAIR = [2.5, 1.85];
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({ id: 'dentist', line, palette, rng, seed: 29, colors: { ...COLORS, tooth: '#fbf6ea', leatherR: '#a8302a', jar: { c: '#cfe6e2', r: 0.06 }, foam: '#ffffff', poleR: '#c9302a' } });
   const { b, t1, t2, lot } = P;
+  vignette(b, -5.0, 3.7);
 
   falseFront(b, { x: BX, fz: FZ, w: W, d: D, h: H, fh: FH, front: 'teal', wall: tone(COLORS.teal, 0.8), parapet: 'peak', door: -1.6, windows: [], trim: 'cream' });
   // a big shop window with a curtain, upstairs windows
@@ -21,7 +22,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
   porch(b, BX - W / 2 - 0.1, BX + W / 2 + 0.1, FZ, 2.6, { awnY: 2.8, awn: ['cream', 'poleR'], posts: 3, stepX: BX - 1.6 });
   porch(b, BX + W / 2 + 0.1, BX + W / 2 + 3.8, FZ, 2.6, { awn: false, step: false });
   signBoard(b, BX, H + 0.0, FZ + 0.18, 4.4, 0.9, { board: 'cream', trim: 'brass' });
-  toothShape(b, BX, H - 0.2 + 0.5, FZ + 0.3, 0.55, 'tooth');
+  toothShape(b, BX - 2.65, H + 0.2, FZ + 0.3, 0.5, 'tooth');
   bigTooth(b, BX + W / 2 - 0.6, H + 1.25, FZ + 0.25, 0.6, 'tooth');
   pole(b, BX + W / 2 + 0.3, FZ + 0.55, true);
   blade(b, BX - W / 2 + 0.3, 1.7, FZ + 1.6, { board: 'ownTeal' });
@@ -89,7 +90,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   return finishPlot(P, C, {
     w: 12, cardW: 11, d: 9, h: FH + 2,
-    camera: cardCam([-0.4, 2.2, 1.2], 12, 26, 13, 42),
+    camera: cardCam([-1.1, 2, 2.5], 26, 20, 22, 38, 7, [[-0.8, 3.0, 2.5], 24, 10, 21, 38, 12]),
     pileAnchor: JAR, pileR: 1.0,
     exit: [[BX - 1.6, 3.4], [4, 4.0], [6.3, 4.2]],
     focus: [0.5, 1.2],
@@ -103,7 +104,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
       const rec = u < 0.35 ? (u / 0.35) * 0.5 : u < 0.55 ? 0.5 + ((u - 0.35) / 0.2) * 0.95 : u < 0.85 ? 1.45 : 1.45 - ((u - 0.85) / 0.15) * 1.45;
       back.position.set(CHAIR[0], 0.95, CHAIR[1] - 0.25);
       back.rotation.set(-rec, 0, 0);
-      const kSC = SC * 1.22 * 1.0;
+      const kSC = SC * CROWD_K * 1.0;
       folk.set(1, CHAIR[0], 0.86, CHAIR[1] + 0.05, 0, 5, 0, 1);
       tilt(folk, 1, CHAIR[0], 0.8 + rec * 0.05, CHAIR[1] - rec * 0.25, 0, -rec * 0.85, 0, kSC);
       folk.hats.put(1, CHAIR[0], 0.86 + Math.cos(rec * 0.85) * 1.7, CHAIR[1] - Math.sin(rec * 0.85) * 1.7, 0, 0.85, -rec, 0);

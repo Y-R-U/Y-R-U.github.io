@@ -4,7 +4,7 @@
 // the lot shows the late Mr Grimsby's version with Pomfrey's purple board.
 // L1 parlour → L25 a little Boot Hill of crosses + a gravedigger → L100 a bell tower with a gilded coffin weather vane.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, tone } from './western.js?v=20261004c';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, tone, vignette } from './western.js?v=20261004c';
 import { createConstruction, finishPlot } from './construction.js?v=20261004c';
 
 const BX = -2.0, FZ = 0.5, W = 7.4, D = 5.6, H = 3.6, FH = 6.4;
@@ -13,6 +13,7 @@ const DOM = { x: 1.7, z: 2.5, n: 9, gap: 0.42 };
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({ id: 'undertaker', line, palette, rng, seed: 37, colors: { ...COLORS, plum: '#5a3a5a', plum2: '#4a2e48', coffin: '#6a4a36', coffin2: '#7e5a40', lining: '#c9473a', crape: '#2a2230', vult: '#3a2e34', vultHead: '#d98a7a', lily: '#f6f0e2' } });
   const { b, t1, t2, lot } = P;
+  vignette(b, -5.4, 3.7);
 
   parlour(b, true);
   parlour(lot, false);
@@ -78,7 +79,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
   return finishPlot(P, C, {
     w: 13, cardW: 12, d: 9, h: FH + 2,
     acquired: true,
-    camera: cardCam([0.2, 2.1, 1.0], 12, 27, 12.5, 42),
+    camera: cardCam([-1.5, 2, 2.5], 26, 20, 23, 38, 7),
     pileAnchor: [DOM.x + DOM.gap * 4, 1.0, DOM.z], pileR: 1.6,
     exit: [[0, 3.4], [5, 4.0], [6.6, 4.2]],
     focus: [0, 1],
@@ -121,7 +122,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
     B.slab('crape', BX + 0.8, 2.6, FZ + 0.22, 1.8, 0.14, 0.05, { round: 0.03, taper: 0 });
     porch(B, BX - W / 2 - 0.1, BX + W / 2 + 0.1, FZ, 2.5, { awn: false, stepX: BX + 0.8 });
     signBoard(B, BX, H + 0.6, FZ + 0.18, 4.4, 0.95, { board: own ? 'cream' : '#6b3f8f', trim: own ? 'brass' : 'gold' });
-    coffinShape(B, BX, H + 1.07, FZ + 0.3, 0.3, 'soot', 0.06, true);
+    coffinShape(B, BX + 2.6, H + 1.07, FZ + 0.3, 0.3, 'soot', 0.06, true);
     // three coffins upright against the front, one open with a lily-white lining (empty, waiting)
     for (let i = 0; i < 3; i++) {
       const x = BX - 3.1 + i * 0.9;

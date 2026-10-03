@@ -4,11 +4,12 @@
 // walls rise with t. No geometry is made after boot: timbers and planks are one InstancedMesh, the swinging front and
 // the sign are two prebuilt meshes, the crew is one crowd. Also plays the Lv25/Lv100 "extension" crew bustle.
 import * as THREE from 'three';
-import { tone, wheel, crate, particles, placed, headY, tilt, rand, smooth01, COLORS } from './western.js?v=20261004c';
+import { tone, wheel, crate, particles, placed, headY, tilt, rand, smooth01, COLORS, CROWD_K } from './western.js?v=20261004c';
 
 const easeBack = (x) => { const t = Math.max(0, Math.min(1, x)); const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
 const _m = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(), _p = new THREE.Vector3(), _s = new THREE.Vector3(), _c = new THREE.Color();
 const NSTAGE = 5, UP = new THREE.Vector3(0, 1, 0);
+const FACE = -0.45; // heading that faces the card cameras (they stand south-west of the lot)
 const CREW_SCALE = 1.08, CREW_K = 1.0;
 
 // site: { x, fz, w, d, h, fh, parapet, ext: {x, z, w, h} (Lv25/100 bustle spot), yard: [x, z] (lumber pile + mule cart) }
@@ -71,7 +72,7 @@ export function createConstruction(kit, P, site) {
 
   // ---- timbers + planks: one InstancedMesh with per-instance stage, reveal time and colour
   const items = [];
-  const T = (stage, r, x, y, z, sx, sy, sz, rx = 0, ry = 0, rz = 0, col = COLORS.raw, grow = 'pop') => items.push({ stage, r, x, y, z, sx, sy, sz, rx, ry, rz, col, grow });
+  const T = (stage, r, x, y, z, sx, sy, sz, rx = 0, ry = 0, rz = 0, col = COLORS.raw, grow = 'pop', until = 9) => items.push({ stage, r, x, y, z, sx, sy, sz, rx, ry, rz, col, grow, until });
   const tb = 0.16;
   // frame: posts up first, then plates, then studs, braces, rafters, scaffold + ladder
   for (const [i, [cx, cz]] of corners.entries()) T(1, i * 0.05, cx, 0.2, cz, tb, S.h - 0.2, tb, 0, 0, 0, COLORS.raw, 'up');
@@ -95,6 +96,16 @@ export function createConstruction(kit, P, site) {
   const lx = x0 - 1.25, lz = zf + 0.7, LH = S.h + 0.5, lean = 0.22;
   for (const s of [-1, 1]) T(1, 0.9, lx + s * 0.22, 0, lz, 0.07, LH, 0.07, -lean, 0, 0, COLORS.raw);
   for (let k = 1; k < 9; k++) { const y = (k / 9) * LH * Math.cos(lean); T(1, 0.9, lx, y, lz - Math.sin(lean) * (k / 9) * LH, 0.5, 0.05, 0.06, 0, 0, 0, COLORS.raw2); }
+  // R3 build card: the frame reads two-storey against the sky (back posts + plates up to the false-front height while
+  // framing) and a gin pole with a dangling plank stands beside it until the walls are done.
+  for (const [cx, cz] of corners.slice(2)) T(1, 0.6, cx, S.h, cz, tb, S.fh - S.h - 0.2, tb, 0, 0, 0, COLORS.raw, 'up', 1);
+  T(1, 0.66, S.x, S.fh - 0.25, zb, S.w + 0.2, tb, tb, 0, 0, 0, COLORS.raw, 'pop', 1);
+  for (const sx of [x0, x1]) T(1, 0.68, sx, S.fh - 0.25, (zf + zb) / 2, tb, tb, S.d + 0.2, 0, 0, 0, COLORS.raw, 'pop', 1);
+  const gx = x1 + 0.7, gz = zf - 0.8, GH = S.fh + 1.8;
+  T(1, 0.3, gx, 0, gz, 0.2, GH, 0.2, 0, 0, 0.04, COLORS.raw2, 'up', 2);
+  T(1, 0.5, gx - 0.9, GH - 0.25, gz, 2.2, 0.14, 0.14, 0, 0, -0.18, COLORS.raw2, 'pop', 2);
+  T(1, 0.52, gx - 1.85, GH - 1.5, gz, 0.035, 2.1, 0.035, 0, 0, 0, COLORS.rope, 'pop', 2);
+  T(1, 0.54, gx - 1.85, GH - 1.6, gz, 2.2, 0.12, 0.28, 0, 0.5, 0.1, tone(COLORS.raw, 1.05), 'pop', 2);
   // walls: planks clad bottom-up (front has door + window gaps), then roof boards
   const PH = 0.3, rows = Math.max(4, Math.floor((S.h - 0.25) / PH));
   const doorW = 1.4, winW = 1.4;
@@ -118,6 +129,7 @@ export function createConstruction(kit, P, site) {
   // two extra instances: a carried plank (bonk gag) and the hoist rope; driven by hand each frame
   const CARRY = items.length; T(-1, 0, 0, 0, 0, 2.4, 0.12, 0.28, 0, 0, 0, tone(COLORS.raw, 1.05));
   const ROPES = items.length; for (let i = 0; i < 3; i++) T(-1, 0, 0, 0, 0, 0.03, 1, 0.03, 0, 0, 0, COLORS.rope);
+  const PLAN = items.length; T(-1, 0, 0, 0, 0, 0.78, 0.56, 0.02, 0, 0, 0, '#f1ead2');
   const ub = kit.builder(P.pal);
   ub.slab('#ffffff', 0, 0, 0, 1, 1, 1, { round: 0.02, taper: 0 });
   const timbers = new THREE.InstancedMesh(ub.geometry({ ao: 0.12, aoH: 0.4 }), kit.materials.uber, items.length);
@@ -212,7 +224,7 @@ export function createConstruction(kit, P, site) {
     out[0] = a.x + (lx * ch + lz * sh) * a.k; out[1] = a.y + ly * a.k; out[2] = a.z + (-lx * sh + lz * ch) * a.k; out[3] = ang;
     return out;
   };
-  ag.forEach((a, k) => { a.ph = k * 1.7; a.k = CREW_SCALE * 1.22 * [1.1, 1.0, 1.25, 1.0][k]; });
+  ag.forEach((a, k) => { a.ph = k * 1.7; a.k = CREW_SCALE * CROWD_K * [1.1, 1.0, 1.25, 1.0][k]; });
 
   let shownStage = -1, popT = 1, lastT = null, lastP = 0, bustle = 0, bonk = 0, bonkCd = 4, hurryKick = 0, thumped = false, dove = false, levelled = false, cheer = 0, prevVt = null;
   const hand = [0, 0, 0, 0];
@@ -221,7 +233,7 @@ export function createConstruction(kit, P, site) {
     for (let i = 0; i < items.length; i++) {
       const it = items[i];
       if (it.stage < 0) continue;
-      const k = rebrand || st > it.stage ? 1 : st < it.stage ? 0 : -1;
+      const k = st > it.until ? 0 : rebrand || st > it.stage ? 1 : st < it.stage ? 0 : -1;
       if (k >= 0 && it.k !== k) { it.k = k; placeItem(i, k); }
     }
     timbers.instanceMatrix.needsUpdate = true;
@@ -349,6 +361,8 @@ export function createConstruction(kit, P, site) {
       const ry = st === 2 ? 0.25 + sp * (S.h - 0.4) : S.h - 0.3;
       A.x = scx; A.z = zf - 0.4; A.y = st === 4 ? 0 : Math.min(S.h - 0.3, ry - 0.3); A.h = Math.PI / 2;
       if (st === 1) A.y = sp > 0.84 ? S.h - 0.25 : sp > 0.4 ? 1.65 : 0;
+      // a brother up on the front plate against the sky, hammering (R3 build card)
+      if ((st === 1 && sp > 0.45) || st === 2) { A.x = x0 + S.w * 0.3; A.z = zf; A.y = S.h + 0.08; A.h = FACE; }
       if (st === 4) { A.x = S.x - SW / 2 + 0.2; A.z = zf - 0.35; A.y = S.h + 0.12; A.h = 0.3; A.clip = sp > 0.6 && sp < 0.78 ? 4 : 0; }
       B.x = S.x + S.w * 0.18; B.z = zf + 0.55; B.h = Math.PI; B.clip = 3;
       if (st === 4) { B.x = S.x + 0.3; B.z = zf + 1.3; B.h = Math.PI; B.clip = sp < 0.6 ? 2 : 0; }
@@ -361,7 +375,7 @@ export function createConstruction(kit, P, site) {
         C.h = Math.atan2(tb2[0] - ya[0], tb2[1] - ya[1]) + (u > 0.5 ? Math.PI : 0);
         carry = u < 0.5; C.clip = carry ? 2 : 1;
         if (u > 0.43 && u < 0.5) { C.h += Math.sin((u - 0.43) / 0.07 * Math.PI) * 1.4; }
-        if (u > 0.46 && bonk <= 0 && bonkCd <= 0) { bonk = 2.6; bonkCd = 9 + rnd() * 6; }
+        if (u > 0.46 && bonk <= 0 && bonkCd <= 0) { bonk = 2.6; bonkCd = 4 + rnd() * 3; }
       } else {
         C.x = S.x - 1.4; C.z = zf + 2.6; C.h = Math.PI * 0.95; C.clip = sp > 0.75 ? 4 : 0;
       }
@@ -373,6 +387,7 @@ export function createConstruction(kit, P, site) {
       C.x = S.x + 0.3 + dive * (S.w / 2 + 1.0); C.z = zf + 1.6 + dive * 0.8; C.h = Math.PI * 0.9 + dive * 1.2; C.clip = sp > 0.7 && sp < 0.85 ? 1 : 0;
       if (sp > 0.84) { C.clip = 5; if (!dove) { dove = true; bonk = 2.4; } }
     }
+    if (st < 4) { M.hide = false; M.x = Math.min(x1 + 1.3, S.x + S.w / 2 + 1.3); M.z = zf + 2.9; M.y = 0; M.h = FACE + 0.25; M.clip = 2; M.sp = 1; }
     if (st === 4 && sp > 0.8) { M.hide = false; const u = smooth01((sp - 0.8) / 0.12); M.x = S.x; M.z = zf + 0.4 + u * 2.0; M.h = 0; M.y = 0.3 * (1 - u); M.clip = u < 1 ? 1 : 4; M.sp = 4; }
     // bonked brother sits seeing stars (B normally; C after the near-flattening)
     const victim = st === 3 ? C : B;
@@ -384,6 +399,9 @@ export function createConstruction(kit, P, site) {
       stars.setMatrixAt(5, _m.makeScale(0, 0, 0));
       stars.instanceMatrix.needsUpdate = true;
     }
+    // the foreman's plan, held open in front of his chest
+    if (!M.hide && st < 4) { const ch = Math.cos(M.h), sh = Math.sin(M.h); placeRaw(PLAN, M.x + sh * 0.5 * M.k, M.y + 0.98 * M.k, M.z + ch * 0.5 * M.k, 0.78, 0.56, 0.02, -0.5, M.h, 0); }
+    else timbers.setMatrixAt(PLAN, _m.makeScale(0, 0, 0));
     // carried plank
     if (carry && st !== 4) {
       const ch = Math.cos(C.h), sh = Math.sin(C.h);
@@ -462,7 +480,7 @@ export function finishPlot(P, C, spec) {
   const before = new Set(P.group.children);
   const user = spec.update;
   const tapSite = { id: 'site', pos: C.anchors.site, r: Math.max(C.site.w, C.site.fh) * 0.55 };
-  let out = null, lotMesh = null;
+  let out = null, lotMeshes = [];
   out = P.done({
     ...spec,
     cardW: spec.camera?.facade ? 0.5 : spec.cardW,
@@ -470,13 +488,15 @@ export function finishPlot(P, C, spec) {
       C.update(dt, stats, ctx);
       const building = !!stats?.building;
       ctx.building = building;
-      if (lotMesh && !ctx.owned) lotMesh.visible = !building || !!spec.acquired;
+      if (!ctx.owned) for (const m of lotMeshes) m.visible = !building || !!spec.acquired;
       const tt = out.tapTargets, has = tt.includes(tapSite);
       if (building && !has) tt.push(tapSite); else if (!building && has) tt.splice(tt.indexOf(tapSite), 1);
       user?.(dt, stats, time, tier, ctx);
     },
   });
-  lotMesh = P.group.children.find((o) => !before.has(o) && o.isMesh) || null;
+  // the unowned lot = its static mesh (first unnamed new mesh) + its painted sign text ('signs:<id>:lot')
+  const fresh = P.group.children.filter((o) => !before.has(o) && o.isMesh);
+  lotMeshes = [fresh.find((o) => !o.name), ...fresh.filter((o) => o.name.endsWith(':lot'))].filter(Boolean);
   out.anchors = { ...C.anchors, ...(spec.anchors || {}) };
   out.construction = C;
   throttle(out, P);
@@ -491,10 +511,14 @@ const OFF_HZ = 16;
 const OFF_ON = typeof location === 'undefined' || !/[?&]plotHz=60\b/.test(location.search);
 const _wp = new THREE.Vector3(), _dir = new THREE.Vector3(), look = { cam: null, f: -1, x: 0, z: 0 };
 function throttle(out, P) {
+  // out.inCard(): this plot's own card camera drew it within the last ~0.7 s (card-only gags, e.g. the saloon ejection).
+  let cardAt = -1e9;
+  out.inCard = () => !OFF_ON || performance.now() - cardAt < 700;
   if (!OFF_ON) return;
   const update = out.update, halfW = out.bounds.heroW / 2 + 8;
   let frame = 0, seen = -99, acc = 0;
   const spy = (r, s, cam) => {
+    if (cam.userData?.iw2Line === P.id) cardAt = performance.now();
     if (seen === frame) return;
     if (cam.userData?.iw2Line === P.id) { seen = frame; return; }
     const f = r.info.render.frame;

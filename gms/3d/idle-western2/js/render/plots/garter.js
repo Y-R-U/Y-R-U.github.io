@@ -4,7 +4,7 @@
 // upstairs window and drops into the hay cart while his wife, rolling pin raised, storms in at the front door.
 // L1 parlour → L25 a gazebo of pink lanterns + a second boa'd balcony → L100 an onion-dome cupola with a heart weather vane.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, cart, tone, tilt, hatGeo, smooth01 } from './western.js?v=20261004c';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, cart, tone, tilt, hatGeo, smooth01, vignette, CROWD_K } from './western.js?v=20261004c';
 import { createConstruction, finishPlot } from './construction.js?v=20261004c';
 
 const BX = -1.6, FZ = 0.6, W = 8.6, D = 6.0, H1 = 3.3, H2 = 6.4, FH = 7.6;
@@ -15,6 +15,7 @@ const CART = [BX + 2.6, 4.0];
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({ id: 'garter', line, palette, rng, seed: 31, colors: { ...COLORS, rose2: '#b8706a', boa: { c: '#ff9ec4', r: 0.95 }, boa2: { c: '#e86aa0', r: 0.95 }, plum: '#7a3a5a', velvet: '#9a2a4a', stocking: '#2a1e2a', frill: '#fbe6ef', john: '#c4473a' } });
   const { b, t1, t2, lot } = P;
+  vignette(b, -5.8, 3.7);
 
   parlour(b, true);
   parlour(lot, false);
@@ -85,7 +86,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   const out = finishPlot(P, C, {
     w: 14, cardW: 12.5, d: 9, h: FH + 2,
-    camera: cardCam([-0.6, 2.6, 1.5], 12, 26, 14, 42),
+    camera: cardCam([-1.0, 2, 2.5], 26, 20, 25, 38, 7, [[-0.8, 3.0, 2.5], 24, 10, 22, 38, 12]),
     pileAnchor: PILE, pileR: 1.2,
     exit: [[DOOR[0] + 1, 3.4], [5, 4.0], [7.2, 4.2]],
     focus: [0, 1],
@@ -114,7 +115,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
   // 0–1.2 shutter bangs open · 1.2–2.6 he climbs onto the sill · 2.6–3.6 drop (hat lags) · 3.6–4.6 lands in the hay, legs up
   // · 4.6–6.5 scrambles off down the street holding his hat; the wife marches up to the door 2.4–5.5 and storms in.
   function runExit(u, dt, time) {
-    const k = SC * 1.22 * 1.05;
+    const k = SC * CROWD_K * 1.05;
     shutter.rotation.y = u < 0.3 ? -smooth01(u / 0.3) * 2.2 : u < 7 ? -2.2 + Math.sin(u * 6) * 0.06 * Math.max(0, 1.5 - u) : -2.2 * (1 - smooth01(u - 7));
     if (u < 1.2 || u > 6.8) { folk.hide(0); lostHat.hide(0); }
     else if (u < 2.6) { const s = (u - 1.2) / 1.4; folk.set(0, WIN[0], WIN[1] - 0.95 + 0.0 * s, WIN[2] + 0.2 + s * 0.45, Math.PI * (1 - s * 0.0), s < 0.6 ? 1 : 0, 0, 3); lostHat.put(0, WIN[0], WIN[1] + 0.95, WIN[2] + 0.2 + s * 0.45, 0, 1.25); }
@@ -161,9 +162,9 @@ export default function buildPlot(kit, { line, palette, rng }) {
     // upstairs: three windows (right one is the escape window, with no right shutter — it's the dynamic one)
     for (let i = 0; i < 3; i++) { const x = BX - 2.6 + i * 2.6; win(B, x, H1 + 0.95, FZ + 0.16, { w: 1.1, h: 1.35, trim: 'frill' }); B.slab('velvet', x, H1 + 0.95, FZ + 0.11, 1.05, 1.3, 0.03, { round: 0.02, taper: 0.5, noAo: true }); B.slab('teal', x - 0.92, H1 + 0.9, FZ + 0.2, 0.6, 1.4, 0.06, { round: 0.02, taper: 0 }); if (i < 2) B.slab('teal', x + 0.92, H1 + 0.9, FZ + 0.2, 0.6, 1.4, 0.06, { round: 0.02, taper: 0 }); }
     signBoard(B, BX, H2 - 0.35, FZ + 0.18, 4.6, 1.0, { board: own ? 'frill' : '#6b3f8f', trim: own ? 'brass' : 'gold' });
-    heart(B, BX - 0.9, H2 + 0.15, FZ + 0.33, 0.28, 'velvet');
-    heart(B, BX + 0.9, H2 + 0.15, FZ + 0.33, 0.28, 'velvet');
-    B.slab('velvet', BX, H2 + 0.1, FZ + 0.32, 0.5, 0.5, 0.06, { round: 0.06, taper: 0.4, rz: Math.PI / 4 });
+    heart(B, BX - 2.75, H2 + 0.15, FZ + 0.33, 0.28, 'velvet');
+    heart(B, BX + 2.75, H2 + 0.15, FZ + 0.33, 0.28, 'velvet');
+    B.slab('velvet', BX, H2 + 0.95, FZ + 0.32, 0.5, 0.5, 0.06, { round: 0.06, taper: 0.4, rz: Math.PI / 4 });
     // porch + balcony with boas draped over the rail
     porch(B, BX - W / 2 - 0.2, BX + W / 2 + 0.2, FZ, 3.0, { h: 0.35, awnY: H1, awn: 'plank2', posts: 4, stepX: DOOR[0], stepW: 2.0 });
     const by = H1 + 0.22;

@@ -3,7 +3,7 @@
 // Won at poker (W13): while unowned the lot shows Pomfrey's version (purple + gold boards); buying re-skins it.
 // L1 saloon → L25 card-room annex + more lanterns → L100 hotel storey, gold sign and a rooftop water tank.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, barrel, crate, lantern, blade, signBoard, horse, hatted, particles, tufts, tone, cart, bale, tilt } from './western.js?v=20261004c';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, barrel, crate, lantern, blade, signBoard, horse, hatted, particles, tufts, tone, cart, bale, tilt, vignette } from './western.js?v=20261004c';
 import { createConstruction, finishPlot } from './construction.js?v=20261004c';
 
 const BX = -1.2, FZ = 0.7, W = 11, D = 6.4, H1 = 3.4, H2 = 6.5, FH = 7.6;
@@ -15,6 +15,7 @@ const HAYCART = [6.4, 3.7], WAGON = [-4.0, 7.8], BALC_Y = H1 + 0.36;
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({ id: 'saloon', line, palette, rng, seed: 41, colors: { ...COLORS, bottle: { c: '#7a3a1e', r: 0.2 }, felt: '#3f7a52', pom: '#6b3f8f', pomGold: COLORS.gold } });
   const { b, t1, t2, lot } = P;
+  vignette(b, -6.6, 3.8);
 
   saloon(b, true);
   saloon(lot, false);
@@ -70,6 +71,12 @@ export default function buildPlot(kit, { line, palette, rng }) {
   lid.rotation.order = 'YXZ'; lid.rotation.y = PRY;
   const notes = particles(kit, P, (n) => { n.ball('#2a1e2a', 0, 0, 0, 0.35, { sx: 1.25, sz: 0.6, detail: 1 }); n.slab('#2a1e2a', 0.33, 0, 0, 0.1, 1.1, 0.1, { round: 0, taper: 0 }); n.slab('#2a1e2a', 0.5, 0.95, 0, 0.36, 0.12, 0.1, { round: 0, taper: 0, rz: -0.5 }); }, 10);
 
+  // Card gag (R3): Mabel throws a cowboy through the bat-wings every EJ s; he tumbles into the street in a dust puff,
+  // lies flat, sits up dizzy and staggers off. Card-only (out.inCard), so it never doubles lane S's hero ejection.
+  const puff = particles(kit, P, (n) => { n.ball('dust', 0, 0, 0, 1, { detail: 1, smooth: true }); }, 16);
+  const EJ = 8.5, LAND = [DOOR[0] + 1.7, 0, FZ + 4.1];
+  let ej = 0, landed = false;
+
   // Stock: crates of rotgut on the porch's right end (the brightest warm thing in frame).
   const rot = kit.builder(P.pal);
   rot.slab('raw', 0, 0, 0, 1, 0.55, 0.75, { round: 0.06 });
@@ -81,13 +88,14 @@ export default function buildPlot(kit, { line, palette, rng }) {
   // People: queue (0–4), Fingers at the piano (5), Pickles slumped on the barrels (6), a loafer on a post (7), Mabel the
   // bouncer by the doors (8), Lulu and a cowboy on the balcony (9, 10)
   const SC = 1.08;
-  const folk = hatted(P.crowd({ count: 11, seed: 23, scale: SC }), EXTRA_HATS, ['#7a5236', '#3a2c2c', '#c9b08a', '#8a3a2a', '#e6d6b8', '#2e2630', '#6a5a3a', '#d9c6a0', '#3a2c2c', '#c4473a', '#3a2c2c'], [1, 1.1, 0.9, 1.0, 1, 0.9, 1.3, 1.15, 0.38, 1, 1]);
+  const folk = hatted(P.crowd({ count: 12, seed: 23, scale: SC }), EXTRA_HATS, ['#7a5236', '#3a2c2c', '#c9b08a', '#8a3a2a', '#e6d6b8', '#2e2630', '#6a5a3a', '#d9c6a0', '#3a2c2c', '#c4473a', '#3a2c2c', '#c9a06a'], [1, 1.1, 0.9, 1.0, 1, 0.9, 1.3, 1.15, 0.38, 1, 1, 1.25]);
   P.queue(folk, { ids: [0, 1, 2, 3, 4], spawn: [[8.4, 4.6], [8.4, 4.2]], counter: [DOOR[0] + 0.15, FZ + 1.25], dir: [1, 0.05], gap: 0.85, y: 0.37, exit: [[DOOR[0], FZ - 0.6], [DOOR[0], FZ - 1.6]], carry: false, faceCounter: Math.PI });
   folk.dress(5, 'fingers');
   folk.dress(6, 'pickles');
   folk.look(7, { top: '#5E8F8C', bot: '#4a3a32', skin: 3, hair: 0, style: 1 }).body(7, 1.18, 1.0, 1.0);
   folk.dress(8, 'mabel');
   folk.dress(9, 'lulu').body(9, 1.24, 0.95, 0.92).look(9, { hatScale: 0.8 });
+  folk.look(11, { top: '#c4473a', bot: '#4a5878', skin: 1, hair: 2, style: 3, stache: 'walrus', hat: 'stetson', hatScale: 1.0, hatColor: 'tan', acc: ['vest'] }).body(11, 1.2, 0.95, 1.0);
   folk.look(10, { top: '#D9A441', bot: '#4a5878', skin: 3, hair: 1, style: 2, stache: 'walrus', hat: 'stetson', hatScale: 0.9, hatColor: 'brown' }).body(10, 1.2, 0.95, 1.05);
 
   let playK = 0, frenzy = 0, nextNote = 0;
@@ -99,7 +107,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
   const out = finishPlot(P, C, {
     w: 16, cardW: 13, d: 9, h: FH + 2,
     acquired: true,
-    camera: cardCam([-1.4, 2.2, 1.0], 12, 24, 12.4, 40),
+    camera: cardCam([-1.4, 2, 2.5], 24, 20, 27, 38, 7),
     pileAnchor: PILE, pileR: 1.4,
     lamps: [[BX - 1.0, 2.6, FZ + 0.45], [BX + 2.2, 2.6, FZ + 0.45]],
     exit: [[DOOR[0] + 1, 3.6], [6, 4.0], [8.5, 4.4]],
@@ -121,7 +129,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
       doorKick = Math.max(0, doorKick - dt);
       const a = doorSwing * Math.sin(time * 9) * 1.1 * doorSwing;
       doors.place(0, DOOR[0] - 0.62, 0.35 + 0.45, FZ + 0.12, -a, 1).place(1, DOOR[0] + 0.62, 0.35 + 0.45, FZ + 0.12, Math.PI + a, 1).commit();
-      if (!owned) { for (const i of [5, 6, 7, 8, 9, 10]) folk.hide(i); notes.visible = false; return; }
+      if (!owned) { for (const i of [5, 6, 7, 8, 9, 10, 11]) folk.hide(i); notes.visible = false; puff.visible = false; return; }
       // Fingers plays; a tap (api.play) speeds him up, the lid flaps and notes rise
       playK = Math.max(0, playK - dt * 0.5);
       lidKick = Math.max(0, lidKick - dt * 2);
@@ -135,12 +143,39 @@ export default function buildPlot(kit, { line, palette, rng }) {
       // the drunk slumped against the barrels, the loafer on the post, the tiny-bowlered barkeep in the window
       folk.set(6, BX + 3.0, 0.37, FZ + 1.25, -0.4, 5, 0, 0.6);
       folk.set(7, BX + 5.6, 0.37, FZ + 2.35, -0.6, 0, 1.2, 1.0);
-      folk.set(8, DOOR[0] + 1.35, 0.37, FZ + 0.45, -0.2, (time % 11) < 2 ? P.CLIP.point : 0, 2.0, 1.0);
+      const card = out.inCard();
+      ej = card ? ej + dt : 0;
+      const u = ej % EJ;
+      folk.set(8, DOOR[0] + 1.35, 0.37, FZ + 0.45, card && u < 0.6 ? -1.2 : -0.2, card && u < 0.6 ? P.CLIP.punch : card && u > 1.3 && u < 2.6 ? P.CLIP.tiphat : (time % 11) < 2 ? P.CLIP.point : 0, 2.0, 1.0);
+      if (!card || ej < 0.2) { folk.hide(11); landed = false; }
+      else eject(u);
+      puff.visible = true;
+      puff.step(dt, (k) => Math.min(1, k * 5) * (1 - k * 0.7));
       // upstairs on the balcony: Lulu waves at the street, a cowboy leans on the rail sipping
       folk.set(9, BX - 2.6, BALC_Y, 1.45, 0.15, (time % 7) < 3 ? 4 : 0, 0, 1.2);
       folk.set(10, BX + 3.8, BALC_Y, 1.5, -0.25, 6, 1.1, 1.0);
     },
   });
+  function eject(u) {
+    const C = P.CLIP;
+    if (u < 0.3) { folk.hide(11); landed = false; return; }
+    if (u < 0.4) { doorKick = 0.6; doorSwing = 1; }
+    if (u < 1.2) {
+      const f = (u - 0.3) / 0.9, x = DOOR[0] + (LAND[0] - DOOR[0]) * f, z = FZ + 0.2 + (LAND[2] - FZ - 0.2) * f;
+      folk.place(11, { x, y: 0.4 * (1 - f) + 2.3 * Math.sin(Math.PI * f), z, heading: 0.2, pitch: -f * 5.2, roll: Math.sin(f * 9) * 0.25, clip: C.flail, speed: 2.2 });
+      return;
+    }
+    if (!landed) {
+      landed = true;
+      for (let i = 0; i < 12; i++) { const a = i * 0.52 + Math.sin(i * 7) * 0.3, v = 0.9 + (i % 3) * 0.45; puff.emit(LAND[0] + Math.cos(a) * 0.45, 0.25, LAND[2] + Math.sin(a) * 0.35, Math.cos(a) * v, 0.5 + (i % 4) * 0.25, Math.sin(a) * v * 0.7, 1.2 + (i % 3) * 0.3, 0.42 + (i % 4) * 0.08, 0.4); }
+      doorSwing = 1;
+    }
+    if (u < 3.6) { const k = Math.min(1, (u - 1.2) / 0.25), slide = 0.5 * Math.min(1, (u - 1.2) / 0.4); folk.place(11, { x: LAND[0], y: 0.08 * Math.abs(Math.sin(k * Math.PI)), z: LAND[2] + slide, heading: 0.2, pitch: -Math.PI / 2, clip: C.sprawl }); return; }
+    if (u < 4.6) { folk.set(11, LAND[0], 0, LAND[2] + 0.5, 0.3, C.dizzy, 0, 1.4); return; }
+    const w = Math.min(1, (u - 4.6) / 3.2);
+    if (w >= 1) { folk.hide(11); return; }
+    folk.set(11, LAND[0] + w * 7.5, 0, LAND[2] + 0.5 + Math.sin(w * 14) * 0.25, Math.PI / 2 + Math.sin(w * 14) * 0.35, C.stagger, 0, 1.2);
+  }
   out.piano = api.play;
   out.kickDoors = () => { doorKick = 0.8; doorSwing = 1; };
   return out;
@@ -157,7 +192,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
     for (let i = 0; i < 3; i++) win(B, BX - 3.4 + i * 3.4, H1 + 0.95, FZ + 0.16, { w: 1.1, h: 1.35, trim: 'cream', shutters: i === 1 ? 'teal' : 'mustard' });
     // the big sign + blade sign
     signBoard(B, BX + 0.6, H1 + 1.45 + 1.0, FZ + 0.18, 5.6, 1.25, { board: boardC, trim: trimC });
-    bottle(B, BX + 0.6, H1 + 3.2, FZ + 0.3, own);
+    bottle(B, BX + 0.6, H1 + 4.25, FZ + 0.3, own);
     if (own) blade(B, BX + W / 2 - 0.5, 2.0, FZ + 1.9, { board: 'ownTeal' });
     else B.slab('pomGold', BX - 3.2, H1 + 2.3, FZ + 0.32, 0.6, 0.6, 0.06, { round: 0.25, taper: 0 });
     // porch + balcony (spindle rail) on the porch roof

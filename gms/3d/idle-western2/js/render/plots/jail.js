@@ -4,7 +4,7 @@
 // while unowned the lot shows the office with Pomfrey's board.
 // L1 one cell → L25 a second cell + a jail wagon → L100 a lookout tower with a bell.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, cart, tone } from './western.js?v=20261004c';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, wheel, cart, tone, vignette } from './western.js?v=20261004c';
 import { createConstruction, finishPlot } from './construction.js?v=20261004c';
 
 const BX = -2.8, FZ = 0.5, W = 5.6, D = 5.4, H = 3.4, FH = 5.4;
@@ -13,6 +13,7 @@ const CELL = { x: 2.0, z: -0.4, w: 4.2, d: 3.0, h: 3.0 };
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({ id: 'jail', line, palette, rng, seed: 43, colors: { ...COLORS, adobe: '#d9b48a', adobe2: '#c49a6e', stoneJ: '#b8a690', sack: '#c9b089', badge: { c: '#f2c84a', r: 0.25, m: 0.9 }, poster: '#efe2c4' } });
   const { b, t1, t2, lot } = P;
+  vignette(b, -5.4, 3.7);
 
   office(b, true);
   office(lot, false);
@@ -75,7 +76,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
   return finishPlot(P, C, {
     w: 13, cardW: 12, d: 9, h: FH + 2,
     acquired: true,
-    camera: cardCam([-0.2, 2.0, 0.8], 12, 28, 12.5, 42),
+    camera: cardCam([-0.9, 2, 2.5], 26, 20, 24, 38, 7),
     pileAnchor: [BX + 1.5, 0.8, FZ + 0.6], pileR: 1.2,
     exit: [[0, 3.4], [5, 4.0], [6.6, 4.2]],
     focus: [0, 1],
@@ -104,7 +105,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
     for (let i = 0; i < 5; i++) B.cyl('iron', BX - 1.6 - 0.45 + i * 0.22, 1.05, FZ + 0.22, 0.025, 1.35, 0, { sides: 4, taper: 1 });
     porch(B, BX - W / 2 - 0.1, BX + W / 2 + 0.1, FZ, 2.4, { awnY: 2.7, awn: 'plank2', posts: 3, stepX: BX + 0.6 });
     signBoard(B, BX, H + 0.4, FZ + 0.18, 3.8, 0.9, { board: own ? 'cream' : '#6b3f8f', trim: own ? 'brass' : 'gold' });
-    badge(B, BX, H + 0.85, FZ + 0.3, 0.38, own ? 'badge' : 'gold');
+    badge(B, BX + 2.3, H + 0.85, FZ + 0.3, 0.34, own ? 'badge' : 'gold');
     for (let i = 0; i < 3; i++) { B.slab('poster', BX + 1.8 + (i % 2) * 0.5, 1.0 + i * 0.55, FZ + 0.18, 0.42, 0.5, 0.02, { round: 0.01, taper: 0, rz: (i - 1) * 0.08, noAo: true }); B.ball('#6a4a36', BX + 1.8 + (i % 2) * 0.5, 1.32 + i * 0.55, FZ + 0.2, 0.09, { sz: 0.2, detail: 0 }); }
     lantern(B, BX - 0.4, 2.2, FZ + 0.45);
     if (own) blade(B, BX - W / 2 + 0.3, 1.7, FZ + 1.6, { board: 'ownTeal' });

@@ -3,7 +3,7 @@
 // bathwater (murky, sold to the saloon as "house beer"). Gag: every few seconds a bather leaps up and the duck flies.
 // L1 two tubs → L25 a third tub behind a rose privacy screen → L100 a water tower piping hot water to the deck.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, barrel, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, tone } from './western.js?v=20261004c';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, win, barrel, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, tone, vignette } from './western.js?v=20261004c';
 import { createConstruction, finishPlot } from './construction.js?v=20261004c';
 
 const BX = -3.0, FZ = 0.4, W = 6.0, D = 5.0, H = 3.2, FH = 5.0;
@@ -12,11 +12,12 @@ const TUBS = [[1.4, 1.2], [3.6, 0.6], [5.0, 2.4]];
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({ id: 'tubs', line, palette, rng, seed: 19, colors: { ...COLORS, murk: { c: '#8a9a5a', r: 0.15 }, bath: { c: '#9cc7c2', r: 0.1 }, john: '#c4473a', duck: '#ffd23a', fire: { c: '#ff8a3a', r: 0.4, g: 2.2 } } });
   const { b, t1, t2, lot } = P;
+  vignette(b, -5.4, 3.7);
 
   falseFront(b, { x: BX, fz: FZ, w: W, d: D, h: H, fh: FH, front: 'sage', wall: tone(COLORS.sage, 0.82), parapet: 'gabled', door: 1.4, windows: [-1.3], winW: 1.6, trim: 'cream' });
   porch(b, BX - W / 2 - 0.1, BX + W / 2 + 0.1, FZ, 2.5, { awnY: 2.7, awn: ['teal', 'cream'], posts: 3, stepX: BX + 1.4 });
   signBoard(b, BX, H + 0.3, FZ + 0.18, 4.2, 1.0, { board: 'cream', trim: 'brass' });
-  tubIcon(b, BX, H + 0.55, FZ + 0.3);
+  tubIcon(b, BX, H + 1.45, FZ + 0.3);
   blade(b, BX - W / 2 + 0.3, 1.6, FZ + 1.6, { board: 'ownTeal' });
   lantern(b, BX + W / 2 - 0.3, 2.0, FZ + 2.0);
   // the deck, tubs, boiler and the laundry line
@@ -83,7 +84,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   return finishPlot(P, C, {
     w: 13, cardW: 12, d: 9, h: FH + 2,
-    camera: cardCam([-0.8, 1.9, 1.2], 12, 26, 14, 42),
+    camera: cardCam([-0.8, 2, 2.5], 26, 20, 25, 38, 7, [[-1.8, 2.4, 2.5], 24, 10, 20, 38, 12]),
     pileAnchor: [PILE[0], 0.8, PILE[2]], pileR: 1.4,
     exit: [[BX + 1.4, 3.4], [5, 4.0], [6.6, 4.2]],
     focus: [1.5, 1.2],

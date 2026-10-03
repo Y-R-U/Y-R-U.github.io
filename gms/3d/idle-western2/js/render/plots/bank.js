@@ -3,7 +3,7 @@
 // every so often (he has never recovered from Black Bart). Stock: money bags. Bought after the robbery (W13).
 // L1 bank → L25 the vault annex gains a second door + gold-bar stack → L100 a clock pediment with a gilded dome.
 import * as THREE from 'three';
-import { COLORS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, tone, tilt, smooth01 } from './western.js?v=20261004c';
+import { COLORS, cardCam, falseFront, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, tone, tilt, smooth01, vignette, CROWD_K } from './western.js?v=20261004c';
 import { createConstruction, finishPlot } from './construction.js?v=20261004c';
 
 const BX = -2.4, FZ = 0.6, W = 7.4, D = 6.0, H = 4.2, FH = 6.4;
@@ -12,6 +12,7 @@ const VAULT = [3.4, 1.2, -0.6];
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({ id: 'bank', line, palette, rng, seed: 47, colors: { ...COLORS, brickB: '#a8573f', brickB2: '#8e4632', col: '#efe4cc', steel: { c: '#9aa3ab', r: 0.3, m: 0.85 }, steel2: { c: '#6f7880', r: 0.35, m: 0.8 }, bag: '#c9a46a', hole: '#2a1e1e', bar: { c: '#f2c84a', r: 0.25, m: 0.9 } } });
   const { b, t1, t2, lot } = P;
+  vignette(b, -5.8, 3.7);
 
   bank(b, true);
   bank(lot, false);
@@ -77,7 +78,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
   return finishPlot(P, C, {
     w: 14, cardW: 12.5, d: 9, h: FH + 2,
     acquired: true,
-    camera: cardCam([0.0, 2.2, 0.8], 12, 27, 12.5, 42),
+    camera: cardCam([-1.4, 2, 2.5], 26, 20, 24, 38, 7),
     pileAnchor: [PILE[0], 0.8, PILE[2]], pileR: 1.4,
     exit: [[BX + 1.5, 3.4], [5, 4.0], [7.2, 4.2]],
     focus: [0, 1],
@@ -91,7 +92,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
       // Thrupp: polishes the vault door… sees his reflection… faints backwards, lies there seeing stars, gets up
       const T = 16, u = time % T;
       const fall = smooth01((u - 9) / 0.5) - smooth01((u - 13) / 0.6);
-      const x = VAULT[0] - 1.5, z = VAULT[2] + 1.1, k = SC * 1.22 * 0.95;
+      const x = VAULT[0] - 1.5, z = VAULT[2] + 1.1, k = SC * CROWD_K * 0.95;
       folk.set(0, x, 0.32, z, Math.PI * 0.75, fall > 0.1 ? 0 : 7, 0, 3);
       if (fall > 0.01) {
         tilt(folk, 0, x, 0.32 + fall * 0.15, z + fall * 0.2, Math.PI * 0.75, fall * 1.5, 0, k);
@@ -119,7 +120,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
     for (let i = 0; i < 6; i++) B.cyl('brass', BX + 2.4 - 0.65 + i * 0.26, 1.0, FZ + 0.24, 0.025, 1.6, 0, { sides: 4, taper: 1 });
     porch(B, BX - W / 2 - 0.1, BX + W / 2 + 0.1, FZ, 2.2, { awn: false, stepX: BX + 0.8, stepW: 2.6 });
     signBoard(B, BX, H + 0.3, FZ + 0.18, 5.0, 1.0, { board: own ? 'cream' : '#6b3f8f', trim: own ? 'brass' : 'gold' });
-    for (const k of [-1, 1]) B.cyl('gold', BX + k * 0.5, H + 0.8, FZ + 0.32, 0.26, 0.06, 0, { sides: 13, taper: 1, rx: Math.PI / 2 });
+    for (const k of [-1, 1]) B.cyl('gold', BX + k * 2.95, H + 0.8, FZ + 0.32, 0.26, 0.06, 0, { sides: 13, taper: 1, rx: Math.PI / 2 });
     // NO GUNS: a pistol silhouette in a red ring with a slash, riddled with bullet holes
     const nx = BX - 2.4, ny = 1.65, nz = FZ + 0.2;
     B.slab('raw2', nx, ny - 0.75, nz, 1.3, 1.3, 0.06, { round: 0.04, taper: 0 });

@@ -2,6 +2,8 @@
 // street (road starts at z ≈ 3.5), y up. Building fronts sit near z ≈ 0.9 with a raised porch out to z ≈ 3.3.
 // Every helper writes into a builder (b), so a plot stays one merged static mesh per tier.
 import * as THREE from 'three';
+import { CROWD_K } from '../kit/crowd.js?v=20261004c';
+export { CROWD_K };
 
 // Look A palette (docs/ART_DIRECTION.md §3). Plots pass these as `colors`, so they don't depend on the town palette.
 export const COLORS = {
@@ -197,6 +199,7 @@ export function blade(b, x, y, z, o = {}) {
 export function signBoard(b, x, y, z, w, h, o = {}) {
   b.slab(o.trim ?? 'brass', x, y - 0.08, z, w + 0.24, h + 0.16, 0.1, { round: 0.04, taper: 0 });
   b.slab(o.board ?? 'cream', x, y, z + 0.06, w, h, 0.08, { round: 0.03, taper: 0, noAo: true });
+  const txt = o.text ?? b.signText; if (txt && b.signs) b.signs.board(w / h > 3.2 ? txt : txt.replace(/\n/g, ' ').replace(/ (?=[^ ]*$)/, '\n'), x, y + h / 2, z + 0.115, w * 0.96, h * 0.92, { style: /pom|6b3f8f/.test(String(o.board)) ? 'pomfrey' : 'civic' });
   return b;
 }
 
@@ -302,7 +305,7 @@ export function hats(kit, P, kind, count, colors = []) {
 }
 
 // Where a hat sits on a crowd head: the rig's head scales about y = 0.76 by headK; legs shift everything by 0.4·(legK−1).
-export function headY(scale, s = 1, legK = 0.95, headK = 1.2) { return (0.76 + 0.37 * headK + 0.4 * (legK - 1)) * scale * 1.22 * s; }
+export function headY(scale, s = 1, legK = 0.95, headK = 1.2) { return (0.76 + 0.37 * headK + 0.4 * (legK - 1)) * scale * CROWD_K * s; }
 
 // Gives a crowd in-rig hats (lane A's parametric hat: zero extra draws, follows head bob/pose/tilt). kind: a hat type
 // name or a list cycled per instance; sizes[i] scales a hat (0 = bare head, the barkeep's tiny bowler is the inverse joke). Extras are capped so the
@@ -393,13 +396,22 @@ export function rand(seed) {
 
 export const smooth01 = (x) => { const t = Math.max(0, Math.min(1, x)); return t * t * (3 - 2 * t); };
 
-// Card camera (round 2, refs/a_clay_card_saloon.jpg): faces the facade from the street at ~30–35°, so the porch, doors
-// and people read. look = the joke's centre; yaw (deg, + = from the west), elevation (deg), dist = final distance on a
-// portrait card. createCardRig pushes portrait cameras out by 1.15 and would widen to fit bounds.w, so facade cams
-// pre-divide the distance and finishPlot sets cardW ≈ 0 (the framing is authored, not fitted).
-export function cardCam(look, yaw = 16, elev = 32, dist = 14, fov = 40) {
+// Card camera (round 3, a three-quarter diorama of the whole lot): the camera stands `dist` from `look` at yaw (deg, + = from
+// the west) and elevation, then tilts only `sky` degrees under the frame's top edge, so the top of every card is a band of
+// sky + mesas and the building sits whole beneath it (a high camera with a shallow pitch keeps the street foreground
+// short). dist = final distance on a portrait card (the rig multiplies by 1.15; finishPlot sets cardW so it never widens).
+// `build` (same args) is the framing while the Mulligans work on the lot, read by createCardRig.
+export function cardCam(look, yaw = 16, elev = 32, dist = 14, fov = 40, sky = null, build = null) {
   const a = (yaw * Math.PI) / 180, e = (elev * Math.PI) / 180, d = dist / 1.15;
-  return { pos: [look[0] - Math.sin(a) * Math.cos(e) * d, look[1] + Math.sin(e) * d, look[2] + Math.cos(a) * Math.cos(e) * d], look, fov, facade: true };
+  const pos = [look[0] - Math.sin(a) * Math.cos(e) * d, look[1] + Math.sin(e) * d, look[2] + Math.cos(a) * Math.cos(e) * d];
+  let at = look;
+  if (sky != null) {
+    const pt = ((fov / 2 - sky) * Math.PI) / 180;
+    at = [pos[0] + Math.sin(a) * Math.cos(pt) * d, pos[1] - Math.sin(pt) * d, pos[2] - Math.cos(a) * Math.cos(pt) * d];
+  }
+  const cam = { pos, look: at, fov, facade: true };
+  if (build) cam.build = cardCam(...build);
+  return cam;
 }
 
 // A builder view that places everything it draws at (x, z) turned by ry (uses the builder's `parent` option), so a
@@ -414,4 +426,24 @@ export function placed(b, x, z, ry = 0, y = 0) {
       return (...a) => { while (a.length < at) a.push(k === 'cyl' || k === 'cone' ? 0 : undefined); a[at] = { ...(a[at] || {}), parent }; return t[k](...a); };
     },
   });
+}
+
+// R3 prop vignette (refs: barrels + crates + bottles clustered on the porch edge, a lantern on a post): one cluster per
+// card foreground corner. side = +1 when the post stands to the cluster's right. Static, zero extra draws.
+export function vignette(b, x, z, o = {}) {
+  const s = o.s ?? 1, sd = o.side ?? 1, glow = o.glow ?? 'lantern';
+  barrel(b, x, 0, z, 0.95 * s);
+  barrel(b, x + 0.82 * s, 0, z - 0.25 * s, 0.9 * s, 'plank2');
+  barrel(b, x + 0.4 * s, 0.95 * s, z - 0.1 * s, 0.75 * s);
+  crate(b, x - 0.9 * s, 0, z + 0.35 * s, 0.95 * s, 0.35);
+  crate(b, x - 0.85 * s, 0.6 * s, z + 0.3 * s, 0.7 * s, -0.2, 'raw2');
+  for (const [dx, dz, h] of [[-0.98, 0.25, 0.34], [-0.72, 0.38, 0.28]]) { b.cyl(dx < -0.8 ? '#4f6b3a' : '#7a3a1e', x + dx * s, 1.03 * s, z + dz * s, 0.07 * s, h * s, 0, { sides: 6, taper: 0.75 }); b.cyl('#e9dcc0', x + dx * s, (1.03 + h) * s, z + dz * s, 0.03 * s, 0.1 * s, 0, { sides: 4, taper: 1 }); }
+  b.cyl('#4f6b3a', x + 0.3 * s, 0.05, z + 0.62 * s, 0.07 * s, 0.3 * s, 0, { sides: 6, taper: 0.75, rz: Math.PI / 2 - 0.1 });
+  const px = x + sd * 1.7 * s, pz = z + 0.2 * s;
+  b.cyl('raw2', px, 0, pz, 0.08 * s, 2.7 * s, 0, { sides: 6, taper: 0.9 });
+  b.slab('raw2', px - sd * 0.28 * s, 2.55 * s, pz, 0.62 * s, 0.07 * s, 0.07 * s, { round: 0.01, taper: 0 });
+  lantern(b, px - sd * 0.5 * s, 2.05 * s, pz + 0.22, { glow });
+  b.contact(x, z, 3.2 * s, 1.8 * s);
+  tufts(b, [[x - 1.5 * s, z + 0.7 * s], [px + sd * 0.3, pz + 0.4]], s);
+  return b;
 }

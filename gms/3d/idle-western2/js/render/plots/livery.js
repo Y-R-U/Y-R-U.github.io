@@ -2,7 +2,7 @@
 // and a mule that kicks the barn wall every few seconds (dust, a plank pops loose). Stock: the manure heap, with flies.
 // L1 barn + corral → L25 lean-to stalls + more horses → L100 a big horseshoe on the roof and a horse weather vane.
 import * as THREE from 'three';
-import { COLORS, EXTRA_HATS, cardCam, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, horse, bale, tone, battens, wheel } from './western.js?v=20261004c';
+import { COLORS, EXTRA_HATS, cardCam, porch, win, lantern, blade, signBoard, hats, hatted, particles, tufts, rock, horse, bale, tone, battens, wheel, vignette } from './western.js?v=20261004c';
 import { createConstruction, finishPlot } from './construction.js?v=20261004c';
 
 const BX = -3.4, FZ = 0.6, W = 7.4, D = 6.4, H = 3.6, FH = 6.6;
@@ -12,6 +12,7 @@ const MULE = [0.5, -0.3];
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({ id: 'livery', line, palette, rng, seed: 23, colors: { ...COLORS, barnW: '#a8573f', manure: '#5a3a24', manure2: '#6e4a2c', ember: { c: '#ff7a2a', r: 0.4, g: 2.0 }, mule: '#8a6a55' } });
   const { b, t1, t2, lot } = P;
+  vignette(b, -6.8, 3.6);
 
   barn(b);
   // the forge: anvil on a stump, a brick hearth with embers, horseshoes on a nail board
@@ -97,7 +98,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   return finishPlot(P, C, {
     w: 16, cardW: 13, d: 9, h: FH + 2,
-    camera: cardCam([-1.6, 2.2, 1.0], 12, 26, 15, 42),
+    camera: cardCam([-1.3, 2, 2.5], 26, 20, 27, 38, 7, [[-2.0, 2.6, 2.5], 24, 10, 22, 38, 12]),
     pileAnchor: [PILE[0], 0.6, PILE[2]], pileR: 1.4,
     exit: [[BX + 0.4, 3.4], [6, 4.0], [8.5, 4.3]],
     focus: [0, 0.5],
@@ -168,7 +169,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
     bale(B, BX + 0.1, FH - 2.75, FZ + 0.9, 0.3, 0.75);
     porch(B, BX - W / 2, BX + W / 2, FZ, 2.4, { h: 0.18, awn: false, step: false });
     signBoard(B, BX + 2.5, 2.4, FZ + 0.2, 1.4, 0.6, { board: 'cream', trim: 'brass' });
-    for (let i = 0; i < 1; i++) B.cyl('iron', BX + 2.5, 2.7, FZ + 0.34, 0.2, 0.05, 0, { sides: 9, taper: 1, rx: Math.PI / 2 });
+    for (let i = 0; i < 1; i++) B.cyl('iron', BX + 2.5, 3.25, FZ + 0.34, 0.2, 0.05, 0, { sides: 9, taper: 1, rx: Math.PI / 2 });
     blade(B, BX - W / 2 + 0.3, 1.8, FZ + 1.4, { board: 'ownTeal' });
     lantern(B, BX - 1.8, 2.8, FZ + 0.45);
     win(B, BX + W / 2 + 0.02, 1.2, FZ - 3.8, { w: 1.1, h: 1.0 });

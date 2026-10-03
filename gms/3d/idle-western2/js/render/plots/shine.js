@@ -1,7 +1,7 @@
 // 🥾 Spit & Shine: Lil' Nubbin's shoeshine throne in front of a mustard shack with a giant wooden boot on the roof.
 // Gag (W4): Nubbin spits on the boot, buffs, and the boot flashes a star glint. Stock: a tip jar with a coin heap.
 // L1 throne + shack → L25 second throne, striped awning, blade sign → L100 "Boot Emporium" with a golden boot.
-import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, crate, blade, signBoard, hats, hatted, particles, tufts, rock, cactus, barrel, lantern, tone } from './western.js?v=20261004c';
+import { COLORS, EXTRA_HATS, cardCam, falseFront, porch, crate, blade, signBoard, hats, hatted, particles, tufts, rock, cactus, barrel, lantern, tone, vignette } from './western.js?v=20261004c';
 import { createConstruction, finishPlot } from './construction.js?v=20261004c';
 
 const BX = -2.9, FZ = 0.3, W = 5.6, D = 4.6, H = 3.0, FH = 4.6;
@@ -10,12 +10,13 @@ const THRONE = [1.9, 1.8];
 export default function buildPlot(kit, { line, palette, rng }) {
   const P = kit.plot({ id: 'shine', line, palette, rng, seed: 13, colors: { ...COLORS, boot: '#6b3a24', bootL: '#8a4e30', leather: '#4a2a1a', polish: '#2a1e1e' } });
   const { b, t1, t2, lot } = P;
+  vignette(b, -5.0, 3.7);
 
   // the shack
   falseFront(b, { x: BX, fz: FZ, w: W, d: D, h: H, fh: FH, front: 'mustard', wall: tone(COLORS.mustard, 0.8), parapet: 'arched', door: -1.2, windows: [1.3], winW: 1.5, trim: 'cream' });
   porch(b, BX - W / 2 - 0.1, BX + W / 2 + 0.1, FZ, 2.5, { awnY: 2.6, awn: 'tin', posts: 3, stepX: BX - 1.2 });
   signBoard(b, BX, H + 0.25, FZ + 0.18, 3.6, 0.85, { board: 'cream', trim: 'brass' });
-  bootShape(b, BX, H + 0.35, FZ + 0.32, 0.55, 'boot');
+  bootShape(b, BX + 2.25, H + 0.3, FZ + 0.32, 0.5, 'boot');
   bigBoot(b, BX + 1.6, FH + 0.85, FZ - 1.4, 1.0, 'bootL');
   throne(b, THRONE[0], THRONE[1]);
   // tip jar on a stool + polish kit
@@ -76,7 +77,7 @@ export default function buildPlot(kit, { line, palette, rng }) {
 
   return finishPlot(P, C, {
     w: 12, cardW: 11, d: 9, h: FH + 2,
-    camera: cardCam([-1.4, 1.9, 1.4], 12, 26, 12.5, 42),
+    camera: cardCam([-1.4, 2, 2.5], 26, 20, 22, 38, 7, [[-2.0, 2.4, 2.5], 24, 10, 19, 38, 12]),
     pileAnchor: [THRONE[0] - 1.5, 0.62, THRONE[1] + 0.8], pileR: 1.2,
     exit: [[THRONE[0], 3.6], [5, 4.0], [6.5, 4.2]],
     focus: [THRONE[0] - 2, 1.2],

@@ -159,3 +159,70 @@ Owner: lane P. The files are `js/render/plots/*`. Each business has one file. Th
     - Passers-by walking the street edge come out big and hat-heavy in the foreground.
     - The build card's site is a one-storey skeleton under backyard dirt, against the ref's two-storey frame on a sky. Its crew reads smaller than the ref's chibi trio, and the brother carrying planks gets cut at the right edge.
     - The lite rig drops some named props (Pete's pliers accessory, Mortimer's tails, the rolling pin), so the separate pliers and pin meshes still carry those gags.
+
+## Round 3 (2026-10-04)
+
+### Card cameras: a three-quarter diorama with a sky band
+- The new signature is `cardCam(look, yaw, elev, dist, fov, sky, build)` (in `western.js`).
+  - The camera stands `dist` from `look`, at `yaw` (degrees from the west) and `elev`.
+  - It then pitches so the top `sky`° of the frame sits above the horizon.
+  - A high camera with a shallow pitch keeps the building whole under a sky band and the street foreground short.
+- The open framings are all `[x≈−0.9…−1.5, 2, 2.5]`, yaw 24–26, elev 20, fov 38, sky 7. The `dist` values are:
+
+  | plot | dist |
+  |---|---|
+  | shine | 22 |
+  | dentist | 22 |
+  | undertaker | 23 |
+  | jail | 24 |
+  | bank | 24 |
+  | tubs | 25 |
+  | garter | 25 |
+  | livery | 27 |
+  | saloon | 27 |
+- `build` is the framing while the Mulligans build. For shine, tubs, livery, dentist and garter it is yaw 24, elev 10, sky 12 and dist 19–22.
+  - The camera sits low enough that the frame, the worker on the beam and the gin pole stand against the sky.
+  - It sits high enough that the south frontage's blade signs stay out of the bottom of the frame.
+- The rig hook (cameras.js `createCardRig.load`) uses `plot.camera.build` while `construction.root` is visible. It is logged in CONTRACT.md.
+- Card distance is authored. finishPlot sets `cardW` to 0.5, so `fit` never widens the shot.
+
+### Gags and props
+- **Saloon ejection (new, card only).** Every 8.5 s Mabel punches toward the doors and the bat-wings kick open.
+  - The cowboy (folk 11) tumbles out on an arc, lands in the street at `[DOOR+1.7, 0, FZ+4.1]` and throws a 12-ball dust puff (a new `puff` particle pool, +1 draw only while live).
+  - He lies sprawled, sits up dizzy and staggers off east while Mabel tips her hat.
+  - It is gated by `out.inCard()`, a new helper in construction.js `throttle`: true for 0.7 s after the plot's own card camera drew it. The hero never sees it, so it never doubles lane S's hero ejection.
+- **Existing gags, now framed.** Dentist chair recline + pliers, tubs steam + flying duck, livery mule kick, Garter window exit, undertaker coffins + vultures + Mortimer, jail singing drunks, bank NO GUNS + vault, shoeshine spit.
+- **Vignettes.** Every plot has a `vignette(b, x, z)` (western.js) at its front-left corner: three barrels, two crates with bottles, a lying bottle, and a lantern hung on a post with an arm. It is static, so 0 draws, and it also dresses the hero foreground.
+- **Signs.** Lane A now letters every board. The P icons that sat on the boards (boot, tub, tooth, hearts, badge, coffin, coins, bottle) moved beside or above them, so the text reads.
+- **CROWD_K.** It is imported from kit/crowd.js; it was hard-coded at 1.22. Lane A raised it to 1.4, so hand-posed `tilt()` actors (Thrupp, the dentist patient, the Garter window man) and the crew's hammer hands stay in scale.
+- **Lot-mesh fix.** finishPlot used to pick the first new mesh as the lot. Lane A's sign-text meshes broke that, and the Garter's unowned lot stayed visible over its build site. It now picks the unnamed lot mesh plus the `signs:<id>:lot` text.
+
+### Build card (construction.js)
+- While framing, the frame reads as two storeys: back posts and plates go up to the false-front height (stage 1 only, the new `until` field).
+- A gin pole with a boom and a dangling plank stands beside the frame through stages 1–2.
+- A brother stands on the front plate hammering against the sky (stage 1 past 45%, and all of stage 2).
+- The foreman (crew 3) stands at the front right through stages 0–3, holding an open plan (a `PLAN` timber instance).
+- The plank bonk with stars now comes every 4–7 s (it was 9–15 s).
+- The mule cart is unchanged. None of this adds draws: all of it is instances in the existing timber mesh.
+
+### Shots (real game, `tools/camshot.mjs` on CDP 9341; gitignored)
+- `docs/art/shots/r3/sheet_cards_open_r3.jpg` holds the 9 open cards (tod 17.5), and `sheet_cards_build_r3.jpg` the `camshot build` run.
+  - The camshot build run has no blank cards.
+  - Most builds finish within camshot's 6 s per card, so most of these frames show finished shops.
+- `sheet_build_frames_r3.jpg` shows the five built businesses mid-frame, taken with T slowed in a scratch harness.
+- `saloon_ejection_burst_r3.jpg` shows the ejection at 0.5 s steps.
+- `vs_refs_r3.jpg` is our saloon and build cards beside `a_clay_card_saloon` and `a_clay_build`.
+- **Draws.** `renderer.info` max per card render, including the shadow pass and the town, is 44–84 with the cams on the lot. Before this change it was 44–72. The plot itself adds +1 (the saloon puff, only while live). The ≤30 target is not met in the real game; the town and shadow pass dominate.
+- **Compared with the refs, gained:**
+  - Whole silhouettes with ground and sky.
+  - Uncropped people at readable size.
+  - One gag per card in frame.
+  - Lettered signs.
+  - Prop clusters and a lantern on a post.
+  - The build card's worker on the beam and the gin pole against the sky.
+- **Compared with the refs, still behind:**
+  - (1) The sky band is a pale empty desert, because cards hide `town:far` (the mesas). Forced on, the mesas fill it like the ref for +1 draw. Request to A is in CONTRACT.md.
+  - (2) Flat afternoon light: no warm rim, no glowing open interior (lane A).
+  - (3) The ref's buildings are much bigger than its people. Ours read small next to A's 1.4× crowd, so the frames look like toy sheds.
+  - (4) The build card's crew and mule cart stand in front of the frame and hide its lower half. The ref stages the crew in the foreground with the frame clear behind.
+  - (5) Pomfrey's south blade signs and a covered wagon still poke into the lower edge of some cards.
