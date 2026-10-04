@@ -141,11 +141,13 @@ export function createScenes(ctx) {
     // Mabel steps out to the porch step so the held drunk is clear of the balcony roof.
     const doors = ctx.hasAnchor('saloon', 'doorsOut') ? ctx.anchor('saloon', 'doorsOut') : [D[0], D[1], D[2] + 2.6];
     doors[2] -= 0.55;
+    // R5: Mabel works a step west of the doorway so the batwing doors stay readable behind the fling.
+    const MX = doors[0] - 1.3;
     let mabel = null, holdProp = -1, flight = null, landAt = -1;
     const bodies = [];
     const kind = args.kind || 'drunk';
     sc.begin = () => {
-      mabel = ctx.actor(sc, { char: 'mabel', x: doors[0], z: doors[2], h: 0, clip: CLIP.carry });
+      mabel = ctx.actor(sc, { char: 'mabel', x: MX, z: doors[2], h: 0, clip: CLIP.carry });
       const table = kind !== 'goat' && kind !== 'pianist' && lv >= 100 && R() < 0.35;
       if (kind === 'goat') holdProp = PV.goat;
       else if (kind === 'pianist') { holdProp = PV.piano; bodies.push(ctx.actor(sc, { char: 'fingers', clip: CLIP.piano, speed: 9 })); }
@@ -163,8 +165,8 @@ export function createScenes(ctx) {
     const over = () => holdProp === PV.table || holdProp === PV.piano;
     function heldPos(i, out) {
       const sway = Math.sin(sc.t * 9 + i) * 0.12;
-      if (over()) { out[0] = doors[0] + (i - 0.5) * 0.7; out[1] = 2.55 + (holdProp === PV.table ? 0.75 : 0.2); out[2] = doors[2] + 0.4; }
-      else { out[0] = doors[0] + (i ? -0.7 : 0.55) + sway * 0.3; out[1] = 0.45 + Math.abs(sway); out[2] = doors[2] + 0.95; }
+      if (over()) { out[0] = MX + (i - 0.5) * 0.7; out[1] = 2.55 + (holdProp === PV.table ? 0.75 : 0.2); out[2] = doors[2] + 0.4; }
+      else { out[0] = MX + (i ? -0.7 : 0.55) + sway * 0.3; out[1] = 0.45 + Math.abs(sway); out[2] = doors[2] + 0.95; }
       return out;
     }
     sc.flingInfo = () => {
@@ -200,7 +202,7 @@ export function createScenes(ctx) {
         if (auto != null && sc.t >= auto) sc.on('fling', { target: pickOf(['trough', 'haycart', 'jail', 'pomfrey']), auto: true });
         if (sc.t > (args.hold || 2.2) + 3) return false;
         bodies.forEach((b, i) => { heldPos(i, _c); b.x = _c[0]; b.y = _c[1]; b.z = _c[2]; b.h = 0; b.roll = Math.sin(sc.t * 9 + i) * 0.25; b.pitch = over() ? 0 : -0.2; });
-        if (holdProp >= 0) { heldPos(0, _c); ctx.prop(holdProp, doors[0], over() ? 2.4 : 0.9 + Math.abs(Math.sin(sc.t * 9)) * 0.1, doors[2] + (over() ? 0.4 : 1.0), { ry: over() ? PI : 0.3, line: 'saloon', ph: sc.t * 3 }); }
+        if (holdProp >= 0) { heldPos(0, _c); ctx.prop(holdProp, MX, over() ? 2.4 : 0.9 + Math.abs(Math.sin(sc.t * 9)) * 0.1, doors[2] + (over() ? 0.4 : 1.0), { ry: over() ? PI : 0.3, line: 'saloon', ph: sc.t * 3 }); }
         if (mabel) { mabel.clip = over() ? CLIP.cheer : CLIP.carry; mabel.speed = 2; }
         if (!sc.cosmetic && bodies[0]) ring(bodies[0], 1.25, 0, 0.8);
         return true;
@@ -954,14 +956,16 @@ export function createScenes(ctx) {
     let z = Math.min(ROAD - 1.5, ctx.heroLook()[2] + 2 + R() * 1.5);
     const [a, b] = st?.ok ? (R() < 0.5 ? [-5, 5] : [5, -5]) : crossing(z, 9);
     const life = Math.max(3, (g.until - g.born) || 9);
-    let x = a, y = 1.6, h = st?.ok ? Math.atan2(st.ax * Math.sign(b - a), st.az * Math.sign(b - a)) : Math.sign(b - a) * PI / 2, fade = 0, out = -1, caught = -1;
+    let lift = 0, x = a, y = 1.6, h = st?.ok ? Math.atan2(st.ax * Math.sign(b - a), st.az * Math.sign(b - a)) : Math.sign(b - a) * PI / 2, fade = 0, out = -1, caught = -1;
     sc.update = (dt) => {
       const t = sc.t;
       if (caught < 0) {
         const u = Math.min(1, t / life);
         x = a + (b - a) * u;
-        if (st?.ok) { const k = x; x = st.x + st.ax * k + st.fx * 20; z = st.z + st.az * k + st.fz * 20; }
-        y = 1.5 + Math.sin(t * 2.2) * 0.25;
+        if (st?.ok) { const k = x; x = st.x + st.ax * k + st.fx * 30; z = st.z + st.az * k + st.fz * 30; }
+        // R5: while a vignette plays it rides high over the rooftops instead of crossing the gag.
+        lift += ((world.spectacle?.clear?.length ? 6 : 0) - lift) * Math.min(1, dt * 2);
+        y = 1.5 + lift + Math.sin(t * 2.2) * 0.25;
         fade = Math.min(1, t / 0.6) * (out < 0 ? 1 : Math.max(0, 1 - (t - out) / 0.6));
         if (Math.floor(t * 3) !== Math.floor((t - dt) * 3)) parts.puff([x - Math.sign(b - a) * 0.4, y - 0.4, z], 1, { r: 0.15, size: 0.18, up: 0.3, col: PCOL.ECTO, life: 1.2 });
         if ((out >= 0 && t - out > 0.6) || t > life + 1.5) return false;

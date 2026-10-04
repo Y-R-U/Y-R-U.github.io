@@ -118,7 +118,7 @@ export function createCardRig(plot) {
   const camera = new THREE.PerspectiveCamera(c.fov, 2.3, 0.5, 400);
   camera.userData.iw2Line = plot.id;
   const lookL = new THREE.Vector3(), posL = new THREE.Vector3(), dir = new THREE.Vector3();
-  let baseDist = 1, key = null, probes = PROBES;
+  let baseDist = 1, key = null, probes = PROBES, fov = c.fov;
   // P's facade cameras (camera.facade) may show sky above the roofs; only their lower frame must stay on the ground.
   // While the Mulligans build, the site (frame + crew + mule cart) is framed whole instead of the open shop's gag.
   const building = () => !!plot.construction?.root?.visible;
@@ -127,6 +127,7 @@ export function createCardRig(plot) {
     c = plot.camera;
     key = keyOf();
     const auth = building() && c.build ? c.build : c;
+    fov = auth.fov || c.fov;
     lookL.set(...auth.look); posL.set(...auth.pos);
     dir.copy(posL).sub(lookL);
     baseDist = dir.length();
@@ -137,11 +138,11 @@ export function createCardRig(plot) {
       lookL.set((x0 + x1) / 2, S.fh * 0.4, S.fz + 1.2);
       dir.y += 0.12;
       dir.normalize();
-      const t = Math.tan((c.fov / 2) * D2R);
+      const t = Math.tan((fov / 2) * D2R);
       baseDist = Math.max(baseDist * 1.1, ((x1 - x0) / 2 + 0.5) / (t * 0.78) / 1.15, (S.fh + 1.5) / (2 * t) / 1.15);
     }
     probes = c.facade ? LOW : PROBES;
-    if (Math.abs(camera.fov - c.fov) > 1e-3) { camera.fov = c.fov; camera.updateProjectionMatrix(); }
+    if (Math.abs(camera.fov - fov) > 1e-3) { camera.fov = fov; camera.updateProjectionMatrix(); }
   }
   load();
   const look = new THREE.Vector3(), pos = new THREE.Vector3(), p = new THREE.Vector3();
@@ -163,7 +164,7 @@ export function createCardRig(plot) {
       lastAspect = aspect;
       camera.aspect = aspect;
       camera.updateProjectionMatrix();
-      const t = Math.tan((c.fov / 2) * D2R);
+      const t = Math.tan((fov / 2) * D2R);
       const wantW = plot.bounds.w * 0.92;
       const d = Math.max(baseDist * (aspect < 1.4 ? 1.15 : 1), wantW / 2 / (t * aspect) + plot.bounds.d * 0.25);
       plot.group.updateMatrixWorld();
@@ -478,7 +479,8 @@ export function createHeroDirector(world, { interval = 10 } = {}) {
 // plane; idle ones in the mid-ground turn to face the lens. Meshes tagged `userData.heroNear` (plot street-front
 // props) hide inside NEAR_PROP m. The hub's placeholder street props (well, wagon, trough, sign) sit on the street axis
 // of every shot near the saloon, so they only show for the opening.
-const NEAR = 10, NEAR_PROP = 13, FOOT_Y = -0.55, FOOT_VIG = -0.3, FACE_R = 34;
+// R5: they face the lens 3/4 (turned FACE_Q toward the frame centre), not square-on.
+const NEAR = 10, NEAR_PROP = 13, FOOT_Y = -0.55, FOOT_VIG = -0.3, FACE_R = 34, FACE_Q = 0.5;
 const FACE_CLIPS = new Set([0, 4, 6, 12, 17]);
 const _vp = new THREE.Matrix4(), _sph = new THREE.Sphere();
 const hidden = [];
@@ -523,7 +525,7 @@ export function heroTidy(world, camera, game) {
       continue;
     }
     if (hd < FACE_R && FACE_CLIPS.has(Math.round(anim[i * 3])) && im[o + 5] > sy * 0.98) {
-      const h = Math.atan2(dx, dz), c = Math.cos(h), s = Math.sin(h);
+      const h = Math.atan2(dx, dz) + (_v.x > 0 ? -FACE_Q : FACE_Q), c = Math.cos(h), s = Math.sin(h);
       im[o] = c * sx; im[o + 1] = 0; im[o + 2] = -s * sx;
       im[o + 8] = s * sz; im[o + 9] = 0; im[o + 10] = c * sz;
     }

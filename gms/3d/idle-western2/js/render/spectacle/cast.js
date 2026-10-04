@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { CHARACTERS, HAT, HAT_COLORS, HAT_SEAT, CROWD_K, hatGeometry } from '../kit/crowd.js?v=20261004e';
+import { CHARACTERS, HAT, HAT_COLORS, HAT_SEAT, CROWD_K, CLIP, hatGeometry } from '../kit/crowd.js?v=20261004e';
 
 // Spectacle cast on lane A's caricature rig (kit/crowd.js): one InstancedMesh + one blob draw for every hero actor,
 // hats/moustaches/accessories inside the rig. Instance index = pool index, so a look is uploaded once per actor and
@@ -11,6 +11,10 @@ const HEAD_TOP = 1.25;
 const _m = new THREE.Matrix4(), _r = new THREE.Matrix4(), _q = new THREE.Quaternion(), _e = new THREE.Euler(),
   _p = new THREE.Vector3(), _s = new THREE.Vector3(), _v = new THREE.Vector3(), _c = new THREE.Color();
 const ZERO = new THREE.Matrix4().makeScale(0, 0, 0);
+const _sq = new THREE.Matrix4(), _t = new THREE.Matrix4();
+// R5: a hat drawn tilted (front down, back brim up) and narrower than the rig's own, so a foreground figure seen from
+// behind and above reads as a body under a hat rather than a hat. Not while tipping it.
+const tilted = (h, a) => h.tilt && h.type >= 0 && !h.off && !h.gone && !(h.lift > 0) && a.clip !== CLIP.tiphat;
 
 export const hatIndex = (t) => (t == null || t === -1 ? -1 : typeof t === 'string' ? HAT[t] ?? -1 : t);
 export const hatColor = (c) => HAT_COLORS[c] || c || '#c9a06a';
@@ -84,7 +88,7 @@ export function createCast(kit, scene, cap = 48) {
       }
       hatKeys[i] = null;
     }
-    const h = a.hat, onHead = h.type >= 0 && !h.off && !h.gone && !(h.lift > 0);
+    const h = a.hat, onHead = h.type >= 0 && !h.off && !h.gone && !(h.lift > 0) && !tilted(h, a);
     const hk = onHead ? h.type + ':' + h.scale.toFixed(3) + ':' + h.color : 'none';
     if (hatKeys[i] !== hk) { hatKeys[i] = hk; if (onHead) crowd.hat(i, h.type, h.scale, hatColor(h.color)); else crowd.look(i, { hat: -1 }); }
   }
@@ -104,15 +108,30 @@ export function createCast(kit, scene, cap = 48) {
           hi = i + 1;
           dressSlot(i, a);
           crowd.place(i, { x: a.x, y: a.y || 0, z: a.z, heading: a.h || 0, pitch: a.pitch || 0, roll: a.roll || 0, clip: a.clip || 0, phase: a.phase, speed: a.speed, s: a.s || 1 });
+          // Squash/stretch (a.sq: world-vertical scale about the ground point, volume kept).
+          if (a.sq && a.sq !== 1) {
+            const k = 1 / Math.sqrt(a.sq);
+            mesh.getMatrixAt(i, _m);
+            _sq.makeTranslation(a.x, 0, a.z).multiply(_t.makeScale(k, a.sq, k)).multiply(_r.makeTranslation(-a.x, 0, -a.z));
+            mesh.setMatrixAt(i, _m.premultiply(_sq));
+          }
         }
-        const h = a.hat;
-        if (h.type >= 0 && !h.gone && (h.off || h.lift > 0)) {
+        const h = a.hat, tl = tilted(h, a);
+        if (tl || (h.type >= 0 && !h.gone && (h.off || h.lift > 0))) {
           const j = nHats;
           if (j < HATS_N) {
             if (h.off) {
               _e.set(h.off.rx || 0, h.off.ry || 0, h.off.rz || 0, 'YXZ');
               _q.setFromEuler(_e);
               _m.compose(_v.set(h.off.x, h.off.y, h.off.z), _q, _s.setScalar(h.scale * bodyS(a)));
+            } else if (tl) {
+              // Seat it where the rig's shader would (head scaled about the neck, legs lengthened).
+              const L = a.look || {}, hk = (L.head ?? 1.24) * 1.14, seat = 0.76 + (HAT_SEAT - 0.76) * hk + 0.4 * ((L.legs ?? 0.95) - 1);
+              bodyMatrix(a, _m);
+              _e.set(h.tilt, 0, 0);
+              _r.makeRotationFromEuler(_e).setPosition(0, seat, 0);
+              _m.multiply(_r).multiply(_r.makeScale(h.scale * hk * (h.brim || 1), h.scale * hk, h.scale * hk * (h.brim || 1)));
+              if (a.sq && a.sq !== 1) { const k = 1 / Math.sqrt(a.sq); _m.premultiply(_sq.makeTranslation(a.x, 0, a.z).multiply(_t.makeScale(k, a.sq, k)).multiply(_r.makeTranslation(-a.x, 0, -a.z))); }
             } else {
               bodyMatrix(a, _m);
               _r.makeScale(h.scale, h.scale, h.scale).setPosition(0, HAT_SEAT + h.lift, 0);

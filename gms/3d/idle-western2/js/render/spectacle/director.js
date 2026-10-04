@@ -61,9 +61,9 @@ export function createSpectacle({ world, kit, host, game, bus, fx, street }) {
     a.lookKey = a.dress ? 'd:' + a.dress : 'l:' + (a.look?.k || a.i);
     a.bodyS = a.dress ? dressScale(a.dress) : c?.s ?? 1;
     setHat(a, spec.hat !== undefined ? spec.hat : c ? c.hat : tf?.hat);
-    a.hat.lift = 0; a.hat.off = null; a.hat.gone = false;
+    a.hat.lift = 0; a.hat.off = null; a.hat.gone = false; a.hat.tilt = 0; a.hat.brim = 1;
     a.x = spec.x ?? 0; a.y = spec.y ?? 0; a.z = spec.z ?? 0; a.h = spec.h ?? 0; a.pitch = 0; a.roll = 0;
-    a.s = spec.s ?? 1; a.clip = spec.clip ?? 0; a.phase = R() * 6; a.speed = spec.speed ?? 3.8;
+    a.s = spec.s ?? 1; a.sq = 1; a.clip = spec.clip ?? 0; a.phase = R() * 6; a.speed = spec.speed ?? 3.8;
     a.line = spec.line ?? sc.line ?? null; a.hidden = false; a.prone = false; a.bodyless = !!spec.bodyless; a.pickR = spec.pickR ?? 0;
     sc.actors.push(a);
     return a;

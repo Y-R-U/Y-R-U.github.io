@@ -14,7 +14,8 @@ try {
   const out = [];
   for (const id of IDS) {
     await page.eval(`(() => { scrollTo(0, 0); const s = __iw2.world.spectacle; s.stop(); const r = __iw2.world.heroRig; if ('${id}' === '@town') r.town(true); else { r.town(false); r.pin('${id}'); } })()`);
-    if (force) { await sleep(2600); await page.eval(`(() => { const s = __iw2.world.spectacle; for (const k of ['gag','duel','eject']) s.stop(k); return !!s.gag('${force}'); })()`); }
+    if (force) { await sleep(2600); await page.eval(`(() => { const s = __iw2.world.spectacle; for (const k of ['gag','duel','eject']) s.stop(k); window.__sc = s.gag('${force}'); return !!window.__sc; })()`); }
+    else await page.eval('window.__sc = null');
     let info = null;
     for (let i = 0; i < 24 && !info; i++) {
       await sleep(250);
@@ -24,7 +25,9 @@ try {
     }
     let prev = 0;
     for (const [k, at] of AT.entries()) {
-    await sleep(info ? Math.max(0, at * 1000 - prev) : 0);
+    // R5: sample by the forced scene's own clock (screenshots take seconds under load), else by wall time.
+    if (force) { for (let i = 0; i < 300; i++) { if (await page.eval('window.__sc ? window.__sc.t : 99') >= at) break; await sleep(50); } }
+    else await sleep(info ? Math.max(0, at * 1000 - prev) : 0);
     prev = at * 1000;
     const m = await page.eval(`(() => { const w = __iw2.world, s = w.spectacle, host = __iw2.host, h = [0,0,0];
       const acts = s.pool.filter((a) => a.used && !a.hidden).map((a) => { s.cast.head(a, h); const top = { ...host.project('hero', [h[0], h[1] + 0.3, h[2]]) }, foot = { ...host.project('hero', [a.x, a.y, a.z]) };

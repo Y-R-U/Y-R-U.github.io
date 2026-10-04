@@ -198,6 +198,28 @@ characters are smaller and stiffer than the ref's (rig/lighting are lane A).
 **Gate (R4):** test-spectacle PASS (incl. falsification), test-look, test-boot PASS; test-scroll PASS (desktop draw
 calls 246–253 vs ≤ 250 is borderline and flaky under load — hero ~151 draws are town/plots, not spectacle).
 
+## Round 5 (2026-10-04): gag scale, squash/stretch, a readable Stranger
+- **Gag ×1.3** (`GAG_S` in vignettes.js): rival/drunk/Pickles/Wendell/Pomfrey (+ bearers, Mortimer) at `s` 1.3, barrel/chicken/
+  tumbleweed props scaled to match. Mid-ground gag figures now ~235–245 S22 device px (R4 ~170–190).
+- **Squash/stretch:** `a.sq` (cast.js) = world-vertical scale about the actor's ground point, volume kept, hat included.
+  `spring()` drives impacts: drunk stretch in flight + belly-flop squash + sit-up bounce, duel faint, Pickles sit-up/flop,
+  Pomfrey's stop; barrel squashes when it freezes, stretches when it bolts.
+- **Eject** rebuilt: nobody in the doorway (R4's Mabel at the porch WAS the critic's "pink blob" over the doors); the doors
+  bang, he cartwheels out (dust 20) and lands in the middle of the free dirt between the doors and you (dust 26, bigger
+  puffs); his hat pops up and back, not into the lens. Skipped when the doors are too far to read (`@town`). The fling
+  scene's Mabel and held body stand 1.3 m west of the doorway for the same reason.
+- **Stranger hat:** vignette Stranger's hat is drawn by the spectacle hat mesh tipped forward (`hat.tilt` 0.34, back brim up)
+  and narrower (`hat.brim` 0.84), seated where the rig shader puts it, so hair, shoulders and arms read under it (back to the
+  rig hat while he tips it).
+- **3/4 faces:** pooled idle townsfolk near the lens (`heroTidy`) and dazed gag actors (`camFace`) turn 0.5 rad off the lens,
+  toward the frame centre.
+- Ghost Town ghosts ride 30 m behind the stage and 6 m up while a vignette is live.
+- `stageshot.mjs` with a forced vignette now samples by the scene's own clock (screenshots take seconds under load).
+Sheets: `docs/shots/spectacle/r5/sheet_vignettes.jpg` (ref + saloon/tubs/@town/dentist), `sheet_base_vs_r5.jpg`, `cam/`.
+Still short of the ref: saloon pin camera stands close to the saloon so its porch posts/lamp/barrel sit in front of the
+doors (P's props, need `heroNear`); bunting wire and the dentist's hitched wagon/horse clutter the duel; Stranger's hat is
+pale cream (ref: dark) — a hat-colour call for A/U.
+
 ## Known gaps / next
 - The saloon plot's hitched horse is merged into its static mesh, so it still shows cut by the bottom edge in the
   dentist shot (camera stands in front of the saloon); needs P's `heroNear` tag (CONTRACT request).
