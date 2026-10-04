@@ -698,6 +698,15 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
     }
   }
 
+  // R6c: one reveal rule for spawns and the Ghosts tab: a second Deed, a grave, or 10 min played. Sticky once true.
+  function ghostsOpen() {
+    if (state.flags.ghostsOpen) return true;
+    if (!state.bootstrap.done || !(state.deeds.length > 1 || state.graves.length > 0 || simTime >= (data.season?.revealSec ?? 600))) return false;
+    state.flags.ghostsOpen = true;
+    dirty = true;
+    return true;
+  }
+
   function stepSeason() {
     const def = seasonDef();
     const was = state.season?.live;
@@ -705,7 +714,7 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
     const st = seasonState(def);
     st.live = true;
     if (!was) emit('season', { kind: 'live', id: def.id });
-    if (!state.bootstrap.done) return;
+    if (!ghostsOpen()) return;
     if (st.ghost && simTime >= st.ghost.until) { emit('ghost:gone', { ghost: st.ghost }); st.ghost = null; }
     if (!st.ghost && simTime >= st.nextGhost) {
       st.ghost = { id: 'g' + ++st.seq, born: simTime, until: simTime + def.ghostLife };
@@ -1463,8 +1472,9 @@ export function createGame({ data: given = {}, save = null, seed = 1, rng = null
       const def = seasonDef();
       if (!def) return { live: false };
       const st = seasonState(def);
-      return { live: true, id: def.id, def, ecto: st.ecto, xp: st.xp, rank: st.rank, ranks: def.ranks.length, xpNext: def.ranks[st.rank]?.xp ?? null, ghost: st.ghost };
+      return { live: true, open: ghostsOpen(), id: def.id, def, ecto: st.ecto, xp: st.xp, rank: st.rank, ranks: def.ranks.length, xpNext: def.ranks[st.rank]?.xp ?? null, ghost: st.ghost };
     },
+    ghostsOpen() { return ghostsOpen(); },
     on(type, fn) {
       if (!subs.has(type)) subs.set(type, new Set());
       subs.get(type).add(fn);

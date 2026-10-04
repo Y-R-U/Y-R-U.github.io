@@ -4,7 +4,7 @@
 export const SEASON = {
   id: 'ghosttown', name: 'Ghost Town', token: '👻', tokenName: 'ectoplasm',
   from: { month: 10, day: 1 }, to: { month: 11, day: 2 },
-  ghostGap: [20, 40], ghostLife: 9, ectoPerGhost: 1,
+  ghostGap: [20, 40], ghostLife: 9, ectoPerGhost: 1, revealSec: 600,
   ranks: [
     { xp: 5, keepsake: 'cobweb_derby' },
     { xp: 15, keepsake: 'ghostly_bowler', box: 'basic' },

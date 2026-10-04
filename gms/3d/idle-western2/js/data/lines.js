@@ -42,7 +42,7 @@ export const BUSINESSES = [
   },
   {
     id: 'tubs', name: 'Tuppenny Tubs', emoji: '🛁', district: 'lower', cycleSec: 3, unit: 'bath', actor: 'walker', tint: 0x6f9aa8,
-    build: { acq: 'built', T: 15 }, sign: 'Water Changed Tuesdays',
+    build: { acq: 'built', T: 8 }, sign: 'Water Changed Tuesdays',
     throughput: [['🛁', 'Another tub'], ['🔥', 'Bigger kettle'], ['🧼', 'Communal soap (one)'], ['🪣', 'Bucket on a rope'], ['👬', 'Tub for two (strangers)']],
     boosts: [['🦆', 'Rubber ducks'], ['🫧', 'Bubbles (soap-adjacent)'], ['🌸', 'Lavender, to hide it'], ['📅', 'Water changed Wednesdays too']],
     manager: { name: 'Pickles McGurk', emoji: '🥴', bark: 'pickles', trait: "He's Always Here Anyway", kind: 'offline', value: 3600, text: 'Offline cap +1 h' },
@@ -101,7 +101,7 @@ export const BUSINESSES = [
 // rate(i) = rate0 · 3 · rateStep^(i−1); costs are rate × the per-row multipliers below (docs/ECONOMY.md §1).
 export const CURVE = {
   rate0: 1, rateStep: 20,
-  unlockPay: [50, 50, 90, 240, 420, 560, 720, 900, 1050],
+  unlockPay: [50, 40, 90, 240, 420, 560, 720, 900, 1050],
   levelPay: [8, 25, 60, 140, 220, 340, 450, 580, 740],
   growth0: 1.1, growthStep: 0.004,
   thrK: 6, thrBase: 3,

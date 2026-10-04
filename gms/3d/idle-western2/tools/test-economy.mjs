@@ -820,6 +820,35 @@ test('Ghost Town: live Oct 1 – Nov 2 on the injected clock; ghosts pay ectopla
   assert.equal(g.state.season.ecto, SEASON.ranks[7].xp, 'ectoplasm is kept');
 });
 
+test('R6c: no ghosts until the Ghosts reveal (second Deed, a grave, or 10 min played); sticky; one flag for UI', () => {
+  const g = mk({ t: Date.parse('2026-10-20T12:00:00') });
+  for (let i = 0; i < BOOT_TAPS; i++) g.act('tap');
+  open(g, A);
+  const spawns = g.seen('ghost:spawn');
+  for (let i = 0; i < 590 && g.simTime < 590; i++) g.run(1);
+  assert.equal(spawns.length, 0, 'no ghosts in the first 10 minutes');
+  assert.equal(g.ghostsOpen(), false);
+  assert.equal(g.seasonInfo().open, false);
+  for (let i = 0; i < 80; i++) g.run(1);
+  assert.equal(g.ghostsOpen(), true);
+  assert.equal(g.seasonInfo().open, true);
+  assert.ok(spawns.length > 0, 'ghosts once open');
+  const h = mk({ t: Date.parse('2026-10-20T12:00:00') });
+  for (let i = 0; i < BOOT_TAPS; i++) h.act('tap');
+  open(h, A);
+  assert.equal(h.ghostsOpen(), false);
+  h.state.graves.push({ gen: 1 });
+  assert.equal(h.ghostsOpen(), true, 'a grave opens it');
+  h.state.graves.length = 0;
+  assert.equal(h.ghostsOpen(), true, 'sticky');
+  const d = mk({ t: Date.parse('2026-10-20T12:00:00') });
+  for (let i = 0; i < BOOT_TAPS; i++) d.act('tap');
+  open(d, A);
+  assert.equal(d.ghostsOpen(), false);
+  d.state.deeds.push('x');
+  assert.equal(d.ghostsOpen(), true, 'a second Deed opens it');
+});
+
 // ---------- "save for X" (PT#5), the game clock (W18), gen-2 bootstrap ----------
 
 test('nextGoal: next business, then the next Deed; buy / save / grind / blocked; a best buy; stats() with no id', () => {
@@ -913,6 +942,7 @@ test('Witching Hour: ghosts come twice as often and pay double ectoplasm in the 
   const g = mk({ t: Date.parse('2026-10-20T12:00:00') });
   for (let i = 0; i < BOOT_TAPS; i++) g.act('tap');
   open(g, A);
+  g.state.flags.ghostsOpen = true;
   for (let i = 0; i < 2400 && !g.day().night; i++) g.run(0.5, 0.5);
   assert.equal(g.day().witching, true);
   let paid = null;

@@ -65,7 +65,7 @@ The line model, R1 pile/σ rulings, tap cap, walk-ins, return harvest, milestone
 | # | id | Business | Block | Acquired (W13) | T (s) | Unlock | $/s per Lv | Manager · trait |
 |---|---|---|---|---|---|---|---|---|
 | 1 | `shine` | 🥾 Spit & Shine | Lower Street | built | 6 | $50 | 1 | Lil' Nubbin · speed +10% |
-| 2 | `tubs` | 🛁 Tuppenny Tubs | Lower Street | built | 15 | $150 | 3 | Pickles · offline +1 h |
+| 2 | `tubs` | 🛁 Tuppenny Tubs | Lower Street | built | 8 | $120 | 3 | Pickles · offline +1 h |
 | 3 | `livery` | 🐴 Hoof & Mouth Livery | Lower Street | built | 20 | $5.4K | 60 | Hortense · shelf ×1.5 |
 | 4 | `saloon` | 🥃 The Thirsty Gizzard | Saloon Row | **poker** | 8 | $288K | 1.2K | Big Mabel · σ +10% |
 | 5 | `dentist` | 💈 Pull & Pray | Saloon Row | built | 30 | $10.1M | 24K | Pliers Pete · every 50th customer drops 🦷 |
@@ -74,7 +74,7 @@ The line model, R1 pile/σ rulings, tap cap, walk-ins, return harvest, milestone
 | 8 | `jail` | ⭐ Sheriff & Jail | Bank Block | **bought** | 8 | $173B | 192M | Wendell · +25% while no special runs |
 | 9 | `bank` | 🏦 First & Last Bank | Bank Block | **bought** | 8 | $4.0T | 3.84B | Thrupp · levels −5% here |
 
-- **Curve:** the IL2 `CURVE`, cut to 9 rows. Round 2 (PT#5) cut the early unlocks: `unlockPay` is `[50, 50, 90, 240, …]` (Tubs $360 → $150, Livery $9K → $5.4K, Saloon $336K → $288K). Every glyph has its own themed name: the throughput and boost ladders are in `BUSINESSES[]`, for example `+🫙 Better spit`, `+🎹 Piano tuning (it never was)` and `+🤫 Discretion, extra`.
+- **Curve:** the IL2 `CURVE`, cut to 9 rows. Round 2 (PT#5) cut the early unlocks: `unlockPay` is `[50, 40, 90, 240, …]` (Tubs $360 → $150, and $120 with an 8 s build in R6, Livery $9K → $5.4K, Saloon $336K → $288K). Every glyph has its own themed name: the throughput and boost ladders are in `BUSINESSES[]`, for example `+🫙 Better spit`, `+🎹 Piano tuning (it never was)` and `+🤫 Discretion, extra`.
 - **Garter:** in Sunday School mode the UI shows `line.sundayName` ("The Velvet Garter Dance Hall").
 - **Deeds (permits):** Saloon Row costs 2 × the Saloon's unlock ($576K, was 3 × $336K). Bank Block costs 4 × the Undertaker's ($27.6B).
   - Each Deed also needs 3 of the previous block's 4 **Town Council Demands** (`data/contracts.js`) to be *finished*. They don't need to be claimed: buying the Deed claims them (the IL2 rule).
@@ -247,7 +247,7 @@ The state emits **`bark {char, trig, prio}`**. `trig` is from the AUDIO.md trigg
 ## 10. Ghost Town (W12, `data/season.js`)
 
 - **Live** from Oct 1 to Nov 2, read off the local date of `nowWall()`. `state.season = {id, year, ecto, xp, rank, ghost, nextGhost, live}` always exists.
-- **Ghosts.** After the first business opens, a ghost drifts in every 20–40 s and lives 9 s:
+- **Ghosts (R6c).** Nothing spawns until the Ghosts reveal: a second Deed, a grave, or 10 min of `simTime` (`SEASON.revealSec`), after the first business opens. The rule is sticky (`flags.ghostsOpen`) and exposed as `game.ghostsOpen()` and `seasonInfo().open`, so the tab and the spawns share it. Once open, a ghost drifts in every 20–40 s and lives 9 s:
   - spawn: `ghost:spawn {ghost}`;
   - `ghost:tap {id}` pays 👻 1: `ghost:tap {ghost, ecto, total}`;
   - otherwise it leaves: `ghost:gone`.
@@ -262,9 +262,9 @@ Life 1, with targets scaled to a ~60 min first run (±30%, the IL2 method). Roun
 | Beat | Target (active) | Active | Casual | Typical | Idle |
 |---|---|---|---|---|---|
 | Spit & Shine open | 0:25–0:45 | 0:27 | 0:20 | 0:33 | 0:29 |
-| Tuppenny Tubs open | 0:45–1:30 (casual ≤ 1:30) | 1:04 | **1:03** | 1:48 | 3:15 |
-| Livery open | 1:30–3:00 (casual ≤ 3:00) | 1:49 | **2:26** | 2:53 | 5:20 |
-| Saloon Row Deed | 3:00–6:00 (casual ≤ 7:00) | 3:22 | **4:19** | 4:43 | 10:00 |
+| Tuppenny Tubs open | 0:45–1:30 (casual ≤ 1:30) | 0:57 | **0:56** | 1:36 | 3:08 |
+| Livery open | 1:30–3:00 (casual ≤ 3:00) | 1:49 | **2:20** | 3:03 | 5:20 |
+| Saloon Row Deed | 3:00–6:00 (casual ≤ 7:00) | 3:14 | **4:09** | 4:43 | 10:00 |
 | First special (wind-up) | casual ≤ 5:00 | 3:25 (scripted brawl) | **4:20** | 4:34 | 4:30 |
 | Velvet Garter open | 9:00–13:00 | 7:30 | 16:10 | 14:13 | 21:45 |
 | Bank Block Deed (= Fake Your Death available) | 20:00–27:00 | 16:46 | 41:26 | 32:28 | 45:00 |
@@ -287,9 +287,11 @@ The first tumbleweed lands at 0:45–0:58 for every profile.
 - **Idle:** checks in every 3 min (every minute for the first 15).
 
 **Casual ceilings** (gated) across seeds 1/2/3/5/7/9/11/21/33/42:
-- Tubs 1:03–1:11;
-- Livery 2:26–2:48;
-- Saloon Row Deed 4:19–4:33;
+- Tubs 0:56–1:00;
+- Livery 2:20–2:35;
+- Saloon Row Deed 4:09–4:26;
+
+**R6 Tubs nudge.** PLAYTEST_2's CDP casual bot bought Tubs at 1:27 and opened it at 1:41, ~38 s behind this sim (it spends taps on the hero, ghosts and the piano). Tubs went $150 → $120 and its build 15 s → 8 s: sim casual 1:03 → 0:56, which should put the bot near 1:25. All other gates and the active/idle ratio (max 2.11) hold.
 - first special 4:20.
 
 The casual mid-game is reported, not gated: Garter ~16 min, Fake Your Death available ~42 min (typical ~33). The casual player still buys the first lit glyph whenever there is nothing to save for. Without the best-buy glow (the playtester's raw "first lit glyph" habit) every ceiling still passes, with the Deed at 6:10–6:52. That margin is thin, so U's best-buy glow is worth having.
