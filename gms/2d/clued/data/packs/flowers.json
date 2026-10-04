@@ -1420,6 +1420,9 @@
     "sweet-violet"
    ],
    "blurb": "A cheerful garden flower with a \"face\" in the middle. Its name comes from the French word for \"thought\".",
+   "differences": {
+    "sweet-violet": "The pansy has large flowers with a dark \"face\"; the sweet violet has small purple flowers and a sweet scent."
+   },
    "clues": [
     "Family: Violaceae.",
     "Genus: Viola.",
@@ -1478,6 +1481,9 @@
     "garden-pansy"
    ],
    "blurb": "A small, sweet-smelling purple flower. Its scent seems to vanish after a sniff or two.",
+   "differences": {
+    "garden-pansy": "The pansy has large flowers with a dark \"face\"; the sweet violet has small purple flowers and a sweet scent."
+   },
    "clues": [
     "Its scent seems to disappear after a few sniffs.",
     "Its flowers are candied to decorate cakes.",

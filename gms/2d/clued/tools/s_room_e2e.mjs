@@ -111,7 +111,7 @@ async function main() {
   await host.click('[data-act=host]');
   await host.click('.tile[data-format=mc]');
   await host.type('[data-field=name]', 'Hosty');
-  await host.click('[data-opt=answer] .chip[data-v="15"]');
+  await host.click('[data-opt=answer] .chip[data-v="30"]');
   await host.click('[data-opt=gap] .chip[data-v="3"]');
   await host.click('[data-act=create]');
   await host.waitFor(`document.querySelector('.net-code')?.textContent`, 30000, 'lobby code');
@@ -170,7 +170,7 @@ async function main() {
           sawLive = sawLive || await p.eval(`!!document.querySelector('.net-live .net-wait')`);
         }
       }
-      await host.waitFor(`window.__cluedRoom.st.phase !== 'question' || window.__cluedRoom.st.q !== ${st.q}`, 25000, 'question end');
+      await host.waitFor(`window.__cluedRoom.st.phase !== 'question' || window.__cluedRoom.st.q !== ${st.q}`, 45000, 'question end');
       const s2 = await host.room();
       if (st.q === total - 1) {
         ok(s2.phase === 'reveal' && s2.answered === 2, 'last question: revealed at the deadline with one player silent', `${s2.phase} ${s2.answered}`);
@@ -213,7 +213,7 @@ async function main() {
   await j2.click('.more-btn:not([hidden])');
   for (const p of pages) await p.waitFor(`window.__cluedRoom.st.stage === 1 && ${btn}.textContent.includes('(0/3)')`, 8000, `${p.name} stage 1`);
   ok(true, 'unanimous vote advances everyone to stage 1');
-  ok((await host.room()).limitMs > 15000, 'the vote extended the deadline', String((await host.room()).limitMs));
+  ok((await host.room()).limitMs >= 45000, 'progressive deadline (30 s × 1.5) never shrinks on a vote', String((await host.room()).limitMs));
   await j1.click('.stage .choices .choice');
   for (const p of [host, j2]) await p.waitFor(`${btn}.textContent.includes('Locked')`, 8000, `${p.name} locked`);
   ok(true, 'the first answer locks voting for everyone');

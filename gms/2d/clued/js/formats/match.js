@@ -140,7 +140,7 @@ export default register({
     let sel = null;   // { side: 'l'|'r', i }
     let done = false;
     const tile = (o, side, i) => {
-      const t = h('button.mt-t', { type: 'button', class: o.img ? 'pic' : '', style: { '--i': i }, dataset: { side, i: String(i) } },
+      const t = h('button.mt-t', { type: 'button', class: o.img ? 'pic' : '', style: `--i:${i}`, dataset: { side, i: String(i) } },
         h('span.key', {}, side === 'l' ? String(i + 1) : String.fromCharCode(65 + i)),
         o.img ? imgEl(o.img, { alt: 'Picture ' + (i + 1) }) : null, h('span.lbl', {}, o.text), side === 'r' ? h('span.dots') : null);
       t.addEventListener('click', () => tap(side, i));

@@ -1123,6 +1123,9 @@
     "alpha-centauri"
    ],
    "blurb": "The closest star to the Sun, about 4.2 light years away. It has at least one planet.",
+   "differences": {
+    "alpha-centauri": "Proxima Centauri is a dim red dwarf you need a telescope to see; Alpha Centauri's two bright stars shine as one of the brightest points in the southern sky. Proxima belongs to the same system."
+   },
    "clues": [
     "It sometimes gives off big flares.",
     "It is part of a three-star system.",
@@ -1163,6 +1166,9 @@
     "proxima-centauri"
    ],
    "blurb": "The closest star system to us. Its two bright stars look like one point of light to the naked eye.",
+   "differences": {
+    "proxima-centauri": "Proxima Centauri is a dim red dwarf you need a telescope to see; Alpha Centauri's two bright stars shine as one of the brightest points in the southern sky. Proxima belongs to the same system."
+   },
    "clues": [
     "It is in the southern sky.",
     "It cannot be seen from most of Europe.",
@@ -1429,6 +1435,9 @@
     "andromeda-galaxy"
    ],
    "blurb": "Our home galaxy, a spiral of hundreds of billions of stars. On dark nights it looks like a glowing band across the sky.",
+   "differences": {
+    "andromeda-galaxy": "The Milky Way is our own galaxy, seen as a band across the sky; the Andromeda Galaxy is a separate, larger spiral about 2.5 million light years away."
+   },
    "clues": [
     "It is about 100,000 light years across.",
     "The Sun takes about 230 million years to go round it.",
@@ -1478,6 +1487,9 @@
     "milky-way"
    ],
    "blurb": "The nearest big galaxy to the Milky Way, about 2.5 million light years away. The two will merge in billions of years.",
+   "differences": {
+    "milky-way": "The Milky Way is our own galaxy, seen as a band across the sky; the Andromeda Galaxy is a separate, larger spiral about 2.5 million light years away."
+   },
    "clues": [
     "It has two small companions called M32 and M110.",
     "It is bigger than the Milky Way.",

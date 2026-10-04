@@ -14,7 +14,7 @@ const CSS = `
 .so-card.text{padding:28px 14px}
 .so-card.next{transform:translateY(10px) scale(.94);opacity:.6;pointer-events:none;filter:saturate(.6)}
 .so-card.dragging{transition:none;cursor:grabbing}
-.so-card.gone{opacity:0;pointer-events:none}
+.so-card.gone,.so-card.flown{opacity:0;pointer-events:none}
 .so-card .so-mark{position:absolute;top:-14px;right:-10px;width:42px;height:42px;border-radius:50%;border:var(--line) solid var(--ink);display:grid;place-items:center;color:#fff;font-size:22px;font-family:var(--font)}
 .so-bins{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:10px}
 .so-bin{--c:var(--sky);position:relative;min-height:74px;padding:8px;border:var(--line) solid var(--ink);border-radius:18px;background:color-mix(in srgb,var(--c) 22%,#fff);box-shadow:var(--shadow);font-weight:900;font-size:17px;line-height:1.1;transition:transform .12s,background .2s}
@@ -137,7 +137,7 @@ export default register({
     const bins = d.bins.map((b, i) => h('button.so-bin', { type: 'button', onclick: () => put(i) }, h('span.k', {}, d.bins.length === 2 ? (i ? '→' : '←') : String(i + 1)), b, h('span.cnt', {}, '')));
     const hint = h('div.so-hint', {}, d.bins.length === 2 ? 'Swipe left or right, or tap a bin' : 'Drag to a bin, or tap one');
     el.append(h('div.f-stage.so', {}, h('h2.q-prompt', {}, q.prompt), h('div.so-top', {}, counter, dots), deck,
-      h('div.so-bins', { style: { '--n': d.bins.length } }, ...bins), hint));
+      h('div.so-bins', { style: `--n:${d.bins.length}` }, ...bins), hint));
     stretchTimer(api, el, 1 + N * 0.35);
     const cardEls = d.cards.map((c, i) => {
       const e = h('div.so-card', { class: c.img ? '' : 'text' }, c.img ? imgEl(c.img, { alt: c.text }) : null, h('span', {}, c.text));

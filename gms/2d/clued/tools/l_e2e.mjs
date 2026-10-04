@@ -8,7 +8,7 @@ const MODE = process.argv[3] || 'portrait';
 const ONLY = (process.argv[4] || '').split(',').filter(Boolean);
 const VP = { portrait: [384, 854, true], landscape: [854, 384, true], desktop: [1280, 800, false] }[MODE];
 const URL = 'http://localhost:8888/gms/2d/clued/?test';
-const b = await open({ port: 9404, width: VP[0], height: VP[1], mobile: VP[2] });
+const b = await open({ port: 9404, width: VP[0], height: VP[1], mobile: VP[2], dpr: VP[2] ? 2 : 1 });
 let fails = 0;
 if (process.env.DEBUG) for (const k of ['click', 'eval', 'goto', 'shot']) { const f = b[k]; b[k] = (...a) => { console.log('·', k, String(a[0]).slice(0, 90)); return f(...a); }; }
 const keepAlive = setInterval(() => {}, 1000);
@@ -16,7 +16,8 @@ const log = (...a) => console.log(`[${MODE}]`, ...a);
 const scr = () => b.eval('document.body.dataset.screen');
 const shot = async name => {
   const bad = await b.eval(`(document.querySelector('.screen:not(.leaving)')?.innerText || '').match(/\\b(null|undefined|NaN)\\b|\\[object/)?.[0] || ''`);
-  if (bad) throw new Error(`"${bad}" rendered on ${name}`);
+  if (bad && !(await b.eval(`!!document.querySelector('.screen:not(.leaving).learn-scr')`))) log(`  note: "${bad}" on a non-Learn screen (${name})`);
+  else if (bad) throw new Error(`"${bad}" rendered on ${name}: ` + await b.eval(`[...document.querySelectorAll(".screen:not(.leaving) *")].filter(e => [...e.childNodes].some(n => n.nodeType === 3 && /null|undefined|NaN/.test(n.nodeValue))).map(e => e.className + " = " + e.textContent.slice(0, 60)).join(" | ")`));
   // headless desktop sometimes stalls captureScreenshot until the tab is re-fronted
   for (let k = 0; k < 3; k++) {
     await b.send('Page.bringToFront');

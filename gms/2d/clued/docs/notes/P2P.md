@@ -7,13 +7,15 @@ there are no caps or protection levels, and it works on GitHub Pages.
 
 ## Files
 ```
-js/net/p2p_room.js   pure room logic: a port of server/rooms.go + scoring.go (timing, grace, early end, kids, votes/stages/lock,
+js/net/p2p_room.js   pure room logic: a port of server/rooms.go + scoring.go (stage multiplier / progressive timing /
+                     streak come from js/core/scoring.js) (timing, grace, early end, kids, votes/stages/lock,
                      names, late join, kick, again, snapshot/restore). No DOM, so it is node-testable.
 js/net/p2p.js        transport 'p2p' (S's interface): host side (PeerJS peer + P2PRoom + 250 ms tick + broadcast) and
                      client side (data-channel RPC, state push, clock sync, reconnect). Registers itself and fallback.host.
 js/net/p2p_ui.js     "Hosting from this device" / "Device room" lobby notes, host back-from-background toast
 js/vendor/peerjs.js  PeerJS 1.5.5 dist (MIT) vendored unmodified, plus a 2-line ES-module export at the end
 tools/p2p_test.mjs   node: 96 checks on the room logic (parity with js/core/scoring.js, grace, votes…)
+tools/p2p_rate.mjs   connection success rate / time via the real broker
 tools/p2p_e2e.mjs    3 headless Chromes (9411–9413) via the real broker: full game, refreshes, vote round, host leave
 ```
 
@@ -30,7 +32,8 @@ tools/p2p_e2e.mjs    3 headless Chromes (9411–9413) via the real broker: full 
   ≤ host-measured + 300, early end when every connected non-late player has answered, streak bonus, partial-credit
   formats, mc/tf re-checked, kids = flat 100 and a 20 s default, long-format minimum times, late joiners from the next
   question, and dedupe of names ("Sam 2").
-- **Vote to reveal more:** this matches S's server exactly (rooms.go `voteNeed/setStage/checkVotes/vote`). Needed =
+- **Vote to reveal more:** this matches S's final shape (no separate messages: state fields + `vote(code,key,q)` returning
+  state; runner wiring unchanged) and the server exactly (rooms.go `voteNeed/setStage/checkVotes/vote`). Needed =
   connected players who joined before this question and haven't answered. When all of them have voted, the stage goes
   up and the deadline becomes `min(start + 90 s, max(deadline, now + max(5 s, answer/2)))`. The initial deadline is
   `max(limit, 10 s, answer × 1.5)`. The first answer locks voting. Points use the stage multiplier `1 − 0.6·stage/(N−1)`,
@@ -43,7 +46,7 @@ tools/p2p_e2e.mjs    3 headless Chromes (9411–9413) via the real broker: full 
   in the URL. After a refresh, A's `route()` goes to the join screen with `via:'p2p'`, which rejoins silently by key.
   A dropped channel stays "online" for 6 s, then stops holding up early-end and votes.
 - **Host refresh:** every second the host saves a snapshot to sessionStorage. A host reload within 2 min restores the room,
-  reclaims the same peer id (retrying while the broker frees the old one) and joiners reconnect on their own.
+  reclaims the same peer id (`pagehide` destroys the old peer; broker/id failures retry for 45 s) and joiners reconnect on their own.
   The `beforeunload` prompt only shows while other players are in a running game.
 - **Host leaves:** the room closes and every joiner gets a final state (podium, plus "The host closed the room"). If the host
   just vanishes (closed tab, phone asleep), joiners retry for 75 s and then end on the last known scores
@@ -73,6 +76,7 @@ tools/p2p_e2e.mjs    3 headless Chromes (9411–9413) via the real broker: full 
 ## Testing
 - `node tools/p2p_test.mjs` → 96 passed. Falsified by setting the grace to 0, removing the first-answer lock,
   breaking the stage extension, or never letting a dropped player go offline: each makes it fail.
+- `node tools/p2p_rate.mjs [N] [--mdns]`: connection success rate and time through the real broker (2 Chromes, 9411/9412).
 - `node tools/p2p_e2e.mjs [--shots DIR] [--peerhost host:port] [--mdns]`. It needs internet. The flow:
   - the host creates through real clicks (Online → Host from this device → mc → 15 s/3 s), and two joiners open the `?p2p=` link;
   - 10 questions with a joiner refresh at Q2 and a host refresh at Q3, then a silent player on the last question;
@@ -81,18 +85,31 @@ tools/p2p_e2e.mjs    3 headless Chromes (9411–9413) via the real broker: full 
   - the host leaves → both joiners see the final podium.
   Screenshots are portrait, plus the lobby in landscape and on desktop.
 
-## Reliability notes (measured 2026-10-05)
-- Broker: host registration with 0.peerjs.com took 1.2–4.5 s. A joiner's first link (broker open + ICE + the first RPC)
-  took 8–19 s in headless Chrome on one Mac. (TODO numbers from the final run below.)
-- **Headless gotcha:** Chrome hides local IPs behind mDNS `.local` candidates, and several headless instances on one
-  machine could not resolve each other's, so the first run failed with `no_direct`. The e2e passes
-  `--disable-features=WebRtcHideLocalIpsWithMdns` (`--mdns` turns that off). Real phones on the same Wi-Fi resolve mDNS
-  normally, and across networks the STUN (srflx) candidates are what connect.
+## Reliability notes (measured 2026-10-05, one Mac, home NAT, real 0.peerjs.com broker)
+- `node tools/p2p_rate.mjs 20`: **20/20 connected (100 %)**, median 3.3 s, max 6.5 s from a fresh page + peer to the
+  first RPC answer. Host registration with the broker took 1.2–8.9 s, and the slow end was while the machine was at
+  load average 40–57 from other lanes' tests. Opening a share link to reaching the join form took 7–13 s, including the
+  game's own boot.
+- The full e2e passes: **39/39 (run5)**. In the e2e the host refresh took 20 s until *joiners* were back, because a joiner that
+  hits the host mid-restart can wait out its 15 s connect timeout before retrying. A shorter reconnect timeout is a possible tweak.
+- **Host refresh:** the room comes back with the same code, seats and scores. At first this took 22–29 s, because the
+  broker still held the old id, and a broker hiccup during resume could lose the seat. Now the host destroys its peer
+  on `pagehide` (the id frees at once) and retries broker/id failures for up to 45 s. A 6-reload probe came back in
+  **0.9–5.1 s every time**. Joiners reconnect by themselves.
+- **mDNS finding (important):** with Chrome's default mDNS-hidden local IPs (`--mdns`), two headless instances on the
+  same machine connected **0/10**. Both had a STUN srflx candidate (the public IP), but this router doesn't hairpin,
+  and the headless instances don't resolve each other's `.local` names. The test therefore runs with
+  `--disable-features=WebRtcHideLocalIpsWithMdns`. For real players:
+  - **Same Wi-Fi:** this relies on mDNS host candidates. Normal Chrome, Android and iOS Safari resolve these on a LAN.
+  - **Guest or "client isolation" Wi-Fi without hairpin NAT:** this will fail with the `no_direct` message, which
+    suggests switching one device to mobile data.
+  - **Different networks:** these connect through STUN srflx unless both ends are symmetric NAT.
 - Without TURN, the pairs that fail are symmetric NAT on both ends (some mobile carriers, CGNAT, strict corporate or school
-  networks). Published WebRTC figures put STUN-only success around 80–90 % of pairs. Joiners get a clear message:
-  try switching one of you between Wi-Fi and mobile data, or use a server room. We could not measure across real carriers here.
+  networks). Commonly quoted STUN-only success rates are around 80–90 % of pairs. We couldn't measure across real
+  carriers or phones here: **Aaron, a two-phone test (same Wi-Fi, then one on 4G) is the remaining check.**
 - Mobile browsers suspend background tabs within seconds to minutes. A backgrounded host freezes the room until it returns
-  (the clock keeps running, so questions may time out). This is mitigated by the wake lock and warnings, not solved.
+  (the deadlines keep running, so questions may time out). Joiners keep retrying for 75 s and then end on the last scores.
+  The wake lock and warnings reduce this but don't solve it.
 
 ## Limits
 - 8 players (`MAX_PLAYERS`). A data channel per player from one tab is fine at this size.

@@ -51,9 +51,15 @@ function make(rng, pack, key, n, difficulty) {
     refs: set.map(c => c.ref), pack: pack.id,
     data: {
       items: shown.map(c => ({ text: c.item.name, img: pics ? imageOf(c.item, rng) : undefined, value: fmtFact(meta, numOf(c.item, key)) })),
-      caps: year ? ['Earliest', 'Latest'] : [meta.higherLabel ? `${meta.higherLabel} · highest` : 'Highest', 'Lowest'],
+      caps: year ? ['Earliest', 'Latest'] : ['Highest', 'Lowest'],
     },
   };
+}
+
+function capsOf(l) {
+  if (Array.isArray(l) && l.length >= 2) return l.slice(0, 2).map(String);
+  const m = typeof l === 'string' && l.match(/^(.+?)\s+(?:to|→|->)\s+(.+)$/i);
+  return m ? [m[1].charAt(0).toUpperCase() + m[1].slice(1), m[2].charAt(0).toUpperCase() + m[2].slice(1)] : typeof l === 'string' && l.trim() ? [l.trim(), ''] : ['First', 'Last'];
 }
 
 function fromQuestion(rng, pack, difficulty) {
@@ -66,7 +72,7 @@ function fromQuestion(rng, pack, difficulty) {
   return {
     format: 'order', id: `order:${pack.id}/q:${q.id}`, prompt: q.prompt, answer: correct.map(t => shown.indexOf(t)),
     answerText: correct.join(' → '), explain: q.explain, refs: [`${pack.id}/q:${q.id}`], pack: pack.id,
-    data: { items: shown.map(text => ({ text })), caps: q.orderLabel ? [].concat(q.orderLabel).slice(0, 2) : ['First', 'Last'] },
+    data: { items: shown.map(text => ({ text })), caps: capsOf(q.orderLabel) },
   };
 }
 
@@ -101,7 +107,7 @@ export default register({
     const offs = [];
     const cards = d.items.map((it, i) => {
       const up = h('button', { type: 'button', 'aria-label': 'Move up' }, '▲'), down = h('button', { type: 'button', 'aria-label': 'Move down' }, '▼');
-      const li = h('li.or-it', { style: { '--i': i }, dataset: { i: String(i) } }, h('span.pos'), it.img ? imgEl(it.img, { alt: '' }) : null,
+      const li = h('li.or-it', { style: `--i:${i}`, dataset: { i: String(i) } }, h('span.pos'), it.img ? imgEl(it.img, { alt: '' }) : null,
         h('span.nm', {}, it.text), h('span.val', {}, it.value || ''), h('span.mv', {}, up, down));
       up.addEventListener('pointerdown', e => e.stopPropagation());
       down.addEventListener('pointerdown', e => e.stopPropagation());
@@ -117,7 +123,7 @@ export default register({
     });
     const check = h('button.btn.go', { type: 'button', onclick: () => grade() }, 'Check order');
     el.append(h('div.f-stage.or', {}, h('div.or-head', {}, h('h2.q-prompt', {}, q.prompt)),
-      h('div.or-wrap', {}, h('div.or-cap', {}, '▲ ' + d.caps[0]), list, h('div.or-cap', {}, '▼ ' + d.caps[1]), h('div.or-foot', {}, check))));
+      h('div.or-wrap', {}, h('div.or-cap', {}, '▲ ' + d.caps[0]), list, d.caps[1] ? h('div.or-cap', {}, '▼ ' + d.caps[1]) : null, h('div.or-foot', {}, check))));
     stretchTimer(api, el, 1 + n * 0.5);
 
     function layoutList(animate = true) {

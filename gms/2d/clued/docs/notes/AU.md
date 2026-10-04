@@ -45,7 +45,7 @@
 | classical-piano | 32 | 29 Mutopia MIDI pieces (truncated to 25–40 s) + Ode to Joy, Eine kleine Nachtmusik, Canon in D transcribed |
 | pd-melodies | 10 | Carols, hymns, Foster, music hall, Take Me Out to the Ball Game (all pre-1931 or traditional) |
 | nursery-rhymes (`kids: true`) | 10 | Twinkle, Mary, Row, Frère Jacques, London Bridge, Old MacDonald, Hot Cross Buns, Happy Birthday, Yankee Doodle, Ode to Joy, with PD lyrics |
-| anthems | 173 countries | Wikidata country → anthem → audio, mostly US Navy Band (US government, PD); 14 easy, 42 medium |
+| anthems | 173 countries | each item has `iso3` + `facts.iso3` (ISO 3166 alpha-3 from Wikidata P298; Kosovo would be XKX but has no usable recording); Wikidata country → anthem → audio, mostly US Navy Band (US government, PD); 14 easy, 42 medium |
 | classical-recordings | 18 | Commons: Musopen, US Marine/Army/Air Force bands (PD), PDP-CH (PD), Kevin MacLeod / CC BY |
 | instruments | 46 | Wikidata instrument → audio + image (images let kids pick pictures) |
 

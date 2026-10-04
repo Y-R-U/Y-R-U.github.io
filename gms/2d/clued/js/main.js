@@ -77,6 +77,7 @@ async function boot() {
   const [fr] = await Promise.all([loadFormats(), loadIndex()]);
   if (fr.failed.length) console.warn('[clued] formats failed to load:', fr.failed.join(', '));
   mountApp(document.getElementById('app'));
+  import(`./learn/hook.js?v=${BUILD}`).then(m => m.install()).catch(() => {});
   hooks();
   await go('home', {}, { replace: true });
   ready();

@@ -54,6 +54,10 @@
     "irukandji-jellyfish"
    ],
    "blurb": "A see-through jellyfish of northern Australia with a cube-shaped bell. Its sting is one of the most deadly in the world.",
+   "differences": {
+    "moon-jellyfish": "The box jellyfish has a clear cube-shaped bell with long tentacles from each corner; the moon jellyfish has a flat saucer bell with four pale rings and a fringe of short tentacles.",
+    "irukandji-jellyfish": "Both are box jellyfish; the Chironex box jellyfish has a bell up to 30 cm with many tentacles per corner, while the Irukandji is about 1 cm with one tentacle per corner."
+   },
    "clues": [
     "Class: Cubozoa.",
     "Family: Chirodropidae.",
@@ -111,6 +115,9 @@
     "box-jellyfish"
    ],
    "blurb": "A tiny box jellyfish, about the size of a fingernail. Its sting can cause terrible pain, sweating and a dangerous rise in blood pressure.",
+   "differences": {
+    "box-jellyfish": "Both are box jellyfish; the Chironex box jellyfish has a bell up to 30 cm with many tentacles per corner, while the Irukandji is about 1 cm with one tentacle per corner."
+   },
    "clues": [
     "Class: Cubozoa.",
     "Family: Carukiidae.",
@@ -163,6 +170,10 @@
     "by-the-wind-sailor"
    ],
    "blurb": "It looks like a jellyfish, but it is really a floating colony of many tiny animals working together. Its long blue tentacles sting.",
+   "differences": {
+    "bluebottle": "They are close relatives; the Atlantic Portuguese man o' war is larger with many long tentacles, while the Pacific bluebottle is smaller with usually one long fishing tentacle.",
+    "by-the-wind-sailor": "The by-the-wind sailor has a flat oval float with a stiff upright sail and short tentacles; the man o' war has a balloon-like gas float and long stinging tentacles."
+   },
    "clues": [
     "Class: Hydrozoa.",
     "Family: Physaliidae.",
@@ -222,6 +233,10 @@
     "blue-button"
    ],
    "blurb": "A small blue floating stinger that washes up on Australian beaches in thousands after onshore winds.",
+   "differences": {
+    "portuguese-man-o-war": "They are close relatives; the Atlantic Portuguese man o' war is larger with many long tentacles, while the Pacific bluebottle is smaller with usually one long fishing tentacle.",
+    "blue-button": "The blue button is a flat round disc with a ring of short blue tentacles; the bluebottle has a balloon float and a long trailing tentacle."
+   },
    "clues": [
     "Class: Hydrozoa.",
     "Family: Physaliidae.",
@@ -281,6 +296,10 @@
     "box-jellyfish"
    ],
    "blurb": "A common see-through jellyfish with four pale rings in its bell. Its sting is too weak for most people to feel.",
+   "differences": {
+    "box-jellyfish": "The box jellyfish has a clear cube-shaped bell with long tentacles from each corner; the moon jellyfish has a flat saucer bell with four pale rings and a fringe of short tentacles.",
+    "warty-comb-jelly": "The comb jelly has no stinging tentacles and shows rows of shimmering rainbow hairs; the moon jellyfish has a saucer bell with four rings and stinging tentacles."
+   },
    "clues": [
     "Class: Scyphozoa.",
     "Family: Ulmaridae.",
@@ -811,6 +830,10 @@
     "blue-button"
    ],
    "blurb": "A small blue floating animal with a stiff sail on top. Millions sometimes wash up on beaches at once.",
+   "differences": {
+    "portuguese-man-o-war": "The by-the-wind sailor has a flat oval float with a stiff upright sail and short tentacles; the man o' war has a balloon-like gas float and long stinging tentacles.",
+    "blue-button": "The blue button is round and flat with no sail; the by-the-wind sailor is oval with a stiff clear sail on top."
+   },
    "clues": [
     "Class: Hydrozoa.",
     "Family: Porpitidae.",
@@ -865,6 +888,10 @@
     "bluebottle"
    ],
    "blurb": "A small, round, floating animal with a golden disc and blue tentacles. It is not a true jellyfish.",
+   "differences": {
+    "bluebottle": "The blue button is a flat round disc with a ring of short blue tentacles; the bluebottle has a balloon float and a long trailing tentacle.",
+    "by-the-wind-sailor": "The blue button is round and flat with no sail; the by-the-wind sailor is oval with a stiff clear sail on top."
+   },
    "clues": [
     "Class: Hydrozoa.",
     "Family: Porpitidae.",
@@ -1078,6 +1105,9 @@
     "red-lionfish"
    ],
    "blurb": "The most venomous fish in the world. It looks just like a lumpy rock, and its spines sting people who step on it.",
+   "differences": {
+    "red-lionfish": "The lionfish is striped red and white with long feathery fins and swims in the open; the stonefish is lumpy and rock-coloured and lies still on the bottom."
+   },
    "clues": [
     "Class: Actinopterygii.",
     "Family: Synanceiidae.",
@@ -1136,6 +1166,9 @@
     "stonefish"
    ],
    "blurb": "A striped fish with long venomous spines. It has invaded the Caribbean, where it eats many native fish.",
+   "differences": {
+    "stonefish": "The lionfish is striped red and white with long feathery fins and swims in the open; the stonefish is lumpy and rock-coloured and lies still on the bottom."
+   },
    "clues": [
     "Class: Actinopterygii.",
     "Family: Scorpaenidae.",
@@ -1190,6 +1223,9 @@
     "geography-cone"
    ],
    "blurb": "A tiny octopus that flashes bright blue rings when alarmed. Its bite contains a venom with no antidote.",
+   "differences": {
+    "geography-cone": "One is a small octopus that flashes bright blue rings; the other is a sea snail with a patterned cone-shaped shell. Both are deadly and should never be handled."
+   },
    "clues": [
     "Class: Cephalopoda.",
     "Its venom is the same toxin found in pufferfish.",
@@ -1246,6 +1282,9 @@
     "blue-ringed-octopus"
    ],
    "blurb": "A sea snail with a beautiful patterned shell that fires a venomous harpoon. It has killed people.",
+   "differences": {
+    "blue-ringed-octopus": "One is a small octopus that flashes bright blue rings; the other is a sea snail with a patterned cone-shaped shell. Both are deadly and should never be handled."
+   },
    "clues": [
     "Class: Gastropoda.",
     "Family: Conidae.",
@@ -1457,6 +1496,9 @@
     "moon-jellyfish"
    ],
    "blurb": "A see-through comb jelly with rows of shimmering hairs. It is not a jellyfish and cannot sting.",
+   "differences": {
+    "moon-jellyfish": "The comb jelly has no stinging tentacles and shows rows of shimmering rainbow hairs; the moon jellyfish has a saucer bell with four rings and stinging tentacles."
+   },
    "clues": [
     "Class: Tentaculata.",
     "Family: Bolinopsidae.",

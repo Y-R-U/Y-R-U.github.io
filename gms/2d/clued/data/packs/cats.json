@@ -155,6 +155,9 @@
     "oriental-shorthair"
    ],
    "blurb": "A slim, chatty cat with blue eyes and dark ears, face, paws and tail.",
+   "differences": {
+    "oriental-shorthair": "The Siamese has dark points and blue eyes; the Oriental Shorthair has the same build but comes in hundreds of solid colours and patterns, usually with green eyes."
+   },
    "clues": [
     "Its dark points are caused by a gene that responds to cold.",
     "Kittens are born almost white.",
@@ -295,6 +298,10 @@
     "savannah"
    ],
    "blurb": "A spotted cat that looks like a little leopard. It was bred from wild leopard cats and pet cats.",
+   "differences": {
+    "ocicat": "The Bengal has wild leopard cat ancestry and often a glittery coat with rosettes; the Ocicat has no wild ancestry and has solid thumbprint spots.",
+    "savannah": "The Savannah is much taller and leggier, with huge ears, and descends from the serval; the Bengal is medium-sized and descends from the Asian leopard cat."
+   },
    "clues": [
     "It was bred from the wild Asian leopard cat.",
     "Its coat can shimmer with a \"glitter\" effect.",
@@ -678,6 +685,9 @@
     "sphynx"
    ],
    "blurb": "An elf-like cat with huge ears and a short, wavy coat. It is playful and mischievous.",
+   "differences": {
+    "cornish-rex": "The Devon Rex has huge low-set ears, an elf-like face and a looser wavy coat; the Cornish Rex has a tight marcel-wave coat and a slim, arched, greyhound-like body."
+   },
    "clues": [
     "It was found in Buckfastleigh in 1960.",
     "It is nicknamed the \"poodle cat\".",
@@ -715,6 +725,9 @@
     "devon-rex"
    ],
    "blurb": "A slim cat with a short, tightly curled coat that feels like velvet. It can run very fast.",
+   "differences": {
+    "devon-rex": "The Devon Rex has huge low-set ears, an elf-like face and a looser wavy coat; the Cornish Rex has a tight marcel-wave coat and a slim, arched, greyhound-like body."
+   },
    "clues": [
     "The first one was a kitten named Kallibunker.",
     "Its coat has no outer guard hairs.",
@@ -763,6 +776,9 @@
     "siamese"
    ],
    "blurb": "A slim, long-legged cat with huge ears, closely related to the Siamese, but in hundreds of colours.",
+   "differences": {
+    "siamese": "The Siamese has dark points and blue eyes; the Oriental Shorthair has the same build but comes in hundreds of solid colours and patterns, usually with green eyes."
+   },
    "clues": [
     "It comes in hundreds of colours and patterns.",
     "It is very talkative.",
@@ -1104,6 +1120,9 @@
     "bengal"
    ],
    "blurb": "A tall, spotted cat bred from a pet cat and a wild African serval. It can leap very high.",
+   "differences": {
+    "bengal": "The Savannah is much taller and leggier, with huge ears, and descends from the serval; the Bengal is medium-sized and descends from the Asian leopard cat."
+   },
    "clues": [
     "It was bred from a pet cat and a wild serval.",
     "It can jump about 2.5 metres high.",
@@ -1422,6 +1441,9 @@
     "egyptian-mau"
    ],
    "blurb": "A spotted cat that looks wild, but it has no wild cat in its family tree. It came from a Siamese–Abyssinian cross.",
+   "differences": {
+    "bengal": "The Bengal has wild leopard cat ancestry and often a glittery coat with rosettes; the Ocicat has no wild ancestry and has solid thumbprint spots."
+   },
    "clues": [
     "It has no wild ancestry at all.",
     "It came from a Siamese and Abyssinian cross.",
@@ -1694,6 +1716,9 @@
     "selkirk-rex"
    ],
    "blurb": "A cat with a loose, curly coat. The first one, Curly, was born bald on a farm in Oregon.",
+   "differences": {
+    "selkirk-rex": "The Selkirk Rex is big and cobby with a thick plush curly coat; the LaPerm is lighter-built with a looser, springy coat."
+   },
    "clues": [
     "The first one was born on an Oregon farm in 1982.",
     "Kittens may be born bald.",
@@ -1732,6 +1757,9 @@
     "devon-rex"
    ],
    "blurb": "A big, cuddly cat with a thick curly coat, first found in Montana in 1987.",
+   "differences": {
+    "laperm": "The Selkirk Rex is big and cobby with a thick plush curly coat; the LaPerm is lighter-built with a looser, springy coat."
+   },
    "clues": [
     "The first one was found in Montana in 1987.",
     "It comes in long and short coats.",

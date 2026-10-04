@@ -97,7 +97,7 @@ defineScreen('challenge', async (el, { id }, cur) => {
     el.classList.remove('playing');
     el.innerHTML = '';
     const name = h('input.field', { type: 'text', maxlength: String(MAX_NAME), autocomplete: 'nickname', placeholder: 'Your name', 'aria-label': 'Your name', id: 'net-cname' });
-    suggestedName().then(n => { if (!name.value) name.value = n; });
+    suggestedName().then(n => { if (!name.value && n && document.activeElement !== name) name.value = n; });
     const err = h('p.net-err', { role: 'alert' });
     const form = h('form.net-form', {}, h('label', { for: 'net-cname' }, 'Your name'), name, err, h('button.btn.go.big.wide', { type: 'submit', dataset: { act: 'play' } }, 'Play'));
     form.addEventListener('submit', e => {

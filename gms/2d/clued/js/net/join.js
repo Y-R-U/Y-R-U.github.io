@@ -22,7 +22,7 @@ const MAX_SET = 500 * 1024;
 function nameField(value = '') {
   const input = h('input.field', { type: 'text', maxlength: String(MAX_NAME), autocomplete: 'nickname', autocapitalize: 'words', spellcheck: 'false', enterkeyhint: 'go', placeholder: 'Your name', 'aria-label': 'Your name', dataset: { field: 'name' } });
   input.value = value;
-  suggestedName().then(n => { if (!input.value && n) input.value = n; });
+  suggestedName().then(n => { if (!input.value && n && document.activeElement !== input) input.value = n; });
   return input;
 }
 

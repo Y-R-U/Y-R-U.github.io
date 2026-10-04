@@ -81,6 +81,14 @@ async function main() {
     const p = JSON.parse(fs.readFileSync(path.join(MUSIC, f), 'utf8'));
     packs.push(p);
     checkPack(p, f).forEach(fail);
+    if (p.id === 'anthems') {
+      const codes = new Set();
+      for (const i of p.items) {
+        if (!/^[A-Z]{3}$/.test(i.iso3 || '') || i.facts?.iso3 !== i.iso3) fail(`anthems/${i.id}: iso3 missing or not matching facts.iso3`);
+        if (codes.has(i.iso3)) fail(`anthems: duplicate iso3 ${i.iso3}`);
+        codes.add(i.iso3);
+      }
+    }
     const easy = p.items.filter((i) => i.difficulty === 1).length;
     if (easy < 15) warn(`${p.id}: only ${easy} difficulty-1 items (target 15)`);
     console.log(`ok   ${p.id}: ${p.items.length} items, ${easy} easy`);

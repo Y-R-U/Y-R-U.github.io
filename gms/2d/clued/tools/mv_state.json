@@ -592,7 +592,8 @@
  "cars-1": {
   "seed": 29120,
   "model": "flux2-klein-9b-mlx-4bit",
-  "at": "2026-10-04T18:07:47.273Z"
+  "at": "2026-10-04T18:07:47.273Z",
+  "attempt": 1
  },
  "happy-feet-1": {
   "seed": 63714,
@@ -633,5 +634,77 @@
   "seed": 45326,
   "model": "flux2-klein-9b-mlx-4bit",
   "at": "2026-10-04T18:23:59.791Z"
+ },
+ "inception-1": {
+  "seed": 27126,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:26:06.088Z",
+  "attempt": 1
+ },
+ "tangled-1": {
+  "seed": 82724,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:28:02.187Z"
+ },
+ "how-to-train-your-dragon-1": {
+  "seed": 41484,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:30:11.600Z"
+ },
+ "life-of-pi-1": {
+  "seed": 19431,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:32:16.412Z"
+ },
+ "brave-1": {
+  "seed": 84271,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:34:25.210Z"
+ },
+ "the-hunger-games-1": {
+  "seed": 66444,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:37:01.318Z"
+ },
+ "frozen-1": {
+  "seed": 81825,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:39:26.793Z"
+ },
+ "gravity-1": {
+  "seed": 19115,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:41:32.207Z"
+ },
+ "interstellar-1": {
+  "seed": 70320,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:43:15.968Z"
+ },
+ "paddington-1": {
+  "seed": 14677,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:45:21.206Z",
+  "attempt": 1
+ },
+ "the-grand-budapest-hotel-1": {
+  "seed": 71141,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:47:04.976Z"
+ },
+ "mad-max-fury-road-1": {
+  "seed": 6176,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:48:38.455Z"
+ },
+ "inside-out-1": {
+  "seed": 35022,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:50:06.356Z"
+ },
+ "the-martian-1": {
+  "seed": 11267,
+  "model": "flux2-klein-9b-mlx-4bit",
+  "at": "2026-10-04T18:51:26.666Z"
  }
 }

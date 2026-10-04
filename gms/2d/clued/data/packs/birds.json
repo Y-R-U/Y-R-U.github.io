@@ -52,6 +52,9 @@
     "southern-cassowary"
    ],
    "blurb": "Australia's tallest bird. It cannot fly, but it can run at about 50 km/h.",
+   "differences": {
+    "southern-cassowary": "The cassowary has a tall horny casque, a bright blue neck and red wattles and lives in rainforest; the emu is brown and shaggy with no casque and lives in open country."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Casuariidae.",
@@ -123,6 +126,9 @@
     "ostrich"
    ],
    "blurb": "A huge flightless bird of rainforests in north Queensland and New Guinea. It has a tall helmet on its head and a dagger-like claw on each foot.",
+   "differences": {
+    "emu": "The cassowary has a tall horny casque, a bright blue neck and red wattles and lives in rainforest; the emu is brown and shaggy with no casque and lives in open country."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Casuariidae.",
@@ -249,6 +255,9 @@
     "galah"
    ],
    "blurb": "A big, noisy white parrot with a yellow crest. In Sydney, some have learned to open wheelie bins.",
+   "differences": {
+    "galah": "The galah is pink and grey with a short pale crest; the sulphur-crested cockatoo is white with a long yellow crest."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Cacatuidae.",
@@ -309,6 +318,9 @@
     "sulphur-crested-cockatoo"
    ],
    "blurb": "A pink-and-grey cockatoo found all over Australia. Its name is also Australian slang for a silly person.",
+   "differences": {
+    "sulphur-crested-cockatoo": "The galah is pink and grey with a short pale crest; the sulphur-crested cockatoo is white with a long yellow crest."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Cacatuidae.",
@@ -372,6 +384,9 @@
     "crimson-rosella"
    ],
    "blurb": "A brilliantly coloured parrot with a blue head, green back and orange chest. It drinks nectar with a brush-tipped tongue.",
+   "differences": {
+    "crimson-rosella": "The crimson rosella is red with blue cheeks and wings; the rainbow lorikeet has a blue head, orange chest and green back."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Psittaculidae.",
@@ -428,6 +443,9 @@
     "rainbow-lorikeet"
    ],
    "blurb": "A bright red parrot with blue cheeks and wings, common in forests of south-eastern Australia.",
+   "differences": {
+    "rainbow-lorikeet": "The crimson rosella is red with blue cheeks and wings; the rainbow lorikeet has a blue head, orange chest and green back."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Psittaculidae.",
@@ -489,6 +507,9 @@
     "cockatiel"
    ],
    "blurb": "A small green-and-yellow Australian parrot and one of the most popular pet birds in the world.",
+   "differences": {
+    "cockatiel": "The budgerigar is small and green and yellow with wavy black bars; the cockatiel is bigger and grey with a yellow face, orange cheeks and a tall crest."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Psittaculidae.",
@@ -555,6 +576,9 @@
     "budgerigar"
    ],
    "blurb": "A small grey cockatoo with a yellow face, orange cheeks and a tall crest. It is a very popular pet.",
+   "differences": {
+    "budgerigar": "The budgerigar is small and green and yellow with wavy black bars; the cockatiel is bigger and grey with a yellow face, orange cheeks and a tall crest."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Cacatuidae.",
@@ -622,6 +646,9 @@
     "pied-currawong"
    ],
    "blurb": "A black-and-white Australian songbird with a beautiful warbling call. In spring, some swoop on people near their nests.",
+   "differences": {
+    "pied-currawong": "The currawong has yellow eyes and is mostly black with white patches on wings and tail; the magpie has red-brown eyes and a white nape."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Artamidae.",
@@ -687,6 +714,9 @@
     "australian-magpie"
    ],
    "blurb": "A big black bird with yellow eyes and white patches, found in eastern Australia. Its name copies its call.",
+   "differences": {
+    "australian-magpie": "The currawong has yellow eyes and is mostly black with white patches on wings and tail; the magpie has red-brown eyes and a white nape."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Artamidae.",

@@ -270,6 +270,9 @@
     "large-intestine"
    ],
    "blurb": "A long, coiled tube where most food is digested and absorbed. It is about 6 metres long.",
+   "differences": {
+    "large-intestine": "The small intestine is long (about 6 m) and narrow and absorbs most nutrients; the large intestine is shorter, wider and absorbs water."
+   },
    "clues": [
     "Its lining is covered in tiny finger-like villi.",
     "Its first part is called the duodenum.",
@@ -312,6 +315,9 @@
     "small-intestine"
    ],
    "blurb": "The last part of the gut. It soaks up water and is home to trillions of helpful bacteria.",
+   "differences": {
+    "small-intestine": "The small intestine is long (about 6 m) and narrow and absorbs most nutrients; the large intestine is shorter, wider and absorbs water."
+   },
    "clues": [
     "Trillions of bacteria live in it.",
     "It soaks up water from waste.",
@@ -713,6 +719,9 @@
     "humerus"
    ],
    "blurb": "The thigh bone, the longest and strongest bone in the body.",
+   "differences": {
+    "humerus": "The femur is the thigh bone and the longest bone in the body; the humerus is the upper arm bone."
+   },
    "clues": [
     "Its top end forms part of the hip joint.",
     "Its bottom end forms part of the knee.",
@@ -1019,6 +1028,9 @@
     "femur"
    ],
    "blurb": "The long bone of the upper arm. Knocking a nerve near it gives the tingle of your \"funny bone\".",
+   "differences": {
+    "femur": "The femur is the thigh bone and the longest bone in the body; the humerus is the upper arm bone."
+   },
    "clues": [
     "Its ball fits into the shoulder socket.",
     "Its name sounds like the word for being amusing.",

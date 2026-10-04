@@ -21,7 +21,7 @@ const BASE_CSS = `
 .f-pop{animation:f-pop .45s cubic-bezier(.2,1.8,.4,1)}
 @keyframes f-pop{40%{transform:scale(1.08)}}
 .f-shake{animation:shake .4s}
-.f-stage{flex:1;display:flex;flex-direction:column;gap:12px;width:100%;max-width:640px;margin:0 auto;min-height:0}
+.f-stage{flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px;width:100%;max-width:640px;margin:0 auto;min-height:0}
 .f-stage .q-prompt{font-size:clamp(20px,5.6vw,28px)}
 .play.kids .f-stage .q-prompt{font-size:clamp(24px,6.8vw,34px)}
 .f-more{align-self:center}

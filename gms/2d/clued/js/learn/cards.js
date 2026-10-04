@@ -9,7 +9,7 @@ import { themeTree, getPack, itemsFor, refOf, thumb, factRows, kidsOn } from './
 import { getCards, updateCards, gradeCard, today } from './model.js?v=1';
 import { buildQueue, dueSummary, INTERVALS, MAX_BOX } from './srs.js?v=1';
 import { carousel } from './item.js?v=1';
-import { say, sayBtn, emptyState, notice, stopAudio, soundBtn } from './ui.js?v=1';
+import { say, sayBtn, emptyState, notice, stopAudio, soundBtn, put } from './ui.js?v=1';
 
 const KIDS_STAR_CAP = 10;
 
@@ -32,7 +32,7 @@ export async function deckSetup(el) {
     const s = dueSummary(dd.cards, await deckRefs(dd.decks, kids), today(), dd.newSeen);
     const games = Object.values(dd.cards).filter(c => c.g).length;
     sumEl.innerHTML = '';
-    sumEl.append(
+    put(sumEl,
       stat(s.due, 'due'), stat(s.fresh, 'new today'), stat(s.learning, 'learning'), stat(s.mastered, 'learned'),
       games ? h('p.tiny.muted.l-gamefeed', {}, `🎯 ${games} missed in games waiting for you`) : null);
     startBtn.disabled = s.total === 0;

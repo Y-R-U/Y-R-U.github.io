@@ -73,6 +73,10 @@
     "eastern-mouse-spider"
    ],
    "blurb": "A glossy black spider from around Sydney. Its venom can kill a person. Since antivenom arrived in 1981, no one has died from its bite.",
+   "differences": {
+    "trapdoor-spider": "The funnel-web is glossy black with a shiny head and lives in silk-lined burrows with trip-lines; trapdoor spiders are usually brown and duller, and many close their burrows with a lid.",
+    "eastern-mouse-spider": "The mouse spider has a very high, domed head with huge jaws, and males often have a blue body; the funnel-web has a flatter, glossy head and long spinnerets at the back."
+   },
    "clues": [
     "Family: Atracidae.",
     "Genus: Atrax.",
@@ -134,6 +138,11 @@
     "false-widow-spider"
    ],
    "blurb": "A small black Australian spider with a red stripe on its back. It likes sheds, letterboxes and outdoor toilets.",
+   "differences": {
+    "black-widow": "Both are widow spiders; the redback has a red stripe on its back, while the black widow usually has a red hourglass underneath and no stripe on top. They live on different continents.",
+    "false-widow-spider": "The false widow is brown with a cream skull-like pattern; the redback is glossy black with a red stripe.",
+    "black-house-spider": "The black house spider is dark brown-black with no red stripe and builds lacy funnel webs on buildings; the redback has a red stripe and builds messy tangled webs."
+   },
    "clues": [
     "Family: Theridiidae.",
     "Genus: Latrodectus.",
@@ -249,6 +258,9 @@
     "wolf-spider"
    ],
    "blurb": "Big, flat, fast spiders that often turn up on walls and in cars in Australia. They look scary but are harmless.",
+   "differences": {
+    "wolf-spider": "Huntsmen are flat, with legs that spread sideways like a crab and live on walls and bark; wolf spiders are stockier, hold their legs under the body and hunt on the ground."
+   },
    "clues": [
     "Family: Sparassidae.",
     "Its legs spread out sideways, like a crab.",
@@ -310,6 +322,9 @@
     "european-garden-spider"
    ],
    "blurb": "A large spider with long banded legs that spins a huge web of golden silk. The female is many times bigger than the male.",
+   "differences": {
+    "european-garden-spider": "The golden orb-weaver is long and slender with banded, tufted legs and golden silk; the garden spider has a round abdomen with a white cross and makes white webs."
+   },
    "clues": [
     "Family: Nephilidae.",
     "Genus: Trichonephila.",
@@ -370,6 +385,9 @@
     "sydney-funnel-web-spider"
    ],
    "blurb": "A stocky burrowing spider of eastern Australia with big, bulging jaws. Males wander by day looking for mates.",
+   "differences": {
+    "sydney-funnel-web-spider": "The mouse spider has a very high, domed head with huge jaws, and males often have a blue body; the funnel-web has a flatter, glossy head and long spinnerets at the back."
+   },
    "clues": [
     "Family: Actinopodidae.",
     "Genus: Missulena.",
@@ -428,6 +446,9 @@
     "sydney-funnel-web-spider"
    ],
    "blurb": "Burrowing spiders that close their burrows with a hinged lid of soil and silk. They wait under the lid and grab passing insects.",
+   "differences": {
+    "sydney-funnel-web-spider": "The funnel-web is glossy black with a shiny head and lives in silk-lined burrows with trip-lines; trapdoor spiders are usually brown and duller, and many close their burrows with a lid."
+   },
    "clues": [
     "Family: Idiopidae.",
     "Some live for over 40 years.",
@@ -485,6 +506,9 @@
     "huntsman-spider"
    ],
    "blurb": "Hairy ground spiders that chase down prey instead of using webs. Mothers carry their babies on their backs.",
+   "differences": {
+    "huntsman-spider": "Huntsmen are flat, with legs that spread sideways like a crab and live on walls and bark; wolf spiders are stockier, hold their legs under the body and hunt on the ground."
+   },
    "clues": [
     "Family: Lycosidae.",
     "Their eyes shine green in torchlight.",
@@ -539,6 +563,9 @@
     "web": false
    },
    "blurb": "A tiny Australian jumping spider. The male raises a brightly coloured flap and dances to win a mate.",
+   "differences": {
+    "jumping-spider": "Peacock spiders are tiny Australian jumping spiders whose males have a bright fan on the abdomen; most other jumping spiders have no fan."
+   },
    "clues": [
     "Family: Salticidae.",
     "Genus: Maratus.",
@@ -598,6 +625,9 @@
     "wasp-spider"
    ],
    "blurb": "An Australian orb-weaver that adds bright zig-zag bands to its web in the shape of a cross.",
+   "differences": {
+    "wasp-spider": "Both make zig-zag silk bands; the St Andrew's cross spider is Australian and arranges them in an X, while the European wasp spider has bold yellow and black stripes and a single vertical band."
+   },
    "clues": [
     "Family: Araneidae.",
     "Genus: Argiope.",
@@ -655,6 +685,9 @@
     "redback-spider"
    ],
    "blurb": "A dark, shy spider that builds messy, funnel-shaped webs in window frames and walls in Australia.",
+   "differences": {
+    "redback-spider": "The black house spider is dark brown-black with no red stripe and builds lacy funnel webs on buildings; the redback has a red stripe and builds messy tangled webs."
+   },
    "clues": [
     "Family: Desidae.",
     "Genus: Badumna.",
@@ -889,6 +922,11 @@
     "false-widow-spider"
    ],
    "blurb": "A glossy black American spider with a red hourglass under its belly. The female sometimes eats the male.",
+   "differences": {
+    "redback-spider": "Both are widow spiders; the redback has a red stripe on its back, while the black widow usually has a red hourglass underneath and no stripe on top. They live on different continents.",
+    "brown-widow": "The brown widow is paler brown with an orange hourglass and spiky egg sacs; the black widow is glossy black with a red hourglass and smooth egg sacs.",
+    "false-widow-spider": "The false widow is brown with cream markings and no red hourglass; the black widow is glossy black with a red hourglass underneath."
+   },
    "clues": [
     "Family: Theridiidae.",
     "Genus: Latrodectus.",
@@ -947,6 +985,9 @@
     "black-widow"
    ],
    "blurb": "A widow spider that has spread around the warm parts of the world. Its egg sacs are covered in spiky bumps.",
+   "differences": {
+    "black-widow": "The brown widow is paler brown with an orange hourglass and spiky egg sacs; the black widow is glossy black with a red hourglass and smooth egg sacs."
+   },
    "clues": [
     "Family: Theridiidae.",
     "Genus: Latrodectus.",
@@ -1177,6 +1218,10 @@
     "mexican-red-knee-tarantula"
    ],
    "blurb": "The heaviest spider in the world, from South American rainforests. Despite its name, it rarely eats birds.",
+   "differences": {
+    "mexican-red-knee-tarantula": "The goliath birdeater is huge and plain brown; the Mexican red-knee is smaller and black with orange bands at its leg joints.",
+    "tarantula": "The goliath birdeater is one kind of tarantula, the heaviest of all; \"tarantula\" covers about 1,000 species."
+   },
    "clues": [
     "Family: Theraphosidae.",
     "Genus: Theraphosa.",
@@ -1238,6 +1283,11 @@
     "chilean-rose-tarantula"
    ],
    "blurb": "A calm, colourful tarantula from Mexico and a favourite pet. Females can live for over 25 years.",
+   "differences": {
+    "goliath-birdeater": "The goliath birdeater is huge and plain brown; the Mexican red-knee is smaller and black with orange bands at its leg joints.",
+    "chilean-rose-tarantula": "The red-knee has bright orange leg bands; the Chilean rose is plainer grey-brown with a pinkish sheen.",
+    "tarantula": "The Mexican red-knee is one kind of tarantula, black with orange leg bands; \"tarantula\" covers about 1,000 species."
+   },
    "clues": [
     "Family: Theraphosidae.",
     "Genus: Brachypelma.",
@@ -1298,6 +1348,9 @@
     "mexican-red-knee-tarantula"
    ],
    "blurb": "A gentle tarantula from South America and one of the most common pet spiders.",
+   "differences": {
+    "mexican-red-knee-tarantula": "The red-knee has bright orange leg bands; the Chilean rose is plainer grey-brown with a pinkish sheen."
+   },
    "clues": [
     "Family: Theraphosidae.",
     "Genus: Grammostola.",
@@ -1357,6 +1410,9 @@
     "legSpanCm": 20
    },
    "blurb": "A bright blue tree-dwelling tarantula from a small patch of forest in India. It is critically endangered.",
+   "differences": {
+    "indian-ornamental-tarantula": "The Gooty sapphire is metallic blue all over; the Indian ornamental is grey, black and white with yellow under its front legs."
+   },
    "clues": [
     "Family: Theraphosidae.",
     "Genus: Poecilotheria.",
@@ -1411,6 +1467,9 @@
     "australian-golden-orb-weaver"
    ],
    "blurb": "The common orb-weaver of European gardens in autumn. It has a white cross of spots on its back.",
+   "differences": {
+    "australian-golden-orb-weaver": "The golden orb-weaver is long and slender with banded, tufted legs and golden silk; the garden spider has a round abdomen with a white cross and makes white webs."
+   },
    "clues": [
     "Family: Araneidae.",
     "Genus: Araneus.",
@@ -1467,6 +1526,10 @@
     "st-andrews-cross-spider"
    ],
    "blurb": "A striking orb-weaver with yellow and black stripes. It has spread north through Europe as the climate has warmed.",
+   "differences": {
+    "st-andrews-cross-spider": "Both make zig-zag silk bands; the St Andrew's cross spider is Australian and arranges them in an X, while the European wasp spider has bold yellow and black stripes and a single vertical band.",
+    "yellow-garden-spider": "The wasp spider has many thin yellow and black stripes; the yellow garden spider is larger with big yellow patches on black. They live on different continents."
+   },
    "clues": [
     "Family: Araneidae.",
     "Genus: Argiope.",
@@ -1528,6 +1591,9 @@
     "wasp-spider"
    ],
    "blurb": "A large black-and-yellow orb-weaver of North American gardens. The thick zig-zag in its web inspired the nickname \"writing spider\".",
+   "differences": {
+    "wasp-spider": "The wasp spider has many thin yellow and black stripes; the yellow garden spider is larger with big yellow patches on black. They live on different continents."
+   },
    "clues": [
     "Family: Araneidae.",
     "Genus: Argiope.",
@@ -1583,6 +1649,10 @@
     "bold-jumping-spider"
    ],
    "blurb": "A small black-and-white jumping spider often seen hunting on sunny walls in Europe and North America.",
+   "differences": {
+    "bold-jumping-spider": "The zebra jumping spider is small with black and white stripes; the bold jumping spider is bigger, fuzzy black with white spots and green-blue jaws.",
+    "jumping-spider": "The zebra jumping spider is one kind of jumping spider, with black and white stripes; \"jumping spider\" covers over 6,000 species."
+   },
    "clues": [
     "Family: Salticidae.",
     "Genus: Salticus.",
@@ -1642,6 +1712,10 @@
     "regal-jumping-spider"
    ],
    "blurb": "A fuzzy black jumping spider of North America with shiny green-blue jaws.",
+   "differences": {
+    "zebra-jumping-spider": "The zebra jumping spider is small with black and white stripes; the bold jumping spider is bigger, fuzzy black with white spots and green-blue jaws.",
+    "regal-jumping-spider": "They are close relatives; regal jumping spiders are larger and females are often orange or grey, while bold jumping spiders are black with a white triangle and spots."
+   },
    "clues": [
     "Family: Salticidae.",
     "Genus: Phidippus.",
@@ -1700,6 +1774,9 @@
     "bold-jumping-spider"
    ],
    "blurb": "The largest jumping spider in eastern North America. Females are often orange or grey.",
+   "differences": {
+    "bold-jumping-spider": "They are close relatives; regal jumping spiders are larger and females are often orange or grey, while bold jumping spiders are black with a white triangle and spots."
+   },
    "clues": [
     "Family: Salticidae.",
     "Genus: Phidippus.",
@@ -2096,6 +2173,10 @@
     "redback-spider"
    ],
    "blurb": "A spider from the Canary Islands that has spread across Britain and Europe. Its bite hurts but is rarely serious.",
+   "differences": {
+    "redback-spider": "The false widow is brown with a cream skull-like pattern; the redback is glossy black with a red stripe.",
+    "black-widow": "The false widow is brown with cream markings and no red hourglass; the black widow is glossy black with a red hourglass underneath."
+   },
    "clues": [
     "Family: Theridiidae.",
     "Genus: Steatoda.",
@@ -2153,6 +2234,9 @@
     "hobo-spider"
    ],
    "blurb": "A big, fast, long-legged spider that appears in European homes in autumn. It is one of the fastest spiders.",
+   "differences": {
+    "hobo-spider": "They are very hard to tell apart by eye; the giant house spider is usually larger and longer-legged, while the hobo spider has a clearer herringbone pattern. Experts check the reproductive parts."
+   },
    "clues": [
     "Family: Agelenidae.",
     "Genus: Eratigena.",
@@ -2211,6 +2295,9 @@
     "giant-house-spider"
    ],
    "blurb": "A brown funnel-weaver from Europe that spread to the north-western USA. It was wrongly blamed for nasty bites.",
+   "differences": {
+    "giant-house-spider": "They are very hard to tell apart by eye; the giant house spider is usually larger and longer-legged, while the hobo spider has a clearer herringbone pattern. Experts check the reproductive parts."
+   },
    "clues": [
     "Family: Agelenidae.",
     "Genus: Eratigena.",
@@ -2326,6 +2413,9 @@
     "gooty-sapphire-tarantula"
    ],
    "blurb": "A fast, tree-dwelling tarantula from India with bold grey, black and yellow patterns.",
+   "differences": {
+    "gooty-sapphire-tarantula": "The Gooty sapphire is metallic blue all over; the Indian ornamental is grey, black and white with yellow under its front legs."
+   },
    "clues": [
     "Family: Theraphosidae.",
     "Genus: Poecilotheria.",
@@ -2385,6 +2475,10 @@
     "peacock-spider"
    ],
    "blurb": "Small spiders with big front eyes that stalk and pounce on insects. They have some of the best eyesight of any small animal.",
+   "differences": {
+    "zebra-jumping-spider": "The zebra jumping spider is one kind of jumping spider, with black and white stripes; \"jumping spider\" covers over 6,000 species.",
+    "peacock-spider": "Peacock spiders are tiny Australian jumping spiders whose males have a bright fan on the abdomen; most other jumping spiders have no fan."
+   },
    "clues": [
     "Family: Salticidae.",
     "They are the largest family of spiders, with over 6,000 kinds.",
@@ -2443,6 +2537,10 @@
     "mexican-red-knee-tarantula"
    ],
    "blurb": "Big, hairy spiders found in warm places around the world. Many are kept as pets and live for many years.",
+   "differences": {
+    "goliath-birdeater": "The goliath birdeater is one kind of tarantula, the heaviest of all; \"tarantula\" covers about 1,000 species.",
+    "mexican-red-knee-tarantula": "The Mexican red-knee is one kind of tarantula, black with orange leg bands; \"tarantula\" covers about 1,000 species."
+   },
    "clues": [
     "Family: Theraphosidae.",
     "Some flick itchy hairs at attackers.",

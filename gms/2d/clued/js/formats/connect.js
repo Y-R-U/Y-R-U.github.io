@@ -117,14 +117,14 @@ export default register({
     let sel = new Set(), lives = d.lives, done = false;
     const solved = new Set(), guesses = new Set();
     const solvedEl = h('div.cn-solved');
-    const grid = h('div.cn-grid', { style: { '--cols': S } });
+    const grid = h('div.cn-grid', { style: `--cols:${S}` });
     const tiles = d.tiles.map((t, i) => {
-      const b = h('button.cn-t', { type: 'button', style: { '--i': i }, dataset: { i: String(i) } }, t);
+      const b = h('button.cn-t', { type: 'button', style: `--i:${i}`, dataset: { i: String(i) } }, t);
       b.addEventListener('click', () => toggle(i));
       return b;
     });
     grid.append(...tiles);
-    const livesEl = h('div.cn-lives', {}, 'Mistakes', ...Array.from({ length: lives }, () => h('i')));
+    const livesEl = h('div.cn-lives', {}, 'Mistakes left', ...Array.from({ length: lives }, () => h('i')));
     const submit = h('button.btn.go', { type: 'button', disabled: true, onclick: () => guess() }, 'Submit');
     const shuffleBtn = h('button.btn', { type: 'button', onclick: () => reshuffle() }, 'Shuffle');
     const clear = h('button.btn', { type: 'button', onclick: () => { sel.clear(); paint(); } }, 'Clear');

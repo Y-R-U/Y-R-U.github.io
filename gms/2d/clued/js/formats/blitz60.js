@@ -40,7 +40,7 @@ function categories(pack) {
     if (m.type === 'cat') {
       const counts = {};
       for (const it of items) for (const v of [].concat(it.facts?.[key] ?? [])) counts[v] = (counts[v] || 0) + 1;
-      for (const [v, c] of Object.entries(counts)) if (c >= 6 && c < items.length) out.push({ label: `${title}: ${m.label || key} ${v}`, key: `${key}=${v}`, test: it => [].concat(it.facts?.[key] ?? []).map(String).includes(v) });
+      for (const [v, c] of Object.entries(counts)) if (c >= 6 && c < items.length) out.push({ label: `${title} (${String(m.label || key).toLowerCase()}: ${v})`, key: `${key}=${v}`, test: it => [].concat(it.facts?.[key] ?? []).map(String).includes(v) });
     } else if (m.type === 'bool') {
       const c = items.filter(it => it.facts?.[key] === true).length;
       if (c >= 6 && c < items.length) out.push({ label: `${title}: ${factText(m, true).toLowerCase()}`, key: `${key}=true`, test: it => it.facts?.[key] === true });
@@ -61,7 +61,7 @@ function make(rng, pack, difficulty) {
   const n = list.length;
   return {
     format: 'blitz60', id: `blitz60:${pack.id}:${cat.key}`, prompt: `Name as many as you can: ${cat.label}`,
-    answer: n, answerText: `${n} in all`, refs: list.map(t => t.ref).slice(0, 60), pack: pack.id,
+    answer: n, answerText: list.length > 8 ? `${list.slice(0, 8).map(t => t.name).join(', ')} and ${list.length - 8} more` : list.map(t => t.name).join(', '), refs: list.map(t => t.ref).slice(0, 60), pack: pack.id,
     data: { targets: list.map(t => ({ name: t.name, accept: t.accept })), goal: Math.max(3, Math.min(10, Math.ceil(n * 0.4))), level: difficulty, seconds: 60 },
   };
 }
@@ -86,9 +86,9 @@ export default register({
     const found = new Set();
     const showGrid = total <= 80;
     const lvl = d.level || 0;
-    const clock = h('div.bz-clock', { style: { '--p': 1 } }, h('span', {}, String(d.seconds)));
+    const clock = h('div.bz-clock', { style: `--p:${1}` }, h('span', {}, String(d.seconds)));
     const countEl = h('div.bz-count', {}, '0', h('small', {}, ` / ${total}`));
-    const grid = h('div.bz-grid', { style: { '--w': total > 40 ? '84px' : '104px' } });
+    const grid = h('div.bz-grid', { style: `--w:${total > 40 ? '84px' : '104px'}` });
     const slots = T.map(t => {
       const hint = !showGrid ? '' : lvl === 1 ? `${t.name.charAt(0)}${'·'.repeat(Math.min(10, t.name.length - 1))}` : lvl === 3 ? '' : t.name.charAt(0);
       const s = h('div.bz-s', {}, hint);

@@ -383,6 +383,9 @@
     "narwhal"
    ],
    "blurb": "A white Arctic whale nicknamed the \"sea canary\" because of its chirps and whistles.",
+   "differences": {
+    "narwhal": "The narwhal male has a long spiral tusk and a mottled grey body; the beluga is all white with no tusk."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Monodontidae.",
@@ -450,6 +453,9 @@
     "beluga"
    ],
    "blurb": "An Arctic whale whose males have a long spiral tusk. Its tusk is really a tooth.",
+   "differences": {
+    "beluga": "The narwhal male has a long spiral tusk and a mottled grey body; the beluga is all white with no tusk."
+   },
    "clues": [
     "Family: Monodontidae.",
     "Genus: Monodon.",
@@ -1712,6 +1718,9 @@
     "weedy-seadragon"
    ],
    "blurb": "One of the biggest seahorses, from Australia and New Zealand. As with all seahorses, the male gets pregnant.",
+   "differences": {
+    "leafy-seadragon": "The leafy seadragon is covered in leaf-like flaps and cannot curl its tail; the seahorse has a curling tail for gripping and no leafy flaps."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Syngnathidae.",
@@ -1772,6 +1781,9 @@
     "big-belly-seahorse"
    ],
    "blurb": "A relative of the seahorse from southern Australia, covered in leaf-like flaps that make it look like seaweed.",
+   "differences": {
+    "big-belly-seahorse": "The leafy seadragon is covered in leaf-like flaps and cannot curl its tail; the seahorse has a curling tail for gripping and no leafy flaps."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Syngnathidae.",

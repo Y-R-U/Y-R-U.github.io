@@ -5,13 +5,13 @@ import { FILMS } from './chain_data.js?v=1';
 
 const CSS = `
 .ch{gap:10px}
-.ch-row{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap}
-.ch-actor{flex:0 1 96px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-weight:900;font-size:13px;line-height:1.1;animation:ch-in .35s cubic-bezier(.2,1.4,.4,1) both}
-.ch-actor .ph{width:64px;height:64px;border-radius:50%;border:var(--line) solid var(--ink);background:#eee center/cover;overflow:hidden;box-shadow:var(--shadow-sm);display:grid;place-items:center;font-family:var(--font-display);font-size:26px}
+.ch-row{display:flex;align-items:flex-start;justify-content:center;gap:2px;flex-wrap:nowrap}
+.ch-actor{flex:1 1 0;min-width:0;max-width:110px;overflow-wrap:anywhere;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-weight:900;font-size:13px;line-height:1.1;animation:ch-in .35s cubic-bezier(.2,1.4,.4,1) both}
+.ch-actor .ph{width:min(64px,15vw);height:min(64px,15vw);border-radius:50%;border:var(--line) solid var(--ink);background:#eee center/cover;overflow:hidden;box-shadow:var(--shadow-sm);display:grid;place-items:center;font-family:var(--font-display);font-size:26px}
 .ch-actor .ph img{width:100%;height:100%;object-fit:cover}
-.ch-link{flex:0 1 74px;min-width:40px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.ch-link{flex:0 1 44px;min-width:24px;margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:2px}
 .ch-link .ln{width:100%;height:5px;border-radius:5px;background:repeating-linear-gradient(90deg,var(--ink-3) 0 6px,transparent 6px 10px)}
-.ch-link .q{width:30px;height:30px;border-radius:9px;border:var(--line) solid var(--ink);background:#fff;display:grid;place-items:center;font-family:var(--font-display);font-size:16px}
+.ch-link .q{width:26px;height:26px;border-radius:9px;border:var(--line) solid var(--ink);background:#fff;display:grid;place-items:center;font-family:var(--font-display);font-size:16px}
 .ch-link.cur .q{background:var(--sun);animation:flame .6s infinite alternate}
 .ch-link.ok .ln{background:var(--good)}.ch-link.ok .q{background:var(--good);color:#fff}
 .ch-link.bad .ln{background:var(--bad)}.ch-link.bad .q{background:var(--bad);color:#fff}
@@ -113,7 +113,7 @@ export default register({
       pickEl.innerHTML = '';
       const grid = h('div.choices', { class: `n${d.links[k].options.length}` });
       buttons = d.links[k].options.map((t, i) => {
-        const b = h('button.choice', { type: 'button', style: { '--i': i } }, h('span.badge', {}, String(i + 1)), h('span.label', {}, t));
+        const b = h('button.choice', { type: 'button', style: `--i:${i}` }, h('span.badge', {}, String(i + 1)), h('span.label', {}, t));
         b.addEventListener('click', () => choose(i));
         grid.append(b);
         return b;

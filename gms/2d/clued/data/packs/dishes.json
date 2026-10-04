@@ -47,6 +47,9 @@
     "sashimi"
    ],
    "blurb": "Vinegared rice with fish, seafood or vegetables, often rolled in seaweed. It began as a way of preserving fish.",
+   "differences": {
+    "sashimi": "Sushi always includes vinegared rice; sashimi is sliced raw fish served without rice."
+   },
    "clues": [
     "It began as a way to preserve fish in fermented rice.",
     "Rolls of it are wrapped in nori seaweed.",
@@ -91,6 +94,9 @@
     "sushi"
    ],
    "blurb": "Thin slices of very fresh raw fish or seafood, served without rice.",
+   "differences": {
+    "sushi": "Sushi always includes vinegared rice; sashimi is sliced raw fish served without rice."
+   },
    "clues": [
     "It is often served with shredded daikon radish.",
     "Unlike sushi, it comes without rice.",

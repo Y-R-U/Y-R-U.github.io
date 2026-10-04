@@ -274,7 +274,10 @@
   ],
   "striped-skunk": [
    "https://www.inaturalist.org/photos/2761953"
-  ]
+  ],
+  "_max": {
+   "lion": 3
+  }
  },
  "sea": {
   "sperm-whale": [

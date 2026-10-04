@@ -40,7 +40,8 @@ function askFor(meta, name) {
     if (PASSIVE.test(l)) return `In what year was ${name} ${l.toLowerCase()}?`;
     return `${name}: ${l.toLowerCase()} (year)?`;
   }
-  return `${l}: ${name}?`;
+  if (/\b(using|by|in|of|per)\b/i.test(l)) return `${name}: ${l.toLowerCase()}?`;
+  return `What is the ${l.toLowerCase()} of ${name}?`;
 }
 
 const BIG = [[1e12, 'trillion'], [1e9, 'billion'], [1e6, 'million']];

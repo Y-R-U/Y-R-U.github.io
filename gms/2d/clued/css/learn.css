@@ -1,6 +1,8 @@
 /* CLUED — Learn tab (lane L). Loaded on demand by js/learn/hook.js. */
 .screen.learn-wide > * { max-width: 1040px; }
 .learn-scr .l-narrow { max-width: 560px; margin-inline: auto; }
+.screen.learn-wide > .opt { margin-inline: auto; }
+.screen.learn-wide > .l-cmp, .screen.learn-wide > .l-diff, .screen.learn-wide > .l-quiz, .screen.learn-wide > .l-looks { max-width: 760px; }
 
 /* home tile badge */
 .tile[data-mode="learn"] { position: relative; }
@@ -39,7 +41,7 @@
 .l-ring.full b { color: #b07a00; font-size: 16px; }
 
 /* shared bits */
-.l-notice { display: flex; gap: 8px; align-items: flex-start; background: #fff3c4; border: 2px solid #e0a800; border-radius: 12px; padding: 8px 12px; font-size: 14px; line-height: 1.35; margin: 8px 0; }
+.l-notice { display: flex; gap: 8px; align-items: flex-start; background: #fff3c4; border: 2px solid #e0a800; border-radius: 12px; padding: 8px 12px; font-size: 14px; line-height: 1.35; margin-block: 8px; }
 .l-empty { text-align: center; padding: 40px 12px; }
 .l-empty .e-ico, .l-done .e-ico, .l-xhint .e-ico { font-size: 52px; }
 .l-empty h3 { font-size: 24px; margin: 6px 0; }
@@ -145,8 +147,7 @@ body.kids-on .l-item-nav { background: #fff4c9; box-shadow: 0 -14px 14px -2px #f
   .l-slide, .l-noimg { aspect-ratio: auto; height: calc(100vh - 120px); }
   .l-item-nav { position: static; box-shadow: none; background: none; padding-top: 4px; }
   body.kids-on .l-item-nav { box-shadow: none; background: none; }
-  .l-cmp-img { aspect-ratio: 4 / 3; }
-  .l-cmp { max-width: 640px; margin-inline: auto; }
+  .screen.learn-wide > .l-cmp { max-width: 600px; }
   .l-today b { font-size: 20px; }
 }
 
@@ -158,7 +159,8 @@ body.kids-on .l-item-nav { background: #fff4c9; box-shadow: 0 -14px 14px -2px #f
 .l-dp .dp-tick { display: none; }
 .l-dp.on { background: var(--mint); color: #fff; }
 .l-dp.on .dp-tick { display: inline; }
-.l-review { max-width: 520px; margin-inline: auto; display: flex; flex-direction: column; gap: 12px; }
+.screen.learn-wide > .l-review { max-width: 540px; }
+.l-review { margin-inline: auto; display: flex; flex-direction: column; gap: 12px; }
 .l-rv-top { display: flex; align-items: center; gap: 10px; }
 .l-prog { flex: 1; height: 12px; border: 2px solid var(--ink); border-radius: 99px; background: #fff; overflow: hidden; }
 .l-prog i { display: block; height: 100%; width: 0; background: var(--mint); transition: width .3s; }
@@ -181,7 +183,8 @@ body.kids-on .l-item-nav { background: #fff4c9; box-shadow: 0 -14px 14px -2px #f
 .l-done { text-align: center; padding: 20px 0; }
 .l-done h2 { font-size: 30px; }
 @media (orientation: landscape) and (max-height: 500px) {
-  .l-review { max-width: 760px; display: grid; grid-template-columns: 1.1fr 1fr; align-items: start; }
+  .screen.learn-wide > .l-review { max-width: 760px; }
+  .l-review { display: grid; grid-template-columns: 1.1fr 1fr; align-items: start; }
   .l-rv-top { grid-column: 1 / -1; }
   .l-card { grid-row: span 3; }
   .l-card .l-slide { aspect-ratio: auto; height: 46vh; }
@@ -220,7 +223,8 @@ body.kids-on .l-item-nav { background: #fff4c9; box-shadow: 0 -14px 14px -2px #f
 .l-quiz-img { max-width: 100%; max-height: 260px; border-radius: 14px; margin: 8px auto; display: block; }
 .l-quiz-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .l-quiz-btns .btn { font-size: 16px; padding: 8px 10px; }
-@media (min-width: 700px) { .l-cmp { max-width: 760px; margin-inline: auto; } }
+
+@media (orientation: landscape) and (max-height: 500px) { .l-cmp-img { aspect-ratio: 4 / 3; } .l-vs { margin-top: 0; } }
 
 /* sound lab */
 .l-groups { flex-wrap: nowrap; overflow-x: auto; padding: 2px 2px 8px; scrollbar-width: none; }

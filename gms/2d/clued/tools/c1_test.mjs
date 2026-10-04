@@ -37,6 +37,12 @@ export function sanity(pack, src = {}) {
     }
     if (it.blurb && it.blurb.split(/(?<=\.)\s/).length > 3) errs.push(`${it.id}: blurb longer than 3 sentences`);
     for (const l of it.lookalikes || []) if (l === it.id) errs.push(`${it.id}: lookalike of itself`);
+    const ids = new Set((pack.items || []).map(i => i.id));
+    for (const [o, t] of Object.entries(it.differences || {})) {
+      if (!ids.has(o)) errs.push(`${it.id}: differences refers to unknown item ${o}`);
+      else if (!pack.items.find(i => i.id === o).differences?.[it.id]) errs.push(`${it.id}: differences with ${o} not mirrored`);
+      if (!t || t.length < 20) errs.push(`${it.id}: differences note for ${o} too short`);
+    }
   }
   for (const q of pack.questions || []) {
     if (q.kind === 'mc' && q.wrong?.some(w => String(w).toLowerCase() === String(q.answer).toLowerCase())) errs.push(`q ${q.id}: answer among wrong`);

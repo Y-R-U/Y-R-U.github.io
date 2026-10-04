@@ -3,23 +3,23 @@ import { h, choiceGrid } from '../ui/kit.js?v=1';
 import { injectCSS, baseCSS, stages, stretchTimer, once, hasImg } from './fkit.js?v=1';
 
 const CSS = `
-.rv-pic{position:relative;flex:1 1 0;min-height:170px;border:var(--line) solid var(--ink);border-radius:var(--r);overflow:hidden;background:#1f1a4d;box-shadow:var(--shadow)}
-.rv-pic canvas,.rv-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
-.rv-pic canvas{image-rendering:pixelated}
-.rv-pic img.zoom{transition:transform .6s cubic-bezier(.3,1,.4,1),filter .4s}
-.rv-tiles{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr)}
-.rv-tiles i{background:linear-gradient(135deg,var(--grape),#5a3fe0);border:1px solid rgba(255,255,255,.25);transition:opacity .35s,transform .35s}
-.rv-tiles i:nth-child(3n){background:linear-gradient(135deg,var(--coral),#e04545)}
-.rv-tiles i:nth-child(4n+1){background:linear-gradient(135deg,var(--sky),#2d82d6)}
-.rv-tiles i.off{opacity:0;transform:scale(.6) rotate(8deg)}
-.rv-meter{position:absolute;left:10px;top:10px;z-index:2;display:flex;gap:4px;padding:4px 6px;background:rgba(255,255,255,.88);border:2px solid var(--ink);border-radius:999px}
-.rv-meter i{width:10px;height:10px;border-radius:50%;background:#ddd;border:2px solid var(--ink)}
-.rv-meter i.on{background:var(--sun)}
-.rv-pic .f-more{position:absolute;right:10px;bottom:10px;z-index:2}
-.rv-pic.done img.zoom{transform:none!important;filter:none!important}
-.rv-q .q-body{flex:none}
-@media (orientation:landscape) and (max-height:520px){.rv-q{flex-direction:row}.rv-q .rv-pic{flex:1 1 50%;min-height:0}.rv-q .q-body{flex:1 1 50%;justify-content:center}}
-@media (min-width:900px) and (min-height:560px){.rv-q{flex-direction:row;max-width:1000px;align-items:center;gap:28px}.rv-q .rv-pic{flex:1 1 55%;height:min(62vh,540px)}.rv-q .q-body{flex:1 1 45%}}
+.rx-pic{position:relative;flex:1 1 0;min-height:170px;border:var(--line) solid var(--ink);border-radius:var(--r);overflow:hidden;background:#1f1a4d;box-shadow:var(--shadow)}
+.rx-pic canvas,.rx-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.rx-pic canvas{image-rendering:pixelated}
+.rx-pic img.zoom{transition:transform .6s cubic-bezier(.3,1,.4,1),filter .4s}
+.rx-tiles{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr)}
+.rx-tiles i{background:linear-gradient(135deg,var(--grape),#5a3fe0);border:1px solid rgba(255,255,255,.25);transition:opacity .35s,transform .35s}
+.rx-tiles i:nth-child(3n){background:linear-gradient(135deg,var(--coral),#e04545)}
+.rx-tiles i:nth-child(4n+1){background:linear-gradient(135deg,var(--sky),#2d82d6)}
+.rx-tiles i.off{opacity:0;transform:scale(.6) rotate(8deg)}
+.rx-meter{position:absolute;left:10px;top:10px;z-index:2;display:flex;gap:4px;padding:4px 6px;background:rgba(255,255,255,.88);border:2px solid var(--ink);border-radius:999px}
+.rx-meter i{width:10px;height:10px;border-radius:50%;background:#ddd;border:2px solid var(--ink)}
+.rx-meter i.on{background:var(--sun)}
+.rx-pic .f-more{position:absolute;right:10px;bottom:10px;z-index:2}
+.rx-pic.done img.zoom{transform:none!important;filter:none!important}
+.rx-q .q-body{flex:none}
+@media (orientation:landscape) and (max-height:520px){.rx-q{flex-direction:row}.rx-q .rx-pic{flex:1 1 50%;min-height:0}.rx-q .q-body{flex:1 1 50%;justify-content:center}}
+@media (min-width:900px) and (min-height:560px){.rx-q{flex-direction:row;max-width:1000px;align-items:center;gap:28px}.rx-q .rx-pic{flex:1 1 55%;height:min(62vh,540px)}.rx-q .q-body{flex:1 1 45%}}
 `;
 
 const STAGES = 6;
@@ -82,12 +82,12 @@ export default register({
     el.innerHTML = '';
     const d = q.data;
     const answer = once(api);
-    const pic = h('div.rv-pic');
-    const meter = h('div.rv-meter', {}, ...Array.from({ length: q.stages || STAGES }, () => h('i')));
+    const pic = h('div.rx-pic');
+    const meter = h('div.rx-meter', {}, ...Array.from({ length: q.stages || STAGES }, () => h('i')));
     const body = h('div.q-body', {}, h('h2.q-prompt', {}, q.prompt));
     const answersEl = h('div.q-answers');
     body.append(answersEl);
-    el.append(h('div.q.has-media.rv-q', {}, pic, body));
+    el.append(h('div.q.has-media.rx-q', {}, pic, body));
     pic.append(meter);
     let img = null, canvas = null, tiles = null, finished = false, cur = 0, loaded = false;
     const ready = loadImg(d.img.src).then(a => { img = a; loaded = true; build(); paint(cur); });
@@ -98,7 +98,7 @@ export default register({
       } else {
         const el2 = h('img.zoom', { src: d.img.src, alt: '', referrerpolicy: 'no-referrer', draggable: 'false' });
         pic.prepend(el2);
-        if (d.mode === 'tiles') { tiles = h('div.rv-tiles', {}, ...Array.from({ length: 16 }, () => h('i'))); el2.after(tiles); }
+        if (d.mode === 'tiles') { tiles = h('div.rx-tiles', {}, ...Array.from({ length: 16 }, () => h('i'))); el2.after(tiles); }
       }
     }
     function paint(s) {

@@ -81,6 +81,10 @@
     "eastern-brown-snake"
    ],
    "blurb": "Its venom is the most toxic of any land snake tested, yet it is shy and lives in remote semi-desert, so bites are very rare.",
+   "differences": {
+    "coastal-taipan": "The coastal taipan lives in tropical coastal Queensland and New Guinea and is longer; the inland taipan lives in remote inland floodplains and its head turns glossy black in winter.",
+    "eastern-brown-snake": "The eastern brown snake lives along the east coast, often near farms and towns; the inland taipan lives in remote semi-desert and darkens to a black head in winter."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Oxyuranus.",
@@ -142,6 +146,10 @@
     "eastern-brown-snake"
    ],
    "blurb": "A long, fast elapid of northern and eastern Australia and New Guinea. Before antivenom arrived in 1955, a bite was almost always fatal.",
+   "differences": {
+    "inland-taipan": "The coastal taipan lives in tropical coastal Queensland and New Guinea and is longer; the inland taipan lives in remote inland floodplains and its head turns glossy black in winter.",
+    "eastern-brown-snake": "The coastal taipan is bigger, with a long pale \"coffin-shaped\" head and a large eye; the eastern brown snake has a small head barely wider than its neck."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Oxyuranus.",
@@ -204,6 +212,12 @@
     "mulga-snake"
    ],
    "blurb": "Responsible for more snakebite deaths in Australia than any other snake. It is common around farms and outer suburbs on the east coast.",
+   "differences": {
+    "inland-taipan": "The eastern brown snake lives along the east coast, often near farms and towns; the inland taipan lives in remote semi-desert and darkens to a black head in winter.",
+    "coastal-taipan": "The coastal taipan is bigger, with a long pale \"coffin-shaped\" head and a large eye; the eastern brown snake has a small head barely wider than its neck.",
+    "mulga-snake": "The mulga snake is much heavier, with a broad head and scales that often look netted with dark edges; the eastern brown snake is slimmer with a small head and plain scales.",
+    "dugite": "They are close relatives that are told apart mostly by where they live: the dugite in south-western Australia, often with scattered black scales, and the eastern brown snake on the east coast."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Pseudonaja.",
@@ -256,6 +270,9 @@
     "eastern-brown-snake"
    ],
    "blurb": "A brown snake of south-western Australia, often met in Perth suburbs. Its venom is highly toxic.",
+   "differences": {
+    "eastern-brown-snake": "They are close relatives that are told apart mostly by where they live: the dugite in south-western Australia, often with scattered black scales, and the eastern brown snake on the east coast."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Pseudonaja.",
@@ -360,6 +377,9 @@
     "mulga-snake"
    ],
    "blurb": "A glossy black snake with a red or pink belly, common near water on the east coast of Australia. Its bite is painful but rarely serious.",
+   "differences": {
+    "mulga-snake": "The red-bellied black snake is glossy black above with a red or pink belly; the mulga snake is brown to copper, with a cream or yellowish belly."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Pseudechis.",
@@ -424,6 +444,10 @@
     "red-bellied-black-snake"
    ],
    "blurb": "One of the heaviest venomous snakes in Australia, found across most of the mainland. It delivers a very large amount of venom.",
+   "differences": {
+    "eastern-brown-snake": "The mulga snake is much heavier, with a broad head and scales that often look netted with dark edges; the eastern brown snake is slimmer with a small head and plain scales.",
+    "red-bellied-black-snake": "The red-bellied black snake is glossy black above with a red or pink belly; the mulga snake is brown to copper, with a cream or yellowish belly."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Pseudechis.",
@@ -541,6 +565,9 @@
     "copperhead"
    ],
    "blurb": "A cold-tolerant elapid of south-eastern Australia and Tasmania. It is active even on cool days.",
+   "differences": {
+    "copperhead": "They are unrelated and live on different continents: the American copperhead is a pit viper with hourglass bands; the lowlands copperhead of south-eastern Australia is an elapid with no bold bands."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Austrelaps.",
@@ -601,6 +628,9 @@
     "keelback"
    ],
    "blurb": "A rainforest elapid of eastern Australia whose keeled scales make it look like the harmless keelback.",
+   "differences": {
+    "keelback": "Both have keeled scales; the harmless keelback has a small loreal scale between nostril and eye, which the venomous rough-scaled snake (an elapid) lacks. Experts often need a close look, so treat both with care."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Tropidechis.",
@@ -661,6 +691,9 @@
     "banded-krait"
    ],
    "blurb": "A small burrowing elapid ringed in bold black and white. It eats almost nothing but blind snakes.",
+   "differences": {
+    "banded-krait": "The banded krait of Asia has broad yellow and black bands and a ridged back; the small Australian bandy-bandy has black and white rings."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Vermicella.",
@@ -721,6 +754,9 @@
     "diamond-python"
    ],
    "blurb": "Australia's most widespread python, often found in roofs and sheds where it eats rats and possums.",
+   "differences": {
+    "diamond-python": "The diamond python is a subspecies of the carpet python: mostly black with cream spots in rosettes, found around Sydney and Victoria; most other carpet pythons have brown blotches."
+   },
    "clues": [
     "Genus: Morelia.",
     "Many subspecies exist, including the jungle and coastal forms.",
@@ -780,6 +816,9 @@
     "carpet-python"
    ],
    "blurb": "A dark subspecies of the carpet python with clusters of cream spots, found in coastal New South Wales and Victoria.",
+   "differences": {
+    "carpet-python": "The diamond python is a subspecies of the carpet python: mostly black with cream spots in rosettes, found around Sydney and Victoria; most other carpet pythons have brown blotches."
+   },
    "clues": [
     "Genus: Morelia.",
     "It is found around Sydney.",
@@ -953,6 +992,9 @@
     "woma"
    ],
    "blurb": "A banded python of northern Australia whose glossy black head helps it warm up quickly in the sun.",
+   "differences": {
+    "woma": "The black-headed python has a glossy jet-black head and neck; the woma is the same shape but its head is pale, with dark patches only above the eyes."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Genus: Aspidites.",
@@ -1014,6 +1056,9 @@
     "black-headed-python"
    ],
    "blurb": "A banded desert python of central and western Australia. It hunts reptiles in burrows by squeezing them against the walls.",
+   "differences": {
+    "black-headed-python": "The black-headed python has a glossy jet-black head and neck; the woma is the same shape but its head is pale, with dark patches only above the eyes."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Genus: Aspidites.",
@@ -1059,6 +1104,9 @@
     "spotted-python"
    ],
    "blurb": "A small python of northern Australia, popular as a pet. It is named after the zoologist John George Children, not young people.",
+   "differences": {
+    "spotted-python": "Both are small Antaresia pythons; the spotted python has bold dark blotches on a pale body, while the children's python is plainer brown with faint blotches."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Genus: Antaresia.",
@@ -1119,6 +1167,9 @@
     "childrens-python"
    ],
    "blurb": "A small, blotchy python of eastern Queensland that often hangs in cave entrances to catch bats.",
+   "differences": {
+    "childrens-python": "Both are small Antaresia pythons; the spotted python has bold dark blotches on a pale body, while the children's python is plainer brown with faint blotches."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Genus: Antaresia.",
@@ -1178,6 +1229,9 @@
     "emerald-tree-boa"
    ],
    "blurb": "A bright green python of New Guinea and Cape York. Babies are yellow or red and turn green as they grow.",
+   "differences": {
+    "emerald-tree-boa": "They look almost identical; the emerald tree boa lives in South America and has white zig-zag marks, while the green tree python lives in New Guinea and Cape York and often has a white stripe or scattered white scales."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Genus: Morelia.",
@@ -1357,6 +1411,9 @@
     "rough-scaled-snake"
    ],
    "blurb": "A harmless water snake of northern and eastern Australia. It can eat small cane toads without dying.",
+   "differences": {
+    "rough-scaled-snake": "Both have keeled scales; the harmless keelback has a small loreal scale between nostril and eye, which the venomous rough-scaled snake (an elapid) lacks. Experts often need a close look, so treat both with care."
+   },
    "clues": [
     "Family: Colubridae.",
     "Genus: Tropidonophis.",
@@ -1417,6 +1474,9 @@
     "yellow-bellied-sea-snake"
    ],
    "blurb": "A sea snake of tropical coasts from the Persian Gulf to Australia. It causes most sea snake bite deaths, often among fishers.",
+   "differences": {
+    "yellow-bellied-sea-snake": "The yellow-bellied sea snake has a sharp split between a black back and a yellow belly; the beaked sea snake is greyish with faint bands and a hooked snout."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Elapidae.",
@@ -1477,6 +1537,9 @@
     "beaked-sea-snake"
    ],
    "blurb": "The most widespread snake on Earth, drifting in the open Pacific and Indian Oceans. It gathers in slicks of floating debris to ambush fish.",
+   "differences": {
+    "beaked-sea-snake": "The yellow-bellied sea snake has a sharp split between a black back and a yellow belly; the beaked sea snake is greyish with faint bands and a hooked snout."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Elapidae.",
@@ -1594,6 +1657,9 @@
     "indian-cobra"
    ],
    "blurb": "The world's longest venomous snake, found in forests of India and South-East Asia. It mostly eats other snakes.",
+   "differences": {
+    "indian-cobra": "The king cobra is far longer, with a narrower hood and pale chevron bands; the Indian cobra is smaller, with a wide hood bearing a spectacle mark."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Ophiophagus.",
@@ -1659,6 +1725,10 @@
     "monocled-cobra"
    ],
    "blurb": "The cobra of snake charmers, with a spectacle-shaped mark on the back of its hood. It is one of India's \"Big Four\" deadly snakes.",
+   "differences": {
+    "king-cobra": "The king cobra is far longer, with a narrower hood and pale chevron bands; the Indian cobra is smaller, with a wide hood bearing a spectacle mark.",
+    "monocled-cobra": "The mark on the back of the hood tells them apart: a pair of \"spectacles\" on the Indian cobra, a single ring on the monocled cobra."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Naja.",
@@ -1719,6 +1789,9 @@
     "indian-cobra"
    ],
    "blurb": "A cobra of eastern India and South-East Asia with a single ring-shaped mark on the back of its hood.",
+   "differences": {
+    "indian-cobra": "The mark on the back of the hood tells them apart: a pair of \"spectacles\" on the Indian cobra, a single ring on the monocled cobra."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Naja.",
@@ -1779,6 +1852,9 @@
     "banded-krait"
    ],
    "blurb": "A night-active snake of South Asia whose nearly painless bite often strikes people sleeping on the floor.",
+   "differences": {
+    "banded-krait": "The banded krait has broad yellow and black bands; the common krait is glossy black with thin white crossbands."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Bungarus.",
@@ -1832,6 +1908,11 @@
     "bandy-bandy"
    ],
    "blurb": "A boldly banded snake of South-East Asia. It is shy and slow by day, and rarely bites unless handled.",
+   "differences": {
+    "bandy-bandy": "The banded krait of Asia has broad yellow and black bands and a ridged back; the small Australian bandy-bandy has black and white rings.",
+    "common-krait": "The banded krait has broad yellow and black bands; the common krait is glossy black with thin white crossbands.",
+    "banded-sea-krait": "The banded sea krait is blue-grey and black with a yellow lip and a paddle tail and lives on reefs; the banded krait is yellow and black and lives on land."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Bungarus.",
@@ -1893,6 +1974,9 @@
     "saw-scaled-viper"
    ],
    "blurb": "A chain-patterned viper of South Asia and one of the deadliest snakes in the world by number of deaths.",
+   "differences": {
+    "saw-scaled-viper": "Russell's viper is much bigger, with three rows of dark chain-like spots; the small saw-scaled viper is sandy with pale zig-zag marks and makes a sizzling sound with its scales."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Genus: Daboia.",
@@ -1939,6 +2023,9 @@
     "russells-viper"
    ],
    "blurb": "A small, quick-tempered viper of dry regions from the Middle East to India. Its group may cause more deaths than any other snakes.",
+   "differences": {
+    "russells-viper": "Russell's viper is much bigger, with three rows of dark chain-like spots; the small saw-scaled viper is sandy with pale zig-zag marks and makes a sizzling sound with its scales."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Genus: Echis.",
@@ -2118,6 +2205,10 @@
     "green-anaconda"
    ],
    "blurb": "The world's longest snake, found in South-East Asia. Very large ones have killed and eaten people.",
+   "differences": {
+    "burmese-python": "The reticulated python has a net-like pattern and orange eyes; the Burmese python has big dark blotches like giraffe patches and an arrow-shaped mark on its head.",
+    "green-anaconda": "The green anaconda is olive with round black spots and lives in South American water; the reticulated python has a net-like pattern and lives in South-East Asia."
+   },
    "clues": [
     "Genus: Malayopython.",
     "Its genus name honours its home region.",
@@ -2180,6 +2271,10 @@
     "african-rock-python"
    ],
    "blurb": "One of the largest snakes on Earth, native to South-East Asia. Released pets now form a large invasive population in Florida's Everglades.",
+   "differences": {
+    "reticulated-python": "The reticulated python has a net-like pattern and orange eyes; the Burmese python has big dark blotches like giraffe patches and an arrow-shaped mark on its head.",
+    "african-rock-python": "They look alike but live on different continents: the African rock python in Africa south of the Sahara, the Burmese python in South-East Asia (and invasive in Florida)."
+   },
    "clues": [
     "Its IUCN conservation status is \"Vulnerable\".",
     "It is native to South-East Asia.",
@@ -2360,6 +2455,9 @@
     "eastern-green-mamba"
    ],
    "blurb": "A long, fast African elapid named for the inky black inside of its mouth. Untreated bites are almost always fatal.",
+   "differences": {
+    "eastern-green-mamba": "The eastern green mamba is bright green; the black mamba is grey to olive-brown and is named for the black inside of its mouth."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Dendroaspis.",
@@ -2421,6 +2519,10 @@
     "boomslang"
    ],
    "blurb": "A shy, bright green tree snake of East and southern Africa. It is less aggressive than its black cousin.",
+   "differences": {
+    "black-mamba": "The eastern green mamba is bright green; the black mamba is grey to olive-brown and is named for the black inside of its mouth.",
+    "boomslang": "The boomslang has very large eyes and a short, egg-shaped head; the green mamba has a long, coffin-shaped head and smaller eyes. Boomslangs can also be brown or black."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Elapidae.",
@@ -2480,6 +2582,9 @@
     "gaboon-viper"
    ],
    "blurb": "A stout, sluggish viper common across Africa. It causes more serious bites in Africa than any other snake because it sits still when approached.",
+   "differences": {
+    "gaboon-viper": "The Gaboon viper lives in rainforest and has a pale head with a dark line and leafy geometric patterns; the puff adder lives in grassland and has neat pale chevrons."
+   },
    "clues": [
     "Family: Viperidae.",
     "Genus: Bitis.",
@@ -2542,6 +2647,10 @@
     "rhinoceros-viper"
    ],
    "blurb": "A huge, beautifully patterned viper of African rainforest floors. It has the longest fangs of any snake.",
+   "differences": {
+    "puff-adder": "The Gaboon viper lives in rainforest and has a pale head with a dark line and leafy geometric patterns; the puff adder lives in grassland and has neat pale chevrons.",
+    "rhinoceros-viper": "The rhinoceros viper has two or three pairs of horn-like scales on its nose and blue and green colours; the Gaboon viper has only small nose horns and browner colours."
+   },
    "clues": [
     "Its IUCN conservation status is \"Vulnerable\".",
     "Genus: Bitis.",
@@ -2602,6 +2711,9 @@
     "gaboon-viper"
    ],
    "blurb": "A gaudy blue, green and red viper of central African rainforests with horn-like scales on its snout.",
+   "differences": {
+    "gaboon-viper": "The rhinoceros viper has two or three pairs of horn-like scales on its nose and blue and green colours; the Gaboon viper has only small nose horns and browner colours."
+   },
    "clues": [
     "Its IUCN conservation status is \"Vulnerable\".",
     "Genus: Bitis.",
@@ -2662,6 +2774,9 @@
     "eastern-green-mamba"
    ],
    "blurb": "A rear-fanged African tree snake with huge eyes. Its slow-acting venom killed the herpetologist Karl Schmidt in 1957.",
+   "differences": {
+    "eastern-green-mamba": "The boomslang has very large eyes and a short, egg-shaped head; the green mamba has a long, coffin-shaped head and smaller eyes. Boomslangs can also be brown or black."
+   },
    "clues": [
     "Family: Colubridae.",
     "Genus: Dispholidus.",
@@ -2900,6 +3015,9 @@
     "sidewinder"
    ],
    "blurb": "A small sand-coloured viper of the Sahara and Arabia that often has a spike-like scale above each eye.",
+   "differences": {
+    "sidewinder": "Both have horn-like scales over the eyes and move by sidewinding; the horned viper lives in the Sahara and Arabia, the sidewinder is a rattlesnake of North American deserts with a rattle on its tail."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Genus: Cerastes.",
@@ -2961,6 +3079,9 @@
     "burmese-python"
    ],
    "blurb": "Africa's largest snake. It can swallow antelopes and is known to have killed people.",
+   "differences": {
+    "burmese-python": "They look alike but live on different continents: the African rock python in Africa south of the Sahara, the Burmese python in South-East Asia (and invasive in Florida)."
+   },
    "clues": [
     "Its IUCN conservation status is \"Near threatened\".",
     "It can swallow small antelopes and crocodiles.",
@@ -3070,6 +3191,10 @@
     "eastern-diamondback-rattlesnake"
    ],
    "blurb": "A big, bold rattlesnake of the south-western USA and Mexico, and one of the most dangerous snakes in North America.",
+   "differences": {
+    "eastern-diamondback-rattlesnake": "The western diamondback has a black-and-white ringed \"coon tail\" and lives in the south-west USA and Mexico; the eastern diamondback has cream-edged diamonds, a brown tail and lives in the south-east USA.",
+    "gopher-snake": "The gopher snake has a narrow head, round pupils and no rattle, though it hisses and shakes its tail; the rattlesnake has a wide triangular head, vertical pupils and a rattle."
+   },
    "clues": [
     "Family: Viperidae.",
     "Genus: Crotalus.",
@@ -3130,6 +3255,9 @@
     "western-diamondback-rattlesnake"
    ],
    "blurb": "The heaviest venomous snake in the Americas, found in pine woods of the south-eastern USA.",
+   "differences": {
+    "western-diamondback-rattlesnake": "The western diamondback has a black-and-white ringed \"coon tail\" and lives in the south-west USA and Mexico; the eastern diamondback has cream-edged diamonds, a brown tail and lives in the south-east USA."
+   },
    "clues": [
     "Family: Viperidae.",
     "Genus: Crotalus.",
@@ -3250,6 +3378,9 @@
     "horned-viper"
    ],
    "blurb": "A small desert rattlesnake of the south-western USA and Mexico that moves across sand in sideways loops.",
+   "differences": {
+    "horned-viper": "Both have horn-like scales over the eyes and move by sidewinding; the horned viper lives in the Sahara and Arabia, the sidewinder is a rattlesnake of North American deserts with a rattle on its tail."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Viperidae.",
@@ -3303,6 +3434,10 @@
     "lowlands-copperhead"
    ],
    "blurb": "A pit viper of the eastern USA with hourglass-shaped bands. It bites more people in the US than any other snake, but deaths are very rare.",
+   "differences": {
+    "lowlands-copperhead": "They are unrelated and live on different continents: the American copperhead is a pit viper with hourglass bands; the lowlands copperhead of south-eastern Australia is an elapid with no bold bands.",
+    "cottonmouth": "The copperhead is lighter, with sharp hourglass bands; the cottonmouth is darker and thicker, swims high in the water and gapes to show a white mouth."
+   },
    "clues": [
     "Family: Viperidae.",
     "Genus: Agkistrodon.",
@@ -3366,6 +3501,9 @@
     "copperhead"
    ],
    "blurb": "A semi-aquatic pit viper of the south-eastern USA. It gapes to show the white lining of its mouth when threatened.",
+   "differences": {
+    "copperhead": "The copperhead is lighter, with sharp hourglass bands; the cottonmouth is darker and thicker, swims high in the water and gapes to show a white mouth."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Viperidae.",
@@ -3426,6 +3564,10 @@
     "scarlet-kingsnake"
    ],
    "blurb": "A brightly ringed elapid of the south-eastern USA. Its red bands touch yellow ones, unlike its harmless lookalikes.",
+   "differences": {
+    "milk-snake": "In US coral snakes the red bands touch yellow bands and the snout is black; in milk snakes red touches black. The rhyme does not work outside the USA.",
+    "scarlet-kingsnake": "The scarlet kingsnake has a red snout and its red bands touch black; the coral snake has a black snout and its red bands touch yellow."
+   },
    "clues": [
     "Family: Elapidae.",
     "Genus: Micrurus.",
@@ -3487,6 +3629,10 @@
     "scarlet-kingsnake"
    ],
    "blurb": "A harmless North American snake whose red, black and yellow bands mimic the deadly coral snakes.",
+   "differences": {
+    "eastern-coral-snake": "In US coral snakes the red bands touch yellow bands and the snout is black; in milk snakes red touches black. The rhyme does not work outside the USA.",
+    "scarlet-kingsnake": "Both are harmless mimics; the scarlet kingsnake is smaller with a red snout, while the milk snake is bigger and often has blotches rather than complete rings."
+   },
    "clues": [
     "Family: Colubridae.",
     "Genus: Lampropeltis.",
@@ -3548,6 +3694,10 @@
     "milk-snake"
    ],
    "blurb": "A small, harmless snake of the south-eastern USA whose red, black and yellow rings mimic the coral snake.",
+   "differences": {
+    "eastern-coral-snake": "The scarlet kingsnake has a red snout and its red bands touch black; the coral snake has a black snout and its red bands touch yellow.",
+    "milk-snake": "Both are harmless mimics; the scarlet kingsnake is smaller with a red snout, while the milk snake is bigger and often has blotches rather than complete rings."
+   },
    "clues": [
     "Family: Colubridae.",
     "Genus: Lampropeltis.",
@@ -3786,6 +3936,9 @@
     "western-diamondback-rattlesnake"
    ],
    "blurb": "A large, harmless snake of western North America that bluffs by hissing and shaking its tail like a rattlesnake.",
+   "differences": {
+    "western-diamondback-rattlesnake": "The gopher snake has a narrow head, round pupils and no rattle, though it hisses and shakes its tail; the rattlesnake has a wide triangular head, vertical pupils and a rattle."
+   },
    "clues": [
     "Family: Colubridae.",
     "Genus: Pituophis.",
@@ -4064,6 +4217,9 @@
     "reticulated-python"
    ],
    "blurb": "The heaviest snake in the world, living in the swamps and rivers of tropical South America.",
+   "differences": {
+    "reticulated-python": "The green anaconda is olive with round black spots and lives in South American water; the reticulated python has a net-like pattern and lives in South-East Asia."
+   },
    "clues": [
     "Family: Boidae.",
     "Genus: Eunectes.",
@@ -4185,6 +4341,9 @@
     "green-tree-python"
    ],
    "blurb": "A bright green boa of Amazon rainforest that coils over branches, looking almost identical to the green tree python.",
+   "differences": {
+    "green-tree-python": "They look almost identical; the emerald tree boa lives in South America and has white zig-zag marks, while the green tree python lives in New Guinea and Cape York and often has a white stripe or scattered white scales."
+   },
    "clues": [
     "Family: Boidae.",
     "Genus: Corallus.",
@@ -4250,6 +4409,10 @@
     "grass-snake"
    ],
    "blurb": "Britain's only venomous snake, with a zig-zag stripe down its back. It lives further north than any other snake, even beyond the Arctic Circle.",
+   "differences": {
+    "smooth-snake": "The adder has a bold zig-zag down its back and red eyes with vertical pupils; the smooth snake has rows of small dark spots, round pupils and smooth scales.",
+    "grass-snake": "The grass snake is longer and greener, with a yellow collar and round pupils; the adder is shorter and stockier, with a zig-zag stripe and vertical pupils."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "It is found north of the Arctic Circle in Scandinavia.",
@@ -4426,6 +4589,9 @@
     "common-european-adder"
    ],
    "blurb": "Europe's common harmless water snake, with a yellow collar behind its head. When cornered it often plays dead.",
+   "differences": {
+    "common-european-adder": "The grass snake is longer and greener, with a yellow collar and round pupils; the adder is shorter and stockier, with a zig-zag stripe and vertical pupils."
+   },
    "clues": [
     "Family: Colubridae.",
     "Genus: Natrix.",
@@ -4486,6 +4652,9 @@
     "common-european-adder"
    ],
    "blurb": "A small, rare, harmless snake of European heathland. It constricts lizards and other small reptiles.",
+   "differences": {
+    "common-european-adder": "The adder has a bold zig-zag down its back and red eyes with vertical pupils; the smooth snake has rows of small dark spots, round pupils and smooth scales."
+   },
    "clues": [
     "Family: Colubridae.",
     "Genus: Coronella.",
@@ -4606,6 +4775,9 @@
     "banded-krait"
    ],
    "blurb": "A blue-and-black banded sea snake of the western Pacific that hunts eels on reefs but comes ashore to rest and lay eggs.",
+   "differences": {
+    "banded-krait": "The banded sea krait is blue-grey and black with a yellow lip and a paddle tail and lives on reefs; the banded krait is yellow and black and lives on land."
+   },
    "clues": [
     "Its IUCN conservation status is \"Least concern\".",
     "Family: Elapidae.",

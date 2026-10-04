@@ -7,6 +7,10 @@
  "version": 1,
  "listenPrompt": "Which country's national anthem is this?",
  "factsMeta": {
+  "iso3": {
+   "type": "text",
+   "label": "ISO code"
+  },
   "anthem": {
    "type": "text",
    "label": "Anthem"
@@ -20,8 +24,10 @@
   {
    "id": "albania",
    "name": "Albania",
+   "iso3": "ALB",
    "group": "Europe",
    "facts": {
+    "iso3": "ALB",
     "anthem": "Himni i Flamurit",
     "continent": "Europe"
    },
@@ -43,8 +49,10 @@
   {
    "id": "algeria",
    "name": "Algeria",
+   "iso3": "DZA",
    "group": "Africa",
    "facts": {
+    "iso3": "DZA",
     "anthem": "Kassaman",
     "continent": "Africa"
    },
@@ -66,8 +74,10 @@
   {
    "id": "andorra",
    "name": "Andorra",
+   "iso3": "AND",
    "group": "Europe",
    "facts": {
+    "iso3": "AND",
     "anthem": "El gran Carlemany",
     "continent": "Europe"
    },
@@ -89,8 +99,10 @@
   {
    "id": "angola",
    "name": "Angola",
+   "iso3": "AGO",
    "group": "Africa",
    "facts": {
+    "iso3": "AGO",
     "anthem": "Angola Avante",
     "continent": "Africa"
    },
@@ -112,8 +124,10 @@
   {
    "id": "antigua-and-barbuda",
    "name": "Antigua and Barbuda",
+   "iso3": "ATG",
    "group": "North America",
    "facts": {
+    "iso3": "ATG",
     "anthem": "Fair Antigua, We Salute Thee",
     "continent": "North America"
    },
@@ -135,8 +149,10 @@
   {
    "id": "argentina",
    "name": "Argentina",
+   "iso3": "ARG",
    "group": "South America",
    "facts": {
+    "iso3": "ARG",
     "anthem": "Argentine National Anthem",
     "continent": "South America"
    },
@@ -158,8 +174,10 @@
   {
    "id": "armenia",
    "name": "Armenia",
+   "iso3": "ARM",
    "group": "Asia",
    "facts": {
+    "iso3": "ARM",
     "anthem": "Mer Hayrenik",
     "continent": "Asia"
    },
@@ -181,8 +199,10 @@
   {
    "id": "australia",
    "name": "Australia",
+   "iso3": "AUS",
    "group": "Oceania",
    "facts": {
+    "iso3": "AUS",
     "anthem": "Advance Australia Fair",
     "continent": "Oceania"
    },
@@ -204,8 +224,10 @@
   {
    "id": "austria",
    "name": "Austria",
+   "iso3": "AUT",
    "group": "Europe",
    "facts": {
+    "iso3": "AUT",
     "anthem": "Land der Berge, Land am Strome",
     "continent": "Europe"
    },
@@ -227,8 +249,10 @@
   {
    "id": "azerbaijan",
    "name": "Azerbaijan",
+   "iso3": "AZE",
    "group": "Asia",
    "facts": {
+    "iso3": "AZE",
     "anthem": "Azərbaycan marşı",
     "continent": "Asia"
    },
@@ -250,8 +274,10 @@
   {
    "id": "bahamas",
    "name": "Bahamas",
+   "iso3": "BHS",
    "group": "North America",
    "facts": {
+    "iso3": "BHS",
     "anthem": "March On, Bahamaland",
     "continent": "North America"
    },
@@ -273,8 +299,10 @@
   {
    "id": "bahrain",
    "name": "Bahrain",
+   "iso3": "BHR",
    "group": "Asia",
    "facts": {
+    "iso3": "BHR",
     "anthem": "Bahrainona",
     "continent": "Asia"
    },
@@ -296,8 +324,10 @@
   {
    "id": "bangladesh",
    "name": "Bangladesh",
+   "iso3": "BGD",
    "group": "Asia",
    "facts": {
+    "iso3": "BGD",
     "anthem": "Amar Sonar Bangla",
     "continent": "Asia"
    },
@@ -319,8 +349,10 @@
   {
    "id": "barbados",
    "name": "Barbados",
+   "iso3": "BRB",
    "group": "North America",
    "facts": {
+    "iso3": "BRB",
     "anthem": "National Anthem of Barbados",
     "continent": "North America"
    },
@@ -342,8 +374,10 @@
   {
    "id": "belarus",
    "name": "Belarus",
+   "iso3": "BLR",
    "group": "Europe",
    "facts": {
+    "iso3": "BLR",
     "anthem": "My Belarusy",
     "continent": "Europe"
    },
@@ -365,8 +399,10 @@
   {
    "id": "belgium",
    "name": "Belgium",
+   "iso3": "BEL",
    "group": "Europe",
    "facts": {
+    "iso3": "BEL",
     "anthem": "The Brabançonne",
     "continent": "Europe"
    },
@@ -388,8 +424,10 @@
   {
    "id": "belize",
    "name": "Belize",
+   "iso3": "BLZ",
    "group": "North America",
    "facts": {
+    "iso3": "BLZ",
     "anthem": "Land of the Free",
     "continent": "North America"
    },
@@ -411,8 +449,10 @@
   {
    "id": "benin",
    "name": "Benin",
+   "iso3": "BEN",
    "group": "Africa",
    "facts": {
+    "iso3": "BEN",
     "anthem": "L'Aube Nouvelle",
     "continent": "Africa"
    },
@@ -434,8 +474,10 @@
   {
    "id": "bolivia",
    "name": "Bolivia",
+   "iso3": "BOL",
    "group": "South America",
    "facts": {
+    "iso3": "BOL",
     "anthem": "National Anthem of Bolivia",
     "continent": "South America"
    },
@@ -457,8 +499,10 @@
   {
    "id": "botswana",
    "name": "Botswana",
+   "iso3": "BWA",
    "group": "Africa",
    "facts": {
+    "iso3": "BWA",
     "anthem": "Fatshe leno la rona",
     "continent": "Africa"
    },
@@ -480,8 +524,10 @@
   {
    "id": "brazil",
    "name": "Brazil",
+   "iso3": "BRA",
    "group": "South America",
    "facts": {
+    "iso3": "BRA",
     "anthem": "Brazilian National Anthem",
     "continent": "South America"
    },
@@ -503,8 +549,10 @@
   {
    "id": "brunei",
    "name": "Brunei",
+   "iso3": "BRN",
    "group": "Asia",
    "facts": {
+    "iso3": "BRN",
     "anthem": "Allah Peliharakan Sultan",
     "continent": "Asia"
    },
@@ -526,8 +574,10 @@
   {
    "id": "bulgaria",
    "name": "Bulgaria",
+   "iso3": "BGR",
    "group": "Europe",
    "facts": {
+    "iso3": "BGR",
     "anthem": "Mila Rodino",
     "continent": "Europe"
    },
@@ -549,8 +599,10 @@
   {
    "id": "burkina-faso",
    "name": "Burkina Faso",
+   "iso3": "BFA",
    "group": "Africa",
    "facts": {
+    "iso3": "BFA",
     "anthem": "Une Seule Nuit",
     "continent": "Africa"
    },
@@ -572,8 +624,10 @@
   {
    "id": "cambodia",
    "name": "Cambodia",
+   "iso3": "KHM",
    "group": "Asia",
    "facts": {
+    "iso3": "KHM",
     "anthem": "Nokor Reach",
     "continent": "Asia"
    },
@@ -595,8 +649,10 @@
   {
    "id": "canada",
    "name": "Canada",
+   "iso3": "CAN",
    "group": "North America",
    "facts": {
+    "iso3": "CAN",
     "anthem": "O Canada",
     "continent": "North America"
    },
@@ -618,8 +674,10 @@
   {
    "id": "cape-verde",
    "name": "Cape Verde",
+   "iso3": "CPV",
    "group": "Africa",
    "facts": {
+    "iso3": "CPV",
     "anthem": "Cântico da Liberdade",
     "continent": "Africa"
    },
@@ -641,8 +699,10 @@
   {
    "id": "central-african-republic",
    "name": "Central African Republic",
+   "iso3": "CAF",
    "group": "Africa",
    "facts": {
+    "iso3": "CAF",
     "anthem": "La Renaissance",
     "continent": "Africa"
    },
@@ -664,8 +724,10 @@
   {
    "id": "chad",
    "name": "Chad",
+   "iso3": "TCD",
    "group": "Africa",
    "facts": {
+    "iso3": "TCD",
     "anthem": "La Tchadienne",
     "continent": "Africa"
    },
@@ -687,8 +749,10 @@
   {
    "id": "chile",
    "name": "Chile",
+   "iso3": "CHL",
    "group": "South America",
    "facts": {
+    "iso3": "CHL",
     "anthem": "National Anthem of Chile",
     "continent": "South America"
    },
@@ -710,8 +774,10 @@
   {
    "id": "china",
    "name": "China",
+   "iso3": "CHN",
    "group": "Asia",
    "facts": {
+    "iso3": "CHN",
     "anthem": "March of the Volunteers",
     "continent": "Asia"
    },
@@ -733,8 +799,10 @@
   {
    "id": "colombia",
    "name": "Colombia",
+   "iso3": "COL",
    "group": "South America",
    "facts": {
+    "iso3": "COL",
     "anthem": "National Anthem of Colombia",
     "continent": "South America"
    },
@@ -756,8 +824,10 @@
   {
    "id": "comoros",
    "name": "Comoros",
+   "iso3": "COM",
    "group": "Africa",
    "facts": {
+    "iso3": "COM",
     "anthem": "Udzima wa ya Masiwa",
     "continent": "Africa"
    },
@@ -779,8 +849,10 @@
   {
    "id": "costa-rica",
    "name": "Costa Rica",
+   "iso3": "CRI",
    "group": "North America",
    "facts": {
+    "iso3": "CRI",
     "anthem": "Noble patria, tu hermosa bandera",
     "continent": "North America"
    },
@@ -802,8 +874,10 @@
   {
    "id": "croatia",
    "name": "Croatia",
+   "iso3": "HRV",
    "group": "Europe",
    "facts": {
+    "iso3": "HRV",
     "anthem": "Lijepa naša domovino",
     "continent": "Europe"
    },
@@ -825,8 +899,10 @@
   {
    "id": "cuba",
    "name": "Cuba",
+   "iso3": "CUB",
    "group": "North America",
    "facts": {
+    "iso3": "CUB",
     "anthem": "El Himno de Bayamo",
     "continent": "North America"
    },
@@ -848,8 +924,10 @@
   {
    "id": "czech-republic",
    "name": "Czech Republic",
+   "iso3": "CZE",
    "group": "Europe",
    "facts": {
+    "iso3": "CZE",
     "anthem": "Kde domov můj",
     "continent": "Europe"
    },
@@ -871,8 +949,10 @@
   {
    "id": "denmark",
    "name": "Denmark",
+   "iso3": "DNK",
    "group": "Europe",
    "facts": {
+    "iso3": "DNK",
     "anthem": "Der er et yndigt land",
     "continent": "Europe"
    },
@@ -894,8 +974,10 @@
   {
    "id": "djibouti",
    "name": "Djibouti",
+   "iso3": "DJI",
    "group": "Africa",
    "facts": {
+    "iso3": "DJI",
     "anthem": "Djibouti",
     "continent": "Africa"
    },
@@ -917,8 +999,10 @@
   {
    "id": "dominica",
    "name": "Dominica",
+   "iso3": "DMA",
    "group": "North America",
    "facts": {
+    "iso3": "DMA",
     "anthem": "Isle of Beauty, Isle of Splendour",
     "continent": "North America"
    },
@@ -940,8 +1024,10 @@
   {
    "id": "dominican-republic",
    "name": "Dominican Republic",
+   "iso3": "DOM",
    "group": "North America",
    "facts": {
+    "iso3": "DOM",
     "anthem": "National Anthem of the Dominican Republic",
     "continent": "North America"
    },
@@ -963,8 +1049,10 @@
   {
    "id": "ecuador",
    "name": "Ecuador",
+   "iso3": "ECU",
    "group": "South America",
    "facts": {
+    "iso3": "ECU",
     "anthem": "Salve, Oh Patria",
     "continent": "South America"
    },
@@ -986,8 +1074,10 @@
   {
    "id": "egypt",
    "name": "Egypt",
+   "iso3": "EGY",
    "group": "Africa",
    "facts": {
+    "iso3": "EGY",
     "anthem": "Bilady, Bilady, Bilady",
     "continent": "Africa"
    },
@@ -1009,8 +1099,10 @@
   {
    "id": "el-salvador",
    "name": "El Salvador",
+   "iso3": "SLV",
    "group": "North America",
    "facts": {
+    "iso3": "SLV",
     "anthem": "National anthem of El Salvador",
     "continent": "North America"
    },
@@ -1032,8 +1124,10 @@
   {
    "id": "equatorial-guinea",
    "name": "Equatorial Guinea",
+   "iso3": "GNQ",
    "group": "Africa",
    "facts": {
+    "iso3": "GNQ",
     "anthem": "Caminemos pisando las sendas de nuestra inmensa felicidad",
     "continent": "Africa"
    },
@@ -1055,8 +1149,10 @@
   {
    "id": "eritrea",
    "name": "Eritrea",
+   "iso3": "ERI",
    "group": "Africa",
    "facts": {
+    "iso3": "ERI",
     "anthem": "Ertra, Ertra, Ertra",
     "continent": "Africa"
    },
@@ -1078,8 +1174,10 @@
   {
    "id": "estonia",
    "name": "Estonia",
+   "iso3": "EST",
    "group": "Europe",
    "facts": {
+    "iso3": "EST",
     "anthem": "Mu isamaa, mu õnn ja rõõm",
     "continent": "Europe"
    },
@@ -1101,8 +1199,10 @@
   {
    "id": "eswatini",
    "name": "Eswatini",
+   "iso3": "SWZ",
    "group": "Africa",
    "facts": {
+    "iso3": "SWZ",
     "anthem": "Nkulunkulu Mnikati wetibusiso temaSwati",
     "continent": "Africa"
    },
@@ -1124,8 +1224,10 @@
   {
    "id": "ethiopia",
    "name": "Ethiopia",
+   "iso3": "ETH",
    "group": "Africa",
    "facts": {
+    "iso3": "ETH",
     "anthem": "March Forward, Dear Mother Ethiopia",
     "continent": "Africa"
    },
@@ -1147,8 +1249,10 @@
   {
    "id": "federated-states-of-micronesia",
    "name": "Federated States of Micronesia",
+   "iso3": "FSM",
    "group": "Oceania",
    "facts": {
+    "iso3": "FSM",
     "anthem": "Patriots of Micronesia",
     "continent": "Oceania"
    },
@@ -1170,8 +1274,10 @@
   {
    "id": "fiji",
    "name": "Fiji",
+   "iso3": "FJI",
    "group": "Insular Oceania",
    "facts": {
+    "iso3": "FJI",
     "anthem": "God Bless Fiji",
     "continent": "Insular Oceania"
    },
@@ -1193,8 +1299,10 @@
   {
    "id": "finland",
    "name": "Finland",
+   "iso3": "FIN",
    "group": "Europe",
    "facts": {
+    "iso3": "FIN",
     "anthem": "Maamme",
     "continent": "Europe"
    },
@@ -1216,8 +1324,10 @@
   {
    "id": "france",
    "name": "France",
+   "iso3": "FRA",
    "group": "Europe",
    "facts": {
+    "iso3": "FRA",
     "anthem": "La Marseillaise",
     "continent": "Europe"
    },
@@ -1239,8 +1349,10 @@
   {
    "id": "gabon",
    "name": "Gabon",
+   "iso3": "GAB",
    "group": "Africa",
    "facts": {
+    "iso3": "GAB",
     "anthem": "La Concorde",
     "continent": "Africa"
    },
@@ -1262,8 +1374,10 @@
   {
    "id": "georgia",
    "name": "Georgia",
+   "iso3": "GEO",
    "group": "Europe",
    "facts": {
+    "iso3": "GEO",
     "anthem": "Tavisupleba",
     "continent": "Europe"
    },
@@ -1285,8 +1399,10 @@
   {
    "id": "germany",
    "name": "Germany",
+   "iso3": "DEU",
    "group": "Europe",
    "facts": {
+    "iso3": "DEU",
     "anthem": "Deutschlandlied (third stanza)",
     "continent": "Europe"
    },
@@ -1308,8 +1424,10 @@
   {
    "id": "ghana",
    "name": "Ghana",
+   "iso3": "GHA",
    "group": "Africa",
    "facts": {
+    "iso3": "GHA",
     "anthem": "God Bless Our Homeland Ghana",
     "continent": "Africa"
    },
@@ -1331,8 +1449,10 @@
   {
    "id": "greece",
    "name": "Greece",
+   "iso3": "GRC",
    "group": "Europe",
    "facts": {
+    "iso3": "GRC",
     "anthem": "Hymn to Liberty",
     "continent": "Europe"
    },
@@ -1354,8 +1474,10 @@
   {
    "id": "grenada",
    "name": "Grenada",
+   "iso3": "GRD",
    "group": "North America",
    "facts": {
+    "iso3": "GRD",
     "anthem": "Hail Grenada",
     "continent": "North America"
    },
@@ -1377,8 +1499,10 @@
   {
    "id": "guatemala",
    "name": "Guatemala",
+   "iso3": "GTM",
    "group": "North America",
    "facts": {
+    "iso3": "GTM",
     "anthem": "National Anthem of Guatemala",
     "continent": "North America"
    },
@@ -1400,8 +1524,10 @@
   {
    "id": "guinea",
    "name": "Guinea",
+   "iso3": "GIN",
    "group": "Africa",
    "facts": {
+    "iso3": "GIN",
     "anthem": "Liberté",
     "continent": "Africa"
    },
@@ -1423,8 +1549,10 @@
   {
    "id": "guyana",
    "name": "Guyana",
+   "iso3": "GUY",
    "group": "South America",
    "facts": {
+    "iso3": "GUY",
     "anthem": "National anthem of Guyana",
     "continent": "South America"
    },
@@ -1446,8 +1574,10 @@
   {
    "id": "haiti",
    "name": "Haiti",
+   "iso3": "HTI",
    "group": "North America",
    "facts": {
+    "iso3": "HTI",
     "anthem": "La Dessalinienne",
     "continent": "North America"
    },
@@ -1469,8 +1599,10 @@
   {
    "id": "honduras",
    "name": "Honduras",
+   "iso3": "HND",
    "group": "North America",
    "facts": {
+    "iso3": "HND",
     "anthem": "National Anthem of Honduras",
     "continent": "North America"
    },
@@ -1492,8 +1624,10 @@
   {
    "id": "hungary",
    "name": "Hungary",
+   "iso3": "HUN",
    "group": "Europe",
    "facts": {
+    "iso3": "HUN",
     "anthem": "Himnusz",
     "continent": "Europe"
    },
@@ -1515,8 +1649,10 @@
   {
    "id": "iceland",
    "name": "Iceland",
+   "iso3": "ISL",
    "group": "Europe",
    "facts": {
+    "iso3": "ISL",
     "anthem": "Lofsöngur",
     "continent": "Europe"
    },
@@ -1538,8 +1674,10 @@
   {
    "id": "india",
    "name": "India",
+   "iso3": "IND",
    "group": "Asia",
    "facts": {
+    "iso3": "IND",
     "anthem": "Jana Gana Mana",
     "continent": "Asia"
    },
@@ -1561,8 +1699,10 @@
   {
    "id": "indonesia",
    "name": "Indonesia",
+   "iso3": "IDN",
    "group": "Asia",
    "facts": {
+    "iso3": "IDN",
     "anthem": "Indonesia Raya",
     "continent": "Asia"
    },
@@ -1584,8 +1724,10 @@
   {
    "id": "iran",
    "name": "Iran",
+   "iso3": "IRN",
    "group": "Asia",
    "facts": {
+    "iso3": "IRN",
     "anthem": "National Anthem of the Islamic Republic of Iran",
     "continent": "Asia"
    },
@@ -1607,8 +1749,10 @@
   {
    "id": "iraq",
    "name": "Iraq",
+   "iso3": "IRQ",
    "group": "Asia",
    "facts": {
+    "iso3": "IRQ",
     "anthem": "Mawtini",
     "continent": "Asia"
    },
@@ -1630,8 +1774,10 @@
   {
    "id": "ireland",
    "name": "Ireland",
+   "iso3": "IRL",
    "group": "Europe",
    "facts": {
+    "iso3": "IRL",
     "anthem": "Amhrán na bhFiann",
     "continent": "Europe"
    },
@@ -1653,8 +1799,10 @@
   {
    "id": "israel",
    "name": "Israel",
+   "iso3": "ISR",
    "group": "Asia",
    "facts": {
+    "iso3": "ISR",
     "anthem": "Hatikvah",
     "continent": "Asia"
    },
@@ -1676,8 +1824,10 @@
   {
    "id": "italy",
    "name": "Italy",
+   "iso3": "ITA",
    "group": "Europe",
    "facts": {
+    "iso3": "ITA",
     "anthem": "Il Canto degli Italiani",
     "continent": "Europe"
    },
@@ -1699,8 +1849,10 @@
   {
    "id": "jamaica",
    "name": "Jamaica",
+   "iso3": "JAM",
    "group": "North America",
    "facts": {
+    "iso3": "JAM",
     "anthem": "Jamaica, Land We Love",
     "continent": "North America"
    },
@@ -1722,8 +1874,10 @@
   {
    "id": "japan",
    "name": "Japan",
+   "iso3": "JPN",
    "group": "Asia",
    "facts": {
+    "iso3": "JPN",
     "anthem": "Kimigayo",
     "continent": "Asia"
    },
@@ -1745,8 +1899,10 @@
   {
    "id": "jordan",
    "name": "Jordan",
+   "iso3": "JOR",
    "group": "Asia",
    "facts": {
+    "iso3": "JOR",
     "anthem": "The Royal Anthem of Jordan",
     "continent": "Asia"
    },
@@ -1768,8 +1924,10 @@
   {
    "id": "kazakhstan",
    "name": "Kazakhstan",
+   "iso3": "KAZ",
    "group": "Europe",
    "facts": {
+    "iso3": "KAZ",
     "anthem": "Menıñ Qazaqstanym"
    },
    "blurb": "\"Menıñ Qazaqstanym\" is the national anthem of Kazakhstan.",
@@ -1790,8 +1948,10 @@
   {
    "id": "kenya",
    "name": "Kenya",
+   "iso3": "KEN",
    "group": "Africa",
    "facts": {
+    "iso3": "KEN",
     "anthem": "Ee Mungu Nguvu Yetu",
     "continent": "Africa"
    },
@@ -1813,8 +1973,10 @@
   {
    "id": "kiribati",
    "name": "Kiribati",
+   "iso3": "KIR",
    "group": "Insular Oceania",
    "facts": {
+    "iso3": "KIR",
     "anthem": "Kunan Kiribati"
    },
    "blurb": "The national anthem of Kiribati.",
@@ -1835,8 +1997,10 @@
   {
    "id": "kuwait",
    "name": "Kuwait",
+   "iso3": "KWT",
    "group": "Asia",
    "facts": {
+    "iso3": "KWT",
     "anthem": "National Anthem of Kuwait",
     "continent": "Asia"
    },
@@ -1858,8 +2022,10 @@
   {
    "id": "kyrgyzstan",
    "name": "Kyrgyzstan",
+   "iso3": "KGZ",
    "group": "Asia",
    "facts": {
+    "iso3": "KGZ",
     "anthem": "State Anthem of the Kyrgyz Republic",
     "continent": "Asia"
    },
@@ -1881,8 +2047,10 @@
   {
    "id": "laos",
    "name": "Laos",
+   "iso3": "LAO",
    "group": "Asia",
    "facts": {
+    "iso3": "LAO",
     "anthem": "Pheng Xat Lao",
     "continent": "Asia"
    },
@@ -1904,8 +2072,10 @@
   {
    "id": "latvia",
    "name": "Latvia",
+   "iso3": "LVA",
    "group": "Europe",
    "facts": {
+    "iso3": "LVA",
     "anthem": "Dievs, svētī Latviju!",
     "continent": "Europe"
    },
@@ -1927,8 +2097,10 @@
   {
    "id": "lebanon",
    "name": "Lebanon",
+   "iso3": "LBN",
    "group": "Asia",
    "facts": {
+    "iso3": "LBN",
     "anthem": "Lebanese national anthem",
     "continent": "Asia"
    },
@@ -1950,8 +2122,10 @@
   {
    "id": "lesotho",
    "name": "Lesotho",
+   "iso3": "LSO",
    "group": "Africa",
    "facts": {
+    "iso3": "LSO",
     "anthem": "Lesotho Fatse La Bontata Rona",
     "continent": "Africa"
    },
@@ -1973,8 +2147,10 @@
   {
    "id": "liberia",
    "name": "Liberia",
+   "iso3": "LBR",
    "group": "Africa",
    "facts": {
+    "iso3": "LBR",
     "anthem": "All Hail, Liberia, Hail!",
     "continent": "Africa"
    },
@@ -1996,8 +2172,10 @@
   {
    "id": "libya",
    "name": "Libya",
+   "iso3": "LBY",
    "group": "Africa",
    "facts": {
+    "iso3": "LBY",
     "anthem": "Libya, Libya, Libya",
     "continent": "Africa"
    },
@@ -2019,8 +2197,10 @@
   {
    "id": "lithuania",
    "name": "Lithuania",
+   "iso3": "LTU",
    "group": "Europe",
    "facts": {
+    "iso3": "LTU",
     "anthem": "Tautiška giesmė",
     "continent": "Europe"
    },
@@ -2042,8 +2222,10 @@
   {
    "id": "luxembourg",
    "name": "Luxembourg",
+   "iso3": "LUX",
    "group": "Europe",
    "facts": {
+    "iso3": "LUX",
     "anthem": "Ons Heemecht",
     "continent": "Europe"
    },
@@ -2065,8 +2247,10 @@
   {
    "id": "madagascar",
    "name": "Madagascar",
+   "iso3": "MDG",
    "group": "Africa",
    "facts": {
+    "iso3": "MDG",
     "anthem": "Ry Tanindrazanay malala ô!",
     "continent": "Africa"
    },
@@ -2088,8 +2272,10 @@
   {
    "id": "malaysia",
    "name": "Malaysia",
+   "iso3": "MYS",
    "group": "Asia",
    "facts": {
+    "iso3": "MYS",
     "anthem": "Negaraku",
     "continent": "Asia"
    },
@@ -2111,8 +2297,10 @@
   {
    "id": "maldives",
    "name": "Maldives",
+   "iso3": "MDV",
    "group": "Asia",
    "facts": {
+    "iso3": "MDV",
     "anthem": "Gaumiii salaaam",
     "continent": "Asia"
    },
@@ -2134,8 +2322,10 @@
   {
    "id": "mali",
    "name": "Mali",
+   "iso3": "MLI",
    "group": "Africa",
    "facts": {
+    "iso3": "MLI",
     "anthem": "Pour l'Afrique et pour toi",
     "continent": "Africa"
    },
@@ -2157,8 +2347,10 @@
   {
    "id": "malta",
    "name": "Malta",
+   "iso3": "MLT",
    "group": "Europe",
    "facts": {
+    "iso3": "MLT",
     "anthem": "L-Innu Malti",
     "continent": "Europe"
    },
@@ -2180,8 +2372,10 @@
   {
    "id": "marshall-islands",
    "name": "Marshall Islands",
+   "iso3": "MHL",
    "group": "Oceania",
    "facts": {
+    "iso3": "MHL",
     "anthem": "Forever Marshall Islands",
     "continent": "Oceania"
    },
@@ -2203,8 +2397,10 @@
   {
    "id": "mauritania",
    "name": "Mauritania",
+   "iso3": "MRT",
    "group": "Africa",
    "facts": {
+    "iso3": "MRT",
     "anthem": "National anthem of Mauritania",
     "continent": "Africa"
    },
@@ -2226,8 +2422,10 @@
   {
    "id": "mauritius",
    "name": "Mauritius",
+   "iso3": "MUS",
    "group": "Africa",
    "facts": {
+    "iso3": "MUS",
     "anthem": "Motherland",
     "continent": "Africa"
    },
@@ -2249,8 +2447,10 @@
   {
    "id": "mexico",
    "name": "Mexico",
+   "iso3": "MEX",
    "group": "North America",
    "facts": {
+    "iso3": "MEX",
     "anthem": "Himno Nacional Mexicano",
     "continent": "North America"
    },
@@ -2272,8 +2472,10 @@
   {
    "id": "moldova",
    "name": "Moldova",
+   "iso3": "MDA",
    "group": "Europe",
    "facts": {
+    "iso3": "MDA",
     "anthem": "Limba noastră",
     "continent": "Europe"
    },
@@ -2295,8 +2497,10 @@
   {
    "id": "monaco",
    "name": "Monaco",
+   "iso3": "MCO",
    "group": "Europe",
    "facts": {
+    "iso3": "MCO",
     "anthem": "Hymne monégasque",
     "continent": "Europe"
    },
@@ -2318,8 +2522,10 @@
   {
    "id": "montenegro",
    "name": "Montenegro",
+   "iso3": "MNE",
    "group": "Europe",
    "facts": {
+    "iso3": "MNE",
     "anthem": "Oj, svijetla majska zoro",
     "continent": "Europe"
    },
@@ -2341,8 +2547,10 @@
   {
    "id": "morocco",
    "name": "Morocco",
+   "iso3": "MAR",
    "group": "Africa",
    "facts": {
+    "iso3": "MAR",
     "anthem": "Cherifian Anthem",
     "continent": "Africa"
    },
@@ -2364,8 +2572,10 @@
   {
    "id": "mozambique",
    "name": "Mozambique",
+   "iso3": "MOZ",
    "group": "Africa",
    "facts": {
+    "iso3": "MOZ",
     "anthem": "Pátria Amada",
     "continent": "Africa"
    },
@@ -2387,8 +2597,10 @@
   {
    "id": "myanmar",
    "name": "Myanmar",
+   "iso3": "MMR",
    "group": "Asia",
    "facts": {
+    "iso3": "MMR",
     "anthem": "Kaba Ma Kyei",
     "continent": "Asia"
    },
@@ -2410,8 +2622,10 @@
   {
    "id": "namibia",
    "name": "Namibia",
+   "iso3": "NAM",
    "group": "Africa",
    "facts": {
+    "iso3": "NAM",
     "anthem": "Namibia, Land of the Brave",
     "continent": "Africa"
    },
@@ -2433,8 +2647,10 @@
   {
    "id": "nauru",
    "name": "Nauru",
+   "iso3": "NRU",
    "group": "Oceania",
    "facts": {
+    "iso3": "NRU",
     "anthem": "Nauru Bwiema",
     "continent": "Oceania"
    },
@@ -2456,8 +2672,10 @@
   {
    "id": "nepal",
    "name": "Nepal",
+   "iso3": "NPL",
    "group": "Asia",
    "facts": {
+    "iso3": "NPL",
     "anthem": "Sayaun Thunga Phulka",
     "continent": "Asia"
    },
@@ -2479,8 +2697,10 @@
   {
    "id": "netherlands",
    "name": "Netherlands",
+   "iso3": "NLD",
    "group": "Europe",
    "facts": {
+    "iso3": "NLD",
     "anthem": "Wilhelmus",
     "continent": "Europe"
    },
@@ -2502,8 +2722,10 @@
   {
    "id": "new-zealand",
    "name": "New Zealand",
+   "iso3": "NZL",
    "group": "Oceania",
    "facts": {
+    "iso3": "NZL",
     "anthem": "God Defend New Zealand",
     "continent": "Oceania"
    },
@@ -2525,8 +2747,10 @@
   {
    "id": "nicaragua",
    "name": "Nicaragua",
+   "iso3": "NIC",
    "group": "North America",
    "facts": {
+    "iso3": "NIC",
     "anthem": "Salve a ti",
     "continent": "North America"
    },
@@ -2548,8 +2772,10 @@
   {
    "id": "niger",
    "name": "Niger",
+   "iso3": "NER",
    "group": "Africa",
    "facts": {
+    "iso3": "NER",
     "anthem": "L'Honneur de la Patrie",
     "continent": "Africa"
    },
@@ -2571,8 +2797,10 @@
   {
    "id": "nigeria",
    "name": "Nigeria",
+   "iso3": "NGA",
    "group": "Africa",
    "facts": {
+    "iso3": "NGA",
     "anthem": "Nigeria, We Hail Thee",
     "continent": "Africa"
    },
@@ -2594,8 +2822,10 @@
   {
    "id": "norway",
    "name": "Norway",
+   "iso3": "NOR",
    "group": "Europe",
    "facts": {
+    "iso3": "NOR",
     "anthem": "Ja, vi elsker dette landet",
     "continent": "Europe"
    },
@@ -2617,8 +2847,10 @@
   {
    "id": "oman",
    "name": "Oman",
+   "iso3": "OMN",
    "group": "Asia",
    "facts": {
+    "iso3": "OMN",
     "anthem": "Nashid as-Salaam as-Sultani",
     "continent": "Asia"
    },
@@ -2640,8 +2872,10 @@
   {
    "id": "pakistan",
    "name": "Pakistan",
+   "iso3": "PAK",
    "group": "Asia",
    "facts": {
+    "iso3": "PAK",
     "anthem": "Qaumi Taranah",
     "continent": "Asia"
    },
@@ -2663,8 +2897,10 @@
   {
    "id": "palau",
    "name": "Palau",
+   "iso3": "PLW",
    "group": "Insular Oceania",
    "facts": {
+    "iso3": "PLW",
     "anthem": "Belau rekid"
    },
    "blurb": "\"Belau rekid\" is the national anthem of Palau.",
@@ -2685,8 +2921,10 @@
   {
    "id": "panama",
    "name": "Panama",
+   "iso3": "PAN",
    "group": "North America",
    "facts": {
+    "iso3": "PAN",
     "anthem": "National anthem of Panama",
     "continent": "North America"
    },
@@ -2708,8 +2946,10 @@
   {
    "id": "paraguay",
    "name": "Paraguay",
+   "iso3": "PRY",
    "group": "South America",
    "facts": {
+    "iso3": "PRY",
     "anthem": "national anthem of Paraguay",
     "continent": "South America"
    },
@@ -2731,8 +2971,10 @@
   {
    "id": "peru",
    "name": "Peru",
+   "iso3": "PER",
    "group": "South America",
    "facts": {
+    "iso3": "PER",
     "anthem": "National Anthem of Peru",
     "continent": "South America"
    },
@@ -2754,8 +2996,10 @@
   {
    "id": "philippines",
    "name": "Philippines",
+   "iso3": "PHL",
    "group": "Asia",
    "facts": {
+    "iso3": "PHL",
     "anthem": "Lupang Hinirang",
     "continent": "Asia"
    },
@@ -2777,8 +3021,10 @@
   {
    "id": "poland",
    "name": "Poland",
+   "iso3": "POL",
    "group": "Europe",
    "facts": {
+    "iso3": "POL",
     "anthem": "Poland Is Not Yet Lost",
     "continent": "Europe"
    },
@@ -2800,8 +3046,10 @@
   {
    "id": "portugal",
    "name": "Portugal",
+   "iso3": "PRT",
    "group": "Europe",
    "facts": {
+    "iso3": "PRT",
     "anthem": "A Portuguesa",
     "continent": "Europe"
    },
@@ -2823,8 +3071,10 @@
   {
    "id": "qatar",
    "name": "Qatar",
+   "iso3": "QAT",
    "group": "Asia",
    "facts": {
+    "iso3": "QAT",
     "anthem": "As Salam al Amiri",
     "continent": "Asia"
    },
@@ -2846,8 +3096,10 @@
   {
    "id": "republic-of-the-congo",
    "name": "Republic of the Congo",
+   "iso3": "COG",
    "group": "Africa",
    "facts": {
+    "iso3": "COG",
     "anthem": "La Congolaise",
     "continent": "Africa"
    },
@@ -2869,8 +3121,10 @@
   {
    "id": "romania",
    "name": "Romania",
+   "iso3": "ROU",
    "group": "Europe",
    "facts": {
+    "iso3": "ROU",
     "anthem": "Deșteaptă-te, române!",
     "continent": "Europe"
    },
@@ -2892,8 +3146,10 @@
   {
    "id": "russia",
    "name": "Russia",
+   "iso3": "RUS",
    "group": "Europe",
    "facts": {
+    "iso3": "RUS",
     "anthem": "State Anthem of the Russian Federation"
    },
    "blurb": "The national anthem of Russia.",
@@ -2914,8 +3170,10 @@
   {
    "id": "rwanda",
    "name": "Rwanda",
+   "iso3": "RWA",
    "group": "Africa",
    "facts": {
+    "iso3": "RWA",
     "anthem": "Rwanda Nziza",
     "continent": "Africa"
    },
@@ -2937,8 +3195,10 @@
   {
    "id": "saint-kitts-and-nevis",
    "name": "Saint Kitts and Nevis",
+   "iso3": "KNA",
    "group": "North America",
    "facts": {
+    "iso3": "KNA",
     "anthem": "O Land of Beauty!",
     "continent": "North America"
    },
@@ -2960,8 +3220,10 @@
   {
    "id": "saint-lucia",
    "name": "Saint Lucia",
+   "iso3": "LCA",
    "group": "North America",
    "facts": {
+    "iso3": "LCA",
     "anthem": "Sons and Daughters of Saint Lucia",
     "continent": "North America"
    },
@@ -2983,8 +3245,10 @@
   {
    "id": "saint-vincent-and-the-grenadines",
    "name": "Saint Vincent and the Grenadines",
+   "iso3": "VCT",
    "group": "North America",
    "facts": {
+    "iso3": "VCT",
     "anthem": "Saint Vincent, Land so Beautiful",
     "continent": "North America"
    },
@@ -3006,8 +3270,10 @@
   {
    "id": "sao-tome-and-principe",
    "name": "São Tomé and Príncipe",
+   "iso3": "STP",
    "group": "Africa",
    "facts": {
+    "iso3": "STP",
     "anthem": "Independência total",
     "continent": "Africa"
    },
@@ -3029,8 +3295,10 @@
   {
    "id": "saudi-arabia",
    "name": "Saudi Arabia",
+   "iso3": "SAU",
    "group": "Asia",
    "facts": {
+    "iso3": "SAU",
     "anthem": "Chant of the Saudi Nation",
     "continent": "Asia"
    },
@@ -3052,8 +3320,10 @@
   {
    "id": "senegal",
    "name": "Senegal",
+   "iso3": "SEN",
    "group": "Africa",
    "facts": {
+    "iso3": "SEN",
     "anthem": "Le Lion rouge",
     "continent": "Africa"
    },
@@ -3075,8 +3345,10 @@
   {
    "id": "serbia",
    "name": "Serbia",
+   "iso3": "SRB",
    "group": "Europe",
    "facts": {
+    "iso3": "SRB",
     "anthem": "Bože pravde",
     "continent": "Europe"
    },
@@ -3098,8 +3370,10 @@
   {
    "id": "seychelles",
    "name": "Seychelles",
+   "iso3": "SYC",
    "group": "Africa",
    "facts": {
+    "iso3": "SYC",
     "anthem": "Koste Seselwa",
     "continent": "Africa"
    },
@@ -3121,8 +3395,10 @@
   {
    "id": "sierra-leone",
    "name": "Sierra Leone",
+   "iso3": "SLE",
    "group": "Africa",
    "facts": {
+    "iso3": "SLE",
     "anthem": "High We Exalt Thee, Realm of the Free",
     "continent": "Africa"
    },
@@ -3144,8 +3420,10 @@
   {
    "id": "singapore",
    "name": "Singapore",
+   "iso3": "SGP",
    "group": "Asia",
    "facts": {
+    "iso3": "SGP",
     "anthem": "Onward Singapore",
     "continent": "Asia"
    },
@@ -3167,8 +3445,10 @@
   {
    "id": "slovakia",
    "name": "Slovakia",
+   "iso3": "SVK",
    "group": "Europe",
    "facts": {
+    "iso3": "SVK",
     "anthem": "Nad Tatrou sa blýska",
     "continent": "Europe"
    },
@@ -3190,8 +3470,10 @@
   {
    "id": "slovenia",
    "name": "Slovenia",
+   "iso3": "SVN",
    "group": "Europe",
    "facts": {
+    "iso3": "SVN",
     "anthem": "Zdravljica",
     "continent": "Europe"
    },
@@ -3213,8 +3495,10 @@
   {
    "id": "somalia",
    "name": "Somalia",
+   "iso3": "SOM",
    "group": "Africa",
    "facts": {
+    "iso3": "SOM",
     "anthem": "Qolobaa Calankeed",
     "continent": "Africa"
    },
@@ -3236,8 +3520,10 @@
   {
    "id": "south-africa",
    "name": "South Africa",
+   "iso3": "ZAF",
    "group": "Africa",
    "facts": {
+    "iso3": "ZAF",
     "anthem": "national anthem of Mzansi",
     "continent": "Africa"
    },
@@ -3259,8 +3545,10 @@
   {
    "id": "south-korea",
    "name": "South Korea",
+   "iso3": "KOR",
    "group": "Asia",
    "facts": {
+    "iso3": "KOR",
     "anthem": "Aegukga",
     "continent": "Asia"
    },
@@ -3282,8 +3570,10 @@
   {
    "id": "south-sudan",
    "name": "South Sudan",
+   "iso3": "SSD",
    "group": "Africa",
    "facts": {
+    "iso3": "SSD",
     "anthem": "South Sudan Oyee!",
     "continent": "Africa"
    },
@@ -3305,8 +3595,10 @@
   {
    "id": "spain",
    "name": "Spain",
+   "iso3": "ESP",
    "group": "Europe",
    "facts": {
+    "iso3": "ESP",
     "anthem": "Marcha Real",
     "continent": "Europe"
    },
@@ -3328,8 +3620,10 @@
   {
    "id": "sri-lanka",
    "name": "Sri Lanka",
+   "iso3": "LKA",
    "group": "Asia",
    "facts": {
+    "iso3": "LKA",
     "anthem": "Sri Lanka Matha",
     "continent": "Asia"
    },
@@ -3351,8 +3645,10 @@
   {
    "id": "sudan",
    "name": "Sudan",
+   "iso3": "SDN",
    "group": "Africa",
    "facts": {
+    "iso3": "SDN",
     "anthem": "Nahnu Jund Allah Jund Al-watan",
     "continent": "Africa"
    },
@@ -3374,8 +3670,10 @@
   {
    "id": "suriname",
    "name": "Suriname",
+   "iso3": "SUR",
    "group": "South America",
    "facts": {
+    "iso3": "SUR",
     "anthem": "God zij met ons Suriname",
     "continent": "South America"
    },
@@ -3397,8 +3695,10 @@
   {
    "id": "sweden",
    "name": "Sweden",
+   "iso3": "SWE",
    "group": "Europe",
    "facts": {
+    "iso3": "SWE",
     "anthem": "Du gamla, du fria",
     "continent": "Europe"
    },
@@ -3420,8 +3720,10 @@
   {
    "id": "switzerland",
    "name": "Switzerland",
+   "iso3": "CHE",
    "group": "Europe",
    "facts": {
+    "iso3": "CHE",
     "anthem": "Swiss Psalm",
     "continent": "Europe"
    },
@@ -3443,8 +3745,10 @@
   {
    "id": "syria",
    "name": "Syria",
+   "iso3": "SYR",
    "group": "Asia",
    "facts": {
+    "iso3": "SYR",
     "anthem": "Humat ad-Diyar",
     "continent": "Asia"
    },
@@ -3466,8 +3770,10 @@
   {
    "id": "tajikistan",
    "name": "Tajikistan",
+   "iso3": "TJK",
    "group": "Asia",
    "facts": {
+    "iso3": "TJK",
     "anthem": "National anthem of Tajikistan",
     "continent": "Asia"
    },
@@ -3489,8 +3795,10 @@
   {
    "id": "tanzania",
    "name": "Tanzania",
+   "iso3": "TZA",
    "group": "Africa",
    "facts": {
+    "iso3": "TZA",
     "anthem": "Mungu ibariki Afrika",
     "continent": "Africa"
    },
@@ -3512,8 +3820,10 @@
   {
    "id": "thailand",
    "name": "Thailand",
+   "iso3": "THA",
    "group": "Asia",
    "facts": {
+    "iso3": "THA",
     "anthem": "Thai National Anthem",
     "continent": "Asia"
    },
@@ -3535,8 +3845,10 @@
   {
    "id": "the-gambia",
    "name": "The Gambia",
+   "iso3": "GMB",
    "group": "Africa",
    "facts": {
+    "iso3": "GMB",
     "anthem": "For The Gambia Our Homeland",
     "continent": "Africa"
    },
@@ -3558,8 +3870,10 @@
   {
    "id": "timor-leste",
    "name": "Timor-Leste",
+   "iso3": "TLS",
    "group": "Asia",
    "facts": {
+    "iso3": "TLS",
     "anthem": "Pátria",
     "continent": "Asia"
    },
@@ -3581,8 +3895,10 @@
   {
    "id": "tonga",
    "name": "Tonga",
+   "iso3": "TON",
    "group": "Oceania",
    "facts": {
+    "iso3": "TON",
     "anthem": "Ko e fasi 'o e tu'i 'o e 'Otu Tonga",
     "continent": "Oceania"
    },
@@ -3604,8 +3920,10 @@
   {
    "id": "tunisia",
    "name": "Tunisia",
+   "iso3": "TUN",
    "group": "Africa",
    "facts": {
+    "iso3": "TUN",
     "anthem": "Humat Al Hima",
     "continent": "Africa"
    },
@@ -3627,8 +3945,10 @@
   {
    "id": "turkey",
    "name": "Turkey",
+   "iso3": "TUR",
    "group": "Europe",
    "facts": {
+    "iso3": "TUR",
     "anthem": "İstiklâl Marşı"
    },
    "blurb": "\"İstiklâl Marşı\" is the national anthem of Turkey.",
@@ -3649,8 +3969,10 @@
   {
    "id": "turkmenistan",
    "name": "Turkmenistan",
+   "iso3": "TKM",
    "group": "Asia",
    "facts": {
+    "iso3": "TKM",
     "anthem": "National anthem of Turkmenistan",
     "continent": "Asia"
    },
@@ -3672,8 +3994,10 @@
   {
    "id": "uganda",
    "name": "Uganda",
+   "iso3": "UGA",
    "group": "Africa",
    "facts": {
+    "iso3": "UGA",
     "anthem": "Oh Uganda, Land of Beauty",
     "continent": "Africa"
    },
@@ -3695,8 +4019,10 @@
   {
    "id": "ukraine",
    "name": "Ukraine",
+   "iso3": "UKR",
    "group": "Europe",
    "facts": {
+    "iso3": "UKR",
     "anthem": "Shche ne vmerla Ukrainy i slava, i volia",
     "continent": "Europe"
    },
@@ -3718,8 +4044,10 @@
   {
    "id": "united-arab-emirates",
    "name": "United Arab Emirates",
+   "iso3": "ARE",
    "group": "Asia",
    "facts": {
+    "iso3": "ARE",
     "anthem": "Ishy Bilady",
     "continent": "Asia"
    },
@@ -3741,8 +4069,10 @@
   {
    "id": "united-kingdom",
    "name": "United Kingdom",
+   "iso3": "GBR",
    "group": "Europe",
    "facts": {
+    "iso3": "GBR",
     "anthem": "God Save the King",
     "continent": "Europe"
    },
@@ -3764,8 +4094,10 @@
   {
    "id": "united-states",
    "name": "United States",
+   "iso3": "USA",
    "group": "North America",
    "facts": {
+    "iso3": "USA",
     "anthem": "The Star-Spangled Banner",
     "continent": "North America"
    },
@@ -3787,8 +4119,10 @@
   {
    "id": "uruguay",
    "name": "Uruguay",
+   "iso3": "URY",
    "group": "South America",
    "facts": {
+    "iso3": "URY",
     "anthem": "National Anthem of Uruguay",
     "continent": "South America"
    },
@@ -3810,8 +4144,10 @@
   {
    "id": "uzbekistan",
    "name": "Uzbekistan",
+   "iso3": "UZB",
    "group": "Asia",
    "facts": {
+    "iso3": "UZB",
     "anthem": "National Anthem of Uzbekistan",
     "continent": "Asia"
    },
@@ -3833,8 +4169,10 @@
   {
    "id": "vanuatu",
    "name": "Vanuatu",
+   "iso3": "VUT",
    "group": "Insular Oceania",
    "facts": {
+    "iso3": "VUT",
     "anthem": "Yumi, Yumi",
     "continent": "Insular Oceania"
    },
@@ -3856,8 +4194,10 @@
   {
    "id": "vatican-city",
    "name": "Vatican City",
+   "iso3": "VAT",
    "group": "Europe",
    "facts": {
+    "iso3": "VAT",
     "anthem": "Inno e Marcia Pontificale",
     "continent": "Europe"
    },
@@ -3879,8 +4219,10 @@
   {
    "id": "venezuela",
    "name": "Venezuela",
+   "iso3": "VEN",
    "group": "South America",
    "facts": {
+    "iso3": "VEN",
     "anthem": "gloria al bravo pueblo",
     "continent": "South America"
    },
@@ -3902,8 +4244,10 @@
   {
    "id": "vietnam",
    "name": "Vietnam",
+   "iso3": "VNM",
    "group": "Asia",
    "facts": {
+    "iso3": "VNM",
     "anthem": "Tiến Quân Ca",
     "continent": "Asia"
    },
@@ -3925,8 +4269,10 @@
   {
    "id": "yemen",
    "name": "Yemen",
+   "iso3": "YEM",
    "group": "Asia",
    "facts": {
+    "iso3": "YEM",
     "anthem": "National anthem of Yemen",
     "continent": "Asia"
    },
@@ -3948,8 +4294,10 @@
   {
    "id": "zambia",
    "name": "Zambia",
+   "iso3": "ZMB",
    "group": "Africa",
    "facts": {
+    "iso3": "ZMB",
     "anthem": "Stand and Sing of Zambia, Proud and Free",
     "continent": "Africa"
    },
@@ -3971,8 +4319,10 @@
   {
    "id": "zimbabwe",
    "name": "Zimbabwe",
+   "iso3": "ZWE",
    "group": "Africa",
    "facts": {
+    "iso3": "ZWE",
     "anthem": "National Anthem of Zimbabwe",
     "continent": "Africa"
    },

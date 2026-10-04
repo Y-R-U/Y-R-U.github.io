@@ -116,6 +116,7 @@ const ANTHEM_OVERRIDE = {
   'Antigua and Barbuda': 'File:Antigua and Barbuda National Anthem.ogg',
 };
 const ANTHEM_NAME = { Denmark: 'Der er et yndigt land', Mexico: 'Himno Nacional Mexicano', Jamaica: 'Jamaica, Land We Love', 'Federated States of Micronesia': 'Patriots of Micronesia', 'Antigua and Barbuda': 'Fair Antigua, We Salute Thee', 'New Zealand': 'God Defend New Zealand', 'United Kingdom': 'God Save the King', Germany: 'Deutschlandlied (third stanza)', Spain: 'Marcha Real', Portugal: 'A Portuguesa', Russia: 'State Anthem of the Russian Federation' };
+const ISO_FIX = { Kosovo: 'XKX', Denmark: 'DNK', Netherlands: 'NLD', 'United Kingdom': 'GBR', China: 'CHN', France: 'FRA' };
 const NAME_FIX = { "People's Republic of China": 'China', 'Kingdom of the Netherlands': 'Netherlands', 'Kingdom of Denmark': 'Denmark', 'The Bahamas': 'Bahamas' };
 // same tune as another country's anthem, or a disputed/contested choice: leave out
 const ANTHEM_SKIP = new Set(['Liechtenstein', 'Cyprus', 'Afghanistan', 'Kosovo', 'Palestine', 'Taiwan', 'Malawi']);
@@ -124,19 +125,20 @@ const MEDIUM = new Set(['Netherlands', 'Sweden', 'Norway', 'Denmark', 'Finland',
   'Argentina', 'South Africa', 'South Korea', 'Nigeria', 'Kenya', 'Jamaica', 'Cuba', 'Chile', 'Colombia', 'Peru', 'Ukraine', 'Hungary', 'Czech Republic', 'Iceland', 'Scotland', 'Wales', 'Croatia', 'Romania', 'Saudi Arabia', 'Iran', 'Pakistan', 'Philippines', 'Vietnam', 'Thailand', 'Indonesia', 'Venezuela', 'Uruguay', 'Morocco', 'Ghana', 'Ethiopia']);
 
 async function anthems() {
-  const rows = await sparql(`SELECT ?c ?cLabel ?a ?aLabel ?audio ?cont ?contLabel WHERE { ?c wdt:P31 wd:Q3624078; wdt:P85 ?a. FILTER NOT EXISTS { ?c wdt:P576 [] }
-    OPTIONAL { ?a wdt:P51 ?audio. } OPTIONAL { ?c wdt:P30 ?cont. } SERVICE wikibase:label { bd:serviceParam wikibase:language "en". } }`);
+  const rows = await sparql(`SELECT ?c ?cLabel ?a ?aLabel ?audio ?cont ?contLabel ?iso WHERE { ?c wdt:P31 wd:Q3624078; wdt:P85 ?a. FILTER NOT EXISTS { ?c wdt:P576 [] }
+    OPTIONAL { ?a wdt:P51 ?audio. } OPTIONAL { ?c wdt:P30 ?cont. } OPTIONAL { ?c wdt:P298 ?iso. } SERVICE wikibase:label { bd:serviceParam wikibase:language "en". } }`);
   const byCountry = new Map();
   for (const r of rows) {
     const raw = r.cLabel.value, name = NAME_FIX[raw] || raw;
     if (ANTHEM_SKIP.has(name) || (/^Q\d+$/.test(r.aLabel.value) && !ANTHEM_NAME[name])) continue;
-    const e = byCountry.get(name) || { name, raw, anthems: new Set(), files: new Set(), cont: new Set() };
+    const e = byCountry.get(name) || { name, raw, anthems: new Set(), files: new Set(), cont: new Set(), iso: new Set() };
+    if (r.iso) e.iso.add(r.iso.value);
     e.anthems.add(r.aLabel.value);
     if (r.audio) e.files.add(fileTitle(r.audio.value));
     if (r.contLabel) e.cont.add(r.contLabel.value);
     byCountry.set(name, e);
   }
-  if (!byCountry.has('Portugal')) byCountry.set('Portugal', { name: 'Portugal', raw: 'Portugal', anthems: new Set(['A Portuguesa']), files: new Set(), cont: new Set(['Europe']) });
+  if (!byCountry.has('Portugal')) byCountry.set('Portugal', { name: 'Portugal', raw: 'Portugal', anthems: new Set(['A Portuguesa']), files: new Set(), cont: new Set(['Europe']), iso: new Set(['PRT']) });
   for (const [raw, f] of Object.entries(ANTHEM_OVERRIDE)) {
     const name = NAME_FIX[raw] || raw;
     const e = byCountry.get(name);
@@ -153,9 +155,11 @@ async function anthems() {
     if (!a) { dropped.push(`${e.name}: no usable file (${[...e.files].map((f) => info[f]?.license || 'missing').join(', ') || 'none'})`); continue; }
     if (!(await headOk(a.src))) { dropped.push(`${e.name}: transcode not reachable`); continue; }
     const anthem = ANTHEM_NAME[e.name] || [...e.anthems][0];
+    const iso3 = ISO_FIX[e.name] || ([...e.iso].length === 1 ? [...e.iso][0] : null);
+    if (!/^[A-Z]{3}$/.test(iso3 || '')) { dropped.push(`${e.name}: no single ISO alpha-3 (${[...e.iso].join(',')})`); continue; }
     items.push({
-      id: slug(e.name), name: e.name, group: [...e.cont][0] || undefined,
-      facts: { anthem, ...(e.cont.size === 1 ? { continent: [...e.cont][0] } : {}) },
+      id: slug(e.name), name: e.name, iso3, group: [...e.cont][0] || undefined,
+      facts: { iso3, anthem, ...(e.cont.size === 1 ? { continent: [...e.cont][0] } : {}) },
       blurb: anthem.toLowerCase().includes(e.name.toLowerCase().split(' ')[0]) || /^national anthem/i.test(anthem) ? `The national anthem of ${e.name}.` : `"${anthem}" is the national anthem of ${e.name}.`,
       media: { audio: [audioObj(a, { minStart: 1 })] },
       difficulty: EASY.has(e.name) ? 1 : MEDIUM.has(e.name) ? 2 : 3,
@@ -164,7 +168,7 @@ async function anthems() {
   write({
     id: 'anthems', title: 'National anthems', theme: 'music', icon: '🎺', kids: false, version: 1,
     listenPrompt: "Which country's national anthem is this?",
-    factsMeta: { anthem: { type: 'text', label: 'Anthem' }, continent: { type: 'cat', label: 'Continent' } },
+    factsMeta: { iso3: { type: 'text', label: 'ISO code' }, anthem: { type: 'text', label: 'Anthem' }, continent: { type: 'cat', label: 'Continent' } },
     items, questions: [],
     sources: [{ name: 'Wikidata (country → anthem → audio)', url: 'https://www.wikidata.org' }, { name: 'Wikimedia Commons; most recordings by the United States Navy Band (US government work, public domain)', url: 'https://commons.wikimedia.org/wiki/Category:Audio_files_of_national_anthems_performed_by_the_United_States_Navy_Band' }],
   }, dropped);

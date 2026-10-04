@@ -57,7 +57,7 @@ defineScreen('home', el => {
       h('div.sticker-shelf', {}, ...kp.stickers.slice(0, Math.max(8, kp.have + 4)).map((x, i) => h('span.sticker', { class: i < kp.have ? '' : 'locked' }, x))));
   }
 
-  el.append(
+  el.append(...[
     h('div.home-top', {}, logo(), h('div.tools', {}, ...toolButtons(),
       h('button.icon-btn', { type: 'button', 'aria-label': 'Settings', onclick: () => go('settings') }, '⚙️'))),
     h('p.tagline', {}, kids ? 'Big pictures, no rush, stickers to win!' : 'Trivia for curious minds.'),
@@ -74,7 +74,7 @@ defineScreen('home', el => {
     h('div.home-foot', {},
       h('button.btn.ghost.small', { type: 'button', onclick: () => go('settings') }, 'Settings'),
       h('button.btn.ghost.small', { type: 'button', onclick: () => go('credits') }, 'Credits')),
-  );
+  ].filter(Boolean));
 }, { pester: true });
 
 export function openMode(id) {

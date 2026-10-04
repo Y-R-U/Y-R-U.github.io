@@ -62,6 +62,10 @@
     "marmalade-hoverfly"
    ],
    "blurb": "The bee that makes the honey we eat. A hive can hold tens of thousands of bees with one queen.",
+   "differences": {
+    "common-wasp": "The honey bee is furry and golden-brown with a rounded body; the common wasp is shiny, bright yellow and black, with a narrow waist.",
+    "marmalade-hoverfly": "The hoverfly has one pair of wings, big eyes, short stubby antennae and hovers still; the honey bee has two pairs of wings and longer antennae."
+   },
    "clues": [
     "Family: Apidae.",
     "Genus: Apis.",
@@ -124,6 +128,11 @@
     "common-carder-bee"
    ],
    "blurb": "A big, fuzzy bee common in Europe. It can fly in cooler weather than most bees by shivering to warm up.",
+   "differences": {
+    "red-tailed-bumblebee": "The buff-tailed bumblebee has yellow bands and a pale tail; the red-tailed bumblebee is mostly black with an orange-red tail.",
+    "common-carder-bee": "The common carder bee is smaller and gingery-brown all over; the buff-tailed bumblebee is black with yellow bands and a pale tail.",
+    "dark-edged-bee-fly": "The bee-fly has a long straight beak, one pair of dark-edged wings and hovers to feed; the bumblebee has two pairs of wings and lands on flowers."
+   },
    "clues": [
     "Family: Apidae.",
     "Genus: Bombus.",
@@ -179,6 +188,9 @@
     "buff-tailed-bumblebee"
    ],
    "blurb": "A black bumblebee with a bright orange-red tail, common in European gardens.",
+   "differences": {
+    "buff-tailed-bumblebee": "The buff-tailed bumblebee has yellow bands and a pale tail; the red-tailed bumblebee is mostly black with an orange-red tail."
+   },
    "clues": [
     "Family: Apidae.",
     "Genus: Bombus.",
@@ -235,6 +247,9 @@
     "buff-tailed-bumblebee"
    ],
    "blurb": "A small gingery bumblebee that weaves moss into a nest above ground.",
+   "differences": {
+    "buff-tailed-bumblebee": "The common carder bee is smaller and gingery-brown all over; the buff-tailed bumblebee is black with yellow bands and a pale tail."
+   },
    "clues": [
     "Family: Apidae.",
     "Genus: Bombus.",
@@ -680,6 +695,13 @@
     "marmalade-hoverfly"
    ],
    "blurb": "The yellow-and-black wasp that turns up at picnics in late summer. It builds paper nests from chewed wood.",
+   "differences": {
+    "honey-bee": "The honey bee is furry and golden-brown with a rounded body; the common wasp is shiny, bright yellow and black, with a narrow waist.",
+    "german-wasp": "They are almost identical; the German wasp usually has three tiny black dots on its face, while the common wasp has an anchor-shaped mark.",
+    "european-hornet": "The hornet is much bigger, with a brown and yellow body and a reddish head; the common wasp is smaller and bright yellow and black.",
+    "marmalade-hoverfly": "The hoverfly has one pair of wings, huge eyes and short antennae and hovers still; the wasp has two pairs of wings, a narrow waist and longer antennae.",
+    "european-paper-wasp": "The paper wasp is slimmer, dangles its legs in flight and has orange antennae; the common wasp is stockier and builds covered paper nests."
+   },
    "clues": [
     "Family: Vespidae.",
     "Genus: Vespula.",
@@ -741,6 +763,9 @@
     "common-wasp"
    ],
    "blurb": "A yellowjacket wasp from Europe that has invaded Australia, New Zealand and the Americas.",
+   "differences": {
+    "common-wasp": "They are almost identical; the German wasp usually has three tiny black dots on its face, while the common wasp has an anchor-shaped mark."
+   },
    "clues": [
     "Family: Vespidae.",
     "Genus: Vespula.",
@@ -802,6 +827,11 @@
     "asian-hornet"
    ],
    "blurb": "The largest wasp in Europe. It is brown and yellow, and calmer than you might think.",
+   "differences": {
+    "common-wasp": "The hornet is much bigger, with a brown and yellow body and a reddish head; the common wasp is smaller and bright yellow and black.",
+    "asian-giant-hornet": "The Asian giant hornet is bigger, with a large orange head and dark-banded abdomen; the European hornet has a reddish-brown head and a mostly yellow abdomen.",
+    "asian-hornet": "The Asian hornet is darker, with a mostly black abdomen, an orange band near the tip and yellow leg tips; the European hornet is bigger with a mostly yellow abdomen."
+   },
    "clues": [
     "Family: Vespidae.",
     "Genus: Vespa.",
@@ -864,6 +894,10 @@
     "asian-hornet"
    ],
    "blurb": "The largest wasp in the world, from East Asia. A small group can kill a whole hive of honey bees.",
+   "differences": {
+    "european-hornet": "The Asian giant hornet is bigger, with a large orange head and dark-banded abdomen; the European hornet has a reddish-brown head and a mostly yellow abdomen.",
+    "asian-hornet": "The Asian giant hornet is much larger with an orange head and yellow-banded abdomen; the Asian hornet is smaller and mostly dark, with yellow leg tips."
+   },
    "clues": [
     "Family: Vespidae.",
     "Genus: Vespa.",
@@ -925,6 +959,10 @@
     "asian-giant-hornet"
    ],
    "blurb": "A dark hornet from Asia with yellow legs. It has spread across Europe and hunts honey bees outside their hives.",
+   "differences": {
+    "european-hornet": "The Asian hornet is darker, with a mostly black abdomen, an orange band near the tip and yellow leg tips; the European hornet is bigger with a mostly yellow abdomen.",
+    "asian-giant-hornet": "The Asian giant hornet is much larger with an orange head and yellow-banded abdomen; the Asian hornet is smaller and mostly dark, with yellow leg tips."
+   },
    "clues": [
     "Family: Vespidae.",
     "Genus: Vespa.",
@@ -1037,6 +1075,9 @@
     "common-wasp"
    ],
    "blurb": "A slim wasp that builds small, open, umbrella-shaped nests under roofs. It dangles its legs in flight.",
+   "differences": {
+    "common-wasp": "The paper wasp is slimmer, dangles its legs in flight and has orange antennae; the common wasp is stockier and builds covered paper nests."
+   },
    "clues": [
     "Family: Vespidae.",
     "Genus: Polistes.",
@@ -1481,6 +1522,10 @@
     "honey-bee"
    ],
    "blurb": "A harmless fly dressed up like a wasp. It hovers still in the air and cannot sting.",
+   "differences": {
+    "honey-bee": "The hoverfly has one pair of wings, big eyes, short stubby antennae and hovers still; the honey bee has two pairs of wings and longer antennae.",
+    "common-wasp": "The hoverfly has one pair of wings, huge eyes and short antennae and hovers still; the wasp has two pairs of wings, a narrow waist and longer antennae."
+   },
    "clues": [
     "Family: Syrphidae.",
     "Genus: Episyrphus.",
@@ -1542,6 +1587,9 @@
     "buff-tailed-bumblebee"
    ],
    "blurb": "A furry fly that looks like a bee, with a long straight beak for drinking nectar. Its young live in bees' nests.",
+   "differences": {
+    "buff-tailed-bumblebee": "The bee-fly has a long straight beak, one pair of dark-edged wings and hovers to feed; the bumblebee has two pairs of wings and lands on flowers."
+   },
    "clues": [
     "Family: Bombyliidae.",
     "Genus: Bombylius.",

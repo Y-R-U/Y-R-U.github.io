@@ -1,12 +1,14 @@
 // Device-hosted room logic: a port of server/rooms.go + scoring.go so the host's tab can be the room
 // server. Pure (no DOM, no network), so tools/p2p_test.mjs runs it in node. State shape = the server's.
+import { stageMultiplier, withStreak, progressiveLimit, stageExtendMs, PROGRESSIVE_CAP } from '../core/scoring.js?v=1';
+export { stageMultiplier, withStreak };
 
 export const MAX_PLAYERS = 8;
 export const LEAD_IN_MS = 3000;
 export const GRACE_MS = 500;
 export const ONLINE_MS = 6000;           // a dropped data channel counts as online this long (refresh/rejoin)
 const DEFAULT_ANSWER = 10000, DEFAULT_GAP = 5000, KIDS_ANSWER = 20000, MAX_BASE = 500;
-export const STAGE_CAP_MS = 90000, STAGE_MIN_MS = 10000, STAGE_EXTEND_MIN = 5000, KIDS_STAGE_MS = 4000;
+export const KIDS_STAGE_MS = 4000;
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const ANSWER_CHOICES = [3, 5, 10, 15, 20, 30], GAP_CHOICES = [3, 5, 10];
 
@@ -18,7 +20,6 @@ export const newCode = (rand = Math.random) => rnd(CODE_ALPHABET, 5, rand);
 const newKey = rand => rnd('abcdefghijklmnopqrstuvwxyz0123456789', 24, rand);
 
 export const stagesOf = q => (q && Number(q.stages) >= 2 ? Math.min(20, Math.floor(Number(q.stages))) : 0);
-export const stageMultiplier = (stage, stages) => (stages >= 2 ? 1 - 0.6 * Math.max(0, Math.min(stage, stages - 1)) / (stages - 1) : 1);
 
 // Base points before the streak bonus (scoring.go basePoints, plus the stage multiplier).
 export function basePoints(format, correct, clientPoints, ms, limitMs, timed, mult = 1) {
@@ -31,10 +32,6 @@ export function basePoints(format, correct, clientPoints, ms, limitMs, timed, mu
   return Math.round(base * mult);
 }
 
-export function withStreak(base, streak) {
-  if (streak <= 1 || base === 0) return base;
-  return Math.round(base * (100 + Math.min(50, 10 * (streak - 1))) / 100);
-}
 
 // mc (index) and tf (bool) are re-checked; everything else trusts the client's claim.
 export function verifyCorrect(q, given, claimed) {
@@ -93,7 +90,7 @@ export class P2PRoom {
     let ms = this.answerMs > 0 ? this.answerMs : DEFAULT_ANSWER;
     const long = LONG[q?.format];
     if (long && long > ms) ms = long;
-    return stagesOf(q) ? Math.max(ms, STAGE_MIN_MS, Math.floor(this.answerMs * 3 / 2)) : ms;
+    return stagesOf(q) ? Math.max(ms, progressiveLimit(this.answerMs)) : ms;
   }
 
   // Progressive questions stretch their deadline as stages open; the ring re-targets (scoring keeps the initial limit).
@@ -190,8 +187,8 @@ export class P2PRoom {
   // Advance and extend: deadline = max(current, now + max(5 s, answer/2)), never past start + 90 s.
   setStage(st, now = this.now()) {
     this.stage = st; this.stageAt = now; this.votes = new Set();
-    const ext = now + Math.max(STAGE_EXTEND_MIN, Math.floor(this.answerMs / 2));
-    this.qDeadline = Math.min(Math.max(this.qDeadline, ext), this.qStart + STAGE_CAP_MS);
+    const ext = now + stageExtendMs(this.answerMs);
+    this.qDeadline = Math.min(Math.max(this.qDeadline, ext), this.qStart + PROGRESSIVE_CAP);
     this.changed();
   }
 

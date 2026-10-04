@@ -62,13 +62,16 @@ async function startHosting(room, hostKey) {
   const Peer = await loadPeer();
   let peer = null;
   // A refreshed host reclaims its id; the broker may need a few seconds to notice the old socket closed.
+  const t0 = Date.now();
   for (let i = 0; !peer; i++) {
     try { peer = await openHostPeer(Peer, room.code); } catch (e) {
-      if (e.code !== 'id_taken' || i >= 12) throw e;
-      if (!hostKey) room.code = newCode();
-      else await new Promise(r => setTimeout(r, 1500));
+      stats.hostRetries = [...(stats.hostRetries || []), `${e.code}@${Date.now() - t0}`];
+      if (e.code === 'id_taken' && !hostKey && i < 5) { room.code = newCode(); continue; }
+      if (!hostKey || Date.now() - t0 > 45000) throw e.code === 'broker' ? new P2PError('network', MSG.broker, 0) : e;
+      await new Promise(r => setTimeout(r, 1500));
     }
   }
+  stats.hostOpenMs = Date.now() - t0;
   const H = { code: room.code, peer, room, conns: new Map(), listeners: new Set(), timers: [], dirty: false, onlineSig: '' };
   hosting = H;
   room.onChange = () => scheduleBroadcast(H);

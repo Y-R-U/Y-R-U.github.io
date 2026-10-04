@@ -101,6 +101,9 @@
     "painted-lady"
    ],
    "blurb": "An orange-and-black butterfly famous for flying thousands of kilometres from North America to Mexico for winter.",
+   "differences": {
+    "painted-lady": "The monarch is orange with thick black veins; the painted lady is orange-brown with black and white spots near the wingtips."
+   },
    "clues": [
     "Family: Nymphalidae.",
     "Genus: Danaus.",
@@ -157,6 +160,10 @@
     "red-admiral"
    ],
    "blurb": "One of the most widespread butterflies on Earth. Some fly from Africa to Europe and back again each year.",
+   "differences": {
+    "monarch-butterfly": "The monarch is orange with thick black veins; the painted lady is orange-brown with black and white spots near the wingtips.",
+    "red-admiral": "The red admiral is black with a red band and white spots; the painted lady is mostly orange-brown."
+   },
    "clues": [
     "Family: Nymphalidae.",
     "Genus: Vanessa.",
@@ -263,6 +270,9 @@
     "painted-lady"
    ],
    "blurb": "A black butterfly with bright red bands and white spots. It is common in gardens in late summer.",
+   "differences": {
+    "painted-lady": "The red admiral is black with a red band and white spots; the painted lady is mostly orange-brown."
+   },
    "clues": [
     "Family: Nymphalidae.",
     "Genus: Vanessa.",
@@ -368,6 +378,9 @@
     "complete": true
    },
    "blurb": "A big butterfly from South American rainforests with shining blue wings. The blue comes from tiny scales that reflect light, not from colour.",
+   "differences": {
+    "ulysses-butterfly": "The Ulysses butterfly has tails on its back wings and lives in Queensland and New Guinea; the blue morpho has no tails and lives in Central and South America."
+   },
    "clues": [
     "Family: Nymphalidae.",
     "Its colour comes from the structure of its scales, not pigment.",
@@ -427,6 +440,9 @@
     "ulysses-butterfly"
    ],
    "blurb": "A big yellow-and-black butterfly with tails on its back wings. In Britain it lives only in the Norfolk Broads.",
+   "differences": {
+    "ulysses-butterfly": "The Old World swallowtail is yellow and black; the Ulysses butterfly is bright metallic blue and black."
+   },
    "clues": [
     "Family: Papilionidae.",
     "Genus: Papilio.",
@@ -487,6 +503,10 @@
     "old-world-swallowtail"
    ],
    "blurb": "A large electric-blue swallowtail of north Queensland and New Guinea. It is a tourism symbol of Queensland.",
+   "differences": {
+    "old-world-swallowtail": "The Old World swallowtail is yellow and black; the Ulysses butterfly is bright metallic blue and black.",
+    "blue-morpho": "The Ulysses butterfly has tails on its back wings and lives in Queensland and New Guinea; the blue morpho has no tails and lives in Central and South America."
+   },
    "clues": [
     "Family: Papilionidae.",
     "Genus: Papilio.",
@@ -839,6 +859,9 @@
     "complete": true
    },
    "blurb": "A big beetle whose males have huge jaws like antlers. They use them to wrestle other males.",
+   "differences": {
+    "hercules-beetle": "The Hercules beetle male has a long horn from its head and thorax; the stag beetle male has huge antler-like jaws."
+   },
    "clues": [
     "Family: Lucanidae.",
     "Genus: Lucanus.",
@@ -893,6 +916,9 @@
     "stag-beetle"
    ],
    "blurb": "One of the longest beetles in the world, from Central and South American rainforests. Males have a huge horn.",
+   "differences": {
+    "stag-beetle": "The Hercules beetle male has a long horn from its head and thorax; the stag beetle male has huge antler-like jaws."
+   },
    "clues": [
     "Family: Scarabaeidae.",
     "Genus: Dynastes.",
@@ -1321,6 +1347,9 @@
     "orchid-mantis"
    ],
    "blurb": "A green insect that holds its spiky front legs as if praying. It catches other insects in a flash.",
+   "differences": {
+    "orchid-mantis": "The European mantis is green or brown and plain; the orchid mantis is pink and white with petal-shaped legs."
+   },
    "clues": [
     "It can turn its head to look over its shoulder.",
     "Females sometimes eat males.",
@@ -1374,6 +1403,9 @@
     "european-mantis"
    ],
    "blurb": "A pink-and-white mantis from South-East Asia that looks like a flower. Insects that come to visit get eaten.",
+   "differences": {
+    "european-mantis": "The European mantis is green or brown and plain; the orchid mantis is pink and white with petal-shaped legs."
+   },
    "clues": [
     "Family: Hymenopodidae.",
     "Genus: Hymenopus.",
@@ -1433,6 +1465,9 @@
     "leaf-insect"
    ],
    "blurb": "A big spiky Australian stick insect that curls its tail like a scorpion. Ants carry its eggs into their nests.",
+   "differences": {
+    "leaf-insect": "The leaf insect is very flat and leaf-shaped; the spiny leaf insect is spiky and curls its tail like a scorpion."
+   },
    "clues": [
     "Family: Phasmatidae.",
     "Genus: Extatosoma.",
@@ -1490,6 +1525,9 @@
     "spiny-leaf-insect"
    ],
    "blurb": "An insect so flat and green it looks exactly like a leaf, even with fake veins and bite marks.",
+   "differences": {
+    "spiny-leaf-insect": "The leaf insect is very flat and leaf-shaped; the spiny leaf insect is spiky and curls its tail like a scorpion."
+   },
    "clues": [
     "Family: Phylliidae.",
     "Some even have brown edges as if they are dying.",
@@ -1547,6 +1585,9 @@
     "banded-demoiselle"
    ],
    "blurb": "A big blue-and-green dragonfly that patrols ponds. It catches other insects in mid-air.",
+   "differences": {
+    "banded-demoiselle": "The demoiselle is a damselfly: slim, folds its wings along its body at rest and males have dark wing bands; the emperor is a big dragonfly that rests with wings spread."
+   },
    "clues": [
     "Family: Aeshnidae.",
     "Genus: Anax.",
@@ -1604,6 +1645,9 @@
     "emperor-dragonfly"
    ],
    "blurb": "A damselfly with a shining blue-green body. Males have a dark band on each wing and flutter like butterflies.",
+   "differences": {
+    "emperor-dragonfly": "The demoiselle is a damselfly: slim, folds its wings along its body at rest and males have dark wing bands; the emperor is a big dragonfly that rests with wings spread."
+   },
    "clues": [
     "Family: Calopterygidae.",
     "Genus: Calopteryx.",
@@ -1770,6 +1814,9 @@
     "complete": false
    },
    "blurb": "A big green Australian cicada. Males sing so loudly in summer they are among the loudest insects in the world.",
+   "differences": {
+    "periodical-cicada": "The green grocer is a big green Australian cicada; the periodical cicada is black with red eyes and lives in the eastern USA."
+   },
    "clues": [
     "Genus: Cyclochila.",
     "Its young live underground for years.",
@@ -1823,6 +1870,9 @@
     "green-grocer-cicada"
    ],
    "blurb": "A red-eyed cicada of the eastern USA that lives underground for 17 years, then comes out in billions all at once.",
+   "differences": {
+    "green-grocer-cicada": "The green grocer is a big green Australian cicada; the periodical cicada is black with red eyes and lives in the eastern USA."
+   },
    "clues": [
     "Genus: Magicicada.",
     "Its species name means seventeen.",

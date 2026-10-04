@@ -53,6 +53,7 @@ All JSON. Errors `{ error, code }` (+ `level` on gate refusals). CORS: `https://
 | `GET /rooms/{code}/q/{i}?k=` | `{ i, game, question }` — only up to current+1 (prefetch) |
 | `POST /rooms/{code}/answer` | `{ key, q, given, correct, points?, ms }` → `{ correct, points, ms, score, streak, state }` |
 | `POST /rooms/{code}/leave` | `{ key }` |
+| `POST /rooms/{code}/vote` | `{ key, q }` → state (vote to reveal more) |
 | `POST /rooms/{code}/{start,next,end,kick,host,settings,again}` | host only, `{ key (or hostKey), playerId?, answerSec?, gapSec?, public?, startIn?, lateJoin?, spec+questions (again) }` → state |
 | `POST /challenges` | `{ name, title, spec, questions, score, correct, ms }` → `{ id }` (8 chars) |
 | `GET /challenges/{id}` | `{ name, title, spec, questions, total, score, plays, scores[top 50] }` |
@@ -78,6 +79,33 @@ and survive restarts/deploys. Host away > 30 s or leaving → earliest-joined on
 from the next question (unless `lateJoin:false`). Names: ≤ 20 runes, control/format chars and `<>` stripped, profanity
 filter (substring + whole-word lists with exceptions: Hancock, Dickens, Sussex pass), case-insensitive dedupe "Sam 2".
 
+## Vote to reveal more (progressive questions) — added 2026-10-05
+- **Server:** a question with `stages: N ≥ 2` is progressive. `POST /rooms/{code}/vote { key|playerKey, q }` → state
+  (409 `locked` / `last_stage` / `cannot_vote` / `not_open` are harmless). needed = connected players who can still answer
+  and haven't; when every one of them has voted, stage +1 for everyone and votes reset. A disconnected player drops out of
+  `needed` (re-checked every tick). The first answer locks voting. Kids rooms auto-advance a stage every 4 s.
+  Timing: initial deadline = answer time × 1.5 (min 10 s); each advance extends to max(deadline, now + max(5 s,
+  answer/2)); capped at 90 s from question start; +500 ms grace on the final deadline. Points = base × (1 − 0.6·stage/(N−1))
+  using the server's stage at receive time, then the streak bonus. Answers record their stage (`you.stage`).
+- **State fields** (no separate messages; the transport carries them in room state): `stage, stages, votes, needed,
+  locked`, with `qDeadline`/`limitMs` updated on each advance, and `you.voted`, `you.stage`. For P2P: a "stage" event =
+  `stage` went up (with the new `qDeadline`), "lock" = `locked` became true, "vote" = `votes/needed` changed.
+  Transport method: `vote(code, key, q)`.
+- **Runner (`js/structures/runner.js`, A's file, edited by S):** `api.stage`, `api.stages`, `api.stageLocked`,
+  `api.onStage(cb) → unsubscribe`, `api.requestMore()`, `api.moreButton` (true when the runner draws the shared button, so
+  formats hide their own). The runner draws "Show more 👀 (votes/needed)" in the HUD row with Locked 🔒 / All shown states.
+  Solo: requestMore advances at once (kids: auto every 4 s) and extends the local timer by the same rule, with a "+5s"
+  flourish on the ring. Online: `cfg.requestMore(i, q, stage)` sends the vote; the room calls `run.setStage(stage,
+  deadline, limitMs)`, `run.setVotes(votes, needed, voted)`, `run.lockStages()`. Answer records carry `stage`/`stages`; the
+  multiplier lives in `js/core/scoring.js` (`stageMultiplier`, `progressiveLimit`, `stageExtendMs`, `PROGRESSIVE_CAP`).
+- **Other runner changes (lane AU requests):** the previous format's `ctrl.destroy()` runs before each new question; the
+  HUD row is shown when a question is progressive. `session.js` gained `prepareFormats(questions)` (calls `fmt.prepare?.(qs)`
+  before preflight); rooms also call it per fetched question. Online rooms put `online: true` into every round's `opts`.
+- **Async progressive scoring (challenges):** Show more is free to use (points still follow the multiplier). Both challenge
+  kinds store per-question `detail = [[correct, stage, ms], …]` (server column `challenge_scores.detail`, link payload
+  `c[].d`). The results show a "Question by question" panel: the winner of each question is correct with the lowest stage,
+  ties by time, with the stage used shown per player ("clue 2", "step 2/4" or the question's `stageLabels[s]`).
+
 ## Protection, caps, stats, alerts
 - Caps (env): public 5 `CLUED_MAX_PUBLIC`, private 20 active (touched < 20 min, not final) `CLUED_MAX_PRIVATE`, 16
   players/room `CLUED_MAX_PLAYERS`, 200 SSE `CLUED_MAX_SSE` (+120/IP), 300 challenges/day `CLUED_CHALLENGES_PER_DAY`,
@@ -96,7 +124,7 @@ filter (substring + whole-word lists with exceptions: Hancock, Dickens, Sussex p
   **Verified:** `clued test-alert` on the box → "delivered via: ntfy".
 - Admin page `admin.html` (Google sign-in via /lib/auth; server checks the token): KPIs, 14-day SVG chart, live rooms with
   Close, level switcher, alerts + "Send test alert". Box CLI: `clued test-alert`, `clued level N`.
-- Memory: RSS **10 MB** idle on br8t; **28 MB** locally with 20 rooms × 10 players and 180 SSE streams.
+- Memory: RSS **10–12 MB** idle on br8t; **28 MB** locally with 20 rooms × 10 players and 180 SSE streams.
   Unit: `GOMEMLIMIT=48MiB`, `MemoryMax=128M`.
 
 ## Transport interface (for the wave-2 P2P lane)
@@ -122,19 +150,27 @@ preflight from `https://y-r-u.github.io` returns `access-control-allow-origin`, 
 `/api/admin/overview` → 401 without a token.
 
 ## How to test
-- `server/test.sh` — gofmt, vet, 18 Go test funcs (rooms flow, scoring, mc/tf verification, kids, grace 499/501 ms,
+- `server/test.sh` — gofmt, vet, 21 Go test funcs (now also: unanimous vote advance, lock on first answer, a disconnected
+  player not blocking, the stage multiplier, deadline extension + 90 s cap + 10 s minimum, kids auto-advance, challenge
+  detail; the multiplier and cap tests were checked to fail when broken) (rooms flow, scoring, mc/tf verification, kids, grace 499/501 ms,
   early end, host-chosen timing, kick/leave/handover, Firebase uid, rate limits, body caps, expiry, persistence, SSE,
   CORS, challenges + 90-day expiry, public cap + listing + auto-start + abandonment, caps/levels/escalation, alert
   rate-limit, admin auth), then smoke-tests the real binary. Falsified: breaking CORS, timed scoring or the grace
   constant makes them fail.
 - `node tools/s_room_e2e.mjs [--poll]` — local server + 3 headless Chromes (9406/9436/9446): host creates via real clicks,
   2 joiners open the share link, 10 questions, a refresh/rejoin mid-game, a silent player on the last question,
-  identical final scores on all screens, host leave → handover. 29 checks, passes with SSE and with the polling fallback.
-- `node tools/s_challenge_e2e.mjs` — challenge from A's results screen, ?c= play + leaderboard; #lc= play + reply chain.
+  identical final scores on all screens, then a progressive round: everyone sees "Show more 👀 (0/3)", 2/3 → 3/3 advances
+  everyone, the first answer locks the button for all, the server applies the stage multiplier; host leave → handover.
+  36 checks, passes with SSE and with `--poll`. Runs have an 8-minute hard timeout and 20 s per CDP call; screenshots are
+  skipped (not failed) when Chrome is too loaded to capture.
+- `node tools/s_unit_test.mjs` — async winners (lowest stage, then time), detail ordering, multiplier and timing helpers.
+- `node tools/s_challenge_e2e.mjs` — challenge from A's results screen, ?c= play + leaderboard + comparison; #lc= play +
+  reply chain + comparison.
 - `node tools/s_public_e2e.mjs` — public list card (host, players, countdown) and public cap → private fallback.
 - `node tools/s_qr_test.mjs` — QR output decoded by jsQR (v1–13).
 
 ## Open issues
+- Other lanes share this scratchpad and the box's Chrome budget: use a private log path for e2e runs.
 - Local reveal points (runner card) use the server formula but can differ by a few points from the server's (scoreboards use server).
 - Profanity filter is English-only and basic.
 - Public-room titles come from the format title; there's no free-text title input (deliberately, less to moderate).

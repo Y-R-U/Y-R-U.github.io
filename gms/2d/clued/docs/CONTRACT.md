@@ -128,3 +128,4 @@ Item: `lname` (lower-case name for mid-sentence use), `quotes[]`, `quote`, `firs
 skip). factsMeta entries: wording templates `ask`, `askReverse`, `askBool`, `askHigh`, `askLow`, `stmt`, `minRatio`, `values`,
 `exclusive:false`; fact type `text`. Item prompts `imgPrompt`, `nameImgPrompt`, `tfImgPrompt`. Facts `flagDisputed`, `kids`.
 Index caps: `qkinds`, `itemImg`, `itemAudio`, `easy`, `kidsItems`.
+Question `refs`: `refs[0]` is the question's subject item; any further refs are the wrong-answer options' items (Learn mastery relies on this).

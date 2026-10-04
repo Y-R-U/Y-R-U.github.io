@@ -62,6 +62,11 @@
     "paddy-straw-mushroom"
    ],
    "blurb": "The deadliest mushroom in the world. It causes most mushroom poisoning deaths, and cooking does not make it safe.",
+   "differences": {
+    "field-mushroom": "The death cap has white gills, a ring and a cup-like sac at the base of its stem, and often a greenish cap; the field mushroom has pink gills that turn brown and no sac. Never rely on this to forage.",
+    "destroying-angel": "Both are deadly Amanitas with a ring and a cup at the base; the destroying angel is pure white, while the death cap's cap is usually yellow-green to olive.",
+    "paddy-straw-mushroom": "Young death caps and paddy straw mushrooms are both egg-shaped in a cup; the paddy straw mushroom has pink gills and no ring, the death cap white gills and a ring. People have died from this mix-up."
+   },
    "clues": [
     "Family: Amanitaceae.",
     "Genus: Amanita.",
@@ -117,6 +122,10 @@
     "field-mushroom"
    ],
    "blurb": "A pure white, deadly mushroom closely related to the death cap. It is easily mistaken for edible white mushrooms.",
+   "differences": {
+    "death-cap": "Both are deadly Amanitas with a ring and a cup at the base; the destroying angel is pure white, while the death cap's cap is usually yellow-green to olive.",
+    "field-mushroom": "The destroying angel keeps white gills and has a cup at its stem base; the field mushroom's gills are pink and then brown, with no cup."
+   },
    "clues": [
     "Family: Amanitaceae.",
     "Genus: Amanita.",
@@ -176,6 +185,9 @@
     "panther-cap"
    ],
    "blurb": "The classic red toadstool with white spots, seen in fairy tales and video games. It is poisonous.",
+   "differences": {
+    "panther-cap": "The fly agaric has a red or orange cap with white warts; the panther cap has a brown cap with white warts and a rim around the base of its stem."
+   },
    "clues": [
     "It was once broken into milk to kill flies.",
     "It grows with birch and pine trees.",
@@ -230,6 +242,9 @@
     "fly-agaric"
    ],
    "blurb": "A brown-capped Amanita with white warts. It is poisonous.",
+   "differences": {
+    "fly-agaric": "The fly agaric has a red or orange cap with white warts; the panther cap has a brown cap with white warts and a rim around the base of its stem."
+   },
    "clues": [
     "Family: Amanitaceae.",
     "Genus: Amanita.",
@@ -290,6 +305,12 @@
     "destroying-angel"
    ],
    "blurb": "A white mushroom of grassy fields, related to the button mushroom. Deadly white Amanitas can look similar.",
+   "differences": {
+    "death-cap": "The death cap has white gills, a ring and a cup-like sac at the base of its stem, and often a greenish cap; the field mushroom has pink gills that turn brown and no sac. Never rely on this to forage.",
+    "destroying-angel": "The destroying angel keeps white gills and has a cup at its stem base; the field mushroom's gills are pink and then brown, with no cup.",
+    "yellow-stainer": "The yellow stainer turns bright yellow when its stem base is scratched and smells of ink; the field mushroom does not.",
+    "button-mushroom": "They are close relatives: the button mushroom is farmed and has two spores per gill cell, the field mushroom grows wild in pastures. They look very similar."
+   },
    "clues": [
     "Family: Agaricaceae.",
     "Genus: Agaricus.",
@@ -351,6 +372,9 @@
     "field-mushroom"
    ],
    "blurb": "The common supermarket mushroom. White button, chestnut and portobello mushrooms are all the same species.",
+   "differences": {
+    "field-mushroom": "They are close relatives: the button mushroom is farmed and has two spores per gill cell, the field mushroom grows wild in pastures. They look very similar."
+   },
    "clues": [
     "Family: Agaricaceae.",
     "Genus: Agaricus.",
@@ -405,6 +429,9 @@
     "field-mushroom"
    ],
    "blurb": "A poisonous mushroom that looks like a field mushroom but turns bright yellow when scratched and smells of ink.",
+   "differences": {
+    "field-mushroom": "The yellow stainer turns bright yellow when its stem base is scratched and smells of ink; the field mushroom does not."
+   },
    "clues": [
     "Family: Agaricaceae.",
     "Genus: Agaricus.",
@@ -463,6 +490,9 @@
     "jack-o-lantern-mushroom"
    ],
    "blurb": "A golden, funnel-shaped mushroom with a fruity smell. It has ridges instead of true gills.",
+   "differences": {
+    "jack-o-lantern-mushroom": "The chanterelle grows from soil and has blunt, forked ridges; the jack-o'-lantern grows in clusters on wood and has true, sharp gills."
+   },
    "clues": [
     "Family: Hydnaceae.",
     "Genus: Cantharellus.",
@@ -523,6 +553,10 @@
     "ghost-fungus"
    ],
    "blurb": "A bright orange, poisonous mushroom that grows in clusters on wood. Its gills glow faintly green in the dark.",
+   "differences": {
+    "golden-chanterelle": "The chanterelle grows from soil and has blunt, forked ridges; the jack-o'-lantern grows in clusters on wood and has true, sharp gills.",
+    "ghost-fungus": "Both glow and are close relatives; the ghost fungus is pale and fan-shaped and lives in Australia, the jack-o'-lantern is bright orange and lives in Europe."
+   },
    "clues": [
     "Family: Omphalotaceae.",
     "Genus: Omphalotus.",
@@ -581,6 +615,9 @@
     "jack-o-lantern-mushroom"
    ],
    "blurb": "An Australian mushroom that glows green in the dark. It is poisonous.",
+   "differences": {
+    "jack-o-lantern-mushroom": "Both glow and are close relatives; the ghost fungus is pale and fan-shaped and lives in Australia, the jack-o'-lantern is bright orange and lives in Europe."
+   },
    "clues": [
     "Family: Omphalotaceae.",
     "Genus: Omphalotus.",
@@ -808,6 +845,9 @@
     "false-morel"
    ],
    "blurb": "A prized mushroom with a honeycomb-patterned cap. It is hollow inside, unlike the poisonous false morel.",
+   "differences": {
+    "false-morel": "The true morel has a honeycomb-pitted cap and is hollow inside from cap to stem; the false morel has a wrinkled, brain-like cap and is not hollow."
+   },
    "clues": [
     "Family: Morchellaceae.",
     "Genus: Morchella.",
@@ -867,6 +907,9 @@
     "common-morel"
    ],
    "blurb": "A poisonous lookalike of the morel with a wrinkled, brain-like cap. It contains a toxin related to rocket fuel.",
+   "differences": {
+    "common-morel": "The true morel has a honeycomb-pitted cap and is hollow inside from cap to stem; the false morel has a wrinkled, brain-like cap and is not hollow."
+   },
    "clues": [
     "Family: Discinaceae.",
     "Genus: Gyromitra.",
@@ -1247,6 +1290,9 @@
     "veiled-lady"
    ],
    "blurb": "A smelly fungus that hatches from an \"egg\". Its slimy tip smells of rotting meat to attract flies, which spread its spores.",
+   "differences": {
+    "veiled-lady": "The veiled lady has a lacy white net hanging from under its cap; the common stinkhorn has no net."
+   },
    "clues": [
     "Family: Phallaceae.",
     "Genus: Phallus.",
@@ -1731,6 +1777,9 @@
     "common-stinkhorn"
    ],
    "blurb": "A tropical stinkhorn with a lacy white \"skirt\" hanging from its cap. It is eaten in Chinese cooking.",
+   "differences": {
+    "common-stinkhorn": "The veiled lady has a lacy white net hanging from under its cap; the common stinkhorn has no net."
+   },
    "clues": [
     "Family: Phallaceae.",
     "Genus: Phallus.",
@@ -1893,6 +1942,9 @@
     "death-cap"
    ],
    "blurb": "A mushroom grown on rice straw in Asia. Young ones look dangerously like death caps.",
+   "differences": {
+    "death-cap": "Young death caps and paddy straw mushrooms are both egg-shaped in a cup; the paddy straw mushroom has pink gills and no ring, the death cap white gills and a ring. People have died from this mix-up."
+   },
    "clues": [
     "Family: Volvariellaceae.",
     "Genus: Volvariella.",

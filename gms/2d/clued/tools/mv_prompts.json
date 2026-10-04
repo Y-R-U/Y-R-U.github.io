@@ -2491,7 +2491,7 @@
    "blurb": "A hotshot race car gets stranded in a forgotten Route 66 town.",
    "scenes": [
     {
-     "p": "a shiny red stock racing car with lightning bolt stripes on a desert highway beside a sleepy old Route 66 town with neon motels and red rock mesas",
+     "p": "a shiny red stock racing car with yellow lightning-bolt stripes parked on a desert highway beside a sleepy old roadside town with neon motel shapes and red rock mesas, no road signs, no lettering",
      "d": 1,
      "cap": "Stranded on Route 66"
     },
@@ -2695,7 +2695,7 @@
    "blurb": "A thief enters people's dreams to plant an idea.",
    "scenes": [
     {
-     "p": "a city street folding up and over onto itself in a dreamscape, people seen from behind walking",
+     "p": "a surreal dreamscape where the far half of a Paris street bends upward and folds completely over overhead, upside-down buildings and cars hanging above, two small figures seen from behind standing on the street below",
      "d": 1,
      "cap": "The city folding over in a dream"
     },
@@ -2901,7 +2901,7 @@
    "blurb": "A polite bear from Peru arrives in London looking for a home.",
    "scenes": [
     {
-     "p": "a jar of marmalade and an old battered suitcase with a luggage tag on a London railway station bench",
+     "p": "a jar of orange marmalade and an old battered brown suitcase with a plain blank luggage tag on a wooden bench in a grand iron-arched London railway station",
      "d": 2,
      "cap": "A bear's luggage at the station"
     },
@@ -3145,7 +3145,7 @@
    "name": "Encanto",
    "alt": [],
    "year": 2021,
-   "director": "Jared Bush, Byron Howard",
+   "director": "Jared Bush, Byron Howard, Charise Castro Smith",
    "kids": true,
    "blurb": "In a magical Colombian house, the only family member without a gift tries to save the magic.",
    "scenes": [

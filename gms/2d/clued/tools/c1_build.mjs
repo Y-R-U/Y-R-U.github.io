@@ -12,6 +12,7 @@ import { validatePack, leakStems, findLeak } from './c1_schema.mjs';
 
 const SRC = join(TOOLS, 'c1_src');
 const MIRROR = readJSON(join(ROOT, 'media/mirror.json'), {});
+const DIFFS = (await import(pathToFileURL(join(TOOLS, 'c1_src/_diffs.mjs')).href)).default;
 const SKIP = readJSON(join(TOOLS, 'c1_src/_skip.json'), {});
 const mir = m => (MIRROR[m.src] ? { ...m, src: MIRROR[m.src] } : m);
 const args = process.argv.slice(2).filter(a => !a.startsWith('--'));
@@ -180,6 +181,9 @@ async function buildPack(id) {
     if (Object.keys(facts).length) item.facts = facts;
     if (it.look?.length) item.lookalikes = it.look.map(l => nameToId.get(l.toLowerCase()) || l);
     if (it.b) item.blurb = it.b;
+    const diffs = {};
+    for (const [k, t] of Object.entries(DIFFS[id] || {})) { const [a, b] = k.split('|'); if (a === iid) diffs[b] = t; else if (b === iid) diffs[a] = t; }
+    if (Object.keys(diffs).length) item.differences = diffs;
 
     // clue ladder: taxonomy (hardest) → hand clues with fact clues mid-way → letters → initial
     const stems = leakStems([it.n, ...(it.alt || [])], S.leakExempt || []);

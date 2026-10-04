@@ -107,7 +107,6 @@ export default register({
     const left = h('div.ld-left', {}, h('div.ld-top', {}, count, pot), list);
     const ans = h('div.ld-ans', {}, prompt);
     el.append(h('div.f-stage.ld', {}, left, ans));
-    stretchTimer(api, el, Math.min(4, 1 + N / 4));
     let st;
     const draw = s => {
       items.forEach((li, i) => li.classList.toggle('hidden', i > s));
@@ -117,6 +116,7 @@ export default register({
       if (s > 0) api.sfx('reveal');
     };
     st = stages(api, q, el, draw);
+    if (!st.native) stretchTimer(api, el, Math.min(4, 1 + N / 4));
     if (st.button) left.append(st.button);
     const showAll = () => items.forEach(li => li.classList.remove('hidden'));
     let grid = null, box = null, tries = 0;
