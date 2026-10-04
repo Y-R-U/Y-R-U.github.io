@@ -1,6 +1,6 @@
 import { el, btn, show, setText } from './dom.js?v=20261004g';
 import { createHud } from './hud.js?v=20261004g';
-import { createLineCard, STAGE_LABEL } from './linecard.js?v=20261004g';
+import { createLineCard, watchBadges, STAGE_LABEL } from './linecard.js?v=20261004g';
 import { createSheets } from './sheets.js?v=20261004g';
 import { createToasts } from './toast.js?v=20261004g';
 import { createJuice } from './juice.js?v=20261004g';
@@ -13,7 +13,7 @@ import { createOffline } from './offline.js?v=20261004g';
 import { createTabs } from './tabs.js?v=20261004g';
 import { fillLineInfo } from './lineinfo.js?v=20261004g';
 import { fillManager } from './manager.js?v=20261004g';
-import { fillSettings } from './settings.js?v=20261004g';
+import { fillSettings, gfxPref, applyGfx } from './settings.js?v=20261004g';
 import { fillCrew } from './crew.js?v=20261004g';
 import { fillGoals } from './goals.js?v=20261004g';
 import { fillBootHill, takePoster } from './boothill.js?v=20261004g';
@@ -37,7 +37,7 @@ export function createUI({ game, host, bus }) {
   const cards = new Map();
   const visibleCards = new Set();
   const doc = document.documentElement;
-  let root, look, sheets, toasts, juice, hud, coach, reveal, events, town, offline, tabs, hats, barks, captions, fling, specials, ghosts, boxes;
+  let root, look, sheets, toasts, juice, hud, coach, reveal, events, town, offline, tabs, hats, barks, captions, fling, specials, ghosts, boxes, badgeWatch;
   let welcome, heroWrap, heroView, tapzone, qtyBar, qtyBtns, list, gate, pinChip, focusChip, tipChip, gfxChip, pianoBtn, posterChip, deedChip;
   let lastFrame = 0, combo = 0, lastTapAt = 0, desktop = false, heroOn = true, ceremony = false;
   let qty = model.setting('qty', 1);
@@ -942,6 +942,7 @@ export function createUI({ game, host, bus }) {
         look.attach(c.view, c.card, 'line:' + line.id, () => host.world.cardRig(line.id).orbit, { lineId: line.id, allow: () => c.mode === 'full' });
         io.observe(c.card);
       }
+      badgeWatch = watchBadges(cardList);
       const ro = new ResizeObserver((es) => {
         for (const e of es) {
           if (e.target === heroView) { geo.viewW = e.contentRect.width; geo.viewH = e.contentRect.height; }
@@ -958,8 +959,8 @@ export function createUI({ game, host, bus }) {
       wide.addEventListener?.('change', layoutMode);
       matchMedia('(prefers-reduced-motion: reduce)').addEventListener?.('change', applyCalm);
       layoutMode();
-      const tier = model.setting('tier', 'auto');
-      if (tier !== 'auto' && !new URLSearchParams(location.search).has('tier')) host.setTier(tier === 'low' ? 'battery' : tier);
+      const tier = gfxPref(model);
+      if (tier !== 'auto' && !new URLSearchParams(location.search).has('tier')) applyGfx(host, tier);
       if (/[?&]reset=1/.test(location.search)) history.replaceState(null, '', location.pathname + location.search.replace(/([?&])reset=1&?/, '$1').replace(/[?&]$/, ''));
       if (host.paused) show(gfxChip, true);
       textNow();

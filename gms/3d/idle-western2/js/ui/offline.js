@@ -6,9 +6,11 @@ export function createOffline(root, ctx) {
   card.hidden = true;
   card.setAttribute('role', 'status');
   root.appendChild(card);
-  let shownFor = null, timer = 0;
+  let shownFor = null, timer = 0, shownAt = 0;
 
-  function hide() {
+  // Taps during the slide-in (+400 ms) are swallowed so a stray double tap cannot dismiss the report unread.
+  function hide(e) {
+    if (e && performance.now() - shownAt < 750) { e.stopPropagation?.(); return; }
     card.classList.remove('in');
     root.classList.remove('away-on');
     clearTimeout(timer);
@@ -35,11 +37,12 @@ export function createOffline(root, ctx) {
       foot.append(el('span', '', report.capped ? '⏳ Cap ' + fmtTime(report.capSec) : report.harvest.length ? '📦 Piles ×1.5' : '🤠 Welcome back, stranger'), btn('away-ok', '👍', hide, 'OK'));
       card.appendChild(foot);
       card.hidden = false;
+      shownAt = performance.now();
       requestAnimationFrame(() => card.classList.add('in'));
       root.classList.add('away-on');
       ctx.audio.sfx.kaching();
       clearTimeout(timer);
-      timer = setTimeout(hide, 9000);
+      timer = setTimeout(() => hide(), 9000);
       const r = card.getBoundingClientRect();
       ctx.juice?.coins(r.left + r.width * 0.7, r.top + 20, 6, { step: 5 });
     },

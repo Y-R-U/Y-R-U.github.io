@@ -273,6 +273,9 @@ button:focus-visible, select:focus-visible, input:focus-visible, .line-card:focu
 .box-loot .item { width: 84px; height: 92px; animation: lootin .45s cubic-bezier(.3, 1.6, .5, 1) backwards; }
 .item-n { font-size: 10px !important; color: var(--muted) !important; }
 @keyframes lootin { from { opacity: 0; transform: translateY(20px) scale(.6); } }
+.box-open.fast .box-e.popped { animation-duration: .25s; }
+.box-open.fast .box-loot .item { animation-duration: .25s; }
+.box-card .pill.wait { opacity: .45; filter: saturate(.4); transition: opacity .2s; }
 
 /* ---------- list & cards ---------- */
 .side { position: relative; padding: 14px 12px calc(var(--tab-h) + 28px + var(--safe-b)); }
@@ -307,6 +310,8 @@ button:focus-visible, select:focus-visible, input:focus-visible, .line-card:focu
 .badge { position: absolute; z-index: 3; left: 8px; bottom: 10px; display: flex; align-items: center; gap: 6px; max-width: calc(100% - 220px); min-width: 0; padding: 4px 10px 4px 6px; border-radius: 6px; color: #fbe9c6; font-weight: 800; font-size: 12.5px; line-height: 1.15; pointer-events: none;
   background: var(--grain), linear-gradient(var(--wood-2), var(--wood-1)); box-shadow: 0 0 0 1.5px var(--brass-lo), 0 2px 6px rgba(30, 15, 5, .35); }
 .b-emoji { font-size: 18px; }
+.glyphs > .badge-low { display: none; position: static; align-self: center; flex: 0 1 auto; margin-right: auto; max-width: none; animation: lowin .18s ease-out; }
+@keyframes lowin { from { opacity: 0; transform: translateY(6px); } }
 .b-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .b-harvest { padding: 1px 6px; border-radius: 999px; background: var(--gold); color: var(--wood-0); font-size: 11px; animation: glowp 1.6s ease-in-out infinite; }
 .corner { position: absolute; z-index: 3; top: 8px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 17px; background: radial-gradient(circle at 50% 35%, var(--paper), var(--paper-3)); box-shadow: 0 0 0 1.5px var(--wood-2), 0 2px 5px rgba(30, 15, 5, .3); }
@@ -485,6 +490,9 @@ button:focus-visible, select:focus-visible, input:focus-visible, .line-card:focu
 .seg { display: flex; padding: 3px; border-radius: 10px; background: rgba(43, 26, 16, .1); }
 .seg-b { height: 34px; padding: 0 11px; border-radius: 8px; font-size: 13px; font-weight: 800; color: var(--ink-soft); }
 .seg-b.on { background: #fffaf0; color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, .2); }
+.seg-hint { display: block; margin-top: 2px; font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+.seg-row.gfx .tog-l { min-width: 0; }
+.seg-row.gfx .seg-b { padding: 0 8px; }
 .import { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .import textarea { width: 100%; border-radius: 8px; border: 1px solid var(--line); padding: 10px; font: 12px ui-monospace, monospace; background: #fffaf0; }
 .confirm { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 800; }
@@ -672,6 +680,10 @@ button:focus-visible, select:focus-visible, input:focus-visible, .line-card:focu
 @media (max-width: 639px) {
   .badge { top: 8px; bottom: auto; max-width: calc(100% - 112px); }
   .line-card:has(.pin:not([hidden])) .badge { max-width: calc(100% - 158px); }
+  .line-card.low .glyphs { left: 8px; pointer-events: none; }
+  .line-card.low .glyph { pointer-events: auto; }
+  .line-card.low .badge-low { display: flex; }
+  .line-card.low .glyphs > .badge-low { max-width: none; }
 }
 @media (max-width: 400px) {
   .ribbon small { display: none; }

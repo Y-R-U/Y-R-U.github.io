@@ -73,9 +73,12 @@ export function toggle(parent, { icon, label, get, set }) {
   return () => { inp.checked = !!get(); };
 }
 
-export function seg(parent, { icon, label, options, get, set }) {
-  const r = el('div', 'seg-row');
-  r.append(el('span', 'buy-i', icon), el('span', 'tog-l', label));
+export function seg(parent, { icon, label, options, get, set, hint, cls = '' }) {
+  const r = el('div', 'seg-row' + (cls ? ' ' + cls : ''));
+  const l = el('span', 'tog-l', label);
+  const h = hint ? el('small', 'seg-hint') : null;
+  if (h) l.append(h);
+  r.append(el('span', 'buy-i', icon), l);
   const g = el('div', 'seg');
   const bs = options.map(([v, t]) => {
     const b = btn('seg-b', t, () => { set(v); paint(); });
@@ -83,7 +86,10 @@ export function seg(parent, { icon, label, options, get, set }) {
     g.appendChild(b);
     return b;
   });
-  const paint = () => bs.forEach((b) => b.classList.toggle('on', b.dataset.v === String(get())));
+  const paint = () => {
+    bs.forEach((b) => b.classList.toggle('on', b.dataset.v === String(get())));
+    if (h) { const t = hint() || ''; if (h.textContent !== t) h.textContent = t; }
+  };
   paint();
   r.appendChild(g);
   parent.appendChild(r);

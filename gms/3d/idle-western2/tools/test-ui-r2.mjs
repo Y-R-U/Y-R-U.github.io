@@ -333,6 +333,101 @@ try {
   check(away && !away.inHero && away.top >= away.hud && away.top < away.hud + 40, `hero away: toast drops to just under the HUD ${JSON.stringify(away)}`);
   check(p.exceptions.length === 0, 'no exceptions');
   await p.close();
+  // ---------- Aaron: card badge mirrors bottom-left when the top is scrolled off ----------
+  console.log('Badge mirror (demo, real touch scrolling)');
+  p = await open('?nosave=1&demo=1');
+  await sleep(1500);
+  const BCARD = `[...document.querySelectorAll('.line-card')].filter((c) => !c.hidden && !c.classList.contains('ghost') && !c.classList.contains('compact'))[2]`;
+  const bgeo = () => p.eval(`(() => { const c = ${BCARD}; const R = (e) => { if (!e || getComputedStyle(e).display === 'none' || e.closest('[hidden]')) return null; const r = e.getBoundingClientRect(); return r.width ? { l: r.left, r: r.right, t: r.top, b: r.bottom } : null; };
+    return { id: c.dataset.line, low: c.classList.contains('low'), card: R(c), top: R(c.querySelector(':scope > .badge')), mir: R(c.querySelector('.badge-low')), glyphs: [...c.querySelectorAll('.glyph')].map(R).filter(Boolean), prog: R(c.querySelector('.prog')),
+      hud: document.querySelector('.hud').getBoundingClientRect().bottom, bar: document.querySelector('.tabbar').getBoundingClientRect().top, vh: innerHeight,
+      t1: c.querySelector(':scope > .badge .b-text').textContent, t2: c.querySelector('.badge-low .b-text').textContent }; })()`);
+  // Drag the list with a real finger until the card's top sits `want` px from the HUD's bottom edge.
+  const bdragTo = async (want) => {
+    for (let i = 0; i < 12; i++) {
+      const g = await bgeo();
+      const d = g.card.t - g.hud - want;
+      if (Math.abs(d) < 14) return g;
+      const step = Math.max(-380, Math.min(380, d));
+      const x = 30, y0 = step > 0 ? g.vh * 0.75 : g.vh * 0.3;
+      await p.touch('touchStart', [[x, y0]]);
+      for (let k = 1; k <= 10; k++) { await sleep(25); await p.touch('touchMove', [[x, y0 - step * k / 10]]); }
+      await sleep(250);
+      await p.touch('touchEnd', []);
+      await sleep(450);
+    }
+    return bgeo();
+  };
+  const bhit = (a, b) => a && b && a.l < b.r - 0.5 && b.l < a.r - 0.5 && a.t < b.b - 0.5 && b.t < a.b - 0.5;
+  let bm0 = await bdragTo(-90);
+  await sleep(300);
+  bm0 = await bgeo();
+  const glyphsOn = bm0.glyphs.length && bm0.glyphs.every((r) => r.b <= bm0.bar && r.t >= bm0.hud);
+  check(bm0.top && bm0.top.b <= bm0.hud + 4 && glyphsOn, `setup: ${bm0.id} top badge under the HUD, buttons on screen (card ${bm0.card.t | 0}, hud ${bm0.hud | 0})`);
+  check(bm0.low && !!bm0.mir, `badge mirror shows bottom-left beside the buttons (${bm0.t2 || 'none'})`);
+  if (bm0.mir) {
+    check(bm0.mir.l < bm0.card.l + 20 && bm0.mir.b > bm0.card.b - 70, 'mirror sits in the card\'s bottom-left corner');
+    check(!bm0.glyphs.some((r) => bhit(r, bm0.mir)), 'mirror never overlaps a glyph button');
+    check(!bhit(bm0.prog, bm0.mir) && bm0.mir.b <= bm0.card.b - 7, 'mirror clear of the progress border');
+    check(bm0.mir.b <= bm0.bar, 'mirror clear of the tab bar / jump dock');
+    check(bm0.t1 === bm0.t2 && /Lv \d+/.test(bm0.t2), `mirror text matches the top badge (${bm0.t2})`);
+    const blv0 = await p.S(`st.lines['${bm0.id}'].lv`);
+    const blg = await p.eval(`(() => { const r = ${BCARD}.querySelector('.glyph[data-act="level"]').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
+    await p.tap(blg.x, blg.y);
+    await sleep(400);
+    const bm1 = await bgeo();
+    check((await p.S(`st.lines['${bm0.id}'].lv`)) > blv0 && /Lv \d+/.test(bm1.t2) && bm1.t2 === bm1.t1, `level-up tap works with the mirror up and it updates live (${bm0.t2} → ${bm1.t2})`);
+  }
+  let bm2 = await bdragTo(40);
+  check(!bm2.low && !bm2.mir, `top badge visible → mirror hidden (card ${bm2.card.t | 0})`);
+  bm2 = await bdragTo(-bm2.card.b + bm2.card.t - 200);
+  check(!bm2.low && !bm2.mir, 'card scrolled past → mirror hidden');
+  check(p.exceptions.length === 0, 'no exceptions');
+  await p.close();
+
+  // ---------- Aaron: a double tap on Open never closes the strongbox before the loot shows ----------
+  console.log('Strongbox double tap');
+  p = await open('?nosave=1&demo=1');
+  await p.S(`(st.boxes.silver = 2, __iw2.ui.openTab('crew'), 0)`);
+  await sleep(600);
+  const obx = await p.rect('.box-btn.silver');
+  await p.tap(obx.x, obx.y, 30);
+  await p.tap(obx.x, obx.y, 30);
+  const bpill = await p.rect('.box-open .pill');
+  if (bpill) await p.tap(bpill.x, bpill.y, 30);
+  await sleep(300);
+  let bxs = await p.eval(`({ open: !!document.querySelector('.box-open:not(.out)'), loot: document.querySelectorAll('.box-open .box-loot .item').length, left: __iw2.game.state.boxes.silver })`);
+  check(bxs.open && bxs.loot >= 1 && bxs.left === 1, `double tap on Open + a tap on Yee-haw! fast-forward to the reveal, popup stays, one box used (${JSON.stringify(bxs)})`);
+  check(await p.until('ui.boxes.ready', 3000), 'popup becomes closable once the reveal settles');
+  await p.tap(bpill.x, bpill.y);
+  await sleep(350);
+  check(await p.eval(`!document.querySelector('.box-open:not(.out)')`), 'then Yee-haw! closes it');
+  check(p.exceptions.length === 0, 'no exceptions');
+  await p.close();
+
+  // ---------- Aaron: Graphics Auto/High/Medium/Low persists ----------
+  console.log('Graphics setting');
+  p = await open('?nosave=1&demo=1');
+  await p.eval(`(localStorage.removeItem('iw2.gfx'), 0)`);
+  const gOpenSettings = async () => { await p.tapEl('.hud-btn.gear'); await sleep(500); };
+  await gOpenSettings();
+  const ghint0 = await p.eval(`document.querySelector('.seg-row.gfx .seg-hint')?.textContent || ''`);
+  check(/^Auto · (High|Medium|Low)$/.test(ghint0), `Auto shows the chosen tier (${ghint0})`);
+  await p.tapEl('.seg-row.gfx .seg-b[data-v="medium"]');
+  await sleep(400);
+  check(await p.eval(`__iw2.host.quality.current().label === 'medium' && __iw2.host.quality.current().mode === 'medium' && localStorage.getItem('iw2.gfx') === 'medium'`), `Medium applies (${await p.eval('JSON.stringify([__iw2.host.quality.current().mode, __iw2.host.quality.current().label])')})`);
+  await p.close();
+  p = await open('?nosave=1&demo=1');
+  await sleep(500);
+  check(await p.eval(`__iw2.host.quality.current().mode === 'medium'`), `Medium survives a reload (${await p.eval('JSON.stringify([__iw2.host.quality.current().mode, __iw2.host.quality.current().label])')})`);
+  await gOpenSettings();
+  check(await p.eval(`document.querySelector('.seg-row.gfx .seg-b.on')?.dataset.v === 'medium'`), 'settings shows Medium selected after reload');
+  await p.tapEl('.seg-row.gfx .seg-b[data-v="auto"]');
+  await sleep(400);
+  check(await p.eval(`localStorage.getItem('iw2.gfx') === 'auto'`), 'back to Auto');
+  await p.eval(`(localStorage.removeItem('iw2.gfx'), 0)`);
+  check(p.exceptions.length === 0, 'no exceptions');
+  await p.close();
 } finally {
   stop(PORT);
 }

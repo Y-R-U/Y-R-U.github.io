@@ -201,7 +201,10 @@ try {
   await sleep(1200);
   r = await page.eval(`({ open: !!document.querySelector('.box-open'), loot: document.querySelectorAll('.box-loot .item').length })`);
   check(r.open && r.loot >= 1, `strongbox opens with loot (${r.loot})`);
+  for (let i = 0; i < 30 && !(await page.eval(S('ui.boxes.ready'))); i++) await sleep(100);
   await tapEl(page, '.box-open .pill');
+  await sleep(350);
+  check(!(await page.eval(`!!document.querySelector('.box-open:not(.out)')`)), 'Yee-haw! closes the strongbox once the loot is shown');
   await page.eval(S('ui.sheets.close()'));
   await sleep(300);
 

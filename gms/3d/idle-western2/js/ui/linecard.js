@@ -48,6 +48,11 @@ export function createLineCard(line, h) {
   pin.hidden = true;
 
   const glyphs = el('div', 'glyphs');
+  const low = el('div', 'badge badge-low');
+  const lowText = el('span', 'b-text');
+  low.append(el('span', 'b-emoji', line.emoji), lowText);
+  low.setAttribute('aria-hidden', 'true');
+  glyphs.appendChild(low);
   const mk = (act, glyph, label) => {
     const b = el('button', 'glyph');
     b.type = 'button';
@@ -98,7 +103,9 @@ export function createLineCard(line, h) {
   const vars = {};
 
   const api = {
-    card, view, line, glyphs: { level: gLevel, throughput: gThr, boost: gBoost, hire: gMgr, hurry: gHurry },
+    card, view, line, badge, glyphRow: glyphs, top: true, bot: false,
+    setLow(on) { if (card.classList.contains('low') !== on) card.classList.toggle('low', on); },
+    glyphs: { level: gLevel, throughput: gThr, boost: gBoost, hire: gMgr, hurry: gHurry },
     at: 0, fps: 0,
     get mode() { return mode; },
     saveHint(text) { show(ghostSave, !!text); if (text) setText(ghostSave, text); },
@@ -155,6 +162,7 @@ export function createLineCard(line, h) {
         if (!b) return;
         const label = b.acq === 'built' ? STAGE_LABEL[b.stageName] || '🔨 Building' : ACQ_LABEL[b.acq] || '🔨';
         setText(bText, `${label} · ${Math.ceil(b.left)}s`);
+        setText(lowText, bText.textContent);
         show(bHarvest, false);
         show(pin, false);
         for (const g of [gLevel, gThr, gBoost, gMgr]) show(g.b, false);
@@ -172,6 +180,7 @@ export function createLineCard(line, h) {
       const right = s.managed ? fmtRate(s.perSec) : fmtRate(s.perSec) + ' · ' + pile;
       setText(bText, `Lv ${s.level} · ${right}`);
       setText(sVal, `Lv ${s.level} · ${right}`);
+      setText(lowText, bText.textContent);
       show(bHarvest, s.harvest && s.stock > 0);
       show(pin, ctx.pinOK);
       card.classList.toggle('pinned', ctx.pinned === line.id);
@@ -205,4 +214,32 @@ export function createLineCard(line, h) {
     wantsAttention: false,
   };
   return api;
+}
+
+// Phones: when a card's top badge is scrolled under the HUD but its buttons are on screen, the same badge
+// shows bottom-left beside them (.low). Driven by one IntersectionObserver; no layout reads per frame.
+export function watchBadges(cards) {
+  let io = null;
+  const byEl = new Map();
+  for (const c of cards) { byEl.set(c.badge, [c, 'top']); byEl.set(c.glyphRow, [c, 'bot']); }
+  const make = () => {
+    io?.disconnect();
+    const hud = document.querySelector('.hud')?.getBoundingClientRect().bottom || 0;
+    const bar = document.querySelector('.tabbar');
+    const tb = bar && !bar.hidden ? Math.max(0, innerHeight - bar.getBoundingClientRect().top) : 0;
+    io = new IntersectionObserver((es) => {
+      for (const e of es) {
+        const [c, k] = byEl.get(e.target) || [];
+        if (!c) continue;
+        c[k] = e.isIntersecting && e.intersectionRatio >= 0.6;
+        c.setLow(!c.top && c.bot);
+      }
+    }, { rootMargin: `${-Math.round(hud)}px 0px ${-Math.round(tb)}px 0px`, threshold: [0, 0.6, 1] });
+    for (const el of byEl.keys()) io.observe(el);
+  };
+  make();
+  let t = 0;
+  const later = () => { clearTimeout(t); t = setTimeout(make, 200); };
+  addEventListener('resize', later);
+  return { refresh: later };
 }

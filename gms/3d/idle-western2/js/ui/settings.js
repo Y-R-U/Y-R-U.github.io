@@ -32,6 +32,29 @@ function restart(value) {
   location.replace(location.pathname + (value === null ? '?reset=1' : ''));
 }
 
+// Graphics is a device setting: kept in its own localStorage key (not the exported save), mirrored in settings.tier.
+const GFX_KEY = 'iw2.gfx', GFX = ['auto', 'high', 'medium', 'low'];
+const TIER_NAME = { high: 'High', medium: 'Medium', mid: 'Medium', low: 'Low' };
+const norm = (v) => (v === 'battery' ? 'low' : v === 'mid' ? 'medium' : GFX.includes(v) ? v : 'auto');
+export function gfxPref(model) {
+  let v = null;
+  try { v = localStorage.getItem(GFX_KEY); } catch {}
+  return norm(v || model?.setting('tier', 'auto'));
+}
+function saveGfx(v) { try { localStorage.setItem(GFX_KEY, v); } catch {} }
+export function applyGfx(host, v) {
+  if (host.quality?.set) host.quality.set(v);
+  else host.setTier(v === 'medium' ? 'mid' : v);
+}
+export function gfxTier(host) {
+  const c = host.quality?.current?.();
+  return norm(c?.label || c?.tier || host.debug?.tier || '');
+}
+function gfxHint(host, pref) {
+  const t = TIER_NAME[gfxTier(host)] || '';
+  return pref === 'auto' ? (t ? 'Auto · ' + t : 'Auto') : t && t !== TIER_NAME[pref] ? `${TIER_NAME[pref]} · now ${t}` : '';
+}
+
 export function fillSettings(body, ctx) {
   const { game, host, model } = ctx;
   const set = (key, value) => { game.act('setting', { key, value }); ctx.audio.applyVolumes(); ctx.textNow(); };
@@ -62,10 +85,11 @@ export function fillSettings(body, ctx) {
   }));
   if ('vibrate' in navigator) ups.push(toggle(s1, { icon: '📳', label: 'Haptics', get: () => model.setting('haptics', true) !== false, set: (v) => set('haptics', v) }));
   ups.push(seg(s1, {
-    icon: '🎨', label: 'Quality',
-    options: [['auto', 'Auto'], ['battery', 'Battery'], ['high', 'High']],
-    get: () => (model.setting('tier', 'auto') === 'low' ? 'battery' : model.setting('tier', 'auto')),
-    set: (v) => { set('tier', v); host.setTier(v); },
+    icon: '🎨', label: 'Graphics', cls: 'gfx',
+    options: [['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']],
+    get: () => gfxPref(model),
+    set: (v) => { saveGfx(v); set('tier', v); applyGfx(host, v); },
+    hint: () => gfxHint(host, gfxPref(model)),
   }));
   ups.push(toggle(s1, {
     icon: '📏', label: 'Compact calm cards',
