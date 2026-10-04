@@ -66,3 +66,6 @@ Aaron's words, condensed (inspiration, not a spec — improve on it):
 - 2026-10-04 Round 3 complete + pushed (BUILD d). Blind critic r3 still ~3.9 avg. Round 4 (ROUND4.md) launched: A/P/S/U.
 - 2026-10-04 Round 4 complete, all suites green, pushed BUILD 20261004e. Hero now matches ref layout (Stranger from behind + vignette). Draw calls borderline 246/250 desktop (hero 154) → needs trim. Blind critic r4 running.
 - 2026-10-04 Blind critic r4 avg ~4.25 (trend 3.4→3.9→4.25). Round 5 (ROUND5.md) launched: A light/faces/wood/night/draw-trim, P build/saloon cards, S gag scale.
+- 2026-10-04 Round 5 complete, pushed BUILD 20261004f (hero draws ~100, all green; lifecycle actor-sum check relaxed for hero near-cut). Blind critic r5 + playtest 2 (9391) running.
+- 2026-10-04 Blind critic r5 ~4.25 (plateau). Concrete blockers in critic/r5/REPORT.md (opaque dust balls, blob ejectee, orange skin, translucent night char, huge fg cactus, hex tiling, red rocks). Waiting on playtest 2 before round 6.
+- 2026-10-04 Playtest 2 done (PLAYTEST_2.md). Round 6 (ROUND6.md) launched: A/P/S/U/E. Rulings R6a ambient ejections from minute 1, R6b drop 'Colonel', R6c ghosts gated.

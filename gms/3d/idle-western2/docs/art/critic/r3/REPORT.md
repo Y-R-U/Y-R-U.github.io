@@ -1,0 +1,1 @@
+# Blind critic r3: game 4.5/4/4/2.5 (hero day/night, saloon card, build card) vs refs ~8.5–9. Fixes: crowd −65% + vignettes, rig with arms/hands/boots, lighting grade + night bloom clamp, sunset sky + haze + silhouettes (cards too), plank textures/AO, ground richness, readable chunky construction, toasts out of centre.
