@@ -4,7 +4,7 @@
 // Pomfrey's crest. Text is painted by kit.signs: pass o.signs (a batch) + o.text and the board gets lettered.
 import * as THREE from 'three';
 import * as S from './shape.js?v=20261004f';
-import { CLAP, PLANK, PLANKX, ROOF } from './build.js?v=20261004f';
+import { CLAP, PLANK, PLANKX, ROOF, TIN } from './build.js?v=20261004f';
 import { SKINS } from '../../data/palette.js?v=20261004f';
 
 export { SKINS };
@@ -203,7 +203,7 @@ export function falseFront(b, x, z, o = {}) {
       for (const s of [-1, 1]) b.slab('wood', s * (W - 0.05), ph + 0.18, pd / 2, 0.1, 0.82, pd - 0.2, { parent: M, round: 0.02, taper: 0 });
     } else {
       b.slab('wood2', 0, ph - 0.05, pd - 0.25, w + 0.1, 0.16, 0.16, { parent: M, round: 0.03, taper: 0 });
-      b.slab(o.porchRoof || 'tin', 0, ph + 0.05, pd / 2 - 0.1, w + 0.3, 0.12, pd + 0.45, { parent: M, round: 0.03, taper: 0, rx: 0.13, surf: ROOF });
+      b.slab(o.porchRoof || 'tin', 0, ph + 0.05, pd / 2 - 0.1, w + 0.3, 0.12, pd + 0.45, { parent: M, round: 0.03, taper: 0, rx: 0.13, surf: (o.porchRoof || 'tin') === 'tin' || o.porchRoof === 'rust' ? TIN : ROOF });
     }
     if (o.lamps !== false) for (const s of [-1, 1]) {
       const lx = doorX + s * ((door ? door.w : 1) / 2 + 0.55);

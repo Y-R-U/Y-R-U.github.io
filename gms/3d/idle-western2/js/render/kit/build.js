@@ -67,15 +67,16 @@ export function mergeParts(parts, { ao = 0.35, aoH = 0.9, speckle = 0.05, seed =
 }
 
 // aPbr.w < 0.5 selects a procedural surface (kit/surface.js): DIRT(k) street dirt, CLAP clapboard, PLANK/PLANKX boards,
-// GRASS desert scrub, ROOF shingle courses. `cobble` is the old name for DIRT.
+// GRASS desert scrub, ROOF shingle courses, TIN corrugated sheet. `cobble` is the old name for DIRT.
 export const GRASS = 0.25;
 export const ROOF = 0.4;
+export const TIN = 0.44;
 export const CLAP = 0.1;
 export const PLANK = 0.18;
 export const PLANKX = 0.21;
 export const DIRT = (wet = 0) => -1 - Math.max(0, Math.min(1, wet));
 export const cobble = DIRT;
-export const SURF = { GRASS, ROOF, CLAP, PLANK, PLANKX, DIRT };
+export const SURF = { GRASS, ROOF, TIN, CLAP, PLANK, PLANKX, DIRT };
 const GRASS_SLOTS = new Set(['grass', 'grass2', 'lawn']);
 // R5 wood grain: 'W' resolves at merge time to WOOD_X/Y/Z (0.27/0.28/0.29) = the world axis of the part's long side.
 export const WOOD = 'W';

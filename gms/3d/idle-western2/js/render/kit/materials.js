@@ -48,9 +48,14 @@ export const WORLD_LIGHT_FRAG = `{
     for (int i = 0; i < 8; i++) {
       vec3 d = uLamps[i].xyz - vWP;
       float r2 = dot(d, d), h2 = dot(d.xz, d.xz);
-      float fall = uLamps[i].w * uLamps[i].w * 0.8 * exp(-h2 / 7.0) * max(0.0, 1.0 - r2 / 70.0);
-      float ndl = 0.35 + 0.65 * max(dot(wn, d * inversesqrt(r2 + 1e-4)), 0.0);
-      acc += fall * ndl * (0.28 + 0.72 * max(wn.y, 0.0));
+      // R6: a defined pool (flat core, short edge) on floors, and a tighter splash on walls and posts near the lamp
+      float hd = sqrt(h2), rd = sqrt(r2);
+      float floorK = (1.0 - smoothstep(1.7, 3.5, hd)) * 0.85 + 0.25 * exp(-h2 / 2.0);
+      float wallK = (1.0 - smoothstep(0.9, 2.6, rd)) * 0.9 + 0.2 * exp(-r2 / 9.0);
+      float up = max(wn.y, 0.0);
+      float fall = uLamps[i].w * uLamps[i].w * 0.8 * mix(wallK, floorK, up) * max(0.0, 1.0 - r2 / 70.0);
+      float ndl = 0.25 + 0.75 * max(dot(wn, d / max(rd, 1e-3)), 0.0);
+      acc += fall * ndl * (0.4 + 0.6 * up);
     }
     // soft-clipped so a lamp pool reads amber but never pushes a surface (or a face) past the bloom threshold
     vec3 lp = uLampCol * acc * uLampK;

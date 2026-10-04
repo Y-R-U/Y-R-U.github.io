@@ -385,7 +385,7 @@ export function crowdMaterial(shared) {
     sh.uniforms.uSkin = { value: skins };
     sh.uniforms.uHair = { value: hairs };
     sh.uniforms.uHatP = { value: HAT_P.flatMap((t) => t.map((v) => new THREE.Vector4(...v))) };
-    for (const k of ['uBounce', 'uLamps', 'uLampCol', 'uLampK', 'uSunDir', 'uSunCol']) sh.uniforms[k] = shared[k];
+    for (const k of ['uBounce', 'uLamps', 'uLampCol', 'uLampK', 'uSunDir', 'uSunCol', 'uNight']) sh.uniforms[k] = shared[k];
     sh.vertexShader = sh.vertexShader
       .replace('#include <common>', `#include <common>
 attribute vec3 aPart;
@@ -551,10 +551,10 @@ else if (slot < 3.5) vColor = uSkin[int(aLook.x + 0.5)];
 else if (slot < 4.5) vColor = uHair[int(aLook.y + 0.5)];
 else if (slot < 6.5) vColor = unpackRGB(aHat.z) * (slot < 5.5 ? 1.0 : 0.45);
 else vColor = uSkin[int(aLook.x + 0.5)] * vec3(1.06, 0.7, 0.64);
-vSkin = float(abs(slot - 3.0) < 0.5 || slot > 6.5);`)
+vSkin = abs(slot - 3.0) < 0.5 ? 1.0 : slot > 6.5 ? 2.0 : 0.0;`)
       .replace('#include <project_vertex>', WORLD_POS_VERT);
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform vec3 uRim;\nuniform vec3 uSunDir;\nuniform vec3 uSunCol;\nvarying float vSkin;\nvarying vec3 vWP;\nvarying vec3 vWN;\n' + WORLD_LIGHT_HEAD)
+      .replace('#include <common>', '#include <common>\nuniform vec3 uRim;\nuniform vec3 uSunDir;\nuniform vec3 uSunCol;\nuniform float uNight;\nvarying float vSkin;\nvarying vec3 vWP;\nvarying vec3 vWN;\n' + WORLD_LIGHT_HEAD)
       .replace('#include <opaque_fragment>', `{
   vec3 cwn = normalize(vWN);
   float ndl = dot(cwn, uSunDir);
@@ -564,13 +564,20 @@ vSkin = float(abs(slot - 3.0) < 0.5 || slot > 6.5);`)
   float nv = saturate(dot(geometryNormal, geometryViewDir));
   float fr = pow(1.0 - nv, 2.6);
   outgoingLight += uRim * fr * (0.25 + 1.5 * max(ndl, 0.0)) * (0.55 + 0.6 * diffuseColor.rgb);
-  outgoingLight += vSkin * diffuseColor.rgb * vec3(0.06, 0.035, 0.03) * (0.6 + 0.4 * nv);
+  outgoingLight += step(0.5, vSkin) * diffuseColor.rgb * vec3(0.06, 0.035, 0.03) * (0.6 + 0.4 * nv);
   outgoingLight += diffuseColor.rgb * max(0.0, max(diffuseColor.r, diffuseColor.g) - 1.05) * 0.8;
 }
 ${WORLD_LIGHT_FRAG}
+// R6 skin grade: the low orange sun and lamp light turned faces sunburnt; pull skin (not the rosy nose) back toward
+// peach at the same luminance, so it still shades but never reads orange-red.
+if (vSkin > 0.5 && vSkin < 1.5) {
+  vec3 pch = vec3(1.0, 0.64, 0.46);
+  float lum = dot(outgoingLight, vec3(0.2126, 0.7152, 0.0722));
+  outgoingLight = mix(outgoingLight, pch * (lum / dot(pch, vec3(0.2126, 0.7152, 0.0722))), 0.6 - 0.35 * uNight);
+}
 #include <opaque_fragment>`);
   };
-  m.customProgramCacheKey = () => 'iw2-crowd7';
+  m.customProgramCacheKey = () => 'iw2-crowd8';
   return m;
 }
 

@@ -53,7 +53,7 @@ function dirt() {
     const k = y * N + x;
     const crack = 1 - Math.min(1, (Math.sqrt(d2) - Math.sqrt(d1)) * CC * 6);
     tone[k] = a[k] * 0.5 + b[k] * 0.3 + c[k] * 0.2;
-    H[k] = tone[k] * 0.4 - crack * 0.25 * b[k];
+    H[k] = tone[k] * 0.4 - crack * 0.17 * b[k];
   }
   for (let i = 0; i < 190; i++) {
     const cx = hash(i * 3 + 1) * N, cy = hash(i * 3 + 2) * N, r = 1.2 + hash(i * 3 + 3) * (i < 40 ? 3.6 : 1.6), lum = hash(i * 5 + 7);
@@ -183,24 +183,54 @@ if (vSurf > 0.04 && vSurf < 0.235) {
   diffuseColor.rgb *= sh * mix(vec3(1.0), vec3(1.05, 0.98, 0.9), (jit - 0.5) * fade);
   sfAO = sh;
 } else if (vSurf > 0.32 && vSurf < 0.48 && sfWN.y > 0.2) {
-  vec2 tg = normalize(vec2(-sfWN.z, sfWN.x) + 1e-5);
-  float cy = vWP.y / 0.24, along = dot(vWP.xz, tg) / 0.3;
-  float course = floor(cy), fy = fract(cy);
-  float u = along + course * 0.5, fu = fract(u);
-  float fade = 1.0 - smoothstep(0.35, 0.9, fwidth(cy) + fwidth(along));
-  float jit = sfHash(vec2(course, floor(u)) + 3.1);
-  float tile = mix(0.7, 1.0, smoothstep(0.0, 0.32, fy)) * (1.0 - 0.18 * (1.0 - smoothstep(0.0, 0.07, min(fu, 1.0 - fu)))) * (0.92 + 0.14 * jit);
-  float sh = mix(0.9, tile, fade);
-  diffuseColor.rgb *= sh * mix(vec3(1.0), vec3(1.04, 0.98, 0.95), (jit - 0.5) * fade);
-  sfAO = sh;
+  // R6: courses run across the fall line measured in plan (a shallow porch roof used to get one course from y);
+  // ROOF 0.40 = staggered shingles with a shadowed butt edge, TIN 0.44 = corrugated sheets with lapped seams and rust.
+  vec2 dn = sfWN.xz;
+  vec2 fall = dot(dn, dn) > 0.0025 ? normalize(dn) : vec2(0.0, 1.0);
+  vec2 tg = vec2(-fall.y, fall.x);
+  float down = dot(vWP.xz, fall), along = dot(vWP.xz, tg);
+  if (vSurf < 0.42) {
+    float cy = down / 0.24, au = along / 0.3;
+    float course = floor(cy), fy = fract(cy);
+    float u = au + course * 0.5, fu = fract(u);
+    float fade = 1.0 - smoothstep(0.35, 0.9, fwidth(cy) + fwidth(au));
+    float jit = sfHash(vec2(course, floor(u)) + 3.1);
+    float tile = mix(0.66, 1.0, smoothstep(0.0, 0.3, 1.0 - fy)) * (1.0 - 0.22 * (1.0 - smoothstep(0.0, 0.08, min(fu, 1.0 - fu)))) * (0.88 + 0.2 * jit);
+    float sh = mix(0.9, tile, fade);
+    vec3 dc = diffuseColor.rgb * mix(vec3(1.0), vec3(1.05, 0.97, 0.92), (jit - 0.5) * 2.0 * fade);
+    dc = mix(dc, vec3(dot(dc, vec3(0.33))) * vec3(1.02, 1.0, 0.98), step(0.86, sfHash(vec2(floor(u), course) + 7.7)) * 0.35 * fade);
+    diffuseColor.rgb = dc * sh;
+    sfAO = sh;
+  } else {
+    float cu = along / 0.16, sheet = floor(along / 0.86), sv = down / 2.2;
+    float fade = 1.0 - smoothstep(0.3, 0.8, fwidth(cu));
+    float rib = sin(cu * 6.2832);
+    float lap = 1.0 - 0.3 * (1.0 - smoothstep(0.0, 0.05, fract(sv))) * fade;
+    float jit = sfHash(vec2(sheet, floor(sv)) + 1.3);
+    float rust = smoothstep(0.55, 0.85, sfNoise(vec2(along * 0.9, down * 2.5) + jit * 7.0));
+    diffuseColor.rgb *= (1.0 + 0.12 * rib * fade) * lap * (0.9 + 0.18 * jit);
+    diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.42, 0.2, 0.1), rust * 0.45);
+    sfN = normalize(sfWN + vec3(tg.x, 0.0, tg.y) * cos(cu * 6.2832) * 0.35 * fade);
+    sfR = 0.45 + 0.35 * rust;
+    sfAO = lap;
+  }
 } else if (vSurf < 0.5 && sfWN.y > 0.6) {
   vec2 wp = vWP.xz;
   float big = sfNoise(wp * 0.07) * 0.55 + sfNoise(wp * 0.23 + 7.0) * 0.3 + sfNoise(wp * 0.9 + 3.0) * 0.15;
   if (vSurf < -0.5) {
     float wet = clamp(-vSurf - 1.0, 0.0, 1.0);
-    vec2 uv = wp / 7.5;
-    vec4 a = texture2D(cobA, uv), b = texture2D(cobB, uv);
+    // R6: two rotated samples of the dirt tile blended by a broad noise, so the 7.5 m repeat and the dried-mud
+    // cells never line up into visible tiling; the cracks only show in sunbaked patches.
+    float rmix = smoothstep(0.3, 0.7, sfNoise(wp * 0.05 + 21.0));
+    vec2 uv = wp / 7.5, uv2 = mat2(0.8, -0.6, 0.6, 0.8) * wp / 10.3 + vec2(0.37, 0.71);
+    vec4 a = mix(texture2D(cobA, uv), texture2D(cobA, uv2), rmix), b = mix(texture2D(cobB, uv), texture2D(cobB, uv2), rmix);
+    float crackK = 0.3 + 0.7 * smoothstep(0.5, 0.8, sfNoise(wp * 0.09 + 5.0));
     vec3 alb = a.rgb * 1.4;
+    // large-scale ground variation: compacted darker swathes, pale dusty drifts, and a bleached ochre-grey wash
+    float lg = sfNoise(wp * 0.016 + 4.0), lg2 = sfNoise(wp * 0.0065 - 9.0);
+    alb *= mix(vec3(0.84, 0.82, 0.88), vec3(1.1, 1.07, 1.0), smoothstep(0.15, 0.85, lg));
+    alb = mix(alb, vec3(dot(alb, vec3(0.36, 0.42, 0.22))) * vec3(1.06, 1.0, 0.9), smoothstep(0.4, 0.8, lg2) * 0.5);
+    alb *= 0.93 + 0.12 * sfNoise(wp * 0.42 + 2.0) * (0.6 + 0.4 * crackK);
     float dusty = smoothstep(0.45, 0.85, big), packed = 1.0 - smoothstep(0.15, 0.5, big);
     alb *= mix(vec3(1.0), vec3(1.1, 1.07, 1.02), dusty) * mix(vec3(1.0), vec3(0.86, 0.8, 0.8), packed * 0.8);
     float rut = 0.0, tread = 0.0;
@@ -235,7 +265,7 @@ if (vSurf > 0.04 && vSurf < 0.235) {
     diffuseColor.rgb *= alb;
     sfAO = (0.94 + 0.06 * b.a) * (1.0 - 0.12 * rut);
     diffuseColor.rgb *= sfAO;
-    vec3 pn = normalize(vec3(-(b.r - 0.5) * 0.9, 1.0, -(b.g - 0.5) * 0.9));
+    vec3 pn = normalize(vec3(-(b.r - 0.5) * 0.9 * crackK, 1.0, -(b.g - 0.5) * 0.9 * crackK));
     sfN = normalize(sfN + pn - vec3(0.0, 1.0, 0.0));
     sfR = a.a;
   } else {

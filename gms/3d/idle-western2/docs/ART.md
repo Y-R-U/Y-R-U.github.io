@@ -224,3 +224,20 @@ ghost in a dark stetson, translucent with a cyan fresnel rim, hem flutter + bob 
   test-boot, test-cards, test-scroll PASS (phone rAF p95 4.1 ms, desktop 1.6 ms).
   Open: night cards still bright under lamp light; dirt reads a bit monochrome red-brown at golden; mesas in cards are good,
   in the hero partly hidden by the HUD band.
+- 2026-10-04 A round 6 (critic r5 C#3/4/6/8/9). **Ghosted night characters (C#4):** the lamp-pool decal for any lamp
+  below 3.2 m was a horizontal additive quad at lamp height − 1.6 m (≈1 m up), so it cut through legs, bodies and
+  animals and washed everything under it pale — the "translucent" Mabel/cow. Every pool now lies on the ground
+  (y 0.1); porch boards and walls take their light from the shader lamps. **Lamp pools (C#8):** new crisp pool
+  texture (flat core, 22 % soft edge, faint hot spot) replaces the gaussian blob (decal r 4.2 → 3.3, opacity 0.42);
+  `WORLD_LIGHT_FRAG` uses a defined floor pool (core to 1.7 m, edge by 3.5 m) and a tighter wall/post splash
+  (0.9–2.6 m) instead of `exp(-h²/7)`. **Skin (C#3):** crowd shader grades skin (not the rosy nose; `vSkin` 1 = skin,
+  2 = nose) toward peach at equal luminance after lighting, 60 % by day / 25 % at night, so the orange sun and lamps
+  no longer sunburn faces. **Ground (C#6):** DIRT blends two rotated samples of the 7.5 m tile (second at 10.3 m,
+  rotated 37°) by broad noise, crack normals only in sunbaked patches (texture crack depth 0.25 → 0.17), plus
+  large-scale swathes (~60 m darker/paler, ~150 m bleached ochre-grey) and a 2.4 m mottle; the hex cells are gone.
+  **Roofs (C#9):** ROOF courses now run across the fall line in plan (shallow porch roofs used to get one course);
+  new `SURF.TIN` (0.44) corrugated sheet (ribs + normal, lapped seams, rust patches), used by `falseFront` tin/rust
+  porch roofs. Plot porches (lane P, toned hex slots) don't get it automatically.
+  Shots `docs/art/a/r6_before/`, `r6_after/`, `r6_before_sheet.jpg`, `r6_after_sheet.jpg`. Hero 94 draws max
+  (drawlist), no geometry added; test-boot, test-cards, test-scroll PASS (phone rAF p95 2.8 ms, 157 calls max).
+  Open: gable roof shingles fade out at hero distance; the plain red side walls on some plot buildings are P's.

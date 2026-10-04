@@ -16,6 +16,25 @@ function birdGeo(kit, gull) {
   return b.geometry({ ao: 0.2, aoH: 0.15 });
 }
 
+// Crisp lamp pool: a flat warm core with a short soft edge and a faint hot spot (not a gaussian smear).
+function poolTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d'), img = g.createImageData(128, 128);
+  for (let y = 0; y < 128; y++) for (let x = 0; x < 128; x++) {
+    const d = Math.hypot(x + 0.5 - 64, y + 0.5 - 64) / 64;
+    const e = Math.max(0, Math.min(1, (1 - d) / 0.22));
+    const a = e * e * (3 - 2 * e) * (0.62 + 0.38 * Math.exp(-d * d * 7)) + 0.12 * Math.max(0, 1 - d) * (1 - e);
+    const i = (y * 128 + x) * 4;
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = 255;
+    img.data[i + 3] = Math.round(255 * Math.min(1, a));
+  }
+  g.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 export function createAmbient(kit, scene, { lamps, life, street }) {
   const group = new THREE.Group();
   group.name = 'ambient';
@@ -27,7 +46,7 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
   glow.frustumCulled = false;
   glow.renderOrder = 4;
   group.add(glow);
-  const poolMat = new THREE.MeshBasicMaterial({ color: 0xff7a1c, map: kit.materials.basicBlob.map, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, opacity: 0, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
+  const poolMat = new THREE.MeshBasicMaterial({ color: 0xff7a1c, map: poolTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false, opacity: 0, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -3 });
   const pool = new THREE.Mesh(new THREE.BufferGeometry(), poolMat);
   pool.frustumCulled = false;
   pool.renderOrder = 3;
@@ -39,7 +58,9 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
     glowGeo.setAttribute('position', new THREE.Float32BufferAttribute(lampPos.flat(), 3));
     const pos = [], uv = [], q = [[-1, -1], [1, -1], [1, 1], [-1, -1], [1, 1], [-1, 1]];
     const disc = (x, y, z, rx, rz) => { for (const [u, v] of q) { pos.push(x + u * rx, y, z - v * rz); uv.push((u + 1) / 2, (v + 1) / 2); } };
-    for (const [x, y, z] of lampPos) disc(x, y > 3.2 ? 0.1 : Math.max(0.1, y - 1.6), z, 4.2, 4.2);
+    // R6: every pool lies on the ground. A disc raised to porch height cut through legs and bodies (the "ghosted"
+    // night characters); porch boards and walls get their light from the shader lamps instead.
+    for (const [x, , z] of lampPos) disc(x, 0.1, z, 3.3, 3.3);
     for (const [x, z, rx, rz, y] of spill) disc(x, y ?? 0.1, z, rx, rz);
     pool.geometry.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     pool.geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
@@ -143,7 +164,7 @@ export function createAmbient(kit, scene, { lamps, life, street }) {
       night = n;
       glow.material.opacity = Math.max(0, (n - 0.15) / 0.85) * 0.6;
       glow.visible = glow.material.opacity > 0.01;
-      poolMat.opacity = Math.max(0, (n - 0.2) / 0.8) * 0.55;
+      poolMat.opacity = Math.max(0, (n - 0.2) / 0.8) * 0.42;
       pool.visible = poolMat.opacity > 0.01;
       mistMat.opacity = Math.max(0, (n - 0.3) / 0.7) * 0.05;
       mist.visible = mistMat.opacity > 0.01;
